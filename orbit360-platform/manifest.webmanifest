@@ -1,0 +1,26 @@
+{
+  "name": "Gravicentra Insurance",
+  "short_name": "Gravicentra",
+  "id": "/",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#1E2227",
+  "theme_color": "#C5162E",
+  "description": "Plataforma de gestión integral para intermediarios de seguros.",
+  "icons": [
+    {
+      "src": "/assets/icons/gravicentra-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/assets/icons/gravicentra-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

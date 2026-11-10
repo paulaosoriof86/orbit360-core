@@ -6,6 +6,9 @@
   <title>Gravicentra Insurance · Plataforma</title>
   <meta name="description" content="Gravicentra Insurance — sistema 360 inteligente e integral para intermediarios de seguros.">
   <meta name="theme-color" content="#1E2227">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="icon" type="image/png" sizes="192x192" href="/assets/icons/gravicentra-192.png">
+  <link rel="apple-touch-icon" href="/assets/icons/gravicentra-192.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=Source+Sans+3:ital,wght@0,400;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
@@ -106,6 +109,35 @@
     (function(){var sel=document.getElementById('rol-sel'),lbl=document.getElementById('tb-rol-lbl');function roles(){return Orbit.session&&Orbit.session.allowedRoles?Orbit.session.allowedRoles():[];}function label(r){return Orbit.session&&Orbit.session.roleLabel?Orbit.session.roleLabel(r):r;}function rebuild(){if(Orbit.router&&Orbit.router.rebuildSidebar)Orbit.router.rebuildSidebar();try{window.dispatchEvent(new HashChangeEvent('hashchange'));}catch(e){window.dispatchEvent(new Event('hashchange'));}}function paint(){var list=roles(),active=Orbit.session&&Orbit.session.rol?Orbit.session.rol():'';if(!list.length){sel.innerHTML='<option value="">Acceso en validación</option>';sel.disabled=true;if(lbl)lbl.textContent='Acceso en validación · salir';return;}sel.disabled=false;sel.innerHTML=list.map(function(r){return '<option value="'+r+'">'+label(r)+'</option>';}).join('');if(active&&list.indexOf(active)>=0)sel.value=active;else sel.value=list[0];if(lbl)lbl.textContent=label(active&&list.indexOf(active)>=0?active:list[0])+' · salir';}paint();sel.addEventListener('change',function(e){e.stopPropagation();var ok=Orbit.session&&Orbit.session.set?Orbit.session.set(sel.value):false;if(ok===false)paint();});document.addEventListener('orbit:session',function(){paint();rebuild();});document.addEventListener('orbit:session:blocked',paint);window.addEventListener('orbit:product-readonly-bootstrap',function(e){if(e&&e.detail&&e.detail.ready===true){if(Orbit.session&&Orbit.session.syncFromAuth)Orbit.session.syncFromAuth();else paint();}});})();
     (function(){
       var bell=document.getElementById('ops-inbox-bell'),cnt=document.getElementById('ops-inbox-count'),rows=[],refreshFlight=null,refreshKey='',refreshSequence=0,lastRenderedScope='',refreshState='idle',lastPublishedInboxSignature='';
+      // Only server-authorized inbox notices reach this scope. Audio never starts without a browser user gesture.
+      var inboxSound={scope:'',initialized:false,seen:new Set(),armed:false,audio:null,lastAt:0};
+      function soundPreferenceKey(){return 'gravicentra-inbox-chime:'+inboxScope();}
+      function soundEnabled(){try{return localStorage.getItem(soundPreferenceKey())!=='off';}catch(_e){return true;}}
+      function armInboxSound(){inboxSound.armed=true;try{
+        var Ctx=window.AudioContext||window.webkitAudioContext;if(!Ctx)return;
+        if(!inboxSound.audio)inboxSound.audio=new Ctx();
+        if(inboxSound.audio.state==='suspended')inboxSound.audio.resume().catch(function(){});
+      }catch(_e){inboxSound.audio=null;}}
+      document.addEventListener('pointerdown',armInboxSound,{once:true});
+      document.addEventListener('keydown',armInboxSound,{once:true});
+      function inboxChimeDecision(state,scope,notices){
+        if(state.scope!==scope){state.scope=scope;state.initialized=false;state.seen=new Set();}
+        var ids=[].concat(notices||[]).filter(function(r){return r&&r.eventId;});
+        if(!state.initialized){state.initialized=true;ids.forEach(function(r){state.seen.add(String(r.eventId));});return false;}
+        var isNew=ids.some(function(r){return !state.seen.has(String(r.eventId))&&!r.archived&&!r.globalResolved&&!r.read&&!r.acknowledged;});
+        ids.forEach(function(r){state.seen.add(String(r.eventId));});
+        return isNew;
+      }
+      function shouldPlayInboxChime(){return inboxSound.armed&&soundEnabled()&&document.visibilityState==='visible'&&(!document.hasFocus||document.hasFocus())&&!!(inboxSound.audio&&inboxSound.audio.state==='running');}
+      function playInboxChime(){if(!shouldPlayInboxChime()||Date.now()-inboxSound.lastAt<2500)return;inboxSound.lastAt=Date.now();try{
+        var ctx=inboxSound.audio,when=ctx.currentTime;
+        [720,940].forEach(function(hz,i){var osc=ctx.createOscillator(),gain=ctx.createGain(),at=when+i*0.16;
+          osc.type='sine';osc.frequency.setValueAtTime(hz,at);
+          gain.gain.setValueAtTime(0.0001,at);gain.gain.exponentialRampToValueAtTime(0.055,at+0.02);gain.gain.exponentialRampToValueAtTime(0.0001,at+0.2);
+          osc.connect(gain);gain.connect(ctx.destination);osc.start(at);osc.stop(at+0.21);
+        });
+      }catch(_e){}}
+
       function tenant(){var x=window.__ORBIT360_PRODUCT_PUBLIC_CONFIG__||{};return String(x.tenantHint||'').trim();}
       function preview(){return /--/.test(String(location.hostname||''));}
       function activeRole(){try{return Orbit.session&&Orbit.session.rol?Orbit.session.rol():'';}catch(e){return'';}}
@@ -153,7 +185,8 @@
         var flight=call(preview()?'orbit360GetAdvisorOpsInboxPreview':'orbit360GetAdvisorOpsInbox',{tenantId:tenant(),activeRole:role,limit:100,includeArchived:true})
           .then(function(out){
             if(seq!==refreshSequence||key!==inboxScope())return rows;
-            rows=[].concat(out&&out.notices||[]);refreshState='ready';paint();
+            rows=[].concat(out&&out.notices||[]);refreshState='ready';
+            if(inboxChimeDecision(inboxSound,key,rows))playInboxChime();paint();
             var dr=document.getElementById('ops-inbox-drawer');if(dr?.classList.contains('open'))open();
             return rows;
           }).catch(function(e){
@@ -208,7 +241,7 @@
         if(!back){back=document.createElement('div');back.id='ops-inbox-back';back.className='drawer-back';dr=document.createElement('div');dr.id='ops-inbox-drawer';dr.className='drawer';document.body.appendChild(back);document.body.appendChild(dr);back.addEventListener('click',function(){back.classList.remove('open');dr.classList.remove('open');});}
         var esc=Orbit.ui.esc,active=rows.filter(function(r){return !r.archived&&!r.globalResolved;}),resolved=rows.filter(function(r){return !r.archived&&r.globalResolved;}),visible=active.concat(resolved);
         dr.innerHTML='<div class="imp-head"><div><div class="imp-eyebrow">Colaboración interna</div><div class="imp-title">📥 Tareas compartidas</div></div><button class="imp-x" id="ops-inbox-x">✕</button></div>'+
-          '<div class="inbox-toolbar" style="flex-wrap:wrap;gap:8px"><span class="inbox-active-count"><b>'+active.length+'</b><span>activas</span></span><span class="muted">'+resolved.length+' resueltas sin archivar</span><button class="btn ghost sm" id="ops-inbox-home" type="button">Ir a Inicio</button><button class="btn ghost sm" id="ops-inbox-archive-resolved">Archivar resueltas</button></div>'+ 
+          '<div class="inbox-toolbar" style="flex-wrap:wrap;gap:8px"><span class="inbox-active-count"><b>'+active.length+'</b><span>activas</span></span><span class="muted">'+resolved.length+' resueltas sin archivar</span><button class="btn ghost sm" id="ops-inbox-home" type="button">Ir a Inicio</button><button class="btn ghost sm" id="ops-inbox-sound" type="button" aria-pressed="'+(soundEnabled()?'true':'false')+'">'+(soundEnabled()?'🔔 Silenciar avisos':'🔕 Activar sonido')+'</button><button class="btn ghost sm" id="ops-inbox-archive-resolved">Archivar resueltas</button></div>'+ 
           '<div class="imp-body"><div class="cfg-note" style="margin-bottom:10px"><b>Estados separados:</b> “Reconocida por ti” es personal. “Resuelta para todos” cierra la tarea compartida para sus destinatarios.</div><div class="inbox-list" data-inbox-render-count="'+visible.length+'">'+(visible.length?visible.map(function(n){
             var resolved=!!n.globalResolved,cls=resolved?'inbox-attended':n.acknowledged?'inbox-read':n.read?'inbox-read':'inbox-new',status=n.statusLabel||resolved&&'Resuelta para todos'||n.acknowledged&&'Reconocida por ti'||n.read&&'Vista por ti'||'Nueva';
             var actor=inboxHumanIdentity(n.actorName,n.actorUid),recipient=n.targetType==='advisor'?'Asesor asignado':n.targetType==='role'?'Equipo operativo':'Destinatario autorizado',owner=n.targetType==='advisor'?'Asesor responsable':'Equipo autorizado';
@@ -218,6 +251,7 @@
           }).join(''):'<div class="empty">'+(refreshState==='error'?'No se pudo consultar las solicitudes. Vuelve a abrir para reintentar.':refreshState==='loading'?'Cargando solicitudes compartidas…':'No tienes solicitudes internas pendientes.')+'</div>')+'</div></div>';
         dr.querySelector('#ops-inbox-x').onclick=function(){back.classList.remove('open');dr.classList.remove('open');};
         dr.querySelector('#ops-inbox-home').onclick=function(){back.classList.remove('open');dr.classList.remove('open');location.hash='#/inicio';};
+        dr.querySelector('#ops-inbox-sound').onclick=function(){try{localStorage.setItem(soundPreferenceKey(),soundEnabled()?'off':'on');}catch(_e){}armInboxSound();open();};
         function byEvent(id){return rows.find(function(r){return String(r.eventId||'')===String(id||'');});}
         dr.querySelectorAll('[data-inbox-event]').forEach(function(b){b.onclick=function(){
           var row=byEvent(b.dataset.inboxEvent);
@@ -251,7 +285,10 @@
       document.addEventListener('orbit:auth',function(){setTimeout(function(){refresh(true);},80);});
       document.addEventListener('orbit:ciclo',function(){setTimeout(refresh,80);});
       window.addEventListener('orbit:product-readonly-bootstrap',function(e){if(e&&e.detail&&e.detail.ready===true)setTimeout(refresh,100);});
-      setTimeout(refresh,1200);setInterval(refresh,60000);
+      setTimeout(refresh,1200);
+      document.addEventListener('visibilitychange',function(){if(document.visibilityState==='visible')refresh(true);});
+      window.addEventListener('focus',function(){if(document.visibilityState==='visible')refresh(true);});
+      setInterval(function(){if(document.visibilityState==='visible')refresh();},30000);
     })();
     document.getElementById('tb-user').addEventListener('click',function(){Orbit.ui.confirm('¿Cerrar sesión?',{title:'Cerrar sesión',ok:'Cerrar sesión',danger:false}).then(function(ok){if(ok)Orbit.auth.logout();});});
 

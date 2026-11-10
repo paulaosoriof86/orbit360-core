@@ -1,6 +1,6 @@
 /* ============================================================
-   Orbit 360 · PWA — instalable como app (white-label)
-   - Manifest dinámico desde la marca del cliente (nombre + logo + color)
+   Gravicentra Insurance · PWA — manifiesto estático auditable
+   - Manifiesto HTTPS estático y marca de producto, independiente del tenant
    - Favicon / apple-touch-icon desde el logo del cliente
    - Captura beforeinstallprompt y ofrece instalar (auto, según dispositivo)
    - Registra service worker (no-op si el origen no lo permite)
@@ -66,12 +66,12 @@
   }
   function publicBrand() { try { return window.OrbitPublicTenantBranding && OrbitPublicTenantBranding.current ? OrbitPublicTenantBranding.current() : null; } catch (e) { return null; } }
   function clientLogo() { try { var p=publicBrand(),t = Orbit.tenant && Orbit.tenant.get(); return (p&&p.logo) || (t && t.branding && t.branding.logo) || localStorage.getItem('orbit360_logo') || ''; } catch (e) { return ''; } }
-  function tenantIcon() { try { var p=publicBrand(); return (p&&p.favicon) || clientLogo() || fallbackIcon(); } catch(e){ return fallbackIcon(); } }
-  function clientName() { try { var p=publicBrand(),t = Orbit.tenant && Orbit.tenant.get(); return (p&&p.displayName) || (t && t.empresa) || 'Orbit 360'; } catch (e) { return 'Orbit 360'; } }
+  function tenantIcon() { return '/assets/icons/gravicentra-192.png'; }
+  function clientName() { return 'Gravicentra Insurance'; }
   function themeColor() { try { return getComputedStyle(document.documentElement).getPropertyValue('--red').trim() || '#C5162E'; } catch (e) { return '#C5162E'; } }
   function fallbackIcon() { var c = themeColor(); var svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192"><rect width="192" height="192" rx="34" fill="#1E2227"/><circle cx="96" cy="96" r="42" fill="' + c + '"/><circle cx="96" cy="96" r="18" fill="#1E2227"/></svg>'; return 'data:image/svg+xml;base64,' + btoa(svg); }
   function setFavicons() { var icon = tenantIcon(); ['icon', 'apple-touch-icon'].forEach(function (rel) { var l = document.querySelector('link[rel="' + rel + '"]'); if (!l) { l = document.createElement('link'); l.rel = rel; document.head.appendChild(l); } l.href = icon; }); }
-  function buildManifest() { var icon = tenantIcon(); var manifest = { name: clientName() + ' · Orbit 360', short_name: clientName().slice(0, 18), start_url: '.', scope: '.', display: 'standalone', orientation: 'any', background_color: '#1E2227', theme_color: themeColor(), description: 'Sistema 360 para intermediarios de seguros.', icons: [{ src: icon, sizes: '192x192', type: icon.indexOf('svg') >= 0 ? 'image/svg+xml' : 'image/png', purpose: 'any maskable' }, { src: icon, sizes: '512x512', type: icon.indexOf('svg') >= 0 ? 'image/svg+xml' : 'image/png', purpose: 'any maskable' }] }; var blob = new Blob([JSON.stringify(manifest)], { type: 'application/manifest+json' }); var url = URL.createObjectURL(blob); var link = document.querySelector('link[rel="manifest"]'); if (!link) { link = document.createElement('link'); link.rel = 'manifest'; document.head.appendChild(link); } link.href = url; }
+  function buildManifest() { var link = document.querySelector('link[rel="manifest"]'); if (!link) { link = document.createElement('link'); link.rel = 'manifest'; document.head.appendChild(link); } link.href = '/manifest.webmanifest'; }
   var deferredPrompt = null;
   function showInstall(estado) {
     var prev = document.getElementById('pwa-install'); if (prev) prev.remove();

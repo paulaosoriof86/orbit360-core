@@ -242,6 +242,39 @@
           "gitBlobSha": "128b1e778d32e7a99c5efc5f0d31050381fddc17"
         }
       ]
+    },
+    {
+      "id": "I6_6_BRANDED_PWA_INSTALL_ICONS_AND_INBOX_CHIME_SCOPE",
+      "approvedByDirection": true,
+      "receipt": "Paula Andrea Osorio Franco, Direccion 2026-11-10: installable Gravicentra Insurance PWA with real 192/512 orbit icons; on-gesture in-app chime for NEW scoped authorized inbox notice IDs and persisted per-user mute, with no FCM/WhatsApp/Make, no Firestore data writes and explicit Chrome browser install UAT HOLD until connected session.",
+      "paths": [
+        {
+          "path": "orbit360-platform/index.html",
+          "gitBlobSha": "dc63f677312771ff36f434a2ce330463967c7f30"
+        },
+        {
+          "path": "orbit360-platform/core/pwa.js",
+          "gitBlobSha": "e610a243aa5b19820c08c5d709b9a76b1876004b"
+        },
+        {
+          "path": "orbit360-platform/manifest.webmanifest",
+          "gitBlobSha": "3287dcfd5378ca9be8685edd33090066a4c17aa9"
+        },
+        {
+          "path": "orbit360-platform/assets/icons/gravicentra-192.png",
+          "gitBlobSha": "8fc4749c72fec08e2d8606ada4efb790a2ba32dc"
+        },
+        {
+          "path": "orbit360-platform/assets/icons/gravicentra-512.png",
+          "gitBlobSha": "8026b39e77ece29da05a9f74e5b060d60f84e6be"
+        }
+      ],
+      "tests": [
+        {
+          "path": "tools/gravicentra-i6-6-inbox-chime-pwa-installability.test.cjs",
+          "gitBlobSha": "3768dfa3f14b50afb707c7a7ae7e116592984494"
+        }
+      ]
     }
   ]
 }

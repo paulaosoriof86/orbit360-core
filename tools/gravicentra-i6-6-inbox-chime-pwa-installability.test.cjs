@@ -1,0 +1,100 @@
+'use strict';
+const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const path = require('node:path');
+const zlib = require('node:zlib');
+const ROOT = path.resolve(__dirname, '..');
+const platform = path.join(ROOT, 'orbit360-platform');
+const read = (name) => fs.readFileSync(path.join(platform, name), 'utf8');
+const html = read('index.html');
+const pwa = read('core/pwa.js');
+const sw = read('sw.js');
+const manifest = JSON.parse(read('manifest.webmanifest'));
+let checks = 0;
+const check = (predicate, message) => { assert.ok(predicate, message); checks++; };
+
+check(manifest.name === 'Gravicentra Insurance', 'Product PWA name is branded');
+check(manifest.short_name === 'Gravicentra', 'Compact product brand');
+check(manifest.id === '/' && manifest.start_url === '/' && manifest.scope === '/', 'Same-origin root identity, start and scope');
+check(manifest.display === 'standalone', 'Standalone launch');
+check(manifest.theme_color === '#C5162E' && manifest.background_color === '#1E2227', 'Canonical palette');
+check(/<link rel="manifest" href="\/manifest\.webmanifest">/.test(html), 'Static manifest linked at first render');
+check(/link\.href = '\/manifest\.webmanifest'/.test(pwa), 'Brand refresh retains static manifest');
+check(!pwa.includes('URL.createObjectURL(blob)'), 'No Blob manifest URL');
+check(/navigator\.serviceWorker\.register\('sw\.js\?v='/.test(pwa), 'Same-origin service worker registration');
+check(/addEventListener\('fetch'/.test(sw), 'Service worker has fetch handler');
+const sig = Buffer.from([137,80,78,71,13,10,26,10]);
+function validatePNG(src, expected) {
+  const file = path.join(platform, src.slice(1));
+  const buf = fs.readFileSync(file);
+  assert.ok(buf.subarray(0, 8).equals(sig), src + ' valid PNG signature');
+  let pos = 8, width = 0, height = 0, depth = 0, color = 0, palette = null, idat = [];
+  while (pos + 12 <= buf.length) {
+    const len = buf.readUInt32BE(pos), type = buf.subarray(pos + 4, pos + 8).toString('ascii');
+    const data = buf.subarray(pos + 8, pos + 8 + len);
+    assert.ok(pos + len + 12 <= buf.length, 'PNG chunk within file');
+    if (type === 'IHDR') { width = data.readUInt32BE(0); height = data.readUInt32BE(4); depth = data[8]; color = data[9]; }
+    if (type === 'PLTE') palette = data;
+    if (type === 'IDAT') idat.push(data);
+    pos += len + 12;
+    if (type === 'IEND') break;
+  }
+  check(width === expected && height === expected, src + ' exact square pixels');
+  check(depth === 4 && color === 3 && !!palette && idat.length > 0, src + ' decodable indexed PNG structure');
+  check(palette[0] === 30 && palette[1] === 34 && palette[2] === 39, src + ' original charcoal background');
+  check(palette[45] === 197 && palette[46] === 22 && palette[47] === 46, src + ' original red orbit');
+  const raw = zlib.inflateSync(Buffer.concat(idat));
+  check(raw.length === expected * (1 + expected / 2), src + ' fully inflated scanlines');
+  check(raw[0] === 0 && raw[(1 + expected/2) * Math.floor(expected/2)] === 0, src + ' valid PNG scanline filters');
+  const sample = (x, y) => {
+    const p = y * (1 + expected / 2) + 1 + Math.floor(x / 2);
+    const packed = raw[p];
+    return x % 2 === 0 ? packed >>> 4 : packed & 0x0f;
+  };
+  check(sample(0, 0) === 0 && sample(Math.floor(expected / 2), Math.floor(expected / 2)) === 0, src + ' charcoal corners and core');
+  check(sample(Math.floor(expected / 2 + 0.15*expected), Math.floor(expected / 2)) >= 14, src + ' orbit ring visible');
+  return file;
+}
+check(Array.isArray(manifest.icons) && manifest.icons.length === 2, 'Two actual PNG launch icons');
+for (const size of [192,512]) {
+  const icon = manifest.icons.find(x => x.sizes === size + 'x' + size);
+  check(!!icon && icon.src === '/assets/icons/gravicentra-' + size + '.png' && icon.type === 'image/png', 'Correct local icon ' + size);
+  check(icon.purpose.includes('maskable'), 'Safe-zone orbit available for adaptive mask');
+  validatePNG(icon.src, size);
+}
+const scriptParts = [...html.matchAll(/<script(?:\s[^>]*)?>([\s\S]*?)<\/script>/g)].map(x => x[1]).filter(x => x.trim());
+check(scriptParts.length > 0, 'Product inline runtime script exists');
+for (const script of scriptParts) new Function(script);
+new Function(pwa);
+check(/new Set\(\)/.test(html) && /function inboxChimeDecision/.test(html), 'Sound only for new server-authorized event IDs');
+check(/document\.addEventListener\('pointerdown',armInboxSound/.test(html) && /document\.addEventListener\('keydown',armInboxSound/.test(html), 'Explicit activation gesture required');
+check(/gravicentra-inbox-chime:/.test(html) && /function soundEnabled\(\)/.test(html) && /ops-inbox-sound/.test(html), 'Mute toggle persisted per user scope');
+check(/document\.visibilityState==='visible'/.test(html) && /document\.hasFocus\(\)/.test(html), 'Silent on hidden or unfocused tab');
+check(/inboxScope\(\).*join\('\|'\)/.test(html), 'Inbox scope includes tenant, uid and role');
+check(/inboxChimeDecision\(inboxSound,key,rows\)/.test(html), 'Sound follows successful inbox server readback');
+const start = html.indexOf('function inboxChimeDecision(');
+const end = html.indexOf('function shouldPlayInboxChime(', start);
+check(start > 0 && end > start, 'Isolated pure new-ID decision');
+const decision = new Function(html.slice(start,end) + '; return inboxChimeDecision;')();
+const n = (eventId, state={}) => ({eventId,read:false,acknowledged:false,archived:false,globalResolved:false,...state});
+const state={scope:'',initialized:false,seen:new Set()};
+check(decision(state,'GT|u1|asesor',[n('a')])===false, 'No sound on first baseline');
+check(decision(state,'GT|u1|asesor',[n('a'),n('b')])===true, 'One new notice');
+check(decision(state,'GT|u1|asesor',[n('b')])===false, 'No repeated sound');
+check(decision(state,'GT|u1|asesor',[n('c',{globalResolved:true})])===false, 'No resolved sound');
+check(decision(state,'GT|u1|asesor',[n('d',{read:true})])===false, 'No read sound');
+check(decision(state,'GT|u1|asesor',[n('e',{archived:true})])===false, 'No archived sound');
+check(decision(state,'CO|u1|asesor',[n('f')])===false, 'Silent tenant switch');
+check(decision(state,'CO|u1|asesor',[n('f'),n('g')])===true, 'New notice in current country');
+check(decision(state,'CO|u2|asesor',[n('h')])===false, 'Silent user switch');
+check(decision(state,'CO|u2|operativo',[n('j')])===false, 'Silent role switch');
+const gateSrc=html.slice(html.indexOf('function shouldPlayInboxChime('),html.indexOf('function playInboxChime('));
+const canSound = new Function('inboxSound','soundEnabled','document',gateSrc+';return shouldPlayInboxChime();');
+const sound={armed:true,audio:{state:'running'}}, doc={visibilityState:'visible',hasFocus:()=>true};
+check(canSound(sound,()=>true,doc)===true, 'Unlocked, visible and unmuted');
+check(canSound({...sound,armed:false},()=>true,doc)===false, 'Silent before gesture');
+check(canSound(sound,()=>false,doc)===false, 'Silent when muted');
+check(canSound(sound,()=>true,{...doc,visibilityState:'hidden'})===false, 'Silent when tab hidden');
+check(canSound(sound,()=>true,{...doc,hasFocus:()=>false})===false, 'Silent when window unfocused');
+check(canSound({...sound,audio:{state:'suspended'}},()=>true,doc)===false, 'Silent when audio context blocked');
+console.log('I6_6_INBOX_CHIME_PWA_BRAND_INSTALLABILITY_SOURCE_PASS checks='+checks+' chromeInstallOffer=NOT_TESTED browser=HOLD');
