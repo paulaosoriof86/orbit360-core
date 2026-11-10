@@ -27,7 +27,15 @@ const findings={
     cp.b4003ProtectedPreviewAuthorization?.authenticatedPreviewProofPassed!==true
 };
 const blocked=Object.values(findings).some(Boolean);
-assert.equal(cp.gateState?.gates?.I6?.activeSubgate,'I6.5');
+const currentI6Gate=cp.gateState?.gates?.I6?.activeSubgate;
+assert.ok(['I6.5','I6.6'].includes(currentI6Gate),'UNEXPECTED_I6_OPERATIONAL_SUBGATE');
+if(currentI6Gate==='I6.6'){
+ const live=cp.b4007OwnerOperationalGateClosure20261110||{};
+ assert.equal(live.operationalReleaseClosedByDirection,true,'I66_REQUIRES_B4007_CLOSED_BY_OWNER');
+ assert.equal(live.lastClosedReleaseGate,'B4-007','I66_REQUIRES_B4007_RELEASE_LINEAGE');
+ assert.equal(live.nextOperationalGate,'I6.6','I66_NEXT_GATE_DRIFT');
+ assert.equal(live.noUnprovenFullModulePassClaim,true,'I66_MUST_NOT_FORGE_FULL_SECURITY_QA');
+}
 if(blocked){
  assert.equal(hold.firestoreRulesDeployAuthorized,false,'UNSAFE_FIRESTORE_RULES_DEPLOY_AUTHORIZED');
  assert.equal(hold.livePromotionAuthorized,false,'UNSAFE_LIVE_PROMOTION_AUTHORIZED');
