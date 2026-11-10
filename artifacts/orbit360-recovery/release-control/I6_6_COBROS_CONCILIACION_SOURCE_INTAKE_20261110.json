@@ -530,6 +530,21 @@
       "id": "BAYRON_TWO_QUOTAS",
       "authority": "PAULA_PRIOR_EXPLICIT_PLUS_LATER_2026_11_09_PAID_CONFIRMATION",
       "rule": "Two actual installments of Q1,557.92 each, not 12 installments. 2026-11-06 Rural statement's one-pending snapshot and owner's later both-paid confirmation are time-different evidence; require a later paid supporting source or controlled user attestation with date before writing paid-at."
+    },
+    {
+      "id": "NOVEMBER_INVOICED_OCTOBER_COLLECTIONS",
+      "authority": "PAULA_DIRECT_2026_11_10",
+      "rule": "Insurer commission planillas and invoices issued in November are for underlying premium collections performed in October 2026. Source calendar for collection = 2026-10, invoice issuance/document filing = 2026-11. Commission calculation uses net premium only; never infer premium-collection month from invoice month."
+    },
+    {
+      "id": "STATEMENT_ASOF_PENDING_FORWARD",
+      "authority": "PAULA_DIRECT_2026_11_10",
+      "rule": "Insurer account statements reporting cartera pending as of source cutoff represent obligations awaiting payment from that cutoff onward, with individual due-date semantics. A due item can be overdue by cutoff or future-due; paid-report datasets are a separate exception."
+    },
+    {
+      "id": "PAID_REPORT_PERIOD_EXPLICIT_EXCEPTION",
+      "authority": "PAULA_DIRECT_2026_11_10",
+      "rule": "Statements titled/reporting 'cobros realizados'/'primas cobradas' are actual collections performed during the explicitly stated report period; these must not be modeled as pending receivables. Cross-statement dedupe by canonical policy+edition+installment+insurer requirement and as-of precedence."
     }
   ],
   "newlyObservedStatementEvidence": [
@@ -588,5 +603,14 @@
     "insurerStatementsNativeFormatsParsed": true,
     "all35CurrentSourceRawHashesPinned": true,
     "fourHistoricalReferenceHashesPinned": true
+  },
+  "periodSemantics": {
+    "commissionInvoiceMonth": "2026-11",
+    "commissionRecaudoMonth": "2026-10",
+    "statementCurrentStatus": "PENDING_AS_OF_SOURCE_CUTOFF_WITH_DUE_DATES",
+    "statementException": "PAID_REPORT_ACTUAL_COLLECTIONS_IN_EXPLICIT_REPORTED_PERIOD",
+    "sourceDatePrecedence": "LATER_PAID_EVIDENCE_CAN_SUPERSEDE_EARLIER_PENDING_SNAPSHOT_FOR_SAME_EXACT_REQUIREMENT",
+    "historicalCalibrationMonth": "2026-09",
+    "customerTotalVsNetCommissionBase": "DISTINCT_FIELDS_NO_BASIS_SUBSTITUTION"
   }
 }
