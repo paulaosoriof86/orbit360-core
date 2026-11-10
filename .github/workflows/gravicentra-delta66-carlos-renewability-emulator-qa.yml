@@ -1,0 +1,61 @@
+# I6.6 Carlos P0; local emulator only. No secrets, no Firebase LIVE, no deploy.
+name: Gravicentra I6.6 Carlos Renovability Emulator Role Country Tenant
+on:
+  push:
+    branches: [recovery/fase-a-clean-20260831]
+    paths:
+      - .github/workflows/gravicentra-delta66-carlos-renewability-emulator-qa.yml
+      - tools/gravicentra-delta66-carlos-renewability-emulator.test.cjs
+permissions:
+  contents: read
+concurrency:
+  group: gi-i66-carlos-emulator-recovery
+  cancel-in-progress: false
+jobs:
+  carlos-only-local:
+    if: github.repository == 'paulaosoriof86/orbit360-core' && github.ref == 'refs/heads/recovery/fase-a-clean-20260831'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 18
+    env:
+      SOURCE_SHA: 35008e0d5b9ac81907e0041398e6434d0fcda631
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - name: Pinned exact Carlos source, historic B4 unchanged, and focal tests
+        run: |
+          set -euo pipefail
+          for p in functions/product-operational-domain.js orbit360-platform/core/policy-receipts-engine.js orbit360-platform/modules/policy-receipts-v1199-bridge.js orbit360-platform/data/store-firestore-product-operational-p0.js;do
+            test "$(git hash-object "$p")" = "$(git rev-parse "$SOURCE_SHA:$p")" || { echo "I66_CARLOS_SOURCE_DRIFT:$p";exit 1; }
+          done
+          node --check tools/gravicentra-delta66-carlos-renewability-emulator.test.cjs
+          node --check functions/product-operational-domain.js
+          node tools/gravicentra-i6-6-delta-guard.mjs
+          node --test tools/gravicentra-i6-6-carlos-renewability-only.test.cjs tools/gravicentra-i6-6-operativo-cross-advisor-scope.test.cjs tools/gravicentra-i6-6-delta-supersession.test.cjs
+      - name: Install Firestore emulator and existing backend dependencies only
+        run: |
+          set -euo pipefail
+          test -z "$(printenv GOOGLE_APPLICATION_CREDENTIALS || true)"
+          (cd functions && npm ci --ignore-scripts --no-audit --no-fund >/dev/null)
+          npm install --prefix "$RUNNER_TEMP/gi-i66-carlos-emulator-cli" --no-save --ignore-scripts --no-audit --no-fund firebase-tools@14.10.1 >/dev/null
+          node tools/gravicentra-firebase-tools-empty-extensions-workaround-v1.mjs "$RUNNER_TEMP/gi-i66-carlos-emulator-cli"
+      - name: Authenticated transaction positive+negative country role tenant CAS and finance-preservation
+        env:
+          GCLOUD_PROJECT: demo-gravicentra-i66-carlos
+          FIREBASE_PROJECT_ID: demo-gravicentra-i66-carlos
+          FIREBASE_CONFIG: '{"projectId":"demo-gravicentra-i66-carlos"}'
+        run: |
+          set -euo pipefail
+          test -z "$(printenv GOOGLE_APPLICATION_CREDENTIALS || true)"
+          CLI="$RUNNER_TEMP/gi-i66-carlos-emulator-cli/node_modules/firebase-tools/lib/bin/firebase.js"
+          node "$CLI" emulators:exec --only firestore --project demo-gravicentra-i66-carlos --non-interactive --config firebase.json "node tools/gravicentra-delta66-carlos-renewability-emulator.test.cjs"
+          echo "I66_CARLOS_EMULATOR_LIVE_WRITES=0"
