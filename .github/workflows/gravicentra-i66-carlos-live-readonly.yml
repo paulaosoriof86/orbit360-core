@@ -28,7 +28,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Verify exact I6.6 source owner and strictly read-only diagnostic
+      - name: Verify exact I6.6 source owner and strictly read-only diagnostic v2
         run: |
           set -euo pipefail
           test "$(git hash-object functions/product-operational-domain.js)" = "$GI_CARLOS_PRODUCT_SOURCE_BLOB"

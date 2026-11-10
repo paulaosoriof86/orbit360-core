@@ -20,7 +20,7 @@ const MAX_ACTIVITY = 120;
 const MAX_EVENTS = 120;
 const norm = value => String(value ?? '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim().replace(/\s+/g, ' ');
 const unique = values => [...new Set((Array.isArray(values) ? values : []).map(v => String(v ?? '').trim()).filter(Boolean))];
-const maskUid = value => crypto.createHash('sha256').update(String(value || '')).digest('hex').slice(0, 16);
+const maskUid = value => crypto.hash('sha256', String(value || ''), 'hex').slice(0, 16);
 const readNames = row => unique([
   row.nombreCompleto, row.fullName, row.displayName, row.name,
   row.nombre, [row.nombre, row.apellidos].filter(Boolean).join(' '),
