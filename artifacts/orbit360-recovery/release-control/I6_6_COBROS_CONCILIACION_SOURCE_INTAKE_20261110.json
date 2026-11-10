@@ -7208,5 +7208,140 @@
       "paymentStatusChanged": 0
     },
     "nextRequiredStep": "Active I6.6 source-delta release successor: preserve prior B4-007 frozen SHA/artifact evidence, test number field edit and patch-only mutation with actor/role + Firestore concurrent write simulation, build once immutable Preview and promote identical artifact to LIVE after guards; then apply 10 insurer numbers with before/after per receipt. Never blindly rerun old B4 Preview gates."
+  },
+  "i66ParallelOperationalFindings20261110": {
+    "id": "GI_I66_PARALLEL_OPERATIVE_FIXES_20261110",
+    "dateGuatemala": "2026-11-10",
+    "owner": "Paula Osorio · Dirección",
+    "authority": "user-approved corrections in Gravicentra Insurance; source authority recovery/fase-a-clean-20260831; B4-007 CLOSED, I6.6 ACTIVE",
+    "status": "FROZEN_ISSUES_ACTIVE_IMPLEMENTATION_PENDING_QA_PREVIEW_LIVE",
+    "releasePolicy": {
+      "singleCandidate": true,
+      "existingBranch": "recovery/fase-a-clean-20260831",
+      "legacyGate": "B4-007 CLOSED; do not reopen historic seals",
+      "release": "Source changes require new immutable artifact; exact same artifact Preview→LIVE; verify app.aysseguros.com separately; rollback ready",
+      "concurrentData": "Team enters new business in LIVE; historical deltas patch-only, read LIVE before applying, no reimports/no overwrites/no duplicate payments"
+    },
+    "defects": {
+      "carlosNonRenewableEdit": {
+        "report": "Operativo Carlos attempted to mark policy non-renewable; UI returned 'No fue posible confirmar el guardado en el servidor. Ningún cambio debe darse por aplicado hasta obtener readback.'",
+        "status": "ROOT_OF_SPECIFIC_FAILURE_UNDETERMINED; STATIC_CAUSE_FANOUT_CONFIRMED",
+        "source": "policy-receipts-v1199-bridge.js → policy-receipts-engine.js → batchDurable/Callable",
+        "cause": "A renewability-only edit builds policy+many receipt+cartera mutations; generic error masks backend code/readback",
+        "fix": "Diff and patch renewable only with audit; no receipt/cartera/cobro/vehicle updates; safe operationId and backend code; readback before retry",
+        "roles": "Operate across advisors within authorized tenant and country; do not relax existing advisor restrictions based on unrelated creation case",
+        "acceptance": "Operativo same-country cross-advisor, audit, after reload, unchanged amounts/due dates/paid status; negative cross-country; no duplicate writes"
+      },
+      "advisorReportPayment": {
+        "report": "Advisor 'Reportar pago' toast 'No fue posible enviar el reporte de pago a Ops.'; date 2026-08-18, transfer, optional support",
+        "status": "SPECIFIC_REJECTION_UNDETERMINED; MISSING_OUTBOX_CONFIRMED",
+        "source": "modules/cobros.js → reconciliationDomain.reportAdvisorPayment → orbit360CobrosReconciliationCommand",
+        "cause": "UI catches all errors; successful backend report creates Ops gestion and reconciliationEvents but does not emit notificationOutbox",
+        "fix": "Error code+requestId, idempotent outbox in same transaction with reconciliationEvents provenance and server processor validation; recipient Operations within scope",
+        "financialBoundary": "Only REPORTED_PENDING_OPERATIVE_VALIDATION, never create cobro/payment application until Operativo validates",
+        "acceptance": "Advisor report→Ops management+bandeja readback exactly once by country; no paid status; negative wrong advisor and repeated request"
+      },
+      "clientNewPolicyCTA": {
+        "report": "From Cliente 360 client ficha no button to create new policy prelinked",
+        "status": "UX_GAP_CONFIRMED_SOURCE",
+        "source": "cliente360.js missing CTA, existing Orbit.modules.cliente360.nuevaPoliza(clientId) bridge usable",
+        "fix": "Add Create Policy CTA in authorized customer ficha, reuse existing wizard with clientId preselected, country/tenant; no duplicate CRUD",
+        "clarification": "Carlos did create from Polizas as Operativo; earlier failed attempt was as Asesor and is expected role restriction; no bug in new-policy access",
+        "acceptance": "Operativo GT/CO client ficha→wizard→persist policy linked to same client, reload; advisor CTA gated, negative cross-country, cancel no writes"
+      }
+    },
+    "notifications": {
+      "observed": "LIVE Dirección shared tasks badge 59; board Novedades is separate, inbox polls ~60 seconds",
+      "status": "IN_APP_PARTIAL; AUDIO_PUSH_WHATSAPP_NOT_LIVE_CERTIFIED",
+      "gaps": [
+        "ops requests sometimes only routed advisor",
+        "missing outbox for advisor payment report",
+        "inbox resolve lacks notice ownership check"
+      ],
+      "firstFix": "backend recipient routing and inbox ownership, deterministic outbox",
+      "laterFix": "opt-in modest in-app chime on new IDs; FCM device push with token/scope/permission; WhatsApp connector via secured Make/GreenAPI with consent/template/rate-limits and audit",
+      "external": "No external sends/activate secrets without verified connection and destination/consent; do not evade spam filters"
+    },
+    "pwa": {
+      "live": "app.aysseguros.com shows 'Instalable como app (PWA)' badge and dynamically generated blob manifest; no actual #pwa-install button found in live DOM",
+      "source": "core/pwa.js manifest name appends '· Orbit 360' to brand; sw.js present",
+      "status": "INSTALLABILITY_NOT_CERTIFIED; BRANDING_CHANGE_PENDING",
+      "acceptance": "Chrome install prompt/menu and standalone launch/reload at production origin; exact name/icon/scope/service worker; Android/iOS directions only after evidence"
+    },
+    "mainI66": {
+      "livePolicyCountCommercial": 1417,
+      "qaPolicies": 9,
+      "lastLiveConfirmedCobros": 5,
+      "driveAudit": {
+        "filesModifiedSinceJuly": 332,
+        "clientDossiers": 157,
+        "policyPdfTexts": 78,
+        "status": "LIVE_MATCH_PENDING"
+      },
+      "sourceNumberFix": {
+        "commit": "0d6396fbd919e13eafebfd0ead75b1a7f198e238",
+        "insurer": "Seguros Universales",
+        "policy": "04-15-01-000603-0",
+        "futureSourceNumbersPending": 10,
+        "status": "CODE_PREPARED_NOT_LIVE"
+      },
+      "firstReleaseGuard": {
+        "commit": "147e7ae9e20cbf6a67ac715364372feab363bb6d",
+        "ciRun": "42852298676",
+        "status": "PASS_GUARD; BUILD_AND_DEPLOY_PENDING"
+      }
+    },
+    "operationsThisFreeze": {
+      "liveDataWrites": 0,
+      "appliedPayments": 0,
+      "customerOrPolicyCreations": 0,
+      "externalWhatsAppSends": 0,
+      "productionDeploys": 0
+    },
+    "nextSteps": [
+      "Run I6.6 builder on recovery branch (workflow_dispatch not visible off default; use safe push transport), immutable Preview QA, same artifact LIVE and domain readback",
+      "Apply 10 source numbers with before/after once UI live; then payments/requirements per source with idempotency",
+      "Ship small P0 advisor report and Carlos renewability deltas with backend QA then LIVE, same candidate",
+      "Add CTA Cliente 360→policy, notifications routing/sound and opt-in PWA; WhatsApp after connection/consent",
+      "Finish Drive Jul-Nov policy LIVE join, classify proof-based missing records and create only true deltas"
+    ],
+    "scope": "P0/release work in this conversation; does not replace earlier LIVE write ledger entries",
+    "newOpsP0": {
+      "status": "SOURCE_ANALYZED_PATCHES_PREPARED_NOT_COMMITTED_NOT_LIVE",
+      "createNewBusinessError": "Paula Dirección GT, Ops '+ Nuevo ingreso', generic no-readback, form preserved; never retry blindly; source hypothesis Leads-scope used for Ops creates; actual server error pending",
+      "deleteBusinessError": "Paula Dirección attempted archive Fernando Arias (business CO), generic failed readback; actual scope/error pending; no delete performed",
+      "deleteManagementUI": "Archive CTA exists in lateral panel but not persistent footer; applied endorsements protected; safe audited soft-archive for pending only proposed",
+      "sourceFinding": "functions/product-ops-leads-domain.js routes create_business/archive_business/transition_business via Leads authorization even for Ops; frontend may drop aseguradoraIds and puntoIngreso; new ID collision risk",
+      "checkpoint": {
+        "uiPatchSha256": "a108cfd294ee2950b4185fed2a91e1d683c0d87c5bc32555c10409beec873a48",
+        "backendPatchSha256": "6ccf6e0edc3c6b3375f90d6b83103d769b61417627077a77323f59e5d525f629",
+        "testSha256": "1958a28aa0746248e4e8cd2223500c7767d3456567ed88e18834811ee34b1c63",
+        "status": "NOT_APPLIED"
+      },
+      "acceptance": "Actual owner cross-scope, GT/CO role and tenant tests; preserve audit, no hard-delete; no source or live writes yet"
+    },
+    "currentI66TransportCheckpoint": {
+      "lastClosedGate": "B4-007",
+      "releaseGate": "I6.6",
+      "sourceProductCommit": "0919914071fb40d4451861b50322fdd04a2bad2b",
+      "guardRun": {
+        "id": 42859356787,
+        "status": "SUCCESS"
+      },
+      "previewRun": {
+        "id": 42859356672,
+        "status": "SUCCESS_READBACK"
+      },
+      "previewUrl": "https://ays-orbit-360-lab--gi-i66-rc-42859356672-irla5ypi.web.app",
+      "artifactId": 13785280178,
+      "zipSha256": "7fde07bcd274942ce5ea639db302baadb4036b13e7ca33cc158dcf244fe62f93",
+      "liveObservedBothDomainsBuildId": "gi-i65-b4-45020d748dd5-57f234755dc1",
+      "authenticatedReadOnlyQA": {
+        "runId": 42860607216,
+        "status": "IN_PROGRESS_AT_FREEZE"
+      },
+      "productionPromotion": "NOT_STARTED",
+      "sourceOfTruth": "Same recovery branch and canonical ledger; artifact prior superseded, no LIVE changes by source release"
+    }
   }
 }
