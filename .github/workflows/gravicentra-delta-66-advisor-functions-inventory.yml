@@ -365,9 +365,11 @@ jobs:
                   'legacyOnlyUnclassifiedPotentiallyReal':sum(x['legacyHttp']==200 and x['canonicalHttp']==404 and not x['explicitQaMarker'] for x in a),
                   'operationCounts':dict(collections.Counter(x['op'] for x in a))}
           affected=[x for x in checked if x['period']=='OLD_TRAFFIC_WINDOW' and x['legacyHttp']==200 and x['canonicalHttp']==404]
+          older=[x for x in checked if x['period']=='BEFORE_2026_11_10_DEPLOY' and x['legacyHttp']==200 and x['canonicalHttp']==404]
           print('I66_OPS_LEGACY_CREATED_WRITE_INVENTORY='+json.dumps({'inspectedWorkflowRequests':len(docs),
               'inspectedUniqueCreateEntities':len(checked),'byPeriod':byPeriod,
-              'oldTrafficWindowOrphanCandidates':affected},sort_keys=True))
+              'oldTrafficWindowOrphanCandidates':affected,
+              'olderLegacyOnlyCandidates':older},sort_keys=True))
           print('I66_OPS_LEGACY_RECONCILIATION_READONLY_COMPLETE; WRITES=0; NO_IMPORT_OR_RETRY')
           PY
       - name: I6.6 P0 Ops Leads Cloud Run error evidence read-only
