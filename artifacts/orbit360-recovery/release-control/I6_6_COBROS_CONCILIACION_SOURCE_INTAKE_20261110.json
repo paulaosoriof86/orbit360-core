@@ -7095,5 +7095,48 @@
         "canonicalLedgerCommits": 1
       }
     }
+  },
+  "liveMariaReadback20261110": {
+    "id": "GI_I66_UNIVERSALES_MARIA_20261110_DIRECT_LIVE_READBACK_VERIFIED",
+    "environment": "https://app.aysseguros.com",
+    "role": "Dirección · Paula Osorio",
+    "method": "Authenticated read-only filter by insurer UNIVERSALES, then individual policy Desglose; no name, policy number, client or payment values typed/submitted",
+    "status": "READBACK_PARTIAL_12_RECEIPTS_EXIST_PENDING_IDS_AND_RAW_VALUES_PROOF_BEFORE_WRITE",
+    "policyNumber": "04-15-01-000603-0",
+    "client": "MARIA GABRIELA MONTEPEQUE PALMA VETTORAZZI",
+    "insurer": "SEGUROS UNIVERSALES",
+    "advisor": "Germán Reyes",
+    "term": "2026-10-01 to 2027-09-30",
+    "state": "Vigente",
+    "frequency": "Mensual",
+    "paymentMethod": "Tarjeta de crédito",
+    "totalPremiumGTQ": 11430.72,
+    "receiptsCount": 12,
+    "allVisiblePaymentStatuses": "Pendiente",
+    "dueDatesVisibleByInstallment": [
+      "2026-10-16",
+      "2026-11-15",
+      "2026-12-16",
+      "2027-01-15",
+      "2027-02-15",
+      "2027-03-18",
+      "2027-04-15",
+      "2027-05-16",
+      "2027-06-15",
+      "2027-07-16",
+      "2027-08-15",
+      "2027-09-15"
+    ],
+    "futureSourceComparison": {
+      "installments": "3/12 to 12/12",
+      "source": "UNIVERSALES aging as of 2026-11-09, primary source already pinned",
+      "sourceDueDays": "2026-12-01 to 2027-09-01, first day monthly",
+      "mismatchedVisibleDueDates": 10
+    },
+    "secondPayment": "Still pending in LIVE even though insurer evidence indicates #39460327, GTQ952.56, paid 2026-11-05; do not fake posted payment.",
+    "firstReceipt": "Insurer identity/source requires specific verification; leave unchanged until source confirmed.",
+    "nextRequiredOperation": "Reverify exact physical receipt IDs, raw amounts and any recent mutations with canonical LIVE reader. Apply only 10 future number/date patch fields using atomic CAS, keep all other fields and payment statuses. Payment #2 separate after live callable failure resolved.",
+    "dataWrites": 0,
+    "codeDeploys": 0
   }
 }
