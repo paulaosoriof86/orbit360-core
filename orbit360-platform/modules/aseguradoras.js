@@ -29,7 +29,9 @@ Orbit.modules.aseguradoras = (function () {
     } catch (e) { return ''; }
   }
   function isB2PreviewHost() {
-    return /^ays-orbit-360-lab--gi-i(?:3|61|65-b[1-4])-[a-z0-9-]+\.web\.app$/i.test(String(location && location.hostname || ''));
+    const legacy=/^ays-orbit-360-lab--gi-i(?:3|61|65-b[1-4])-[a-z0-9-]+\.web\.app$/i.test(String(location && location.hostname || ''));
+    const runtime=Orbit.productRuntimeBrowserProvidersP0;
+    return legacy||!!(runtime&&typeof runtime.protectedHostMode==='function'&&runtime.protectedHostMode()==='preview');
   }
   async function resolveLogoAsset(id, assetRef) {
     id = clean(id); assetRef = clean(assetRef);
@@ -747,7 +749,7 @@ Orbit.modules.aseguradoras = (function () {
       if (pendingLogo.size > 2 * 1024 * 1024) throw new Error('INSURER_LOGO_TOO_LARGE');
       const bytes = new Uint8Array(await pendingLogo.arrayBuffer());
       let binary = ''; for (let i=0;i<bytes.length;i+=0x8000) binary += String.fromCharCode.apply(null, bytes.subarray(i,Math.min(i+0x8000,bytes.length)));
-      const previewHost = /^ays-orbit-360-lab--gi-i(?:3|61|65-b[1-4])-[a-z0-9-]+\.web\.app$/i.test(String(location && location.hostname || ''));
+      const previewHost = isB2PreviewHost();
       if (previewHost && !/^(?:b2-asg-[a-z0-9-]+|b4003qa_[A-Za-z0-9._:-]+)$/i.test(id)) throw new Error('INSURER_PREVIEW_REAL_RECORD_PROTECTED');
       const assetCallable = previewHost ? 'orbit360ProductAssetUploadPreview' : 'orbit360ProductAssetUpload';
       const assetRegion = previewHost ? 'us-east1' : 'us-central1';

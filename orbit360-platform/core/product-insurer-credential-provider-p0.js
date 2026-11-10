@@ -65,7 +65,9 @@
   function isCertifiedPreviewHost() {
     let host = '';
     try { host = text(window.location && window.location.hostname, 255).toLowerCase(); } catch (e) {}
-    return /^ays-orbit-360-lab--gi-i(?:3|61|65-b[1-4])-[a-z0-9-]+\.web\.app$/.test(host);
+    const legacy=/^ays-orbit-360-lab--gi-i(?:3|61|65-b[1-4])-[a-z0-9-]+\.web\.app$/.test(host);
+    const runtime=Orbit.productRuntimeBrowserProvidersP0;
+    return legacy||!!(runtime&&typeof runtime.protectedHostMode==='function'&&runtime.protectedHostMode()==='preview');
   }
 
   function callableTarget() {

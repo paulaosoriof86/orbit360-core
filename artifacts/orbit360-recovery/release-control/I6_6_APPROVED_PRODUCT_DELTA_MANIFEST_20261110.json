@@ -18,7 +18,7 @@
       "approvedByDirection": true,
       "receipt": "artifacts/orbit360-recovery/release-control/I6_6_COBROS_CONCILIACION_SOURCE_INTAKE_20261110.json",
       "sourceCommit": "0d6396fbd919e13eafebfd0ead75b1a7f198e238",
-      "sourceStatus": "CANDIDATE_NOT_YET_DEPLOYED",
+      "sourceStatus": "I6_6_DELTA_CONTROLLED_PREVIEW_SAFE_REBUILD_PENDING",
       "paths": [
         {
           "path": "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js",
@@ -30,7 +30,7 @@
         },
         {
           "path": "orbit360-platform/data/store-firestore-product-operational-p0.js",
-          "gitBlobSha": "112e72cc755eafcfcbea04c2b89340ca9b3e8062"
+          "gitBlobSha": "0fc392d55599bf8388c51d1b3a5cbd8d60545803"
         }
       ],
       "tests": [
@@ -44,11 +44,11 @@
       "id": "I6_6_PROTECTED_PREVIEW_HOST_AND_READONLY_SELF_ACCESS",
       "approvedByDirection": true,
       "receipt": "I6_6_RELEASE_TRANSPORT_CONTROL_20261110.json / Paula direction: correct gi-i66 protected Preview without LIVE or data mutation",
-      "sourceStatus": "PREVIEW_ONLY_SOURCE_FIX_REQUIRES_NEW_EXACT_ARTIFACT",
+      "sourceStatus": "I6_6_PREVIEW_WRITER_GUARD_EXPANDED_BUILD_PENDING",
       "paths": [
         {
           "path": "orbit360-platform/core/product-runtime-browser-providers-p0.js",
-          "gitBlobSha": "509249cc411ea99e0eab4b84da5846b53d26c674"
+          "gitBlobSha": "b344d85f9065603738a96464e581ea688cb4a865"
         },
         {
           "path": "orbit360-platform/core/auth-product-runtime-p0.js",
@@ -59,6 +59,40 @@
         {
           "path": "tools/gravicentra-i6-6-protected-host-and-pure-preview-auth.test.cjs",
           "gitBlobSha": "a6c7217c2d03e84f488cab274176c1318a131fce"
+        }
+      ]
+    },
+    {
+      "id": "I6_6_PROTECTED_READONLY_HOST_ROUTING_AND_WRITE_DENIAL_ALL_SURFACES",
+      "approvedByDirection": true,
+      "receipt": "Paula direction 2026-11-10: safe I6.6 Preview whole runtime, block all writers before authenticated QA, preserve LIVE; repo-wide scan of 370 JS/HTML and all 133 loaded scripts",
+      "sourceStatus": "PREVIEW_ONLY_QA_PROTECTION_REQUIRES_NEW_EXACT_ARTIFACT",
+      "paths": [
+        {
+          "path": "orbit360-platform/core/product-app-p0.js",
+          "gitBlobSha": "05f72aeb7f7efb1719050af2d9a3d31762aeb6b8"
+        },
+        {
+          "path": "orbit360-platform/modules/aseguradoras.js",
+          "gitBlobSha": "143296dfdb62bc7d72a46446b65059b44edcb731"
+        },
+        {
+          "path": "orbit360-platform/modules/cronograma.js",
+          "gitBlobSha": "ecbed8de9f6767b7ecf2720cc21f4f70fd734d99"
+        },
+        {
+          "path": "orbit360-platform/modules/policy-receipts-v1199-bridge.js",
+          "gitBlobSha": "cb35ecbb6dd59dea0d09b1e93d288de57d7eb00f"
+        },
+        {
+          "path": "orbit360-platform/core/product-insurer-credential-provider-p0.js",
+          "gitBlobSha": "feb8e06be419d326965fc6ffa265a1e538baaa54"
+        }
+      ],
+      "tests": [
+        {
+          "path": "tools/gravicentra-i6-6-preview-writer-failclosed.test.cjs",
+          "gitBlobSha": "51b451da933ecfa0aff7972867ba7207a5157505"
         }
       ]
     }

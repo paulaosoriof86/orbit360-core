@@ -10,6 +10,28 @@
   window.Orbit = window.Orbit || {};
   var modulesPromise=null, contextPromise=null;
   function config(){return window.__ORBIT360_PRODUCT_PUBLIC_CONFIG__||{};}
+  // I6.6 Preview is a read-only verification surface, even after staff login.
+  // This transport guard prevents any operational callable from this channel.
+  function isI66PreviewHost(){
+    var host=String(window.location&&window.location.hostname||'').toLowerCase();
+    return /^ays-orbit-360-lab--gi-i66-rc-[a-z0-9-]+\.web\.app$/.test(host);
+  }
+  var I66_READ_ONLY_CALLABLES=Object.freeze({
+    orbit360ScopedPolicyReadPreview:true,
+    orbit360AssignableAdvisorRosterPreview:true,
+    orbit360TenantDomainConfigPreview:true,
+    orbit360ProductAssetReadPreview:true
+  });
+  function i66ReadOnlyCallableError(name,data,region){
+    if(!isI66PreviewHost())return '';
+    if(I66_READ_ONLY_CALLABLES[name]!==true)return 'I66_PREVIEW_MUTATION_CALLABLE_DENIED';
+    if(region!=='us-east1')return 'I66_PREVIEW_REGION_DENIED';
+    if(name==='orbit360TenantDomainConfigPreview'&&(!data||data.action!=='get'))
+      return 'I66_PREVIEW_DOMAIN_CONFIG_WRITE_DENIED';
+    if(name==='orbit360ScopedPolicyReadPreview'&&(!data||!['list','bootstrap-membership','bootstrap-tenant-config'].includes(String(data.mode||''))))
+      return 'I66_PREVIEW_SCOPED_READ_MODE_DENIED';
+    return '';
+  }
   // One immutable candidate must use the protected transport in Preview AND
   // after promotion of those same bytes to the certified Hosting site. The
   // hostname selects a separately deployed callable; it never grants access.
@@ -100,6 +122,8 @@
   function callFunction(name,data,region){
     name=String(name||'').trim();region=String(region||'us-central1').trim();
     if(!/^[A-Za-z][A-Za-z0-9_]{2,120}$/.test(name))return Promise.reject(new Error('PRODUCT_FUNCTION_NAME_INVALID'));
+    var previewSafety=i66ReadOnlyCallableError(name,data,region);
+    if(previewSafety)return Promise.reject(new Error(previewSafety));
     return initialize().then(function(ctx){
       var fx=ctx.functionsByRegion[region];
       if(!fx){fx=ctx.modules.functions.getFunctions(ctx.app,region);ctx.functionsByRegion[region]=fx;}
@@ -152,5 +176,5 @@
   function updateCurrentUserPassword(password){
     return initialize().then(function(ctx){var target=ctx.auth.currentUser;if(!target)throw new Error('AUTH_USER_NOT_AVAILABLE');return ctx.modules.auth.updatePassword(target,String(password||''));});
   }
-  window.Orbit.productRuntimeBrowserProvidersP0=Object.freeze({VERSION:'p0-b1-20260919.1',enabled:enabled,initialize:initialize,dependencies:dependencies,signIn:signIn,signOut:signOut,sendVerificationEmail:sendVerificationEmail,updateCurrentUserPassword:updateCurrentUserPassword,initialUser:initialUser,waitForUser:waitUser,readTenantConfig:readTenantConfig,callFunction:callFunction,protectedReadPage:protectedReadPage,configDescriptor:publicDescriptor,containsSecrets:false,tenantSource:'membership_only',browserFirestoreWriteAuthorized:false,serverWriteTransport:'firebase-functions',authoritativeFirstRead:true,authPersistence:'firebase-default-local',noFallback:true});
+  window.Orbit.productRuntimeBrowserProvidersP0=Object.freeze({VERSION:'p0-b1-20260919.1',enabled:enabled,initialize:initialize,dependencies:dependencies,signIn:signIn,signOut:signOut,sendVerificationEmail:sendVerificationEmail,updateCurrentUserPassword:updateCurrentUserPassword,initialUser:initialUser,waitForUser:waitUser,readTenantConfig:readTenantConfig,callFunction:callFunction,protectedReadPage:protectedReadPage,configDescriptor:publicDescriptor,protectedHostMode:protectedHostMode,isI66PreviewHost:isI66PreviewHost,containsSecrets:false,tenantSource:'membership_only',browserFirestoreWriteAuthorized:false,serverWriteTransport:'firebase-functions',authoritativeFirstRead:true,authPersistence:'firebase-default-local',noFallback:true});
 })();

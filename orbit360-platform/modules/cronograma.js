@@ -95,7 +95,9 @@ Orbit.modules.cronograma = (function () {
     return ev;
   }
   function previewUat() {
-    return /^ays-orbit-360-lab--gi-i(?:3|61|65-b[1-4])-[a-z0-9-]+\.web\.app$/i.test(location.hostname);
+    const legacy=/^ays-orbit-360-lab--gi-i(?:3|61|65-b[1-4])-[a-z0-9-]+\.web\.app$/i.test(location.hostname);
+    const runtime=Orbit.productRuntimeBrowserProvidersP0;
+    return legacy||!!(runtime&&typeof runtime.protectedHostMode==='function'&&runtime.protectedHostMode()==='preview');
   }
   function taskFeedback(message) {
     if (U && typeof U.toast === 'function') U.toast(message);

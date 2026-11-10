@@ -95,8 +95,9 @@
       // A missing flag on either release host fails closed, never falling back
       // to browser Firestore reads during a release promotion.
       var runtimeHost=String(window.location&&window.location.hostname||'').toLowerCase();
-      var previewChannel=/^ays-orbit-360-lab--gi-i65-b4-[a-z0-9-]+\.web\.app$/.test(runtimeHost);
-      var liveChannel=runtimeHost==='ays-orbit-360-lab.web.app'||runtimeHost==='ays-orbit-360-lab.firebaseapp.com'||runtimeHost==='app.aysseguros.com';
+      var releaseHostMode=providers&&typeof providers.protectedHostMode==='function'?providers.protectedHostMode():'';
+      var previewChannel=releaseHostMode==='preview';
+      var liveChannel=releaseHostMode==='live';
       var scopedChannel=previewChannel||liveChannel;
       if(scopedChannel&&cfg.scopedReadPreviewCandidate!==true)
         throw new Error('PROTECTED_READ_CANDIDATE_DISABLED');

@@ -47,7 +47,11 @@ Orbit.modules = Orbit.modules || {};
     operacion_atomica_no_confirmada: 'No fue posible confirmar el guardado en el servidor. Ningún cambio debe darse por aplicado hasta obtener readback.'
   };
   function errorText(errors) { return (errors || []).map(x => ERROR_LABELS[String(x).split(':')[0]] || 'No fue posible confirmar esta operación.').join(' · '); }
-  function protectedPreviewRealPolicy(id){const host=String(location&&location.hostname||'');return /^ays-orbit-360-lab--gi-i65-b4-/i.test(host)&&!/^(?:b3004qa_|b4003qa_)/i.test(String(id||''));}
+  function protectedPreviewRealPolicy(id){
+    const host=String(location&&location.hostname||''),runtime=Orbit.productRuntimeBrowserProvidersP0;
+    const releasePreview=runtime&&typeof runtime.protectedHostMode==='function'&&runtime.protectedHostMode()==='preview';
+    return (releasePreview||/^ays-orbit-360-lab--gi-i65-b4-/i.test(host))&&!/^(?:b3004qa_|b4003qa_)/i.test(String(id||''));
+  }
   async function requestCorrection(client, policyId, action) {
     if (!client) return toast('Cliente no disponible');
     try {
