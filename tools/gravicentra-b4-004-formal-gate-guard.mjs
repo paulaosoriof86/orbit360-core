@@ -699,8 +699,19 @@ export function verifyDeclaredB4005SourceSuccessor(cp=read(CP),state=read(STATE)
 function verifyB4006FormalGateSuccessor(cp,state,ledger,reg){
   const p=cp.b4006FormalOwnerVisualGateSeal20261109;
   if(!p)return false;
+  // B4-006 is an immutable historical seal. Its old 'next B4-007'
+  // cursor may advance to the separately proven B4-007 LIVE / I6.6 gate.
+  const released=cp.b4007OwnerOperationalGateClosure20261110||{};
+  const advancedI66=released.operationalReleaseClosedByDirection===true&&
+    released.lastClosedReleaseGate==='B4-007'&&released.nextOperationalGate==='I6.6'&&
+    released.sameApprovedSourceSha===p.sourceSha&&released.buildId===p.buildId&&
+    released.immutablePreviewArtifactId===p.artifactId&&
+    released.noUnprovenFullModulePassClaim===true&&
+    state.b4007OperationalClosureOwnerCorrection20261110?.lastClosedReleaseGate==='B4-007'&&
+    state.currentIteration===6&&
+    cp.nextAction?.startsWith('I6_6_')&&state.nextAction?.startsWith('I6_6_');
   need(same(p,state.b4006FormalOwnerVisualGateSeal20261109)&&
-    cp.nextAction===B4006_FORMAL_NEXT_ACTION&&state.nextAction===B4006_FORMAL_NEXT_ACTION&&
+    (advancedI66||(cp.nextAction===B4006_FORMAL_NEXT_ACTION&&state.nextAction===B4006_FORMAL_NEXT_ACTION))&&
     p.gate==='I6.5/B4-006'&&p.status==='CLOSED_PASS_SCOPED_TO_EXPLICIT_OWNER_VISUAL_ACCEPTANCE'&&
     p.receiptPath===B4006_FORMAL_RECEIPT&&
     p.sourceSha==='45020d748dd5fa4328a96f99fe9919a6fcb207eb'&&
