@@ -1,6 +1,6 @@
 {
   "schema": "GRAVICENTRA_I6_6_SOURCE_INTAKE_AND_COMMISSION_DECISION_CARRY_FORWARD_V1",
-  "status": "PRE_GATE_SOURCE_INVENTORY_REGISTERED_NOT_LIVE_APPLIED",
+  "status": "PRE_GATE_RAW_SOURCES_PINNED_CROSS_SOURCE_SAMPLED_NOT_LIVE_APPLIED",
   "dateGuatemala": "2026-11-10",
   "productBrand": "Gravicentra Insurance",
   "repository": "paulaosoriof86/orbit360-core",
@@ -48,160 +48,180 @@
           "bytes": 6185,
           "mimeType": "text/html",
           "driveModifiedAt": "2026-11-09T14:24:20.597Z",
-          "hashStatus": "PENDING_RAW_BYTES_SHA256",
-          "identityStatus": "DRIVE_METADATA_READBACK_PASS"
+          "hashStatus": "RAW_BYTES_SHA256_VERIFIED_2026_11_10",
+          "identityStatus": "DRIVE_METADATA_AND_RAW_HASH_PASS",
+          "sha256": "235d23552a76f4ea90cc60fd71b44b68c76b009f97ec9f1456bacaa431e36a91"
         },
         {
           "filename": "Planilla de comisiones Aseguradora Guatemalteca Octubre.pdf.xlsx",
           "bytes": 225345,
           "mimeType": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
           "driveModifiedAt": "2026-11-07T22:06:22.798Z",
-          "hashStatus": "PENDING_RAW_BYTES_SHA256",
-          "identityStatus": "DRIVE_METADATA_READBACK_PASS"
+          "hashStatus": "RAW_BYTES_SHA256_VERIFIED_2026_11_10",
+          "identityStatus": "DRIVE_METADATA_AND_RAW_HASH_PASS",
+          "sha256": "72971f0cf6f2350663a8205b5d103a3acb8df050969001d4019a11cb8f078d86"
         },
         {
           "filename": "Planilla de comisiones Bantrab Octubre.pdf",
           "bytes": 209009,
           "mimeType": "application/pdf",
           "driveModifiedAt": "2026-11-07T22:05:48.867Z",
-          "hashStatus": "PENDING_RAW_BYTES_SHA256",
-          "identityStatus": "DRIVE_METADATA_READBACK_PASS"
+          "hashStatus": "RAW_BYTES_SHA256_VERIFIED_2026_11_10",
+          "identityStatus": "DRIVE_METADATA_AND_RAW_HASH_PASS",
+          "sha256": "9be45a11c4695c3fa21849f8c9d8a380281313d13d632e6ce0577529fad8453b"
         },
         {
           "filename": "FV Aseguradora Guatemalteca.pdf",
           "bytes": 55506,
           "mimeType": "application/pdf",
           "driveModifiedAt": "2026-11-07T15:35:15.867Z",
-          "hashStatus": "PENDING_RAW_BYTES_SHA256",
-          "identityStatus": "DRIVE_METADATA_READBACK_PASS"
+          "hashStatus": "RAW_BYTES_SHA256_VERIFIED_2026_11_10",
+          "identityStatus": "DRIVE_METADATA_AND_RAW_HASH_PASS",
+          "sha256": "365001d23fc941f1710f3951b638fa7749a222716d2c1668bd4239be392c4693"
         },
         {
           "filename": "Planilla de comisiones GyT $ Octubre.pdf",
           "bytes": 59423,
           "mimeType": "application/pdf",
           "driveModifiedAt": "2026-11-07T15:31:22.558Z",
-          "hashStatus": "PENDING_RAW_BYTES_SHA256",
-          "identityStatus": "DRIVE_METADATA_READBACK_PASS"
+          "hashStatus": "RAW_BYTES_SHA256_VERIFIED_2026_11_10",
+          "identityStatus": "DRIVE_METADATA_AND_RAW_HASH_PASS",
+          "sha256": "50dc6df536fb12a20cb55bf2c6ead01df6b9e72561f76115981c4811015878f5"
         },
         {
           "filename": "Planilla de comisiones GyT Q Octubre.pdf",
           "bytes": 59403,
           "mimeType": "application/pdf",
           "driveModifiedAt": "2026-11-07T15:30:55.923Z",
-          "hashStatus": "PENDING_RAW_BYTES_SHA256",
-          "identityStatus": "DRIVE_METADATA_READBACK_PASS"
+          "hashStatus": "RAW_BYTES_SHA256_VERIFIED_2026_11_10",
+          "identityStatus": "DRIVE_METADATA_AND_RAW_HASH_PASS",
+          "sha256": "d104bd123fddc6d71deb7753b49d48beeb5ca8c3408ab733a7b243aef2dc4870"
         },
         {
           "filename": "FV Aseguradora General ok.pdf",
           "bytes": 55558,
           "mimeType": "application/pdf",
           "driveModifiedAt": "2026-11-05T23:09:25.450Z",
-          "hashStatus": "PENDING_RAW_BYTES_SHA256",
-          "identityStatus": "DRIVE_METADATA_READBACK_PASS"
+          "hashStatus": "RAW_BYTES_SHA256_VERIFIED_2026_11_10",
+          "identityStatus": "DRIVE_METADATA_AND_RAW_HASH_PASS",
+          "sha256": "5f8a45ec3c2fe1f2e63a2273aea2a11728e69d147d71f7bf2d751bec92516d62"
         },
         {
           "filename": "FV El Roble.pdf",
           "bytes": 55501,
           "mimeType": "application/pdf",
           "driveModifiedAt": "2026-11-05T22:39:11.154Z",
-          "hashStatus": "PENDING_RAW_BYTES_SHA256",
-          "identityStatus": "DRIVE_METADATA_READBACK_PASS"
+          "hashStatus": "RAW_BYTES_SHA256_VERIFIED_2026_11_10",
+          "identityStatus": "DRIVE_METADATA_AND_RAW_HASH_PASS",
+          "sha256": "2bad460d170a3d277a66c1b93ec0a0be4ef1175bcb475f3d43e7fef0e24b95ce"
         },
         {
           "filename": "Planilla de Comisiones El Roble.CSV",
           "bytes": 10221,
           "mimeType": "text/csv",
           "driveModifiedAt": "2026-11-05T22:38:22.030Z",
-          "hashStatus": "PENDING_RAW_BYTES_SHA256",
-          "identityStatus": "DRIVE_METADATA_READBACK_PASS"
+          "hashStatus": "RAW_BYTES_SHA256_VERIFIED_2026_11_10",
+          "identityStatus": "DRIVE_METADATA_AND_RAW_HASH_PASS",
+          "sha256": "5f41084d3db2a7324a8c15b5cb0843893aa5d7cf98d55afba1830fd56d5a337d"
         },
         {
           "filename": "FV Mapfre.pdf",
           "bytes": 55537,
           "mimeType": "application/pdf",
           "driveModifiedAt": "2026-11-05T22:35:50.787Z",
-          "hashStatus": "PENDING_RAW_BYTES_SHA256",
-          "identityStatus": "DRIVE_METADATA_READBACK_PASS"
+          "hashStatus": "RAW_BYTES_SHA256_VERIFIED_2026_11_10",
+          "identityStatus": "DRIVE_METADATA_AND_RAW_HASH_PASS",
+          "sha256": "5d707481b444af778301a40e998765d60832b2cc05474ba8ae6a3d63bcbf9308"
         },
         {
           "filename": "Planilla de comisiones Universales Octubre.pdf",
           "bytes": 193512,
           "mimeType": "application/pdf",
           "driveModifiedAt": "2026-11-05T22:28:57.529Z",
-          "hashStatus": "PENDING_RAW_BYTES_SHA256",
-          "identityStatus": "DRIVE_METADATA_READBACK_PASS"
+          "hashStatus": "RAW_BYTES_SHA256_VERIFIED_2026_11_10",
+          "identityStatus": "DRIVE_METADATA_AND_RAW_HASH_PASS",
+          "sha256": "0f32b71c6b1db972a169529ba75adfefdde3c8a2b690691a5cf298e9d0fc18c5"
         },
         {
           "filename": "FV Universales.pdf",
           "bytes": 176708,
           "mimeType": "application/pdf",
           "driveModifiedAt": "2026-11-05T22:26:11.412Z",
-          "hashStatus": "PENDING_RAW_BYTES_SHA256",
-          "identityStatus": "DRIVE_METADATA_READBACK_PASS"
+          "hashStatus": "RAW_BYTES_SHA256_VERIFIED_2026_11_10",
+          "identityStatus": "DRIVE_METADATA_AND_RAW_HASH_PASS",
+          "sha256": "92160d39e0ba8290a2a7f8dbf06e0b1a3a04584805847daefd27c7dfc0cfcd38"
         },
         {
           "filename": "FV Ficohsa.pdf",
           "bytes": 174097,
           "mimeType": "application/pdf",
           "driveModifiedAt": "2026-11-05T22:23:07.571Z",
-          "hashStatus": "PENDING_RAW_BYTES_SHA256",
-          "identityStatus": "DRIVE_METADATA_READBACK_PASS"
+          "hashStatus": "RAW_BYTES_SHA256_VERIFIED_2026_11_10",
+          "identityStatus": "DRIVE_METADATA_AND_RAW_HASH_PASS",
+          "sha256": "0b4c945d53bfc4d1ca07a0fe3a491e0d5ef5499e458d26f908ee71713a2f379a"
         },
         {
           "filename": "Planilla de comisiones Ficohsa Octubre.xlsx",
           "bytes": 32139,
           "mimeType": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
           "driveModifiedAt": "2026-11-05T22:22:11.013Z",
-          "hashStatus": "PENDING_RAW_BYTES_SHA256",
-          "identityStatus": "DRIVE_METADATA_READBACK_PASS"
+          "hashStatus": "RAW_BYTES_SHA256_VERIFIED_2026_11_10",
+          "identityStatus": "DRIVE_METADATA_AND_RAW_HASH_PASS",
+          "sha256": "3c43dc11ce04a4e5ecba9fc17fdd7641cb894faa6da9bd6c8e6d2fb7d175262f"
         },
         {
           "filename": "FV Banrural.pdf",
           "bytes": 171961,
           "mimeType": "application/pdf",
           "driveModifiedAt": "2026-11-05T22:19:09.620Z",
-          "hashStatus": "PENDING_RAW_BYTES_SHA256",
-          "identityStatus": "DRIVE_METADATA_READBACK_PASS"
+          "hashStatus": "RAW_BYTES_SHA256_VERIFIED_2026_11_10",
+          "identityStatus": "DRIVE_METADATA_AND_RAW_HASH_PASS",
+          "sha256": "049d38f7dcc1c6c11bc92847c6cfbeb47a6d7e840491a1b0af0decb460bf7ea6"
         },
         {
           "filename": "Planilla de comisiones Banrural Octubre.xlsx",
           "bytes": 63020,
           "mimeType": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
           "driveModifiedAt": "2026-11-05T22:16:27.331Z",
-          "hashStatus": "PENDING_RAW_BYTES_SHA256",
-          "identityStatus": "DRIVE_METADATA_READBACK_PASS"
+          "hashStatus": "RAW_BYTES_SHA256_VERIFIED_2026_11_10",
+          "identityStatus": "DRIVE_METADATA_AND_RAW_HASH_PASS",
+          "sha256": "54b1f9d68e7fb1fc7206ab4ecd1268d8a4ed726cd31352925344ba2230013e9c"
         },
         {
           "filename": "FV GyT $.pdf",
           "bytes": 177288,
           "mimeType": "application/pdf",
           "driveModifiedAt": "2026-11-04T23:29:55.170Z",
-          "hashStatus": "PENDING_RAW_BYTES_SHA256",
-          "identityStatus": "DRIVE_METADATA_READBACK_PASS"
+          "hashStatus": "RAW_BYTES_SHA256_VERIFIED_2026_11_10",
+          "identityStatus": "DRIVE_METADATA_AND_RAW_HASH_PASS",
+          "sha256": "23f2085c7a797ada47f5565ddaff535ab90a85dca3bbb62bc33bdf9b98041172"
         },
         {
           "filename": "FV GyT Q.pdf",
           "bytes": 176444,
           "mimeType": "application/pdf",
           "driveModifiedAt": "2026-11-04T23:28:06.197Z",
-          "hashStatus": "PENDING_RAW_BYTES_SHA256",
-          "identityStatus": "DRIVE_METADATA_READBACK_PASS"
+          "hashStatus": "RAW_BYTES_SHA256_VERIFIED_2026_11_10",
+          "identityStatus": "DRIVE_METADATA_AND_RAW_HASH_PASS",
+          "sha256": "d4f983a99c2d2117529e147a1f059245953b3e7a89ebfa1627e6a30a08cbb50d"
         },
         {
           "filename": "FV Bantrab.pdf",
           "bytes": 175606,
           "mimeType": "application/pdf",
           "driveModifiedAt": "2026-11-04T23:22:49.387Z",
-          "hashStatus": "PENDING_RAW_BYTES_SHA256",
-          "identityStatus": "DRIVE_METADATA_READBACK_PASS"
+          "hashStatus": "RAW_BYTES_SHA256_VERIFIED_2026_11_10",
+          "identityStatus": "DRIVE_METADATA_AND_RAW_HASH_PASS",
+          "sha256": "841d81da7429812e9b27ab8be89c8cd75a5000a3834c57df4a7c3476e3ad51fb"
         },
         {
           "filename": "Planilla de comisiones ASeguradora General Octubre.pdf",
           "bytes": 119493,
           "mimeType": "application/pdf",
           "driveModifiedAt": "2026-11-04T23:03:37.821Z",
-          "hashStatus": "PENDING_RAW_BYTES_SHA256",
-          "identityStatus": "DRIVE_METADATA_READBACK_PASS"
+          "hashStatus": "RAW_BYTES_SHA256_VERIFIED_2026_11_10",
+          "identityStatus": "DRIVE_METADATA_AND_RAW_HASH_PASS",
+          "sha256": "767c3d65870bc60a1af19ae01589ca0cbc1ff3045570103eb760d47388e101ff"
         }
       ],
       "count": 20,
@@ -214,120 +234,135 @@
           "bytes": 3788,
           "mimeType": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
           "driveModifiedAt": "2026-11-09T19:50:51.866Z",
-          "hashStatus": "PENDING_RAW_BYTES_SHA256",
-          "identityStatus": "DRIVE_METADATA_READBACK_PASS"
+          "hashStatus": "RAW_BYTES_SHA256_VERIFIED_2026_11_10",
+          "identityStatus": "DRIVE_METADATA_AND_RAW_HASH_PASS",
+          "sha256": "0396615a394859ce39a0694567747e4dec3cc0e34a415222d5cf4d009cda5ac0"
         },
         {
           "filename": "Universales - Estado de cuenta - Cobros noviembre - Corte 2026-11-09.PDF",
           "bytes": 426116,
           "mimeType": "application/pdf",
           "driveModifiedAt": "2026-11-09T17:55:50.849Z",
-          "hashStatus": "PENDING_RAW_BYTES_SHA256",
-          "identityStatus": "DRIVE_METADATA_READBACK_PASS"
+          "hashStatus": "RAW_BYTES_SHA256_VERIFIED_2026_11_10",
+          "identityStatus": "DRIVE_METADATA_AND_RAW_HASH_PASS",
+          "sha256": "519c7ff5e03a722431ba4983270b7e2eb1c71fd6ec786e453ce8cde205daf2b6"
         },
         {
           "filename": "Estado de cuenta Columna a noviembre 9.xlsb",
           "bytes": 6329711,
           "mimeType": "application/vnd.ms-excel.sheet.binary.macroenabled.12",
           "driveModifiedAt": "2026-11-09T16:56:22.753Z",
-          "hashStatus": "PENDING_RAW_BYTES_SHA256",
-          "identityStatus": "DRIVE_METADATA_READBACK_PASS"
+          "hashStatus": "RAW_BYTES_SHA256_VERIFIED_2026_11_10",
+          "identityStatus": "DRIVE_METADATA_AND_RAW_HASH_PASS",
+          "sha256": "d17c933ed9c8624f59da6df8ac2f8cdb5974055c754a55029d9bada6c3d2603f"
         },
         {
           "filename": "Bantrab - Primas por cobrar - Reporte 2026-11-04.xlsx",
           "bytes": 30312,
           "mimeType": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
           "driveModifiedAt": "2026-11-09T16:42:40.546Z",
-          "hashStatus": "PENDING_RAW_BYTES_SHA256",
-          "identityStatus": "DRIVE_METADATA_READBACK_PASS"
+          "hashStatus": "RAW_BYTES_SHA256_VERIFIED_2026_11_10",
+          "identityStatus": "DRIVE_METADATA_AND_RAW_HASH_PASS",
+          "sha256": "b945a98c7c572909c643be4c849a7526a363eb490cdcf24ac8d0ae54ca3025b7"
         },
         {
           "filename": "Mapfre - Cobros realizados - Noviembre 2026.xls",
           "bytes": 4111,
           "mimeType": "application/vnd.ms-excel",
           "driveModifiedAt": "2026-11-09T16:42:33.673Z",
-          "hashStatus": "PENDING_RAW_BYTES_SHA256",
-          "identityStatus": "DRIVE_METADATA_READBACK_PASS"
+          "hashStatus": "RAW_BYTES_SHA256_VERIFIED_2026_11_10",
+          "identityStatus": "DRIVE_METADATA_AND_RAW_HASH_PASS",
+          "sha256": "7e5fd1f37e1da2c25cd2616b93380629fe58c44493c30f289cad06fd09370c43"
         },
         {
           "filename": "Mapfre - Recaudos pendientes - Noviembre 2026.xls",
           "bytes": 9198,
           "mimeType": "application/vnd.ms-excel",
           "driveModifiedAt": "2026-11-09T16:42:30.278Z",
-          "hashStatus": "PENDING_RAW_BYTES_SHA256",
-          "identityStatus": "DRIVE_METADATA_READBACK_PASS"
+          "hashStatus": "RAW_BYTES_SHA256_VERIFIED_2026_11_10",
+          "identityStatus": "DRIVE_METADATA_AND_RAW_HASH_PASS",
+          "sha256": "29a42705ae6f7b2b42693f51a27a0b1f4ced279e2259b28ce021ff7b21ccefb0"
         },
         {
           "filename": "Aseguradora Guatemalteca - Estado de cuenta - Corte 2026-10-23.pdf",
           "bytes": 321996,
           "mimeType": "application/pdf",
           "driveModifiedAt": "2026-11-09T16:36:46.111Z",
-          "hashStatus": "PENDING_RAW_BYTES_SHA256",
-          "identityStatus": "DRIVE_METADATA_READBACK_PASS"
+          "hashStatus": "RAW_BYTES_SHA256_VERIFIED_2026_11_10",
+          "identityStatus": "DRIVE_METADATA_AND_RAW_HASH_PASS",
+          "sha256": "79cf81525bdf6736af4b62cfb3dcdc6912b7aae12ef632d8cb53880f447c5e31"
         },
         {
           "filename": "Ficohsa - Estado de cuenta - Reporte 2026-10-22.xlsx",
           "bytes": 78046,
           "mimeType": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
           "driveModifiedAt": "2026-11-09T16:36:40.248Z",
-          "hashStatus": "PENDING_RAW_BYTES_SHA256",
-          "identityStatus": "DRIVE_METADATA_READBACK_PASS"
+          "hashStatus": "RAW_BYTES_SHA256_VERIFIED_2026_11_10",
+          "identityStatus": "DRIVE_METADATA_AND_RAW_HASH_PASS",
+          "sha256": "0246c29d7982e548011add8af150f2c657eed42b0bac9f9b58abeb4d5ea46f23"
         },
         {
           "filename": "Aseguradora General - Primas pendientes - Corte 2026-11-09.xls",
           "bytes": 16320,
           "mimeType": "application/vnd.ms-excel",
           "driveModifiedAt": "2026-11-09T16:36:36.983Z",
-          "hashStatus": "PENDING_RAW_BYTES_SHA256",
-          "identityStatus": "DRIVE_METADATA_READBACK_PASS"
+          "hashStatus": "RAW_BYTES_SHA256_VERIFIED_2026_11_10",
+          "identityStatus": "DRIVE_METADATA_AND_RAW_HASH_PASS",
+          "sha256": "9f9f4e101c7e9edfb1a3a46ce1d0722156895e22bacf23440975f295fa338e2f"
         },
         {
           "filename": "Universales - Estado de cuenta - Antigüedad de saldos - Corte 2026-11-09.pdf",
           "bytes": 428709,
           "mimeType": "application/pdf",
           "driveModifiedAt": "2026-11-09T16:36:11.899Z",
-          "hashStatus": "PENDING_RAW_BYTES_SHA256",
-          "identityStatus": "DRIVE_METADATA_READBACK_PASS"
+          "hashStatus": "RAW_BYTES_SHA256_VERIFIED_2026_11_10",
+          "identityStatus": "DRIVE_METADATA_AND_RAW_HASH_PASS",
+          "sha256": "f7bd1833a1573d4d0a1e6b494b71383aa1209f0b9afec3f06972a31213f1bd4b"
         },
         {
           "filename": "Mapfre - Estado de cuenta al 2026-11-02.html",
           "bytes": 10175,
           "mimeType": "text/html",
           "driveModifiedAt": "2026-11-09T14:23:07.858Z",
-          "hashStatus": "PENDING_RAW_BYTES_SHA256",
-          "identityStatus": "DRIVE_METADATA_READBACK_PASS"
+          "hashStatus": "RAW_BYTES_SHA256_VERIFIED_2026_11_10",
+          "identityStatus": "DRIVE_METADATA_AND_RAW_HASH_PASS",
+          "sha256": "9bd35651e29af40e63daf8ac456a24cec607960698d93ec547cbcce66231c462"
         },
         {
           "filename": "Balance de cuenta GyT a Octubre 27.xlsx",
           "bytes": 11664,
           "mimeType": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
           "driveModifiedAt": "2026-11-07T17:59:58.666Z",
-          "hashStatus": "PENDING_RAW_BYTES_SHA256",
-          "identityStatus": "DRIVE_METADATA_READBACK_PASS"
+          "hashStatus": "RAW_BYTES_SHA256_VERIFIED_2026_11_10",
+          "identityStatus": "DRIVE_METADATA_AND_RAW_HASH_PASS",
+          "sha256": "69c60e6da9a7d16bf85433af9b34b0509ff0cae58a7bf14fd42a8b1752dfaaf1"
         },
         {
           "filename": "Reporte de ingresos Aseguradora General al 26 de Octubre.xls",
           "bytes": 16320,
           "mimeType": "application/vnd.ms-excel",
           "driveModifiedAt": "2026-11-07T17:58:28.515Z",
-          "hashStatus": "PENDING_RAW_BYTES_SHA256",
-          "identityStatus": "DRIVE_METADATA_READBACK_PASS"
+          "hashStatus": "RAW_BYTES_SHA256_VERIFIED_2026_11_10",
+          "identityStatus": "DRIVE_METADATA_AND_RAW_HASH_PASS",
+          "sha256": "3032a7cfc0cc0e21ef70480d234c41496b9eb14119e925fabd23c5e9f3725db9"
         },
         {
           "filename": "Estado de Cuenta El Roble a Octubre 23.XLS",
           "bytes": 59554,
           "mimeType": "application/vnd.ms-excel",
           "driveModifiedAt": "2026-11-07T17:47:11.190Z",
-          "hashStatus": "PENDING_RAW_BYTES_SHA256",
-          "identityStatus": "DRIVE_METADATA_READBACK_PASS"
+          "hashStatus": "RAW_BYTES_SHA256_VERIFIED_2026_11_10",
+          "identityStatus": "DRIVE_METADATA_AND_RAW_HASH_PASS",
+          "sha256": "ea39f55c1d91ff53a1db62a707aceb7ac6c444a5559a6453ec8850cdb366f6bc"
         },
         {
           "filename": "Estado de cuenta Aseguradora Rural al 06 de noviembre.xlsx",
           "bytes": 30416,
           "mimeType": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
           "driveModifiedAt": "2026-11-07T17:19:39.199Z",
-          "hashStatus": "PENDING_RAW_BYTES_SHA256",
-          "identityStatus": "DRIVE_METADATA_READBACK_PASS"
+          "hashStatus": "RAW_BYTES_SHA256_VERIFIED_2026_11_10",
+          "identityStatus": "DRIVE_METADATA_AND_RAW_HASH_PASS",
+          "sha256": "a6d5f5242d2a40bef0f979215e9cb683875fb8efa04c2df78dad895ab59cc31d"
         }
       ],
       "count": 15,
@@ -364,7 +399,56 @@
         "bytes": 61246,
         "role": "OCTOBER_FOLDER_HISTORICAL_COMMISSION_PATTERN_ONLY_NO_NOV_INVOICE"
       }
-    ]
+    ],
+    "commissionOctoberHistorical": {
+      "role": "PRIOR_PERIOD_COMMISSION_CALIBRATION_NOT_NOVEMBER_COLLECTION_CONFIRMATION",
+      "files": [
+        {
+          "filename": "Planilla La Ceiba.pdf",
+          "bytes": 61246,
+          "mimeType": "application/pdf",
+          "sha256": "f553d44f40e671622788d9d857845b4edfe01bd84f5c7bfbe397741fef1fc7e7",
+          "hashStatus": "RAW_BYTES_SHA256_VERIFIED_2026_11_10"
+        },
+        {
+          "filename": "FV La Ceiba.pdf",
+          "bytes": 55532,
+          "mimeType": "application/pdf",
+          "sha256": "b0358bd0b70cdbba95c0bc14d84d5bbb00611ff6326eb63d333f23e4db90ea06",
+          "hashStatus": "RAW_BYTES_SHA256_VERIFIED_2026_11_10"
+        },
+        {
+          "filename": "FV Columna.pdf",
+          "bytes": 55500,
+          "mimeType": "application/pdf",
+          "sha256": "79aa11f4ea67e6a71f949ce89f13f2cb4d094be2a18a9b3d91f15a3150ed50b8",
+          "hashStatus": "RAW_BYTES_SHA256_VERIFIED_2026_11_10"
+        },
+        {
+          "filename": "Planilla de comisiones Columna.pdf",
+          "bytes": 293110,
+          "mimeType": "application/pdf",
+          "sha256": "7acd99bb0141a258741d41d5f1dde2a29677b341d7f60c3bcd0d58a07e17b0f4",
+          "hashStatus": "RAW_BYTES_SHA256_VERIFIED_2026_11_10"
+        }
+      ],
+      "sourceFolder": "AyS Guatemala / Comisiones / Octubre",
+      "actualSourcePeriod": "2026-09",
+      "note": "Columna source visibly states 01/09/2026–30/09/2026; La Ceiba explicitly reports the same September period; uploaded October folder name is not the cash month."
+    },
+    "sha256Pinning": {
+      "algorithm": "SHA-256",
+      "verifiedRawSourceCounts": {
+        "novemberStatements": 15,
+        "novemberCommissionAndInvoices": 20,
+        "octoberFolderHistoricalReferences": 4,
+        "total": 39
+      },
+      "verifiedDateGuatemala": "2026-11-10",
+      "signedUrlsStored": false,
+      "rawCustomerRowsCommittedToRepository": false,
+      "normalizedWorkbookHashIsNotRawSourceHash": true
+    }
   },
   "ownerFrozenDecisions": [
     {
@@ -426,6 +510,26 @@
       "id": "PRIOR_QUESTIONS_RESPONDED",
       "authority": "PAULA_DIRECT_2026_11_10",
       "rule": "Owner says exceptions and original ambiguous questions were answered individually after workbook creation. Blank historical workbook consultation cells are NOT evidence the decisions remain unanswered. Exact text recovery remains incomplete; do not silently treat unrecovered response as a new unknown business decision."
+    },
+    {
+      "id": "ADVISOR_COMMISSION_PARTICIPATION",
+      "authority": "PAULA_EXPLICIT_2026_11_07_19_58_48_RETRIEVED_PERSONAL_CONTEXT_2026_11_10",
+      "rule": "Braulio=60%; Carlos=60%; Fernando=70%; Johanna=60%; Nicole=60%; Paula=80%; Samuel=70%; Germán=60%; preserve contract-specific effective dates rather than back-date all existing records."
+    },
+    {
+      "id": "CUSTOMER_ADVISOR_MAPPING",
+      "authority": "PAULA_EXPLICIT_2026_11_07_19_58_48_RETRIEVED_PERSONAL_CONTEXT_2026_11_10",
+      "rule": "Owner confirmed default Paula portfolio except Julia and María Gabriela assigned to Germán Reyes, Priscila Areli to Samuel Daza; do not transfer customers across adviser or country without matching policy/edition."
+    },
+    {
+      "id": "INDIVIDUAL_DOCUMENT_IDENTITIES",
+      "authority": "PAULA_EXPLICIT_2026_11_07_19_58_48_RETRIEVED_PERSONAL_CONTEXT_2026_11_10",
+      "rule": "María Larios policies are distinct by vehicle; Josué additional; Julia has a linked policy and must not be merged with namesakes; Paula health linkage; Aura Saquic excluded; Sonia Esmeralda recent additional policy; Marco AUTO-1000007073 distinct from earlier policy."
+    },
+    {
+      "id": "BAYRON_TWO_QUOTAS",
+      "authority": "PAULA_PRIOR_EXPLICIT_PLUS_LATER_2026_11_09_PAID_CONFIRMATION",
+      "rule": "Two actual installments of Q1,557.92 each, not 12 installments. 2026-11-06 Rural statement's one-pending snapshot and owner's later both-paid confirmation are time-different evidence; require a later paid supporting source or controlled user attestation with date before writing paid-at."
     }
   ],
   "newlyObservedStatementEvidence": [
@@ -452,11 +556,27 @@
     {
       "id": "BANTRAB_CEIBA_GT_RURAL_AGING",
       "observation": "Statements expose installment/requirement, collection/pending fields and dates. N/M installment counts and source cutoffs must be preserved. Rural older report may differ from later owner-paid confirmation; preserve both temporal facts."
+    },
+    {
+      "id": "COLUMNA_NATIVE_SCOPE_AND_STATUS",
+      "observation": "As of source through 2026-11-09, insurer-wide 'Cob Total' has 196,744 rows but A&S intermediary code 346 has exactly four collected installments (3 October + 1 November). A&S-only 'Data General' aging shows nine pending line items by Nov10; do not import other intermediaries, sum insurer-wide rows or treat pending projection as new payment."
+    },
+    {
+      "id": "GENERAL_COLLECTED_VS_PENDING",
+      "observation": "Source 'Reporte de ingresos' Oct 01–26 has 7 collected requirements totaling Q3,171.61 customer total and Q2,638.06 net; separate Nov09 pending report has 9 rows totaling Q5,125.48. Join by policy+endorsement+requirement+quota, not by policy alone."
+    },
+    {
+      "id": "ROBLE_AGING_BUCKETS_OCT23",
+      "observation": "El Roble Oct23 raw DIF report for A&S agent 3288 contains 238 requirement lines across 34 policies, Q94,660.30 total outstanding; Q77,163.36 unexpired and Q17,496.94 in aging buckets, with bucket sums exactly matching report total. These are customer premium totals pending as of older cut, not newly collected payments."
+    },
+    {
+      "id": "HISTORIC_COL_CEIBA_SEPTEMBER",
+      "observation": "October-folder Columna commission planilla actually covers Sept 01–30: Q5,251.08 net and Q787.72 commission, rate 15%. La Ceiba planilla also covers Sept 01–30: net Q14,396.52, total Q18,469.50, commission Q2,159.48, 15%. Use strictly for historical rate pattern; do not claim Oct/Nov invoice or payment."
     }
   ],
   "technicalCursor": {
-    "currentProtocolStep": "REGISTER_SOURCE_INVENTORY_AND_OWNER_DECISIONS",
-    "fileByteSha256Pinned": false,
+    "currentProtocolStep": "RAW_SOURCE_PIN_AND_NATIVE_FORMAT_AS_OF_CLASSIFICATION_COMPLETE_LIVE_MATCH_PENDING",
+    "fileByteSha256Pinned": true,
     "insurerStatementsFullyParsed": false,
     "owner28DecisionsRecoveredExactly": false,
     "livePreApplyReadback": false,
@@ -464,6 +584,9 @@
     "operationalWrites": 0,
     "sourceChangeInProduction": false,
     "importerRebuildRequired": false,
-    "nextRequiredStep": "Complete exact private answer-to-28 mapping from original conversations and raw statement hashing/parsing (especially Columna, General, El Roble), then take LIVE per-receipt readback and build deterministic idempotent delta through already approved server-owned command. Do not advance gate or claim LIVE PASS before evidence."
+    "nextRequiredStep": "Recover residual exact individual owner responses from authorized source if accessible (no repeated user questionnaires); then LIVE receipt/policy edition readback, per insurer+policy+edition+quota+requirement+source date idempotent deterministic diff, commit through already approved server-owned write chain, before/after readback and visual certification. No blind import or paid marking.",
+    "insurerStatementsNativeFormatsParsed": true,
+    "all35CurrentSourceRawHashesPinned": true,
+    "fourHistoricalReferenceHashesPinned": true
   }
 }
