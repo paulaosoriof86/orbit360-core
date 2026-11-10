@@ -1,0 +1,222 @@
+# I6.6 Ops P0 exact immutable artifact promotion only; source e898, no source rebuild, data writes, Rules/Auth.
+name: Gravicentra I6.6 Advisor CTA Exact LIVE Targeted Transport
+on:
+  push:
+    branches: [recovery/fase-a-clean-20260831]
+    paths:
+      - .github/workflows/gravicentra-delta-66-advisor-live-targeted.yml
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: gravicentra-i66-advisor-prod-targeted
+  cancel-in-progress: false
+jobs:
+  transport:
+    if: github.repository == 'paulaosoriof86/orbit360-core' && github.ref == 'refs/heads/recovery/fase-a-clean-20260831'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    env:
+      PROJECT_ID: ays-orbit-360-lab
+      SITE: ays-orbit-360-lab
+      I66_ADVISOR_SOURCE_SHA: 439ff7aebc685866c5605407dbc920fb329a552b
+      I66_ADVISOR_ARTIFACT_ID: '13789885477'
+      I66_ADVISOR_ARTIFACT_DIGEST: sha256:16bcf79be3d63fd67498194288e5131e1bf165b88ee32eff78b6dd184ce75c90
+      I66_ADVISOR_PREVIEW_CHANNEL: gi-i66-rc-42870013249
+      I66_ADVISOR_PREVIEW_URL: https://ays-orbit-360-lab--gi-i66-rc-42870013249-m0bkuoy4.web.app
+      I66_ADVISOR_PREVIEW_FUNCTION_RUN: '42871323207'
+      SA_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_ALT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify immutable Ops source and green Preview Function gate
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          git cat-file -e "$I66_ADVISOR_SOURCE_SHA^{commit}"
+          node --check tools/gravicentra-i6-6-advisor-live-exact-transport.mjs
+          node - <<'NODE'
+          const assert=require('node:assert/strict');
+          (async()=>{
+            const h={Authorization:'Bearer '+process.env.GH_TOKEN,Accept:'application/vnd.github+json','User-Agent':'GI-I66-Ops-P0-Live'};
+            const base='https://api.github.com/repos/paulaosoriof86/orbit360-core/actions/';
+            const [p,q,b,a]=await Promise.all([
+              fetch(base+'runs/'+process.env.I66_ADVISOR_PREVIEW_FUNCTION_RUN,{headers:h}).then(x=>x.json()),
+              fetch(base+'runs/42870010579',{headers:h}).then(x=>x.json()),
+              fetch(base+'runs/42870013249',{headers:h}).then(x=>x.json()),
+              fetch(base+'artifacts/'+process.env.I66_ADVISOR_ARTIFACT_ID,{headers:h}).then(x=>x.json())
+            ]);
+            assert.equal(p.conclusion,'success','I66_ADVISOR_PREVIEW_FUNCTION_NOT_GREEN');
+            assert.equal(p.head_sha,'8746377916de051c96d6f1c791a29a3ab07b8e09','I66_ADVISOR_PREVIEW_FUNCTION_WORKFLOW_DRIFT');
+            assert.equal(q.conclusion,'success','I66_ADVISOR_EMULATOR_NOT_GREEN');
+            assert.equal(b.conclusion,'success','I66_ADVISOR_ORIGINAL_PACKAGE_NOT_GREEN');
+            assert.equal(b.head_sha,process.env.I66_ADVISOR_SOURCE_SHA,'I66_ADVISOR_ORIGINAL_SOURCE_DRIFT');
+            assert.equal(a.digest,process.env.I66_ADVISOR_ARTIFACT_DIGEST,'I66_ADVISOR_ZIP_DIGEST_DRIFT');
+            assert.equal(a.workflow_run.id,42870013249,'I66_ADVISOR_ARTIFACT_RUN_DRIFT');
+            assert.equal(a.expired,false,'I66_ADVISOR_ARTIFACT_EXPIRED');
+            console.log('I66_ADVISOR_FUNCTION_PREVIEW_AND_EMULATOR_PROOFS_PASS');
+          })().catch(e=>{console.error(e.message);process.exitCode=1;});
+          NODE
+      - uses: actions/download-artifact@v4
+        with:
+          artifact-ids: 13789885477
+          run-id: 42870013249
+          github-token: ${{ github.token }}
+          path: ${{ runner.temp }}/ops-live-packet-download
+      - name: Verify exact TAR digest and historical Ops source match
+        run: |
+          set -euo pipefail
+          DL="$RUNNER_TEMP/ops-live-packet-download"
+          test "$(find "$DL" -maxdepth 3 -type f -name gi-i66-exact-package.tar.gz | wc -l)" -eq 1
+          test "$(find "$DL" -maxdepth 3 -type f -name gi-i66-exact-package.sha256 | wc -l)" -eq 1
+          TAR=$(find "$DL" -maxdepth 3 -type f -name gi-i66-exact-package.tar.gz -print -quit)
+          SUM=$(find "$DL" -maxdepth 3 -type f -name gi-i66-exact-package.sha256 -print -quit)
+          test "$(dirname "$TAR")" = "$(dirname "$SUM")"
+          test "$(sha256sum "$TAR" | awk '{print $1}')" = "$(awk '{print $1}' "$SUM")"
+          mkdir -p "$RUNNER_TEMP/ops-live-packet"
+          tar -xzf "$TAR" -C "$RUNNER_TEMP/ops-live-packet" --no-same-owner
+          echo "I66_PACKAGE_ROOT=$RUNNER_TEMP/ops-live-packet" >> "$GITHUB_ENV"
+          export OPS_LIVE_PKT="$RUNNER_TEMP/ops-live-packet"
+          node - <<'NODE'
+          const fs=require('node:fs'),{execFileSync}=require('node:child_process');
+          const p=process.env.OPS_LIVE_PKT+'/bundle/',m=JSON.parse(fs.readFileSync(p+'site/__recovery__/build.json'));
+          if(m.sourceSha!==process.env.I66_ADVISOR_SOURCE_SHA||m.gate!=='I6.6')throw Error('I66_ADVISOR_PACKAGE_SOURCE_DRIFT');
+          for(const [target,src] of [
+            ['backend/cobros-reconciliation-domain.js','functions/cobros-reconciliation-domain.js'],
+            ['backend/notification-outbox-processor.js','functions/notification-outbox-processor.js'],
+            ['backend/ops-advisor-inbox.js','functions/ops-advisor-inbox.js'],
+            ['site/modules/cobros.js','orbit360-platform/modules/cobros.js'],
+            ['site/modules/cliente360.js','orbit360-platform/modules/cliente360.js']
+          ]){
+            if(!fs.readFileSync(p+target).equals(execFileSync('git',['show',process.env.I66_ADVISOR_SOURCE_SHA+':'+src])))
+              throw Error('I66_ADVISOR_PRODUCT_BLOB_DRIFT:'+src);
+          }
+          if(!fs.existsSync(p+'backend/index.js')||!fs.existsSync(p+'backend/package-lock.json')||!fs.existsSync(process.env.OPS_LIVE_PKT+'/evidence/site-manifest.sha256'))throw Error('I66_ADVISOR_PACKET_INCOMPLETE');
+          console.log('I66_ADVISOR_EXACT_ARTIFACT_AND_BOTH_SOURCE_FILES_PASS build='+m.buildId);
+          NODE
+      - name: Use existing LAB credential, pinned Firebase CLI and Node Google Auth
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/ops-live-auth"
+          python3 - <<'PY'
+          import json,os,pathlib
+          root=pathlib.Path(os.environ['RUNNER_TEMP'])/'ops-live-auth';found=[]
+          for i,key in enumerate(('SA_LAB','SA_ALT','SA_DEFAULT')):
+              try: data=json.loads(os.environ.get(key,''))
+              except (ValueError,TypeError):continue
+              if data.get('type')=='service_account' and data.get('project_id')=='ays-orbit-360-lab' and data.get('private_key'):
+                  p=root/f'{i}.json';p.write_text(json.dumps(data));p.chmod(0o600);found.append(str(p))
+          if not found:raise SystemExit('I66_ADVISOR_LIVE_CREDENTIAL_NOT_CONFIGURED')
+          (root/'candidates').write_text('\n'.join(found)+'\n')
+          PY
+          npm install --prefix "$RUNNER_TEMP/ops-live-cli" --no-save --ignore-scripts --no-audit --no-fund firebase-tools@14.10.1 >/dev/null
+          node tools/gravicentra-firebase-tools-empty-extensions-workaround-v1.mjs "$RUNNER_TEMP/ops-live-cli"
+          CLI="$RUNNER_TEMP/ops-live-cli/node_modules/firebase-tools/lib/bin/firebase.js";SEL=''
+          while IFS= read -r c;do
+            if GOOGLE_APPLICATION_CREDENTIALS="$c" node "$CLI" functions:list --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/ops-live-functions-before.json" 2>/dev/null;then SEL="$c";break;fi
+          done < "$RUNNER_TEMP/ops-live-auth/candidates"
+          test -n "$SEL"
+          cp "$SEL" "$RUNNER_TEMP/ops-live-auth/selected.json"
+          chmod 600 "$RUNNER_TEMP/ops-live-auth/selected.json"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$RUNNER_TEMP/ops-live-auth/selected.json" >> "$GITHUB_ENV"
+          echo "FIREBASE_CLI_BIN=$CLI" >> "$GITHUB_ENV"
+          npm install --no-save --package-lock=false --ignore-scripts --no-audit --no-fund firebase-admin@13.4.0 >/dev/null
+      - uses: google-github-actions/setup-gcloud@v2
+        with:
+          version: '>= 483.0.0'
+      - name: Snapshot four LIVE Function revisions and Hosting exact rollback channel
+        run: |
+          set -euo pipefail
+          gcloud auth activate-service-account --key-file="$GOOGLE_APPLICATION_CREDENTIALS" --quiet >/dev/null
+          gcloud config set project "$PROJECT_ID" --quiet >/dev/null
+          : > "$RUNNER_TEMP/adv-old-functions.tsv"
+          for FN in orbit360CobrosReconciliationCommand orbit360NotificationOutboxCreated orbit360GetAdvisorOpsInbox orbit360UpdateAdvisorOpsInboxState; do
+            gcloud functions describe "$FN" --gen2 --region us-central1 --project "$PROJECT_ID" --format=json > "$RUNNER_TEMP/adv-$FN-fn-before.json"
+            SERVICE=$(node - "$FN" <<'NODE'
+          const fs=require('node:fs'),fn=process.argv[2],r=process.env.RUNNER_TEMP;
+          const f=JSON.parse(fs.readFileSync(r+'/adv-'+fn+'-fn-before.json'));
+          const full=String(f.serviceConfig?.service||''),name=full.split('/').pop();
+          if(!full.includes('/locations/us-central1/services/')||!/^[a-z][a-z0-9-]+$/.test(name))
+            throw Error('I66_ADVISOR_ROLLBACK_SERVICE_UNAVAILABLE:'+fn);
+          process.stdout.write(name);
+          NODE
+            )
+            gcloud run services describe "$SERVICE" --region us-central1 --project "$PROJECT_ID" --format=json > "$RUNNER_TEMP/adv-$FN-run-before.json"
+            REV=$(node - "$FN" "$SERVICE" <<'NODE'
+          const fs=require('node:fs'),fn=process.argv[2],service=process.argv[3],r=process.env.RUNNER_TEMP;
+          const v=JSON.parse(fs.readFileSync(r+'/adv-'+fn+'-run-before.json')),traffic=v.status?.traffic||v.traffic||[];
+          const full=traffic.filter(t=>Number(t.percent)===100),rev=String(full[0]?.revisionName||full[0]?.revision||'');
+          if(full.length!==1||!rev.startsWith(service+'-'))throw Error('I66_ADVISOR_ROLLBACK_REVISION_AMBIGUOUS:'+fn);
+          process.stdout.write(rev);
+          NODE
+            )
+            printf '%s\t%s\t%s\n' "$FN" "$SERVICE" "$REV" >> "$RUNNER_TEMP/adv-old-functions.tsv"
+          done
+          test "$(wc -l < "$RUNNER_TEMP/adv-old-functions.tsv")" -eq 4
+          RB="gi-i66-advrb-$GITHUB_RUN_ID"
+          node "$FIREBASE_CLI_BIN" hosting:clone "$SITE:live" "$SITE:$RB" --project "$PROJECT_ID" --non-interactive
+          echo "I66_ADVISOR_ROLLBACK_CHANNEL=$RB" >> "$GITHUB_ENV"
+          FROOT="$RUNNER_TEMP/adv-live-functions";mkdir -p "$FROOT"
+          cp -a "$I66_PACKAGE_ROOT/bundle/backend" "$FROOT/backend"
+          (cd "$FROOT/backend" && npm ci --ignore-scripts --no-audit --no-fund >/dev/null)
+          printf '{"functions":{"source":"backend"}}\n' > "$FROOT/firebase.json"
+          echo 'I66_ADVISOR_FOUR_FUNCTIONS_AND_HOSTING_ROLLBACK_SNAPSHOTS_READY'
+      - name: Promote four scoped LIVE Functions and exact Hosting version, rollback both on any error
+        run: |
+          set -euo pipefail
+          completed=0
+          rollback(){
+            code=$?
+            if test "$completed" != 1;then
+              set +e
+              echo 'I66_ADVISOR_FAILED_ATTEMPTING_FOUR_FUNCTION_ROLLBACK'
+              failed=0
+              while IFS="$(printf '\t')" read -r FN SERVICE OLD_REV; do
+                test -n "$SERVICE" || continue
+                gcloud run services update-traffic "$SERVICE" --region us-central1 --project "$PROJECT_ID" --to-revisions="$OLD_REV=100" --quiet || failed=1
+              done < "$RUNNER_TEMP/adv-old-functions.tsv"
+              node "$FIREBASE_CLI_BIN" hosting:clone "$SITE:$I66_ADVISOR_ROLLBACK_CHANNEL" "$SITE:live" --project "$PROJECT_ID" --non-interactive || failed=1
+              echo "I66_ADVISOR_ROLLBACK_ERRORS=$failed"
+              if test "$failed" != 0;then echo 'I66_ADVISOR_CRITICAL_ROLLBACK_UNCONFIRMED';fi
+            fi
+            exit "$code"
+          }
+          trap rollback EXIT
+          node "$FIREBASE_CLI_BIN" deploy --only functions:orbit360CobrosReconciliationCommand,functions:orbit360NotificationOutboxCreated,functions:orbit360GetAdvisorOpsInbox,functions:orbit360UpdateAdvisorOpsInboxState --config "$RUNNER_TEMP/adv-live-functions/firebase.json" --project "$PROJECT_ID" --non-interactive
+          node tools/gravicentra-i6-6-advisor-live-exact-transport.mjs
+          for FN in orbit360CobrosReconciliationCommand orbit360NotificationOutboxCreated orbit360GetAdvisorOpsInbox orbit360UpdateAdvisorOpsInboxState; do
+            gcloud functions describe "$FN" --gen2 --region us-central1 --project "$PROJECT_ID" --format=json > "$RUNNER_TEMP/adv-$FN-fn-after.json"
+            node - "$FN" <<'NODE'
+          const fs=require('node:fs'),fn=process.argv[2],o=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/adv-'+fn+'-fn-after.json'));
+          if(!['ACTIVE','READY'].includes(String(o.state||'').toUpperCase())||!String(o.serviceConfig?.uri||'').startsWith('https://'))
+            throw Error('I66_ADVISOR_FUNCTION_HEALTH_FAILED:'+fn);
+          NODE
+          done
+          node - <<'NODE'
+          const fs=require('node:fs'),r=process.env.RUNNER_TEMP,ev=JSON.parse(fs.readFileSync(r+'/i66-advisor-live-exact-readback.json'));
+          if(!ev.status.startsWith('LIVE_ADVISOR_HOSTING_SAME_ARTIFACT_')||
+             ev.previewReadbackCount<200||ev.firebaseLiveReadbackCount!==ev.previewReadbackCount||
+             ev.appDomainReadbackCount!==ev.previewReadbackCount||ev.rollback!=='NOT_REQUIRED')
+            throw Error('I66_ADVISOR_EXACT_HOSTING_READBACK_INCOMPLETE');
+          console.log('I66_ADVISOR_LIVE_FOUR_FUNCTIONS_AND_'+ev.previewReadbackCount+'_HOSTING_BYTES_PASS');
+          console.log('I66_ADVISOR_NO_REAL_FIRESTORE_WRITE_OR_PAYMENT_APPLICATION');
+          NODE
+          completed=1
+      - name: Preserve exact release and rollback proof without customer information
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gi-i66-advisor-live-exact-proof-${{ github.run_id }}
+          path: |
+            ${{ runner.temp }}/i66-advisor-live-exact-readback.json
+          if-no-files-found: warn
+          retention-days: 21
