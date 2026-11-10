@@ -1,0 +1,124 @@
+# I6.6 exact Hosting version clone ONLY. B4-007 historic close and Firestore data untouched.
+name: Gravicentra I6.6 Exact Preview to LIVE Clone
+
+on:
+  push:
+    branches: [recovery/fase-a-clean-20260831]
+    paths:
+      - .github/workflows/gravicentra-delta-66-exact-live-clone.yml
+      - artifacts/orbit360-recovery/release-control/I6_6_EXACT_HOSTING_LIVE_PROMOTION_REQUEST_20261110.json
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: gravicentra-delta-66-live-hosting
+  cancel-in-progress: false
+
+jobs:
+  exact-hosting-clone:
+    if: github.repository == 'paulaosoriof86/orbit360-core' && github.ref == 'refs/heads/recovery/fase-a-clean-20260831'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 26
+    env:
+      PROJECT_ID: ays-orbit-360-lab
+      SA_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_LAB_ALT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+      I66_PACKAGE_ROOT: ${{ runner.temp }}/gi-i66-promote-package
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Enforce explicit LIVE approval, historically sealed gate and exact success proofs
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          node tools/gravicentra-i6-6-delta-guard.mjs
+          node - <<'NODE'
+          const fs=require('node:fs'),cp=require('node:child_process');
+          const j=JSON.parse(fs.readFileSync('artifacts/orbit360-recovery/release-control/I6_6_EXACT_HOSTING_LIVE_PROMOTION_REQUEST_20261110.json','utf8'));
+          if(j.schema!=='I6_6_EXACT_HOSTING_LIVE_PROMOTION_V1'||j.status!=='LIVE_HOSTING_CLONE_APPROVED_AFTER_AUTH_QA_PASS'||j.approvedByDirection!==true||j.noBackendDeploy!==true||j.noFirestoreAuthOrDataWrites!==true)throw Error('I66_PROMOTION_APPROVAL_INVALID');
+          if(j.qaRunId!==42861298905||j.buildRunId!==42859356672||j.artifactId!==13785280178||j.sourceSha!=='0919914071fb40d4451861b50322fdd04a2bad2b')throw Error('I66_APPROVED_SOURCE_ID_DRIFT');
+          cp.execFileSync('git',['merge-base','--is-ancestor',j.sourceSha,'HEAD']);
+          if(cp.execFileSync('git',['diff','--name-only',j.sourceSha,'HEAD','--','orbit360-platform','functions','firebase.json','firestore.rules','storage.rules'],{encoding:'utf8'}).trim())throw Error('I66_PRODUCT_CHANGED_AFTER_BUILD');
+          (async()=>{
+            const api='https://api.github.com/repos/paulaosoriof86/orbit360-core/actions/';
+            const heads={Authorization:'Bearer '+process.env.GITHUB_TOKEN,'User-Agent':'GI-I66-Exact-Hosting-Clone','X-GitHub-Api-Version':'2022-11-28'};
+            const [qr,ar]=await Promise.all([fetch(api+'runs/'+j.qaRunId,{headers:heads}),fetch(api+'artifacts/'+j.artifactId,{headers:heads})]);
+            if(!qr.ok||!ar.ok)throw Error('I66_SUCCESS_PROOF_UNAVAILABLE');
+            const qa=await qr.json(),a=await ar.json();
+            if(qa.status!=='completed'||qa.conclusion!=='success'||a.workflow_run?.id!==j.buildRunId||
+               a.digest!=='sha256:'+j.artifactZipSha256||a.expired===true)throw Error('I66_QA_OR_PACKAGE_SUCCESS_PROOF_DRIFT');
+            console.log('I66_PINNED_QA_AND_PACKAGE_SUCCESS_PROOFS_PASS');
+          })().catch(e=>{console.error(e.message);process.exitCode=1;});
+          NODE
+      - name: Download original immutable GitHub artifact only; no rebuild
+        uses: actions/download-artifact@v4
+        with:
+          artifact-ids: 13785280178
+          run-id: 42859356672
+          github-token: ${{ github.token }}
+          path: ${{ runner.temp }}/gi-i66-artifact-download
+      - name: Verify artifact TAR checksum and unpack original site manifest
+        run: |
+          set -euo pipefail
+          ZIPDIR="$RUNNER_TEMP/gi-i66-artifact-download"
+          test -f "$ZIPDIR/gi-i66-exact-package.tar.gz"
+          test -f "$ZIPDIR/gi-i66-exact-package.sha256"
+          EXPECTED="$(cut -d' ' -f1 "$ZIPDIR/gi-i66-exact-package.sha256")"
+          ACTUAL="$(sha256sum "$ZIPDIR/gi-i66-exact-package.tar.gz" | cut -d' ' -f1)"
+          test "$EXPECTED" = "$ACTUAL"
+          mkdir -p "$I66_PACKAGE_ROOT"
+          tar -xzf "$ZIPDIR/gi-i66-exact-package.tar.gz" -C "$I66_PACKAGE_ROOT"
+          test -f "$I66_PACKAGE_ROOT/evidence/site-manifest.sha256"
+          test -f "$I66_PACKAGE_ROOT/bundle/site/__recovery__/build.json"
+          echo "I66_IMMUTABLE_ARTIFACT_TAR_SHA256=$ACTUAL"
+      - name: Select existing Firebase LAB service-account and pinned Hosting clone CLI
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/gi-i66-promote-auth"
+          python3 - <<'PY'
+          import json,os,pathlib
+          root=pathlib.Path(os.environ['RUNNER_TEMP'])/'gi-i66-promote-auth'
+          candidates=[]
+          for n,key in enumerate(('SA_LAB','SA_LAB_ALT','SA_DEFAULT')):
+              try: value=json.loads(os.environ.get(key,''))
+              except (ValueError,TypeError): continue
+              if value.get('type')=='service_account' and value.get('project_id')=='ays-orbit-360-lab' and value.get('private_key'):
+                  p=root/f'{n}.json';p.write_text(json.dumps(value));p.chmod(0o600);candidates.append(str(p))
+          if not candidates: raise SystemExit('I66_CLONE_CREDENTIAL_NOT_FOUND')
+          (root/'candidates').write_text('\n'.join(candidates)+'\n')
+          PY
+          npm install --prefix "$RUNNER_TEMP/gi-i66-promote-cli" --no-save --ignore-scripts --no-audit --no-fund firebase-tools@14.10.1 >/dev/null
+          node tools/gravicentra-firebase-tools-empty-extensions-workaround-v1.mjs "$RUNNER_TEMP/gi-i66-promote-cli"
+          CLI="$RUNNER_TEMP/gi-i66-promote-cli/node_modules/firebase-tools/lib/bin/firebase.js"
+          selected=''
+          while IFS= read -r candidate; do
+            if GOOGLE_APPLICATION_CREDENTIALS="$candidate" node "$CLI" apps:list WEB --project "$PROJECT_ID" --non-interactive --json >/dev/null 2>&1; then
+              selected="$candidate";break
+            fi
+          done < "$RUNNER_TEMP/gi-i66-promote-auth/candidates"
+          test -n "$selected"
+          cp "$selected" "$RUNNER_TEMP/gi-i66-promote-auth/selected.json"
+          chmod 600 "$RUNNER_TEMP/gi-i66-promote-auth/selected.json"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$RUNNER_TEMP/gi-i66-promote-auth/selected.json" >> "$GITHUB_ENV"
+          echo "FIREBASE_CLI_BIN=$CLI" >> "$GITHUB_ENV"
+          npm install --no-save --package-lock=false --ignore-scripts --no-audit --no-fund firebase-admin@13.4.0 >/dev/null
+      - name: Clone exact Preview Hosting version to LIVE with rollback and two-origin 100-percent byte readback
+        run: node tools/gravicentra-i6-6-live-exact-clone.mjs
+      - name: Preserve release/rollback proof without user data
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gi-i66-live-exact-clone-evidence-${{ github.run_id }}
+          path: ${{ runner.temp }}/i66-live-exact-clone-readback.json
+          retention-days: 14
+          if-no-files-found: warn

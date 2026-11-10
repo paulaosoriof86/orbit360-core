@@ -1,0 +1,21 @@
+{
+  "schema": "I6_6_EXACT_HOSTING_LIVE_PROMOTION_V1",
+  "status": "LIVE_HOSTING_CLONE_APPROVED_AFTER_AUTH_QA_PASS",
+  "approvedByDirection": true,
+  "historicalGateClosed": "B4-007",
+  "noBackendDeploy": true,
+  "noFirestoreAuthOrDataWrites": true,
+  "qaRunId": 42861298905,
+  "buildRunId": 42859356672,
+  "artifactId": 13785280178,
+  "artifactZipSha256": "7fde07bcd274942ce5ea639db302baadb4036b13e7ca33cc158dcf244fe62f93",
+  "sourceSha": "0919914071fb40d4451861b50322fdd04a2bad2b",
+  "previewChannel": "gi-i66-rc-42859356672",
+  "buildId": "gi-i66-0919914071fb-57f234755dc1",
+  "previewUrl": "https://ays-orbit-360-lab--gi-i66-rc-42859356672-irla5ypi.web.app",
+  "expectedOldSourceSha": "45020d748dd5fa4328a96f99fe9919a6fcb207eb",
+  "expectedOldBuildId": "gi-i65-b4-45020d748dd5-57f234755dc1",
+  "mustRollbackOnMismatch": true,
+  "businessDataWritesAuthorized": false,
+  "scope": "Hosting files only"
+}
