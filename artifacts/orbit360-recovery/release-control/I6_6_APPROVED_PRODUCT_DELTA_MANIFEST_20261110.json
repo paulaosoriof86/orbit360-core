@@ -297,6 +297,46 @@
           "gitBlobSha": "1c51bae1e7ad3c21c8cc2922369d4ce4e8726be9"
         }
       ]
+    },
+    {
+      "id": "I6_6_FORWARD_ONLY_UTC_MONTHLY_CADENCE_WITH_TERM_GUARD",
+      "approvedByDirection": true,
+      "receipt": "artifacts/orbit360-recovery/release-control/I6_6_PRIMAS_CALENDAR_FORWARD_ONLY_QA_MANIFEST_20261110.json",
+      "sourceCommit": "d1d97f2afb85f4a93beec4de848e4f8fd71ac4d7",
+      "sourceStatus": "SOURCE_QA_27_OF_27_PASS_NO_PREVIEW_NO_LIVE",
+      "capabilityOwners": [
+        "POLIZAS_PRIMARY_RUNTIME",
+        "RECIBOS_CARTERA_PRIMARY_RUNTIME"
+      ],
+      "scope": "FORWARD_ONLY: new policy plans version UTC_ANCHOR_V1, explicit payment frequency determines month cadence, installments determine count, reject outside contractual vigencia; no edits/rewrites of existing plans",
+      "dataWrites": 0,
+      "paths": [
+        {
+          "path": "orbit360-platform/core/primas.js",
+          "gitBlobSha": "2a8f86459c66c459da1fdb5d14e99f5f70341ee2"
+        },
+        {
+          "path": "orbit360-platform/core/policy-receipts-engine.js",
+          "gitBlobSha": "cfb24efa661e31f11e41d8246f8d0c574bcce0a3",
+          "replaces": {
+            "path": "orbit360-platform/core/policy-receipts-engine.js",
+            "priorGitBlobSha": "83a46af3d3bd24b65b90fe042308bfee511176f2",
+            "priorChangeId": "I6_6_CARLOS_POLICY_RENEWABILITY_ONLY_CAS_OPERATIVE_SCOPE_P0"
+          }
+        }
+      ],
+      "tests": [
+        {
+          "path": "tools/gravicentra-i6-6-primas-calendar-forward-only.test.cjs",
+          "gitBlobSha": "e649591392d2a4d0f35b3ea7d718e5ea0ecbaa79"
+        }
+      ],
+      "qa": {
+        "runId": 42883220523,
+        "conclusion": "PASS_3_OF_3_TZ_JOBS_27_OF_27_TESTS",
+        "liveRelease": false,
+        "protectedPreviewPending": true
+      }
     }
   ]
 }
