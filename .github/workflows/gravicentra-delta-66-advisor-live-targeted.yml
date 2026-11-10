@@ -141,7 +141,7 @@ jobs:
           : > "$RUNNER_TEMP/adv-old-functions.tsv"
           for FN in orbit360CobrosReconciliationCommand orbit360NotificationOutboxCreated orbit360GetAdvisorOpsInbox orbit360UpdateAdvisorOpsInboxState; do
             if ! gcloud functions describe "$FN" --gen2 --region us-central1 --project "$PROJECT_ID" --format=json > "$RUNNER_TEMP/adv-$FN-fn-before.json" 2> "$RUNNER_TEMP/adv-$FN-describe-error.txt";then
-              if test "$FN" != 'orbit360NotificationOutboxCreated' || ! grep -Fq 'status=[404]' "$RUNNER_TEMP/adv-$FN-describe-error.txt";then
+              if { test "$FN" != 'orbit360NotificationOutboxCreated' && test "$FN" != 'orbit360UpdateAdvisorOpsInboxState'; } || ! grep -Fq 'status=[404]' "$RUNNER_TEMP/adv-$FN-describe-error.txt";then
                 echo "I66_ADVISOR_UNEXPECTED_LIVE_FUNCTION_READ_FAILURE:$FN";exit 1
               fi
               node - "$FN" <<'NODE'
@@ -151,7 +151,7 @@ jobs:
             throw Error('I66_ADVISOR_NEW_TRIGGER_NOT_CONFIRMED_ABSENT');
           NODE
               printf '%s\t%s\t%s\n' "$FN" "__ABSENT__" "__ABSENT__" >> "$RUNNER_TEMP/adv-old-functions.tsv"
-              echo 'I66_ADVISOR_NEW_OUTBOX_TRIGGER_PREVIOUSLY_ABSENT_ROLLBACK_DELETE_SCOPED'
+              echo 'I66_ADVISOR_APPROVED_FUNCTION_PREVIOUSLY_ABSENT_ROLLBACK_DELETE_SCOPED'
               continue
             fi
             SERVICE=$(node - "$FN" <<'NODE'
@@ -175,6 +175,8 @@ jobs:
             printf '%s\t%s\t%s\n' "$FN" "$SERVICE" "$REV" >> "$RUNNER_TEMP/adv-old-functions.tsv"
           done
           test "$(wc -l < "$RUNNER_TEMP/adv-old-functions.tsv")" -eq 4
+          test "$(grep -c '__ABSENT__' "$RUNNER_TEMP/adv-old-functions.tsv")" -eq 2
+          echo "I66_ADVISOR_ROLLBACK_INVENTORY_EXISTING=2_NEW_ABSENT=2_PASS"
           RB="gi-i66-advrb-$GITHUB_RUN_ID"
           node "$FIREBASE_CLI_BIN" hosting:clone "$SITE:live" "$SITE:$RB" --project "$PROJECT_ID" --non-interactive
           echo "I66_ADVISOR_ROLLBACK_CHANNEL=$RB" >> "$GITHUB_ENV"
@@ -212,9 +214,14 @@ jobs:
             exit "$code"
           }
           trap rollback EXIT
-          if gcloud functions describe orbit360NotificationOutboxCreated --gen2 --region us-central1 --project "$PROJECT_ID" >/dev/null 2>&1;then
-            echo 'I66_ADVISOR_NEW_TRIGGER_APPEARED_DURING_PREFLIGHT';exit 1
-          fi
+          for FN in orbit360NotificationOutboxCreated orbit360UpdateAdvisorOpsInboxState; do
+            if gcloud functions describe "$FN" --gen2 --region us-central1 --project "$PROJECT_ID" >/dev/null 2> "$RUNNER_TEMP/adv-$FN-lastcheck.error";then
+              echo "I66_ADVISOR_NEW_FUNCTION_APPEARED_DURING_PREFLIGHT:$FN";exit 1
+            fi
+            if ! grep -Fq 'status=[404]' "$RUNNER_TEMP/adv-$FN-lastcheck.error";then
+              echo "I66_ADVISOR_NEW_FUNCTION_ABSENCE_NOT_PROVEN:$FN";exit 1
+            fi
+          done
           deployment_started=1
           node "$FIREBASE_CLI_BIN" deploy --only functions:orbit360CobrosReconciliationCommand,functions:orbit360NotificationOutboxCreated,functions:orbit360GetAdvisorOpsInbox,functions:orbit360UpdateAdvisorOpsInboxState --config "$RUNNER_TEMP/adv-live-functions/firebase.json" --project "$PROJECT_ID" --non-interactive
           node tools/gravicentra-i6-6-advisor-live-exact-transport.mjs
