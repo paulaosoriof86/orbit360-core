@@ -665,16 +665,16 @@
     }
   ],
   "technicalCursor": {
-    "currentProtocolStep": "I6_6_LIVE_BAYRON_POLICY_2_RECEIPTS_CORRECTED_PAYMENT_AND_ADVISOR_CONTRACT_HOLD",
+    "currentProtocolStep": "I6_6_LIVE_BAYRON_POLICY_PLAN_CORRECTED_MARIA_POLICY_CREATED_PAYMENT_AND_SOURCE_DATES_HOLD",
     "fileByteSha256Pinned": true,
     "insurerStatementsFullyParsed": false,
     "owner28DecisionsRecoveredExactly": false,
     "livePreApplyReadback": true,
     "deterministicDiffReady": false,
-    "operationalWrites": 6,
+    "operationalWrites": 7,
     "sourceChangeInProduction": false,
     "importerRebuildRequired": false,
-    "nextRequiredStep": "Continue insurer reconciliation case-by-case/batch: diagnose server-owned payment callable failure (Bayron 1/2 no changes), correct Client360 full-edit overwrite risk via safe patch-only method and policy advisor display; then establish source-exact bulk receipt schedule writer for all insurer statements and new policies, preserving paid/history. Importer remains demo fallback FAIL-CLOSED. Cross-module verified only Bayron policy+receipts+Client360 balance, not all Cobros/Reports.",
+    "nextRequiredStep": "First, remedy source-exact receipt schedule/insurer requirement ID for existing Maria 12 receipts (10 future aging rows due 1st, #39460328..37); do not recreate policy. Diagnose server payment callable before Bayron or Maria payment attempts. Then continue insurer reconciliations with deterministic exact UID, correcting row-level client/policy/commission projections. Importer demo path remains fail-closed/non-blocking.",
     "insurerStatementsNativeFormatsParsed": true,
     "all35CurrentSourceRawHashesPinned": true,
     "fourHistoricalReferenceHashesPinned": true,
@@ -1187,6 +1187,113 @@
         "monthlyIssueGTQ": 14.83,
         "monthlyTaxGTQ": 37.37
       }
+    },
+    "mariaGabriela": {
+      "dateGuatemala": "2026-11-10",
+      "environment": "https://app.aysseguros.com",
+      "status": "LIVE_NEW_POLICY_CREATED_VERIFIED_IN_CLIENT360_AND_POLICY_DETAIL; RECEIPT_SCHEDULE_UNRECONCILED; PAYMENT_HOLD",
+      "policyId": "pol_mwajp407_fizii",
+      "policyNumber": "04-15-01-000603-0",
+      "clientId": "cli_mwafruvk",
+      "client": "MARIA GABRIELA MONTEPEQUE PALMA VETTORAZZI",
+      "insurer": "SEGUROS UNIVERSALES",
+      "advisor": "Germán Reyes",
+      "product": "Gastos Médicos > GM Individual",
+      "currency": "GTQ",
+      "term": "2026-10-01 through 2027-09-30",
+      "premium": {
+        "net": 9720,
+        "emission": 486,
+        "surcharge": 0,
+        "vat": 1224.72,
+        "total": 11430.72
+      },
+      "paymentPlan": {
+        "frequency": "Mensual",
+        "installmentsCreated": 12,
+        "eachGTQ": 952.56,
+        "sourceFutureOpenInstallments": 10,
+        "sourceOpenTotalGTQ": 9525.6
+      },
+      "commission": {
+        "insurerRateInputPct": 10,
+        "sellerSharePct": 60,
+        "financialPosting": "DEFERRED"
+      },
+      "primaryPolicySource": "libfile_ec2f5e8a454481919fedd67aa15f20de",
+      "agingSource": "https://drive.google.com/file/d/1JUJVCqh9kL1KX9C9Qu_2W--R0Vyj1-5i/view",
+      "paymentSource": "https://drive.google.com/file/d/1ugk2ra8cAXQsfrY9BPE76LWKQUPm3nH9/view",
+      "sourceReceiptsFuture": [
+        {
+          "seq": 3,
+          "insurerReceipt": "39460328",
+          "due": "2026-12-01"
+        },
+        {
+          "seq": 4,
+          "insurerReceipt": "39460329",
+          "due": "2027-01-01"
+        },
+        {
+          "seq": 5,
+          "insurerReceipt": "39460330",
+          "due": "2027-02-01"
+        },
+        {
+          "seq": 6,
+          "insurerReceipt": "39460331",
+          "due": "2027-03-01"
+        },
+        {
+          "seq": 7,
+          "insurerReceipt": "39460332",
+          "due": "2027-04-01"
+        },
+        {
+          "seq": 8,
+          "insurerReceipt": "39460333",
+          "due": "2027-05-01"
+        },
+        {
+          "seq": 9,
+          "insurerReceipt": "39460334",
+          "due": "2027-06-01"
+        },
+        {
+          "seq": 10,
+          "insurerReceipt": "39460335",
+          "due": "2027-07-01"
+        },
+        {
+          "seq": 11,
+          "insurerReceipt": "39460336",
+          "due": "2027-08-01"
+        },
+        {
+          "seq": 12,
+          "insurerReceipt": "39460337",
+          "due": "2027-09-01"
+        }
+      ],
+      "sourcePaymentEvidence": {
+        "date": "2026-11-05",
+        "insurerReceipt": "39460327",
+        "seq": 2,
+        "amountGTQ": 952.56,
+        "method": "TC DEL DEPTO.",
+        "recordedInLive": false,
+        "reason": "COBROS_SERVER_COMMAND_PRIOR_FAILED_BAYRON; NO_RETRY_UNTIL_DIAGNOSED"
+      },
+      "liveReadback": {
+        "policyDetailExactPremiumConfirmed": true,
+        "client360CurrentReceipts": 12,
+        "allAmountsGTQ": 952.56,
+        "client360CollectionConfirmed": "none",
+        "platformGeneratedLimitDates": "2026-10-16 through 2027-09-15; 15-day source mismatch",
+        "platformGeneratedContractDates": "2026-10-01, 2026-10-31, 2026-12-01, 2026-12-31, 2027-01-31, 2027-03-03, 2027-03-31, 2027-05-01, 2027-05-31, 2027-07-01, 2027-07-31, 2027-08-31; average-month arithmetic drift",
+        "policyListSearch": "0 de 1425 immediately after creation although client360 has 1 policy and detail view; independently reload and reconcile projection before attributing source of inconsistency"
+      },
+      "actionBoundary": "Existing policy persisted; never create duplicate. Correct 10 future requirements to exact 1st day and insurer IDs with safe audited updateReceipt; prior 2 source IDs/dates must be crosschecked; paid command unavailable and thus no paid claim."
     }
   },
   "livePerformanceObservation": {
@@ -1234,6 +1341,18 @@
         "observedMs": null,
         "result": "URL switched #/cobros, one read failed CDP Runtime.evaluate 3s, subsequent read succeeded, 2559 current Cobros rows including 1227 SIGA unconfirmed",
         "status": "PERFORMANCE_SYMPTOM_WITH_CDP_TRANSPORT_CAVEAT"
+      },
+      {
+        "module": "Pólizas / Cliente360",
+        "action": "New Maria 12-receipt policy created, then navigation between Client360, details and Pólizas list",
+        "result": "Client360 and policy detail show persisted exact premium and 12 receipts; Pólizas list search retained zero of old 1425 after returning, requiring independent reload/projection check",
+        "status": "INTERMODULE_REFRESH_MISMATCH_OBSERVED_NOT_CAUSE_PROVEN"
+      },
+      {
+        "module": "Cliente360",
+        "action": "Direct navigate to Maria receipts tab then snapshot",
+        "result": "Browser post-execution hook timeout 17.8s; subsequent fresh browser session recovered tab with complete 12 receipts",
+        "status": "SLOW_NAVIGATION_AND_BROWSER_TRANSPORT_TIMEOUT_NOT_APP_ONLY"
       }
     ],
     "nextDiagnostics": "Instrument navigation, first render/data-ready and filter response independently; compare warmed vs fresh load and eliminate nonessential startup waits only on canonical source with regression QA. Do not block insurer reconciliation.",
@@ -1331,6 +1450,12 @@
           "source": "orbit360-platform/modules/cobros.js",
           "evidence": "K.wireFilters live branch already debounces search with 180ms timer; previous accepted B3-002 bounded-first-paint/60 rows and warm 380.6ms documented.",
           "fixBoundary": "Do not redo Cobros optimization already PASS; investigate hydration/readiness and duplicate semantic projections first, compare LIVE against exact approved build."
+        },
+        {
+          "id": "MONTHLY_PLAN_DRIFT_AND_GRACE_MISMATCH_MARIA",
+          "source": "orbit360-platform/core/primas.js",
+          "evidence": "12 Mensual receipt preview generated source contract dates 2026-10-01, 10-31, 12-01, 12-31, 2027-01-31, 03-03..., rather than exact 1st of every month (ten insurer aging dates Dec1 through Sep1). Separate 'fechaLimite' automatically +15 days; insurer report 'Fecha' is 1st. Receipt IDs on platform show blank vs primary insurer numbered #39460328..37.",
+          "actionBoundary": "Correct month progression by calendar-month add, preserve receipt-date vs grace semantics, allow insurer exact ID/due source maps; never silently use fake serial or overwrite paid."
         }
       ],
       "browserTransportNotes": "Connected Chrome/CDP intermittently exceeded 3s command dispatch and page action; previous coarse route timings include tool transport, so do not attribute all 6s to app without independent app-only measurement."
@@ -1502,6 +1627,23 @@
       "uiError": "No fue posible registrar el pago. No se guardaron cambios.",
       "paymentRecorded": false,
       "followup": "Diagnose server-owned Cobros Reconciliation Command without retry spam."
+    },
+    {
+      "id": "LIVE_MARIA_MONTEPEQUE_POLICY_CREATED_20261110",
+      "action": "CREATE_POLICY_AND_RECEIPTS",
+      "status": "LIVE_WRITE_VERIFIED_IN_CLIENT360_AND_POLICY_DETAIL",
+      "policy": "04-15-01-000603-0",
+      "policyId": "pol_mwajp407_fizii",
+      "clientId": "cli_mwafruvk",
+      "advisor": "Germán Reyes",
+      "netGTQ": 9720,
+      "grossGTQ": 11430.72,
+      "receipts": 12,
+      "perReceiptGTQ": 952.56,
+      "allReceiptDatesSourceMatched": false,
+      "paymentRecorded": false,
+      "source": "PRIMARY_UNIVERSALES_ISSUANCE_AND_NOV9_AGING",
+      "warning": "Do not duplicate; date/insurer receipt ID reconciliation and Nov5 payment pending."
     }
   ],
   "verifiedSourceReadbacks": [
@@ -1824,6 +1966,27 @@
       ],
       "caution": "Text extraction collapses PDF columns and client-name alignment; row-to-customer link not inferred. Header 'netas' alone does not establish numeric basis; compare actual line amount with source policy gross/net and requirement before updating. Historical cutoff is not current 2026-11-10 status.",
       "mutations": "NONE"
+    },
+    {
+      "id": "UNIVERSALES_MARIA_ISSUE_AND_LIVE_POLICY_NEW_20261110",
+      "status": "VERIFIED_PRIMARY_PDF_AND_LIVE_PERSISTENCE",
+      "policy": "04-15-01-000603-0",
+      "policyLibrary": "libfile_ec2f5e8a454481919fedd67aa15f20de",
+      "contract": {
+        "start": "2026-10-01",
+        "end": "2027-09-30",
+        "net": 9720,
+        "emission": 486,
+        "iva": 1224.72,
+        "gross": 11430.72,
+        "monthly": 12
+      },
+      "livePolicyId": "pol_mwajp407_fizii",
+      "liveClientId": "cli_mwafruvk",
+      "insurerAging": "https://drive.google.com/file/d/1JUJVCqh9kL1KX9C9Qu_2W--R0Vyj1-5i/view",
+      "outstandingFuture10": "39460328 through 39460337, 2026-12-01 through 2027-09-01, Q952.56 each",
+      "paidNov5": "39460327 payment 2/12 verified source; NOT applied LIVE",
+      "writeStatus": "ONE_NEW_POLICY_CREATED_ACTIVE_12_PENDING_DATE_RECONCILIATION"
     }
   ]
 }
