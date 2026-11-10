@@ -28,6 +28,7 @@ const sha = input => require('node:crypto').createHash('sha256').update(String(i
 const membershipRef = (tenantId, uid) => db.collection('tenants').doc(tenantId).collection('members').doc(uid);
 const outboxRef = (tenantId, eventId, preview) => db.collection('tenants').doc(tenantId).collection(preview ? 'previewNotificationOutbox' : 'notificationOutbox').doc(eventId);
 const eventRef = (tenantId, eventId, preview) => db.collection('tenants').doc(tenantId).collection(preview ? 'previewWorkflowEvents' : 'workflowEvents').doc(eventId);
+const reconciliationEventRef = (tenantId, eventId) => db.collection('tenants').doc(tenantId).collection('reconciliationEvents').doc(eventId);
 const previewProjectionRef = (tenantId, notificationId) => db.collection('tenants').doc(tenantId).collection('previewNotifs').doc(notificationId);
 const portalProjectionRef = (tenantId, notificationId) => db.collection('tenantId').doc(tenantId).collection('notifs').doc(notificationId);
 const internalProjectionRef = (tenantId, notificationId, preview) => db.collection('tenants').doc(tenantId).collection(preview ? 'previewInternalNotifs' : 'internalNotifs').doc(notificationId);
@@ -102,13 +103,27 @@ async function processOutbox(tenantIdInput, eventIdInput, preview, actorUid) {
   const eventId = cleanId(eventIdInput, 'eventId');
   if (preview && tenantId !== 'alianzas-soluciones') throw new Error('PREVIEW_QA_TENANT_ONLY');
   const outRef = outboxRef(tenantId, eventId, preview);
-  const evtRef = eventRef(tenantId, eventId, preview);
   try {
     return await db.runTransaction(async tx => {
-      const [outSnap, evtSnap] = await Promise.all([tx.get(outRef), tx.get(evtRef)]);
+      const outSnap = await tx.get(outRef);
       if (!outSnap.exists) throw new Error('OUTBOX_NOT_FOUND');
       const row = outSnap.data() || {};
+      const eventSource = norm(row.eventSource || 'workflow');
+      if (!['workflow', 'reconciliation'].includes(eventSource)) throw new Error('UNKNOWN_CANONICAL_EVENT_SOURCE');
+      if (eventSource === 'reconciliation' && preview) throw new Error('RECONCILIATION_EVENT_PREVIEW_NOT_ALLOWED');
+      const evtRef = eventSource === 'reconciliation' ? reconciliationEventRef(tenantId, eventId) : eventRef(tenantId, eventId, preview);
+      const evtSnap = await tx.get(evtRef);
       if (!evtSnap.exists) throw new Error('CANONICAL_EVENT_NOT_COMMITTED');
+      if (eventSource === 'reconciliation') {
+        const verified = evtSnap.data() || {};
+        if (text(verified.tenantId) !== tenantId ||
+            text(verified.eventId) !== eventId ||
+            text(verified.operation) !== 'report_advisor_payment' ||
+            text(verified.managementId) !== text(row.entityId) ||
+            text(verified.receiptId) !== text(row.receiptId) ||
+            text(row.operation) !== 'report_advisor_payment')
+          throw new Error('RECONCILIATION_EVENT_OUTBOX_MISMATCH');
+      }
       if (preview) { const entityId=text(row.entityId,180); if(row.previewWrite!==true||!/^b400[23]qa[_:-]/i.test(entityId))throw new Error('PREVIEW_QA_EVENT_ONLY'); }
       if (row.processorVersion === VERSION && ['delivered_internal','pending_connection'].includes(text(row.status, 80))) {
         return { ok: true, reused: true, status: text(row.status, 80), attemptCount: Number(row.attemptCount) || 0 };
@@ -158,6 +173,7 @@ async function processOutbox(tenantIdInput, eventIdInput, preview, actorUid) {
           const direction=text(row.direction,40),targetSurface=type==='advisor'?'leads':'ops';
           tx.set(internalProjectionRef(tenantId,id,preview),{
             id,tenantId,eventId,entityType:text(row.entityType,100),entityId:text(row.entityId,180),operation:text(row.operation,100),
+            eventSource:text(row.eventSource||'workflow',80),pais:text(row.pais,8).toUpperCase(),asesorId:text(row.asesorId,180),
             targetType:type,targetId,targetSurface,direction,actorUid,actorName,titulo:text(row.payload&&row.payload.title,240)||'Actualización interna',
             cuerpo:text(row.payload&&row.payload.message,1200),leida:false,previewWrite:preview===true,source:'canonical_notification_outbox',
             processorVersion:VERSION,createdAt:FieldValue.serverTimestamp(),updatedAt:FieldValue.serverTimestamp()

@@ -123,6 +123,42 @@
           "gitBlobSha": "2ff01c2cf871e39027841678e70082856b8cef4e"
         }
       ]
+    },
+    {
+      "id": "I6_6_ADVISOR_REPORT_OPS_INTERNAL_OUTBOX_ROLE_COUNTRY_P0",
+      "approvedByDirection": true,
+      "receipt": "artifacts/orbit360-recovery/release-control/I6_6_ADVISOR_REPORT_OPS_OUTBOX_AUTH_20261110.json",
+      "sourceStatus": "SOURCE_COMMIT_CANDIDATE_INTERNAL_ONLY_PREVIEW_FUNCTION_QA_REQUIRED_NO_LIVE",
+      "capabilityOwners": [
+        "COBROS_RECONCILIATION",
+        "OPS_ADVISOR_INBOX",
+        "IN_APP_NOTIFICATION_OUTBOX"
+      ],
+      "scope": "Asesor reportar pago only; create deterministic internal Ops notification after canonical reconciliation event, enforce tenant/country/role inbox and reject foreign resolution, preserve pending validation. No payment applied or external push.",
+      "paths": [
+        {
+          "path": "functions/cobros-reconciliation-domain.js",
+          "gitBlobSha": "8fa714493b2f3cdf93655b4b252bf4fda9c30ee2"
+        },
+        {
+          "path": "functions/notification-outbox-processor.js",
+          "gitBlobSha": "b1c2f7a3c658c03905c1df68d642013f910790ec"
+        },
+        {
+          "path": "functions/ops-advisor-inbox.js",
+          "gitBlobSha": "6a9908ef6ab78301279184988bd6f954ff990a4f"
+        },
+        {
+          "path": "orbit360-platform/modules/cobros.js",
+          "gitBlobSha": "ffdc305d9103252b92893689d37d5597a72bf69a"
+        }
+      ],
+      "tests": [
+        {
+          "path": "tools/gravicentra-i6-6-advisor-payment-notification.test.cjs",
+          "gitBlobSha": "4600c54a69c671847ed633feacb28ac0f8758a19"
+        }
+      ]
     }
   ]
 }

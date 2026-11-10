@@ -48,6 +48,9 @@ function requestRef(tenantId, requestId) {
 function eventRef(tenantId, eventId) {
   return db.collection('tenants').doc(tenantId).collection('reconciliationEvents').doc(eventId);
 }
+function paymentNotificationRef(tenantId, eventId) {
+  return db.collection('tenants').doc(tenantId).collection('notificationOutbox').doc(eventId);
+}
 function controlRef(tenantId) {
   return tenantData(tenantId, 'cobrosLedgerControl').doc('active');
 }
@@ -90,7 +93,8 @@ async function authorize(request, operation) {
   const tenantId = id(request.data && request.data.tenantId, 'tenantId');
   const snap = await memberRef(tenantId, request.auth.uid).get();
   const member = snap.exists ? snap.data() : null;
-  if (!active(member)) throw new HttpsError('permission-denied', 'Membresía inactiva.');
+  if (!active(member) || (text(member.tenantId,180) && text(member.tenantId,180)!==tenantId))
+    throw new HttpsError('permission-denied', 'Membresía inactiva o fuera del tenant.');
   let roleState;
   try {
     roleState = resolveProductActiveRole(member, request.data && request.data.activeRole);
@@ -275,6 +279,9 @@ async function reportAdvisorPayment(authz, data, payload) {
     const policySnap = await tx.get(policyRef);
     if (!policySnap.exists) throw new HttpsError('failed-precondition', 'La póliza vinculada no existe.');
     const policy = Object.assign({ id: policySnap.id }, policySnap.data() || {});
+    const notificationCountry = text(policy.pais || receipt.pais, 8).toUpperCase();
+    if (!['GT', 'CO'].includes(notificationCountry))
+      throw new HttpsError('failed-precondition', 'PAYMENT_REPORT_COUNTRY_UNRESOLVED: la póliza requiere país válido.');
     const clientId = id(receipt.clienteId || policy.clienteId, 'clienteId');
     const receiptAdvisorId = text(receipt.asesorId || policy.asesorId, 180);
     if (!authz.actor.advisorId || !receiptAdvisorId || receiptAdvisorId !== authz.actor.advisorId) {
@@ -359,6 +366,29 @@ async function reportAdvisorPayment(authz, data, payload) {
       managementId,
       payloadDigest: digest(reqPayload),
       resultDigest: digest(committed),
+      createdAt: technicalNow
+    }, { merge: false });
+    tx.set(paymentNotificationRef(authz.tenantId, eventId), {
+      schemaVersion: VERSION,
+      tenantId: authz.tenantId,
+      eventId,
+      eventSource: 'reconciliation',
+      operation: 'report_advisor_payment',
+      entityType: 'gestiones',
+      entityId: managementId,
+      receiptId,
+      pais: notificationCountry,
+      asesorId: receiptAdvisorId,
+      targets: [{ type: 'role', id: 'operations' }],
+      channels: ['in_app'],
+      status: 'pending_provider',
+      actorUid: authz.actor.uid,
+      actorName: text(authz.member.nombre || authz.member.displayName || authz.member.name, 220).includes('@') ? '' :
+        text(authz.member.nombre || authz.member.displayName || authz.member.name, 220),
+      payload: {
+        title: 'Validar pago reportado',
+        message: 'Un asesor reportó un pago. Verificar recibo y evidencia antes de cualquier aplicación.'
+      },
       createdAt: technicalNow
     }, { merge: false });
     tx.set(reqRef, { status: 'committed', operation: 'report_advisor_payment', eventId, payloadDigest: digest(reqPayload), result: committed, committedAt: technicalNow }, { merge: true });

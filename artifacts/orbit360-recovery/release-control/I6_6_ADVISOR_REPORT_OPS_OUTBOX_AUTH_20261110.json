@@ -1,0 +1,54 @@
+{
+  "schema": "GRAVICENTRA_I6_6_ADVISOR_REPORT_OPS_OUTBOX_P0_V1",
+  "brand": "Gravicentra Insurance",
+  "date": "2026-11-10",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "reviewedHead": "9d903a7edbf199b7762bbc09ded11c839c65859b",
+  "approvedByDirection": true,
+  "directionRecord": "Paula authorized P0 Reportar pago Asesor→Ops, internal outbox, idempotence, tenant/country/role scoped inbox, same canonical branch, isolated Preview QA; no LIVE data mutation or external sends",
+  "frozenBoundary": "B4-007 CLOSED, I6.6 active; this P0 is a successor delta, not a B4 reopen",
+  "files": [
+    {
+      "path": "functions/cobros-reconciliation-domain.js",
+      "previousGitBlobSha": "5b27038d1c8380e4d2d0ed044996c1570d8c3767",
+      "newGitBlobSha": "8fa714493b2f3cdf93655b4b252bf4fda9c30ee2"
+    },
+    {
+      "path": "functions/notification-outbox-processor.js",
+      "previousGitBlobSha": "ce31ae776beb5945741ef0f9f9dbf53075d03910",
+      "newGitBlobSha": "b1c2f7a3c658c03905c1df68d642013f910790ec"
+    },
+    {
+      "path": "functions/ops-advisor-inbox.js",
+      "previousGitBlobSha": "a26aeefdb27344bf91f978ca054ae9c1bfa8c3f7",
+      "newGitBlobSha": "6a9908ef6ab78301279184988bd6f954ff990a4f"
+    },
+    {
+      "path": "orbit360-platform/modules/cobros.js",
+      "previousGitBlobSha": "89f5b0bdfb49a4f822de5d617ee8382ea269d916",
+      "newGitBlobSha": "ffdc305d9103252b92893689d37d5597a72bf69a"
+    }
+  ],
+  "test": {
+    "path": "tools/gravicentra-i6-6-advisor-payment-notification.test.cjs",
+    "gitBlobSha": "4600c54a69c671847ed633feacb28ac0f8758a19",
+    "staticResult": "I6_6_ADVISOR_REPORT_OPS_NOTIFICATION_AND_SCOPE_PASS",
+    "scriptRunExit": 0,
+    "reversePatchCheckExit": 0
+  },
+  "guarantees": [
+    "report_advisor_payment remains pending operational validation; no collection cobros write",
+    "atomic receipt/management/reconciliationEvents/notificationOutbox; deterministic event and request IDs",
+    "outbox processing rejects absent or mismatching canonical reconciliation event",
+    "recipient authorized by active member tenant, country GT/CO and opsScope plus role; foreign inbox notice cannot be resolved",
+    "in-app channels only, no Make, GreenAPI, WhatsApp, FCM, external send",
+    "client portal projection path unchanged and not selected for role:operations targets"
+  ],
+  "releaseState": "SOURCE_CANDIDATE_AUTHORIZED_COMMIT_PENDING_ISOLATED_FUNCTION_PREVIEW_QA_NOT_LIVE",
+  "testLimitations": [
+    "static tests are not authenticated Firebase readback",
+    "observed toast root cause requires real callable trace",
+    "no LIVE data writes or deployment in this commit"
+  ]
+}

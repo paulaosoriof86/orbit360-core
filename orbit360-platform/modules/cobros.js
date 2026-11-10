@@ -812,7 +812,23 @@ Orbit.modules.cobros = (function () {
         }});
         close();U.toast(reported&&reported.documentLifecycleOk===false?'✓ Pago reportado. El soporte quedó en recuperación controlada.':'✓ Pago reportado y enviado a Ops para validación');
         baseCache=null;/* B3-004 R14: router/store reactive owner preserves the active payment context. */
-      }catch(error){btn.disabled=false;U.toast('No fue posible enviar el reporte de pago a Ops.');}
+      }catch(error){
+        btn.disabled=false;
+        const rawCode=String(error&&(error.code||'')||'').toLowerCase();
+        const trace=error&&error.gravicentraPayment||{};
+        try{console.warn('[Gravicentra][Cobros] Reporte de asesor rechazado',{
+          operation:'report_advisor_payment',code:rawCode||'UNKNOWN',requestId:String(trace.requestId||''),
+          receiptId:String(receipt.id||'')
+        });}catch(_){}
+        const message=rawCode.includes('permission-denied')
+          ?'No se pudo reportar: revisa que el recibo esté asignado a tu cartera como Asesor.'
+          :rawCode.includes('not-found')
+          ?'No se encontró el recibo o la póliza en el servidor. No se registró el reporte.'
+          :rawCode.includes('failed-precondition')
+          ?'El recibo no cumple una condición para reportar (ya aplicado, monto o país sin validar). Ningún pago se aplicó.'
+          :'No fue posible confirmar el reporte a Ops. No se aplicó ningún pago. Reintenta solo después de verificar el estado.';
+        U.toast(message);
+      }
     };
   }
 

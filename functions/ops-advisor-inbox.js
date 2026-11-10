@@ -56,9 +56,19 @@ function timestampMs(value){
   if(typeof value.seconds==='number')return value.seconds*1000+Number(value.nanoseconds||0)/1e6;
   const n=Date.parse(String(value));return Number.isFinite(n)?n:0;
 }
-function recipientMatch(target,authz,actorUid){
+function recipientMatch(target,authz,actorUid,notice){
   if(actorUid&&text(actorUid,180)===text(authz.uid,180))return false;
   const type=norm(target&&target.type),targetId=text(target&&target.id,180);
+  // Reconciliation events carry their verified country and advisor.
+  // Deliver to the operational roles only within signed membership boundaries.
+  if(notice&&norm(notice.eventSource)==='reconciliation'){
+    const country=text(notice.pais,8).toUpperCase();
+    const countries=unique([...(authz.member.countries||[]),...(authz.member.paises||[])]).map(v=>text(v,8).toUpperCase());
+    if(!['GT','CO'].includes(country)||!countries.includes(country))return false;
+    const advisorId=text(notice.asesorId,180);
+    if((authz.opsScope==='own'||authz.opsScope==='team')&&
+       !allowedAdvisorIds(authz,'ops').includes(advisorId))return false;
+  }
   if(type==='advisor')return advisorRole(authz.activeRole)&&!!authz.advisorId&&targetId===authz.advisorId;
   if(type==='role'&&norm(targetId)==='operations')return authz.opsScope!=='none'&&opsRole(authz.activeRole);
   return false;
@@ -100,7 +110,8 @@ async function authorize(request) {
   const tenantId = cleanId(request.data && request.data.tenantId, 'tenantId');
   const snap = await membershipRef(tenantId, request.auth.uid).get();
   const member = snap.exists ? snap.data() : null;
-  if (!activeMember(member)) throw new HttpsError('permission-denied', 'La membresía no está activa.');
+  if (!activeMember(member) || (text(member.tenantId,180) && text(member.tenantId,180)!==tenantId))
+    throw new HttpsError('permission-denied', 'La membresía no está activa o pertenece a otro tenant.');
   let resolvedRole;
   try{resolvedRole=resolveProductActiveRole(member,request.data&&request.data.activeRole);}
   catch(_){throw new HttpsError('permission-denied','El rol activo no está asignado.');}
@@ -170,9 +181,9 @@ async function inbox(request,preview) {
   const stateByEvent=new Map(stateSnap.docs.map(doc=>{const row=doc.data()||{};return[text(row.noticeId||doc.id,180),row];}));
   const taskByEvent=new Map(taskSnap.docs.map(doc=>{const row=doc.data()||{};return[text(row.noticeId||doc.id,180),row];}));
   const outboxNotices = noticesSnap.docs.map(doc => Object.assign({ id: doc.id }, doc.data())).filter(row =>
-    [].concat(row.targets||[]).some(target=>recipientMatch(target,authz,row.actorUid))
+    [].concat(row.targets||[]).some(target=>recipientMatch(target,authz,row.actorUid,row))
   ).map(row => {
-    const allTargets=[].concat(row.targets||[]).filter(Boolean),targets=allTargets.filter(t=>recipientMatch(t,authz,row.actorUid)),target=targets[0]||{},eventId=text(row.eventId||row.id,180);
+    const allTargets=[].concat(row.targets||[]).filter(Boolean),targets=allTargets.filter(t=>recipientMatch(t,authz,row.actorUid,row)),target=targets[0]||{},eventId=text(row.eventId||row.id,180);
     const recipientList=allTargets.map(t=>norm(t&&t.type)+':'+text(t&&t.id,180)).filter(v=>!/:$/.test(v));
     return {
       id:eventId,eventId,entityType:text(row.entityType,100),entityId:text(row.entityId,180),operation:text(row.operation,100),
@@ -191,7 +202,7 @@ async function inbox(request,preview) {
       const direction=text(comment&&comment.direction,40);if(!['advisor','operations'].includes(direction))return;
       const target=direction==='advisor'?{type:'advisor',id:text(row.asesorId,180)}:{type:'role',id:'operations'};
       const actorUid=text(comment&&comment.actorUid,180);
-      if(!recipientMatch(target,authz,actorUid))return;
+      if(!recipientMatch(target,authz,actorUid,row))return;
       const eventId=text(comment.eventId||('collab_'+row.id+'_'+index),180);
       collaborationNotices.push({id:eventId,eventId,entityType:'negocios',entityId:text(row.id,180),operation:'typed_collaboration',status:'internal_committed',
         title:text(comment.tipo||'Colaboración comercial-operativa',240),message:text(comment.texto||comment.txt,1200),attemptCount:0,retryEligible:false,lastError:'',
@@ -202,7 +213,7 @@ async function inbox(request,preview) {
     });
   });
   const internalNotices=internalSnap.docs.map(doc=>Object.assign({id:doc.id},doc.data())).filter(row=>{
-    const target={type:row.targetType,id:row.targetId};return recipientMatch(target,authz,row.actorUid);
+    const target={type:row.targetType,id:row.targetId};return recipientMatch(target,authz,row.actorUid,row);
   }).map(row=>{const eventId=text(row.eventId||row.id,180),type=norm(row.targetType),targetId=text(row.targetId,180);return{id:eventId,eventId,entityType:text(row.entityType,100),entityId:text(row.entityId,180),
     operation:text(row.operation,100),status:'internal_delivered',title:text(row.titulo,240),message:text(row.cuerpo,1200),attemptCount:1,retryEligible:false,lastError:'',
     nextAttemptAt:null,processedAt:row.updatedAt||null,channelStates:{internal:'delivered'},externalChannelsPendingConnection:[],createdAt:row.createdAt||null,
@@ -262,6 +273,15 @@ async function updateInboxState(request,preview){
   const authz=await authorize(request),noticeId=cleanId(request.data&&request.data.noticeId,'noticeId'),requestedAction=norm(request.data&&request.data.action);
   if(!['read','acknowledge','resolve','attended','archive','restore'].includes(requestedAction))throw new HttpsError('invalid-argument','Acción de bandeja no soportada.');
   const action=requestedAction==='attended'?'resolve':requestedAction;
+  // Re-authorize this event against the current server-computed inbox.
+  // A valid tenant membership cannot resolve a task addressed to someone else.
+  const visibleInbox=await inbox({
+    auth:request.auth,data:Object.assign({},request.data||{},{limit:500,includeArchived:true})
+  },preview);
+  const selected=visibleInbox.notices.find(row=>text(row.eventId,180)===noticeId);
+  if(!selected)throw new HttpsError('permission-denied','La notificación no está autorizada para este destinatario.');
+  if(action==='resolve'&&selected.targetType==='role'&&!opsRole(authz.activeRole))
+    throw new HttpsError('permission-denied','Solo el equipo operativo puede resolver esta solicitud compartida.');
   const personalDoc=inboxStateCollection(authz.tenantId,authz.uid,preview).doc(noticeId);
   const taskDoc=inboxTaskCollection(authz.tenantId,preview).doc(noticeId);
   const personalPatch={noticeId,updatedAt:FieldValue.serverTimestamp()};
