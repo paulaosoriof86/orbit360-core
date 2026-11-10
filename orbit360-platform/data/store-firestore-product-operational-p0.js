@@ -437,7 +437,9 @@
       var requestId=text(options.requestId)||('batch_'+Date.now()+'_'+Math.random().toString(36).slice(2,8));
       var previewGeneral=isB2PreviewHost();
       var input={tenantId:m.tenantId,activeRole:m.activeRole,requestId:requestId,mutations:prepared.map(function(x){
-        var mutation={action:x.action,collection:x.collection,id:x.id,payload:x.action==='remove'?null:clone(x.row)};
+        // For existing insurer obligations, transmit only the changed fields. The server merges the patch in a Firestore transaction with the latest row; a cached complete row could erase concurrent LIVE changes.
+        var preserveConcurrentFields=x.action==='update'&&(x.collection==='recibosEsperados'||x.collection==='carteraPrimas');
+        var mutation={action:x.action,collection:x.collection,id:x.id,payload:x.action==='remove'?null:clone(preserveConcurrentFields?x.payload:x.row)};
         if(x.collection==='aseguradoras'&&x.action!=='remove'){
           mutation.payload=x.action==='update'?clone(x.payload):insurerWritePayload(x.action,x.row,x.prior);
           mutation.auditReason=x.auditReason;
