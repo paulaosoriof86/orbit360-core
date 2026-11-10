@@ -1,6 +1,6 @@
 {
   "schemaVersion": "gi.i66.calendar.forward_only.source_qa_manifest.v1",
-  "status": "I66_SOURCE_CANDIDATE_QA_PENDING_NO_PREVIEW_NO_LIVE",
+  "status": "I66_UTC_AND_PERIODICITY_SOURCE_CANDIDATE_NEW_CI_PENDING_NO_PREVIEW_NO_LIVE",
   "dateGuatemala": "2026-11-10",
   "product": "Gravicentra Insurance",
   "repository": "paulaosoriof86/orbit360-core",
@@ -28,18 +28,18 @@
   "candidateSource": [
     {
       "path": "orbit360-platform/core/primas.js",
-      "blobSha": "a84f60759f31b59059480b863ab7264b947c8fff",
-      "role": "Civil UTC anchored due dates and UTC grace deadline; legacy local mode explicit for historic plans"
+      "blobSha": "2a8f86459c66c459da1fdb5d14e99f5f70341ee2",
+      "role": "Civil UTC anchor/clamp; explicit periodicity controls month interval, optional civil term boundary; legacy unchanged"
     },
     {
       "path": "orbit360-platform/core/policy-receipts-engine.js",
-      "blobSha": "c2bbacd425691ec169dbde17e8f7394c30ffe159",
-      "role": "New policies persist planCalendarVersion UTC_ANCHOR_V1; existing policies retain old mode; no silent migration"
+      "blobSha": "cfb24efa661e31f11e41d8246f8d0c574bcce0a3",
+      "role": "Forward-only UTC_ANCHOR_V1 and pre-write term guard; legacy edits stay on original date computation"
     }
   ],
   "qa": {
     "testFile": "tools/gravicentra-i6-6-primas-calendar-forward-only.test.cjs",
-    "testBlobSha": "12eb5023e73385aebe89c19de42d14fbb774cd74",
+    "testBlobSha": "e649591392d2a4d0f35b3ea7d718e5ea0ecbaa79",
     "workflow": ".github/workflows/gravicentra-i66-primas-calendar-forward-only-qa.yml",
     "workflowBlobSha": "765ad05dcac9c6cb313a852b534172fb6fdb8039",
     "expectedMatrix": [
@@ -54,10 +54,17 @@
       "BIMESTRAL_TRIMESTRAL_CUATRIMESTRAL_SEMESTRAL_ANUAL",
       "LEGACY_EDIT_NONFINANCIAL_PRESERVES_DATES",
       "NEW_POLICY_UTC_ANCHOR_FORWARD_ONLY",
-      "NO_FIRESTORE"
+      "NO_FIRESTORE",
+      "MONTHLY_5_CONSECUTIVE",
+      "TERM_REJECT_5_MONTHLY_IN_3_MONTHS_AND_24_IN_YEAR"
     ],
     "runId": null,
-    "conclusion": "PENDING_CI"
+    "conclusion": "PENDING_NEW_CI_3_ZONES",
+    "lastProvenPreviousRun": {
+      "runId": 42882704534,
+      "status": "PASS_3_ZONES_7_TEST_GROUPS",
+      "sourceBoundary": "UTC_TIMEZONE_FIX_PRIOR_TO_PERIODICITY_EXTENSION"
+    }
   },
   "strictDataSeparation": {
     "thisCandidateWritesToLive": 0,
@@ -67,5 +74,28 @@
     "mariaSevenDatesDataPatch": "SEPARATE_SOURCE_DATE_RECONCILIATION_HOLD",
     "idempotence": "Unrelated historical work and prior B4-007 immutable releases preserved",
     "deployment": "NO_LIVE_WITHOUT_NEW_INDIVIDUAL_PREVIEW_AND_BUILD_DIGEST"
+  },
+  "explicitPaymentCadenceForwardOnly": {
+    "decision": "OWNER_FROZEN_2026-11-10",
+    "rule": "Payment frequency determines months between due dates; cuotas determines count, not 12/count",
+    "intervalsMonths": {
+      "Mensual": 1,
+      "Bimestral": 2,
+      "Trimestral": 3,
+      "Cuatrimestral": 4,
+      "Semestral": 6,
+      "Anual": 12,
+      "Contado": 0
+    },
+    "monthlyFiveExpected": [
+      "2026-10-01",
+      "2026-11-01",
+      "2026-12-01",
+      "2027-01-01",
+      "2027-02-01"
+    ],
+    "termGuard": "reject newly issued plan whose final due date exceeds policy vigenciaFin; no policy/receipt writes",
+    "historicalLegacyRule": "existing policies without UTC_ANCHOR_V1 keep original legacy schedule on edit; separate audited migration only",
+    "oldFormulaP0": "12/n misinterprets Mensual+5 as ~2.4-month intervals, preserved as causal evidence but no longer used for new plans"
   }
 }

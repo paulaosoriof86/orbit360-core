@@ -109,6 +109,16 @@ Orbit.policyReceipts = (function () {
     const currency = clean(p.moneda || p.divisa || currencyFor(country));
     const allowedCurrencies = policyCurrencies(country);
     const statusActive = isActiveState(p.estado);
+    if (p.planCalendarVersion === PLAN_CALENDAR_UTC_VERSION && p.vigenciaInicio && p.vigenciaFin) {
+      try {
+        Orbit.primas.recibos({ neta: 0, gastosEmision: 0, gastosFinan: 0, otros: 0, iva: 0, ivaPct: 0 }, {
+          frecuencia: p.frecuencia, cuotas: p.cuotas, vigenciaInicio: p.vigenciaInicio, vigenciaFin: p.vigenciaFin,
+          calendarMode: 'utc_anchor_v1'
+        });
+      } catch (error) {
+        errors.push('plan_cuotas_invalido:' + clean(error && error.message || 'calendario'));
+      }
+    }
 
     if (!clean(p.tenantId || tenantId())) errors.push('tenant_requerido');
     if (!client) errors.push('cliente_requerido');
@@ -243,6 +253,7 @@ Orbit.policyReceipts = (function () {
       frecuencia: policy.frecuencia,
       cuotas: policy.cuotas,
       vigenciaInicio: policy.vigenciaInicio,
+      vigenciaFin: policy.vigenciaFin,
       calendarMode: policy.planCalendarVersion === PLAN_CALENDAR_UTC_VERSION ? 'utc_anchor_v1' : 'legacy_local_v0',
       emisionEn: policy.emisionEn,
       recargoEn: policy.recargoEn,

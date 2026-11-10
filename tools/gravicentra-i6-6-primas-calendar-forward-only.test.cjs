@@ -55,10 +55,10 @@ test('GT y CO: 12 cuotas mensuales usan día 1 civil sin desfase local',()=>{
 });
 test('Año bisiesto y días 29,30,31: clamp independiente por mes, sin deriva posterior',()=>{
   const primas=makeRuntime().Orbit.primas;
-  assert.deepEqual(due(primas,'2024-01-31','Mensual',12).slice(0,5),['2024-01-31','2024-02-29','2024-03-31','2024-04-30','2024-05-31']);
-  assert.deepEqual(due(primas,'2023-01-31','Mensual',12).slice(0,5),['2023-01-31','2023-02-28','2023-03-31','2023-04-30','2023-05-31']);
-  assert.deepEqual(due(primas,'2024-01-30','Mensual',12).slice(0,3),['2024-01-30','2024-02-29','2024-03-30']);
-  assert.deepEqual(due(primas,'2024-02-29','Mensual',12).slice(0,3),['2024-02-29','2024-03-29','2024-04-29']);
+  assert.deepEqual(due(primas,'2024-01-31','Mensual',5),['2024-01-31','2024-02-29','2024-03-31','2024-04-30','2024-05-31']);
+  assert.deepEqual(due(primas,'2023-01-31','Mensual',5),['2023-01-31','2023-02-28','2023-03-31','2023-04-30','2023-05-31']);
+  assert.deepEqual(due(primas,'2024-01-30','Mensual',3),['2024-01-30','2024-02-29','2024-03-30']);
+  assert.deepEqual(due(primas,'2024-02-29','Mensual',3),['2024-02-29','2024-03-29','2024-04-29']);
 });
 test('Cadencias originales intactas: contado, bimestral, trimestral, cuatrimestral y semestral',()=>{
   const p=makeRuntime().Orbit.primas;
@@ -107,6 +107,29 @@ test('Nuevas pólizas adoptan calendario UTC en captura y lo conservan tras edit
     const after=rows.recibosEsperados.filter(x=>x.polizaId===input.id).sort((a,b)=>a.secuencia-b.secuencia);
     assert.deepEqual(after.map(x=>x.vence),expected);
     assert.equal(rows.polizas[0].planCalendarVersion,'UTC_ANCHOR_V1');
+  }
+});
+test('Mensual+5: periodicidad manda y cinco cuotas son cinco meses consecutivos',()=>{
+  const p=makeRuntime().Orbit.primas;
+  assert.deepEqual(due(p,'2026-10-01','Mensual',5),['2026-10-01','2026-11-01','2026-12-01','2027-01-01','2027-02-01']);
+  assert.deepEqual(due(p,'2024-01-31','Mensual',5),['2024-01-31','2024-02-29','2024-03-31','2024-04-30','2024-05-31']);
+});
+test('Vigencia insuficiente impide crear cuotas fuera del contrato, sin ninguna mutación',async()=>{
+  for(const country of ['GT','CO']){
+    const env=makeRuntime(country),{Orbit,rows,policy}=env;
+    const short=policy('p_invalid_'+country,'POL-INVALID-'+country);
+    short.cuotas=5;short.vigenciaFin='2026-12-31';
+    const result=await Orbit.policyReceipts.createPolicy(short,{operationId:'blocked_'+country});
+    assert.equal(result.ok,false,'Plan fuera de vigencia debe rechazarse');
+    assert.ok(result.errors.includes('plan_cuotas_invalido:cuotas_fuera_vigencia'),JSON.stringify(result.errors));
+    assert.equal(rows.polizas.length,0);
+    assert.equal(rows.recibosEsperados.length,0);
+    const exceed=policy('p_24_'+country,'POL-24-'+country);
+    exceed.cuotas=24;
+    const second=await Orbit.policyReceipts.createPolicy(exceed,{operationId:'blocked24_'+country});
+    assert.equal(second.ok,false);
+    assert.ok(second.errors.includes('plan_cuotas_invalido:cuotas_fuera_vigencia'));
+    assert.equal(rows.polizas.length,0);
   }
 });
 test('Paridad del defecto histórico: solo modo legacy reproduce desfase GT/CO',()=>{

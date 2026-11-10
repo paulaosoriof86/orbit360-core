@@ -88,6 +88,15 @@ Orbit.primas = (function () {
     return new Date(Date.UTC(original.getUTCFullYear(), original.getUTCMonth(), original.getUTCDate()));
   }
 
+  // Explicit payment frequency controls cadence; count controls how many dues.
+  function frequencyMonths(frequency) {
+    const steps = { mensual: 1, bimestral: 2, trimestral: 3, cuatrimestral: 4,
+      semestral: 6, anual: 12, contado: 0 };
+    const key = String(frequency == null ? '' : frequency).trim().toLowerCase();
+    if (!Object.prototype.hasOwnProperty.call(steps, key)) throw new RangeError('frecuencia_cuotas_no_soportada');
+    return steps[key];
+  }
+
   // Keep the original day as the immutable anchor; clamp only short months.
   // Example: Jan 31 -> Feb 28/29 -> Mar 31 (never drifts to Mar 28).
   function dueAtCalendarMonthUtc(start, monthOffset) {
@@ -106,7 +115,8 @@ Orbit.primas = (function () {
       : asCivilUtcDate(opts.vigenciaInicio);
     const comAsegPct = +opts.comAseguradoraPct || 0;
     const comVendPct = +opts.comVendedorPct || 0;
-    const pasoMeses = 12 / n;
+    const pasoMeses = legacyCalendar ? 12 / n : frequencyMonths(opts.frecuencia || 'Contado');
+    const finCivil = !legacyCalendar && opts.vigenciaFin ? asCivilUtcDate(opts.vigenciaFin) : null;
     // ¿En cuántos recibos se reparte cada cargo? Por defecto en TODOS (prorrateo).
     // Algunas aseguradoras cobran gastos de emisión / recargo de una vez → emisionEn:1.
     const clampK = k => Math.max(1, Math.min(n, +k || n));
@@ -133,6 +143,7 @@ Orbit.primas = (function () {
       const months = Math.round(i * pasoMeses);
       const venc = legacyCalendar ? new Date(inicio) : dueAtCalendarMonthUtc(inicio, months);
       if (legacyCalendar) venc.setMonth(venc.getMonth() + months);
+      if (finCivil && venc.getTime() > finCivil.getTime()) throw new RangeError('cuotas_fuera_vigencia');
       const lim = new Date(venc);
       if (legacyCalendar) lim.setDate(lim.getDate() + 15);
       else lim.setUTCDate(lim.getUTCDate() + 15);
