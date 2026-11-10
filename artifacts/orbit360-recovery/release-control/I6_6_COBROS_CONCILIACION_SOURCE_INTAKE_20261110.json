@@ -7893,5 +7893,85 @@
     "currentLiveRun": 42884115167,
     "legacyGate": "B4-007 CLOSED",
     "activeGate": "I6.6"
+  },
+  "i66RapidReleaseMethodFreeze20261110": {
+    "id": "GI_I66_OWNER_FROZEN_SAME_CANDIDATE_RELEASE_AND_DATA_REFRESH_METHOD_20261110",
+    "owner": "Paula Andrea Osorio Franco",
+    "dateGuatemala": "2026-11-10",
+    "status": "FROZEN_ACTIVE",
+    "legacyGate": "B4-007 CLOSED",
+    "activeGate": "I6.6",
+    "repository": "paulaosoriof86/orbit360-core",
+    "branch": "recovery/fase-a-clean-20260831",
+    "singleCanonicalProduct": true,
+    "singleCumulativeSource": true,
+    "noHistoricalGatesReopened": true,
+    "exactSequence": [
+      "Read latest approved source+manifest+control plane+I6.6 ledger and isolate one causal finding",
+      "Implement minimal diff on same recovery branch; preserve existing accepted behavior and tenant/country/role boundaries",
+      "Run focused QA including negative permissions and persistence; do not invent PASS from screenshots or successful build",
+      "Build one immutable package and verify Preview, then promote EXACT SAME artifact to LIVE with rollback channel ready",
+      "Byte-exact readback on Firebase and app.aysseguros.com; record source/artifact/run/build/QA/version immediately",
+      "Perform authenticated role real-write/reload UAT on safely reserved reversible records; mark HOLD if access absent",
+      "For historical cartera separate per insurer/source dryrun/CAS protected writer and readback; no broad reimport",
+      "Update this canonical I6.6 ledger and CONTROL_PLANE pointer after every release; do not accumulate unpublished source deltas"
+    ],
+    "activeProduct": {
+      "sourceSha": "a9c52e4ee8e358d065f8723bd7964595d772009b",
+      "liveWorkflowRun": 42884115167,
+      "artifactId": 13795297616,
+      "digest": "sha256:4b6a4ba17ab7b165303946b2891b83cc15298b8f9882e41ef61e7d81a65c2378",
+      "buildId": "gi-i66-a9c52e4ee8e3-57f234755dc1",
+      "firebaseHostingVersion": "d91024e66ae6b243",
+      "verify": "221_OF_221_PREVIEW_FIREBASE_APP_BYTE_EXACT"
+    },
+    "liveFixRuns": [
+      {
+        "scope": "Recibo fuente sparse patch",
+        "run": 42863359176,
+        "source": "0919914071fb40d4451861b50322fdd04a2bad2b"
+      },
+      {
+        "scope": "Ops create/archive governance",
+        "run": 42869612792,
+        "source": "e8986c81ed1748bea680447d07d2f37dc0c1db7a"
+      },
+      {
+        "scope": "Advisor payment reporting/Client360/new notification functions",
+        "run": 42875456562,
+        "source": "439ff7aebc685866c5605407dbc920fb329a552b"
+      },
+      {
+        "scope": "Operativo nonrenewability edit",
+        "run": 42879288326,
+        "source": "35008e0d5b9ac81907e0041398e6434d0fcda631"
+      },
+      {
+        "scope": "PWA manifest/sound",
+        "run": 42882661083,
+        "source": "13345caebe981940d8aae9dcbf274f44aad04deb"
+      },
+      {
+        "scope": "UTC periods for new policies",
+        "run": 42884115167,
+        "source": "a9c52e4ee8e358d065f8723bd7964595d772009b"
+      }
+    ],
+    "prohibitions": [
+      "No blanket data import",
+      "No claims of user LIVE UAT from transport checks",
+      "No random WhatsApp wording to evade spam",
+      "No Make/GreenAPI credentials in frontend aut_cfg",
+      "No unprotected historical data writes",
+      "No parallel source/repo/project candidate"
+    ],
+    "nextGates": [
+      "Authenticated LIVE no-duplicate before/after verification of Ops create/archive/edit, Carlos nonrenewability, advisor payment report and Client360 CTA",
+      "Verify Ops editorial/copy against latest approved module, distinguish actual missing source from stale running tab",
+      "Protected environment authorization for Universales Maria 10 source receipt numbers and 7 due dates, then guarded CAS and readback",
+      "Recent July-Nov client Drive 157 dossier latest-2026 policy matching against current LIVE inventory; only exceptions manual",
+      "PWA Chrome install and audible notification UAT",
+      "Secure backend Make/GreenAPI dispatcher with opt-in/template/idempotency QA before any live WhatsApp sender"
+    ]
   }
 }
