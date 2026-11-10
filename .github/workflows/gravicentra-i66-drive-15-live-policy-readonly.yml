@@ -5,6 +5,7 @@ on:
     branches: [recovery/fase-a-clean-20260831]
     paths:
       - .github/workflows/gravicentra-i66-drive-15-live-policy-readonly.yml
+      - tools/gravicentra-i66-drive-15-live-readonly.cjs
 permissions:
   contents: read
 concurrency:

@@ -87,47 +87,73 @@ const containsName=(a,b)=>Boolean(a&&b&&(a===b||a.includes(b)||b.includes(a)));
     for(const d of pol.docs)all.push(pickPolicyMeta({id:d.id,tenantId:t.id,tenantCountry,data:d.data()||{},clientLookup:clients,insurerLookup:insurers}));
   }
   need(policyRead>=100&&policyRead<=6000,'LIVE_POLICY_INVENTORY_OUTSIDE_EXPECTED_BOUNDS');
-  const results=[];
-  for(const d of exceptions){
-    const ids=sourceNumbers(d),dn=nameNorm(d.clientFolder),hint=insurerFromFilename(d.documentName),term=documentDates(d);
-    const exactNum=all.filter(p=>ids.some(id=>p.numberVariants.includes(id)));
-    const gtExact=exactNum.filter(p=>isCountryGT(p.country));
-    const gtClient=all.filter(p=>isCountryGT(p.country)&&p.client.some(c=>containsName(c,dn)));
-    const candidate=unique([...gtExact,...gtClient.filter(p=>hint&&p.insurer.some(v=>containsName(v,nameNorm(hint))))]);
-    const brief=p=>({
-      policyId:p.policyId,tenantId:p.tenantId,country:p.country,
+  const authenticDrivePdf=new Map(Object.entries({
+  '1cBgH387j5-zYt0TV8lL1GFOLm8ydHDnM':{insurer:'LA CEIBA',client:'DANIEL ISAAC ALEMAN YORQUI',numbers:['0226125562'],start:'2026-04-01',end:'2027-04-01'},
+  '1ET-yBpte2pkld5b6Nk-FgOewG-xbF8nj':{insurer:'FICOHSA',client:'VANESA LOPEZ ALDANA',numbers:['AUTO-1000002899'],start:'2026-02-09',end:'2027-02-09',note:'PDF emission 20-Feb distinct from policy start 09-Feb'},
+  '1Sojl_OoAESHhK7W0DgDqV4gXYSNL1Mry':{insurer:'COLUMNA',client:'JOSE ALEJANDRO HERRARTE GONZALEZ',numbers:['VA-57280'],start:'2026-02-20',end:'2027-02-20',note:'PDF primary policy text VA-57280'},
+  '1odOfnvDlbeP_74nrf-lyed7QZZwVDk0L':{insurer:'G T',client:'JULIO SERGIO SINAY SANCHEZ',numbers:['AUBU-85183'],start:'2026-08-21',end:'2027-08-21',note:'PDF renewal AUBU-85183'},
+  '19ht0t_0TTAMmBgo1rYiO5CJZdebdP-7F':{insurer:'RURAL',client:'ANGEL FERNANDO GUTIERREZ MUNOZ',numbers:['VA125-00010777'],start:'2026-09-08',end:'2027-09-07',note:'PDF insured full surname Gutierrez Munoz, insurer Rural'}
+}));
+const stripZero=x=>/^\d+$/.test(x)?x.replace(/^0+(?=\d)/,''):x;
+const sourceCover=x=>{
+  const n=nameNorm(x);
+  if(n.includes('MOTOCICLETA'))return 'MOTOCICLETA';
+  if(n.includes('TRANSPORTE'))return 'TRANSPORTE';
+  if(n.includes('VEHICUL')||n.includes('AUTOMOVIL'))return 'VEHICULOS';
+  if(n.includes('PASAJEROS'))return 'PASAJEROS';
+  return '';
+};
+const results=[];
+for(const d of exceptions){
+  const auth=authenticDrivePdf.get(d.driveFileId)||{};
+  const ids=unique([...sourceNumbers(d),...(auth.numbers||[]).map(norm)]);
+  const dn=nameNorm(auth.client||d.clientFolder),hint=nameNorm(auth.insurer||insurerFromFilename(d.documentName));
+  const term=auth.start?{start:auth.start,end:auth.end}:documentDates(d);
+  const matchNumber=(p)=>ids.some(n=>p.numberVariants.some(v=>v===n||(/^\d+$/.test(n)&&/^\d+$/.test(v)&&stripZero(n)===stripZero(v))));
+  const exactLiteral=(p)=>ids.some(n=>p.numberVariants.includes(n));
+  const gtNumber=all.filter(p=>isCountryGT(p.country)&&matchNumber(p));
+  const allCountries=all.filter(matchNumber);
+  const gtClient=all.filter(p=>isCountryGT(p.country)&&p.client.some(c=>containsName(c,dn)));
+  const eligible=unique([...gtNumber,...gtClient.filter(p=>hint&&p.insurer.some(v=>containsName(v,hint)))]);
+  const brief=p=>{
+    const ev={
+      number:matchNumber(p),literalNumber:exactLiteral(p),
+      normalizedLeadingZeroAlias:matchNumber(p)&&!exactLiteral(p),
+      client:!!p.client.find(c=>containsName(c,dn)),
+      insurer:hint?!!p.insurer.find(i=>containsName(i,hint)):null,
+      term:term.start&&term.end&&p.dates.start&&p.dates.end?(term.start===p.dates.start&&term.end===p.dates.end):null
+    };
+    return {policyId:p.policyId,tenantId:p.tenantId,country:p.country,
       number:p.numberVariants.slice(0,3),client:p.client.slice(0,3),insurer:p.insurer.slice(0,3),
-      dates:p.dates,product:p.product.slice(0,3),
-      evidence:{
-        exactNumber:ids.some(id=>p.numberVariants.includes(id)),
-        client:!!p.client.find(c=>containsName(c,dn)),
-        insurer:hint?!!p.insurer.find(i=>containsName(i,nameNorm(hint))):null,
-        term:term.start&&term.end&&p.dates.start&&p.dates.end?(term.start===p.dates.start&&term.end===p.dates.end):null
-      }
-    });
-    const selected=unique([...gtExact.map(p=>p.tenantId+'/'+p.policyId),...candidate.map(p=>p.tenantId+'/'+p.policyId)])
-      .map(id=>all.find(p=>p.tenantId+'/'+p.policyId===id)).slice(0,10).map(brief);
-    const strict=selected.filter(p=>p.evidence.exactNumber&&p.evidence.client&&p.evidence.insurer===true&&p.evidence.term===true);
-    const endorsed=/ENDOSO|ANEXO|RENOVACI[OÓ]N|CAR[AÁ]TULA\s+DE\s+RENOVACI/i.test(d.documentName);
-    const exactSourceNumber=ids.length>0;
-    let status='HOLD_UNRESOLVED_LIVE_JOIN';
-    if(strict.length===1&&gtExact.length===1)status='ALREADY_LIVE_EXACT';
-    else if(endorsed&&gtExact.length===0)status='DOCUMENTARY_OR_RENEWAL_ONLY_POSSIBLE';
-    else if(exactSourceNumber&&gtExact.length===0&&d.documentClass!=='RENEWAL_OR_ENDORSEMENT_UNDATED_NAME')status='MISSING_NEW_POLICY_CANDIDATE_REQUIRES_DOSSIER_QA';
-    if(gtExact.length>1)status='HOLD_DUPLICATE_POLICY_NUMBER_GT';
-    if(exactNum.some(p=>p.country==='CO'||p.country==='COLOMBIA'))status='HOLD_CROSS_COUNTRY_NUMBER_COLLISION';
-    if(exactNum.some(p=>!p.country))status='HOLD_COUNTRY_UNDECLARED_IN_LIVE_POLICY';
-    results.push({driveFileId:d.driveFileId,clientFolder:d.clientFolder,documentName:d.documentName,
-      sourceNumberCandidates:ids,sourceInsurer:hint||null,sourceDates:term,sourceClass:d.documentClass,
-      gtPolicyNumberMatches:gtExact.length,allCountryNumberMatches:exactNum.length,
-      gtClientPolicyCount:gtClient.length,status,liveCandidates:selected});
-  }
+      dates:p.dates,product:p.product.slice(0,3),evidence:ev};
+  };
+  const selected=unique(eligible.map(p=>p.tenantId+'/'+p.policyId))
+    .map(key=>all.find(p=>p.tenantId+'/'+p.policyId===key)).slice(0,10).map(brief);
+  const strict=selected.filter(p=>p.evidence.number&&p.evidence.client&&p.evidence.insurer===true&&p.evidence.term===true);
+  const historical=/ANEXO|ENDOSO/i.test(d.documentName)&&/2025/.test(d.documentName);
+  const renewal=/RENOVACI[OÓ]N|CAR[AÁ]TULA\s+DE\s+RENOVACI/i.test(d.documentName);
+  let status='HOLD_IDENTITY_OR_TERM_UNRESOLVED';
+  if(strict.length===1)status=strict[0].evidence.normalizedLeadingZeroAlias?'ALREADY_LIVE_ZERO_PREFIX_DATA_QUALITY':'ALREADY_LIVE_FULL_IDENTITY';
+  else if(strict.length>1)status='HOLD_MULTIPLE_LIVE_SAME_NUMBER_CLIENT_INSURER_TERM';
+  else if(historical&&gtNumber.length>=1)status='DOCUMENTARY_HISTORICAL_ENDORSEMENT_LIVE';
+  else if(gtNumber.length===0&&renewal)status='HOLD_RENEWAL_NOT_FOUND_NO_NEW_POLICY_AUTO_CREATE';
+  else if(gtNumber.length===0&&selected.some(p=>p.evidence.client&&p.evidence.insurer===true&&p.evidence.term===true))status='HOLD_EXISTING_CLIENT_INSURER_TERM_DIFFERENT_POLICY_NUMBER';
+  else if(gtNumber.length===0&&ids.length>=1)status='MISSING_NEW_POLICY_NUMBER_LIVE_CONFIRM_DOSSIER';
+  if(allCountries.some(p=>p.country==='CO'||p.country==='COLOMBIA'))status='HOLD_CROSS_COUNTRY_POLICY_NUMBER_COLLISION';
+  if(allCountries.some(p=>!p.country))status='HOLD_LIVE_POLICY_COUNTRY_UNDECLARED';
+  results.push({driveFileId:d.driveFileId,clientFolder:d.clientFolder,sourceClientVerified:dn,
+    documentName:d.documentName,sourceNumberCandidates:ids,sourceInsurer:hint||null,
+    sourceDates:term,sourceCoverage:sourceCover(d.documentName),sourceClass:d.documentClass,
+    documentedDriveOverride:auth.note||null,
+    gtPolicyNumberMatches:gtNumber.length,gtClientPolicyCount:gtClient.length,
+    liveAllCountryMatches:allCountries.length,status,liveCandidates:selected});
+}
   const byStatus=Object.fromEntries([...new Set(results.map(x=>x.status))].sort().map(k=>[k,results.filter(x=>x.status===k).length]));
-  const output={schema:'I66_DRIVE_15_LIVE_POLICY_READONLY_QA_V1',sourceAuditId:audit.id,
+  const output={schema:'I66_DRIVE_15_LIVE_POLICY_READONLY_QA_V2',sourceAuditId:audit.id,
     sourceLedgerSha256:sha(fs.readFileSync('artifacts/orbit360-recovery/release-control/I6_6_COBROS_CONCILIACION_SOURCE_INTAKE_20261110.json')),
     projectId:'ays-orbit-360-lab',tenantCount:tenants.length,livePolicyCount:policyRead,liveClientsRead:clientsRead,liveInsurersRead:insurersRead,
     driveFiles:15,summary:byStatus,results,writeOperations:0,status:'READ_ONLY_CLASSIFICATION_FOR_REVIEW'};
   fs.writeFileSync(process.env.GI_I66_REPORT_PATH,JSON.stringify(output,null,2)+'\n',{mode:0o600});
   console.log('I66_DRIVE_15_LIVE_POLICY_READONLY_PASS '+JSON.stringify({tenants:tenants.length,policies:policyRead,clients:clientsRead,insurers:insurersRead,status:byStatus,writeOperations:0}));
-  for(const d of results)console.log('I66_DRIVE_15_CASE '+JSON.stringify({client:d.clientFolder,number:d.sourceNumberCandidates,insurer:d.sourceInsurer,status:d.status,livePolicyNumberMatches:d.gtPolicyNumberMatches,topMatched:d.liveCandidates.filter(p=>p.evidence.exactNumber).map(p=>({policyId:p.policyId,tenantId:p.tenantId,country:p.country,evidence:p.evidence}))}));
+  for(const d of results)console.log('I66_DRIVE_15_CASE '+JSON.stringify({client:d.clientFolder,number:d.sourceNumberCandidates,insurer:d.sourceInsurer,status:d.status,livePolicyNumberMatches:d.gtPolicyNumberMatches,topMatched:d.liveCandidates.filter(p=>p.evidence.number).map(p=>({policyId:p.policyId,tenantId:p.tenantId,country:p.country,evidence:p.evidence}))}));
 })().catch(e=>{console.error('I66_DRIVE_15_READONLY_HOLD:'+String(e.message||e));process.exitCode=1;});
