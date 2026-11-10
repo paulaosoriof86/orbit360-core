@@ -575,6 +575,26 @@
       "id": "FINANCE_SETTLEMENT_DEFER_20261110",
       "authority": "PAULA_DIRECT_2026_11_10",
       "rule": "November-issued insurer commission invoices correspond to October collections and ultimately create A&S accounts receivable plus adviser commission liquidation/accounts payable in company Finance, but only AFTER policy, client, premium, receipt and insurer reconciliation are corrected and verified. Keep full linkage/amounts/commission share and invoice references documented for downstream posting; do not create finance entries now or let finance block operational update. Avoid any duplication when finance resumes."
+    },
+    {
+      "id": "BAYRON_PORTFOLIO_PAULA_SUPERSEDES_SAMUEL",
+      "authority": "PAULA_DIRECT_2026_11_10_LATEST",
+      "rule": "Bayron Estuardo Contreras Portillo VA125-00010478 belongs to Paula Osorio as sales adviser/portfolio owner, NOT Samuel Daza. The LIVE system currently shows Samuel; correct exact policy and affected client/adviser relations, protecting other independent Samuel records. This owner statement supersedes prior secondary recollection of Samuel for this case."
+    },
+    {
+      "id": "FRACCIONAMIENTO_MONTH_DEPENDENT_20261110",
+      "authority": "PAULA_DIRECT_2026_11_10_LATEST",
+      "rule": "Fractional-payment surcharge generally increases about 1 percentage point per month/installment count; longer monthly schedules around 12 payments can yield approximately 13-point-something surcharge under the insurer's actual rate scheme. Reconcile exact tariff per insurer, product and contract rather than hardcode one universal 1% or one 2% amount. For Bayron two installments the arithmetic 2% of Q2600 fits two Q1557.92 gross payments when 5% issue fee and 12% VAT apply; treat as source-supported inference pending exact source tie-out."
+    },
+    {
+      "id": "CROSS_INSURER_SAME_RISK_RENEWAL_LINEAGE_20261110",
+      "authority": "PAULA_DIRECT_2026_11_10_LATEST",
+      "rule": "If an existing customer renews coverage for the SAME vehicle/risk, changing insurer and policy number is a renewal of the existing commercial relationship, not a fresh independent new sale. Create/link new effective policy edition and preserve prior insurer/number/period history; do not overwrite earlier issued policy or duplicate risk; classify Marco Payés and analogous cases as renewal after exact vehicle and term matching."
+    },
+    {
+      "id": "PERFORMANCE_PARALLEL_OBSERVABILITY_20261110",
+      "authority": "PAULA_DIRECT_2026_11_10_LATEST",
+      "rule": "In parallel with operational policy/cartera work, inspect excessive time moving between modules, initial/hydration loading and interactive insurer/adviser/search filters. Preserve released capabilities and data; address reproducible root cause on same canonical source/release process only; avoid speculative reimports and do not interrupt priority carrier reconciliation."
     }
   ],
   "newlyObservedStatementEvidence": [
@@ -629,7 +649,7 @@
     "operationalWrites": 0,
     "sourceChangeInProduction": false,
     "importerRebuildRequired": false,
-    "nextRequiredStep": "Connected LIVE Chrome is available. Verify client and policy exact record/edition identities for Bayron, Camila, Mirlet and recovered additional issued policies; compare source net, gross, issue surcharge, VAT, payment method and installment count; apply idempotent source-supported edits with before/after and reload. Finance downstream postings remain deferred until carrier reconciliation confirmed.",
+    "nextRequiredStep": "Do not assume prior UI write. Exact source-supported data input in authenticated LIVE requires action-time sensitive-data confirmation. Then create only missing clients (Julia, Maria Gabriela, Priscila pending final check), preserve existing customer details, link authentic new/renewal editions by vehicle and vigencia, correct Bayron adviser+premium+2-installment receipts and as-of paid status; verify persistence. Parallel non-destructive performance timings/filter transitions.",
     "insurerStatementsNativeFormatsParsed": true,
     "all35CurrentSourceRawHashesPinned": true,
     "fourHistoricalReferenceHashesPinned": true,
@@ -887,5 +907,128 @@
     "businessPolicyCaseLevelPrecheck": "NOT_YET_DONE",
     "writesMadeInThisTurn": 0,
     "interpretation": "Dashboard totals are not proof of specific new policy existence nor of paid-state updates; exact policy/edition/receipt readback remains required."
+  },
+  "liveCaseReadback": {
+    "atGuatemala": "2026-11-10 after 02:00",
+    "source": "Authenticated Chrome live UI, Paula Dirección; per-insurer dropdown and actual detail modal",
+    "writesThisReadback": 0,
+    "bayron": {
+      "policy": "VA125-00010478",
+      "insurer": "ASEGURADORA RURAL",
+      "client": "BAYRON ESTUARDO CONTRERAS PORTILLO",
+      "currentAdvisor": "Samuel Daza",
+      "correctAdvisor": "Paula Osorio",
+      "period": "2026-08-20/2027-08-20",
+      "currentNetGTQ": 2600,
+      "currentEmissionGTQ": 0,
+      "currentFinancialGTQ": 0,
+      "currentVatGTQ": 312,
+      "currentGrossGTQ": 2912,
+      "currentFrequency": "Mensual",
+      "currentPaymentMethod": "Tarjeta de crédito",
+      "currentExpectedReceipts": 0,
+      "ownerInstallments": 2,
+      "installmentGrossGTQ": 1557.92,
+      "impliedGrossGTQ": 3115.84,
+      "varianceGTQ": 203.84,
+      "inferredCorrectIssueGTQ": 130,
+      "inferredFraccionGTQ": 52,
+      "inferredVatGTQ": 333.84,
+      "inferredSurchargeRatePct": 2,
+      "financialMathMatchesOwnerInstallments": true,
+      "sourceVerificationStatus": "ARITHMETIC_FIT_NOT_YET_EDITED",
+      "paidStatus": "USER_LATER_BOTH_PAID_CONFIRMED; exact after-cut evidence or controlled owner attestation before paid-at write"
+    },
+    "Guatemalteca": {
+      "filteredCount": 73,
+      "observed": [
+        {
+          "policyUI": "AUTO38209",
+          "expiryUI": "2026-08-30",
+          "grossUI": 2623,
+          "sourceNewExpiry": "2027-08-30",
+          "sourceGross": 2678.53
+        },
+        {
+          "policyUI": "AUTO38446",
+          "expiryUI": "2026-10-06",
+          "grossUI": 2453,
+          "sourceNewExpiry": "2027-10-06",
+          "sourceGross": 2508.8
+        },
+        {
+          "policyUI": "AUTO-38594",
+          "expiryUI": "2026-10-21",
+          "grossUI": 3388,
+          "sourceNewExpiry": "2027-10-21",
+          "sourceGross": 2888.13
+        },
+        {
+          "policyUI": "AUTO-38624",
+          "expiryUI": "2026-10-27",
+          "grossUI": 2509,
+          "sourceNewExpiry": "2027-10-27",
+          "sourceGross": 2508.8
+        }
+      ],
+      "notObservedInFilteredTable": [
+        "AUTO-41523",
+        "AUTO-41535"
+      ],
+      "interpretation": "Old/other editions may exist; do not overwrite old periods. Verify by full edition key before new period creation."
+    },
+    "Ficohsa": {
+      "filteredCount": 9,
+      "oldPolicyFound": "AUTO-1000000187",
+      "oldPolicyGrossGTQ": 3038,
+      "newSourcePolicyNotObserved": "AUTO-1000007073",
+      "ownerClassification": "RENEWAL_SAME_RISK_IF_VEHICLE_MATCH"
+    },
+    "Universales": {
+      "filteredCount": 34,
+      "newSourcePoliciesNotObserved": [
+        "04-05-01-015590-0",
+        "04-15-01-000603-0"
+      ],
+      "newClientDropdownOptionsNotObserved": [
+        "JULIA MONICA MARISOL ROMERO LOAIZA",
+        "MARIA GABRIELA MONTEPEQUE PALMA VETTORAZZI"
+      ]
+    },
+    "newFormFindings": {
+      "policyFormCanCreateReceipts": true,
+      "existingClientSelectorCount": 441,
+      "clientFormCanCreate": true,
+      "clientFormDefaultAdvisor": "Braulio Hernández",
+      "policyFormDefaultAdvisor": "Paula Osorio",
+      "policyFormDefaultInsurer": "PRUEBA PREVIEW · Aseguradora",
+      "requireExplicitChosenValues": true
+    },
+    "otherInsurers": {
+      "GyT": "177 records, first page only scanned",
+      "Roble": "670 records, first page only scanned",
+      "Mapfre": "162 records, first page only scanned",
+      "doNotDeclareAbsenceWithoutAllPages": true
+    },
+    "verifiedInsurerPolicyDocs": {
+      "Julia": {
+        "policy": "04-05-01-015590-0",
+        "netGTQ": 7800,
+        "issueGTQ": 390,
+        "vatGTQ": 982.8,
+        "grossGTQ": 9172.8,
+        "monthlyGrossGTQ": 764.4,
+        "advisor": "Germán Reyes"
+      },
+      "MariaGabriela": {
+        "policy": "04-15-01-000603-0",
+        "netGTQ": 9720,
+        "issueGTQ": 486,
+        "vatGTQ": 1224.72,
+        "grossGTQ": 11430.72,
+        "monthlyGrossGTQ": 952.56,
+        "advisor": "Germán Reyes"
+      }
+    }
   }
 }
