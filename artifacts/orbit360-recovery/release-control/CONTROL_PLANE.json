@@ -3230,7 +3230,7 @@
     "mechanismRegistryBlobSha": "8a549608e06d1dd7c89613334b8d5b0d527dc92b",
     "activeModule": "COBROS_CONCILIACION_CARTERA",
     "activeSourceIntakePath": "artifacts/orbit360-recovery/release-control/I6_6_COBROS_CONCILIACION_SOURCE_INTAKE_20261110.json",
-    "activeSourceIntakeBlobSha": "3116749b6be648e39686c5567b2c1bb3c17f092c",
+    "activeSourceIntakeBlobSha": "7cef64b4ec3ae75530432936a9c53e979f9cbae8",
     "sourceSha256": "f445e2f4a20b9eb7a526bda8896472dab9e7ac4617b3c5d8124a939a0dee0e6a",
     "conversationAsAuthority": false,
     "requestCurrentSourceBeforeEveryNewModule": true,
@@ -22584,11 +22584,11 @@
     "historicalB4006SealPreserved": true,
     "noNewReleaseBuild": true,
     "noDataReimport": true,
-    "dataRefreshLedgerBlob": "3116749b6be648e39686c5567b2c1bb3c17f092c",
+    "dataRefreshLedgerBlob": "7cef64b4ec3ae75530432936a9c53e979f9cbae8",
     "recoveryStateBlob": "9f5ee1b4a91c0ce58c4da2426eea7a2dcad69c85"
   },
   "i66ClientDossierCrosscheckFreeze20261110": {
-    "status": "FROZEN_POST_CURRENT_SAFE_LIVE_CARTERA_BLOCK_NOT_YET_EXECUTED",
+    "status": "READ_ONLY_DRIVE_CENSUS_COMPLETE_LIVE_POLICY_INVENTORY_JOIN_PENDING",
     "owner": "Paula Andrea Osorio Franco",
     "driveScope": "AyS Guatemala/Clientes",
     "startDocumentActivityDate": "2026-07-01",
@@ -22596,6 +22596,19 @@
     "crosscheck": "LATEST_2026_ISSUED_POLICY_PER_CLIENT_VS_EXISTING_LIVE_GRAVICENTRA_POLICY_INSURER_NUMBER_EFFECTIVE_DATES",
     "noDuplicatedPolicyCreation": true,
     "manualReviewOnlyAmbiguousCases": true,
-    "preserveVerifiedOldPolicies": true
+    "preserveVerifiedOldPolicies": true,
+    "censusDateGuatemala": "2026-11-10",
+    "exactEvidencePath": "artifacts/orbit360-recovery/release-control/I6_6_COBROS_CONCILIACION_SOURCE_INTAKE_20261110.json",
+    "exactEvidenceBlobSha": "7cef64b4ec3ae75530432936a9c53e979f9cbae8",
+    "realClientFoldersScanned": 306,
+    "recursiveFoldersScanned": 470,
+    "recentModifiedFiles": 332,
+    "recentClientDossiers": 157,
+    "authenticPolicyPdfFilesTextRead": 78,
+    "historicalExcelMatchedPdfDocs": 63,
+    "historicalExcelUnmatchedPdfDocs": 15,
+    "liveExportNotYetAcquired": true,
+    "noProductionDataWritesInAudit": true,
+    "priorityIdentityConflict": "AUTO-45497 same 2026/27 number two named insured, requires insurer chain"
   }
 }
