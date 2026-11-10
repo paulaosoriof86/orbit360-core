@@ -1,0 +1,155 @@
+# I6.6 one-purpose, read-only inventory/dry-run. Never writes Firestore.
+# All operational source authority remains the canonical I6.6 ledger/checkpoint.
+name: Gravicentra I6.6 Maria 10 source LIVE READ ONLY
+
+on:
+  push:
+    branches:
+      - recovery/fase-a-clean-20260831
+    paths:
+      - .github/workflows/gravicentra-i66-maria-10-source-live-readonly.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: gi-i66-maria-source-readonly
+  cancel-in-progress: false
+
+jobs:
+  inspect-ten-receipts-only:
+    if: github.ref_name == 'recovery/fase-a-clean-20260831'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      PROJECT_ID: ays-orbit-360-lab
+      GCLOUD_PROJECT: ays-orbit-360-lab
+      FIREBASE_PROJECT_ID: ays-orbit-360-lab
+      SA_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_LAB_ALT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+      GI_I66_REPORT_PATH: ${{ runner.temp }}/gi-i66-maria-ten-receipts-before.json
+    steps:
+      - name: Checkout exact recovery and read-only boundary
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          ref: recovery/fase-a-clean-20260831
+
+      - name: Guard source checkpoint and extract unchanged runner/fixture
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF_NAME" = "recovery/fase-a-clean-20260831"
+          test "$PROJECT_ID" = "ays-orbit-360-lab"
+          test -z "${FIRESTORE_EMULATOR_HOST:-}"
+          SRC=artifacts/orbit360-recovery/release-control/i6-6-p0-checkpoints/I66_UNIVERSALES_MARIA_10_PATCH_ONLY_NOT_APPLIED_20261110.tar.gz.b64.md
+          test "$(git hash-object "$SRC")" = "0938c08daa1238b77007eb785ab5bd955dfac3ab"
+          mkdir -p "$RUNNER_TEMP/gi-i66-maria-source"
+          awk '/^```base64$/{on=1;next} /^```$/{on=0} on{print}' "$SRC" | base64 --decode > "$RUNNER_TEMP/gi-i66-maria-source/bundle.tar.gz"
+          test "$(tar -tzf "$RUNNER_TEMP/gi-i66-maria-source/bundle.tar.gz" | grep -Ec '(^/|(^|/)\.\.(/|$))' || true)" = 0
+          tar -xzf "$RUNNER_TEMP/gi-i66-maria-source/bundle.tar.gz" --no-same-owner -C "$RUNNER_TEMP/gi-i66-maria-source"
+          FIXTURE=$(find "$RUNNER_TEMP/gi-i66-maria-source" -type f -name 'i66_universales_maria_source_PATCH_ONLY_NOT_APPLIED.json' -print -quit)
+          RUNNER=$(find "$RUNNER_TEMP/gi-i66-maria-source" -type f -name 'gravicentra-i66-universales-source-patch-guarded.NOT_APPLIED.cjs' -print -quit)
+          test -n "$FIXTURE" && test -n "$RUNNER"
+          node --check "$RUNNER"
+          node - "$FIXTURE" <<'JS'
+          const fs=require('fs'),f=JSON.parse(fs.readFileSync(process.argv[2],'utf8'));
+          if(f.projectId!=='ays-orbit-360-lab'||f.status!=='NOT_APPLIED'||f.rows.length!==10||new Set(f.rows.map(x=>x.receiptId)).size!==10)throw Error('SOURCE_FIXTURE_BOUNDARY_INVALID');
+          console.log('I66_MARIA_ARCHIVED_SOURCE_GUARD=PASS_10');
+          JS
+          echo "GI_I66_FIXTURE_PATH=$FIXTURE" >> "$GITHUB_ENV"
+          echo "GI_I66_RUNNER_PATH=$RUNNER" >> "$GITHUB_ENV"
+
+      - name: Install pinned Firebase Admin dependency for read-only queries
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm install --prefix "$RUNNER_TEMP/gi-i66-maria-admin" --no-audit --no-fund --ignore-scripts firebase-admin@13.4.0 >/dev/null
+          echo "NODE_PATH=$RUNNER_TEMP/gi-i66-maria-admin/node_modules" >> "$GITHUB_ENV"
+
+      - name: Resolve existing exact project service account
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/gi-i66-maria-auth"
+          chmod 700 "$RUNNER_TEMP/gi-i66-maria-auth"
+          python3 - <<'PY'
+          import json,os,pathlib
+          target='ays-orbit-360-lab'
+          p=pathlib.Path(os.environ['RUNNER_TEMP'])/'gi-i66-maria-auth'/'existing-lab.json'
+          for key in ('SA_LAB','SA_LAB_ALT','SA_DEFAULT'):
+              try: obj=json.loads(os.environ.get(key,''))
+              except (ValueError,TypeError):continue
+              if obj.get('type')!='service_account' or obj.get('project_id')!=target or not obj.get('private_key'):continue
+              p.write_text(json.dumps(obj),encoding='utf-8')
+              p.chmod(0o600)
+              with open(os.environ['GITHUB_ENV'],'a') as output:output.write('GOOGLE_APPLICATION_CREDENTIALS='+str(p)+'\n')
+              print('I66_MARIA_EXACT_LAB_CREDENTIAL_PROJECT_GUARD_PASS')
+              break
+          else:raise SystemExit('I66_MARIA_EXACT_LAB_CREDENTIAL_UNAVAILABLE')
+          PY
+
+      - name: Discover exact tenant using LIVE policy ID + number + client + country, read only
+        shell: bash
+        run: |
+          set -euo pipefail
+          node - <<'JS'
+          'use strict';
+          const fs=require('fs'),crypto=require('crypto');
+          const fixture=JSON.parse(fs.readFileSync(process.env.GI_I66_FIXTURE_PATH,'utf8'));
+          const {getApps,initializeApp}=require('firebase-admin/app');
+          const {getFirestore}=require('firebase-admin/firestore');
+          const hash=x=>crypto.createHash('sha256').update(String(x)).digest('hex');
+          const id=x=>String(x==null?'':x).trim();
+          (async()=>{
+            if(process.env.GCLOUD_PROJECT!=='ays-orbit-360-lab'||process.env.FIRESTORE_EMULATOR_HOST)throw Error('PROJECT_OR_EMULATOR_BLOCK');
+            const app=getApps()[0]||initializeApp({projectId:'ays-orbit-360-lab'});
+            const db=getFirestore(app);
+            const tenants=await db.collection('tenants').listDocuments();
+            if(tenants.length===0||tenants.length>300)throw Error('TENANT_SCAN_BOUNDARY');
+            const found=[];
+            for(const t of tenants){
+              const p=await t.collection('data').doc('polizas').collection('items').doc(fixture.policyId).get();
+              if(!p.exists)continue;
+              const x=p.data()||{};
+              if((!id(x.id)||id(x.id)===fixture.policyId)&&id(x.numero)===fixture.policyNumber&&id(x.clienteId)===fixture.clientId&&id(x.pais).toUpperCase()==='GT'&&(!id(x.tenantId)||id(x.tenantId)===t.id))found.push(t.id);
+            }
+            if(found.length!==1){
+              console.log('I66_MARIA_TENANT_EXACT_MATCH_COUNT='+found.length);
+              throw Error('I66_MARIA_TENANT_NOT_EXACTLY_ONE');
+            }
+            fs.appendFileSync(process.env.GITHUB_ENV,'GI_I66_TENANT_ID='+found[0]+'\n');
+            const fixtureDigest=hash(JSON.stringify(fixture.rows));
+            const reqId='i66_maria_source_'+fixtureDigest.slice(0,24);
+            const req=await db.collection('tenants').doc(found[0]).collection('operationalRequests').doc(reqId).get();
+            console.log('I66_MARIA_EXACT_TENANT_RESOLVED=PASS_HASH_'+hash(found[0]).slice(0,12));
+            console.log('I66_MARIA_EXISTING_REQUEST_MARKER='+String(req.exists));
+            console.log('I66_MARIA_READONLY_TENANT_SCAN_COUNT='+tenants.length);
+          })().catch(e=>{console.error('I66_MARIA_TENANT_DISCOVERY_HOLD='+String(e.message||e).slice(0,80));process.exitCode=1});
+          JS
+
+      - name: Validate all ten current receipts and compute beforeDigest with NO writes
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "$GI_I66_TENANT_ID"
+          node "$GI_I66_RUNNER_PATH" --mode=dry-run --fixture="$GI_I66_FIXTURE_PATH" > "$RUNNER_TEMP/i66-maria-private-runner-output.txt"
+          node - <<'JS'
+          const fs=require('fs'),r=JSON.parse(fs.readFileSync(process.env.GI_I66_REPORT_PATH,'utf8'));
+          if(r.mode!=='dry-run'||r.dataWrites!==0||r.receipts?.length!==10)throw Error('UNVERIFIED_READONLY_REPORT');
+          console.log('I66_MARIA_LIVE_TEN_RECEIPT_INSPECTION='+r.status);
+          console.log('I66_MARIA_LIVE_BEFORE_DIGEST='+r.beforeDigest);
+          console.log('I66_MARIA_LIVE_PATCH_COUNT='+r.patchCount);
+          console.log('I66_MARIA_LIVE_DATA_WRITES=0');
+          JS
+
+      - name: Preserve exact sanitized before-snapshot evidence even on HOLD
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gi-i66-maria-ten-receipts-readonly-${{ github.run_id }}
+          path: ${{ runner.temp }}/gi-i66-maria-ten-receipts-before.json
+          if-no-files-found: warn
+          retention-days: 30
