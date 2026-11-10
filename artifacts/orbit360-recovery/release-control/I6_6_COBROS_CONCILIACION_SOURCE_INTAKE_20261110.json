@@ -7853,5 +7853,45 @@
     ],
     "historicalGate": "B4-007 CLOSED",
     "currentGate": "I6.6"
+  },
+  "i66WhatsAppNotificationIntegrationAudit20261110": {
+    "id": "GI_I66_WHATSAPP_MAKE_GREENAPI_READ_ONLY_AUDIT_20261110",
+    "status": "INTERNAL_OUTBOX_AND_PWA_CHIME_LIVE_EXTERNAL_DELIVERY_NOT_INTEGRATED_HOLD",
+    "auditedFiles": [
+      "functions/notification-outbox-processor.js",
+      "modules/notificaciones.js",
+      "modules/automatizaciones.js",
+      "core/integraciones.js",
+      "data/store.js"
+    ],
+    "sourceFindings": [
+      "Outbox external messages remain pending_connection with retryEligible=false; no network sender/dispatcher",
+      "Advisor inbox and Operations/Admin/SuperAdmin/Direccion internal notifications follow permitted tenant/country scopes; authenticated LIVE write UAT pending",
+      "Automation UI only simulates trigger; Make webhook/IA key under aut_cfg pref potentially persists in localStorage; integ_* sanitization does not cover aut_cfg",
+      "Do not enter provider credentials/webhooks into the current automation UI",
+      "Make/GreenAPI not reactivated, zero external WhatsApp messages, zero push sent"
+    ],
+    "plannedRouting": {
+      "operationalRequests": "Internal Ops + Admin/AdminTenant/SuperAdmin/Direccion same tenant/country. WhatsApp future whitelisted Ops group with generic summary and deep link",
+      "advisorResponses": "Current internal advisor inbox. External direct WhatsApp only verified phone, opt-in, opt-out, reviewed template and role/country match",
+      "clientResponses": "Future WhatsApp only with customer opt-in and approved template, no confidential or financial information",
+      "reportedPayment": "A report is not a confirmed/collected payment, ever"
+    },
+    "compliance": [
+      "Respect opt-in and opt-out, quality, frequency and Meta 24-hour conversation window",
+      "Do not vary wordings to evade spam detection",
+      "GreenAPI group transport @g.us is not inherently Meta official Business Platform",
+      "Use backend-managed credentials and per-tenant/country allowlist, no front-end secrets",
+      "Stable deliveryId, transactional lease, idempotency, provider delivery callbacks, explicit error/429/410 handling and no blind retries"
+    ],
+    "nextGate": "Secure backend secrets and provider auth; approved channel/group mapping and opt-in/templates; isolated QA duplicate/rate/error testing before explicit LIVE enablement",
+    "sentWhatsApp": 0,
+    "configuredMakeWebhook": "NOT_VERIFIED_ACTIVE",
+    "functionDeployedDuringAudit": 0,
+    "liveDataWritesDuringAudit": 0,
+    "currentReleaseSource": "a9c52e4ee8e358d065f8723bd7964595d772009b",
+    "currentLiveRun": 42884115167,
+    "legacyGate": "B4-007 CLOSED",
+    "activeGate": "I6.6"
   }
 }
