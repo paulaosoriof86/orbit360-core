@@ -95,6 +95,34 @@
           "gitBlobSha": "a0dbb67c82687e40a2e2b07cadb42fa680bc5137"
         }
       ]
+    },
+    {
+      "id": "I6_6_OPS_CRUD_ROLE_COUNTRY_AUDITED_SOFT_DELETE_P0",
+      "approvedByDirection": true,
+      "receipt": "artifacts/orbit360-recovery/release-control/i6-6-p0-checkpoints/I6_6_P0_PATCHES_TESTS_NOT_APPLIED_20261110.tar.gz.b64.md",
+      "sourceStatus": "CODE_CANDIDATE_READY_SOURCE_AND_TEST_SHA_PINNED_PREVIEW_AND_BACKEND_QA_PENDING_NOT_DEPLOYED",
+      "capabilityOwners": [
+        "OPS_PRIMARY_RUNTIME",
+        "LEADS_PRIMARY_RUNTIME",
+        "ROLE_SCOPE_RUNTIME"
+      ],
+      "scope": "Ciclo comercial Ops business creation, audited archive and pending-endorsement soft-delete; country-scoped signed memberships; no customer/Firestore write by this source commit",
+      "paths": [
+        {
+          "path": "orbit360-platform/core/ciclo.js",
+          "gitBlobSha": "4c3baf147757347d7a5954ae8fa63bd79526d57d"
+        },
+        {
+          "path": "functions/product-ops-leads-domain.js",
+          "gitBlobSha": "012feb9e1a3cd119ce128edd6ce835556df3e827"
+        }
+      ],
+      "tests": [
+        {
+          "path": "tools/gravicentra-i6-6-ops-crud-role-country.test.cjs",
+          "gitBlobSha": "2ff01c2cf871e39027841678e70082856b8cef4e"
+        }
+      ]
     }
   ]
 }

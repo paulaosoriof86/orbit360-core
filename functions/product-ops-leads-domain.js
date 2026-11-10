@@ -28,7 +28,7 @@ const ADMIN_ROLES = new Set(['superadmin','admintenant','direccion','admin','ope
 const SELF_SERVICE_ROLES = new Set(['asesor','asesora','asesor_sr','asesora_sr','asesor_jr','asesora_jr','comercial']);
 const MANAGE_PERMISSIONS = new Set(['ops_manage','leads_manage','gestiones_manage','workflow_manage']);
 const BUSINESS_MUTABLE_FIELDS = Object.freeze([
-  'nombre','tipo','email','telefono','asesorId','clienteId','polizaId','vehiculoId','cancelacionId','pais','moneda','canal','producto','ramo','aseguradoraId','plan','segmento',
+  'nombre','tipo','email','telefono','asesorId','clienteId','polizaId','vehiculoId','cancelacionId','pais','moneda','canal','producto','ramo','aseguradoraId','aseguradoraIds','puntoIngreso','commercialIdentityId','sourceOpportunityId','plan','segmento',
   'emissionContract','primaEst','prioridad','origen','proximoToque','descripcion','prob','cadenciaActiva','cadencia','nroCotizacion','decision',
   'bitacora','motivoPerdido','checklist','colLeads','notas','comentarios','vence','creado','actualizado','ultimoContacto'
 ]);
@@ -37,7 +37,7 @@ const MANAGEMENT_MUTABLE_FIELDS = Object.freeze([
   'proximaAccion','checklist','nota','notas','origen','bitacora','comentarios','creado','actualizado','resultado',
   'adjuntos','documentoCargaPendiente','documentoCargaFallida'
 ]);
-const BUSINESS_CREATE_EXTRA_FIELDS = Object.freeze(['plan','segmento','polizaId','cancelacionId','prob','proximoToque','descripcion','cadenciaActiva','cadencia','nroCotizacion','decision','bitacora','motivoPerdido','checklist','colLeads','notas','comentarios','vence','creado','actualizado','ultimoContacto']);
+const BUSINESS_CREATE_EXTRA_FIELDS = Object.freeze(['plan','segmento','aseguradoraIds','puntoIngreso','commercialIdentityId','sourceOpportunityId','polizaId','cancelacionId','prob','proximoToque','descripcion','cadenciaActiva','cadencia','nroCotizacion','decision','bitacora','motivoPerdido','checklist','colLeads','notas','comentarios','vence','creado','actualizado','ultimoContacto']);
 const MANAGEMENT_CREATE_EXTRA_FIELDS = Object.freeze(['cancelacionId','ramo','pais','moneda','producto','vence','proximaAccion','checklist','notas','bitacora','comentarios','creado','actualizado','resultado','adjuntos','documentoCargaPendiente','documentoCargaFallida']);
 const ISSUANCE_MANAGEMENT_FIELDS = Object.freeze(['workflowType','requestKey','operationId','issuanceMode','sourcePolicyId','renewalManagementId','pais','moneda','producto','acceptedOffer','acceptedConfirmed','emissionStage','requiereInspeccion','documentosCompletos','requiereValidacion','validacionAlertas','policyCreatedId','policyNumber','documentRef','resueltaAt','nuevaPolizaId','emisionGestionId']);
 const RENEWAL_MANAGEMENT_FIELDS = Object.freeze(['workflowType','renewalAction','sourcePolicyId','acceptedConfirmed','clientApprovalAt','clientApprovalNote','quoteContext','directRenewalPolicyId','issuanceRequestId','nuevaPolizaId','emisionGestionId']);
@@ -98,7 +98,27 @@ function advisorAllowed(m,target,domain,activeRole){
  return true;
 }
 function collaborationWriteDirection(before,payload){const prior=[].concat(before&&before.comentarios||[]),next=[].concat(payload&&payload.comentarios||[]);if(next.length<=prior.length)return'';const last=next[next.length-1]||{},direction=text(last.direction,40),eventId=text(last.eventId,180);if(!eventId||!['advisor','operations'].includes(direction))return'';const seen=new Set(prior.map(x=>text(x&&x.eventId,180)).filter(Boolean));return seen.has(eventId)?'':direction;}
-function workflowAuthorizationDomain(authz,operation,entityType,before,payload,cfg){if(entityType!=='negocios')return'ops';const direction=collaborationWriteDirection(before,payload),stage=norm(before&&before.etapa),origin=norm(before&&before.origen),operationalContext=origin==='ops'||!!(cfg&&cfg.stages&&cfg.stages[stage]&&cfg.stages[stage].ops===true);if(operation==='update_business'&&direction==='advisor'&&operationalContext&&ADMIN_ROLES.has(authz.actor.activeRole))return'ops';if(operation==='update_business'&&operationalContext&&ADMIN_ROLES.has(authz.actor.activeRole))return'ops';return'leads';}
+function assertRecordCountryScope(member,before,after){
+ const allowed=unique(member&& (member.countries||member.paises) || []).map(x=>text(x,8).toUpperCase());
+ if(!allowed.length)return; // Preserve legacy membership semantics unless signed country scope exists.
+ for(const row of [before,after]){
+   if(!row)continue;
+   const country=text(row.pais,8).toUpperCase();
+   if(country&&!allowed.includes(country))
+     throw new HttpsError('permission-denied','OPS_RECORD_COUNTRY_SCOPE_MISMATCH');
+ }
+}
+function workflowAuthorizationDomain(authz,operation,entityType,before,payload,cfg){
+  if(entityType!=='negocios')return'ops';
+  const stage=norm((before&&before.etapa)||(payload&&payload.etapa));
+  const origin=norm((before&&before.origen)||(payload&&payload.origen));
+  const operationalContext=origin==='ops'||!!(cfg&&cfg.stages&&cfg.stages[stage]&&cfg.stages[stage].ops===true);
+  // Ops users may manage operational business stages with their Ops scope.
+  // Never grant advisor/tenant/country access here; authorization still checks signed membership.
+  if(ADMIN_ROLES.has(authz.actor.activeRole)&&operationalContext&&
+     ['create_business','update_business','transition_business','archive_business'].includes(operation))return'ops';
+  return'leads';
+}
 function canonicalizeCollaborationPayload(before,payload,actor){
  const prior=[].concat(before&&before.comentarios||[]),next=[].concat(payload&&payload.comentarios||[]);
  if(next.length<=prior.length)return payload;
@@ -178,7 +198,7 @@ function validDate(value){return /^\d{4}-\d{2}-\d{2}$/.test(text(value,40));}
 
 async function validateEndorsementMutation(tx,{tenantId,authz,operation,entityId,payload,before,after,previewOnly}){
   if(after.workflowType!=='endorsement_request')return;
-  if(!['create_management','update_management','assign_management'].includes(operation))
+  if(!['create_management','update_management','assign_management','archive_management'].includes(operation))
     throw new HttpsError('failed-precondition','ENDOSO_WORKFLOW_OWNER_REQUIRED: usa el ciclo de aprobación del endoso.');
   if(!text(after.polizaId,180)||!text(after.clienteId,180)||!text(after.endorsementType,100)||!text(after.endorsementKey,400))
     throw new HttpsError('failed-precondition','ENDOSO_POLICY_LINK_REQUIRED');
@@ -198,6 +218,16 @@ async function validateEndorsementMutation(tx,{tenantId,authz,operation,entityId
     throw new HttpsError('permission-denied','ENDOSO_COUNTRY_SCOPE_MISMATCH');
   if(previewOnly&&(!/^b4003qa_[A-Za-z0-9._:-]+$/.test(after.polizaId)||policy.__syntheticQa!==true))
     throw new HttpsError('permission-denied','ENDOSO_PREVIEW_SYNTHETIC_POLICY_ONLY');
+  if(operation==='archive_management'){
+    const audited=payload.deleted===true&&payload.eliminado===true&&text(payload.deleteReason,600).length>=5;
+    if(!before||!ADMIN_ROLES.has(authz.actor.activeRole)||!audited)
+      throw new HttpsError('permission-denied','ENDOSO_ARCHIVE_REQUIRES_AUDITED_OPERATIONS_DELETE');
+    if(!['SOLICITADO','EN_REVISION'].includes(text(before.endorsementStage,80))||
+       text(before.policyUpdatedId,180)||text(policy.ultimoEndosoId,180)===entityId||
+       [].concat(policy.historial||[]).some(row=>row&&text(row.gestionId,180)===entityId))
+      throw new HttpsError('failed-precondition','ENDOSO_APPLIED_OR_REFERENCED_ARCHIVE_FORBIDDEN');
+    return; // Audit fields and soft-hide are committed by archive_management below.
+  }
   if(!before){
     if(operation!=='create_management'||after.endorsementStage!=='SOLICITADO'||
       !after.propuestaCambios||typeof after.propuestaCambios!=='object'||
@@ -234,7 +264,8 @@ if(entityId===metaQaId||text(payload.id,180)===metaQaId){
  if(operation==='create_business'&&(text(payload.piezaOrigen,120)!=='F02-V27-QA'||text(payload.canal,100)!=='Facebook'||text(payload.origen,100)!=='Leads'||norm(payload.etapa)!=='nuevo'||text(payload.pais,8).toUpperCase()!=='GT'||text(payload.email||payload.correo,320)||text(payload.telefono||payload.phone,100)))throw new HttpsError('permission-denied','META_TR_QA_PREVIEW_ONLY: se requiere el caso sintético exacto sin datos reales.');
 }
 if(operation==='create_business')prepared=canonicalizeCreationAudit(sanitizeBusiness(payload,authz.actor),authz.actor);if(operation==='create_management'||operation==='portal_request')prepared=sanitizeManagement(payload,authz.actor);if(prepared&&entityType==='gestiones')prepared=await enrichManagementContext(authz.tenantId,prepared);if(prepared)entityId=prepared.id;entityId=id(entityId,isBusiness?'businessId':'managementId');const entity=dataRef(authz.tenantId,entityType,entityId);if(previewOnly===true&&!['create_management','create_business','portal_request'].includes(operation)){const ps=await entity.get(),pr=ps.exists?ps.data():null;if(!pr||pr.previewWrite!==true)throw new HttpsError('permission-denied','PREVIEW_TEST_RECORD_ONLY: en Preview solo se modifican gestiones/negocios creados durante la prueba.');}const rid=requestId(authz.tenantId,operation,entityId,payload,d.requestId),req=requestRef(authz.tenantId,rid,previewOnly),eventId=`evt_${sha(`${authz.tenantId}|${rid}`).slice(0,28)}`;
-const committed=await db.runTransaction(async tx=>{const priorReq=await tx.get(req);if(priorReq.exists&&priorReq.data().status==='committed')return Object.assign({reused:true},priorReq.data().result||{});const snap=await tx.get(entity),before=snap.exists?snap.data():null;if(prepared&&before)throw new HttpsError('already-exists','El registro ya existe.');if(!prepared&&!before)throw new HttpsError('not-found','El registro no existe.');let after=prepared?Object.assign({},prepared):Object.assign({},before);if(operation==='update_business'||operation==='update_management')payload=canonicalizeCollaborationPayload(before,payload,authz.actor);const authorizationDomain=workflowAuthorizationDomain(authz,operation,entityType,before,payload,cfg);if(!advisorAllowed(authz.member,after.asesorId||payload.asesorId||payload.advisorId,authorizationDomain,authz.actor.activeRole))throw new HttpsError('permission-denied','El asesor está fuera de su alcance activo.');
+const committed=await db.runTransaction(async tx=>{const priorReq=await tx.get(req);if(priorReq.exists&&priorReq.data().status==='committed')return Object.assign({reused:true},priorReq.data().result||{});const snap=await tx.get(entity),before=snap.exists?snap.data():null;if(prepared&&before)throw new HttpsError('already-exists','El registro ya existe.');if(!prepared&&!before)throw new HttpsError('not-found','El registro no existe.');let after=prepared?Object.assign({},prepared):Object.assign({},before);if(operation==='update_business'||operation==='update_management')payload=canonicalizeCollaborationPayload(before,payload,authz.actor);const authorizationDomain=workflowAuthorizationDomain(authz,operation,entityType,before,payload,cfg);assertRecordCountryScope(authz.member,before,after);
+if(!advisorAllowed(authz.member,after.asesorId||payload.asesorId||payload.advisorId,authorizationDomain,authz.actor.activeRole))throw new HttpsError('permission-denied','El asesor está fuera de su alcance activo.');
 if(entityType==='gestiones'&&after.workflowType==='endorsement_request'&&prepared)
   await validateEndorsementMutation(tx,{tenantId:authz.tenantId,authz,operation,entityId,payload,before,after,previewOnly});
 if(operation==='transition_business'){const from=norm(before.etapa),to=norm(payload.to||payload.etapa||payload.stage),stage=cfg.stages[from];if(!cfg.stages[to])throw new HttpsError('failed-precondition','La etapa destino no está configurada.');if(!stage||!stage.next.includes(to))throw new HttpsError('failed-precondition','Transición no permitida.');copyAllowed(after,payload,BUSINESS_MUTABLE_FIELDS.filter(k=>!['etapa','archivado'].includes(k)));after.etapa=to;after.prob=Number(payload.prob!=null?payload.prob:after.prob||0);after.opsVisible=cfg.stages[to].ops===true;after.opsList=cfg.stages[to].opsList||'';if(to==='propuesta'&&cfg.cadenceEnabled){after.cadenciaActiva=true;after.cadenciaPaso=Math.max(1,Number(after.cadenciaPaso)||1);if(!text(after.proximoToque,40))after.proximoToque=new Date(Date.now()+3*86400000).toISOString().slice(0,10);}

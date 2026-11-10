@@ -733,7 +733,9 @@ Orbit.ciclo = (function () {
         const result = await Orbit.recordDelete.remove('negocios', id, { label: n.nombre || n.id });
         if (result && result.ok) { back.remove(); refresh(); return; }
       } catch (error) {
-        U.toast('No fue posible confirmar la eliminación del negocio.');
+        const errorCode = String(error && error.code || 'DELETE_UNCONFIRMED').replace(/[^A-Za-z0-9_/.-]/g, '').slice(0, 64);
+        try { console.warn('[Gravicentra Ops] DELETE_BUSINESS_UNCONFIRMED', { code: errorCode }); } catch (_) {}
+        U.toast('No fue posible confirmar la eliminación del negocio (código: ' + errorCode + ').');
       }
       ngDelete.disabled = false;
     });
@@ -849,7 +851,6 @@ Orbit.ciclo = (function () {
               ${g.estado !== 'Resuelta' ? '<button class="btn primary" data-gact="resolver">✓ Marcar resuelta</button>' : '<button class="btn ghost" data-gact="reabrir">↺ Reabrir</button>'}
               ${cli ? `<button class="btn ghost" data-gact="cliente">🧑‍💼 Ver cliente</button>` : ''}
               <button class="btn ghost" data-gact="archivar">📦 Archivar</button>
-              <button class="btn ghost" data-gact="eliminar" style="color:var(--danger,var(--red))">Eliminar</button>
             </div>
           </div>
           <div class="ciclo-sec">
@@ -860,7 +861,7 @@ Orbit.ciclo = (function () {
       </div>
       <div class="ciclo-foot">
         <div class="muted" style="font-size:12px">Creada ${U.fmtDate(g.creado)} · origen ${g.origen}</div>
-        <div style="display:flex;gap:8px"><button class="btn ghost" data-close>Cerrar</button><button class="btn primary" id="gs-save">Guardar cambios</button></div>
+        <div style="display:flex;gap:8px">${Orbit.recordDelete && Orbit.recordDelete.can("gestiones", g) ? '<button type="button" class="btn ghost" data-gact="eliminar" aria-label="Eliminar gestión operativa" style="color:var(--danger,var(--red))">Eliminar</button>' : ''}<button class="btn ghost" data-close>Cerrar</button><button class="btn primary" id="gs-save">Guardar cambios</button></div>
       </div>`;
     const back = modal(html, 820);
     back.querySelectorAll('[data-gdoc]').forEach(btn => btn.addEventListener('click', () => openGestionDocument((g.adjuntos || [])[+btn.dataset.gdoc], g.id)));
@@ -978,7 +979,9 @@ Orbit.ciclo = (function () {
           const result = await Orbit.recordDelete.remove('gestiones', id, { label: g.titulo || g.tipo || g.id });
           if (result && result.ok) { back.remove(); refresh(); return; }
         } catch (error) {
-          U.toast('No fue posible confirmar la eliminación de la gestión.');
+          const errorCode = String(error && error.code || 'DELETE_UNCONFIRMED').replace(/[^A-Za-z0-9_/.-]/g, '').slice(0, 64);
+          try { console.warn('[Gravicentra Ops] DELETE_MANAGEMENT_UNCONFIRMED', { code: errorCode }); } catch (_) {}
+          U.toast('No fue posible confirmar la eliminación de la gestión (código: ' + errorCode + ').');
         }
         b.disabled = false;
         return;
@@ -1404,6 +1407,7 @@ Orbit.ciclo = (function () {
       </div>
       <div class="ciclo-foot"><div class="muted" style="font-size:12px">${prefill.commercialIdentityId?'Identidad comercial vinculada · oportunidades independientes':'Nuevo es el estado inicial normal'}</div><div style="display:flex;gap:8px"><button class="btn ghost" data-close>Cancelar</button><button class="btn primary" id="nn-ok">Crear</button></div></div>`;
     const back = modal(html, 700);
+    let attemptedBusinessId = ''; // Stable across retries: never create a second business after uncertain ack.
     const advisorSelect=back.querySelector('#nn-ase'),countrySelect=back.querySelector('#nn-pais'),ramoSelect=back.querySelector('#nn-ramo'),productSelect=back.querySelector('#nn-prod'),planSelect=back.querySelector('#nn-plan'),insurerSelect=back.querySelector('#nn-asg');
     const refreshDependencies=()=>{
       const priorProduct=productSelect.value,priorPlan=planSelect.value;
@@ -1429,7 +1433,7 @@ Orbit.ciclo = (function () {
       if(!asesorId||!asesores.some(a=>String(a.id)===String(asesorId)))return U.toast('Selecciona un asesor responsable confirmado para este país y rol.');
       const metaQa=metaQaPreview&&back.querySelector('#nn-meta-qa')?.checked===true;
       if(metaQa&&(pais!=='GT'||ingresoOps||ingreso.etapa!=='nuevo'))return U.toast('La prueba Meta requiere Guatemala y el punto de ingreso Leads / Nuevo.');
-      const id=metaQa?'b4003qa_meta_tr_v27_20261025_01':'neg'+Date.now().toString().slice(-7),identityId=prefill.commercialIdentityId||id;
+      const id=metaQa?'b4003qa_meta_tr_v27_20261025_01':(attemptedBusinessId || (attemptedBusinessId = 'neg_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 10))),identityId=prefill.commercialIdentityId||id;
       const creator=currentUserIdentity();
       const n={id,commercialIdentityId:identityId,sourceOpportunityId:prefill.sourceOpportunityId||'',nombre:metaQa?'QA Meta · Caso sintético sin datos personales':(v('nn-nombre')||'Prospecto'),tipo:metaQa?'Persona':v('nn-tipo'),
         etapa:ingreso.etapa,prob:Number(ingreso.probability??ingreso.prob??0),puntoIngreso:ingreso.id,asesorId,canal:metaQa?'Facebook':v('nn-canal'),pais,moneda:pais==='CO'?'COP':'GTQ',
@@ -1442,7 +1446,12 @@ Orbit.ciclo = (function () {
         comentarios:[],origen:ingresoOps?'Ops':'Leads',creado:today(),actualizado:today()};
       save.disabled=true;const original=save.textContent;save.textContent='Guardando…';
       try{if(!S().insertDurable)throw new Error('OPS_BUSINESS_DURABLE_WRITE_REQUIRED');await S().insertDurable('negocios',n);const confirmed=S().get('negocios',n.id);if(!confirmed)throw new Error('OPS_BUSINESS_DURABLE_READBACK_MISSING');back.remove();refresh();openNegocio(n.id);}
-      catch(error){save.disabled=false;save.textContent=original;U.toast('No fue posible confirmar el nuevo ingreso. No se registró un falso éxito.');}
+      catch(error){
+        save.disabled=false;save.textContent=original;
+        const errorCode=String(error && error.code || 'CREATE_UNCONFIRMED').replace(/[^A-Za-z0-9_/.-]/g,'').slice(0,64);
+        try{console.warn('[Gravicentra Ops] CREATE_BUSINESS_UNCONFIRMED',{code:errorCode});}catch(_){}
+        U.toast('No se confirmó el nuevo ingreso (código: '+errorCode+'). Conserva esta ficha; no la dupliques.');
+      }
     });
   }
   function nuevaGestion() {
