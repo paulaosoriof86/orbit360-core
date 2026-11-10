@@ -148,10 +148,7 @@ jobs:
           function expectedIndex(html,buildId){
             const branding=/<script\s+src=["']core\/public-tenant-branding\.js[^"']*["']\s*><\/script>/i;
             if(!branding.test(html))throw Error('I66_INDEX_BRANDING_TAG_NOT_FOUND');
-            html=html.replace(branding,'<script src="data/tenant-public-branding-snapshot.generated.js"></script>\n          for(const change of manifest.changes)for(const {path:p} of change.paths){
-            const source=fs.readFileSync(p),target=fs.readFileSync(base+'/'+(p.startsWith('functions/')?'backend/'+p.slice(10):'site/'+p.slice(18)));
-            if(!source.equals(target))throw Error('I66_APPROVED_PRODUCT_FILE_NOT_REACHED_UNCHANGED:'+p);
-          }');
+            html=html.replace(branding,'<script src="data/tenant-public-branding-snapshot.generated.js"></script>\n$&');
             let bound=0;
             const bind=url=>{
               const raw=String(url||'');
@@ -180,8 +177,12 @@ jobs:
             }
             return Buffer.from(js,'utf8');
           }
-          for(const change of manifest.changes)for(const pin of change.paths){
-            const p=pin.path,source=fs.readFileSync(p),target=fs.readFileSync(base+'/'+(p.startsWith('functions/')?'backend/'+p.slice(10):'site/'+p.slice(18)));
+          // The delta guard validates each explicit replaces-chain. Check the
+          // terminal approved blob for each path; earlier receipts stay sealed.
+          const effectivePins=new Map();
+          for(const change of manifest.changes)for(const pin of change.paths)effectivePins.set(pin.path,pin);
+          for(const [p,pin] of effectivePins){
+            const source=fs.readFileSync(p),target=fs.readFileSync(base+'/'+(p.startsWith('functions/')?'backend/'+p.slice(10):'site/'+p.slice(18)));
             if(execFileSync('git',['hash-object',p],{encoding:'utf8'}).trim()!==pin.gitBlobSha)
               throw Error('I66_SOURCE_MANIFEST_PIN_DRIFT:'+p);
             let expected=source;
