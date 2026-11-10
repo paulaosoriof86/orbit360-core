@@ -1,0 +1,105 @@
+# Read-only I6.6 Advisor approved four-function inventory, no deploy/Firestore/Rules/Auth changes.
+name: Gravicentra I6.6 Advisor LIVE Functions Inventory
+on:
+  push:
+    branches: [recovery/fase-a-clean-20260831]
+    paths:
+      - .github/workflows/gravicentra-delta-66-advisor-functions-inventory.yml
+permissions:
+  contents: read
+concurrency:
+  group: gravicentra-i66-advisor-functions-inventory
+  cancel-in-progress: false
+jobs:
+  inventory:
+    if: github.repository == 'paulaosoriof86/orbit360-core' && github.ref == 'refs/heads/recovery/fase-a-clean-20260831'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      PROJECT_ID: ays-orbit-360-lab
+      SA_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_ALT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: 439ff7aebc685866c5605407dbc920fb329a552b
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Authenticate using already configured same-project read authority
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/adv-inventory-auth"
+          python3 - <<'PY'
+          import json,os,pathlib
+          root=pathlib.Path(os.environ['RUNNER_TEMP'])/'adv-inventory-auth';found=[]
+          for i,key in enumerate(('SA_LAB','SA_ALT','SA_DEFAULT')):
+              try: data=json.loads(os.environ.get(key,''))
+              except (ValueError,TypeError):continue
+              if data.get('type')=='service_account' and data.get('project_id')=='ays-orbit-360-lab' and data.get('private_key'):
+                  p=root/f'{i}.json';p.write_text(json.dumps(data));p.chmod(0o600);found.append(str(p))
+          if not found:raise SystemExit('I66_ADVISOR_INVENTORY_LAB_CREDENTIAL_UNAVAILABLE')
+          (root/'candidates').write_text('\n'.join(found)+'\n')
+          PY
+          npm install --prefix "$RUNNER_TEMP/adv-inventory-cli" --no-save --ignore-scripts --no-audit --no-fund firebase-tools@14.10.1 >/dev/null
+          node tools/gravicentra-firebase-tools-empty-extensions-workaround-v1.mjs "$RUNNER_TEMP/adv-inventory-cli"
+          CLI="$RUNNER_TEMP/adv-inventory-cli/node_modules/firebase-tools/lib/bin/firebase.js"
+          SEL=''
+          while IFS= read -r c;do
+            if GOOGLE_APPLICATION_CREDENTIALS="$c" node "$CLI" functions:list --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/adv-inventory-firebase.json" 2>/dev/null;then SEL="$c";break;fi
+          done < "$RUNNER_TEMP/adv-inventory-auth/candidates"
+          test -n "$SEL"
+          cp "$SEL" "$RUNNER_TEMP/adv-inventory-auth/selected.json"
+          chmod 600 "$RUNNER_TEMP/adv-inventory-auth/selected.json"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$RUNNER_TEMP/adv-inventory-auth/selected.json" >> "$GITHUB_ENV"
+          echo "FIREBASE_CLI_BIN=$CLI" >> "$GITHUB_ENV"
+      - uses: google-github-actions/setup-gcloud@v2
+        with:
+          version: '>= 483.0.0'
+      - name: Inventory all four exact Function identities/regions and Cloud Run revisions
+        run: |
+          set -euo pipefail
+          gcloud auth activate-service-account --key-file="$GOOGLE_APPLICATION_CREDENTIALS" --quiet >/dev/null
+          gcloud config set project "$PROJECT_ID" --quiet >/dev/null
+          node - <<'NODE'
+          const fs=require('node:fs'),j=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/adv-inventory-firebase.json'));
+          const a=j.result||j.functions||[];
+          if(!Array.isArray(a))throw Error('I66_ADVISOR_FIREBASE_LIST_SCHEMA_UNSUPPORTED');
+          const names=['orbit360CobrosReconciliationCommand','orbit360NotificationOutboxCreated','orbit360GetAdvisorOpsInbox','orbit360UpdateAdvisorOpsInboxState'];
+          for(const name of names){
+            const x=a.filter(row=>String(row.id||row.name||row.functionName||'').split('/').at(-1)===name);
+            console.log('I66_ADVISOR_FIREBASE_LIST_ID='+name+' MATCHES='+x.length+' REGIONS='+x.map(z=>z.region||z.location||'?').join(','));
+            if(x.length>1)throw Error('I66_ADVISOR_DUPLICATE_FUNCTION_NAME:'+name);
+          }
+          NODE
+          for FN in orbit360CobrosReconciliationCommand orbit360NotificationOutboxCreated orbit360GetAdvisorOpsInbox orbit360UpdateAdvisorOpsInboxState; do
+            for REG in us-central1 us-east1; do
+              if gcloud functions describe "$FN" --gen2 --region "$REG" --project "$PROJECT_ID" --format=json > "$RUNNER_TEMP/adv-inv-$FN-$REG.json" 2> "$RUNNER_TEMP/adv-inv-$FN-$REG.error";then
+                SERVICE=$(node - "$FN" "$REG" <<'NODE'
+          const fs=require('node:fs'),fn=process.argv[2],region=process.argv[3],r=process.env.RUNNER_TEMP;
+          const o=JSON.parse(fs.readFileSync(r+'/adv-inv-'+fn+'-'+region+'.json'));
+          const service=String(o.serviceConfig?.service||''),name=service.split('/').at(-1);
+          if(!service.includes('/locations/'+region+'/services/')||!/^[a-z][a-z0-9-]+$/.test(name))
+            throw Error('I66_ADVISOR_FUNCTION_SERVICE_UNAVAILABLE:'+fn+':'+region);
+          process.stdout.write(name);
+          NODE
+                )
+                gcloud run services describe "$SERVICE" --region "$REG" --project "$PROJECT_ID" --format=json > "$RUNNER_TEMP/adv-inv-$FN-$REG-run.json"
+                node - "$FN" "$REG" "$SERVICE" <<'NODE'
+          const fs=require('node:fs'),fn=process.argv[2],reg=process.argv[3],service=process.argv[4],r=process.env.RUNNER_TEMP;
+          const v=JSON.parse(fs.readFileSync(r+'/adv-inv-'+fn+'-'+reg+'-run.json')),ts=v.status?.traffic||v.traffic||[];
+          const full=ts.filter(x=>Number(x.percent)===100),rev=String(full[0]?.revisionName||full[0]?.revision||'');
+          if(full.length!==1||!rev.startsWith(service+'-'))throw Error('I66_ADVISOR_FUNCTION_REVISION_NOT_UNIQUE:'+fn+':'+reg);
+          console.log('I66_ADVISOR_CLOUD_FUNCTION='+fn+' REGION='+reg+' CLASS=EXISTING_REV REV='+rev);
+          NODE
+              else
+                if ! grep -Fq 'status=[404]' "$RUNNER_TEMP/adv-inv-$FN-$REG.error";then
+                  echo "I66_ADVISOR_GCLOUD_ERROR_NOT_404:$FN:$REG";exit 1
+                fi
+                echo "I66_ADVISOR_CLOUD_FUNCTION=$FN REGION=$REG CLASS=ABSENT_VERIFIED"
+              fi
+            done
+          done
+          echo 'I66_ADVISOR_ALL_FOUR_FUNCTIONS_READONLY_INVENTORY_PASS; REAL_DATA_WRITES=0'
