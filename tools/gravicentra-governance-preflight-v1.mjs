@@ -28,12 +28,15 @@ const i6Active=control.i6Execution?.authorized===true||(!['','HOLD_PENDING_EXPLI
 const preI5Guard='tools/gravicentra-control-plane-guard-v2.mjs';
 const postI5Guard='tools/gravicentra-post-i5-control-plane-guard-v1.mjs';
 const i6Guard='tools/gravicentra-i6-control-plane-guard-v1.mjs';
-const activeGuard=i6Active?i6Guard:(postI5?postI5Guard:preI5Guard);
+const i66Guard='tools/gravicentra-i6-6-delta-guard.mjs';
+const i66Active=i6Active&&control.gateState?.gates?.I6?.activeSubgate==='I6.6';
+const activeGuard=i66Active?i66Guard:(i6Active?i6Guard:(postI5?postI5Guard:preI5Guard));
 const evergreenGuard='tools/gravicentra-evergreen-sources-invariant-v2.mjs';
 const syntaxTargets=[
   preI5Guard,
   postI5Guard,
   i6Guard,
+  i66Guard,
   'tools/gravicentra-mechanism-invariant-v2.mjs',
   evergreenGuard,
   'tools/gravicentra-i4a-proof-registry-guard-v1.mjs',
@@ -61,6 +64,7 @@ console.log('PREFLIGHT_MODE='+mode);
 console.log('CONTROL_STATUS='+control.status);
 console.log('ACTIVE_CONTROL_GUARD='+activeGuard);
 console.log('I6_ACTIVE='+String(i6Active));
+console.log('I6_6_ACTIVE='+String(i66Active));
 console.log('SAME_HEAD_GOVERNANCE_AND_GATE_GUARD=true');
 console.log('PRODUCT_SOURCE_MUTATION=false');
 console.log('PRODUCTION_ACCEPTED='+String(control.environmentState?.productionAccepted===true));

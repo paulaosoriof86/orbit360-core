@@ -1,0 +1,32 @@
+{
+  "schema": "GRAVICENTRA_I6_6_APPROVED_PRODUCT_DELTAS_V1",
+  "productBrand": "Gravicentra Insurance",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "activeGate": "I6.6",
+  "historicalBoundary": "B4-007 CLOSED; never rerun or reinterpret B4-006 against an I6.6 HEAD",
+  "baselineSuccessfulHead": "1ab76bcb2580c11449e5b13c99c84cb7a92eb871",
+  "baselineSuccessfulRun": 42840283468,
+  "baselineRunConclusion": "success",
+  "baselineRunUrl": "https://github.com/paulaosoriof86/orbit360-core/actions/runs/42840283468",
+  "dataMutationAuthorized": false,
+  "deploymentAuthorized": false,
+  "approvalModel": "Every future I6.6 product delta must carry an owner-approved receipt, exact Git blobs, and pinned passing tests; all other paths are refused by CI.",
+  "changes": [
+    {
+      "id": "I6_6_RECEIPT_SOURCE_NUMBER_AND_SPARSE_DURABLE_PATCH",
+      "approvedByDirection": true,
+      "receipt": "artifacts/orbit360-recovery/release-control/I6_6_COBROS_CONCILIACION_SOURCE_INTAKE_20261110.json",
+      "sourceCommit": "0d6396fbd919e13eafebfd0ead75b1a7f198e238",
+      "sourceStatus": "CANDIDATE_NOT_YET_DEPLOYED",
+      "paths": [
+        {"path": "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js", "gitBlobSha": "abf7ada42b69c7d2cdf21558255b964f2f76b087"},
+        {"path": "orbit360-platform/core/policy-receipts-engine.js", "gitBlobSha": "6d21573cc2215ae72fa1075a9b7a2930be03fb34"},
+        {"path": "orbit360-platform/data/store-firestore-product-operational-p0.js", "gitBlobSha": "112e72cc755eafcfcbea04c2b89340ca9b3e8062"}
+      ],
+      "tests": [
+        {"path": "tools/gravicentra-i6-6-receipt-number-and-sparse-patch.test.cjs", "gitBlobSha": "e3de97486eb8c78c07e775428afecdd07f5e1cd7"}
+      ]
+    }
+  ]
+}
