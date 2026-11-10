@@ -109,10 +109,23 @@ const expectedSource='13345caebe981940d8aae9dcbf274f44aad04deb';
 const expectedPreview=process.env.I66_PWA_PREVIEW_URL||'';
 const expectedOld='35008e0d5b9ac81907e0041398e6434d0fcda631';
 const expectedOldBuild='gi-i66-35008e0d5b9a-57f234755dc1';
+function validPreviewUrl(origin,channel){
+  if(!/^gi-i66-rc-[0-9]+$/.test(channel))return false;
+  const prefix='https://ays-orbit-360-lab--'+channel+'-',suffix='.web.app';
+  if(!origin.startsWith(prefix)||!origin.endsWith(suffix))return false;
+  return /^[a-z0-9]+$/.test(origin.slice(prefix.length,-suffix.length));
+}
+const negativePreviewUrls=[
+  'https://ays-orbit-360-lab--gi-i66-rc-42871046232-old.web.app',
+  'https://ays-orbit-360-lab--gi-i66-rc-42881038831-g1udjwhn.web.app.evil.test',
+  'http://ays-orbit-360-lab--gi-i66-rc-42881038831-g1udjwhn.web.app',
+  'https://malicious--gi-i66-rc-42881038831-g1udjwhn.web.app'
+];
 try{
+  need(negativePreviewUrls.every(u=>!validPreviewUrl(u,request.previewChannel)),'I66_PWA_PREVIEW_NEGATIVE_GUARD_FAILED');
   need(request.sourceSha===expectedSource&&request.artifactId===13792634838&&
        request.previewChannel==='gi-i66-rc-42881038831'&&
-       /^https:\/\/ays-orbit-360-lab--gi-i66-rc-42871046232-[a-z0-9]+\.web\.app$/.test(expectedPreview),'I66_PWA_SOURCE_OR_ARTIFACT_PIN_DRIFT');
+       validPreviewUrl(expectedPreview,request.previewChannel),'I66_PWA_SOURCE_OR_ARTIFACT_PIN_DRIFT');
   need(packageRoot&&cli&&cred&&fs.existsSync(path.join(packageRoot,'bundle/site/__recovery__/build.json')),'I66_PWA_PACKAGE_NOT_MOUNTED');
   const pkg=JSON.parse(fs.readFileSync(path.join(packageRoot,'bundle/site/__recovery__/build.json'),'utf8'));
   need(pkg.gate==='I6.6'&&pkg.sourceSha===expectedSource&&pkg.buildId.startsWith('gi-i66-'),'I66_PWA_PACKET_IDENTITY_DRIFT');

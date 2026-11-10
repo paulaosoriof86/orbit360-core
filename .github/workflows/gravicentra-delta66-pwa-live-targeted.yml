@@ -5,6 +5,7 @@ on:
     branches: [recovery/fase-a-clean-20260831]
     paths:
       - .github/workflows/gravicentra-delta66-pwa-live-targeted.yml
+      - tools/gravicentra-i6-6-pwa-live-exact-transport.mjs
 permissions:
   contents: read
   actions: read
