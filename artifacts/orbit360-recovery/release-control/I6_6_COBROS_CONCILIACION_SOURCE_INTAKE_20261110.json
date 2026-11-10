@@ -1,13 +1,13 @@
 {
   "schema": "GRAVICENTRA_I6_6_SOURCE_INTAKE_AND_COMMISSION_DECISION_CARRY_FORWARD_V1",
-  "status": "PRE_GATE_RAW_SOURCES_PINNED_CROSS_SOURCE_SAMPLED_NOT_LIVE_APPLIED",
+  "status": "I6_6_ACTIVE_LIVE_CARTERA_SOURCES_PINNED_VERIFIED_WRITES_PARTIAL_PAYMENTS_ON_DIAGNOSTIC_HOLD",
   "dateGuatemala": "2026-11-10",
   "productBrand": "Gravicentra Insurance",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
   "formalGate": "I6.6",
-  "currentReleaseGate": "I6.5/B4-007",
-  "lastClosedReleaseGate": "B4-006",
+  "currentReleaseGate": "I6.6",
+  "lastClosedReleaseGate": "B4-007",
   "productionAccepted": false,
   "purpose": "Single incremental source-intake checkpoint for insurer statements supplied after the 2026-11-07 commission-planilla-only analysis; preserves owner resolutions and avoids redoing the original study.",
   "authorityPointers": [
@@ -2021,8 +2021,8 @@
     "singleCanonicalPath": "artifacts/orbit360-recovery/release-control/I6_6_COBROS_CONCILIACION_SOURCE_INTAKE_20261110.json",
     "branch": "recovery/fase-a-clean-20260831",
     "noParallelReleaseCandidate": true,
-    "previousClosedReleaseGate": "B4-006",
-    "currentReleaseGate": "I6.5/B4-007",
+    "previousClosedReleaseGate": "B4-007",
+    "currentReleaseGate": "I6.6",
     "ownerDecisionsAlreadyFrozen": 34,
     "previousLiveVerifiedWrites": 7,
     "previousLivePaymentsRecorded": 0,
@@ -2228,6 +2228,12 @@
         "priority": 5,
         "action": "Repair reproduced month-frequency/receipt-count schedule bug in same canonical source release with focused tests and exact insurer-source date priority; profile nav/filter performance in parallel; importer is non-blocking; Finance deferred.",
         "status": "P0_REPRODUCED_FIX_PENDING"
+      },
+      {
+        "priority": 6,
+        "action": "AFTER CURRENT I6.6 SAFE LIVE CARTERA BLOCK: Google Drive AyS Guatemala/Clientes, documents created/modified July 1 through Nov 10 2026; identify latest 2026 policy for each recent client, compare policy number/insurer/term/client with LIVE, dedupe and list only ambiguous cases for manual review.",
+        "status": "FROZEN_NEXT_BLOCK_NOT_STARTED",
+        "ownerConfirmed20261110": true
       }
     ],
     "sourceCodeReadback": {
@@ -2295,5 +2301,19 @@
       "requiredFix": "Preserve selected Frecuencia, Cantidad de recibos, Forma de pago and Conducto as four separate fields. Frequency controls real cadence; number of installments controls count; insurer source explicit contractual receipt dates and numbers override generated defaults. Never replace paid receipts or invent accounting collections. Add regression tests Mensual×2, Mensual×12, month end, and insurer exact source schedule; use same canonical release gate.",
       "result": "P0_BUG_REPRODUCED_NO_LIVE_WRITE_NO_PASS"
     }
+  },
+  "liveOperationalReleaseAcknowledgment": {
+    "status": "B4_007_CLOSED_BY_DIRECTION_WITH_EXACT_LIVE_DEPLOY_PROOF_FULL_ROLE_UAT_CARRIED_NONBLOCKING",
+    "dateGuatemala": "2026-11-10",
+    "owner": "Paula Andrea Osorio Franco",
+    "canonicalControlPointer": "artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json#b4007OwnerOperationalGateClosure20261110",
+    "evidenceReceipt": "artifacts/orbit360-recovery/release-control/I6_5_B4_007_EXACT_LIVE_PROMOTION_CARLOS_INSURER_CANARY_20261109.json",
+    "liveWorkflowRun": 42660305513,
+    "governanceWorkflowRun": 42660305518,
+    "exactHostedFiles": "218/218",
+    "previewSourceSha": "45020d748dd5fa4328a96f99fe9919a6fcb207eb",
+    "fullRoleUatCertified": false,
+    "productionAcceptedFieldMeaning": "FULL_LIVE_E2E_CERTIFICATION_NOT_OPERATIONAL_LIVE_STATUS",
+    "noReopenReleaseForPortfolioUpdate": true
   }
 }
