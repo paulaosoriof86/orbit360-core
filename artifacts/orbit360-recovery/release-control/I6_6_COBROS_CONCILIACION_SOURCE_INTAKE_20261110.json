@@ -665,7 +665,7 @@
     }
   ],
   "technicalCursor": {
-    "currentProtocolStep": "I6_6_MARIA_SOURCE_NUMBER_UI_BLOCKED_CONTRACTUAL_VS_OPERATIVE_DATES_CORRECTED",
+    "currentProtocolStep": "I6_6_MARIA_SOURCE_NUMBER_PATCH_CANDIDATE_CI_HISTORICAL_GUARD_HOLD_NO_LIVE_WRITES",
     "fileByteSha256Pinned": true,
     "insurerStatementsFullyParsed": false,
     "owner28DecisionsRecoveredExactly": false,
@@ -674,7 +674,7 @@
     "operationalWrites": 7,
     "sourceChangeInProduction": false,
     "importerRebuildRequired": false,
-    "nextRequiredStep": "I6.6: correct previous apparent due-date mismatch in canonical state (confirmed #3/12 contractual due 2026-12-01 and separate operational deadline 2026-12-16); receipt edit UI maps 'Serie / recibo' only to internal serie, not insurer numeroReciboFuente. No unsafe LIVE mutation. Implement/test guarded source-number edit in single candidate before 10 source numbers, then payment command diagnosis and Drive join.",
+    "nextRequiredStep": "I6.6 source candidate 0d6396f exists in same branch but cannot be declared PASS or deployed: prior B4 guard B4006_GLOBAL_VISUAL_RECEIPT compares historical accepted diff to new HEAD. Create/validate scoped I6.6 successor release preserving certified B4 artifact, then same-artifact LIVE; ten source-number receipt patches remain not executed.",
     "insurerStatementsNativeFormatsParsed": true,
     "all35CurrentSourceRawHashesPinned": true,
     "fourHistoricalReferenceHashesPinned": true,
@@ -2032,7 +2032,8 @@
       "No server payment posted or retried",
       "No source release build or deployment performed",
       "No Finance entries created",
-      "No change to contractual installment dates, operational grace deadline, or internal series; direct LIVE detail proved earlier apparent mismatch was a wrong interpretation of summary heading."
+      "No change to contractual installment dates, operational grace deadline, or internal series; direct LIVE detail proved earlier apparent mismatch was a wrong interpretation of summary heading.",
+      "The I6.6 source patch is committed only to canonical recovery branch; old B4 preflight fails by comparing historic certified B4 product diff to current post-B4-I6.6 code. No new preview or live artifact. No insurer number updates."
     ],
     "immediateBatch": {
       "id": "UNIVERSALES_MARIA_10_FUTURE_RECEIPTS",
@@ -2213,7 +2214,8 @@
       {
         "priority": 2,
         "action": "Correct source-number edit surface without changing internal serie or contractual/operational dates; test/publish same candidate under I6.6, then verify and update only ten existing LIVE receipt numeroReciboFuente values via safeguarded patch, with individual readback.",
-        "status": "HOLD_UNSAFE_UI_CONFLATES_SERIE_AND_INSURER_REQUIREMENT; NO_LIVE_WRITES"
+        "status": "SOURCE_CANDIDATE_PREPARED_NOT_PUBLISHED_CI_HISTORICAL_GATE_HOLD",
+        "candidateCommit": "0d6396fbd919e13eafebfd0ead75b1a7f198e238"
       },
       {
         "priority": 3,
@@ -7165,5 +7167,46 @@
       "engineAllows": "numeroReciboFuente",
       "action": "NO_LIVE_DATA_WRITE; add separately labelled field with patch-only update and concurrency guard, verify/test/release SAME artifact before batch"
     }
+  },
+  "i66ReceiptSourceNumberCandidate20261110": {
+    "id": "GI_I66_SOURCE_NUMBER_SEPARATE_PATCH_ONLY_CANDIDATE",
+    "dateGuatemala": "2026-11-10",
+    "branch": "recovery/fase-a-clean-20260831",
+    "commit": "0d6396fbd919e13eafebfd0ead75b1a7f198e238",
+    "status": "SOURCE_COMMITTED_READBACK_MATCH_PREVIEW_AND_LIVE_HOLD_FAIL_CLOSED",
+    "files": [
+      {
+        "path": "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js",
+        "blob": "abf7ada42b69c7d2cdf21558255b964f2f76b087",
+        "change": "Separate insurer numeroReciboFuente field from internal serie in per-receipt edit modal"
+      },
+      {
+        "path": "orbit360-platform/data/store-firestore-product-operational-p0.js",
+        "blob": "112e72cc755eafcfcbea04c2b89340ca9b3e8062",
+        "change": "Send update payload patch only for recibosEsperados and carteraPrimas; server transactional merge preserves concurrent other fields"
+      },
+      {
+        "path": "orbit360-platform/core/policy-receipts-engine.js",
+        "blob": "6d21573cc2215ae72fa1075a9b7a2930be03fb34",
+        "change": "Do not recompute/write carteraPrimas when only non-financial insurer number or internal serie is edited"
+      }
+    ],
+    "localJavascriptSyntaxCheck": "PASS_3_OF_3_BY_V8_PARSER",
+    "githubBlobReadback": "MATCH_3_OF_3",
+    "ci": {
+      "42846664824": "SUCCESS E4 Reportes regression",
+      "42846665187": "FAILED prior B4-006 global visual receipt guard compares historical CSS-only diff to current I6.6 HEAD; 0 LIVE deployment",
+      "42846664822": "FAILED old B4-003 immutable preview source gate; zero preview deployment",
+      "42846665116": "FAILED old B4-005 immutable preview formal scope gate; zero preview deployment"
+    },
+    "rootBoundary": "Do not re-open B4-007 or overwrite prior immutable source; historical B4 seal checks must bind to certified B4 source, I6.6 code changes require new scoped successor gate and immutable preview/live promotion. No PASS for new I6.6 source.",
+    "operations": {
+      "liveWritesFromThisTurn": 0,
+      "receiptIdsUpdated": 0,
+      "insurerNumbersUpdated": 0,
+      "datesChanged": 0,
+      "paymentStatusChanged": 0
+    },
+    "nextRequiredStep": "Active I6.6 source-delta release successor: preserve prior B4-007 frozen SHA/artifact evidence, test number field edit and patch-only mutation with actor/role + Firestore concurrent write simulation, build once immutable Preview and promote identical artifact to LIVE after guards; then apply 10 insurer numbers with before/after per receipt. Never blindly rerun old B4 Preview gates."
   }
 }
