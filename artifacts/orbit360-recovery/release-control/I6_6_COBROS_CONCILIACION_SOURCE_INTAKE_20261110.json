@@ -674,7 +674,7 @@
     "operationalWrites": 7,
     "sourceChangeInProduction": false,
     "importerRebuildRequired": false,
-    "nextRequiredStep": "First, remedy source-exact receipt schedule/insurer requirement ID for existing Maria 12 receipts (10 future aging rows due 1st, #39460328..37); do not recreate policy. Diagnose server payment callable before Bayron or Maria payment attempts. Then continue insurer reconciliations with deterministic exact UID, correcting row-level client/policy/commission projections. Importer demo path remains fail-closed/non-blocking.",
+    "nextRequiredStep": "Use continuityFreeze20261110 immediateBatch and sequential nextActions; first unblock exact paid command and verify stored receipt IDs; Maria 10 future source-backed receipt updates are prepared but not executed. No duplicate policy/importer demonstration/Finance writes.",
     "insurerStatementsNativeFormatsParsed": true,
     "all35CurrentSourceRawHashesPinned": true,
     "fourHistoricalReferenceHashesPinned": true,
@@ -1987,6 +1987,288 @@
       "outstandingFuture10": "39460328 through 39460337, 2026-12-01 through 2027-09-01, Q952.56 each",
       "paidNov5": "39460327 payment 2/12 verified source; NOT applied LIVE",
       "writeStatus": "ONE_NEW_POLICY_CREATED_ACTIVE_12_PENDING_DATE_RECONCILIATION"
+    },
+    {
+      "id": "I6_6_20261110_CANONICAL_SOURCE_PAYMENT_RECEIPT_CODE_READBACK",
+      "status": "SOURCE_ONLY_PASS_LIVE_NOT_MODIFIED",
+      "repo": "paulaosoriof86/orbit360-core",
+      "branch": "recovery/fase-a-clean-20260831",
+      "sourceFiles": [
+        {
+          "path": "orbit360-platform/core/policy-receipts-engine.js",
+          "sha": "37471433de5b09ba4ecd2ca847baae55317ff8e5"
+        },
+        {
+          "path": "orbit360-platform/core/primas.js",
+          "sha": "507735bbd809546f97dbb5fec166a30d68fc2c93"
+        },
+        {
+          "path": "orbit360-platform/core/cobros-reconciliation-domain-client.js",
+          "sha": "7f00ced68ad64dd1ff4b9c0eff85f1f959dc6d68"
+        },
+        {
+          "path": "functions/cobros-reconciliation-domain.js",
+          "sha": "5b27038d1c8380e4d2d0ed044996c1570d8c3767"
+        }
+      ],
+      "finding": "Exact receipt update path available; server payment preconditions explicit; no proof of actual LIVE rejection code; prospective Maria 10 receipt patch manifest frozen."
     }
-  ]
+  ],
+  "continuityFreeze20261110": {
+    "id": "GI_I6_6_FROZEN_NEXT_OPERATIONAL_BLOCK_20261110",
+    "authority": "PAULA_DIRECT_2026_11_10",
+    "createdAtDateGuatemala": "2026-11-10",
+    "singleCanonicalPath": "artifacts/orbit360-recovery/release-control/I6_6_COBROS_CONCILIACION_SOURCE_INTAKE_20261110.json",
+    "branch": "recovery/fase-a-clean-20260831",
+    "noParallelReleaseCandidate": true,
+    "previousClosedReleaseGate": "B4-006",
+    "currentReleaseGate": "I6.5/B4-007",
+    "ownerDecisionsAlreadyFrozen": 34,
+    "previousLiveVerifiedWrites": 7,
+    "previousLivePaymentsRecorded": 0,
+    "policyDuplicatePrevention": "MARTA? NO: MARIA_GABRIELA_POL_MWAJP407_FIZII_EXISTS; DO_NOT_RECREATE",
+    "explicitNotDone": [
+      "No new LIVE insurer receipt mutations performed in this checkpoint",
+      "No server payment posted or retried",
+      "No source release build or deployment performed",
+      "No Finance entries created"
+    ],
+    "immediateBatch": {
+      "id": "UNIVERSALES_MARIA_10_FUTURE_RECEIPTS",
+      "beforeWriteRequirement": "Read current canonical receipt IDs, amounts, state, due and portfolio row after reload; reconcile insurer receipt identity, no past paid overwrite",
+      "sourceAsOf": "2026-11-09",
+      "insurerFutureOpenCount": 10,
+      "insurerFutureOpenTotalGTQ": 9525.6,
+      "pendingPatchRows": [
+        {
+          "policyId": "pol_mwajp407_fizii",
+          "clientId": "cli_mwafruvk",
+          "receiptId": "cob_pol_mwajp407_fizii_003",
+          "seq": 3,
+          "insurerRequirementId": "39460328",
+          "contractualDueDate": "2026-12-01",
+          "amountGTQ": 952.56,
+          "expectedStatusAtInsurerCutoff": "PENDING_FUTURE_2026_11_09",
+          "requiredPatchFields": [
+            "numeroReciboFuente",
+            "fechaLimite"
+          ],
+          "source": "UNIVERSALES_AGING_CUTOFF_2026_11_09",
+          "writeStatus": "NOT_EXECUTED_REQUIRES_EXISTING_ID_AND_CURRENT_VALUE_READBACK"
+        },
+        {
+          "policyId": "pol_mwajp407_fizii",
+          "clientId": "cli_mwafruvk",
+          "receiptId": "cob_pol_mwajp407_fizii_004",
+          "seq": 4,
+          "insurerRequirementId": "39460329",
+          "contractualDueDate": "2027-01-01",
+          "amountGTQ": 952.56,
+          "expectedStatusAtInsurerCutoff": "PENDING_FUTURE_2026_11_09",
+          "requiredPatchFields": [
+            "numeroReciboFuente",
+            "fechaLimite"
+          ],
+          "source": "UNIVERSALES_AGING_CUTOFF_2026_11_09",
+          "writeStatus": "NOT_EXECUTED_REQUIRES_EXISTING_ID_AND_CURRENT_VALUE_READBACK"
+        },
+        {
+          "policyId": "pol_mwajp407_fizii",
+          "clientId": "cli_mwafruvk",
+          "receiptId": "cob_pol_mwajp407_fizii_005",
+          "seq": 5,
+          "insurerRequirementId": "39460330",
+          "contractualDueDate": "2027-02-01",
+          "amountGTQ": 952.56,
+          "expectedStatusAtInsurerCutoff": "PENDING_FUTURE_2026_11_09",
+          "requiredPatchFields": [
+            "numeroReciboFuente",
+            "fechaLimite"
+          ],
+          "source": "UNIVERSALES_AGING_CUTOFF_2026_11_09",
+          "writeStatus": "NOT_EXECUTED_REQUIRES_EXISTING_ID_AND_CURRENT_VALUE_READBACK"
+        },
+        {
+          "policyId": "pol_mwajp407_fizii",
+          "clientId": "cli_mwafruvk",
+          "receiptId": "cob_pol_mwajp407_fizii_006",
+          "seq": 6,
+          "insurerRequirementId": "39460331",
+          "contractualDueDate": "2027-03-01",
+          "amountGTQ": 952.56,
+          "expectedStatusAtInsurerCutoff": "PENDING_FUTURE_2026_11_09",
+          "requiredPatchFields": [
+            "numeroReciboFuente",
+            "fechaLimite"
+          ],
+          "source": "UNIVERSALES_AGING_CUTOFF_2026_11_09",
+          "writeStatus": "NOT_EXECUTED_REQUIRES_EXISTING_ID_AND_CURRENT_VALUE_READBACK"
+        },
+        {
+          "policyId": "pol_mwajp407_fizii",
+          "clientId": "cli_mwafruvk",
+          "receiptId": "cob_pol_mwajp407_fizii_007",
+          "seq": 7,
+          "insurerRequirementId": "39460332",
+          "contractualDueDate": "2027-04-01",
+          "amountGTQ": 952.56,
+          "expectedStatusAtInsurerCutoff": "PENDING_FUTURE_2026_11_09",
+          "requiredPatchFields": [
+            "numeroReciboFuente",
+            "fechaLimite"
+          ],
+          "source": "UNIVERSALES_AGING_CUTOFF_2026_11_09",
+          "writeStatus": "NOT_EXECUTED_REQUIRES_EXISTING_ID_AND_CURRENT_VALUE_READBACK"
+        },
+        {
+          "policyId": "pol_mwajp407_fizii",
+          "clientId": "cli_mwafruvk",
+          "receiptId": "cob_pol_mwajp407_fizii_008",
+          "seq": 8,
+          "insurerRequirementId": "39460333",
+          "contractualDueDate": "2027-05-01",
+          "amountGTQ": 952.56,
+          "expectedStatusAtInsurerCutoff": "PENDING_FUTURE_2026_11_09",
+          "requiredPatchFields": [
+            "numeroReciboFuente",
+            "fechaLimite"
+          ],
+          "source": "UNIVERSALES_AGING_CUTOFF_2026_11_09",
+          "writeStatus": "NOT_EXECUTED_REQUIRES_EXISTING_ID_AND_CURRENT_VALUE_READBACK"
+        },
+        {
+          "policyId": "pol_mwajp407_fizii",
+          "clientId": "cli_mwafruvk",
+          "receiptId": "cob_pol_mwajp407_fizii_009",
+          "seq": 9,
+          "insurerRequirementId": "39460334",
+          "contractualDueDate": "2027-06-01",
+          "amountGTQ": 952.56,
+          "expectedStatusAtInsurerCutoff": "PENDING_FUTURE_2026_11_09",
+          "requiredPatchFields": [
+            "numeroReciboFuente",
+            "fechaLimite"
+          ],
+          "source": "UNIVERSALES_AGING_CUTOFF_2026_11_09",
+          "writeStatus": "NOT_EXECUTED_REQUIRES_EXISTING_ID_AND_CURRENT_VALUE_READBACK"
+        },
+        {
+          "policyId": "pol_mwajp407_fizii",
+          "clientId": "cli_mwafruvk",
+          "receiptId": "cob_pol_mwajp407_fizii_010",
+          "seq": 10,
+          "insurerRequirementId": "39460335",
+          "contractualDueDate": "2027-07-01",
+          "amountGTQ": 952.56,
+          "expectedStatusAtInsurerCutoff": "PENDING_FUTURE_2026_11_09",
+          "requiredPatchFields": [
+            "numeroReciboFuente",
+            "fechaLimite"
+          ],
+          "source": "UNIVERSALES_AGING_CUTOFF_2026_11_09",
+          "writeStatus": "NOT_EXECUTED_REQUIRES_EXISTING_ID_AND_CURRENT_VALUE_READBACK"
+        },
+        {
+          "policyId": "pol_mwajp407_fizii",
+          "clientId": "cli_mwafruvk",
+          "receiptId": "cob_pol_mwajp407_fizii_011",
+          "seq": 11,
+          "insurerRequirementId": "39460336",
+          "contractualDueDate": "2027-08-01",
+          "amountGTQ": 952.56,
+          "expectedStatusAtInsurerCutoff": "PENDING_FUTURE_2026_11_09",
+          "requiredPatchFields": [
+            "numeroReciboFuente",
+            "fechaLimite"
+          ],
+          "source": "UNIVERSALES_AGING_CUTOFF_2026_11_09",
+          "writeStatus": "NOT_EXECUTED_REQUIRES_EXISTING_ID_AND_CURRENT_VALUE_READBACK"
+        },
+        {
+          "policyId": "pol_mwajp407_fizii",
+          "clientId": "cli_mwafruvk",
+          "receiptId": "cob_pol_mwajp407_fizii_012",
+          "seq": 12,
+          "insurerRequirementId": "39460337",
+          "contractualDueDate": "2027-09-01",
+          "amountGTQ": 952.56,
+          "expectedStatusAtInsurerCutoff": "PENDING_FUTURE_2026_11_09",
+          "requiredPatchFields": [
+            "numeroReciboFuente",
+            "fechaLimite"
+          ],
+          "source": "UNIVERSALES_AGING_CUTOFF_2026_11_09",
+          "writeStatus": "NOT_EXECUTED_REQUIRES_EXISTING_ID_AND_CURRENT_VALUE_READBACK"
+        }
+      ],
+      "boundary": "Only update exact currently pending source-backed future requirements; do not mark them paid; insurer paid 2/12 #39460327 on 2026-11-05 needs separate payment command after server fix; 1/12 requires exact original source."
+    },
+    "nextActions": [
+      {
+        "priority": 1,
+        "action": "Diagnose existing server-owned apply_payment command: capture precise error code/current deployed function revision, check persistent receipt exists, one active cartera obligation and idempotent request; no blind retry or duplicate collection.",
+        "status": "DIAGNOSIS_PENDING"
+      },
+      {
+        "priority": 2,
+        "action": "Update 10 existing Maria future requirement IDs and due dates using updateReceipt atomic writer; no new receipt/policy; verify 10 readbacks in Client360, Cartera, Cobros and report.",
+        "status": "READY_WITH_PRECONDITIONS"
+      },
+      {
+        "priority": 3,
+        "action": "Apply source-proven #2 Maria Q952.56 dated Nov5 and owner-proven Bayron payments only after server payment diagnosis and independent before/after; no invented payment date.",
+        "status": "BLOCKED_BY_PAYMENT_COMMAND"
+      },
+      {
+        "priority": 4,
+        "action": "Finish remaining Julia/Priscila policies on existing clients after source discrepancy holds, same-vehicle Marco renewal, Bayron owner and cross-module projection corrections; reconcile all insurer requirements with exact cutoff.",
+        "status": "PENDING_CONTROLLED_LIVE_SEQUENCE"
+      },
+      {
+        "priority": 5,
+        "action": "Performance optimization and importer fail-closed fixes in same source/CI release path; Finance commission liquidation deferred until insurer reconciliation passes.",
+        "status": "PARALLEL_DIAGNOSIS_ONLY"
+      }
+    ],
+    "sourceCodeReadback": {
+      "module": "orbit360-platform/core/policy-receipts-engine.js",
+      "blobSha": "37471433de5b09ba4ecd2ca847baae55317ff8e5",
+      "expectedReceiptIdRule": "cob_<policyId>_<zero-padded-sequence>",
+      "updateReceiptAllowedFields": [
+        "serie",
+        "numeroReciboFuente",
+        "fechaLimite",
+        "primaNeta",
+        "gastosExpedicion",
+        "gastosFinanciamiento",
+        "descuento",
+        "impuestosIVA",
+        "primaTotal"
+      ],
+      "saveContract": "batchDurable mutates recibosEsperados and matching active carteraPrimas and activity; protects paid receipts",
+      "schedule": "orbit360-platform/core/primas.js",
+      "scheduleBlobSha": "507735bbd809546f97dbb5fec166a30d68fc2c93",
+      "observedRoot": "pasoMeses=12/n plus new Date.setMonth creates insurer-date mismatches/overflow",
+      "paymentClient": "orbit360-platform/core/cobros-reconciliation-domain-client.js",
+      "paymentClientBlobSha": "7f00ced68ad64dd1ff4b9c0eff85f1f959dc6d68",
+      "paymentServer": "functions/cobros-reconciliation-domain.js",
+      "paymentServerBlobSha": "5b27038d1c8380e4d2d0ed044996c1570d8c3767",
+      "serverPreconditions": [
+        "authenticated active tenant/role",
+        "receipt ID present in Firestore",
+        "linked policy exists",
+        "at most one active cartera row per receipt",
+        "at most one cobro per receipt",
+        "valid receipt amount"
+      ],
+      "rootCauseClassification": "NOT_YET_PROVEN; need real callable error code and deployed revision, not just UI toast"
+    },
+    "browserEvidence": {
+      "host": "app.aysseguros.com",
+      "lastAuthReadback": "2026-11-10 prior turn",
+      "currentTurn": "Chrome extension recognized, but multiple tab DOM attempts failed due browser-focus transport timeouts; cannot interpret as app server or write failure",
+      "currentTurnLiveWrites": 0
+    },
+    "historicalContinuity": "All named exceptions including Bayron Paula, Marco same-vehicle insurer switch renewal, Mirlet prior phone, Camila and Germán/Samuel named exceptions preserved in ownerFrozenDecisions, caseDossiers and operationalActions. November commission invoices track October collections; Finance deferred."
+  }
 }
