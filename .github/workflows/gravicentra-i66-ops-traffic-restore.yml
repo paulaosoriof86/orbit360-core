@@ -1,0 +1,147 @@
+# I6.6 Ops/Leads existing Cloud Run service: one reversible traffic-only correction.
+# No backend deploy, no Firestore/Rules/Auth writes, no new project or product artifact.
+name: Gravicentra I6.6 Ops LIVE Canonical Revision Traffic Repair
+on:
+  push:
+    branches: [recovery/fase-a-clean-20260831]
+    paths:
+      - .github/workflows/gravicentra-i66-ops-traffic-restore.yml
+permissions:
+  contents: read
+concurrency:
+  group: gravicentra-i66-ops-prod-targeted
+  cancel-in-progress: false
+jobs:
+  restore:
+    if: github.repository == 'paulaosoriof86/orbit360-core' && github.ref == 'refs/heads/recovery/fase-a-clean-20260831'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      PROJECT_ID: ays-orbit-360-lab
+      REGION: us-central1
+      SERVICE: orbit360opsleadscommand
+      OLD_REVISION: orbit360opsleadscommand-00002-nop
+      PRODUCT_REVISION: orbit360opsleadscommand-00003-wed
+      OLD_IMAGE_DIGEST: sha256:c8b6424fe69c521159e957d48216918e0c87a4ea5babc49cbb57f41e55598aa0
+      PRODUCT_IMAGE_DIGEST: sha256:13ed71c890b7c2ea000b9c5aa9dfb76b8987946a7147c5d22b2d95154160552b
+      PRODUCT_SOURCE_SHA: e8986c81ed1748bea680447d07d2f37dc0c1db7a
+      SA_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_ALT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify same approved source and role/country/soft-delete tests
+        run: |
+          set -euo pipefail
+          git cat-file -e "$PRODUCT_SOURCE_SHA^{commit}"
+          test "$(git rev-parse HEAD:functions/product-ops-leads-domain.js)" = "$(git rev-parse "$PRODUCT_SOURCE_SHA":functions/product-ops-leads-domain.js)"
+          node --check functions/product-ops-leads-domain.js
+          node tools/gravicentra-i6-6-ops-crud-role-country.test.cjs
+          node tools/gravicentra-i6-6-ops-delete-diagnostic.test.cjs
+          echo 'I66_OPS_TRAFFIC_SOURCE_AND_ROLE_QA_PASS; NO_DATA_WRITES'
+      - uses: google-github-actions/setup-gcloud@v2
+        with:
+          version: '>= 483.0.0'
+      - name: Select existing authorized same-project credential once
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/ops-traffic-auth"
+          python3 - <<'PY'
+          import json,os,pathlib
+          root=pathlib.Path(os.environ['RUNNER_TEMP'])/'ops-traffic-auth'
+          found=[]
+          for i,key in enumerate(('SA_LAB','SA_ALT','SA_DEFAULT')):
+              try: data=json.loads(os.environ.get(key,''))
+              except (ValueError,TypeError):continue
+              if data.get('type')=='service_account' and data.get('project_id')=='ays-orbit-360-lab' and data.get('private_key'):
+                  p=root/f'{i}.json';p.write_text(json.dumps(data));p.chmod(0o600);found.append(str(p))
+          if not found:raise SystemExit('I66_OPS_TRAFFIC_CONFIGURED_SAME_PROJECT_AUTH_MISSING')
+          (root/'candidates').write_text('\n'.join(found)+'\n')
+          PY
+          SEL=''
+          while IFS= read -r C;do
+            gcloud auth activate-service-account --key-file="$C" --quiet >/dev/null 2>&1 || continue
+            if gcloud run services describe "$SERVICE" --region "$REGION" --project "$PROJECT_ID" --format='value(status.latestReadyRevisionName)' > "$RUNNER_TEMP/ops-traffic-service-probe" 2>/dev/null;then SEL="$C";break;fi
+          done < "$RUNNER_TEMP/ops-traffic-auth/candidates"
+          test -n "$SEL" || { echo 'I66_OPS_TRAFFIC_CONFIGURED_IDENTITY_HAS_NO_SERVICE_READ';exit 1; }
+          cp "$SEL" "$RUNNER_TEMP/ops-traffic-auth/selected.json"
+          chmod 600 "$RUNNER_TEMP/ops-traffic-auth/selected.json"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$RUNNER_TEMP/ops-traffic-auth/selected.json" >> "$GITHUB_ENV"
+          echo 'I66_OPS_TRAFFIC_EXISTING_IDENTITY_SELECTED_NO_SECRET_OUTPUT'
+      - name: Fail-closed exact image/env/IAM/ready/100-percent old revision gate
+        run: |
+          set -euo pipefail
+          gcloud auth activate-service-account --key-file="$GOOGLE_APPLICATION_CREDENTIALS" --quiet >/dev/null
+          gcloud run services describe "$SERVICE" --region "$REGION" --project "$PROJECT_ID" --format=json > "$RUNNER_TEMP/ops-traffic-before.json"
+          for REV in "$OLD_REVISION" "$PRODUCT_REVISION";do
+            gcloud run revisions describe "$REV" --region "$REGION" --project "$PROJECT_ID" --format=json > "$RUNNER_TEMP/$REV.json"
+          done
+          gcloud functions describe orbit360OpsLeadsCommand --gen2 --region "$REGION" --project "$PROJECT_ID" --format=json > "$RUNNER_TEMP/ops-traffic-function.json"
+          python3 - <<'PY'
+          import os,json
+          root=os.environ['RUNNER_TEMP'];old=os.environ['OLD_REVISION'];new=os.environ['PRODUCT_REVISION']
+          a=json.load(open(root+'/'+old+'.json'));b=json.load(open(root+'/'+new+'.json'))
+          service=json.load(open(root+'/ops-traffic-before.json'))
+          fun=json.load(open(root+'/ops-traffic-function.json'))
+          def ready(r):
+              return any(c.get('type')=='Ready' and str(c.get('status')).lower()=='true' for c in (r.get('status') or {}).get('conditions') or [])
+          def container(r):
+              c=(r.get('spec') or {}).get('containers') or []
+              if len(c)!=1:raise RuntimeError('I66_OPS_TRAFFIC_CONTAINER_CARDINALITY_NOT_ONE')
+              return c[0]
+          def digest(r):
+              d=str((r.get('status') or {}).get('imageDigest') or container(r).get('image') or '')
+              return 'sha256:'+d.split('sha256:')[-1] if 'sha256:' in d else ''
+          def env(r):
+              return {v.get('name'):json.dumps(v,sort_keys=True) for v in container(r).get('env') or []}
+          traffic=(service.get('status') or {}).get('traffic') or []
+          exact= len(traffic)==1 and traffic[0].get('revisionName')==old and int(traffic[0].get('percent') or 0)==100
+          sameAccount=bool((a.get('spec') or {}).get('serviceAccountName')) and (a.get('spec') or {}).get('serviceAccountName')==(b.get('spec') or {}).get('serviceAccountName')
+          checks={'oldReady':ready(a),'newReady':ready(b),'exactPriorTraffic100':exact,
+              'latestReadyIsNew':(service.get('status') or {}).get('latestReadyRevisionName')==new,
+              'oldImageDigestPinned':digest(a)==os.environ['OLD_IMAGE_DIGEST'],
+              'newImageDigestPinned':digest(b)==os.environ['PRODUCT_IMAGE_DIGEST'],
+              'sameServiceAccount':sameAccount,'sameEnvironmentValues':env(a)==env(b),
+              'functionActive':fun.get('state')=='ACTIVE',
+              'functionServiceExact':str((fun.get('serviceConfig') or {}).get('service') or '').split('/')[-1]==os.environ['SERVICE'],
+              'entrypointExact':(fun.get('buildConfig') or {}).get('entryPoint')=='orbit360OpsLeadsCommand',
+              'runtimeNode22':(fun.get('buildConfig') or {}).get('runtime')=='nodejs22'}
+          print('I66_OPS_TRAFFIC_PRECUTOVER='+json.dumps(checks,sort_keys=True))
+          if not all(checks.values()):raise SystemExit('I66_OPS_TRAFFIC_PRECUTOVER_HOLD')
+          PY
+      - name: Repair live traffic only then verify and rollback on unsuccessful readback
+        run: |
+          set -euo pipefail
+          gcloud auth activate-service-account --key-file="$GOOGLE_APPLICATION_CREDENTIALS" --quiet >/dev/null
+          REPAIR_STARTED=0
+          rollback() {
+            EXIT_CODE=$?
+            if [ "$REPAIR_STARTED" -eq 1 ];then
+              echo 'I66_OPS_TRAFFIC_REPAIR_READBACK_FAILED_ATTEMPTING_ROLLBACK'
+              gcloud run services update-traffic "$SERVICE" --region "$REGION" --project "$PROJECT_ID" --to-revisions="$OLD_REVISION=100" --quiet || echo 'I66_OPS_TRAFFIC_ROLLBACK_COMMAND_FAILED_MANUAL_HOLD'
+            fi
+            exit "$EXIT_CODE"
+          }
+          trap rollback ERR
+          REPAIR_STARTED=1
+          gcloud run services update-traffic "$SERVICE" --region "$REGION" --project "$PROJECT_ID" --to-revisions="$PRODUCT_REVISION=100" --quiet
+          gcloud run services describe "$SERVICE" --region "$REGION" --project "$PROJECT_ID" --format=json > "$RUNNER_TEMP/ops-traffic-after.json"
+          python3 - <<'PY'
+          import os,json
+          s=json.load(open(os.environ['RUNNER_TEMP']+'/ops-traffic-after.json'))
+          traffic=(s.get('status') or {}).get('traffic') or []
+          expected=os.environ['PRODUCT_REVISION']
+          assert len(traffic)==1 and traffic[0].get('revisionName')==expected and int(traffic[0].get('percent') or 0)==100,'I66_OPS_TRAFFIC_POSTCUTOVER_MISMATCH'
+          assert (s.get('status') or {}).get('latestReadyRevisionName')==expected,'I66_OPS_TRAFFIC_READY_DRIFT'
+          print('I66_OPS_TRAFFIC_CANONICAL_REVISION_100_PERCENT_READBACK_PASS; REV='+expected+' DATA_WRITES=0')
+          PY
+          REPAIR_STARTED=0
+          trap - ERR
+          echo 'I66_OPS_TRAFFIC_REPAIRED_BACKEND_ONLY; LIVE_WRITE_UAT_PENDING_BROWSER'
