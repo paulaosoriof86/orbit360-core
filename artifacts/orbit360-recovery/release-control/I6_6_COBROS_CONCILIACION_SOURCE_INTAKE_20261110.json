@@ -649,7 +649,7 @@
     "operationalWrites": 3,
     "sourceChangeInProduction": false,
     "importerRebuildRequired": false,
-    "nextRequiredStep": "Do not assume prior UI write. Exact source-supported data input in authenticated LIVE requires action-time sensitive-data confirmation. Then create only missing clients (Julia, Maria Gabriela, Priscila pending final check), preserve existing customer details, link authentic new/renewal editions by vehicle and vigencia, correct Bayron adviser+premium+2-installment receipts and as-of paid status; verify persistence. Parallel non-destructive performance timings/filter transitions.",
+    "nextRequiredStep": "Recover exact original source vs LIVE, including Bantrab 2026-11-04 AUTO-45580 duplicated 10/10 and 2026-04-21 ghost. Preserve previous B3-002 PASS and diagnose new global search, client list, hydration separately. Fix importer demo fallback and receipt due-date scheduling through same canonical source/release QA gate; do NOT run writes that fabricate dates or persist no document; verify client edit durability after reload before claiming. Continue source-backed policy/receipt reconciliation for other insurers; finance remains deferred.",
     "insurerStatementsNativeFormatsParsed": true,
     "all35CurrentSourceRawHashesPinned": true,
     "fourHistoricalReferenceHashesPinned": true,
@@ -1125,6 +1125,55 @@
       "conclusion": "FAIL: UI shows demo/sample records while claiming extraction completed. Confirmar mapeo and Ejecutar escritura controlada NOT INVOKED.",
       "severity": "P0 DATA_INTEGRITY",
       "scope": "Importer source-state parser and preview must demonstrate actual file-specific row identities before apply; no reimport to solve UI."
+    },
+    "sourceCodeFindings": {
+      "scope": "READ_ONLY_SOURCE_ANALYSIS_ON_CANONICAL_RECOVERY_BRANCH_NO_SOURCE_EDITS",
+      "priorAcceptedPerformanceEvidence": {
+        "gate": "I6.5/B3-002",
+        "date": "2026-09-29",
+        "previewWarmUsableMs": 380.6,
+        "firstPaintDomRows": 60,
+        "source": "artifacts/orbit360-recovery/release-control/I6_5_B3_002_TARGETED_VISUAL_PERFORMANCE_PASS_20260929.json",
+        "rule": "Preserve this previously accepted fix; new LIVE symptoms require causal regression proof, do not restart historical audit."
+      },
+      "findings": [
+        {
+          "id": "GLOBAL_SEARCH_QUADRATIC_VEHICLE_SCAN",
+          "source": "orbit360-platform/core/router.js",
+          "blobSha": "df3f134f16246c770418ad11323f6e9a931cb3bb",
+          "evidence": "For every user keystroke, buscar() iterates every client, every policy, every vehicle, every cobro and every insurer. Within the policies loop calls S.all('vehiculos').find() per policy; with prior inventory ~1414 policies and ~1063 vehicles this can scan ~1.5m vehicle pairs per search event.",
+          "actionBoundary": "Precompute keyed vehicle and client lookup once per dataset version; debounce indexed global search; measure post-hydration input response and preserve role scopes."
+        },
+        {
+          "id": "CLIENT360_FILTER_FULL_AGGREGATE_PER_KEYSTROKE",
+          "source": "orbit360-platform/modules/cliente360.js",
+          "blobSha": "0fd9dc9452b2336f91e6e1506f06a5984e066edf",
+          "evidence": "liveFilter() calls lista() for each input event; lista() recomputes client/policy/cartera indexes, KPIs and entire host HTML while bounded to page. Existing diagnostics available under approved runtime; preserve earlier bounded-first-paint optimization.",
+          "actionBoundary": "Separate filter rows/pagination from aggregate KPI recomputation; debounce/search index, no false zero or stale selectors."
+        },
+        {
+          "id": "RECEIPT_DATE_GENERATION_FIXED_ANNUAL_SPAN",
+          "source": "orbit360-platform/core/primas.js",
+          "blobSha": "507735bbd809546f97dbb5fec166a30d68fc2c93",
+          "evidence": "recibos() explicitly uses pasoMeses=12/n and fecha inicio plus Math.round(i*pasoMeses), regardless frecuencia; n=2 creates six-month spacing even when insurer issued two consecutive monthly installments. Independent Bayron UI showed Sep04 2026 and Mar07 2027 instead of PDF Aug20/Sep20.",
+          "actionBoundary": "Model explicit contractual due dates and actual monthly cadence/count separately; no save until exact receipt schedule rendered; preserve paid receipts."
+        },
+        {
+          "id": "IMPORTER_SILENT_SAMPLE_FALLBACK",
+          "source": "orbit360-platform/core/importa.js",
+          "blobSha": "dbd4a0583bb2f9745c3f951d312b26c4dba53750",
+          "evidence": "step2() sets sample=real?real.rows:m.sample; nReg fallback m.sample.length+'+'; always renders label 'Extracción completada · N registros · 0 errores de formato' even if state.parsed null. catch/fail path explicitly sets parsed=null and paint(). Exact Rural Excel after actual upload displayed unrelated KINDS['estados-cuenta'].sample rows.",
+          "actionBoundary": "Fail closed: parser-error state, block confirm, never mix demo/fake with source preview, require row-level source identity and count proof before any write."
+        },
+        {
+          "id": "CLIENT360_DURABLE_SAVE_READBACK_INCONSISTENT",
+          "source": "orbit360-platform/modules/cliente360.js",
+          "blobSha": "0fd9dc9452b2336f91e6e1506f06a5984e066edf",
+          "evidence": "Save invokes batchDurable client update+activity with timeout 20s and closes after returned success; Marco edit appeared in same route after click but was reverted after full reload. Could be failed save, event race or store/source conflict; no verified durable write.",
+          "actionBoundary": "Instrument requestId/before-after and independent reload, avoid repeated blind writes/false success."
+        }
+      ],
+      "browserTransportNotes": "Connected Chrome/CDP intermittently exceeded 3s command dispatch and page action; previous coarse route timings include tool transport, so do not attribute all 6s to app without independent app-only measurement."
     }
   },
   "operationalActions": [
@@ -1176,6 +1225,22 @@
       "after": "443 commercial / 444 total; exact search 1 de 444 and Samuel Daza, no policies yet",
       "linkedPolicyCreate": "PENDING",
       "notes": "No invented phone, identification or email; payment frequency monthly source backed, mechanism not confirmed; frontend click timed out while write did persist."
+    },
+    {
+      "id": "LIVE_MARCO_CLIENT_EDIT_NOT_PERSISTED_20261110",
+      "action": "CLIENT_EDIT_ATTEMPT",
+      "client": "MARCO VINICIO PAYES ESCOBAR",
+      "clientId": "cli_siga_f600b510a7a0c7d097",
+      "source": "libfile_0f7e755123ac819190d78574e862e078",
+      "fieldsRequested": [
+        "email",
+        "ciudad",
+        "direccion"
+      ],
+      "event": "Submitted Guardar cambios; browser command exceeded deadline. Modal subsequently closed and reopen in same route displayed edited values, but AFTER full reload reopened form reverted to blank email, Amatitlan and short address.",
+      "status": "NOT_VERIFIED_NO_DURABLE_CHANGE",
+      "writeCountIncrement": 0,
+      "requiredAction": "Do not claim updated; investigate durable write/readback or competing projection/source before retry, prevent overwrite of current data."
     }
   ],
   "verifiedSourceReadbacks": [
@@ -1331,6 +1396,70 @@
       "duplicates": "TWO ROWS SAME RECEIPT/REQUIREMENT; one DEPOSITO MONETARIO BANCO INDUSTRIAL and one OTROS GASTOS CONTABLES INVALIDO. Count as ONE candidate pending status cross-check; never double-post.",
       "sourcePolicy": "libfile_738f65ff1d9c8191bb3e906f6b1893b3",
       "writeStatus": "NO_PAYMENT_APPLIED; policy missing; reconcile changed monthly amount before create."
+    },
+    {
+      "id": "BANTRAB_NOV4_AUTO45580_REAL_AGING",
+      "status": "VERIFIED_ORIGINAL_PENDING_STATEMENT_AND_LIVE_MATCH",
+      "statement": "https://docs.google.com/spreadsheets/d/1CSqlSJ-8jxsjFIs1tkUhUK9VeOVeD6zF/edit",
+      "policy": "AUTO-45580",
+      "clientStatement": "PERCY CHAMALE",
+      "clientLive": "PERCY ROLANDO CHAMALE MUÑOZ",
+      "cutoff": "2026-11-04",
+      "receipt4of10": {
+        "due": "2026-10-21",
+        "grossGTQ": 299.94,
+        "aging": "1-30 DIAS",
+        "requirement": "AC-11349841"
+      },
+      "futureReceipts5to10": {
+        "firstDue": "2026-11-21",
+        "lastDue": "2027-04-21",
+        "eachGTQ": 299.94,
+        "number": 6
+      },
+      "statementObligations": 7,
+      "statementTotalGTQ": 2099.58,
+      "liveFilter": "22 rows: 11 operational + 11 SIGA unconfirmed; each same seq/amount represented twice; an extra second 10/10 due 2026-04-21 is both a ghost current receivable and an unconfirmed SIGA row",
+      "liveError": "10/10 also appears correctly due 2027-04-21; false 2026 is not statement-backed",
+      "writeStatus": "NO_PAYMENT_WRITE_NO_DELETE; requires exact receipt ID de-dup/readback"
+    },
+    {
+      "id": "MAPFRE_NOV_2026_PROJECTED_NOT_ACTUAL_AGING",
+      "status": "VERIFIED_ORIGINAL_REPORT_SCOPE",
+      "source": "https://docs.google.com/spreadsheets/d/1tililHqGhdlifR9dDpLK5bgOls5b7DRh/edit",
+      "title": "REPORTE DE PRIMAS POR COBRAR",
+      "explicitHorizon": "PROYECTADO: Al 30 NOVEMBER DE 2026",
+      "interpretation": "Forward-looking horizon report includes future 2026-11-30 requirements as well as overdue 2026-04/2026-09; NOT all currently due or past-due as of Nov10. Preserve each due and report horizon separately.",
+      "reportedTotalGTQ": 10612.3,
+      "writeStatus": "READ_ONLY"
+    },
+    {
+      "id": "LA_CEIBA_NOV9_SOURCE_DATES_NOT_PAID",
+      "status": "VERIFIED_ORIGINAL_SPREADSHEET",
+      "source": "https://docs.google.com/spreadsheets/d/1B5XupnxyFOGlXNJxy9-4cIZCQX2mjs7m/edit",
+      "asOf": "2026-11-09",
+      "rows": [
+        {
+          "policy": "0225118528",
+          "insured": "NORA LUCIA HURTARTE FLORES",
+          "requirement": "02492371",
+          "scheduledDate": "2026-11-16",
+          "netGTQ": 1040.75,
+          "customerGrossGTQ": 1165.64
+        },
+        {
+          "policy": "0226130804",
+          "insured": "ROLANDO JAVIER LARIOS CALDERON",
+          "requirement": "02505903",
+          "scheduledDate": "2026-10-31",
+          "netGTQ": 16.18,
+          "emisionGTQ": 53.95,
+          "financialSurchargeGTQ": 53.95,
+          "vatGTQ": 14.89,
+          "grossGTQ": 138.97
+        }
+      ],
+      "interpretation": "Column FECHA_COBRO may be scheduled/contractual, not settlement proof; first date is in the future relative to cutoff. Do not mark paid without affirmative source."
     }
   ]
 }
