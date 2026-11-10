@@ -133,6 +133,29 @@ jobs:
             }
             console.log('I66_MARIA_POLICY_ID_FOUND_COUNT='+seen.length);
             console.log('I66_MARIA_POLICY_ID_SCHEMA_DIAGNOSTIC='+JSON.stringify(seen.slice(0,5)));
+            const byNumber=[];
+            async function lookupExactNumber(col,scope,scopeId){
+              for(const field of ['numero','numeroPoliza','numero_poliza']){
+                const q=await col.where(field,'==',fixture.policyNumber).limit(3).get();
+                for(const doc of q.docs){
+                  const p=doc.data()||{};
+                  byNumber.push({
+                    scope,scopeHash:hash(scopeId).slice(0,12),field,
+                    docIdMatches:doc.id===fixture.policyId,
+                    rowIdMatches:id(p.id)===fixture.policyId,
+                    clientAliasMatches:clientKeys.filter(k=>id(p[k])===fixture.clientId),
+                    countryAliasMatches:countryKeys.filter(k=>id(p[k]).toUpperCase()==='GT'),
+                    recognizedKeys:Object.keys(p).filter(k=>[...numberKeys,...clientKeys,...countryKeys,'id','tenantId'].includes(k))
+                  });
+                }
+              }
+            }
+            for(const t of tenants)await lookupExactNumber(t.collection('data').doc('polizas').collection('items'),'tenant',t.id);
+            await lookupExactNumber(db.collection('polizas'),'legacy_root','polizas');
+            await lookupExactNumber(db.collection('data').doc('polizas').collection('items'),'legacy_data_root','data/polizas/items');
+            console.log('I66_MARIA_TENANT_ROOT_LIST_COUNT='+tenants.length);
+            console.log('I66_MARIA_EXACT_NUMBER_BOUND_QUERY_COUNT='+byNumber.length);
+            console.log('I66_MARIA_EXACT_NUMBER_LOCATIONS='+JSON.stringify(byNumber.slice(0,8)));
             if(found.length!==1){
               console.log('I66_MARIA_TENANT_EXACT_MATCH_COUNT='+found.length);
               throw Error('I66_MARIA_TENANT_NOT_EXACTLY_ONE');
