@@ -7343,5 +7343,55 @@
       "productionPromotion": "NOT_STARTED",
       "sourceOfTruth": "Same recovery branch and canonical ledger; artifact prior superseded, no LIVE changes by source release"
     }
+  },
+  "i66FrontOnlyLiveRelease20261110": {
+    "id": "GI_I66_FRONT_ONLY_SOURCE_NUMBER_AND_PREVIEW_GUARD_LIVE_READBACK_20261110",
+    "dateGuatemala": "2026-11-10",
+    "status": "LIVE_HOSTING_SAME_ARTIFACT_READBACK_PASS_NOT_FULL_WRITE_UAT",
+    "historicalClosedGate": "B4-007",
+    "activeGate": "I6.6",
+    "productSourceSha": "0919914071fb40d4451861b50322fdd04a2bad2b",
+    "buildId": "gi-i66-0919914071fb-57f234755dc1",
+    "previewChannel": "gi-i66-rc-42859356672",
+    "previewRun": {
+      "id": 42859356672,
+      "result": "SUCCESS"
+    },
+    "authenticatedReadOnlyQa": {
+      "id": 42861298905,
+      "result": "PASS",
+      "actorRole": "Operativo",
+      "fields": "Serie / cuota interna; Número de requerimiento de aseguradora",
+      "firestoreWrites": 0,
+      "backendWriterCalls": 0,
+      "fullWriteUat": false
+    },
+    "promotion": {
+      "runId": 42863359176,
+      "result": "SUCCESS",
+      "immutableArtifactId": 13785280178,
+      "zipSha256": "7fde07bcd274942ce5ea639db302baadb4036b13e7ca33cc158dcf244fe62f93",
+      "firebaseVersionPreview": "0912035255bdf0be",
+      "firebaseVersionLive": "0912035255bdf0be",
+      "priorLiveVersionRollback": "cc03b53092aa0e1d",
+      "previewExactFiles": "218/218",
+      "firebaseLiveExactFiles": "218/218",
+      "customDomainExactFiles": "218/218",
+      "backendDeployments": 0,
+      "operationalDataWrites": 0,
+      "rollback": "NOT_REQUIRED"
+    },
+    "productChangesPublished": [
+      "separate insurer receipt number from internal installment number",
+      "sparse non-financial receipt patch preserving concurrent edits",
+      "preview host classification and read-only writer guards"
+    ],
+    "remainingDataWrites": [
+      "10 source insurer receipt numbers not applied",
+      "payments and inferred cobros not applied in this release",
+      "future and overdue requirements refresh pending"
+    ],
+    "remainingP0": "Ops create/archive/delete, Carlos renewability edit, Advisor report to Ops, Cliente360 CTA, inbox notifications, chime, PWA and WhatsApp are NOT_DEPLOYED in this artifact",
+    "interpretation": "Exact same artifact in both LIVE origins; does not certify every write path or imply payment/portfolio refresh complete."
   }
 }
