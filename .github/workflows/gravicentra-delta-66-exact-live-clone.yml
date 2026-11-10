@@ -70,9 +70,15 @@ jobs:
       - name: Verify artifact TAR checksum and unpack original site manifest
         run: |
           set -euo pipefail
-          ZIPDIR="$RUNNER_TEMP/gi-i66-artifact-download"
-          test -f "$ZIPDIR/gi-i66-exact-package.tar.gz"
-          test -f "$ZIPDIR/gi-i66-exact-package.sha256"
+          DLROOT="$RUNNER_TEMP/gi-i66-artifact-download"
+          mapfile -t TARS < <(find "$DLROOT" -maxdepth 3 -type f -name 'gi-i66-exact-package.tar.gz' -print)
+          mapfile -t SUMS < <(find "$DLROOT" -maxdepth 3 -type f -name 'gi-i66-exact-package.sha256' -print)
+          test "${#TARS[@]}" -eq 1
+          test "${#SUMS[@]}" -eq 1
+          test "$(dirname "${TARS[0]}")" = "$(dirname "${SUMS[0]}")"
+          ZIPDIR="$(dirname "${TARS[0]}")"
+          echo "I66_ARTIFACT_BUNDLE_PAIR_EXACTLY_ONE=true"
+          echo "I66_ARTIFACT_BUNDLE_FILENAMES=$(basename "${TARS[0]}"),$(basename "${SUMS[0]}")"
           EXPECTED="$(cut -d' ' -f1 "$ZIPDIR/gi-i66-exact-package.sha256")"
           ACTUAL="$(sha256sum "$ZIPDIR/gi-i66-exact-package.tar.gz" | cut -d' ' -f1)"
           test "$EXPECTED" = "$ACTUAL"
