@@ -133,12 +133,13 @@ jobs:
             }
             console.log('I66_MARIA_POLICY_ID_FOUND_COUNT='+seen.length);
             console.log('I66_MARIA_POLICY_ID_SCHEMA_DIAGNOSTIC='+JSON.stringify(seen.slice(0,5)));
-            const byNumber=[];
+            const byNumber=[],byNumberRaw=[];
             async function lookupExactNumber(col,scope,scopeId){
               for(const field of ['numero','numeroPoliza','numero_poliza']){
                 const q=await col.where(field,'==',fixture.policyNumber).limit(3).get();
                 for(const doc of q.docs){
                   const p=doc.data()||{};
+                  byNumberRaw.push({scope,scopeId,docId:doc.id,rowId:id(p.id),clientId:id(p.clienteId),country:id(p.pais),policyNumber:id(p.numero)});
                   byNumber.push({
                     scope,scopeHash:hash(scopeId).slice(0,12),field,
                     docIdMatches:doc.id===fixture.policyId,
@@ -157,6 +158,42 @@ jobs:
             console.log('I66_MARIA_EXACT_NUMBER_BOUND_QUERY_COUNT='+byNumber.length);
             console.log('I66_MARIA_EXACT_NUMBER_LOCATIONS='+JSON.stringify(byNumber.slice(0,8)));
             if(found.length!==1){
+              const eligibleMap=new Map();
+              for(const x of byNumberRaw){
+                if(x.scope==='tenant'&&x.policyNumber===fixture.policyNumber&&x.clientId===fixture.clientId&&x.country.toUpperCase()==='GT')eligibleMap.set(x.scopeId+'|'+x.docId,x);
+              }
+              const eligible=[...eligibleMap.values()];
+              if(eligible.length===1){
+                const policy=eligible[0],col=db.collection('tenants').doc(policy.scopeId).collection('data').doc('recibosEsperados').collection('items');
+                const ids=[...new Set([policy.docId,policy.rowId,fixture.policyId])].filter(Boolean);
+                const docs=new Map();
+                for(const policyId of ids){
+                  const q=await col.where('polizaId','==',policyId).limit(25).get();
+                  for(const d of q.docs)docs.set(d.id,Object.assign({id:d.id},d.data()||{}));
+                }
+                const receipts=[...docs.values()].map(x=>({
+                  id:x.id,polizaId:x.polizaId||null,serie:x.serie||null,secuencia:x.secuencia||null,cuota:x.cuota||null,
+                  monto:x.monto??null,montoTotal:x.montoTotal??null,primaTotal:x.primaTotal??null,
+                  vence:x.vence||null,fechaLimite:x.fechaLimite||null,estado:x.estado||null,estadoPago:x.estadoPago||null,
+                  numeroReciboFuente:x.numeroReciboFuente||null,pagado:x.pagado===true,conciliado:x.conciliado===true,
+                  fechaPago:x.fechaPago||null
+                })).sort((a,b)=>String(a.id).localeCompare(String(b.id)));
+                const fingerprint=hash(JSON.stringify(receipts));
+                const report={
+                  schemaVersion:'gi.i66.universales.source-id-reconciliation.READONLY.v1',
+                  status:'HOLD_FIXTURE_POLICY_ID_DIFFERS_FROM_LIVE_NO_PATCH',
+                  projectId:'ays-orbit-360-lab',tenantId:policy.scopeId,
+                  sourceFixturePolicyId:fixture.policyId,
+                  livePolicyDocumentId:policy.docId,livePolicyRowId:policy.rowId,
+                  policyNumber:fixture.policyNumber,clientId:fixture.clientId,country:'GT',
+                  receiptCount:receipts.length,receipts,readOnlySnapshotDigest:fingerprint,
+                  dataWrites:0,neverApplyOldFixture:true
+                };
+                fs.writeFileSync(process.env.GI_I66_REPORT_PATH,JSON.stringify(report,null,2)+'\n',{mode:0o600});
+                console.log('I66_MARIA_LIVE_POLICY_ID_MISMATCH_READONLY_REPORT=CREATED');
+                console.log('I66_MARIA_LIVE_RECEIPT_INVENTORY_COUNT='+receipts.length);
+                console.log('I66_MARIA_LIVE_RECEIPT_INVENTORY_DIGEST='+fingerprint);
+              }
               console.log('I66_MARIA_TENANT_EXACT_MATCH_COUNT='+found.length);
               throw Error('I66_MARIA_TENANT_NOT_EXACTLY_ONE');
             }
