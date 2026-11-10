@@ -128,7 +128,7 @@
       "id": "I6_6_ADVISOR_REPORT_OPS_INTERNAL_OUTBOX_ROLE_COUNTRY_P0",
       "approvedByDirection": true,
       "receipt": "artifacts/orbit360-recovery/release-control/I6_6_ADVISOR_REPORT_OPS_OUTBOX_AUTH_20261110.json",
-      "sourceStatus": "SOURCE_COUNTRY_SCOPE_MICROFIX_EMULATOR_CI_PENDING_NO_LIVE",
+      "sourceStatus": "SOURCE_COUNTRY_VISIBILITY_GUARD_V3_EMULATOR_RETEST_PENDING_NO_LIVE",
       "capabilityOwners": [
         "COBROS_RECONCILIATION",
         "OPS_ADVISOR_INBOX",
@@ -146,7 +146,7 @@
         },
         {
           "path": "functions/ops-advisor-inbox.js",
-          "gitBlobSha": "fe743ad94dadb43af5c1b17c3513365ac3d45209"
+          "gitBlobSha": "5e5daeb9e3dee4ba806875a40068a2cb7adb4cfd"
         },
         {
           "path": "orbit360-platform/modules/cobros.js",
@@ -156,7 +156,7 @@
       "tests": [
         {
           "path": "tools/gravicentra-i6-6-advisor-payment-notification.test.cjs",
-          "gitBlobSha": "e598f230081571be58f014938190ddbb3852acb9"
+          "gitBlobSha": "bde1dd7ffad8d6ac4d6626cec7bb08b960104658"
         }
       ]
     },

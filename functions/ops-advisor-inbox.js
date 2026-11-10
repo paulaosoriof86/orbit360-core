@@ -130,7 +130,7 @@ function refFor(mode, tenantId, collection) {
 }
 function allowedAdvisorIds(authz,domain){const scope=domain==='leads'?authz.leadsScope:authz.opsScope;if(scope==='own')return[authz.advisorId];if(scope==='team')return teamAdvisorIds(authz.member,authz.activeRole);return[];}
 function visible(record,authz,domain){if(!record||record.archivado===true)return false;
-  if(norm(record.workflowType)==='advisor_payment_validation'){
+  if(norm(record.workflowType).replace(/ /g,'_')==='advisor_payment_validation'){
     const country=text(record.pais,8).toUpperCase();
     const countries=unique([...(authz.member.countries||[]),...(authz.member.paises||[])]).map(v=>text(v,8).toUpperCase());
     if(!['GT','CO'].includes(country)||!countries.includes(country))return false;

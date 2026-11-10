@@ -34,7 +34,7 @@ assert.match(ui,/Reporte de asesor rechazado/,'UI must give technical trace to d
 assert.match(ui,/No se aplicó ningún pago/,'UI must distinguish report from application');
 
 const text=(v,max=1000)=>String(v==null?'':v).trim().slice(0,max);
-const norm=v=>text(v).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'_').replace(/^_+|_+$/g,'');
+const norm=v=>text(v).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,' ').replace(/\s+/g,' ').trim();
 const unique=v=>Array.from(new Set([].concat(v||[]).map(x=>text(x)).filter(Boolean)));
 const opsRole=v=>/operativo|admin|direccion|superadmin|super admin/.test(norm(v));
 const advisorRole=v=>/asesor|comercial|asistente/.test(norm(v));

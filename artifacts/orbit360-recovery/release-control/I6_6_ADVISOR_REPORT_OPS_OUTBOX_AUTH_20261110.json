@@ -1,10 +1,10 @@
 {
-  "schema": "GRAVICENTRA_I6_6_ADVISOR_REPORT_OPS_OUTBOX_P0_V2",
+  "schema": "GRAVICENTRA_I6_6_ADVISOR_REPORT_OPS_OUTBOX_P0_V3",
   "brand": "Gravicentra Insurance",
   "date": "2026-11-10",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
-  "reviewedHead": "07abf1d43377f435a72f14ea4bf7b0d155757bca",
+  "reviewedHead": "1ffa001ac930321822102f3c4c3379466cf1a57d",
   "approvedByDirection": true,
   "directionRecord": "Paula authorized P0 Reportar pago Asesor→Ops, internal outbox, idempotence, tenant/country/role scoped inbox, same canonical branch, isolated Preview QA; no LIVE data mutation or external sends",
   "frozenBoundary": "B4-007 CLOSED, I6.6 active; this P0 is a successor delta, not a B4 reopen",
@@ -22,7 +22,7 @@
     {
       "path": "functions/ops-advisor-inbox.js",
       "previousGitBlobSha": "a26aeefdb27344bf91f978ca054ae9c1bfa8c3f7",
-      "newGitBlobSha": "fe743ad94dadb43af5c1b17c3513365ac3d45209"
+      "newGitBlobSha": "5e5daeb9e3dee4ba806875a40068a2cb7adb4cfd"
     },
     {
       "path": "orbit360-platform/modules/cobros.js",
@@ -32,8 +32,8 @@
   ],
   "test": {
     "path": "tools/gravicentra-i6-6-advisor-payment-notification.test.cjs",
-    "gitBlobSha": "e598f230081571be58f014938190ddbb3852acb9",
-    "staticResult": "SOURCE_CONTRACT_PREPARED_COUNTRY_MICROFIX_EMULATOR_PENDING",
+    "gitBlobSha": "bde1dd7ffad8d6ac4d6626cec7bb08b960104658",
+    "staticResult": "I6_6_ADVISOR_REPORT_OPS_NOTIFICATION_AND_SCOPE_PASS_WITH_PRODUCTION_NORM_SEMANTICS",
     "scriptRunExit": 0,
     "reversePatchCheckExit": 0
   },
@@ -45,7 +45,7 @@
     "in-app channels only, no Make, GreenAPI, WhatsApp, FCM, external send",
     "client portal projection path unchanged and not selected for role:operations targets"
   ],
-  "releaseState": "SOURCE_COUNTRY_MICROFIX_CANDIDATE_EMULATOR_QA_PENDING_NO_LIVE",
+  "releaseState": "SOURCE_SCOPE_MICROFIX_V3_EMULATOR_RETEST_REQUIRED_NO_LIVE",
   "testLimitations": [
     "static tests are not authenticated Firebase readback",
     "observed toast root cause requires real callable trace",
@@ -54,13 +54,15 @@
   "safetyAmendments": [
     "advisor country must be signed in member.countries/member.paises (no cross-country report even with same advisorId)",
     "linked payment Ops management carries explicit pais; inbox filters advisor_payment_validation management by signed country",
-    "new isolated Firestore emulator positive and negative matrix for GT/CO, roles, tenant, idempotency, outbox/readback; no Firebase credentials"
+    "new isolated Firestore emulator positive and negative matrix for GT/CO, roles, tenant, idempotency, outbox/readback; no Firebase credentials",
+    "invoice management workflowType normalizes underscores to spaces; country guard now normalizes back before exact match"
   ],
   "supplementalEmulatorQa": {
     "testPath": "tools/gravicentra-delta66-advisor-payment-emulator-functional.test.cjs",
     "testGitBlobSha": "5b2dc4a818e5558090eaedec2fd975728b905b16",
     "workflowPath": ".github/workflows/gravicentra-delta66-advisor-payment-emulator-qa.yml",
     "workflowGitBlobSha": "40c863a408776bd78b2a695ea4bd1a4141723ba8",
-    "status": "CI_NOT_RUN_NO_LIVE_WRITES"
+    "status": "FIRST_EMULATOR_RUN_FAILED_ON_GT_OPS_CO_MANAGEMENT_EXPOSURE; NORM_GUARD_FIXED; RETEST_PENDING",
+    "failedRun": 42869400960
   }
 }
