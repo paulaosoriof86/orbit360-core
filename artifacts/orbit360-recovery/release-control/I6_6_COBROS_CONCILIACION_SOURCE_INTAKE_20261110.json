@@ -6976,5 +6976,38 @@
       "livePayments": 0,
       "sourceCodeDeploys": 0
     }
+  },
+  "governanceHistoricalWorkflowReconciliation20261110": {
+    "id": "GI_I66_RELEASE_GUARD_RECONCILED_B4007_OPERATIONAL_I66_20261110",
+    "dateGuatemala": "2026-11-10",
+    "scope": "Governance/QA only; no product-source mutation, no current LIVE portfolio update",
+    "rootCause": "Stale frozen B4-003/B4-004/B4-006 assertions expected I6.5 and B4-007 unstarted; current owner-closed B4-007 and I6.6 were valid but not recognized by old guards.",
+    "correctedGuardFiles": [
+      "tools/gravicentra-b4-003-secure-hydration-release-check.cjs",
+      "tools/gravicentra-b4-003-formal-live-closeout-guard.mjs",
+      "tools/gravicentra-b4-004-formal-gate-guard.mjs"
+    ],
+    "controlsPreserved": "Earlier B4-003/B4-004/B4-006 exact source/evidence assertions remain, I6.6 successor requires owner-closed B4-007 and unchanged LIVE artifact; no unproven full QA PASS.",
+    "centralControlRun": {
+      "runId": 42811258212,
+      "conclusion": "SUCCESS",
+      "commitSha": "2c651acf7bb0b27b8e13559f7465804c1d335519",
+      "url": "https://github.com/paulaosoriof86/orbit360-core/actions/runs/42811258212"
+    },
+    "historicalPreviewRetrigger": {
+      "runId": 42811258229,
+      "conclusion": "SUCCESS",
+      "effect": "B4-005 isolated Preview callable and same existing Preview channel only; LIVE Hosting fingerprints unchanged per successful workflow step",
+      "notNewAuthorizedProductionCandidate": true,
+      "notPromotedToLive": true,
+      "notOperationalCarteraDataWrites": true
+    },
+    "preventiveWorkflowChange": {
+      "file": ".github/workflows/gravicentra-b4-005-immutable-preview.yml",
+      "commitSha": "53892c70ebfb41490653e9346651850b042f2bcd",
+      "effect": "Removed governance-only guard paths from B4-005 Preview push triggers, retaining functional source triggers and manual workflow_dispatch",
+      "ciForChangeSkippedToAvoidFurtherPreviewReruns": true
+    },
+    "nextAction": "Never use new B4-005 preview artifact as canonical release; continue I6.6 existing LIVE source and read-only Drive inventory to current LIVE crossjoin."
   }
 }
