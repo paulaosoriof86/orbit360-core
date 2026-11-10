@@ -10,9 +10,9 @@
   "branch": "recovery/fase-a-clean-20260831",
   "forensicOriginSha": "9c95f31461f2eabe9804625b5659bee772f5602a",
   "createdAtUtc": "2026-08-31T18:00:00Z",
-  "updatedAtUtc": "2026-11-09T18:09:48.967Z",
-  "status": "ITERATION_2_SOURCE_MATERIALIZED_VALIDATION_PENDING",
-  "currentIteration": 2,
+  "updatedAtUtc": "2026-11-10T11:24:43.140Z",
+  "status": "I6_6_LIVE_CONTROLLED_PORTFOLIO_UPDATE_IN_PROGRESS",
+  "currentIteration": 6,
   "lastCompletedIteration": 1,
   "productionTargetIteration": 5,
   "targetProductionDate": "2026-08-31",
@@ -187,7 +187,7 @@
     "phaseAIterationStatuses": "HISTORICAL_FIELDS_ABOVE_PRESERVED_UNTIL_FORMAL_GATE_EVIDENCE;_NO_NEW_PASS_INFERRED",
     "labDataWriteScope": "ONLY_35_AUTHORIZED_COUNTRY_FIELDS;_NO_AUGUST_REFRESH"
   },
-  "nextAction": "B4_007_RESOLVE_GERMAN_NO_AUTH_NO_EMAIL_AND_VALIDATE_INDIVIDUAL_USER_ROLE_UAT_AND_HOSTING_DNS_PROPAGATION_NO_NEW_BUILD",
+  "nextAction": "I6_6_SAFE_LIVE_COBROS_CARTERA_SEQUENCE_AFTER_B4_007_OWNER_OPERATIONAL_CLOSURE_AND_THEN_DRIVE_RECENT_CLIENT_POLICY_AUDIT",
   "sourceOfTruth": {
     "projectBoundaryPrevalentAddendum": "orbit360-platform/docs/recovery/ADDENDUM_PREVALENTE_CHATGPT_PROJECT_BOUNDARY_20260831.md",
     "mutableState": "orbit360-platform/docs/recovery/orbit360-recovery-state-v1.json",
@@ -646,7 +646,7 @@
     "noNewIterationsOrParallelReleaseMethod": true,
     "noGlobalSynchronizationClaim": true
   },
-  "currentExecutionDecisionPointer": "ownerDecisionFreeze20261107",
+  "currentExecutionDecisionPointer": "artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json#b4007OwnerOperationalGateClosure20261110",
   "b4003CausalFrontendSuccessor20261107": {
     "schema": "GRAVICENTRA_B4_003_CAUSAL_FRONTEND_SUCCESSOR_CURSOR_V1",
     "status": "FRONTEND_SUCCESSOR_LIVE_BYTES_PASS_FOCAL_LIVE_PENDING",
@@ -1488,5 +1488,24 @@
     "customDomainPaulaExistingAuthenticatedSessionReadOnly": "PASS_INICIO_5_OF_5_SERVER_SOURCES",
     "liveTeamRosterReadback": "8_TOTAL_7_AUTH_ACTIVE_1_GERMAN_REYES_NO_AUTH_NO_EMAIL",
     "germanNoAuthAccess": "BLOCKING_FOR_ALL_USERS_GOAL_PENDING_CORRECT_EMAIL_AND_AUTH_PROVISIONING"
+  },
+  "b4007OperationalClosureOwnerCorrection20261110": {
+    "status": "OWNER_OPERATIONAL_CLOSED_LIVE_EXACT_DEPLOY_CONFIRMED_FULL_MODULE_ROLE_QA_UNCERTIFIED",
+    "lastClosedReleaseGate": "B4-007",
+    "activeOperationalGate": "I6.6",
+    "owner": "Paula Andrea Osorio Franco",
+    "ownerDecisionDateGuatemala": "2026-11-10",
+    "liveWorkflowRun": 42660305513,
+    "guardRun": 42660305518,
+    "hostedBytesExact": "218_OF_218",
+    "sourceSha": "45020d748dd5fa4328a96f99fe9919a6fcb207eb",
+    "buildId": "gi-i65-b4-45020d748dd5-57f234755dc1",
+    "oldB4007TechnicalReceiptIsHistorical": true,
+    "fullRoleMatrixCertified": false,
+    "productionAcceptedUnqualified": false,
+    "operationalLive": true,
+    "fullQAOutstandingNonblocking": true,
+    "dataRefreshLedger": "artifacts/orbit360-recovery/release-control/I6_6_COBROS_CONCILIACION_SOURCE_INTAKE_20261110.json",
+    "canonicalControlPlane": "artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json"
   }
 }
