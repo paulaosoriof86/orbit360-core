@@ -110,7 +110,7 @@ jobs:
           gcloud config set project "$PROJECT_ID" --quiet >/dev/null
           gcloud functions describe orbit360OpsLeadsCommand --gen2 --region us-central1 --project "$PROJECT_ID" --format='value(state)' | sed 's/^/I66_OPS_LIVE_FUNCTION_STATE=/'
           python3 - <<'PY'
-          import json,os,subprocess,urllib.request,urllib.parse,urllib.error,hashlib
+          import json,os,subprocess,urllib.request,urllib.parse,urllib.error,hashlib,datetime
           project=os.environ['PROJECT_ID']
           token=subprocess.check_output(['gcloud','auth','print-access-token'],text=True).strip()
           root='https://firestore.googleapis.com/v1/projects/'+project+'/databases/(default)/documents/tenants/alianzas-soluciones/data/'
@@ -146,8 +146,54 @@ jobs:
                        for d in sample]
               print('I66_OPS_CANONICAL_IDENTITY='+json.dumps({'collection':collection,'physicalDocumentCount':len(rows),'idMismatchCount':len(bad),'missingLogicalIdCount':len(missing),'specificScreenshotRecordCount':len(sample),'specificScreenshotRecordIdentity':matched},sort_keys=True))
               return rows
-          for collection in ('negocios','gestiones'):
-              query(collection)
+          negocios=query('negocios')
+          gestiones=query('gestiones')
+          # 10-Nov 16:04 GT I6.6 UAT: enumerate only a precise synthetic QA
+          # marker. Never disclose a document ID, client name or note content.
+          canary=[]
+          for d in gestiones:
+              marker=' '.join(field(d,k) for k in ('nota','notas','proximaAccion','titulo')).casefold()
+              if 'qa i6.6' not in marker:continue
+              physical=d['name'].split('/')[-1]
+              fields=d.get('fields') or {}
+              canary.append({'referenceHash16':hashlib.sha256(('alianzas-soluciones|gestiones|'+physical).encode()).hexdigest()[:16],
+                  'archive':(fields.get('archivado') or {}).get('booleanValue') is True,
+                  'hasCountry':bool(field(d,'pais')),'hasAdvisor':bool(field(d,'asesorId')),
+                  'listHash12':hashlib.sha256(field(d,'lista').encode()).hexdigest()[:12] if field(d,'lista') else ''})
+          print('I66_OPS_1604_CANARY_GESTIONES='+json.dumps({'matchedCount':len(canary),'rows':canary},sort_keys=True))
+
+          # The server writes workflowRequests/status=committed in the SAME
+          # transaction as data/gestiones. Read-only request inventory verifies
+          # whether a 200 invocation actually committed a management creation.
+          reqRoot='https://firestore.googleapis.com/v1/projects/'+project+'/databases/(default)/documents/tenants/alianzas-soluciones/workflowRequests'
+          start=datetime.datetime.fromisoformat('2026-11-10T22:03:00+00:00')
+          end=datetime.datetime.fromisoformat('2026-11-10T22:07:00+00:00')
+          reqCount=0;window=[];page=''
+          for _ in range(15):
+              url=reqRoot+'?pageSize=500'+('&pageToken='+urllib.parse.quote(page,safe='') if page else '')
+              request=urllib.request.Request(url,headers={'Authorization':'Bearer '+token,'Accept':'application/json'})
+              with urllib.request.urlopen(request,timeout=25) as response:body=json.load(response)
+              docs=body.get('documents') or [];reqCount+=len(docs)
+              for d in docs:
+                  fields=d.get('fields') or {}
+                  if field(d,'operation')!='create_management':continue
+                  stamp=(fields.get('committedAt') or {}).get('timestampValue') or ''
+                  try:when=datetime.datetime.fromisoformat(stamp.replace('Z','+00:00'))
+                  except ValueError:continue
+                  if not start<=when<=end:continue
+                  result=(fields.get('result') or {}).get('mapValue') or {}
+                  resultFields=result.get('fields') or {}
+                  entity=(resultFields.get('entityId') or {}).get('stringValue') or ''
+                  entityHash=hashlib.sha256(('alianzas-soluciones|gestiones|'+entity).encode()).hexdigest()[:16] if entity else ''
+                  window.append({'requestHash16':hashlib.sha256(d['name'].split('/')[-1].encode()).hexdigest()[:16],
+                      'entityReferenceHash16':entityHash,'status':field(d,'status'),
+                      'sameEntityAsCanary':any(x['referenceHash16']==entityHash for x in canary),
+                      'hasCanonicalEntityId':bool(entity)})
+              page=str(body.get('nextPageToken') or '')
+              if not page:break
+          else:
+              raise RuntimeError('I66_OPS_READONLY_REQUEST_PAGINATION_LIMIT')
+          print('I66_OPS_1604_WORKFLOW_REQUESTS='+json.dumps({'inspectedCount':reqCount,'windowMatches':len(window),'rows':window},sort_keys=True))
           print('I66_OPS_LIVE_IDENTITY_READONLY_COMPLETE; MUTATIONS=0')
           PY
       - name: I6.6 P0 Ops Leads Cloud Run error evidence read-only
