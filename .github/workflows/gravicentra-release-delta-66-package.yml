@@ -177,6 +177,15 @@ jobs:
             }
             return Buffer.from(js,'utf8');
           }
+          function expectedBootstrap(js){
+            const marker="require('./b4-003-scoped-policy-callable')";
+            const alreadyIntegrated=js.includes(marker);
+            if(js.includes('b4-003-scoped-policy-callable')&&!alreadyIntegrated)
+              throw Error('B4_003_SCOPED_EXPORT_DUPLICATE');
+            const scoped=process.env.GRAVICENTRA_B4_003_SCOPED_PREVIEW==='true';
+            const suffix="\n// B4-003 dual-name source; executor deploys Preview only.\nObject.assign(module.exports,require('./b4-003-scoped-policy-callable'));\n";
+            return Buffer.from(scoped&&!alreadyIntegrated?js+suffix:js,'utf8');
+          }
           // The delta guard validates each explicit replaces-chain. Check the
           // terminal approved blob for each path; earlier receipts stay sealed.
           const effectivePins=new Map();
@@ -188,6 +197,7 @@ jobs:
             let expected=source;
             if(p==='orbit360-platform/index.html')expected=expectedIndex(source.toString('utf8'),meta.buildId);
             else if(p==='orbit360-platform/core/pwa.js')expected=expectedPwa(source.toString('utf8'),meta.buildId);
+            else if(p==='functions/bootstrap.js')expected=expectedBootstrap(source.toString('utf8'));
             if(!expected.equals(target))throw Error('I66_APPROVED_PRODUCT_BUILD_BYTES_DRIFT:'+p);
           }
           console.log('I66_MANIFEST_EXACT_BUILD_BOUND_INDEX_PWA_AND_RAW_OTHERS_PASS');
