@@ -8075,5 +8075,117 @@
       "preservation": "Do not reset, reimport, or overwrite verified LIVE writes",
       "hold": "Payment application failed for Bayron and Universales exact receipt number/date patches remain source-CAS/readback pending"
     }
+  },
+  "i66OpsCobrosDiagnosticLiveAndDispatchHolds20261110": {
+    "id": "GI_I66_OPS_COBROS_DIAG_HOSTING_LIVE_AND_EXTERNAL_DISPATCH_HOLDS_20261110",
+    "dateGuatemala": "2026-11-10",
+    "formalGate": "I6.6",
+    "lastClosedReleaseGate": "B4-007 CLOSED",
+    "branch": "recovery/fase-a-clean-20260831",
+    "status": "DIAGNOSTIC_HOSTING_LIVE_PASS_OPS_DELETE_AND_ADVISOR_PAYMENT_SIGNED_WRITE_UAT_HOLD",
+    "release": {
+      "sourceSha": "a99d7c9bfef452c79b1ed4b828546bcd32367017",
+      "transportCommit": "b502249261f89f2254fa3e950096efc6f30ddf0e",
+      "controlPlaneSourceGuardRun": 42907116689,
+      "controlPlaneTransportGuardRun": 42907801605,
+      "advisorEmulatorRun": 42907116723,
+      "immutableBuildPreviewRun": 42907116776,
+      "liveWorkflowRun": 42907801866,
+      "liveWorkflowStatus": "SUCCESS",
+      "immutableArtifactId": 13803949911,
+      "immutableArtifactZipSha256": "b13af35e35c23dfc5dccc19bc2f9fb3053b6ebd667ced50b246dbfd975fc90f0",
+      "buildId": "gi-i66-a99d7c9bfef4-57f234755dc1",
+      "previewChannel": "gi-i66-rc-42907116776",
+      "previewUrl": "https://ays-orbit-360-lab--gi-i66-rc-42907116776-1f11zz7t.web.app",
+      "liveUrls": [
+        "https://ays-orbit-360-lab.web.app",
+        "https://app.aysseguros.com"
+      ],
+      "exactByteReadback": {
+        "preview": "221/221 PASS",
+        "firebaseLive": "221/221 PASS",
+        "appAysseguros": "221/221 PASS"
+      },
+      "hostingBefore": "d91024e66ae6b243",
+      "hostingAfter": "e311e2c71347e263",
+      "rollbackChannel": "gi-i66-opsdiagrb-42907801866",
+      "rollbackPerformed": false,
+      "productFilesChangedFromPreviousLive": [
+        "orbit360-platform/core/ciclo.js",
+        "orbit360-platform/modules/cobros.js"
+      ],
+      "functionsDeployed": 0,
+      "authRulesFirestoreDataWritesByThisRelease": 0,
+      "scope": "Fail-closed P0 diagnostic codes and non-PII hashed reference for signed privileged Ops delete/management failure; advisor Cobros payment report error category and request-safe reference; NO backend CRUD policy/action/payment application repair."
+    },
+    "functionalCertification": {
+      "opsBusinessDelete": "HOLD_SIGNED_LIVE_WRITE_RELOAD_CAUSE_PENDING",
+      "opsManagementDelete": "HOLD_SIGNED_LIVE_WRITE_RELOAD_CAUSE_PENDING; applied endoso protected from deletion",
+      "newOpsBusinessCreate": "HOLD_SIGNED_LIVE_CREATE_AND_PERSISTENCE_READBACK",
+      "advisorReportPaymentToOps": "HOLD_SIGNED_LIVE_ROLE_COUNTRY_AND_OUTBOX_READBACK",
+      "paymentApplied": "NOT_BY_DIAGNOSTIC_RELEASE",
+      "rule": "A successful immutable Hosting promotion does NOT certify business CRUD, notification delivery, payment application or signed live role/tenant writes."
+    },
+    "greenApi": {
+      "verification": "Authenticated provider console active instance/destination IDs; not a delivery or integration test",
+      "instanceId": "710522720868",
+      "instanceState": "ACTIVE_INSTANCE_ID_VERIFIED",
+      "operationsGroup": {
+        "name": "AyS Operaciones",
+        "chatId": "120363420665870658@g.us",
+        "scope": "Ops requests and responses pending channel QA"
+      },
+      "paymentsGroup": {
+        "name": "AyS Pagos",
+        "chatId": "120363421316253378@g.us",
+        "scope": "Confirmed payment application events, never mere Advisor reports"
+      },
+      "advisorAndCustomerTargets": "NOT_RESOLVED_INDIVIDUALLY; require explicit recipient, consent and approved template",
+      "dispatchState": "NO_DISPATCH",
+      "externalMessagesSentByThisRelease": 0,
+      "nextGate": "Backend credential vault/authorized sender + tenant/country/event mapping, opt-in/out and template QA, idempotency/receipt, exact group test approval; no anti-spam evasion."
+    },
+    "carteraHolds": {
+      "universalesMaria": {
+        "policyNumber": "04-15-01-000603-0",
+        "currentPolicyId": "pol_mwajp407",
+        "proposedCorrections": {
+          "insurerSourceReceiptNumberFields": 10,
+          "contractualDueDateFields": 7,
+          "totalFieldLevelCorrections": 17,
+          "distinctDocuments": "NOT_VERIFIED_AND_MAY_OVERLAP"
+        },
+        "status": "PREPARED_OR_IDENTIFIED_NOT_APPLIED",
+        "safeguards": "Old _fizii IDs superseded; exact present-day receipt IDs and preimage CAS/digest required; no creation/overwrite/reimport of existing receipts or recalculation of financial amounts.",
+        "liveDataWritesFromCandidate": 0
+      },
+      "ruralBayron": {
+        "policyNumber": "VA125-00010478",
+        "firstReceipt": {
+          "sourcePaidDate": "2026-10-29",
+          "sourceFact": "PAID_PER_SOURCE",
+          "livePaymentApplication": "ZERO_CONFIRMED_APPLIED_FROM_THIS_PENDING_BATCH"
+        },
+        "secondReceipt": {
+          "ownerPaidStatement": true,
+          "paidDate": "NOT_VERIFIED",
+          "status": "HOLD_NO_INFERRED_DATE_OR_AUTOMATIC_SETTLEMENT"
+        },
+        "status": "NOT_APPLIED_IN_LIVE_BY_PENDING_BATCH",
+        "noDuplicatePaymentOrReconciliationWithoutExactBeforeAfter": true
+      },
+      "protectedProductionEnvironment": {
+        "status": "ABSENT_CONFIRMED_GITHUB_CHROME",
+        "consequence": "No authorized protected transaction path proven; stop guarded data writes rather than bypassing access, creating alternate Firebase, or using unapproved credentials."
+      }
+    },
+    "preservation": {
+      "noReimport": true,
+      "concurrentNewBusinessWritesProtected": true,
+      "sameCanonicalCandidate": true,
+      "historicalB4SealsUnchanged": true,
+      "priorI66EntriesRetained": true,
+      "nextSignedGate": "Obtain genuine Ops/Cobros failure code using authorized roles and validate UAT; separate proper payment/due-date guarded patches from diagnostic Hosting release."
+    }
   }
 }
