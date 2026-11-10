@@ -2713,10 +2713,11 @@
         "postWriteContextsFail": 0
       },
       "I6": {
-        "status": "I6_5_DATA_UPDATE_V5_ACTIVE",
-        "activeSubgate": "I6.5",
-        "dataMutationAuthorized": false,
-        "lastFrozenMiniGate": "I6.4"
+        "status": "I6_6_COBROS_CARTERA_CONTROLLED_REFRESH_ACTIVE",
+        "activeSubgate": "I6.6",
+        "dataMutationAuthorized": true,
+        "lastFrozenMiniGate": "I6.5",
+        "dataMutationScope": "ONLY_SOURCE_PROVEN_DEDUPED_I6_6_CASES_AFTER_EXISTING_RECORD_BEFORE_AFTER_AND_RELOAD_NO_BLIND_PAYMENT_RETRY"
       }
     },
     "lastFormallyCompletedMiniGate": "I6.4"
@@ -3219,7 +3220,7 @@
     "livePromotionAuthorized": false
   },
   "postproductionDataUpdateControl": {
-    "status": "FROZEN_ACTIVE",
+    "status": "I6_6_SCOPED_SOURCE_REFRESH_ACTIVE",
     "class": "DATA_UPDATE",
     "operatingPlanPath": "artifacts/orbit360-recovery/release-control/POSTPROD_DATA_UPDATE_OPERATING_PLAN_LOCK_20260917.json",
     "operatingPlanBlobSha": "d071b2840cf7df4f55426d3caa25f35599909470",
@@ -3227,17 +3228,17 @@
     "executionDisciplineBlobSha": "7af17759086da336dbf755d72ad85692f892b71b",
     "mechanismRegistryPath": "artifacts/orbit360-recovery/release-control/DATA_UPDATE_MECHANISM_REGISTRY.json",
     "mechanismRegistryBlobSha": "8a549608e06d1dd7c89613334b8d5b0d527dc92b",
-    "activeModule": "RECIBOS_CARTERA",
-    "activeSourceIntakePath": "artifacts/orbit360-recovery/release-control/I6_5_RECIBOS_CARTERA_SOURCE_INTAKE_20260918.json",
-    "activeSourceIntakeBlobSha": "90982e8fcbb88baa370350e0082c4db3b4474aa7",
+    "activeModule": "COBROS_CONCILIACION_CARTERA",
+    "activeSourceIntakePath": "artifacts/orbit360-recovery/release-control/I6_6_COBROS_CONCILIACION_SOURCE_INTAKE_20261110.json",
+    "activeSourceIntakeBlobSha": "336631c5aa87e181dc6fd91d871b1fdb882fc191",
     "sourceSha256": "f445e2f4a20b9eb7a526bda8896472dab9e7ac4617b3c5d8124a939a0dee0e6a",
     "conversationAsAuthority": false,
     "requestCurrentSourceBeforeEveryNewModule": true,
     "liveVisualRefreshRequiredForClosure": true,
     "pureDataUpdateRequiresBuildOrDeploy": false,
     "reimportForVisibilityFailureForbidden": true,
-    "nextRequiredStep": "USER_VISUAL_REFRESH_CHECK",
-    "executionCursor": "POST_WRITE_READBACK_INTEGRITY_PASS",
+    "nextRequiredStep": "EXISTING_PAYMENT_COMMAND_CAUSAL_DIAGNOSIS_AND_TEN_EXISTING_MARIA_FUTURE_RECEIPTS_EXACT_SOURCE_READBACK",
+    "executionCursor": "I6_6_SOURCE_PINNED_39_FILES_LIVE_CASES_PARTIAL_NO_AUTOMATIC_PAYMENT_WRITE",
     "miniClosurePlanPath": "artifacts/orbit360-recovery/release-control/I6_5_MINI_CIERRE_OPERATIVO_DECISION_LOCK_20260918.json",
     "futureI66ExecutionDecision": {
       "status": "FROZEN_FOR_FUTURE_GATE_NOT_OPENED",
@@ -3333,13 +3334,13 @@
     "i63LiveReadbackPass": true,
     "i63DeterministicDiffReady": true
   },
-  "nextAction": "B4_006_CLOSED_PASS_PREPARE_EXACT_ARTIFACT_PROMOTION_PREFLIGHT",
+  "nextAction": "I6_6_LIVE_CARTERA_SAFE_DETERMINISTIC_BATCH_AND_PAYMENT_COMMAND_CAUSAL_DIAGNOSIS_THEN_CLIENT_DRIVE_JULY_TO_DATE_CROSSCHECK",
   "postproductionExitProgress": {
-    "formalPercent": 50,
-    "frozenMiniGates": 5,
+    "formalPercent": 60,
+    "frozenMiniGates": 6,
     "totalMiniGates": 10,
-    "lastFrozenMiniGate": "I6.4",
-    "activeMiniGate": "I6.5",
+    "lastFrozenMiniGate": "I6.5",
+    "activeMiniGate": "I6.6",
     "method": "frozenMiniGates / 10 * 100; no partial mini-gate credit"
   },
   "i6BaselineSeal": {
@@ -21647,7 +21648,7 @@
     "noNewIterationsOrParallelReleaseMethod": true,
     "noGlobalSynchronizationClaim": true
   },
-  "currentExecutionDecisionPointer": "ownerDecisionFreeze20261107",
+  "currentExecutionDecisionPointer": "b4007OwnerOperationalGateClosure20261110",
   "b4003CausalFrontendSuccessor20261107": {
     "schema": "GRAVICENTRA_B4_003_CAUSAL_FRONTEND_SUCCESSOR_CURSOR_V1",
     "status": "FRONTEND_SUCCESSOR_LIVE_BYTES_PASS_FOCAL_LIVE_PENDING",
@@ -22548,5 +22549,51 @@
     "noLiveDeployment": true,
     "realInsurerLiveWritesCertified": false,
     "nextExecution": "B4_007_CONTROLLED_SAME_ARTIFACT_PROMOTION_PREFLIGHT_THEN_LIVE_MODULE_AND_WRITE_QA"
+  },
+  "b4007OwnerOperationalGateClosure20261110": {
+    "schema": "GRAVICENTRA_B4_007_OWNER_OPERATIONAL_CLOSURE_AND_LIVE_CARTEIRA_HANDOFF_V1",
+    "gate": "I6.5/B4-007",
+    "dateGuatemala": "2026-11-10",
+    "status": "CLOSED_BY_DIRECTION_LIVE_RELEASE_PROVEN_SCOPED_FUNCTIONAL_UAT_CARRIED_FORWARD",
+    "authority": "Paula Andrea Osorio Franco explicit owner correction 2026-11-10: B4-007 completed and team working in production updating cartera",
+    "releaseTransportEvidencePath": "artifacts/orbit360-recovery/release-control/I6_5_B4_007_EXACT_LIVE_PROMOTION_CARLOS_INSURER_CANARY_20261109.json",
+    "releaseTransportEvidenceBlob": "4f0148d302f783ae46dc2033490ca6b5ae4db16c",
+    "sameApprovedSourceSha": "45020d748dd5fa4328a96f99fe9919a6fcb207eb",
+    "buildId": "gi-i65-b4-45020d748dd5-57f234755dc1",
+    "immutablePreviewArtifactId": 13681376540,
+    "previewDigest": "sha256:74a1120fd9abe9533a709baa882fdf656d09206702a57f80672bc677f16147ef",
+    "liveWorkflowRun": 42660305513,
+    "governanceWorkflowRun": 42660305518,
+    "liveReadbackExactFiles": "218_OF_218_PASS",
+    "liveMainUrl": "https://app.aysseguros.com/",
+    "liveCanonicalFirebaseUrl": "https://ays-orbit-360-lab.web.app/",
+    "carlosRealLiveInsurerWriteReloadRevert": "PASS_SCOPED_CANARY",
+    "paulaLiveAuthenticatedCobrosRead": "PASS_SCOPED_READONLY",
+    "operationalReleaseClosedByDirection": true,
+    "fullSevenUserLiveRoleMatrixCertified": false,
+    "germanAuthConfigured": false,
+    "dnsHostingConsoleVerifiedComplete": false,
+    "noUnprovenFullModulePassClaim": true,
+    "nonBlockingFollowups": [
+      "COMPLETE_TARGETED_ROLE_AND_PERMISSIONS_QA_WHEN_AUTH_ACCESS_EXISTS",
+      "VERIFY_FIREBASE_HOSTING_CONSOLE_CUSTOM_DOMAIN_STATUS",
+      "KEEP_FOCAL_PERFORMANCE_AND_CREDS_UAT_SEPARATE_FROM_RELEASE_CLOSURE"
+    ],
+    "lastClosedReleaseGate": "B4-007",
+    "nextOperationalGate": "I6.6",
+    "historicalB4006SealPreserved": true,
+    "noNewReleaseBuild": true,
+    "noDataReimport": true
+  },
+  "i66ClientDossierCrosscheckFreeze20261110": {
+    "status": "FROZEN_POST_CURRENT_SAFE_LIVE_CARTERA_BLOCK_NOT_YET_EXECUTED",
+    "owner": "Paula Andrea Osorio Franco",
+    "driveScope": "AyS Guatemala/Clientes",
+    "startDocumentActivityDate": "2026-07-01",
+    "endDocumentActivityDate": "2026-11-10",
+    "crosscheck": "LATEST_2026_ISSUED_POLICY_PER_CLIENT_VS_EXISTING_LIVE_GRAVICENTRA_POLICY_INSURER_NUMBER_EFFECTIVE_DATES",
+    "noDuplicatedPolicyCreation": true,
+    "manualReviewOnlyAmbiguousCases": true,
+    "preserveVerifiedOldPolicies": true
   }
 }
