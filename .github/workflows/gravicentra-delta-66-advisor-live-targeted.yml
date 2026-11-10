@@ -140,7 +140,20 @@ jobs:
           gcloud config set project "$PROJECT_ID" --quiet >/dev/null
           : > "$RUNNER_TEMP/adv-old-functions.tsv"
           for FN in orbit360CobrosReconciliationCommand orbit360NotificationOutboxCreated orbit360GetAdvisorOpsInbox orbit360UpdateAdvisorOpsInboxState; do
-            gcloud functions describe "$FN" --gen2 --region us-central1 --project "$PROJECT_ID" --format=json > "$RUNNER_TEMP/adv-$FN-fn-before.json"
+            if ! gcloud functions describe "$FN" --gen2 --region us-central1 --project "$PROJECT_ID" --format=json > "$RUNNER_TEMP/adv-$FN-fn-before.json" 2> "$RUNNER_TEMP/adv-$FN-describe-error.txt";then
+              if test "$FN" != 'orbit360NotificationOutboxCreated' || ! grep -Fq 'status=[404]' "$RUNNER_TEMP/adv-$FN-describe-error.txt";then
+                echo "I66_ADVISOR_UNEXPECTED_LIVE_FUNCTION_READ_FAILURE:$FN";exit 1
+              fi
+              node - "$FN" <<'NODE'
+          const fs=require('node:fs'),fn=process.argv[2],r=process.env.RUNNER_TEMP;
+          const obj=JSON.parse(fs.readFileSync(r+'/ops-live-functions-before.json')),arr=obj.result||obj.functions||[];
+          if(!Array.isArray(arr)||arr.some(x=>String(x.id||x.name||x.functionName||'').split('/').at(-1)===fn))
+            throw Error('I66_ADVISOR_NEW_TRIGGER_NOT_CONFIRMED_ABSENT');
+          NODE
+              printf '%s\t%s\t%s\n' "$FN" "__ABSENT__" "__ABSENT__" >> "$RUNNER_TEMP/adv-old-functions.tsv"
+              echo 'I66_ADVISOR_NEW_OUTBOX_TRIGGER_PREVIOUSLY_ABSENT_ROLLBACK_DELETE_SCOPED'
+              continue
+            fi
             SERVICE=$(node - "$FN" <<'NODE'
           const fs=require('node:fs'),fn=process.argv[2],r=process.env.RUNNER_TEMP;
           const f=JSON.parse(fs.readFileSync(r+'/adv-'+fn+'-fn-before.json'));
@@ -174,6 +187,7 @@ jobs:
         run: |
           set -euo pipefail
           completed=0
+          deployment_started=0
           rollback(){
             code=$?
             if test "$completed" != 1;then
@@ -182,7 +196,14 @@ jobs:
               failed=0
               while IFS="$(printf '\t')" read -r FN SERVICE OLD_REV; do
                 test -n "$SERVICE" || continue
-                gcloud run services update-traffic "$SERVICE" --region us-central1 --project "$PROJECT_ID" --to-revisions="$OLD_REV=100" --quiet || failed=1
+                if test "$OLD_REV" = "__ABSENT__";then
+                  if test "$deployment_started" = 1 && gcloud functions describe "$FN" --gen2 --region us-central1 --project "$PROJECT_ID" >/dev/null 2>&1;then
+                    node "$FIREBASE_CLI_BIN" functions:delete "$FN" --region us-central1 --project "$PROJECT_ID" --force --non-interactive || failed=1
+                    echo "I66_ADVISOR_NEW_FUNCTION_ROLLBACK_DELETED=$FN"
+                  fi
+                else
+                  gcloud run services update-traffic "$SERVICE" --region us-central1 --project "$PROJECT_ID" --to-revisions="$OLD_REV=100" --quiet || failed=1
+                fi
               done < "$RUNNER_TEMP/adv-old-functions.tsv"
               node "$FIREBASE_CLI_BIN" hosting:clone "$SITE:$I66_ADVISOR_ROLLBACK_CHANNEL" "$SITE:live" --project "$PROJECT_ID" --non-interactive || failed=1
               echo "I66_ADVISOR_ROLLBACK_ERRORS=$failed"
@@ -191,6 +212,10 @@ jobs:
             exit "$code"
           }
           trap rollback EXIT
+          if gcloud functions describe orbit360NotificationOutboxCreated --gen2 --region us-central1 --project "$PROJECT_ID" >/dev/null 2>&1;then
+            echo 'I66_ADVISOR_NEW_TRIGGER_APPEARED_DURING_PREFLIGHT';exit 1
+          fi
+          deployment_started=1
           node "$FIREBASE_CLI_BIN" deploy --only functions:orbit360CobrosReconciliationCommand,functions:orbit360NotificationOutboxCreated,functions:orbit360GetAdvisorOpsInbox,functions:orbit360UpdateAdvisorOpsInboxState --config "$RUNNER_TEMP/adv-live-functions/firebase.json" --project "$PROJECT_ID" --non-interactive
           node tools/gravicentra-i6-6-advisor-live-exact-transport.mjs
           for FN in orbit360CobrosReconciliationCommand orbit360NotificationOutboxCreated orbit360GetAdvisorOpsInbox orbit360UpdateAdvisorOpsInboxState; do
