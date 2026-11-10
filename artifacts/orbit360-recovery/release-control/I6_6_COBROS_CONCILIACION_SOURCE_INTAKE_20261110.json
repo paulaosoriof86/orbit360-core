@@ -7393,5 +7393,47 @@
     ],
     "remainingP0": "Ops create/archive/delete, Carlos renewability edit, Advisor report to Ops, Cliente360 CTA, inbox notifications, chime, PWA and WhatsApp are NOT_DEPLOYED in this artifact",
     "interpretation": "Exact same artifact in both LIVE origins; does not certify every write path or imply payment/portfolio refresh complete."
+  },
+  "i66UniversalesBatchCheckpoint20261110": {
+    "id": "GI_I66_UNIVERSALES_MARIA_TEN_NUMBERS_CAS_BATCH_CHECKPOINT_20261110",
+    "dateGuatemala": "2026-11-10",
+    "status": "ARCHIVED_NOT_APPLIED_NO_PRODUCTION_WRITES",
+    "recordCount": 10,
+    "policyNumber": "04-15-01-000603-0",
+    "policyId": "pol_mwajp407_fizii",
+    "client": "María Gabriela Montepeque Palma Vettorazzi",
+    "insurer": "Seguros Universales",
+    "receiptIdRange": "cob_pol_mwajp407_fizii_003 through cob_pol_mwajp407_fizii_012",
+    "insurerReceiptNumbers": [
+      "39460328",
+      "39460329",
+      "39460330",
+      "39460331",
+      "39460332",
+      "39460333",
+      "39460334",
+      "39460335",
+      "39460336",
+      "39460337"
+    ],
+    "fieldToPatchOnly": "numeroReciboFuente",
+    "internalSerie": "Preserve 3/12 through 12/12 unchanged",
+    "contractualDueDates": "Already correctly 2026-12-01 through 2027-09-01; no date rewrites",
+    "paymentStatuses": "All pending; never auto-apply payments",
+    "archive": {
+      "path": "artifacts/orbit360-recovery/release-control/i6-6-p0-checkpoints/I66_UNIVERSALES_MARIA_10_PATCH_ONLY_NOT_APPLIED_20261110.tar.gz.b64.md",
+      "commit": "5a49d9aae830639f77e1857984bf070bbf1b290b",
+      "blobSha": "0938c08daa1238b77007eb785ab5bd955dfac3ab",
+      "contents": "exact 10-record fixture, guarded transaction script, 7/7 local test PASS, workflow, readme; only checkpoint"
+    },
+    "requiredBeforeLivePatch": [
+      "Resolve exact tenantId via authenticated readback",
+      "Read all 10 current LIVE before values and compute beforeDigest",
+      "Run protective transaction with exact expected-before compare and idempotent readback",
+      "Preserve all concurrently edited fields; zero duplicate receipts",
+      "Record afterDigest, 10/10 readback and audit source pointer"
+    ],
+    "productionDataWrites": 0,
+    "manualActionsRequiredFromPaula": 0
   }
 }
