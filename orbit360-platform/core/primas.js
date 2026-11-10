@@ -71,10 +71,39 @@ Orbit.primas = (function () {
    * @returns [{ n, neta, gastosEmision, gastosFinan, otros, iva, total,
    *            comAseguradora, comVendedor, vence, fechaLimite }]
    */
+  // Civil dates in business policies are calendar days, never local instants.
+  function asCivilUtcDate(value) {
+    const raw = typeof value === 'string' ? value.trim() : '';
+    const match = /^(\d{4})-(\d{2})-(\d{2})(?=$|[T\s])/.exec(raw);
+    if (match) {
+      const year = +match[1], month = +match[2], day = +match[3];
+      const civil = new Date(Date.UTC(year, month - 1, day));
+      if (civil.getUTCFullYear() !== year || civil.getUTCMonth() !== month - 1 || civil.getUTCDate() !== day) {
+        throw new RangeError('vigenciaInicio_fecha_civil_invalida');
+      }
+      return civil;
+    }
+    const original = value ? new Date(value) : new Date();
+    if (!Number.isFinite(original.getTime())) throw new RangeError('vigenciaInicio_invalida');
+    return new Date(Date.UTC(original.getUTCFullYear(), original.getUTCMonth(), original.getUTCDate()));
+  }
+
+  // Keep the original day as the immutable anchor; clamp only short months.
+  // Example: Jan 31 -> Feb 28/29 -> Mar 31 (never drifts to Mar 28).
+  function dueAtCalendarMonthUtc(start, monthOffset) {
+    const first = new Date(Date.UTC(start.getUTCFullYear(), start.getUTCMonth() + monthOffset, 1));
+    const year = first.getUTCFullYear(), month = first.getUTCMonth();
+    const lastDay = new Date(Date.UTC(year, month + 1, 0)).getUTCDate();
+    return new Date(Date.UTC(year, month, Math.min(start.getUTCDate(), lastDay)));
+  }
+
   function recibos(d, opts) {
     opts = opts || {};
     const n = Math.max(1, +opts.cuotas || cuotasDe(opts.frecuencia || 'Contado'));
-    const inicio = opts.vigenciaInicio ? new Date(opts.vigenciaInicio) : new Date();
+    const legacyCalendar = opts.calendarMode === 'legacy_local_v0';
+    const inicio = legacyCalendar
+      ? (opts.vigenciaInicio ? new Date(opts.vigenciaInicio) : new Date())
+      : asCivilUtcDate(opts.vigenciaInicio);
     const comAsegPct = +opts.comAseguradoraPct || 0;
     const comVendPct = +opts.comVendedorPct || 0;
     const pasoMeses = 12 / n;
@@ -101,8 +130,12 @@ Orbit.primas = (function () {
       // IVA por recibo = 12%/19% sobre la base de ESE recibo (cuadra exacto al sumar)
       const iva = i === n - 1 ? r2(d.iva - rows.reduce((s, r) => s + r.iva, 0)) : r2(baseGrav * (d.ivaPct || 0) / 100);
       const total = r2(baseGrav + iva);
-      const venc = new Date(inicio); venc.setMonth(venc.getMonth() + Math.round(i * pasoMeses));
-      const lim = new Date(venc); lim.setDate(lim.getDate() + 15);
+      const months = Math.round(i * pasoMeses);
+      const venc = legacyCalendar ? new Date(inicio) : dueAtCalendarMonthUtc(inicio, months);
+      if (legacyCalendar) venc.setMonth(venc.getMonth() + months);
+      const lim = new Date(venc);
+      if (legacyCalendar) lim.setDate(lim.getDate() + 15);
+      else lim.setUTCDate(lim.getUTCDate() + 15);
       const comAseguradora = r2(neta * comAsegPct / 100);
       rows.push({
         n: (i + 1) + '/' + n,

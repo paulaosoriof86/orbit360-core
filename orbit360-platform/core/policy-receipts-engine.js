@@ -10,6 +10,7 @@ Orbit.policyReceipts = (function () {
   const A = () => Orbit.access;
   const ACTIVE = new Set(['vigente', 'porrenovar']);
   const PAID = new Set(['pagado', 'conciliado']);
+  const PLAN_CALENDAR_UTC_VERSION = 'UTC_ANCHOR_V1';
   const MANAGE_ROLES = new Set(['Dirección', 'SuperAdmin', 'AdminTenant', 'Admin', 'Operativo']);
   const RECONCILE_ROLES = new Set(['Dirección', 'SuperAdmin', 'AdminTenant', 'Admin', 'Operativo', 'Finanzas']);
   const CRITICAL_FIELDS = new Set([
@@ -216,10 +217,16 @@ Orbit.policyReceipts = (function () {
     base.operationId = opId;
     base.actualizado = now();
     if (!existing) {
+      base.planCalendarVersion = PLAN_CALENDAR_UTC_VERSION;
       base.id = clean(base.id || ('pol_' + Date.now().toString(36)));
       base.creado = now();
       base.creadoPor = actor().id || actor().nombre;
       base.rolCreacion = role();
+    } else if (clean(existing.planCalendarVersion)) {
+      base.planCalendarVersion = clean(existing.planCalendarVersion);
+    } else {
+      // Do not silently migrate old payment plans during unrelated policy edits.
+      delete base.planCalendarVersion;
     }
     delete base.vehiculo;
     base.trazabilidad = Object.assign({}, base.trazabilidad || {}, {
@@ -236,6 +243,7 @@ Orbit.policyReceipts = (function () {
       frecuencia: policy.frecuencia,
       cuotas: policy.cuotas,
       vigenciaInicio: policy.vigenciaInicio,
+      calendarMode: policy.planCalendarVersion === PLAN_CALENDAR_UTC_VERSION ? 'utc_anchor_v1' : 'legacy_local_v0',
       emisionEn: policy.emisionEn,
       recargoEn: policy.recargoEn,
       comAseguradoraPct: policy.comAseguradoraPct,

@@ -1,0 +1,71 @@
+{
+  "schemaVersion": "gi.i66.calendar.forward_only.source_qa_manifest.v1",
+  "status": "I66_SOURCE_CANDIDATE_QA_PENDING_NO_PREVIEW_NO_LIVE",
+  "dateGuatemala": "2026-11-10",
+  "product": "Gravicentra Insurance",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "canonicalI66Ledger": "artifacts/orbit360-recovery/release-control/I6_6_COBROS_CONCILIACION_SOURCE_INTAKE_20261110.json",
+  "capability": "POLIZAS_RECIBOS_CARTERA_PRIMARY_RUNTIME",
+  "symptom": "I6.6 Maria 7/10 contractual vence dates drifted from first-day monthly insurer statement in LIVE",
+  "rootCauseEvidence": {
+    "path": "orbit360-platform/core/primas.js",
+    "beforeBehavior": "new Date(YYYY-MM-DD) parses as UTC; setMonth/getMonth use local time, day becomes 30 in GT/CO, February overflows",
+    "readOnlyRunId": 42879486457,
+    "tenSourceReadOnlyRunId": 42880721417,
+    "insurerSourceDate": "2026-11-09",
+    "sourcePdfSha256": "f7bd1833a1573d4d0a1e6b494b71383aa1209f0b9afec3f06972a31213f1bd4b",
+    "datesMismatchSequences": [
+      4,
+      5,
+      6,
+      7,
+      9,
+      11,
+      12
+    ]
+  },
+  "candidateSource": [
+    {
+      "path": "orbit360-platform/core/primas.js",
+      "blobSha": "a84f60759f31b59059480b863ab7264b947c8fff",
+      "role": "Civil UTC anchored due dates and UTC grace deadline; legacy local mode explicit for historic plans"
+    },
+    {
+      "path": "orbit360-platform/core/policy-receipts-engine.js",
+      "blobSha": "c2bbacd425691ec169dbde17e8f7394c30ffe159",
+      "role": "New policies persist planCalendarVersion UTC_ANCHOR_V1; existing policies retain old mode; no silent migration"
+    }
+  ],
+  "qa": {
+    "testFile": "tools/gravicentra-i6-6-primas-calendar-forward-only.test.cjs",
+    "testBlobSha": "12eb5023e73385aebe89c19de42d14fbb774cd74",
+    "workflow": ".github/workflows/gravicentra-i66-primas-calendar-forward-only-qa.yml",
+    "workflowBlobSha": "765ad05dcac9c6cb313a852b534172fb6fdb8039",
+    "expectedMatrix": [
+      "America/Guatemala",
+      "America/Bogota",
+      "UTC"
+    ],
+    "cases": [
+      "GT_CO_12_MONTHS",
+      "DAYS_29_30_31",
+      "FEB_LEAP_2024_2023",
+      "BIMESTRAL_TRIMESTRAL_CUATRIMESTRAL_SEMESTRAL_ANUAL",
+      "LEGACY_EDIT_NONFINANCIAL_PRESERVES_DATES",
+      "NEW_POLICY_UTC_ANCHOR_FORWARD_ONLY",
+      "NO_FIRESTORE"
+    ],
+    "runId": null,
+    "conclusion": "PENDING_CI"
+  },
+  "strictDataSeparation": {
+    "thisCandidateWritesToLive": 0,
+    "existingReceiptsChanged": 0,
+    "existingPoliciesChanged": 0,
+    "mariaNumbersDataPatch": "SEPARATE_PROTECTED_CAS_HOLD",
+    "mariaSevenDatesDataPatch": "SEPARATE_SOURCE_DATE_RECONCILIATION_HOLD",
+    "idempotence": "Unrelated historical work and prior B4-007 immutable releases preserved",
+    "deployment": "NO_LIVE_WITHOUT_NEW_INDIVIDUAL_PREVIEW_AND_BUILD_DIGEST"
+  }
+}

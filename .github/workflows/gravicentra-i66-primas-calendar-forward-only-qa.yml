@@ -1,0 +1,51 @@
+# I6.6 forward-only civil UTC payment calendar; no Firebase access or deployment.
+name: Gravicentra I6.6 Forward-Only Calendar UTC QA
+on:
+  push:
+    branches:
+      - recovery/fase-a-clean-20260831
+    paths:
+      - orbit360-platform/core/primas.js
+      - orbit360-platform/core/policy-receipts-engine.js
+      - tools/gravicentra-i6-6-primas-calendar-forward-only.test.cjs
+      - .github/workflows/gravicentra-i66-primas-calendar-forward-only-qa.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: gi-i66-forward-calendar-utc-qa
+  cancel-in-progress: false
+
+jobs:
+  calendar-regression:
+    if: github.repository == 'paulaosoriof86/orbit360-core' && github.ref == 'refs/heads/recovery/fase-a-clean-20260831'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        timezone: [America/Guatemala, America/Bogota, UTC]
+    steps:
+      - name: Checkout exact commit, no writes
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Node 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Syntax guard source and test
+        run: |
+          set -euo pipefail
+          node --check orbit360-platform/core/primas.js
+          node --check orbit360-platform/core/policy-receipts-engine.js
+          node --check tools/gravicentra-i6-6-primas-calendar-forward-only.test.cjs
+      - name: Functional QA country timezone and leap dates
+        env:
+          TZ: ${{ matrix.timezone }}
+        run: |
+          set -euo pipefail
+          node --test tools/gravicentra-i6-6-primas-calendar-forward-only.test.cjs
+          echo "I66_CALENDAR_FORWARD_ONLY_NO_FIRESTORE_WRITES=PASS"
