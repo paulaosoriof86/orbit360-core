@@ -3230,7 +3230,7 @@
     "mechanismRegistryBlobSha": "8a549608e06d1dd7c89613334b8d5b0d527dc92b",
     "activeModule": "COBROS_CONCILIACION_CARTERA",
     "activeSourceIntakePath": "artifacts/orbit360-recovery/release-control/I6_6_COBROS_CONCILIACION_SOURCE_INTAKE_20261110.json",
-    "activeSourceIntakeBlobSha": "7cef64b4ec3ae75530432936a9c53e979f9cbae8",
+    "activeSourceIntakeBlobSha": "a743f55c0369851eb017f12ce88823e0f58bc12d",
     "sourceSha256": "f445e2f4a20b9eb7a526bda8896472dab9e7ac4617b3c5d8124a939a0dee0e6a",
     "conversationAsAuthority": false,
     "requestCurrentSourceBeforeEveryNewModule": true,
@@ -22584,8 +22584,8 @@
     "historicalB4006SealPreserved": true,
     "noNewReleaseBuild": true,
     "noDataReimport": true,
-    "dataRefreshLedgerBlob": "7cef64b4ec3ae75530432936a9c53e979f9cbae8",
-    "recoveryStateBlob": "65daa8f06e941333715914522ba58d99f6260444"
+    "dataRefreshLedgerBlob": "a743f55c0369851eb017f12ce88823e0f58bc12d",
+    "recoveryStateBlob": "ef467b1693b3705ea70ca7e8bb41ee8cb93cb932"
   },
   "i66ClientDossierCrosscheckFreeze20261110": {
     "status": "READ_ONLY_DRIVE_CENSUS_COMPLETE_LIVE_POLICY_INVENTORY_JOIN_PENDING",
@@ -22599,7 +22599,7 @@
     "preserveVerifiedOldPolicies": true,
     "censusDateGuatemala": "2026-11-10",
     "exactEvidencePath": "artifacts/orbit360-recovery/release-control/I6_6_COBROS_CONCILIACION_SOURCE_INTAKE_20261110.json",
-    "exactEvidenceBlobSha": "7cef64b4ec3ae75530432936a9c53e979f9cbae8",
+    "exactEvidenceBlobSha": "a743f55c0369851eb017f12ce88823e0f58bc12d",
     "realClientFoldersScanned": 306,
     "recursiveFoldersScanned": 470,
     "recentModifiedFiles": 332,
@@ -22610,6 +22610,21 @@
     "liveExportNotYetAcquired": true,
     "noProductionDataWritesInAudit": true,
     "priorityIdentityConflict": "AUTO-45497 same 2026/27 number two named insured, requires insurer chain",
-    "recoveryStateBlob": "65daa8f06e941333715914522ba58d99f6260444"
+    "recoveryStateBlob": "ef467b1693b3705ea70ca7e8bb41ee8cb93cb932"
+  },
+  "i66GovernanceAndPreviewTriggerContainment20261110": {
+    "status": "CENTRAL_GOVERNANCE_GUARD_SUCCESS_HISTORICAL_PREVIEW_RETRIGGER_CONTAINED",
+    "centralGuardRunId": 42811258212,
+    "centralGuardHead": "2c651acf7bb0b27b8e13559f7465804c1d335519",
+    "centralGuardConclusion": "SUCCESS",
+    "historicPreviewRetriggerRunId": 42811258229,
+    "historicPreviewNoLiveChanges": "PASS_WORKFLOW_LIVE_FINGERPRINT_VERIFIED",
+    "historicPreviewArtifactAdoptedAsProduction": false,
+    "preventionCommit": "53892c70ebfb41490653e9346651850b042f2bcd",
+    "frozenLiveB4007BuildId": "gi-i65-b4-45020d748dd5-57f234755dc1",
+    "i66LedgerBlob": "a743f55c0369851eb017f12ce88823e0f58bc12d",
+    "stateBlob": "ef467b1693b3705ea70ca7e8bb41ee8cb93cb932",
+    "noAdditionalLiveDeploy": true,
+    "noCarteraWriteFromThisCheckpoint": true
   }
 }
