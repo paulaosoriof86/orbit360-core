@@ -20,12 +20,46 @@
       "sourceCommit": "0d6396fbd919e13eafebfd0ead75b1a7f198e238",
       "sourceStatus": "CANDIDATE_NOT_YET_DEPLOYED",
       "paths": [
-        {"path": "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js", "gitBlobSha": "abf7ada42b69c7d2cdf21558255b964f2f76b087"},
-        {"path": "orbit360-platform/core/policy-receipts-engine.js", "gitBlobSha": "6d21573cc2215ae72fa1075a9b7a2930be03fb34"},
-        {"path": "orbit360-platform/data/store-firestore-product-operational-p0.js", "gitBlobSha": "112e72cc755eafcfcbea04c2b89340ca9b3e8062"}
+        {
+          "path": "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js",
+          "gitBlobSha": "abf7ada42b69c7d2cdf21558255b964f2f76b087"
+        },
+        {
+          "path": "orbit360-platform/core/policy-receipts-engine.js",
+          "gitBlobSha": "6d21573cc2215ae72fa1075a9b7a2930be03fb34"
+        },
+        {
+          "path": "orbit360-platform/data/store-firestore-product-operational-p0.js",
+          "gitBlobSha": "112e72cc755eafcfcbea04c2b89340ca9b3e8062"
+        }
       ],
       "tests": [
-        {"path": "tools/gravicentra-i6-6-receipt-number-and-sparse-patch.test.cjs", "gitBlobSha": "e3de97486eb8c78c07e775428afecdd07f5e1cd7"}
+        {
+          "path": "tools/gravicentra-i6-6-receipt-number-and-sparse-patch.test.cjs",
+          "gitBlobSha": "e3de97486eb8c78c07e775428afecdd07f5e1cd7"
+        }
+      ]
+    },
+    {
+      "id": "I6_6_PROTECTED_PREVIEW_HOST_AND_READONLY_SELF_ACCESS",
+      "approvedByDirection": true,
+      "receipt": "I6_6_RELEASE_TRANSPORT_CONTROL_20261110.json / Paula direction: correct gi-i66 protected Preview without LIVE or data mutation",
+      "sourceStatus": "PREVIEW_ONLY_SOURCE_FIX_REQUIRES_NEW_EXACT_ARTIFACT",
+      "paths": [
+        {
+          "path": "orbit360-platform/core/product-runtime-browser-providers-p0.js",
+          "gitBlobSha": "509249cc411ea99e0eab4b84da5846b53d26c674"
+        },
+        {
+          "path": "orbit360-platform/core/auth-product-runtime-p0.js",
+          "gitBlobSha": "871c9661343043cdbabfa76630dd216d03c54927"
+        }
+      ],
+      "tests": [
+        {
+          "path": "tools/gravicentra-i6-6-protected-host-and-pure-preview-auth.test.cjs",
+          "gitBlobSha": "a6c7217c2d03e84f488cab274176c1318a131fce"
+        }
       ]
     }
   ]
