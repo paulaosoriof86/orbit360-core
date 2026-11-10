@@ -149,3 +149,29 @@ jobs:
               query(collection)
           print('I66_OPS_LIVE_IDENTITY_READONLY_COMPLETE; MUTATIONS=0')
           PY
+      - name: I6.6 P0 Ops Leads Cloud Run error evidence read-only
+        run: |
+          set -euo pipefail
+          gcloud auth activate-service-account --key-file="$GOOGLE_APPLICATION_CREDENTIALS" --quiet >/dev/null
+          SVC="$(gcloud functions describe orbit360OpsLeadsCommand --gen2 --region us-central1 --project "$PROJECT_ID" --format='value(serviceConfig.service)' | awk -F/ '{print $NF}')"
+          test -n "$SVC"
+          # Keep original entries in runner temp, never upload or print payloads with client data.
+          if ! gcloud logging read "resource.type=\"cloud_run_revision\" AND resource.labels.service_name=\"$SVC\" AND timestamp>=\"2026-11-10T19:30:00Z\" AND timestamp<=\"2026-11-10T20:10:00Z\"" --project "$PROJECT_ID" --limit=500 --format=json > "$RUNNER_TEMP/i66-ops-runtime-logs.json" 2>"$RUNNER_TEMP/i66-ops-runtime-logs.err";then
+            echo 'I66_OPS_CLOUD_LOG_READ=UNAVAILABLE; MUTATIONS=0'
+            exit 0
+          fi
+          python3 - <<'PY'
+          import collections,json,os
+          rows=json.load(open(os.environ['RUNNER_TEMP']+'/i66-ops-runtime-logs.json'))
+          status=collections.Counter()
+          issue=collections.Counter()
+          for row in rows:
+              h=row.get('httpRequest') or {}
+              if h.get('status') is not None:status[str(h.get('status'))]+=1
+              s=str(row.get('textPayload') or row.get('jsonPayload') or '')
+              if 'El registro no existe' in s:issue['CANONICAL_RECORD_NOT_FOUND']+=1
+              if 'PERMISSION_DENIED' in s or 'permission-denied' in s:issue['PERMISSION_DENIED']+=1
+              if 'not found' in s.lower() or 'not-found' in s.lower():issue['OTHER_NOT_FOUND_MARKER']+=1
+          print('I66_OPS_CLOUD_LOG_INVENTORY='+json.dumps({'entryCount':len(rows),'httpStatusCounts':dict(status),'diagnosticCodeCounts':dict(issue)},sort_keys=True))
+          print('I66_OPS_CLOUD_LOG_READONLY_COMPLETE; MUTATIONS=0')
+          PY
