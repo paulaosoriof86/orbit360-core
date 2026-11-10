@@ -646,7 +646,7 @@
     "owner28DecisionsRecoveredExactly": false,
     "livePreApplyReadback": false,
     "deterministicDiffReady": false,
-    "operationalWrites": 1,
+    "operationalWrites": 2,
     "sourceChangeInProduction": false,
     "importerRebuildRequired": false,
     "nextRequiredStep": "Do not assume prior UI write. Exact source-supported data input in authenticated LIVE requires action-time sensitive-data confirmation. Then create only missing clients (Julia, Maria Gabriela, Priscila pending final check), preserve existing customer details, link authentic new/renewal editions by vehicle and vigencia, correct Bayron adviser+premium+2-installment receipts and as-of paid status; verify persistence. Parallel non-destructive performance timings/filter transitions.",
@@ -1108,6 +1108,23 @@
       "clientId": "NOT_CAPTURED_UI",
       "linkedPolicyCreate": "PENDING",
       "notes": "Source policy address used. Acquisition channel not documented; saved field UI default Referido must not be treated as verified."
+    },
+    {
+      "id": "LIVE_CREATE_MARIA_GABRIELA_20261110",
+      "date": "2026-11-10",
+      "authority": "Paula Osorio / Gravicentra LIVE Chrome authenticated",
+      "entity": "Cliente 360",
+      "client": "MARIA GABRIELA MONTEPEQUE PALMA VETTORAZZI",
+      "clientId": "cli_mwafruvk",
+      "status": "LIVE_WRITE_VERIFIED_IN_SAME_AUTHENTICATED_CHROME_SESSION",
+      "sourcePolicy": "04-15-01-000603-0",
+      "sourceDocument": "libfile_ec2f5e8a454481919fedd67aa15f20de",
+      "before": "441 commercial clients / 442 including QA; new Maria not in selector",
+      "after": "442 commercial clients observed on fresh Cliente360 load / 443 including QA inferred; direct authentic Client360 detail URL with client ID and activity 'Cliente creado 10 nov 2026'",
+      "advisor": "Germán Reyes",
+      "address": "4 CALLE 19-84, APTO. 303, EDIFICIO BONARES, VISTA HERMOSA 1, ZONA 15, GUATEMALA",
+      "linkedPolicyCreate": "PENDING",
+      "note": "Acquisition channel unknown; UI Referido default not source-verified. Creation click timed out at CDP transport but record persisted and detail rendered."
     }
   ]
 }
