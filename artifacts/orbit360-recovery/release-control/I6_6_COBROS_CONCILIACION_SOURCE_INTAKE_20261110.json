@@ -7690,5 +7690,65 @@
     "readOnlyArtifactId": 13792848679,
     "next": "Remap exact 12 current receipt doc IDs and source numbers; new preimage/digest and guarded CAS; zero duplicate/financial writes",
     "productionDataWrites": 0
+  },
+  "i66MariaDueDateCorrectionFinding20261110": {
+    "id": "GI_I66_MARIA_LIVE_VENCE_SOURCE_MISMATCH_20261110",
+    "dateGuatemala": "2026-11-10",
+    "status": "READ_ONLY_FIREFSTORE_AUTHENTICATED_7_OF_10_DUE_DATES_MISMATCH_NO_DATA_WRITES",
+    "readOnlyRun": 42879486457,
+    "policyNumber": "04-15-01-000603-0",
+    "currentPolicyId": "pol_mwajp407",
+    "supersedes": [
+      "i66UniversalesBatchCheckpoint20261110.contractualDueDates statement: do not assume due dates all correct",
+      "i66UniversalesExactIdentityHold20261110 old fixture IDs must not be patched"
+    ],
+    "correctCurrentReceiptPattern": "cob_pol_mwajp407_001 through _012",
+    "sourceMonthlyRule": "Contractual 1st day of each month per insurer statement 2026-11-09; revalidate before any date write",
+    "mismatches": [
+      {
+        "seq": 4,
+        "live": "2026-12-31",
+        "source": "2027-01-01"
+      },
+      {
+        "seq": 5,
+        "live": "2027-01-31",
+        "source": "2027-02-01"
+      },
+      {
+        "seq": 6,
+        "live": "2027-03-03",
+        "source": "2027-03-01"
+      },
+      {
+        "seq": 7,
+        "live": "2027-03-31",
+        "source": "2027-04-01"
+      },
+      {
+        "seq": 9,
+        "live": "2027-05-31",
+        "source": "2027-06-01"
+      },
+      {
+        "seq": 11,
+        "live": "2027-07-31",
+        "source": "2027-08-01"
+      },
+      {
+        "seq": 12,
+        "live": "2027-08-31",
+        "source": "2027-09-01"
+      }
+    ],
+    "dueDateMatchUnreconciled": "3,8,10 require explicit per-row trace if included in patch",
+    "financialFieldsUnchanged": true,
+    "paymentStatuses": "1–2 overdue; 3–12 pending; none applied during I6.6 dryrun",
+    "sourceNumberPatch": "SEPARATE_10_NUMBERS_REMAP_AND_GUARDED_DRYRUN_PENDING; no old _fizii IDs",
+    "datePatch": "SEPARATE_7_DATES_CAUSAL_SOURCE_AND_BEFOREDIGEST_PENDING",
+    "fechaLimite": "Distinct operational +15 day field; do not blindly recompute under source-only update",
+    "possibleCause": "Monthly recurring engine using fixed-day increments is hypothesis only; not yet proven",
+    "dataWrites": 0,
+    "gate": "HOLD_NO_PATCH_UNTIL_CURRENT_BEFORE_MATCH_AND_SOURCE_VERIFIED"
   }
 }
