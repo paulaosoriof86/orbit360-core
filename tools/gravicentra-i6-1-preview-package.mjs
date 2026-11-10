@@ -90,10 +90,12 @@ const SCOPED_PREVIEW=process.env.GRAVICENTRA_B4_003_SCOPED_PREVIEW==='true';
 const GOALS_PREVIEW=process.env.GRAVICENTRA_B4_003_GOALS_PREVIEW==='true';
 if(GOALS_PREVIEW&&!SCOPED_PREVIEW)throw new Error('B4_003_GOALS_PREVIEW_REQUIRES_SCOPED_PREVIEW');
 if(SCOPED_PREVIEW){
- const isSealedB4=['I6.5-B4-003','I6.5-B4-004','I6.5-B4-005'].includes(RELEASE_GATE)&&BUILD_PREFIX==='gi-i65-b4';
- const isI66Successor=RELEASE_GATE==='I6.6'&&BUILD_PREFIX==='gi-i66';
- if((!isSealedB4&&!isI66Successor)||!ENVIRONMENT_REF.includes('preview'))
-  throw new Error('B4_003_SCOPED_PREVIEW_BOUNDARY_DENIED');
+ // Retain the exact B4 condition as historically certified. An I6.6 builder
+ // uses a separate explicit exception; no historical gate is reinterpreted.
+ if(!['I6.5-B4-003','I6.5-B4-004','I6.5-B4-005'].includes(RELEASE_GATE)||BUILD_PREFIX!=='gi-i65-b4'||!ENVIRONMENT_REF.includes('preview')){
+  if(RELEASE_GATE!=='I6.6'||BUILD_PREFIX!=='gi-i66'||!ENVIRONMENT_REF.includes('preview'))
+   throw new Error('B4_003_SCOPED_PREVIEW_BOUNDARY_DENIED');
+ }
  const entry=path.join(BACKEND,'bootstrap.js');
  const base=read(entry);
  const alreadyIntegrated=base.includes("require('./b4-003-scoped-policy-callable')");

@@ -37,7 +37,11 @@ for(const change of manifest.changes){
   need(Array.isArray(change.tests)&&change.tests.length>0,'CHANGE_TESTS_MISSING:'+change.id);
   for(const entry of change.paths){
     const p=entry.path||'';
-    need(/^(orbit360-platform|functions)\/[A-Za-z0-9_./-]+\.js$/.test(p),'UNSUPPORTED_PRODUCT_PATH:'+p);
+    // Exact blob + approved receipt + pinned test are required for every path.
+    // Allow asset/HTML successors as well as JS without relaxing the gate.
+    const frontend=/^orbit360-platform\/[A-Za-z0-9_./-]+\.(?:js|html|css|json|webmanifest|svg|png|jpg|jpeg|webp|woff2?)$/.test(p);
+    const backend=/^functions\/[A-Za-z0-9_./-]+\.js$/.test(p);
+    need(frontend||backend,'UNSUPPORTED_PRODUCT_PATH:'+p);
     need(/^[0-9a-f]{40}$/.test(entry.gitBlobSha||'')&&!approved.has(p),'DUPLICATE_OR_BAD_BLOB:'+p);
     approved.set(p,entry.gitBlobSha);
   }
@@ -53,8 +57,10 @@ const diff=git('diff','--name-only',BASE,'HEAD','--','orbit360-platform','functi
 need(JSON.stringify(diff)===JSON.stringify(expectedPaths),'UNDECLARED_PRODUCT_SOURCE_DELTA:'+diff.join(','));
 for(const [p,blob] of approved){
   need(git('rev-parse','HEAD:'+p)===blob,'UNAPPROVED_OR_STALE_SOURCE_BLOB:'+p);
-  const syntax=spawnSync(process.execPath,['--check',p],{stdio:'inherit'});
-  need(syntax.status===0,'SOURCE_SYNTAX_FAILED:'+p);
+  if(p.endsWith('.js')){
+    const syntax=spawnSync(process.execPath,['--check',p],{stdio:'inherit'});
+    need(syntax.status===0,'SOURCE_SYNTAX_FAILED:'+p);
+  }
 }
 for(const p of tests){
   const check=spawnSync(process.execPath,['--check',p],{stdio:'inherit'});
