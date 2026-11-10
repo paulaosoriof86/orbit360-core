@@ -595,6 +595,11 @@
       "id": "PERFORMANCE_PARALLEL_OBSERVABILITY_20261110",
       "authority": "PAULA_DIRECT_2026_11_10_LATEST",
       "rule": "In parallel with operational policy/cartera work, inspect excessive time moving between modules, initial/hydration loading and interactive insurer/adviser/search filters. Preserve released capabilities and data; address reproducible root cause on same canonical source/release process only; avoid speculative reimports and do not interrupt priority carrier reconciliation."
+    },
+    {
+      "id": "GUATEMALTECA_STATEMENT_BASIS_SOURCE_OVERRIDE_20261110",
+      "authority": "VERIFIED_GUATEMALTECA_PDF_AND_ISSUED_POLICY_CROSSCHECK_2026_11_10",
+      "rule": "Supersedes shorthand asserting Guatemalteca aging line values are necessarily net simply because the report title says 'primas netas'. Specific rows 38624 Q2508.80 and 41523 Q2678.53 match their issued policy GROSS totals whereas net base Q1800 each. Determine numeric basis per requirement/edition/receipt rather than label; do not aggregate or change net premium from aging title alone."
     }
   ],
   "newlyObservedStatementEvidence": [
@@ -649,7 +654,7 @@
     "operationalWrites": 3,
     "sourceChangeInProduction": false,
     "importerRebuildRequired": false,
-    "nextRequiredStep": "Continue source-by-source readback and exact LIVE edition/receipt matching; avoid unverified import: authentic Rural Excel currently displays unrelated demo preview. Repair importer fail-closed and source-driven installment dates via canonical gated source+QA; verify cross-insurer renewal linkage; current connected Chrome DOM operations intermittently fail CDP focus. Preserve previously certified Cobros B3-002 performance and separate browser transport vs actual page latency. No duplicate or speculative payment writes.",
+    "nextRequiredStep": "With all original source file byte hashes pinned, continue individually matching real insurer statement rows by edition+requirement+due/payment date; Guatemalteca title 'net' contradicts gross-matching row amounts. In LIVE, do not apply fake importer preview or wrong generated due dates, and do not overwrite cross-insurer prior editions. Fix through same canonical QA/release gate and use authenticated Chrome for before/after when transport recovers; preserve prior Cobros performance PASS.",
     "insurerStatementsNativeFormatsParsed": true,
     "all35CurrentSourceRawHashesPinned": true,
     "fourHistoricalReferenceHashesPinned": true,
@@ -1563,6 +1568,40 @@
       ],
       "writeStatus": "READ_ONLY_NO_POLICY_OR_PAYMENT_MUTATION",
       "lineage": "Keep Marco P788KJN previous El Roble policy and Ficohsa successor linked as renewal; do not connect unrelated Chery risk."
+    },
+    {
+      "id": "GUATEMALTECA_OCT23_NET_TITLE_GROSS_ROW_VALUES",
+      "status": "AUTHENTIC_SOURCE_PDF_TEXT_READBACK",
+      "source": "https://drive.google.com/file/d/13d4cUoZngmV29DQWYBjAZQ88Y6wMzbZH/view",
+      "title": "RELACION DE PRIMAS NETAS POR COBRAR POR ANTIGUEDAD Y TIPO DE SEGURO",
+      "asOf": "2026-10-23",
+      "reportedTotalGTQ": 26673.31,
+      "sourceReportTerm": "Primas netas por cobrar",
+      "observedPolicyRows": [
+        {
+          "policy": "38624",
+          "reportedOpenGTQ": 2508.8,
+          "issuedNewEditionGrossGTQ": 2508.8,
+          "issuedNetGTQ": 1800,
+          "implication": "Reported open amount numerically matches issued GROSS, not issued net"
+        },
+        {
+          "policy": "41523",
+          "reportedOpenGTQ": 2678.53,
+          "issuedNewEditionGrossGTQ": 2678.53,
+          "issuedNetGTQ": 1800,
+          "implication": "Reported open amount numerically matches issued GROSS, not issued net"
+        },
+        {
+          "policy": "38594",
+          "reportedOpenGTQ": 3088.34,
+          "issuedDocumentGrossGTQ": 2888.13,
+          "liveOlderDisplayedGrossGTQ": 3388,
+          "implication": "Three distinct amounts; exact edition, date and receipt matching required, cannot auto-correct"
+        }
+      ],
+      "caution": "Text extraction collapses PDF columns and client-name alignment; row-to-customer link not inferred. Header 'netas' alone does not establish numeric basis; compare actual line amount with source policy gross/net and requirement before updating. Historical cutoff is not current 2026-11-10 status.",
+      "mutations": "NONE"
     }
   ]
 }
