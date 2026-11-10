@@ -599,7 +599,7 @@
     "operationalWrites": 0,
     "sourceChangeInProduction": false,
     "importerRebuildRequired": false,
-    "nextRequiredStep": "Live exact client-policy-edition readback required; 4 Guatemalteca renewals' source PDFs and target Drive dossier checks now pinned in policyClientDocumentationReadback. Do not create duplicates, apply payments or represent those records as updated until authenticated current LIVE readback and idempotent before/after proof.",
+    "nextRequiredStep": "Owner original attachments and Drive support now recovered. First readback existing LIVE client+policy+edition+receipt exact IDs and periods. Create only absent records through approved canonical client/policy workflow, then idempotent receipt/cobro source-supported application with current insurer as-of precedence and before/after proof. No new owner decisions needed for cases documented here. Camila current 2026/27 PDF not recovered yet but owner approved term; resolve via source reconciliation without reopening same question.",
     "insurerStatementsNativeFormatsParsed": true,
     "all35CurrentSourceRawHashesPinned": true,
     "fourHistoricalReferenceHashesPinned": true
@@ -668,53 +668,53 @@
       {
         "case": "MARCO_FICOHSA_DISTINCT",
         "clientFolderId": "1saV55Q6h8OboNiGhkPDn74JoMFUC_1xi",
-        "observed": "Drive has documents for earlier AUTO-1000000187 and other historical policies, but no individual PDF visibly identified as AUTO-1000007073 in current folder; 7073 appears in insurer planilla and account statement.",
-        "action": "KEEP_7073_SEPARATE; retrieve issue document if needed; live lookup first"
+        "observed": "Drive client dossier contains older AUTO-1000000187; newly issued AUTO-1000007073 was in owner-attached POLIZA.pdf (libfile_0f7e755123ac819190d78574e862e078) and its req 7315461 in REQ..pdf (libfile_f72f2fc9b2508191ba6604f2d488b235). Source found; earlier 'missing PDF' statement superseded.",
+        "action": "Do not ask for 7073 document; distinguish from 0187; LIVE precheck create-if-absent, then exact req application as supported."
       },
       {
         "case": "SONIA_ADDITIONAL_NOVEMBER",
         "clientFolderId": "1u8VS6_iWvDb8bw1NQRwQjsbtFNJgMryV",
-        "observed": "Existing Roble PDF 91-8350081 renewal Apr 07 2026-Apr 07 2027, file 1neH81Oi_oqc8EL-uUO6BiTW-o7Qgixdz. New additional issued Nov 06 not in four currently listed dossier children.",
-        "action": "Do not substitute April renewal for additional November policy"
+        "observed": "New Roble 91-9119234 issued Nov06 2026-Nov06 2027 found in owner-attached 919119234414299.pdf (libfile_bb1ee4670e2c81918b2ea64d00b93c8d), including Sonia Esmeralda payment requirements; earlier Drive folder's Apr renewal 91-8350081 is distinct. First page names Otto Enrique insured: preserve role distinction.",
+        "action": "No missing-PDF query; LIVE exact role/client/policy match before insert."
       },
       {
         "case": "PRISCILA_MAPFRE",
         "clientFolderId": "1M2X9B_PQ1DWHbo8-CuaUGk-yZ1HC7CIh",
-        "observed": "Application file 1U4K7cUq6SdnRH0eSnmPByc23GJcgMVh3, quotation file 14p3azXqxDNMm9d6y45935j3pWgjuFk2O and onboarding file; not proof issued policy exists.",
+        "observed": "Owner-attached full issued SCIN-4394.pdf (libfile_738f65ff1d9c8191bb3e906f6b1893b3) discovered; Drive has quotation and application. Prior note 'no issued policy proof' superseded.",
         "advisor": "Samuel Daza",
-        "action": "Check LIVE first and seek issued policy identifier/support only if missing"
+        "action": "No re-request; LIVE exact edition and recalendar matching before insert."
       },
       {
         "case": "MARIA_LARIOS_DISTINCT",
         "clientFolderId": "1_dgPS_Lsxu-X5OYkMy-cQEbmoDV_XnCV",
-        "observed": "Contains Roble 91-8278775 renewal 2026-2027 file 1IFBaRIjVXO-0LNGKsw9wB-3As7Lmpw4l, separate La Ceiba 0223092797 file 1IM0DpqnLL2l9ww-DXOQDzB07bRjMDoK_; no merging by person.",
+        "observed": "Owner-attached 914143471361594.pdf confirms new Roble 91-4143471 Hyundai, distinct from 91-8278775 Mazda in 918278775261438.pdf. Document names show possible contract vs insured differences; preserve roles and avoid joining by person alone.",
         "action": "Keep insurer, vehicle and edition keys separate"
       },
       {
         "case": "JOSUE_ADDITIONAL",
         "clientFolderId": "1wLRjo90S1W9PamNUxTUz5LS6nTU45fLG",
-        "observed": "Folder contains multiple insurer/incident PDFs, including 91834554165490, and separate incident subfolders; not yet uniquely linked to additional policy.",
-        "action": "No automatic merge or creation until exact edition crossmatch"
+        "observed": "Owner-attached NSIN-11311_NUEVA_2026-2027_434271421.pdf (libfile_bc9d7ccf287081918f240f6bab5d7db4) identifies new policy and payment requirement 1/1. Requirement explicitly not proof of money collected.",
+        "action": "Use issued file to crossmatch; do not mark paid solely from due/printed payment date."
       },
       {
         "case": "CAMILA_GT_RENEWAL",
         "clientFolderId": null,
-        "observed": "Found G&T VIME-18154 policy PDF file 1z4VlklvbD-Xp8n9GgoqJe-G2n3c0tyE4 in another dossier: its visible coverage was 2025-08-01 to 2026-08-01 with Q500.57 monthly total, NOT owner-confirmed current 2026-08-01 to 2027-08-01 Q538.35. Search did not surface current issued renewal PDF.",
-        "action": "Never reuse 2025 PDF or 2025 invoice for current edition; keep renewal and exact quota 3/12 distinct"
+        "observed": "Prior 2026-11-07 private file VIME18154_POLICY_VALIDITY_HOLD_ADDENDUM_20261107.json (libfile_4f21a7b5c8a8819187baf51a3a8dfde2) identified OLD cancelled 2025-08-01/2026-08-01 policy ID pol_7bbc2ca83bc4e463462967f311fb, client ID cli_siga_c6278936f20723d740, old receipt rec_c4472ea2046f00199657394f. Owner subsequently confirmed premium Oct 2026 corresponds to ANNUAL RENEWAL 2026-08-01/2027-08-01, 3/12 net Q458.99, customer total Q538.35. Previous request to re-answer term superseded. Drive PDF poliza_18154.pdf covers 2025/26 only.",
+        "action": "Do not re-ask term; preserve owner decision; check whether 2026/27 edition exists LIVE before creating and DO NOT apply payment to cancelled 2025 record."
       },
       {
         "case": "JULIA_UNIVERSALES",
         "clientFolderId": null,
-        "observed": "No exact-name direct customer folder found in AyS Guatemala/Clientes by targeted Drive folder search; commission planilla includes Universales policies.",
+        "observed": "Owner-attached full issued Universales 1792018671026.pdf (libfile_3f375195df3c8191b058f99c119ab6a5), policy 04-05-01-015590-0, term Oct01 2026-Sep30 2027, plus customer requirements reporte(6).pdf. Earlier 'no folder' did not mean document missing.",
         "advisor": "Germán Reyes",
-        "action": "Preserve new freelance sale and one linked policy; Live match first"
+        "action": "Do not re-request source; keep freelance advisor Germán, LIVE readback create-if-absent."
       },
       {
         "case": "MARIA_GABRIELA_UNIVERSALES",
         "clientFolderId": null,
-        "observed": "No exact-name direct customer folder found by targeted Drive folder search; insurer commission planilla carries policy 041501603-0.",
+        "observed": "Owner-attached full issued 1791480940021 (1).pdf (libfile_ec2f5e8a454481919fedd67aa15f20de), 04-15-01-000603-0, term Oct01 2026-Sep30 2027, plus reporte(7).pdf.",
         "advisor": "Germán Reyes",
-        "action": "No reassign to Paula, live match before insert"
+        "action": "Do not re-request source; keep Germán, LIVE match create-if-absent."
       },
       {
         "case": "AURA_SAQUIC_EXCLUDED",
@@ -727,6 +727,119 @@
       "Commission liquidations issued November correspond to October collections. Insurer age balances reflect pending as-of their own cutoff, except explicit collected-reports.",
       "No live mutation, customer creation, policy creation, payment marking or receipt update was performed in this documentation step."
     ],
-    "nextOperation": "Live authenticated per-customer exact policy+edition+receipt readback, source matching without duplicate writes, recover recent issued PDFs from prior conversation attachments or Drive; then idempotent approved server command with before/after and reload proof. Ask Paula only for specific missing issued document if the normal sources truly do not contain it."
+    "nextOperation": "Owner original attachments and Drive support now recovered. First readback existing LIVE client+policy+edition+receipt exact IDs and periods. Create only absent records through approved canonical client/policy workflow, then idempotent receipt/cobro source-supported application with current insurer as-of precedence and before/after proof. No new owner decisions needed for cases documented here. Camila current 2026/27 PDF not recovered yet but owner approved term; resolve via source reconciliation without reopening same question.",
+    "previousMissingEvidenceFoundInUserUploadedNov07Attachments": true,
+    "userClarificationFrozen": "All individual ambiguous cases and advisor assignments were previously answered. Never reopen the whole questionnaire. Original conversation attachments are authoritative documentary leads in addition to Google Drive; use both before asking Paula for a targeted remaining document.",
+    "verifiedUploadedAttachments": [
+      {
+        "file": "reporte (6).pdf",
+        "id": "libfile_57c3ba4b6d788191893b5bd1bc63c4b5",
+        "role": "Julia Universales pending requirements later periods; not paid evidence"
+      },
+      {
+        "file": "1792018671026.pdf",
+        "id": "libfile_3f375195df3c8191b058f99c119ab6a5",
+        "role": "Issued Universales Julia 04-05-01-015590-0, term 2026-10-01 to 2027-09-30"
+      },
+      {
+        "file": "AUTO-41523.pdf",
+        "id": "libfile_85871fed86bc81919c74f7f3fcb335ea",
+        "role": "Issued Guatemalteca Mirlet AUTO-41523, term 2026-09-26 to 2027-09-26, net Q1800, total Q2678.53"
+      },
+      {
+        "file": "AUTO-41535.pdf",
+        "id": "libfile_203ece809078819192108a71a4587165",
+        "role": "Guatemalteca Nilda AUTO-41535 policy/endoso change; term 2026-10-02 to 2027-10-02; retain edition/endoso identity"
+      },
+      {
+        "file": "CARATULA POLIZA NUEVA-1.pdf",
+        "id": "libfile_34207ad8aed481918c24595716777475",
+        "role": "G&T TLG$-7529 temporary transport, term 2026-10-19 to 2026-11-19, net USD182.78, total USD214.95, not annual renewable"
+      },
+      {
+        "file": "919118884404770.pdf",
+        "id": "libfile_c3c175f533688191b6e78cfcc813acb0",
+        "role": "Roble 91-9118884 Oct28 2026-2027, distinct insured vehicle"
+      },
+      {
+        "file": "919119234414299.pdf",
+        "id": "libfile_bb1ee4670e2c81918b2ea64d00b93c8d",
+        "role": "Roble new 91-9119234 Nov06 2026-Nov06 2027; Sonia Esmeralda named in payment requirements, first-page insured vehicle shows Otto Enrique; distinguish owner and insured/certificate"
+      },
+      {
+        "file": "914143471361594.pdf",
+        "id": "libfile_b708dc4591e08191bcf8cc683112c9af",
+        "role": "Roble new 91-4143471 Hyundai Accent María Larios, Sep21 2026-2027; distinct by vehicle"
+      },
+      {
+        "file": "918278775261438.pdf",
+        "id": "libfile_d6ae5f5ff7848191ac27297c1f13e436",
+        "role": "Roble 91-8278775 Mazda, Feb01 2026-2027; page1 card names Rolando Javier, cover letter María Luisa; reconcile named roles, never merge based only on name"
+      },
+      {
+        "file": "SCIN-4394.pdf",
+        "id": "libfile_738f65ff1d9c8191bb3e906f6b1893b3",
+        "role": "Issued Mapfre SCIN-4394, Priscila Areli, Medical Pro; not merely quote/application"
+      },
+      {
+        "file": "NSIN-11311_NUEVA_2026-2027_434271421.pdf",
+        "id": "libfile_bc9d7ccf287081918f240f6bab5d7db4",
+        "role": "Mapfre NSIN-11311 Josué García, 2026-09-25 to 2027-09-25, payment requirement 1/1 Q978.78 due/dated Nov06; requirement says it is NOT proof of paid"
+      },
+      {
+        "file": "1791480940021 (1).pdf",
+        "id": "libfile_ec2f5e8a454481919fedd67aa15f20de",
+        "role": "Issued Universales María Gabriela, 04-15-01-000603-0, term Oct01 2026-Sep30 2027, net annual Q9720, gross annual Q11430.72"
+      },
+      {
+        "file": "reporte (7).pdf",
+        "id": "libfile_cbe95aed512c81918595110891848eab",
+        "role": "María Gabriela Universales pending requirements later periods; monthly Q952.56, not proof paid"
+      },
+      {
+        "file": "REQ..pdf",
+        "id": "libfile_f72f2fc9b2508191ba6604f2d488b235",
+        "role": "Ficohsa Marco AUTO-1000007073 req 7315461, 1/1 due 2026-10-01, net Q2300, total Q2704.80; due is not receipt"
+      },
+      {
+        "file": "POLIZA.pdf",
+        "id": "libfile_0f7e755123ac819190d78574e862e078",
+        "role": "Issued Ficohsa Marco AUTO-1000007073, term 2026-09-07 to 2027-09-07, distinct from earlier AUTO-1000000187"
+      }
+    ],
+    "additionalNewOrDistinctPoliciesRecovered": [
+      {
+        "policy": "AUTO-41523",
+        "insurer": "Guatemalteca",
+        "sourceLibraryId": "libfile_85871fed86bc81919c74f7f3fcb335ea"
+      },
+      {
+        "policy": "AUTO-41535",
+        "insurer": "Guatemalteca",
+        "sourceLibraryId": "libfile_203ece809078819192108a71a4587165",
+        "qualifier": "Endoso and policy identity; avoid duplicate"
+      },
+      {
+        "policy": "TLG$-7529",
+        "insurer": "G&T",
+        "sourceLibraryId": "libfile_34207ad8aed481918c24595716777475",
+        "qualifier": "One-month transport"
+      },
+      {
+        "policy": "91-9118884",
+        "insurer": "El Roble",
+        "sourceLibraryId": "libfile_c3c175f533688191b6e78cfcc813acb0"
+      },
+      {
+        "policy": "91-9119234",
+        "insurer": "El Roble",
+        "sourceLibraryId": "libfile_bb1ee4670e2c81918b2ea64d00b93c8d"
+      },
+      {
+        "policy": "91-4143471",
+        "insurer": "El Roble",
+        "sourceLibraryId": "libfile_b708dc4591e08191bcf8cc683112c9af"
+      }
+    ]
   }
 }
