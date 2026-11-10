@@ -1029,6 +1029,66 @@
         "monthlyGrossGTQ": 952.56,
         "advisor": "Germán Reyes"
       }
+    },
+    "newClientSourceDetails": {
+      "Julia": {
+        "fullName": "JULIA MONICA MARISOL ROMERO LOAIZA",
+        "policy": "04-05-01-015590-0",
+        "term": "2026-10-01/2027-09-30",
+        "annualNetGTQ": 7800,
+        "annualIssueGTQ": 390,
+        "annualVatGTQ": 982.8,
+        "annualTotalGTQ": 9172.8,
+        "monthlyGrossGTQ": 764.4,
+        "advisor": "Germán Reyes",
+        "sourceLibraryId": "libfile_3f375195df3c8191b058f99c119ab6a5"
+      },
+      "MariaGabriela": {
+        "fullName": "MARIA GABRIELA MONTEPEQUE PALMA VETTORAZZI",
+        "policy": "04-15-01-000603-0",
+        "term": "2026-10-01/2027-09-30",
+        "annualNetGTQ": 9720,
+        "annualIssueGTQ": 486,
+        "annualVatGTQ": 1224.72,
+        "annualTotalGTQ": 11430.72,
+        "monthlyGrossGTQ": 952.56,
+        "advisor": "Germán Reyes",
+        "sourceLibraryId": "libfile_ec2f5e8a454481919fedd67aa15f20de"
+      },
+      "Priscila": {
+        "fullName": "PRISCILA ARELI LOPEZ DE LEON",
+        "policy": "SCIN-4394",
+        "term": "2026-09-01/2027-04-01",
+        "advisor": "Samuel Daza",
+        "sourceLibraryId": "libfile_738f65ff1d9c8191bb3e906f6b1893b3",
+        "policyPage2MonthlyNetGTQ": 296.56,
+        "monthlyIssueGTQ": 14.83,
+        "monthlyTaxGTQ": 37.37
+      }
     }
+  },
+  "livePerformanceObservation": {
+    "atGuatemala": "2026-11-10",
+    "environment": "https://app.aysseguros.com",
+    "role": "Paula / Dirección",
+    "scope": "Chrome connected UI only; timings include browser automation transport overhead",
+    "observations": [
+      {
+        "module": "Pólizas",
+        "action": "Insurer filter from all to Ficohsa",
+        "observedMs": 2704,
+        "recordCountShown": 9,
+        "consoleErrorsOrWarnings": 0
+      },
+      {
+        "module": "Cobros y cartera",
+        "action": "Route click followed by DOM read",
+        "observedMs": 6092,
+        "routeChangedTo": "#/cobros",
+        "domReadTimedOut": true,
+        "interpretation": "Cannot attribute full delay exclusively to platform; connected browser/CDP deadline contributed."
+      }
+    ],
+    "nextDiagnostics": "Instrument navigation, first render/data-ready and filter response independently; compare warmed vs fresh load and eliminate nonessential startup waits only on canonical source with regression QA. Do not block insurer reconciliation."
   }
 }
