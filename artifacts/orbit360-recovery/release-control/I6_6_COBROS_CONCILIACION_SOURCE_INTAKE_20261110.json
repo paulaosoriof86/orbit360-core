@@ -646,7 +646,7 @@
     "owner28DecisionsRecoveredExactly": false,
     "livePreApplyReadback": false,
     "deterministicDiffReady": false,
-    "operationalWrites": 2,
+    "operationalWrites": 3,
     "sourceChangeInProduction": false,
     "importerRebuildRequired": false,
     "nextRequiredStep": "Do not assume prior UI write. Exact source-supported data input in authenticated LIVE requires action-time sensitive-data confirmation. Then create only missing clients (Julia, Maria Gabriela, Priscila pending final check), preserve existing customer details, link authentic new/renewal editions by vehicle and vigencia, correct Bayron adviser+premium+2-installment receipts and as-of paid status; verify persistence. Parallel non-destructive performance timings/filter transitions.",
@@ -1125,6 +1125,21 @@
       "address": "4 CALLE 19-84, APTO. 303, EDIFICIO BONARES, VISTA HERMOSA 1, ZONA 15, GUATEMALA",
       "linkedPolicyCreate": "PENDING",
       "note": "Acquisition channel unknown; UI Referido default not source-verified. Creation click timed out at CDP transport but record persisted and detail rendered."
+    },
+    {
+      "id": "LIVE_CREATE_PRISCILA_ARELI_20261110",
+      "date": "2026-11-10",
+      "entity": "Cliente 360",
+      "client": "PRISCILA ARELI LOPEZ DE LEON",
+      "status": "LIVE_WRITE_VERIFIED_FRESH_AUTHENTICATED_READBACK",
+      "sourcePolicy": "SCIN-4394",
+      "sourceInsurer": "MAPFRE SEGUROS",
+      "sourceDocument": "libfile_738f65ff1d9c8191bb3e906f6b1893b3",
+      "advisor": "Samuel Daza",
+      "before": "442 commercial / 443 total; exact search 0 de 443",
+      "after": "443 commercial / 444 total; exact search 1 de 444 and Samuel Daza, no policies yet",
+      "linkedPolicyCreate": "PENDING",
+      "notes": "No invented phone, identification or email; payment frequency monthly source backed, mechanism not confirmed; frontend click timed out while write did persist."
     }
   ]
 }
