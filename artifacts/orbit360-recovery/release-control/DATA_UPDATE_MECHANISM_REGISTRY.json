@@ -248,23 +248,30 @@
     "COBROS_CONCILIACION": {
       "gate": "I6.6",
       "sourceRequiredBeforeStart": true,
-      "sourceState": "NOV_2026_STATEMENT_INVENTORY_REGISTERED_PENDING_SHA256_AND_LIVE_READBACK",
+      "sourceState": "ALL_15_NOVEMBER_STATEMENTS_RAW_SHA256_PINNED_NATIVE_FORMATS_READ_LIVE_MATCH_PENDING",
       "mechanism": "REUSE_APPROVED_EXISTING_WRITE_CONTRACT_FROM_LINEAGE_AND_ACCEPTANCE_EVIDENCE; LOCATE POINTERS ONLY, DO_NOT REDISCOVER_ARCHITECTURE",
       "liveClosure": "READBACK_PASS_THEN_USER_REFRESH_MUST_SHOW_UPDATED_DATA",
       "activeSourceIntake": "artifacts/orbit360-recovery/release-control/I6_6_COBROS_CONCILIACION_SOURCE_INTAKE_20261110.json",
-      "resumeCursor": "SOURCE_INVENTORY_READBACK_PASS",
-      "nextMaterialStep": "VERIFY_RAW_SHA256_FOR_15_STATEMENTS_AND_CAPTURE_CURRENT_LIVE_RECEIPT_STATE",
-      "dataWritesAuthorizedNow": false
+      "resumeCursor": "ALL_CURRENT_SOURCES_HASHED_AND_SOURCE_SCOPES_FILTERED",
+      "nextMaterialStep": "CURRENT_LIVE_RECEIPT_POLICY_EDITION_READBACK_THEN_IDEMPOTENT_DELTA_WITH_OWNER_DECISIONS",
+      "dataWritesAuthorizedNow": false,
+      "verifiedSourceShaCount": 15,
+      "verifiedCommissionShaCount": 20,
+      "verifiedHistoricalReferenceShaCount": 4,
+      "sourcePinVerifiedDate": "2026-11-10",
+      "ownerConsultationsStatus": "PARTIAL_LITERAL_RECOVERY_FROM_2026_11_07_MESSAGE_DO_NOT_REASK_ENTIRE_Q01_Q28"
     },
     "COMISIONES_LIQUIDACIONES": {
       "gate": "I6.7",
       "sourceRequiredBeforeStart": true,
-      "sourceState": "NOV_2026_COMMISSION_20_DOCUMENTS_FROM_20261107_REVIEW_REUSED_AND_OCT_HISTORICAL_FOR_COL_CEIBA",
+      "sourceState": "NOVEMBER_20_COMMISSION_AND_INVOICE_RAW_SHA256_VERIFIED_REUSED_NOV07_ANALYSIS;_COL_CEIBA_OCTOBER_FOLDER_SOURCES_ARE_SEPTEMBER_PERIOD",
       "mechanism": "REUSE_APPROVED_EXISTING_WRITE_CONTRACT_AND_COMMISSION_ENGINE; NO_BLIND_REIMPORT",
       "liveClosure": "READBACK_PASS_THEN_USER_REFRESH_MUST_SHOW_UPDATED_DATA",
       "activeSourceIntake": "artifacts/orbit360-recovery/release-control/I6_6_COBROS_CONCILIACION_SOURCE_INTAKE_20261110.json",
-      "resumeCursor": "PRIOR_PLANILLA_STUDY_RETAINED_PENDING_I6_6",
-      "dataWritesAuthorizedNow": false
+      "resumeCursor": "20_CURRENT_PLUS_4_HISTORICAL_SOURCES_PINNED_AWAIT_I6_6_LIVE_DELTA",
+      "dataWritesAuthorizedNow": false,
+      "verifiedSourceShaCount": 20,
+      "verifiedHistoricalReferenceShaCount": 4
     },
     "I6_8_ENABLEMENT_HISTORY_TRAINING": {
       "gate": "I6.8",
