@@ -1519,8 +1519,21 @@
     "absentFromHistoricalExcel": 15,
     "noClaimAllLivePoliciesMatch": true,
     "canonicalEvidencePath": "artifacts/orbit360-recovery/release-control/I6_6_COBROS_CONCILIACION_SOURCE_INTAKE_20261110.json",
-    "canonicalEvidenceBlob": "7cef64b4ec3ae75530432936a9c53e979f9cbae8",
+    "canonicalEvidenceBlob": "a743f55c0369851eb017f12ce88823e0f58bc12d",
     "lastAction": "Record 78 source PDFs and full 332 recent file metadata, preserve verified B4-007 operational LIVE close, next authoritative join LIVE policies and I6.6 safe updates; do not reimport.",
     "noLiveDataChangeFromThisAudit": true
+  },
+  "i66GovernanceGateSync20261110": {
+    "lastClosedReleaseGate": "B4-007",
+    "activeOperationalGate": "I6.6",
+    "centralGuardRunId": 42811258212,
+    "centralGuardConclusion": "SUCCESS",
+    "sourceAndProductionArtifactUnchanged": true,
+    "oldPreviewWorkflowRetriggerRunId": 42811258229,
+    "oldPreviewLiveFingerprintInvariant": "PASS",
+    "newPreviewArtifactNotCanonical": true,
+    "stalePreviewTriggerRemovedByCommit": "53892c70ebfb41490653e9346651850b042f2bcd",
+    "canonicalLedgerBlob": "a743f55c0369851eb017f12ce88823e0f58bc12d",
+    "fullLiveModuleQaNotFalselyCertified": true
   }
 }
