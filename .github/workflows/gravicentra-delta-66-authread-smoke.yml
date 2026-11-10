@@ -7,6 +7,7 @@ on:
     paths:
       - .github/workflows/gravicentra-delta-66-authread-smoke.yml
       - artifacts/orbit360-recovery/release-control/I6_6_AUTHENTICATED_READONLY_SMOKE_REQUEST_20261110.json
+      - tools/gravicentra-i6-6-authread-preview-smoke.mjs
 
 permissions:
   contents: read
