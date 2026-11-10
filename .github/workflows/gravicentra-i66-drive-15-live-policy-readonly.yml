@@ -1,0 +1,75 @@
+# I6.6 bounded canonical Drive 15-vs-LIVE policy audit; read-only, never deploy.
+name: Gravicentra I6.6 Drive 15 LIVE Policy Read Only
+on:
+  push:
+    branches: [recovery/fase-a-clean-20260831]
+    paths:
+      - .github/workflows/gravicentra-i66-drive-15-live-policy-readonly.yml
+permissions:
+  contents: read
+concurrency:
+  group: gi-i66-drive-15-live-readonly
+  cancel-in-progress: false
+jobs:
+  inventory-join:
+    if: github.repository == 'paulaosoriof86/orbit360-core' && github.ref == 'refs/heads/recovery/fase-a-clean-20260831'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      PROJECT_ID: ays-orbit-360-lab
+      GCLOUD_PROJECT: ays-orbit-360-lab
+      FIREBASE_PROJECT_ID: ays-orbit-360-lab
+      SA_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_LAB_ALT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Guard 15 Drive source records and forbid release or Firestore mutations
+        run: |
+          set -euo pipefail
+          node --check tools/gravicentra-i66-drive-15-live-readonly.cjs
+          test -z "${FIRESTORE_EMULATOR_HOST:-}"
+          node - <<'NODE'
+          const fs=require('node:fs'),a=JSON.parse(fs.readFileSync('artifacts/orbit360-recovery/release-control/I6_6_COBROS_CONCILIACION_SOURCE_INTAKE_20261110.json','utf8')).driveClientPoliciesJulyNovAudit20261110;
+          if(a.recentDocumentCounts?.uniqueClientDossiers!==157||a.recentDocumentCounts?.potentialPolicyPdfTextFetched!==78||a.recentDocumentCounts?.docsWithHistoricalPolicyNumberMatch!==63||a.recentDocumentCounts?.docsWithoutHistoricalPolicyNumberMatch!==15||a.reviewedPolicyPdfRecords.filter(d=>!d.historicalSeptemberExcelMatch).length!==15)throw Error('I66_DRIVE_CENSUS_SOURCE_DRIFT');
+          console.log('I66_DRIVE_15_SOURCE_COUNTS_PASS_157_DOSSIERS_78_PDF_63_HISTORICAL_MATCHES_15_EXCEPTIONS');
+          NODE
+      - name: Install pinned Firebase Admin for database READs only
+        run: |
+          set -euo pipefail
+          npm install --prefix "$RUNNER_TEMP/i66-drive15-admin" --no-audit --no-fund --ignore-scripts firebase-admin@13.4.0 >/dev/null
+          echo "NODE_PATH=$RUNNER_TEMP/i66-drive15-admin/node_modules" >> "$GITHUB_ENV"
+          echo "GI_I66_REPORT_PATH=$RUNNER_TEMP/i66-drive-15-live-policy-readonly.json" >> "$GITHUB_ENV"
+      - name: Resolve already configured exact-project service account
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/i66-drive15-auth"
+          chmod 700 "$RUNNER_TEMP/i66-drive15-auth"
+          python3 - <<'PY'
+          import json,os,pathlib
+          p=pathlib.Path(os.environ['RUNNER_TEMP'])/'i66-drive15-auth'/'existing-lab.json'
+          for key in ('SA_LAB','SA_LAB_ALT','SA_DEFAULT'):
+              try:x=json.loads(os.environ.get(key,''))
+              except (ValueError,TypeError):continue
+              if x.get('type')!='service_account' or x.get('project_id')!='ays-orbit-360-lab' or not x.get('private_key'):continue
+              p.write_text(json.dumps(x),encoding='utf-8');p.chmod(0o600)
+              with open(os.environ['GITHUB_ENV'],'a') as f:f.write('GOOGLE_APPLICATION_CREDENTIALS='+str(p)+'\n')
+              print('I66_DRIVE15_READONLY_EXACT_PROJECT_GUARD_PASS');break
+          else:raise SystemExit('I66_DRIVE15_FIREBASE_CONFIGURED_CREDENTIAL_MISSING')
+          PY
+      - name: Enumerate LIVE policies for 15-drive-file unique GT identity join, no writes
+        run: |
+          set -euo pipefail
+          node tools/gravicentra-i66-drive-15-live-readonly.cjs
+      - name: Archive bounded 15-record read-only report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gi-i66-drive-15-live-readonly-${{ github.run_id }}
+          path: ${{ runner.temp }}/i66-drive-15-live-policy-readonly.json
+          retention-days: 30
+          if-no-files-found: warn
