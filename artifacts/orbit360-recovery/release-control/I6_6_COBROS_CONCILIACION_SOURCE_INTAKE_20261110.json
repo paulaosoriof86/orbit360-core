@@ -654,7 +654,7 @@
     "operationalWrites": 3,
     "sourceChangeInProduction": false,
     "importerRebuildRequired": false,
-    "nextRequiredStep": "With all original source file byte hashes pinned, continue individually matching real insurer statement rows by edition+requirement+due/payment date; Guatemalteca title 'net' contradicts gross-matching row amounts. In LIVE, do not apply fake importer preview or wrong generated due dates, and do not overwrite cross-insurer prior editions. Fix through same canonical QA/release gate and use authenticated Chrome for before/after when transport recovers; preserve prior Cobros performance PASS.",
+    "nextRequiredStep": "P0 scheduler/receipt identity: Bayron currently shows 12 wrong Cobros rows Q2912 while source requires 2 Q1557.92 exact due dates and gross Q3115.84; prior Pólizas view counted 0 receipts, so compare actual receipt IDs across modules before correction. Source importer demo fallback fail-closed, renewal same risk cross-insurer issuer history, then controlled QA+LIVE write with fresh readback. Performance: warm Pólizas exact filter 2.47–2.84s tool-inclusive and Cobros route CDP delays, preserve B3-002 PASS. Continue insurer as-of classification, no speculative paid writes or duplicate customer records.",
     "insurerStatementsNativeFormatsParsed": true,
     "all35CurrentSourceRawHashesPinned": true,
     "fourHistoricalReferenceHashesPinned": true,
@@ -944,7 +944,30 @@
       "inferredSurchargeRatePct": 2,
       "financialMathMatchesOwnerInstallments": true,
       "sourceVerificationStatus": "ARITHMETIC_FIT_NOT_YET_EDITED",
-      "paidStatus": "USER_LATER_BOTH_PAID_CONFIRMED; exact after-cut evidence or controlled owner attestation before paid-at write"
+      "paidStatus": "USER_LATER_BOTH_PAID_CONFIRMED; exact after-cut evidence or controlled owner attestation before paid-at write",
+      "cobrosReadback": {
+        "when": "2026-11-10",
+        "liveRows": 12,
+        "allStatus": "UNPAID_UI_3_OVERDUE_9_FUTURE",
+        "receiptNumbers": "1/12 through 12/12",
+        "firstDue": "2026-09-04",
+        "thirdDue": "2026-11-04",
+        "lastDue": "2027-08-04",
+        "amountMostlyGTQ": 242.67,
+        "lastAmountGTQ": 242.63,
+        "wrongScheduleTotalGTQ": 2912,
+        "actualSourceExpectedInstallments": 2,
+        "actualPerInstallmentGTQ": 1557.92,
+        "sourceActualDueDates": [
+          "2026-08-20",
+          "2026-09-20"
+        ],
+        "sourceGrossGTQ": 3115.84,
+        "missingGrossDeltaGTQ": 203.84,
+        "advisorStillIncorrect": "Samuel Daza in Pólizas; owner Paula",
+        "interpretation": "Pólizas detail previously displayed zero expected receipts, yet Cobros projects 12 existing rows. This is an inter-module projection inconsistency; must reconcile stable receipt IDs, not generate 2 more or falsely apply to 12.",
+        "mutation": "NO_WRITE_TO_WRONG_SCHEDULE"
+      }
     },
     "Guatemalteca": {
       "filteredCount": 73,
@@ -1094,6 +1117,31 @@
         "routeChangedTo": "#/cobros",
         "domReadTimedOut": true,
         "interpretation": "Cannot attribute full delay exclusively to platform; connected browser/CDP deadline contributed."
+      },
+      {
+        "module": "Pólizas",
+        "action": "Warm exact-policy filter VA125-00010478 from 0 results; wait until row visible",
+        "observedMs": 2471,
+        "result": "1 de 1425",
+        "countCommercialAtCapture": 1416,
+        "reportedQAPolicies": 9,
+        "scope": "Chrome connected automation end-to-end, includes locator transport; not pure page execution time",
+        "status": "OBSERVED_NOT_PASS"
+      },
+      {
+        "module": "Pólizas",
+        "action": "Warm filter to old Marco policy 91-8321599, wait until row visible",
+        "observedMs": 2837,
+        "result": "3 policy editions of 1425",
+        "scope": "Chrome connected automation end-to-end; not pure page execution",
+        "status": "OBSERVED_NOT_PASS"
+      },
+      {
+        "module": "Pólizas→Cobros",
+        "action": "Sidebar navigation after warm Pólizas, then Cobros DOM readback",
+        "observedMs": null,
+        "result": "URL switched #/cobros, one read failed CDP Runtime.evaluate 3s, subsequent read succeeded, 2559 current Cobros rows including 1227 SIGA unconfirmed",
+        "status": "PERFORMANCE_SYMPTOM_WITH_CDP_TRANSPORT_CAVEAT"
       }
     ],
     "nextDiagnostics": "Instrument navigation, first render/data-ready and filter response independently; compare warmed vs fresh load and eliminate nonessential startup waits only on canonical source with regression QA. Do not block insurer reconciliation.",
@@ -1213,7 +1261,17 @@
       "sourceBlobSha": "df3f134f16246c770418ad11323f6e9a931cb3bb",
       "action": "No further global-search stress repeated in production; use narrower module filters and source diagnostics."
     },
-    "browserTransportNotes": "undefined Reattempted authenticated Chrome tabs for Julia and Cobros on 2026-11-10: three DOM snapshots failed CDP Emulation.setFocusEmulationEnabled after 3000ms. This is browser-control transport instability and not proof of application-only TTI. No destructive or financial write retried."
+    "browserTransportNotes": "undefined Reattempted authenticated Chrome tabs for Julia and Cobros on 2026-11-10: three DOM snapshots failed CDP Emulation.setFocusEmulationEnabled after 3000ms. This is browser-control transport instability and not proof of application-only TTI. No destructive or financial write retried.",
+    "liveFilterCurrentEvidence": {
+      "atGuatemala": "2026-11-10",
+      "app": "https://app.aysseguros.com",
+      "policiesTotalIncludingQA": 1425,
+      "commercialPolicies": 1416,
+      "currentActiveCommercial": 223,
+      "cobrosRows": 2559,
+      "unconfirmedSiga": 1227,
+      "note": "Counts are point-in-time LIVE observations, not a formal cross-module certification or proof of current release digest."
+    }
   },
   "operationalActions": [
     {
