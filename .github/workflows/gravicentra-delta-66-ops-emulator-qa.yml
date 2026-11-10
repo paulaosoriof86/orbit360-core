@@ -1,0 +1,58 @@
+# NO production credentials; all writes target local Firestore emulator only.
+name: Gravicentra I6.6 Ops P0 Emulator Role Country CRUD
+
+on:
+  push:
+    branches: [recovery/fase-a-clean-20260831]
+    paths:
+      - .github/workflows/gravicentra-delta-66-ops-emulator-qa.yml
+      - tools/gravicentra-delta66-ops-emulator-functional.test.cjs
+
+permissions:
+  contents: read
+
+concurrency:
+  group: gi-i66-ops-emulator-recovery
+  cancel-in-progress: false
+
+jobs:
+  synthetic-crud:
+    if: github.repository == 'paulaosoriof86/orbit360-core' && github.ref == 'refs/heads/recovery/fase-a-clean-20260831'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - name: Guard I6.6 and pin exact Ops product source from approved manifest
+        run: |
+          set -euo pipefail
+          node tools/gravicentra-i6-6-delta-guard.mjs
+          node --check tools/gravicentra-delta66-ops-emulator-functional.test.cjs
+          node --check functions/product-ops-leads-domain.js
+      - name: Install existing backend dependencies and locally pinned Firestore emulator
+        run: |
+          set -euo pipefail
+          (cd functions && npm ci --ignore-scripts --no-audit --no-fund >/dev/null)
+          npm install --prefix "$RUNNER_TEMP/gi-i66-ops-qa-cli" --no-save --ignore-scripts --no-audit --no-fund firebase-tools@14.10.1 >/dev/null
+          node tools/gravicentra-firebase-tools-empty-extensions-workaround-v1.mjs "$RUNNER_TEMP/gi-i66-ops-qa-cli"
+      - name: Execute authentic transactional Ops role and country matrix against ephemeral Firestore emulator
+        env:
+          GCLOUD_PROJECT: demo-gravicentra-i66-ops
+          FIREBASE_PROJECT_ID: demo-gravicentra-i66-ops
+          FIREBASE_CONFIG: '{"projectId":"demo-gravicentra-i66-ops"}'
+        run: |
+          set -euo pipefail
+          test -z "${GOOGLE_APPLICATION_CREDENTIALS:-}"
+          CLI="$RUNNER_TEMP/gi-i66-ops-qa-cli/node_modules/firebase-tools/lib/bin/firebase.js"
+          node "$CLI" emulators:exec --only firestore --project demo-gravicentra-i66-ops --non-interactive --config firebase.json "node tools/gravicentra-delta66-ops-emulator-functional.test.cjs"
+          echo "I66_OPS_EMULATOR_NO_REAL_FIRESTORE_WRITES=true"
