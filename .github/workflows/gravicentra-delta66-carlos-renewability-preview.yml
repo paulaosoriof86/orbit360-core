@@ -1,0 +1,152 @@
+# I6.6 Carlos P0; single immutable 350 source artifact; Preview Function ONLY, no production write/deploy.
+name: Gravicentra I6.6 Carlos Scoped Function Preview
+on:
+  push:
+    branches: [recovery/fase-a-clean-20260831]
+    paths:
+      - .github/workflows/gravicentra-delta66-carlos-renewability-preview.yml
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: gi-i66-carlos-function-preview
+  cancel-in-progress: false
+jobs:
+  stage:
+    if: github.repository == 'paulaosoriof86/orbit360-core' && github.ref == 'refs/heads/recovery/fase-a-clean-20260831'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    env:
+      PROJECT_ID: ays-orbit-360-lab
+      SOURCE_SHA: 35008e0d5b9ac81907e0041398e6434d0fcda631
+      ARTIFACT_ID: '13789672305'
+      ARTIFACT_DIGEST: sha256:726f238f54be782917d4031f391cfba913e5233e508142b040c78fa18441cc15
+      ARTIFACT_RUN: '42871046232'
+      EMULATOR_RUN: '42877608644'
+      PREVIEW_URL: https://ays-orbit-360-lab--gi-i66-rc-42871046232-rwaltr30.web.app
+      SA_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_ALT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: 35008e0d5b9ac81907e0041398e6434d0fcda631
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify original package+emulator gates and exact source ancestry
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$SOURCE_SHA"
+          node --check functions/product-operational-domain.js
+          node --test tools/gravicentra-i6-6-carlos-renewability-only.test.cjs tools/gravicentra-i6-6-operativo-cross-advisor-scope.test.cjs
+          node - <<'NODE'
+          const assert=require('node:assert/strict');
+          (async()=>{
+            const h={Authorization:'Bearer '+process.env.GH_TOKEN,Accept:'application/vnd.github+json','User-Agent':'GI-I66-Carlos'};
+            const u='https://api.github.com/repos/paulaosoriof86/orbit360-core/actions/';
+            const [qa,build,artifact]=await Promise.all([
+              fetch(u+'runs/'+process.env.EMULATOR_RUN,{headers:h}).then(r=>r.json()),
+              fetch(u+'runs/'+process.env.ARTIFACT_RUN,{headers:h}).then(r=>r.json()),
+              fetch(u+'artifacts/'+process.env.ARTIFACT_ID,{headers:h}).then(r=>r.json())]);
+            assert.equal(qa.conclusion,'success','I66_CARLOS_EMULATOR_NOT_GREEN');
+            assert.equal(qa.head_sha,'a125a8c8d06df8a45a1198e46966110a4a52fe7a','I66_CARLOS_EMULATOR_RUN_DRIFT');
+            assert.equal(build.conclusion,'success','I66_CARLOS_PREVIEW_BUILD_NOT_GREEN');
+            assert.equal(build.head_sha,process.env.SOURCE_SHA,'I66_CARLOS_SOURCE_PACKAGE_DRIFT');
+            assert.equal(artifact.workflow_run.id,Number(process.env.ARTIFACT_RUN),'I66_CARLOS_ARTIFACT_RUN_DRIFT');
+            assert.equal(artifact.digest,process.env.ARTIFACT_DIGEST,'I66_CARLOS_ARTIFACT_DIGEST_DRIFT');
+            assert.equal(artifact.expired,false,'I66_CARLOS_ARTIFACT_EXPIRED');
+            console.log('I66_CARLOS_17_SYNTHETIC_AND_20_EMULATOR_AUTHENTICATED_PASS');
+          })().catch(e=>{console.error(e.message);process.exitCode=1;});
+          NODE
+      - uses: actions/download-artifact@v4
+        with:
+          artifact-ids: 13789672305
+          run-id: 42871046232
+          github-token: ${{ github.token }}
+          path: ${{ runner.temp }}/carlos-preview-archive
+      - name: Verify TAR bytes, source, four changed owners, Preview marker
+        run: |
+          set -euo pipefail
+          DL="$RUNNER_TEMP/carlos-preview-archive"
+          test "$(find "$DL" -maxdepth 3 -type f -name gi-i66-exact-package.tar.gz | wc -l)" -eq 1
+          test "$(find "$DL" -maxdepth 3 -type f -name gi-i66-exact-package.sha256 | wc -l)" -eq 1
+          TAR="$(find "$DL" -maxdepth 3 -type f -name gi-i66-exact-package.tar.gz -print -quit)"
+          SUM="$(find "$DL" -maxdepth 3 -type f -name gi-i66-exact-package.sha256 -print -quit)"
+          test "$(sha256sum "$TAR" | awk '{print $1}')" = "$(awk '{print $1}' "$SUM")"
+          mkdir -p "$RUNNER_TEMP/carlos-preview-packet"
+          tar -xzf "$TAR" -C "$RUNNER_TEMP/carlos-preview-packet" --no-same-owner
+          export CARLOS_PKT="$RUNNER_TEMP/carlos-preview-packet"
+          node - <<'NODE'
+          const fs=require('node:fs'),cp=require('node:child_process');
+          const p=process.env.CARLOS_PKT+'/bundle/';
+          const m=JSON.parse(fs.readFileSync(p+'site/__recovery__/build.json','utf8'));
+          if(m.sourceSha!==process.env.SOURCE_SHA||m.gate!=='I6.6')throw Error('CARLOS_SOURCE_BUILD_MARKER_DRIFT');
+          for(const [archive,source] of [
+            ['backend/product-operational-domain.js','functions/product-operational-domain.js'],
+            ['site/core/policy-receipts-engine.js','orbit360-platform/core/policy-receipts-engine.js'],
+            ['site/modules/policy-receipts-v1199-bridge.js','orbit360-platform/modules/policy-receipts-v1199-bridge.js'],
+            ['site/data/store-firestore-product-operational-p0.js','orbit360-platform/data/store-firestore-product-operational-p0.js']
+          ]) if(!fs.readFileSync(p+archive).equals(cp.execFileSync('git',['show',process.env.SOURCE_SHA+':'+source])))
+            throw Error('CARLOS_SOURCE_ARCHIVE_MISMATCH:'+source);
+          if(!fs.existsSync(p+'backend/bootstrap.js')||!fs.existsSync(p+'backend/package-lock.json')||!fs.existsSync(process.env.CARLOS_PKT+'/evidence/site-manifest.sha256'))
+            throw Error('CARLOS_BACKEND_PACKET_INCOMPLETE');
+          console.log('I66_CARLOS_ARTIFACT_UNCHANGED_SOURCE_MATCH build='+m.buildId);
+          NODE
+          curl -fsSL --max-time 30 "$PREVIEW_URL/__recovery__/build.json" -o "$RUNNER_TEMP/carlos-preview-marker.json"
+          node - <<'NODE'
+          const m=require(process.env.RUNNER_TEMP+'/carlos-preview-marker.json');
+          if(m.sourceSha!==process.env.SOURCE_SHA||m.gate!=='I6.6')throw Error('CARLOS_PREVIEW_HOSTING_MARKER_DRIFT');
+          console.log('I66_CARLOS_HOSTING_PREVIEW_SOURCE_PASS');
+          NODE
+      - name: Select existing same-project LAB service account and Firebase CLI
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/carlos-preview-auth"
+          python3 - <<'PY'
+          import json,os,pathlib
+          base=pathlib.Path(os.environ['RUNNER_TEMP'])/'carlos-preview-auth';found=[]
+          for i,k in enumerate(('SA_LAB','SA_ALT','SA_DEFAULT')):
+              try:d=json.loads(os.environ.get(k,''))
+              except (ValueError,TypeError):continue
+              if d.get('type')=='service_account' and d.get('project_id')=='ays-orbit-360-lab' and d.get('private_key'):
+                  f=base/f'{i}.json';f.write_text(json.dumps(d));f.chmod(0o600);found.append(str(f))
+          if not found:raise SystemExit('I66_CARLOS_PREVIEW_AUTH_UNAVAILABLE')
+          (base/'candidates').write_text('\n'.join(found)+'\n')
+          PY
+          npm install --prefix "$RUNNER_TEMP/carlos-preview-cli" --no-save --ignore-scripts --no-audit --no-fund firebase-tools@14.10.1 >/dev/null
+          node tools/gravicentra-firebase-tools-empty-extensions-workaround-v1.mjs "$RUNNER_TEMP/carlos-preview-cli"
+          CLI="$RUNNER_TEMP/carlos-preview-cli/node_modules/firebase-tools/lib/bin/firebase.js"
+          SEL=''
+          while IFS= read -r c; do
+            if GOOGLE_APPLICATION_CREDENTIALS="$c" node "$CLI" functions:list --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/carlos-functions-before.json" 2>/dev/null; then SEL="$c";break;fi
+          done < "$RUNNER_TEMP/carlos-preview-auth/candidates"
+          test -n "$SEL"
+          cp "$SEL" "$RUNNER_TEMP/carlos-preview-auth/selected.json"
+          chmod 600 "$RUNNER_TEMP/carlos-preview-auth/selected.json"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$RUNNER_TEMP/carlos-preview-auth/selected.json" >> "$GITHUB_ENV"
+          echo "CARLOS_FIREBASE_CLI=$CLI" >> "$GITHUB_ENV"
+      - name: Stage ONLY ProductOperationalCommandPreview in isolated us-east1
+        run: |
+          set -euo pipefail
+          FROOT="$RUNNER_TEMP/carlos-preview-functions"
+          mkdir -p "$FROOT"
+          cp -a "$RUNNER_TEMP/carlos-preview-packet/bundle/backend" "$FROOT/backend"
+          (cd "$FROOT/backend" && npm ci --ignore-scripts --no-audit --no-fund >/dev/null)
+          printf '{"functions":{"source":"backend"}}\n' > "$FROOT/firebase.json"
+          node "$CARLOS_FIREBASE_CLI" deploy --only functions:orbit360ProductOperationalCommandPreview --config "$FROOT/firebase.json" --project "$PROJECT_ID" --non-interactive
+          node "$CARLOS_FIREBASE_CLI" functions:list --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/carlos-functions-after.json"
+          node - <<'NODE'
+          const j=require(process.env.RUNNER_TEMP+'/carlos-functions-after.json');
+          const rows=j.result||j.functions||[];
+          const matches=rows.filter(x=>String(x.id||x.name||x.functionName||'').split('/').at(-1)==='orbit360ProductOperationalCommandPreview');
+          if(matches.length!==1||!String(matches[0].region||matches[0].location||'').includes('us-east1'))
+            throw Error('I66_CARLOS_PREVIEW_FUNCTION_REGION_OR_READBACK_MISSING');
+          console.log('I66_CARLOS_SCOPED_FUNCTION_PREVIEW_US_EAST1_PASS');
+          console.log('I66_CARLOS_LIVE_FUNCTIONS_UNTOUCHED=true');
+          console.log('I66_CARLOS_REAL_FIRESTORE_WRITES=0');
+          NODE
