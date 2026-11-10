@@ -1,0 +1,153 @@
+# I6.6 Ops-only Preview Function: exact e898 artifact, no LIVE/Firestore writes.
+name: Gravicentra I6.6 CTA Advisor Notification Scoped Preview
+on:
+  push:
+    branches: [recovery/fase-a-clean-20260831]
+    paths:
+      - .github/workflows/gravicentra-delta-66-advisor-function-preview.yml
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: gravicentra-i66-advisor-p0-function-preview
+  cancel-in-progress: false
+jobs:
+  stage-ops-preview:
+    if: github.repository == 'paulaosoriof86/orbit360-core' && github.ref == 'refs/heads/recovery/fase-a-clean-20260831'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    env:
+      PROJECT_ID: ays-orbit-360-lab
+      SOURCE_SHA: 439ff7aebc685866c5605407dbc920fb329a552b
+      ARTIFACT_ID: '13789885477'
+      ARTIFACT_DIGEST: sha256:16bcf79be3d63fd67498194288e5131e1bf165b88ee32eff78b6dd184ce75c90
+      ARTIFACT_RUN: '42870013249'
+      EMULATOR_QA_RUN: '42870010579'
+      PREVIEW_URL: https://ays-orbit-360-lab--gi-i66-rc-42870013249-naeek9rl.web.app
+      SA_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_ALT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: 439ff7aebc685866c5605407dbc920fb329a552b
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify original source, immutable bundle and successful synthetic QA
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$SOURCE_SHA"
+          node tools/gravicentra-i6-6-advisor-payment-notification.test.cjs
+          node - <<'NODE'
+          const assert=require('node:assert/strict');
+          (async()=>{
+            const h={Authorization:'Bearer '+process.env.GH_TOKEN,Accept:'application/vnd.github+json','User-Agent':'GI-I66-Ops-P0'};
+            const base='https://api.github.com/repos/paulaosoriof86/orbit360-core/actions/';
+            const [q,b,a]=await Promise.all([
+              fetch(base+'runs/'+process.env.EMULATOR_QA_RUN,{headers:h}).then(r=>r.json()),
+              fetch(base+'runs/'+process.env.ARTIFACT_RUN,{headers:h}).then(r=>r.json()),
+              fetch(base+'artifacts/'+process.env.ARTIFACT_ID,{headers:h}).then(r=>r.json())
+            ]);
+            assert.equal(q.conclusion,'success','OPS_EMULATOR_QA_HOLD');
+            assert.equal(q.head_sha,'439ff7aebc685866c5605407dbc920fb329a552b','OPS_EMULATOR_QA_COMMIT_DRIFT');
+            assert.equal(b.conclusion,'success','OPS_PACKAGE_NOT_GREEN');
+            assert.equal(b.head_sha,process.env.SOURCE_SHA,'OPS_PACKAGE_SOURCE_DRIFT');
+            assert.equal(a.digest,process.env.ARTIFACT_DIGEST,'OPS_ARTIFACT_DIGEST_DRIFT');
+            assert.equal(a.workflow_run.id,Number(process.env.ARTIFACT_RUN),'OPS_ARTIFACT_RUN_DRIFT');
+            assert.equal(a.expired,false,'OPS_ARTIFACT_EXPIRED');
+            console.log('I66_ADVISOR_EMULATOR_16_CHECKS_SINGLE_ARTIFACT_PROOF_PASS');
+          })().catch(e=>{console.error(e.message);process.exitCode=1;});
+          NODE
+      - uses: actions/download-artifact@v4
+        with:
+          artifact-ids: 13789885477
+          run-id: 42870013249
+          github-token: ${{ github.token }}
+          path: ${{ runner.temp }}/ops-package-downloaded
+      - name: Verify one TAR and backend bytes; use original source only
+        run: |
+          set -euo pipefail
+          DL="$RUNNER_TEMP/ops-package-downloaded"
+          test "$(find "$DL" -maxdepth 3 -type f -name gi-i66-exact-package.tar.gz | wc -l)" -eq 1
+          test "$(find "$DL" -maxdepth 3 -type f -name gi-i66-exact-package.sha256 | wc -l)" -eq 1
+          TAR=$(find "$DL" -maxdepth 3 -type f -name gi-i66-exact-package.tar.gz -print -quit)
+          SUM=$(find "$DL" -maxdepth 3 -type f -name gi-i66-exact-package.sha256 -print -quit)
+          test "$(dirname "$TAR")" = "$(dirname "$SUM")"
+          test "$(sha256sum "$TAR" | awk '{print $1}')" = "$(awk '{print $1}' "$SUM")"
+          mkdir -p "$RUNNER_TEMP/ops-immutable-packet"
+          tar -xzf "$TAR" -C "$RUNNER_TEMP/ops-immutable-packet" --no-same-owner
+          export OPS_PKT="$RUNNER_TEMP/ops-immutable-packet"
+          node - <<'NODE'
+          const fs=require('node:fs'),{execFileSync}=require('node:child_process');
+          const p=process.env.OPS_PKT+'/bundle/',marker=JSON.parse(fs.readFileSync(p+'site/__recovery__/build.json'));
+          if(marker.sourceSha!==process.env.SOURCE_SHA||marker.gate!=='I6.6')throw Error('OPS_IMMUTABLE_MARKER_DRIFT');
+          for(const [target,src] of [
+            ['backend/cobros-reconciliation-domain.js','functions/cobros-reconciliation-domain.js'],
+            ['backend/notification-outbox-processor.js','functions/notification-outbox-processor.js'],
+            ['backend/ops-advisor-inbox.js','functions/ops-advisor-inbox.js'],
+            ['site/modules/cobros.js','orbit360-platform/modules/cobros.js'],
+            ['site/modules/cliente360.js','orbit360-platform/modules/cliente360.js']
+          ]){
+            const data=fs.readFileSync(p+target),source=execFileSync('git',['show',process.env.SOURCE_SHA+':'+src]);
+            if(!data.equals(source))throw Error('I66_ADVISOR_ARTIFACT_SOURCE_DRIFT:'+src);
+          }
+          if(!fs.existsSync(p+'backend/index.js')||!fs.existsSync(p+'backend/package-lock.json'))throw Error('I66_ADVISOR_PACKET_INCOMPLETE');
+          console.log('I66_ADVISOR_EXACT_BACKEND_AND_MARKER_PASS build='+marker.buildId);
+          NODE
+          curl --fail --silent --show-error --max-time 30 "$PREVIEW_URL/__recovery__/build.json" > "$RUNNER_TEMP/ops-preview-marker.json"
+          node - <<'NODE'
+          const j=require(process.env.RUNNER_TEMP+'/ops-preview-marker.json');
+          if(j.sourceSha!==process.env.SOURCE_SHA)throw Error('OPS_PREVIEW_SOURCE_DRIFT');
+          console.log('I66_ADVISOR_PREVIEW_HOSTING_SOURCE_PASS');
+          NODE
+      - name: Pick already configured LAB authority and pinned Firebase CLI
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/ops-preview-auth"
+          python3 - <<'PY'
+          import json,os,pathlib
+          root=pathlib.Path(os.environ['RUNNER_TEMP'])/'ops-preview-auth'
+          found=[]
+          for i,key in enumerate(('SA_LAB','SA_ALT','SA_DEFAULT')):
+              try: a=json.loads(os.environ.get(key,''))
+              except (ValueError,TypeError):continue
+              if a.get('type')=='service_account' and a.get('project_id')=='ays-orbit-360-lab' and a.get('private_key'):
+                  p=root/f'{i}.json';p.write_text(json.dumps(a));p.chmod(0o600);found.append(str(p))
+          if not found: raise SystemExit('I66_ADVISOR_PREVIEW_LAB_CREDENTIAL_NOT_CONFIGURED')
+          (root/'candidates').write_text('\n'.join(found)+'\n')
+          PY
+          npm install --prefix "$RUNNER_TEMP/ops-preview-cli" --no-save --ignore-scripts --no-audit --no-fund firebase-tools@14.10.1 >/dev/null
+          node tools/gravicentra-firebase-tools-empty-extensions-workaround-v1.mjs "$RUNNER_TEMP/ops-preview-cli"
+          CLI="$RUNNER_TEMP/ops-preview-cli/node_modules/firebase-tools/lib/bin/firebase.js"
+          SEL=''
+          while IFS= read -r c;do
+            if GOOGLE_APPLICATION_CREDENTIALS="$c" node "$CLI" functions:list --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/ops-functions-before.json" 2>/dev/null;then SEL="$c";break;fi
+          done < "$RUNNER_TEMP/ops-preview-auth/candidates"
+          test -n "$SEL"
+          cp "$SEL" "$RUNNER_TEMP/ops-preview-auth/selected.json"
+          chmod 600 "$RUNNER_TEMP/ops-preview-auth/selected.json"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$RUNNER_TEMP/ops-preview-auth/selected.json" >> "$GITHUB_ENV"
+          echo "OPS_FIREBASE_CLI=$CLI" >> "$GITHUB_ENV"
+      - name: Deploy only Ops Preview callable from immutable artifact
+        run: |
+          set -euo pipefail
+          FROOT="$RUNNER_TEMP/ops-preview-functions";mkdir -p "$FROOT"
+          cp -a "$RUNNER_TEMP/ops-immutable-packet/bundle/backend" "$FROOT/backend"
+          (cd "$FROOT/backend" && npm ci --ignore-scripts --no-audit --no-fund >/dev/null)
+          printf '{"functions":{"source":"backend"}}\n' > "$FROOT/firebase.json"
+          node "$OPS_FIREBASE_CLI" deploy --only functions:orbit360CobrosReconciliationCommandPreview,functions:orbit360NotificationOutboxPreviewCreated,functions:orbit360GetAdvisorOpsInboxPreview,functions:orbit360UpdateAdvisorOpsInboxStatePreview --config "$FROOT/firebase.json" --project "$PROJECT_ID" --non-interactive
+          node "$OPS_FIREBASE_CLI" functions:list --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/ops-functions-after.json"
+          node - <<'NODE'
+          const fs=require('node:fs'),j=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/ops-functions-after.json'));
+          const arr=j.result||j.functions||[];
+          if(!Array.isArray(arr)||!['orbit360CobrosReconciliationCommandPreview','orbit360NotificationOutboxPreviewCreated','orbit360GetAdvisorOpsInboxPreview','orbit360UpdateAdvisorOpsInboxStatePreview'].every(n=>arr.some(x=>String(x.id||x.name||x.functionName||'').includes(n))))
+            throw Error('OPS_PREVIEW_FUNCTION_READBACK_MISSING');
+          console.log('I66_ADVISOR_FUNCTION_PREVIEW_DEPLOY_READBACK_PASS');
+          console.log('I66_ADVISOR_REAL_LIVE_FIRESTORE_WRITES=0');
+          console.log('I66_ADVISOR_LIVE_FUNCTION_NOT_DEPLOYED');
+          NODE
