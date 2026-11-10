@@ -248,16 +248,23 @@
     "COBROS_CONCILIACION": {
       "gate": "I6.6",
       "sourceRequiredBeforeStart": true,
-      "sourceState": "WAITING_FOR_PAULA_SOURCE",
+      "sourceState": "NOV_2026_STATEMENT_INVENTORY_REGISTERED_PENDING_SHA256_AND_LIVE_READBACK",
       "mechanism": "REUSE_APPROVED_EXISTING_WRITE_CONTRACT_FROM_LINEAGE_AND_ACCEPTANCE_EVIDENCE; LOCATE POINTERS ONLY, DO_NOT REDISCOVER_ARCHITECTURE",
-      "liveClosure": "READBACK_PASS_THEN_USER_REFRESH_MUST_SHOW_UPDATED_DATA"
+      "liveClosure": "READBACK_PASS_THEN_USER_REFRESH_MUST_SHOW_UPDATED_DATA",
+      "activeSourceIntake": "artifacts/orbit360-recovery/release-control/I6_6_COBROS_CONCILIACION_SOURCE_INTAKE_20261110.json",
+      "resumeCursor": "SOURCE_INVENTORY_READBACK_PASS",
+      "nextMaterialStep": "VERIFY_RAW_SHA256_FOR_15_STATEMENTS_AND_CAPTURE_CURRENT_LIVE_RECEIPT_STATE",
+      "dataWritesAuthorizedNow": false
     },
     "COMISIONES_LIQUIDACIONES": {
       "gate": "I6.7",
       "sourceRequiredBeforeStart": true,
-      "sourceState": "WAITING_FOR_PAULA_SOURCE_OR_REUSE_ALREADY_PINNED_PLANILLAS_BY_LINEAGE_WHEN_AUTHORIZED",
+      "sourceState": "NOV_2026_COMMISSION_20_DOCUMENTS_FROM_20261107_REVIEW_REUSED_AND_OCT_HISTORICAL_FOR_COL_CEIBA",
       "mechanism": "REUSE_APPROVED_EXISTING_WRITE_CONTRACT_AND_COMMISSION_ENGINE; NO_BLIND_REIMPORT",
-      "liveClosure": "READBACK_PASS_THEN_USER_REFRESH_MUST_SHOW_UPDATED_DATA"
+      "liveClosure": "READBACK_PASS_THEN_USER_REFRESH_MUST_SHOW_UPDATED_DATA",
+      "activeSourceIntake": "artifacts/orbit360-recovery/release-control/I6_6_COBROS_CONCILIACION_SOURCE_INTAKE_20261110.json",
+      "resumeCursor": "PRIOR_PLANILLA_STUDY_RETAINED_PENDING_I6_6",
+      "dataWritesAuthorizedNow": false
     },
     "I6_8_ENABLEMENT_HISTORY_TRAINING": {
       "gate": "I6.8",
@@ -271,5 +278,12 @@
       "mechanism": "FINAL_TRANSVERSAL_ACCEPTANCE_ON_FROZEN_POSTPRODUCTION_STATE",
       "liveClosure": "FASE_A_POSTSALIDA_PRODUCTION_ACCEPTED"
     }
+  },
+  "latestEvidenceOnlyCheckpoint": {
+    "asOfGuatemala": "2026-11-10",
+    "path": "artifacts/orbit360-recovery/release-control/I6_6_COBROS_CONCILIACION_SOURCE_INTAKE_20261110.json",
+    "status": "SOURCE_INVENTORY_AND_OWNER_RULES_REGISTERED_NOT_OPERATIONAL_APPLY",
+    "scope": "I6.6/I6.7 preparatory evidence; B4-007 remains first incomplete live release gate",
+    "noNewAuthority": true
   }
 }
