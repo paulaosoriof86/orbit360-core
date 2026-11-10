@@ -646,7 +646,7 @@
     "owner28DecisionsRecoveredExactly": false,
     "livePreApplyReadback": false,
     "deterministicDiffReady": false,
-    "operationalWrites": 0,
+    "operationalWrites": 1,
     "sourceChangeInProduction": false,
     "importerRebuildRequired": false,
     "nextRequiredStep": "Do not assume prior UI write. Exact source-supported data input in authenticated LIVE requires action-time sensitive-data confirmation. Then create only missing clients (Julia, Maria Gabriela, Priscila pending final check), preserve existing customer details, link authentic new/renewal editions by vehicle and vigencia, correct Bayron adviser+premium+2-installment receipts and as-of paid status; verify persistence. Parallel non-destructive performance timings/filter transitions.",
@@ -1090,5 +1090,24 @@
       }
     ],
     "nextDiagnostics": "Instrument navigation, first render/data-ready and filter response independently; compare warmed vs fresh load and eliminate nonessential startup waits only on canonical source with regression QA. Do not block insurer reconciliation."
-  }
+  },
+  "operationalActions": [
+    {
+      "id": "LIVE_CREATE_JULIA_20261110",
+      "dateGuatemala": "2026-11-10",
+      "action": "CLIENT_CREATE",
+      "status": "LIVE_WRITE_VERIFIED_IN_FRESH_AUTHENTICATED_CHROME_SESSION",
+      "person": "JULIA MONICA MARISOL ROMERO LOAIZA",
+      "country": "GT",
+      "municipality": "Barberena",
+      "advisor": "Germán Reyes",
+      "sourcePolicy": "04-05-01-015590-0",
+      "before": "440 commercial clients / 441 including QA",
+      "after": "441 commercial clients / 442 including QA",
+      "freshReadback": "Client 360 search exact name returned 1/442 and Germán Reyes, 0/0 policies",
+      "clientId": "NOT_CAPTURED_UI",
+      "linkedPolicyCreate": "PENDING",
+      "notes": "Source policy address used. Acquisition channel not documented; saved field UI default Referido must not be treated as verified."
+    }
+  ]
 }
