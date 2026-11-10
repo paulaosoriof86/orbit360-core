@@ -7750,5 +7750,54 @@
     "possibleCause": "Monthly recurring engine using fixed-day increments is hypothesis only; not yet proven",
     "dataWrites": 0,
     "gate": "HOLD_NO_PATCH_UNTIL_CURRENT_BEFORE_MATCH_AND_SOURCE_VERIFIED"
+  },
+  "i66PwaChimeLiveRelease20261110": {
+    "id": "GI_I66_PWA_CHIME_LIVE_HOSTING_SAME_ARTIFACT_20261110",
+    "status": "LIVE_HOSTING_TRANSPORT_221_OF_221_PASS_CHROME_INSTALL_VISUAL_UAT_HOLD",
+    "releaseRun": 42882661083,
+    "result": "SUCCESS",
+    "sourceCommit": "13345caebe981940d8aae9dcbf274f44aad04deb",
+    "productArtifactId": 13792634838,
+    "productArtifactZipSha256": "0e287546a75a56afe34aaf4d77b8080c05585c864bdcf4e8e26f5d10fdc28c25",
+    "buildId": "gi-i66-13345caebe98-57f234755dc1",
+    "previewBuildRun": 42881038831,
+    "sourceChecks": {
+      "pwaSound": 55,
+      "countrySound": 18,
+      "guard": "PASS"
+    },
+    "hostingBefore": "98aeaa3975b771cb",
+    "hostingAfter": "ce8e468b936ada58",
+    "readbacks": {
+      "preview": "221/221",
+      "firebaseLive": "221/221",
+      "appAysseguros": "221/221"
+    },
+    "rollbackChannel": "gi-i66-pwarb-42882661083",
+    "rollbackPerformed": false,
+    "evidenceArtifact": {
+      "id": 13794717679,
+      "digest": "sha256:eede9565320b6f9c0b6000db44bb950843cf6cd3c1bfc8dede8cc683f55c7360"
+    },
+    "businessScope": [
+      "Gravicentra Insurance manifest and 192/512 real square PNG",
+      "PWA start and scope under same origin",
+      "Chime after user gesture only for new inbox IDs; country, tenant, user, role isolated; mute"
+    ],
+    "functionsDeployed": 0,
+    "productionDataWrites": 0,
+    "preserved": [
+      "Ops P0 LIVE e898",
+      "Advisor and Client360 LIVE 439ff7",
+      "Carlos nonrenewability LIVE 35008e"
+    ],
+    "pending": [
+      "Chromium install offer test in originating browser context",
+      "Audible real notification test",
+      "Mobile Android install and background push UAT",
+      "Make/GreenAPI and WhatsApp consent templates not activated"
+    ],
+    "legacyGate": "B4-007 CLOSED",
+    "activeGate": "I6.6"
   }
 }
