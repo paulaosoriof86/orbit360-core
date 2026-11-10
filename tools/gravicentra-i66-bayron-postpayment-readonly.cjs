@@ -1,7 +1,7 @@
 'use strict';
 /**
  * I6.6 Bayron: signed LIVE first-payment READ ONLY post-commit probe.
- * Payment 1/2 was posted by Paula Direccion (Cloud Run HTTP 200 at
+ * Payment 1/2 was posted in Paula's signed session (event role superadmin; HTTP 200 at
  * 2026-11-10 22:17:26Z). NEVER apply or reconcile any payment here.
  * This module has NO Firestore mutation, no admin Auth token minting and no
  * external payment calls. The prepayment script was superseded.
@@ -65,7 +65,7 @@ function certify(s){
   if(s.events.length!==1||txt(s.events[0].operation)!=='apply_payment'||
     txt(s.events[0].receiptId)!==K.first||
     !txt(s.events[0].actor&&s.events[0].actor.uid)||
-    txt(s.events[0].actor&&s.events[0].actor.activeRole)!=='direccion')issues.push('SIGNED_DIRECTION_EVENT_NOT_VERIFIED');
+    !['direccion','superadmin'].includes(txt(s.events[0].actor&&s.events[0].actor.activeRole).toLowerCase()))issues.push('SIGNED_PRIVILEGED_EVENT_NOT_VERIFIED');
   const source=txt(s.first&&s.first.numeroReciboFuente);
   if(source&&source!==K.sourceNumber||s.sourceMatches.length>1||
     s.sourceMatches.some(r=>r.id!==K.first)||
