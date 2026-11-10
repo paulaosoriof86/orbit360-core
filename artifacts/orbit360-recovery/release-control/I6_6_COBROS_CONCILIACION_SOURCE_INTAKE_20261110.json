@@ -545,6 +545,36 @@
       "id": "PAID_REPORT_PERIOD_EXPLICIT_EXCEPTION",
       "authority": "PAULA_DIRECT_2026_11_10",
       "rule": "Statements titled/reporting 'cobros realizados'/'primas cobradas' are actual collections performed during the explicitly stated report period; these must not be modeled as pending receivables. Cross-statement dedupe by canonical policy+edition+installment+insurer requirement and as-of precedence."
+    },
+    {
+      "id": "DEFAULT_SELLER_EXCEPTIONS_20261110",
+      "authority": "PAULA_DIRECT_2026_11_10",
+      "rule": "For all newly supplied policies whose sales adviser was not individually named as Samuel Daza or Germán Reyes, the seller/adviser is Paula Osorio. Previously frozen named exceptions retain their own assignment; never overwrite historical policy adviser from a client-wide default. Assign to the exact policy edition."
+    },
+    {
+      "id": "NET_TO_GROSS_PREMIUM_CORRECTION_20261110",
+      "authority": "PAULA_DIRECT_2026_11_10",
+      "rule": "When an authentic insurer requirement or policy net premium differs from the existing system net premium, correct the specific policy/edition/receipt net and recompute customer gross total faithfully. Include issue expenses at 5% of net EXCEPT Seguros Columna charges 0 issue expense; include the actual policy's fractional-payment surcharge and applicable IVA according to the already-approved insurer/product/rate rules and source evidence. Do not impose a guessed universal surcharge or infer an unsupported payment count. Compare final gross to authentic statement gross where statements report gross; Guatemalteca net aging explicitly reports net."
+    },
+    {
+      "id": "PAYMENT_METHOD_AND_QUOTA_COUNT_CORRECTION_20261110",
+      "authority": "PAULA_DIRECT_2026_11_10",
+      "rule": "Reconcile actual form of payment and number of installments against policy + insurer requirements + as-of statements, including Bayron Contreras exactly 2 installments of Q1,557.92 rather than 12. Preserve paid/pending dates and source precedence; no auto-confirmation of paid from a mere due date."
+    },
+    {
+      "id": "CROSS_MODULE_CARRIER_RECONCILIATION_20261110",
+      "authority": "PAULA_DIRECT_2026_11_10",
+      "rule": "Once a customer, policy edition, premium component, receipt, payment plan or collection is corrected, verify propagated effect in Policies, Clients 360, Receipts/Cartera, Cobros, Conciliaciones, relevant Renewals, dashboards and reports. Never use broad data reimport to force visual synchronization; record before/after and persisted readback."
+    },
+    {
+      "id": "MIRLET_PHONE_PRESERVE_20261110",
+      "authority": "PAULA_DIRECT_2026_11_10",
+      "rule": "Paula reports Mirlet Arely/Aracely customer phone previously updated in LIVE and considered correct. Preserve and verify exact existing phone in Client 360 before any client edit; do not overwrite it with blank, stale or another homonym's data. No new phone number was supplied this turn."
+    },
+    {
+      "id": "FINANCE_SETTLEMENT_DEFER_20261110",
+      "authority": "PAULA_DIRECT_2026_11_10",
+      "rule": "November-issued insurer commission invoices correspond to October collections and ultimately create A&S accounts receivable plus adviser commission liquidation/accounts payable in company Finance, but only AFTER policy, client, premium, receipt and insurer reconciliation are corrected and verified. Keep full linkage/amounts/commission share and invoice references documented for downstream posting; do not create finance entries now or let finance block operational update. Avoid any duplication when finance resumes."
     }
   ],
   "newlyObservedStatementEvidence": [
@@ -599,10 +629,11 @@
     "operationalWrites": 0,
     "sourceChangeInProduction": false,
     "importerRebuildRequired": false,
-    "nextRequiredStep": "Owner original attachments and Drive support now recovered. First readback existing LIVE client+policy+edition+receipt exact IDs and periods. Create only absent records through approved canonical client/policy workflow, then idempotent receipt/cobro source-supported application with current insurer as-of precedence and before/after proof. No new owner decisions needed for cases documented here. Camila current 2026/27 PDF not recovered yet but owner approved term; resolve via source reconciliation without reopening same question.",
+    "nextRequiredStep": "Connected LIVE Chrome is available. Verify client and policy exact record/edition identities for Bayron, Camila, Mirlet and recovered additional issued policies; compare source net, gross, issue surcharge, VAT, payment method and installment count; apply idempotent source-supported edits with before/after and reload. Finance downstream postings remain deferred until carrier reconciliation confirmed.",
     "insurerStatementsNativeFormatsParsed": true,
     "all35CurrentSourceRawHashesPinned": true,
-    "fourHistoricalReferenceHashesPinned": true
+    "fourHistoricalReferenceHashesPinned": true,
+    "liveTopLevelReadback": true
   },
   "periodSemantics": {
     "commissionInvoiceMonth": "2026-11",
@@ -841,5 +872,20 @@
         "sourceLibraryId": "libfile_b708dc4591e08191bcf8cc683112c9af"
       }
     ]
+  },
+  "liveViewReadback": {
+    "atGuatemala": "2026-11-10 02:00-02:15",
+    "environment": "https://app.aysseguros.com",
+    "role": "Paula Osorio / Dirección",
+    "source": "AUTHENTIC_CHROME_CONNECTED_UI",
+    "importerPolicyRecords": 1425,
+    "policyBusinessDenominatorExcludingQA": 1416,
+    "excludedQAPoliciesVisible": 9,
+    "expectedReceiptsInImporter": 1872,
+    "statementReceiptLayer": "No disponible / Sin lectura canónica confirmada",
+    "primeReconciliationLayer": "No disponible / Sin lectura canónica confirmada",
+    "businessPolicyCaseLevelPrecheck": "NOT_YET_DONE",
+    "writesMadeInThisTurn": 0,
+    "interpretation": "Dashboard totals are not proof of specific new policy existence nor of paid-state updates; exact policy/edition/receipt readback remains required."
   }
 }
