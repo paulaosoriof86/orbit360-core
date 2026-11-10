@@ -7009,5 +7009,44 @@
       "ciForChangeSkippedToAvoidFurtherPreviewReruns": true
     },
     "nextAction": "Never use new B4-005 preview artifact as canonical release; continue I6.6 existing LIVE source and read-only Drive inventory to current LIVE crossjoin."
+  },
+  "liveConcurrentOperationsPolicy20261110": {
+    "id": "GI_I6_6_LIVE_NEW_BUSINESS_CONCURRENT_HISTORICAL_DELTA_FROZEN_20261110",
+    "dateGuatemala": "2026-11-10",
+    "ownerAuthority": "Paula Osorio, Dirección GT; explícito en conversación 2026-11-10",
+    "status": "OWNER_FROZEN_OPERATING_RULE_PENDING_MECHANISM_PROOF",
+    "objective": "Permitir al equipo registrar desde ahora nuevas ventas y operaciones directamente en LIVE, mientras I6.6 actualiza cartera y pólizas históricas sin sobrescribir lo posterior.",
+    "productionBoundary": "El entorno operativo vigente sigue siendo app.aysseguros.com en el mismo Firebase/Firestore, misma candidata canónica. B4-007 OWNER_CLOSED no se reabre. Código modificado exige build, Preview y mismo artifact promovido a LIVE con guard/readback.",
+    "teamRule": {
+      "newBusiness": "Desde 2026-11-10, ingreso inmediato a LIVE de nuevas altas y movimientos operativos de todos los módulos permitidos por rol; no esperar cierre del backlog histórico.",
+      "historicalBacklog": "No pedir al equipo reintroducir ni completar en bloque los históricos hasta indicación específica de Dirección; actualización histórica I6.6 en proceso.",
+      "authority": "Un registro actual de LIVE es autoridad operativa, incluso si no estaba en los cortes documentales anteriores; una fuente histórica nunca lo reemplaza automáticamente."
+    },
+    "historicalDeltaRule": {
+      "sources": "Fuente documental exacta + identificador/versión de póliza + fecha/vigencia, antes de proponer diferencias.",
+      "baseline": "Releer siempre el objeto LIVE inmediatamente antes de cada lote/operación, no utilizar la instantánea histórica como base para escritura.",
+      "identity": "Resolver tenant, país, cliente, aseguradora, número de póliza, edición/vigencia, riesgo/vehículo, recibo y origen; no buscar solamente por nombre.",
+      "writes": "Crear solo los objetos faltantes; para registros existentes, parchear exclusivamente campos soportados por evidencia y aprobados. Nunca reemplazar colecciones/documentos completos, borrar nuevos datos, reimportar ni modificar otros países.",
+      "conflicts": "Si campo o documento fue creado/modificado en LIVE después del corte base y difiere del histórico, mantener valor LIVE y enviar únicamente ese conflicto a HOLD; no bloquear filas determinísticas independientes.",
+      "transaction": "Usar mecanismo ya aprobado con validación de precondiciones/versión en el servidor o transacción atómica. No asumir que un merge de interfaz por sí solo evita una sobrescritura concurrente.",
+      "idempotency": "ID operativo estable por identidad de edición + tipo de movimiento + evidencia; reintentos deben devolver mismo resultado, no duplicar pólizas, recibos, vehículos ni cobros.",
+      "financial": "Conservar cuotas futuras, vencidas y actuales según su fecha contractual; pago confirmado/inferido solo con evidencia válida, sin inventar fecha efectiva ni factura; pagos y cartera consistentes.",
+      "proof": "Por lote registrar readback previo, delta exacto, campo old/new, commit/idempotency key, auditoría, readback posterior en LIVE y conteo. No declarar PASS antes de hacerlo.",
+      "rollback": "Ante inconsistencias, aislar fila y revertir solo mutación atribuible al lote, jamás volver a importar snapshot completo."
+    },
+    "sequencing": [
+      "I6.6: corregir la ruta de pagos que actualmente rechaza la operación y la cadencia de recibos nuevos, guardadas sin alterar datos ya emitidos",
+      "Aplicar fuentes verificadas en lotes independientes de pólizas, contactos, riesgos, cuotas, cartera y cobros con lecturas y pruebas en LIVE",
+      "Paralelamente permitir alta diaria nueva en LIVE por el equipo; no aplicar históricos con carga de reemplazo",
+      "Al final: cruzar expedientes de Drive de clientes con documento desde julio de 2026, vigencia real y LIVE por claves completas; crear solo diferencias concluyentes",
+      "Cierre I6.6 por cobertura real, sin porcentajes inventados y con bloqueos individuales visibles"
+    ],
+    "executionState": {
+      "teamNewBusinessPermission": "AUTHORIZED_BY_DIRECTION",
+      "actualLiveConcurrentWritingProtection": "NOT_YET_VERIFIED_FOR_ALL_WRITE_PATHS",
+      "immediateHistoricWritesAfterThisDecision": 0,
+      "newSourceCommitOrLiveDeployFromThisDecision": false,
+      "pending": "La orden de operar desde ahora no equivale a certificar que todos los caminos de escritura previenen carreras; probar antes de ejecutar sincronización masiva."
+    }
   }
 }
