@@ -7047,6 +7047,53 @@
       "immediateHistoricWritesAfterThisDecision": 0,
       "newSourceCommitOrLiveDeployFromThisDecision": false,
       "pending": "La orden de operar desde ahora no equivale a certificar que todos los caminos de escritura previenen carreras; probar antes de ejecutar sincronización masiva."
+    },
+    "verifiedPhysicalEvidence": {
+      "dateGuatemala": "2026-11-10",
+      "authority": "Read-only authenticated Gravicentra Insurance LIVE on app.aysseguros.com, Paula Dirección, plus current recovery branch source blobs",
+      "livePolicies": {
+        "allVisible": 1426,
+        "qaExcluded": 9,
+        "business": 1417,
+        "activeBusiness": 224,
+        "source": "Pólizas module cards and paginated table; do not interpret 1426 as new sales"
+      },
+      "liveCobros": {
+        "confirmedRowsVisible": 5,
+        "source": "Cobros module authenticated readback; zero newly applied in this intervention"
+      },
+      "sourceConcurrencyFinding": {
+        "path": "functions/product-operational-domain.js",
+        "sha": "187efbfa9868531349154f26ec90a5e2c2ed33e8",
+        "observation": "The callable reads current documents inside Firestore transaction, but for update builds a row from current before plus mutation.payload; product store batchDurable constructs mutation payload from its locally cached full row. If that cached payload is stale, same-field newer LIVE values may be overwritten even with merge:true; transaction by itself is insufficient for historical delta safety.",
+        "clientPath": "orbit360-platform/data/store-firestore-product-operational-p0.js",
+        "clientBlob": "da7493e445b712b4434364e231ffacf296018e07",
+        "mitigationStatus": "NO_BULK_APPLY_WITH_THIS_STALE_FULL_ROW_CONTRACT; require backend compare-and-set or field-selective patch plus current-revision validation before any I6.6 historical concurrent apply",
+        "futureTeamWrites": "Continue normal LIVE operational usage, but do not assert complete concurrency protection until verified."
+      },
+      "paymentSourceFinding": {
+        "serverPath": "functions/cobros-reconciliation-domain.js",
+        "serverBlob": "5b27038d1c8380e4d2d0ed044996c1570d8c3767",
+        "transaction": "applyPayment uses per-receipt Firestore transaction, stable receipt-linked cobroId, request/event idempotency; cannot claim LIVE application while UI returned no-save toast",
+        "browserCurrentStatus": "LIVE 5 confirmed, prior failed Bayron payment not assumed applied"
+      },
+      "scheduleSourceFinding": {
+        "path": "orbit360-platform/core/primas.js",
+        "blob": "507735bbd809546f97dbb5fec166a30d68fc2c93",
+        "effect": "Due date increment uses Math.round(i*12/n), not explicit frequency; Mensual with 2 installments would generate 6-month cadence; months near day 29-31 may roll forward; keep issuer contractual dates authoritative.",
+        "mitigationStatus": "CODE_FIX_REQUIRED_PREVIEW_SAME_ARTIFACT_LIVE_BEFORE_GENERATING_NEW_RECEIPT_PLAN; never rewrite paid or existing historical schedule in bulk"
+      },
+      "guard": {
+        "runId": 42839148272,
+        "conclusion": "SUCCESS",
+        "headSha": "c95430835ba64e28c9e4786d47bf3694d4df0f43"
+      },
+      "interventions": {
+        "newOperationalWrites": 0,
+        "newPayments": 0,
+        "newSourceCodeDeploys": 0,
+        "canonicalLedgerCommits": 1
+      }
     }
   }
 }
