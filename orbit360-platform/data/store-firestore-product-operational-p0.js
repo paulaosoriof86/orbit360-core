@@ -454,9 +454,8 @@
       var previewGeneral=isB2PreviewHost();
       var input={tenantId:m.tenantId,activeRole:m.activeRole,requestId:requestId,mutations:prepared.map(function(x){
         // For existing insurer obligations, transmit only the changed fields. The server merges the patch in a Firestore transaction with the latest row; a cached complete row could erase concurrent LIVE changes.
-        var preserveConcurrentFields=x.action==='update'&&
-          (x.collection==='recibosEsperados'||x.collection==='carteraPrimas'||
-           (x.collection==='polizas'&&options.policyRenewabilityOnly===true));
+        var preserveConcurrentFields=x.action==='update'&&(x.collection==='recibosEsperados'||x.collection==='carteraPrimas')||
+          (x.action==='update'&&x.collection==='polizas'&&options.policyRenewabilityOnly===true);
         var mutation={action:x.action,collection:x.collection,id:x.id,payload:x.action==='remove'?null:clone(preserveConcurrentFields?x.payload:x.row)};
         if(x.collection==='polizas'&&x.action==='update'&&options.policyRenewabilityOnly===true){
           mutation.expectedBefore={renovable:x.prior&&Object.prototype.hasOwnProperty.call(x.prior,'renovable')?clone(x.prior.renovable):null};

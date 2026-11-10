@@ -188,7 +188,7 @@
       "id": "I6_6_CARLOS_POLICY_RENEWABILITY_ONLY_CAS_OPERATIVE_SCOPE_P0",
       "approvedByDirection": true,
       "receipt": "artifacts/orbit360-recovery/release-control/I6_6_CARLOS_NONRENEWABLE_SOURCE_QA_20261110.json",
-      "sourceStatus": "SOURCE_QA_17_OF_17_PASS_PREVIEW_AND_LIVE_HOLD_NOT_DEPLOYED",
+      "sourceStatus": "SOURCE_QA_17_OF_17_PASS_HISTORIC_SPARSE_WRITER_COMPATIBILITY_FIXED_PREVIEW_AND_LIVE_HOLD",
       "capabilityOwners": [
         "POLIZAS_PRIMARY_RUNTIME",
         "ROLE_SCOPE_RUNTIME",
@@ -216,7 +216,7 @@
         },
         {
           "path": "orbit360-platform/data/store-firestore-product-operational-p0.js",
-          "gitBlobSha": "4bebe4f61eacdc499c048bf69dfb25535d4d5c2e",
+          "gitBlobSha": "fba24bea887d31693c948663b9fcfe7fdb1c481c",
           "replaces": {
             "path": "orbit360-platform/data/store-firestore-product-operational-p0.js",
             "priorGitBlobSha": "0fc392d55599bf8388c51d1b3a5cbd8d60545803",

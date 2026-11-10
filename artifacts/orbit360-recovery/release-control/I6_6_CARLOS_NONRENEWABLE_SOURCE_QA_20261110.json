@@ -26,7 +26,7 @@
     "sourceSha256": {
       "orbit360-platform/core/policy-receipts-engine.js": "cff6b438707cc517600bf601cb507b14d5be937c0b3e5c79382fb5de9b4879ab",
       "orbit360-platform/modules/policy-receipts-v1199-bridge.js": "9b8336569fbda820d66e4f3cb8d91653ab2f32f6595b9c33991426cbeb33fa6e",
-      "orbit360-platform/data/store-firestore-product-operational-p0.js": "0d0a9efa60caefa537a7793d536d923df42583a4b42693326bc8f539f64ad795",
+      "orbit360-platform/data/store-firestore-product-operational-p0.js": "e9ad6bb55d8794d180f8b36c1e096f07ac1727a319779751fbc1e4a9583fe2ab",
       "functions/product-operational-domain.js": "705f8f5b968f129fcf1a47422aed0d1bf1767da9813510aa5346e61b16d04868"
     },
     "allowedPolicyPatch": ["renovable"],
