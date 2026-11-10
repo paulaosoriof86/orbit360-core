@@ -2232,8 +2232,9 @@
       {
         "priority": 6,
         "action": "AFTER CURRENT I6.6 SAFE LIVE CARTERA BLOCK: Google Drive AyS Guatemala/Clientes, documents created/modified July 1 through Nov 10 2026; identify latest 2026 policy for each recent client, compare policy number/insurer/term/client with LIVE, dedupe and list only ambiguous cases for manual review.",
-        "status": "FROZEN_NEXT_BLOCK_NOT_STARTED",
-        "ownerConfirmed20261110": true
+        "status": "DRIVE_SOURCE_SCAN_COMPLETE_78_PDF_HISTORICAL_JOIN_DONE_LIVE_JOIN_PENDING",
+        "ownerConfirmed20261110": true,
+        "auditPointer": "driveClientPoliciesJulyNovAudit20261110"
       }
     ],
     "sourceCodeReadback": {
@@ -2315,5 +2316,4665 @@
     "fullRoleUatCertified": false,
     "productionAcceptedFieldMeaning": "FULL_LIVE_E2E_CERTIFICATION_NOT_OPERATIONAL_LIVE_STATUS",
     "noReopenReleaseForPortfolioUpdate": true
+  },
+  "driveClientPoliciesJulyNovAudit20261110": {
+    "id": "GI_I6_6_DRIVE_CLIENTS_JULY_2026_TO_NOV_10_READ_ONLY_CENSUS_20261110",
+    "auditDateGuatemala": "2026-11-10",
+    "authority": "PAULA_DIRECTION_2026_11_10",
+    "status": "DRIVE_CONTENT_READ_AND_HISTORICAL_EXCEL_RECONCILED_LIVE_JOIN_PENDING",
+    "scope": "AyS Guatemala/Clientes first/second/third-level folders; files modified 2026-07-01 through 2026-11-10; insurer effective dates distinct from Drive modified dates",
+    "driveFolderId": "13H7zMGwFC9f1UnHyfNqzzSfFex1jJRHE",
+    "driveFolderUrl": "https://drive.google.com/drive/folders/13H7zMGwFC9f1UnHyfNqzzSfFex1jJRHE",
+    "sourceFolderCounts": {
+      "realClientDossiers": 306,
+      "rootEntries": 309,
+      "nestedSecond": 131,
+      "nestedThird": 33,
+      "foldersTraversed": 470,
+      "folderReadErrors": 0
+    },
+    "recentDocumentCounts": {
+      "modifiedFiles": 332,
+      "uniqueClientDossiers": 157,
+      "potentialPolicyPdfTextFetched": 78,
+      "extractedTextSuccess": 78,
+      "explicitNamed2026To2027": 53,
+      "otherRelevantRenewals": 14,
+      "numberOnlyOrEmissionDocs": 11,
+      "docsWithHistoricalPolicyNumberMatch": 63,
+      "docsWithoutHistoricalPolicyNumberMatch": 15,
+      "uniqueReviewedClientDossiers": 67
+    },
+    "historicalReferenceSources": [
+      "08-Polizas-16-.xlsx, noncancelled rows 530",
+      "10-Polizas-17-.xlsx, cancelled rows 205"
+    ],
+    "historicalReferenceLimit": "These September-source Excel spreadsheets are reference only: presence there does not prove policy exists in Gravicentra LIVE; absence does not prove missing in LIVE.",
+    "allRecentFilesMetadata": [
+      {
+        "fileId": "1PsA2OElV7g23t9J4XwTc4YkILGoZc8yT",
+        "client": "RICHARD ESTUARDO GARCIA CORADO",
+        "name": "RTU - Impresión SAT.pdf",
+        "lastModified": "2026-10-15T09:09:27.002Z",
+        "folder": "RICHARD ESTUARDO GARCIA CORADO"
+      },
+      {
+        "fileId": "1LwPaa6mGojSdxA9KrFSu0iQUPxIThy7v",
+        "client": "RICHARD ESTUARDO GARCIA CORADO",
+        "name": "Renovación - Universales - Gastos Médicos - 2025-2026.pdf",
+        "lastModified": "2026-10-15T09:07:02.614Z",
+        "folder": "RICHARD ESTUARDO GARCIA CORADO"
+      },
+      {
+        "fileId": "1g7H_QF4__a1riCRBBw--ZEr6zqwYCUpb",
+        "client": "Nilda Patricia Poroj Caraballo",
+        "name": "Ficohsa - Póliza de automóvil - 2025-2026.pdf",
+        "lastModified": "2026-10-25T00:03:37.931Z",
+        "folder": "Nilda Patricia Poroj Caraballo"
+      },
+      {
+        "fileId": "1A3FXmqfYwf4JdLvzvBfUjc3h5MYdUBhI",
+        "client": "Nilda Patricia Poroj Caraballo",
+        "name": "Ficohsa - Requerimiento de pago - octubre 2025.pdf",
+        "lastModified": "2026-10-25T00:02:51.403Z",
+        "folder": "Nilda Patricia Poroj Caraballo"
+      },
+      {
+        "fileId": "1jpK4siajpvm3cDm-yweEvUxGdKF-JblG",
+        "client": "Nilda Patricia Poroj Caraballo",
+        "name": "Ficohsa - Anexo de pagos fraccionados - octubre 2025.pdf",
+        "lastModified": "2026-10-25T00:01:07.701Z",
+        "folder": "Nilda Patricia Poroj Caraballo"
+      },
+      {
+        "fileId": "1EGImTVfLhaQ3yrcv5iBwVhQ5ihFWCVoR",
+        "client": "Nilda Patricia Poroj Caraballo",
+        "name": "NILDA PATRICIA POROJ CARABALLO",
+        "lastModified": "2026-10-24T19:20:02.263Z",
+        "folder": "Nilda Patricia Poroj Caraballo"
+      },
+      {
+        "fileId": "1nd9RIFuliVJRYOU2z_js3jU6M0o_roUr",
+        "client": "HENRY ELÍSEO LÓPEZ LÓPEZ",
+        "name": "Solicitud gastos médicos - Universales - Medic Centroamericano Plus - 2026-06-08.pdf",
+        "lastModified": "2026-11-01T16:20:49.595Z",
+        "folder": "HENRY ELÍSEO LÓPEZ LÓPEZ"
+      },
+      {
+        "fileId": "1Dz_qYoCG0UNpgcWUqOLz2o04KBtwQe-b",
+        "client": "JAIR ROLANDO CIFUENTES GONZALES",
+        "name": "Anexo renovación automóvil - Aseguradora de los Trabajadores - AUTO-45497 - 2026-07-09 a 2027-07-09.pdf",
+        "lastModified": "2026-11-01T18:46:07.379Z",
+        "folder": "JAIR ROLANDO CIFUENTES GONZALES"
+      },
+      {
+        "fileId": "1xZMbZZW_q1-Pcbji8pqJBtr45WbeLWKZ",
+        "client": "JOSÉ ROBERTO MAYÉN MOTA",
+        "name": "Tarjeta de Circulación.pdf",
+        "lastModified": "2026-10-15T09:08:46.560Z",
+        "folder": "JOSÉ ROBERTO MAYÉN MOTA"
+      },
+      {
+        "fileId": "10p9jOJoNjrzA1rhi_jU9i_r8ztF9_GSq",
+        "client": "JOSÉ ROBERTO MAYÉN MOTA",
+        "name": "Póliza - Mapfre - Vehículos - 2026-2027.pdf",
+        "lastModified": "2026-10-15T09:06:31.226Z",
+        "folder": "JOSÉ ROBERTO MAYÉN MOTA"
+      },
+      {
+        "fileId": "19EM3B7-nX5Ihblf_fB-SAiwmA5sUBzBd",
+        "client": "JOSÉ ROBERTO MAYÉN MOTA",
+        "name": "WhatsApp Image 2026-09-17 at 11.33.44 AM.jpeg",
+        "lastModified": "2026-09-17T16:35:14.000Z",
+        "folder": "JOSÉ ROBERTO MAYÉN MOTA"
+      },
+      {
+        "fileId": "1NswPmdkrlYWz6GxvjsU06XIOSg3Hx8sJ",
+        "client": "THELMA ARACELY URRUTIA GUDIEL",
+        "name": "1963770-316212454.pdf",
+        "lastModified": "2026-09-07T16:02:44.000Z",
+        "folder": "THELMA ARACELY URRUTIA GUDIEL"
+      },
+      {
+        "fileId": "1ChKMawDdzD4wy7PYbWzikjWx8YICWGNT",
+        "client": "THELMA ARACELY URRUTIA GUDIEL",
+        "name": "ASR32 - Bayron cid.xlsx",
+        "lastModified": "2026-09-07T16:02:44.000Z",
+        "folder": "THELMA ARACELY URRUTIA GUDIEL"
+      },
+      {
+        "fileId": "1T4sWGtl8GM_7GG_O7aLLw8Fy7ItUW_Iz",
+        "client": "THELMA ARACELY URRUTIA GUDIEL",
+        "name": "02 DPI.pdf",
+        "lastModified": "2026-09-07T16:02:43.000Z",
+        "folder": "THELMA ARACELY URRUTIA GUDIEL"
+      },
+      {
+        "fileId": "16-G5zlVtU0d_77J56E435nTd1A-chvVP",
+        "client": "THELMA ARACELY URRUTIA GUDIEL",
+        "name": "WhatsApp Image 2026-09-04 at 12.31.56 PM.jpeg",
+        "lastModified": "2026-09-07T16:02:43.000Z",
+        "folder": "THELMA ARACELY URRUTIA GUDIEL"
+      },
+      {
+        "fileId": "1Vod4HfDI2fNrkFNnXjt8Bxeispkg89TP",
+        "client": "MONICA JOSE CHAVARRIA SALAZAR",
+        "name": "Tarjeta de Circulación.pdf",
+        "lastModified": "2026-10-15T09:09:06.828Z",
+        "folder": "MONICA JOSE CHAVARRIA SALAZAR"
+      },
+      {
+        "fileId": "1ZMLEDCZ0gOvoGr35RFakpv2fhOsk4gD-",
+        "client": "MONICA JOSE CHAVARRIA SALAZAR",
+        "name": "Póliza - La Ceiba - Vehículos - 2026-2027.pdf",
+        "lastModified": "2026-10-15T05:39:44.052Z",
+        "folder": "MONICA JOSE CHAVARRIA SALAZAR"
+      },
+      {
+        "fileId": "1yd6o820GzzwEs8gI6aCHO5q0hjovFYN0",
+        "client": "MONICA JOSE CHAVARRIA SALAZAR",
+        "name": "Dpi (1).pdf",
+        "lastModified": "2026-09-03T15:16:25.000Z",
+        "folder": "MONICA JOSE CHAVARRIA SALAZAR"
+      },
+      {
+        "fileId": "1Pz9LxZrS36yw-cvMSiHCcV3GqnU1oqKb",
+        "client": "BAYRON ESTUARDO CONTRERAS PORTILLO",
+        "name": "Recibo.jpeg",
+        "lastModified": "2026-08-21T18:09:29.000Z",
+        "folder": "BAYRON ESTUARDO CONTRERAS PORTILLO"
+      },
+      {
+        "fileId": "1FgWi8KIWQmIKJn_f50xSYmiZ2A_R0Vlx",
+        "client": "BAYRON ESTUARDO CONTRERAS PORTILLO",
+        "name": "TC.pdf",
+        "lastModified": "2026-08-21T18:09:12.000Z",
+        "folder": "BAYRON ESTUARDO CONTRERAS PORTILLO"
+      },
+      {
+        "fileId": "19cbnp0SgbgG_RC3VIrs1phm0QaBcxwqV",
+        "client": "BAYRON ESTUARDO CONTRERAS PORTILLO",
+        "name": "Scan DPI Bayron.pdf",
+        "lastModified": "2026-08-21T18:07:09.000Z",
+        "folder": "BAYRON ESTUARDO CONTRERAS PORTILLO"
+      },
+      {
+        "fileId": "16GVJL8MOEaf5jG-3dKF2bONlAe-FQhzn",
+        "client": "BAYRON ESTUARDO CONTRERAS PORTILLO",
+        "name": "SOLICITUD PERSONA INDIVIDUAL -AUTO Bayron.pdf",
+        "lastModified": "2026-08-21T18:06:51.000Z",
+        "folder": "BAYRON ESTUARDO CONTRERAS PORTILLO"
+      },
+      {
+        "fileId": "1eDTCh_9eIoU-XpXbiwnad2lOmy-QOTfl",
+        "client": "BAYRON ESTUARDO CONTRERAS PORTILLO",
+        "name": "Scan DPI Bayron (1).pdf",
+        "lastModified": "2026-08-21T18:06:15.000Z",
+        "folder": "BAYRON ESTUARDO CONTRERAS PORTILLO"
+      },
+      {
+        "fileId": "1U4K7cUq6SdnRH0eSnmPByc23GJcgMVh3",
+        "client": "Priscila Areli Lopez de Leon",
+        "name": "Solicitud Mapfre Medical Pro - VFinal.pdf",
+        "lastModified": "2026-10-15T09:09:49.735Z",
+        "folder": "Priscila Areli Lopez de Leon"
+      },
+      {
+        "fileId": "14p3azXqxDNMm9d6y45935j3pWgjuFk2O",
+        "client": "Priscila Areli Lopez de Leon",
+        "name": "Cotización - MAPFRE Medical Pro - 2026-08-10.pdf",
+        "lastModified": "2026-10-15T09:07:32.305Z",
+        "folder": "Priscila Areli Lopez de Leon"
+      },
+      {
+        "fileId": "15oduSBJldXB1ulnlJo5B3boEbv7B2pb-",
+        "client": "Priscila Areli Lopez de Leon",
+        "name": "Información Requerida Persona Individual - Contratante (Asegurado).pdf",
+        "lastModified": "2026-08-19T12:21:50.000Z",
+        "folder": "Priscila Areli Lopez de Leon"
+      },
+      {
+        "fileId": "1REnY7JTIh0B7dx6aS-pO__hnFKKLBJvZ",
+        "client": "YENIFER PINEDA ZACARIAS",
+        "name": "RENOVACIÓN 1002000000099.pdf",
+        "lastModified": "2026-08-05T19:54:43.000Z",
+        "folder": "YENIFER PINEDA ZACARIAS"
+      },
+      {
+        "fileId": "1NONkvPkJNUKf5Q6-6igeKOFW9yczcki1",
+        "client": "CINDY LISBETH POROJ CARABALLO",
+        "name": "Cindy Poroj - Tarjeta de Circulación (1).pdf",
+        "lastModified": "2026-07-31T18:56:57.000Z",
+        "folder": "CINDY LISBETH POROJ CARABALLO"
+      },
+      {
+        "fileId": "1VnvUIJHI_F7l8udIyHnoxclVvVC8IRwI",
+        "client": "CINDY LISBETH POROJ CARABALLO",
+        "name": "formulario Cindy Poroj (1).pdf",
+        "lastModified": "2026-07-31T18:56:56.000Z",
+        "folder": "CINDY LISBETH POROJ CARABALLO"
+      },
+      {
+        "fileId": "1Z_CecMTLm4Lf1w7g0qT9LzzoFyTzXoWS",
+        "client": "CINDY LISBETH POROJ CARABALLO",
+        "name": "Dpi CPoroj pdf (3).pdf",
+        "lastModified": "2026-07-31T18:54:49.000Z",
+        "folder": "CINDY LISBETH POROJ CARABALLO"
+      },
+      {
+        "fileId": "1LCEw9Q1BQNAvD_r8L7yN-W64fJxv6oAe",
+        "client": "INDUSTRIA Y COMERCIO MEDITERRANEO",
+        "name": "RTU MEDITERRANEO 2026.pdf",
+        "lastModified": "2026-07-22T19:55:23.000Z",
+        "folder": "INDUSTRIA Y COMERCIO MEDITERRANEO"
+      },
+      {
+        "fileId": "1InZ0dGYdTKIanpSYFpjNR8VbzhdxMAmi",
+        "client": "INDUSTRIA Y COMERCIO MEDITERRANEO",
+        "name": "NOMBRAMIENTO NUEVO ACTUALIZADO MEDI 10 04  24.pdf",
+        "lastModified": "2026-07-14T19:54:07.000Z",
+        "folder": "INDUSTRIA Y COMERCIO MEDITERRANEO"
+      },
+      {
+        "fileId": "1dPr8WmZuNx7DnG8xrM6UmcnKX4fQPw3A",
+        "client": "INDUSTRIA Y COMERCIO MEDITERRANEO",
+        "name": "RTU MEDITERRANEO ACTULIZADO 2025.pdf",
+        "lastModified": "2026-07-14T19:54:05.000Z",
+        "folder": "INDUSTRIA Y COMERCIO MEDITERRANEO"
+      },
+      {
+        "fileId": "1Gkmq09SbERvrc09_jqddPoaSew9qeo2Z",
+        "client": "INDUSTRIA Y COMERCIO MEDITERRANEO",
+        "name": "patentes medi zona 8 sociedad y empresa.pdf",
+        "lastModified": "2026-07-14T19:54:04.000Z",
+        "folder": "INDUSTRIA Y COMERCIO MEDITERRANEO"
+      },
+      {
+        "fileId": "17ImONN_oQRBYY-WI2BwXnFHIga4kSMe0",
+        "client": "INDUSTRIA Y COMERCIO MEDITERRANEO",
+        "name": "DPI DE LUIS ESTUARDO ALVAREZ VIGENTE.pdf",
+        "lastModified": "2026-07-14T19:54:01.000Z",
+        "folder": "INDUSTRIA Y COMERCIO MEDITERRANEO"
+      },
+      {
+        "fileId": "13RT8VV1OUbNUpJXt3-S_BOZUcY0FLr9I",
+        "client": "LUIS ESTUARDO PEREZ CIFUENTES",
+        "name": "Póliza automóvil - Aseguradora Guatemalteca - AUTO-40844 - 2026-07-07 a 2027-07-07.pdf",
+        "lastModified": "2026-11-01T18:22:23.935Z",
+        "folder": "LUIS ESTUARDO PEREZ CIFUENTES"
+      },
+      {
+        "fileId": "1pUsvavJ8CVBY3t0l3W-ViJ34Yh2xDmda",
+        "client": "LUIS ESTUARDO PEREZ CIFUENTES",
+        "name": "Tarjeta de Circulación.pdf",
+        "lastModified": "2026-10-15T09:49:23.255Z",
+        "folder": "LUIS ESTUARDO PEREZ CIFUENTES"
+      },
+      {
+        "fileId": "1ifMib7qIrHgMUD2XfhSRsFmJURKvHRRu",
+        "client": "LUIS ESTUARDO PEREZ CIFUENTES",
+        "name": "ASR32 - Luis Perez.xlsx",
+        "lastModified": "2026-07-14T15:38:22.000Z",
+        "folder": "LUIS ESTUARDO PEREZ CIFUENTES"
+      },
+      {
+        "fileId": "1eoDpR5rHBad8s0f2AdMiUF7c8hBBVtpF",
+        "client": "LUIS ESTUARDO PEREZ CIFUENTES",
+        "name": "WhatsApp Image 2026-07-14 at 9.00.00 AM.jpeg",
+        "lastModified": "2026-07-14T15:38:22.000Z",
+        "folder": "LUIS ESTUARDO PEREZ CIFUENTES"
+      },
+      {
+        "fileId": "1ke2u_64dAI0dIyYyreCZKu0yVRW0OMPW",
+        "client": "LUIS ESTUARDO PEREZ CIFUENTES",
+        "name": "Whatsapp Scan 13 de julio de 2026 at 12.51.57.pdf",
+        "lastModified": "2026-07-14T15:38:22.000Z",
+        "folder": "LUIS ESTUARDO PEREZ CIFUENTES"
+      },
+      {
+        "fileId": "1TldDOlkLlefHwJk9nN4K34u0eI-JvhvF",
+        "client": "BAYRON BASILIO CALGUA LUX",
+        "name": "Póliza automóvil - Aseguradora Guatemalteca - AUTO-40798 - 2026-07-03 a 2027-07-03.pdf",
+        "lastModified": "2026-11-01T18:25:57.230Z",
+        "folder": "BAYRON BASILIO CALGUA LUX"
+      },
+      {
+        "fileId": "1qInalJmi7FabSvBRRd1Mp9M3Ghd950TF",
+        "client": "BAYRON BASILIO CALGUA LUX",
+        "name": "DPI.pdf",
+        "lastModified": "2026-07-08T15:27:48.000Z",
+        "folder": "BAYRON BASILIO CALGUA LUX"
+      },
+      {
+        "fileId": "1IhLjFt0TM6TiiL-qNtfQjh4WCtnkvcYy",
+        "client": "BAYRON BASILIO CALGUA LUX",
+        "name": "WhatsApp Image 2026-07-08 at 10.02.48 AM.jpeg",
+        "lastModified": "2026-07-08T15:27:48.000Z",
+        "folder": "BAYRON BASILIO CALGUA LUX"
+      },
+      {
+        "fileId": "1t55lJwmzWoQzjFHJulDlulyFa9u6GOGF",
+        "client": "BAYRON BASILIO CALGUA LUX",
+        "name": "ASR32 - Bayron.xlsx",
+        "lastModified": "2026-07-08T15:27:47.000Z",
+        "folder": "BAYRON BASILIO CALGUA LUX"
+      },
+      {
+        "fileId": "12WEoLYNPBZ_swVhD7D6rp0zZFMq8BxeM",
+        "client": "BAYRON BASILIO CALGUA LUX",
+        "name": "FacturaEGGSA-20260518.pdf",
+        "lastModified": "2026-07-08T15:27:47.000Z",
+        "folder": "BAYRON BASILIO CALGUA LUX"
+      },
+      {
+        "fileId": "14RhHZcJRmoPeYeNvkQcBYZA2FG3H84F8",
+        "client": "JAVIER ENRIQUE MARTINEZ ALVA",
+        "name": "Tarjeta de Circulación - 2026-03-27.pdf",
+        "lastModified": "2026-10-15T05:39:10.547Z",
+        "folder": "JAVIER ENRIQUE MARTINEZ ALVA"
+      },
+      {
+        "fileId": "1tS6OaFclLD2ACaT-hi-g-xrM7l0bDYUS",
+        "client": "JAVIER ENRIQUE MARTINEZ ALVA",
+        "name": "Tarjeta de Circulación - 2026-03-19.pdf",
+        "lastModified": "2026-10-15T05:38:39.686Z",
+        "folder": "JAVIER ENRIQUE MARTINEZ ALVA"
+      },
+      {
+        "fileId": "1W6KMQ4D0Yxj8Xt-A_BPCCMCIuSiMAzaL",
+        "client": "JAVIER ENRIQUE MARTINEZ ALVA",
+        "name": "WhatsApp Image 2026-07-03 at 8.27.58 AM.jpeg",
+        "lastModified": "2026-07-03T15:18:24.000Z",
+        "folder": "JAVIER ENRIQUE MARTINEZ ALVA"
+      },
+      {
+        "fileId": "1X_Fyn9J_Z6ErtlwaINaxNy8Lc-FI_VRj",
+        "client": "JAVIER ENRIQUE MARTINEZ ALVA",
+        "name": "DPI JAVIER.pdf",
+        "lastModified": "2026-07-03T15:18:23.000Z",
+        "folder": "JAVIER ENRIQUE MARTINEZ ALVA"
+      },
+      {
+        "fileId": "1lzggSvZzNt6megerTYbNdteqTUnSTdSr",
+        "client": "JAVIER ENRIQUE MARTINEZ ALVA",
+        "name": "WhatsApp Image 2026-07-03 at 8.27.58 AM (1).jpeg",
+        "lastModified": "2026-07-03T15:18:23.000Z",
+        "folder": "JAVIER ENRIQUE MARTINEZ ALVA"
+      },
+      {
+        "fileId": "1123739sGupD0toXjwISnuISvVjiSX4dz",
+        "client": "JAVIER ENRIQUE MARTINEZ ALVA",
+        "name": "WhatsApp Image 2026-07-03 at 8.27.59 AM.jpeg",
+        "lastModified": "2026-07-03T15:18:23.000Z",
+        "folder": "JAVIER ENRIQUE MARTINEZ ALVA"
+      },
+      {
+        "fileId": "1PZX3aBeVxSD7hx-oxxOGxlyTUSmhM6Tt",
+        "client": "JAVIER ENRIQUE MARTINEZ ALVA",
+        "name": "IMPORTADORA JM INTERNATIONAL-1.pdf",
+        "lastModified": "2026-07-03T15:18:22.000Z",
+        "folder": "JAVIER ENRIQUE MARTINEZ ALVA"
+      },
+      {
+        "fileId": "1QNaxAIDzDra_20hS6mNWmIpXI8Y6FrIV",
+        "client": "JAVIER ENRIQUE MARTINEZ ALVA",
+        "name": "IMPORTADORA JM INTERNATIONAL.pdf",
+        "lastModified": "2026-07-03T15:18:22.000Z",
+        "folder": "JAVIER ENRIQUE MARTINEZ ALVA"
+      },
+      {
+        "fileId": "1qwK_qx5hbG6Q1kezFg3qSc7EVx4lbLhb",
+        "client": "JAVIER ENRIQUE MARTINEZ ALVA",
+        "name": "WhatsApp Image 2026-07-03 at 8.27.58 AM (2).jpeg",
+        "lastModified": "2026-07-03T15:18:22.000Z",
+        "folder": "JAVIER ENRIQUE MARTINEZ ALVA"
+      },
+      {
+        "fileId": "1ITMHPxK9YnRLGm5nbu7sHqX2lWh0gjaR",
+        "client": "JUAN JOSÉ GUTIERREZ VALLE",
+        "name": "Informe inspección automóvil - No 55805 - 2026-06-23.pdf",
+        "lastModified": "2026-11-01T18:39:37.995Z"
+      },
+      {
+        "fileId": "1aqSLKupTYwdhnaQPMSPqv3ZhLsiAjhyS",
+        "client": "JUAN JOSÉ GUTIERREZ VALLE",
+        "name": "Dpi Juanjo_20250815_120418_0000 (1).pdf",
+        "lastModified": "2026-07-02T17:41:35.000Z"
+      },
+      {
+        "fileId": "1WC_FWKMN5zSzjrcFUmJMcG3At_ko9U5K",
+        "client": "JUAN JOSÉ GUTIERREZ VALLE",
+        "name": "tarjeta_circulacion_electronica (21).pdf",
+        "lastModified": "2026-07-02T17:41:35.000Z"
+      },
+      {
+        "fileId": "1WSewiL5TyqS__mbeXhoJwWwt039NJVNs",
+        "client": "JUAN JOSÉ GUTIERREZ VALLE",
+        "name": "ASR32 - JUAN 5.xlsx",
+        "lastModified": "2026-07-02T17:41:32.000Z"
+      },
+      {
+        "fileId": "1l5MJ1--g6eqYgW3cJoSbB5UE99D14_uJ",
+        "client": "JUAN JOSÉ GUTIERREZ VALLE",
+        "name": "Recibo luz_20260413_101727_0000 (3).pdf",
+        "lastModified": "2026-07-02T17:41:32.000Z"
+      },
+      {
+        "fileId": "1cR8TIX_xMXNFUHZKmRKi127y5eFTWaWs",
+        "client": "WALTER ISAAC ARAGON LOPEZ",
+        "name": "Tarjeta de Circulación.pdf",
+        "lastModified": "2026-10-15T09:49:57.197Z"
+      },
+      {
+        "fileId": "1xA3PEKpjDaNSKoJlssZ4HgcZBgfdB-As",
+        "client": "WENDY PAOLA VALLE LEAL DE GUTIERREZ",
+        "name": "Solicitud automóvil - El Roble - 2026-04-21.pdf",
+        "lastModified": "2026-11-01T18:43:46.939Z"
+      },
+      {
+        "fileId": "1x0dK7gsUNttTLvWHe1BwXDMnGfkqjzW1",
+        "client": "WENDY PAOLA VALLE LEAL DE GUTIERREZ",
+        "name": "ASR32 - Wendy.xlsx",
+        "lastModified": "2026-07-01T23:11:10.000Z"
+      },
+      {
+        "fileId": "1vghqJVgDSSrCWGTg3k2sKbp_a4opDGt2",
+        "client": "DANIEL ISAAC ALEMAN YORQUI",
+        "name": "DPI - Frente.jpeg",
+        "lastModified": "2026-10-15T09:53:16.864Z"
+      },
+      {
+        "fileId": "1WiZLiXccb7ctA8nAwuS_-sZbdCV8he0R",
+        "client": "DANIEL ISAAC ALEMAN YORQUI",
+        "name": "DPI - Reverso.jpeg",
+        "lastModified": "2026-10-15T09:53:02.965Z"
+      },
+      {
+        "fileId": "1cBgH387j5-zYt0TV8lL1GFOLm8ydHDnM",
+        "client": "DANIEL ISAAC ALEMAN YORQUI",
+        "name": "Póliza - Vehículos - 2026-2027.pdf",
+        "lastModified": "2026-10-15T09:51:43.249Z"
+      },
+      {
+        "fileId": "1ahVn6lAxT96UIMiYVRzyJJoM9VIsBOZ5",
+        "client": "GABRIELA ESTEFANIA PAR HERNÁNDEZ",
+        "name": "DPI - Frente.jpeg",
+        "lastModified": "2026-10-15T09:52:43.539Z"
+      },
+      {
+        "fileId": "1nyGW9wyqXvLxZyxwU_MeP_d3eR57nVd5",
+        "client": "GABRIELA ESTEFANIA PAR HERNÁNDEZ",
+        "name": "DPI - Reverso.jpeg",
+        "lastModified": "2026-10-15T09:52:22.541Z"
+      },
+      {
+        "fileId": "10xxEe5jFoYCCbkCkJa9THC7Q4o4jLMZS",
+        "client": "Daniel Alemán",
+        "name": "Cotización motocicleta - La Ceiba - TVS Apache RTR 200 4V - 2026-04-07.pdf",
+        "lastModified": "2026-11-02T17:37:34.551Z"
+      },
+      {
+        "fileId": "15si4NNZywU0y-LqjfXU5emnBVQCq2Bl_",
+        "client": "PABLO DAVID CROCKER MEDRANO",
+        "name": "DPI - Reverso.jpeg",
+        "lastModified": "2026-10-15T09:53:53.975Z"
+      },
+      {
+        "fileId": "1iLuhKqY2r5PFJ_5WssQOuWzKSm-yRZ4k",
+        "client": "PABLO DAVID CROCKER MEDRANO",
+        "name": "DPI - Frente.jpeg",
+        "lastModified": "2026-10-15T09:53:38.393Z"
+      },
+      {
+        "fileId": "1IWiB45Y0uNf_vEwMxswf9up3NC4TyzjU",
+        "client": "PABLO DAVID CROCKER MEDRANO",
+        "name": "Tarjeta de Circulación.pdf",
+        "lastModified": "2026-10-15T09:50:42.057Z"
+      },
+      {
+        "fileId": "1wcd32xVC-0F_zPEuC17IkmTTvC87A8xd",
+        "client": "KARLA IVONNE ALFARO ALVAREZ",
+        "name": "DPI KArla.pdf",
+        "lastModified": "2026-09-18T17:00:11.000Z"
+      },
+      {
+        "fileId": "1yzcf5-hXCLCw8uCk-KODTjT69L6yuMh-",
+        "client": "KARLA IVONNE ALFARO ALVAREZ",
+        "name": "Información Requerida Persona Individual - Karla.pdf",
+        "lastModified": "2026-09-18T17:00:08.000Z"
+      },
+      {
+        "fileId": "1xz9q0QlvBGbdzi-CYsh2EucPX0cjs3gB",
+        "client": "KARLA IVONNE ALFARO ALVAREZ",
+        "name": "TC Polo.jpeg",
+        "lastModified": "2026-09-18T16:59:17.000Z"
+      },
+      {
+        "fileId": "1mUe-txkto5hEgAphJRV3RxdUpjPMLM3C",
+        "client": "KARLA IVONNE ALFARO ALVAREZ",
+        "name": "DPI Back.jpeg",
+        "lastModified": "2026-09-18T16:58:31.000Z"
+      },
+      {
+        "fileId": "1LI9_PCLNg5OomO3AwHCI1mfN04ynqEau",
+        "client": "KARLA IVONNE ALFARO ALVAREZ",
+        "name": "Licencia back.jpeg",
+        "lastModified": "2026-09-18T16:58:17.000Z"
+      },
+      {
+        "fileId": "1lbU1eqywjJ9kqX7XdPozbaSo3aaA2Rko",
+        "client": "KARLA IVONNE ALFARO ALVAREZ",
+        "name": "Factura_001885189_0000496405.pdf",
+        "lastModified": "2026-09-18T11:29:58.000Z"
+      },
+      {
+        "fileId": "1K05sPAahZMJk2MXfJRlISeucFRkeKrQn",
+        "client": "KARLA IVONNE ALFARO ALVAREZ",
+        "name": "Licencia Fronto.jpeg",
+        "lastModified": "2026-09-17T23:51:04.000Z"
+      },
+      {
+        "fileId": "1erL73DpyNZjP5tIPWo03J7wrkocK4NAi",
+        "client": "KARLA IVONNE ALFARO ALVAREZ",
+        "name": "DPI Front.jpeg",
+        "lastModified": "2026-09-17T23:50:55.000Z"
+      },
+      {
+        "fileId": "1ET-yBpte2pkld5b6Nk-FgOewG-xbF8nj",
+        "client": "Vanesa Lopez Aldana",
+        "name": "Póliza automóvil - Ficohsa - AUTO-1000002899 - Audi Q5 - 2026-2027.pdf",
+        "lastModified": "2026-11-02T17:38:03.115Z"
+      },
+      {
+        "fileId": "1dZaLdg-Q8yG1lzGngp73Uu7NhvLAW8sI",
+        "client": "Vanesa Lopez Aldana",
+        "name": "Tarjeta de Circulación.pdf",
+        "lastModified": "2026-10-15T09:51:02.980Z"
+      },
+      {
+        "fileId": "1uFWbR6E4L4j0xQpABy9fHMflMyJ3rOTN",
+        "client": "CARLOS FERNANDO RECINOS VELASQUEZ",
+        "name": "Póliza - Vehículos - 2026-2027.pdf",
+        "lastModified": "2026-10-15T09:52:05.344Z"
+      },
+      {
+        "fileId": "15iR5exxLOMFIEE4Hwx3Hn9FN9oQSTnHK",
+        "client": "Manola Pinetta",
+        "name": "Licencia T.jpeg",
+        "lastModified": "2026-08-21T14:04:44.000Z"
+      },
+      {
+        "fileId": "1tmCd0xFubJk_tDCCdN8UaEPZzIpL-Fl1",
+        "client": "Manola Pinetta",
+        "name": "TC BMW.jpeg",
+        "lastModified": "2026-08-20T20:15:59.000Z"
+      },
+      {
+        "fileId": "13MWO2-uzjUp2tBWO1NpZwfI98xGQ1t7h",
+        "client": "Manola Pinetta",
+        "name": "Licencia F.jpeg",
+        "lastModified": "2026-08-20T20:15:49.000Z"
+      },
+      {
+        "fileId": "1nbwsnAxvWgqHUoa-tc2x19sJpuZriSdk",
+        "client": "JUANA ESPERANZA MUY GONZALEZ",
+        "name": "Endoso de modificación - Aseguradora General - Póliza 93243 - Mazda CX-5 - 2026-2027 - Endoso 10828-2026.pdf",
+        "lastModified": "2026-11-04T13:56:40.482Z"
+      },
+      {
+        "fileId": "1tuY66AA_5TmparyTTRf-ejq5It75Bh6d",
+        "client": "MARCO VINICIO PAYES ESCOBAR",
+        "name": "Tarjeta de Circulación.pdf",
+        "lastModified": "2026-10-15T09:51:23.243Z"
+      },
+      {
+        "fileId": "1uF9bohenRNVXdwgNW_PL7R6poSwhPuF1",
+        "client": "ELVIA LETICIA MÉNDEZ ALVAREZ",
+        "name": "Póliza automóvil - G&T - AUTO-526844 - Freightliner Cascadia 125 - 2026-2027.pdf",
+        "lastModified": "2026-11-04T16:03:55.497Z"
+      },
+      {
+        "fileId": "1SyAYlSu0Js6NnDKpgyXfJ4EkI9iTul4h",
+        "client": "JULIO ALBERTO RODRIGUEZ AGUILAR",
+        "name": "Póliza automóvil - Universales - 2025-05-29 a 2026-05-29.pdf",
+        "lastModified": "2026-11-01T02:37:05.979Z"
+      },
+      {
+        "fileId": "1bDlmWfGeQEMxI0SRu27nkf-a9QoiYgj1",
+        "client": "LEONARDO RAMIREZ BORRAYO",
+        "name": "Póliza motocicleta - El Roble - 91-8349954 - Honda CRF110A4 Adventure - 2025-2026.pdf",
+        "lastModified": "2026-11-04T16:34:27.370Z"
+      },
+      {
+        "fileId": "1DyMk3G9JmHmqHP0G5LaMXJlz6nJtoS7r",
+        "client": "EYMY MERCEDES YOLANDA MEJIA VENTUR",
+        "name": "Póliza vehículos automotores - La Ceiba - 0226123193 - Hino 268 - 2026-2027.pdf",
+        "lastModified": "2026-11-04T16:20:35.207Z"
+      },
+      {
+        "fileId": "1x-MEpXzoXrV_wdeC7-AeCGtdgJ1RRY7X",
+        "client": "ANTE VIRGINIA VELÁSQUEZ TEPAZ",
+        "name": "Factura compra microbús - 2025-12-18.pdf",
+        "lastModified": "2026-11-01T03:09:36.971Z"
+      },
+      {
+        "fileId": "1t_ooCSaZKbCvMF1_TLWsBFpR_-5UJHOh",
+        "client": "HUGO ROLANDO JUAREZ PAIZ",
+        "name": "TC Hyundai Tucson 2017.jpeg",
+        "lastModified": "2026-07-13T17:20:36.560Z"
+      },
+      {
+        "fileId": "17g7UaXOdugMAvTV32nRbIF-vnJTpYOyE",
+        "client": "Alianzas y Soluciones",
+        "name": "Formulario Autorización Cargos a Tarjeta ASSA.xlsx",
+        "lastModified": "2026-09-15T20:32:27.000Z"
+      },
+      {
+        "fileId": "1IRmGgIygdg55a9JT-S2D823cXlt-FR93",
+        "client": "EMANUEL ALEXANDER VASQUEZ MONZON",
+        "name": "Póliza automóvil - El Roble - 2026-01-15 a 2027-01-15.pdf",
+        "lastModified": "2026-11-01T03:10:10.466Z"
+      },
+      {
+        "fileId": "1ItZG53q5Z3H2O6UxMpo7XJX92CZ33DU5",
+        "client": "Juan Pablo Ruiz",
+        "name": "Póliza automóvil - La Ceiba - 0224100278 - 2025-2026.pdf",
+        "lastModified": "2026-11-04T19:02:51.745Z"
+      },
+      {
+        "fileId": "1AbKEdTqESQMYcpyHz1JjLthYqzsGiG-P",
+        "client": "Juan Pablo Ruiz",
+        "name": "Tarjeta de identificación - La Ceiba - 0224100278 - P-445KYG.pdf",
+        "lastModified": "2026-11-04T18:48:24.438Z"
+      },
+      {
+        "fileId": "1IwgJFHZWpXgAYSMn1B7idctTIXFi0bum",
+        "client": "Juan Pablo Ruiz",
+        "name": "Requerimiento de pago - La Ceiba - 0224100278 - 2025-2026.pdf",
+        "lastModified": "2026-11-04T18:47:51.982Z"
+      },
+      {
+        "fileId": "1ADfTywlOuYg2QgyvmC3jASq0P9J8QN_y",
+        "client": "KATHERINE NICOLE TEJEDA MATAS",
+        "name": "Renovación póliza automóvil - El Roble - 91-8277867 - Mazda 3 - 2026-2027 - Endoso 063396.pdf",
+        "lastModified": "2026-11-04T16:23:40.202Z"
+      },
+      {
+        "fileId": "15Kz58bTdQtFD7EqogZqRJCxjGvX3SgaI",
+        "client": "MIRYAM JULISSA MUNGUIA GIL",
+        "name": "Póliza automóvil - El Roble - 91-8326660 - Honda CR-V - 2026-2027 - Endoso 068119.pdf",
+        "lastModified": "2026-11-04T16:35:07.768Z"
+      },
+      {
+        "fileId": "1GSjM18M9DTJTSYwKAkWPQDk5L8r2J6ed",
+        "client": "JOSE JUAN MUNGUIA GIL",
+        "name": "Renovación póliza automóvil - El Roble - 91-8326659 - Mitsubishi L200 - 2026-2027 - Endoso 066710.pdf",
+        "lastModified": "2026-11-04T18:45:07.229Z"
+      },
+      {
+        "fileId": "1w_t_SUJSqB_ypPQ7vOKEZQyYrQ-ZhSaY",
+        "client": "ZOILA LORENA MUNGUIA GIL",
+        "name": "Renovación póliza automóvil - El Roble - 91-8326772 - Toyota Yaris - 2026-2027 - Endoso 063853.pdf",
+        "lastModified": "2026-11-04T19:01:53.540Z"
+      },
+      {
+        "fileId": "11x3CikoVDB9SdRrRe-3idIfLEnAouQtR",
+        "client": "PEDRO PAÚL MUNGUIA GIL",
+        "name": "Renovación póliza automóvil - El Roble - 91-8326558 - Honda CR-V - 2026-2027 - Endoso 065489.pdf",
+        "lastModified": "2026-11-04T19:02:23.068Z"
+      },
+      {
+        "fileId": "1qQO0H9blgTTeCIt1A-QKgvv9DjhI373L",
+        "client": "NILMA ETELVINA HUOX POS",
+        "name": "Póliza transporte extraurbano obligatorio - Columna - ST-16425 - 2025-12-15 a 2026-12-14.pdf",
+        "lastModified": "2026-11-01T03:13:18.583Z"
+      },
+      {
+        "fileId": "1jCdY07Gl_W_d4spGRFHlDDdTPsBjjFXK",
+        "client": "NILMA ETELVINA HUOX POS",
+        "name": "Póliza transporte extraurbano obligatorio - Columna - ST-16424 - 2025-12-15 a 2026-12-14.pdf",
+        "lastModified": "2026-11-01T03:13:13.775Z"
+      },
+      {
+        "fileId": "19QvmSf4Kw42DMO-VR8SszwC5FyG-Wr5C",
+        "client": "JOSÉ ARMANDO MENDOZA",
+        "name": "Renovación póliza automóvil - El Roble - 91-8276951 - Kia Soul - 2025-2026 - Endoso 031724.pdf",
+        "lastModified": "2026-11-04T18:49:37.557Z"
+      },
+      {
+        "fileId": "16VQxSm95FUyJQCVVGh4Uxkohth2CJE_j",
+        "client": "JOSÉ ARMANDO MENDOZA",
+        "name": "DPI Frontal.jpeg",
+        "lastModified": "2026-07-21T19:52:58.000Z"
+      },
+      {
+        "fileId": "1lnmoQd0rIGQDRM1Zxmr5WscAB3wXMkMb",
+        "client": "JOSÉ ARMANDO MENDOZA",
+        "name": "DPI T.jpeg",
+        "lastModified": "2026-07-21T19:52:48.000Z"
+      },
+      {
+        "fileId": "1uJFYeo_BOZG2MaS3QnyrfnLJ-BsWQqz7",
+        "client": "JOSÉ ARMANDO MENDOZA",
+        "name": "LC F.jpeg",
+        "lastModified": "2026-07-21T19:52:20.000Z"
+      },
+      {
+        "fileId": "1sLBfOKpBs_vk_jHmVO7k-B_r8_y4LuJO",
+        "client": "JOSÉ ARMANDO MENDOZA",
+        "name": "LC T.jpeg",
+        "lastModified": "2026-07-21T19:51:59.000Z"
+      },
+      {
+        "fileId": "1jOi-GJ4ps53GCrVZcEEWqk01g7iSO8ra",
+        "client": "JOSÉ ARMANDO MENDOZA",
+        "name": "tarjeta_circulacion_electronica 92.pdf",
+        "lastModified": "2026-07-21T19:51:13.000Z"
+      },
+      {
+        "fileId": "16YJWAfr1VrsNujZMnBERt1XalNC7V7dy",
+        "client": "WANDA STTIFANY YHOANA RIVERO PEREZ",
+        "name": "Póliza automóvil - El Roble - 91-8344741 - Mitsubishi Outlander - 2025-2026 - Endoso 997920.pdf",
+        "lastModified": "2026-11-04T16:30:15.333Z"
+      },
+      {
+        "fileId": "1n3KJmL2U-tdraV5EHeB7ATL_TIkts-dg",
+        "client": "WANDA STTIFANY YHOANA RIVERO PEREZ",
+        "name": "Renovación póliza automóvil - El Roble - 91-8344741 - Mitsubishi Outlander - 2026-2027 - Endoso 064108.pdf",
+        "lastModified": "2026-11-04T16:29:27.959Z"
+      },
+      {
+        "fileId": "1xymDTQCmSuvOAfkDoG0E1lNPbETRjyPk",
+        "client": "CARLOS MANUEL HERNÁNDEZ ALDANA",
+        "name": "Renovación póliza automóvil - Mapfre - 3002100022867 - Honda CR-V - 2025-2026 - Endoso 5.pdf",
+        "lastModified": "2026-11-04T16:02:01.124Z"
+      },
+      {
+        "fileId": "1ZqenTA7lBMxJjhxz-ahx1iH0TdLHYX65",
+        "client": "ALEXANDER ADOLFO ESCOBAR",
+        "name": "Renovación póliza automóvil - El Roble - 91-8344089 - Mitsubishi Outlander - 2025-2026 - Endoso 032248.pdf",
+        "lastModified": "2026-11-04T19:03:19.810Z"
+      },
+      {
+        "fileId": "10lCaqyilD5GjZMWY-NwbDJyqDYzEEgnQ",
+        "client": "MARIA FERNANDA CRUZ PALACIOS",
+        "name": "Póliza automóvil - Aseguradora de los Trabajadores - AUTO-46277 - Lexus IS 250 - 2025-2026.pdf",
+        "lastModified": "2026-11-04T16:34:48.704Z"
+      },
+      {
+        "fileId": "1Qz2lvJKXoebjOFSyJg3kdG49rSXIeh58",
+        "client": "JULIO LEONEL OROZCO HERNANDEZ",
+        "name": "Póliza automóvil - Aseguradora Rural - VA125-00006522 - Freightliner Columbia 120 - 2025-2026.pdf",
+        "lastModified": "2026-11-04T16:07:26.011Z"
+      },
+      {
+        "fileId": "1vF1mPGnCdegZC6pvrA6FkGSGc_CsRYb8",
+        "client": "CARMEN ELIZABETH YANTUCHE DE LA CRUZ",
+        "name": "Expediente automóvil y endosos - Aseguradora Guatemalteca - AUTO-38624 - 2025-10-27 a 2026-10-27.pdf",
+        "lastModified": "2026-11-01T03:09:50.909Z"
+      },
+      {
+        "fileId": "19Z_7QNfBpxWIPhGucAWOtqULzAxVQs6X",
+        "client": "CARMEN ELIZABETH YANTUCHE DE LA CRUZ",
+        "name": "Renovación AUTO-38624.pdf",
+        "lastModified": "2026-09-14T21:21:49.000Z"
+      },
+      {
+        "fileId": "1AokRkwt9uba2P8eh-Zb_GoZ8_TJrD39s",
+        "client": "SINDY CLARIBEL HENANDEZ AREVALO",
+        "name": "Renovación póliza automóvil - El Roble - 91-4141103 - Honda Odyssey - 2025-2026 - Endoso 990935.pdf",
+        "lastModified": "2026-11-04T18:51:56.222Z"
+      },
+      {
+        "fileId": "1XqN6uMvZWySMxCwKVQbfxqB7ORXx2fGb",
+        "client": "WILFREDO MISAEL PINEDA CRUZ",
+        "name": "Renovación AUTO-38446.pdf",
+        "lastModified": "2026-11-07T19:36:49.472Z"
+      },
+      {
+        "fileId": "1PycZac_SDcmLnF8jEYURCiyhCdITomRB",
+        "client": "WILFREDO MISAEL PINEDA CRUZ",
+        "name": "Póliza automóvil - Columna - VA-31545 - 2024-2025.pdf",
+        "lastModified": "2026-11-04T18:59:54.172Z"
+      },
+      {
+        "fileId": "1_5y-YTHsZyUIdjkkiOMT5RQ988lhJvVs",
+        "client": "FRANCISCO ANTONIO VÁSQUEZ MARTINEZ",
+        "name": "Póliza automóvil - Aseguradora Rural - VA125-00006039 - Honda Fit Sport - 2025-2026.pdf",
+        "lastModified": "2026-11-04T16:05:31.884Z"
+      },
+      {
+        "fileId": "1JAtiYeLMx6jSWImM2l_HrRQx27mlgy-s",
+        "client": "ASHLYN LILIANA AGUILAR COC",
+        "name": "Póliza automóvil - El Roble - 2026-02-16 a 2027-02-16.pdf",
+        "lastModified": "2026-11-01T02:37:42.758Z"
+      },
+      {
+        "fileId": "1vTZ4nm7SlEBZwL3RX6KGG6-HVE3o3kq-",
+        "client": "LINDA FRANCELLA FONSEA GUZMÁN",
+        "name": "Póliza transporte - La Ceiba - 2025-09-18 a 2026-09-18.pdf",
+        "lastModified": "2026-11-01T03:12:05.830Z"
+      },
+      {
+        "fileId": "1bz1y9mU70YMwxDI7ujushCA6kVMDnIhi",
+        "client": "LINDA FRANCELLA FONSEA GUZMÁN",
+        "name": "Póliza automóvil - La Ceiba - 2025-09-18 a 2026-09-18.pdf",
+        "lastModified": "2026-11-01T03:12:00.447Z"
+      },
+      {
+        "fileId": "1NjVpLivoM059E5-NtIUC0165u82vEX-f",
+        "client": "DIGITAL GROUP SOCIEDAD ANONIMA",
+        "name": "Póliza motocicleta - La Ceiba - 0225117908 - 2025-2026.pdf",
+        "lastModified": "2026-11-04T18:53:26.617Z"
+      },
+      {
+        "fileId": "1KPXLTSFEh-t6P_7bXg6LBHpjGR2vUMDz",
+        "client": "DIGITAL GROUP SOCIEDAD ANONIMA",
+        "name": "Requerimiento de pago - La Ceiba - 0225117908 - 2025-2026.pdf",
+        "lastModified": "2026-11-04T18:53:21.453Z"
+      },
+      {
+        "fileId": "1s6aVxxKDiXeLV7Cp8j3j379RBxyx7Kri",
+        "client": "DIGITAL GROUP SOCIEDAD ANONIMA",
+        "name": "Tarjeta de identificación - La Ceiba - 0225117908 - M-076LZW.pdf",
+        "lastModified": "2026-11-04T18:52:56.620Z"
+      },
+      {
+        "fileId": "1s_kMHdAPm9vzoabi8Xt7fCSiBtk-Nu2j",
+        "client": "MARÍA FERNANDA SARAVIA GUTIERREZ",
+        "name": "Póliza automóvil - El Roble - 91-0202111 - Toyota Yaris - 2025-2026 - Endoso 915637.pdf",
+        "lastModified": "2026-11-04T18:54:09.229Z"
+      },
+      {
+        "fileId": "13k28YyYCRxUFMCfrSYV32dNb8tDDk5yV",
+        "client": "LUIS ERNESTO GODOY ACEITUNO",
+        "name": "Póliza automóvil - La Ceiba - 2025-06-25 a 2026-06-25.pdf",
+        "lastModified": "2026-11-01T03:12:23.487Z"
+      },
+      {
+        "fileId": "1EErMvxVsq4simB0bgEc3_K-W5j-VabwK",
+        "client": "CARINA ELIZABETH ALVARADO",
+        "name": "Renovación póliza automóvil - El Roble - 91-8301043 - Toyota Yaris - 2024-2025 - Endoso 468467.pdf",
+        "lastModified": "2026-11-04T18:54:34.159Z"
+      },
+      {
+        "fileId": "1syzsWmi6kuMvZDaPDX9W5gjGk3hrPh_R",
+        "client": "CARINA ELIZABETH ALVARADO",
+        "name": "Póliza automóvil - El Roble - 91-8301043 - Toyota Yaris - 2025-2026 - Endoso 849936.pdf",
+        "lastModified": "2026-11-04T18:54:22.601Z"
+      },
+      {
+        "fileId": "1qh7vcF_pZYa8h1RPH80vdrQ0taM4-4Qr",
+        "client": "JOSE PABLO LOPEZ GARCIA",
+        "name": "Solicitud automóvil - Rural - 2025-08-11.pdf",
+        "lastModified": "2026-11-01T03:09:25.494Z"
+      },
+      {
+        "fileId": "1gpeZrQgMwUoJXgQ1koyV06_wXERJ6bLM",
+        "client": "JOSE PABLO LOPEZ GARCIA",
+        "name": "Solicitud automóvil - Rural - 2025-11-04.pdf",
+        "lastModified": "2026-11-01T03:09:07.580Z"
+      },
+      {
+        "fileId": "1h2gZ1H7DOj-KYHHabbYoJE6C7OPCv3bV",
+        "client": "JOSE PABLO LOPEZ GARCIA",
+        "name": "Cotización automóvil - 2025-10-31.pdf",
+        "lastModified": "2026-11-01T03:08:28.929Z"
+      },
+      {
+        "fileId": "1iYt4ay_3kZSZueDG8tQqLDovmBIiDcqN",
+        "client": "JOSE PABLO LOPEZ GARCIA",
+        "name": "Requerimientos de pago automóvil - VA-52068 - 2025-05-07 a 2026-05-07.pdf",
+        "lastModified": "2026-11-01T03:08:17.029Z"
+      },
+      {
+        "fileId": "1gsnPBFVhSKjYXgQdzt4N5n-0lzbG4Wb0",
+        "client": "ERICKA LIZETTE AGUILAR LUNA DE CASTILLO",
+        "name": "Póliza automóvil - El Roble - 91-8332808 - Toyota Yaris - 2024-2025 - Endoso 445504.pdf",
+        "lastModified": "2026-11-04T19:04:41.556Z"
+      },
+      {
+        "fileId": "1PtSrhBgr6pl7j-awW9mKflm7wN0XkGNJ",
+        "client": "ERICKA LIZETTE AGUILAR LUNA DE CASTILLO",
+        "name": "Renovación póliza automóvil - El Roble - 91-8332808 - Toyota Yaris - 2025-2026 - Endoso 783212.pdf",
+        "lastModified": "2026-11-04T18:55:23.337Z"
+      },
+      {
+        "fileId": "1QzIQMvPAFxuj5tKIYrb8eSMqBec08llM",
+        "client": "Juan Francisco Escobar",
+        "name": "Póliza automóvil - El Roble - 91-8345142 - Nissan Versa - 2025-2026 - Endoso 712907.pdf",
+        "lastModified": "2026-11-04T19:05:39.032Z"
+      },
+      {
+        "fileId": "1Ilks3-BfRdSgY2XXlSGlVL0yGLdv_yrX",
+        "client": "Juan Francisco Escobar",
+        "name": "Renovación póliza automóvil - El Roble - 91-8345142 - Nissan Versa - 2026-2027 - Endoso 063110.pdf",
+        "lastModified": "2026-11-04T18:57:18.042Z"
+      },
+      {
+        "fileId": "1-Ws8Nhm15P0VwOBx-6yQyN7wgCw_00lM",
+        "client": "Juan Francisco Escobar",
+        "name": "Póliza automóvil - El Roble - 91-9105982 - Hyundai Accent - 2026-2027 - Endoso 135654.pdf",
+        "lastModified": "2026-11-04T18:56:14.464Z"
+      },
+      {
+        "fileId": "12u9e2me4YqgB6Hvjkq0BB4yDA7RB4Ewf",
+        "client": "KEVIN WUILLIAM MARADIAGA ZELEDON",
+        "name": "Póliza vehículos automotores - Aseguradora Rural - VA125-00005733 - 2025-2026.pdf",
+        "lastModified": "2026-11-04T18:57:53.309Z"
+      },
+      {
+        "fileId": "1IyJXWtHuSFu2WAKMPWYv5OZ_h8oez39C",
+        "client": "ABNER ABRAHAM LIMA ZEPEDA",
+        "name": "tarjeta_circulacion_electronica (2).pdf",
+        "lastModified": "2026-09-07T19:17:12.000Z"
+      },
+      {
+        "fileId": "1bpUT_-yaEQMEkyKitudPiRRDAhrnCINJ",
+        "client": "ABNER ABRAHAM LIMA ZEPEDA",
+        "name": "DPI BA.jpeg",
+        "lastModified": "2026-09-07T16:16:23.000Z"
+      },
+      {
+        "fileId": "19Lf0g6GNlO8iCptww6K4FBD4sYLhW30L",
+        "client": "ABNER ABRAHAM LIMA ZEPEDA",
+        "name": "DPI FT.jpeg",
+        "lastModified": "2026-09-07T16:16:23.000Z"
+      },
+      {
+        "fileId": "1y1ObDnWtKiggoaAJ0EQiPMA9jknm-kwR",
+        "client": "ABNER ABRAHAM LIMA ZEPEDA",
+        "name": "IVE-23-PI EDITABLE Abner.xlsx",
+        "lastModified": "2026-09-07T16:16:23.000Z"
+      },
+      {
+        "fileId": "1WcxGJ4mb-es7cU9T2gt2zbhnjNVs4dkQ",
+        "client": "NAHUM WALDEMAR ALARCON GONZALEZ",
+        "name": "Renovación póliza automóvil - El Roble - 91-8322304 - Honda CR-V - 2025-2026 - Endoso 926415.pdf",
+        "lastModified": "2026-11-04T18:58:41.880Z"
+      },
+      {
+        "fileId": "1Uku56rd6nyK7j420l5sgstiDXn-a8o3_",
+        "client": "RAUL ESTUARDO FUENTES MORALES",
+        "name": "Endoso modificación vehículo - El Roble - 91-0160109 - Peugeot 207 - 2025 - Endoso 914546.pdf",
+        "lastModified": "2026-11-04T19:00:35.768Z"
+      },
+      {
+        "fileId": "1Bgj_LJrD7ToXWeR087Gr6rfhJ9g8DFn1",
+        "client": "RUTH ESTHER DE LEÓN OLIVA",
+        "name": "Póliza vehículos automotores - Universales - 02-01-488-5283-0 - 2025-2026.pdf",
+        "lastModified": "2026-11-04T18:59:07.671Z"
+      },
+      {
+        "fileId": "1qkiFbdP4lw1qMDZPvATN0wno6VAmCToG",
+        "client": "Seon Keun Kim",
+        "name": "Póliza automóvil - El Roble - 2025-07-25 a 2026-07-25.pdf",
+        "lastModified": "2026-11-01T02:39:38.028Z"
+      },
+      {
+        "fileId": "1QFUH6YfcZqIUJ8l5XiGxdJFferJn_khC",
+        "client": "Seon Keun Kim",
+        "name": "Póliza automóvil - La Ceiba - 2025-11-17 a 2026-11-17.pdf",
+        "lastModified": "2026-11-01T02:39:26.262Z"
+      },
+      {
+        "fileId": "1b2TQMfkYgxF1IaERGFiEX57BH7F446w3",
+        "client": "Gustavo Adolfo López Figueroa",
+        "name": "Póliza automóvil - La Ceiba - 2025-06-18 a 2026-06-18.pdf",
+        "lastModified": "2026-11-01T02:34:53.815Z"
+      },
+      {
+        "fileId": "1fuouvNowRFNqWTvdajKGiSqZ1dZqqf0I",
+        "client": "ROLANDO JAVIER LARIOS CALDERON",
+        "name": "Javier Larios",
+        "lastModified": "2026-10-24T19:08:22.699Z"
+      },
+      {
+        "fileId": "1DFFo_3DlG8rbeUgbJ2qzIGhpNrGzjk0b",
+        "client": "Javier Larios",
+        "name": "ASR32 - JAVIER LARIOS.xlsx",
+        "lastModified": "2026-10-19T18:09:25.000Z"
+      },
+      {
+        "fileId": "1sNWTgjI3XGBa0plCnSKTlQgq-aVL7rK1",
+        "client": "JHEFRI ISAAC RAMIREZ AGUSTÍN",
+        "name": "Póliza automóvil - Seguros G&T - AUTO-509869 - 2025-2026.pdf",
+        "lastModified": "2026-11-01T02:38:23.319Z"
+      },
+      {
+        "fileId": "1Lg2ECUSCiomFHmajOUCJp74ifz032u-3",
+        "client": "JHEFRI ISAAC RAMIREZ AGUSTÍN",
+        "name": "Póliza automóvil - Seguros G&T - AUTO-514726 - 2025-2026.pdf",
+        "lastModified": "2026-11-01T02:38:17.813Z"
+      },
+      {
+        "fileId": "16oB9uSxyySxlVAS5AF7SNdkJ4LvciRaq",
+        "client": "JOSE FERNANDO IZARA REVOLORIO",
+        "name": "Renovación póliza automóvil - El Roble - 91-8298374 - 2025-2026 - Endoso 783205.pdf",
+        "lastModified": "2026-11-05T13:54:09.277Z"
+      },
+      {
+        "fileId": "1TgOraeYMag-KSTA-ccFodWp-jTrizOT4",
+        "client": "JOSE FERNANDO IZARA REVOLORIO",
+        "name": "Renovación póliza automóvil - El Roble - 91-8298374 - 2026-2027 - Endoso 149431.pdf",
+        "lastModified": "2026-11-05T13:53:54.609Z"
+      },
+      {
+        "fileId": "1wKb7ZiSYUkR35iq8kQEffFnMRefhKNUq",
+        "client": "JOSE FERNANDO IZARA REVOLORIO",
+        "name": "Renovación póliza automóvil - El Roble - 91-8298374 - 2026-2027 - Endoso 155028.pdf",
+        "lastModified": "2026-11-05T13:52:00.513Z"
+      },
+      {
+        "fileId": "1052xPTlli07P3pSjhsngWF-Qm6Ji8Gdd",
+        "client": "Nora Delfina",
+        "name": "Renovación póliza automóvil - El Roble - 91-8282008 - 2025-2026 - Endoso 783200.pdf",
+        "lastModified": "2026-11-05T13:54:25.755Z"
+      },
+      {
+        "fileId": "1zJOpvC0eQN6u90KiXFeE3w95setGbOLj",
+        "client": "Nora Delfina",
+        "name": "Renovación póliza automóvil - El Roble - 91-8282111 - 2025-2026 - Endoso 783202.pdf",
+        "lastModified": "2026-11-05T13:54:16.527Z"
+      },
+      {
+        "fileId": "1O6bV3EPaFozehhG5S2Jq0UO3Dl55LAnv",
+        "client": "JAIRO JOSUÉ VELÁSQUEZ SICÁN",
+        "name": "Póliza automóvil - Bantrab - AUTO-44870 - 2025-2026.pdf",
+        "lastModified": "2026-11-05T13:55:05.753Z"
+      },
+      {
+        "fileId": "1cVYx2adnl8d1-r91ktdbXLQ6UNtvpSnG",
+        "client": "JAIRO JOSUÉ VELÁSQUEZ SICÁN",
+        "name": "Requerimiento de cobro - Bantrab - AUTO-44870 - AC-10039399 - 2025.pdf",
+        "lastModified": "2026-11-05T13:54:57.647Z"
+      },
+      {
+        "fileId": "1IapZMkM1JoCwta6OwYWKSPOLYbvIPaAp",
+        "client": "YURI ALEXANDER ALFARO REYES",
+        "name": "Póliza automóvil - El Roble - 91-8350646 - 2025-2026 - Endoso 813643.pdf",
+        "lastModified": "2026-11-05T13:55:34.037Z"
+      },
+      {
+        "fileId": "1K4CRuCbD9M83rVpZVRQU25xMgFG_Pw9O",
+        "client": "HEYSSEL ALICIA PALMA GUZMÁN",
+        "name": "Renovación póliza automóvil - El Roble - 91-8350368 - Hyundai Elantra - 2026-2027 - Endoso 149437.pdf",
+        "lastModified": "2026-11-04T13:55:23.687Z"
+      },
+      {
+        "fileId": "1qVeOiwLrBiPA8NetiwCVFSvtNQ4eEkoZ",
+        "client": "HEYSSEL ALICIA PALMA GUZMÁN",
+        "name": "Póliza automóvil - El Roble - 91-8350368 - Hyundai Elantra - 2025-2026 - Endoso 809797.pdf",
+        "lastModified": "2026-11-03T17:40:16.606Z"
+      },
+      {
+        "fileId": "1_A8llU-UKXQAVo0jX6Ev9IbrYkreM6Jz",
+        "client": "Adriana Oxlaj - Jairo Velásquez",
+        "name": "Renovación póliza automóvil - El Roble - 91-8346281 - 2026-2027 - Endoso 066321.pdf",
+        "lastModified": "2026-11-05T13:58:22.584Z"
+      },
+      {
+        "fileId": "1poERKeacdIg7hZf2SqlSUCzWSXI-8UET",
+        "client": "JUAN FRANCISCO VALLE ALVARADO",
+        "name": "Renovación póliza automóvil - El Roble - 91-8314685 - Mazda 3 - 2025-2026 - Endoso 783207.pdf",
+        "lastModified": "2026-11-03T17:37:30.041Z"
+      },
+      {
+        "fileId": "1q1ZJ5b31NDvWhUhXproftDn3WedsYP7p",
+        "client": "Nora lucia Hurtarte",
+        "name": "Solicitud Póliza Nueva Telesuscripcion - Kimberly.xlsx",
+        "lastModified": "2026-08-05T20:36:33.000Z"
+      },
+      {
+        "fileId": "1C8SXrsm9FM9NEhwafW0NvsJs8KZQrT79",
+        "client": "Nora lucia Hurtarte",
+        "name": "FO-PV-00-019 - BOLETA PERSONA INDIVIDUAL (6) (2) (9).xlsx",
+        "lastModified": "2026-08-05T20:36:30.000Z"
+      },
+      {
+        "fileId": "1Drhrwd_evdqpg_kQcVMuMHzHSHXxc6ad",
+        "client": "PABLO ANTONIO AGUILAR HERRERA",
+        "name": "Póliza automóvil - Columna - VA-50952 - 2025-2026.pdf",
+        "lastModified": "2026-11-05T13:57:35.016Z"
+      },
+      {
+        "fileId": "1neH81Oi_oqc8EL-uUO6BiTW-o7Qgixdz",
+        "client": "Sonia Esmeralda Velásquez Valdez",
+        "name": "Renovación póliza automóvil - El Roble - 91-8350081 - Nissan Kicks - 2026-2027 - Endoso 149435.pdf",
+        "lastModified": "2026-11-04T01:06:27.078Z"
+      },
+      {
+        "fileId": "1Sojl_OoAESHhK7W0DgDqV4gXYSNL1Mry",
+        "client": "Jose Alejandro Herrarte Gonzalez",
+        "name": "Póliza motocicleta - Columna - 2026-02-20 a 2027-02-20.pdf",
+        "lastModified": "2026-11-01T02:38:34.343Z"
+      },
+      {
+        "fileId": "1BanyBMAsTRSvsBrgyze8uqNHqN6TbTUM",
+        "client": "SILVIA ROXANA HIDALGO DE RENDEROS",
+        "name": "Póliza automóvil - El Roble - 2025-03-19 a 2026-03-19.pdf",
+        "lastModified": "2026-11-01T02:37:26.162Z"
+      },
+      {
+        "fileId": "1dsUYcAwk1GkmSprkszvlNivXo3VpQlgm",
+        "client": "SILVIA ROXANA HIDALGO DE RENDEROS",
+        "name": "Póliza automóvil - El Roble - 2025-12-22 a 2026-12-22.pdf",
+        "lastModified": "2026-11-01T02:37:20.605Z"
+      },
+      {
+        "fileId": "1gOjn2Gc50tfldLBlPR6X8hIBZHhegoPO",
+        "client": "SILVIA ROXANA HIDALGO DE RENDEROS",
+        "name": "Camioneta blanca.pdf",
+        "lastModified": "2026-07-14T19:03:27.000Z"
+      },
+      {
+        "fileId": "1Q3RYB4PYApUREfOxJlVXzjJ6-08VpZrq",
+        "client": "Sindi Aneida Sacalxot",
+        "name": "Póliza automóvil - El Roble - 91-0234395 - 2025-2026 - Endoso 833867.pdf",
+        "lastModified": "2026-11-05T13:58:51.580Z"
+      },
+      {
+        "fileId": "1wOYOFz07R5VjTE7_4bSPrnNL0xMV1na_",
+        "client": "Adán Soto",
+        "name": "Póliza automóvil - G&T - AUTO-505865 - 2025-2026.pdf",
+        "lastModified": "2026-11-05T13:59:06.257Z"
+      },
+      {
+        "fileId": "1GyPXZXRQa1YY6NZy_LXq6XzMPRF4kuMt",
+        "client": "Adán Soto",
+        "name": "Renovación póliza automóvil - G&T - AUTO-505865 - 2026-2027.pdf",
+        "lastModified": "2026-11-05T13:59:00.844Z"
+      },
+      {
+        "fileId": "140QG_0Qe1sQ8-kUDXzZ3ep2LDpkJzic0",
+        "client": "Carlos Eliu Mejia",
+        "name": "Póliza automóvil - La Ceiba - 0226123930 - 2026-2027.pdf",
+        "lastModified": "2026-11-05T14:02:10.110Z"
+      },
+      {
+        "fileId": "1VFz4Zbd4ma_88FQ73pof9gihEa2MSego",
+        "client": "Carlos Eliu Mejia",
+        "name": "Póliza automóvil - G&T - AUTO-505457 - 2025-2026.pdf",
+        "lastModified": "2026-11-05T14:01:37.356Z"
+      },
+      {
+        "fileId": "1JItLdODVFXlYEnWZNyvF9CMaFkWw7Y29",
+        "client": "Aldo Calito",
+        "name": "Póliza automóvil - Columna - VA-50810 - 2025-2026.pdf",
+        "lastModified": "2026-11-05T14:01:46.445Z"
+      },
+      {
+        "fileId": "1kwowt6djnVxiunUXI0RInC92GlpnaTNn",
+        "client": "Olivia Vicente",
+        "name": "Renovación póliza automóvil - El Roble - 91-8264237 - 2026-2027 - Endoso 064106.pdf",
+        "lastModified": "2026-11-05T14:02:18.856Z"
+      },
+      {
+        "fileId": "16Fz_kBQvapsVJU2j-oHUlahoZlIaE7VD",
+        "client": "Diego Vicente",
+        "name": "Renovación póliza automóvil - El Roble - 91-8266232 - 2026-2027 - Endoso 104199.pdf",
+        "lastModified": "2026-11-05T14:02:29.280Z"
+      },
+      {
+        "fileId": "149TRjhddLuEA9D90kcMwYd5dkw62f_qV",
+        "client": "Allan Juárez",
+        "name": "Renovación póliza automóvil - El Roble - 91-8350767 - 2026-2027 - Endoso 149439.pdf",
+        "lastModified": "2026-11-05T14:02:54.219Z"
+      },
+      {
+        "fileId": "1-QkYRaHgO2pTew6_ME9fTjh-sTDbGXoH",
+        "client": "MARIA LUISA LARIOS",
+        "name": "Requerimiento de pago - La Ceiba - 0223092797 - 2025-2026.pdf",
+        "lastModified": "2026-11-05T14:03:24.913Z"
+      },
+      {
+        "fileId": "1IM0DpqnLL2l9ww-DXOQDzB07bRjMDoK_",
+        "client": "MARIA LUISA LARIOS",
+        "name": "Póliza automóvil - La Ceiba - 0223092797 - 2025-2026.pdf",
+        "lastModified": "2026-11-05T14:03:08.476Z"
+      },
+      {
+        "fileId": "1IFBaRIjVXO-0LNGKsw9wB-3As7Lmpw4l",
+        "client": "MARIA LUISA LARIOS",
+        "name": "Renovación póliza automóvil - El Roble - 91-8278775 - 2026-2027 - Endoso 104200.pdf",
+        "lastModified": "2026-11-05T14:03:04.113Z"
+      },
+      {
+        "fileId": "1eHa2r0JQmli9OhQ9Pm-WS755ePXtYO8x",
+        "client": "ALLAN FRANCISCO PLATERO ARMAS",
+        "name": "Renovación póliza automóvil - El Roble - 91-0199961 - 2024-2025 - Endoso 432136.pdf",
+        "lastModified": "2026-11-05T14:03:36.986Z"
+      },
+      {
+        "fileId": "1SWzZf58AN7qdM6cMCO0Xj9BcqyRc6cpH",
+        "client": "ALLAN FRANCISCO PLATERO ARMAS",
+        "name": "Renovación póliza automóvil - El Roble - 91-0199961 - Mazda CX-5 - 2025-2026 - Endoso 810518.pdf",
+        "lastModified": "2026-11-03T17:46:36.380Z"
+      },
+      {
+        "fileId": "1dZvGB6msHduoWnru-6izoRybHumBDyEk",
+        "client": "SARAH ELIZABETH SALAZAR AGUIRRE",
+        "name": "Renovación póliza automóvil - El Roble - 91-8283846 - 2024-2025 - Endoso 432450.pdf",
+        "lastModified": "2026-11-05T14:03:46.052Z"
+      },
+      {
+        "fileId": "1E6E4lGJILasZ-FnMR5am5d-KTWC5q-l9",
+        "client": "ABRAHAM ESTUARDO BRAN PRADO",
+        "name": "Renovación póliza automóvil - El Roble - 91-8284180 - 2025-2026 - Endoso 809426.pdf",
+        "lastModified": "2026-11-05T14:03:55.286Z"
+      },
+      {
+        "fileId": "1RRKXhNoDywnq3PnoCCTP6TN2OAdzqRQb",
+        "client": "MARIA JOSEFA SUPE CERNA",
+        "name": "Renovación póliza automóvil - Mapfre - 3000000000371 - 2024-2025 - Endoso 6-EC.pdf",
+        "lastModified": "2026-11-05T16:01:47.491Z"
+      },
+      {
+        "fileId": "1VzFz9ou8ZJAIBP8gcTO1TIYRRHoCcejH",
+        "client": "LESVIA LIZETH LUNA HERNÁNDEZ",
+        "name": "Póliza automóvil - G&T - AUTO-474677 - 2023-2024.pdf",
+        "lastModified": "2026-11-05T16:02:39.335Z"
+      },
+      {
+        "fileId": "1ahAOdigCTVMxWjBGZ8XraQ5D8AKIseBq",
+        "client": "Andrhe Alejandro Giron Castañeda",
+        "name": "Póliza automóvil - El Roble - 91-8328760 - 2024-2025 - Endoso 367678.pdf",
+        "lastModified": "2026-11-05T16:03:29.924Z"
+      },
+      {
+        "fileId": "1e7-zb5k9UxbqZCjN5xRdW2Yofexfhvxz",
+        "client": "Walter Tizón",
+        "name": "Renovación póliza automóvil - El Roble - 91-8350489 - 2026-2027 - Endoso 149438.pdf",
+        "lastModified": "2026-11-05T16:06:30.409Z"
+      },
+      {
+        "fileId": "1qvEkouuy6xa6psUHUDJQRcnhGnsbYi1m",
+        "client": "Héctor Galván",
+        "name": "Renovación póliza automóvil - Mapfre - 3000000000357 - 2024-2025 - Endoso 7-EC.pdf",
+        "lastModified": "2026-11-05T16:07:32.170Z"
+      },
+      {
+        "fileId": "1U5FXEr8woQV0XDB3Z1KizwcO5wvVgsVP",
+        "client": "Vilma Noguera",
+        "name": "Renovación póliza automóvil - El Roble - 91-8327655 - 2026-2027 - Endoso 064107.pdf",
+        "lastModified": "2026-11-05T16:07:59.177Z"
+      },
+      {
+        "fileId": "1O9BvWe5MJRLR5INd9yBZxJNJNRwtmuwf",
+        "client": "Katherine Rodas",
+        "name": "Póliza automóvil - El Roble - 91-8326971 - 2024-2025 - Endoso 333882.pdf",
+        "lastModified": "2026-11-05T16:08:08.696Z"
+      },
+      {
+        "fileId": "11NV8kPBma-AEWNV6wBii3tgtGLxhVF7U",
+        "client": "Eduardo Rubio",
+        "name": "Renovación póliza automóvil - El Roble - 91-8326915 - 2026-2027 - Endoso 063854.pdf",
+        "lastModified": "2026-11-05T16:08:33.174Z"
+      },
+      {
+        "fileId": "1gF6ZSvDcpGrTj3u-0gtwXZ5JSzACkKsK",
+        "client": "Sayda Samayoa Dubón",
+        "name": "Póliza automóvil - Columna - VA-29079 - 2025-2026.pdf",
+        "lastModified": "2026-11-05T16:08:39.826Z"
+      },
+      {
+        "fileId": "1VP1M4Hk0DAq_Qj60i6Jn4YNUhwL-x1Ck",
+        "client": "PEDRO GONZALO OTZOY GABRIEL",
+        "name": "Renovación póliza automóvil - El Roble - 91-0184509 - 2024-2025 - Endoso 464029.pdf",
+        "lastModified": "2026-11-05T16:09:15.255Z"
+      },
+      {
+        "fileId": "1GpHllAJ7kj-tziYZ2k52_Vop61vQ-HaN",
+        "client": "Josué Morales",
+        "name": "Póliza automóvil - El Roble - 91-8332731 - 2024-2025 - Endoso 444464.pdf",
+        "lastModified": "2026-11-05T16:09:37.627Z"
+      },
+      {
+        "fileId": "155klHFXb2wQXnm2naPUz_mOMksO8bpEK",
+        "client": "ROSALINDA RAMIREZ SANTIZO",
+        "name": "Póliza automóvil - G&T - AUTO-487555 - 2024-2025.pdf",
+        "lastModified": "2026-11-05T16:09:48.835Z"
+      },
+      {
+        "fileId": "1PKsuidSxGebHKq2q8NzuaUaLDI1oIYqT",
+        "client": "ANA LUCIA LOPEZ DOMINGUEZ",
+        "name": "El Roble - Póliza 91-8335973 - Toyota Yaris - 2024-2025.pdf",
+        "lastModified": "2026-11-09T14:19:35.780Z"
+      },
+      {
+        "fileId": "1IbCgT0bXaF7MCLs_5G0NqwA48BxZGJiQ",
+        "client": "MIGUEL ENRIQUE MAYEN MOYA",
+        "name": "Renovación póliza automóvil - El Roble - 91-8318505 - 2025-2026 - Endoso 888271.pdf",
+        "lastModified": "2026-11-05T16:09:56.070Z"
+      },
+      {
+        "fileId": "1CVVhqYBUoZurXzxX04nimGqiPeoSh7dX",
+        "client": "Diego Lux",
+        "name": "Póliza automóvil - El Roble - 91-0237120 - 2025-2026 - Endoso 901096.pdf",
+        "lastModified": "2026-11-05T16:10:08.973Z"
+      },
+      {
+        "fileId": "1SV-hvnYVU4GHFiGEN6b9jR2LB_RytAvF",
+        "client": "ALLAN NOE MARTiNEZ GARCiA",
+        "name": "Renovación póliza automóvil - El Roble - 91-8301697 - 2024-2025 - Endoso 489061.pdf",
+        "lastModified": "2026-11-05T16:10:44.511Z"
+      },
+      {
+        "fileId": "1q6ZPlPXJKfZA5_AYZcMgfJ7KoSz_5Sxl",
+        "client": "ADRIEN CRISTOPHER PHILIP SOLARES MUNGUIA",
+        "name": "Póliza automóvil - El Roble - 91-8334771 - 2024-06-10 a 2025-06-10.pdf",
+        "lastModified": "2026-11-01T03:13:40.691Z"
+      },
+      {
+        "fileId": "1erANtHYLkG0vRs-LZHbUDud71aJoQTFJ",
+        "client": "VERA ALICIA GONZÁLEZ",
+        "name": "Renovación póliza automóvil - El Roble - 91-8334610 - 2025-2026 - Endoso 827776.pdf",
+        "lastModified": "2026-11-05T16:11:05.524Z"
+      },
+      {
+        "fileId": "15fbo-0flMGrlhxrwP-4Riifg--lFry4K",
+        "client": "Feliciano Chávez",
+        "name": "Renovación póliza automóvil - El Roble - 91-8334355 - 2025-2026 - Endoso 810525.pdf",
+        "lastModified": "2026-11-05T16:11:16.741Z"
+      },
+      {
+        "fileId": "15PKyj1DYSOEjHvdqBOHk8H0tWTldqc2G",
+        "client": "INVERSIONES Y DESARROLLOS J&J, SOCIEDAD ANÓNIMA",
+        "name": "Póliza automóvil - G&T - AUTO-492287 - 2024-2025.pdf",
+        "lastModified": "2026-11-05T16:11:31.707Z"
+      },
+      {
+        "fileId": "1N_BeFbfVHgpcXrWK85rycyoQCbfnM61j",
+        "client": "DULCE MARÍA FLORES GARAVITO",
+        "name": "Renovación póliza automóvil - El Roble - 91-8289098 - 2024-2025 - Endoso 554053.pdf",
+        "lastModified": "2026-11-05T18:03:53.394Z"
+      },
+      {
+        "fileId": "1kqpL-q_SpwUFCpKS2o_gCbYKK-DYgqj1",
+        "client": "DULCE MARÍA FLORES GARAVITO",
+        "name": "Renovación póliza automóvil - El Roble - 91-8289098 - 2025-2026 - Endoso 925933.pdf",
+        "lastModified": "2026-11-05T18:00:13.590Z"
+      },
+      {
+        "fileId": "1hFbvCKZZUUpxsC0ceqmqVXTrDMpEMI3s",
+        "client": "DULCE MARÍA FLORES GARAVITO",
+        "name": "Renovación póliza automóvil - El Roble - 91-8289098 - Mazda 3I Sport - 2025-2026 - Endoso 980917.pdf",
+        "lastModified": "2026-11-02T17:39:43.064Z"
+      },
+      {
+        "fileId": "1Lxo3gbvyTnUIAFsRdNO4ddmQmHkjZP4j",
+        "client": "RONALD GUILLERMO SAMAYOA PRADO",
+        "name": "Renovación póliza automóvil - El Roble - 91-8321989 - 2024-2025 - Endoso 554055.pdf",
+        "lastModified": "2026-11-05T16:11:50.621Z"
+      },
+      {
+        "fileId": "10i-iCnWyd-ey1sBHIg0uhHsjzDasnDxM",
+        "client": "Ana Patricia Batres",
+        "name": "Póliza automóvil - El Roble - 2025-08-09 a 2026-08-09.pdf",
+        "lastModified": "2026-11-01T02:39:49.784Z"
+      },
+      {
+        "fileId": "1ryQkBmyqwskVkkwPPvao9tSizokoIvmT",
+        "client": "Rosa Hernández",
+        "name": "Renovación póliza automóvil - El Roble - 91-8331591 - 2026-2027 - Endoso 149433.pdf",
+        "lastModified": "2026-11-05T16:12:25.362Z"
+      },
+      {
+        "fileId": "1vQODrFZtFwBd_NdolV0OKVt1FnCgpkqV",
+        "client": "Skipy",
+        "name": "Póliza automóvil - G&T - AUTO-490658 - 2025-2026.pdf",
+        "lastModified": "2026-11-05T16:12:37.097Z"
+      },
+      {
+        "fileId": "12BPrsGpOHaerVnrvj8wzdVyAO8JQ1Gq0",
+        "client": "Leonel Coronado",
+        "name": "Póliza automóvil - G&T - AUTO-496605 - 2024-2025.pdf",
+        "lastModified": "2026-11-05T16:14:52.703Z"
+      },
+      {
+        "fileId": "14aqzibOM7BykBtR_qW7kFhqWQYXouBRp",
+        "client": "Ricardo Oliva",
+        "name": "Renovación póliza automóvil - El Roble - 91-8324052 - 2024-2025 - Endoso 622845.pdf",
+        "lastModified": "2026-11-05T16:13:13.312Z"
+      },
+      {
+        "fileId": "1O9F-A_8Dz7uVqWbTsgba33gl3xXJIkH-",
+        "client": "KEVIN MARIO FERNANDO STEWART FLORES",
+        "name": "Póliza automóvil - El Roble - 91-8323091 - 2024-10-11 a 2025-10-11.pdf",
+        "lastModified": "2026-11-01T03:11:49.961Z"
+      },
+      {
+        "fileId": "1hgyR4QQOPxWvx4RSRN7KG2F_JnlRNbEW",
+        "client": "KEVIN MARIO FERNANDO STEWART FLORES",
+        "name": "Póliza automóvil - El Roble - 91-8324489 - 2024-11-16 a 2025-11-16.pdf",
+        "lastModified": "2026-11-01T03:11:40.328Z"
+      },
+      {
+        "fileId": "1N4KeYnhs0Tn0J6nMmxCLRgPPxFese_0u",
+        "client": "KEVIN MARIO FERNANDO STEWART FLORES",
+        "name": "Póliza automóvil - El Roble - 91-8323091 - 2025-10-11 a 2026-10-11.pdf",
+        "lastModified": "2026-11-01T03:11:36.716Z"
+      },
+      {
+        "fileId": "1jGaudPEJxmZie_k86ASMLinyM6f63Isd",
+        "client": "KEVIN MARIO FERNANDO STEWART FLORES",
+        "name": "Póliza automóvil - El Roble - 91-8324489 - 2025-11-16 a 2026-11-16.pdf",
+        "lastModified": "2026-11-01T03:11:31.634Z"
+      },
+      {
+        "fileId": "121UHCWK6NBPAb0bvS-sVpjJG0HnCKpBh",
+        "client": "IRAYDA DEL SOCORRO TINOCO MARTÍNEZ",
+        "name": "Renovación póliza automóvil - El Roble - 91-8307073 - Toyota Yaris - 2024-2025 - Endoso 622844.pdf",
+        "lastModified": "2026-11-04T16:34:09.020Z"
+      },
+      {
+        "fileId": "1Qi5yTtrpqotHfEST3p_x0fnaEwkxi0AH",
+        "client": "IRAYDA DEL SOCORRO TINOCO MARTÍNEZ",
+        "name": "Renovación póliza automóvil - Mapfre - 3002400056901 - Toyota Yaris - 2025-2026 - Endoso 1.pdf",
+        "lastModified": "2026-11-04T16:33:58.068Z"
+      },
+      {
+        "fileId": "1dB8fmIUHHUqb3UGc8L2iXuk8FQZ_oJFl",
+        "client": "WILFREDO ALEXANDER RENDEROS HIDALGO",
+        "name": "Renovación póliza automóvil - El Roble - 91-8350219 - 2026-2027 - Endoso 149436.pdf",
+        "lastModified": "2026-11-05T18:04:29.964Z"
+      },
+      {
+        "fileId": "1izjNgay-jrZ-TBW5PLMp7gqa2ThJRNJ9",
+        "client": "WILFREDO ALEXANDER RENDEROS HIDALGO",
+        "name": "Póliza automóvil - El Roble - 91-8350219 - 2025-2026 - Endoso 807245.pdf",
+        "lastModified": "2026-11-05T18:00:54.693Z"
+      },
+      {
+        "fileId": "1Gu3Fk-Yg9MDJet2-W8zaSRihSVvSJKQi",
+        "client": "ERICK FERNANDO GARAVITO",
+        "name": "Renovación AUTO-38209.pdf",
+        "lastModified": "2026-11-07T19:34:13.410Z"
+      },
+      {
+        "fileId": "10IyB5h1hv6d1jHR12i4MMBdOkgkEmH4h",
+        "client": "MIREA CAROLINA ALVARADO",
+        "name": "Renovación automóvil - El Roble - endoso 591276 - 2024-10-29 a 2025-10-29.pdf",
+        "lastModified": "2026-11-01T03:12:58.007Z"
+      },
+      {
+        "fileId": "1bwdbD8vIA7EHMAPt___jRbACyrpXNlmt",
+        "client": "MIREA CAROLINA ALVARADO",
+        "name": "Renovación automóvil - El Roble - endoso 957404 - 2025-10-29 a 2026-10-29.pdf",
+        "lastModified": "2026-11-01T03:12:45.175Z"
+      },
+      {
+        "fileId": "1Y4Jss2m_Wdv5ZfaDuPeAqtg3dGhE-_RL",
+        "client": "MIREA CAROLINA ALVARADO",
+        "name": "Renovación automóvil - El Roble - endoso 980904 - 2025-10-29 a 2026-10-29.pdf",
+        "lastModified": "2026-11-01T03:12:36.904Z"
+      },
+      {
+        "fileId": "1w0GAliXa4f_LuXQi3S_5OUUVkNGDGFhT",
+        "client": "NANCY BEATRIZ GONZALEZ TORRES",
+        "name": "Renovación póliza automóvil - El Roble - 91-8325710 - Toyota Yaris - 2024-2025 - Endoso 647436.pdf",
+        "lastModified": "2026-11-04T16:35:25.078Z"
+      },
+      {
+        "fileId": "1XzheCgReqWaPlT15-xU5klgyYJloJ1_p",
+        "client": "NANCY BEATRIZ GONZALEZ TORRES",
+        "name": "Renovación póliza automóvil - El Roble - 91-8325710 - Toyota Yaris - 2025-2026 - Endoso 031725.pdf",
+        "lastModified": "2026-11-04T16:27:53.181Z"
+      },
+      {
+        "fileId": "1fCIPV3hrOegW6YcenpRA8hE4frCgeS0E",
+        "client": "NANCY BEATRIZ GONZALEZ TORRES",
+        "name": "Endoso sustitución de vehículo - El Roble - 91-8325710 - Toyota Yaris a Honda HR-V - 2026 - Endoso 144485.pdf",
+        "lastModified": "2026-11-04T16:27:16.113Z"
+      },
+      {
+        "fileId": "1thO3iGNwcTsQpRXWbJELIVuevOoxWI-R",
+        "client": "Jonathan Enamorado",
+        "name": "tarjeta_circulacion_electronica 5 (1).pdf",
+        "lastModified": "2026-10-22T15:27:30.000Z"
+      },
+      {
+        "fileId": "1q3cpWWvsPHM6-rTwT5MSzAtPdjArrRga",
+        "client": "Jonathan Enamorado",
+        "name": "Renovación AUTO-38594.pdf",
+        "lastModified": "2026-09-14T21:19:20.000Z"
+      },
+      {
+        "fileId": "1DscqRD_ah8dejz2_k7yi1RhZfofGHxUv",
+        "client": "JESSICA PAOLA HERNANDEZ CASTAÑEDA",
+        "name": "Póliza automóvil - El Roble - 2025-02-24 a 2026-02-24.pdf",
+        "lastModified": "2026-11-01T02:38:00.788Z"
+      },
+      {
+        "fileId": "1feh-zaOO6lKMC15s_RhmiQXHvBeBk8Mg",
+        "client": "JESSICA PAOLA HERNANDEZ CASTAÑEDA",
+        "name": "Póliza automóvil - El Roble - 2026-02-24 a 2027-02-24.pdf",
+        "lastModified": "2026-11-01T02:37:53.957Z"
+      },
+      {
+        "fileId": "1HZ1VhzaRlXUCqdmkdqQnsJycEJ-vzS9V",
+        "client": "HÉCTOR RAUL ORELLANA VELÁSQUEZ",
+        "name": "Póliza automóvil - El Roble - 2026-03-02 a 2027-03-02.pdf",
+        "lastModified": "2026-11-01T02:35:55.014Z"
+      },
+      {
+        "fileId": "1ZLeplTY4ZgGa2QrfwAzNMhzx_9-eQB13",
+        "client": "Angel Fernando Muñoz",
+        "name": "DPI.docx",
+        "lastModified": "2026-09-08T21:25:24.000Z"
+      },
+      {
+        "fileId": "15RrmVdbwu4IcpynPp5mgnIvN-useGSAp",
+        "client": "CARLOS FERNANDO BETTAGLIO LÓPEZ",
+        "name": "Póliza transporte local - G&T - GTTL-47212 - 2025-2026.pdf",
+        "lastModified": "2026-11-04T01:01:50.681Z"
+      },
+      {
+        "fileId": "1Gi3AcrwxOnnA_MWP_wIzNCWKniMKKDLM",
+        "client": "CARLOS FERNANDO BETTAGLIO LÓPEZ",
+        "name": "Póliza vehículos automotores - La Ceiba - 0225118528 - International 4400 - 2025-2026.pdf",
+        "lastModified": "2026-11-03T17:34:50.613Z"
+      },
+      {
+        "fileId": "1RDH3PhbUHe_1LJnK6cI03o_WokuwLiwG",
+        "client": "NILDA PATRICIA POROJ CARABALLO",
+        "name": "Mapfre - Póliza 3002000008196 - Renovación 2024-2025.pdf",
+        "lastModified": "2026-11-09T14:19:04.449Z"
+      },
+      {
+        "fileId": "1SIU-z8rP9VbdjdImepeTr_OLg3Cp7oDp",
+        "client": "NILDA PATRICIA POROJ CARABALLO",
+        "name": "Columna - Póliza VA-48216 - Automóvil 2024-2025.pdf",
+        "lastModified": "2026-11-09T14:18:59.841Z"
+      },
+      {
+        "fileId": "1bQ5DlacBrECQHvDCNYZ7OBHPZenxq1Bm",
+        "client": "NILDA PATRICIA POROJ CARABALLO",
+        "name": "Columna - Póliza VA-48216 - Anexo modificación 143727689 - 2025.pdf",
+        "lastModified": "2026-11-09T14:18:55.997Z"
+      },
+      {
+        "fileId": "1KDJ8ntqyIYmv9PO1zIEfvSvj8YCMKsFi",
+        "client": "MIRLET ARACELY CABALLEROS MONROY",
+        "name": "Tarjeta de circulación - Honda HR-V - P-157KWT - válida hasta 2026-07-31.pdf",
+        "lastModified": "2026-11-04T16:28:43.196Z"
+      },
+      {
+        "fileId": "1_AoZnHTFYjdOZTHAkaJ4f7xonHsLW-4W",
+        "client": "MIRLET ARACELY CABALLEROS MONROY",
+        "name": "Inspección vehículo - El Roble - Honda HR-V - P-157KWT - 2025-02-14.pdf",
+        "lastModified": "2026-11-04T16:28:32.260Z"
+      },
+      {
+        "fileId": "1qJMeZUkADm-BaLokNkucKtyn6dcpPA1b",
+        "client": "MIRLET ARACELY CABALLEROS MONROY",
+        "name": "Póliza automóvil - El Roble - 2025-02-14 a 2026-02-14.pdf",
+        "lastModified": "2026-11-01T02:39:17.403Z"
+      },
+      {
+        "fileId": "12pjiNETFdqoUWAX3cd-Tdio-au-BcRMR",
+        "client": "MIRLET ARACELY CABALLEROS MONROY",
+        "name": "Póliza automóvil - El Roble - 2026-02-14 a 2027-02-14.pdf",
+        "lastModified": "2026-11-01T02:39:12.561Z"
+      },
+      {
+        "fileId": "1VZsdSpNBnuCfx4DOgDmqERM4zxxN_2dq",
+        "client": "MIRLET ARACELY CABALLEROS MONROY",
+        "name": "Recibo de Servicios.pdf",
+        "lastModified": "2026-09-30T16:14:42.000Z"
+      },
+      {
+        "fileId": "1u3tJy-PqvaFNEzOCqLBelGmlhKihqUns",
+        "client": "Heber Estrada",
+        "name": "DPI ANDREAAAA (1).pdf",
+        "lastModified": "2026-07-03T15:21:17.000Z"
+      },
+      {
+        "fileId": "1HWS2pMZ1pY1A3g96ISSHM98TEiWxbcbR",
+        "client": "Heber Estrada",
+        "name": "Licencia Hija.pdf",
+        "lastModified": "2026-07-03T15:20:28.000Z"
+      },
+      {
+        "fileId": "1iDebCkoPnzaYo7MxbvRwho4Qpud1qzcH",
+        "client": "HEBER ANDRES ESTRADA HERNANDEZ",
+        "name": "Póliza automóvil - El Roble - 2025-01-27 a 2026-01-27.pdf",
+        "lastModified": "2026-11-01T03:11:13.492Z"
+      },
+      {
+        "fileId": "1vCSFXQD5NDGYHOrT-kxPoFbiciqnLIRI",
+        "client": "RICHARD ESTUARDO GARCIA CORADO",
+        "name": "1788816404076.pdf",
+        "lastModified": "2026-09-08T15:25:05.000Z",
+        "folder": "Universales"
+      },
+      {
+        "fileId": "1A8Mq1Gwko6inAThEtp0YHVOgUck2Yj_a",
+        "client": "Osmar Josue Daniel Delcompare Acevedo",
+        "name": "Osmar Delcompare - SOLICITUD SEGURO INDIVIDUAL SEGURO TOTAL.pdf",
+        "lastModified": "2026-09-24T15:23:56.000Z",
+        "folder": "Documentos"
+      },
+      {
+        "fileId": "1_dEjKb2-qVEJA8EfpgsC3_uIPx750iwf",
+        "client": "Osmar Josue Daniel Delcompare Acevedo",
+        "name": "Solicitud Colectiva TAR Editable (1) (1) Osmar Delcompare3.pdf",
+        "lastModified": "2026-09-24T15:23:52.000Z",
+        "folder": "Documentos"
+      },
+      {
+        "fileId": "1V_tTGGaXrDH8cbFabq_9Ac7uJRIRYFnx",
+        "client": "Osmar Josue Daniel Delcompare Acevedo",
+        "name": "P-UCV-01-R-28-V1 IVE (2) (1).xlsx",
+        "lastModified": "2026-09-24T15:23:49.000Z",
+        "folder": "Documentos"
+      },
+      {
+        "fileId": "1cdkxgNJu-5ORr7FFoaTntl961M0y65RT",
+        "client": "SILVIA VANESA HERNANDEZ CAJAS",
+        "name": "Carátula póliza - Mapfre - 3002600002453 - 2026-2027.pdf",
+        "lastModified": "2026-11-01T02:11:17.540Z",
+        "folder": "RV_ MAPFRE - Emision Automatica de Poliza (3002600002453)"
+      },
+      {
+        "fileId": "1Kib4HzHz3hCR4MfV5OPEqWlmadl4DaDU",
+        "client": "THELMA ARACELY URRUTIA GUDIEL",
+        "name": "Póliza automóvil - Aseguradora Guatemalteca - AUTO-41334 - 2026-08-28 a 2027-08-28.pdf",
+        "lastModified": "2026-11-01T18:21:36.944Z",
+        "folder": "Aseguate"
+      },
+      {
+        "fileId": "1lbVQXQo8JtlrU-g1fcn3Q7n203owN5Sa",
+        "client": "BAYRON ESTUARDO CONTRERAS PORTILLO",
+        "name": "VA125-00010478 CARNET (2).pdf",
+        "lastModified": "2026-08-27T17:13:29.000Z",
+        "folder": "Rural"
+      },
+      {
+        "fileId": "1DMNU1duf8Ok3OLLOnUEpeV1cT6u1UuGw",
+        "client": "BAYRON ESTUARDO CONTRERAS PORTILLO",
+        "name": "VA125-00010478 EMISIÓN.pdf",
+        "lastModified": "2026-08-27T17:13:29.000Z",
+        "folder": "Rural"
+      },
+      {
+        "fileId": "1PdxAuUmBDnmUi_eSKeGF042Udx1XS0yl",
+        "client": "CINDY LISBETH POROJ CARABALLO",
+        "name": "Dpi CPoroj pdf (3).pdf",
+        "lastModified": "2026-07-31T18:57:23.000Z",
+        "folder": "Aceiba"
+      },
+      {
+        "fileId": "1jrn1_Wz5rh3isCjoh7WPVHSQGndGatJQ",
+        "client": "CINDY LISBETH POROJ CARABALLO",
+        "name": "Cindy Poroj - Tarjeta de Circulación (1).pdf",
+        "lastModified": "2026-07-31T18:57:22.000Z",
+        "folder": "Aceiba"
+      },
+      {
+        "fileId": "1znDA4hfnnHiZxW3j1fOz6CaC5afSmqdU",
+        "client": "CINDY LISBETH POROJ CARABALLO",
+        "name": "formulario Cindy Poroj (1).pdf",
+        "lastModified": "2026-07-31T18:57:21.000Z",
+        "folder": "Aceiba"
+      },
+      {
+        "fileId": "1KGEqXAolGOo2TpLoG0jykK9eelmLGsef",
+        "client": "INDUSTRIA Y COMERCIO MEDITERRANEO",
+        "name": "Póliza - Universales - Vehículos - 2026-2027.pdf",
+        "lastModified": "2026-10-15T09:07:56.901Z",
+        "folder": "Universales"
+      },
+      {
+        "fileId": "1luWH6R3dLXi1ncr-Pyd8qaSjDvM6OBQ0",
+        "client": "INDUSTRIA Y COMERCIO MEDITERRANEO",
+        "name": "BOLETA DE DATOS.xlsx",
+        "lastModified": "2026-10-13T22:23:29.000Z",
+        "folder": "Universales"
+      },
+      {
+        "fileId": "1dWSby9kRbEwihJBjSszVevA-4h_oOEsp",
+        "client": "INDUSTRIA Y COMERCIO MEDITERRANEO",
+        "name": "ENDOSO DE RENOVACIÓN AUTO-45497 - INDUSTRIA Y COMERCIO MEDITERRANEO, SOCIEDAD ANONIMA.pdf",
+        "lastModified": "2026-07-23T20:01:57.000Z",
+        "folder": "Bantrab"
+      },
+      {
+        "fileId": "1lDc3ktAnRklVttDV81VnCjp3h_tzXLdR",
+        "client": "BAYRON BASILIO CALGUA LUX",
+        "name": "Póliza automóvil - Aseguradora Guatemalteca - AUTO-40930 - 2026-07-14 a 2027-07-14.pdf",
+        "lastModified": "2026-11-01T18:26:54.655Z",
+        "folder": "Aseguate"
+      },
+      {
+        "fileId": "1BS6homil664yyOmGoO5holkIXWEeFa14",
+        "client": "JAVIER ENRIQUE MARTINEZ ALVA",
+        "name": "Póliza automóvil - La Ceiba - 0226127883 - 2026-07-02 a 2027-07-02.pdf",
+        "lastModified": "2026-11-01T18:30:31.069Z",
+        "folder": "Aceiba"
+      },
+      {
+        "fileId": "1RNKCA7BdVuu5Tp8HKT-H2pX1n39Mn5tG",
+        "client": "JAVIER ENRIQUE MARTINEZ ALVA",
+        "name": "Póliza automóvil - La Ceiba - 0226127898 - 2026-07-02 a 2027-07-02.pdf",
+        "lastModified": "2026-11-01T18:28:31.008Z",
+        "folder": "Aceiba"
+      },
+      {
+        "fileId": "190klEOpgtqtmUcqFqzLeVhHavlrL5gDO",
+        "client": "Manola Pinetta",
+        "name": "919115209334884.pdf",
+        "lastModified": "2026-08-24T14:59:19.000Z",
+        "folder": "Roble"
+      },
+      {
+        "fileId": "1_CNHePoP6Gq14sByHfH8RavM7lFvrXu2",
+        "client": "MARCO VINICIO PAYES ESCOBAR",
+        "name": "918321599323544.pdf",
+        "lastModified": "2026-08-11T15:35:20.000Z",
+        "folder": "Roble"
+      },
+      {
+        "fileId": "1mZdJj9Ft7nrW87Jf7Od4bMpb-1SamjJR",
+        "client": "JOSÉ VIDAL DE LA ROSA CHAJÓN",
+        "name": "AUTO-519815.pdf",
+        "lastModified": "2026-09-14T20:08:35.000Z",
+        "folder": "Renovación 2026"
+      },
+      {
+        "fileId": "1ouWNC9PtqXWxvSW4SUNUG_mvHjXc3IBJ",
+        "client": "CARMEN ELIZABETH YANTUCHE DE LA CRUZ",
+        "name": "AUTO-38624.pdf",
+        "lastModified": "2026-09-14T21:21:49.000Z",
+        "folder": "Aseguate"
+      },
+      {
+        "fileId": "1B-0qgW7tBIXN7QfDGMJeiaRrG35YMYvY",
+        "client": "ABNER ABRAHAM LIMA ZEPEDA",
+        "name": "AUTO-38111.pdf",
+        "lastModified": "2026-09-14T21:15:21.000Z",
+        "folder": "Aseguate"
+      },
+      {
+        "fileId": "1S3OO3gIuc8LVf0ZFiR8FMDwx6erFUK2T",
+        "client": "NAHUM WALDEMAR ALARCON GONZALEZ",
+        "name": "918322304322986.pdf",
+        "lastModified": "2026-08-11T15:25:42.000Z",
+        "folder": "Roble"
+      },
+      {
+        "fileId": "1y9zItCsjaw5hHUXwo19D1nJuq1bAqbQ-",
+        "client": "Katherine Pimentel",
+        "name": "918354439260197.pdf",
+        "lastModified": "2026-08-03T20:06:44.000Z",
+        "folder": "Renovación"
+      },
+      {
+        "fileId": "13XPKm5uJUi9lnzy_r1-jCqS9get42Zp0",
+        "client": "Seon Keun Kim",
+        "name": "0226129669_181954.pdf",
+        "lastModified": "2026-09-14T20:28:53.000Z",
+        "folder": "Aceiba"
+      },
+      {
+        "fileId": "17LraR_VVmCdiaA8bgalxqLZKDvOnFmf7",
+        "client": "ROLANDO JAVIER LARIOS CALDERON",
+        "name": "AUTO-40740.pdf",
+        "lastModified": "2026-07-03T16:01:44.000Z",
+        "folder": "AUTO-40740"
+      },
+      {
+        "fileId": "11kVgm7v2kihpGeaZGLdc8Bzr4vvgHNx5",
+        "client": "PERCY RONALDO CHAMALE MUÑOZ",
+        "name": "RENOVACION POLIZA NO.3002100014117.PDF",
+        "lastModified": "2026-07-15T21:16:12.000Z",
+        "folder": "Mapfre"
+      },
+      {
+        "fileId": "1c_bZLo4slmo1aKcGS9K10dr-HMlY-o5I",
+        "client": "PERCY RONALDO CHAMALE MUÑOZ",
+        "name": "ENDOSO DE RENOVACION AUTO-45580-PERCY RONALDO CHAMALE MUÑOZ.pdf",
+        "lastModified": "2026-07-14T17:11:52.000Z",
+        "folder": "Bantrab"
+      },
+      {
+        "fileId": "1BZv41ya9zPpZPS6gYeUVqy331hYu7hOW",
+        "client": "Nora lucia Hurtarte",
+        "name": "0226128439_091041.pdf",
+        "lastModified": "2026-07-29T21:57:02.000Z",
+        "folder": "Aceiba"
+      },
+      {
+        "fileId": "1lUqLTS7JfHH078D83n9T_hoo9m_Th388",
+        "client": "Nora lucia Hurtarte",
+        "name": "0225117457_162552.pdf",
+        "lastModified": "2026-07-09T19:19:26.000Z",
+        "folder": "Aceiba"
+      },
+      {
+        "fileId": "1_Wcy5cW2Q_txpezW_2ig5F2VNr7vyD0O",
+        "client": "MARIA LUISA LARIOS",
+        "name": "DPI back ma.jpeg",
+        "lastModified": "2026-09-21T18:53:45.000Z",
+        "folder": "Documentos personales"
+      },
+      {
+        "fileId": "1SDa1EHIWJUplM7-Oy9DhYTXvPYUMGclh",
+        "client": "MARIA LUISA LARIOS",
+        "name": "DPI front MA.jpeg",
+        "lastModified": "2026-09-21T18:53:44.000Z",
+        "folder": "Documentos personales"
+      },
+      {
+        "fileId": "1D0oSs_FfY-GQ2UbojWdT4Pf5LlyfMuim",
+        "client": "MARIA LUISA LARIOS",
+        "name": "Licencia front Ma.jpeg",
+        "lastModified": "2026-09-21T18:53:20.000Z",
+        "folder": "Documentos personales"
+      },
+      {
+        "fileId": "1k9sxyRY1QI_Tje30RH_isGaaIBuYqiov",
+        "client": "MARIA LUISA LARIOS",
+        "name": "Licencia M Ba.jpeg",
+        "lastModified": "2026-09-21T18:53:20.000Z",
+        "folder": "Documentos personales"
+      },
+      {
+        "fileId": "1sdRFbqbGCfPAtXvhIJp4-Ci3JWY-dOyg",
+        "client": "MARIA LUISA LARIOS",
+        "name": "factura_386458_G73129.pdf",
+        "lastModified": "2026-09-21T18:52:57.000Z",
+        "folder": "Documentos personales"
+      },
+      {
+        "fileId": "1yowgA2BBRAFgUEF1p7BQk1nIWI2cO9kH",
+        "client": "MARIA LUISA LARIOS",
+        "name": "tarjeta_circulacion_electronica (4).pdf",
+        "lastModified": "2026-09-21T18:52:57.000Z",
+        "folder": "Documentos personales"
+      },
+      {
+        "fileId": "1ZHBGuPTFN2bCCYBZjdL0yPp09FH50KPr",
+        "client": "DULCE MARÍA FLORES GARAVITO",
+        "name": "918289098322985.pdf",
+        "lastModified": "2026-08-11T15:28:40.000Z",
+        "folder": "Roble"
+      },
+      {
+        "fileId": "1xBBlDNlUUJTtrmVPxv84pEs2RkaXg0Gd",
+        "client": "ISAAC ABRAHAM MARTINEZ LIMA",
+        "name": "36207996 (1).pdf",
+        "lastModified": "2026-07-29T21:48:06.000Z",
+        "folder": "LaGeneral"
+      },
+      {
+        "fileId": "1RVcZcpJv0tQQ4yWiR_6Jegj9zD3ZDvcw",
+        "client": "EDDY JOSUE GARCIA CHINCHILLA",
+        "name": "DPI EDDY JOSUE.pdf",
+        "lastModified": "2026-09-28T15:03:15.000Z",
+        "folder": "Documentos incendio Septiembre 2026"
+      },
+      {
+        "fileId": "1R7Fhu9gfpB4xZe_OBQvhyB1qcN0YDXh9",
+        "client": "EDDY JOSUE GARCIA CHINCHILLA",
+        "name": "PATENTE AZUL SPA.pdf",
+        "lastModified": "2026-09-28T15:03:15.000Z",
+        "folder": "Documentos incendio Septiembre 2026"
+      },
+      {
+        "fileId": "14AeJyYvzRMeAa-XLj9H-sXI-03ssdCTs",
+        "client": "EDDY JOSUE GARCIA CHINCHILLA",
+        "name": "FACTURA LUZ AZUL SPA.pdf",
+        "lastModified": "2026-09-28T15:03:14.000Z",
+        "folder": "Documentos incendio Septiembre 2026"
+      },
+      {
+        "fileId": "1oRHrkVqj3EmI_-R03oekzJp0PgEmAqWa",
+        "client": "EDDY JOSUE GARCIA CHINCHILLA",
+        "name": "RTU EDDY GARCIA.pdf",
+        "lastModified": "2026-09-28T15:03:13.000Z",
+        "folder": "Documentos incendio Septiembre 2026"
+      },
+      {
+        "fileId": "1k8Uw3RoKABentKCGw4IR6kkceOo1Hscm",
+        "client": "EDDY JOSUE GARCIA CHINCHILLA",
+        "name": "EDDY JOSUÉ GARCIA CHINCHILLA -NMS- (1).pdf",
+        "lastModified": "2026-09-28T15:03:12.000Z",
+        "folder": "Documentos incendio Septiembre 2026"
+      },
+      {
+        "fileId": "1EBjD6PM2NogZ_-56m_JgCk-nOaNazrrA",
+        "client": "EDDY JOSUE GARCIA CHINCHILLA",
+        "name": "EDDY JOSUÉ GARCIA CHINCHILLA -NMS-.pdf",
+        "lastModified": "2026-09-28T15:03:12.000Z",
+        "folder": "Documentos incendio Septiembre 2026"
+      },
+      {
+        "fileId": "1QhtbW7x2u4hpSP7-URXQoPthBr84PNZi",
+        "client": "EDDY JOSUE GARCIA CHINCHILLA",
+        "name": "Información Requerida Persona Jurídica - Contratante (Asegurado Eddy.pdf",
+        "lastModified": "2026-09-28T15:03:12.000Z",
+        "folder": "Documentos incendio Septiembre 2026"
+      },
+      {
+        "fileId": "1ADHBFdQE7C2RouyA7f1vDJgTepXyYhIY",
+        "client": "Edson Pineda",
+        "name": "36226093.pdf",
+        "lastModified": "2026-08-24T15:04:47.000Z",
+        "folder": "La General"
+      },
+      {
+        "fileId": "1R6HMlHHv09_87BALnvLpa-E_cWiKlr9m",
+        "client": "Roberto Santizo",
+        "name": "914140843322984.pdf",
+        "lastModified": "2026-08-11T15:23:17.000Z",
+        "folder": "ROBLE"
+      },
+      {
+        "fileId": "1ujx6jIOI3GvF3UIurELfk0o3esFprpUH",
+        "client": "Jonathan Enamorado",
+        "name": "AUTO-38594.pdf",
+        "lastModified": "2026-09-14T21:19:20.000Z",
+        "folder": "Aseguata"
+      },
+      {
+        "fileId": "1N869PzCQiUO0-2FBTrSWpBw_OMFx2fPR",
+        "client": "Jonathan Enamorado",
+        "name": "AUTO-38308.pdf",
+        "lastModified": "2026-09-09T19:45:22.000Z",
+        "folder": "Aseguata"
+      },
+      {
+        "fileId": "1vhZhXb52E86WT5c0qjV1JBM5iwq71qLZ",
+        "client": "Angel Fernando Muñoz",
+        "name": "VA125-00010743 EMISIÓN.pdf",
+        "lastModified": "2026-09-11T18:33:12.000Z",
+        "folder": "Rural"
+      },
+      {
+        "fileId": "19ht0t_0TTAMmBgo1rYiO5CJZdebdP-7F",
+        "client": "Angel Fernando Muñoz",
+        "name": "VA125-00010777 EMISIÓN.pdf",
+        "lastModified": "2026-09-11T18:33:12.000Z",
+        "folder": "Rural"
+      },
+      {
+        "fileId": "1bbGOuy1Lg47vbt_CrFP2cAL2amk4Ttwb",
+        "client": "ERIKA MISHELLE RODRIGUEZ TARACENA",
+        "name": "Renovación - El Roble - Vehículos - 2026-2027.pdf",
+        "lastModified": "2026-10-15T09:08:19.800Z",
+        "folder": "Roble"
+      },
+      {
+        "fileId": "1FE0mSv0zr8kBfx2yNvBHOJsuxdbAfKKG",
+        "client": "DAVID JOSÉ MARADIAGA ZELEDON",
+        "name": "Póliza automóvil - Aseguate - AUTO-40322 - 2026-2027.pdf",
+        "lastModified": "2026-11-01T02:10:52.531Z",
+        "folder": "Aseguate"
+      },
+      {
+        "fileId": "16LKceScjAY4atJ-Zcx6HohV8VfIJf33T",
+        "client": "IVÁN JOSÉ ARGUIJO MACZ",
+        "name": "Póliza automóvil - El Roble - 2026-2027.pdf",
+        "lastModified": "2026-11-01T02:09:30.537Z",
+        "folder": "Póliza Roble"
+      },
+      {
+        "fileId": "13JCLhzmO_iKtPiL5Sw3BA0LyfKw8hgH9",
+        "client": "IMPAGUA",
+        "name": "Carátula póliza transporte local - Seguros G&T - TLG$-7348 - 2026-05-07 a 2026-06-07.pdf",
+        "lastModified": "2026-11-01T18:45:23.451Z",
+        "folder": "Transportes mayo"
+      },
+      {
+        "fileId": "1v_v7NX5aRMYQakKzi3AjRAiIpUy2Ee_j",
+        "client": "WENDY PAOLA VALLE LEAL DE GUTIERREZ",
+        "name": "Póliza automóvil - Aseguradora Guatemalteca - AUTO-40116 - 2026-04-22 a 2027-04-22.pdf",
+        "lastModified": "2026-11-01T18:40:57.921Z",
+        "folder": "Póliza Aseguate"
+      },
+      {
+        "fileId": "1dG1qeB0rjBWgVjDZdskOxU2A8LWShP11",
+        "client": "CINDY LISBETH POROJ CARABALLO",
+        "name": "tarjeta_circulacion_electronica (57).pdf",
+        "lastModified": "2026-07-31T18:58:05.000Z",
+        "folder": "Aceiba / Ford"
+      },
+      {
+        "fileId": "1vBvUA29ZTsd4ADDSqF9iW05LeLcEPzQE",
+        "client": "CINDY LISBETH POROJ CARABALLO",
+        "name": "Póliza automóvil - La Ceiba - 0226128642 - 2026-07-24 a 2027-07-24.pdf",
+        "lastModified": "2026-11-01T18:44:39.002Z",
+        "folder": "Aceiba / Honda"
+      },
+      {
+        "fileId": "1LlIVKKfZXKhbnIdtjwbBMFRDJhUYMHGl",
+        "client": "CINDY LISBETH POROJ CARABALLO",
+        "name": "Cindy Poroj - Tarjeta de Circulación (1).pdf",
+        "lastModified": "2026-07-31T18:57:39.000Z",
+        "folder": "Aceiba / Honda"
+      },
+      {
+        "fileId": "1cRq1KcriIMZNFDyWsEV-9er14GGLIOGE",
+        "client": "CINDY LISBETH POROJ CARABALLO",
+        "name": "Dpi CPoroj pdf (3).pdf",
+        "lastModified": "2026-07-31T18:57:39.000Z",
+        "folder": "Aceiba / Honda"
+      },
+      {
+        "fileId": "1BpFjfq4h4-AJWWYwVK13PnSOHOBsE7D1",
+        "client": "CINDY LISBETH POROJ CARABALLO",
+        "name": "formulario Cindy Poroj (1).pdf",
+        "lastModified": "2026-07-31T18:57:39.000Z",
+        "folder": "Aceiba / Honda"
+      },
+      {
+        "fileId": "1ubMBbqa5PMXnIgsQPtiI4vsoe_GYgIyD",
+        "client": "Óscar Haroldo Rodríguez",
+        "name": "91169567290911.pdf",
+        "lastModified": "2026-07-09T15:04:01.000Z",
+        "folder": "Roble / Renovación 2026"
+      },
+      {
+        "fileId": "1iQP8dRAZUVGGmfHo0YWzQAzH0ayNl3Lr",
+        "client": "JOSÉ ARMANDO MENDOZA",
+        "name": "914143202301561.pdf",
+        "lastModified": "2026-07-22T19:58:31.000Z",
+        "folder": "Roble / Hyundai"
+      },
+      {
+        "fileId": "1TDlM7zkWo6Ce7OEWk_2M71HPwZhrA19s",
+        "client": "SINDY CLARIBEL HENANDEZ AREVALO",
+        "name": "914141103356689.pdf",
+        "lastModified": "2026-09-14T20:01:12.000Z",
+        "folder": "Roble / Renovación 2026"
+      },
+      {
+        "fileId": "1F0ttLoucLCRVD4flwKTrl62koQxRcm7r",
+        "client": "BRENDA LUCRECIA MONTÚFAR GÓMEZ DE GARCIA",
+        "name": "431545817ENVIOPOLIZAMAIL.pdf",
+        "lastModified": "2026-09-10T15:35:37.000Z",
+        "folder": "Ficohsa / Renovación 2026"
+      },
+      {
+        "fileId": "1bWwIynCrjZHGKle2jaI5ETjxr-Ah20Es",
+        "client": "LUIS ERNESTO GODOY ACEITUNO",
+        "name": "0225116618_101343.pdf",
+        "lastModified": "2026-08-18T20:35:43.000Z",
+        "folder": "Aceiba / 2026"
+      },
+      {
+        "fileId": "11T4Zn1_6o1ZgI1kBqcI7Ev4pnvrgVvOo",
+        "client": "JUAN CARLOS CORADO GARCIA",
+        "name": "AUTO-37856.pdf",
+        "lastModified": "2026-07-27T19:54:49.000Z",
+        "folder": "Aseguate / Hyundai Grace"
+      },
+      {
+        "fileId": "1avFJDjl0n6bJOii4IFovR0xlpc93ckO4",
+        "client": "JORGE ANTONIO RUSTRIAN FAJARDO",
+        "name": "431543687ENVIOPOLIZAMAIL.pdf",
+        "lastModified": "2026-09-10T15:50:17.000Z",
+        "folder": "Ficohsa / Renovación 2026"
+      },
+      {
+        "fileId": "1X3mSeQY9TOnST_-gB57KIQTpCmNycpnO",
+        "client": "Nora lucia Hurtarte",
+        "name": "0225118528_151109.pdf",
+        "lastModified": "2026-09-14T20:12:29.000Z",
+        "folder": "Aceiba / Renovación 2026"
+      },
+      {
+        "fileId": "1ki3SALuF5K3F-tUgnFdogmYpX0UVIVun",
+        "client": "Cristian Arriaga",
+        "name": "ENDOSO RENOVACION AUTO-45566-CRISTIAN AROLDO ARREAGA LOPEZ.pdf",
+        "lastModified": "2026-07-14T17:07:37.000Z",
+        "folder": "Bantrab / 2026"
+      },
+      {
+        "fileId": "1QJfbs5J4SSi4HRAePHi2VrGbQhhUxeEe",
+        "client": "INVERSIONES Y DESARROLLOS J&J, SOCIEDAD ANÓNIMA",
+        "name": "AUTO-492287.pdf",
+        "lastModified": "2026-07-14T17:16:21.000Z",
+        "folder": "GyT / 2026"
+      },
+      {
+        "fileId": "1qmUypnZBwW4xyeKlINpk6U42vltZKk-W",
+        "client": "KEVIN MARIO FERNANDO STEWART FLORES",
+        "name": "918323091353922.pdf",
+        "lastModified": "2026-09-14T19:49:57.000Z",
+        "folder": "Renovación 2026 / Elantra"
+      },
+      {
+        "fileId": "1IsvnNfbahXoY5RD6r8qRbxooPm5gWLpa",
+        "client": "Shirley Munguía - Pedro Munguía",
+        "name": "918322914353920.pdf",
+        "lastModified": "2026-09-10T16:06:24.000Z",
+        "folder": "EL Roble / Mazda CX-3"
+      },
+      {
+        "fileId": "1kfkAT3iPkYXzt889UtkeDCwpH--bnSbs",
+        "client": "WENDY PAOLA VALLE LEAL DE GUTIERREZ",
+        "name": "Póliza automóvil - Aseguradora Guatemalteca - AUTO-40748 - 2026-06-30 a 2027-06-30.pdf",
+        "lastModified": "2026-11-01T18:42:10.756Z",
+        "folder": "Póliza Aseguate / 40748"
+      },
+      {
+        "fileId": "1xJo2NWty2_lmSE86kLR2q_qwBjg5-m9V",
+        "client": "HUGO ROLANDO JUAREZ PAIZ",
+        "name": "16811954_merged_pdf17728406379276034557.pdf",
+        "lastModified": "2026-07-27T19:56:04.000Z",
+        "folder": "Universales / Tucson"
+      },
+      {
+        "fileId": "1odOfnvDlbeP_74nrf-lyed7QZZwVDk0L",
+        "client": "Julio Sinay",
+        "name": "CARÁTULA DE RENOVACIÓN-1 (1).pdf",
+        "lastModified": "2026-07-15T22:49:48.000Z",
+        "folder": "GyT / AUBU-85183"
+      }
+    ],
+    "reviewedPolicyPdfRecords": [
+      {
+        "driveFileId": "1Dz_qYoCG0UNpgcWUqOLz2o04KBtwQe-b",
+        "clientFolder": "JAIR ROLANDO CIFUENTES GONZALES",
+        "documentName": "Anexo renovación automóvil - Aseguradora de los Trabajadores - AUTO-45497 - 2026-07-09 a 2027-07-09.pdf",
+        "documentClass": "EXPLICIT_2026_2027_NAME",
+        "policyCandidates": [
+          "AUTO-45497"
+        ],
+        "sourceDates": [
+          "09/07/2026",
+          "09/07/2027",
+          "09/07/2026",
+          "09/07/2027"
+        ],
+        "textExtraction": "TEXT_EXTRACTED",
+        "historicalSeptemberExcelMatch": true,
+        "matchedHistoricalPolicyRows": [
+          {
+            "insurerFile": "08-Polizas-16-.xlsx",
+            "policy": "AUTO-45497",
+            "client": "JAIR ROLANDO CIFUENTES GONZALEZ",
+            "start": "09-07-2025",
+            "end": "09-07-2026",
+            "status": "Renovada"
+          },
+          {
+            "insurerFile": "08-Polizas-16-.xlsx",
+            "policy": "AUTO-45497",
+            "client": "INDUSTRIA Y COMERCIO MEDITERRANEO, SOCIEDAD ANONIMA",
+            "start": "09-07-2026",
+            "end": "09-07-2027",
+            "status": "Vigente"
+          }
+        ],
+        "liveMatch": "NOT_YET_CERTIFIED"
+      },
+      {
+        "driveFileId": "10p9jOJoNjrzA1rhi_jU9i_r8ztF9_GSq",
+        "clientFolder": "JOSÉ ROBERTO MAYÉN MOTA",
+        "documentName": "Póliza - Mapfre - Vehículos - 2026-2027.pdf",
+        "documentClass": "EXPLICIT_2026_2027_NAME",
+        "policyCandidates": [
+          "3002600004525",
+          "Póliza No. 3002600004525"
+        ],
+        "sourceDates": [
+          "08/09/2026",
+          "08/09/2027",
+          "08/09/2026",
+          "08/09/2027",
+          "08/09/2026",
+          "08/09/2027"
+        ],
+        "textExtraction": "TEXT_EXTRACTED",
+        "historicalSeptemberExcelMatch": true,
+        "matchedHistoricalPolicyRows": [
+          {
+            "insurerFile": "08-Polizas-16-.xlsx",
+            "policy": "3002600004525",
+            "client": "JOSÉ ROBERTO MAYÉN MOTA",
+            "start": "08-09-2026",
+            "end": "08-09-2027",
+            "status": "Vigente"
+          }
+        ],
+        "liveMatch": "NOT_YET_CERTIFIED"
+      },
+      {
+        "driveFileId": "1ZMLEDCZ0gOvoGr35RFakpv2fhOsk4gD-",
+        "clientFolder": "MONICA JOSE CHAVARRIA SALAZAR",
+        "documentName": "Póliza - La Ceiba - Vehículos - 2026-2027.pdf",
+        "documentClass": "EXPLICIT_2026_2027_NAME",
+        "policyCandidates": [
+          "0226129489",
+          "Póliza No. 0226129489"
+        ],
+        "sourceDates": [
+          "29/08/2026",
+          "29/08/2027",
+          "31/08/2026",
+          "29/08/2026",
+          "29/08/2027",
+          "31/08/2026"
+        ],
+        "textExtraction": "TEXT_EXTRACTED",
+        "historicalSeptemberExcelMatch": false,
+        "matchedHistoricalPolicyRows": [],
+        "liveMatch": "NOT_YET_CERTIFIED"
+      },
+      {
+        "driveFileId": "13RT8VV1OUbNUpJXt3-S_BOZUcY0FLr9I",
+        "clientFolder": "LUIS ESTUARDO PEREZ CIFUENTES",
+        "documentName": "Póliza automóvil - Aseguradora Guatemalteca - AUTO-40844 - 2026-07-07 a 2027-07-07.pdf",
+        "documentClass": "EXPLICIT_2026_2027_NAME",
+        "policyCandidates": [
+          "AUTO 40844"
+        ],
+        "sourceDates": [
+          "07/07/2026",
+          "07/07/2027",
+          "07/07/2026",
+          "07/07/2027",
+          "07/07/2026",
+          "07/07/2027"
+        ],
+        "textExtraction": "TEXT_EXTRACTED",
+        "historicalSeptemberExcelMatch": true,
+        "matchedHistoricalPolicyRows": [
+          {
+            "insurerFile": "08-Polizas-16-.xlsx",
+            "policy": "AUTO 40844",
+            "client": "LUIS ESTUARDO PEREZ CIFUENTES",
+            "start": "07-07-2026",
+            "end": "07-07-2027",
+            "status": "Vigente"
+          }
+        ],
+        "liveMatch": "NOT_YET_CERTIFIED"
+      },
+      {
+        "driveFileId": "1TldDOlkLlefHwJk9nN4K34u0eI-JvhvF",
+        "clientFolder": "BAYRON BASILIO CALGUA LUX",
+        "documentName": "Póliza automóvil - Aseguradora Guatemalteca - AUTO-40798 - 2026-07-03 a 2027-07-03.pdf",
+        "documentClass": "EXPLICIT_2026_2027_NAME",
+        "policyCandidates": [
+          "AUTO 40798"
+        ],
+        "sourceDates": [
+          "03/07/2026",
+          "03/07/2027",
+          "03/07/2026",
+          "03/07/2027",
+          "03/07/2026",
+          "03/07/2027"
+        ],
+        "textExtraction": "TEXT_EXTRACTED",
+        "historicalSeptemberExcelMatch": true,
+        "matchedHistoricalPolicyRows": [
+          {
+            "insurerFile": "08-Polizas-16-.xlsx",
+            "policy": "AUTO 40798",
+            "client": "BAYRON BASILIO CALGUA LUX",
+            "start": "03-07-2026",
+            "end": "03-07-2027",
+            "status": "Vigente"
+          }
+        ],
+        "liveMatch": "NOT_YET_CERTIFIED"
+      },
+      {
+        "driveFileId": "1cBgH387j5-zYt0TV8lL1GFOLm8ydHDnM",
+        "clientFolder": "DANIEL ISAAC ALEMAN YORQUI",
+        "documentName": "Póliza - Vehículos - 2026-2027.pdf",
+        "documentClass": "EXPLICIT_2026_2027_NAME",
+        "policyCandidates": [
+          "0226125562",
+          "Póliza No. 0226125562"
+        ],
+        "sourceDates": [
+          "01/04/2026",
+          "01/04/2027",
+          "09/04/2026",
+          "01/04/2026",
+          "01/04/2027",
+          "09/04/2026"
+        ],
+        "textExtraction": "TEXT_EXTRACTED",
+        "historicalSeptemberExcelMatch": false,
+        "matchedHistoricalPolicyRows": [],
+        "liveMatch": "NOT_YET_CERTIFIED"
+      },
+      {
+        "driveFileId": "1ET-yBpte2pkld5b6Nk-FgOewG-xbF8nj",
+        "clientFolder": "Vanesa Lopez Aldana",
+        "documentName": "Póliza automóvil - Ficohsa - AUTO-1000002899 - Audi Q5 - 2026-2027.pdf",
+        "documentClass": "EXPLICIT_2026_2027_NAME",
+        "policyCandidates": [
+          "AUTO-10000028"
+        ],
+        "sourceDates": [
+          "20/02/2026",
+          "09/02/2026",
+          "09/02/2027",
+          "20/02/2026",
+          "09/02/2026",
+          "09/02/2027"
+        ],
+        "textExtraction": "TEXT_EXTRACTED",
+        "historicalSeptemberExcelMatch": false,
+        "matchedHistoricalPolicyRows": [],
+        "liveMatch": "NOT_YET_CERTIFIED"
+      },
+      {
+        "driveFileId": "1uFWbR6E4L4j0xQpABy9fHMflMyJ3rOTN",
+        "clientFolder": "CARLOS FERNANDO RECINOS VELASQUEZ",
+        "documentName": "Póliza - Vehículos - 2026-2027.pdf",
+        "documentClass": "EXPLICIT_2026_2027_NAME",
+        "policyCandidates": [
+          "AUTO-25014"
+        ],
+        "sourceDates": [
+          "28/02/2026",
+          "28/02/2027",
+          "28/02/2026",
+          "28/02/2027",
+          "28/02/2026",
+          "28/02/2026"
+        ],
+        "textExtraction": "TEXT_EXTRACTED",
+        "historicalSeptemberExcelMatch": true,
+        "matchedHistoricalPolicyRows": [
+          {
+            "insurerFile": "08-Polizas-16-.xlsx",
+            "policy": "AUTO-25014",
+            "client": "CARLOS FERNANDO RECINOS VELASQUEZ",
+            "start": "28-02-2026",
+            "end": "28-02-2027",
+            "status": "Vigente"
+          }
+        ],
+        "liveMatch": "NOT_YET_CERTIFIED"
+      },
+      {
+        "driveFileId": "1nbwsnAxvWgqHUoa-tc2x19sJpuZriSdk",
+        "clientFolder": "JUANA ESPERANZA MUY GONZALEZ",
+        "documentName": "Endoso de modificación - Aseguradora General - Póliza 93243 - Mazda CX-5 - 2026-2027 - Endoso 10828-2026.pdf",
+        "documentClass": "EXPLICIT_2026_2027_NAME",
+        "policyCandidates": [],
+        "sourceDates": [
+          "01/03/2026",
+          "01/03/2027",
+          "01/03/2026",
+          "01/03/2027"
+        ],
+        "textExtraction": "TEXT_EXTRACTED",
+        "historicalSeptemberExcelMatch": false,
+        "matchedHistoricalPolicyRows": [],
+        "liveMatch": "NOT_YET_CERTIFIED"
+      },
+      {
+        "driveFileId": "1uF9bohenRNVXdwgNW_PL7R6poSwhPuF1",
+        "clientFolder": "ELVIA LETICIA MÉNDEZ ALVAREZ",
+        "documentName": "Póliza automóvil - G&T - AUTO-526844 - Freightliner Cascadia 125 - 2026-2027.pdf",
+        "documentClass": "EXPLICIT_2026_2027_NAME",
+        "policyCandidates": [
+          "AUTO - 526844"
+        ],
+        "sourceDates": [
+          "11/02/2026",
+          "11/02/2027",
+          "11/02/2026",
+          "11/02/2027",
+          "11/02/2027",
+          "12/02/2026"
+        ],
+        "textExtraction": "TEXT_EXTRACTED",
+        "historicalSeptemberExcelMatch": true,
+        "matchedHistoricalPolicyRows": [
+          {
+            "insurerFile": "08-Polizas-16-.xlsx",
+            "policy": "AUTO - 526844",
+            "client": "ELVIA LETICIA MÉNDEZ ALVAREZ",
+            "start": "11-02-2026",
+            "end": "11-02-2027",
+            "status": "Vencida"
+          }
+        ],
+        "liveMatch": "NOT_YET_CERTIFIED"
+      },
+      {
+        "driveFileId": "1DyMk3G9JmHmqHP0G5LaMXJlz6nJtoS7r",
+        "clientFolder": "EYMY MERCEDES YOLANDA MEJIA VENTUR",
+        "documentName": "Póliza vehículos automotores - La Ceiba - 0226123193 - Hino 268 - 2026-2027.pdf",
+        "documentClass": "EXPLICIT_2026_2027_NAME",
+        "policyCandidates": [
+          "0226123193",
+          "Póliza No. 0226123193"
+        ],
+        "sourceDates": [
+          "20/01/2026",
+          "20/01/2027",
+          "23/01/2026",
+          "20/01/2026",
+          "20/01/2027",
+          "23/01/2026"
+        ],
+        "textExtraction": "TEXT_EXTRACTED",
+        "historicalSeptemberExcelMatch": false,
+        "matchedHistoricalPolicyRows": [],
+        "liveMatch": "NOT_YET_CERTIFIED"
+      },
+      {
+        "driveFileId": "1IRmGgIygdg55a9JT-S2D823cXlt-FR93",
+        "clientFolder": "EMANUEL ALEXANDER VASQUEZ MONZON",
+        "documentName": "Póliza automóvil - El Roble - 2026-01-15 a 2027-01-15.pdf",
+        "documentClass": "EXPLICIT_2026_2027_NAME",
+        "policyCandidates": [
+          "91 – 8345329"
+        ],
+        "sourceDates": [
+          "15/ 01/ 2027",
+          "15/ 01/ 2026",
+          "19/12/2025"
+        ],
+        "textExtraction": "TEXT_EXTRACTED",
+        "historicalSeptemberExcelMatch": true,
+        "matchedHistoricalPolicyRows": [
+          {
+            "insurerFile": "08-Polizas-16-.xlsx",
+            "policy": "91 – 8345329",
+            "client": "EMANUEL ALEXANDER VÁSQUEZ MONZÓN",
+            "start": "15-01-2025",
+            "end": "15-01-2026",
+            "status": "Renovada"
+          },
+          {
+            "insurerFile": "08-Polizas-16-.xlsx",
+            "policy": "91 – 8345329",
+            "client": "EMANUEL ALEXANDER VÁSQUEZ MONZÓN",
+            "start": "15-01-2026",
+            "end": "15-01-2027",
+            "status": "Vencida"
+          }
+        ],
+        "liveMatch": "NOT_YET_CERTIFIED"
+      },
+      {
+        "driveFileId": "1ADfTywlOuYg2QgyvmC3jASq0P9J8QN_y",
+        "clientFolder": "KATHERINE NICOLE TEJEDA MATAS",
+        "documentName": "Renovación póliza automóvil - El Roble - 91-8277867 - Mazda 3 - 2026-2027 - Endoso 063396.pdf",
+        "documentClass": "EXPLICIT_2026_2027_NAME",
+        "policyCandidates": [
+          "91 – 8277867"
+        ],
+        "sourceDates": [
+          "08/ 01/ 2027",
+          "08/ 01/ 2026",
+          "19/12/2025"
+        ],
+        "textExtraction": "TEXT_EXTRACTED",
+        "historicalSeptemberExcelMatch": true,
+        "matchedHistoricalPolicyRows": [
+          {
+            "insurerFile": "08-Polizas-16-.xlsx",
+            "policy": "91 – 8277867",
+            "client": "KATHERINE NICOLE TEJEDA MATAS",
+            "start": "08-01-2025",
+            "end": "08-01-2026",
+            "status": "Renovada"
+          },
+          {
+            "insurerFile": "08-Polizas-16-.xlsx",
+            "policy": "91 – 8277867",
+            "client": "KATHERINE NICOLE TEJEDA MATAS",
+            "start": "08-01-2026",
+            "end": "08-01-2027",
+            "status": "Vencida"
+          }
+        ],
+        "liveMatch": "NOT_YET_CERTIFIED"
+      },
+      {
+        "driveFileId": "15Kz58bTdQtFD7EqogZqRJCxjGvX3SgaI",
+        "clientFolder": "MIRYAM JULISSA MUNGUIA GIL",
+        "documentName": "Póliza automóvil - El Roble - 91-8326660 - Honda CR-V - 2026-2027 - Endoso 068119.pdf",
+        "documentClass": "EXPLICIT_2026_2027_NAME",
+        "policyCandidates": [
+          "91 – 8326660"
+        ],
+        "sourceDates": [
+          "02/ 01/ 2027",
+          "02/ 01/ 2026",
+          "23/12/2025"
+        ],
+        "textExtraction": "TEXT_EXTRACTED",
+        "historicalSeptemberExcelMatch": true,
+        "matchedHistoricalPolicyRows": [
+          {
+            "insurerFile": "08-Polizas-16-.xlsx",
+            "policy": "91 – 8326660",
+            "client": "MIRYAM JULISSA MUNGUIA GIL",
+            "start": "02-01-2025",
+            "end": "02-01-2026",
+            "status": "Renovada"
+          },
+          {
+            "insurerFile": "08-Polizas-16-.xlsx",
+            "policy": "91 – 8326660",
+            "client": "MIRYAM JULISSA MUNGUIA GIL",
+            "start": "02-01-2026",
+            "end": "02-01-2027",
+            "status": "Vencida"
+          }
+        ],
+        "liveMatch": "NOT_YET_CERTIFIED"
+      },
+      {
+        "driveFileId": "1GSjM18M9DTJTSYwKAkWPQDk5L8r2J6ed",
+        "clientFolder": "JOSE JUAN MUNGUIA GIL",
+        "documentName": "Renovación póliza automóvil - El Roble - 91-8326659 - Mitsubishi L200 - 2026-2027 - Endoso 066710.pdf",
+        "documentClass": "EXPLICIT_2026_2027_NAME",
+        "policyCandidates": [
+          "91 – 8326659"
+        ],
+        "sourceDates": [
+          "02/ 01/ 2027",
+          "02/ 01/ 2026",
+          "22/12/2025"
+        ],
+        "textExtraction": "TEXT_EXTRACTED",
+        "historicalSeptemberExcelMatch": true,
+        "matchedHistoricalPolicyRows": [
+          {
+            "insurerFile": "08-Polizas-16-.xlsx",
+            "policy": "91 – 8326659",
+            "client": "JOSE JUAN MUNGUIA GIL",
+            "start": "02-01-2025",
+            "end": "02-01-2026",
+            "status": "Renovada"
+          },
+          {
+            "insurerFile": "08-Polizas-16-.xlsx",
+            "policy": "91 – 8326659",
+            "client": "JOSE JUAN MUNGUIA GIL",
+            "start": "02-01-2026",
+            "end": "02-01-2027",
+            "status": "Vencida"
+          }
+        ],
+        "liveMatch": "NOT_YET_CERTIFIED"
+      },
+      {
+        "driveFileId": "1w_t_SUJSqB_ypPQ7vOKEZQyYrQ-ZhSaY",
+        "clientFolder": "ZOILA LORENA MUNGUIA GIL",
+        "documentName": "Renovación póliza automóvil - El Roble - 91-8326772 - Toyota Yaris - 2026-2027 - Endoso 063853.pdf",
+        "documentClass": "EXPLICIT_2026_2027_NAME",
+        "policyCandidates": [
+          "91 – 8326772"
+        ],
+        "sourceDates": [
+          "04/ 01/ 2027",
+          "04/ 01/ 2026",
+          "19/12/2025"
+        ],
+        "textExtraction": "TEXT_EXTRACTED",
+        "historicalSeptemberExcelMatch": true,
+        "matchedHistoricalPolicyRows": [
+          {
+            "insurerFile": "08-Polizas-16-.xlsx",
+            "policy": "91 – 8326772",
+            "client": "ZOILA LORENA MUNGUIA GIL",
+            "start": "04-01-2025",
+            "end": "04-01-2026",
+            "status": "Renovada"
+          },
+          {
+            "insurerFile": "08-Polizas-16-.xlsx",
+            "policy": "91 – 8326772",
+            "client": "ZOILA LORENA MUNGUIA GIL",
+            "start": "04-01-2026",
+            "end": "04-01-2027",
+            "status": "Vencida"
+          }
+        ],
+        "liveMatch": "NOT_YET_CERTIFIED"
+      },
+      {
+        "driveFileId": "11x3CikoVDB9SdRrRe-3idIfLEnAouQtR",
+        "clientFolder": "PEDRO PAÚL MUNGUIA GIL",
+        "documentName": "Renovación póliza automóvil - El Roble - 91-8326558 - Honda CR-V - 2026-2027 - Endoso 065489.pdf",
+        "documentClass": "EXPLICIT_2026_2027_NAME",
+        "policyCandidates": [
+          "91 – 8326558"
+        ],
+        "sourceDates": [
+          "02/ 01/ 2027",
+          "02/ 01/ 2026",
+          "22/12/2025"
+        ],
+        "textExtraction": "TEXT_EXTRACTED",
+        "historicalSeptemberExcelMatch": true,
+        "matchedHistoricalPolicyRows": [
+          {
+            "insurerFile": "08-Polizas-16-.xlsx",
+            "policy": "91 – 8326558",
+            "client": "Pedro Paul Mungia Gil",
+            "start": "02-01-2025",
+            "end": "02-01-2026",
+            "status": "Renovada"
+          },
+          {
+            "insurerFile": "08-Polizas-16-.xlsx",
+            "policy": "91 – 8326558",
+            "client": "Pedro Paul Mungia Gil",
+            "start": "02-01-2026",
+            "end": "02-01-2027",
+            "status": "Vencida"
+          }
+        ],
+        "liveMatch": "NOT_YET_CERTIFIED"
+      },
+      {
+        "driveFileId": "1n3KJmL2U-tdraV5EHeB7ATL_TIkts-dg",
+        "clientFolder": "WANDA STTIFANY YHOANA RIVERO PEREZ",
+        "documentName": "Renovación póliza automóvil - El Roble - 91-8344741 - Mitsubishi Outlander - 2026-2027 - Endoso 064108.pdf",
+        "documentClass": "EXPLICIT_2026_2027_NAME",
+        "policyCandidates": [
+          "91 – 8344741"
+        ],
+        "sourceDates": [
+          "03/ 01/ 2027",
+          "03/ 01/ 2026",
+          "19/12/2025"
+        ],
+        "textExtraction": "TEXT_EXTRACTED",
+        "historicalSeptemberExcelMatch": true,
+        "matchedHistoricalPolicyRows": [
+          {
+            "insurerFile": "08-Polizas-16-.xlsx",
+            "policy": "91 – 8344741",
+            "client": "WANDA STTIFANY YHOANA RIVERO PEREZ",
+            "start": "03-01-2025",
+            "end": "03-01-2026",
+            "status": "Renovada"
+          },
+          {
+            "insurerFile": "08-Polizas-16-.xlsx",
+            "policy": "91 – 8344741",
+            "client": "WANDA STTIFANY YHOANA RIVERO PEREZ",
+            "start": "03-01-2026",
+            "end": "03-01-2027",
+            "status": "Vencida"
+          }
+        ],
+        "liveMatch": "NOT_YET_CERTIFIED"
+      },
+      {
+        "driveFileId": "1JAtiYeLMx6jSWImM2l_HrRQx27mlgy-s",
+        "clientFolder": "ASHLYN LILIANA AGUILAR COC",
+        "documentName": "Póliza automóvil - El Roble - 2026-02-16 a 2027-02-16.pdf",
+        "documentClass": "EXPLICIT_2026_2027_NAME",
+        "policyCandidates": [
+          "91 – 9105495"
+        ],
+        "sourceDates": [
+          "16/ 02/ 2027",
+          "16/ 02/ 2026",
+          "16/ 02/ 2027",
+          "09/ 04/ 2026",
+          "10/04/2026",
+          "16/02/2026"
+        ],
+        "textExtraction": "TEXT_EXTRACTED",
+        "historicalSeptemberExcelMatch": true,
+        "matchedHistoricalPolicyRows": [
+          {
+            "insurerFile": "08-Polizas-16-.xlsx",
+            "policy": "91 – 9105495",
+            "client": "ASHLYN LILIANA AGUILAR COC",
+            "start": "18-02-2026",
+            "end": "18-02-2027",
+            "status": "Vigente"
+          }
+        ],
+        "liveMatch": "NOT_YET_CERTIFIED"
+      },
+      {
+        "driveFileId": "1Ilks3-BfRdSgY2XXlSGlVL0yGLdv_yrX",
+        "clientFolder": "Juan Francisco Escobar",
+        "documentName": "Renovación póliza automóvil - El Roble - 91-8345142 - Nissan Versa - 2026-2027 - Endoso 063110.pdf",
+        "documentClass": "EXPLICIT_2026_2027_NAME",
+        "policyCandidates": [
+          "91 – 8345142"
+        ],
+        "sourceDates": [
+          "12/ 01/ 2027",
+          "12/ 01/ 2026",
+          "19/12/2025"
+        ],
+        "textExtraction": "TEXT_EXTRACTED",
+        "historicalSeptemberExcelMatch": true,
+        "matchedHistoricalPolicyRows": [
+          {
+            "insurerFile": "08-Polizas-16-.xlsx",
+            "policy": "91 – 8345142",
+            "client": "JUAN FRANCISCO ESCOBAR ESCOBAR",
+            "start": "12-01-2025",
+            "end": "12-01-2026",
+            "status": "Renovada"
+          },
+          {
+            "insurerFile": "08-Polizas-16-.xlsx",
+            "policy": "91 – 8345142",
+            "client": "JUAN FRANCISCO ESCOBAR ESCOBAR",
+            "start": "12-01-2026",
+            "end": "12-01-2027",
+            "status": "Renovada"
+          }
+        ],
+        "liveMatch": "NOT_YET_CERTIFIED"
+      },
+      {
+        "driveFileId": "1-Ws8Nhm15P0VwOBx-6yQyN7wgCw_00lM",
+        "clientFolder": "Juan Francisco Escobar",
+        "documentName": "Póliza automóvil - El Roble - 91-9105982 - Hyundai Accent - 2026-2027 - Endoso 135654.pdf",
+        "documentClass": "EXPLICIT_2026_2027_NAME",
+        "policyCandidates": [
+          "91 – 9105982"
+        ],
+        "sourceDates": [
+          "25/ 02/ 2027",
+          "25/ 02/ 2026",
+          "26/02/2026"
+        ],
+        "textExtraction": "TEXT_EXTRACTED",
+        "historicalSeptemberExcelMatch": true,
+        "matchedHistoricalPolicyRows": [
+          {
+            "insurerFile": "08-Polizas-16-.xlsx",
+            "policy": "91 – 9105982",
+            "client": "JUAN FRANCISCO ESCOBAR ESCOBAR",
+            "start": "25-02-2026",
+            "end": "25-02-2027",
+            "status": "Cancelada"
+          },
+          {
+            "insurerFile": "10-Polizas-17-.xlsx",
+            "policy": "91 – 9105982",
+            "client": "JUAN FRANCISCO ESCOBAR ESCOBAR",
+            "start": "25-02-2026",
+            "end": "25-02-2027",
+            "status": "Cancelada"
+          }
+        ],
+        "liveMatch": "NOT_YET_CERTIFIED"
+      },
+      {
+        "driveFileId": "1TgOraeYMag-KSTA-ccFodWp-jTrizOT4",
+        "clientFolder": "JOSE FERNANDO IZARA REVOLORIO",
+        "documentName": "Renovación póliza automóvil - El Roble - 91-8298374 - 2026-2027 - Endoso 149431.pdf",
+        "documentClass": "EXPLICIT_2026_2027_NAME",
+        "policyCandidates": [
+          "91 – 8298374"
+        ],
+        "sourceDates": [
+          "13/ 04/ 2027",
+          "13/ 04/ 2026",
+          "10/03/2026"
+        ],
+        "textExtraction": "TEXT_EXTRACTED",
+        "historicalSeptemberExcelMatch": true,
+        "matchedHistoricalPolicyRows": [
+          {
+            "insurerFile": "08-Polizas-16-.xlsx",
+            "policy": "91 – 8298374",
+            "client": "JOSÉ FERNANDO IZARA REVOLORIO",
+            "start": "13-04-2025",
+            "end": "13-04-2026",
+            "status": "Renovada"
+          }
+        ],
+        "liveMatch": "NOT_YET_CERTIFIED"
+      },
+      {
+        "driveFileId": "1wKb7ZiSYUkR35iq8kQEffFnMRefhKNUq",
+        "clientFolder": "JOSE FERNANDO IZARA REVOLORIO",
+        "documentName": "Renovación póliza automóvil - El Roble - 91-8298374 - 2026-2027 - Endoso 155028.pdf",
+        "documentClass": "EXPLICIT_2026_2027_NAME",
+        "policyCandidates": [
+          "91 – 8298374"
+        ],
+        "sourceDates": [
+          "13/ 04/ 2027",
+          "13/ 04/ 2026"
+        ],
+        "textExtraction": "TEXT_EXTRACTED",
+        "historicalSeptemberExcelMatch": true,
+        "matchedHistoricalPolicyRows": [
+          {
+            "insurerFile": "08-Polizas-16-.xlsx",
+            "policy": "91 – 8298374",
+            "client": "JOSÉ FERNANDO IZARA REVOLORIO",
+            "start": "13-04-2025",
+            "end": "13-04-2026",
+            "status": "Renovada"
+          }
+        ],
+        "liveMatch": "NOT_YET_CERTIFIED"
+      },
+      {
+        "driveFileId": "1K4CRuCbD9M83rVpZVRQU25xMgFG_Pw9O",
+        "clientFolder": "HEYSSEL ALICIA PALMA GUZMÁN",
+        "documentName": "Renovación póliza automóvil - El Roble - 91-8350368 - Hyundai Elantra - 2026-2027 - Endoso 149437.pdf",
+        "documentClass": "EXPLICIT_2026_2027_NAME",
+        "policyCandidates": [
+          "91 – 8350368"
+        ],
+        "sourceDates": [
+          "11/ 04/ 2027",
+          "11/ 04/ 2026",
+          "10/03/2026"
+        ],
+        "textExtraction": "TEXT_EXTRACTED",
+        "historicalSeptemberExcelMatch": true,
+        "matchedHistoricalPolicyRows": [
+          {
+            "insurerFile": "08-Polizas-16-.xlsx",
+            "policy": "91 – 8350368",
+            "client": "HEYSSEL ALICIA PALMA GUZMAN",
+            "start": "11-04-2025",
+            "end": "11-04-2026",
+            "status": "Renovada"
+          },
+          {
+            "insurerFile": "08-Polizas-16-.xlsx",
+            "policy": "91 – 8350368",
+            "client": "HEYSSEL ALICIA PALMA GUZMAN",
+            "start": "11-04-2026",
+            "end": "11-04-2027",
+            "status": "Cancelada"
+          },
+          {
+            "insurerFile": "10-Polizas-17-.xlsx",
+            "policy": "91 – 8350368",
+            "client": "HEYSSEL ALICIA PALMA GUZMAN",
+            "start": "11-04-2026",
+            "end": "11-04-2027",
+            "status": "Cancelada"
+          }
+        ],
+        "liveMatch": "NOT_YET_CERTIFIED"
+      },
+      {
+        "driveFileId": "1_A8llU-UKXQAVo0jX6Ev9IbrYkreM6Jz",
+        "clientFolder": "Adriana Oxlaj - Jairo Velásquez",
+        "documentName": "Renovación póliza automóvil - El Roble - 91-8346281 - 2026-2027 - Endoso 066321.pdf",
+        "documentClass": "EXPLICIT_2026_2027_NAME",
+        "policyCandidates": [
+          "91 – 8346281"
+        ],
+        "sourceDates": [
+          "31/ 01/ 2027",
+          "31/ 01/ 2026",
+          "22/12/2025"
+        ],
+        "textExtraction": "TEXT_EXTRACTED",
+        "historicalSeptemberExcelMatch": true,
+        "matchedHistoricalPolicyRows": [
+          {
+            "insurerFile": "08-Polizas-16-.xlsx",
+            "policy": "91 – 8346281",
+            "client": "ADRIANA RAQUEL OXLAJ GONàN",
+            "start": "31-01-2025",
+            "end": "31-01-2026",
+            "status": "Renovada"
+          },
+          {
+            "insurerFile": "08-Polizas-16-.xlsx",
+            "policy": "91 – 8346281",
+            "client": "Manola Pinetta",
+            "start": "31-01-2026",
+            "end": "31-01-2027",
+            "status": "Renovada"
+          }
+        ],
+        "liveMatch": "NOT_YET_CERTIFIED"
+      },
+      {
+        "driveFileId": "1neH81Oi_oqc8EL-uUO6BiTW-o7Qgixdz",
+        "clientFolder": "Sonia Esmeralda Velásquez Valdez",
+        "documentName": "Renovación póliza automóvil - El Roble - 91-8350081 - Nissan Kicks - 2026-2027 - Endoso 149435.pdf",
+        "documentClass": "EXPLICIT_2026_2027_NAME",
+        "policyCandidates": [
+          "91 – 8350081"
+        ],
+        "sourceDates": [
+          "07/ 04/ 2027",
+          "07/ 04/ 2026",
+          "10/03/2026"
+        ],
+        "textExtraction": "TEXT_EXTRACTED",
+        "historicalSeptemberExcelMatch": true,
+        "matchedHistoricalPolicyRows": [
+          {
+            "insurerFile": "08-Polizas-16-.xlsx",
+            "policy": "91 – 8350081",
+            "client": "SONIA ESMERALDA VELÁSQUEZ VALDEZ",
+            "start": "07-04-2025",
+            "end": "07-04-2026",
+            "status": "Renovada"
+          },
+          {
+            "insurerFile": "08-Polizas-16-.xlsx",
+            "policy": "91 – 8350081",
+            "client": "SONIA ESMERALDA VELÁSQUEZ VALDEZ",
+            "start": "07-04-2026",
+            "end": "07-04-2027",
+            "status": "Vigente"
+          }
+        ],
+        "liveMatch": "NOT_YET_CERTIFIED"
+      },
+      {
+        "driveFileId": "1Sojl_OoAESHhK7W0DgDqV4gXYSNL1Mry",
+        "clientFolder": "Jose Alejandro Herrarte Gonzalez",
+        "documentName": "Póliza motocicleta - Columna - 2026-02-20 a 2027-02-20.pdf",
+        "documentClass": "EXPLICIT_2026_2027_NAME",
+        "policyCandidates": [],
+        "sourceDates": [
+          "20/02/2026",
+          "20/02/2027",
+          "04/03/2026",
+          "20/02/2026",
+          "20/02/2027",
+          "20/02/2026"
+        ],
+        "textExtraction": "TEXT_EXTRACTED",
+        "historicalSeptemberExcelMatch": false,
+        "matchedHistoricalPolicyRows": [],
+        "liveMatch": "NOT_YET_CERTIFIED"
+      },
+      {
+        "driveFileId": "1GyPXZXRQa1YY6NZy_LXq6XzMPRF4kuMt",
+        "clientFolder": "Adán Soto",
+        "documentName": "Renovación póliza automóvil - G&T - AUTO-505865 - 2026-2027.pdf",
+        "documentClass": "EXPLICIT_2026_2027_NAME",
+        "policyCandidates": [
+          "AUTO-505865"
+        ],
+        "sourceDates": [
+          "10/03/2026",
+          "10/03/2027",
+          "12/03/2026",
+          "10/03/2026",
+          "10/03/2027",
+          "10-03-2026"
+        ],
+        "textExtraction": "TEXT_EXTRACTED",
+        "historicalSeptemberExcelMatch": true,
+        "matchedHistoricalPolicyRows": [
+          {
+            "insurerFile": "08-Polizas-16-.xlsx",
+            "policy": "AUTO-505865",
+            "client": "Adan Soto Vida",
+            "start": "10-03-2025",
+            "end": "10-03-2026",
+            "status": "Renovada"
+          },
+          {
+            "insurerFile": "08-Polizas-16-.xlsx",
+            "policy": "AUTO-505865",
+            "client": "Adan Soto Vida",
+            "start": "10-03-2026",
+            "end": "10-03-2027",
+            "status": "Vigente"
+          }
+        ],
+        "liveMatch": "NOT_YET_CERTIFIED"
+      },
+      {
+        "driveFileId": "140QG_0Qe1sQ8-kUDXzZ3ep2LDpkJzic0",
+        "clientFolder": "Carlos Eliu Mejia",
+        "documentName": "Póliza automóvil - La Ceiba - 0226123930 - 2026-2027.pdf",
+        "documentClass": "EXPLICIT_2026_2027_NAME",
+        "policyCandidates": [
+          "0226123930",
+          "Póliza No. 0226123930"
+        ],
+        "sourceDates": [
+          "09/02/2026",
+          "09/02/2027",
+          "13/02/2026",
+          "09/02/2026",
+          "09/02/2027",
+          "13/02/2026"
+        ],
+        "textExtraction": "TEXT_EXTRACTED",
+        "historicalSeptemberExcelMatch": false,
+        "matchedHistoricalPolicyRows": [],
+        "liveMatch": "NOT_YET_CERTIFIED"
+      },
+      {
+        "driveFileId": "1kwowt6djnVxiunUXI0RInC92GlpnaTNn",
+        "clientFolder": "Olivia Vicente",
+        "documentName": "Renovación póliza automóvil - El Roble - 91-8264237 - 2026-2027 - Endoso 064106.pdf",
+        "documentClass": "EXPLICIT_2026_2027_NAME",
+        "policyCandidates": [
+          "91 – 8264237"
+        ],
+        "sourceDates": [
+          "07/ 01/ 2027",
+          "07/ 01/ 2026",
+          "19/12/2025"
+        ],
+        "textExtraction": "TEXT_EXTRACTED",
+        "historicalSeptemberExcelMatch": true,
+        "matchedHistoricalPolicyRows": [
+          {
+            "insurerFile": "08-Polizas-16-.xlsx",
+            "policy": "91 – 8264237",
+            "client": "OLIVIA ARACEKY VICENTE TINOCO",
+            "start": "07-01-2025",
+            "end": "07-01-2026",
+            "status": "Renovada"
+          },
+          {
+            "insurerFile": "08-Polizas-16-.xlsx",
+            "policy": "91 – 8264237",
+            "client": "OLIVIA ARACEKY VICENTE TINOCO",
+            "start": "07-01-2026",
+            "end": "07-01-2027",
+            "status": "Vigente"
+          }
+        ],
+        "liveMatch": "NOT_YET_CERTIFIED"
+      },
+      {
+        "driveFileId": "16Fz_kBQvapsVJU2j-oHUlahoZlIaE7VD",
+        "clientFolder": "Diego Vicente",
+        "documentName": "Renovación póliza automóvil - El Roble - 91-8266232 - 2026-2027 - Endoso 104199.pdf",
+        "documentClass": "EXPLICIT_2026_2027_NAME",
+        "policyCandidates": [
+          "91 – 8266232"
+        ],
+        "sourceDates": [
+          "13/ 02/ 2027",
+          "13/ 02/ 2026",
+          "01/02/2026"
+        ],
+        "textExtraction": "TEXT_EXTRACTED",
+        "historicalSeptemberExcelMatch": true,
+        "matchedHistoricalPolicyRows": [
+          {
+            "insurerFile": "08-Polizas-16-.xlsx",
+            "policy": "91 – 8266232",
+            "client": "DIEGO RAMÓN VICENTE TINOCO",
+            "start": "13-02-2025",
+            "end": "13-02-2026",
+            "status": "Renovada"
+          },
+          {
+            "insurerFile": "08-Polizas-16-.xlsx",
+            "policy": "91 – 8266232",
+            "client": "DIEGO RAMÓN VICENTE TINOCO",
+            "start": "13-02-2026",
+            "end": "13-02-2027",
+            "status": "Vencida"
+          }
+        ],
+        "liveMatch": "NOT_YET_CERTIFIED"
+      },
+      {
+        "driveFileId": "149TRjhddLuEA9D90kcMwYd5dkw62f_qV",
+        "clientFolder": "Allan Juárez",
+        "documentName": "Renovación póliza automóvil - El Roble - 91-8350767 - 2026-2027 - Endoso 149439.pdf",
+        "documentClass": "EXPLICIT_2026_2027_NAME",
+        "policyCandidates": [
+          "91 – 8350767"
+        ],
+        "sourceDates": [
+          "23/ 04/ 2027",
+          "23/ 04/ 2026",
+          "10/03/2026"
+        ],
+        "textExtraction": "TEXT_EXTRACTED",
+        "historicalSeptemberExcelMatch": true,
+        "matchedHistoricalPolicyRows": [
+          {
+            "insurerFile": "08-Polizas-16-.xlsx",
+            "policy": "91 – 8350767",
+            "client": "ALLAN ARTEMIO JUÁREZ OLIVA",
+            "start": "23-04-2025",
+            "end": "23-04-2026",
+            "status": "Renovada"
+          },
+          {
+            "insurerFile": "08-Polizas-16-.xlsx",
+            "policy": "91 – 8350767",
+            "client": "ALLAN ARTEMIO JUÁREZ OLIVA",
+            "start": "23-04-2026",
+            "end": "23-04-2027",
+            "status": "Vencida"
+          }
+        ],
+        "liveMatch": "NOT_YET_CERTIFIED"
+      },
+      {
+        "driveFileId": "1IFBaRIjVXO-0LNGKsw9wB-3As7Lmpw4l",
+        "clientFolder": "MARIA LUISA LARIOS",
+        "documentName": "Renovación póliza automóvil - El Roble - 91-8278775 - 2026-2027 - Endoso 104200.pdf",
+        "documentClass": "EXPLICIT_2026_2027_NAME",
+        "policyCandidates": [
+          "91 – 8278775"
+        ],
+        "sourceDates": [
+          "01/ 02/ 2027",
+          "01/ 02/ 2026",
+          "01/02/2026"
+        ],
+        "textExtraction": "TEXT_EXTRACTED",
+        "historicalSeptemberExcelMatch": true,
+        "matchedHistoricalPolicyRows": [
+          {
+            "insurerFile": "08-Polizas-16-.xlsx",
+            "policy": "91 – 8278775",
+            "client": "MARÍA LUISA LARIOS CALDERÓN",
+            "start": "01-02-2025",
+            "end": "01-02-2026",
+            "status": "Renovada"
+          },
+          {
+            "insurerFile": "08-Polizas-16-.xlsx",
+            "policy": "91 – 8278775",
+            "client": "MARÍA LUISA LARIOS CALDERÓN",
+            "start": "01-02-2026",
+            "end": "01-02-2027",
+            "status": "Vigente"
+          }
+        ],
+        "liveMatch": "NOT_YET_CERTIFIED"
+      },
+      {
+        "driveFileId": "1e7-zb5k9UxbqZCjN5xRdW2Yofexfhvxz",
+        "clientFolder": "Walter Tizón",
+        "documentName": "Renovación póliza automóvil - El Roble - 91-8350489 - 2026-2027 - Endoso 149438.pdf",
+        "documentClass": "EXPLICIT_2026_2027_NAME",
+        "policyCandidates": [
+          "91 – 8350489"
+        ],
+        "sourceDates": [
+          "14/ 04/ 2027",
+          "14/ 04/ 2026",
+          "10/03/2026"
+        ],
+        "textExtraction": "TEXT_EXTRACTED",
+        "historicalSeptemberExcelMatch": true,
+        "matchedHistoricalPolicyRows": [
+          {
+            "insurerFile": "08-Polizas-16-.xlsx",
+            "policy": "91 – 8350489",
+            "client": "WALTER VINICIO TIZÓN PINELO",
+            "start": "14-04-2025",
+            "end": "14-04-2026",
+            "status": "Renovada"
+          },
+          {
+            "insurerFile": "08-Polizas-16-.xlsx",
+            "policy": "91 – 8350489",
+            "client": "WALTER VINICIO TIZÓN PINELO",
+            "start": "14-04-2026",
+            "end": "14-04-2027",
+            "status": "Cancelada"
+          },
+          {
+            "insurerFile": "10-Polizas-17-.xlsx",
+            "policy": "91 – 8350489",
+            "client": "WALTER VINICIO TIZÓN PINELO",
+            "start": "14-04-2026",
+            "end": "14-04-2027",
+            "status": "Cancelada"
+          }
+        ],
+        "liveMatch": "NOT_YET_CERTIFIED"
+      },
+      {
+        "driveFileId": "1U5FXEr8woQV0XDB3Z1KizwcO5wvVgsVP",
+        "clientFolder": "Vilma Noguera",
+        "documentName": "Renovación póliza automóvil - El Roble - 91-8327655 - 2026-2027 - Endoso 064107.pdf",
+        "documentClass": "EXPLICIT_2026_2027_NAME",
+        "policyCandidates": [
+          "91 – 8327655"
+        ],
+        "sourceDates": [
+          "20/ 01/ 2027",
+          "20/ 01/ 2026",
+          "19/12/2025"
+        ],
+        "textExtraction": "TEXT_EXTRACTED",
+        "historicalSeptemberExcelMatch": true,
+        "matchedHistoricalPolicyRows": [
+          {
+            "insurerFile": "08-Polizas-16-.xlsx",
+            "policy": "91 – 8327655",
+            "client": "VILMA CONSUELO NOGUERA GÁLVEZ",
+            "start": "20-01-2025",
+            "end": "20-01-2026",
+            "status": "Cancelada"
+          },
+          {
+            "insurerFile": "08-Polizas-16-.xlsx",
+            "policy": "91 – 8327655",
+            "client": "VILMA CONSUELO NOGUERA GÁLVEZ",
+            "start": "20-01-2025",
+            "end": "20-01-2026",
+            "status": "Renovada"
+          },
+          {
+            "insurerFile": "08-Polizas-16-.xlsx",
+            "policy": "91 – 8327655",
+            "client": "VILMA CONSUELO NOGUERA GÁLVEZ",
+            "start": "20-01-2026",
+            "end": "20-01-2027",
+            "status": "Vigente"
+          },
+          {
+            "insurerFile": "10-Polizas-17-.xlsx",
+            "policy": "91 – 8327655",
+            "client": "VILMA CONSUELO NOGUERA GÁLVEZ",
+            "start": "20-01-2025",
+            "end": "20-01-2026",
+            "status": "Cancelada"
+          }
+        ],
+        "liveMatch": "NOT_YET_CERTIFIED"
+      },
+      {
+        "driveFileId": "11NV8kPBma-AEWNV6wBii3tgtGLxhVF7U",
+        "clientFolder": "Eduardo Rubio",
+        "documentName": "Renovación póliza automóvil - El Roble - 91-8326915 - 2026-2027 - Endoso 063854.pdf",
+        "documentClass": "EXPLICIT_2026_2027_NAME",
+        "policyCandidates": [
+          "91 – 8326915"
+        ],
+        "sourceDates": [
+          "06/ 01/ 2027",
+          "06/ 01/ 2026",
+          "19/12/2025"
+        ],
+        "textExtraction": "TEXT_EXTRACTED",
+        "historicalSeptemberExcelMatch": true,
+        "matchedHistoricalPolicyRows": [
+          {
+            "insurerFile": "08-Polizas-16-.xlsx",
+            "policy": "91 – 8326915",
+            "client": "EDUARDO RUBIO ALEMÁN",
+            "start": "06-01-2025",
+            "end": "06-01-2026",
+            "status": "Renovada"
+          },
+          {
+            "insurerFile": "08-Polizas-16-.xlsx",
+            "policy": "91 – 8326915",
+            "client": "EDUARDO RUBIO ALEMÁN",
+            "start": "06-01-2026",
+            "end": "06-01-2027",
+            "status": "Cancelada"
+          },
+          {
+            "insurerFile": "10-Polizas-17-.xlsx",
+            "policy": "91 – 8326915",
+            "client": "EDUARDO RUBIO ALEMÁN",
+            "start": "06-01-2026",
+            "end": "06-01-2027",
+            "status": "Cancelada"
+          }
+        ],
+        "liveMatch": "NOT_YET_CERTIFIED"
+      },
+      {
+        "driveFileId": "1ryQkBmyqwskVkkwPPvao9tSizokoIvmT",
+        "clientFolder": "Rosa Hernández",
+        "documentName": "Renovación póliza automóvil - El Roble - 91-8331591 - 2026-2027 - Endoso 149433.pdf",
+        "documentClass": "EXPLICIT_2026_2027_NAME",
+        "policyCandidates": [
+          "91 – 8331591"
+        ],
+        "sourceDates": [
+          "03/ 04/ 2027",
+          "03/ 04/ 2026",
+          "10/03/2026"
+        ],
+        "textExtraction": "TEXT_EXTRACTED",
+        "historicalSeptemberExcelMatch": true,
+        "matchedHistoricalPolicyRows": [
+          {
+            "insurerFile": "08-Polizas-16-.xlsx",
+            "policy": "91 – 8331591",
+            "client": "ROSA CLAUDIA DEL PILAR HERNÁNDEZ SASO",
+            "start": "03-04-2025",
+            "end": "03-04-2026",
+            "status": "Renovada"
+          },
+          {
+            "insurerFile": "08-Polizas-16-.xlsx",
+            "policy": "91 – 8331591",
+            "client": "ROSA CLAUDIA DEL PILAR HERNÁNDEZ SASO",
+            "start": "03-04-2026",
+            "end": "03-04-2027",
+            "status": "Vencida"
+          }
+        ],
+        "liveMatch": "NOT_YET_CERTIFIED"
+      },
+      {
+        "driveFileId": "1dB8fmIUHHUqb3UGc8L2iXuk8FQZ_oJFl",
+        "clientFolder": "WILFREDO ALEXANDER RENDEROS HIDALGO",
+        "documentName": "Renovación póliza automóvil - El Roble - 91-8350219 - 2026-2027 - Endoso 149436.pdf",
+        "documentClass": "EXPLICIT_2026_2027_NAME",
+        "policyCandidates": [
+          "91 – 8350219"
+        ],
+        "sourceDates": [
+          "09/ 04/ 2027",
+          "09/ 04/ 2026",
+          "10/03/2026"
+        ],
+        "textExtraction": "TEXT_EXTRACTED",
+        "historicalSeptemberExcelMatch": true,
+        "matchedHistoricalPolicyRows": [
+          {
+            "insurerFile": "08-Polizas-16-.xlsx",
+            "policy": "91 – 8350219",
+            "client": "WILFREDO ALEXANDER RENDEROS HIDALGO",
+            "start": "09-04-2025",
+            "end": "09-04-2026",
+            "status": "Renovada"
+          },
+          {
+            "insurerFile": "08-Polizas-16-.xlsx",
+            "policy": "91 – 8350219",
+            "client": "WILFREDO ALEXANDER RENDEROS HIDALGO",
+            "start": "09-04-2026",
+            "end": "09-04-2027",
+            "status": "Vigente"
+          }
+        ],
+        "liveMatch": "NOT_YET_CERTIFIED"
+      },
+      {
+        "driveFileId": "1feh-zaOO6lKMC15s_RhmiQXHvBeBk8Mg",
+        "clientFolder": "JESSICA PAOLA HERNANDEZ CASTAÑEDA",
+        "documentName": "Póliza automóvil - El Roble - 2026-02-24 a 2027-02-24.pdf",
+        "documentClass": "EXPLICIT_2026_2027_NAME",
+        "policyCandidates": [
+          "91 – 8347521"
+        ],
+        "sourceDates": [
+          "24/ 02/ 2027",
+          "24/ 02/ 2026",
+          "01/02/2026"
+        ],
+        "textExtraction": "TEXT_EXTRACTED",
+        "historicalSeptemberExcelMatch": true,
+        "matchedHistoricalPolicyRows": [
+          {
+            "insurerFile": "08-Polizas-16-.xlsx",
+            "policy": "91 – 8347521",
+            "client": "JESSICA PAOLA HERNANDEZ CASTAÑEDA",
+            "start": "24-02-2025",
+            "end": "24-02-2026",
+            "status": "Renovada"
+          },
+          {
+            "insurerFile": "08-Polizas-16-.xlsx",
+            "policy": "91 – 8347521",
+            "client": "JESSICA PAOLA HERNANDEZ CASTAÑEDA",
+            "start": "24-02-2026",
+            "end": "24-02-2027",
+            "status": "Cancelada"
+          },
+          {
+            "insurerFile": "10-Polizas-17-.xlsx",
+            "policy": "91 – 8347521",
+            "client": "JESSICA PAOLA HERNANDEZ CASTAÑEDA",
+            "start": "24-02-2026",
+            "end": "24-02-2027",
+            "status": "Cancelada"
+          }
+        ],
+        "liveMatch": "NOT_YET_CERTIFIED"
+      },
+      {
+        "driveFileId": "1HZ1VhzaRlXUCqdmkdqQnsJycEJ-vzS9V",
+        "clientFolder": "HÉCTOR RAUL ORELLANA VELÁSQUEZ",
+        "documentName": "Póliza automóvil - El Roble - 2026-03-02 a 2027-03-02.pdf",
+        "documentClass": "EXPLICIT_2026_2027_NAME",
+        "policyCandidates": [
+          "91 – 8312133"
+        ],
+        "sourceDates": [
+          "02/ 03/ 2027",
+          "02/ 03/ 2026",
+          "10/02/2026"
+        ],
+        "textExtraction": "TEXT_EXTRACTED",
+        "historicalSeptemberExcelMatch": true,
+        "matchedHistoricalPolicyRows": [
+          {
+            "insurerFile": "08-Polizas-16-.xlsx",
+            "policy": "91 – 8312133",
+            "client": "HÉCTOR RAUL ORELLANA VELÁSQUEZ",
+            "start": "02-03-2025",
+            "end": "02-03-2026",
+            "status": "Renovada"
+          },
+          {
+            "insurerFile": "08-Polizas-16-.xlsx",
+            "policy": "91 – 8312133",
+            "client": "HÉCTOR RAUL ORELLANA VELÁSQUEZ",
+            "start": "02-03-2026",
+            "end": "02-03-2027",
+            "status": "Vigente"
+          }
+        ],
+        "liveMatch": "NOT_YET_CERTIFIED"
+      },
+      {
+        "driveFileId": "12pjiNETFdqoUWAX3cd-Tdio-au-BcRMR",
+        "clientFolder": "MIRLET ARACELY CABALLEROS MONROY",
+        "documentName": "Póliza automóvil - El Roble - 2026-02-14 a 2027-02-14.pdf",
+        "documentClass": "EXPLICIT_2026_2027_NAME",
+        "policyCandidates": [
+          "91 – 8347044"
+        ],
+        "sourceDates": [
+          "14/ 02/ 2027",
+          "14/ 02/ 2026",
+          "01/02/2026"
+        ],
+        "textExtraction": "TEXT_EXTRACTED",
+        "historicalSeptemberExcelMatch": true,
+        "matchedHistoricalPolicyRows": [
+          {
+            "insurerFile": "08-Polizas-16-.xlsx",
+            "policy": "91 – 8347044",
+            "client": "MIRLET ARACELY CABALLEROS MONROY",
+            "start": "14-02-2025",
+            "end": "14-02-2026",
+            "status": "Renovada"
+          },
+          {
+            "insurerFile": "08-Polizas-16-.xlsx",
+            "policy": "91 – 8347044",
+            "client": "MIRLET ARACELY CABALLEROS MONROY",
+            "start": "14-02-2026",
+            "end": "14-02-2027",
+            "status": "Cancelada"
+          },
+          {
+            "insurerFile": "10-Polizas-17-.xlsx",
+            "policy": "91 – 8347044",
+            "client": "MIRLET ARACELY CABALLEROS MONROY",
+            "start": "14-02-2026",
+            "end": "14-02-2027",
+            "status": "Cancelada"
+          }
+        ],
+        "liveMatch": "NOT_YET_CERTIFIED"
+      },
+      {
+        "driveFileId": "1cdkxgNJu-5ORr7FFoaTntl961M0y65RT",
+        "clientFolder": "SILVIA VANESA HERNANDEZ CAJAS",
+        "documentName": "Carátula póliza - Mapfre - 3002600002453 - 2026-2027.pdf",
+        "documentClass": "EXPLICIT_2026_2027_NAME",
+        "policyCandidates": [
+          "3002600002453",
+          "Póliza No. 3002600002453"
+        ],
+        "sourceDates": [
+          "22/05/2026",
+          "22/05/2027",
+          "22/05/2026",
+          "22/05/2027",
+          "22/05/2026",
+          "22/05/2027"
+        ],
+        "textExtraction": "TEXT_EXTRACTED",
+        "historicalSeptemberExcelMatch": true,
+        "matchedHistoricalPolicyRows": [
+          {
+            "insurerFile": "08-Polizas-16-.xlsx",
+            "policy": "3002600002453",
+            "client": "SILVIA VANESA HERNÁNDEZ CAJAS",
+            "start": "22-05-2026",
+            "end": "22-05-2027",
+            "status": "Vigente"
+          }
+        ],
+        "liveMatch": "NOT_YET_CERTIFIED"
+      },
+      {
+        "driveFileId": "1Kib4HzHz3hCR4MfV5OPEqWlmadl4DaDU",
+        "clientFolder": "THELMA ARACELY URRUTIA GUDIEL",
+        "documentName": "Póliza automóvil - Aseguradora Guatemalteca - AUTO-41334 - 2026-08-28 a 2027-08-28.pdf",
+        "documentClass": "EXPLICIT_2026_2027_NAME",
+        "policyCandidates": [
+          "AUTO 41334"
+        ],
+        "sourceDates": [
+          "28/08/2026",
+          "28/08/2027",
+          "28/08/2026",
+          "28/08/2027",
+          "28/08/2026",
+          "28/08/2027"
+        ],
+        "textExtraction": "TEXT_EXTRACTED",
+        "historicalSeptemberExcelMatch": true,
+        "matchedHistoricalPolicyRows": [
+          {
+            "insurerFile": "08-Polizas-16-.xlsx",
+            "policy": "AUTO 41334",
+            "client": "THELMA ARACELY URRUTIA GUDIEL",
+            "start": "28-08-2026",
+            "end": "28-08-2027",
+            "status": "Vencida"
+          }
+        ],
+        "liveMatch": "NOT_YET_CERTIFIED"
+      },
+      {
+        "driveFileId": "1KGEqXAolGOo2TpLoG0jykK9eelmLGsef",
+        "clientFolder": "INDUSTRIA Y COMERCIO MEDITERRANEO",
+        "documentName": "Póliza - Universales - Vehículos - 2026-2027.pdf",
+        "documentClass": "EXPLICIT_2026_2027_NAME",
+        "policyCandidates": [
+          "Póliza No. 02-01-488-5659-1"
+        ],
+        "sourceDates": [
+          "08/09/2026",
+          "08/09/2027",
+          "8/09/2026",
+          "8/09/2027",
+          "23/09/2026",
+          "23/09/2026"
+        ],
+        "textExtraction": "TEXT_EXTRACTED",
+        "historicalSeptemberExcelMatch": false,
+        "matchedHistoricalPolicyRows": [],
+        "liveMatch": "NOT_YET_CERTIFIED"
+      },
+      {
+        "driveFileId": "1lDc3ktAnRklVttDV81VnCjp3h_tzXLdR",
+        "clientFolder": "BAYRON BASILIO CALGUA LUX",
+        "documentName": "Póliza automóvil - Aseguradora Guatemalteca - AUTO-40930 - 2026-07-14 a 2027-07-14.pdf",
+        "documentClass": "EXPLICIT_2026_2027_NAME",
+        "policyCandidates": [
+          "AUTO 40930"
+        ],
+        "sourceDates": [
+          "14/07/2026",
+          "14/07/2027",
+          "14/07/2026",
+          "14/07/2027",
+          "14/07/2026",
+          "14/07/2027"
+        ],
+        "textExtraction": "TEXT_EXTRACTED",
+        "historicalSeptemberExcelMatch": true,
+        "matchedHistoricalPolicyRows": [
+          {
+            "insurerFile": "08-Polizas-16-.xlsx",
+            "policy": "AUTO 40930",
+            "client": "BAYRON BASILIO CALGUA LUX",
+            "start": "14-07-2026",
+            "end": "14-07-2027",
+            "status": "Vigente"
+          }
+        ],
+        "liveMatch": "NOT_YET_CERTIFIED"
+      },
+      {
+        "driveFileId": "1BS6homil664yyOmGoO5holkIXWEeFa14",
+        "clientFolder": "JAVIER ENRIQUE MARTINEZ ALVA",
+        "documentName": "Póliza automóvil - La Ceiba - 0226127883 - 2026-07-02 a 2027-07-02.pdf",
+        "documentClass": "EXPLICIT_2026_2027_NAME",
+        "policyCandidates": [
+          "0226127883",
+          "Póliza No. 0226127883"
+        ],
+        "sourceDates": [
+          "02/07/2026",
+          "02/07/2027",
+          "06/07/2026",
+          "02/07/2026",
+          "02/07/2027",
+          "06/07/2026"
+        ],
+        "textExtraction": "TEXT_EXTRACTED",
+        "historicalSeptemberExcelMatch": false,
+        "matchedHistoricalPolicyRows": [],
+        "liveMatch": "NOT_YET_CERTIFIED"
+      },
+      {
+        "driveFileId": "1RNKCA7BdVuu5Tp8HKT-H2pX1n39Mn5tG",
+        "clientFolder": "JAVIER ENRIQUE MARTINEZ ALVA",
+        "documentName": "Póliza automóvil - La Ceiba - 0226127898 - 2026-07-02 a 2027-07-02.pdf",
+        "documentClass": "EXPLICIT_2026_2027_NAME",
+        "policyCandidates": [
+          "0226127898",
+          "Póliza No. 0226127898"
+        ],
+        "sourceDates": [
+          "02/07/2026",
+          "02/07/2027",
+          "06/07/2026",
+          "02/07/2026",
+          "02/07/2027",
+          "06/07/2026"
+        ],
+        "textExtraction": "TEXT_EXTRACTED",
+        "historicalSeptemberExcelMatch": false,
+        "matchedHistoricalPolicyRows": [],
+        "liveMatch": "NOT_YET_CERTIFIED"
+      },
+      {
+        "driveFileId": "1bbGOuy1Lg47vbt_CrFP2cAL2amk4Ttwb",
+        "clientFolder": "ERIKA MISHELLE RODRIGUEZ TARACENA",
+        "documentName": "Renovación - El Roble - Vehículos - 2026-2027.pdf",
+        "documentClass": "EXPLICIT_2026_2027_NAME",
+        "policyCandidates": [
+          "91 – 8302768"
+        ],
+        "sourceDates": [
+          "28/ 07/ 2027",
+          "28/ 07/ 2026",
+          "09/06/2026"
+        ],
+        "textExtraction": "TEXT_EXTRACTED",
+        "historicalSeptemberExcelMatch": true,
+        "matchedHistoricalPolicyRows": [
+          {
+            "insurerFile": "08-Polizas-16-.xlsx",
+            "policy": "91 – 8302768",
+            "client": "ERIKA MISHELLE RODRÍGUEZ TARACENA",
+            "start": "28-07-2025",
+            "end": "28-07-2026",
+            "status": "Renovada"
+          },
+          {
+            "insurerFile": "08-Polizas-16-.xlsx",
+            "policy": "91 – 8302768",
+            "client": "ERIKA MISHELLE RODRÍGUEZ TARACENA",
+            "start": "28-07-2026",
+            "end": "28-07-2027",
+            "status": "Vigente"
+          }
+        ],
+        "liveMatch": "NOT_YET_CERTIFIED"
+      },
+      {
+        "driveFileId": "1FE0mSv0zr8kBfx2yNvBHOJsuxdbAfKKG",
+        "clientFolder": "DAVID JOSÉ MARADIAGA ZELEDON",
+        "documentName": "Póliza automóvil - Aseguate - AUTO-40322 - 2026-2027.pdf",
+        "documentClass": "EXPLICIT_2026_2027_NAME",
+        "policyCandidates": [
+          "AUTO 40322"
+        ],
+        "sourceDates": [
+          "13/05/2026",
+          "13/05/2027",
+          "13/05/2026",
+          "13/05/2027",
+          "13/05/2026",
+          "13/05/2027"
+        ],
+        "textExtraction": "TEXT_EXTRACTED",
+        "historicalSeptemberExcelMatch": true,
+        "matchedHistoricalPolicyRows": [
+          {
+            "insurerFile": "08-Polizas-16-.xlsx",
+            "policy": "AUTO 40322",
+            "client": "DAVID JOSE MARADIAGA ZELEDON",
+            "start": "15-05-2026",
+            "end": "15-05-2027",
+            "status": "Vencida"
+          }
+        ],
+        "liveMatch": "NOT_YET_CERTIFIED"
+      },
+      {
+        "driveFileId": "16LKceScjAY4atJ-Zcx6HohV8VfIJf33T",
+        "clientFolder": "IVÁN JOSÉ ARGUIJO MACZ",
+        "documentName": "Póliza automóvil - El Roble - 2026-2027.pdf",
+        "documentClass": "EXPLICIT_2026_2027_NAME",
+        "policyCandidates": [
+          "91 – 4142679"
+        ],
+        "sourceDates": [
+          "07/ 05/ 2027",
+          "07/ 05/ 2026",
+          "08/05/2026"
+        ],
+        "textExtraction": "TEXT_EXTRACTED",
+        "historicalSeptemberExcelMatch": true,
+        "matchedHistoricalPolicyRows": [
+          {
+            "insurerFile": "08-Polizas-16-.xlsx",
+            "policy": "91 – 4142679",
+            "client": "IVÁN JOSÉ ARGUIJO MACZ",
+            "start": "07-05-2026",
+            "end": "07-05-2027",
+            "status": "Vencida"
+          }
+        ],
+        "liveMatch": "NOT_YET_CERTIFIED"
+      },
+      {
+        "driveFileId": "1v_v7NX5aRMYQakKzi3AjRAiIpUy2Ee_j",
+        "clientFolder": "WENDY PAOLA VALLE LEAL DE GUTIERREZ",
+        "documentName": "Póliza automóvil - Aseguradora Guatemalteca - AUTO-40116 - 2026-04-22 a 2027-04-22.pdf",
+        "documentClass": "EXPLICIT_2026_2027_NAME",
+        "policyCandidates": [
+          "AUTO 40116"
+        ],
+        "sourceDates": [
+          "22/04/2026",
+          "22/04/2027",
+          "22/04/2026",
+          "22/04/2027",
+          "22/04/2026",
+          "22/04/2027"
+        ],
+        "textExtraction": "TEXT_EXTRACTED",
+        "historicalSeptemberExcelMatch": true,
+        "matchedHistoricalPolicyRows": [
+          {
+            "insurerFile": "08-Polizas-16-.xlsx",
+            "policy": "AUTO 40116",
+            "client": "WENDY PAOLA VALLE LEAL DE GUTIÉRREZ",
+            "start": "22-04-2026",
+            "end": "22-04-2027",
+            "status": "Vencida"
+          }
+        ],
+        "liveMatch": "NOT_YET_CERTIFIED"
+      },
+      {
+        "driveFileId": "1vBvUA29ZTsd4ADDSqF9iW05LeLcEPzQE",
+        "clientFolder": "CINDY LISBETH POROJ CARABALLO",
+        "documentName": "Póliza automóvil - La Ceiba - 0226128642 - 2026-07-24 a 2027-07-24.pdf",
+        "documentClass": "EXPLICIT_2026_2027_NAME",
+        "policyCandidates": [
+          "0226128642",
+          "Póliza No. 0226128642"
+        ],
+        "sourceDates": [
+          "24/07/2026",
+          "24/07/2027",
+          "30/07/2026",
+          "24/07/2026",
+          "24/07/2027",
+          "30/07/2026"
+        ],
+        "textExtraction": "TEXT_EXTRACTED",
+        "historicalSeptemberExcelMatch": false,
+        "matchedHistoricalPolicyRows": [],
+        "liveMatch": "NOT_YET_CERTIFIED"
+      },
+      {
+        "driveFileId": "1kfkAT3iPkYXzt889UtkeDCwpH--bnSbs",
+        "clientFolder": "WENDY PAOLA VALLE LEAL DE GUTIERREZ",
+        "documentName": "Póliza automóvil - Aseguradora Guatemalteca - AUTO-40748 - 2026-06-30 a 2027-06-30.pdf",
+        "documentClass": "EXPLICIT_2026_2027_NAME",
+        "policyCandidates": [
+          "AUTO 40748"
+        ],
+        "sourceDates": [
+          "30/06/2026",
+          "30/06/2027",
+          "30/06/2026",
+          "30/06/2027",
+          "30/06/2026",
+          "30/06/2027"
+        ],
+        "textExtraction": "TEXT_EXTRACTED",
+        "historicalSeptemberExcelMatch": true,
+        "matchedHistoricalPolicyRows": [
+          {
+            "insurerFile": "08-Polizas-16-.xlsx",
+            "policy": "AUTO 40748",
+            "client": "WENDY PAOLA VALLE LEAL DE GUTIÉRREZ",
+            "start": "30-06-2026",
+            "end": "30-06-2027",
+            "status": "Vencida"
+          }
+        ],
+        "liveMatch": "NOT_YET_CERTIFIED"
+      },
+      {
+        "driveFileId": "1REnY7JTIh0B7dx6aS-pO__hnFKKLBJvZ",
+        "clientFolder": "YENIFER PINEDA ZACARIAS",
+        "documentName": "RENOVACIÓN 1002000000099.pdf",
+        "documentClass": "RENEWAL_OR_ENDORSEMENT_UNDATED_NAME",
+        "policyCandidates": [
+          "1002000000099"
+        ],
+        "sourceDates": [
+          "Guatemala, julio 2026"
+        ],
+        "textExtraction": "TEXT_EXTRACTED",
+        "historicalSeptemberExcelMatch": true,
+        "matchedHistoricalPolicyRows": [
+          {
+            "insurerFile": "08-Polizas-16-.xlsx",
+            "policy": "1002000000099",
+            "client": "YENIFER PINEDA ZACARÍAS",
+            "start": "27-06-2025",
+            "end": "15-07-2027",
+            "status": ""
+          },
+          {
+            "insurerFile": "08-Polizas-16-.xlsx",
+            "policy": "1002000000099",
+            "client": "YENIFER PINEDA ZACARÍAS",
+            "start": "15-07-2025",
+            "end": "15-07-2026",
+            "status": ""
+          }
+        ],
+        "liveMatch": "NOT_YET_CERTIFIED"
+      },
+      {
+        "driveFileId": "19Z_7QNfBpxWIPhGucAWOtqULzAxVQs6X",
+        "clientFolder": "CARMEN ELIZABETH YANTUCHE DE LA CRUZ",
+        "documentName": "Renovación AUTO-38624.pdf",
+        "documentClass": "RENEWAL_OR_ENDORSEMENT_UNDATED_NAME",
+        "policyCandidates": [
+          "AUTO-38624"
+        ],
+        "sourceDates": [
+          "27/10/2026",
+          "27/10/2027",
+          "27/10/2026",
+          "27/10/2027",
+          "27/10/2026",
+          "27/10/2027"
+        ],
+        "textExtraction": "TEXT_EXTRACTED",
+        "historicalSeptemberExcelMatch": true,
+        "matchedHistoricalPolicyRows": [
+          {
+            "insurerFile": "08-Polizas-16-.xlsx",
+            "policy": "AUTO-38624",
+            "client": "CARMEN ELIZABETH YANTUCHE DE LA CRUZ",
+            "start": "27-10-2025",
+            "end": "27-10-2026",
+            "status": ""
+          }
+        ],
+        "liveMatch": "NOT_YET_CERTIFIED"
+      },
+      {
+        "driveFileId": "1XqN6uMvZWySMxCwKVQbfxqB7ORXx2fGb",
+        "clientFolder": "WILFREDO MISAEL PINEDA CRUZ",
+        "documentName": "Renovación AUTO-38446.pdf",
+        "documentClass": "RENEWAL_OR_ENDORSEMENT_UNDATED_NAME",
+        "policyCandidates": [
+          "AUTO-38446"
+        ],
+        "sourceDates": [
+          "06/10/2026",
+          "06/10/2027",
+          "06/10/2026",
+          "06/10/2027",
+          "06/10/2026",
+          "06/10/2027"
+        ],
+        "textExtraction": "TEXT_EXTRACTED",
+        "historicalSeptemberExcelMatch": true,
+        "matchedHistoricalPolicyRows": [
+          {
+            "insurerFile": "08-Polizas-16-.xlsx",
+            "policy": "AUTO-38446",
+            "client": "WILFREDO MISAEL PINEDA CRUZ",
+            "start": "06-10-2025",
+            "end": "06-10-2026",
+            "status": ""
+          }
+        ],
+        "liveMatch": "NOT_YET_CERTIFIED"
+      },
+      {
+        "driveFileId": "1Uku56rd6nyK7j420l5sgstiDXn-a8o3_",
+        "clientFolder": "RAUL ESTUARDO FUENTES MORALES",
+        "documentName": "Endoso modificación vehículo - El Roble - 91-0160109 - Peugeot 207 - 2025 - Endoso 914546.pdf",
+        "documentClass": "RENEWAL_OR_ENDORSEMENT_UNDATED_NAME",
+        "policyCandidates": [
+          "0160109",
+          "91-0160109"
+        ],
+        "sourceDates": [
+          "29/07/2025",
+          "18/07/2025",
+          "30/01/2026",
+          "18/07/2025",
+          "30/01/2026",
+          "18/07/2025"
+        ],
+        "textExtraction": "TEXT_EXTRACTED",
+        "historicalSeptemberExcelMatch": true,
+        "matchedHistoricalPolicyRows": [
+          {
+            "insurerFile": "08-Polizas-16-.xlsx",
+            "policy": "91-0160109",
+            "client": "RAÚL ESTUARDO FUENTES MORALES",
+            "start": "30-01-2025",
+            "end": "30-01-2026",
+            "status": ""
+          },
+          {
+            "insurerFile": "08-Polizas-16-.xlsx",
+            "policy": "91-0160109",
+            "client": "RAÚL ESTUARDO FUENTES MORALES",
+            "start": "30-01-2026",
+            "end": "30-01-2027",
+            "status": ""
+          }
+        ],
+        "liveMatch": "NOT_YET_CERTIFIED"
+      },
+      {
+        "driveFileId": "1Gu3Fk-Yg9MDJet2-W8zaSRihSVvSJKQi",
+        "clientFolder": "ERICK FERNANDO GARAVITO",
+        "documentName": "Renovación AUTO-38209.pdf",
+        "documentClass": "RENEWAL_OR_ENDORSEMENT_UNDATED_NAME",
+        "policyCandidates": [
+          "AUTO-38209"
+        ],
+        "sourceDates": [
+          "30/08/2026",
+          "30/08/2027",
+          "30/08/2026",
+          "30/08/2027",
+          "30/08/2026",
+          "30/08/2027"
+        ],
+        "textExtraction": "TEXT_EXTRACTED",
+        "historicalSeptemberExcelMatch": true,
+        "matchedHistoricalPolicyRows": [
+          {
+            "insurerFile": "08-Polizas-16-.xlsx",
+            "policy": "AUTO-38209",
+            "client": "ERICK FERNANDO GARAVITO",
+            "start": "30-08-2025",
+            "end": "30-08-2026",
+            "status": ""
+          }
+        ],
+        "liveMatch": "NOT_YET_CERTIFIED"
+      },
+      {
+        "driveFileId": "1fCIPV3hrOegW6YcenpRA8hE4frCgeS0E",
+        "clientFolder": "NANCY BEATRIZ GONZALEZ TORRES",
+        "documentName": "Endoso sustitución de vehículo - El Roble - 91-8325710 - Toyota Yaris a Honda HR-V - 2026 - Endoso 144485.pdf",
+        "documentClass": "RENEWAL_OR_ENDORSEMENT_UNDATED_NAME",
+        "policyCandidates": [
+          "8325710",
+          "91-8325710",
+          "V - 2026"
+        ],
+        "sourceDates": [
+          "04/03/2026",
+          "03/03/2026",
+          "03/03/2026",
+          "03/03/2026",
+          "12/12/2026",
+          "03/03/2026"
+        ],
+        "textExtraction": "TEXT_EXTRACTED",
+        "historicalSeptemberExcelMatch": true,
+        "matchedHistoricalPolicyRows": [
+          {
+            "insurerFile": "08-Polizas-16-.xlsx",
+            "policy": "91-8325710",
+            "client": "NANCY BEATRIZ GONZALEZ TORRES",
+            "start": "12-12-2025",
+            "end": "12-12-2026",
+            "status": ""
+          }
+        ],
+        "liveMatch": "NOT_YET_CERTIFIED"
+      },
+      {
+        "driveFileId": "1q3cpWWvsPHM6-rTwT5MSzAtPdjArrRga",
+        "clientFolder": "Jonathan Enamorado",
+        "documentName": "Renovación AUTO-38594.pdf",
+        "documentClass": "RENEWAL_OR_ENDORSEMENT_UNDATED_NAME",
+        "policyCandidates": [
+          "AUTO-38594"
+        ],
+        "sourceDates": [
+          "21/10/2026",
+          "21/10/2027",
+          "21/10/2026",
+          "21/10/2027",
+          "21/10/2026",
+          "21/10/2027"
+        ],
+        "textExtraction": "TEXT_EXTRACTED",
+        "historicalSeptemberExcelMatch": true,
+        "matchedHistoricalPolicyRows": [
+          {
+            "insurerFile": "08-Polizas-16-.xlsx",
+            "policy": "AUTO-38594",
+            "client": "DENIS JONATAN ENAMORADO SOLARES",
+            "start": "21-10-2025",
+            "end": "21-10-2026",
+            "status": ""
+          }
+        ],
+        "liveMatch": "NOT_YET_CERTIFIED"
+      },
+      {
+        "driveFileId": "1bQ5DlacBrECQHvDCNYZ7OBHPZenxq1Bm",
+        "clientFolder": "NILDA PATRICIA POROJ CARABALLO",
+        "documentName": "Columna - Póliza VA-48216 - Anexo modificación 143727689 - 2025.pdf",
+        "documentClass": "RENEWAL_OR_ENDORSEMENT_UNDATED_NAME",
+        "policyCandidates": [
+          "VA-48216",
+          "143727689"
+        ],
+        "sourceDates": [],
+        "textExtraction": "TEXT_EXTRACTED",
+        "historicalSeptemberExcelMatch": false,
+        "matchedHistoricalPolicyRows": [],
+        "liveMatch": "NOT_YET_CERTIFIED"
+      },
+      {
+        "driveFileId": "1dWSby9kRbEwihJBjSszVevA-4h_oOEsp",
+        "clientFolder": "INDUSTRIA Y COMERCIO MEDITERRANEO",
+        "documentName": "ENDOSO DE RENOVACIÓN AUTO-45497 - INDUSTRIA Y COMERCIO MEDITERRANEO, SOCIEDAD ANONIMA.pdf",
+        "documentClass": "RENEWAL_OR_ENDORSEMENT_UNDATED_NAME",
+        "policyCandidates": [
+          "AUTO-45497"
+        ],
+        "sourceDates": [
+          "09/07/2026",
+          "09/07/2027",
+          "09/07/2026",
+          "09/07/2027",
+          "09/07/2026",
+          "09/07/2027"
+        ],
+        "textExtraction": "TEXT_EXTRACTED",
+        "historicalSeptemberExcelMatch": true,
+        "matchedHistoricalPolicyRows": [
+          {
+            "insurerFile": "08-Polizas-16-.xlsx",
+            "policy": "AUTO-45497",
+            "client": "JAIR ROLANDO CIFUENTES GONZALEZ",
+            "start": "09-07-2025",
+            "end": "09-07-2026",
+            "status": ""
+          },
+          {
+            "insurerFile": "08-Polizas-16-.xlsx",
+            "policy": "AUTO-45497",
+            "client": "INDUSTRIA Y COMERCIO MEDITERRANEO, SOCIEDAD ANONIMA",
+            "start": "09-07-2026",
+            "end": "09-07-2027",
+            "status": ""
+          }
+        ],
+        "liveMatch": "NOT_YET_CERTIFIED"
+      },
+      {
+        "driveFileId": "11kVgm7v2kihpGeaZGLdc8Bzr4vvgHNx5",
+        "clientFolder": "PERCY RONALDO CHAMALE MUÑOZ",
+        "documentName": "RENOVACION POLIZA NO.3002100014117.PDF",
+        "documentClass": "RENEWAL_OR_ENDORSEMENT_UNDATED_NAME",
+        "policyCandidates": [
+          "3002100014117"
+        ],
+        "sourceDates": [
+          "23/06/2026",
+          "23/06/2027",
+          "23/06/2026",
+          "23/06/2027",
+          "23/06/2021",
+          "23/06/2026"
+        ],
+        "textExtraction": "TEXT_EXTRACTED",
+        "historicalSeptemberExcelMatch": true,
+        "matchedHistoricalPolicyRows": [
+          {
+            "insurerFile": "08-Polizas-16-.xlsx",
+            "policy": "3002100014117",
+            "client": "PERCY ROLANDO CHAMALÉ MUÑOZ",
+            "start": "23-06-2025",
+            "end": "23-06-2026",
+            "status": ""
+          },
+          {
+            "insurerFile": "08-Polizas-16-.xlsx",
+            "policy": "3002100014117",
+            "client": "PERCY ROLANDO CHAMALÉ MUÑOZ",
+            "start": "23-06-2026",
+            "end": "23-06-2027",
+            "status": ""
+          }
+        ],
+        "liveMatch": "NOT_YET_CERTIFIED"
+      },
+      {
+        "driveFileId": "1c_bZLo4slmo1aKcGS9K10dr-HMlY-o5I",
+        "clientFolder": "PERCY RONALDO CHAMALE MUÑOZ",
+        "documentName": "ENDOSO DE RENOVACION AUTO-45580-PERCY RONALDO CHAMALE MUÑOZ.pdf",
+        "documentClass": "RENEWAL_OR_ENDORSEMENT_UNDATED_NAME",
+        "policyCandidates": [
+          "AUTO-45580"
+        ],
+        "sourceDates": [
+          "21/07/2026",
+          "21/07/2027",
+          "21/07/2026",
+          "21/07/2027"
+        ],
+        "textExtraction": "TEXT_EXTRACTED",
+        "historicalSeptemberExcelMatch": true,
+        "matchedHistoricalPolicyRows": [
+          {
+            "insurerFile": "08-Polizas-16-.xlsx",
+            "policy": "AUTO-45580",
+            "client": "PERCY ROLANDO CHAMALÉ MUÑOZ",
+            "start": "21-07-2025",
+            "end": "21-07-2026",
+            "status": ""
+          },
+          {
+            "insurerFile": "08-Polizas-16-.xlsx",
+            "policy": "AUTO-45580",
+            "client": "PERCY ROLANDO CHAMALÉ MUÑOZ",
+            "start": "21-07-2026",
+            "end": "21-07-2027",
+            "status": ""
+          }
+        ],
+        "liveMatch": "NOT_YET_CERTIFIED"
+      },
+      {
+        "driveFileId": "13JCLhzmO_iKtPiL5Sw3BA0LyfKw8hgH9",
+        "clientFolder": "IMPAGUA",
+        "documentName": "Carátula póliza transporte local - Seguros G&T - TLG$-7348 - 2026-05-07 a 2026-06-07.pdf",
+        "documentClass": "RENEWAL_OR_ENDORSEMENT_UNDATED_NAME",
+        "policyCandidates": [],
+        "sourceDates": [
+          "07/05/2026",
+          "07/06/2026"
+        ],
+        "textExtraction": "TEXT_EXTRACTED",
+        "historicalSeptemberExcelMatch": false,
+        "matchedHistoricalPolicyRows": [],
+        "liveMatch": "NOT_YET_CERTIFIED"
+      },
+      {
+        "driveFileId": "1ki3SALuF5K3F-tUgnFdogmYpX0UVIVun",
+        "clientFolder": "Cristian Arriaga",
+        "documentName": "ENDOSO RENOVACION AUTO-45566-CRISTIAN AROLDO ARREAGA LOPEZ.pdf",
+        "documentClass": "RENEWAL_OR_ENDORSEMENT_UNDATED_NAME",
+        "policyCandidates": [
+          "AUTO-45566"
+        ],
+        "sourceDates": [
+          "15/07/2026",
+          "15/07/2027",
+          "15/07/2026",
+          "15/07/2027"
+        ],
+        "textExtraction": "TEXT_EXTRACTED",
+        "historicalSeptemberExcelMatch": true,
+        "matchedHistoricalPolicyRows": [
+          {
+            "insurerFile": "08-Polizas-16-.xlsx",
+            "policy": "AUTO-45566",
+            "client": "CRISTIAN ARREAGA",
+            "start": "15-07-2025",
+            "end": "15-07-2026",
+            "status": ""
+          },
+          {
+            "insurerFile": "08-Polizas-16-.xlsx",
+            "policy": "AUTO-45566",
+            "client": "CRISTIAN ARREAGA",
+            "start": "15-07-2026",
+            "end": "15-07-2027",
+            "status": ""
+          }
+        ],
+        "liveMatch": "NOT_YET_CERTIFIED"
+      },
+      {
+        "driveFileId": "1odOfnvDlbeP_74nrf-lyed7QZZwVDk0L",
+        "clientFolder": "Julio Sinay",
+        "documentName": "CARÁTULA DE RENOVACIÓN-1 (1).pdf",
+        "documentClass": "RENEWAL_OR_ENDORSEMENT_UNDATED_NAME",
+        "policyCandidates": [],
+        "sourceDates": [
+          "21/08/2026",
+          "21/08/2027"
+        ],
+        "textExtraction": "TEXT_EXTRACTED",
+        "historicalSeptemberExcelMatch": false,
+        "matchedHistoricalPolicyRows": [],
+        "liveMatch": "NOT_YET_CERTIFIED"
+      },
+      {
+        "driveFileId": "1DMNU1duf8Ok3OLLOnUEpeV1cT6u1UuGw",
+        "clientFolder": "BAYRON ESTUARDO CONTRERAS PORTILLO",
+        "documentName": "VA125-00010478 EMISIÓN.pdf",
+        "documentClass": "POLICY_NUMBER_ONLY_OR_EMISSION_NAME",
+        "policyCandidates": [
+          "VA125-00010478"
+        ],
+        "sourceDates": [
+          "20-08-2026",
+          "19-08-2027",
+          "20-08-2026",
+          "19-08-2027",
+          "20-08-2026",
+          "20-08-2026"
+        ],
+        "textExtraction": "TEXT_EXTRACTED",
+        "historicalSeptemberExcelMatch": true,
+        "matchedHistoricalPolicyRows": [
+          {
+            "insurerFile": "08-Polizas-16-.xlsx",
+            "policy": "",
+            "client": "BAYRON ESTUARDO CONTRERAS PORTILLO",
+            "start": "20-08-2026",
+            "end": "20-08-2027",
+            "status": ""
+          }
+        ],
+        "liveMatch": "NOT_YET_CERTIFIED"
+      },
+      {
+        "driveFileId": "1mZdJj9Ft7nrW87Jf7Od4bMpb-1SamjJR",
+        "clientFolder": "JOSÉ VIDAL DE LA ROSA CHAJÓN",
+        "documentName": "AUTO-519815.pdf",
+        "documentClass": "POLICY_NUMBER_ONLY_OR_EMISSION_NAME",
+        "policyCandidates": [
+          "AUTO-519815"
+        ],
+        "sourceDates": [
+          "28/10/2026",
+          "28/10/2027",
+          "28/10/2026",
+          "28/10/2027",
+          "28/10/2027",
+          "28/10/2026"
+        ],
+        "textExtraction": "TEXT_EXTRACTED",
+        "historicalSeptemberExcelMatch": true,
+        "matchedHistoricalPolicyRows": [
+          {
+            "insurerFile": "08-Polizas-16-.xlsx",
+            "policy": "",
+            "client": "JOSE VIDAL DE LA ROSA CHAJON",
+            "start": "28-10-2025",
+            "end": "28-10-2026",
+            "status": ""
+          }
+        ],
+        "liveMatch": "NOT_YET_CERTIFIED"
+      },
+      {
+        "driveFileId": "1ouWNC9PtqXWxvSW4SUNUG_mvHjXc3IBJ",
+        "clientFolder": "CARMEN ELIZABETH YANTUCHE DE LA CRUZ",
+        "documentName": "AUTO-38624.pdf",
+        "documentClass": "POLICY_NUMBER_ONLY_OR_EMISSION_NAME",
+        "policyCandidates": [
+          "AUTO-38624"
+        ],
+        "sourceDates": [
+          "27/10/2026",
+          "27/10/2027",
+          "27/10/2026",
+          "27/10/2027",
+          "27/10/2026",
+          "27/10/2027"
+        ],
+        "textExtraction": "TEXT_EXTRACTED",
+        "historicalSeptemberExcelMatch": true,
+        "matchedHistoricalPolicyRows": [
+          {
+            "insurerFile": "08-Polizas-16-.xlsx",
+            "policy": "",
+            "client": "CARMEN ELIZABETH YANTUCHE DE LA CRUZ",
+            "start": "27-10-2025",
+            "end": "27-10-2026",
+            "status": ""
+          }
+        ],
+        "liveMatch": "NOT_YET_CERTIFIED"
+      },
+      {
+        "driveFileId": "1B-0qgW7tBIXN7QfDGMJeiaRrG35YMYvY",
+        "clientFolder": "ABNER ABRAHAM LIMA ZEPEDA",
+        "documentName": "AUTO-38111.pdf",
+        "documentClass": "POLICY_NUMBER_ONLY_OR_EMISSION_NAME",
+        "policyCandidates": [
+          "AUTO-38111"
+        ],
+        "sourceDates": [
+          "23/08/2026",
+          "23/08/2027",
+          "23/08/2026",
+          "23/08/2027",
+          "23/08/2026",
+          "23/08/2027"
+        ],
+        "textExtraction": "TEXT_EXTRACTED",
+        "historicalSeptemberExcelMatch": true,
+        "matchedHistoricalPolicyRows": [
+          {
+            "insurerFile": "08-Polizas-16-.xlsx",
+            "policy": "",
+            "client": "ABNER ABRAHAM LIMA ZEPEDA",
+            "start": "23-08-2025",
+            "end": "23-08-2026",
+            "status": ""
+          },
+          {
+            "insurerFile": "08-Polizas-16-.xlsx",
+            "policy": "",
+            "client": "ABNER ABRAHAM LIMA ZEPEDA",
+            "start": "23-08-2026",
+            "end": "23-08-2027",
+            "status": ""
+          }
+        ],
+        "liveMatch": "NOT_YET_CERTIFIED"
+      },
+      {
+        "driveFileId": "17LraR_VVmCdiaA8bgalxqLZKDvOnFmf7",
+        "clientFolder": "ROLANDO JAVIER LARIOS CALDERON",
+        "documentName": "AUTO-40740.pdf",
+        "documentClass": "POLICY_NUMBER_ONLY_OR_EMISSION_NAME",
+        "policyCandidates": [
+          "AUTO-40740"
+        ],
+        "sourceDates": [
+          "27/06/2026",
+          "27/06/2027",
+          "27/06/2026",
+          "27/06/2027",
+          "27/06/2026",
+          "27/06/2027"
+        ],
+        "textExtraction": "TEXT_EXTRACTED",
+        "historicalSeptemberExcelMatch": true,
+        "matchedHistoricalPolicyRows": [
+          {
+            "insurerFile": "08-Polizas-16-.xlsx",
+            "policy": "",
+            "client": "ROLANDO JAVIER LARIOS CALDERON",
+            "start": "27-06-2026",
+            "end": "27-06-2027",
+            "status": ""
+          }
+        ],
+        "liveMatch": "NOT_YET_CERTIFIED"
+      },
+      {
+        "driveFileId": "1ujx6jIOI3GvF3UIurELfk0o3esFprpUH",
+        "clientFolder": "Jonathan Enamorado",
+        "documentName": "AUTO-38594.pdf",
+        "documentClass": "POLICY_NUMBER_ONLY_OR_EMISSION_NAME",
+        "policyCandidates": [
+          "AUTO-38594"
+        ],
+        "sourceDates": [
+          "21/10/2026",
+          "21/10/2027",
+          "21/10/2026",
+          "21/10/2027",
+          "21/10/2026",
+          "21/10/2027"
+        ],
+        "textExtraction": "TEXT_EXTRACTED",
+        "historicalSeptemberExcelMatch": true,
+        "matchedHistoricalPolicyRows": [
+          {
+            "insurerFile": "08-Polizas-16-.xlsx",
+            "policy": "",
+            "client": "DENIS JONATAN ENAMORADO SOLARES",
+            "start": "21-10-2025",
+            "end": "21-10-2026",
+            "status": ""
+          }
+        ],
+        "liveMatch": "NOT_YET_CERTIFIED"
+      },
+      {
+        "driveFileId": "1N869PzCQiUO0-2FBTrSWpBw_OMFx2fPR",
+        "clientFolder": "Jonathan Enamorado",
+        "documentName": "AUTO-38308.pdf",
+        "documentClass": "POLICY_NUMBER_ONLY_OR_EMISSION_NAME",
+        "policyCandidates": [
+          "AUTO-38308"
+        ],
+        "sourceDates": [
+          "12/09/2026",
+          "12/09/2027",
+          "12/09/2026",
+          "12/09/2027",
+          "12/09/2026",
+          "12/09/2027"
+        ],
+        "textExtraction": "TEXT_EXTRACTED",
+        "historicalSeptemberExcelMatch": true,
+        "matchedHistoricalPolicyRows": [
+          {
+            "insurerFile": "08-Polizas-16-.xlsx",
+            "policy": "",
+            "client": "DENIS JONATAN ENAMORADO SOLARES",
+            "start": "12-09-2025",
+            "end": "12-09-2026",
+            "status": ""
+          },
+          {
+            "insurerFile": "08-Polizas-16-.xlsx",
+            "policy": "",
+            "client": "DENIS JONATAN ENAMORADO SOLARES",
+            "start": "12-09-2026",
+            "end": "12-09-2027",
+            "status": ""
+          }
+        ],
+        "liveMatch": "NOT_YET_CERTIFIED"
+      },
+      {
+        "driveFileId": "1vhZhXb52E86WT5c0qjV1JBM5iwq71qLZ",
+        "clientFolder": "Angel Fernando Muñoz",
+        "documentName": "VA125-00010743 EMISIÓN.pdf",
+        "documentClass": "POLICY_NUMBER_ONLY_OR_EMISSION_NAME",
+        "policyCandidates": [
+          "VA125-00010743"
+        ],
+        "sourceDates": [
+          "08-09-2026",
+          "07-09-2027",
+          "08-09-2026",
+          "07-09-2027",
+          "08-09-2026",
+          "08-09-2026"
+        ],
+        "textExtraction": "TEXT_EXTRACTED",
+        "historicalSeptemberExcelMatch": true,
+        "matchedHistoricalPolicyRows": [
+          {
+            "insurerFile": "08-Polizas-16-.xlsx",
+            "policy": "",
+            "client": "ÁNGEL FERNANDO GUTIERREZ MUÑOZ",
+            "start": "08-09-2026",
+            "end": "07-09-2027",
+            "status": ""
+          }
+        ],
+        "liveMatch": "NOT_YET_CERTIFIED"
+      },
+      {
+        "driveFileId": "19ht0t_0TTAMmBgo1rYiO5CJZdebdP-7F",
+        "clientFolder": "Angel Fernando Muñoz",
+        "documentName": "VA125-00010777 EMISIÓN.pdf",
+        "documentClass": "POLICY_NUMBER_ONLY_OR_EMISSION_NAME",
+        "policyCandidates": [
+          "VA125-00010777"
+        ],
+        "sourceDates": [
+          "08-09-2026",
+          "07-09-2027",
+          "08-09-2026",
+          "07-09-2027",
+          "08-09-2026",
+          "08-09-2026"
+        ],
+        "textExtraction": "TEXT_EXTRACTED",
+        "historicalSeptemberExcelMatch": false,
+        "matchedHistoricalPolicyRows": [],
+        "liveMatch": "NOT_YET_CERTIFIED"
+      },
+      {
+        "driveFileId": "11T4Zn1_6o1ZgI1kBqcI7Ev4pnvrgVvOo",
+        "clientFolder": "JUAN CARLOS CORADO GARCIA",
+        "documentName": "AUTO-37856.pdf",
+        "documentClass": "POLICY_NUMBER_ONLY_OR_EMISSION_NAME",
+        "policyCandidates": [
+          "AUTO-37856"
+        ],
+        "sourceDates": [
+          "26/07/2026",
+          "26/07/2027",
+          "26/07/2026",
+          "26/07/2027",
+          "26/07/2026",
+          "26/07/2026"
+        ],
+        "textExtraction": "TEXT_EXTRACTED",
+        "historicalSeptemberExcelMatch": true,
+        "matchedHistoricalPolicyRows": [
+          {
+            "insurerFile": "08-Polizas-16-.xlsx",
+            "policy": "",
+            "client": "JUAN CARLOS CORADO GARCIA",
+            "start": "26-07-2025",
+            "end": "26-07-2026",
+            "status": ""
+          },
+          {
+            "insurerFile": "08-Polizas-16-.xlsx",
+            "policy": "",
+            "client": "JUAN CARLOS CORADO GARCIA",
+            "start": "26-07-2026",
+            "end": "26-07-2027",
+            "status": ""
+          }
+        ],
+        "liveMatch": "NOT_YET_CERTIFIED"
+      },
+      {
+        "driveFileId": "1QJfbs5J4SSi4HRAePHi2VrGbQhhUxeEe",
+        "clientFolder": "INVERSIONES Y DESARROLLOS J&J, SOCIEDAD ANÓNIMA",
+        "documentName": "AUTO-492287.pdf",
+        "documentClass": "POLICY_NUMBER_ONLY_OR_EMISSION_NAME",
+        "policyCandidates": [
+          "AUTO-492287"
+        ],
+        "sourceDates": [
+          "06/08/2026",
+          "06/08/2027",
+          "06/08/2026",
+          "06/08/2027",
+          "06/08/2027",
+          "06/08/2026"
+        ],
+        "textExtraction": "TEXT_EXTRACTED",
+        "historicalSeptemberExcelMatch": true,
+        "matchedHistoricalPolicyRows": [
+          {
+            "insurerFile": "08-Polizas-16-.xlsx",
+            "policy": "",
+            "client": "INVERSIONES Y DESARROLLOS J&J, SOCIEDAD ANÓNIMA",
+            "start": "06-08-2025",
+            "end": "06-08-2026",
+            "status": ""
+          },
+          {
+            "insurerFile": "08-Polizas-16-.xlsx",
+            "policy": "",
+            "client": "INVERSIONES Y DESARROLLOS J&J, SOCIEDAD ANÓNIMA",
+            "start": "06-08-2026",
+            "end": "06-08-2027",
+            "status": ""
+          }
+        ],
+        "liveMatch": "NOT_YET_CERTIFIED"
+      }
+    ],
+    "highPriorityConflicts": [
+      {
+        "policyNumber": "AUTO-45497",
+        "effectiveStart": "2026-07-09",
+        "effectiveEnd": "2027-07-09",
+        "driveClients": [
+          "JAIR ROLANDO CIFUENTES GONZALES",
+          "INDUSTRIA Y COMERCIO MEDITERRANEO"
+        ],
+        "evidence": "Two authentic insurer documents same policy number and term, distinct named insured; source Excel has both 2025 and 2026 identity rows. Verify insurer endorsement chain before changing ownership.",
+        "status": "HOLD_IDENTITY_RECONCILIATION"
+      },
+      {
+        "policyNumber": "AUTO-40798",
+        "client": "BAYRON BASILIO CALGUA LUX",
+        "effectiveStart": "2026-07-03",
+        "effectiveEnd": "2027-07-03",
+        "evidence": "Authentic primary PDF; authenticated LIVE policy-number search returned 0 rows. Confirm by client/alias/insurer/vehicle/report export.",
+        "status": "POTENTIAL_LIVE_GAP_NOT_CONCLUSIVE"
+      },
+      {
+        "policyNumber": "VA125-00010777",
+        "client": "Angel Fernando Muñoz",
+        "effectiveStart": "2026-09-08",
+        "effectiveEnd": "2027-09-07",
+        "evidence": "Authentic primary issue PDF; no match in two historical source spreadsheets; current LIVE join pending.",
+        "status": "HISTORICAL_SOURCE_GAP_NOT_CONCLUSIVE"
+      }
+    ],
+    "safeMethodFrozen": {
+      "sourceRead": "Scan all client dossier descendants; record Drive File ID and modified date separately from actual insurance term.",
+      "firstJoin": "Match exact normalized policy number, insurer, client, effective term; never by folder name or modified time alone.",
+      "authoritativeJoin": "Use LIVE Gravicentra policies inventory, 1,417 total seen Nov 10, authenticated; September Excel only provisional.",
+      "deltaTypes": [
+        "EXISTS_LIVE_MATCH",
+        "NEEDS_CREATE_POLICY",
+        "NEEDS_RENEWAL_OR_ENDORSEMENT",
+        "RECEIPTS_OR_PAYMENT_ONLY",
+        "DOCUMENT_OR_IDENTITY_AMBIGUOUS"
+      ],
+      "mutationPolicy": "This census is read-only; never create clients, vehicles, policies, requirements, or collections before LIVE before/after, policy uniqueness, source evidence, active I6.6 write path; insurer requirements must reconcile exactly.",
+      "manualOnly": "Escalate only identity conflicts, contradictory terms, absent definitive source identity, or unsupported payment evidence.",
+      "blocker": "Browser connected report tab timed out on CDP FocusEmulation; LIVE report export or equivalent authorized inventory still needed; crossmatch not certified.",
+      "nextAction": "Restore authenticated LIVE policy export/read-only inventory and multi-key reconcile 78 reviewed documents; classify remaining non-policy recent documents, apply only proven deltas in large I6.6 safe batches."
+    },
+    "effects": {
+      "driveWrites": 0,
+      "liveDataWrites": 0,
+      "livePayments": 0,
+      "sourceCodeDeploys": 0
+    }
   }
 }
