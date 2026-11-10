@@ -1,4 +1,4 @@
-# NOT APPLIED. Safe push-path trigger only AFTER source/manifest review.
+# LIVE finance READ ONLY diagnostic; no payment/reconciliation or Firestore mutations.
 # Existing first payment MUST NEVER be retried by this workflow.
 name: Gravicentra I6.6 Bayron signed payment POST-READBACK ONLY
 
@@ -7,6 +7,8 @@ on:
     branches: [recovery/fase-a-clean-20260831]
     paths:
       - .github/workflows/gravicentra-i66-bayron-postpayment-readonly.yml
+      - tools/gravicentra-i66-bayron-postpayment-readonly.cjs
+      - tools/gravicentra-i66-bayron-postpayment-readonly.test.cjs
 
 permissions:
   contents: read
@@ -31,7 +33,7 @@ jobs:
         with:
           ref: ${{ github.sha }}
           persist-credentials: false
-      - name: Syntax and 11 focused no-write regression tests
+      - name: Syntax and 12 focused no-write regression tests
         shell: bash
         run: |
           set -euo pipefail
