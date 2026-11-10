@@ -29,7 +29,6 @@ jobs:
       SA_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
       SA_LAB_ALT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
       SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
-      GI_I66_REPORT_PATH: ${{ runner.temp }}/gi-i66-maria-ten-receipts-before.json
     steps:
       - name: Checkout exact recovery and read-only boundary
         uses: actions/checkout@v4
@@ -42,6 +41,7 @@ jobs:
         run: |
           set -euo pipefail
           test "$GITHUB_REF_NAME" = "recovery/fase-a-clean-20260831"
+          echo "GI_I66_REPORT_PATH=$RUNNER_TEMP/gi-i66-maria-ten-receipts-before.json" >> "$GITHUB_ENV"
           test "$PROJECT_ID" = "ays-orbit-360-lab"
           test -z "${FIRESTORE_EMULATOR_HOST:-}"
           SRC=artifacts/orbit360-recovery/release-control/i6-6-p0-checkpoints/I66_UNIVERSALES_MARIA_10_PATCH_ONLY_NOT_APPLIED_20261110.tar.gz.b64.md
