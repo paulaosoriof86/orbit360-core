@@ -193,6 +193,8 @@ jobs:
                 console.log('I66_MARIA_LIVE_POLICY_ID_MISMATCH_READONLY_REPORT=CREATED');
                 console.log('I66_MARIA_LIVE_RECEIPT_INVENTORY_COUNT='+receipts.length);
                 console.log('I66_MARIA_LIVE_RECEIPT_INVENTORY_DIGEST='+fingerprint);
+                console.log('I66_MARIA_LIVE_CANONICAL_IDS='+JSON.stringify({policyDocumentId:policy.docId,policyRowId:policy.rowId,tenantIdHash:hash(policy.scopeId).slice(0,12)}));
+                console.log('I66_MARIA_LIVE_RECEIPT_SAFE_SUMMARY='+JSON.stringify(receipts.map(x=>({id:x.id,polizaId:x.polizaId,serie:x.serie,secuencia:x.secuencia,cuota:x.cuota,monto:x.monto,montoTotal:x.montoTotal,primaTotal:x.primaTotal,vence:x.vence,fechaLimite:x.fechaLimite,estado:x.estado,estadoPago:x.estadoPago,numeroReciboFuente:x.numeroReciboFuente,fechaPagoPresent:!!x.fechaPago,pagado:x.pagado,conciliado:x.conciliado}))));
               }
               console.log('I66_MARIA_TENANT_EXACT_MATCH_COUNT='+found.length);
               throw Error('I66_MARIA_TENANT_NOT_EXACTLY_ONE');
