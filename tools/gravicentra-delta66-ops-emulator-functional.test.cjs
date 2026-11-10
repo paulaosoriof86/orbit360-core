@@ -70,7 +70,7 @@ async function go(uid,role,operation,entityId,payload){return handler.run(req(ui
   assert.equal(snap.data().deleted,true);assert.equal(snap.data().archivado,true);checks++;
   const management='ges_i66_ops_00001';
   await doc('gestiones',management).set({id:management,tenantId:tenant,asesorId:'advisor-other',pais:'GT',
-    tipo:'Gestión',titulo:'QA gestione',estado:'Pendiente',workflowType:'general'});
+    tipo:'Gestión',titulo:'QA gestione',estado:'Pendiente',workflowType:'general',previewWrite:true});
   stage='archive-management';
   await go('op-gt','Operativo','archive_management',management,{deleted:true,eliminado:true,archivado:true,
     deleteReason:'Gestión QA solamente',deletedAt:new Date().toISOString(),deletedByRole:'Operativo'});
@@ -80,7 +80,7 @@ async function go(uid,role,operation,entityId,payload){return handler.run(req(ui
     asesorId:'advisor-other',pais:'GT',__syntheticQa:true,historial:[]});
   const endorsementData={tenantId:tenant,asesorId:'advisor-other',pais:'GT',clienteId:'cli-1',polizaId:policyId,
     workflowType:'endorsement_request',endorsementType:'beneficiario',endorsementKey:tenant+'|'+policyId+'|beneficiario',
-    endorsementStage:'SOLICITADO',estado:'Pendiente',titulo:'QA Endoso solicitado'};
+    endorsementStage:'SOLICITADO',estado:'Pendiente',titulo:'QA Endoso solicitado',previewWrite:true};
   await doc('gestiones','ges_i66_endoso_pending').set({...endorsementData,id:'ges_i66_endoso_pending'});
   stage='archive-pending-endorsement';
   await go('op-gt','Operativo','archive_management','ges_i66_endoso_pending',{deleted:true,eliminado:true,archivado:true,
