@@ -526,6 +526,7 @@ Orbit.modules.cliente360 = (function () {
               <button class="btn ghost sm" title="Redactar correo (se asocia al cliente)" onclick="window.__orbitCompose={para:'${U.esc(c.email || '')}',asunto:'',cuerpo:'',clienteId:'${cid}',vinculo:{tipo:'cliente',id:'${cid}',label:'${U.esc(c.nombre)}'}};location.hash='#/correo'" style="color:#2563a8">✉ Correo</button>
               <button class="btn ghost sm" title="Solicitar gestión operativa (Ops)" onclick="Orbit.ciclo.solicitarGestion('${cid}')">🗂 Gestión</button>
               <button class="btn ghost sm" title="Solicitud del cliente (Portal)" onclick="Orbit.ciclo.solicitarGestion('${cid}',null,true)">🙋 Cliente</button>
+              ${Orbit.policyReceipts && typeof Orbit.policyReceipts.canManagePolicies === 'function' && Orbit.policyReceipts.canManagePolicies() ? `<button class="btn primary sm" title="Crear póliza vinculada a este cliente" onclick="Orbit.modules.cliente360.nuevaPoliza('${cid}')">+ Crear póliza</button>` : ''}
               <button class="btn primary sm" onclick="Orbit.modules.cliente360.edit('${cid}')">Editar</button>
             </div>
           </div>
