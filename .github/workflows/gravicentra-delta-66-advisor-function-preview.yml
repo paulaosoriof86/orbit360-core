@@ -1,4 +1,4 @@
-# I6.6 Ops-only Preview Function: exact e898 artifact, no LIVE/Firestore writes.
+# I6.6 Advisor/Cliente360 Preview only: reassert source 439ff7 exact artifact, no LIVE/data writes.
 name: Gravicentra I6.6 CTA Advisor Notification Scoped Preview
 on:
   push:
@@ -99,12 +99,7 @@ jobs:
           if(!fs.existsSync(p+'backend/index.js')||!fs.existsSync(p+'backend/package-lock.json'))throw Error('I66_ADVISOR_PACKET_INCOMPLETE');
           console.log('I66_ADVISOR_EXACT_BACKEND_AND_MARKER_PASS build='+marker.buildId);
           NODE
-          curl --fail --silent --show-error --max-time 30 "$PREVIEW_URL/__recovery__/build.json" > "$RUNNER_TEMP/ops-preview-marker.json"
-          node - <<'NODE'
-          const j=require(process.env.RUNNER_TEMP+'/ops-preview-marker.json');
-          if(j.sourceSha!==process.env.SOURCE_SHA)throw Error('OPS_PREVIEW_SOURCE_DRIFT');
-          console.log('I66_ADVISOR_PREVIEW_HOSTING_SOURCE_PASS');
-          NODE
+          echo 'I66_ADVISOR_PACKAGE_SOURCE_BYTES_VERIFIED; PREVIEW_URL_TO_BE_REASSERTED_AFTER_CONFIGURED_FIREBASE_ACCESS'
       - name: Pick already configured LAB authority and pinned Firebase CLI
         run: |
           set -euo pipefail
@@ -133,6 +128,61 @@ jobs:
           chmod 600 "$RUNNER_TEMP/ops-preview-auth/selected.json"
           echo "GOOGLE_APPLICATION_CREDENTIALS=$RUNNER_TEMP/ops-preview-auth/selected.json" >> "$GITHUB_ENV"
           echo "OPS_FIREBASE_CLI=$CLI" >> "$GITHUB_ENV"
+      - name: Reassert SAME byte-exact Hosting Preview channel and full 218 asset readback
+        run: |
+          set -euo pipefail
+          curl -fsSL --max-time 25 'https://ays-orbit-360-lab.web.app/' | sha256sum > "$RUNNER_TEMP/adv-live-firebase-before.sha"
+          curl -fsSL --max-time 25 'https://app.aysseguros.com/' | sha256sum > "$RUNNER_TEMP/adv-live-app-before.sha"
+          cd "$RUNNER_TEMP/ops-immutable-packet/bundle"
+          node "$OPS_FIREBASE_CLI" hosting:channel:deploy "gi-i66-rc-42870013249" --config firebase.json --project "$PROJECT_ID" --expires 7d --non-interactive --json > "$RUNNER_TEMP/adv-preview-deploy.json" 2>&1
+          export PREVIEW_URL=$(python3 - <<'PY'
+          import os,re
+          raw=open(os.environ['RUNNER_TEMP']+'/adv-preview-deploy.json').read()
+          prefix='https://ays-orbit-360-lab--gi-i66-rc-42870013249-'
+          urls=sorted(set(s.rstrip('/') for s in re.findall(r'https://[A-Za-z0-9._-]+\.web\.app',raw) if s.startswith(prefix)))
+          if len(urls)!=1:raise SystemExit('I66_ADVISOR_PREVIEW_URL_AMBIGUOUS')
+          print(urls[0])
+          PY
+          )
+          test -n "$PREVIEW_URL"
+          echo "PREVIEW_URL=$PREVIEW_URL" >> "$GITHUB_ENV"
+          echo "I66_ADVISOR_REASSERTED_PREVIEW_ORIGIN=$PREVIEW_URL"
+          node - <<'NODE'
+          (async()=>{
+          const fs=require('node:fs'),crypto=require('node:crypto'),path=require('node:path');
+          const root=process.env.RUNNER_TEMP+'/ops-immutable-packet',site=root+'/bundle/site',url=process.env.PREVIEW_URL;
+          const lines=fs.readFileSync(root+'/evidence/site-manifest.sha256','utf8').trim().split('\n');
+          const rows=lines.map(s=>{const m=s.match(/^([0-9a-f]{64})  (.+)$/);if(!m)throw Error('BAD_SITE_MANIFEST');return {hash:m[1],rel:m[2]};});
+          if(rows.length<200||rows.length>800)throw Error('BAD_PREVIEW_FILE_COUNT');
+          const sha=b=>crypto.createHash('sha256').update(b).digest('hex'),sleep=t=>new Promise(r=>setTimeout(r,t));let index=0,ok=0;
+          async function get(p){let last;
+            for(let i=0;i<5;i++)try{
+              const r=await fetch(url+'/'+p.split('/').map(encodeURIComponent).join('/'),{redirect:'follow',headers:{'cache-control':'no-cache'},signal:AbortSignal.timeout(15000)});
+              if(!r.ok)throw Error('HTTP_'+r.status);
+              return Buffer.from(await r.arrayBuffer());
+            }catch(e){last=e;if(i<4)await sleep(1500*(i+1));}
+            throw Error('I66_ADVISOR_PREVIEW_UNAVAILABLE:'+String(last&&last.message||last));
+          }
+          await Promise.all(Array.from({length:10},async()=>{
+            while(index<rows.length){
+              const row=rows[index++],local=fs.readFileSync(path.join(site,row.rel));
+              if(sha(local)!==row.hash)throw Error('I66_ADVISOR_LOCAL_MANIFEST_MISMATCH');
+              const remote=await get(row.rel);
+              if(sha(remote)!==row.hash)throw Error('I66_ADVISOR_PREVIEW_BYTE_MISMATCH:'+row.rel);
+              ok++;
+            }
+          }));
+          if(ok!==rows.length)throw Error('I66_ADVISOR_PREVIEW_READBACK_INCOMPLETE');
+          const meta=JSON.parse((await get('__recovery__/build.json')).toString('utf8'));
+          if(meta.sourceSha!==process.env.SOURCE_SHA||meta.gate!=='I6.6')throw Error('I66_ADVISOR_PREVIEW_MARKER_SOURCE_DRIFT');
+          console.log('I66_ADVISOR_REASSERTED_HOSTING_PREVIEW_BYTE_READBACK_PASS files='+ok);
+          })().catch(e=>{console.error(String(e&&e.message||e));process.exitCode=1;});
+          NODE
+          curl -fsSL --max-time 25 'https://ays-orbit-360-lab.web.app/' | sha256sum > "$RUNNER_TEMP/adv-live-firebase-after.sha"
+          curl -fsSL --max-time 25 'https://app.aysseguros.com/' | sha256sum > "$RUNNER_TEMP/adv-live-app-after.sha"
+          cmp "$RUNNER_TEMP/adv-live-firebase-before.sha" "$RUNNER_TEMP/adv-live-firebase-after.sha"
+          cmp "$RUNNER_TEMP/adv-live-app-before.sha" "$RUNNER_TEMP/adv-live-app-after.sha"
+          echo "I66_ADVISOR_BOTH_LIVE_ORIGINS_UNCHANGED_PASS"
       - name: Deploy only Ops Preview callable from immutable artifact
         run: |
           set -euo pipefail
