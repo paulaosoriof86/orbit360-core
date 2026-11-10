@@ -7566,5 +7566,69 @@
     "productionWrites": 0,
     "whatsappSent": 0,
     "note": "Reporter UX original failure still requires authenticated LIVE readback; emulator confirms contract, not production acceptance. Do not change built source without new artifact."
+  },
+  "i66AdvisorClient360LiveRelease20261110": {
+    "id": "GI_I66_ADVISOR_PAYMENT_AND_CLIENT360_LIVE_20261110",
+    "status": "LIVE_FOUR_FUNCTIONS_AND_HOSTING_TRANSPORT_PASS_AUTHENTICATED_WRITE_UAT_PENDING",
+    "liveRun": 42875456562,
+    "result": "SUCCESS",
+    "sourceCommit": "439ff7aebc685866c5605407dbc920fb329a552b",
+    "artifactId": 13789885477,
+    "artifactDigest": "sha256:16bcf79be3d63fd67498194288e5131e1bf165b88ee32eff78b6dd184ce75c90",
+    "buildId": "gi-i66-439ff7aebc68-57f234755dc1",
+    "previewFunctionsRun": 42871323207,
+    "emulatorRun": 42870010579,
+    "emulatorChecks": 48,
+    "sourceGuardRun": 42870010697,
+    "functionsUpdated": [
+      "orbit360CobrosReconciliationCommand",
+      "orbit360GetAdvisorOpsInbox"
+    ],
+    "functionsNewlyCreated": [
+      "orbit360NotificationOutboxCreated",
+      "orbit360UpdateAdvisorOpsInboxState"
+    ],
+    "functionsRegion": "us-central1",
+    "hostingPrior": "3372f81dd6ee2964",
+    "hostingAfter": "02dddf5f62bac21b",
+    "readbacks": {
+      "preview": "218/218",
+      "firebaseLive": "218/218",
+      "appAysseguros": "218/218"
+    },
+    "rollbackChannel": "gi-i66-advrb-42875456562",
+    "rollbackPerformed": false,
+    "proofArtifact": {
+      "id": 13792260660,
+      "digest": "sha256:c14ecffabd7c3aaec590473d482153bc7a9f6296576e433a917cb22533760b51"
+    },
+    "scope": [
+      "Client 360 contextual + Crear póliza CTA",
+      "Advisor report pending payment to Operations without applying payment",
+      "In-app country/tenant/role scoped notification outbox and inbox"
+    ],
+    "excluded": [
+      "Carlos renewability patch",
+      "PWA chime/install validation",
+      "WhatsApp Make/GreenAPI",
+      "Historical data bulk"
+    ],
+    "liveDataWrites": 0,
+    "paymentsApplied": 0,
+    "whatsappSent": 0,
+    "remaining": "Authenticated LIVE human write UAT/report and readback required; do not claim complete workflow passed",
+    "historicalGate": "B4-007 CLOSED",
+    "activeGate": "I6.6"
+  },
+  "i66OpsVisualFreshness20261110": {
+    "status": "APPROVED_OPS_FILES_INCLUDED_BYTE_EXACT_LIVE_CLIENT_OPEN_TAB_FRESHNESS_UNVERIFIED",
+    "source": "e8986c81ed1748bea680447d07d2f37dc0c1db7a",
+    "evidence": "218/218 dual origin, Ops core/ciclo and backend exact, buildId injected into JS/CSS, service worker/cache rewritten",
+    "notes": [
+      "Open tab may keep prior evaluated UI until reload",
+      "Editorial/translations not included in scoped Ops patch require source-to-last-acceptance comparison",
+      "Authenticated write UAT HOLD due inaccessible originating browser, no reserved reversible QA case"
+    ],
+    "failedNewIngressDuplicateStatus": "UNKNOWN_DO_NOT_REPEAT_UNTIL_AUTH_READBACK"
   }
 }
