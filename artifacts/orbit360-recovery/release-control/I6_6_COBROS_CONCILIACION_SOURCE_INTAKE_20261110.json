@@ -7435,5 +7435,54 @@
     ],
     "productionDataWrites": 0,
     "manualActionsRequiredFromPaula": 0
+  },
+  "i66P0ExecutionEvidence20261110": {
+    "id": "GI_I66_P0_OPS_ADVISOR_CLIENT360_SOURCE_QA_FROZEN_20261110",
+    "dateGuatemala": "2026-11-10",
+    "status": "MIXED_SOURCE_QA_PREVIEW; OPS_BACKEND_LIVE_NOT_YET_DEPLOYED",
+    "singleCanonicalBranch": "recovery/fase-a-clean-20260831",
+    "priorLiveHosting": "gi-i66-0919914071fb-57f234755dc1",
+    "ops": {
+      "productSourceCommit": "e8986c81ed1748bea680447d07d2f37dc0c1db7a",
+      "ciControl": 42865214831,
+      "ciControlStatus": "SUCCESS",
+      "immutableArtifact": 13786263277,
+      "zipSha256": "9168acf6701443349897226976cde9174628133074e47d2fd286fa768ddaf1e3",
+      "previewRun": 42865214814,
+      "previewRunStatus": "SUCCESS",
+      "emulatorRoleCountryCrudRun": 42867352575,
+      "emulatorStatus": "PASS_16_OF_16_NO_PRODUCTION_WRITES",
+      "scope": "new business Ops GT/CO with idempotency; deny advisor/foreign tenant/country; soft archive pending business and management; deny archive applied endorsement",
+      "firebasePreviewFunction": "NOT_YET_DEPLOYED",
+      "firebaseLiveFunction": "NOT_YET_DEPLOYED",
+      "firebaseLiveHosting": "NOT_YET_PROMOTED",
+      "warning": "Ops source pass and Preview UI pass are NOT LIVE permission/persistence certification; promote only exact e8986c artifact after function role UAT"
+    },
+    "advisorReport": {
+      "sourceCommit": "6c5997f43fbfa39273e7b33dea095155c7c0703a",
+      "status": "SOURCE_COMMITTED_LOCAL_TEST_PASS_LIVE_NOT_APPLIED",
+      "scope": "report advisor payment, reconciliation outbox notification to scoped operations; report does not apply payment",
+      "remaining": "staged function preview + authenticated write/readback + Hosting exact-artifact to LIVE",
+      "backendDeployment": 0,
+      "productionWrites": 0
+    },
+    "client360PolicyCTA": {
+      "sourceCommit": "d947f97efa3049dadb5f2e06ee5e75c7ccdb83ec",
+      "blobSha": "e1ea909944992d5811d781dbded69190fcfa23eb",
+      "status": "SOURCE_COMMITTED_8_LOCAL_CHECKS_PASS_LIVE_NOT_APPLIED",
+      "scope": "single-line + Crear póliza opening existing wizard with client preselected and role/tenant/country checks",
+      "remaining": "immutable new build + exact preview and LIVE readback + authenticated click test",
+      "backendDeployment": 0,
+      "productionWrites": 0
+    },
+    "carlosNonRenewable": {
+      "status": "PATCH_REBASE_AND_BACKEND_CAUSAL_QA_IN_PROGRESS_NOT_LIVE",
+      "warning": "specific backend failure not yet proven; do not broaden advisor role"
+    },
+    "pwaAudioWhatsapp": {
+      "status": "CHECKPOINT_NOT_APPLIED",
+      "warning": "chime and manifest source prepared but no PWA install certificate; Make/GreenAPI not configured, no WhatsApp notifications sent"
+    },
+    "concurrency": "Product source commits after e8986c do not modify the already pinned Ops immutable artifact; later builds required for later features."
   }
 }
