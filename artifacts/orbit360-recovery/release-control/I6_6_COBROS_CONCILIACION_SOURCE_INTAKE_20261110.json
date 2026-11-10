@@ -2226,8 +2226,8 @@
       },
       {
         "priority": 5,
-        "action": "Performance optimization and importer fail-closed fixes in same source/CI release path; Finance commission liquidation deferred until insurer reconciliation passes.",
-        "status": "PARALLEL_DIAGNOSIS_ONLY"
+        "action": "Repair reproduced month-frequency/receipt-count schedule bug in same canonical source release with focused tests and exact insurer-source date priority; profile nav/filter performance in parallel; importer is non-blocking; Finance deferred.",
+        "status": "P0_REPRODUCED_FIX_PENDING"
       }
     ],
     "sourceCodeReadback": {
@@ -2266,9 +2266,34 @@
     "browserEvidence": {
       "host": "app.aysseguros.com",
       "lastAuthReadback": "2026-11-10 prior turn",
-      "currentTurn": "Chrome extension recognized, but multiple tab DOM attempts failed due browser-focus transport timeouts; cannot interpret as app server or write failure",
+      "currentTurn": "Fresh authenticated Chrome tab succeeded; polizas form inspected and monthly/2 scheduling bug reproduced; modal cancelled without saving.",
       "currentTurnLiveWrites": 0
     },
-    "historicalContinuity": "All named exceptions including Bayron Paula, Marco same-vehicle insurer switch renewal, Mirlet prior phone, Camila and Germán/Samuel named exceptions preserved in ownerFrozenDecisions, caseDossiers and operationalActions. November commission invoices track October collections; Finance deferred."
+    "historicalContinuity": "All named exceptions including Bayron Paula, Marco same-vehicle insurer switch renewal, Mirlet prior phone, Camila and Germán/Samuel named exceptions preserved in ownerFrozenDecisions, caseDossiers and operationalActions. November commission invoices track October collections; Finance deferred.",
+    "liveReproducedPaymentScheduleMismatch": {
+      "date": "2026-11-10",
+      "surface": "https://app.aysseguros.com/#/polizas",
+      "actor": "authenticated Dirección (Paula)",
+      "interaction": "Opened Nueva póliza form; selected Frecuencia=Mensual and Cantidad de recibos=2 with Vigencia Inicio=2026-11-10; inspected receipt preview; pressed Cancelar; no policy/payment created.",
+      "observedReceiptPreview": [
+        {
+          "sequence": 1,
+          "displayedDue": "2026-11-25"
+        },
+        {
+          "sequence": 2,
+          "displayedDue": "2027-05-25"
+        }
+      ],
+      "finding": "LIVE preview spaces two installments six months apart even though the explicitly selected frequency is Mensual. The form does offer a separate Forma de pago selector (Tarjeta de crédito, Visa Cuotas, Transferencia, Efectivo, Domiciliado, Cheque), Conducto, Frecuencia and Cantidad de recibos. The existence of the selectors does not guarantee correct receipt dates.",
+      "sourceMechanism": {
+        "path": "orbit360-platform/core/primas.js",
+        "blobSha": "507735bbd809546f97dbb5fec166a30d68fc2c93",
+        "expression": "pasoMeses = 12 / n; venc.setMonth(venc.getMonth() + Math.round(i * pasoMeses)); fechaLimite = vence + 15 days",
+        "status": "VERIFIED_SOURCE_LOGIC_AND_LIVE_UI_REPRO"
+      },
+      "requiredFix": "Preserve selected Frecuencia, Cantidad de recibos, Forma de pago and Conducto as four separate fields. Frequency controls real cadence; number of installments controls count; insurer source explicit contractual receipt dates and numbers override generated defaults. Never replace paid receipts or invent accounting collections. Add regression tests Mensual×2, Mensual×12, month end, and insurer exact source schedule; use same canonical release gate.",
+      "result": "P0_BUG_REPRODUCED_NO_LIVE_WRITE_NO_PASS"
+    }
   }
 }
