@@ -7799,5 +7799,59 @@
     ],
     "legacyGate": "B4-007 CLOSED",
     "activeGate": "I6.6"
+  },
+  "i66CalendarEngineLiveRelease20261110": {
+    "id": "GI_I66_CALENDAR_UTC_PERIODICITY_HOSTING_LIVE_SAME_ARTIFACT_20261110",
+    "status": "LIVE_HOSTING_TRANSPORT_221_OF_221_PASS_NEW_POLICIES_FORWARD_ONLY_AUTHENTICATED_WRITE_UAT_HOLD",
+    "liveRun": 42884115167,
+    "result": "SUCCESS",
+    "sourceCommit": "a9c52e4ee8e358d065f8723bd7964595d772009b",
+    "artifactId": 13795297616,
+    "immutableZipSha256": "4b6a4ba17ab7b165303946b2891b83cc15298b8f9882e41ef61e7d81a65c2378",
+    "buildId": "gi-i66-a9c52e4ee8e3-57f234755dc1",
+    "previewRun": 42883578427,
+    "qaRun": 42883220523,
+    "qaChecks": "27/27 PASS GT/CO/UTC",
+    "guardRun": 42883578539,
+    "hostingBefore": "ce8e468b936ada58",
+    "hostingAfter": "d91024e66ae6b243",
+    "readbacks": {
+      "preview": "221/221",
+      "firebaseLive": "221/221",
+      "appAysseguros": "221/221"
+    },
+    "rollbackChannel": "gi-i66-calendarrb-42884115167",
+    "rollbackPerformed": false,
+    "proofArtifact": {
+      "id": 13795018477
+    },
+    "productDiff": [
+      "core/primas.js",
+      "core/policy-receipts-engine.js"
+    ],
+    "behavior": [
+      "UTC calendar for new opt-in policies planCalendarVersion UTC_ANCHOR_V1",
+      "Periodicidad drives month interval; count drives number of installments",
+      "Clamped 29/30/31 including leap; avoid due dates beyond contractual term",
+      "Do not rewrite legacy historical receipt due dates"
+    ],
+    "preserved": [
+      "Ops P0 LIVE",
+      "Advisor payment report and Client360 CTA LIVE",
+      "Carlos policy renewability LIVE",
+      "PWA+chime LIVE"
+    ],
+    "functionsDeployed": 0,
+    "productionDataWrites": 0,
+    "existingReceiptsMutated": 0,
+    "paymentsApplied": 0,
+    "outstanding": [
+      "Live authenticated new-policy end-to-end readback",
+      "Universales Maria ten source receipt numbers HOLD protected environment",
+      "Maria seven mismatched historical due dates separately HOLD protected environment",
+      "Chromium PWA installation visual UAT"
+    ],
+    "historicalGate": "B4-007 CLOSED",
+    "currentGate": "I6.6"
   }
 }
