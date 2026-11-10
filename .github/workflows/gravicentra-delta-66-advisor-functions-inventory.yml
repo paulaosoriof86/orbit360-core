@@ -120,6 +120,63 @@ jobs:
           print('I66_OPS_CLOUDRUN_TRAFFIC_READONLY='+json.dumps([{'revision':v.get('revisionName',''), 'percent':v.get('percent',0),'latestRevision':v.get('latestRevision',False)} for v in traffic],sort_keys=True))
           PY
           else echo 'I66_OPS_CLOUDRUN_TRAFFIC_READONLY=UNAVAILABLE_WITH_EXISTING_IAM';fi
+          # Exact two-revision cutover preflight, before any service mutation.
+          # The output is reduced to revision identities, immutable digests,
+          # readiness and safe equality summaries; no environment values,
+          # service-account addresses, tokens or client records are printed.
+          for CR_REV in orbit360opsleadscommand-00002-nop orbit360opsleadscommand-00003-wed;do
+            gcloud run revisions describe "$CR_REV" --region us-central1 --project "$PROJECT_ID" --format=json > "$RUNNER_TEMP/i66-ops-revision-$CR_REV.json"
+          done
+          gcloud functions describe orbit360OpsLeadsCommand --gen2 --region us-central1 --project "$PROJECT_ID" --format=json > "$RUNNER_TEMP/i66-ops-functions-product.json"
+          python3 - <<'PY'
+          import json,os,hashlib
+          root=os.environ['RUNNER_TEMP']
+          names=['orbit360opsleadscommand-00002-nop','orbit360opsleadscommand-00003-wed']
+          rows=[json.load(open(root+'/i66-ops-revision-'+name+'.json')) for name in names]
+          fun=json.load(open(root+'/i66-ops-functions-product.json'))
+          service=json.load(open(root+'/i66-ops-cloudrun-service.json'))
+          def container(rev):
+              arr=((rev.get('spec') or {}).get('containers') or [])
+              if not arr:raise RuntimeError('I66_OPS_REVISION_CONTAINER_MISSING')
+              return arr[0]
+          def env(rev):
+              return {v.get('name'):json.dumps(v,sort_keys=True) for v in (container(rev).get('env') or []) if v.get('name')}
+          def ready(rev):
+              conds=((rev.get('status') or {}).get('conditions') or [])
+              return any(c.get('type')=='Ready' and (c.get('status') is True or str(c.get('status')).lower()=='true') for c in conds)
+          def digest(rev):
+              img=str((rev.get('status') or {}).get('imageDigest') or container(rev).get('image') or '')
+              return img.rsplit('@',1)[-1] if '@sha256:' in img else ('sha256:'+img.rsplit('sha256:',1)[-1] if 'sha256:' in img else '')
+          accounts=[str((x.get('spec') or {}).get('serviceAccountName') or '') for x in rows]
+          eq=env(rows[0]);n=env(rows[1]);shared=sorted(set(eq)&set(n))
+          images=[digest(x) for x in rows]
+          summaries=[]
+          for name,x,img in zip(names,rows,images):
+              summaries.append({'revision':name,'ready':ready(x), 'imageDigest':img,
+                  'imageDigestAvailable':bool(img),'envCount':len(env(x)),
+                  'serviceAccountConfigured':bool((x.get('spec') or {}).get('serviceAccountName')),
+                  'revisionUrlPresent':bool((x.get('status') or {}).get('url')),
+                  'revisionUrlHostHash12':hashlib.sha256(str((x.get('status') or {}).get('url') or '').encode()).hexdigest()[:12] if (x.get('status') or {}).get('url') else ''})
+          build=(fun.get('buildConfig') or {});source=(build.get('source') or {});serviceConfig=(fun.get('serviceConfig') or {})
+          traffic=(service.get('status') or {}).get('traffic') or []
+          actual={(v.get('revisionName') or v.get('revision')):int(v.get('percent') or 0) for v in traffic}
+          gating={'bothReady':all(ready(x) for x in rows),
+              'digestBothAvailable':all(images),
+              'trafficBaselineExact':actual.get(names[0])==100 and actual.get(names[1],0)==0,
+              'latestReadyIsNew':(service.get('status') or {}).get('latestReadyRevisionName')==names[1],
+              'sameServiceAccount':bool(accounts[0]) and accounts[0]==accounts[1],
+              'environmentValuesEqual':eq==n,
+              'runtimeBuildNode':str(build.get('runtime') or ''),
+              'entryPointIsOpsCallable':build.get('entryPoint')=='orbit360OpsLeadsCommand',
+              'functionStateActive':fun.get('state')=='ACTIVE',
+              'functionServiceMatches':str(serviceConfig.get('service') or '').split('/')[-1]=='orbit360opsleadscommand',
+              'revisionUrlAvailable':bool((rows[1].get('status') or {}).get('url'))}
+          print('I66_OPS_CUTOVER_REVISIONS='+json.dumps(summaries,sort_keys=True))
+          print('I66_OPS_CUTOVER_PREFLIGHT='+json.dumps({'checks':gating,
+              'envOnlyOld':sorted(set(eq)-set(n)), 'envOnlyNew':sorted(set(n)-set(eq)),
+              'differingSharedEnvKeys':sorted(k for k in shared if eq[k]!=n[k]),
+              'buildSourceKind':sorted(source.keys())},sort_keys=True))
+          PY
           python3 - <<'PY'
           import json,os,subprocess,urllib.request,urllib.parse,urllib.error,hashlib,datetime
           project=os.environ['PROJECT_ID']
@@ -205,9 +262,12 @@ jobs:
                   resultFields=result.get('fields') or {}
                   entity=(resultFields.get('entityId') or {}).get('stringValue') or ''
                   eventId=(resultFields.get('eventId') or {}).get('stringValue') or ''
+                  storageMode=(resultFields.get('storageMode') or {}).get('stringValue') or 'legacyCompatible'
                   entityHash=hashlib.sha256(('alianzas-soluciones|gestiones|'+entity).encode()).hexdigest()[:16] if entity else ''
                   eventHash=hashlib.sha256(eventId.encode()).hexdigest()[:16] if eventId else ''
                   entityDoc,entityHttp=exact_document('tenants/alianzas-soluciones/data/gestiones/items/'+urllib.parse.quote(entity,safe='')) if entity else (None,0)
+                  legacyPath=('tenants/alianzas-soluciones/workflow/gestiones/items/' if storageMode=='canonicalV2' else 'tenantId/alianzas-soluciones/gestiones/')+urllib.parse.quote(entity,safe='')
+                  legacyDoc,legacyHttp=exact_document(legacyPath) if entity else (None,0)
                   eventDoc,eventHttp=exact_document('tenants/alianzas-soluciones/workflowEvents/'+urllib.parse.quote(eventId,safe='')) if eventId else (None,0)
                   eventFields=(eventDoc.get('fields') or {}) if eventDoc else {}
                   eventEntity=(eventFields.get('entityId') or {}).get('stringValue') or ''
@@ -217,6 +277,7 @@ jobs:
                       'entityReferenceHash16':entityHash,'status':field(d,'status'),
                       'entityType':str((resultFields.get('entityType') or {}).get('stringValue') or ''),
                       'committedAtUtc':stamp,'directCanonicalEntityHttp':entityHttp,
+                      'legacyStorageMode':storageMode,'directLegacyEntityHttp':legacyHttp,
                       'entityExistsInCanonicalGestiones':entityHash in allCanonicalGestionHashes,
                       'sameEntityAsCanary':any(x['referenceHash16']==entityHash for x in canary),
                       'eventHash16':eventHash,'directWorkflowEventHttp':eventHttp,
