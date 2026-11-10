@@ -3230,7 +3230,7 @@
     "mechanismRegistryBlobSha": "8a549608e06d1dd7c89613334b8d5b0d527dc92b",
     "activeModule": "COBROS_CONCILIACION_CARTERA",
     "activeSourceIntakePath": "artifacts/orbit360-recovery/release-control/I6_6_COBROS_CONCILIACION_SOURCE_INTAKE_20261110.json",
-    "activeSourceIntakeBlobSha": "336631c5aa87e181dc6fd91d871b1fdb882fc191",
+    "activeSourceIntakeBlobSha": "3116749b6be648e39686c5567b2c1bb3c17f092c",
     "sourceSha256": "f445e2f4a20b9eb7a526bda8896472dab9e7ac4617b3c5d8124a939a0dee0e6a",
     "conversationAsAuthority": false,
     "requestCurrentSourceBeforeEveryNewModule": true,
@@ -22583,7 +22583,9 @@
     "nextOperationalGate": "I6.6",
     "historicalB4006SealPreserved": true,
     "noNewReleaseBuild": true,
-    "noDataReimport": true
+    "noDataReimport": true,
+    "dataRefreshLedgerBlob": "3116749b6be648e39686c5567b2c1bb3c17f092c",
+    "recoveryStateBlob": "9f5ee1b4a91c0ce58c4da2426eea7a2dcad69c85"
   },
   "i66ClientDossierCrosscheckFreeze20261110": {
     "status": "FROZEN_POST_CURRENT_SAFE_LIVE_CARTERA_BLOCK_NOT_YET_EXECUTED",
