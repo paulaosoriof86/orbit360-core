@@ -654,7 +654,8 @@
     "all35CurrentSourceRawHashesPinned": true,
     "fourHistoricalReferenceHashesPinned": true,
     "liveTopLevelReadback": true,
-    "latestVerifiedAccountStatements": "Rural 2026-11-06; Universales 2026-11-09; primary Bayron issue PDF"
+    "latestVerifiedAccountStatements": "Rural 2026-11-06; Universales 2026-11-09; primary Bayron issue PDF",
+    "lastDryRun": "REAL_SOURCE_EXCEL_BROWSER_UPLOADED_BUT_PREVIEW_DEMO_FAIL_WRITE_BLOCKED"
   },
   "periodSemantics": {
     "commissionInvoiceMonth": "2026-11",
@@ -1111,6 +1112,19 @@
       ],
       "status": "BLOCKS_APPLY_OF_2_RECEIPTS",
       "action": "Do not save misdated receipt schedule; requires ability to preserve actual issued due dates."
+    },
+    "importerDryRunFailure": {
+      "date": "2026-11-10",
+      "app": "Gravicentra Insurance LIVE",
+      "path": "Importación inteligente > Importar estados de cuenta",
+      "file": "Estado de cuenta Aseguradora Rural al 06 de noviembre.xlsx",
+      "sourceDriveId": "1njDdh2raI7rmnyTN_R7M3Y7d9-dYI4BI",
+      "sourceSha256": "a6d5f5242d2a40bef0f979215e9cb683875fb8efa04c2df78dad895ab59cc31d",
+      "uploadMethod": "Authenticated Chrome file chooser using securely downloaded exact source Excel",
+      "uiOutcome": "Extraction completed · 3+ records · 0 formatting errors; preview rows REC-00451/GT-AT-48210, REC-00452/GT-AT-48210, REC-01188/CO-PA-91733; unrelated to source rows including actual VA125-00010478 / receipt 62444671 / Q1557.92",
+      "conclusion": "FAIL: UI shows demo/sample records while claiming extraction completed. Confirmar mapeo and Ejecutar escritura controlada NOT INVOKED.",
+      "severity": "P0 DATA_INTEGRITY",
+      "scope": "Importer source-state parser and preview must demonstrate actual file-specific row identities before apply; no reimport to solve UI."
     }
   },
   "operationalActions": [
