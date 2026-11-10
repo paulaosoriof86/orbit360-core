@@ -7973,5 +7973,45 @@
       "PWA Chrome install and audible notification UAT",
       "Secure backend Make/GreenAPI dispatcher with opt-in/template/idempotency QA before any live WhatsApp sender"
     ]
+  },
+  "i66PaulaAuthenticatedOpsBrowserReadback20261110": {
+    "id": "GI_I66_PAULA_CHROME_LIVE_OPS_UX_READONLY_AND_PROVIDER_HANDOFF_20261110",
+    "dateGuatemala": "2026-11-10",
+    "status": "LIVE_AUTHENTICATED_UI_READ_ONLY_PASS_WRITE_UAT_HOLD",
+    "session": "Paula Osorio / Dirección; country All",
+    "appUrl": "https://app.aysseguros.com/#/ops",
+    "buildJsonAfterReload": {
+      "sourceSha": "a9c52e4ee8e358d065f8723bd7964595d772009b",
+      "buildId": "gi-i66-a9c52e4ee8e3-57f234755dc1",
+      "gate": "I6.6"
+    },
+    "freshnessFinding": "Previously open build.json Chrome tab showed older B4-005 source 45020d; after explicit reload it showed current I6.6 A9. Old open tabs can reflect stale previously-loaded view, not proof that hosting serves old bytes.",
+    "uiReadbacks": [
+      "Ops dashboard loads Paula authenticated: 1 commercial business, 3 operational management records; no console errors captured",
+      "+ Nuevo ingreso opens the empty Nuevo prospecto creation form, GT default, real Crear control; no submit performed",
+      "Existing B4-003 synthetic applied endoso opens management modal with visible enabled Eliminar gestion operativa control; backend deletion permission/denial not exercised",
+      "Existing commercial Fernando Arias modal shows Eliminar and collaboration comments; no deletion attempted",
+      "PWA Instalar como app control visible; actual installation not attempted because browser installation requires confirmation"
+    ],
+    "liveWrites": 0,
+    "destructiveBrowserActions": 0,
+    "held": [
+      "Do not retry past failed new-income create without identifying if it persisted",
+      "Do not delete applied endoso synthetic without checking impact; historical applied workflow is deny",
+      "Carlos independent real role save/reload nonrenewable policy UAT",
+      "Advisor actual send-to-ops payment report readback, no automatic payment application",
+      "Paula approved real/reversible Ops create/archive UAT"
+    ],
+    "providerLoginStatus": {
+      "make": "https://www.make.com/login — LOGIN_REQUIRED",
+      "greenApi": "https://console.green-api.com/auth — LOGIN_REQUIRED",
+      "browserTabsOpenedForUser": true,
+      "noCredentialsEntered": true,
+      "noKeysCreated": true,
+      "noScenarioCreated": true,
+      "noMessagesSent": true,
+      "safeConfigureLocation": "Provider site for instance/scenario; Firebase backend secret + secure dispatcher for transport. Never paste credentials into app frontend aut_cfg."
+    },
+    "next": "Paula signs into existing Make and GreenAPI tabs; continue inspecting existing scenarios/instances without duplicate creation or external messages; independent Carlos real UAT."
   }
 }
