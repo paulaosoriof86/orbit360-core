@@ -345,7 +345,13 @@
         "La Ceiba"
       ],
       "role": "INSURER_COLLECTION_AND_OUTSTANDING_STATEMENTS_NEW_PHASE",
-      "readableTextStatus": "PARTIAL_13_OF_15_ATTEMPTED_COL_UC_FAILED_GENERAL_XLS_BINARY_EL_ROBLE_XLS_NOT_YET_CANONICAL_PARSE"
+      "readableTextStatus": "ALL_15_STATEMENT_FILES_ATTEMPTED_11_TEXT_READABLE_4_REQUIRE_NATIVE_FORMAT_PARSING",
+      "nativeFormatParserHolds": [
+        "Estado de cuenta Columna a noviembre 9.xlsb",
+        "Aseguradora General - Primas pendientes - Corte 2026-11-09.xls",
+        "Reporte de ingresos Aseguradora General al 26 de Octubre.xls",
+        "Estado de Cuenta El Roble a Octubre 23.XLS"
+      ]
     },
     "octoberHistoricalPlanillas": [
       {
