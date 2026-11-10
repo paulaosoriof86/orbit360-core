@@ -665,16 +665,16 @@
     }
   ],
   "technicalCursor": {
-    "currentProtocolStep": "RAW_SOURCE_PIN_AND_NATIVE_FORMAT_AS_OF_CLASSIFICATION_COMPLETE_LIVE_MATCH_PENDING",
+    "currentProtocolStep": "I6_6_LIVE_BAYRON_POLICY_2_RECEIPTS_CORRECTED_PAYMENT_AND_ADVISOR_CONTRACT_HOLD",
     "fileByteSha256Pinned": true,
     "insurerStatementsFullyParsed": false,
     "owner28DecisionsRecoveredExactly": false,
-    "livePreApplyReadback": false,
+    "livePreApplyReadback": true,
     "deterministicDiffReady": false,
-    "operationalWrites": 3,
+    "operationalWrites": 6,
     "sourceChangeInProduction": false,
     "importerRebuildRequired": false,
-    "nextRequiredStep": "I6.6 PRIORITY: ensure source-specific safe writer for existing policies/receipts and reconciled due dates, verify receipt IDs of Bayron 12 wrong projections before correction; use statement as-of due status; apply evidence-backed collected separately; new policies follow exact client/vehicle creation. Importer demo fallback must NEVER be confirmed; may bypass via traceable direct UI or canonical controlled batch with QA+LIVE readbacks. Performance observations parallel without blocking.",
+    "nextRequiredStep": "Continue insurer reconciliation case-by-case/batch: diagnose server-owned payment callable failure (Bayron 1/2 no changes), correct Client360 full-edit overwrite risk via safe patch-only method and policy advisor display; then establish source-exact bulk receipt schedule writer for all insurer statements and new policies, preserving paid/history. Importer remains demo fallback FAIL-CLOSED. Cross-module verified only Bayron policy+receipts+Client360 balance, not all Cobros/Reports.",
     "insurerStatementsNativeFormatsParsed": true,
     "all35CurrentSourceRawHashesPinned": true,
     "fourHistoricalReferenceHashesPinned": true,
@@ -954,7 +954,7 @@
       "currentGrossGTQ": 2912,
       "currentFrequency": "Mensual",
       "currentPaymentMethod": "Tarjeta de crédito",
-      "currentExpectedReceipts": 0,
+      "currentExpectedReceipts": 2,
       "ownerInstallments": 2,
       "installmentGrossGTQ": 1557.92,
       "impliedGrossGTQ": 3115.84,
@@ -964,7 +964,7 @@
       "inferredVatGTQ": 333.84,
       "inferredSurchargeRatePct": 2,
       "financialMathMatchesOwnerInstallments": true,
-      "sourceVerificationStatus": "ARITHMETIC_FIT_NOT_YET_EDITED",
+      "sourceVerificationStatus": "LIVE_POLICY_AND_RECEIPT_PLAN_APPLIED_VERIFIED_20261110; payment/advisor still hold",
       "paidStatus": "USER_LATER_BOTH_PAID_CONFIRMED; exact after-cut evidence or controlled owner attestation before paid-at write",
       "cobrosReadback": {
         "when": "2026-11-10",
@@ -987,7 +987,78 @@
         "missingGrossDeltaGTQ": 203.84,
         "advisorStillIncorrect": "Samuel Daza in Pólizas; owner Paula",
         "interpretation": "Pólizas detail previously displayed zero expected receipts, yet Cobros projects 12 existing rows. This is an inter-module projection inconsistency; must reconcile stable receipt IDs, not generate 2 more or falsely apply to 12.",
-        "mutation": "NO_WRITE_TO_WRONG_SCHEDULE"
+        "mutation": "SUPERSEDED_BY_20261110_LIVE_RECONCILIATION_EXECUTION"
+      },
+      "reconciliationExecution": {
+        "dateGuatemala": "2026-11-10",
+        "environment": "https://app.aysseguros.com",
+        "actor": "Paula Osorio · Dirección, autenticada",
+        "status": "PARTIAL_LIVE_PERSISTED_POLICY_PLAN_DATES_VERIFIED_PAYMENT_HOLD",
+        "sourcePolicy": "https://drive.google.com/file/d/1DMNU1duf8Ok3OLLOnUEpeV1cT6u1UuGw/view",
+        "sourceRuralAsOf": "https://docs.google.com/spreadsheets/d/1njDdh2raI7rmnyTN_R7M3Y7d9-dYI4BI/edit",
+        "original": {
+          "grossGTQ": 2912,
+          "netGTQ": 2600,
+          "emissionGTQ": 0,
+          "fraccionGTQ": 0,
+          "ivaGTQ": 312,
+          "advisorVisible": "Samuel Daza",
+          "expectedReceipts": 12,
+          "receiptsAverageGTQ": 242.67
+        },
+        "persisted": {
+          "policy": "VA125-00010478",
+          "netGTQ": 2600,
+          "emissionGTQ": 130,
+          "fraccionGTQ": 52,
+          "ivaGTQ": 333.84,
+          "grossGTQ": 3115.84,
+          "installments": 2,
+          "eachGTQ": 1557.92,
+          "dueDates": [
+            "2026-08-20",
+            "2026-09-20"
+          ],
+          "vehicle": {
+            "make": "NISSAN",
+            "line": "ROGUE SL FWD",
+            "year": 2014,
+            "plate": "P-720LHT",
+            "color": "AZUL POLICROMADO",
+            "vin": "5N1AT2MT6EC839650",
+            "engine": "421166V QR25",
+            "sumInsuredGTQ": 1645000
+          },
+          "historicalCalendarUI": "12 prior requirements retained",
+          "client360Current": "2/2 active and Q3115.84 overdue; no paid reported",
+          "policyDetail": "2 active receipts; Q3115.84; vehicle data correct"
+        },
+        "commandsVerified": [
+          "POLICY_UPDATE_ATOMIC_SYNC",
+          "RECEIPT_1_DATE_CORRECTION",
+          "RECEIPT_2_DATE_CORRECTION"
+        ],
+        "policyAdvisorInput": "Paula Osorio",
+        "policyDetailAdvisorVisibleAfter": "Samuel Daza",
+        "advisorStatus": "HOLD_CROSS_MODULE_CLIENT_ADVISOR_MISMATCH; UI policy shows Samuel despite editor Paula and history asesorId change",
+        "clientEditRisk": "Cancelled without write: Client360 header phone +50246317019 and segment Nuevo, but edit form phone blank and segment Premium auto-selected; full replacement would silently alter unrelated fields. Must implement patch-only safe update or recover precise before values.",
+        "paymentAttempt": {
+          "receipt": "1/2",
+          "ownerEvidence": "Paula says paid 2026-10-29",
+          "paymentDateEntered": "2026-10-29",
+          "method": "UNKNOWN_LEFT_BLANK",
+          "clientNotification": false,
+          "outcome": "NO_CHANGES_SAVED",
+          "uiError": "No fue posible registrar el pago. No se guardaron cambios.",
+          "errorCode": "UNAVAILABLE_UI_HIDDEN",
+          "recordedPayments": 0,
+          "retryBoundary": "Diagnose callable backend and payment domain before retry, avoid duplicate"
+        },
+        "paymentStatus": "0/2 applied in LIVE as of this verified readback; both are overdue pending in current UI despite later owner paid attestation",
+        "paymentApplicationSource": "Not supplied; do not invent application date or conflate 11/06 pending report with subsequent confirmation",
+        "unresolvedMetadata": "Real payment method and direct collection channel not explicit in issued policy PDF; 'MENSUAL' is schedule only, Acsel-E 'PagoCaja' is insurer processing type, not proof card/transfer; leave legacy Tarjeta de crédito/CAT flagged for source-specific correction.",
+        "noDuplicates": true,
+        "sourceCodeUnchanged": true
       }
     },
     "Guatemalteca": {
@@ -1184,8 +1255,8 @@
         "2026-08-20",
         "2026-09-20"
       ],
-      "status": "BLOCKS_APPLY_OF_2_RECEIPTS",
-      "action": "Do not save misdated receipt schedule; requires ability to preserve actual issued due dates."
+      "status": "WORKAROUND_APPLIED_TO_BAYRON_IN_LIVE; ROOT_CAUSE_UNFIXED_IN_SOURCE",
+      "action": "Exact 2 dates corrected by existing audited receipt-edit UI after atomic policy schedule sync. Fix generic monthly cadence, source date override, and visible preview before scaled batch."
     },
     "importerDryRunFailure": {
       "date": "2026-11-10",
@@ -1292,6 +1363,22 @@
       "cobrosRows": 2559,
       "unconfirmedSiga": 1227,
       "note": "Counts are point-in-time LIVE observations, not a formal cross-module certification or proof of current release digest."
+    },
+    "clientEditorRisk": {
+      "observedOn": "2026-11-10",
+      "case": "BAYRON",
+      "uiHeader": {
+        "phone": "+50246317019",
+        "segment": "Nuevo",
+        "advisor": "Samuel Daza"
+      },
+      "uiEditor": {
+        "phone": "",
+        "segment": "Premium",
+        "advisor": "Samuel Daza"
+      },
+      "source": "orbit360-platform/modules/cliente360.js",
+      "code": "Save uses full patch of all fields, not changed-field patch, including empty phone/default segment. Cancelled client edit; needs minimally invasive update before advisor correction."
     }
   },
   "operationalActions": [
@@ -1359,6 +1446,62 @@
       "status": "NOT_VERIFIED_NO_DURABLE_CHANGE",
       "writeCountIncrement": 0,
       "requiredAction": "Do not claim updated; investigate durable write/readback or competing projection/source before retry, prevent overwrite of current data."
+    },
+    {
+      "id": "LIVE_BAYRON_POLICY_RECONCILE_20261110",
+      "action": "POLICY_UPDATE_AND_PLAN_SYNC",
+      "dateGuatemala": "2026-11-10",
+      "status": "LIVE_WRITE_VERIFIED_IN_INDEPENDENT_DETAIL_AND_CLIENT360",
+      "policy": "VA125-00010478",
+      "insurer": "RURAL",
+      "fromReceipts": 12,
+      "toActiveReceipts": 2,
+      "fromGrossGTQ": 2912,
+      "toGrossGTQ": 3115.84,
+      "advisorInput": "Paula Osorio",
+      "advisorDisplayConflict": "Pólizas detail still displays Samuel; client record still Samuel; do not mark advisor reconciled",
+      "historicalPreservation": "12 previous calendar requirements shown as historical",
+      "paymentsApplied": 0,
+      "source": "ISSUED_RURAL_POLICY_PDF_AND_OWNER"
+    },
+    {
+      "id": "LIVE_BAYRON_RECEIPT1_DUE_20261110",
+      "action": "RECEIPT_DATE_EDIT",
+      "status": "LIVE_WRITE_VERIFIED_DETAILS_AND_CLIENT360",
+      "policy": "VA125-00010478",
+      "sequence": "1/2",
+      "fromLimit": "2026-09-04",
+      "toDueAndLimit": "2026-08-20",
+      "amountGTQ": 1557.92,
+      "paymentStatus": "PENDING_OVERDUE",
+      "source": "RURAL_ISSUED_ANEXO",
+      "paidNotApplied": true
+    },
+    {
+      "id": "LIVE_BAYRON_RECEIPT2_DUE_20261110",
+      "action": "RECEIPT_DATE_EDIT",
+      "status": "LIVE_WRITE_VERIFIED_DETAILS_AND_CLIENT360",
+      "policy": "VA125-00010478",
+      "sequence": "2/2",
+      "fromContractual": "2027-02-20",
+      "fromLimit": "2027-03-07",
+      "toDueAndLimit": "2026-09-20",
+      "amountGTQ": 1557.92,
+      "paymentStatus": "PENDING_OVERDUE",
+      "source": "RURAL_ISSUED_ANEXO",
+      "paidNotApplied": true
+    },
+    {
+      "id": "LIVE_BAYRON_PAYMENT_APPLY_FAILED_NO_WRITE_20261110",
+      "action": "PAYMENT_APPLY_ATTEMPT",
+      "status": "FAIL_CLOSED_NO_DATA_WRITE",
+      "policy": "VA125-00010478",
+      "sequence": "1/2",
+      "paidDateSubmitted": "2026-10-29",
+      "clientNotification": false,
+      "uiError": "No fue posible registrar el pago. No se guardaron cambios.",
+      "paymentRecorded": false,
+      "followup": "Diagnose server-owned Cobros Reconciliation Command without retry spam."
     }
   ],
   "verifiedSourceReadbacks": [
