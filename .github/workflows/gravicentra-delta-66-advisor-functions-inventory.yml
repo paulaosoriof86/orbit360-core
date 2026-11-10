@@ -109,6 +109,9 @@ jobs:
           gcloud auth activate-service-account --key-file="$GOOGLE_APPLICATION_CREDENTIALS" --quiet >/dev/null
           gcloud config set project "$PROJECT_ID" --quiet >/dev/null
           gcloud functions describe orbit360OpsLeadsCommand --gen2 --region us-central1 --project "$PROJECT_ID" --format='value(state)' | sed 's/^/I66_OPS_LIVE_FUNCTION_STATE=/'
+          gcloud functions describe orbit360OpsLeadsCommand --gen2 --region us-central1 --project "$PROJECT_ID" --format='value(updateTime)' | sed 's/^/I66_OPS_LIVE_FUNCTION_UPDATED_AT=/'
+          REV="$(gcloud run services describe orbit360opsleadscommand --region us-central1 --project "$PROJECT_ID" --format='value(status.latestReadyRevisionName)' 2>/dev/null || true)"
+          echo "I66_OPS_LIVE_CLOUDRUN_READY_REVISION=${REV:-UNAVAILABLE_WITH_EXISTING_IAM}"
           python3 - <<'PY'
           import json,os,subprocess,urllib.request,urllib.parse,urllib.error,hashlib,datetime
           project=os.environ['PROJECT_ID']
@@ -117,6 +120,14 @@ jobs:
           def field(row,key):
               v=(row.get('fields') or {}).get(key) or {}
               return str(v.get('stringValue') or '')
+          documentPrefix='https://firestore.googleapis.com/v1/projects/'+project+'/databases/(default)/documents/'
+          def exact_document(path):
+              request=urllib.request.Request(documentPrefix+path,headers={'Authorization':'Bearer '+token,'Accept':'application/json'})
+              try:
+                  with urllib.request.urlopen(request,timeout=25) as response:return json.load(response),200
+              except urllib.error.HTTPError as error:
+                  if error.code==404:return None,404
+                  raise
           def query(collection):
               rows=[];page=''
               for _ in range(10):
@@ -185,12 +196,20 @@ jobs:
                   result=(fields.get('result') or {}).get('mapValue') or {}
                   resultFields=result.get('fields') or {}
                   entity=(resultFields.get('entityId') or {}).get('stringValue') or ''
+                  eventId=(resultFields.get('eventId') or {}).get('stringValue') or ''
                   entityHash=hashlib.sha256(('alianzas-soluciones|gestiones|'+entity).encode()).hexdigest()[:16] if entity else ''
+                  eventHash=hashlib.sha256(eventId.encode()).hexdigest()[:16] if eventId else ''
+                  entityDoc,entityHttp=exact_document('tenants/alianzas-soluciones/data/gestiones/items/'+urllib.parse.quote(entity,safe='')) if entity else (None,0)
+                  eventDoc,eventHttp=exact_document('tenants/alianzas-soluciones/workflowEvents/'+urllib.parse.quote(eventId,safe='')) if eventId else (None,0)
+                  eventEntity=(eventDoc.get('fields') or {}).get('entityId',{}).get('stringValue') if eventDoc else ''
                   window.append({'requestHash16':hashlib.sha256(d['name'].split('/')[-1].encode()).hexdigest()[:16],
                       'entityReferenceHash16':entityHash,'status':field(d,'status'),
                       'entityType':str((resultFields.get('entityType') or {}).get('stringValue') or ''),
+                      'committedAtUtc':stamp,'directCanonicalEntityHttp':entityHttp,
                       'entityExistsInCanonicalGestiones':entityHash in allCanonicalGestionHashes,
                       'sameEntityAsCanary':any(x['referenceHash16']==entityHash for x in canary),
+                      'eventHash16':eventHash,'directWorkflowEventHttp':eventHttp,
+                      'workflowEventEntityMatchesRequest':bool(eventEntity and eventEntity==entity),
                       'hasCanonicalEntityId':bool(entity)})
               page=str(body.get('nextPageToken') or '')
               if not page:break
