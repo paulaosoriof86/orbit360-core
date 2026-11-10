@@ -112,6 +112,14 @@ jobs:
           gcloud functions describe orbit360OpsLeadsCommand --gen2 --region us-central1 --project "$PROJECT_ID" --format='value(updateTime)' | sed 's/^/I66_OPS_LIVE_FUNCTION_UPDATED_AT=/'
           REV="$(gcloud run services describe orbit360opsleadscommand --region us-central1 --project "$PROJECT_ID" --format='value(status.latestReadyRevisionName)' 2>/dev/null || true)"
           echo "I66_OPS_LIVE_CLOUDRUN_READY_REVISION=${REV:-UNAVAILABLE_WITH_EXISTING_IAM}"
+          if gcloud run services describe orbit360opsleadscommand --region us-central1 --project "$PROJECT_ID" --format=json > "$RUNNER_TEMP/i66-ops-cloudrun-service.json" 2>/dev/null;then
+            python3 - <<'PY'
+          import json,os
+          s=json.load(open(os.environ['RUNNER_TEMP']+'/i66-ops-cloudrun-service.json'))
+          traffic=(s.get('status') or {}).get('traffic') or []
+          print('I66_OPS_CLOUDRUN_TRAFFIC_READONLY='+json.dumps([{'revision':v.get('revisionName',''), 'percent':v.get('percent',0),'latestRevision':v.get('latestRevision',False)} for v in traffic],sort_keys=True))
+          PY
+          else echo 'I66_OPS_CLOUDRUN_TRAFFIC_READONLY=UNAVAILABLE_WITH_EXISTING_IAM';fi
           python3 - <<'PY'
           import json,os,subprocess,urllib.request,urllib.parse,urllib.error,hashlib,datetime
           project=os.environ['PROJECT_ID']
@@ -201,7 +209,10 @@ jobs:
                   eventHash=hashlib.sha256(eventId.encode()).hexdigest()[:16] if eventId else ''
                   entityDoc,entityHttp=exact_document('tenants/alianzas-soluciones/data/gestiones/items/'+urllib.parse.quote(entity,safe='')) if entity else (None,0)
                   eventDoc,eventHttp=exact_document('tenants/alianzas-soluciones/workflowEvents/'+urllib.parse.quote(eventId,safe='')) if eventId else (None,0)
-                  eventEntity=(eventDoc.get('fields') or {}).get('entityId',{}).get('stringValue') if eventDoc else ''
+                  eventFields=(eventDoc.get('fields') or {}) if eventDoc else {}
+                  eventEntity=(eventFields.get('entityId') or {}).get('stringValue') or ''
+                  eventOp=(eventFields.get('operation') or {}).get('stringValue') or ''
+                  eventType=(eventFields.get('entityType') or {}).get('stringValue') or ''
                   window.append({'requestHash16':hashlib.sha256(d['name'].split('/')[-1].encode()).hexdigest()[:16],
                       'entityReferenceHash16':entityHash,'status':field(d,'status'),
                       'entityType':str((resultFields.get('entityType') or {}).get('stringValue') or ''),
@@ -210,6 +221,9 @@ jobs:
                       'sameEntityAsCanary':any(x['referenceHash16']==entityHash for x in canary),
                       'eventHash16':eventHash,'directWorkflowEventHttp':eventHttp,
                       'workflowEventEntityMatchesRequest':bool(eventEntity and eventEntity==entity),
+                      'workflowEventOperation':eventOp,'workflowEventEntityType':eventType,
+                      'eventAfterDigestPresent':bool((eventFields.get('afterDigest') or {}).get('stringValue')),
+                      'requestResultWritePathContract':str((resultFields.get('writePath') or {}).get('stringValue') or ''),
                       'hasCanonicalEntityId':bool(entity)})
               page=str(body.get('nextPageToken') or '')
               if not page:break
