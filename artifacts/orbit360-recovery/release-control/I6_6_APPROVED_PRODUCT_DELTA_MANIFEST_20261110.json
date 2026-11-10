@@ -390,10 +390,7 @@
       "approvedByDirection": true,
       "receipt": "Dirección 2026-11-10 approved I6.6 same-source fail-closed Ops diagnostic compatibility after guard 42906473061 rejected missing management delete marker; canonical backend, authorization, CRUD semantics and live data unchanged",
       "sourceStatus": "SOURCE_QA_LEGACY_AND_NEW_OPS_DIAGNOSTIC_PASS_PREVIEW_LIVE_NOT_APPLIED",
-      "capabilityOwners": [
-        "OPS_PRIMARY_RUNTIME",
-        "ROLE_SCOPE_RUNTIME"
-      ],
+      "capabilityOwners": ["OPS_PRIMARY_RUNTIME", "ROLE_SCOPE_RUNTIME"],
       "scope": "Restore the previously approved fallback DELETE_MANAGEMENT_UNCONFIRMED for unclassified management deletion errors, while retaining new error.code classification and private fingerprint; no backend, tenant, role, data, or workflow operation change",
       "dataWrites": 0,
       "paths": [
@@ -421,42 +418,6 @@
         "regressionTriggerRun": 42906473061,
         "fullGuardPending": true,
         "liveRelease": false
-      }
-    },
-    {
-      "id": "I6_6_BAYRON_POSTPAYMENT_SIGNED_READBACK_READONLY_20261110",
-      "approvedByDirection": true,
-      "receipt": "Dirección 2026-11-10 autorizó read-only postpayment LIVE proof after Paula's authenticated first Bayron payment (Cloud Run HTTP 200 22:17:26Z); no payment retry, no source patch, no writes, B4-007 closed",
-      "sourceStatus": "READONLY_SOURCE_QA_11_11_PASS_LIVE_READBACK_PENDING",
-      "capabilityOwners": [
-        "COBROS_RECONCILIATION_RUNTIME",
-        "RECIBOS_CARTERA_RELATIONS",
-        "LIVE_SIGNED_EVENT_AUDIT"
-      ],
-      "scope": "Signed first Bayron Q1557.92 paid 2026-10-29: verify receipt, cartera, cobro, reconciliationEvents/reconciliationRequests, no duplicate, applicationState; second 62444671 observed only and untouched",
-      "dataWrites": 0,
-      "deployProduct": false,
-      "paths": [
-        {
-          "path": "tools/gravicentra-i66-bayron-postpayment-readonly.cjs",
-          "gitBlobSha": "ccc556dc1eb9d46da137f15abbad79d890ab27f0"
-        },
-        {
-          "path": ".github/workflows/gravicentra-i66-bayron-postpayment-readonly.yml",
-          "gitBlobSha": "37b5542e43d71698998ccc9f1b9fa85075e3fe6f"
-        }
-      ],
-      "tests": [
-        {
-          "path": "tools/gravicentra-i66-bayron-postpayment-readonly.test.cjs",
-          "gitBlobSha": "2ac468b00faa92b1153bc8c2f73e5a444cc501dc"
-        }
-      ],
-      "qa": {
-        "localUnit": 11,
-        "localUnitPass": 11,
-        "readOnlyOnly": true,
-        "liveRunPending": true
       }
     }
   ]

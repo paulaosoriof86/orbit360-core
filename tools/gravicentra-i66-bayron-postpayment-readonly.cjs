@@ -75,12 +75,17 @@ function certify(s){
   const cob=s.cobros[0]||{},state=txt(cob.applicationState||s.first&&s.first.applicationState),
     methodStatus=txt(cob.paymentMethod||cob.metodo)?'PRESENT':'UNVERIFIED',
     recon=cob.conciliado===true||/^APPLIED_/.test(state);
+  const event=s.events[0]||{};
+  const eventAudit={operation:txt(event.operation).slice(0,32),
+    activeRole:txt(event.actor&&event.actor.activeRole).replace(/[^A-Za-z0-9_-]/g,'').slice(0,32)||'MISSING',
+    signedUidPresent:!!txt(event.actor&&event.actor.uid),receiptMatches:txt(event.receiptId)===K.first,
+    requestIdPresent:!!txt(event.requestId)};
   const status=issues.length?'HOLD_SIGNED_PAYMENT_OR_RELATIONS':recon?'PAID_RECONCILED':'PAID_PENDING_APPLICATION';
   const secondHasPayment=paid(s.second)||s.secondCobros.length>0;
   return {status,issues,sourceNumberPresent:source===K.sourceNumber,
     applicationState:state||'UNVERIFIED',paymentState:txt(cob.paymentState)||'UNVERIFIED',
     paymentMethodPresence:methodStatus,receiptCount:s.receipts.length,cobroCount:s.cobros.length,
-    carteraCount:s.car.length,requestCount:s.requests.length,eventCount:s.events.length,
+    carteraCount:s.car.length,requestCount:s.requests.length,eventCount:s.events.length,eventAudit,
     secondState:secondHasPayment?'SECOND_HAS_FINANCIAL_ACTIVITY_REVIEW':'SECOND_NOT_PAID',
     secondPaidDate:txt(s.second&&(s.second.fechaPago||s.second.paidDate))||null,
     secondAction:'HOLD_NO_SOURCE_BACKED_REAL_PAYMENT_DATE'};

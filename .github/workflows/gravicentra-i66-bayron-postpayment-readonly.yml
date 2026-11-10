@@ -31,6 +31,12 @@ jobs:
         with:
           ref: ${{ github.sha }}
           persist-credentials: false
+      - name: Syntax and 11 focused no-write regression tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check tools/gravicentra-i66-bayron-postpayment-readonly.cjs
+          node --test tools/gravicentra-i66-bayron-postpayment-readonly.test.cjs
       - name: Setup exact Firebase Admin read-only access
         shell: bash
         run: |
