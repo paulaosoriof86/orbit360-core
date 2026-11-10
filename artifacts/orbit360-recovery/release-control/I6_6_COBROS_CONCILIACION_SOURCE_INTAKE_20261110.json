@@ -654,7 +654,7 @@
     "all35CurrentSourceRawHashesPinned": true,
     "fourHistoricalReferenceHashesPinned": true,
     "liveTopLevelReadback": true,
-    "latestVerifiedAccountStatements": "Rural 2026-11-06; Universales 2026-11-09; primary Bayron issue PDF",
+    "latestVerifiedAccountStatements": "Rural 2026-11-06; Universales 2026-11-09; primary Bayron issue PDF; Ficohsa Sept collections Marco; Mapfre Nov collections Priscila",
     "lastDryRun": "REAL_SOURCE_EXCEL_BROWSER_UPLOADED_BUT_PREVIEW_DEMO_FAIL_WRITE_BLOCKED"
   },
   "periodSemantics": {
@@ -1276,6 +1276,61 @@
         }
       ],
       "interpretation": "Report explicitly named Cobros noviembre not invoice commissions for October; verify in reporting ledger separately."
+    },
+    {
+      "id": "MARCO_PAYES_TRUE_RENEWAL_20261110",
+      "status": "VERIFIED_MATCH_SAME_VEHICLE_CROSS_INSURER",
+      "old": {
+        "policy": "91-8321599",
+        "insurer": "SEGUROS EL ROBLE",
+        "insured": "MARCO VINICIO PAYÉS ESCOBAR",
+        "vehiclePlate": "P788KJN",
+        "vigencia": "2025-09-07 to 2026-09-07",
+        "policyState": "Renovada",
+        "historyPeriods": [
+          "2023-09-07 to 2024-09-07",
+          "2024-09-07 to 2025-09-07",
+          "2025-09-07 to 2026-09-07"
+        ]
+      },
+      "new": {
+        "policy": "AUTO-1000007073",
+        "insurer": "SEGUROS FICOHSA",
+        "insured": "MARCO VINICIO PAYES ESCOBAR",
+        "vehiclePlate": "P788KJN",
+        "vehicle": "MAZDA CX-3 GRAND TOURING AWD 2016",
+        "VIN": "JM1DKBD75G0107103",
+        "vigencia": "2026-09-07 to 2027-09-07",
+        "netGTQ": 2300,
+        "issueGTQ": 115,
+        "vatGTQ": 289.8,
+        "totalGTQ": 2704.8,
+        "numberOfPayments": 1,
+        "paidOn": "2026-10-02 according to Ficohsa primas cobradas report"
+      },
+      "falseAncestor": "AUTO-1000000187 is another Marco policy for CHERY TIGGO 7 PRO plate P0005LMZ. NEVER link renewal to that policy.",
+      "sourceNew": "libfile_0f7e755123ac819190d78574e862e078",
+      "sourcePaid": "https://docs.google.com/spreadsheets/d/1qnOMyFHKnZlAgLNnACmsmgky3avOHsl4/edit",
+      "UIFinding": "Renovaciones 90-day Kanban excludes old record marked Renovada (0/87 when filtering P788KJN); Polizas detail only Editar / Solicitar endoso / Gestion / Eliminar. Need renewal lineage source-to-new with insurer/number change, not overwrite prior term or unrelated new sale.",
+      "writeStatus": "PENDING_UI_CAPABILITY; NO_DUPLICATE_CREATED"
+    },
+    {
+      "id": "MAPFRE_PRISCILA_COBROS_20261104",
+      "status": "VERIFIED_STATEMENT_MISMATCH_DD",
+      "source": "https://docs.google.com/spreadsheets/d/1KReCocFl7z7vQdNRUq4Cpd3zt92-JBCC/edit",
+      "policy": "SCIN-4394",
+      "client": "PRISCILA ARELI LOPEZ DE LEON",
+      "receiptSequence": "3/7",
+      "requirement": "139187477",
+      "doc": "3528738277",
+      "due": "2026-11-01",
+      "paid": "2026-11-04",
+      "paidAmountGTQ": 379.63,
+      "sourceIssuedMonthlyGTQ": 348.76,
+      "deltaGTQ": 30.87,
+      "duplicates": "TWO ROWS SAME RECEIPT/REQUIREMENT; one DEPOSITO MONETARIO BANCO INDUSTRIAL and one OTROS GASTOS CONTABLES INVALIDO. Count as ONE candidate pending status cross-check; never double-post.",
+      "sourcePolicy": "libfile_738f65ff1d9c8191bb3e906f6b1893b3",
+      "writeStatus": "NO_PAYMENT_APPLIED; policy missing; reconcile changed monthly amount before create."
     }
   ]
 }
