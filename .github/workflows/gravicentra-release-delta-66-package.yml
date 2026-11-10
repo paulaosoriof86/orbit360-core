@@ -7,17 +7,52 @@ name: Gravicentra I6.6 Build Immutable Release Package
 
 on:
   workflow_dispatch:
+  push:
+    branches: [recovery/fase-a-clean-20260831]
+    paths:
+      - .github/workflows/gravicentra-release-delta-66-package.yml
+      - artifacts/orbit360-recovery/release-control/I6_6_RELEASE_TRANSPORT_CONTROL_20261110.json
 
 permissions:
   contents: read
+  actions: read
 
 concurrency:
   group: gravicentra-delta-66-package-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:
-  immutable-package:
+  gate:
     if: github.repository == 'paulaosoriof86/orbit360-core' && github.ref == 'refs/heads/recovery/fase-a-clean-20260831'
+    runs-on: ubuntu-24.04
+    outputs:
+      mode: ${{ steps.release.outputs.mode }}
+      source: ${{ steps.release.outputs.source }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - id: release
+        run: |
+          set -euo pipefail
+          node - <<'NODE'
+          const fs=require('node:fs');
+          const c=JSON.parse(fs.readFileSync('artifacts/orbit360-recovery/release-control/I6_6_RELEASE_TRANSPORT_CONTROL_20261110.json','utf8'));
+          if(c.schema!=='GRAVICENTRA_I6_6_SINGLE_ARTIFACT_RELEASE_TRANSPORT_V1'||c.gate!=='I6.6'||c.historicalClosedGate!=='B4-007'||c.forbidBackendFunctionDeploy!==true||c.forbidFirestoreRulesDataAuthWrites!==true)throw Error('I66_TRANSPORT_SCOPE_INVALID');
+          let mode='disabled',source='';
+          if(c.status==='PREVIEW_BUILD_REQUESTED'&&c.livePromotionAuthorized===false)mode='package';
+          if(c.status==='LIVE_PROMOTION_APPROVED'&&c.livePromotionAuthorized===true&&c.previewApproved===true){
+            if(!/^[0-9a-f]{40}$/.test(c.approvedSourceSha||'')||!(c.sourceBuildWorkflowRunId>0)||!/^[0-9a-f]{64}$/.test(c.immutableTarSha256||'')||!/^gi-i66-rc-[0-9]+$/.test(c.sourcePreviewChannelId||''))throw Error('I66_LIVE_PROMOTION_PROOF_MISSING');
+            throw Error('I66_LIVE_PROMOTION_REQUIRES_SEPARATE_APPROVED_EXACT_ARTIFACT_TRANSPORT');
+          }
+          fs.appendFileSync(process.env.GITHUB_OUTPUT,`mode=${mode}\nsource=${source}\n`);
+          console.log('I66_TRANSPORT_MODE='+mode);
+          NODE
+  immutable-package:
+    needs: gate
+    if: needs.gate.outputs.mode == 'package'
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     env:
@@ -122,6 +157,7 @@ jobs:
           echo "SOURCE_SHA=$SOURCE_SHA" >> "$GITHUB_STEP_SUMMARY"
           echo "I6.6: build only; Preview=NOT_DEPLOYED; LIVE=NOT_DEPLOYED; DATA_WRITES=0" >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/upload-artifact@v4
+        id: immutable_artifact
         with:
           name: gi-i66-immutable-${{ github.sha }}
           path: |
@@ -129,3 +165,60 @@ jobs:
             ${{ runner.temp }}/gi-i66-exact-package.sha256
           retention-days: 30
           if-no-files-found: error
+      - name: Fingerprint both existing LIVE origins before isolated Preview deployment
+        run: |
+          set -euo pipefail
+          curl --fail --location --silent --show-error --max-time 30 https://ays-orbit-360-lab.web.app/ | sha256sum > "$RUNNER_TEMP/gi-i66-live-before.sha"
+          curl --fail --location --silent --show-error --max-time 30 https://app.aysseguros.com/ | sha256sum > "$RUNNER_TEMP/gi-i66-staff-before.sha"
+      - name: Publish exact immutable site only to isolated Hosting Preview
+        id: preview
+        run: |
+          set -euo pipefail
+          CHANNEL_ID="gi-i66-rc-${GITHUB_RUN_ID}"
+          echo "channel=$CHANNEL_ID" >> "$GITHUB_OUTPUT"
+          cd "$RUNNER_TEMP/gi-i66-package/bundle"
+          node "$FIREBASE_CLI_BIN" hosting:channel:deploy "$CHANNEL_ID" --config firebase.json --project "$PROJECT_ID" --expires 7d --non-interactive --json > "$RUNNER_TEMP/gi-i66-preview-result.json" 2>&1
+          export CHANNEL_ID
+          python3 - <<'PY' >> "$GITHUB_OUTPUT"
+          import os,re
+          raw=open(os.environ['RUNNER_TEMP']+'/gi-i66-preview-result.json').read()
+          prefix='https://ays-orbit-360-lab--'+os.environ['CHANNEL_ID']+'-'
+          urls=sorted(set(u.rstrip('/') for u in re.findall(r'https://[A-Za-z0-9._-]+\.web\.app',raw) if u.startswith(prefix)))
+          if len(urls)!=1:raise SystemExit('I66_PREVIEW_URL_NOT_UNIQUE')
+          print('url='+urls[0])
+          PY
+      - name: Preview readback all artifact files and confirm both LIVE origins are untouched
+        env:
+          PREVIEW_URL: ${{ steps.preview.outputs.url }}
+          PREVIEW_CHANNEL: ${{ steps.preview.outputs.channel }}
+          ARTIFACT_ID: ${{ steps.immutable_artifact.outputs.artifact-id }}
+          ARTIFACT_DIGEST: ${{ steps.immutable_artifact.outputs.artifact-digest }}
+        run: |
+          set -euo pipefail
+          ROOT="$RUNNER_TEMP/gi-i66-package/bundle/site"
+          mkdir -p "$RUNNER_TEMP/gi-i66-readback"
+          READY=0
+          for attempt in $(seq 1 25); do
+            if curl -fsSL --max-time 15 "$PREVIEW_URL/__recovery__/build.json" -o "$RUNNER_TEMP/gi-i66-readback/build.json" 2>/dev/null &&
+               cmp -s "$ROOT/__recovery__/build.json" "$RUNNER_TEMP/gi-i66-readback/build.json"; then READY=1;break;fi
+            sleep 4
+          done
+          test "$READY" = 1
+          while IFS= read -r line; do
+            rel="${line#*  }"
+            mkdir -p "$RUNNER_TEMP/gi-i66-readback/$(dirname "$rel")"
+            curl -fsSL --retry 3 --retry-all-errors --retry-delay 2 --max-time 25 "$PREVIEW_URL/$rel" -o "$RUNNER_TEMP/gi-i66-readback/$rel"
+            cmp "$ROOT/$rel" "$RUNNER_TEMP/gi-i66-readback/$rel"
+          done < "$RUNNER_TEMP/gi-i66-package/evidence/site-manifest.sha256"
+          curl --fail --location --silent --show-error --max-time 30 https://ays-orbit-360-lab.web.app/ | sha256sum > "$RUNNER_TEMP/gi-i66-live-after.sha"
+          curl --fail --location --silent --show-error --max-time 30 https://app.aysseguros.com/ | sha256sum > "$RUNNER_TEMP/gi-i66-staff-after.sha"
+          cmp "$RUNNER_TEMP/gi-i66-live-before.sha" "$RUNNER_TEMP/gi-i66-live-after.sha"
+          cmp "$RUNNER_TEMP/gi-i66-staff-before.sha" "$RUNNER_TEMP/gi-i66-staff-after.sha"
+          echo "## I6.6 — Preview exact, LIVE untouched" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Source SHA: $SOURCE_SHA" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Immutable artifact ID: $ARTIFACT_ID" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Artifact digest: $ARTIFACT_DIGEST" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Preview channel: $PREVIEW_CHANNEL" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Preview URL: $PREVIEW_URL" >> "$GITHUB_STEP_SUMMARY"
+          echo "- LIVE and staff-origin fingerprints: UNCHANGED" >> "$GITHUB_STEP_SUMMARY"
+          echo "- LIVE promotion: REQUIRES SEPARATE HUMAN GATE" >> "$GITHUB_STEP_SUMMARY"
