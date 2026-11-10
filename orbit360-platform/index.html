@@ -111,6 +111,7 @@
       var bell=document.getElementById('ops-inbox-bell'),cnt=document.getElementById('ops-inbox-count'),rows=[],refreshFlight=null,refreshKey='',refreshSequence=0,lastRenderedScope='',refreshState='idle',lastPublishedInboxSignature='';
       // Only server-authorized inbox notices reach this scope. Audio never starts without a browser user gesture.
       var inboxSound={scope:'',initialized:false,seen:new Set(),armed:false,audio:null,lastAt:0};
+      function inboxSoundScope(){return inboxScope()+'|'+String(Orbit.pais||'TODOS').trim().toUpperCase();}
       function soundPreferenceKey(){return 'gravicentra-inbox-chime:'+inboxScope();}
       function soundEnabled(){try{return localStorage.getItem(soundPreferenceKey())!=='off';}catch(_e){return true;}}
       function armInboxSound(){inboxSound.armed=true;try{
@@ -186,7 +187,7 @@
           .then(function(out){
             if(seq!==refreshSequence||key!==inboxScope())return rows;
             rows=[].concat(out&&out.notices||[]);refreshState='ready';
-            if(inboxChimeDecision(inboxSound,key,rows))playInboxChime();paint();
+            {const key=inboxSoundScope();if(inboxChimeDecision(inboxSound,key,rows))playInboxChime();}paint();
             var dr=document.getElementById('ops-inbox-drawer');if(dr?.classList.contains('open'))open();
             return rows;
           }).catch(function(e){
