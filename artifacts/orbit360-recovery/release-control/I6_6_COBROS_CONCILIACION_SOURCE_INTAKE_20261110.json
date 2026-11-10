@@ -649,7 +649,7 @@
     "operationalWrites": 3,
     "sourceChangeInProduction": false,
     "importerRebuildRequired": false,
-    "nextRequiredStep": "Recover exact original source vs LIVE, including Bantrab 2026-11-04 AUTO-45580 duplicated 10/10 and 2026-04-21 ghost. Preserve previous B3-002 PASS and diagnose new global search, client list, hydration separately. Fix importer demo fallback and receipt due-date scheduling through same canonical source/release QA gate; do NOT run writes that fabricate dates or persist no document; verify client edit durability after reload before claiming. Continue source-backed policy/receipt reconciliation for other insurers; finance remains deferred.",
+    "nextRequiredStep": "P0 exact-domain repairs before financial apply: importer fake fallback blocks source evidence; receipt schedule uses 12/n and contains ghost 10/10 2026; renewal lifecycle hardcodes same insurer so Marco cross-carrier replacement cannot be declared as renewal. Preserve previous accepted B3-002 fast Cobros without reopening gate. Continue read-only issuer proofs and do controlled exact UI writes only when all role/edition/receipt preconditions can be satisfied.",
     "insurerStatementsNativeFormatsParsed": true,
     "all35CurrentSourceRawHashesPinned": true,
     "fourHistoricalReferenceHashesPinned": true,
@@ -1171,9 +1171,33 @@
           "blobSha": "0fd9dc9452b2336f91e6e1506f06a5984e066edf",
           "evidence": "Save invokes batchDurable client update+activity with timeout 20s and closes after returned success; Marco edit appeared in same route after click but was reverted after full reload. Could be failed save, event race or store/source conflict; no verified durable write.",
           "actionBoundary": "Instrument requestId/before-after and independent reload, avoid repeated blind writes/false success."
+        },
+        {
+          "id": "RENEWAL_LINEAGE_SAME_INSURER_LOCK",
+          "source": "orbit360-platform/modules/renovaciones.js",
+          "blobSha": "e3eecb72e7642d4c572338d89f119ae98135f6c1",
+          "sourceLines": "97-160",
+          "evidence": "renewalLifecycleSnapshot() coreKey includes insurerId; sameCore() demands same core; explicit verified renewal links and source-backed candidates both demand sameCore. Therefore a new insurer FICOHSA cannot be recognized as renewal successor of prior insurer EL ROBLE even for same client, plate, continuous vigencia; UI Pedir renovar only creates Ops management, not issued successor.",
+          "case": "MARCO VINICIO PAYES ESCOBAR P788KJN; EL ROBLE 91-8321599 expired 2026-09-07; FICOHSA AUTO-1000007073 issued 2026-09-07 to 2027-09-07. Other Marco FICOHSA CHERY P0005LMZ unrelated.",
+          "fixBoundary": "Allow explicit, source-verified cross-insurer linkage same client/vehicle and contiguous terms without overwriting old issuer/number, with duplicate/ambiguous safeguards, commercial role validation, and dedicated readback. No false inferred successor when same client has different vehicle."
+        },
+        {
+          "id": "COBROS_ALREADY_DEBOUNCED_180MS",
+          "source": "orbit360-platform/modules/cobros.js",
+          "evidence": "K.wireFilters live branch already debounces search with 180ms timer; previous accepted B3-002 bounded-first-paint/60 rows and warm 380.6ms documented.",
+          "fixBoundary": "Do not redo Cobros optimization already PASS; investigate hydration/readiness and duplicate semantic projections first, compare LIVE against exact approved build."
         }
       ],
       "browserTransportNotes": "Connected Chrome/CDP intermittently exceeded 3s command dispatch and page action; previous coarse route timings include tool transport, so do not attribute all 6s to app without independent app-only measurement."
+    },
+    "latestLiveTargetedFilter": {
+      "environment": "LIVE Chrome authenticated Paula Dirección",
+      "module": "Cobros y cartera",
+      "filter": "AUTO-45580",
+      "initialToolElapsedMs": 301,
+      "followupObserved": "22 rows after filter settled (11 operational + 11 unconfirmed SIGA)",
+      "elapsedCaveat": "Not app-only TTI; includes connected-browser transport and asynchronous debounce.",
+      "sourceReference": "Bantrab 2026-11-04 pending report"
     }
   },
   "operationalActions": [
