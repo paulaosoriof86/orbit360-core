@@ -160,6 +160,7 @@ jobs:
                   'archive':(fields.get('archivado') or {}).get('booleanValue') is True,
                   'hasCountry':bool(field(d,'pais')),'hasAdvisor':bool(field(d,'asesorId')),
                   'listHash12':hashlib.sha256(field(d,'lista').encode()).hexdigest()[:12] if field(d,'lista') else ''})
+          allCanonicalGestionHashes={hashlib.sha256(('alianzas-soluciones|gestiones|'+d['name'].split('/')[-1]).encode()).hexdigest()[:16] for d in gestiones}
           print('I66_OPS_1604_CANARY_GESTIONES='+json.dumps({'matchedCount':len(canary),'rows':canary},sort_keys=True))
 
           # The server writes workflowRequests/status=committed in the SAME
@@ -187,6 +188,8 @@ jobs:
                   entityHash=hashlib.sha256(('alianzas-soluciones|gestiones|'+entity).encode()).hexdigest()[:16] if entity else ''
                   window.append({'requestHash16':hashlib.sha256(d['name'].split('/')[-1].encode()).hexdigest()[:16],
                       'entityReferenceHash16':entityHash,'status':field(d,'status'),
+                      'entityType':str((resultFields.get('entityType') or {}).get('stringValue') or ''),
+                      'entityExistsInCanonicalGestiones':entityHash in allCanonicalGestionHashes,
                       'sameEntityAsCanary':any(x['referenceHash16']==entityHash for x in canary),
                       'hasCanonicalEntityId':bool(entity)})
               page=str(body.get('nextPageToken') or '')
