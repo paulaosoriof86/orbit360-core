@@ -1,0 +1,60 @@
+# NOT APPLIED. Safe push-path trigger only AFTER source/manifest review.
+# Existing first payment MUST NEVER be retried by this workflow.
+name: Gravicentra I6.6 Bayron signed payment POST-READBACK ONLY
+
+on:
+  push:
+    branches: [recovery/fase-a-clean-20260831]
+    paths:
+      - .github/workflows/gravicentra-i66-bayron-postpayment-readonly.yml
+
+permissions:
+  contents: read
+
+concurrency:
+  group: gravicentra-live-data-writes-i66-bayron-readonly
+  cancel-in-progress: false
+
+jobs:
+  signed-finance-state:
+    if: github.repository == 'paulaosoriof86/orbit360-core' && github.ref_name == 'recovery/fase-a-clean-20260831'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      GCLOUD_PROJECT: ays-orbit-360-lab
+      GI_I66_POSTPAYMENT_MODE: readonly
+      SA_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_LAB_ALT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - name: Setup exact Firebase Admin read-only access
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF_NAME" = 'recovery/fase-a-clean-20260831'
+          test "$GCLOUD_PROJECT" = 'ays-orbit-360-lab'
+          test -z "${FIRESTORE_EMULATOR_HOST:-}"
+          npm install --prefix "$RUNNER_TEMP/gi-i66-bayron-postread" --no-audit --no-fund --ignore-scripts firebase-admin@13.4.0 >/dev/null
+          echo "NODE_PATH=$RUNNER_TEMP/gi-i66-bayron-postread/node_modules" >> "$GITHUB_ENV"
+          python3 - <<'PY'
+          import json,os,pathlib
+          p=pathlib.Path(os.environ['RUNNER_TEMP'])/'gi-i66-bayron-postread-service-account.json'
+          for key in ('SA_LAB','SA_LAB_ALT','SA_DEFAULT'):
+              try: c=json.loads(os.environ.get(key,''))
+              except (TypeError,ValueError): continue
+              if c.get('type')!='service_account' or c.get('project_id')!='ays-orbit-360-lab' or not c.get('private_key'): continue
+              p.write_text(json.dumps(c),encoding='utf8');p.chmod(0o600)
+              with open(os.environ['GITHUB_ENV'],'a') as out:out.write('GOOGLE_APPLICATION_CREDENTIALS='+str(p)+'\n')
+              print('GI_I66_BAYRON_EXISTING_LAB_READONLY_IDENTITY_PASS')
+              break
+          else: raise SystemExit('GI_I66_BAYRON_READONLY_CREDENTIAL_HOLD')
+          PY
+      - name: Verify first REAL signed payment, reconciliation state and second unaffected
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/gravicentra-i66-bayron-postpayment-readonly.cjs
