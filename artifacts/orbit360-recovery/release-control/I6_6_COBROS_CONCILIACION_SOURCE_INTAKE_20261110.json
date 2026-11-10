@@ -7630,5 +7630,65 @@
       "Authenticated write UAT HOLD due inaccessible originating browser, no reserved reversible QA case"
     ],
     "failedNewIngressDuplicateStatus": "UNKNOWN_DO_NOT_REPEAT_UNTIL_AUTH_READBACK"
+  },
+  "i66CarlosRenewabilityLiveRelease20261110": {
+    "id": "GI_I66_CARLOS_NON_RENEWABLE_LIVE_SAME_ARTIFACT_20261110",
+    "status": "LIVE_PRODUCT_OPERATIONAL_FUNCTION_HOSTING_PASS_AUTHENTICATED_ROLE_WRITE_UAT_HOLD",
+    "releaseRun": 42879288326,
+    "result": "SUCCESS",
+    "sourceCommit": "35008e0d5b9ac81907e0041398e6434d0fcda631",
+    "immutableArtifactId": 13789672305,
+    "zipSha256": "726f238f54be782917d4031f391cfba913e5233e508142b040c78fa18441cc15",
+    "buildId": "gi-i66-35008e0d5b9a-57f234755dc1",
+    "emulatorRun": 42877608644,
+    "emulatorResult": "20/20 PASS",
+    "focal": "17/17 PASS",
+    "previewFunctionRun": 42878554035,
+    "functionUpdated": "orbit360ProductOperationalCommand(us-central1)",
+    "hostingBefore": "02dddf5f62bac21b",
+    "hostingAfter": "98aeaa3975b771cb",
+    "readbacks": {
+      "preview": "218/218",
+      "firebaseLive": "218/218",
+      "appAysseguros": "218/218"
+    },
+    "rollbackChannel": "gi-i66-carlosrb-42879288326",
+    "rollbackPerformed": false,
+    "proofArtifact": {
+      "id": 13793476419,
+      "digest": "sha256:d12d8830bd8eb8bf788c406e4bb2d455c336634b5226774b14356cfe587ef64a"
+    },
+    "businessFix": [
+      "Renewability-only sparse policy update/audit without recalculation of receipts, cartera, vehicles",
+      "Operativo may edit own/other advisor businesses within authorized tenant and country",
+      "Idempotent transaction expected-before and useful failure codes"
+    ],
+    "liveDataWrites": 0,
+    "fullRoleWriteUat": "HOLD_ORIGINATING_BROWSER_NOT_AVAILABLE",
+    "legacyGate": "B4-007 CLOSED",
+    "currentGate": "I6.6",
+    "excluded": [
+      "PWA+chime source 53268c not in artifact",
+      "Make/GreenAPI WhatsApp",
+      "historical data backfill"
+    ]
+  },
+  "i66UniversalesExactIdentityHold20261110": {
+    "id": "GI_I66_UNIVERSALES_MARIA_10_RECEIPTS_OLD_IDS_HOLD_20261110",
+    "status": "LIVE_READ_ONLY_MATCH_POLICY_NUMBER_CLIENT_COUNTRY_UNIQUE_BUT_OLD_DOC_IDS_WRONG_ZERO_WRITES",
+    "readOnlyRuns": [
+      42878124825,
+      42878378489,
+      42878917601,
+      42879221110
+    ],
+    "verifiedUniqueLivePolicyNumber": "04-15-01-000603-0",
+    "oldFixturePolicyId": "pol_mwajp407_fizii",
+    "oldFixtureIds": "cob_pol_mwajp407_fizii_003..._012",
+    "finding": "Actual tenanted live policy doc.id/row.id differs from historical fixture despite unique match policy number, GT and client; live policy has 12 receipts. Do not apply old exact-id patch.",
+    "currentLiveReceiptSnapshotSha256": "61e842ac2605bdf44c392a82d7ad3ccdcfa494eacf79375f8f4854a9a31ffd21",
+    "readOnlyArtifactId": 13792848679,
+    "next": "Remap exact 12 current receipt doc IDs and source numbers; new preimage/digest and guarded CAS; zero duplicate/financial writes",
+    "productionDataWrites": 0
   }
 }
