@@ -24,7 +24,7 @@ jobs:
     env:
       GI_I66_PERF_PROJECT: ays-orbit-360-lab
       GI_I66_PERF_TENANT: alianzas-soluciones
-      GI_I66_PERF_ORIGIN: https://ays-orbit-360-lab--gi-i66-rc-43116689585-17au0dhv.web.app
+      GI_I66_PERF_ORIGIN: https://ays-orbit-360-lab--gi-i66-rc-43119744773-o8zuyuey.web.app
       SA_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
       SA_LAB_ALT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
       SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
@@ -53,8 +53,8 @@ jobs:
           curl -fsSL --max-time 25 "$GI_I66_PERF_ORIGIN/__recovery__/build.json" > "$RUNNER_TEMP/i66-preview-exact-build.json"
           node - <<'NODE'
           const b=require(process.env.RUNNER_TEMP+'/i66-preview-exact-build.json');
-          if(b.sourceSha!=='1833a08efb9409478e46cd65e9c887122456d0be'||
-             b.gate!=='I6.6'||!String(b.buildId||'').startsWith('gi-i66-1833a08efb94-'))
+          if(b.sourceSha!=='d4e9bc7b9ab01664dcdf0771798a6af2d40ff7af'||
+             b.gate!=='I6.6'||!String(b.buildId||'').startsWith('gi-i66-d4e9bc7b9ab0-'))
             throw Error('I66_PREVIEW_PERF_CERTIFIED_ARTIFACT_DRIFT');
           console.log('I66_PREVIEW_PERF_EXACT_ARTIFACT_PASS');
           NODE

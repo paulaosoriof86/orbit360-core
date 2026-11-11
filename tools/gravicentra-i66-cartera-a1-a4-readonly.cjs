@@ -17,6 +17,7 @@ const cents=x=>x==null||text(x)===''?null:Number.isFinite(+x)?Math.round((+x+Num
 const amount=r=>['monto','montoTotal','primaTotal','saldo','valor'].map(k=>cents(r&&r[k])).find(x=>x!==null);
 const reqKeys=['numeroReciboFuente','numeroReciboAseguradora','numeroRecibo','numeroRequerimiento','requerimiento','numeroBoleta','sourceNumber','numeroFactura','referencia','referenciaCobro','receiptNumber'];
 const numbers=r=>reqKeys.map(k=>text(r&&r[k])).filter(Boolean);
+const safeIso=r=>{const value=text(r);return /^\d{4}-\d{2}-\d{2}$/.test(value)?value:null;};
 const paid=r=>!!r&&(r.pagado===true||r.conciliadoPago===true||!!text(r.fechaPago||r.paidDate)||/^(Pagado|Paid)$/i.test(text(r.estado))||/^PAID_/.test(text(r.paymentState)));
 const safeError=e=>/^I66_A1_A4_[A-Z0-9_]+$/.test(text(e&&e.message))?text(e.message):'I66_A1_A4_PRIVATE_READ_ERROR';
 
@@ -27,6 +28,8 @@ function assess(one,snapshot){
     currentStatus:'HOLD_UNVERIFIED',writes:0};
   if(policies.length!==1){out.currentStatus=policies.length?'HOLD_MULTIPLE_POLICY_EDITIONS':'HOLD_POLICY_NOT_FOUND';return out;}
   const p=policies[0],receipts=snapshot.receipts||[],cobros=snapshot.cobros||[];
+  out.policyValidity={start:safeIso(p.vigenciaInicio||p.vigenciaIni||p.fechaInicio),
+    end:safeIso(p.vigenciaFin||p.vigenciaFinal||p.fechaFin),state:text(p.estado).slice(0,28)};
   out.clientVerified=snapshot.clientExists===true;
   out.countryVerified=text(p.pais).toUpperCase()==='GT';
   out.receiptRows=receipts.length;
@@ -34,6 +37,14 @@ function assess(one,snapshot){
   const amounts=receipts.filter(r=>amount(r)===one.cents);
   out.exactRequirementMatches=exact.length;
   out.amountMatches=amounts.length;
+  out.amountCandidateReadback=amounts.slice(0,8).map(r=>({
+    due:safeIso(r.fechaLimite||r.vence||r.fechaVencimiento),
+    sequence:Number.isSafeInteger(+r.secuencia)?+r.secuencia:null,
+    hasExternalNumber:numbers(r).length>0,
+    sourceNumberMatched:numbers(r).includes(one.requirement),
+    status:/^(Pendiente|Vencido|Pagado|Anulado)$/i.test(text(r.estado))?text(r.estado):'OTHER',
+    hasPaymentEvidence:paid(r)
+  }));
   if(exact.length===1){
     const r=exact[0];out.exactAmountMatch=amount(r)===one.cents;
     const linked=cobros.filter(c=>text(c.reciboId)===text(r.id));

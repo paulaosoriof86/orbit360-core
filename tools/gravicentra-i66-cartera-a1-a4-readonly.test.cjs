@@ -22,4 +22,9 @@ assert.equal(resolveEditions(c,[snap(),snap()]).currentStatus,'HOLD_MULTIPLE_EXA
 assert.equal(resolveEditions(c,[unrelated,unrelated]).currentStatus,'HOLD_NO_EXACT_REQUIREMENT_IN_ANY_EDITION');
 assert.equal(resolveEditions(c,[]).currentStatus,'HOLD_POLICY_NOT_FOUND');
 assert.equal(resolveEditions(c,[snap({clientExists:false}),unrelated]).currentStatus,'HOLD_NO_EXACT_REQUIREMENT_IN_ANY_EDITION');
-console.log('I66_CARTERA_A1_A4_PROTECTED_SOURCE_RECONCILIATION_16_16_PASS');
+const clue=assess(c,snap({receipts:[{...receipt,numeroReciboFuente:'',vence:'2026-11-03',secuencia:2}]}));
+assert.equal(clue.amountCandidateReadback[0].due,'2026-11-03');
+assert.equal(clue.amountCandidateReadback[0].sourceNumberMatched,false);
+assert.equal(clue.amountCandidateReadback[0].hasExternalNumber,false);
+assert.equal(clue.policyValidity.start,null);
+console.log('I66_CARTERA_A1_A4_PROTECTED_SOURCE_RECONCILIATION_20_20_PASS');

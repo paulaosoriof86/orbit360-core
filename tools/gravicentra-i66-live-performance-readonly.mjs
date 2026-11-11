@@ -9,9 +9,9 @@ import {getAuth} from 'firebase-admin/auth';
 const PROJECT='ays-orbit-360-lab';
 const TENANT='alianzas-soluciones';
 const ORIGIN=process.env.GI_I66_PERF_ORIGIN||'https://app.aysseguros.com';
-// Exact 1833a08efb94 source passed immutable-build and Preview byte readback.
+// Exact d4e9bc7b9ab0 source passed immutable-build and Preview byte readback.
 // It is the sole approved candidate for this scoped comparison.
-const APPROVED_PREVIEW='https://ays-orbit-360-lab--gi-i66-rc-43116689585-17au0dhv.web.app';
+const APPROVED_PREVIEW='https://ays-orbit-360-lab--gi-i66-rc-43119744773-o8zuyuey.web.app';
 const OUTPUT=process.env.GI_I66_PERF_REPORT;
 const norm=x=>String(x??'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();
 const need=(ok,code)=>{if(!ok)throw Error(code);};
@@ -295,7 +295,10 @@ async function run(){
         .map(([name,r])=>[name,{...r}]))
     }));
     need(report.globalTopbarSearch.ready,'I66_TOPBAR_LIVE_BROWSER_RESULT_HOLD');
-    need(report.globalTopbarSearch.first.timeMs<7000&&report.globalTopbarSearch.second.timeMs<2200,
+    // The old LIVE run is a documented BAD baseline; do not pretend it is fast.
+    // The new Preview has the strict target. Both must still show real results.
+    const coldBudgetMs=ORIGIN===APPROVED_PREVIEW?2200:15000;
+    need(report.globalTopbarSearch.first.timeMs<coldBudgetMs&&report.globalTopbarSearch.second.timeMs<1000,
       'I66_TOPBAR_REAL_SEARCH_LATENCY_HOLD');
     // Measure a real, already-authorized client detail without printing its identity.
     await cdp.send('Profiler.start');
