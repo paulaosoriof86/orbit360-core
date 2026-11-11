@@ -34,11 +34,12 @@ jobs:
           const norm=x=>String(x||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();
           const iso=v=>{if(!v)return '';try{return (typeof v.toDate==='function'?v.toDate():new Date(v)).toISOString();}catch{return '';}};
           (async()=>{
-            const [insSnap,members,advisors,requestSnaps]=await Promise.all([
+            const [insSnap,members,advisors,requestSnaps,insurerDirectory]=await Promise.all([
               tenant.collection('data').doc('aseguradoras').collection('items').doc('gt-aseguradora-guatemalteca').get(),
               tenant.collection('members').limit(150).get(),
               tenant.collection('data').doc('asesores').collection('items').limit(400).get(),
-              tenant.collection('operationalRequests').orderBy('committedAt','desc').limit(250).get()
+              tenant.collection('operationalRequests').orderBy('committedAt','desc').limit(250).get(),
+              tenant.collection('data').doc('aseguradoras').collection('items').limit(120).get()
             ]);
             assert.ok(insSnap.exists,'I66_INSURER_NOT_FOUND');
             assert.ok(members.size<150&&advisors.size<400,'I66_MEMBER_ADVISOR_BOUNDED_READ_HOLD');
@@ -65,12 +66,22 @@ jobs:
             const todayReceipts=receipts.filter(r=>iso(r.committedAt)>=recentISO);
             const safeEvents=events.slice(0,5).map(e=>({utc:iso(e.fecha),serverOwned:e.serverOwned===true,
               actorCarlos:e.actorUid===uid,changedFieldCount:Array.isArray(e.camposCambiados)?e.camposCambiados.length:null}));
+            // Reproduce exactly the frontend authorize() guard using KEYS ONLY.
+            // It receives the *complete* row although insurerWritePayload sends changed fields alone.
+            const secretKey=/(pass(word)?|contrasena|contraseña|secret|token|credential|credencial|username|usuario|login)/i;
+            const guardedKeys=obj=>Object.keys(obj||{}).filter(k=>secretKey.test(k));
+            const guardImpacted=insurerDirectory.docs.filter(d=>guardedKeys(d.data()).length>0);
+            const synthetic=insurerDirectory.docs.filter(d=>/^b4003qa_insurer_/i.test(d.id));
             console.log('I66_INSURER_REAL_LIVE_SERVER_RECEIPTS_READONLY='+JSON.stringify({
               insurerExists:insSnap.exists,recordUpdatedUtc:iso(row.updatedAt),auditRows:events.length,
               recentActivitySummary:safeEvents,carlosActivitySince1100GT:todayEvents.length,
               carlosCommittedRequestReceiptsSince1100GT:todayReceipts.length,
               lastCarlosReceiptUtc:receipts.length?iso(receipts[0].committedAt):null,
               scopedRequestWindow:requestSnaps.size,requestWindowTruncated:requestSnaps.size===250,
+              frontendGuardWouldRejectExistingRealRow:guardedKeys(row).length>0,
+              existingRealRowSensitiveTopLevelKeys:guardedKeys(row),
+              insurerDirectorySize:insurerDirectory.size,insurerRecordsWronglyRejectedByWholeRowGuard:guardImpacted.length,
+              syntheticCount:synthetic.length,syntheticWronglyRejected:synthetic.filter(d=>guardedKeys(d.data()).length>0).length,
               noBusinessFieldValuesEmitted:true,readsOnly:true,writes:0
             }));
           })().catch(e=>{console.error('I66_INSURER_RECEIPT_READONLY_HOLD='+String(e?.message||e).replace(/[^A-Za-z0-9_-]/g,'').slice(0,70));process.exitCode=1;});
