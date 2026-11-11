@@ -188,9 +188,9 @@ async function run(){
     report.cliente360Detail=await page.evaluate(async()=>{
       const clients=Orbit.store?.all('clientes')||[],policies=Orbit.store?.all('polizas')||[];
       const ids=new Set(clients.map(c=>String(c?.id||'')).filter(Boolean));
-      const count=new Map();
-      for(const p of policies){const id=String(p?.clienteId||'');if(ids.has(id))count.set(id,(count.get(id)||0)+1);}
-      const best=[...count.entries()].sort((a,b)=>b[1]-a[1])[0]?.[0]||String(clients[0]?.id||'');
+      const count=Object.create(null);
+      for(const p of policies){const id=String(p?.clienteId||'');if(ids.has(id))count[id]=(count[id]||0)+1;}
+      const best=Object.entries(count).sort((a,b)=>b[1]-a[1])[0]?.[0]||String(clients[0]?.id||'');
       if(!best)return {available:false,reason:'NO_AUTHORIZED_CLIENT'};
       const start=performance.now(),host=document.getElementById('host');
       location.hash='#/cliente360?c='+encodeURIComponent(best);
@@ -204,7 +204,7 @@ async function run(){
       const states=[...host.querySelectorAll('[data-readiness]')].map(e=>String(e.getAttribute('data-readiness')||''));
       const readies=states.reduce((m,k)=>(m[k]=(m[k]||0)+1,m),{});
       return {available:true,detailMs:Math.round(performance.now()-start),ready,
-        detailChars:host.innerHTML.length,policyCountForSelected:count.get(best)||0,
+        detailChars:host.innerHTML.length,policyCountForSelected:count[best]||0,
         readinessCounts:readies,renderStats:window.__GI_I66_RENDER_STATS__?.cliente360||null};
     });
     await page.setViewportSize({width:390,height:844});
