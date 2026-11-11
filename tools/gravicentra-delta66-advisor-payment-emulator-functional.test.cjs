@@ -128,5 +128,41 @@ const seed=async(id,country,advisorId,monto)=>{
   const orphan=await processor.__notificationOutboxProcessor.processOutbox(tenant,'orphan_qai66_evt',false,'system');
   assert.equal(orphan.ok,false);checks++;
   assert.equal((await coll(tenant,'internalNotifs').get()).size,2,'orphan cannot generate internal notification');checks++;
+  stage='direct-payment-seven-methods-after-advisor-notices';
+  const methods=['Transferencia bancaria','Tarjeta de crédito','Tarjeta de débito','Cheque','Efectivo','Visa cuotas','Link de pago'];
+  const apply=(uid,role,receiptId,requestId,method,amount)=>command.run(request(uid,role,{
+    operation:'apply_payment',requestId,reason:'QA aislado: aplicación canónica de pago',
+    payload:{receiptId,sourceType:'manual',paidDate:'2026-11-10',paymentMethod:method,amount}
+  }));
+  for(let i=0;i<methods.length;i++){
+    const suffix='method_'+i,receiptId='rec_'+suffix,amount=100+i;
+    await seed(suffix,'GT','ase-gt',amount);
+    await data('recibosEsperados',receiptId).set({moneda:'GTQ'},{merge:true});
+    await data('carteraPrimas','car_'+suffix).set({id:'car_'+suffix,reciboId:receiptId,polizaId:'pol_'+suffix,
+      clienteId:'cli_'+suffix,pais:'GT',moneda:'GTQ',monto:amount,estado:'Pendiente',estadoCartera:'Pendiente',carteraActiva:true});
+    const requestId='qa_payment_method_'+i;
+    const done=await apply('op-gt','Operativo',receiptId,requestId,methods[i],amount);
+    assert.equal(done.ok,true,methods[i]);assert.equal(done.portfolioUpdated,true,methods[i]);checks++;
+    assert.equal((await data('recibosEsperados',receiptId).get()).data().estado,'Pagado');checks++;
+    assert.equal((await data('carteraPrimas','car_'+suffix).get()).data().estadoCartera,'Pagado');checks++;
+    const cobro=(await data('cobros',done.cobroId).get()).data();
+    assert.equal(cobro.estado,'Pagado');assert.equal(cobro.paymentMethod,methods[i]);checks++;
+    const retry=await apply('op-gt','Operativo',receiptId,requestId,methods[i],amount);
+    assert.equal(retry.reused,true,methods[i]);checks++;
+    const rows=await coll(tenant,'data').doc('cobros').collection('items').where('reciboId','==',receiptId).get();
+    assert.equal(rows.size,1,'only one physical cobro per receipt: '+methods[i]);checks++;
+  }
+  stage='direct-payment-authorization';
+  await expectDenied(()=>apply('advisor-gt','Asesor','rec_method_0','qa_advisor_wrong','Efectivo',100));
+  await expectDenied(()=>apply('op-co','Operativo','rec_method_0','qa_country_wrong','Efectivo',100));
+  stage='advisor-report-to-operative-application';
+  await data('carteraPrimas','car_gt').set({id:'car_gt',reciboId:'rec_gt',polizaId:'pol_gt',clienteId:'cli_gt',
+    pais:'GT',moneda:'GTQ',monto:250,estado:'Pendiente',estadoCartera:'Pendiente',carteraActiva:true});
+  const fromReport=await apply('op-gt','Operativo','rec_gt','qa_apply_reported_gt','Transferencia bancaria',250);
+  assert.equal(fromReport.ok,true);assert.equal(fromReport.portfolioUpdated,true);checks++;
+  assert.equal((await data('recibosEsperados','rec_gt').get()).data().paymentIntakeState,'VALIDATED_APPLIED');checks++;
+  assert.equal((await data('gestiones',gt.managementId).get()).data().paymentReportStatus,'VALIDATED_APPLIED');checks++;
+  assert.equal((await data('carteraPrimas','car_gt').get()).data().estadoCartera,'Pagado');checks++;
+  console.log('I66_PAYMENT_DIRECT_SEVEN_METHODS_AND_ADVISOR_TO_OPS_EMULATOR_PASS checks='+checks+' methods='+methods.length+' liveWrites=0');
   console.log('I66_ADVISOR_PAYMENT_OUTBOX_EMULATOR_ROLE_COUNTRY_IDEMPOTENCY_PASS checks='+checks+' project='+process.env.GCLOUD_PROJECT+' liveWrites=0');
 })().catch(e=>{console.error('I66_ADVISOR_PAYMENT_EMULATOR_BLOCKER_STAGE='+stage+' CODE='+String(e&&e.code||'')+' MESSAGE='+String(e&&e.message||e).slice(0,250));process.exitCode=1;});
