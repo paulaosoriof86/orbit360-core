@@ -62,8 +62,26 @@ async function run(){
     const context=await browser.newContext({viewport:{width:1365,height:900},ignoreHTTPSErrors:false});
     const page=await context.newPage();
     let pageErrors=0,consoleErrors=0;
+    const consoleClasses={},httpClasses={};
+    const classifyError=message=>{
+      const s=String(message||'').toLowerCase();
+      if(/permission.denied|missing or insufficient permissions|403|unauthorized/.test(s))return 'PERMISSION';
+      if(/functions\/internal|internal error|\binternal\b/.test(s))return 'FUNCTION_INTERNAL';
+      if(/404|not found/.test(s))return 'NOT_FOUND';
+      if(/network|failed to fetch|net::/.test(s))return 'NETWORK';
+      if(/csp|content security policy/.test(s))return 'CSP';
+      return 'OTHER';
+    };
     page.on('pageerror',()=>{pageErrors++;});
-    page.on('console',m=>{if(m.type()==='error')consoleErrors++;});
+    page.on('console',m=>{if(m.type()==='error'){
+      consoleErrors++;const code=classifyError(m.text());consoleClasses[code]=(consoleClasses[code]||0)+1;
+    }});
+    page.on('response',response=>{
+      const status=response.status();if(status<400)return;
+      const url=response.url();const kind=/cloudfunctions\.net|\/functions\//.test(url)?'FUNCTION':
+        /firestore|googleapis/.test(url)?'GOOGLE_API':'OTHER';
+      const key=kind+'_'+String(status);httpClasses[key]=(httpClasses[key]||0)+1;
+    });
     const wallStart=Date.now();
     await page.goto(ORIGIN+'/#/inicio',{waitUntil:'domcontentloaded',timeout:60000});
     report.auth.documentReadyWallMs=Date.now()-wallStart;
@@ -94,6 +112,18 @@ async function run(){
     report.auth.activation=activation;
     need(activation.ok,'I66_PERF_AUTHENTICATED_BOOTSTRAP_HOLD');
     need(norm(activation.role)==='operativo','I66_PERF_ACTIVE_ROLE_NOT_CARLOS_OPERATIVO');
+    await page.evaluate(()=>{
+      const stats=window.__GI_I66_RENDER_STATS__={};
+      for(const name of ['cliente360','polizas','cobros','aseguradoras','renovaciones','cronograma','ops','leads','siniestros','calidad','historial','inicio']){
+        const mod=Orbit.modules?.[name];if(!mod||typeof mod.render!=='function')continue;
+        const original=mod.render;stats[name]={calls:0,totalMs:0,maxMs:0};
+        mod.render=function(...args){const start=performance.now();try{return original.apply(this,args);}finally{
+          const ms=Math.round((performance.now()-start)*10)/10,record=stats[name];
+          record.calls++;record.totalMs=Math.round((record.totalMs+ms)*10)/10;
+          record.maxMs=Math.max(record.maxMs,ms);
+        }};
+      }
+    });
     const routeTargets=[
       ['cliente360','[data-c360-list-ready="1"]'],
       ['polizas','[data-polizas-kpi-ready]'],
@@ -142,15 +172,41 @@ async function run(){
         });
         observer.disconnect();document.removeEventListener('orbit:route-ready',handler);
         const status=Orbit.store?._productStatus?.()||{};
+        const renderStats=window.__GI_I66_RENDER_STATS__?.[route]||null;
         return {route,routeMs,contentMs,readyMs,denied,complete,visibleRows:host?.querySelectorAll('tbody tr').length||0,
           hostChars:host?.innerHTML.length||0,
           loadedSources:[].concat(status.serverConfirmedCollections||[]).length,
           pendingSources:[].concat(status.optionalMissing||[]).length,
           snapshotErrorCount:Object.keys(status.snapshotErrors||{}).length,
+          snapshotErrorSources:Object.keys(status.snapshotErrors||{}).filter(k=>/^[a-zA-Z0-9_-]{1,35}$/.test(k)).sort(),
+          renderStats,
           client360RenderMs:route==='cliente360'?Math.round(window.OrbitRuntimeDiagnostics?.cliente360?.renderMs||0):null};
       },{route,readySelector});
       report.routes.push(measurement);
     }
+    // Measure a real, already-authorized client detail without printing its identity.
+    report.cliente360Detail=await page.evaluate(async()=>{
+      const clients=Orbit.store?.all('clientes')||[],policies=Orbit.store?.all('polizas')||[];
+      const ids=new Set(clients.map(c=>String(c?.id||'')).filter(Boolean));
+      const count=new Map();
+      for(const p of policies){const id=String(p?.clienteId||'');if(ids.has(id))count.set(id,(count.get(id)||0)+1);}
+      const best=[...count.entries()].sort((a,b)=>b[1]-a[1])[0]?.[0]||String(clients[0]?.id||'');
+      if(!best)return {available:false,reason:'NO_AUTHORIZED_CLIENT'};
+      const start=performance.now(),host=document.getElementById('host');
+      location.hash='#/cliente360?c='+encodeURIComponent(best);
+      const ready=await new Promise(resolve=>{
+        const timer=setInterval(()=>{
+          const hasHeader=!!host.querySelector('.fichahdr'),hasBody=!!host.querySelector('#c360-body');
+          if(hasHeader&&hasBody){clearInterval(timer);resolve(true);}
+          else if(performance.now()-start>12000){clearInterval(timer);resolve(false);}
+        },40);
+      });
+      const states=[...host.querySelectorAll('[data-readiness]')].map(e=>String(e.getAttribute('data-readiness')||''));
+      const readies=states.reduce((m,k)=>(m[k]=(m[k]||0)+1,m),{});
+      return {available:true,detailMs:Math.round(performance.now()-start),ready,
+        detailChars:host.innerHTML.length,policyCountForSelected:count.get(best)||0,
+        readinessCounts:readies,renderStats:window.__GI_I66_RENDER_STATS__?.cliente360||null};
+    });
     await page.setViewportSize({width:390,height:844});
     // The menu is a local UI operation; it must not wait for a network request.
     report.mobile=await page.evaluate(async()=>{
@@ -164,6 +220,7 @@ async function run(){
         navItems:sidebar.querySelectorAll('[data-route]').length};
     });
     report.auth.pageErrors=pageErrors;report.auth.consoleErrors=consoleErrors;
+    report.auth.consoleErrorClasses=consoleClasses;report.auth.httpErrorClasses=httpClasses;
     await context.close();
     report.status='LIVE_READONLY_MEASURED';
   }finally{if(browser)await browser.close();}
