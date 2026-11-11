@@ -23,13 +23,13 @@ jobs:
           node-version: '22'
       - uses: actions/download-artifact@v4
         with:
-          run-id: 43092881329
+          run-id: 43101692093
           name: gi-i66-preview-performance-readonly
           github-token: ${{ github.token }}
           path: perf-preview
       - uses: actions/download-artifact@v4
         with:
-          run-id: 43092881446
+          run-id: 43101692169
           name: gi-i66-live-performance-readonly
           github-token: ${{ github.token }}
           path: perf-live
@@ -40,7 +40,7 @@ jobs:
           const fs=require('node:fs');
           const p=JSON.parse(fs.readFileSync('perf-preview/gi-i66-preview-perf-summary.json','utf8'));
           const l=JSON.parse(fs.readFileSync('perf-live/gi-i66-live-perf-summary.json','utf8'));
-          if(p.origin!=='https://ays-orbit-360-lab--gi-i66-rc-43090584888-lu40dci6.web.app'||
+          if(p.origin!=='https://ays-orbit-360-lab--gi-i66-rc-43100918872-ef0vrjx2.web.app'||
              l.origin!=='https://app.aysseguros.com'||
              p.status!=='PREVIEW_READONLY_MEASURED'||l.status!=='LIVE_READONLY_MEASURED'||
              p.auth.activation?.role!=='Operativo'||l.auth.activation?.role!=='Operativo'||
@@ -55,10 +55,10 @@ jobs:
               liveGetCostMs:old.readStats?.get?.totalMs||0,previewGetCostMs:now.readStats?.get?.totalMs||0};
           });
           const sample={
-            comparison:'I66_APPROVED_SOURCE_6006d7843bf8_READONLY',
-            previewArtifactId:13888208036,
-            previewArtifactSha256:'9c140b7a02a8d63300868c84b5ae955ad2a8c3f101a257ab74708018dc2b98a9',
-            expectedSource:'6006d7843bf8eef5904a930b7346a1b00c114445',
+            comparison:'I66_APPROVED_SOURCE_abb0ea3f4dc0_READONLY',
+            previewArtifactId:13890908106,
+            previewArtifactSha256:'61e21dd4c3943b469c916ad9150d0249f504030282204688dd8523d2a35b1251',
+            expectedSource:'abb0ea3f4dc0bfd221cb891258e7be81ddc65fd2',
             auth:{liveActivateMs:l.auth.activation?.activateMs,previewActivateMs:p.auth.activation?.activateMs,
               livePageErrors:l.auth.pageErrors,previewPageErrors:p.auth.pageErrors,
               liveConsoleErrors:l.auth.consoleErrors,previewConsoleErrors:p.auth.consoleErrors},
@@ -75,4 +75,8 @@ jobs:
           console.log('I66_PREVIEW_VS_LIVE_SANITIZED_PERFORMANCE='+JSON.stringify(sample));
           console.log('I66_PREVIEW_VS_LIVE_SOURCE_AND_READ_ONLY_PROVENANCE_PASS');
           if(p.auth.pageErrors!==0||p.mobile.menuOpen!==true)throw Error('I66_PREVIEW_BROWSER_P0_REGRESSION');
+          const ren=rows.find(x=>x.route==='renovaciones');
+          if(!ren||ren.liveGetCalls<1000||ren.previewGetCalls>=ren.liveGetCalls/2)
+            throw Error('I66_RENEWALS_PROTECTED_READ_AMPLIFICATION_NOT_REMOVED');
+          console.log('I66_RENEWALS_GET_CALLS_REDUCED_AT_LEAST_HALF_IN_SIGNED_PREVIEW_PASS');
           NODE
