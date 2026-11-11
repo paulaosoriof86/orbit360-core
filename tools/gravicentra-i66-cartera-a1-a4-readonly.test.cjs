@@ -1,6 +1,6 @@
 'use strict';
 const assert=require('node:assert/strict');
-const {CASES,assess}=require('./gravicentra-i66-cartera-a1-a4-readonly.cjs');
+const {CASES,assess,resolveEditions}=require('./gravicentra-i66-cartera-a1-a4-readonly.cjs');
 const c=CASES[1],policy={id:'p',numero:c.policy,pais:'GT'},clientExists=true;
 const receipt={id:'r',polizaId:'p',numeroReciboFuente:c.requirement,monto:c.cents/100,estado:'Pendiente'};
 const snap=(over={})=>Object.assign({policies:[policy],clientExists,receipts:[receipt],cobros:[]},over);
@@ -15,4 +15,11 @@ assert.equal(assess(c,snap({cobros:[{reciboId:'r'},{reciboId:'r'}]})).currentSta
 const future=CASES.find(x=>x.id==='A2.M1');
 assert.equal(assess(future,snap({receipts:[{...receipt,numeroReciboFuente:future.requirement,monto:0}]})).currentStatus,'HOLD_SOURCE_AMOUNT_DIFF');
 assert.equal(assess(future,snap({receipts:[{...receipt,numeroReciboFuente:future.requirement,monto:future.cents/100}]})).currentStatus,'PENDING_FUTURE_NO_PAID_WRITE');
-console.log('I66_CARTERA_A1_A4_PROTECTED_SOURCE_RECONCILIATION_10_10_PASS');
+const unrelated=snap({policies:[{...policy,id:'other'}],receipts:[]});
+assert.equal(resolveEditions(c,[unrelated,snap()]).candidateEditionIndex,2);
+assert.equal(resolveEditions(c,[unrelated,snap()]).currentStatus,'PAID_SOURCE_UNPAID_LIVE_CANDIDATE_SIGNED_CAS_REQUIRED');
+assert.equal(resolveEditions(c,[snap(),snap()]).currentStatus,'HOLD_MULTIPLE_EXACT_PAYMENT_EDITIONS');
+assert.equal(resolveEditions(c,[unrelated,unrelated]).currentStatus,'HOLD_NO_EXACT_REQUIREMENT_IN_ANY_EDITION');
+assert.equal(resolveEditions(c,[]).currentStatus,'HOLD_POLICY_NOT_FOUND');
+assert.equal(resolveEditions(c,[snap({clientExists:false}),unrelated]).currentStatus,'HOLD_NO_EXACT_REQUIREMENT_IN_ANY_EDITION');
+console.log('I66_CARTERA_A1_A4_PROTECTED_SOURCE_RECONCILIATION_16_16_PASS');

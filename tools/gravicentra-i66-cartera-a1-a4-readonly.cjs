@@ -50,6 +50,32 @@ function assess(one,snapshot){
   return out;
 }
 
+// Multiple policy editions are expected after renewals. A policy NUMBER alone
+// cannot establish a payment target: resolve exact receipt and amount per
+// edition, and retain HOLD if two editions appear financially eligible.
+function resolveEditions(one,snapshots){
+  if(!snapshots.length)return assess(one,{policies:[]});
+  const editionResults=snapshots.map((snapshot,index)=>{
+    const oneEdition=assess(one,snapshot);
+    return Object.assign({editionIndex:index+1},oneEdition);
+  });
+  const candidates=editionResults.filter(row=>
+    row.exactRequirementMatches===1&&row.exactAmountMatch===true&&
+    row.clientVerified===true&&row.countryVerified===true&&
+    row.linkedPaymentCount<=1);
+  const out={id:one.id,sourcePaid:!!one.paidDate,policyMatches:snapshots.length,
+    editionResults,exactRequirementMatches:editionResults.reduce((s,r)=>s+r.exactRequirementMatches,0),
+    exactAmountEditions:candidates.length,candidateEditionIndex:null,writes:0};
+  if(candidates.length!==1){
+    out.currentStatus=candidates.length?'HOLD_MULTIPLE_EXACT_PAYMENT_EDITIONS':
+      'HOLD_NO_EXACT_REQUIREMENT_IN_ANY_EDITION';
+    return out;
+  }
+  const candidate=candidates[0];out.candidateEditionIndex=candidate.editionIndex;
+  out.currentStatus=candidate.currentStatus;
+  return out;
+}
+
 async function scan(db){
   const tenantRefs=await db.collection('tenants').listDocuments();
   if(!tenantRefs.length||tenantRefs.length>300)throw Error('I66_A1_A4_TENANT_SCOPE');
@@ -64,19 +90,26 @@ async function scan(db){
   const output=[];
   for(let i=0;i<CASES.length;i++){
     const one=CASES[i],matches=buckets[i];
-    if(matches.length!==1){output.push(assess(one,{policies:matches.map(x=>x.data)}));continue;}
-    const match=matches[0],base=name=>match.tenant.collection('data').doc(name).collection('items');
-    const [r,c,client]=await Promise.all([
-      base('recibosEsperados').where('polizaId','==',match.id).limit(80).get(),
-      base('cobros').where('polizaId','==',match.id).limit(80).get(),
-      text(match.data.clienteId)?base('clientes').doc(text(match.data.clienteId)).get():Promise.resolve(null)
-    ]);
-    if(r.size>=80||c.size>=80){output.push({id:one.id,currentStatus:'HOLD_READ_LIMIT',writes:0});continue;}
-    const rows=r.docs.map(d=>Object.assign({id:d.id},d.data()||{}));
-    const payments=c.docs.map(d=>Object.assign({id:d.id},d.data()||{}));
-    output.push(Object.assign(assess(one,{policies:[match.data],receipts:rows,cobros:payments,clientExists:!!client&&client.exists}),{
-      snapshotFingerprint:digest({policy:match.data,receipts:rows,cobros:payments,clientExists:!!client&&client.exists})
+    if(!matches.length){output.push(assess(one,{policies:[]}));continue;}
+    if(matches.length>24){output.push({id:one.id,currentStatus:'HOLD_POLICY_READ_LIMIT',writes:0});continue;}
+    const snapshots=await Promise.all(matches.map(async(match)=>{
+      const base=name=>match.tenant.collection('data').doc(name).collection('items');
+      const [r,c,client]=await Promise.all([
+        base('recibosEsperados').where('polizaId','==',match.id).limit(80).get(),
+        base('cobros').where('polizaId','==',match.id).limit(80).get(),
+        text(match.data.clienteId)?base('clientes').doc(text(match.data.clienteId)).get():Promise.resolve(null)
+      ]);
+      if(r.size>=80||c.size>=80)throw Error('I66_A1_A4_REQUIREMENT_READ_LIMIT');
+      const rows=r.docs.map(d=>Object.assign({id:d.id},d.data()||{}));
+      const payments=c.docs.map(d=>Object.assign({id:d.id},d.data()||{}));
+      return {policies:[match.data],receipts:rows,cobros:payments,clientExists:!!client&&client.exists,
+        fingerprint:digest({policy:match.data,receipts:rows,cobros:payments,clientExists:!!client&&client.exists})};
     }));
+    const result=resolveEditions(one,snapshots);
+    result.editionResults.forEach((edition,index)=>{
+      edition.snapshotFingerprint=snapshots[index].fingerprint;
+    });
+    output.push(result);
   }
   return output;
 }
@@ -95,4 +128,4 @@ async function main(){
   console.log('I66_CARTERA_A1_A4_READONLY='+JSON.stringify(report));
 }
 if(require.main===module)main().catch(e=>{console.error(safeError(e));process.exitCode=1});
-module.exports={CASES,assess,numbers,amount,paid};
+module.exports={CASES,assess,resolveEditions,numbers,amount,paid};

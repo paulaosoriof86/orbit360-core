@@ -30,7 +30,7 @@ need(ancestry.status===0,'B4007_HISTORICAL_GUARD_SOURCE_NOT_ANCESTOR');
 const manifest=JSON.parse(fs.readFileSync(MANIFEST_PATH,'utf8'));
 need(manifest.schema==='GRAVICENTRA_I6_6_APPROVED_PRODUCT_DELTAS_V1'&&manifest.baselineSuccessfulHead===BASE&&manifest.baselineSuccessfulRun===HISTORICAL_GUARD_RUN,'DELTA_MANIFEST_AUTHORITY_INVALID');
 need(Array.isArray(manifest.changes)&&manifest.changes.length>0,'DELTA_MANIFEST_EMPTY');
-const approved=new Map(),tests=new Set(),seenChangeIds=new Set();
+const approved=new Map(),tests=new Map(),seenChangeIds=new Set();
 // An I6.6 path may evolve in the same release branch only through an explicit,
 // audited successor. Historical entries retain their original immutable blobs.
 // The last linked entry is the sole blob permitted at HEAD.
@@ -48,6 +48,17 @@ function approveOrSupersede(entry,changeId){
     need(!entry.replaces,'SUPERSESSION_WITHOUT_PREDECESSOR:'+p);
   }
   approved.set(p,{gitBlobSha:entry.gitBlobSha,changeId});
+}
+function approveTestOrSupersede(entry,changeId){
+  const p=entry.path||'';
+  const prior=tests.get(p);
+  if(prior&&prior.gitBlobSha!==entry.gitBlobSha){
+    const r=entry.replaces;
+    need(Boolean(r)&&r.path===p&&r.priorGitBlobSha===prior.gitBlobSha&&
+      r.priorChangeId===prior.changeId&&prior.changeId!==changeId,
+    'TEST_UNAUTHORIZED_OR_BROKEN_SUPERSESSION_CHAIN:'+p);
+  }else need(!entry.replaces,'TEST_SUPERSESSION_WITHOUT_CHANGED_PREDECESSOR:'+p);
+  tests.set(p,{gitBlobSha:entry.gitBlobSha,changeId});
 }
 for(const change of manifest.changes){
   need(/^I6_6_[A-Z0-9_]+$/.test(change.id||'')&&change.approvedByDirection===true&&Array.isArray(change.paths)&&change.paths.length>0,'CHANGE_NOT_AUTHORIZED_OR_MISSING_PATHS');
@@ -70,8 +81,7 @@ for(const change of manifest.changes){
   for(const entry of change.tests){
     const p=entry.path||'';
     need(/^tools\/gravicentra-i6-6-[A-Za-z0-9_-]+\.test\.cjs$/.test(p)&&/^[0-9a-f]{40}$/.test(entry.gitBlobSha||''),'TEST_WITHOUT_PINNED_IMPLEMENTATION:'+p);
-    need(git('rev-parse','HEAD:'+p)===entry.gitBlobSha,'TEST_BLOB_CHANGED_WITHOUT_MANIFEST:'+p);
-    tests.add(p);
+    approveTestOrSupersede(entry,change.id);
   }
 }
 const expectedPaths=[...approved.keys()].sort();
@@ -84,7 +94,8 @@ for(const [p,approval] of approved){
     need(syntax.status===0,'SOURCE_SYNTAX_FAILED:'+p);
   }
 }
-for(const p of tests){
+for(const [p,testApproval] of tests){
+  need(git('rev-parse','HEAD:'+p)===testApproval.gitBlobSha,'TEST_BLOB_CHANGED_WITHOUT_MANIFEST:'+p);
   const check=spawnSync(process.execPath,['--check',p],{stdio:'inherit'});
   need(check.status===0,'TEST_SYNTAX_FAILED:'+p);
   const test=spawnSync(process.execPath,[p],{stdio:'inherit',env:process.env});

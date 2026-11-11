@@ -127,17 +127,20 @@ Orbit.router = (function () {
       const clients = S.all('clientes') || [], policies = S.all('polizas') || [];
       const vehicles = S.all('vehiculos') || [], charges = S.all('cobros') || [];
       const insurers = S.all('aseguradoras') || [], clientsById = new Map(), vehiclesByPolicy = new Map();
-      const projection = Orbit.clientProjection;
-      // project(raw) without a policy batch context can call store.find('polizas')
-      // once PER CLIENT, rescanning the entire portfolio while the user types.
-      // The already-scoped policy snapshot supplies a constant-time context.
-      const policyClientIds = new Set(policies.map(p => String(p && p.clienteId || '')).filter(Boolean));
       function add(ic, title, subtitle, route, query) {
         rows.push({ ic, t: title, s: subtitle, go: route, query: normalized(query) });
       }
       clients.forEach(raw => {
-        const c = projection && projection.project ? projection.project(raw, { policyClientIds }) : raw;
-        if (!c) return;
+        if (!raw) return;
+        // The authorized scopedStore().all('clientes') ALREADY uses the current
+        // approved canonical client view projection. Calling project() again
+        // can re-read/clone the entire portfolio for EACH client (444 x).
+        // Index only the six search fields; never reproject or mutate records.
+        const c = { id: raw.id, tipo: raw.tipo,
+          nombre: raw.nombre || raw.nombreCompleto || raw.razonSocial || '',
+          identificacion: raw.identificacion || raw.numeroDocumento || raw.documento || raw.nit || '',
+          email: raw.email || raw.correo || raw.contactoPrincipalCorreo || '',
+          telefono: raw.telefono || raw.whatsapp || raw.telefonoAlterno || raw.contactoPrincipalTelefono || '' };
         clientsById.set(String(c.id), c);
         add('🧑', c.nombre || 'Cliente', 'Cliente · ' + (c.identificacion || c.tipo || ''),
           '#/cliente360?c=' + c.id, (c.nombre || '') + ' ' + (c.identificacion || '') + ' ' + (c.email || '') + ' ' + (c.telefono || ''));

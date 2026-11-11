@@ -875,6 +875,40 @@
           "gitBlobSha": "67f82a258720379b7245ebcb35504c0f9ffe5160"
         }
       ]
+    },
+    {
+      "id": "I6_6_GLOBAL_TOPBAR_REMOVE_ALREADY_PROJECTED_CLIENT_RECOMPUTATION_P0",
+      "approvedByDirection": true,
+      "receipt": "artifacts/orbit360-recovery/release-control/I6_6_GLOBAL_TOPBAR_CONFIRMED_PROJECTION_LATENCY_20261111.json",
+      "sourceStatus": "ROOT_CAUSE_REAL_BROWSER_8573MS_EVIDENCE_SOURCE_QA_PASS_NEW_IMMUTABLE_PREVIEW_AND_LIVE_PENDING",
+      "capabilityOwners": ["GLOBAL_SHELL_SEARCH", "ROLE_SCOPE_RUNTIME", "STARTUP_PERFORMANCE"],
+      "scope": "Actual signed Carlos Operativo Preview Chrome measured 444 redundant canonical projectClient() calls / 8362.4ms after scopedStore().all('clientes') had already returned projected rows; exact fix indexes only six aliases from the authorized already-projected read without reprojecting, storing or changing country/role visibility. Preserve orphan links to scoped modules and accent folding; zero business data or backend mutations.",
+      "paths": [
+        {
+          "path": "orbit360-platform/core/router.js",
+          "gitBlobSha": "66c96a1dc01bf0abd6caff00b7e76f3aeef06462",
+          "replaces": {
+            "path": "orbit360-platform/core/router.js",
+            "priorGitBlobSha": "739e4cea151a43098b200a8aad4c65f1e4fa0401",
+            "priorChangeId": "I6_6_TOPBAR_POLICY_BATCH_CONTEXT_AND_SCOPED_FALLBACK_P0"
+          }
+        }
+      ],
+      "tests": [
+        {
+          "path": "tools/gravicentra-i6-6-global-search-policy-context-and-scoped-fallback.test.cjs",
+          "gitBlobSha": "f845c92a5b52f3af857c2c3fbc85304d4fb8ac67",
+          "replaces": {
+            "path": "tools/gravicentra-i6-6-global-search-policy-context-and-scoped-fallback.test.cjs",
+            "priorGitBlobSha": "67f82a258720379b7245ebcb35504c0f9ffe5160",
+            "priorChangeId": "I6_6_TOPBAR_POLICY_BATCH_CONTEXT_AND_SCOPED_FALLBACK_P0"
+          }
+        },
+        {
+          "path": "tools/gravicentra-i6-6-test-supersession-chain.test.cjs",
+          "gitBlobSha": "1e9ef38bfaf6a6d200ec58672216124284be098b"
+        }
+      ]
     }
   ]
 }

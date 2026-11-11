@@ -1,0 +1,44 @@
+{
+  "schema": "GRAVICENTRA_I6_6_GLOBAL_TOPBAR_PROJECTION_CAUSAL_RECEIPT_V1",
+  "dateGuatemala": "2026-11-11",
+  "product": "Gravicentra Insurance",
+  "activeGate": "I6.6",
+  "historicalBoundary": "B4-007 CLOSED",
+  "approvedDirection": "Corrige exclusivamente el buscador SUPERIOR, no los filtros de cada modulo. Cambios transversales por rol y pais; prueba y pasa la misma candidata a LIVE.",
+  "deployedLiveSourceAtDiagnosis": "81b0a5b430ba496471bf255462c8910ae2e4f671",
+  "isolatedPreviewSourceAtDiagnosis": "1833a08efb9409478e46cd65e9c887122456d0be",
+  "signedRealChromeEvidence": {
+    "workflowRun": 43118639634,
+    "artifactId": 13899557565,
+    "role": "Operativo",
+    "firstGlobalTopbarSearchMs": 8573,
+    "secondCachedAccentSearchMs": 150,
+    "scopedCollectionsInitialReadsApproxMs": 59.5,
+    "clientProjectionCalls": 444,
+    "clientProjectionTotalMs": 8362.4,
+    "storeReadAllCalls": 456,
+    "storeReadAllTotalMs": 8355.4,
+    "profileTopFunction": "readCloneRows",
+    "profileTopFunctionMs": 7107,
+    "status": "HOLD_REAL_LATENCY_REPRODUCED_AND_CAUSE_ISOLATED"
+  },
+  "cause": "The client-scoped all('clientes') snapshot already returns its authorized canonical projection. The global topbar duplicated clientProjection.project() for every one of 444 clients; this invokes a segmentation fallback that clones the policy portfolio per client. Passing policyClientIds did not help because the actual active projection version uses a different context shape.",
+  "approvedFix": [
+    "Use only the already-scoped, already-projected clientes snapshot; index six lightweight text fields with display aliases without another clientProjection.project call.",
+    "Keep existing role/country/tenant scoping and clientId privacy: no global fallback to hidden client documents.",
+    "Retain source-specific cache invalidation and accents, no backend, Firestore document or Rules changes."
+  ],
+  "qa": {
+    "globalTopbarNoRedundantProjection": "8/8 PASS locally",
+    "globalSearchIndex": "17/17 PASS locally",
+    "cobrosAndTemporalRegression": "19/19 PASS locally",
+    "deltaGuard": "PASS locally; exact source metadata must be committed before immutable QA build",
+    "signedAuthenticatedPreviewTimingAfterFix": "PENDING",
+    "signedLiveTimingAfterPromotion": "PENDING"
+  },
+  "sourceStatus": "SOURCE_READY_NEW_IMMUTABLE_ARTIFACT_REQUIRED_PREVIEW_LIVE_HOLD",
+  "paymentWrites": 0,
+  "financialLedgerWrites": 0,
+  "dataReimport": false,
+  "authority": "Direction user reports 2026-11-11, linked immutable GitHub Actions evidence and matching approved source blobs"
+}
