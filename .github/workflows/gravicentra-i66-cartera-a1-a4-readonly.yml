@@ -1,0 +1,76 @@
+# I6.6 insurer/source batch A1-A4: LIVE tenant-scoped read-only exact-match probe.
+# Never mutates Firestore, Auth, Hosting, Rules or payment state.
+name: Gravicentra I6.6 Cartera A1-A4 LIVE Source Readback ONLY
+on:
+  push:
+    branches: [recovery/fase-a-clean-20260831]
+    paths:
+      - .github/workflows/gravicentra-i66-cartera-a1-a4-readonly.yml
+      - tools/gravicentra-i66-cartera-a1-a4-readonly.cjs
+      - tools/gravicentra-i66-cartera-a1-a4-readonly.test.cjs
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: gravicentra-i66-cartera-a1-a4-readonly
+  cancel-in-progress: false
+jobs:
+  signed-current-ledger:
+    if: github.repository == 'paulaosoriof86/orbit360-core' && github.ref_name == 'recovery/fase-a-clean-20260831'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 18
+    env:
+      GCLOUD_PROJECT: ays-orbit-360-lab
+      GI_I66_CARTERA_MODE: readonly
+      SA_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_LAB_ALT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Enforce read-only commands and exact source unit proof
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check tools/gravicentra-i66-cartera-a1-a4-readonly.cjs
+          node tools/gravicentra-i66-cartera-a1-a4-readonly.test.cjs
+          node - <<'NODE'
+          const fs=require('node:fs');
+          const s=fs.readFileSync('tools/gravicentra-i66-cartera-a1-a4-readonly.cjs','utf8');
+          for(const re of [/\.set\s*\(/,/\.delete\s*\(/,/\.batch\s*\(/,/\.runTransaction\s*\(/,/\.updateDurable\s*\(/,/\.createUser\s*\(/,/\.setCustomUserClaims\s*\(/])
+            if(re.test(s))throw Error('I66_CARTERA_READONLY_MUTATION_PATH_REFUSED');
+          if(!s.includes("GI_I66_CARTERA_MODE!=='readonly'")||!s.includes('writes:0'))throw Error('I66_CARTERA_READONLY_GUARD_DRIFT');
+          console.log('I66_CARTERA_SOURCE_PRIVATE_READONLY_GUARD_PASS');
+          NODE
+      - name: Select existing authorized Firebase project identity
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GCLOUD_PROJECT" = 'ays-orbit-360-lab'
+          test "$GI_I66_CARTERA_MODE" = 'readonly'
+          test -z "${FIRESTORE_EMULATOR_HOST:-}"
+          npm install --prefix "$RUNNER_TEMP/gi-i66-cartera-readonly" --ignore-scripts --no-audit --no-fund firebase-admin@13.4.0 >/dev/null
+          echo "NODE_PATH=$RUNNER_TEMP/gi-i66-cartera-readonly/node_modules" >> "$GITHUB_ENV"
+          python3 - <<'PY'
+          import json,os,pathlib
+          p=pathlib.Path(os.environ['RUNNER_TEMP'])/'gi-i66-cartera-existing-service-account.json'
+          for key in ('SA_LAB','SA_LAB_ALT','SA_DEFAULT'):
+              try: value=json.loads(os.environ.get(key,''))
+              except (TypeError,ValueError): continue
+              if value.get('type')!='service_account' or value.get('project_id')!='ays-orbit-360-lab' or not value.get('private_key'): continue
+              p.write_text(json.dumps(value),encoding='utf8');p.chmod(0o600)
+              with open(os.environ['GITHUB_ENV'],'a') as f:f.write('GOOGLE_APPLICATION_CREDENTIALS='+str(p)+'\n')
+              print('I66_CARTERA_SERVICE_ACCOUNT_PROJECT_BOUND_PASS')
+              break
+          else: raise SystemExit('I66_CARTERA_AUTH_READONLY_HOLD')
+          PY
+      - name: Read source requirements and current LIVE counterparts twice; never write
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/gravicentra-i66-cartera-a1-a4-readonly.cjs

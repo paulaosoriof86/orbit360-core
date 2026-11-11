@@ -9,9 +9,9 @@ import {getAuth} from 'firebase-admin/auth';
 const PROJECT='ays-orbit-360-lab';
 const TENANT='alianzas-soluciones';
 const ORIGIN=process.env.GI_I66_PERF_ORIGIN||'https://app.aysseguros.com';
-// Exact 81b0a5b4 source passed immutable-build and Preview byte readback.
+// Exact 1833a08efb94 source passed immutable-build and Preview byte readback.
 // It is the sole approved candidate for this scoped comparison.
-const APPROVED_PREVIEW='https://ays-orbit-360-lab--gi-i66-rc-43112679946-dnjvhn42.web.app';
+const APPROVED_PREVIEW='https://ays-orbit-360-lab--gi-i66-rc-43116689585-17au0dhv.web.app';
 const OUTPUT=process.env.GI_I66_PERF_REPORT;
 const norm=x=>String(x??'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();
 const need=(ok,code)=>{if(!ok)throw Error(code);};
@@ -235,6 +235,34 @@ async function run(){
       if(withCpuProfile){const prof=await cdp.send('Profiler.stop');report.cpuProfiles[route]=profileTop(prof.profile);}
       report.routes.push(measurement);
     }
+    // Search the GLOBAL topbar, not a module's local filter. Observe the
+    // browser's real event-loop delay and visible dropdown without touching data.
+    report.globalTopbarSearch=await page.evaluate(async()=>{
+      const input=document.querySelector('.tb-search input'),dd=document.getElementById('tb-search-dd');
+      if(!input||!dd)return {ready:false,reason:'TOPBAR_INPUT_MISSING'};
+      const probe=async(term)=>{
+        dd.classList.remove('open');dd.innerHTML='';
+        const begin=performance.now();input.value=term;
+        input.dispatchEvent(new Event('input',{bubbles:true}));
+        const got=await new Promise(resolve=>{
+          const timer=setInterval(()=>{
+            const hasResults=dd.classList.contains('open')&&
+              (!!dd.querySelector('.tb-sr')||!!dd.querySelector('.tb-sr-empty'));
+            if(hasResults||performance.now()-begin>7500){clearInterval(timer);resolve(hasResults);}
+          },25);
+        });
+        return {termType:term==='MAPFRE'?'basic':'accent',ready:got,
+          timeMs:Math.round(performance.now()-begin),resultCount:dd.querySelectorAll('.tb-sr').length};
+      };
+      const first=await probe('MAPFRE');
+      const second=await probe('MAPFRÉ');
+      input.value='';input.dispatchEvent(new Event('input',{bubbles:true}));
+      return {ready:first.ready&&second.ready&&first.resultCount>0&&second.resultCount===first.resultCount,
+        first,second,createdFinancialWrites:0};
+    });
+    need(report.globalTopbarSearch.ready,'I66_TOPBAR_LIVE_BROWSER_RESULT_HOLD');
+    need(report.globalTopbarSearch.first.timeMs<7000&&report.globalTopbarSearch.second.timeMs<2200,
+      'I66_TOPBAR_REAL_SEARCH_LATENCY_HOLD');
     // Measure a real, already-authorized client detail without printing its identity.
     await cdp.send('Profiler.start');
     report.cliente360Detail=await page.evaluate(async()=>{
