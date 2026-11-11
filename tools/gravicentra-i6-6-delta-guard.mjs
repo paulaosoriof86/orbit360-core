@@ -61,7 +61,10 @@ for(const change of manifest.changes){
     // Allow asset/HTML successors as well as JS without relaxing the gate.
     const frontend=/^orbit360-platform\/[A-Za-z0-9_./-]+\.(?:js|html|css|json|webmanifest|svg|png|jpg|jpeg|webp|woff2?)$/.test(p);
     const backend=/^functions\/[A-Za-z0-9_./-]+\.js$/.test(p);
-    need(frontend||backend,'UNSUPPORTED_PRODUCT_PATH:'+p);
+    // Exact canonical build packager may evolve only with pinned owner receipt and test.
+    // Do not admit other tools, alternate packaging scripts or release paths.
+    const canonicalBuildTool=p==='tools/gravicentra-i6-1-preview-package.mjs';
+    need(frontend||backend||canonicalBuildTool,'UNSUPPORTED_PRODUCT_PATH:'+p);
     approveOrSupersede(entry,change.id);
   }
   for(const entry of change.tests){
@@ -72,7 +75,7 @@ for(const change of manifest.changes){
   }
 }
 const expectedPaths=[...approved.keys()].sort();
-const diff=git('diff','--name-only',BASE,'HEAD','--','orbit360-platform','functions','firestore.rules','storage.rules','database.rules.json','firebase.json').split('\n').filter(Boolean).sort();
+const diff=git('diff','--name-only',BASE,'HEAD','--','orbit360-platform','functions','tools/gravicentra-i6-1-preview-package.mjs','firestore.rules','storage.rules','database.rules.json','firebase.json').split('\n').filter(Boolean).sort();
 need(JSON.stringify(diff)===JSON.stringify(expectedPaths),'UNDECLARED_PRODUCT_SOURCE_DELTA:'+diff.join(','));
 for(const [p,approval] of approved){
   need(git('rev-parse','HEAD:'+p)===approval.gitBlobSha,'UNAPPROVED_OR_STALE_SOURCE_BLOB:'+p);
