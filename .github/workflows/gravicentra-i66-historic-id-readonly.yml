@@ -42,7 +42,13 @@ jobs:
             const docsByCollection=new Map();
             for(const collection of collections){
               const path=db.collection('tenants').doc(tenant).collection('data').doc(collection).collection('items');
-              const snap=await path.select('id','tenantId','titulo','numero','polizaId','workflowType','endorsementStage','opsBoardHidden').limit(5001).get();
+              const snap=await path.select(
+                'id','tenantId','titulo','numero','polizaId','workflowType','endorsementStage','opsBoardHidden',
+                'reciboId','receiptId','matchedReceiptId','cobroId','cuota','serie','numeroReciboFuente',
+                'primaTotal','monto','montoTotal','saldo','estado','estadoCartera','estadoOperativo',
+                'carteraActiva','fechaPago','paidDate','applicationState','paymentState',
+                'deleted','archivado','eliminado','fechaVencimiento','vence','fechaLimite'
+              ).limit(5001).get();
               assert.ok(snap.size<=5000,'READONLY_PROBE_LIMIT_EXCEEDED_'+collection);
               docsByCollection.set(collection,snap.docs);
               let mismatch=0,missing=0,missingTenant=0,foreignTenant=0;
@@ -69,8 +75,14 @@ jobs:
             const grouped=new Map();for(const d of activePortfolios){const rid=String(d.data().reciboId||'');if(rid)grouped.set(rid,(grouped.get(rid)||0)+1);}
             const inactiveReceipts=linkedReceipts.filter(d=>{const r=d.data()||{};return r.deleted===true||r.eliminado===true||r.archivado===true||['anulado','cancelado','superseded','reemplazado'].includes(normalized(r.estado));});
             const paymentRecord=docsByCollection.get('cobros').filter(d=>pIds.has(String(d.data().polizaId||'')));
-            const appliedReceiptRefs=new Set(paymentRecord.map(d=>String(d.data().reciboId||'')).filter(Boolean));
+            const appliedReceiptRefs=new Set(paymentRecord.map(d=>String(d.data().reciboId||d.data().receiptId||d.data().matchedReceiptId||'')).filter(Boolean));
             console.log('ID_PROBE_BAYRON_SHAPE receipts='+linkedReceipts.length+' inactive_receipts='+inactiveReceipts.length+' active_portfolio='+activePortfolios.length+' unlinked_portfolio='+activePortfolios.filter(d=>!d.data().reciboId).length+' ambiguous_active_portfolio_receipts='+Array.from(grouped.values()).filter(n=>n>1).length+' paid_receipt_refs='+appliedReceiptRefs.size+' paid_receipt_ref_exists='+[...appliedReceiptRefs].every(id=>linkedReceipts.some(d=>d.id===id)));
+            const amount=d=>{const r=d.data()||{};for(const k of ['monto','montoTotal','primaTotal','saldo']){const n=Number(r[k]);if(r[k]!==undefined&&r[k]!==null&&r[k]!==''&&Number.isFinite(n))return Math.round(n*100)/100;}return null;};
+            const amountClasses=docs=>({approved1557_92:docs.filter(d=>amount(d)===1557.92).length,legacy242_67:docs.filter(d=>amount(d)===242.67).length,other:docs.filter(d=>amount(d)!==null&&amount(d)!==1557.92&&amount(d)!==242.67).length,missing:docs.filter(d=>amount(d)===null).length});
+            const states=docs=>Object.fromEntries(Object.entries(docs.reduce((acc,d)=>{const r=d.data()||{},k=normalized(r.estadoOperativo||r.estadoCartera||r.estado)||'sin_estado';acc[k]=(acc[k]||0)+1;return acc;},{})).filter(([k])=>/^[a-z_]{1,45}$/.test(k)));
+            console.log('ID_PROBE_BAYRON_RECEIPTS_CLASS '+JSON.stringify({amounts:amountClasses(linkedReceipts),states:states(linkedReceipts),paid:linkedReceipts.filter(d=>Boolean(d.data().cobroId)).length}));
+            console.log('ID_PROBE_BAYRON_PORTFOLIO_CLASS '+JSON.stringify({amounts:amountClasses(linkedPortfolios),states:states(linkedPortfolios),linked:linkedPortfolios.filter(d=>Boolean(d.data().reciboId||d.data().receiptId)).length}));
+            console.log('ID_PROBE_BAYRON_COBRO_CLASS '+JSON.stringify({count:paymentRecord.length,linked:paymentRecord.filter(d=>Boolean(d.data().reciboId||d.data().receiptId)).length,states:states(paymentRecord),paidDatePresent:paymentRecord.filter(d=>Boolean(d.data().paidDate||d.data().fechaPago)).length,applicationStatePresent:paymentRecord.filter(d=>Boolean(d.data().applicationState)).length}));
             console.log('I66_READONLY_METADATA_PROBE_COMPLETED_WITHOUT_WRITES');
           })().catch(e=>{console.error(String(e.message||e).replace(/[^a-zA-Z0-9_ -]/g,''));process.exitCode=1;});
           NODE
