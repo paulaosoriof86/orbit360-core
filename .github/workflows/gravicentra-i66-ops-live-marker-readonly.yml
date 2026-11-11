@@ -1,0 +1,38 @@
+# I6.6 P0: reusable public-marker readback before a rollback-safe LIVE promotion.
+# No credentials, Firebase writes, Auth/Rules/data changes, or deploy.
+name: Gravicentra I6.6 Ops LIVE Marker Readonly
+on:
+  push:
+    branches: [recovery/fase-a-clean-20260831]
+    paths:
+      - .github/workflows/gravicentra-i66-ops-live-marker-readonly.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  exact-live-marker:
+    if: github.repository == 'paulaosoriof86/orbit360-core' && github.ref == 'refs/heads/recovery/fase-a-clean-20260831'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Read and compare current LIVE markers on both public origins
+        run: |
+          set -euo pipefail
+          curl --fail --location --silent --show-error --retry 3 --max-time 30 -H 'Cache-Control: no-cache' "https://ays-orbit-360-lab.web.app/__recovery__/build.json?i66=$GITHUB_RUN_ID" > "$RUNNER_TEMP/firebase-live.json"
+          curl --fail --location --silent --show-error --retry 3 --max-time 30 -H 'Cache-Control: no-cache' "https://app.aysseguros.com/__recovery__/build.json?i66=$GITHUB_RUN_ID" > "$RUNNER_TEMP/custom-live.json"
+          node - <<'NODE'
+          const fs=require('node:fs'),p=process.env.RUNNER_TEMP;
+          const a=JSON.parse(fs.readFileSync(p+'/firebase-live.json'));
+          const b=JSON.parse(fs.readFileSync(p+'/custom-live.json'));
+          if(a.product!=='Gravicentra Insurance'||b.product!==a.product||
+             !/^[0-9a-f]{40}$/.test(a.sourceSha||'')||a.sourceSha!==b.sourceSha||
+             typeof a.buildId!=='string'||!/^gi-i66-/.test(a.buildId)||a.buildId!==b.buildId)
+            throw Error('I66_LIVE_MARKER_DUAL_ORIGIN_MISMATCH');
+          console.log('I66_LIVE_MARKER_DUAL_ORIGIN_PASS');
+          console.log('I66_LIVE_SOURCE_SHA='+a.sourceSha);
+          console.log('I66_LIVE_BUILD_ID='+a.buildId);
+          console.log('I66_LIVE_READONLY_NO_DATA_WRITES=true');
+          NODE
