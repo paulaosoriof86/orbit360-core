@@ -553,6 +553,35 @@
         "backendEmulatorPending": true,
         "liveRelease": false
       }
+    },
+    {
+      "id": "I6_6_PAYMENT_COUNTRY_DIRECT_AND_INFERRED_WRITE_BOUNDARY_P0",
+      "approvedByDirection": true,
+      "receipt": "Paula Andrea Osorio Franco, Dirección, 2026-11-11: corrección urgente y transversal de regresiones de pagos por rol y país; probar antes de publicar; conversación activa Gravicentra Insurance",
+      "sourceStatus": "SOURCE_COUNTRY_SCOPE_GUARDED; EMULATOR_AND_CONTROL_PLANE_RETST_PENDING; PREVIEW_AND_LIVE_HOLD",
+      "capabilityOwners": [
+        "COBROS_RECONCILIATION",
+        "RECIBOS_CARTERA_PRIMARY_RUNTIME",
+        "ROLE_SCOPE_RUNTIME"
+      ],
+      "scope": "Requerir país consistente póliza/recibo y membership de rol antes de aplicar pago directo o inferido; preservar contrato existente de rol asesor, idempotencia, origen y ledger; sin alterar clientes/recibos reales ni aumentar permisos.",
+      "paths": [
+        {
+          "path": "functions/cobros-reconciliation-domain.js",
+          "gitBlobSha": "9ab10bbed8b4745a46009d62c7f04863ec2d4659",
+          "replaces": {
+            "path": "functions/cobros-reconciliation-domain.js",
+            "priorGitBlobSha": "1bceb40153326ab22a7010a6a047aec05fbb5b45",
+            "priorChangeId": "I6_6_ADVISOR_REPORT_OPS_INTERNAL_OUTBOX_ROLE_COUNTRY_P0"
+          }
+        }
+      ],
+      "tests": [
+        {
+          "path": "tools/gravicentra-i6-6-payment-country-write-boundary.test.cjs",
+          "gitBlobSha": "04c8c8cdf6516d0fd6c323431c5800417073a586"
+        }
+      ]
     }
   ]
 }
