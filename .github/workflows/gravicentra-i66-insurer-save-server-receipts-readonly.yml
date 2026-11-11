@@ -34,14 +34,30 @@ jobs:
           const norm=x=>String(x||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();
           const iso=v=>{if(!v)return '';try{return (typeof v.toDate==='function'?v.toDate():new Date(v)).toISOString();}catch{return '';}};
           (async()=>{
-            const [insSnap,members,requestSnaps]=await Promise.all([
+            const [insSnap,members,advisors,requestSnaps]=await Promise.all([
               tenant.collection('data').doc('aseguradoras').collection('items').doc('gt-aseguradora-guatemalteca').get(),
-              tenant.collection('members').select('nombre','displayName','name','roles','activeRole').get(),
+              tenant.collection('members').limit(150).get(),
+              tenant.collection('data').doc('asesores').collection('items').limit(400).get(),
               tenant.collection('operationalRequests').orderBy('committedAt','desc').limit(250).get()
             ]);
             assert.ok(insSnap.exists,'I66_INSURER_NOT_FOUND');
-            const member=members.docs.filter(d=>[d.data().nombre,d.data().displayName,d.data().name].some(x=>norm(x).startsWith('carlos castro')));
-            assert.equal(member.length,1,'I66_CARLOS_MEMBER_NOT_UNIQUE');
+            assert.ok(members.size<150&&advisors.size<400,'I66_MEMBER_ADVISOR_BOUNDED_READ_HOLD');
+            const advisorIds=new Set(),userIds=new Set();
+            for(const d of advisors.docs){
+              const a=d.data()||{};
+              if([a.nombre,a.nombreCompleto,a.displayName,a.name].some(x=>norm(x).startsWith('carlos castro'))){
+                advisorIds.add(d.id);
+                for(const k of [a.authUid,a.uid,a.userId])if(k)userIds.add(String(k));
+              }
+            }
+            const member=members.docs.filter(d=>{
+              const m=d.data()||{},isCarlos=[m.nombre,m.displayName,m.name,m.nombreCompleto,m.fullName]
+                .some(x=>norm(x).startsWith('carlos castro'))||advisorIds.has(String(m.advisorId||m.asesorId||''))||userIds.has(d.id);
+              const roles=[m.activeRole,m.rol,m.rolDefault,...[].concat(m.roles||[])].map(norm);
+              return isCarlos&&roles.includes('operativo')&&norm(m.activeRole)==='operativo'&&m.active!==false&&m.activo!==false&&
+                !['inactivo','inactive','bloqueado','blocked'].includes(norm(m.status||m.estado));
+            });
+            assert.equal(member.length,1,'I66_CARLOS_SIGNED_ACTIVE_MEMBER_NOT_UNIQUE');
             const uid=member[0].id,row=insSnap.data()||{},events=Array.isArray(row.actividad)?row.actividad:[],recentISO='2026-11-11T17:00:00.000Z';
             const carlosEvents=events.filter(e=>e?.actorUid===uid),todayEvents=carlosEvents.filter(e=>iso(e.fecha)>=recentISO);
             const receipts=requestSnaps.docs.map(d=>d.data()||{}).filter(d=>d.insurerActor?.uid===uid&&Array.isArray(d.result?.insurerActivityEvents)
