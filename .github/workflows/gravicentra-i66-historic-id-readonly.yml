@@ -132,3 +132,34 @@ jobs:
             }
           })().catch(e=>{console.error(String(e.name||'error'));process.exitCode=1;});
           NODE
+  inspect-live-revision-traffic:
+    if: github.repository == 'paulaosoriof86/orbit360-core' && github.ref == 'refs/heads/recovery/fase-a-clean-20260831'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    env:
+      SA_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_ALT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+    steps:
+      - uses: google-github-actions/setup-gcloud@v2
+        with:
+          version: '>= 483.0.0'
+      - name: Inspect LIVE Ops function and Cloud Run traffic with existing credential; no writes
+        run: |
+          set -euo pipefail
+          node - <<'NODE'
+          const fs=require('fs');const found=['SA_LAB','SA_ALT','SA_DEFAULT'].map(x=>process.env[x]).filter(Boolean).map(x=>{try{return JSON.parse(x);}catch{return null;}}).find(x=>x?.type==='service_account'&&x.project_id==='ays-orbit-360-lab'&&x.private_key);
+          if(!found)throw Error('READONLY_TRAFFIC_AUTH_MISSING');
+          fs.writeFileSync(process.env.RUNNER_TEMP+'/i66-traffic-credential.json',JSON.stringify(found),{mode:0o600});
+          NODE
+          gcloud auth activate-service-account --key-file="$RUNNER_TEMP/i66-traffic-credential.json" --quiet >/dev/null 2>&1
+          gcloud run services describe orbit360opsleadscommand --region us-central1 --project ays-orbit-360-lab --format=json > "$RUNNER_TEMP/ops-live-service.json"
+          gcloud run revisions list --service orbit360opsleadscommand --region us-central1 --project ays-orbit-360-lab --format=json > "$RUNNER_TEMP/ops-live-revisions.json"
+          gcloud functions describe orbit360OpsLeadsCommand --gen2 --region us-central1 --project ays-orbit-360-lab --format=json > "$RUNNER_TEMP/ops-live-function.json"
+          node - <<'NODE'
+          const fs=require('fs'),root=process.env.RUNNER_TEMP;
+          const service=JSON.parse(fs.readFileSync(root+'/ops-live-service.json')),fun=JSON.parse(fs.readFileSync(root+'/ops-live-function.json')),revisions=JSON.parse(fs.readFileSync(root+'/ops-live-revisions.json'));
+          const state=service.status||{};
+          console.log('OPS_TRAFFIC_LIVE '+JSON.stringify({latestCreated:state.latestCreatedRevisionName,latestReady:state.latestReadyRevisionName,traffic:(state.traffic||[]).map(t=>({revision:t.revisionName,percent:t.percent})),functionState:fun.state,functionUpdated:fun.updateTime,entryPoint:fun.buildConfig?.entryPoint}));
+          console.log('OPS_REVISION_LIST '+JSON.stringify(revisions.map(r=>({name:r.metadata?.name,created:r.metadata?.creationTimestamp,imageDigest:r.status?.imageDigest,ready:(r.status?.conditions||[]).some(c=>c.type==='Ready'&&String(c.status)==='True')})).slice(0,12)));
+          NODE
