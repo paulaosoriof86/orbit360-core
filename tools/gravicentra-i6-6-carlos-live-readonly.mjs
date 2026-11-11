@@ -10,10 +10,13 @@ import { createRequire } from 'node:module';
 const require = createRequire(path.join(process.cwd(), 'functions', 'package.json'));
 const admin = require('firebase-admin');
 const PROJECT_ID = 'ays-orbit-360-lab';
+// Exact tenant source evidence (current canonical branch):
+// data/tenant-config/alianzas-soluciones.asesores.json (blob d2874007a5c7)
+// data/tenant-runtime-config-index.js (blob 8ab6d2f592b2).
+const TENANT_ID = 'alianzas-soluciones';
 const EXPECTED_SOURCE_BLOB = 'a27810c65e6a5a761d40c0e1f20cae61df483d1f';
 const TARGET = 'carlos castro';
 const OUTPUT = path.resolve(process.env.GI_CARLOS_READONLY_REPORT || 'carlos-live-readonly-private.json');
-const MAX_TENANTS = 15;
 const MAX_ADVISORS = 400;
 const MAX_MEMBERS = 150;
 const MAX_ACTIVITY = 120;
@@ -108,41 +111,40 @@ function safeWrite(result) {
 }
 async function run() {
   assert.equal(process.env.GI_CARLOS_READONLY_PROJECT, PROJECT_ID, 'PROJECT_MISMATCH');
+  assert.equal(process.env.GI_CARLOS_READONLY_TENANT, TENANT_ID, 'TENANT_MISMATCH');
   assert.equal(process.env.GI_CARLOS_PRODUCT_SOURCE_BLOB, EXPECTED_SOURCE_BLOB, 'SOURCE_BLOB_DRIFT');
   const cred = JSON.parse(fs.readFileSync(process.env.GOOGLE_APPLICATION_CREDENTIALS, 'utf8'));
   assert.equal(cred.type, 'service_account', 'AUTH_TYPE_INVALID');
   assert.equal(cred.project_id, PROJECT_ID, 'AUTH_PROJECT_MISMATCH');
   admin.initializeApp({ credential: admin.credential.cert(cred), projectId: PROJECT_ID });
   const db = admin.firestore();
-  const tenants = await db.collection('tenants').limit(MAX_TENANTS).get();
-  assert(!tenants.empty && tenants.size < MAX_TENANTS, 'TENANT_COUNT_OUT_OF_SAFE_BOUND');
+  const tenantDoc = db.collection('tenants').doc(TENANT_ID);
+  const tenantSnap = await tenantDoc.get();
+  assert(tenantSnap.exists, 'CANONICAL_TENANT_NOT_FOUND_LIVE');
+  const root = tenantDoc;
   const matches = [];
-  for (const tenantDoc of tenants.docs) {
-    const tenantId = tenantDoc.id;
-    const root = db.collection('tenants').doc(tenantId);
-    const [advisorSnap, memberSnap] = await Promise.all([
-      root.collection('data').doc('asesores').collection('items').limit(MAX_ADVISORS).get(),
-      root.collection('members').limit(MAX_MEMBERS).get()
-    ]);
-    assert(advisorSnap.size < MAX_ADVISORS && memberSnap.size < MAX_MEMBERS, 'STAFF_LIST_OUT_OF_SAFE_BOUND');
-    const advisors = advisorSnap.docs.filter(doc => isCarlos(doc.data()));
-    const advisorIds = new Set(advisors.map(doc => doc.id));
-    const linkedUids = new Set(advisors.flatMap(doc => [doc.data().authUid, doc.data().uid, doc.data().userId]).filter(Boolean).map(String));
-    for (const doc of memberSnap.docs) {
-      const row = doc.data() || {};
-      const memberAdvisorId = String(row.advisorId || row.asesorId || '');
-      const byName = isCarlos(row), byLinkedAdvisor = advisorIds.has(memberAdvisorId), byLinkedUid = linkedUids.has(doc.id);
-      if (byName || byLinkedAdvisor || byLinkedUid) {
-        matches.push({tenantId, uid:doc.id, member:row, advisorId:memberAdvisorId,
-          matchStrength:[byName ? 'memberExactName' : '', byLinkedAdvisor ? 'linkedAdvisorExactName' : '', byLinkedUid ? 'linkedAuthUidExactAdvisor' : ''].filter(Boolean)});
-      }
+  const [advisorSnap, memberSnap] = await Promise.all([
+    root.collection('data').doc('asesores').collection('items').limit(MAX_ADVISORS).get(),
+    root.collection('members').limit(MAX_MEMBERS).get()
+  ]);
+  assert(advisorSnap.size < MAX_ADVISORS && memberSnap.size < MAX_MEMBERS, 'STAFF_LIST_OUT_OF_SAFE_BOUND');
+  const advisors = advisorSnap.docs.filter(doc => isCarlos(doc.data()));
+  const advisorIds = new Set(advisors.map(doc => doc.id));
+  const linkedUids = new Set(advisors.flatMap(doc => [doc.data().authUid, doc.data().uid, doc.data().userId]).filter(Boolean).map(String));
+  for (const doc of memberSnap.docs) {
+    const row = doc.data() || {};
+    const memberAdvisorId = String(row.advisorId || row.asesorId || '');
+    const byName = isCarlos(row), byLinkedAdvisor = advisorIds.has(memberAdvisorId), byLinkedUid = linkedUids.has(doc.id);
+    if (byName || byLinkedAdvisor || byLinkedUid) {
+      matches.push({tenantId:TENANT_ID, uid:doc.id, member:row, advisorId:memberAdvisorId,
+        matchStrength:[byName ? 'memberExactName' : '', byLinkedAdvisor ? 'linkedAdvisorExactName' : '', byLinkedUid ? 'linkedAuthUidExactAdvisor' : ''].filter(Boolean)});
     }
   }
   const report = {
     schema:'GI_I66_CARLOS_LIVE_SERVICE_READONLY_V1', generatedAtUtc:new Date().toISOString(),
     projectId:PROJECT_ID, expectedProductSourceBlob:EXPECTED_SOURCE_BLOB,
     actorSessionImpersonated:false, firestoreWrites:0, roleUpdates:0,
-    lookup:{tenantsScanned:tenants.size,carlosMembershipCandidates:matches.length},
+    lookup:{exactTenantId:TENANT_ID,carlosMembershipCandidates:matches.length},
     conclusion:matches.length === 0 ? 'HOLD_CARLOS_MEMBERSHIP_NOT_FOUND_BY_EXACT_CANONICAL_IDENTITY' :
       matches.length > 1 ? 'HOLD_CARLOS_MEMBER_IDENTITY_AMBIGUOUS' : 'READONLY_CONFIG_OBSERVED_SIGNED_WRITE_UAT_HOLD'
   };
@@ -207,7 +209,7 @@ async function run() {
 run().catch(error => {
   // Never log SDK error objects/messages; they can embed a live document path.
   const known = new Set(['PROJECT_MISMATCH','SOURCE_BLOB_DRIFT','AUTH_TYPE_INVALID',
-    'AUTH_PROJECT_MISMATCH','TENANT_COUNT_OUT_OF_SAFE_BOUND',
+    'AUTH_PROJECT_MISMATCH','TENANT_MISMATCH','CANONICAL_TENANT_NOT_FOUND_LIVE',
     'STAFF_LIST_OUT_OF_SAFE_BOUND','ACTOR_EVENTS_OUT_OF_SAFE_BOUND']);
   const code = known.has(String(error.message)) ? error.message :
     /^[A-Z0-9_-]{1,50}$/.test(String(error.code || '')) ? String(error.code) : 'PRIVATE_FIRESTORE_READ_FAILED';

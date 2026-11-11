@@ -16,6 +16,7 @@ jobs:
     timeout-minutes: 20
     env:
       GI_CARLOS_READONLY_PROJECT: ays-orbit-360-lab
+      GI_CARLOS_READONLY_TENANT: alianzas-soluciones
       GI_CARLOS_PRODUCT_SOURCE_BLOB: a27810c65e6a5a761d40c0e1f20cae61df483d1f
       SA_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
       SA_ALT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
@@ -28,7 +29,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Verify exact I6.6 source owner and strictly read-only diagnostic v2
+      - name: Verify exact I6.6 source and one canonical tenant read-only diagnostic v3
         run: |
           set -euo pipefail
           test "$(git hash-object functions/product-operational-domain.js)" = "$GI_CARLOS_PRODUCT_SOURCE_BLOB"
@@ -39,6 +40,7 @@ jobs:
           for(const forbidden of [/\.set\s*\(/,/\.update\s*\(/,/\.delete\s*\(/,/\.create\s*\(/,/\.runTransaction\s*\(/,/\.signIn/,/\.createCustomToken/,/\.setCustomUserClaims/])
             if(forbidden.test(script))throw Error('MUTATION_API_IN_READONLY_SOURCE:'+forbidden);
           if(!script.includes("const PROJECT_ID = 'ays-orbit-360-lab'"))throw Error('READONLY_PROJECT_GUARD_MISSING');
+          if(!script.includes("const TENANT_ID = 'alianzas-soluciones'"))throw Error('CANONICAL_TENANT_GUARD_MISSING');
           console.log('I66_CARLOS_READONLY_CODE_STATIC_GUARD_PASS');
           NODE
       - name: Select configured existing LAB credential without exposing key
