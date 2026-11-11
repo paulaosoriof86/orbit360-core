@@ -1,0 +1,61 @@
+# I6.6 forensic: distinguish durable server commit vs rejected client/callable. No data values or writes.
+name: Gravicentra I6.6 Insurer SAVE Server Receipts Readonly
+on:
+  push:
+    branches: [recovery/fase-a-clean-20260831]
+    paths: [.github/workflows/gravicentra-i66-insurer-save-server-receipts-readonly.yml]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  inspect:
+    if: github.repository == 'paulaosoriof86/orbit360-core' && github.ref_name == 'recovery/fase-a-clean-20260831'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 9
+    env:
+      SA_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_ALT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+    steps:
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Install exact existing Firestore admin reader
+        run: npm install --no-save --package-lock=false --ignore-scripts --no-audit --no-fund firebase-admin@13.4.0 >/dev/null
+      - name: Read only scoped insurer audit and operational receipts
+        run: |
+          node - <<'NODE'
+          'use strict';
+          const assert=require('node:assert/strict'),sdk=require('firebase-admin');
+          const service=['SA_LAB','SA_ALT','SA_DEFAULT'].map(n=>process.env[n]).filter(Boolean).map(s=>{try{return JSON.parse(s);}catch(_){return null;}})
+            .find(s=>s&&s.type==='service_account'&&s.project_id==='ays-orbit-360-lab'&&s.private_key);
+          assert.ok(service,'I66_RECEIPT_EXISTING_AUTH_MISSING');
+          sdk.initializeApp({credential:sdk.credential.cert(service),projectId:'ays-orbit-360-lab'});
+          const db=sdk.firestore(),tenant=db.collection('tenants').doc('alianzas-soluciones');
+          const norm=x=>String(x||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();
+          const iso=v=>{if(!v)return '';try{return (typeof v.toDate==='function'?v.toDate():new Date(v)).toISOString();}catch{return '';}};
+          (async()=>{
+            const [insSnap,members,requestSnaps]=await Promise.all([
+              tenant.collection('data').doc('aseguradoras').collection('items').doc('gt-aseguradora-guatemalteca').get(),
+              tenant.collection('members').select('nombre','displayName','name','roles','activeRole').get(),
+              tenant.collection('operationalRequests').orderBy('committedAt','desc').limit(250).get()
+            ]);
+            assert.ok(insSnap.exists,'I66_INSURER_NOT_FOUND');
+            const member=members.docs.filter(d=>[d.data().nombre,d.data().displayName,d.data().name].some(x=>norm(x).startsWith('carlos castro')));
+            assert.equal(member.length,1,'I66_CARLOS_MEMBER_NOT_UNIQUE');
+            const uid=member[0].id,row=insSnap.data()||{},events=Array.isArray(row.actividad)?row.actividad:[],recentISO='2026-11-11T17:00:00.000Z';
+            const carlosEvents=events.filter(e=>e?.actorUid===uid),todayEvents=carlosEvents.filter(e=>iso(e.fecha)>=recentISO);
+            const receipts=requestSnaps.docs.map(d=>d.data()||{}).filter(d=>d.insurerActor?.uid===uid&&Array.isArray(d.result?.insurerActivityEvents)
+              &&d.result.insurerActivityEvents.some(e=>e?.id==='gt-aseguradora-guatemalteca'));
+            const todayReceipts=receipts.filter(r=>iso(r.committedAt)>=recentISO);
+            const safeEvents=events.slice(0,5).map(e=>({utc:iso(e.fecha),serverOwned:e.serverOwned===true,
+              actorCarlos:e.actorUid===uid,changedFieldCount:Array.isArray(e.camposCambiados)?e.camposCambiados.length:null}));
+            console.log('I66_INSURER_REAL_LIVE_SERVER_RECEIPTS_READONLY='+JSON.stringify({
+              insurerExists:insSnap.exists,recordUpdatedUtc:iso(row.updatedAt),auditRows:events.length,
+              recentActivitySummary:safeEvents,carlosActivitySince1100GT:todayEvents.length,
+              carlosCommittedRequestReceiptsSince1100GT:todayReceipts.length,
+              lastCarlosReceiptUtc:receipts.length?iso(receipts[0].committedAt):null,
+              scopedRequestWindow:requestSnaps.size,requestWindowTruncated:requestSnaps.size===250,
+              noBusinessFieldValuesEmitted:true,readsOnly:true,writes:0
+            }));
+          })().catch(e=>{console.error('I66_INSURER_RECEIPT_READONLY_HOLD='+String(e?.message||e).replace(/[^A-Za-z0-9_-]/g,'').slice(0,70));process.exitCode=1;});
+          NODE
