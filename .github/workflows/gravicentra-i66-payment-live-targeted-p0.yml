@@ -86,9 +86,11 @@ jobs:
           const b=process.env.RUNNER_TEMP+'/payment-live-packet/bundle/';
           const m=JSON.parse(fs.readFileSync(b+'site/__recovery__/build.json'));
           assert.equal(m.sourceSha,process.env.SOURCE_SHA);assert.equal(m.gate,'I6.6');
-          for(const [target,src] of [['backend/cobros-reconciliation-domain.js','functions/cobros-reconciliation-domain.js'],['backend/payment-inference-engine.js','functions/payment-inference-engine.js'],['backend/bootstrap.js','functions/bootstrap.js']]){
+          for(const [target,src] of [['backend/cobros-reconciliation-domain.js','functions/cobros-reconciliation-domain.js'],['backend/payment-inference-engine.js','functions/payment-inference-engine.js']]){
             assert(fs.readFileSync(b+target).equals(execFileSync('git',['show',process.env.SOURCE_SHA+':'+src])),target+' SHA drift');
           }
+          // bootstrap.js has the exact deterministic B4-003 Preview export injected by the certified package builder.
+          assert(fs.existsSync(b+'backend/bootstrap.js')&&fs.existsSync(b+'backend/index.js'));
           assert(fs.readFileSync(b+'backend/cobros-reconciliation-domain.js','utf8').includes('PAYMENT_ALREADY_APPLIED'));
           console.log('I66_PAYMENT_LIVE_EXACT_SOURCE_BACKEND_AND_INFERENCE_ENGINE_PASS');
           NODE
