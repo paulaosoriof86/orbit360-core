@@ -136,7 +136,7 @@ jobs:
           export TENANT_BRANDING_SNAPSHOT_FILE="$RUNNER_TEMP/gi-i66-branding.json"
           node tools/gravicentra-i6-1-preview-package.mjs . "$RUNNER_TEMP/gi-i66-package" "$RUNNER_TEMP/gi-i66-sdkconfig.json" > "$RUNNER_TEMP/gi-i66-package-output.json"
           node - <<'NODE'
-          const fs=require('node:fs'),{execFileSync}=require('node:child_process');
+          const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/strict'),{execFileSync}=require('node:child_process');
           const base=process.env.RUNNER_TEMP+'/gi-i66-package/bundle';
           const cfg=JSON.parse(fs.readFileSync(base+'/firebase.json','utf8'));
           const meta=JSON.parse(fs.readFileSync(base+'/site/__recovery__/build.json','utf8'));
@@ -167,6 +167,22 @@ jobs:
             html=html.replace(/(<link\b[^>]*\brel=["']stylesheet["'][^>]*\bhref=["'])([^"']+)(["'])/gi,(m,a,u,z)=>a+bind(u)+z);
             html=html.replace(/(<link\b[^>]*\bhref=["'])([^"']+\.css(?:[^"']*)?)(["'][^>]*\brel=["']stylesheet["'])/gi,(m,a,u,z)=>a+bind(u)+z);
             if(bound<10)throw Error('I66_INDEX_BUILD_BINDING_TOO_FEW');
+            // Verify both favicon links against the authoritative public tenant
+            // snapshot, without admitting any other generated HTML transform.
+            const snapCode=fs.readFileSync(base+'/site/data/tenant-public-branding-snapshot.generated.js','utf8');
+            const brandCtx={window:{}};vm.runInNewContext(snapCode,brandCtx,{timeout:1000});
+            const brand=brandCtx.window.__ORBIT360_TENANT_BRANDING_SNAPSHOT__;
+            if(!brand||brand.tenantId!==process.env.TENANT_HINT||!/^[0-9a-f]{64}$/.test(brand.hash||''))throw Error('I66_TENANT_SNAPSHOT_INVALID');
+            const favicon=String(brand.branding&&brand.branding.favicon||'').replace(/^\\/+/, '');
+            const tenantPrefix='assets/tenant/'+brand.tenantId+'/';
+            if(!favicon.startsWith(tenantPrefix)||!/^[a-z0-9_.-]+\\.png$/i.test(favicon.slice(tenantPrefix.length)))throw Error('I66_TENANT_FAVICON_SCOPE_INVALID');
+            const icon192=favicon.replace(/-\\d+\\.png$/i,'').replace(/\\.png$/i,'')+'-192.png';
+            const iconStamp='?brand='+brand.hash.slice(0,12);
+            const faviconTag=/(<link rel="icon"[^>]*href=")[^"]+("[^>]*>)/i;
+            const appleTag=/(<link rel="apple-touch-icon"[^>]*href=")[^"]+("[^>]*>)/i;
+            if(!faviconTag.test(html)||!appleTag.test(html))throw Error('I66_TENANT_INDEX_ICON_TAGS_MISSING');
+            html=html.replace(faviconTag,(_,a,b)=>a+'/'+favicon+iconStamp+b)
+              .replace(appleTag,(_,a,b)=>a+'/'+icon192+iconStamp+b);
             return Buffer.from(html,'utf8');
           }
           function expectedPwa(js,buildId){
@@ -194,16 +210,28 @@ jobs:
           const effectivePins=new Map();
           for(const change of manifest.changes)for(const pin of change.paths)effectivePins.set(pin.path,pin);
           for(const [p,pin] of effectivePins){
-            const source=fs.readFileSync(p),target=fs.readFileSync(base+'/'+(p.startsWith('functions/')?'backend/'+p.slice(10):'site/'+p.slice(18)));
+            const source=fs.readFileSync(p);
             if(execFileSync('git',['hash-object',p],{encoding:'utf8'}).trim()!==pin.gitBlobSha)
               throw Error('I66_SOURCE_MANIFEST_PIN_DRIFT:'+p);
+            // Build tooling is SHA-pinned and executed, never published as a site asset.
+            if(p==='tools/gravicentra-i6-1-preview-package.mjs')continue;
+            const target=fs.readFileSync(base+'/'+(p.startsWith('functions/')?'backend/'+p.slice(10):'site/'+p.slice(18)));
             let expected=source;
             if(p==='orbit360-platform/index.html')expected=expectedIndex(source.toString('utf8'),meta.buildId);
             else if(p==='orbit360-platform/core/pwa.js')expected=expectedPwa(source.toString('utf8'),meta.buildId);
             else if(p==='functions/bootstrap.js')expected=expectedBootstrap(source.toString('utf8'));
             if(!expected.equals(target))throw Error('I66_APPROVED_PRODUCT_BUILD_BYTES_DRIFT:'+p);
           }
-          console.log('I66_MANIFEST_EXACT_BUILD_BOUND_INDEX_PWA_AND_RAW_OTHERS_PASS');
+          const staticManifest=JSON.parse(fs.readFileSync('orbit360-platform/manifest.webmanifest','utf8'));
+          const builtManifest=JSON.parse(fs.readFileSync(base+'/site/manifest.webmanifest','utf8'));
+          const brandCtx={window:{}};vm.runInNewContext(fs.readFileSync(base+'/site/data/tenant-public-branding-snapshot.generated.js','utf8'),brandCtx,{timeout:1000});
+          const brand=brandCtx.window.__ORBIT360_TENANT_BRANDING_SNAPSHOT__;
+          const iconPrefix=String(brand.branding.favicon).replace(/^\\/+/, '').replace(/-\\d+\\.png$/i,'').replace(/\\.png$/i,'');
+          if(brand.tenantId!==process.env.TENANT_HINT||staticManifest.id!=='/'||staticManifest.scope!=='/'||staticManifest.start_url!=='/')throw Error('I66_TENANT_PWA_STABLE_ID_DRIFT');
+          staticManifest.name='Gravicentra Insurance · '+String(brand.branding.displayName).trim();
+          staticManifest.icons=[192,512].map(size=>({src:'/'+iconPrefix+'-'+size+'.png?brand='+brand.hash.slice(0,12),sizes:size+'x'+size,type:'image/png',purpose:'any maskable'}));
+          assert.deepStrictEqual(builtManifest,staticManifest,'I66_TENANT_PWA_MANIFEST_BYTES_SEMANTIC_DRIFT');
+          console.log('I66_MANIFEST_EXACT_BUILD_BOUND_INDEX_PWA_AND_TENANT_ICONS_PASS');
           if(execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim()!==meta.sourceSha)throw Error('I66_PACKAGE_BUILD_AFTER_SOURCE_MUTATION');
           console.log('I66_BUILD_ONE_SOURCE_ONE_ARTIFACT_NO_DEPLOY_PASS');
           NODE
