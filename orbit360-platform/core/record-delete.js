@@ -43,6 +43,7 @@
   function can(collection, row) {
     const key = moduleKey(collection);
     if (!key || !row || !Orbit.access || typeof Orbit.access.can !== 'function') return false;
+    if(collection==='gestiones'&&row.opsBoardHidden===true)return false;
     if (Orbit.access.can(key, 'edit') !== true) return false;
     if (typeof Orbit.access.canAccessRecord === 'function' && Orbit.access.canAccessRecord(row, key, { collection }) !== true) return false;
     return true;
@@ -152,6 +153,16 @@
     }
     return [];
   }
+  function isPolicyProtectedEndorsement(collection, row) {
+    if(collection!=='gestiones'||!row||row.workflowType!=='endorsement_request')return false;
+    const stage=text(row.endorsementStage).toUpperCase();
+    const policy=text(row.polizaId)&&S()&&typeof S().get==='function'?S().get('polizas',row.polizaId):null;
+    const policyLink=!!policy&&(
+      text(policy.ultimoEndosoId)===text(row.id)||
+      [].concat(policy.historial||[]).some(entry=>entry&&text(entry.gestionId)===text(row.id))
+    );
+    return stage==='APLICADO'||!!text(row.policyUpdatedId)||policyLink;
+  }
 
 
   function button(collection, id, label, options) {
@@ -183,9 +194,13 @@
     }
 
     const label = labelFor(collection, row, options && options.label);
+    const boardOnly = isPolicyProtectedEndorsement(collection,row);
     const ok = Orbit.ui && typeof Orbit.ui.confirm === 'function'
-      ? await Orbit.ui.confirm('¿Eliminar "' + label + '"? Dejará de aparecer en la operación normal, pero se conservará trazabilidad para no romper relaciones.', { title: 'Eliminar registro', ok: 'Eliminar', danger: true })
-      : window.confirm('¿Eliminar "' + label + '"?');
+      ? await Orbit.ui.confirm(boardOnly
+          ? '¿Retirar "' + label + '" del tablero activo? El endoso aplicado, la póliza, sus referencias y el historial permanecen intactos.'
+          : '¿Eliminar "' + label + '"? Dejará de aparecer en la operación normal, pero se conservará trazabilidad para no romper relaciones.',
+          { title: boardOnly?'Retirar del tablero':'Eliminar registro', ok: boardOnly?'Retirar':'Eliminar', danger: true })
+      : window.confirm(boardOnly?'¿Retirar del tablero activo sin alterar póliza e historial?':'¿Eliminar "' + label + '"?');
     if (!ok) return { ok: false, cancelled: true };
 
     const reason = Orbit.ui && typeof Orbit.ui.prompt === 'function'
@@ -205,6 +220,28 @@
     } catch (_) {}
 
     const now = new Date().toISOString();
+    if(boardOnly){
+      const boardPatch={
+        opsBoardHidden:true,
+        opsBoardHiddenAt:now,
+        opsBoardHiddenReason:text(reason),
+        opsBoardHiddenByRole:actorRole,
+        opsBoardHiddenByUid:actorUid
+      };
+      const boardReadback=await st.updateDurable('gestiones',id,boardPatch);
+      if(!boardReadback||boardReadback.opsBoardHidden!==true||
+         text(boardReadback.opsBoardHiddenReason)!==text(reason)||
+         !text(boardReadback.opsBoardHiddenAt))throw new Error('OPS_BOARD_HIDE_DURABLE_READBACK_REQUIRED');
+      const retained=st.get('gestiones',id);
+      if(!retained||retained.opsBoardHidden!==true||retained.archivado===true||retained.deleted===true)
+        throw new Error('OPS_BOARD_HIDE_HISTORY_PRESERVATION_REQUIRED');
+      try{document.dispatchEvent(new CustomEvent('orbit:management-board-hidden',{
+        detail:{collection:'gestiones',id,boardOnly:true,reason:text(reason),hiddenAt:now}
+      }));}catch(_){}
+      if(Orbit.ui&&Orbit.ui.toast)Orbit.ui.toast('✓ Gestión retirada del tablero. Póliza e historial conservados.');
+      if(options&&typeof options.onDeleted==='function')options.onDeleted(boardReadback);
+      return{ok:true,boardOnly:true,softDelete:false,row:boardReadback,relatedSoftDeleted:0};
+    }
     const patch = {
       deleted: true,
       eliminado: true,

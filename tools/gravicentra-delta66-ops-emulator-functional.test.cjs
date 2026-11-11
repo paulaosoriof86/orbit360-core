@@ -90,5 +90,31 @@ async function go(uid,role,operation,entityId,payload){return handler.run(req(ui
   await match(()=>go('op-gt','Operativo','archive_management','ges_i66_endoso_applied',{deleted:true,eliminado:true,
     archivado:true,deleteReason:'Intento no autorizado',deletedAt:new Date().toISOString()}),'ENDOSO_APPLIED_OR_REFERENCED_ARCHIVE_FORBIDDEN');
   assert.notEqual((await doc('gestiones','ges_i66_endoso_applied').get()).data().archivado,true);checks++;
+  stage='hide-applied-endoso-qa-board-only';
+  const appliedId='ges_i66_endoso_applied';
+  await doc('polizas',policyId).update({ultimoEndosoId:appliedId,historial:[{gestionId:appliedId,accion:'Endoso QA aplicado'}]});
+  const beforePolicy=(await doc('polizas',policyId).get()).data();
+  const beforeManagement=(await doc('gestiones',appliedId).get()).data();
+  await match(()=>go('advisor','Asesor','hide_management_card',appliedId,{opsBoardHidden:true,opsBoardHiddenReason:'No autorizado'}),'permission-denied');
+  assert.notEqual((await doc('gestiones',appliedId).get()).data().opsBoardHidden,true);checks++;
+  await doc('gestiones','ges_i66_endoso_pending2').set({...endorsementData,id:'ges_i66_endoso_pending2'});
+  await match(()=>go('op-gt','Operativo','hide_management_card','ges_i66_endoso_pending2',{opsBoardHidden:true,opsBoardHiddenReason:'Endoso no aplicado'}),'OPS_BOARD_HIDE_ONLY_APPLIED_OR_REFERENCED_ENDORSEMENT');
+  assert.notEqual((await doc('gestiones','ges_i66_endoso_pending2').get()).data().opsBoardHidden,true);checks++;
+  await match(()=>go('op-gt','Operativo','hide_management_card',appliedId,{opsBoardHidden:true,opsBoardHiddenReason:'x'}),'OPS_BOARD_HIDE_AUDIT_REQUIRED');
+  assert.notEqual((await doc('gestiones',appliedId).get()).data().opsBoardHidden,true);checks++;
+  const hidden=await go('op-gt','Operativo','hide_management_card',appliedId,{opsBoardHidden:true,opsBoardHiddenReason:'Retiro visual QA controlado'});
+  assert.equal(hidden.canonicalReadback,true);assert.equal(hidden.opsBoardHideReadback.opsBoardHidden,true);checks++;
+  assert.equal(hidden.opsBoardHideReadback.deletedPreserved,true);assert.equal(hidden.opsBoardHideReadback.archivedPreserved,true);checks++;
+  assert.equal(hidden.notificationSuppressed,true);
+  const afterManagement=(await doc('gestiones',appliedId).get()).data();
+  assert.equal(afterManagement.opsBoardHidden,true);assert.equal(afterManagement.opsBoardHiddenByRole,'operativo');checks++;
+  assert.equal(afterManagement.archivado,undefined);assert.equal(afterManagement.deleted,undefined);checks++;
+  assert.deepEqual((await doc('polizas',policyId).get()).data(),beforePolicy);checks++;
+  assert.deepEqual(afterManagement.comentarios,beforeManagement.comentarios);checks++;
+  assert.equal((await db.collection('tenants').doc(tenant).collection('notificationOutbox').doc(hidden.eventId).get()).exists,false);checks++;
+  assert.equal((await db.collection('tenants').doc(tenant).collection('workflowEvents').doc(hidden.eventId).get()).exists,true);checks++;
+  await match(()=>go('op-gt','Operativo','archive_management',appliedId,{deleted:true,eliminado:true,archivado:true,deleteReason:'Intento posterior'}),'ENDOSO_APPLIED_OR_REFERENCED_ARCHIVE_FORBIDDEN');
+  assert.equal((await doc('gestiones',appliedId).get()).data().opsBoardHidden,true);checks++;
   console.log('I66_OPS_EMULATOR_AUTHENTICATED_ROLE_COUNTRY_BUSINESS_MANAGEMENT_PASS checks='+checks+' project='+process.env.GCLOUD_PROJECT+' liveWrites=0');
 })().catch(e=>{console.error('I66_OPS_EMULATOR_BLOCKER_STAGE='+stage+' CODE='+String(e&&e.code||'')+' MESSAGE='+String(e&&e.message||e).slice(0,180));process.exitCode=1;});
+

@@ -390,7 +390,10 @@
       "approvedByDirection": true,
       "receipt": "Dirección 2026-11-10 approved I6.6 same-source fail-closed Ops diagnostic compatibility after guard 42906473061 rejected missing management delete marker; canonical backend, authorization, CRUD semantics and live data unchanged",
       "sourceStatus": "SOURCE_QA_LEGACY_AND_NEW_OPS_DIAGNOSTIC_PASS_PREVIEW_LIVE_NOT_APPLIED",
-      "capabilityOwners": ["OPS_PRIMARY_RUNTIME", "ROLE_SCOPE_RUNTIME"],
+      "capabilityOwners": [
+        "OPS_PRIMARY_RUNTIME",
+        "ROLE_SCOPE_RUNTIME"
+      ],
       "scope": "Restore the previously approved fallback DELETE_MANAGEMENT_UNCONFIRMED for unclassified management deletion errors, while retaining new error.code classification and private fingerprint; no backend, tenant, role, data, or workflow operation change",
       "dataWrites": 0,
       "paths": [
@@ -481,6 +484,78 @@
         "liveReleased": false,
         "activationEnabled": false,
         "consentAndWebhookHold": true
+      }
+    },
+    {
+      "id": "I6_6_OPS_PROTECTED_ENDORSEMENT_BOARD_HIDE_TRANSVERSAL_P0",
+      "approvedByDirection": true,
+      "receipt": "Dirección 2026-11-10 autorizó corregir el retiro de fichas de Ops aplicadas y vinculadas: mantener guard de archive_management, ocultar solo tarjeta activa bajo rol operativo/dirección con auditoría y preservar póliza, historial, comentarios y país; QA B4-003 vinculada probada por lectura LIVE 42935999204; no borrar ni reimportar registros",
+      "sourceStatus": "SOURCE_STATIC_QA_11_OF_11_PASS_EMULATOR_TRIGGERED_BY_TEST_DELTA_PREVIEW_LIVE_HOLD",
+      "capabilityOwners": [
+        "OPS_PRIMARY_RUNTIME",
+        "LEADS_PRIMARY_RUNTIME",
+        "ROLE_SCOPE_RUNTIME"
+      ],
+      "scope": "New restricted hide_management_card command for linked applied endorsements; only active Ops card hidden; canonical management, policy endorsements, history, documents and collaboration remain durable. Cross-role/country controls retained and outbound notifications suppressed.",
+      "dataWrites": 0,
+      "paths": [
+        {
+          "path": "functions/product-ops-leads-domain.js",
+          "gitBlobSha": "ad208454627584b81875b950fbe37040cc7f1ffc",
+          "replaces": {
+            "path": "functions/product-ops-leads-domain.js",
+            "priorGitBlobSha": "012feb9e1a3cd119ce128edd6ce835556df3e827",
+            "priorChangeId": "I6_6_OPS_CRUD_ROLE_COUNTRY_AUDITED_SOFT_DELETE_P0"
+          }
+        },
+        {
+          "path": "orbit360-platform/data/store-firestore-product-operational-p0.js",
+          "gitBlobSha": "8dbbb76ef161627f9ef6565c79a6046726b5dc2d",
+          "replaces": {
+            "path": "orbit360-platform/data/store-firestore-product-operational-p0.js",
+            "priorGitBlobSha": "fba24bea887d31693c948663b9fcfe7fdb1c481c",
+            "priorChangeId": "I6_6_CARLOS_POLICY_RENEWABILITY_ONLY_CAS_OPERATIVE_SCOPE_P0"
+          }
+        },
+        {
+          "path": "orbit360-platform/core/record-delete.js",
+          "gitBlobSha": "d1fe4d5155d6c3fec071e8ad5684505ee1f38d81"
+        },
+        {
+          "path": "orbit360-platform/core/ciclo.js",
+          "gitBlobSha": "1ca57bb0c2b5eb2f8897e2ddb5f69ed48e3365ec",
+          "replaces": {
+            "path": "orbit360-platform/core/ciclo.js",
+            "priorGitBlobSha": "fd262f2923f9307bdaa960fb8b3e0c8b256d7d38",
+            "priorChangeId": "I6_6_OPS_MANAGEMENT_DELETE_LEGACY_DIAGNOSTIC_COMPAT_P0"
+          }
+        }
+      ],
+      "tests": [
+        {
+          "path": "tools/gravicentra-delta66-ops-emulator-functional.test.cjs",
+          "gitBlobSha": "4f8f2d355e41afa2ddf3001ef95e28ffe1f5eaba"
+        },
+        {
+          "path": "tools/gravicentra-i66-applied-endoso-board-hide.test.cjs",
+          "gitBlobSha": "9db6b252951748dc8b7217970a11a9cdcf75a225"
+        },
+        {
+          "path": "tools/gravicentra-i6-6-ops-crud-role-country.test.cjs",
+          "gitBlobSha": "2ff01c2cf871e39027841678e70082856b8cef4e"
+        },
+        {
+          "path": "tools/gravicentra-i6-6-ops-delete-diagnostic.test.cjs",
+          "gitBlobSha": "d3e38aafd458b0ea5ced0275305cddb49f0f620c"
+        }
+      ],
+      "qa": {
+        "sourceNodeSyntax": true,
+        "sourceStaticTests": 11,
+        "legacyRoleCases": 8,
+        "countryCases": 6,
+        "backendEmulatorPending": true,
+        "liveRelease": false
       }
     }
   ]

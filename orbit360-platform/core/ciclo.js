@@ -221,6 +221,7 @@ Orbit.ciclo = (function () {
   function gestiones(opts) {
     opts=opts||{};const surface=opts.surface||'ops';
     const visible=S().all('gestiones').filter(g => !g.archivado &&
+      (opts.includeBoardHidden === true || g.opsBoardHidden !== true) &&
       (() => { const c = S().get('clientes', g.clienteId); return !c || paisOK(c.pais); })() &&
       scopeAllows(g.asesorId,surface));
     ensureAdvisorRoster(visible.map(g=>(S().get('clientes',g.clienteId)||{}).pais||g.pais));

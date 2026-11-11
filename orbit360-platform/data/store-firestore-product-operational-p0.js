@@ -107,6 +107,8 @@
     var out={},src=clone(input)||{};
     Object.keys(src).forEach(function(k){
       if(collection==='aseguradoras'&&(k==='actividad'||k==='actividadTotal'||k==='__syntheticQa'))return;
+      // Server owns the durable hide timestamp; client ISO is for immediate UI only.
+      if(collection==='gestiones'&&k==='opsBoardHiddenAt')return;
       if(k==='updatedAt'||k==='updatedByUid'||k==='updatedByEmail'||k==='createdAt'||k==='ownerUid'||k==='ownerEmail'||k==='tenantId'||k==='canonicalDocumentId'||k==='legacyDataId')return;
       out[k]=clone(src[k]);
     });
@@ -246,6 +248,7 @@
         return /portal|solicitud del cliente/.test(origin)?'portal_request':'create_management';
       }
       if(action==='remove'||(prior&&prior.archivado!==true&&row&&row.archivado===true))return'archive_management';
+      if(action==='update'&&prior&&prior.opsBoardHidden!==true&&row&&row.opsBoardHidden===true)return'hide_management_card';
       // Endoso closure requires the Ops state guard to verify the already
       // committed policy marker. Generic resolve_management bypasses it.
       if(action==='update'&&prior&&row&&row.workflowType==='endorsement_request'&&row.endorsementStage==='APLICADO')return'update_management';
@@ -273,6 +276,7 @@
     if(operation==='archive_business')return'Archivo de negocio desde Orbit.store';
     if(operation==='create_management')return'Creación de gestión desde Orbit.store';
     if(operation==='archive_management')return'Archivo de gestión desde Orbit.store';
+    if(operation==='hide_management_card')return text(row&&row.opsBoardHiddenReason)||'Retiro visual auditado de endoso aplicado del tablero Ops';
     if(operation==='resolve_management')return'Resolución de gestión desde Orbit.store';
     if(operation==='reopen_management')return'Reapertura de gestión desde Orbit.store';
     if(operation==='assign_management')return'Asignación de gestión desde Orbit.store';
@@ -313,6 +317,14 @@
       if(workflow&&payload&&payload.deleted===true){
         var dr=result&&result.deleteAuditReadback||null;
         if(!dr||dr.deleted!==true||dr.eliminado!==true||dr.archivado!==true||text(dr.deleteReason)!==text(payload.deleteReason||payload.motivoEliminacion)||!text(dr.deletedAt))throw new Error('PRODUCT_WORKFLOW_DELETE_DURABLE_READBACK_REQUIRED');
+      }
+      if(workflow&&collection==='gestiones'&&prior&&prior.opsBoardHidden!==true&&payload&&payload.opsBoardHidden===true){
+        var bh=result&&result.opsBoardHideReadback||null;
+        if(!bh||bh.opsBoardHidden!==true||!bh.opsBoardHiddenAtPresent||
+           text(bh.opsBoardHiddenReason)!==text(payload.opsBoardHiddenReason)||
+           bh.deletedPreserved!==true||bh.archivedPreserved!==true||
+           text(bh.policyId)!==text(payload.polizaId))
+          throw new Error('OPS_BOARD_HIDE_SERVER_READBACK_REQUIRED');
       }
       if(workflow&&collection==='gestiones'&&(action==='insert'||action==='update')&&payload&&Array.isArray(payload.adjuntos)){
         var docKey=function(x){if(!x||typeof x!=='object')return text(x);return text(x.documentRef||x.fileId||x.archivoRef||x.driveUrl||x.externalUrl||x.url);};

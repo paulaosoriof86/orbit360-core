@@ -23,7 +23,7 @@ const DEFAULT_STAGES = Object.freeze({
   emitido:{leads:true,ops:false,terminal:true,next:[]},
   perdido:{leads:true,ops:false,terminal:true,next:['contactado']}
 });
-const OPERATIONS = new Set(['create_business','transition_business','update_business','archive_business','create_management','update_management','assign_management','resolve_management','reopen_management','archive_management','portal_request']);
+const OPERATIONS = new Set(['create_business','transition_business','update_business','archive_business','create_management','update_management','assign_management','resolve_management','reopen_management','archive_management','hide_management_card','portal_request']);
 const ADMIN_ROLES = new Set(['superadmin','admintenant','direccion','admin','operativo']);
 const SELF_SERVICE_ROLES = new Set(['asesor','asesora','asesor_sr','asesora_sr','asesor_jr','asesora_jr','comercial']);
 const MANAGE_PERMISSIONS = new Set(['ops_manage','leads_manage','gestiones_manage','workflow_manage']);
@@ -148,6 +148,8 @@ async function authorize(request,operation){
  let roleState;
  try{roleState=resolveProductActiveRole(member,request.data&&request.data.activeRole);}
  catch(error){throw new HttpsError('permission-denied',error&&error.code==='PRODUCT_ASSIGNED_ROLES_MISSING'?'La membresía no tiene roles asignados.':'El rol activo no está asignado.');}
+ if(operation==='hide_management_card'&&!ADMIN_ROLES.has(roleState.activeRole))
+   throw new HttpsError('permission-denied','OPS_BOARD_HIDE_REQUIRES_OPERATIONS_ROLE');
  const pr=permissions(member),can=ADMIN_ROLES.has(roleState.activeRole)||pr.some(p=>MANAGE_PERMISSIONS.has(p));
  const selfService=SELF_SERVICE_ROLES.has(roleState.activeRole)&&['create_management','portal_request'].includes(operation);
  if(!can&&!selfService&&!['update_business','transition_business','update_management','resolve_management'].includes(operation))
@@ -195,6 +197,15 @@ function deterministicPolicyId(tenantId,businessId){return`pol_${sha(`${tenantId
 function deterministicVehicleId(tenantId,businessId,plate){return`veh_${sha(`${tenantId}|business-vehicle|${norm(plate)||businessId}`).slice(0,24)}`;}
 function deterministicActivityId(tenantId,businessId){return`act_${sha(`${tenantId}|business-issued|${businessId}`).slice(0,24)}`;}
 function validDate(value){return /^\d{4}-\d{2}-\d{2}$/.test(text(value,40));}
+// A policy-linked applied endorsement must remain durable and historically
+// visible. A separate Ops-only command may hide its *card*, never delete its
+// audit trail or mutate the insured contract. No special case by tenant/QA ID.
+function protectedEndorsementLink(before,policy,entityId){
+ if(!before||before.workflowType!=='endorsement_request'||!policy)return false;
+ return text(before.endorsementStage,80)==='APLICADO'||
+   !!text(before.policyUpdatedId,180)||text(policy.ultimoEndosoId,180)===entityId||
+   [].concat(policy.historial||[]).some(row=>row&&text(row.gestionId,180)===entityId);
+}
 
 async function validateEndorsementMutation(tx,{tenantId,authz,operation,entityId,payload,before,after,previewOnly}){
   if(after.workflowType!=='endorsement_request')return;
@@ -306,17 +317,40 @@ else if(operation==='update_business'){copyAllowed(after,payload,BUSINESS_MUTABL
 else if(operation==='archive_business'){after.archivado=true;copyAllowed(after,payload,DELETE_AUDIT_FIELDS);}
 else if(operation==='update_management'){copyAllowed(after,payload,MANAGEMENT_MUTABLE_FIELDS);copyWorkflowManagementFields(after,payload,before);}
 else if(operation==='assign_management'){copyAllowed(after,payload,MANAGEMENT_MUTABLE_FIELDS.filter(k=>k!=='asesorId'));copyWorkflowManagementFields(after,payload,before);after.asesorId=id(payload.asesorId||payload.advisorId,'advisorId');}
+else if(operation==='hide_management_card'){
+  if(!ADMIN_ROLES.has(authz.actor.activeRole)||!before||before.workflowType!=='endorsement_request'||!text(before.polizaId,180))
+    throw new HttpsError('permission-denied','OPS_BOARD_HIDE_NOT_ELIGIBLE');
+  const ps=await tx.get(dataRef(authz.tenantId,'polizas',id(before.polizaId,'policyId'))),policy=ps.exists?ps.data()||{}:null;
+  if(!policy||policy.tenantId&&policy.tenantId!==authz.tenantId||
+     text(policy.clienteId,180)!==text(before.clienteId,180)||
+     text(policy.asesorId,180)!==text(before.asesorId,180)||
+     text(policy.pais,8).toUpperCase()!==text(before.pais,8).toUpperCase())
+    throw new HttpsError('permission-denied','OPS_BOARD_HIDE_POLICY_SCOPE_MISMATCH');
+  if(!protectedEndorsementLink(before,policy,entityId))
+    throw new HttpsError('failed-precondition','OPS_BOARD_HIDE_ONLY_APPLIED_OR_REFERENCED_ENDORSEMENT');
+  if(before.opsBoardHidden===true)
+    throw new HttpsError('already-exists','OPS_BOARD_CARD_ALREADY_HIDDEN');
+  const why=text(payload.opsBoardHiddenReason,600);
+  if(payload.opsBoardHidden!==true||why.length<5||payload.deleted===true||payload.archivado===true)
+    throw new HttpsError('invalid-argument','OPS_BOARD_HIDE_AUDIT_REQUIRED');
+  after.opsBoardHidden=true;
+  after.opsBoardHiddenReason=why;
+  after.opsBoardHiddenAt=now();
+  after.opsBoardHiddenByRole=authz.actor.activeRole;
+  after.opsBoardHiddenByUid=authz.actor.uid;
+  after.opsBoardHiddenByName=authz.actor.name;
+}
 else if(operation==='resolve_management'){copyAllowed(after,payload,MANAGEMENT_MUTABLE_FIELDS.filter(k=>k!=='estado'));copyWorkflowManagementFields(after,payload,before);after.estado='Resuelta';after.resultado=text(payload.resultado||payload.result||after.resultado,3000);after.resolvedAt=now();}
 else if(operation==='reopen_management'){copyAllowed(after,payload,MANAGEMENT_MUTABLE_FIELDS.filter(k=>k!=='estado'));copyWorkflowManagementFields(after,payload,before);after.estado='Pendiente';after.reopenedAt=now();}
 else if(operation==='archive_management'){after.archivado=true;copyAllowed(after,payload,DELETE_AUDIT_FIELDS);}
-if(!prepared&&entityType==='gestiones'&&after.workflowType==='endorsement_request')
+if(!prepared&&entityType==='gestiones'&&after.workflowType==='endorsement_request'&&operation!=='hide_management_card')
   await validateEndorsementMutation(tx,{tenantId:authz.tenantId,authz,operation,entityId,payload,before,after,previewOnly});
 if(!advisorAllowed(authz.member,after.asesorId||payload.asesorId||payload.advisorId,authorizationDomain,authz.actor.activeRole))throw new HttpsError('permission-denied','El asesor está fuera de su alcance activo.');
 if(previewOnly===true){after.previewWrite=true;after.previewSource='hosting-preview-uat';after.previewWriteAt=now();}
 after.tenantId=authz.tenantId;after.schemaVersion=VERSION;after.updatedAt=now();after.updatedByUid=authz.actor.uid;if(!before){after.createdAt=now();after.createdByUid=authz.actor.uid;}tx.set(entity,after,{merge:true});tx.set(eventRef(authz.tenantId,eventId,previewOnly),{schemaVersion:VERSION,tenantId:authz.tenantId,operation,entityType,entityId:entityId,requestId:rid,actor:authz.actor,reason:motivo,beforeDigest:before?digest(before):'',afterDigest:digest(after),previewWrite:previewOnly===true,createdAt:now()},{merge:false});const comments=[].concat(after.comentarios||[]),collab=comments.length?comments[comments.length-1]:null;let collabDirection=entityType==='negocios'?collaborationWriteDirection(before,after):'';if(entityType==='gestiones'&&operation==='update_management')collabDirection=collaborationWriteDirection(before,after);const targets=[];
     if(collabDirection==='advisor'&&after.asesorId)targets.push({type:'advisor',id:after.asesorId});
     else if(collabDirection==='operations')targets.push({type:'role',id:'operations'});
-    else if(after.asesorId)targets.push({type:'advisor',id:after.asesorId});if(cfg.portalResponseEnabled&&after.clienteId&&['resolve_management','create_management','portal_request','assign_management'].includes(operation))targets.push({type:'client',id:after.clienteId});if(targets.length)tx.set(outboxRef(authz.tenantId,eventId,previewOnly),{schemaVersion:VERSION,tenantId:authz.tenantId,eventId:collabDirection&&collab&&collab.eventId?text(collab.eventId,180):eventId,operation,entityType,entityId,targets,channels:cfg.notificationChannels,status:'pending_provider',previewWrite:previewOnly===true,actorUid:authz.actor.uid,actorName:authz.actor.name,direction:collabDirection,targetSurface:collabDirection==='advisor'?'leads':collabDirection==='operations'?'ops':'',payload:{title:text(payload.notificationTitle||(collabDirection?(text(collab&&collab.tipo,160)||'Colaboración comercial-operativa'):(after.titulo||after.nombre||'Actualización')),220),message:text(payload.notificationMessage||(collabDirection?(text(collab&&collab.texto,1200)||text(collab&&collab.txt,1200)||motivo):motivo),1200)},createdAt:now()},{merge:false});const result={ok:true,operation,entityType,entityId,requestId:rid,eventId,previewWrite:previewOnly===true,notificationSuppressed:false,notificationPreview:previewOnly===true,storageMode:'productCanonicalDataV1',writePath:'tenants/{tenant}/data/{collection}/items',projection:{leadsVisible:entityType==='negocios'?!!(cfg.stages[after.etapa]&&cfg.stages[after.etapa].leads):false,opsVisible:entityType==='gestiones'?!after.archivado:!!(cfg.stages[after.etapa]&&cfg.stages[after.etapa].ops),advisorVisible:!!after.asesorId,clientId:text(after.clienteIdCreado||after.clienteId),policyId:text(after.polizaId),vehicleId:text(after.vehiculoId)}};tx.set(req,{status:'committed',operation,entityType,entityId,eventId,result,committedAt:now()},{merge:true});return result;});const confirmed=await entity.get();if(!confirmed.exists)throw new HttpsError('internal','Canonical workflow readback missing.');const confirmedRow=confirmed.data()||{};const readAction=(operation==='create_management'||operation==='create_business'||operation==='portal_request')?'insert':'update';const response={canonicalReadback:true,canonicalReadbackCount:1,readback:[{collection:entityType,id:entityId,action:readAction,exists:true}],collaborationReadback:[].concat(confirmedRow.comentarios||[]).slice(-1)[0]||null};if(entityType==='gestiones'){const docKey=x=>{if(!x||typeof x!=='object')return text(x,1000);return text(x.documentRef||x.fileId||x.archivoRef||x.driveUrl||x.externalUrl||x.url,1000);};response.managementDocumentReadback={documentRefs:[].concat(confirmedRow.adjuntos||[]).map(docKey).filter(Boolean).sort(),documentoCargaPendiente:confirmedRow.documentoCargaPendiente===true,documentoCargaFallidaCount:[].concat(confirmedRow.documentoCargaFallida||[]).filter(Boolean).length};}if(operation==='transition_business'&&norm(confirmedRow.etapa)==='emitido'){
+    else if(after.asesorId&&operation!=='hide_management_card')targets.push({type:'advisor',id:after.asesorId});if(cfg.portalResponseEnabled&&after.clienteId&&['resolve_management','create_management','portal_request','assign_management'].includes(operation))targets.push({type:'client',id:after.clienteId});if(targets.length)tx.set(outboxRef(authz.tenantId,eventId,previewOnly),{schemaVersion:VERSION,tenantId:authz.tenantId,eventId:collabDirection&&collab&&collab.eventId?text(collab.eventId,180):eventId,operation,entityType,entityId,targets,channels:cfg.notificationChannels,status:'pending_provider',previewWrite:previewOnly===true,actorUid:authz.actor.uid,actorName:authz.actor.name,direction:collabDirection,targetSurface:collabDirection==='advisor'?'leads':collabDirection==='operations'?'ops':'',payload:{title:text(payload.notificationTitle||(collabDirection?(text(collab&&collab.tipo,160)||'Colaboración comercial-operativa'):(after.titulo||after.nombre||'Actualización')),220),message:text(payload.notificationMessage||(collabDirection?(text(collab&&collab.texto,1200)||text(collab&&collab.txt,1200)||motivo):motivo),1200)},createdAt:now()},{merge:false});const result={ok:true,operation,entityType,entityId,requestId:rid,eventId,previewWrite:previewOnly===true,notificationSuppressed:operation==='hide_management_card',notificationPreview:previewOnly===true,storageMode:'productCanonicalDataV1',writePath:'tenants/{tenant}/data/{collection}/items',projection:{leadsVisible:entityType==='negocios'?!!(cfg.stages[after.etapa]&&cfg.stages[after.etapa].leads):false,opsVisible:entityType==='gestiones'?!after.archivado&&!after.opsBoardHidden:!!(cfg.stages[after.etapa]&&cfg.stages[after.etapa].ops),advisorVisible:!!after.asesorId,clientId:text(after.clienteIdCreado||after.clienteId),policyId:text(after.polizaId),vehicleId:text(after.vehiculoId)}};tx.set(req,{status:'committed',operation,entityType,entityId,eventId,result,committedAt:now()},{merge:true});return result;});const confirmed=await entity.get();if(!confirmed.exists)throw new HttpsError('internal','Canonical workflow readback missing.');const confirmedRow=confirmed.data()||{};const readAction=(operation==='create_management'||operation==='create_business'||operation==='portal_request')?'insert':'update';const response={canonicalReadback:true,canonicalReadbackCount:1,readback:[{collection:entityType,id:entityId,action:readAction,exists:true}],collaborationReadback:[].concat(confirmedRow.comentarios||[]).slice(-1)[0]||null};if(entityType==='gestiones'){const docKey=x=>{if(!x||typeof x!=='object')return text(x,1000);return text(x.documentRef||x.fileId||x.archivoRef||x.driveUrl||x.externalUrl||x.url,1000);};response.managementDocumentReadback={documentRefs:[].concat(confirmedRow.adjuntos||[]).map(docKey).filter(Boolean).sort(),documentoCargaPendiente:confirmedRow.documentoCargaPendiente===true,documentoCargaFallidaCount:[].concat(confirmedRow.documentoCargaFallida||[]).filter(Boolean).length};}if(operation==='hide_management_card')response.opsBoardHideReadback={opsBoardHidden:confirmedRow.opsBoardHidden===true,opsBoardHiddenReason:text(confirmedRow.opsBoardHiddenReason,600),opsBoardHiddenByRole:text(confirmedRow.opsBoardHiddenByRole,120),opsBoardHiddenAtPresent:!!confirmedRow.opsBoardHiddenAt,deletedPreserved:confirmedRow.deleted!==true,archivedPreserved:confirmedRow.archivado!==true,policyId:text(confirmedRow.polizaId,180)};if(operation==='transition_business'&&norm(confirmedRow.etapa)==='emitido'){
   const clientId=text(confirmedRow.clienteId,180),policyId=text(confirmedRow.polizaId,180),vehicleId=text(confirmedRow.vehiculoId,180);
   const [clientReadback,policyReadback,vehicleReadback]=await Promise.all([
     clientId?dataRef(authz.tenantId,'clientes',clientId).get():Promise.resolve(null),
