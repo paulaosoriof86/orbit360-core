@@ -1,0 +1,71 @@
+{
+  "schema": "GRAVICENTRA_I6_6_RENOVACIONES_PERFORMANCE_POSTLIVE_READBACK_V1",
+  "dateGuatemala": "2026-11-11",
+  "branch": "recovery/fase-a-clean-20260831",
+  "lastClosedReleaseGate": "B4-007",
+  "currentOperationalGate": "I6.6",
+  "status": "TARGETED_PRODUCT_LIVE_EXACT_RELEASE_PASS_WITH_OPEN_FUNCTIONAL_UAT",
+  "productSourceSha": "abb0ea3f4dc0bfd221cb891258e7be81ddc65fd2",
+  "productBuildId": "gi-i66-abb0ea3f4dc0-57f234755dc1",
+  "immutableArtifactId": 13890908106,
+  "artifactZipSha256": "61e21dd4c3943b469c916ad9150d0249f504030282204688dd8523d2a35b1251",
+  "releaseRequest": "artifacts/orbit360-recovery/release-control/I6_6_EXACT_HOSTING_LIVE_PROMOTION_REQUEST_20261111_R2.json",
+  "releaseRunId": 43102436462,
+  "releaseStatus": "LIVE_HOSTING_SAME_ARTIFACT_READBACK_PASS_NOT_FULL_UAT",
+  "exactReadback": {
+    "previewFiles": 223,
+    "firebaseLiveFiles": 223,
+    "appCorporateDomainFiles": 223,
+    "allDigestMatches": true,
+    "backendDeployments": 0,
+    "operationalDataWritesDuringRelease": 0,
+    "rollbackNeeded": false
+  },
+  "qaRuns": {
+    "centralGuardAfterRelease": 43103085168,
+    "sourceTests": 43100918792,
+    "signedCarlosInsurerPreviewReadOnly": 43101692009,
+    "previewPerfReadOnly": 43101692093,
+    "oldLiveBaselinePerfReadOnly": 43101692169,
+    "signedComparison": 43102079087,
+    "newLivePerfReadOnly": 43103085143
+  },
+  "performance": {
+    "renovacionesAuthenticatedBeforeMs": 4115,
+    "renovacionesAuthenticatedPreviewMs": 264,
+    "renovacionesSingleSampleImprovementPercent": 94,
+    "renovacionesGetCallsBefore": 64053,
+    "renovacionesGetCallsPreview": 1722,
+    "renovacionesGetCpuCostBeforeMs": 3260,
+    "renovacionesGetCpuCostPreviewMs": 77.9,
+    "localSyntheticGetBefore": 27968,
+    "localSyntheticGetAfter": 0,
+    "newLiveStartupMs": 1923,
+    "newLiveLoadedRoutes": 12,
+    "newLiveProbedRoutes": 13,
+    "newLivePageErrors": 0,
+    "note": "Browser samples are evidence for this release, not a permanent latency SLA. The source unit regression is permanent and runs in the canonical delta guard."
+  },
+  "paulaAuthenticatedChromeReadOnly": {
+    "country": "TODOS",
+    "role": "Dirección",
+    "renovacionesBoardVisible": true,
+    "renovacionesFilterNoMatchReturnsZero": true,
+    "cobrosViewVisible": true,
+    "cobrosPlaywrightSnapshotTimeout": true,
+    "cobrosDomCuaReadSucceeded": true,
+    "cobrosToRenewalsClickMs": 909,
+    "renovacionesBoardReturned": true,
+    "businessWrites": 0
+  },
+  "openHolds": [
+    "Aseguradoras signed role permission preflight passed but controlled real durable SAVE, reload and restore for Paula and Carlos remain unproven on the new LIVE source",
+    "Conciliaciones route did not become ready within automated Chrome timing sampler (12/13 routes loaded), despite prior manual page readback; determine causal readiness independently",
+    "Cobros first Playwright DOM snapshot after navigation timed out while DOM CUA could read the loaded UI; distinguish browser transport from application main-thread under repetition",
+    "New login activation displayed between-run variance and needs repeated cold/warm sample",
+    "Cartera and payment inference source rows, receipt due-date semantics and July-November Drive policy inventory still need exact LIVE joins, protected writes and before/after readback",
+    "Full seven-user role matrix, full module durable writes and physical device QA are not certified by this performance release"
+  ],
+  "next": "Preserve the LIVE artifact; close focused insurer SAVE/reload/revert, Conciliaciones and Cobros UI readiness, then resume policy/receipt/payment inference and 78 Drive policy PDF LIVE joins using existing source ledger. Do not reimport, alter countries or create new branch/repo.",
+  "falseFullAcceptanceClaim": false
+}

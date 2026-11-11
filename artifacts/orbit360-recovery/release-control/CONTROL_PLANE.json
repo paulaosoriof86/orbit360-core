@@ -22651,5 +22651,31 @@
     "policy": "Single source/branch; do not accumulate source deltas; QA→immutable build→Preview byte-exact→same artifact LIVE→domain readback→document; preserve all earlier closes; no reimport or unprotected writes",
     "next": "Targeted role-authenticated write/reload readback, current live dossier diff, Ops copy parity, protected Universales receipt source numbers/dates, secure notification dispatcher",
     "deprecatedOlderLedgerBlobPointersRemainHistoricalSnapshots": true
+  },
+  "i66LatestExactLiveRelease20261111": {
+    "schema": "GI_I66_LATEST_EXACT_LIVE_RELEASE_POINTER_V1",
+    "dateGuatemala": "2026-11-11",
+    "status": "LIVE_EXACT_223_OF_223_PASS_OPEN_FUNCTIONAL_UAT",
+    "currentActiveGate": "I6.6",
+    "historicalB4007ClosurePreserved": true,
+    "latestProductSourceSha": "abb0ea3f4dc0bfd221cb891258e7be81ddc65fd2",
+    "latestProductBuildId": "gi-i66-abb0ea3f4dc0-57f234755dc1",
+    "immutableArtifactId": 13890908106,
+    "immutableArtifactZipSha256": "61e21dd4c3943b469c916ad9150d0249f504030282204688dd8523d2a35b1251",
+    "releaseRunId": 43102436462,
+    "latestLiveSignedPerformanceRunId": 43103085143,
+    "lastGuardRunId": 43103085168,
+    "sameArtifactPreviewFirebaseAndCustomDomainReadback": "223_OF_223_EACH_PASS",
+    "releaseBackendDeployments": 0,
+    "releaseOperationalDataWrites": 0,
+    "priorSnapshotKey": "i66RapidReleaseFreezeCurrent20261110",
+    "priorApprovedLiveProductSourceSha": "6006d7843bf8eef5904a930b7346a1b00c114445",
+    "latestReleaseReceipt": "artifacts/orbit360-recovery/release-control/I6_6_RENOVACIONES_PERFORMANCE_POSTLIVE_READBACK_20261111.json",
+    "latestReleaseRequest": "artifacts/orbit360-recovery/release-control/I6_6_EXACT_HOSTING_LIVE_PROMOTION_REQUEST_20261111_R2.json",
+    "insurerDurableSaveUat": "HOLD_AFTER_SIGNED_PREFLIGHT_PASS",
+    "conciliacionesReadySampler": "HOLD_ROUTE_13_OF_13_NOT_READY",
+    "liveCarteraSync": "IN_PROGRESS_NOT_REIMPORTED",
+    "nextAction": "I6_6_FOCAL_INSURER_DURABLE_SAVE_AND_COBROS_CONCILIACIONES_READINESS_THEN_EXACT_CARRIER_RECEIPT_PAYMENT_DIFF",
+    "doNotClaimWholePlatformQaPass": true
   }
 }
