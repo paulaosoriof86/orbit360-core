@@ -1,0 +1,57 @@
+{
+  "schema": "GRAVICENTRA_I6_6_PERFORMANCE_READ_MODEL_ROOT_FIX_V1",
+  "gate": "I6.6",
+  "tenant": "alianzas-soluciones",
+  "project": "ays-orbit-360-lab",
+  "owner": "Dirección Paula Osorio",
+  "ownerRequestDate": "2026-11-10 America/Guatemala",
+  "status": "SOURCE_QA_PASS_PREVIEW_AND_LIVE_REGRESSION_PENDING",
+  "userImpact": "Inicio, Pólizas, Renovaciones, Aseguradoras, Cliente 360, mobile menu main-thread block",
+  "readOnlyEvidence": {
+    "workflowRunId": 42967931516,
+    "role": "Operativo Carlos",
+    "firestoreWrites": 0,
+    "paymentActions": 0,
+    "productionPageErrors": 0,
+    "protectedListConfirmations": true,
+    "hotspots": [
+      {
+        "surface": "renovaciones",
+        "sampledCloneCpuMs": 6407
+      },
+      {
+        "surface": "aseguradoras",
+        "sampledCloneCpuMs": 2685
+      },
+      {
+        "surface": "inicio",
+        "sampledCloneCpuMs": 3070
+      },
+      {
+        "surface": "cliente360Detail",
+        "sampledCloneCpuMs": 2258
+      }
+    ],
+    "note": "CPU profiles are sampled under instrumentation and vary with host load; not exact production SLAs."
+  },
+  "source": {
+    "path": "orbit360-platform/data/store-firestore-product-readonly-p0.js",
+    "blobSha": "1ad40c9dd3bfdf35a1a4c9760838bd7936809513",
+    "modification": "Bulk native read-only deep clone in protected mode for all/where; single-record get/find native clone; catch falls back to existing JSON clone; no RBAC/paging/business write changes."
+  },
+  "test": {
+    "path": "tools/gravicentra-i66-protected-read-clone-performance.test.cjs",
+    "blobSha": "17fac78ed3e4f6c21a7e3bb3b605f8a9dc363591",
+    "localNodeTests": "2/2 PASS, nested mutation isolation, exact JSON values, forbidden write and fallback"
+  },
+  "hardGates": [
+    "Exact immutable build from one canonical HEAD",
+    "isolated Preview QA with Carlos Operativo and Dirección role",
+    "record-level integrity and permission matrix no regression",
+    "prove latency reduction with same browser profiler and no CPU modal freeze",
+    "promote same exact artifact only after production approval/rollback"
+  ],
+  "productionTouched": false,
+  "firestoreDataTouched": false,
+  "automaticLiveDeployment": false
+}

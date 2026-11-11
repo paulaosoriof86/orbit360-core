@@ -647,6 +647,32 @@
           "gitBlobSha": "ad433adf6dc3a43fb9d0ed7664ebbfc1b859df0e"
         }
       ]
+    },
+    {
+      "id": "I6_6_CROSS_MODULE_AUTHORIZED_READ_BULK_CLONE_PERFORMANCE_P0",
+      "approvedByDirection": true,
+      "receipt": "artifacts/orbit360-recovery/release-control/I6_6_CROSS_MODULE_PROTECTED_READ_CLONE_PERFORMANCE_20261110.json",
+      "sourceStatus": "SOURCE_QA_2_OF_2_PASS_PREVIEW_LIVE_NOT_DEPLOYED",
+      "capabilityOwners": [
+        "STARTUP_PERFORMANCE",
+        "SINGLE_PRODUCT_ENTRYPOINT",
+        "CLIENTE360_PRIMARY_RUNTIME",
+        "POLIZAS_PRIMARY_RUNTIME",
+        "RECIBOS_CARTERA_PRIMARY_RUNTIME"
+      ],
+      "scope": "Replace per-row JSON stringify/parse with native bulk deep snapshot clone for protected read-only list/where and native single clone for get/find; preserve fallback, per-role/country server scope, records, writers; source-only, no Firebase/data mutations.",
+      "paths": [
+        {
+          "path": "orbit360-platform/data/store-firestore-product-readonly-p0.js",
+          "gitBlobSha": "1ad40c9dd3bfdf35a1a4c9760838bd7936809513"
+        }
+      ],
+      "tests": [
+        {
+          "path": "tools/gravicentra-i66-protected-read-clone-performance.test.cjs",
+          "gitBlobSha": "17fac78ed3e4f6c21a7e3bb3b605f8a9dc363591"
+        }
+      ]
     }
   ]
 }

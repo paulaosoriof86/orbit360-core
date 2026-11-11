@@ -27,6 +27,24 @@
     // Role changes can leave prior-epoch callable requests in flight. Prioritize
     // the new role's required source before starting optional route fan-out.
     var protectedRoleRecovery=false,protectedDeferredQueue=[],protectedDeferredActive=new Set(),protectedRetryCounts={};
+    // I6.6: server-scoped callable rows are JSON-compatible. Clone their
+    // authorized read snapshots in one native operation, preserving deep-copy
+    // isolation while avoiding thousands of per-row stringify/parse cycles on
+    // Inicio, Renovaciones, Cliente 360 and the mobile navigation main thread.
+    // Legacy/non-protected reads retain their established JSON clone semantics.
+    function readClone(value) {
+      if (protectedMode && typeof structuredClone === 'function') {
+        try { return structuredClone(value); } catch (_) { /* legacy fallback */ }
+      }
+      return clone(value);
+    }
+    function readCloneRows(rows) {
+      var input = Array.isArray(rows) ? rows : [];
+      if (protectedMode && typeof structuredClone === 'function') {
+        try { return structuredClone(input); } catch (_) { /* legacy fallback */ }
+      }
+      return input.map(clone);
+    }
     var listeners = [], unsubscribers = [], cache = {}, prefs = clone(options.initialPrefs || {}), deferredAttached = false, deferredScheduled = false, deferredCursor = 0, deferredPauseUntil = 0, attachStarted = {};
     var state = { version: VERSION, mode: 'product', tenantId: tenantCheck.tenantId || text(options.tenantId), source: 'data/store-firestore-product-readonly-p0.js', noFallback: true, writeEnabled: false, ready: false, status: 'created', attachedCollections: [], observedCollections: [], serverConfirmedCollections: [], cacheOnlyCollections: [], snapshotSources: {}, deniedCollections: [], snapshotErrors: {}, quarantinedRows: {}, queryPlans: {}, lastSnapshotAt: null, requiredStartupCollections: startupCollections.slice(), deferredCollections: deferredCollections.slice(), deferredAttached: false, authoritativeFirstRead: authoritativeFirstReadRequired };
     collections.forEach(function (collection) { cache[collection] = []; state.quarantinedRows[collection] = []; });
@@ -359,8 +377,8 @@
       if (state.deniedCollections.indexOf(collection) >= 0) return [];
       return logicalRows(collection);
     }
-    function all(collection) { return scopedRows(collection).map(clone); }
-    function get(collection, id) { var row = scopedRows(collection).find(function (item) { return rowId(item) === id; }); return row ? clone(row) : null; }
+    function all(collection) { return readCloneRows(scopedRows(collection)); }
+    function get(collection, id) { var row = scopedRows(collection).find(function (item) { return rowId(item) === id; }); return row ? readClone(row) : null; }
     function where(collection, fieldOrPredicate, opOrValue, maybeValue) {
       var source = scopedRows(collection), matches;
       if (typeof fieldOrPredicate === 'function') matches = source.filter(fieldOrPredicate);
@@ -381,7 +399,7 @@
           return false;
         });
       }
-      return matches.map(clone);
+      return readCloneRows(matches);
     }
     function find(collection, predicate) {
       var source = scopedRows(collection), row = null;
@@ -389,7 +407,7 @@
       else if (predicate && typeof predicate === 'object') row = source.find(function (item) {
         return Object.keys(predicate).every(function (key) { return item[key] === predicate[key]; });
       }) || null;
-      return row ? clone(row) : null;
+      return row ? readClone(row) : null;
     }
     function on(collection, callback) { if (typeof collection === 'function') { callback = collection; collection = '*'; } var listener = function (changed) { if (collection === '*' || collection === changed || changed === '*') callback(changed); }; listeners.push(listener); return function () { listeners = listeners.filter(function (item) { return item !== listener; }); }; }
     function pref(key, defaultValue) { return Object.prototype.hasOwnProperty.call(prefs, key) ? clone(prefs[key]) : defaultValue; }
