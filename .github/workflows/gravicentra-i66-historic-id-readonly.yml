@@ -83,6 +83,17 @@ jobs:
             console.log('ID_PROBE_BAYRON_RECEIPTS_CLASS '+JSON.stringify({amounts:amountClasses(linkedReceipts),states:states(linkedReceipts),paid:linkedReceipts.filter(d=>Boolean(d.data().cobroId)).length}));
             console.log('ID_PROBE_BAYRON_PORTFOLIO_CLASS '+JSON.stringify({amounts:amountClasses(linkedPortfolios),states:states(linkedPortfolios),linked:linkedPortfolios.filter(d=>Boolean(d.data().reciboId||d.data().receiptId)).length}));
             console.log('ID_PROBE_BAYRON_COBRO_CLASS '+JSON.stringify({count:paymentRecord.length,linked:paymentRecord.filter(d=>Boolean(d.data().reciboId||d.data().receiptId)).length,states:states(paymentRecord),paidDatePresent:paymentRecord.filter(d=>Boolean(d.data().paidDate||d.data().fechaPago)).length,applicationStatePresent:paymentRecord.filter(d=>Boolean(d.data().applicationState)).length}));
+            const receiptsById=new Map(docsByCollection.get('recibosEsperados').map(d=>[d.id,d.data()||{}]));
+            const portfoliosByReceipt=new Map();for(const d of docsByCollection.get('carteraPrimas')){const r=d.data()||{},rid=String(r.reciboId||r.receiptId||'');if(rid&&activePortfolio(r)){if(!portfoliosByReceipt.has(rid))portfoliosByReceipt.set(rid,[]);portfoliosByReceipt.get(rid).push(r);}}
+            const allCobros=docsByCollection.get('cobros');
+            let paidCobros=0,linkedPaid=0,missingReceipt=0,ambiguousPortfolio=0,activePortfolioMissing=0,portfolioStatusStale=0,receiptStatusStale=0;
+            for(const doc of allCobros){const c=doc.data()||{},st=normalized(c.estado||c.paymentState||'');if(st!=='pagado'&&!st.startsWith('paid'))continue;paidCobros++;
+              const rid=String(c.reciboId||c.receiptId||c.matchedReceiptId||'');if(!rid||!receiptsById.has(rid)){missingReceipt++;continue;}linkedPaid++;
+              const receipt=receiptsById.get(rid);if(normalized(receipt.estado)!=='pagado')receiptStatusStale++;
+              const pp=portfoliosByReceipt.get(rid)||[];if(!pp.length)activePortfolioMissing++;if(pp.length>1)ambiguousPortfolio++;
+              if(pp.length===1&&!['pagado','recaudado','conciliado','aplicado'].includes(normalized(pp[0].estadoCartera||pp[0].estado)))portfolioStatusStale++;
+            }
+            console.log('ID_PROBE_PAID_LEDGER_COHERENCE '+JSON.stringify({allCobros:allCobros.length,paidCobros,linkedPaid,missingReceipt,ambiguousPortfolio,activePortfolioMissing,portfolioStatusStale,receiptStatusStale}));
             console.log('I66_READONLY_METADATA_PROBE_COMPLETED_WITHOUT_WRITES');
           })().catch(e=>{console.error(String(e.message||e).replace(/[^a-zA-Z0-9_ -]/g,''));process.exitCode=1;});
           NODE
