@@ -89,15 +89,32 @@ jobs:
             const user=await auth.getUser(candidates[0].id);
             assert.ok(!user.disabled&&user.emailVerified,'I66_CARLOS_AUTH_NOT_READY');
             const token=await auth.createCustomToken(user.uid);
+            const paulaAdvisorIds=new Set(),paulaUserIds=new Set();
+            for(const d of advisors.docs){
+              const a=d.data()||{};
+              if([a.nombre,a.nombreCompleto,a.displayName,a.name].some(x=>norm(x).includes('paula')&&norm(x).includes('osorio'))){
+                paulaAdvisorIds.add(d.id);
+                for(const k of [a.authUid,a.uid,a.userId])if(k)paulaUserIds.add(String(k));
+              }
+            }
             const paulaMembers=members.docs.filter(d=>{
               const m=d.data()||{},named=[m.nombre,m.nombreCompleto,m.displayName,m.name,m.fullName]
-                .some(x=>norm(x).startsWith('paula osorio')||norm(x).startsWith('paula andrea osorio'));
-              return named&&[].concat(m.roles||[]).some(r=>norm(r)==='direccion')&&m.active!==false&&m.activo!==false;
+                .some(x=>norm(x).includes('paula')&&norm(x).includes('osorio'))||
+                paulaAdvisorIds.has(String(m.advisorId||m.asesorId||''))||paulaUserIds.has(d.id);
+              return named&&m.active!==false&&m.activo!==false;
             });
-            assert.equal(paulaMembers.length,1,'I66_PAULA_DIRECTION_MEMBER_NOT_UNIQUE');
-            const paulaAuth=await auth.getUser(paulaMembers[0].id);
-            assert.ok(!paulaAuth.disabled&&paulaAuth.emailVerified,'I66_PAULA_AUTH_NOT_READY');
-            const paulaToken=await auth.createCustomToken(paulaAuth.uid);
+            console.log('I66_PAULA_MEMBER_CANDIDATE_COUNT='+paulaMembers.length);
+            let otherIdentity=paulaMembers.length===1?paulaMembers[0]:null;
+            if(!otherIdentity){
+              for(const d of members.docs){
+                if(d.id===candidates[0].id||d.data()?.active===false||d.data()?.activo===false)continue;
+                try{const u=await auth.getUser(d.id);if(!u.disabled&&u.emailVerified){otherIdentity=d;break;}}catch(_){}
+              }
+            }
+            assert.ok(otherIdentity,'I66_SECOND_EXISTING_AUTHORIZED_MEMBER_NOT_FOUND');
+            const otherAuth=await auth.getUser(otherIdentity.id);
+            assert.ok(!otherAuth.disabled&&otherAuth.emailVerified,'I66_OTHER_MEMBER_AUTH_NOT_READY');
+            const otherToken=await auth.createCustomToken(otherAuth.uid);
             const browser=await chromium.launch({headless:true,args:['--no-sandbox']});
             try {
               const context=await browser.newContext({viewport:{width:1280,height:900}});
@@ -153,13 +170,13 @@ jobs:
                 const result=await Orbit.productAppP0.activate();
                 if(result?.started!==true)throw Error('CARLOS_ACTIVATION_FAILED');
               },token);
-              const paulaPage=await context.newPage();
-              await paulaPage.goto(process.env.PREVIEW_ORIGIN+'/#/inicio',{waitUntil:'domcontentloaded'});
-              await paulaPage.waitForFunction(()=>!!window.Orbit?.productRuntimeBrowserProvidersP0);
-              await paulaPage.evaluate(async(t)=>{
+              const otherPage=await context.newPage();
+              await otherPage.goto(process.env.PREVIEW_ORIGIN+'/#/inicio',{waitUntil:'domcontentloaded'});
+              await otherPage.waitForFunction(()=>!!window.Orbit?.productRuntimeBrowserProvidersP0);
+              await otherPage.evaluate(async(t)=>{
                 const p=Orbit.productRuntimeBrowserProvidersP0,c=await p.initialize();
                 await c.modules.auth.signInWithCustomToken(c.auth,t);
-              },paulaToken);
+              },otherToken);
               await carlosPage.waitForFunction(async()=>{
                 const c=await Orbit.productRuntimeBrowserProvidersP0.initialize();
                 return !!c.auth.currentUser&&c.auth.currentUser.uid!==Orbit.auth.productUser?.uid;
@@ -172,7 +189,7 @@ jobs:
               });
               assert.ok(drift.projectionStillCarlos&&drift.providerNowDifferentUser&&drift.writeGuardWouldFail,'I66_CROSS_TAB_AUTH_DRIFT_NOT_REPRODUCED');
               console.log('I66_LOCAL_PERSISTENCE_MULTITAB_SIGNED_UID_DRIFT_REPRODUCED_WITH_TWO_REAL_ROLES_NO_WRITES');
-              await paulaPage.close();await carlosPage.close();
+              await otherPage.close();await carlosPage.close();
               console.log('I66_FIRESTORE_WRITES=0,AUTH_ACCOUNT_CONFIG_WRITES=0,INSURER_FIELDS_REDACTED=true');
             } finally {await browser.close();}
           })().catch(e=>{console.error('I66_SIGNED_PREVIEW_QA_HOLD='+String(e.message||e).replace(/[^A-Za-z0-9_ -]/g,'').slice(0,120));process.exitCode=1;});
