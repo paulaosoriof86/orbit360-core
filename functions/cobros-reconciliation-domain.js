@@ -88,6 +88,25 @@ function active(member) {
 function canManage(activeRole, member) {
   return ADMIN_ROLES.has(activeRole) || permissions(member).some(permission => PERMISSIONS.has(permission));
 }
+function paymentCountry(value) {
+  const normalized = norm(value);
+  if (normalized === 'guatemala' || normalized === 'gt') return 'GT';
+  if (normalized === 'colombia' || normalized === 'co') return 'CO';
+  return text(value, 8).toUpperCase();
+}
+function assertPaymentCountryScope(authz, policy, receipt) {
+  const policyCountry = paymentCountry(policy && policy.pais);
+  const receiptCountry = paymentCountry(receipt && receipt.pais);
+  if (policyCountry && receiptCountry && policyCountry !== receiptCountry)
+    throw new HttpsError('failed-precondition', 'PAYMENT_POLICY_RECEIPT_COUNTRY_MISMATCH');
+  const country = policyCountry || receiptCountry;
+  if (!country) throw new HttpsError('failed-precondition', 'PAYMENT_COUNTRY_UNRESOLVED');
+  const countries = unique([...(Array.isArray(authz.member.countries) ? authz.member.countries : []),
+    ...(Array.isArray(authz.member.paises) ? authz.member.paises : [])]).map(paymentCountry);
+  if (countries.length && !countries.includes(country))
+    throw new HttpsError('permission-denied', 'PAYMENT_COUNTRY_OUTSIDE_MEMBERSHIP');
+  return country;
+}
 async function authorize(request, operation) {
   if (!request.auth || !request.auth.uid) throw new HttpsError('unauthenticated', 'Se requiere sesión activa.');
   const tenantId = id(request.data && request.data.tenantId, 'tenantId');
@@ -454,6 +473,7 @@ async function applyPayment(authz, data, payload, operationName = 'apply_payment
     const policySnap = await tx.get(policyRef);
     if (!policySnap.exists) throw new HttpsError('failed-precondition', 'La póliza vinculada no existe.');
     const policy = Object.assign({ id: policySnap.id }, policySnap.data() || {});
+    assertPaymentCountryScope(authz, policy, receipt);
     const clientId = id(receipt.clienteId || policy.clienteId, 'clienteId');
 
     const portfolioQuery = tenantData(authz.tenantId, 'carteraPrimas').where('reciboId', '==', receiptId);
@@ -701,7 +721,9 @@ async function reconcileEvidence(authz, data, payload, previewOnly) {
     const [policySnap, receiptSnap] = await Promise.all([tx.get(policyRef), tx.get(receiptQuery)]);
     if (!policySnap.exists) throw new HttpsError('not-found', 'La póliza no existe.');
     const policy = Object.assign({ id: policySnap.id }, policySnap.data() || {});
+    assertPaymentCountryScope(authz, policy);
     const receipts = receiptSnap.docs.map(doc => Object.assign({ id: doc.id }, doc.data() || {}));
+    for (const receipt of receipts) assertPaymentCountryScope(authz, policy, receipt);
     const plan = planEvidence({ policy, receipts, evidence: evidencePayload, reconciliationConfig });
     if (!plan || plan.ok !== true) throw new HttpsError('failed-precondition', 'No fue posible evaluar la evidencia.');
     if (plan.autoCommit !== true || plan.status === 'REVIEW_REQUIRED') {
