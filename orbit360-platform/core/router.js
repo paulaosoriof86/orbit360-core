@@ -175,8 +175,18 @@ Orbit.router = (function () {
     function buscar(query) {
       const term = normalized(query.trim());
       if (term.length < 2) { dd.classList.remove('open'); dd.innerHTML = ''; return; }
-      const top = []; let total = 0;
-      searchIndex().forEach(row => { if (row.query.includes(term)) { total++; if (top.length < 12) top.push(row); } });
+      const top = [], seen = new Set(); let total = 0;
+      searchIndex().forEach(row => {
+        if (!row.query.includes(term)) return;
+        // Historical editions of the same policy may be separate records, yet
+        // point to the same client. One topbar option per visible destination
+        // and policy label avoids crowding out other matching clients.
+        const identity = [row.ic, row.t, row.go].join('\u0000');
+        if (seen.has(identity)) return;
+        seen.add(identity);
+        total++;
+        if (top.length < 12) top.push(row);
+      });
       dd.innerHTML = top.length
         ? top.map(r => `<button class="tb-sr" data-go="${U.esc(r.go)}"><span>${r.ic}</span><span class="tb-sr-t">${U.esc(r.t)}<small>${U.esc(r.s)}</small></span></button>`).join('') +
           (total > 12 ? `<div class="tb-sr-more">+${total - 12} más…</div>` : '')
@@ -206,6 +216,21 @@ Orbit.router = (function () {
     window.addEventListener('orbit:domain-config', invalidate);
     inp.addEventListener('input', schedule);
     inp.addEventListener('focus', () => { if (inp.value.trim().length >= 2) schedule(); });
+    // Enter is the expected primary action on a global search field. Without
+    // this handler the matches appear but pressing Enter silently does nothing.
+    // Build the pending index before selecting so fast typists are supported.
+    inp.addEventListener('keydown', event => {
+      if (event.key === 'Escape') { dd.classList.remove('open'); return; }
+      if (event.key !== 'Enter' || inp.value.trim().length < 2) return;
+      event.preventDefault();
+      if (pending) { clearTimeout(pending); pending = null; }
+      buscar(inp.value);
+      const first = dd.querySelector('[data-go]');
+      if (!first) return;
+      location.hash = first.dataset.go;
+      dd.classList.remove('open');
+      inp.value = '';
+    });
     inp.addEventListener('blur', () => setTimeout(() => dd.classList.remove('open'), 180));
   }
   return { init, go, loadRuntimeContracts, runtimeContractState, rebuildSidebar: () => { try { buildSidebar(); setActive((Orbit.route && Orbit.route.key) || 'inicio'); } catch (e) {} } };

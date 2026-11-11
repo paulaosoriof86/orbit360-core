@@ -1,0 +1,47 @@
+{
+  "schema": "GRAVICENTRA_I6_6_RENEWAL_SHARED_DECISION_FLOW_DIRECTION_V1",
+  "dateGuatemala": "2026-11-11",
+  "product": "Gravicentra Insurance",
+  "branch": "recovery/fase-a-clean-20260831",
+  "historicalGateClosed": "B4-007",
+  "activeGate": "I6.6",
+  "directionRequest": "En Renovaciones y ficha Cliente 360 el boton Renovar debe ofrecer al rol autorizado renovar directamente con poliza en firme o crear gestion con modalidad de renovacion. Asesor solo crea gestion. Ops sigue, responde y puede concluir. Implementacion transversal por rol y pais, no para Carlos ni una ficha especifica.",
+  "currentSourceReadback": {
+    "modules/renewals-v1200-operational-bridge.js:registrarAceptacion": "Crea obligatoriamente una gestion renewal_accepted y envia a Ops incluso cuando el usuario ya tiene renovacion en firme.",
+    "modules/cliente360.js:renewalCTAs": "Envia al mismo registrarAceptacion; otros botones llaman solicitarPropuestas.",
+    "modules/issuance-endosos-v1201-bridge.js:openDirectRenewal": "El editor para registrar renovacion en firme se abre solo desde una gestion Ops.",
+    "core/issuance-workflow-v1201.js:createDirectRenewal": "Exige gestion renewal_accepted confirmada, documento emitido autentico y crea poliza vinculada, cartera y recibos. Este owner preserva los invariantes de no duplicar."
+  },
+  "sharedEntryPoints": ["Renovaciones.lista_y_detalle", "Cliente360.ficha_y_poliza", "Ops.gestion_de_renovacion_existente"],
+  "rolesAndChoices": [
+    {"roleGroup": ["Direccion", "SuperAdmin", "AdminTenant", "Admin", "Operativo"], "canRegisterIssuedRenewal": true, "canCreateManagement": true, "subjectTo": "signed module permission, country, tenant, actual policy and issued proof"},
+    {"roleGroup": ["Asesor", "Comercial"], "canRegisterIssuedRenewal": false, "canCreateManagement": true, "subjectTo": "authorized own/client policy, country, tenant, no emission privilege"}
+  ],
+  "choiceFlow": {
+    "sharedAction": "Renovar",
+    "authorizedOperationsChoices": ["Registrar renovacion en firme", "Crear gestion de renovacion"],
+    "advisorChoice": "Crear gestion de renovacion",
+    "managementModalities": [
+      "Solicitar condiciones/renovacion con misma aseguradora",
+      "Cotizar con la misma aseguradora",
+      "Cotizar con varias aseguradoras y comparar propuestas",
+      "Solicitar emision de propuesta ya aceptada"
+    ],
+    "directIssuedPreconditions": ["Aprobacion documentada del cliente", "Numero real de la nueva poliza", "Aseguradora real", "Vigencias validas no traslapadas", "Forma de pago, periodicidad, cuotas y prima verificadas", "Documento real de renovacion emitida y referencia confirmada"],
+    "directIssuedCommit": "Reutilizar owner canonico de emision, generar nueva vigencia y relacion renuevaDe/renovadaPor, materializar sus recibos y cartera, registrar evento auditable y dejar una gestion Ops resultante cerrada automaticamente sin que el operador deba pasar manualmente por Ops.",
+    "managementCommit": "Una sola gestion canonical con policyId, cliente, country, modalidad, responsables y checklist; Ops es el tablero de seguimiento. Su cierre emite o registra desde el mismo owner sin crear gestiones duplicadas."
+  },
+  "noRegressions": [
+    "Una poliza en firme no es sinonimo de gestion solicitada; interfaz y estado deben distinguirlos claramente.",
+    "No emitir sin documento, consentimiento del cliente ni poliza real; no inventar valor, aseguradora o numero.",
+    "No exponer accion de emision a Asesor ni permitir invocarla por llamada directa.",
+    "Reutilizar el modal y la logica desde las tres superficies, no duplicarlos por modulo.",
+    "Idempotencia de renovacion, no crear segunda sucesora ni duplicar recibos/cartera.",
+    "No alterar la poliza historica mas alla del vinculo y estado auditado de renovacion.",
+    "Operacion transversal GT/CO con permisos efectivos por pais y tenant; no correccion personal de Carlos."
+  ],
+  "requiredEvidence": ["unit multirol/país", "preview flujo directo y gestion", "no duplicacion y persistencia", "emision y recibos en firme", "Chrome LIVE controlado", "mismo artefacto inmutable"],
+  "implementationStatus": "DIRECTION_FLOW_CAPTURED_SOURCE_CHANGE_NOT_STARTED; DO_NOT_REPORT_PASS_OR_DEPLOYED",
+  "releaseStrategy": "Preservar el hotfix prioritario de buscador y Cobros ya promovido; implementar el flujo como delta sucesor dentro del mismo gate y en la misma rama antes de otra promocion controlada.",
+  "dataWritesFromThisReceipt": 0
+}

@@ -1,0 +1,32 @@
+{
+  "schema": "GRAVICENTRA_I6_6_GLOBAL_TOPBAR_ENTER_LIVE_INTERACTION_FIX_V1",
+  "dateGuatemala": "2026-11-11",
+  "gate": "I6.6",
+  "historicalGate": "B4-007_CLOSED",
+  "product": "Gravicentra Insurance",
+  "branch": "recovery/fase-a-clean-20260831",
+  "direction": "Paula reporto que el buscador superior ya no busca. Atender sin detener Cobros ni renovar otro baseline.",
+  "chromeLiveObserved": {
+    "origin": "https://app.aysseguros.com",
+    "role": "Direccion",
+    "country": "Todos los paises",
+    "queryMapfre": "2 aseguradoras GT/CO visibles tras escribir y esperar debounce",
+    "queryEdsonKened": "Cliente y polizas coincidentes visibles tras escribir",
+    "queryPaula": "2 clientes y polizas coincidentes visibles tras escribir",
+    "enterOnExistingResult": "Press Enter produjo cero navegaciones; hash permanecio #/inicio aun con resultados visibles",
+    "mouseClickOnFirstResult": "La ruta cambio a #/cliente360?c=cli_siga_a8473cbf91fb2d865c",
+    "duplicateVisibleRows": "Polizas con mismo numero y destino aparecen varias veces por ediciones historicas y agotan los 12 resultados"
+  },
+  "rootCause": "wireGlobalSearch() solo escucha input/focus/blur y vincula navegacion a mousedown de sugerencias. No existe keydown Enter, por eso una busqueda por teclado parece inoperante. El mismo titulo y destino se reitera por varias ediciones de poliza.",
+  "sourceChanges": [
+    "Al pulsar Enter, cancelar temporizador, resolver el indice autorizado y navegar a la primera coincidencia; limpiar entrada.",
+    "Mantener click/mousedown actual, Escape para cerrar y mensaje sin resultados.",
+    "Desduplicar solo las opciones visibles segun tipo, titulo y destino; no desduplicar polizas operativas ni mutar Firestore.",
+    "Preservar una lectura scoped de clientes, sin reproyeccion redundante y sin filtrar datos de otro rol/pais."
+  ],
+  "sourceUnitTest": "tools/gravicentra-i6-6-global-search-policy-context-and-scoped-fallback.test.cjs",
+  "localSourceQa": "15 assertions PASS, including fast Enter, result navigation, historical option dedup, Escape and scope fallback",
+  "status": "SOURCE_UNIT_PASS_PREVIEW_LIVE_INTERACTIVE_QA_PENDING",
+  "firebaseWrites": 0,
+  "productionDeployment": false
+}

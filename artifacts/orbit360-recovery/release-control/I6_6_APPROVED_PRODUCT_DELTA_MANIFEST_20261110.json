@@ -910,5 +910,36 @@
         }
       ]
     }
+    ,
+    {
+      "id": "I6_6_GLOBAL_TOPBAR_ENTER_NAVIGATION_AND_VISIBLE_DEDUP_P0",
+      "approvedByDirection": true,
+      "receipt": "artifacts/orbit360-recovery/release-control/I6_6_GLOBAL_TOPBAR_ENTER_LIVE_REGRESSION_FIX_20261111.json",
+      "sourceStatus": "SOURCE_UNIT_15_PASS_PREVIEW_AND_LIVE_CHROME_QA_PENDING",
+      "capabilityOwners": ["GLOBAL_SHELL_SEARCH", "ROLE_SCOPE_RUNTIME", "STARTUP_PERFORMANCE"],
+      "scope": "Live Paula Direccion keyboard Enter does nothing on existing topbar matches; Enter must select authorized first result including fast input, Escape closes, only visible duplicate editions collapsed. Preserve signed performance fix, role/country isolation, no backend or data writes.",
+      "paths": [
+        {
+          "path": "orbit360-platform/core/router.js",
+          "gitBlobSha": "c54b221a258ccb4de5b959afe9b3274caf6d3fb7",
+          "replaces": {
+            "path": "orbit360-platform/core/router.js",
+            "priorGitBlobSha": "66c96a1dc01bf0abd6caff00b7e76f3aeef06462",
+            "priorChangeId": "I6_6_GLOBAL_TOPBAR_REMOVE_ALREADY_PROJECTED_CLIENT_RECOMPUTATION_P0"
+          }
+        }
+      ],
+      "tests": [
+        {
+          "path": "tools/gravicentra-i6-6-global-search-policy-context-and-scoped-fallback.test.cjs",
+          "gitBlobSha": "64b2ed0f5a0576c7cca5fbdbea512f68cdea368d",
+          "replaces": {
+            "path": "tools/gravicentra-i6-6-global-search-policy-context-and-scoped-fallback.test.cjs",
+            "priorGitBlobSha": "f845c92a5b52f3af857c2c3fbc85304d4fb8ac67",
+            "priorChangeId": "I6_6_GLOBAL_TOPBAR_REMOVE_ALREADY_PROJECTED_CLIENT_RECOMPUTATION_P0"
+          }
+        }
+      ]
+    }
   ]
 }
