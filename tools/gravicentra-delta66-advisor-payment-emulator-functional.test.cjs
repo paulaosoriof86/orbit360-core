@@ -155,6 +155,22 @@ const seed=async(id,country,advisorId,monto)=>{
   stage='direct-payment-authorization';
   await expectDenied(()=>apply('advisor-gt','Asesor','rec_method_0','qa_advisor_wrong','Efectivo',100));
   await expectDenied(()=>apply('op-co','Operativo','rec_method_0','qa_country_wrong','Efectivo',100));
+  stage='direct-payment-country-invariants';
+  await seed('co_direct','CO','ase-co',333);
+  await data('recibosEsperados','rec_co_direct').set({moneda:'COP'},{merge:true});
+  await data('carteraPrimas','car_co_direct').set({id:'car_co_direct',reciboId:'rec_co_direct',polizaId:'pol_co_direct',
+    clienteId:'cli_co_direct',pais:'CO',moneda:'COP',monto:333,estado:'Pendiente',estadoCartera:'Pendiente',carteraActiva:true});
+  const coDirect=await apply('op-co','Operativo','rec_co_direct','qa_co_direct_001','Efectivo',333);
+  assert.equal(coDirect.ok,true);assert.equal(coDirect.portfolioUpdated,true);checks++;
+  assert.equal((await data('carteraPrimas','car_co_direct').get()).data().estadoCartera,'Pagado');checks++;
+  await expectDenied(()=>apply('op-gt','Operativo','rec_co_direct','qa_gt_wrong_co','Cheque',333));
+  await expectDenied(()=>command.run(request('op-co','Operativo',{
+    operation:'reconcile_evidence',requestId:'qa_inference_country_wrong',reason:'QA aislado país inferencia',
+    payload:{policyId:'pol_method_0',evidenceType:'BANK_STATEMENT_MATCH',evidenceId:'qa-country-boundary',uniqueMatch:true}
+  })));
+  await seed('country_conflict','GT','ase-gt',278);
+  await data('recibosEsperados','rec_country_conflict').set({pais:'CO'},{merge:true});
+  await expectDenied(()=>apply('op-gt','Operativo','rec_country_conflict','qa_policy_receipt_country_conflict','Cheque',278),'failed-precondition');
   stage='advisor-report-to-operative-application';
   await data('carteraPrimas','car_gt').set({id:'car_gt',reciboId:'rec_gt',polizaId:'pol_gt',clienteId:'cli_gt',
     pais:'GT',moneda:'GTQ',monto:250,estado:'Pendiente',estadoCartera:'Pendiente',carteraActiva:true});
