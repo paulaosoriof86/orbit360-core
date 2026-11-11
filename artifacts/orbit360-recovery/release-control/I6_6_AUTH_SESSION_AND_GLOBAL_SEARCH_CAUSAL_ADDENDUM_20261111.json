@@ -18,10 +18,13 @@
     "observedClientError": "PRODUCT_WRITE_AUTH_CONTEXT_MISMATCH",
     "confirmedLocation": "store-firestore-product-operational-p0.js batchDurable signed actor consistency check",
     "firestoreReadback": "No change to insurer business record, no new Carlos activity after failed save",
-    "readonlyIntegrityRuns": [43085784388, 43086136439],
+    "readonlyIntegrityRuns": [
+      43085784388,
+      43086136439
+    ],
     "previousAdviserScopeHypothesis": "DISPROVEN_AS_SUFFICIENT_CAUSE: client edit permission passes for the real signed actor; previous receipt retained as historical, not treated as causal proof",
     "sensitiveFieldNameMismatchHypothesis": "DISPROVEN_BY_READONLY_33_INSURER_SCAN",
-    "underlyingSessionCause": "CANDIDATE: Firebase default local persistence shares identity across tabs, but signed cross-tab reproduction is not yet certified; actual observed cause is UID projection mismatch"
+    "underlyingSessionCause": "NOT_REPRODUCED in real signed multi-tab CI; observed P0 was PRODUCT_WRITE_AUTH_CONTEXT_MISMATCH. Session isolation and bounded authStateReady are preventive/coherence corrections, not a proved cross-tab causal attribution."
   },
   "minimalTransversalSourceChanges": [
     "For new interactive login set Firebase browserSessionPersistence before signIn, isolating signed actors across tabs; existing restored sessions are not forcibly logged out.",
@@ -41,13 +44,52 @@
     "singleImmutableArtifactPreviewThenLive": true
   },
   "nextEvidenceRequirements": [
-    "GitHub delta guard PASS on canonical source and blob-pinned tests",
-    "One exact Preview artifact with byte readback",
-    "Real signed Carlos/Paula write-path tests in controlled safe environment; no real insurer mutation before approved LIVE canary",
-    "Search/filter/navigation performance under repeated role/country/mobile switching, especially Cobros and Renovaciones",
-    "LIVE exact clone, post-deploy functional write/reload/readback and no regressions"
+    "Signed controlled reversible insurer SAVE with durable server readback and reload for Carlos Operativo and Paula Dirección, without per-user exceptions.",
+    "Resolve actual Paula signed role/scope and complete Dirección create/edit/delete administration, plus Admin/AdminTenant/SuperAdmin and restricted Asesor cases.",
+    "Repeated interactive performance sampling of global search, module filter/dropdowns, Cobros/Renovaciones and mobile cold start; investigate intermittent hung Chrome and 1-sample variance.",
+    "Conciliaciones route readiness missing from 13-route signed sample: diagnose without losing prior acceptance.",
+    "Cobros Byron application, Cliente360/Portal/list write semantics and Ops/Leads persistent CRUD/comments/attachments post-release role/country tests.",
+    "Cartera/recibos/commissions inference refresh, October-November data sync and July onward Drive delta checks only after functional write safety passes."
   ],
-  "previewStatus": "PENDING",
-  "liveStatus": "PENDING",
-  "businessDataChanged": false
+  "previewStatus": "EXACT_SOURCE_PREVIEW_QA_PASS_FOR_SIGNED_PREFLIGHT_AUTH_ISOLATION_AND_TARGETED_PERFORMANCE",
+  "liveStatus": "SAME_IMMUTABLE_ARTIFACT_HOSTING_READBACK_PASS; POST_DEPLOY_TARGETED_READONLY_PASS; INSURER_DURABLE_SAVE_AND_FULL_MODULE_UAT_HOLD",
+  "businessDataChanged": false,
+  "newVerifiedEvidence": {
+    "canonicalProductSourceSha": "6006d7843bf8eef5904a930b7346a1b00c114445",
+    "immutableBuildRunId": 43090584888,
+    "immutableArtifactId": 13888208036,
+    "immutableArtifactSha256": "9c140b7a02a8d63300868c84b5ae955ad2a8c3f101a257ab74708018dc2b98a9",
+    "signedCarlosAndTwoBrowserActorsQaRunId": 43092047023,
+    "transverseSourceQaRunId": 43090584563,
+    "previewPerformanceReadOnlyRunId": 43092881329,
+    "preReleaseLivePerformanceReadOnlyRunId": 43092881446,
+    "signedComparisonReadOnlyRunId": 43093275461,
+    "exactHostingLiveCloneRunId": 43093619962,
+    "sameArtifactThreeOriginByteReadbackFilesPerOrigin": 223,
+    "liveMarkerSourceSha": "6006d7843bf8eef5904a930b7346a1b00c114445",
+    "liveMarkerBuildId": "gi-i66-6006d7843bf8-57f234755dc1",
+    "postReleaseLivePerformanceReadOnlyRunId": 43094096593,
+    "postReleaseStartMs": 1661,
+    "preReleaseStartMs": 2259,
+    "browserPostReleaseReadOnly": [
+      "Paula Operativo Aseguradoras real record opens/edit form without advisor required; edit cancelled, no business write",
+      "Ops Kanban renders",
+      "Leads pipeline renders",
+      "Global search returns ASEGURADORA GUATEMALTECA"
+    ],
+    "previewReadOnlyRoutesLoaded": 12,
+    "previewReadOnlyRoutesTotal": 13,
+    "liveReadOnlyRoutesLoaded": 12,
+    "liveReadOnlyRoutesTotal": 13,
+    "missingRoute": "conciliaciones",
+    "noDataWritesByRelease": true,
+    "rollbackRequired": false,
+    "wholePlatformFunctionalAccepted": false,
+    "singleSampleSlowerRoutes": [
+      "aseguradoras",
+      "renovaciones",
+      "cobros",
+      "inicio"
+    ]
+  }
 }
