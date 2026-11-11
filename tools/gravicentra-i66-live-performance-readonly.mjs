@@ -9,9 +9,9 @@ import {getAuth} from 'firebase-admin/auth';
 const PROJECT='ays-orbit-360-lab';
 const TENANT='alianzas-soluciones';
 const ORIGIN=process.env.GI_I66_PERF_ORIGIN||'https://app.aysseguros.com';
-// Exact d4e9bc7b9ab0 source passed immutable-build and Preview byte readback.
+// Exact 867b0b0d75cf source passed immutable-build and Preview byte readback.
 // It is the sole approved candidate for this scoped comparison.
-const APPROVED_PREVIEW='https://ays-orbit-360-lab--gi-i66-rc-43119744773-o8zuyuey.web.app';
+const APPROVED_PREVIEW='https://ays-orbit-360-lab--gi-i66-rc-43123134271-5vsqe8fh.web.app';
 const OUTPUT=process.env.GI_I66_PERF_REPORT;
 const norm=x=>String(x??'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();
 const need=(ok,code)=>{if(!ok)throw Error(code);};
@@ -300,6 +300,31 @@ async function run(){
     const coldBudgetMs=ORIGIN===APPROVED_PREVIEW?2200:15000;
     need(report.globalTopbarSearch.first.timeMs<coldBudgetMs&&report.globalTopbarSearch.second.timeMs<1000,
       'I66_TOPBAR_REAL_SEARCH_LATENCY_HOLD');
+    // A visible suggestion is not enough: signed Chrome must prove keyboard
+    // activation navigates. This was missing on the formerly fast LIVE source.
+    report.globalTopbarKeyboard=await page.evaluate(async()=>{
+      const input=document.querySelector('.tb-search input'),dd=document.getElementById('tb-search-dd');
+      if(!input||!dd)return {ready:false,reason:'TOPBAR_KEYBOARD_INPUT_MISSING'};
+      input.value='MAPFRE';
+      input.dispatchEvent(new Event('input',{bubbles:true}));
+      const ready=await new Promise(resolve=>{
+        const started=performance.now(),timer=setInterval(()=>{
+          const matched=dd.classList.contains('open')&&dd.querySelector('[data-go]');
+          if(matched||performance.now()-started>3000){clearInterval(timer);resolve(!!matched);}
+        },30);
+      });
+      const first=dd.querySelector('[data-go]'),route=first&&first.dataset.go||'';
+      const event=new KeyboardEvent('keydown',{key:'Enter',bubbles:true,cancelable:true});
+      const original=location.hash;
+      input.dispatchEvent(event);
+      return {ready,activated:!!route&&location.hash===route&&location.hash!==original,
+        fieldCleared:input.value==='',dropdownClosed:!dd.classList.contains('open'),
+        defaultPrevented:event.defaultPrevented,options:dd.querySelectorAll('[data-go]').length};
+    });
+    if(ORIGIN===APPROVED_PREVIEW)
+      need(report.globalTopbarKeyboard.ready&&report.globalTopbarKeyboard.activated&&
+        report.globalTopbarKeyboard.fieldCleared&&report.globalTopbarKeyboard.dropdownClosed&&
+        report.globalTopbarKeyboard.defaultPrevented,'I66_TOPBAR_KEYBOARD_PREVIEW_HOLD');
     // Measure a real, already-authorized client detail without printing its identity.
     await cdp.send('Profiler.start');
     report.cliente360Detail=await page.evaluate(async()=>{
