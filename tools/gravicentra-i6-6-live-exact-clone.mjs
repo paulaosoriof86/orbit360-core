@@ -5,7 +5,7 @@ import {execFileSync} from 'node:child_process';
 import {GoogleAuth} from 'google-auth-library';
 
 const SITE='ays-orbit-360-lab',PROJECT='ays-orbit-360-lab';
-const REQUEST='artifacts/orbit360-recovery/release-control/I6_6_EXACT_HOSTING_LIVE_PROMOTION_REQUEST_20261110.json';
+const REQUEST=process.env.I66_APPROVED_RELEASE_REQUEST||'artifacts/orbit360-recovery/release-control/I6_6_EXACT_HOSTING_LIVE_PROMOTION_REQUEST_20261110.json';
 const request=JSON.parse(fs.readFileSync(REQUEST,'utf8'));
 const packageRoot=process.env.I66_PACKAGE_ROOT||'';
 const cli=process.env.FIREBASE_CLI_BIN||'';
@@ -87,11 +87,14 @@ function cloneToLive(version){
 function validateRequest(){
   need(request.schema==='I6_6_EXACT_HOSTING_LIVE_PROMOTION_V1'&&request.status==='LIVE_HOSTING_CLONE_APPROVED_AFTER_TARGETED_PREVIEW_QA_PASS','I66_LIVE_PROMOTION_NOT_APPROVED');
   need(request.approvedByDirection===true&&request.historicalGateClosed==='B4-007'&&request.noBackendDeploy===true&&request.noFirestoreAuthOrDataWrites===true,'I66_PROMOTION_SCOPE_INVALID');
-  need(request.qaRunId===42962064341&&request.buildRunId===42962064341&&request.artifactId===13829367381,'I66_APPROVAL_PROOFS_INVALID');
-  need(request.sourceSha==='4546970cbdeedc6296852b6f3624f7d56b8e02b6'&&request.previewChannel==='gi-i66-rc-42962064341','I66_APPROVED_SOURCE_OR_CHANNEL_DRIFT');
-  need(request.buildId==='gi-i66-4546970cbdee-57f234755dc1','I66_APPROVED_BUILD_ID_DRIFT');
-  need(request.previewUrl==='https://ays-orbit-360-lab--gi-i66-rc-42962064341-7c92qvbb.web.app','I66_PREVIEW_ORIGIN_DRIFT');
-  need(request.expectedOldSourceSha==='d810b4d20569a18e90f4387928cf8816da88aa6a'&&request.expectedOldBuildId==='gi-i66-d810b4d20569-57f234755dc1','I66_HISTORICAL_LIVE_BASE_DRIFT');
+  need(request.activeGate==='I6.6'&&Number.isSafeInteger(request.qaRunId)&&request.qaRunId>0&&request.buildRunId===request.qaRunId&&Number.isSafeInteger(request.artifactId)&&request.artifactId>0,'I66_APPROVAL_PROOFS_INVALID');
+  need(/^[0-9a-f]{40}$/.test(request.sourceSha||'')&&request.previewChannel==='gi-i66-rc-'+request.buildRunId,'I66_APPROVED_SOURCE_OR_CHANNEL_DRIFT');
+  need(request.buildId==='gi-i66-'+request.sourceSha.slice(0,12)+'-57f234755dc1','I66_APPROVED_BUILD_ID_DRIFT');
+  need(new RegExp('^https://ays-orbit-360-lab--'+request.previewChannel+'-[a-z0-9]+\\.web\\.app$').test(request.previewUrl||''),'I66_PREVIEW_ORIGIN_DRIFT');
+  need(/^[0-9a-f]{64}$/.test(request.artifactZipSha256||''),'I66_ARTIFACT_DIGEST_INVALID');
+  need(/^[0-9a-f]{40}$/.test(request.expectedOldSourceSha||'')&&request.expectedOldSourceSha!==request.sourceSha&&
+    request.expectedOldBuildId==='gi-i66-'+request.expectedOldSourceSha.slice(0,12)+'-57f234755dc1','I66_HISTORICAL_LIVE_BASE_DRIFT');
+  need(request.mustRollbackOnMismatch===true&&request.businessDataWritesAuthorized===false,'I66_ROLLBACK_AND_DATA_WRITE_GUARD_MISSING');
 }
 try{
   validateRequest();

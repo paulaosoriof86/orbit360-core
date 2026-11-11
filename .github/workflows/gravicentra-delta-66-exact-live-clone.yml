@@ -7,6 +7,7 @@ on:
     paths:
       - .github/workflows/gravicentra-delta-66-exact-live-clone.yml
       - artifacts/orbit360-recovery/release-control/I6_6_EXACT_HOSTING_LIVE_PROMOTION_REQUEST_20261110.json
+      - artifacts/orbit360-recovery/release-control/I6_6_EXACT_HOSTING_LIVE_PROMOTION_REQUEST_20261111.json
 
 permissions:
   contents: read
@@ -27,6 +28,7 @@ jobs:
       SA_LAB_ALT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
       SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
       I66_PACKAGE_ROOT: /tmp/gi-i66-promote-package
+      I66_APPROVED_RELEASE_REQUEST: artifacts/orbit360-recovery/release-control/I6_6_EXACT_HOSTING_LIVE_PROMOTION_REQUEST_20261111.json
     steps:
       - uses: actions/checkout@v4
         with:
@@ -37,6 +39,7 @@ jobs:
         with:
           node-version: '22'
       - name: Enforce explicit LIVE approval, historically sealed gate and exact success proofs
+        id: approve
         env:
           GITHUB_TOKEN: ${{ github.token }}
         run: |
@@ -44,27 +47,32 @@ jobs:
           node tools/gravicentra-i6-6-delta-guard.mjs
           node - <<'NODE'
           const fs=require('node:fs'),cp=require('node:child_process');
-          const j=JSON.parse(fs.readFileSync('artifacts/orbit360-recovery/release-control/I6_6_EXACT_HOSTING_LIVE_PROMOTION_REQUEST_20261110.json','utf8'));
+          const j=JSON.parse(fs.readFileSync(process.env.I66_APPROVED_RELEASE_REQUEST,'utf8'));
           if(j.schema!=='I6_6_EXACT_HOSTING_LIVE_PROMOTION_V1'||j.status!=='LIVE_HOSTING_CLONE_APPROVED_AFTER_TARGETED_PREVIEW_QA_PASS'||j.approvedByDirection!==true||j.noBackendDeploy!==true||j.noFirestoreAuthOrDataWrites!==true)throw Error('I66_PROMOTION_APPROVAL_INVALID');
-          if(j.qaRunId!==42962064341||j.buildRunId!==42962064341||j.artifactId!==13829367381||j.sourceSha!=='4546970cbdeedc6296852b6f3624f7d56b8e02b6')throw Error('I66_APPROVED_SOURCE_ID_DRIFT');
+          if(!/^[0-9a-f]{40}$/.test(j.sourceSha||'')||!Number.isSafeInteger(j.buildRunId)||j.buildRunId!==j.qaRunId||!Number.isSafeInteger(j.artifactId)||j.artifactId<=0||!/^[0-9a-f]{64}$/.test(j.artifactZipSha256||''))throw Error('I66_APPROVED_SOURCE_ID_INVALID');
           cp.execFileSync('git',['merge-base','--is-ancestor',j.sourceSha,'HEAD']);
           if(cp.execFileSync('git',['diff','--name-only',j.sourceSha,'HEAD','--','orbit360-platform','functions','firebase.json','firestore.rules','storage.rules'],{encoding:'utf8'}).trim())throw Error('I66_PRODUCT_CHANGED_AFTER_BUILD');
           (async()=>{
             const api='https://api.github.com/repos/paulaosoriof86/orbit360-core/actions/';
             const heads={Authorization:'Bearer '+process.env.GITHUB_TOKEN,'User-Agent':'GI-I66-Exact-Hosting-Clone','X-GitHub-Api-Version':'2022-11-28'};
-            const [qr,ar]=await Promise.all([fetch(api+'runs/'+j.qaRunId,{headers:heads}),fetch(api+'artifacts/'+j.artifactId,{headers:heads})]);
-            if(!qr.ok||!ar.ok)throw Error('I66_SUCCESS_PROOF_UNAVAILABLE');
-            const qa=await qr.json(),a=await ar.json();
-            if(qa.status!=='completed'||qa.conclusion!=='success'||a.workflow_run?.id!==j.buildRunId||
+            const supporting=[j.qaEvidence?.unitSourceQaRunId,j.qaEvidence?.authenticatedPreviewReadOnlyRunId,j.qaEvidence?.authenticatedLiveBaselineReadOnlyRunId,j.qaEvidence?.controlledComparisonRunId].filter(Number.isSafeInteger);
+            if(supporting.length!==4||j.qaEvidence?.sourceTestsPassed!==5||j.qaEvidence?.noClaimOfWholePlatformPerformancePass!==true)throw Error('I66_TARGETED_QA_EVIDENCE_INCOMPLETE');
+            const [qr,ar,...probes]=await Promise.all([fetch(api+'runs/'+j.qaRunId,{headers:heads}),fetch(api+'artifacts/'+j.artifactId,{headers:heads}),...supporting.map(id=>fetch(api+'runs/'+id,{headers:heads}))]);
+            if(!qr.ok||!ar.ok||probes.some(p=>!p.ok))throw Error('I66_SUCCESS_PROOF_UNAVAILABLE');
+            const qa=await qr.json(),a=await ar.json(),proofs=await Promise.all(probes.map(p=>p.json()));
+            if(qa.status!=='completed'||qa.conclusion!=='success'||qa.head_sha!==j.sourceSha||a.workflow_run?.id!==j.buildRunId||a.workflow_run?.head_sha!==j.sourceSha||
                a.digest!=='sha256:'+j.artifactZipSha256||a.expired===true)throw Error('I66_QA_OR_PACKAGE_SUCCESS_PROOF_DRIFT');
+            if(proofs.some(p=>p.status!=='completed'||p.conclusion!=='success'))throw Error('I66_TARGETED_QA_RUN_NOT_SUCCESS');
+            for(const p of proofs)cp.execFileSync('git',['merge-base','--is-ancestor',j.sourceSha,p.head_sha]);
+            fs.appendFileSync(process.env.GITHUB_OUTPUT,`artifact_id=${j.artifactId}\nbuild_run_id=${j.buildRunId}\n`);
             console.log('I66_PINNED_PREVIEW_QA_AND_PACKAGE_SUCCESS_PROOFS_PASS');
           })().catch(e=>{console.error(e.message);process.exitCode=1;});
           NODE
       - name: Download original immutable GitHub artifact only; no rebuild
         uses: actions/download-artifact@v4
         with:
-          artifact-ids: 13829367381
-          run-id: 42962064341
+          artifact-ids: ${{ steps.approve.outputs.artifact_id }}
+          run-id: ${{ steps.approve.outputs.build_run_id }}
           github-token: ${{ github.token }}
           path: ${{ runner.temp }}/gi-i66-artifact-download
       - name: Verify artifact TAR checksum and unpack original site manifest
