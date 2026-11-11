@@ -1,5 +1,6 @@
 'use strict';
 // I6.6 P0 Ops: real Firestore emulator, NO credentials/no production/project writes.
+// Includes protected applied-endorsement board-only hide regression; source release unchanged.
 const assert=require('node:assert/strict');
 if(!/^127\.0\.0\.1:\d+$/.test(process.env.FIRESTORE_EMULATOR_HOST||''))throw Error('I66_EMULATOR_HOST_REQUIRED');
 if(process.env.GCLOUD_PROJECT!=='demo-gravicentra-i66-ops')throw Error('I66_DEMO_PROJECT_REQUIRED');
