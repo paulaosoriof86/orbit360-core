@@ -1,0 +1,53 @@
+{
+  "schema": "GRAVICENTRA_I6_6_TENANT_PWA_BRANDING_RECEIPT_V1",
+  "gate": "I6.6",
+  "approvedBy": "Paula Andrea Osorio Franco",
+  "approvedAtLocalDate": "2026-11-10",
+  "tenantSourceAuthority": "tenants/{tenantId}/config/branding via existing read-only build-time snapshot",
+  "product": "Gravicentra Insurance",
+  "tenantExample": "alianzas-soluciones",
+  "scope": "Only manifest PWA icons and tab/touch favicons; exact source owner shared across tenants, deterministic per tenant deployment",
+  "inputLogo": "Logo Bolita V2025 sin fondo.png supplied in Gravicentra Insurance project",
+  "assetPurpose": "Pre-rendered square nontransparent 192/512 PNG safe zone, preserving original company emblem",
+  "testResult": {
+    "passed": 4,
+    "total": 4,
+    "mode": "local-node-vm-candidate",
+    "liveStatus": "NOT_DEPLOYED",
+    "previewStatus": "NOT_DEPLOYED"
+  },
+  "files": [
+    {
+      "path": "orbit360-platform/core/pwa.js",
+      "sha": "e21deea103334948545ce371f955b186b89d46be"
+    },
+    {
+      "path": "tools/gravicentra-i6-1-preview-package.mjs",
+      "sha": "0d1b4044784d8d46dfb2a3c482b933ec2d16a078"
+    },
+    {
+      "path": "tools/gravicentra-i6-6-tenant-pwa-icons.test.cjs",
+      "sha": "ad433adf6dc3a43fb9d0ed7664ebbfc1b859df0e"
+    },
+    {
+      "path": "orbit360-platform/assets/tenant/alianzas-soluciones/logo-bolita-192.png",
+      "sha": "91b0af55ab0efa575c62a1688c8a98258e7fc9db"
+    },
+    {
+      "path": "orbit360-platform/assets/tenant/alianzas-soluciones/logo-bolita-512.png",
+      "sha": "9be704c9b5388307e7832142b6363bc5a77de83c"
+    }
+  ],
+  "releaseRules": [
+    "One immutable source package; Preview and LIVE exact digest",
+    "Stable manifest URL and PWA id; version icon by tenant branding hash",
+    "Browser installed icon updates are OS-dependent; no silent update promise",
+    "No Firestore/Auth/Rules/tenant settings/customer data writes",
+    "No branch/repo/Firebase duplication"
+  ],
+  "unresolved": [
+    "Carlos signed payment UAT separate from icon",
+    "Cross-device installed-icon visual certification after release",
+    "Broad all-module navigation speed diagnostic"
+  ]
+}

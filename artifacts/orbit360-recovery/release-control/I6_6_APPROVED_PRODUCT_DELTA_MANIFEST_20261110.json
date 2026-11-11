@@ -611,6 +611,42 @@
           "gitBlobSha": "8e80bb3affe508b9cc606a22d9099ecfe94a7a11"
         }
       ]
+    },
+    {
+      "id": "I6_6_TENANT_BRANDED_PWA_ICON_FROM_CANONICAL_BRANDING_20261110",
+      "approvedByDirection": true,
+      "receipt": "artifacts/orbit360-recovery/release-control/I6_6_TENANT_PWA_BRANDING_OWNER_RECEIPT_20261110.json",
+      "sourceStatus": "SOURCE_QA_4_OF_4_PASS_PREVIEW_LIVE_PENDING",
+      "scope": "One canonical tenant branding owner from tenants/{tenantId}/config/branding at immutable build; native PWA manifest at stable URL, versioned correct 192/512 icon pixels, no user-specific overrides, no backend/Auth/Rules/data writes, no LIVE claim until exact artifact verified.",
+      "paths": [
+        {
+          "path": "orbit360-platform/core/pwa.js",
+          "gitBlobSha": "e21deea103334948545ce371f955b186b89d46be",
+          "replaces": {
+            "path": "orbit360-platform/core/pwa.js",
+            "priorGitBlobSha": "e610a243aa5b19820c08c5d709b9a76b1876004b",
+            "priorChangeId": "I6_6_BRANDED_PWA_INSTALL_ICONS_AND_INBOX_CHIME_SCOPE"
+          }
+        },
+        {
+          "path": "tools/gravicentra-i6-1-preview-package.mjs",
+          "gitBlobSha": "0d1b4044784d8d46dfb2a3c482b933ec2d16a078"
+        },
+        {
+          "path": "orbit360-platform/assets/tenant/alianzas-soluciones/logo-bolita-192.png",
+          "gitBlobSha": "91b0af55ab0efa575c62a1688c8a98258e7fc9db"
+        },
+        {
+          "path": "orbit360-platform/assets/tenant/alianzas-soluciones/logo-bolita-512.png",
+          "gitBlobSha": "9be704c9b5388307e7832142b6363bc5a77de83c"
+        }
+      ],
+      "tests": [
+        {
+          "path": "tools/gravicentra-i6-6-tenant-pwa-icons.test.cjs",
+          "gitBlobSha": "ad433adf6dc3a43fb9d0ed7664ebbfc1b859df0e"
+        }
+      ]
     }
   ]
 }

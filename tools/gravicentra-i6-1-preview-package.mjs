@@ -152,6 +152,41 @@ if(
   !String(brandingSnapshot.branding.favicon||'').trim()||
   !/^[0-9a-f]{64}$/.test(String(brandingSnapshot.hash||''))
 )throw new Error('TENANT_BRANDING_SNAPSHOT_INVALID');
+
+const configuredFavicon=String(brandingSnapshot.branding.favicon).trim().replace(/^\/+/, '');
+const tenantAssetPrefix='assets/tenant/'+TENANT_HINT+'/';
+if(!configuredFavicon.startsWith(tenantAssetPrefix) ||
+   !/^[a-z0-9_.-]+\.png$/i.test(configuredFavicon.slice(tenantAssetPrefix.length)) ||
+   configuredFavicon.slice(tenantAssetPrefix.length).startsWith('.'))
+  throw new Error('TENANT_PWA_FAVICON_PATH_NOT_REGISTERED');
+const installIconPrefix=configuredFavicon.replace(/-\d+\.png$/i,'').replace(/\.png$/i,'');
+const installIconPaths=[192,512].map(size=>({size,relative:installIconPrefix+'-'+size+'.png'}));
+function verifyTenantPngIcon(icon){
+  const file=path.join(SITE,icon.relative);
+  if(!fs.existsSync(file)||fs.lstatSync(file).isSymbolicLink()||!fs.statSync(file).isFile())throw new Error('TENANT_PWA_ICON_MISSING:'+icon.size);
+  const raw=fs.readFileSync(file);
+  if(raw.length<33||!raw.subarray(0,8).equals(Buffer.from([137,80,78,71,13,10,26,10]))||raw.toString('ascii',12,16)!=='IHDR'||
+     raw.readUInt32BE(16)!==icon.size||raw.readUInt32BE(20)!==icon.size)
+    throw new Error('TENANT_PWA_ICON_SIZE_OR_FORMAT_INVALID:'+icon.size);
+  return crypto.createHash('sha256').update(raw).digest('hex');
+}
+const installedIconProof=installIconPaths.map(icon=>({size:icon.size,relative:icon.relative,sha256:verifyTenantPngIcon(icon)}));
+const installedManifestPath=path.join(SITE,'manifest.webmanifest');
+const installedManifest=JSON.parse(read(installedManifestPath));
+if(installedManifest.id!=='/'||installedManifest.scope!=='/'||installedManifest.start_url!=='/')
+  throw new Error('TENANT_PWA_APP_ID_SCOPE_DRIFT');
+installedManifest.name='Gravicentra Insurance · '+String(brandingSnapshot.branding.displayName).trim();
+installedManifest.icons=installIconPaths.map(icon=>({
+  src:'/'+icon.relative+'?brand='+brandingSnapshot.hash.slice(0,12),
+  sizes:icon.size+'x'+icon.size,
+  type:'image/png',
+  purpose:'any maskable'
+}));
+fs.writeFileSync(installedManifestPath,JSON.stringify(installedManifest,null,2)+'\n');
+fs.writeFileSync(path.join(EVIDENCE,'tenant-pwa-icon-descriptor.json'),JSON.stringify({
+  tenantId:TENANT_HINT,brandingHash:brandingSnapshot.hash,manifestPath:'/manifest.webmanifest',
+  stablePwaId:'/',icons:installedIconProof
+},null,2)+'\n');
 const generatedBranding={
   schemaVersion:'gravicentra-tenant-branding-build-snapshot-v1',
   tenantId:TENANT_HINT,
@@ -174,6 +209,11 @@ artifactIndex=artifactIndex.replace(
   brandingScript,
   '<script src="data/tenant-public-branding-snapshot.generated.js"></script>\n$&'
 );
+const iconLink=/(<link rel="icon"[^>]*href=")[^"]+("[^>]*>)/i;
+const appleIconLink=/(<link rel="apple-touch-icon"[^>]*href=")[^"]+("[^>]*>)/i;
+if(!iconLink.test(artifactIndex)||!appleIconLink.test(artifactIndex))throw new Error('TENANT_PWA_HTML_ICONS_MISSING');
+artifactIndex=artifactIndex.replace(iconLink,(_,a,b)=>a+'/'+configuredFavicon+'?brand='+brandingSnapshot.hash.slice(0,12)+b)
+  .replace(appleIconLink,(_,a,b)=>a+'/'+installIconPaths[0].relative+'?brand='+brandingSnapshot.hash.slice(0,12)+b);
 fs.writeFileSync(path.join(SITE,'index.html'),artifactIndex);
 fs.writeFileSync(
   path.join(EVIDENCE,'tenant-branding-snapshot-descriptor.json'),
