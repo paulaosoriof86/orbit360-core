@@ -177,6 +177,14 @@ Orbit.access = (function () {
   }
   function roleWidePortfolioScope(moduleKey) {
     var role = activeRole(), scopes = accessConfig().roleScopes || {};
+    // The insurer directory is a tenant-owned resource, not an advisor's
+    // portfolio. Its protected reader and server writer already authorize
+    // qualified roles by signed country and module rights, without requiring
+    // an asesorId on the insurer. Mirror that rule before a durable write;
+    // never inherit an Asesor-own default when Operativo is the active role.
+    if (moduleKey === 'aseguradoras' &&
+        ['Operativo', 'Admin', 'AdminTenant', 'SuperAdmin', 'Dirección'].indexOf(role) >= 0)
+      return roleScopeCeiling(moduleKey) === 'all';
     return (role === 'Operativo' || role === 'AdminTenant') &&
       (moduleKey === 'polizas' || moduleKey === 'cliente360' || moduleKey === 'cobros') &&
       normalizeScope(scopes[role]) === 'all';

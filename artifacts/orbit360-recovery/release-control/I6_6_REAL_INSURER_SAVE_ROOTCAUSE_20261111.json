@@ -1,0 +1,32 @@
+{
+  "schema": "GRAVICENTRA_I66_INSURER_SAVE_CAUSAL_RECEIPT_V1",
+  "date": "2026-11-11",
+  "gate": "I6.6",
+  "parentGate": "B4-007_CLOSED_HISTORICAL",
+  "sourceBranch": "recovery/fase-a-clean-20260831",
+  "userEvidence": "2026-11-11 Carlos Operativo screenshot: real GT insurer edit panel shows generic unable to save; operational form preserved.",
+  "readonlyLiveWorkflowRunId": 43081626422,
+  "readonlyLiveReadback": {
+    "insurerFound": true,
+    "insurerCountryGT": true,
+    "insurerHasAdvisor": false,
+    "carlosSignedMembershipMatches": 1,
+    "carlosRoles": ["operativo", "asesor"],
+    "carlosActiveRole": "operativo",
+    "carlosAllowedCountries": ["GT", "CO"],
+    "carlosDefaultDataScope": "propios",
+    "carlosInsurerModuleScope": "",
+    "operativeInsurerEditMatrix": "allow",
+    "operativeInsurerViewMatrix": "allow",
+    "operativeRoleScope": "all",
+    "businessDataWritten": 0
+  },
+  "rootCause": "Client store operational save calls Orbit.access.canAccessRecord('aseguradoras') which incorrectly inherits advisor own scope from signed mixed Operativo/Asesor profile. Tenant-wide insurer without asesorId is denied before server writer. Server insurer writer and protected reader correctly use signed role/module/country without advisor requirement.",
+  "minimalFix": "In access-scope.js authorize insurer directory dataScope='all' for active allowed broad-directory role only when role ceiling is all; preserve explicit none, signed country, module matrix and restrictions; do not modify live data, backend, Rules, roles or Asesor scope.",
+  "regressionTest": "tools/gravicentra-i6-6-insurer-operativo-signed-scope.test.cjs",
+  "localRegressionCases": 13,
+  "localRegressionStatus": "PASS",
+  "previewStatus": "PENDING",
+  "liveStatus": "PENDING",
+  "liveWriteCertification": "NOT_YET_CLAIMED"
+}

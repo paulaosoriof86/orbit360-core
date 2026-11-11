@@ -692,6 +692,35 @@
           "gitBlobSha": "d39ea05396c2fc74dd8f60f1fea5482d1540b32c"
         }
       ]
+    },
+    {
+      "id": "I6_6_REAL_INSURER_OPERATIVO_SAVE_ROLE_COUNTRY_SCOPE_P0",
+      "approvedByDirection": true,
+      "receipt": "artifacts/orbit360-recovery/release-control/I6_6_REAL_INSURER_SAVE_ROOTCAUSE_20261111.json",
+      "sourceStatus": "LOCAL_SOURCE_FIX_AND_SIGNED_SCOPE_REGRESSION_TEST_13_PASS_PREVIEW_AND_LIVE_PENDING",
+      "capabilityOwners": [
+        "ASEGURADORAS_PRIMARY_RUNTIME",
+        "ROLE_SCOPE_RUNTIME",
+        "TENANT_DOMAIN_CONFIG_CLIENT"
+      ],
+      "scope": "Align active Operativo/Admin/AdminTenant/SuperAdmin/Dirección insurer directory edit preflight with signed role matrix, country and backend insurer writer; default propios does not require an advisor on a tenant directory. Preserve explicit none, roleScope ceilings, restricted modules, Asesor limitations, and backend. No insurer data, auth, Rules, or other backend write.",
+      "paths": [
+        {
+          "path": "orbit360-platform/core/access-scope.js",
+          "gitBlobSha": "207b8c59be6d72f732e6549f06bba6ad04c0a103",
+          "replaces": {
+            "path": "orbit360-platform/core/access-scope.js",
+            "priorGitBlobSha": "1e8204b8835b76ee6a07554452d25561bd88a3c9",
+            "priorChangeId": "I6_6_CROSS_MODULE_AUTHORIZED_READ_BULK_CLONE_PERFORMANCE_P0"
+          }
+        }
+      ],
+      "tests": [
+        {
+          "path": "tools/gravicentra-i6-6-insurer-operativo-signed-scope.test.cjs",
+          "gitBlobSha": "3c7051f61fe5813aea1beaaec0d8dbbe5b44138e"
+        }
+      ]
     }
   ]
 }
