@@ -1,8 +1,7 @@
 # I6.6: one canonical LIVE performance discriminator. No product or data mutation.
 # The tested LIVE build is SHA-pinned; cold auth and UI render are timed separately.
-# 2026-11-11: refresh CURRENT old-LIVE baseline for the exact 81b0a5b4 Preview
-# before any Hosting promotion. This workflow intentionally stays pinned to
-# the previously certified LIVE abb0ea3f; it performs no user data writes.
+# 2026-11-11: refresh CURRENT LIVE baseline 81b0a5b4 against the later
+# immutable 1833a08efb94 Preview. Hosting-only comparison, no business writes.
 name: Gravicentra I6.6 LIVE Performance READ ONLY
 on:
   push:
@@ -57,10 +56,10 @@ jobs:
           curl -fsSL --max-time 25 https://app.aysseguros.com/__recovery__/build.json > "$RUNNER_TEMP/gi-i66-live-build.json"
           node - <<'NODE'
           const b=require(process.env.RUNNER_TEMP+'/gi-i66-live-build.json');
-          if(b.buildId!=='gi-i66-abb0ea3f4dc0-57f234755dc1'||
-             b.sourceSha!=='abb0ea3f4dc0bfd221cb891258e7be81ddc65fd2')
+          if(b.buildId!=='gi-i66-81b0a5b430ba-57f234755dc1'||
+             b.sourceSha!=='81b0a5b430ba496471bf255462c8910ae2e4f671')
             throw Error('I66_PERF_LIVE_BUILD_CHANGED_HOLD');
-          console.log('I66_PERF_PINNED_LIVE_ABB0EA3F_BUILD_PASS');
+          console.log('I66_PERF_PINNED_LIVE_81B0A5B4_BUILD_PASS');
           NODE
       - name: Select existing exact Firebase account, never log credentials
         run: |

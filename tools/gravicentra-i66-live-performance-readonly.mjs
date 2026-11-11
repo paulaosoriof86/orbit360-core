@@ -235,8 +235,36 @@ async function run(){
       if(withCpuProfile){const prof=await cdp.send('Profiler.stop');report.cpuProfiles[route]=profileTop(prof.profile);}
       report.routes.push(measurement);
     }
-    // Search the GLOBAL topbar, not a module's local filter. Observe the
-    // browser's real event-loop delay and visible dropdown without touching data.
+    // Search the GLOBAL topbar, not a module's local filter. Profile precisely
+    // which already-authorized snapshot/projection consumes the FIRST keypress;
+    // aggregate only collection names and durations, never client data.
+    await page.evaluate(()=>{
+      const metrics=window.__GI_I66_TOPBAR_TIMING__={collections:{},projection:{calls:0,totalMs:0,maxMs:0}};
+      const access=Orbit.access,originalScoped=access?.scopedStore;
+      if(typeof originalScoped==='function')access.scopedStore=function(...args){
+        const scoped=originalScoped.apply(this,args),originalAll=scoped?.all;
+        if(typeof originalAll==='function')scoped.all=function(name,...rest){
+          const start=performance.now();
+          try{return originalAll.call(this,name,...rest);}finally{
+            const allowed=['clientes','polizas','vehiculos','cobros','aseguradoras'];
+            const key=allowed.includes(name)?name:'other';
+            const item=metrics.collections[key]||(metrics.collections[key]={calls:0,totalMs:0,maxMs:0});
+            const ms=performance.now()-start;item.calls++;item.totalMs=Math.round((item.totalMs+ms)*10)/10;
+            item.maxMs=Math.max(item.maxMs,Math.round(ms*10)/10);
+          }
+        };
+        return scoped;
+      };
+      const projection=Orbit.clientProjection,originalProject=projection?.project;
+      if(typeof originalProject==='function')projection.project=function(...args){
+        const start=performance.now();try{return originalProject.apply(this,args);}finally{
+          const ms=performance.now()-start,item=metrics.projection;
+          item.calls++;item.totalMs=Math.round((item.totalMs+ms)*10)/10;
+          item.maxMs=Math.max(item.maxMs,Math.round(ms*10)/10);
+        }
+      };
+    });
+    await cdp.send('Profiler.start');
     report.globalTopbarSearch=await page.evaluate(async()=>{
       const input=document.querySelector('.tb-search input'),dd=document.getElementById('tb-search-dd');
       if(!input||!dd)return {ready:false,reason:'TOPBAR_INPUT_MISSING'};
@@ -260,6 +288,12 @@ async function run(){
       return {ready:first.ready&&second.ready&&first.resultCount>0&&second.resultCount===first.resultCount,
         first,second,createdFinancialWrites:0};
     });
+    report.cpuProfiles.globalTopbarSearch=profileTop((await cdp.send('Profiler.stop')).profile);
+    report.globalTopbarTiming=await page.evaluate(()=>({
+      ...(window.__GI_I66_TOPBAR_TIMING__||{}),
+      storeReads:Object.fromEntries(Object.entries(window.__GI_I66_STORE_READ_STATS__||{})
+        .map(([name,r])=>[name,{...r}]))
+    }));
     need(report.globalTopbarSearch.ready,'I66_TOPBAR_LIVE_BROWSER_RESULT_HOLD');
     need(report.globalTopbarSearch.first.timeMs<7000&&report.globalTopbarSearch.second.timeMs<2200,
       'I66_TOPBAR_REAL_SEARCH_LATENCY_HOLD');
