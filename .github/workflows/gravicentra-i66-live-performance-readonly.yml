@@ -54,10 +54,10 @@ jobs:
           curl -fsSL --max-time 25 https://app.aysseguros.com/__recovery__/build.json > "$RUNNER_TEMP/gi-i66-live-build.json"
           node - <<'NODE'
           const b=require(process.env.RUNNER_TEMP+'/gi-i66-live-build.json');
-          if(b.buildId!=='gi-i66-7c66f8d31f87-57f234755dc1'||
-             b.sourceSha!=='7c66f8d31f87d13c97dca726f77847712605c173')
+          if(b.buildId!=='gi-i66-6006d7843bf8-57f234755dc1'||
+             b.sourceSha!=='6006d7843bf8eef5904a930b7346a1b00c114445')
             throw Error('I66_PERF_LIVE_BUILD_CHANGED_HOLD');
-          console.log('I66_PERF_PINNED_LIVE_7C66F8D3_BUILD_PASS');
+          console.log('I66_PERF_PINNED_LIVE_6006D784_BUILD_PASS');
           NODE
       - name: Select existing exact Firebase account, never log credentials
         run: |
