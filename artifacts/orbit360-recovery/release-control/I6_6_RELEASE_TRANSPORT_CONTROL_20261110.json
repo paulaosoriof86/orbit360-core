@@ -4,11 +4,11 @@
   "productBrand": "Gravicentra Insurance",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
-  "status": "PAYMENT_LIVE_BACKEND_DEPLOYED_AUTHENTICATED_UAT_PENDING",
-  "scope": "PAYMENT_BACKEND_ONLY_PROTECTED_FUNCTION_HOTFIX_NO_HOSTING_NO_DATA_WRITES",
+  "status": "PREVIEW_BUILD_REQUESTED",
+  "scope": "CANONICAL_TENANT_PWA_BRANDING_ICON_HOSTING_PREVIEW_ONLY_NO_BACKEND_DATA_WRITES",
   "historicalClosedGate": "B4-007",
   "approvedProductDeltaManifest": "artifacts/orbit360-recovery/release-control/I6_6_APPROVED_PRODUCT_DELTA_MANIFEST_20261110.json",
-  "ownerAuthority": "Paula Osorio Dirección: solicitudes explícitas 2026-11-10 de corrección urgente y publicación de pagos en LIVE, con garantía transversal y rollback; QA emulator 108/108, guard, immutable Preview y función Preview readback PASS. Promover ÚNICAMENTE función pago, conservar Hosting, Firestore/Auth/Rules/datos.",
+  "ownerAuthority": "Paula Osorio Dirección: solicitudes explícitas 2026-11-10 de corrección urgente y publicación de pagos en LIVE, con garantía transversal y rollback; QA emulator 108/108, guard, immutable Preview y función Preview readback PASS. Promover ÚNICAMENTE función pago, conservar Hosting, Firestore/Auth/Rules/datos. Dirección: 10/11/2026 solicitó ícono PWA de Alianzas y pruebas con Carlos; salida LIVE únicamente tras Preview/QA del mismo artifact.",
   "livePromotionAuthorized": false,
   "previewApproved": true,
   "approvedSourceSha": "2e6bdd4a43ad82eb3d212ff67adcb8fa96ec4b9b",
@@ -39,12 +39,12 @@
   "liveAccessGuard": "UNAUTHENTICATED_401_PASS",
   "hostingOriginsUntouched": true,
   "liveCustomerDataWrites": 0,
-  "releaseStatus": "BACKEND_FUNCTION_ACTIVE; AUTHENTICATED_CARLOS_PAYMENT_UAT_HOLD; BULK_INFERENCE_HOLD; GREENAPI_REAL_SEND_HOLD",
+  "releaseStatus": "BACKEND_PAYMENT_FUNCTION_ACTIVE_UNCHANGED; CARLOS_AUTHENTICATED_UAT_IN_PROGRESS; BAYRON_FIRST_PAYMENT_CONFIRMED_SECOND_UNPAID_APPLICATION_FIELDS_INCOMPLETE; BRANDING_ICON_PREVIEW_BUILD_REQUESTED; HOSTING_LIVE_NOT_AUTHORIZED; BULK_INFERENCE_HOLD; GREENAPI_SEND_HOLD",
   "requiredNextChecks": [
-    "Connected Chrome Carlos Operativo session: own permitted country and cross-country denials",
-    "One controlled documented valid payment in live via approved UI and reload readback",
-    "Advisor report -> Ops validation -> paid receipt -> portfolio linkage",
-    "High confidence inferred payment batch with no duplicate request and expected receipts/car​tera preflight",
-    "WhatsApp groups Operaciones, Pagos, Asesor real delivery and info@aysseguros.com verified separately"
+    "Build canonical tenant PWA icon package + strict diff readback in isolated Preview",
+    "Chrome Carlos Operativo mobile+desktop visual and base module QA including real icon URLs",
+    "Exact same certified artifact promotion to two authorized LIVE hosts after gate, do not touch backend",
+    "Bayron payment application supporting document verification; Maria Gabriela; cartera inferential batches",
+    "GreenAPI Operaciones/Pagos/Asesor destination delivery QA, independently"
   ]
 }
