@@ -173,10 +173,10 @@ jobs:
             const brandCtx={window:{}};vm.runInNewContext(snapCode,brandCtx,{timeout:1000});
             const brand=brandCtx.window.__ORBIT360_TENANT_BRANDING_SNAPSHOT__;
             if(!brand||brand.tenantId!==process.env.TENANT_HINT||!/^[0-9a-f]{64}$/.test(brand.hash||''))throw Error('I66_TENANT_SNAPSHOT_INVALID');
-            const favicon=String(brand.branding&&brand.branding.favicon||'').replace(/^\\/+/, '');
+            const favicon=String(brand.branding&&brand.branding.favicon||'').replace(/^\/+/, '');
             const tenantPrefix='assets/tenant/'+brand.tenantId+'/';
-            if(!favicon.startsWith(tenantPrefix)||!/^[a-z0-9_.-]+\\.png$/i.test(favicon.slice(tenantPrefix.length)))throw Error('I66_TENANT_FAVICON_SCOPE_INVALID');
-            const icon192=favicon.replace(/-\\d+\\.png$/i,'').replace(/\\.png$/i,'')+'-192.png';
+            if(!favicon.startsWith(tenantPrefix)||!/^[a-z0-9_.-]+\.png$/i.test(favicon.slice(tenantPrefix.length)))throw Error('I66_TENANT_FAVICON_SCOPE_INVALID');
+            const icon192=favicon.replace(/-\d+\.png$/i,'').replace(/\.png$/i,'')+'-192.png';
             const iconStamp='?brand='+brand.hash.slice(0,12);
             const faviconTag=/(<link rel="icon"[^>]*href=")[^"]+("[^>]*>)/i;
             const appleTag=/(<link rel="apple-touch-icon"[^>]*href=")[^"]+("[^>]*>)/i;
@@ -226,7 +226,7 @@ jobs:
           const builtManifest=JSON.parse(fs.readFileSync(base+'/site/manifest.webmanifest','utf8'));
           const brandCtx={window:{}};vm.runInNewContext(fs.readFileSync(base+'/site/data/tenant-public-branding-snapshot.generated.js','utf8'),brandCtx,{timeout:1000});
           const brand=brandCtx.window.__ORBIT360_TENANT_BRANDING_SNAPSHOT__;
-          const iconPrefix=String(brand.branding.favicon).replace(/^\\/+/, '').replace(/-\\d+\\.png$/i,'').replace(/\\.png$/i,'');
+          const iconPrefix=String(brand.branding.favicon).replace(/^\/+/, '').replace(/-\d+\.png$/i,'').replace(/\.png$/i,'');
           if(brand.tenantId!==process.env.TENANT_HINT||staticManifest.id!=='/'||staticManifest.scope!=='/'||staticManifest.start_url!=='/')throw Error('I66_TENANT_PWA_STABLE_ID_DRIFT');
           staticManifest.name='Gravicentra Insurance · '+String(brand.branding.displayName).trim();
           staticManifest.icons=[192,512].map(size=>({src:'/'+iconPrefix+'-'+size+'.png?brand='+brand.hash.slice(0,12),sizes:size+'x'+size,type:'image/png',purpose:'any maskable'}));
