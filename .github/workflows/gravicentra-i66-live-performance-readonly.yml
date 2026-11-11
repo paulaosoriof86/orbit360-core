@@ -1,7 +1,7 @@
 # I6.6: one canonical LIVE performance discriminator. No product or data mutation.
 # The tested LIVE build is SHA-pinned; cold auth and UI render are timed separately.
-# 2026-11-11: refresh CURRENT LIVE baseline 81b0a5b4 against the later
-# immutable 1833a08efb94 Preview. Hosting-only comparison, no business writes.
+# 2026-11-11: POST-PROMOTION LIVE retest of EXACT d4e9bc7b9ab0,
+# after immutable same-artifact clone 43120966489. No business writes.
 name: Gravicentra I6.6 LIVE Performance READ ONLY
 on:
   push:
@@ -56,10 +56,10 @@ jobs:
           curl -fsSL --max-time 25 https://app.aysseguros.com/__recovery__/build.json > "$RUNNER_TEMP/gi-i66-live-build.json"
           node - <<'NODE'
           const b=require(process.env.RUNNER_TEMP+'/gi-i66-live-build.json');
-          if(b.buildId!=='gi-i66-81b0a5b430ba-57f234755dc1'||
-             b.sourceSha!=='81b0a5b430ba496471bf255462c8910ae2e4f671')
+          if(b.buildId!=='gi-i66-d4e9bc7b9ab0-57f234755dc1'||
+             b.sourceSha!=='d4e9bc7b9ab01664dcdf0771798a6af2d40ff7af')
             throw Error('I66_PERF_LIVE_BUILD_CHANGED_HOLD');
-          console.log('I66_PERF_PINNED_LIVE_81B0A5B4_BUILD_PASS');
+          console.log('I66_PERF_PINNED_LIVE_D4E9BC7B_BUILD_PASS');
           NODE
       - name: Select existing exact Firebase account, never log credentials
         run: |
@@ -90,6 +90,22 @@ jobs:
         run: |
           set -euo pipefail
           node tools/gravicentra-i66-live-performance-readonly.mjs
+      - name: Certify LIVE topbar cold first-search latency independently
+        run: |
+          set -euo pipefail
+          node - <<'NODE'
+          const x=require(process.env.RUNNER_TEMP+'/gi-i66-live-perf-summary.json');
+          const s=x.globalTopbarSearch||{},t=x.globalTopbarTiming||{};
+          if(x.status!=='LIVE_READONLY_MEASURED'||x.origin!=='https://app.aysseguros.com'||
+             x.auth?.activation?.role!=='Operativo'||x.auth?.pageErrors!==0||
+             x.firestoreWrites!==0||x.paymentActions!==0||
+             !s.ready||!s.first?.resultCount||s.first.timeMs>=2200||
+             s.second?.timeMs>=1000||s.second.resultCount!==s.first.resultCount||
+             t.projection?.calls!==0)
+            throw Error('I66_LIVE_GLOBAL_TOPBAR_POST_DEPLOY_QA_HOLD');
+          console.log('I66_LIVE_GLOBAL_TOPBAR_2P2S_0_REPROJECTIONS_CARLOS_OPERATIVO_PASS');
+          console.log('I66_LIVE_FOUR_HUNDRED_PLUS_CLIENTS_AUTHORIZED_READ_ONLY_BROWSER_PASS');
+          NODE
       - name: Preserve aggregate evidence for I6.6 (no IDs, tokens or amounts)
         if: always()
         uses: actions/upload-artifact@v4
