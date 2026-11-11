@@ -119,15 +119,18 @@ async function run() {
   admin.initializeApp({ credential: admin.credential.cert(cred), projectId: PROJECT_ID });
   const db = admin.firestore();
   const tenantDoc = db.collection('tenants').doc(TENANT_ID);
-  const tenantSnap = await tenantDoc.get();
-  assert(tenantSnap.exists, 'CANONICAL_TENANT_NOT_FOUND_LIVE');
+  // Firestore permits a document with subcollections but no materialized
+  // parent document; do NOT infer tenant absence from tenants/{id}.exists.
+  // Only trust concrete reads under this exact source-bound tenant.
   const root = tenantDoc;
   const matches = [];
-  const [advisorSnap, memberSnap] = await Promise.all([
+  const [advisorSnap, memberSnap, accessSnap] = await Promise.all([
     root.collection('data').doc('asesores').collection('items').limit(MAX_ADVISORS).get(),
-    root.collection('members').limit(MAX_MEMBERS).get()
+    root.collection('members').limit(MAX_MEMBERS).get(),
+    root.collection('config').doc('access').get()
   ]);
   assert(advisorSnap.size < MAX_ADVISORS && memberSnap.size < MAX_MEMBERS, 'STAFF_LIST_OUT_OF_SAFE_BOUND');
+  assert(!memberSnap.empty || accessSnap.exists, 'CANONICAL_TENANT_SUBCOLLECTIONS_EMPTY');
   const advisors = advisorSnap.docs.filter(doc => isCarlos(doc.data()));
   const advisorIds = new Set(advisors.map(doc => doc.id));
   const linkedUids = new Set(advisors.flatMap(doc => [doc.data().authUid, doc.data().uid, doc.data().userId]).filter(Boolean).map(String));
@@ -151,7 +154,6 @@ async function run() {
   if (matches.length === 1) {
     const found = matches[0];
     const root = db.collection('tenants').doc(found.tenantId);
-    const accessSnap = await root.collection('config').doc('access').get();
     const access = accessSnap.exists ? accessSnap.data() || {} : {};
     report.member = {
       tenantId:found.tenantId, uid:found.uid, uidDigest:maskUid(found.uid),
@@ -209,7 +211,7 @@ async function run() {
 run().catch(error => {
   // Never log SDK error objects/messages; they can embed a live document path.
   const known = new Set(['PROJECT_MISMATCH','SOURCE_BLOB_DRIFT','AUTH_TYPE_INVALID',
-    'AUTH_PROJECT_MISMATCH','TENANT_MISMATCH','CANONICAL_TENANT_NOT_FOUND_LIVE',
+    'AUTH_PROJECT_MISMATCH','TENANT_MISMATCH','CANONICAL_TENANT_SUBCOLLECTIONS_EMPTY',
     'STAFF_LIST_OUT_OF_SAFE_BOUND','ACTOR_EVENTS_OUT_OF_SAFE_BOUND']);
   const code = known.has(String(error.message)) ? error.message :
     /^[A-Z0-9_-]{1,50}$/.test(String(error.code || '')) ? String(error.code) : 'PRIVATE_FIRESTORE_READ_FAILED';

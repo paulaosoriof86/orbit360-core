@@ -29,7 +29,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Verify exact I6.6 source and one canonical tenant read-only diagnostic v3
+      - name: Verify exact I6.6 source and one canonical tenant subcollection diagnostic v4
         run: |
           set -euo pipefail
           test "$(git hash-object functions/product-operational-domain.js)" = "$GI_CARLOS_PRODUCT_SOURCE_BLOB"
