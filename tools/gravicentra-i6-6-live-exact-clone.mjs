@@ -85,13 +85,13 @@ function cloneToLive(version){
     {encoding:'utf8',stdio:['ignore','pipe','pipe'],timeout:180000,env:process.env});
 }
 function validateRequest(){
-  need(request.schema==='I6_6_EXACT_HOSTING_LIVE_PROMOTION_V1'&&request.status==='LIVE_HOSTING_CLONE_APPROVED_AFTER_AUTH_QA_PASS','I66_LIVE_PROMOTION_NOT_APPROVED');
+  need(request.schema==='I6_6_EXACT_HOSTING_LIVE_PROMOTION_V1'&&request.status==='LIVE_HOSTING_CLONE_APPROVED_AFTER_TARGETED_PREVIEW_QA_PASS','I66_LIVE_PROMOTION_NOT_APPROVED');
   need(request.approvedByDirection===true&&request.historicalGateClosed==='B4-007'&&request.noBackendDeploy===true&&request.noFirestoreAuthOrDataWrites===true,'I66_PROMOTION_SCOPE_INVALID');
-  need(request.qaRunId===42861298905&&request.buildRunId===42859356672&&request.artifactId===13785280178,'I66_APPROVAL_PROOFS_INVALID');
-  need(request.sourceSha==='0919914071fb40d4451861b50322fdd04a2bad2b'&&request.previewChannel==='gi-i66-rc-42859356672','I66_APPROVED_SOURCE_OR_CHANNEL_DRIFT');
-  need(request.buildId==='gi-i66-0919914071fb-57f234755dc1','I66_APPROVED_BUILD_ID_DRIFT');
-  need(request.previewUrl==='https://ays-orbit-360-lab--gi-i66-rc-42859356672-irla5ypi.web.app','I66_PREVIEW_ORIGIN_DRIFT');
-  need(request.expectedOldSourceSha==='45020d748dd5fa4328a96f99fe9919a6fcb207eb'&&request.expectedOldBuildId==='gi-i65-b4-45020d748dd5-57f234755dc1','I66_HISTORICAL_LIVE_BASE_DRIFT');
+  need(request.qaRunId===42962064341&&request.buildRunId===42962064341&&request.artifactId===13829367381,'I66_APPROVAL_PROOFS_INVALID');
+  need(request.sourceSha==='4546970cbdeedc6296852b6f3624f7d56b8e02b6'&&request.previewChannel==='gi-i66-rc-42962064341','I66_APPROVED_SOURCE_OR_CHANNEL_DRIFT');
+  need(request.buildId==='gi-i66-4546970cbdee-57f234755dc1','I66_APPROVED_BUILD_ID_DRIFT');
+  need(request.previewUrl==='https://ays-orbit-360-lab--gi-i66-rc-42962064341-7c92qvbb.web.app','I66_PREVIEW_ORIGIN_DRIFT');
+  need(request.expectedOldSourceSha==='d810b4d20569a18e90f4387928cf8816da88aa6a'&&request.expectedOldBuildId==='gi-i66-d810b4d20569-57f234755dc1','I66_HISTORICAL_LIVE_BASE_DRIFT');
 }
 try{
   validateRequest();
