@@ -1,4 +1,4 @@
-# I6.6 APPROVAL REISSUE after branch head 4444c0de0fcb65b44074c56988e775829d1f0d47; financial logic unchanged.
+# I6.6 REISSUE after 42923575099 test harness MODULE_NOT_FOUND; ONLY test import path corrected; finance source unchanged.
 # First payment ALREADY posted through Paula signed LIVE session. This
 # workflow only reconciles its insurer commission evidence and receipt number;
 # it never creates another payment or modifies the second installment.

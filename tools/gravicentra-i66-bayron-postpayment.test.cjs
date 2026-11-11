@@ -3,7 +3,7 @@ const test=require('node:test');
 const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const path=require('node:path');
-const script=process.env.GI_I66_BAYRON_POSTPAYMENT_SOURCE||path.join(__dirname,'gravicentra-i66-bayron-postpayment.NOT_APPLIED.cjs');
+const script=process.env.GI_I66_BAYRON_POSTPAYMENT_SOURCE||path.join(__dirname,'gravicentra-i66-bayron-postpayment.cjs');
 const {K,review,financeSnapshot,immutableSnapshot,commissionPatches,digest,verifyReviewGate,safeError}=require(script);
 
 function facts(){
