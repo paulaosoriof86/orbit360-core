@@ -8417,5 +8417,280 @@
       "noDataReimport": true,
       "oneCanonicalBranchAndCandidate": true
     }
+  },
+  "i66NextCarteraCashReconciliationBatches20261111": {
+    "id": "GI_I66_CARTERA_COBROS_A1_A7_SOURCE_RECONCILIATION_QUEUE_20261111",
+    "dateGuatemala": "2026-11-11",
+    "historicalGate": "B4-007 CLOSED",
+    "currentGate": "I6.6",
+    "status": "FROZEN_NEXT_BATCH_QUEUE_SOURCE_ONLY_NO_LIVE_DIFF_NO_DATA_WRITES",
+    "ownerDecision": "Keep one canonical recovery branch+ledger; new business entered in LIVE from 2026-11-10 always prevails; no historical reload, duplicate client/policy/receipt/payment, or cross-tenant write; publish tested source fix to LIVE by same immutable artifact when authorized.",
+    "scope": "Source-to-source payable/paid classification, next work queue A1-A7 only; excludes Bayron first success, Bayron second with unknown paid date, and María/Universales protected sparse CAS already completed.",
+    "sourcePrimaryHashes": {
+      "mapfrePaidNov": "7e5fd1f37e1da2c25cd2616b93380629fe58c44493c30f289cad06fd09370c43",
+      "mapfrePendingNov": "29a42705ae6f7b2b42693f51a27a0b1f4ced279e2259b28ce021ff7b21ccefb0",
+      "mapfreHistoricalNov02": "9bd35651e29af40e63daf8ac456a24cec607960698d93ec547cbcce66231c462",
+      "bantrabNov04": "b945a98c7c572909c643be4c849a7526a363eb490cdcf24ac8d0ae54ca3025b7",
+      "laCeibaNov09": "0396615a394859ce39a0694567747e4dec3cc0e34a415222d5cf4d009cda5ac0",
+      "generalPendingNov09": "9f9f4e101c7e9edfb1a3a46ce1d0722156895e22bacf23440975f295fa338e2f",
+      "generalPaidOct01to26": "3032a7cfc0cc0e21ef70480d234c41496b9eb14119e925fabd23c5e9f3725db9",
+      "columnaNov09": "d17c933ed9c8624f59da6df8ac2f8cdb5974055c754a55029d9bada6c3d2603f",
+      "ficohsaOct22": "0246c29d7982e548011add8af150f2c657eed42b0bac9f9b58abeb4d5ea46f23",
+      "robleOct23": "ea39f55c1d91ff53a1db62a707aceb7ac6c444a5559a6453ec8850cdb366f6bc"
+    },
+    "cutAndPeriodDiscipline": "Mapfre paid source Nov01-08; pending report is projection through Nov30, not proof of current paid status. Bantrab statement 2026-11-04; La Ceiba as-of 2026-11-09; General paid 2026-10-01..26 vs pending 2026-11-09; Columna as-of Nov09, intermediary 346 only; Ficohsa collected actual 2026-10-02 though source section says September; Roble as-of Oct23. Derived overdue/future categories are recalculated as-of 2026-11-11 America/Guatemala from source due dates and must be superseded by later authentic paid evidence.",
+    "batches": [
+      {
+        "id": "A1",
+        "priority": "P0",
+        "insurer": "MAPFRE",
+        "operation": "Reconcile collected requirements Nov01-08; read current LIVE policy+receipt+cobro first and apply only missing confirmed paid once",
+        "sourceEvidence": {
+          "uniquePayments": 3,
+          "grossGTQ": 3004.55,
+          "sourceRows": 4,
+          "duplicateSourceRows": 1,
+          "items": [
+            {
+              "policy": "SCIN-4394",
+              "client": "PRISCILA ARELI LOPEZ DE LEON",
+              "sequence": "3/7",
+              "requirement": "139187477",
+              "invoice": "3528738277",
+              "paidDate": "2026-11-04",
+              "amountGTQ": 379.63,
+              "sourceRows": 2,
+              "sourcePolicyMonthlyGTQ": 348.76,
+              "monthlyDeltaGTQ": 30.87,
+              "hold": "Client LIVE exists, policy SCIN-4394 not yet linked/created as of prior authenticated readback. Resolve source premium differential and unique policy/receipt mapping first; never double-post two accounting rows."
+            },
+            {
+              "policy": "SC-79849",
+              "client": "LOS FREELANCE PUBLICIDAD, SOCIEDAD ANONIMA",
+              "requirement": "138828141",
+              "paidDate": "2026-11-06",
+              "amountGTQ": 2497.15,
+              "hold": "Match exact tenant/edition/requirement and current LIVE payment before any write; newer requirement 140461192 due 2026-11-30 remains pending separately."
+            },
+            {
+              "policy": "3002400057714",
+              "client": "ESTRADA NAJERA OSCAR ESTUARDO",
+              "requirement": "1993561",
+              "paidDate": "2026-11-04",
+              "amountGTQ": 127.77,
+              "hold": "Match exact tenant/edition/requirement and current LIVE payment before any write."
+            }
+          ]
+        },
+        "sourceStatusOnly": true
+      },
+      {
+        "id": "A2",
+        "priority": "P0",
+        "insurer": "MAPFRE",
+        "operation": "Stage 17 expected pending requirements, never restore A1 paid rows; only create missing with exact LIVE diff",
+        "sourceEvidence": {
+          "requirements": 17,
+          "grossGTQ": 10612.3,
+          "overdueAsOf20261111": {
+            "count": 13,
+            "grossGTQ": 6773.35
+          },
+          "futureAsOf20261111": {
+            "count": 4,
+            "grossGTQ": 3838.95
+          },
+          "reportHorizon": "PROYECTADO AL 30/11/2026",
+          "explicitExample": {
+            "policy": "SC-79849",
+            "requirement": "140461192",
+            "due": "2026-11-30",
+            "grossGTQ": 2497.15
+          }
+        },
+        "sourceStatusOnly": true
+      },
+      {
+        "id": "A3",
+        "priority": "P0",
+        "insurer": "BANTRAB",
+        "operation": "Before any creation, exact identity and duplicate preflight on operational+SIGA rows, preserve valid historical and current business",
+        "sourceEvidence": {
+          "requirements": 14,
+          "policies": 3,
+          "grossGTQ": 4263.56,
+          "overdueAsOf20261111": {
+            "count": 1,
+            "grossGTQ": 299.94
+          },
+          "futureAsOf20261111": {
+            "count": 13,
+            "grossGTQ": 3963.62
+          },
+          "policyExample": {
+            "policy": "AUTO-45580",
+            "client": "PERCY ROLANDO CHAMALE MUÑOZ",
+            "due": "2026-10-21",
+            "sourceRequirement": "AC-11349841",
+            "sourceAmountGTQ": 299.94,
+            "sourceOpenInstallments": "4/10 through 10/10",
+            "liveObservation": "Prior UI had 22 rows (11 operative plus 11 unconfirmed SIGA); includes ghost 10/10 due 2026-04-21 while correct source 10/10 due 2027-04-21; no blind import, deletion, payment or duplicate receipt."
+          }
+        },
+        "sourceStatusOnly": true
+      },
+      {
+        "id": "A4",
+        "priority": "P1",
+        "insurer": "LA CEIBA",
+        "operation": "Stage 2 exact open requirements from as-of Nov09; scheduled FECHA_COBRO is not payment proof",
+        "sourceEvidence": {
+          "requirements": 2,
+          "grossGTQ": 1304.61,
+          "overdueAsOf20261111": {
+            "count": 1,
+            "grossGTQ": 138.97
+          },
+          "futureAsOf20261111": {
+            "count": 1,
+            "grossGTQ": 1165.64
+          },
+          "items": [
+            {
+              "policy": "0226130804",
+              "requirement": "02505903",
+              "date": "2026-10-31",
+              "amountGTQ": 138.97,
+              "status": "PENDING_OVERDUE"
+            },
+            {
+              "policy": "0225118528",
+              "requirement": "02492371",
+              "date": "2026-11-16",
+              "amountGTQ": 1165.64,
+              "status": "PENDING_FUTURE"
+            }
+          ]
+        },
+        "sourceStatusOnly": true
+      },
+      {
+        "id": "A5",
+        "priority": "P1",
+        "insurer": "ASEGURADORA GENERAL",
+        "operation": "Match collected vs pending with exact policy+endorsement+requirement+quota; do not infer current paid from older cutoff",
+        "sourceEvidence": {
+          "collectedOct01to26": {
+            "requirements": 7,
+            "customerGrossGTQ": 3171.61,
+            "netGTQ": 2638.06
+          },
+          "pendingAsOfNov09": {
+            "requirements": 9,
+            "customerGrossGTQ": 5125.48
+          }
+        },
+        "sourceStatusOnly": true
+      },
+      {
+        "id": "A6",
+        "priority": "P1",
+        "insurer": "COLUMNA",
+        "operation": "Limit insurer-wide binary report strictly to intermediary A&S code 346; ensure xlsb parser scoped/validated before live diff",
+        "sourceEvidence": {
+          "intermediaryCode": "346",
+          "collected": {
+            "requirements": 4,
+            "months": "3 October + 1 November"
+          },
+          "pendingAsOfNov09": {
+            "requirements": 9
+          },
+          "excludedInsurerWideCobTotalRows": 196744
+        },
+        "sourceStatusOnly": true
+      },
+      {
+        "id": "A7",
+        "priority": "P1",
+        "insurer": "FICOHSA",
+        "operation": "Link new paid policy as actual renewal of same vehicle/risk across insurer; no overwrite prior edition or cross-link unrelated vehicle",
+        "sourceEvidence": {
+          "newPolicy": "AUTO-1000007073",
+          "oldInsurer": "SEGUROS EL ROBLE",
+          "oldPolicy": "91-8321599",
+          "client": "MARCO VINICIO PAYES ESCOBAR",
+          "plate": "P788KJN",
+          "vehicle": "MAZDA CX-3 GRAND TOURING AWD 2016",
+          "paidRequirement": "7315461",
+          "paidDate": "2026-10-02",
+          "grossGTQ": 2704.8,
+          "paymentCount": "1/1",
+          "forbiddenUnrelatedPolicy": "AUTO-1000000187 Chery TIGGO 7 PRO P0005LMZ"
+        },
+        "sourceStatusOnly": true
+      }
+    ],
+    "sourceOnlyMiniLot": {
+      "insurers": [
+        "MAPFRE",
+        "BANTRAB",
+        "LA CEIBA"
+      ],
+      "pendingRequirements": 33,
+      "pendingGrossGTQ": 16180.47,
+      "overdueAsOf20261111": {
+        "count": 15,
+        "grossGTQ": 7212.26
+      },
+      "futureAsOf20261111": {
+        "count": 18,
+        "grossGTQ": 8968.21
+      },
+      "mapfrePaidUniqueSeparate": {
+        "count": 3,
+        "grossGTQ": 3004.55
+      },
+      "noLiveDeltaEstablished": true
+    },
+    "laterWorkNotBatch": {
+      "roble": "El Roble 2026-10-23 source 238 pending requirements across 34 policies Q94,660.30; older cut, require refreshed evidence before any current cash inference",
+      "universalesMaria": "Protected sparse CAS 17 technical documents LIVE readback PASS run 42914107853; no payments applied; separate authorized workstream",
+      "bayron": "First signed paid+technical application APPLIED_DIRECT PASS run 42933920971, 0 new payment; second HOLD due to absent proven paidDate/insurer later collection evidence; no blind repeat."
+    },
+    "nextExecutionGate": {
+      "phase1": "Fetch fresh read-only Firestore/tenant-scoped current policy, receipt, cartera and cobros snapshots for each exact requirement; take preimage digests; identify source-new vs LIVE-new since 2026-11-10.",
+      "matchingKey": [
+        "tenantId",
+        "country",
+        "insurerId",
+        "normalizedPolicyNumber",
+        "policyEditionAndValidity",
+        "endorsement",
+        "sourceRequirementNumber",
+        "installmentSequence",
+        "currency",
+        "grossAmount"
+      ],
+      "classifications": [
+        "PAID_CONFIRMED_SOURCE_AND_LIVE_UNPAID_CANDIDATE",
+        "PENDING_OVERDUE",
+        "PENDING_CURRENT",
+        "PENDING_FUTURE",
+        "ALREADY_RECORDED_NO_WRITE",
+        "MISSING_POLICY_OR_CLIENT_HOLD",
+        "CONFLICTING_EVIDENCE_HOLD"
+      ],
+      "phase2": "Generate per-record diff CREATE_MISSING / PATCH_PROVEN_FIELDS_ONLY / NO_OP / HOLD and deterministic idempotency key, never apply paid when only scheduled date is known.",
+      "phase3": "Protected reviewer-gated transactional compare-and-swap with audited identity, no full-document replacement, no user record loss; status correction only after signed authentic financial action and exact source paidDate; after readback + count/hash + rollback focal.",
+      "authority": "No write authorized by this source-only queue. Before/after verified for each actual LIVE transaction; one canonical branch and ledger, same tested artifact for source fixes."
+    },
+    "readOnlyActionsThisEntry": {
+      "githubFilesModified": 1,
+      "firestoreDocumentWrites": 0,
+      "cloudHostingDeployments": 0,
+      "financialApplications": 0,
+      "externalNotifications": 0
+    }
   }
 }
