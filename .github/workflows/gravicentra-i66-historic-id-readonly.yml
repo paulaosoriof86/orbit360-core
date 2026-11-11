@@ -47,7 +47,8 @@ jobs:
                 'reciboId','receiptId','matchedReceiptId','cobroId','cuota','serie','numeroReciboFuente',
                 'primaTotal','monto','montoTotal','saldo','estado','estadoCartera','estadoOperativo',
                 'carteraActiva','fechaPago','paidDate','applicationState','paymentState',
-                'deleted','archivado','eliminado','fechaVencimiento','vence','fechaLimite'
+                'deleted','archivado','eliminado','fechaVencimiento','vence','fechaLimite',
+                'clienteId','asesorId','pais','policyUpdatedId','historial','ultimoEndosoId'
               ).limit(5001).get();
               assert.ok(snap.size<=5000,'READONLY_PROBE_LIMIT_EXCEEDED_'+collection);
               docsByCollection.set(collection,snap.docs);
@@ -60,6 +61,10 @@ jobs:
             }
             const mg=docsByCollection.get('gestiones').filter(d=>String(d.data().titulo||'').includes(target));
             console.log('ID_PROBE_APPLIED_ENDORSEMENT matches='+mg.length+' physical_matches_logical='+mg.filter(d=>d.id===String(d.data().id||'')).length+' hidden='+mg.filter(d=>d.data().opsBoardHidden===true).length);
+            if(mg.length===1){const g=mg[0].data()||{},p=docsByCollection.get('polizas').find(d=>d.id===String(g.polizaId||'')),pr=p?.data()||{};
+              const history=[].concat(pr.historial||[]);const approved=g.endorsementStage==='APLICADO'||Boolean(g.policyUpdatedId)||pr.ultimoEndosoId===mg[0].id||history.some(e=>e&&e.gestionId===mg[0].id);
+              console.log('ID_PROBE_B4_HIDE_ELIGIBILITY '+JSON.stringify({workflowTypeValid:g.workflowType==='endorsement_request',policyIdPresent:Boolean(g.polizaId),policyFound:Boolean(p),tenantPolicyValid:!pr.tenantId||pr.tenantId===tenant,clientSame:String(pr.clienteId||'')===String(g.clienteId||''),advisorSame:String(pr.asesorId||'')===String(g.asesorId||''),countrySame:String(pr.pais||'').toUpperCase()===String(g.pais||'').toUpperCase(),stage:g.endorsementStage||'',approved,hidden:g.opsBoardHidden===true}));
+            }
             const policies=docsByCollection.get('polizas').filter(d=>String(d.data().numero||'')===policyNumber);
             const pIds=new Set(policies.flatMap(d=>[d.id,String(d.data().id||'')]).filter(Boolean));
             console.log('ID_PROBE_PAYMENT_POLICY matches='+policies.length+' physical_matches_logical='+policies.filter(d=>d.id===String(d.data().id||'')).length);
