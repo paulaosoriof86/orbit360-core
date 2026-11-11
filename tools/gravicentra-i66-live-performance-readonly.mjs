@@ -114,22 +114,50 @@ async function run(){
     report.auth.activation=activation;
     need(activation.ok,'I66_PERF_AUTHENTICATED_BOOTSTRAP_HOLD');
     need(norm(activation.role)==='operativo','I66_PERF_ACTIVE_ROLE_NOT_CARLOS_OPERATIVO');
+    report.auth.storeReadContext=await page.evaluate(()=>({
+      protectedCandidate:Orbit.store?._protectedCandidate===true,
+      nativeStructuredClone:typeof structuredClone==='function',
+      readAccessors:['all','get','where','find','_productStatus','raw','pref'].filter(x=>typeof Orbit.store?.[x]==='function')
+    }));
     const cdp=await context.newCDPSession(page);
     await cdp.send('Profiler.enable');
     const profileTop=profile=>{
       const nodes=new Map((profile.nodes||[]).map(n=>[n.id,n]));
+      const parents=Object.create(null);
+      for(const n of profile.nodes||[])for(const child of n.children||[])parents[child]=n.id;
       const totals=Object.create(null);
+      const cloneCallers=Object.create(null);
       (profile.samples||[]).forEach((id,i)=>{
         const n=nodes.get(id),name=String(n?.callFrame?.functionName||'(anonymous)').slice(0,75);
         const key=/^[\w$ ()-]{1,75}$/.test(name)?name:'(other)';
-        totals[key]=(totals[key]||0)+Number(profile.timeDeltas?.[i]||0)/1000;
+        const ms=Number(profile.timeDeltas?.[i]||0)/1000;
+        totals[key]=(totals[key]||0)+ms;
+        if(name==='clone'){
+          const parent=nodes.get(parents[id]);
+          const caller=String(parent?.callFrame?.functionName||'(unknown)').slice(0,75);
+          cloneCallers[caller]=(cloneCallers[caller]||0)+ms;
+        }
       });
-      return Object.entries(totals).sort((a,b)=>b[1]-a[1]).slice(0,12)
+      const top=Object.entries(totals).sort((a,b)=>b[1]-a[1]).slice(0,12)
         .map(([functionName,sampledMs])=>({functionName,sampledMs:Math.round(sampledMs)}));
+      const callerSummary=Object.entries(cloneCallers).sort((a,b)=>b[1]-a[1]).slice(0,10)
+        .map(([caller,sampledMs])=>({caller,sampledMs:Math.round(sampledMs)}));
+      return {top,cloneCallers:callerSummary};
     };
     report.cpuProfiles={};
     await page.evaluate(()=>{
       const stats=window.__GI_I66_RENDER_STATS__={};
+      const store=Orbit.store;
+      const readStats=window.__GI_I66_STORE_READ_STATS__={};
+      for(const name of ['all','get','where','find','_productStatus','raw','pref']){
+        if(typeof store?.[name]!=='function')continue;
+        const original=store[name];readStats[name]={calls:0,totalMs:0,maxMs:0};
+        store[name]=function(...args){const start=performance.now();try{return original.apply(this,args);}finally{
+          const ms=performance.now()-start,record=readStats[name];
+          record.calls++;record.totalMs=Math.round((record.totalMs+ms)*10)/10;
+          record.maxMs=Math.max(record.maxMs,Math.round(ms*10)/10);
+        }};
+      }
       for(const name of ['cliente360','polizas','cobros','aseguradoras','renovaciones','cronograma','ops','leads','siniestros','calidad','historial','inicio']){
         const mod=Orbit.modules?.[name];if(!mod||typeof mod.render!=='function')continue;
         const original=mod.render;stats[name]={calls:0,totalMs:0,maxMs:0};
@@ -191,13 +219,15 @@ async function run(){
         observer.disconnect();document.removeEventListener('orbit:route-ready',handler);
         const status=Orbit.store?._productStatus?.()||{};
         const renderStats=window.__GI_I66_RENDER_STATS__?.[route]||null;
+        const readStats=Object.fromEntries(Object.entries(window.__GI_I66_STORE_READ_STATS__||{}).map(([name,r])=>[name,{...r}]));
+        for(const r of Object.values(window.__GI_I66_STORE_READ_STATS__||{})){r.calls=0;r.totalMs=0;r.maxMs=0;}
         return {route,routeMs,contentMs,readyMs,denied,complete,visibleRows:host?.querySelectorAll('tbody tr').length||0,
           hostChars:host?.innerHTML.length||0,
           loadedSources:[].concat(status.serverConfirmedCollections||[]).length,
           pendingSources:[].concat(status.optionalMissing||[]).length,
           snapshotErrorCount:Object.keys(status.snapshotErrors||{}).length,
           snapshotErrorSources:Object.keys(status.snapshotErrors||{}).filter(k=>/^[a-zA-Z0-9_-]{1,35}$/.test(k)).sort(),
-          renderStats,
+          renderStats,readStats,
           client360RenderMs:route==='cliente360'?Math.round(window.OrbitRuntimeDiagnostics?.cliente360?.renderMs||0):null};
       },{route,readySelector});
       if(withCpuProfile){const prof=await cdp.send('Profiler.stop');report.cpuProfiles[route]=profileTop(prof.profile);}
