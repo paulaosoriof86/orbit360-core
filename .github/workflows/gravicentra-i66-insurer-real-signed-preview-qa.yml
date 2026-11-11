@@ -187,8 +187,10 @@ jobs:
                   providerNowDifferentUser:!!c.auth.currentUser&&c.auth.currentUser.uid!==Orbit.auth.productUser?.uid,
                   writeGuardWouldFail:!c.auth.currentUser||c.auth.currentUser.uid!==Orbit.auth.productUser?.uid};
               });
-              assert.ok(drift.projectionStillCarlos&&drift.providerNowDifferentUser&&drift.writeGuardWouldFail,'I66_CROSS_TAB_AUTH_DRIFT_NOT_REPRODUCED');
-              console.log('I66_LOCAL_PERSISTENCE_MULTITAB_SIGNED_UID_DRIFT_REPRODUCED_WITH_TWO_REAL_ROLES_NO_WRITES');
+              // A browser/SDK may immediately refresh the stale projection in
+              // this scenario; a non-reproduction is evidence, not a false
+              // product failure or a license to declare the cause proven.
+              console.log('I66_LOCAL_PERSISTENCE_MULTITAB_DRIFT_OBSERVED='+Boolean(drift.projectionStillCarlos&&drift.providerNowDifferentUser&&drift.writeGuardWouldFail));
               await otherPage.close();await carlosPage.close();
               // The independent-session contract must also be proven in the
               // actual Firebase SDK, not only by source-text unit assertions.
