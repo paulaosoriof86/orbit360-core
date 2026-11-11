@@ -1,0 +1,66 @@
+# I6.6 P0 diagnostic: verify the canonical versus logical identity of historical
+# documents using counts only. Never print a client name, ID or payment amount.
+name: Gravicentra I6.6 Historic ID Readonly
+on:
+  push:
+    branches: [recovery/fase-a-clean-20260831]
+    paths:
+      - .github/workflows/gravicentra-i66-historic-id-readonly.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  inspect-identities:
+    if: github.repository == 'paulaosoriof86/orbit360-core' && github.ref == 'refs/heads/recovery/fase-a-clean-20260831'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    env:
+      SA_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_ALT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+    steps:
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install read-only SDK
+        run: npm install --prefix "$RUNNER_TEMP/i66-readonly" --no-save --ignore-scripts --no-audit --no-fund firebase-admin@13.4.0 >/dev/null
+      - name: Read metadata-only identity alignment for operational and financial collections
+        run: |
+          node - <<'NODE'
+          'use strict';
+          const assert=require('node:assert/strict');
+          const sdk=require(process.env.RUNNER_TEMP+'/i66-readonly/node_modules/firebase-admin');
+          const choices=['SA_LAB','SA_ALT','SA_DEFAULT'].map(n=>process.env[n]).filter(Boolean);
+          const service=choices.map(s=>{try{return JSON.parse(s);}catch(_){return null;}})
+            .find(s=>s&&s.type==='service_account'&&s.project_id==='ays-orbit-360-lab'&&s.private_key);
+          assert.ok(service,'READONLY_IDENTITY_PROBE_AUTH_NOT_CONFIGURED');
+          sdk.initializeApp({credential:sdk.credential.cert(service),projectId:'ays-orbit-360-lab'});
+          const db=sdk.firestore(),tenant='alianzas-soluciones';
+          const collections=['negocios','gestiones','recibosEsperados','carteraPrimas','cobros','polizas'];
+          const target='B4-003-EXP-38102224750',policyNumber='VA125-00010478';
+          (async()=>{
+            const docsByCollection=new Map();
+            for(const collection of collections){
+              const path=db.collection('tenants').doc(tenant).collection('data').doc(collection).collection('items');
+              const snap=await path.select('id','tenantId','titulo','numero','polizaId','workflowType','endorsementStage','opsBoardHidden').limit(5001).get();
+              assert.ok(snap.size<=5000,'READONLY_PROBE_LIMIT_EXCEEDED_'+collection);
+              docsByCollection.set(collection,snap.docs);
+              let mismatch=0,missing=0,missingTenant=0,foreignTenant=0;
+              for(const doc of snap.docs){const row=doc.data()||{},logical=String(row.id||'').trim();
+                if(!logical)missing++;else if(logical!==doc.id)mismatch++;
+                if(!row.tenantId)missingTenant++;else if(row.tenantId!==tenant)foreignTenant++;
+              }
+              console.log('ID_PROBE '+collection+' total='+snap.size+' logical_physical_mismatch='+mismatch+' missing_logical='+missing+' missing_tenant='+missingTenant+' foreign_tenant='+foreignTenant);
+            }
+            const mg=docsByCollection.get('gestiones').filter(d=>String(d.data().titulo||'').includes(target));
+            console.log('ID_PROBE_APPLIED_ENDORSEMENT matches='+mg.length+' physical_matches_logical='+mg.filter(d=>d.id===String(d.data().id||'')).length+' hidden='+mg.filter(d=>d.data().opsBoardHidden===true).length);
+            const policies=docsByCollection.get('polizas').filter(d=>String(d.data().numero||'')===policyNumber);
+            const pIds=new Set(policies.flatMap(d=>[d.id,String(d.data().id||'')]).filter(Boolean));
+            console.log('ID_PROBE_PAYMENT_POLICY matches='+policies.length+' physical_matches_logical='+policies.filter(d=>d.id===String(d.data().id||'')).length);
+            for(const coll of ['recibosEsperados','carteraPrimas','cobros']){
+              const refs=docsByCollection.get(coll).filter(d=>pIds.has(String(d.data().polizaId||'')));
+              console.log('ID_PROBE_PAYMENT_'+coll+' linked='+refs.length+' physical_matches_logical='+refs.filter(d=>d.id===String(d.data().id||'')).length);
+            }
+            console.log('I66_READONLY_METADATA_PROBE_COMPLETED_WITHOUT_WRITES');
+          })().catch(e=>{console.error(String(e.message||e).replace(/[^a-zA-Z0-9_ -]/g,''));process.exitCode=1;});
+          NODE
