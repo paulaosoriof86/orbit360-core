@@ -482,6 +482,13 @@ async function applyPayment(authz, data, payload, operationName = 'apply_payment
     const activePortfolioRows = portfolioSnap.docs.filter(doc => activePortfolio(doc.data() || {}));
     if (activePortfolioRows.length > 1) throw new HttpsError('failed-precondition', 'Más de una obligación activa corresponde al mismo recibo.');
     if (cobroSnap.size > 1) throw new HttpsError('failed-precondition', 'Más de un cobro corresponde al mismo recibo.');
+    const existingCobro = cobroSnap.empty ? null : (cobroSnap.docs[0].data() || {});
+    const existingPaid = Boolean(existingCobro && (norm(existingCobro.estado) === 'pagado' || /^PAID_/.test(text(existingCobro.paymentState, 80).toUpperCase())))
+      || (norm(receipt.estado) === 'pagado' && !existingCobro);
+    const enrichment = ['insurer_invoice', 'insurer_statement', 'commission_statement'].includes(source) && Boolean(existingCobro);
+    if (existingPaid && !enrichment) throw new HttpsError('failed-precondition', 'PAYMENT_ALREADY_APPLIED: no se puede registrar de nuevo el mismo recibo.');
+    if (!existingPaid && activePortfolioRows.length !== 1)
+      throw new HttpsError('failed-precondition', 'PAYMENT_ACTIVE_PORTFOLIO_REQUIRED: falta obligación activa única para aplicar el pago.');
 
     const amount = explicitAmount != null ? explicitAmount : receiptAmount(receipt);
     if (amount == null || amount <= 0) throw new HttpsError('failed-precondition', 'El recibo no tiene monto válido.');
