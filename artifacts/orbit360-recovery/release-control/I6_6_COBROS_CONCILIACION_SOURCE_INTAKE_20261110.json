@@ -8325,5 +8325,97 @@
       "noDataReimportOrOverwrite": true,
       "oneCanonicalBranchAndCandidate": true
     }
+  },
+  "i66BayronFirstSignedPaymentCommissionProtectedReconciliationLive20261111": {
+    "id": "GI_I66_BAYRON_FIRST_SIGNED_PAYMENT_TECHNICAL_COMMISSION_CAS_20261111",
+    "dateGuatemala": "2026-11-11",
+    "historicalGate": "B4-007 CLOSED",
+    "activeGate": "I6.6",
+    "provenance": {
+      "repository": "paulaosoriof86/orbit360-core",
+      "branch": "recovery/fase-a-clean-20260831",
+      "runId": 42933920971,
+      "runUrl": "https://github.com/paulaosoriof86/orbit360-core/actions/runs/42933920971",
+      "runConclusion": "SUCCESS",
+      "protectedEnvironment": "gravicentra-live-data-writes",
+      "reviewerGate": "APPROVED",
+      "sourceCommit": "573a6c63dc07dd5fc4e75f83070209abf6138fd2",
+      "preflight": "18/18 source and fail-closed tests PASS",
+      "readbackProof": "Workflow official console log I66_BAYRON_PROTECTED_RECONCILIATION ... readback PASS",
+      "downloadableArtifact": "NONE_PUBLISHED_BY_THIS_WORKFLOW; do not invent artifact digest"
+    },
+    "policy": {
+      "country": "GT",
+      "insurer": "ASEGURADORA RURAL",
+      "policyNumber": "VA125-00010478",
+      "firstReceiptId": "cob_pol_cb085b8b5cd85a922c3b29164820_001",
+      "sourcePaidDate": "2026-10-29",
+      "firstPaymentGrossGTQ": 1557.92,
+      "insurerSourceReceiptNumber": "58876231"
+    },
+    "result": {
+      "status": "FIRST_COMMISSION_RECONCILED_LIVE_PROTECTED_CAS_READBACK_PASS",
+      "before": "PAID_DIRECT with PENDING_APPLICATION technical state and insurer source number absent",
+      "after": "PAID_AND_RECONCILED with APPLIED_DIRECT technical state and numeroReciboFuente 58876231",
+      "existingDocumentsUpdated": 3,
+      "auditDocumentCreated": 1,
+      "totalWrites": 4,
+      "receiptPatch": "numeroReciboFuente=58876231; applicationState=APPLIED_DIRECT and technical reconciliation evidence",
+      "cobroPatch": "Existing signed first cobro technical reconciliation fields only",
+      "carteraPatch": "Existing first premium account technical application fields only",
+      "audit": "FIRST_COMMISSION_RECONCILED; source commission evidence; before digest and reviewed GitHub run",
+      "amountCentsInReadback": 155792,
+      "commissionAmountCentsInAudit": 19500,
+      "commissionPaidAsNewMoney": "NOT_CLAIMED",
+      "newPayments": 0,
+      "newCobros": 0,
+      "newReceipts": 0,
+      "applicationDateAsserted": false,
+      "modifiedFinancialAmounts": 0,
+      "modifiedSourcePaidDates": 0,
+      "secondReceiptWrites": 0,
+      "exactPostwriteReadback": "PASS",
+      "immutableBusinessStatePreserved": true,
+      "noDuplicatePayment": true,
+      "rollbackOrRepeat": "No blind rerun; job is idempotent ALREADY_RECONCILED_NO_WRITE if exact successful prior state remains."
+    },
+    "secondReceipt": {
+      "ownerSaysPaid": true,
+      "lastVerifiedLiveStateBeforeThisRun": "SECOND_NOT_PAID",
+      "sourcePaymentDate": "MISSING",
+      "newPaymentApplications": 0,
+      "status": "HOLD_RECONCILE_WITH_INSURER_SOURCE_AND_EXACT_DATE",
+      "forbidden": "Do not infer payment date, create synthetic cobro, or apply second receipt from first reconciliation"
+    },
+    "postRun": {
+      "independentReconciliationProbe": "PASS_12_OF_12_READ_ONLY_AFTER_PROTECTED_CAS",
+      "independentWorkflowRun": 42917054110,
+      "independentAttempt": 2,
+      "independentJobId": 130240802269,
+      "independentReadback": {
+        "firstStatus": "PAID_RECONCILED",
+        "sourceNumberPresent": true,
+        "applicationState": "APPLIED_DIRECT",
+        "paymentState": "PAID_DIRECT",
+        "cobroCount": 1,
+        "carteraCount": 1,
+        "signedRequestCount": 1,
+        "signedEventCount": 1,
+        "issues": [],
+        "secondState": "SECOND_NOT_PAID",
+        "secondDate": null,
+        "liveWrites": 0
+      },
+      "signedEndToEndScope": "FIRST_RECEIPT_TECHNICAL_APPLICATION_ONLY",
+      "doesNotCertify": "Complete client portfolio, monthly collection batch, second payment, external WhatsApp, or global Ops/Cobros role tests"
+    },
+    "legacyAndConcurrence": {
+      "previousLedgerEntry": "i66OpsLeadsSignedCrudMariaCashlessCasBayronGreenApiFreeze20261110 first PENDING_APPLICATION now superseded for this exact first receipt only",
+      "preserveMaria17SparseCorrections": true,
+      "preserveNewConcurrentTeamTransactions": true,
+      "sourceCodeAndHostingUnchangedByLedger": true,
+      "noDataReimport": true,
+      "oneCanonicalBranchAndCandidate": true
+    }
   }
 }
