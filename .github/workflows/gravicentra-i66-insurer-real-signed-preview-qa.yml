@@ -89,6 +89,15 @@ jobs:
             const user=await auth.getUser(candidates[0].id);
             assert.ok(!user.disabled&&user.emailVerified,'I66_CARLOS_AUTH_NOT_READY');
             const token=await auth.createCustomToken(user.uid);
+            const paulaMembers=members.docs.filter(d=>{
+              const m=d.data()||{},named=[m.nombre,m.nombreCompleto,m.displayName,m.name,m.fullName]
+                .some(x=>norm(x).startsWith('paula osorio')||norm(x).startsWith('paula andrea osorio'));
+              return named&&[].concat(m.roles||[]).some(r=>norm(r)==='direccion')&&m.active!==false&&m.activo!==false;
+            });
+            assert.equal(paulaMembers.length,1,'I66_PAULA_DIRECTION_MEMBER_NOT_UNIQUE');
+            const paulaAuth=await auth.getUser(paulaMembers[0].id);
+            assert.ok(!paulaAuth.disabled&&paulaAuth.emailVerified,'I66_PAULA_AUTH_NOT_READY');
+            const paulaToken=await auth.createCustomToken(paulaAuth.uid);
             const browser=await chromium.launch({headless:true,args:['--no-sandbox']});
             try {
               const context=await browser.newContext({viewport:{width:1280,height:900}});
@@ -130,9 +139,41 @@ jobs:
               const live=await checkOrigin(process.env.LIVE_ORIGIN);
               assert.ok(live.found&&live.tenant&&live.country&&live.lacksAdvisor,'I66_LIVE_BASELINE_RECORD_DRIFT');
               assert.equal(live.matrixAllows,true,'I66_LIVE_BASELINE_MATRIX_DRIFT');
-              assert.equal(live.preflightAllows,false,'I66_LIVE_BASELINE_ALREADY_CHANGED_RECHECK_RELEASE');
-              console.log('I66_SIGNED_PREVIEW_TRUE_VS_LIVE_BASELINE_FALSE_CAUSAL_AB_PASS');
-              console.log('I66_FIRESTORE_WRITES=0,AUTH_CHANGES=0,INSURER_FIELDS_REDACTED=true');
+              assert.equal(live.preflightAllows,true,'I66_LIVE_RECORD_PREFLIGHT_NOT_THE_ROOT');
+              console.log('I66_SIGNED_PREVIEW_AND_LIVE_INSURER_RECORD_PREFLIGHT_BOTH_ALLOW');
+              // Reproduce tab-local productUser outliving browser-wide Firebase LOCAL
+              // auth after a different authorized user signs in on the same origin.
+              // No real insurer mutation and no settings/persistence changes.
+              const carlosPage=await context.newPage();
+              await carlosPage.goto(process.env.PREVIEW_ORIGIN+'/#/aseguradoras?ficha=gt-aseguradora-guatemalteca',{waitUntil:'domcontentloaded'});
+              await carlosPage.waitForFunction(()=>!!window.Orbit?.productRuntimeBrowserProvidersP0&&!!window.Orbit?.productAppP0);
+              await carlosPage.evaluate(async(t)=>{
+                const p=Orbit.productRuntimeBrowserProvidersP0,c=await p.initialize();
+                await c.modules.auth.signInWithCustomToken(c.auth,t);
+                const result=await Orbit.productAppP0.activate();
+                if(result?.started!==true)throw Error('CARLOS_ACTIVATION_FAILED');
+              },token);
+              const paulaPage=await context.newPage();
+              await paulaPage.goto(process.env.PREVIEW_ORIGIN+'/#/inicio',{waitUntil:'domcontentloaded'});
+              await paulaPage.waitForFunction(()=>!!window.Orbit?.productRuntimeBrowserProvidersP0);
+              await paulaPage.evaluate(async(t)=>{
+                const p=Orbit.productRuntimeBrowserProvidersP0,c=await p.initialize();
+                await c.modules.auth.signInWithCustomToken(c.auth,t);
+              },paulaToken);
+              await carlosPage.waitForFunction(async()=>{
+                const c=await Orbit.productRuntimeBrowserProvidersP0.initialize();
+                return !!c.auth.currentUser&&c.auth.currentUser.uid!==Orbit.auth.productUser?.uid;
+              },null,{timeout:15000});
+              const drift=await carlosPage.evaluate(async()=>{
+                const c=await Orbit.productRuntimeBrowserProvidersP0.initialize();
+                return {projectionStillCarlos:!!Orbit.auth.productUser?.uid,
+                  providerNowDifferentUser:!!c.auth.currentUser&&c.auth.currentUser.uid!==Orbit.auth.productUser?.uid,
+                  writeGuardWouldFail:!c.auth.currentUser||c.auth.currentUser.uid!==Orbit.auth.productUser?.uid};
+              });
+              assert.ok(drift.projectionStillCarlos&&drift.providerNowDifferentUser&&drift.writeGuardWouldFail,'I66_CROSS_TAB_AUTH_DRIFT_NOT_REPRODUCED');
+              console.log('I66_LOCAL_PERSISTENCE_MULTITAB_SIGNED_UID_DRIFT_REPRODUCED_WITH_TWO_REAL_ROLES_NO_WRITES');
+              await paulaPage.close();await carlosPage.close();
+              console.log('I66_FIRESTORE_WRITES=0,AUTH_ACCOUNT_CONFIG_WRITES=0,INSURER_FIELDS_REDACTED=true');
             } finally {await browser.close();}
           })().catch(e=>{console.error('I66_SIGNED_PREVIEW_QA_HOLD='+String(e.message||e).replace(/[^A-Za-z0-9_ -]/g,'').slice(0,120));process.exitCode=1;});
           NODE
