@@ -145,3 +145,4 @@ jobs:
           REPAIR_STARTED=0
           trap - ERR
           echo 'I66_OPS_TRAFFIC_REPAIRED_BACKEND_ONLY; LIVE_WRITE_UAT_PENDING_BROWSER'
+# Incident readback 2026-11-10: canonical callable recognizes update_management but not hide_management_card; re-evaluate guarded revision traffic.
