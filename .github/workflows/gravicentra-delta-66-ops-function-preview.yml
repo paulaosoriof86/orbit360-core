@@ -1,4 +1,4 @@
-# I6.6 Ops-only Preview Function: exact e898 artifact, no LIVE/Firestore writes.
+# I6.6 Ops-only Preview Function and Hosting: exact d810 immutable artifact, no LIVE/Firestore writes.
 name: Gravicentra I6.6 Ops P0 Scoped Function Preview
 on:
   push:
@@ -18,12 +18,13 @@ jobs:
     timeout-minutes: 35
     env:
       PROJECT_ID: ays-orbit-360-lab
-      SOURCE_SHA: e8986c81ed1748bea680447d07d2f37dc0c1db7a
-      ARTIFACT_ID: '13786263277'
-      ARTIFACT_DIGEST: sha256:9168acf6701443349897226976cde9174628133074e47d2fd286fa768ddaf1e3
-      ARTIFACT_RUN: '42865214814'
-      EMULATOR_QA_RUN: '42867352575'
-      PREVIEW_URL: https://ays-orbit-360-lab--gi-i66-rc-42865214814-naeek9rl.web.app
+      SOURCE_SHA: d810b4d20569a18e90f4387928cf8816da88aa6a
+      ARTIFACT_ID: '13819981500'
+      ARTIFACT_DIGEST: sha256:292e4d8f594e9aea0b685dfe1b18dec0a5a511506687841e8440f018e0d3b499
+      ARTIFACT_RUN: '42939201474'
+      EMULATOR_QA_RUN: '42939201374'
+      PREVIEW_CHANNEL: gi-i66-opsboard-42939201474
+      PREVIEW_URL: https://ays-orbit-360-lab--gi-i66-opsboard-42939201474-naeek9rl.web.app
       SA_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
       SA_ALT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
       SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
@@ -54,13 +55,13 @@ jobs:
               fetch(base+'artifacts/'+process.env.ARTIFACT_ID,{headers:h}).then(r=>r.json())
             ]);
             assert.equal(q.conclusion,'success','OPS_EMULATOR_QA_HOLD');
-            assert.equal(q.head_sha,'a3b3eed03b54c4a0a52eedf40e1d7365af75e769','OPS_EMULATOR_QA_COMMIT_DRIFT');
+            assert.equal(q.head_sha,process.env.SOURCE_SHA,'OPS_EMULATOR_QA_COMMIT_DRIFT');
             assert.equal(b.conclusion,'success','OPS_PACKAGE_NOT_GREEN');
             assert.equal(b.head_sha,process.env.SOURCE_SHA,'OPS_PACKAGE_SOURCE_DRIFT');
             assert.equal(a.digest,process.env.ARTIFACT_DIGEST,'OPS_ARTIFACT_DIGEST_DRIFT');
             assert.equal(a.workflow_run.id,Number(process.env.ARTIFACT_RUN),'OPS_ARTIFACT_RUN_DRIFT');
             assert.equal(a.expired,false,'OPS_ARTIFACT_EXPIRED');
-            console.log('I66_OPS_EMULATOR_16_CHECKS_SINGLE_ARTIFACT_PROOF_PASS');
+            console.log('I66_OPS_EMULATOR_32_CHECKS_SINGLE_ARTIFACT_PROOF_PASS');
           })().catch(e=>{console.error(e.message);process.exitCode=1;});
           NODE
       - uses: actions/download-artifact@v4
@@ -92,12 +93,6 @@ jobs:
             throw Error('OPS_BACKEND_ARTIFACT_DRIFT');
           console.log('I66_OPS_EXACT_BACKEND_AND_MARKER_PASS build='+marker.buildId);
           NODE
-          curl --fail --silent --show-error --max-time 30 "$PREVIEW_URL/__recovery__/build.json" > "$RUNNER_TEMP/ops-preview-marker.json"
-          node - <<'NODE'
-          const j=require(process.env.RUNNER_TEMP+'/ops-preview-marker.json');
-          if(j.sourceSha!==process.env.SOURCE_SHA)throw Error('OPS_PREVIEW_SOURCE_DRIFT');
-          console.log('I66_OPS_PREVIEW_HOSTING_SOURCE_PASS');
-          NODE
       - name: Pick already configured LAB authority and pinned Firebase CLI
         run: |
           set -euo pipefail
@@ -126,14 +121,26 @@ jobs:
           chmod 600 "$RUNNER_TEMP/ops-preview-auth/selected.json"
           echo "GOOGLE_APPLICATION_CREDENTIALS=$RUNNER_TEMP/ops-preview-auth/selected.json" >> "$GITHUB_ENV"
           echo "OPS_FIREBASE_CLI=$CLI" >> "$GITHUB_ENV"
-      - name: Deploy only Ops Preview callable from immutable artifact
+      - name: Deploy only Ops Preview callable and same immutable Hosting packet
         run: |
           set -euo pipefail
           FROOT="$RUNNER_TEMP/ops-preview-functions";mkdir -p "$FROOT"
           cp -a "$RUNNER_TEMP/ops-immutable-packet/bundle/backend" "$FROOT/backend"
+          cp -a "$RUNNER_TEMP/ops-immutable-packet/bundle/site" "$FROOT/site"
           (cd "$FROOT/backend" && npm ci --ignore-scripts --no-audit --no-fund >/dev/null)
-          printf '{"functions":{"source":"backend"}}\n' > "$FROOT/firebase.json"
+          printf '{"functions":{"source":"backend"},"hosting":{"site":"ays-orbit-360-lab","public":"site"}}\n' > "$FROOT/firebase.json"
           node "$OPS_FIREBASE_CLI" deploy --only functions:orbit360OpsLeadsCommandPreview --config "$FROOT/firebase.json" --project "$PROJECT_ID" --non-interactive
+          node "$OPS_FIREBASE_CLI" hosting:channel:deploy "$PREVIEW_CHANNEL" --config "$FROOT/firebase.json" --project "$PROJECT_ID" --expires 7d --non-interactive
+          for f in __recovery__/build.json core/ciclo.js core/record-delete.js data/store-firestore-product-operational-p0.js;do
+            curl --fail --silent --show-error --retry 3 --max-time 30 "$PREVIEW_URL/$f" > "$RUNNER_TEMP/$(basename "$f").preview"
+            cmp "$FROOT/site/$f" "$RUNNER_TEMP/$(basename "$f").preview"
+          done
+          node - <<'NODE'
+          const fs=require('node:fs');
+          const j=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/build.json.preview','utf8'));
+          if(j.sourceSha!==process.env.SOURCE_SHA||j.gate!=='I6.6')throw Error('OPS_PREVIEW_HOSTING_EXACT_SOURCE_DRIFT');
+          console.log('I66_OPS_PREVIEW_HOSTING_BUILD_AND_3_CRITICAL_JS_BYTE_EQUAL_PASS');
+          NODE
           node "$OPS_FIREBASE_CLI" functions:list --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/ops-functions-after.json"
           node - <<'NODE'
           const fs=require('node:fs'),j=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/ops-functions-after.json'));
@@ -144,3 +151,4 @@ jobs:
           console.log('I66_OPS_REAL_LIVE_FIRESTORE_WRITES=0');
           console.log('I66_OPS_LIVE_FUNCTION_NOT_DEPLOYED');
           NODE
+
