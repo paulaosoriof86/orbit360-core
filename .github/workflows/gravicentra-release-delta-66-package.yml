@@ -216,6 +216,9 @@ jobs:
             // Build tooling is SHA-pinned and executed, never published as a site asset.
             if(p==='tools/gravicentra-i6-1-preview-package.mjs')continue;
             const target=fs.readFileSync(base+'/'+(p.startsWith('functions/')?'backend/'+p.slice(10):'site/'+p.slice(18)));
+            // The public PWA manifest is deterministically tenant-bound;
+            // compare its COMPLETE expected object below, not source bytes.
+            if(p==='orbit360-platform/manifest.webmanifest')continue;
             let expected=source;
             if(p==='orbit360-platform/index.html')expected=expectedIndex(source.toString('utf8'),meta.buildId);
             else if(p==='orbit360-platform/core/pwa.js')expected=expectedPwa(source.toString('utf8'),meta.buildId);
