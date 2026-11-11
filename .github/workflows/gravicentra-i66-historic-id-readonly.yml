@@ -118,3 +118,17 @@ jobs:
             }
           })().catch(e=>{console.error(String(e.name||'error'));process.exitCode=1;});
           NODE
+      - name: Distinguish unsupported old LIVE operation from authentication guard without mutation
+        run: |
+          node - <<'NODE'
+          'use strict';
+          const tests=[['orbit360OpsLeadsCommand','hide_management_card'],['orbit360OpsLeadsCommand','update_management'],['orbit360CobrosReconciliationCommand','apply_payment'],['orbit360CobrosReconciliationCommand','report_advisor_payment']];
+          (async()=>{
+            for(const [name,operation] of tests){
+              const res=await fetch('https://us-central1-ays-orbit-360-lab.cloudfunctions.net/'+name,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({data:{operation,tenantId:'alianzas-soluciones',entityId:'qa_nonexistent_readonly',payload:{}}}),signal:AbortSignal.timeout(15000)});
+              let status='';try{status=String((await res.json()).error?.status||'');}catch(_){status='NON_JSON';}
+              console.log('OPERATION_PROBE '+name+' operation='+operation+' http='+res.status+' status='+status.replace(/[^A-Z_]/g,''));
+              if(res.status===200)throw Error('UNAUTHENTICATED_PROBE_UNEXPECTED_SUCCESS');
+            }
+          })().catch(e=>{console.error(String(e.name||'error'));process.exitCode=1;});
+          NODE
