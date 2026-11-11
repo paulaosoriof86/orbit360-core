@@ -20,11 +20,11 @@ jobs:
       PROJECT_ID: ays-orbit-360-lab
       REGION: us-central1
       SERVICE: orbit360opsleadscommand
-      OLD_REVISION: orbit360opsleadscommand-00002-nop
-      PRODUCT_REVISION: orbit360opsleadscommand-00003-wed
-      OLD_IMAGE_DIGEST: sha256:c8b6424fe69c521159e957d48216918e0c87a4ea5babc49cbb57f41e55598aa0
-      PRODUCT_IMAGE_DIGEST: sha256:13ed71c890b7c2ea000b9c5aa9dfb76b8987946a7147c5d22b2d95154160552b
-      PRODUCT_SOURCE_SHA: e8986c81ed1748bea680447d07d2f37dc0c1db7a
+      OLD_REVISION: orbit360opsleadscommand-00003-wed
+      PRODUCT_REVISION: orbit360opsleadscommand-00008-cil
+      OLD_IMAGE_DIGEST: sha256:13ed71c890b7c2ea000b9c5aa9dfb76b8987946a7147c5d22b2d95154160552b
+      PRODUCT_IMAGE_DIGEST: sha256:e660db30201153891b5f8b9fd8085ab70a53a365f309770a49cc203f3fed805b
+      PRODUCT_SOURCE_SHA: d810b4d20569a18e90f4387928cf8816da88aa6a
       SA_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
       SA_ALT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
       SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
@@ -105,7 +105,8 @@ jobs:
           exact= len(traffic)==1 and traffic[0].get('revisionName')==old and int(traffic[0].get('percent') or 0)==100
           sameAccount=bool((a.get('spec') or {}).get('serviceAccountName')) and (a.get('spec') or {}).get('serviceAccountName')==(b.get('spec') or {}).get('serviceAccountName')
           checks={'oldReady':ready(a),'newReady':ready(b),'exactPriorTraffic100':exact,
-              'latestReadyIsNew':(service.get('status') or {}).get('latestReadyRevisionName')==new,
+              'latestCreatedIsNew':(service.get('status') or {}).get('latestCreatedRevisionName')==new,
+              'currentTrafficReadyIsOld':(service.get('status') or {}).get('latestReadyRevisionName')==old,
               'oldImageDigestPinned':digest(a)==os.environ['OLD_IMAGE_DIGEST'],
               'newImageDigestPinned':digest(b)==os.environ['PRODUCT_IMAGE_DIGEST'],
               'sameServiceAccount':sameAccount,'sameEnvironmentValues':env(a)==env(b),
@@ -139,10 +140,9 @@ jobs:
           traffic=(s.get('status') or {}).get('traffic') or []
           expected=os.environ['PRODUCT_REVISION']
           assert len(traffic)==1 and traffic[0].get('revisionName')==expected and int(traffic[0].get('percent') or 0)==100,'I66_OPS_TRAFFIC_POSTCUTOVER_MISMATCH'
-          assert (s.get('status') or {}).get('latestReadyRevisionName')==expected,'I66_OPS_TRAFFIC_READY_DRIFT'
+          assert (s.get('status') or {}).get('latestCreatedRevisionName')==expected,'I66_OPS_TRAFFIC_CREATED_REVISION_DRIFT'
           print('I66_OPS_TRAFFIC_CANONICAL_REVISION_100_PERCENT_READBACK_PASS; REV='+expected+' DATA_WRITES=0')
           PY
           REPAIR_STARTED=0
           trap - ERR
           echo 'I66_OPS_TRAFFIC_REPAIRED_BACKEND_ONLY; LIVE_WRITE_UAT_PENDING_BROWSER'
-# Incident readback 2026-11-10: canonical callable recognizes update_management but not hide_management_card; re-evaluate guarded revision traffic.
