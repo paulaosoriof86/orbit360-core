@@ -152,7 +152,22 @@ const seed=async(id,country,advisorId,monto)=>{
     const rows=await coll(tenant,'data').doc('cobros').collection('items').where('reciboId','==',receiptId).get();
     assert.equal(rows.size,1,'only one physical cobro per receipt: '+methods[i]);checks++;
   }
-  stage='direct-payment-authorization';
+  stage='direct-payment-repeat-id-and-portfolio-guard';
+  const eventsBeforeRepeat=(await coll(tenant,'reconciliationEvents').get()).size;
+  const paidBeforeRepeat=(await data('cobros','dummy').parent.where('reciboId','==','rec_method_0').get()).docs[0].data();
+  await expectDenied(()=>apply('op-gt','Operativo','rec_method_0','qa_other_request_same_receipt','Efectivo',100),'failed-precondition');
+  assert.equal((await coll(tenant,'reconciliationEvents').get()).size,eventsBeforeRepeat,'different ID cannot emit duplicate receipt payment');checks++;
+  assert.equal((await data('cobros','dummy').parent.where('reciboId','==','rec_method_0').get()).docs[0].data().paymentMethod,paidBeforeRepeat.paymentMethod);checks++;
+  await seed('no_portfolio','GT','ase-gt',999);
+  await expectDenied(()=>apply('op-gt','Operativo','rec_no_portfolio','qa_no_active_portfolio','Cheque',999),'failed-precondition');
+  assert.equal((await data('cobros','dummy').parent.where('reciboId','==','rec_no_portfolio').get()).size,0,'incomplete ledger cannot commit partial paid state');checks++;
+  const enriched=await command.run(request('op-gt','Operativo',{
+    operation:'apply_payment',requestId:'qa_enrich_insurer_invoice_001',reason:'QA factura conciliada posterior',
+    payload:{receiptId:'rec_method_0',sourceType:'insurer_invoice',invoiceNumber:'QA-INV-100',applicationDate:'2026-11-10',amount:100}
+  }));
+  assert.equal(enriched.ok,true);assert.equal(enriched.portfolioUpdated,true);checks++;
+  assert.equal((await data('cobros','dummy').parent.where('reciboId','==','rec_method_0').get()).size,1,'enrichment preserves one cobro');checks++;
+    stage='direct-payment-authorization';
   await expectDenied(()=>apply('advisor-gt','Asesor','rec_method_0','qa_advisor_wrong','Efectivo',100));
   await expectDenied(()=>apply('op-co','Operativo','rec_method_0','qa_country_wrong','Efectivo',100));
   stage='direct-payment-country-invariants';
