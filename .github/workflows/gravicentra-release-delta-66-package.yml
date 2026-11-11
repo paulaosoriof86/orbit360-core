@@ -42,8 +42,9 @@ jobs:
           const fs=require('node:fs');
           const c=JSON.parse(fs.readFileSync('artifacts/orbit360-recovery/release-control/I6_6_RELEASE_TRANSPORT_CONTROL_20261110.json','utf8'));
           const scopedPreview=c.status==='PAYMENT_FUNCTION_PREVIEW_AUTHORIZED'&&c.backendFunctionPreviewOnly===true&&c.forbidBackendLiveFunctionDeploy===true&&c.livePromotionAuthorized===false&&c.previewApproved===false;
-          if(c.schema!=='GRAVICENTRA_I6_6_SINGLE_ARTIFACT_RELEASE_TRANSPORT_V1'||c.gate!=='I6.6'||c.historicalClosedGate!=='B4-007'||(c.forbidBackendFunctionDeploy!==true&&!scopedPreview)||c.forbidFirestoreRulesDataAuthWrites!==true)throw Error('I66_TRANSPORT_SCOPE_INVALID');
-          if(scopedPreview&&(!/^[0-9a-f]{40}$/.test(c.approvedSourceSha||'')||!(c.sourceBuildWorkflowRunId>0)||!(c.immutableArtifactId>0)||!/^[0-9a-f]{64}$/.test(String(c.immutableArtifactZipDigest||'').replace(/^sha256:/,''))))throw Error('I66_PAYMENT_PREVIEW_PROOF_MISSING');
+          const scopedLive=c.status==='PAYMENT_LIVE_FUNCTION_PROMOTION_AUTHORIZED'&&c.liveFunctionScope==='orbit360CobrosReconciliationCommand'&&c.noHostingPromotion===true&&c.forbidBackendLiveFunctionDeploy===false&&c.livePromotionAuthorized===true&&c.previewApproved===true&&c.previewFunctionRunId===42955048019;
+          if(c.schema!=='GRAVICENTRA_I6_6_SINGLE_ARTIFACT_RELEASE_TRANSPORT_V1'||c.gate!=='I6.6'||c.historicalClosedGate!=='B4-007'||(c.forbidBackendFunctionDeploy!==true&&!scopedPreview&&!scopedLive)||c.forbidFirestoreRulesDataAuthWrites!==true)throw Error('I66_TRANSPORT_SCOPE_INVALID');
+          if((scopedPreview||scopedLive)&&(!/^[0-9a-f]{40}$/.test(c.approvedSourceSha||'')||!(c.sourceBuildWorkflowRunId>0)||!(c.immutableArtifactId>0)||!/^[0-9a-f]{64}$/.test(String(c.immutableArtifactZipDigest||'').replace(/^sha256:/,''))))throw Error('I66_PAYMENT_SCOPED_RELEASE_PROOF_MISSING');
           let mode='disabled',source='';
           if(c.status==='PREVIEW_BUILD_REQUESTED'&&c.livePromotionAuthorized===false)mode='package';
           if(c.status==='LIVE_PROMOTION_APPROVED'&&c.livePromotionAuthorized===true&&c.previewApproved===true){
