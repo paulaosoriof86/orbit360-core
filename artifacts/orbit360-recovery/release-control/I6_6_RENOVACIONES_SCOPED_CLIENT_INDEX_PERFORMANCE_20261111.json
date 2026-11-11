@@ -1,0 +1,49 @@
+{
+  "schema": "GRAVICENTRA_I6_6_RENOVACIONES_SCOPED_CLIENT_INDEX_PERFORMANCE_V1",
+  "recordedDate": "2026-11-11 America/Guatemala",
+  "gate": "I6.6",
+  "lastClosedReleaseGate": "B4-007",
+  "status": "LOCAL_CAUSAL_QA_PASS_PREVIEW_NOT_DEPLOYED_LIVE_NOT_DEPLOYED",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "previousApprovedLiveSource": "6006d7843bf8eef5904a930b7346a1b00c114445",
+  "finding": {
+    "surface": "Renovaciones, navigation from Cobros and cross-module renewal lifecycle",
+    "realSignedBrowserEvidence": "A Chrome navigation to Renovaciones timed out; authenticated CI profiler logged 64053 protected store.get() calls for this route in a 6006d784 source comparison. Neither observation alone certifies all causes of latency.",
+    "syntheticRepro": "1600 policies and 800 clients produced 27968 store.get('clientes',...) calls during one baseline render in a local isolated VM without any business writes.",
+    "root": "Country inheritance and synthetic QA lineage repeatedly called scoped store.get for the same client while filtering, assessing and rendering one portfolio. Each read incurred protected clone/scope overhead."
+  },
+  "change": {
+    "source": "orbit360-platform/modules/renovaciones.js",
+    "sourceGitBlobSha": "c5757d2cd857eec30d56d6d111e8d839b7762352",
+    "implementation": "One scoped client index per render and lifecycle projection; per-projection core key and risk set memoization; no stored data mutation; reset render index in a finally guard.",
+    "touchesFirestoreRules": false,
+    "touchesBackend": false,
+    "touchesOperationalRecords": false,
+    "changesCountryOrRoleEntitlements": false,
+    "addsAnotherCandidateOrBranch": false
+  },
+  "localTests": {
+    "status": "PASS",
+    "focusedRenewalAndRelatedTests": "22/22",
+    "syntheticGetCallsBefore": 27968,
+    "syntheticGetCallsAfter": 0,
+    "postFixAllCalls": 8,
+    "gtCommercialBucket": 798,
+    "coCommercialBucket": 800,
+    "qaLinkedPoliciesExcludedGt": 2,
+    "clientCountryChangeInvalidatesAndRebuilds": true,
+    "testSource": "tools/gravicentra-i6-6-renovaciones-read-index.test.cjs",
+    "testGitBlobSha": "423301bf8c2a3e51508e7bb8f27ec1259a2447c2",
+    "note": "Counts use isolated synthetic source fixture; live latency and authenticated persistence remain unproven until post-build verification."
+  },
+  "releaseBoundary": {
+    "exactBuildRequired": true,
+    "isolatedPreviewFunctionalAndPerformanceQaRequired": true,
+    "sameImmutableArtifactToLiveRequired": true,
+    "liveRoleAndCountryVerificationRequired": true,
+    "currentLivePreservedUntilPromotion": true,
+    "preproductionClaim": false,
+    "postproductionClaim": false
+  }
+}

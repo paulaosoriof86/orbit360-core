@@ -10,7 +10,7 @@ const start=renewalSource.indexOf('const countryCode =');
 const stop=renewalSource.indexOf('const renewabilityState =',start);
 assert.ok(start>=0&&stop>start,'preserve canonical renewal country/QA boundary');
 const selectionSource=renewalSource.slice(start,stop);
-assert.match(renewalSource,/function renewalLifecycleSnapshot\(\)\s*\{\s*const store=S\(\),rows=\(store\.all\('polizas'\)\|\|\[\]\)\.filter\(p=>p&&p\.id&&!isSyntheticQaPolicy\(p\)\)/,
+assert.match(renewalSource,/function renewalLifecycleSnapshot\(\)\s*\{\s*const store=S\(\),clients=activeClientIndex\|\|clientIndex\(store\),rows=\(store\.all\('polizas'\)\|\|\[\]\)\.filter\(p=>p&&p\.id&&!isSyntheticQaPolicy\(p,clients\)\)/,
   'renewal lineage projection must share the same QA exclusion as the board');
 
 const qaMarker=row=>!!row&&(row.__syntheticQa===true||row.syntheticQa===true||

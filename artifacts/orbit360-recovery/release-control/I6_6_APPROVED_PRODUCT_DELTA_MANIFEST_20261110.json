@@ -774,6 +774,30 @@
           "gitBlobSha": "947f0e0dabe31a97695e3f12d7968496bb468546"
         }
       ]
+    },
+    {
+      "id": "I6_6_RENOVACIONES_SCOPED_CLIENT_INDEX_N2_RENDER_ROOTFIX_P0",
+      "approvedByDirection": true,
+      "receipt": "artifacts/orbit360-recovery/release-control/I6_6_RENOVACIONES_SCOPED_CLIENT_INDEX_PERFORMANCE_20261111.json",
+      "sourceStatus": "LOCAL_CAUSAL_SOURCE_QA_PASS_PREVIEW_AND_LIVE_PENDING",
+      "capabilityOwners": [
+        "RENOVACIONES_PRIMARY_RUNTIME",
+        "ROLE_SCOPE_RUNTIME",
+        "STARTUP_PERFORMANCE"
+      ],
+      "scope": "Within the current single product, reuse one authorized scoped client snapshot for renewal country inheritance, synthetic-QA provenance, lifecycle and card display; memoize immutable per-snapshot policy core/risk; keep exact country, role, renewability and no-write semantics. No backend, Rules, auth, insurer, payment or Firestore data changes.",
+      "paths": [
+        {
+          "path": "orbit360-platform/modules/renovaciones.js",
+          "gitBlobSha": "c5757d2cd857eec30d56d6d111e8d839b7762352"
+        }
+      ],
+      "tests": [
+        {
+          "path": "tools/gravicentra-i6-6-renovaciones-read-index.test.cjs",
+          "gitBlobSha": "423301bf8c2a3e51508e7bb8f27ec1259a2447c2"
+        }
+      ]
     }
   ]
 }

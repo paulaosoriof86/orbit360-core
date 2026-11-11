@@ -59,16 +59,30 @@ Orbit.modules.renovaciones = (function () {
     });return index;
   }
   const countryCode = v => String(v == null ? '' : v).trim().toUpperCase();
-  const policyCountry = p => { const own=countryCode(p&&p.pais);if(own)return own;const cli=p&&p.clienteId?S().get('clientes',p.clienteId):null;return countryCode(cli&&cli.pais); };
+  /* I6.6: a render and each lifecycle projection must reuse one scoped client
+     snapshot. Repeated get() previously amplified to tens of thousands of
+     cloned/scoped reads when policies had no own country or QA provenance. */
+  let activeClientIndex=null;
+  function clientIndex(store){
+    const rows=(store.all('clientes')||[]),index=new Map();
+    rows.forEach(row=>{const id=row&&(row.id||row.uid||row.codigo||row.numero||row.key);if(id&&!index.has(id))index.set(id,row);});
+    return index;
+  }
+  const policyClient=(p,index)=>{
+    if(!p||!p.clienteId)return null;
+    const scoped=index||activeClientIndex;
+    return scoped?scoped.get(p.clienteId)||null:S().get('clientes',p.clienteId);
+  };
+  const policyCountry = (p,index) => { const own=countryCode(p&&p.pais);if(own)return own;const cli=policyClient(p,index);return countryCode(cli&&cli.pais); };
   // B4-003: use the same QA provenance contract as Pólizas and E4/Queries.
   // Explicit cancelled-run fixtures and B2 QA source-backed orphans remain in
   // Firestore for audit, but never appear as commercial renewal opportunities.
-  const isSyntheticQaPolicy = p => !!p && (
+  const isSyntheticQaPolicy = (p,index) => !!p && (
     (typeof q.isSyntheticQaRecord === 'function' && q.isSyntheticQaRecord(p)) ||
     p.__syntheticQa === true || p.syntheticQa === true ||
     /^B2 QA firme(?:\s|$)/i.test(String(p.sourceRef || '').trim()) ||
     (p.clienteId && typeof q.isSyntheticQaRecord === 'function' &&
-      q.isSyntheticQaRecord(S().get('clientes', p.clienteId)))
+      q.isSyntheticQaRecord(policyClient(p,index)))
   );
   const selectedCountry = p => { if(isSyntheticQaPolicy(p))return false; const wanted=countryCode(Orbit.pais); return !wanted || wanted==='TODOS' || policyCountry(p)===wanted; };
   const renewabilityState = p => {
@@ -90,12 +104,14 @@ Orbit.modules.renovaciones = (function () {
      una renovacion. La continuidad puede cambiar de numero de poliza.
      Toda proyeccion es read-only, nunca escribe renuevaDe/renovadaPor. */
   function renewalLifecycleSnapshot(){
-    const store=S(),rows=(store.all('polizas')||[]).filter(p=>p&&p.id&&!isSyntheticQaPolicy(p));
+    const store=S(),clients=activeClientIndex||clientIndex(store),rows=(store.all('polizas')||[]).filter(p=>p&&p.id&&!isSyntheticQaPolicy(p,clients));
     const norm=v=>String(v==null?'':v).trim().normalize('NFD').replace(/[\u0300-\u036f]/g,'').toUpperCase().replace(/[^A-Z0-9]/g,'');
-    const byId=new Map(rows.map(p=>[String(p.id),p])),reverse=new Map(),byCore=new Map(),cache=new Map(),plates=new Map();
+    const byId=new Map(rows.map(p=>[String(p.id),p])),reverse=new Map(),byCore=new Map(),cache=new Map(),plates=new Map(),coreKeys=new Map(),riskSets=new Map();
     const coreKey=p=>{
-      const tenant=norm(p&&p.tenantId),pais=norm(policyCountry(p)),client=norm(p&&p.clienteId),insurer=norm(p&&p.aseguradoraId),ramo=norm(p&&p.ramo);
-      return !pais||!client||!insurer||!ramo?'INCOMPLETE|'+String(p&&p.id||''):[tenant,pais,client,insurer,ramo].join('|');
+      if(coreKeys.has(p))return coreKeys.get(p);
+      const tenant=norm(p&&p.tenantId),pais=norm(policyCountry(p,clients)),client=norm(p&&p.clienteId),insurer=norm(p&&p.aseguradoraId),ramo=norm(p&&p.ramo);
+      const key=!pais||!client||!insurer||!ramo?'INCOMPLETE|'+String(p&&p.id||''):[tenant,pais,client,insurer,ramo].join('|');
+      coreKeys.set(p,key);return key;
     };
     function plate(p){
       const direct=norm(p&& (p.placa||p.placaNormalizada||p.placaFuente||''));
@@ -113,7 +129,9 @@ Orbit.modules.renovaciones = (function () {
       if(p.renuevaDe){const parent=String(p.renuevaDe);if(!reverse.has(parent))reverse.set(parent,[]);reverse.get(parent).push(p);}
     }
     const riskSet=p=>{
-      const values=new Set(plates.get(String(p.id))||[]),own=plate(p);if(own)values.add(own);return values;
+      if(riskSets.has(p))return riskSets.get(p);
+      const values=new Set(plates.get(String(p.id))||[]),own=plate(p);if(own)values.add(own);
+      riskSets.set(p,values);return values;
     };
     const riskCompatible=(p,q)=>{
       const left=riskSet(p),right=riskSet(q);
@@ -123,7 +141,7 @@ Orbit.modules.renovaciones = (function () {
       const left=riskSet(p),right=riskSet(q);
       return left.size>0&&right.size>0&&[...left].some(x=>right.has(x));
     };
-    const sameCore=(p,q)=>coreKey(p)===coreKey(q)&&!coreKey(p).startsWith('INCOMPLETE|')&&riskCompatible(p,q);
+    const sameCore=(p,q)=>{const key=coreKey(p);return !key.startsWith('INCOMPLETE|')&&key===coreKey(q)&&riskCompatible(p,q);};
     const later=(p,q)=>!!(p.vigenciaInicio&&p.vigenciaFin&&q.vigenciaInicio&&q.vigenciaFin&&String(q.vigenciaInicio)>String(p.vigenciaInicio)&&String(q.vigenciaFin)>String(p.vigenciaFin));
     const sourceRenewal=q=>/RENOVAD/.test(norm(q&&(q.tipoEmisionFuente||q.tipoEmision||q.tipoDeEmision||q.tipo_emision||q.emisionTipo||q.tipoEmisionPoliza||'')));
     const consecutive=(p,q)=>{
@@ -246,6 +264,11 @@ Orbit.modules.renovaciones = (function () {
   }
 
   function render(host) {
+    const previousClientIndex=activeClientIndex;
+    try { return renderBody(host); }
+    finally { activeClientIndex=previousClientIndex; }
+  }
+  function renderBody(host) {
     activeHost = host;
     activeLifecycle=null;
     ensureDataCollections();
@@ -258,6 +281,7 @@ Orbit.modules.renovaciones = (function () {
       return;
     }
     clearReadinessWait();
+    activeClientIndex=clientIndex(S());
     activeLifecycle=Orbit.renewalLifecycle.snapshot();
     const cols = buckets();
     const searchQuery=foldSearch(searchText),searchState=searchHydration(),searchApplied=!!searchQuery&&searchState.state==='ready';
@@ -322,7 +346,7 @@ Orbit.modules.renovaciones = (function () {
           </div>
           <div style="padding:10px;display:grid;gap:9px;max-height:560px;overflow-y:auto">
             ${c.items.map(({ p, d }) => {
-              const cli = S().get('clientes', p.clienteId), asg = q.aseguradora(p.aseguradoraId), life=lifecycleOf(p);
+              const cli = policyClient(p), asg = q.aseguradora(p.aseguradoraId), life=lifecycleOf(p);
               const overdueFollowup=d<0&&life.bucketEligible&&!life.terminal&&life.reviewOnly&&renewabilityState(p)!=='NO';
               const wa = (cli && cli.telefono || '').replace(/[^0-9]/g, '');
               // Un cliente puede existir sin nombre confirmado: evitar "Hola ,"
