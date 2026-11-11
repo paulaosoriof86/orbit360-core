@@ -9,7 +9,7 @@ import {getAuth} from 'firebase-admin/auth';
 const PROJECT='ays-orbit-360-lab';
 const TENANT='alianzas-soluciones';
 const ORIGIN=process.env.GI_I66_PERF_ORIGIN||'https://app.aysseguros.com';
-const APPROVED_PREVIEW='https://ays-orbit-360-lab--gi-i66-rc-42972205409-3nt4y0wv.web.app';
+const APPROVED_PREVIEW='https://ays-orbit-360-lab--gi-i66-rc-43090584888-lu40dci6.web.app';
 const OUTPUT=process.env.GI_I66_PERF_REPORT;
 const norm=x=>String(x??'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();
 const need=(ok,code)=>{if(!ok)throw Error(code);};
