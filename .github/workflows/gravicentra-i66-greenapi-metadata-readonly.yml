@@ -1,0 +1,199 @@
+# I6.6 GREENAPI METADATA PROBE -- OFFLINE CANDIDATE, NOT YET COMMITTED.
+# Manual read-only inventory of existing GCP Secret Manager/Functions/Cloud Run.
+# No GreenAPI HTTP, no Secret Manager payload read, no Firestore, no deployment.
+name: Gravicentra I6.6 GreenAPI Secure Metadata ONLY
+
+on:
+  workflow_dispatch:
+    inputs:
+      scope_confirmation:
+        description: "Inventory metadata only; never access token payload or send messages"
+        required: true
+        type: choice
+        options: [READ_ONLY_NO_SEND]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: gravicentra-i66-greenapi-metadata-readonly
+  cancel-in-progress: false
+
+jobs:
+  probe:
+    if: >-
+      github.repository == 'paulaosoriof86/orbit360-core' &&
+      github.ref == 'refs/heads/recovery/fase-a-clean-20260831' &&
+      inputs.scope_confirmation == 'READ_ONLY_NO_SEND'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    env:
+      PROJECT_ID: ays-orbit-360-lab
+      REGION: us-central1
+      SA_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_ALT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: google-github-actions/setup-gcloud@v2
+        with:
+          version: '>= 483.0.0'
+      - name: Select already configured same-project service account without printing credentials
+        shell: bash
+        run: |
+          set -euo pipefail
+          set +x
+          mkdir -p "$RUNNER_TEMP/i66-greenapi-meta-auth"
+          python3 - <<'PY'
+          import json,os,pathlib
+          root=pathlib.Path(os.environ['RUNNER_TEMP'])/'i66-greenapi-meta-auth'
+          selected=None
+          for key in ('SA_LAB','SA_ALT','SA_DEFAULT'):
+              try: row=json.loads(os.environ.get(key) or '{}')
+              except (TypeError,ValueError): continue
+              if row.get('type')=='service_account' and row.get('project_id')=='ays-orbit-360-lab' and row.get('private_key'):
+                  selected=row
+                  break
+          if selected is None:
+              print('I66_GREENAPI_METADATA_CREDENTIAL_MATCH=false')
+              raise SystemExit(1)
+          target=root/'selected.json'
+          target.write_text(json.dumps(selected))
+          target.chmod(0o600)
+          print('I66_GREENAPI_METADATA_CREDENTIAL_MATCH=true')
+          PY
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$RUNNER_TEMP/i66-greenapi-meta-auth/selected.json" >> "$GITHUB_ENV"
+      - name: Collect metadata only (never request a secret version payload)
+        shell: bash
+        run: |
+          set -euo pipefail
+          set +x
+          root="$RUNNER_TEMP/i66-greenapi-meta"
+          mkdir -p "$root/functions" "$root/services" "$root/versions"
+          gcloud auth activate-service-account --key-file="$GOOGLE_APPLICATION_CREDENTIALS" --quiet >/dev/null 2>&1
+          gcloud config set project "$PROJECT_ID" --quiet >/dev/null 2>&1
+          if gcloud secrets list --project "$PROJECT_ID" --format=json > "$root/secrets.json" 2> "$root/secrets.err"; then
+            : > "$root/secrets-readable"
+          fi
+          if gcloud functions list --v2 --regions="$REGION" --project "$PROJECT_ID" --format=json > "$root/functions-list.json" 2> "$root/functions.err"; then
+            : > "$root/functions-readable"
+          fi
+          for fn in orbit360GreenApiOutboxUpdated orbit360GreenApiDeliveryStatus; do
+            if gcloud functions describe "$fn" --gen2 --region "$REGION" --project "$PROJECT_ID" --format=json > "$root/functions/$fn.json" 2> "$root/functions/$fn.err"; then
+              : > "$root/functions/$fn-readable"
+            fi
+          done
+          # Extract ONLY the two exact, same-project Cloud Run service names.
+          python3 - <<'PY'
+          import json,os,pathlib,re
+          root=pathlib.Path(os.environ['RUNNER_TEMP'])/'i66-greenapi-meta'
+          out=[]
+          for fn in ('orbit360GreenApiOutboxUpdated','orbit360GreenApiDeliveryStatus'):
+              p=root/'functions'/f'{fn}.json'
+              if not p.is_file():continue
+              item=json.loads(p.read_text())
+              uri=str((item.get('serviceConfig') or {}).get('service') or '')
+              prefix='projects/ays-orbit-360-lab/locations/us-central1/services/'
+              if not uri.startswith(prefix):continue
+              name=uri[len(prefix):]
+              if re.fullmatch(r'[a-z][a-z0-9-]{1,62}',name):out.append((fn,name))
+          (root/'services-to-read').write_text(''.join(f'{a} {b}\n' for a,b in out))
+          PY
+          while read -r fn service; do
+            test -n "${fn:-}" || continue
+            if gcloud run services describe "$service" --region "$REGION" --project "$PROJECT_ID" --format=json > "$root/services/$fn.json" 2> "$root/services/$fn.err"; then
+              : > "$root/services/$fn-readable"
+            fi
+          done < "$root/services-to-read"
+          # IDs are not printed. Candidate selection is metadata-only and may
+          # be inconclusive when the secret was named without a provider label.
+          python3 - <<'PY'
+          import json,os,pathlib,re
+          root=pathlib.Path(os.environ['RUNNER_TEMP'])/'i66-greenapi-meta'
+          names=[]
+          if (root/'secrets-readable').exists():
+              rows=json.loads((root/'secrets.json').read_text())
+              for item in rows if isinstance(rows,list) else []:
+                  name=str(item.get('name') or '').split('/')[-1]
+                  if re.fullmatch(r'[A-Za-z0-9_-]{4,100}',name) and re.search(r'green[-_]?api|whatsapp|wa[-_]?green',name,re.I):
+                      names.append(name)
+          # Exact server-side Secret Manager references outrank guessed names;
+          # parse only the reference URI, never a payload or token.
+          for fn in ('orbit360GreenApiOutboxUpdated','orbit360GreenApiDeliveryStatus'):
+              p=root/'functions'/f'{fn}.json'
+              if not p.is_file():continue
+              data=json.loads(p.read_text())
+              settings=(data.get('serviceConfig') or {}).get('environmentVariables') or {}
+              ref=str(settings.get('ORBIT360_GREENAPI_GT_SECRET_VERSION') or '')
+              match=re.fullmatch(r'projects/ays-orbit-360-lab/secrets/([A-Za-z0-9_-]{4,100})/versions/(?:latest|[0-9]+)',ref)
+              if match:names.append(match.group(1))
+          # Bounded metadata scan; never access `secrets versions access`.
+          (root/'candidate-secrets').write_text('\n'.join(sorted(set(names))[:5])+'\n' if names else '')
+          PY
+          while IFS= read -r secret; do
+            test -n "${secret:-}" || continue
+            gcloud secrets versions list "$secret" --project "$PROJECT_ID" --format=json > "$root/versions/$secret.json" 2> "$root/versions/$secret.err" || true
+          done < "$root/candidate-secrets"
+      - name: Reduce results to fixed boolean-only report
+        shell: bash
+        run: |
+          set -euo pipefail
+          set +x
+          python3 - <<'PY'
+          import json,os,pathlib
+          root=pathlib.Path(os.environ['RUNNER_TEMP'])/'i66-greenapi-meta'
+          def obj(path):
+              try: return json.loads(path.read_text())
+              except (OSError,ValueError):return None
+          names=['orbit360GreenApiOutboxUpdated','orbit360GreenApiDeliveryStatus']
+          functions=[obj(root/'functions'/f'{n}.json') for n in names]
+          services=[obj(root/'services'/f'{n}.json') for n in names]
+          refname='ORBIT360_GREENAPI_GT_SECRET_VERSION'
+          flagname='ORBIT360_GREENAPI_ENABLED'
+          def env_from_function(item):
+              return (item.get('serviceConfig') or {}).get('environmentVariables') or {} if isinstance(item,dict) else {}
+          def env_from_service(item):
+              if not isinstance(item,dict):return {}
+              containers=(((item.get('spec') or {}).get('template') or {}).get('spec') or {}).get('containers') or []
+              if not containers:
+                  containers=(((item.get('template') or {}).get('containers')) or [])
+              envs=containers[0].get('env') or [] if containers else []
+              return {str(e.get('name')):e for e in envs if isinstance(e,dict)}
+          cfg=[env_from_function(x) for x in functions]
+          renv=[env_from_service(x) for x in services]
+          ver_dir=root/'versions'
+          enabled_versions=False
+          for path in ver_dir.glob('*.json'):
+              rows=obj(path)
+              if isinstance(rows,list) and any(str(x.get('state') or '').upper()=='ENABLED' for x in rows if isinstance(x,dict)):
+                  enabled_versions=True
+          names_source=pathlib.Path('functions/greenapi-firebase-bridge.js').read_text()
+          report={
+            'projectCredentialMatched':True,
+            'secretMetadataListReadable':(root/'secrets-readable').exists(),
+            'greenApiSecretCandidatePresent':bool((root/'candidate-secrets').read_text().strip()),
+            'namedCandidateHasEnabledVersion':enabled_versions,
+            'functionsMetadataListReadable':(root/'functions-readable').exists(),
+            'outboxFunctionDescribeReadable':(root/'functions'/f'{names[0]}-readable').exists(),
+            'webhookFunctionDescribeReadable':(root/'functions'/f'{names[1]}-readable').exists(),
+            'outboxCloudRunDescribeReadable':(root/'services'/f'{names[0]}-readable').exists(),
+            'webhookCloudRunDescribeReadable':(root/'services'/f'{names[1]}-readable').exists(),
+            'bothFunctionsHaveEnvEnabledFlag':all(x.get(flagname)=='true' for x in cfg),
+            'bothFunctionsHaveSecretPathReference':all(bool(x.get(refname)) and str(x.get(refname)).startswith('projects/ays-orbit-360-lab/secrets/') for x in cfg),
+            'bothCloudRunServicesExposeEnableFlagName':all(flagname in x for x in renv),
+            'bothCloudRunServicesExposeSecretVersionName':all(refname in x for x in renv),
+            'activeInstanceIdMatchesApprovedSource':"const INSTANCE = '710522720868'" in names_source,
+            'operationsGroupMatchesApprovedSource':"operations: '120363420665870658@g.us'" in names_source,
+            'paymentsGroupMatchesApprovedSource':"payments: '120363421316253378@g.us'" in names_source,
+            'providerAuthorizedStateVerifiedNow':False,
+            'providerGroupMembershipVerifiedNow':False,
+            'secretPayloadRead':False,
+            'whatsappMessagesSent':False,
+            'cloudResourcesMutated':False,
+          }
+          if not all(type(v) is bool for v in report.values()):raise RuntimeError('NON_BOOLEAN_REPORT_BLOCKED')
+          print('I66_GREENAPI_READONLY_METADATA='+json.dumps(report,sort_keys=True,separators=(',',':')))
+          PY
