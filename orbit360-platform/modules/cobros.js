@@ -756,7 +756,12 @@ Orbit.modules.cobros = (function () {
         if(state)state.textContent='Confirmando aplicación y documentos…';
         const domain=Orbit.reconciliationDomain;
         if(!domain||typeof domain.reconcilePayment!=='function') throw new Error('PAYMENT_DOMAIN_UNAVAILABLE');
-        const origin=paymentOriginKind(receipt) === 'CRM_DIRECT' ? 'crm_migrated_direct' : 'insurer_invoice';
+        // This operation enriches an EXISTING payment with the insurer's
+        // application evidence. CRM_DIRECT is the original payment origin,
+        // never the enrichment source: the server intentionally rejects a
+        // second CRM_DIRECT payment as PAYMENT_ALREADY_APPLIED. It preserves
+        // the original provenance when sourceType=insurer_invoice.
+        const origin='insurer_invoice';
         const saved=await domain.reconcilePayment(receipt.id,{payload:{
           paymentOriginSource:origin,
           paidDate:pm.querySelector('#cc-paid').value||'',
@@ -770,9 +775,19 @@ Orbit.modules.cobros = (function () {
         close(); U.toast(saved&&saved.documentLifecycleOk===false?'✓ Pago conciliado. Un documento quedó en recuperación controlada.':'✓ Pago conciliado y datos actualizados');
         baseCache=null;/* B3-004 R14: router/store reactive owner preserves the active payment context. */
       } catch(error) {
-        console.error('[Gravicentra][Cobros] Aplicación falló',{code:String(error&&(error.code||error.message)||'UNKNOWN'),trace:error&&error.gravicentraPayment||{},receiptId:receipt.id||''});
-        btn.disabled=false;btn.textContent='Guardar aplicación';pm.removeAttribute('aria-busy');if(state)state.textContent='No se guardaron cambios.';
-        U.toast(isPreviewHost()?'La prueba Preview no fue aceptada por el servidor. No se guardaron cambios.':'No fue posible guardar la aplicación del pago.');
+        const feedback=paymentFailureFeedback(error);
+        console.error('[Gravicentra][Cobros] Aplicación falló',{
+          code:String(error&&(error.code||error.message)||'UNKNOWN'),trace:error&&error.gravicentraPayment||{},
+          diagnosticCategory:feedback.code,receiptId:receipt.id||''
+        });
+        btn.disabled=feedback.uncertain;btn.textContent=feedback.uncertain?'Verifica antes de reintentar':'Guardar aplicación';
+        pm.removeAttribute('aria-busy');
+        const status=feedback.uncertain
+          ?'Resultado no confirmado. Comprueba el estado del mismo recibo antes de repetir; esta pantalla conserva los datos.'
+          :'El servidor no aceptó la aplicación. Corrige los datos y vuelve a guardar; esta pantalla conserva los datos.';
+        const reference=feedback.requestId?' · Ref. '+feedback.requestId:'';
+        if(state)state.textContent=status+' Código: '+feedback.code+reference;
+        U.toast((isPreviewHost()?'Preview: ':'')+feedback.message+' Código: '+feedback.code+reference+'. '+status);
       }
     };
   }

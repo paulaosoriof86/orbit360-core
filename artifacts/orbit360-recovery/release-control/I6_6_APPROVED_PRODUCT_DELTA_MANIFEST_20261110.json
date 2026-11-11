@@ -798,6 +798,58 @@
           "gitBlobSha": "423301bf8c2a3e51508e7bb8f27ec1259a2447c2"
         }
       ]
+    },
+    {
+      "id": "I6_6_COBROS_APPLICATION_TEMPORAL_STATUS_AND_GLOBAL_SEARCH_P0",
+      "approvedByDirection": true,
+      "receipt": "artifacts/orbit360-recovery/release-control/I6_6_COBROS_APPLICATION_GLOBAL_SEARCH_AND_DUE_STATUS_20261111.json",
+      "sourceStatus": "SOURCE_CORRECTED_TESTS_PASS_IMMUTABLE_PREVIEW_LIVE_PENDING",
+      "capabilityOwners": [
+        "COBROS_PRIMARY_RUNTIME",
+        "CLIENTE_360_POLICY_RECEIPT_DETAIL",
+        "POLIZAS_PRIMARY_RUNTIME",
+        "GLOBAL_SHELL_SEARCH",
+        "RECEIPTS_READ_MODEL"
+      ],
+      "scope": "Single shared Cobros/Cliente 360 application enrichment from CRM direct payment; preserve exact server payment replay and country guards. Derive day-sensitive receipt display without financial write. Cache global topbar index only across relevant store changes and accent-fold query. No Firestore/Auth/Rules mutation.",
+      "paths": [
+        {
+          "path": "orbit360-platform/core/queries.js",
+          "gitBlobSha": "5dd3f7d7dc4622dfcd804fe5fed0d4272d36802b"
+        },
+        {
+          "path": "orbit360-platform/core/router.js",
+          "gitBlobSha": "349b5db7531a128c16c3cd7c80bd3d119d144d28",
+          "replaces": {
+            "path": "orbit360-platform/core/router.js",
+            "priorGitBlobSha": "60f73dfae6c57e7853acdcd120e05d5be8fde0ee",
+            "priorChangeId": "I6_6_SIGNED_AUTH_WRITER_AND_GLOBAL_SEARCH_INDEX_TRANSVERSAL_P0"
+          }
+        },
+        {
+          "path": "orbit360-platform/modules/cobros.js",
+          "gitBlobSha": "b745f881855f7012a05f03634c316dc91124db91",
+          "replaces": {
+            "path": "orbit360-platform/modules/cobros.js",
+            "priorGitBlobSha": "aca0b2948e9484aaf21ecd367047d61676ae305d",
+            "priorChangeId": "I6_6_OPS_COBROS_SAFE_FAILURE_DIAGNOSTICS_P0"
+          }
+        },
+        {
+          "path": "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js",
+          "gitBlobSha": "d1a6d06feb91e32a6da500f426f0877057f42c1d"
+        },
+        {
+          "path": "orbit360-platform/modules/polizas.js",
+          "gitBlobSha": "cb44522646d70e175db223d32a05f402552140fd"
+        }
+      ],
+      "tests": [
+        {
+          "path": "tools/gravicentra-i6-6-cobros-application-and-temporal-search.test.cjs",
+          "gitBlobSha": "6a5a17727b4f0ff5a3beb572f0f809a09bba633c"
+        }
+      ]
     }
   ]
 }

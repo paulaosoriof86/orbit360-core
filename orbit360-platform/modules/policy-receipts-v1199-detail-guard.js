@@ -340,7 +340,9 @@ Orbit.modules = Orbit.modules || {};
     return `<div style="overflow-x:auto"><table class="tbl"><thead><tr><th>Recibo</th><th>Vence</th><th class="num">Prima neta</th><th class="num">Expedición</th><th class="num">Financiamiento</th><th class="num">Descuento / ajuste</th><th class="num">IVA / impuestos</th><th class="num">Total</th><th>Estado</th></tr></thead><tbody>${rows.map((r, i) => {
       const total = first(r.primaTotal, r.montoTotal, r.monto, r.total);
       const due = first(r.fechaLimite, r.vence, r.fechaVencimiento);
-      const state = first(r.estadoVisual, r.estadoOperativo, r.estado, r.estadoCartera, r.status, 'Pendiente');
+      const state = Orbit.q && Orbit.q.expectedReceiptDisplayStatus
+        ? Orbit.q.expectedReceiptDisplayStatus(r)
+        : first(r.estadoVisual, r.estadoOperativo, r.estado, r.estadoCartera, r.status, 'Pendiente');
       const rid=safe(r.id);
       return `<tr class="${rid?'clickable':''}" ${rid?`onclick="Orbit.receiptsPortfolioProjection&&Orbit.receiptsPortfolioProjection.openReceiptDetail&&Orbit.receiptsPortfolioProjection.openReceiptDetail('${esc(rid)}','${esc(r.clienteId||'')}')"`:''}><td>${esc(first(r.serie, r.numero, r.cuota, i + 1))}</td><td>${esc(fmtDate(due))}</td><td class="num">${esc(moneyDetail(r.primaNeta, r.moneda || cur))}</td><td class="num">${esc(moneyDetail(r.gastosExpedicion, r.moneda || cur))}</td><td class="num">${esc(moneyDetail(r.gastosFinanciamiento, r.moneda || cur))}</td><td class="num">${esc(moneyDetail(r.descuento, r.moneda || cur))}</td><td class="num">${esc(moneyDetail(r.impuestosIVA, r.moneda || cur))}</td><td class="num"><b>${esc(moneyDetail(total, r.moneda || cur))}</b></td><td>${badge(state)}</td></tr>`;
     }).join('')}</tbody></table></div>`;

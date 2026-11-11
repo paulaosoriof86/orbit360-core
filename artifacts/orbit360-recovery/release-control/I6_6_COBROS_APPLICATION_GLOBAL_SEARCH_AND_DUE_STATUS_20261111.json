@@ -1,0 +1,53 @@
+{
+  "schema": "GRAVICENTRA_I6_6_COBROS_APPLICATION_SEARCH_DUE_CAUSAL_RECEIPT_V1",
+  "dateGuatemala": "2026-11-11",
+  "product": "Gravicentra Insurance",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "historicalClosedGate": "B4-007",
+  "activeGate": "I6.6",
+  "approvedByDirection": true,
+  "instruction": "Corregir transversalmente falla de guardar aplicación de pago desde Cobros y Cliente 360, optimizar buscador superior, respetar fuente exacta, probar y publicar misma candidata sin duplicados",
+  "causalFindings": [
+    {
+      "case": "COBROS_APPLICATION_CRM_DIRECT_REPLAY",
+      "evidence": "La pantalla envía paymentOriginSource=crm_migrated_direct en reconcile_payment cuando la procedencia original es CRM_DIRECT; backend applyPayment permite enriquecer registros ya pagados solo con sourceType insurer_invoice/insurer_statement/commission_statement y rechaza un segundo CRM_DIRECT como PAYMENT_ALREADY_APPLIED.",
+      "correction": "Para reconcile_payment la operación informa el tipo de nueva evidencia insurer_invoice, preserva el origen del cobro existente y evita intentar crear un segundo pago; sigue prohibido repetir un cobro ya aplicado. No se relaja comprobación de cobro único ni obligación activa."
+    },
+    {
+      "case": "APPLICATION_ERROR_HIDDEN",
+      "evidence": "El catch de conciliarFactura emite toast genérico sin categoría ni requestId y no conserva indicación de resultado incierto.",
+      "correction": "Se informa categoría, referencia, estado incierto sin repetición ciega y se conservan campos para corregir o contrastar readback."
+    },
+    {
+      "case": "STORED_FUTURO_AFTER_DUE_DATE",
+      "evidence": "LIVE muestra AUTO-45580 4/10 con fecha 2026-10-21 como Futuro al 2026-11-11; Mapfre 3002400057714 11/12 del 2026-11-02 también Futuro.",
+      "correction": "Estado solo de lectura calculado por fecha contractual: vencido / hoy pendiente / futuro; estados reportados, inferidos y pagos confirmados conservan origen y no se convierten por calendario. No se escribe estado financiero."
+    },
+    {
+      "case": "GLOBAL_TOPBAR_SEARCH_REINDEX",
+      "evidence": "El indexador superior leía las colecciones completas tras cualquier evento de store, incluidos dominios no indexados; búsqueda con tildes no plegaba término.",
+      "correction": "Invalida el índice solo ante colecciones relevantes, sesión, ruta o país y usa folding de tildes tanto en índice como en consulta. Preserva filtrado por rol/país."
+    }
+  ],
+  "tests": [
+    "tools/gravicentra-i6-6-cobros-application-and-temporal-search.test.cjs",
+    "tools/gravicentra-i6-6-global-search-index-performance.test.cjs",
+    "tools/gravicentra-i6-6-payment-replay-ledger-guard.test.cjs"
+  ],
+  "scope": {
+    "mutateFinancialData": false,
+    "reimportPolicies": false,
+    "relaxPermissions": false,
+    "changeServerFinancialRules": false,
+    "deployNewBackendFunction": false,
+    "preserveHistoricalRelease": true,
+    "sameSourceImmutablePreviewThenLive": true
+  },
+  "sourceStatus": "SOURCE_CORRECTED_LOCAL_TESTED_PREVIEW_LIVE_NOT_YET_PROVEN",
+  "paymentInferenceQueue": "I6_6_COBROS_CONCILIACION_SOURCE_INTAKE_20261110.json#i66NextCarteraCashReconciliationBatches20261111",
+  "realCarlosPayment": {
+    "status": "REPORTED_BY_CARLOS_NOT_EXACT_RECEIPT_IDENTIFIED",
+    "reason": "La captura acredita la falla genérica, no el código de respuesta o el ID del requerimiento. No declarar corrección funcional LIVE sin readback del caso real o prueba sintética firmada."
+  }
+}

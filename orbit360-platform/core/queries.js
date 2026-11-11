@@ -129,6 +129,27 @@ Orbit.q = (function () {
     return state === 'pagado' || state === 'conciliado' || paymentState === 'PAID_DIRECT' ||
       paymentState === 'PAID_CONFIRMED' || applicationState === 'APPLIED_DIRECT' || row && row.conciliado === true;
   }
+  // The stored visual label is a snapshot, not proof of payment and not the
+  // current calendar. Derive overdue/future only for open, non-reported dues;
+  // never turn a reported/inferred payment into a confirmed payment.
+  function expectedReceiptDisplayStatus(row) {
+    if (!row) return 'Pendiente';
+    const op = textNorm(row.estadoOperativo).replace(/\s+/g, '_');
+    const paymentState = String(row.paymentState || '').trim().toUpperCase();
+    if (['pago_reportado','pago_reportado_aplicado','pago_reportado_asesor','pago_reportado_asesor_aplicado','reportado'].includes(op) ||
+        ['PAID_REPORTED','REPORTED_PENDING_OPERATIVE_VALIDATION'].includes(paymentState) || row.pagoReportado === true)
+      return 'Pago reportado';
+    if (['pago_inferido','inferido'].includes(op) || paymentState === 'PAID_INFERRED' || row.inferredPaid === true || row.paidInferred === true)
+      return 'Pago inferido';
+    if (receiptHasAppliedPayment(row)) return 'Pagado';
+    const status = String(row.estadoOperativo || row.estado || row.estadoCartera || row.estadoVisual || row.status || '').trim();
+    const normalized = textNorm(status).replace(/\s+/g, '_');
+    if (['anulado','anulada','cancelado','cancelada','cerrado','rechazado'].includes(normalized)) return status;
+    const dated = calendarClassification(row, true);
+    if (dated.overdue) return 'Vencido';
+    if (dated.future) return dated.daysRemaining === 0 ? 'Pendiente' : 'Futuro';
+    return status || 'Pendiente';
+  }
 
   // B4-003: cartera determines whether an obligation is open and overdue;
   // a linked expected receipt may supply a missing contractual installment
@@ -751,6 +772,6 @@ Orbit.q = (function () {
     asesor, aseguradora, polizasDe, recibosEsperadosDe, carteraPrimasDe, carteraPendienteDe, carteraVencidaDe, cobrosDe, comisionesDe, actividadesDe, cancelacionesDe,
     clienteResumen, clientesResumenIndex, saludCliente, carteraGlobal, carteraPendienteRows, carteraVencidaRows, cobrosConfirmadosRows, carteraGlobalPorMoneda, primaVigenteGlobal, renovacionesProximas, cobrosVencidos, leaderboard,
     clientesScoped, polizasScoped, isSyntheticQaRecord, realizedPaymentRows, currentMonthKey, produccionMesPorMoneda, recaudoMesPorMoneda, metaAdvisorMes, leaderboardMes,
-    agingVencido, agingVencidoPorMoneda, portfolioAmountProof, portfolioAmountContext, portfolioValuedRowsCount, portfolioDue, portfolioOpen, portfolioClassification, portfolioIsOverdue, expectedReceiptClassification, expectedReceiptIsOverdue, comisionesPor, clienteNombre, norm, monedaPais, policyLinkedClientId, policyLinkedCountry, vehiculosDe, vehiculoDePoliza, postRecaudo
+    agingVencido, agingVencidoPorMoneda, portfolioAmountProof, portfolioAmountContext, portfolioValuedRowsCount, portfolioDue, portfolioOpen, portfolioClassification, portfolioIsOverdue, expectedReceiptClassification, expectedReceiptIsOverdue, expectedReceiptDisplayStatus, comisionesPor, clienteNombre, norm, monedaPais, policyLinkedClientId, policyLinkedCountry, vehiculosDe, vehiculoDePoliza, postRecaudo
   };
 })();

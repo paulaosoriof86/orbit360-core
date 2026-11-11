@@ -107,7 +107,10 @@ Orbit.router = (function () {
     const U = Orbit.ui;
     const scopedSearchStore = () => Orbit.access && typeof Orbit.access.scopedStore === 'function'
       ? Orbit.access.scopedStore(current || 'inicio') : Orbit.store;
-    const normalized = v => String(v == null ? '' : v).toLowerCase();
+    // Accent folding belongs to BOTH the indexed text and the typed query;
+    // it is a search-only projection and never changes client identities.
+    const normalized = v => String(v == null ? '' : v).toLowerCase()
+      .normalize('NFD').replace(/[\u0300-\u036f]/g, '');
     let cached = null, pending = null;
     function cacheKey() {
       const member = Orbit.auth && Orbit.auth.productUser || {};
@@ -162,7 +165,7 @@ Orbit.router = (function () {
       return rows;
     }
     function buscar(query) {
-      const term = query.trim().toLowerCase();
+      const term = normalized(query.trim());
       if (term.length < 2) { dd.classList.remove('open'); dd.innerHTML = ''; return; }
       const top = []; let total = 0;
       searchIndex().forEach(row => { if (row.query.includes(term)) { total++; if (top.length < 12) top.push(row); } });
@@ -176,7 +179,15 @@ Orbit.router = (function () {
       }));
     }
     function schedule() { if (pending) clearTimeout(pending); pending = setTimeout(() => { pending = null; buscar(inp.value); }, 120); }
-    const invalidate = () => { cached = null; };
+    // Ops, notifications and unrelated modules emit frequent write/hydration
+    // events. Rebuilding six scoped collections for those unrelated events
+    // caused the next global keypress to repeat the expensive first search.
+    const indexedCollections = new Set(['clientes','polizas','vehiculos','cobros','aseguradoras','asesores']);
+    const invalidate = event => {
+      const collection = event && event.detail && event.detail.collection;
+      if (collection && collection !== '*' && !indexedCollections.has(collection)) return;
+      cached = null;
+    };
     document.addEventListener('orbit:store', invalidate);
     // Product authoritative snapshots notify on WINDOW, not document.
     // A cache without this event could keep stale clients/receipts after an
