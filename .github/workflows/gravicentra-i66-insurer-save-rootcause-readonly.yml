@@ -1,0 +1,88 @@
+# I6.6 P0: physical LIVE insurer and signed role/scope metadata only.
+# No mutation, deployment, credential/secret reads, or customer field logging.
+name: Gravicentra I6.6 Insurer SAVE Root Cause Readonly
+on:
+  workflow_dispatch:
+  push:
+    branches: [recovery/fase-a-clean-20260831]
+    paths:
+      - .github/workflows/gravicentra-i66-insurer-save-rootcause-readonly.yml
+permissions:
+  contents: read
+jobs:
+  inspect:
+    if: github.repository == 'paulaosoriof86/orbit360-core' && github.ref == 'refs/heads/recovery/fase-a-clean-20260831'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    env:
+      SA_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_ALT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+    steps:
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install metadata-only Firestore reader
+        run: npm install --prefix "$RUNNER_TEMP/insurer-reader" --no-save --ignore-scripts --no-audit --no-fund firebase-admin@13.4.0 >/dev/null
+      - name: Read exact physical metadata and role scope without writes
+        shell: bash
+        run: |
+          node - <<'NODE'
+          'use strict';
+          const assert=require('node:assert/strict');
+          const sdk=require(process.env.RUNNER_TEMP+'/insurer-reader/node_modules/firebase-admin');
+          const service=['SA_LAB','SA_ALT','SA_DEFAULT'].map(n=>process.env[n]).filter(Boolean)
+            .map(s=>{try{return JSON.parse(s);}catch(_){return null;}})
+            .find(s=>s&&s.type==='service_account'&&s.project_id==='ays-orbit-360-lab'&&s.private_key);
+          assert.ok(service,'INSURER_READONLY_EXISTING_IDENTITY_MISSING');
+          sdk.initializeApp({credential:sdk.credential.cert(service),projectId:'ays-orbit-360-lab'});
+          const db=sdk.firestore(),tenant='alianzas-soluciones',insurerId='gt-aseguradora-guatemalteca';
+          const root=db.collection('tenants').doc(tenant);
+          const norm=v=>String(v||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_+|_+$/g,'');
+          const list=v=>Array.isArray(v)?v:[];
+          (async()=>{
+            const [insurer,members,advisors,access]=await Promise.all([
+              root.collection('data').doc('aseguradoras').collection('items').doc(insurerId)
+                .get(),
+              root.collection('members').select('nombre','displayName','name','advisorId','roles','activeRole','countries','paises','dataScopes','scopeDatos','status','modulesRestricted','modulesExtra').get(),
+              root.collection('data').doc('asesores').collection('items').select('nombre','displayName','authUid','uid','id').get(),
+              root.collection('config').doc('access').get()
+            ]);
+            const row=insurer.exists?insurer.data()||{}:{},hist=row.actividad;
+            const clients=members.docs.map(d=>({uid:d.id,...(d.data()||{})}));
+            const advisorCandidates=new Set(advisors.docs.filter(d=>/carlos.*castro|castro.*carlos/i.test(norm((d.data()||{}).nombre||''))).map(d=>d.id));
+            const carlos=clients.filter(m=>/carlos.*castro|castro.*carlos/i.test(norm(m.nombre||m.displayName||m.name||''))||advisorCandidates.has(m.advisorId));
+            const configs=access.exists?access.data()||{}:{},roleKeys=Object.keys(configs.rolePermissions||{});
+            const role=roleKeys.find(k=>norm(k)==='operativo');
+            const rolePerm=role?(configs.rolePermissions||{})[role]||{}:{};
+            const moduleKey=Object.keys(rolePerm).find(k=>norm(k)==='aseguradoras');
+            const modulePerm=moduleKey?rolePerm[moduleKey]||{}:{};
+            const roleScopeKey=Object.keys(configs.roleScopes||{}).find(k=>norm(k)==='operativo');
+            const summary={
+              schema:'GI_I66_INSURER_SAVE_ROOT_CAUSE_READONLY_V1',
+              insurerFound:insurer.exists,
+              insurerIdentityMatch:insurer.exists&&(!row.id||row.id===insurerId),
+              insurerTenantMatch:insurer.exists&&(!row.tenantId||row.tenantId===tenant),
+              insurerCountryGT:insurer.exists&&String(row.pais||row.country||'').toUpperCase()==='GT',
+              insurerActivityKind:hist==null?'absent':Array.isArray(hist)?'array':typeof hist,
+              insurerActivityLength:Array.isArray(hist)?hist.length:null,
+              insurerHasAdvisor:Boolean(row.asesorId||row.advisorId||row.ownerAdvisorId),
+              insurerLogoHttps:!row.logo||/^https:\/\//i.test(String(row.logo)),
+              carlosSignedMembershipMatches:carlos.length,
+              carlosMemberships:carlos.map(m=>({roles:list(m.roles).map(norm),activeRole:norm(m.activeRole),
+                allowedGT:list(m.countries||m.paises).map(v=>String(v).toUpperCase()).includes('GT'),
+                allowedCO:list(m.countries||m.paises).map(v=>String(v).toUpperCase()).includes('CO'),
+                moduleScope:typeof m.dataScopes?.modules==='object'?norm(m.dataScopes.modules.aseguradoras):'',
+                defaultScope:norm(m.dataScopes?.default||m.scopeDatos),
+                insurerModuleRestricted:list(m.modulesRestricted).map(norm).includes('aseguradoras'),
+                insurerModuleExtra:list(m.modulesExtra).map(norm).includes('aseguradoras'),
+                status:norm(m.status)})),
+              operativeRoleScope:roleScopeKey?norm(configs.roleScopes[roleScopeKey]):'not_explicit',
+              operativeInsurerEditMatrix:modulePerm.editar===true?'allow':modulePerm.editar===false?'deny':'absent',
+              operativeInsurerViewMatrix:modulePerm.ver===true?'allow':modulePerm.ver===false?'deny':'absent',
+              readsOnly:true,writes:0
+            };
+            console.log('INSURER_SAVE_METADATA='+JSON.stringify(summary));
+            console.log('INSURER_SAVE_READONLY_DONE no_business_fields_no_credentials_no_writes');
+          })().catch(error=>{console.error('INSURER_READONLY_ERROR='+String(error?.code||error?.message||'unknown').replace(/[^A-Za-z0-9_ -]/g,'').slice(0,100));process.exitCode=1;});
+          NODE
