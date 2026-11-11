@@ -1,0 +1,129 @@
+# G14 creates an immutable single-publisher candidate specification only.
+# This workflow intentionally has NO publisher job and NO release credentials.
+name: AYS G14 G15 coordinated Hosting publisher SOURCE ONLY
+on:
+  push:
+    branches:
+      - audit/ays-g4-shared-hosting-sourceonly-20261013
+    paths:
+      - '.github/workflows/ays-g14-coordinated-publisher-sourceonly.yml'
+      - 'tools/ays-g14/**'
+      - 'tools/ays-g15/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: ays-shared-hosting-publisher-g14-sourceonly
+  cancel-in-progress: false
+jobs:
+  prepare-coordinated-publisher-without-release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Download immutable G4 source evidence
+        uses: actions/download-artifact@v4
+        with:
+          artifact-ids: '11851102002'
+          run-id: '38469690277'
+          github-token: ${{ github.token }}
+          path: ${{ runner.temp }}/g14-g4
+      - name: Download G7 administrative READ-ONLY evidence (frozen hashes checked by G8)
+        uses: actions/download-artifact@v4
+        with:
+          name: ays-g7-firebase-lab-readonly-evidence
+          run-id: '38582624499'
+          github-token: ${{ github.token }}
+          path: ${{ runner.temp }}/g14-g7
+      - name: Fetch exact immutable Portal and Siniestros source commits
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch --no-tags origin f873ce1f2b55dc5ad8cac07b58be43faddeb0a99 1623cac977498bb5bba0092748a8c70a9cd06189
+          git cat-file -e 'f873ce1f2b55dc5ad8cac07b58be43faddeb0a99^{commit}'
+          git cat-file -e '1623cac977498bb5bba0092748a8c70a9cd06189^{commit}'
+      - name: Reconstruct exact source-only 2708-file union outside checkout
+        shell: bash
+        run: |
+          set -euo pipefail
+          python tools/ays-g4/AYS_G4_ENSAMBLADOR_HOSTING_READONLY.py \
+            --repo "$GITHUB_WORKSPACE" \
+            --out "$RUNNER_TEMP/g14-staged" \
+            --expected-count 2706
+      - name: Portal frozen read-only local synthetic tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/g14-staged/candidate/functions"
+          git show 1623cac977498bb5bba0092748a8c70a9cd06189:functions/portal-p01-s511f-shell.test.js > "$RUNNER_TEMP/g14-staged/candidate/functions/portal-p01-s511f-shell.test.js"
+          node --check "$RUNNER_TEMP/g14-staged/candidate/orbit360-platform/core/portal-p01-s511f.js"
+          node --check "$RUNNER_TEMP/g14-staged/candidate/orbit360-platform/core/siniestros-s512d-public.js"
+          node --test "$RUNNER_TEMP/g14-staged/candidate/functions/portal-p01-s511f-shell.test.js"
+      - name: Recheck G8 immutable manifests, 15/15 negatives and 963 live public bytes
+        shell: bash
+        run: |
+          set -euo pipefail
+          python tools/ays-g8/G8_RECOVERY_GATE.py \
+            --g4-dir "$RUNNER_TEMP/g14-g4/ays-g4-source-manifest" \
+            --g7-dir "$RUNNER_TEMP/g14-g7" \
+            --staged-dir "$RUNNER_TEMP/g14-staged/candidate" \
+            --selftest --public-smoke --full-bytes \
+            --out "$RUNNER_TEMP/g14-evidence/G8_SAME_RUN_PRECHECK.json"
+      - name: Generate exact 965-source-path manifest and 967-path future target with HOLD
+        shell: bash
+        run: |
+          set -euo pipefail
+          python tools/ays-g14/G14_SHARED_HOSTING_PUBLISHER_PREPARE_SOURCEONLY.py \
+            --g4-dir "$RUNNER_TEMP/g14-g4/ays-g4-source-manifest" \
+            --g7-dir "$RUNNER_TEMP/g14-g7" \
+            --g8-receipt "$RUNNER_TEMP/g14-evidence/G8_SAME_RUN_PRECHECK.json" \
+            --out-dir "$RUNNER_TEMP/g14-evidence/final"
+      - name: G15 prepare exact 965-file isolated Hosting publication bundle, no deploy
+        shell: bash
+        run: |
+          set -euo pipefail
+          python tools/ays-g15/G15_PREPARE_EXACT_HOSTING_TREE_SOURCEONLY.py \
+            --repo "$GITHUB_WORKSPACE" \
+            --source-root "$RUNNER_TEMP/g14-staged/candidate/orbit360-platform" \
+            --manifest "$RUNNER_TEMP/g14-evidence/final/G14_PUBLISH_CANDIDATE_MANIFEST.json" \
+            --g14-receipt "$RUNNER_TEMP/g14-evidence/final/G14_SOURCE_ONLY_RELEASE_HOLD_RECEIPT.json" \
+            --g8-receipt "$RUNNER_TEMP/g14-evidence/G8_SAME_RUN_PRECHECK.json" \
+            --out "$RUNNER_TEMP/g15-publisher"
+      - name: Assert no publishing commands or Firebase credentials in G14 workflow
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+          t=Path(".github/workflows/ays-g14-coordinated-publisher-sourceonly.yml").read_text()
+          live="\n".join(line for line in t.splitlines() if not line.lstrip().startswith("#"))
+          forbidden=tuple(a+b for a,b in (("firebase"," deploy"),("firebase","-tools"),("FIREBASE_","SERVICE_ACCOUNT"),("GOOGLE_","APPLICATION_CREDENTIALS"),("hosting:channel:","deploy"),("FirebaseExtended/","action-hosting-deploy"),("secrets",".")))
+          # Forbid even echoing any cloud publishing command in executable source.
+          assert all(s not in live for s in forbidden), "G14_WORKFLOW_DEPLOY_DENIED"
+          assert "contents: read" in live and "actions: read" in live
+          assert "persist-credentials: false" in live
+          print("G14_WORKFLOW_NON_PUBLISHER_GUARD PASS")
+          PY
+      - name: Retain sanitized manifest and immutable source-only tests
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ays-g14-g15-coordinated-publisher-sourceonly
+          path: |
+            ${{ runner.temp }}/g14-evidence/G8_SAME_RUN_PRECHECK.json
+            ${{ runner.temp }}/g14-evidence/final/G14_PUBLISH_CANDIDATE_MANIFEST.json
+            ${{ runner.temp }}/g14-evidence/final/G14_SOURCE_ONLY_RELEASE_HOLD_RECEIPT.json
+            ${{ runner.temp }}/g15-publisher/
+          if-no-files-found: warn
+          retention-days: 15
+# NEVER deploy or merge from this job. A separately authorized release mechanism is required.

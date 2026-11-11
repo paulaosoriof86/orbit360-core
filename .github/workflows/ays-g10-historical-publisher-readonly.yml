@@ -1,0 +1,44 @@
+# G10: cross-branch READ ONLY publisher detection. No Firebase operations.
+name: AYS G10 historical publisher risk read only
+on:
+  push:
+    branches:
+      - audit/ays-g4-shared-hosting-sourceonly-20261013
+    paths:
+      - '.github/workflows/ays-g10-historical-publisher-readonly.yml'
+      - 'tools/ays-g10/G10_HISTORICAL_PUBLISHER_READONLY_AUDIT.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: ays-g10-historical-publisher-readonly
+  cancel-in-progress: false
+jobs:
+  source-only-historical-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verify historical branches and current PR without writes
+        shell: bash
+        run: |
+          set -euo pipefail
+          python tools/ays-g10/G10_HISTORICAL_PUBLISHER_READONLY_AUDIT.py \
+            --root "$GITHUB_WORKSPACE" --selftest \
+            --out "$RUNNER_TEMP/ays-g10/G10_READONLY_RISK_RECEIPT.json"
+      - name: Retain immutable read-only risk receipt
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ays-g10-historical-publisher-risk
+          path: ${{ runner.temp }}/ays-g10/G10_READONLY_RISK_RECEIPT.json
+          if-no-files-found: warn
+          retention-days: 15
+# HOLD is an expected result when legacy publishers are present; no green release signal.
+# No Firebase secrets, token persistence, deploy, merge, or changes to historical branches.

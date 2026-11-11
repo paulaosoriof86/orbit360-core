@@ -1,0 +1,66 @@
+# G9 coordinated Hosting ownership proposal. Contains NO release action.
+name: AYS G9 Shared Hosting source-only ownership guard
+on:
+  push:
+    branches:
+      - audit/ays-g4-shared-hosting-sourceonly-20261013
+    paths:
+      - '.github/workflows/ays-g9-shared-hosting-sourceonly.yml'
+      - '.github/workflows/portal-p01-s511f-customer-shell-lab.yml'
+      - '.github/workflows/siniestros-s512d-public-resolver-lab.yml'
+      - 'tools/ays-g9/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: ays-g9-hosting-sourceonly
+  cancel-in-progress: false
+jobs:
+  coordinated-preflight-sourceonly:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify both legacy publishers no longer write Hosting in PR candidate
+        shell: bash
+        run: |
+          set -euo pipefail
+          python tools/ays-g9/G9_HOSTING_OWNER_GUARD.py --root "$GITHUB_WORKSPACE" --out "$RUNNER_TEMP/g9/G9_SOURCE_OWNER_RECEIPT.json"
+      - name: Test Siniestros resolver locally without any Cloud operations
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm ci --prefix functions
+          node --check functions/siniestros-public-resolver-s512d.js
+          node --check orbit360-platform/core/siniestros-s512d-public.js
+          node --test functions/siniestros-s512d-public-surface.test.js
+      - name: Test frozen Portal P-01 locally without customer login
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch --no-tags origin 1623cac977498bb5bba0092748a8c70a9cd06189
+          mkdir -p "$RUNNER_TEMP/portal/orbit360-platform/core" "$RUNNER_TEMP/portal/functions"
+          git show 1623cac977498bb5bba0092748a8c70a9cd06189:orbit360-platform/portal-p01-lab.html > "$RUNNER_TEMP/portal/orbit360-platform/portal-p01-lab.html"
+          git show 1623cac977498bb5bba0092748a8c70a9cd06189:orbit360-platform/core/portal-p01-s511f.js > "$RUNNER_TEMP/portal/orbit360-platform/core/portal-p01-s511f.js"
+          git show 1623cac977498bb5bba0092748a8c70a9cd06189:functions/portal-p01-s511f-shell.test.js > "$RUNNER_TEMP/portal/functions/portal-p01-s511f-shell.test.js"
+          node --check "$RUNNER_TEMP/portal/orbit360-platform/core/portal-p01-s511f.js"
+          node --test "$RUNNER_TEMP/portal/functions/portal-p01-s511f-shell.test.js"
+      - name: Upload read-only governance receipt
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ays-g9-shared-hosting-sourceonly
+          path: ${{ runner.temp }}/g9/G9_SOURCE_OWNER_RECEIPT.json
+          if-no-files-found: warn
+          retention-days: 15
+# IMPORTANT: No merge, Firebase auth, deploy, rollback or user-data access.
+# Historical branch copies remain unsafe until independently reconciled under later authorization.

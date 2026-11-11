@@ -1,0 +1,52 @@
+# G11 read-only census of existing repository workflow sources. NOT a publisher.
+name: AYS G11 Hosting publisher universe READ ONLY
+on:
+  push:
+    branches:
+      - audit/ays-g4-shared-hosting-sourceonly-20261013
+    paths:
+      - '.github/workflows/ays-g11-hosting-publisher-inventory.yml'
+      - 'tools/ays-g11/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: ays-g11-publisher-inventory-sourceonly
+  cancel-in-progress: false
+jobs:
+  branch-source-inventory:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Enumerate branch workflow sources and test explicit Hosting publishers
+        shell: bash
+        run: |
+          set -euo pipefail
+          python tools/ays-g11/G11_REPOSITORY_HOSTING_PUBLISHER_READONLY.py \
+            --root "$GITHUB_WORKSPACE" \
+            --out "$RUNNER_TEMP/ays-g11/G11_BRANCH_PUBLISHER_INVENTORY.json"
+      - name: G13 inspect actual branch push-match and default-branch workflow registration
+        shell: bash
+        run: |
+          set -euo pipefail
+          python tools/ays-g11/G13_RESIDUAL_PUBLISHER_TRIGGERS_READONLY.py \
+            --root "$GITHUB_WORKSPACE" \
+            --out "$RUNNER_TEMP/ays-g11/G13_RESIDUAL_PUBLISHER_TRIGGER_RECEIPT.json"
+      - name: Retain only source audit and gate receipt
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ays-g11-hosting-publisher-inventory-sourceonly
+          path: |
+            ${{ runner.temp }}/ays-g11/G11_BRANCH_PUBLISHER_INVENTORY.json
+            ${{ runner.temp }}/ays-g11/G13_RESIDUAL_PUBLISHER_TRIGGER_RECEIPT.json
+          if-no-files-found: warn
+          retention-days: 15
+# No deploy, Firebase auth, secrets, IAM modifications, promotion or branch changes.

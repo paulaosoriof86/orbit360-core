@@ -1,0 +1,49 @@
+# A&S G9 source-only Portal P-01 shell contract; no independent Hosting deploy.
+# Frozen historical Portal source HEAD 1623cac977498bb5bba0092748a8c70a9cd06189.
+name: Portal P-01 S5.11F Customer Shell SOURCE ONLY
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - audit/ays-g4-shared-hosting-sourceonly-20261013
+      - ays/portal-p01-s511f-customer-shell-lab-20261007
+    paths:
+      - '.github/workflows/portal-p01-s511f-customer-shell-lab.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  portal-shell-source-verification:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Extract immutable Portal source into isolated temporary workspace
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch --no-tags origin 1623cac977498bb5bba0092748a8c70a9cd06189
+          mkdir -p "$RUNNER_TEMP/ays-g9-portal/orbit360-platform/core" "$RUNNER_TEMP/ays-g9-portal/functions"
+          git show 1623cac977498bb5bba0092748a8c70a9cd06189:orbit360-platform/portal-p01-lab.html > "$RUNNER_TEMP/ays-g9-portal/orbit360-platform/portal-p01-lab.html"
+          git show 1623cac977498bb5bba0092748a8c70a9cd06189:orbit360-platform/core/portal-p01-s511f.js > "$RUNNER_TEMP/ays-g9-portal/orbit360-platform/core/portal-p01-s511f.js"
+          git show 1623cac977498bb5bba0092748a8c70a9cd06189:functions/portal-p01-s511f-shell.test.js > "$RUNNER_TEMP/ays-g9-portal/functions/portal-p01-s511f-shell.test.js"
+      - name: Verify original Portal source constraints
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check "$RUNNER_TEMP/ays-g9-portal/orbit360-platform/core/portal-p01-s511f.js"
+          node --test "$RUNNER_TEMP/ays-g9-portal/functions/portal-p01-s511f-shell.test.js"
+          grep -q 'Portal P-01 · LAB · READ-ONLY' "$RUNNER_TEMP/ays-g9-portal/orbit360-platform/portal-p01-lab.html"
+          grep -q 'portalP01ReadOnlyS511E' "$RUNNER_TEMP/ays-g9-portal/orbit360-platform/core/portal-p01-s511f.js"
+      - name: Explicit no-release receipt
+        shell: bash
+        run: echo 'G9_PORTAL_SOURCE_ONLY_PASS NO_FIREBASE_DEPLOY NO_HOSTING_MUTATION'
+# No Firebase CLI, service account, user account or site writes.
