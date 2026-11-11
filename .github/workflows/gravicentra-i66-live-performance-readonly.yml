@@ -1,0 +1,98 @@
+# I6.6: one canonical LIVE performance discriminator. No product or data mutation.
+# The tested LIVE build is SHA-pinned; cold auth and UI render are timed separately.
+name: Gravicentra I6.6 LIVE Performance READ ONLY
+on:
+  push:
+    branches: [recovery/fase-a-clean-20260831]
+    paths:
+      - .github/workflows/gravicentra-i66-live-performance-readonly.yml
+      - tools/gravicentra-i66-live-performance-readonly.mjs
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: gi-i66-live-performance-readonly
+  cancel-in-progress: false
+
+jobs:
+  real-chrome-perf:
+    if: github.repository == 'paulaosoriof86/orbit360-core' && github.ref_name == 'recovery/fase-a-clean-20260831'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      GI_I66_PERF_PROJECT: ays-orbit-360-lab
+      GI_I66_PERF_TENANT: alianzas-soluciones
+      SA_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_LAB_ALT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+    steps:
+      - name: Checkout exact canonical I6.6 and prove read-only code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Guard LIVE source and diagnostics scope
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          test -z "${FIRESTORE_EMULATOR_HOST:-}"
+          node --check tools/gravicentra-i66-live-performance-readonly.mjs
+          node - <<'NODE'
+          const fs=require('node:fs');
+          const s=fs.readFileSync('tools/gravicentra-i66-live-performance-readonly.mjs','utf8');
+          for(const re of [/\.set\s*\(/,/\.update\s*\(/,/\.delete\s*\(/,/\.runTransaction\s*\(/,/\.setCustomUserClaims\s*\(/,/\.createUser\s*\(/])
+            if(re.test(s))throw Error('I66_PERF_WRITE_PATH_DENIED');
+          if(!s.includes("const ORIGIN='https://app.aysseguros.com'")||!s.includes('firestoreWrites:0,businessActions:0,paymentActions:0'))
+            throw Error('I66_PERF_SCOPE_DRIFT');
+          console.log('I66_PERF_STATIC_READONLY_BOUNDARY_PASS');
+          NODE
+          curl -fsSL --max-time 25 https://app.aysseguros.com/__recovery__/build.json > "$RUNNER_TEMP/gi-i66-live-build.json"
+          node - <<'NODE'
+          const b=require(process.env.RUNNER_TEMP+'/gi-i66-live-build.json');
+          if(b.buildId!=='gi-i66-4546970cbdee-57f234755dc1'||
+             b.sourceSha!=='4546970cbdeedc6296852b6f3624f7d56b8e02b6')
+            throw Error('I66_PERF_LIVE_BUILD_CHANGED_HOLD');
+          console.log('I66_PERF_PINNED_LIVE_4546970C_BUILD_PASS');
+          NODE
+      - name: Select existing exact Firebase account, never log credentials
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/gi-i66-perf-auth"
+          chmod 700 "$RUNNER_TEMP/gi-i66-perf-auth"
+          python3 - <<'PY'
+          import json,os,pathlib
+          root=pathlib.Path(os.environ['RUNNER_TEMP'])/'gi-i66-perf-auth'
+          for key in ('SA_LAB','SA_LAB_ALT','SA_DEFAULT'):
+            try: v=json.loads(os.environ.get(key,''))
+            except (TypeError,ValueError): continue
+            if v.get('type')!='service_account' or v.get('project_id')!='ays-orbit-360-lab' or not v.get('private_key'):continue
+            file=root/'existing.json';file.write_text(json.dumps(v));file.chmod(0o600)
+            with open(os.environ['GITHUB_ENV'],'a') as out:out.write('GOOGLE_APPLICATION_CREDENTIALS='+str(file)+'\n')
+            print('I66_PERF_EXISTING_PROJECT_CREDENTIAL_PASS')
+            break
+          else:raise SystemExit('I66_PERF_EXISTING_AUTH_HOLD')
+          PY
+      - name: Install pinned CI browser and Admin read-only dependencies
+        run: |
+          set -euo pipefail
+          npm install --no-save --package-lock=false --ignore-scripts --no-audit --no-fund firebase-admin@13.4.0 playwright@1.55.0 >/dev/null
+          node node_modules/playwright/cli.js install --with-deps chromium >/dev/null
+      - name: Measure REAL Chromium origin timings as Carlos Operativo (no writes)
+        env:
+          GI_I66_PERF_REPORT: ${{ runner.temp }}/gi-i66-live-perf-summary.json
+        run: |
+          set -euo pipefail
+          node tools/gravicentra-i66-live-performance-readonly.mjs
+      - name: Preserve aggregate evidence for I6.6 (no IDs, tokens or amounts)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gi-i66-live-performance-readonly
+          path: ${{ runner.temp }}/gi-i66-live-perf-summary.json
+          if-no-files-found: ignore
+          retention-days: 3
