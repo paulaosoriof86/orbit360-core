@@ -1,0 +1,31 @@
+{
+  "schema": "GRAVICENTRA_I6_6_TOPBAR_PROJECTION_ROOTFIX_RECEIPT_V1",
+  "dateGuatemala": "2026-11-11",
+  "product": "Gravicentra Insurance",
+  "branch": "recovery/fase-a-clean-20260831",
+  "historicalGateClosed": "B4-007",
+  "activeGate": "I6.6",
+  "approvedByDirection": true,
+  "supersedesProductPath": "I6_6_COBROS_APPLICATION_TEMPORAL_STATUS_AND_GLOBAL_SEARCH_P0:orbit360-platform/core/router.js",
+  "deployedPreviousSourceSha": "81b0a5b430ba496471bf255462c8910ae2e4f671",
+  "deployedPreviousExactCloneWorkflow": 43115181393,
+  "observations": [
+    "After previous LIVE promotion, real Paula Chrome global topbar search was attempted. Browser extension exceeded its execution/deadline and its tab was re-created; this is a search UI readiness HOLD, not proof of an app-only TTI number.",
+    "Search builds a projected client index without passing a precomputed policyClientIds context; clientProjection.project may call Orbit.store.find('polizas') once per client, repeating portfolio scans.",
+    "Fallback clientProjection.get(id) bypasses the already scoped client index and can do repeated reads for missing/hidden clients; forbidden as a global topbar fallback."
+  ],
+  "fixes": [
+    "Compute policyClientIds once from the scoped policy snapshot and inject it into each client projection, eliminating policy scans per client during index build.",
+    "Only resolve client labels/links from clientsById in the current scoped snapshot. Keep orphan/partial policy, vehicle and charge number search without embedding hidden client IDs in destination links.",
+    "Keep existing relevant-collection invalidation, accent folding, one index per role/country/route, no backend or data change."
+  ],
+  "tests": [
+    "tools/gravicentra-i6-6-global-search-index-performance.test.cjs",
+    "tools/gravicentra-i6-6-global-search-policy-context-and-scoped-fallback.test.cjs"
+  ],
+  "sourceStatus": "SOURCE_CORRECTED_LOCAL_QA_PASS_IMMUTABLE_PREVIEW_AND_LIVE_PENDING",
+  "proofRequiredBeforePerformancePass": "Real signed LIVE browser search input/result timing, 0 console errors, multirole/country scope, and retained route responsiveness; source-only test is not runtime certification.",
+  "businessDataWrites": 0,
+  "dataReimport": false,
+  "backendOrRulesDeployment": false
+}

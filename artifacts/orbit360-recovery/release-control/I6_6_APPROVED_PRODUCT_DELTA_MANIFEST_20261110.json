@@ -850,6 +850,31 @@
           "gitBlobSha": "6a5a17727b4f0ff5a3beb572f0f809a09bba633c"
         }
       ]
+    },
+    {
+      "id": "I6_6_TOPBAR_POLICY_BATCH_CONTEXT_AND_SCOPED_FALLBACK_P0",
+      "approvedByDirection": true,
+      "receipt": "artifacts/orbit360-recovery/release-control/I6_6_TOPBAR_POLICY_BATCH_CONTEXT_AND_SCOPE_20261111.json",
+      "sourceStatus": "SOURCE_CORRECTED_LOCAL_QA_PASS_PREVIEW_AND_LIVE_PENDING",
+      "capabilityOwners": ["GLOBAL_SHELL_SEARCH", "ROLE_SCOPE_RUNTIME", "STARTUP_PERFORMANCE"],
+      "scope": "Eliminate O(clients*policies) on initial global topbar search projection by passing scoped policyClientIds once; never fetch or link an excluded client outside the current role/country snapshot. Preserve searchable policy, vehicle and cobro reference; no backend, financial or auth changes.",
+      "paths": [
+        {
+          "path": "orbit360-platform/core/router.js",
+          "gitBlobSha": "739e4cea151a43098b200a8aad4c65f1e4fa0401",
+          "replaces": {
+            "path": "orbit360-platform/core/router.js",
+            "priorGitBlobSha": "349b5db7531a128c16c3cd7c80bd3d119d144d28",
+            "priorChangeId": "I6_6_COBROS_APPLICATION_TEMPORAL_STATUS_AND_GLOBAL_SEARCH_P0"
+          }
+        }
+      ],
+      "tests": [
+        {
+          "path": "tools/gravicentra-i6-6-global-search-policy-context-and-scoped-fallback.test.cjs",
+          "gitBlobSha": "67f82a258720379b7245ebcb35504c0f9ffe5160"
+        }
+      ]
     }
   ]
 }

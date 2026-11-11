@@ -128,37 +128,42 @@ Orbit.router = (function () {
       const vehicles = S.all('vehiculos') || [], charges = S.all('cobros') || [];
       const insurers = S.all('aseguradoras') || [], clientsById = new Map(), vehiclesByPolicy = new Map();
       const projection = Orbit.clientProjection;
+      // project(raw) without a policy batch context can call store.find('polizas')
+      // once PER CLIENT, rescanning the entire portfolio while the user types.
+      // The already-scoped policy snapshot supplies a constant-time context.
+      const policyClientIds = new Set(policies.map(p => String(p && p.clienteId || '')).filter(Boolean));
       function add(ic, title, subtitle, route, query) {
         rows.push({ ic, t: title, s: subtitle, go: route, query: normalized(query) });
       }
       clients.forEach(raw => {
-        const c = projection && projection.project ? projection.project(raw) : raw;
+        const c = projection && projection.project ? projection.project(raw, { policyClientIds }) : raw;
         if (!c) return;
         clientsById.set(String(c.id), c);
         add('🧑', c.nombre || 'Cliente', 'Cliente · ' + (c.identificacion || c.tipo || ''),
           '#/cliente360?c=' + c.id, (c.nombre || '') + ' ' + (c.identificacion || '') + ' ' + (c.email || '') + ' ' + (c.telefono || ''));
       });
       vehicles.forEach(v => { if (v && v.polizaId && !vehiclesByPolicy.has(String(v.polizaId))) vehiclesByPolicy.set(String(v.polizaId), v); });
-      const clientView = id => clientsById.get(String(id)) ||
-        (projection && projection.get ? projection.get(id) : S.get('clientes', id));
+      // Never consult a global/unscoped store for a client excluded from the
+      // current role/country snapshot. Also prevents per-policy fallback reads.
+      const clientView = id => clientsById.get(String(id)) || null;
       policies.forEach(p => {
         const veh = vehiclesByPolicy.get(String(p.id));
         const placa = veh && veh.placa || p.placa || '', cli = clientView(p.clienteId);
         add('📑', (p.numero || '') + (placa ? ' · ' + placa : ''), 'Póliza · ' + (p.ramo || '') + (cli ? ' · ' + cli.nombre : ''),
-          '#/cliente360?c=' + p.clienteId,
+          cli ? '#/cliente360?c=' + cli.id : '#/polizas',
           (p.numero || '') + ' ' + (p.producto || '') + ' ' + placa + ' ' + (cli ? cli.nombre : '') + ' ' + (veh ? (veh.marca || '') + ' ' + (veh.linea || '') : ''));
       });
       vehicles.forEach(v => {
         const cli = clientView(v.clienteId);
         add('🚗', v.placa || ((v.marca || '') + ' ' + (v.linea || '')),
           'Vehículo · ' + (v.marca || '') + ' ' + (v.linea || '') + (cli ? ' · ' + cli.nombre : ''),
-          '#/cliente360?c=' + v.clienteId, (v.placa || '') + ' ' + (v.marca || '') + ' ' + (v.linea || ''));
+          cli ? '#/cliente360?c=' + cli.id : '#/polizas', (v.placa || '') + ' ' + (v.marca || '') + ' ' + (v.linea || ''));
       });
       charges.forEach(cb => {
         const cli = clientView(cb.clienteId);
         add('💳', (cb.numeroRecibo || 'Recibo') + ' · ' + U.money(cb.monto || 0, cb.moneda),
           'Cobro · ' + cb.estado + (cli ? ' · ' + cli.nombre : ''),
-          '#/cliente360?c=' + cb.clienteId, (cli ? cli.nombre : '') + ' ' + (cb.numeroRecibo || ''));
+          cli ? '#/cliente360?c=' + cli.id : '#/cobros', (cli ? cli.nombre : '') + ' ' + (cb.numeroRecibo || ''));
       });
       insurers.forEach(a => add('🏛️', a.nombre, 'Aseguradora · ' + (a.pais || ''), '#/aseguradoras', a.nombre || ''));
       cached = { key, rows };
