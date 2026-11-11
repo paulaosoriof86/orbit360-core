@@ -47,7 +47,7 @@ jobs:
           const s=fs.readFileSync('tools/gravicentra-i66-live-performance-readonly.mjs','utf8');
           for(const re of [/\.set\s*\(/,/\.update\s*\(/,/\.delete\s*\(/,/\.runTransaction\s*\(/,/\.setCustomUserClaims\s*\(/,/\.createUser\s*\(/])
             if(re.test(s))throw Error('I66_PERF_WRITE_PATH_DENIED');
-          if(!s.includes("const ORIGIN='https://app.aysseguros.com'")||!s.includes('firestoreWrites:0,businessActions:0,paymentActions:0'))
+          if(!s.includes("const ORIGIN=process.env.GI_I66_PERF_ORIGIN||'https://app.aysseguros.com'")||!s.includes('firestoreWrites:0,businessActions:0,paymentActions:0'))
             throw Error('I66_PERF_SCOPE_DRIFT');
           console.log('I66_PERF_STATIC_READONLY_BOUNDARY_PASS');
           NODE

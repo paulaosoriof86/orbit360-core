@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// I6.6 LIVE P0. Browser-origin timings only; never write business data.
+// I6.6 LIVE/PREVIEW P0. Browser-origin timings only; never write business data.
 import fs from 'node:fs';
 import {chromium} from 'playwright';
 import {initializeApp,applicationDefault,getApps} from 'firebase-admin/app';
@@ -8,17 +8,19 @@ import {getAuth} from 'firebase-admin/auth';
 
 const PROJECT='ays-orbit-360-lab';
 const TENANT='alianzas-soluciones';
-const ORIGIN='https://app.aysseguros.com';
+const ORIGIN=process.env.GI_I66_PERF_ORIGIN||'https://app.aysseguros.com';
+const APPROVED_PREVIEW='https://ays-orbit-360-lab--gi-i66-rc-42969089524-wdh6naae.web.app';
 const OUTPUT=process.env.GI_I66_PERF_REPORT;
 const norm=x=>String(x??'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();
 const need=(ok,code)=>{if(!ok)throw Error(code);};
 need(process.env.GI_I66_PERF_PROJECT===PROJECT&&process.env.GI_I66_PERF_TENANT===TENANT,'I66_PERF_PROJECT_TENANT_HOLD');
+need(ORIGIN==='https://app.aysseguros.com'||ORIGIN===APPROVED_PREVIEW,'I66_PERF_ORIGIN_NOT_APPROVED');
 need(!process.env.FIRESTORE_EMULATOR_HOST,'I66_PERF_EMULATOR_HOLD');
 need(OUTPUT&&OUTPUT.startsWith(process.env.RUNNER_TEMP+'/'),'I66_PERF_OUTPUT_SCOPE_HOLD');
 const app=getApps()[0]||initializeApp({credential:applicationDefault(),projectId:PROJECT});
 const db=getFirestore(app),auth=getAuth(app);
 const report={
-  schema:'GI_I66_LIVE_BROWSER_PERFORMANCE_READONLY_V1',project:PROJECT,tenant:TENANT,
+  schema:'GI_I66_BROWSER_PERFORMANCE_READONLY_V2',project:PROJECT,tenant:TENANT,
   origin:ORIGIN,gate:'I6.6',sourceSha:process.env.GITHUB_SHA||'',
   readOnly:true,firestoreWrites:0,businessActions:0,paymentActions:0,
   syntheticFixtures:0,pushNotifications:0,roleChanged:false,
@@ -241,7 +243,7 @@ async function run(){
     report.auth.pageErrors=pageErrors;report.auth.consoleErrors=consoleErrors;
     report.auth.consoleErrorClasses=consoleClasses;report.auth.httpErrorClasses=httpClasses;
     await context.close();
-    report.status='LIVE_READONLY_MEASURED';
+    report.status=ORIGIN===APPROVED_PREVIEW?'PREVIEW_READONLY_MEASURED':'LIVE_READONLY_MEASURED';
   }finally{if(browser)await browser.close();}
 }
 try{
