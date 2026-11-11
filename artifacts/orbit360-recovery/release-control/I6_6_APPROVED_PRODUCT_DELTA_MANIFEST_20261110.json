@@ -533,11 +533,7 @@
       ],
       "tests": [
         {
-          "path": "tools/gravicentra-delta66-ops-emulator-functional.test.cjs",
-          "gitBlobSha": "4f8f2d355e41afa2ddf3001ef95e28ffe1f5eaba"
-        },
-        {
-          "path": "tools/gravicentra-i66-applied-endoso-board-hide.test.cjs",
+          "path": "tools/gravicentra-i6-6-applied-endoso-board-hide.test.cjs",
           "gitBlobSha": "9db6b252951748dc8b7217970a11a9cdcf75a225"
         },
         {
