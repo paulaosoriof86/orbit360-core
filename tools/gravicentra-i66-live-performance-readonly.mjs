@@ -112,6 +112,20 @@ async function run(){
     report.auth.activation=activation;
     need(activation.ok,'I66_PERF_AUTHENTICATED_BOOTSTRAP_HOLD');
     need(norm(activation.role)==='operativo','I66_PERF_ACTIVE_ROLE_NOT_CARLOS_OPERATIVO');
+    const cdp=await context.newCDPSession(page);
+    await cdp.send('Profiler.enable');
+    const profileTop=profile=>{
+      const nodes=new Map((profile.nodes||[]).map(n=>[n.id,n]));
+      const totals=Object.create(null);
+      (profile.samples||[]).forEach((id,i)=>{
+        const n=nodes.get(id),name=String(n?.callFrame?.functionName||'(anonymous)').slice(0,75);
+        const key=/^[\w$ ()-]{1,75}$/.test(name)?name:'(other)';
+        totals[key]=(totals[key]||0)+Number(profile.timeDeltas?.[i]||0)/1000;
+      });
+      return Object.entries(totals).sort((a,b)=>b[1]-a[1]).slice(0,12)
+        .map(([functionName,sampledMs])=>({functionName,sampledMs:Math.round(sampledMs)}));
+    };
+    report.cpuProfiles={};
     await page.evaluate(()=>{
       const stats=window.__GI_I66_RENDER_STATS__={};
       for(const name of ['cliente360','polizas','cobros','aseguradoras','renovaciones','cronograma','ops','leads','siniestros','calidad','historial','inicio']){
@@ -141,6 +155,8 @@ async function run(){
     ];
     // Measure inside Chromium (performance.now), never across Playwright calls.
     for(const [route,readySelector] of routeTargets){
+      const withCpuProfile=['polizas','aseguradoras','renovaciones','inicio'].includes(route);
+      if(withCpuProfile)await cdp.send('Profiler.start');
       const measurement=await page.evaluate(async({route,readySelector})=>{
         const targetHash='#/'+route,host=document.getElementById('host');
         const begin=performance.now();
@@ -182,9 +198,11 @@ async function run(){
           renderStats,
           client360RenderMs:route==='cliente360'?Math.round(window.OrbitRuntimeDiagnostics?.cliente360?.renderMs||0):null};
       },{route,readySelector});
+      if(withCpuProfile){const prof=await cdp.send('Profiler.stop');report.cpuProfiles[route]=profileTop(prof.profile);}
       report.routes.push(measurement);
     }
     // Measure a real, already-authorized client detail without printing its identity.
+    await cdp.send('Profiler.start');
     report.cliente360Detail=await page.evaluate(async()=>{
       const clients=Orbit.store?.all('clientes')||[],policies=Orbit.store?.all('polizas')||[];
       const ids=new Set(clients.map(c=>String(c?.id||'')).filter(Boolean));
@@ -207,6 +225,7 @@ async function run(){
         detailChars:host.innerHTML.length,policyCountForSelected:count[best]||0,
         readinessCounts:readies,renderStats:window.__GI_I66_RENDER_STATS__?.cliente360||null};
     });
+    report.cpuProfiles.cliente360Detail=profileTop((await cdp.send('Profiler.stop')).profile);
     await page.setViewportSize({width:390,height:844});
     // The menu is a local UI operation; it must not wait for a network request.
     report.mobile=await page.evaluate(async()=>{
