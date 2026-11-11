@@ -9,7 +9,9 @@ import {getAuth} from 'firebase-admin/auth';
 const PROJECT='ays-orbit-360-lab';
 const TENANT='alianzas-soluciones';
 const ORIGIN=process.env.GI_I66_PERF_ORIGIN||'https://app.aysseguros.com';
-const APPROVED_PREVIEW='https://ays-orbit-360-lab--gi-i66-rc-43100918872-ef0vrjx2.web.app';
+// Exact 81b0a5b4 source passed immutable-build and Preview byte readback.
+// It is the sole approved candidate for this scoped comparison.
+const APPROVED_PREVIEW='https://ays-orbit-360-lab--gi-i66-rc-43112679946-dnjvhn42.web.app';
 const OUTPUT=process.env.GI_I66_PERF_REPORT;
 const norm=x=>String(x??'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();
 const need=(ok,code)=>{if(!ok)throw Error(code);};
