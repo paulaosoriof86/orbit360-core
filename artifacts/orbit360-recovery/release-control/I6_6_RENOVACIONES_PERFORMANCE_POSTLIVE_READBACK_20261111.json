@@ -58,10 +58,46 @@
     "renovacionesBoardReturned": true,
     "businessWrites": 0
   },
+  "paulaAuthenticatedChromeControlledLiveUat": {
+    "dateGuatemala": "2026-11-11",
+    "route": "#/aseguradoras",
+    "actor": "Paula Osorio · Dirección",
+    "fixtureName": "B4 R20 Aseguradora QA",
+    "fixtureId": "b4003qa_insurer_38102224750",
+    "syntheticOnly": true,
+    "liveEditorAvailable": true,
+    "fieldUnderTest": "observaciones",
+    "initialDisplay": "Sin registrar",
+    "controlledSaveWithAuditReason": "PASS",
+    "markerAfterFullReload": "PASS",
+    "controlledRestoreToInitialBlankDisplayWithAuditReason": "PASS",
+    "blankAfterSecondFullReload": "PASS",
+    "productionAuditedSyntheticWrites": 2,
+    "realInsurerWrites": 0,
+    "realPolicyOrReceivableWrites": 0,
+    "scope": "Dirección LIVE durable write/reload/revert only; not a Carlos or full-insurer-matrix certification"
+  },
+  "additionalLiveRouteObservations": {
+    "conciliaciones": {
+      "manualChromeNavigationMs": 1171,
+      "tableRendered": true,
+      "formalProposalsVisible": 0,
+      "consoleErrorEntriesDuringReadback": 0,
+      "interpretation": "Manual route renders correctly in this session; the earlier automated 12/13 readiness result remains unexplained and is not silently converted to PASS"
+    },
+    "aseguradoras": {
+      "manualChromeNavigationMs": 3129,
+      "directoryVisible": true,
+      "directoryTotal": 33,
+      "actives": 29,
+      "nonblockingWarnings": "Repeated LOGO_ASSET_RESOLVE_FAILED functions/internal; investigate failed logo asset reads and retry storm without masking backend failures"
+    }
+  },
   "openHolds": [
-    "Aseguradoras signed role permission preflight passed but controlled real durable SAVE, reload and restore for Paula and Carlos remain unproven on the new LIVE source",
-    "Conciliaciones route did not become ready within automated Chrome timing sampler (12/13 routes loaded), despite prior manual page readback; determine causal readiness independently",
+    "Aseguradoras LIVE Dirección controlled durable synthetic SAVE/reload/revert now passes; Carlos actual authenticated durable SAVE/reload/revert and complete role matrix remain unproven on this source",
+    "Conciliaciones manual Chrome route rendered 0 formal proposals in 1171ms with no console errors, while automated Chrome timing sampler reported 12/13 ready; determine readiness mismatch causally",
     "Cobros first Playwright DOM snapshot after navigation timed out while DOM CUA could read the loaded UI; distinguish browser transport from application main-thread under repetition",
+    "Aseguradoras logo asset resolver emitted repeated functions/internal warnings; classify backend versus retry/caching effects without treating fallback as verified logo functionality",
     "New login activation displayed between-run variance and needs repeated cold/warm sample",
     "Cartera and payment inference source rows, receipt due-date semantics and July-November Drive policy inventory still need exact LIVE joins, protected writes and before/after readback",
     "Full seven-user role matrix, full module durable writes and physical device QA are not certified by this performance release"
