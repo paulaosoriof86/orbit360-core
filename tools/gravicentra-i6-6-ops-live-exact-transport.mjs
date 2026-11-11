@@ -84,13 +84,15 @@ function cloneToLive(version){
     {encoding:'utf8',stdio:['ignore','pipe','pipe'],timeout:180000,env:process.env});
 }
 
-const expectedSource='e8986c81ed1748bea680447d07d2f37dc0c1db7a';
-const expectedPreview='https://ays-orbit-360-lab--gi-i66-rc-42865214814-naeek9rl.web.app';
-const expectedOld='0919914071fb40d4451861b50322fdd04a2bad2b';
-const expectedOldBuild='gi-i66-0919914071fb-57f234755dc1';
+const expectedSource='d810b4d20569a18e90f4387928cf8816da88aa6a';
+const expectedPreview='https://ays-orbit-360-lab--gi-i66-opsboard-42939201474-thxy7d98.web.app';
+// Independently read from BOTH current LIVE origins in read-only run 42940130433.
+// Fail closed if either origin changed while awaiting controlled promotion.
+const expectedOld='a99d7c9bfef452c79b1ed4b828546bcd32367017';
+const expectedOldBuild='gi-i66-a99d7c9bfef4-57f234755dc1';
 try{
-  need(request.sourceSha===expectedSource&&request.artifactId===13786263277&&
-       request.previewChannel==='gi-i66-rc-42865214814'&&
+  need(request.sourceSha===expectedSource&&request.artifactId===13819981500&&
+       request.previewChannel==='gi-i66-opsboard-42939201474'&&
        process.env.I66_OPS_PREVIEW_URL===expectedPreview,'I66_OPS_SOURCE_OR_ARTIFACT_PIN_DRIFT');
   need(packageRoot&&cli&&cred&&fs.existsSync(path.join(packageRoot,'bundle/site/__recovery__/build.json')),'I66_OPS_PACKAGE_NOT_MOUNTED');
   const pkg=JSON.parse(fs.readFileSync(path.join(packageRoot,'bundle/site/__recovery__/build.json'),'utf8'));
@@ -152,3 +154,4 @@ try{
   console.log('I66_OPS_ROLLBACK='+evidence.rollback);
   if(evidence.blocker)console.log('I66_OPS_BLOCKER='+safe(evidence.blocker));
 }
+

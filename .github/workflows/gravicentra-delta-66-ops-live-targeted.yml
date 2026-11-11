@@ -1,4 +1,4 @@
-# I6.6 Ops P0 exact immutable artifact promotion only; source e898, no source rebuild, data writes, Rules/Auth.
+# I6.6 Ops P0 exact immutable artifact promotion only; source d810, no source rebuild, data writes, Rules/Auth.
 name: Gravicentra I6.6 Ops P0 Exact LIVE Targeted Transport
 on:
   push:
@@ -19,12 +19,12 @@ jobs:
     env:
       PROJECT_ID: ays-orbit-360-lab
       SITE: ays-orbit-360-lab
-      I66_OPS_SOURCE_SHA: e8986c81ed1748bea680447d07d2f37dc0c1db7a
-      I66_OPS_ARTIFACT_ID: '13786263277'
-      I66_OPS_ARTIFACT_DIGEST: sha256:9168acf6701443349897226976cde9174628133074e47d2fd286fa768ddaf1e3
-      I66_OPS_PREVIEW_CHANNEL: gi-i66-rc-42865214814
-      I66_OPS_PREVIEW_URL: https://ays-orbit-360-lab--gi-i66-rc-42865214814-naeek9rl.web.app
-      I66_OPS_PREVIEW_FUNCTION_RUN: '42869020697'
+      I66_OPS_SOURCE_SHA: d810b4d20569a18e90f4387928cf8816da88aa6a
+      I66_OPS_ARTIFACT_ID: '13819981500'
+      I66_OPS_ARTIFACT_DIGEST: sha256:292e4d8f594e9aea0b685dfe1b18dec0a5a511506687841e8440f018e0d3b499
+      I66_OPS_PREVIEW_CHANNEL: gi-i66-opsboard-42939201474
+      I66_OPS_PREVIEW_URL: https://ays-orbit-360-lab--gi-i66-opsboard-42939201474-thxy7d98.web.app
+      I66_OPS_PREVIEW_FUNCTION_RUN: '42940214772'
       SA_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
       SA_ALT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
       SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
@@ -51,25 +51,25 @@ jobs:
             const base='https://api.github.com/repos/paulaosoriof86/orbit360-core/actions/';
             const [p,q,b,a]=await Promise.all([
               fetch(base+'runs/'+process.env.I66_OPS_PREVIEW_FUNCTION_RUN,{headers:h}).then(x=>x.json()),
-              fetch(base+'runs/42867352575',{headers:h}).then(x=>x.json()),
-              fetch(base+'runs/42865214814',{headers:h}).then(x=>x.json()),
+              fetch(base+'runs/42939201374',{headers:h}).then(x=>x.json()),
+              fetch(base+'runs/42939201474',{headers:h}).then(x=>x.json()),
               fetch(base+'artifacts/'+process.env.I66_OPS_ARTIFACT_ID,{headers:h}).then(x=>x.json())
             ]);
             assert.equal(p.conclusion,'success','I66_OPS_PREVIEW_FUNCTION_NOT_GREEN');
-            assert.equal(p.head_sha,'07abf1d43377f435a72f14ea4bf7b0d155757bca','I66_OPS_PREVIEW_FUNCTION_WORKFLOW_DRIFT');
+            assert.equal(p.head_sha,'e33109c4c96ae8a9f6fe21a665399e6e0f68b538','I66_OPS_PREVIEW_FUNCTION_WORKFLOW_DRIFT');
             assert.equal(q.conclusion,'success','I66_OPS_EMULATOR_NOT_GREEN');
             assert.equal(b.conclusion,'success','I66_OPS_ORIGINAL_PACKAGE_NOT_GREEN');
             assert.equal(b.head_sha,process.env.I66_OPS_SOURCE_SHA,'I66_OPS_ORIGINAL_SOURCE_DRIFT');
             assert.equal(a.digest,process.env.I66_OPS_ARTIFACT_DIGEST,'I66_OPS_ZIP_DIGEST_DRIFT');
-            assert.equal(a.workflow_run.id,42865214814,'I66_OPS_ARTIFACT_RUN_DRIFT');
+            assert.equal(a.workflow_run.id,42939201474,'I66_OPS_ARTIFACT_RUN_DRIFT');
             assert.equal(a.expired,false,'I66_OPS_ARTIFACT_EXPIRED');
             console.log('I66_OPS_FUNCTION_PREVIEW_AND_EMULATOR_PROOFS_PASS');
           })().catch(e=>{console.error(e.message);process.exitCode=1;});
           NODE
       - uses: actions/download-artifact@v4
         with:
-          artifact-ids: 13786263277
-          run-id: 42865214814
+          artifact-ids: 13819981500
+          run-id: 42939201474
           github-token: ${{ github.token }}
           path: ${{ runner.temp }}/ops-live-packet-download
       - name: Verify exact TAR digest and historical Ops source match
@@ -201,3 +201,4 @@ jobs:
             ${{ runner.temp }}/ops-live-fn-after.json
           if-no-files-found: warn
           retention-days: 21
+
