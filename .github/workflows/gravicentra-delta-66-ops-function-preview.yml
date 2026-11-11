@@ -24,7 +24,7 @@ jobs:
       ARTIFACT_RUN: '42939201474'
       EMULATOR_QA_RUN: '42939201374'
       PREVIEW_CHANNEL: gi-i66-opsboard-42939201474
-      PREVIEW_URL: https://ays-orbit-360-lab--gi-i66-opsboard-42939201474-naeek9rl.web.app
+      PREVIEW_URL: https://ays-orbit-360-lab--gi-i66-opsboard-42939201474-thxy7d98.web.app
       SA_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
       SA_ALT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
       SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
