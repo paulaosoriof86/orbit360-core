@@ -5,7 +5,7 @@
   "project": "ays-orbit-360-lab",
   "owner": "Dirección Paula Osorio",
   "ownerRequestDate": "2026-11-10 America/Guatemala",
-  "status": "SOURCE_V2_UNIT_QA_AND_ISOLATED_PREVIEW_PENDING_NO_LIVE",
+  "status": "PREVIEW_MEASURABLE_GAINS_BUT_FULL_GATE_HOLD_LIVE_UNCHANGED",
   "userImpact": "Inicio, Pólizas, Renovaciones, Aseguradoras, Cliente 360, mobile menu main-thread block",
   "readOnlyEvidence": {
     "workflowRunId": 42967931516,
@@ -87,5 +87,70 @@
     "path": "tools/gravicentra-i6-6-transversal-access-index-mobile.test.cjs",
     "blobSha": "d39ea05396c2fc74dd8f60f1fea5482d1540b32c",
     "status": "CI_PENDING"
+  },
+  "qa": {
+    "sourceTests": {
+      "runId": 42972205480,
+      "passed": 5,
+      "failed": 0
+    },
+    "controlPlaneRunId": 42972205454,
+    "paymentNotificationEmulatorRunId": 42972205392,
+    "reportRegressionRunId": 42972205393,
+    "exactPackage": {
+      "runId": 42972205409,
+      "sourceSha": "7c66f8d31f87d13c97dca726f77847712605c173",
+      "artifactId": 13833673527,
+      "artifactDigest": "sha256:347ddc71d2ba9b5f93fe4985a735613232e13c73d4edd41d19de8a207781c72f",
+      "previewUrl": "https://ays-orbit-360-lab--gi-i66-rc-42972205409-3nt4y0wv.web.app"
+    },
+    "authenticatedReadOnly": {
+      "previewRunId": 42972567672,
+      "liveControlRunId": 42972567655,
+      "comparisonRunId": 42972834782,
+      "actorRole": "Operativo",
+      "firestoreWrites": 0,
+      "paymentActions": 0,
+      "pageErrorsPreview": 0,
+      "pageErrorsLive": 0,
+      "mobileMenuOpenedPreview": true
+    },
+    "measuredGains": [
+      {
+        "module": "cobros",
+        "liveMs": 7593,
+        "previewMs": 5668,
+        "improvementPct": 25
+      },
+      {
+        "module": "aseguradoras",
+        "liveMs": 2612,
+        "previewMs": 799,
+        "improvementPct": 69
+      },
+      {
+        "module": "renovaciones",
+        "liveMs": 6156,
+        "previewMs": 4182,
+        "improvementPct": 32
+      },
+      {
+        "module": "inicio",
+        "liveMs": 2598,
+        "previewMs": 1209,
+        "improvementPct": 53
+      }
+    ],
+    "client360Detail": {
+      "liveMs": 1617,
+      "previewMs": 972
+    },
+    "holds": [
+      "Pólizas lacked readiness by the controlled 10-second probe in both LIVE and Preview; no module PASS claimed.",
+      "Preview auth activation was slower in the sampled pair; source variability requires repeat.",
+      "Physical Android/iOS menu UX and complete financial write E2E remain unverified.",
+      "Whole I6.6 manifest includes nonperformance deltas, not all independently promoted; never promote all before corresponding QA."
+    ],
+    "decision": "NO_LIVE_PROMOTION_UNTIL_UNBLOCKED_AND_EXACT_ARTIFACT_VERIFIED"
   }
 }
