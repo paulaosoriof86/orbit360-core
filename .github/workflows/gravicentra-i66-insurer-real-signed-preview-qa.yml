@@ -16,8 +16,8 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     env:
-      SOURCE_SHA: 0fa8c4f5eae74fe83c8f1d35c23d52b7cff92d9a
-      PREVIEW_ORIGIN: https://ays-orbit-360-lab--gi-i66-rc-43083191717-0lr8xz5e.web.app
+      SOURCE_SHA: 6006d7843bf8eef5904a930b7346a1b00c114445
+      PREVIEW_ORIGIN: https://ays-orbit-360-lab--gi-i66-rc-43090584888-lu40dci6.web.app
       LIVE_ORIGIN: https://app.aysseguros.com
       SA_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
       SA_ALT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
@@ -40,7 +40,7 @@ jobs:
           curl -fsSL --max-time 25 "$PREVIEW_ORIGIN/__recovery__/build.json" > "$RUNNER_TEMP/i66-insurer-build.json"
           node - <<'NODE'
           const b=require(process.env.RUNNER_TEMP+'/i66-insurer-build.json');
-          if(b.sourceSha!==process.env.SOURCE_SHA||b.gate!=='I6.6'||!String(b.buildId).startsWith('gi-i66-0fa8c4f5eae7-'))throw Error('I66_INSURER_PREVIEW_SOURCE_MISMATCH');
+          if(b.sourceSha!==process.env.SOURCE_SHA||b.gate!=='I6.6'||!String(b.buildId).startsWith('gi-i66-6006d7843bf8-'))throw Error('I66_INSURER_PREVIEW_SOURCE_MISMATCH');
           console.log('I66_INSURER_PREVIEW_EXACT_SOURCE_PASS');
           NODE
       - name: Install pinned read-only signed Chrome QA dependencies
@@ -120,7 +120,7 @@ jobs:
               const context=await browser.newContext({viewport:{width:1280,height:900}});
               async function checkOrigin(origin){
                 const page=await context.newPage();
-                await page.goto(origin+'/#/aseguradoras?ficha=gt-aseguradora-guatemalteca',{waitUntil:'domcontentloaded',timeout:60000});
+                await page.goto(origin+'/#/aseguradoras?ficha=gt-aseguradora-guatemalteca',{waitUntil:'commit',timeout:30000});
                 await page.waitForFunction(()=>!!window.Orbit?.productRuntimeBrowserProvidersP0&&!!window.Orbit?.productAppP0,null,{timeout:30000});
                 const authResult=await page.evaluate(async(token)=>{
                   const provider=Orbit.productRuntimeBrowserProvidersP0, state=await provider.initialize();
@@ -162,7 +162,7 @@ jobs:
               // auth after a different authorized user signs in on the same origin.
               // No real insurer mutation and no settings/persistence changes.
               const carlosPage=await context.newPage();
-              await carlosPage.goto(process.env.PREVIEW_ORIGIN+'/#/aseguradoras?ficha=gt-aseguradora-guatemalteca',{waitUntil:'domcontentloaded'});
+              await carlosPage.goto(process.env.PREVIEW_ORIGIN+'/#/aseguradoras?ficha=gt-aseguradora-guatemalteca',{waitUntil:'commit',timeout:30000});
               await carlosPage.waitForFunction(()=>!!window.Orbit?.productRuntimeBrowserProvidersP0&&!!window.Orbit?.productAppP0);
               await carlosPage.evaluate(async(t)=>{
                 const p=Orbit.productRuntimeBrowserProvidersP0,c=await p.initialize();
@@ -171,7 +171,7 @@ jobs:
                 if(result?.started!==true)throw Error('CARLOS_ACTIVATION_FAILED');
               },token);
               const otherPage=await context.newPage();
-              await otherPage.goto(process.env.PREVIEW_ORIGIN+'/#/inicio',{waitUntil:'domcontentloaded'});
+              await otherPage.goto(process.env.PREVIEW_ORIGIN+'/#/inicio',{waitUntil:'commit',timeout:30000});
               await otherPage.waitForFunction(()=>!!window.Orbit?.productRuntimeBrowserProvidersP0);
               await otherPage.evaluate(async(t)=>{
                 const p=Orbit.productRuntimeBrowserProvidersP0,c=await p.initialize();
@@ -190,6 +190,34 @@ jobs:
               assert.ok(drift.projectionStillCarlos&&drift.providerNowDifferentUser&&drift.writeGuardWouldFail,'I66_CROSS_TAB_AUTH_DRIFT_NOT_REPRODUCED');
               console.log('I66_LOCAL_PERSISTENCE_MULTITAB_SIGNED_UID_DRIFT_REPRODUCED_WITH_TWO_REAL_ROLES_NO_WRITES');
               await otherPage.close();await carlosPage.close();
+              // The independent-session contract must also be proven in the
+              // actual Firebase SDK, not only by source-text unit assertions.
+              // Custom-token sign-in is used for QA without revealing a password.
+              const isolated=await browser.newContext({viewport:{width:1280,height:900}});
+              const first=await isolated.newPage();
+              await first.goto(process.env.PREVIEW_ORIGIN+'/#/inicio',{waitUntil:'commit',timeout:30000});
+              await first.waitForFunction(()=>!!window.Orbit?.productRuntimeBrowserProvidersP0&&!!window.Orbit?.productAppP0,null,{timeout:30000});
+              await first.evaluate(async(t)=>{
+                const p=Orbit.productRuntimeBrowserProvidersP0,c=await p.initialize();
+                await c.modules.auth.setPersistence(c.auth,c.modules.auth.browserSessionPersistence);
+                await c.modules.auth.signInWithCustomToken(c.auth,t);
+                const a=await Orbit.productAppP0.activate();if(a?.started!==true)throw Error('ISOLATED_CARLOS_PRODUCT_ACTIVATION_FAILED');
+              },token);
+              const second=await isolated.newPage();
+              await second.goto(process.env.PREVIEW_ORIGIN+'/#/inicio',{waitUntil:'commit',timeout:30000});
+              await second.waitForFunction(()=>!!window.Orbit?.productRuntimeBrowserProvidersP0,null,{timeout:30000});
+              await second.evaluate(async(t)=>{
+                const p=Orbit.productRuntimeBrowserProvidersP0,c=await p.initialize();
+                await c.modules.auth.setPersistence(c.auth,c.modules.auth.browserSessionPersistence);
+                await c.modules.auth.signInWithCustomToken(c.auth,t);
+              },otherToken);
+              const stable=await first.evaluate(async()=>{
+                const c=await Orbit.productRuntimeBrowserProvidersP0.initialize();
+                return !!c.auth.currentUser?.uid&&c.auth.currentUser.uid===Orbit.auth.productUser?.uid;
+              });
+              assert.equal(stable,true,'I66_BROWSER_SESSION_TABS_STILL_SHARE_AUTH');
+              console.log('I66_FIREBASE_BROWSER_SESSION_TWO_REAL_ACTORS_ISOLATED_PASS');
+              await isolated.close();
               console.log('I66_FIRESTORE_WRITES=0,AUTH_ACCOUNT_CONFIG_WRITES=0,INSURER_FIELDS_REDACTED=true');
             } finally {await browser.close();}
           })().catch(e=>{console.error('I66_SIGNED_PREVIEW_QA_HOLD='+String(e.message||e).replace(/[^A-Za-z0-9_ -]/g,'').slice(0,120));process.exitCode=1;});
