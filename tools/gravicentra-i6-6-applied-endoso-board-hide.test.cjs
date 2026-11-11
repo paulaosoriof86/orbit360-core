@@ -60,7 +60,7 @@ test('Active Ops excludes board-hidden cards, historic data can include them',()
   assert(ui.includes('(opts.includeBoardHidden === true || g.opsBoardHidden !== true)'));
   assert(store.includes("return'hide_management_card'"));
   assert(store.includes('OPS_BOARD_HIDE_SERVER_READBACK_REQUIRED'));
-  assert(store.includes("if(collection==='gestiones'&&k==='opsBoardHiddenAt')return;"));
+  assert(store.includes("'opsBoardHiddenByRole','opsBoardHiddenByUid','opsBoardHiddenByName'"));
   assert(backend.includes('response.opsBoardHideReadback'));
 });
 for(const [name,source] of [['backend',backend],['store',store],['delete',del],['ui',ui]])test(name+' JS syntax',()=>assert.doesNotThrow(()=>new Function(source)));

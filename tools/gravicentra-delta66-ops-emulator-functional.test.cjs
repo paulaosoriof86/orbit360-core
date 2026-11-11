@@ -112,8 +112,8 @@ async function go(uid,role,operation,entityId,payload){return handler.run(req(ui
   assert.equal(afterManagement.archivado,undefined);assert.equal(afterManagement.deleted,undefined);checks++;
   assert.deepEqual((await doc('polizas',policyId).get()).data(),beforePolicy);checks++;
   assert.deepEqual(afterManagement.comentarios,beforeManagement.comentarios);checks++;
-  assert.equal((await db.collection('tenants').doc(tenant).collection('notificationOutbox').doc(hidden.eventId).get()).exists,false);checks++;
-  assert.equal((await db.collection('tenants').doc(tenant).collection('workflowEvents').doc(hidden.eventId).get()).exists,true);checks++;
+  assert.equal((await db.collection('tenants').doc(tenant).collection('previewNotificationOutbox').doc(hidden.eventId).get()).exists,false);checks++;
+  assert.equal((await db.collection('tenants').doc(tenant).collection('previewWorkflowEvents').doc(hidden.eventId).get()).exists,true);checks++;
   await match(()=>go('op-gt','Operativo','archive_management',appliedId,{deleted:true,eliminado:true,archivado:true,deleteReason:'Intento posterior'}),'ENDOSO_APPLIED_OR_REFERENCED_ARCHIVE_FORBIDDEN');
   assert.equal((await doc('gestiones',appliedId).get()).data().opsBoardHidden,true);checks++;
   console.log('I66_OPS_EMULATOR_AUTHENTICATED_ROLE_COUNTRY_BUSINESS_MANAGEMENT_PASS checks='+checks+' project='+process.env.GCLOUD_PROJECT+' liveWrites=0');

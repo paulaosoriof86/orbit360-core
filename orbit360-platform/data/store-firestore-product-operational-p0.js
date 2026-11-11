@@ -107,8 +107,10 @@
     var out={},src=clone(input)||{};
     Object.keys(src).forEach(function(k){
       if(collection==='aseguradoras'&&(k==='actividad'||k==='actividadTotal'||k==='__syntheticQa'))return;
-      // Server owns the durable hide timestamp; client ISO is for immediate UI only.
-      if(collection==='gestiones'&&k==='opsBoardHiddenAt')return;
+      // Server owns the durable hide timestamp and signed actor identity.
+      // Comparing client-side display-role spelling against signed canonical
+      // role leaves a stale optimistic overlay even after a successful commit.
+      if(collection==='gestiones'&&['opsBoardHiddenAt','opsBoardHiddenByRole','opsBoardHiddenByUid','opsBoardHiddenByName'].includes(k))return;
       if(k==='updatedAt'||k==='updatedByUid'||k==='updatedByEmail'||k==='createdAt'||k==='ownerUid'||k==='ownerEmail'||k==='tenantId'||k==='canonicalDocumentId'||k==='legacyDataId')return;
       out[k]=clone(src[k]);
     });

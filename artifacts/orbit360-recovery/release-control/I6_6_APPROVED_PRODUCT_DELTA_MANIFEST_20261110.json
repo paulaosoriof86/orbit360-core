@@ -510,7 +510,7 @@
         },
         {
           "path": "orbit360-platform/data/store-firestore-product-operational-p0.js",
-          "gitBlobSha": "8dbbb76ef161627f9ef6565c79a6046726b5dc2d",
+          "gitBlobSha": "1e58b9099e0f773baf26feb403650ec4029b2715",
           "replaces": {
             "path": "orbit360-platform/data/store-firestore-product-operational-p0.js",
             "priorGitBlobSha": "fba24bea887d31693c948663b9fcfe7fdb1c481c",
@@ -534,7 +534,7 @@
       "tests": [
         {
           "path": "tools/gravicentra-i6-6-applied-endoso-board-hide.test.cjs",
-          "gitBlobSha": "9db6b252951748dc8b7217970a11a9cdcf75a225"
+          "gitBlobSha": "2ab66711ba438be81b5025a0ea57bbc20c4216a9"
         },
         {
           "path": "tools/gravicentra-i6-6-ops-crud-role-country.test.cjs",
