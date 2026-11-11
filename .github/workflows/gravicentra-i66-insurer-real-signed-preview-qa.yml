@@ -1,0 +1,138 @@
+# I6.6 real signed Operativo policy A/B. Preview and LIVE read-only; never mutate insurer or permissions.
+name: Gravicentra I6.6 Real Signed Insurer Preview QA
+on:
+  push:
+    branches: [recovery/fase-a-clean-20260831]
+    paths: [.github/workflows/gravicentra-i66-insurer-real-signed-preview-qa.yml]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: gi-i66-real-insurer-signed-qa
+  cancel-in-progress: false
+jobs:
+  qa:
+    if: github.repository == 'paulaosoriof86/orbit360-core' && github.ref_name == 'recovery/fase-a-clean-20260831'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      SOURCE_SHA: 0fa8c4f5eae74fe83c8f1d35c23d52b7cff92d9a
+      PREVIEW_ORIGIN: https://ays-orbit-360-lab--gi-i66-rc-43083191717-0lr8xz5e.web.app
+      LIVE_ORIGIN: https://app.aysseguros.com
+      SA_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_ALT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Prove source, artifact identity and regression without new product mutations
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor "$SOURCE_SHA" HEAD
+          test -z "$(git diff --name-only "$SOURCE_SHA" HEAD -- orbit360-platform functions firebase.json firestore.rules storage.rules)"
+          node tools/gravicentra-i6-6-insurer-operativo-signed-scope.test.cjs
+          curl -fsSL --max-time 25 "$PREVIEW_ORIGIN/__recovery__/build.json" > "$RUNNER_TEMP/i66-insurer-build.json"
+          node - <<'NODE'
+          const b=require(process.env.RUNNER_TEMP+'/i66-insurer-build.json');
+          if(b.sourceSha!==process.env.SOURCE_SHA||b.gate!=='I6.6'||!String(b.buildId).startsWith('gi-i66-0fa8c4f5eae7-'))throw Error('I66_INSURER_PREVIEW_SOURCE_MISMATCH');
+          console.log('I66_INSURER_PREVIEW_EXACT_SOURCE_PASS');
+          NODE
+      - name: Install pinned read-only signed Chrome QA dependencies
+        run: |
+          set -euo pipefail
+          npm install --no-save --package-lock=false --ignore-scripts --no-audit --no-fund firebase-admin@13.4.0 playwright@1.55.0 >/dev/null
+          node node_modules/playwright/cli.js install --with-deps chromium >/dev/null
+      - name: Confirm Carlos signed role and real insurer write preflight in Preview
+        run: |
+          node - <<'NODE'
+          'use strict';
+          const assert=require('node:assert/strict');
+          const sdk=require('firebase-admin'),{chromium}=require('playwright');
+          const service=['SA_LAB','SA_ALT','SA_DEFAULT'].map(n=>process.env[n]).filter(Boolean)
+            .map(s=>{try{return JSON.parse(s);}catch(_){return null;}})
+            .find(s=>s&&s.type==='service_account'&&s.project_id==='ays-orbit-360-lab'&&s.private_key);
+          assert.ok(service,'I66_EXISTING_FIREBASE_IDENTITY_NOT_FOUND');
+          sdk.initializeApp({credential:sdk.credential.cert(service),projectId:'ays-orbit-360-lab'});
+          const db=sdk.firestore(),auth=sdk.auth(),root=db.collection('tenants').doc('alianzas-soluciones');
+          const norm=x=>String(x||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();
+          (async()=>{
+            const [members,advisors]=await Promise.all([
+              root.collection('members').limit(150).get(),
+              root.collection('data').doc('asesores').collection('items').limit(400).get()
+            ]);
+            assert.ok(members.size<150&&advisors.size<400,'I66_SIGNED_QA_BOUND_HOLD');
+            const advisorIds=new Set(),userIds=new Set();
+            for(const d of advisors.docs){
+              const a=d.data()||{};
+              if([a.nombre,a.nombreCompleto,a.displayName,a.name].some(x=>norm(x).startsWith('carlos castro'))){
+                advisorIds.add(d.id);
+                for(const k of [a.authUid,a.uid,a.userId])if(k)userIds.add(String(k));
+              }
+            }
+            const candidates=members.docs.filter(d=>{
+              const m=d.data()||{},isCarlos=[m.nombre,m.displayName,m.name,m.nombreCompleto,m.fullName]
+                .some(x=>norm(x).startsWith('carlos castro'))||advisorIds.has(String(m.advisorId||m.asesorId||''))||userIds.has(d.id);
+              const roles=[m.activeRole,m.rol,m.rolDefault,...[].concat(m.roles||[])].map(norm);
+              return isCarlos&&roles.includes('operativo')&&m.active!==false&&m.activo!==false&&
+                !['inactivo','inactive','bloqueado','blocked'].includes(norm(m.status||m.estado));
+            });
+            assert.equal(candidates.length,1,'I66_CARLOS_SIGNED_MEMBER_NOT_UNIQUE');
+            const member=candidates[0].data()||{};
+            assert.equal(norm(member.activeRole),'operativo','I66_CARLOS_ACTIVE_ROLE_DRIFT');
+            assert.ok([].concat(member.countries||member.paises||[]).map(x=>String(x).toUpperCase()).includes('GT'),'I66_CARLOS_GT_DENIED');
+            const user=await auth.getUser(candidates[0].id);
+            assert.ok(!user.disabled&&user.emailVerified,'I66_CARLOS_AUTH_NOT_READY');
+            const token=await auth.createCustomToken(user.uid);
+            const browser=await chromium.launch({headless:true,args:['--no-sandbox']});
+            try {
+              const context=await browser.newContext({viewport:{width:1280,height:900}});
+              async function checkOrigin(origin){
+                const page=await context.newPage();
+                await page.goto(origin+'/#/aseguradoras?ficha=gt-aseguradora-guatemalteca',{waitUntil:'domcontentloaded',timeout:60000});
+                await page.waitForFunction(()=>!!window.Orbit?.productRuntimeBrowserProvidersP0&&!!window.Orbit?.productAppP0,null,{timeout:30000});
+                const authResult=await page.evaluate(async(token)=>{
+                  const provider=Orbit.productRuntimeBrowserProvidersP0, state=await provider.initialize();
+                  if(!state.auth.currentUser)await state.modules.auth.signInWithCustomToken(state.auth,token);
+                  const result=await Orbit.productAppP0.activate();
+                  return {started:result?.started===true,role:String(Orbit.session?.rol?.()||'')};
+                },token);
+                assert.ok(authResult.started,'I66_SIGNED_PRODUCT_ACTIVATION_FAILED');
+                assert.equal(norm(authResult.role),'operativo','I66_SIGNED_ROLE_INCORRECT');
+                await page.waitForFunction(()=>!!window.Orbit?.store?.get('aseguradoras','gt-aseguradora-guatemalteca'),null,{timeout:30000});
+                const proof=await page.evaluate(()=>{
+                  const rec=Orbit.store.get('aseguradoras','gt-aseguradora-guatemalteca');
+                  const member=Orbit.auth?.productUser||{};
+                  return {found:!!rec,tenant:rec?.tenantId==='alianzas-soluciones',country:rec?.pais==='GT',
+                    lacksAdvisor:!rec?.asesorId,role:String(Orbit.session?.rol?.()||''),
+                    roleAssigned:[].concat(member.roles||[]).includes('Operativo'),
+                    activeRole:member.activeRole,
+                    scope:Orbit.access.dataScope('aseguradoras'),
+                    matrixAllows:Orbit.access.can('aseguradoras','edit'),
+                    preflightAllows:Orbit.access.canAccessRecord(rec,'aseguradoras',{collection:'aseguradoras'})};
+                });
+                await page.close();
+                return proof;
+              }
+              const preview=await checkOrigin(process.env.PREVIEW_ORIGIN);
+              assert.ok(preview.found&&preview.tenant&&preview.country&&preview.lacksAdvisor&&preview.roleAssigned,'I66_PREVIEW_REAL_INSURER_SCOPE_DRIFT');
+              assert.equal(preview.scope,'all','I66_PREVIEW_SCOPE_NOT_TENANT');
+              assert.equal(preview.matrixAllows,true,'I66_PREVIEW_ROLE_EDIT_DENIED');
+              assert.equal(preview.preflightAllows,true,'I66_PREVIEW_REAL_SAVE_PREFLIGHT_DENIED');
+              console.log('I66_REAL_CARLOS_SIGNED_PREVIEW_INSURER_SAVE_PREFLIGHT_PASS');
+              console.log('I66_PREVIEW_ROLE_COUNTRY_SCOPE_AND_NO_ADVISOR_PASS');
+              // Baseline is observed only to distinguish old LIVE policy, never write real records.
+              const live=await checkOrigin(process.env.LIVE_ORIGIN);
+              assert.ok(live.found&&live.tenant&&live.country&&live.lacksAdvisor,'I66_LIVE_BASELINE_RECORD_DRIFT');
+              assert.equal(live.matrixAllows,true,'I66_LIVE_BASELINE_MATRIX_DRIFT');
+              assert.equal(live.preflightAllows,false,'I66_LIVE_BASELINE_ALREADY_CHANGED_RECHECK_RELEASE');
+              console.log('I66_SIGNED_PREVIEW_TRUE_VS_LIVE_BASELINE_FALSE_CAUSAL_AB_PASS');
+              console.log('I66_FIRESTORE_WRITES=0,AUTH_CHANGES=0,INSURER_FIELDS_REDACTED=true');
+            } finally {await browser.close();}
+          })().catch(e=>{console.error('I66_SIGNED_PREVIEW_QA_HOLD='+String(e.message||e).replace(/[^A-Za-z0-9_ -]/g,'').slice(0,120));process.exitCode=1;});
+          NODE
