@@ -347,6 +347,21 @@ jobs:
               canonicalPath='tenants/alianzas-soluciones/data/'+entityType+'/items/'+urllib.parse.quote(entity,safe='')
               rows.append({'period':period,'when':stamp,'op':op,'type':entityType,'mode':mode,
                   'referenceHash16':safeHash,'legacyPath':legacyPath,'canonicalPath':canonicalPath})
+          def listCanonical(collection):
+              page='';out=[]
+              for _ in range(12):
+                  url=base+'tenants/alianzas-soluciones/data/'+collection+'/items?pageSize=500'+('&pageToken='+urllib.parse.quote(page,safe='') if page else '')
+                  with urllib.request.urlopen(urllib.request.Request(url,headers=hdr),timeout=25) as response:data=json.load(response)
+                  out.extend(data.get('documents') or [])
+                  page=str(data.get('nextPageToken') or '')
+                  if not page:return out
+              raise RuntimeError('I66_OPS_CANDIDATE_READONLY_PAGINATION_LIMIT')
+          canonicalBusinesses=listCanonical('negocios')
+          canonicalManagements=listCanonical('gestiones')
+          def norm(s):
+              return ' '.join(re.findall(r'[a-z0-9]+',unicodedata.normalize('NFKD',str(s or '')).encode('ascii','ignore').decode('ascii').casefold()))
+          def number(s):return ''.join(re.findall(r'\d+',str(s or '')))
+          screenshot=[b for b in canonicalBusinesses if norm(value(b,'nombre'))=='fernando arias']
           def inspect(row):
               legacy,legacyCode=get(row['legacyPath'])
               canonical,canonicalCode=get(row['canonicalPath'])
@@ -369,10 +384,32 @@ jobs:
                   noAccent=unicodedata.normalize('NFKD',s).encode('ascii','ignore').decode('ascii').casefold()
                   allWords.extend(re.findall(r'[a-z0-9]+',noAccent))
               digests={hashlib.sha256((allWords[i]+' '+allWords[i+1]).encode()).hexdigest() for i in range(len(allWords)-1)}
+              legacyId=str((legacy or {}).get('name') or '').split('/')[-1]
+              name=norm(value(legacy or {},'nombre'))
+              phone=number(value(legacy or {},'telefono'))
+              matchingByName=[b for b in canonicalBusinesses if name and norm(value(b,'nombre'))==name]
+              matchingByPhone=[b for b in canonicalBusinesses if len(phone)>=8 and number(value(b,'telefono'))==phone]
+              refs=('clienteId','polizaId','sourceOpportunityId','commercialIdentityId','negocioId')
+              screenshotReferenceMatch=any(bool(value(legacy or {},k)) and value(legacy or {},k)==value(s,k) for s in screenshot for k in refs)
+              associatedManagementCount=sum(any(value(g,k)==legacyId for k in ('negocioId','sourceBusinessId','sourceOpportunityId')) for g in canonicalManagements) if legacyId else 0
+              parent=((legacy or {}).get('fields') or {})
+              legacyCountry=value(legacy or {},'pais')
+              legacyOrigin=value(legacy or {},'origen')
               return {k:row[k] for k in ('period','when','op','type','mode','referenceHash16')}|{
                   'legacyHttp':legacyCode,'canonicalHttp':canonicalCode,'explicitQaMarker':synthetic,
                   'matchesPreviouslyReportedContact':contactHash in digests,
-                  'matchesPreviouslyReportedScreenshotName':screenshotNameHash in digests}
+                  'matchesPreviouslyReportedScreenshotName':screenshotNameHash in digests,
+                  'sourceNameHash16':hashlib.sha256(name.encode()).hexdigest()[:16] if name else '',
+                  'sourceNamePresent':bool(name),'sourcePhonePresent':len(phone)>=8,
+                  'sourceCountry':legacyCountry if legacyCountry in ('GT','CO') else 'UNSPECIFIED',
+                  'sourceOriginOps':norm(legacyOrigin).startswith('ops'),
+                  'clientRefPresent':bool(value(legacy or {},'clienteId')),
+                  'advisorRefPresent':bool(value(legacy or {},'asesorId')),
+                  'policyRefPresent':bool(value(legacy or {},'polizaId')),
+                  'sameNameCanonicalBusinessCount':len(matchingByName),
+                  'samePhoneCanonicalBusinessCount':len(matchingByPhone),
+                  'sameReferenceAsScreenshotFernando':screenshotReferenceMatch,
+                  'linkedCanonicalManagementCount':associatedManagementCount}
           with concurrent.futures.ThreadPoolExecutor(max_workers=6) as pool:checked=list(pool.map(inspect,rows))
           byPeriod={}
           for period in ('BEFORE_2026_11_10_DEPLOY','OLD_TRAFFIC_WINDOW','AFTER_TRAFFIC_REPAIR'):
@@ -390,6 +427,99 @@ jobs:
               'oldTrafficWindowOrphanCandidates':affected,
               'olderLegacyOnlyCandidates':older},sort_keys=True))
           print('I66_OPS_LEGACY_RECONCILIATION_READONLY_COMPLETE; WRITES=0; NO_IMPORT_OR_RETRY')
+          PY
+      - name: I6.6 historical QA endoso and CO lead deletion path/protection read-only
+        run: |
+          set -euo pipefail
+          gcloud auth activate-service-account --key-file="$GOOGLE_APPLICATION_CREDENTIALS" --quiet >/dev/null
+          python3 - <<'PY'
+          import json,os,subprocess,urllib.request,urllib.parse,urllib.error,hashlib,datetime
+          project=os.environ['PROJECT_ID']
+          token=subprocess.check_output(['gcloud','auth','print-access-token'],text=True).strip()
+          base='https://firestore.googleapis.com/v1/projects/'+project+'/databases/(default)/documents/'
+          headers={'Authorization':'Bearer '+token,'Accept':'application/json'}
+          def get(path):
+              try:
+                  with urllib.request.urlopen(urllib.request.Request(base+path,headers=headers),timeout=25) as resp:return json.load(resp),200
+              except urllib.error.HTTPError as error:
+                  if error.code==404:return None,404
+                  raise
+          def field(row,key):
+              return ((row or {}).get('fields') or {}).get(key) or {}
+          def string(row,key):return str(field(row,key).get('stringValue') or '')
+          def boolean(row,key):return field(row,key).get('booleanValue') is True
+          def digest(coll,physical):return hashlib.sha256(('alianzas-soluciones|'+coll+'|'+physical).encode()).hexdigest()[:16]
+          def coll(name):
+              path='tenants/alianzas-soluciones/data/'+name+'/items';out=[];page=''
+              for _ in range(12):
+                  url=base+path+'?pageSize=500'+('&pageToken='+urllib.parse.quote(page,safe='') if page else '')
+                  with urllib.request.urlopen(urllib.request.Request(url,headers=headers),timeout=25) as resp:body=json.load(resp)
+                  out.extend(body.get('documents') or [])
+                  page=str(body.get('nextPageToken') or '')
+                  if not page:break
+              else:raise RuntimeError('I66_OPS_HISTORICAL_PATH_PAGINATION_LIMIT')
+              return out
+          gs=coll('gestiones');bs=coll('negocios')
+          qa=[d for d in gs if 'B4-003-EXP-38102224750' in string(d,'titulo') or 'QA-SIMULADA-NO-REAL-42449448186' in string(d,'referenciaAseguradora')]
+          co=[d for d in bs if string(d,'nombre').strip().casefold()=='fernando arias' and string(d,'pais').upper()=='CO']
+          def historyLinks(policy,managementId):
+              values=(field(policy,'historial').get('arrayValue') or {}).get('values') or []
+              for v in values:
+                  fields=(v.get('mapValue') or {}).get('fields') or {}
+                  if str((fields.get('gestionId') or {}).get('stringValue') or '')==managementId:return True
+              return False
+          qout=[]
+          for doc in qa:
+              physical=doc['name'].split('/')[-1]
+              legacy,oldCode=get('tenantId/alianzas-soluciones/gestiones/'+urllib.parse.quote(physical,safe=''))
+              legacyV2,workflowCode=get('tenants/alianzas-soluciones/workflow/gestiones/items/'+urllib.parse.quote(physical,safe=''))
+              pid=string(doc,'polizaId');policy,pcode=get('tenants/alianzas-soluciones/data/polizas/items/'+urllib.parse.quote(pid,safe='')) if pid else (None,0)
+              stage=string(doc,'endorsementStage')
+              fromHistory=bool(policy and historyLinks(policy,physical))
+              policyLatest=bool(policy and string(policy,'ultimoEndosoId')==physical)
+              backendGuardWouldBlock=stage not in ('SOLICITADO','EN_REVISION') or bool(string(doc,'policyUpdatedId')) or policyLatest or fromHistory
+              qout.append({'hash16':digest('gestiones',physical),'physicalEqualsLogical':physical==string(doc,'id'),
+                  'country':string(doc,'pais'),'workflowType':string(doc,'workflowType'),
+                  'endorsementStage':stage,'archived':boolean(doc,'archivado'),
+                  'deleted':boolean(doc,'deleted'),'syntheticFlag':boolean(doc,'__syntheticQa'),
+                  'referenceMatch':string(doc,'referenciaAseguradora')=='QA-SIMULADA-NO-REAL-42449448186',
+                  'legacySameIdHttp':oldCode,'legacyWorkflowSameIdHttp':workflowCode,
+                  'policyCanonicalHttp':pcode,'policySyntheticFlag':boolean(policy,'__syntheticQa'),
+                  'policyLatestEndorsementIsThis':policyLatest,'policyHistoryReferencesThis':fromHistory,
+                  'policyUpdatedIdPresent':bool(string(doc,'policyUpdatedId')),
+                  'backendAppliedOrReferencedGuard':backendGuardWouldBlock,
+                  'clientRefPresent':bool(string(doc,'clienteId')),'policyRefPresent':bool(pid)})
+          bout=[]
+          for doc in co:
+              physical=doc['name'].split('/')[-1]
+              legacy,oldCode=get('tenantId/alianzas-soluciones/negocios/'+urllib.parse.quote(physical,safe=''))
+              legacyV2,workflowCode=get('tenants/alianzas-soluciones/workflow/negocios/items/'+urllib.parse.quote(physical,safe=''))
+              linkedManagements=sum(string(m,'negocioId')==physical for m in gs)
+              bout.append({'hash16':digest('negocios',physical),'physicalEqualsLogical':physical==string(doc,'id'),
+                  'country':string(doc,'pais'),'stage':string(doc,'etapa'),'archived':boolean(doc,'archivado'),
+                  'deleted':boolean(doc,'deleted'),'legacySameIdHttp':oldCode,
+                  'legacyWorkflowSameIdHttp':workflowCode,'linkedManagementCount':linkedManagements,
+                  'clientRefPresent':bool(string(doc,'clienteId')),'advisorRefPresent':bool(string(doc,'asesorId')),
+                  'sourceOpportunityRefPresent':bool(string(doc,'sourceOpportunityId'))})
+          reqs=[];page=''
+          start=datetime.datetime.fromisoformat('2026-11-11T00:57:00+00:00');end=datetime.datetime.fromisoformat('2026-11-11T01:00:00+00:00')
+          for _ in range(15):
+              path='tenants/alianzas-soluciones/workflowRequests?pageSize=500'+('&pageToken='+urllib.parse.quote(page,safe='') if page else '')
+              with urllib.request.urlopen(urllib.request.Request(base+path,headers=headers),timeout=25) as resp:body=json.load(resp)
+              for doc in body.get('documents') or []:
+                  op=string(doc,'operation')
+                  if op not in ('archive_management','archive_business'):continue
+                  stamp=field(doc,'committedAt').get('timestampValue') or field(doc,'createdAt').get('timestampValue') or ''
+                  try:when=datetime.datetime.fromisoformat(stamp.replace('Z','+00:00'))
+                  except ValueError:continue
+                  if start<=when<=end:reqs.append({'operation':op,'status':string(doc,'status'),'atUtc':stamp})
+              page=str(body.get('nextPageToken') or '')
+              if not page:break
+          else:raise RuntimeError('I66_OPS_HISTORICAL_REQUEST_PAGINATION_LIMIT')
+          print('I66_OPS_HISTORICAL_QA_ENDOSO='+json.dumps({'canonicalRecordMatches':len(qa),'records':qout},sort_keys=True))
+          print('I66_OPS_HISTORICAL_FERNANDO_LEAD='+json.dumps({'canonicalRecordMatches':len(co),'records':bout},sort_keys=True))
+          print('I66_OPS_0058_ARCHIVE_WORKFLOW_REQUESTS='+json.dumps({'windowCount':len(reqs),'rows':reqs},sort_keys=True))
+          print('I66_OPS_HISTORICAL_DELETE_READONLY_COMPLETE; MUTATIONS=0')
           PY
       - name: I6.6 P0 Ops Leads Cloud Run error evidence read-only
         run: |
