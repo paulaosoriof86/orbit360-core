@@ -1,11 +1,11 @@
 {
-  "schema": "GRAVICENTRA_I6_6_PERFORMANCE_READ_MODEL_ROOT_FIX_V1",
+  "schema": "GRAVICENTRA_I6_6_PERFORMANCE_READ_MODEL_ROOT_FIX_V2",
   "gate": "I6.6",
   "tenant": "alianzas-soluciones",
   "project": "ays-orbit-360-lab",
   "owner": "Dirección Paula Osorio",
   "ownerRequestDate": "2026-11-10 America/Guatemala",
-  "status": "SOURCE_QA_PASS_PREVIEW_AND_LIVE_REGRESSION_PENDING",
+  "status": "SOURCE_V2_UNIT_QA_AND_ISOLATED_PREVIEW_PENDING_NO_LIVE",
   "userImpact": "Inicio, Pólizas, Renovaciones, Aseguradoras, Cliente 360, mobile menu main-thread block",
   "readOnlyEvidence": {
     "workflowRunId": 42967931516,
@@ -32,12 +32,27 @@
         "sampledCloneCpuMs": 2258
       }
     ],
-    "note": "CPU profiles are sampled under instrumentation and vary with host load; not exact production SLAs."
+    "note": "CPU profiles are sampled under instrumentation and vary with host load; not exact production SLAs.",
+    "previewComparison": {
+      "workflowRunId": 42970685643,
+      "liveControlRunId": 42970685578,
+      "oldPreviewArtifactId": 13832208840,
+      "outcome": "PREVIEW_NOT_FASTER_HOLD",
+      "sourceSha": "5fb67357a8ab96e1b6e0bab80e65a9b5edda1008",
+      "protectedRead": true,
+      "nativeStructuredClone": true,
+      "routeQueryCounts": {
+        "renovacionesGet": 64053,
+        "polizasGet": 7798,
+        "inicioGet": 14313
+      },
+      "rootCloning": "Orbit.domainConfig.peek('access') on every scoped access; deep clone repeated from access-scope"
+    }
   },
   "source": {
     "path": "orbit360-platform/data/store-firestore-product-readonly-p0.js",
-    "blobSha": "1ad40c9dd3bfdf35a1a4c9760838bd7936809513",
-    "modification": "Bulk native read-only deep clone in protected mode for all/where; single-record get/find native clone; catch falls back to existing JSON clone; no RBAC/paging/business write changes."
+    "blobSha": "4cdf9bc60150075a61e01f83151cdaad0ad21147",
+    "modification": "Existing bulk native snapshots plus O(1) protected get with cache-identity invalidation; preserve scope predicate and copies"
   },
   "test": {
     "path": "tools/gravicentra-i6-6-protected-read-clone-performance.test.cjs",
@@ -53,5 +68,24 @@
   ],
   "productionTouched": false,
   "firestoreDataTouched": false,
-  "automaticLiveDeployment": false
+  "automaticLiveDeployment": false,
+  "additionalSources": [
+    {
+      "path": "orbit360-platform/core/tenant-domain-config-client.js",
+      "blobSha": "6215c26fe5751cced5c8a1f5920599e48cea45da"
+    },
+    {
+      "path": "orbit360-platform/core/access-scope.js",
+      "blobSha": "1e8204b8835b76ee6a07554452d25561bd88a3c9"
+    },
+    {
+      "path": "orbit360-platform/core/router.js",
+      "blobSha": "fff88f3096172dee9d13165bbfd450b534dc8e84"
+    }
+  ],
+  "additionalTest": {
+    "path": "tools/gravicentra-i6-6-transversal-access-index-mobile.test.cjs",
+    "blobSha": "d39ea05396c2fc74dd8f60f1fea5482d1540b32c",
+    "status": "CI_PENDING"
+  }
 }

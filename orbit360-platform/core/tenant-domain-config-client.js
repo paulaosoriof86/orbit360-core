@@ -2,7 +2,14 @@
 (function(){'use strict';window.Orbit=window.Orbit||{};
 const VERSION='orbit360-tenant-domain-config-client-v4-b2-r96',FUNCTION_NAME='orbit360TenantDomainConfig',PREVIEW_FUNCTION_NAME='orbit360TenantDomainConfigPreview';
 const text=v=>String(v==null?'':v).trim(),clone=v=>{try{return JSON.parse(JSON.stringify(v));}catch(e){return Object.assign({},v||{});}};
-const cache=new Map(),meta=new Map(),inflight=new Map();
+const cache=new Map(),meta=new Map(),inflight=new Map(),immutableReadViews=new Map();
+// Read-only access checks share a deep-frozen snapshot of each published policy.
+function deepFreeze(value,seen){
+  if(!value||typeof value!=='object')return value;
+  seen=seen||new WeakSet();if(seen.has(value))return value;seen.add(value);
+  Object.keys(value).forEach(key=>deepFreeze(value[key],seen));
+  return Object.freeze(value);
+}
 const tenantId=()=>text((window.__ORBIT360_PRODUCT_PUBLIC_CONFIG__||{}).tenantHint||(window.OrbitBackend&&(OrbitBackend.tenantId||OrbitBackend.tenant))||(Orbit.tenant&&Orbit.tenant.get&&Orbit.tenant.get().id));
 const isPreview=()=>/--/.test(String(location.hostname||''));
 const functionName=()=>isPreview()?PREVIEW_FUNCTION_NAME:FUNCTION_NAME;
@@ -16,10 +23,15 @@ function provider(){return Orbit.productRuntimeBrowserProvidersP0&&typeof Orbit.
 function compat(){try{return window.firebase&&typeof firebase.functions==='function'?firebase.app().functions(functionRegion()).httpsCallable(functionName()):null;}catch(e){return null;}}
 function available(){return !!(tenantId()&&(provider()||compat()));}
 async function request(payload){const p=provider();if(p)return p.callFunction(functionName(),payload,functionRegion());const fn=compat();if(!fn)throw new Error('TENANT_DOMAIN_CONFIG_BACKEND_NOT_ACTIVE');const r=await fn(payload);return r&&r.data?r.data:r;}
-function publish(domain,config,source,syncPending){const value=Object.assign({},defaults(domain),clone(config||{}));cache.set(domain,value);meta.set(domain,{source:source||'unknown',syncPending:syncPending===true,at:new Date().toISOString()});localSave(domain,value);try{window.dispatchEvent(new CustomEvent('orbit:domain-config',{detail:{domain,config:clone(value),source:source||'unknown',syncPending:syncPending===true}}));}catch(e){}return value;}
+function publish(domain,config,source,syncPending){const value=Object.assign({},defaults(domain),clone(config||{}));cache.set(domain,value);immutableReadViews.delete(domain);meta.set(domain,{source:source||'unknown',syncPending:syncPending===true,at:new Date().toISOString()});localSave(domain,value);try{window.dispatchEvent(new CustomEvent('orbit:domain-config',{detail:{domain,config:clone(value),source:source||'unknown',syncPending:syncPending===true}}));}catch(e){}return value;}
 function peek(domain){if(cache.has(domain))return clone(cache.get(domain));const local=localGet(domain);cache.set(domain,local);meta.set(domain,{source:'local-unhydrated',syncPending:true});return clone(local);}
+function peekReadOnly(domain){
+  if(!cache.has(domain))peek(domain);
+  if(!immutableReadViews.has(domain))immutableReadViews.set(domain,deepFreeze(clone(cache.get(domain))));
+  return immutableReadViews.get(domain);
+}
 async function get(domain){const local=peek(domain);if(!available())return{ok:true,domain,config:local,source:'local-fallback',syncPending:true};try{const data=await request({tenantId:tenantId(),action:'get',domain});const config=publish(domain,data&&data.config?data.config:local,'protected',false);return Object.assign({source:'protected'},data||{},{config});}catch(error){const config=publish(domain,local,'local-fallback',true);return{ok:true,domain,config,source:'local-fallback',syncPending:true,error:text(error&&(error.message||error))};}}
 function ensure(domain){const m=meta.get(domain);if(m&&m.source==='protected'&&m.syncPending!==true)return Promise.resolve({ok:true,domain,config:peek(domain),source:'protected',cached:true});if(inflight.has(domain))return inflight.get(domain);const p=get(domain).finally(()=>inflight.delete(domain));inflight.set(domain,p);return p;}
 async function save(domain,config,reason){if((domain==='access'||domain==='catalogs')&&!available())throw new Error(domain==='catalogs'?'CATALOG_CONFIG_SERVER_REQUIRED':'ACCESS_CONFIG_SERVER_REQUIRED');if(!available()){const stored=publish(domain,config,'local-fallback',true);return{ok:true,domain,config:stored,source:'local-fallback',syncPending:true};}const data=await request({tenantId:tenantId(),action:'save',domain,config:clone(config||{}),reason:text(reason||'Configuración actualizada desde Gravicentra Insurance')});if(!data||data.ok!==true||!data.config)throw new Error('TENANT_DOMAIN_CONFIG_SAVE_NOT_CONFIRMED');const stored=publish(domain,data.config,'protected',false);return Object.assign({source:'protected'},data,{config:stored});}
-Orbit.domainConfig=Object.freeze({VERSION,defaults,peek,get,ensure,save,status:()=>Object.freeze({version:VERSION,functionName:functionName(),functionRegion:functionRegion(),previewIsolated:isPreview(),tenantId:tenantId(),available:available(),domains:[...cache.keys()].map(domain=>({domain,...(meta.get(domain)||{})}))})});
+Orbit.domainConfig=Object.freeze({VERSION,defaults,peek,peekReadOnly,get,ensure,save,status:()=>Object.freeze({version:VERSION,functionName:functionName(),functionRegion:functionRegion(),previewIsolated:isPreview(),tenantId:tenantId(),available:available(),domains:[...cache.keys()].map(domain=>({domain,...(meta.get(domain)||{})}))})});
 })();

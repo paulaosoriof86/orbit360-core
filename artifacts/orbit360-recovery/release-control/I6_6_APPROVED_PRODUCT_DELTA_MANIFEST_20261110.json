@@ -652,25 +652,44 @@
       "id": "I6_6_CROSS_MODULE_AUTHORIZED_READ_BULK_CLONE_PERFORMANCE_P0",
       "approvedByDirection": true,
       "receipt": "artifacts/orbit360-recovery/release-control/I6_6_CROSS_MODULE_PROTECTED_READ_CLONE_PERFORMANCE_20261110.json",
-      "sourceStatus": "SOURCE_QA_2_OF_2_PASS_PREVIEW_LIVE_NOT_DEPLOYED",
+      "sourceStatus": "SOURCE_ROOT_FIX_V2_TEST_AND_ISOLATED_PREVIEW_PENDING_NO_LIVE",
       "capabilityOwners": [
         "STARTUP_PERFORMANCE",
         "SINGLE_PRODUCT_ENTRYPOINT",
         "CLIENTE360_PRIMARY_RUNTIME",
         "POLIZAS_PRIMARY_RUNTIME",
-        "RECIBOS_CARTERA_PRIMARY_RUNTIME"
+        "RECIBOS_CARTERA_PRIMARY_RUNTIME",
+        "ROLE_SCOPE_RUNTIME",
+        "TENANT_DOMAIN_CONFIG_CLIENT",
+        "MOBILE_ROUTER"
       ],
-      "scope": "Replace per-row JSON stringify/parse with native bulk deep snapshot clone for protected read-only list/where and native single clone for get/find; preserve fallback, per-role/country server scope, records, writers; source-only, no Firebase/data mutations.",
+      "scope": "Native bulk clone and exact protected per-ID index on cached snapshot, immutable tenant access policy read view invalidated on publish, mobile store-driven rerenders keep navigation drawer open; dynamic relation predicates, role/country guards, writer denials unchanged; no Firestore data/real payments/WhatsApp writes.",
       "paths": [
         {
+          "path": "orbit360-platform/core/tenant-domain-config-client.js",
+          "gitBlobSha": "6215c26fe5751cced5c8a1f5920599e48cea45da"
+        },
+        {
+          "path": "orbit360-platform/core/access-scope.js",
+          "gitBlobSha": "1e8204b8835b76ee6a07554452d25561bd88a3c9"
+        },
+        {
           "path": "orbit360-platform/data/store-firestore-product-readonly-p0.js",
-          "gitBlobSha": "1ad40c9dd3bfdf35a1a4c9760838bd7936809513"
+          "gitBlobSha": "4cdf9bc60150075a61e01f83151cdaad0ad21147"
+        },
+        {
+          "path": "orbit360-platform/core/router.js",
+          "gitBlobSha": "fff88f3096172dee9d13165bbfd450b534dc8e84"
         }
       ],
       "tests": [
         {
           "path": "tools/gravicentra-i6-6-protected-read-clone-performance.test.cjs",
           "gitBlobSha": "17fac78ed3e4f6c21a7e3bb3b605f8a9dc363591"
+        },
+        {
+          "path": "tools/gravicentra-i6-6-transversal-access-index-mobile.test.cjs",
+          "gitBlobSha": "d39ea05396c2fc74dd8f60f1fea5482d1540b32c"
         }
       ]
     }

@@ -378,7 +378,23 @@
       return logicalRows(collection);
     }
     function all(collection) { return readCloneRows(scopedRows(collection)); }
-    function get(collection, id) { var row = scopedRows(collection).find(function (item) { return rowId(item) === id; }); return row ? readClone(row) : null; }
+    // Authorized protected reads without relation predicates use a source-identity
+    // map. New snapshots and role changes replace cache arrays, invalidating it.
+    // Relational and denied collections retain their original scope guard.
+    var protectedIdIndexes=Object.create(null);
+    function get(collection, id) {
+      var row=null,plan=state.queryPlans[collection]||{},constraints=plan.constraints||[];
+      var relational=constraints.some(function(item){return String(item&&item.field||'').indexOf('__relation_')===0;});
+      if(protectedMode&&!relational&&state.deniedCollections.indexOf(collection)<0){
+        var source=cache[collection]||[],cached=protectedIdIndexes[collection];
+        if(!cached||cached.source!==source){
+          var index=new Map();source.forEach(function(item){var key=rowId(item);if(!index.has(key))index.set(key,item);});
+          cached={source:source,index:index};protectedIdIndexes[collection]=cached;
+        }
+        row=cached.index.get(id)||null;
+      }else row=scopedRows(collection).find(function(item){return rowId(item)===id;})||null;
+      return row?readClone(row):null;
+    }
     function where(collection, fieldOrPredicate, opOrValue, maybeValue) {
       var source = scopedRows(collection), matches;
       if (typeof fieldOrPredicate === 'function') matches = source.filter(fieldOrPredicate);

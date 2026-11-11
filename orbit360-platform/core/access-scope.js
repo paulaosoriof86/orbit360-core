@@ -120,7 +120,9 @@ Orbit.access = (function () {
   }
   function accessConfig() {
     try {
-      var live=Orbit.domainConfig&&typeof Orbit.domainConfig.peek==='function'?Orbit.domainConfig.peek('access'):null;
+      var config=Orbit.domainConfig;
+      var live=config&&typeof config.peekReadOnly==='function'?config.peekReadOnly('access'):
+        config&&typeof config.peek==='function'?config.peek('access'):null;
       if(live&&typeof live==='object')return live;
       var cfg=tenantConfig(),dc=cfg&&cfg.domainConfig&&cfg.domainConfig.access;
       return dc&&typeof dc==='object'?dc:{};
