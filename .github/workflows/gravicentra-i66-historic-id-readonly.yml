@@ -61,6 +61,32 @@ jobs:
               const refs=docsByCollection.get(coll).filter(d=>pIds.has(String(d.data().polizaId||'')));
               console.log('ID_PROBE_PAYMENT_'+coll+' linked='+refs.length+' physical_matches_logical='+refs.filter(d=>d.id===String(d.data().id||'')).length);
             }
+            const linkedReceipts=docsByCollection.get('recibosEsperados').filter(d=>pIds.has(String(d.data().polizaId||'')));
+            const linkedPortfolios=docsByCollection.get('carteraPrimas').filter(d=>pIds.has(String(d.data().polizaId||'')));
+            const normalized=v=>String(v==null?'':v).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim();
+            const activePortfolio=r=>r.carteraActiva!==false&&!['anulado','cancelado','cancelada','superseded','reemplazado'].includes(normalized(r.estadoCartera||r.estado));
+            const activePortfolios=linkedPortfolios.filter(d=>activePortfolio(d.data()||{}));
+            const grouped=new Map();for(const d of activePortfolios){const rid=String(d.data().reciboId||'');if(rid)grouped.set(rid,(grouped.get(rid)||0)+1);}
+            const inactiveReceipts=linkedReceipts.filter(d=>{const r=d.data()||{};return r.deleted===true||r.eliminado===true||r.archivado===true||['anulado','cancelado','superseded','reemplazado'].includes(normalized(r.estado));});
+            const paymentRecord=docsByCollection.get('cobros').filter(d=>pIds.has(String(d.data().polizaId||'')));
+            const appliedReceiptRefs=new Set(paymentRecord.map(d=>String(d.data().reciboId||'')).filter(Boolean));
+            console.log('ID_PROBE_BAYRON_SHAPE receipts='+linkedReceipts.length+' inactive_receipts='+inactiveReceipts.length+' active_portfolio='+activePortfolios.length+' unlinked_portfolio='+activePortfolios.filter(d=>!d.data().reciboId).length+' ambiguous_active_portfolio_receipts='+Array.from(grouped.values()).filter(n=>n>1).length+' paid_receipt_refs='+appliedReceiptRefs.size+' paid_receipt_ref_exists='+[...appliedReceiptRefs].every(id=>linkedReceipts.some(d=>d.id===id)));
             console.log('I66_READONLY_METADATA_PROBE_COMPLETED_WITHOUT_WRITES');
           })().catch(e=>{console.error(String(e.message||e).replace(/[^a-zA-Z0-9_ -]/g,''));process.exitCode=1;});
+          NODE
+      - name: Probe existence of LIVE callable endpoints without authentication or writes
+        run: |
+          node - <<'NODE'
+          'use strict';
+          const names=['orbit360OpsLeadsCommand','orbit360CobrosReconciliationCommand','orbit360ProductOperationalCommand','orbit360B4003ProtectedReader'];
+          (async()=>{
+            for(const name of names){
+              const endpoint='https://us-central1-ays-orbit-360-lab.cloudfunctions.net/'+name;
+              try{
+                const res=await fetch(endpoint,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({data:{}}),signal:AbortSignal.timeout(15000)});
+                const response=await res.text();let code='';try{const obj=JSON.parse(response);code=String(obj.error&&obj.error.status||obj.error&&obj.error.message||'').replace(/[^A-Za-z_-]/g,'').slice(0,60);}catch(_){code='NON_JSON';}
+                console.log('ENDPOINT_PROBE '+name+' http='+res.status+' unauthenticated_error='+code);
+              }catch(e){console.log('ENDPOINT_PROBE '+name+' http=NETWORK_ERROR class='+String(e.name||'error').replace(/[^A-Za-z_-]/g,''));}
+            }
+          })().catch(e=>{console.error(String(e.name||'error'));process.exitCode=1;});
           NODE
