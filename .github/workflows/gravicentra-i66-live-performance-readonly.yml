@@ -1,5 +1,8 @@
 # I6.6: one canonical LIVE performance discriminator. No product or data mutation.
 # The tested LIVE build is SHA-pinned; cold auth and UI render are timed separately.
+# 2026-11-11: refresh CURRENT old-LIVE baseline for the exact 81b0a5b4 Preview
+# before any Hosting promotion. This workflow intentionally stays pinned to
+# the previously certified LIVE abb0ea3f; it performs no user data writes.
 name: Gravicentra I6.6 LIVE Performance READ ONLY
 on:
   push:
