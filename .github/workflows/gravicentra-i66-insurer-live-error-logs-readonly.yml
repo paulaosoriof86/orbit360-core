@@ -1,0 +1,59 @@
+# I6.6: inspect only classified live operational callable failures. Never print customer data or full log messages.
+name: Gravicentra I6.6 Insurer LIVE Error Classification Readonly
+on:
+  push:
+    branches: [recovery/fase-a-clean-20260831]
+    paths: [.github/workflows/gravicentra-i66-insurer-live-error-logs-readonly.yml]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  diagnose:
+    if: github.repository == 'paulaosoriof86/orbit360-core' && github.ref_name == 'recovery/fase-a-clean-20260831'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    env:
+      SA_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_ALT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+    steps:
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Install read-only authenticated Google Logging API client
+        run: npm install --no-save --package-lock=false --ignore-scripts --no-audit --no-fund google-auth-library@9.15.1 >/dev/null
+      - name: Query recent function error classifications without personal data
+        run: |
+          node - <<'NODE'
+          const assert=require('node:assert/strict'),{GoogleAuth}=require('google-auth-library');
+          const service=['SA_LAB','SA_ALT','SA_DEFAULT'].map(n=>process.env[n]).filter(Boolean)
+            .map(s=>{try{return JSON.parse(s);}catch(_){return null;}})
+            .find(s=>s&&s.type==='service_account'&&s.project_id==='ays-orbit-360-lab'&&s.private_key);
+          assert.ok(service,'I66_LOG_READ_EXISTING_ACCOUNT_REQUIRED');
+          (async()=>{
+            const client=await new GoogleAuth({credentials:service,scopes:['https://www.googleapis.com/auth/logging.read']}).getClient();
+            const token=await client.getAccessToken();
+            const filter='timestamp>="2026-11-11T16:00:00Z" AND timestamp<="2026-11-11T20:00:00Z" AND (resource.type="cloud_run_revision" OR resource.type="cloud_function") AND (resource.labels.service_name="orbit360productoperationalcommand" OR resource.labels.function_name="orbit360ProductOperationalCommand")';
+            const req=await fetch('https://logging.googleapis.com/v2/entries:list',{method:'POST',headers:{Authorization:'Bearer '+token.token,'content-type':'application/json'},
+              body:JSON.stringify({resourceNames:['projects/ays-orbit-360-lab'],filter,pageSize:250,orderBy:'timestamp desc'}),signal:AbortSignal.timeout(30000)});
+            console.log('I66_LOGGING_HTTP_STATUS='+req.status);
+            if(!req.ok){console.log('I66_LOGGING_ACCESS_HOLD_NO_BYPASS=true');process.exitCode=1;return;}
+            const response=await req.json(),entries=response.entries||[],counts={};
+            const patterns=[
+              ['CLOUD_FUNCTION_ERROR',/function execution|callable error|exception/i],
+              ['INSURER_SCOPE',/insurer.*scope|aseguradora.*alcance|no autorizado para modificar|permission.denied/i],
+              ['INSURER_AUDIT',/historial can[oó]nico|actividad.*commit|insurer.*activity/i],
+              ['SECRET_PAYLOAD',/material secreto no permitido|containsSecret|secretos/i],
+              ['SERVER_READBACK',/canonical.*readback|falta el recibo can[oó]nico|readback.*mismatch/i],
+              ['INVALID_ARGUMENT',/invalid.argument|argumento inv[aá]lido|payload requerido/i],
+              ['FUNCTION_NOT_FOUND',/not.found|function not found/i],
+              ['NETWORK_OR_TIMEOUT',/deadline.exceeded|timeout|unavailable|resource.exhausted/i],
+              ['AUTHORIZATION',/unauthenticated|authorization|not.authorized/i]
+            ];
+            for(const e of entries){
+              const s=String(e.textPayload||'')+' '+JSON.stringify(e.jsonPayload||{});
+              const tags=patterns.filter(([_,re])=>re.test(s)).map(([tag])=>tag);
+              for(const tag of tags.length?tags:['UNCLASSIFIED'])counts[tag]=(counts[tag]||0)+1;
+            }
+            console.log('I66_LIVE_OPERATIONAL_FUNCTION_LOG_READONLY='+JSON.stringify({entries:entries.length,classifiedCounts:counts,more:Boolean(response.nextPageToken),zeroWrites:true}));
+          })().catch(e=>{console.log('I66_LOGGING_UNAVAILABLE_CLASS='+String(e?.code||e?.name||'ERROR').replace(/[^A-Za-z0-9_]/g,'').slice(0,40));process.exitCode=1;});
+          NODE
