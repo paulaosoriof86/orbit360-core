@@ -91,12 +91,25 @@
       "directoryTotal": 33,
       "actives": 29,
       "nonblockingWarnings": "Repeated LOGO_ASSET_RESOLVE_FAILED functions/internal; investigate failed logo asset reads and retry storm without masking backend failures"
+    },
+    "cobros": {
+      "mainRendered": true,
+      "reportedVisibleRecords": 2562,
+      "visibleTablePageSize": 60,
+      "noMatchSearchReturnedZero": true,
+      "noMatchSearchCleared": true,
+      "readOnlyDomEvaluateAfterRenderMs": 60,
+      "fullDomSnapshotCdpTimeoutMs": 3000,
+      "advisorSelectOptionCdpTimeoutMs": 3000,
+      "advisorSelectValueChangedDespiteTimeout": true,
+      "advisorSelectRestoredToDefault": true,
+      "interpretation": "The app displayed and accepted search; browser locator / DOM-snapshot transport timed out and select value changed without a proven filtered-row readback. Avoid declaring advisor dropdown PASS or an application hang from controller timeout alone."
     }
   },
   "openHolds": [
     "Aseguradoras LIVE Dirección controlled durable synthetic SAVE/reload/revert now passes; Carlos actual authenticated durable SAVE/reload/revert and complete role matrix remain unproven on this source",
     "Conciliaciones manual Chrome route rendered 0 formal proposals in 1171ms with no console errors, while automated Chrome timing sampler reported 12/13 ready; determine readiness mismatch causally",
-    "Cobros first Playwright DOM snapshot after navigation timed out while DOM CUA could read the loaded UI; distinguish browser transport from application main-thread under repetition",
+    "Cobros Playwright DOM snapshots and advisor selectOption exceeded 3s CDP command timeout despite rendered 60-row page and fast read-only DOM evaluation; advisor result not certified; investigate browser transport versus callback render",
     "Aseguradoras logo asset resolver emitted repeated functions/internal warnings; classify backend versus retry/caching effects without treating fallback as verified logo functionality",
     "New login activation displayed between-run variance and needs repeated cold/warm sample",
     "Cartera and payment inference source rows, receipt due-date semantics and July-November Drive policy inventory still need exact LIVE joins, protected writes and before/after readback",
