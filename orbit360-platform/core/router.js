@@ -99,6 +99,95 @@ Orbit.router = (function () {
     window.addEventListener('resize', function () { if (!isMobile()) close(); });
   }
 
-  function wireGlobalSearch() { const box = document.querySelector('.tb-search'); if (!box) return; const inp = box.querySelector('input'); if (!inp) return; let dd = document.getElementById('tb-search-dd'); if (!dd) { dd = document.createElement('div'); dd.id = 'tb-search-dd'; dd.className = 'tb-search-dd'; box.appendChild(dd); } const U = Orbit.ui; const scopedSearchStore=()=>Orbit.access&&typeof Orbit.access.scopedStore==='function'?Orbit.access.scopedStore(current||'inicio'):Orbit.store; const clientView = id => {const S=scopedSearchStore();return (Orbit.clientProjection && Orbit.clientProjection.get ? Orbit.clientProjection.get(id) : S.get('clientes', id));}; function buscar(qstr) { const S=scopedSearchStore(); const t = qstr.trim().toLowerCase(); if (t.length < 2) { dd.classList.remove('open'); dd.innerHTML = ''; return; } const res = []; S.all('clientes').forEach(raw => { const c = Orbit.clientProjection && Orbit.clientProjection.project ? Orbit.clientProjection.project(raw) : raw; if (((c.nombre || '') + ' ' + (c.identificacion || '') + ' ' + (c.email || '') + ' ' + (c.telefono || '')).toLowerCase().includes(t)) res.push({ ic: '🧑', t: c.nombre || 'Cliente', s: 'Cliente · ' + (c.identificacion || c.tipo || ''), go: '#/cliente360?c=' + c.id }); }); S.all('polizas').forEach(p => { const veh = S.all('vehiculos').find(v => v.polizaId === p.id); const placa = (veh && veh.placa) || p.placa || ''; const cli = clientView(p.clienteId); if ((p.numero + ' ' + p.producto + ' ' + placa + ' ' + (cli ? cli.nombre : '') + ' ' + (veh ? veh.marca + ' ' + veh.linea : '')).toLowerCase().includes(t)) res.push({ ic: '📑', t: p.numero + (placa ? ' · ' + placa : ''), s: 'Póliza · ' + p.ramo + (cli ? ' · ' + cli.nombre : ''), go: '#/cliente360?c=' + p.clienteId }); }); S.all('vehiculos').forEach(v => { if (((v.placa || '') + ' ' + (v.marca || '') + ' ' + (v.linea || '')).toLowerCase().includes(t)) { const cli = clientView(v.clienteId); res.push({ ic: '🚗', t: (v.placa || (v.marca + ' ' + v.linea)), s: 'Vehículo · ' + v.marca + ' ' + v.linea + (cli ? ' · ' + cli.nombre : ''), go: '#/cliente360?c=' + v.clienteId }); } }); S.all('cobros').forEach(cb => { const cli = clientView(cb.clienteId); if (((cli ? cli.nombre : '') + ' ' + (cb.numeroRecibo || '')).toLowerCase().includes(t)) res.push({ ic: '💳', t: (cb.numeroRecibo || 'Recibo') + ' · ' + U.money(cb.monto || 0, cb.moneda), s: 'Cobro · ' + cb.estado + (cli ? ' · ' + cli.nombre : ''), go: '#/cliente360?c=' + cb.clienteId }); }); S.all('aseguradoras').forEach(a => { if ((a.nombre || '').toLowerCase().includes(t)) res.push({ ic: '🏛️', t: a.nombre, s: 'Aseguradora · ' + (a.pais || ''), go: '#/aseguradoras' }); }); const top = res.slice(0, 12); dd.innerHTML = top.length ? top.map(r => `<button class="tb-sr" data-go="${r.go}"><span>${r.ic}</span><span class="tb-sr-t">${U.esc(r.t)}<small>${U.esc(r.s)}</small></span></button>`).join('') + (res.length > 12 ? `<div class="tb-sr-more">+${res.length - 12} más…</div>` : '') : '<div class="tb-sr-empty">Sin resultados para "' + U.esc(qstr) + '"</div>'; dd.classList.add('open'); dd.querySelectorAll('[data-go]').forEach(b => b.addEventListener('mousedown', e => { e.preventDefault(); location.hash = b.dataset.go; dd.classList.remove('open'); inp.value = ''; })); } inp.addEventListener('input', () => buscar(inp.value)); inp.addEventListener('focus', () => { if (inp.value.trim().length >= 2) buscar(inp.value); }); inp.addEventListener('blur', () => setTimeout(() => dd.classList.remove('open'), 180)); }
+  function wireGlobalSearch() {
+    const box = document.querySelector('.tb-search'); if (!box) return;
+    const inp = box.querySelector('input'); if (!inp) return;
+    let dd = document.getElementById('tb-search-dd');
+    if (!dd) { dd = document.createElement('div'); dd.id = 'tb-search-dd'; dd.className = 'tb-search-dd'; box.appendChild(dd); }
+    const U = Orbit.ui;
+    const scopedSearchStore = () => Orbit.access && typeof Orbit.access.scopedStore === 'function'
+      ? Orbit.access.scopedStore(current || 'inicio') : Orbit.store;
+    const normalized = v => String(v == null ? '' : v).toLowerCase();
+    let cached = null, pending = null;
+    function cacheKey() {
+      const member = Orbit.auth && Orbit.auth.productUser || {};
+      let role = ''; try { role = Orbit.session && Orbit.session.rol ? Orbit.session.rol() : ''; } catch (_) {}
+      return [current || 'inicio', Orbit.pais || '', role, member.uid || '', member.tenantId || ''].join('|');
+    }
+    // An indexed, scoped snapshot is rebuilt only when the tenant/role/country,
+    // route or source changes. S.all('vehiculos') inside EACH policy used to
+    // deep-clone the whole fleet over a thousand times on EVERY keypress.
+    function searchIndex() {
+      const key = cacheKey();
+      if (cached && cached.key === key) return cached.rows;
+      const S = scopedSearchStore(), rows = [];
+      const clients = S.all('clientes') || [], policies = S.all('polizas') || [];
+      const vehicles = S.all('vehiculos') || [], charges = S.all('cobros') || [];
+      const insurers = S.all('aseguradoras') || [], clientsById = new Map(), vehiclesByPolicy = new Map();
+      const projection = Orbit.clientProjection;
+      function add(ic, title, subtitle, route, query) {
+        rows.push({ ic, t: title, s: subtitle, go: route, query: normalized(query) });
+      }
+      clients.forEach(raw => {
+        const c = projection && projection.project ? projection.project(raw) : raw;
+        if (!c) return;
+        clientsById.set(String(c.id), c);
+        add('🧑', c.nombre || 'Cliente', 'Cliente · ' + (c.identificacion || c.tipo || ''),
+          '#/cliente360?c=' + c.id, (c.nombre || '') + ' ' + (c.identificacion || '') + ' ' + (c.email || '') + ' ' + (c.telefono || ''));
+      });
+      vehicles.forEach(v => { if (v && v.polizaId && !vehiclesByPolicy.has(String(v.polizaId))) vehiclesByPolicy.set(String(v.polizaId), v); });
+      const clientView = id => clientsById.get(String(id)) ||
+        (projection && projection.get ? projection.get(id) : S.get('clientes', id));
+      policies.forEach(p => {
+        const veh = vehiclesByPolicy.get(String(p.id));
+        const placa = veh && veh.placa || p.placa || '', cli = clientView(p.clienteId);
+        add('📑', (p.numero || '') + (placa ? ' · ' + placa : ''), 'Póliza · ' + (p.ramo || '') + (cli ? ' · ' + cli.nombre : ''),
+          '#/cliente360?c=' + p.clienteId,
+          (p.numero || '') + ' ' + (p.producto || '') + ' ' + placa + ' ' + (cli ? cli.nombre : '') + ' ' + (veh ? (veh.marca || '') + ' ' + (veh.linea || '') : ''));
+      });
+      vehicles.forEach(v => {
+        const cli = clientView(v.clienteId);
+        add('🚗', v.placa || ((v.marca || '') + ' ' + (v.linea || '')),
+          'Vehículo · ' + (v.marca || '') + ' ' + (v.linea || '') + (cli ? ' · ' + cli.nombre : ''),
+          '#/cliente360?c=' + v.clienteId, (v.placa || '') + ' ' + (v.marca || '') + ' ' + (v.linea || ''));
+      });
+      charges.forEach(cb => {
+        const cli = clientView(cb.clienteId);
+        add('💳', (cb.numeroRecibo || 'Recibo') + ' · ' + U.money(cb.monto || 0, cb.moneda),
+          'Cobro · ' + cb.estado + (cli ? ' · ' + cli.nombre : ''),
+          '#/cliente360?c=' + cb.clienteId, (cli ? cli.nombre : '') + ' ' + (cb.numeroRecibo || ''));
+      });
+      insurers.forEach(a => add('🏛️', a.nombre, 'Aseguradora · ' + (a.pais || ''), '#/aseguradoras', a.nombre || ''));
+      cached = { key, rows };
+      return rows;
+    }
+    function buscar(query) {
+      const term = query.trim().toLowerCase();
+      if (term.length < 2) { dd.classList.remove('open'); dd.innerHTML = ''; return; }
+      const top = []; let total = 0;
+      searchIndex().forEach(row => { if (row.query.includes(term)) { total++; if (top.length < 12) top.push(row); } });
+      dd.innerHTML = top.length
+        ? top.map(r => `<button class="tb-sr" data-go="${U.esc(r.go)}"><span>${r.ic}</span><span class="tb-sr-t">${U.esc(r.t)}<small>${U.esc(r.s)}</small></span></button>`).join('') +
+          (total > 12 ? `<div class="tb-sr-more">+${total - 12} más…</div>` : '')
+        : '<div class="tb-sr-empty">Sin resultados para "' + U.esc(query) + '"</div>';
+      dd.classList.add('open');
+      dd.querySelectorAll('[data-go]').forEach(b => b.addEventListener('mousedown', e => {
+        e.preventDefault(); location.hash = b.dataset.go; dd.classList.remove('open'); inp.value = '';
+      }));
+    }
+    function schedule() { if (pending) clearTimeout(pending); pending = setTimeout(() => { pending = null; buscar(inp.value); }, 120); }
+    const invalidate = () => { cached = null; };
+    document.addEventListener('orbit:store', invalidate);
+    // Product authoritative snapshots notify on WINDOW, not document.
+    // A cache without this event could keep stale clients/receipts after an
+    // otherwise successful live hydration or write.
+    window.addEventListener('orbit:store:emit', invalidate);
+    document.addEventListener('orbit:session', invalidate);
+    window.addEventListener('hashchange', invalidate);
+    window.addEventListener('orbit:domain-config', invalidate);
+    inp.addEventListener('input', schedule);
+    inp.addEventListener('focus', () => { if (inp.value.trim().length >= 2) schedule(); });
+    inp.addEventListener('blur', () => setTimeout(() => dd.classList.remove('open'), 180));
+  }
   return { init, go, loadRuntimeContracts, runtimeContractState, rebuildSidebar: () => { try { buildSidebar(); setActive((Orbit.route && Orbit.route.key) || 'inicio'); } catch (e) {} } };
 })();

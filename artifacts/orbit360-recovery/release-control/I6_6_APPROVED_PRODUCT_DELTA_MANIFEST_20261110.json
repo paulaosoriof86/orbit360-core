@@ -721,6 +721,59 @@
           "gitBlobSha": "3c7051f61fe5813aea1beaaec0d8dbbe5b44138e"
         }
       ]
+    },
+    {
+      "id": "I6_6_SIGNED_AUTH_WRITER_AND_GLOBAL_SEARCH_INDEX_TRANSVERSAL_P0",
+      "approvedByDirection": true,
+      "receipt": "artifacts/orbit360-recovery/release-control/I6_6_AUTH_SESSION_AND_GLOBAL_SEARCH_CAUSAL_ADDENDUM_20261111.json",
+      "sourceStatus": "SOURCE_UNIT_QA_PASS_SIGNED_PREVIEW_AND_LIVE_PERSISTENCE_QA_PENDING",
+      "capabilityOwners": [
+        "LOGIN_AND_ACCESS",
+        "ASEGURADORAS_PRIMARY_RUNTIME",
+        "ROLE_SCOPE_RUNTIME",
+        "SINGLE_PRODUCT_ENTRYPOINT",
+        "STARTUP_PERFORMANCE"
+      ],
+      "scope": "Authenticated writer identity matches signed Firebase UID across approved operational mutations; new interactive sessions are tab-isolated. Global search indexes one authorized scoped snapshot, invalidates on session/tenant/role/store/route change and debounces input. No insurer advisor requirement, no data import, no backend/rules deployment.",
+      "paths": [
+        {
+          "path": "orbit360-platform/core/product-runtime-browser-providers-p0.js",
+          "gitBlobSha": "b0507a5c3c911637f0429cad3dcf4896d9b29424",
+          "replaces": {
+            "path": "orbit360-platform/core/product-runtime-browser-providers-p0.js",
+            "priorGitBlobSha": "b344d85f9065603738a96464e581ea688cb4a865",
+            "priorChangeId": "I6_6_PROTECTED_PREVIEW_HOST_AND_READONLY_SELF_ACCESS"
+          }
+        },
+        {
+          "path": "orbit360-platform/data/store-firestore-product-operational-p0.js",
+          "gitBlobSha": "788a14755e1e51d420126e8be68111a150c08207",
+          "replaces": {
+            "path": "orbit360-platform/data/store-firestore-product-operational-p0.js",
+            "priorGitBlobSha": "1e58b9099e0f773baf26feb403650ec4029b2715",
+            "priorChangeId": "I6_6_OPS_PROTECTED_ENDORSEMENT_BOARD_HIDE_TRANSVERSAL_P0"
+          }
+        },
+        {
+          "path": "orbit360-platform/core/router.js",
+          "gitBlobSha": "60f73dfae6c57e7853acdcd120e05d5be8fde0ee",
+          "replaces": {
+            "path": "orbit360-platform/core/router.js",
+            "priorGitBlobSha": "fff88f3096172dee9d13165bbfd450b534dc8e84",
+            "priorChangeId": "I6_6_CROSS_MODULE_AUTHORIZED_READ_BULK_CLONE_PERFORMANCE_P0"
+          }
+        }
+      ],
+      "tests": [
+        {
+          "path": "tools/gravicentra-i6-6-auth-session-write-coherence.test.cjs",
+          "gitBlobSha": "a52724c81ed84f66bf0989998571c73563582ded"
+        },
+        {
+          "path": "tools/gravicentra-i6-6-global-search-index-performance.test.cjs",
+          "gitBlobSha": "947f0e0dabe31a97695e3f12d7968496bb468546"
+        }
+      ]
     }
   ]
 }

@@ -1,0 +1,53 @@
+{
+  "schema": "GRAVICENTRA_I6_6_TRANSVERSAL_AUTH_SEARCH_CAUSAL_ADDENDUM_V1",
+  "date": "2026-11-11",
+  "gate": "I6.6",
+  "branch": "recovery/fase-a-clean-20260831",
+  "parentAcceptedGate": "B4-007_CLOSED_BY_DIRECTION",
+  "realUserSymptoms": [
+    "Carlos Operativo and Paula cannot save an insurer record in LIVE despite visible edit affordance.",
+    "Global toolbar search, module filters and navigation are intermittently slow; Chrome has reported page unresponsive.",
+    "Carlos-signed LIVE browser timed out after selecting Cobros y cartera; bounded performance recertification still pending."
+  ],
+  "insurerSignedLiveReproduction": {
+    "entityId": "gt-aseguradora-guatemalteca",
+    "signedActor": "Carlos Operativo",
+    "accessCanEdit": true,
+    "accessCanAccessRecord": true,
+    "attemptedChange": "Temporary, one-field Responsable interno canary with audit motive",
+    "observedClientError": "PRODUCT_WRITE_AUTH_CONTEXT_MISMATCH",
+    "confirmedLocation": "store-firestore-product-operational-p0.js batchDurable signed actor consistency check",
+    "firestoreReadback": "No change to insurer business record, no new Carlos activity after failed save",
+    "readonlyIntegrityRuns": [43085784388, 43086136439],
+    "previousAdviserScopeHypothesis": "DISPROVEN_AS_SUFFICIENT_CAUSE: client edit permission passes for the real signed actor; previous receipt retained as historical, not treated as causal proof",
+    "sensitiveFieldNameMismatchHypothesis": "DISPROVEN_BY_READONLY_33_INSURER_SCAN",
+    "underlyingSessionCause": "CANDIDATE: Firebase default local persistence shares identity across tabs, but signed cross-tab reproduction is not yet certified; actual observed cause is UID projection mismatch"
+  },
+  "minimalTransversalSourceChanges": [
+    "For new interactive login set Firebase browserSessionPersistence before signIn, isolating signed actors across tabs; existing restored sessions are not forcibly logged out.",
+    "On all four signed operational transports, await Firebase authStateReady for a bounded 3.5 seconds only when currentUser is transiently absent; reject wrong actor fail-closed.",
+    "On global toolbar search use one country/role/tenant-scoped index with O(N) policy-vehicle lookup, 120 ms debounce and session/store/route/product snapshot invalidation."
+  ],
+  "regressionUnitEvidence": {
+    "signedAuthCoherence": "I66_AUTH_TAB_ISOLATION_AND_SIGNED_WRITER_COHERENCE_12_12_PASS",
+    "indexedGlobalSearch": "I66_GLOBAL_SEARCH_TRANSVERSAL_INDEX_SINGLE_SNAPSHOT_AND_SCOPE_INVALIDATION_17_17_PASS"
+  },
+  "scopeAndSafety": {
+    "insurersHaveNoRequiredAdvisor": true,
+    "allRoleAndCountrySemanticsPreserved": true,
+    "noClientOrInsurerDataWriteForThisSourceDelta": true,
+    "noFirestoreRulesOrBackendFunctionChange": true,
+    "noNewBranchOrFirebaseProject": true,
+    "singleImmutableArtifactPreviewThenLive": true
+  },
+  "nextEvidenceRequirements": [
+    "GitHub delta guard PASS on canonical source and blob-pinned tests",
+    "One exact Preview artifact with byte readback",
+    "Real signed Carlos/Paula write-path tests in controlled safe environment; no real insurer mutation before approved LIVE canary",
+    "Search/filter/navigation performance under repeated role/country/mobile switching, especially Cobros and Renovaciones",
+    "LIVE exact clone, post-deploy functional write/reload/readback and no regressions"
+  ],
+  "previewStatus": "PENDING",
+  "liveStatus": "PENDING",
+  "businessDataChanged": false
+}

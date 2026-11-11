@@ -168,7 +168,15 @@
       membershipProvider:{getByUid:membershipByUid},protectedReadPage:protectedReadPage
     };
   }
-  function signIn(email,password){return initialize().then(function(ctx){return ctx.modules.auth.signInWithEmailAndPassword(ctx.auth,String(email||'').trim(),String(password||''));});}
+  function signIn(email,password){return initialize().then(function(ctx){
+    // Firebase's default LOCAL session is shared across every tab of this
+    // origin. Switching between Dirección and Operativo in another tab used
+    // to leave the first tab's productUser pointing at a different signed UID.
+    // New interactive logins get tab-scoped SESSION before credentials are
+    // accepted; existing restored sessions are not forcibly migrated/logged out.
+    return ctx.modules.auth.setPersistence(ctx.auth,ctx.modules.auth.browserSessionPersistence)
+      .then(function(){return ctx.modules.auth.signInWithEmailAndPassword(ctx.auth,String(email||'').trim(),String(password||''));});
+  });}
   function signOut(){return initialize().then(function(ctx){return ctx.modules.auth.signOut(ctx.auth);});}
   function sendVerificationEmail(user){
     return initialize().then(function(ctx){var target=user||ctx.auth.currentUser;if(!target)throw new Error('AUTH_USER_NOT_AVAILABLE');return ctx.modules.auth.sendEmailVerification(target);});
@@ -176,5 +184,5 @@
   function updateCurrentUserPassword(password){
     return initialize().then(function(ctx){var target=ctx.auth.currentUser;if(!target)throw new Error('AUTH_USER_NOT_AVAILABLE');return ctx.modules.auth.updatePassword(target,String(password||''));});
   }
-  window.Orbit.productRuntimeBrowserProvidersP0=Object.freeze({VERSION:'p0-b1-20260919.1',enabled:enabled,initialize:initialize,dependencies:dependencies,signIn:signIn,signOut:signOut,sendVerificationEmail:sendVerificationEmail,updateCurrentUserPassword:updateCurrentUserPassword,initialUser:initialUser,waitForUser:waitUser,readTenantConfig:readTenantConfig,callFunction:callFunction,protectedReadPage:protectedReadPage,configDescriptor:publicDescriptor,protectedHostMode:protectedHostMode,isI66PreviewHost:isI66PreviewHost,containsSecrets:false,tenantSource:'membership_only',browserFirestoreWriteAuthorized:false,serverWriteTransport:'firebase-functions',authoritativeFirstRead:true,authPersistence:'firebase-default-local',noFallback:true});
+  window.Orbit.productRuntimeBrowserProvidersP0=Object.freeze({VERSION:'p0-b1-20261111.2-session-isolated',enabled:enabled,initialize:initialize,dependencies:dependencies,signIn:signIn,signOut:signOut,sendVerificationEmail:sendVerificationEmail,updateCurrentUserPassword:updateCurrentUserPassword,initialUser:initialUser,waitForUser:waitUser,readTenantConfig:readTenantConfig,callFunction:callFunction,protectedReadPage:protectedReadPage,configDescriptor:publicDescriptor,protectedHostMode:protectedHostMode,isI66PreviewHost:isI66PreviewHost,containsSecrets:false,tenantSource:'membership_only',browserFirestoreWriteAuthorized:false,serverWriteTransport:'firebase-functions',authoritativeFirstRead:true,authPersistence:'firebase-browser-session-on-new-login',noFallback:true});
 })();

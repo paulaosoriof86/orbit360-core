@@ -51,6 +51,29 @@
     if(m.roles.indexOf(role)<0)error('PRODUCT_WRITE_MEMBERSHIP_REQUIRED');
     return Object.assign({},m,{activeRole:role});
   }
+  function signedContext(p,m){
+    // The read-only membership and the Firebase signed-in principal must be
+    // the SAME actor. After a tab switches account or Auth is still restoring,
+    // do not authorize a write under a stale productUser projection.
+    return p.initialize().then(function(ctx){
+      if(!ctx||!ctx.auth)throw new Error('PRODUCT_WRITE_AUTH_CONTEXT_MISSING');
+      var signed=ctx.auth.currentUser;
+      if(signed){
+        if(text(signed.uid)!==text(m.uid))throw new Error('PRODUCT_WRITE_AUTH_CONTEXT_MISMATCH');
+        return ctx;
+      }
+      if(typeof ctx.auth.authStateReady!=='function')throw new Error('PRODUCT_WRITE_AUTH_CONTEXT_MISMATCH');
+      var timeout=null;
+      return Promise.race([
+        Promise.resolve().then(function(){return ctx.auth.authStateReady();}),
+        new Promise(function(_,reject){timeout=setTimeout(function(){reject(new Error('PRODUCT_WRITE_AUTH_RESTORE_TIMEOUT'));},3500);})
+      ]).then(function(){
+        if(!ctx.auth.currentUser||text(ctx.auth.currentUser.uid)!==text(m.uid))
+          throw new Error('PRODUCT_WRITE_AUTH_CONTEXT_MISMATCH');
+        return ctx;
+      }).finally(function(){if(timeout)clearTimeout(timeout);});
+    });
+  }
   function moduleFor(collection){
     var moduleKey=SURFACE[collection];
     if(!moduleKey)error('PRODUCT_WRITE_COLLECTION_NOT_AUTHORIZED');
@@ -214,8 +237,7 @@
   function metaPreviewQaRead(input,operation){
     var context,m;
     try{context=metaPreviewContext(Object.assign({},input,{operation:operation}),['probe','inspect']);m=member();}catch(e){return Promise.reject(e);}
-    return provider.initialize().then(function(ctx){
-      if(!ctx||!ctx.auth||!ctx.auth.currentUser||text(ctx.auth.currentUser.uid)!==text(m.uid))error('PRODUCT_WRITE_AUTH_CONTEXT_MISMATCH');
+    return signedContext(provider,m).then(function(ctx){
       if(provider.browserFirestoreWriteAuthorized!==false||provider.serverWriteTransport!=='firebase-functions'||provider.noFallback!==true)error('PRODUCT_WRITE_SERVER_TRANSPORT_REQUIRED');
       return provider.callFunction(previewGeneralCommand(),{tenantId:m.tenantId,activeRole:m.activeRole,metaPreviewQa:context,mutations:[]},'us-east1');
     }).then(function(result){return acceptMetaPreviewResponse(result,context,m,true);});
@@ -288,8 +310,7 @@
   function callDurable(action,collection,id,payload,prior){
     var m=member(), p=provider, workflow=collection==='negocios'||collection==='gestiones';
     state.pending+=1;state.tenantId=text(m.tenantId);state.lastError='';
-    return p.initialize().then(function(ctx){
-      if(!ctx||!ctx.auth||!ctx.auth.currentUser||text(ctx.auth.currentUser.uid)!==text(m.uid))throw new Error('PRODUCT_WRITE_AUTH_CONTEXT_MISMATCH');
+    return signedContext(p,m).then(function(ctx){
       if(p.browserFirestoreWriteAuthorized!==false||p.serverWriteTransport!=='firebase-functions'||p.noFallback!==true||typeof p.callFunction!=='function')throw new Error('PRODUCT_WRITE_SERVER_TRANSPORT_REQUIRED');
       if(workflow){
         var operation=workflowOperation(action,collection,prior,payload||prior||{});
@@ -461,8 +482,7 @@
       [...new Set(prepared.map(function(x){return x.collection;}))].forEach(emit);
     }catch(e){return Promise.reject(e);}
     state.pending+=prepared.length;state.tenantId=text(m.tenantId);state.lastError='';
-    return provider.initialize().then(function(ctx){
-      if(!ctx||!ctx.auth||!ctx.auth.currentUser||text(ctx.auth.currentUser.uid)!==text(m.uid))throw new Error('PRODUCT_WRITE_AUTH_CONTEXT_MISMATCH');
+    return signedContext(provider,m).then(function(ctx){
       if(provider.browserFirestoreWriteAuthorized!==false||provider.serverWriteTransport!=='firebase-functions'||provider.noFallback!==true||typeof provider.callFunction!=='function')throw new Error('PRODUCT_WRITE_SERVER_TRANSPORT_REQUIRED');
       var requestId=text(options.requestId)||('batch_'+Date.now()+'_'+Math.random().toString(36).slice(2,8));
       var previewGeneral=isB2PreviewHost();
@@ -567,8 +587,7 @@
       authorize('asesores','update',Object.assign({},prior,patch));
     }catch(e){return Promise.reject(e);}
     state.pending+=1;state.tenantId=text(m.tenantId);state.lastError='';
-    return provider.initialize().then(function(ctx){
-      if(!ctx||!ctx.auth||!ctx.auth.currentUser||text(ctx.auth.currentUser.uid)!==text(m.uid))error('PRODUCT_WRITE_AUTH_CONTEXT_MISMATCH');
+    return signedContext(provider,m).then(function(ctx){
       if(provider.browserFirestoreWriteAuthorized!==false||provider.serverWriteTransport!=='firebase-functions'||provider.noFallback!==true||typeof provider.callFunction!=='function')error('PRODUCT_WRITE_SERVER_TRANSPORT_REQUIRED');
       // This deliberate owner-authorized path uses the real, signed operational
       // command even on Preview. No other collection or payload is eligible.
