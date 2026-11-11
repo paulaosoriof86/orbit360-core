@@ -669,7 +669,7 @@
       ],
       "tests": [
         {
-          "path": "tools/gravicentra-i66-protected-read-clone-performance.test.cjs",
+          "path": "tools/gravicentra-i6-6-protected-read-clone-performance.test.cjs",
           "gitBlobSha": "17fac78ed3e4f6c21a7e3bb3b605f8a9dc363591"
         }
       ]

@@ -40,7 +40,7 @@
     "modification": "Bulk native read-only deep clone in protected mode for all/where; single-record get/find native clone; catch falls back to existing JSON clone; no RBAC/paging/business write changes."
   },
   "test": {
-    "path": "tools/gravicentra-i66-protected-read-clone-performance.test.cjs",
+    "path": "tools/gravicentra-i6-6-protected-read-clone-performance.test.cjs",
     "blobSha": "17fac78ed3e4f6c21a7e3bb3b605f8a9dc363591",
     "localNodeTests": "2/2 PASS, nested mutation isolation, exact JSON values, forbidden write and fallback"
   },
