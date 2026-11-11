@@ -23,13 +23,13 @@ jobs:
           node-version: '22'
       - uses: actions/download-artifact@v4
         with:
-          run-id: 43114012562
+          run-id: 43120427526
           name: gi-i66-preview-performance-readonly
           github-token: ${{ github.token }}
           path: perf-preview
       - uses: actions/download-artifact@v4
         with:
-          run-id: 43114012456
+          run-id: 43120427607
           name: gi-i66-live-performance-readonly
           github-token: ${{ github.token }}
           path: perf-live
@@ -40,7 +40,7 @@ jobs:
           const fs=require('node:fs');
           const p=JSON.parse(fs.readFileSync('perf-preview/gi-i66-preview-perf-summary.json','utf8'));
           const l=JSON.parse(fs.readFileSync('perf-live/gi-i66-live-perf-summary.json','utf8'));
-          if(p.origin!=='https://ays-orbit-360-lab--gi-i66-rc-43112679946-dnjvhn42.web.app'||
+          if(p.origin!=='https://ays-orbit-360-lab--gi-i66-rc-43119744773-o8zuyuey.web.app'||
              l.origin!=='https://app.aysseguros.com'||
              p.status!=='PREVIEW_READONLY_MEASURED'||l.status!=='LIVE_READONLY_MEASURED'||
              p.auth.activation?.role!=='Operativo'||l.auth.activation?.role!=='Operativo'||
@@ -55,15 +55,21 @@ jobs:
               liveGetCostMs:old.readStats?.get?.totalMs||0,previewGetCostMs:now.readStats?.get?.totalMs||0};
           });
           const sample={
-            comparison:'I66_APPROVED_SOURCE_81b0a5b430ba_READONLY',
-            previewArtifactId:13896863105,
-            previewArtifactSha256:'f514729eb197bc735bca0ebe711531ee37d503f24af383df26155e50342bc733',
-            expectedSource:'81b0a5b430ba496471bf255462c8910ae2e4f671',
+            comparison:'I66_APPROVED_SOURCE_D4E9BC7B9AB0_READONLY',
+            previewArtifactId:13899149401,
+            previewArtifactSha256:'3e31a7f7debdc1c74da03f03b4ed8df3f60cd695970512eb3d3ad58b4dc6c527',
+            expectedSource:'d4e9bc7b9ab01664dcdf0771798a6af2d40ff7af',
             auth:{liveActivateMs:l.auth.activation?.activateMs,previewActivateMs:p.auth.activation?.activateMs,
               livePageErrors:l.auth.pageErrors,previewPageErrors:p.auth.pageErrors,
               liveConsoleErrors:l.auth.consoleErrors,previewConsoleErrors:p.auth.consoleErrors},
             client360Detail:{liveMs:l.cliente360Detail?.detailMs,previewMs:p.cliente360Detail?.detailMs},
             mobile:{live:l.mobile,preview:p.mobile},
+            globalTopbar:{liveFirstMs:l.globalTopbarSearch?.first?.timeMs,
+              previewFirstMs:p.globalTopbarSearch?.first?.timeMs,
+              liveSecondMs:l.globalTopbarSearch?.second?.timeMs,
+              previewSecondMs:p.globalTopbarSearch?.second?.timeMs,
+              liveProjectionCalls:l.globalTopbarTiming?.projection?.calls,
+              previewProjectionCalls:p.globalTopbarTiming?.projection?.calls},
             routes:rows,
             cpuCloneCallers:{
               liveRenovaciones:l.cpuProfiles?.renovaciones?.cloneCallers?.slice(0,3),
@@ -75,6 +81,13 @@ jobs:
           console.log('I66_PREVIEW_VS_LIVE_SANITIZED_PERFORMANCE='+JSON.stringify(sample));
           console.log('I66_PREVIEW_VS_LIVE_SOURCE_AND_READ_ONLY_PROVENANCE_PASS');
           if(p.auth.pageErrors!==0||p.mobile.menuOpen!==true)throw Error('I66_PREVIEW_BROWSER_P0_REGRESSION');
+          if(!p.globalTopbarSearch?.ready||!l.globalTopbarSearch?.ready||
+             p.globalTopbarSearch.first.timeMs>=2200||p.globalTopbarSearch.second.timeMs>=1000||
+             p.globalTopbarSearch.first.timeMs>=l.globalTopbarSearch.first.timeMs||
+             p.globalTopbarTiming?.projection?.calls!==0||
+             (p.auth.consoleErrors||0)>(l.auth.consoleErrors||0))
+             throw Error('I66_APPROVED_GLOBAL_TOPBAR_NOT_FASTER_THAN_LIVE_OR_SCOPE_HOLD');
+          console.log('I66_REAL_CHROME_GLOBAL_TOPBAR_COLD_SEARCH_LATENCY_AND_NO_REPROJECTION_PASS');
           // The previously optimized Renovaciones is already LIVE. Compare
           // against that CURRENT baseline, never claim another 94% gain.
           for(const route of ['renovaciones','cobros','polizas','aseguradoras']){
