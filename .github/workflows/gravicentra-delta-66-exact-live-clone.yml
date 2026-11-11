@@ -8,6 +8,7 @@ on:
       - .github/workflows/gravicentra-delta-66-exact-live-clone.yml
       - artifacts/orbit360-recovery/release-control/I6_6_EXACT_HOSTING_LIVE_PROMOTION_REQUEST_20261110.json
       - artifacts/orbit360-recovery/release-control/I6_6_EXACT_HOSTING_LIVE_PROMOTION_REQUEST_20261111.json
+      - artifacts/orbit360-recovery/release-control/I6_6_EXACT_HOSTING_LIVE_PROMOTION_REQUEST_20261111_R2.json
 
 permissions:
   contents: read
@@ -28,7 +29,7 @@ jobs:
       SA_LAB_ALT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
       SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
       I66_PACKAGE_ROOT: /tmp/gi-i66-promote-package
-      I66_APPROVED_RELEASE_REQUEST: artifacts/orbit360-recovery/release-control/I6_6_EXACT_HOSTING_LIVE_PROMOTION_REQUEST_20261111.json
+      I66_APPROVED_RELEASE_REQUEST: artifacts/orbit360-recovery/release-control/I6_6_EXACT_HOSTING_LIVE_PROMOTION_REQUEST_20261111_R2.json
     steps:
       - uses: actions/checkout@v4
         with:

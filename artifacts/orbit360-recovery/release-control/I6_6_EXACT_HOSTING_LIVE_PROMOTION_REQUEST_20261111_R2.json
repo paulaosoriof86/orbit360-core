@@ -1,0 +1,53 @@
+{
+  "schema": "I6_6_EXACT_HOSTING_LIVE_PROMOTION_V1",
+  "status": "LIVE_HOSTING_CLONE_APPROVED_AFTER_TARGETED_PREVIEW_QA_PASS",
+  "approvedByDirection": true,
+  "approvedDateGuatemala": "2026-11-11",
+  "historicalGateClosed": "B4-007",
+  "activeGate": "I6.6",
+  "noBackendDeploy": true,
+  "noFirestoreAuthOrDataWrites": true,
+  "qaRunId": 43100918872,
+  "buildRunId": 43100918872,
+  "artifactId": 13890908106,
+  "artifactZipSha256": "61e21dd4c3943b469c916ad9150d0249f504030282204688dd8523d2a35b1251",
+  "sourceSha": "abb0ea3f4dc0bfd221cb891258e7be81ddc65fd2",
+  "previewChannel": "gi-i66-rc-43100918872",
+  "buildId": "gi-i66-abb0ea3f4dc0-57f234755dc1",
+  "previewUrl": "https://ays-orbit-360-lab--gi-i66-rc-43100918872-ef0vrjx2.web.app",
+  "expectedOldSourceSha": "6006d7843bf8eef5904a930b7346a1b00c114445",
+  "expectedOldBuildId": "gi-i66-6006d7843bf8-57f234755dc1",
+  "qaEvidence": {
+    "unitSourceQaRunId": 43100918792,
+    "sourceTestsPassed": 5,
+    "authenticatedPreviewReadOnlyRunId": 43101692093,
+    "authenticatedLiveBaselineReadOnlyRunId": 43101692169,
+    "controlledComparisonRunId": 43102079087,
+    "signedCarlosPreviewInsurerPreflightRunId": 43101692009,
+    "measurableImprovements": [
+      "renovaciones_4115_to_264_ms_single_sample",
+      "renovaciones_scoped_get_64053_to_1722",
+      "polizas_6547_to_4415_ms_single_sample",
+      "aseguradoras_931_to_700_ms_single_sample",
+      "cobros_186_to_158_ms_single_sample",
+      "inicio_1247_to_403_ms_single_sample"
+    ],
+    "observedSlowerSingleSample": [
+      "signed_auth_activation_2659_to_4576_ms"
+    ],
+    "previewPageErrors": 0,
+    "liveBaselinePageErrors": 0,
+    "insurerOperativoRealSignedPreflightPassed": true,
+    "insurerDurableSaveReadbackNotYetProven": true,
+    "unresolvedConciliacionesReadiness": true,
+    "unresolvedPhysicalMobileDeviceQa": true,
+    "noClaimOfWholePlatformPerformancePass": true
+  },
+  "previousReleaseReceipt": "artifacts/orbit360-recovery/release-control/I6_6_EXACT_HOSTING_LIVE_PROMOTION_REQUEST_20261111.json",
+  "performanceRootFixReceipt": "artifacts/orbit360-recovery/release-control/I6_6_RENOVACIONES_SCOPED_CLIENT_INDEX_PERFORMANCE_20261111.json",
+  "mustRollbackOnMismatch": true,
+  "businessDataWritesAuthorized": false,
+  "scope": "Promote exactly the previously built and byte-verified Preview artifact: cross-role Renovaciones scoped client country/provenance index and prior signed identity/search fixes; Hosting only. No backend, Auth, Rules, Firestore business data, insurance statement inference or cartera mutations.",
+  "qaScope": "TARGETED_RENEWALS_REAL_SIGNED_CARLOS_READ_AMPLIFICATION_94_PERCENT_LATENCY_SAMPLE_AND_97_PERCENT_GET_REDUCTION; SIGNED_INSURER_EDIT_PREFLIGHT_AND_BROWSER_SESSION_ISOLATION; MIXED_LOGIN_LATENCY_AND_CONCILIACIONES_LOAD_HOLD; LIVE_DURABLE_UAT_PENDING",
+  "automaticLiveDeploymentWithoutThisReceipt": false
+}
