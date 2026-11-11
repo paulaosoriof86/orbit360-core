@@ -582,6 +582,35 @@
           "gitBlobSha": "04c8c8cdf6516d0fd6c323431c5800417073a586"
         }
       ]
+    },
+    {
+      "id": "I6_6_PAYMENT_REPEAT_AND_PORTFOLIO_INTEGRITY_WRITE_BOUNDARY_P0",
+      "approvedByDirection": true,
+      "receipt": "Paula Dirección 2026-11-10: solicita urgentemente garantizar flujo transversal de pagos antes de habilitar a Carlos y cobrar/inferir en lote; hallazgo forense de reintento con requestId distinto y obligación activa ausente",
+      "sourceStatus": "SOURCE_GUARDS_PENDING_EMULATOR_AND_EXACT_PREVIEW_LIVE_GATE",
+      "capabilityOwners": [
+        "COBROS_RECONCILIATION",
+        "RECIBOS_CARTERA_PRIMARY_RUNTIME",
+        "ROLE_SCOPE_RUNTIME"
+      ],
+      "scope": "Rechazar segunda aplicación del mismo recibo aunque cambie requestId, y prohibir pago nuevo sin única obligación activa en cartera; conservar enriquecimiento posterior con factura/estado de cuenta real y reintento idempotente por mismo requestId. Sin reimportar ni cambiar datos existentes.",
+      "paths": [
+        {
+          "path": "functions/cobros-reconciliation-domain.js",
+          "gitBlobSha": "56bdb9e3714fe72d754da207cdf3e266f1392363",
+          "replaces": {
+            "path": "functions/cobros-reconciliation-domain.js",
+            "priorGitBlobSha": "9ab10bbed8b4745a46009d62c7f04863ec2d4659",
+            "priorChangeId": "I6_6_PAYMENT_COUNTRY_DIRECT_AND_INFERRED_WRITE_BOUNDARY_P0"
+          }
+        }
+      ],
+      "tests": [
+        {
+          "path": "tools/gravicentra-i6-6-payment-replay-ledger-guard.test.cjs",
+          "gitBlobSha": "8e80bb3affe508b9cc606a22d9099ecfe94a7a11"
+        }
+      ]
     }
   ]
 }
