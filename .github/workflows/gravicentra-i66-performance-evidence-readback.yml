@@ -23,13 +23,13 @@ jobs:
           node-version: '22'
       - uses: actions/download-artifact@v4
         with:
-          run-id: 42972567672
+          run-id: 43092881329
           name: gi-i66-preview-performance-readonly
           github-token: ${{ github.token }}
           path: perf-preview
       - uses: actions/download-artifact@v4
         with:
-          run-id: 42972567655
+          run-id: 43092881446
           name: gi-i66-live-performance-readonly
           github-token: ${{ github.token }}
           path: perf-live
@@ -40,7 +40,7 @@ jobs:
           const fs=require('node:fs');
           const p=JSON.parse(fs.readFileSync('perf-preview/gi-i66-preview-perf-summary.json','utf8'));
           const l=JSON.parse(fs.readFileSync('perf-live/gi-i66-live-perf-summary.json','utf8'));
-          if(p.origin!=='https://ays-orbit-360-lab--gi-i66-rc-42972205409-3nt4y0wv.web.app'||
+          if(p.origin!=='https://ays-orbit-360-lab--gi-i66-rc-43090584888-lu40dci6.web.app'||
              l.origin!=='https://app.aysseguros.com'||
              p.status!=='PREVIEW_READONLY_MEASURED'||l.status!=='LIVE_READONLY_MEASURED'||
              p.auth.activation?.role!=='Operativo'||l.auth.activation?.role!=='Operativo'||
@@ -55,10 +55,10 @@ jobs:
               liveGetCostMs:old.readStats?.get?.totalMs||0,previewGetCostMs:now.readStats?.get?.totalMs||0};
           });
           const sample={
-            comparison:'I66_APPROVED_SOURCE_7c66f8d31f87_READONLY',
-            previewArtifactId:13833673527,
-            previewArtifactSha256:'347ddc71d2ba9b5f93fe4985a735613232e13c73d4edd41d19de8a207781c72f',
-            expectedSource:'7c66f8d31f87d13c97dca726f77847712605c173',
+            comparison:'I66_APPROVED_SOURCE_6006d7843bf8_READONLY',
+            previewArtifactId:13888208036,
+            previewArtifactSha256:'9c140b7a02a8d63300868c84b5ae955ad2a8c3f101a257ab74708018dc2b98a9',
+            expectedSource:'6006d7843bf8eef5904a930b7346a1b00c114445',
             auth:{liveActivateMs:l.auth.activation?.activateMs,previewActivateMs:p.auth.activation?.activateMs,
               livePageErrors:l.auth.pageErrors,previewPageErrors:p.auth.pageErrors,
               liveConsoleErrors:l.auth.consoleErrors,previewConsoleErrors:p.auth.consoleErrors},
