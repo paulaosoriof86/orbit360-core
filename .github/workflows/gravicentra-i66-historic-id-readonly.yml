@@ -163,3 +163,14 @@ jobs:
           console.log('OPS_TRAFFIC_LIVE '+JSON.stringify({latestCreated:state.latestCreatedRevisionName,latestReady:state.latestReadyRevisionName,traffic:(state.traffic||[]).map(t=>({revision:t.revisionName,percent:t.percent})),functionState:fun.state,functionUpdated:fun.updateTime,entryPoint:fun.buildConfig?.entryPoint}));
           console.log('OPS_REVISION_LIST '+JSON.stringify(revisions.map(r=>({name:r.metadata?.name,created:r.metadata?.creationTimestamp,imageDigest:r.status?.imageDigest,ready:(r.status?.conditions||[]).some(c=>c.type==='Ready'&&String(c.status)==='True')})).slice(0,12)));
           NODE
+          gcloud functions describe orbit360CobrosReconciliationCommand --gen2 --region us-central1 --project ays-orbit-360-lab --format=json > "$RUNNER_TEMP/payment-live-function.json"
+          PAYMENT_SERVICE=$(node -e "const f=require(process.argv[1]);const n=String(f.serviceConfig?.service||'').split('/').pop();if(!/^[-a-z0-9]+$/.test(n))process.exit(1);process.stdout.write(n)" "$RUNNER_TEMP/payment-live-function.json")
+          gcloud run services describe "$PAYMENT_SERVICE" --region us-central1 --project ays-orbit-360-lab --format=json > "$RUNNER_TEMP/payment-live-service.json"
+          gcloud run revisions list --service "$PAYMENT_SERVICE" --region us-central1 --project ays-orbit-360-lab --format=json > "$RUNNER_TEMP/payment-live-revisions.json"
+          node - <<'NODE'
+          const fs=require('fs'),root=process.env.RUNNER_TEMP;
+          const service=JSON.parse(fs.readFileSync(root+'/payment-live-service.json')),fun=JSON.parse(fs.readFileSync(root+'/payment-live-function.json')),revisions=JSON.parse(fs.readFileSync(root+'/payment-live-revisions.json'));
+          const state=service.status||{};
+          console.log('PAYMENT_TRAFFIC_LIVE '+JSON.stringify({service:service.metadata?.name,latestCreated:state.latestCreatedRevisionName,latestReady:state.latestReadyRevisionName,traffic:(state.traffic||[]).map(t=>({revision:t.revisionName,percent:t.percent})),functionState:fun.state,functionUpdated:fun.updateTime,entryPoint:fun.buildConfig?.entryPoint}));
+          console.log('PAYMENT_REVISION_LIST '+JSON.stringify(revisions.map(r=>({name:r.metadata?.name,created:r.metadata?.creationTimestamp,imageDigest:r.status?.imageDigest,ready:(r.status?.conditions||[]).some(c=>c.type==='Ready'&&String(c.status)==='True')})).slice(0,12)));
+          NODE
