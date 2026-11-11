@@ -1,0 +1,78 @@
+# I6.6 read-only comparison of already-produced immutable Preview and LIVE reports.
+name: Gravicentra I6.6 Preview vs LIVE Performance Evidence
+on:
+  push:
+    branches: [recovery/fase-a-clean-20260831]
+    paths:
+      - .github/workflows/gravicentra-i66-performance-evidence-readback.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  compare-sanitized-reports:
+    if: github.repository == 'paulaosoriof86/orbit360-core' && github.ref_name == 'recovery/fase-a-clean-20260831'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 42972567672
+          name: gi-i66-preview-performance-readonly
+          github-token: ${{ github.token }}
+          path: perf-preview
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 42972567655
+          name: gi-i66-live-performance-readonly
+          github-token: ${{ github.token }}
+          path: perf-live
+      - name: Print read-only role-safe comparison with exact artifact provenance
+        run: |
+          set -euo pipefail
+          node - <<'NODE'
+          const fs=require('node:fs');
+          const p=JSON.parse(fs.readFileSync('perf-preview/gi-i66-preview-perf-summary.json','utf8'));
+          const l=JSON.parse(fs.readFileSync('perf-live/gi-i66-live-perf-summary.json','utf8'));
+          if(p.origin!=='https://ays-orbit-360-lab--gi-i66-rc-42972205409-3nt4y0wv.web.app'||
+             l.origin!=='https://app.aysseguros.com'||
+             p.status!=='PREVIEW_READONLY_MEASURED'||l.status!=='LIVE_READONLY_MEASURED'||
+             p.auth.activation?.role!=='Operativo'||l.auth.activation?.role!=='Operativo'||
+             p.firestoreWrites!==0||l.firestoreWrites!==0||p.paymentActions!==0||l.paymentActions!==0)
+            throw Error('I66_PERFORMANCE_COMPARISON_PROVENANCE_OR_ROLE_DRIFT');
+          const rows=l.routes.map(old=>{
+            const now=p.routes.find(x=>x.route===old.route)||{};
+            const lv=old.readyMs,pv=now.readyMs;
+            return {route:old.route,liveMs:lv,previewMs:pv,
+              improvementPct:lv&&pv!=null?Math.round((lv-pv)/lv*100):null,
+              liveGetCalls:old.readStats?.get?.calls||0,previewGetCalls:now.readStats?.get?.calls||0,
+              liveGetCostMs:old.readStats?.get?.totalMs||0,previewGetCostMs:now.readStats?.get?.totalMs||0};
+          });
+          const sample={
+            comparison:'I66_APPROVED_SOURCE_7c66f8d31f87_READONLY',
+            previewArtifactId:13833673527,
+            previewArtifactSha256:'347ddc71d2ba9b5f93fe4985a735613232e13c73d4edd41d19de8a207781c72f',
+            expectedSource:'7c66f8d31f87d13c97dca726f77847712605c173',
+            auth:{liveActivateMs:l.auth.activation?.activateMs,previewActivateMs:p.auth.activation?.activateMs,
+              livePageErrors:l.auth.pageErrors,previewPageErrors:p.auth.pageErrors,
+              liveConsoleErrors:l.auth.consoleErrors,previewConsoleErrors:p.auth.consoleErrors},
+            client360Detail:{liveMs:l.cliente360Detail?.detailMs,previewMs:p.cliente360Detail?.detailMs},
+            mobile:{live:l.mobile,preview:p.mobile},
+            routes:rows,
+            cpuCloneCallers:{
+              liveRenovaciones:l.cpuProfiles?.renovaciones?.cloneCallers?.slice(0,3),
+              previewRenovaciones:p.cpuProfiles?.renovaciones?.cloneCallers?.slice(0,3),
+              liveAseguradoras:l.cpuProfiles?.aseguradoras?.cloneCallers?.slice(0,3),
+              previewAseguradoras:p.cpuProfiles?.aseguradoras?.cloneCallers?.slice(0,3)
+            }
+          };
+          console.log('I66_PREVIEW_VS_LIVE_SANITIZED_PERFORMANCE='+JSON.stringify(sample));
+          console.log('I66_PREVIEW_VS_LIVE_SOURCE_AND_READ_ONLY_PROVENANCE_PASS');
+          if(p.auth.pageErrors!==0||p.mobile.menuOpen!==true)throw Error('I66_PREVIEW_BROWSER_P0_REGRESSION');
+          NODE
