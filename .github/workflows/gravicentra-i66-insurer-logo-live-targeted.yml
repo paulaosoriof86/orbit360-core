@@ -1,0 +1,161 @@
+# Gravicentra Insurance I6.6 — owner-approved insurer logo upload/read closure.
+# Publishes only the two missing production callables from the same vetted
+# backend source staged for Preview. No Hosting/Firestore/Rules/Auth/IAM writes.
+name: Gravicentra I6.6 Insurer Logo LIVE Targeted
+on:
+  push:
+    branches: [recovery/fase-a-clean-20260831]
+    paths: [.github/workflows/gravicentra-i66-insurer-logo-live-targeted.yml]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: gi-i66-insurer-logo-live-targeted
+  cancel-in-progress: false
+jobs:
+  verify-preview-then-deploy:
+    if: github.repository == 'paulaosoriof86/orbit360-core' && github.ref == 'refs/heads/recovery/fase-a-clean-20260831'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    env:
+      PROJECT_ID: ays-orbit-360-lab
+      EXPECTED_OWNER_BLOB: a27810c65e6a5a761d40c0e1f20cae61df483d1f
+      SA_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_ALT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify exact source and product security guards
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          test "$(git hash-object functions/product-operational-domain.js)" = "$EXPECTED_OWNER_BLOB"
+          node --check functions/product-operational-domain.js
+          node --check functions/bootstrap.js
+          node tools/gravicentra-b4-003-operational-write-security-regression.test.cjs > "$RUNNER_TEMP/logo-security-regression.json"
+          node tools/gravicentra-b4-003-insurer-activity-audit.test.cjs > "$RUNNER_TEMP/logo-activity-audit.json"
+          node - <<'NODE'
+          const fs=require('fs'),source=fs.readFileSync('functions/product-operational-domain.js','utf8');
+          for(const pattern of [
+            /exports\.orbit360ProductAssetUpload = onCall\(\{ region: REGION/,
+            /exports\.orbit360ProductAssetRead = onCall\(\{ region: REGION/,
+            /exports\.orbit360ProductAssetUploadPreview = onCall\(\{ region: PREVIEW_REGION/,
+            /if\(!withinScope\(actor,'aseguradoras','aseguradoras'/,
+            /mime=text\(input\.mimeType,80\)/,
+            /bytes\.length>2\*1024\*1024/,
+            /insurerRef\.set\(\{logo:url,logoAssetRef:assetRef/,
+            /if\(row\.logo!==url\|\|row\.logoAssetRef!==assetRef\)/
+          ])if(!pattern.test(source))throw Error('I66_LOGO_APPROVED_BACKEND_CONTRACT_MISSING:'+pattern);
+          console.log('I66_LOGO_EXACT_BACKEND_SOURCE_AND_SYNTHETIC_GUARDS_PASS');
+          NODE
+      - name: Stage one immutable source tree and select existing Firebase credentials
+        shell: bash
+        run: |
+          set -euo pipefail
+          set +x
+          ROOT="$RUNNER_TEMP/gi-i66-insurer-logo-exact"
+          mkdir -p "$ROOT" "$RUNNER_TEMP/gi-i66-logo-auth"
+          cp -a functions "$ROOT/backend"
+          printf '{"functions":{"source":"backend","runtime":"nodejs22"}}\n' > "$ROOT/firebase.json"
+          echo "STAGE_ROOT=$ROOT" >> "$GITHUB_ENV"
+          (cd "$ROOT/backend" && npm ci --ignore-scripts --no-audit --no-fund >/dev/null)
+          printf 'BACKEND_ORIGIN_BLOB=%s\n' "$(git hash-object "$ROOT/backend/product-operational-domain.js")"
+          python3 - <<'PY'
+          import json,os,pathlib
+          root=pathlib.Path(os.environ['RUNNER_TEMP'])/'gi-i66-logo-auth';selected=None
+          for key in ('SA_LAB','SA_ALT','SA_DEFAULT'):
+              try: row=json.loads(os.environ.get(key) or '{}')
+              except (ValueError,TypeError): continue
+              if row.get('type')=='service_account' and row.get('project_id')=='ays-orbit-360-lab' and row.get('private_key'):selected=row;break
+          if selected is None:raise SystemExit('I66_LOGO_SAME_PROJECT_CREDENTIAL_MISSING')
+          target=root/'selected.json';target.write_text(json.dumps(selected));target.chmod(0o600)
+          with open(os.environ['GITHUB_ENV'],'a') as out:out.write('GOOGLE_APPLICATION_CREDENTIALS='+str(target)+'\n')
+          PY
+          npm install --prefix "$RUNNER_TEMP/gi-i66-logo-cli" --no-save --no-audit --no-fund --ignore-scripts firebase-tools@14.10.1 >/dev/null
+          node tools/gravicentra-firebase-tools-empty-extensions-workaround-v1.mjs "$RUNNER_TEMP/gi-i66-logo-cli"
+          CLI="$RUNNER_TEMP/gi-i66-logo-cli/node_modules/firebase-tools/lib/bin/firebase.js"
+          echo "FIREBASE_CLI_BIN=$CLI" >> "$GITHUB_ENV"
+          GOOGLE_APPLICATION_CREDENTIALS="$RUNNER_TEMP/gi-i66-logo-auth/selected.json" node "$CLI" functions:list --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/logo-functions-before.json"
+      - name: Preflight absence in LIVE and active existing Preview counterparts
+        shell: bash
+        run: |
+          set -euo pipefail
+          node - <<'NODE'
+          const fs=require('fs'),src=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/logo-functions-before.json','utf8'));
+          const raw=src.result??src,v=typeof raw==='string'?JSON.parse(raw):raw,rows=Array.isArray(v)?v:Array.isArray(v.functions)?v.functions:[];
+          if(!rows.length)throw Error('I66_LOGO_FUNCTION_INVENTORY_UNREADABLE');
+          const names=rows.map(x=>String(x.id||x.name||x.functionName||'').split('/').pop());
+          for(const name of ['orbit360ProductAssetUpload','orbit360ProductAssetRead'])if(names.includes(name))throw Error('I66_LOGO_LIVE_ALREADY_DEPLOYED_STOP_RECONCILE:'+name);
+          for(const name of ['orbit360ProductAssetUploadPreview','orbit360ProductAssetReadPreview'])if(!names.includes(name))throw Error('I66_LOGO_PREVIEW_NOT_PRESENT:'+name);
+          fs.writeFileSync(process.env.RUNNER_TEMP+'/logo-functions-before-names.json',JSON.stringify(names.sort()));
+          console.log('I66_LOGO_LIVE_ABSENT_AND_PREVIEW_EXISTS_PASS; inventoryCount='+names.length);
+          NODE
+      - name: Refresh only two Preview logo callables from immutable staged source
+        id: preview
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git hash-object "$STAGE_ROOT/backend/product-operational-domain.js")" = "$EXPECTED_OWNER_BLOB"
+          node "$FIREBASE_CLI_BIN" deploy --only functions:orbit360ProductAssetUploadPreview,functions:orbit360ProductAssetReadPreview --config "$STAGE_ROOT/firebase.json" --project "$PROJECT_ID" --non-interactive
+          node "$FIREBASE_CLI_BIN" functions:list --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/logo-functions-after-preview.json"
+          node - <<'NODE'
+          const fs=require('fs'),r=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/logo-functions-after-preview.json'));
+          const v=r.result??r,rows=Array.isArray(v)?v:Array.isArray(v.functions)?v.functions:[];
+          const before=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/logo-functions-before-names.json'));
+          const after=rows.map(x=>String(x.id||x.name||x.functionName||'').split('/').pop()).sort();
+          if(JSON.stringify(after)!==JSON.stringify(before))throw Error('I66_LOGO_PREVIEW_DEPLOY_CHANGED_FUNCTION_INVENTORY');
+          console.log('I66_LOGO_SAME_SOURCE_PREVIEW_TWO_CALLABLES_PASS');
+          NODE
+      - name: Deploy ONLY two missing LIVE logo functions
+        id: deploy_live
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git hash-object "$STAGE_ROOT/backend/product-operational-domain.js")" = "$EXPECTED_OWNER_BLOB"
+          node "$FIREBASE_CLI_BIN" deploy --only functions:orbit360ProductAssetUpload,functions:orbit360ProductAssetRead --config "$STAGE_ROOT/firebase.json" --project "$PROJECT_ID" --non-interactive
+          node "$FIREBASE_CLI_BIN" functions:list --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/logo-functions-after-live.json"
+          node - <<'NODE'
+          const fs=require('fs'),tmp=process.env.RUNNER_TEMP;
+          const r=JSON.parse(fs.readFileSync(tmp+'/logo-functions-after-live.json'));
+          const v=r.result??r,rows=Array.isArray(v)?v:Array.isArray(v.functions)?v.functions:[];
+          const before=JSON.parse(fs.readFileSync(tmp+'/logo-functions-before-names.json'));
+          const after=rows.map(x=>String(x.id||x.name||x.functionName||'').split('/').pop()).sort();
+          const created=after.filter(x=>!before.includes(x)),removed=before.filter(x=>!after.includes(x));
+          if(JSON.stringify(created)!==JSON.stringify(['orbit360ProductAssetRead','orbit360ProductAssetUpload'])||removed.length)throw Error('I66_LOGO_LIVE_FUNCTION_INVENTORY_SCOPE_DRIFT:'+JSON.stringify({created,removed}));
+          fs.writeFileSync(tmp+'/logo-function-release-receipt.json',JSON.stringify({gate:'I6.6',status:'EXACT_TWO_LOGO_LIVE_FUNCTIONS_DEPLOYED_READBACK_PENDING_SIGNED_FILE_UAT',sourceBlob:process.env.EXPECTED_OWNER_BLOB,sourceCommit:process.env.GITHUB_SHA,workflowRunId:process.env.GITHUB_RUN_ID,newFunctionNames:created,otherFunctionNamesUnchanged:true,previewSameSource:true,hostingChanged:false,firestoreRecordsWritten:false,rulesAuthIamChanged:false,productionAccepted:false},null,2)+'\n');
+          console.log('I66_LOGO_LIVE_TWO_FUNCTIONS_CREATED_SCOPE_EXACT_PASS; before='+before.length+' after='+after.length);
+          NODE
+      - name: Roll back only new logo functions if LIVE two-function release failed
+        if: failure() && steps.deploy_live.outcome == 'failure' && steps.preview.outcome == 'success'
+        shell: bash
+        run: |
+          set -euo pipefail
+          node "$FIREBASE_CLI_BIN" functions:list --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/logo-functions-failed-live.json"
+          node - <<'NODE' > "$RUNNER_TEMP/logo-new-targets"
+          const fs=require('fs'),r=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/logo-functions-failed-live.json'));
+          const v=r.result??r,rows=Array.isArray(v)?v:Array.isArray(v.functions)?v.functions:[];
+          const before=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/logo-functions-before-names.json'));
+          for(const x of rows){const name=String(x.id||x.name||x.functionName||'').split('/').pop();if(['orbit360ProductAssetUpload','orbit360ProductAssetRead'].includes(name)&&!before.includes(name))console.log(name);}
+          NODE
+          while IFS= read -r TARGET;do
+            test -n "$TARGET" || continue
+            node "$FIREBASE_CLI_BIN" functions:delete "$TARGET" --region us-central1 --project "$PROJECT_ID" --force
+          done < "$RUNNER_TEMP/logo-new-targets"
+          echo 'I66_LOGO_TARGETED_ROLLBACK_EXECUTED_IF_NEW_FUNCTIONS_EXISTED'
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: gi-i66-insurer-logo-exact-${{ github.run_id }}
+          path: |
+            ${{ runner.temp }}/logo-security-regression.json
+            ${{ runner.temp }}/logo-activity-audit.json
+            ${{ runner.temp }}/logo-function-release-receipt.json
+          if-no-files-found: warn
+          retention-days: 30
