@@ -16,8 +16,8 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     env:
-      SOURCE_SHA: b54d868e94233d6d30dccc46930b2c737df30823
-      PREVIEW_ORIGIN: https://ays-orbit-360-lab--gi-i66-rc-43146496115-6ovwfgp1.web.app
+      SOURCE_SHA: f3341e24ad5fa35bac419e42a1cdf2882a284075
+      PREVIEW_ORIGIN: https://ays-orbit-360-lab--gi-i66-rc-43157739496-d0l3mxpf.web.app
       LIVE_ORIGIN: https://app.aysseguros.com
       SA_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
       SA_ALT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
@@ -38,10 +38,11 @@ jobs:
           test -z "$(git diff --name-only "$SOURCE_SHA" HEAD -- orbit360-platform functions firebase.json firestore.rules storage.rules)"
           node tools/gravicentra-i6-6-insurer-operativo-signed-scope.test.cjs
           node tools/gravicentra-i6-6-insurer-legacy-credential-update.test.cjs
+          node tools/gravicentra-i6-6-insurer-credential-placeholder-integrity.test.cjs
           curl -fsSL --max-time 25 "$PREVIEW_ORIGIN/__recovery__/build.json" > "$RUNNER_TEMP/i66-insurer-build.json"
           node - <<'NODE'
           const b=require(process.env.RUNNER_TEMP+'/i66-insurer-build.json');
-          if(b.sourceSha!==process.env.SOURCE_SHA||b.gate!=='I6.6'||!String(b.buildId).startsWith('gi-i66-b54d868e9423-'))throw Error('I66_INSURER_PREVIEW_SOURCE_MISMATCH');
+          if(b.sourceSha!==process.env.SOURCE_SHA||b.gate!=='I6.6'||!String(b.buildId).startsWith('gi-i66-'+process.env.SOURCE_SHA.slice(0,12)+'-'))throw Error('I66_INSURER_PREVIEW_SOURCE_MISMATCH');
           console.log('I66_INSURER_PREVIEW_EXACT_SOURCE_PASS');
           NODE
       - name: Install pinned read-only signed Chrome QA dependencies
@@ -132,7 +133,7 @@ jobs:
                   assert.ok(authResult.started,'I66_SIGNED_PRODUCT_ACTIVATION_FAILED');
                   assert.ok(norm(authResult.role).includes(norm(expectedRole)),'I66_SIGNED_ROLE_INCORRECT');
                   await page.waitForFunction(()=>!!window.Orbit?.store?.get('aseguradoras','gt-aseguradora-guatemalteca'),null,{timeout:30000});
-                  return await page.evaluate(()=>{
+                  const readback=await page.evaluate(()=>{
                     const rec=Orbit.store.get('aseguradoras','gt-aseguradora-guatemalteca');
                     const member=Orbit.auth?.productUser||{};
                     return {found:!!rec,tenant:rec?.tenantId==='alianzas-soluciones',country:rec?.pais==='GT',
@@ -143,6 +144,21 @@ jobs:
                       matrixAllows:Orbit.access.can('aseguradoras','edit'),
                       preflightAllows:Orbit.access.canAccessRecord(rec,'aseguradoras',{collection:'aseguradoras'})};
                   });
+                  if(origin===process.env.PREVIEW_ORIGIN){
+                    await page.locator('#af-editar').waitFor({state:'visible',timeout:20000});
+                    await page.locator('#af-editar').click();
+                    assert.equal(await page.locator('#af-logo-file').count(),1,'I66_EDITABLE_LOGO_FILE_MISSING');
+                    assert.equal(await page.locator('#af-logo-file').isEnabled(),true,'I66_LOGO_FILE_DISABLED');
+                    await page.locator('[data-tab="bancos"]').click();
+                    assert.ok(await page.locator('#af-cuentas [data-ccn]').count()>0,'I66_EDITABLE_BANK_ACCOUNTS_MISSING');
+                    assert.equal(await page.locator('#af-cuentas [data-ccn]').first().isEnabled(),true,'I66_BANK_ACCOUNT_READ_ONLY');
+                    await page.locator('[data-tab="plataformas"]').click();
+                    assert.ok(await page.locator('#af-portales [data-ppass]').count()>0,'I66_SECURE_PASSWORD_INPUT_MISSING');
+                    assert.equal(await page.locator('#af-portales [data-ppass]').first().isEnabled(),true,'I66_PASSWORD_INPUT_DISABLED');
+                    await page.locator('#af-cancelar').click();
+                    console.log('I66_'+expectedRole.toUpperCase()+'_PREVIEW_INSURER_BANK_PASSWORD_LOGO_EDITABLE_NO_WRITES_PASS');
+                  }
+                  return readback;
                 } finally {await isolatedActor.close();}
               }
               for(const actor of [{name:'CARLOS',token,role:'operativo'},{name:'PAULA',token:otherToken,role:'direccion'}]){
