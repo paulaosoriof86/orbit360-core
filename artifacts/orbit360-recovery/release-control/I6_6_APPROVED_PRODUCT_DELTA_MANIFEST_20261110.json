@@ -1215,6 +1215,28 @@
       "tests": [
         {"path":"tools/gravicentra-i6-6-carlos-payment-preview-synthetic-gate.test.cjs","gitBlobSha":"d36338e2d70d9b7ea4a36df7d975f4b7c4a5b3a6"}
       ]
+    },
+    {
+      "id": "I6_6_CARLOS_PAYMENT_ONCALL_RESPONSE_MODE_HOTFIX_P0",
+      "approvedByDirection": true,
+      "receipt": "Paula Dirección 2026-11-12: Carlos debe poder aplicar cobros LIVE, no acumular correcciones; signed LIVE test 43311517495 detected Firebase CallableResponse bound to previewOnly, with synthetic cleanup PASS. Scoped exact backend Preview to LIVE hotfix authorized by existing publication rule.",
+      "sourceStatus": "SECOND_ARGUMENT_CAUSE_ROOT_CONFIRMED_REGRESSION_PASS_EXACT_BACKEND_PREVIEW_LIVE_SIGNED_UAT_IN_PROGRESS",
+      "capabilityOwners": ["COBROS_PRIMARY_RUNTIME", "RECONCILIACION_PAYMENT_BACKEND", "FIREBASE_CALLABLE_BRIDGE"],
+      "scope": "Bind the CallableRequest explicitly to execute(request,false) for LIVE/LAB, executePreview(request) for Preview. Never infer previewOnly from the optional CallableResponse argument. Regression test both modes with second argument, deploy one immutable backend package to existing Preview and LIVE only after real Carlos/Paula signed synthetic UAT, preserve frontend 1dd unchanged and roll back LIVE function on failure.",
+      "paths": [
+        {
+          "path": "functions/cobros-reconciliation-domain.js",
+          "gitBlobSha": "b492d610bd1c49458881dc17c89367e23168db5e",
+          "replaces": {
+            "path": "functions/cobros-reconciliation-domain.js",
+            "priorGitBlobSha": "494cc2eb78f7d9431bcf5c1772f0762169b8877f",
+            "priorChangeId": "I6_6_CARLOS_PAYMENT_SYNTHETIC_PREVIEW_TRANSPORT_AND_LEDGER_P0"
+          }
+        }
+      ],
+      "tests": [
+        {"path": "tools/gravicentra-i6-6-payment-oncall-second-argument-guard.test.cjs", "gitBlobSha": "0bc29b4fb3c4121b53d29e5c3386df58df9d0990"}
+      ]
     }
   ]
 }
