@@ -1,0 +1,57 @@
+name: Gravicentra I6.6 Carlos Paula Direct Renewal LIVE Reversible QA
+on:
+  push:
+    branches: [recovery/fase-a-clean-20260831]
+    paths:
+      - .github/workflows/gravicentra-i66-carlos-paula-live-direct-renewal-synthetic-uat.yml
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: gi-i66-live-direct-renewal-signed-qa
+  cancel-in-progress: false
+jobs:
+  signed-direct-renewal:
+    if: github.repository == 'paulaosoriof86/orbit360-core' && github.ref == 'refs/heads/recovery/fase-a-clean-20260831'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 22
+    env:
+      I66_LIVE_ORIGIN: https://app.aysseguros.com
+      SA_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_ALT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Guard current LIVE lineage and historical proof
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor 1dd675ed59ac51fd122915ca8056f85f82fa12d6 HEAD
+          node --check tools/gravicentra-i6-6-carlos-paula-live-direct-renewal-synthetic-uat.cjs
+          node - <<'NODE'
+          const assert=require('node:assert/strict');
+          (async()=>{
+            const h={Authorization:'Bearer '+process.env.GH_TOKEN,Accept:'application/vnd.github+json','User-Agent':'GI-I66-Direct-Renewal-QA'};
+            for(const id of [43309935816,43310610618,43312896784,43316460352]){
+              const r=await fetch('https://api.github.com/repos/paulaosoriof86/orbit360-core/actions/runs/'+id,{headers:h}).then(x=>x.json());
+              assert.equal(r.conclusion,'success','I66_LIVE_PRECONDITION_FAIL_'+id);
+            }
+            const b=await fetch('https://app.aysseguros.com/__recovery__/build.json',{headers:{'cache-control':'no-cache'}}).then(x=>x.json());
+            assert.equal(b.sourceSha,'1dd675ed59ac51fd122915ca8056f85f82fa12d6');
+            console.log('I66_RENEWAL_SIGNED_LIVE_QA_PRECONDITIONS_PASS');
+          })().catch(e=>{console.error(e.message);process.exitCode=1;});
+          NODE
+      - name: Install isolated signed browser and Firebase runtime
+        run: |
+          set -euo pipefail
+          npm install --no-save --package-lock=false --ignore-scripts --no-audit --no-fund firebase-admin@13.4.0 playwright@1.55.0 >/dev/null
+          node node_modules/playwright/cli.js install --with-deps chromium >/dev/null
+      - name: Signed LIVE direct renewal, synthetic QA document, crossmodule readback and restore
+        run: node tools/gravicentra-i6-6-carlos-paula-live-direct-renewal-synthetic-uat.cjs
