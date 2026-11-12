@@ -13,6 +13,7 @@ on:
       - .github/workflows/gravicentra-release-delta-66-package.yml
       - artifacts/orbit360-recovery/release-control/I6_6_RELEASE_TRANSPORT_CONTROL_20261110.json
       - artifacts/orbit360-recovery/release-control/I6_6_APPROVED_PRODUCT_DELTA_MANIFEST_20261110.json
+      - tools/gravicentra-i6-6-delta-guard.mjs
 
 permissions:
   contents: read

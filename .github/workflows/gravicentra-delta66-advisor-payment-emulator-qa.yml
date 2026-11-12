@@ -7,6 +7,7 @@ on:
     paths:
       - .github/workflows/gravicentra-delta66-advisor-payment-emulator-qa.yml
       - tools/gravicentra-delta66-advisor-payment-emulator-functional.test.cjs
+      - tools/gravicentra-i6-6-delta-guard.mjs
       - functions/cobros-reconciliation-domain.js
       - functions/notification-outbox-processor.js
       - functions/ops-advisor-inbox.js

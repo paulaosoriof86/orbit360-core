@@ -14,6 +14,14 @@ const fail=(reason)=>{throw new Error('I6_6_DELTA_GUARD:'+reason);};
 const git=(...args)=>execFileSync('git',args,{encoding:'utf8'}).trim();
 const need=(ok,reason)=>{if(!ok)fail(reason);};
 const cp=JSON.parse(fs.readFileSync('artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json','utf8'));
+// The project recovery-state document is mutable governance metadata, not a
+// product asset. Validate its operational boundary explicitly but keep its
+// updates out of the product-source blob allowlist. Exclude this one file only.
+const recoveryState=JSON.parse(fs.readFileSync('orbit360-platform/docs/recovery/orbit360-recovery-state-v1.json','utf8'));
+need(recoveryState.branch==='recovery/fase-a-clean-20260831'&&
+  recoveryState.b4007OperationalClosureOwnerCorrection20261110?.lastClosedReleaseGate==='B4-007'&&
+  recoveryState.b4007OperationalClosureOwnerCorrection20261110?.activeOperationalGate==='I6.6',
+  'RECOVERY_STATE_GATE_DRIFT');
 const closure=cp.b4007OwnerOperationalGateClosure20261110||{};
 const i6=cp.gateState?.gates?.I6||{};
 need(cp.status==='PRODUCTION_ACCEPTED'&&cp.environmentState?.productionAccepted===true,'PRODUCTION_BASE_NOT_ACCEPTED');
@@ -85,7 +93,7 @@ for(const change of manifest.changes){
   }
 }
 const expectedPaths=[...approved.keys()].sort();
-const diff=git('diff','--name-only',BASE,'HEAD','--','orbit360-platform','functions','tools/gravicentra-i6-1-preview-package.mjs','firestore.rules','storage.rules','database.rules.json','firebase.json').split('\n').filter(Boolean).sort();
+const diff=git('diff','--name-only',BASE,'HEAD','--','orbit360-platform','functions','tools/gravicentra-i6-1-preview-package.mjs','firestore.rules','storage.rules','database.rules.json','firebase.json',':(exclude)orbit360-platform/docs/recovery/orbit360-recovery-state-v1.json').split('\n').filter(Boolean).sort();
 need(JSON.stringify(diff)===JSON.stringify(expectedPaths),'UNDECLARED_PRODUCT_SOURCE_DELTA:'+diff.join(','));
 for(const [p,approval] of approved){
   need(git('rev-parse','HEAD:'+p)===approval.gitBlobSha,'UNAPPROVED_OR_STALE_SOURCE_BLOB:'+p);
