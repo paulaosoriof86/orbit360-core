@@ -13,11 +13,22 @@
   "updatedAtUtc": "2026-11-12T15:04:45Z",
   "status": "I6_6_LIVE_CONTROLLED_PORTFOLIO_UPDATE_IN_PROGRESS",
   "currentIteration": 6,
-  "lastCompletedIteration": 1,
+  "lastCompletedIteration": 5,
+  "iterationProgressAuthority": "CONTROL_PLANE.json#gateState: I0-I5 certified in earlier release epoch; I6.6 active for current successor. Timestamped iterationN evidence snapshots remain immutable historical observations.",
   "productionTargetIteration": 5,
   "targetProductionDate": "2026-08-31",
   "dataRefreshIteration": 6,
-  "productionAccepted": false,
+  "productionAccepted": true,
+  "productionAcceptedScope": "HISTORICAL_I5_CERTIFIED_BASE_IN_CONTROL_PLANE_NOT_I6_6_LATEST_SUCCESSOR",
+  "currentLiveSuccessorAcceptance": {
+    "gate": "I6.6",
+    "sourceSha": "c191b56461742f631c492e2ffd904278f1795fe2",
+    "frontEndExactLiveReadback": "PASS_223_OF_223_EACH_ORIGIN",
+    "signedCrossRouteReadOnly": "PASS_CARLOS_OPERATIVO_PAULA_DIRECCION_43250591471",
+    "fullPerModuleRoleCountryWriteUat": "HOLD_NOT_CERTIFIED",
+    "protectedConciliacionesLiveBackend": "HOLD_OLDER_BACKEND_PREVIEW_READY",
+    "currentSuccessorProductionAccepted": false
+  },
   "productionTouchedByRecovery": true,
   "dataTouchedByRecovery": true,
   "dataCutoff": "2026-07-31",
@@ -74,23 +85,23 @@
     },
     "2": {
       "name": "CLEAN_SOURCE_SINGLE_ENTRYPOINT_AND_STARTUP_PERFORMANCE",
-      "status": "IN_PROGRESS_SOURCE_MATERIALIZED"
+      "status": "PASS_PRIOR_I5_CERTIFIED_EPOCH"
     },
     "3": {
       "name": "IMMUTABLE_BUILD_AND_FIREBASE_PREVIEW",
-      "status": "PENDING"
+      "status": "PASS_PRIOR_I5_CERTIFIED_EPOCH"
     },
     "4": {
       "name": "MODULE_BY_MODULE_PREVIEW_PLUS_TRANSVERSAL_E2E",
-      "status": "PENDING"
+      "status": "PASS_PRIOR_I5_CERTIFIED_EPOCH"
     },
     "5": {
       "name": "PROMOTE_SAME_ARTIFACT_AND_MODULE_BY_MODULE_LIVE_VALIDATION",
-      "status": "PENDING"
+      "status": "PASS_PRIOR_I5_CERTIFIED_EPOCH"
     },
     "6": {
       "name": "DATA_REFRESH_20260801_TO_20260831",
-      "status": "PENDING_POST_PRODUCTION"
+      "status": "IN_PROGRESS_CURRENT_SUBGATE_I6_6_CURRENT_SUCCESSOR_WRITES_AND_READER_HOLD"
     }
   },
   "requiredModuleStates": {
