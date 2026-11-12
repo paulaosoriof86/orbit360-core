@@ -71,6 +71,16 @@ jobs:
           PY
       - name: Read source requirements and current LIVE counterparts twice; never write
         shell: bash
+        env:
+          GI_I66_CARTERA_REPORT: ${{ runner.temp }}/gi-i66-cartera-protected-readback.json
         run: |
           set -euo pipefail
           node tools/gravicentra-i66-cartera-a1-a4-readonly.cjs
+      - name: Save protected read-only outcome with no customer identities
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gi-i66-cartera-full-signed-readonly-${{ github.run_id }}
+          path: ${{ runner.temp }}/gi-i66-cartera-protected-readback.json
+          if-no-files-found: ignore
+          retention-days: 7

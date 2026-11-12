@@ -2,6 +2,7 @@
 // I6.6 protected LIVE source-to-operational snapshot. Strictly read-only;
 // never output clients, tenant IDs, full policy numbers, Firestore data or credentials.
 const crypto=require('node:crypto');
+const fs=require('node:fs');
 const CASES=Object.freeze([
   {id:'A1.M1',insurer:'MAPFRE',policy:'SCIN-4394',requirement:'139187477',cents:37963,paidDate:'2026-11-04'},
   {id:'A1.M2',insurer:'MAPFRE',policy:'SC-79849',requirement:'138828141',cents:249715,paidDate:'2026-11-06'},
@@ -218,6 +219,13 @@ async function main(){
       BANTRAB:CASES.filter(x=>x.id.startsWith('A3.')).length,
       LA_CEIBA:CASES.filter(x=>x.id.startsWith('A4.')).length},
     next:'Only exact unique unpaid candidates may proceed to separate signed protected CAS + before/after readback.'};
+  const dest=process.env.GI_I66_CARTERA_REPORT||'';
+  if(dest){
+    const prefix=String(process.env.RUNNER_TEMP||'')+'/';
+    if(!prefix.startsWith('/home/runner/work/_temp/')||!dest.startsWith(prefix)||
+      !/\/gi-i66-cartera-protected-readback\.json$/.test(dest))throw Error('I66_A1_A4_REPORT_DESTINATION_DENIED');
+    fs.writeFileSync(dest,JSON.stringify(report,null,2)+'\n',{flag:'wx',mode:0o600});
+  }
   console.log('I66_CARTERA_A1_A4_READONLY='+JSON.stringify(report));
 }
 if(require.main===module)main().catch(e=>{console.error(safeError(e));process.exitCode=1});
