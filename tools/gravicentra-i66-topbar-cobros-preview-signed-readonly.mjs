@@ -16,6 +16,7 @@ const requirePass=(value,code)=>{if(!value)throw Error(code);};
 const norm=x=>String(x??'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();
 const report={gate:'I6.6',status:'HOLD',origin:ORIGIN,sourceSha:SOURCE,readOnly:true,
   firebaseWrites:0,customerWrites:0,authWrites:0,roleImpersonationChanges:0,cases:[]};
+const failedChecks=[];
 requirePass(process.env.GI_I66_TARGET_PROJECT===PROJECT&&process.env.GI_I66_TARGET_TENANT===TENANT,'I66_TARGET_PROJECT_TENANT_DRIFT');
 requirePass(process.env.GI_I66_QA_REPORT?.startsWith(process.env.RUNNER_TEMP+'/'),'I66_REPORT_PATH_DENIED');
 const app=getApps()[0]||initializeApp({credential:applicationDefault(),projectId:PROJECT});
@@ -142,7 +143,15 @@ async function inspectOperational(target){
       await page.evaluate(r=>{location.hash='#/'+r;},route);
       await page.waitForFunction(r=>Orbit.route?.key===r&&!!document.querySelector('#host .page'),route,{timeout:30000});
     };
+    const waitSourceState=async collections=>{
+      await page.waitForFunction(names=>{
+        const s=Orbit.store?._productStatus?.()||{};
+        return names.every(n=>(s.serverConfirmedCollections||[]).includes(n)||
+          (s.deniedCollections||[]).includes(n)||!!(s.snapshotErrors||{})[n]);
+      },collections,{timeout:35000}).catch(()=>{});
+    };
     await navigate('renovaciones');
+    await waitSourceState(['polizas']);
     const renewals=await page.evaluate(()=>({
       edit:Orbit.access?.can?.('renovaciones','edit')===true,
       manage:Orbit.issuance?.canManage?.()===true,
@@ -151,19 +160,25 @@ async function inspectOperational(target){
       decisionButtonsText:document.getElementById('host')?.innerText?.includes('Pedir renovar')===true
     }));
     await navigate('cobros');
+    await waitSourceState(['cobros','recibosEsperados']);
     const cobros=await page.evaluate(()=>({
       view:Orbit.access?.can?.('cobros','view')===true,
+      edit:Orbit.access?.can?.('cobros','edit')===true,
+      operationPresent:typeof Orbit.modules?.cobros?.aplicarPago==='function',
       actionVisible:[...document.querySelectorAll('#host button')].some(x=>/Aplicar pago/i.test(x.textContent||'')),
       confirmedCollections:[].concat(Orbit.store?._productStatus?.()?.serverConfirmedCollections||[]).filter(x=>['cobros','recibosEsperados','carteraPrimas'].includes(x))
     }));
     await navigate('leads');
+    await waitSourceState(['negocios']);
     const leads=await page.evaluate(()=>({
       view:Orbit.access?.can?.('leads','view')===true,
       edit:Orbit.access?.can?.('leads','edit')===true,
+      createFormPresent:typeof Orbit.ciclo?.nuevoNegocio==='function',
       hasBoard:!!document.querySelector('#host .kanban'),
       serverConfirmed:Orbit.store?._productStatus?.()?.serverConfirmedCollections?.includes('negocios')===true
     }));
     await navigate('ops');
+    await waitSourceState(['negocios','gestiones']);
     const ops=await page.evaluate(()=>({
       view:Orbit.access?.can?.('ops','view')===true,
       hasBoard:!!document.querySelector('#host .kanban'),
@@ -184,13 +199,19 @@ async function inspectOperational(target){
       serverErrorCollections:Object.keys(Orbit.store?._productStatus?.()?.snapshotErrors||{}).filter(x=>['conciliaciones','conciliacionesPrimas'].includes(x))
     }));
     report.cases.push({role:target,scope:'operational-cross-route',renewals,cobros,leads,ops,reconciliation,previewPageErrors:pageErrors});
-    requirePass(pageErrors===0,'I66_OPERATIONAL_SIGNED_PAGE_ERRORS_'+target);
-    requirePass(renewals.edit&&renewals.manage&&renewals.directHook&&renewals.entry,'I66_DIRECT_RENEWAL_ENTRY_HOLD_'+target);
-    requirePass(cobros.view&&cobros.actionVisible,'I66_PAYMENT_ENTRY_HOLD_'+target);
-    requirePass(leads.view&&leads.hasBoard&&leads.serverConfirmed,'I66_SIGNED_LEADS_BOARD_HOLD_'+target);
-    requirePass(ops.view&&ops.hasBoard&&ops.sharedInboxButton&&ops.serverConfirmed,'I66_SIGNED_OPS_BRIDGE_HOLD_'+target);
-    requirePass(reconciliation.permitted&&reconciliation.readiness==='ready'&&reconciliation.sourceConfirmed.length===2&&reconciliation.readOnly,
-      'I66_SIGNED_PROTECTED_CONCILIACIONES_HOLD_'+target);
+    const check=(ok,code)=>{if(!ok)failedChecks.push(code+'_'+target);};
+    check(pageErrors===0,'I66_OPERATIONAL_SIGNED_PAGE_ERRORS');
+    check(renewals.edit&&renewals.manage&&renewals.directHook&&renewals.entry,'I66_DIRECT_RENEWAL_ENTRY_HOLD');
+    check(cobros.view&&cobros.edit&&cobros.operationPresent&&cobros.confirmedCollections.includes('cobros'),
+      'I66_PAYMENT_ENTRY_AND_DATA_HOLD');
+    check(leads.view&&leads.edit&&leads.createFormPresent&&leads.hasBoard&&leads.serverConfirmed,
+      'I66_SIGNED_LEADS_BOARD_HOLD');
+    check(ops.view&&ops.hasBoard&&ops.sharedInboxButton&&ops.serverConfirmed,'I66_SIGNED_OPS_BRIDGE_HOLD');
+    // Carlos applies payments in Cobros; Conciliaciones is separately scoped.
+    // Only a signed authorized Dirección read certifies the protected queue.
+    if(target==='Dirección')check(reconciliation.permitted&&reconciliation.readiness==='ready'&&
+      reconciliation.sourceConfirmed.length===2&&reconciliation.readOnly,
+      'I66_SIGNED_PROTECTED_CONCILIACIONES_HOLD');
     await context.close();
   }finally{await browser.close();}
 }
@@ -206,6 +227,7 @@ try{
   // a separate LIVE canary, not a fabricated Preview PASS.
   await exercise('Operativo');
   for(const target of ['Operativo','Dirección'])await inspectOperational(target);
+  requirePass(failedChecks.length===0,failedChecks.join('__'));
   report.status='SIGNED_OPERATIONAL_CROSS_ROUTE_READONLY_PASS';
   console.log('I66_SIGNED_OPERATIONAL_PREVIEW_PASS '+JSON.stringify(report.cases));
 }catch(error){
