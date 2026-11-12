@@ -19,13 +19,13 @@ jobs:
     timeout-minutes: 50
     env:
       PROJECT_ID: ays-orbit-360-lab
-      SOURCE_SHA: c6ee2b2edc5788a1172593507ebc70f493fb0dc1
-      ARTIFACT_RUN: '43127221729'
-      ARTIFACT_ID: '13902129993'
-      ARTIFACT_DIGEST: sha256:1313e0a85a733f2e2bac93ca7d3233856b5c91ff5201aa2f9300404ac0d4c444
-      QA_RUN: '43127221947'
-      CONTROL_RUN: '43127221993'
-      PREVIEW_FUNCTION_RUN: '43127910914'
+      SOURCE_SHA: 1dd675ed59ac51fd122915ca8056f85f82fa12d6
+      ARTIFACT_RUN: '43305281214'
+      ARTIFACT_ID: '13984026378'
+      ARTIFACT_DIGEST: sha256:f51907a610ca467b7bf840652a3f3e9983a7f9913f5d279e01fa34a539123dbc
+      QA_RUN: '43305281266'
+      CONTROL_RUN: '43305281448'
+      PREVIEW_FUNCTION_RUN: '43306217923'
       SA_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
       SA_ALT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
       SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
@@ -37,11 +37,13 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Gate exact scoped owner approval + green 122 emulator/guard/Preview/function evidence
+      - name: Gate signed Carlos/Paula payment Preview PASS and exact immutable artifact
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
+          node tools/gravicentra-i6-6-carlos-payment-preview-synthetic-gate.test.cjs
+          node tools/gravicentra-i6-6-payment-replay-ledger-guard.test.cjs
           node - <<'NODE'
           const assert=require('node:assert/strict'),fs=require('node:fs');
           (async()=>{
@@ -53,6 +55,7 @@ jobs:
             assert.equal(c.noHostingPromotion,true);
             assert.equal(c.forbidBackendLiveFunctionDeploy,false);
             assert.equal(c.liveFunctionScope,'orbit360CobrosReconciliationCommand');
+            assert.equal(c.carlosPaymentPreviewNextSource20261112?.signedCarlosPaulaPaymentUat,'PASS_43306217923');
             for(const [k,v] of [['approvedSourceSha',process.env.SOURCE_SHA],['sourceBuildWorkflowRunId',Number(process.env.ARTIFACT_RUN)],['immutableArtifactId',Number(process.env.ARTIFACT_ID)],['immutableArtifactZipDigest',process.env.ARTIFACT_DIGEST],['previewFunctionRunId',Number(process.env.PREVIEW_FUNCTION_RUN)]])assert.equal(c[k],v,k);
             const h={Authorization:'Bearer '+process.env.GH_TOKEN,Accept:'application/vnd.github+json','User-Agent':'GI-I66-Payment-Live-Scoped'};
             const base='https://api.github.com/repos/paulaosoriof86/orbit360-core/actions/';
@@ -61,13 +64,13 @@ jobs:
             for(const {name,run} of runs){assert.equal(run.conclusion,'success',name);if(name!=='PREVIEW_FUNCTION')assert.equal(run.head_sha,process.env.SOURCE_SHA,name+' sha');}
             const a=await fetch(base+'artifacts/'+process.env.ARTIFACT_ID,{headers:h}).then(r=>r.json());
             assert.equal(a.digest,process.env.ARTIFACT_DIGEST);assert.equal(a.workflow_run.id,Number(process.env.ARTIFACT_RUN));assert.equal(a.expired,false);
-            console.log('I66_PAYMENT_LIVE_OWNER_EXACT_ARTIFACT_AND_122_QA_PREVIEW_PASS');
+            console.log('I66_PAYMENT_LIVE_OWNER_EXACT_ARTIFACT_CARLOS_PAULA_SIGNED_QA_PASS');
           })().catch(e=>{console.error(e.message);process.exitCode=1;});
           NODE
       - uses: actions/download-artifact@v4
         with:
-          artifact-ids: 13902129993
-          run-id: 43127221729
+          artifact-ids: 13984026378
+          run-id: 43305281214
           github-token: ${{ github.token }}
           path: ${{ runner.temp }}/payment-live-packet-download
       - name: Verify exact immutable TAR/backend bytes before any deployment
