@@ -136,7 +136,14 @@ function resolveEditions(one,snapshots){
 async function scan(db){
   // The source files are exclusively A&S GT. Cross-tenant probing is forbidden.
   const tenant=db.collection('tenants').doc('alianzas-soluciones');
-  if(!(await tenant.get()).exists)throw Error('I66_A1_A4_TENANT_SCOPE');
+  // Firestore permits live subcollections below a nonmaterialized parent doc.
+  // Validate the actual tenant operational collections instead of requiring
+  // the tenants/{tenant} root document to have fields.
+  const [memberProbe,policyProbe]=await Promise.all([
+    tenant.collection('members').limit(1).get(),
+    tenant.collection('data').doc('polizas').collection('items').limit(1).get()
+  ]);
+  if(memberProbe.empty||policyProbe.empty)throw Error('I66_A1_A4_TENANT_SCOPE');
   const buckets=CASES.map(()=>[]);
   {
     const col=tenant.collection('data').doc('polizas').collection('items');
