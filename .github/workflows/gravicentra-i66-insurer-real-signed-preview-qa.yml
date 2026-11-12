@@ -1,4 +1,4 @@
-# I6.6 real signed Operativo policy A/B. Preview and LIVE read-only; never mutate insurer or permissions.
+# I6.6 real signed Direccion/Operativo insurer QA. Preview and LIVE read-only; never mutate insurer or permissions.
 name: Gravicentra I6.6 Real Signed Insurer Preview QA
 on:
   push:
@@ -16,8 +16,8 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     env:
-      SOURCE_SHA: abb0ea3f4dc0bfd221cb891258e7be81ddc65fd2
-      PREVIEW_ORIGIN: https://ays-orbit-360-lab--gi-i66-rc-43100918872-ef0vrjx2.web.app
+      SOURCE_SHA: b54d868e94233d6d30dccc46930b2c737df30823
+      PREVIEW_ORIGIN: https://ays-orbit-360-lab--gi-i66-rc-43146496115-6ovwfgp1.web.app
       LIVE_ORIGIN: https://app.aysseguros.com
       SA_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
       SA_ALT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
@@ -37,10 +37,11 @@ jobs:
           git merge-base --is-ancestor "$SOURCE_SHA" HEAD
           test -z "$(git diff --name-only "$SOURCE_SHA" HEAD -- orbit360-platform functions firebase.json firestore.rules storage.rules)"
           node tools/gravicentra-i6-6-insurer-operativo-signed-scope.test.cjs
+          node tools/gravicentra-i6-6-insurer-legacy-credential-update.test.cjs
           curl -fsSL --max-time 25 "$PREVIEW_ORIGIN/__recovery__/build.json" > "$RUNNER_TEMP/i66-insurer-build.json"
           node - <<'NODE'
           const b=require(process.env.RUNNER_TEMP+'/i66-insurer-build.json');
-          if(b.sourceSha!==process.env.SOURCE_SHA||b.gate!=='I6.6'||!String(b.buildId).startsWith('gi-i66-abb0ea3f4dc0-'))throw Error('I66_INSURER_PREVIEW_SOURCE_MISMATCH');
+          if(b.sourceSha!==process.env.SOURCE_SHA||b.gate!=='I6.6'||!String(b.buildId).startsWith('gi-i66-b54d868e9423-'))throw Error('I66_INSURER_PREVIEW_SOURCE_MISMATCH');
           console.log('I66_INSURER_PREVIEW_EXACT_SOURCE_PASS');
           NODE
       - name: Install pinned read-only signed Chrome QA dependencies
@@ -48,7 +49,7 @@ jobs:
           set -euo pipefail
           npm install --no-save --package-lock=false --ignore-scripts --no-audit --no-fund firebase-admin@13.4.0 playwright@1.55.0 >/dev/null
           node node_modules/playwright/cli.js install --with-deps chromium >/dev/null
-      - name: Confirm Carlos signed role and real insurer write preflight in Preview
+      - name: Confirm Paula Direccion and Carlos Operativo signed insurer preflight in Preview
         run: |
           node - <<'NODE'
           'use strict';
@@ -101,63 +102,64 @@ jobs:
               const m=d.data()||{},named=[m.nombre,m.nombreCompleto,m.displayName,m.name,m.fullName]
                 .some(x=>norm(x).includes('paula')&&norm(x).includes('osorio'))||
                 paulaAdvisorIds.has(String(m.advisorId||m.asesorId||''))||paulaUserIds.has(d.id);
-              return named&&m.active!==false&&m.activo!==false;
+              return named&&m.active!==false&&m.activo!==false&&
+                !['inactivo','inactive','bloqueado','blocked'].includes(norm(m.status||m.estado));
             });
-            console.log('I66_PAULA_MEMBER_CANDIDATE_COUNT='+paulaMembers.length);
-            let otherIdentity=paulaMembers.length===1?paulaMembers[0]:null;
-            if(!otherIdentity){
-              for(const d of members.docs){
-                if(d.id===candidates[0].id||d.data()?.active===false||d.data()?.activo===false)continue;
-                try{const u=await auth.getUser(d.id);if(!u.disabled&&u.emailVerified){otherIdentity=d;break;}}catch(_){}
-              }
-            }
-            assert.ok(otherIdentity,'I66_SECOND_EXISTING_AUTHORIZED_MEMBER_NOT_FOUND');
-            const otherAuth=await auth.getUser(otherIdentity.id);
-            assert.ok(!otherAuth.disabled&&otherAuth.emailVerified,'I66_OTHER_MEMBER_AUTH_NOT_READY');
-            const otherToken=await auth.createCustomToken(otherAuth.uid);
+            assert.equal(paulaMembers.length,1,'I66_PAULA_SIGNED_MEMBER_NOT_UNIQUE');
+            const paulaMember=paulaMembers[0].data()||{};
+            assert.ok(norm(paulaMember.activeRole).includes('direccion'),'I66_PAULA_ACTIVE_ROLE_DRIFT');
+            assert.ok([].concat(paulaMember.countries||paulaMember.paises||[]).map(x=>String(x).toUpperCase()).includes('GT'),'I66_PAULA_GT_DENIED');
+            const paulaAuth=await auth.getUser(paulaMembers[0].id);
+            assert.ok(!paulaAuth.disabled&&paulaAuth.emailVerified,'I66_PAULA_AUTH_NOT_READY');
+            const otherToken=await auth.createCustomToken(paulaAuth.uid);
             const browser=await chromium.launch({headless:true,args:['--no-sandbox']});
             try {
               const context=await browser.newContext({viewport:{width:1280,height:900}});
-              async function checkOrigin(origin){
-                const page=await context.newPage();
-                await page.goto(origin+'/#/aseguradoras?ficha=gt-aseguradora-guatemalteca',{waitUntil:'commit',timeout:30000});
-                await page.waitForFunction(()=>!!window.Orbit?.productRuntimeBrowserProvidersP0&&!!window.Orbit?.productAppP0,null,{timeout:30000});
-                const authResult=await page.evaluate(async(token)=>{
-                  const provider=Orbit.productRuntimeBrowserProvidersP0, state=await provider.initialize();
-                  if(!state.auth.currentUser)await state.modules.auth.signInWithCustomToken(state.auth,token);
-                  const result=await Orbit.productAppP0.activate();
-                  return {started:result?.started===true,role:String(Orbit.session?.rol?.()||'')};
-                },token);
-                assert.ok(authResult.started,'I66_SIGNED_PRODUCT_ACTIVATION_FAILED');
-                assert.equal(norm(authResult.role),'operativo','I66_SIGNED_ROLE_INCORRECT');
-                await page.waitForFunction(()=>!!window.Orbit?.store?.get('aseguradoras','gt-aseguradora-guatemalteca'),null,{timeout:30000});
-                const proof=await page.evaluate(()=>{
-                  const rec=Orbit.store.get('aseguradoras','gt-aseguradora-guatemalteca');
-                  const member=Orbit.auth?.productUser||{};
-                  return {found:!!rec,tenant:rec?.tenantId==='alianzas-soluciones',country:rec?.pais==='GT',
-                    lacksAdvisor:!rec?.asesorId,role:String(Orbit.session?.rol?.()||''),
-                    roleAssigned:[].concat(member.roles||[]).includes('Operativo'),
-                    activeRole:member.activeRole,
-                    scope:Orbit.access.dataScope('aseguradoras'),
-                    matrixAllows:Orbit.access.can('aseguradoras','edit'),
-                    preflightAllows:Orbit.access.canAccessRecord(rec,'aseguradoras',{collection:'aseguradoras'})};
-                });
-                await page.close();
-                return proof;
+              async function checkOrigin(origin,actorToken,expectedRole){
+                const isolatedActor=await browser.newContext({viewport:{width:1280,height:900}});
+                try {
+                  const page=await isolatedActor.newPage();
+                  await page.goto(origin+'/#/aseguradoras?ficha=gt-aseguradora-guatemalteca',{waitUntil:'commit',timeout:30000});
+                  await page.waitForFunction(()=>!!window.Orbit?.productRuntimeBrowserProvidersP0&&!!window.Orbit?.productAppP0,null,{timeout:30000});
+                  const authResult=await page.evaluate(async(token)=>{
+                    const provider=Orbit.productRuntimeBrowserProvidersP0, state=await provider.initialize();
+                    await state.modules.auth.signInWithCustomToken(state.auth,token);
+                    const result=await Orbit.productAppP0.activate();
+                    return {started:result?.started===true,role:String(Orbit.session?.rol?.()||'')};
+                  },actorToken);
+                  assert.ok(authResult.started,'I66_SIGNED_PRODUCT_ACTIVATION_FAILED');
+                  assert.ok(norm(authResult.role).includes(norm(expectedRole)),'I66_SIGNED_ROLE_INCORRECT');
+                  await page.waitForFunction(()=>!!window.Orbit?.store?.get('aseguradoras','gt-aseguradora-guatemalteca'),null,{timeout:30000});
+                  return await page.evaluate(()=>{
+                    const rec=Orbit.store.get('aseguradoras','gt-aseguradora-guatemalteca');
+                    const member=Orbit.auth?.productUser||{};
+                    return {found:!!rec,tenant:rec?.tenantId==='alianzas-soluciones',country:rec?.pais==='GT',
+                      lacksAdvisor:!rec?.asesorId,role:String(Orbit.session?.rol?.()||''),
+                      assignedRoles:[].concat(member.roles||[],member.activeRole||''),
+                      activeRole:member.activeRole,
+                      scope:Orbit.access.dataScope('aseguradoras'),
+                      matrixAllows:Orbit.access.can('aseguradoras','edit'),
+                      preflightAllows:Orbit.access.canAccessRecord(rec,'aseguradoras',{collection:'aseguradoras'})};
+                  });
+                } finally {await isolatedActor.close();}
               }
-              const preview=await checkOrigin(process.env.PREVIEW_ORIGIN);
-              assert.ok(preview.found&&preview.tenant&&preview.country&&preview.lacksAdvisor&&preview.roleAssigned,'I66_PREVIEW_REAL_INSURER_SCOPE_DRIFT');
-              assert.equal(preview.scope,'all','I66_PREVIEW_SCOPE_NOT_TENANT');
-              assert.equal(preview.matrixAllows,true,'I66_PREVIEW_ROLE_EDIT_DENIED');
-              assert.equal(preview.preflightAllows,true,'I66_PREVIEW_REAL_SAVE_PREFLIGHT_DENIED');
-              console.log('I66_REAL_CARLOS_SIGNED_PREVIEW_INSURER_SAVE_PREFLIGHT_PASS');
-              console.log('I66_PREVIEW_ROLE_COUNTRY_SCOPE_AND_NO_ADVISOR_PASS');
+              for(const actor of [{name:'CARLOS',token,role:'operativo'},{name:'PAULA',token:otherToken,role:'direccion'}]){
+                const preview=await checkOrigin(process.env.PREVIEW_ORIGIN,actor.token,actor.role);
+                assert.ok(preview.found&&preview.tenant&&preview.country&&preview.lacksAdvisor,'I66_PREVIEW_REAL_INSURER_SCOPE_DRIFT_'+actor.name);
+                assert.ok(preview.assignedRoles.some(x=>norm(x).includes(actor.role)),'I66_PREVIEW_ASSIGNED_ROLE_DRIFT_'+actor.name);
+                assert.equal(preview.scope,'all','I66_PREVIEW_SCOPE_NOT_TENANT_'+actor.name);
+                assert.equal(preview.matrixAllows,true,'I66_PREVIEW_ROLE_EDIT_DENIED_'+actor.name);
+                assert.equal(preview.preflightAllows,true,'I66_PREVIEW_REAL_SAVE_PREFLIGHT_DENIED_'+actor.name);
+                console.log('I66_REAL_'+actor.name+'_SIGNED_PREVIEW_INSURER_SAVE_PREFLIGHT_PASS');
+                // LIVE remains an observed baseline: no real customer writes, no false certification.
+                const live=await checkOrigin(process.env.LIVE_ORIGIN,actor.token,actor.role);
+                assert.ok(live.found&&live.tenant&&live.country&&live.lacksAdvisor,'I66_LIVE_BASELINE_RECORD_DRIFT_'+actor.name);
+                console.log('I66_EXISTING_LIVE_'+actor.name+'_MATRIX_ALLOWS='+Boolean(live.matrixAllows));
+                console.log('I66_EXISTING_LIVE_'+actor.name+'_INSURER_PREFLIGHT_ALLOWS='+Boolean(live.preflightAllows));
+              }
+              console.log('I66_TWO_REAL_ROLES_PREVIEW_COUNTRY_SCOPE_AND_NO_ADVISOR_PASS');
               // Baseline is observed only to distinguish old LIVE policy, never write real records.
-              const live=await checkOrigin(process.env.LIVE_ORIGIN);
-              assert.ok(live.found&&live.tenant&&live.country&&live.lacksAdvisor,'I66_LIVE_BASELINE_RECORD_DRIFT');
-              assert.equal(live.matrixAllows,true,'I66_LIVE_BASELINE_MATRIX_DRIFT');
-              assert.equal(live.preflightAllows,true,'I66_LIVE_RECORD_PREFLIGHT_NOT_THE_ROOT');
-              console.log('I66_SIGNED_PREVIEW_AND_LIVE_INSURER_RECORD_PREFLIGHT_BOTH_ALLOW');
+              console.log('I66_LIVE_INSURER_BASELINE_OBSERVED_WITHOUT_WRITE_OR_FALSE_PASS');
               // Reproduce tab-local productUser outliving browser-wide Firebase LOCAL
               // auth after a different authorized user signs in on the same origin.
               // No real insurer mutation and no settings/persistence changes.
