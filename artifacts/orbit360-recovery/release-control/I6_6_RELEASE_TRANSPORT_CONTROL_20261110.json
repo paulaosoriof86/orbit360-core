@@ -4,7 +4,7 @@
   "productBrand": "Gravicentra Insurance",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
-  "status": "INSURER_SAFE_PREVIEW_SIGNED_PREFLIGHT_PASS_LIVE_HOLD",
+  "status": "PREVIEW_BUILD_REQUESTED",
   "scope": "I6_6_SINGLE_CANONICAL_SUCCESSOR_INSURER_SAFE_DELTA_PREVIEW_HOSTING_ONLY_NO_LIVE_NO_CUSTOMER_WRITES",
   "historicalClosedGate": "B4-007",
   "approvedProductDeltaManifest": "artifacts/orbit360-recovery/release-control/I6_6_APPROVED_PRODUCT_DELTA_MANIFEST_20261110.json",
@@ -141,7 +141,7 @@
   "liveAccessGuard": "UNAUTHENTICATED_401_PASS",
   "hostingOriginsUntouched": true,
   "liveCustomerDataWrites": 0,
-  "releaseStatus": "NEW_P0_INSURER_SAFE_DELTA_IMMUTABLE_PREVIEW_BUILD_AND_SIGNED_DUAL_ROLE_PREFLIGHT_PASS; SAVE_RELOAD_RESTORE_AND_LIVE_HOLD; PRIOR_CONCILIACIONES_READER_PREVIEW_RECEIPT_PRESERVED; LIVE_UNCHANGED; FINANCIAL_WRITES_ZERO",
+  "releaseStatus": "INSURER_VAULT_REF_AND_BANK_EDIT_SUCCESSOR_NEW_EXACT_SOURCE_PACKAGE_AND_PREVIEW_REQUESTED; PRIOR_SIGNED_PREFLIGHT_PRESERVED; LIVE_FRONTEND_UNCHANGED; TWO_LOGO_FUNCTION_REVISIONS_LIVE_SUCCESS; SIGNED_ASSET_UPLOAD_QA_PENDING",
   "pendingFrontendTopbarRelease": {
     "receipt": "artifacts/orbit360-recovery/release-control/I6_6_GLOBAL_TOPBAR_CROSSMODULE_HYDRATION_20261111.json",
     "currentStatus": "SOURCE_UNIT_PASS_IMMUTABLE_BUILD_REQUESTED",
@@ -218,11 +218,24 @@
     ],
     "runtimeInventoryBefore": 83,
     "runtimeInventoryAfter": 85,
-    "sourceBlob": "a27810c65e6a5a761d40c0e1f20cae61df483d1f",
+    "sourceBlob": "60722d67bb873f321d91ced02c31ae999e13ae5a",
     "signedLiveUploadQaRun": 43154812175,
     "signedLiveResult": "HOLD_STORAGE_ASSET_WRITE_UNAVAILABLE_BUCKETS_404",
     "fullModuleLiveAcceptance": false,
     "hostingUnchanged": true,
-    "dataReimported": false
+    "dataReimported": false,
+    "bucketMetadataReadOnlyRun": 43155071269,
+    "revisedDeployRun": 43155528580,
+    "deployStatus": "EXACT_EXISTING_TWO_PREVIEW_AND_LIVE_FUNCTION_REVISIONS_SUCCESS",
+    "functionInventoryBefore": 85,
+    "functionInventoryAfter": 85,
+    "signedLiveUploadQaStatus": "RETEST_RUNNING"
+  },
+  "preInsurerCredentialSuccessorPreviewEvidencePreserved20261112": {
+    "status": "INSURER_SAFE_PREVIEW_SIGNED_PREFLIGHT_PASS_LIVE_HOLD",
+    "sourceBuildWorkflowRunId": 43146496115,
+    "immutableArtifactId": 13911507447,
+    "approvedSourceSha": "b54d868e94233d6d30dccc46930b2c737df30823",
+    "sourcePreviewChannelId": "gi-i66-rc-43146496115"
   }
 }
