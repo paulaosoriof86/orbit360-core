@@ -1,5 +1,7 @@
 # I6.6 insurer/source batch A1-A4 + A7: same LIVE tenant-scoped read-only exact-match probe.
 # Never mutates Firestore, Auth, Hosting, Rules or payment state.
+# I6.6 2026-11-12 successor: fresh LIVE readback after certified Operativo reader traffic
+# and direct-renewal QA; this remains strictly read-only and does not count as A1-A7 applied.
 name: Gravicentra I6.6 Cartera A1-A4 + A7 LIVE Source Readback ONLY
 on:
   push:
