@@ -22,11 +22,19 @@
   "productionAcceptedScope": "HISTORICAL_I5_CERTIFIED_BASE_IN_CONTROL_PLANE_NOT_I6_6_LATEST_SUCCESSOR",
   "currentLiveSuccessorAcceptance": {
     "gate": "I6.6",
-    "sourceSha": "c191b56461742f631c492e2ffd904278f1795fe2",
+    "sourceSha": "1dd675ed59ac51fd122915ca8056f85f82fa12d6",
     "frontEndExactLiveReadback": "PASS_223_OF_223_EACH_ORIGIN",
-    "signedCrossRouteReadOnly": "PASS_CARLOS_OPERATIVO_PAULA_DIRECCION_43250591471",
+    "signedCrossRouteReadOnly": "PASS_43250591471_AND_SIGNED_LIVE_OPS_LEADS_TASKS_43310610618",
     "fullPerModuleRoleCountryWriteUat": "HOLD_NOT_CERTIFIED",
     "protectedConciliacionesLiveBackend": "PASS_EXACT_ISOLATED_READER_MANIFEST_B0D010_DEPLOY_43278018706_AND_SIGNED_DUAL_ORIGIN_RUN_43278857052_READ_ONLY",
+    "currentExactHostingRunId": 43309935816,
+    "currentExactHostingArtifactId": 13984026378,
+    "currentExactHostingBuildId": "gi-i66-1dd675ed59ac-57f234755dc1",
+    "liveTwoActorOpsLeadsTasksCrudRunId": 43310610618,
+    "liveTwoActorPaymentAndRenewabilityRunId": 43312896784,
+    "targetedCobrosBackendSourceSha": "a49f5f76bc85b5df211a865efed94d9821cdd680",
+    "targetedCobrosBackendImmutableTarSha256": "3bc2599c42e01dca2e4b9c9053b2a8990885cd0c762fe3117f78b851c5f791ec",
+    "backendTransportInterpretation": "Payment CallableResponse mode bug repaired on same Preview then LIVE backend package; LIVE frontend stays on immutable 1dd source, synthetic financial writes only and full direct-renewal issuance remains HOLD",
     "currentSuccessorProductionAccepted": false
   },
   "i66OwnerFrozenUrgentWorkPlan20261112": {
@@ -34,7 +42,7 @@
     "owner": "Paula Andrea Osorio Franco",
     "activeGate": "I6.6_POST_B4_007_LIVE",
     "oneCanonicalBranch": "recovery/fase-a-clean-20260831",
-    "currentExactLiveFrontendSource": "c191b56461742f631c492e2ffd904278f1795fe2",
+    "currentExactLiveFrontendSource": "1dd675ed59ac51fd122915ca8056f85f82fa12d6",
     "releaseCadence": "EACH_CAUSAL_FIX_SOURCE_TEST_PREVIEW_SIGNED_QA_SAME_ARTIFACT_OR_ISOLATED_FUNCTION_LIVE_READBACK_IMMEDIATELY_NO_UNVERIFIED_PASS_NO_BATCHED_CHANGES",
     "operativoAndSuperiorsWriteDecision": "Operativo Carlos: crear, editar, gestionar, responder, registrar, resolver y ejecutar toda accion operativa aprobada en los modulos que realmente tiene autorizados, incluidos Ops, Leads, renovaciones y cobros; Direccion/Admin/AdminTenant/SuperAdmin mismas facultades o superiores en sus alcances; preservar tenant pais privilegios sensibles y auditoria. No extender Asesor ni permitir pagos a ciegas.",
     "frozenOrder": [
@@ -44,7 +52,7 @@
       "P1_ASEGURADORAS_FULL_OPERATIONAL_EDITS_LOGO_ACCOUNT_SECRET_WITH_AUDIT",
       "P1_SEARCH_PERFORMANCE_MODULE_ROLE_COUNTRY_REGRESSION_AND_DOCUMENTAL_CONVERGENCE"
     ],
-    "firstIncompleteBlockAfterReaderParity": "P0_CARLOS_ACTUAL_SIGNED_OPS_LEADS_RENEWAL_PAYMENT_WRITE_READBACK_IDEMPOTENCE_COUNTRY_SCOPE; FINANCIAL_CASES_EXECUTE_IN_OWN_SAFE_PROTECTED_MINIBATCHES",
+    "firstIncompleteBlockAfterReaderParity": "P0_CARLOS_DIRECT_RENEWAL_ISSUANCE_LEADS_OPS_HANDOFF_COUNTRY_NEGATIVE_WITH_SUPERIOR_PARITY; FINANCIAL_A1_A7_ONLY_SAFE_CAS_MINIBATCHES",
     "liveReadback20261112": {
       "opsPaulaSimulatedOperativo": "PLUS_GESTION_AND_PLUS_NUEVO_INGRESO_VISIBLE_MODAL_OPENS_NO_WRITE_UAT",
       "opsLeadsPendingProjection": 1,
@@ -63,7 +71,14 @@
       "signedDualOriginQaHead": "82929f78db901ece2a4992636e3c438f2073fa0e",
       "signedQaStatus": "SIGNED_PREVIEW_AND_LIVE_CROSS_ROUTE_READER_PARITY_PASS_DIRECTION_AND_OPERATIVO_DENIAL",
       "signedQaWrites": 0,
-      "currentReaderOutcome": "LATEST_APPROVED_VERSION_LIVE_READ_ONLY_PASS_FULL_FINANCIAL_WRITE_PARITY_NOT_YET_CERTIFIED"
+      "currentReaderOutcome": "LATEST_APPROVED_VERSION_LIVE_READ_ONLY_PASS_FULL_FINANCIAL_WRITE_PARITY_NOT_YET_CERTIFIED",
+      "currentHostingExactLiveRunId": 43309935816,
+      "currentHostingExactLiveSourceSha": "1dd675ed59ac51fd122915ca8056f85f82fa12d6",
+      "currentHostingExactLiveReadback": "223_OF_223_PER_ORIGIN_SAME_IMMUTABLE_ARTIFACT_13984026378",
+      "signedCarlosAndDirectionOpsLeadsTasksLiveRunId": 43310610618,
+      "signedCarlosAndDirectionPaymentRenewabilityLiveRunId": 43312896784,
+      "livePaymentBackendFixedModeRevision": "orbit360cobrosreconciliationcommand-00010-dig",
+      "livePaymentBackendSignedOutcome": "SYNTHETIC_APPLY_RECONCILE_NO_DUPLICATE_COBRO_RECEIPT_PORTFOLIO_AND_POLICY_RENEWABLE_CAS_RELOAD_RESTORE_PASS_REAL_CUSTOMER_WRITES_0"
     },
     "progressMetric": "ONLY_EVIDENCE_BACKED_ACCEPTANCE_CHECKS_COUNT; NOT_TIME_ELAPSED_OR_ESTIMATED_COMPLETION",
     "latestFinancialCensusReadOnly20261112": {
@@ -95,11 +110,12 @@
         "pending": []
       },
       "carlosOpsLeadsRenovalsCobros": {
-        "verifiedSteps": 2,
-        "requiredSteps": 7,
-        "percent": 29,
-        "verified": ["OPERATIVO_FRONTEND_AND_BACKEND_CREATE_ENTRY_SOURCE", "LIVE_PAULA_OPERATIVO_SIMULATION_OPS_CREATE_MODAL_OPENS"],
-        "pending": ["SIGNED_CARLOS_OPS_CREATE_READBACK", "SIGNED_CARLOS_LEADS_CREATE_REPLY_OPS_PROJECTION", "SIGNED_CARLOS_DIRECT_RENEWAL_READBACK", "SIGNED_CARLOS_APPLY_PAYMENT_NO_DUPLICATE", "COUNTRY_TENANT_ROLE_NEGATIVE_AND_SUPERIOR_PARITY"]
+        "verifiedSteps": 5,
+        "requiredSteps": 8,
+        "percent": 63,
+        "denominatorClarification20261112": "Original 7 mixed operations separated into 8 independently observable outcomes: Leads CRUD and Leads-to-Ops exact projection are distinct. Count only signed LIVE completed, not source QA or simulated click.",
+        "verified": ["CARLOS_AND_DIRECTION_OPS_CREATE_UPDATE_RESOLVE_RELOAD_RESTORE_LIVE_43310610618", "CARLOS_AND_DIRECTION_LEADS_CREATE_UPDATE_RELOAD_RESTORE_LIVE_43310610618", "CARLOS_AND_DIRECTION_TASKS_CREATE_RESOLVE_RELOAD_RESTORE_LIVE_43310610618", "CARLOS_AND_DIRECTION_POLICY_RENEWABLE_FALSE_TO_TRUE_CAS_RELOAD_RESTORE_LIVE_43312896784", "CARLOS_AND_DIRECTION_PAYMENT_APPLY_AND_RECONCILE_ONE_COBRO_RECEIPT_PORTFOLIO_RELOAD_RESTORE_LIVE_43312896784"],
+        "pending": ["SIGNED_CARLOS_FULL_DIRECT_RENEWAL_ISSUANCE_CROSS_MODULE_READBACK_WITH_APPROVAL_AND_REAL_DOCUMENT_GATES", "SIGNED_LEADS_TO_OPS_EXACT_HANDOFF_CORRELATION_AND_REPLY", "SIGNED_NEGATIVE_COUNTRY_TENANT_ROLE_AND_DIRECTION_ADMIN_SUPERADMIN_TRANSVERSAL_REGRESSION"]
       },
       "financialA1A7Applied": {
         "verifiedSteps": 0,
@@ -120,7 +136,7 @@
         "verifiedSteps": 4,
         "requiredSteps": 5,
         "percent": 80,
-        "verified": ["HISTORICAL_B4_007_CLOSED", "CURRENT_C191_223_OF_223_EXACT_FRONTEND_LIVE", "CANONICAL_STATE_NEXT_ACTION_RECONCILED_AND_I66_6_GUARD", "READER_RELEASE_LIVE_READBACK_43278018706_43278857052"],
+        "verified": ["HISTORICAL_B4_007_CLOSED", "CURRENT_1DD_223_OF_223_EXACT_FRONTEND_LIVE_43309935816", "I66_6_GUARD_APPROVED_ONCALL_SOURCE_SUCCESS_43313298186", "READER_RELEASE_LIVE_READBACK_43278018706_43278857052"],
         "pending": ["FULL_I66_REAL_WRITE_UAT_SUCCESSOR_ACCEPTANCE"]
       }
     },
