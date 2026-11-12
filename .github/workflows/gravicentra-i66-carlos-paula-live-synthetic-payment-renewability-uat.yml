@@ -1,0 +1,73 @@
+# Same exact I6.6 production artifact; real actors but synthetic-only payments.
+# No automatic real-client or insurer financial movement; cleanup mandatory.
+name: Gravicentra I6.6 Carlos Paula Signed LIVE Payment Renewal UAT
+on:
+  push:
+    branches: [recovery/fase-a-clean-20260831]
+    paths:
+      - .github/workflows/gravicentra-i66-carlos-paula-live-synthetic-payment-renewability-uat.yml
+      - tools/gravicentra-i6-6-carlos-paula-live-synthetic-payment-renewability-uat.cjs
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: gi-i66-carlos-paula-live-payment-renewability-signed-uat
+  cancel-in-progress: false
+jobs:
+  signed-financial-uat:
+    if: github.repository == 'paulaosoriof86/orbit360-core' && github.ref_name == 'recovery/fase-a-clean-20260831'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    env:
+      I66_SOURCE_SHA: 1dd675ed59ac51fd122915ca8056f85f82fa12d6
+      I66_LIVE_ORIGIN: https://app.aysseguros.com
+      I66_OPS_HOSTING_LIVE_RUN: '43309935816'
+      I66_PAYMENT_LIVE_RUN: '43307238568'
+      I66_OPS_SIGNED_LIVE_UAT_RUN: '43310610618'
+      SA_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_ALT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify unchanged exact product, prior LIVE payment, Ops, and synthetic UAT proof
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor "$I66_SOURCE_SHA" HEAD
+          test -z "$(git diff --name-only "$I66_SOURCE_SHA" HEAD -- orbit360-platform functions firebase.json firestore.rules storage.rules)"
+          node --check tools/gravicentra-i6-6-carlos-paula-live-synthetic-payment-renewability-uat.cjs
+          node tools/gravicentra-i6-6-carlos-renewability-only.test.cjs
+          node tools/gravicentra-i6-6-carlos-payment-preview-synthetic-gate.test.cjs
+          node - <<'NODE'
+          const assert=require('node:assert/strict');
+          (async()=>{
+            const h={Authorization:'Bearer '+process.env.GH_TOKEN,Accept:'application/vnd.github+json','User-Agent':'GI-I66-Live-Financial-Signed-Uat'};
+            const base='https://api.github.com/repos/paulaosoriof86/orbit360-core/actions/runs/';
+            for(const id of [process.env.I66_OPS_HOSTING_LIVE_RUN,process.env.I66_PAYMENT_LIVE_RUN,process.env.I66_OPS_SIGNED_LIVE_UAT_RUN]){
+              const r=await fetch(base+id,{headers:h}).then(x=>x.json());
+              assert.equal(r.conclusion,'success','I66_PRIOR_EXACT_LIVE_OR_SIGNED_UAT_NOT_ACCEPTED_'+id);
+            }
+            for(const origin of ['https://app.aysseguros.com','https://ays-orbit-360-lab.web.app']){
+              const x=await fetch(origin+'/__recovery__/build.json',{headers:{'cache-control':'no-cache'}});
+              assert.ok(x.ok,'I66_LIVE_BUILD_MARKER_UNAVAILABLE');const m=await x.json();
+              assert.equal(m.sourceSha,process.env.I66_SOURCE_SHA,'I66_LIVE_SOURCE_CHANGED');
+              assert.equal(m.buildId,'gi-i66-1dd675ed59ac-57f234755dc1');
+            }
+            console.log('I66_LIVE_PAYMENT_RENEWABILITY_SIGNED_UAT_PRECONDITIONS_PASS');
+          })().catch(e=>{console.error(e.message);process.exitCode=1;});
+          NODE
+      - name: Install isolated browser and Firebase signed UAT dependencies
+        run: |
+          set -euo pipefail
+          npm install --no-save --package-lock=false --ignore-scripts --no-audit --no-fund firebase-admin@13.4.0 playwright@1.55.0 >/dev/null
+          node node_modules/playwright/cli.js install --with-deps chromium >/dev/null
+      - name: Verify both actors signed LIVE renewability, payment, receipt, cartera, cobro and cleanup
+        run: node tools/gravicentra-i6-6-carlos-paula-live-synthetic-payment-renewability-uat.cjs
