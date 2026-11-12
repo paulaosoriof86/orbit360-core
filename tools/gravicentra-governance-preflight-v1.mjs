@@ -30,6 +30,33 @@ const postI5Guard='tools/gravicentra-post-i5-control-plane-guard-v1.mjs';
 const i6Guard='tools/gravicentra-i6-control-plane-guard-v1.mjs';
 const i66Guard='tools/gravicentra-i6-6-delta-guard.mjs';
 const i66Active=i6Active&&control.gateState?.gates?.I6?.activeSubgate==='I6.6';
+// An immutable Hosting promotion and a separately authorized Preview-only
+// backend reader are different operations. Keep their permission flags scoped,
+// and fail closed if mutable release summaries disagree on actual LIVE bytes.
+if(i66Active){
+  const transport=JSON.parse(fs.readFileSync('artifacts/orbit360-recovery/release-control/I6_6_RELEASE_TRANSPORT_CONTROL_20261110.json','utf8'));
+  const latest=control.i66LatestExactLiveRelease20261111;
+  const live=transport.currentExactHostingRelease;
+  const r4=transport.latestExactHostingPromotionR4;
+  const fields=[
+    [latest?.latestProductSourceSha,live?.sourceSha],
+    [latest?.latestProductBuildId,live?.buildId],
+    [latest?.immutableArtifactId,live?.artifactId],
+    [latest?.immutableArtifactZipSha256,live?.artifactDigest],
+    [latest?.releaseRunId,live?.liveCloneRunId],
+    [latest?.latestPreviewBuildRunId,live?.previewRunId],
+    [latest?.latestReleaseReceipt,live?.receipt]
+  ];
+  if(!live||!['PUBLISHED_EXACT_NOT_FULL_FUNCTIONAL_UAT','PUBLISHED_EXACT_FUNCTIONAL_UAT_PASS'].includes(live.status)||
+     fields.some(([a,b])=>!a||!b||a!==b)||
+     (live.sourceSha===r4?.sourceSha&&
+       (live.artifactId!==r4.artifactId||live.liveCloneRunId!==r4.liveCloneRunId))||
+     transport.authorizationFlagScopeClarification20261111?.exactR4LiveHostingPromotionConfirmed!==true||
+     (transport.scope==='I6_6_ACTIVE_READER_PREVIEW_AUTHORIZATION_FLAGS_WITH_HISTORICAL_EXACT_R4_LIVE_HOSTING_RECEIPT'&&
+       (transport.livePromotionAuthorized!==false||transport.previewApproved!==false))||
+     (live.status==='PUBLISHED_EXACT_NOT_FULL_FUNCTIONAL_UAT'&&latest.doNotClaimWholePlatformQaPass!==true))
+    throw new Error('I6_6_EXACT_LIVE_RELEASE_POINTER_OR_READER_AUTHORIZATION_DRIFT');
+}
 const activeGuard=i66Active?i66Guard:(i6Active?i6Guard:(postI5?postI5Guard:preI5Guard));
 const evergreenGuard='tools/gravicentra-evergreen-sources-invariant-v2.mjs';
 const syntaxTargets=[
