@@ -11,6 +11,7 @@ on:
       - artifacts/orbit360-recovery/release-control/I6_6_EXACT_HOSTING_LIVE_PROMOTION_REQUEST_20261111_R2.json
       - artifacts/orbit360-recovery/release-control/I6_6_EXACT_HOSTING_LIVE_PROMOTION_REQUEST_20261111_R3.json
       - artifacts/orbit360-recovery/release-control/I6_6_EXACT_HOSTING_LIVE_PROMOTION_REQUEST_20261111_R4.json
+      - artifacts/orbit360-recovery/release-control/I6_6_EXACT_HOSTING_LIVE_PROMOTION_REQUEST_20261112_R5.json
 
 permissions:
   contents: read
@@ -31,7 +32,7 @@ jobs:
       SA_LAB_ALT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
       SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
       I66_PACKAGE_ROOT: /tmp/gi-i66-promote-package
-      I66_APPROVED_RELEASE_REQUEST: artifacts/orbit360-recovery/release-control/I6_6_EXACT_HOSTING_LIVE_PROMOTION_REQUEST_20261111_R4.json
+      I66_APPROVED_RELEASE_REQUEST: artifacts/orbit360-recovery/release-control/I6_6_EXACT_HOSTING_LIVE_PROMOTION_REQUEST_20261112_R5.json
     steps:
       - uses: actions/checkout@v4
         with:
@@ -54,30 +55,31 @@ jobs:
           if(j.schema!=='I6_6_EXACT_HOSTING_LIVE_PROMOTION_V1'||j.status!=='LIVE_HOSTING_CLONE_APPROVED_AFTER_TARGETED_PREVIEW_QA_PASS'||j.approvedByDirection!==true||j.noBackendDeploy!==true||j.noFirestoreAuthOrDataWrites!==true)throw Error('I66_PROMOTION_APPROVAL_INVALID');
           if(!/^[0-9a-f]{40}$/.test(j.sourceSha||'')||!Number.isSafeInteger(j.buildRunId)||j.buildRunId!==j.qaRunId||!Number.isSafeInteger(j.artifactId)||j.artifactId<=0||!/^[0-9a-f]{64}$/.test(j.artifactZipSha256||''))throw Error('I66_APPROVED_SOURCE_ID_INVALID');
           cp.execFileSync('git',['merge-base','--is-ancestor',j.sourceSha,'HEAD']);
-          if(cp.execFileSync('git',['diff','--name-only',j.sourceSha,'HEAD','--','orbit360-platform','functions','firebase.json','firestore.rules','storage.rules'],{encoding:'utf8'}).trim())throw Error('I66_PRODUCT_CHANGED_AFTER_BUILD');
+          if(cp.execFileSync('git',['diff','--name-only',j.sourceSha,'HEAD','--','orbit360-platform',':(exclude)orbit360-platform/docs/**','functions','firebase.json','firestore.rules','storage.rules'],{encoding:'utf8'}).trim())throw Error('I66_PRODUCT_CHANGED_AFTER_BUILD');
           (async()=>{
             const api='https://api.github.com/repos/paulaosoriof86/orbit360-core/actions/';
             const heads={Authorization:'Bearer '+process.env.GITHUB_TOKEN,'User-Agent':'GI-I66-Exact-Hosting-Clone','X-GitHub-Api-Version':'2022-11-28'};
             const ev=j.qaEvidence||{};
-            const currentProofs=[ev.signedDualRolePreviewRunId,ev.controlPlaneRunId,ev.transversalPerformanceSourceQaRunId];
-            const historicContext=[ev.previousLogoBackendSignedLiveQaRunId];
-            const supporting=[...currentProofs,...historicContext];
-            if(supporting.length!==4||supporting.some(x=>!Number.isSafeInteger(x)||x<=0)||
+            const supporting=[ev.signedDualRolePreviewRunId,ev.controlPlaneRunId];
+            if(supporting.length!==2||supporting.some(x=>!Number.isSafeInteger(x)||x<=0)||
                ev.sourceTestsPassed!==38||!Array.isArray(ev.previewRolesActuallyVerified)||
                !ev.previewRolesActuallyVerified.includes('Direccion')||!ev.previewRolesActuallyVerified.includes('Operativo')||
-               ev.logoBankPasswordEditUiAndScopePreflight!==true||ev.signedPreviewNoDataWrites!==true||
-               ev.pageClickPromiseTimeoutObserved!==true||ev.tabSelectionAndFieldVisibilityPostconditionPass!==true||
-               ev.noClaimOfWholePlatformPerformancePass!==true||ev.noClaimOfFullInsurerModuleAcceptance!==true)
-              throw Error('I66_TARGETED_INSURER_QA_EVIDENCE_INCOMPLETE');
+               ev.operativoDirectRenewalEntryAndScopedIssuanceEngine!==true||
+               ev.operativoCobrosEditAndCallableUiPreflight!==true||
+               ev.signedLeadsOpsServerConfirmedWithoutPageErrors!==true||
+               ev.directionSignedProtectedConciliacionesPreviewTwoCollectionsReady!==true||
+               ev.signedPreviewNoDataWrites!==true||ev.noClaimOfActualRenewalOrPaymentWriteAcceptance!==true||
+               ev.liveProtectedConciliacionesReaderNotPartOfHostingPromotion!==true||
+               ev.noClaimOfWholePlatformPerformancePass!==true||ev.noClaimOfFullModuleRoleCountryAcceptance!==true)
+              throw Error('I66_TARGETED_RENEWAL_OPS_AND_PROTECTED_PREVIEW_QA_EVIDENCE_INCOMPLETE');
             const [qr,ar,...probes]=await Promise.all([fetch(api+'runs/'+j.qaRunId,{headers:heads}),fetch(api+'artifacts/'+j.artifactId,{headers:heads}),...supporting.map(id=>fetch(api+'runs/'+id,{headers:heads}))]);
             if(!qr.ok||!ar.ok||probes.some(p=>!p.ok))throw Error('I66_SUCCESS_PROOF_UNAVAILABLE');
             const qa=await qr.json(),a=await ar.json(),proofs=await Promise.all(probes.map(p=>p.json()));
             if(qa.status!=='completed'||qa.conclusion!=='success'||qa.head_sha!==j.sourceSha||a.workflow_run?.id!==j.buildRunId||a.workflow_run?.head_sha!==j.sourceSha||
                a.digest!=='sha256:'+j.artifactZipSha256||a.expired===true)throw Error('I66_QA_OR_PACKAGE_SUCCESS_PROOF_DRIFT');
             if(proofs.some(p=>p.status!=='completed'||p.conclusion!=='success'))throw Error('I66_TARGETED_QA_RUN_NOT_SUCCESS');
-            for(const p of proofs.slice(0,3))cp.execFileSync('git',['merge-base','--is-ancestor',j.sourceSha,p.head_sha]);
-            for(const p of proofs.slice(3))cp.execFileSync('git',['merge-base','--is-ancestor',p.head_sha,j.sourceSha]);
-            console.log('I66_SIGNED_INSURER_DUAL_ROLE_CURRENT_QA_AND_HISTORIC_LOGO_BACKEND_SEPARATE_PROOFS_PASS');
+            for(const p of proofs)cp.execFileSync('git',['merge-base','--is-ancestor',j.sourceSha,p.head_sha]);
+            console.log('I66_SIGNED_CARLOS_AND_DIRECCION_PROTECTED_PREVIEW_AND_CONTROL_PROOFS_PASS');
             fs.appendFileSync(process.env.GITHUB_OUTPUT,`artifact_id=${j.artifactId}\nbuild_run_id=${j.buildRunId}\n`);
             console.log('I66_PINNED_PREVIEW_QA_AND_PACKAGE_SUCCESS_PROOFS_PASS');
           })().catch(e=>{console.error(e.message);process.exitCode=1;});
