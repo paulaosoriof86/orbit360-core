@@ -756,7 +756,10 @@ async function uploadProductAsset(request, previewOnly) {
   const encoded=String(input.base64||'').replace(/\s+/g,'');if(!encoded||encoded.length>3_000_000)throw new HttpsError('invalid-argument','Archivo de logo inválido o demasiado grande.');
   let bytes;try{bytes=Buffer.from(encoded,'base64');}catch(e){throw new HttpsError('invalid-argument','Archivo de logo inválido.');}
   if(!bytes.length||bytes.length>2*1024*1024)throw new HttpsError('invalid-argument','El logo no puede superar 2 MB.');
-  const contentHash=sha(bytes),assetRef=(previewOnly===true?'preview/':'')+'tenants/'+tenantId+'/assets/insurers/'+insurerId+'/logo-'+contentHash.slice(0,20)+'.'+ext;
+  // Hash the actual binary bytes: the generic sha() helper coerces a Buffer
+  // to UTF-8 text and can produce a different digest from the read function.
+  const contentHash=crypto.createHash('sha256').update(bytes).digest('hex');
+  const assetRef=(previewOnly===true?'preview/':'')+'tenants/'+tenantId+'/assets/insurers/'+insurerId+'/logo-'+contentHash.slice(0,20)+'.'+ext;
   let firebaseConfig={};try{firebaseConfig=JSON.parse(process.env.FIREBASE_CONFIG||'{}')||{};}catch(e){}
   const projectId=text(app.options&&app.options.projectId||process.env.GCLOUD_PROJECT||process.env.GOOGLE_CLOUD_PROJECT||'',120);
   const bucketCandidates=unique([

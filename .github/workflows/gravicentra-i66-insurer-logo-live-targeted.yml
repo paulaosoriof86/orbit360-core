@@ -20,7 +20,7 @@ jobs:
     timeout-minutes: 45
     env:
       PROJECT_ID: ays-orbit-360-lab
-      EXPECTED_OWNER_BLOB: 60722d67bb873f321d91ced02c31ae999e13ae5a
+      EXPECTED_OWNER_BLOB: 416775a865e8b23ae7e8bbb604c8d7c519297517
       SA_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
       SA_ALT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
       SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}

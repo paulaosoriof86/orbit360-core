@@ -1111,6 +1111,36 @@
       "tests": [
         {"path": "tools/gravicentra-i6-6-insurer-assets-bucket.test.cjs", "gitBlobSha": "ad37d539a97fbcb94429f6ad4540397acff60053"}
       ]
+    },
+    {
+      "id": "I6_6_INSURER_LOGO_BINARY_DIGEST_PARITY_P0",
+      "approvedByDirection": true,
+      "receipt": "artifacts/orbit360-recovery/release-control/I6_6_REAL_INSURER_SAVE_ROOTCAUSE_20261111.json#insurerLogoStorageDefectProof20261112",
+      "sourceStatus": "SOURCE_UNIT_9_PASS_OLD_SYNTHETIC_FIXTURE_RESTORED_RUN_43156475613_FINAL_SIGNED_QA_PENDING",
+      "capabilityOwners": ["ASEGURADORAS_PRIMARY_RUNTIME", "ASEGURADORAS_PRODUCT_ASSET_BACKEND"],
+      "scope": "Exact SHA-256 of uploaded binary bytes must equal the independently read hash. Legacy sha(Buffer) coerced binary PNG data to UTF-8 and generated a different content hash. Preserve correct preexisting asset bucket, exact two-function deployment scope, tenant/role guards and reversible synthetic QA. No real insurer or financial record writes.",
+      "paths": [
+        {
+          "path": "functions/product-operational-domain.js",
+          "gitBlobSha": "416775a865e8b23ae7e8bbb604c8d7c519297517",
+          "replaces": {
+            "path": "functions/product-operational-domain.js",
+            "priorGitBlobSha": "60722d67bb873f321d91ced02c31ae999e13ae5a",
+            "priorChangeId": "I6_6_INSURER_LOGO_EXISTING_ASSET_BUCKET_RUNTIME_P0"
+          }
+        }
+      ],
+      "tests": [
+        {
+          "path": "tools/gravicentra-i6-6-insurer-assets-bucket.test.cjs",
+          "gitBlobSha": "e150eb4ff9a1cb7909cc6cbe4432f5dc75eede31",
+          "replaces": {
+            "path": "tools/gravicentra-i6-6-insurer-assets-bucket.test.cjs",
+            "priorGitBlobSha": "ad37d539a97fbcb94429f6ad4540397acff60053",
+            "priorChangeId": "I6_6_INSURER_LOGO_EXISTING_ASSET_BUCKET_RUNTIME_P0"
+          }
+        }
+      ]
     }
   ]
 }
