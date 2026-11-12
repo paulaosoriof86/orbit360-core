@@ -82,6 +82,22 @@ async function actorUat(browser,actor){
     },actor.token);
     assert.ok(session.started&&!session.preview&&norm(session.role).includes(actor.role),'I66_LIVE_SIGNED_SESSION_NOT_READY_'+actor.role);
     for(const key of Object.keys(session.rights))assert.equal(session.rights[key],true,'I66_LIVE_SIGNED_WRITE_RIGHT_DENIED_'+actor.role+'_'+key);
+    // Real, pre-existing Carlos tasks: verify the exact GT records are in the
+    // signed Ops DOM without touching them or bypassing the legal consent UI.
+    // No raw task IDs/titles are logged; this is independent from synthetic QA.
+    if(actor.role==='operativo'){
+      const own=await items('tareas','_').parent.where('ownerUid','==',actor.uid).limit(100).get();
+      assert.ok(own.size<100,'I66_LIVE_CARLOS_ACTUAL_TASK_READ_BOUND');
+      const gt=own.docs.filter(d=>d.data()?.pais==='GT'&&d.data()?.__syntheticQa!==true)
+        .map(d=>({id:d.id,done:d.data()?.done===true}));
+      assert.ok(gt.length>=1,'I66_LIVE_CARLOS_NO_ACTUAL_GT_TASK_TO_CORRELATE');
+      await page.waitForFunction(ids=>ids.every(id=>
+        (Orbit.store.all('tareas')||[]).some(t=>t.id===id)&&
+        !!document.querySelector('[aria-label="Tareas de agenda en Ops"] [data-ops-task-toggle="'+CSS.escape(id)+'"]')),
+      gt.map(x=>x.id),{timeout:18000});
+      console.log('I66_LIVE_OPERATIVO_ACTUAL_GT_TASKS_SIGNED_OPS_DOM_READBACK_PASS count='+gt.length+
+        ' completed='+gt.filter(x=>x.done).length+' writes=0');
+    }
     const workflow=async(op,id,payload)=>{
       const req=requests.find(x=>x.op===op&&x.id===id);
       return page.evaluate(async args=>Orbit.productRuntimeBrowserProvidersP0.callFunction('orbit360OpsLeadsCommand',args,'us-central1'),
