@@ -72,6 +72,28 @@ jobs:
             const guardedKeys=obj=>Object.keys(obj||{}).filter(k=>secretKey.test(k));
             const guardImpacted=insurerDirectory.docs.filter(d=>guardedKeys(d.data()).length>0);
             const synthetic=insurerDirectory.docs.filter(d=>/^b4003qa_insurer_/i.test(d.id));
+            // Compare the complete nested portal/bank shapes against the real
+            // server's recursive secret rejection. Classify keys only, never
+            // emit passwords, usernames, account numbers or field values.
+            const serverSecretKey=/^(?:password|pass|pwd|contrasena|contraseña|clave|secret|token|accessToken|refreshToken|privateKey|clientSecret|credentialValue|credential_value)$/i;
+            const containsLiveSecret=(v)=>{
+              if(!v||typeof v!=='object')return false;
+              return Object.keys(v).some(k=>(serverSecretKey.test(k)&&v[k]!=null&&String(v[k]).trim()!=='')||
+                (v[k]&&typeof v[k]==='object'&&containsLiveSecret(v[k])));
+            };
+            const realRows=insurerDirectory.docs.filter(d=>!/^b4003qa_insurer_/i.test(d.id));
+            const portalRows=realRows.filter(d=>Array.isArray((d.data()||{}).portales)&&d.data().portales.length);
+            const bankRows=realRows.filter(d=>Array.isArray((d.data()||{}).cuentas)&&d.data().cuentas.length);
+            const nestedSecretRows=realRows.filter(d=>containsLiveSecret((d.data()||{}).portales)||containsLiveSecret((d.data()||{}).cuentas));
+            const legacyPortalRefRows=portalRows.filter(d=>(d.data().portales||[]).some(p=>p&&!String(p.credentialRef||'').trim()));
+            console.log('I66_INSURER_NESTED_FORM_SHAPE_READONLY='+JSON.stringify({
+              realInsurerRows:realRows.length,rowsWithPortals:portalRows.length,rowsWithBankAccounts:bankRows.length,
+              rowsWithServerRejectedNestedSecretKeys:nestedSecretRows.length,
+              rowsWithPortalCredentialRefMissing:legacyPortalRefRows.length,
+              targetInsurerHasNestedSecret:containsLiveSecret((row||{}).portales)||containsLiveSecret((row||{}).cuentas),
+              targetInsurerHasPortalMissingCredentialRef:Array.isArray(row.portales)&&row.portales.some(p=>p&&!String(p.credentialRef||'').trim()),
+              keyNamesAndSecretsNotEmitted:true,readsOnly:true,writes:0
+            }));
             console.log('I66_INSURER_REAL_LIVE_SERVER_RECEIPTS_READONLY='+JSON.stringify({
               insurerExists:insSnap.exists,recordUpdatedUtc:iso(row.updatedAt),auditRows:events.length,
               recentActivitySummary:safeEvents,carlosActivitySince1100GT:todayEvents.length,
