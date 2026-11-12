@@ -605,7 +605,7 @@ async function deny(fn,code){let thrown;try{await fn()}catch(e){thrown=e}assert.
  const backend=fs.readFileSync('functions/b4-003-scoped-related-reader.js','utf8');
  const protectedStore=fs.readFileSync('orbit360-platform/data/store-firestore-product-readonly-p0.js','utf8');
  assert.match(backend,/await warmParents\(docs\)/,'UAT5_BACKEND_BATCH_LOOKUP');
- assert.match(protectedStore,/\['vehiculos','recibosEsperados','carteraPrimas','cobros','reclamos','comisiones','finmovs','tareas'\]\.includes\(collection\)/,'UAT5_BATCHED_FINANCE_PAGING');
+ assert.match(protectedStore,/\['vehiculos','recibosEsperados','carteraPrimas','cobros','conciliaciones','conciliacionesPrimas','reclamos','comisiones','finmovs','tareas'\]\.includes\(collection\)/,'UAT5_BATCHED_FINANCE_PAGING');
  console.log('UAT5_CAUSAL_SOURCE_QA_PASS route_stale_blocked importer_tri_state_readiness financial_200_scoped_no_data_writes');
 }
 

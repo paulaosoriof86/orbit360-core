@@ -145,7 +145,7 @@
         if(countries.indexOf(selectedCountry)<0)return Promise.reject(new Error('PROTECTED_READ_COUNTRY_DENIED'));
         countries=[selectedCountry];
       }
-      var initialRole=role(),pageSize=(collection==='polizas'||collection==='clientes'||['vehiculos','recibosEsperados','carteraPrimas','cobros','reclamos','comisiones','finmovs','tareas'].includes(collection))?200:50;
+      var initialRole=role(),pageSize=(collection==='polizas'||collection==='clientes'||['vehiculos','recibosEsperados','carteraPrimas','cobros','conciliaciones','conciliacionesPrimas','reclamos','comisiones','finmovs','tareas'].includes(collection))?200:50;
       // Each country's pages remain sequential to preserve cursor integrity.
       // Independent authorized countries can load concurrently, but nothing
       // becomes visible until *every* country passes its full validation.
@@ -191,7 +191,7 @@
       });
     }
     function protectedRelatedUniverse(collection,epoch){
-      if(['vehiculos','recibosEsperados','carteraPrimas','cobros','reclamos','comisiones','finmovs','tareas'].includes(collection))return protectedLoad(collection,'',epoch);
+      if(['vehiculos','recibosEsperados','carteraPrimas','cobros','conciliaciones','conciliacionesPrimas','reclamos','comisiones','finmovs','tareas'].includes(collection))return protectedLoad(collection,'',epoch);
       // Do not cache partially hydrated global views. Server verifies every batch.
       if(!protectedPoliciesPromise)protectedPoliciesPromise=protectedLoad('polizas','',epoch);
       return protectedPoliciesPromise.then(function(policies){
@@ -234,8 +234,13 @@
     function protectedAttach(collection){
       var plan=queryPlan(collection);state.queryPlans[collection]=clone(plan);
       if(plan.hardError)throw new Error('PROTECTED_READ_PLAN_DENIED');
-      if(plan.denied){if(state.deniedCollections.indexOf(collection)<0)state.deniedCollections.push(collection);return false;}
-      var related=['vehiculos','recibosEsperados','carteraPrimas','cobros','reclamos','comisiones','finmovs','tareas'].indexOf(collection)>=0;
+      if(plan.denied){
+        if(state.deniedCollections.indexOf(collection)<0)state.deniedCollections.push(collection);
+        cache[collection]=[];
+        emit(collection); // Repaint the route as denied, never as an empty ledger.
+        return false;
+      }
+      var related=['vehiculos','recibosEsperados','carteraPrimas','cobros','conciliaciones','conciliacionesPrimas','reclamos','comisiones','finmovs','tareas'].indexOf(collection)>=0;
       if(!related&&collection!=='clientes'&&collection!=='polizas'&&collection!=='aseguradoras'&&collection!=='asesores'&&collection!=='negocios'&&collection!=='gestiones'&&collection!=='actividades'&&collection!=='metas'&&collection!=='cancelaciones'&&collection!=='reclamos'&&collection!=='comisiones'&&collection!=='finmovs'&&collection!=='tareas'&&collection!=='auditoria')
         throw new Error('PROTECTED_READ_COLLECTION_UNSUPPORTED_'+collection);
       var epoch=protectedEpoch;
@@ -320,7 +325,7 @@
       // Preflight the complete required collection set before fetching any
       // protected data. A six-of-eight bootstrap is never an accepted startup.
       if(protectedMode){
-        var supported=new Set(['clientes','polizas','vehiculos','recibosEsperados','carteraPrimas','cobros','aseguradoras','asesores','negocios','gestiones','actividades','metas','cancelaciones','reclamos','comisiones','finmovs','tareas','auditoria']);
+        var supported=new Set(['clientes','polizas','vehiculos','recibosEsperados','carteraPrimas','cobros','conciliaciones','conciliacionesPrimas','aseguradoras','asesores','negocios','gestiones','actividades','metas','cancelaciones','reclamos','comisiones','finmovs','tareas','auditoria']);
         var unsupported=startupCollections.filter(function(name){return !supported.has(name);});
         if(unsupported.length){
           state.status='blocked-protected-incomplete';

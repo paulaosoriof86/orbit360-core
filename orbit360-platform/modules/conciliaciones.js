@@ -106,6 +106,20 @@
     return Array.from(rows.values()).filter(row => !filterState || row.estado === filterState);
   }
 
+  // A protected collection that has never returned a server snapshot is not
+  // an empty ledger. Likewise, a role/country denial is not a zero balance.
+  // Never leak raw callable errors or source identifiers into this UI.
+  function proposalReadiness() {
+    let status = null;
+    try { status = S() && typeof S()._productStatus === 'function' ? S()._productStatus() : null; }
+    catch (_) { return 'unavailable'; }
+    if (!status || !Array.isArray(status.serverConfirmedCollections)) return 'legacy';
+    const sources = [CANONICAL_COLLECTION, DOMAIN_COLLECTION];
+    if (sources.some(name => (status.deniedCollections || []).includes(name))) return 'denied';
+    if (sources.some(name => !!(status.snapshotErrors || {})[name])) return 'unavailable';
+    return sources.every(name => status.serverConfirmedCollections.includes(name)) ? 'ready' : 'pending';
+  }
+
   function isHistoricalExigible(row) {
     return !!(row && (row.historicalExigible === true || row.exigible === true ||
       text(row.carteraTipo) === 'cartera_historica_exigible' || text(row.exigibilidad) === 'historica_exigible'));
@@ -191,15 +205,29 @@
   }
   function render(host) {
     freezeCobrosModule();
-    const rows = proposalRows();
+    const readiness = proposalReadiness();
+    const rows = readiness === 'ready' || readiness === 'legacy' ? proposalRows() : [];
     const counts = rows.reduce((acc,row) => { acc[row.estado] = (acc[row.estado] || 0) + 1; return acc; },{});
     const filters = ['', 'PROPUESTA','EN_REVISION','REQUIERE_VALIDACION','VALIDADA','RECHAZADA','BLOQUEADA'];
     const banner = K().banner ? K().banner({icon:'🔗',title:'Bandeja de conciliaciones',sub:'Revisión de coincidencias. Ninguna propuesta aplica pagos por sí sola.',features:[]}) : '<div class="card pad"><b>Bandeja de conciliaciones</b><div class="muted">Revisión de coincidencias. Ninguna propuesta aplica pagos por sí sola.</div></div>';
+    const noRows = readiness === 'pending'
+      ? 'Cargando propuestas autorizadas…'
+      : readiness === 'denied'
+        ? 'La consulta de propuestas no está autorizada para el rol o país activo.'
+        : readiness === 'unavailable'
+          ? 'No fue posible verificar las propuestas en el servidor. No se mostrará un saldo cero.'
+          : filterState ? 'No hay propuestas para este filtro.'
+          : 'No hay propuestas formales confirmadas para esta vista. Los cobros se consultan en Cobros y cartera.';
+    const notice = readiness === 'denied' || readiness === 'unavailable'
+      ? `<div class="cfg-note" role="alert" data-conc-read-state="${readiness}">${esc(noRows)}</div>`
+      : readiness === 'pending'
+        ? `<div class="cfg-note" role="status" data-conc-read-state="pending">${esc(noRows)}</div>` : '';
     host.innerHTML = `<div class="page">${banner}
       <div class="cfg-note" style="margin-bottom:12px">Esta bandeja registra propuestas formales, distintas de pagos ya confirmados y pendientes de conciliar. Consultar pagos SIGA y otros orígenes en Cobros y cartera.</div>
+      ${notice}
       <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px">${filters.map(state => `<button class="btn ${filterState===state?'primary':'ghost'} sm" data-conc-filter="${state}">${state?state.replaceAll('_',' '):'Todos'}${state?` · ${counts[state]||0}`:''}</button>`).join('')}</div>
       <div class="card" style="overflow:hidden"><div style="overflow-x:auto"><table class="tbl"><thead><tr><th>Estado</th><th>Coincidencia</th><th>Fuente</th><th>País / moneda</th><th>Cliente · póliza · recibo</th><th class="num">Monto</th><th>Trazabilidad</th><th></th></tr></thead><tbody>
-      ${rows.map(row => `<tr><td><span class="badge ${tone(row.estado)}">${esc(row.estado.replaceAll('_',' '))}</span></td><td>${esc(row.score.replaceAll('_',' '))}</td><td>${esc(row.fuente)}</td><td>${esc([row.pais,row.moneda].filter(Boolean).join(' / ')||'—')}</td><td>${esc([row.cliente,row.poliza,row.recibo].filter(Boolean).join(' · ')||'—')}</td><td class="num">${row.moneda?money(row.monto,row.moneda):esc(row.monto||'—')}</td><td class="mono" style="font-size:10.5px">${esc([row.archivo,row.hoja,row.fila?`fila ${row.fila}`:'',row.periodo].filter(Boolean).join(' · ')||'—')}</td><td><button class="btn ghost sm" data-conc-id="${esc(row.id)}">Ver</button></td></tr>`).join('') || '<tr><td colspan="8" class="muted" style="text-align:center;padding:30px">No hay propuestas formales visibles. Los pagos pendientes se consultan en Cobros y cartera.</td></tr>'}
+      ${rows.map(row => `<tr><td><span class="badge ${tone(row.estado)}">${esc(row.estado.replaceAll('_',' '))}</span></td><td>${esc(row.score.replaceAll('_',' '))}</td><td>${esc(row.fuente)}</td><td>${esc([row.pais,row.moneda].filter(Boolean).join(' / ')||'—')}</td><td>${esc([row.cliente,row.poliza,row.recibo].filter(Boolean).join(' · ')||'—')}</td><td class="num">${row.moneda?money(row.monto,row.moneda):esc(row.monto||'—')}</td><td class="mono" style="font-size:10.5px">${esc([row.archivo,row.hoja,row.fila?`fila ${row.fila}`:'',row.periodo].filter(Boolean).join(' · ')||'—')}</td><td><button class="btn ghost sm" data-conc-id="${esc(row.id)}">Ver</button></td></tr>`).join('') || `<tr><td colspan="8" class="muted" style="text-align:center;padding:30px">${esc(noRows)}</td></tr>`}
       </tbody></table></div></div></div>`;
     host.querySelectorAll('[data-conc-filter]').forEach(button => button.addEventListener('click', () => { filterState = button.dataset.concFilter || ''; render(host); }));
     host.querySelectorAll('[data-conc-id]').forEach(button => button.addEventListener('click', () => detalle(button.dataset.concId)));
@@ -221,7 +249,7 @@
 
   Orbit.cobrosConciliacionReadOnly = Object.freeze({
     version: VERSION, phase: PHASE, canonicalCollection: CANONICAL_COLLECTION, domainCollection: DOMAIN_COLLECTION,
-    proposalRows, simulateFifo, freezeCobrosModule, operationalWrites: 0, firestoreWrites: 0, autoApply: false
+    proposalRows, proposalReadiness, simulateFifo, freezeCobrosModule, operationalWrites: 0, firestoreWrites: 0, autoApply: false
   });
   Orbit.modules.conciliaciones = Object.freeze({render, detalle, accion: blocked, filtro(value){filterState=value||'';const host=document.getElementById('host');if(host)render(host);}});
   freezeCobrosModule();

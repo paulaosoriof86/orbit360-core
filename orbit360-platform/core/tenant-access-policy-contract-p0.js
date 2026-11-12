@@ -46,6 +46,10 @@
     recibosEsperados: { module: 'cobros', scoped: true, advisorRead: true, advisorWrite: false },
     cobros: { module: 'cobros', scoped: true, advisorRead: true, advisorWrite: false },
     carteraPrimas: { module: 'cobros', scoped: true, advisorRead: true, advisorWrite: false },
+    // Formal reconciliation proposals are read-only here. A source row is
+    // never authority to record a collection, receipt or paid installment.
+    conciliaciones: { module: 'conciliaciones', scoped: true, advisorRead: false, advisorWrite: false, finance: true, controlledWriteOnly: true },
+    conciliacionesPrimas: { module: 'conciliaciones', scoped: true, advisorRead: false, advisorWrite: false, finance: true, controlledWriteOnly: true },
     reclamos: { module: 'siniestros', scoped: true, advisorRead: true, advisorWrite: false },
     cancelaciones: { module: 'cancelaciones', scoped: true, advisorRead: true, advisorWrite: false },
     comisiones: { module: 'comisiones', scoped: true, advisorRead: false, advisorWrite: false, finance: true },

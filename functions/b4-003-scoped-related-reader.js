@@ -4,9 +4,9 @@
 const {resolve,allowRow,Denied}=require('./b4-003-scoped-access-boundary');
 const {clientCountryNeedsInsurer,resolveClientCountry}=require('./b4-003-client-country-authority');
 const {projectScopedClientList}=require('./b4-003-client-country-list-projection');
-const collections=new Set(['clientes','vehiculos','recibosEsperados','carteraPrimas','cobros','comisiones','finmovs','tareas','negocios','gestiones','actividades','metas','cancelaciones','reclamos','auditoria']);
+const collections=new Set(['clientes','vehiculos','recibosEsperados','carteraPrimas','cobros','comisiones','finmovs','conciliaciones','conciliacionesPrimas','tareas','negocios','gestiones','actividades','metas','cancelaciones','reclamos','auditoria']);
 const workflowCollections=new Set(['negocios','gestiones','actividades']);
-const financeCollections=new Set(['vehiculos','recibosEsperados','carteraPrimas','cobros','comisiones']);
+const financeCollections=new Set(['vehiculos','recibosEsperados','carteraPrimas','cobros','comisiones','conciliaciones','conciliacionesPrimas']);
 const clean=v=>String(v==null?'':v).trim();
 const safeId=(id,label)=>{
  const value=clean(id);
@@ -279,6 +279,11 @@ async function readScopedRelatedList({db,auth,request}){
    tenantId,activeRole:role,country,collection:coll});
  const target=tenant.collection('data').doc(coll).collection('items');
 
+ // Formal proposal browsing is a complete, server-scoped read-only list.
+ // A caller-supplied policy anchor cannot select a different reader path.
+ if((coll==='conciliaciones'||coll==='conciliacionesPrimas')&&(policyId||hasBatch))
+   throw new Denied('RELATION_ANCHOR_UNEXPECTED');
+
  // The indexed `where(pais == country)` query cannot return a physically
  // present client with missing/ambiguous country. Reconcile every client with
  // its complete insurer links, then authorize each *projected client* against
@@ -390,7 +395,7 @@ async function readScopedRelatedList({db,auth,request}){
  // every existing policy.  A requested page is a lookup hint, NEVER authority.
  // Parents and scopes are verified server-side for every returned record.
  // Unlike the earlier Cobros fast path, client-only real receipts are retained.
- if(['vehiculos','recibosEsperados','carteraPrimas','cobros'].includes(coll)&&!policyId&&!hasBatch){
+ if(['vehiculos','recibosEsperados','carteraPrimas','cobros','conciliaciones','conciliacionesPrimas'].includes(coll)&&!policyId&&!hasBatch){
    const MAX_SCANNED=3000,RAW_PAGE=100,PARENT_CONCURRENCY=10;
    const parents=new Map();
    async function verifiedParent(kind,id){

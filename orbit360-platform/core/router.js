@@ -21,7 +21,9 @@ Orbit.router = (function () {
     polizas: ['polizas', 'clientes', 'aseguradoras', 'vehiculos'],
     cobros: ['cobros', 'clientes', 'polizas', 'recibosEsperados', 'carteraPrimas'],
     cronograma: ['clientes', 'polizas', 'recibosEsperados', 'carteraPrimas', 'cobros', 'gestiones', 'tareas'],
-    conciliaciones: ['cobros', 'polizas', 'clientes', 'finmovs'],
+    // Demand-load formal proposals only on this route. Cobros retains the
+    // operational payment owner and is not requested merely for this table.
+    conciliaciones: ['conciliaciones', 'conciliacionesPrimas'],
     renovaciones: ['polizas', 'clientes', 'aseguradoras', 'gestiones'],
     comisiones: ['comisiones', 'polizas', 'clientes'],
     calidad: ['clientes', 'polizas', 'asesores'],
