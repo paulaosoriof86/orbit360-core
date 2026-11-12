@@ -35,7 +35,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          test "$(git hash-object functions/product-operational-domain.js)" = '60722d67bb873f321d91ced02c31ae999e13ae5a'
+          test "$(git hash-object functions/product-operational-domain.js)" = '416775a865e8b23ae7e8bbb604c8d7c519297517'
           node tools/gravicentra-i6-6-insurer-assets-bucket.test.cjs
           node --check tools/gravicentra-i6-6-insurer-logo-live-signed-qa.cjs
           node --check functions/product-operational-domain.js
