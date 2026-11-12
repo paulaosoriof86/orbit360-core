@@ -1,8 +1,9 @@
 # I6.6 successor, build-only. B4-003/004/005/006/007 historic gates are immutable.
-# This workflow performs no Hosting/Functions deployment, no Firestore mutation,
-# no Rules/Auth modification and no preview/live release promotion.
-# Separate approval, isolated Preview readback and exact-artifact LIVE promotion
-# are mandatory after this package is certified.
+# The default mode builds and verifies an isolated Hosting Preview without
+# modifying LIVE. Owner-approved reader-preview mode reuses the exact immutable
+# artifact and deploys ONLY the existing scoped reader Preview callable.
+# No Firestore, Rules/Auth, other Function, or LIVE Hosting writes are permitted.
+# LIVE promotion remains a separate human gate.
 name: Gravicentra I6.6 Build Immutable Release Package
 
 on:
@@ -44,10 +45,27 @@ jobs:
           const c=JSON.parse(fs.readFileSync('artifacts/orbit360-recovery/release-control/I6_6_RELEASE_TRANSPORT_CONTROL_20261110.json','utf8'));
           const scopedPreview=c.status==='PAYMENT_FUNCTION_PREVIEW_AUTHORIZED'&&c.backendFunctionPreviewOnly===true&&c.forbidBackendLiveFunctionDeploy===true&&c.livePromotionAuthorized===false&&c.previewApproved===false;
           const scopedLive=c.status==='PAYMENT_LIVE_FUNCTION_PROMOTION_AUTHORIZED'&&c.liveFunctionScope==='orbit360CobrosReconciliationCommand'&&c.noHostingPromotion===true&&c.forbidBackendLiveFunctionDeploy===false&&c.livePromotionAuthorized===true&&c.previewApproved===true&&c.previewFunctionRunId===42955048019;
-          if(c.schema!=='GRAVICENTRA_I6_6_SINGLE_ARTIFACT_RELEASE_TRANSPORT_V1'||c.gate!=='I6.6'||c.historicalClosedGate!=='B4-007'||(c.forbidBackendFunctionDeploy!==true&&!scopedPreview&&!scopedLive)||c.forbidFirestoreRulesDataAuthWrites!==true)throw Error('I66_TRANSPORT_SCOPE_INVALID');
-          if((scopedPreview||scopedLive)&&(!/^[0-9a-f]{40}$/.test(c.approvedSourceSha||'')||!(c.sourceBuildWorkflowRunId>0)||!(c.immutableArtifactId>0)||!/^[0-9a-f]{64}$/.test(String(c.immutableArtifactZipDigest||'').replace(/^sha256:/,''))))throw Error('I66_PAYMENT_SCOPED_RELEASE_PROOF_MISSING');
+          const reader=c.readerPreviewAuthorization||{};
+          const readerPreview=c.status==='CONCILIACIONES_READER_PREVIEW_AUTHORIZED'&&
+            c.backendFunctionPreviewOnly===true&&c.forbidBackendLiveFunctionDeploy===true&&
+            c.livePromotionAuthorized===false&&c.previewApproved===false&&
+            c.forbidBackendFunctionDeploy===false&&c.noHostingPromotion===true&&
+            reader.targetFunction==='orbit360ScopedPolicyReadPreview'&&reader.region==='us-east1'&&
+            reader.sourceCommit==='a4763f794559d15d5462ae71d12bc0b61dd1120c'&&
+            reader.sourceWorkflowRunId===43139926207&&reader.sourceArtifactId===13908838564&&
+            reader.dataWritesPermitted===false&&reader.liveBackendDeployPermitted===false&&
+            reader.hostingPromotionPermitted===false&&
+            c.approvedSourceSha===reader.sourceCommit&&
+            c.sourceBuildWorkflowRunId===reader.sourceWorkflowRunId&&
+            c.immutableArtifactId===reader.sourceArtifactId&&
+            c.immutableArtifactZipDigest==='sha256:dc22a21b1bda7812196303442256df18759b3cd6544db53df3f11c634250368d'&&
+            c.sourcePreviewChannelId==='gi-i66-rc-43139926207'&&
+            c.sourcePreviewUrl==='https://ays-orbit-360-lab--gi-i66-rc-43139926207-ua8r8jvc.web.app';
+          if(c.schema!=='GRAVICENTRA_I6_6_SINGLE_ARTIFACT_RELEASE_TRANSPORT_V1'||c.gate!=='I6.6'||c.historicalClosedGate!=='B4-007'||(c.forbidBackendFunctionDeploy!==true&&!scopedPreview&&!scopedLive&&!readerPreview)||c.forbidFirestoreRulesDataAuthWrites!==true)throw Error('I66_TRANSPORT_SCOPE_INVALID');
+          if((scopedPreview||scopedLive||readerPreview)&&(!/^[0-9a-f]{40}$/.test(c.approvedSourceSha||'')||!(c.sourceBuildWorkflowRunId>0)||!(c.immutableArtifactId>0)||!/^[0-9a-f]{64}$/.test(String(c.immutableArtifactZipDigest||'').replace(/^sha256:/,''))))throw Error('I66_SCOPED_RELEASE_PROOF_MISSING');
           let mode='disabled',source='';
           if(c.status==='PREVIEW_BUILD_REQUESTED'&&c.livePromotionAuthorized===false)mode='package';
+          if(readerPreview){mode='reader-preview';source=reader.sourceCommit;}
           if(c.status==='LIVE_PROMOTION_APPROVED'&&c.livePromotionAuthorized===true&&c.previewApproved===true){
             if(!/^[0-9a-f]{40}$/.test(c.approvedSourceSha||'')||!(c.sourceBuildWorkflowRunId>0)||!/^[0-9a-f]{64}$/.test(c.immutableTarSha256||'')||!/^gi-i66-rc-[0-9]+$/.test(c.sourcePreviewChannelId||''))throw Error('I66_LIVE_PROMOTION_PROOF_MISSING');
             throw Error('I66_LIVE_PROMOTION_REQUIRES_SEPARATE_APPROVED_EXACT_ARTIFACT_TRANSPORT');
@@ -313,3 +331,209 @@ jobs:
           echo "- Preview URL: $PREVIEW_URL" >> "$GITHUB_STEP_SUMMARY"
           echo "- LIVE and staff-origin fingerprints: UNCHANGED" >> "$GITHUB_STEP_SUMMARY"
           echo "- LIVE promotion: REQUIRES SEPARATE HUMAN GATE" >> "$GITHUB_STEP_SUMMARY"
+
+  protected-conciliaciones-reader-preview:
+    needs: gate
+    if: >-
+      needs.gate.outputs.mode == 'reader-preview' &&
+      github.repository == 'paulaosoriof86/orbit360-core' &&
+      github.ref == 'refs/heads/recovery/fase-a-clean-20260831'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    env:
+      PROJECT_ID: ays-orbit-360-lab
+      SOURCE_SHA: a4763f794559d15d5462ae71d12bc0b61dd1120c
+      SOURCE_RUN: '43139926207'
+      ARTIFACT_ID: '13908838564'
+      ARTIFACT_DIGEST: sha256:dc22a21b1bda7812196303442256df18759b3cd6544db53df3f11c634250368d
+      TARGET_FUNCTION: orbit360ScopedPolicyReadPreview
+      TARGET_REGION: us-east1
+      SA_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_LAB_ALT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+    steps:
+      - name: Checkout approved control only and verify exact authorization
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Refuse any wrong source, artifact, scope, or release target
+        env:
+          GH_READ_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          node - <<'NODE'
+          const fs=require('node:fs');
+          const c=JSON.parse(fs.readFileSync('artifacts/orbit360-recovery/release-control/I6_6_RELEASE_TRANSPORT_CONTROL_20261110.json','utf8'));
+          const r=c.readerPreviewAuthorization||{};
+          if(c.status!=='CONCILIACIONES_READER_PREVIEW_AUTHORIZED'||
+             c.forbidFirestoreRulesDataAuthWrites!==true||c.forbidBackendLiveFunctionDeploy!==true||
+             c.forbidBackendFunctionDeploy!==false||c.backendFunctionPreviewOnly!==true||
+             c.livePromotionAuthorized!==false||c.previewApproved!==false||
+             r.targetFunction!==process.env.TARGET_FUNCTION||r.region!==process.env.TARGET_REGION||
+             r.sourceCommit!==process.env.SOURCE_SHA||r.sourceWorkflowRunId!==Number(process.env.SOURCE_RUN)||
+             r.sourceArtifactId!==Number(process.env.ARTIFACT_ID)||
+             r.dataWritesPermitted!==false||r.liveBackendDeployPermitted!==false||
+             r.hostingPromotionPermitted!==false||
+             c.immutableArtifactZipDigest!==process.env.ARTIFACT_DIGEST||
+             c.approvedSourceSha!==process.env.SOURCE_SHA||
+             c.sourcePreviewChannelId!=='gi-i66-rc-43139926207')
+            throw Error('I66_READER_PREVIEW_AUTHORIZATION_OR_IMMUTABLE_SOURCE_DRIFT');
+          NODE
+          curl -fsSL --retry 3 --retry-delay 2 -H "Authorization: Bearer $GH_READ_TOKEN" \
+            "https://api.github.com/repos/$GITHUB_REPOSITORY/actions/runs/$SOURCE_RUN" > "$RUNNER_TEMP/i66-read-source-run.json"
+          curl -fsSL --retry 3 --retry-delay 2 -H "Authorization: Bearer $GH_READ_TOKEN" \
+            "https://api.github.com/repos/$GITHUB_REPOSITORY/actions/artifacts/$ARTIFACT_ID" > "$RUNNER_TEMP/i66-read-source-artifact.json"
+          node - <<'NODE'
+          const fs=require('node:fs');
+          const run=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/i66-read-source-run.json','utf8'));
+          const a=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/i66-read-source-artifact.json','utf8'));
+          if(run.id!==Number(process.env.SOURCE_RUN)||run.head_sha!==process.env.SOURCE_SHA||
+             run.status!=='completed'||run.conclusion!=='success'||run.head_branch!=='recovery/fase-a-clean-20260831'||
+             a.id!==Number(process.env.ARTIFACT_ID)||a.expired!==false||
+             a.digest!==process.env.ARTIFACT_DIGEST||
+             a.name!=='gi-i66-immutable-'+process.env.SOURCE_SHA||
+             a.workflow_run?.id!==Number(process.env.SOURCE_RUN)||
+             a.workflow_run?.head_sha!==process.env.SOURCE_SHA)
+            throw Error('I66_READER_PREVIEW_SIGNED_SOURCE_ARTIFACT_READBACK_REJECTED');
+          console.log('I66_READER_PREVIEW_EXACT_ARTIFACT_PROVENANCE_PASS');
+          NODE
+
+      - name: Download existing certified immutable artifact; never rebuild
+        uses: actions/download-artifact@v4
+        with:
+          run-id: 43139926207
+          artifact-ids: 13908838564
+          github-token: ${{ github.token }}
+          path: ${{ runner.temp }}/gi-i66-reader-artifact
+
+      - name: Verify byte-exact archive and protected reader source before deployment
+        run: |
+          set -euo pipefail
+          DOWNLOAD="$RUNNER_TEMP/gi-i66-reader-artifact"
+          mapfile -t TARS < <(find "$DOWNLOAD" -type f -name 'gi-i66-exact-package.tar.gz')
+          mapfile -t SUMS < <(find "$DOWNLOAD" -type f -name 'gi-i66-exact-package.sha256')
+          test "${#TARS[@]}" -eq 1
+          test "${#SUMS[@]}" -eq 1
+          test "$(dirname "${TARS[0]}")" = "$(dirname "${SUMS[0]}")"
+          (cd "$(dirname "${TARS[0]}")" && sha256sum --check gi-i66-exact-package.sha256)
+          PACKAGE="$RUNNER_TEMP/gi-i66-reader-certified"
+          mkdir -p "$PACKAGE"
+          tar -xzf "${TARS[0]}" -C "$PACKAGE"
+          BACKEND="$PACKAGE/bundle/backend"
+          test -f "$PACKAGE/bundle/site/__recovery__/build.json"
+          test -f "$BACKEND/bootstrap.js"
+          test -f "$BACKEND/b4-003-scoped-policy-callable.js"
+          test "$(git hash-object "$BACKEND/b4-003-scoped-access-boundary.js")" = 38fa8cee808be6b92b65150625e69b0f93639564
+          test "$(git hash-object "$BACKEND/b4-003-scoped-related-reader.js")" = 849cc33c7bf048787b3f1a35e176a3baa5285fc7
+          node --check "$BACKEND/b4-003-scoped-policy-callable.js"
+          node --check "$BACKEND/b4-003-scoped-related-reader.js"
+          node --check "$BACKEND/bootstrap.js"
+          export PACKAGE
+          node - <<'NODE'
+          const fs=require('node:fs'),p=process.env.PACKAGE+'/bundle';
+          const b=JSON.parse(fs.readFileSync(p+'/site/__recovery__/build.json','utf8'));
+          const code=fs.readFileSync(p+'/backend/bootstrap.js','utf8');
+          const reader=fs.readFileSync(p+'/backend/b4-003-scoped-policy-callable.js','utf8');
+          if(b.sourceSha!==process.env.SOURCE_SHA||b.gate!=='I6.6'||
+             !code.includes("require('./b4-003-scoped-policy-callable')")||
+             !reader.includes('orbit360ScopedPolicyReadPreview:onCall(opts,handle)')||
+             !reader.includes('const {readScopedRelatedDocument,readScopedRelatedList}'))
+             throw Error('I66_READER_PREVIEW_BACKEND_PACKAGE_OR_EXPORT_DRIFT');
+          console.log('I66_READER_PREVIEW_CERTIFIED_BACKEND_BYTES_PASS');
+          NODE
+          echo "I66_READER_PACKAGE=$PACKAGE" >> "$GITHUB_ENV"
+
+      - name: Select existing scoped LAB credentials and snapshot both LIVE Hosting origins
+        run: |
+          set -euo pipefail
+          curl -fsSL --max-time 30 https://ays-orbit-360-lab.web.app/ | sha256sum > "$RUNNER_TEMP/i66-reader-live-lab-before.sha"
+          curl -fsSL --max-time 30 https://app.aysseguros.com/ | sha256sum > "$RUNNER_TEMP/i66-reader-live-staff-before.sha"
+          mkdir -p "$RUNNER_TEMP/i66-reader-auth"
+          python3 - <<'PY'
+          import json,os,pathlib
+          root=pathlib.Path(os.environ['RUNNER_TEMP'])/'i66-reader-auth'
+          found=[]
+          for n,key in enumerate(('SA_LAB','SA_LAB_ALT','SA_DEFAULT')):
+            try: obj=json.loads(os.environ.get(key,''))
+            except (ValueError,TypeError): continue
+            if obj.get('type')=='service_account' and obj.get('project_id')==os.environ['PROJECT_ID'] and obj.get('private_key'):
+              p=root/f'{n}.json';p.write_text(json.dumps(obj));p.chmod(0o600);found.append(str(p))
+          if not found:raise SystemExit('I66_READER_PREVIEW_EXISTING_LAB_ACCOUNT_MISSING')
+          (root/'candidates').write_text('\n'.join(found)+'\n')
+          PY
+          npm install --prefix "$RUNNER_TEMP/i66-reader-cli" --no-save --ignore-scripts --no-audit --no-fund firebase-tools@14.10.1 >/dev/null
+          node tools/gravicentra-firebase-tools-empty-extensions-workaround-v1.mjs "$RUNNER_TEMP/i66-reader-cli"
+          CLI="$RUNNER_TEMP/i66-reader-cli/node_modules/firebase-tools/lib/bin/firebase.js"
+          selected=''
+          while IFS= read -r candidate; do
+            if GOOGLE_APPLICATION_CREDENTIALS="$candidate" node "$CLI" functions:list --project "$PROJECT_ID" --non-interactive --json >/dev/null 2>&1; then
+              selected="$candidate";break
+            fi
+          done < "$RUNNER_TEMP/i66-reader-auth/candidates"
+          test -n "$selected"
+          cp "$selected" "$RUNNER_TEMP/i66-reader-auth/selected.json"
+          chmod 600 "$RUNNER_TEMP/i66-reader-auth/selected.json"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$RUNNER_TEMP/i66-reader-auth/selected.json" >> "$GITHUB_ENV"
+          echo "FIREBASE_CLI_BIN=$CLI" >> "$GITHUB_ENV"
+
+      - name: Prove target is an existing Preview function; build only a Functions config
+        run: |
+          set -euo pipefail
+          node "$FIREBASE_CLI_BIN" functions:list --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/i66-reader-functions-before.json"
+          node - <<'NODE'
+          const fs=require('node:fs');
+          const x=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/i66-reader-functions-before.json','utf8'));
+          const all=Array.isArray(x.result)?x.result:Array.isArray(x)?x:[];
+          const preview=all.filter(r=>[r.entryPoint,r.id,r.name].some(x=>String(x||'').includes('orbit360ScopedPolicyReadPreview')));
+          if(preview.length!==1)throw Error('I66_READER_PREVIEW_EXISTING_TARGET_NOT_EXACTLY_ONE');
+          if(String(preview[0].region||preview[0].location||'us-east1')!=='us-east1')
+            throw Error('I66_READER_PREVIEW_REGION_DRIFT');
+          const live=all.filter(r=>String(r.entryPoint||r.id||r.name||'').includes('orbit360ScopedPolicyRead')&&!String(r.entryPoint||r.id||r.name||'').includes('Preview'));
+          if(live.length!==1)throw Error('I66_READER_LIVE_CONTROL_TARGET_NOT_EXACTLY_ONE');
+          NODE
+          (cd "$I66_READER_PACKAGE/bundle/backend" && npm ci --ignore-scripts --no-audit --no-fund >/dev/null)
+          printf '{"functions":{"source":"backend","runtime":"nodejs22"}}\n' > "$I66_READER_PACKAGE/bundle/firebase.json"
+
+      - name: Deploy exclusively one authorized existing scoped callable to Preview
+        run: |
+          set -euo pipefail
+          cd "$I66_READER_PACKAGE/bundle"
+          node "$FIREBASE_CLI_BIN" deploy --only functions:orbit360ScopedPolicyReadPreview --config firebase.json --project "$PROJECT_ID" --non-interactive
+          echo "I66_READER_PREVIEW_ONLY_DEPLOY_COMPLETED"
+
+      - name: Read back target and prove all other Functions and both LIVE origins unchanged
+        run: |
+          set -euo pipefail
+          node "$FIREBASE_CLI_BIN" functions:list --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/i66-reader-functions-after.json"
+          node - <<'NODE'
+          const fs=require('node:fs'),base=process.env.RUNNER_TEMP+'/i66-reader-functions-';
+          const norm=file=>{
+            const x=JSON.parse(fs.readFileSync(file,'utf8'));return Array.isArray(x.result)?x.result:Array.isArray(x)?x:[];
+          };
+          const before=norm(base+'before.json'),after=norm(base+'after.json');
+          const id=x=>String(x.entryPoint||x.id||x.name||'');
+          const names=all=>all.filter(x=>!id(x).includes('orbit360ScopedPolicyReadPreview')).map(id).sort();
+          if(JSON.stringify(names(before))!==JSON.stringify(names(after)))
+            throw Error('I66_READER_PREVIEW_OTHER_FUNCTION_INVENTORY_DRIFT');
+          const target=after.filter(x=>[x.entryPoint,x.id,x.name].some(y=>String(y||'').includes('orbit360ScopedPolicyReadPreview')));
+          if(target.length!==1)throw Error('I66_READER_PREVIEW_TARGET_MISSING_AFTER_DEPLOY');
+          console.log('I66_READER_PREVIEW_SINGLE_FUNCTION_INVENTORY_PASS');
+          NODE
+          status=$(curl --silent --show-error --output /dev/null --write-out '%{http_code}' --max-time 25 --head https://us-east1-ays-orbit-360-lab.cloudfunctions.net/orbit360ScopedPolicyReadPreview)
+          test "$status" = 400
+          curl -fsSL --max-time 30 https://ays-orbit-360-lab.web.app/ | sha256sum > "$RUNNER_TEMP/i66-reader-live-lab-after.sha"
+          curl -fsSL --max-time 30 https://app.aysseguros.com/ | sha256sum > "$RUNNER_TEMP/i66-reader-live-staff-after.sha"
+          cmp "$RUNNER_TEMP/i66-reader-live-lab-before.sha" "$RUNNER_TEMP/i66-reader-live-lab-after.sha"
+          cmp "$RUNNER_TEMP/i66-reader-live-staff-before.sha" "$RUNNER_TEMP/i66-reader-live-staff-after.sha"
+          echo "I66_READER_PREVIEW_TECHNICAL_READBACK_PASS_ONE_FUNCTION_ZERO_LIVE_WRITES"
+          echo "## I6.6 — Conciliaciones protected reader Preview only" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Certified source: $SOURCE_SHA; run $SOURCE_RUN; artifact $ARTIFACT_ID" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Deployed: $TARGET_FUNCTION in $TARGET_REGION (1 existing function only)" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Unauthenticated endpoint guard: HTTP 400 (callable protocol)" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Other Functions inventory and both LIVE Hosting origins: UNCHANGED" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Firestore document writes, Rules/Auth/IAM and Hosting promotion: NONE" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Authenticated role/country Preview UAT: PENDING" >> "$GITHUB_STEP_SUMMARY"
