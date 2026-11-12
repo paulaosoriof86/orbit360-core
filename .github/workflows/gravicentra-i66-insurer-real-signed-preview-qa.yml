@@ -16,8 +16,8 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     env:
-      SOURCE_SHA: f3341e24ad5fa35bac419e42a1cdf2882a284075
-      PREVIEW_ORIGIN: https://ays-orbit-360-lab--gi-i66-rc-43157739496-d0l3mxpf.web.app
+      SOURCE_SHA: 0a54148547282b07536d5cc1c92854b023f23d71
+      PREVIEW_ORIGIN: https://ays-orbit-360-lab--gi-i66-rc-43293845272-j4qucpnj.web.app
       LIVE_ORIGIN: https://app.aysseguros.com
       SA_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
       SA_ALT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
