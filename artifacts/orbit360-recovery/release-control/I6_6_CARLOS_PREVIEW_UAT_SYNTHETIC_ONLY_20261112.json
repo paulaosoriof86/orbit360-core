@@ -14,7 +14,13 @@
     "backendPreviewDeployRun": 43297485061,
     "backendPreviewDeployResult": "SUCCESS_ORIGINAL_IMMUTABLE_0a541",
     "test": "tools/gravicentra-i6-6-carlos-preview-synthetic-write-gate.test.cjs",
-    "testStatus": "SOURCE_UNIT_16_PASS_NEW_SOURCE_NOT_YET_PUBLISHED"
+    "testStatus": "SOURCE_UNIT_12_TRANSPORT_CASES_6_SERVER_GUARD_MARKERS_PASS",
+    "successorSourceSha": "b86cad550fadc050e8574678f02f3097caa8b5bd",
+    "successorBuildRunId": 43299843267,
+    "successorImmutableArtifactId": 13980273112,
+    "successorImmutableArtifactZipDigest": "sha256:50e0d0d51ecdc9302a40a58abb96dd6949ee66f45c2dd3bbd5e258adcdc0657a",
+    "successorHostingPreviewUrl": "https://ays-orbit-360-lab--gi-i66-rc-43299843267-qispe7e9.web.app",
+    "successorHostingReadback": "PASS_ALL_IMMUTABLE_FILES"
   },
   "forbidden": ["Real customer or financial Firestore writes before signed UAT", "LIVE deployment before exact successor preview/readback/QA", "Firestore Rules/Auth/IAM mutation", "New Firebase or branch", "Blind promotion of previous artifact", "Legal-consent bypass or impersonated acceptance"],
   "frozenBlocks": [
@@ -26,8 +32,8 @@
     {"id":"PREVIEW_BACKEND_THREE_TARGETS","done":3,"total":3,"percent":100,"status":"DEPLOY_READBACK_PASS_43297485061_PRIOR_SOURCE"},
     {"id":"NEXT_LIVE_PROMOTION","done":0,"total":1,"percent":0,"status":"HOLD_PENDING_SIGNED_FUNCTIONAL_UAT"}
   ],
-  "nextExactAction": "Package the changed product source exactly once on canonical recovery with preview build/run source digest, republish the same candidate to its new immutable Preview channel, redeploy only the three existing synthetic-guarded Preview functions from that artifact, and run signed Carlos + Paula UAT with before/after synthetic restore. Only after acceptance promote exact tested bytes to LIVE.",
+  "nextExactAction": "From the new immutable b86cad Hosting Preview package, redeploy only the three existing synthetic-guarded Preview functions; run signed Carlos + Paula UAT with before/after synthetic restore. Only after acceptance promote exact tested bytes to LIVE.",
   "productLiveStatus": "UNCHANGED_PRIOR_RELEASE",
-  "previewSignedWritesStatus": "PENDING_NEW_IMMUTABLE_SOURCE",
+  "previewSignedWritesStatus": "IMMUTABLE_SOURCE_AND_HOSTING_PASS_FUNCTION_REDEPLOY_AND_SIGNED_WRITE_HOLD",
   "customerDataWritesThisReceipt": 0
 }

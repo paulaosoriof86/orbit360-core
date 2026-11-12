@@ -55,10 +55,10 @@ jobs:
             carlos.protectedSyntheticQaOnly===true&&carlos.allowRealCustomerDataWrites===false&&
             carlos.allowFirestoreRulesAuthIamChange===false&&carlos.allowHostingLivePromotion===false&&
             carlos.allowBackendLivePromotion===false&&carlos.signedCarlosDurableReadbackAndRestore==='HOLD'&&
-            carlos.sourceCommit==='0a54148547282b07536d5cc1c92854b023f23d71'&&
-            carlos.immutableBuildRunId===43293845272&&carlos.immutableArtifactId===13977703391&&
-            carlos.immutableArtifactZipDigest==='sha256:000572953a2fd39e95b4efabb3975a485d61675d5a317adf7643e18d835c97e7'&&
-            carlos.hostingPreviewChannel==='gi-i66-rc-43293845272'&&
+            carlos.sourceCommit==='b86cad550fadc050e8574678f02f3097caa8b5bd'&&
+            carlos.immutableBuildRunId===43299843267&&carlos.immutableArtifactId===13980273112&&
+            carlos.immutableArtifactZipDigest==='sha256:50e0d0d51ecdc9302a40a58abb96dd6949ee66f45c2dd3bbd5e258adcdc0657a'&&
+            carlos.hostingPreviewChannel==='gi-i66-rc-43299843267'&&
             c.approvedSourceSha===carlos.sourceCommit&&c.sourceBuildWorkflowRunId===carlos.immutableBuildRunId&&
             c.immutableArtifactId===carlos.immutableArtifactId&&
             c.immutableArtifactZipDigest===carlos.immutableArtifactZipDigest;

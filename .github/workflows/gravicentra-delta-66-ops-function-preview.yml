@@ -1,4 +1,4 @@
-# I6.6 Carlos all-scope Preview callables, exact 0a541 artifact; no LIVE/Firestore business writes.
+# I6.6 Carlos all-scope Preview callables, exact b86cad synthetic-only artifact; no LIVE or real customer writes.
 name: Gravicentra I6.6 Carlos Transversal Function Preview
 on:
   push:
@@ -19,13 +19,13 @@ jobs:
     timeout-minutes: 35
     env:
       PROJECT_ID: ays-orbit-360-lab
-      SOURCE_SHA: 0a54148547282b07536d5cc1c92854b023f23d71
-      ARTIFACT_ID: '13977703391'
-      ARTIFACT_DIGEST: sha256:000572953a2fd39e95b4efabb3975a485d61675d5a317adf7643e18d835c97e7
-      ARTIFACT_RUN: '43293845272'
-      EMULATOR_QA_RUN: '43293845340'
-      PREVIEW_CHANNEL: gi-i66-rc-43293845272
-      PREVIEW_URL: https://ays-orbit-360-lab--gi-i66-rc-43293845272-j4qucpnj.web.app
+      SOURCE_SHA: b86cad550fadc050e8574678f02f3097caa8b5bd
+      ARTIFACT_ID: '13980273112'
+      ARTIFACT_DIGEST: sha256:50e0d0d51ecdc9302a40a58abb96dd6949ee66f45c2dd3bbd5e258adcdc0657a
+      ARTIFACT_RUN: '43299843267'
+      EMULATOR_QA_RUN: '43299843202'
+      PREVIEW_CHANNEL: gi-i66-rc-43299843267
+      PREVIEW_URL: https://ays-orbit-360-lab--gi-i66-rc-43299843267-qispe7e9.web.app
       SA_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
       SA_ALT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
       SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
@@ -47,6 +47,7 @@ jobs:
           test -z "$(git diff --name-only "$SOURCE_SHA" HEAD -- orbit360-platform functions firebase.json firestore.rules storage.rules)"
           node tools/gravicentra-i6-6-carlos-ops-tasks-transversal.test.cjs
           node tools/gravicentra-i6-6-ops-crud-role-country.test.cjs
+          node tools/gravicentra-i6-6-carlos-preview-synthetic-write-gate.test.cjs
           node - <<'NODE'
           const fs=require('node:fs'),assert=require('node:assert/strict');
           const c=JSON.parse(fs.readFileSync('artifacts/orbit360-recovery/release-control/I6_6_RELEASE_TRANSPORT_CONTROL_20261110.json'));
@@ -86,8 +87,8 @@ jobs:
           NODE
       - uses: actions/download-artifact@v4
         with:
-          artifact-ids: 13977703391
-          run-id: 43293845272
+          artifact-ids: 13980273112
+          run-id: 43299843267
           github-token: ${{ github.token }}
           path: ${{ runner.temp }}/ops-package-downloaded
       - name: Verify one TAR and backend bytes; use original source only
