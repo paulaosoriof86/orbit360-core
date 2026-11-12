@@ -163,6 +163,21 @@ async function one(browser,actor){
     assert.equal(portfolio.size,1,'I66_RENEWAL_EXPECTED_PORTFOLIO_NOT_ONE');
     assert.equal(receipts.docs[0].data()?.id,'cob_'+outcome+'_001');
     assert.equal(portfolio.docs[0].data()?.reciboId,receipts.docs[0].id);
+    // Beyond the guarded issuance callable, certify the normal signed policy
+    // editor for Operativo and Direccion. The test policy belongs to a
+    // deliberately foreign adviser ID inside the authorized GT tenant; the
+    // active Operativo role must inherit roleScopes=all for both read AND write.
+    await page.waitForFunction(id=>!!window.Orbit?.store?.get?.('polizas',id),outcome,{timeout:30000});
+    const manualEditNote='I6.6 QA signed policy editing only '+actor.role+' '+suffix;
+    const manualEdit=await page.evaluate(async x=>Orbit.store.updateDurable('polizas',x.id,
+      {observaciones:x.note}),{id:outcome,note:manualEditNote});
+    assert.notEqual(manualEdit?.ok,false,
+      'I66_RENEWAL_SIGNED_MANUAL_POLICY_EDIT_REJECTED_'+actor.role);
+    assert.equal((await item('polizas',outcome).get()).data()?.observaciones,manualEditNote,
+      'I66_RENEWAL_SIGNED_MANUAL_POLICY_EDIT_FIRESTORE_MISSING_'+actor.role);
+    assert.equal((await item('polizas',outcome).get()).data()?.updatedByUid,actor.uid,
+      'I66_RENEWAL_SIGNED_MANUAL_POLICY_EDIT_AUDIT_MISSING_'+actor.role);
+    console.log('I66_LIVE_'+actor.role.toUpperCase()+'_SIGNED_NORMAL_POLICY_EDITOR_CROSS_ADVISOR_GT_WRITE_PASS');
     const repeat=await page.evaluate(async x=>Orbit.issuance.createDirectRenewal(x.id,x.data,
       {operationId:x.op,motivo:'I6.6 synthetic idempotent replay'}),{id:ids.management,data:input,op});
     assert.ok(repeat?.ok&&repeat.alreadyCreated&&repeat.policy?.id===outcome,'I66_RENEWAL_REPLAY_DUPLICATES');
@@ -172,8 +187,9 @@ async function one(browser,actor){
       await p.initialize();await p.waitForUser();await Orbit.productAppP0.activate();});
     await page.evaluate(async()=>{await Orbit.store._ensureCollections(['gestiones','polizas','recibosEsperados','carteraPrimas']);});
     await page.waitForFunction(x=>Orbit.store?.get?.('polizas',x.policy)?.renuevaDe===x.source&&
+      Orbit.store?.get?.('polizas',x.policy)?.observaciones===x.note&&
       Orbit.store?.get?.('gestiones',x.management)?.directRenewalPolicyId===x.policy,
-      {policy:outcome,source:ids.source,management:ids.management},{timeout:30000});
+      {policy:outcome,source:ids.source,management:ids.management,note:manualEditNote},{timeout:30000});
     console.log('I66_LIVE_'+actor.role.toUpperCase()+'_DIRECT_RENEWAL_SYNTHETIC_POLICY_RECEIPT_PORTFOLIO_OPS_LINKS_RELOAD_IDEMPOTENCE_PASS');
   }finally{
     const errors=[];
