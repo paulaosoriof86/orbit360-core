@@ -109,6 +109,10 @@ async function actorUat(browser,actor){
     assert.equal(t?.id,task,'I66_LIVE_SIGNED_TASK_CREATE_FAILED_'+actor.role);
     await page.evaluate(async id=>Orbit.store.updateDurable('tareas',id,{done:true}),task);
     assert.equal((await items('tareas',task).get()).data()?.done,true);
+    await page.evaluate(()=>document.querySelector('#op-show-tasks')?.click());
+    await page.waitForFunction(id=>!!document.querySelector('[aria-label="Tareas de agenda en Ops"] [data-ops-task-toggle="'+id+'"]'),
+      task,{timeout:30000});
+    console.log('I66_LIVE_'+actor.role.toUpperCase()+'_SYNTHETIC_CRONOGRAMA_TASK_VISIBLE_IN_OPS_PASS');
     await page.reload({waitUntil:'commit',timeout:30000});
     await page.waitForFunction(()=>!!window.Orbit?.productRuntimeBrowserProvidersP0&&!!window.Orbit?.productAppP0,null,{timeout:30000});
     const after=await page.evaluate(async()=>{const p=Orbit.productRuntimeBrowserProvidersP0;await p.initialize();const u=await p.waitForUser();return{uid:u?.uid,started:(await Orbit.productAppP0.activate())?.started===true};});
@@ -116,6 +120,10 @@ async function actorUat(browser,actor){
     assert.equal((await items('gestiones',management).get()).data()?.estado,'Resuelta');
     assert.equal((await items('negocios',business).get()).data()?.nombre,testName+' actualizada');
     assert.equal((await items('tareas',task).get()).data()?.done,true);
+    await page.evaluate(()=>document.querySelector('#op-show-tasks')?.click());
+    await page.waitForFunction(id=>!!document.querySelector('[aria-label="Tareas de agenda en Ops"] [data-ops-task-toggle="'+id+'"]'),
+      task,{timeout:30000});
+    console.log('I66_LIVE_'+actor.role.toUpperCase()+'_SIGNED_TASK_OPS_PROJECTION_AFTER_RELOAD_PASS');
     console.log('I66_LIVE_'+actor.role.toUpperCase()+'_OPS_LEADS_TASKS_AND_POLICIES_RENEWALS_COBROS_WRITE_RIGHTS_SIGNED_PASS');
   }finally{
     const failures=[];
