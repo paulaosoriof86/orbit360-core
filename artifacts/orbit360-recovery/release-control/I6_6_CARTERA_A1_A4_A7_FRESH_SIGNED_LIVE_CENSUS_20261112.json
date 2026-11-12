@@ -1,0 +1,35 @@
+{
+  "schema": "GRAVICENTRA_I6_6_A1_A4_A7_SIGNED_LIVE_CENSUS_V1",
+  "dateGuatemala": "2026-11-12",
+  "gate": "I6.6",
+  "sourceAuthority": "PINNED_MAPFRE_AND_BANTRAB_INSURER_STATEMENTS_AND_DOCUMENTED_LA_CEIBA_FICOHSA_ROWS",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "certification": {
+    "runId": 43326553828,
+    "conclusion": "SUCCESS_READ_ONLY",
+    "artifactId": 13992054429,
+    "artifactSha256": "f42fd12f1e354d6db89cca2cde8077728767767d97065d5642778b16be3534a2",
+    "sameSnapshotTwice": true,
+    "tenant": "alianzas-soluciones",
+    "firestoreBusinessWrites": 0,
+    "paymentApplications": 0
+  },
+  "coverage": {
+    "sourceCases": 37,
+    "sourcePaidCases": 4,
+    "sourcePendingCases": 33,
+    "alreadyExistingExactPendingRequirements": ["A2.M2", "A2.M3"],
+    "alreadyExistingExactPendingCount": 2,
+    "heldNoExactRequirementAcrossEdition": 26,
+    "heldMissingExactPolicy": 9,
+    "heldConflictingExistingSourceReferenceOnSameDueAndAmount": 8,
+    "eligiblePaidSafeCASNow": 0,
+    "affectedFamilies": ["A1_MAPFRE_PAID", "A2_MAPFRE_PENDING", "A3_BANTRAB", "A4_LA_CEIBA", "A7_FICOHSA"],
+    "notCoveredByThisCensus": ["A5_ASEGURADORA_GENERAL", "A6_COLUMNA"]
+  },
+  "frozenBusinessDecision": "Never mutate a receipt merely because due date and amount agree when an occupied insurer reference differs. Preserve the legacy reference, determine the policy edition and unique source requirement first; paid application is disallowed for all four paid candidates in this readback.",
+  "nextSafeOperationalMiniBatch": "Design and validate deterministic creation of missing future/overdue insurer requirements only after unique edition, client, amount, due date and external insurer reference are proven with no conflicting existing receipt. Execute transactionally with before/after, idempotency, notification guard, audit and rollback; then LIVE readback. Missing policies require separate canonical client/policy creation first.",
+  "progressApplied": {"completedBlocks":0,"requiredBlocks":7,"percent":0},
+  "note": "A refreshed READ-ONLY census is not a completed financial write block and does not add receipts, policies, payments or reconciled cash."
+}

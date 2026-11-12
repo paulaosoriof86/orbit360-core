@@ -10,7 +10,7 @@
   "branch": "recovery/fase-a-clean-20260831",
   "forensicOriginSha": "9c95f31461f2eabe9804625b5659bee772f5602a",
   "createdAtUtc": "2026-08-31T18:00:00Z",
-  "updatedAtUtc": "2026-11-12T23:06:00Z",
+  "updatedAtUtc": "2026-11-12T23:12:00Z",
   "status": "I6_6_LIVE_CONTROLLED_PORTFOLIO_UPDATE_IN_PROGRESS",
   "currentIteration": 6,
   "lastCompletedIteration": 5,
@@ -120,6 +120,19 @@
       "dueAndAmountExactButConflictingExistingSourceReference": 8,
       "noneOfTheFourPaidSourceCasesMetExactSourceRequirementLiveCas": true,
       "liveReceiptOrPaymentWrites": 0,
+      "freshSignedA1A4A7CurrentLiveReadback20261112": {
+        "runId": 43326553828,
+        "artifactId": 13992054429,
+        "scope": "MAPFRE_BANTRAB_LA_CEIBA_FICOHSA_NOT_A5_OR_A6",
+        "sourceCases": 37,
+        "alreadyExactLinkedPending": 2,
+        "unmatchedExternalRequirementAcrossPolicyEditions": 26,
+        "missingExactPolicyIdentifier": 9,
+        "occupiedDifferentExternalReferenceSameDueAndAmount": 8,
+        "safePaidCandidates": 0,
+        "writes": 0,
+        "next": "No paid CAS is safe until external requirement identity and matching policy edition are resolved; build deterministic missing-requirement or edition candidate with no conflicting reference and verify under PREVIEW and reversible LIVE mini-batch."
+      },
       "interpretation": "Do not silently overwrite external source numbers or mark paid; reconcile the eight conflicting references with preserved before images and a protected transaction, and adjudicate missing policies and editions before new expected receipts."
     },
     "blocks": {
