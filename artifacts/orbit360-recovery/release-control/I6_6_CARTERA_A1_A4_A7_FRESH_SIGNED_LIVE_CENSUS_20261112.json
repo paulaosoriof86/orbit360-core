@@ -29,6 +29,28 @@
     "notCoveredByThisCensus": ["A5_ASEGURADORA_GENERAL", "A6_COLUMNA"]
   },
   "frozenBusinessDecision": "Never mutate a receipt merely because due date and amount agree when an occupied insurer reference differs. Preserve the legacy reference, determine the policy edition and unique source requirement first; paid application is disallowed for all four paid candidates in this readback.",
+  "driveCrossCheck20261112": {
+    "family": "A2_MAPFRE_PENDING",
+    "policyNumber": "SC-79829",
+    "liveLatestLocatedEdition": "2025-06-01/2026-06-01",
+    "documentedLaterCoverage": "2026-06-01/2027-06-01",
+    "latestRenewalEndorsement2026_2027Located": false,
+    "individualRequirement": {
+      "sourceReference": "138847044",
+      "dueDate": "2026-10-31",
+      "amountGTQ": 884.86,
+      "paidProven": false,
+      "driveId": "1rdkuQo22OX5ZTJqF3ASKwiWgXDuQHdMy"
+    },
+    "sourceStatement": {
+      "cutoff": "2026-11-02",
+      "driveId": "1hBTi5YJ1_AAdBba2MZI7nMxQFIks6rrf",
+      "laterPeriodExternalReferences": ["132044877", "135226671", "137345069", "138847044", "140557498"],
+      "allTheseRowsShownAsCollectionsPending": true
+    },
+    "previousPeriodEndorsementDriveId": "1INMEcvFfxiDCSjHcmKxoRfIwP2wGFn4M",
+    "decision": "HOLD_WRITE: do not attach current requirements to the expired policy edition or infer new coverage/premium terms from the old endorsement; request exact 2026-2027 renewal document or another insurer-issued authoritative policy record before creating the missing edition. Do not mark any stated requirement paid without independent paid evidence."
+  },
   "nextSafeOperationalMiniBatch": "Design and validate deterministic creation of missing future/overdue insurer requirements only after unique edition, client, amount, due date and external insurer reference are proven with no conflicting existing receipt. Execute transactionally with before/after, idempotency, notification guard, audit and rollback; then LIVE readback. Missing policies require separate canonical client/policy creation first.",
   "progressApplied": {"completedBlocks":0,"requiredBlocks":7,"percent":0},
   "note": "A refreshed READ-ONLY census is not a completed financial write block and does not add receipts, policies, payments or reconciled cash."
