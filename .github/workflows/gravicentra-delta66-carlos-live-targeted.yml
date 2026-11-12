@@ -160,7 +160,7 @@ jobs:
       - uses: google-github-actions/setup-gcloud@v2
         with:
           version: '>= 483.0.0'
-      - name: Snapshot two existing LIVE operational revisions and recoverable Hosting release
+      - name: Snapshot two existing LIVE operational revisions and immutable Hosting version
         run: |
           set -euo pipefail
           gcloud auth activate-service-account --key-file="$GOOGLE_APPLICATION_CREDENTIALS" --quiet >/dev/null
@@ -189,14 +189,28 @@ jobs:
             printf '%s|%s|%s\n' "$FN" "$SERVICE" "$REV" >> "$RUNNER_TEMP/carlos-live-two-old-revisions.tsv"
           done
           test "$(wc -l < "$RUNNER_TEMP/carlos-live-two-old-revisions.tsv")" -eq 2
-          RB="gi-i66-carlosrb-$GITHUB_RUN_ID"
-          node "$FIREBASE_CLI_BIN" hosting:clone "$SITE:live" "$SITE:$RB" --project "$PROJECT_ID" --non-interactive
-          echo "I66_CARLOS_ROLLBACK_CHANNEL=$RB" >> "$GITHUB_ENV"
+          # Hosting Preview channel quota must not block this release or
+          # produce another temporary channel. A resolved immutable LIVE
+          # version is directly cloneable and is a stronger rollback pointer.
+          TOKEN="$(gcloud auth print-access-token)"
+          curl -fsSL --retry 2 --max-time 25 -H "Authorization: Bearer $TOKEN" \
+            "https://firebasehosting.googleapis.com/v1beta1/sites/$SITE/channels/live/releases?pageSize=1" \
+            > "$RUNNER_TEMP/carlos-live-hosting-before.json"
+          unset TOKEN
+          OLD_VERSION_ID="$(node - <<'NODE'
+          const r=require(process.env.RUNNER_TEMP+'/carlos-live-hosting-before.json');
+          const name=String(r.releases?.[0]?.version?.name||'');
+          const match=name.match(/^sites\/ays-orbit-360-lab\/versions\/([A-Za-z0-9_-]+)$/);
+          if(!match)throw Error('CARLOS_HOSTING_PRIOR_IMMUTABLE_VERSION_NOT_RESOLVED');
+          process.stdout.write(match[1]);
+          NODE
+          )"
+          echo "I66_CARLOS_ROLLBACK_VERSION_ID=$OLD_VERSION_ID" >> "$GITHUB_ENV"
           FROOT="$RUNNER_TEMP/carlos-live-functions";mkdir -p "$FROOT"
           cp -a "$I66_PACKAGE_ROOT/bundle/backend" "$FROOT/backend"
           (cd "$FROOT/backend" && npm ci --ignore-scripts --no-audit --no-fund >/dev/null)
           printf '{"functions":{"source":"backend"}}\n' > "$FROOT/firebase.json"
-          echo "I66_CARLOS_TWO_FUNCTION_REVISIONS_AND_HOSTING_BACKUP_READY"
+          echo "I66_CARLOS_TWO_FUNCTION_REVISIONS_AND_IMMUTABLE_HOSTING_ROLLBACK_READY"
       - name: Promote exact Ops/Leads and ProductOperational writers, then identical Hosting with rollback
         run: |
           set -euo pipefail
@@ -209,7 +223,7 @@ jobs:
               while IFS='|' read -r fn service oldrev;do
                 gcloud run services update-traffic "$service" --region us-central1 --project "$PROJECT_ID" --to-revisions="$oldrev=100" --quiet || failed=1
               done < "$RUNNER_TEMP/carlos-live-two-old-revisions.tsv"
-              node "$FIREBASE_CLI_BIN" hosting:clone "$SITE:$I66_CARLOS_ROLLBACK_CHANNEL" "$SITE:live" --project "$PROJECT_ID" --non-interactive || failed=1
+              node "$FIREBASE_CLI_BIN" hosting:clone "$SITE@$I66_CARLOS_ROLLBACK_VERSION_ID" "$SITE:live" --project "$PROJECT_ID" --non-interactive || failed=1
               echo "I66_CARLOS_AUTO_ROLLBACK_ERRORS=$failed"
               if test "$failed" != 0;then echo 'I66_CARLOS_CRITICAL_ROLLBACK_UNCONFIRMED';fi
             fi
