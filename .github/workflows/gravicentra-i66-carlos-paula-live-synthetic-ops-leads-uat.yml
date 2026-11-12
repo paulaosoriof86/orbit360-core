@@ -1,0 +1,66 @@
+# I6.6 post-deploy signed Carlos/Direccion functional LIVE UAT.
+# Uses only synthetic records with guarded side-effect cleanup; no real clients.
+name: Gravicentra I6.6 Carlos Paula Signed LIVE Ops Leads UAT
+on:
+  push:
+    branches: [recovery/fase-a-clean-20260831]
+    paths:
+      - .github/workflows/gravicentra-i66-carlos-paula-live-synthetic-ops-leads-uat.yml
+      - tools/gravicentra-i6-6-carlos-paula-live-synthetic-ops-leads-uat.cjs
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: gi-i66-carlos-paula-live-signed-uat
+  cancel-in-progress: false
+jobs:
+  verify-live-writes:
+    if: github.repository == 'paulaosoriof86/orbit360-core' && github.ref_name == 'recovery/fase-a-clean-20260831'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    env:
+      I66_SOURCE_SHA: 1dd675ed59ac51fd122915ca8056f85f82fa12d6
+      I66_LIVE_ORIGIN: https://app.aysseguros.com
+      I66_LIVE_TRANSPORT_RUN: '43309935816'
+      SA_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_ALT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Gate exact transport LIVE success, unchanged product source and dual origin marker
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor "$I66_SOURCE_SHA" HEAD
+          test -z "$(git diff --name-only "$I66_SOURCE_SHA" HEAD -- orbit360-platform functions firebase.json firestore.rules storage.rules)"
+          node --check tools/gravicentra-i6-6-carlos-paula-live-synthetic-ops-leads-uat.cjs
+          node - <<'NODE'
+          const assert=require('node:assert/strict');
+          (async()=>{
+            const h={Authorization:'Bearer '+process.env.GH_TOKEN,Accept:'application/vnd.github+json','User-Agent':'GI-I66-Live-Signed-Uat'};
+            const r=await fetch('https://api.github.com/repos/paulaosoriof86/orbit360-core/actions/runs/'+process.env.I66_LIVE_TRANSPORT_RUN,{headers:h}).then(x=>x.json());
+            assert.equal(r.conclusion,'success','I66_TWO_WRITERS_AND_EXACT_HOSTING_LIVE_TRANSPORT_NOT_ACCEPTED');
+            for(const origin of ['https://app.aysseguros.com','https://ays-orbit-360-lab.web.app']){
+              const x=await fetch(origin+'/__recovery__/build.json',{headers:{'cache-control':'no-cache'}});
+              assert.ok(x.ok,'I66_LIVE_MARKER_FETCH_FAILED');
+              const b=await x.json();assert.equal(b.sourceSha,process.env.I66_SOURCE_SHA,'I66_LIVE_PRODUCT_SOURCE_DRIFT');
+              assert.equal(b.buildId,'gi-i66-1dd675ed59ac-57f234755dc1');
+            }
+            console.log('I66_CARLOS_PAULA_LIVE_TWO_SERVICES_AND_DUAL_ORIGIN_BUILD_EXACT_PASS');
+          })().catch(e=>{console.error(e.message);process.exitCode=1;});
+          NODE
+      - name: Install isolated signed browser dependencies
+        run: |
+          set -euo pipefail
+          npm install --no-save --package-lock=false --ignore-scripts --no-audit --no-fund firebase-admin@13.4.0 playwright@1.55.0 >/dev/null
+          node node_modules/playwright/cli.js install --with-deps chromium >/dev/null
+      - name: Test signed Carlos and Paula LIVE Ops Leads tasks and restore every QA side effect
+        run: node tools/gravicentra-i6-6-carlos-paula-live-synthetic-ops-leads-uat.cjs
