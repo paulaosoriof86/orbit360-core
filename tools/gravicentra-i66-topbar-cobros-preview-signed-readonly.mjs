@@ -211,11 +211,15 @@ async function inspectOperational(target,origin=ORIGIN){
     check(leads.view&&leads.edit&&leads.createFormPresent&&leads.hasBoard&&leads.serverConfirmed,
       'I66_SIGNED_LEADS_BOARD_HOLD');
     check(ops.view&&ops.hasBoard&&ops.sharedInboxButton&&ops.serverConfirmed,'I66_SIGNED_OPS_BRIDGE_HOLD');
-    // Carlos applies payments in Cobros; Conciliaciones is separately scoped.
-    // Only a signed authorized Dirección read certifies the protected queue.
-    if(target==='Dirección'&&origin===ORIGIN)check(reconciliation.permitted&&reconciliation.readiness==='ready'&&
-      reconciliation.sourceConfirmed.length===2&&reconciliation.readOnly,
-      'I66_SIGNED_PROTECTED_CONCILIACIONES_HOLD');
+    // Both origins must have the SAME approved reader behavior. Carlos uses
+    // Cobros and does not acquire the separate Dirección-only reconciliation
+    // queue by virtue of ordinary Operativo writes.
+    if(target==='Dirección')check(reconciliation.permitted&&reconciliation.readiness==='ready'&&
+      reconciliation.sourceConfirmed.length===2&&reconciliation.serverErrorCollections.length===0&&reconciliation.readOnly,
+      'I66_SIGNED_PROTECTED_CONCILIACIONES_PARITY_HOLD');
+    if(target==='Operativo')check(!reconciliation.permitted&&reconciliation.readiness!=='ready'&&
+      reconciliation.sourceConfirmed.length===0&&reconciliation.readOnly,
+      'I66_SIGNED_PROTECTED_CONCILIACIONES_OPERATIVO_SCOPE_HOLD');
     await context.close();
   }finally{await browser.close();}
 }
@@ -238,7 +242,7 @@ try{
   for(const target of ['Operativo','Dirección'])await inspectOperational(target);
   for(const target of ['Operativo','Dirección'])await inspectOperational(target,LIVE_ORIGIN);
   requirePass(failedChecks.length===0,failedChecks.join('__'));
-  report.status='SIGNED_PREVIEW_AND_LIVE_CROSS_ROUTE_READONLY_PASS_LIVE_READER_PARITY_SEPARATE';
+  report.status='SIGNED_PREVIEW_AND_LIVE_CROSS_ROUTE_READER_PARITY_PASS_DIRECTION_AND_OPERATIVO_DENIAL';
   console.log('I66_SIGNED_PREVIEW_LIVE_OPERATIONAL_READONLY_PASS '+JSON.stringify(report.cases));
 }catch(error){
   report.status='HOLD';report.blocker=String(error?.message||'UNKNOWN').replace(/[^A-Z0-9_-]/gi,'').slice(0,100);
