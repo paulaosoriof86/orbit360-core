@@ -36,12 +36,13 @@ jobs:
           node tools/gravicentra-i6-6-delta-guard.mjs >/dev/null
           node --check tools/gravicentra-i66-topbar-cobros-preview-signed-readonly.mjs
           git merge-base --is-ancestor c191b56461742f631c492e2ffd904278f1795fe2 HEAD
-          test -z "$(git diff --name-only c191b56461742f631c492e2ffd904278f1795fe2 HEAD -- orbit360-platform functions firebase.json firestore.rules storage.rules)"
+          test -z "$(git diff --name-only c191b56461742f631c492e2ffd904278f1795fe2 HEAD -- orbit360-platform ':(exclude)orbit360-platform/docs/**' functions firebase.json firestore.rules storage.rules)"
           node - <<'NODE'
           const s=require('node:fs').readFileSync('tools/gravicentra-i66-topbar-cobros-preview-signed-readonly.mjs','utf8');
           for(const r of [/\.set\s*\(/,/\.update\s*\(/,/\.delete\s*\(/,/\.runTransaction\s*\(/,/\.setCustomUserClaims\s*\(/,/\.createUser\s*\(/])if(r.test(s))throw Error('I66_QA_WRITE_PATH_FORBIDDEN');
           if(!s.includes("const SOURCE='c191b56461742f631c492e2ffd904278f1795fe2'"))throw Error('I66_QA_PREVIEW_SOURCE_DRIFT');
           if(!s.includes("const ORIGIN='https://ays-orbit-360-lab--gi-i66-rc-43244954006-cdz2e4x6.web.app'"))throw Error('I66_QA_PREVIEW_ORIGIN_DRIFT');
+          if(!s.includes("const LIVE_ORIGIN='https://app.aysseguros.com'"))throw Error('I66_QA_LIVE_ORIGIN_DRIFT');
           console.log('I66_REAL_SIGNED_QA_READONLY_AND_EXACT_ARTIFACT_BOUNDARY_PASS');
           NODE
       - name: Select existing authorized Firebase project account

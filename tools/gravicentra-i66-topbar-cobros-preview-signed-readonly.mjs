@@ -11,6 +11,7 @@ import {getAuth} from 'firebase-admin/auth';
 const PROJECT='ays-orbit-360-lab',TENANT='alianzas-soluciones';
 const SOURCE='c191b56461742f631c492e2ffd904278f1795fe2';
 const ORIGIN='https://ays-orbit-360-lab--gi-i66-rc-43244954006-cdz2e4x6.web.app';
+const LIVE_ORIGIN='https://app.aysseguros.com';
 const expectedBuild='gi-i66-'+SOURCE.slice(0,12)+'-57f234755dc1';
 const requirePass=(value,code)=>{if(!value)throw Error(code);};
 const norm=x=>String(x??'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();
@@ -124,7 +125,7 @@ async function exercise(target){
   }finally{await browser.close();}
 }
 
-async function inspectOperational(target){
+async function inspectOperational(target,origin=ORIGIN){
   const token=await findRole(target);
   const browser=await chromium.launch({headless:true,args:['--no-sandbox']});
   try{
@@ -132,7 +133,7 @@ async function inspectOperational(target){
     const page=await context.newPage();
     let pageErrors=0;
     page.on('pageerror',()=>pageErrors++);
-    await page.goto(ORIGIN+'/#/renovaciones',{waitUntil:'domcontentloaded',timeout:60000});
+    await page.goto(origin+'/#/renovaciones',{waitUntil:'domcontentloaded',timeout:60000});
     await page.waitForFunction(()=>!!window.Orbit?.productRuntimeBrowserProvidersP0&&!!window.Orbit?.productAppP0,null,{timeout:30000});
     const activated=await page.evaluate(async t=>{
       const p=Orbit.productRuntimeBrowserProvidersP0,s=await p.initialize();
@@ -200,7 +201,8 @@ async function inspectOperational(target){
       readOnly:Orbit.cobrosConciliacionReadOnly?.operationalWrites===0&&Orbit.cobrosConciliacionReadOnly?.autoApply===false,
       serverErrorCollections:Object.keys(Orbit.store?._productStatus?.()?.snapshotErrors||{}).filter(x=>['conciliaciones','conciliacionesPrimas'].includes(x))
     }));
-    report.cases.push({role:target,scope:'operational-cross-route',renewals,cobros,leads,ops,reconciliation,previewPageErrors:pageErrors});
+    report.cases.push({role:target,scope:origin===ORIGIN?'preview-operational-cross-route':'live-operational-cross-route',
+      renewals,cobros,leads,ops,reconciliation,pageErrors});
     const check=(ok,code)=>{if(!ok)failedChecks.push(code+'_'+target);};
     check(pageErrors===0,'I66_OPERATIONAL_SIGNED_PAGE_ERRORS');
     check(renewals.edit&&renewals.manage&&renewals.directHook&&renewals.entry,'I66_DIRECT_RENEWAL_ENTRY_HOLD');
@@ -211,7 +213,7 @@ async function inspectOperational(target){
     check(ops.view&&ops.hasBoard&&ops.sharedInboxButton&&ops.serverConfirmed,'I66_SIGNED_OPS_BRIDGE_HOLD');
     // Carlos applies payments in Cobros; Conciliaciones is separately scoped.
     // Only a signed authorized Dirección read certifies the protected queue.
-    if(target==='Dirección')check(reconciliation.permitted&&reconciliation.readiness==='ready'&&
+    if(target==='Dirección'&&origin===ORIGIN)check(reconciliation.permitted&&reconciliation.readiness==='ready'&&
       reconciliation.sourceConfirmed.length===2&&reconciliation.readOnly,
       'I66_SIGNED_PROTECTED_CONCILIACIONES_HOLD');
     await context.close();
@@ -224,14 +226,20 @@ try{
   });
   requirePass(marker.sourceSha===SOURCE&&marker.buildId===expectedBuild&&marker.gate==='I6.6',
     'I66_PREVIEW_WRONG_PRODUCT_ARTIFACT');
+  const liveMarker=await fetch(LIVE_ORIGIN+'/__recovery__/build.json',{signal:AbortSignal.timeout(20000)}).then(r=>{
+    requirePass(r.ok,'I66_LIVE_MARKER_UNREADABLE');return r.json();
+  });
+  requirePass(liveMarker.sourceSha===SOURCE&&liveMarker.buildId===expectedBuild&&liveMarker.gate==='I6.6',
+    'I66_LIVE_WRONG_PRODUCT_ARTIFACT');
   // The known signed Operativo identity is resolved using the same certified
   // advisor-member linkage as the previous performance UAT. Dirección stays
   // a separate LIVE canary, not a fabricated Preview PASS.
   await exercise('Operativo');
   for(const target of ['Operativo','Dirección'])await inspectOperational(target);
+  for(const target of ['Operativo','Dirección'])await inspectOperational(target,LIVE_ORIGIN);
   requirePass(failedChecks.length===0,failedChecks.join('__'));
-  report.status='SIGNED_OPERATIONAL_CROSS_ROUTE_READONLY_PASS';
-  console.log('I66_SIGNED_OPERATIONAL_PREVIEW_PASS '+JSON.stringify(report.cases));
+  report.status='SIGNED_PREVIEW_AND_LIVE_CROSS_ROUTE_READONLY_PASS_LIVE_READER_PARITY_SEPARATE';
+  console.log('I66_SIGNED_PREVIEW_LIVE_OPERATIONAL_READONLY_PASS '+JSON.stringify(report.cases));
 }catch(error){
   report.status='HOLD';report.blocker=String(error?.message||'UNKNOWN').replace(/[^A-Z0-9_-]/gi,'').slice(0,100);
   console.error('I66_SIGNED_COBROS_TOPBAR_PREVIEW_HOLD='+report.blocker);
