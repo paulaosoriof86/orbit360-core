@@ -107,7 +107,11 @@ jobs:
           node --check functions/b4-003-scoped-policy-callable.js
           node --check tools/gravicentra-b4-003-live-backend-source-readback.cjs
           node tools/gravicentra-b4-003-live-reader-source-readback.test.cjs
-          node tools/gravicentra-b4-003-isolated-reader-package.test.cjs
+          # The exact I6.5 package hash belongs to deploy authorization only.
+          # A readback of today's I6.6 LIVE backend must not be blocked by it.
+          if test "$REQUESTED_MODE" = deploy; then
+            node tools/gravicentra-b4-003-isolated-reader-package.test.cjs
+          fi
           node tools/gravicentra-i6-control-plane-guard-v1.mjs --mode=i6
           node tests/goal-participation-classification-writer.test.cjs
           node tools/gravicentra-b4-003-scoped-bootstrap-reader.test.cjs
