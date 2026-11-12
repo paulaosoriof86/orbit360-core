@@ -2,7 +2,7 @@
 const assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm');
 const norm=x=>String(x==null?'':x).trim().toLowerCase().replace(/[^a-z0-9]+/g,'_'),text=x=>String(x==null?'':x).trim(),unique=x=>[...new Set([].concat(x||[]).map(text).filter(Boolean))];
 function grab(p,a,b,n,extra={}){const s=fs.readFileSync(p,'utf8'),i=s.indexOf(a),j=s.indexOf(b,i+1);assert.ok(i>=0&&j>i);const c={norm,text,unique,Set,Object,Array,...extra};vm.runInNewContext(s.slice(i,j)+'\nthis.fn={'+n+'};',c);return c.fn;}
-const ops=grab('functions/product-ops-leads-domain.js','function scope(m,domain,activeRole){','function collaborationWriteDirection(','scope,advisorAllowed');
+const ops=grab('functions/product-ops-leads-domain.js','function scope(m,domain,activeRole,accessConfig){','function collaborationWriteDirection(','scope,advisorAllowed');
 const m={roles:['Asesor','Operativo'],advisorId:'a1',dataScopes:{default:'todos',modules:{leads:'propios',ops:'equipo'}},teamAdvisorIds:['a2'],roleVisibleAdvisorIds:{Operativo:['a3']}};
 let n=0;function eq(a,b){assert.equal(a,b);n++};eq(ops.scope(m,'ops','operativo'),'team');eq(ops.scope(m,'leads','operativo'),'own');eq(ops.scope(m,'ops','asesor'),'own');eq(ops.advisorAllowed(m,'a3','ops','operativo'),true);eq(ops.advisorAllowed(m,'a2','ops','operativo'),false);
 m.dataScopes.modules.ops='ninguno';eq(ops.scope(m,'ops','operativo'),'none');m.dataScopes.modules.ops='invalid';eq(ops.scope(m,'ops','operativo'),'none');m.dataScopes.modules.ops='todos';eq(ops.scope(m,'ops','operativo'),'all');
@@ -27,7 +27,7 @@ assert.doesNotMatch(sourceCycle,/surface==='leads'\)return own\?'own'/,'MULTIROL
 
 // C03.03 authenticated writer guard: reject missing/pending/invited/contradictory
 // membership states before any transaction. Synthetic source-only VM proof.
-const membershipGate=grab('functions/product-ops-leads-domain.js','function active(m){','function scope(m,domain,activeRole){','active');
+const membershipGate=grab('functions/product-ops-leads-domain.js','function active(m){','function scope(m,domain,activeRole,accessConfig){','active');
 const membershipCases=[
  [{status:'active'},true,'active'],
  [{estado:'activo'},true,'activo_alias'],
