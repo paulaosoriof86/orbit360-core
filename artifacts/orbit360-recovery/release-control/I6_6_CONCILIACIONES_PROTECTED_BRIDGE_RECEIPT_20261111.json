@@ -13,8 +13,17 @@
   ],
   "roleRule": "AdminTenant, Dirección and Finanzas retain existing signed financing access; Asesor and Operativo remain denied absent a separately approved role entitlement.",
   "sourceDataWrites": 0,
-  "releaseStatus": "SOURCE_AND_SYNTHETIC_QA_ONLY_PREVIEW_AND_LIVE_PENDING",
-  "functionDeployStatus": "NOT_DEPLOYED",
+  "releaseStatus": "PROTECTED_READER_PREVIEW_DEPLOYED; LIVE_PROPOSAL_VIEW_ZERO; SIGNED_PREVIEW_READBACK_HOLD; NO_FINANCIAL_WRITES",
+  "functionDeployStatus": "PREVIEW_ONLY_ORBIT360_SCOPED_POLICY_READ_RUN_43143532569_SUCCESS_LIVE_UNCHANGED",
   "productionAcceptance": false,
-  "note": "A missing or rejected protected source read is not proof that the Firestore collections contain zero records."
+  "liveDireccionBrowserObservation20261111": {
+    "url": "https://app.aysseguros.com/#/conciliaciones",
+    "signedRole": "Paula Direccion",
+    "tableVisible": true,
+    "displayedProposalsEachFilter": 0,
+    "currentServerCollectionCounts": "NOT_VERIFIED_THIS_TURN",
+    "earlierReadOnlyFirestoreCount20261017": {"conciliaciones": 0, "conciliacionesPrimas": 0},
+    "interpretation": "The module projects only formal proposals from two collections, not automatically all Cobros payments. Visible zero is not a reconciled portfolio or evidence of no pending payments."
+  },
+  "note": "A missing or rejected protected source read is not proof that the Firestore collections contain zero records; final signed Preview/live server readback pending."
 }

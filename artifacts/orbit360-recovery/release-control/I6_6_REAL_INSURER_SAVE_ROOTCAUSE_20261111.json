@@ -32,8 +32,9 @@
     "testBlob": "905ed1b0b307549c4bee11d03960674d76d41486",
     "syntheticRoleCountryAndSecretRegression": "14_OF_14_PASS_NO_REAL_DATA_WRITES",
     "realPaulaAndCarlosWriteReadback": "SIGNED_PREVIEW_ROLE_SCOPE_PREFLIGHT_PASS_BOTH_ACTORS; DURABLE_SAVE_RELOAD_RESTORE_PENDING",
-    "actualLiveFailureClassification": "PENDING_SIGNED_CLOUD_READBACK",
+    "actualLiveFailureClassification": "CARLOS_PREVIOUS_LIVE_SIGNED_WRITE_REPRODUCED_PRODUCT_WRITE_AUTH_CONTEXT_MISMATCH; PAULA_REAL_BUSINESS_INSURER_FAILURE_CAUSE_NOT_YET_PROVEN",
     "release": "IMMUTABLE_PREVIEW_43146496115_AND_REAL_SIGNED_QA_43147635373_SUCCESS; LIVE_HUMAN_GATE_AND_DURABLE_SAVE_PENDING",
+    "causalLimitation": "The 2026-11-11 read-only 33-insurer scan previously rejected sensitive-field name mismatch as the actual Carlos cause. This source safety fix is reproducible synthetically but is not asserted to explain his observed LIVE error.",
     "signedQaEvidence": {
       "sourceSha": "b54d868e94233d6d30dccc46930b2c737df30823",
       "artifactId": 13911507447,
@@ -44,6 +45,22 @@
       "insurerWrites": 0,
       "livePromotion": false
     }
+  },
+  "paulaCurrentChromeLiveSyntheticCanary20261111": {
+    "actor": "Paula Osorio Direccion GT signed LIVE Chrome session",
+    "fixtureId": "b4003qa_insurer_38102224750",
+    "field": "observaciones",
+    "before": "blank",
+    "controlledAuditedSave": "PASS",
+    "freshTabPersistedMarker": "PASS",
+    "controlledAuditedRestore": "PASS",
+    "freshTabRestoredBlank": "PASS",
+    "controllerTimeoutDuringIntermediateRead": true,
+    "interpretation": "Browser controller timeout was not a failed server save. LIVE Direccion synthetic fixture works, real insurer record error and Carlos write are still separate holds.",
+    "syntheticAuditedWrites": 2,
+    "realInsurerWrites": 0,
+    "paymentOrReceivableWrites": 0,
+    "newHostingDeployment": false
   },
   "minimalFix": "In access-scope.js authorize insurer directory dataScope='all' for active allowed broad-directory role only when role ceiling is all; preserve explicit none, signed country, module matrix and restrictions; do not modify live data, backend, Rules, roles or Asesor scope.",
   "regressionTest": "tools/gravicentra-i6-6-insurer-operativo-signed-scope.test.cjs",

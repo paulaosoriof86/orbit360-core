@@ -83,6 +83,18 @@
     "productionAcceptance": false,
     "note": "Signed preflight is not a real insurer durable write; no claim of LIVE fix or human promotion gate."
   },
+  "paulaCurrentLiveSyntheticInsurerControl20261111": {
+    "actor": "Paula Direccion GT in existing authenticated Chrome LIVE",
+    "existingSyntheticFixtureId": "b4003qa_insurer_38102224750",
+    "auditedSaveConfirmedAfterFreshTab": true,
+    "auditedRestoreToOriginalBlankConfirmedAfterFreshTab": true,
+    "syntheticAuditedWrites": 2,
+    "realInsurerWrites": 0,
+    "paymentOrReceivableWrites": 0,
+    "browserControllerTimeoutNotInterpretedAsServerFailure": true,
+    "sourceBeingTested": "EXISTING_LIVE_BEFORE_B54D868E_PROMOTION",
+    "realInsurerPaulaAndCarlosFailureStillOpen": true
+  },
   "nextImmutablePreviewBuildRequest": {
     "purpose": "Real insurer ordinary save must not be rejected by unchanged legacy secret fields under Dirección, Operativo or Admin-family roles.",
     "approvedSourceFile": "orbit360-platform/data/store-firestore-product-operational-p0.js",
