@@ -10,7 +10,7 @@
   "branch": "recovery/fase-a-clean-20260831",
   "forensicOriginSha": "9c95f31461f2eabe9804625b5659bee772f5602a",
   "createdAtUtc": "2026-08-31T18:00:00Z",
-  "updatedAtUtc": "2026-11-12T18:25:00Z",
+  "updatedAtUtc": "2026-11-12T18:42:00Z",
   "status": "I6_6_LIVE_CONTROLLED_PORTFOLIO_UPDATE_IN_PROGRESS",
   "currentIteration": 6,
   "lastCompletedIteration": 5,
@@ -44,6 +44,7 @@
       "P1_ASEGURADORAS_FULL_OPERATIONAL_EDITS_LOGO_ACCOUNT_SECRET_WITH_AUDIT",
       "P1_SEARCH_PERFORMANCE_MODULE_ROLE_COUNTRY_REGRESSION_AND_DOCUMENTAL_CONVERGENCE"
     ],
+    "firstIncompleteBlockAfterReaderParity": "P0_CARLOS_ACTUAL_SIGNED_OPS_LEADS_RENEWAL_PAYMENT_WRITE_READBACK_IDEMPOTENCE_COUNTRY_SCOPE; FINANCIAL_CASES_EXECUTE_IN_OWN_SAFE_PROTECTED_MINIBATCHES",
     "liveReadback20261112": {
       "opsPaulaSimulatedOperativo": "PLUS_GESTION_AND_PLUS_NUEVO_INGRESO_VISIBLE_MODAL_OPENS_NO_WRITE_UAT",
       "opsLeadsPendingProjection": 1,
@@ -65,6 +66,26 @@
       "currentReaderOutcome": "LATEST_APPROVED_VERSION_LIVE_READ_ONLY_PASS_FULL_FINANCIAL_WRITE_PARITY_NOT_YET_CERTIFIED"
     },
     "progressMetric": "ONLY_EVIDENCE_BACKED_ACCEPTANCE_CHECKS_COUNT; NOT_TIME_ELAPSED_OR_ESTIMATED_COMPLETION",
+    "latestFinancialCensusReadOnly20261112": {
+      "status": "SIGNED_LIVE_READ_ONLY_TWO_SNAPSHOTS_MATCH_NO_DATA_WRITES",
+      "sourceAndLiveReadbackRunId": 43281747834,
+      "sourceAndLiveReadbackArtifactId": 13972721876,
+      "sourceFieldOccupancyRunId": 43282190188,
+      "sourceFieldOccupancyArtifactId": 13974420019,
+      "sourceMapfrePendingSha256": "29a42705ae6f7b2b42693f51a27a0b1f4ced279e2259b28ce021ff7b21ccefb0",
+      "sourceBantrabPendingSha256": "b945a98c7c572909c643be4c849a7526a363eb490cdcf24ac8d0ae54ca3025b7",
+      "targetTenant": "alianzas-soluciones",
+      "sourceCases": 37,
+      "uniquePaidSourceCases": 4,
+      "pendingSourceCases": 33,
+      "exactSourceLinkedPendingAlreadyInLive": 2,
+      "existingPolicyWithoutMatchingExternalRequirement": 26,
+      "policyNotFoundByApprovedExactAliases": 9,
+      "dueAndAmountExactButConflictingExistingSourceReference": 8,
+      "noneOfTheFourPaidSourceCasesMetExactSourceRequirementLiveCas": true,
+      "liveReceiptOrPaymentWrites": 0,
+      "interpretation": "Do not silently overwrite external source numbers or mark paid; reconcile the eight conflicting references with preserved before images and a protected transaction, and adjudicate missing policies and editions before new expected receipts."
+    },
     "blocks": {
       "readerParity": {
         "verifiedSteps": 6,
