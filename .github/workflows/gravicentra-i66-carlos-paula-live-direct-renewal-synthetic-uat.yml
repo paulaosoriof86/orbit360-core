@@ -1,5 +1,6 @@
 name: Gravicentra I6.6 Carlos Paula Direct Renewal LIVE Reversible QA
 on:
+  workflow_dispatch:
   push:
     branches: [recovery/fase-a-clean-20260831]
     paths:
@@ -53,5 +54,5 @@ jobs:
           set -euo pipefail
           npm install --no-save --package-lock=false --ignore-scripts --no-audit --no-fund firebase-admin@13.4.0 playwright@1.55.0 >/dev/null
           node node_modules/playwright/cli.js install --with-deps chromium >/dev/null
-      - name: Signed LIVE direct renewal, synthetic QA document, crossmodule readback and restore
+      - name: Signed LIVE direct renewal with hydration stage diagnostics and reversible fixtures
         run: node tools/gravicentra-i6-6-carlos-paula-live-direct-renewal-synthetic-uat.cjs

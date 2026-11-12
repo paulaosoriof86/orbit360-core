@@ -82,9 +82,19 @@ async function one(browser,actor){
     },actor.token);
     assert.ok(session.started&&!session.preview&&norm(session.role)===actor.role&&
       session.canRenew&&session.canPolicy&&session.canIssue&&session.direct,'I66_RENEWAL_SIGNED_ROLE_DENIED_'+actor.role);
-    await page.evaluate(async()=>{
-      await Orbit.store._ensureCollections(['gestiones','polizas','vehiculos','clientes','aseguradoras']);
-    });
+    console.log('I66_RENEWAL_'+actor.role.toUpperCase()+'_SIGNED_READY_PASSED');
+    const requested=await page.evaluate(()=>Orbit.store._ensureCollections(['gestiones','polizas','vehiculos','clientes','aseguradoras']));
+    console.log('I66_RENEWAL_'+actor.role.toUpperCase()+'_HYDRATION_REQUESTED_'+requested.join(','));
+    const status=await page.evaluate(x=>{
+      const s=Orbit.store._productStatus(),names=['gestiones','polizas','vehiculos','clientes','aseguradoras'];
+      const seen=Object.fromEntries(names.map(c=>[c,!!Orbit.store.get(c,x[c==='gestiones'?'management':c==='polizas'?'source':c==='clientes'?'client':c==='aseguradoras'?'insurer':'source'])]));
+      return{seen,confirmed:names.filter(c=>s.serverConfirmedCollections?.includes(c)),
+        denied:names.filter(c=>s.deniedCollections?.includes(c)),
+        errorKeys:names.filter(c=>!!s.snapshotErrors?.[c]),
+        sizes:Object.fromEntries(names.map(c=>[c,Orbit.store.all(c).length])),
+        role:Orbit.session.rol(),country:Orbit.pais,readState:s.status};
+    },ids);
+    console.log('I66_RENEWAL_'+actor.role.toUpperCase()+'_INITIAL_PROTECTED_READBACK '+JSON.stringify(status));
     await page.waitForFunction(x=>!!Orbit.store.get('gestiones',x.management)&&!!Orbit.store.get('polizas',x.source)&&
       !!Orbit.store.get('clientes',x.client)&&!!Orbit.store.get('aseguradoras',x.insurer),ids,{timeout:30000});
     const modal=await page.evaluate(id=>{
