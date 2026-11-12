@@ -1,6 +1,7 @@
 # Gravicentra Insurance I6.6 — owner-approved insurer logo upload/read closure.
-# Publishes only the two missing production callables from the same vetted
-# backend source staged for Preview. No Hosting/Firestore/Rules/Auth/IAM writes.
+# Revisions ONLY of the two existing logo callables, first Preview then LIVE.
+# Uses the existing project asset bucket: inventory run 43155071269.
+# No Hosting/Firestore/Rules/Auth/IAM writes, no function creation or deletion.
 name: Gravicentra I6.6 Insurer Logo LIVE Targeted
 on:
   push:
@@ -19,7 +20,7 @@ jobs:
     timeout-minutes: 45
     env:
       PROJECT_ID: ays-orbit-360-lab
-      EXPECTED_OWNER_BLOB: a27810c65e6a5a761d40c0e1f20cae61df483d1f
+      EXPECTED_OWNER_BLOB: 60722d67bb873f321d91ced02c31ae999e13ae5a
       SA_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
       SA_ALT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
       SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
@@ -39,6 +40,7 @@ jobs:
           test "$(git hash-object functions/product-operational-domain.js)" = "$EXPECTED_OWNER_BLOB"
           node --check functions/product-operational-domain.js
           node --check functions/bootstrap.js
+          node tools/gravicentra-i6-6-insurer-assets-bucket.test.cjs
           node tools/gravicentra-b4-003-operational-write-security-regression.test.cjs > "$RUNNER_TEMP/logo-security-regression.json"
           node tools/gravicentra-b4-003-insurer-activity-audit.test.cjs > "$RUNNER_TEMP/logo-activity-audit.json"
           node - <<'NODE'
@@ -83,7 +85,7 @@ jobs:
           CLI="$RUNNER_TEMP/gi-i66-logo-cli/node_modules/firebase-tools/lib/bin/firebase.js"
           echo "FIREBASE_CLI_BIN=$CLI" >> "$GITHUB_ENV"
           GOOGLE_APPLICATION_CREDENTIALS="$RUNNER_TEMP/gi-i66-logo-auth/selected.json" node "$CLI" functions:list --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/logo-functions-before.json"
-      - name: Preflight absence in LIVE and active existing Preview counterparts
+      - name: Preflight existence of both LIVE and both Preview callables
         shell: bash
         run: |
           set -euo pipefail
@@ -92,10 +94,9 @@ jobs:
           const raw=src.result??src,v=typeof raw==='string'?JSON.parse(raw):raw,rows=Array.isArray(v)?v:Array.isArray(v.functions)?v.functions:[];
           if(!rows.length)throw Error('I66_LOGO_FUNCTION_INVENTORY_UNREADABLE');
           const names=rows.map(x=>String(x.id||x.name||x.functionName||'').split('/').pop());
-          for(const name of ['orbit360ProductAssetUpload','orbit360ProductAssetRead'])if(names.includes(name))throw Error('I66_LOGO_LIVE_ALREADY_DEPLOYED_STOP_RECONCILE:'+name);
-          for(const name of ['orbit360ProductAssetUploadPreview','orbit360ProductAssetReadPreview'])if(!names.includes(name))throw Error('I66_LOGO_PREVIEW_NOT_PRESENT:'+name);
+          for(const name of ['orbit360ProductAssetUpload','orbit360ProductAssetRead','orbit360ProductAssetUploadPreview','orbit360ProductAssetReadPreview'])if(!names.includes(name))throw Error('I66_LOGO_EXISTING_FUNCTION_MISSING_STOP:'+name);
           fs.writeFileSync(process.env.RUNNER_TEMP+'/logo-functions-before-names.json',JSON.stringify(names.sort()));
-          console.log('I66_LOGO_LIVE_ABSENT_AND_PREVIEW_EXISTS_PASS; inventoryCount='+names.length);
+          console.log('I66_LOGO_LIVE_AND_PREVIEW_FOUR_FUNCTIONS_EXIST_PASS; inventoryCount='+names.length);
           NODE
       - name: Refresh only two Preview logo callables from immutable staged source
         id: preview
@@ -113,7 +114,7 @@ jobs:
           if(JSON.stringify(after)!==JSON.stringify(before))throw Error('I66_LOGO_PREVIEW_DEPLOY_CHANGED_FUNCTION_INVENTORY');
           console.log('I66_LOGO_SAME_SOURCE_PREVIEW_TWO_CALLABLES_PASS');
           NODE
-      - name: Deploy ONLY two missing LIVE logo functions
+      - name: Update ONLY two existing LIVE logo function revisions
         id: deploy_live
         shell: bash
         run: |
@@ -128,27 +129,16 @@ jobs:
           const before=JSON.parse(fs.readFileSync(tmp+'/logo-functions-before-names.json'));
           const after=rows.map(x=>String(x.id||x.name||x.functionName||'').split('/').pop()).sort();
           const created=after.filter(x=>!before.includes(x)),removed=before.filter(x=>!after.includes(x));
-          if(JSON.stringify(created)!==JSON.stringify(['orbit360ProductAssetRead','orbit360ProductAssetUpload'])||removed.length)throw Error('I66_LOGO_LIVE_FUNCTION_INVENTORY_SCOPE_DRIFT:'+JSON.stringify({created,removed}));
-          fs.writeFileSync(tmp+'/logo-function-release-receipt.json',JSON.stringify({gate:'I6.6',status:'EXACT_TWO_LOGO_LIVE_FUNCTIONS_DEPLOYED_READBACK_PENDING_SIGNED_FILE_UAT',sourceBlob:process.env.EXPECTED_OWNER_BLOB,sourceCommit:process.env.GITHUB_SHA,workflowRunId:process.env.GITHUB_RUN_ID,newFunctionNames:created,otherFunctionNamesUnchanged:true,previewSameSource:true,hostingChanged:false,firestoreRecordsWritten:false,rulesAuthIamChanged:false,productionAccepted:false},null,2)+'\n');
-          console.log('I66_LOGO_LIVE_TWO_FUNCTIONS_CREATED_SCOPE_EXACT_PASS; before='+before.length+' after='+after.length);
+          if(created.length||removed.length||JSON.stringify(after)!==JSON.stringify(before))throw Error('I66_LOGO_LIVE_FUNCTION_INVENTORY_SCOPE_DRIFT:'+JSON.stringify({created,removed}));
+          fs.writeFileSync(tmp+'/logo-function-release-receipt.json',JSON.stringify({gate:'I6.6',status:'EXACT_TWO_EXISTING_LOGO_FUNCTIONS_UPDATED_PENDING_SIGNED_UPLOAD_UAT',sourceBlob:process.env.EXPECTED_OWNER_BLOB,sourceCommit:process.env.GITHUB_SHA,workflowRunId:process.env.GITHUB_RUN_ID,updatedFunctionNames:['orbit360ProductAssetRead','orbit360ProductAssetUpload'],functionInventoryUnchanged:true,previewSameSource:true,hostingChanged:false,firestoreRecordsWritten:false,rulesAuthIamChanged:false,productionAccepted:false},null,2)+'\n');
+          console.log('I66_LOGO_LIVE_TWO_EXISTING_FUNCTIONS_UPDATED_NO_INVENTORY_DRIFT_PASS; before='+before.length+' after='+after.length);
           NODE
-      - name: Roll back only new logo functions if LIVE two-function release failed
+      - name: Preserve existing functions and fail closed if update failed
         if: failure() && steps.deploy_live.outcome == 'failure' && steps.preview.outcome == 'success'
         shell: bash
         run: |
           set -euo pipefail
-          node "$FIREBASE_CLI_BIN" functions:list --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/logo-functions-failed-live.json"
-          node - <<'NODE' > "$RUNNER_TEMP/logo-new-targets"
-          const fs=require('fs'),r=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/logo-functions-failed-live.json'));
-          const v=r.result??r,rows=Array.isArray(v)?v:Array.isArray(v.functions)?v.functions:[];
-          const before=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/logo-functions-before-names.json'));
-          for(const x of rows){const name=String(x.id||x.name||x.functionName||'').split('/').pop();if(['orbit360ProductAssetUpload','orbit360ProductAssetRead'].includes(name)&&!before.includes(name))console.log(name);}
-          NODE
-          while IFS= read -r TARGET;do
-            test -n "$TARGET" || continue
-            node "$FIREBASE_CLI_BIN" functions:delete "$TARGET" --region us-central1 --project "$PROJECT_ID" --force
-          done < "$RUNNER_TEMP/logo-new-targets"
-          echo 'I66_LOGO_TARGETED_ROLLBACK_EXECUTED_IF_NEW_FUNCTIONS_EXISTED'
+          echo 'I66_LOGO_LIVE_UPDATE_HOLD_EXISTING_FUNCTIONS_PRESERVED_NO_DELETE_ROLLBACK_REVISION_RECONCILIATION_REQUIRED'
       - uses: actions/upload-artifact@v4
         if: always()
         with:
