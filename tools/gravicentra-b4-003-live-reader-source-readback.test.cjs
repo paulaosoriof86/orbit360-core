@@ -4,17 +4,19 @@ const source=fs.readFileSync(path.join(__dirname,'gravicentra-b4-003-live-backen
 const catalog='orbit360TenantDomainConfig';
 const isolatedReader=require('./gravicentra-b4-003-isolated-reader-package.cjs');
 const reader='orbit360ScopedPolicyRead',roster='orbit360AssignableAdvisorRoster',writer='orbit360ProductOperationalCommand';
+const previewReader='orbit360ScopedPolicyReadPreview';
 const readerFiles=['bootstrap.js','package.json','package-lock.json','b4-003-scoped-policy-callable.js','b4-003-scoped-bootstrap-reader.js','b4-003-scoped-access-boundary.js','b4-003-scoped-policy-reader.js','b4-003-scoped-related-reader.js','b4-003-client-country-authority.js','b4-003-client-country-list-projection.js'];
 const suffix="\n// B4-003: stage reader exports; deploy only LIVE target.\nObject.assign(module.exports,require('./b4-003-scoped-policy-callable'));\n";
 async function run(options={}){
  const writes=new Map(),urls=[],logs=[],errors=[];
  if(options.before)writes.set('/tmp/gi-b4003-live-sources-before.json',JSON.stringify(options.before));
  const local=file=>Buffer.from('fixture '+file+'\n');
- const region=name=>name===reader?'us-east1':'us-central1';
- const files=name=>name===reader?readerFiles.filter(file=>!(options.readerMissing||[]).includes(file)).concat(options.readerExtra||[]):name===roster?['assignable-advisor-roster.js']:name===catalog?['tenant-domain-config.js']:['product-operational-domain.js','goal-participation-contract.js'];
+ const region=name=>[reader,previewReader].includes(name)?'us-east1':'us-central1';
+ const files=name=>name===reader?readerFiles.filter(file=>!(options.readerMissing||[]).includes(file)).concat(options.readerExtra||[]):name===previewReader?isolatedReader.MODULES:name===roster?['assignable-advisor-roster.js']:name===catalog?['tenant-domain-config.js']:['product-operational-domain.js','goal-participation-contract.js'];
  const bytes=(name,file)=>{
   if(name===reader&&file==='bootstrap.js')return options.readerExact?Buffer.from(isolatedReader.ENTRYPOINT):Buffer.concat([local(file),Buffer.from(suffix)]);
   if(name===catalog)return Buffer.from("const VERSION='test';const DOMAINS=new Set(['workflow','catalogs']);if(!['get','save'].includes(action))throw Error();");
+  if(name===previewReader&&options.previewDrift&&file===isolatedReader.MODULES[0])return Buffer.from('stale preview reader\n');
   if((options.readerExtra||[]).includes(file))return Buffer.from('extra '+(options.extraVersion||'1'));
   if(name===reader&&file==='b4-003-scoped-bootstrap-reader.js'&&!options.readerExact)return Buffer.from('older deployed reader\n');
   return local(file);
@@ -34,16 +36,16 @@ async function run(options={}){
  const mockProcess={argv:['node','readback',options.phase||'before'],env:{GI_DEPS_DIR:'/deps',RUNNER_TEMP:'/tmp',PROJECT_ID:'ays-orbit-360-lab',GI_TARGET_FUNCTION:options.target||reader,GI_DIAGNOSTIC_ONLY:options.diagnostic===false?'false':'true'},exitCode:0};
  const mockRequire=name=>{
   if(name==='node:fs')return mockFs;
-  if(name==='./gravicentra-b4-003-isolated-reader-package.cjs')return{FILES:readerFiles,plan(){const sourceFiles=Object.fromEntries(readerFiles.map(file=>[file,{sha256:crypto.createHash('sha256').update(file==='bootstrap.js'?Buffer.from(isolatedReader.ENTRYPOINT):local(file)).digest('hex')}]));return{sourceFiles,sourceManifestSha256:isolatedReader.manifest(sourceFiles),localDependencyClosure:isolatedReader.MODULES};}};
+  if(name==='./gravicentra-b4-003-isolated-reader-package.cjs')return{FILES:readerFiles,MODULES:isolatedReader.MODULES,plan(){const sourceFiles=Object.fromEntries(readerFiles.map(file=>[file,{sha256:crypto.createHash('sha256').update(file==='bootstrap.js'?Buffer.from(isolatedReader.ENTRYPOINT):local(file)).digest('hex')}]));return{sourceFiles,sourceManifestSha256:isolatedReader.manifest(sourceFiles),localDependencyClosure:isolatedReader.MODULES};}};
   if(name==='node:path')return path;
   if(name==='node:crypto')return crypto;
-  if(name==='node:child_process')return{execFileSync(command,args){assert.equal(command,'unzip');const name=[reader,roster,writer,catalog].find(n=>args[1].endsWith('-'+n+'.zip'));assert.ok(name);return args[0]==='-Z1'?files(name).join('\n'):bytes(name,args[2]);}};
+  if(name==='node:child_process')return{execFileSync(command,args){assert.equal(command,'unzip');const name=[reader,previewReader,roster,writer,catalog].find(n=>args[1].endsWith('-'+n+'.zip'));assert.ok(name);return args[0]==='-Z1'?files(name).join('\n'):bytes(name,args[2]);}};
   if(name==='/deps/google-auth-library')return{GoogleAuth:class{async getClient(){return client;}}};
   throw Error('UNEXPECTED_REQUIRE:'+name);
  };
  vm.runInNewContext(source,{require:mockRequire,process:mockProcess,Buffer,console:{log:x=>logs.push(x),error:x=>errors.push(x)},Date},{filename:'readback-fixture.cjs'});
  await new Promise(resolve=>setImmediate(resolve));
- const raw=writes.get(options.target===catalog?'/tmp/gi-b4003-tenant-config-source-readback.json':'/tmp/gi-b4003-live-sources-'+(options.phase||'before')+'.json');
+ const raw=writes.get(options.target===catalog?'/tmp/gi-b4003-tenant-config-source-readback.json':options.target===previewReader?'/tmp/gi-b4003-preview-reader-source-readback.json':'/tmp/gi-b4003-live-sources-'+(options.phase||'before')+'.json');
  return {output:raw&&JSON.parse(raw),exitCode:mockProcess.exitCode,urls,errors,logs};
 }
 (async()=>{
@@ -73,7 +75,7 @@ async function run(options={}){
  const badRollback=await run({phase:'rollback',before:before.output,readerExact:true,readerRevision:'reader-3'});
  assert.equal(badRollback.exitCode,41);checks++;
  assert.match(badRollback.errors.join('\n'),/ROLLBACK_READER_DEPENDENCY_BYTES_NOT_RESTORED/);checks++;
- await assert.rejects(run({target:'unrelatedFunction'}),/ONLY_FOUR_EXACT_B4003_BACKEND_READBACK_TARGETS_ALLOWED/);checks++;
+ await assert.rejects(run({target:'unrelatedFunction'}),/ONLY_FIVE_EXACT_B4003_BACKEND_READBACK_TARGETS_ALLOWED/);checks++;
  const legacy=await run({target:writer});
  assert.equal(legacy.exitCode,0,legacy.errors.join('\n'));checks++;
  assert.equal(legacy.output.region,'us-central1');checks++;
@@ -102,5 +104,15 @@ async function run(options={}){
  assert.ok(diagnostic.urls.some(url=>url.includes('/locations/us-central1/functions/'+catalog)));checks++;
  await assert.rejects(run({target:catalog,phase:'after'}),/TENANT_CONFIG_READBACK_ONLY_BEFORE_REQUIRED/);checks++;
  await assert.rejects(run({target:catalog,diagnostic:false}),/TENANT_CONFIG_READBACK_ONLY_BEFORE_REQUIRED/);checks++;
+ const preview=await run({target:previewReader});
+ assert.equal(preview.exitCode,0,preview.errors.join('\n'));checks++;
+ assert.equal(preview.output.allApprovedSourceModulesExact,true);checks++;
+ assert.equal(Object.keys(preview.output.modules).length,7);checks++;
+ assert.ok(preview.urls.some(url=>url.endsWith('/locations/us-east1/functions/'+previewReader)));checks++;
+ const previewDrift=await run({target:previewReader,previewDrift:true});
+ assert.equal(previewDrift.exitCode,41);checks++;
+ assert.equal(previewDrift.output.allApprovedSourceModulesExact,false);checks++;
+ await assert.rejects(run({target:previewReader,phase:'after'}),/PREVIEW_READER_READBACK_ONLY_BEFORE_REQUIRED/);checks++;
+ await assert.rejects(run({target:previewReader,diagnostic:false}),/PREVIEW_READER_READBACK_ONLY_BEFORE_REQUIRED/);checks++;
  console.log('PASS: '+checks+' source readback checks; synthetic fixtures only, no network, deploy or data writes.');
 })().catch(error=>{console.error(error);process.exitCode=1;});

@@ -205,6 +205,13 @@ jobs:
           GI_DIAGNOSTIC_ONLY: 'true'
         run: node tools/gravicentra-b4-003-live-backend-source-readback.cjs before
 
+      - name: Verify existing Preview reader module bytes without invoking it
+        if: env.REQUESTED_MODE == 'readback'
+        env:
+          GI_TARGET_FUNCTION: orbit360ScopedPolicyReadPreview
+          GI_DIAGNOSTIC_ONLY: 'true'
+        run: node tools/gravicentra-b4-003-live-backend-source-readback.cjs before
+
       - name: Prepare exact predecessor rollback package
         if: steps.assess.outputs.needs_deploy == 'true'
         shell: bash
@@ -273,6 +280,7 @@ jobs:
             ${{ runner.temp }}/gi-b4003-live-reader-result.json
             ${{ runner.temp }}/gi-b4003-isolated-reader-package.json
             ${{ runner.temp }}/gi-b4003-tenant-config-source-readback.json
+            ${{ runner.temp }}/gi-b4003-preview-reader-source-readback.json
           if-no-files-found: warn
           retention-days: 30
 

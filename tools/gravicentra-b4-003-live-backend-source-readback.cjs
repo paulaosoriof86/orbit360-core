@@ -9,15 +9,16 @@ const phase=process.argv[2],tmp=process.env.RUNNER_TEMP,project=process.env.PROJ
 if(!['before','after','rollback'].includes(phase)||project!=='ays-orbit-360-lab'||!tmp)throw Error('EXACT_PROJECT_AND_PHASE_REQUIRED');
 const sha=b=>crypto.createHash('sha256').update(b).digest('hex');
 const roster='orbit360AssignableAdvisorRoster',writer='orbit360ProductOperationalCommand';
-const reader='orbit360ScopedPolicyRead',catalog='orbit360TenantDomainConfig';
+const reader='orbit360ScopedPolicyRead',previewReader='orbit360ScopedPolicyReadPreview',catalog='orbit360TenantDomainConfig';
 const target=process.env.GI_TARGET_FUNCTION||roster;
-if(![roster,writer,reader,catalog].includes(target))throw Error('ONLY_FOUR_EXACT_B4003_BACKEND_READBACK_TARGETS_ALLOWED');
+if(![roster,writer,reader,previewReader,catalog].includes(target))throw Error('ONLY_FIVE_EXACT_B4003_BACKEND_READBACK_TARGETS_ALLOWED');
 if(target===catalog&&(phase!=='before'||process.env.GI_DIAGNOSTIC_ONLY!=='true'))throw Error('TENANT_CONFIG_READBACK_ONLY_BEFORE_REQUIRED');
+if(target===previewReader&&(phase!=='before'||process.env.GI_DIAGNOSTIC_ONLY!=='true'))throw Error('PREVIEW_READER_READBACK_ONLY_BEFORE_REQUIRED');
 const READER_FILES=isolatedReader.FILES;
 const sourceManifest=files=>sha(JSON.stringify(Object.keys(files).sort().map(file=>[file,files[file].sha256])));
 
 async function source(client,name){
- const region=name===reader?'us-east1':'us-central1';
+ const region=[reader,previewReader].includes(name)?'us-east1':'us-central1';
  const functionId=`projects/${project}/locations/${region}/functions/${name}`;
  const {data:meta}=await client.request({url:'https://cloudfunctions.googleapis.com/v2/'+functionId});
  if(meta.name!==functionId||meta.state!=='ACTIVE'||meta.environment!=='GEN_2'||meta.buildConfig?.entryPoint!==name)throw Error('LIVE_FUNCTION_IDENTITY_INVALID:'+name);
@@ -33,7 +34,7 @@ async function source(client,name){
   if(matches.length!==1)throw Error('DEPLOYED_SOURCE_FILE_CARDINALITY:'+name+':'+file+':'+matches.length);
   return execFileSync('unzip',['-p',archive,matches[0]],{maxBuffer:10_000_000});
  };
- const file=name===roster?'assignable-advisor-roster.js':name===reader?'b4-003-scoped-bootstrap-reader.js':name===catalog?'tenant-domain-config.js':'product-operational-domain.js';
+ const file=name===roster?'assignable-advisor-roster.js':[reader,previewReader].includes(name)?'b4-003-scoped-bootstrap-reader.js':name===catalog?'tenant-domain-config.js':'product-operational-domain.js';
  const sourceBytes=readOne(file);
  const goalBytes=name===writer?readOne('goal-participation-contract.js'):null;
  const gitBlob=b=>crypto.createHash('sha1').update(Buffer.concat([Buffer.from('blob '+b.length+'\u0000'),b])).digest('hex');
@@ -49,7 +50,7 @@ async function source(client,name){
    archiveSourceFiles[relative]={sha256:sha(bytes),bytes:bytes.length};
   }
  }
- const sourceFiles=name===reader?Object.fromEntries(READER_FILES.map(file=>{
+ const sourceFiles=[reader,previewReader].includes(name)?Object.fromEntries((name===reader?READER_FILES:isolatedReader.MODULES).map(file=>{
   // An older deployed reader may predate a dependency. Record that absence;
   // after still requires the complete current source manifest byte for byte.
   if(!names.some(n=>n===file||n.endsWith('/'+file)))return[file,{sha256:null,gitBlobSha:null,bytes:0,present:false}];
@@ -100,9 +101,26 @@ async function catalogFlow(client){
  fs.writeFileSync(path.join(tmp,'gi-b4003-tenant-config-source-readback.json'),JSON.stringify(result,null,2)+'\n');
  console.log(JSON.stringify({target:catalog,status:result.status,sourceMatchesCurrent:result.sourceMatchesCurrent,sourceGitBlobSha:live.sourceGitBlobSha,catalogStatic:live.catalogStatic}));
 }
+async function previewReaderFlow(client){
+ const {archive,...live}=await source(client,previewReader);
+ const expected=isolatedReader.plan('functions');
+ const modules=Object.fromEntries(isolatedReader.MODULES.map(name=>[name,{
+  expectedSha256:expected.sourceFiles[name].sha256,
+  observedSha256:live.sourceFiles[name]?.sha256||null,
+  exact:live.sourceFiles[name]?.sha256===expected.sourceFiles[name].sha256
+ }]));
+ const result={target:previewReader,region:'us-east1',project,phase,observedAtUtc:new Date().toISOString(),
+  status:'PREVIEW_READER_SOURCE_READBACK_ONLY',live,modules,
+  allApprovedSourceModulesExact:Object.values(modules).every(m=>m.exact),
+  readOnly:true,deployAuthorized:false,businessWrites:0};
+ fs.writeFileSync(path.join(tmp,'gi-b4003-preview-reader-source-readback.json'),JSON.stringify(result,null,2)+'\n');
+ console.log(JSON.stringify({target:previewReader,status:result.status,allApprovedSourceModulesExact:result.allApprovedSourceModulesExact,sourceFiles:modules}));
+ if(!result.allApprovedSourceModulesExact)throw Error('PREVIEW_READER_APPROVED_SOURCE_DRIFT');
+}
 (async()=>{
  const client=await new GoogleAuth({scopes:['https://www.googleapis.com/auth/cloud-platform']}).getClient();
  if(target===reader){await readerFlow(client);return;}
+ if(target===previewReader){await previewReaderFlow(client);return;}
  if(target===catalog){await catalogFlow(client);return;}
  const deployed=await Promise.all([roster,writer].map(n=>source(client,n)));
  const local={roster:sha(fs.readFileSync('functions/assignable-advisor-roster.js')),writer:sha(fs.readFileSync('functions/product-operational-domain.js')),goalParticipationContract:sha(fs.readFileSync('functions/goal-participation-contract.js'))};
