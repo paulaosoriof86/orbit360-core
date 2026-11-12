@@ -10,7 +10,7 @@ try{
  assert.equal(p.region,'us-east1');checks++;
  assert.equal(p.localDependencyClosure.length,7);checks++;
  assert.equal(Object.keys(p.sourceFiles).length,10);checks++;
- assert.equal(p.sourceManifestSha256,'690d036074683b4ea1d46cf867fa14856b40536fe739388ff50801ec9d31786a');checks++;
+ assert.equal(p.sourceManifestSha256,'b0d010ec3cb1aebc3a6bcd38a3e748406b04fcfca281d04602935dcc92a874cb');checks++;
  const before=fs.readFileSync(path.join(root,'bootstrap.js'));
  const staged=path.join(temp,'staged');helper.stage(root,staged);
  assert.deepEqual(fs.readdirSync(staged).sort(),helper.FILES.slice().sort());checks++;

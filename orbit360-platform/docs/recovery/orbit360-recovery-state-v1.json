@@ -10,7 +10,7 @@
   "branch": "recovery/fase-a-clean-20260831",
   "forensicOriginSha": "9c95f31461f2eabe9804625b5659bee772f5602a",
   "createdAtUtc": "2026-08-31T18:00:00Z",
-  "updatedAtUtc": "2026-11-12T15:04:45Z",
+  "updatedAtUtc": "2026-11-12T18:06:45Z",
   "status": "I6_6_LIVE_CONTROLLED_PORTFOLIO_UPDATE_IN_PROGRESS",
   "currentIteration": 6,
   "lastCompletedIteration": 5,
@@ -28,6 +28,72 @@
     "fullPerModuleRoleCountryWriteUat": "HOLD_NOT_CERTIFIED",
     "protectedConciliacionesLiveBackend": "HOLD_OLDER_BACKEND_PREVIEW_READY",
     "currentSuccessorProductionAccepted": false
+  },
+  "i66OwnerFrozenUrgentWorkPlan20261112": {
+    "status": "OWNER_DECISIONS_FROZEN_EXECUTION_AND_LIVE_READBACK_REQUIRED",
+    "owner": "Paula Andrea Osorio Franco",
+    "activeGate": "I6.6_POST_B4_007_LIVE",
+    "oneCanonicalBranch": "recovery/fase-a-clean-20260831",
+    "currentExactLiveFrontendSource": "c191b56461742f631c492e2ffd904278f1795fe2",
+    "releaseCadence": "EACH_CAUSAL_FIX_SOURCE_TEST_PREVIEW_SIGNED_QA_SAME_ARTIFACT_OR_ISOLATED_FUNCTION_LIVE_READBACK_IMMEDIATELY_NO_UNVERIFIED_PASS_NO_BATCHED_CHANGES",
+    "operativoAndSuperiorsWriteDecision": "Operativo Carlos: crear, editar, gestionar, responder, registrar, resolver y ejecutar toda accion operativa aprobada en los modulos que realmente tiene autorizados, incluidos Ops, Leads, renovaciones y cobros; Direccion/Admin/AdminTenant/SuperAdmin mismas facultades o superiores en sus alcances; preservar tenant pais privilegios sensibles y auditoria. No extender Asesor ni permitir pagos a ciegas.",
+    "frozenOrder": [
+      "P0_I66_CONCILIACIONES_ISOLATED_READER_PREVIEW_LIVE_SOURCE_PARITY_WITH_ROLLBACK",
+      "P0_CARLOS_ACTUAL_SIGNED_OPS_LEADS_RENEWAL_PAYMENT_WRITE_READBACK_IDEMPOTENCE_COUNTRY_SCOPE",
+      "P0_FINANCIAL_A1_A7_DEDUP_EXACT_RECEIPT_MATCH_SAFE_LIVE_WRITES_IN_FINISHED_MINIBATCHES",
+      "P1_ASEGURADORAS_FULL_OPERATIONAL_EDITS_LOGO_ACCOUNT_SECRET_WITH_AUDIT",
+      "P1_SEARCH_PERFORMANCE_MODULE_ROLE_COUNTRY_REGRESSION_AND_DOCUMENTAL_CONVERGENCE"
+    ],
+    "liveReadback20261112": {
+      "opsPaulaSimulatedOperativo": "PLUS_GESTION_AND_PLUS_NUEVO_INGRESO_VISIBLE_MODAL_OPENS_NO_WRITE_UAT",
+      "opsLeadsPendingProjection": 1,
+      "conciliacionesPaulaDireccion": "SERVER_UNAVAILABLE_EXPLICIT_NOT_ZERO",
+      "liveReaderRevision": "orbit360scopedpolicyread-00002-pok",
+      "liveReaderManifestSha256": "690d036074683b4ea1d46cf867fa14856b40536fe739388ff50801ec9d31786a",
+      "approvedPreviewReaderManifestSha256": "b0d010ec3cb1aebc3a6bcd38a3e748406b04fcfca281d04602935dcc92a874cb",
+      "oldReadbackWorkflowRunId": 43252183905,
+      "oldReadbackWasNotDeployment": true
+    },
+    "progressMetric": "ONLY_EVIDENCE_BACKED_ACCEPTANCE_CHECKS_COUNT; NOT_TIME_ELAPSED_OR_ESTIMATED_COMPLETION",
+    "blocks": {
+      "readerParity": {
+        "verifiedSteps": 2,
+        "requiredSteps": 6,
+        "percent": 33,
+        "verified": ["SIGNED_PREVIEW_TWO_SOURCES", "EXACT_PREVIEW_MODULE_MANIFEST"],
+        "pending": ["EXACT_ONE_FUNCTION_RELEASE", "NEW_LIVE_SOURCE_MANIFEST_READBACK", "SIGNED_LIVE_DIRECTION_OPERATIVO_READS_AND_DENIALS", "BOTH_ORIGINS_NO_REGRESSION"]
+      },
+      "carlosOpsLeadsRenovalsCobros": {
+        "verifiedSteps": 2,
+        "requiredSteps": 7,
+        "percent": 29,
+        "verified": ["OPERATIVO_FRONTEND_AND_BACKEND_CREATE_ENTRY_SOURCE", "LIVE_PAULA_OPERATIVO_SIMULATION_OPS_CREATE_MODAL_OPENS"],
+        "pending": ["SIGNED_CARLOS_OPS_CREATE_READBACK", "SIGNED_CARLOS_LEADS_CREATE_REPLY_OPS_PROJECTION", "SIGNED_CARLOS_DIRECT_RENEWAL_READBACK", "SIGNED_CARLOS_APPLY_PAYMENT_NO_DUPLICATE", "COUNTRY_TENANT_ROLE_NEGATIVE_AND_SUPERIOR_PARITY"]
+      },
+      "financialA1A7Applied": {
+        "verifiedSteps": 0,
+        "requiredSteps": 7,
+        "percent": 0,
+        "verified": [],
+        "pending": ["A1_MAPFRE_PAID", "A2_MAPFRE_PENDING", "A3_BANTRAB", "A4_LA_CEIBA", "A5_ASEGURADORA_GENERAL", "A6_COLUMNA", "A7_FICOHSA_MARCO_PAYES"],
+        "preparatoryReadOnlyCensusNotCountedAsApplied": true
+      },
+      "insurersOperationalParity": {
+        "verifiedSteps": 2,
+        "requiredSteps": 5,
+        "percent": 40,
+        "verified": ["SOURCE_ROLE_VISIBILITY_FIX_LIVE", "PAULA_DIRECTION_LOGO_UPLOAD_READ_RESTORE"],
+        "pending": ["CARLOS_SIGNED_REAL_EDIT", "ACCOUNT_AND_PASSWORD_CHANGE_WITH_AUDIT", "RELOAD_AND_HIGHER_ROLE_TRANSVERSAL_REGRESSION"]
+      },
+      "governanceAndCurrentRelease": {
+        "verifiedSteps": 2,
+        "requiredSteps": 5,
+        "percent": 40,
+        "verified": ["HISTORICAL_B4_007_CLOSED", "CURRENT_C191_223_OF_223_EXACT_FRONTEND_LIVE"],
+        "pending": ["CANONICAL_STATE_NEXT_ACTION_RECONCILED_AND_GUARD", "READER_RELEASE_LIVE_READBACK", "FULL_I66_REAL_WRITE_UAT_SUCCESSOR_ACCEPTANCE"]
+      }
+    },
+    "finalAccepted": false
   },
   "productionTouchedByRecovery": true,
   "dataTouchedByRecovery": true,
@@ -198,7 +264,7 @@
     "phaseAIterationStatuses": "HISTORICAL_FIELDS_ABOVE_PRESERVED_UNTIL_FORMAL_GATE_EVIDENCE;_NO_NEW_PASS_INFERRED",
     "labDataWriteScope": "ONLY_35_AUTHORIZED_COUNTRY_FIELDS;_NO_AUGUST_REFRESH"
   },
-  "nextAction": "I6_6_ONE_CANONICAL_PREVIEW_RENEWAL_OPS_HANDOFF_SIGNED_CARLOS_ROLE_COUNTRY_AND_CONCILIACIONES_READBACK_THEN_EXACT_ARTIFACT_LIVE_ONLY_AFTER_PASS; COBROS_PAYMENT_UAT_AND_A5_A7_SAFE_FINANCIAL_MATCH_REMAIN_HOLD",
+  "nextAction": "I6_6_URGENT_20261112_PROTECT_CURRENT_C191_LIVE_FRONTEND; RELEASE_ONLY_EXACT_APPROVED_CONCILIACIONES_READER_AFTER_PREVIEW_SOURCE_AND_OLD_REVISION_GUARD; SIGNED_LIVE_READBACK; THEN_CARLOS_ACTUAL_OPS_LEADS_RENEWAL_PAYMENT_WRITE_UAT_AND_IMMEDIATE_FINANCIAL_A1_A7_MINIBATCHES; NEVER_REOPEN_B4_007_OR_CLAIM_FALSE_PASS",
   "sourceOfTruth": {
     "projectBoundaryPrevalentAddendum": "orbit360-platform/docs/recovery/ADDENDUM_PREVALENTE_CHATGPT_PROJECT_BOUNDARY_20260831.md",
     "mutableState": "orbit360-platform/docs/recovery/orbit360-recovery-state-v1.json",

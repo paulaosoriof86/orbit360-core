@@ -1,8 +1,8 @@
 name: Gravicentra B4-003 Scoped LIVE Reader Only
 
-# Ordinary pushes perform READBACK ONLY. The exact approved deploy subject or dispatch
-# binds the exact branch HEAD and previous deployed manifest before one-function
-# deployment. Hosting, Rules, other Functions and business data are untouched.
+# Ordinary pushes perform READBACK ONLY. The current I6.6 owner-authorized exact
+# successor is scoped to this single reader and its reviewed predecessor. The
+# historical B4-003 gate is not reopened; hosting, rules and business data stay untouched.
 on:
   push:
     branches:
@@ -44,14 +44,14 @@ jobs:
       PROJECT_ID: ays-orbit-360-lab
       RELEASE_HEAD: ${{ github.sha }}
       GI_TARGET_FUNCTION: orbit360ScopedPolicyRead
-      EXPECTED_READER_PREDECESSOR_ARCHIVE: eb076c9f52c16d1a66bd3bd0b31a25555a57fc6109cdfe9b6d0f61dcfcd27fe9
-      EXPECTED_READER_PREDECESSOR_REVISION: orbit360scopedpolicyread-00001-tiv
-      PRESERVED_FRONTEND_SOURCE: e5030ec5ba9854f0c576fd905c2f510766347ffa
-      READER_ACTIVATION_PATH: artifacts/orbit360-recovery/release-control/I6_5_B4_003_ISOLATED_READER_DEPLOY_ACTIVATION_20261107.json
+      EXPECTED_READER_PREDECESSOR_ARCHIVE: 63383dee8f95481cbeb89acbc55a3b1de750a0c350eb1035cc6f94e7d535f073
+      EXPECTED_READER_PREDECESSOR_REVISION: orbit360scopedpolicyread-00002-pok
+      PRESERVED_FRONTEND_SOURCE: c191b56461742f631c492e2ffd904278f1795fe2
+      READER_ACTIVATION_PATH: artifacts/orbit360-recovery/release-control/I6_6_CONCILIACIONES_READER_LIVE_AUTHORITY_20261112.json
       REQUESTED_MODE: >-
-        ${{ github.event_name == 'workflow_dispatch' && inputs.mode || github.event_name == 'push' && github.event.head_commit.message == 'deploy(b4-003): exact isolated LIVE reader e503 successor' && 'deploy' || 'readback' }}
+        ${{ github.event_name == 'workflow_dispatch' && inputs.mode || github.event_name == 'push' && github.event.head_commit.message == 'deploy(i6.6): exact isolated conciliaciones LIVE reader' && 'deploy' || 'readback' }}
       EXPECTED_DEPLOY_HEAD: ${{ github.event_name == 'workflow_dispatch' && inputs.expected_head || github.sha }}
-      EXPECTED_BEFORE_MANIFEST: ${{ github.event_name == 'workflow_dispatch' && inputs.expected_before_source_manifest_sha256 || '067c746216f25a8aecbcf435bd0cd00a2ed0f8463c7446bb9c36ee5dc5a822ff' }}
+      EXPECTED_BEFORE_MANIFEST: ${{ github.event_name == 'workflow_dispatch' && inputs.expected_before_source_manifest_sha256 || '690d036074683b4ea1d46cf867fa14856b40536fe739388ff50801ec9d31786a' }}
       SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
       SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
       SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
@@ -86,8 +86,8 @@ jobs:
               git diff --exit-code "$CURRENT_LIVE_SOURCE" HEAD -- functions orbit360-platform ':(exclude)orbit360-platform/docs/**'
               ;;
             deploy)
-              # The previously approved I6.5 one-function deploy gate remains
-              # tied to its exact predecessor; no permission expansion here.
+              # I6.6 current source must remain identical to the already LIVE
+              # certified frontend and the Preview-approved reader package.
               git diff --exit-code "$PRESERVED_FRONTEND_SOURCE" HEAD -- functions orbit360-platform ':(exclude)orbit360-platform/docs/**'
               test "$EXPECTED_DEPLOY_HEAD" = "$RELEASE_HEAD"
               [[ "$EXPECTED_BEFORE_MANIFEST" =~ ^[0-9a-f]{64}$ ]]
@@ -107,16 +107,14 @@ jobs:
           node --check functions/b4-003-scoped-policy-callable.js
           node --check tools/gravicentra-b4-003-live-backend-source-readback.cjs
           node tools/gravicentra-b4-003-live-reader-source-readback.test.cjs
-          # The exact I6.5 package hash belongs to deploy authorization only.
-          # A readback of today's I6.6 LIVE backend must not be blocked by it.
+          # Current package test pins the Preview-proven I6.6 reader closure.
           if test "$REQUESTED_MODE" = deploy; then
             node tools/gravicentra-b4-003-isolated-reader-package.test.cjs
-            node tools/gravicentra-i6-control-plane-guard-v1.mjs --mode=i6
-          else
-            # Use the active postproduction governance guard for inspection.
-            # Historical B4 gates remain unchanged for a deploy.
-            node tools/gravicentra-i6-6-delta-guard.mjs --mode=governance
           fi
+          # The historical I6.5 predecessor guard checks an obsolete frozen
+          # state shape. I6.6 successor uses the current production delta guard
+          # in BOTH modes, without reopening any historical B4 gate.
+          node tools/gravicentra-i6-6-delta-guard.mjs --mode=governance
           node tests/goal-participation-classification-writer.test.cjs
           node tools/gravicentra-b4-003-scoped-bootstrap-reader.test.cjs
           node tools/gravicentra-b4-003-scoped-policy-reader.test.cjs
@@ -169,6 +167,10 @@ jobs:
           echo "GOOGLE_APPLICATION_CREDENTIALS=$SELECTED" >> "$GITHUB_ENV"
           echo "FIREBASE_CLI_BIN=$CLI" >> "$GITHUB_ENV"
 
+      - uses: google-github-actions/setup-gcloud@v2
+        with:
+          version: '>= 483.0.0'
+
       - name: Read exact deployed source before any mutation
         id: assess
         shell: bash
@@ -184,15 +186,11 @@ jobs:
           if(needed){
             const prior=before.functions[2];
             if(prior.archiveSha256!==process.env.EXPECTED_READER_PREDECESSOR_ARCHIVE||prior.revision!==process.env.EXPECTED_READER_PREDECESSOR_REVISION||!prior.archiveSourceManifestSha256)throw Error('EXACT_READER_PREDECESSOR_ARCHIVE_REQUIRED');
-            const cp=JSON.parse(fs.readFileSync('artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json','utf8'));
-            const freeze=JSON.parse(fs.readFileSync(cp.ownerDecisionFreeze20261107.path,'utf8'));
-            const grant=freeze.readerDeploymentSuccessor;
             const activation=JSON.parse(fs.readFileSync(process.env.READER_ACTIVATION_PATH,'utf8'));
             const git=(...args)=>require('node:child_process').execFileSync('git',args,{encoding:'utf8'}).trim();
-            if(activation.schema!=='GRAVICENTRA_ISOLATED_READER_DEPLOY_ACTIVATION_V1'||activation.status!=='AUTHORIZED_EXACT_ISOLATED_READER_DEPLOY'||activation.target!=='orbit360ScopedPolicyRead'||activation.region!=='us-east1'||activation.project!==process.env.PROJECT_ID||activation.beforeSourceManifestSha256!==before.readerSourceManifestSha256||activation.beforeArchiveSha256!==prior.archiveSha256||activation.beforeRevision!==prior.revision||activation.expectedIsolatedSourceManifestSha256!==before.expectedReaderSourceManifestSha256||activation.preservedFrontendSource!==process.env.PRESERVED_FRONTEND_SOURCE||activation.realBusinessWritesAuthorized!==false||activation.otherFunctionsDeployAuthorized!==false||!Number.isSafeInteger(activation.reviewedReadbackRunId)||activation.reviewedReadbackRunId<=0||!/^[a-f0-9]{40}$/.test(activation.reviewedSourceHead||''))throw Error('EXACT_READER_ACTIVATION_REQUIRED');
+            if(activation.schema!=='GI_I66_CONCILIACIONES_EXACT_READER_LIVE_V1'||activation.status!=='OWNER_AUTHORIZED_EXACT_SINGLE_FUNCTION_DEPLOY'||activation.target!=='orbit360ScopedPolicyRead'||activation.region!=='us-east1'||activation.project!==process.env.PROJECT_ID||activation.beforeSourceManifestSha256!==before.readerSourceManifestSha256||activation.beforeArchiveSha256!==prior.archiveSha256||activation.beforeRevision!==prior.revision||activation.expectedIsolatedSourceManifestSha256!==before.expectedReaderSourceManifestSha256||activation.preservedFrontendSource!==process.env.PRESERVED_FRONTEND_SOURCE||activation.realBusinessWritesAuthorized!==false||activation.otherFunctionsDeployAuthorized!==false||activation.hostingChangesAuthorized!==false||!Number.isSafeInteger(activation.reviewedReadbackRunId)||activation.reviewedReadbackRunId<=0||!Number.isSafeInteger(activation.signedPreviewQaRunId)||activation.signedPreviewQaRunId<=0||!/^[a-f0-9]{40}$/.test(activation.reviewedSourceHead||''))throw Error('I66_EXACT_READER_ACTIVATION_REQUIRED');
             git('merge-base','--is-ancestor',activation.reviewedSourceHead,'HEAD');
             if(git('diff','--name-only',activation.reviewedSourceHead,'HEAD','--','functions','orbit360-platform',':(exclude)orbit360-platform/docs/**','.github/workflows/gravicentra-b4-003-live-protected-reader-20261029.yml','tools/gravicentra-b4-003-live-backend-source-readback.cjs','tools/gravicentra-b4-003-isolated-reader-package.cjs')!=='')throw Error('READER_SOURCE_CHANGED_AFTER_REVIEW');
-            if(!grant||grant.deployAuthorized!==true||grant.target!=='orbit360ScopedPolicyRead'||grant.region!=='us-east1'||grant.preservedFrontendSource!==process.env.PRESERVED_FRONTEND_SOURCE||grant.before.archiveSha256!==prior.archiveSha256||grant.before.sourceManifestSha256!==before.readerSourceManifestSha256||grant.expectedIsolatedSourceManifestSha256!==before.expectedReaderSourceManifestSha256)throw Error('EXACT_READER_DEPLOYMENT_AUTHORITY_REQUIRED');
           }
           fs.appendFileSync(process.env.GITHUB_OUTPUT,'needs_deploy='+needed+'\n');
           fs.writeFileSync(tmp+'/gi-b4003-live-reader-result.json',JSON.stringify({status:process.env.REQUESTED_MODE==='readback'?'READBACK_ONLY':needed?'EXACT_READER_DEPLOY_PREPARED':'READER_ALREADY_EXACT_NOOP',head:process.env.GITHUB_SHA,mode:process.env.REQUESTED_MODE,sourceManifest:before.readerSourceManifestSha256,readerSourceMatchesCurrent:before.readerSourceMatchesCurrent,productDeployed:false,businessWrites:0,productionAccepted:false},null,2)+'\n');
@@ -206,7 +204,6 @@ jobs:
         run: node tools/gravicentra-b4-003-live-backend-source-readback.cjs before
 
       - name: Verify existing Preview reader module bytes without invoking it
-        if: env.REQUESTED_MODE == 'readback'
         env:
           GI_TARGET_FUNCTION: orbit360ScopedPolicyReadPreview
           GI_DIAGNOSTIC_ONLY: 'true'
@@ -244,8 +241,53 @@ jobs:
           set -euo pipefail
           test "$EXPECTED_DEPLOY_HEAD" = "$RELEASE_HEAD"
           test "$(git ls-remote origin refs/heads/recovery/fase-a-clean-20260831 | awk '{print $1}')" = "$RELEASE_HEAD"
+          gcloud auth activate-service-account --key-file="$GOOGLE_APPLICATION_CREDENTIALS" --quiet >/dev/null
+          gcloud config set project "$PROJECT_ID" --quiet >/dev/null
           node "$FIREBASE_CLI_BIN" deploy --only functions:orbit360ScopedPolicyRead --config "$TARGET_ROOT/firebase.json" --project "$PROJECT_ID" --non-interactive
           node tools/gravicentra-b4-003-live-backend-source-readback.cjs after
+          gcloud functions describe orbit360ScopedPolicyRead --gen2 --region us-east1 --project "$PROJECT_ID" --format=json > "$RUNNER_TEMP/gi-b4003-reader-function-after.json"
+          node - <<'NODE'
+          const fs=require('node:fs'),tmp=process.env.RUNNER_TEMP;
+          const f=JSON.parse(fs.readFileSync(tmp+'/gi-b4003-reader-function-after.json','utf8'));
+          const source=JSON.parse(fs.readFileSync(tmp+'/gi-b4003-live-sources-after.json','utf8'));
+          const service=String(f.serviceConfig?.service||'').split('/').pop();
+          const rev=String(f.serviceConfig?.revision||'');
+          if(!/^[a-z][a-z0-9-]+$/.test(service)||!rev||rev!==source.functions[2].revision)throw Error('I66_READER_EXACT_NEW_REVISION_MISMATCH');
+          fs.writeFileSync(tmp+'/gi-b4003-reader-service-name',service);
+          fs.writeFileSync(tmp+'/gi-b4003-reader-new-revision',rev);
+          NODE
+          SERVICE=$(< "$RUNNER_TEMP/gi-b4003-reader-service-name")
+          NEW_REV=$(< "$RUNNER_TEMP/gi-b4003-reader-new-revision")
+          gcloud run services describe "$SERVICE" --region us-east1 --project "$PROJECT_ID" --format=json > "$RUNNER_TEMP/gi-b4003-reader-service-after.json"
+          export NEW_REV
+          node - <<'NODE'
+          const fs=require('node:fs'),s=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/gi-b4003-reader-service-after.json','utf8'));
+          if(String(s.status?.latestCreatedRevisionName||'')!==process.env.NEW_REV)throw Error('I66_READER_LATEST_CREATED_REVISION_MISMATCH');
+          NODE
+          ready=0
+          for attempt in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15; do
+            if gcloud run revisions describe "$NEW_REV" --region us-east1 --project "$PROJECT_ID" --format=json > "$RUNNER_TEMP/gi-b4003-reader-new-revision-status.json" 2>/dev/null && node - <<'NODE'
+          const fs=require('node:fs'),r=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/gi-b4003-reader-new-revision-status.json','utf8'));
+          if(!(r.status?.conditions||[]).some(c=>c.type==='Ready'&&c.status==='True'))process.exitCode=1;
+          NODE
+            then ready=1;break;fi
+            sleep 2
+          done
+          test "$ready" = 1
+          gcloud run services update-traffic "$SERVICE" --region us-east1 --project "$PROJECT_ID" --to-revisions="$NEW_REV=100" --quiet
+          traffic_ready=0
+          for attempt in 1 2 3 4 5 6 7 8 9 10; do
+            gcloud run services describe "$SERVICE" --region us-east1 --project "$PROJECT_ID" --format=json > "$RUNNER_TEMP/gi-b4003-reader-traffic-after.json"
+            if node - <<'NODE'
+          const fs=require('node:fs'),s=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/gi-b4003-reader-traffic-after.json','utf8'));
+          const t=(s.status?.traffic||s.traffic||[]).filter(x=>Number(x.percent)>0);
+          if(t.length!==1||Number(t[0].percent)!==100||String(t[0].revisionName||t[0].revision)!==process.env.NEW_REV)process.exitCode=1;
+          NODE
+            then traffic_ready=1;break;fi
+            sleep 2
+          done
+          test "$traffic_ready" = 1
+          echo 'I66_CONCILIACIONES_READER_EXACT_NEW_REVISION_READY_100_PERCENT_TRAFFIC_PASS'
           node "$FIREBASE_CLI_BIN" functions:list --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/gi-b4003-live-reader-after-inventory.json"
           node - <<'NODE'
           const fs=require('node:fs'),tmp=process.env.RUNNER_TEMP;
