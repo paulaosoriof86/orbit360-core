@@ -122,12 +122,13 @@ jobs:
           node - <<'NODE'
           const fs=require('node:fs'),p=process.env.RUNNER_TEMP+'/gi-b4003-live-sources-before.json';
           const d=JSON.parse(fs.readFileSync(p));
-          if(d.target!=='orbit360ScopedPolicyRead'||d.readerSourceMatchesCurrent||
-             d.functions.length!==3||d.functions[2].region!=='us-east1')throw Error('I66_READER_BEFORE_GUARD_FAILED');
-          fs.writeFileSync(process.env.RUNNER_TEMP+'/gi-reader-repair/old-revision',d.functions[2].revision);
+          if(d.target!=='orbit360ScopedPolicyRead'||d.functions.length!==3||
+             d.functions[2].region!=='us-east1')throw Error('I66_READER_BEFORE_GUARD_FAILED');
           const current=require('./tools/gravicentra-i66-protected-reader-dual-isolated-package.cjs').plan('functions');
           if(current.sourceManifestSha256!==d.expectedReaderSourceManifestSha256)throw Error('I66_READER_MANIFEST_INCONSISTENT');
-          console.log('I66_READER_OLD_REVISION_AND_NEW_BYTE_MANIFEST_SEALED');
+          const reuse=d.readerSourceMatchesCurrent;
+          fs.appendFileSync(process.env.GITHUB_ENV,'I66_READER_REUSE_EXACT_DEPLOYED_SOURCE='+(reuse?'true':'false')+'\n');
+          console.log('I66_READER_PRE_DEPLOY_EXACT_MANIFEST_SEALED '+(reuse?'EXISTING_STAGED_SOURCE':'NEEDS_NEW_SOURCE_DEPLOY'));
           NODE
           gcloud functions describe orbit360ScopedPolicyRead --gen2 --region us-east1 --project "$PROJECT_ID" --format=json \
             > "$RUNNER_TEMP/gi-reader-repair/live-function-before.json"
@@ -136,6 +137,19 @@ jobs:
           const s=String(d.serviceConfig?.service||'').split('/').pop();
           if(!/^[a-z][a-z0-9-]+$/.test(s))throw Error('I66_READER_SERVICE_UNKNOWN');
           fs.writeFileSync(process.env.RUNNER_TEMP+'/gi-reader-repair/service-name',s);
+          NODE
+          SERVICE=$(< "$RUNNER_TEMP/gi-reader-repair/service-name")
+          gcloud run services describe "$SERVICE" --region us-east1 --project "$PROJECT_ID" --format=json \
+            > "$RUNNER_TEMP/gi-reader-repair/traffic-initial.json"
+          node - <<'NODE'
+          const fs=require('node:fs'),path=require('node:path');
+          const p=path.join(process.env.RUNNER_TEMP,'gi-reader-repair');
+          const t=JSON.parse(fs.readFileSync(path.join(p,'traffic-initial.json')));
+          const route=(t.status?.traffic||[]).filter(v=>Number(v.percent)>0);
+          if(route.length!==1||Number(route[0].percent)!==100||!/^orbit360scopedpolicyread-[a-z0-9-]+$/.test(route[0].revisionName))
+            throw Error('I66_READER_PREVIOUS_ROUTING_AMBIGUOUS');
+          fs.writeFileSync(path.join(p,'old-revision'),route[0].revisionName);
+          console.log('I66_READER_PREVIOUS_EFFECTIVE_TRAFFIC_100_PERCENT_SEALED '+route[0].revisionName);
           NODE
           for ORIGIN in 'https://app.aysseguros.com' 'https://ays-orbit-360-lab.web.app';do
             curl -fsSL --max-time 30 "$ORIGIN/" | sha256sum
@@ -185,9 +199,42 @@ jobs:
             exit "$code"
           }
           trap rollback EXIT
-          node "$FIREBASE_CLI_BIN" deploy --only functions:orbit360ScopedPolicyRead \
-            --config "$RUNNER_TEMP/gi-reader-repair/live/firebase.json" --project "$PROJECT_ID" --non-interactive
-          node tools/gravicentra-b4-003-live-backend-source-readback.cjs after
+          if test "$I66_READER_REUSE_EXACT_DEPLOYED_SOURCE" = true;then
+            echo 'I66_READER_REUSE_EXISTING_EXACT_SOURCE_ALREADY_DEPLOYED_PREVIOUS_RUN'
+            I66_ALLOW_EXISTING_EXACT_READER_SOURCE=true \
+              node tools/gravicentra-b4-003-live-backend-source-readback.cjs after
+          else
+            node "$FIREBASE_CLI_BIN" deploy --only functions:orbit360ScopedPolicyRead \
+              --config "$RUNNER_TEMP/gi-reader-repair/live/firebase.json" --project "$PROJECT_ID" --non-interactive
+            node tools/gravicentra-b4-003-live-backend-source-readback.cjs after
+          fi
+          # Firebase source provenance describes the newest revision, while a
+          # previously pinned Cloud Run traffic rule may still serve the OLD one.
+          # Make routing explicit, signed-UAT it, and rollback on any failure.
+          NEW_REV=$(node -e 'const x=require(process.argv[1]);if(!x.readerSourceMatchesCurrent)process.exit(41);process.stdout.write(x.functions[2].revision)' \
+            "$RUNNER_TEMP/gi-b4003-live-sources-after.json")
+          test -n "$NEW_REV" && test "$NEW_REV" != "$OLD_REV"
+          gcloud run services describe "$SERVICE" --region us-east1 --project "$PROJECT_ID" --format=json \
+            > "$RUNNER_TEMP/gi-reader-repair/traffic-before-explicit-promotion.json"
+          node - <<'NODE'
+          const x=require(process.env.RUNNER_TEMP+'/gi-reader-repair/traffic-before-explicit-promotion.json');
+          console.log('I66_READER_POST_DEPLOY_ROUTING_BEFORE_EXPLICIT_PROMOTION '+
+            JSON.stringify((x.status?.traffic||[]).map(v=>({revisionName:v.revisionName,percent:v.percent}))));
+          NODE
+          gcloud run services update-traffic "$SERVICE" --region us-east1 --project "$PROJECT_ID" \
+            --to-revisions="$NEW_REV=100" --quiet
+          gcloud run services describe "$SERVICE" --region us-east1 --project "$PROJECT_ID" --format=json \
+            > "$RUNNER_TEMP/gi-reader-repair/traffic-after-explicit-promotion.json"
+          node - <<'NODE'
+          const fs=require('node:fs'),path=require('node:path');
+          const p=path.join(process.env.RUNNER_TEMP,'gi-reader-repair');
+          const t=JSON.parse(fs.readFileSync(path.join(p,'traffic-after-explicit-promotion.json')));
+          const r=JSON.parse(fs.readFileSync(path.join(process.env.RUNNER_TEMP,'gi-b4003-live-sources-after.json')));
+          const route=(t.status?.traffic||[]).filter(v=>Number(v.percent)>0);
+          if(route.length!==1||route[0].revisionName!==r.functions[2].revision||Number(route[0].percent)!==100)
+            throw Error('I66_READER_LIVE_ROUTING_EXACT_NEW_REVISION_NOT_100_PERCENT');
+          console.log('I66_READER_LIVE_SOURCE_AND_EFFECTIVE_TRAFFIC_EXACT_NEW_REVISION_100_PERCENT_PASS');
+          NODE
           node tools/gravicentra-i66-protected-ops-leads-carlos-paula-dual-host-uat.cjs
           for ORIGIN in 'https://app.aysseguros.com' 'https://ays-orbit-360-lab.web.app';do
             curl -fsSL --max-time 30 "$ORIGIN/" | sha256sum
@@ -210,5 +257,8 @@ jobs:
             ${{ runner.temp }}/gi-b4003-live-sources-after.json
             ${{ runner.temp }}/gi-reader-repair/hosting-before.sha256
             ${{ runner.temp }}/gi-reader-repair/hosting-after.sha256
+            ${{ runner.temp }}/gi-reader-repair/traffic-before-explicit-promotion.json
+            ${{ runner.temp }}/gi-reader-repair/traffic-after-explicit-promotion.json
+            ${{ runner.temp }}/gi-reader-repair/traffic-initial.json
           if-no-files-found: warn
           retention-days: 21

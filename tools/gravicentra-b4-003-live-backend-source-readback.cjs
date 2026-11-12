@@ -90,7 +90,9 @@ async function readerFlow(client){
   if(prior.name!==reader||prior.region!=='us-east1')throw Error('READER_BEFORE_REGION_REQUIRED');
   if(phase==='after'){
    if(!result.readerSourceMatchesCurrent)throw Error('DEPLOYED_READER_DEPENDENCY_BYTES_MISMATCH');
-   if(prior.revision===current.revision)throw Error('TARGET_REVISION_DID_NOT_MOVE');
+   if(prior.revision===current.revision&&!(dualReader&&
+      process.env.I66_ALLOW_EXISTING_EXACT_READER_SOURCE==='true'&&before.readerSourceMatchesCurrent))
+      throw Error('TARGET_REVISION_DID_NOT_MOVE');
   }else if(prior.sourceManifestSha256!==current.sourceManifestSha256||!prior.archiveSourceManifestSha256||prior.archiveSourceManifestSha256!==current.archiveSourceManifestSha256)throw Error('ROLLBACK_READER_DEPENDENCY_BYTES_NOT_RESTORED');
  }
  fs.writeFileSync(path.join(tmp,'gi-b4003-live-sources-'+phase+'.json'),JSON.stringify(result,null,2)+'\n');
