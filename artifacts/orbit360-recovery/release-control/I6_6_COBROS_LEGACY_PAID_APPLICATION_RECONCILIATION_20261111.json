@@ -1,0 +1,33 @@
+{
+  "schema": "GRAVICENTRA_I6_6_COBROS_PAID_RECEIPT_APPLICATION_RECONCILIATION_V1",
+  "status": "SOURCE_CORRECTED_EMULATOR_QA_AND_LIVE_BACKEND_VALIDATION_PENDING",
+  "approvedByDirection": true,
+  "dateGuatemala": "2026-11-11",
+  "lastClosedReleaseGate": "B4-007",
+  "activeOperationalGate": "I6.6",
+  "authorization": "Dirección solicita corregir transversalmente el error de aplicación del pago desde Cliente 360 y Cobros, preservar origen de pago, continuar actualización de cartera sin reimportación y publicar correcciones probadas.",
+  "reportedSymptom": "Carlos Operativo: Guardar aplicación muestra error genérico. La captura no permite conocer el código remoto exacto.",
+  "provenCodeFailure": "applyPayment rechaza un recibo previamente pagado que no tenga aún un documento cobro; receipt.estado Pagado hace existingPaid=true, pero antiguo enrichment requería existingCobro.",
+  "unknown": "No se atribuye el error particular de Carlos a este caso sin leer su requestId y estado de recibo correspondientes.",
+  "scope": [
+    "Autorizar solo reconcile_payment explícito con evidencia de aseguradora para vincular recibo ya pagado sin cobro físico.",
+    "Preservar fecha de pago, país, paymentState, provenance DIRECT/INFERRED y origin existentes; jamás volver a recaudar el mismo pago.",
+    "Continuar exigiendo obligación activa única para registrar un nuevo pago no existente; duplicados y conflictos de estado fallan cerrados.",
+    "Aplicar una sola ruta backend para Cobros y Cliente 360; role-country authorization inalterada."
+  ],
+  "codeOwner": "functions/cobros-reconciliation-domain.js",
+  "testOwner": "tools/gravicentra-delta66-advisor-payment-emulator-functional.test.cjs",
+  "sourceUnitTest": "tools/gravicentra-i6-6-cobros-application-and-temporal-search.test.cjs",
+  "testScenarios": [
+    "already_paid_imported_receipt_no_cobro_can_link_one_application",
+    "ordinary_second_apply_payment_still_denied",
+    "same_request_idempotent",
+    "GT_and_CO_membership_scope_denies_foreign_country",
+    "preexisting_inference_provenance_preserved",
+    "receipt_paid_but_linked_cobro_pending_state_conflict_denied"
+  ],
+  "productionBackendDeployed": false,
+  "productionBusinessDataWrites": 0,
+  "noVerifiedCarlosReadbackYet": true,
+  "nextAction": "Run synthetics in Firestore emulator without cloud credentials, then review exact signed function deployment gate and LIVE readback before declaring resolved."
+}

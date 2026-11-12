@@ -940,6 +940,36 @@
           }
         }
       ]
+    },
+    {
+      "id": "I6_6_LEGACY_PAID_RECEIPT_APPLICATION_WITHOUT_DOUBLE_PAYMENT_P0",
+      "approvedByDirection": true,
+      "receipt": "artifacts/orbit360-recovery/release-control/I6_6_COBROS_LEGACY_PAID_APPLICATION_RECONCILIATION_20261111.json",
+      "sourceStatus": "SOURCE_UNIT_PASS_EMULATOR_AUTHORIZED_PENDING_NO_LIVE_WRITES",
+      "capabilityOwners": ["COBROS_PRIMARY_RUNTIME", "CLIENTE360_PRIMARY_RUNTIME", "CROSS_MODULE_RELATIONSHIPS"],
+      "scope": "Manual insurer application for pre-existing paid receipts with no physical cobro is an idempotent reconciliation, never a new payment. Preserve historical direct/inferred provenance and fail closed on conflicting linked states or deterministic ID collisions; cross-role and cross-country owner is unchanged.",
+      "paths": [
+        {
+          "path": "functions/cobros-reconciliation-domain.js",
+          "gitBlobSha": "e707884baa8c6c87f8d3875c9701b350b49ccfcc",
+          "replaces": {
+            "path": "functions/cobros-reconciliation-domain.js",
+            "priorGitBlobSha": "56bdb9e3714fe72d754da207cdf3e266f1392363",
+            "priorChangeId": "I6_6_PAYMENT_REPEAT_AND_PORTFOLIO_INTEGRITY_WRITE_BOUNDARY_P0"
+          }
+        }
+      ],
+      "tests": [
+        {
+          "path": "tools/gravicentra-i6-6-cobros-application-and-temporal-search.test.cjs",
+          "gitBlobSha": "41ee9f9aa0ef65d9e19ecc18eee20fdbc3ddc54d",
+          "replaces": {
+            "path": "tools/gravicentra-i6-6-cobros-application-and-temporal-search.test.cjs",
+            "priorGitBlobSha": "6a5a17727b4f0ff5a3beb572f0f809a09bba633c",
+            "priorChangeId": "I6_6_COBROS_APPLICATION_TEMPORAL_STATUS_AND_GLOBAL_SEARCH_P0"
+          }
+        }
+      ]
     }
   ]
 }

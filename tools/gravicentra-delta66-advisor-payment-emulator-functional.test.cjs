@@ -167,6 +167,57 @@ const seed=async(id,country,advisorId,monto)=>{
   }));
   assert.equal(enriched.ok,true);assert.equal(enriched.portfolioUpdated,true);checks++;
   assert.equal((await data('cobros','dummy').parent.where('reciboId','==','rec_method_0').get()).size,1,'enrichment preserves one cobro');checks++;
+  stage='legacy-paid-receipt-without-cobro-application';
+  await seed('legacy_paid','GT','ase-gt',237);
+  await data('recibosEsperados','rec_legacy_paid').set({moneda:'GTQ',estado:'Pagado',paymentState:'PAID_DIRECT',
+    paymentOrigin:'CRM_MIGRATED_DIRECT_PAYMENT',fechaPago:'2026-10-29',metodoPago:'Transferencia bancaria'},{merge:true});
+  await data('carteraPrimas','car_legacy_paid').set({id:'car_legacy_paid',reciboId:'rec_legacy_paid',
+    polizaId:'pol_legacy_paid',clienteId:'cli_legacy_paid',pais:'GT',moneda:'GTQ',monto:237,
+    estado:'Pagado',estadoCartera:'Pagado',carteraActiva:true});
+  await expectDenied(()=>command.run(request('op-gt','Operativo',{
+    operation:'apply_payment',requestId:'qa_legacy_repeat_disallowed',reason:'QA no duplicar pago ya existente',
+    payload:{receiptId:'rec_legacy_paid',sourceType:'manual',paidDate:'2026-11-10',amount:237}
+  })),'failed-precondition');
+  assert.equal((await data('cobros','dummy').parent.where('reciboId','==','rec_legacy_paid').get()).size,0);checks++;
+  const reconcileLegacy=()=>command.run(request('op-gt','Operativo',{
+    operation:'reconcile_payment',requestId:'qa_legacy_paid_application_001',reason:'QA aplicación de pago histórico acreditado',
+    payload:{receiptId:'rec_legacy_paid',paymentOriginSource:'insurer_invoice',
+      applicationDate:'2026-11-10',invoiceNumber:'QA-LEGACY-237',applicationEvidenceType:'MANUAL_RECONCILIATION'}
+  }));
+  const legacyApplied=await reconcileLegacy();
+  assert.equal(legacyApplied.ok,true);assert.equal(legacyApplied.paymentState,'PAID_DIRECT');checks++;
+  assert.equal(legacyApplied.paymentOrigin,'CRM_MIGRATED_DIRECT_PAYMENT');assert.equal(legacyApplied.paidDate,'2026-10-29');checks++;
+  const legacyCobros=await data('cobros','dummy').parent.where('reciboId','==','rec_legacy_paid').get();
+  assert.equal(legacyCobros.size,1,'historic paid receipt may acquire only one deterministic linked cobro');checks++;
+  assert.equal(legacyCobros.docs[0].data().paymentOrigin,'CRM_MIGRATED_DIRECT_PAYMENT');checks++;
+  assert.equal((await reconcileLegacy()).reused,true,'idempotent retry never creates another payment');checks++;
+  await expectDenied(()=>command.run(request('op-co','Operativo',{
+    operation:'reconcile_payment',requestId:'qa_legacy_wrong_country',reason:'QA country scope',
+    payload:{receiptId:'rec_legacy_paid',paymentOriginSource:'insurer_invoice',invoiceNumber:'QA-OTHER'}
+  })));
+  stage='legacy-inferred-receipt-application-provenance';
+  await seed('legacy_inferred','GT','ase-gt',157);
+  await data('recibosEsperados','rec_legacy_inferred').set({moneda:'GTQ',estado:'Pagado',
+    paymentState:'PAID_INFERRED',directOrInferred:'INFERRED',paymentOrigin:'INSURER_STATEMENT_INFERRED',
+    inferredEffectiveDate:'2026-10-20',evidenceAsOfDate:'2026-11-10',confidence:'HIGH'},{merge:true});
+  const legacyInferred=await command.run(request('direction-gt','Direccion',{
+    operation:'reconcile_payment',requestId:'qa_legacy_inferred_application',reason:'QA conservar inferencia preexistente',
+    payload:{receiptId:'rec_legacy_inferred',paymentOriginSource:'insurer_statement',applicationDate:'2026-11-10'}
+  }));
+  assert.equal(legacyInferred.ok,true);assert.equal(legacyInferred.paymentState,'PAID_INFERRED');checks++;
+  assert.equal(legacyInferred.applicationState,'APPLIED_INFERRED');checks++;
+  assert.equal((await data('cobros',legacyInferred.cobroId).get()).data().directOrInferred,'INFERRED');checks++;
+  assert.equal((await data('recibosEsperados','rec_legacy_inferred').get()).data().inferredEffectiveDate,'2026-10-20');checks++;
+  stage='conflicting-paid-receipt-and-unpaid-cobro-fails-closed';
+  await seed('legacy_conflict','GT','ase-gt',200);
+  await data('recibosEsperados','rec_legacy_conflict').set({estado:'Pagado',moneda:'GTQ'},{merge:true});
+  await data('cobros','cob_legacy_conflict').set({reciboId:'rec_legacy_conflict',polizaId:'pol_legacy_conflict',
+    clienteId:'cli_legacy_conflict',pais:'GT',monto:200,estado:'Pendiente'});
+  await expectDenied(()=>command.run(request('op-gt','Operativo',{
+    operation:'reconcile_payment',requestId:'qa_conflict_paid_receipt',reason:'QA no sobreescribir conflicto',
+    payload:{receiptId:'rec_legacy_conflict',paymentOriginSource:'insurer_invoice'}
+  })),'failed-precondition');
+  assert.equal((await data('cobros','cob_legacy_conflict').get()).data().estado,'Pendiente');checks++;
     stage='direct-payment-authorization';
   await expectDenied(()=>apply('advisor-gt','Asesor','rec_method_0','qa_advisor_wrong','Efectivo',100));
   await expectDenied(()=>apply('op-co','Operativo','rec_method_0','qa_country_wrong','Efectivo',100));

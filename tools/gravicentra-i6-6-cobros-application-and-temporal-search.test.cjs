@@ -37,10 +37,14 @@ assert.match(policies,/q\.expectedReceiptDisplayStatus\s*\?\s*q\.expectedReceipt
 assert.match(detail,/Orbit\.q\.expectedReceiptDisplayStatus\(r\)/,'CLIENT_POLICY_DETAIL_OWNER');
 assert.match(cobros,/const origin='insurer_invoice';/,'APPLICATION_IS_ENRICHMENT_NOT_SECOND_CRM_PAYMENT');
 assert.doesNotMatch(cobros,/const origin=paymentOriginKind\(receipt\) === 'CRM_DIRECT' \? 'crm_migrated_direct'/,'CRM_DUPLICATE_PAYMENT_PATH_REMOVED');
-assert.match(backend,/const enrichment = \['insurer_invoice',\s*'insurer_statement',\s*'commission_statement'\]\.includes\(source\) && Boolean\(existingCobro\)/,'SERVER_ENRICHMENT_GUARD_PRESERVED');
+assert.match(backend,/const legacyPaidReceiptReconciliation = !existingCobro && receiptPaid && operationName === 'reconcile_payment';/,'LEGACY_PAID_RECEIPT_CAN_ENRICH_NOT_REAPPLY');
+assert.match(backend,/const enrichment = applicationEvidenceSource && \(cobroPaid \|\| legacyPaidReceiptReconciliation\)/,'SERVER_ENRICHMENT_ONLY_FOR_EXISTING_PAID_EVIDENCE');
+assert.match(backend,/PAYMENT_RECEIPT_COBRO_STATE_CONFLICT/,'CONFLICTING_LINKED_PAYMENT_STATES_FAIL_CLOSED');
+assert.match(backend,/PAYMENT_DETERMINISTIC_COBRO_ID_CONFLICT/,'HISTORIC_RELINK_ID_COLLISION_FAIL_CLOSED');
+assert.match(backend,/existingPaymentState === 'PAID_INFERRED' \|\| existingDirectOrInferred === 'INFERRED'/,'APPLICATION_ENRICHMENT_PRESERVES_INFERRED_PROVENANCE');
 assert.match(backend,/if \(existingPaid && !enrichment\) throw/,'SERVER_DUPLICATE_PAID_GUARD_PRESERVED');
 assert.match(cobros,/const feedback=paymentFailureFeedback\(error\);[\s\S]*?btn\.disabled=feedback\.uncertain/,'APPLICATION_ERROR_TRUTH_AND_RETRY_GUARD');
 assert.match(cobros,/esta pantalla conserva los datos/,'APPLICATION_FAILURE_PRESERVES_FIELDS');
 assert.match(router,/const indexedCollections = new Set\(\['clientes','polizas','vehiculos','cobros','aseguradoras','asesores'\]\)/,'GLOBAL_SEARCH_RELEVANT_COLLECTIONS_ONLY');
 assert.match(router,/const term = normalized\(query\.trim\(\)\)/,'GLOBAL_SEARCH_ACCENT_FOLD_BOTH_SIDES');
-console.log('I66_COBROS_APPLICATION_TEMPORAL_SEARCH_TRANSVERSAL_19_19_PASS');
+console.log('I66_COBROS_APPLICATION_TEMPORAL_SEARCH_TRANSVERSAL_PASS');

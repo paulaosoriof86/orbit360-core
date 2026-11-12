@@ -483,9 +483,17 @@ async function applyPayment(authz, data, payload, operationName = 'apply_payment
     if (activePortfolioRows.length > 1) throw new HttpsError('failed-precondition', 'Más de una obligación activa corresponde al mismo recibo.');
     if (cobroSnap.size > 1) throw new HttpsError('failed-precondition', 'Más de un cobro corresponde al mismo recibo.');
     const existingCobro = cobroSnap.empty ? null : (cobroSnap.docs[0].data() || {});
-    const existingPaid = Boolean(existingCobro && (norm(existingCobro.estado) === 'pagado' || /^PAID_/.test(text(existingCobro.paymentState, 80).toUpperCase())))
-      || (norm(receipt.estado) === 'pagado' && !existingCobro);
-    const enrichment = ['insurer_invoice', 'insurer_statement', 'commission_statement'].includes(source) && Boolean(existingCobro);
+    const cobroPaid = Boolean(existingCobro && (norm(existingCobro.estado) === 'pagado' || /^PAID_/.test(text(existingCobro.paymentState, 80).toUpperCase())));
+    const receiptPaid = norm(receipt.estado) === 'pagado' || /^PAID_/.test(text(receipt.paymentState, 80).toUpperCase());
+    if (receiptPaid && existingCobro && !cobroPaid)
+      throw new HttpsError('failed-precondition', 'PAYMENT_RECEIPT_COBRO_STATE_CONFLICT: el recibo pagado y el cobro vinculado requieren revisión.');
+    const existingPaid = cobroPaid || (receiptPaid && !existingCobro);
+    const applicationEvidenceSource = ['insurer_invoice', 'insurer_statement', 'commission_statement'].includes(source);
+    // An imported/confirmed paid receipt may predate the physical cobro row.
+    // Only the explicit insurer-application operation may link that history;
+    // never accept it as a second payment or as an automatic inference.
+    const legacyPaidReceiptReconciliation = !existingCobro && receiptPaid && operationName === 'reconcile_payment';
+    const enrichment = applicationEvidenceSource && (cobroPaid || legacyPaidReceiptReconciliation);
     if (existingPaid && !enrichment) throw new HttpsError('failed-precondition', 'PAYMENT_ALREADY_APPLIED: no se puede registrar de nuevo el mismo recibo.');
     if (!existingPaid && activePortfolioRows.length !== 1)
       throw new HttpsError('failed-precondition', 'PAYMENT_ACTIVE_PORTFOLIO_REQUIRED: falta obligación activa única para aplicar el pago.');
@@ -496,37 +504,38 @@ async function applyPayment(authz, data, payload, operationName = 'apply_payment
     const cobroDoc = cobroSnap.empty ? null : cobroSnap.docs[0];
     const cobroId = cobroDoc ? cobroDoc.id : deterministicCobroId(authz.tenantId, receiptId);
     const cobroRef = tenantData(authz.tenantId, 'cobros').doc(cobroId);
+    if (!cobroDoc && (await tx.get(cobroRef)).exists)
+      throw new HttpsError('failed-precondition', 'PAYMENT_DETERMINISTIC_COBRO_ID_CONFLICT: revisar relación del recibo.');
     const beforeCobro = cobroDoc ? (cobroDoc.data() || {}) : {};
     const advisorReported = advisorReportPending(receipt);
-    const existingPaidDate = text(beforeCobro.paidDate || beforeCobro.fechaPago, 32);
-    const existingApplicationDate = text(beforeCobro.applicationDate || beforeCobro.fechaAplicacion, 32);
+    const existingPaidDate = text(beforeCobro.paidDate || beforeCobro.fechaPago || (existingPaid ? (receipt.paidDate || receipt.fechaPago) : ''), 32);
+    const existingApplicationDate = text(beforeCobro.applicationDate || beforeCobro.fechaAplicacion || (existingPaid ? receipt.applicationDate : ''), 32);
     const reportPaidDate = advisorReported ? text(receipt.fechaPagoReportada || receipt.paidDate || receipt.fechaPago, 32) : '';
     const finalPaidDate = paidDate || reportPaidDate || existingPaidDate;
     const finalApplicationDate = applicationDate || existingApplicationDate;
-    const finalPaymentMethod = paymentMethod || (advisorReported ? text(receipt.metodoPago || receipt.paymentMethod, 180) : '') || text(beforeCobro.paymentMethod || beforeCobro.metodo, 180);
-    const finalPaymentSupportDocumentRef = paymentSupportDocumentRef || (advisorReported ? text(receipt.paymentSupportDocumentRef || receipt.soportePagoRef, 500) : '') || text(beforeCobro.paymentSupportDocumentRef, 500);
-    const applicationEvidenceSource = ['insurer_invoice','insurer_statement','commission_statement'].includes(source);
-    const isApplicationEnrichment = Boolean(cobroDoc && applicationEvidenceSource);
-    const existingPaymentState = text(beforeCobro.paymentState, 80);
-    const existingDirectOrInferred = text(beforeCobro.directOrInferred, 80);
-    const existingPaymentEvidenceType = text(beforeCobro.paymentEvidenceType, 120);
-    const priorInferenceProvenance = beforeCobro.inferenceProvenance || (existingPaymentState === 'PAID_INFERRED' || existingDirectOrInferred === 'INFERRED' ? {
-      evidenceType: text(beforeCobro.evidenceType || beforeCobro.paymentEvidenceType, 120),
-      evidenceId: text(beforeCobro.evidenceId || beforeCobro.sourceRef, 500),
-      anchorInstallment: Number(beforeCobro.anchorInstallment || 0) || null,
-      inferenceRuleId: text(beforeCobro.inferenceRuleId, 160),
-      inferredEffectiveDate: text(beforeCobro.inferredEffectiveDate, 32),
-      evidenceAsOfDate: text(beforeCobro.evidenceAsOfDate, 32),
-      confidence: text(beforeCobro.confidence, 40) || 'HIGH'
+    const finalPaymentMethod = paymentMethod || (advisorReported ? text(receipt.metodoPago || receipt.paymentMethod, 180) : '') || text(beforeCobro.paymentMethod || beforeCobro.metodo || (existingPaid ? (receipt.paymentMethod || receipt.metodoPago) : ''), 180);
+    const finalPaymentSupportDocumentRef = paymentSupportDocumentRef || (advisorReported ? text(receipt.paymentSupportDocumentRef || receipt.soportePagoRef, 500) : '') || text(beforeCobro.paymentSupportDocumentRef || (existingPaid ? receipt.paymentSupportDocumentRef : ''), 500);
+    const isApplicationEnrichment = existingPaid && applicationEvidenceSource;
+    const existingPaymentState = text(beforeCobro.paymentState || (existingPaid ? receipt.paymentState : ''), 80);
+    const existingDirectOrInferred = text(beforeCobro.directOrInferred || (existingPaid ? receipt.directOrInferred : '') || (existingPaymentState === 'PAID_INFERRED' ? 'INFERRED' : ''), 80);
+    const existingPaymentEvidenceType = text(beforeCobro.paymentEvidenceType || (existingPaid ? receipt.paymentEvidenceType : ''), 120);
+    const priorInferenceProvenance = beforeCobro.inferenceProvenance || (existingPaid && receipt.inferenceProvenance) || (existingPaymentState === 'PAID_INFERRED' || existingDirectOrInferred === 'INFERRED' ? {
+      evidenceType: text(beforeCobro.evidenceType || receipt.evidenceType || beforeCobro.paymentEvidenceType || receipt.paymentEvidenceType, 120),
+      evidenceId: text(beforeCobro.evidenceId || receipt.evidenceId || beforeCobro.sourceRef || receipt.sourceRef, 500),
+      anchorInstallment: Number(beforeCobro.anchorInstallment || receipt.anchorInstallment || 0) || null,
+      inferenceRuleId: text(beforeCobro.inferenceRuleId || receipt.inferenceRuleId, 160),
+      inferredEffectiveDate: text(beforeCobro.inferredEffectiveDate || receipt.inferredEffectiveDate, 32),
+      evidenceAsOfDate: text(beforeCobro.evidenceAsOfDate || receipt.evidenceAsOfDate, 32),
+      confidence: text(beforeCobro.confidence || receipt.confidence, 40) || 'HIGH'
     } : null);
     const paymentState = isApplicationEnrichment && existingPaymentState ? existingPaymentState : paidStateFor(source, inferred);
     const directOrInferred = isApplicationEnrichment && existingDirectOrInferred ? existingDirectOrInferred : (inferred ? 'INFERRED' : 'DIRECT');
     const paymentEvidenceType = isApplicationEnrichment && existingPaymentEvidenceType ? existingPaymentEvidenceType : (advisorReported ? 'ADVISOR_REPORTED' : source.toUpperCase());
-    const paymentOrigin = advisorReported ? 'ADVISOR_REPORTED_PAYMENT' : (source === 'crm_migrated_direct' ? 'CRM_MIGRATED_DIRECT_PAYMENT' : (source === 'client_reported' ? 'CLIENT_PORTAL' : text(beforeCobro.paymentOrigin, 120) || 'OPERATIVE_DIRECT_PAYMENT'));
-    const applicationEvidenceType = applicationProved ? (applicationEvidenceTypeInput || (source === 'crm_migrated_direct' ? 'MANUAL_RECONCILIATION' : source.toUpperCase())) : text(beforeCobro.applicationEvidenceType, 120);
-    const existingApplicationState = text(beforeCobro.applicationState, 80);
+    const paymentOrigin = advisorReported ? 'ADVISOR_REPORTED_PAYMENT' : (source === 'crm_migrated_direct' ? 'CRM_MIGRATED_DIRECT_PAYMENT' : (source === 'client_reported' ? 'CLIENT_PORTAL' : text(beforeCobro.paymentOrigin || (existingPaid ? receipt.paymentOrigin : ''), 120) || 'OPERATIVE_DIRECT_PAYMENT'));
+    const applicationEvidenceType = applicationProved ? (applicationEvidenceTypeInput || (source === 'crm_migrated_direct' ? 'MANUAL_RECONCILIATION' : source.toUpperCase())) : text(beforeCobro.applicationEvidenceType || receipt.applicationEvidenceType, 120);
+    const existingApplicationState = text(beforeCobro.applicationState || (existingPaid ? receipt.applicationState : ''), 80);
     const applicationState = (applicationProved || finalApplicationDate)
-      ? (inferred ? 'APPLIED_INFERRED' : 'APPLIED_DIRECT')
+      ? ((inferred || (isApplicationEnrichment && (existingPaymentState === 'PAID_INFERRED' || existingDirectOrInferred === 'INFERRED'))) ? 'APPLIED_INFERRED' : 'APPLIED_DIRECT')
       : (existingApplicationState || (beforeCobro.conciliado === true ? 'APPLIED_DIRECT' : 'PENDING_APPLICATION'));
     const technicalNow = now();
 
@@ -537,8 +546,8 @@ async function applyPayment(authz, data, payload, operationName = 'apply_payment
       paymentEvidenceType,
       paymentOrigin,
       applicationEvidenceType,
-      evidenceAsOfDate: evidenceAsOfDate || text(beforeCobro.evidenceAsOfDate, 32),
-      inferredEffectiveDate: inferredEffectiveDate || text(beforeCobro.inferredEffectiveDate, 32),
+      evidenceAsOfDate: evidenceAsOfDate || text(beforeCobro.evidenceAsOfDate || (existingPaid ? receipt.evidenceAsOfDate : ''), 32),
+      inferredEffectiveDate: inferredEffectiveDate || text(beforeCobro.inferredEffectiveDate || (existingPaid ? receipt.inferredEffectiveDate : ''), 32),
       matchedPolicyId: policyId,
       matchedReceiptId: receiptId,
       reconciledAt: technicalNow,
