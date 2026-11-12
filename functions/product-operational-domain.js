@@ -196,7 +196,7 @@ function effectiveScope(member,accessConfig,role,moduleKey){
   const configured=accessConfig&&accessConfig.roleScopes&&typeof accessConfig.roleScopes==='object'?accessConfig.roleScopes:{};
   const roleKey=Object.keys(configured).find(k=>norm(k)===norm(role));
   const explicitRoleScope=roleKey?normalizedScope(configured[roleKey]):'';
-  if(norm(role)==='operativo'&&['polizas','cliente360','cobros'].includes(norm(moduleKey))&&
+  if(norm(role)==='operativo'&&['polizas','cliente360','cobros','ops','leads'].includes(norm(moduleKey))&&
      explicitRoleScope==='all'&&requested!=='none')return 'all';
   if(!requested)return ceiling;return scopeRank(requested)<=scopeRank(ceiling)?requested:ceiling;
 }

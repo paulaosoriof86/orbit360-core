@@ -186,7 +186,8 @@ Orbit.access = (function () {
         ['Operativo', 'Admin', 'AdminTenant', 'SuperAdmin', 'Dirección'].indexOf(role) >= 0)
       return roleScopeCeiling(moduleKey) === 'all';
     return (role === 'Operativo' || role === 'AdminTenant') &&
-      (moduleKey === 'polizas' || moduleKey === 'cliente360' || moduleKey === 'cobros') &&
+      (moduleKey === 'polizas' || moduleKey === 'cliente360' || moduleKey === 'cobros' ||
+       (role === 'Operativo' && (moduleKey === 'ops' || moduleKey === 'leads'))) &&
       normalizeScope(scopes[role]) === 'all';
   }
   function dataScope(moduleKey) {

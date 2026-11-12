@@ -111,6 +111,10 @@ Orbit.modules.cronograma = (function () {
   async function toggleTarea(id) {
     const t = S().get('tareas', id);
     if (!t) return;
+    if (Orbit.access && Orbit.access.can && Orbit.access.can('ops','edit') !== true) {
+      taskFeedback('No tienes permiso para modificar tareas operativas.');
+      return;
+    }
     if (previewUat() && !(t.__syntheticQa === true && /^b4003qa_tareas_[a-z0-9._:-]+$/i.test(id))) {
       taskFeedback('En Preview solo se pueden modificar tareas sintéticas B4-003.');
       return;
@@ -121,7 +125,7 @@ Orbit.modules.cronograma = (function () {
     }
     try {
       await S().updateDurable('tareas', id, { done: !t.done });
-      draw();
+      if (host && (!Orbit.route || Orbit.route.key === 'cronograma')) draw();
     } catch (_) {
       taskFeedback('No se confirmó el cambio de la tarea en el servidor.');
     }
@@ -132,7 +136,7 @@ Orbit.modules.cronograma = (function () {
   function draw() {
     const ev = eventos();
     host.innerHTML = `<div class="page" data-cronograma-ready="1">
-      ${K.banner({ icon: '📅', title: 'Cronograma', sub: 'Agenda de renovaciones, recibos, gestiones y tareas del equipo', features: [], actions: `<button class="btn primary" id="cr-new" style="background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.28)">+ Tarea</button>` })}
+      ${K.banner({ icon: '📅', title: 'Cronograma', sub: 'Agenda de renovaciones, recibos, gestiones y tareas del equipo', features: [], actions: (!Orbit.access || !Orbit.access.can || Orbit.access.can('ops','create')) ? `<button class="btn primary" id="cr-new" style="background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.28)">+ Tarea</button>` : '' })}
       <div class="cr-bar">
         <div class="mk-nav"><button class="mk-navb" id="cr-prev">‹</button><b id="cr-title" style="font-family:var(--f-display);font-size:17px;min-width:200px;text-align:center">${titulo()}</b><button class="mk-navb" id="cr-next">›</button></div>
         <button class="btn ghost sm" id="cr-hoy">Hoy</button>
@@ -143,7 +147,7 @@ Orbit.modules.cronograma = (function () {
     host.querySelector('#cr-prev').addEventListener('click', () => { shift(-1); draw(); });
     host.querySelector('#cr-next').addEventListener('click', () => { shift(1); draw(); });
     host.querySelector('#cr-hoy').addEventListener('click', () => { ref = new Date(U.NOW || Date.now()); draw(); });
-    host.querySelector('#cr-new').addEventListener('click', () => nuevaTarea());
+    const newTask=host.querySelector('#cr-new');if(newTask)newTask.addEventListener('click', () => nuevaTarea());
     host.querySelectorAll('.ins-seg-b').forEach(b => b.addEventListener('click', () => { vista = b.dataset.v; draw(); }));
     host.querySelectorAll('[data-ev]').forEach((el, i) => el.addEventListener('click', () => { const fn = el._go; if (fn) fn(); }));
     // attach handlers
@@ -198,22 +202,41 @@ Orbit.modules.cronograma = (function () {
   }
 
   async function nuevaTarea() {
+    if (Orbit.access && Orbit.access.can && Orbit.access.can('ops','create') !== true) {
+      taskFeedback('No tienes permiso para crear tareas operativas.');
+      return { confirmed: false, reason: 'ROLE_DENIED' };
+    }
     const f = await U.prompt('Tarea para hoy (o escribe la fecha como AAAA-MM-DD al inicio):', { title: 'Nueva tarea' });
     if (!f) return;
     let fecha = iso(new Date(U.NOW || Date.now())), txt = f;
     const m = f.match(/^(\d{4}-\d{2}-\d{2})\s+(.*)$/); if (m) { fecha = m[1]; txt = m[2]; }
+    if (!txt.trim()) { taskFeedback('Escribe el nombre de la tarea.'); return; }
+    const user=Orbit.auth&&Orbit.auth.productUser||{},allowed=[].concat(user.countries||user.paises||[])
+      .map(x=>String(x).trim().toUpperCase()).filter(x=>x==='GT'||x==='CO');
+    const selected=String(Orbit.pais||'').trim().toUpperCase();
+    let country=(selected==='GT'||selected==='CO')?selected:(allowed.length===1?allowed[0]:'');
+    if (!country) {
+      const answer=await U.prompt('¿En qué país se realizará la tarea? Escribe GT o CO.', { title: 'País de la tarea' });
+      if (!answer) return;
+      country=String(answer).trim().toUpperCase();
+    }
+    if (!['GT','CO'].includes(country)||(allowed.length>0&&!allowed.includes(country))) {
+      taskFeedback('Selecciona un país autorizado: GT o CO. No se guardó ninguna tarea.');
+      return;
+    }
     if (typeof S().insertDurable !== 'function') {
       taskFeedback('Guardado protegido de tareas no disponible.');
       return;
     }
     const synthetic = previewUat();
     const id = synthetic ? 'b4003qa_tareas_' + Date.now() : 'tk' + Date.now();
-    const task = { id, t: txt, fecha, done: false };
+    const task = { id, t: txt.trim(), fecha, pais: country, done: false };
     if (synthetic) task.__syntheticQa = true;
     try {
       await S().insertDurable('tareas', task);
-      draw();
+      if (host && (!Orbit.route || Orbit.route.key === 'cronograma')) draw();
       taskFeedback('Tarea creada y confirmada en el servidor.');
+      return { confirmed: true, id };
     } catch (error) {
       // Preview-only, allowlisted error code for authenticated write UAT.
       // No raw server message, identity, token, or client data is disclosed.
@@ -222,5 +245,5 @@ Orbit.modules.cronograma = (function () {
     }
   }
 
-  return { render, __b3007: Object.freeze({ obligationsReady, pendingObligations, linkedReceipt, openObligation }) };
+  return { render, nuevaTarea, toggleTarea, __b3007: Object.freeze({ obligationsReady, pendingObligations, linkedReceipt, openObligation }) };
 })();

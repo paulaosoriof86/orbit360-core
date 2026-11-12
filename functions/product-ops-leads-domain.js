@@ -59,6 +59,7 @@ function id(v,label){const out=text(v,180);if(!/^[A-Za-z0-9][A-Za-z0-9._:-]{1,17
 function memberRef(t,u){return db.collection('tenants').doc(t).collection('members').doc(u);}
 function dataRef(t,c,i){return db.collection('tenants').doc(t).collection('data').doc(c).collection('items').doc(i);}
 function configRef(t){return db.collection('tenants').doc(t).collection('config').doc('workflow');}
+function accessRef(t){return db.collection('tenants').doc(t).collection('config').doc('access');}
 function requestRef(t,r,preview){return db.collection('tenants').doc(t).collection(preview?'previewWorkflowRequests':'workflowRequests').doc(r);}
 function eventRef(t,e,preview){return db.collection('tenants').doc(t).collection(preview?'previewWorkflowEvents':'workflowEvents').doc(e);}
 function outboxRef(t,e,preview){return db.collection('tenants').doc(t).collection(preview?'previewNotificationOutbox':'notificationOutbox').doc(e);}
@@ -69,11 +70,19 @@ function active(m){
   const states=[m.status,m.estado].map(norm).filter(Boolean);
   return states.length>0&&states.every(s=>s==='active'||s==='activo');
 }
-function scope(m,domain,activeRole){
+function scope(m,domain,activeRole,accessConfig){
  const ds=m.dataScopes||{},modules=ds.modules&&typeof ds.modules==='object'&&!Array.isArray(ds.modules)?ds.modules:{};
  const raw=domain==='leads'?(modules.leads??ds.leads??ds.commercial??ds.default):
    (modules.ops??modules.gestiones??ds.ops??ds.workflow??ds.gestiones??ds.default);
  const value=norm(raw??m.scopeDatos??m.dataScope),role=norm(activeRole);
+ // The assigned Operativo role can manage the authorized country-wide
+ // workflow when the signed tenant explicitly grants that role all-scope.
+ // An explicit module NONE still denies; Asesor never inherits this grant.
+ const byRole=accessConfig&&accessConfig.roleScopes||{};
+ const roleKey=Object.keys(byRole).find(k=>norm(k)===role);
+ const roleScope=roleKey===undefined?'':norm(byRole[roleKey]);
+ if(role==='operativo'&&['all','todos','global'].includes(roleScope)&&
+    !['none','ninguno','sin_acceso'].includes(value))return'all';
  if(['asesor','asesora','asesor_sr','asesora_sr','asesor_jr','asesora_jr','comercial'].includes(role))
    return ['none','ninguno','sin_acceso'].includes(value)?'none':'own';
  if(['propios','propio','own'].includes(value))return'own';
@@ -84,8 +93,8 @@ function scope(m,domain,activeRole){
  if(domain==='leads'&&text(m.advisorId||m.asesorId,180))return'own';
  return'all'; // Legacy unspecified operational scope; preserve existing contract.
 }
-function advisorAllowed(m,target,domain,activeRole){
- const sc=scope(m,domain,activeRole),own=text(m.advisorId||m.asesorId,180),t=text(target,180);
+function advisorAllowed(m,target,domain,activeRole,accessConfig){
+ const sc=scope(m,domain,activeRole,accessConfig),own=text(m.advisorId||m.asesorId,180),t=text(target,180);
  if(sc==='none')return false;
  if(sc==='own')return!!own&&own===t;
  if(sc==='team'){
@@ -119,6 +128,22 @@ function workflowAuthorizationDomain(authz,operation,entityType,before,payload,c
      ['create_business','update_business','transition_business','archive_business'].includes(operation))return'ops';
   return'leads';
 }
+function workflowRoleModuleAllowed(authz,moduleKey,row){
+ // Operativo's privileged fallback must still honor signed module restrictions
+ // and explicit tenant matrix denials. Advisor self-service is unchanged.
+ if(norm(authz&&authz.actor&&authz.actor.activeRole)!=='operativo')return true;
+ const member=authz.member||{},blocked=unique(member.modulesRestricted||member.modulosRestringidos).map(norm);
+ if(blocked.includes(norm(moduleKey)))return false;
+ const countries=unique(member.countries||member.paises).map(x=>text(x,8).toUpperCase());
+ const country=text(row&&(row.pais||row.country),8).toUpperCase();
+ if(!['GT','CO'].includes(country)||!countries.includes(country))return false;
+ const matrix=authz.accessConfig&&authz.accessConfig.rolePermissions||{};
+ const roleKey=Object.keys(matrix).find(k=>norm(k)==='operativo');
+ const roleMatrix=roleKey===undefined?{}:matrix[roleKey]||{};
+ const moduleKeyActual=Object.keys(roleMatrix).find(k=>norm(k)===norm(moduleKey));
+ const granted=moduleKeyActual===undefined?{}:roleMatrix[moduleKeyActual]||{};
+ return granted.ver!==false&&granted.editar!==false;
+}
 function canonicalizeCollaborationPayload(before,payload,actor){
  const prior=[].concat(before&&before.comentarios||[]),next=[].concat(payload&&payload.comentarios||[]);
  if(next.length<=prior.length)return payload;
@@ -142,7 +167,9 @@ function humanActorName(value){
 }
 async function authorize(request,operation){
  if(!request.auth||!request.auth.uid)throw new HttpsError('unauthenticated','Se requiere sesión activa.');
- const tenantId=id(request.data&&request.data.tenantId,'tenantId'),snap=await memberRef(tenantId,request.auth.uid).get(),member=snap.exists?snap.data():null;
+ const tenantId=id(request.data&&request.data.tenantId,'tenantId');
+ const [snap,accessSnap]=await Promise.all([memberRef(tenantId,request.auth.uid).get(),accessRef(tenantId).get()]);
+ const member=snap.exists?snap.data():null,accessConfig=accessSnap.exists?accessSnap.data()||{}:{};
  if(!active(member)||text(member.tenantId,180)!==tenantId)
    throw new HttpsError('permission-denied','Membresía inactiva o fuera del tenant.');
  let roleState;
@@ -167,7 +194,7 @@ async function authorize(request,operation){
    }
  }
  if(!actorName)actorName=humanActorName(request.auth.token&&request.auth.token.name)||'Usuario del equipo';
- return{tenantId,member,actor:{uid:request.auth.uid,
+ return{tenantId,member,accessConfig,actor:{uid:request.auth.uid,
    email:text(member.email||request.auth.token&&request.auth.token.email,320),
    name:actorName,advisorId,activeRole:roleState.activeRole,roles:roleState.assignedRoles}};
 }
@@ -276,7 +303,8 @@ if(entityId===metaQaId||text(payload.id,180)===metaQaId){
 }
 if(operation==='create_business')prepared=canonicalizeCreationAudit(sanitizeBusiness(payload,authz.actor),authz.actor);if(operation==='create_management'||operation==='portal_request')prepared=sanitizeManagement(payload,authz.actor);if(prepared&&entityType==='gestiones')prepared=await enrichManagementContext(authz.tenantId,prepared);if(prepared)entityId=prepared.id;entityId=id(entityId,isBusiness?'businessId':'managementId');const entity=dataRef(authz.tenantId,entityType,entityId);if(previewOnly===true&&!['create_management','create_business','portal_request'].includes(operation)){const ps=await entity.get(),pr=ps.exists?ps.data():null;if(!pr||pr.previewWrite!==true)throw new HttpsError('permission-denied','PREVIEW_TEST_RECORD_ONLY: en Preview solo se modifican gestiones/negocios creados durante la prueba.');}const rid=requestId(authz.tenantId,operation,entityId,payload,d.requestId),req=requestRef(authz.tenantId,rid,previewOnly),eventId=`evt_${sha(`${authz.tenantId}|${rid}`).slice(0,28)}`;
 const committed=await db.runTransaction(async tx=>{const priorReq=await tx.get(req);if(priorReq.exists&&priorReq.data().status==='committed')return Object.assign({reused:true},priorReq.data().result||{});const snap=await tx.get(entity),before=snap.exists?snap.data():null;if(prepared&&before)throw new HttpsError('already-exists','El registro ya existe.');if(!prepared&&!before)throw new HttpsError('not-found','El registro no existe.');let after=prepared?Object.assign({},prepared):Object.assign({},before);if(operation==='update_business'||operation==='update_management')payload=canonicalizeCollaborationPayload(before,payload,authz.actor);const authorizationDomain=workflowAuthorizationDomain(authz,operation,entityType,before,payload,cfg);assertRecordCountryScope(authz.member,before,after);
-if(!advisorAllowed(authz.member,after.asesorId||payload.asesorId||payload.advisorId,authorizationDomain,authz.actor.activeRole))throw new HttpsError('permission-denied','El asesor está fuera de su alcance activo.');
+if(!workflowRoleModuleAllowed(authz,authorizationDomain,after))throw new HttpsError('permission-denied','El rol activo no puede escribir en este módulo o país.');
+if(!advisorAllowed(authz.member,after.asesorId||payload.asesorId||payload.advisorId,authorizationDomain,authz.actor.activeRole,authz.accessConfig))throw new HttpsError('permission-denied','El asesor está fuera de su alcance activo.');
 if(entityType==='gestiones'&&after.workflowType==='endorsement_request'&&prepared)
   await validateEndorsementMutation(tx,{tenantId:authz.tenantId,authz,operation,entityId,payload,before,after,previewOnly});
 if(operation==='transition_business'){const from=norm(before.etapa),to=norm(payload.to||payload.etapa||payload.stage),stage=cfg.stages[from];if(!cfg.stages[to])throw new HttpsError('failed-precondition','La etapa destino no está configurada.');if(!stage||!stage.next.includes(to))throw new HttpsError('failed-precondition','Transición no permitida.');copyAllowed(after,payload,BUSINESS_MUTABLE_FIELDS.filter(k=>!['etapa','archivado'].includes(k)));after.etapa=to;after.prob=Number(payload.prob!=null?payload.prob:after.prob||0);after.opsVisible=cfg.stages[to].ops===true;after.opsList=cfg.stages[to].opsList||'';if(to==='propuesta'&&cfg.cadenceEnabled){after.cadenciaActiva=true;after.cadenciaPaso=Math.max(1,Number(after.cadenciaPaso)||1);if(!text(after.proximoToque,40))after.proximoToque=new Date(Date.now()+3*86400000).toISOString().slice(0,10);}
@@ -345,7 +373,7 @@ else if(operation==='reopen_management'){copyAllowed(after,payload,MANAGEMENT_MU
 else if(operation==='archive_management'){after.archivado=true;copyAllowed(after,payload,DELETE_AUDIT_FIELDS);}
 if(!prepared&&entityType==='gestiones'&&after.workflowType==='endorsement_request'&&operation!=='hide_management_card')
   await validateEndorsementMutation(tx,{tenantId:authz.tenantId,authz,operation,entityId,payload,before,after,previewOnly});
-if(!advisorAllowed(authz.member,after.asesorId||payload.asesorId||payload.advisorId,authorizationDomain,authz.actor.activeRole))throw new HttpsError('permission-denied','El asesor está fuera de su alcance activo.');
+if(!advisorAllowed(authz.member,after.asesorId||payload.asesorId||payload.advisorId,authorizationDomain,authz.actor.activeRole,authz.accessConfig))throw new HttpsError('permission-denied','El asesor está fuera de su alcance activo.');
 if(previewOnly===true){after.previewWrite=true;after.previewSource='hosting-preview-uat';after.previewWriteAt=now();}
 after.tenantId=authz.tenantId;after.schemaVersion=VERSION;after.updatedAt=now();after.updatedByUid=authz.actor.uid;if(!before){after.createdAt=now();after.createdByUid=authz.actor.uid;}tx.set(entity,after,{merge:true});tx.set(eventRef(authz.tenantId,eventId,previewOnly),{schemaVersion:VERSION,tenantId:authz.tenantId,operation,entityType,entityId:entityId,requestId:rid,actor:authz.actor,reason:motivo,beforeDigest:before?digest(before):'',afterDigest:digest(after),previewWrite:previewOnly===true,createdAt:now()},{merge:false});const comments=[].concat(after.comentarios||[]),collab=comments.length?comments[comments.length-1]:null;let collabDirection=entityType==='negocios'?collaborationWriteDirection(before,after):'';if(entityType==='gestiones'&&operation==='update_management')collabDirection=collaborationWriteDirection(before,after);const targets=[];
     if(collabDirection==='advisor'&&after.asesorId)targets.push({type:'advisor',id:after.asesorId});
@@ -403,7 +431,7 @@ async function cadenceSweep(){
 async function cadencePreview(request){
  const authz=await authorize(request,'update_business'),businessId=id(request.data&&request.data.entityId,'businessId'),snap=await dataRef(authz.tenantId,'negocios',businessId).get();
  if(!snap.exists||snap.data().previewWrite!==true)throw new HttpsError('permission-denied','PREVIEW_TEST_RECORD_ONLY');
- if(!advisorAllowed(authz.member,snap.data().asesorId,'leads',authz.actor.activeRole))throw new HttpsError('permission-denied','El negocio está fuera de su alcance.');
+ if(!advisorAllowed(authz.member,snap.data().asesorId,'leads',authz.actor.activeRole,authz.accessConfig))throw new HttpsError('permission-denied','El negocio está fuera de su alcance.');
  return runCadenceBusiness(authz.tenantId,businessId,true);
 }
 

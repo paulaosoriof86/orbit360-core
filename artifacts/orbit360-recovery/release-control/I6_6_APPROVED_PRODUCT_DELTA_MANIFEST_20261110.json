@@ -1166,6 +1166,28 @@
       "tests": [
         {"path": "tools/gravicentra-i6-6-ops-leads-inbox-projection.test.cjs", "gitBlobSha": "b036fbbf7827305d9a998ec645406c98d4496b3a"}
       ]
+    },
+    {
+      "id": "I6_6_CARLOS_TRANSVERSAL_OPS_TASKS_ROLE_WRITE_PARITY_P0",
+      "approvedByDirection": true,
+      "receipt": "artifacts/orbit360-recovery/release-control/I6_6_CARLOS_TRANSVERSAL_OPS_TASKS_GATE_20261112.json",
+      "sourceStatus": "SOURCE_SYNTHETIC_7_OF_7_PASS_IMMUTABLE_PREVIEW_AND_LIVE_UAT_HOLD",
+      "capabilityOwners": ["OPS_PRIMARY_RUNTIME", "LEADS_PRIMARY_RUNTIME", "CRONOGRAMA_TASKS_PRIMARY_RUNTIME", "ROLE_SCOPE_CLIENT_SERVER", "SCOPED_READER", "OPERATIONAL_WRITERS"],
+      "scope": "Preserve signed Operativo tenant-country boundaries while aligning cross-advisor workflow CRUD with already-approved all-scope Pólizas/Cobros. Display the same protected Cronograma tasks in Ops, add Ops task creation/completion, require explicit task country in TODOS mode. Never convert a tarea into a duplicated gestion. All source QA synthetic; Preview/LIVE functional write and exact release not yet accepted.",
+      "paths": [
+        {"path":"functions/b4-003-scoped-access-boundary.js","gitBlobSha":"f68d6120b4b379223bbc0a31d9c494b27d857b34","replaces":{"path":"functions/b4-003-scoped-access-boundary.js","priorGitBlobSha":"38fa8cee808be6b92b65150625e69b0f93639564","priorChangeId":"I6_6_CONCILIACIONES_PROTECTED_SCOPED_READ_BRIDGE_P0"}},
+        {"path":"functions/product-operational-domain.js","gitBlobSha":"6c5c7f767e306169d882d05231dcbd74c9daffc4","replaces":{"path":"functions/product-operational-domain.js","priorGitBlobSha":"416775a865e8b23ae7e8bbb604c8d7c519297517","priorChangeId":"I6_6_INSURER_LOGO_BINARY_DIGEST_PARITY_P0"}},
+        {"path":"functions/product-ops-leads-domain.js","gitBlobSha":"93cd0a64f64de01c1b6d73804f2247c4ae62ee50","replaces":{"path":"functions/product-ops-leads-domain.js","priorGitBlobSha":"ad208454627584b81875b950fbe37040cc7f1ffc","priorChangeId":"I6_6_OPS_PROTECTED_ENDORSEMENT_BOARD_HIDE_TRANSVERSAL_P0"}},
+        {"path":"orbit360-platform/core/access-scope.js","gitBlobSha":"cfc5c96fbff5dce241fd86d622b3ca107e8ed7df","replaces":{"path":"orbit360-platform/core/access-scope.js","priorGitBlobSha":"207b8c59be6d72f732e6549f06bba6ad04c0a103","priorChangeId":"I6_6_REAL_INSURER_OPERATIVO_SAVE_ROLE_COUNTRY_SCOPE_P0"}},
+        {"path":"orbit360-platform/core/router.js","gitBlobSha":"2b4f347bca3a8f864b398c0d893d831745dbcf9c","replaces":{"path":"orbit360-platform/core/router.js","priorGitBlobSha":"7c8648c8cf41d7132dad1c594838240bf8a1291a","priorChangeId":"I6_6_CONCILIACIONES_PROTECTED_SCOPED_READ_BRIDGE_P0"}},
+        {"path":"orbit360-platform/core/visual-runtime-hydration-contract-v20260805.js","gitBlobSha":"4dcab1e1676cf86a0b10f124bb250a203fe6f390"},
+        {"path":"orbit360-platform/core/visual-runtime-rootfix-v20260805.js","gitBlobSha":"bfb0b477e7aa27153866b106d60674ce1330a32f"},
+        {"path":"orbit360-platform/modules/cronograma.js","gitBlobSha":"50bc02a8f56675497b42d0983c6d29e0276ee975","replaces":{"path":"orbit360-platform/modules/cronograma.js","priorGitBlobSha":"ecbed8de9f6767b7ecf2720cc21f4f70fd734d99","priorChangeId":"I6_6_PROTECTED_READONLY_HOST_ROUTING_AND_WRITE_DENIAL_ALL_SURFACES"}},
+        {"path":"orbit360-platform/modules/ops.js","gitBlobSha":"eb5b54b8edb1f1df4b120cac73c42af18b2d2608","replaces":{"path":"orbit360-platform/modules/ops.js","priorGitBlobSha":"538fc271b8708bff662e23e5786a06b0f1f81f5a","priorChangeId":"I6_6_OPS_INBOX_PENDING_LEADS_PROJECTION"}}
+      ],
+      "tests": [
+        {"path":"tools/gravicentra-i6-6-carlos-ops-tasks-transversal.test.cjs","gitBlobSha":"c5c010b62810b298af7c6085dbfa0757b7a130c8"}
+      ]
     }
   ]
 }

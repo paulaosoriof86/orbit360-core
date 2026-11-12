@@ -1,0 +1,52 @@
+{
+  "schema": "GI_I6_6_CARLOS_TRANSVERSAL_OPERATIONS_CONTINUITY_V1",
+  "dateGuatemala": "2026-11-12",
+  "project": "Gravicentra Insurance",
+  "repo": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "parent": "d17e1b8c4b1a7995a5b8096d41750989eccc0f94",
+  "authority": "Paula Dirección, instrucciones expresas 2026-11-12: Carlos Operativo debe poder escribir en todos los módulos autorizados, crear Ops, gestionar Leads, renovaciones, cobros y pólizas, con paridad para roles superiores y publicación inmediata de cada bloque probado.",
+  "frozenScope": [
+    "La matriz firmada rolePermissions, roles asignados y modulesRestricted sigue siendo autoridad de escritura.",
+    "Operativo con roleScopes.Operativo=all no hereda own del perfil Asesor previo para Ops/Leads ni pólizas/cobros; ningún alcance se expande a otro tenant o país.",
+    "Tareas manuales son la colección canónica tareas; Ops las proyecta y opera sin duplicarlas como gestiones.",
+    "Cronograma y Ops permiten seleccionar país explícito para tareas de usuarios GT+CO; jamás elegir GT implícitamente cuando el selector es TODOS.",
+    "Ninguna prueba sintética local equivale a una escritura autenticada y persistida por Carlos en LIVE.",
+    "Publicar solamente mediante build inmutable, Preview autenticado y mismo digest en LIVE con lectura de regreso y rollback."
+  ],
+  "causeEvidence": {
+    "opsMissingCalendarTasks": "modules/ops.js solo proyectaba gestiones/negocios, mientras modules/cronograma.js guardaba tareas en colección independiente.",
+    "crossCountryTaskCreation": "store-firestore-product-operational-p0.js exigía country en TODO/ALL pero Cronograma no ofrecía captura de país.",
+    "activeRoleScopeDivergence": "El full-portfolio de Operativo se aplicaba a Pólizas/Cliente360/Cobros, no a Ops/Leads en cliente, lectores y escritor servidor.",
+    "historicMissingTaskProvenance": "No se identificó el ID real de la tarea mencionada por Carlos; la causa exacta del registro individual sigue pendiente de readback firmado."
+  },
+  "sourceQA": {
+    "status": "PASS_LOCAL_SYNTHETIC_ONLY",
+    "newFocusedCases": "7/7 PASS",
+    "existingRegressionSuites": " targeted legacy suites for Cronograma, scoped reader, session, Ops/Leads, renovación y cobros PASS (local only)",
+    "realFirebaseCustomerWrites": 0,
+    "realCarlosSignedWrites": 0,
+    "previewSignedWritePass": false,
+    "liveSignedWritePass": false,
+    "publishedToLive": false
+  },
+  "operationalGate": {
+    "status": "HOLD_REAL_CARLOS_UAT_AND_EXACT_ARTIFACT_PROMOTION",
+    "confirmedSubchecks": 2,
+    "totalSubchecks": 7,
+    "percent": 29,
+    "remaining": [
+      "Ops: crear tarea y gestión con Carlos Operativo, readback del mismo ID, recarga y validación Dirección.",
+      "Leads: crear/responder y comprobar bandeja y proyección en Ops sin duplicados.",
+      "Renovaciones/Pólizas: renovación directa, nueva póliza y vínculos persistidos.",
+      "Cobros: aplicar un pago autorizado una sola vez y leer recibo/cobro resultante.",
+      "Seguridad y release: negativos país/Asesor, paridad Dirección/Admin y MISMO artifact certificado en Preview/LIVE con rollback."
+    ]
+  },
+  "parallelFrozenBlocks": {
+    "conciliacionesReaderParity": { "completed": 6, "total": 6, "percent": 100, "status": "PREVIOUS_SIGNED_READONLY_PASS; NEW_SIGNED_WRITE_PARITY_PENDING" },
+    "financialPortfolioA1A7": { "completed": 0, "total": 7, "percent": 0, "status": "PROTECTED_WRITE_HOLD" },
+    "insurersOperational": { "completed": 2, "total": 5, "percent": 40, "status": "REAL_USER_FUNCTIONAL_UAT_PENDING" },
+    "governanceRelease": { "completed": 4, "total": 5, "percent": 80, "status": "LAST_EXACT_LIVE_PROVEN; NEW_SUCCESSOR_NOT_PROMOTED" }
+  }
+}
