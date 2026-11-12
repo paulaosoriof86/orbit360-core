@@ -49,6 +49,7 @@ async function actorUat(browser,actor){
   const base='i66liveqa_'+actor.role+'_'+suffix;
   const management=base+'_gestion',business=base+'_lead';
   const task='i66liveqa_tareas_'+actor.role+'_'+suffix;
+  const uiTaskTitle='I6.6 LIVE QA Tarea desde boton Ops '+actor.role+' '+suffix;
   const actions=[
     ['create_management',management,'gestiones'],
     ['update_management',management,'gestiones'],
@@ -109,6 +110,24 @@ async function actorUat(browser,actor){
     assert.equal(t?.id,task,'I66_LIVE_SIGNED_TASK_CREATE_FAILED_'+actor.role);
     await page.evaluate(async id=>Orbit.store.updateDurable('tareas',id,{done:true}),task);
     assert.equal((await items('tareas',task).get()).data()?.done,true);
+    // Exercise Carlos's actual + Tarea UX, not just the store API. Native
+    // modal, product handler, authenticated durable writer, Ops projection.
+    // If an assertion fails after insertion, the exact synthetic title is
+    // always queried and removed in finally; no real agenda records touched.
+    assert.equal((await items('tareas','_').parent.where('t','==',uiTaskTitle).limit(3).get()).empty,true);
+    await page.locator('#op-new-task').click();
+    await page.locator('.drawer-back.open [data-in]').fill(uiTaskTitle);
+    await page.locator('.drawer-back.open [data-yes]').click();
+    await page.waitForFunction(title=>(Orbit.store.all('tareas')||[]).some(t=>t.t===title),uiTaskTitle,{timeout:30000});
+    const uiCreated=(await items('tareas','_').parent.where('t','==',uiTaskTitle).limit(3).get()).docs;
+    assert.equal(uiCreated.length,1,'I66_LIVE_TASK_FROM_OPS_UI_NOT_DURABLE_'+actor.role);
+    const uiTaskId=uiCreated[0].id,uiRecord=uiCreated[0].data()||{};
+    assert.match(uiTaskId,/^tk\d{10,}$/, 'I66_LIVE_UI_TASK_ID_NOT_CANONICAL');
+    assert.equal(uiRecord.ownerUid,actor.uid);
+    assert.equal(uiRecord.pais,'GT');
+    assert.equal(uiRecord.done,false);
+    targets.push(['tareas',uiTaskId]);
+    console.log('I66_LIVE_'+actor.role.toUpperCase()+'_SIGNED_OPS_PLUS_TAREA_UI_CREATE_PERSIST_PASS');
     await page.evaluate(()=>document.querySelector('#op-show-tasks')?.click());
     await page.waitForFunction(id=>!!document.querySelector('[aria-label="Tareas de agenda en Ops"] [data-ops-task-toggle="'+id+'"]'),
       task,{timeout:30000});
@@ -120,13 +139,32 @@ async function actorUat(browser,actor){
     assert.equal((await items('gestiones',management).get()).data()?.estado,'Resuelta');
     assert.equal((await items('negocios',business).get()).data()?.nombre,testName+' actualizada');
     assert.equal((await items('tareas',task).get()).data()?.done,true);
+    assert.equal((await items('tareas',uiTaskId).get()).data()?.t,uiTaskTitle);
     await page.evaluate(()=>document.querySelector('#op-show-tasks')?.click());
     await page.waitForFunction(id=>!!document.querySelector('[aria-label="Tareas de agenda en Ops"] [data-ops-task-toggle="'+id+'"]'),
       task,{timeout:30000});
+    await page.waitForFunction(id=>!!document.querySelector('[aria-label="Tareas de agenda en Ops"] [data-ops-task-toggle="'+id+'"]'),
+      uiTaskId,{timeout:30000});
+    console.log('I66_LIVE_'+actor.role.toUpperCase()+'_SIGNED_OPS_PLUS_TAREA_UI_RELOAD_VISIBILITY_PASS');
     console.log('I66_LIVE_'+actor.role.toUpperCase()+'_SIGNED_TASK_OPS_PROJECTION_AFTER_RELOAD_PASS');
     console.log('I66_LIVE_'+actor.role.toUpperCase()+'_OPS_LEADS_TASKS_AND_POLICIES_RENEWALS_COBROS_WRITE_RIGHTS_SIGNED_PASS');
   }finally{
     const failures=[];
+    // Catch even a partially submitted UI task if a preceding assertion
+    // failed before its generated ID could be added to the cleanup list.
+    try{
+      const extras=await items('tareas','_').parent.where('t','==',uiTaskTitle).limit(3).get();
+      assert.ok(extras.size<3,'I66_LIVE_UI_TASK_CLEANUP_QUERY_LIMIT');
+      for(const d of extras.docs){
+        const x=d.data()||{};
+        assert.match(d.id,/^tk\d{10,}$/);
+        assert.equal(x.t,uiTaskTitle);
+        assert.equal(x.ownerUid,actor.uid);
+        assert.equal(x.tenantId,TENANT);
+        assert.equal(x.pais,'GT');
+        if(!targets.some(([c,id])=>c==='tareas'&&id===d.id))targets.push(['tareas',d.id]);
+      }
+    }catch(e){failures.push('ui_task_cleanup_preflight_'+String(e.code||'GUARD'));}
     // No deletion of real records: every cleanup ID is unpredictable, unique,
     // prefixed, preflight-absent and must retain the signed actor's provenance.
     for(const [c,id] of targets.slice().reverse())try{
