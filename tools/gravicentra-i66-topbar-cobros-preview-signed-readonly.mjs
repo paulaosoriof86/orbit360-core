@@ -30,25 +30,27 @@ async function findRole(target){
   ]);
   requirePass(docs.size<150&&advisors.size<400,'I66_MEMBER_READ_BOUND');
   const knownAdvisors=new Set(),knownUids=new Set();
+  const isNamedPerson=value=>target==='Operativo'
+    ?norm(value)==='carlos castro'||norm(value).startsWith('carlos castro ')
+    :norm(value).includes('paula')&&norm(value).includes('osorio');
   for(const doc of advisors.docs){
     const a=doc.data()||{};
-    if([a.nombre,a.nombreCompleto,a.displayName,a.name].some(x=>norm(x)==='carlos castro'||norm(x).startsWith('carlos castro '))){
+    if([a.nombre,a.nombreCompleto,a.displayName,a.name].some(isNamedPerson)){
       knownAdvisors.add(doc.id);
       for(const uid of [a.authUid,a.uid,a.userId])if(uid)knownUids.add(String(uid));
     }
   }
   const who=docs.docs.filter(doc=>{
-    const m=doc.data()||{},names=[m.nombre,m.displayName,m.name,m.nombreCompleto,m.fullName];
-    const matches=target==='Operativo'
-      ? names.some(x=>norm(x)==='carlos castro'||norm(x).startsWith('carlos castro '))||
-        knownAdvisors.has(String(m.advisorId||m.asesorId||''))||knownUids.has(doc.id)
-      : names.some(x=>norm(x).includes('paula')&&norm(x).includes('osorio'));
+    const m=doc.data()||{},names=[m.nombre,m.displayName,m.name,m.nombreCompleto,m.fullName,
+      [m.firstName||m.primerNombre,m.lastName||m.apellido||m.primerApellido].filter(Boolean).join(' ')];
+    const matches=names.some(isNamedPerson)||
+      knownAdvisors.has(String(m.advisorId||m.asesorId||''))||knownUids.has(doc.id);
     const roles=[m.activeRole,m.rol,m.rolDefault,...[].concat(m.roles||[])].map(norm);
     return matches&&m.active!==false&&m.activo!==false&&
       !['inactivo','inactive','bloqueado','blocked'].includes(norm(m.status||m.estado))&&
       roles.includes(norm(target));
   });
-  requirePass(who.length===1,'I66_SIGNED_'+target.toUpperCase()+'_MEMBER_NOT_UNIQUE');
+  requirePass(who.length===1,'I66_SIGNED_'+target.toUpperCase()+'_MEMBER_COUNT_'+who.length);
   const user=await auth.getUser(who[0].id);
   requirePass(!user.disabled,'I66_SIGNED_MEMBER_DISABLED');
   return auth.createCustomToken(user.uid);
