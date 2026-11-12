@@ -19,13 +19,13 @@ jobs:
     timeout-minutes: 50
     env:
       PROJECT_ID: ays-orbit-360-lab
-      SOURCE_SHA: 2e6bdd4a43ad82eb3d212ff67adcb8fa96ec4b9b
-      ARTIFACT_RUN: '42954455520'
-      ARTIFACT_ID: '13825379034'
-      ARTIFACT_DIGEST: sha256:849fb658d9bd05549e9d5fb320d9d0d47aeb18bc623817e1fe58b67a08f63e28
-      QA_RUN: '42954455398'
-      CONTROL_RUN: '42954455399'
-      PREVIEW_FUNCTION_RUN: '42955048019'
+      SOURCE_SHA: c6ee2b2edc5788a1172593507ebc70f493fb0dc1
+      ARTIFACT_RUN: '43127221729'
+      ARTIFACT_ID: '13902129993'
+      ARTIFACT_DIGEST: sha256:1313e0a85a733f2e2bac93ca7d3233856b5c91ff5201aa2f9300404ac0d4c444
+      QA_RUN: '43127221947'
+      CONTROL_RUN: '43127221993'
+      PREVIEW_FUNCTION_RUN: '43127910914'
       SA_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
       SA_ALT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
       SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
@@ -37,7 +37,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Gate exact scoped owner approval + green 108 emulator/guard/Preview/function evidence
+      - name: Gate exact scoped owner approval + green 122 emulator/guard/Preview/function evidence
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -61,13 +61,13 @@ jobs:
             for(const {name,run} of runs){assert.equal(run.conclusion,'success',name);if(name!=='PREVIEW_FUNCTION')assert.equal(run.head_sha,process.env.SOURCE_SHA,name+' sha');}
             const a=await fetch(base+'artifacts/'+process.env.ARTIFACT_ID,{headers:h}).then(r=>r.json());
             assert.equal(a.digest,process.env.ARTIFACT_DIGEST);assert.equal(a.workflow_run.id,Number(process.env.ARTIFACT_RUN));assert.equal(a.expired,false);
-            console.log('I66_PAYMENT_LIVE_OWNER_EXACT_ARTIFACT_AND_108_QA_PREVIEW_PASS');
+            console.log('I66_PAYMENT_LIVE_OWNER_EXACT_ARTIFACT_AND_122_QA_PREVIEW_PASS');
           })().catch(e=>{console.error(e.message);process.exitCode=1;});
           NODE
       - uses: actions/download-artifact@v4
         with:
-          artifact-ids: 13825379034
-          run-id: 42954455520
+          artifact-ids: 13902129993
+          run-id: 43127221729
           github-token: ${{ github.token }}
           path: ${{ runner.temp }}/payment-live-packet-download
       - name: Verify exact immutable TAR/backend bytes before any deployment
