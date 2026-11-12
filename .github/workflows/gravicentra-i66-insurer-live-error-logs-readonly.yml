@@ -1,4 +1,5 @@
-# I6.6: inspect only classified live operational callable failures. Never print customer data or full log messages.
+# I6.6: classify LIVE insurer and Cobros callable failures, without printing
+# customer fields, identity, receipt numbers or full log messages.
 name: Gravicentra I6.6 Insurer LIVE Error Classification Readonly
 on:
   push:
@@ -32,12 +33,12 @@ jobs:
           (async()=>{
             const client=await new GoogleAuth({credentials:service,scopes:['https://www.googleapis.com/auth/logging.read']}).getClient();
             const token=await client.getAccessToken();
-            const filter='timestamp>="2026-11-11T16:00:00Z" AND timestamp<="2026-11-11T20:00:00Z" AND (resource.type="cloud_run_revision" OR resource.type="cloud_function") AND (resource.labels.service_name="orbit360productoperationalcommand" OR resource.labels.function_name="orbit360ProductOperationalCommand")';
+            const filter='timestamp>="2026-11-10T12:00:00Z" AND timestamp<="2026-11-12T06:00:00Z" AND (resource.type="cloud_run_revision" OR resource.type="cloud_function") AND (resource.labels.service_name="orbit360productoperationalcommand" OR resource.labels.function_name="orbit360ProductOperationalCommand" OR resource.labels.service_name="orbit360cobrosreconciliationcommand" OR resource.labels.function_name="orbit360CobrosReconciliationCommand")';
             const req=await fetch('https://logging.googleapis.com/v2/entries:list',{method:'POST',headers:{Authorization:'Bearer '+token.token,'content-type':'application/json'},
               body:JSON.stringify({resourceNames:['projects/ays-orbit-360-lab'],filter,pageSize:250,orderBy:'timestamp desc'}),signal:AbortSignal.timeout(30000)});
             console.log('I66_LOGGING_HTTP_STATUS='+req.status);
             if(!req.ok){console.log('I66_LOGGING_ACCESS_HOLD_NO_BYPASS=true');process.exitCode=1;return;}
-            const response=await req.json(),entries=response.entries||[],counts={};
+            const response=await req.json(),entries=response.entries||[],counts={},byService={};
             const patterns=[
               ['CLOUD_FUNCTION_ERROR',/function execution|callable error|exception/i],
               ['INSURER_SCOPE',/insurer.*scope|aseguradora.*alcance|no autorizado para modificar|permission.denied/i],
@@ -47,13 +48,18 @@ jobs:
               ['INVALID_ARGUMENT',/invalid.argument|argumento inv[aá]lido|payload requerido/i],
               ['FUNCTION_NOT_FOUND',/not.found|function not found/i],
               ['NETWORK_OR_TIMEOUT',/deadline.exceeded|timeout|unavailable|resource.exhausted/i],
+              ['ALREADY_PAID_OR_CONFLICT',/already.paid|payment.already.applied|duplicate|conflict|ya pagad/i],
+              ['MISSING_PAYMENT_EVIDENCE',/source.evidence|insurance.statement|source.*not.found|evidencia/i],
               ['AUTHORIZATION',/unauthenticated|authorization|not.authorized/i]
             ];
             for(const e of entries){
               const s=String(e.textPayload||'')+' '+JSON.stringify(e.jsonPayload||{});
               const tags=patterns.filter(([_,re])=>re.test(s)).map(([tag])=>tag);
               for(const tag of tags.length?tags:['UNCLASSIFIED'])counts[tag]=(counts[tag]||0)+1;
+              const service=String(e.resource?.labels?.service_name||e.resource?.labels?.function_name||'unknown').toLowerCase();
+              const bucket=service.includes('cobros')?'COBROS':service.includes('operational')?'INSURER_AND_GENERAL':'OTHER';
+              byService[bucket]=(byService[bucket]||0)+1;
             }
-            console.log('I66_LIVE_OPERATIONAL_FUNCTION_LOG_READONLY='+JSON.stringify({entries:entries.length,classifiedCounts:counts,more:Boolean(response.nextPageToken),zeroWrites:true}));
+            console.log('I66_LIVE_INSURER_COBROS_FUNCTION_LOG_READONLY='+JSON.stringify({entries:entries.length,byService,classifiedCounts:counts,more:Boolean(response.nextPageToken),boundedUtc:'2026-11-10T12:00:00Z/2026-11-12T06:00:00Z',noLogBodyOrPersonalData:true,zeroWrites:true}));
           })().catch(e=>{console.log('I66_LOGGING_UNAVAILABLE_CLASS='+String(e?.code||e?.name||'ERROR').replace(/[^A-Za-z0-9_]/g,'').slice(0,40));process.exitCode=1;});
           NODE
