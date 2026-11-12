@@ -17,7 +17,7 @@ const safe=v=>String(v||'').replace(/[^a-zA-Z0-9_-]/g,'').slice(0,120);
 const ver=v=>/^sites\/ays-orbit-360-lab\/versions\/[A-Za-z0-9_-]+$/.test(String(v||''));
 const evidence={schema:'I6_6_CARLOS_RENEWABILITY_LIVE_EXACT_TRANSPORT_V1',gate:'I6.6',sourceSha:request.sourceSha,buildId:request.buildId,
   artifactId:request.artifactId,previewChannel:request.previewChannel,status:'HOLD',liveBeforeVersion:'',previewVersion:'',liveAfterVersion:'',
-  firebaseLiveReadbackCount:0,appDomainReadbackCount:0,previewReadbackCount:0,dataWrites:0,backendDeployments:1,rollback:'NOT_REQUIRED'};
+  firebaseLiveReadbackCount:0,appDomainReadbackCount:0,previewReadbackCount:0,dataWrites:0,backendDeployments:2,rollback:'NOT_REQUIRED'};
 let oldVersion='',promoting=false;
 async function bytes(origin,p,attempts=3){
   const u=origin.replace(/\/$/,'')+'/'+p.split('/').map(encodeURIComponent).join('/');
@@ -84,14 +84,14 @@ function cloneToLive(version){
     {encoding:'utf8',stdio:['ignore','pipe','pipe'],timeout:180000,env:process.env});
 }
 
-const expectedSource='35008e0d5b9ac81907e0041398e6434d0fcda631';
+const expectedSource='1dd675ed59ac51fd122915ca8056f85f82fa12d6';
 const expectedPreview=process.env.I66_CARLOS_PREVIEW_URL||'';
-const expectedOld='439ff7aebc685866c5605407dbc920fb329a552b';
-const expectedOldBuild='gi-i66-439ff7aebc68-57f234755dc1';
+const expectedOld='c191b56461742f631c492e2ffd904278f1795fe2';
+const expectedOldBuild='gi-i66-c191b5646174-57f234755dc1';
 try{
-  need(request.sourceSha===expectedSource&&request.artifactId===13789672305&&
-       request.previewChannel==='gi-i66-rc-42871046232'&&
-       /^https:\/\/ays-orbit-360-lab--gi-i66-rc-42871046232-[a-z0-9]+\.web\.app$/.test(expectedPreview),'I66_CARLOS_SOURCE_OR_ARTIFACT_PIN_DRIFT');
+  need(request.sourceSha===expectedSource&&request.artifactId===13984026378&&
+       request.previewChannel==='gi-i66-rc-43305281214'&&
+       /^https:\/\/ays-orbit-360-lab--gi-i66-rc-43305281214-[a-z0-9]+\.web\.app$/.test(expectedPreview),'I66_CARLOS_SOURCE_OR_ARTIFACT_PIN_DRIFT');
   need(packageRoot&&cli&&cred&&fs.existsSync(path.join(packageRoot,'bundle/site/__recovery__/build.json')),'I66_CARLOS_PACKAGE_NOT_MOUNTED');
   const pkg=JSON.parse(fs.readFileSync(path.join(packageRoot,'bundle/site/__recovery__/build.json'),'utf8'));
   need(pkg.gate==='I6.6'&&pkg.sourceSha===expectedSource&&pkg.buildId.startsWith('gi-i66-'),'I66_CARLOS_PACKET_IDENTITY_DRIFT');

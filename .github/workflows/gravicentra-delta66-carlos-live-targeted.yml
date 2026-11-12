@@ -1,5 +1,6 @@
-# I6.6 Carlos P0 exact promotion, source 35008e immutable artifact and one scoped LIVE function.
-name: Gravicentra I6.6 Carlos Exact LIVE Product Writer Transport
+# I6.6 Carlos P0: exact source for both operational LIVE writers and Hosting,
+# preserving payment LIVE backend, with prior function/Hosting rollback.
+name: Gravicentra I6.6 Carlos Ops Policies Exact LIVE Transport
 on:
   push:
     branches: [recovery/fase-a-clean-20260831]
@@ -19,13 +20,16 @@ jobs:
     env:
       PROJECT_ID: ays-orbit-360-lab
       SITE: ays-orbit-360-lab
-      I66_CARLOS_SOURCE_SHA: 35008e0d5b9ac81907e0041398e6434d0fcda631
-      I66_CARLOS_ARTIFACT_ID: '13789672305'
-      I66_CARLOS_ARTIFACT_DIGEST: sha256:726f238f54be782917d4031f391cfba913e5233e508142b040c78fa18441cc15
-      I66_CARLOS_PREVIEW_CHANNEL: gi-i66-rc-42871046232
-      I66_CARLOS_PREVIEW_URL: https://ays-orbit-360-lab--gi-i66-rc-42871046232-rwaltr30.web.app
-      I66_CARLOS_PREVIEW_FUNCTION_RUN: '42878554035'
-      I66_CARLOS_EMULATOR_RUN: '42877608644'
+      I66_CARLOS_SOURCE_SHA: 1dd675ed59ac51fd122915ca8056f85f82fa12d6
+      I66_CARLOS_ARTIFACT_ID: '13984026378'
+      I66_CARLOS_ARTIFACT_DIGEST: sha256:f51907a610ca467b7bf840652a3f3e9983a7f9913f5d279e01fa34a539123dbc
+      I66_CARLOS_PREVIEW_CHANNEL: gi-i66-rc-43305281214
+      I66_CARLOS_PREVIEW_URL: https://ays-orbit-360-lab--gi-i66-rc-43305281214-hr641g40.web.app
+      I66_CARLOS_PREVIEW_FUNCTION_RUN: '43300939205'
+      I66_CARLOS_EMULATOR_RUN: '43305281266'
+      I66_CARLOS_SIGNED_OPS_UAT: '43301759098'
+      I66_CARLOS_SIGNED_PAYMENT_UAT: '43306217923'
+      I66_CARLOS_PAYMENT_LIVE_RUN: '43307238568'
       SA_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
       SA_ALT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
       SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
@@ -38,42 +42,60 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Verify original CI+artifact+emulator+Preview and regression-preserving source
+      - name: Verify one exact package and signed real Carlos/Paula Preview and payment LIVE prerequisites
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
           git cat-file -e "$I66_CARLOS_SOURCE_SHA^{commit}"
+          git merge-base --is-ancestor "$I66_CARLOS_SOURCE_SHA" HEAD
+          test -z "$(git diff --name-only "$I66_CARLOS_SOURCE_SHA" HEAD -- orbit360-platform functions firebase.json firestore.rules storage.rules)"
           node --check tools/gravicentra-i6-6-carlos-live-exact-transport.mjs
+          node tools/gravicentra-i6-6-carlos-ops-tasks-transversal.test.cjs
+          node tools/gravicentra-i6-6-carlos-preview-synthetic-write-gate.test.cjs
+          node tools/gravicentra-i6-6-carlos-payment-preview-synthetic-gate.test.cjs
           node - <<'NODE'
           const assert=require('node:assert/strict'),{execFileSync}=require('node:child_process');
           (async()=>{
+            const fs=require('node:fs');
+            const control=JSON.parse(fs.readFileSync('artifacts/orbit360-recovery/release-control/I6_6_RELEASE_TRANSPORT_CONTROL_20261110.json'));
+            const gate=control.carlosOpsLiveAuthorization20261112||{};
+            assert.equal(gate.status,'EXACT_TWO_WRITERS_AND_HOSTING_AUTHORIZED_AFTER_SIGNED_PREVIEW');
+            assert.equal(gate.sourceSha,process.env.I66_CARLOS_SOURCE_SHA);
+            assert.equal(gate.artifactId,Number(process.env.I66_CARLOS_ARTIFACT_ID));
+            assert.equal(gate.paymentLiveRunId,Number(process.env.I66_CARLOS_PAYMENT_LIVE_RUN));
+            assert.equal(gate.signedOpsPreviewRunId,Number(process.env.I66_CARLOS_SIGNED_OPS_UAT));
+            assert.equal(gate.signedPaymentPreviewRunId,Number(process.env.I66_CARLOS_SIGNED_PAYMENT_UAT));
+            assert.equal(gate.noOtherFunctionRulesAuthOrFinancialWrites,true);
+            assert.equal(gate.automaticRollbackIfAnyBackendOrDualOriginReadbackFails,true);
+            assert.equal(JSON.stringify(gate.targetLiveFunctions),JSON.stringify(['orbit360ProductOperationalCommand','orbit360OpsLeadsCommand']));
+            assert.equal(gate.targetRegion,'us-central1');
+            assert.equal(gate.artifactDigest,process.env.I66_CARLOS_ARTIFACT_DIGEST);
+            assert.equal(gate.previewChannel,process.env.I66_CARLOS_PREVIEW_CHANNEL);
+            assert.equal(control.status,'CARLOS_OPS_HOSTING_LIVE_PROMOTION_AUTHORIZED');
+            assert.equal(control.forbidFirestoreRulesDataAuthWrites,true);
             const H={Authorization:'Bearer '+process.env.GH_TOKEN,Accept:'application/vnd.github+json','User-Agent':'GI-I66-Carlos-Live'};
             const U='https://api.github.com/repos/paulaosoriof86/orbit360-core/actions/';
-            const [qa,stage,build,art]=await Promise.all([
-              fetch(U+'runs/'+process.env.I66_CARLOS_EMULATOR_RUN,{headers:H}).then(r=>r.json()),
-              fetch(U+'runs/'+process.env.I66_CARLOS_PREVIEW_FUNCTION_RUN,{headers:H}).then(r=>r.json()),
-              fetch(U+'runs/42871046232',{headers:H}).then(r=>r.json()),
-              fetch(U+'artifacts/'+process.env.I66_CARLOS_ARTIFACT_ID,{headers:H}).then(r=>r.json())]);
-            assert.equal(qa.conclusion,'success','CARLOS_EMULATOR_NOT_GREEN');
-            assert.equal(qa.head_sha,'a125a8c8d06df8a45a1198e46966110a4a52fe7a','CARLOS_QA_SOURCE_PROOF_DRIFT');
-            assert.equal(stage.conclusion,'success','CARLOS_FUNCTION_PREVIEW_NOT_GREEN');
-            assert.equal(stage.head_sha,'f1c5a98036aabe9f73693230647016d428989d77','CARLOS_PREVIEW_WORKFLOW_DRIFT');
-            assert.equal(build.conclusion,'success','CARLOS_IMMUTABLE_PACKAGE_NOT_GREEN');
+            const ids=[process.env.I66_CARLOS_EMULATOR_RUN,process.env.I66_CARLOS_PREVIEW_FUNCTION_RUN,'43305281214',process.env.I66_CARLOS_SIGNED_OPS_UAT,process.env.I66_CARLOS_SIGNED_PAYMENT_UAT,process.env.I66_CARLOS_PAYMENT_LIVE_RUN];
+            const [qa,stage,build,ops,payment,live]=await Promise.all(ids.map(id=>fetch(U+'runs/'+id,{headers:H}).then(r=>r.json())));
+            for(const [name,r] of [['QA',qa],['THREE_PREVIEW_FUNCTIONS',stage],['PACKAGE',build],['SIGNED_OPS',ops],['SIGNED_PAYMENT',payment],['PAYMENT_LIVE',live]])assert.equal(r.conclusion,'success',name);
+            assert.equal(qa.head_sha,process.env.I66_CARLOS_SOURCE_SHA,'CARLOS_QA_SOURCE_PROOF_DRIFT');
+            assert.equal(build.head_sha,process.env.I66_CARLOS_SOURCE_SHA,'CARLOS_IMMUTABLE_PACKAGE_NOT_GREEN');
+            for(const x of [stage,ops])assert.equal(execFileSync('git',['merge-base','--is-ancestor',x.head_sha,process.env.I66_CARLOS_SOURCE_SHA]).length,0);
             assert.equal(build.head_sha,process.env.I66_CARLOS_SOURCE_SHA,'CARLOS_ORIGINAL_SOURCE_DRIFT');
+            const art=await fetch(U+'artifacts/'+process.env.I66_CARLOS_ARTIFACT_ID,{headers:H}).then(r=>r.json());
             assert.equal(art.digest,process.env.I66_CARLOS_ARTIFACT_DIGEST,'CARLOS_ZIP_DIGEST_DRIFT');
-            assert.equal(art.workflow_run.id,42871046232,'CARLOS_PACKAGE_RUN_DRIFT');
+            assert.equal(art.workflow_run.id,43305281214,'CARLOS_PACKAGE_RUN_DRIFT');
             assert.equal(art.expired,false,'CARLOS_ARTIFACT_EXPIRED');
-            const changed=execFileSync('git',['diff','--name-only','439ff7aebc685866c5605407dbc920fb329a552b',process.env.I66_CARLOS_SOURCE_SHA,'--','orbit360-platform','functions'],{encoding:'utf8'}).trim().split('\n').filter(Boolean).sort();
-            const expected=['functions/product-operational-domain.js','orbit360-platform/core/policy-receipts-engine.js','orbit360-platform/data/store-firestore-product-operational-p0.js','orbit360-platform/modules/policy-receipts-v1199-bridge.js'].sort();
-            assert.deepEqual(changed,expected,'CARLOS_UNAPPROVED_MODULE_DIFF');
-            console.log('I66_CARLOS_EMULATOR_FUNCTION_PREVIEW_ARTIFACT_AND_OPS_ADVISOR_REGRESSION_PIN_PASS');
+            const drift=execFileSync('git',['diff','--name-only','b86cad550fadc050e8574678f02f3097caa8b5bd',process.env.I66_CARLOS_SOURCE_SHA,'--','orbit360-platform','functions'],{encoding:'utf8'}).trim().split('\n').filter(Boolean).sort();
+            assert.deepEqual(drift,['functions/cobros-reconciliation-domain.js','orbit360-platform/core/product-runtime-browser-providers-p0.js'].sort(),'CARLOS_SIGNED_PREVIEW_OWNER_DRIFT');
+            console.log('I66_CARLOS_TWO_REAL_SIGNED_PREVIEW_FUNCTIONS_PAYMENT_LIVE_AND_ONE_ARTIFACT_PREREQUISITES_PASS');
           })().catch(e=>{console.error(e.message);process.exitCode=1;});
           NODE
       - uses: actions/download-artifact@v4
         with:
-          artifact-ids: 13789672305
-          run-id: 42871046232
+          artifact-ids: 13984026378
+          run-id: 43305281214
           github-token: ${{ github.token }}
           path: ${{ runner.temp }}/carlos-live-archive
       - name: Verify one byte-exact TAR and backend/frontend owner contents
@@ -93,9 +115,12 @@ jobs:
           node - <<'NODE'
           const fs=require('node:fs'),{execFileSync}=require('node:child_process'),root=process.env.CARLOS_LIVE_PKT;
           const p=root+'/bundle/',m=JSON.parse(fs.readFileSync(p+'site/__recovery__/build.json'));
-          if(m.sourceSha!==process.env.I66_CARLOS_SOURCE_SHA||m.gate!=='I6.6'||m.buildId!=='gi-i66-35008e0d5b9a-57f234755dc1')throw Error('CARLOS_PACKET_MARKER_DRIFT');
+          if(m.sourceSha!==process.env.I66_CARLOS_SOURCE_SHA||m.gate!=='I6.6'||m.buildId!=='gi-i66-1dd675ed59ac-57f234755dc1')throw Error('CARLOS_PACKET_MARKER_DRIFT');
           for(const [target,source] of [
             ['backend/product-operational-domain.js','functions/product-operational-domain.js'],
+            ['backend/product-ops-leads-domain.js','functions/product-ops-leads-domain.js'],
+            ['site/modules/ops.js','orbit360-platform/modules/ops.js'],
+            ['site/core/product-runtime-browser-providers-p0.js','orbit360-platform/core/product-runtime-browser-providers-p0.js'],
             ['site/core/policy-receipts-engine.js','orbit360-platform/core/policy-receipts-engine.js'],
             ['site/modules/policy-receipts-v1199-bridge.js','orbit360-platform/modules/policy-receipts-v1199-bridge.js'],
             ['site/data/store-firestore-product-operational-p0.js','orbit360-platform/data/store-firestore-product-operational-p0.js']
@@ -135,31 +160,35 @@ jobs:
       - uses: google-github-actions/setup-gcloud@v2
         with:
           version: '>= 483.0.0'
-      - name: Snapshot exact LIVE single ProductOperational revision and immutable Hosting rollback
+      - name: Snapshot two existing LIVE operational revisions and recoverable Hosting release
         run: |
           set -euo pipefail
           gcloud auth activate-service-account --key-file="$GOOGLE_APPLICATION_CREDENTIALS" --quiet >/dev/null
           gcloud config set project "$PROJECT_ID" --quiet >/dev/null
-          FN='orbit360ProductOperationalCommand'
-          gcloud functions describe "$FN" --gen2 --region us-central1 --project "$PROJECT_ID" --format=json > "$RUNNER_TEMP/carlos-live-fn-before.json"
-          SERVICE="$(node - <<'NODE'
-          const f=require(process.env.RUNNER_TEMP+'/carlos-live-fn-before.json');
+          : > "$RUNNER_TEMP/carlos-live-two-old-revisions.tsv"
+          for FN in orbit360ProductOperationalCommand orbit360OpsLeadsCommand;do
+            export FN
+            gcloud functions describe "$FN" --gen2 --region us-central1 --project "$PROJECT_ID" --format=json > "$RUNNER_TEMP/carlos-live-fn-before-$FN.json"
+            SERVICE="$(node - <<'NODE'
+          const f=require(process.env.RUNNER_TEMP+'/carlos-live-fn-before-'+process.env.FN+'.json');
           const full=String(f.serviceConfig?.service||''),s=full.split('/').pop();
           if(!full.includes('/locations/us-central1/services/')||!/^[a-z][a-z0-9-]+$/.test(s))throw Error('CARLOS_EXISTING_LIVE_FUNCTION_NOT_SCOPED');
           process.stdout.write(s);
           NODE
-          )"
-          gcloud run services describe "$SERVICE" --region us-central1 --project "$PROJECT_ID" --format=json > "$RUNNER_TEMP/carlos-live-run-before.json"
-          REV="$(node - "$SERVICE" <<'NODE'
-          const f=require(process.env.RUNNER_TEMP+'/carlos-live-run-before.json');
+            )"
+            export SERVICE
+            gcloud run services describe "$SERVICE" --region us-central1 --project "$PROJECT_ID" --format=json > "$RUNNER_TEMP/carlos-live-run-before-$FN.json"
+            REV="$(node - <<'NODE'
+          const f=require(process.env.RUNNER_TEMP+'/carlos-live-run-before-'+process.env.FN+'.json');
           const p=(f.status?.traffic||f.traffic||[]).filter(x=>Number(x.percent)===100);
           const s=String(p[0]?.revisionName||p[0]?.revision||'');
-          if(p.length!==1||!s.startsWith(process.argv[2]+'-'))throw Error('CARLOS_PREVIOUS_100_PERCENT_REVISION_AMBIGUOUS');
+          if(p.length!==1||!s.startsWith(process.env.SERVICE+'-'))throw Error('CARLOS_PREVIOUS_100_PERCENT_REVISION_AMBIGUOUS');
           process.stdout.write(s);
           NODE
-          )"
-          echo "I66_CARLOS_OLD_SERVICE=$SERVICE" >> "$GITHUB_ENV"
-          echo "I66_CARLOS_OLD_REVISION=$REV" >> "$GITHUB_ENV"
+            )"
+            printf '%s|%s|%s\n' "$FN" "$SERVICE" "$REV" >> "$RUNNER_TEMP/carlos-live-two-old-revisions.tsv"
+          done
+          test "$(wc -l < "$RUNNER_TEMP/carlos-live-two-old-revisions.tsv")" -eq 2
           RB="gi-i66-carlosrb-$GITHUB_RUN_ID"
           node "$FIREBASE_CLI_BIN" hosting:clone "$SITE:live" "$SITE:$RB" --project "$PROJECT_ID" --non-interactive
           echo "I66_CARLOS_ROLLBACK_CHANNEL=$RB" >> "$GITHUB_ENV"
@@ -167,8 +196,8 @@ jobs:
           cp -a "$I66_PACKAGE_ROOT/bundle/backend" "$FROOT/backend"
           (cd "$FROOT/backend" && npm ci --ignore-scripts --no-audit --no-fund >/dev/null)
           printf '{"functions":{"source":"backend"}}\n' > "$FROOT/firebase.json"
-          echo "I66_CARLOS_FUNCTION_AND_HOSTING_BACKUP_READY"
-      - name: Promote only ProductOperationalCommand and same Hosting version with automatic rollback
+          echo "I66_CARLOS_TWO_FUNCTION_REVISIONS_AND_HOSTING_BACKUP_READY"
+      - name: Promote exact Ops/Leads and ProductOperational writers, then identical Hosting with rollback
         run: |
           set -euo pipefail
           completed=0;deployment_started=0
@@ -177,7 +206,9 @@ jobs:
             if test "$completed" != 1 && test "$deployment_started" = 1;then
               set +e
               failed=0
-              gcloud run services update-traffic "$I66_CARLOS_OLD_SERVICE" --region us-central1 --project "$PROJECT_ID" --to-revisions="$I66_CARLOS_OLD_REVISION=100" --quiet || failed=1
+              while IFS='|' read -r fn service oldrev;do
+                gcloud run services update-traffic "$service" --region us-central1 --project "$PROJECT_ID" --to-revisions="$oldrev=100" --quiet || failed=1
+              done < "$RUNNER_TEMP/carlos-live-two-old-revisions.tsv"
               node "$FIREBASE_CLI_BIN" hosting:clone "$SITE:$I66_CARLOS_ROLLBACK_CHANNEL" "$SITE:live" --project "$PROJECT_ID" --non-interactive || failed=1
               echo "I66_CARLOS_AUTO_ROLLBACK_ERRORS=$failed"
               if test "$failed" != 0;then echo 'I66_CARLOS_CRITICAL_ROLLBACK_UNCONFIRMED';fi
@@ -186,18 +217,32 @@ jobs:
           }
           trap rollback EXIT
           deployment_started=1
-          node "$FIREBASE_CLI_BIN" deploy --only functions:orbit360ProductOperationalCommand --config "$RUNNER_TEMP/carlos-live-functions/firebase.json" --project "$PROJECT_ID" --non-interactive
+          node "$FIREBASE_CLI_BIN" deploy --only functions:orbit360ProductOperationalCommand,functions:orbit360OpsLeadsCommand --config "$RUNNER_TEMP/carlos-live-functions/firebase.json" --project "$PROJECT_ID" --non-interactive
           node tools/gravicentra-i6-6-carlos-live-exact-transport.mjs
-          gcloud functions describe orbit360ProductOperationalCommand --gen2 --region us-central1 --project "$PROJECT_ID" --format=json > "$RUNNER_TEMP/carlos-live-fn-after.json"
-          node - <<'NODE'
-          const f=require(process.env.RUNNER_TEMP+'/carlos-live-fn-after.json');
-          if(!['ACTIVE','READY'].includes(String(f.state||'').toUpperCase())||!String(f.serviceConfig?.uri||'').startsWith('https://'))
-            throw Error('CARLOS_LIVE_FUNCTION_POSTDEPLOY_HEALTH_FAILED');
-          console.log('I66_CARLOS_PRODUCT_OPERATIONAL_FUNCTION_LIVE_PASS');
+          while IFS='|' read -r FN SERVICE OLD_REV;do
+            export FN SERVICE OLD_REV
+            gcloud functions describe "$FN" --gen2 --region us-central1 --project "$PROJECT_ID" --format=json > "$RUNNER_TEMP/carlos-live-fn-after-$FN.json"
+            gcloud run services describe "$SERVICE" --region us-central1 --project "$PROJECT_ID" --format=json > "$RUNNER_TEMP/carlos-live-run-after-$FN.json"
+            node - <<'NODE'
+          const f=require(process.env.RUNNER_TEMP+'/carlos-live-fn-after-'+process.env.FN+'.json');
+          const r=require(process.env.RUNNER_TEMP+'/carlos-live-run-after-'+process.env.FN+'.json');
+          const revision=String(f.serviceConfig?.revision||'');
+          const traffic=(r.status?.traffic||r.traffic||[]).filter(x=>Number(x.percent)>0);
+          if(!['ACTIVE','READY'].includes(String(f.state||'').toUpperCase())||
+              !String(f.serviceConfig?.uri||'').startsWith('https://')||
+              revision===process.env.OLD_REV||traffic.length!==1||Number(traffic[0].percent)!==100||
+              String(traffic[0].revisionName||traffic[0].revision)!==revision)
+            throw Error('CARLOS_TWO_LIVE_FUNCTIONS_REVISION_OR_TRAFFIC_NOT_ACCEPTED:'+process.env.FN);
+          console.log('I66_CARLOS_EXACT_LIVE_NEW_REVISION_100_PERCENT_PASS '+process.env.FN);
           NODE
+          done < "$RUNNER_TEMP/carlos-live-two-old-revisions.tsv"
+          STATUS=$(curl -sS --max-time 25 -o "$RUNNER_TEMP/carlos-live-unauth.json" -w '%{http_code}' -X POST 'https://us-central1-ays-orbit-360-lab.cloudfunctions.net/orbit360OpsLeadsCommand' -H 'Content-Type: application/json' --data '{"data":{"tenantId":"alianzas-soluciones","operation":"create_management"}}')
+          test "$STATUS" = 401
+          grep -q 'UNAUTHENTICATED' "$RUNNER_TEMP/carlos-live-unauth.json"
+          echo 'I66_CARLOS_LIVE_OPS_AUTH_GUARD_401_PASS'
           completed=1
           trap - EXIT
-          echo 'I66_CARLOS_SINGLE_FUNCTION_AND_218_DUAL_ORIGIN_SAME_ARTIFACT_LIVE_PASS'
+          echo 'I66_CARLOS_TWO_WRITERS_AND_DUAL_ORIGIN_SAME_ARTIFACT_LIVE_PASS'
       - name: Upload immutable non-PII readback evidence
         if: always()
         uses: actions/upload-artifact@v4

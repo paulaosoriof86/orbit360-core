@@ -45,6 +45,16 @@ jobs:
           const c=JSON.parse(fs.readFileSync('artifacts/orbit360-recovery/release-control/I6_6_RELEASE_TRANSPORT_CONTROL_20261110.json','utf8'));
           const scopedPreview=c.status==='PAYMENT_FUNCTION_PREVIEW_AUTHORIZED'&&c.backendFunctionPreviewOnly===true&&c.forbidBackendLiveFunctionDeploy===true&&c.livePromotionAuthorized===false&&c.previewApproved===false;
           const scopedLive=c.status==='PAYMENT_LIVE_FUNCTION_PROMOTION_AUTHORIZED'&&c.liveFunctionScope==='orbit360CobrosReconciliationCommand'&&c.noHostingPromotion===true&&c.forbidBackendLiveFunctionDeploy===false&&c.livePromotionAuthorized===true&&c.previewApproved===true&&c.previewFunctionRunId===43306217923&&c.carlosPaymentPreviewNextSource20261112?.signedCarlosPaulaPaymentUat==='PASS_43306217923';
+          const opsAuthorization=c.carlosOpsLiveAuthorization20261112||{};
+          const scopedCarlosLive=c.status==='CARLOS_OPS_HOSTING_LIVE_PROMOTION_AUTHORIZED'&&
+            c.approvedSourceSha==='1dd675ed59ac51fd122915ca8056f85f82fa12d6'&&
+            c.sourceBuildWorkflowRunId===43305281214&&c.immutableArtifactId===13984026378&&
+            c.immutableArtifactZipDigest==='sha256:f51907a610ca467b7bf840652a3f3e9983a7f9913f5d279e01fa34a539123dbc'&&
+            c.livePromotionAuthorized===true&&c.previewApproved===true&&c.forbidBackendLiveFunctionDeploy===false&&
+            opsAuthorization.status==='EXACT_TWO_WRITERS_AND_HOSTING_AUTHORIZED_AFTER_SIGNED_PREVIEW'&&
+            opsAuthorization.sourceSha===c.approvedSourceSha&&opsAuthorization.artifactId===c.immutableArtifactId&&
+            opsAuthorization.paymentLiveRunId===43307238568&&opsAuthorization.signedOpsPreviewRunId===43301759098&&
+            opsAuthorization.signedPaymentPreviewRunId===43306217923&&opsAuthorization.noOtherFunctionRulesAuthOrFinancialWrites===true;
           const carlos=c.carlosPreviewAuthorization20261112||{};
           const carlosTargets=['orbit360OpsLeadsCommandPreview','orbit360ProductOperationalCommandPreview','orbit360ScopedPolicyReadPreview'];
           const carlosFunctionPreview=c.status==='CARLOS_TRANSVERSAL_FUNCTIONS_PREVIEW_AUTHORIZED'&&
@@ -78,8 +88,8 @@ jobs:
             c.immutableArtifactZipDigest==='sha256:dc22a21b1bda7812196303442256df18759b3cd6544db53df3f11c634250368d'&&
             c.sourcePreviewChannelId==='gi-i66-rc-43139926207'&&
             c.sourcePreviewUrl==='https://ays-orbit-360-lab--gi-i66-rc-43139926207-ua8r8jvc.web.app';
-          if(c.schema!=='GRAVICENTRA_I6_6_SINGLE_ARTIFACT_RELEASE_TRANSPORT_V1'||c.gate!=='I6.6'||c.historicalClosedGate!=='B4-007'||(c.forbidBackendFunctionDeploy!==true&&!scopedPreview&&!scopedLive&&!readerPreview&&!carlosFunctionPreview)||c.forbidFirestoreRulesDataAuthWrites!==true)throw Error('I66_TRANSPORT_SCOPE_INVALID');
-          if((scopedPreview||scopedLive||readerPreview)&&(!/^[0-9a-f]{40}$/.test(c.approvedSourceSha||'')||!(c.sourceBuildWorkflowRunId>0)||!(c.immutableArtifactId>0)||!/^[0-9a-f]{64}$/.test(String(c.immutableArtifactZipDigest||'').replace(/^sha256:/,''))))throw Error('I66_SCOPED_RELEASE_PROOF_MISSING');
+          if(c.schema!=='GRAVICENTRA_I6_6_SINGLE_ARTIFACT_RELEASE_TRANSPORT_V1'||c.gate!=='I6.6'||c.historicalClosedGate!=='B4-007'||(c.forbidBackendFunctionDeploy!==true&&!scopedPreview&&!scopedLive&&!scopedCarlosLive&&!readerPreview&&!carlosFunctionPreview)||c.forbidFirestoreRulesDataAuthWrites!==true)throw Error('I66_TRANSPORT_SCOPE_INVALID');
+          if((scopedPreview||scopedLive||scopedCarlosLive||readerPreview)&&(!/^[0-9a-f]{40}$/.test(c.approvedSourceSha||'')||!(c.sourceBuildWorkflowRunId>0)||!(c.immutableArtifactId>0)||!/^[0-9a-f]{64}$/.test(String(c.immutableArtifactZipDigest||'').replace(/^sha256:/,''))))throw Error('I66_SCOPED_RELEASE_PROOF_MISSING');
           let mode='disabled',source='';
           if(c.status==='PREVIEW_BUILD_REQUESTED'&&c.livePromotionAuthorized===false)mode='package';
           if(readerPreview){mode='reader-preview';source=reader.sourceCommit;}
