@@ -1070,7 +1070,7 @@
       "receipt": "artifacts/orbit360-recovery/release-control/I6_6_REAL_INSURER_SAVE_ROOTCAUSE_20261111.json#portalCredentialReferenceRuntimeCorrection20261111",
       "sourceStatus": "SOURCE_UNIT_11_PASS_ISOLATED_PREVIEW_BUILD_REQUIRED_NO_LIVE_DATA_WRITES",
       "capabilityOwners": ["ASEGURADORAS_PRIMARY_RUNTIME", "ASEGURADORAS_CREDENTIAL_REVEAL", "ROLE_SCOPE_RUNTIME"],
-      "scope": "In real insurer portals, a missing vault ref or legacy backend_required sentinel must never be presented as an available password. Preserve server-issued cred_ references; do not inject placeholders on ordinary portal edits. Align bank-account edit controls for approved Operativo role with the existing insurer writer and module, preventing masked account numbers from being serialized; Asesor remains denied. No insurer/financial data write in source tests.",
+      "scope": "In the reachable primary Aseguradoras module, a missing vault ref or legacy backend_required sentinel must never be introduced on portal edits. Preserve server-issued cred_ references; the reachable secure credential provider enforces actual reference format. Bank-account numbers remain editable for Dirección and approved Operativo in the main insurer editor; Asesor cannot edit. The dormant July P02 DOM decorator is intentionally excluded from this canonical product build; it is not the owner. No insurer/financial writes in source tests.",
       "paths": [
         {
           "path": "orbit360-platform/modules/aseguradoras.js",
@@ -1080,14 +1080,10 @@
             "priorGitBlobSha": "143296dfdb62bc7d72a46446b65059b44edcb731",
             "priorChangeId": "I6_6_PROTECTED_READONLY_HOST_ROUTING_AND_WRITE_DENIAL_ALL_SURFACES"
           }
-        },
-        {
-          "path": "orbit360-platform/core/aseguradoras-sensitive-p02.js",
-          "gitBlobSha": "0f2f1e752275854e859a8786633cb15d0ff569a5"
         }
       ],
       "tests": [
-        {"path": "tools/gravicentra-i6-6-insurer-credential-placeholder-integrity.test.cjs", "gitBlobSha": "8f116dc9d9ef336ace098c6eed869c5f8e6395d6"}
+        {"path": "tools/gravicentra-i6-6-insurer-credential-placeholder-integrity.test.cjs", "gitBlobSha": "1318806a77c34a3b8dd017db1eec09d7a10c6aa7"}
       ]
     },
     {

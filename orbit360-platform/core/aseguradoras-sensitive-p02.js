@@ -10,14 +10,8 @@
   window.Orbit = window.Orbit || {};
 
   var VIEW_ROLES = ['superadmin', 'super_admin', 'direccion', 'admin', 'admintenant', 'admin_tenant', 'operativo'];
-  // The insurer directory's approved operational roles may maintain bank
-  // details. Keeping Operativo read-only here masked the editable input and
-  // risked serializing the mask when saving unrelated insurer changes.
-  var EDIT_ROLES = ['superadmin', 'super_admin', 'direccion', 'admin', 'admintenant', 'admin_tenant', 'operativo'];
+  var EDIT_ROLES = ['superadmin', 'super_admin', 'direccion', 'admin', 'admintenant', 'admin_tenant'];
   var BLOCKED_METADATA = ['value', 'valor', 'password', 'pass', 'contrasena', 'token', 'secret', 'secreto', 'clipboard', 'numero', 'numero_cuenta', 'numerocuenta', 'accountnumber', 'account_number'];
-  // Must match the server-issued insurer vault reference format. The former
-  // backend_required string is a placeholder, never an actual saved secret.
-  var CREDENTIAL_REF_RE = /^cred_[a-f0-9]{32}$/;
 
   function clean(value) { return String(value == null ? '' : value).trim(); }
   function norm(value) {
@@ -120,12 +114,10 @@
 
   function normalizePortal(portal) {
     portal = portal || {};
-    var rawRef = clean(portal.credentialRef || portal.secretRef);
-    var actualRef = CREDENTIAL_REF_RE.test(rawRef) ? rawRef : '';
     return {
       id: clean(portal.id), nombre: clean(portal.nombre || portal.name || 'Portal'), url: clean(portal.url),
-      usuario: clean(portal.usuario || portal.user), credentialRef: actualRef,
-      estadoCredencial: clean(actualRef ? (portal.estadoCredencial || 'registrada') : 'sin_credencial'),
+      usuario: clean(portal.usuario || portal.user), credentialRef: clean(portal.credentialRef || portal.secretRef),
+      estadoCredencial: clean(portal.estadoCredencial || (portal.credentialRef ? 'registrada' : 'sin_credencial')),
       ultimaVerificacion: clean(portal.ultimaVerificacion), notas: clean(portal.notas)
     };
   }

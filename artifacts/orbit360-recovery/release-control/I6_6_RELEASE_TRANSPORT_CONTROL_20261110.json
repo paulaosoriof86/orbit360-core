@@ -141,7 +141,7 @@
   "liveAccessGuard": "UNAUTHENTICATED_401_PASS",
   "hostingOriginsUntouched": true,
   "liveCustomerDataWrites": 0,
-  "releaseStatus": "INSURER_VAULT_REF_AND_BANK_EDIT_SUCCESSOR_NEW_EXACT_SOURCE_PACKAGE_AND_PREVIEW_REQUESTED; PRIOR_SIGNED_PREFLIGHT_PRESERVED; LIVE_FRONTEND_UNCHANGED; TWO_LOGO_FUNCTION_REVISIONS_LIVE_SUCCESS; SIGNED_ASSET_UPLOAD_QA_PENDING",
+  "releaseStatus": "LOGO_BACKEND_SIGNED_LIVE_E2E_PASS; CANONICAL_FRONTEND_INSURER_REF_SUCCESSOR_UNIT_PASS_NEW_PREVIEW_PACKAGE_PENDING; LIVE_FRONTEND_UNCHANGED; FULL_MODULE_ACCEPTANCE_HOLD",
   "pendingFrontendTopbarRelease": {
     "receipt": "artifacts/orbit360-recovery/release-control/I6_6_GLOBAL_TOPBAR_CROSSMODULE_HYDRATION_20261111.json",
     "currentStatus": "SOURCE_UNIT_PASS_IMMUTABLE_BUILD_REQUESTED",
@@ -190,27 +190,26 @@
     "A5-A7 planilla/insurer statement matching with idempotent per-receipt controlled application; GreenAPI separately"
   ],
   "newCanonicalInsurerPortalReferenceSourceCandidate20261111": {
-    "sourceStatus": "UNIT_11_OF_11_PASS_PREVIEW_BUILD_REQUESTED_LIVE_HOLD",
+    "sourceStatus": "UNIT_11_OF_11_PASS_PREVIEW_BUILD_REQUESTED_LIVE_FRONTEND_HOLD",
     "purpose": "Preserve real vault reference and display missing/legacy placeholder as unavailable; do not manufacture backend_required on portal edits or new portals; honor already-approved Operativo bank-account edit semantics without masked serialization.",
     "causalBoundary": "This corrects a distinct portal-reference display/persistence defect, not the unproven cause of Paula's SAVE failure or Carlos's signed UID mismatch.",
     "sourcePaths": [
-      "orbit360-platform/modules/aseguradoras.js",
-      "orbit360-platform/core/aseguradoras-sensitive-p02.js"
+      "orbit360-platform/modules/aseguradoras.js"
     ],
     "sourceBlobShas": [
-      "f224e3a4ff3b5e53be0988adbe915fcefbfafdc1",
-      "0f2f1e752275854e859a8786633cb15d0ff569a5"
+      "f224e3a4ff3b5e53be0988adbe915fcefbfafdc1"
     ],
     "testPath": "tools/gravicentra-i6-6-insurer-credential-placeholder-integrity.test.cjs",
-    "testBlobSha": "8f116dc9d9ef336ace098c6eed869c5f8e6395d6",
+    "testBlobSha": "1318806a77c34a3b8dd017db1eec09d7a10c6aa7",
     "pastBuildEvidencePreservedUnder": "insurerSafePreviewAndSignedQaReceipt",
     "requestedTarget": "EXISTING_LAB_HOSTING_ISOLATED_PREVIEW",
     "backendDeploy": false,
     "livePromotion": false,
-    "firestoreAuthRulesDataWrites": 0
+    "firestoreAuthRulesDataWrites": 0,
+    "dormantP02Exclusion": "Legacy DOM decorator core/aseguradoras-sensitive-p02.js is not reachable; excluded from canonical I6.6 package and restored to historical baseline."
   },
   "insurerLogoTwoFunctionTargetedLiveRuntimeReceipt20261112": {
-    "status": "FUNCTIONS_DEPLOYED_UPLOAD_FIX_INCOMPLETE",
+    "status": "TWO_FUNCTION_LIVE_DEPLOY_AND_SIGNED_LOGO_E2E_PASS",
     "functionDeployRun": 43153093484,
     "functionsCreated": [
       "orbit360ProductAssetUpload",
@@ -229,7 +228,16 @@
     "deployStatus": "EXACT_EXISTING_TWO_PREVIEW_AND_LIVE_FUNCTION_REVISIONS_SUCCESS",
     "functionInventoryBefore": 85,
     "functionInventoryAfter": 85,
-    "signedLiveUploadQaStatus": "RETEST_RUNNING"
+    "signedLiveUploadQaStatus": "PASS",
+    "finalFunctionDeployRun": 43156655361,
+    "finalFunctionSourceBlob": "416775a865e8b23ae7e8bbb604c8d7c519297517",
+    "signedFinalLiveQaRun": 43157088135,
+    "signedFinalLiveQaResult": "PASS_UPLOAD_READ_SHA256_MATCH_FIRESTORE_READBACK_EXACT_TEST_CLEANUP",
+    "syntheticRecordsRestored": true,
+    "testStorageAssetDeleted": true,
+    "realInsurerWrites": 0,
+    "financialWrites": 0,
+    "credentialsChanged": false
   },
   "preInsurerCredentialSuccessorPreviewEvidencePreserved20261112": {
     "status": "INSURER_SAFE_PREVIEW_SIGNED_PREFLIGHT_PASS_LIVE_HOLD",

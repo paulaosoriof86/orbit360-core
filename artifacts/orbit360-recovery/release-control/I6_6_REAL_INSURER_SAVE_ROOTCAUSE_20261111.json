@@ -115,19 +115,18 @@
     "codeDefect": "Aseguradoras snapshot/new portal inserted backend_required, and the sensitive UI interpreted any non-empty ref as a stored credential. The server accepts only cred_ plus 32 lowercase hex characters.",
     "fix": "Preserve an existing reference without inserting placeholders; only a valid server-issued reference enables reveal/copy; a missing or legacy placeholder shows no stored credential. Align Operativo bank number edit to its existing primary-module/backend permission to avoid masked-account serialization; Asesor remains denied. No existing insurer records are rewritten.",
     "sourcePaths": [
-      "orbit360-platform/modules/aseguradoras.js",
-      "orbit360-platform/core/aseguradoras-sensitive-p02.js"
+      "orbit360-platform/modules/aseguradoras.js"
     ],
     "sourceBlobShas": [
-      "f224e3a4ff3b5e53be0988adbe915fcefbfafdc1",
-      "0f2f1e752275854e859a8786633cb15d0ff569a5"
+      "f224e3a4ff3b5e53be0988adbe915fcefbfafdc1"
     ],
     "testPath": "tools/gravicentra-i6-6-insurer-credential-placeholder-integrity.test.cjs",
-    "testBlobSha": "8f116dc9d9ef336ace098c6eed869c5f8e6395d6",
+    "testBlobSha": "1318806a77c34a3b8dd017db1eec09d7a10c6aa7",
     "unitResult": "11_OF_11_PASS_NO_LIVE_WRITES",
-    "previewAndLiveResult": "PENDING_NEW_IMMUTABLE_BUILD_AND_SIGNED_UI_QA",
+    "previewAndLiveResult": "UNIT_11_OF_11_PASS; NEW_CANONICAL_IMMUTABLE_PREVIEW_BUILD_PENDING; LIVE_FRONTEND_UNCHANGED",
     "liveDataWrites": 0,
-    "permissionBroadened": "Operativo bank number edit aligned with already-approved insurer writer and main module; Asesor unchanged"
+    "permissionBroadened": "No: canonical main module already has Direccion/Admin/SuperAdmin/Operativo edit permission; existing bank number input remains editable; Asesor unchanged.",
+    "dormantP02Exclusion": "core/aseguradoras-sensitive-p02.js is not loaded by canonical index or reachable runtime; restored to historical blob 9c524ab2dabb8d981fde2d0f231cb9a8beb90e26; do not add legacy DOM decorator to product."
   },
   "insurerLogoStorageDefectProof20261112": {
     "observableForDirection": true,
@@ -137,7 +136,16 @@
     "signedLiveUploadRun": 43154812175,
     "error": "STORAGE_ASSET_WRITE_UNAVAILABLE",
     "serverStorageErrorCode": "404",
-    "logoE2E": "HOLD_PENDING_ACTUAL_BUCKET_CONFIGURATION",
-    "realCustomerRecordWrites": 0
+    "logoE2E": "PASS_AUTHENTICATED_DIRECCION_SYNTHETIC_LIVE_UPLOAD_READ_SHA256_FIRESTORE_PERSIST_AND_EXACT_RESTORE",
+    "realCustomerRecordWrites": 0,
+    "existingAssetBucket": "gravicentra-insurance-assets-60e88ed5a1",
+    "bucketReadOnlyEvidenceRun": 43155071269,
+    "finalBackendFunctionDeployRun": 43156655361,
+    "signedLiveUploadReadRestoreRun": 43157088135,
+    "syntheticRecordRestored": true,
+    "syntheticAssetDeleted": true,
+    "financialWrites": 0,
+    "credentialsChanged": false,
+    "fullModuleLiveAcceptance": false
   }
 }
