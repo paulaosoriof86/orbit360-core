@@ -23,12 +23,31 @@
   "sourceQA": {
     "status": "PASS_LOCAL_SYNTHETIC_ONLY",
     "newFocusedCases": "7/7 PASS",
-    "existingRegressionSuites": " targeted legacy suites for Cronograma, scoped reader, session, Ops/Leads, renovación y cobros PASS (local only)",
+    "existingRegressionSuites": "39 governed I6.6 tests plus legacy Ops human actor fixtures; source guard PASS, Control Plane Guard v5 run 43294238882 SUCCESS",
     "realFirebaseCustomerWrites": 0,
     "realCarlosSignedWrites": 0,
     "previewSignedWritePass": false,
     "liveSignedWritePass": false,
     "publishedToLive": false
+  },
+  "immutablePreview20261112": {
+    "status": "BUILD_EXACT_PREVIEW_PUBLISHED_AND_READBACK_PASS",
+    "sourceSha": "0a54148547282b07536d5cc1c92854b023f23d71",
+    "buildRunId": 43293845272,
+    "artifactId": 13977703391,
+    "artifactZipDigest": "sha256:000572953a2fd39e95b4efabb3975a485d61675d5a317adf7643e18d835c97e7",
+    "previewUrl": "https://ays-orbit-360-lab--gi-i66-rc-43293845272-j4qucpnj.web.app",
+    "previewExactReadback": "PASS",
+    "liveHostingUntouched": true,
+    "approvedProductSourcePaths": 48,
+    "approvedSyntheticRegressionTests": 39,
+    "signedDirecciónCarlosReadOnlyRunId": 43295884232,
+    "signedMemberRoleCountryScope": "PASS_BOTH_ACTORS",
+    "signedInsurerEditControls": "PRESENT_AND_ENABLED_DOM_ONLY",
+    "pointerActionability": "HOLD_ANONYMOUS_MODAL_BACKDROP_INTERCEPTS_TAB_AND_CANCEL_POINTER_CLICKS_FRESH_AUTH_CONTEXT",
+    "backendPreviewFunctions": "AUTHORIZED_NOT_YET_DEPLOYED",
+    "backendLiveFunctions": "NOT_DEPLOYED",
+    "signedDurableBusinessWrites": 0
   },
   "operationalGate": {
     "status": "HOLD_REAL_CARLOS_UAT_AND_EXACT_ARTIFACT_PROMOTION",

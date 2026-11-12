@@ -45,6 +45,23 @@ jobs:
           const c=JSON.parse(fs.readFileSync('artifacts/orbit360-recovery/release-control/I6_6_RELEASE_TRANSPORT_CONTROL_20261110.json','utf8'));
           const scopedPreview=c.status==='PAYMENT_FUNCTION_PREVIEW_AUTHORIZED'&&c.backendFunctionPreviewOnly===true&&c.forbidBackendLiveFunctionDeploy===true&&c.livePromotionAuthorized===false&&c.previewApproved===false;
           const scopedLive=c.status==='PAYMENT_LIVE_FUNCTION_PROMOTION_AUTHORIZED'&&c.liveFunctionScope==='orbit360CobrosReconciliationCommand'&&c.noHostingPromotion===true&&c.forbidBackendLiveFunctionDeploy===false&&c.livePromotionAuthorized===true&&c.previewApproved===true&&c.previewFunctionRunId===42955048019;
+          const carlos=c.carlosPreviewAuthorization20261112||{};
+          const carlosTargets=['orbit360OpsLeadsCommandPreview','orbit360ProductOperationalCommandPreview','orbit360ScopedPolicyReadPreview'];
+          const carlosFunctionPreview=c.status==='CARLOS_TRANSVERSAL_FUNCTIONS_PREVIEW_AUTHORIZED'&&
+            c.backendFunctionPreviewOnly===true&&c.forbidBackendFunctionDeploy===false&&
+            c.forbidBackendLiveFunctionDeploy===true&&c.livePromotionAuthorized===false&&c.previewApproved===false&&
+            carlos.status==='AUTHORIZED_EXISTING_PREVIEW_FUNCTIONS_ONLY'&&carlos.targetRegion==='us-east1'&&
+            JSON.stringify(carlos.targetFunctions)===JSON.stringify(carlosTargets)&&
+            carlos.protectedSyntheticQaOnly===true&&carlos.allowRealCustomerDataWrites===false&&
+            carlos.allowFirestoreRulesAuthIamChange===false&&carlos.allowHostingLivePromotion===false&&
+            carlos.allowBackendLivePromotion===false&&carlos.signedCarlosDurableReadbackAndRestore==='HOLD'&&
+            carlos.sourceCommit==='0a54148547282b07536d5cc1c92854b023f23d71'&&
+            carlos.immutableBuildRunId===43293845272&&carlos.immutableArtifactId===13977703391&&
+            carlos.immutableArtifactZipDigest==='sha256:000572953a2fd39e95b4efabb3975a485d61675d5a317adf7643e18d835c97e7'&&
+            carlos.hostingPreviewChannel==='gi-i66-rc-43293845272'&&
+            c.approvedSourceSha===carlos.sourceCommit&&c.sourceBuildWorkflowRunId===carlos.immutableBuildRunId&&
+            c.immutableArtifactId===carlos.immutableArtifactId&&
+            c.immutableArtifactZipDigest===carlos.immutableArtifactZipDigest;
           const reader=c.readerPreviewAuthorization||{};
           const readerPreview=c.status==='CONCILIACIONES_READER_PREVIEW_AUTHORIZED'&&
             c.backendFunctionPreviewOnly===true&&c.forbidBackendLiveFunctionDeploy===true&&
@@ -61,7 +78,7 @@ jobs:
             c.immutableArtifactZipDigest==='sha256:dc22a21b1bda7812196303442256df18759b3cd6544db53df3f11c634250368d'&&
             c.sourcePreviewChannelId==='gi-i66-rc-43139926207'&&
             c.sourcePreviewUrl==='https://ays-orbit-360-lab--gi-i66-rc-43139926207-ua8r8jvc.web.app';
-          if(c.schema!=='GRAVICENTRA_I6_6_SINGLE_ARTIFACT_RELEASE_TRANSPORT_V1'||c.gate!=='I6.6'||c.historicalClosedGate!=='B4-007'||(c.forbidBackendFunctionDeploy!==true&&!scopedPreview&&!scopedLive&&!readerPreview)||c.forbidFirestoreRulesDataAuthWrites!==true)throw Error('I66_TRANSPORT_SCOPE_INVALID');
+          if(c.schema!=='GRAVICENTRA_I6_6_SINGLE_ARTIFACT_RELEASE_TRANSPORT_V1'||c.gate!=='I6.6'||c.historicalClosedGate!=='B4-007'||(c.forbidBackendFunctionDeploy!==true&&!scopedPreview&&!scopedLive&&!readerPreview&&!carlosFunctionPreview)||c.forbidFirestoreRulesDataAuthWrites!==true)throw Error('I66_TRANSPORT_SCOPE_INVALID');
           if((scopedPreview||scopedLive||readerPreview)&&(!/^[0-9a-f]{40}$/.test(c.approvedSourceSha||'')||!(c.sourceBuildWorkflowRunId>0)||!(c.immutableArtifactId>0)||!/^[0-9a-f]{64}$/.test(String(c.immutableArtifactZipDigest||'').replace(/^sha256:/,''))))throw Error('I66_SCOPED_RELEASE_PROOF_MISSING');
           let mode='disabled',source='';
           if(c.status==='PREVIEW_BUILD_REQUESTED'&&c.livePromotionAuthorized===false)mode='package';
