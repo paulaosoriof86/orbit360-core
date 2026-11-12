@@ -1089,6 +1089,28 @@
       "tests": [
         {"path": "tools/gravicentra-i6-6-insurer-credential-placeholder-integrity.test.cjs", "gitBlobSha": "8f116dc9d9ef336ace098c6eed869c5f8e6395d6"}
       ]
+    },
+    {
+      "id": "I6_6_INSURER_LOGO_EXISTING_ASSET_BUCKET_RUNTIME_P0",
+      "approvedByDirection": true,
+      "receipt": "artifacts/orbit360-recovery/release-control/I6_6_REAL_INSURER_SAVE_ROOTCAUSE_20261111.json#insurerLogoStorageDefectProof20261112",
+      "sourceStatus": "UNIT_8_PASS_TARGETED_TWO_FUNCTION_PREVIEW_AND_LIVE_RUN_PENDING_SIGNED_ASSET_QA",
+      "capabilityOwners": ["ASEGURADORAS_PRIMARY_RUNTIME", "ASEGURADORAS_PRODUCT_ASSET_BACKEND"],
+      "scope": "Use the already provisioned Gravicentra project asset bucket (metadata inventory run 43155071269) for exactly the insurer-logo upload/read functions. Preserve environment override, project binding, actor authorization and tenant/insurer scope. No data reimport; synthetic signed upload/read/restore required to claim functional PASS.",
+      "paths": [
+        {
+          "path": "functions/product-operational-domain.js",
+          "gitBlobSha": "60722d67bb873f321d91ced02c31ae999e13ae5a",
+          "replaces": {
+            "path": "functions/product-operational-domain.js",
+            "priorGitBlobSha": "a27810c65e6a5a761d40c0e1f20cae61df483d1f",
+            "priorChangeId": "I6_6_CARLOS_POLICY_RENEWABILITY_ONLY_CAS_OPERATIVE_SCOPE_P0"
+          }
+        }
+      ],
+      "tests": [
+        {"path": "tools/gravicentra-i6-6-insurer-assets-bucket.test.cjs", "gitBlobSha": "ad37d539a97fbcb94429f6ad4540397acff60053"}
+      ]
     }
   ]
 }
