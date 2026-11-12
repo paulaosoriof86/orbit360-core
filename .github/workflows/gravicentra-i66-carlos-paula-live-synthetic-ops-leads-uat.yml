@@ -44,7 +44,11 @@ jobs:
           # The previously deployed reader was promoted and traffic-routed
           # separately; rejecting ALL functions/ diffs here confuses product
           # source identity with an independently certified backend revision.
-          test -z "$(git diff --name-only "$I66_SOURCE_SHA" HEAD -- orbit360-platform firebase.json firestore.rules storage.rules)"
+          # Recovery state checkpoints are stored under orbit360-platform/docs
+          # but never enter the runtime bundle. Ignore ONLY that docs subtree.
+          all_product_changes="$(git diff --name-only "$I66_SOURCE_SHA" HEAD -- orbit360-platform firebase.json firestore.rules storage.rules)"
+          frontend_changes="$(printf '%s\n' "$all_product_changes" | grep -v '^orbit360-platform/docs/' || true)"
+          test -z "$frontend_changes"
           node --check tools/gravicentra-i6-6-carlos-paula-live-synthetic-ops-leads-uat.cjs
           node - <<'NODE'
           const assert=require('node:assert/strict');
