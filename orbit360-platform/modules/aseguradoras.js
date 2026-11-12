@@ -8,7 +8,7 @@
    reglas/presentación/comparativo/condiciones/casos de prueba). Gate
    Cotizador/Comparativo default-deny: un ramo solo se ofrece si fue
    HABILITADO explícitamente.
-   Seguridad: nunca contraseñas reales — credentialRef:'backend_required'
+   Seguridad: nunca contraseñas reales en la ficha — solo credentialRef
    + estado honesto. Logo nunca se persiste como Data URL nueva.
    Borrado: normal = desactivar con motivo; borrado físico solo si
    cero vínculos y deja auditoría externa antes de eliminar.
@@ -685,7 +685,7 @@ Orbit.modules.aseguradoras = (function () {
       const index = (st.draft.portales || []).findIndex((portal, idx) => clean(portal.id || String(idx)) === portalId);
       if (index < 0) return;
       st.draft.portales[index] = Object.assign({}, st.draft.portales[index], {
-        credentialRef: clean(mapping.credentialRef) || st.draft.portales[index].credentialRef || 'backend_required',
+        credentialRef: clean(mapping.credentialRef) || st.draft.portales[index].credentialRef || '',
         estadoCredencial: mapping.available === false ? 'requiere_actualizacion' : 'registrada',
         estadoAcceso: mapping.usernameAvailable === false || mapping.passwordAvailable === false ? 'Requiere actualización' : 'Acceso disponible',
         credencialActualizadaAt: new Date().toISOString()
@@ -906,7 +906,7 @@ Orbit.modules.aseguradoras = (function () {
 
   /* ---- Plataformas y accesos (sin contraseñas) ---- */
   function tabPlataformas(a, editing) {
-    const portales = a.portales && a.portales.length ? a.portales : (a.portal ? [{ nombre: 'Portal principal', url: a.portal, estadoAcceso: 'Sin verificar', credentialRef: 'backend_required' }] : []);
+    const portales = a.portales && a.portales.length ? a.portales : (a.portal ? [{ nombre: 'Portal principal', url: a.portal, estadoAcceso: 'Sin verificar' }] : []);
     return `<div class="asg-sec">
       <div class="asg-sec-t" style="display:flex;justify-content:space-between;align-items:center">Plataformas y accesos ${editing ? '<button class="btn ghost sm" id="af-add-portal">+ Portal</button>' : ''}</div>
       <div class="cfg-note" style="margin-bottom:9px">El usuario se guarda como dato operativo. Dirección, Superadmin, Admin y Operativo pueden cambiar la contraseña mediante el proveedor seguro; la contraseña nunca se escribe en la ficha.</div>
@@ -1295,7 +1295,10 @@ Orbit.modules.aseguradoras = (function () {
         draft.portales = [...body.querySelectorAll('[data-portal]')].map((r, idx) => {
           const prior = previous[idx] || {};
           const resourceId = clean(prior.id || r.dataset.resourceId || String(idx));
-          const portal = Object.assign({}, prior, { id: prior.id || (resourceId.indexOf('portal_') === 0 ? resourceId : undefined), nombre: r.querySelector('[data-pn]').value, tipo: r.querySelector('[data-ptipo]').value, url: r.querySelector('[data-pu]').value, usuario: r.querySelector('[data-puser]').value, pais: r.querySelector('[data-ppais]').value, estadoAcceso: r.querySelector('[data-pest]').value, responsable: r.querySelector('[data-presp]').value, ultimaVerificacion: r.querySelector('[data-pver]').value, credentialRef: prior.credentialRef || 'backend_required' });
+          // Keep a real server-issued credential reference if present. Merely
+          // opening/editing a portal must not invent a reference that the
+          // secure vault cannot resolve (historical backend_required stub).
+          const portal = Object.assign({}, prior, { id: prior.id || (resourceId.indexOf('portal_') === 0 ? resourceId : undefined), nombre: r.querySelector('[data-pn]').value, tipo: r.querySelector('[data-ptipo]').value, url: r.querySelector('[data-pu]').value, usuario: r.querySelector('[data-puser]').value, pais: r.querySelector('[data-ppais]').value, estadoAcceso: r.querySelector('[data-pest]').value, responsable: r.querySelector('[data-presp]').value, ultimaVerificacion: r.querySelector('[data-pver]').value });
           const password = r.querySelector('[data-ppass]');
           if (password && password.value) st.credentialDrafts[resourceId] = { portalId: resourceId, credentialRef: portal.credentialRef, username: portal.usuario, password: password.value };
           return portal;
@@ -1386,7 +1389,7 @@ Orbit.modules.aseguradoras = (function () {
     body.querySelectorAll('input,select,textarea').forEach(el => { el.addEventListener('change', snapshotTab); el.addEventListener('input', snapshotTab); });
 
     if (t === 'contactos') { const add = body.querySelector('#af-add-cont'); if (add) add.addEventListener('click', () => { snapshotTab(); draft.contactos = (draft.contactos || []).concat([{ id: 'contact_' + Date.now().toString(36), nombre: '', area: 'Comercial', email: '', tel: '', cargo: '', canal: 'Correo', principal: false }]); selectTab('contactos'); }); }
-    if (t === 'plataformas') { const add = body.querySelector('#af-add-portal'); if (add) add.addEventListener('click', () => { snapshotTab(); draft.portales = (draft.portales || []).concat([{ id: 'portal_' + Date.now().toString(36), nombre: '', url: '', usuario: '', estadoAcceso: 'Sin verificar', credentialRef: 'backend_required' }]); selectTab('plataformas'); }); }
+    if (t === 'plataformas') { const add = body.querySelector('#af-add-portal'); if (add) add.addEventListener('click', () => { snapshotTab(); draft.portales = (draft.portales || []).concat([{ id: 'portal_' + Date.now().toString(36), nombre: '', url: '', usuario: '', estadoAcceso: 'Sin verificar' }]); selectTab('plataformas'); }); }
     if (t === 'bancos') { const add = body.querySelector('#af-add-cta'); if (add) add.addEventListener('click', () => { snapshotTab(); draft.cuentas = (draft.cuentas || []).concat([{ id: 'account_' + Date.now().toString(36), banco: '', tipo: 'Monetaria', numero: '', moneda: draft.pais === 'GT' ? 'GTQ' : 'COP', titular: '', linkPago: '', ultimaVerificacion: '' }]); selectTab('bancos'); }); }
     if (t === 'productos') {
       body.querySelectorAll('[data-offer-ramo]').forEach(chk=>chk.addEventListener('change',()=>{snapshotTab();selectTab('productos');}));

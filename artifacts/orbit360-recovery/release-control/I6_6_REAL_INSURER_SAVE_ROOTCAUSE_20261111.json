@@ -11,9 +11,15 @@
     "insurerCountryGT": true,
     "insurerHasAdvisor": false,
     "carlosSignedMembershipMatches": 1,
-    "carlosRoles": ["operativo", "asesor"],
+    "carlosRoles": [
+      "operativo",
+      "asesor"
+    ],
     "carlosActiveRole": "operativo",
-    "carlosAllowedCountries": ["GT", "CO"],
+    "carlosAllowedCountries": [
+      "GT",
+      "CO"
+    ],
     "carlosDefaultDataScope": "propios",
     "carlosInsurerModuleScope": "",
     "operativeInsurerEditMatrix": "allow",
@@ -103,5 +109,35 @@
   "localRegressionStatus": "PASS",
   "previewStatus": "EXACT_IMMUTABLE_BUILD_READBACK_AND_DUAL_SIGNED_ROLE_PREFLIGHT_PASS_NO_DURABLE_WRITE",
   "liveStatus": "EXISTING_LIVE_DIRECCION_REAL_INSURER_REVERSIBLE_SAVE_AND_RESTORE_PASS; B54_NEW_IMMUTABLE_PREVIEW_NOT_PROMOTED; CARLOS_AND_PAULA_SPECIFIC_REPORTED_FAILURE_HOLD",
-  "liveWriteCertification": "FOCAL_PAULA_SINGLE_RECORD_ONLY; NO_TRANSVERSAL_PASS_CLAIMED"
+  "liveWriteCertification": "FOCAL_PAULA_SINGLE_RECORD_ONLY; NO_TRANSVERSAL_PASS_CLAIMED",
+  "portalCredentialReferenceRuntimeCorrection20261111": {
+    "trigger": "Live readonly run 43150787839 identified 25 real insurer rows with portals lacking a real vault reference; this is a separate integrity issue, not proof of the reported SAVE rejection.",
+    "codeDefect": "Aseguradoras snapshot/new portal inserted backend_required, and the sensitive UI interpreted any non-empty ref as a stored credential. The server accepts only cred_ plus 32 lowercase hex characters.",
+    "fix": "Preserve an existing reference without inserting placeholders; only a valid server-issued reference enables reveal/copy; a missing or legacy placeholder shows no stored credential. Align Operativo bank number edit to its existing primary-module/backend permission to avoid masked-account serialization; Asesor remains denied. No existing insurer records are rewritten.",
+    "sourcePaths": [
+      "orbit360-platform/modules/aseguradoras.js",
+      "orbit360-platform/core/aseguradoras-sensitive-p02.js"
+    ],
+    "sourceBlobShas": [
+      "f224e3a4ff3b5e53be0988adbe915fcefbfafdc1",
+      "0f2f1e752275854e859a8786633cb15d0ff569a5"
+    ],
+    "testPath": "tools/gravicentra-i6-6-insurer-credential-placeholder-integrity.test.cjs",
+    "testBlobSha": "8f116dc9d9ef336ace098c6eed869c5f8e6395d6",
+    "unitResult": "11_OF_11_PASS_NO_LIVE_WRITES",
+    "previewAndLiveResult": "PENDING_NEW_IMMUTABLE_BUILD_AND_SIGNED_UI_QA",
+    "liveDataWrites": 0,
+    "permissionBroadened": "Operativo bank number edit aligned with already-approved insurer writer and main module; Asesor unchanged"
+  },
+  "insurerLogoStorageDefectProof20261112": {
+    "observableForDirection": true,
+    "credentialOrRoleCause": "NOT_SUPPORTED_BY_LOGO_FUNCTION_ERROR",
+    "backendCallableMissingPriorToRun": 43153093484,
+    "callableDeploy": "PASS_TWO_ONLY",
+    "signedLiveUploadRun": 43154812175,
+    "error": "STORAGE_ASSET_WRITE_UNAVAILABLE",
+    "serverStorageErrorCode": "404",
+    "logoE2E": "HOLD_PENDING_ACTUAL_BUCKET_CONFIGURATION",
+    "realCustomerRecordWrites": 0
+  }
 }

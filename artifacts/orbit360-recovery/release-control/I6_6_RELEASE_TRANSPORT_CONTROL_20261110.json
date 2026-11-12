@@ -70,7 +70,10 @@
     "liveHostingOriginsUnchanged": true,
     "signedQaRunId": 43147635373,
     "signedQaConclusion": "SUCCESS",
-    "signedRealActorNames": ["Paula Direccion GT", "Carlos Operativo GT"],
+    "signedRealActorNames": [
+      "Paula Direccion GT",
+      "Carlos Operativo GT"
+    ],
     "signedRoleCountryScopeAndInsurerPreflight": "PASS_BOTH_ACTORS",
     "syntheticLegacyCredentialGuardTests": "14_OF_14_PASS",
     "firebaseSessionIsolation": "PASS",
@@ -185,5 +188,41 @@
     "Carlos authenticated payment application from Cliente360 once an exact safe receipt context is known; do not duplicate existing payments",
     "Bayron payment application supporting document verification; Maria Gabriela; cartera inferential batches",
     "A5-A7 planilla/insurer statement matching with idempotent per-receipt controlled application; GreenAPI separately"
-  ]
+  ],
+  "newCanonicalInsurerPortalReferenceSourceCandidate20261111": {
+    "sourceStatus": "UNIT_11_OF_11_PASS_PREVIEW_BUILD_REQUESTED_LIVE_HOLD",
+    "purpose": "Preserve real vault reference and display missing/legacy placeholder as unavailable; do not manufacture backend_required on portal edits or new portals; honor already-approved Operativo bank-account edit semantics without masked serialization.",
+    "causalBoundary": "This corrects a distinct portal-reference display/persistence defect, not the unproven cause of Paula's SAVE failure or Carlos's signed UID mismatch.",
+    "sourcePaths": [
+      "orbit360-platform/modules/aseguradoras.js",
+      "orbit360-platform/core/aseguradoras-sensitive-p02.js"
+    ],
+    "sourceBlobShas": [
+      "f224e3a4ff3b5e53be0988adbe915fcefbfafdc1",
+      "0f2f1e752275854e859a8786633cb15d0ff569a5"
+    ],
+    "testPath": "tools/gravicentra-i6-6-insurer-credential-placeholder-integrity.test.cjs",
+    "testBlobSha": "8f116dc9d9ef336ace098c6eed869c5f8e6395d6",
+    "pastBuildEvidencePreservedUnder": "insurerSafePreviewAndSignedQaReceipt",
+    "requestedTarget": "EXISTING_LAB_HOSTING_ISOLATED_PREVIEW",
+    "backendDeploy": false,
+    "livePromotion": false,
+    "firestoreAuthRulesDataWrites": 0
+  },
+  "insurerLogoTwoFunctionTargetedLiveRuntimeReceipt20261112": {
+    "status": "FUNCTIONS_DEPLOYED_UPLOAD_FIX_INCOMPLETE",
+    "functionDeployRun": 43153093484,
+    "functionsCreated": [
+      "orbit360ProductAssetUpload",
+      "orbit360ProductAssetRead"
+    ],
+    "runtimeInventoryBefore": 83,
+    "runtimeInventoryAfter": 85,
+    "sourceBlob": "a27810c65e6a5a761d40c0e1f20cae61df483d1f",
+    "signedLiveUploadQaRun": 43154812175,
+    "signedLiveResult": "HOLD_STORAGE_ASSET_WRITE_UNAVAILABLE_BUCKETS_404",
+    "fullModuleLiveAcceptance": false,
+    "hostingUnchanged": true,
+    "dataReimported": false
+  }
 }
