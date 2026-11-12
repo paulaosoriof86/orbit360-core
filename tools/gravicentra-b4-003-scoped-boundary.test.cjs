@@ -266,11 +266,24 @@ console.log('B4_003_APPROVED_ROLE_SCOPE_PARITY_PASS Finance Marketing Assistant 
        assert.equal(historic.stdout.trim(),'187efbfa9868531349154f26ec90a5e2c2ed33e8','Frozen B4 writer blob unchanged');
        const i66=JSON.parse(fs.readFileSync(root+'I6_6_APPROVED_PRODUCT_DELTA_MANIFEST_20261110.json','utf8'));
        assert.equal(i66.activeGate,'I6.6','New source belongs to active successor gate');
-       const approved=i66.changes.find(e=>e.id==='I6_6_CARLOS_POLICY_RENEWABILITY_ONLY_CAS_OPERATIVE_SCOPE_P0');
-       assert.ok(approved&&approved.approvedByDirection===true,'Writer successor must be explicitly approved');
-       const pinned=approved.paths.find(e=>e.path===proof.owner);
-       assert.ok(pinned&&pinned.gitBlobSha,'Exact I6.6 writer blob missing from successor');
-       assert.equal(blob,pinned.gitBlobSha,'Current writer must match explicit I6.6 successor pin');
+       // A sealed B4 writer can have multiple I6.6 successors. Validate the
+       // complete approved chain and pin HEAD to its latest node; testing the
+       // first successor forever incorrectly rejected later safe releases.
+       let pinned=null,previousChange='';
+       for(const approved of i66.changes){
+        const next=approved.paths?.find(e=>e.path===proof.owner);
+        if(!next)continue;
+        assert.equal(approved.approvedByDirection,true,'Every writer successor needs Direction approval');
+        assert.ok(next.gitBlobSha,'Every writer successor needs exact blob');
+        if(pinned){
+         assert.equal(next.replaces?.path,proof.owner,'Writer successor must name its predecessor path');
+         assert.equal(next.replaces?.priorGitBlobSha,pinned.gitBlobSha,'Writer successor must chain exact previous blob');
+         assert.equal(next.replaces?.priorChangeId,previousChange,'Writer successor must chain exact previous change');
+        }else assert.ok(!next.replaces,'Initial writer successor cannot claim an unknown predecessor');
+        pinned=next;previousChange=approved.id;
+       }
+       assert.ok(pinned,'Exact I6.6 writer blob missing from successor ledger');
+       assert.equal(blob,pinned.gitBlobSha,'Current writer must match latest explicit I6.6 successor pin');
        assert.equal(goals.previewDeployed,false);
        assert.equal(goals.productionAuthorized,false);
        assert.equal(goals.businessDataWrites,0);
