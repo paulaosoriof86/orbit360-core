@@ -5,7 +5,9 @@ name: Gravicentra I6.6 Insurer Logo Signed LIVE QA
 on:
   push:
     branches: [recovery/fase-a-clean-20260831]
-    paths: [.github/workflows/gravicentra-i66-insurer-logo-signed-live-qa.yml]
+    paths:
+      - .github/workflows/gravicentra-i66-insurer-logo-signed-live-qa.yml
+      - tools/gravicentra-i6-6-insurer-logo-live-signed-qa.cjs
   workflow_dispatch:
 permissions:
   contents: read
