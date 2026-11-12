@@ -1,14 +1,28 @@
 'use strict';
 const assert=require('node:assert/strict');
 const fs=require('node:fs');
-const {CASES,assess,resolveEditions}=require('./gravicentra-i66-cartera-a1-a4-readonly.cjs');
-assert.equal(CASES.length,8,'SAME_PROTECTED_A1_A4_A7_CONTROL_NO_NEW_PIPELINE');
+const {CASES,SOURCE_SHA256,assess,resolveEditions,policyVariants}=require('./gravicentra-i66-cartera-a1-a4-readonly.cjs');
+assert.equal(SOURCE_SHA256.mapfrePendingNov,'29a42705ae6f7b2b42693f51a27a0b1f4ced279e2259b28ce021ff7b21ccefb0');
+assert.equal(SOURCE_SHA256.bantrabNov04,'b945a98c7c572909c643be4c849a7526a363eb490cdcf24ac8d0ae54ca3025b7');
+assert.equal(CASES.length,37,'A1_PAID_THREE_A2_SEVENTEEN_A3_FOURTEEN_A4_TWO_A7_ONE');
+assert.equal(new Set(CASES.map(x=>x.id)).size,CASES.length,'UNIQUE_SOURCE_CASE_IDS');
+assert.equal(CASES.filter(x=>x.id.startsWith('A1.')).length,3);
+assert.equal(CASES.filter(x=>x.id.startsWith('A2.')).length,17);
+assert.equal(CASES.filter(x=>x.id.startsWith('A3.')).length,14);
+assert.equal(CASES.filter(x=>x.id.startsWith('A4.')).length,2);
+assert.equal(CASES.filter(x=>x.id.startsWith('A7.')).length,1);
+assert.equal(CASES.filter(x=>x.id.startsWith('A2.')).reduce((s,x)=>s+x.cents,0),1061230,'SOURCE_MAPFRE_DETAILS_NO_DOUBLE_SUBTOTAL');
+assert.equal(CASES.filter(x=>x.id.startsWith('A3.')).reduce((s,x)=>s+x.cents,0),426356,'SOURCE_BANTRAB_DETAILS_NO_DOUBLE_SUBTOTAL');
+assert.ok(policyVariants("'3002100014247").includes('3002100014247'));
+assert.ok(policyVariants('SC-79849').includes('SC 79849'));
+assert.equal(CASES.find(x=>x.id==='A3.B9').due,'2027-04-21','BANTRAB_10_OF_10_NO_2026_GHOST');
 const ficohsa=CASES.find(x=>x.id==='A7.F1');
 assert.ok(ficohsa&&ficohsa.sourceBasis==='OCTOBER_COMMISSION_INFERENCE_REQUIRES_EXACT_POLICY_RECEIPT_MATCH');
 assert.equal(ficohsa.cents,270480);
 const readonly=fs.readFileSync(require('node:path').join(__dirname,'gravicentra-i66-cartera-a1-a4-readonly.cjs'),'utf8');
 assert.ok(readonly.includes("one.id==='A7.F1'")&&readonly.includes("'numeroPoliza','numero_poliza'")&&
  readonly.includes('seen.add(d.id)')&&!readonly.includes('found.set('),'A7_EXACT_POLICY_NUMBER_ALIASES_DEDUP_REQUIRED');
+assert.ok(readonly.includes("doc('alianzas-soluciones')")&&!readonly.includes('listDocuments()'),'TENANT_BOUND_NO_CROSS_TENANT_SCANNING');
 for(const pattern of [/\.set\s*\(/,/\.delete\s*\(/,/\.batch\s*\(/,/\.runTransaction\s*\(/,/\.updateDurable\s*\(/,/\.createUser\s*\(/,/\.setCustomUserClaims\s*\(/])
  assert.ok(!pattern.test(readonly),'PROTECTED_WORKFLOW_READONLY_GUARD_MUST_PASS');
 assert.equal(assess(ficohsa,{policies:[]}).currentStatus,'HOLD_POLICY_NOT_FOUND');
@@ -40,4 +54,7 @@ assert.equal(clue.amountCandidateReadback[0].due,'2026-11-03');
 assert.equal(clue.amountCandidateReadback[0].sourceNumberMatched,false);
 assert.equal(clue.amountCandidateReadback[0].hasExternalNumber,false);
 assert.equal(clue.policyValidity.start,null);
+assert.equal(clue.sourceDueExactAmountMatches,null);
+const dueCase=CASES.find(x=>x.id==='A2.M1');
+assert.equal(assess(dueCase,snap({receipts:[{...receipt,numeroReciboFuente:'',monto:2497.15,fechaVencimiento:'2026-11-30'}]})).sourceDueExactAmountMatches,1,'READONLY_DUE_AMOUNT_CANDIDATE_NOT_PAYMENT_PROOF');
 console.log('I66_CARTERA_A1_A4_A7_PROTECTED_SOURCE_RECONCILIATION_PASS source_only no_data_writes');
