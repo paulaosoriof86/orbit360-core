@@ -1,0 +1,72 @@
+# Existing Carlos real task incident, no synthetic or customer writes.
+name: Gravicentra I6.6 Carlos Actual Ops Tasks LIVE READONLY
+on:
+  push:
+    branches: [recovery/fase-a-clean-20260831]
+    paths:
+      - .github/workflows/gravicentra-i66-carlos-live-task-trace-readonly.yml
+      - tools/gravicentra-i66-carlos-live-task-trace-readonly.cjs
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: gi-i66-carlos-actual-task-readonly
+  cancel-in-progress: false
+jobs:
+  inspect-real-task-projection:
+    if: github.repository == 'paulaosoriof86/orbit360-core' && github.ref_name == 'recovery/fase-a-clean-20260831'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    env:
+      GCLOUD_PROJECT: ays-orbit-360-lab
+      GI_I66_CARLOS_TRACE_MODE: readonly
+      SA_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_ALT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify same LIVE frontend and strict no-mutation source
+        run: |
+          set -euo pipefail
+          node --check tools/gravicentra-i66-carlos-live-task-trace-readonly.cjs
+          node - <<'NODE'
+          const assert=require('node:assert/strict');
+          const fs=require('node:fs');
+          (async()=>{
+            const s=fs.readFileSync('tools/gravicentra-i66-carlos-live-task-trace-readonly.cjs','utf8');
+            for(const re of [/\.set\s*\(/,/\.delete\s*\(/,/\.batch\s*\(/,/\.runTransaction\s*\(/,/\.updateDurable\s*\(/])
+              assert.ok(!re.test(s),'I66_CARLOS_ACTUAL_TASK_MUTATION_PATH_FORBIDDEN');
+            assert.ok(s.includes("GI_I66_CARLOS_TRACE_MODE,'readonly'"));
+            const r=await fetch('https://app.aysseguros.com/__recovery__/build.json',{headers:{'cache-control':'no-cache'}});
+            assert.ok(r.ok);const b=await r.json();
+            assert.equal(b.sourceSha,'1dd675ed59ac51fd122915ca8056f85f82fa12d6');
+            console.log('I66_CARLOS_TASK_SIGNED_LIVE_FRONTEND_SOURCE_AND_READONLY_GUARD_PASS');
+          })().catch(e=>{console.error(e.message);process.exitCode=1;});
+          NODE
+      - name: Load bound existing service account
+        run: |
+          set -euo pipefail
+          test "$GCLOUD_PROJECT" = 'ays-orbit-360-lab'
+          test "$GI_I66_CARLOS_TRACE_MODE" = 'readonly'
+          test -z "${FIRESTORE_EMULATOR_HOST:-}"
+          npm install --no-save --package-lock=false --ignore-scripts --no-audit --no-fund firebase-admin@13.4.0 >/dev/null
+      - name: Compare Carlos actual recent tasks and Ops source conditions with LIVE
+        env:
+          GI_I66_CARLOS_TRACE_REPORT: ${{ runner.temp }}/gi-i66-carlos-actual-task-readonly.json
+        run: |
+          set -euo pipefail
+          node tools/gravicentra-i66-carlos-live-task-trace-readonly.cjs
+      - name: Preserve anonymized diagnostic evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gi-i66-carlos-actual-task-trace-${{ github.run_id }}
+          path: ${{ runner.temp }}/gi-i66-carlos-actual-task-readonly.json
+          if-no-files-found: ignore
+          retention-days: 7
