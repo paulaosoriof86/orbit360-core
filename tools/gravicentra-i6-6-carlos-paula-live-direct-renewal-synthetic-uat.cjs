@@ -91,12 +91,29 @@ async function one(browser,actor){
       return{seen,confirmed:names.filter(c=>s.serverConfirmedCollections?.includes(c)),
         denied:names.filter(c=>s.deniedCollections?.includes(c)),
         errorKeys:names.filter(c=>!!s.snapshotErrors?.[c]),
+        queryPlans:Object.keys(s.queryPlans||{}),
+        startup:s.requiredStartupCollections||[],optionalMissing:(s.optionalMissing||[]).length,
         sizes:Object.fromEntries(names.map(c=>[c,Orbit.store.all(c).length])),
         role:Orbit.session.rol(),country:Orbit.pais,readState:s.status};
     },ids);
     console.log('I66_RENEWAL_'+actor.role.toUpperCase()+'_INITIAL_PROTECTED_READBACK '+JSON.stringify(status));
-    await page.waitForFunction(x=>!!Orbit.store.get('gestiones',x.management)&&!!Orbit.store.get('polizas',x.source)&&
-      !!Orbit.store.get('clientes',x.client)&&!!Orbit.store.get('aseguradoras',x.insurer),ids,{timeout:30000});
+    try{
+      await page.waitForFunction(x=>!!Orbit.store.get('gestiones',x.management)&&!!Orbit.store.get('polizas',x.source)&&
+        !!Orbit.store.get('clientes',x.client)&&!!Orbit.store.get('aseguradoras',x.insurer),ids,{timeout:30000});
+    }catch(error){
+      const evidence=await page.evaluate(x=>{
+        const s=Orbit.store._productStatus(),names=['gestiones','polizas','vehiculos','clientes','aseguradoras'];
+        return{confirmed:names.filter(c=>s.serverConfirmedCollections?.includes(c)),
+          denied:names.filter(c=>s.deniedCollections?.includes(c)),
+          errors:Object.fromEntries(names.filter(c=>!!s.snapshotErrors?.[c]).map(c=>[c,String(s.snapshotErrors[c]).slice(0,90)])),
+          queryPlans:Object.keys(s.queryPlans||{}),
+          sizes:Object.fromEntries(names.map(c=>[c,Orbit.store.all(c).length])),
+          seen:{management:!!Orbit.store.get('gestiones',x.management),source:!!Orbit.store.get('polizas',x.source),
+            client:!!Orbit.store.get('clientes',x.client),insurer:!!Orbit.store.get('aseguradoras',x.insurer)}};
+      },ids);
+      console.log('I66_RENEWAL_'+actor.role.toUpperCase()+'_HYDRATION_TIMEOUT_PROTECTED_READBACK '+JSON.stringify(evidence));
+      throw error;
+    }
     const modal=await page.evaluate(id=>{
       const g=Orbit.store.get('gestiones',id);
       Orbit.renewalDirect.open(g);
