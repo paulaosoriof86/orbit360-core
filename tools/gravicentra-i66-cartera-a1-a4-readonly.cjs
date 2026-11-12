@@ -108,9 +108,12 @@ async function scan(db){
           'noPoliza','polizaNumero','policyNumber','policyNo','polizaNo','numeroContrato']
         : ['numero'];
       const reads=await Promise.all(fields.map(key=>col.where(key,'==',one.policy).limit(5).get()));
-      const found=new Map();
-      for(const snapshot of reads)for(const d of snapshot.docs||[])found.set(d.id,d);
-      for(const d of found.values())buckets[i].push({tenant:t,id:d.id,data:d.data()||{}});
+      const found=[],seen=new Set();
+      for(const snapshot of reads)for(const d of snapshot.docs||[]){
+        if(seen.has(d.id))continue;
+        seen.add(d.id);found.push(d);
+      }
+      for(const d of found)buckets[i].push({tenant:t,id:d.id,data:d.data()||{}});
     }));
   }
   const output=[];

@@ -8,7 +8,9 @@ assert.ok(ficohsa&&ficohsa.sourceBasis==='OCTOBER_COMMISSION_INFERENCE_REQUIRES_
 assert.equal(ficohsa.cents,270480);
 const readonly=fs.readFileSync(require('node:path').join(__dirname,'gravicentra-i66-cartera-a1-a4-readonly.cjs'),'utf8');
 assert.ok(readonly.includes("one.id==='A7.F1'")&&readonly.includes("'numeroPoliza','numero_poliza'")&&
- readonly.includes('found.set(d.id,d)'),'A7_EXACT_POLICY_NUMBER_ALIASES_DEDUP_REQUIRED');
+ readonly.includes('seen.add(d.id)')&&!readonly.includes('found.set('),'A7_EXACT_POLICY_NUMBER_ALIASES_DEDUP_REQUIRED');
+for(const pattern of [/\.set\s*\(/,/\.delete\s*\(/,/\.batch\s*\(/,/\.runTransaction\s*\(/,/\.updateDurable\s*\(/,/\.createUser\s*\(/,/\.setCustomUserClaims\s*\(/])
+ assert.ok(!pattern.test(readonly),'PROTECTED_WORKFLOW_READONLY_GUARD_MUST_PASS');
 assert.equal(assess(ficohsa,{policies:[]}).currentStatus,'HOLD_POLICY_NOT_FOUND');
 assert.equal(assess(ficohsa,{policies:[{pais:'GT'}],clientExists:true,receipts:[],cobros:[]}).currentStatus,
  'HOLD_EXACT_REQUIREMENT_NOT_LINKED');
