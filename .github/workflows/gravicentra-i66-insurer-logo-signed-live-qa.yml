@@ -1,0 +1,60 @@
+# LIVE I6.6 after exactly two logo callables were deployed (run 43153093484).
+# Signed Paula/Direccion test is bounded to synthetic insurer B4 QA fixture;
+# changes are restored with Firestore before/after verification and asset delete.
+name: Gravicentra I6.6 Insurer Logo Signed LIVE QA
+on:
+  push:
+    branches: [recovery/fase-a-clean-20260831]
+    paths: [.github/workflows/gravicentra-i66-insurer-logo-signed-live-qa.yml]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: gi-i66-insurer-logo-signed-live-qa
+  cancel-in-progress: false
+jobs:
+  signed-synthetic-upload-read-and-restore:
+    if: github.repository == 'paulaosoriof86/orbit360-core' && github.ref == 'refs/heads/recovery/fase-a-clean-20260831'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      SA_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_ALT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Lock exact existing backend owner and test script
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git hash-object functions/product-operational-domain.js)" = 'a27810c65e6a5a761d40c0e1f20cae61df483d1f'
+          node --check tools/gravicentra-i6-6-insurer-logo-live-signed-qa.cjs
+          node --check functions/product-operational-domain.js
+          node tools/gravicentra-b4-003-operational-write-security-regression.test.cjs > "$RUNNER_TEMP/insurer-logo-security-unit.json"
+          echo 'I66_LOGO_LIVE_SYNTHETIC_SIGNED_QA_SOURCE_AND_SECURITY_GUARD_PASS'
+      - name: Install pinned independent signed browser QA dependencies
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm install --no-save --package-lock=false --ignore-scripts --no-audit --no-fund firebase-admin@13.4.0 playwright@1.55.0 > /dev/null
+          node node_modules/playwright/cli.js install --with-deps chromium > /dev/null
+      - name: Signed LIVE Direction upload, independent read, canonical restore
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/gravicentra-i6-6-insurer-logo-live-signed-qa.cjs | tee "$RUNNER_TEMP/insurer-logo-signed-qa-output.txt"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: gi-i66-insurer-logo-signed-live-qa-${{ github.run_id }}
+          path: |
+            ${{ runner.temp }}/insurer-logo-security-unit.json
+            ${{ runner.temp }}/insurer-logo-signed-qa-output.txt
+          if-no-files-found: warn
+          retention-days: 30
