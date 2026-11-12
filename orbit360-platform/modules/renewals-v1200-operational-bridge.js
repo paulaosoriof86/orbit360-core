@@ -96,6 +96,14 @@ Orbit.modules = Orbit.modules || {};
   function canDirectQuote() {
     try{return !!(A.can&&A.can('renovaciones','edit')&&!(A.esAsesor&&A.esAsesor()));}catch(e){return false;}
   }
+  function canDirectRenewal() {
+    const role=String(Orbit.session&&Orbit.session.rol&&Orbit.session.rol()||'');
+    // An advisor with an unrelated extra permission cannot bypass the renewal
+    // decision. The operational scope still has to approve edits separately.
+    return ['Dirección','SuperAdmin','AdminTenant','Admin','Operativo'].includes(role)&&
+      canDirectQuote()&&!!(Orbit.issuance&&Orbit.issuance.canManage&&Orbit.issuance.canManage())&&
+      !!(Orbit.renewalDirect&&typeof Orbit.renewalDirect.open==='function');
+  }
   function overdueReviewAllowed(p){
     const d=daysUntil(p?.vigenciaFin);
     if(!p||d==null||d>=0||renewabilityState(p)==='NO'||terminalRenewalOutcome(p))return false;
@@ -187,12 +195,9 @@ Orbit.modules = Orbit.modules || {};
     window.__orbitRenewalContext=renewalContext(p,null);
     location.hash='#/cotizador?renueva='+encodeURIComponent(p.id);
   }
-  function registrarAceptacion(policyId) {
-    const p=S().get('polizas',policyId);
-    if(!p||!A.canView('polizas',p,'renovaciones'))return U.toast('Póliza fuera de tu alcance');
-    if(!active(p)){if(overdueReviewAllowed(p))return openOverdueReview(p,'accept');return U.toast('No hay aceptación de renovación acreditada para esta versión.');}
-    const existing=existingManagement(p.id,'renewal_accepted');
+  function registrarAceptacionGestion(p,existing,direct) {
     if(existing){
+      if(direct&&canDirectRenewal())return Orbit.renewalDirect.open(existing);
       U.toast('La renovación aceptada ya está en Ops.');
       location.hash='#/ops';
       window.__orbitOpenGestion=existing.id;
@@ -236,11 +241,27 @@ Orbit.modules = Orbit.modules || {};
       onCreated:g=>{
         window.__orbitRenewalContext=renewalContext(p,g);
         if(A.audit)A.audit('renovacion_aceptada','gestiones',g.id,null,g,'Cliente confirmó renovación',{policyId:p.id});
+        // Direct issuance starts from the SAME entry point and management
+        // record. If the issued-policy form is cancelled, the client approval
+        // remains recoverable in Ops; it is never falsely marked as issued.
+        if(direct&&canDirectRenewal())return Orbit.renewalDirect.open(g);
         U.toast('Renovación aceptada creada y confirmada en Ops.');
         location.hash='#/ops';
         window.__orbitOpenGestion=g.id;
       }
     });
+  }
+  function registrarAceptacion(policyId) {
+    const p=S().get('polizas',policyId);
+    if(!p||!A.canView('polizas',p,'renovaciones'))return U.toast('Póliza fuera de tu alcance');
+    if(!active(p)){if(overdueReviewAllowed(p))return openOverdueReview(p,'accept');return U.toast('No hay aceptación de renovación acreditada para esta versión.');}
+    const existing=existingManagement(p.id,'renewal_accepted');
+    if(!canDirectRenewal())return registrarAceptacionGestion(p,existing,false);
+    const b=modal('renewal-decision-v1200','Renovar · '+p.numero,
+      '<div class="cfg-note">Selecciona el resultado real. La renovación en firme exige número nuevo de póliza, vigencias, aprobación del cliente y soporte documental; no se crea una póliza sin esos datos.</div>',
+      '<button class="btn ghost" data-management>Crear gestión de renovación</button><button class="btn primary" data-direct>Registrar renovación en firme</button>');
+    b.querySelector('[data-management]').onclick=()=>{b.remove();registrarAceptacionGestion(p,existing,false);};
+    b.querySelector('[data-direct]').onclick=()=>{b.remove();registrarAceptacionGestion(p,existing,true);};
   }
   function campana() {
     const rows=policies(60);

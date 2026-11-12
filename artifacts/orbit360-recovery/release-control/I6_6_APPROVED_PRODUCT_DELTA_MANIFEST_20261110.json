@@ -1137,6 +1137,35 @@
           }
         }
       ]
+    },
+    {
+      "id": "I6_6_CARLOS_DIRECT_RENEWAL_ONE_ENTRY",
+      "approvedByDirection": true,
+      "receipt": "artifacts/orbit360-recovery/release-control/I6_6_CARLOS_RENEWAL_OPS_HANDOFF_GATE_20261112.json#sourceDeltas",
+      "sourceStatus": "SOURCE_SYNTHETIC_QA_PASS_PREVIEW_SIGNED_LIVE_HOLD",
+      "capabilityOwners": ["RENEWALS_PRIMARY_RUNTIME", "POLIZAS_PRIMARY_RUNTIME", "RECIBOS_CARTERA_PRIMARY_RUNTIME"],
+      "scope": "One managed renewal entry allows configured Operativo and admin/director roles to choose direct issue or Ops management. Advisor cannot issue. Reuse existing canonical issuance engine, secure approval/document gates and same management id; no financial data writes during source QA.",
+      "paths": [
+        {"path": "orbit360-platform/modules/renewals-v1200-operational-bridge.js", "gitBlobSha": "0735c097ee69e5346421a07400628d58090e2949"},
+        {"path": "orbit360-platform/modules/issuance-endosos-v1201-bridge.js", "gitBlobSha": "e2eb436a18af192eea89dc39aa4ec29a40dbdbb8"}
+      ],
+      "tests": [
+        {"path": "tools/gravicentra-i6-6-operational-renewal-entry.test.cjs", "gitBlobSha": "8cbc67612d7c25ddf27e76edeb56d99e62bc5d60"}
+      ]
+    },
+    {
+      "id": "I6_6_OPS_INBOX_PENDING_LEADS_PROJECTION",
+      "approvedByDirection": true,
+      "receipt": "artifacts/orbit360-recovery/release-control/I6_6_CARLOS_RENEWAL_OPS_HANDOFF_GATE_20261112.json#sourceDeltas",
+      "sourceStatus": "SOURCE_SYNTHETIC_QA_PASS_PREVIEW_SIGNED_LIVE_HOLD",
+      "capabilityOwners": ["OPS_PRIMARY_RUNTIME", "LEADS_PRIMARY_RUNTIME"],
+      "scope": "Project only server-confirmed unresolved authorized Leads handoffs already sharing the canonical negocio outside Ops stages, plus direct access to existing signed shared inbox. No second gestion, stage shift, or Firestore write.",
+      "paths": [
+        {"path": "orbit360-platform/modules/ops.js", "gitBlobSha": "538fc271b8708bff662e23e5786a06b0f1f81f5a"}
+      ],
+      "tests": [
+        {"path": "tools/gravicentra-i6-6-ops-leads-inbox-projection.test.cjs", "gitBlobSha": "b036fbbf7827305d9a998ec645406c98d4496b3a"}
+      ]
     }
   ]
 }

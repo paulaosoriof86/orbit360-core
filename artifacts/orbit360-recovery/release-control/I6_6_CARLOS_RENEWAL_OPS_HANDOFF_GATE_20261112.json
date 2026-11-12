@@ -1,0 +1,46 @@
+{
+  "schema": "GRAVICENTRA_I6_6_CARLOS_RENEWAL_OPS_HANDOFF_GATE_V1",
+  "gate": "I6.6",
+  "branch": "recovery/fase-a-clean-20260831",
+  "lastClosedReleaseGate": "B4-007",
+  "approvedByDirection": true,
+  "directionDateGuatemala": "2026-11-12",
+  "authorization": "Dirección exige renovación directa para Operativo autorizado, pagos y Leads/Ops funcionales, conciliaciones en Preview y promoción a LIVE solo tras pruebas seguras; conservar una fuente y no reimportar.",
+  "liveObserved": {
+    "source": "app.aysseguros.com, sesión autenticada Paula Dirección, consulta de interfaz, sin escrituras",
+    "sharedInbox": "Se visualizaron dos eventos con autor Carlos Castro: Reenviado a Operaciones y Respuesta del asesor; el caso específico reportado por Carlos aún no se correlacionó por ID.",
+    "opsBoard": "Las columnas estándar proyectan solo etapas operativas de negocios y gestiones; una notificación de Leads puede vivir exclusivamente en la bandeja compartida.",
+    "renewalDirect": "No publicada en la fuente LIVE anterior.",
+    "carlosSignedWriteUat": "HOLD",
+    "carlosPaymentUat": "HOLD"
+  },
+  "sourceDeltas": [
+    {
+      "id": "I6_6_CARLOS_DIRECT_RENEWAL_ONE_ENTRY",
+      "files": ["orbit360-platform/modules/renewals-v1200-operational-bridge.js", "orbit360-platform/modules/issuance-endosos-v1201-bridge.js"],
+      "behavior": "Una decisión para dirección/admin/operativo con permiso de edición: crear gestión o registrar renovación en firme. Directo abre la emisión sobre la gestión aprobada y crea póliza/cartera mediante el owner preexistente. Asesor no emite. Se exige aprobación y soporte; cancelar no crea póliza.",
+      "test": "tools/gravicentra-i6-6-operational-renewal-entry.test.cjs",
+      "status": "SOURCE_SYNTHETIC_QA_PASS_PREVIEW_PENDING"
+    },
+    {
+      "id": "I6_6_OPS_INBOX_PENDING_LEADS_PROJECTION",
+      "files": ["orbit360-platform/modules/ops.js"],
+      "behavior": "Ops ofrece entrada visible a la bandeja y una sección para los handoffs de Leads no resueltos, autorizados por scope y confirmados por servidor, sobre la misma ficha negocio; no duplica gestiones o etapas ni modifica datos.",
+      "test": "tools/gravicentra-i6-6-ops-leads-inbox-projection.test.cjs",
+      "status": "SOURCE_SYNTHETIC_QA_PASS_PREVIEW_PENDING"
+    }
+  ],
+  "protectedConciliaciones": {
+    "previewScopedFunction": "orbit360ScopedPolicyReadPreview, backend source 7/7 exact current, synthetic QA PASS",
+    "liveScopedFunction": "SOURCE_MANIFEST_STALE_NO_NEW_DEPLOY",
+    "previewSignedRoleCountryTenantReadback": "HOLD_PREVIEW_ORIGIN_REQUIRES_AUTHENTICATION",
+    "productionRelease": "HOLD_NO_SILENT_FINANCIAL_WRITES"
+  },
+  "currentLiveProductSource": "f3341e24ad5fa35bac419e42a1cdf2882a284075",
+  "currentLiveArtifactId": 13916074927,
+  "currentLiveBuildId": "gi-i66-f3341e24ad5f-57f234755dc1",
+  "businessDataWrites": 0,
+  "authAndRulesWrites": 0,
+  "release": "PREVIEW_CANDIDATE_PENDING; LIVE_UNCHANGED",
+  "nextGate": "Exact immutable build of current canonical source, signed role/country/tenant preview readback and payment/renewal persistence fixture before same-artifact LIVE promotion."
+}

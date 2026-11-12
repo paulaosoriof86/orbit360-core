@@ -10,7 +10,7 @@
   "branch": "recovery/fase-a-clean-20260831",
   "forensicOriginSha": "9c95f31461f2eabe9804625b5659bee772f5602a",
   "createdAtUtc": "2026-08-31T18:00:00Z",
-  "updatedAtUtc": "2026-11-12T00:16:58Z",
+  "updatedAtUtc": "2026-11-12T15:04:45Z",
   "status": "I6_6_LIVE_CONTROLLED_PORTFOLIO_UPDATE_IN_PROGRESS",
   "currentIteration": 6,
   "lastCompletedIteration": 1,
@@ -187,7 +187,7 @@
     "phaseAIterationStatuses": "HISTORICAL_FIELDS_ABOVE_PRESERVED_UNTIL_FORMAL_GATE_EVIDENCE;_NO_NEW_PASS_INFERRED",
     "labDataWriteScope": "ONLY_35_AUTHORIZED_COUNTRY_FIELDS;_NO_AUGUST_REFRESH"
   },
-  "nextAction": "I6_6_SAFE_LIVE_COBROS_CARTERA_SEQUENCE_AFTER_B4_007_OWNER_OPERATIONAL_CLOSURE_AND_THEN_DRIVE_RECENT_CLIENT_POLICY_AUDIT",
+  "nextAction": "I6_6_ONE_CANONICAL_PREVIEW_RENEWAL_OPS_HANDOFF_SIGNED_CARLOS_ROLE_COUNTRY_AND_CONCILIACIONES_READBACK_THEN_EXACT_ARTIFACT_LIVE_ONLY_AFTER_PASS; COBROS_PAYMENT_UAT_AND_A5_A7_SAFE_FINANCIAL_MATCH_REMAIN_HOLD",
   "sourceOfTruth": {
     "projectBoundaryPrevalentAddendum": "orbit360-platform/docs/recovery/ADDENDUM_PREVALENTE_CHATGPT_PROJECT_BOUNDARY_20260831.md",
     "mutableState": "orbit360-platform/docs/recovery/orbit360-recovery-state-v1.json",
@@ -1598,7 +1598,7 @@
     "nextAction": "I6_6_PAYMENT_APPLICATION_CARLOS_UAT_AND_A5_A7_SAFE_EXACT_MATCH_NEVER_BLIND_BULK_IMPORT"
   },
   "i66TopbarCrossModuleHydrationRegression20261111": {
-    "status": "SOURCE_UNIT_PASS_IMMUTABLE_BUILD_REQUESTED_PREVIEW_AND_LIVE_PENDING",
+    "status": "HISTORICAL_SOURCE_UNIT_AND_SUBSEQUENT_R4_LIVE_READBACK_PRESERVED_FULL_ROLE_MATRIX_PENDING",
     "previousTopbarFocalLivePassPreserved": true,
     "newFinding": "Chrome Paula Operativo and Direccion on #/cobros returned Sin resultados to MAPFRE; previous Inicio Enter success is insufficient for full route-role search certification",
     "rootCause": "Global search relies on current route's hydrated collection cache; insurer collection may be missing after Cobros navigation and protected role cache invalidation",
@@ -1606,9 +1606,31 @@
     "newRegressionTest": "tools/gravicentra-i6-6-topbar-crossmodule-hydration.test.cjs",
     "sourceUnitPass": true,
     "sameCanonicalBranch": "recovery/fase-a-clean-20260831",
-    "liveFrontendChangedByThisBlock": false,
+    "liveFrontendChangedByThisBlock": true,
     "cobrosLiveFunctionPreserved": "orbit360cobrosreconciliationcommand-00006-viw",
     "financialRecordWrites": 0,
-    "nextAction": "immutable_build_then_scoped_preview_readback_then_exact_artifact_LIVE_if_pass; continue_Carlos_UAT_and_A5_A7_reconciliation_in_parallel"
+    "nextAction": "Preserve proven R4 exact LIVE source f3341e24ad5fa35bac419e42a1cdf2882a284075; continue signed Carlos UAT in new same-branch release gate"
+  },
+  "i66CarlosRenewalOpsHandoffPreviewGate20261112": {
+    "status": "SYNTHETIC_SOURCE_QA_PASS_IMMUTABLE_PREVIEW_BUILD_REQUESTED_SIGNED_AND_LIVE_HOLD",
+    "lastClosedReleaseGate": "B4-007",
+    "activeOperationalGate": "I6.6",
+    "sameCanonicalBranch": "recovery/fase-a-clean-20260831",
+    "receipt": "artifacts/orbit360-recovery/release-control/I6_6_CARLOS_RENEWAL_OPS_HANDOFF_GATE_20261112.json",
+    "approvedDeltaManifest": "artifacts/orbit360-recovery/release-control/I6_6_APPROVED_PRODUCT_DELTA_MANIFEST_20261110.json",
+    "previousLiveSourceSha": "f3341e24ad5fa35bac419e42a1cdf2882a284075",
+    "previousLiveBuildId": "gi-i66-f3341e24ad5f-57f234755dc1",
+    "previousLiveArtifactId": 13916074927,
+    "carlosActualRenewalDirect": "NOT_LIVE_YET",
+    "carlosActualPaymentApplyAndReload": "HOLD",
+    "carlosActualLeadsCreateRespondPersistReload": "HOLD_TWO_SIGNED_SHARED_NOTICES_VISIBLE_TO_DIRECCION",
+    "opsLeadHandoffRootCause": "Shared inbox server events can exist while original business remains in a Leads-only stage and absent from Ops kanban; this source delta projects verified unresolved handoffs without duplicate writes.",
+    "conciliacionesSignedPreview": "HOLD_SEPARATE_PREVIEW_AUTHENTICATION_REQUIRED",
+    "conciliacionesLiveBackendParity": "HOLD_READER_LIVE_STALE",
+    "syntheticTests": ["tools/gravicentra-i6-6-operational-renewal-entry.test.cjs", "tools/gravicentra-i6-6-ops-leads-inbox-projection.test.cjs"],
+    "realCustomerRecordWrites": 0,
+    "liveHostingAndBackendModifiedByThisBlock": false,
+    "fullRoleCountryFinancialUatCertified": false,
+    "nextAction": "BUILD_SAME_CANONICAL_SOURCE_TO_ISOLATED_PREVIEW_THEN_SIGNED_CARLOS_RENEWAL_LEADS_OPS_AND_DIRECCION_CONCILIACIONES_NO_FINANCIAL_WRITES_BEFORE_EXACT_LIVE_PROMOTION"
   }
 }

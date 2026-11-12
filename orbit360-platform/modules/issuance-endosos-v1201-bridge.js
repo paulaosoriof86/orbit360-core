@@ -476,7 +476,11 @@ Orbit.modules = Orbit.modules || {};
     };
   }
   function openDirectRenewal(g) {
-    if(!I.canManage())return toast('Tu rol activo no puede registrar la renovación.');
+    const role=String(Orbit.session&&Orbit.session.rol&&Orbit.session.rol()||'');
+    if(!['Dirección','SuperAdmin','AdminTenant','Admin','Operativo'].includes(role)||!I.canManage()||
+      !(A.can&&A.can('renovaciones','edit')))return toast('Tu rol activo no puede registrar la renovación.');
+    if(!g||g.workflowType!=='renewal_accepted'||g.acceptedConfirmed!==true)
+      return toast('Primero confirma la aceptación del cliente en la gestión canónica.');
     const source=renewalSource(g);if(!source)return toast('No se encontró la póliza origen.');
     const insurers=renewalInsurers(source),start=source.vigenciaFin||today(),payments=renewalDefaultPayments(source);
     const body=`<div class="cfg-note" style="margin-bottom:12px">Usa esta opción cuando la aseguradora ya envió la <b>renovación en firme</b>. Al confirmar se crea una nueva póliza vinculada a la anterior, con sus recibos/cartera; la póliza origen se conserva.</div><div class="cgrid">
@@ -668,5 +672,8 @@ Orbit.modules = Orbit.modules || {};
   installComparativo();
   installOpsEnhancement();
   installClientActions();
+  // One presentation entry for the already-approved canonical issuance owner;
+  // this does not create a second persistence path or duplicate an Ops gestion.
+  Orbit.renewalDirect=Object.freeze({open:openDirectRenewal});
   document.addEventListener('orbit:ciclo', () => { if (window.__orbitOpenGestion) { const id = window.__orbitOpenGestion; window.__orbitOpenGestion = ''; setTimeout(() => Orbit.ciclo.openGestion(id), 60); } });
 })();

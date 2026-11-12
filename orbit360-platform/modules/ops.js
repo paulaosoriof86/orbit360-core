@@ -37,26 +37,34 @@ Orbit.modules.ops = (function () {
     const advisor = isAdvisor();
     let board = C().opsBoard();
     const actionRanks=C().actionQueueRanks?C().actionQueueRanks('ops'):{};
+    // A Leads handoff is an authorized collaboration event on the SAME negocio.
+    // If the opportunity remains in a commercial stage, the regular Ops columns
+    // do not include it. Project the pending handoff here without creating a
+    // second gestion or moving the opportunity to an incorrect pipeline stage.
+    const onBoard=new Set(board.flatMap(col=>(col.items||[]).filter(it=>it.kind==='negocio').map(it=>String(it.rec.id))));
+    let incoming=C().negocios({surface:'ops'}).filter(n=>{
+      if(onBoard.has(String(n.id)))return false;
+      const state=C().collaborationState(n,'ops');
+      // Do not show unconfirmed or previously resolved inbox notifications as
+      // current tasks. The signed inbox projection owns resolution state.
+      return state.noticeKnown===true&&state.needsAction===true;
+    }).map(rec=>({kind:'negocio',rec}));
     if (Orbit.access && Orbit.access.canView) {
       board = board.map(col => Object.assign({}, col, {
         items: (col.items || []).filter(it => Orbit.access.canView(it.kind === 'negocio' ? 'negocios' : 'gestiones', it.rec, 'ops'))
       }));
+      incoming=incoming.filter(it=>Orbit.access.canView('negocios',it.rec,'ops'));
     }
+    const matchesFilters=it=>{
+      const r=it.rec,cli=r.clienteId?Orbit.store.get('clientes',r.clienteId):null;
+      const asg=r.aseguradoraId?Orbit.store.get('aseguradoras',r.aseguradoraId):null;
+      const txt=[(cli&&cli.nombre)||r.titulo||r.nombre||'',r.numero||'',(asg&&asg.nombre)||''].join(' ').toLowerCase();
+      return (!st.q||txt.includes(st.q.toLowerCase()))&&(!st.fAseg||r.aseguradoraId===st.fAseg)&&
+        (advisor||!st.fAse||r.asesorId===st.fAse);
+    };
     if (st.q || st.fAseg || (!advisor && st.fAse)) {
-      const ql = (st.q || '').toLowerCase();
-      board = board.map(col => {
-        const items = col.items.filter(it => {
-          const r = it.rec;
-          const cli = r.clienteId ? Orbit.store.get('clientes', r.clienteId) : null;
-          const asg = r.aseguradoraId ? Orbit.store.get('aseguradoras', r.aseguradoraId) : null;
-          const txt = [(cli && cli.nombre) || r.titulo || r.nombre || '', r.numero || '', (asg && asg.nombre) || ''].join(' ').toLowerCase();
-          if (ql && txt.indexOf(ql) < 0) return false;
-          if (st.fAseg && r.aseguradoraId !== st.fAseg) return false;
-          if (!advisor && st.fAse && r.asesorId !== st.fAse) return false;
-          return true;
-        });
-        return Object.assign({}, col, { items });
-      });
+      board = board.map(col=>Object.assign({},col,{items:col.items.filter(matchesFilters)}));
+      incoming=incoming.filter(matchesFilters);
     }
     const totNeg = board.filter(c => c.def.kind === 'negocio').reduce((s, c) => s + c.items.length, 0);
     const totGes = board.filter(c => c.def.kind === 'gestion').reduce((s, c) => s + c.items.length, 0);
@@ -83,13 +91,16 @@ Orbit.modules.ops = (function () {
       <div class="ops-legend">
         <span class="muted">${advisor ? 'Tu operación' : 'Tablero operativo en vivo'} · <b>${totNeg}</b> negocios en flujo · <b>${totGes}</b> gestiones</span>
         <span class="ops-sync">🔁 Sincronizado con Orbit Leads</span>
+        <button class="btn ghost sm" id="op-shared-inbox" type="button">📥 Tareas compartidas</button>
       </div>
+      ${incoming.length?`<section class="card pad" aria-label="Solicitudes de Leads pendientes" style="margin-bottom:14px"><b>📥 Solicitudes de Leads pendientes · ${incoming.length}</b><div class="muted" style="margin:4px 0 11px">Misma oportunidad, sin duplicarla ni cambiar su etapa comercial. Abre la tarjeta para responder en la ficha colaborativa.</div><div class="kanban" style="grid-template-columns:repeat(auto-fit,minmax(min(260px,100%),1fr));gap:10px">${incoming.map(it=>C().cardNegocio(it.rec,{board:'ops',actionRank:actionRanks[it.rec.id]||0})).join('')}</div></section>`:''}
       <div class="kanban">${board.map(col => kcol(col, advisor, actionRanks)).join('')}</div>
     </div>`;
     C().wireCards(host);
     const lists = host.querySelector('#op-lists'); if (lists) lists.addEventListener('click', () => C().gestionarListas('opsListas'));
     const newManagement = host.querySelector('#op-new-ges'); if (newManagement) newManagement.addEventListener('click', () => C().nuevaGestion());
     const newBusiness = host.querySelector('#op-new-neg'); if (newBusiness) newBusiness.addEventListener('click', () => C().nuevoNegocio());
+    const sharedInbox=host.querySelector('#op-shared-inbox');if(sharedInbox)sharedInbox.addEventListener('click',()=>document.getElementById('ops-inbox-bell')?.click());
     const qi = host.querySelector('#op-q'); if (qi) { qi.addEventListener('input', () => { st.q = qi.value; const pos = qi.selectionStart; draw(); const nq = host.querySelector('#op-q'); if (nq) { nq.focus(); try { nq.setSelectionRange(pos, pos); } catch (e) {} } }); }
     const fa = host.querySelector('#op-faseg'); if (fa) fa.addEventListener('change', () => { st.fAseg = fa.value; draw(); });
     const fs = host.querySelector('#op-fase'); if (fs) fs.addEventListener('change', () => { st.fAse = fs.value; draw(); });
