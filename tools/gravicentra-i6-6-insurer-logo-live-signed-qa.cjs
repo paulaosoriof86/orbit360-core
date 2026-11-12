@@ -73,8 +73,20 @@ async function main(){
     },token);
     assert.equal(normalize(role),'direccion','GI_LOGO_QA_ACTIVE_ROLE_NOT_DIRECTION');
     uploadResult=await page.evaluate(async params=>{
-      return await Orbit.productRuntimeBrowserProvidersP0.callFunction('orbit360ProductAssetUpload',
-        {tenantId:params.tenantId,activeRole:params.activeRole,insurerId:params.insurerId,fileName:'gi-i66-synthetic-1px.png',mimeType:'image/png',base64:params.base64},'us-central1');
+      try {
+        return await Orbit.productRuntimeBrowserProvidersP0.callFunction('orbit360ProductAssetUpload',
+          {tenantId:params.tenantId,activeRole:params.activeRole,insurerId:params.insurerId,fileName:'gi-i66-synthetic-1px.png',mimeType:'image/png',base64:params.base64},'us-central1');
+      } catch (error) {
+        // Show only the server-owned storage failure class. No credentials,
+        // account values, fixture fields, or identities are ever logged.
+        const details=error?.details||{};
+        throw new Error('GI_LOGO_QA_UPLOAD_FUNCTION_FAILURE:'+JSON.stringify({
+          code:String(error?.code||'').slice(0,80),
+          message:String(error?.message||'').slice(0,120),
+          storageCode:String(details?.errorCode||'').slice(0,80),
+          bucketCount:Array.isArray(details?.bucketCandidates)?details.bucketCandidates.length:0
+        }));
+      }
     },{tenantId:TENANT,activeRole:role,insurerId:FIXTURE,base64:IMAGE_BASE64});
     assert.equal(uploadResult?.ok,true,'GI_LOGO_QA_UPLOAD_NOT_CONFIRMED');
     assert.equal(uploadResult?.contentHash,IMAGE_HASH,'GI_LOGO_QA_UPLOAD_HASH_MISMATCH');
