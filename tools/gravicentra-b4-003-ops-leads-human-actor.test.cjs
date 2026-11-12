@@ -14,6 +14,7 @@ const norm=x=>text(x).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCas
 class HttpsError extends Error{constructor(code,message){super(message);this.code=code;}}
 const scope={text,norm,HttpsError,id:x=>text(x),
  memberRef:(_t,_uid)=>({get:async()=>{reads++;return snap(member)}}),
+ accessRef:(_t)=>({get:async()=>snap({})}),
  dataRef:(_t,c,_id)=>{assert.equal(c,'asesores');return{get:async()=>{reads++;return snap(advisor)}};},
  active:m=>m&&m.status==='active',
  permissions:()=>[],ADMIN_ROLES:new Set(['operativo']),
@@ -61,6 +62,7 @@ const denied=async(fn,code)=>{let x;try{await fn()}catch(e){x=e}assert.equal(x&&
   const rowPath='tenants/'+unitTenant+'/data/gestiones/items/'+managementId;
   documents.set(memberPath('operator-01'),{tenantId:unitTenant,uid:'operator-01',
    status:'active',roles:['operativo'],activeRole:'operativo',advisorId:'advisor-01',
+   countries:['GT'],
    nombre:'Operador sintético',
    dataScopes:{modules:{ops:'equipo'}},roleVisibleAdvisorIds:{operativo:['advisor-01','advisor-02']}});
   documents.set(memberPath('advisor-02'),{tenantId:unitTenant,uid:'advisor-02',
