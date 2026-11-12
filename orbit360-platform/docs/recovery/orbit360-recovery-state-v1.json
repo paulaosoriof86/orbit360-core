@@ -10,7 +10,7 @@
   "branch": "recovery/fase-a-clean-20260831",
   "forensicOriginSha": "9c95f31461f2eabe9804625b5659bee772f5602a",
   "createdAtUtc": "2026-08-31T18:00:00Z",
-  "updatedAtUtc": "2026-11-12T18:42:00Z",
+  "updatedAtUtc": "2026-11-12T23:06:00Z",
   "status": "I6_6_LIVE_CONTROLLED_PORTFOLIO_UPDATE_IN_PROGRESS",
   "currentIteration": 6,
   "lastCompletedIteration": 5,
@@ -34,7 +34,19 @@
     "liveTwoActorPaymentAndRenewabilityRunId": 43312896784,
     "targetedCobrosBackendSourceSha": "a49f5f76bc85b5df211a865efed94d9821cdd680",
     "targetedCobrosBackendImmutableTarSha256": "3bc2599c42e01dca2e4b9c9053b2a8990885cd0c762fe3117f78b851c5f791ec",
-    "backendTransportInterpretation": "Payment CallableResponse mode bug repaired on same Preview then LIVE backend package; LIVE frontend stays on immutable 1dd source, synthetic financial writes only and full direct-renewal issuance remains HOLD",
+    "backendTransportInterpretation": "Payment CallableResponse mode bug repaired on same Preview then LIVE backend package; LIVE frontend stays on immutable 1dd source. Direct renewal succeeded with reversible synthetic LIVE issuance for Operativo and Direccion on run 43325504543; authentic insurer-document workflow and broader cross-role acceptance remain HOLD.",
+    "liveReaderCrossAdvisorScopeAllEvidence20261112": {
+      "certifiedSourceManifestSha256": "f0853986f23d6eacec3531dcb462631b24fd4c49536045f358827a1499158171",
+      "certifiedActiveRevision": "orbit360scopedpolicyread-00005-yes",
+      "causalError": "Latest deployed source differed from effective Cloud Run traffic: revision orbit360scopedpolicyread-00003-lef was still receiving 100 percent after initial deploy. Initial run 43323669448 failed signed LIVE and restored old traffic; follow-up explicitly promoted the same source to 100 percent and signed UAT passed.",
+      "successfulPreviewLiveSameSourceAndTrafficRunId": 43324845568,
+      "signedOperativoAndDirectionOpsLeadsForeignAdvisorAndTenantDenied": true,
+      "liveFrontendUnchanged": true,
+      "signedDirectRenewalSyntheticOnlyRunId": 43325504543,
+      "genuineInsurerDocumentGateCertified": false,
+      "realCustomerDataWrites": 0,
+      "releaseCheckpoint": "artifacts/orbit360-recovery/release-control/I6_6_CARLOS_LIVE_READER_TRAFFIC_AND_RENEWAL_EVIDENCE_20261112.json"
+    },
     "currentSuccessorProductionAccepted": false
   },
   "i66OwnerFrozenUrgentWorkPlan20261112": {
@@ -82,7 +94,12 @@
       "leadsOpsExactPendingLiveResult": "CARLOS_ONE_REAL_PENDING_BUSINESS_EXACT_OPS_CARD_MATCH_NO_DUPLICATE_PAULA_ZERO_PENDING_NO_WRITES",
       "insurerSignedLiveResult": "CARLOS_AND_PAULA_SYNTHETIC_INSURER_ACCOUNT_CREATE_UPDATE_AUDIT_RELOAD_COUNTRY_ROLE_NEGATIVE_RESTORE_PASS_NO_REAL_INSURER_CREDENTIAL_WRITES",
       "livePaymentBackendFixedModeRevision": "orbit360cobrosreconciliationcommand-00010-dig",
-      "livePaymentBackendSignedOutcome": "SYNTHETIC_APPLY_RECONCILE_NO_DUPLICATE_COBRO_RECEIPT_PORTFOLIO_AND_POLICY_RENEWABLE_CAS_RELOAD_RESTORE_PASS_REAL_CUSTOMER_WRITES_0"
+      "livePaymentBackendSignedOutcome": "SYNTHETIC_APPLY_RECONCILE_NO_DUPLICATE_COBRO_RECEIPT_PORTFOLIO_AND_POLICY_RENEWABLE_CAS_RELOAD_RESTORE_PASS_REAL_CUSTOMER_WRITES_0",
+      "liveProtectedReaderOpsLeadsCrossAdvisorRoleCountryRunId": 43324845568,
+      "liveProtectedReaderSourceManifestSha256": "f0853986f23d6eacec3531dcb462631b24fd4c49536045f358827a1499158171",
+      "liveProtectedReaderActualTrafficRevision": "orbit360scopedpolicyread-00005-yes",
+      "liveCarlosDirectionDirectRenewalSyntheticReversibleRunId": 43325504543,
+      "liveCarlosDirectionDirectRenewalOutcome": "SIGNED_TWO_ACTORS_SYNTHETIC_POLICY_RECEIPT_PORTFOLIO_OPS_LINKS_RELOAD_IDEMPOTENCE_MISSING_DOC_DENIAL_AND_FULL_CLEANUP_PASS_NO_REAL_CUSTOMER_WRITES_GENUINE_INSURER_DOCUMENT_HOLD"
     },
     "progressMetric": "ONLY_EVIDENCE_BACKED_ACCEPTANCE_CHECKS_COUNT; NOT_TIME_ELAPSED_OR_ESTIMATED_COMPLETION",
     "latestFinancialCensusReadOnly20261112": {
@@ -119,6 +136,8 @@
         "percent": 75,
         "denominatorClarification20261112": "Original 7 mixed operations separated into 8 independently observable outcomes: Leads CRUD and Leads-to-Ops exact projection are distinct. Count only signed LIVE completed, not source QA or simulated click.",
         "verified": ["CARLOS_AND_DIRECTION_OPS_CREATE_UPDATE_RESOLVE_RELOAD_RESTORE_LIVE_43310610618", "CARLOS_AND_DIRECTION_LEADS_CREATE_UPDATE_RELOAD_RESTORE_LIVE_43310610618", "CARLOS_AND_DIRECTION_TASKS_CREATE_RESOLVE_RELOAD_RESTORE_LIVE_43310610618", "CARLOS_AND_DIRECTION_POLICY_RENEWABLE_FALSE_TO_TRUE_CAS_RELOAD_RESTORE_LIVE_43312896784", "CARLOS_AND_DIRECTION_PAYMENT_APPLY_AND_RECONCILE_ONE_COBRO_RECEIPT_PORTFOLIO_RELOAD_RESTORE_LIVE_43312896784", "CARLOS_ONE_REAL_PENDING_LEADS_OPS_EXACT_BUSINESS_INBOX_READBACK_NO_DUPLICATE_SIGNED_CARLOS_AND_DIRECTION_43315196712"],
+        "signedSyntheticDirectRenewalEvidenceNotCountedAsGenuineDocumentAcceptance": "43325504543_OPERATIVO_DIRECTION_LIVE_POLICY_RECEIPT_PORTFOLIO_OPS_RELOAD_IDEMPOTENCE_FULL_SYNTHETIC_CLEANUP_PASS",
+        "liveFullScopeOpsLeadsRoleCorrectionEvidence": "43324845568_PREVIEW_LIVE_SAME_SOURCE_SIGNED_OPERATIVO_DIRECTION_SCOPE_ALL_FOREIGN_ADVISOR_COUNTRY_TENANT_DENIAL_PASS",
         "pending": ["SIGNED_CARLOS_FULL_DIRECT_RENEWAL_ISSUANCE_CROSS_MODULE_READBACK_WITH_APPROVAL_AND_REAL_DOCUMENT_GATES", "SIGNED_COMPLETE_COUNTRY_TENANT_ROLE_AND_DIRECTION_ADMIN_SUPERADMIN_TRANSVERSAL_REGRESSION"]
       },
       "financialA1A7Applied": {

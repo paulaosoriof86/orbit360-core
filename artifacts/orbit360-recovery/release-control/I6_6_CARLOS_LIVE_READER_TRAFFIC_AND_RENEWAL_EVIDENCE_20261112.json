@@ -1,0 +1,67 @@
+{
+  "schema": "GRAVICENTRA_I6_6_OPERATIVO_TRANSVERSAL_SIGNED_LIVE_CLOSURE_20261112_V1",
+  "dateGuatemala": "2026-11-12",
+  "project": "Gravicentra Insurance",
+  "status": "READER_SCOPE_ALL_LIVE_PASS_DIRECT_RENEWAL_SYNTHETIC_LIVE_PASS_REAL_DOCUMENT_AND_FULL_CARLOS_GATE_HOLD",
+  "authority": {
+    "repository": "paulaosoriof86/orbit360-core",
+    "branch": "recovery/fase-a-clean-20260831",
+    "gate": "I6.6",
+    "previousB4007": "HISTORICAL_LIVE_PASS_DO_NOT_REOPEN",
+    "frontendSourceSha": "1dd675ed59ac51fd122915ca8056f85f82fa12d6",
+    "frontendArtifactId": 13984026378,
+    "frontendHosting": "LIVE_223_OF_223_SAME_BYTES_BOTH_ORIGINS"
+  },
+  "readerSourceAndEffectiveTraffic": {
+    "causalDiagnosis": "Configured roleScopes.Operativo was already all. Current backend source scope logic allowed Ops and Leads all but LIVE effective Cloud Run traffic was pinned to an older revision serving own.",
+    "oldRevision": "orbit360scopedpolicyread-00003-lef",
+    "newRevision": "orbit360scopedpolicyread-00005-yes",
+    "sourceManifestSha256": "f0853986f23d6eacec3531dcb462631b24fd4c49536045f358827a1499158171",
+    "failedFirstDeployWithExactSourceButOldEffectiveTrafficRunId": 43323669448,
+    "firstAttemptRollback": "PASS_100_PERCENT_BACK_TO_OLD_REVISION",
+    "successfulExactReaderPreviewTrafficLiveRunId": 43324845568,
+    "successfulRunConclusion": "SUCCESS",
+    "actualLiveTraffic": "NEW_REVISION_100_PERCENT_CONFIRMED",
+    "signedActors": ["Carlos Castro Operativo", "Paula Osorio Direccion"],
+    "signedReadback": "PREVIEW_AND_LIVE_GESTIONES_NEGOCIOS_CROSS_ADVISOR_SCOPE_ALL_SERVER_AND_UI_PASS_TENANT_COUNTRY_ROLE_GUARDS_PRESERVED",
+    "syntheticRows": "TWO_TEMPORARY_QA_ROWS_REMOVED_AFTER_EACH_ENVIRONMENT",
+    "otherFunctionAndHostingBytes": "UNCHANGED_CONFIRMED_BY_SOURCE_AND_DUAL_HOSTING_READBACK",
+    "realCustomerWrites": 0
+  },
+  "signedLiveOperationalEvidence": {
+    "opsLeadsTasksCrudRunId": 43310610618,
+    "renewabilityAndPaymentRunId": 43312896784,
+    "realPendingLeadOpsReadbackRunId": 43315196712,
+    "insurerAccountAuditRunId": 43316460352,
+    "directRenewalSignedLiveRunId": 43325504543,
+    "directRenewalSignedLiveConclusion": "SUCCESS",
+    "directRenewalActors": ["Carlos Castro Operativo", "Paula Osorio Direccion"],
+    "directRenewalChecks": [
+      "CAN_EDIT_AND_DIRECT_MODAL_PRESENT",
+      "MISSING_SUPPORT_REJECTED_FAIL_CLOSED",
+      "SYNTHETIC_RENEWED_POLICY_CREATED_EXACTLY_ONCE",
+      "ONE_EXPECTED_RECEIPT_AND_ONE_PORTFOLIO_RECORD",
+      "OLD_POLICY_AND_APPROVED_OPS_MANAGEMENT_LINKS_PERSISTED",
+      "IDEMPOTENT_REPLAY_NOT_DUPLICATED",
+      "SIGNED_RELOAD_PERSISTENCE_PASS",
+      "ALL_SYNTHETIC_BUSINESS_AND_NOTIFICATION_SIDE_EFFECTS_REMOVED"
+    ],
+    "genuineInsurerDocumentUploadFlowValidated": false,
+    "realCustomerPoliciesOrPaymentsModified": 0
+  },
+  "unchangedFrozenProgress": {
+    "readerParity": {"verified": 6, "required": 6, "percent": 100},
+    "carlosOpsLeadsRenewalCobros": {"verified": 6, "required": 8, "percent": 75, "reason7NotCounted": "Only synthetic document reference, not a genuine insurer document upload and issuer acceptance; full signed country and higher-role matrix still outstanding."},
+    "insurers": {"verified": 3, "required": 5, "percent": 60},
+    "financialA1A7Applied": {"verified": 0, "required": 7, "percent": 0},
+    "releaseGovernance": {"verified": 4, "required": 5, "percent": 80}
+  },
+  "frozenNextTasksInOrder": [
+    "COMPLETE_GENUINE_DOCUMENT_AND_ADMIN_HIGHER_ROLE_SIGNED_DIRECT_RENEWAL_UAT_WITH_NO_REAL_CUSTOMER_SIDE_EFFECTS",
+    "CERTIFY_CARLOS_FULL_ROLE_COUNTRY_TENANT_AND_POLICY_COBROS_OPS_LEADS_WRITER_PARITY",
+    "FINANCIAL_A1_A7_EXACT_SOURCE_LIVE_CAS_RECONCILIATION_IN_PROVEN_SAFE_MINIBATCHES_NO_BLIND_IMPORT",
+    "INSURER_PASSWORD_UPDATE_WITH_SECRET_SECURITY_AND_COMPLETE_HIGHER_ROLE_PARITY",
+    "PERFORMANCE_TOPBAR_SEARCH_AND_FINAL_MODULE_CONSISTENCY_READBACK"
+  ],
+  "claimBoundary": "This checkpoint certifies source and signed LIVE synthetic operational pathways. It does not represent updated real portfolio, genuine insurer document acceptance, financial write parity, all higher roles or I6.6 PRODUCTION_ACCEPTED."
+}
