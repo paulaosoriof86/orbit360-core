@@ -4,6 +4,8 @@
 const fs=require('node:fs'),path=require('node:path'),crypto=require('node:crypto');
 const {execFileSync}=require('node:child_process');
 const isolatedReader=require('./gravicentra-b4-003-isolated-reader-package.cjs');
+const dualReader=process.env.I66_EXPECT_DUAL_READER_PACKAGE==='true'
+  ?require('./gravicentra-i66-protected-reader-dual-isolated-package.cjs'):null;
 const {GoogleAuth}=require(path.join(process.env.GI_DEPS_DIR,'google-auth-library'));
 const phase=process.argv[2],tmp=process.env.RUNNER_TEMP,project=process.env.PROJECT_ID;
 if(!['before','after','rollback'].includes(phase)||project!=='ays-orbit-360-lab'||!tmp)throw Error('EXACT_PROJECT_AND_PHASE_REQUIRED');
@@ -66,7 +68,7 @@ async function source(client,name){
 async function readerFlow(client){
  const deployed=await Promise.all([roster,writer,reader].map(name=>source(client,name)));
  const current=deployed[2];
- const expected=isolatedReader.plan('functions');
+ const expected=dualReader?dualReader.plan('functions'):isolatedReader.plan('functions');
  const expectedManifest=expected.sourceManifestSha256;
  const result={phase,target:reader,observedAtUtc:new Date().toISOString(),project,region:'us-east1',
   functions:deployed.map(({archive,...rest})=>rest),

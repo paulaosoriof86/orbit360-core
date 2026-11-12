@@ -1,0 +1,214 @@
+# I6.6: one causal reader dependency differs from the reviewed LIVE source.
+# Same isolated immutable bytes go to Preview, signed two-user QA and LIVE.
+name: Gravicentra I6.6 Protected Ops Leads Reader Exact LIVE Scope Repair
+on:
+  push:
+    branches: [recovery/fase-a-clean-20260831]
+    paths:
+      - .github/workflows/gravicentra-i66-protected-ops-leads-reader-preview-live-role-fix.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: gi-i66-protected-ops-leads-reader-live-role-fix
+  cancel-in-progress: false
+jobs:
+  certify-preview-then-promote-one-reader:
+    if: github.repository == 'paulaosoriof86/orbit360-core' && github.ref == 'refs/heads/recovery/fase-a-clean-20260831'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 65
+    env:
+      PROJECT_ID: ays-orbit-360-lab
+      I66_LIVE_ORIGIN: https://app.aysseguros.com
+      I66_PREVIEW_ORIGIN: https://ays-orbit-360-lab--gi-i66-rc-43305281214-hr641g40.web.app
+      I66_LIVE_SHA: 1dd675ed59ac51fd122915ca8056f85f82fa12d6
+      I66_TARGET_FUNCTION: orbit360ScopedPolicyRead
+      I66_EXPECT_DUAL_READER_PACKAGE: 'true'
+      GI_TARGET_FUNCTION: orbit360ScopedPolicyRead
+      SA_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_ALT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Seal root cause exact one-file delta, historical gate and signed role negatives
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor "$I66_LIVE_SHA" HEAD
+          git merge-base --is-ancestor e58830da3657efefe0e5bc583277a0c9450c6731 HEAD
+          mapfile -t CHANGED < <(git diff --name-only e58830da3657efefe0e5bc583277a0c9450c6731 HEAD -- \
+            functions/b4-003-scoped-policy-callable.js functions/b4-003-scoped-bootstrap-reader.js \
+            functions/b4-003-scoped-access-boundary.js functions/b4-003-scoped-policy-reader.js \
+            functions/b4-003-scoped-related-reader.js functions/b4-003-client-country-authority.js \
+            functions/b4-003-client-country-list-projection.js)
+          test "${#CHANGED[@]}" -eq 1
+          test "${CHANGED[0]}" = functions/b4-003-scoped-access-boundary.js
+          git diff -U1 e58830da3657efefe0e5bc583277a0c9450c6731 HEAD -- \
+            functions/b4-003-scoped-access-boundary.js | grep -Fq "'negocios','gestiones','tareas'"
+          node --test tools/gravicentra-i66-reader-operativo-ops-leads-all-scope.test.cjs \
+            tools/gravicentra-b4-003-scoped-boundary.test.cjs
+          node tools/gravicentra-i66-protected-reader-dual-isolated-package.test.cjs
+          node --check tools/gravicentra-i66-protected-ops-leads-carlos-paula-dual-host-uat.cjs
+          node --check tools/gravicentra-i66-protected-reader-dual-isolated-package.cjs
+          node - <<'NODE'
+          const assert=require('node:assert/strict');
+          (async()=>{
+            const headers={Authorization:'Bearer '+process.env.GH_TOKEN,Accept:'application/vnd.github+json','User-Agent':'GI-I66-Reader-Role-Fix'};
+            for(const id of [43309935816,43278018706,43278857052,43310610618,43312896784,43315196712]){
+              const r=await fetch('https://api.github.com/repos/paulaosoriof86/orbit360-core/actions/runs/'+id,{headers}).then(x=>x.json());
+              assert.equal(r.conclusion,'success','PREVIOUS_LIVE_READER_OR_WRITE_GUARD_MISSING_'+id);
+            }
+            for(const origin of [process.env.I66_LIVE_ORIGIN,process.env.I66_PREVIEW_ORIGIN]){
+              const r=await fetch(origin+'/__recovery__/build.json',{headers:{'cache-control':'no-cache'}});
+              assert.ok(r.ok,'I66_READER_HOST_UNAVAILABLE');
+              assert.equal((await r.json()).sourceSha,process.env.I66_LIVE_SHA,'I66_READER_HOST_SOURCE_DRIFT');
+            }
+            console.log('I66_READER_OLD_PREVIEW_LIVE_AND_FRONTEND_SOURCE_GUARD_PASS');
+          })().catch(e=>{console.error(e.message);process.exitCode=1;});
+          NODE
+      - name: Build one immutable isolated reader pair and source manifest
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/gi-reader-repair/bundle" "$RUNNER_TEMP/gi-reader-repair/artifact"
+          node tools/gravicentra-i66-protected-reader-dual-isolated-package.cjs functions \
+            "$RUNNER_TEMP/gi-reader-repair/bundle/backend" > "$RUNNER_TEMP/gi-reader-repair/artifact/source-manifest.json"
+          printf '{"functions":{"source":"backend","runtime":"nodejs22"}}\n' > "$RUNNER_TEMP/gi-reader-repair/bundle/firebase.json"
+          tar --sort=name --mtime='UTC 1970-01-01' --owner=0 --group=0 --numeric-owner \
+            -cf - -C "$RUNNER_TEMP/gi-reader-repair/bundle" . | gzip -n > "$RUNNER_TEMP/gi-reader-repair/artifact/exact-reader.tar.gz"
+          sha256sum "$RUNNER_TEMP/gi-reader-repair/artifact/exact-reader.tar.gz" \
+            > "$RUNNER_TEMP/gi-reader-repair/artifact/exact-reader.sha256"
+          for STAGE in preview live;do
+            mkdir -p "$RUNNER_TEMP/gi-reader-repair/$STAGE"
+            tar -xzf "$RUNNER_TEMP/gi-reader-repair/artifact/exact-reader.tar.gz" -C "$RUNNER_TEMP/gi-reader-repair/$STAGE" --no-same-owner
+            (cd "$RUNNER_TEMP/gi-reader-repair/$STAGE/backend" && npm ci --ignore-scripts --no-audit --no-fund >/dev/null)
+          done
+          echo "GI_DEPS_DIR=$RUNNER_TEMP/gi-reader-repair/live/backend/node_modules" >> "$GITHUB_ENV"
+          echo 'I66_READER_ONE_IMMUTABLE_PREVIEW_LIVE_SOURCE_PACKAGE_PASS'
+      - name: Resolve existing project credentials and exact Firebase CLI
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/gi-reader-repair/credentials"
+          python3 - <<'PY'
+          import json,os,pathlib
+          p=pathlib.Path(os.environ['RUNNER_TEMP'])/'gi-reader-repair/credentials/selected.json'
+          for name in ('SA_LAB','SA_ALT','SA_DEFAULT'):
+              try: v=json.loads(os.environ.get(name,''))
+              except (ValueError,TypeError): continue
+              if v.get('type')=='service_account' and v.get('project_id')==os.environ['PROJECT_ID'] and v.get('private_key'):
+                  p.write_text(json.dumps(v));p.chmod(0o600);break
+          if not p.exists():raise SystemExit('I66_READER_CONFIGURED_PROJECT_CREDENTIAL_MISSING')
+          PY
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$RUNNER_TEMP/gi-reader-repair/credentials/selected.json" >> "$GITHUB_ENV"
+          npm install --prefix "$RUNNER_TEMP/gi-reader-repair/cli" --no-save --ignore-scripts --no-audit --no-fund firebase-tools@14.10.1 >/dev/null
+          node tools/gravicentra-firebase-tools-empty-extensions-workaround-v1.mjs "$RUNNER_TEMP/gi-reader-repair/cli"
+          echo "FIREBASE_CLI_BIN=$RUNNER_TEMP/gi-reader-repair/cli/node_modules/firebase-tools/lib/bin/firebase.js" >> "$GITHUB_ENV"
+      - uses: google-github-actions/setup-gcloud@v2
+        with:
+          version: '>= 483.0.0'
+      - name: Preserve previous LIVE revision and fully read back actual source
+        run: |
+          set -euo pipefail
+          gcloud auth activate-service-account --key-file="$GOOGLE_APPLICATION_CREDENTIALS" --quiet >/dev/null
+          gcloud config set project "$PROJECT_ID" --quiet >/dev/null
+          node tools/gravicentra-b4-003-live-backend-source-readback.cjs before
+          node - <<'NODE'
+          const fs=require('node:fs'),p=process.env.RUNNER_TEMP+'/gi-b4003-live-sources-before.json';
+          const d=JSON.parse(fs.readFileSync(p));
+          if(d.target!=='orbit360ScopedPolicyRead'||d.readerSourceMatchesCurrent||
+             d.functions.length!==3||d.functions[2].region!=='us-east1')throw Error('I66_READER_BEFORE_GUARD_FAILED');
+          fs.writeFileSync(process.env.RUNNER_TEMP+'/gi-reader-repair/old-revision',d.functions[2].revision);
+          const current=require('./tools/gravicentra-i66-protected-reader-dual-isolated-package.cjs').plan('functions');
+          if(current.sourceManifestSha256!==d.expectedReaderSourceManifestSha256)throw Error('I66_READER_MANIFEST_INCONSISTENT');
+          console.log('I66_READER_OLD_REVISION_AND_NEW_BYTE_MANIFEST_SEALED');
+          NODE
+          gcloud functions describe orbit360ScopedPolicyRead --gen2 --region us-east1 --project "$PROJECT_ID" --format=json \
+            > "$RUNNER_TEMP/gi-reader-repair/live-function-before.json"
+          node - <<'NODE'
+          const fs=require('node:fs'),d=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/gi-reader-repair/live-function-before.json'));
+          const s=String(d.serviceConfig?.service||'').split('/').pop();
+          if(!/^[a-z][a-z0-9-]+$/.test(s))throw Error('I66_READER_SERVICE_UNKNOWN');
+          fs.writeFileSync(process.env.RUNNER_TEMP+'/gi-reader-repair/service-name',s);
+          NODE
+          for ORIGIN in 'https://app.aysseguros.com' 'https://ays-orbit-360-lab.web.app';do
+            curl -fsSL --max-time 30 "$ORIGIN/" | sha256sum
+          done > "$RUNNER_TEMP/gi-reader-repair/hosting-before.sha256"
+      - name: Deploy the exact package to the existing Preview reader ONLY
+        run: |
+          set -euo pipefail
+          sha256sum -c "$RUNNER_TEMP/gi-reader-repair/artifact/exact-reader.sha256"
+          node "$FIREBASE_CLI_BIN" deploy --only functions:orbit360ScopedPolicyReadPreview \
+            --config "$RUNNER_TEMP/gi-reader-repair/preview/firebase.json" --project "$PROJECT_ID" --non-interactive
+          echo 'I66_READER_EXACT_PREVIEW_ISOLATED_FUNCTION_DEPLOY_PASS'
+      - name: Signed Preview Carlos and Paula cross-advisor and negative QA
+        env:
+          I66_SIGNED_READER_ORIGIN: ${{ env.I66_PREVIEW_ORIGIN }}
+          I66_SIGNED_READER_MODE: preview
+        run: |
+          set -euo pipefail
+          npm install --no-save --package-lock=false --ignore-scripts --no-audit --no-fund firebase-admin@13.4.0 playwright@1.55.0 >/dev/null
+          node node_modules/playwright/cli.js install --with-deps chromium >/dev/null
+          node tools/gravicentra-i66-protected-ops-leads-carlos-paula-dual-host-uat.cjs
+          echo 'I66_READER_SIGNED_PREVIEW_CARLOS_PAULA_SCOPE_READBACK_PASS'
+      - name: Promote identical immutable reader package to LIVE and rollback on failed signed UAT
+        env:
+          GH_TOKEN: ${{ github.token }}
+          I66_SIGNED_READER_ORIGIN: ${{ env.I66_LIVE_ORIGIN }}
+          I66_SIGNED_READER_MODE: live
+        run: |
+          set -euo pipefail
+          node - <<'NODE'
+          (async()=>{
+            const r=await fetch('https://api.github.com/repos/paulaosoriof86/orbit360-core/git/ref/heads/recovery/fase-a-clean-20260831',
+              {headers:{Authorization:'Bearer '+process.env.GH_TOKEN,Accept:'application/vnd.github+json','User-Agent':'GI-I66-Head-Guard'}});
+            if(!r.ok||(await r.json()).object?.sha!==process.env.GITHUB_SHA)throw Error('I66_READER_PRODUCTION_SOURCE_HEAD_CHANGED');
+          })().catch(e=>{console.error(e.message);process.exitCode=1;});
+          NODE
+          sha256sum -c "$RUNNER_TEMP/gi-reader-repair/artifact/exact-reader.sha256"
+          SERVICE=$(< "$RUNNER_TEMP/gi-reader-repair/service-name")
+          OLD_REV=$(< "$RUNNER_TEMP/gi-reader-repair/old-revision")
+          completed=0
+          rollback(){
+            code=$?
+            if test "$completed" != 1;then
+              echo 'I66_READER_LIVE_SIGNED_UAT_HOLD_TRAFFIC_ROLLBACK_START'
+              gcloud run services update-traffic "$SERVICE" --region us-east1 --project "$PROJECT_ID" \
+                --to-revisions="$OLD_REV=100" --quiet || echo 'I66_READER_ROLLBACK_UNCONFIRMED_CRITICAL'
+            fi
+            exit "$code"
+          }
+          trap rollback EXIT
+          node "$FIREBASE_CLI_BIN" deploy --only functions:orbit360ScopedPolicyRead \
+            --config "$RUNNER_TEMP/gi-reader-repair/live/firebase.json" --project "$PROJECT_ID" --non-interactive
+          node tools/gravicentra-b4-003-live-backend-source-readback.cjs after
+          node tools/gravicentra-i66-protected-ops-leads-carlos-paula-dual-host-uat.cjs
+          for ORIGIN in 'https://app.aysseguros.com' 'https://ays-orbit-360-lab.web.app';do
+            curl -fsSL --max-time 30 "$ORIGIN/" | sha256sum
+          done > "$RUNNER_TEMP/gi-reader-repair/hosting-after.sha256"
+          cmp "$RUNNER_TEMP/gi-reader-repair/hosting-before.sha256" "$RUNNER_TEMP/gi-reader-repair/hosting-after.sha256"
+          completed=1
+          echo 'I66_READER_LIVE_CARLOS_PAULA_SIGNED_SCOPE_ALL_EXACT_SOURCE_ROLLBACK_AVAILABLE_PASS'
+          echo "I66_READER_BACKEND_PACKAGE_SHA256=$(awk '{print $1}' "$RUNNER_TEMP/gi-reader-repair/artifact/exact-reader.sha256")" >> "$GITHUB_STEP_SUMMARY"
+          echo "I66_READER_UNTOUCHED_HOSTING_SHA=$I66_LIVE_SHA" >> "$GITHUB_STEP_SUMMARY"
+      - name: Persist non-credential immutable source provenance and readbacks
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gi-i66-reader-scope-repair-${{ github.run_id }}
+          path: |
+            ${{ runner.temp }}/gi-reader-repair/artifact/exact-reader.tar.gz
+            ${{ runner.temp }}/gi-reader-repair/artifact/exact-reader.sha256
+            ${{ runner.temp }}/gi-reader-repair/artifact/source-manifest.json
+            ${{ runner.temp }}/gi-b4003-live-sources-before.json
+            ${{ runner.temp }}/gi-b4003-live-sources-after.json
+            ${{ runner.temp }}/gi-reader-repair/hosting-before.sha256
+            ${{ runner.temp }}/gi-reader-repair/hosting-after.sha256
+          if-no-files-found: warn
+          retention-days: 21
