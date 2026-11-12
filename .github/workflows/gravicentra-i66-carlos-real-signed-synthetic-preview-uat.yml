@@ -1,0 +1,70 @@
+# Signed Carlos/Paula synthetic Preview UAT; reversible QA documents only.
+# This workflow NEVER deploys LIVE, changes Auth/IAM/Rules, or accepts legal terms.
+name: Gravicentra I6.6 Carlos Paula Signed Synthetic Preview UAT
+on:
+  push:
+    branches: [recovery/fase-a-clean-20260831]
+    paths:
+      - .github/workflows/gravicentra-i66-carlos-real-signed-synthetic-preview-uat.yml
+      - tools/gravicentra-i6-6-carlos-real-signed-synthetic-preview-uat.cjs
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: gi-i66-carlos-real-signed-synthetic-preview-uat
+  cancel-in-progress: false
+jobs:
+  signed-functional-uat:
+    if: github.repository == 'paulaosoriof86/orbit360-core' && github.ref_name == 'recovery/fase-a-clean-20260831'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      I66_SOURCE_SHA: b86cad550fadc050e8574678f02f3097caa8b5bd
+      I66_PREVIEW_ORIGIN: https://ays-orbit-360-lab--gi-i66-rc-43299843267-qispe7e9.web.app
+      I66_PACKAGE_RUN: '43299843267'
+      I66_FUNCTION_RUN: '43300939205'
+      SA_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_ALT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify exact immutable Preview source, backend deployment and synthetic-only contract
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor "$I66_SOURCE_SHA" HEAD
+          test -z "$(git diff --name-only "$I66_SOURCE_SHA" HEAD -- orbit360-platform functions firebase.json firestore.rules storage.rules)"
+          node tools/gravicentra-i6-6-carlos-preview-synthetic-write-gate.test.cjs
+          node tools/gravicentra-i6-6-carlos-ops-tasks-transversal.test.cjs
+          node - <<'NODE'
+          const assert=require('node:assert/strict');
+          (async()=>{
+            const h={Authorization:'Bearer '+process.env.GH_TOKEN,Accept:'application/vnd.github+json','User-Agent':'GI-I66-Signed-Synthetic-UAT'};
+            const base='https://api.github.com/repos/paulaosoriof86/orbit360-core/actions/runs/';
+            const [p,f]=await Promise.all([process.env.I66_PACKAGE_RUN,process.env.I66_FUNCTION_RUN].map(id=>fetch(base+id,{headers:h}).then(r=>r.json())));
+            assert.equal(p.conclusion,'success','I66_SIGNED_UAT_EXACT_PREVIEW_BUILD_NOT_ACCEPTED');
+            assert.equal(p.head_sha,process.env.I66_SOURCE_SHA,'I66_SIGNED_UAT_BUILD_SHA_DRIFT');
+            assert.equal(f.conclusion,'success','I66_SIGNED_UAT_THREE_BACKEND_PREVIEW_FUNCTIONS_NOT_ACCEPTED');
+            const b=await fetch(process.env.I66_PREVIEW_ORIGIN+'/__recovery__/build.json');
+            assert.equal(b.ok,true,'I66_SIGNED_UAT_PREVIEW_BUILD_READBACK_HOLD');
+            const j=await b.json();
+            assert.equal(j.sourceSha,process.env.I66_SOURCE_SHA,'I66_SIGNED_UAT_PREVIEW_EXACT_SOURCE_DRIFT');
+            console.log('I66_SIGNED_UAT_EXACT_IMMUTABLE_PREVIEW_AND_THREE_FUNCTIONS_ACCEPTED_PASS');
+          })().catch(e=>{console.error(e.message);process.exitCode=1;});
+          NODE
+      - name: Install bounded signed Chromium QA dependencies
+        run: |
+          set -euo pipefail
+          npm install --no-save --package-lock=false --ignore-scripts --no-audit --no-fund firebase-admin@13.4.0 playwright@1.55.0 >/dev/null
+          node node_modules/playwright/cli.js install --with-deps chromium >/dev/null
+      - name: Test actual signed Carlos and Paula synthetic Ops, Leads and tasks with automatic restore
+        run: node tools/gravicentra-i6-6-carlos-real-signed-synthetic-preview-uat.cjs
