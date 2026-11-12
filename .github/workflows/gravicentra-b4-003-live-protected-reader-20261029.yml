@@ -75,10 +75,23 @@ jobs:
           REMOTE=$(git ls-remote origin refs/heads/recovery/fase-a-clean-20260831 | awk '{print $1}')
           test "$REMOTE" = "$RELEASE_HEAD"
           test "$PROJECT_ID" = ays-orbit-360-lab
-          git diff --exit-code "$PRESERVED_FRONTEND_SOURCE" HEAD -- functions orbit360-platform ':(exclude)orbit360-platform/docs/**'
           case "$REQUESTED_MODE" in
-            readback) ;;
-            deploy) test "$EXPECTED_DEPLOY_HEAD" = "$RELEASE_HEAD"; [[ "$EXPECTED_BEFORE_MANIFEST" =~ ^[0-9a-f]{64}$ ]] ;;
+            readback)
+              # I6.6 may inspect the existing deployed reader without reopening
+              # the old I6.5 deploy authorization. Verify that the HEAD still
+              # contains exactly the currently published product source.
+              CURRENT_LIVE_SOURCE=$(node -p "require('./artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json').i66LatestExactLiveRelease20261111.latestProductSourceSha")
+              [[ "$CURRENT_LIVE_SOURCE" =~ ^[0-9a-f]{40}$ ]]
+              git merge-base --is-ancestor "$CURRENT_LIVE_SOURCE" HEAD
+              git diff --exit-code "$CURRENT_LIVE_SOURCE" HEAD -- functions orbit360-platform ':(exclude)orbit360-platform/docs/**'
+              ;;
+            deploy)
+              # The previously approved I6.5 one-function deploy gate remains
+              # tied to its exact predecessor; no permission expansion here.
+              git diff --exit-code "$PRESERVED_FRONTEND_SOURCE" HEAD -- functions orbit360-platform ':(exclude)orbit360-platform/docs/**'
+              test "$EXPECTED_DEPLOY_HEAD" = "$RELEASE_HEAD"
+              [[ "$EXPECTED_BEFORE_MANIFEST" =~ ^[0-9a-f]{64}$ ]]
+              ;;
             *) exit 1 ;;
           esac
           test -f functions/b4-003-scoped-policy-callable.js
