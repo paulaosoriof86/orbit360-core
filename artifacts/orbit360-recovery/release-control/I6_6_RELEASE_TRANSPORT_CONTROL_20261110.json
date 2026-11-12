@@ -95,6 +95,20 @@
     "sourceBeingTested": "EXISTING_LIVE_BEFORE_B54D868E_PROMOTION",
     "realInsurerPaulaAndCarlosFailureStillOpen": true
   },
+  "paulaCurrentLiveRealInsurerControl20261111": {
+    "actor": "Paula Direccion GT in existing authenticated Chrome LIVE",
+    "realInsurerId": "gt-aseguradora-guatemalteca",
+    "controlledUiField": "Responsable interno",
+    "auditedSaveConfirmedAfterFreshTab": true,
+    "auditedRestoreToOriginalBlankConfirmedAfterFreshTab": true,
+    "realInsurerAuditedReversibleWrites": 2,
+    "realInsurerFieldDeltaAfterRestore": 0,
+    "financialWrites": 0,
+    "newHostingDeployment": false,
+    "carlosLiveDurableWriteCertification": "PENDING",
+    "otherRealInsurerFailures": "NOT_REPRODUCED_OR_RULED_OUT",
+    "conclusion": "This real GT insurer saves as Direccion now; generic role denial not supported."
+  },
   "nextImmutablePreviewBuildRequest": {
     "purpose": "Real insurer ordinary save must not be rejected by unchanged legacy secret fields under Dirección, Operativo or Admin-family roles.",
     "approvedSourceFile": "orbit360-platform/data/store-firestore-product-operational-p0.js",

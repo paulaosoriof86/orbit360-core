@@ -62,6 +62,21 @@
     "paymentOrReceivableWrites": 0,
     "newHostingDeployment": false
   },
+  "paulaCurrentChromeLiveRealInsurerCanary20261111": {
+    "actor": "Paula Osorio Direccion GT signed LIVE Chrome session",
+    "realInsurerId": "gt-aseguradora-guatemalteca",
+    "uiField": "Responsable interno",
+    "before": "blank",
+    "controlledAuditedSave": "PASS",
+    "freshTabPersistedMarker": "PASS",
+    "controlledAuditedRestore": "PASS",
+    "freshTabRestoredBlank": "PASS",
+    "auditedReversibleRealInsurerWrites": 2,
+    "durableBusinessFieldDeltaAfterRestore": 0,
+    "paymentOrReceivableWrites": 0,
+    "newHostingDeployment": false,
+    "conclusion": "This particular real GT insurer currently saves and restores for Direccion on existing LIVE. Carlos live write and other reported real record remain HOLD, not a generic role denial."
+  },
   "minimalFix": "In access-scope.js authorize insurer directory dataScope='all' for active allowed broad-directory role only when role ceiling is all; preserve explicit none, signed country, module matrix and restrictions; do not modify live data, backend, Rules, roles or Asesor scope.",
   "regressionTest": "tools/gravicentra-i6-6-insurer-operativo-signed-scope.test.cjs",
   "localRegressionCases": 13,
