@@ -109,9 +109,14 @@
     if(collection!=='aseguradoras'||!payload||typeof payload!=='object')return false;
     return Object.keys(payload).some(function(k){return /(pass(word)?|contrasena|contraseña|secret|token|credential|credencial|username|usuario|login)/i.test(k);});
   }
-  function authorize(collection,action,row){
+  function authorize(collection,action,row,actualPatch){
     var moduleKey=moduleFor(collection);
-    if(sensitiveInsurerPatch(collection,row))error('PRODUCT_WRITE_SECURE_INSURER_OWNER_REQUIRED');
+    // A legacy insurer may already carry old top-level credential fields.
+    // Authorize record scope on the full row, but validate secrets only in
+    // the proposed durable delta. Unchanged historical fields are never sent
+    // by insurerWritePayload and must not block a non-secret update.
+    if(action!=='remove'&&sensitiveInsurerPatch(collection,actualPatch===undefined?row:actualPatch))
+      error('PRODUCT_WRITE_SECURE_INSURER_OWNER_REQUIRED');
     if(!Orbit.access||typeof Orbit.access.can!=='function')error('PRODUCT_WRITE_ACCESS_OWNER_MISSING');
     var accessAction=action==='insert'?'create':'edit',m=member(),activeRole=text(m.activeRole).toLowerCase();
     var advisorSelfService=collection==='gestiones'&&action==='insert'&&/asesor|comercial/.test(activeRole)&&text(row&&row.asesorId)===text(m.advisorId);
@@ -472,7 +477,7 @@
           payload=insurerWritePayload(action,payload,prior);
         }
         if(action==='insert'){if(prior)error('PRODUCT_BATCH_INSERT_ALREADY_EXISTS');row=payload||{};row.id=id;row.tenantId=text(m.tenantId);row.createdAt=row.createdAt||new Date().toISOString();row.updatedAt=new Date().toISOString();row.ownerUid=row.ownerUid||text(m.uid);row.ownerEmail=row.ownerEmail||text(m.email);scopedMutationRow(collection,row,m);authorize(collection,'insert',row);}
-        else if(action==='update'){if(!prior)error('PRODUCT_BATCH_UPDATE_NOT_FOUND');row=Object.assign({},prior,payload||{},{id:id,tenantId:text(m.tenantId),updatedAt:new Date().toISOString(),updatedByUid:text(m.uid),updatedByEmail:text(m.email)});scopedMutationRow(collection,row,m);authorize(collection,'update',row);}
+        else if(action==='update'){if(!prior)error('PRODUCT_BATCH_UPDATE_NOT_FOUND');row=Object.assign({},prior,payload||{},{id:id,tenantId:text(m.tenantId),updatedAt:new Date().toISOString(),updatedByUid:text(m.uid),updatedByEmail:text(m.email)});scopedMutationRow(collection,row,m);authorize(collection,'update',row,payload);}
         else{if(!prior)error('PRODUCT_BATCH_REMOVE_NOT_FOUND');authorize(collection,'remove',prior);}
         var pb=pendingBucket(collection),eb=expectationBucket(collection),db=deletedBucket(collection);
         backups.push({collection:collection,id:id,pendingHad:Object.prototype.hasOwnProperty.call(pb,id),pendingValue:clone(pb[id]),expectationHad:Object.prototype.hasOwnProperty.call(eb,id),expectationValue:clone(eb[id]),deletedHad:Object.prototype.hasOwnProperty.call(db,id),deletedValue:db[id]});
@@ -534,7 +539,7 @@
     id=text(id);if(!id)error('PRODUCT_WRITE_ID_REQUIRED');
     var prior=get(collection,id);if(!prior)error('PRODUCT_WRITE_RECORD_NOT_FOUND');
     var m=member(), row=Object.assign({},prior,clone(patch)||{},{id:id,tenantId:text(m.tenantId),updatedAt:new Date().toISOString(),updatedByUid:text(m.uid),updatedByEmail:text(m.email)});
-    scopedMutationRow(collection,row,m);authorize(collection,'update',row);
+    scopedMutationRow(collection,row,m);authorize(collection,'update',row,collection==='aseguradoras'?insurerWritePayload('update',row,prior):undefined);
     var optimistic=clone(row);
     if(collection==='negocios'&&text(prior.etapa)!=='emitido'&&text(row.etapa)==='emitido'&&!text(row.clienteIdCreado))optimistic.clienteIdCreado=text(row.clienteId)||SERVER_EMISSION_GUARD;
     setPending(collection,id,optimistic,{kind:'update',patch:expectedPatch(patch||{},collection)});emit(collection);
@@ -567,7 +572,7 @@
     id=text(id);if(!id)error('PRODUCT_WRITE_ID_REQUIRED');
     var prior=get(collection,id);if(!prior)error('PRODUCT_WRITE_RECORD_NOT_FOUND');
     var m=member(),row=Object.assign({},prior,clone(patch)||{},{id:id,tenantId:text(m.tenantId),updatedAt:new Date().toISOString(),updatedByUid:text(m.uid),updatedByEmail:text(m.email)});
-    scopedMutationRow(collection,row,m);authorize(collection,'update',row);setPending(collection,id,row,{kind:'update',patch:expectedPatch(patch||{},collection)});emit(collection);
+    scopedMutationRow(collection,row,m);authorize(collection,'update',row,collection==='aseguradoras'?insurerWritePayload('update',row,prior):undefined);setPending(collection,id,row,{kind:'update',patch:expectedPatch(patch||{},collection)});emit(collection);
     return callDurable('update',collection,id,row,prior).then(function(){return clone(row);});
   }
   // Explicit administrative classification is the only real-data write available

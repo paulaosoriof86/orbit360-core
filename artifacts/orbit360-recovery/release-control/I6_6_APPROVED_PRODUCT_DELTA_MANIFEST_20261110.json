@@ -1041,6 +1041,28 @@
       "tests": [
         {"path": "tools/gravicentra-i6-6-conciliaciones-protected-bridge.test.cjs", "gitBlobSha": "f4d439f4b03865a51e48bfd2442bd03e6d6499d8"}
       ]
+    },
+    {
+      "id": "I6_6_INSURER_LEGACY_CREDENTIAL_SURVIVOR_SAFE_UPDATE_P0",
+      "approvedByDirection": true,
+      "receipt": "artifacts/orbit360-recovery/release-control/I6_6_REAL_INSURER_SAVE_ROOTCAUSE_20261111.json#additionalTransversalCausalFinding20261111",
+      "sourceStatus": "SOURCE_UNIT_13_PASS_NEW_IMMUTABLE_PREVIEW_AND_SIGNED_LIVE_UAT_PENDING",
+      "capabilityOwners": ["ASEGURADORAS_PRIMARY_RUNTIME", "ASEGURADORAS_OPERATIONAL_DIRECTORY", "ROLE_SCOPE_RUNTIME"],
+      "scope": "Dirección and Operativo insurer edits must not fail because unchanged historical username/password keys coexist on the real row. Record/country permissions use full row; secure-field blocking uses only actual durable delta. No credential replay or relaxation, no financial or insurer data writes during source QA.",
+      "paths": [
+        {
+          "path": "orbit360-platform/data/store-firestore-product-operational-p0.js",
+          "gitBlobSha": "7214bad37a5d5609397964c3eef55b71a347e004",
+          "replaces": {
+            "path": "orbit360-platform/data/store-firestore-product-operational-p0.js",
+            "priorGitBlobSha": "788a14755e1e51d420126e8be68111a150c08207",
+            "priorChangeId": "I6_6_SIGNED_AUTH_WRITER_AND_GLOBAL_SEARCH_INDEX_TRANSVERSAL_P0"
+          }
+        }
+      ],
+      "tests": [
+        {"path": "tools/gravicentra-i6-6-insurer-legacy-credential-update.test.cjs", "gitBlobSha": "905ed1b0b307549c4bee11d03960674d76d41486"}
+      ]
     }
   ]
 }

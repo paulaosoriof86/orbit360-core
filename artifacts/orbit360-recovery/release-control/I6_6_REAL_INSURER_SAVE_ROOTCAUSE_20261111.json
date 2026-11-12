@@ -22,6 +22,19 @@
     "businessDataWritten": 0
   },
   "rootCause": "Client store operational save calls Orbit.access.canAccessRecord('aseguradoras') which incorrectly inherits advisor own scope from signed mixed Operativo/Asesor profile. Tenant-wide insurer without asesorId is denied before server writer. Server insurer writer and protected reader correctly use signed role/module/country without advisor requirement.",
+  "additionalTransversalCausalFinding20261111": {
+    "ownerCorrection": "Dirección reporta que el mismo guardado falla también con su rol. La regla heredada de alcance mixto Operativo/Asesor NO explica por sí sola este fallo transversal.",
+    "sourceEvidence": "store-firestore-product-operational-p0.js authorize(collection,action,row) analizaba Object.keys de TODA la fila al hacer update, antes de generar el insurerWritePayload diferencial; una fila histórica con usuario/password activa erróneamente PRODUCT_WRITE_SECURE_INSURER_OWNER_REQUIRED incluso si solo cambia el nombre o contacto.",
+    "minimalFix": "Usar la fila completa exclusivamente para autorizar alcance por rol/país/tenant, y usar el delta real insurerWritePayload para la prohibición de escrituras sensibles en update, updateDurable y batchDurable. No enviar credenciales heredadas al backend ni relajar cambios de credenciales.",
+    "sourceFile": "orbit360-platform/data/store-firestore-product-operational-p0.js",
+    "sourceBlob": "7214bad37a5d5609397964c3eef55b71a347e004",
+    "testFile": "tools/gravicentra-i6-6-insurer-legacy-credential-update.test.cjs",
+    "testBlob": "905ed1b0b307549c4bee11d03960674d76d41486",
+    "syntheticRoleCountryAndSecretRegression": "14_OF_14_PASS_NO_REAL_DATA_WRITES",
+    "realPaulaAndCarlosWriteReadback": "PENDING_NOT_CERTIFIED",
+    "actualLiveFailureClassification": "PENDING_SIGNED_CLOUD_READBACK",
+    "release": "SOURCE_ONLY_PENDING_NEW_IMMUTABLE_PREVIEW_AND_LIVE_HUMAN_GATE"
+  },
   "minimalFix": "In access-scope.js authorize insurer directory dataScope='all' for active allowed broad-directory role only when role ceiling is all; preserve explicit none, signed country, module matrix and restrictions; do not modify live data, backend, Rules, roles or Asesor scope.",
   "regressionTest": "tools/gravicentra-i6-6-insurer-operativo-signed-scope.test.cjs",
   "localRegressionCases": 13,
