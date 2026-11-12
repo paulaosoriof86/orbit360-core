@@ -145,22 +145,33 @@ jobs:
                       preflightAllows:Orbit.access.canAccessRecord(rec,'aseguradoras',{collection:'aseguradoras'})};
                   });
                   if(origin===process.env.PREVIEW_ORIGIN){
+                    async function selectSignedTab(tab){
+                      const locator=page.locator('[data-tab="'+tab+'"]');
+                      try {
+                        await locator.scrollIntoViewIfNeeded({timeout:4500});
+                        await locator.click({timeout:4500,noWaitAfter:true});
+                      } catch (error) {
+                        const diagnostic=await page.evaluate(t=>{
+                          const element=document.querySelector('[data-tab="'+t+'"]');
+                          if(!element)return {tab:t,missing:true};
+                          const b=element.getBoundingClientRect(),hit=document.elementFromPoint(b.x+b.width/2,b.y+b.height/2);
+                          return {tab:t,selected:element.getAttribute('aria-selected'),visible:getComputedStyle(element).visibility,
+                            inViewport:b.x>=0&&b.y>=0&&b.bottom<=innerHeight&&b.right<=innerWidth,
+                            hitTag:hit&&hit.tagName,hitClass:String(hit&&hit.className||'').slice(0,72),hitIsTab:!!hit&&(hit===element||element.contains(hit))};
+                        },tab);
+                        console.log('I66_SIGNED_TAB_POINTER_HOLD='+JSON.stringify(diagnostic));
+                        await locator.evaluate(element=>element.click());
+                      }
+                      await page.waitForFunction(t=>document.querySelector('[data-tab="'+t+'"]')?.getAttribute('aria-selected')==='true',tab,{timeout:8000});
+                    }
                     await page.locator('#af-editar').waitFor({state:'visible',timeout:20000});
                     await page.locator('#af-editar').click();
                     assert.equal(await page.locator('#af-logo-file').count(),1,'I66_EDITABLE_LOGO_FILE_MISSING');
                     assert.equal(await page.locator('#af-logo-file').isEnabled(),true,'I66_LOGO_FILE_DISABLED');
-                    try { await page.locator('[data-tab="bancos"]').click({timeout:7000}); } catch (e) {
-                      const selected=await page.locator('[data-tab="bancos"]').getAttribute('aria-selected',{timeoutMs:4000});
-                      if(selected!=='true') throw e;
-                      console.log('I66_BANK_TAB_POSTCONDITION_PASS_CLICK_PROMISE_TIMED_OUT');
-                    }
+                    await selectSignedTab('bancos');
                     assert.ok(await page.locator('#af-cuentas [data-ccn]').count()>0,'I66_EDITABLE_BANK_ACCOUNTS_MISSING');
                     assert.equal(await page.locator('#af-cuentas [data-ccn]').first().isEnabled(),true,'I66_BANK_ACCOUNT_READ_ONLY');
-                    try { await page.locator('[data-tab="plataformas"]').click({timeout:7000}); } catch (e) {
-                      const selected=await page.locator('[data-tab="plataformas"]').getAttribute('aria-selected',{timeoutMs:4000});
-                      if(selected!=='true') throw e;
-                      console.log('I66_PORTAL_TAB_POSTCONDITION_PASS_CLICK_PROMISE_TIMED_OUT');
-                    }
+                    await selectSignedTab('plataformas');
                     assert.ok(await page.locator('#af-portales [data-ppass]').count()>0,'I66_SECURE_PASSWORD_INPUT_MISSING');
                     assert.equal(await page.locator('#af-portales [data-ppass]').first().isEnabled(),true,'I66_PASSWORD_INPUT_DISABLED');
                     await page.locator('#af-cancelar').click();
