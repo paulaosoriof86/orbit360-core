@@ -40,6 +40,23 @@
     "sourceMatchesCurrent": true,
     "status": "PASS_EXACT_SOURCE_BYTES"
   },
+  "otherLiveBackendSourcesObserved": {
+    "orbit360AssignableAdvisorRoster": {
+      "deployedGitBlobSha": "9778d74b6d305ff56caf73bb68be3dadac4b14ce",
+      "currentGitBlobSha": "9778d74b6d305ff56caf73bb68be3dadac4b14ce",
+      "sourceMatchesCurrent": true
+    },
+    "orbit360ProductOperationalCommand": {
+      "deployedGitBlobSha": "a27810c65e6a5a761d40c0e1f20cae61df483d1f",
+      "currentGitBlobSha": "416775a865e8b23ae7e8bbb604c8d7c519297517",
+      "deployedEqualsCurrent": false,
+      "deployedSourceHistoricalCommit": "e3acbb9afc52420428439ccdcbac0f6c561286fe",
+      "currentSourceDelta": "Only asset upload/read helpers: project-owned bucket resolution and exact binary SHA-256 for insurer logos. Separate asset upload/read callables have their own deployment evidence; do not redeploy operational commands to remedy their helper-source version difference.",
+      "goalParticipationContractGitBlobSha": "ff86fa441fd6cb4ec6254e2dc5078a37bf68fc36",
+      "goalParticipationContractMatchesCurrent": true,
+      "operationalCommandFunctionalParity": "NOT_RETESTED_BY_SOURCE_READBACK"
+    }
+  },
   "hosting": {
     "sourceAndArtifactRemainExact": true,
     "sameLiveArtifactVerifiedFiles": 223,
