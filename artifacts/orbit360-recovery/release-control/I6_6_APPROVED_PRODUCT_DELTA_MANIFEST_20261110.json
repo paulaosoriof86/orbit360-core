@@ -995,6 +995,52 @@
           "gitBlobSha": "8df6b8d909b72d588d029d6afdfafbc7a0a68e8c"
         }
       ]
+    },
+    {
+      "id": "I6_6_CONCILIACIONES_PROTECTED_SCOPED_READ_BRIDGE_P0",
+      "approvedByDirection": true,
+      "receipt": "artifacts/orbit360-recovery/release-control/I6_6_CONCILIACIONES_PROTECTED_BRIDGE_RECEIPT_20261111.json",
+      "sourceCommit": "30406dc6cc23684f8d97e6f25ff36dd6a7e0186d",
+      "sourceStatus": "SOURCE_SYNTHETIC_QA_PASS_PREVIEW_AND_LIVE_NOT_DEPLOYED",
+      "capabilityOwners": ["COBROS_RECONCILIATION", "ROLE_SCOPE_RUNTIME", "GLOBAL_SHELL_ROUTER"],
+      "scope": "Expose only securely signed existing conciliaciones and conciliacionesPrimas proposals, verified country by canonical parent policy/client, and precise UI pending/error states. No payment, account, user, role or data write.",
+      "dataWrites": 0,
+      "paths": [
+        {"path": "functions/b4-003-scoped-access-boundary.js", "gitBlobSha": "38fa8cee808be6b92b65150625e69b0f93639564"},
+        {"path": "functions/b4-003-scoped-related-reader.js", "gitBlobSha": "849cc33c7bf048787b3f1a35e176a3baa5285fc7"},
+        {
+          "path": "orbit360-platform/core/product-runtime-browser-providers-p0.js",
+          "gitBlobSha": "76555ee036149eb7eb003b528f54d996a75c00eb",
+          "replaces": {
+            "path": "orbit360-platform/core/product-runtime-browser-providers-p0.js",
+            "priorGitBlobSha": "b0507a5c3c911637f0429cad3dcf4896d9b29424",
+            "priorChangeId": "I6_6_SIGNED_AUTH_WRITER_AND_GLOBAL_SEARCH_INDEX_TRANSVERSAL_P0"
+          }
+        },
+        {
+          "path": "orbit360-platform/core/router.js",
+          "gitBlobSha": "7c8648c8cf41d7132dad1c594838240bf8a1291a",
+          "replaces": {
+            "path": "orbit360-platform/core/router.js",
+            "priorGitBlobSha": "2adf80dc1d251eb283f60e9ee8d871e50db22b2d",
+            "priorChangeId": "I6_6_GLOBAL_TOPBAR_CROSSMODULE_PROTECTED_HYDRATION_P0"
+          }
+        },
+        {"path": "orbit360-platform/core/tenant-access-policy-contract-p0.js", "gitBlobSha": "6ea240869a3c0d70b28380c3f7c017bdcbd71621"},
+        {
+          "path": "orbit360-platform/data/store-firestore-product-readonly-p0.js",
+          "gitBlobSha": "062e5633e97ba830a4149fcf4d4ef49cd9f7f8cb",
+          "replaces": {
+            "path": "orbit360-platform/data/store-firestore-product-readonly-p0.js",
+            "priorGitBlobSha": "4cdf9bc60150075a61e01f83151cdaad0ad21147",
+            "priorChangeId": "I6_6_CROSS_MODULE_AUTHORIZED_READ_BULK_CLONE_PERFORMANCE_P0"
+          }
+        },
+        {"path": "orbit360-platform/modules/conciliaciones.js", "gitBlobSha": "9b9e7cb1ef049b84ff2b4ac01edcf945edd8544c"}
+      ],
+      "tests": [
+        {"path": "tools/gravicentra-i6-6-conciliaciones-protected-bridge.test.cjs", "gitBlobSha": "f4d439f4b03865a51e48bfd2442bd03e6d6499d8"}
+      ]
     }
   ]
 }

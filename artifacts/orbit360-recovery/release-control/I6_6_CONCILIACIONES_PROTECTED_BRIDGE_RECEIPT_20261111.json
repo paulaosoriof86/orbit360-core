@@ -1,0 +1,20 @@
+{
+  "schema": "GRAVICENTRA_I6_6_CONCILIACIONES_PROTECTED_BRIDGE_RECEIPT_V1",
+  "gate": "I6.6",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "approvedByDirection": true,
+  "directionSource": "Paula, 2026-11-11: Conciliaciones no muestra registros; mantener buscador superior y rendimiento, corregir transversalmente sin interferir con actualización de cartera.",
+  "sourceCommit": "30406dc6cc23684f8d97e6f25ff36dd6a7e0186d",
+  "scope": "Route-demand of conciliaciones and conciliacionesPrimas; backend signed role/tenant/country/verified-parent reads; authenticated read-only provider and explicit unavailable/denied/pending states; no payment application.",
+  "evidence": [
+    "tools/gravicentra-i66-conciliaciones-protected-bridge.test.cjs",
+    "tools/gravicentra-b4-003-scoped-related-reader.test.cjs"
+  ],
+  "roleRule": "AdminTenant, Dirección and Finanzas retain existing signed financing access; Asesor and Operativo remain denied absent a separately approved role entitlement.",
+  "sourceDataWrites": 0,
+  "releaseStatus": "SOURCE_AND_SYNTHETIC_QA_ONLY_PREVIEW_AND_LIVE_PENDING",
+  "functionDeployStatus": "NOT_DEPLOYED",
+  "productionAcceptance": false,
+  "note": "A missing or rejected protected source read is not proof that the Firestore collections contain zero records."
+}
