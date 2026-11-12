@@ -19,13 +19,13 @@ jobs:
     timeout-minutes: 35
     env:
       PROJECT_ID: ays-orbit-360-lab
-      SOURCE_SHA: 2e6bdd4a43ad82eb3d212ff67adcb8fa96ec4b9b
-      ARTIFACT_RUN: '42954455520'
-      ARTIFACT_ID: '13825379034'
-      ARTIFACT_DIGEST: sha256:849fb658d9bd05549e9d5fb320d9d0d47aeb18bc623817e1fe58b67a08f63e28
-      QA_RUN: '42954455398'
-      CONTROL_RUN: '42954455399'
-      PREVIEW_URL: https://ays-orbit-360-lab--gi-i66-rc-42954455520-63ig5nhn.web.app
+      SOURCE_SHA: c6ee2b2edc5788a1172593507ebc70f493fb0dc1
+      ARTIFACT_RUN: '43127221729'
+      ARTIFACT_ID: '13902129993'
+      ARTIFACT_DIGEST: sha256:1313e0a85a733f2e2bac93ca7d3233856b5c91ff5201aa2f9300404ac0d4c444
+      QA_RUN: '43127221947'
+      CONTROL_RUN: '43127221993'
+      PREVIEW_URL: https://ays-orbit-360-lab--gi-i66-rc-43127221729-3b9iozx9.web.app
       SA_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
       SA_ALT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
       SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
@@ -70,8 +70,8 @@ jobs:
           NODE
       - uses: actions/download-artifact@v4
         with:
-          artifact-ids: 13825379034
-          run-id: 42954455520
+          artifact-ids: 13902129993
+          run-id: 43127221729
           github-token: ${{ github.token }}
           path: ${{ runner.temp }}/payment-packet-download
       - name: Verify one original immutable TAR, backend source and published Hosting Preview marker
