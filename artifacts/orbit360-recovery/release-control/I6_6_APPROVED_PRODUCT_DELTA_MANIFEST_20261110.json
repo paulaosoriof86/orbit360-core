@@ -909,8 +909,7 @@
           "gitBlobSha": "1e9ef38bfaf6a6d200ec58672216124284be098b"
         }
       ]
-    }
-    ,
+    },
     {
       "id": "I6_6_GLOBAL_TOPBAR_ENTER_NAVIGATION_AND_VISIBLE_DEDUP_P0",
       "approvedByDirection": true,
@@ -1185,6 +1184,21 @@
       ],
       "tests": [
         {"path":"tools/gravicentra-i6-6-carlos-ops-tasks-transversal.test.cjs","gitBlobSha":"8514a2c3593a59c0c4534d1312f1476524888efa"}
+      ]
+    },
+    {
+      "id": "I6_6_CARLOS_PREVIEW_SYNTHETIC_WRITE_TRANSPORT_PARITY_P0",
+      "approvedByDirection": true,
+      "receipt": "artifacts/orbit360-recovery/release-control/I6_6_CARLOS_PREVIEW_UAT_SYNTHETIC_ONLY_20261112.json",
+      "sourceStatus": "SYNTHETIC_TRANSPORT_UNIT_16_PASS_PENDING_IMMUTABLE_PREVIEW_SIGNED_UAT",
+      "capabilityOwners": ["PRODUCT_RUNTIME_PROVIDER", "OPS_LEADS_SERVER_WRITER"],
+      "scope": "Same I6.6 candidate and Firebase. Enable only b4003qa and b3004qa synthetic operations in I6.6 Hosting Preview, deny all real IDs and live-callable routing. Server Preview enforces synthetic Ops/Leads IDs, no real client/policy links, and no policy emission. LIVE source permissions unchanged. Rebuild exact successor once from new source, certify and promote only after signed UAT and readback.",
+      "paths": [
+        {"path":"orbit360-platform/core/product-runtime-browser-providers-p0.js","gitBlobSha":"debea657f837464d57c326ebd9e9043b2b085156","replaces":{"path":"orbit360-platform/core/product-runtime-browser-providers-p0.js","priorGitBlobSha":"76555ee036149eb7eb003b528f54d996a75c00eb","priorChangeId":"I6_6_CONCILIACIONES_PROTECTED_SCOPED_READ_BRIDGE_P0"}},
+        {"path":"functions/product-ops-leads-domain.js","gitBlobSha":"43a87e86d7e0a7ffb71227c687d1acca512a217d","replaces":{"path":"functions/product-ops-leads-domain.js","priorGitBlobSha":"93cd0a64f64de01c1b6d73804f2247c4ae62ee50","priorChangeId":"I6_6_CARLOS_TRANSVERSAL_OPS_TASKS_ROLE_WRITE_PARITY_P0"}}
+      ],
+      "tests": [
+        {"path":"tools/gravicentra-i6-6-carlos-preview-synthetic-write-gate.test.cjs","gitBlobSha":"305703b6f82b1b99e23aa141ba99198598a1e4e5"}
       ]
     }
   ]

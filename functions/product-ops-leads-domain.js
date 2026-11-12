@@ -296,6 +296,18 @@ async function validateEndorsementMutation(tx,{tenantId,authz,operation,entityId
 }
 
 async function execute(request,previewOnly=false){const d=request.data||{},operation=norm(d.operation);if(!OPERATIONS.has(operation))throw new HttpsError('invalid-argument','Operación no soportada.');const authz=await authorize(request,operation),cfg=await config(authz.tenantId),motivo=reason(d);let payload=d.payload&&typeof d.payload==='object'?d.payload:{};const isBusiness=operation.includes('business'),entityType=isBusiness?'negocios':'gestiones';let entityId=text(d.entityId||payload.id,180),prepared=null;
+// The Preview endpoint shares the Firebase tenant but must never create a
+// business-looking record, link a real client/policy, or emit a real policy.
+// In LIVE this entire guard is inactive: signed operators retain normal CRUD.
+if(previewOnly){
+ if(authz.tenantId!=='alianzas-soluciones'||!/^b4003qa_[A-Za-z0-9._:-]+$/.test(entityId)||
+    (payload.id&&text(payload.id,180)!==entityId))
+   throw new HttpsError('permission-denied','PREVIEW_SYNTHETIC_ENTITY_ID_REQUIRED');
+ if(['clienteId','polizaId','vehiculoId','negocioId','clientId','policyId','businessId','sourcePolicyId'].some(k=>text(payload[k],180)))
+   throw new HttpsError('permission-denied','PREVIEW_REAL_RELATION_DENIED');
+ if(operation==='transition_business'&&norm(payload.to||payload.etapa||payload.stage)==='emitido')
+   throw new HttpsError('permission-denied','PREVIEW_POLICY_EMISSION_DENIED');
+}
 const metaQaId='b4003qa_meta_tr_v27_20261025_01';
 if(entityId===metaQaId||text(payload.id,180)===metaQaId){
  if(previewOnly!==true||authz.tenantId!=='alianzas-soluciones'||entityId!==metaQaId||(payload.id&&text(payload.id,180)!==metaQaId))throw new HttpsError('permission-denied','META_TR_QA_PREVIEW_ONLY: ID y tenant deben coincidir en la función Preview.');

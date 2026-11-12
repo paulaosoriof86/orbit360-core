@@ -1,0 +1,33 @@
+{
+  "schema": "GRAVICENTRA_I6_6_CARLOS_PREVIEW_SYNTHETIC_WRITE_PARITY_V1",
+  "dateGuatemala": "2026-11-12",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "gate": "I6.6",
+  "lastClosedGate": "B4-007",
+  "authority": "Dirección exige escritura transversal efectiva de Carlos en sus módulos, prueba controlada y publicación de cada bloque probado a LIVE sin acumulación.",
+  "diagnosis": {
+    "finding": "The exact I6.6 Preview browser provider rejected every operational callable, despite product UI exposing a protected synthetic task workflow and three Preview callable deployments succeeding.",
+    "cause": "i66ReadOnlyCallableError allowlist contained scoped readers only; it blocked synthetic-only Ops/Leads and product operational commands before Firebase Functions could validate a signed actor.",
+    "resolutionInSameGate": "Permit only existing us-east1 Preview function names, the existing tenant, synthetic b4003qa/b3004qa IDs and synthetic record flags. Enforce separate server-side synthetic Ops/Leads ID guard; deny links to real client/policy/business and policy emission from Preview.",
+    "serverPreviewFunctionsDeployedBeforeSuccessor": ["orbit360OpsLeadsCommandPreview", "orbit360ProductOperationalCommandPreview", "orbit360ScopedPolicyReadPreview"],
+    "backendPreviewDeployRun": 43297485061,
+    "backendPreviewDeployResult": "SUCCESS_ORIGINAL_IMMUTABLE_0a541",
+    "test": "tools/gravicentra-i6-6-carlos-preview-synthetic-write-gate.test.cjs",
+    "testStatus": "SOURCE_UNIT_16_PASS_NEW_SOURCE_NOT_YET_PUBLISHED"
+  },
+  "forbidden": ["Real customer or financial Firestore writes before signed UAT", "LIVE deployment before exact successor preview/readback/QA", "Firestore Rules/Auth/IAM mutation", "New Firebase or branch", "Blind promotion of previous artifact", "Legal-consent bypass or impersonated acceptance"],
+  "frozenBlocks": [
+    {"id":"CARLOS_SEVEN_FUNCTIONAL_UAT","done":2,"total":7,"percent":29,"status":"SIGNED_PREFLIGHT_PASS_WRITE_AND_RELOAD_HOLD"},
+    {"id":"CONCILIACIONES_PROTECTED_READER","done":6,"total":6,"percent":100,"status":"PREVIEW_READ_ONLY_PARITY_PASS_BACKEND_LIVE_PARITY_HOLD"},
+    {"id":"CARTERA_SEVEN_UPDATE_BATCHES","done":0,"total":7,"percent":0,"status":"NO_NEW_RECONCILIATION_DATA_WRITES"},
+    {"id":"ASEGURADORAS_FIVE_SIGNED_FUNCTIONS","done":2,"total":5,"percent":40,"status":"SIGNED_PREVIEW_CONTROLS_PASS_REAL_SAVE_HOLD"},
+    {"id":"CURRENT_IMMUTABLE_PREVIEW_HOSTING","done":1,"total":1,"percent":100,"status":"ORIGINAL_0a541_PREVIEW_PASS_SUCCESSOR_REBUILD_REQUIRED"},
+    {"id":"PREVIEW_BACKEND_THREE_TARGETS","done":3,"total":3,"percent":100,"status":"DEPLOY_READBACK_PASS_43297485061_PRIOR_SOURCE"},
+    {"id":"NEXT_LIVE_PROMOTION","done":0,"total":1,"percent":0,"status":"HOLD_PENDING_SIGNED_FUNCTIONAL_UAT"}
+  ],
+  "nextExactAction": "Package the changed product source exactly once on canonical recovery with preview build/run source digest, republish the same candidate to its new immutable Preview channel, redeploy only the three existing synthetic-guarded Preview functions from that artifact, and run signed Carlos + Paula UAT with before/after synthetic restore. Only after acceptance promote exact tested bytes to LIVE.",
+  "productLiveStatus": "UNCHANGED_PRIOR_RELEASE",
+  "previewSignedWritesStatus": "PENDING_NEW_IMMUTABLE_SOURCE",
+  "customerDataWritesThisReceipt": 0
+}

@@ -10,8 +10,9 @@
   window.Orbit = window.Orbit || {};
   var modulesPromise=null, contextPromise=null;
   function config(){return window.__ORBIT360_PRODUCT_PUBLIC_CONFIG__||{};}
-  // I6.6 Preview is a read-only verification surface, even after staff login.
-  // This transport guard prevents any operational callable from this channel.
+  // I6.6 Preview exposes read-only business data and permits only bounded,
+  // namespaced synthetic UAT writes through existing Preview callables.
+  // Real customer/policy/collection writes from this channel remain denied.
   function isI66PreviewHost(){
     var host=String(window.location&&window.location.hostname||'').toLowerCase();
     return /^ays-orbit-360-lab--gi-i66-rc-[a-z0-9-]+\.web\.app$/.test(host);
@@ -24,8 +25,25 @@
   });
   function i66ReadOnlyCallableError(name,data,region){
     if(!isI66PreviewHost())return '';
-    if(I66_READ_ONLY_CALLABLES[name]!==true)return 'I66_PREVIEW_MUTATION_CALLABLE_DENIED';
     if(region!=='us-east1')return 'I66_PREVIEW_REGION_DENIED';
+    if(name==='orbit360OpsLeadsCommandPreview'){
+      var action=String(data&&data.operation||'');
+      var entityId=String(data&&(data.entityId||data.payload&&data.payload.id)||'');
+      if(!/^(create_management|update_management|assign_management|resolve_management|reopen_management|archive_management|create_business|update_business|transition_business|archive_business)$/.test(action)||
+         !/^b4003qa_[a-z0-9._:-]+$/i.test(entityId)||
+         String(data&&data.tenantId||'')!=='alianzas-soluciones'||
+         !data||!data.payload||typeof data.payload!=='object')return 'I66_PREVIEW_MUTATION_CALLABLE_DENIED';
+      return '';
+    }
+    if(name==='orbit360ProductOperationalCommandPreview'){
+      var mutations=data&&data.mutations;
+      if(String(data&&data.tenantId||'')!=='alianzas-soluciones'||!Array.isArray(mutations)||mutations.length<1||mutations.length>8||
+         mutations.some(function(m){return !m||!['insert','update','remove'].includes(String(m.action||''))||
+           !/(?:^|_)(?:b3004qa|b4003qa)_[a-z0-9._:-]+$/i.test(String(m.id||''))||
+           (m.action!=='remove'&&(!m.payload||m.payload.__syntheticQa!==true));}))return 'I66_PREVIEW_MUTATION_CALLABLE_DENIED';
+      return '';
+    }
+    if(I66_READ_ONLY_CALLABLES[name]!==true)return 'I66_PREVIEW_MUTATION_CALLABLE_DENIED';
     if(name==='orbit360TenantDomainConfigPreview'&&(!data||data.action!=='get'))
       return 'I66_PREVIEW_DOMAIN_CONFIG_WRITE_DENIED';
     if(name==='orbit360ScopedPolicyReadPreview'&&(!data||!['list','bootstrap-membership','bootstrap-tenant-config'].includes(String(data.mode||''))))

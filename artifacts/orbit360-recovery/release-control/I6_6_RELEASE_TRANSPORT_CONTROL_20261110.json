@@ -4,8 +4,8 @@
   "productBrand": "Gravicentra Insurance",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
-  "status": "CARLOS_TRANSVERSAL_FUNCTIONS_PREVIEW_AUTHORIZED",
-  "scope": "I6_6_CARLOS_OPERATIVO_CROSS_MODULE_EXACT_IMMUTABLE_FUNCTIONS_PREVIEW_ONLY; HOSTING_PREVIEW_43293845272_READBACK_PASS; LIVE_HOSTING_AND_BACKEND_UNCHANGED; HISTORIC_B4_007_CLOSED",
+  "status": "PREVIEW_BUILD_REQUESTED",
+  "scope": "I6_6_CARLOS_OPERATIVO_SYNTHETIC_WRITE_TRANSPORT_GUARD_SOURCE_SUCCESSOR; BACKEND_PREVIEW_43297485061_PASS_ORIGINAL_ARTIFACT; NEW_EXACT_HOSTING_PREVIEW_BUILD_REQUESTED; LIVE_UNCHANGED; HISTORIC_B4_007_CLOSED",
   "historicalClosedGate": "B4-007",
   "approvedProductDeltaManifest": "artifacts/orbit360-recovery/release-control/I6_6_APPROVED_PRODUCT_DELTA_MANIFEST_20261110.json",
   "ownerAuthority": "Paula Osorio Dirección: 2026-11-12 autorizó explícitamente completar la escritura transversal de Carlos en Ops, Leads, renovaciones, pólizas y cobros, mantener operación mientras se actualiza y publicar cada bloque probado sin acumulación. La presente autorización despliega solamente los tres callables existentes de Preview desde el mismo paquete inmutable; NO autoriza todavía escrituras reales de clientes, actualización de Rules/Auth, funciones LIVE ni promoción LIVE sin UAT firmado y rollback. Se preservan las aprobaciones y límites históricos de cobros y lector de Conciliaciones.",
@@ -42,7 +42,20 @@
     "allowHostingLivePromotion": false,
     "allowBackendLivePromotion": false,
     "signedCarlosDurableReadbackAndRestore": "HOLD",
-    "exactBackendPreviewDeployment": "PENDING"
+    "exactBackendPreviewDeployment": "PASS_RUN_43297485061_THREE_PREVIEW_FUNCTIONS_READBACK_PRIOR_SOURCE"
+  },
+  "carlosSyntheticPreviewWriteSuccessor20261112": {
+    "receipt": "artifacts/orbit360-recovery/release-control/I6_6_CARLOS_PREVIEW_UAT_SYNTHETIC_ONLY_20261112.json",
+    "status": "NEW_SOURCE_BUILD_PENDING",
+    "reason": "The exact prior I6.6 Hosting Preview product guard denied all protected writes; signed write UAT could not run despite Preview backend PASS.",
+    "allowedMode": "SYNTHETIC_B4003QA_AND_B3004QA_ONLY_US_EAST1_PREVIEW",
+    "newProductPaths": ["orbit360-platform/core/product-runtime-browser-providers-p0.js", "functions/product-ops-leads-domain.js"],
+    "newTest": "tools/gravicentra-i6-6-carlos-preview-synthetic-write-gate.test.cjs",
+    "testStatus": "SOURCE_UNIT_PASS_REAL_SIGNED_UAT_HOLD",
+    "reusePriorImmutableBundle": false,
+    "rebuildNewSourceOnce": true,
+    "customerDataWritesAuthorized": false,
+    "liveDeploymentAuthorized": false
   },
   "nextCandidateRequest20261112": {
     "status": "EXACT_FRONTEND_LIVE_PUBLISHED_SIGNED_CROSS_ROUTE_PASS_FINANCIAL_BACKEND_HOLD",
@@ -99,7 +112,7 @@
   "requiredCanonicalOrigin": "https://ays-orbit-360-lab.web.app",
   "requiredStaffOrigin": "https://app.aysseguros.com",
   "originReadbackRequirement": "BOTH_HOSTS_IDENTICAL_TO_SAME_ARTIFACT_OR_ROLLBACK",
-  "forbidBackendFunctionDeploy": false,
+  "forbidBackendFunctionDeploy": true,
   "forbidFirestoreRulesDataAuthWrites": true,
   "rollback": "FRONTEND_TOPBAR_PREVIEW_FIRST; KEEP BOTH LIVE HOSTING ORIGINS AND COBROS FUNCTION UNCHANGED UNTIL EXACT_ARTIFACT_PREVIEW_PASS; THEN BACKUP_AND_ATOMIC_EXACT_ARTIFACT_LIVE_PROMOTION_WITH_REHASH_AND_ROLLBACK",
   "immutableArtifactId": 13977703391,
