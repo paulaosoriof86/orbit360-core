@@ -970,6 +970,31 @@
           }
         }
       ]
+    },
+    {
+      "id": "I6_6_GLOBAL_TOPBAR_CROSSMODULE_PROTECTED_HYDRATION_P0",
+      "approvedByDirection": true,
+      "receipt": "artifacts/orbit360-recovery/release-control/I6_6_GLOBAL_TOPBAR_CROSSMODULE_HYDRATION_20261111.json",
+      "sourceStatus": "SOURCE_UNIT_PASS_PREVIEW_AND_LIVE_PENDING",
+      "capabilityOwners": ["GLOBAL_SHELL_SEARCH", "ROLE_SCOPE_RUNTIME", "STARTUP_PERFORMANCE"],
+      "scope": "A cross-module topbar search must request missing approved sources only after user input, once per role and country, and refresh when an authorized snapshot arrives; it must not show false empty results on Cobros or leak an insurer to a disallowed role.",
+      "paths": [
+        {
+          "path": "orbit360-platform/core/router.js",
+          "gitBlobSha": "2adf80dc1d251eb283f60e9ee8d871e50db22b2d",
+          "replaces": {
+            "path": "orbit360-platform/core/router.js",
+            "priorGitBlobSha": "c54b221a258ccb4de5b959afe9b3274caf6d3fb7",
+            "priorChangeId": "I6_6_GLOBAL_TOPBAR_ENTER_NAVIGATION_AND_VISIBLE_DEDUP_P0"
+          }
+        }
+      ],
+      "tests": [
+        {
+          "path": "tools/gravicentra-i6-6-topbar-crossmodule-hydration.test.cjs",
+          "gitBlobSha": "8df6b8d909b72d588d029d6afdfafbc7a0a68e8c"
+        }
+      ]
     }
   ]
 }

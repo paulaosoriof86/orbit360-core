@@ -105,17 +105,58 @@ Orbit.router = (function () {
     let dd = document.getElementById('tb-search-dd');
     if (!dd) { dd = document.createElement('div'); dd.id = 'tb-search-dd'; dd.className = 'tb-search-dd'; box.appendChild(dd); }
     const U = Orbit.ui;
-    const scopedSearchStore = () => Orbit.access && typeof Orbit.access.scopedStore === 'function'
-      ? Orbit.access.scopedStore(current || 'inicio') : Orbit.store;
+    // Topbar is cross-module. A search made while Cobros is open cannot use
+    // Cobros' module facade for every other collection: each destination must
+    // be resolved through its own authorized scope. Never read a raw,
+    // unscoped collection to compensate for missing hydration.
+    const SEARCH_OWNERS = { clientes:'cliente360', polizas:'polizas',
+      vehiculos:'polizas', cobros:'cobros', aseguradoras:'aseguradoras' };
+    const SEARCH_COLLECTIONS = Object.keys(SEARCH_OWNERS);
+    function allowedSearchCollections() {
+      return SEARCH_COLLECTIONS.filter(name => {
+        try { return !Orbit.access || typeof Orbit.access.can !== 'function' ||
+          Orbit.access.can(SEARCH_OWNERS[name], 'view'); }
+        catch (_) { return false; }
+      });
+    }
+    function searchRows(name) {
+      if (!allowedSearchCollections().includes(name)) return [];
+      const S = Orbit.access && typeof Orbit.access.scopedStore === 'function'
+        ? Orbit.access.scopedStore(SEARCH_OWNERS[name]) : Orbit.store;
+      return S && typeof S.all === 'function' ? S.all(name) || [] : [];
+    }
     // Accent folding belongs to BOTH the indexed text and the typed query;
     // it is a search-only projection and never changes client identities.
     const normalized = v => String(v == null ? '' : v).toLowerCase()
       .normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-    let cached = null, pending = null;
+    let cached = null, pending = null, hydrationRequestedFor = '';
     function cacheKey() {
       const member = Orbit.auth && Orbit.auth.productUser || {};
       let role = ''; try { role = Orbit.session && Orbit.session.rol ? Orbit.session.rol() : ''; } catch (_) {}
       return [current || 'inicio', Orbit.pais || '', role, member.uid || '', member.tenantId || ''].join('|');
+    }
+    function hydrationKey() { return cacheKey().split('|').slice(1).join('|'); }
+    function searchReadiness() {
+      const S = Orbit.store;
+      if (!S || typeof S._productStatus !== 'function') return [];
+      let state; try { state = S._productStatus(); } catch (_) { return []; }
+      const ready = new Set(state.serverConfirmedCollections || []);
+      const denied = new Set(state.deniedCollections || []);
+      const errors = state.snapshotErrors || {};
+      return allowedSearchCollections().filter(name =>
+        !ready.has(name) && !denied.has(name) && !errors[name]);
+    }
+    function ensureSearchSources() {
+      const S = Orbit.store;
+      if (!S || typeof S._ensureCollections !== 'function') return;
+      // Demand-driven, once per role/country/member epoch. Calling ensure on
+      // every keystroke keeps extending the protected store's 2.5s deferred
+      // pause and makes a previously responsive search appear permanently empty.
+      const key = hydrationKey();
+      if (hydrationRequestedFor === key) return;
+      hydrationRequestedFor = key;
+      const missing = searchReadiness();
+      if (missing.length) S._ensureCollections(missing);
     }
     // An indexed, scoped snapshot is rebuilt only when the tenant/role/country,
     // route or source changes. S.all('vehiculos') inside EACH policy used to
@@ -123,10 +164,10 @@ Orbit.router = (function () {
     function searchIndex() {
       const key = cacheKey();
       if (cached && cached.key === key) return cached.rows;
-      const S = scopedSearchStore(), rows = [];
-      const clients = S.all('clientes') || [], policies = S.all('polizas') || [];
-      const vehicles = S.all('vehiculos') || [], charges = S.all('cobros') || [];
-      const insurers = S.all('aseguradoras') || [], clientsById = new Map(), vehiclesByPolicy = new Map();
+      const rows = [];
+      const clients = searchRows('clientes'), policies = searchRows('polizas');
+      const vehicles = searchRows('vehiculos'), charges = searchRows('cobros');
+      const insurers = searchRows('aseguradoras'), clientsById = new Map(), vehiclesByPolicy = new Map();
       function add(ic, title, subtitle, route, query) {
         rows.push({ ic, t: title, s: subtitle, go: route, query: normalized(query) });
       }
@@ -175,6 +216,7 @@ Orbit.router = (function () {
     function buscar(query) {
       const term = normalized(query.trim());
       if (term.length < 2) { dd.classList.remove('open'); dd.innerHTML = ''; return; }
+      ensureSearchSources();
       const top = [], seen = new Set(); let total = 0;
       searchIndex().forEach(row => {
         if (!row.query.includes(term)) return;
@@ -190,7 +232,9 @@ Orbit.router = (function () {
       dd.innerHTML = top.length
         ? top.map(r => `<button class="tb-sr" data-go="${U.esc(r.go)}"><span>${r.ic}</span><span class="tb-sr-t">${U.esc(r.t)}<small>${U.esc(r.s)}</small></span></button>`).join('') +
           (total > 12 ? `<div class="tb-sr-more">+${total - 12} más…</div>` : '')
-        : '<div class="tb-sr-empty">Sin resultados para "' + U.esc(query) + '"</div>';
+        : searchReadiness().length
+          ? '<div class="tb-sr-empty" role="status">Buscando resultados autorizados…</div>'
+          : '<div class="tb-sr-empty">Sin resultados para "' + U.esc(query) + '"</div>';
       dd.classList.add('open');
       dd.querySelectorAll('[data-go]').forEach(b => b.addEventListener('mousedown', e => {
         e.preventDefault(); location.hash = b.dataset.go; dd.classList.remove('open'); inp.value = '';
@@ -205,6 +249,8 @@ Orbit.router = (function () {
       const collection = event && event.detail && event.detail.collection;
       if (collection && collection !== '*' && !indexedCollections.has(collection)) return;
       cached = null;
+      if (collection === '*') hydrationRequestedFor = '';
+      if (inp.value.trim().length >= 2) schedule();
     };
     document.addEventListener('orbit:store', invalidate);
     // Product authoritative snapshots notify on WINDOW, not document.

@@ -1,0 +1,35 @@
+{
+  "schema": "GI_I66_GLOBAL_TOPBAR_CROSSMODULE_HYDRATION_OWNER_V1",
+  "dateGuatemala": "2026-11-11",
+  "gate": "I6.6",
+  "historicalClosedGate": "B4-007",
+  "branch": "recovery/fase-a-clean-20260831",
+  "status": "SOURCE_UNIT_PASS_PREVIEW_AND_LIVE_PENDING",
+  "authority": "Dirección solicita reparar buscador superior de forma transversal, publicando con comprobación de las mismas fuentes sin recrear candidata.",
+  "liveObservation": {
+    "origin": "https://app.aysseguros.com",
+    "route": "#/cobros",
+    "text": "MAPFRE",
+    "roleViews": ["Operativo", "Dirección"],
+    "result": "Sin resultados para MAPFRE, aun siendo aseguradora visible y buscable anteriormente desde Inicio/Aseguradoras",
+    "authenticRoleIdentity": "Paula Osorio con selector Ver como; no representa autenticación independiente de Carlos",
+    "noCustomerWrites": true
+  },
+  "rootCause": "El buscador usa solo el caché hidratado de la ruta actual. Cobros no asegura la colección aseguradoras; un cambio de rol vacía cachés opcionales. La ausencia temporal se interpretaba como cero coincidencias y la entrada no solicitaba hidratación autorizada.",
+  "sourceFix": {
+    "file": "orbit360-platform/core/router.js",
+    "moduleScope": "Por destino autorizado, sin lectura global o bypass de permisos",
+    "hydration": "A demanda y una vez por rol/pais/miembro, sin bloquear startup ni prolongar 2.5s en cada tecla",
+    "feedback": "Buscando resultados autorizados mientras hay colecciones pendientes; reindexado y sugerencias al recibir snapshot firmado",
+    "navigation": "Preserva Enter, Escape, deduplicación, identidad de cliente y país"
+  },
+  "localTests": [
+    "tools/gravicentra-i6-6-topbar-crossmodule-hydration.test.cjs",
+    "tools/gravicentra-i6-6-global-search-policy-context-and-scoped-fallback.test.cjs"
+  ],
+  "localTestResult": "BOTH_PASS",
+  "preview": "PENDING_EXACT_IMMUTABLE_PACKAGE_AND_SCOPED_PROTECTED_ROLE_READBACK",
+  "live": "NOT_DEPLOYED_NOT_CERTIFIED",
+  "permissionsAndData": "NO_RULES_AUTH_FIRESTORE_OR_CUSTOMER_RECORD_MUTATION",
+  "unrelatedFunctionRelease": "Cobros reconciler c6ee2b2e and function revision 00006-viw remain LIVE and are not redeployed by this frontend fix"
+}

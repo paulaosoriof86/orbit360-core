@@ -1596,5 +1596,19 @@
       "Transversal module-role-country performance and UI certification still open"
     ],
     "nextAction": "I6_6_PAYMENT_APPLICATION_CARLOS_UAT_AND_A5_A7_SAFE_EXACT_MATCH_NEVER_BLIND_BULK_IMPORT"
+  },
+  "i66TopbarCrossModuleHydrationRegression20261111": {
+    "status": "SOURCE_UNIT_PASS_IMMUTABLE_BUILD_REQUESTED_PREVIEW_AND_LIVE_PENDING",
+    "previousTopbarFocalLivePassPreserved": true,
+    "newFinding": "Chrome Paula Operativo and Direccion on #/cobros returned Sin resultados to MAPFRE; previous Inicio Enter success is insufficient for full route-role search certification",
+    "rootCause": "Global search relies on current route's hydrated collection cache; insurer collection may be missing after Cobros navigation and protected role cache invalidation",
+    "fixedSource": "orbit360-platform/core/router.js",
+    "newRegressionTest": "tools/gravicentra-i6-6-topbar-crossmodule-hydration.test.cjs",
+    "sourceUnitPass": true,
+    "sameCanonicalBranch": "recovery/fase-a-clean-20260831",
+    "liveFrontendChangedByThisBlock": false,
+    "cobrosLiveFunctionPreserved": "orbit360cobrosreconciliationcommand-00006-viw",
+    "financialRecordWrites": 0,
+    "nextAction": "immutable_build_then_scoped_preview_readback_then_exact_artifact_LIVE_if_pass; continue_Carlos_UAT_and_A5_A7_reconciliation_in_parallel"
   }
 }
