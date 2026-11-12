@@ -1562,5 +1562,39 @@
     "planillaStatementInferenceWrites": 0,
     "renewalRoleModalitiesDecisionFrozenButNotImplemented": true,
     "nextAction": "I6_6_COBROS_EXISTING_PAID_RECEIPT_WITHOUT_LINKED_COBRO_REPRODUCE_WITH_SYNTHETIC_EMULATOR_AND_VERIFY_CARLOS_ROOT_CAUSE; THEN_APPROVED_FINANCIAL_A5_A7_MATCH_READONLY_BEFORE_ANY_WRITE"
+  },
+  "i66CobrosPaidLegacyExactBackendLive20261111": {
+    "status": "EXACT_BACKEND_LIVE_FUNCTION_PASS_USER_PAYMENT_UAT_AND_LEDGER_UPDATES_PENDING",
+    "lastClosedReleaseGate": "B4-007",
+    "activeOperationalGate": "I6.6",
+    "sameCanonicalBranch": "recovery/fase-a-clean-20260831",
+    "backendSourceSha": "c6ee2b2edc5788a1172593507ebc70f493fb0dc1",
+    "sourceUnitAndEmulatorRunId": 43127221947,
+    "emulatorChecks": 122,
+    "controlGuardRunId": 43127221993,
+    "immutableBuildRunId": 43127221729,
+    "immutableArtifactId": 13902129993,
+    "artifactDigest": "sha256:1313e0a85a733f2e2bac93ca7d3233856b5c91ff5201aa2f9300404ac0d4c444",
+    "isolatedPreviewCallableRunId": 43127910914,
+    "firstLiveAttemptRunId": 43128327783,
+    "firstLiveAttempt": "FAIL_CLOUD_RUN_LATEST_READY_STALE_AFTER_NEW_REVISION_CREATED_00005; ROLLBACK_PREVIOUS_00003_100_PERCENT_PASS",
+    "fixedReleaseMechanism": "Select exact Cloud Function new revision, verify matching Cloud Run latestCreated and poll new revision Ready before traffic; retain rollback",
+    "certifiedLiveTargetedFunctionRunId": 43129008894,
+    "liveBackendRevision": "orbit360cobrosreconciliationcommand-00006-viw",
+    "liveTraffic": "100_PERCENT_READY_PASS",
+    "unauthenticatedEndpoint": "401_PASS",
+    "bothLiveHostingOriginsChanged": false,
+    "liveCustomerRecordWritesDuringDeploy": 0,
+    "carlosSpecificErrorCause": "UNCONFIRMED_USER_RECEIPT_REQUEST_ID_NOT_YET_READ",
+    "carlosAuthenticatedPaymentApplicationUat": "PENDING_NOT_CERTIFIED",
+    "financialInferenceA1ToA4Status": "READONLY_RUN_43120427641_20_OF_20_PASS_NO_UNIQUE_PAID_RECEIPT_MATCH_NO_WRITES",
+    "sourceMapfreNovemberCrosscheck": "THREE_UNIQUE_PAID_REQUIREMENTS_GTQ_3004_55_RECONCILE_WITH_PENDING_REPORT_DROP; DUPLICATE_INVALID_ACCOUNTING_ROW_EXCLUDED; NO_LIVE_WRITE",
+    "remaining": [
+      "Carlos exact receipt authenticated preimage/save/reload/permission readback, no duplicate payment",
+      "A5-A7 safe policy-edition+insurer-requirement+due-date crosswalk and proposed minimal writes",
+      "Renewals direct vs management role-modalities same module/Cliente360/OPS decision still unimplemented",
+      "Transversal module-role-country performance and UI certification still open"
+    ],
+    "nextAction": "I6_6_PAYMENT_APPLICATION_CARLOS_UAT_AND_A5_A7_SAFE_EXACT_MATCH_NEVER_BLIND_BULK_IMPORT"
   }
 }

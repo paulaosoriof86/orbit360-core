@@ -1,6 +1,6 @@
 {
   "schema": "GRAVICENTRA_I6_6_COBROS_PAID_RECEIPT_APPLICATION_RECONCILIATION_V1",
-  "status": "SOURCE_CORRECTED_EMULATOR_QA_AND_LIVE_BACKEND_VALIDATION_PENDING",
+  "status": "SOURCE_EMULATOR_AND_EXACT_BACKEND_LIVE_RELEASE_PASS_CARLOS_AUTHENTICATED_UAT_PENDING",
   "approvedByDirection": true,
   "dateGuatemala": "2026-11-11",
   "lastClosedReleaseGate": "B4-007",
@@ -26,8 +26,18 @@
     "preexisting_inference_provenance_preserved",
     "receipt_paid_but_linked_cobro_pending_state_conflict_denied"
   ],
-  "productionBackendDeployed": false,
+  "productionBackendDeployed": true,
+  "sourceSha": "c6ee2b2edc5788a1172593507ebc70f493fb0dc1",
+  "emulatorRunId": 43127221947,
+  "emulatorChecksPassed": 122,
+  "immutableArtifactId": 13902129993,
+  "previewFunctionRunId": 43127910914,
+  "liveFunctionRunId": 43129008894,
+  "liveFunctionRevision": "orbit360cobrosreconciliationcommand-00006-viw",
+  "liveTraffic": "100_PERCENT_VERIFIED",
+  "unauthenticatedReadback": "401_PASS",
+  "hostingOriginsChanged": false,
   "productionBusinessDataWrites": 0,
   "noVerifiedCarlosReadbackYet": true,
-  "nextAction": "Run synthetics in Firestore emulator without cloud credentials, then review exact signed function deployment gate and LIVE readback before declaring resolved."
+  "nextAction": "Reproduce Carlos's exact payment application with authenticated receipt context and before/after readback; A5-A7 multi-source matching must resolve unique policy edition, due date and insurer requirement before any financial live write. Do not reopen successful emulator, immutable package, Preview or LIVE transport."
 }
