@@ -54,8 +54,10 @@ const denied=async(fn,code)=>{let x;try{await fn()}catch(e){x=e}assert.equal(x&&
  r=await call('asesor');assert.equal(r.actor.activeRole,'asesor');checks++;
  assert.equal(JSON.stringify(r.actor).includes('synthetic-advisor'),true);checks++;
 
- // B4-003 priority preflight: exercise the REAL Preview command handler with
- // a synthetic transactional Firestore double. This does not touch Firebase.
+ // B4-003 priority preflight: exercise the canonical command handler with a
+ // synthetic transactional Firestore double. I6.6 Preview is deliberately
+ // tenant- and ID-bounded; this historical role test does not test that gate.
+ // There are no network, Firebase, or production writes.
  {
   const documents=new Map(),unitTenant='test-tenant',managementId='synthetic-management';
   const memberPath=id=>'tenants/'+unitTenant+'/members/'+id;
@@ -110,7 +112,7 @@ const denied=async(fn,code)=>{let x;try{await fn()}catch(e){x=e}assert.equal(x&&
   };
   vm.runInNewContext(source,{require:stubRequire,exports:sandboxExports,process:{env:{}}},
    {timeout:1000});
-  const call=sandboxExports.orbit360OpsLeadsCommandPreview;
+  const call=sandboxExports.orbit360OpsLeadsCommand;
   const opRequest={auth:{uid:'operator-01',token:{email:'operator@example.invalid'}},
    data:{tenantId:unitTenant,activeRole:'operativo',operation:'assign_management',
     entityId:managementId,requestId:'synthetic-request-001',
