@@ -170,23 +170,54 @@ jobs:
           gcloud functions describe orbit360CobrosReconciliationCommand --gen2 --region us-central1 --project "$PROJECT_ID" --format=json > "$RUNNER_TEMP/payment-live-fn-after.json"
           gcloud run services describe "$SERVICE" --region us-central1 --project "$PROJECT_ID" --format=json > "$RUNNER_TEMP/payment-live-run-after.json"
           NEW_REV=$(node - <<'NODE'
-          const fs=require('node:fs'),a=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/payment-live-run-after.json'));
-          const rev=String(a.status?.latestReadyRevisionName||a.status?.latestCreatedRevisionName||'');
-          if(!rev)throw Error('I66_PAYMENT_NEW_READY_REVISION_UNRESOLVED');
+          const fs=require('node:fs'),r=process.env.RUNNER_TEMP;
+          const f=JSON.parse(fs.readFileSync(r+'/payment-live-fn-after.json'));
+          const a=JSON.parse(fs.readFileSync(r+'/payment-live-run-after.json'));
+          const rev=String(f.serviceConfig?.revision||'');
+          const created=String(a.status?.latestCreatedRevisionName||'');
+          if(!rev||created!==rev)throw Error('I66_PAYMENT_NEW_FUNCTION_REVISION_AND_CREATED_REVISION_MISMATCH');
           process.stdout.write(rev);
           NODE
           )
           test "$NEW_REV" != "$OLD_REV"
+          export NEW_REV
+          # Firebase deploy may finish before Cloud Run's latestReadyRevisionName
+          # catches up. Verify readiness on the immutable NEW revision itself.
+          ready=0
+          for attempt in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15; do
+            if gcloud run revisions describe "$NEW_REV" --region us-central1 --project "$PROJECT_ID" --format=json > "$RUNNER_TEMP/payment-live-new-revision.json" 2>/dev/null && node - <<'NODE'
+          const fs=require('node:fs'),a=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/payment-live-new-revision.json'));
+          const ready=(a.status?.conditions||[]).find(c=>c.type==='Ready');
+          if(ready?.status!=='True')process.exitCode=1;
+          NODE
+            then ready=1;break;fi
+            sleep 2
+          done
+          test "$ready" = 1
+          echo 'I66_PAYMENT_NEW_CLOUD_RUN_REVISION_READY_BEFORE_TRAFFIC_PASS'
           gcloud run services update-traffic "$SERVICE" --region us-central1 --project "$PROJECT_ID" --to-revisions="$NEW_REV=100" --quiet
-          gcloud run services describe "$SERVICE" --region us-central1 --project "$PROJECT_ID" --format=json > "$RUNNER_TEMP/payment-live-run-verified.json"
-          node - <<'NODE'
+          promoted=0
+          for attempt in 1 2 3 4 5 6 7 8 9 10; do
+            gcloud run services describe "$SERVICE" --region us-central1 --project "$PROJECT_ID" --format=json > "$RUNNER_TEMP/payment-live-run-verified.json"
+            if node - <<'NODE'
           const fs=require('node:fs'),a=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/payment-live-run-verified.json'));
-          const f=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/payment-live-fn-after.json'));
           const traffic=(a.status?.traffic||a.traffic||[]).filter(t=>Number(t.percent)>0);
-          const ready=String(a.status?.latestReadyRevisionName||'');
-          if(traffic.length!==1||Number(traffic[0].percent)!==100||String(traffic[0].revisionName||traffic[0].revision)!==ready)throw Error('I66_PAYMENT_FUNCTION_NOT_100_PERCENT_LATEST_READY');
+          if(traffic.length!==1||Number(traffic[0].percent)!==100||String(traffic[0].revisionName||traffic[0].revision)!==process.env.NEW_REV)process.exitCode=1;
+          NODE
+            then promoted=1;break;fi
+            sleep 2
+          done
+          test "$promoted" = 1
+          node - <<'NODE'
+          const fs=require('node:fs'),r=process.env.RUNNER_TEMP,a=JSON.parse(fs.readFileSync(r+'/payment-live-run-verified.json'));
+          const f=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/payment-live-fn-after.json'));
+          const rev=JSON.parse(fs.readFileSync(r+'/payment-live-new-revision.json'));
+          const traffic=(a.status?.traffic||a.traffic||[]).filter(t=>Number(t.percent)>0);
+          if(traffic.length!==1||Number(traffic[0].percent)!==100||String(traffic[0].revisionName||traffic[0].revision)!==process.env.NEW_REV)throw Error('I66_PAYMENT_FUNCTION_NOT_100_PERCENT_EXACT_NEW_REVISION');
+          if(!(rev.status?.conditions||[]).some(c=>c.type==='Ready'&&c.status==='True'))throw Error('I66_PAYMENT_NEW_REVISION_NOT_READY');
+          if(f.serviceConfig?.revision!==process.env.NEW_REV)throw Error('I66_PAYMENT_FUNCTION_CURRENT_REVISION_MISMATCH');
           if(!['ACTIVE','READY'].includes(String(f.state||'').toUpperCase()))throw Error('I66_PAYMENT_FUNCTION_STATE_NOT_ACTIVE');
-          console.log('I66_PAYMENT_LIVE_BACKEND_100_PERCENT_LATEST_READY_PASS');
+          console.log('I66_PAYMENT_LIVE_BACKEND_100_PERCENT_EXACT_READY_REVISION_PASS');
           NODE
           STATUS=$(curl -sS --max-time 25 -o "$RUNNER_TEMP/payment-live-unauth.json" -w '%{http_code}' -X POST 'https://us-central1-ays-orbit-360-lab.cloudfunctions.net/orbit360CobrosReconciliationCommand' -H 'Content-Type: application/json' --data '{"data":{"tenantId":"alianzas-soluciones","operation":"apply_payment","payload":{"receiptId":"b3005qa_probe"}}}')
           test "$STATUS" = 401
@@ -213,6 +244,7 @@ jobs:
             ${{ runner.temp }}/payment-live-fn-after.json
             ${{ runner.temp }}/payment-live-run-before.json
             ${{ runner.temp }}/payment-live-run-after.json
+            ${{ runner.temp }}/payment-live-new-revision.json
             ${{ runner.temp }}/payment-live-run-verified.json
           if-no-files-found: warn
           retention-days: 21

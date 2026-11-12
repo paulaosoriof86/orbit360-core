@@ -39,7 +39,17 @@
   "liveAccessGuard": "UNAUTHENTICATED_401_PASS",
   "hostingOriginsUntouched": true,
   "liveCustomerDataWrites": 0,
-  "releaseStatus": "NEW_SOURCE_EMULATOR_122_122_CONTROL_IMMUTABLE_BUILD_AND_PREVIEW_FUNCTION_ALL_PASS; TARGETED_SINGLE_FUNCTION_LIVE_PROMOTION_AUTHORIZED_PENDING; NO_LIVE_CUSTOMER_DATA_WRITES; CARLOS_ERROR_CAUSE_UNCONFIRMED; BULK_INFERENCE_HOLD; HOSTING_UNCHANGED",
+  "releaseStatus": "NEW_SOURCE_EMULATOR_122_122_CONTROL_IMMUTABLE_BUILD_AND_PREVIEW_FUNCTION_ALL_PASS; FIRST_LIVE_ATTEMPT_FAILED_ON_EARLY_LATEST_READY_REVISION_READ; OLD_LIVE_REVISION_TRAFFIC_RESTORED_100_PERCENT; REVISED_READY_REVISION_PROBE_AUTHORIZED; NO_CUSTOMER_DATA_WRITES; CARLOS_UAT_PENDING; BULK_INFERENCE_HOLD; HOSTING_UNCHANGED",
+  "failedLiveFunctionAttempt": {
+    "workflowRunId": 43128327783,
+    "conclusion": "FAILURE_AFTER_FIREBASE_FUNCTION_UPDATE_BEFORE_NEW_TRAFFIC",
+    "technicalCause": "Function revision 00005-pep was created but Cloud Run latestReadyRevisionName temporarily remained 00003-kax; old gate selected stale Ready and rejected identical OLD/NEW.",
+    "functionCreatedRevision": "orbit360cobrosreconciliationcommand-00005-pep",
+    "oldTrafficRestoredRevision": "orbit360cobrosreconciliationcommand-00003-kax",
+    "rollbackReturnCode": 0,
+    "evidenceArtifactId": 13904291612,
+    "newGuard": "Verify exact Firebase serviceConfig.revision matches Cloud Run latestCreated; poll specific new revision Ready=true before 100 percent routing; verify actual traffic 100 percent new and auth guard."
+  },
   "previousPaymentLiveRelease": {
     "sourceSha": "2e6bdd4a43ad82eb3d212ff67adcb8fa96ec4b9b",
     "immutableArtifactId": 13825379034,
