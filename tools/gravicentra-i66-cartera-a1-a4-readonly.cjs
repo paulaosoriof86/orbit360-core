@@ -9,7 +9,12 @@ const CASES=Object.freeze([
   {id:'A2.M1',insurer:'MAPFRE',policy:'SC-79849',requirement:'140461192',cents:249715,due:'2026-11-30'},
   {id:'A3.B1',insurer:'BANTRAB',policy:'AUTO-45580',requirement:'AC-11349841',cents:29994,due:'2026-10-21'},
   {id:'A4.C1',insurer:'LA CEIBA',policy:'0226130804',requirement:'02505903',cents:13897,due:'2026-10-31'},
-  {id:'A4.C2',insurer:'LA CEIBA',policy:'0225118528',requirement:'02492371',cents:116564,due:'2026-11-16'}
+  {id:'A4.C2',insurer:'LA CEIBA',policy:'0225118528',requirement:'02492371',cents:116564,due:'2026-11-16'},
+  // Same canonical read-only workflow; Ficohsa October commission sheet
+  // indicates collection but cannot itself authorize a paid Firestore write.
+  // Former El Roble risk is a cross-insurer renewal, not a second Ficohsa cash event.
+  {id:'A7.F1',insurer:'FICOHSA',policy:'AUTO-1000007073',requirement:'7315461',cents:270480,
+   paidDate:'2026-10-02',sourceBasis:'OCTOBER_COMMISSION_INFERENCE_REQUIRES_EXACT_POLICY_RECEIPT_MATCH'}
 ]);
 const PROJECT='ays-orbit-360-lab',text=x=>String(x==null?'':x).trim();
 const digest=x=>crypto.createHash('sha256').update(JSON.stringify(x,(k,v)=>v&&typeof v.toJSON==='function'?v.toJSON():v)).digest('hex').slice(0,16);
@@ -23,6 +28,7 @@ const safeError=e=>/^I66_A1_A4_[A-Z0-9_]+$/.test(text(e&&e.message))?text(e.mess
 
 function assess(one,snapshot){
   const policies=snapshot.policies||[],out={id:one.id,sourcePaid:!!one.paidDate,
+    sourceBasis:one.sourceBasis||'INSURER_STATEMENT',
     policyMatches:policies.length,receiptRows:0,exactRequirementMatches:0,
     amountMatches:0,exactPaid:false,linkedPaymentCount:0,clientVerified:false,
     currentStatus:'HOLD_UNVERIFIED',writes:0};
@@ -131,10 +137,11 @@ async function main(){
   const {getFirestore}=require('firebase-admin/firestore');
   const db=getFirestore(getApps()[0]||initializeApp({projectId:PROJECT}));
   const first=await scan(db),second=await scan(db);
-  if(first.length!==7||JSON.stringify(first)!==JSON.stringify(second))throw Error('I66_A1_A4_CONCURRENT_CHANGE');
-  const report={schema:'gi.i66.cartera.a1-a4.readonly.v1',dateGuatemala:'2026-11-11',
+  if(first.length!==CASES.length||JSON.stringify(first)!==JSON.stringify(second))throw Error('I66_A1_A4_CONCURRENT_CHANGE');
+  const report={schema:'gi.i66.cartera.a1-a4-a7.readonly.v2',dateGuatemala:'2026-11-12',
     project:'ays-orbit-360-lab',cases:first,totalCases:first.length,writes:0,
-    paidSourceUnique:3,pendingSourceExamples:4,certifiedApplied:0,
+    paidSourceUnique:CASES.filter(x=>x.paidDate).length,
+    pendingSourceExamples:CASES.filter(x=>x.due&&!x.paidDate).length,certifiedApplied:0,
     next:'Only exact unique unpaid candidates may proceed to separate signed protected CAS + before/after readback.'};
   console.log('I66_CARTERA_A1_A4_READONLY='+JSON.stringify(report));
 }

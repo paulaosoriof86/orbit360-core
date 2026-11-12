@@ -1,6 +1,6 @@
-# I6.6 insurer/source batch A1-A4: LIVE tenant-scoped read-only exact-match probe.
+# I6.6 insurer/source batch A1-A4 + A7: same LIVE tenant-scoped read-only exact-match probe.
 # Never mutates Firestore, Auth, Hosting, Rules or payment state.
-name: Gravicentra I6.6 Cartera A1-A4 LIVE Source Readback ONLY
+name: Gravicentra I6.6 Cartera A1-A4 + A7 LIVE Source Readback ONLY
 on:
   push:
     branches: [recovery/fase-a-clean-20260831]

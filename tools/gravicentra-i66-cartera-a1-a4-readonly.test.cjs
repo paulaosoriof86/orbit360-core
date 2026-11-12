@@ -1,6 +1,13 @@
 'use strict';
 const assert=require('node:assert/strict');
 const {CASES,assess,resolveEditions}=require('./gravicentra-i66-cartera-a1-a4-readonly.cjs');
+assert.equal(CASES.length,8,'SAME_PROTECTED_A1_A4_A7_CONTROL_NO_NEW_PIPELINE');
+const ficohsa=CASES.find(x=>x.id==='A7.F1');
+assert.ok(ficohsa&&ficohsa.sourceBasis==='OCTOBER_COMMISSION_INFERENCE_REQUIRES_EXACT_POLICY_RECEIPT_MATCH');
+assert.equal(ficohsa.cents,270480);
+assert.equal(assess(ficohsa,{policies:[]}).currentStatus,'HOLD_POLICY_NOT_FOUND');
+assert.equal(assess(ficohsa,{policies:[{pais:'GT'}],clientExists:true,receipts:[],cobros:[]}).currentStatus,
+ 'HOLD_EXACT_REQUIREMENT_NOT_LINKED');
 const c=CASES[1],policy={id:'p',numero:c.policy,pais:'GT'},clientExists=true;
 const receipt={id:'r',polizaId:'p',numeroReciboFuente:c.requirement,monto:c.cents/100,estado:'Pendiente'};
 const snap=(over={})=>Object.assign({policies:[policy],clientExists,receipts:[receipt],cobros:[]},over);
@@ -27,4 +34,4 @@ assert.equal(clue.amountCandidateReadback[0].due,'2026-11-03');
 assert.equal(clue.amountCandidateReadback[0].sourceNumberMatched,false);
 assert.equal(clue.amountCandidateReadback[0].hasExternalNumber,false);
 assert.equal(clue.policyValidity.start,null);
-console.log('I66_CARTERA_A1_A4_PROTECTED_SOURCE_RECONCILIATION_20_20_PASS');
+console.log('I66_CARTERA_A1_A4_A7_PROTECTED_SOURCE_RECONCILIATION_PASS source_only no_data_writes');
