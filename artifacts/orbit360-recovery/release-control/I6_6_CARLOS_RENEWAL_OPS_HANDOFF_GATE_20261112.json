@@ -20,27 +20,52 @@
       "files": ["orbit360-platform/modules/renewals-v1200-operational-bridge.js", "orbit360-platform/modules/issuance-endosos-v1201-bridge.js"],
       "behavior": "Una decisión para dirección/admin/operativo con permiso de edición: crear gestión o registrar renovación en firme. Directo abre la emisión sobre la gestión aprobada y crea póliza/cartera mediante el owner preexistente. Asesor no emite. Se exige aprobación y soporte; cancelar no crea póliza.",
       "test": "tools/gravicentra-i6-6-operational-renewal-entry.test.cjs",
-      "status": "SOURCE_SYNTHETIC_QA_PASS_PREVIEW_PENDING"
+      "status": "SOURCE_UNIT_PASS_AND_SIGNED_OPERATIVO_DIRECTION_PREVIEW_ROLE_READONLY_PASS_LIVE_WRITE_HOLD"
     },
     {
       "id": "I6_6_OPS_INBOX_PENDING_LEADS_PROJECTION",
       "files": ["orbit360-platform/modules/ops.js"],
       "behavior": "Ops ofrece entrada visible a la bandeja y una sección para los handoffs de Leads no resueltos, autorizados por scope y confirmados por servidor, sobre la misma ficha negocio; no duplica gestiones o etapas ni modifica datos.",
       "test": "tools/gravicentra-i6-6-ops-leads-inbox-projection.test.cjs",
-      "status": "SOURCE_SYNTHETIC_QA_PASS_PREVIEW_PENDING"
+      "status": "SOURCE_UNIT_PASS_AND_SIGNED_OPS_LEADS_PREVIEW_READONLY_PASS_SPECIFIC_TASK_CORRELATION_HOLD"
     }
   ],
   "protectedConciliaciones": {
     "previewScopedFunction": "orbit360ScopedPolicyReadPreview, backend source 7/7 exact current, synthetic QA PASS",
     "liveScopedFunction": "SOURCE_MANIFEST_STALE_NO_NEW_DEPLOY",
-    "previewSignedRoleCountryTenantReadback": "HOLD_PREVIEW_ORIGIN_REQUIRES_AUTHENTICATION",
+    "previewSignedRoleCountryTenantReadback": "DIRECCION_SIGNED_GT_PASS_TWO_PROTECTED_COLLECTIONS_SERVER_CONFIRMED_NO_ERRORS; OPERATIVO_FINANCE_QUEUE_NOT_IN_ACTIVE_MODULE_SCOPE",
     "productionRelease": "HOLD_NO_SILENT_FINANCIAL_WRITES"
   },
   "currentLiveProductSource": "f3341e24ad5fa35bac419e42a1cdf2882a284075",
   "currentLiveArtifactId": 13916074927,
   "currentLiveBuildId": "gi-i66-f3341e24ad5f-57f234755dc1",
+  "immutablePreviewAndSignedReadback20261112": {
+    "sourceSha": "c191b56461742f631c492e2ffd904278f1795fe2",
+    "buildId": "gi-i66-c191b5646174-57f234755dc1",
+    "buildRunId": 43244954006,
+    "artifactId": 13957090813,
+    "artifactZipDigest": "sha256:686cde1c5dced16c9264ec745ee5c9d45e6fdb541d50f497d0b15c7e695b4147",
+    "previewUrl": "https://ays-orbit-360-lab--gi-i66-rc-43244954006-cdz2e4x6.web.app",
+    "previewHostingBytesExact": true,
+    "signedReadOnlyQaRunId": 43248055224,
+    "signedQaArtifactId": 13957926952,
+    "signedQaStatus": "SIGNED_OPERATIONAL_CROSS_ROUTE_READONLY_PASS",
+    "signedActors": ["Carlos Operativo", "Paula Dirección"],
+    "signedCarlosRenovaciones": "EDIT_AND_DIRECT_ENTRY_AVAILABLE_NO_POLICY_WRITTEN",
+    "signedCarlosCobros": "VIEW_EDIT_AND_APPLY_FUNCTION_AVAILABLE_SERVER_CONFIRMED; REAL_RECEIPTS_PREVIEW_READ_ONLY",
+    "signedCarlosLeads": "VIEW_EDIT_CREATE_ENTRY_AND_BUSINESS_SNAPSHOT_CONFIRMED",
+    "signedCarlosOps": "BOARD_SHARED_INBOX_AND_NEGOCIOS_GESTIONES_SERVER_CONFIRMED; INCIDENT_TASK_BY_ID_NOT_MATCHED",
+    "signedDireccionConciliaciones": "READY_BOTH_COLLECTIONS_CONFIRMED_ZERO_SERVER_ERRORS_NO_AUTO_APPLY",
+    "pageErrors": 0,
+    "authWrites": 0,
+    "firestoreBusinessWrites": 0,
+    "controlPlaneRunId": 43248055226,
+    "liveHostingUnchangedReadbackBothOrigins": "f3341e24ad5fa35bac419e42a1cdf2882a284075",
+    "liveScopedReaderParity": "HOLD_OLDER_LIVE_BACKEND_NOT_PROMOTED",
+    "fullRoleCountryTenantAndLiveWriteQa": "HOLD_NOT_CERTIFIED"
+  },
   "businessDataWrites": 0,
   "authAndRulesWrites": 0,
-  "release": "PREVIEW_CANDIDATE_PENDING; LIVE_UNCHANGED",
-  "nextGate": "Exact immutable build of current canonical source, signed role/country/tenant preview readback and payment/renewal persistence fixture before same-artifact LIVE promotion."
+  "release": "EXACT_IMMUTABLE_PREVIEW_AND_TWO_SIGNED_ROLE_READONLY_PASS; LIVE_UNCHANGED",
+  "nextGate": "Certify live protected reader security across required roles/countries/tenants with rollback and exact immutable backend; then promote the SAME c191 frontend artifact atomically, verify both LIVE origins, and complete controlled Carlos real renewal/payment/Leads persistence-readback before declaring LIVE acceptance. No blind financial writes."
 }

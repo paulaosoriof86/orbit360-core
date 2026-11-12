@@ -1612,7 +1612,7 @@
     "nextAction": "Preserve proven R4 exact LIVE source f3341e24ad5fa35bac419e42a1cdf2882a284075; continue signed Carlos UAT in new same-branch release gate"
   },
   "i66CarlosRenewalOpsHandoffPreviewGate20261112": {
-    "status": "SYNTHETIC_SOURCE_QA_PASS_IMMUTABLE_PREVIEW_BUILD_REQUESTED_SIGNED_AND_LIVE_HOLD",
+    "status": "EXACT_IMMUTABLE_PREVIEW_AND_CARLOS_DIRECTION_SIGNED_READONLY_QA_PASS_LIVE_HOLD",
     "lastClosedReleaseGate": "B4-007",
     "activeOperationalGate": "I6.6",
     "sameCanonicalBranch": "recovery/fase-a-clean-20260831",
@@ -1625,12 +1625,21 @@
     "carlosActualPaymentApplyAndReload": "HOLD",
     "carlosActualLeadsCreateRespondPersistReload": "HOLD_TWO_SIGNED_SHARED_NOTICES_VISIBLE_TO_DIRECCION",
     "opsLeadHandoffRootCause": "Shared inbox server events can exist while original business remains in a Leads-only stage and absent from Ops kanban; this source delta projects verified unresolved handoffs without duplicate writes.",
-    "conciliacionesSignedPreview": "HOLD_SEPARATE_PREVIEW_AUTHENTICATION_REQUIRED",
+    "conciliacionesSignedPreview": "DIRECCION_SIGNED_PASS_TWO_OF_TWO_SOURCES_SERVER_CONFIRMED_NO_ERRORS",
     "conciliacionesLiveBackendParity": "HOLD_READER_LIVE_STALE",
+    "newSourceSha": "c191b56461742f631c492e2ffd904278f1795fe2",
+    "newBuildId": "gi-i66-c191b5646174-57f234755dc1",
+    "newArtifactId": 13957090813,
+    "newArtifactDigest": "sha256:686cde1c5dced16c9264ec745ee5c9d45e6fdb541d50f497d0b15c7e695b4147",
+    "immutablePreviewBuildRunId": 43244954006,
+    "signedPreviewQaRunId": 43248055224,
+    "signedPreviewQaStatus": "SIGNED_OPERATIONAL_CROSS_ROUTE_READONLY_PASS",
+    "signedCarlosRenewalPaymentLeadsOps": "ROLE_ENTRIES_AND_SOURCE_SNAPSHOTS_PASS; ALL_REAL_PERSISTENT_WRITES_HOLD",
+    "opsSpecificCarlosTaskCorrelation": "HOLD_NOT_MATCHED_BY_EXACT_TASK_ID",
     "syntheticTests": ["tools/gravicentra-i6-6-operational-renewal-entry.test.cjs", "tools/gravicentra-i6-6-ops-leads-inbox-projection.test.cjs"],
     "realCustomerRecordWrites": 0,
     "liveHostingAndBackendModifiedByThisBlock": false,
     "fullRoleCountryFinancialUatCertified": false,
-    "nextAction": "BUILD_SAME_CANONICAL_SOURCE_TO_ISOLATED_PREVIEW_THEN_SIGNED_CARLOS_RENEWAL_LEADS_OPS_AND_DIRECCION_CONCILIACIONES_NO_FINANCIAL_WRITES_BEFORE_EXACT_LIVE_PROMOTION"
+    "nextAction": "CERTIFY_TARGETED_LIVE_READER_ROLE_COUNTRY_TENANT_SECURITY_AND_ROLLBACK; PROMOTE_EXACT_C191_PREVIEW_ARTIFACT_WITH_BACKEND_PARITY_ONLY_WHEN_GATE_PASSES; SIGNED_CARLOS_LIVE_MUTATION_BEFORE_AFTER_READBACK_THEN_CLOSE"
   }
 }
