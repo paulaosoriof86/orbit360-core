@@ -107,8 +107,8 @@
   "regressionTest": "tools/gravicentra-i6-6-insurer-operativo-signed-scope.test.cjs",
   "localRegressionCases": 13,
   "localRegressionStatus": "PASS",
-  "previewStatus": "EXACT_IMMUTABLE_BUILD_READBACK_AND_DUAL_SIGNED_ROLE_PREFLIGHT_PASS_NO_DURABLE_WRITE",
-  "liveStatus": "EXISTING_LIVE_DIRECCION_REAL_INSURER_REVERSIBLE_SAVE_AND_RESTORE_PASS; B54_NEW_IMMUTABLE_PREVIEW_NOT_PROMOTED; CARLOS_AND_PAULA_SPECIFIC_REPORTED_FAILURE_HOLD",
+  "previewStatus": "R4_EXACT_223_FILE_IMMUTABLE_PREVIEW_SIGNED_DIRECCION_OPERATIVO_UI_CONTROLS_PASS",
+  "liveStatus": "R4_EXACT_HOSTING_CLONE_43159049828_PASS; DIRECTION_LIVE_UI_FIELDS_PRESENT_ENABLED; CARLOS_DURABLE_SAVE_AND_FULL_MODULE_CERTIFICATION_HOLD",
   "liveWriteCertification": "FOCAL_PAULA_SINGLE_RECORD_ONLY; NO_TRANSVERSAL_PASS_CLAIMED",
   "portalCredentialReferenceRuntimeCorrection20261111": {
     "trigger": "Live readonly run 43150787839 identified 25 real insurer rows with portals lacking a real vault reference; this is a separate integrity issue, not proof of the reported SAVE rejection.",
@@ -123,7 +123,7 @@
     "testPath": "tools/gravicentra-i6-6-insurer-credential-placeholder-integrity.test.cjs",
     "testBlobSha": "1318806a77c34a3b8dd017db1eec09d7a10c6aa7",
     "unitResult": "11_OF_11_PASS_NO_LIVE_WRITES",
-    "previewAndLiveResult": "UNIT_11_OF_11_PASS; NEW_CANONICAL_IMMUTABLE_PREVIEW_BUILD_PENDING; LIVE_FRONTEND_UNCHANGED",
+    "previewAndLiveResult": "SIGNED_PREVIEW_BOTH_ROLES_EDITABLE_CONTROLS_43158675578_PASS; EXACT_FRONTEND_LIVE_43159049828_223_223_PASS; DIRECTION_LIVE_UI_READONLY_INSPECTION_PASS_NO_PASSWORD_ROTATION_OR_BANK_WRITE",
     "liveDataWrites": 0,
     "permissionBroadened": "No: canonical main module already has Direccion/Admin/SuperAdmin/Operativo edit permission; existing bank number input remains editable; Asesor unchanged.",
     "dormantP02Exclusion": "core/aseguradoras-sensitive-p02.js is not loaded by canonical index or reachable runtime; restored to historical blob 9c524ab2dabb8d981fde2d0f231cb9a8beb90e26; do not add legacy DOM decorator to product."
@@ -147,5 +147,20 @@
     "financialWrites": 0,
     "credentialsChanged": false,
     "fullModuleLiveAcceptance": false
+  },
+  "latestExactHostingPromotion20261111": {
+    "sourceSha": "f3341e24ad5fa35bac419e42a1cdf2882a284075",
+    "artifactId": 13916074927,
+    "artifactDigest": "sha256:3615860b68389eb5acea9e0d90a5302de1cf50986846a686582a74261017eded",
+    "previewRun": 43157739496,
+    "signedDualRoleQaRun": 43158675578,
+    "releaseRun": 43159049828,
+    "readback": "PREVIEW_FIREBASE_LIVE_APP_CUSTOM_DOMAIN_223_FILES_EACH_PASS",
+    "paulaLiveManualNoSave": "LOGO_FILE_ENABLED_FOUR_BANK_FIELDS_ENABLED_ONE_PASSWORD_FIELD_ENABLED_CANCELLED",
+    "realInsurerWrites": 0,
+    "financialWrites": 0,
+    "credentialChanges": 0,
+    "actualCarlosRealSave": "HOLD_PENDING_CONTROLLED_DURABLE_EVIDENCE",
+    "fullInsurerModuleAcceptance": false
   }
 }

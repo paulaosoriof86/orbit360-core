@@ -1,0 +1,46 @@
+{
+  "schema": "GI_I6_6_INSURER_R4_EXACT_LIVE_TARGETED_RECEIPT_V1",
+  "gate": "I6.6",
+  "localDateGuatemala": "2026-11-11",
+  "branch": "recovery/fase-a-clean-20260831",
+  "sourceSha": "f3341e24ad5fa35bac419e42a1cdf2882a284075",
+  "packagePreviewRunId": 43157739496,
+  "packageArtifactId": 13916074927,
+  "packageDigest": "sha256:3615860b68389eb5acea9e0d90a5302de1cf50986846a686582a74261017eded",
+  "signedDualRolePreviewQaRunId": 43158675578,
+  "insurerSourceTestCount": 38,
+  "controlGuardRunId": 43158675633,
+  "liveCloneRunId": 43159049828,
+  "liveCloneEvidenceArtifactId": 13916942719,
+  "previewFileReadback": 223,
+  "firebaseLiveFileReadback": 223,
+  "appDomainLiveFileReadback": 223,
+  "logoBackendTwoFunctionDeployRunId": 43156655361,
+  "logoSignedSyntheticLiveE2eRunId": 43157088135,
+  "syntheticLogoAndFieldsExactRestored": true,
+  "paulaSignedLiveChromePostDeploy": {
+    "role": "Dirección",
+    "logoFileSelectorEnabled": true,
+    "editableBankInputCount": 4,
+    "editablePasswordFieldCount": 1,
+    "changesSaved": false,
+    "editCancelled": true
+  },
+  "cypressOrPlaywrightClickNote": "Signed Preview QA had a browser click promise timeout on tab switch; postcondition tab selected and controls present. Not labeled full E2E module PASS.",
+  "forbiddenActions": {
+    "liveFirestoreCustomerDataWrites": 0,
+    "backendDeploymentsDuringHostingPromotion": 0,
+    "insurerPasswordRotations": 0,
+    "bankAccountChanges": 0,
+    "dataReimports": 0,
+    "rollbacksRequired": 0
+  },
+  "openIssues": {
+    "carlosSpecificReportedInsurerSave": "HOLD_NO_DURABLE_REPRODUCTION_CLOSURE",
+    "paulaOriginalLogoUiFileSelection": "HOLD_UI_REAL_FILE_NOT_UPLOADED",
+    "insurerFullAcceptance": "HOLD",
+    "conciliacionesEmpty": "HOLD_FORMAL_PROPOSAL_COLLECTOR_COUNTS_AND_VIEW_SEMANTICS",
+    "performanceInteraction": "FOLLOW_UP_CLICK_PROMISE_TIMEOUT"
+  },
+  "scope": "Targeted source, immutable Hosting publication and signed safe UI readiness evidence. Not full module acceptance."
+}
