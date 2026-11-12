@@ -1,0 +1,209 @@
+# I6.6 P0: fixes Firebase onCall's second CallableResponse argument being
+# mistaken for the internal boolean previewOnly flag. Backend-only release:
+# build one immutable backend bundle, signed Preview UAT, then deploy precisely
+# the same bytes to LIVE and run signed LIVE UAT with rollback if it fails.
+name: Gravicentra I6.6 Payment onCall LIVE Mode Repair
+on:
+  push:
+    branches: [recovery/fase-a-clean-20260831]
+    paths:
+      - .github/workflows/gravicentra-i66-payment-oncall-mode-live-repair.yml
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: gi-i66-payment-oncall-mode-live-repair
+  cancel-in-progress: false
+jobs:
+  certify-and-promote:
+    if: github.repository == 'paulaosoriof86/orbit360-core' && github.ref == 'refs/heads/recovery/fase-a-clean-20260831'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    env:
+      PROJECT_ID: ays-orbit-360-lab
+      TENANT_ID: alianzas-soluciones
+      I66_LIVE_ORIGIN: https://app.aysseguros.com
+      I66_PREVIEW_ORIGIN: https://ays-orbit-360-lab--gi-i66-rc-43305281214-hr641g40.web.app
+      I66_FRONTEND_SHA: 1dd675ed59ac51fd122915ca8056f85f82fa12d6
+      I66_SOURCE_SHA: 1dd675ed59ac51fd122915ca8056f85f82fa12d6
+      I66_PAYMENT_LIVE_RUN: '43307238568'
+      I66_OPS_HOSTING_LIVE_RUN: '43309935816'
+      I66_OPS_SIGNED_LIVE_UAT_RUN: '43310610618'
+      SA_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_ALT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Guard exact bounded backend patch, existing LIVE and regression
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          test "$(git diff --name-only "$I66_FRONTEND_SHA" HEAD -- functions | tr '\n' ' ')" = 'functions/cobros-reconciliation-domain.js '
+          node --check functions/cobros-reconciliation-domain.js
+          node tools/gravicentra-i6-6-payment-oncall-second-argument-guard.test.cjs
+          node tools/gravicentra-i6-6-carlos-payment-preview-synthetic-gate.test.cjs
+          node tools/gravicentra-i6-6-payment-replay-ledger-guard.test.cjs
+          node - <<'NODE'
+          const assert=require('node:assert/strict');
+          (async()=>{
+            const hdr={Authorization:'Bearer '+process.env.GH_TOKEN,Accept:'application/vnd.github+json','User-Agent':'GI-I66-Payment-Mode-Fix'};
+            for(const id of [process.env.I66_PAYMENT_LIVE_RUN,process.env.I66_OPS_HOSTING_LIVE_RUN,process.env.I66_OPS_SIGNED_LIVE_UAT_RUN]){
+              const r=await fetch('https://api.github.com/repos/paulaosoriof86/orbit360-core/actions/runs/'+id,{headers:hdr}).then(x=>x.json());
+              assert.equal(r.conclusion,'success','I66_PREVIOUS_EXACT_LIVE_PROOF_MISSING_'+id);
+            }
+            for(const origin of ['https://app.aysseguros.com','https://ays-orbit-360-lab.web.app',process.env.I66_PREVIEW_ORIGIN]){
+              const x=await fetch(origin+'/__recovery__/build.json',{headers:{'cache-control':'no-cache'}});
+              assert.ok(x.ok,'I66_SITE_READBACK_UNAVAILABLE');
+              const j=await x.json();assert.equal(j.sourceSha,process.env.I66_FRONTEND_SHA,'I66_HOSTING_SOURCE_DRIFT');
+            }
+            console.log('I66_PAYMENT_MODE_REPAIR_EXACT_SOURCE_AND_SIGNED_PRIOR_RELEASE_GUARD_PASS');
+          })().catch(e=>{console.error(e.message);process.exitCode=1;});
+          NODE
+      - name: Build and freeze one backend source artifact
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/payment-mode-package" "$RUNNER_TEMP/payment-mode-functions/backend"
+          git archive --format=tar HEAD:functions | gzip -n > "$RUNNER_TEMP/payment-mode-package/backend-source.tar.gz"
+          sha256sum "$RUNNER_TEMP/payment-mode-package/backend-source.tar.gz" | tee "$RUNNER_TEMP/payment-mode-package/backend-source.sha256"
+          tar -xzf "$RUNNER_TEMP/payment-mode-package/backend-source.tar.gz" -C "$RUNNER_TEMP/payment-mode-functions/backend" --no-same-owner
+          test "$(sha256sum "$RUNNER_TEMP/payment-mode-package/backend-source.tar.gz" | awk '{print $1}')" = "$(awk '{print $1}' "$RUNNER_TEMP/payment-mode-package/backend-source.sha256")"
+          git show HEAD:functions/cobros-reconciliation-domain.js | cmp - "$RUNNER_TEMP/payment-mode-functions/backend/cobros-reconciliation-domain.js"
+          (cd "$RUNNER_TEMP/payment-mode-functions/backend" && npm ci --ignore-scripts --no-audit --no-fund >/dev/null)
+          printf '{"functions":{"source":"backend"}}\n' > "$RUNNER_TEMP/payment-mode-functions/firebase.json"
+          printf 'frontend_source_sha=%s\nbackend_source_sha=%s\n' "$I66_FRONTEND_SHA" "$GITHUB_SHA" > "$RUNNER_TEMP/payment-mode-package/provenance.txt"
+          echo 'I66_PAYMENT_MODE_REPAIR_IMMUTABLE_BACKEND_PACKAGE_PASS'
+      - name: Resolve preconfigured Firebase authority and pinned CLI
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/payment-mode-auth"
+          python3 - <<'PY'
+          import json,os,pathlib
+          root=pathlib.Path(os.environ['RUNNER_TEMP'])/'payment-mode-auth'
+          for key in ('SA_LAB','SA_ALT','SA_DEFAULT'):
+              try: a=json.loads(os.environ.get(key,''))
+              except (ValueError,TypeError): continue
+              if a.get('type')=='service_account' and a.get('project_id')==os.environ['PROJECT_ID'] and a.get('private_key'):
+                  p=root/'selected.json';p.write_text(json.dumps(a));p.chmod(0o600);break
+          if not (root/'selected.json').exists():raise SystemExit('I66_CONFIGURED_FIREBASE_AUTHORITY_MISSING')
+          PY
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$RUNNER_TEMP/payment-mode-auth/selected.json" >> "$GITHUB_ENV"
+          npm install --prefix "$RUNNER_TEMP/payment-mode-cli" --no-save --ignore-scripts --no-audit --no-fund firebase-tools@14.10.1 >/dev/null
+          node tools/gravicentra-firebase-tools-empty-extensions-workaround-v1.mjs "$RUNNER_TEMP/payment-mode-cli"
+          echo "FIREBASE_CLI_BIN=$RUNNER_TEMP/payment-mode-cli/node_modules/firebase-tools/lib/bin/firebase.js" >> "$GITHUB_ENV"
+      - uses: google-github-actions/setup-gcloud@v2
+        with:
+          version: '>= 483.0.0'
+      - name: Snapshot LIVE backend revision and both LIVE Hosting origin hashes
+        run: |
+          set -euo pipefail
+          gcloud auth activate-service-account --key-file="$GOOGLE_APPLICATION_CREDENTIALS" --quiet >/dev/null
+          gcloud config set project "$PROJECT_ID" --quiet >/dev/null
+          gcloud functions describe orbit360CobrosReconciliationCommand --gen2 --region us-central1 --project "$PROJECT_ID" --format=json > "$RUNNER_TEMP/payment-mode-package/live-function-before.json"
+          node - <<'NODE'
+          const fs=require('node:fs'),path=process.env.RUNNER_TEMP+'/payment-mode-package/';
+          const f=JSON.parse(fs.readFileSync(path+'live-function-before.json'));
+          const service=String(f.serviceConfig?.service||'').split('/').pop();
+          if(!/^[a-z][a-z0-9-]+$/.test(service))throw Error('PAYMENT_LIVE_SERVICE_UNRESOLVED');
+          fs.writeFileSync(path+'service-name',service);
+          NODE
+          SERVICE=$(< "$RUNNER_TEMP/payment-mode-package/service-name")
+          gcloud run services describe "$SERVICE" --region us-central1 --project "$PROJECT_ID" --format=json > "$RUNNER_TEMP/payment-mode-package/live-service-before.json"
+          node - <<'NODE'
+          const fs=require('node:fs'),path=process.env.RUNNER_TEMP+'/payment-mode-package/';
+          const s=JSON.parse(fs.readFileSync(path+'live-service-before.json'));
+          const t=(s.status?.traffic||[]).filter(x=>Number(x.percent)>0);
+          if(t.length!==1||Number(t[0].percent)!==100)throw Error('PAYMENT_LIVE_PREVIOUS_TRAFFIC_NOT_EXACT');
+          fs.writeFileSync(path+'old-revision',String(t[0].revisionName||t[0].revision));
+          NODE
+          for ORIGIN in 'https://app.aysseguros.com' 'https://ays-orbit-360-lab.web.app';do
+            curl -fsSL --max-time 30 "$ORIGIN/" | sha256sum
+          done > "$RUNNER_TEMP/payment-mode-package/hosting-before.sha256"
+          echo 'I66_PAYMENT_MODE_REPAIR_LIVE_ROLLBACK_REVISION_FROZEN_PASS'
+      - name: Deploy exact bundle to existing Preview callable only
+        run: |
+          set -euo pipefail
+          test "$(sha256sum "$RUNNER_TEMP/payment-mode-package/backend-source.tar.gz" | awk '{print $1}')" = "$(awk '{print $1}' "$RUNNER_TEMP/payment-mode-package/backend-source.sha256")"
+          node "$FIREBASE_CLI_BIN" deploy --only functions:orbit360CobrosReconciliationCommandPreview --config "$RUNNER_TEMP/payment-mode-functions/firebase.json" --project "$PROJECT_ID" --non-interactive
+          echo 'I66_PAYMENT_SECOND_ARG_FIX_EXACT_BACKEND_PREVIEW_DEPLOY_PASS'
+      - name: Certify real signed Carlos and Dirección Preview payment persistence with synthetic data
+        run: |
+          set -euo pipefail
+          npm install --no-save --package-lock=false --ignore-scripts --no-audit --no-fund firebase-admin@13.4.0 playwright@1.55.0 >/dev/null
+          node node_modules/playwright/cli.js install --with-deps chromium >/dev/null
+          node tools/gravicentra-i6-6-carlos-payment-signed-synthetic-preview-uat.cjs
+          echo 'I66_PAYMENT_SECOND_ARG_FIX_CARLOS_PAULA_SIGNED_PREVIEW_PASS'
+      - name: Promote identical bundle to LIVE, signed LIVE acceptance or rollback
+        run: |
+          set -euo pipefail
+          SERVICE=$(< "$RUNNER_TEMP/payment-mode-package/service-name")
+          OLD_REV=$(< "$RUNNER_TEMP/payment-mode-package/old-revision")
+          test -n "$SERVICE" && test -n "$OLD_REV"
+          test "$(sha256sum "$RUNNER_TEMP/payment-mode-package/backend-source.tar.gz" | awk '{print $1}')" = "$(awk '{print $1}' "$RUNNER_TEMP/payment-mode-package/backend-source.sha256")"
+          completed=0
+          rollback(){
+            code=$?
+            if test "$completed" != 1;then
+              echo 'I66_PAYMENT_MODE_REPAIR_SIGNED_LIVE_HOLD_ROLLBACK_START'
+              gcloud run services update-traffic "$SERVICE" --region us-central1 --project "$PROJECT_ID" --to-revisions="$OLD_REV=100" --quiet || echo 'I66_PAYMENT_CRITICAL_ROLLBACK_UNCONFIRMED'
+            fi
+            exit "$code"
+          }
+          trap rollback EXIT
+          node "$FIREBASE_CLI_BIN" deploy --only functions:orbit360CobrosReconciliationCommand --config "$RUNNER_TEMP/payment-mode-functions/firebase.json" --project "$PROJECT_ID" --non-interactive
+          gcloud functions describe orbit360CobrosReconciliationCommand --gen2 --region us-central1 --project "$PROJECT_ID" --format=json > "$RUNNER_TEMP/payment-mode-package/live-function-after.json"
+          NEW_REV=$(node - <<'NODE'
+          const fs=require('node:fs'),p=process.env.RUNNER_TEMP+'/payment-mode-package/';
+          const f=JSON.parse(fs.readFileSync(p+'live-function-after.json'));
+          const r=String(f.serviceConfig?.revision||'');if(!r)throw Error('PAYMENT_NEW_REVISION_UNKNOWN');process.stdout.write(r);
+          NODE
+          )
+          test "$NEW_REV" != "$OLD_REV"
+          export NEW_REV
+          gcloud run services update-traffic "$SERVICE" --region us-central1 --project "$PROJECT_ID" --to-revisions="$NEW_REV=100" --quiet
+          gcloud run services describe "$SERVICE" --region us-central1 --project "$PROJECT_ID" --format=json > "$RUNNER_TEMP/payment-mode-package/live-service-after.json"
+          node - <<'NODE'
+          const fs=require('node:fs'),p=process.env.RUNNER_TEMP+'/payment-mode-package/';
+          const s=JSON.parse(fs.readFileSync(p+'live-service-after.json'));
+          const t=(s.status?.traffic||[]).filter(x=>Number(x.percent)>0);
+          if(t.length!==1||Number(t[0].percent)!==100||String(t[0].revisionName||t[0].revision)!==process.env.NEW_REV)throw Error('PAYMENT_LIVE_NEW_REVISION_NOT_100_PERCENT');
+          console.log('I66_PAYMENT_SECOND_ARG_FIX_EXACT_NEW_REVISION_100_PERCENT_PASS');
+          NODE
+          STATUS=$(curl -sS --max-time 25 -o "$RUNNER_TEMP/payment-mode-package/unauth.json" -w '%{http_code}' -X POST 'https://us-central1-ays-orbit-360-lab.cloudfunctions.net/orbit360CobrosReconciliationCommand' -H 'Content-Type: application/json' --data '{"data":{"tenantId":"alianzas-soluciones","operation":"apply_payment"}}')
+          test "$STATUS" = 401
+          grep -q UNAUTHENTICATED "$RUNNER_TEMP/payment-mode-package/unauth.json"
+          echo 'I66_PAYMENT_SECOND_ARG_FIX_LIVE_UNAUTH_DENIED_401_PASS'
+          node tools/gravicentra-i6-6-carlos-paula-live-synthetic-payment-renewability-uat.cjs
+          for ORIGIN in 'https://app.aysseguros.com' 'https://ays-orbit-360-lab.web.app';do
+            curl -fsSL --max-time 30 "$ORIGIN/" | sha256sum
+          done > "$RUNNER_TEMP/payment-mode-package/hosting-after.sha256"
+          cmp "$RUNNER_TEMP/payment-mode-package/hosting-before.sha256" "$RUNNER_TEMP/payment-mode-package/hosting-after.sha256"
+          completed=1
+          echo 'I66_PAYMENT_SECOND_ARG_FIX_CARLOS_PAULA_SIGNED_LIVE_PAYMENT_RENEWABILITY_PASS'
+          echo "PAYMENT_BACKEND_SOURCE=$GITHUB_SHA" >> "$GITHUB_STEP_SUMMARY"
+          echo "FRONTEND_UNCHANGED_SOURCE=$I66_FRONTEND_SHA" >> "$GITHUB_STEP_SUMMARY"
+          echo "PAYMENT_BACKEND_IMMUTABLE_DIGEST=$(awk '{print $1}' "$RUNNER_TEMP/payment-mode-package/backend-source.sha256")" >> "$GITHUB_STEP_SUMMARY"
+          echo "LIVE_PAYMENT_REVISION=$NEW_REV" >> "$GITHUB_STEP_SUMMARY"
+      - name: Persist release transport proof only, never credential materials
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gi-i66-payment-oncall-live-repair-${{ github.run_id }}
+          path: |
+            ${{ runner.temp }}/payment-mode-package/backend-source.tar.gz
+            ${{ runner.temp }}/payment-mode-package/backend-source.sha256
+            ${{ runner.temp }}/payment-mode-package/provenance.txt
+            ${{ runner.temp }}/payment-mode-package/live-function-before.json
+            ${{ runner.temp }}/payment-mode-package/live-function-after.json
+            ${{ runner.temp }}/payment-mode-package/live-service-before.json
+            ${{ runner.temp }}/payment-mode-package/live-service-after.json
+            ${{ runner.temp }}/payment-mode-package/hosting-before.sha256
+            ${{ runner.temp }}/payment-mode-package/hosting-after.sha256
+          if-no-files-found: warn
+          retention-days: 21

@@ -1075,7 +1075,11 @@ async function execute(request, previewOnly = false) {
   });
 }
 
-exports.orbit360CobrosReconciliationCommand = onCall({ region: REGION, cors: true }, execute);
-exports.orbit360CobrosReconciliationCommandPreview = onCall({ region: REGION, cors: true }, executePreview);
-exports.orbit360CobrosReconciliationCommandLabV20260804 = onCall({ region: REGION, cors: true }, execute);
+// onCall invokes handlers with (request, optional CallableResponse). Passing
+// execute directly would bind that second argument to our internal previewOnly
+// flag, erroneously applying synthetic Preview guards to real LIVE payments.
+// Bind the execution mode explicitly; never derive it from Firebase callbacks.
+exports.orbit360CobrosReconciliationCommand = onCall({ region: REGION, cors: true }, request => execute(request, false));
+exports.orbit360CobrosReconciliationCommandPreview = onCall({ region: REGION, cors: true }, request => executePreview(request));
+exports.orbit360CobrosReconciliationCommandLabV20260804 = onCall({ region: REGION, cors: true }, request => execute(request, false));
 exports.__cobrosReconciliationDomain = Object.freeze({ VERSION, CONTRACT_VERSION, OPERATIONS });
