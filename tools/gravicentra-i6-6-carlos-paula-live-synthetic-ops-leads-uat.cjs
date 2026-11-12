@@ -115,7 +115,17 @@ async function actorUat(browser,actor){
     // If an assertion fails after insertion, the exact synthetic title is
     // always queried and removed in finally; no real agenda records touched.
     assert.equal((await items('tareas','_').parent.where('t','==',uiTaskTitle).limit(3).get()).empty,true);
-    await page.locator('#op-new-task').click();
+    const uiPreflight=await page.evaluate(()=>{
+      const b=document.querySelector('#op-new-task'),r=b?.getBoundingClientRect();
+      const top=r?document.elementFromPoint(r.left+r.width/2,r.top+r.height/2):null;
+      return{buttonPresent:!!b,visible:!!r&&r.width>0&&r.height>0,
+        rect:r?{x:Math.round(r.x),y:Math.round(r.y),w:Math.round(r.width),h:Math.round(r.height)}:null,
+        topTag:top?.tagName||null,topId:top?.id||null,topClass:String(top?.className||'').slice(0,70),
+        modalOverlays:document.querySelectorAll('.drawer-back.open').length,
+        route:Orbit.route?.key||null};
+    });
+    console.log('I66_LIVE_'+actor.role.toUpperCase()+'_OPS_PLUS_TAREA_BUTTON_PREFLIGHT '+JSON.stringify(uiPreflight));
+    await page.locator('#op-new-task').click({timeout:10000});
     await page.locator('.drawer-back.open [data-in]').fill(uiTaskTitle);
     await page.locator('.drawer-back.open [data-yes]').click();
     await page.waitForFunction(title=>(Orbit.store.all('tareas')||[]).some(t=>t.t===title),uiTaskTitle,{timeout:30000});
