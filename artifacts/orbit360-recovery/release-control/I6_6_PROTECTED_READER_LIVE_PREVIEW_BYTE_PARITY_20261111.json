@@ -1,0 +1,52 @@
+{
+  "schema": "GI_I66_PROTECTED_READER_PREVIEW_LIVE_BACKEND_SOURCE_READBACK_V1",
+  "gate": "I6.6",
+  "dateGuatemala": "2026-11-11",
+  "project": "ays-orbit-360-lab",
+  "branch": "recovery/fase-a-clean-20260831",
+  "approvedProductSourceSha": "f3341e24ad5fa35bac419e42a1cdf2882a284075",
+  "hostingLiveReleaseRunId": 43159049828,
+  "readback": {
+    "firstLiveSourceRunId": 43166750397,
+    "currentPreviewAndLiveSourceRunId": 43167490831,
+    "signedGitHubActionsArtifactId": 13920762181,
+    "artifactZipSha256": "sha256:341e312b5831e3068655775acb1420f9898e9a1eca11fa54da1cfa7e834cbaf7",
+    "mode": "READBACK_ONLY",
+    "functionsInvoked": 0,
+    "functionsDeployed": 0,
+    "businessDataWrites": 0,
+    "rolesImpersonated": 0
+  },
+  "protectedReaderLive": {
+    "name": "orbit360ScopedPolicyRead",
+    "region": "us-east1",
+    "actualSourceManifestSha256": "690d036074683b4ea1d46cf867fa14856b40536fe739388ff50801ec9d31786a",
+    "currentReviewedSourceManifestSha256": "b0d010ec3cb1aebc3a6bcd38a3e748406b04fcfca281d04602935dcc92a874cb",
+    "sourceMatchesCurrent": false,
+    "status": "REAL_DEPLOYED_BACKEND_SOURCE_DRIFT_CONFIRMED"
+  },
+  "protectedReaderPreview": {
+    "name": "orbit360ScopedPolicyReadPreview",
+    "region": "us-east1",
+    "reviewedSourceModules": 7,
+    "exactModuleHashes": 7,
+    "allApprovedSourceModulesExact": true,
+    "sourceReadbackStatus": "PASS_ONLY_SOURCE_BYTE_PARITY",
+    "signedRoleCountryTenantFunctionalUat": "HOLD_NOT_PERFORMED_BY_THIS_READBACK"
+  },
+  "tenantDomainConfigLive": {
+    "name": "orbit360TenantDomainConfig",
+    "region": "us-central1",
+    "sourceMatchesCurrent": true,
+    "status": "PASS_EXACT_SOURCE_BYTES"
+  },
+  "hosting": {
+    "sourceAndArtifactRemainExact": true,
+    "sameLiveArtifactVerifiedFiles": 223,
+    "deployedDuringBackendReadback": false
+  },
+  "remainingGate": "SIGNED_PREVIEW_ROLE_COUNTRY_TENANT_POSITIVE_AND_NEGATIVE_UAT_THEN_EXACT_ONE_FUNCTION_DEPLOY_AUTHORIZATION_AND_SIGNED_LIVE_READ_RELOAD",
+  "productionConciliacionesFunctionalAccepted": false,
+  "financialRecordsAndInsurerCredentialsChanged": false,
+  "interpretation": "Backend Preview source parity proves reviewed bytes only. LIVE protected reader remains older. Do not call a server source readback a user-role functional UAT, and do not deploy the protected LIVE reader until the independently required security gate passes. Existing approved Hosting R4 remains intact."
+}
