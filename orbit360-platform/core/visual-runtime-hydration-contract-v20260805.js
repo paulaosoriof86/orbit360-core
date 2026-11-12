@@ -26,7 +26,7 @@
     cobros: { required: ['cobros', 'clientes', 'polizas', 'aseguradoras', 'vehiculos'], optional: ['asesores'] },
     conciliaciones: { required: ['cobros', 'clientes', 'polizas', 'recibosEsperados'], optional: [] },
     cancelaciones: { required: ['clientes', 'polizas', 'aseguradoras'], optional: ['cancelaciones', 'asesores'] },
-    ops: { required: ['clientes', 'polizas', 'aseguradoras'], optional: ['negocios', 'gestiones', 'tareas', 'asesores'] },
+    ops: { required: ['clientes', 'polizas', 'aseguradoras'], optional: ['negocios', 'gestiones', 'asesores'] },
     leads: { required: ['clientes', 'polizas', 'aseguradoras'], optional: ['negocios', 'gestiones', 'asesores'] }
   };
 

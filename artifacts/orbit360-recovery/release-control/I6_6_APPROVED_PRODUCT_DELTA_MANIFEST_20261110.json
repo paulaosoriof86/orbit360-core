@@ -1180,13 +1180,11 @@
         {"path":"functions/product-ops-leads-domain.js","gitBlobSha":"93cd0a64f64de01c1b6d73804f2247c4ae62ee50","replaces":{"path":"functions/product-ops-leads-domain.js","priorGitBlobSha":"ad208454627584b81875b950fbe37040cc7f1ffc","priorChangeId":"I6_6_OPS_PROTECTED_ENDORSEMENT_BOARD_HIDE_TRANSVERSAL_P0"}},
         {"path":"orbit360-platform/core/access-scope.js","gitBlobSha":"cfc5c96fbff5dce241fd86d622b3ca107e8ed7df","replaces":{"path":"orbit360-platform/core/access-scope.js","priorGitBlobSha":"207b8c59be6d72f732e6549f06bba6ad04c0a103","priorChangeId":"I6_6_REAL_INSURER_OPERATIVO_SAVE_ROLE_COUNTRY_SCOPE_P0"}},
         {"path":"orbit360-platform/core/router.js","gitBlobSha":"2b4f347bca3a8f864b398c0d893d831745dbcf9c","replaces":{"path":"orbit360-platform/core/router.js","priorGitBlobSha":"7c8648c8cf41d7132dad1c594838240bf8a1291a","priorChangeId":"I6_6_CONCILIACIONES_PROTECTED_SCOPED_READ_BRIDGE_P0"}},
-        {"path":"orbit360-platform/core/visual-runtime-hydration-contract-v20260805.js","gitBlobSha":"4dcab1e1676cf86a0b10f124bb250a203fe6f390"},
-        {"path":"orbit360-platform/core/visual-runtime-rootfix-v20260805.js","gitBlobSha":"bfb0b477e7aa27153866b106d60674ce1330a32f"},
         {"path":"orbit360-platform/modules/cronograma.js","gitBlobSha":"50bc02a8f56675497b42d0983c6d29e0276ee975","replaces":{"path":"orbit360-platform/modules/cronograma.js","priorGitBlobSha":"ecbed8de9f6767b7ecf2720cc21f4f70fd734d99","priorChangeId":"I6_6_PROTECTED_READONLY_HOST_ROUTING_AND_WRITE_DENIAL_ALL_SURFACES"}},
         {"path":"orbit360-platform/modules/ops.js","gitBlobSha":"eb5b54b8edb1f1df4b120cac73c42af18b2d2608","replaces":{"path":"orbit360-platform/modules/ops.js","priorGitBlobSha":"538fc271b8708bff662e23e5786a06b0f1f81f5a","priorChangeId":"I6_6_OPS_INBOX_PENDING_LEADS_PROJECTION"}}
       ],
       "tests": [
-        {"path":"tools/gravicentra-i6-6-carlos-ops-tasks-transversal.test.cjs","gitBlobSha":"c5c010b62810b298af7c6085dbfa0757b7a130c8"}
+        {"path":"tools/gravicentra-i6-6-carlos-ops-tasks-transversal.test.cjs","gitBlobSha":"8514a2c3593a59c0c4534d1312f1476524888efa"}
       ]
     }
   ]

@@ -31,7 +31,7 @@
     cobros: ['cobros', 'clientes', 'polizas', 'aseguradoras', 'asesores', 'vehiculos'],
     conciliaciones: ['cobros', 'clientes', 'polizas', 'recibosEsperados'],
     cancelaciones: ['cancelaciones', 'clientes', 'polizas', 'aseguradoras', 'asesores'],
-    ops: ['negocios', 'gestiones', 'tareas', 'clientes', 'polizas', 'aseguradoras', 'asesores'],
+    ops: ['negocios', 'gestiones', 'clientes', 'polizas', 'aseguradoras', 'asesores'],
     leads: ['negocios', 'gestiones', 'clientes', 'polizas', 'aseguradoras', 'asesores']
   };
 

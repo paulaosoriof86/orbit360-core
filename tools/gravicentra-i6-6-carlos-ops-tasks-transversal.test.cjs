@@ -13,8 +13,6 @@ const writerSource=source('functions/product-operational-domain.js');
 const accessSource=source('orbit360-platform/core/access-scope.js');
 const reader=require('../functions/b4-003-scoped-access-boundary');
 const routerSource=source('orbit360-platform/core/router.js');
-const visualDeps=source('orbit360-platform/core/visual-runtime-rootfix-v20260805.js');
-const hydrationSource=source('orbit360-platform/core/visual-runtime-hydration-contract-v20260805.js');
 
 function opsFixture(role='Operativo'){
  const tasks=[
@@ -41,8 +39,6 @@ function opsFixture(role='Operativo'){
 
 test('Ops projects only permitted, country-classified durable calendar tasks without duplicating data',()=>{
  assert.match(routerSource,/ops: \['negocios', 'gestiones', 'tareas'/,'route must demand-load protected tasks');
- assert.match(visualDeps,/ops: \['negocios', 'gestiones', 'tareas'/,'visual wrapper must demand-load same tasks');
- assert.match(hydrationSource,/ops: \{ required: \[[^\]]+\], optional: \['negocios', 'gestiones', 'tareas'/,'tasks stay optional, not startup-blocking');
  const x=opsFixture();
  assert.match(x.host.innerHTML,/Tareas de agenda · 2/);
  assert.match(x.host.innerHTML,/Pendiente de Ops|Terminada en agenda/);
