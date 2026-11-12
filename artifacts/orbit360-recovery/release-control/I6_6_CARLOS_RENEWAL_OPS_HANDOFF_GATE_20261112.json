@@ -36,9 +36,28 @@
     "previewSignedRoleCountryTenantReadback": "DIRECCION_SIGNED_GT_PASS_TWO_PROTECTED_COLLECTIONS_SERVER_CONFIRMED_NO_ERRORS; OPERATIVO_FINANCE_QUEUE_NOT_IN_ACTIVE_MODULE_SCOPE",
     "productionRelease": "HOLD_NO_SILENT_FINANCIAL_WRITES"
   },
-  "currentLiveProductSource": "f3341e24ad5fa35bac419e42a1cdf2882a284075",
-  "currentLiveArtifactId": 13916074927,
-  "currentLiveBuildId": "gi-i66-f3341e24ad5f-57f234755dc1",
+  "priorLiveProductSource": "f3341e24ad5fa35bac419e42a1cdf2882a284075",
+  "priorLiveArtifactId": 13916074927,
+  "priorLiveBuildId": "gi-i66-f3341e24ad5f-57f234755dc1",
+  "currentLiveProductSource": "c191b56461742f631c492e2ffd904278f1795fe2",
+  "currentLiveArtifactId": 13957090813,
+  "currentLiveBuildId": "gi-i66-c191b5646174-57f234755dc1",
+  "exactLiveHostingAndSignedReadback20261112": {
+    "releaseRunId": 43250027168,
+    "hostingReadbackBothOrigins": "223_OF_223_EACH_EXACT_C191",
+    "receiptArtifactId": 13958673560,
+    "signedPreviewAndLiveQaRunId": 43250591471,
+    "signedReadOnlyArtifactId": 13957324582,
+    "carlosLiveRenewalDirect": "ROLE_EDIT_AND_DIRECT_HOOK_TRUE_NO_DURABLE_ISSUANCE_TEST",
+    "carlosLivePayment": "ROLE_COBROS_VIEW_EDIT_TRUE_APPLICATION_OWNER_PRESENT_NO_REAL_RECEIPT_APPLIED",
+    "carlosLiveLeads": "CREATE_FORM_BOARD_BUSINESS_DATA_SERVER_CONFIRMED_NO_NEW_WRITE_TEST",
+    "carlosLiveOps": "BOARD_SHARED_INBOX_AND_ONE_PENDING_HANDOFF_SERVER_CONFIRMED_EXACT_REPORTED_TASK_ID_NOT_MATCHED",
+    "directionLiveConciliaciones": "UNAVAILABLE_READER_BACKEND_STALE_PREVIEW_READY",
+    "allPageErrors": 0,
+    "firestoreAndAuthWrites": 0,
+    "backendDeployments": 0,
+    "fullLiveWriteUat": "HOLD"
+  },
   "immutablePreviewAndSignedReadback20261112": {
     "sourceSha": "c191b56461742f631c492e2ffd904278f1795fe2",
     "buildId": "gi-i66-c191b5646174-57f234755dc1",
@@ -66,6 +85,6 @@
   },
   "businessDataWrites": 0,
   "authAndRulesWrites": 0,
-  "release": "EXACT_IMMUTABLE_PREVIEW_AND_TWO_SIGNED_ROLE_READONLY_PASS; LIVE_UNCHANGED",
-  "nextGate": "Certify live protected reader security across required roles/countries/tenants with rollback and exact immutable backend; then promote the SAME c191 frontend artifact atomically, verify both LIVE origins, and complete controlled Carlos real renewal/payment/Leads persistence-readback before declaring LIVE acceptance. No blind financial writes."
+  "release": "EXACT_IMMUTABLE_FRONTEND_LIVE_223_OF_223_BOTH_ORIGINS_AND_TWO_REAL_ROLES_SIGNED_READONLY_PASS; LIVE_BACKEND_READER_AND_DURABLE_TRANSACTIONS_HOLD",
+  "nextGate": "Certify protected Conciliaciones reader security across roles/countries/tenants with rollback and explicit backend authorization; publish only its verified backend without rebuilding the c191 frontend. Independently complete controlled Carlos real renewal/payment/Leads persistence-readback before whole-platform LIVE acceptance. No blind financial writes."
 }

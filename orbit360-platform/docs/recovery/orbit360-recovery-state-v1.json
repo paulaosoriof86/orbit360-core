@@ -1612,7 +1612,7 @@
     "nextAction": "Preserve proven R4 exact LIVE source f3341e24ad5fa35bac419e42a1cdf2882a284075; continue signed Carlos UAT in new same-branch release gate"
   },
   "i66CarlosRenewalOpsHandoffPreviewGate20261112": {
-    "status": "EXACT_IMMUTABLE_PREVIEW_AND_CARLOS_DIRECTION_SIGNED_READONLY_QA_PASS_LIVE_HOLD",
+    "status": "EXACT_223_OF_223_LIVE_FRONTEND_AND_SIGNED_PREVIEW_AND_LIVE_CROSS_ROUTE_PASS_REAL_WRITES_AND_READER_HOLD",
     "lastClosedReleaseGate": "B4-007",
     "activeOperationalGate": "I6.6",
     "sameCanonicalBranch": "recovery/fase-a-clean-20260831",
@@ -1621,7 +1621,7 @@
     "previousLiveSourceSha": "f3341e24ad5fa35bac419e42a1cdf2882a284075",
     "previousLiveBuildId": "gi-i66-f3341e24ad5f-57f234755dc1",
     "previousLiveArtifactId": 13916074927,
-    "carlosActualRenewalDirect": "NOT_LIVE_YET",
+    "carlosActualRenewalDirect": "FRONTEND_PUBLISHED_IN_LIVE_NO_DURABLE_REAL_WRITE_UAT",
     "carlosActualPaymentApplyAndReload": "HOLD",
     "carlosActualLeadsCreateRespondPersistReload": "HOLD_TWO_SIGNED_SHARED_NOTICES_VISIBLE_TO_DIRECCION",
     "opsLeadHandoffRootCause": "Shared inbox server events can exist while original business remains in a Leads-only stage and absent from Ops kanban; this source delta projects verified unresolved handoffs without duplicate writes.",
@@ -1634,12 +1634,21 @@
     "immutablePreviewBuildRunId": 43244954006,
     "signedPreviewQaRunId": 43248055224,
     "signedPreviewQaStatus": "SIGNED_OPERATIONAL_CROSS_ROUTE_READONLY_PASS",
+    "signedLiveQaRunId": 43250591471,
+    "signedLiveQaArtifactId": 13957324582,
+    "signedLiveCarlosAndDireccionStatus": "LIVE_AUTHENTICATED_READONLY_PASS_RENEWALS_COBROS_LEADS_OPS_ZERO_PAGE_ERRORS",
+    "signedLiveOpsPendingLeadsCount": 1,
+    "signedLiveDirectionConciliacionesStatus": "UNAVAILABLE_STALE_LIVE_READER_PREVIEW_READY",
     "signedCarlosRenewalPaymentLeadsOps": "ROLE_ENTRIES_AND_SOURCE_SNAPSHOTS_PASS; ALL_REAL_PERSISTENT_WRITES_HOLD",
     "opsSpecificCarlosTaskCorrelation": "HOLD_NOT_MATCHED_BY_EXACT_TASK_ID",
     "syntheticTests": ["tools/gravicentra-i6-6-operational-renewal-entry.test.cjs", "tools/gravicentra-i6-6-ops-leads-inbox-projection.test.cjs"],
     "realCustomerRecordWrites": 0,
-    "liveHostingAndBackendModifiedByThisBlock": false,
+    "liveHostingAndBackendModifiedByThisBlock": "HOSTING_ONLY_LIVE_FRONTEND_PUBLISHED_BACKEND_UNCHANGED",
+    "liveHostingCloneRunId": 43250027168,
+    "liveCloneReadbackArtifactId": 13958673560,
+    "liveReadbackBothOrigins": "223_OF_223_EACH_EXACT_C191",
+    "activeLatestLivePointer": "artifacts/orbit360-recovery/release-control/I6_6_LATEST_EXACT_LIVE_POINTER_20261112.json",
     "fullRoleCountryFinancialUatCertified": false,
-    "nextAction": "CERTIFY_TARGETED_LIVE_READER_ROLE_COUNTRY_TENANT_SECURITY_AND_ROLLBACK; PROMOTE_EXACT_C191_PREVIEW_ARTIFACT_WITH_BACKEND_PARITY_ONLY_WHEN_GATE_PASSES; SIGNED_CARLOS_LIVE_MUTATION_BEFORE_AFTER_READBACK_THEN_CLOSE"
+    "nextAction": "EXACT_CARLOS_LIVE_WRITE_BEFORE_AFTER_READBACK_WITH_IDEMPOTENCE; SEPARATE_BACKEND_READER_COUNTRY_ROLE_TENANT_GATE_AND_RELEASE; DOCUMENTAL_POINTER_R5_SAME_CANONICAL_ARTIFACT_NO_DUPLICATE_SOURCE"
   }
 }

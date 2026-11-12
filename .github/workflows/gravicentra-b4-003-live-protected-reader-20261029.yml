@@ -80,7 +80,7 @@ jobs:
               # I6.6 may inspect the existing deployed reader without reopening
               # the old I6.5 deploy authorization. Verify that the HEAD still
               # contains exactly the currently published product source.
-              CURRENT_LIVE_SOURCE=$(node -p "require('./artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json').i66LatestExactLiveRelease20261111.latestProductSourceSha")
+              CURRENT_LIVE_SOURCE=$(node -p "require('./artifacts/orbit360-recovery/release-control/I6_6_LATEST_EXACT_LIVE_POINTER_20261112.json').latestProductSourceSha")
               [[ "$CURRENT_LIVE_SOURCE" =~ ^[0-9a-f]{40}$ ]]
               git merge-base --is-ancestor "$CURRENT_LIVE_SOURCE" HEAD
               git diff --exit-code "$CURRENT_LIVE_SOURCE" HEAD -- functions orbit360-platform ':(exclude)orbit360-platform/docs/**'

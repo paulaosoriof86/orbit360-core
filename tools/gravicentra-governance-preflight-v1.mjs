@@ -35,7 +35,11 @@ const i66Active=i6Active&&control.gateState?.gates?.I6?.activeSubgate==='I6.6';
 // and fail closed if mutable release summaries disagree on actual LIVE bytes.
 if(i66Active){
   const transport=JSON.parse(fs.readFileSync('artifacts/orbit360-recovery/release-control/I6_6_RELEASE_TRANSPORT_CONTROL_20261110.json','utf8'));
-  const latest=control.i66LatestExactLiveRelease20261111;
+  // Release pointers are immutable daily snapshots. The 11-Nov R4 pointer
+  // remains historical; the exact R5 LIVE successor is the active sidecar.
+  const pointer='artifacts/orbit360-recovery/release-control/I6_6_LATEST_EXACT_LIVE_POINTER_20261112.json';
+  const latest=fs.existsSync(pointer)?JSON.parse(fs.readFileSync(pointer,'utf8')):
+    control.i66LatestExactLiveRelease20261111;
   const live=transport.currentExactHostingRelease;
   const r4=transport.latestExactHostingPromotionR4;
   const fields=[
