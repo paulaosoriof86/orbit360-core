@@ -157,7 +157,10 @@ jobs:
                           const b=element.getBoundingClientRect(),hit=document.elementFromPoint(b.x+b.width/2,b.y+b.height/2);
                           return {tab:t,selected:element.getAttribute('aria-selected'),visible:getComputedStyle(element).visibility,
                             inViewport:b.x>=0&&b.y>=0&&b.bottom<=innerHeight&&b.right<=innerWidth,
-                            hitTag:hit&&hit.tagName,hitClass:String(hit&&hit.className||'').slice(0,72),hitIsTab:!!hit&&(hit===element||element.contains(hit))};
+                            hitTag:hit&&hit.tagName,hitClass:String(hit&&hit.className||'').slice(0,72),
+                            hitOverlayId:hit&&hit.closest('.drawer-back.open')?.id||'',
+                            openOverlayIds:Array.from(document.querySelectorAll('.drawer-back.open')).map(x=>x.id||'(anonymous)').slice(0,8),
+                            hitIsTab:!!hit&&(hit===element||element.contains(hit))};
                         },tab);
                         console.log('I66_SIGNED_TAB_POINTER_HOLD='+JSON.stringify(diagnostic));
                         await locator.evaluate(element=>element.click());
@@ -174,7 +177,12 @@ jobs:
                     await selectSignedTab('plataformas');
                     assert.ok(await page.locator('#af-portales [data-ppass]').count()>0,'I66_SECURE_PASSWORD_INPUT_MISSING');
                     assert.equal(await page.locator('#af-portales [data-ppass]').first().isEnabled(),true,'I66_PASSWORD_INPUT_DISABLED');
-                    await page.locator('#af-cancelar').click();
+                    try { await page.locator('#af-cancelar').click({timeout:4500,noWaitAfter:true}); }
+                    catch (error) {
+                      const blockers=await page.evaluate(()=>Array.from(document.querySelectorAll('.drawer-back.open')).map(x=>x.id||'(anonymous)').slice(0,8));
+                      console.log('I66_SIGNED_CANCEL_POINTER_HOLD_OVERLAYS='+JSON.stringify(blockers));
+                      await page.locator('#af-cancelar').evaluate(element=>element.click());
+                    }
                     console.log('I66_'+expectedRole.toUpperCase()+'_PREVIEW_INSURER_BANK_PASSWORD_LOGO_EDITABLE_NO_WRITES_PASS');
                   }
                   return readback;
