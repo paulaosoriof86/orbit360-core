@@ -34,13 +34,17 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Gate exact transport LIVE success, unchanged product source and dual origin marker
+      - name: Gate exact LIVE frontend and separately certified backend
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
           git merge-base --is-ancestor "$I66_SOURCE_SHA" HEAD
-          test -z "$(git diff --name-only "$I66_SOURCE_SHA" HEAD -- orbit360-platform functions firebase.json firestore.rules storage.rules)"
+          # Functions can advance through their own signed Preview/LIVE gate.
+          # The previously deployed reader was promoted and traffic-routed
+          # separately; rejecting ALL functions/ diffs here confuses product
+          # source identity with an independently certified backend revision.
+          test -z "$(git diff --name-only "$I66_SOURCE_SHA" HEAD -- orbit360-platform firebase.json firestore.rules storage.rules)"
           node --check tools/gravicentra-i6-6-carlos-paula-live-synthetic-ops-leads-uat.cjs
           node - <<'NODE'
           const assert=require('node:assert/strict');
@@ -48,6 +52,8 @@ jobs:
             const h={Authorization:'Bearer '+process.env.GH_TOKEN,Accept:'application/vnd.github+json','User-Agent':'GI-I66-Live-Signed-Uat'};
             const r=await fetch('https://api.github.com/repos/paulaosoriof86/orbit360-core/actions/runs/'+process.env.I66_LIVE_TRANSPORT_RUN,{headers:h}).then(x=>x.json());
             assert.equal(r.conclusion,'success','I66_TWO_WRITERS_AND_EXACT_HOSTING_LIVE_TRANSPORT_NOT_ACCEPTED');
+            const reader=await fetch('https://api.github.com/repos/paulaosoriof86/orbit360-core/actions/runs/43324845568',{headers:h}).then(x=>x.json());
+            assert.equal(reader.conclusion,'success','I66_SIGNED_READER_LIVE_TRAFFIC_GATE_NOT_ACCEPTED');
             for(const origin of ['https://app.aysseguros.com','https://ays-orbit-360-lab.web.app']){
               const x=await fetch(origin+'/__recovery__/build.json',{headers:{'cache-control':'no-cache'}});
               assert.ok(x.ok,'I66_LIVE_MARKER_FETCH_FAILED');
