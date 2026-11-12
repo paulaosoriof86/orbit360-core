@@ -27,7 +27,8 @@
   "liveSignedReadOnlyPostPromotion": "RUN_43310610618_SUCCESS_CARLOS_OPERATIVO_PAULA_DIRECCION_SIGNED_LIVE_OPS_LEADS_TASKS_CRUD_RELOAD_RESTORE",
   "liveSignedReadOnlyEvidenceArtifactId": 0,
   "liveSignedOperationsEvidence": "GitHub Actions completed PASS run 43310610618; no separate artifact uploaded",
-  "liveOpsPendingLeadsProjection": "SIGNED_LEADS_CRUD_PASS_43310610618_LEADS_TO_OPS_EXACT_HANDOFF_LINK_REGRESSION_PENDING",
+  "liveOpsPendingLeadsProjection": "SIGNED_LEADS_CRUD_PASS_43310610618_AND_REAL_CARLOS_PENDING_BUSINESS_SHARED_INBOX_ONE_EXACT_OPS_CARD_READBACK_43315196712_PAULA_ZERO_PENDING",
+  "liveInsurerOperationalAccountSignedUat": "SIGNED_CARLOS_AND_PAULA_LIVE_SYNTHETIC_INSURER_ACCOUNT_CREATE_UPDATE_AUDIT_RELOAD_ROLE_COUNTRY_NEGATIVE_RESTORE_PASS_RUN_43316460352_NO_REAL_INSURER_OR_CREDENTIAL_WRITES",
   "liveDirectionProtectedConciliaciones": "PASS_SIGNED_READER_6_OF_6_PREVIEW_LIVE_43278018706_43278857052_READ_ONLY",
   "actualPaymentRenewalAndLeadWriteUat": "OPS_LEADS_TASKS_SIGNED_LIVE_PASS_43310610618_PAYMENT_APPLY_RECONCILE_NO_DUPLICATE_AND_POLICY_RENEWABLE_CAS_SIGNED_LIVE_PASS_43312896784_FULL_DIRECT_RENEWAL_ISSUANCE_HOLD",
   "liveProtectedReaderBackend": "PASS_EXACT_SCOPED_READER_LIVE_43278018706_SIGNED_CARLOS_PAULA_43278857052",
@@ -47,6 +48,6 @@
   },
   "fullRoleCountryTenantLiveAcceptance": false,
   "liveCarteraSync": "A1_A7_0_OF_7_APPLIED_READ_ONLY_37_SOURCE_CASES_NOT_REIMPORTED",
-  "nextAction": "Certify Carlos direct renewal issuance and Leads to Ops exact handoff, plus negative country/role and insurer sensitive-edit UAT; then execute safe ledger CAS A1-A7 minibatches using current evidence. Do not conflate signed synthetic finance PASS with real customer portfolio updates or full I6.6 production acceptance.",
+  "nextAction": "Certify Carlos full direct-renewal issuance with insurer-issued documentation and recoverable QA evidence, complete secure credential update on isolated Preview and Admin/SuperAdmin regression. Signed LIVE exact real pending Leads-to-Ops and synthetic insurer account writes are PASS. Execute safe A1-A7 live cartera CAS minibatches only where exact source linkage is independently proved; otherwise HOLD. Do not conflate synthetic finance PASS with real customer portfolio updates or full I6.6 production acceptance.",
   "doNotClaimWholePlatformQaPass": true
 }
