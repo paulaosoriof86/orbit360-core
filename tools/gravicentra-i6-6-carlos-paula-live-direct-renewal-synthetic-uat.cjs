@@ -101,12 +101,24 @@ async function one(browser,actor){
       await page.waitForFunction(x=>!!Orbit.store.get('gestiones',x.management)&&!!Orbit.store.get('polizas',x.source)&&
         !!Orbit.store.get('clientes',x.client)&&!!Orbit.store.get('aseguradoras',x.insurer),ids,{timeout:30000});
     }catch(error){
-      const evidence=await page.evaluate(x=>{
+      const evidence=await page.evaluate(async x=>{
         const s=Orbit.store._productStatus(),names=['gestiones','polizas','vehiculos','clientes','aseguradoras'];
+        let exactServer=null;
+        try{
+          const r=await Orbit.productRuntimeBrowserProvidersP0.protectedReadPage({
+            tenantId:'alianzas-soluciones',activeRole:Orbit.session.rol(),country:'GT',collection:'gestiones',
+            mode:'list',pageSize:50,cursor:''});
+          exactServer={ok:r.ok===true,scope:r.scope,count:(r.rows||[]).length,
+            qaFixturePresent:(r.rows||[]).some(v=>v.canonicalDocumentId===x.management||v.id===x.management),
+            more:!!r.nextCursor};
+        }catch(e){exactServer={error:String(e?.code||e?.message||e).slice(0,75)};}
         return{confirmed:names.filter(c=>s.serverConfirmedCollections?.includes(c)),
           denied:names.filter(c=>s.deniedCollections?.includes(c)),
           errors:Object.fromEntries(names.filter(c=>!!s.snapshotErrors?.[c]).map(c=>[c,String(s.snapshotErrors[c]).slice(0,90)])),
           queryPlans:Object.keys(s.queryPlans||{}),
+          gestionPlan:{scope:s.queryPlans?.gestiones?.scope,
+            constraints:(s.queryPlans?.gestiones?.constraints||[]).map(v=>({field:v.field,op:v.op}))},
+          exactServer,
           sizes:Object.fromEntries(names.map(c=>[c,Orbit.store.all(c).length])),
           seen:{management:!!Orbit.store.get('gestiones',x.management),source:!!Orbit.store.get('polizas',x.source),
             client:!!Orbit.store.get('clientes',x.client),insurer:!!Orbit.store.get('aseguradoras',x.insurer)}};
