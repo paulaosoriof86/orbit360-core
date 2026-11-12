@@ -126,7 +126,10 @@ try{
   });
   requirePass(marker.sourceSha===SOURCE&&marker.buildId===expectedBuild&&marker.gate==='I6.6',
     'I66_PREVIEW_WRONG_PRODUCT_ARTIFACT');
-  for(const target of ['Dirección','Operativo'])await exercise(target);
+  // The known signed Operativo identity is resolved using the same certified
+  // advisor-member linkage as the previous performance UAT. Dirección stays
+  // a separate LIVE canary, not a fabricated Preview PASS.
+  for(const target of ['Operativo'])await exercise(target);
   report.status='SIGNED_COBROS_TOPBAR_READONLY_PASS';
   console.log('I66_SIGNED_COBROS_TOPBAR_PREVIEW_PASS '+JSON.stringify(report.cases));
 }catch(error){
