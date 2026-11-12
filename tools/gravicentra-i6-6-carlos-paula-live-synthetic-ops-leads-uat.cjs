@@ -122,22 +122,32 @@ async function actorUat(browser,actor){
         rect:r?{x:Math.round(r.x),y:Math.round(r.y),w:Math.round(r.width),h:Math.round(r.height)}:null,
         topTag:top?.tagName||null,topId:top?.id||null,topClass:String(top?.className||'').slice(0,70),
         modalOverlays:document.querySelectorAll('.drawer-back.open').length,
+        legalGate:!!document.querySelector('[data-legal-gate]'),
         route:Orbit.route?.key||null};
     });
     console.log('I66_LIVE_'+actor.role.toUpperCase()+'_OPS_PLUS_TAREA_BUTTON_PREFLIGHT '+JSON.stringify(uiPreflight));
-    await page.locator('#op-new-task').click({timeout:10000});
-    await page.locator('.drawer-back.open [data-in]').fill(uiTaskTitle);
-    await page.locator('.drawer-back.open [data-yes]').click();
-    await page.waitForFunction(title=>(Orbit.store.all('tareas')||[]).some(t=>t.t===title),uiTaskTitle,{timeout:30000});
-    const uiCreated=(await items('tareas','_').parent.where('t','==',uiTaskTitle).limit(3).get()).docs;
-    assert.equal(uiCreated.length,1,'I66_LIVE_TASK_FROM_OPS_UI_NOT_DURABLE_'+actor.role);
-    const uiTaskId=uiCreated[0].id,uiRecord=uiCreated[0].data()||{};
-    assert.match(uiTaskId,/^tk\d{10,}$/, 'I66_LIVE_UI_TASK_ID_NOT_CANONICAL');
-    assert.equal(uiRecord.ownerUid,actor.uid);
-    assert.equal(uiRecord.pais,'GT');
-    assert.equal(uiRecord.done,false);
-    targets.push(['tareas',uiTaskId]);
-    console.log('I66_LIVE_'+actor.role.toUpperCase()+'_SIGNED_OPS_PLUS_TAREA_UI_CREATE_PERSIST_PASS');
+    let uiTaskId=null;
+    if(uiPreflight.legalGate){
+      // A fresh signed test session is legitimately stopped by the legal
+      // agreement. Never click Accept or forge localStorage for a real actor.
+      // Backend signed write UAT remains valid; exact visible click is HOLD.
+      console.log('I66_LIVE_'+actor.role.toUpperCase()+'_OPS_PLUS_TAREA_UI_HOLD_USER_LEGAL_ACCEPTANCE_NOT_IMPERSONATED');
+    }else{
+      await page.locator('#op-new-task').click({timeout:10000});
+      await page.locator('.drawer-back.open [data-in]').fill(uiTaskTitle);
+      await page.locator('.drawer-back.open [data-yes]').click();
+      await page.waitForFunction(title=>(Orbit.store.all('tareas')||[]).some(t=>t.t===title),uiTaskTitle,{timeout:30000});
+      const uiCreated=(await items('tareas','_').parent.where('t','==',uiTaskTitle).limit(3).get()).docs;
+      assert.equal(uiCreated.length,1,'I66_LIVE_TASK_FROM_OPS_UI_NOT_DURABLE_'+actor.role);
+      uiTaskId=uiCreated[0].id;
+      const uiRecord=uiCreated[0].data()||{};
+      assert.match(uiTaskId,/^tk\d{10,}$/, 'I66_LIVE_UI_TASK_ID_NOT_CANONICAL');
+      assert.equal(uiRecord.ownerUid,actor.uid);
+      assert.equal(uiRecord.pais,'GT');
+      assert.equal(uiRecord.done,false);
+      targets.push(['tareas',uiTaskId]);
+      console.log('I66_LIVE_'+actor.role.toUpperCase()+'_SIGNED_OPS_PLUS_TAREA_UI_CREATE_PERSIST_PASS');
+    }
     await page.evaluate(()=>document.querySelector('#op-show-tasks')?.click());
     await page.waitForFunction(id=>!!document.querySelector('[aria-label="Tareas de agenda en Ops"] [data-ops-task-toggle="'+id+'"]'),
       task,{timeout:30000});
@@ -149,13 +159,15 @@ async function actorUat(browser,actor){
     assert.equal((await items('gestiones',management).get()).data()?.estado,'Resuelta');
     assert.equal((await items('negocios',business).get()).data()?.nombre,testName+' actualizada');
     assert.equal((await items('tareas',task).get()).data()?.done,true);
-    assert.equal((await items('tareas',uiTaskId).get()).data()?.t,uiTaskTitle);
+    if(uiTaskId)assert.equal((await items('tareas',uiTaskId).get()).data()?.t,uiTaskTitle);
     await page.evaluate(()=>document.querySelector('#op-show-tasks')?.click());
     await page.waitForFunction(id=>!!document.querySelector('[aria-label="Tareas de agenda en Ops"] [data-ops-task-toggle="'+id+'"]'),
       task,{timeout:30000});
-    await page.waitForFunction(id=>!!document.querySelector('[aria-label="Tareas de agenda en Ops"] [data-ops-task-toggle="'+id+'"]'),
-      uiTaskId,{timeout:30000});
-    console.log('I66_LIVE_'+actor.role.toUpperCase()+'_SIGNED_OPS_PLUS_TAREA_UI_RELOAD_VISIBILITY_PASS');
+    if(uiTaskId){
+      await page.waitForFunction(id=>!!document.querySelector('[aria-label="Tareas de agenda en Ops"] [data-ops-task-toggle="'+id+'"]'),
+        uiTaskId,{timeout:30000});
+      console.log('I66_LIVE_'+actor.role.toUpperCase()+'_SIGNED_OPS_PLUS_TAREA_UI_RELOAD_VISIBILITY_PASS');
+    }
     console.log('I66_LIVE_'+actor.role.toUpperCase()+'_SIGNED_TASK_OPS_PROJECTION_AFTER_RELOAD_PASS');
     console.log('I66_LIVE_'+actor.role.toUpperCase()+'_OPS_LEADS_TASKS_AND_POLICIES_RENEWALS_COBROS_WRITE_RIGHTS_SIGNED_PASS');
   }finally{

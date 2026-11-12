@@ -1,0 +1,84 @@
+# I6.6 Aseguradora General + Columna exact November sources versus LIVE tenant.
+# Read-only: no application of money, no changes to customer or policy records.
+name: Gravicentra I6.6 Cartera A5 A6 LIVE Exact Readback ONLY
+on:
+  push:
+    branches: [recovery/fase-a-clean-20260831]
+    paths:
+      - .github/workflows/gravicentra-i66-cartera-a5-a6-readonly.yml
+      - tools/gravicentra-i66-cartera-a5-a6-readonly.cjs
+      - artifacts/orbit360-recovery/release-control/I6_6_CARTERA_A5_A6_SOURCE_EXACT_20261112.json
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: gravicentra-i66-cartera-a5-a6-readonly
+  cancel-in-progress: false
+jobs:
+  signed-live-source-matching:
+    if: github.repository == 'paulaosoriof86/orbit360-core' && github.ref_name == 'recovery/fase-a-clean-20260831'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 18
+    env:
+      GCLOUD_PROJECT: ays-orbit-360-lab
+      GI_I66_CARTERA_MODE: readonly
+      SA_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_ALT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate source row totals, paid overlap and mutation exclusion
+        run: |
+          set -euo pipefail
+          node --check tools/gravicentra-i66-cartera-a5-a6-readonly.cjs
+          node -e "require('./tools/gravicentra-i66-cartera-a5-a6-readonly.cjs').validateSource()"
+          node - <<'NODE'
+          const fs=require('node:fs');
+          const s=fs.readFileSync('tools/gravicentra-i66-cartera-a5-a6-readonly.cjs','utf8');
+          for(const re of [/\.set\s*\(/,/\.delete\s*\(/,/\.batch\s*\(/,/\.runTransaction\s*\(/,/\.updateDurable\s*\(/,/\.createUser\s*\(/,/\.setCustomUserClaims\s*\(/])
+            if(re.test(s))throw Error('I66_A5_A6_MUTATION_PATH_FORBIDDEN');
+          if(!s.includes("GI_I66_CARTERA_MODE,'readonly'")||!s.includes('writes:0'))
+            throw Error('I66_A5_A6_READONLY_GUARD_DRIFT');
+          console.log('I66_A5_A6_SOURCE_HASH_AND_DUPLICATE_CONTRACT_READONLY_PASS');
+          NODE
+      - name: Select existing strictly authorized Firebase project identity
+        run: |
+          set -euo pipefail
+          test "$GCLOUD_PROJECT" = 'ays-orbit-360-lab'
+          test "$GI_I66_CARTERA_MODE" = 'readonly'
+          test -z "${FIRESTORE_EMULATOR_HOST:-}"
+          npm install --prefix "$RUNNER_TEMP/gi-i66-a5-a6" --ignore-scripts --no-audit --no-fund firebase-admin@13.4.0 >/dev/null
+          echo "NODE_PATH=$RUNNER_TEMP/gi-i66-a5-a6/node_modules" >> "$GITHUB_ENV"
+          python3 - <<'PY'
+          import json,os,pathlib
+          p=pathlib.Path(os.environ['RUNNER_TEMP'])/'gi-i66-a5-a6-existing-service-account.json'
+          for key in ('SA_LAB','SA_ALT','SA_DEFAULT'):
+              try: value=json.loads(os.environ.get(key,''))
+              except (TypeError,ValueError): continue
+              if value.get('type')!='service_account' or value.get('project_id')!='ays-orbit-360-lab' or not value.get('private_key'): continue
+              p.write_text(json.dumps(value),encoding='utf8');p.chmod(0o600)
+              with open(os.environ['GITHUB_ENV'],'a') as f:f.write('GOOGLE_APPLICATION_CREDENTIALS='+str(p)+'\n')
+              print('I66_A5_A6_PROJECT_BOUND_SERVICE_IDENTITY_PASS')
+              break
+          else: raise SystemExit('I66_A5_A6_AUTH_READONLY_HOLD')
+          PY
+      - name: Scan exact A5 A6 source requirements against LIVE twice with zero writes
+        env:
+          GI_I66_CARTERA_REPORT: ${{ runner.temp }}/gi-i66-a5-a6-live-readonly.json
+        run: |
+          set -euo pipefail
+          node tools/gravicentra-i66-cartera-a5-a6-readonly.cjs
+      - name: Store sanitized source-to-live diff artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gi-i66-a5-a6-signed-live-readonly-${{ github.run_id }}
+          path: ${{ runner.temp }}/gi-i66-a5-a6-live-readonly.json
+          if-no-files-found: ignore
+          retention-days: 7

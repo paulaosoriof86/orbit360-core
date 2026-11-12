@@ -1,0 +1,82 @@
+{
+  "schema": "gi.i66.cartera.a5-a6.source-exact.v1",
+  "dateGuatemala": "2026-11-12",
+  "mode": "READ_ONLY_SOURCE_FORENSICS_NO_FINANCIAL_WRITE",
+  "scope": "GT_A_S_CORREDORA_ONLY",
+  "insurers": {
+    "A5": {
+      "name": "ASEGURADORA GENERAL",
+      "paidSourceId": "1lk4KNKuXP-zTw6hcBOPPqqL8JedUyfe2",
+      "paidSha256": "3032a7cfc0cc0e21ef70480d234c41496b9eb14119e925fabd23c5e9f3725db9",
+      "pendingSourceId": "1r0dlKcfZ8J8DiaQgBTEa0pkd9K2RzqKK",
+      "pendingSha256": "9f9f4e101c7e9edfb1a3a46ce1d0722156895e22bacf23440975f295fa338e2f",
+      "paidCount": 7,
+      "paidCents": 317161,
+      "pendingCount": 9,
+      "pendingCents": 512548,
+      "paid": [
+        {"row":11,"policy":"1-AP-21167","endorsement":"10128/2026","quota":1,"requirement":"14557894","cents":6783,"paidDate":"2026-10-21"},
+        {"row":12,"policy":"1-AP-21167","endorsement":"10831/2026","quota":1,"requirement":"14574121","cents":13566,"paidDate":"2026-10-21"},
+        {"row":13,"policy":"1-AP-21167","endorsement":"9881/2026","quota":1,"requirement":"14551850","cents":74613,"paidDate":"2026-10-21"},
+        {"row":14,"policy":"1-AP-21167","endorsement":"9705/2026","quota":1,"requirement":"14547238","cents":128877,"paidDate":"2026-10-21"},
+        {"row":15,"policy":"1-AP-21167","endorsement":"11063/2026","quota":1,"requirement":"14580566","cents":13566,"paidDate":"2026-10-21"},
+        {"row":16,"policy":"1-AU-70682","endorsement":"42263/2026","quota":3,"requirement":"14477966","cents":47170,"paidDate":"2026-10-02"},
+        {"row":17,"policy":"1-AU-136553","endorsement":"0/2026","quota":2,"requirement":"14518454","cents":32586,"paidDate":"2026-10-09"}
+      ],
+      "pending": [
+        {"row":8,"policy":"1-AP-22426","endorsement":"11864-2026","quota":1,"requirement":"14604714","cents":61050,"due":"2026-11-06"},
+        {"row":9,"policy":"1-AP-21167","endorsement":"11863-2026","quota":1,"requirement":"14604700","cents":6783,"due":"2026-11-06"},
+        {"row":10,"policy":"1-AP-21167","endorsement":"11361-2026","quota":1,"requirement":"14594870","cents":94962,"due":"2026-10-27"},
+        {"row":11,"policy":"1-AP-22426","endorsement":"11827-2026","quota":1,"requirement":"14604169","cents":122100,"due":"2026-11-06"},
+        {"row":12,"policy":"1-AU-136553","endorsement":"0-2026","quota":4,"requirement":"14518456","cents":32586,"due":"2026-11-21"},
+        {"row":13,"policy":"1-AU-70682","endorsement":"42263-2026","quota":4,"requirement":"14477967","cents":47170,"due":"2026-11-04"},
+        {"row":14,"policy":"1-AP-21167","endorsement":"11658-2026","quota":1,"requirement":"14602417","cents":6783,"due":"2026-11-04"},
+        {"row":15,"policy":"1-AP-21167","endorsement":"11602-2026","quota":1,"requirement":"14597624","cents":108528,"due":"2026-10-30"},
+        {"row":16,"policy":"1-AU-136553","endorsement":"0-2026","quota":3,"requirement":"14518455","cents":32586,"due":"2026-10-21"}
+      ]
+    },
+    "A6": {
+      "name": "COLUMNA",
+      "sourceId": "1gQqqvGEZNQ6kG3-hAocjUQGTV_JqIRcx",
+      "sha256": "d17c933ed9c8624f59da6df8ac2f8cdb5974055c754a55029d9bada6c3d2603f",
+      "intermediaryCode": "346",
+      "paidSourceSheet": "Cob Total",
+      "sourceTotalRows": 196745,
+      "currentSourceSheet": "Data General",
+      "currentSourceTotalRows": 1942,
+      "paidCount": 4,
+      "paidCents": 102256,
+      "currentCount": 9,
+      "currentCents": 287056,
+      "currentAlreadyCollectedOverlapCount": 1,
+      "currentAlreadyCollectedOverlapCents": 14803,
+      "currentNotCollectedCount": 8,
+      "currentNotCollectedCents": 272253,
+      "paid": [
+        {"row":651,"policy":"VA-58028","quota":7,"totalQuotas":12,"requirement":"7122449","paymentId":"6160810","cents":22493,"paidDate":"2026-10-15"},
+        {"row":35069,"policy":"VA-41977","quota":5,"totalQuotas":10,"requirement":"7167583","paymentId":"6174759","cents":33320,"paidDate":"2026-10-26"},
+        {"row":91619,"policy":"VA-50952","quota":3,"totalQuotas":8,"requirement":"7586104","paymentId":"6181060","cents":31640,"paidDate":"2026-10-29"},
+        {"row":196607,"policy":"VA-57280","quota":9,"totalQuotas":12,"requirement":"7043053","paymentId":"6200925","cents":14803,"paidDate":"2026-11-09"}
+      ],
+      "current": [
+        {"row":191,"policy":"VA-52068","quota":6,"requirement":"7172685","cents":45500,"due":"2026-10-14","collectedCents":0},
+        {"row":349,"policy":"VA-41977","quota":6,"requirement":"7167584","cents":33320,"due":"2026-10-28","collectedCents":0},
+        {"row":361,"policy":"VA-50952","quota":4,"requirement":"7586105","cents":31640,"due":"2026-10-28","collectedCents":0},
+        {"row":598,"policy":"VA-57280","quota":9,"requirement":"7043053","cents":14803,"due":"2026-11-04","collectedCents":14803,"alsoInPaidSheet":true},
+        {"row":883,"policy":"VA-43685","quota":1,"requirement":"7650618","cents":28840,"due":"2026-11-10","collectedCents":0},
+        {"row":1063,"policy":"VA-52068","quota":7,"requirement":"7172686","cents":45500,"due":"2026-11-14","collectedCents":0},
+        {"row":1083,"policy":"VA-58028","quota":8,"requirement":"7122450","cents":22493,"due":"2026-11-15","collectedCents":0},
+        {"row":1682,"policy":"VA-41977","quota":7,"requirement":"7167585","cents":33320,"due":"2026-11-28","collectedCents":0},
+        {"row":1714,"policy":"VA-50952","quota":5,"requirement":"7586106","cents":31640,"due":"2026-11-28","collectedCents":0}
+      ]
+    }
+  },
+  "safety": {
+    "sourceHashVerified": true,
+    "clientNamesExcluded": true,
+    "sourceRequirementsNotAutomaticallyPaid": true,
+    "doubleCountOverlappingPaidAndCurrentForbidden": true,
+    "exactPolicyEditionReceiptRequirementAmountAndInsurerMatchRequiredBeforeCashWrite": true,
+    "writes": 0
+  }
+}
