@@ -1,5 +1,8 @@
 name: Gravicentra I6.6 Insurer Logo Function Inventory
 on:
+  push:
+    branches: [recovery/fase-a-clean-20260831]
+    paths: [.github/workflows/gravicentra-i66-insurer-logo-function-inventory-readonly.yml]
   workflow_dispatch:
     inputs:
       scope_confirmation:
@@ -14,7 +17,7 @@ concurrency:
   cancel-in-progress: false
 jobs:
   inspect:
-    if: github.repository == 'paulaosoriof86/orbit360-core' && github.ref == 'refs/heads/recovery/fase-a-clean-20260831' && inputs.scope_confirmation == 'READ_ONLY_METADATA'
+    if: github.repository == 'paulaosoriof86/orbit360-core' && github.ref == 'refs/heads/recovery/fase-a-clean-20260831' && (github.event_name == 'push' || inputs.scope_confirmation == 'READ_ONLY_METADATA')
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     env:
