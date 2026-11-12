@@ -1,0 +1,71 @@
+name: Gravicentra I6.6 Insurer Logo Function Inventory
+on:
+  workflow_dispatch:
+    inputs:
+      scope_confirmation:
+        description: Read metadata only; no upload, tenant writes, IAM or deployment
+        type: choice
+        options: [READ_ONLY_METADATA]
+        required: true
+permissions:
+  contents: read
+concurrency:
+  group: gi-i66-insurer-logo-inventory-readonly
+  cancel-in-progress: false
+jobs:
+  inspect:
+    if: github.repository == 'paulaosoriof86/orbit360-core' && github.ref == 'refs/heads/recovery/fase-a-clean-20260831' && inputs.scope_confirmation == 'READ_ONLY_METADATA'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    env:
+      PROJECT_ID: ays-orbit-360-lab
+      SA_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_ALT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+    steps:
+      - uses: google-github-actions/setup-gcloud@v2
+        with:
+          version: '>= 483.0.0'
+      - name: Select existing project credential without exposing contents
+        shell: bash
+        run: |
+          set -euo pipefail
+          set +x
+          python3 - <<'PY'
+          import json,os,pathlib
+          selected=None
+          for key in ('SA_LAB','SA_ALT','SA_DEFAULT'):
+              try: row=json.loads(os.environ.get(key) or '{}')
+              except (ValueError,TypeError): continue
+              if row.get('project_id')=='ays-orbit-360-lab' and row.get('type')=='service_account' and row.get('private_key'): selected=row; break
+          if selected is None: raise SystemExit('INSURER_LOGO_GCP_CREDENTIAL_UNAVAILABLE')
+          p=pathlib.Path(os.environ['RUNNER_TEMP'])/'insurer-logo-readonly-sa.json'
+          p.write_text(json.dumps(selected));p.chmod(0o600)
+          with open(os.environ['GITHUB_ENV'],'a') as out: out.write('GOOGLE_APPLICATION_CREDENTIALS='+str(p)+'\n')
+          print('INSURER_LOGO_EXISTING_PROJECT_CREDENTIAL=PASS')
+          PY
+      - name: Read exact LIVE and Preview function deployment metadata
+        shell: bash
+        run: |
+          set -euo pipefail
+          set +x
+          gcloud auth activate-service-account --key-file="$GOOGLE_APPLICATION_CREDENTIALS" --quiet >/dev/null 2>&1
+          gcloud config set project "$PROJECT_ID" --quiet >/dev/null 2>&1
+          for SPEC in orbit360ProductAssetUpload:us-central1 orbit360ProductAssetRead:us-central1 orbit360ProductAssetUploadPreview:us-east1 orbit360ProductAssetReadPreview:us-east1; do
+            FN="${SPEC%%:*}"; REG="${SPEC##*:}"
+            OUT="$RUNNER_TEMP/insurer-logo-$FN-$REG.json"
+            ERR="$RUNNER_TEMP/insurer-logo-$FN-$REG.err"
+            if gcloud functions describe "$FN" --gen2 --region "$REG" --project "$PROJECT_ID" --format=json > "$OUT" 2> "$ERR"; then
+              python3 - "$OUT" "$FN" "$REG" <<'PY'
+          import json,sys
+          d=json.load(open(sys.argv[1])); c=d.get('serviceConfig') or {}
+          print('INSURER_LOGO_FUNCTION='+sys.argv[2]+' REGION='+sys.argv[3]+' PRESENT=true STATE='+str(d.get('state') or '?')+' REVISION='+str(c.get('revision') or '?'))
+          PY
+            elif grep -Eq '(^|[^0-9])404([^0-9]|$)|NOT_FOUND|Not found|does not exist' "$ERR"; then
+              echo "INSURER_LOGO_FUNCTION=$FN REGION=$REG PRESENT=false GCP_404_VERIFIED=true"
+            else
+              echo "INSURER_LOGO_FUNCTION=$FN REGION=$REG PRESENT=UNKNOWN NOT_404=true"
+              exit 1
+            fi
+          done
+          echo 'INSURER_LOGO_READ_ONLY_METADATA_COMPLETE=PASS; businessWrites=0; deploys=0'
