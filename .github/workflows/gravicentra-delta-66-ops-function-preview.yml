@@ -13,8 +13,27 @@ concurrency:
   group: gravicentra-i66-ops-p0-function-preview
   cancel-in-progress: false
 jobs:
+  scope:
+    runs-on: ubuntu-24.04
+    outputs:
+      authorized: ${{ steps.current.outputs.authorized }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - id: current
+        name: Enforce no stale Carlos function redeploy after a successor gate
+        run: |
+          node - <<'NODE'
+          const fs=require('node:fs');
+          const c=JSON.parse(fs.readFileSync('artifacts/orbit360-recovery/release-control/I6_6_RELEASE_TRANSPORT_CONTROL_20261110.json'));
+          const authorized=c.status==='CARLOS_TRANSVERSAL_FUNCTIONS_PREVIEW_AUTHORIZED'&&c.forbidBackendFunctionDeploy===false&&c.forbidBackendLiveFunctionDeploy===true;
+          fs.appendFileSync(process.env.GITHUB_OUTPUT,'authorized='+String(authorized)+'\n');
+          console.log(authorized?'I66_PREVIOUS_EXACT_CARLOS_PREVIEW_FUNCTION_GATE_ACTIVE':'I66_PREVIOUS_CARLOS_PREVIEW_FUNCTION_GATE_SUPERSEDED_SAFE_SKIP');
+          NODE
   stage-ops-preview:
-    if: github.repository == 'paulaosoriof86/orbit360-core' && github.ref == 'refs/heads/recovery/fase-a-clean-20260831'
+    needs: scope
+    if: github.repository == 'paulaosoriof86/orbit360-core' && github.ref == 'refs/heads/recovery/fase-a-clean-20260831' && needs.scope.outputs.authorized == 'true'
     runs-on: ubuntu-24.04
     timeout-minutes: 35
     env:

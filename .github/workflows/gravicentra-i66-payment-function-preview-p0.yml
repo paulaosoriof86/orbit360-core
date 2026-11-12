@@ -1,5 +1,5 @@
-# I6.6 direct + inferred payment guards: exact sealed artifact to PREVIEW callable only.
-# No LIVE Hosting/Functions, no customer data writes, Rules/Auth changes or new Firebase.
+# I6.6 Carlos P0: exact synthetic-only payment source to existing Preview callable.
+# No LIVE Hosting/Functions, real client writes, Rules/Auth or new Firebase.
 name: Gravicentra I6.6 Payment Function Exact Preview P0
 on:
   push:
@@ -19,13 +19,13 @@ jobs:
     timeout-minutes: 35
     env:
       PROJECT_ID: ays-orbit-360-lab
-      SOURCE_SHA: c6ee2b2edc5788a1172593507ebc70f493fb0dc1
-      ARTIFACT_RUN: '43127221729'
-      ARTIFACT_ID: '13902129993'
-      ARTIFACT_DIGEST: sha256:1313e0a85a733f2e2bac93ca7d3233856b5c91ff5201aa2f9300404ac0d4c444
-      QA_RUN: '43127221947'
-      CONTROL_RUN: '43127221993'
-      PREVIEW_URL: https://ays-orbit-360-lab--gi-i66-rc-43127221729-3b9iozx9.web.app
+      SOURCE_SHA: 1dd675ed59ac51fd122915ca8056f85f82fa12d6
+      ARTIFACT_RUN: '43305281214'
+      ARTIFACT_ID: '13984026378'
+      ARTIFACT_DIGEST: sha256:f51907a610ca467b7bf840652a3f3e9983a7f9913f5d279e01fa34a539123dbc
+      QA_RUN: '43305281266'
+      CONTROL_RUN: '43305281448'
+      PREVIEW_URL: https://ays-orbit-360-lab--gi-i66-rc-43305281214-hr641g40.web.app
       SA_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
       SA_ALT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
       SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
@@ -42,16 +42,23 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
+          node tools/gravicentra-i6-6-carlos-payment-preview-synthetic-gate.test.cjs
+          node tools/gravicentra-i6-6-payment-replay-ledger-guard.test.cjs
           node - <<'NODE'
           const assert=require('node:assert/strict'),fs=require('node:fs');
           (async()=>{
             const c=JSON.parse(fs.readFileSync('artifacts/orbit360-recovery/release-control/I6_6_RELEASE_TRANSPORT_CONTROL_20261110.json'));
             assert.equal(c.status,'PAYMENT_FUNCTION_PREVIEW_AUTHORIZED');
             assert.equal(c.backendFunctionPreviewOnly,true);
+            assert.equal(c.forbidBackendFunctionDeploy,false);
             assert.equal(c.forbidBackendLiveFunctionDeploy,true);
             assert.equal(c.forbidFirestoreRulesDataAuthWrites,true);
             assert.equal(c.livePromotionAuthorized,false);
             assert.equal(c.previewApproved,false);
+            assert.equal(c.carlosPaymentPreviewNextSource20261112?.status,'AUTHORIZED_ONE_EXISTING_PREVIEW_FUNCTION');
+            assert.equal(c.carlosPaymentPreviewNextSource20261112?.allowedFunction,'orbit360CobrosReconciliationCommandPreview');
+            assert.equal(c.carlosPaymentPreviewNextSource20261112?.allowedRegion,'us-central1');
+            assert.equal(c.carlosPaymentPreviewNextSource20261112?.syntheticOnly,true);
             for(const [k,v] of [['approvedSourceSha',process.env.SOURCE_SHA],['sourceBuildWorkflowRunId',Number(process.env.ARTIFACT_RUN)],['immutableArtifactId',Number(process.env.ARTIFACT_ID)],['immutableArtifactZipDigest',process.env.ARTIFACT_DIGEST],['sourcePreviewUrl',process.env.PREVIEW_URL]])assert.equal(c[k],v,k);
             const h={Authorization:'Bearer '+process.env.GH_TOKEN,Accept:'application/vnd.github+json','User-Agent':'GI-I66-Payment-Preview'};
             const base='https://api.github.com/repos/paulaosoriof86/orbit360-core/actions/';
@@ -65,13 +72,13 @@ jobs:
             assert.equal(a.digest,process.env.ARTIFACT_DIGEST);
             assert.equal(a.workflow_run.id,Number(process.env.ARTIFACT_RUN));
             assert.equal(a.expired,false);
-            console.log('I66_PAYMENT_PREVIEW_OWNER_QA_108_AND_ARTIFACT_PIN_PASS');
+            console.log('I66_CARLOS_PAYMENT_PREVIEW_OWNER_CURRENT_ARTIFACT_AND_QA_PIN_PASS');
           })().catch(e=>{console.error(e.message);process.exitCode=1;});
           NODE
       - uses: actions/download-artifact@v4
         with:
-          artifact-ids: 13902129993
-          run-id: 43127221729
+          artifact-ids: 13984026378
+          run-id: 43305281214
           github-token: ${{ github.token }}
           path: ${{ runner.temp }}/payment-packet-download
       - name: Verify one original immutable TAR, backend source and published Hosting Preview marker
@@ -94,6 +101,7 @@ jobs:
           const source=execFileSync('git',['show',process.env.SOURCE_SHA+':functions/cobros-reconciliation-domain.js']);
           assert(packed.equals(source),'payment function source bytes drift');
           assert(packed.includes('PAYMENT_ALREADY_APPLIED')&&packed.includes('PAYMENT_ACTIVE_PORTFOLIO_REQUIRED')&&packed.includes('PAYMENT_COUNTRY_OUTSIDE_MEMBERSHIP'));
+          for(const marker of ['PREVIEW_PAYMENT_SYNTHETIC_RELATION_REQUIRED','previewReconciliationRequests','previewReconciliationEvents'])assert(packed.includes(marker));
           assert(fs.existsSync(b+'backend/index.js')&&fs.existsSync(b+'backend/package-lock.json'));
           console.log('I66_PAYMENT_PREVIEW_EXACT_BACKEND_MARKER_AND_THREE_GUARDS_PASS');
           NODE
@@ -184,6 +192,15 @@ jobs:
           cmp "$RUNNER_TEMP/payment-live-app-before.sha" "$RUNNER_TEMP/payment-live-app-after.sha"
           echo 'I66_PAYMENT_BOTH_LIVE_HOSTS_UNCHANGED_PASS'
           echo 'I66_PAYMENT_CLIENT_BILLING_WRITES=0'
+      - name: Install authenticated synthetic Preview UAT dependencies
+        run: |
+          set -euo pipefail
+          npm install --no-save --package-lock=false --ignore-scripts --no-audit --no-fund firebase-admin@13.4.0 playwright@1.55.0 >/dev/null
+          node node_modules/playwright/cli.js install --with-deps chromium >/dev/null
+      - name: Real signed Carlos and Paula apply and reconcile synthetic receipts without LIVE writes
+        env:
+          I66_PREVIEW_ORIGIN: ${{ env.PREVIEW_URL }}
+        run: node tools/gravicentra-i6-6-carlos-payment-signed-synthetic-preview-uat.cjs
       - name: Retain scoped Preview proof only
         if: always()
         uses: actions/upload-artifact@v4
