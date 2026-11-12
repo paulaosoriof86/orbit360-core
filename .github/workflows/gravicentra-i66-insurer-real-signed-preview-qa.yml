@@ -102,7 +102,9 @@ jobs:
               const m=d.data()||{},named=[m.nombre,m.nombreCompleto,m.displayName,m.name,m.fullName]
                 .some(x=>norm(x).includes('paula')&&norm(x).includes('osorio'))||
                 paulaAdvisorIds.has(String(m.advisorId||m.asesorId||''))||paulaUserIds.has(d.id);
-              return named&&m.active!==false&&m.activo!==false&&
+              return named&&norm(m.activeRole).includes('direccion')&&
+                [].concat(m.countries||m.paises||[]).map(x=>String(x).toUpperCase()).includes('GT')&&
+                m.active!==false&&m.activo!==false&&
                 !['inactivo','inactive','bloqueado','blocked'].includes(norm(m.status||m.estado));
             });
             assert.equal(paulaMembers.length,1,'I66_PAULA_SIGNED_MEMBER_NOT_UNIQUE');
