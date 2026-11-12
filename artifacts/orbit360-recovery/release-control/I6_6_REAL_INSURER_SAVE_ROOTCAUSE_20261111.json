@@ -31,15 +31,25 @@
     "testFile": "tools/gravicentra-i6-6-insurer-legacy-credential-update.test.cjs",
     "testBlob": "905ed1b0b307549c4bee11d03960674d76d41486",
     "syntheticRoleCountryAndSecretRegression": "14_OF_14_PASS_NO_REAL_DATA_WRITES",
-    "realPaulaAndCarlosWriteReadback": "PENDING_NOT_CERTIFIED",
+    "realPaulaAndCarlosWriteReadback": "SIGNED_PREVIEW_ROLE_SCOPE_PREFLIGHT_PASS_BOTH_ACTORS; DURABLE_SAVE_RELOAD_RESTORE_PENDING",
     "actualLiveFailureClassification": "PENDING_SIGNED_CLOUD_READBACK",
-    "release": "SOURCE_ONLY_PENDING_NEW_IMMUTABLE_PREVIEW_AND_LIVE_HUMAN_GATE"
+    "release": "IMMUTABLE_PREVIEW_43146496115_AND_REAL_SIGNED_QA_43147635373_SUCCESS; LIVE_HUMAN_GATE_AND_DURABLE_SAVE_PENDING",
+    "signedQaEvidence": {
+      "sourceSha": "b54d868e94233d6d30dccc46930b2c737df30823",
+      "artifactId": 13911507447,
+      "qaRunId": 43147635373,
+      "paulaDireccionGtReadAndEditPreflight": "PASS",
+      "carlosOperativoGtReadAndEditPreflight": "PASS",
+      "sessionIsolation": "PASS",
+      "insurerWrites": 0,
+      "livePromotion": false
+    }
   },
   "minimalFix": "In access-scope.js authorize insurer directory dataScope='all' for active allowed broad-directory role only when role ceiling is all; preserve explicit none, signed country, module matrix and restrictions; do not modify live data, backend, Rules, roles or Asesor scope.",
   "regressionTest": "tools/gravicentra-i6-6-insurer-operativo-signed-scope.test.cjs",
   "localRegressionCases": 13,
   "localRegressionStatus": "PASS",
-  "previewStatus": "PENDING",
-  "liveStatus": "PENDING",
+  "previewStatus": "EXACT_IMMUTABLE_BUILD_READBACK_AND_DUAL_SIGNED_ROLE_PREFLIGHT_PASS_NO_DURABLE_WRITE",
+  "liveStatus": "UNTOUCHED_PENDING_EXACT_ARTIFACT_PROMOTION_AND_WRITE_READBACK",
   "liveWriteCertification": "NOT_YET_CLAIMED"
 }
