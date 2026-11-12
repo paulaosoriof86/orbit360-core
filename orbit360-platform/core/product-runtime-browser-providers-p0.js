@@ -25,6 +25,20 @@
   });
   function i66ReadOnlyCallableError(name,data,region){
     if(!isI66PreviewHost())return '';
+    // The payment contract was already deployed in us-central1. Its Preview
+    // endpoint may act on *synthetic* fixtures only; LIVE payments remain
+    // unreachable from this origin, including via a forged region argument.
+    if(name==='orbit360CobrosReconciliationCommandPreview'){
+      if(region!=='us-central1')return 'I66_PREVIEW_REGION_DENIED';
+      var paymentOp=String(data&&data.operation||'');
+      var paymentPayload=data&&data.payload;
+      var paymentId=String(paymentPayload&&(paymentPayload.receiptId||paymentPayload.reciboId||paymentPayload.polizaId||paymentPayload.policyId)||'');
+      if(String(data&&data.tenantId||'')!=='alianzas-soluciones'||
+         !['preview_policy','apply_payment','reconcile_payment'].includes(paymentOp)||
+         !/^(?:b3004qa|b3005qa|b3004human|b3005human)_[a-z0-9._:-]+$/i.test(paymentId)||
+         !paymentPayload||typeof paymentPayload!=='object')return 'I66_PREVIEW_MUTATION_CALLABLE_DENIED';
+      return '';
+    }
     if(region!=='us-east1')return 'I66_PREVIEW_REGION_DENIED';
     if(name==='orbit360OpsLeadsCommandPreview'){
       var action=String(data&&data.operation||'');

@@ -42,11 +42,11 @@ function tenantData(tenantId, collection) {
 function memberRef(tenantId, uid) {
   return db.collection('tenants').doc(tenantId).collection('members').doc(uid);
 }
-function requestRef(tenantId, requestId) {
-  return db.collection('tenants').doc(tenantId).collection('reconciliationRequests').doc(requestId);
+function requestRef(tenantId, requestId, previewOnly = false) {
+  return db.collection('tenants').doc(tenantId).collection(previewOnly ? 'previewReconciliationRequests' : 'reconciliationRequests').doc(requestId);
 }
-function eventRef(tenantId, eventId) {
-  return db.collection('tenants').doc(tenantId).collection('reconciliationEvents').doc(eventId);
+function eventRef(tenantId, eventId, previewOnly = false) {
+  return db.collection('tenants').doc(tenantId).collection(previewOnly ? 'previewReconciliationEvents' : 'reconciliationEvents').doc(eventId);
 }
 function paymentNotificationRef(tenantId, eventId) {
   return db.collection('tenants').doc(tenantId).collection('notificationOutbox').doc(eventId);
@@ -423,7 +423,7 @@ async function reportAdvisorPayment(authz, data, payload) {
   return result;
 }
 
-async function applyPayment(authz, data, payload, operationName = 'apply_payment') {
+async function applyPayment(authz, data, payload, operationName = 'apply_payment', previewOnly = false) {
   const receiptId = id(payload.receiptId || payload.reciboId, 'reciboId');
   const source = paymentSource(payload.sourceType || payload.fuentePago || 'manual');
   const inferred = payload.inferred === true || source === 'inference';
@@ -455,7 +455,7 @@ async function applyPayment(authz, data, payload, operationName = 'apply_payment
     forceReconciliation: payload.forceReconciliation === true, applicationEvidenceType: applicationEvidenceTypeInput
   };
   const reqId = operationRequestId(authz.tenantId, operationName, reqPayload, data.requestId);
-  const reqRef = requestRef(authz.tenantId, reqId);
+  const reqRef = requestRef(authz.tenantId, reqId, previewOnly);
   const eventId = `payevt_${sha(`${authz.tenantId}|${receiptId}|${reqId}`).slice(0, 28)}`;
 
   const result = await db.runTransaction(async tx => {
@@ -475,11 +475,34 @@ async function applyPayment(authz, data, payload, operationName = 'apply_payment
     const policy = Object.assign({ id: policySnap.id }, policySnap.data() || {});
     assertPaymentCountryScope(authz, policy, receipt);
     const clientId = id(receipt.clienteId || policy.clienteId, 'clienteId');
+    if (previewOnly) {
+      // Protect every root of the payment transaction, not just the submitted
+      // receipt ID. No authentic customer, policy or advisor relationship may
+      // be affected by a synthetic rehearsal.
+      const synthetic = value => previewSyntheticId(value);
+      if (authz.tenantId !== 'alianzas-soluciones' ||
+          !synthetic(receiptId) || !synthetic(policyId) || !synthetic(clientId) ||
+          receipt.__syntheticQa !== true || policy.__syntheticQa !== true ||
+          text(policy.clienteId,180) !== clientId ||
+          text(receipt.linkedOpsManagementId,180) ||
+          (receipt.asesorId && !synthetic(receipt.asesorId)) ||
+          (policy.asesorId && !synthetic(policy.asesorId)))
+        throw new HttpsError('permission-denied','PREVIEW_PAYMENT_SYNTHETIC_RELATION_REQUIRED');
+      const syntheticClientSnap = await tx.get(tenantData(authz.tenantId,'clientes').doc(clientId));
+      if (!syntheticClientSnap.exists || syntheticClientSnap.data().__syntheticQa !== true)
+        throw new HttpsError('permission-denied','PREVIEW_PAYMENT_SYNTHETIC_CLIENT_REQUIRED');
+    }
 
     const portfolioQuery = tenantData(authz.tenantId, 'carteraPrimas').where('reciboId', '==', receiptId);
     const cobroQuery = tenantData(authz.tenantId, 'cobros').where('reciboId', '==', receiptId);
     const [portfolioSnap, cobroSnap] = await Promise.all([tx.get(portfolioQuery), tx.get(cobroQuery)]);
     const activePortfolioRows = portfolioSnap.docs.filter(doc => activePortfolio(doc.data() || {}));
+    if (previewOnly && (portfolioSnap.docs.some(doc =>
+          !previewSyntheticId(doc.id) || doc.data().__syntheticQa !== true) ||
+        cobroSnap.docs.some(doc =>
+          (doc.id !== deterministicCobroId(authz.tenantId, receiptId) && !previewSyntheticId(doc.id)) ||
+          doc.data().__syntheticQa !== true)))
+      throw new HttpsError('permission-denied','PREVIEW_PAYMENT_SYNTHETIC_LEDGER_REQUIRED');
     if (activePortfolioRows.length > 1) throw new HttpsError('failed-precondition', 'Más de una obligación activa corresponde al mismo recibo.');
     if (cobroSnap.size > 1) throw new HttpsError('failed-precondition', 'Más de un cobro corresponde al mismo recibo.');
     const existingCobro = cobroSnap.empty ? null : (cobroSnap.docs[0].data() || {});
@@ -583,6 +606,7 @@ async function applyPayment(authz, data, payload, operationName = 'apply_payment
       conciliado: /^APPLIED_/.test(applicationState),
       ...shared
     });
+    if (previewOnly) cobro.__syntheticQa = true;
     if (finalPaidDate) cobro.fechaPago = finalPaidDate;
     if (finalPaymentMethod) cobro.metodo = finalPaymentMethod;
     if (invoiceNumber) cobro.numeroFactura = invoiceNumber;
@@ -661,7 +685,7 @@ async function applyPayment(authz, data, payload, operationName = 'apply_payment
       serverOwned: true,
       idempotent: true
     };
-    tx.set(eventRef(authz.tenantId, eventId), {
+    tx.set(eventRef(authz.tenantId, eventId, previewOnly), {
       schemaVersion: VERSION,
       contractVersion: CONTRACT_VERSION,
       tenantId: authz.tenantId,
@@ -958,7 +982,16 @@ function previewSyntheticId(value) {
 async function executePreview(request) {
   const data = request.data || {}, payload = data.payload || {};
   const targetId = text(payload.receiptId || payload.reciboId || payload.polizaId || payload.policyId || payload.proposalId, 180);
-  if (!previewSyntheticId(targetId)) throw new HttpsError('permission-denied', 'Preview de Cobros solo admite fixtures sintéticas autorizadas.');
+  const op=norm(data.operation).replace(/ /g, '_');
+  if (!['preview_policy','apply_payment','reconcile_payment'].includes(op) || !previewSyntheticId(targetId))
+    throw new HttpsError('permission-denied', 'Preview de Cobros solo admite pagos y lectura de fixtures sintéticas autorizadas.');
+  if (text(data.tenantId,180)!=='alianzas-soluciones')
+    throw new HttpsError('permission-denied','PREVIEW_PAYMENT_TENANT_DENIED');
+  if (op==='preview_policy') {
+    const policySnap=await tenantData(data.tenantId,'polizas').doc(targetId).get();
+    if (!policySnap.exists || policySnap.data().__syntheticQa !== true)
+      throw new HttpsError('permission-denied','PREVIEW_PAYMENT_SYNTHETIC_POLICY_REQUIRED');
+  }
   return execute(request, true);
 }
 
@@ -971,14 +1004,14 @@ async function execute(request, previewOnly = false) {
 
   if (operation === 'preview_policy') return previewPolicy(authz, payload);
   if (operation === 'report_advisor_payment') return reportAdvisorPayment(authz, data, payload);
-  if (operation === 'apply_payment') return applyPayment(authz, data, payload, 'apply_payment');
+  if (operation === 'apply_payment') return applyPayment(authz, data, payload, 'apply_payment', previewOnly);
   if (operation === 'reconcile_payment') {
     const origin = text(payload.paymentOriginSource || payload.sourceType || 'insurer_invoice', 120);
     return applyPayment(authz, data, Object.assign({}, payload, {
       sourceType: origin,
       forceReconciliation: true,
       applicationEvidenceType: payload.applicationEvidenceType || 'MANUAL_RECONCILIATION'
-    }), 'reconcile_payment');
+    }), 'reconcile_payment', previewOnly);
   }
   if (operation === 'reconcile_evidence') return reconcileEvidence(authz, data, payload, previewOnly === true);
   unsupportedMutation(operation);

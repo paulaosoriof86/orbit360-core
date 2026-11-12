@@ -1200,6 +1200,21 @@
       "tests": [
         {"path":"tools/gravicentra-i6-6-carlos-preview-synthetic-write-gate.test.cjs","gitBlobSha":"305703b6f82b1b99e23aa141ba99198598a1e4e5"}
       ]
+    },
+    {
+      "id": "I6_6_CARLOS_PAYMENT_SYNTHETIC_PREVIEW_TRANSPORT_AND_LEDGER_P0",
+      "approvedByDirection": true,
+      "receipt": "Paula Dirección 2026-11-12: completar Cobros para Carlos con paridad Preview y publicar únicamente después de QA; autorización restringida a fixtures sintéticas",
+      "sourceStatus": "PREVIEW_PACKAGE_REQUESTED_SIGNED_PAYMENT_UAT_PENDING_NO_LIVE",
+      "capabilityOwners": ["COBROS_PRIMARY_RUNTIME", "PRODUCT_RUNTIME_PROVIDER", "RECONCILIACION_PAYMENT_BACKEND"],
+      "scope": "Permitir en el Hosting Preview I6.6 solamente lectura/aplicación/conciliación de pago de fixtures sintéticas por callable preexistente us-central1. Exigir marcas QA en recibo, póliza, cliente, cartera, cobro y relaciones; aislar request/event de Preview para no afectar ledger LIVE. Denegar otras operaciones, nombres LIVE y referencias auténticas. Ningún cambio de permisos de asesor, país, Auth, Rules ni dato real.",
+      "paths": [
+        {"path":"orbit360-platform/core/product-runtime-browser-providers-p0.js","gitBlobSha":"4a220bafcfd1a4f0b1326673be8b77548539c7c5","replaces":{"path":"orbit360-platform/core/product-runtime-browser-providers-p0.js","priorGitBlobSha":"debea657f837464d57c326ebd9e9043b2b085156","priorChangeId":"I6_6_CARLOS_PREVIEW_SYNTHETIC_WRITE_TRANSPORT_PARITY_P0"}},
+        {"path":"functions/cobros-reconciliation-domain.js","gitBlobSha":"494cc2eb78f7d9431bcf5c1772f0762169b8877f","replaces":{"path":"functions/cobros-reconciliation-domain.js","priorGitBlobSha":"e707884baa8c6c87f8d3875c9701b350b49ccfcc","priorChangeId":"I6_6_LEGACY_PAID_RECEIPT_APPLICATION_WITHOUT_DOUBLE_PAYMENT_P0"}}
+      ],
+      "tests": [
+        {"path":"tools/gravicentra-i6-6-carlos-payment-preview-synthetic-gate.test.cjs","gitBlobSha":"d36338e2d70d9b7ea4a36df7d975f4b7c4a5b3a6"}
+      ]
     }
   ]
 }
