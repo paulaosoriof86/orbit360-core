@@ -10,7 +10,7 @@
   "branch": "recovery/fase-a-clean-20260831",
   "forensicOriginSha": "9c95f31461f2eabe9804625b5659bee772f5602a",
   "createdAtUtc": "2026-08-31T18:00:00Z",
-  "updatedAtUtc": "2026-11-12T18:06:45Z",
+  "updatedAtUtc": "2026-11-12T18:25:00Z",
   "status": "I6_6_LIVE_CONTROLLED_PORTFOLIO_UPDATE_IN_PROGRESS",
   "currentIteration": 6,
   "lastCompletedIteration": 5,
@@ -26,7 +26,7 @@
     "frontEndExactLiveReadback": "PASS_223_OF_223_EACH_ORIGIN",
     "signedCrossRouteReadOnly": "PASS_CARLOS_OPERATIVO_PAULA_DIRECCION_43250591471",
     "fullPerModuleRoleCountryWriteUat": "HOLD_NOT_CERTIFIED",
-    "protectedConciliacionesLiveBackend": "HOLD_OLDER_BACKEND_PREVIEW_READY",
+    "protectedConciliacionesLiveBackend": "PASS_EXACT_ISOLATED_READER_MANIFEST_B0D010_DEPLOY_43278018706_AND_SIGNED_DUAL_ORIGIN_RUN_43278857052_READ_ONLY",
     "currentSuccessorProductionAccepted": false
   },
   "i66OwnerFrozenUrgentWorkPlan20261112": {
@@ -52,16 +52,26 @@
       "liveReaderManifestSha256": "690d036074683b4ea1d46cf867fa14856b40536fe739388ff50801ec9d31786a",
       "approvedPreviewReaderManifestSha256": "b0d010ec3cb1aebc3a6bcd38a3e748406b04fcfca281d04602935dcc92a874cb",
       "oldReadbackWorkflowRunId": 43252183905,
-      "oldReadbackWasNotDeployment": true
+      "oldReadbackWasNotDeployment": true,
+      "actualLiveReaderDeploymentRunId": 43278018706,
+      "actualLiveReaderDeploymentHead": "e58830da3657efefe0e5bc583277a0c9450c6731",
+      "actualLiveReaderManifestSha256": "b0d010ec3cb1aebc3a6bcd38a3e748406b04fcfca281d04602935dcc92a874cb",
+      "actualLiveReaderDeploymentArtifactId": 13972470184,
+      "signedDualOriginQaRunId": 43278857052,
+      "signedDualOriginQaArtifactId": 13970494340,
+      "signedDualOriginQaHead": "82929f78db901ece2a4992636e3c438f2073fa0e",
+      "signedQaStatus": "SIGNED_PREVIEW_AND_LIVE_CROSS_ROUTE_READER_PARITY_PASS_DIRECTION_AND_OPERATIVO_DENIAL",
+      "signedQaWrites": 0,
+      "currentReaderOutcome": "LATEST_APPROVED_VERSION_LIVE_READ_ONLY_PASS_FULL_FINANCIAL_WRITE_PARITY_NOT_YET_CERTIFIED"
     },
     "progressMetric": "ONLY_EVIDENCE_BACKED_ACCEPTANCE_CHECKS_COUNT; NOT_TIME_ELAPSED_OR_ESTIMATED_COMPLETION",
     "blocks": {
       "readerParity": {
-        "verifiedSteps": 2,
+        "verifiedSteps": 6,
         "requiredSteps": 6,
-        "percent": 33,
-        "verified": ["SIGNED_PREVIEW_TWO_SOURCES", "EXACT_PREVIEW_MODULE_MANIFEST"],
-        "pending": ["EXACT_ONE_FUNCTION_RELEASE", "NEW_LIVE_SOURCE_MANIFEST_READBACK", "SIGNED_LIVE_DIRECTION_OPERATIVO_READS_AND_DENIALS", "BOTH_ORIGINS_NO_REGRESSION"]
+        "percent": 100,
+        "verified": ["SIGNED_PREVIEW_TWO_SOURCES", "EXACT_PREVIEW_MODULE_MANIFEST", "EXACT_ONE_FUNCTION_RELEASE_43278018706", "NEW_LIVE_SOURCE_MANIFEST_READBACK_B0D010", "SIGNED_LIVE_DIRECTION_OPERATIVO_READS_AND_DENIALS_43278857052", "BOTH_ORIGINS_NO_REGRESSION_43278857052"],
+        "pending": []
       },
       "carlosOpsLeadsRenovalsCobros": {
         "verifiedSteps": 2,
@@ -86,11 +96,11 @@
         "pending": ["CARLOS_SIGNED_REAL_EDIT", "ACCOUNT_AND_PASSWORD_CHANGE_WITH_AUDIT", "RELOAD_AND_HIGHER_ROLE_TRANSVERSAL_REGRESSION"]
       },
       "governanceAndCurrentRelease": {
-        "verifiedSteps": 2,
+        "verifiedSteps": 4,
         "requiredSteps": 5,
-        "percent": 40,
-        "verified": ["HISTORICAL_B4_007_CLOSED", "CURRENT_C191_223_OF_223_EXACT_FRONTEND_LIVE"],
-        "pending": ["CANONICAL_STATE_NEXT_ACTION_RECONCILED_AND_GUARD", "READER_RELEASE_LIVE_READBACK", "FULL_I66_REAL_WRITE_UAT_SUCCESSOR_ACCEPTANCE"]
+        "percent": 80,
+        "verified": ["HISTORICAL_B4_007_CLOSED", "CURRENT_C191_223_OF_223_EXACT_FRONTEND_LIVE", "CANONICAL_STATE_NEXT_ACTION_RECONCILED_AND_I66_6_GUARD", "READER_RELEASE_LIVE_READBACK_43278018706_43278857052"],
+        "pending": ["FULL_I66_REAL_WRITE_UAT_SUCCESSOR_ACCEPTANCE"]
       }
     },
     "finalAccepted": false
