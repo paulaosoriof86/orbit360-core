@@ -60,6 +60,7 @@ const cents=x=>x==null||text(x)===''?null:Number.isFinite(+x)?Math.round((+x+Num
 const amount=r=>['monto','montoTotal','primaTotal','saldo','valor'].map(k=>cents(r&&r[k])).find(x=>x!==null);
 const reqKeys=['numeroReciboFuente','numeroReciboAseguradora','numeroRecibo','numeroRequerimiento','requerimiento','numeroBoleta','sourceNumber','numeroFactura','referencia','referenciaCobro','receiptNumber'];
 const numbers=r=>reqKeys.map(k=>text(r&&r[k])).filter(Boolean);
+const sourceRefKeys=['numeroReciboFuente','numeroReciboAseguradora','numeroRequerimiento','requerimiento','numeroBoleta','sourceNumber','referenciaCobro','receiptNumber'];
 const policyVariants=raw=>{const p=text(raw,180).replace(/^[\s']+/,''),compact=p.replace(/[\s-]+/g,'');return Array.from(new Set([p,p.replace(/-/g,' '),p.replace(/\s/g,'-'),compact].filter(Boolean)));};
 const safeIso=r=>{const value=text(r);return /^\d{4}-\d{2}-\d{2}$/.test(value)?value:null;};
 const due=r=>safeIso(r&& (r.fechaLimite||r.vence||r.fechaVencimiento));
@@ -84,6 +85,14 @@ function assess(one,snapshot){
   out.exactRequirementMatches=exact.length;
   out.amountMatches=amounts.length;
   out.sourceDueExactAmountMatches=one.due?receipts.filter(r=>amount(r)===one.cents&&due(r)===one.due).length:null;
+  out.sourceDueExactAmountDetails=one.due?receipts.filter(r=>amount(r)===one.cents&&due(r)===one.due).map(r=>({
+    numberFieldNames:reqKeys.filter(k=>text(r[k])),
+    sourceRefFieldNames:sourceRefKeys.filter(k=>text(r[k])),
+    sourceRefAlreadyCorrect:sourceRefKeys.some(k=>text(r[k])===one.requirement),
+    sourceRefOccupiedByDifferentValue:sourceRefKeys.some(k=>text(r[k])&&text(r[k])!==one.requirement),
+    paidEvidence:paid(r),linkedCobros:cobros.filter(c=>text(c.reciboId)===text(r.id)).length,
+    status:text(r.estado).slice(0,32)
+  })):[];
   out.amountCandidateReadback=amounts.slice(0,8).map(r=>({
     due:due(r),
     sequence:Number.isSafeInteger(+r.secuencia)?+r.secuencia:null,
