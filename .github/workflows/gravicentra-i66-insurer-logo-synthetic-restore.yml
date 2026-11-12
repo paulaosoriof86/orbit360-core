@@ -26,7 +26,7 @@ jobs:
       - name: Restrict source and restore only one verified B4 synthetic logo
         run: |
           set -euo pipefail
-          test "$(git hash-object tools/gravicentra-i6-6-insurer-logo-synthetic-restore.cjs)" = '898bbaddaaa6ca65a07b5b5a8a718b26fddc7849'
+          test "$(git hash-object tools/gravicentra-i6-6-insurer-logo-synthetic-restore.cjs)" = '5200deb47ddd52c5dcdda90fefc8c77e7b318cab'
           node --check tools/gravicentra-i6-6-insurer-logo-synthetic-restore.cjs
           npm install --no-save --package-lock=false --ignore-scripts --no-audit --no-fund firebase-admin@13.4.0 >/dev/null
           node tools/gravicentra-i6-6-insurer-logo-synthetic-restore.cjs

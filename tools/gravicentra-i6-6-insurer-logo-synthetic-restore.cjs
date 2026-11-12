@@ -30,7 +30,25 @@ async function main(){
   const update=typeof row.logoUpdatedAt?.toDate==='function'?row.logoUpdatedAt.toDate():new Date(0);
   assert.ok(+update>=+new Date('2026-11-12T04:35:00Z')&&+update<=+new Date('2026-11-12T04:41:00Z'),'GI_LOGO_FIXTURE_RESTORE_TIME_WINDOW_REQUIRED');
   const memberSnap=await root.collection('members').doc(String(row.logoUpdatedByUid||'')).get(),member=memberSnap.data()||{};
-  assert.ok(memberSnap.exists&&[member.nombre,member.nombreCompleto,member.displayName,member.name,member.fullName].some(s=>norm(s).includes('paula')&&norm(s).includes('osorio'))&&norm(member.activeRole)==='direccion','GI_LOGO_FIXTURE_RESTORE_ORIGINAL_DIRECTION_ACTOR_REQUIRED');
+  const advisorId=String(member.advisorId||member.asesorId||'');
+  const advisorSnap=advisorId?await root.collection('data').doc('asesores').collection('items').doc(advisorId).get():null;
+  const advisor=advisorSnap?.data()||{};
+  const authUser=await sdk.auth().getUser(String(row.logoUpdatedByUid||''));
+  const displayedNames=[member.nombre,member.nombreCompleto,member.displayName,member.name,member.fullName,
+    advisor.nombre,advisor.nombreCompleto,advisor.displayName,advisor.name,authUser.displayName];
+  let identity=displayedNames.some(s=>norm(s).includes('paula')&&norm(s).includes('osorio'));
+  if(!identity){
+    const advisors=await root.collection('data').doc('asesores').collection('items').limit(400).get();
+    assert.ok(advisors.size<400,'GI_LOGO_FIXTURE_RESTORE_ADVISOR_SCAN_BOUND');
+    identity=advisors.docs.some(doc=>{
+      const a=doc.data()||{};
+      const owned=[a.authUid,a.uid,a.userId].some(x=>String(x||'')===String(row.logoUpdatedByUid));
+      const named=[a.nombre,a.nombreCompleto,a.displayName,a.name].some(s=>norm(s).includes('paula')&&norm(s).includes('osorio'));
+      return owned&&named;
+    });
+  }
+  const countries=[].concat(member.countries||member.paises||[]).map(x=>String(x).toUpperCase());
+  assert.ok(memberSnap.exists&&identity&&norm(member.activeRole)==='direccion'&&countries.includes('GT')&&authUser.disabled===false,'GI_LOGO_FIXTURE_RESTORE_ORIGINAL_DIRECTION_ACTOR_REQUIRED');
   const object=sdk.storage().bucket(BUCKET).file(assetRef),[metadata]=await object.getMetadata();
   assert.equal(metadata?.metadata?.tenantId,TENANT,'GI_LOGO_FIXTURE_RESTORE_ASSET_TENANT');
   assert.equal(metadata?.metadata?.insurerId,ID,'GI_LOGO_FIXTURE_RESTORE_ASSET_INSURER');
