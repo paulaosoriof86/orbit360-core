@@ -1,0 +1,32 @@
+name: Gravicentra I6.6 Restore Exact Signed Logo QA Fixture
+on:
+  push:
+    branches: [recovery/fase-a-clean-20260831]
+    paths: [.github/workflows/gravicentra-i66-insurer-logo-synthetic-restore.yml]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: gi-i66-exact-logo-fixture-restore
+  cancel-in-progress: false
+jobs:
+  restore-only-verified-synthetic-fixture:
+    if: github.repository == 'paulaosoriof86/orbit360-core' && github.ref == 'refs/heads/recovery/fase-a-clean-20260831'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 9
+    env:
+      SA_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_ALT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: '${{ github.sha }}', persist-credentials: false}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Restrict source and restore only one verified B4 synthetic logo
+        run: |
+          set -euo pipefail
+          test "$(git hash-object tools/gravicentra-i6-6-insurer-logo-synthetic-restore.cjs)" = '898bbaddaaa6ca65a07b5b5a8a718b26fddc7849'
+          node --check tools/gravicentra-i6-6-insurer-logo-synthetic-restore.cjs
+          npm install --no-save --package-lock=false --ignore-scripts --no-audit --no-fund firebase-admin@13.4.0 >/dev/null
+          node tools/gravicentra-i6-6-insurer-logo-synthetic-restore.cjs
