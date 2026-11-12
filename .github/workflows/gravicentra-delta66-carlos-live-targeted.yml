@@ -218,7 +218,14 @@ jobs:
           trap rollback EXIT
           deployment_started=1
           node "$FIREBASE_CLI_BIN" deploy --only functions:orbit360ProductOperationalCommand,functions:orbit360OpsLeadsCommand --config "$RUNNER_TEMP/carlos-live-functions/firebase.json" --project "$PROJECT_ID" --non-interactive
-          node tools/gravicentra-i6-6-carlos-live-exact-transport.mjs
+          # Firebase's update operation may complete while a second-generation
+          # Cloud Run service still routes its old revision. Explicitly promote
+          # each new revision (as the payment LIVE gate already does) and verify
+          # 100% before making the corresponding UI available on LIVE.
+          while IFS='|' read -r FN SERVICE OLD_REV;do
+            gcloud run services update-traffic "$SERVICE" --region us-central1 --project "$PROJECT_ID" --to-latest --quiet
+            echo "I66_CARLOS_LIVE_NEW_REVISION_TRAFFIC_PROMOTED $FN"
+          done < "$RUNNER_TEMP/carlos-live-two-old-revisions.tsv"
           while IFS='|' read -r FN SERVICE OLD_REV;do
             export FN SERVICE OLD_REV
             gcloud functions describe "$FN" --gen2 --region us-central1 --project "$PROJECT_ID" --format=json > "$RUNNER_TEMP/carlos-live-fn-after-$FN.json"
@@ -231,11 +238,14 @@ jobs:
           if(!['ACTIVE','READY'].includes(String(f.state||'').toUpperCase())||
               !String(f.serviceConfig?.uri||'').startsWith('https://')||
               revision===process.env.OLD_REV||traffic.length!==1||Number(traffic[0].percent)!==100||
-              String(traffic[0].revisionName||traffic[0].revision)!==revision)
+              String(traffic[0].revisionName||traffic[0].revision)!==revision){
+            console.error('I66_CARLOS_TRAFFIC_DIAGNOSTIC '+JSON.stringify({fn:process.env.FN,oldRevision:process.env.OLD_REV,revision,traffic:traffic.map(x=>({revision:String(x.revisionName||x.revision||''),percent:Number(x.percent)})),state:String(f.state||'')}));
             throw Error('CARLOS_TWO_LIVE_FUNCTIONS_REVISION_OR_TRAFFIC_NOT_ACCEPTED:'+process.env.FN);
+          }
           console.log('I66_CARLOS_EXACT_LIVE_NEW_REVISION_100_PERCENT_PASS '+process.env.FN);
           NODE
           done < "$RUNNER_TEMP/carlos-live-two-old-revisions.tsv"
+          node tools/gravicentra-i6-6-carlos-live-exact-transport.mjs
           STATUS=$(curl -sS --max-time 25 -o "$RUNNER_TEMP/carlos-live-unauth.json" -w '%{http_code}' -X POST 'https://us-central1-ays-orbit-360-lab.cloudfunctions.net/orbit360OpsLeadsCommand' -H 'Content-Type: application/json' --data '{"data":{"tenantId":"alianzas-soluciones","operation":"create_management"}}')
           test "$STATUS" = 401
           grep -q 'UNAUTHENTICATED' "$RUNNER_TEMP/carlos-live-unauth.json"
