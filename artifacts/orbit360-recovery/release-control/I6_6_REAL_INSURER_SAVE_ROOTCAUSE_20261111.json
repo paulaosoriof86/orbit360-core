@@ -21,7 +21,8 @@
     "operativeRoleScope": "all",
     "businessDataWritten": 0
   },
-  "rootCause": "Client store operational save calls Orbit.access.canAccessRecord('aseguradoras') which incorrectly inherits advisor own scope from signed mixed Operativo/Asesor profile. Tenant-wide insurer without asesorId is denied before server writer. Server insurer writer and protected reader correctly use signed role/module/country without advisor requirement.",
+  "rootCause": "NOT_YET_PROVEN_FOR_PAULA_REPORTED_FAILURE. Earlier Carlos signed LIVE failed before server dispatch with PRODUCT_WRITE_AUTH_CONTEXT_MISMATCH despite allowed module matrix and record scope. Do not misclassify this as a role denial or a missing insurer advisor. The exact cause of the signed identity drift and the specific Paula failing field/record remain to be reproduced.",
+  "supersededEarlierHypothesis": "The former broad-directory adviser-scope hypothesis was insufficient and is not current causal authority. It remains preserved in source history/readonlyLiveReadback for traceability; the signed Carlos failure passed role/scope preflight.",
   "additionalTransversalCausalFinding20261111": {
     "ownerCorrection": "Dirección reporta que el mismo guardado falla también con su rol. La regla heredada de alcance mixto Operativo/Asesor NO explica por sí sola este fallo transversal.",
     "sourceEvidence": "store-firestore-product-operational-p0.js authorize(collection,action,row) analizaba Object.keys de TODA la fila al hacer update, antes de generar el insurerWritePayload diferencial; una fila histórica con usuario/password activa erróneamente PRODUCT_WRITE_SECURE_INSURER_OWNER_REQUIRED incluso si solo cambia el nombre o contacto.",
@@ -77,11 +78,30 @@
     "newHostingDeployment": false,
     "conclusion": "This particular real GT insurer currently saves and restores for Direccion on existing LIVE. Carlos live write and other reported real record remain HOLD, not a generic role denial."
   },
-  "minimalFix": "In access-scope.js authorize insurer directory dataScope='all' for active allowed broad-directory role only when role ceiling is all; preserve explicit none, signed country, module matrix and restrictions; do not modify live data, backend, Rules, roles or Asesor scope.",
+  "currentLiveNestedFormReadOnly20261111": {
+    "runId": 43150787839,
+    "result": "SUCCESS_READS_ONLY",
+    "directoryRecords": 33,
+    "realInsurers": 32,
+    "realInsurersWithPortalRecords": 27,
+    "realInsurersWithBankAccounts": 16,
+    "realInsurersWithNestedServerRejectedSecretValues": 0,
+    "realInsurersWithMissingPortalCredentialReferences": 25,
+    "carlosCommittedInsurerRequestsInBoundedWindow": 0,
+    "conclusion": "Disproves legacy nested plaintext secrets as the real save rejection in this dataset; missing credentialRef is a separate portal integrity/reveal question, not proof that a credential exists or that it caused failed SAVE."
+  },
+  "currentLiveCallableLoggingReadOnly20261111": {
+    "runId": 43151013812,
+    "status": "HOLD_NO_ACCESS",
+    "googleCloudLoggingHttpStatus": 403,
+    "bypassAttempted": false,
+    "backendErrorCodeFromTheseLogs": "NOT_AVAILABLE"
+  },
+  "historicalScopePatchNotCurrentRootCause": "The former access-scope.js broad-directory patch preserved signed role/country/tenant and Asesor restrictions; its local 13-case regression is not evidence of the actual Carlos/Paula failure.",
   "regressionTest": "tools/gravicentra-i6-6-insurer-operativo-signed-scope.test.cjs",
   "localRegressionCases": 13,
   "localRegressionStatus": "PASS",
   "previewStatus": "EXACT_IMMUTABLE_BUILD_READBACK_AND_DUAL_SIGNED_ROLE_PREFLIGHT_PASS_NO_DURABLE_WRITE",
-  "liveStatus": "UNTOUCHED_PENDING_EXACT_ARTIFACT_PROMOTION_AND_WRITE_READBACK",
-  "liveWriteCertification": "NOT_YET_CLAIMED"
+  "liveStatus": "EXISTING_LIVE_DIRECCION_REAL_INSURER_REVERSIBLE_SAVE_AND_RESTORE_PASS; B54_NEW_IMMUTABLE_PREVIEW_NOT_PROMOTED; CARLOS_AND_PAULA_SPECIFIC_REPORTED_FAILURE_HOLD",
+  "liveWriteCertification": "FOCAL_PAULA_SINGLE_RECORD_ONLY; NO_TRANSVERSAL_PASS_CLAIMED"
 }
