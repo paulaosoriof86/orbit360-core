@@ -1,0 +1,50 @@
+# I6.6 diagnostic: list bucket NAMES and availability only, no customer objects.
+name: Gravicentra I6.6 Insurer Storage Buckets Readonly
+on:
+  push:
+    branches: [recovery/fase-a-clean-20260831]
+    paths: [.github/workflows/gravicentra-i66-insurer-storage-buckets-readonly.yml]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  inventory:
+    if: github.repository == 'paulaosoriof86/orbit360-core' && github.ref_name == 'recovery/fase-a-clean-20260831'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    env:
+      SA_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_ALT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+    steps:
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Google Cloud Storage bucket inventory (metadata only)
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm install --no-save --package-lock=false --ignore-scripts --no-audit --no-fund google-auth-library@9.15.1 >/dev/null
+          node - <<'NODE'
+          const assert=require('node:assert/strict');
+          const {GoogleAuth}=require('google-auth-library');
+          const project='ays-orbit-360-lab';
+          const key=['SA_LAB','SA_ALT','SA_DEFAULT'].map(k=>process.env[k]).filter(Boolean).map(x=>{try{return JSON.parse(x);}catch(_){return null;}}).find(x=>x?.type==='service_account'&&x.project_id===project);
+          assert.ok(key,'I66_STORAGE_METADATA_EXISTING_SERVICE_ACCOUNT_REQUIRED');
+          (async()=>{
+            const client=await new GoogleAuth({credentials:key,scopes:['https://www.googleapis.com/auth/cloud-platform.read-only']}).getClient();
+            const token=(await client.getAccessToken()).token;
+            const read=async(url)=>{
+              const response=await fetch(url,{headers:{Authorization:'Bearer '+token},signal:AbortSignal.timeout(20000)});
+              const body=await response.json().catch(()=>({}));
+              return {status:response.status,body};
+            };
+            const list=await read('https://storage.googleapis.com/storage/v1/b?project='+project+'&fields=items(name,location,storageClass),nextPageToken');
+            const buckets=(list.body.items||[]).map(x=>({name:x.name,location:x.location,storageClass:x.storageClass}));
+            console.log('GI_I66_STORAGE_BUCKET_METADATA='+JSON.stringify({http:list.status,buckets,more:!!list.body.nextPageToken,errorClass:list.status===200?'':String(list.body?.error?.code||'UNKNOWN').slice(0,20),noObjectReads:true,zeroWrites:true}));
+            for(const name of [project+'.firebasestorage.app',project+'.appspot.com']){
+              const hit=await read('https://storage.googleapis.com/storage/v1/b/'+encodeURIComponent(name)+'?fields=name,location,storageClass');
+              console.log('GI_I66_EXPECTED_BUCKET_CHECK='+JSON.stringify({bucket:name,http:hit.status,errorClass:hit.status===200?'':String(hit.body?.error?.code||'UNKNOWN').slice(0,20)}));
+            }
+            if(list.status!==200)process.exitCode=1;
+          })().catch(e=>{console.error('GI_I66_STORAGE_INVENTORY_HOLD:'+String(e?.code||e?.name||'ERROR').slice(0,60));process.exitCode=1;});
+          NODE
