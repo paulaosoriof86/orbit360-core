@@ -5,6 +5,7 @@ on:
     branches: [recovery/fase-a-clean-20260831]
     paths:
       - .github/workflows/gravicentra-i66-carlos-paula-live-direct-renewal-synthetic-uat.yml
+      - tools/gravicentra-i6-6-carlos-paula-live-direct-renewal-synthetic-uat.cjs
 permissions:
   contents: read
   actions: read
