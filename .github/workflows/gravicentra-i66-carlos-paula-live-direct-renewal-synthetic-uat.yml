@@ -41,7 +41,7 @@ jobs:
           const assert=require('node:assert/strict');
           (async()=>{
             const h={Authorization:'Bearer '+process.env.GH_TOKEN,Accept:'application/vnd.github+json','User-Agent':'GI-I66-Direct-Renewal-QA'};
-            for(const id of [43309935816,43310610618,43312896784,43316460352,43323669448]){
+            for(const id of [43309935816,43310610618,43312896784,43316460352,43324845568]){
               const r=await fetch('https://api.github.com/repos/paulaosoriof86/orbit360-core/actions/runs/'+id,{headers:h}).then(x=>x.json());
               assert.equal(r.conclusion,'success','I66_LIVE_PRECONDITION_FAIL_'+id);
             }
