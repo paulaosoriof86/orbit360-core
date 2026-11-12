@@ -1,0 +1,77 @@
+name: Gravicentra I6.6 Signed Cobros Topbar Preview QA
+on:
+  push:
+    branches: [recovery/fase-a-clean-20260831]
+    paths:
+      - .github/workflows/gravicentra-i66-topbar-cobros-preview-signed-qa.yml
+      - tools/gravicentra-i66-topbar-cobros-preview-signed-readonly.mjs
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: gi-i66-signed-cobros-topbar-qa
+  cancel-in-progress: false
+jobs:
+  cross-route-real-chrome:
+    if: github.repository == 'paulaosoriof86/orbit360-core' && github.ref == 'refs/heads/recovery/fase-a-clean-20260831'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 18
+    env:
+      GI_I66_TARGET_PROJECT: ays-orbit-360-lab
+      GI_I66_TARGET_TENANT: alianzas-soluciones
+      SA_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_ALT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify exact already-built source, closed historic gate and read-only test
+        run: |
+          set -euo pipefail
+          node tools/gravicentra-i6-6-delta-guard.mjs >/dev/null
+          node --check tools/gravicentra-i66-topbar-cobros-preview-signed-readonly.mjs
+          git merge-base --is-ancestor 59c2781b14f53030b0163fa0a833b12116d5475d HEAD
+          test -z "$(git diff --name-only 59c2781b14f53030b0163fa0a833b12116d5475d HEAD -- orbit360-platform functions firebase.json firestore.rules storage.rules)"
+          node - <<'NODE'
+          const s=require('node:fs').readFileSync('tools/gravicentra-i66-topbar-cobros-preview-signed-readonly.mjs','utf8');
+          for(const r of [/\.set\s*\(/,/\.update\s*\(/,/\.delete\s*\(/,/\.runTransaction\s*\(/,/\.setCustomUserClaims\s*\(/,/\.createUser\s*\(/])if(r.test(s))throw Error('I66_QA_WRITE_PATH_FORBIDDEN');
+          if(!s.includes("const ORIGIN='https://ays-orbit-360-lab--gi-i66-rc-43131776926-z7owc7v2.web.app'"))throw Error('I66_QA_PREVIEW_ORIGIN_DRIFT');
+          console.log('I66_REAL_SIGNED_QA_READONLY_AND_EXACT_ARTIFACT_BOUNDARY_PASS');
+          NODE
+      - name: Select existing authorized Firebase project account
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/i66-topbar-qa-auth"
+          python3 - <<'PY'
+          import json,os,pathlib
+          root=pathlib.Path(os.environ['RUNNER_TEMP'])/'i66-topbar-qa-auth'
+          for key in ('SA_LAB','SA_ALT','SA_DEFAULT'):
+            try: value=json.loads(os.environ.get(key,''))
+            except (ValueError,TypeError): continue
+            if value.get('type')!='service_account' or value.get('project_id')!='ays-orbit-360-lab' or not value.get('private_key'):continue
+            file=root/'selected.json';file.write_text(json.dumps(value));file.chmod(0o600)
+            with open(os.environ['GITHUB_ENV'],'a') as out:out.write('GOOGLE_APPLICATION_CREDENTIALS='+str(file)+'\n')
+            break
+          else:raise SystemExit('I66_EXISTING_PROJECT_AUTH_UNAVAILABLE')
+          PY
+      - name: Run signed read-only QA in real Chromium
+        env:
+          GI_I66_QA_REPORT: ${{ runner.temp }}/i66-topbar-cobros-signed-qa.json
+        run: |
+          set -euo pipefail
+          npm install --no-save --package-lock=false --ignore-scripts --no-audit --no-fund firebase-admin@13.4.0 playwright@1.55.0 >/dev/null
+          node node_modules/playwright/cli.js install --with-deps chromium >/dev/null
+          node tools/gravicentra-i66-topbar-cobros-preview-signed-readonly.mjs
+      - name: Preserve role-safe evidence without customer identifiers
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gi-i66-topbar-cobros-signed-preview-${{ github.run_id }}
+          path: ${{ runner.temp }}/i66-topbar-cobros-signed-qa.json
+          retention-days: 7
+          if-no-files-found: ignore
