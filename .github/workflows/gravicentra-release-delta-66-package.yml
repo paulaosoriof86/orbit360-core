@@ -419,7 +419,14 @@ jobs:
           test "${#TARS[@]}" -eq 1
           test "${#SUMS[@]}" -eq 1
           test "$(dirname "${TARS[0]}")" = "$(dirname "${SUMS[0]}")"
-          (cd "$(dirname "${TARS[0]}")" && sha256sum --check gi-i66-exact-package.sha256)
+          # The build wrote its signed SHA alongside an absolute runner-temp
+          # pathname. A different runner cannot re-use that pathname; validate
+          # the digest against the actual downloaded tar, not the stale path.
+          EXPECTED="$(awk 'NR==1 {print $1}' "${SUMS[0]}")"
+          test "${#EXPECTED}" -eq 64
+          case "$EXPECTED" in *[!0-9a-f]*) exit 1;; esac
+          ACTUAL="$(sha256sum "${TARS[0]}" | awk '{print $1}')"
+          test "$ACTUAL" = "$EXPECTED"
           PACKAGE="$RUNNER_TEMP/gi-i66-reader-certified"
           mkdir -p "$PACKAGE"
           tar -xzf "${TARS[0]}" -C "$PACKAGE"
