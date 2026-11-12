@@ -1,10 +1,14 @@
 'use strict';
 const assert=require('node:assert/strict');
+const fs=require('node:fs');
 const {CASES,assess,resolveEditions}=require('./gravicentra-i66-cartera-a1-a4-readonly.cjs');
 assert.equal(CASES.length,8,'SAME_PROTECTED_A1_A4_A7_CONTROL_NO_NEW_PIPELINE');
 const ficohsa=CASES.find(x=>x.id==='A7.F1');
 assert.ok(ficohsa&&ficohsa.sourceBasis==='OCTOBER_COMMISSION_INFERENCE_REQUIRES_EXACT_POLICY_RECEIPT_MATCH');
 assert.equal(ficohsa.cents,270480);
+const readonly=fs.readFileSync(require('node:path').join(__dirname,'gravicentra-i66-cartera-a1-a4-readonly.cjs'),'utf8');
+assert.ok(readonly.includes("one.id==='A7.F1'")&&readonly.includes("'numeroPoliza','numero_poliza'")&&
+ readonly.includes('found.set(d.id,d)'),'A7_EXACT_POLICY_NUMBER_ALIASES_DEDUP_REQUIRED');
 assert.equal(assess(ficohsa,{policies:[]}).currentStatus,'HOLD_POLICY_NOT_FOUND');
 assert.equal(assess(ficohsa,{policies:[{pais:'GT'}],clientExists:true,receipts:[],cobros:[]}).currentStatus,
  'HOLD_EXACT_REQUIREMENT_NOT_LINKED');

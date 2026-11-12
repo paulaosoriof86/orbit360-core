@@ -100,8 +100,17 @@ async function scan(db){
   for(const t of tenantRefs){
     const col=t.collection('data').doc('polizas').collection('items');
     await Promise.all(CASES.map(async(one,i)=>{
-      const found=await col.where('numero','==',one.policy).limit(5).get();
-      for(const d of found.docs)buckets[i].push({tenant:t,id:d.id,data:d.data()||{}});
+      // Ficohsa may have arrived with a legacy policy-number field. Search
+      // exact aliases only, deduplicating physical documents before any
+      // edition/amount/requisite inference. This never mutates policy data.
+      const fields=one.id==='A7.F1'
+        ? ['numero','numeroPoliza','numero_poliza','numPoliza','numeroDePoliza',
+          'noPoliza','polizaNumero','policyNumber','policyNo','polizaNo','numeroContrato']
+        : ['numero'];
+      const reads=await Promise.all(fields.map(key=>col.where(key,'==',one.policy).limit(5).get()));
+      const found=new Map();
+      for(const snapshot of reads)for(const d of snapshot.docs||[])found.set(d.id,d);
+      for(const d of found.values())buckets[i].push({tenant:t,id:d.id,data:d.data()||{}});
     }));
   }
   const output=[];
