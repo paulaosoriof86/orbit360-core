@@ -1,0 +1,152 @@
+# I6.6 A3: one existing protected financial gate, seven exact Bantrab references.
+# Safe source-only preflight first; native GitHub Environment reviewer required
+# before ONE atomic sparse transaction. Do not create a new environment or repo.
+name: Gravicentra I6.6 Bantrab 7 exact reference CAS
+on:
+  push:
+    branches: [recovery/fase-a-clean-20260831]
+    paths:
+      - .github/workflows/gravicentra-i66-bantrab-seven-protected-cas.yml
+      - tools/gravicentra-i66-bantrab-seven-protected-cas.cjs
+      - tools/gravicentra-i66-bantrab-seven-protected-cas.test.cjs
+permissions:
+  contents: read
+concurrency:
+  group: gravicentra-live-data-writes-i66
+  cancel-in-progress: false
+env:
+  GCLOUD_PROJECT: ays-orbit-360-lab
+  SA_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+  SA_LAB_ALT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+  SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+jobs:
+  exact-source-preflight:
+    if: >
+      github.repository == 'paulaosoriof86/orbit360-core' &&
+      github.ref_name == 'recovery/fase-a-clean-20260831' &&
+      contains(github.event.head_commit.message, 'I66_BANTRAB_7_REF_PATCH')
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Pin seven source rows, backend scope, and full negative tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GCLOUD_PROJECT" = 'ays-orbit-360-lab'
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          echo 'f7f82cc29feab2e333eb9a6a7361216121e6f86938bf81756ba70a52535ec289  tools/gravicentra-i66-bantrab-seven-protected-cas.cjs' | sha256sum -c -
+          echo '059f574986276039541c0d763f1030c192b3e4279300fbb1edc558ce10c28671  tools/gravicentra-i66-bantrab-seven-protected-cas.test.cjs' | sha256sum -c -
+          node --check tools/gravicentra-i66-bantrab-seven-protected-cas.cjs
+          node tools/gravicentra-i66-bantrab-seven-protected-cas.test.cjs
+      - name: Select existing project credential and install isolated dependency
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm install --prefix "$RUNNER_TEMP/gi-i66-bantrab" --ignore-scripts --no-audit --no-fund firebase-admin@13.4.0 >/dev/null
+          echo "NODE_PATH=$RUNNER_TEMP/gi-i66-bantrab/node_modules" >> "$GITHUB_ENV"
+          python3 - <<'PY'
+          import json,os,pathlib
+          out=pathlib.Path(os.environ['RUNNER_TEMP'])/'gi-i66-bantrab-existing.json'
+          for name in ('SA_LAB','SA_LAB_ALT','SA_DEFAULT'):
+              try: value=json.loads(os.environ.get(name,''))
+              except (ValueError,TypeError): continue
+              if value.get('type')!='service_account' or value.get('project_id')!='ays-orbit-360-lab' or not value.get('private_key'):continue
+              out.write_text(json.dumps(value),encoding='utf8');out.chmod(0o600)
+              with open(os.environ['GITHUB_ENV'],'a') as env:env.write('GOOGLE_APPLICATION_CREDENTIALS='+str(out)+'\n')
+              print('I66_BANTRAB_EXISTING_PROJECT_IDENTITY_PASS');break
+          else:raise SystemExit('I66_BANTRAB_NO_AUTHORIZED_LIVE_CREDENTIAL')
+          PY
+      - name: Read exact policy edition and seven receipt preimages twice without writes
+        shell: bash
+        env:
+          GI_I66_BANTRAB_MODE: dry-run
+          GI_I66_BANTRAB_REPORT: ${{ runner.temp }}/gi-i66-bantrab-7-report.json
+        run: |
+          set -euo pipefail
+          node tools/gravicentra-i66-bantrab-seven-protected-cas.cjs
+          node - <<'JS'
+          const r=require(process.env.GI_I66_BANTRAB_REPORT);
+          if(r.status!=='PREIMAGE_SIGNED_READONLY_PASS_NOT_APPLIED'||r.selected?.length!==7||r.writes!==0||
+             r.attemptedPaymentWrites!==0||r.amountDateStatusWrites!==0)throw Error('I66_BANTRAB_DRYRUN_NOT_EXACT');
+          console.log('I66_BANTRAB_SEVEN_CAS_PREFLIGHT_GREEN_NO_DATA_WRITES');
+          JS
+      - name: Retain only scoped reference preimage and safe results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gi-i66-bantrab-seven-preflight-${{ github.run_id }}
+          path: ${{ runner.temp }}/gi-i66-bantrab-7-report.json
+          if-no-files-found: ignore
+          retention-days: 7
+  protected-seven-source-refs-live:
+    needs: exact-source-preflight
+    runs-on: ubuntu-24.04
+    timeout-minutes: 18
+    environment:
+      name: gravicentra-live-data-writes
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Reverify exact same branch source and negative tests inside reviewer gate
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF_NAME" = recovery/fase-a-clean-20260831
+          test "$GCLOUD_PROJECT" = ays-orbit-360-lab
+          echo 'f7f82cc29feab2e333eb9a6a7361216121e6f86938bf81756ba70a52535ec289  tools/gravicentra-i66-bantrab-seven-protected-cas.cjs' | sha256sum -c -
+          echo '059f574986276039541c0d763f1030c192b3e4279300fbb1edc558ce10c28671  tools/gravicentra-i66-bantrab-seven-protected-cas.test.cjs' | sha256sum -c -
+          node tools/gravicentra-i66-bantrab-seven-protected-cas.test.cjs
+      - name: Select same existing Firebase LAB credential
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm install --prefix "$RUNNER_TEMP/gi-i66-bantrab" --ignore-scripts --no-audit --no-fund firebase-admin@13.4.0 >/dev/null
+          echo "NODE_PATH=$RUNNER_TEMP/gi-i66-bantrab/node_modules" >> "$GITHUB_ENV"
+          python3 - <<'PY'
+          import json,os,pathlib
+          out=pathlib.Path(os.environ['RUNNER_TEMP'])/'gi-i66-bantrab-existing.json'
+          for name in ('SA_LAB','SA_LAB_ALT','SA_DEFAULT'):
+              try: value=json.loads(os.environ.get(name,''))
+              except (ValueError,TypeError):continue
+              if value.get('type')!='service_account' or value.get('project_id')!='ays-orbit-360-lab' or not value.get('private_key'):continue
+              out.write_text(json.dumps(value),encoding='utf8');out.chmod(0o600)
+              with open(os.environ['GITHUB_ENV'],'a') as env:env.write('GOOGLE_APPLICATION_CREDENTIALS='+str(out)+'\n')
+              print('I66_BANTRAB_PROTECTED_IDENTITY_PASS');break
+          else:raise SystemExit('I66_BANTRAB_PROTECTED_AUTH_HOLD')
+          PY
+      - name: Perform one protected tenant-scoped CAS and postimage readback
+        shell: bash
+        env:
+          GI_I66_BANTRAB_MODE: apply
+          GI_I66_BANTRAB_REPORT: ${{ runner.temp }}/gi-i66-bantrab-7-report.json
+        run: |
+          set -euo pipefail
+          node tools/gravicentra-i66-bantrab-seven-protected-cas.cjs
+          node - <<'JS'
+          const r=require(process.env.GI_I66_BANTRAB_REPORT);
+          if(r.status!=='PROTECTED_LIVE_BANTRAB_SEVEN_SOURCE_REFERENCES_PASS'||
+             r.receiptSourceReferenceWrites!==7||r.paymentWrites!==0||
+             r.amountDateStatusWrites!==0||r.rollbackRecorded!==true||r.auditRecorded!==true)
+            throw Error('I66_BANTRAB_PROTECTED_LIVE_READBACK_HOLD');
+          console.log('I66_BANTRAB_SEVEN_LIVE_EXACT_REF_CAS_READBACK_PASS');
+          JS
+      - name: Preserve sanitized financial write receipt
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gi-i66-bantrab-seven-live-${{ github.run_id }}
+          path: ${{ runner.temp }}/gi-i66-bantrab-7-report.json
+          if-no-files-found: ignore
+          retention-days: 90

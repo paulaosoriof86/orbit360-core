@@ -1,0 +1,38 @@
+'use strict';
+const assert=require('node:assert/strict');
+const {SOURCE_SHA,ROWS,chooseSeven,moneyCents,due,paid}=require('./gravicentra-i66-bantrab-seven-protected-cas.cjs');
+assert.equal(SOURCE_SHA,'b945a98c7c572909c643be4c849a7526a363eb490cdcf24ac8d0ae54ca3025b7');
+assert.equal(ROWS.length,7);
+assert.equal(new Set(ROWS.map(x=>x.number)).size,7);
+assert.equal(ROWS.reduce((s,x)=>s+x.amountCents,0),209958);
+assert.equal(ROWS[0].due,'2026-10-21');
+assert.equal(ROWS.at(-1).due,'2027-04-21');
+const policy={id:'pol_1',numero:'AUTO-45580',pais:'GT',clienteId:'cli_1',aseguradoraId:'ins_bantrab',
+  vigenciaInicio:'2026-07-21',vigenciaFin:'2027-07-21'};
+const receipts=ROWS.map((x,i)=>({id:'r'+i,polizaId:'pol_1',fechaLimite:x.due,monto:299.94,
+  numeroReciboFuente:'HISTORICAL_'+i,estado:'Pendiente'}));
+const numberIndex=Object.fromEntries(ROWS.map(x=>[x.number,[]]));
+const plan=chooseSeven(policy,receipts,[],numberIndex);
+assert.equal(plan.length,7);
+assert.deepEqual(plan.map(x=>x.newSourceNumber),ROWS.map(x=>x.number));
+assert.ok(plan.every(x=>x.oldFieldPresent&&x.oldSourceNumber.startsWith('HISTORICAL_')));
+assert.equal(moneyCents({monto:299.94}),29994);
+assert.equal(due({fechaLimite:'2027-04-21'}),'2027-04-21');
+assert.equal(paid({estado:'Pendiente'}),false);
+assert.equal(paid({estado:'Pagado'}),true);
+const bad=(rows=receipts,policyPatch={},cobros=[],numbers=numberIndex)=>()=>chooseSeven({...policy,...policyPatch},rows,cobros,numbers);
+assert.throws(bad(receipts,{pais:'CO'}),/POLICY_COUNTRY_EDITION_CLIENT_INSURER/);
+assert.throws(bad(receipts,{vigenciaFin:'2026-07-21'}),/POLICY_COUNTRY_EDITION_CLIENT_INSURER/);
+assert.throws(bad(receipts,{aseguradoraId:''}),/POLICY_COUNTRY_EDITION_CLIENT_INSURER/);
+assert.throws(bad([...receipts,{...receipts[0],id:'other'}]),/RECEIPT_DATE_AMOUNT_NOT_UNIQUE/);
+assert.throws(bad(receipts.slice(1)),/RECEIPT_DATE_AMOUNT_NOT_UNIQUE/);
+assert.throws(bad(receipts.map((r,i)=>i===0?{...r,monto:300}:r)),/RECEIPT_DATE_AMOUNT_NOT_UNIQUE/);
+assert.throws(bad(receipts.map((r,i)=>i===0?{...r,fechaLimite:'2026-04-21'}:r)),/RECEIPT_DATE_AMOUNT_NOT_UNIQUE/);
+assert.throws(bad(receipts.map((r,i)=>i===0?{...r,pagado:true}:r)),/RECEIPT_ALREADY_PAID_OR_LINKED/);
+assert.throws(bad(receipts,{},[{reciboId:'r0'}]),/RECEIPT_ALREADY_PAID_OR_LINKED/);
+assert.throws(bad(receipts,{},[],{...numberIndex,[ROWS[0].number]:['another_receipt']}),/SOURCE_NUMBER_ALREADY_ASSIGNED/);
+const source=require('node:fs').readFileSync(__filename.replace(/\.test\.cjs$/,'.cjs'),'utf8');
+assert.ok(source.includes("process.env.GI_I66_BANTRAB_MODE!=='apply'")&&source.includes("process.env.GITHUB_ACTIONS!=='true'"));
+assert.ok(source.includes('beforeFingerprint!==initial.beforeFingerprint')&&source.includes('rollbackBeforeFields'));
+assert.ok(source.includes('tx.create(audit')&&source.includes('sourceNumberWrites:7,paymentWrites:0'));
+console.log('I66_BANTRAB_SEVEN_PROTECTED_CAS_PURE_CONTRACT_PASS_7_REFS_NO_PAYMENT_OR_AMOUNT_CHANGE');
