@@ -21,12 +21,25 @@ const app=getApps()[0]||initializeApp({credential:applicationDefault(),projectId
 const db=getFirestore(app),auth=getAuth(app);
 
 async function findRole(target){
-  const docs=await db.collection('tenants').doc(TENANT).collection('members').limit(150).get();
-  requirePass(docs.size<150,'I66_MEMBER_READ_BOUND');
+  const tenant=db.collection('tenants').doc(TENANT);
+  const [docs,advisors]=await Promise.all([
+    tenant.collection('members').limit(150).get(),
+    tenant.collection('data').doc('asesores').collection('items').limit(400).get()
+  ]);
+  requirePass(docs.size<150&&advisors.size<400,'I66_MEMBER_READ_BOUND');
+  const knownAdvisors=new Set(),knownUids=new Set();
+  for(const doc of advisors.docs){
+    const a=doc.data()||{};
+    if([a.nombre,a.nombreCompleto,a.displayName,a.name].some(x=>norm(x)==='carlos castro'||norm(x).startsWith('carlos castro '))){
+      knownAdvisors.add(doc.id);
+      for(const uid of [a.authUid,a.uid,a.userId])if(uid)knownUids.add(String(uid));
+    }
+  }
   const who=docs.docs.filter(doc=>{
     const m=doc.data()||{},names=[m.nombre,m.displayName,m.name,m.nombreCompleto,m.fullName];
     const matches=target==='Operativo'
-      ? names.some(x=>norm(x).startsWith('carlos castro'))
+      ? names.some(x=>norm(x)==='carlos castro'||norm(x).startsWith('carlos castro '))||
+        knownAdvisors.has(String(m.advisorId||m.asesorId||''))||knownUids.has(doc.id)
       : names.some(x=>norm(x).includes('paula')&&norm(x).includes('osorio'));
     const roles=[m.activeRole,m.rol,m.rolDefault,...[].concat(m.roles||[])].map(norm);
     return matches&&m.active!==false&&m.activo!==false&&
@@ -113,7 +126,7 @@ try{
   });
   requirePass(marker.sourceSha===SOURCE&&marker.buildId===expectedBuild&&marker.gate==='I6.6',
     'I66_PREVIEW_WRONG_PRODUCT_ARTIFACT');
-  for(const target of ['Operativo','Dirección'])await exercise(target);
+  for(const target of ['Dirección','Operativo'])await exercise(target);
   report.status='SIGNED_COBROS_TOPBAR_READONLY_PASS';
   console.log('I66_SIGNED_COBROS_TOPBAR_PREVIEW_PASS '+JSON.stringify(report.cases));
 }catch(error){
