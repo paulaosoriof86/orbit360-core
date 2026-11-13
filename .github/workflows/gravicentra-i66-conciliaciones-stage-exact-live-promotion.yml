@@ -1,13 +1,9 @@
 # Existing I6.6 gate. The single certified Preview artifact is cloned to
 # LIVE, and only the existing live scoped reader is deployed from its backend.
-# Automatic rollback preserves R7 if any source, function, UI or file test fails.
+# One-time executed gate 43388747480. Retained for audit only; no push re-deploy.
 name: Gravicentra I6.6 Conciliaciones Stage Exact LIVE and Rollback
 on:
-  push:
-    branches: [recovery/fase-a-clean-20260831]
-    paths:
-      - .github/workflows/gravicentra-i66-conciliaciones-stage-exact-live-promotion.yml
-      - artifacts/orbit360-recovery/release-control/I6_6_RELEASE_TRANSPORT_CONTROL_20261110.json
+  workflow_dispatch:
 permissions:
   contents: read
   actions: read

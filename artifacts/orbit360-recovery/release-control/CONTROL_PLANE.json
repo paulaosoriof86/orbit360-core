@@ -3334,7 +3334,7 @@
     "i63LiveReadbackPass": true,
     "i63DeterministicDiffReady": true
   },
-  "nextAction": "I6_6_CONCILIACIONES_PREVIEW_SIGNED_ROLE_COUNTRY_TENANT_UAT_AFTER_7_OF_7_SOURCE_PASS_THEN_EXACT_ONE_FUNCTION_LIVE_DEPLOY_AUTHORIZATION_AND_DURABLE_INSURER_SAVE_AND_CARTERA_DIFF",
+  "nextAction": "I6_6_CONCILIACIONES_STAGE_READONLY_EXACT_LIVE_DONE_43388747480_52_OF_132_UNIQUE_RENDERED_80_HOLD; NEXT_SAFE_A1_A7_ISSUER_POLICY_EDITION_SOURCE_MATCH_THEN_IDEMPOTENT_BEFORE_AFTER_FINANCIAL_WRITES_AND_REAL_INSURER_DOC_RENEWAL_AND_ROLE_COUNTRY_WRITER_MATRIX; NO_REPEAT_PREVIOUS_DEPLOY",
   "postproductionExitProgress": {
     "formalPercent": 60,
     "frozenMiniGates": 6,
@@ -21648,7 +21648,7 @@
     "noNewIterationsOrParallelReleaseMethod": true,
     "noGlobalSynchronizationClaim": true
   },
-  "currentExecutionDecisionPointer": "b4007OwnerOperationalGateClosure20261110",
+  "currentExecutionDecisionPointer": "i66LatestExactLiveRelease20261113",
   "b4003CausalFrontendSuccessor20261107": {
     "schema": "GRAVICENTRA_B4_003_CAUSAL_FRONTEND_SUCCESSOR_CURSOR_V1",
     "status": "FRONTEND_SUCCESSOR_LIVE_BYTES_PASS_FOCAL_LIVE_PENDING",
@@ -22691,5 +22691,42 @@
     "liveCarteraSync": "IN_PROGRESS_NOT_REIMPORTED",
     "nextAction": "I6_6_PROTECTED_READER_SIGNED_PREVIEW_ROLE_COUNTRY_TENANT_UAT_THEN_EXACT_ONE_FUNCTION_LIVE_AUTHORIZATION_THEN_CARLOS_INSURER_DURABLE_SAVE_AND_CARRIER_PAYMENT_DIFF",
     "doNotClaimWholePlatformQaPass": true
+  },
+  "i66LatestExactLiveRelease20261113": {
+    "schema": "GI_I66_CURRENT_EXACT_LIVE_CUMULATIVE_RELEASE_V3",
+    "dateGuatemala": "2026-11-13",
+    "status": "CURRENT_STAGE_READONLY_SIGNED_EXACT_LIVE_PASS_FINANCIAL_AND_FULL_I66_HOLD",
+    "currentActiveGate": "I6.6",
+    "historicalB4007ClosurePreserved": true,
+    "sourceSha": "e6183a9f1da68243cc935e222d98b2d21b5f17b8",
+    "buildRunId": 43385953587,
+    "immutableArtifactId": 14018512857,
+    "immutableZipDigest": "sha256:64ccf09525abf48d8c707deb366ca1cf0122c6cd7765a7ae98c5ea5380dcec31",
+    "previewScopedReaderDeployRunId": 43386427260,
+    "signedPreviewUiRunId": 43387403110,
+    "signedExactLivePublishAndUiRunId": 43388747480,
+    "signedExactLiveEvidenceArtifactId": 14019334050,
+    "immutableLiveVersionBothOrigins": "sites/ays-orbit-360-lab/versions/dae5d5235978cefe",
+    "sameArtifactPreviewFirebaseStaffOriginReadback": "223_OF_223_EACH_PASS",
+    "oneExistingProtectedReaderNewLiveRevisionTraffic": "100_PERCENT",
+    "otherLiveFunctionsPreserved": true,
+    "signedDirectionConciliacionesStageUiBothOrigins": "52_UNIQUE_POLICY_NUMBER_LINKS_OF_132_TOTAL_PROPOSALS_RENDERED_READONLY_PASS",
+    "signedCarlosOperativoConciliacionesUnassignedBothOrigins": "ACCESS_DENIED_PASS",
+    "priorR7SignedCarlosAssignedModules": "8_OF_8_WITH_APPROVED_SYNTHETIC_WRITE_CRUD_RUN_43375687134",
+    "priorR7SignedDirectionAssignedModules": "10_OF_10_WITH_APPROVED_SYNTHETIC_WRITE_CRUD_RUN_43375687134",
+    "ambiguousStagePolicyEditionsHold": 80,
+    "realFinancialWritesInCurrentRelease": 0,
+    "carteraA1A7ActuallyApplied": 0,
+    "otherActualAdminTenantEmailVerificationHold": true,
+    "realInsurerIssuedDocumentUat": "HOLD",
+    "fullRoleCountryModuleWriteMatrix": "HOLD",
+    "currentI66ProductionAccepted": false,
+    "priorLiveSourceSha": "0153f5cbbe00c3732e11ebae59b32bd357e38bfd",
+    "priorLiveHostingVersion": "sites/ays-orbit-360-lab/versions/9cedc5ecda75bb2a",
+    "priorPointerHistorical": "artifacts/orbit360-recovery/release-control/I6_6_LATEST_EXACT_LIVE_POINTER_20261112.json",
+    "currentPointer": "artifacts/orbit360-recovery/release-control/I6_6_LATEST_EXACT_LIVE_POINTER_20261113.json",
+    "signedReleaseReceipt": "artifacts/orbit360-recovery/release-control/I6_6_CONCILIACIONES_STAGE_READONLY_LIVE_RECEIPT_20261113.json",
+    "currentFrozenNextAction": "ADJUDICATE_80_AMBIGUOUS_STAGE_PROPOSALS_THEN_A1_A7_EXACT_ISSUER_RECEIPT_MATCH_AND_AUDITED_SAFE_WRITES; PROVE_GENUINE_INSURER_RENEWAL_AND_FULL_ROLE_COUNTRY_WRITES; PRESERVE_ALL_PRIOR_ACCEPTED_MODULES",
+    "noAutomaticRepeatOfPublishedStageRelease": true
   }
 }

@@ -10,7 +10,7 @@
   "branch": "recovery/fase-a-clean-20260831",
   "forensicOriginSha": "9c95f31461f2eabe9804625b5659bee772f5602a",
   "createdAtUtc": "2026-08-31T18:00:00Z",
-  "updatedAtUtc": "2026-11-13T06:31:51Z",
+  "updatedAtUtc": "2026-11-13T07:54:00Z",
   "status": "I6_6_LIVE_CONTROLLED_PORTFOLIO_UPDATE_IN_PROGRESS",
   "currentIteration": 6,
   "lastCompletedIteration": 5,
@@ -22,13 +22,13 @@
   "productionAcceptedScope": "HISTORICAL_I5_CERTIFIED_BASE_IN_CONTROL_PLANE_NOT_I6_6_LATEST_SUCCESSOR",
   "currentLiveSuccessorAcceptance": {
     "gate": "I6.6",
-    "sourceSha": "0153f5cbbe00c3732e11ebae59b32bd357e38bfd",
+    "sourceSha": "e6183a9f1da68243cc935e222d98b2d21b5f17b8",
     "frontEndExactLiveReadback": "PASS_223_OF_223_EACH_ORIGIN",
     "signedCrossRouteReadOnly": "PASS_43250591471_SIGNED_LIVE_OPS_LEADS_TASKS_43310610618_REAL_PENDING_LEADS_OPS_43315196712_AND_ACTUAL_CARLOS_TASK_DOM_43332642537",
     "fullPerModuleRoleCountryWriteUat": "HOLD_NOT_CERTIFIED",
-    "protectedConciliacionesLiveBackend": "LATEST_PASS_SIGNED_PREVIEW_LIVE_SAME_F0853986_SOURCE_ACTIVE_00005_TRAFFIC_100_PERCENT_RUN_43324845568_READ_ONLY; PREVIOUS_B0D010_RUN_43278857052_HISTORICAL; FINANCIAL_WRITES_HOLD",
+    "protectedConciliacionesLiveBackend": "LATEST_EXACT_STAGE_READONLY_SOURCE_E6183A9F1DA6_SINGLE_EXISTING_LIVE_READER_NEW_REVISION_100_PERCENT_SIGNED_DIRECTION_52_OF_52_BOTH_LIVE_ORIGINS_CARLOS_UNASSIGNED_DENIAL_43388747480; HISTORICAL_F0853986_READER_43324845568_PRESERVED; FINANCIAL_WRITES_HOLD",
     "conciliacionesActiveLedgerViewGap20261113": {
-      "status": "ROOT_CAUSE_READONLY_CENSUS_PASS_PROJECTION_PREVIEW_LIVE_HOLD",
+      "status": "ROOT_CAUSE_PROVEN_STAGE_READONLY_UI_PROJECTION_EXACT_LIVE_REPAIRED_FINANCIAL_APPLICATION_HOLD",
       "evidenceReceipt": "artifacts/orbit360-recovery/release-control/I6_6_CONCILIACIONES_ACTIVE_LEDGER_VIEW_GAP_20261113.json",
       "liveCensusRunId": 43378603985,
       "livePolicyJoinReadOnlyRunId": 43379037882,
@@ -38,17 +38,41 @@
       "activeLedgerHolds": 233,
       "uniquePolicyNumberMatchCandidates": 52,
       "ambiguousPolicyNumberMatchHold": 80,
-      "proposalsActuallyVisibleFromStage": 0,
-      "next": "SERVER_SCOPED_READONLY_PROJECTION_WITH_VERIFIED_POLICY_EDITION_AND_COUNTRY_ADVISOR_AUTH_IN_ISOLATED_PREVIEW_NO_IMPORT_NO_FINANCIAL_WRITE"
+      "proposalsActuallyVisibleFromStage": 52,
+      "signedLiveVisibleOnBothOrigins": 52,
+      "signedLiveExactStageRunId": 43388747480,
+      "remainingAmbiguousOrNonUnique": 80,
+      "next": "SOURCE_EXACT_POLICY_EDITION_ADJUDICATION_FOR_80_HOLD_AND_CARRIER_SCHEDULE_APPLICATION_GUARDED_BY_BEFORE_AFTER_NO_BLIND_WRITE"
     },
-    "currentExactHostingRunId": 43375687134,
-    "currentExactHostingArtifactId": 14013250472,
-    "currentExactHostingBuildId": "gi-i66-0153f5cbbe00-57f234755dc1",
+    "conciliacionesStageExactLiveCompleted20261113": {
+      "status": "SIGNED_DUAL_ORIGIN_STAGE_READONLY_LIVE_PASS_NOT_PAYMENT_APPLICATION",
+      "sourceSha": "e6183a9f1da68243cc935e222d98b2d21b5f17b8",
+      "buildRun": 43385953587,
+      "immutableArtifactId": 14018512857,
+      "artifactDigest": "sha256:64ccf09525abf48d8c707deb366ca1cf0122c6cd7765a7ae98c5ea5380dcec31",
+      "previewReaderRun": 43386427260,
+      "previewSignedRealUiRun": 43387403110,
+      "liveSignedDualOriginRun": 43388747480,
+      "liveEvidenceArtifactId": 14019334050,
+      "exactHostingVersion": "sites/ays-orbit-360-lab/versions/dae5d5235978cefe",
+      "sameBuildFilesEachOrigin": 223,
+      "directionUniqueProposalsVisible": 52,
+      "totalStageProposals": 132,
+      "ambiguousHolds": 80,
+      "operativoCarlosAccessToUnassignedModule": "DENIED_EXPECTED",
+      "backendFunctionChanges": "ONE_EXISTING_PROTECTED_LIVE_READER_ONLY",
+      "realFinancialWrites": 0,
+      "fullI66ProductionAccepted": false,
+      "latestReleaseReceipt": "artifacts/orbit360-recovery/release-control/I6_6_CONCILIACIONES_STAGE_READONLY_LIVE_RECEIPT_20261113.json"
+    },
+    "currentExactHostingRunId": 43388747480,
+    "currentExactHostingArtifactId": 14018512857,
+    "currentExactHostingBuildId": null,
     "liveTwoActorOpsLeadsTasksCrudRunId": 43310610618,
     "liveTwoActorPaymentAndRenewabilityRunId": 43312896784,
     "targetedCobrosBackendSourceSha": "a49f5f76bc85b5df211a865efed94d9821cdd680",
     "targetedCobrosBackendImmutableTarSha256": "3bc2599c42e01dca2e4b9c9053b2a8990885cd0c762fe3117f78b851c5f791ec",
-    "backendTransportInterpretation": "Payment CallableResponse correction remains preserved. New R7 exact source 0153f5c from immutable artifact 14013250472 was signed in Preview 43375403003, deployed to three LIVE backend functions with 100 percent latest revision traffic and the identical Hosting version 9cedc5ecda75bb2a on both origins 223/223 each, then real Carlos and Direction signed LIVE workflow and rights UAT passed 43375687134. The signed tests used reversible synthetic records, removed with readback. Other actual AdminTenant/SuperAdmin users, real insurer documents and financial writes remain HOLD.",
+    "backendTransportInterpretation": "Historical R7 source 0153f5c artifact 14013250472 and 3 signed LIVE backend function revisions remain preserved. Current successor e6183a9 exact immutable artifact 14018512857 cloned from signed Preview to both LIVE Hosting origins 223/223 under version dae5d5235978cefe, with only the existing protected scoped reader LIVE function new revision 100 percent; real signed Direction sees 52/52 uniquely linked staged proposals in Conciliaciones on both origins; Carlos correctly denied because Conciliaciones is not an assigned module. LIVE 43388747480 SUCCESS. No real customer or financial writes. Other real insurer document, unverified AdminTenant, and A1-A7 financial writers remain HOLD.",
     "privilegedRoleExactLiveSuccessor20261112": {
       "status": "PUBLISHED_TARGETED_PASS_NOT_FULL_I6_6_PRODUCTION_ACCEPTANCE",
       "sourceSha": "0153f5cbbe00c3732e11ebae59b32bd357e38bfd",
@@ -134,7 +158,7 @@
       "scope": "Remove old B4-003 workflow push trigger only; preserve manual dispatch and all B4 PASS records; no source artifact, Hosting, Firestore or financial mutation.",
       "currentGate": "I6.6"
     },
-    "currentExactLiveFrontendSource": "0153f5cbbe00c3732e11ebae59b32bd357e38bfd",
+    "currentExactLiveFrontendSource": "e6183a9f1da68243cc935e222d98b2d21b5f17b8",
     "releaseCadence": "EACH_CAUSAL_FIX_SOURCE_TEST_PREVIEW_SIGNED_QA_SAME_ARTIFACT_OR_ISOLATED_FUNCTION_LIVE_READBACK_IMMEDIATELY_NO_UNVERIFIED_PASS_NO_BATCHED_CHANGES",
     "operativoAndSuperiorsWriteDecision": "Operativo Carlos: crear, editar, gestionar, responder, registrar, resolver y ejecutar toda accion operativa aprobada en los modulos que realmente tiene autorizados, incluidos Ops, Leads, renovaciones y cobros; Direccion/Admin/AdminTenant/SuperAdmin mismas facultades o superiores en sus alcances; preservar tenant pais privilegios sensibles y auditoria. No extender Asesor ni permitir pagos a ciegas.",
     "frozenOrder": [
@@ -144,7 +168,7 @@
       "P1_ASEGURADORAS_FULL_OPERATIONAL_EDITS_LOGO_ACCOUNT_SECRET_WITH_AUDIT",
       "P1_SEARCH_PERFORMANCE_MODULE_ROLE_COUNTRY_REGRESSION_AND_DOCUMENTAL_CONVERGENCE"
     ],
-    "firstIncompleteBlockAfterReaderParity": "P0_GENUINE_INSURER_DOCUMENT_RENEWAL_AND_ADMIN_COUNTRY_TRANSVERSAL_MATRIX_NOT_YET_CERTIFIED; P0_FINANCIAL_A1_A7_REQUIREMENT_EDITION_MATCH_SAFE_CAS_MINIBATCHES",
+    "firstIncompleteBlockAfterReaderParity": "P0_80_AMBIGUOUS_CONCILIACIONES_STAGE_PROPOSALS_POLICY_EDITION_SOURCE_ADJUDICATION; P0_FINANCIAL_A1_A7_SOURCE_SCHEDULE_MATCH_BEFORE_SAFE_WRITES; P0_GENUINE_INSURER_DOCUMENT_RENEWAL_AND_ADMIN_COUNTRY_TRANSVERSAL_WRITER_MATRIX",
     "liveReadback20261112": {
       "opsPaulaSimulatedOperativo": "PLUS_GESTION_AND_PLUS_NUEVO_INGRESO_VISIBLE_MODAL_OPENS_NO_WRITE_UAT",
       "opsLeadsPendingProjection": 1,
@@ -499,7 +523,7 @@
     "phaseAIterationStatuses": "HISTORICAL_FIELDS_ABOVE_PRESERVED_UNTIL_FORMAL_GATE_EVIDENCE;_NO_NEW_PASS_INFERRED",
     "labDataWriteScope": "ONLY_35_AUTHORIZED_COUNTRY_FIELDS;_NO_AUGUST_REFRESH"
   },
-  "nextAction": "I6_6_CURRENT_R7_EXACT_LIVE_0153F5_ARTIFACT_14013250472_HOSTING_9CEDC5ECDA75BB2A_223_EACH_3_BACKEND_REVISIONS_100_PERCENT_SIGNED_CARLOS_8_MODULES_DIRECTION_10_MODULES_AND_HIGHER_ROLE_AUTH_READY_ADMINTENANT_SUPERADMIN_10_EACH; FIRST_P0_PROTECTED_CONCILIACIONES_STAGE_TO_UI_READONLY_PROJECTION_CAUSAL_GAP_132_STAGE_VS_ZERO_VISIBLE_52_UNIQUE_POLICY_MATCH_80_AMBIGUOUS_HOLD_READONLY_43378603985_43379037882; BUILD_FAST_VERIFIED_PARENT_COUNTRY_ADVISOR_SERVER_BRIDGE_IN_ISOLATED_PREVIEW_SIGNED_THEN_SAME_ARTIFACT_LIVE_NO_FINANCIAL_WRITES; NEXT_P0_REAL_ADMIN_TENANT_EMAIL_AUTH_HOLD_ADMIN_ZERO_ACTIVE_INSURER_DOC_RENEWAL_PASSWORD_UI_LEGAL_GATE_AND_COUNTRY_WRITER_MATRIX; NEXT_P0_FINANCIAL_WRITER_PARITY_AND_A1_A7_SAFE_SOURCE_EXACT_MINIBATCHES_AFTER_A5P7_A6P4_ISSUER_SCHEDULE_CONFLICT; P1_PREVIEW_QUOTA_RETENTION_PERFORMANCE. B4_007_CLOSED_I6_6_WHOLE_PLATFORM_ACCEPTANCE_FALSE.",
+  "nextAction": "I6_6_CURRENT_E6183A_EXACT_LIVE_ARTIFACT_14018512857_HOSTING_DAE5D5235978CEFE_223_OF_223_EACH_PREVIEW_FIREBASE_STAFF_ORIGIN_SIGNED_DIRECTION_CONCILIACIONES_52_OF_52_VISIBLE_AND_CARLOS_UNASSIGNED_DENIED_43388747480_ZERO_FINANCIAL_WRITES. NEXT_P0_ADJUDICATE_80_AMBIGUOUS_OF_132_ACTIVE_STAGE_PROPOSALS_USING_POLICY_EDITION_EVIDENCE_NO_BLIND_WRITE; NEXT_P0_A1_A7_PAYMENT_ISSUER_SCHEDULE_MATCH_AND_IDEMPOTENT_CAS_REAL_BEFORE_AFTER_WITH_APPROVED_SCOPE; PARALLEL_P0_REAL_INSURER_ISSUED_RENEWAL_AND_ADMIN_COUNTRY_WRITER_MATRIX; P1_PREVIEW_CHANNEL_RETENTION_AND_CAUSAL_PERFORMANCE_REGRESSION. B4_007_HISTORICALLY_CLOSED_I6_6_WHOLE_PLATFORM_ACCEPTANCE_FALSE.",
   "sourceOfTruth": {
     "projectBoundaryPrevalentAddendum": "orbit360-platform/docs/recovery/ADDENDUM_PREVALENTE_CHATGPT_PROJECT_BOUNDARY_20260831.md",
     "mutableState": "orbit360-platform/docs/recovery/orbit360-recovery-state-v1.json",
@@ -958,7 +982,7 @@
     "noNewIterationsOrParallelReleaseMethod": true,
     "noGlobalSynchronizationClaim": true
   },
-  "currentExecutionDecisionPointer": "artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json#b4007OwnerOperationalGateClosure20261110",
+  "currentExecutionDecisionPointer": "artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json#i66LatestExactLiveRelease20261113",
   "b4003CausalFrontendSuccessor20261107": {
     "schema": "GRAVICENTRA_B4_003_CAUSAL_FRONTEND_SUCCESSOR_CURSOR_V1",
     "status": "FRONTEND_SUCCESSOR_LIVE_BYTES_PASS_FOCAL_LIVE_PENDING",
@@ -1959,7 +1983,7 @@
     "liveHostingCloneRunId": 43250027168,
     "liveCloneReadbackArtifactId": 13958673560,
     "liveReadbackBothOrigins": "223_OF_223_EACH_EXACT_C191",
-    "activeLatestLivePointer": "artifacts/orbit360-recovery/release-control/I6_6_LATEST_EXACT_LIVE_POINTER_20261112.json",
+    "activeLatestLivePointer": "artifacts/orbit360-recovery/release-control/I6_6_LATEST_EXACT_LIVE_POINTER_20261113.json",
     "fullRoleCountryFinancialUatCertified": false,
     "nextAction": "EXACT_CARLOS_LIVE_WRITE_BEFORE_AFTER_READBACK_WITH_IDEMPOTENCE; SEPARATE_BACKEND_READER_COUNTRY_ROLE_TENANT_GATE_AND_RELEASE; DOCUMENTAL_POINTER_R5_SAME_CANONICAL_ARTIFACT_NO_DUPLICATE_SOURCE"
   }

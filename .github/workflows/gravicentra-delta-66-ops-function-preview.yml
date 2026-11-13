@@ -1,11 +1,7 @@
 # I6.6 Carlos all-scope Preview callables, exact b86cad synthetic-only artifact; no LIVE or real customer writes.
 name: Gravicentra I6.6 Carlos Transversal Function Preview
 on:
-  push:
-    branches: [recovery/fase-a-clean-20260831]
-    paths:
-      - .github/workflows/gravicentra-delta-66-ops-function-preview.yml
-      - artifacts/orbit360-recovery/release-control/I6_6_RELEASE_TRANSPORT_CONTROL_20261110.json
+  workflow_dispatch:
 permissions:
   contents: read
   actions: read

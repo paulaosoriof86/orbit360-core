@@ -1,11 +1,6 @@
 name: Gravicentra I6.6 Conciliaciones Stage Signed Preview UI Readonly
 on:
-  push:
-    branches: [recovery/fase-a-clean-20260831]
-    paths:
-      - .github/workflows/gravicentra-i66-conciliaciones-stage-signed-preview-ui-readonly.yml
-      - tools/gravicentra-i66-conciliaciones-stage-signed-preview-ui-readonly.cjs
-      - artifacts/orbit360-recovery/release-control/I6_6_RELEASE_TRANSPORT_CONTROL_20261110.json
+  workflow_dispatch:
 permissions:
   contents: read
 jobs:
