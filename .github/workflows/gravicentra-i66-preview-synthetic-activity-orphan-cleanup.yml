@@ -1,0 +1,33 @@
+name: Gravicentra I6.6 Preview Single Synthetic Activity Orphan Cleanup
+on:
+  push:
+    branches: [recovery/fase-a-clean-20260831]
+    paths:
+      - .github/workflows/gravicentra-i66-preview-synthetic-activity-orphan-cleanup.yml
+permissions:
+  contents: read
+concurrency:
+  group: gi-i66-preview-single-synthetic-activity-orphan
+  cancel-in-progress: false
+jobs:
+  exact-preview-activity:
+    if: github.repository == 'paulaosoriof86/orbit360-core' && github.ref == 'refs/heads/recovery/fase-a-clean-20260831'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    env:
+      SA_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_ALT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Remove precisely one explicitly marked Preview synthetic activity
+        run: |
+          set -euo pipefail
+          node --check tools/gravicentra-i6-6-preview-synthetic-activity-orphan-cleanup.cjs
+          npm install --no-save --package-lock=false --ignore-scripts --no-audit --no-fund firebase-admin@13.4.0 >/dev/null
+          node tools/gravicentra-i6-6-preview-synthetic-activity-orphan-cleanup.cjs
