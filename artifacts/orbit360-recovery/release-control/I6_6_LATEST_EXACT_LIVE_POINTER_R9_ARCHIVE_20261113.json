@@ -1,0 +1,109 @@
+{
+  "schema": "GI_I66_LATEST_EXACT_LIVE_RELEASE_POINTER_V3",
+  "dateGuatemala": "2026-11-13",
+  "status": "LATEST_R9_PAYMENT_INVOICE_AND_POLICY_SIGNED_LIVE_PASS_I66_FULL_ACCEPTANCE_HOLD",
+  "productBrand": "Gravicentra Insurance",
+  "activeGate": "I6.6",
+  "historicalB4007Closed": true,
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "currentLiveSourceSha": "586401bfbe1a80cfef2820982f432743af36b108",
+  "currentLiveImmutableBuildRunId": 43463160506,
+  "currentLiveArtifactId": 14057935092,
+  "currentLiveArtifactDigest": "sha256:1621f236b9d1b9e49ea42fc53e338a695d5872080361ada2a84183fa7d52207f",
+  "currentLiveDeployAndSignedQaRunId": 43472800270,
+  "currentLiveEvidenceArtifactId": 14059959240,
+  "currentLiveHostingVersion": "sites/ays-orbit-360-lab/versions/1dd873081501d7fb",
+  "previewFirebaseLiveAndCustomLiveArtifactFiles": "223_OF_223_EACH_ORIGIN_EXACT",
+  "liveOneExistingProtectedReaderEffectiveTraffic": "100_PERCENT_NEW_REVISION",
+  "otherFunctionsPreserved": true,
+  "directionLiveConciliacionesStageReadOnly": "52_OF_52_UNIQUE_LINKS_VISIBLE_BOTH_ORIGINS_PASS",
+  "operativoCarlosConciliacionesNotAssigned": "SIGNED_DENY_IN_PREVIEW_AND_BOTH_LIVE_ORIGINS_PASS",
+  "operativoCarlosExistingAuthorizedModulesFromPriorR7": "HISTORICAL_R7_43375687134_PRESERVED; CURRENT_R8_SIGNED_LIVE_8_OF_8_43452158412",
+  "directionExistingAuthorizedModulesFromPriorR7": "HISTORICAL_R7_43375687134_PRESERVED; CURRENT_R8_SIGNED_LIVE_10_OF_10_43452158412",
+  "rolePermissionDecision": "OPERATIVO_FULL_APPROVED_WRITES_IN_EACH_ASSIGNED_MODULE_WITH_TENANT_COUNTRY_AND_SENSITIVE_SCOPES;_NOT_GLOBAL_ACCESS_TO_UNASSIGNED_CONCILIACIONES_OR_OTHER_MODULES",
+  "stageProposalTotal": 132,
+  "stageProposalUniqueReadOnlyRendered": 52,
+  "stageProposalAmbiguousHold": 80,
+  "stageProposalUniqueCoveragePercent": 39.39,
+  "actualFinancialUpdatesThisRelease": 0,
+  "carteraA1A7ActualReceiptApplication": "HOLD_ZERO_OF_SEVEN_APPLIED_UNTIL_EXACT_SOURCE_MATCH_AND_IDEMPOTENT_BEFORE_AFTER",
+  "higherRolesRealSignedScope": "CURRENT_SIGNED_LIVE_ADMINTENANT_1_OF_2_ACTIVE_SUPERADMIN_1_OF_1_ACTIVE_10_OF_10_43452158208; ONE_ADMINTENANT_EMAIL_UNVERIFIED_HOLD",
+  "realInsurerIssuedRenewal": "HOLD",
+  "fullModuleRoleCountryRealWriteAcceptance": false,
+  "fullI66ProductionAccepted": false,
+  "currentLiveReceipt": "artifacts/orbit360-recovery/release-control/I6_6_PAYMENT_INVOICE_POLICY_R9_LIVE_RECEIPT_20261113.json",
+  "priorR7LiveReceipt": "artifacts/orbit360-recovery/release-control/I6_6_LATEST_EXACT_LIVE_POINTER_20261112.json",
+  "previousLiveVersionForRollback": "sites/ays-orbit-360-lab/versions/162340ae18a9e6f7",
+  "currentR9SignedPaymentInvoicePolicyLiveAcceptance20261113": {
+    "receipt": "artifacts/orbit360-recovery/release-control/I6_6_PAYMENT_INVOICE_POLICY_R9_LIVE_RECEIPT_20261113.json",
+    "backendSignedLiveRunId": 43471877267,
+    "frontendSignedLiveRunId": 43472800270,
+    "paymentUserInterfaceSignedLiveRunId": 43473378992,
+    "newPolicyClient360CarlosPaulaSignedLive": "TWO_OF_TWO_ATOMIC_CREATE_RELOAD_AND_CLEANUP_PASS",
+    "paymentInvoiceDateCarlosPaulaSignedLive": "TWO_OF_TWO_APPLY_RECONCILE_RELOAD_AND_CLEANUP_PASS",
+    "actualInsurerInvoicePdfUploadReadback": "HOLD_NOT_SIGNED",
+    "newRealFinancialRecordsWrittenByRelease": 0
+  },
+  "nextAction": "BANTRAB_A1_A7_PROTECTED_ENV_REVIEW_43438038880; MAPFRE_SC79829_FULL_ANNUAL_CONTRACT_PREMIUM; 80_AMBIGUOUS_STAGE_PROPOSALS_EDITION_EVIDENCE; SECURE_INSURER_PASSWORD_REAL_SAVE_AND_PORTAL_CLIENT360_TASK_E2E; NO_BLIND_FINANCIAL_WRITES",
+  "historicalR8ExactPublishedRoleRightsAndUat20261113": {
+    "receipt": "artifacts/orbit360-recovery/release-control/I6_6_ROLE_TRANSVERSAL_R8_LIVE_RECEIPT_20261113.json",
+    "qa": {
+      "roleSourceTests": {
+        "passed": 17,
+        "total": 17,
+        "runId": 43448848149
+      },
+      "preview": {
+        "buildRunId": 43448848169,
+        "artifactId": 14048803073,
+        "sourceSha": "8a0e904500cbb3c961d83f16517caab69df88a2b",
+        "verifiedFiles": 223,
+        "roleMatrixCellsPassed": 35,
+        "roleMatrixCellsTotal": 35,
+        "signedRunId": 43450480491
+      },
+      "live": {
+        "promotionRunId": 43451818931,
+        "evidenceArtifactId": 14050397535,
+        "hostingVersion": "sites/ays-orbit-360-lab/versions/162340ae18a9e6f7",
+        "previewFiles": 223,
+        "firebaseFiles": 223,
+        "staffDomainFiles": 223,
+        "signedRoleRunId": 43452158412,
+        "operativoVisibleCreateEdit": {
+          "passed": 8,
+          "total": 8
+        },
+        "direccionVisibleCreateEdit": {
+          "passed": 10,
+          "total": 10
+        },
+        "opsLeadsTasksSyntheticUatRunId": 43452502778,
+        "paymentAndRenewabilitySyntheticUatRunId": 43452656400,
+        "insurerSyntheticAccountUatRunId": 43452980131,
+        "directRenewalSyntheticUatRunId": 43453049866,
+        "higherRolesSignedRunId": 43452158208,
+        "higherRolesRunConclusion": "failure_due_only_to_one_unverified_email",
+        "adminTenantSignedPass": 1,
+        "adminTenantActive": 2,
+        "superAdminSignedPass": 1,
+        "superAdminActive": 1,
+        "realCustomerWrites": 0,
+        "syntheticQaFixturesReverted": true
+      },
+      "hold": {
+        "adminTenantSecondUser": "EMAIL_NOT_VERIFIED_NO_IMPERSONATION",
+        "adminRole": "NO_ACTIVE_SIGNED_USER_TO_TEST",
+        "realInsurerPortalPasswordSave": "NOT_END_TO_END_TESTED",
+        "completeCreatePolicyFromBlank": "NOT_DISTINCTLY_TESTED",
+        "client360AndCustomerPortalRequestEntry": "NOT_COMPLETE_END_TO_END_TESTED",
+        "notificationLiveAudioWhatsApp": "NOT_REAL_DELIVERY_TESTED",
+        "bantrabSevenSourceRefs": "GH_PROTECTED_ENV_REVIEW_WAITING_43438038880_ZERO_WRITES",
+        "mapfreSc79829": "FIVE_REQUIREMENTS_STAGED_ZERO_WRITES_ANNUAL_CONTRACT_PREMIUM_OR_ANNEX_NEEDED",
+        "conciliaciones": "52_OF_132_UNIQUE_STAGE_RENDERED_80_AMBIGUOUS_HOLD_FINANCIAL_APPLICATION_ZERO",
+        "fullI66ProductionAccepted": false
+      }
+    }
+  }
+}

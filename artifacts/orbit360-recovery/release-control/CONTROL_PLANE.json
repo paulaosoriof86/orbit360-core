@@ -21648,10 +21648,10 @@
     "noNewIterationsOrParallelReleaseMethod": true,
     "noGlobalSynchronizationClaim": true
   },
-  "currentExecutionDecisionPointer": "i66PaymentInvoicePolicyR9ExactLiveRelease20261113",
+  "currentExecutionDecisionPointer": "i66ConciliacionesHumanNamesR10ExactLiveRelease20261113",
   "i66PaymentInvoicePolicyR9ExactLiveRelease20261113": {
     "schema": "GI_I66_R9_EXACT_LIVE_OPERATIVE_SUCCESSOR_V1",
-    "status": "CURRENT_R9_PAYMENT_INVOICE_POLICY_DUAL_ORIGIN_SIGNED_LIVE_PASS_FULL_I66_HOLD",
+    "status": "PREVIOUS_R9_PAYMENT_INVOICE_POLICY_SIGNED_LIVE_PRESERVED",
     "sourceSha": "586401bfbe1a80cfef2820982f432743af36b108",
     "buildId": "gi-i66-586401bfbe1a-57f234755dc1",
     "buildRunId": 43463160506,
@@ -22788,5 +22788,33 @@
     "currentPointer": "artifacts/orbit360-recovery/release-control/I6_6_LATEST_EXACT_LIVE_POINTER_20261113.json",
     "signedReleaseReceipt": "artifacts/orbit360-recovery/release-control/I6_6_ROLE_TRANSVERSAL_R8_LIVE_RECEIPT_20261113.json",
     "next": "BANTRAB_PROTECTED_REVIEW_43438038880_AND_MAPFRE_SC79829_ANNUAL_CONTRACT"
+  },
+  "i66ConciliacionesHumanNamesR10ExactLiveRelease20261113": {
+    "schema": "GI_I66_R10_CONCILIACIONES_HUMAN_CLIENT_NAMES_EXACT_LIVE_SUCCESSOR_V1",
+    "status": "CURRENT_R10_CONCILIACIONES_HUMAN_NAMES_EXACT_LIVE_PASS_FULL_I66_HOLD",
+    "sourceSha": "851d68441b819eac6dd37ec1d5d15fb971e35bf2",
+    "buildId": "gi-i66-851d68441b81-57f234755dc1",
+    "buildRunId": 43484031398,
+    "artifactId": 14066487146,
+    "artifactDigest": "sha256:f0d45ff58490d53c434f7285d98818439cfabdafb9bbc0f8e814787927df5f3d",
+    "liveCloneRunId": 43498437664,
+    "signedLiveUiRunId": 43498437664,
+    "liveEvidenceArtifactId": 14072713179,
+    "sameFilesBothOrigins": 223,
+    "hostingVersion": "sites/ays-orbit-360-lab/versions/23037b2a726a8def",
+    "receipt": "artifacts/orbit360-recovery/release-control/I6_6_CONCILIACIONES_HUMAN_NAMES_R10_LIVE_RECEIPT_20261113.json",
+    "currentPointer": "artifacts/orbit360-recovery/release-control/I6_6_LATEST_EXACT_LIVE_POINTER_20261113.json",
+    "previousR9Receipt": "artifacts/orbit360-recovery/release-control/I6_6_PAYMENT_INVOICE_POLICY_R9_LIVE_RECEIPT_20261113.json",
+    "previousR9HostingVersion": "sites/ays-orbit-360-lab/versions/1dd873081501d7fb",
+    "protectedReaderFunction": "orbit360ScopedPolicyRead",
+    "protectedReaderRegion": "us-east1",
+    "protectedReaderNewRevisionEffectiveTrafficPercent": 100,
+    "roleCountrySigned": "DIRECTION_AND_CARLOS_SCOPE_PASS",
+    "uniqueHumanClientNames": 52,
+    "technicalCustomerIdLabelsVisible": 0,
+    "ambiguousHold": 80,
+    "financialActualWrites": 0,
+    "documentDriveRealUploadCertified": false,
+    "fullI66ProductionAccepted": false
   }
 }
