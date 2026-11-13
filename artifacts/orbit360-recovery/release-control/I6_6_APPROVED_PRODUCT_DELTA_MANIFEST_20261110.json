@@ -1841,6 +1841,7 @@
     "qa": "14/14 local synthetic PASS",
     "liveTouchAuthorized": false,
     "existingPreviewChannelOnly": true,
-    "oneBuildOneArtifact": true
+    "oneBuildOneArtifact": true,
+    "preflightScopeCorrection": "R10_CURRENT_LIVE_POINTER_PRESERVED_R11_PREVIEW_ONLY_AUTHORIZATION_NARROW"
   }
 }

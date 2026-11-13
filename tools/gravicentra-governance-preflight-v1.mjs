@@ -69,6 +69,28 @@ if(i66Active){
     const current=state.currentLiveSuccessorAcceptance||{};
     const exact=transport.i66ConciliacionesHumanNameExactLiveCompleted20261113||{};
     const prior=transport.previousExactHostingReleaseR9||{};
+    // R11 only requests immutable isolated Preview; R10 remains LIVE.
+    const r11Request=transport.i66R11PreviewBuildRequest20261113||{};
+    const r11Backup=transport.i66R11RenewalDrivePreviewQuotaRecovery20261113||{};
+    const r11ScopedPreview=transport.status==='PREVIEW_BUILD_REQUESTED'&&
+      r11Request.approvedByDirection===true&&
+      r11Request.sourceCommit==='9cc674f528a5216bea7ad8e7abe7cdab98799de2'&&
+      r11Request.testLocal==='14_OF_14_PASS'&&
+      r11Request.liveHostingPromotionAuthorized===false&&
+      r11Request.backendFunctionDeployAuthorized===false&&
+      r11Request.customerDataWritesAuthorized===false&&
+      r11Backup.status==='R10_CURRENT_PREVIEW_LIVE_EXACT_BACKUP_AUTHORIZED_SINGLE_CHANNEL'&&
+      r11Backup.expectedCurrentSourceSha===receipt.sourceSha&&
+      r11Backup.expectedCurrentHostingVersion===receipt.hostingVersion.split('/').pop()&&
+      r11Backup.recoverableSourceRunId===receipt.immutableBuildRunId&&
+      r11Backup.recoverableArtifactId===receipt.immutableArtifactId&&
+      r11Backup.recoverableArtifactDigest===receipt.immutableArtifactDigest&&
+      r11Backup.denyLiveHostingOrBackendDataWrites===true&&
+      r11Backup.denyChannelDeletion===true&&
+      transport.livePromotionAuthorized===false&&transport.previewApproved===false&&
+      transport.forbidBackendFunctionDeploy===true&&
+      transport.forbidBackendLiveFunctionDeploy===true&&transport.noHostingPromotion===true&&
+      transport.forbidFirestoreRulesDataAuthWrites===true;
     const fields=[
       [latest.currentLiveSourceSha,r10Release.sourceSha],[latest.currentLiveSourceSha,receipt.sourceSha],
       [latest.currentLiveSourceSha,live?.sourceSha],[latest.currentLiveSourceSha,current.sourceSha],
@@ -111,7 +133,7 @@ if(i66Active){
        r9Release?.status!=='PREVIOUS_R9_PAYMENT_INVOICE_POLICY_SIGNED_LIVE_PRESERVED'||
        previousR9.hostingVersion!=='sites/ays-orbit-360-lab/versions/1dd873081501d7fb'||
        receipt.previousLiveVersionForRollback!==previousR9.hostingVersion||
-       transport.status!=='CONCILIACIONES_HUMAN_NAMES_R10_LIVE_ACCEPTED_LOCKED'||
+       (!r11ScopedPreview&&transport.status!=='CONCILIACIONES_HUMAN_NAMES_R10_LIVE_ACCEPTED_LOCKED')||
        transport.livePromotionAuthorized!==false||transport.previewApproved!==false||
        transport.forbidBackendFunctionDeploy!==true||
        transport.forbidBackendLiveFunctionDeploy!==true||transport.noHostingPromotion!==true||
