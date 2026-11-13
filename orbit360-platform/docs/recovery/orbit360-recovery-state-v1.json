@@ -10,7 +10,7 @@
   "branch": "recovery/fase-a-clean-20260831",
   "forensicOriginSha": "9c95f31461f2eabe9804625b5659bee772f5602a",
   "createdAtUtc": "2026-08-31T18:00:00Z",
-  "updatedAtUtc": "2026-11-13T00:54:13Z",
+  "updatedAtUtc": "2026-11-13T01:01:12Z",
   "status": "I6_6_LIVE_CONTROLLED_PORTFOLIO_UPDATE_IN_PROGRESS",
   "currentIteration": 6,
   "lastCompletedIteration": 5,
@@ -82,6 +82,14 @@
     "owner": "Paula Andrea Osorio Franco",
     "activeGate": "I6.6_POST_B4_007_LIVE",
     "oneCanonicalBranch": "recovery/fase-a-clean-20260831",
+    "historicalB4003ReentryPrevented20261112": {
+      "status": "OLD_B4_003_IMMUTABLE_SOURCE_PIN_WORKFLOW_ARCHIVED_DISPATCH_ONLY_CURRENT_I6_6_CONTINUES",
+      "spuriousOldGateRunId": 43341320338,
+      "spuriousOldGateWasNotLiveDeploy": true,
+      "rootCause": "Modern policy-writer test file still matched historical B4-003 Preview push.paths; historical source-pin gate then rejected current I6.6 tree.",
+      "scope": "Remove old B4-003 workflow push trigger only; preserve manual dispatch and all B4 PASS records; no source artifact, Hosting, Firestore or financial mutation.",
+      "currentGate": "I6.6"
+    },
     "currentExactLiveFrontendSource": "7e9b2b915535cfcc20285142d57bfb0afcda1057",
     "releaseCadence": "EACH_CAUSAL_FIX_SOURCE_TEST_PREVIEW_SIGNED_QA_SAME_ARTIFACT_OR_ISOLATED_FUNCTION_LIVE_READBACK_IMMEDIATELY_NO_UNVERIFIED_PASS_NO_BATCHED_CHANGES",
     "operativoAndSuperiorsWriteDecision": "Operativo Carlos: crear, editar, gestionar, responder, registrar, resolver y ejecutar toda accion operativa aprobada en los modulos que realmente tiene autorizados, incluidos Ops, Leads, renovaciones y cobros; Direccion/Admin/AdminTenant/SuperAdmin mismas facultades o superiores en sus alcances; preservar tenant pais privilegios sensibles y auditoria. No extender Asesor ni permitir pagos a ciegas.",

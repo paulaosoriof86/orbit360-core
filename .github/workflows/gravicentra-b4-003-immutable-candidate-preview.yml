@@ -7,42 +7,13 @@
 # 2026-11-04: exact same-channel candidate after Inicio signed-advisor first-paint fix.
 # 2026-11-04: same-channel causal rerun after Inicio event-listener VM compatibility guard.
 # 2026-11-04: repackage after witnessed Inicio 1 póliza/obligación grammar bug and regressions.
-# Reusable in the same canonical branch when a causal source fix invalidates
-# the former immutable candidate; never patch or promote the older bundle.
+# Archived after signed B4-007 LIVE closure. The current active gate is I6.6.
+# Keep historical manual execution for explicit authorization only: triggering
+# this obsolete immutable B4 source-pin lane on every modern product/test push
+# creates a guaranteed false failure and re-enters a sealed historical gate.
 name: Gravicentra B4-003 Immutable Candidate Hosting Preview
 on:
   workflow_dispatch:
-  push:
-    branches: [recovery/fase-a-clean-20260831]
-    paths:
-      - .github/workflows/gravicentra-b4-003-immutable-candidate-preview.yml
-      - orbit360-platform/core/queries.js
-      - orbit360-platform/core/ciclo.js
-      - orbit360-platform/index.html
-      - orbit360-platform/styles/infra.css
-      - tools/gravicentra-b4-003-inbox-human-identity.test.cjs
-      - tools/gravicentra-b4-003-commercial-pipeline-qa-isolation.test.cjs
-      - orbit360-platform/modules/equipo.js
-      - orbit360-platform/core/policy-receipts-engine.js
-      - orbit360-platform/modules/policy-receipts-v1199-bridge.js
-      - orbit360-platform/modules/crm-v1198-operational-bridge.js
-      - tools/gravicentra-b4-004-policy-form-currency-commission.test.cjs
-      - tools/gravicentra-b4-004-equipo-commission-audit.test.cjs
-      - tools/gravicentra-b4-004-client-create-country-scope.test.cjs
-      - tools/gravicentra-policy-writer-backend-causal.test.cjs
-      - orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js
-      - tools/gravicentra-b4-004-policy-capture-preview-qa.mjs
-      - tools/gravicentra-b4-004-policy-capture-preview-qa.test.mjs
-      - tools/gravicentra-b4-004-receipt-editor-preservation.test.cjs
-      - tools/gravicentra-i6-5-b4-003-preview-proof.mjs
-      - orbit360-platform/data/store-firestore-product-operational-p0.js
-      - tests/goal-participation-classification-writer.test.cjs
-      - functions/b4-003-scoped-bootstrap-reader.js
-      - functions/product-operational-domain.js
-      - tools/gravicentra-b4-003-scoped-bootstrap-reader.test.cjs
-      - tools/gravicentra-b4-003-operational-write-security-regression.test.cjs
-      - tools/gravicentra-b4-003-scoped-boundary.test.cjs
-      - tools/gravicentra-b4-003-financial-qa-commercial-exclusion.test.cjs
 
 permissions:
   contents: read
