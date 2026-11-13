@@ -19,7 +19,9 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 25
     env:
-      I66_SOURCE_SHA: 1dd675ed59ac51fd122915ca8056f85f82fa12d6
+      I66_SOURCE_SHA: 8a0e904500cbb3c961d83f16517caab69df88a2b
+      I66_APPROVED_LIVE_SOURCE_SHA: 8a0e904500cbb3c961d83f16517caab69df88a2b
+      I66_ROLE_HOSTING_LIVE_RUN: '43451818931'
       I66_LIVE_ORIGIN: https://app.aysseguros.com
       I66_OPS_HOSTING_LIVE_RUN: '43309935816'
       I66_PAYMENT_LIVE_RUN: '43307238568'
@@ -51,7 +53,7 @@ jobs:
           (async()=>{
             const h={Authorization:'Bearer '+process.env.GH_TOKEN,Accept:'application/vnd.github+json','User-Agent':'GI-I66-Live-Financial-Signed-Uat'};
             const base='https://api.github.com/repos/paulaosoriof86/orbit360-core/actions/runs/';
-            for(const id of [process.env.I66_OPS_HOSTING_LIVE_RUN,process.env.I66_PAYMENT_LIVE_RUN,process.env.I66_OPS_SIGNED_LIVE_UAT_RUN]){
+            for(const id of [process.env.I66_OPS_HOSTING_LIVE_RUN,process.env.I66_PAYMENT_LIVE_RUN,process.env.I66_OPS_SIGNED_LIVE_UAT_RUN,process.env.I66_ROLE_HOSTING_LIVE_RUN]){
               const r=await fetch(base+id,{headers:h}).then(x=>x.json());
               assert.equal(r.conclusion,'success','I66_PRIOR_EXACT_LIVE_OR_SIGNED_UAT_NOT_ACCEPTED_'+id);
             }
@@ -59,7 +61,7 @@ jobs:
               const x=await fetch(origin+'/__recovery__/build.json',{headers:{'cache-control':'no-cache'}});
               assert.ok(x.ok,'I66_LIVE_BUILD_MARKER_UNAVAILABLE');const m=await x.json();
               assert.equal(m.sourceSha,process.env.I66_SOURCE_SHA,'I66_LIVE_SOURCE_CHANGED');
-              assert.equal(m.buildId,'gi-i66-1dd675ed59ac-57f234755dc1');
+              assert.equal(m.buildId,'gi-i66-8a0e904500cb-57f234755dc1');
             }
             console.log('I66_LIVE_PAYMENT_RENEWABILITY_SIGNED_UAT_PRECONDITIONS_PASS');
           })().catch(e=>{console.error(e.message);process.exitCode=1;});

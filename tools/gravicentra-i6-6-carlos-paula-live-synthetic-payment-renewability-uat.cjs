@@ -7,7 +7,7 @@ const crypto=require('node:crypto');
 const admin=require('firebase-admin');
 const {chromium}=require('playwright');
 const ORIGIN='https://app.aysseguros.com',TENANT='alianzas-soluciones';
-const SHA='1dd675ed59ac51fd122915ca8056f85f82fa12d6';
+const SHA=process.env.I66_APPROVED_LIVE_SOURCE_SHA||'1dd675ed59ac51fd122915ca8056f85f82fa12d6';
 const h=x=>crypto.createHash('sha256').update(x).digest('hex');
 const norm=x=>String(x||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();
 assert.equal(process.env.I66_LIVE_ORIGIN,ORIGIN,'I66_LIVE_FINANCIAL_ORIGIN_MISMATCH');
