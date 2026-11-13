@@ -4,7 +4,7 @@
   "productBrand": "Gravicentra Insurance",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
-  "status": "CONCILIACIONES_STAGE_SIGNED_PREVIEW_UAT_REQUESTED",
+  "status": "CONCILIACIONES_HUMAN_NAMES_EXACT_LIVE_AUTHORIZED",
   "i66PaymentInvoicePreviewRelease20261113": {
     "status": "SIGNED_POLICY_AND_CLIENT360_PREVIEW_PASS_PAYMENT_BACKEND_PREVIEW_ONLY",
     "authority": "Paula Dirección 2026-11-13: Carlos aplica y concilia con factura, fecha factura separada, certifica antes de publicar.",
@@ -335,13 +335,13 @@
     "priorR7HostingRollback": "sites/ays-orbit-360-lab/versions/9cedc5ecda75bb2a",
     "fullI66FinancialProductionAcceptance": false
   },
-  "currentReleaseStatus": "CURRENT_R8_8A0E904500CB_223_OF_223_THREE_ORIGINS_43451818931_SIGNED_ROLES_43452158412_SYNTHETIC_UAT_FOUR_RUNS_PASS_FULL_I66_HOLD",
+  "currentReleaseStatus": "R9_LIVE_UNCHANGED_HUMAN_NAMES_R10_EXACT_STAGE_AUTHORIZED_PENDING_EXECUTION",
   "scope": "CURRENT_R8_IMMUTABLE_SOURCE_8A0E904500CB_ARTIFACT_14048803073_LIVE_HOSTING_162340AE18A9E6F7_223_OF_223_EACH_ORIGIN; C+P_ACTUAL_SIGNED_ROLE_MATRIX_PASS; OPS_LEADS_TASKS_PAYMENT_COBROS_RENEWABILITY_INSURER_ACCOUNT_DIRECT_RENEWAL_SYNTHETIC_RESTORED_PASS; NO_REAL_FINANCIAL_WRITES; HISTORIC_CONCILIACIONES_52_OF_132_STAGE_VISIBLE_80_AMBIGUOUS_HOLD; BANTRAB_REVIEW_AND_MAPFRE_ANNUAL_DOC_HOLD",
   "historicalClosedGate": "B4-007",
   "approvedProductDeltaManifest": "artifacts/orbit360-recovery/release-control/I6_6_APPROVED_PRODUCT_DELTA_MANIFEST_20261110.json",
   "ownerAuthority": "Paula Osorio Dirección 2026-11-12: Operativo tiene escritura integral en cada módulo autorizado, con paridad funcional para roles superiores según sus permisos, país, tenant y auditoría; cada arreglo probado pasa inmediatamente a LIVE desde un artefacto exacto. Alcance R7 autorizado, Preview firmado PASS 43375403003 y LIVE exacto publicado con tres funciones y hosting 223/223 en ambas URL, actores reales Carlos y Dirección y escrituras sintéticas reversibles PASS 43375687134. Mantener el resto de UAT real por país/rol, documentación real de aseguradora, UI legal y escrituras financieras en HOLD hasta prueba específica, sin tocar Firestore Rules, Auth ni IAM. Histórico R5/R6 se conserva como linaje, no como estado actual.",
-  "livePromotionAuthorized": false,
-  "previewApproved": false,
+  "livePromotionAuthorized": true,
+  "previewApproved": true,
   "carlosOpsLiveAuthorization20261112": {
     "status": "EXACT_TWO_WRITERS_AND_HOSTING_AUTHORIZED_AFTER_SIGNED_PREVIEW",
     "sourceSha": "1dd675ed59ac51fd122915ca8056f85f82fa12d6",
@@ -536,7 +536,7 @@
   "immutableArtifactId": 14066487146,
   "immutableArtifactZipDigest": "sha256:f0d45ff58490d53c434f7285d98818439cfabdafb9bbc0f8e814787927df5f3d",
   "sourcePreviewUrl": "https://ays-orbit-360-lab--gi-i66-rc-42868854629-abj14q6n.web.app",
-  "backendFunctionPreviewOnly": true,
+  "backendFunctionPreviewOnly": false,
   "carlosSignedTransversalQaReceipt20261112": {
     "sourceSha": "b86cad550fadc050e8574678f02f3097caa8b5bd",
     "immutableHostingPreviewRunId": 43299843267,
@@ -584,7 +584,7 @@
     "syntheticLedgerRequestEventRestored": true,
     "livePromotionAccepted": false
   },
-  "forbidBackendLiveFunctionDeploy": true,
+  "forbidBackendLiveFunctionDeploy": false,
   "readerPreviewAuthorization": {
     "authorizedBy": "Paula Andrea Osorio Franco, Direccion",
     "authorizedAtGuatemala": "2026-11-11",
@@ -692,7 +692,7 @@
   "previewFunctionRunId": 43306217923,
   "previewFunctionStatus": "EXACT_ARTIFACT_PREVIEW_FUNCTION_ACTIVE_401_AND_LIVE_BACKEND_TWO_HOSTS_UNCHANGED_PASS",
   "liveFunctionScope": "orbit360CobrosReconciliationCommand",
-  "noHostingPromotion": true,
+  "noHostingPromotion": false,
   "liveFunctionRunId": 43129008894,
   "liveFunctionOldRevision": "orbit360cobrosreconciliationcommand-00003-kax",
   "liveFunctionNewRevision": "orbit360cobrosreconciliationcommand-00006-viw",
@@ -994,5 +994,45 @@
     "hostingChanges": 0,
     "firestoreRulesChanges": 0,
     "next": "SINGLE_ADMIN_GOOGLE_OAUTH_CONSENT_THEN_CARLOS_DRIVE_UPLOAD_PERSISTENCE_RELOAD"
+  },
+  "i66ConciliacionesHumanNameExactLiveAuthorization20261113": {
+    "status": "SIGNED_HUMAN_NAMES_PREVIEW_ACCEPTED_EXACT_R9_SUCCESSOR_ONE_LIVE_READER_DUAL_HOSTING",
+    "approvedByDirection": true,
+    "authority": "Paula Dirección 2026-11-13: correcciones probadas de Conciliaciones se publican a LIVE por lotes sin acumular; nombres reales, no etiquetas técnicas.",
+    "sameImmutableArtifact": true,
+    "oneExistingLiveFunctionOnly": true,
+    "noBusinessFinancialWrites": true,
+    "rollbackBackendAndHostingOnAnyFailure": true,
+    "sourceSha": "851d68441b819eac6dd37ec1d5d15fb971e35bf2",
+    "sourceRun": 43484031398,
+    "artifactId": 14066487146,
+    "artifactDigest": "sha256:f0d45ff58490d53c434f7285d98818439cfabdafb9bbc0f8e814787927df5f3d",
+    "previewReaderDeployRun": 43484798631,
+    "signedPreviewUatRun": 43496416284,
+    "previewChannel": "gi-i66-rc-42868854629",
+    "previewUrl": "https://ays-orbit-360-lab--gi-i66-rc-42868854629-abj14q6n.web.app",
+    "expectedPriorLiveSource": "586401bfbe1a80cfef2820982f432743af36b108",
+    "expectedPriorLiveHostingVersion": "1dd873081501d7fb",
+    "targetFunction": "orbit360ScopedPolicyRead",
+    "region": "us-east1",
+    "testedUniqueHumanClientNames": 52,
+    "unresolvedAmbiguousStillHold": 80,
+    "verifiedSameProductionCodeDelta": [
+      "functions/i66-conciliaciones-active-ledger-projection.js",
+      "orbit360-platform/modules/conciliaciones.js"
+    ],
+    "noPolicyCustomerWrites": true,
+    "noPaymentsApplied": true,
+    "noGoogleDriveAuthChanges": true,
+    "preexistingDriveRuntimeRepair": "NINE_LIVE_DOCUMENT_FUNCTIONS_SEPARATE_43491032658_PRESERVE",
+    "previousSafetyFlags": {
+      "livePromotionAuthorized": false,
+      "previewApproved": false,
+      "forbidBackendFunctionDeploy": false,
+      "forbidBackendLiveFunctionDeploy": true,
+      "backendFunctionPreviewOnly": true,
+      "noHostingPromotion": true
+    },
+    "postRun": "RESTORE_GLOBAL_FLAGS_AND_LOG_R10_EXACT_POINTER_ON_PASS; ON_FAIL_RESTORE_LOCKS_AND_PRESERVE_R9"
   }
 }
