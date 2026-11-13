@@ -65,6 +65,18 @@ Orbit.q = (function () {
     return verified.getUTCFullYear()===y && verified.getUTCMonth()===m-1 && verified.getUTCDate()===d
       ? match[1]+'-'+match[2]+'-'+match[3] : '';
   }
+  // Operational projection only: an expired contractual period cannot be
+  // displayed as Vigente merely because its imported Firestore state is stale.
+  // Never rewrite the stored status, infer a renewal, or override terminal
+  // insurer states (Renovada, Cancelada, Anulada, etc.).
+  function policyDisplayStatus(policy, asOf) {
+    const state = String(policy && policy.estado || '').trim();
+    const normalized = textNorm(state).replace(/[^a-z]/g, '');
+    if (normalized !== 'vigente' && normalized !== 'porrenovar') return state;
+    const expiry = validBusinessDate(policy && (policy.vigenciaFin || policy.fechaFin || policy.fechaVencimiento || policy.finVigencia));
+    const current = validBusinessDate(asOf || (U.today ? U.today() : new Date()));
+    return expiry && current && expiry < current ? 'Vencida' : state;
+  }
   function portfolioDue(row) {
     return row && (validBusinessDate(row.fechaLimite) || validBusinessDate(row.fechaVencimiento) || validBusinessDate(row.vence)) || '';
   }
@@ -247,7 +259,7 @@ Orbit.q = (function () {
     const proof = row => portfolioAmountProof(row, ctx).value;
     return {
       totals: {
-        primaAnual: sumsByCurrency(pol.filter(p => p.estado === 'Vigente' || p.estado === 'Por renovar'), p => p.primaTotal, p => p.moneda || p.divisa),
+        primaAnual: sumsByCurrency(pol.filter(p => ['Vigente','Por renovar'].includes(policyDisplayStatus(p))), p => p.primaTotal, p => p.moneda || p.divisa),
         cobrado: sumsByCurrency(realized, p => p.monto, byPolicyCurrency),
         pendiente: sumsByCurrency(pending, proof, byPolicyCurrency),
         vencido: sumsByCurrency(overdue, proof, byPolicyCurrency),
@@ -276,7 +288,7 @@ Orbit.q = (function () {
     const cob = cobrosDe(cliId);
     const realized = realizedPaymentRows().filter(c => c && c.clienteId === cliId);
     const com = comisionesDe(cliId);
-    const vigentes = pol.filter(p => p.estado === 'Vigente' || p.estado === 'Por renovar');
+    const vigentes = pol.filter(p => ['Vigente','Por renovar'].includes(policyDisplayStatus(p)));
     const primaAnual = vigentes.reduce((s, p) => s + amount(p.primaTotal), 0);
     const cobrado = realized.reduce((s, c) => s + amount(c.monto), 0);
     const amountIndex=portfolioAmountContext({receipts:rec,policies:pol,portfolios:car,cobros:cob});
@@ -333,7 +345,7 @@ Orbit.q = (function () {
       const cob = cobByClient.get(cli.id) || [];
       const realizedCob = realizedByClient.get(cli.id) || [];
       const com = comByClient.get(cli.id) || [];
-      const vigentes = pol.filter(p => p.estado === 'Vigente' || p.estado === 'Por renovar');
+      const vigentes = pol.filter(p => ['Vigente','Por renovar'].includes(policyDisplayStatus(p)));
       const primaAnual = vigentes.reduce((s, p) => s + amount(p.primaTotal), 0);
       const cobrado = realizedCob.reduce((s, c) => s + amount(c.monto), 0);
       const pendiente = car.filter(r => portfolioOpen(r) && !portfolioIsOverdue(r)).reduce((s, r) => s + portfolioAmountValue(r,portfolioMoney), 0);
@@ -701,7 +713,7 @@ Orbit.q = (function () {
   function primaVigenteGlobal() {
     const clients = clientIndex();
     return S().where('polizas', p => !isSyntheticQaRecord(p) && !isSyntheticQaRecord(S().get('clientes', p.clienteId)) &&
-      (p.estado === 'Vigente' || p.estado === 'Por renovar') && polPais(p, clients))
+      ['Vigente','Por renovar'].includes(policyDisplayStatus(p)) && polPais(p, clients))
       .reduce((s, p) => s + norm(p.primaTotal, p.moneda), 0);
   }
   function renovacionesProximas(dias) {
@@ -710,7 +722,7 @@ Orbit.q = (function () {
     return S().where('polizas', p => {
       const d = U.daysFromNow(p.vigenciaFin);
       return !isSyntheticQaRecord(p) && !isSyntheticQaRecord(S().get('clientes', p.clienteId)) &&
-        polPais(p, clients) && (p.estado === 'Vigente' || p.estado === 'Por renovar') && d != null && d >= 0 && d <= dias;
+        polPais(p, clients) && ['Vigente','Por renovar'].includes(policyDisplayStatus(p)) && d != null && d >= 0 && d <= dias;
     }).sort((a, b) => String(a.vigenciaFin||'').localeCompare(String(b.vigenciaFin||'')));
   }
   /** Nombre conservado por compatibilidad: retorna obligaciones esperadas vencidas, no Cobros reales. */
@@ -724,7 +736,7 @@ Orbit.q = (function () {
     const commissions = S().all('comisiones') || [];
     return (S().all('asesores') || []).map(a => {
       const pol = policies.filter(p => !isSyntheticQaRecord(p) && !isSyntheticQaRecord(S().get('clientes', p.clienteId)) &&
-        p.asesorId === a.id && (p.estado === 'Vigente' || p.estado === 'Por renovar') && polPais(p, clients));
+        p.asesorId === a.id && ['Vigente','Por renovar'].includes(policyDisplayStatus(p)) && polPais(p, clients));
       const prima = pol.reduce((s, p) => s + norm(p.prima, p.moneda), 0);
       const com = commissions.filter(c => c.asesorId === a.id).reduce((s, c) => s + norm(c.monto, c.moneda), 0);
       const metaPrima = Number(a && a.metaPrima);
@@ -769,7 +781,7 @@ Orbit.q = (function () {
   function postRecaudo(/* cobro, fecha, metodo */) { return; }
 
   return {
-    asesor, aseguradora, polizasDe, recibosEsperadosDe, carteraPrimasDe, carteraPendienteDe, carteraVencidaDe, cobrosDe, comisionesDe, actividadesDe, cancelacionesDe,
+    asesor, aseguradora, polizasDe, policyDisplayStatus, recibosEsperadosDe, carteraPrimasDe, carteraPendienteDe, carteraVencidaDe, cobrosDe, comisionesDe, actividadesDe, cancelacionesDe,
     clienteResumen, clientesResumenIndex, saludCliente, carteraGlobal, carteraPendienteRows, carteraVencidaRows, cobrosConfirmadosRows, carteraGlobalPorMoneda, primaVigenteGlobal, renovacionesProximas, cobrosVencidos, leaderboard,
     clientesScoped, polizasScoped, isSyntheticQaRecord, realizedPaymentRows, currentMonthKey, produccionMesPorMoneda, recaudoMesPorMoneda, metaAdvisorMes, leaderboardMes,
     agingVencido, agingVencidoPorMoneda, portfolioAmountProof, portfolioAmountContext, portfolioValuedRowsCount, portfolioDue, portfolioOpen, portfolioClassification, portfolioIsOverdue, expectedReceiptClassification, expectedReceiptIsOverdue, expectedReceiptDisplayStatus, comisionesPor, clienteNombre, norm, monedaPais, policyLinkedClientId, policyLinkedCountry, vehiculosDe, vehiculoDePoliza, postRecaudo

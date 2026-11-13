@@ -431,6 +431,7 @@ async function applyPayment(authz, data, payload, operationName = 'apply_payment
   const inferredEffectiveDate = isoDate(payload.inferredEffectiveDate || payload.fechaInferida, 'Fecha operativa inferida', false);
   const evidenceAsOfDate = isoDate(payload.evidenceAsOfDate || payload.fechaCorteEvidencia, 'Fecha de evidencia', false);
   const applicationDate = isoDate(payload.applicationDate || payload.fechaAplicacion, 'Fecha de aplicación', false);
+  const invoiceDate = isoDate(payload.invoiceDate || payload.fechaFactura, 'Fecha de factura', false);
   const invoiceNumber = text(payload.invoiceNumber || payload.numeroFactura, 180);
   const paymentMethod = text(payload.paymentMethod || payload.metodoPago || payload.metodo, 180);
   const paymentSupportDocumentRef = text(payload.paymentSupportDocumentRef || payload.soportePagoRef, 500);
@@ -449,7 +450,7 @@ async function applyPayment(authz, data, payload, operationName = 'apply_payment
   const applicationProved = Boolean(payload.forceReconciliation === true || applicationDate || invoiceNumber || invoiceDocumentRef || ['insurer_invoice','insurer_statement','commission_statement'].includes(source));
   const receiptRef = tenantData(authz.tenantId, 'recibosEsperados').doc(receiptId);
   const reqPayload = {
-    receiptId, source, inferred, paidDate, inferredEffectiveDate, evidenceAsOfDate, applicationDate,
+    receiptId, source, inferred, paidDate, inferredEffectiveDate, evidenceAsOfDate, applicationDate, invoiceDate,
     invoiceNumber, paymentMethod, paymentSupportDocumentRef, invoiceDocumentRef, amount: explicitAmount,
     evidenceId, evidenceType, anchorInstallment, inferenceRuleId, confidence,
     forceReconciliation: payload.forceReconciliation === true, applicationEvidenceType: applicationEvidenceTypeInput
@@ -536,6 +537,7 @@ async function applyPayment(authz, data, payload, operationName = 'apply_payment
     const reportPaidDate = advisorReported ? text(receipt.fechaPagoReportada || receipt.paidDate || receipt.fechaPago, 32) : '';
     const finalPaidDate = paidDate || reportPaidDate || existingPaidDate;
     const finalApplicationDate = applicationDate || existingApplicationDate;
+    const finalInvoiceDate = invoiceDate || text(beforeCobro.invoiceDate || (existingPaid ? receipt.invoiceDate : ''), 32);
     const finalPaymentMethod = paymentMethod || (advisorReported ? text(receipt.metodoPago || receipt.paymentMethod, 180) : '') || text(beforeCobro.paymentMethod || beforeCobro.metodo || (existingPaid ? (receipt.paymentMethod || receipt.metodoPago) : ''), 180);
     const finalPaymentSupportDocumentRef = paymentSupportDocumentRef || (advisorReported ? text(receipt.paymentSupportDocumentRef || receipt.soportePagoRef, 500) : '') || text(beforeCobro.paymentSupportDocumentRef || (existingPaid ? receipt.paymentSupportDocumentRef : ''), 500);
     const isApplicationEnrichment = existingPaid && applicationEvidenceSource;
@@ -587,6 +589,7 @@ async function applyPayment(authz, data, payload, operationName = 'apply_payment
     if (finalPaymentMethod) shared.paymentMethod = finalPaymentMethod;
     if (finalPaymentSupportDocumentRef) shared.paymentSupportDocumentRef = finalPaymentSupportDocumentRef;
     if (finalApplicationDate) shared.applicationDate = finalApplicationDate;
+    if (finalInvoiceDate) shared.invoiceDate = finalInvoiceDate;
     if (invoiceNumber) shared.invoiceNumber = invoiceNumber;
     if (invoiceDocumentRef) shared.invoiceDocumentRef = invoiceDocumentRef;
 
@@ -678,6 +681,7 @@ async function applyPayment(authz, data, payload, operationName = 'apply_payment
       paidDate: finalPaidDate || '',
       inferredEffectiveDate: inferredEffectiveDate || '',
       applicationDate: finalApplicationDate || '',
+      invoiceDate: finalInvoiceDate || '',
       paymentOrigin,
       linkedManagementId: advisorReported ? text(receipt.linkedOpsManagementId, 180) : '',
       invoiceNumber: invoiceNumber || text(beforeCobro.invoiceNumber || beforeCobro.numeroFactura, 180),
@@ -705,6 +709,12 @@ async function applyPayment(authz, data, payload, operationName = 'apply_payment
 
   const [receiptReadback, cobroReadback] = await Promise.all([receiptRef.get(), tenantData(authz.tenantId, 'cobros').doc(result.cobroId).get()]);
   if (!receiptReadback.exists || !cobroReadback.exists) throw new HttpsError('data-loss', 'No fue posible confirmar la persistencia del pago.');
+  const confirmedReceipt = receiptReadback.data() || {}, confirmedCobro = cobroReadback.data() || {};
+  if (confirmedReceipt.paymentState !== result.paymentState || confirmedCobro.paymentState !== result.paymentState ||
+      confirmedReceipt.applicationState !== result.applicationState || confirmedCobro.applicationState !== result.applicationState ||
+      confirmedReceipt.conciliado !== /^APPLIED_/.test(result.applicationState) || confirmedCobro.conciliado !== /^APPLIED_/.test(result.applicationState) ||
+      (result.invoiceDate && (confirmedReceipt.invoiceDate !== result.invoiceDate || confirmedCobro.invoiceDate !== result.invoiceDate)))
+    throw new HttpsError('data-loss', 'El pago se escribió, pero la conciliación o fecha de factura no tiene lectura posterior confirmada. Revisar antes de reintentar.');
   return result;
 }
 
@@ -734,6 +744,7 @@ async function reconcileEvidence(authz, data, payload, previewOnly) {
     evidenceAsOfDate: isoDate(payload.evidenceAsOfDate || payload.fechaCorteEvidencia, 'Fecha de evidencia', false),
     paidDate: isoDate(payload.paidDate || payload.fechaPago, 'Fecha real de pago', false),
     applicationDate: isoDate(payload.applicationDate || payload.fechaAplicacion, 'Fecha de aplicación', false),
+    invoiceDate: isoDate(payload.invoiceDate || payload.fechaFactura, 'Fecha de factura', false),
     invoiceNumber: text(payload.invoiceNumber || payload.numeroFactura, 180),
     paymentMethod: text(payload.paymentMethod || payload.metodoPago || payload.metodo, 180),
     paymentSupportDocumentRef: text(payload.paymentSupportDocumentRef || payload.soportePagoRef, 500),
@@ -865,6 +876,7 @@ async function reconcileEvidence(authz, data, payload, previewOnly) {
       if (inferenceProvenance) shared.inferenceProvenance = inferenceProvenance;
       if (paidDate) shared.paidDate = paidDate;
       if (applicationDate) shared.applicationDate = applicationDate;
+      if (!isInferred && evidencePayload.invoiceDate) shared.invoiceDate = evidencePayload.invoiceDate;
       if (!isInferred && evidencePayload.invoiceNumber) shared.invoiceNumber = evidencePayload.invoiceNumber;
       if (!isInferred && evidencePayload.paymentSupportDocumentRef) shared.paymentSupportDocumentRef = evidencePayload.paymentSupportDocumentRef;
       if (!isInferred && evidencePayload.invoiceDocumentRef) shared.invoiceDocumentRef = evidencePayload.invoiceDocumentRef;

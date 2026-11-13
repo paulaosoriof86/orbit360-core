@@ -144,7 +144,10 @@ Orbit.modules = Orbit.modules || {};
     const initialSubs = subramos(country, initialRamo).slice();
     if (initialProduct && !initialSubs.includes(initialProduct)) initialSubs.unshift(initialProduct);
     const insurers = linkedInsurers(country);
-    const advisors = S().all('asesores') || [];
+    // The legacy `asesores` store includes historical labels and can be stale
+    // after a user is created in Equipos. Only the signed, scoped roster may
+    // offer an advisor for a new policy; no user names are hard-coded here.
+    let advisors = [], advisorRosterConfirmed = false, advisorRosterSequence = 0;
     const existingVehicleRaw = existing ? ((S().all('vehiculos') || []).find(v => v.polizaId === existing.id && String(v.estado || '').toLowerCase() !== 'histórico') || null) : null;
     const existingVehicle = existingVehicleRaw && E.normalizeVehicle ? E.normalizeVehicle(existingVehicleRaw) : existingVehicleRaw;
     const initialAdvisorId = existing && existing.asesorId || selectedClient.asesorId || '';
@@ -162,7 +165,7 @@ Orbit.modules = Orbit.modules || {};
         <label class="ce-l gi-client-search">🔎 Buscar cliente<input class="o-sel" data-client-search placeholder="Nombre, identificación o correo"></label>
         <div class="cgrid">
           <label class="ce-l">Cliente *<select class="o-sel" data-client>${clients.map(c => `<option value="${esc(c.id)}" ${c.id === selectedClient.id ? 'selected' : ''}>${esc(c.nombre)}</option>`).join('')}</select></label>
-          <label class="ce-l">Asesor / vendedor *<select class="o-sel" data-advisor>${advisors.map(a => '<option value="'+esc(a.id)+'" '+(a.id === initialAdvisorId ? 'selected' : '')+'>'+esc(a.nombre)+'</option>').join('')}</select></label>
+           <label class="ce-l">Asesor / vendedor *<select class="o-sel" data-advisor disabled><option value="">Consultando asesores habilitados en Equipos…</option></select><small data-advisor-hint>El listado se actualiza desde los permisos y países vigentes, sin configurar nombres en código.</small></label>
           <label class="ce-l">País del cliente<input class="o-sel" data-country value="${esc(country)}" disabled></label>
           <label class="ce-l">Moneda de la póliza *<select class="o-sel" data-currency><option value="">— Seleccionar —</option>${E.policyCurrencies(country).map(value => '<option value="'+esc(value)+'" '+(value === cur ? 'selected' : '')+'>'+esc(value)+'</option>').join('')}</select><small>Usa la moneda del documento; los importes no se convierten.</small></label>
           <label class="ce-l">Aseguradora *<select class="o-sel" data-insurer>${insurers.map(a => `<option value="${esc(a.id)}" ${existing && a.id === existing.aseguradoraId ? 'selected' : ''}>${esc(a.nombre)}</option>`).join('')}</select></label>
@@ -201,6 +204,45 @@ Orbit.modules = Orbit.modules || {};
     const clientEl = $('[data-client]'), advisorEl = $('[data-advisor]'), insurerEl = $('[data-insurer]'), ramoEl = $('[data-ramo]'), productEl = $('[data-product]');
     const currencyEl = $('[data-currency]');
     const clientSearch = $('[data-client-search]');
+    async function refreshAdvisors(preferredId) {
+      const sequence = ++advisorRosterSequence;
+      const save = $('[data-save]');
+      const country2 = String(client().pais || '').toUpperCase();
+      const hint = $('[data-advisor-hint]');
+      advisorRosterConfirmed = false;
+      advisors = [];
+      advisorEl.disabled = true;
+      advisorEl.innerHTML = '<option value="">Consultando asesores habilitados…</option>';
+      if (save) save.disabled = true;
+      try {
+        const service = Orbit.assignableAdvisorRoster;
+        if (!service || typeof service.list !== 'function') throw Error('ASSIGNABLE_ADVISOR_ROSTER_REQUIRED');
+        const rows = await service.list(country2, { force: true });
+        if (!b.isConnected || sequence !== advisorRosterSequence) return;
+        advisors = rows.filter(a => a && a.id && a.nombre && a.assignable === true &&
+          a.roleEligible === true && a.activo !== false &&
+          [].concat(a.paises || []).includes(country2));
+        advisorEl.innerHTML = '<option value="">— Seleccionar asesor habilitado —</option>' +
+          advisors.map(a => '<option value="'+esc(a.id)+'">'+esc(a.nombre)+'</option>').join('');
+        const desiredId = preferredId || '';
+        if (desiredId && advisors.some(a => a.id === desiredId)) advisorEl.value = desiredId;
+        else if (existing && desiredId === initialAdvisorId && desiredId) {
+          // Preserve the historical assignment on an edit, but do not allow
+          // it to be selected for a new policy or reassigned to other records.
+          const historical = S().get('asesores', desiredId);
+          advisorEl.insertAdjacentHTML('beforeend', '<option value="'+esc(desiredId)+'" data-historical="1">'+esc(historical && historical.nombre || 'Asesor histórico')+' · asignación anterior</option>');
+          advisorEl.value = desiredId;
+        }
+        advisorEl.disabled = false;
+        advisorRosterConfirmed = true;
+        if (save) save.disabled = false;
+        if (hint) hint.textContent = advisors.length ? 'Lista vigente de Equipos · '+advisors.length+' asesor(es) habilitado(s) para '+country2+'.' : 'No hay asesores habilitados para '+country2+'. Revisa roles y país en Equipos.';
+        resetNewCommissions('seller');
+      } catch (error) {
+        if (!b.isConnected || sequence !== advisorRosterSequence) return;
+        if (hint) hint.textContent = 'No se pudo verificar el padrón vigente. Por seguridad, no se permite guardar hasta recuperarlo.';
+      }
+    }
     function paintClientOptions(query) {
       const current = clientEl.value || (selectedClient && selectedClient.id) || '';
       const q = String(query || '').trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
@@ -219,6 +261,7 @@ Orbit.modules = Orbit.modules || {};
       const taxNote = $('[data-tax-note]'); if (taxNote) taxNote.textContent = 'IVA ' + countryTaxPct(country2) + '% según país. Emisión, asistencia y recargo continúan editables para conservar excepciones reales.';
       insurerEl.innerHTML = linkedInsurers(country2).map(a => `<option value="${esc(a.id)}">${esc(a.nombre)}</option>`).join('');
       ramoEl.innerHTML = ramos(country2).map(x => `<option>${esc(x)}</option>`).join(''); refreshProducts('');
+      refreshAdvisors(existing ? initialAdvisorId : (c.asesorId || ''));
     }
     function refreshProducts(preferred, preserveSourceValue) {
       const current = preferred != null ? String(preferred) : String(productEl.value || '');
@@ -281,7 +324,7 @@ Orbit.modules = Orbit.modules || {};
       preview.innerHTML = `<div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start"><div><small class="muted">Resultado antes de guardar</small><b style="display:block">${active ? recs.length + ' recibo(s) en cartera' : 'Histórico · sin cartera nueva'}</b></div><b>${money(prepared.moneda, prepared.primaTotal)}</b></div><div class="asg197-info-grid" style="margin-top:10px"><div><small>Prima neta</small><b>${money(prepared.moneda, prepared.primaNeta)}</b></div><div><small>Gastos financieros</small><b>${money(prepared.moneda, prepared.gastosFinan)}</b></div><div><small>IVA</small><b>${money(prepared.moneda, prepared.ivaMonto)}</b></div><div><small>Total</small><b>${money(prepared.moneda, prepared.primaTotal)}</b></div></div>`;
       if(active&&recs.length)preview.insertAdjacentHTML('beforeend','<div style="margin-top:12px"><div style="font-weight:800;font-size:14px;margin-bottom:7px">🧾 Calendario que quedará guardado</div><div style="max-height:190px;overflow:auto;border:1px solid var(--line);border-radius:10px"><table class="tbl"><thead><tr><th>Recibo</th><th>Vence</th><th class="num">Monto</th></tr></thead><tbody>'+recs.map((r,i)=>'<tr><td>'+(i+1)+'</td><td>'+esc(r.fechaLimite||r.vence||r.fechaVencimiento||'—')+'</td><td class="num">'+esc(money(prepared.moneda,r.montoTotal!=null?r.montoTotal:r.monto))+'</td></tr>').join('')+'</tbody></table></div></div>');
     }
-    clientEl.addEventListener('change', () => { if (!existing && advisorEl) { const own = client().asesorId; if (own && advisors.some(a => a.id === own)) advisorEl.value = own; } refreshCountry(); resetNewCommissions(); }); ramoEl.addEventListener('change', () => refreshProducts('', false));
+    clientEl.addEventListener('change', () => { refreshCountry(); resetNewCommissions(); }); ramoEl.addEventListener('change', () => refreshProducts('', false));
     [insurerEl, ramoEl, productEl].forEach(el => el.addEventListener('change', () => resetNewCommissions('insurer')));
     advisorEl.addEventListener('change', () => resetNewCommissions('seller'));
     $('[data-start]').addEventListener('change', () => { if (!$('[data-end]').value) $('[data-end]').value = plusYear($('[data-start]').value); preview(); });
@@ -313,6 +356,11 @@ Orbit.modules = Orbit.modules || {};
     $('[data-save]').addEventListener('click', async () => {
       const save = $('[data-save]'), payload = raw(), reason = existing ? $('[data-reason]').value.trim() : 'Alta operativa desde plataforma';
       const err = $('[data-error]'), originalText = save.textContent;
+      if (!advisorRosterConfirmed || !payload.asesorId ||
+          (!advisors.some(a => a.id === payload.asesorId) && !(existing && payload.asesorId === initialAdvisorId))) {
+        err.style.display=''; err.textContent='Selecciona un asesor habilitado para el país desde Equipos. Si falta, revisa su rol y país allí.';
+        return;
+      }
       const commissionAdvisor = S().get('asesores', payload.asesorId) || {};
       if (!existing && commissionAdvisor.comModo && commissionAdvisor.comModo !== 'comision') {
         err.style.display = ''; err.textContent = 'El vendedor usa otro modelo de comisión. Conserva esa configuración y registra este caso mediante su flujo correspondiente; no se convertirá a participación porcentual.';
@@ -357,6 +405,7 @@ Orbit.modules = Orbit.modules || {};
       }
     });
     refreshProducts(initialProduct, true); syncInstallments(); resetNewCommissions(); preview();
+    refreshAdvisors(initialAdvisorId);
     // Snapshot after default normalization: classify only user-originated form changes.
     nonRenewalBaseline=existing?Array.from(b.querySelectorAll('input,select'))
       .filter(el=>!el.matches('[data-client-search],[data-country],[data-renewable]'))

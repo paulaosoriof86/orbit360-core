@@ -1595,6 +1595,47 @@
         "currentBackupArtifact": 14018512857,
         "currentBackupHostingVersion": "dae5d5235978cefe"
       }
+    },
+    {
+      "id": "I6_6_OPERATIVE_ADVISOR_PAYMENT_INVOICE_EXPIRY_BATCH_20261113",
+      "approvedByDirection": true,
+      "receipt": "artifacts/orbit360-recovery/release-control/I6_6_OPERATIVE_ADVISOR_PAYMENT_INVOICE_EXPIRY_BATCH_20261113.json",
+      "sourceStatus": "SOURCE_TARGETED_QA_PASS_PREVIEW_LIVE_AND_REAL_WRITES_HOLD",
+      "capabilityOwners": ["EQUIPOS_ASSIGNABLE_ADVISOR_ROSTER", "POLIZAS_NEW", "CLIENTE360", "COBROS_RECONCILIATION", "CONTRACTUAL_EXPIRY_VIEW"],
+      "scope": "Operativo/Direccion/Admin keep server-configured rights; fresh role-country advisor roster in new policy; invoice issue date distinct from payment and insurer application; reconciliation persistence/readback; expired policy projection read-only. No direct financial data writes or external customer messaging in this source change.",
+      "paths": [
+        {
+          "path": "orbit360-platform/modules/policy-receipts-v1199-bridge.js",
+          "gitBlobSha": "c01aa549e1b62ae892d225fc584094a1767088e3",
+          "replaces": {"path": "orbit360-platform/modules/policy-receipts-v1199-bridge.js", "priorGitBlobSha": "a39ddcc8a53cefa55bc5edd56e7f5a628db31c03", "priorChangeId": "I6_6_CARLOS_POLICY_RENEWABILITY_ONLY_CAS_OPERATIVE_SCOPE_P0"}
+        },
+        {
+          "path": "orbit360-platform/modules/cobros.js",
+          "gitBlobSha": "cbd1d20bea67dd7f7f0f8b1fb43e902576f95aac",
+          "replaces": {"path": "orbit360-platform/modules/cobros.js", "priorGitBlobSha": "b745f881855f7012a05f03634c316dc91124db91", "priorChangeId": "I6_6_COBROS_APPLICATION_TEMPORAL_STATUS_AND_GLOBAL_SEARCH_P0"}
+        },
+        {
+          "path": "functions/cobros-reconciliation-domain.js",
+          "gitBlobSha": "0e4d42737ad8e14a70ccf882533269cd61e95a60",
+          "replaces": {"path": "functions/cobros-reconciliation-domain.js", "priorGitBlobSha": "b492d610bd1c49458881dc17c89367e23168db5e", "priorChangeId": "I6_6_CARLOS_PAYMENT_ONCALL_RESPONSE_MODE_HOTFIX_P0"}
+        },
+        {
+          "path": "orbit360-platform/core/queries.js",
+          "gitBlobSha": "c3b9ccf39d3ef8a6e5c06e3965df159ad65288b7",
+          "replaces": {"path": "orbit360-platform/core/queries.js", "priorGitBlobSha": "5dd3f7d7dc4622dfcd804fe5fed0d4272d36802b", "priorChangeId": "I6_6_COBROS_APPLICATION_TEMPORAL_STATUS_AND_GLOBAL_SEARCH_P0"}
+        },
+        {
+          "path": "orbit360-platform/modules/polizas.js",
+          "gitBlobSha": "6cd5e1c5d8cfa367c28399b8dce35a2f45819b73",
+          "replaces": {"path": "orbit360-platform/modules/polizas.js", "priorGitBlobSha": "cb44522646d70e175db223d32a05f402552140fd", "priorChangeId": "I6_6_COBROS_APPLICATION_TEMPORAL_STATUS_AND_GLOBAL_SEARCH_P0"}
+        },
+        {
+          "path": "orbit360-platform/modules/cliente360.js",
+          "gitBlobSha": "fca5f7b6a8ecae7e0b3f4cfc94547fffcd6b97e5",
+          "replaces": {"path": "orbit360-platform/modules/cliente360.js", "priorGitBlobSha": "e1ea909944992d5811d781dbded69190fcfa23eb", "priorChangeId": "I6_6_CLIENTE360_LINKED_POLICY_CREATE_CTA_P0"}
+        }
+      ],
+      "tests": [{"path": "tools/gravicentra-i6-6-roles-payment-expiry-hotfix.test.cjs", "gitBlobSha": "dc717555e60d0405ba14c38f0a4739dfb1056130"}]
     }
   ]
 }

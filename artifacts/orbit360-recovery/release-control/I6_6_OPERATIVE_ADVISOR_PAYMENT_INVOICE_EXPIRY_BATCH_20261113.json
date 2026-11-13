@@ -1,0 +1,33 @@
+{
+  "schema": "GI_I66_OPERATIVE_ROSTER_INVOICE_EXPIRY_BATCH_V1",
+  "date": "2026-11-13",
+  "gate": "I6.6",
+  "authority": "Paula Andrea Osorio Franco, Dirección: autoriza corregir roles transversales, alta de pólizas desde cero, aplicación y conciliación con factura y fecha, estado contractual visible, probar notificaciones y publicar solo después de QA.",
+  "sourceBranch": "recovery/fase-a-clean-20260831",
+  "sourceParent": "50dd47361908ab5f772395038ac500630e237bc9",
+  "changes": [
+    "Nueva póliza: seleccionar asesores solo desde callable autenticada, activos, rol Asesor/Comercial y país permitido; bloquear alta si el servidor no confirma la lista. Sin nombres ni excepciones personales en código.",
+    "Cobros: registrar fecha de factura explícita opcional, diferente de fecha de pago y aplicación; conservar número y adjunto; persistir cobro y recibo esperado y comprobar el estado de conciliación después de escribir.",
+    "Pólizas y Cliente 360: calcular Vencida cuando la fecha fin contractual anterior a hoy contradice Vigente/Por renovar; no modificar Firestore ni inventar renovación.",
+    "No cambiar el sistema de permisos de Equipos ni elevar privilegios de Asesor ni enviar WhatsApp real a clientes durante QA."
+  ],
+  "testEvidence": {
+    "targetedSourceBusinessAssertions": "3/3 PASS local",
+    "greenApiContract": "43/43 PASS local with simulated provider",
+    "syntax": "6/6 modified JS PASS",
+    "realSignedBlankNewPolicyPersistence": "HOLD",
+    "actualPaulaDuplicateAdvisorRecordsCensus": "HOLD",
+    "realInvoicePaymentReconciliationReadback": "HOLD",
+    "realGreenApiProviderAck": "HOLD",
+    "immutablePreviewArtifact": "HOLD",
+    "latestApprovedLiveExactDigest": "HOLD"
+  },
+  "deployment": "NOT_PUBLISHED_PREVIEW_AND_LIVE_GATES_OPEN",
+  "unsafeClaimsForbidden": [
+    "No afirmar que Carlos está habilitado sin lectura por rol en LIVE.",
+    "No afirmar que Priscila tiene rol Asesor sin comprobar Equipo/tenant.",
+    "No unificar fichas Paula únicamente por igualdad de nombre.",
+    "No acreditar fecha factura en LIVE antes del despliegue backend y readback del mismo recibo.",
+    "No afirmar envío WhatsApp al usuario real con el proveedor simulado."
+  ]
+}

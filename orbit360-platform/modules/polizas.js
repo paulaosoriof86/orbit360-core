@@ -100,12 +100,13 @@ Orbit.modules.polizas = (function () {
   const M = (v, cur) => { const n = numberOrNull(v); return n == null ? 'Pendiente de completar' : U.money(n, cur); };
   const ACTIVE_STATES = new Set(['Vigente', 'Por renovar']);
   const HISTORICAL_STATES = new Set(['Renovada', 'Cancelada', 'Histórica', 'No Renovada', 'Reexpedida', 'Vencida', 'Anulada', 'Rechazada']);
-  const isActivePolicy = p => !!p && ACTIVE_STATES.has(p.estado);
+  const displayState = p => q.policyDisplayStatus ? q.policyDisplayStatus(p) : p && p.estado;
+  const isActivePolicy = p => !!p && ACTIVE_STATES.has(displayState(p));
   const isSyntheticQaPolicy = p => !!p && (
     (typeof q.isSyntheticQaRecord === 'function' && q.isSyntheticQaRecord(p)) ||
     p.__syntheticQa === true || p.syntheticQa === true ||
     /^B2 QA firme(?:\s|$)/i.test(String(p.sourceRef || '').trim()));
-  const isHistoricalNoPortfolio = p => !!p && HISTORICAL_STATES.has(p.estado);
+  const isHistoricalNoPortfolio = p => !!p && HISTORICAL_STATES.has(displayState(p));
   const renewabilityState = p => {
     if (!p || !Object.prototype.hasOwnProperty.call(p, 'renovable') || p.renovable == null || String(p.renovable).trim() === '') return 'UNKNOWN';
     if (p.renovable === true || ['true', 'si', 'sí', 'renovable'].includes(String(p.renovable).trim().toLowerCase())) return 'YES';
@@ -289,7 +290,7 @@ Orbit.modules.polizas = (function () {
         (!st.framo || p.ramo === st.framo) &&
         (!st.fasg || p.aseguradoraId === st.fasg) &&
         (!st.fase || p.asesorId === st.fase) &&
-        (!st.fest || p.estado === st.fest);
+        (!st.fest || displayState(p) === st.fest);
     }).sort((a, b) => st.sort === 'prima' ? ((policyPremiumTotal(b) || 0) - (policyPremiumTotal(a) || 0)) : String(a.vigenciaFin || '').localeCompare(String(b.vigenciaFin || '')));
   }
 
@@ -364,7 +365,7 @@ Orbit.modules.polizas = (function () {
             <td>${advisorCell(p.asesorId,I)}</td>
             <td class="num">${M(policyPremiumTotal(p), p.moneda)}</td>
             <td style="font-size:12.5px">${U.fmtDate(p.vigenciaFin)}</td>
-            <td>${U.estadoBadge(p.estado)}</td>
+            <td>${U.estadoBadge(displayState(p))}</td>
             <td style="text-align:right;color:var(--ink-3)"><button class="btn ghost sm" onclick="event.stopPropagation();Orbit.modules.polizas.verDesglose('${p.id}')" title="Desglose de prima y recibos">Desglose</button> ›</td></tr>`).join('') || emptyRow(9)}</tbody>
         </table></div>
         <div style="padding:10px 14px;border-top:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">
@@ -419,7 +420,7 @@ Orbit.modules.polizas = (function () {
     const sourceAdjustment = numberOrNull(p.descuento);
     const recibos = rb.receipts;
     const pendingCalendarAuthority = recibos.length>0 && rb.total!=null && total!=null && Math.abs(rb.total-total)>0.01;
-    const genera = (p.estado === 'Vigente' || p.estado === 'Por renovar');
+    const genera = isActivePolicy(p);
     const req = p.requiereValidacion || !p.pais || !p.moneda || p.estado === 'Requiere validación' || neta == null || total == null || pendingCalendarAuthority;
     const fuente = p.sourceRef || p._origenHoja || (p.importado ? 'Importación' : 'Carga manual');
     const filaFuente = p._numeroFila ? (' · fila ' + p._numeroFila) : '';
@@ -432,7 +433,7 @@ Orbit.modules.polizas = (function () {
         <div><b style="font-family:var(--f-display);font-size:16px">Póliza ${U.esc(p.numero || '')}</b><div class="muted" style="font-size:12px">${U.esc(p.ramo || '')}${p.producto ? ' · ' + U.esc(p.producto) : ''} · ${U.esc(asg.nombre || '')}</div></div>
         <button class="imp-x" id="pd-x">✕</button></div>
       <div style="padding:16px 20px">
-        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">${U.estadoBadge(p.estado)} ${req ? '<span class="badge warn">Información parcial / requiere validación</span>' : '<span class="badge ok">Datos principales validados</span>'} <span class="badge ${genera ? 'ok' : 'neutral'}">${genera ? 'Genera calendario' : 'Histórico'}</span></div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">${U.estadoBadge(displayState(p))} ${req ? '<span class="badge warn">Información parcial / requiere validación</span>' : '<span class="badge ok">Datos principales validados</span>'} <span class="badge ${genera ? 'ok' : 'neutral'}">${genera ? 'Vigencia activa' : 'Sin vigencia activa'} · los recibos históricos se preservan</span></div>
         <div style="font-family:var(--f-display);font-weight:800;font-size:13px;margin:4px 0 6px">Desglose de prima (${cur})</div>
         ${row('Prima neta de póliza', M(neta,cur))}
         ${row('Gastos de expedición', M(exped != null ? exped : rb.expedition,cur))}

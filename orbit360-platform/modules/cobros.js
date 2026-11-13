@@ -656,7 +656,7 @@ Orbit.modules.cobros = (function () {
           ${vr('Aseguradora', asg ? U.esc(asg.nombre) : '—')}${vr('Asesor', ase ? U.esc(ase.nombre) : '—')}
           ${vr('Forma de pago', (p && p.formaPago) || c.metodo || '—')}${vr('Conducto', (p && p.conducto) || '—')}
           ${vr('Vence', U.fmtDate(c.vence))}${vr('Fecha límite', U.fmtDate(c.fechaLimite || c.vence))}
-          ${vr('Fecha real de pago', (c.paidDate || c.fechaPago || c.fechaPagoReportada) ? U.fmtDate(c.paidDate || c.fechaPago || c.fechaPagoReportada) : '—')}${vr('Fecha operativa inferida', c.inferredEffectiveDate ? U.fmtDate(c.inferredEffectiveDate) : '—')}${vr('Fecha de aplicación', c.applicationDate ? U.fmtDate(c.applicationDate) : '—')}${vr('Número de factura', U.esc(c.invoiceNumber || c.numeroFactura || '—'))}${vr('Soporte de pago', c.paymentSupportDocumentRef ? 'Adjunto' : 'No adjunto')}${vr('Factura / soporte de aplicación', c.invoiceDocumentRef ? 'Adjunta' : 'No adjunta')}
+           ${vr('Fecha real de pago', (c.paidDate || c.fechaPago || c.fechaPagoReportada) ? U.fmtDate(c.paidDate || c.fechaPago || c.fechaPagoReportada) : '—')}${vr('Fecha operativa inferida', c.inferredEffectiveDate ? U.fmtDate(c.inferredEffectiveDate) : '—')}${vr('Fecha de aplicación', c.applicationDate ? U.fmtDate(c.applicationDate) : '—')}${vr('Fecha de factura', c.invoiceDate ? U.fmtDate(c.invoiceDate) : '—')}${vr('Número de factura', U.esc(c.invoiceNumber || c.numeroFactura || '—'))}${vr('Soporte de pago', c.paymentSupportDocumentRef ? 'Adjunto' : 'No adjunto')}${vr('Factura / soporte de aplicación', c.invoiceDocumentRef ? 'Adjunta' : 'No adjunta')}
         </div>
         <div class="vp-desglose">
           <div class="vp-sec-t">🧾 Desglose del ${TT('recibo').toLowerCase()}</div>
@@ -724,6 +724,7 @@ Orbit.modules.cobros = (function () {
       + '<label class="ce-l">Método de pago <span class="muted">(opcional)</span><input id="cc-method" class="o-sel" value="' + U.esc(c.paymentMethod || c.metodo || '') + '" placeholder="Opcional"></label>'
       + '<div class="ce-l"><span style="font-size:12.5px;font-weight:600;color:var(--ink-2);margin-bottom:7px;display:block">Soporte del pago <span class="muted">(opcional)</span></span><div style="display:flex;gap:8px;align-items:center"><button class="btn ghost sm" id="cc-pay-btn">⬆ Adjuntar soporte</button><span id="cc-pay-name" class="muted" style="font-size:12px">Sin archivo nuevo</span></div></div>'
       + '<label class="ce-l">Fecha de aplicación por la aseguradora<input id="cc-aplicacion" class="o-sel" type="date" value="' + U.esc(c.applicationDate || '') + '"></label>'
+       + '<label class="ce-l">Fecha que aparece en la factura <span class="muted">(opcional)</span><input id="cc-invoice-date" class="o-sel" type="date" value="' + U.esc(c.invoiceDate || '') + '"></label>'
       + '<label class="ce-l">Número de factura<input id="cc-numero" class="o-sel" value="' + U.esc(c.invoiceNumber || c.numeroFactura || '') + '" placeholder="Opcional"></label>'
       + '<div class="ce-l"><span style="font-size:12.5px;font-weight:600;color:var(--ink-2);margin-bottom:7px;display:block">Factura / soporte de aplicación <span class="muted">(opcional)</span></span>'
       + '<div style="display:flex;gap:8px;align-items:center"><button class="btn ghost sm" id="cc-btn">⬆ Adjuntar factura</button><span id="cc-name" class="muted" style="font-size:12px">Sin archivo nuevo</span></div></div>'
@@ -746,6 +747,11 @@ Orbit.modules.cobros = (function () {
     };
     pm.querySelector('#cc-ok').onclick = async () => {
       const btn=pm.querySelector('#cc-ok'),state=pm.querySelector('#cc-save-state');
+      if (!pm.querySelector('#cc-aplicacion').value && !pm.querySelector('#cc-numero').value.trim() && !invoiceFile &&
+          !c.applicationDate && !c.invoiceNumber && !c.numeroFactura && !c.invoiceDocumentRef) {
+        if(state)state.textContent='Para conciliar, registra la aplicación de la aseguradora, el número de factura o adjunta la factura. La fecha de factura sola no acredita aplicación.';
+        return;
+      }
       btn.disabled=true;btn.textContent='Guardando…';pm.setAttribute('aria-busy','true');
       if(state)state.textContent='Guardando documentos y confirmando persistencia…';
       try {
@@ -768,11 +774,13 @@ Orbit.modules.cobros = (function () {
           paymentMethod:pm.querySelector('#cc-method').value.trim(),
           paymentSupportDocumentRef,
           applicationDate:pm.querySelector('#cc-aplicacion').value||'',
+           invoiceDate:pm.querySelector('#cc-invoice-date').value||'',
           invoiceNumber:pm.querySelector('#cc-numero').value.trim(),
           invoiceDocumentRef,
           applicationEvidenceType:'MANUAL_RECONCILIATION'
         }});
-        close(); U.toast(saved&&saved.documentLifecycleOk===false?'✓ Pago conciliado. Un documento quedó en recuperación controlada.':'✓ Pago conciliado y datos actualizados');
+        if (!saved || !/^APPLIED_/.test(String(saved.applicationState||''))) throw Error('PAYMENT_RECONCILIATION_READBACK_REQUIRED');
+        close(); U.toast(saved.documentLifecycleOk===false?'✓ Aplicación conciliada. Un documento quedó en recuperación controlada.':'✓ Aplicación conciliada y datos confirmados');
         baseCache=null;/* B3-004 R14: router/store reactive owner preserves the active payment context. */
       } catch(error) {
         const feedback=paymentFailureFeedback(error);
@@ -923,6 +931,7 @@ Orbit.modules.cobros = (function () {
       +'<div class="ce-l"><span style="font-size:12.5px;font-weight:600;color:var(--ink-2);display:block;margin-bottom:7px">Soporte del pago del cliente <span class="muted">(opcional)</span></span><div style="display:flex;gap:8px;align-items:center"><button class="btn ghost sm" id="pm-support-btn">⬆ Adjuntar soporte</button><span id="pm-support-name" class="muted" style="font-size:12px">Sin archivo</span></div></div>'
       +'<hr style="border:0;border-top:1px solid var(--line)">'
       +'<label class="ce-l">Fecha de aplicación por la aseguradora <span class="muted">(opcional)</span><input id="pm-app" class="o-sel" type="date" value="'+U.esc(c.applicationDate||'')+'"></label>'
+       +'<label class="ce-l">Fecha que aparece en la factura <span class="muted">(opcional)</span><input id="pm-invoice-date" class="o-sel" type="date" value="'+U.esc(c.invoiceDate||'')+'"></label>'
       +'<label class="ce-l">Número de factura <span class="muted">(opcional)</span><input id="pm-invoice-number" class="o-sel" value="'+U.esc(c.invoiceNumber||c.numeroFactura||'')+'"></label>'
       +'<div class="ce-l"><span style="font-size:12.5px;font-weight:600;color:var(--ink-2);display:block;margin-bottom:7px">Factura / soporte de aplicación <span class="muted">(opcional)</span></span><div style="display:flex;gap:8px;align-items:center"><button class="btn ghost sm" id="pm-invoice-btn">⬆ Adjuntar factura</button><span id="pm-invoice-name" class="muted" style="font-size:12px">Sin archivo</span></div></div>'
       +'<label class="ce-l" style="display:flex;align-items:center;gap:8px;flex-direction:row;cursor:pointer"><input id="pm-avisar" type="checkbox" checked style="width:auto"> Avisar al cliente después de registrar</label>'
@@ -949,13 +958,15 @@ Orbit.modules.cobros = (function () {
           paymentMethod:pm.querySelector('#pm-metodo').value||'',
           paymentSupportDocumentRef:supportRef,
           applicationDate:pm.querySelector('#pm-app').value||'',
+           invoiceDate:pm.querySelector('#pm-invoice-date').value||'',
           invoiceNumber:pm.querySelector('#pm-invoice-number').value.trim(),
           invoiceDocumentRef:invoiceRef,
           amount:c.monto
         }});
         const avisar=pm.querySelector('#pm-avisar')&&pm.querySelector('#pm-avisar').checked;
         const docsOk=!(applied&&applied.documentLifecycleOk===false);
-        close();U.toast(docsOk?'✓ Pago registrado':'✓ Pago registrado. Un documento quedó en recuperación controlada.');baseCache=null;
+         const reconciled=!!(applied&&/^APPLIED_/.test(String(applied.applicationState||'')));
+         close();U.toast(docsOk ? (reconciled ? '✓ Pago aplicado y conciliado con la aseguradora' : '✓ Pago aplicado; pendiente de conciliación') : '✓ Pago registrado. Un documento quedó en recuperación controlada.');baseCache=null;
         if(docsOk&&avisar&&Orbit.notify&&cli&&cli.id){Orbit.notify.pedir(cli.id,{tipo:'Aviso de pago confirmado',icon:'💳',asunto:'Confirmación de pago · póliza '+(p.numero||''),mensaje:'Hola '+(cli.nombre||'')+', registramos tu pago de '+U.money(c.monto,c.moneda)+' (cuota '+(c.cuota||'')+') de la póliza '+(p.numero||'')+'. ¡Gracias por tu confianza!'});}
         /* B3-004 R14: router/store reactive owner preserves the active payment context. */
       } catch (error) {

@@ -19,6 +19,7 @@ Orbit.modules.cliente360 = (function () {
     return raw;
   }
   const esRenovable = p => p && (p.estado === 'Vigente' || p.estado === 'Por renovar');
+  const esVigente = p => p && ['Vigente','Por renovar'].includes(q.policyDisplayStatus(p));
   const policyTotal = p => U.finiteNumber(p && p.primaTotal);
 
   // B4-003 UAT4: reconcile authorized policy scope against visible clients.
@@ -307,7 +308,7 @@ Orbit.modules.cliente360 = (function () {
     const clientById = new Map(clientes.filter(c => c && c.id != null).map(c => [c.id, c]));
     const primaNetaVigentePorMoneda = {};
     policiesForKpi.forEach(p => {
-      if (!esRenovable(p)) return;
+      if (!esVigente(p)) return;
       const cli = clientById.get(p.clienteId);
       if (!cli) return;
       const neta = U.finiteNumber(p.primaNeta != null ? p.primaNeta : p.prima);
@@ -322,7 +323,7 @@ Orbit.modules.cliente360 = (function () {
           const rank = x => x === 'GTQ' ? 0 : x === 'COP' ? 1 : 2;
           return rank(a) - rank(b) || a.localeCompare(b);
         }).map(moneda => '<span style="display:block;font-size:' + (primaNetaVigenteKeys.length > 1 ? '14px' : '22px') + '">' + U.esc(moneda) + ' ' + Number(primaNetaVigentePorMoneda[moneda] || 0).toLocaleString('es-GT', { maximumFractionDigits: 0 }) + '</span>').join('') || '<span class="muted">Sin valores</span>');
-    const activePolicyCount = policyReadiness === 'ready' ? policiesForKpi.filter(esRenovable).length : null;
+    const activePolicyCount = policyReadiness === 'ready' ? policiesForKpi.filter(esVigente).length : null;
     const totalPolicyCount = policyReadiness === 'ready' ? policiesForKpi.length : null;
     const renewals45Policies = policyReadiness === 'ready' ? policiesForKpi.filter(p => { const d = U.daysFromNow(p.vigenciaFin); return esRenovable(p) && d != null && d >= 0 && d <= 45; }) : [];
     const renewals45Count = policyReadiness === 'ready' ? renewals45Policies.length : null;
@@ -409,7 +410,7 @@ Orbit.modules.cliente360 = (function () {
       const title = kind === 'renewals' ? 'Por renovar ≤45 d' : kind === 'premium' ? 'Prima neta vigente' : 'Pólizas activas';
       let back=document.getElementById('c360-kpi-detail');if(back)back.remove();
       back=document.createElement('div');back.id='c360-kpi-detail';back.className='drawer-back open';back.style.cssText='display:grid;place-items:center;z-index:96';back.setAttribute('data-row-count',String(list.length));
-      const body=list.slice(0,250).map(p=>{const cli=clientById.get(p.clienteId)||{};const cur=p.moneda||p.divisa||cli.moneda||'';const net=U.finiteNumber(p.primaNeta!=null?p.primaNeta:p.prima);return `<tr class="clickable" data-client="${U.esc(p.clienteId||'')}"><td>${U.esc(cli.nombre||'—')}</td><td>${U.esc(p.numero||'—')}</td><td>${U.esc(p.ramo||p.producto||'—')}</td><td>${net==null?'Sin monto fuente':U.money(net,cur)}</td><td>${U.fmtDate(p.vigenciaFin)}</td><td>${U.esc(p.estado||'—')}</td></tr>`;}).join('');
+    const body=list.slice(0,250).map(p=>{const cli=clientById.get(p.clienteId)||{};const cur=p.moneda||p.divisa||cli.moneda||'';const net=U.finiteNumber(p.primaNeta!=null?p.primaNeta:p.prima);return `<tr class="clickable" data-client="${U.esc(p.clienteId||'')}"><td>${U.esc(cli.nombre||'—')}</td><td>${U.esc(p.numero||'—')}</td><td>${U.esc(p.ramo||p.producto||'—')}</td><td>${net==null?'Sin monto fuente':U.money(net,cur)}</td><td>${U.fmtDate(p.vigenciaFin)}</td><td>${U.esc(q.policyDisplayStatus(p)||'—')}</td></tr>`;}).join('');
       back.innerHTML=`<div class="card" style="width:min(900px,96vw);max-height:88vh;overflow:auto;padding:0"><div style="padding:16px 20px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between"><b>${title} · ${list.length}</b><button class="imp-x" data-close>✕</button></div><div style="overflow-x:auto"><table class="tbl"><thead><tr><th>Cliente</th><th>Póliza</th><th>Ramo</th><th>Prima neta</th><th>Vence</th><th>Estado</th></tr></thead><tbody>${body||'<tr><td colspan="6" class="muted" style="text-align:center;padding:24px">Sin registros.</td></tr>'}</tbody></table></div>${list.length>250?'<div class="muted" style="padding:10px 20px">Se muestran los primeros 250 registros; usa los filtros de la vista para acotar el universo.</div>':''}</div>`;
       document.body.appendChild(back);const close=()=>back.remove();back.querySelector('[data-close]').onclick=close;back.onclick=e=>{if(e.target===back)close();};back.querySelectorAll('[data-client]').forEach(tr=>tr.onclick=()=>{const cid=tr.getAttribute('data-client');close();if(cid)location.hash='#/cliente360?c='+encodeURIComponent(cid);});
     };
@@ -724,7 +725,7 @@ Orbit.modules.cliente360 = (function () {
           <td>${U.esc(policyPaymentMethod(p))}</td>
           <td class="num">${policyTotal(p) == null ? 'Pendiente de completar' : U.money(policyTotal(p), p.moneda)}</td>
           <td style="font-size:12.5px">${U.fmtDate(p.vigenciaInicio)}<div class="muted">→ ${U.fmtDate(p.vigenciaFin)}</div></td>
-          <td>${U.estadoBadge(p.estado)}</td>
+          <td>${U.estadoBadge(q.policyDisplayStatus(p))}</td>
           <td style="text-align:right;color:var(--ink-3)">›</td>
         </tr>`;
       }).join('')}${r.pol.length === 0 ? '<tr><td colspan="8" class="muted" style="text-align:center;padding:28px">Sin pólizas.</td></tr>' : ''}</tbody>
@@ -921,7 +922,7 @@ Orbit.modules.cliente360 = (function () {
       <div style="margin-top:16px;display:grid;gap:12px">
       ${items.map(p => {
         const d = U.daysFromNow(p.vigenciaFin);
-        const estado = p.estado === 'Vencida' ? 'Vencida' : d <= 45 ? 'Por renovar' : 'Vigente';
+        const estado = q.policyDisplayStatus(p) === 'Vencida' ? 'Vencida' : d != null && d <= 45 ? 'Por renovar' : q.policyDisplayStatus(p);
         const tone = estado === 'Vencida' ? 'danger' : estado === 'Por renovar' ? 'warn' : 'ok';
         const pct = Math.max(2, Math.min(100, 100 - (d / 365 * 100)));
         const gestionable = estado !== 'Vigente';
@@ -1453,7 +1454,7 @@ Orbit.modules.cliente360 = (function () {
     let back = document.getElementById('c360-edit'); if (back) back.remove();
     back = document.createElement('div'); back.id = 'c360-edit'; back.className = 'drawer-back open';
     back.style.display = 'grid'; back.style.placeItems = 'center';
-    const estBadge = U.estadoBadge(p.estado);
+    const estBadge = U.estadoBadge(q.policyDisplayStatus(p));
     const renState = renovabilidad(p);
     const renBadge = renState === 'YES' ? '<span class="badge ok">Renovable</span>' : renState === 'NO' ? '<span class="badge neutral">No renovable</span>' : '<span class="badge warn">Renovabilidad pendiente de validar</span>';
     back.innerHTML = `<div class="card" style="width:min(960px,96vw);max-height:92vh;overflow:auto;padding:0">
