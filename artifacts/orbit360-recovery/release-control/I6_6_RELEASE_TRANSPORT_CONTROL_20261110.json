@@ -4,7 +4,7 @@
   "productBrand": "Gravicentra Insurance",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
-  "status": "CONCILIACIONES_STAGE_READER_PREVIEW_AUTHORIZED",
+  "status": "CONCILIACIONES_STAGE_SIGNED_PREVIEW_UAT_REQUESTED",
   "i66PaymentInvoicePreviewRelease20261113": {
     "status": "SIGNED_POLICY_AND_CLIENT360_PREVIEW_PASS_PAYMENT_BACKEND_PREVIEW_ONLY",
     "authority": "Paula Dirección 2026-11-13: Carlos aplica y concilia con factura, fecha factura separada, certifica antes de publicar.",
@@ -24,7 +24,10 @@
     "completedPreviewProof": {
       "runId": 43467007164,
       "conclusion": "SUCCESS",
-      "appliedAndReconciledInvoiceDatePersistedReloaded": ["Carlos Operativo", "Paula Direccion"],
+      "appliedAndReconciledInvoiceDatePersistedReloaded": [
+        "Carlos Operativo",
+        "Paula Direccion"
+      ],
       "separateInvoiceDate": "2026-11-11",
       "livePaymentFunctionRevisionTrafficUnchanged": true,
       "bothLiveHostingOriginsUnchanged": true,
@@ -915,5 +918,19 @@
         "fullI66ProductionAccepted": false
       }
     }
+  },
+  "i66ConciliacionesHumanNameSignedPreviewUat20261113": {
+    "status": "SIGNED_UAT_REQUESTED_AFTER_43484798631_PREVIEW_READER_PASS",
+    "authority": "Paula 2026-11-13: human names in Conciliaciones, signed role/country Preview before exact artifact LIVE; zero real financial writes.",
+    "sourceSha": "851d68441b819eac6dd37ec1d5d15fb971e35bf2",
+    "previewUrl": "https://ays-orbit-360-lab--gi-i66-rc-42868854629-abj14q6n.web.app",
+    "previewReaderDeploymentRunId": 43484798631,
+    "exactPreviewReaderFunctionDeployed": true,
+    "realDataWritesPermitted": false,
+    "livePromotionPermitted": false,
+    "coverageExpected": 52,
+    "ambiguousHold": 80,
+    "greenApiIndependentTest": "PROVIDER_AUTHORIZED_UNTIL_2026_12_10_WEBHOOK_NOT_CONFIGURED_SEPARATE_GATE",
+    "nextGate": "SIGNED_HUMAN_NAME_52_OF_52_UI_NO_TECHNICAL_LABELS_NO_WRITES"
   }
 }

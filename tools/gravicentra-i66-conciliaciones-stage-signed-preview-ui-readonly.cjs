@@ -2,9 +2,12 @@
 // LIVE remains untouched. Real signed Firebase Auth sessions through the
 // isolated Hosting Preview and existing scoped reader Preview function only.
 const assert=require('node:assert/strict');
+const fs=require('node:fs');
 const admin=require('firebase-admin');
 const {chromium}=require('playwright');
-const TENANT='alianzas-soluciones',PROJECT='ays-orbit-360-lab',R7='0153f5cbbe00c3732e11ebae59b32bd357e38bfd';
+const TENANT='alianzas-soluciones',PROJECT='ays-orbit-360-lab';
+const LIVE_SOURCE=JSON.parse(fs.readFileSync('artifacts/orbit360-recovery/release-control/I6_6_LATEST_EXACT_LIVE_POINTER_20261113.json','utf8')).currentLiveSourceSha;
+assert.match(String(LIVE_SOURCE||''),/^[0-9a-f]{40}$/,'I66_CURRENT_LIVE_POINTER_INVALID');
 const MODE=String(process.env.I66_STAGE_MODE||'PREVIEW').toUpperCase();
 assert.ok(['PREVIEW','LIVE'].includes(MODE),'I66_SIGNED_STAGE_MODE_NOT_ALLOWED');
 const PREVIEW=String(process.env.I66_STAGE_PREVIEW_URL||'');
@@ -116,12 +119,16 @@ async function signedPage(browser,{token},role,origin){
    return{ready:Orbit.cobrosConciliacionReadOnly.proposalReadiness(),
      count:proposals.length,rendered:host.querySelectorAll('[data-conc-id]').length,
      previewReadOnly:Orbit.cobrosConciliacionReadOnly.firestoreWrites===0,
+     humanNames:proposals.filter(x=>x.cliente&&x.cliente!=='Cliente por identificar'&&!/^(cli_|client_|[0-9a-f]{12,})/i.test(x.cliente)).length,
+     technicalVisible:/\bcli_siga_[a-z0-9_]+\b|\bMATCH_PROBABLE\b|\b[a-f0-9]{20,}\b/i.test(host.textContent||''),
      headingAndNoAutoApply:host.textContent?.includes('Bandeja de conciliaciones')===true&&
        host.textContent?.includes('Ninguna propuesta aplica pagos por sí sola')===true,
      errors:Object.keys(Orbit.store._productStatus().snapshotErrors||{})
        .filter(x=>x==='conciliaciones'||x==='conciliacionesPrimas')};
   });
   assert.equal(view.ready,'ready');assert.equal(view.count,52);assert.equal(view.rendered,52);
+  assert.equal(view.humanNames,52,'I66_SIGNED_CLIENT_HUMAN_NAME_COVERAGE_HOLD');
+  assert.equal(view.technicalVisible,false,'I66_SIGNED_TECHNICAL_LABEL_LEAK');
   assert.ok(view.previewReadOnly&&view.headingAndNoAutoApply&&view.errors.length===0);
   assert.equal(faults.length,0,'I66_SIGNED_PREVIEW_JS_PAGE_ERROR');
   console.log('I66_SIGNED_DIRECTION_CONCILIACIONES_'+MODE+'_UI_PASS '+JSON.stringify({
@@ -135,8 +142,8 @@ async function main(){
  const builds=await Promise.all(origins.map(readBuild));
  assert.equal(builds[0].sourceSha,SOURCE,'I66_'+MODE+'_IMMUTABLE_SOURCE_DRIFT');
  if(MODE==='PREVIEW'){
-  assert.equal(builds[1].sourceSha,R7,'I66_LIVE_PRIMARY_DRIFT');
-  assert.equal(builds[2].sourceSha,R7,'I66_LIVE_STAFF_DRIFT');
+  assert.equal(builds[1].sourceSha,LIVE_SOURCE,'I66_LIVE_PRIMARY_DRIFT');
+  assert.equal(builds[2].sourceSha,LIVE_SOURCE,'I66_LIVE_STAFF_DRIFT');
  }else{
   assert.equal(builds[1].sourceSha,SOURCE,'I66_LIVE_STAFF_SOURCE_DRIFT');
  }
