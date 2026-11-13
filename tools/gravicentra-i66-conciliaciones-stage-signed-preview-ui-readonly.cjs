@@ -112,17 +112,27 @@ async function signedPage(browser,{token},role){
  }finally{await context.close();}
 }
 async function main(){
+ console.log('I66_SIGNED_UAT_STEP=BUILD_ORIGINS');
  const [candidate,live,staff]=await Promise.all([
   readBuild(PREVIEW),readBuild('https://ays-orbit-360-lab.web.app'),readBuild('https://app.aysseguros.com')]);
  assert.equal(candidate.sourceSha,SOURCE,'I66_PREVIEW_IMMUTABLE_SOURCE_DRIFT');
  assert.equal(live.sourceSha,R7,'I66_LIVE_PRIMARY_DRIFT');
  assert.equal(staff.sourceSha,R7,'I66_LIVE_STAFF_DRIFT');
+ console.log('I66_SIGNED_UAT_STEP=REAL_ACTORS');
  const people=await actors();
+ console.log('I66_SIGNED_UAT_STEP=SIGNED_BROWSER');
  const browser=await chromium.launch({headless:true,args:['--no-sandbox']});
  try{await signedPage(browser,people.direction,'Dirección');await signedPage(browser,people.carlos,'Operativo');}
  finally{await browser.close();}
  console.log('I66_CONCILIACIONES_STAGE_SIGNED_PREVIEW_ACCEPTANCE_PASS zero_live_changes zero_business_writes');
 }
-main().catch(e=>{console.error('I66_SIGNED_PREVIEW_HOLD '+String(e.code||e.message||e)
- .replace(/[^\w.:/-]+/g,'_').slice(0,230));process.exitCode=1;})
+main().catch(e=>{
+ const code=String(e?.code||'UNKNOWN').replace(/[^A-Z0-9_]/gi,'_').slice(0,40);
+ const message=String(e?.message||'').replace(/[^\w.:/-]+/g,'_').slice(0,150);
+ const frame=String(e?.stack||'').split('\n').find(x=>/at (signedPage|actors|main|readBuild) \(/.test(x))||'';
+ const position=frame.match(/:(\d+):(\d+)\)?$/);
+ console.error('I66_SIGNED_PREVIEW_HOLD code='+code+' reason='+message+
+   ' localLine='+(position?.[1]||'unknown'));
+ process.exitCode=1;
+})
  .finally(()=>admin.app().delete());
