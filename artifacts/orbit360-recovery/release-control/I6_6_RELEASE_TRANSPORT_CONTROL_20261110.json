@@ -920,7 +920,7 @@
     }
   },
   "i66ConciliacionesHumanNameSignedPreviewUat20261113": {
-    "status": "SIGNED_UAT_REQUESTED_AFTER_43484798631_PREVIEW_READER_PASS",
+    "status": "SIGNED_ROLE_COUNTRY_PREVIEW_PASS",
     "authority": "Paula 2026-11-13: human names in Conciliaciones, signed role/country Preview before exact artifact LIVE; zero real financial writes.",
     "sourceSha": "851d68441b819eac6dd37ec1d5d15fb971e35bf2",
     "previewUrl": "https://ays-orbit-360-lab--gi-i66-rc-42868854629-abj14q6n.web.app",
@@ -931,6 +931,41 @@
     "coverageExpected": 52,
     "ambiguousHold": 80,
     "greenApiIndependentTest": "PROVIDER_AUTHORIZED_UNTIL_2026_12_10_WEBHOOK_NOT_CONFIGURED_SEPARATE_GATE",
-    "nextGate": "SIGNED_HUMAN_NAME_52_OF_52_UI_NO_TECHNICAL_LABELS_NO_WRITES"
+    "nextGate": "EXACT_IMMUTABLE_PREVIEW_ARTIFACT_TO_LIVE_PROMOTION_NOT_YET_AUTHORIZED_FOR_THIS_SOURCE",
+    "signedQaRunId": 43487251474,
+    "signedQaResult": "SUCCESS",
+    "uniqueCanonicalClientNamesRendered": 52,
+    "unresolvedAmbiguousHold": 80,
+    "technicalCustomerIdLabelsRendered": 0,
+    "actualFinancialWrites": 0
+  },
+  "i66DriveDocumentLiveRestorationAuthorization20261113": {
+    "status": "SCOPED_LIVE_DOCUMENT_FUNCTION_RESTORATION_AUTHORIZED_AND_PENDING",
+    "authorizedBy": "Paula Dirección",
+    "authorityDate": "2026-11-13",
+    "purpose": "restore_missing_production_document_callables_only",
+    "evidence": "Browser authenticated Work: LIVE status/upload GET=404; LIVE Ops GET=400; Preview upload GET=400; functions/document-drive-domain.js identical to R9 accepted blob",
+    "sourceR9": "586401bfbe1a80cfef2820982f432743af36b108",
+    "backendBlobSha": "928dc218aa09be4648552f84502e50f4c0d65227",
+    "region": "us-central1",
+    "functionNames": [
+      "orbit360DocumentDriveStatus",
+      "orbit360DocumentDriveUpload",
+      "orbit360DocumentDriveListFolder",
+      "orbit360DocumentDriveReadDossier",
+      "orbit360DocumentDriveRead",
+      "orbit360DocumentDriveDownload",
+      "orbit360DocumentDriveFinalize",
+      "orbit360DocumentDriveQuarantine",
+      "orbit360DocumentDriveBootstrap"
+    ],
+    "doNotRedeployExistingFunctions": true,
+    "requireProductionOAuthSecret": true,
+    "allowFinancialRecordWrites": false,
+    "allowHostingPromotion": false,
+    "allowFirestoreRulesChange": false,
+    "requireLiveRoutesHttp400": true,
+    "requireRealCarlosPdfWriteReadbackBeforeOperationalPass": true,
+    "preExistingBusinessDataUntouched": true
   }
 }
