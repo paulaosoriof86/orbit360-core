@@ -1,19 +1,19 @@
 {
   "schema": "GI_I66_LATEST_EXACT_LIVE_RELEASE_POINTER_V3",
   "dateGuatemala": "2026-11-13",
-  "status": "LATEST_R10_CONCILIACIONES_HUMAN_NAMES_SIGNED_LIVE_PASS_I66_FULL_ACCEPTANCE_HOLD",
+  "status": "LATEST_R11_RENEWAL_DRIVE_EXACT_SIGNED_LIVE_PASS_FULL_I66_HOLD",
   "productBrand": "Gravicentra Insurance",
   "activeGate": "I6.6",
   "historicalB4007Closed": true,
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
-  "currentLiveSourceSha": "851d68441b819eac6dd37ec1d5d15fb971e35bf2",
-  "currentLiveImmutableBuildRunId": 43484031398,
-  "currentLiveArtifactId": 14066487146,
-  "currentLiveArtifactDigest": "sha256:f0d45ff58490d53c434f7285d98818439cfabdafb9bbc0f8e814787927df5f3d",
-  "currentLiveDeployAndSignedQaRunId": 43498437664,
-  "currentLiveEvidenceArtifactId": 14072713179,
-  "currentLiveHostingVersion": "sites/ays-orbit-360-lab/versions/23037b2a726a8def",
+  "currentLiveSourceSha": "84769378eb2014addebfefdbdd63091bddc4b817",
+  "currentLiveImmutableBuildRunId": 43503721126,
+  "currentLiveArtifactId": 14075022275,
+  "currentLiveArtifactDigest": "sha256:b0f3bacb68511cdfc91ac934602c51f55afec5c1d6428d886d13a72a706ee283",
+  "currentLiveDeployAndSignedQaRunId": 43506971214,
+  "currentLiveEvidenceArtifactId": 14076447556,
+  "currentLiveHostingVersion": "sites/ays-orbit-360-lab/versions/0766db29b338befc",
   "previewFirebaseLiveAndCustomLiveArtifactFiles": "223_OF_223_EACH_ORIGIN_EXACT",
   "liveOneExistingProtectedReaderEffectiveTraffic": "100_PERCENT_NEW_REVISION",
   "otherFunctionsPreserved": true,
@@ -32,9 +32,9 @@
   "realInsurerIssuedRenewal": "HOLD_REAL_PDF_DRIVE_OAUTH_CONSENT_PENDING",
   "fullModuleRoleCountryRealWriteAcceptance": false,
   "fullI66ProductionAccepted": false,
-  "currentLiveReceipt": "artifacts/orbit360-recovery/release-control/I6_6_CONCILIACIONES_HUMAN_NAMES_R10_LIVE_RECEIPT_20261113.json",
+  "currentLiveReceipt": "artifacts/orbit360-recovery/release-control/I6_6_R11_RENEWAL_DRIVE_EXACT_LIVE_RECEIPT_20261113.json",
   "priorR7LiveReceipt": "artifacts/orbit360-recovery/release-control/I6_6_LATEST_EXACT_LIVE_POINTER_20261112.json",
-  "previousLiveVersionForRollback": "sites/ays-orbit-360-lab/versions/1dd873081501d7fb",
+  "previousLiveVersionForRollback": "sites/ays-orbit-360-lab/versions/23037b2a726a8def",
   "currentR9SignedPaymentInvoicePolicyLiveAcceptance20261113": {
     "receipt": "artifacts/orbit360-recovery/release-control/I6_6_PAYMENT_INVOICE_POLICY_R9_LIVE_RECEIPT_20261113.json",
     "backendSignedLiveRunId": 43471877267,
@@ -45,7 +45,7 @@
     "actualInsurerInvoicePdfUploadReadback": "HOLD_NOT_SIGNED",
     "newRealFinancialRecordsWrittenByRelease": 0
   },
-  "nextAction": "DRIVE_ADMIN_OAUTH_CONSENT_REAL_CARLOS_PDF_UPLOAD; DIRECT_ISSUED_RENEWAL_WITHOUT_OPS_DETOUR; BANTRAB_PROTECTED_REVIEW_43438038880_ZERO_WRITES; MAPFRE_ANNUAL_PREMIUM_AND_DOCUMENT",
+  "nextAction": "DRIVE_ADMIN_OAUTH_CONSENT_REAL_CARLOS_PDF_UPLOAD; BANTRAB_PROTECTED_REVIEW_43438038880_ZERO_WRITES; MAPFRE_ANNUAL_PREMIUM_AND_DOCUMENT; SIGNED_REAL_ISSUED_RENEWAL_READBACK; GREENAPI_REAL_DELIVERY_TEST",
   "historicalR8ExactPublishedRoleRightsAndUat20261113": {
     "receipt": "artifacts/orbit360-recovery/release-control/I6_6_ROLE_TRANSVERSAL_R8_LIVE_RECEIPT_20261113.json",
     "qa": {
@@ -106,7 +106,7 @@
       }
     }
   },
-  "currentLiveExactReleaseTag": "R10_HUMAN_CLIENT_NAMES",
+  "currentLiveExactReleaseTag": "R11_RENEWALS_KANBAN_DIRECT_ISSUED_DRIVE_FEEDBACK",
   "priorR9LiveReceipt": "artifacts/orbit360-recovery/release-control/I6_6_PAYMENT_INVOICE_POLICY_R9_LIVE_RECEIPT_20261113.json",
   "priorR9LiveSourceSha": "586401bfbe1a80cfef2820982f432743af36b108",
   "currentR10HumanClientNamesAcceptance20261113": {
@@ -125,7 +125,22 @@
     "ambiguousHold": 80,
     "technicalLabelsVisible": 0,
     "realFinancialWrites": 0,
-    "fullI66ProductionAccepted": false
+    "fullI66ProductionAccepted": false,
+    "status": "PREVIOUS_R10_EXACT_SIGNED_LIVE_PRESERVED"
   },
-  "currentLiveBuildId": "gi-i66-851d68441b81-57f234755dc1"
+  "currentLiveBuildId": "gi-i66-84769378eb20-57f234755dc1",
+  "currentR11RenewalsDriveAcceptance20261113": {
+    "receipt": "artifacts/orbit360-recovery/release-control/I6_6_R11_RENEWAL_DRIVE_EXACT_LIVE_RECEIPT_20261113.json",
+    "sourceSha": "84769378eb2014addebfefdbdd63091bddc4b817",
+    "hostingVersion": "sites/ays-orbit-360-lab/versions/0766db29b338befc",
+    "buildRunId": 43503721126,
+    "artifactId": 14075022275,
+    "signedPreviewRun": 43504669496,
+    "signedLiveRun": 43506971214,
+    "filesPerOrigin": 223,
+    "backendChanges": 0,
+    "realFinancialWrites": 0,
+    "realPdfUpload": "HOLD tenant OAuth",
+    "fullI66ProductionAccepted": false
+  }
 }

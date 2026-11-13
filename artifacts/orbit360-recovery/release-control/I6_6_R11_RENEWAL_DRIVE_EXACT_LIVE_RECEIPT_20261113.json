@@ -1,0 +1,52 @@
+{
+  "schema": "GI_I66_RENEWALS_DRIVE_R11_EXACT_LIVE_RECEIPT_V1",
+  "status": "PUBLISHED_EXACT_223_FILES_DUAL_ORIGIN_SIGNED_CARLOS_PAULA_LIVE_PASS",
+  "dateGuatemala": "2026-11-13",
+  "gate": "I6.6",
+  "sourceSha": "84769378eb2014addebfefdbdd63091bddc4b817",
+  "previousLiveSourceSha": "851d68441b819eac6dd37ec1d5d15fb971e35bf2",
+  "immutableBuildRunId": 43503721126,
+  "immutableArtifactId": 14075022275,
+  "immutableArtifactDigest": "sha256:b0f3bacb68511cdfc91ac934602c51f55afec5c1d6428d886d13a72a706ee283",
+  "immutableBuildId": "gi-i66-84769378eb20-57f234755dc1",
+  "signedPreviewRunId": 43504669496,
+  "liveSignedUatRunId": 43506971214,
+  "liveEvidenceArtifactId": 14076447556,
+  "liveEvidenceArtifactDigest": "sha256:04e6aa7d2a57a4f039264c29cf2bc46cf10064ae54ad8e50c63df33bc60c6d41",
+  "hostingVersion": "sites/ays-orbit-360-lab/versions/0766db29b338befc",
+  "previousLiveVersionForRollback": "sites/ays-orbit-360-lab/versions/23037b2a726a8def",
+  "previewChannel": "gi-i66-rc-42868854629",
+  "previewUrl": "https://ays-orbit-360-lab--gi-i66-rc-42868854629-abj14q6n.web.app",
+  "sameFiles": {
+    "preview": 223,
+    "firebaseLive": 223,
+    "staffCustomDomain": 223
+  },
+  "signedRoles": {
+    "carlosOperativo": "SOURCE_HYDRATION_FOUR_COLLECTIONS_AND_CANMANAGE_TRUE_PASS",
+    "paulaDireccion": "SOURCE_HYDRATION_FOUR_COLLECTIONS_AND_CANMANAGE_TRUE_PASS",
+    "businessWrites": 0
+  },
+  "scope": [
+    "Renewals actionable board excludes confirmed already-renewed predecessor",
+    "Issued renewal direct entry no Ops management modal detour",
+    "Cliente360 same direct policy renewal decision",
+    "Drive upload failure diagnostic and safe retry, no fake PDF success"
+  ],
+  "firstPromotionAttempt": {
+    "runId": 43505948038,
+    "result": "FAILED_SIGNED_UI_ASSERTION",
+    "autoRollback": "R10_HOSTING_VERSION_RESTORED_FAILURE_COUNT_0",
+    "exactBytesBeforeRollback": "223/223 all three origins"
+  },
+  "successfulPromotionRunId": 43506971214,
+  "backendFunctionsChanged": 0,
+  "realFinancialWrites": 0,
+  "realPolicyWrites": 0,
+  "realDocumentUploads": 0,
+  "driveStatus": "SIGNED_TENANT_SETUP_REQUIRED_ADMIN_GOOGLE_DRIVE_OAUTH_CONSENT_HOLD",
+  "bantrab": "WAITING_PROTECTED_ENV_43438038880_ZERO_WRITES",
+  "mapfre": "HOLD_ANNUAL_PREMIUM_OR_ANNEX",
+  "greenApi": "APPROVED_INSTANCE_ACTIVE_NOT_REAL_WA_DELIVERY_TESTED",
+  "fullI66ProductionAccepted": false
+}

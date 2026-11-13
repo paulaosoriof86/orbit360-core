@@ -21648,7 +21648,7 @@
     "noNewIterationsOrParallelReleaseMethod": true,
     "noGlobalSynchronizationClaim": true
   },
-  "currentExecutionDecisionPointer": "i66ConciliacionesHumanNamesR10ExactLiveRelease20261113",
+  "currentExecutionDecisionPointer": "i66R11RenewalDriveExactLiveRelease20261113",
   "i66PaymentInvoicePolicyR9ExactLiveRelease20261113": {
     "schema": "GI_I66_R9_EXACT_LIVE_OPERATIVE_SUCCESSOR_V1",
     "status": "PREVIOUS_R9_PAYMENT_INVOICE_POLICY_SIGNED_LIVE_PRESERVED",
@@ -22791,7 +22791,7 @@
   },
   "i66ConciliacionesHumanNamesR10ExactLiveRelease20261113": {
     "schema": "GI_I66_R10_CONCILIACIONES_HUMAN_CLIENT_NAMES_EXACT_LIVE_SUCCESSOR_V1",
-    "status": "CURRENT_R10_CONCILIACIONES_HUMAN_NAMES_EXACT_LIVE_PASS_FULL_I66_HOLD",
+    "status": "PREVIOUS_R10_CONCILIACIONES_HUMAN_NAMES_EXACT_LIVE_PRESERVED",
     "sourceSha": "851d68441b819eac6dd37ec1d5d15fb971e35bf2",
     "buildId": "gi-i66-851d68441b81-57f234755dc1",
     "buildRunId": 43484031398,
@@ -22813,6 +22813,30 @@
     "uniqueHumanClientNames": 52,
     "technicalCustomerIdLabelsVisible": 0,
     "ambiguousHold": 80,
+    "financialActualWrites": 0,
+    "documentDriveRealUploadCertified": false,
+    "fullI66ProductionAccepted": false
+  },
+  "i66R11RenewalDriveExactLiveRelease20261113": {
+    "schema": "GI_I66_R11_RENEWALS_DRIVE_EXACT_LIVE_SUCCESSOR_V1",
+    "status": "CURRENT_R11_RENEWAL_DRIVE_EXACT_LIVE_SIGNED_PASS_FULL_I66_HOLD",
+    "sourceSha": "84769378eb2014addebfefdbdd63091bddc4b817",
+    "buildId": "gi-i66-84769378eb20-57f234755dc1",
+    "buildRunId": 43503721126,
+    "artifactId": 14075022275,
+    "artifactDigest": "sha256:b0f3bacb68511cdfc91ac934602c51f55afec5c1d6428d886d13a72a706ee283",
+    "signedPreviewRunId": 43504669496,
+    "liveCloneRunId": 43506971214,
+    "signedLiveUiRunId": 43506971214,
+    "liveEvidenceArtifactId": 14076447556,
+    "sameFilesBothOrigins": 223,
+    "hostingVersion": "sites/ays-orbit-360-lab/versions/0766db29b338befc",
+    "receipt": "artifacts/orbit360-recovery/release-control/I6_6_R11_RENEWAL_DRIVE_EXACT_LIVE_RECEIPT_20261113.json",
+    "currentPointer": "artifacts/orbit360-recovery/release-control/I6_6_LATEST_EXACT_LIVE_POINTER_20261113.json",
+    "previousR10Receipt": "artifacts/orbit360-recovery/release-control/I6_6_CONCILIACIONES_HUMAN_NAMES_R10_LIVE_RECEIPT_20261113.json",
+    "previousR10HostingVersion": "sites/ays-orbit-360-lab/versions/23037b2a726a8def",
+    "backendFunctionsChanged": 0,
+    "roleCountrySigned": "CARLOS_OPERATIVO_AND_PAULA_DIRECCION_SOURCE_HYDRATION_PASS",
     "financialActualWrites": 0,
     "documentDriveRealUploadCertified": false,
     "fullI66ProductionAccepted": false

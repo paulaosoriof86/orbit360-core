@@ -22,8 +22,8 @@
   "productionAcceptedScope": "HISTORICAL_I5_CERTIFIED_BASE_IN_CONTROL_PLANE_NOT_I6_6_LATEST_SUCCESSOR",
   "currentLiveSuccessorAcceptance": {
     "gate": "I6.6",
-    "sourceSha": "851d68441b819eac6dd37ec1d5d15fb971e35bf2",
-    "frontEndExactLiveReadback": "R10_SAME_223_OF_223_PREVIEW_FIREBASE_AND_APP_LIVE_43498437664",
+    "sourceSha": "84769378eb2014addebfefdbdd63091bddc4b817",
+    "frontEndExactLiveReadback": "R11_SAME_223_OF_223_PREVIEW_FIREBASE_AND_APP_LIVE_43506971214",
     "currentR9SignedLiveReceipt": "artifacts/orbit360-recovery/release-control/I6_6_PAYMENT_INVOICE_POLICY_R9_LIVE_RECEIPT_20261113.json",
     "currentR9SignedPaymentsAndPolicies": "CARLOS_AND_PAULA_NEW_POLICY_CLIENT360_RELOAD_43472800270_PAYMENT_INVOICE_APPLY_RECONCILE_RELOAD_43473378992_SYNTHETIC_RESTORED",
     "signedCrossRouteReadOnly": "PASS_43250591471_SIGNED_LIVE_OPS_LEADS_TASKS_43310610618_REAL_PENDING_LEADS_OPS_43315196712_AND_ACTUAL_CARLOS_TASK_DOM_43332642537",
@@ -67,14 +67,14 @@
       "fullI66ProductionAccepted": false,
       "latestReleaseReceipt": "artifacts/orbit360-recovery/release-control/I6_6_CONCILIACIONES_STAGE_READONLY_LIVE_RECEIPT_20261113.json"
     },
-    "currentExactHostingRunId": 43498437664,
-    "currentExactHostingArtifactId": 14066487146,
-    "currentExactHostingBuildId": "gi-i66-851d68441b81-57f234755dc1",
+    "currentExactHostingRunId": 43506971214,
+    "currentExactHostingArtifactId": 14075022275,
+    "currentExactHostingBuildId": "gi-i66-84769378eb20-57f234755dc1",
     "liveTwoActorOpsLeadsTasksCrudRunId": 43310610618,
     "liveTwoActorPaymentAndRenewabilityRunId": 43312896784,
     "targetedCobrosBackendSourceSha": "a49f5f76bc85b5df211a865efed94d9821cdd680",
     "targetedCobrosBackendImmutableTarSha256": "3bc2599c42e01dca2e4b9c9053b2a8990885cd0c762fe3117f78b851c5f791ec",
-    "backendTransportInterpretation": "Current R10 immutable source 851d68441b81 artifact 14066487146 Preview/Firebase/APP 223/223 bytes and signed 52 human names for Dirección, Carlos unassigned-module correctly denied, 0 financial writes, run 43498437664. R9 source 586401 remains certified historical for Carlos/Paula payment invoice number/date apply/reconcile and new policy Cliente360 synthetic UAT, no real business writes. Nine Drive callables restored + scoped tenant secret IAM, but tenant admin Google OAuth consent and real PDF upload remain HOLD; seven Bantrab references protected review waiting; Mapfre annual premium/support missing; 80 ambiguous matches HOLD; global release authorization re-locked; full I6.6 acceptance HOLD.",
+    "backendTransportInterpretation": "R11 signed immutable frontend source 84769378eb20 artifact 14075022275 223/223 files Preview/Firebase/App exact; signed Carlos and Direccion live hydration PASS 43506971214. R10 human names 52/52 preserved from prior signed source. No functions, rules, financial/document writes in R11. Drive 9 callables restored but tenant admin OAuth consent remains HOLD; Bantrab protected environment waiting; Mapfre annual contract premium missing; full I6.6 acceptance HOLD.",
     "privilegedRoleExactLiveSuccessor20261112": {
       "status": "PUBLISHED_TARGETED_PASS_NOT_FULL_I6_6_PRODUCTION_ACCEPTANCE",
       "sourceSha": "0153f5cbbe00c3732e11ebae59b32bd357e38bfd",
@@ -278,7 +278,9 @@
       "realCustomerWrites": 0,
       "fullI66ProductionAccepted": false,
       "previousR9LiveReceipt": "artifacts/orbit360-recovery/release-control/I6_6_PAYMENT_INVOICE_POLICY_R9_LIVE_RECEIPT_20261113.json"
-    }
+    },
+    "currentR11RenewalDriveSignedLiveReceipt": "artifacts/orbit360-recovery/release-control/I6_6_R11_RENEWAL_DRIVE_EXACT_LIVE_RECEIPT_20261113.json",
+    "realIssuedRenewalWithPdf": "HOLD tenant Drive OAuth consent"
   },
   "i66OwnerFrozenUrgentWorkPlan20261112": {
     "status": "OWNER_DECISIONS_FROZEN_EXECUTION_AND_LIVE_READBACK_REQUIRED",
@@ -1170,7 +1172,7 @@
     "noNewIterationsOrParallelReleaseMethod": true,
     "noGlobalSynchronizationClaim": true
   },
-  "currentExecutionDecisionPointer": "artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json#i66ConciliacionesHumanNamesR10ExactLiveRelease20261113",
+  "currentExecutionDecisionPointer": "artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json#i66R11RenewalDriveExactLiveRelease20261113",
   "b4003CausalFrontendSuccessor20261107": {
     "schema": "GRAVICENTRA_B4_003_CAUSAL_FRONTEND_SUCCESSOR_CURSOR_V1",
     "status": "FRONTEND_SUCCESSOR_LIVE_BYTES_PASS_FOCAL_LIVE_PENDING",
@@ -2216,5 +2218,30 @@
     "realFinancialWrites": 0,
     "realCustomerWrites": 0,
     "fullI66ProductionAccepted": false
+  },
+  "i66CurrentR11RenewalDriveExactPublished20261113": {
+    "status": "EXACT_FRONTEND_SIGNED_LIVE_ACCEPTED_FULL_I66_HOLD",
+    "sourceSha": "84769378eb2014addebfefdbdd63091bddc4b817",
+    "buildId": "gi-i66-84769378eb20-57f234755dc1",
+    "artifactId": 14075022275,
+    "artifactDigest": "sha256:b0f3bacb68511cdfc91ac934602c51f55afec5c1d6428d886d13a72a706ee283",
+    "sourceQaTests": "14_OF_14_PASS",
+    "signedPreviewCarlosPaula": 43504669496,
+    "signedLiveCarlosPaula": 43506971214,
+    "liveEvidenceArtifactId": 14076447556,
+    "hostingVersion": "sites/ays-orbit-360-lab/versions/0766db29b338befc",
+    "verifiedFiles": {
+      "preview": 223,
+      "firebaseLive": 223,
+      "staffCustomLive": 223
+    },
+    "rollbackFirstFailedAttempt": 43505948038,
+    "rollbackFirstFailedAttemptErrors": 0,
+    "backendChanges": 0,
+    "financialWrites": 0,
+    "documentWrites": 0,
+    "driveRealUpload": "HOLD tenant OAuth consent",
+    "fullI66ProductionAccepted": false,
+    "receipt": "artifacts/orbit360-recovery/release-control/I6_6_R11_RENEWAL_DRIVE_EXACT_LIVE_RECEIPT_20261113.json"
   }
 }

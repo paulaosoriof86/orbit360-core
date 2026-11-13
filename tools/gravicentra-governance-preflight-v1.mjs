@@ -46,7 +46,9 @@ if(i66Active){
   const r9Current=r9Release?.status==='CURRENT_R9_PAYMENT_INVOICE_POLICY_DUAL_ORIGIN_SIGNED_LIVE_PASS_FULL_I66_HOLD';
   const r10Release=control.i66ConciliacionesHumanNamesR10ExactLiveRelease20261113;
   const r10Current=r10Release?.status==='CURRENT_R10_CONCILIACIONES_HUMAN_NAMES_EXACT_LIVE_PASS_FULL_I66_HOLD';
-  const pointer=(r10Current||r9Current||roleCurrent||stageCurrent)
+  const r11Release=control.i66R11RenewalDriveExactLiveRelease20261113;
+  const r11Current=r11Release?.status==='CURRENT_R11_RENEWAL_DRIVE_EXACT_LIVE_SIGNED_PASS_FULL_I66_HOLD';
+  const pointer=(r11Current||r10Current||r9Current||roleCurrent||stageCurrent)
     ?'artifacts/orbit360-recovery/release-control/I6_6_LATEST_EXACT_LIVE_POINTER_20261113.json'
     :'artifacts/orbit360-recovery/release-control/I6_6_LATEST_EXACT_LIVE_POINTER_20261112.json';
   const latest=fs.existsSync(pointer)?JSON.parse(fs.readFileSync(pointer,'utf8')):
@@ -62,7 +64,65 @@ if(i66Active){
     transport.i66ConciliacionesHumanNameReaderPreviewAuthorization20261113?.dataWritesPermitted===false&&
     transport.noHostingPromotion===true&&transport.forbidFirestoreRulesDataAuthWrites===true;
   const guard='I6_6_EXACT_LIVE_RELEASE_POINTER_OR_READER_AUTHORIZATION_DRIFT';
-  if(r10Current){
+  if(r11Current){
+    const r10=JSON.parse(fs.readFileSync('artifacts/orbit360-recovery/release-control/I6_6_CONCILIACIONES_HUMAN_NAMES_R10_LIVE_RECEIPT_20261113.json','utf8'));
+    const r11=JSON.parse(fs.readFileSync('artifacts/orbit360-recovery/release-control/I6_6_R11_RENEWAL_DRIVE_EXACT_LIVE_RECEIPT_20261113.json','utf8'));
+    const state=JSON.parse(fs.readFileSync('orbit360-platform/docs/recovery/orbit360-recovery-state-v1.json','utf8'));
+    const current=state.currentLiveSuccessorAcceptance||{};
+    const prior=transport.previousExactHostingReleaseR10||{};
+    const confirmed=transport.i66R11RenewalDriveExactLiveCompleted20261113||{};
+    const expectedSource='84769378eb2014addebfefdbdd63091bddc4b817';
+    const expectedVersion='sites/ays-orbit-360-lab/versions/0766db29b338befc';
+    const expectedArtifact='sha256:b0f3bacb68511cdfc91ac934602c51f55afec5c1d6428d886d13a72a706ee283';
+    const fields=[
+      [latest.currentLiveSourceSha,expectedSource],[latest.currentLiveSourceSha,r11.sourceSha],
+      [latest.currentLiveSourceSha,r11Release.sourceSha],[latest.currentLiveSourceSha,live?.sourceSha],
+      [latest.currentLiveSourceSha,current.sourceSha],[latest.currentLiveSourceSha,confirmed.sourceSha],
+      [latest.currentLiveArtifactId,14075022275],[latest.currentLiveArtifactId,live?.artifactId],
+      [latest.currentLiveArtifactId,r11Release.artifactId],[latest.currentLiveArtifactId,r11.immutableArtifactId],
+      [latest.currentLiveArtifactDigest,expectedArtifact],
+      [latest.currentLiveArtifactDigest,r11Release.artifactDigest],
+      [latest.currentLiveArtifactDigest,live?.artifactDigest],
+      [latest.currentLiveArtifactDigest,r11.immutableArtifactDigest],
+      [latest.currentLiveHostingVersion,expectedVersion],
+      [latest.currentLiveHostingVersion,r11.hostingVersion],
+      [latest.currentLiveHostingVersion,r11Release.hostingVersion],
+      [latest.currentLiveHostingVersion,live?.liveHostingVersion],
+      [latest.currentLiveHostingVersion,confirmed.hostingVersion],
+      [latest.currentLiveImmutableBuildRunId,43503721126],
+      [latest.currentLiveDeployAndSignedQaRunId,43506971214],
+      [latest.currentLiveEvidenceArtifactId,14076447556],
+      [latest.currentLiveReceipt,r11Release.receipt],[latest.currentLiveReceipt,live?.receipt],
+      [latest.previousLiveVersionForRollback,r10.hostingVersion],
+      [latest.previousLiveVersionForRollback,prior.liveHostingVersion],
+      [r11.previousLiveVersionForRollback,r10.hostingVersion],
+      [latest.currentLiveBuildId,r11.immutableBuildId],[latest.currentLiveBuildId,live?.buildId]
+    ];
+    if(fields.some(([a,b])=>a==null||b==null||a!==b)||
+       control.currentExecutionDecisionPointer!=='i66R11RenewalDriveExactLiveRelease20261113'||
+       state.currentExecutionDecisionPointer!=='artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json#i66R11RenewalDriveExactLiveRelease20261113'||
+       pointer!=='artifacts/orbit360-recovery/release-control/I6_6_LATEST_EXACT_LIVE_POINTER_20261113.json'||
+       latest.status!=='LATEST_R11_RENEWAL_DRIVE_EXACT_SIGNED_LIVE_PASS_FULL_I66_HOLD'||
+       live?.status!=='PUBLISHED_EXACT_R11_223_FILES_SIGNED_FRONTEND_HOSTING_ONLY_PARTIAL'||
+       r11.schema!=='GI_I66_RENEWALS_DRIVE_R11_EXACT_LIVE_RECEIPT_V1'||
+       r11.status!=='PUBLISHED_EXACT_223_FILES_DUAL_ORIGIN_SIGNED_CARLOS_PAULA_LIVE_PASS'||
+       r11.sameFiles.preview!==223||r11.sameFiles.firebaseLive!==223||
+       r11.sameFiles.staffCustomDomain!==223||r11.realFinancialWrites!==0||
+       r11.realDocumentUploads!==0||r11.fullI66ProductionAccepted!==false||
+       r11.previousLiveSourceSha!==r10.sourceSha||
+       r10.sourceSha!=='851d68441b819eac6dd37ec1d5d15fb971e35bf2'||
+       r10.hostingVersion!=='sites/ays-orbit-360-lab/versions/23037b2a726a8def'||
+       r10Release?.status!=='PREVIOUS_R10_CONCILIACIONES_HUMAN_NAMES_EXACT_LIVE_PRESERVED'||
+       transport.status!=='R11_RENEWAL_DRIVE_EXACT_LIVE_ACCEPTED_LOCKED'||
+       transport.livePromotionAuthorized!==false||transport.previewApproved!==false||
+       transport.forbidBackendFunctionDeploy!==true||
+       transport.forbidBackendLiveFunctionDeploy!==true||
+       transport.noHostingPromotion!==true||
+       transport.forbidFirestoreRulesDataAuthWrites!==true||
+       r11Release.financialActualWrites!==0||
+       current.currentR11RenewalDriveSignedLiveReceipt!==r11Release.receipt||
+       latest.fullI66ProductionAccepted!==false)throw new Error(guard);
+  }else if(r10Current){
     const receipt=JSON.parse(fs.readFileSync('artifacts/orbit360-recovery/release-control/I6_6_CONCILIACIONES_HUMAN_NAMES_R10_LIVE_RECEIPT_20261113.json','utf8'));
     const previousR9=JSON.parse(fs.readFileSync('artifacts/orbit360-recovery/release-control/I6_6_PAYMENT_INVOICE_POLICY_R9_LIVE_RECEIPT_20261113.json','utf8'));
     const state=JSON.parse(fs.readFileSync('orbit360-platform/docs/recovery/orbit360-recovery-state-v1.json','utf8'));
