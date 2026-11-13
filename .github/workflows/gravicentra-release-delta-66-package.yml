@@ -147,7 +147,18 @@ jobs:
             c.immutableArtifactId===stage.sourceArtifactId&&
             c.immutableArtifactZipDigest===stage.sourceArtifactDigest&&
             c.sourcePreviewChannelId===stage.hostingPreviewChannel;
-          if(c.schema!=='GRAVICENTRA_I6_6_SINGLE_ARTIFACT_RELEASE_TRANSPORT_V1'||c.gate!=='I6.6'||c.historicalClosedGate!=='B4-007'||(c.forbidBackendFunctionDeploy!==true&&!scopedPreview&&!scopedLive&&!scopedCarlosLive&&!readerPreview&&!stageReaderPreview&&!carlosFunctionPreview&&!privilegedPreview&&!privilegedLive)||c.forbidFirestoreRulesDataAuthWrites!==true)throw Error('I66_TRANSPORT_SCOPE_INVALID');
+          const exactStageLive=c.i66ConciliacionesStageExactLiveAuthorization20261113||{};
+          const stageLive=c.status==='CONCILIACIONES_STAGE_EXACT_LIVE_AUTHORIZED'&&
+            c.forbidBackendFunctionDeploy===false&&c.forbidBackendLiveFunctionDeploy===false&&
+            c.backendFunctionPreviewOnly===false&&c.livePromotionAuthorized===true&&
+            c.previewApproved===true&&c.noHostingPromotion===false&&
+            exactStageLive.status==='SIGNED_PREVIEW_ACCEPTED_EXACT_SOURCE_ARTIFACT_ONE_LIVE_READER_DUAL_HOSTING'&&
+            exactStageLive.approvedByDirection===true&&exactStageLive.sameImmutableArtifact===true&&
+            exactStageLive.oneExistingLiveFunctionOnly===true&&exactStageLive.noBusinessFinancialWrites===true&&
+            exactStageLive.rollbackBackendAndHostingOnAnyFailure===true&&
+            exactStageLive.sourceSha===c.approvedSourceSha&&
+            exactStageLive.artifactId===c.immutableArtifactId;
+          if(c.schema!=='GRAVICENTRA_I6_6_SINGLE_ARTIFACT_RELEASE_TRANSPORT_V1'||c.gate!=='I6.6'||c.historicalClosedGate!=='B4-007'||(c.forbidBackendFunctionDeploy!==true&&!scopedPreview&&!scopedLive&&!scopedCarlosLive&&!readerPreview&&!stageReaderPreview&&!stageLive&&!carlosFunctionPreview&&!privilegedPreview&&!privilegedLive)||c.forbidFirestoreRulesDataAuthWrites!==true)throw Error('I66_TRANSPORT_SCOPE_INVALID');
           if((scopedPreview||scopedLive||scopedCarlosLive||readerPreview)&&(!/^[0-9a-f]{40}$/.test(c.approvedSourceSha||'')||!(c.sourceBuildWorkflowRunId>0)||!(c.immutableArtifactId>0)||!/^[0-9a-f]{64}$/.test(String(c.immutableArtifactZipDigest||'').replace(/^sha256:/,''))))throw Error('I66_SCOPED_RELEASE_PROOF_MISSING');
           let mode='disabled',source='',sourceRun='',artifactId='',artifactDigest='',accessSha='',readerSha='',previewChannel='';
           if(c.status==='PREVIEW_BUILD_REQUESTED'&&c.livePromotionAuthorized===false)mode='package';

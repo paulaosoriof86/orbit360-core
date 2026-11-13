@@ -1,0 +1,269 @@
+# Existing I6.6 gate. The single certified Preview artifact is cloned to
+# LIVE, and only the existing live scoped reader is deployed from its backend.
+# Automatic rollback preserves R7 if any source, function, UI or file test fails.
+name: Gravicentra I6.6 Conciliaciones Stage Exact LIVE and Rollback
+on:
+  push:
+    branches: [recovery/fase-a-clean-20260831]
+    paths:
+      - .github/workflows/gravicentra-i66-conciliaciones-stage-exact-live-promotion.yml
+      - artifacts/orbit360-recovery/release-control/I6_6_RELEASE_TRANSPORT_CONTROL_20261110.json
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: gi-i66-conciliaciones-stage-exact-live
+  cancel-in-progress: false
+jobs:
+  exact-stage-live:
+    if: github.repository == 'paulaosoriof86/orbit360-core' && github.ref == 'refs/heads/recovery/fase-a-clean-20260831'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 65
+    env:
+      PROJECT_ID: ays-orbit-360-lab
+      SOURCE_SHA: e6183a9f1da68243cc935e222d98b2d21b5f17b8
+      SOURCE_RUN: '43385953587'
+      ARTIFACT_ID: '14018512857'
+      ARTIFACT_DIGEST: sha256:64ccf09525abf48d8c707deb366ca1cf0122c6cd7765a7ae98c5ea5380dcec31
+      PREVIEW_READER_RUN: '43386427260'
+      SIGNED_PREVIEW_RUN: '43387403110'
+      I66_STAGE_PREVIEW_CHANNEL: gi-i66-rc-42868854629
+      I66_STAGE_PREVIEW_URL: https://ays-orbit-360-lab--gi-i66-rc-42868854629-abj14q6n.web.app
+      I66_STAGE_SOURCE_SHA: e6183a9f1da68243cc935e222d98b2d21b5f17b8
+      GH_READ_TOKEN: ${{ github.token }}
+      SA_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_ALT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Fail closed unless exact signed Preview and one-function LIVE are authorized
+        run: |
+          set -euo pipefail
+          node tools/gravicentra-i6-6-delta-guard.mjs
+          git cat-file -e "$SOURCE_SHA^{commit}"
+          git merge-base --is-ancestor "$SOURCE_SHA" HEAD
+          test -z "$(git diff --name-only "$SOURCE_SHA" HEAD -- orbit360-platform functions firebase.json firestore.rules storage.rules)"
+          node --check tools/gravicentra-i66-conciliaciones-stage-exact-live-transport.mjs
+          node --check tools/gravicentra-i66-conciliaciones-stage-signed-preview-ui-readonly.cjs
+          node - <<'NODE'
+          const assert=require('node:assert/strict'),fs=require('node:fs');
+          const c=JSON.parse(fs.readFileSync('artifacts/orbit360-recovery/release-control/I6_6_RELEASE_TRANSPORT_CONTROL_20261110.json','utf8'));
+          const a=c.i66ConciliacionesStageExactLiveAuthorization20261113||{};
+          assert.equal(c.status,'CONCILIACIONES_STAGE_EXACT_LIVE_AUTHORIZED');
+          assert.equal(c.gate,'I6.6');assert.equal(c.historicalClosedGate,'B4-007');
+          assert.ok(c.livePromotionAuthorized===true&&c.previewApproved===true&&
+            c.forbidBackendFunctionDeploy===false&&c.forbidBackendLiveFunctionDeploy===false&&
+            c.backendFunctionPreviewOnly===false&&c.noHostingPromotion===false&&
+            c.forbidFirestoreRulesDataAuthWrites===true,'I66_STAGE_LIVE_GLOBAL_SCOPE_DENIED');
+          assert.ok(a.status==='SIGNED_PREVIEW_ACCEPTED_EXACT_SOURCE_ARTIFACT_ONE_LIVE_READER_DUAL_HOSTING'&&
+            a.approvedByDirection===true&&a.sameImmutableArtifact===true&&
+            a.oneExistingLiveFunctionOnly===true&&a.noBusinessFinancialWrites===true&&
+            a.rollbackBackendAndHostingOnAnyFailure===true&&
+            a.targetFunction==='orbit360ScopedPolicyRead'&&a.region==='us-east1'&&
+            a.expectedPriorLiveHostingVersion==='9cedc5ecda75bb2a'&&
+            a.expectedPriorLiveSource==='0153f5cbbe00c3732e11ebae59b32bd357e38bfd'&&
+            a.sourceSha===process.env.SOURCE_SHA&&a.sourceRun===Number(process.env.SOURCE_RUN)&&
+            a.artifactId===Number(process.env.ARTIFACT_ID)&&a.artifactDigest===process.env.ARTIFACT_DIGEST&&
+            a.previewReaderDeployRun===Number(process.env.PREVIEW_READER_RUN)&&
+            a.signedPreviewUatRun===Number(process.env.SIGNED_PREVIEW_RUN)&&
+            a.previewChannel===process.env.I66_STAGE_PREVIEW_CHANNEL&&
+            a.previewUrl===process.env.I66_STAGE_PREVIEW_URL&&
+            c.approvedSourceSha===a.sourceSha&&c.immutableArtifactId===a.artifactId&&
+            c.sourcePreviewChannelId===a.previewChannel,
+            'I66_STAGE_LIVE_EXACT_OWNER_ACCEPTANCE_NOT_PROVEN');
+          (async()=>{
+            const headers={Authorization:'Bearer '+process.env.GH_READ_TOKEN,
+              Accept:'application/vnd.github+json','User-Agent':'I66-Exact-Stage-LIVE'};
+            const uri='https://api.github.com/repos/paulaosoriof86/orbit360-core/actions/';
+            const ids=[Number(process.env.SOURCE_RUN),Number(process.env.PREVIEW_READER_RUN),
+              Number(process.env.SIGNED_PREVIEW_RUN),43383902368];
+            const [runs,artifact]=await Promise.all([
+              Promise.all(ids.map(id=>fetch(uri+'runs/'+id,{headers}).then(r=>{
+                assert.ok(r.ok,'I66_STAGE_REQUIRED_RUN_UNREADABLE');return r.json();}))),
+              fetch(uri+'artifacts/'+process.env.ARTIFACT_ID,{headers}).then(r=>{
+                assert.ok(r.ok,'I66_STAGE_ARTIFACT_UNREADABLE');return r.json();})]);
+            assert.ok(runs.every((r,i)=>r.id===ids[i]&&r.status==='completed'&&r.conclusion==='success')&&
+              runs[0].head_sha===process.env.SOURCE_SHA&&
+              artifact.id===Number(process.env.ARTIFACT_ID)&&artifact.expired===false&&
+              artifact.digest===process.env.ARTIFACT_DIGEST&&
+              artifact.workflow_run?.id===Number(process.env.SOURCE_RUN)&&
+              artifact.workflow_run?.head_sha===process.env.SOURCE_SHA,
+              'I66_STAGE_SIGNED_PROVENANCE_FAILED');
+            console.log('I66_STAGE_FOUR_REQUIRED_GATES_AND_ORIGINAL_ARTIFACT_PASS');
+          })().catch(e=>{console.error(String(e.message||e).slice(0,140));process.exitCode=1;});
+          NODE
+      - name: Download original immutable build and verify byte-exact backend
+        uses: actions/download-artifact@v4
+        with:
+          run-id: 43385953587
+          artifact-ids: 14018512857
+          github-token: ${{ github.token }}
+          path: ${{ runner.temp }}/i66-stage-exact-download
+      - name: Extract certified artifact into read-only evidence and independent deploy workspace
+        run: |
+          set -euo pipefail
+          DL="$RUNNER_TEMP/i66-stage-exact-download"
+          mapfile -t TARS < <(find "$DL" -type f -name gi-i66-exact-package.tar.gz)
+          mapfile -t SUMS < <(find "$DL" -type f -name gi-i66-exact-package.sha256)
+          test "${#TARS[@]}" -eq 1 && test "${#SUMS[@]}" -eq 1
+          test "$(dirname "${TARS[0]}")" = "$(dirname "${SUMS[0]}")"
+          test "$(sha256sum "${TARS[0]}" | cut -d' ' -f1)" = "$(cut -d' ' -f1 "${SUMS[0]}")"
+          PACKAGE="$RUNNER_TEMP/i66-stage-exact-package"
+          mkdir -p "$PACKAGE"
+          tar -xzf "${TARS[0]}" -C "$PACKAGE" --no-same-owner
+          test -f "$PACKAGE/bundle/site/__recovery__/build.json"
+          test -f "$PACKAGE/bundle/backend/bootstrap.js"
+          test "$(git hash-object "$PACKAGE/bundle/backend/b4-003-scoped-access-boundary.js")" = bc4cfabae86027657d08aaac21963fb605f5f17a
+          test "$(git hash-object "$PACKAGE/bundle/backend/b4-003-scoped-related-reader.js")" = 34cb6c09c63fb9e45feb6c9d55c3e1c514ab17b2
+          node - <<'NODE'
+          const assert=require('node:assert/strict'),fs=require('node:fs'),{execFileSync}=require('node:child_process');
+          const root=process.env.RUNNER_TEMP+'/i66-stage-exact-package/bundle';
+          const build=JSON.parse(fs.readFileSync(root+'/site/__recovery__/build.json'));
+          assert.equal(build.sourceSha,process.env.SOURCE_SHA);
+          for(const p of ['functions/i66-conciliaciones-active-ledger-projection.js',
+              'functions/b4-003-scoped-related-reader.js','functions/b4-003-scoped-access-boundary.js']){
+            const certified=fs.readFileSync(root+'/backend/'+p.split('/').at(-1));
+            assert.ok(certified.equals(execFileSync('git',['show',process.env.SOURCE_SHA+':'+p])),
+              'I66_STAGE_BACKEND_SOURCE_IS_NOT_CERTIFIED_'+p);
+          }
+          console.log('I66_STAGE_IMMUTABLE_BACKEND_SOURCE_BYTES_PASS');
+          NODE
+          DEPLOY="$RUNNER_TEMP/i66-stage-functions-only"
+          mkdir -p "$DEPLOY"
+          cp -a "$PACKAGE/bundle/backend" "$DEPLOY/backend"
+          (cd "$DEPLOY/backend" && npm ci --ignore-scripts --no-audit --no-fund >/dev/null)
+          printf '{"functions":{"source":"backend","runtime":"nodejs22"}}\n' > "$DEPLOY/firebase.json"
+          echo "I66_STAGE_PACKAGE_ROOT=$PACKAGE" >> "$GITHUB_ENV"
+          echo "I66_STAGE_FUNCTIONS_CONFIG=$DEPLOY/firebase.json" >> "$GITHUB_ENV"
+      - uses: google-github-actions/setup-gcloud@v2
+        with:
+          version: '>= 483.0.0'
+      - name: Use only existing same-project credentials and snapshot R7 live function revision
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/i66-stage-auth"
+          python3 - <<'PY'
+          import json,os,pathlib
+          root=pathlib.Path(os.environ['RUNNER_TEMP'])/'i66-stage-auth';found=[]
+          for i,k in enumerate(('SA_LAB','SA_ALT','SA_DEFAULT')):
+            try:x=json.loads(os.environ.get(k,''))
+            except (ValueError,TypeError):continue
+            if x.get('type')=='service_account' and x.get('project_id')=='ays-orbit-360-lab' and x.get('private_key'):
+              p=root/f'{i}.json';p.write_text(json.dumps(x));p.chmod(0o600);found.append(str(p))
+          if not found:raise SystemExit('I66_STAGE_EXISTING_LAB_CREDENTIAL_NOT_AVAILABLE')
+          (root/'candidates').write_text('\n'.join(found)+'\n')
+          PY
+          npm install --prefix "$RUNNER_TEMP/i66-stage-cli" --no-save --ignore-scripts --no-audit --no-fund firebase-tools@14.10.1 >/dev/null
+          node tools/gravicentra-firebase-tools-empty-extensions-workaround-v1.mjs "$RUNNER_TEMP/i66-stage-cli"
+          CLI="$RUNNER_TEMP/i66-stage-cli/node_modules/firebase-tools/lib/bin/firebase.js"
+          selected=''
+          while IFS= read -r candidate;do
+            if GOOGLE_APPLICATION_CREDENTIALS="$candidate" node "$CLI" functions:list --project "$PROJECT_ID" --non-interactive --json >/dev/null 2>&1;then selected="$candidate";break;fi
+          done < "$RUNNER_TEMP/i66-stage-auth/candidates"
+          test -n "$selected"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$selected" >> "$GITHUB_ENV"
+          echo "FIREBASE_CLI_BIN=$CLI" >> "$GITHUB_ENV"
+          gcloud auth activate-service-account --key-file="$selected" --quiet >/dev/null
+          gcloud config set project "$PROJECT_ID" --quiet >/dev/null
+          node "$CLI" functions:list --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/i66-stage-fns-before.json"
+          node - <<'NODE'
+          const assert=require('node:assert/strict'),j=require(process.env.RUNNER_TEMP+'/i66-stage-fns-before.json');
+          const all=Array.isArray(j.result)?j.result:Array.isArray(j)?j:[];
+          const name=x=>String(x.entryPoint||x.id||x.name||'').split('/').pop();
+          assert.equal(all.filter(x=>name(x)==='orbit360ScopedPolicyRead').length,1);
+          assert.equal(all.filter(x=>name(x)==='orbit360ScopedPolicyReadPreview').length,1);
+          console.log('I66_STAGE_ONE_EXISTING_LIVE_READER_TARGET_PASS');
+          NODE
+          gcloud functions describe orbit360ScopedPolicyRead --gen2 --region us-east1 --project "$PROJECT_ID" --format=json > "$RUNNER_TEMP/i66-stage-fn-before.json"
+          SERVICE=$(node - <<'NODE'
+          const f=require(process.env.RUNNER_TEMP+'/i66-stage-fn-before.json');
+          const v=String(f.serviceConfig?.service||'').split('/').at(-1);
+          if(!/^[a-z][a-z0-9-]+$/.test(v)||!String(f.serviceConfig?.service||'').includes('/locations/us-east1/services/'))throw Error('I66_STAGE_LIVE_SERVICE_NOT_EXACT');
+          process.stdout.write(v);
+          NODE
+          )
+          export SERVICE
+          gcloud run services describe "$SERVICE" --region us-east1 --project "$PROJECT_ID" --format=json > "$RUNNER_TEMP/i66-stage-service-before.json"
+          OLD_REV=$(node - <<'NODE'
+          const s=require(process.env.RUNNER_TEMP+'/i66-stage-service-before.json');
+          const active=(s.status?.traffic||s.traffic||[]).filter(x=>Number(x.percent)>0);
+          const old=String(active[0]?.revisionName||active[0]?.revision||'');
+          if(active.length!==1||Number(active[0].percent)!==100||!old.startsWith(process.env.SERVICE+'-'))throw Error('I66_STAGE_LIVE_OLD_100_PERCENT_TRAFFIC_NOT_VERIFIED');
+          process.stdout.write(old);
+          NODE
+          )
+          echo "I66_STAGE_LIVE_SERVICE=$SERVICE" >> "$GITHUB_ENV"
+          echo "I66_STAGE_OLD_LIVE_REVISION=$OLD_REV" >> "$GITHUB_ENV"
+          npm install --no-save --package-lock=false --ignore-scripts --no-audit --no-fund google-auth-library@10.9.1 firebase-admin@13.4.0 playwright@1.55.0 >/dev/null
+          node node_modules/playwright/cli.js install --with-deps chromium >/dev/null
+      - name: Confirm immutable Preview and R7 rollback version before any live changes
+        run: node tools/gravicentra-i66-conciliaciones-stage-exact-live-transport.mjs pre
+      - name: Publish one LIVE reader plus exact Preview Hosting version, rollback on any failure
+        run: |
+          set -euo pipefail
+          started=0;completed=0
+          rollback(){
+            code=$?
+            if test "$started" = 1 && test "$completed" != 1;then
+              set +e;failed=0
+              gcloud run services update-traffic "$I66_STAGE_LIVE_SERVICE" --region us-east1 --project "$PROJECT_ID" --to-revisions="$I66_STAGE_OLD_LIVE_REVISION=100" --quiet || failed=1
+              # Never overwrite a concurrent independent production release.
+              LIVE_SHA=$(curl -fsSL --max-time 20 https://ays-orbit-360-lab.web.app/__recovery__/build.json | node -e 'let s="";process.stdin.on("data",x=>s+=x).on("end",()=>{try{process.stdout.write(JSON.parse(s).sourceSha||"")}catch{}})')
+              if test "$LIVE_SHA" = '0153f5cbbe00c3732e11ebae59b32bd357e38bfd' || test "$LIVE_SHA" = "$SOURCE_SHA";then
+                node "$FIREBASE_CLI_BIN" hosting:clone "ays-orbit-360-lab@9cedc5ecda75bb2a" 'ays-orbit-360-lab:live' --project "$PROJECT_ID" --non-interactive || failed=1
+              else
+                echo 'I66_STAGE_HOSTING_ROLLBACK_CONCURRENT_SOURCE_CHANGED_STOP';failed=1
+              fi
+              echo "I66_STAGE_AUTO_ROLLBACK_FAILURE_COUNT=$failed"
+              if test "$failed" != 0;then echo 'I66_STAGE_ROLLBACK_NEEDS_OPERATOR_REVIEW';fi
+            fi
+            exit "$code"
+          }
+          trap rollback EXIT
+          started=1
+          node "$FIREBASE_CLI_BIN" deploy --only functions:orbit360ScopedPolicyRead --config "$I66_STAGE_FUNCTIONS_CONFIG" --project "$PROJECT_ID" --non-interactive
+          gcloud run services update-traffic "$I66_STAGE_LIVE_SERVICE" --region us-east1 --project "$PROJECT_ID" --to-latest --quiet
+          gcloud functions describe orbit360ScopedPolicyRead --gen2 --region us-east1 --project "$PROJECT_ID" --format=json > "$RUNNER_TEMP/i66-stage-fn-after.json"
+          gcloud run services describe "$I66_STAGE_LIVE_SERVICE" --region us-east1 --project "$PROJECT_ID" --format=json > "$RUNNER_TEMP/i66-stage-service-after.json"
+          node - <<'NODE'
+          const f=require(process.env.RUNNER_TEMP+'/i66-stage-fn-after.json');
+          const s=require(process.env.RUNNER_TEMP+'/i66-stage-service-after.json');
+          const rev=String(f.serviceConfig?.revision||'');
+          const traffic=(s.status?.traffic||s.traffic||[]).filter(x=>Number(x.percent)>0);
+          if(!['ACTIVE','READY'].includes(String(f.state||'').toUpperCase())||
+             rev===process.env.I66_STAGE_OLD_LIVE_REVISION||traffic.length!==1||
+             Number(traffic[0].percent)!==100||String(traffic[0].revisionName||traffic[0].revision)!==rev)
+            throw Error('I66_STAGE_ONE_LIVE_READER_NEW_REVISION_NOT_EFFECTIVE');
+          console.log('I66_STAGE_LIVE_READER_NEW_REVISION_100_PERCENT_PASS');
+          NODE
+          node tools/gravicentra-i66-conciliaciones-stage-exact-live-transport.mjs promote
+          I66_STAGE_MODE=LIVE node tools/gravicentra-i66-conciliaciones-stage-signed-preview-ui-readonly.cjs
+          node tools/gravicentra-i66-conciliaciones-stage-exact-live-transport.mjs post
+          node "$FIREBASE_CLI_BIN" functions:list --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/i66-stage-fns-after.json"
+          node - <<'NODE'
+          const assert=require('node:assert/strict');
+          const before=require(process.env.RUNNER_TEMP+'/i66-stage-fns-before.json');
+          const after=require(process.env.RUNNER_TEMP+'/i66-stage-fns-after.json');
+          const rows=x=>Array.isArray(x.result)?x.result:Array.isArray(x)?x:[];
+          const id=x=>String(x.entryPoint||x.id||x.name||'').split('/').pop();
+          assert.deepEqual(rows(before).map(id).sort(),rows(after).map(id).sort(),
+            'I66_STAGE_OTHER_FUNCTION_INVENTORY_CHANGED');
+          console.log('I66_STAGE_LIVE_ONE_FUNCTION_AND_OTHER_FUNCTION_INVENTORY_PASS');
+          NODE
+          completed=1
+          trap - EXIT
+          echo 'I66_STAGE_EXACT_ARTIFACT_SIGNED_LIVE_ACCEPTANCE_PASS_ZERO_BUSINESS_WRITES'
+      - name: Preserve PII-free LIVE release evidence and rollback pointer
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gi-i66-conciliaciones-exact-live-evidence-${{ github.run_id }}
+          path: ${{ runner.temp }}/i66-stage-live-exact-proof.json
+          retention-days: 30
+          if-no-files-found: warn
