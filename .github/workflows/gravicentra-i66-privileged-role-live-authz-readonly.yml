@@ -51,20 +51,21 @@ jobs:
             for(const role of roles){
               const k=key(scope,role),ceiling=norm(k===undefined?'':scope[k]);
               const mk=key(matrix,role),permissions=mk===undefined?{}:matrix[mk]||{};
-              const denied=modules.filter(m=>{
+              const restrictions=modules.map(m=>{
                 const pm=permissions[Object.keys(permissions).find(x=>norm(x)===norm(m))]||{};
-                return pm.ver===false||pm.editar===false||pm.crear===false;
-              });
+                return{module:m,visible:pm.ver!==false,editable:pm.editar!==false,creatable:pm.crear!==false};
+              }).filter(x=>!x.visible||!x.editable||!x.creatable);
               const active=members.docs.filter(d=>{const m=d.data()||{};
                 return (Array.isArray(m.roles)?m.roles:[]).some(r=>norm(r)===norm(role))&&m.active!==false&&m.activo!==false&&
                   !['blocked','suspended','inactivo','inactive'].includes(norm(m.status||m.estado));
               }).length;
-              row.push({role,configuredScope:ceiling||'DEFAULT',activeAssignedMembers:active,explicitDeniedModules:denied});
+              row.push({role,configuredScope:ceiling||'DEFAULT',activeAssignedMembers:active,explicitRestrictions:restrictions});
               console.log('I66_ACTUAL_TENANT_ROLE_READONLY '+JSON.stringify(row.at(-1)));
             }
             const op=row.find(x=>x.role==='Operativo');
             assert.equal(op.configuredScope,'all','I66_ACTUAL_OPERATIVO_NOT_ALL_IN_SIGNED_TENANT');
-            assert.equal(op.explicitDeniedModules.length,0,'I66_ACTUAL_OPERATIVO_MODULE_DENIAL_NEEDS_AUTHORIZED_RESOLUTION');
+            assert.equal(op.explicitRestrictions.filter(x=>x.visible&&(!x.editable||!x.creatable)).length,0,
+              'I66_ACTUAL_OPERATIVO_VISIBLE_MODULE_HAS_WRITE_DENIAL_NEEDS_RESOLUTION');
             assert.ok(op.activeAssignedMembers>=1,'I66_NO_ACTIVE_OPERATIVO_MEMBER_TO_TEST');
             console.log('I66_REAL_OPERATIVO_TENANT_ROLE_CONFIG_AND_ALL_TEN_APPROVED_MODULES_READONLY_PASS');
             console.log('I66_OTHER_ROLES_EXPLICIT_MATRIX_READBACK_COMPLETE_NO_WRITES');
