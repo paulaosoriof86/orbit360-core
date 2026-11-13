@@ -6,12 +6,76 @@ const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const crypto=require('node:crypto');
 const source=require('../artifacts/orbit360-recovery/release-control/I6_6_CARTERA_A5_A6_SOURCE_EXACT_20261112.json');
+const issuerEvidence=require('../artifacts/orbit360-recovery/release-control/I6_6_A5_A6_INSURER_ISSUED_INSTALLMENT_SCHEDULE_LIVE_DIFF_20261112.json').insurerIssuedScheduleEvidence;
 const {resolveEditions,policyVariants,numbers,amount}=require('./gravicentra-i66-cartera-a1-a4-readonly.cjs');
 const PROJECT='ays-orbit-360-lab',TENANT='alianzas-soluciones';
 const text=x=>String(x==null?'':x).trim();
 const norm=x=>text(x).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toUpperCase().replace(/[^A-Z0-9]+/g,' ');
 const h=x=>crypto.createHash('sha256').update(JSON.stringify(x)).digest('hex').slice(0,16);
 const cents=a=>a.reduce((s,r)=>s+r.cents,0);
+// These schedules are transcribed from insurer-issued 2026 PDF annexes, not
+// inferred from the application's generic monthly frequency. No client PII.
+function issuerInstallments(caseId){
+  const e=issuerEvidence[caseId];
+  if(!e||!['A5.P7','A6.P4'].includes(caseId))return [];
+  const start=caseId==='A5.P7'?'2026-08-21':'2026-03-04';
+  const count=caseId==='A5.P7'?10:12;
+  const firstRef=caseId==='A5.P7'?14518453:7043045;
+  const rows=Array.from({length:count},(_,i)=>{
+    const month=Number(start.slice(0,4))*12+Number(start.slice(5,7))-1+i;
+    const due=String(Math.floor(month/12)).padStart(4,'0')+'-'+String(month%12+1).padStart(2,'0')+'-'+start.slice(8);
+    return {quota:i+1,requirement:String(firstRef+i),due,
+      cents:caseId==='A6.P4'&&i===count-1?14799:caseId==='A6.P4'?14803:32586};
+  });
+  assert.equal(rows.length,e.issuedInstallmentCount);
+  assert.equal(cents(rows),e.issuedTotalCents);
+  assert.equal(rows[0].due,e.firstInsurerDueDate);
+  assert.equal(rows.at(-1).due,e.lastInsurerDueDate);
+  assert.equal(rows[e.paidStatementQuota-1].requirement,e.paidStatementRequirement);
+  assert.equal(rows[e.paidStatementQuota-1].cents,e.paidStatementAmountCents);
+  return rows;
+}
+function receiptOrdinal(r){
+  const candidates=['secuencia','numeroCuota','cuotaNumero','cuota','serie']
+    .map(k=>String(r?.[k]??'').trim().match(/^(\d{1,2})(?:\s*\/\s*\d{1,2})?$/))
+    .filter(Boolean).map(m=>Number(m[1])).filter(n=>n>=1&&n<=24);
+  const unique=[...new Set(candidates)];
+  return unique.length===1?unique[0]:null;
+}
+function paymentOrReportEvidence(r){
+  return !!(r&&(r.pagado===true||r.conciliado===true||r.conciliadoPago===true||
+    r.reportado||r.validadoReporte||r.fechaPago||r.fechaPagoReportada||
+    /^(pagado|conciliado|pago.?reportado)$/i.test(String(r.estado||'').trim())));
+}
+function issuerSchedulePreview(caseId,snapshot){
+  const issued=issuerInstallments(caseId),receipts=snapshot.receipts||[];
+  if(!issued.length)return null;
+  const byOrdinal=receipts.map(r=>({r,quota:receiptOrdinal(r)}));
+  const sequenced=byOrdinal.filter(x=>x.quota!=null);
+  const unique=new Set(sequenced.map(x=>x.quota));
+  const completeIdentity=sequenced.length===receipts.length&&unique.size===receipts.length;
+  const occupied=receipts.filter(r=>numbers(r).length>0).length;
+  const paidOrReported=receipts.filter(paymentOrReportEvidence).length;
+  const diff=completeIdentity?issued.map(i=>{
+    const row=byOrdinal.find(x=>x.quota===i.quota)?.r;
+    if(!row)return{quota:i.quota,missing:true};
+    const date=String(row.fechaLimite||row.vence||row.fechaVencimiento||'');
+    return{quota:i.quota,amountMatches:amount(row)===i.cents,
+      dueMatches:date===i.due,sourceMatches:numbers(row).includes(i.requirement),
+      sourceOccupiedByDifferentValue:numbers(row).some(n=>n!==i.requirement),
+      paymentEvidence:paymentOrReportEvidence(row)};
+  }):[];
+  return {mode:'READ_ONLY_INSURER_ISSUED_SCHEDULE_PREFLIGHT',issuerQuotaCount:issued.length,
+    issuerTotalCents:cents(issued),liveReceiptCount:receipts.length,
+    liveReceiptTotalCents:receipts.reduce((s,r)=>s+(amount(r)||0),0),
+    identifiedUniqueInternalQuotas:unique.size,completeInternalQuotaIdentity:completeIdentity,
+    preexistingExternalReferenceRows:occupied,paymentOrReportEvidenceRows:paidOrReported,
+    liveDateAmountOrReferenceDifferences:diff,
+    // A summary alone cannot approve a mutation. Full preimages, conflict-free
+    // source identities, a protected transaction and signed LIVE readback are
+    // always required in a separate, reviewer-gated workflow.
+    safeToAutoApply:false,writes:0};
+}
 function validateSource(){
   assert.equal(source.mode,'READ_ONLY_SOURCE_FORENSICS_NO_FINANCIAL_WRITE');
   const a=source.insurers.A5,b=source.insurers.A6;
@@ -132,21 +196,24 @@ async function scan(db){
       receiptCount:snapshot.receipts.length,
       cobroCount:snapshot.cobros.length,
       policyDateEvidence:Object.fromEntries(Object.entries(snapshot.policies[0]||{})
-        .filter(([k,v])=>/^(fechaInicio|fechaFin|inicioVigencia|finVigencia|vigenciaDesde|vigenciaHasta|fechaVencimiento|periodicidad)$/i.test(k)
-          &&typeof v==='string'&&v.length<=35)
+        .filter(([k,v])=>/^(fechaInicio|fechaFin|vigenciaInicio|vigenciaFin|vigenciaIni|vigenciaFinal|inicioVigencia|finVigencia|vigenciaDesde|vigenciaHasta|fechaVencimiento|periodicidad|frecuencia|cuotas)$/i.test(k)
+          &&(typeof v==='string'||typeof v==='number')&&String(v).length<=35)
         .map(([k,v])=>[k,v])),
+      insurerIssuedPlanPreflight:issuerSchedulePreview(one.id,snapshot),
       receiptCandidates:snapshot.receipts.filter(r=>one.id==='A5.P7'||
         amount(r)===one.cents||[r.secuencia,r.cuota,r.numeroCuota,r.cuotaNumero]
           .some(v=>v!=null&&Number(v)===Number(one.quota)))
         .slice(0,12).map(r=>({
           cents:amount(r),
           quota:[r.secuencia,r.cuota,r.numeroCuota,r.cuotaNumero]
-            .map(v=>v==null?null:Number(v)).find(Number.isSafeInteger)||null,
+            .map(v=>v==null?null:Number(v)).find(v=>Number.isSafeInteger(v)&&v>=1)||receiptOrdinal(r),
+          internalSerieIsParseable:receiptOrdinal(r)!=null,
           sourceRequirementMatched:numbers(r).includes(one.requirement),
           hasDifferentSourceNumber:numbers(r).some(n=>n!==one.requirement),
           hasAnySourceNumber:numbers(r).length>0,
           dateDue:/^\d{4}-\d{2}-\d{2}$/.test(String(r.fechaVencimiento||r.fechaLimite||r.vence||''))
             ?String(r.fechaVencimiento||r.fechaLimite||r.vence):null,
+          hasPaymentOrReportEvidence:paymentOrReportEvidence(r),
           state:['Pendiente','Vencido','Pagado','Anulado'].includes(String(r.estado||''))
             ?r.estado:'OTHER'
         }))
@@ -194,4 +261,4 @@ if(require.main===module)main().catch(e=>{
   console.error(/^I66_A5_A6_[A-Z0-9_]+$/.test(text(e.message))?e.message:'I66_A5_A6_READONLY_HOLD');
   process.exitCode=1;
 });
-module.exports={validateSource,CASES,aliases,sameInsurer};
+module.exports={validateSource,CASES,aliases,sameInsurer,issuerInstallments,receiptOrdinal,paymentOrReportEvidence,issuerSchedulePreview};
