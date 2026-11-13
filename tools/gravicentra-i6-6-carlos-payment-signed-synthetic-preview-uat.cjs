@@ -88,16 +88,21 @@ async function testActor(browser,actor){
     assert.equal(receiptAfter.data()?.estado,'Pagado');assert.equal(portfolioAfter.data()?.estado,'Pagado');
     assert.equal(cobroAfter.data()?.paymentState,'PAID_DIRECT');assert.equal(cobroAfter.data()?.__syntheticQa,true);
     const enriched=await page.evaluate(async args=>Orbit.reconciliationDomain.reconcilePayment(args.id,{requestId:args.requestId,
-      payload:{sourceType:'insurer_invoice',applicationDate:'2026-11-12',invoiceNumber:'QA-INVOICE-ONLY-'+args.tag,amount:173.23},
+      payload:{sourceType:'insurer_invoice',applicationDate:'2026-11-12',invoiceDate:'2026-11-11',invoiceNumber:'QA-INVOICE-ONLY-'+args.tag,amount:173.23},
       reason:'I6.6 conciliación sintética firmada sin pago duplicado'}),{id:ids.receipt,requestId:requestIds[1],tag:suffix});
-    assert.ok(enriched.ok&&enriched.cobroId===cobroId&&enriched.paymentState==='PAID_DIRECT','PAYMENT_SIGNED_RECONCILE_DOUBLE_PAID_'+actor.role);
-    assert.equal((await idRef('cobros',cobroId).get()).data()?.invoiceNumber,'QA-INVOICE-ONLY-'+suffix,'PAYMENT_INVOICE_NOT_PERSISTED');
+    assert.ok(enriched.ok&&enriched.cobroId===cobroId&&enriched.paymentState==='PAID_DIRECT'&&enriched.applicationState==='APPLIED_DIRECT','PAYMENT_SIGNED_RECONCILE_DOUBLE_PAID_'+actor.role);
+    const [bill,paidReceipt]=await Promise.all([idRef('cobros',cobroId).get(),idRef('recibosEsperados',ids.receipt).get()]);
+    assert.equal(bill.data()?.invoiceNumber,'QA-INVOICE-ONLY-'+suffix,'PAYMENT_INVOICE_NOT_PERSISTED');
+    assert.equal(bill.data()?.invoiceDate,'2026-11-11','PAYMENT_INVOICE_DATE_COBRO_NOT_PERSISTED');
+    assert.equal(paidReceipt.data()?.invoiceDate,'2026-11-11','PAYMENT_INVOICE_DATE_RECEIPT_NOT_PERSISTED');
+    assert.equal(bill.data()?.conciliado,true,'PAYMENT_INVOICE_RECONCILED_FLAG_NOT_PERSISTED');
     await page.reload({waitUntil:'commit',timeout:30000});
     await page.waitForFunction(()=>!!window.Orbit?.productRuntimeBrowserProvidersP0&&!!window.Orbit?.productAppP0,null,{timeout:30000});
     const session=await page.evaluate(async()=>{const p=Orbit.productRuntimeBrowserProvidersP0;await p.initialize();return{uid:(await p.waitForUser())?.uid||'',ready:(await Orbit.productAppP0.activate())?.started===true};});
     assert.equal(session.uid,actor.uid);assert.ok(session.ready);
     assert.equal((await idRef('recibosEsperados',ids.receipt).get()).data()?.estado,'Pagado');
     assert.equal((await idRef('cobros',cobroId).get()).data()?.applicationState,'APPLIED_DIRECT');
+    assert.equal((await idRef('cobros',cobroId).get()).data()?.invoiceDate,'2026-11-11','PAYMENT_INVOICE_DATE_NOT_RELOADED');
     console.log('I66_SIGNED_'+actor.role.toUpperCase()+'_SYNTHETIC_PAYMENT_APPLY_RECONCILE_RECEIPT_COBRO_PORTFOLIO_RELOAD_PASS');
   }finally{
     const errors=[];

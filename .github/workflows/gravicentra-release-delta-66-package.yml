@@ -156,7 +156,20 @@ jobs:
             exactStageLive.rollbackBackendAndHostingOnAnyFailure===true&&
             exactStageLive.sourceSha===c.approvedSourceSha&&
             exactStageLive.artifactId===c.immutableArtifactId;
-          if(c.schema!=='GRAVICENTRA_I6_6_SINGLE_ARTIFACT_RELEASE_TRANSPORT_V1'||c.gate!=='I6.6'||c.historicalClosedGate!=='B4-007'||(c.forbidBackendFunctionDeploy!==true&&!scopedPreview&&!scopedLive&&!scopedCarlosLive&&!readerPreview&&!stageReaderPreview&&!stageLive&&!carlosFunctionPreview&&!privilegedPreview&&!privilegedLive)||c.forbidFirestoreRulesDataAuthWrites!==true)throw Error('I66_TRANSPORT_SCOPE_INVALID');
+          const invoicePreview=c.i66PaymentInvoicePreviewRelease20261113||{};
+          const paymentInvoicePreview=c.status==='PAYMENT_INVOICE_BACKEND_PREVIEW_AUTHORIZED'&&
+            c.backendFunctionPreviewOnly===true&&c.forbidBackendLiveFunctionDeploy===true&&
+            c.forbidBackendFunctionDeploy===false&&c.livePromotionAuthorized===false&&
+            c.previewApproved===false&&c.noHostingPromotion===true&&
+            invoicePreview.status==='SIGNED_POLICY_AND_CLIENT360_PREVIEW_PASS_PAYMENT_BACKEND_PREVIEW_ONLY'&&
+            invoicePreview.approvedSourceSha==='586401bfbe1a80cfef2820982f432743af36b108'&&
+            invoicePreview.singleAllowedFunction==='orbit360CobrosReconciliationCommandPreview'&&
+            invoicePreview.singleAllowedRegion==='us-central1'&&
+            invoicePreview.syntheticOnly===true&&invoicePreview.forbidLiveFunctionOrHostingDeployment===true&&
+            invoicePreview.forbidRealFinancialWrites===true&&
+            invoicePreview.requireLiveFunctionRevisionBeforeAfterIdentity===true&&
+            invoicePreview.requireExactBackendBlobInArtifact===true;
+          if(c.schema!=='GRAVICENTRA_I6_6_SINGLE_ARTIFACT_RELEASE_TRANSPORT_V1'||c.gate!=='I6.6'||c.historicalClosedGate!=='B4-007'||(c.forbidBackendFunctionDeploy!==true&&!scopedPreview&&!scopedLive&&!scopedCarlosLive&&!readerPreview&&!stageReaderPreview&&!stageLive&&!carlosFunctionPreview&&!privilegedPreview&&!privilegedLive&&!paymentInvoicePreview)||c.forbidFirestoreRulesDataAuthWrites!==true)throw Error('I66_TRANSPORT_SCOPE_INVALID');
           if((scopedPreview||scopedLive||scopedCarlosLive||readerPreview)&&(!/^[0-9a-f]{40}$/.test(c.approvedSourceSha||'')||!(c.sourceBuildWorkflowRunId>0)||!(c.immutableArtifactId>0)||!/^[0-9a-f]{64}$/.test(String(c.immutableArtifactZipDigest||'').replace(/^sha256:/,''))))throw Error('I66_SCOPED_RELEASE_PROOF_MISSING');
           let mode='disabled',source='',sourceRun='',artifactId='',artifactDigest='',accessSha='',readerSha='',previewChannel='';
           if(c.status==='PREVIEW_BUILD_REQUESTED'&&c.livePromotionAuthorized===false)mode='package';

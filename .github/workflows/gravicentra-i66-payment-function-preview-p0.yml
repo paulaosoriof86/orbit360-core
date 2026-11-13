@@ -1,4 +1,4 @@
-# I6.6 Carlos P0: exact synthetic-only payment source to existing Preview callable.
+# I6.6 invoice date: exact synthetic-only payment source to existing Preview callable.
 # No LIVE Hosting/Functions, real client writes, Rules/Auth or new Firebase.
 name: Gravicentra I6.6 Payment Function Exact Preview P0
 on:
@@ -19,13 +19,13 @@ jobs:
     timeout-minutes: 35
     env:
       PROJECT_ID: ays-orbit-360-lab
-      SOURCE_SHA: 1dd675ed59ac51fd122915ca8056f85f82fa12d6
-      ARTIFACT_RUN: '43305281214'
-      ARTIFACT_ID: '13984026378'
-      ARTIFACT_DIGEST: sha256:f51907a610ca467b7bf840652a3f3e9983a7f9913f5d279e01fa34a539123dbc
-      QA_RUN: '43305281266'
-      CONTROL_RUN: '43305281448'
-      PREVIEW_URL: https://ays-orbit-360-lab--gi-i66-rc-43305281214-hr641g40.web.app
+      SOURCE_SHA: 586401bfbe1a80cfef2820982f432743af36b108
+      ARTIFACT_RUN: '43463160506'
+      ARTIFACT_ID: '14057935092'
+      ARTIFACT_DIGEST: sha256:1621f236b9d1b9e49ea42fc53e338a695d5872080361ada2a84183fa7d52207f
+      POLICY_UAT_RUN: '43465087494'
+      ADVISOR_CENSUS_RUN: '43465811712'
+      PREVIEW_URL: https://ays-orbit-360-lab--gi-i66-rc-42868854629-abj14q6n.web.app
       SA_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
       SA_ALT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
       SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
@@ -42,33 +42,43 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          node tools/gravicentra-i6-6-carlos-payment-preview-synthetic-gate.test.cjs
           node tools/gravicentra-i6-6-payment-replay-ledger-guard.test.cjs
           node - <<'NODE'
-          const assert=require('node:assert/strict'),fs=require('node:fs');
+          const assert=require('node:assert/strict'),fs=require('node:fs'),{execFileSync}=require('node:child_process');
           (async()=>{
             const c=JSON.parse(fs.readFileSync('artifacts/orbit360-recovery/release-control/I6_6_RELEASE_TRANSPORT_CONTROL_20261110.json'));
-            assert.equal(c.status,'PAYMENT_FUNCTION_PREVIEW_AUTHORIZED');
+            assert.equal(c.status,'PAYMENT_INVOICE_BACKEND_PREVIEW_AUTHORIZED');
             assert.equal(c.backendFunctionPreviewOnly,true);
             assert.equal(c.forbidBackendFunctionDeploy,false);
             assert.equal(c.forbidBackendLiveFunctionDeploy,true);
             assert.equal(c.forbidFirestoreRulesDataAuthWrites,true);
             assert.equal(c.livePromotionAuthorized,false);
             assert.equal(c.previewApproved,false);
-            assert.equal(c.carlosPaymentPreviewNextSource20261112?.status,'AUTHORIZED_ONE_EXISTING_PREVIEW_FUNCTION');
-            assert.equal(c.carlosPaymentPreviewNextSource20261112?.allowedFunction,'orbit360CobrosReconciliationCommandPreview');
-            assert.equal(c.carlosPaymentPreviewNextSource20261112?.allowedRegion,'us-central1');
-            assert.equal(c.carlosPaymentPreviewNextSource20261112?.syntheticOnly,true);
-            for(const [k,v] of [['approvedSourceSha',process.env.SOURCE_SHA],['sourceBuildWorkflowRunId',Number(process.env.ARTIFACT_RUN)],['immutableArtifactId',Number(process.env.ARTIFACT_ID)],['immutableArtifactZipDigest',process.env.ARTIFACT_DIGEST],['sourcePreviewUrl',process.env.PREVIEW_URL]])assert.equal(c[k],v,k);
+            const gate=c.i66PaymentInvoicePreviewRelease20261113||{};
+            assert.equal(gate.status,'SIGNED_POLICY_AND_CLIENT360_PREVIEW_PASS_PAYMENT_BACKEND_PREVIEW_ONLY');
+            assert.equal(gate.singleAllowedFunction,'orbit360CobrosReconciliationCommandPreview');
+            assert.equal(gate.singleAllowedRegion,'us-central1');
+            assert.equal(gate.syntheticOnly,true);
+            assert.equal(gate.forbidLiveFunctionOrHostingDeployment,true);
+            assert.equal(gate.forbidRealFinancialWrites,true);
+            assert.equal(gate.requireLiveFunctionRevisionBeforeAfterIdentity,true);
+            assert.equal(gate.requireExactBackendBlobInArtifact,true);
+            for(const [k,v] of [['approvedSourceSha',process.env.SOURCE_SHA],['immutableHostingPreviewBuildRunId',Number(process.env.ARTIFACT_RUN)],['immutableArtifactId',Number(process.env.ARTIFACT_ID)],['immutableArtifactDigest',process.env.ARTIFACT_DIGEST],['existingHostingPreviewUrl',process.env.PREVIEW_URL],['signedTwoRolesPolicyClient360UatRunId',Number(process.env.POLICY_UAT_RUN)]])assert.equal(gate[k],v,k);
             const h={Authorization:'Bearer '+process.env.GH_TOKEN,Accept:'application/vnd.github+json','User-Agent':'GI-I66-Payment-Preview'};
             const base='https://api.github.com/repos/paulaosoriof86/orbit360-core/actions/';
             const [q,g,b,a]=await Promise.all([
-              fetch(base+'runs/'+process.env.QA_RUN,{headers:h}).then(r=>r.json()),
-              fetch(base+'runs/'+process.env.CONTROL_RUN,{headers:h}).then(r=>r.json()),
+              fetch(base+'runs/'+process.env.POLICY_UAT_RUN,{headers:h}).then(r=>r.json()),
+              fetch(base+'runs/'+process.env.ADVISOR_CENSUS_RUN,{headers:h}).then(r=>r.json()),
               fetch(base+'runs/'+process.env.ARTIFACT_RUN,{headers:h}).then(r=>r.json()),
               fetch(base+'artifacts/'+process.env.ARTIFACT_ID,{headers:h}).then(r=>r.json())
             ]);
-            for(const [kind,r] of [['EMULATOR',q],['GUARD',g],['BUILD',b]]){assert.equal(r.conclusion,'success',kind);assert.equal(r.head_sha,process.env.SOURCE_SHA,kind+' source');}
+            for(const [kind,r] of [['POLICY_UAT',q],['ADVISOR_CENSUS',g],['BUILD',b]]){assert.equal(r.conclusion,'success',kind);}
+            for(const [kind,r] of [['POLICY_UAT',q],['ADVISOR_CENSUS',g]]){
+              assert.match(String(r.head_sha||''),/^[0-9a-f]{40}$/);
+              const drift=execFileSync('git',['diff','--name-only',process.env.SOURCE_SHA,r.head_sha,'--','functions/','orbit360-platform/'],{encoding:'utf8'}).trim();
+              assert.equal(drift,'',kind+' product source drift');
+            }
+            assert.equal(b.head_sha,process.env.SOURCE_SHA,'BUILD source');
             assert.equal(a.digest,process.env.ARTIFACT_DIGEST);
             assert.equal(a.workflow_run.id,Number(process.env.ARTIFACT_RUN));
             assert.equal(a.expired,false);
@@ -77,8 +87,8 @@ jobs:
           NODE
       - uses: actions/download-artifact@v4
         with:
-          artifact-ids: 13984026378
-          run-id: 43305281214
+          artifact-ids: 14057935092
+          run-id: 43463160506
           github-token: ${{ github.token }}
           path: ${{ runner.temp }}/payment-packet-download
       - name: Verify one original immutable TAR, backend source and published Hosting Preview marker
@@ -101,6 +111,7 @@ jobs:
           const source=execFileSync('git',['show',process.env.SOURCE_SHA+':functions/cobros-reconciliation-domain.js']);
           assert(packed.equals(source),'payment function source bytes drift');
           assert(packed.includes('PAYMENT_ALREADY_APPLIED')&&packed.includes('PAYMENT_ACTIVE_PORTFOLIO_REQUIRED')&&packed.includes('PAYMENT_COUNTRY_OUTSIDE_MEMBERSHIP'));
+          assert(packed.includes('invoiceDate')&&packed.includes('confirmedReceipt.invoiceDate'),'invoice date persisted/readback marker missing');
           for(const marker of ['PREVIEW_PAYMENT_SYNTHETIC_RELATION_REQUIRED','previewReconciliationRequests','previewReconciliationEvents'])assert(packed.includes(marker));
           assert(fs.existsSync(b+'backend/index.js')&&fs.existsSync(b+'backend/package-lock.json'));
           console.log('I66_PAYMENT_PREVIEW_EXACT_BACKEND_MARKER_AND_THREE_GUARDS_PASS');
