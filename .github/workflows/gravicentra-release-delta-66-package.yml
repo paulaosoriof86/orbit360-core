@@ -313,7 +313,26 @@ jobs:
           CHANNEL_ID="gi-i66-rc-${GITHUB_RUN_ID}"
           echo "channel=$CHANNEL_ID" >> "$GITHUB_OUTPUT"
           cd "$RUNNER_TEMP/gi-i66-package/bundle"
-          node "$FIREBASE_CLI_BIN" hosting:channel:deploy "$CHANNEL_ID" --config firebase.json --project "$PROJECT_ID" --expires 7d --non-interactive --json > "$RUNNER_TEMP/gi-i66-preview-result.json" 2>&1
+          if ! node "$FIREBASE_CLI_BIN" hosting:channel:deploy "$CHANNEL_ID" --config firebase.json --project "$PROJECT_ID" --expires 7d --non-interactive --json > "$RUNNER_TEMP/gi-i66-preview-result.json" 2>&1; then
+            node - <<'NODE'
+          const fs=require('node:fs');
+          const raw=fs.readFileSync(process.env.RUNNER_TEMP+'/gi-i66-preview-result.json','utf8');
+          const clean=s=>String(s||'').replace(/Bearer\s+\S+/gi,'[REDACTED]')
+            .replace(/[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+/g,'[EMAIL]')
+            .replace(/-----BEGIN[\s\S]*?-----END[^\n]*/g,'[KEY_REDACTED]')
+            .slice(0,260);
+          let errors=[];
+          try{
+            const j=JSON.parse(raw),e=j.error||j.result?.error||{};
+            errors=[clean(e.code||e.status||''),clean(e.message||j.message||'')].filter(Boolean);
+          }catch(_){
+            errors=raw.split('\n').filter(x=>/(?:error|denied|forbidden|quota|limit|channel|http)/i.test(x))
+              .slice(-5).map(clean);
+          }
+          console.error('I66_PREVIEW_DEPLOY_DIAGNOSTIC '+JSON.stringify(errors.length?errors:['NO_STRUCTURED_ERROR_RETURNED']));
+          NODE
+            exit 1
+          fi
           export CHANNEL_ID
           python3 - <<'PY' >> "$GITHUB_OUTPUT"
           import os,re
