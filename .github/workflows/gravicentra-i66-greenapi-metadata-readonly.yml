@@ -81,11 +81,11 @@ jobs:
           if gcloud secrets list --project "$PROJECT_ID" --format=json > "$root/secrets.json" 2> "$root/secrets.err" && python3 -c 'import json,sys; assert isinstance(json.load(open(sys.argv[1])),list)' "$root/secrets.json" >/dev/null 2>&1; then
             : > "$root/secrets-readable"
           fi
-          if gcloud functions list --v2 --regions="$REGION" --project "$PROJECT_ID" --format=json > "$root/functions-list.json" 2> "$root/functions.err"; then
+          if gcloud functions list --v2 --regions="$REGION" --project "$PROJECT_ID" --format=json > "$root/functions-list.json" 2> "$root/functions.err" && python3 -m json.tool "$root/functions-list.json" >/dev/null 2>&1; then
             : > "$root/functions-readable"
           fi
           for fn in orbit360GreenApiOutboxUpdated orbit360GreenApiDeliveryStatus; do
-            if gcloud functions describe "$fn" --gen2 --region "$REGION" --project "$PROJECT_ID" --format=json > "$root/functions/$fn.json" 2> "$root/functions/$fn.err"; then
+            if gcloud functions describe "$fn" --gen2 --region "$REGION" --project "$PROJECT_ID" --format=json > "$root/functions/$fn.json" 2> "$root/functions/$fn.err" && python3 -m json.tool "$root/functions/$fn.json" >/dev/null 2>&1; then
               : > "$root/functions/$fn-readable"
             fi
           done
@@ -96,7 +96,7 @@ jobs:
           out=[]
           for fn in ('orbit360GreenApiOutboxUpdated','orbit360GreenApiDeliveryStatus'):
               p=root/'functions'/f'{fn}.json'
-              if not p.is_file():continue
+              if not (root/'functions'/f'{fn}-readable').exists():continue
               item=json.loads(p.read_text())
               uri=str((item.get('serviceConfig') or {}).get('service') or '')
               prefix='projects/ays-orbit-360-lab/locations/us-central1/services/'
@@ -107,7 +107,7 @@ jobs:
           PY
           while read -r fn service; do
             test -n "${fn:-}" || continue
-            if gcloud run services describe "$service" --region "$REGION" --project "$PROJECT_ID" --format=json > "$root/services/$fn.json" 2> "$root/services/$fn.err"; then
+            if gcloud run services describe "$service" --region "$REGION" --project "$PROJECT_ID" --format=json > "$root/services/$fn.json" 2> "$root/services/$fn.err" && python3 -m json.tool "$root/services/$fn.json" >/dev/null 2>&1; then
               : > "$root/services/$fn-readable"
             fi
           done < "$root/services-to-read"
@@ -127,7 +127,7 @@ jobs:
           # parse only the reference URI, never a payload or token.
           for fn in ('orbit360GreenApiOutboxUpdated','orbit360GreenApiDeliveryStatus'):
               p=root/'functions'/f'{fn}.json'
-              if not p.is_file():continue
+              if not (root/'functions'/f'{fn}-readable').exists():continue
               data=json.loads(p.read_text())
               settings=(data.get('serviceConfig') or {}).get('environmentVariables') or {}
               ref=str(settings.get('ORBIT360_GREENAPI_GT_SECRET_VERSION') or '')
