@@ -7,7 +7,7 @@ const crypto=require('node:crypto');
 const admin=require('firebase-admin');
 const {chromium}=require('playwright');
 const ORIGIN='https://app.aysseguros.com',TENANT='alianzas-soluciones';
-const SOURCE='1dd675ed59ac51fd122915ca8056f85f82fa12d6';
+const SOURCE='7e9b2b915535cfcc20285142d57bfb0afcda1057';
 const norm=x=>String(x||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();
 assert.equal(process.env.I66_LIVE_ORIGIN,ORIGIN,'I66_RENEWAL_LIVE_ORIGIN_MISMATCH');
 const credential=['SA_LAB','SA_ALT','SA_DEFAULT'].map(k=>process.env[k]).filter(Boolean)
@@ -83,6 +83,23 @@ async function one(browser,actor){
     assert.ok(session.started&&!session.preview&&norm(session.role)===actor.role&&
       session.canRenew&&session.canPolicy&&session.canIssue&&session.direct,'I66_RENEWAL_SIGNED_ROLE_DENIED_'+actor.role);
     console.log('I66_RENEWAL_'+actor.role.toUpperCase()+'_SIGNED_READY_PASSED');
+    // The current LIVE source must load deferred authoritative dependencies
+    // itself on explicit renewal, without relying on a prior route prefetch.
+    // This deliberately nonexistent management never authorizes a data write.
+    const unprefetched=await page.evaluate(async id=>{
+      const original=Orbit.store._ensureCollections,requested=[];
+      Orbit.store._ensureCollections=function(names){requested.push([].concat(names));return original.call(this,names);};
+      try{
+        const r=await Orbit.issuance.createDirectRenewal(id,{},
+          {operationId:'qa_missing_management_read_only'});
+        return{errors:[].concat(r.errors||[]),requested};
+      }finally{Orbit.store._ensureCollections=original;}
+    },'i66qa_missing_direct_'+suffix);
+    assert.deepEqual(unprefetched.requested[0],['gestiones','polizas','vehiculos','clientes'],
+      'I66_RENEWAL_EXPLICIT_LIVE_SOURCE_REQUEST_MISSING_'+actor.role);
+    assert.ok(unprefetched.errors.includes('gestion_renovacion_aceptada_no_encontrada'),
+      'I66_RENEWAL_EXPLICIT_LIVE_UNPREFETCHED_FAIL_CLOSED_HOLD_'+actor.role);
+    console.log('I66_LIVE_'+actor.role.toUpperCase()+'_DIRECT_RENEWAL_UNPREFETCHED_HYDRATION_PASS no_writes=true');
     const requested=await page.evaluate(()=>Orbit.store._ensureCollections(['gestiones','polizas','vehiculos','clientes','aseguradoras']));
     console.log('I66_RENEWAL_'+actor.role.toUpperCase()+'_HYDRATION_REQUESTED_'+requested.join(','));
     const status=await page.evaluate(x=>{
