@@ -2,6 +2,9 @@
 // Synthetic-only, no Firebase credentials, no network and no business writes.
 const assert=require('node:assert/strict');
 const crypto=require('node:crypto');
+const fs=require('node:fs');
+const path=require('node:path');
+const vm=require('node:vm');
 const {readActiveLedgerProposalPage}=require('../functions/i66-conciliaciones-active-ledger-projection');
 const {readScopedRelatedList}=require('../functions/b4-003-scoped-related-reader');
 const {Denied}=require('../functions/b4-003-scoped-access-boundary');
@@ -86,6 +89,20 @@ const denied=(fn,code)=>assert.rejects(fn,error=>error instanceof Denied&&error.
  assert.ok(gt.rows.every(x=>x.pais==='GT'&&x.readOnly===true&&x.applicationPermitted===false&&
   x.polizaId&&x.clienteId&&x.proposalIdentity&&x.source_ref.row_hash===x.proposalIdentity));
  assert.equal(new Set(gt.rows.map(x=>x.proposalIdentity)).size,26);
+ const clientStore={all:name=>name==='conciliaciones'?gt.rows.concat(co.rows):[],
+   _productStatus:()=>({serverConfirmedCollections:['conciliaciones','conciliacionesPrimas'],
+     deniedCollections:[],snapshotErrors:{}})};
+ const browser={window:{Orbit:{store:clientStore,modules:{},ui:{},kit:{}}},
+   document:{addEventListener(){},getElementById(){return null;}}};
+ browser.Orbit=browser.window.Orbit;
+ const uiSource=fs.readFileSync(path.resolve(__dirname,'../orbit360-platform/modules/conciliaciones.js'),'utf8');
+ vm.runInNewContext(uiSource,browser);
+ assert.equal(browser.Orbit.cobrosConciliacionReadOnly.proposalReadiness(),'ready');
+ assert.equal(browser.Orbit.cobrosConciliacionReadOnly.proposalRows().length,52,'UI_NOT_TO_COLLAPSE_UNIQUE_PROPOSALS');
+ const host={innerHTML:'',querySelectorAll:()=>[]};
+ browser.Orbit.modules.conciliaciones.render(host);
+ assert.equal((host.innerHTML.match(/data-conc-id=/g)||[]).length,52,'UI_RENDER_52_PROPOSALS');
+ assert.ok(host.innerHTML.includes('Libro activo')&&host.innerHTML.includes('Propuestas'));
  assert.ok(co.rows.every(x=>x.pais==='CO'));
  assert.ok(!gt.rows.some(x=>x.polizaNumero.startsWith('DUP_')),'AMBIGUOUS_80_QUARANTINED');
  assert.ok(!co.rows.some(x=>x.polizaNumero.startsWith('DUP_')));
@@ -108,5 +125,5 @@ const denied=(fn,code)=>assert.rejects(fn,error=>error instanceof Denied&&error.
  assert.ok(counters.policyIndexed>0&&counters.policyFullScan===0,'INDEXED_NO_FULL_CATALOG_SCAN');
  assert.ok(counters.clientBatchRead>0,'BATCHED_CANONICAL_CLIENT_READS');
  assert.equal(counters.writes,0);
- console.log('I66_CONCILIACIONES_STAGE_PROJECTION_PASS unique_52_of_132 ambiguous_80_hold role_country_advisor_paging_manifest_guard indexed_number_batches no_scan writes_0');
+ console.log('I66_CONCILIACIONES_STAGE_PROJECTION_PASS unique_52_of_132 ui_52_rendered ambiguous_80_hold role_country_advisor_paging_manifest_guard indexed_number_batches no_scan writes_0');
 })().catch(error=>{console.error(error);process.exitCode=1;});

@@ -31,7 +31,7 @@ jobs:
         run: |
           set -euo pipefail
           git merge-base --is-ancestor 0153f5cbbe00c3732e11ebae59b32bd357e38bfd HEAD
-          test -z "$(git diff --name-only 0153f5cbbe00c3732e11ebae59b32bd357e38bfd HEAD -- orbit360-platform functions | grep -Ev '^functions/(b4-003-scoped-related-reader|i66-conciliaciones-active-ledger-projection)\.js$' || true)"
+          test -z "$(git diff --name-only 0153f5cbbe00c3732e11ebae59b32bd357e38bfd HEAD -- orbit360-platform functions ':(exclude)orbit360-platform/docs/recovery/orbit360-recovery-state-v1.json' | grep -Ev '^functions/(b4-003-scoped-related-reader|i66-conciliaciones-active-ledger-projection)\.js$' || true)"
           node --check functions/i66-conciliaciones-active-ledger-projection.js
           node --check tools/gravicentra-i66-conciliaciones-stage-real-scope-readonly.cjs
           node tools/gravicentra-i6-6-conciliaciones-active-ledger-projection.test.cjs

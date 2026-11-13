@@ -39,7 +39,9 @@ function projectionRow({proposal,stageId,policy,policyId,client,tenantId,runId,c
    estado:'PROPUESTA',status:'PROPUESTA',fuente:'Libro activo de cobros',
    motivo:'Propuesta pendiente de validación; aplicación de pagos deshabilitada',
    proposalIdentity:clean(proposal.sourceRowIdSha256),
-   source_ref:{row_hash:clean(proposal.sourceRowIdSha256)},
+   source_ref:{file:'Libro activo',sheet:'Propuestas',
+     row:clean(proposal.sourceRowIdSha256).slice(0,12),
+     row_hash:clean(proposal.sourceRowIdSha256)},
    origenLibroActivo:true,readOnly:true,applicationPermitted:false,
    sourceRunId:runId
  };
