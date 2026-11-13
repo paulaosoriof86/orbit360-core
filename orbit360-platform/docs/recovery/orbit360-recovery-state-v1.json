@@ -10,7 +10,7 @@
   "branch": "recovery/fase-a-clean-20260831",
   "forensicOriginSha": "9c95f31461f2eabe9804625b5659bee772f5602a",
   "createdAtUtc": "2026-08-31T18:00:00Z",
-  "updatedAtUtc": "2026-11-13T15:33:29.707Z",
+  "updatedAtUtc": "2026-11-13T19:48:53.953Z",
   "status": "I6_6_LIVE_CONTROLLED_PORTFOLIO_UPDATE_IN_PROGRESS",
   "currentIteration": 6,
   "lastCompletedIteration": 5,
@@ -230,6 +230,31 @@
           "fullI66ProductionAccepted": false
         }
       }
+    },
+    "driveDocumentProductionRecovery20261113": {
+      "status": "NINE_LIVE_CALLABLES_DEPLOYED_SECRET_SCOPED_IAM_PASS_SIGNED_TWO_ROLE_STATUS_PASS_TENANT_ADMIN_OAUTH_CONSENT_HOLD",
+      "environment": "ays-orbit-360-lab",
+      "tenant": "alianzas-soluciones",
+      "sourceBackendSha": "586401bfbe1a80cfef2820982f432743af36b108",
+      "hostingSourceUnchanged": true,
+      "functionsDeployedCount": 9,
+      "missingLiveFunctionsInitial": 9,
+      "liveRestorationRunId": 43491032658,
+      "secretScopedIAMSetupRunId": 43495463214,
+      "syntheticSignedStatusRunId": 43494861370,
+      "syntheticSignedStatusRunAttempt": 2,
+      "directionSignedStatus": "HTTP_200_tenant_setup_required_bootstrapClientIdPresent",
+      "carlosSignedStatus": "HTTP_200_tenant_setup_required_noAdminBootstrapAccess",
+      "vault": "orbit360-drive-oauth-alianzas-soluciones",
+      "vaultExists": true,
+      "vaultVersions": 0,
+      "previewTokenCopied": false,
+      "realDocumentUploadReadbackCertified": false,
+      "realCustomerDocumentWrites": 0,
+      "financialDataWrites": 0,
+      "crmChanges": 0,
+      "rootCause": "LIVE_CALLABLES_MISSING_THEN_RUNTIME_SECRET_MANAGER_PERMISSION_DENIED_CODE_7; BOTH RESTORED",
+      "next": "DIRECTOR_AUTHORIZES_ONE_TIME_GOOGLE_DRIVE_TENANT_OAUTH_FOR_EXISTING_CLIENTS_FOLDER; THEN CARLOS_REAL_ISSUED_RENEWAL_SUPPORT_AND_PAYMENT_INVOICE_UPLOAD_READBACK"
     }
   },
   "i66OwnerFrozenUrgentWorkPlan20261112": {

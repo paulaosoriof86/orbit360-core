@@ -974,5 +974,25 @@
     "doNotCreateNewOAuthClient": true,
     "doNotRotateExistingProductionSecret": true,
     "neverLogClientSecret": true
+  },
+  "i66DriveDocumentLiveRestorationReceipt20261113": {
+    "status": "FUNCTIONS_LIVE_AND_TWO_ROLE_STATUS_PASS_OAUTH_CONSENT_REQUIRED",
+    "sourceSha": "586401bfbe1a80cfef2820982f432743af36b108",
+    "runtimeSourceChanged": false,
+    "functionsRestored": 9,
+    "liveFunctionDeployRunId": 43491032658,
+    "tenantVaultMinimalIAMRunId": 43495463214,
+    "signedRoleStatusRunId": 43494861370,
+    "signedRoleStatusRunAttempt": 2,
+    "directionResult": "HTTP200_tenant_setup_required_bootstrapClientIdPresent",
+    "carlosResult": "HTTP200_tenant_setup_required_bootstrapClientIdAbsent_expected",
+    "scopeOfIAMChange": "ONLY_secret_orbit360-drive-oauth-alianzas-soluciones_for_existing_orbit360-secrets-lab_runtime_service_account",
+    "tenantVaultHasOAuthToken": false,
+    "previewSecretCopied": false,
+    "realDocumentUploadReadback": "HOLD_NOT_TESTED",
+    "realFinancialWrites": 0,
+    "hostingChanges": 0,
+    "firestoreRulesChanges": 0,
+    "next": "SINGLE_ADMIN_GOOGLE_OAUTH_CONSENT_THEN_CARLOS_DRIVE_UPLOAD_PERSISTENCE_RELOAD"
   }
 }
