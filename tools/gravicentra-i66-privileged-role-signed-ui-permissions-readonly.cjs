@@ -56,12 +56,15 @@ async function checkActor(browser,actor){
       // A signed client must resolve its protected tenant policy before the
       // authorization verdict; default local policy is NOT an acceptance.
       const access=await Orbit.domainConfig.ensure('access');
+      const domain=(Orbit.domainConfig.status()?.domains||[]).find(x=>x.domain==='access');
       return{started:result?.started===true,preview:p.isI66PreviewHost(),role:String(Orbit.session?.rol?.()||''),
-        policyProtected:access?.source==='protected'&&access?.syncPending!==true,
+        policyProtected:access?.ok===true&&domain?.source==='protected'&&domain?.syncPending===false,
+        policyBackendSource:String(access?.source||''),policyClientSource:String(domain?.source||''),
         rights:Object.fromEntries(modules.map(m=>[m,{view:Orbit.access?.can(m,'view')===true,
           create:Orbit.access?.can(m,'create')===true,
           edit:Orbit.access?.can(m,'edit')===true,scope:Orbit.access?.dataScope(m)||'none'}]))};
     },{token,modules});
+    console.log('I66_SIGNED_'+actor.role.toUpperCase()+'_POLICY_HYDRATION '+JSON.stringify({backend: rights.policyBackendSource,client:rights.policyClientSource,protected:rights.policyProtected}));
     assert.ok(rights.started&&rights.policyProtected&&rights.preview===(ORIGIN===PREVIEW)&&norm(rights.role).includes(actor.role),'I66_SIGNED_PERMISSION_PROTECTED_POLICY_NOT_READY');
     console.log('I66_SIGNED_'+actor.role.toUpperCase()+'_ACTUAL_RIGHTS '+JSON.stringify(rights.rights));
     for(const [module,grant] of Object.entries(rights.rights)){
