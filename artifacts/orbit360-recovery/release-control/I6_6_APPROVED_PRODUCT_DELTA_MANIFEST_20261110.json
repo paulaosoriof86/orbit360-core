@@ -20,6 +20,15 @@
     "requiresSignedPreviewUatBeforeLive": true,
     "productionAccepted": false
   },
+  "previewChannelR9QuotaRecoveryRequest20261113": {
+    "status": "PREVIEW_ONLY_R9_BACKUP_PROOF_REQUIRED_429_NOT_DELETED",
+    "precedingBuildRun": 43482946353,
+    "precedingImmutableArtifactId": 14064859960,
+    "precedingBuildSha": "2735bd1c6d985bcd6712f5dac4fa0078b7a9bcb0",
+    "observedCurrentPreviewVersion": "1dd873081501d7fb",
+    "existingSignedR9Release": "artifacts/orbit360-recovery/release-control/I6_6_PAYMENT_INVOICE_POLICY_R9_LIVE_RECEIPT_20261113.json",
+    "approvedScope": "Reuse one known isolated Preview channel after exact R9 immutable backup and LIVE/Preview readback; zero financial and zero LIVE writes"
+  },
   "approvalModel": "Every future I6.6 product delta must carry an owner-approved receipt, exact Git blobs, and pinned passing tests; all other paths are refused by CI.",
   "changes": [
     {
