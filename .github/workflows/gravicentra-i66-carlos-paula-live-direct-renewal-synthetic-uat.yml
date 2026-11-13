@@ -19,6 +19,7 @@ jobs:
     timeout-minutes: 22
     env:
       I66_LIVE_ORIGIN: https://app.aysseguros.com
+      I66_APPROVED_LIVE_SOURCE_SHA: 8a0e904500cbb3c961d83f16517caab69df88a2b
       SA_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
       SA_ALT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
       SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
@@ -35,19 +36,19 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          git merge-base --is-ancestor 7e9b2b915535cfcc20285142d57bfb0afcda1057 HEAD
-          test -z "$(git diff --name-only 7e9b2b915535cfcc20285142d57bfb0afcda1057 HEAD -- orbit360-platform functions firebase.json firestore.rules storage.rules)"
+          git merge-base --is-ancestor 8a0e904500cbb3c961d83f16517caab69df88a2b HEAD
+          test -z "$(git diff --name-only 8a0e904500cbb3c961d83f16517caab69df88a2b HEAD -- orbit360-platform functions firebase.json firestore.rules storage.rules)"
           node --check tools/gravicentra-i6-6-carlos-paula-live-direct-renewal-synthetic-uat.cjs
           node - <<'NODE'
           const assert=require('node:assert/strict');
           (async()=>{
             const h={Authorization:'Bearer '+process.env.GH_TOKEN,Accept:'application/vnd.github+json','User-Agent':'GI-I66-Direct-Renewal-QA'};
-            for(const id of [43309935816,43310610618,43312896784,43316460352,43324845568,43337202772,43337771601]){
+            for(const id of [43309935816,43310610618,43312896784,43316460352,43324845568,43337202772,43337771601,43451818931,43452158412,43452502778]){
               const r=await fetch('https://api.github.com/repos/paulaosoriof86/orbit360-core/actions/runs/'+id,{headers:h}).then(x=>x.json());
               assert.equal(r.conclusion,'success','I66_LIVE_PRECONDITION_FAIL_'+id);
             }
             const b=await fetch('https://app.aysseguros.com/__recovery__/build.json',{headers:{'cache-control':'no-cache'}}).then(x=>x.json());
-            assert.equal(b.sourceSha,'7e9b2b915535cfcc20285142d57bfb0afcda1057');
+            assert.equal(b.sourceSha,'8a0e904500cbb3c961d83f16517caab69df88a2b');
             console.log('I66_RENEWAL_SIGNED_LIVE_QA_PRECONDITIONS_PASS');
           })().catch(e=>{console.error(e.message);process.exitCode=1;});
           NODE
