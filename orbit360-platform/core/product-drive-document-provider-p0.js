@@ -188,7 +188,20 @@
       return out;
     } catch (error) {
       const raw = String(error && (error.code || error.message) || '');
-      return { ok: false, status: /permission-denied/i.test(raw) ? 'sin_permiso' : /not-found/i.test(raw) ? 'sin_referencia' : /SETUP_REQUIRED/i.test(raw) ? 'tenant_setup_required' : 'no_disponible', message: 'No fue posible guardar el documento en Drive.', code: raw };
+      // A signed upload error is not proof of a Drive billing, role, or file failure.
+      // Ask the existing backend for its current tenant state before reporting why.
+      const current = await probe(true);
+      if (current && current.status === 'tenant_setup_required') {
+        return { ok: false, status: 'tenant_setup_required', action: 'configurar_drive',
+          message: 'Drive de A&S todavía no tiene la conexión administrativa. Dirección debe abrir Clientes 360 → Documentos → Configurar Drive y autorizar la cuenta con acceso a la carpeta Clientes. El archivo no se guardó.', code: raw };
+      }
+      if (current && current.status === 'tenant_connection_invalid') {
+        return { ok: false, status: 'tenant_connection_invalid', action: 'reconectar_drive',
+          message: 'La conexión administrativa de Drive necesita revisión por Dirección. El archivo no se guardó.', code: raw };
+      }
+      if (/permission-denied/i.test(raw)) return { ok: false, status: 'sin_permiso', message: 'No se autorizó guardar este soporte en el expediente. Revisa los permisos de la gestión y de la carpeta Drive; el archivo no se guardó.', code: raw };
+      if (/not-found/i.test(raw)) return { ok: false, status: 'sin_referencia', message: 'No se encontró el expediente o la carpeta de destino en Drive. El archivo no se guardó.', code: raw };
+      return { ok: false, status: 'no_disponible', message: 'Drive no confirmó el guardado del soporte. No se aplicó ningún cambio al documento; verifica la conexión e inténtalo nuevamente.', code: raw };
     }
   }
   async function listFolder(extra) {

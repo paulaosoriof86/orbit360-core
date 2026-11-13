@@ -1343,6 +1343,7 @@ Orbit.modules.cliente360 = (function () {
   function renovar(polId) {
     const p = S().get('polizas', polId); if (!p) return;
     const renewal = Orbit.modules && Orbit.modules.renovaciones;
+    if (renewal && typeof renewal.registrarAceptacion === 'function') { renewal.registrarAceptacion(polId); return; }
     if (renewal && typeof renewal.solicitarPropuestas === 'function') { renewal.solicitarPropuestas(polId); return; }
     c360toast('La gestión de renovación aún no está disponible. No se modificó la póliza.');
   }

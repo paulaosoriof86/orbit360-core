@@ -24,25 +24,47 @@ function harness(role='Operativo',entitled=true){
     ui:{esc:x=>String(x??''),today:()=> '2026-11-12',toast:x=>toasts.push(x)},
     access:{can:()=>entitled,canView:()=>true,esAsesor:()=>role==='Asesor',norm:x=>String(x||'').toLowerCase(),filter:(_c,x)=>x},
     session:{rol:()=>role},issuance:{canManage:()=>true},renewalDirect:{open:g=>opened.push(g.id)},
-    ciclo:{managementCreateModal:input=>{modals.push(input);return input;}}};
+    cat:{ensure:async()=>true},
+    ciclo:{managementCreateModal:input=>{modals.push(input);return input;},
+      crearGestionDurable:async input=>{const g={...input};db.gestiones.push(g);writes.push({kind:'gestion',id:g.id});return g;}}};
   const ctx={document,Orbit,Date:FixedDate,location:{hash:'#/renovaciones'},console,setTimeout,clearTimeout};
   ctx.window=ctx;vm.createContext(ctx);vm.runInContext(src,ctx,{filename:'renewals-v1200-operational-bridge.js'});
   return{Orbit,ctx,nodes,db,modals,opened,toasts,writes};
 }
 
-test('Authorized Operativo has one choice, confirmed direct entry without manual Ops hop, and reuses accepted management',()=>{
+test('Authorized Operativo enters issued renewal directly, persists one canonical Ops audit record and never opens Ops form',async()=>{
   const h=harness();const m=h.Orbit.modules.renovaciones;
-  m.registrarAceptacion('synthetic-p');const first=h.nodes.get('renewal-decision-v1200');assert.ok(first);
-  assert.match(first.innerHTML,/Crear gestión de renovación/);assert.match(first.innerHTML,/Registrar renovación en firme/);
-  assert.equal(h.modals.length,0);assert.equal(h.writes.length,0);
-  first.querySelector('[data-direct]').onclick();assert.equal(h.modals.length,1);
-  assert.match(h.modals[0].requireConfirmationText,/cliente aprobó/);
-  assert.equal(h.modals[0].extraFields.workflowType,'renewal_accepted');
-  h.modals[0].onCreated({id:'accepted',workflowType:'renewal_accepted',acceptedConfirmed:true});
-  assert.deepEqual(h.opened,['accepted']);assert.equal(h.ctx.location.hash,'#/renovaciones');
-  h.db.gestiones=[{id:'already-approved',polizaId:'synthetic-p',workflowType:'renewal_accepted',acceptedConfirmed:true,estado:'Pendiente'}];
-  m.registrarAceptacion('synthetic-p');h.nodes.get('renewal-decision-v1200').querySelector('[data-direct]').onclick();
-  assert.deepEqual(h.opened,['accepted','already-approved']);assert.equal(h.modals.length,1);assert.equal(h.writes.length,0);
+  m.registrarAceptacion('synthetic-p');
+  const first=h.nodes.get('renewal-decision-v1200');assert.ok(first);
+  assert.match(first.innerHTML,/Crear gestión de renovación/);
+  assert.match(first.innerHTML,/Registrar renovación en firme/);
+  first.querySelector('[data-direct]').onclick();
+  assert.equal(h.modals.length,0,'direct route must never open the generic Ops management form');
+  const approval=h.nodes.get('renewal-direct-approval-v1201');assert.ok(approval);
+  assert.match(approval.innerHTML,/Confirmo que el cliente aprobó/);
+  assert.equal(h.writes.length,0);
+  approval.querySelector('#ren-direct-approval-confirm').checked=true;
+  approval.querySelector('#ren-direct-approval-note').value='Correo de aprobación real';
+  await approval.querySelector('[data-direct-confirm]').onclick();
+  assert.equal(h.writes.length,1,'one durable canonical management record expected');
+  assert.equal(h.db.gestiones[0].workflowType,'renewal_accepted');
+  assert.equal(h.db.gestiones[0].acceptedConfirmed,true);
+  assert.equal(h.db.gestiones[0].clientApprovalNote,'Correo de aprobación real');
+  assert.deepEqual(h.opened,[h.db.gestiones[0].id]);
+  assert.equal(h.ctx.location.hash,'#/renovaciones','no navigational detour through Ops');
+  m.registrarAceptacion('synthetic-p');
+  h.nodes.get('renewal-decision-v1200').querySelector('[data-direct]').onclick();
+  assert.equal(h.writes.length,1,'must reuse accepted management idempotently');
+  assert.deepEqual(h.opened,[h.db.gestiones[0].id,h.db.gestiones[0].id]);
+});
+
+test('Direct renewal refuses silent client approval and never writes without a checked confirmation',async()=>{
+  const h=harness();h.Orbit.modules.renovaciones.registrarAceptacion('synthetic-p');
+  h.nodes.get('renewal-decision-v1200').querySelector('[data-direct]').onclick();
+  const approval=h.nodes.get('renewal-direct-approval-v1201');
+  await approval.querySelector('[data-direct-confirm]').onclick();
+  assert.equal(h.writes.length,0);assert.equal(h.opened.length,0);
+  assert.ok(h.toasts.some(x=>/Confirma la aprobación/.test(x)));
 });
 
 test('Advisor and non-entitled Operativo have no direct renewal shortcut',()=>{
@@ -57,4 +79,22 @@ test('Direct issuance form itself enforces managed role, approved client managem
   assert.match(issuance,/\['Dirección','SuperAdmin','AdminTenant','Admin','Operativo'\]\.includes\(role\)/);
   assert.match(issuance,/g\.workflowType!=='renewal_accepted'\|\|g\.acceptedConfirmed!==true/);
   assert.match(issuance,/Orbit\.renewalDirect=Object\.freeze\(\{open:openDirectRenewal\}\)/);
+});
+
+test('All privileged roles share direct issued-renewal route; Carlos and Dirección have parity',()=>{
+  for(const role of ['Dirección','SuperAdmin','AdminTenant','Admin','Operativo']){
+    const h=harness(role,true);h.Orbit.modules.renovaciones.registrarAceptacion('synthetic-p');
+    const decision=h.nodes.get('renewal-decision-v1200');assert.ok(decision,role);
+    decision.querySelector('[data-direct]').onclick();
+    assert.ok(h.nodes.has('renewal-direct-approval-v1201'),role);
+    assert.equal(h.modals.length,0,'Ops form detour: '+role);
+  }
+});
+
+test('Cliente360 routes renewal to shared role decision and issued-document failures remain retryable',()=>{
+  const client=fs.readFileSync(path.resolve(__dirname,'../orbit360-platform/modules/cliente360.js'),'utf8');
+  assert.match(client,/renewal\.registrarAceptacion\(polId\)/);
+  assert.match(issuance,/if\(supportFile&&!confirmedDocumentRef\)\{[\s\S]*?try\{/);
+  assert.match(issuance,/No fue posible confirmar el soporte en Drive/);
+  assert.match(issuance,/No fue posible confirmar la renovación\. Consulta la póliza antes de reintentar/);
 });

@@ -170,13 +170,13 @@ Orbit.modules.renovaciones = (function () {
       let reason='FUERA_DE_HORIZONTE',terminal=false,actionable=false,reviewOnly=false,bucketEligible=false;
       if(cancelled){terminal=true;reason='CANCELADA';}
       else if(verified.length===1&&!broken){terminal=true;reason='RENOVACION_VINCULADA';}
-      else if(verified.length>1||broken){reason='LINEAGE_CONFLICTO';reviewOnly=true;bucketEligible=d!=null&&d<0&&renewable!=='NO';}
+      else if(verified.length>1||broken){reason='LINEAGE_CONFLICTO';reviewOnly=true;bucketEligible=false;}
       else if(closed){reason='NO_RENOVADA_CERRADA';terminal=true;}
       else if(sourceBacked){
         reason='SUCESORA_DE_FUENTE_PENDIENTE_ENLACE';reviewOnly=true;bucketEligible=false;
       }
-      else if(renewalState==='renovada'){reason='RENOVADA_DECLARADA_SIN_SUCESORA_VERIFICADA';reviewOnly=true;bucketEligible=d!=null&&d<0&&renewable!=='NO';}
-      else if(historical){reason=possible?'POSIBLE_SUCESORA_SIN_PRUEBA_SUFICIENTE':'HISTORICA_SIN_SUCESORA_ACREDITADA';reviewOnly=true;bucketEligible=d!=null&&d<0&&renewable!=='NO';}
+      else if(renewalState==='renovada'){reason='RENOVADA_DECLARADA_SIN_SUCESORA_VERIFICADA';reviewOnly=true;bucketEligible=false;}
+      else if(historical){reason=possible?'POSIBLE_SUCESORA_SIN_PRUEBA_SUFICIENTE':'HISTORICA_SIN_SUCESORA_ACREDITADA';reviewOnly=true;bucketEligible=false;}
       else if(renewable==='NO'){reason='NO_RENOVABLE';terminal=true;}
       else if(d!=null&&d<=90&&['vigente','porrenovar','vencida'].includes(state)){
         bucketEligible=d<0||['vigente','porrenovar'].includes(state);reviewOnly=renewable==='UNKNOWN';actionable=bucketEligible&&!reviewOnly;
@@ -293,7 +293,8 @@ Orbit.modules.renovaciones = (function () {
     const pendingValidation=S().where('polizas', renewalPendingValidation);
     const dispositionRows45=date45DispositionRows(),disposition45=date45Disposition();
     const totalPrima = cols.reduce((s, c) => s + c.items.filter(it=>lifecycleOf(it.p).actionable).reduce((ss, it) => ss + q.norm(it.p.prima, it.p.moneda), 0), 0),expired=expiredContext();
-    const reviewCount=cols.reduce((n,c)=>n+c.items.filter(it=>lifecycleOf(it.p).reviewOnly).length,0);
+    const reviewCases=activeLifecycle.rows.filter(p=>selectedCountry(p)&&lifecycleOf(p).reviewOnly&&!lifecycleOf(p).terminal&&lifecycleOf(p).days!=null&&lifecycleOf(p).days<0&&lifecycleOf(p).reason!=='SUCESORA_DE_FUENTE_PENDIENTE_ENLACE');
+    const reviewCount=reviewCases.length;
     const unlinkedHistorical=activeLifecycle.rows.filter(p=>selectedCountry(p)&&lifecycleOf(p).reason==='SUCESORA_DE_FUENTE_PENDIENTE_ENLACE').length;
     const unlinkedCases=activeLifecycle.rows.filter(p=>selectedCountry(p)&&lifecycleOf(p).sourceBackedSuccessorId);
     const effectiveBadge=(p,life,d)=>d<0
@@ -315,6 +316,7 @@ Orbit.modules.renovaciones = (function () {
           <b>Revisión de información</b>
           <p>${reviewCount} vencidas requieren validar su estado antes de una acción automática. ${unlinkedHistorical} ediciones anteriores tienen una nueva vigencia con evidencia de origen, pero su vínculo todavía no está registrado. No se consideran renovaciones acreditadas ni se envían a campaña mientras se verifica esa relación.</p>
           ${unlinkedCases.slice(0,20).map(p=>'<button type="button" class="btn ghost sm" data-unlinked-review="'+U.esc(p.id)+'">Revisar relación: '+U.esc(p.numero||'Sin número')+'</button>').join('')}
+          ${reviewCases.slice().sort((a,b)=>(lifecycleOf(b).days||0)-(lifecycleOf(a).days||0)).slice(0,25).map(p=>'<button type="button" class="btn ghost sm" data-renewal-review="'+U.esc(p.id)+'">Revisar estado: '+U.esc((policyClient(p)||{}).nombre||'Cliente')+' · '+U.esc(p.numero||'Póliza')+'</button>').join('')}
         </div>
       </details>
       <div class="renewal-searchbar" role="search" aria-label="Buscar renovaciones">
@@ -381,6 +383,7 @@ Orbit.modules.renovaciones = (function () {
         </div>`).join('')}
       </div></div>`;
     host.querySelectorAll('[data-unlinked-review]').forEach(button=>button.addEventListener('click',()=>Orbit.modules.cliente360.verPoliza(button.dataset.unlinkedReview)));
+    host.querySelectorAll('[data-renewal-review]').forEach(button=>button.addEventListener('click',()=>Orbit.modules.cliente360.verPoliza(button.dataset.renewalReview)));
     const box=host.querySelector('[data-renewal-search-input]');
     if(box)box.addEventListener('input',event=>{
       searchText=event.target.value;clearTimeout(searchTimer);

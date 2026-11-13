@@ -1,0 +1,93 @@
+{
+  "schema": "GRAVICENTRA_I6_6_TARGETED_R11_RECEIPT_V1",
+  "date": "2026-11-13",
+  "gate": "I6.6",
+  "changeId": "I6_6_RENEWAL_KANBAN_ISSUED_DIRECT_AND_DRIVE_FEEDBACK_R11_20261113",
+  "origin": "Dirección Paula reportes 2026-11-13 y captura Carlos WhatsApp; Chrome de origen no accesible en esta conversación",
+  "risk": "Operational P0; fail closed, zero financial data writes",
+  "baselineR10": {
+    "source": "851d68441b819eac6dd37ec1d5d15fb971e35bf2",
+    "artifact": 14066487146,
+    "liveWorkflow": 43498437664,
+    "guard": 43500308712
+  },
+  "symptoms": [
+    "Pólizas históricas/renovadas aún en lista accionable",
+    "Renovación ya emitida exige un formulario Ops intermedio",
+    "Carga Drive muestra error genérico; faltante obligatorio sí se bloquea"
+  ],
+  "changes": [
+    {
+      "path": "orbit360-platform/modules/renovaciones.js",
+      "gitBlobSha": "863ed115292c4f81cc9e9668162675493e044676",
+      "replaces": {
+        "path": "orbit360-platform/modules/renovaciones.js",
+        "priorGitBlobSha": "c5757d2cd857eec30d56d6d111e8d839b7762352",
+        "priorChangeId": "I6_6_RENOVACIONES_SCOPED_CLIENT_INDEX_N2_RENDER_ROOTFIX_P0"
+      }
+    },
+    {
+      "path": "orbit360-platform/modules/renewals-v1200-operational-bridge.js",
+      "gitBlobSha": "5bcd7cfa8c81f1a0f6c7a6616e1088cacb026cb6",
+      "replaces": {
+        "path": "orbit360-platform/modules/renewals-v1200-operational-bridge.js",
+        "priorGitBlobSha": "0735c097ee69e5346421a07400628d58090e2949",
+        "priorChangeId": "I6_6_CARLOS_DIRECT_RENEWAL_ONE_ENTRY"
+      }
+    },
+    {
+      "path": "orbit360-platform/modules/cliente360.js",
+      "gitBlobSha": "8c4828146fc10bce10e30381e755596e9895c831",
+      "replaces": {
+        "path": "orbit360-platform/modules/cliente360.js",
+        "priorGitBlobSha": "fca5f7b6a8ecae7e0b3f4cfc94547fffcd6b97e5",
+        "priorChangeId": "I6_6_OPERATIVE_ADVISOR_PAYMENT_INVOICE_EXPIRY_BATCH_20261113"
+      }
+    },
+    {
+      "path": "orbit360-platform/modules/issuance-endosos-v1201-bridge.js",
+      "gitBlobSha": "b5bb89070166cf73f0f1b5c013c9747b8dcff0fc",
+      "replaces": {
+        "path": "orbit360-platform/modules/issuance-endosos-v1201-bridge.js",
+        "priorGitBlobSha": "e2eb436a18af192eea89dc39aa4ec29a40dbdbb8",
+        "priorChangeId": "I6_6_CARLOS_DIRECT_RENEWAL_ONE_ENTRY"
+      }
+    },
+    {
+      "path": "orbit360-platform/core/product-drive-document-provider-p0.js",
+      "gitBlobSha": "c337fb0e7c930020286b5293bc848d4d70458b3a"
+    }
+  ],
+  "tests": [
+    {
+      "path": "tools/gravicentra-i6-6-operational-renewal-entry.test.cjs",
+      "gitBlobSha": "dc5cba86fd8db6c4439c46e676c5ebbf6077da6e",
+      "replaces": {
+        "path": "tools/gravicentra-i6-6-operational-renewal-entry.test.cjs",
+        "priorGitBlobSha": "8cbc67612d7c25ddf27e76edeb56d99e62bc5d60",
+        "priorChangeId": "I6_6_CARLOS_DIRECT_RENEWAL_ONE_ENTRY"
+      }
+    },
+    {
+      "path": "tools/gravicentra-i6-6-renovaciones-read-index.test.cjs",
+      "gitBlobSha": "d35b06f916f622d5310ff510e9bb696e900afba0",
+      "replaces": {
+        "path": "tools/gravicentra-i6-6-renovaciones-read-index.test.cjs",
+        "priorGitBlobSha": "423301bf8c2a3e51508e7bb8f27ec1259a2447c2",
+        "priorChangeId": "I6_6_RENOVACIONES_SCOPED_CLIENT_INDEX_N2_RENDER_ROOTFIX_P0"
+      }
+    },
+    {
+      "path": "tools/gravicentra-i6-6-drive-upload-feedback.test.cjs",
+      "gitBlobSha": "03819bc27625cf51a0c838715e5a4da92b9a092c"
+    }
+  ],
+  "sourceQA": {
+    "localTests": "14/14 PASS",
+    "liveBrowser": "not tested; originating Chrome unavailable",
+    "driveUpload": "not tested; signed tenant status required admin setup, 43494861370 attempt2"
+  },
+  "acceptance": "PENDING_IMMUTABLE_PREVIEW_AND_EXACT_LIVE_READBACK",
+  "noConfirmedFinancialWrites": true,
+  "manualPrerequisite": "Dirección autoriza conexión OAuth persistente de Drive una vez; no simulada"
+}

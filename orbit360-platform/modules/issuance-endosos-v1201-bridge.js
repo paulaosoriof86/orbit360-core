@@ -551,7 +551,8 @@ Orbit.modules = Orbit.modules || {};
       const original=btn.textContent;btn.disabled=true;btn.textContent='Guardando…';
       let confirmedDocumentRef=docInput.value.trim();
       const supportFile=docFile.files&&docFile.files[0];
-      if(supportFile){
+      if(supportFile&&!confirmedDocumentRef){
+        try{
         if(!Orbit.secureResources||typeof Orbit.secureResources.uploadDocument!=='function'){btn.disabled=false;btn.textContent=original;return toast('Drive no está disponible para cargar el soporte.');}
         const uploaded=await Orbit.secureResources.uploadDocument(supportFile,{entidad:'gestion',entidadId:g.id,clienteId:source.clienteId,polizaId:source.id,categoria:'renovacion_en_firme',nombre:supportFile.name});
         if(!uploaded||uploaded.ok!==true||!(uploaded.documentRef||uploaded.fileId)){btn.disabled=false;btn.textContent=original;return toast(uploaded&&uploaded.message||'Drive no confirmó el soporte de renovación.');}
@@ -562,15 +563,21 @@ Orbit.modules = Orbit.modules || {};
           adjuntos.push({id:confirmedDocumentRef,nombre:uploaded.nombre||supportFile.name,documentRef:confirmedDocumentRef,driveUrl:uploaded.driveUrl||uploaded.externalUrl||'',externalUrl:uploaded.externalUrl||uploaded.driveUrl||'',mimeType:uploaded.mimeType||supportFile.type||'',clienteId:source.clienteId,polizaId:source.id,categoria:'renovacion_en_firme',origen:'Google Drive'});
           await S().updateDurable('gestiones',g.id,{adjuntos,documentoCargaPendiente:false,actualizado:today()});
         }
+        }catch(error){
+          btn.disabled=false;btn.textContent=original;
+          return toast('No fue posible confirmar el soporte en Drive. Verifica la conexión documental y reintenta sin duplicar la póliza.');
+        }
       }
       if(!confirmedDocumentRef){btn.disabled=false;btn.textContent=original;return toast('Selecciona o carga el soporte de renovación en firme.');}
-      const result=await I.createDirectRenewal(g.id,{
+      let result;
+      try{result=await I.createDirectRenewal(g.id,{
         aseguradoraId:$('#rend-asg').value,numero:$('#rend-num').value.trim(),
         vigenciaInicio:$('#rend-start').value,vigenciaFin:$('#rend-end').value,producto:$('#rend-prod').value.trim(),
         frecuencia:$('#rend-freq').value,cuotas:+$('#rend-payments').value||1,formaPago:$('#rend-form').value.trim(),
         conducto:$('#rend-conduct').value.trim(),primaNeta:+$('#rend-net').value||0,gastosEmision:+$('#rend-gem').value||0,
         gastosFinan:+$('#rend-gfin').value||0,otros:+$('#rend-other').value||0,ivaPct:+$('#rend-iva').value||0,sourceRef:$('#rend-source').value.trim(),documentRef:confirmedDocumentRef
       },{motivo:'Renovación en firme recibida y aprobada'});
+      }catch(error){btn.disabled=false;btn.textContent=original;return toast('No fue posible confirmar la renovación. Consulta la póliza antes de reintentar.');}
       if(!result.ok){btn.disabled=false;btn.textContent=original;return toast('No se creó: '+(result.errors||[]).join(', '));}
       b.remove();const base=document.getElementById('ciclo-modal');if(base)base.remove();toast(result.alreadyCreated?'La renovación ya estaba registrada.':'Nueva póliza de renovación creada con sus recibos.');Orbit.modules.cliente360.verPoliza(result.policy.id);
     };

@@ -1629,57 +1629,209 @@
       "approvedByDirection": true,
       "receipt": "artifacts/orbit360-recovery/release-control/I6_6_OPERATIVE_ADVISOR_PAYMENT_INVOICE_EXPIRY_BATCH_20261113.json",
       "sourceStatus": "SOURCE_TARGETED_QA_PASS_PREVIEW_LIVE_AND_REAL_WRITES_HOLD",
-      "capabilityOwners": ["EQUIPOS_ASSIGNABLE_ADVISOR_ROSTER", "POLIZAS_NEW", "CLIENTE360", "COBROS_RECONCILIATION", "CONTRACTUAL_EXPIRY_VIEW"],
+      "capabilityOwners": [
+        "EQUIPOS_ASSIGNABLE_ADVISOR_ROSTER",
+        "POLIZAS_NEW",
+        "CLIENTE360",
+        "COBROS_RECONCILIATION",
+        "CONTRACTUAL_EXPIRY_VIEW"
+      ],
       "scope": "Operativo/Direccion/Admin keep server-configured rights; fresh role-country advisor roster in new policy; invoice issue date distinct from payment and insurer application; reconciliation persistence/readback; expired policy projection read-only. No direct financial data writes or external customer messaging in this source change.",
       "paths": [
         {
           "path": "orbit360-platform/modules/policy-receipts-v1199-bridge.js",
           "gitBlobSha": "c01aa549e1b62ae892d225fc584094a1767088e3",
-          "replaces": {"path": "orbit360-platform/modules/policy-receipts-v1199-bridge.js", "priorGitBlobSha": "a39ddcc8a53cefa55bc5edd56e7f5a628db31c03", "priorChangeId": "I6_6_CARLOS_POLICY_RENEWABILITY_ONLY_CAS_OPERATIVE_SCOPE_P0"}
+          "replaces": {
+            "path": "orbit360-platform/modules/policy-receipts-v1199-bridge.js",
+            "priorGitBlobSha": "a39ddcc8a53cefa55bc5edd56e7f5a628db31c03",
+            "priorChangeId": "I6_6_CARLOS_POLICY_RENEWABILITY_ONLY_CAS_OPERATIVE_SCOPE_P0"
+          }
         },
         {
           "path": "orbit360-platform/modules/cobros.js",
           "gitBlobSha": "cbd1d20bea67dd7f7f0f8b1fb43e902576f95aac",
-          "replaces": {"path": "orbit360-platform/modules/cobros.js", "priorGitBlobSha": "b745f881855f7012a05f03634c316dc91124db91", "priorChangeId": "I6_6_COBROS_APPLICATION_TEMPORAL_STATUS_AND_GLOBAL_SEARCH_P0"}
+          "replaces": {
+            "path": "orbit360-platform/modules/cobros.js",
+            "priorGitBlobSha": "b745f881855f7012a05f03634c316dc91124db91",
+            "priorChangeId": "I6_6_COBROS_APPLICATION_TEMPORAL_STATUS_AND_GLOBAL_SEARCH_P0"
+          }
         },
         {
           "path": "functions/cobros-reconciliation-domain.js",
           "gitBlobSha": "0e4d42737ad8e14a70ccf882533269cd61e95a60",
-          "replaces": {"path": "functions/cobros-reconciliation-domain.js", "priorGitBlobSha": "b492d610bd1c49458881dc17c89367e23168db5e", "priorChangeId": "I6_6_CARLOS_PAYMENT_ONCALL_RESPONSE_MODE_HOTFIX_P0"}
+          "replaces": {
+            "path": "functions/cobros-reconciliation-domain.js",
+            "priorGitBlobSha": "b492d610bd1c49458881dc17c89367e23168db5e",
+            "priorChangeId": "I6_6_CARLOS_PAYMENT_ONCALL_RESPONSE_MODE_HOTFIX_P0"
+          }
         },
         {
           "path": "orbit360-platform/core/queries.js",
           "gitBlobSha": "c3b9ccf39d3ef8a6e5c06e3965df159ad65288b7",
-          "replaces": {"path": "orbit360-platform/core/queries.js", "priorGitBlobSha": "5dd3f7d7dc4622dfcd804fe5fed0d4272d36802b", "priorChangeId": "I6_6_COBROS_APPLICATION_TEMPORAL_STATUS_AND_GLOBAL_SEARCH_P0"}
+          "replaces": {
+            "path": "orbit360-platform/core/queries.js",
+            "priorGitBlobSha": "5dd3f7d7dc4622dfcd804fe5fed0d4272d36802b",
+            "priorChangeId": "I6_6_COBROS_APPLICATION_TEMPORAL_STATUS_AND_GLOBAL_SEARCH_P0"
+          }
         },
         {
           "path": "orbit360-platform/modules/polizas.js",
           "gitBlobSha": "6cd5e1c5d8cfa367c28399b8dce35a2f45819b73",
-          "replaces": {"path": "orbit360-platform/modules/polizas.js", "priorGitBlobSha": "cb44522646d70e175db223d32a05f402552140fd", "priorChangeId": "I6_6_COBROS_APPLICATION_TEMPORAL_STATUS_AND_GLOBAL_SEARCH_P0"}
+          "replaces": {
+            "path": "orbit360-platform/modules/polizas.js",
+            "priorGitBlobSha": "cb44522646d70e175db223d32a05f402552140fd",
+            "priorChangeId": "I6_6_COBROS_APPLICATION_TEMPORAL_STATUS_AND_GLOBAL_SEARCH_P0"
+          }
         },
         {
           "path": "orbit360-platform/modules/cliente360.js",
           "gitBlobSha": "fca5f7b6a8ecae7e0b3f4cfc94547fffcd6b97e5",
-          "replaces": {"path": "orbit360-platform/modules/cliente360.js", "priorGitBlobSha": "e1ea909944992d5811d781dbded69190fcfa23eb", "priorChangeId": "I6_6_CLIENTE360_LINKED_POLICY_CREATE_CTA_P0"}
+          "replaces": {
+            "path": "orbit360-platform/modules/cliente360.js",
+            "priorGitBlobSha": "e1ea909944992d5811d781dbded69190fcfa23eb",
+            "priorChangeId": "I6_6_CLIENTE360_LINKED_POLICY_CREATE_CTA_P0"
+          }
         }
       ],
-      "tests": [{"path": "tools/gravicentra-i6-6-roles-payment-expiry-hotfix.test.cjs", "gitBlobSha": "dc717555e60d0405ba14c38f0a4739dfb1056130"}]
+      "tests": [
+        {
+          "path": "tools/gravicentra-i6-6-roles-payment-expiry-hotfix.test.cjs",
+          "gitBlobSha": "dc717555e60d0405ba14c38f0a4739dfb1056130"
+        }
+      ]
     },
     {
       "id": "I6_6_CONCILIACIONES_HUMAN_CLIENT_NAMES_20261113",
       "approvedByDirection": true,
       "receipt": "Paula Dirección 2026-11-13: en Conciliaciones mostrar cliente real y estados comprensibles, sin identificadores técnicos visibles; conservar auditoría y no aplicar propuestas automáticamente",
       "sourceStatus": "SOURCE_TESTED_LOCAL_PENDING_IMMUTABLE_PREVIEW_AND_LIVE_PROOF",
-      "capabilityOwners": ["CONCILIACIONES_ACTIVE_LEDGER_SCOPED_READ", "CONCILIACIONES_UI"],
+      "capabilityOwners": [
+        "CONCILIACIONES_ACTIVE_LEDGER_SCOPED_READ",
+        "CONCILIACIONES_UI"
+      ],
       "scope": "El servidor proyecta el nombre desde el cliente canónico previamente validado. La interfaz usa nombre autorizado o ficha local, oculta referencias técnicas y traduce estados. Se conservan 52 propuestas con vínculo único, 80 ambiguas en espera y cero escrituras financieras.",
       "dataWrites": 0,
       "paths": [
-        {"path": "functions/i66-conciliaciones-active-ledger-projection.js", "gitBlobSha": "4951c7e93f102e475152375997870421f7600b56", "replaces": {"path": "functions/i66-conciliaciones-active-ledger-projection.js", "priorGitBlobSha": "1fc919f1b6a5356e21c3811e09aab4182adca25c", "priorChangeId": "I6_6_ACTIVE_LEDGER_STAGE_INDEXED_UI_READONLY_P0"}},
-        {"path": "orbit360-platform/modules/conciliaciones.js", "gitBlobSha": "c0c6ffb403e7121c5bbd087b2a52533805c1fdbb", "replaces": {"path": "orbit360-platform/modules/conciliaciones.js", "priorGitBlobSha": "9b9e7cb1ef049b84ff2b4ac01edcf945edd8544c", "priorChangeId": "I6_6_CONCILIACIONES_PROTECTED_SCOPED_READ_BRIDGE_P0"}}
+        {
+          "path": "functions/i66-conciliaciones-active-ledger-projection.js",
+          "gitBlobSha": "4951c7e93f102e475152375997870421f7600b56",
+          "replaces": {
+            "path": "functions/i66-conciliaciones-active-ledger-projection.js",
+            "priorGitBlobSha": "1fc919f1b6a5356e21c3811e09aab4182adca25c",
+            "priorChangeId": "I6_6_ACTIVE_LEDGER_STAGE_INDEXED_UI_READONLY_P0"
+          }
+        },
+        {
+          "path": "orbit360-platform/modules/conciliaciones.js",
+          "gitBlobSha": "c0c6ffb403e7121c5bbd087b2a52533805c1fdbb",
+          "replaces": {
+            "path": "orbit360-platform/modules/conciliaciones.js",
+            "priorGitBlobSha": "9b9e7cb1ef049b84ff2b4ac01edcf945edd8544c",
+            "priorChangeId": "I6_6_CONCILIACIONES_PROTECTED_SCOPED_READ_BRIDGE_P0"
+          }
+        }
       ],
       "tests": [
-        {"path": "tools/gravicentra-i6-6-conciliaciones-active-ledger-projection.test.cjs", "gitBlobSha": "6a045149287ae54cbfec0223b1cb0739b0a94176", "replaces": {"path": "tools/gravicentra-i6-6-conciliaciones-active-ledger-projection.test.cjs", "priorGitBlobSha": "93a314e05a840bfa664503f0cf7d49468a51b24d", "priorChangeId": "I6_6_ACTIVE_LEDGER_STAGE_INDEXED_UI_READONLY_P0"}}
+        {
+          "path": "tools/gravicentra-i6-6-conciliaciones-active-ledger-projection.test.cjs",
+          "gitBlobSha": "6a045149287ae54cbfec0223b1cb0739b0a94176",
+          "replaces": {
+            "path": "tools/gravicentra-i6-6-conciliaciones-active-ledger-projection.test.cjs",
+            "priorGitBlobSha": "93a314e05a840bfa664503f0cf7d49468a51b24d",
+            "priorChangeId": "I6_6_ACTIVE_LEDGER_STAGE_INDEXED_UI_READONLY_P0"
+          }
+        }
       ]
+    },
+    {
+      "id": "I6_6_RENEWAL_KANBAN_ISSUED_DIRECT_AND_DRIVE_FEEDBACK_R11_20261113",
+      "approvedByDirection": true,
+      "receipt": "artifacts/orbit360-recovery/release-control/I6_6_RENEWAL_KANBAN_ISSUED_DIRECT_AND_DRIVE_FEEDBACK_R11_20261113.json",
+      "sourceStatus": "SOURCE_TARGETED_SYNTHETIC_TESTS_14_OF_14_PASS_PREVIEW_PENDING_LIVE_HOLD",
+      "capabilityOwners": [
+        "RENOVACIONES_ACTIONABLE_WORKLIST",
+        "CLIENTE360_DIRECT_RENEWAL",
+        "OPS_DURABLE_AUDIT",
+        "DOCUMENT_DRIVE_TENANT_STATE_ERRORS"
+      ],
+      "scope": "Quitar del tablero accionable versiones históricas/renovadas o sucesión contradictoria; conservarlas en revisión. Registrar renovación ya emitida desde Cliente 360 o Renovaciones para Dirección/Admin/Operativo sin formulario Ops intermedio, con aceptación expresa, gestión canónica única y readback, sin póliza ficticia. Drive muestra estado real del tenant al fallar carga y conserva requisito documental; la conexión OAuth administrativa sigue pendiente y no se certifica upload real.",
+      "dataWrites": 0,
+      "paths": [
+        {
+          "path": "orbit360-platform/modules/renovaciones.js",
+          "gitBlobSha": "863ed115292c4f81cc9e9668162675493e044676",
+          "replaces": {
+            "path": "orbit360-platform/modules/renovaciones.js",
+            "priorGitBlobSha": "c5757d2cd857eec30d56d6d111e8d839b7762352",
+            "priorChangeId": "I6_6_RENOVACIONES_SCOPED_CLIENT_INDEX_N2_RENDER_ROOTFIX_P0"
+          }
+        },
+        {
+          "path": "orbit360-platform/modules/renewals-v1200-operational-bridge.js",
+          "gitBlobSha": "5bcd7cfa8c81f1a0f6c7a6616e1088cacb026cb6",
+          "replaces": {
+            "path": "orbit360-platform/modules/renewals-v1200-operational-bridge.js",
+            "priorGitBlobSha": "0735c097ee69e5346421a07400628d58090e2949",
+            "priorChangeId": "I6_6_CARLOS_DIRECT_RENEWAL_ONE_ENTRY"
+          }
+        },
+        {
+          "path": "orbit360-platform/modules/cliente360.js",
+          "gitBlobSha": "8c4828146fc10bce10e30381e755596e9895c831",
+          "replaces": {
+            "path": "orbit360-platform/modules/cliente360.js",
+            "priorGitBlobSha": "fca5f7b6a8ecae7e0b3f4cfc94547fffcd6b97e5",
+            "priorChangeId": "I6_6_OPERATIVE_ADVISOR_PAYMENT_INVOICE_EXPIRY_BATCH_20261113"
+          }
+        },
+        {
+          "path": "orbit360-platform/modules/issuance-endosos-v1201-bridge.js",
+          "gitBlobSha": "b5bb89070166cf73f0f1b5c013c9747b8dcff0fc",
+          "replaces": {
+            "path": "orbit360-platform/modules/issuance-endosos-v1201-bridge.js",
+            "priorGitBlobSha": "e2eb436a18af192eea89dc39aa4ec29a40dbdbb8",
+            "priorChangeId": "I6_6_CARLOS_DIRECT_RENEWAL_ONE_ENTRY"
+          }
+        },
+        {
+          "path": "orbit360-platform/core/product-drive-document-provider-p0.js",
+          "gitBlobSha": "c337fb0e7c930020286b5293bc848d4d70458b3a"
+        }
+      ],
+      "tests": [
+        {
+          "path": "tools/gravicentra-i6-6-operational-renewal-entry.test.cjs",
+          "gitBlobSha": "dc5cba86fd8db6c4439c46e676c5ebbf6077da6e",
+          "replaces": {
+            "path": "tools/gravicentra-i6-6-operational-renewal-entry.test.cjs",
+            "priorGitBlobSha": "8cbc67612d7c25ddf27e76edeb56d99e62bc5d60",
+            "priorChangeId": "I6_6_CARLOS_DIRECT_RENEWAL_ONE_ENTRY"
+          }
+        },
+        {
+          "path": "tools/gravicentra-i6-6-renovaciones-read-index.test.cjs",
+          "gitBlobSha": "d35b06f916f622d5310ff510e9bb696e900afba0",
+          "replaces": {
+            "path": "tools/gravicentra-i6-6-renovaciones-read-index.test.cjs",
+            "priorGitBlobSha": "423301bf8c2a3e51508e7bb8f27ec1259a2447c2",
+            "priorChangeId": "I6_6_RENOVACIONES_SCOPED_CLIENT_INDEX_N2_RENDER_ROOTFIX_P0"
+          }
+        },
+        {
+          "path": "tools/gravicentra-i6-6-drive-upload-feedback.test.cjs",
+          "gitBlobSha": "03819bc27625cf51a0c838715e5a4da92b9a092c"
+        }
+      ],
+      "qa": {
+        "localSyntheticTests": 14,
+        "localSyntheticTestsPassed": 14,
+        "sourceSyntaxPass": true,
+        "previewBuildPending": true,
+        "livePublished": false,
+        "realDriveUploadAccepted": false,
+        "realSignedRoleWriteAccepted": false,
+        "financeDataWritten": 0
+      }
     }
   ]
 }

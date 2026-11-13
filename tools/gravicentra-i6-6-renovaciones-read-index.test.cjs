@@ -94,3 +94,19 @@ test('I6.6 selected country CO preserves its own commercial portfolio and 0 GT c
   assert.doesNotMatch(f.host.innerHTML, /data-renewal-policy="policy-0"/);
   assert.ok(f.metrics().getCalls < 100);
 });
+
+
+test('Renewed and lineage-conflicted expired policies are not actionable cards but remain visible in review, while genuinely expired policies stay actionable',()=>{
+  const f=fixture();
+  f.policies[0].vigenciaFin='2026-10-01';f.policies[0].estado='Renovada';f.policies[0].renovacionEstado='Renovada';
+  f.policies[2].vigenciaFin='2026-10-01';f.policies[2].estado='Vencida';
+  f.policies[6].vigenciaFin='2026-10-01';f.policies[6].estado='Vencida';f.policies[6].renovadaPor='missing-renewed-policy';
+  f.Orbit.ui.daysFromNow = date => date==='2026-10-01' ? -43 : 20;
+  f.Orbit.modules.renovaciones.render(f.host);
+  assert.doesNotMatch(f.host.innerHTML,/data-renewal-policy="policy-0"/,'renewed historical version may not be offered again');
+  assert.doesNotMatch(f.host.innerHTML,/data-renewal-policy="policy-6"/,'broken lineage must be reviewed outside actionable Kanban');
+  assert.match(f.host.innerHTML,/data-renewal-review="policy-0"/,'review details must retain traceability');
+  assert.match(f.host.innerHTML,/data-renewal-review="policy-6"/,'lineage conflict must be accessible');
+  assert.match(f.host.innerHTML,/data-renewal-policy="policy-2"/,'genuine expired and renewable policy stays actionable');
+  assert.match(f.host.innerHTML,/data-renewal-search-total="796"/,'GT actionable population excludes 2 reviewed policies');
+});
