@@ -53,12 +53,16 @@ async function checkActor(browser,actor){
       await c.modules.auth.setPersistence(c.auth,c.modules.auth.browserSessionPersistence);
       await c.modules.auth.signInWithCustomToken(c.auth,token);
       const result=await Orbit.productAppP0.activate();
+      // A signed client must resolve its protected tenant policy before the
+      // authorization verdict; default local policy is NOT an acceptance.
+      const access=await Orbit.domainConfig.ensure('access');
       return{started:result?.started===true,preview:p.isI66PreviewHost(),role:String(Orbit.session?.rol?.()||''),
+        policyProtected:access?.source==='protected'&&access?.syncPending!==true,
         rights:Object.fromEntries(modules.map(m=>[m,{view:Orbit.access?.can(m,'view')===true,
           create:Orbit.access?.can(m,'create')===true,
           edit:Orbit.access?.can(m,'edit')===true,scope:Orbit.access?.dataScope(m)||'none'}]))};
     },{token,modules});
-    assert.ok(rights.started&&rights.preview===(ORIGIN===PREVIEW)&&norm(rights.role).includes(actor.role),'I66_SIGNED_PERMISSION_PRODUCT_SESSION_INVALID');
+    assert.ok(rights.started&&rights.policyProtected&&rights.preview===(ORIGIN===PREVIEW)&&norm(rights.role).includes(actor.role),'I66_SIGNED_PERMISSION_PROTECTED_POLICY_NOT_READY');
     console.log('I66_SIGNED_'+actor.role.toUpperCase()+'_ACTUAL_RIGHTS '+JSON.stringify(rights.rights));
     for(const [module,grant] of Object.entries(rights.rights)){
       if(essential.includes(module))assert.equal(grant.view,true,'I66_SIGNED_ROLE_ESSENTIAL_MODULE_INVISIBLE_'+actor.role+'_'+module);
