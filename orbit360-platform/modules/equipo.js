@@ -254,11 +254,22 @@ Orbit.modules.equipo = (function () {
     const roles = roleCatalog();
     roles.forEach(rol => {
       def[rol] = {};
-      // Existing role definitions govern reading; missing edit authority is not assumed.
+      // The product membership contract uses modules/defaultScope, not legacy
+      // `nivel`. Requiring that removed field silently rendered EVERY Edit
+      // checkbox unchecked (including SuperAdmin) in the clean product.
+      // This is only the initial matrix; the protected access document remains
+      // the authority for all owner-configured Ver/Editar overrides.
       const nivel = Number(roleDefinition(rol)?.nivel||0);
+      const fullAdmin = ['Dirección', 'SuperAdmin', 'AdminTenant', 'Admin'].includes(rol);
+      const fullOperator = rol === 'Operativo';
+      const assigned = new Set(baseModules([rol]));
       allModuleIds().forEach(m => {
         const admin = ['comisiones', 'finanzas', 'configuracion', 'equipo'].includes(m);
-        def[rol][m] = { ver: admin ? nivel >= 3 : baseModules([rol]).includes(m), editar: admin ? nivel >= 4 : nivel >= 2 && baseModules([rol]).includes(m) };
+        const visible = assigned.has(m);
+        def[rol][m] = {
+          ver: visible,
+          editar: visible && (fullAdmin || (fullOperator && !admin) || nivel >= (admin ? 4 : 2))
+        };
       });
     });
     return def;

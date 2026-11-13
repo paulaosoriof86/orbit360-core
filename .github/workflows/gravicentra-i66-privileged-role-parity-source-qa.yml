@@ -8,8 +8,10 @@ on:
       - functions/product-operational-domain.js
       - functions/product-ops-leads-domain.js
       - orbit360-platform/core/access-scope.js
+      - orbit360-platform/modules/equipo.js
       - tools/gravicentra-i6-6-privileged-role-portfolio-parity.test.cjs
       - tools/gravicentra-i6-6-privileged-role-writer-transaction.test.cjs
+      - tools/gravicentra-i66-equipo-protected-role-defaults.test.cjs
       - artifacts/orbit360-recovery/release-control/I6_6_APPROVED_PRODUCT_DELTA_MANIFEST_20261110.json
   workflow_dispatch:
 permissions:
@@ -37,8 +39,10 @@ jobs:
           node --check functions/product-operational-domain.js
           node --check functions/product-ops-leads-domain.js
           node --check orbit360-platform/core/access-scope.js
+          node --check orbit360-platform/modules/equipo.js
           node --test tools/gravicentra-i6-6-privileged-role-portfolio-parity.test.cjs \
-            tools/gravicentra-i6-6-privileged-role-writer-transaction.test.cjs
+            tools/gravicentra-i6-6-privileged-role-writer-transaction.test.cjs \
+            tools/gravicentra-i66-equipo-protected-role-defaults.test.cjs
           node tools/gravicentra-b4-003-financial-role-scope-transversal.test.cjs
           node tools/gravicentra-b4-003-scoped-boundary.test.cjs
           node tools/gravicentra-b4-003-ops-leads-role-scopes.test.cjs
