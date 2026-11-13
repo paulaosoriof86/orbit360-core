@@ -37,3 +37,9 @@ jobs:
           npm install --no-save --package-lock=false --ignore-scripts --no-audit --no-fund firebase-admin@13.4.0 playwright@1.55.0 >/dev/null
           node node_modules/playwright/cli.js install --with-deps chromium >/dev/null
           node tools/gravicentra-i66-privileged-role-signed-ui-permissions-readonly.cjs
+      - name: Sign in as same real Carlos and Paula on exact LIVE and check protected write rights without mutations
+        env:
+          I66_SIGNED_MATRIX_ORIGIN: https://app.aysseguros.com
+        run: |
+          set -euo pipefail
+          node tools/gravicentra-i66-privileged-role-signed-ui-permissions-readonly.cjs

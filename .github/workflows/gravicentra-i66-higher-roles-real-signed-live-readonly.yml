@@ -1,4 +1,4 @@
-name: Gravicentra I6.6 R7 AdminTenant SuperAdmin Real Signed LIVE Readonly
+name: Gravicentra I6.6 R8 AdminTenant SuperAdmin Real Signed LIVE Readonly
 on:
   push:
     branches: [recovery/fase-a-clean-20260831]
@@ -28,8 +28,8 @@ jobs:
       - name: Assert canonical R7 frontend and all three function owners unchanged
         run: |
           set -euo pipefail
-          git merge-base --is-ancestor 0153f5cbbe00c3732e11ebae59b32bd357e38bfd HEAD
-          test -z "$(git diff --name-only 0153f5cbbe00c3732e11ebae59b32bd357e38bfd HEAD -- orbit360-platform functions ':!orbit360-platform/docs/**')"
+          git merge-base --is-ancestor 8a0e904500cbb3c961d83f16517caab69df88a2b HEAD
+          test -z "$(git diff --name-only 8a0e904500cbb3c961d83f16517caab69df88a2b HEAD -- orbit360-platform functions ':!orbit360-platform/docs/**')"
           node --check tools/gravicentra-i66-higher-roles-real-signed-live-readonly.cjs
       - name: Verify each real active AdminTenant and SuperAdmin LIVE session and protected write matrix without mutations
         run: |
