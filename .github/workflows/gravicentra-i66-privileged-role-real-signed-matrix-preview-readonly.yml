@@ -5,6 +5,7 @@ on:
     branches: [recovery/fase-a-clean-20260831]
     paths:
       - .github/workflows/gravicentra-i66-privileged-role-real-signed-matrix-preview-readonly.yml
+      - tools/gravicentra-i66-privileged-role-signed-ui-permissions-readonly.cjs
 permissions:
   contents: read
 jobs:
