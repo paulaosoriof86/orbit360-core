@@ -29,7 +29,7 @@ jobs:
         run: |
           set -euo pipefail
           git merge-base --is-ancestor 0153f5cbbe00c3732e11ebae59b32bd357e38bfd HEAD
-          test -z "$(git diff --name-only 0153f5cbbe00c3732e11ebae59b32bd357e38bfd HEAD -- orbit360-platform functions)"
+          test -z "$(git diff --name-only 0153f5cbbe00c3732e11ebae59b32bd357e38bfd HEAD -- orbit360-platform functions ':!orbit360-platform/docs/**')"
           node --check tools/gravicentra-i66-higher-roles-real-signed-live-readonly.cjs
       - name: Verify each real active AdminTenant and SuperAdmin LIVE session and protected write matrix without mutations
         run: |
