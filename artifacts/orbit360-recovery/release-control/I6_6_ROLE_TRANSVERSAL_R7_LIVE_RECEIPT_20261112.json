@@ -1,0 +1,74 @@
+{
+  "schema": "GRAVICENTRA_I66_R7_TRANSVERSAL_OPERATIVO_EXACT_LIVE_RECEIPT_V1",
+  "dateGuatemala": "2026-11-12",
+  "activeGate": "I6.6",
+  "historicalB4007Closed": true,
+  "status": "TARGETED_RELEASE_LIVE_PASS_FULL_PLATFORM_AND_FINANCIAL_WRITES_HOLD",
+  "source": {
+    "branch": "recovery/fase-a-clean-20260831",
+    "sha": "0153f5cbbe00c3732e11ebae59b32bd357e38bfd",
+    "buildId": "gi-i66-0153f5cbbe00-57f234755dc1",
+    "immutableArtifactId": 14013250472,
+    "sha256": "a1e16528689cc02336a3d753e3086c95eeedce92f753d14de20e790552b9f461"
+  },
+  "certificationEvidence": {
+    "sourceRoleTestsDeclaredPass": 45,
+    "sourceRoleTestsDeclaredTotal": 45,
+    "previewBuildRunId": 43371940341,
+    "previewSignedCarlosAndDirectionRunId": 43375403003,
+    "realTenantAccessConfigReadOnlyRunId": 43374139073,
+    "liveReleaseAndSignedUatRunId": 43375687134,
+    "liveReadbackEvidenceArtifactId": 14014701842,
+    "liveWorkflowConclusion": "SUCCESS",
+    "hostingVersionOnPreviewAndBothLiveOrigins": "sites/ays-orbit-360-lab/versions/9cedc5ecda75bb2a",
+    "filesByteExactOnPreview": 223,
+    "filesByteExactOnFirebaseLive": 223,
+    "filesByteExactOnCustomLive": 223,
+    "targetedBackendFunctions": [
+      "orbit360ProductOperationalCommand",
+      "orbit360OpsLeadsCommand",
+      "orbit360ScopedPolicyRead"
+    ],
+    "targetedBackendFunctionsDeployedLatestRevisionAt100Percent": 3,
+    "signedCarlosVisibleModulesAllCreateEditAndAllDataScope": 8,
+    "signedDirectionVisibleModulesAllCreateEditAndAllDataScope": 10,
+    "signedBothActorsOpsLeadsTasksSyntheticCreateUpdateResolveReloadRestore": true,
+    "signedCarlosExistingGtOpsCompletedTaskReadOnlyCount": 1,
+    "signedRealCustomerFinancialWrites": 0,
+    "syntheticAuditRecordsRestored": true
+  },
+  "authorizationBoundary": {
+    "operativoAllowedModulesVerified": [
+      "cliente360",
+      "polizas",
+      "renovaciones",
+      "cobros",
+      "ops",
+      "leads",
+      "aseguradoras",
+      "siniestros"
+    ],
+    "operativoDeniedInActualTenantConfigNotSilentlyGranted": ["cancelaciones", "comisiones"],
+    "direccionAllowedModuleCount": 10,
+    "otherActualAdminAdminTenantSuperAdminSignedLive": "HOLD",
+    "legalAcceptanceButtonPhysicalClick": "HOLD_REAL_LEGAL_ACCEPTANCE_REQUIRED",
+    "realInsurerCredentialEdit": "HOLD",
+    "authenticInsurerIssuedRenewal": "HOLD",
+    "realFinancialWriteAndCarteraA1ToA7": "HOLD_ZERO_OF_SEVEN",
+    "conciliaciones": "READ_ONLY_PROTECTED_PREVIEW_LIVE_PASS_43324845568_WRITER_PARITY_HOLD"
+  },
+  "nextGates": [
+    "Real AdminTenant and SuperAdmin signed authorization and country module matrix; include physical UI writes with legal acceptance, no forged consent",
+    "Authentic insurer-issued renewal and credential edit audit including insurer account and logo",
+    "Protected Conciliaciones true writer parity and safe matched financial source-to-receipt CAS before any real update",
+    "A1-A7 matched cartera batch processing only after exact insurer installment discrepancy resolution",
+    "Permanent Preview channel retention, startup performance and cross-role anti-regression"
+  ],
+  "canonicalPointer": "artifacts/orbit360-recovery/release-control/I6_6_LATEST_EXACT_LIVE_POINTER_20261112.json",
+  "canonicalMutableState": "orbit360-platform/docs/recovery/orbit360-recovery-state-v1.json",
+  "mustNotClaim": [
+    "I6.6 full platform production acceptance",
+    "All five privileged roles physically signed and accepted",
+    "Real insurer-issued renewal, insurer password change, real payment application, or A1-A7 refresh completed"
+  ]
+}
