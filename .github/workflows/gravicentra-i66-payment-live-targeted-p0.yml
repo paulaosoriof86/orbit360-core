@@ -1,5 +1,7 @@
 # I6.6 invoice-date payment backend only: exact immutable source after signed Preview, rollback.
 # Does NOT deploy Hosting, touch Firestore records, Rules/Auth, other Functions, or new Firebase.
+# Re-promote the same pinned artifact after I6.6 exact synthetic QA rollback
+# and its operation-ID-verified orphan cleanup (run 43471612256, PASS).
 name: Gravicentra I6.6 Payment Exact LIVE Backend Hotfix P0
 on:
   push:

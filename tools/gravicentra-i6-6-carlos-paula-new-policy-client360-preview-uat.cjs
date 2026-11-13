@@ -201,9 +201,17 @@ async function runOne(browser,actor){
         assert.ok(snapshot.size<50,'QA_CLEANUP_UNBOUNDED_'+name);
         for(const doc of snapshot.docs){
           const row=doc.data()||{};
-          assert.ok(row.__syntheticQa===true&&(row.id===ids.policy||
-            row.clienteId===ids.client),'QA_CLEANUP_NON_SYNTHETIC_HALT_'+name);
-          await doc.ref.delete();
+          // The product's derived atomic rows intentionally copy policy links
+          // and the signed operation ID, not the QA-only seed marker. The
+          // authoritatively unique QA IDs and operation prove their origin.
+          const linked=row.clienteId===ids.client&&row.tenantId===TENANT&&row.pais==='GT';
+          const exactOperation=String(row.operationId||row.operacionId||'')===operationId;
+          const exactPolicy=name==='polizas'?doc.id===ids.policy:row.polizaId===ids.policy;
+          const syntheticActivity=name==='actividades'&&doc.id==='act_'+operationId;
+          const safelyDerived=linked&&exactOperation&&(exactPolicy||syntheticActivity);
+          assert.ok(safelyDerived&&(name!=='polizas'||row.__syntheticQa===true),
+            'QA_CLEANUP_NOT_PROVEN_SYNTHETIC_HALT_'+name);
+          await doc.ref.delete({lastUpdateTime:doc.updateTime});
         }
       }catch(error){errors.push(name+':'+String(error.message||error));}
     }
@@ -218,6 +226,10 @@ async function runOne(browser,actor){
     for(const name of ['clientes','aseguradoras','polizas']){
       const id=ids[name==='clientes'?'client':name==='aseguradoras'?'insurer':'policy'];
       assert.equal((await item(name,id).get()).exists,false,'QA_FIXTURE_LEFT_BEHIND_'+name);
+    }
+    for(const name of ['actividades','vehiculos','carteraPrimas','recibosEsperados']){
+      const left=await collection(name).where('clienteId','==',ids.client).limit(1).get();
+      assert.equal(left.size,0,'QA_DERIVED_FIXTURE_LEFT_BEHIND_'+name);
     }
     console.log('I66_NEW_POLICY_'+actor.role.toUpperCase()+'_SYNTHETIC_CLEANUP_CONFIRMED');
   }
