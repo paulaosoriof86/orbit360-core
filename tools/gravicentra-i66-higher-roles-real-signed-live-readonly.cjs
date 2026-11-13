@@ -29,7 +29,10 @@ async function actorInventory(){
 }
 async function checkOne(browser,uid,requiredRole){
   const user=await auth.getUser(uid);
-  assert.ok(!user.disabled&&user.emailVerified,'I66_HIGHER_ROLE_REAL_AUTH_NOT_READY_'+requiredRole);
+  if(user.disabled||!user.emailVerified){
+    console.log('I66_HIGHER_ROLE_MEMBER_AUTH_NOT_READY_HOLD role='+requiredRole+' disabled='+Boolean(user.disabled)+' emailVerified='+Boolean(user.emailVerified)+' rightsNotRead=true');
+    return null;
+  }
   const token=await auth.createCustomToken(uid);
   const context=await browser.newContext({viewport:{width:1280,height:850}});
   try{
@@ -66,15 +69,17 @@ async function checkOne(browser,uid,requiredRole){
 }
 (async()=>{
   const groups=await actorInventory(),browser=await chromium.launch({headless:true,args:['--no-sandbox']});
-  const ok={admintenant:0,superadmin:0};
+  const ok={admintenant:0,superadmin:0},hold={admintenant:0,superadmin:0};
   try{
     for(const role of ['admintenant','superadmin']){
       for(const uid of groups[role]){
-        await checkOne(browser,uid,role);
-        ok[role]++;
+        if(await checkOne(browser,uid,role)!==null)ok[role]++;
+        else hold[role]++;
       }
     }
   }finally{await browser.close();}
-  console.log('I66_REAL_SIGNED_LIVE_HIGHER_ROLES_ALL_ACTIVE_MEMBERS_READONLY_PASS '+JSON.stringify(ok));
+  console.log('I66_REAL_SIGNED_LIVE_HIGHER_ROLES_READBACK_RESULTS '+JSON.stringify({signedPass:ok,authNotReadyHold:hold}));
+  assert.ok(ok.admintenant>0&&ok.superadmin>0,'I66_HIGHER_ROLE_NO_ACTIVE_SIGNABLE_PERSON_FOR_ONE_ROLE');
+  assert.equal(hold.admintenant+hold.superadmin,0,'I66_HIGHER_ROLE_MEMBER_AUTH_HOLD_NO_FULL_SIGNED_CERTIFICATION');
 })().catch(e=>{console.error(String(e.message||e).replace(/[^\w.:-]+/g,'_').slice(0,210));process.exitCode=1;})
   .finally(()=>admin.app().delete());
