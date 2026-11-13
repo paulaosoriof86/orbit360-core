@@ -2,7 +2,7 @@
 // Insurer-issued source schedules checked against immutable PDF-derived facts.
 // No Firebase, no customer records, no write transport in this test.
 const assert=require('node:assert/strict');
-const {issuerInstallments,receiptOrdinal,paymentOrReportEvidence,issuerSchedulePreview}=require('./gravicentra-i66-cartera-a5-a6-readonly.cjs');
+const {issuerInstallments,receiptOrdinal,paymentOrReportEvidence,issuerSchedulePreview,issuerScheduleAdjudication}=require('./gravicentra-i66-cartera-a5-a6-readonly.cjs');
 
 const general=issuerInstallments('A5.P7');
 assert.equal(general.length,10);
@@ -42,6 +42,7 @@ const conflicted=generated.map(r=>({...r}));
 conflicted[0].numeroReciboFuente='OTHER_INSURER_REF';
 conflicted[11].monto=148.03;
 conflicted[8].fechaPagoReportada='2026-11-09';
+conflicted[8].fechaLimite='2026-11-30';
 const diff=issuerSchedulePreview('A6.P4',{receipts:conflicted});
 assert.equal(diff.liveReceiptTotalCents,177636);
 assert.equal(diff.paymentOrReportEvidenceRows,1);
@@ -56,4 +57,27 @@ assert.equal(unsequenced.issuerQuotaCount,10);
 assert.equal(unsequenced.liveReceiptCount,12);
 assert.equal(unsequenced.safeToAutoApply,false);
 
-console.log('I66_A5_A6_ISSUER_DOCUMENT_SCHEDULE_PREFLIGHT_2_CASES_24_ASSERTIONS_READONLY_PASS');
+const exactAdjudication=issuerScheduleAdjudication('A6.P4',{receipts:generated});
+assert.equal(exactAdjudication.cases.length,12);
+assert.equal(exactAdjudication.statusCounts.NOOP_ALREADY_INSURER_EXACT,12);
+assert.equal(exactAdjudication.writes,0);
+const disputed=issuerScheduleAdjudication('A6.P4',{receipts:conflicted});
+assert.equal(disputed.cases[0].decision,'HOLD_EXISTING_EXTERNAL_REFERENCE_NOT_PROVEN_REPLACEABLE');
+assert.equal(disputed.cases[8].decision,'HOLD_PAYMENT_OR_REPORT_PROTECTED');
+assert.equal(disputed.cases[11].document.cents,14799);
+assert.equal(disputed.safeToAutoApply,false);
+const crossQuota=generated.map(x=>({...x}));
+crossQuota[1].numeroReciboFuente=columna[2].requirement;
+assert.equal(issuerScheduleAdjudication('A6.P4',{receipts:crossQuota}).cases[1].decision,
+  'HOLD_REFERENCE_BELONGS_TO_ANOTHER_INSURER_QUOTA');
+const extra=issuerScheduleAdjudication('A5.P7',{receipts:[...general.map(r=>({
+  serie:r.quota+'/12',monto:r.cents/100,fechaLimite:r.due,
+  numeroReciboFuente:r.requirement,estado:'Pendiente'})),
+  {serie:'11/12',monto:1,fechaLimite:'2027-06-21',numeroReciboFuente:'legacy-A'},
+  {serie:'12/12',monto:1,fechaLimite:'2027-07-21',numeroReciboFuente:'legacy-B'}]});
+assert.equal(extra.cases.length,12);
+assert.equal(extra.cases[10].decision,'HOLD_EXTRA_LIVE_QUOTA_NOT_IN_INSURER_POLICY');
+assert.equal(extra.cases[11].decision,'HOLD_EXTRA_LIVE_QUOTA_NOT_IN_INSURER_POLICY');
+assert.equal(extra.safeToAutoApply,false);
+
+console.log('I66_A5_A6_ISSUER_DOCUMENT_SCHEDULE_PREFLIGHT_AND_REFERENCE_ADJUDICATION_READONLY_PASS');

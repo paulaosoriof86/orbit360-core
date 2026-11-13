@@ -13,6 +13,10 @@ const text=x=>String(x==null?'':x).trim();
 const norm=x=>text(x).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toUpperCase().replace(/[^A-Z0-9]+/g,' ');
 const h=x=>crypto.createHash('sha256').update(JSON.stringify(x)).digest('hex').slice(0,16);
 const cents=a=>a.reduce((s,r)=>s+r.cents,0);
+const EXTERNAL_REFERENCE_FIELDS=Object.freeze([
+  'numeroReciboFuente','numeroReciboAseguradora','numeroRequerimiento',
+  'requerimiento','numeroBoleta','sourceNumber','referenciaCobro','receiptNumber'
+]);
 // These schedules are transcribed from insurer-issued 2026 PDF annexes, not
 // inferred from the application's generic monthly frequency. No client PII.
 function issuerInstallments(caseId){
@@ -75,6 +79,57 @@ function issuerSchedulePreview(caseId,snapshot){
     // source identities, a protected transaction and signed LIVE readback are
     // always required in a separate, reviewer-gated workflow.
     safeToAutoApply:false,writes:0};
+}
+// Operational mini-batch triage: show actual issuer reference conflicts, but
+// never emit client data, raw Firestore document IDs or a write permit.
+// A prior payment *report* is protected just like an already reconciled cash
+// receipt; the insurer-issued schedule cannot silently replace that history.
+function issuerScheduleAdjudication(caseId,snapshot){
+  const issued=issuerInstallments(caseId),receipts=snapshot.receipts||[];
+  if(!issued.length)return null;
+  const byQuota=new Map(),duplicates=[];
+  for(const row of receipts){
+    const quota=receiptOrdinal(row);
+    if(quota==null||byQuota.has(quota))duplicates.push(quota);
+    else byQuota.set(quota,row);
+  }
+  const officialRefs=new Set(issued.map(x=>x.requirement));
+  const cases=[];
+  for(let quota=1;quota<=Math.max(issued.length,...byQuota.keys(),0);quota++){
+    const document=issued.find(x=>x.quota===quota)||null;
+    const live=byQuota.get(quota)||null;
+    const actualReferences=live?EXTERNAL_REFERENCE_FIELDS.filter(k=>text(live[k]))
+      .map(k=>({field:k,value:text(live[k])})):[];
+    const actualDue=live?text(live.fechaLimite||live.vence||live.fechaVencimiento):'';
+    const beforeAmount=live?amount(live):null;
+    const evidence=paymentOrReportEvidence(live);
+    const exact=!!document&&!!live&&beforeAmount===document.cents&&
+      actualDue===document.due&&actualReferences.some(x=>x.value===document.requirement)&&
+      actualReferences.every(x=>x.value===document.requirement);
+    let decision='HOLD_SOURCE_EXACT_REVIEW';
+    if(!document)decision='HOLD_EXTRA_LIVE_QUOTA_NOT_IN_INSURER_POLICY';
+    else if(!live)decision='HOLD_MISSING_LIVE_QUOTA';
+    else if(exact)decision='NOOP_ALREADY_INSURER_EXACT';
+    else if(evidence)decision='HOLD_PAYMENT_OR_REPORT_PROTECTED';
+    else if(actualReferences.some(x=>x.value!==document.requirement))
+      decision=actualReferences.some(x=>officialRefs.has(x.value))?
+        'HOLD_REFERENCE_BELONGS_TO_ANOTHER_INSURER_QUOTA':
+        'HOLD_EXISTING_EXTERNAL_REFERENCE_NOT_PROVEN_REPLACEABLE';
+    else if(receipts.length!==issued.length)decision='HOLD_OVERALL_INSTALLMENT_COUNT_MISMATCH';
+    else decision='CANDIDATE_EMPTY_REFERENCE_REVIEW_REQUIRED';
+    cases.push({quota,document,live:live?{
+      cents:beforeAmount,due:actualDue,externalReferences:actualReferences,
+      paymentOrReportProtected:evidence,
+      receiptIdFingerprint:h([caseId,live.id||null,quota])
+    }:null,decision});
+  }
+  const statusCounts=cases.reduce((out,x)=>(out[x.decision]=(out[x.decision]||0)+1,out),{});
+  return {mode:'READ_ONLY_FULL_REFERENCE_ADJUDICATION_NO_AUTO_WRITE',
+    caseId,insurerQuotaCount:issued.length,liveQuotaCount:receipts.length,
+    completeQuotaIdentity:duplicates.length===0&&byQuota.size===receipts.length,
+    duplicateOrUnparseableQuotas:duplicates,
+    issuerTotalCents:cents(issued),liveTotalCents:receipts.reduce((s,r)=>s+(amount(r)||0),0),
+    cases,statusCounts,safeToAutoApply:false,writes:0};
 }
 function validateSource(){
   assert.equal(source.mode,'READ_ONLY_SOURCE_FORENSICS_NO_FINANCIAL_WRITE');
@@ -200,6 +255,7 @@ async function scan(db){
           &&(typeof v==='string'||typeof v==='number')&&String(v).length<=35)
         .map(([k,v])=>[k,v])),
       insurerIssuedPlanPreflight:issuerSchedulePreview(one.id,snapshot),
+      insurerIssuedAdjudication:issuerScheduleAdjudication(one.id,snapshot),
       receiptCandidates:snapshot.receipts.filter(r=>one.id==='A5.P7'||
         amount(r)===one.cents||[r.secuencia,r.cuota,r.numeroCuota,r.cuotaNumero]
           .some(v=>v!=null&&Number(v)===Number(one.quota)))
@@ -261,4 +317,4 @@ if(require.main===module)main().catch(e=>{
   console.error(/^I66_A5_A6_[A-Z0-9_]+$/.test(text(e.message))?e.message:'I66_A5_A6_READONLY_HOLD');
   process.exitCode=1;
 });
-module.exports={validateSource,CASES,aliases,sameInsurer,issuerInstallments,receiptOrdinal,paymentOrReportEvidence,issuerSchedulePreview};
+module.exports={validateSource,CASES,aliases,sameInsurer,issuerInstallments,receiptOrdinal,paymentOrReportEvidence,issuerSchedulePreview,issuerScheduleAdjudication};
