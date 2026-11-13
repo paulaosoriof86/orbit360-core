@@ -78,9 +78,25 @@ jobs:
           print('DRIVE_TEST_EXACT_ONE_PUBLIC_WEB_APP_SELECTED')
           PY
           app_id="$(< "$RUNNER_TEMP/gi-drive-status-app-id")"
-          node "$cli" apps:sdkconfig WEB "$app_id" --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/gi-drive-status-web-sdk.json"
-          echo "FIREBASE_WEB_SDK_CONFIG=$RUNNER_TEMP/gi-drive-status-web-sdk.json" >> "$GITHUB_ENV"
           npm ci --prefix functions --ignore-scripts --no-audit --no-fund >/dev/null
+          FIREBASE_WEB_APP_ID="$app_id" node - <<'NODE'
+          const fs=require('node:fs'),path=require('node:path'),assert=require('node:assert/strict');
+          const {GoogleAuth}=require(path.join(process.cwd(),'functions/node_modules/google-auth-library'));
+          (async()=>{
+            const project=process.env.PROJECT_ID,app=process.env.FIREBASE_WEB_APP_ID;
+            assert.equal(project,'ays-orbit-360-lab');
+            assert.ok(/^[0-9]+:[0-9]+:web:[a-f0-9]+$/i.test(app),'DRIVE_WEB_APP_ID_FORMAT');
+            const auth=new GoogleAuth({scopes:['https://www.googleapis.com/auth/cloud-platform']});
+            const token=await auth.getAccessToken();
+            const url='https://firebase.googleapis.com/v1beta1/projects/'+encodeURIComponent(project)+'/webApps/'+encodeURIComponent(app)+'/config';
+            const response=await fetch(url,{headers:{Authorization:'Bearer '+token}});
+            const config=await response.json().catch(()=>({}));
+            if(!response.ok||!config.apiKey||config.projectId!==project)throw Error('DRIVE_PUBLIC_WEB_SDK_CONFIG_UNAVAILABLE_HTTP_'+response.status);
+            fs.writeFileSync(path.join(process.env.RUNNER_TEMP,'gi-drive-status-web-sdk.json'),JSON.stringify(config),{mode:0o600});
+            console.log('DRIVE_PUBLIC_SDK_CONFIG_READ_FROM_SAME_PROJECT_GOOGLE_API');
+          })().catch(e=>{console.error(String(e&&e.message||e));process.exit(1);});
+          NODE
+          echo "FIREBASE_WEB_SDK_CONFIG=$RUNNER_TEMP/gi-drive-status-web-sdk.json" >> "$GITHUB_ENV"
       - name: Read signed Paula and Carlos LIVE document status with zero product writes
         run: |
           set -euo pipefail
