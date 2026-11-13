@@ -10,7 +10,7 @@
   "branch": "recovery/fase-a-clean-20260831",
   "forensicOriginSha": "9c95f31461f2eabe9804625b5659bee772f5602a",
   "createdAtUtc": "2026-08-31T18:00:00Z",
-  "updatedAtUtc": "2026-11-13T00:36:00Z",
+  "updatedAtUtc": "2026-11-13T00:54:13Z",
   "status": "I6_6_LIVE_CONTROLLED_PORTFOLIO_UPDATE_IN_PROGRESS",
   "currentIteration": 6,
   "lastCompletedIteration": 5,
@@ -174,6 +174,19 @@
         "financialWrites": 0,
         "next": "Resolve missing insurer policy editions and requirements, compare paid and due identities to existing receipt amounts, apply only exact protected CAS with rollback and live readback."
       },
+      "insurerIssuedScheduleAgainstLiveCausalFollowup20261112": {
+        "status": "SIGNED_DOUBLE_READ_ONLY_PASS_DOCUMENTARY_PAID_IDENTITIES_EXACT_BUT_LIVE_INSTALLMENT_SCHEDULE_CONFLICT_HOLD",
+        "canonicalReceipt": "artifacts/orbit360-recovery/release-control/I6_6_A5_A6_INSURER_ISSUED_INSTALLMENT_SCHEDULE_LIVE_DIFF_20261112.json",
+        "firstFocalRunId": 43340119256,
+        "secondFocalRunId": 43340415262,
+        "secondEvidenceArtifactId": 13999800393,
+        "aseguradoraGeneralCase": "A5_P7_1_AU_136553_10_OFFICIAL_X_Q325_86_VS_12_LIVE_X_Q271_55_SAME_TOTAL_REQUIREMENT_14518454_PAID_2026_10_09_NO_EXACT_EXPECTED_RECEIPT",
+        "columnaCase": "A6_P4_VA_57280_INSURER_4TH_OF_MONTH_SOURCE_REFS_7043045_7043056_LIVE_MOSTLY_30TH_OF_MONTH_MISSING_OR_DIFFERENT_SOURCE_REFS_AND_Q0_04_TOTAL_DELTA_REQUIREMENT_7043053_PAID_2026_11_09",
+        "safePaymentsApplied": 0,
+        "financialWrites": 0,
+        "causalBoundary": "OBSERVED_FINANCIAL_SCHEDULE_AND_REFERENCE_MISMATCH_PROVEN_IMPORTER_DEFAULT_CAUSE_NOT_YET_PROVEN",
+        "next": "Correct document-led installment schedules with protected transaction, before image, idempotency, audit and rollback only after no-conflict receipt classification and Preview QA, then exact LIVE mini-batch paid CAS."
+      },
       "freshSignedA1A4A7CurrentLiveReadback20261112": {
         "runId": 43326553828,
         "artifactId": 13992054429,
@@ -187,7 +200,7 @@
         "writes": 0,
         "next": "No paid CAS is safe until external requirement identity and matching policy edition are resolved; build deterministic missing-requirement or edition candidate with no conflicting reference and verify under PREVIEW and reversible LIVE mini-batch."
       },
-      "interpretation": "Do not silently overwrite external source numbers or mark paid; reconcile the eight conflicting references with preserved before images and a protected transaction, and adjudicate missing policies and editions before new expected receipts."
+      "interpretation": "Do not silently overwrite external source numbers or mark paid; in addition to the eight A1-A4 conflicts, two signed A5-A6 real PDF cases prove installed expected-receipt schedules themselves differ from insurer-issued 2026 schedules. Reconcile effective policy edition, due dates, quota count and external references with before images and protected transactions before creating/replacing expected receipts."
     },
     "blocks": {
       "readerParity": {
@@ -401,7 +414,7 @@
     "phaseAIterationStatuses": "HISTORICAL_FIELDS_ABOVE_PRESERVED_UNTIL_FORMAL_GATE_EVIDENCE;_NO_NEW_PASS_INFERRED",
     "labDataWriteScope": "ONLY_35_AUTHORIZED_COUNTRY_FIELDS;_NO_AUGUST_REFRESH"
   },
-  "nextAction": "I6_6_20261112_CURRENT_HOSTING_7E9_EXACT_LIVE_223_OF_223_BOTH_ORIGINS_43337771601_SIGNED_CARLOS_DIRECTION_RENEWAL_HYDRATION_SYNTHETIC_FULL_RESTORE_43338068508_PASS; NEXT_P0_FINANCIAL_A1_A7_SOURCE_IDENTITY_MISSING_INSURER_EDITION_AND_REQUIREMENT_SAFE_PROTECTED_CAS_REAL_MINIBATCH_ONLY_AFTER_NONCONFLICT_MATCH; P0_AUTHENTIC_INSURER_DOCUMENT_RENEWAL_AND_ALL_ADMIN_ROLE_COUNTRY_REGRESSION_HOLD; P1_SECURE_PASSWORD_EDIT_AND_PERMANENT_PREVIEW_CHANNEL_QUOTA_RETENTION; B4_007_STAYS_CLOSED_NO_UNVERIFIED_PRODUCTION_ACCEPTED",
+  "nextAction": "I6_6_20261112_CURRENT_HOSTING_7E9_EXACT_LIVE_223_OF_223_BOTH_ORIGINS_43337771601_SIGNED_CARLOS_DIRECTION_RENEWAL_HYDRATION_SYNTHETIC_FULL_RESTORE_43338068508_PASS; NEXT_P0_FINANCIAL_A5_P7_AND_A6_P4_OFFICIAL_INSURER_PDF_VS_LIVE_EXPECTED_RECEIPT_SCHEDULE_CONFLICT_SIGNED_READONLY_43340415262_RESOLVE_EDITION_REQUIREMENT_DUE_QUOTA_AMOUNT_IN_PREVIEW_WITH_PROTECTED_IDEMPOTENT_ROLLBACK_THEN_LIVE_EXACT_CAS; REMAINING_A1_A7_SOURCE_IDENTITY_CASES_HOLD; P0_AUTHENTIC_INSURER_DOCUMENT_RENEWAL_AND_ADMIN_COUNTRY_ROLE_MATRIX_HOLD; P1_SECURE_PASSWORD_EDIT_AND_PERMANENT_PREVIEW_CHANNEL_QUOTA_RETENTION; B4_007_STAYS_CLOSED_NO_UNVERIFIED_PRODUCTION_ACCEPTED",
   "sourceOfTruth": {
     "projectBoundaryPrevalentAddendum": "orbit360-platform/docs/recovery/ADDENDUM_PREVALENTE_CHATGPT_PROJECT_BOUNDARY_20260831.md",
     "mutableState": "orbit360-platform/docs/recovery/orbit360-recovery-state-v1.json",
