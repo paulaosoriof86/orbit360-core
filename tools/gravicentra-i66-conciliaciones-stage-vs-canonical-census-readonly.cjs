@@ -33,12 +33,33 @@ async function main(){
       rows.forEach(r=>Object.keys(r).filter(k=>/^[a-zA-Z][a-zA-Z0-9_]{0,44}$/.test(k)).forEach(k=>keys.add(k)));
       stageProposalShape={sampled:rows.length,fieldNames:[...keys].sort(),
         withPolicyLink:rows.filter(r=>has(r,['polizaId','policyId','poliza_id'])).length,
+        withPolicyNumber:rows.filter(r=>has(r,['policyNumber','numeroPoliza','polizaNumero'])).length,
         withClientLink:rows.filter(r=>has(r,['clienteId','clientId','cliente_id'])).length,
         withReceiptLink:rows.filter(r=>has(r,['reciboId','receiptId','recibo_id'])).length,
         withCountry:rows.filter(r=>has(r,['pais','country'])).length,
         withAdvisor:rows.filter(r=>has(r,['asesorId','advisorId'])).length,
-        withAmount:rows.filter(r=>has(r,['monto','total','saldo','montoAplicar','importe'])).length,
-        withSourceReference:rows.filter(r=>has(r,['source_ref','sourceRef','fuente','sourceId'])).length};
+        withAmount:rows.filter(r=>has(r,['amount','monto','total','saldo','montoAplicar','importe'])).length,
+        withSourceReference:rows.filter(r=>has(r,['sourceRowId','source_ref','sourceRef','fuente','sourceId'])).length};
+      const policies=await data('polizas').limit(3500).get();
+      assert.ok(policies.size<3500,'I66_CONCILIACIONES_POLICY_CATALOG_SCAN_LIMIT');
+      const normalize=v=>String(v??'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toUpperCase().replace(/[^A-Z0-9]/g,'');
+      const byNumber=new Map();
+      for(const doc of policies.docs){
+        const p=doc.data()||{}, aliases=new Set(['numero','numeroPoliza','numero_poliza','numPoliza','polizaNumero','policyNumber']
+          .map(k=>normalize(p[k])).filter(Boolean));
+        for(const key of aliases){if(!byNumber.has(key))byNumber.set(key,[]);byNumber.get(key).push(p);}
+      }
+      const matches=rows.map(r=>byNumber.get(normalize(r.policyNumber||r.numeroPoliza||r.polizaNumero))||[]);
+      const unique=matches.filter(x=>x.length===1).map(x=>x[0]);
+      stageProposalShape.policyJoinReadOnly={
+        canonicalPolicyDocsScanned:policies.size,
+        uniquePolicyNumberMatches:matches.filter(x=>x.length===1).length,
+        policyNumberNotFound:matches.filter(x=>x.length===0).length,
+        ambiguousPolicyNumberMatches:matches.filter(x=>x.length>1).length,
+        uniqueWithExplicitCountry:unique.filter(p=>['GT','CO'].includes(String(p.pais||p.country||'').toUpperCase())).length,
+        uniqueWithCanonicalClientId:unique.filter(p=>!!(p.clienteId||p.clientId)).length,
+        uniqueWithAdvisorId:unique.filter(p=>!!(p.asesorId||p.advisorId||p.ownerAdvisorId)).length
+      };
     }
   }
   const verdict=!activeRunId?'HOLD_NO_ACTIVE_LEDGER_POINTER':!manifestExists?'HOLD_ACTIVE_LEDGER_RUN_MISSING':
