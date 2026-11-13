@@ -1,0 +1,87 @@
+name: Gravicentra I6.6 Drive Signed Status Read-Only LIVE
+on:
+  push:
+    branches: [recovery/fase-a-clean-20260831]
+    paths:
+      - .github/workflows/gravicentra-i66-drive-signed-status-readonly.yml
+      - tools/gravicentra-i66-drive-signed-status-readonly.cjs
+permissions:
+  contents: read
+concurrency:
+  group: gi-i66-drive-status-readonly
+  cancel-in-progress: false
+jobs:
+  verify-signed-document-access:
+    if: github.repository == 'paulaosoriof86/orbit360-core' && github.ref == 'refs/heads/recovery/fase-a-clean-20260831'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      PROJECT_ID: ays-orbit-360-lab
+      SA_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_ALT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Exact source and no-write test guard
+        run: |
+          set -euo pipefail
+          node --check tools/gravicentra-i66-drive-signed-status-readonly.cjs
+          node - <<'NODE'
+          const assert=require('node:assert/strict');
+          const p=require('./artifacts/orbit360-recovery/release-control/I6_6_LATEST_EXACT_LIVE_POINTER_20261113.json');
+          assert.equal(p.currentLiveSourceSha,'586401bfbe1a80cfef2820982f432743af36b108');
+          assert.equal(p.currentLiveHostingVersion,'sites/ays-orbit-360-lab/versions/1dd873081501d7fb');
+          assert.equal(p.fullI66ProductionAccepted,false);
+          console.log('DRIVE_SIGNED_STATUS_TEST_EXACT_R9_LIVE_READONLY');
+          NODE
+      - name: Select same-project existing service account and public web configuration
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/gi-drive-status-auth"
+          python3 - <<'PY'
+          import os,json,pathlib
+          root=pathlib.Path(os.environ['RUNNER_TEMP'])/'gi-drive-status-auth'
+          found=[]
+          for i,k in enumerate(('SA_LAB','SA_ALT','SA_DEFAULT')):
+              try:v=json.loads(os.environ.get(k,''))
+              except (ValueError,TypeError):continue
+              if v.get('type')=='service_account' and v.get('project_id')=='ays-orbit-360-lab' and v.get('private_key'):
+                  f=root/f'{i}.json';f.write_text(json.dumps(v));f.chmod(0o600);found.append(str(f))
+          if not found:raise SystemExit('DRIVE_SAME_PROJECT_TEST_CREDENTIAL_UNAVAILABLE')
+          (root/'candidates').write_text('\n'.join(found)+'\n')
+          PY
+          npm install --prefix "$RUNNER_TEMP/gi-drive-status-cli" --no-save --ignore-scripts --no-audit --no-fund firebase-tools@14.10.1 >/dev/null
+          node tools/gravicentra-firebase-tools-empty-extensions-workaround-v1.mjs "$RUNNER_TEMP/gi-drive-status-cli"
+          cli="$RUNNER_TEMP/gi-drive-status-cli/node_modules/firebase-tools/lib/bin/firebase.js"
+          selected=''
+          while IFS= read -r candidate; do
+            if GOOGLE_APPLICATION_CREDENTIALS="$candidate" node "$cli" apps:list WEB --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/gi-drive-status-apps.json" 2>/dev/null; then selected="$candidate"; break; fi
+          done < "$RUNNER_TEMP/gi-drive-status-auth/candidates"
+          test -n "$selected" || { echo DRIVE_FIREBASE_APP_LOOKUP_UNAVAILABLE; exit 1; }
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$selected" >> "$GITHUB_ENV"
+          python3 - <<'PY'
+          import json,os
+          x=json.load(open(os.environ['RUNNER_TEMP']+'/gi-drive-status-apps.json'))
+          rows=x.get('result',x) if isinstance(x,dict) else x
+          if isinstance(rows,dict):rows=rows.get('apps',[])
+          if not isinstance(rows,list) or len(rows)!=1:raise SystemExit('DRIVE_TEST_PUBLIC_WEB_APP_NONUNIQUE')
+          row=rows[0]
+          app=row.get('appId') or row.get('app_id')
+          if not app:raise SystemExit('DRIVE_TEST_PUBLIC_WEB_APP_ID_ABSENT')
+          with open(os.environ['RUNNER_TEMP']+'/gi-drive-status-app-id','w') as f:f.write(app)
+          print('DRIVE_TEST_EXACT_ONE_PUBLIC_WEB_APP_SELECTED')
+          PY
+          app_id="$(< "$RUNNER_TEMP/gi-drive-status-app-id")"
+          node "$cli" apps:sdkconfig WEB "$app_id" --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/gi-drive-status-web-sdk.json"
+          echo "FIREBASE_WEB_SDK_CONFIG=$RUNNER_TEMP/gi-drive-status-web-sdk.json" >> "$GITHUB_ENV"
+          npm ci --prefix functions --ignore-scripts --no-audit --no-fund >/dev/null
+      - name: Read signed Paula and Carlos LIVE document status with zero product writes
+        run: |
+          set -euo pipefail
+          NODE_PATH="$GITHUB_WORKSPACE/functions/node_modules" node tools/gravicentra-i66-drive-signed-status-readonly.cjs
