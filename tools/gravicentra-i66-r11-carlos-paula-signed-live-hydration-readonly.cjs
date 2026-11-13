@@ -64,6 +64,7 @@ async function checkActor(browser,a){
       return {started:started?.started===true,preview:provider.isI66PreviewHost(),
         role:Orbit.session?.rol?.(),canManage:Orbit.issuance.canManage()};
     },a.token);
+    console.log('I66_R11_DIAG_ROLE_'+a.role.toUpperCase()+' '+JSON.stringify({started:role.started,previewExpected:!LIVE,previewObserved:role.preview,roleMatches:norm(role.role)===a.role,canManage:role.canManage}));
     assert.ok(role.started&&(LIVE?!role.preview:role.preview)&&norm(role.role)===a.role&&role.canManage,
       'I66_PREVIEW_AUTH_OR_ROLE_INCOMPLETE_'+a.role);
     const evaluation=await page.evaluate(async managementId=>{
@@ -82,6 +83,7 @@ async function checkActor(browser,a){
           snapshotErrors:after.snapshotErrors||{},pageErrors:[]};
       }finally{store._ensureCollections=original;}
     },'i66qa_missing_management_'+crypto.randomBytes(8).toString('hex'));
+    console.log('I66_R11_DIAG_SOURCES_'+a.role.toUpperCase()+' '+JSON.stringify({deferred:evaluation.deferred,requestedExact:['gestiones','polizas','vehiculos','clientes'].join('|')===([].concat(evaluation.requests[0]||[]).join('|')),missingGestionProtected:evaluation.errors.includes('gestion_renovacion_aceptada_no_encontrada'),confirmedRequired:['gestiones','polizas','vehiculos','clientes'].every(x=>evaluation.confirmed.includes(x)),deniedAny:['gestiones','polizas','vehiculos','clientes'].some(x=>evaluation.denied.includes(x)||evaluation.snapshotErrors[x])}));
     assert.equal(evaluation.deferred,true,'I66_PREVIEW_DEFERRED_PRECONDITION_NOT_OBSERVED');
     assert.deepEqual(evaluation.requests[0],['gestiones','polizas','vehiculos','clientes'],
       'I66_PREVIEW_DIRECT_RENEWAL_DID_NOT_REQUEST_AUTHORITATIVE_SOURCES');

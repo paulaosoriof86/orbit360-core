@@ -1,0 +1,50 @@
+# After automatic R11 LIVE rollback: compare signed real-role read-only hydration
+# on R11 Preview and previously accepted R10 LIVE without deploying or writing.
+name: Gravicentra I6.6 R11 Preview LIVE Hydration Causal READONLY
+on:
+  push:
+    branches: [recovery/fase-a-clean-20260831]
+    paths:
+      - .github/workflows/gravicentra-i66-r11-live-hydration-causal-readonly.yml
+permissions:
+  contents: read
+jobs:
+  signed-real-role-isolation:
+    if: github.repository == 'paulaosoriof86/orbit360-core' && github.ref_name == 'recovery/fase-a-clean-20260831'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      SA_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_ALT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify untouched LIVE R10 and signed Preview R11 build markers
+        run: |
+          set -euo pipefail
+          node --check tools/gravicentra-i66-r11-carlos-paula-signed-live-hydration-readonly.cjs
+          node - <<'NODE'
+          (async()=>{
+            const rows=[['https://app.aysseguros.com','851d68441b819eac6dd37ec1d5d15fb971e35bf2'],
+              ['https://ays-orbit-360-lab--gi-i66-rc-42868854629-abj14q6n.web.app','84769378eb2014addebfefdbdd63091bddc4b817']];
+            for(const [u,sha] of rows){const r=await fetch(u+'/__recovery__/build.json',{headers:{'cache-control':'no-cache'}});
+              if(!r.ok||(await r.json()).sourceSha!==sha)throw Error('I66_R11_DIAG_HOSTING_BUILD_DRIFT');}
+            console.log('I66_R11_DIAG_R10_LIVE_R11_PREVIEW_SOURCES_PINNED_PASS');
+          })().catch(e=>{console.error(e.message);process.exitCode=1;});
+          NODE
+      - name: Install signed read-only browser dependencies
+        run: |
+          set -euo pipefail
+          npm install --no-save --package-lock=false --ignore-scripts --no-audit --no-fund firebase-admin@13.4.0 playwright@1.55.0 >/dev/null
+          node node_modules/playwright/cli.js install --with-deps chromium >/dev/null
+      - name: Run signed R10 LIVE root difference diagnostic without writes
+        env:
+          I66_PREVIEW_ORIGIN: https://app.aysseguros.com
+          I66_SOURCE_SHA: 851d68441b819eac6dd37ec1d5d15fb971e35bf2
+          I66_SIGNED_TEST_LIVE: 'true'
+        run: node tools/gravicentra-i66-r11-carlos-paula-signed-live-hydration-readonly.cjs
