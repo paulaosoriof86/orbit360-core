@@ -159,13 +159,13 @@
   "requiredCanonicalOrigin": "https://ays-orbit-360-lab.web.app",
   "requiredStaffOrigin": "https://app.aysseguros.com",
   "originReadbackRequirement": "BOTH_HOSTS_IDENTICAL_TO_SAME_ARTIFACT_OR_ROLLBACK",
-  "forbidBackendFunctionDeploy": false,
+  "forbidBackendFunctionDeploy": true,
   "forbidFirestoreRulesDataAuthWrites": true,
   "rollback": "FRONTEND_TOPBAR_PREVIEW_FIRST; KEEP BOTH LIVE HOSTING ORIGINS AND COBROS FUNCTION UNCHANGED UNTIL EXACT_ARTIFACT_PREVIEW_PASS; THEN BACKUP_AND_ATOMIC_EXACT_ARTIFACT_LIVE_PROMOTION_WITH_REHASH_AND_ROLLBACK",
   "immutableArtifactId": 13984026378,
   "immutableArtifactZipDigest": "sha256:f51907a610ca467b7bf840652a3f3e9983a7f9913f5d279e01fa34a539123dbc",
   "sourcePreviewUrl": "https://ays-orbit-360-lab--gi-i66-rc-43305281214-hr641g40.web.app",
-  "backendFunctionPreviewOnly": true,
+  "backendFunctionPreviewOnly": false,
   "carlosSignedTransversalQaReceipt20261112": {
     "sourceSha": "b86cad550fadc050e8574678f02f3097caa8b5bd",
     "immutableHostingPreviewRunId": 43299843267,
@@ -202,7 +202,7 @@
     "syntheticLedgerRequestEventRestored": true,
     "livePromotionAccepted": false
   },
-  "forbidBackendLiveFunctionDeploy": false,
+  "forbidBackendLiveFunctionDeploy": true,
   "readerPreviewAuthorization": {
     "authorizedBy": "Paula Andrea Osorio Franco, Direccion",
     "authorizedAtGuatemala": "2026-11-11",
