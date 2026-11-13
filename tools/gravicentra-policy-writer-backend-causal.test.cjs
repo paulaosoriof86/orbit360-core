@@ -63,6 +63,12 @@ class Element {
     if (m) return this.nodes.filter(x=>Object.hasOwn(x.attrs,m[1]));
     return [];
   }
+  matches(selector) {
+    return String(selector).split(',').some(part=>{
+      const m=part.trim().match(/^\[([:\w-]+)\]$/);
+      return !!m&&Object.hasOwn(this.attrs,m[1]);
+    });
+  }
   appendChild(el){this.children.push(el);if(el.id)this.doc.ids.set(el.id,el);return el;}
   addEventListener(name,fn){if(!this.listeners.has(name))this.listeners.set(name,[]);this.listeners.get(name).push(fn);}
   async fire(name){for(const fn of this.listeners.get(name)||[])await fn({target:this,preventDefault(){},stopPropagation(){}});}
