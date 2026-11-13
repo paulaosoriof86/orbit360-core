@@ -209,7 +209,11 @@ async function runOne(browser,actor){
           const exactPolicy=name==='polizas'?doc.id===ids.policy:row.polizaId===ids.policy;
           const syntheticActivity=name==='actividades'&&doc.id==='act_'+operationId;
           const safelyDerived=linked&&exactOperation&&(exactPolicy||syntheticActivity);
-          assert.ok(safelyDerived&&(name!=='polizas'||row.__syntheticQa===true),
+          // Preview's synthetic callable can also materialize additional
+          // marked, same-client activity rows with a separate audit identity.
+          // Live has no marker on atomic derivatives and MUST match op+policy.
+          const explicitlyMarked=row.clienteId===ids.client&&row.__syntheticQa===true;
+          assert.ok((safelyDerived||explicitlyMarked)&&(name!=='polizas'||row.__syntheticQa===true),
             'QA_CLEANUP_NOT_PROVEN_SYNTHETIC_HALT_'+name);
           await doc.ref.delete({lastUpdateTime:doc.updateTime});
         }
