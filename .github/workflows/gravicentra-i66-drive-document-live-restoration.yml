@@ -57,6 +57,8 @@ jobs:
           assert.equal(a?.allowFinancialRecordWrites,false);
           assert.equal(a?.allowHostingPromotion,false);
           assert.equal(a?.allowFirestoreRulesChange,false);
+          assert.equal(a?.provisionProductionOAuthFromExistingGoogleProvider,true);
+          assert.equal(a?.doNotCopyPreviewSecrets,true);
           assert.equal(control.noHostingPromotion,true);
           assert.equal(control.forbidFirestoreRulesDataAuthWrites,true);
           assert.equal(control.currentExactHostingRelease.sourceSha,process.env.SOURCE_R9);
@@ -92,12 +94,51 @@ jobs:
       - uses: google-github-actions/setup-gcloud@v2
         with:
           version: '>= 483.0.0'
-      - name: Inspect LIVE functions and required production secret without exposing credentials
+      - name: Provision missing production OAuth binding from the same existing Identity Platform provider
         run: |
           set -euo pipefail
           gcloud auth activate-service-account --key-file="$GOOGLE_APPLICATION_CREDENTIALS" --quiet >/dev/null
           gcloud config set project "$PROJECT_ID" --quiet >/dev/null
-          gcloud secrets describe ORBIT360_DRIVE_OAUTH_CLIENT_PRODUCTION --project "$PROJECT_ID" --format='value(name)' >/dev/null
+          CLIENT_SECRET=ORBIT360_DRIVE_OAUTH_CLIENT_PRODUCTION
+          if ! gcloud secrets describe "$CLIENT_SECRET" --project "$PROJECT_ID" --format='value(name)' >/dev/null 2>&1; then
+            PROD_OAUTH_CLIENT_FILE="$RUNNER_TEMP/gi-drive-prod-oauth-client.json"
+            export PROD_OAUTH_CLIENT_FILE
+            (cd functions && node - <<'NODE'
+          const fs=require('node:fs'),assert=require('node:assert/strict');
+          const {GoogleAuth}=require('google-auth-library');
+          (async()=>{
+            const project=process.env.PROJECT_ID;
+            assert.equal(project,'ays-orbit-360-lab');
+            const auth=new GoogleAuth({scopes:['https://www.googleapis.com/auth/cloud-platform']});
+            const token=await auth.getAccessToken();
+            const url='https://identitytoolkit.googleapis.com/v2/projects/'+encodeURIComponent(project)+'/defaultSupportedIdpConfigs/google.com';
+            const response=await fetch(url,{headers:{Authorization:'Bearer '+token}});
+            const body=await response.json().catch(()=>({}));
+            if(!response.ok||body.enabled!==true||!body.clientId||!body.clientSecret)throw Error('DRIVE_EXISTING_SAME_PROJECT_GOOGLE_PROVIDER_NOT_READY');
+            const config={clientId:String(body.clientId),clientSecret:String(body.clientSecret)};
+            fs.writeFileSync(process.env.PROD_OAUTH_CLIENT_FILE,JSON.stringify(config),{mode:0o600});
+            console.log('DRIVE_EXISTING_GOOGLE_IDENTITY_PROVIDER_READ_OK_SECRET_CONTENT_NOT_LOGGED');
+          })().catch(e=>{console.error(String(e&&e.message||e));process.exit(1);});
+          NODE
+            )
+            node "$FIREBASE_CLI_BIN" functions:secrets:set "$CLIENT_SECRET" --data-file "$PROD_OAUTH_CLIENT_FILE" --project "$PROJECT_ID" --non-interactive >/dev/null
+            rm -f "$PROD_OAUTH_CLIENT_FILE"
+            echo 'DRIVE_PRODUCTION_CLIENT_OAUTH_SECRET_CREATED_FROM_CANONICAL_GOOGLE_PROVIDER'
+          else
+            echo 'DRIVE_EXISTING_PRODUCTION_OAUTH_SECRET_PRESERVED_NO_ROTATION'
+          fi
+          if ! gcloud secrets versions list "$CLIENT_SECRET" --project "$PROJECT_ID" --filter='state=ENABLED' --format='value(name)' --limit=1 | grep -q .; then
+            echo DRIVE_PRODUCTION_OAUTH_SECRET_VERSION_NOT_ENABLED
+            exit 1
+          fi
+          if gcloud secrets describe orbit360-drive-oauth-alianzas-soluciones --project "$PROJECT_ID" --format='value(name)' >/dev/null 2>&1; then
+            echo 'DRIVE_TENANT_OAUTH_VAULT_EXISTS_STATUS_NOT_YET_CERTIFIED'
+          else
+            echo 'DRIVE_TENANT_OAUTH_VAULT_ABSENT_ADMIN_ONE_TIME_CONNECTION_MAY_BE_REQUIRED'
+          fi
+      - name: Inventory existing LIVE document functions before any function deployment
+        run: |
+          set -euo pipefail
           node - <<'NODE'
           const fs=require('node:fs'),path=require('node:path'),assert=require('node:assert/strict');
           const b=require(path.join(process.env.RUNNER_TEMP,'gi-drive-functions-before.json'));

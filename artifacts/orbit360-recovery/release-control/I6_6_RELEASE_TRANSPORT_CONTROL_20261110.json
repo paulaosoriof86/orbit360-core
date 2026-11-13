@@ -940,7 +940,7 @@
     "actualFinancialWrites": 0
   },
   "i66DriveDocumentLiveRestorationAuthorization20261113": {
-    "status": "SCOPED_LIVE_DOCUMENT_FUNCTION_RESTORATION_AUTHORIZED_AND_PENDING",
+    "status": "EXISTING_SAME_PROJECT_GOOGLE_OAUTH_PRODUCTION_BINDING_PROVISIONING_AUTHORIZED",
     "authorizedBy": "Paula Dirección",
     "authorityDate": "2026-11-13",
     "purpose": "restore_missing_production_document_callables_only",
@@ -966,6 +966,13 @@
     "allowFirestoreRulesChange": false,
     "requireLiveRoutesHttp400": true,
     "requireRealCarlosPdfWriteReadbackBeforeOperationalPass": true,
-    "preExistingBusinessDataUntouched": true
+    "preExistingBusinessDataUntouched": true,
+    "firstPreflightRunId": 43490232427,
+    "firstPreflightOutcome": "HALTED_BEFORE_DEPLOYMENT_MISSING_PRODUCTION_OAUTH_CLIENT_SECRET",
+    "provisionProductionOAuthFromExistingGoogleProvider": true,
+    "doNotCopyPreviewSecrets": true,
+    "doNotCreateNewOAuthClient": true,
+    "doNotRotateExistingProductionSecret": true,
+    "neverLogClientSecret": true
   }
 }
