@@ -78,7 +78,7 @@ jobs:
           mkdir -p "$root/functions" "$root/services" "$root/versions"
           gcloud auth activate-service-account --key-file="$GOOGLE_APPLICATION_CREDENTIALS" --quiet >/dev/null 2>&1
           gcloud config set project "$PROJECT_ID" --quiet >/dev/null 2>&1
-          if gcloud secrets list --project "$PROJECT_ID" --format=json > "$root/secrets.json" 2> "$root/secrets.err"; then
+          if gcloud secrets list --project "$PROJECT_ID" --format=json > "$root/secrets.json" 2> "$root/secrets.err" && python3 -c 'import json,sys; assert isinstance(json.load(open(sys.argv[1])),list)' "$root/secrets.json" >/dev/null 2>&1; then
             : > "$root/secrets-readable"
           fi
           if gcloud functions list --v2 --regions="$REGION" --project "$PROJECT_ID" --format=json > "$root/functions-list.json" 2> "$root/functions.err"; then
