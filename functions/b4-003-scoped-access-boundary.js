@@ -86,12 +86,13 @@ function resolve({auth,member,config,tenantId,activeRole,collection,country}){
   const ceiling=configured&&order[configured]<order[maxScope]?configured:maxScope;
   effective=requested?(order[requested]<=order[ceiling]?requested:ceiling):
     (configured?ceiling:(collection==='cancelaciones'&&self.has(role)?'own':'none'));
-  // Tenant role=all owns the portfolio READ scope even when a legacy
-  // membership contains own/team. No other modules or countries are widened.
+  // Each privileged role with tenant role=all owns the approved business
+  // portfolio READ scope even with a legacy own/team membership default.
+  // No other modules, countries or advisor roles are widened.
   // The scoped reader is read-only; durable writers retain separate guards.
   if(['clientes','polizas','vehiculos','cobros','carteraPrimas','recibosEsperados',
-      'negocios','gestiones','tareas'].includes(collection) &&
-     ['operativo','admintenant','admin_tenant'].includes(role) &&
+      'negocios','gestiones','tareas','actividades','cancelaciones','reclamos','comisiones'].includes(collection) &&
+     ['operativo','direccion','superadmin','super_admin','admintenant','admin_tenant','admin'].includes(role) &&
      configured==='all' && moduleRequested!=='none' && requested!=='none') effective='all';
  }
  if(effective==='none')deny('SCOPE_NONE');

@@ -189,14 +189,15 @@ function effectiveScope(member,accessConfig,role,moduleKey){
   const ds=member&&member.dataScopes&&typeof member.dataScopes==='object'?member.dataScopes:{},mods=ds.modules&&typeof ds.modules==='object'?ds.modules:{};
   let requested=normalizedScope(moduleScopeValue(mods,moduleKey)); if(!requested)requested=normalizedScope(ds.default||member.scopeDatos||member.dataScope);
   const ceiling=roleScope(accessConfig,role);
-  // A signed Operativo role may manage any advisor in the SAME authorized
-  // country when the tenant explicitly grants that role portfolio-wide scope.
-  // A legacy Asesor own-only profile is not allowed to shrink that active role;
-  // an explicit none, module deny, missing country or another tenant still denies.
+  // An active privileged business role may manage any advisor in the SAME
+  // authorized country when the tenant explicitly grants portfolio-wide scope.
+  // Legacy personal Asesor defaults cannot shrink Operativo OR its superiors;
+  // explicit NONE, module denial, country and tenant guards still prevail.
   const configured=accessConfig&&accessConfig.roleScopes&&typeof accessConfig.roleScopes==='object'?accessConfig.roleScopes:{};
   const roleKey=Object.keys(configured).find(k=>norm(k)===norm(role));
   const explicitRoleScope=roleKey?normalizedScope(configured[roleKey]):'';
-  if(norm(role)==='operativo'&&['polizas','cliente360','cobros','ops','leads'].includes(norm(moduleKey))&&
+  if(['operativo','direccion','superadmin','super_admin','admintenant','admin_tenant','admin'].includes(norm(role))&&
+     ['polizas','cliente360','cobros','ops','leads','cancelaciones','siniestros','comisiones'].includes(norm(moduleKey))&&
      explicitRoleScope==='all'&&requested!=='none')return 'all';
   if(!requested)return ceiling;return scopeRank(requested)<=scopeRank(ceiling)?requested:ceiling;
 }

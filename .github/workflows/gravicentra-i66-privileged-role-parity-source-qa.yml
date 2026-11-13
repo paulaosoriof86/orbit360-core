@@ -1,0 +1,61 @@
+name: Gravicentra I6.6 Privileged Operational Role Parity Source QA
+on:
+  push:
+    branches: [recovery/fase-a-clean-20260831]
+    paths:
+      - .github/workflows/gravicentra-i66-privileged-role-parity-source-qa.yml
+      - functions/b4-003-scoped-access-boundary.js
+      - functions/product-operational-domain.js
+      - functions/product-ops-leads-domain.js
+      - orbit360-platform/core/access-scope.js
+      - tools/gravicentra-i6-6-privileged-role-portfolio-parity.test.cjs
+      - tools/gravicentra-i6-6-privileged-role-writer-transaction.test.cjs
+      - artifacts/orbit360-recovery/release-control/I6_6_APPROVED_PRODUCT_DELTA_MANIFEST_20261110.json
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: gi-i66-privileged-role-parity-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  signed-source-gate-no-production-writes:
+    if: github.repository == 'paulaosoriof86/orbit360-core' && github.ref == 'refs/heads/recovery/fase-a-clean-20260831'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 16
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Source test with 5 roles, 12 domain writers and explicit negative boundaries
+        run: |
+          set -euo pipefail
+          node --check functions/b4-003-scoped-access-boundary.js
+          node --check functions/product-operational-domain.js
+          node --check functions/product-ops-leads-domain.js
+          node --check orbit360-platform/core/access-scope.js
+          node --test tools/gravicentra-i6-6-privileged-role-portfolio-parity.test.cjs \
+            tools/gravicentra-i6-6-privileged-role-writer-transaction.test.cjs
+          node tools/gravicentra-b4-003-financial-role-scope-transversal.test.cjs
+          node tools/gravicentra-b4-003-scoped-boundary.test.cjs
+          node tools/gravicentra-b4-003-ops-leads-role-scopes.test.cjs
+          node tools/gravicentra-b4-003-operational-write-security-regression.test.cjs > "$RUNNER_TEMP/gi-operational-regression.json"
+          node tools/gravicentra-i6-6-payment-country-write-boundary.test.cjs
+          node tools/gravicentra-i6-6-auth-session-write-coherence.test.cjs
+          echo 'I66_PRIVILEGED_ROLE_SYNTHETIC_SOURCE_REGRESSION_PASS_NO_CUSTOMER_WRITES_NO_DEPLOY'
+      - name: Canonical source blob and historic release guard without re-opening B4
+        run: |
+          set -euo pipefail
+          node tools/gravicentra-i6-6-delta-guard.mjs
+          echo 'I66_APPROVED_ROLE_SOURCE_LINEAGE_GUARD_PASS_PREVIEW_AND_LIVE_STILL_PENDING'
+      - name: Preserve source-only validation receipt
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gi-i66-role-parity-source-only-${{ github.run_id }}
+          path: ${{ runner.temp }}/gi-operational-regression.json
+          if-no-files-found: warn
+          retention-days: 14

@@ -185,10 +185,16 @@ Orbit.access = (function () {
     if (moduleKey === 'aseguradoras' &&
         ['Operativo', 'Admin', 'AdminTenant', 'SuperAdmin', 'Dirección'].indexOf(role) >= 0)
       return roleScopeCeiling(moduleKey) === 'all';
-    return (role === 'Operativo' || role === 'AdminTenant') &&
-      (moduleKey === 'polizas' || moduleKey === 'cliente360' || moduleKey === 'cobros' ||
-       (role === 'Operativo' && (moduleKey === 'ops' || moduleKey === 'leads'))) &&
-      normalizeScope(scopes[role]) === 'all';
+    // All approved operational roles inherit the same in-country portfolio
+    // access. A legacy personal Asesor default must not shrink Dirección or
+    // Admin's active-role grant; it must also never widen an explicit NONE.
+    // Module visibility/edit rights and the signed country/tenant boundaries
+    // are checked separately. No direct finance/secret writer is added here.
+    var privileged = ['operativo', 'admin', 'admintenant', 'superadmin', 'direccion'];
+    var business = ['polizas', 'cliente360', 'cobros', 'ops', 'leads', 'cancelaciones', 'siniestros', 'comisiones'];
+    var configuredKey = Object.keys(scopes).find(function (key) { return norm(key) === norm(role); });
+    return privileged.indexOf(norm(role)) >= 0 && business.indexOf(moduleKey) >= 0 &&
+      configuredKey !== undefined && normalizeScope(scopes[configuredKey]) === 'all';
   }
   function dataScope(moduleKey) {
     if (!roleIsAssigned()) return 'none';
@@ -343,6 +349,11 @@ Orbit.access = (function () {
     record = record || {}; opts = opts || {};
     try {
       if (!puedeVerModulo(moduleKey)) return false;
+      var member = signedProductMembership();
+      // A stale cross-tenant browser projection is never a readable or
+      // writable record merely because its country and advisor match.
+      var currentTenant = member ? (clean(member.tenantId) || tenantId()) : '';
+      if (member && clean(record.tenantId) && (!currentTenant || clean(record.tenantId) !== currentTenant)) return false;
       var country = clean(opts.pais || record.pais);
       // A missing/unresolved country is never part of a full role portfolio.
       if (roleWidePortfolioScope(moduleKey) &&

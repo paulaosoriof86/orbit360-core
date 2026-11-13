@@ -75,13 +75,14 @@ function scope(m,domain,activeRole,accessConfig){
  const raw=domain==='leads'?(modules.leads??ds.leads??ds.commercial??ds.default):
    (modules.ops??modules.gestiones??ds.ops??ds.workflow??ds.gestiones??ds.default);
  const value=norm(raw??m.scopeDatos??m.dataScope),role=norm(activeRole);
- // The assigned Operativo role can manage the authorized country-wide
- // workflow when the signed tenant explicitly grants that role all-scope.
+ // Privileged operational roles inherit the same authorized country-wide
+ // portfolio scope when the signed tenant grants each role all-scope.
  // An explicit module NONE still denies; Asesor never inherits this grant.
  const byRole=accessConfig&&accessConfig.roleScopes||{};
  const roleKey=Object.keys(byRole).find(k=>norm(k)===role);
  const roleScope=roleKey===undefined?'':norm(byRole[roleKey]);
- if(role==='operativo'&&['all','todos','global'].includes(roleScope)&&
+ if(['operativo','direccion','superadmin','super_admin','admintenant','admin_tenant','admin'].includes(role)&&
+    ['all','todos','global'].includes(roleScope)&&
     !['none','ninguno','sin_acceso'].includes(value))return'all';
  if(['asesor','asesora','asesor_sr','asesora_sr','asesor_jr','asesora_jr','comercial'].includes(role))
    return ['none','ninguno','sin_acceso'].includes(value)?'none':'own';
@@ -129,16 +130,17 @@ function workflowAuthorizationDomain(authz,operation,entityType,before,payload,c
   return'leads';
 }
 function workflowRoleModuleAllowed(authz,moduleKey,row){
- // Operativo's privileged fallback must still honor signed module restrictions
- // and explicit tenant matrix denials. Advisor self-service is unchanged.
- if(norm(authz&&authz.actor&&authz.actor.activeRole)!=='operativo')return true;
+ // Every privileged business role, not only Operativo, must honor signed
+ // module denials and country membership before a durable workflow command.
+ // Advisor self-service keeps its own separately constrained contract.
+ if(!['operativo','direccion','superadmin','super_admin','admintenant','admin_tenant','admin'].includes(norm(authz&&authz.actor&&authz.actor.activeRole)))return true;
  const member=authz.member||{},blocked=unique(member.modulesRestricted||member.modulosRestringidos).map(norm);
  if(blocked.includes(norm(moduleKey)))return false;
  const countries=unique(member.countries||member.paises).map(x=>text(x,8).toUpperCase());
  const country=text(row&&(row.pais||row.country),8).toUpperCase();
  if(!['GT','CO'].includes(country)||!countries.includes(country))return false;
  const matrix=authz.accessConfig&&authz.accessConfig.rolePermissions||{};
- const roleKey=Object.keys(matrix).find(k=>norm(k)==='operativo');
+ const roleKey=Object.keys(matrix).find(k=>norm(k)===norm(authz.actor.activeRole));
  const roleMatrix=roleKey===undefined?{}:matrix[roleKey]||{};
  const moduleKeyActual=Object.keys(roleMatrix).find(k=>norm(k)===norm(moduleKey));
  const granted=moduleKeyActual===undefined?{}:roleMatrix[moduleKeyActual]||{};
