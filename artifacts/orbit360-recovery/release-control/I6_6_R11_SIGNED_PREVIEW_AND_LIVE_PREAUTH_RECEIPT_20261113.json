@@ -1,0 +1,21 @@
+{
+  "schema": "GI_I66_R11_SIGNED_PREVIEW_HOSTING_ONLY_LIVE_PREAUTH_V1",
+  "dateGuatemala": "2026-11-13",
+  "sourceSha": "84769378eb2014addebfefdbdd63091bddc4b817",
+  "buildRunId": 43503721126,
+  "artifactId": 14075022275,
+  "artifactDigest": "sha256:b0f3bacb68511cdfc91ac934602c51f55afec5c1d6428d886d13a72a706ee283",
+  "previewChannel": "gi-i66-rc-42868854629",
+  "previewUrl": "https://ays-orbit-360-lab--gi-i66-rc-42868854629-abj14q6n.web.app",
+  "signedPreviewRun": 43504669496,
+  "signedActorResults": [
+    "Carlos Operativo GT: PASS, no write",
+    "Paula Dirección GT: PASS, no write"
+  ],
+  "sourceTests": "14/14 PASS",
+  "liveBefore": "R10 unchanged",
+  "liveAfter": "PENDING immutable same artifact hosting-only and live signed UAT",
+  "liveFinancialWrites": 0,
+  "driveRealPdfStatus": "HOLD tenant OAuth consent",
+  "fullI66ProductionAccepted": false
+}

@@ -1,0 +1,227 @@
+# I6.6 R11 signed renewals and Drive feedback frontend ONLY.
+# One immutable R11 Preview Hosting version -> existing LIVE site; automatic
+# same-project Hosting rollback on failure. No backend, rules or data writes.
+name: Gravicentra I6.6 R11 Renewals Drive Exact LIVE Hosting and Rollback
+on:
+  push:
+    branches: [recovery/fase-a-clean-20260831]
+    paths:
+      - .github/workflows/gravicentra-i66-r11-renewal-drive-frontend-exact-live-promotion.yml
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: gi-i66-r11-renewal-drive-exact-live
+  cancel-in-progress: false
+jobs:
+  exact-hosting-only:
+    if: github.repository == 'paulaosoriof86/orbit360-core' && github.ref == 'refs/heads/recovery/fase-a-clean-20260831'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    env:
+      PROJECT_ID: ays-orbit-360-lab
+      SITE: ays-orbit-360-lab
+      I66_R11_SOURCE_SHA: 84769378eb2014addebfefdbdd63091bddc4b817
+      I66_R11_BUILD_RUN: '43503721126'
+      I66_R11_ARTIFACT_ID: '14075022275'
+      I66_R11_ARTIFACT_DIGEST: sha256:b0f3bacb68511cdfc91ac934602c51f55afec5c1d6428d886d13a72a706ee283
+      I66_R11_SIGNED_PREVIEW_RUN: '43504669496'
+      I66_R11_PREVIEW_CHANNEL: gi-i66-rc-42868854629
+      I66_R11_PREVIEW_ORIGIN: https://ays-orbit-360-lab--gi-i66-rc-42868854629-abj14q6n.web.app
+      I66_R10_PRIOR_SOURCE_SHA: 851d68441b819eac6dd37ec1d5d15fb971e35bf2
+      I66_R10_PRIOR_HOSTING_VERSION: '23037b2a726a8def'
+      SA_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_ALT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Pin direction approval, R10 LIVE pointer, R11 immutable Preview and signed roles
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor "$I66_R11_SOURCE_SHA" HEAD
+          test -z "$(git diff --name-only "$I66_R11_SOURCE_SHA" HEAD -- orbit360-platform functions firebase.json firestore.rules storage.rules)"
+          node --check tools/gravicentra-i66-r11-carlos-paula-signed-live-hydration-readonly.cjs
+          node --check tools/gravicentra-i66-r11-three-origin-byte-readback.mjs
+          node tools/gravicentra-i6-6-delta-guard.mjs >/dev/null
+          node --test tools/gravicentra-i6-6-operational-renewal-entry.test.cjs tools/gravicentra-i6-6-renovaciones-read-index.test.cjs tools/gravicentra-i6-6-drive-upload-feedback.test.cjs
+          node - <<'NODE'
+          const assert=require('node:assert/strict'),fs=require('node:fs');
+          const c=JSON.parse(fs.readFileSync('artifacts/orbit360-recovery/release-control/I6_6_RELEASE_TRANSPORT_CONTROL_20261110.json'));
+          const p=JSON.parse(fs.readFileSync('artifacts/orbit360-recovery/release-control/I6_6_LATEST_EXACT_LIVE_POINTER_20261113.json'));
+          const a=c.i66R11RenewalDriveLiveAuthorization20261113||{};
+          assert.equal(c.status,'R11_RENEWAL_DRIVE_HOSTING_ONLY_LIVE_AUTHORIZED');
+          assert.equal(c.gate,'I6.6');assert.equal(c.historicalClosedGate,'B4-007');
+          assert.equal(c.livePromotionAuthorized,true);assert.equal(c.previewApproved,true);
+          assert.equal(c.noHostingPromotion,false);
+          assert.equal(c.forbidBackendFunctionDeploy,true);
+          assert.equal(c.forbidBackendLiveFunctionDeploy,true);
+          assert.equal(c.forbidFirestoreRulesDataAuthWrites,true);
+          assert.equal(p.currentLiveSourceSha,process.env.I66_R10_PRIOR_SOURCE_SHA);
+          assert.equal(p.currentLiveHostingVersion,'sites/ays-orbit-360-lab/versions/'+process.env.I66_R10_PRIOR_HOSTING_VERSION);
+          assert.equal(p.fullI66ProductionAccepted,false);
+          assert.equal(a.status,'SIGNED_PREVIEW_ACCEPTED_HOSTING_ONLY_R11_EXACT_AUTHORIZED');
+          for(const [k,v] of [['sourceSha',process.env.I66_R11_SOURCE_SHA],
+            ['buildRunId',Number(process.env.I66_R11_BUILD_RUN)],
+            ['artifactId',Number(process.env.I66_R11_ARTIFACT_ID)],
+            ['artifactDigest',process.env.I66_R11_ARTIFACT_DIGEST],
+            ['signedPreviewUatRunId',Number(process.env.I66_R11_SIGNED_PREVIEW_RUN)],
+            ['previewChannel',process.env.I66_R11_PREVIEW_CHANNEL],
+            ['expectedPriorLiveSourceSha',process.env.I66_R10_PRIOR_SOURCE_SHA],
+            ['expectedPriorLiveHostingVersion',process.env.I66_R10_PRIOR_HOSTING_VERSION]])
+              assert.equal(a[k],v,'R11_DIRECTION_EXACT_AUTHORIZATION_'+k);
+          for(const k of ['approvedByDirection','sameImmutableArtifact','hostingOnly',
+            'noBackendFunctionsRulesOrFinancialWrites','rollbackOnAnyFailure','signedCarlosPaulaLiveRequired'])
+              assert.equal(a[k],true,'R11_DIRECTION_SCOPE_'+k);
+          (async()=>{
+            const h={Authorization:'Bearer '+process.env.GH_TOKEN,Accept:'application/vnd.github+json','User-Agent':'GI-R11-Exact-HOSTING'};
+            const base='https://api.github.com/repos/paulaosoriof86/orbit360-core/actions/';
+            const ids=[Number(process.env.I66_R11_BUILD_RUN),Number(process.env.I66_R11_SIGNED_PREVIEW_RUN),43503721246];
+            const [runs,r]=await Promise.all([
+              Promise.all(ids.map(async id=>{const x=await fetch(base+'runs/'+id,{headers:h});assert.ok(x.ok);return x.json();})),
+              fetch(base+'artifacts/'+process.env.I66_R11_ARTIFACT_ID,{headers:h})]);
+            assert.ok(r.ok,'R11_IMMUTABLE_ARTIFACT_NOT_READABLE');
+            const artifact=await r.json();
+            assert.ok(runs.every((x,i)=>x.id===ids[i]&&x.conclusion==='success'),
+              'R11_SIGNED_PREVIEW_OR_SOURCE_GATE_NOT_PASS');
+            assert.equal(runs[0].head_sha,process.env.I66_R11_SOURCE_SHA);
+            assert.equal(artifact.workflow_run?.id,ids[0]);
+            assert.equal(artifact.workflow_run?.head_sha,process.env.I66_R11_SOURCE_SHA);
+            assert.equal(artifact.digest,process.env.I66_R11_ARTIFACT_DIGEST);
+            assert.equal(artifact.expired,false);
+            console.log('I66_R11_SIGNED_TWO_ROLES_EXACT_PREVIEW_IMMUTABLE_ARTIFACT_PASS');
+          })().catch(e=>{console.error(e.message);process.exitCode=1;});
+          NODE
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 43503721126
+          artifact-ids: 14075022275
+          github-token: ${{ github.token }}
+          path: ${{ runner.temp }}/gi-r11-exact-archive
+      - name: Validate original certified TAR and file manifest, no new build
+        run: |
+          set -euo pipefail
+          DL="$RUNNER_TEMP/gi-r11-exact-archive"
+          mapfile -t TARS < <(find "$DL" -type f -name gi-i66-exact-package.tar.gz)
+          mapfile -t SUMS < <(find "$DL" -type f -name gi-i66-exact-package.sha256)
+          test "${#TARS[@]}" -eq 1 && test "${#SUMS[@]}" -eq 1
+          test "$(dirname "${TARS[0]}")" = "$(dirname "${SUMS[0]}")"
+          test "$(sha256sum "${TARS[0]}" | cut -d' ' -f1)" = "$(cut -d' ' -f1 "${SUMS[0]}")"
+          ROOT="$RUNNER_TEMP/gi-r11-extracted"
+          mkdir -p "$ROOT"
+          tar -xzf "${TARS[0]}" -C "$ROOT" --no-same-owner
+          export ROOT
+          node - <<'NODE'
+          const assert=require('node:assert/strict'),fs=require('node:fs'),crypto=require('node:crypto'),path=require('node:path');
+          const site=path.join(process.env.ROOT,'bundle','site');
+          const meta=JSON.parse(fs.readFileSync(path.join(site,'__recovery__','build.json')));
+          assert.equal(meta.sourceSha,process.env.I66_R11_SOURCE_SHA);
+          assert.equal(meta.gate,'I6.6');
+          const manifest=fs.readFileSync(path.join(process.env.ROOT,'evidence','site-manifest.sha256'),'utf8').trim().split('\n');
+          assert.ok(manifest.length>=200&&manifest.length<=800);
+          for(const row of manifest){const m=row.match(/^([a-f0-9]{64})  (.+)$/);assert.ok(m);
+            assert.ok(!m[2].startsWith('/')&&!m[2].split('/').some(t=>!t||t==='..'||t==='.')&&!m[2].includes('\\'));
+            const got=crypto.createHash('sha256').update(fs.readFileSync(path.join(site,m[2]))).digest('hex');
+            assert.equal(got,m[1]);}
+          console.log('I66_R11_NO_REBUILD_CERTIFIED_SITE_MANIFEST_PASS '+manifest.length);
+          NODE
+          echo "I66_R11_EXTRACTED_ROOT=$ROOT" >> "$GITHUB_ENV"
+          echo "I66_R11_EVIDENCE_PATH=$RUNNER_TEMP/i66-r11-live-exact-proof.json" >> "$GITHUB_ENV"
+      - uses: google-github-actions/setup-gcloud@v2
+        with:
+          version: '>= 483.0.0'
+      - name: Authenticate only previously configured same Firebase project
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/gi-r11-host-auth"
+          python3 - <<'PY'
+          import os,json,pathlib
+          root=pathlib.Path(os.environ['RUNNER_TEMP'])/'gi-r11-host-auth'
+          good=[]
+          for i,k in enumerate(('SA_LAB','SA_ALT','SA_DEFAULT')):
+            try:x=json.loads(os.environ.get(k,''))
+            except (ValueError,TypeError):continue
+            if x.get('type')=='service_account' and x.get('project_id')=='ays-orbit-360-lab' and x.get('private_key'):
+              dest=root/f'{i}.json';dest.write_text(json.dumps(x));dest.chmod(0o600);good.append(str(dest))
+          if not good:raise SystemExit('R11_LIVE_AUTH_EXISTING_SERVICE_ACCOUNT_MISSING')
+          (root/'candidates').write_text('\n'.join(good)+'\n')
+          PY
+          npm install --prefix "$RUNNER_TEMP/gi-r11-cli" --no-save --ignore-scripts --no-audit --no-fund firebase-tools@14.10.1 >/dev/null
+          node tools/gravicentra-firebase-tools-empty-extensions-workaround-v1.mjs "$RUNNER_TEMP/gi-r11-cli"
+          CLI="$RUNNER_TEMP/gi-r11-cli/node_modules/firebase-tools/lib/bin/firebase.js"
+          selected=''
+          while IFS= read -r f;do
+            if GOOGLE_APPLICATION_CREDENTIALS="$f" node "$CLI" functions:list --project "$PROJECT_ID" --non-interactive --json >/dev/null 2>&1;then selected="$f";break;fi
+          done < "$RUNNER_TEMP/gi-r11-host-auth/candidates"
+          test -n "$selected"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$selected" >> "$GITHUB_ENV"
+          echo "I66_R11_FIREBASE_CLI_BIN=$CLI" >> "$GITHUB_ENV"
+          npm install --no-save --package-lock=false --ignore-scripts --no-audit --no-fund firebase-admin@13.4.0 playwright@1.55.0 >/dev/null
+          node node_modules/playwright/cli.js install --with-deps chromium >/dev/null
+      - name: Snapshot exact prior LIVE version and signed new Preview for rollback
+        run: |
+          set -euo pipefail
+          gcloud auth activate-service-account --key-file="$GOOGLE_APPLICATION_CREDENTIALS" --quiet >/dev/null
+          gcloud config set project "$PROJECT_ID" --quiet >/dev/null
+          TOKEN=$(gcloud auth print-access-token)
+          curl -fsSL --max-time 25 -H "Authorization: Bearer $TOKEN" "https://firebasehosting.googleapis.com/v1beta1/sites/$SITE/channels/live/releases?pageSize=1" > "$RUNNER_TEMP/gi-r11-live-before.json"
+          curl -fsSL --max-time 25 -H "Authorization: Bearer $TOKEN" "https://firebasehosting.googleapis.com/v1beta1/sites/$SITE/channels/$I66_R11_PREVIEW_CHANNEL/releases?pageSize=1" > "$RUNNER_TEMP/gi-r11-preview-current.json"
+          unset TOKEN
+          node - <<'NODE'
+          const assert=require('node:assert/strict'),fs=require('node:fs'),root=process.env.RUNNER_TEMP;
+          const live=require(root+'/gi-r11-live-before.json'),preview=require(root+'/gi-r11-preview-current.json');
+          const version=x=>String(x.releases?.[0]?.version?.name||'');
+          assert.equal(version(live),'sites/ays-orbit-360-lab/versions/'+process.env.I66_R10_PRIOR_HOSTING_VERSION,'R11_LIVE_PREVIOUS_HOSTING_VERSION_DRIFT');
+          assert.match(version(preview),/^sites\/ays-orbit-360-lab\/versions\/[a-zA-Z0-9_-]+$/);
+          assert.notEqual(version(preview),version(live));
+          fs.writeFileSync(root+'/gi-r11-approved-preview-version',version(preview).split('/').pop());
+          console.log('I66_R11_HOSTING_R10_OLD_AND_NEW_PREVIEW_VERSION_PIN_PASS');
+          NODE
+          for ORIGIN in https://ays-orbit-360-lab.web.app https://app.aysseguros.com;do
+            BUILD=$(curl -fsSL --max-time 20 -H 'Cache-Control: no-cache' "$ORIGIN/__recovery__/build.json")
+            printf '%s' "$BUILD" | node -e 'let s="";process.stdin.on("data",x=>s+=x).on("end",()=>{if(JSON.parse(s).sourceSha!==process.env.I66_R10_PRIOR_SOURCE_SHA)process.exit(1)})'
+          done
+          BUILD=$(curl -fsSL --max-time 20 -H 'Cache-Control: no-cache' "$I66_R11_PREVIEW_ORIGIN/__recovery__/build.json")
+          printf '%s' "$BUILD" | node -e 'let s="";process.stdin.on("data",x=>s+=x).on("end",()=>{if(JSON.parse(s).sourceSha!==process.env.I66_R11_SOURCE_SHA)process.exit(1)})'
+          echo 'I66_R11_PRELIVE_TWO_DOMAINS_R10_AND_PREVIEW_R11_SOURCE_PASS'
+      - name: Clone only same immutable Preview Hosting version and signed LIVE UAT or rollback
+        run: |
+          set -euo pipefail
+          started=0;completed=0
+          rollback(){
+            code=$?
+            if test "$started" = 1 && test "$completed" != 1;then
+              set +e;failed=0
+              CURRENT=$(curl -fsSL --max-time 20 'https://ays-orbit-360-lab.web.app/__recovery__/build.json' | node -e 'let s="";process.stdin.on("data",x=>s+=x).on("end",()=>{try{process.stdout.write(JSON.parse(s).sourceSha||"")}catch{}})')
+              if test "$CURRENT" = "$I66_R10_PRIOR_SOURCE_SHA" || test "$CURRENT" = "$I66_R11_SOURCE_SHA";then
+                node "$I66_R11_FIREBASE_CLI_BIN" hosting:clone "$SITE@$I66_R10_PRIOR_HOSTING_VERSION" "$SITE:live" --project "$PROJECT_ID" --non-interactive || failed=1
+              else
+                echo 'I66_R11_ROLLBACK_CONCURRENT_LIVE_CHANGE_STOP';failed=1
+              fi
+              echo "I66_R11_AUTO_ROLLBACK_FAILURE_COUNT=$failed"
+            fi
+            exit "$code"
+          }
+          trap rollback EXIT
+          VERSION=$(< "$RUNNER_TEMP/gi-r11-approved-preview-version")
+          started=1
+          node "$I66_R11_FIREBASE_CLI_BIN" hosting:clone "$SITE@$VERSION" "$SITE:live" --project "$PROJECT_ID" --non-interactive
+          node tools/gravicentra-i66-r11-three-origin-byte-readback.mjs
+          I66_PREVIEW_ORIGIN=https://app.aysseguros.com I66_SOURCE_SHA="$I66_R11_SOURCE_SHA" I66_SIGNED_TEST_LIVE=true node tools/gravicentra-i66-r11-carlos-paula-signed-live-hydration-readonly.cjs
+          completed=1
+          trap - EXIT
+          echo 'I66_R11_SIGNED_CARLOS_PAULA_EXACT_FRONTEND_LIVE_PASS_NO_BUSINESS_WRITES'
+      - name: Retain PII-free exact LIVE byte proof
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gi-i66-r11-renewal-drive-exact-live-${{ github.run_id }}
+          path: ${{ runner.temp }}/i66-r11-live-exact-proof.json
+          if-no-files-found: warn
+          retention-days: 30

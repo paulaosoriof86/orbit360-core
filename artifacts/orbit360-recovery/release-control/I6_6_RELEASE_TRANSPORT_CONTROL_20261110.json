@@ -4,7 +4,7 @@
   "productBrand": "Gravicentra Insurance",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
-  "status": "PREVIEW_BUILD_REQUESTED",
+  "status": "R11_RENEWAL_DRIVE_HOSTING_ONLY_LIVE_AUTHORIZED",
   "i66PaymentInvoicePreviewRelease20261113": {
     "status": "SIGNED_POLICY_AND_CLIENT360_PREVIEW_PASS_PAYMENT_BACKEND_PREVIEW_ONLY",
     "authority": "Paula Dirección 2026-11-13: Carlos aplica y concilia con factura, fecha factura separada, certifica antes de publicar.",
@@ -340,8 +340,8 @@
   "historicalClosedGate": "B4-007",
   "approvedProductDeltaManifest": "artifacts/orbit360-recovery/release-control/I6_6_APPROVED_PRODUCT_DELTA_MANIFEST_20261110.json",
   "ownerAuthority": "Paula Osorio Dirección 2026-11-12: Operativo tiene escritura integral en cada módulo autorizado, con paridad funcional para roles superiores según sus permisos, país, tenant y auditoría; cada arreglo probado pasa inmediatamente a LIVE desde un artefacto exacto. Alcance R7 autorizado, Preview firmado PASS 43375403003 y LIVE exacto publicado con tres funciones y hosting 223/223 en ambas URL, actores reales Carlos y Dirección y escrituras sintéticas reversibles PASS 43375687134. Mantener el resto de UAT real por país/rol, documentación real de aseguradora, UI legal y escrituras financieras en HOLD hasta prueba específica, sin tocar Firestore Rules, Auth ni IAM. Histórico R5/R6 se conserva como linaje, no como estado actual.",
-  "livePromotionAuthorized": false,
-  "previewApproved": false,
+  "livePromotionAuthorized": true,
+  "previewApproved": true,
   "carlosOpsLiveAuthorization20261112": {
     "status": "EXACT_TWO_WRITERS_AND_HOSTING_AUTHORIZED_AFTER_SIGNED_PREVIEW",
     "sourceSha": "1dd675ed59ac51fd122915ca8056f85f82fa12d6",
@@ -689,7 +689,7 @@
   "previewFunctionRunId": 43306217923,
   "previewFunctionStatus": "EXACT_ARTIFACT_PREVIEW_FUNCTION_ACTIVE_401_AND_LIVE_BACKEND_TWO_HOSTS_UNCHANGED_PASS",
   "liveFunctionScope": "orbit360CobrosReconciliationCommand",
-  "noHostingPromotion": true,
+  "noHostingPromotion": false,
   "liveFunctionRunId": 43129008894,
   "liveFunctionOldRevision": "orbit360cobrosreconciliationcommand-00003-kax",
   "liveFunctionNewRevision": "orbit360cobrosreconciliationcommand-00006-viw",
@@ -1115,5 +1115,27 @@
     "customerDataWritesAuthorized": false,
     "liveHostingPromotionAuthorized": false,
     "requiresSignedPreviewAndReadbackBeforeLive": true
+  },
+  "i66R11RenewalDriveLiveAuthorization20261113": {
+    "status": "SIGNED_PREVIEW_ACCEPTED_HOSTING_ONLY_R11_EXACT_AUTHORIZED",
+    "approvedByDirection": true,
+    "sourceSha": "84769378eb2014addebfefdbdd63091bddc4b817",
+    "buildRunId": 43503721126,
+    "artifactId": 14075022275,
+    "artifactDigest": "sha256:b0f3bacb68511cdfc91ac934602c51f55afec5c1d6428d886d13a72a706ee283",
+    "signedPreviewUatRunId": 43504669496,
+    "sourceQaRunId": 43503721246,
+    "previewChannel": "gi-i66-rc-42868854629",
+    "previewUrl": "https://ays-orbit-360-lab--gi-i66-rc-42868854629-abj14q6n.web.app",
+    "expectedPriorLiveSourceSha": "851d68441b819eac6dd37ec1d5d15fb971e35bf2",
+    "expectedPriorLiveHostingVersion": "23037b2a726a8def",
+    "sameImmutableArtifact": true,
+    "hostingOnly": true,
+    "noBackendFunctionsRulesOrFinancialWrites": true,
+    "rollbackOnAnyFailure": true,
+    "signedCarlosPaulaLiveRequired": true,
+    "fullI66ProductionAccepted": false,
+    "driveRealPdfStillRequiresTenantOauth": true,
+    "financialBatchWritesThisRelease": 0
   }
 }

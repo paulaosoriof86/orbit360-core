@@ -91,6 +91,25 @@ if(i66Active){
       transport.forbidBackendFunctionDeploy===true&&
       transport.forbidBackendLiveFunctionDeploy===true&&transport.noHostingPromotion===true&&
       transport.forbidFirestoreRulesDataAuthWrites===true;
+    // Scoped R11 Hosting-only window: the R10 pointer remains authoritative until
+    // exact immutable clone plus signed Carlos/Paula LIVE checks and rollback proof.
+    const r11Host=transport.i66R11RenewalDriveLiveAuthorization20261113||{};
+    const r11ScopedHosting=transport.status==='R11_RENEWAL_DRIVE_HOSTING_ONLY_LIVE_AUTHORIZED'&&
+      r11Host.status==='SIGNED_PREVIEW_ACCEPTED_HOSTING_ONLY_R11_EXACT_AUTHORIZED'&&
+      r11Host.approvedByDirection===true&&r11Host.sameImmutableArtifact===true&&
+      r11Host.hostingOnly===true&&r11Host.noBackendFunctionsRulesOrFinancialWrites===true&&
+      r11Host.rollbackOnAnyFailure===true&&r11Host.signedCarlosPaulaLiveRequired===true&&
+      r11Host.sourceSha==='84769378eb2014addebfefdbdd63091bddc4b817'&&
+      r11Host.buildRunId===43503721126&&r11Host.artifactId===14075022275&&
+      r11Host.artifactDigest==='sha256:b0f3bacb68511cdfc91ac934602c51f55afec5c1d6428d886d13a72a706ee283'&&
+      r11Host.signedPreviewUatRunId===43504669496&&
+      r11Host.expectedPriorLiveSourceSha===receipt.sourceSha&&
+      r11Host.expectedPriorLiveHostingVersion===receipt.hostingVersion.split('/').pop()&&
+      r11Host.previewChannel==='gi-i66-rc-42868854629'&&
+      transport.livePromotionAuthorized===true&&transport.previewApproved===true&&
+      transport.forbidBackendFunctionDeploy===true&&
+      transport.forbidBackendLiveFunctionDeploy===true&&
+      transport.noHostingPromotion===false&&transport.forbidFirestoreRulesDataAuthWrites===true;
     const fields=[
       [latest.currentLiveSourceSha,r10Release.sourceSha],[latest.currentLiveSourceSha,receipt.sourceSha],
       [latest.currentLiveSourceSha,live?.sourceSha],[latest.currentLiveSourceSha,current.sourceSha],
@@ -133,10 +152,12 @@ if(i66Active){
        r9Release?.status!=='PREVIOUS_R9_PAYMENT_INVOICE_POLICY_SIGNED_LIVE_PRESERVED'||
        previousR9.hostingVersion!=='sites/ays-orbit-360-lab/versions/1dd873081501d7fb'||
        receipt.previousLiveVersionForRollback!==previousR9.hostingVersion||
-       (!r11ScopedPreview&&transport.status!=='CONCILIACIONES_HUMAN_NAMES_R10_LIVE_ACCEPTED_LOCKED')||
-       transport.livePromotionAuthorized!==false||transport.previewApproved!==false||
+       (!r11ScopedPreview&&!r11ScopedHosting&&transport.status!=='CONCILIACIONES_HUMAN_NAMES_R10_LIVE_ACCEPTED_LOCKED')||
+       transport.livePromotionAuthorized!==r11ScopedHosting||
+       transport.previewApproved!==r11ScopedHosting||
        transport.forbidBackendFunctionDeploy!==true||
-       transport.forbidBackendLiveFunctionDeploy!==true||transport.noHostingPromotion!==true||
+       transport.forbidBackendLiveFunctionDeploy!==true||
+       transport.noHostingPromotion===r11ScopedHosting||
        transport.forbidFirestoreRulesDataAuthWrites!==true||
        current.currentR10HumanNamesSignedLiveReceipt!==r10Release.receipt)
       throw new Error(guard);
