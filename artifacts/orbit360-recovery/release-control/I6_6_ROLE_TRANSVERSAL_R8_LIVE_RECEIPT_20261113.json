@@ -1,0 +1,94 @@
+{
+  "schema": "GI_I66_ROLE_TRANSVERSAL_R8_LIVE_RECEIPT_V1",
+  "dateGuatemala": "2026-11-13",
+  "updatedAtUtc": "2026-11-13T15:33:29.707Z",
+  "gate": "I6.6",
+  "historicalB4007Closed": true,
+  "status": "PUBLISHED_EXACT_ARTIFACT_SIGNED_LIVE_SYNTHETIC_PARTIAL_ACCEPTANCE",
+  "productBrand": "Gravicentra Insurance",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "sourceSha": "8a0e904500cbb3c961d83f16517caab69df88a2b",
+  "sourceProductBlob": "2c0967040526e96e60b210125545f23ee754b47b",
+  "immutableBuildRunId": 43448848169,
+  "immutableArtifactId": 14048803073,
+  "immutableArtifactZipDigest": "sha256:e85a0b86975b288dab24a916208c905229cf071ce579141653e9f88080f69abe",
+  "previewUrl": "https://ays-orbit-360-lab--gi-i66-rc-42868854629-abj14q6n.web.app",
+  "previewChannel": "gi-i66-rc-42868854629",
+  "previewChannelQuotaRecoveredViaExistingCurrentLiveArtifact": true,
+  "exactCloneRunId": 43451818931,
+  "exactCloneEvidenceArtifactId": 14050397535,
+  "liveHostingVersion": "sites/ays-orbit-360-lab/versions/162340ae18a9e6f7",
+  "previousLiveVersion": "sites/ays-orbit-360-lab/versions/dae5d5235978cefe",
+  "previousLiveSourceSha": "e6183a9f1da68243cc935e222d98b2d21b5f17b8",
+  "immutableBuildId": "gi-i66-8a0e904500cb-57f234755dc1",
+  "sameFiles": {
+    "preview": 223,
+    "firebaseLive": 223,
+    "staffDomainLive": 223
+  },
+  "rollback": "NOT_REQUIRED",
+  "backendDeployments": 0,
+  "realDataWrites": 0,
+  "qa": {
+    "roleSourceTests": {
+      "passed": 17,
+      "total": 17,
+      "runId": 43448848149
+    },
+    "preview": {
+      "buildRunId": 43448848169,
+      "artifactId": 14048803073,
+      "sourceSha": "8a0e904500cbb3c961d83f16517caab69df88a2b",
+      "verifiedFiles": 223,
+      "roleMatrixCellsPassed": 35,
+      "roleMatrixCellsTotal": 35,
+      "signedRunId": 43450480491
+    },
+    "live": {
+      "promotionRunId": 43451818931,
+      "evidenceArtifactId": 14050397535,
+      "hostingVersion": "sites/ays-orbit-360-lab/versions/162340ae18a9e6f7",
+      "previewFiles": 223,
+      "firebaseFiles": 223,
+      "staffDomainFiles": 223,
+      "signedRoleRunId": 43452158412,
+      "operativoVisibleCreateEdit": {
+        "passed": 8,
+        "total": 8
+      },
+      "direccionVisibleCreateEdit": {
+        "passed": 10,
+        "total": 10
+      },
+      "opsLeadsTasksSyntheticUatRunId": 43452502778,
+      "paymentAndRenewabilitySyntheticUatRunId": 43452656400,
+      "insurerSyntheticAccountUatRunId": 43452980131,
+      "directRenewalSyntheticUatRunId": 43453049866,
+      "higherRolesSignedRunId": 43452158208,
+      "higherRolesRunConclusion": "failure_due_only_to_one_unverified_email",
+      "adminTenantSignedPass": 1,
+      "adminTenantActive": 2,
+      "superAdminSignedPass": 1,
+      "superAdminActive": 1,
+      "realCustomerWrites": 0,
+      "syntheticQaFixturesReverted": true
+    },
+    "hold": {
+      "adminTenantSecondUser": "EMAIL_NOT_VERIFIED_NO_IMPERSONATION",
+      "adminRole": "NO_ACTIVE_SIGNED_USER_TO_TEST",
+      "realInsurerPortalPasswordSave": "NOT_END_TO_END_TESTED",
+      "completeCreatePolicyFromBlank": "NOT_DISTINCTLY_TESTED",
+      "client360AndCustomerPortalRequestEntry": "NOT_COMPLETE_END_TO_END_TESTED",
+      "notificationLiveAudioWhatsApp": "NOT_REAL_DELIVERY_TESTED",
+      "bantrabSevenSourceRefs": "GH_PROTECTED_ENV_REVIEW_WAITING_43438038880_ZERO_WRITES",
+      "mapfreSc79829": "FIVE_REQUIREMENTS_STAGED_ZERO_WRITES_ANNUAL_CONTRACT_PREMIUM_OR_ANNEX_NEEDED",
+      "conciliaciones": "52_OF_132_UNIQUE_STAGE_RENDERED_80_AMBIGUOUS_HOLD_FINANCIAL_APPLICATION_ZERO",
+      "fullI66ProductionAccepted": false
+    }
+  },
+  "productionAcceptanceScope": "ROLE_PERMISSION_FIX_AND_REVERSIBLE_SIGNED_OPERATIONS_ONLY_NOT_FULL_I66",
+  "noClaimsOfLiveFullCountryRoleUat": true,
+  "priorExactLivePointer": "artifacts/orbit360-recovery/release-control/I6_6_CONCILIACIONES_STAGE_READONLY_LIVE_RECEIPT_20261113.json",
+  "next": "PROTECTED_FINANCIAL_BATCH_REVIEW_PLUS_MAPFRE_FULL_CONTRACT_ISSUER_DOC;R8_ADMIN_AUTH_AND_PORTAL_AND_NOTIFICATION_HOLDS"
+}
