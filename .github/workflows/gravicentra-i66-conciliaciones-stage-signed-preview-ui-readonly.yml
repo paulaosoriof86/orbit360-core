@@ -1,0 +1,70 @@
+name: Gravicentra I6.6 Conciliaciones Stage Signed Preview UI Readonly
+on:
+  push:
+    branches: [recovery/fase-a-clean-20260831]
+    paths:
+      - .github/workflows/gravicentra-i66-conciliaciones-stage-signed-preview-ui-readonly.yml
+      - tools/gravicentra-i66-conciliaciones-stage-signed-preview-ui-readonly.cjs
+      - artifacts/orbit360-recovery/release-control/I6_6_RELEASE_TRANSPORT_CONTROL_20261110.json
+permissions:
+  contents: read
+jobs:
+  gate:
+    if: github.repository == 'paulaosoriof86/orbit360-core' && github.ref == 'refs/heads/recovery/fase-a-clean-20260831'
+    runs-on: ubuntu-24.04
+    outputs:
+      enabled: ${{ steps.guard.outputs.enabled }}
+      preview: ${{ steps.guard.outputs.preview }}
+      source: ${{ steps.guard.outputs.source }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - id: guard
+        run: |
+          set -euo pipefail
+          node - <<'NODE'
+          const fs=require('node:fs');
+          const c=JSON.parse(fs.readFileSync('artifacts/orbit360-recovery/release-control/I6_6_RELEASE_TRANSPORT_CONTROL_20261110.json','utf8'));
+          const a=c.i66ConciliacionesStageSignedPreviewUat20261113||{};
+          const enabled=c.status==='CONCILIACIONES_STAGE_SIGNED_PREVIEW_UAT_REQUESTED'&&
+            c.livePromotionAuthorized===false&&c.previewApproved===false&&
+            c.forbidBackendLiveFunctionDeploy===true&&c.noHostingPromotion===true&&
+            c.forbidFirestoreRulesDataAuthWrites===true&&
+            a.realDataWritesPermitted===false&&a.livePromotionPermitted===false&&
+            a.exactPreviewReaderFunctionDeployed===true&&
+            Number.isSafeInteger(a.previewReaderDeploymentRunId)&&a.previewReaderDeploymentRunId>0&&
+            /^https:\/\/ays-orbit-360-lab--gi-i66-rc-\d+-[a-z0-9]+\.web\.app$/.test(a.previewUrl||'')&&
+            /^[0-9a-f]{40}$/.test(a.sourceSha||'')&&
+            a.sourceSha===c.approvedSourceSha&&a.previewUrl===c.sourcePreviewUrl;
+          fs.appendFileSync(process.env.GITHUB_OUTPUT,`enabled=${enabled?'true':'false'}\npreview=${enabled?a.previewUrl:''}\nsource=${enabled?a.sourceSha:''}\n`);
+          console.log('I66_SIGNED_PREVIEW_UAT_MODE='+(enabled?'AUTHORIZED':'NOT_REQUESTED'));
+          NODE
+  signed-preview:
+    needs: gate
+    if: needs.gate.outputs.enabled == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      I66_STAGE_PREVIEW_URL: ${{ needs.gate.outputs.preview }}
+      I66_STAGE_SOURCE_SHA: ${{ needs.gate.outputs.source }}
+      SA_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_ALT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install signed QA client dependencies
+        run: |
+          set -euo pipefail
+          node --check tools/gravicentra-i66-conciliaciones-stage-signed-preview-ui-readonly.cjs
+          npm install --no-save --package-lock=false --ignore-scripts --no-audit --no-fund firebase-admin@13.4.0 playwright@1.55.0 >/dev/null
+          node node_modules/playwright/cli.js install --with-deps chromium >/dev/null
+      - name: Signed real Direccion 52 visible and Carlos Operativo explicit module denial, no writes
+        run: |
+          set -euo pipefail
+          node tools/gravicentra-i66-conciliaciones-stage-signed-preview-ui-readonly.cjs

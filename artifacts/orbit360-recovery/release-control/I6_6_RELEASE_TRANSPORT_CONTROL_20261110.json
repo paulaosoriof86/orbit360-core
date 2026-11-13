@@ -4,7 +4,7 @@
   "productBrand": "Gravicentra Insurance",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
-  "status": "CONCILIACIONES_STAGE_READER_PREVIEW_AUTHORIZED",
+  "status": "CONCILIACIONES_STAGE_SIGNED_PREVIEW_UAT_REQUESTED",
   "i66PrivilegedRolePreviewCandidate20261112": {
     "scope": "Preview Hosting only: 5 privileged roles, 12 operational domains, signed tenant/country permissions. No LIVE deployment or customer financial writes.",
     "sourceQaCommit": "0151411326fc5fc1bfe450d7226853b52de12f78",
@@ -123,6 +123,15 @@
     "dataWritesPermitted": false,
     "liveBackendDeployPermitted": false,
     "hostingPromotionPermitted": false
+  },
+  "i66ConciliacionesStageSignedPreviewUat20261113": {
+    "status": "EXACT_PREVIEW_READER_DEPLOY_43386427260_PASS_SIGNED_REAL_DIRECTION_AND_CARLOS_READONLY_UAT_REQUESTED",
+    "previewReaderDeploymentRunId": 43386427260,
+    "exactPreviewReaderFunctionDeployed": true,
+    "sourceSha": "e6183a9f1da68243cc935e222d98b2d21b5f17b8",
+    "previewUrl": "https://ays-orbit-360-lab--gi-i66-rc-42868854629-abj14q6n.web.app",
+    "realDataWritesPermitted": false,
+    "livePromotionPermitted": false
   },
   "currentReleaseStatus": "CURRENT_0153F5_LIVE_223_OF_223_PER_ORIGIN_EXACT_PREVIEW_VERSION_43375687134_THREE_BACKENDS_100_PERCENT_SIGNED_CARLOS_8_MODULES_DIRECTION_10_MODULES_RELOAD_RESTORE_PASS_FULL_ROLE_REAL_DOC_FINANCIAL_WRITES_HOLD",
   "scope": "CURRENT_R7_EXACT_HOSTING_SOURCE_0153F5CBBE00_ARTIFACT_14013250472_SAME_HOSTING_VERSION_9CEDC5ECDA75BB2A_PREVIEW_FIREBASE_LIVE_CUSTOM_223_OF_223_EACH_SIGNED_CARLOS_OPERATIVO_8_OF_8_DIRECTION_10_OF_10_LIVE_43375687134; THREE_BACKEND_FUNCTIONS_DEPLOYED_TRAFFIC_100_PERCENT_AND_SYNTHETIC_OPS_LEADS_TASKS_RELOAD_RESTORE_PASS; HISTORICAL_R6_SOURCE_7E9B2B91_LIVE_43337771601_RETAINED_FOR_LINEAGE; SIGNED_COBROS_SYNTHETIC_43312896784_AND_PROTECTED_CONCILIACIONES_READER_43324845568_PRESERVED; NO_REAL_CUSTOMER_FINANCIAL_WRITES; B4_007_HISTORICAL_CLOSED; CURRENT_I6_6_OTHER_REAL_PRIVILEGED_ROLE_COUNTRY_UAT_INSURER_DOCUMENT_AND_FULL_FINANCIAL_WRITE_PARITY_HOLD",
@@ -278,13 +287,13 @@
   "requiredCanonicalOrigin": "https://ays-orbit-360-lab.web.app",
   "requiredStaffOrigin": "https://app.aysseguros.com",
   "originReadbackRequirement": "BOTH_HOSTS_IDENTICAL_TO_SAME_ARTIFACT_OR_ROLLBACK",
-  "forbidBackendFunctionDeploy": false,
+  "forbidBackendFunctionDeploy": true,
   "forbidFirestoreRulesDataAuthWrites": true,
   "rollback": "FRONTEND_TOPBAR_PREVIEW_FIRST; KEEP BOTH LIVE HOSTING ORIGINS AND COBROS FUNCTION UNCHANGED UNTIL EXACT_ARTIFACT_PREVIEW_PASS; THEN BACKUP_AND_ATOMIC_EXACT_ARTIFACT_LIVE_PROMOTION_WITH_REHASH_AND_ROLLBACK",
   "immutableArtifactId": 14018512857,
   "immutableArtifactZipDigest": "sha256:64ccf09525abf48d8c707deb366ca1cf0122c6cd7765a7ae98c5ea5380dcec31",
   "sourcePreviewUrl": "https://ays-orbit-360-lab--gi-i66-rc-42868854629-abj14q6n.web.app",
-  "backendFunctionPreviewOnly": true,
+  "backendFunctionPreviewOnly": false,
   "carlosSignedTransversalQaReceipt20261112": {
     "sourceSha": "b86cad550fadc050e8574678f02f3097caa8b5bd",
     "immutableHostingPreviewRunId": 43299843267,
