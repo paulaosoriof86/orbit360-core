@@ -1,0 +1,39 @@
+name: Gravicentra I6.6 R7 AdminTenant SuperAdmin Real Signed LIVE Readonly
+on:
+  push:
+    branches: [recovery/fase-a-clean-20260831]
+    paths:
+      - .github/workflows/gravicentra-i66-higher-roles-real-signed-live-readonly.yml
+      - tools/gravicentra-i66-higher-roles-real-signed-live-readonly.cjs
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  higher-role-live-matrix:
+    if: github.repository == 'paulaosoriof86/orbit360-core' && github.ref == 'refs/heads/recovery/fase-a-clean-20260831'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    env:
+      SA_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_ALT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Assert canonical R7 frontend and all three function owners unchanged
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor 0153f5cbbe00c3732e11ebae59b32bd357e38bfd HEAD
+          test -z "$(git diff --name-only 0153f5cbbe00c3732e11ebae59b32bd357e38bfd HEAD -- orbit360-platform functions)"
+          node --check tools/gravicentra-i66-higher-roles-real-signed-live-readonly.cjs
+      - name: Verify each real active AdminTenant and SuperAdmin LIVE session and protected write matrix without mutations
+        run: |
+          set -euo pipefail
+          npm install --no-save --package-lock=false --ignore-scripts --no-audit --no-fund firebase-admin@13.4.0 playwright@1.55.0 >/dev/null
+          node node_modules/playwright/cli.js install --with-deps chromium >/dev/null
+          node tools/gravicentra-i66-higher-roles-real-signed-live-readonly.cjs
