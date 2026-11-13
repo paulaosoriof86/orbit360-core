@@ -4,7 +4,7 @@
   "productBrand": "Gravicentra Insurance",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
-  "status": "CONCILIACIONES_STAGE_EXACT_LIVE_PUBLISHED_SIGNED_ACCEPTED_NEW_DEPLOYS_DISABLED",
+  "status": "PREVIEW_BUILD_REQUESTED",
   "i66PrivilegedRolePreviewCandidate20261112": {
     "scope": "Preview Hosting only: 5 privileged roles, 12 operational domains, signed tenant/country permissions. No LIVE deployment or customer financial writes.",
     "sourceQaCommit": "0151411326fc5fc1bfe450d7226853b52de12f78",
@@ -18,7 +18,11 @@
     "hostingPreviewChannelId": "gi-i66-rc-42868854629",
     "hostingPreviewUrl": "https://ays-orbit-360-lab--gi-i66-rc-42868854629-abj14q6n.web.app",
     "backendPreviewAuthorized": true,
-    "backendPreviewTargets": ["orbit360OpsLeadsCommandPreview", "orbit360ProductOperationalCommandPreview", "orbit360ScopedPolicyReadPreview"],
+    "backendPreviewTargets": [
+      "orbit360OpsLeadsCommandPreview",
+      "orbit360ProductOperationalCommandPreview",
+      "orbit360ScopedPolicyReadPreview"
+    ],
     "backendPreviewRegion": "us-east1",
     "backendPreviewSyntheticRecordsOnly": true,
     "backendPreviewCustomerDataWritesPermitted": false,
@@ -39,14 +43,26 @@
     "threePreviewEffectiveRevisionRun": 43373253757,
     "realTenantRoleMatrixReadOnlyRun": 43374139073,
     "liveTargets": [
-      {"name": "orbit360ProductOperationalCommand", "region": "us-central1"},
-      {"name": "orbit360OpsLeadsCommand", "region": "us-central1"},
-      {"name": "orbit360ScopedPolicyRead", "region": "us-east1"}
+      {
+        "name": "orbit360ProductOperationalCommand",
+        "region": "us-central1"
+      },
+      {
+        "name": "orbit360OpsLeadsCommand",
+        "region": "us-central1"
+      },
+      {
+        "name": "orbit360ScopedPolicyRead",
+        "region": "us-east1"
+      }
     ],
     "frontendClonePreviewVersionOnly": true,
     "noBusinessOrRealFinancialWrites": true,
     "rollbackThreeBackendRevisionsAndHosting": true,
-    "intentionallyInvisibleOperativoModules": ["cancelaciones", "comisiones"],
+    "intentionallyInvisibleOperativoModules": [
+      "cancelaciones",
+      "comisiones"
+    ],
     "liveFunctionalUatStatus": "SIGNED_CARLOS_OPERATIVO_8_OF_8_AND_PAULA_DIRECCION_10_OF_10_VISIBLE_MODULES_OPS_LEADS_TASK_CRUD_RELOAD_RESTORE_PASS_43375687134_LEGAL_BUTTON_AND_GENUINE_REAL_DATA_HOLD",
     "liveReleaseRunId": 43375687134,
     "liveReadbackEvidenceArtifactId": 14014701842,
@@ -68,7 +84,10 @@
   },
   "i66ConciliacionesStageProjectionGap20261113": {
     "status": "P0_CONFIRMED_UNPUBLISHED_CAUSAL_VIEW_PROJECTION_GAP",
-    "readOnlyRunIds": [43378603985, 43379037882],
+    "readOnlyRunIds": [
+      43378603985,
+      43379037882
+    ],
     "liveCanonicalVisibleProposalCount": 0,
     "liveActiveRunProposalCount": 132,
     "uniquelyLinkedCanonicalPolicyCandidates": 52,
@@ -83,7 +102,10 @@
     "candidateSourceAuthority": "THIS_EXACT_GITHUB_PUSH_SHA_ONLY_AT_BUILD_TIME",
     "realReadOnlyRunId": 43383902368,
     "controlPlaneGuardRunId": 43383902492,
-    "newProductFiles": ["functions/i66-conciliaciones-active-ledger-projection.js", "functions/b4-003-scoped-related-reader.js"],
+    "newProductFiles": [
+      "functions/i66-conciliaciones-active-ledger-projection.js",
+      "functions/b4-003-scoped-related-reader.js"
+    ],
     "currentLiveSourcePreserved": "0153f5cbbe00c3732e11ebae59b32bd357e38bfd",
     "currentLiveArtifactPreserved": 14013250472,
     "activeLedgerProposals": 132,
@@ -195,9 +217,15 @@
     "paymentLiveRunId": 43307238568,
     "signedOpsPreviewRunId": 43301759098,
     "signedPaymentPreviewRunId": 43306217923,
-    "targetLiveFunctions": ["orbit360ProductOperationalCommand", "orbit360OpsLeadsCommand"],
+    "targetLiveFunctions": [
+      "orbit360ProductOperationalCommand",
+      "orbit360OpsLeadsCommand"
+    ],
     "targetRegion": "us-central1",
-    "hostingTargets": ["https://ays-orbit-360-lab.web.app", "https://app.aysseguros.com"],
+    "hostingTargets": [
+      "https://ays-orbit-360-lab.web.app",
+      "https://app.aysseguros.com"
+    ],
     "noOtherFunctionRulesAuthOrFinancialWrites": true,
     "automaticRollbackIfAnyBackendOrDualOriginReadbackFails": true,
     "fullFunctionalLiveUatStatus": "SIGNED_OPS_LEADS_TASKS_43310610618_AND_PAYMENT_RENEWABLE_43312896784_PASS_DIRECT_RENEWAL_ISSUANCE_AND_EXACT_LEAD_OPS_PROJECTION_STILL_HOLD",
@@ -213,7 +241,11 @@
     "previewReadbackRequired": true,
     "signedCarlosWritesAndReloadRequired": true,
     "sameArtifactPromotionRequired": true,
-    "backendFunctionsChanged": ["orbit360ProductOperationalCommand", "orbit360OpsLeadsCommand", "orbit360ScopedPolicyRead"],
+    "backendFunctionsChanged": [
+      "orbit360ProductOperationalCommand",
+      "orbit360OpsLeadsCommand",
+      "orbit360ScopedPolicyRead"
+    ],
     "backendLiveDeployAuthorizedInThisBuild": false,
     "customerWritesAuthorizedInThisBuild": false,
     "hostingLivePromotionAuthorizedInThisBuild": false,
@@ -222,7 +254,11 @@
   },
   "carlosPreviewAuthorization20261112": {
     "status": "AUTHORIZED_EXISTING_PREVIEW_FUNCTIONS_ONLY",
-    "targetFunctions": ["orbit360OpsLeadsCommandPreview", "orbit360ProductOperationalCommandPreview", "orbit360ScopedPolicyReadPreview"],
+    "targetFunctions": [
+      "orbit360OpsLeadsCommandPreview",
+      "orbit360ProductOperationalCommandPreview",
+      "orbit360ScopedPolicyReadPreview"
+    ],
     "targetRegion": "us-east1",
     "sourceCommit": "b86cad550fadc050e8574678f02f3097caa8b5bd",
     "immutableBuildRunId": 43299843267,
@@ -245,7 +281,10 @@
     "status": "NEW_SOURCE_EXACT_HOSTING_PREVIEW_PASS_THREE_FUNCTION_REDEPLOY_AUTHORIZED",
     "reason": "The exact prior I6.6 Hosting Preview product guard denied all protected writes; signed write UAT could not run despite Preview backend PASS.",
     "allowedMode": "SYNTHETIC_B4003QA_AND_B3004QA_ONLY_US_EAST1_PREVIEW",
-    "newProductPaths": ["orbit360-platform/core/product-runtime-browser-providers-p0.js", "functions/product-ops-leads-domain.js"],
+    "newProductPaths": [
+      "orbit360-platform/core/product-runtime-browser-providers-p0.js",
+      "functions/product-ops-leads-domain.js"
+    ],
     "newTest": "tools/gravicentra-i6-6-carlos-preview-synthetic-write-gate.test.cjs",
     "testStatus": "SOURCE_UNIT_PASS_REAL_SIGNED_UAT_HOLD",
     "reusePriorImmutableBundle": false,
@@ -257,7 +296,11 @@
     "status": "EXACT_FRONTEND_LIVE_PUBLISHED_SIGNED_CROSS_ROUTE_PASS_FINANCIAL_BACKEND_HOLD",
     "decisionReceipt": "artifacts/orbit360-recovery/release-control/I6_6_CARLOS_RENEWAL_OPS_HANDOFF_GATE_20261112.json",
     "sourceSelection": "workflow github.sha of canonical recovery/fase-a-clean-20260831 only",
-    "sourceChanges": ["orbit360-platform/modules/renewals-v1200-operational-bridge.js", "orbit360-platform/modules/issuance-endosos-v1201-bridge.js", "orbit360-platform/modules/ops.js"],
+    "sourceChanges": [
+      "orbit360-platform/modules/renewals-v1200-operational-bridge.js",
+      "orbit360-platform/modules/issuance-endosos-v1201-bridge.js",
+      "orbit360-platform/modules/ops.js"
+    ],
     "candidateTestStatus": "SYNTHETIC_SOURCE_AND_TWO_REAL_SIGNED_ROLE_PREVIEW_AND_LIVE_READONLY_PASS_43250591471",
     "protectedConciliaciones": "SIGNED_DIRECCION_PREVIEW_READY_2_OF_2_SERVER_CONFIRMED_NO_WRITES; LIVE_BACKEND_PARITY_HOLD",
     "sourceSha": "c191b56461742f631c492e2ffd904278f1795fe2",
@@ -314,7 +357,10 @@
     "hostingRunId": 43309935816,
     "hostingReadback": "223_OF_223_FILES_PER_ORIGIN_PASS",
     "opsLeadsTasksSignedLiveRunId": 43310610618,
-    "opsLeadsTasksSignedActors": ["Carlos Operativo GT", "Paula Direccion GT"],
+    "opsLeadsTasksSignedActors": [
+      "Carlos Operativo GT",
+      "Paula Direccion GT"
+    ],
     "opsLeadsTasksSignedResult": "CREATE_UPDATE_RESOLVE_RELOAD_CLEANUP_PASS",
     "paymentLiveRootCause": "Firebase https.onCall second CallableResponse argument was incorrectly bound to internal previewOnly flag, causing synthetic Preview relation rejection in LIVE 43311517495",
     "paymentGuardApprovedManifestRunId": 43313298186,
@@ -323,7 +369,10 @@
     "paymentRepairPreviewAndLiveRunId": 43312896784,
     "paymentLiveRevision": "orbit360cobrosreconciliationcommand-00010-dig",
     "paymentLiveTrafficPercent": 100,
-    "paymentSignedActors": ["Carlos Operativo GT", "Paula Direccion GT"],
+    "paymentSignedActors": [
+      "Carlos Operativo GT",
+      "Paula Direccion GT"
+    ],
     "paymentSignedResult": "RENEWABLE_CAS_AND_PAYMENT_APPLY_RECONCILE_RECEIPT_COBRO_CARTERA_PERSIST_RELOAD_NO_DUPLICATE_AND_SYNTHETIC_CLEANUP_PASS",
     "signedLiveSyntheticCustomerWritesRetained": 0,
     "realFinancialUpdatesThisRelease": 0,
@@ -352,19 +401,30 @@
     "signedRealCarlosAndPaulaSyntheticUatRunId": 43301759098,
     "status": "OPS_LEADS_TASKS_SIGNED_CREATE_UPDATE_RESOLVE_RELOAD_AND_RESTORE_PASS",
     "actorCount": 2,
-    "collectionsRestoredPerActor": ["gestiones", "negocios", "tareas"],
+    "collectionsRestoredPerActor": [
+      "gestiones",
+      "negocios",
+      "tareas"
+    ],
     "realCustomersPoliciesPaymentsTouched": 0,
     "liveFunctionsOrHostingDeployed": false,
     "physicalUiButtonAndLiveWriteAccepted": false
   },
   "carlosPaymentPreviewNextSource20261112": {
     "status": "SIGNED_PREVIEW_PASS_LIVE_PAYMENT_BACKEND_AUTHORIZED",
-    "productPaths": ["orbit360-platform/core/product-runtime-browser-providers-p0.js", "functions/cobros-reconciliation-domain.js"],
+    "productPaths": [
+      "orbit360-platform/core/product-runtime-browser-providers-p0.js",
+      "functions/cobros-reconciliation-domain.js"
+    ],
     "guardTest": "tools/gravicentra-i6-6-carlos-payment-preview-synthetic-gate.test.cjs",
     "sourceTestResult": "PASS_16_CALLS_10_BACKEND_MARKERS",
     "allowedFunction": "orbit360CobrosReconciliationCommandPreview",
     "allowedRegion": "us-central1",
-    "allowedOperations": ["preview_policy", "apply_payment", "reconcile_payment"],
+    "allowedOperations": [
+      "preview_policy",
+      "apply_payment",
+      "reconcile_payment"
+    ],
     "syntheticOnly": true,
     "immutableBuildRunId": 43305281214,
     "immutableArtifactId": 13984026378,
@@ -627,5 +687,30 @@
       "Bank account write and secure password rotation with authorized fixture",
       "Conciliaciones empty proposals vs operational receipts"
     ]
+  },
+  "i66RolePermissionsPreviewBuildRequest20261113": {
+    "status": "PREVIEW_BUILD_REQUESTED_SOURCE_CERTIFIED_NO_LIVE",
+    "approvedByDirection": true,
+    "approvalText": "Paula 2026-11-13: trabajar, certificar y publicar a producción solo después de pruebas; priorizar SuperAdmin, Admin, Operativo",
+    "sourceParentWithCertifiedQAGuards": "a9f7f30ce69c035da68fb895087f0faf31918f69",
+    "sourceRolePatchFile": "orbit360-platform/modules/equipo.js",
+    "sourceRolePatchBlobSha": "2c0967040526e96e60b210125545f23ee754b47b",
+    "sourceQaRun": 43445860868,
+    "controlPlaneGuardRun": 43445860818,
+    "manifestDeltaPaths": 51,
+    "hostingTarget": "EXISTING_FIREBASE_LAB_ISOLATED_I6_6_CHANNEL_ONLY",
+    "backendDeployAllowed": false,
+    "liveHostingPromotionAllowed": false,
+    "financialWritesAllowed": false,
+    "customerWritesAllowed": false,
+    "certificationRequired": [
+      "exact immutable artifact source SHA",
+      "same canonical build host Preview",
+      "signed owner role Edit readback",
+      "Operativo renewal and policy/payment UAT",
+      "no console/page errors",
+      "protected role matrix save/reload audit"
+    ],
+    "releaseSuccessorAfterCertifiedPreviewOnly": true
   }
 }

@@ -1563,7 +1563,7 @@
       "approvedByDirection": true,
       "receipt": "Paula Andrea Osorio Franco, Dirección, instrucción expresa 2026-11-13: terminar escritura transversal, priorizar Operativo y garantizar SuperAdmin/Admin/Dirección, gestionar permisos por Equipos y certificar antes de LIVE; autorización de corrección y publicación sujeta a PASS real.",
       "sourceCommit": "e2859e8ce8c29a48ed8f34b1f32e752558ca032d",
-      "sourceStatus": "SOURCE_17_OF_17_SYNTHETIC_PASS_HISTORICAL_GUARD_PREVIEW_SIGNED_LIVE_HOLD",
+      "sourceStatus": "SOURCE_GOVERNANCE_17_OF_17_SYNTHETIC_PASS_CONTROL_PLANE_PASS_PREVIEW_REQUESTED_LIVE_HOLD",
       "capabilityOwners": [
         "ROLE_SCOPE_RUNTIME",
         "EQUIPOS_ROLE_PERMISSIONS"
@@ -1581,7 +1581,15 @@
           "path": "tools/gravicentra-i6-6-equipo-protected-role-defaults.test.cjs",
           "gitBlobSha": "7c8f591ad014795c4618a1cf426a1fa68b803f6d"
         }
-      ]
+      ],
+      "qa": {
+        "roleSourceRun": 43445860868,
+        "roleSourceConclusion": "SUCCESS",
+        "governanceRun": 43445860818,
+        "governanceConclusion": "SUCCESS",
+        "productionDeployed": false,
+        "realSignedRoleWritesAccepted": false
+      }
     }
   ]
 }
