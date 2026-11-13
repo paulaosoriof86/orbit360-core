@@ -108,7 +108,6 @@ on:
     - 'tools/gravicentra-i6-5-b3-004-r8-operational-proof.mjs'
     - 'orbit360-platform/core/record-delete.js'
     - 'artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B3_EXECUTION_LOCK_20260929.json'
-    - '.github/workflows/gravicentra-recovery-i6-postsalida.yml'
     - 'artifacts/orbit360-recovery/release-control/I6_5_OCTOBER_RECONCILIATION_PRIVATE_READBACK_REQUEST_20261107.json'
     - 'tools/gravicentra-i6-5-encrypted-live-snapshot.mjs'
 permissions:
