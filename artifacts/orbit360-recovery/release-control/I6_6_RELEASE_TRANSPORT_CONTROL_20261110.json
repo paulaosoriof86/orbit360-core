@@ -34,6 +34,25 @@
     },
     "nextGate": "EXACT_SAME_ARTIFACT_LIVE_PROMOTION_WITH_ROLLBACK_AND_SIGNED_LIVE_UAT"
   },
+  "i66PaymentInvoiceLiveTargetedAuthorization20261113": {
+    "status": "EXACT_PREVIEW_PASSED_ONE_LIVE_PAYMENT_FUNCTION_ROLLBACK_AUTHORIZED",
+    "authority": "Paula Dirección 2026-11-13: corregir, certificar y publicar cada lote a producción; pagos aplicados y conciliados con factura, para Carlos y Dirección.",
+    "sourceSha": "586401bfbe1a80cfef2820982f432743af36b108",
+    "immutableBuildRunId": 43463160506,
+    "immutableArtifactId": 14057935092,
+    "immutableArtifactDigest": "sha256:1621f236b9d1b9e49ea42fc53e338a695d5872080361ada2a84183fa7d52207f",
+    "signedTwoActorsPreviewFunctionRunId": 43467007164,
+    "governanceSynchronizationPassRunId": 43467912651,
+    "singleAllowedLiveFunction": "orbit360CobrosReconciliationCommand",
+    "region": "us-central1",
+    "onlyDeployExactBackendFromSamePreviewArtifact": true,
+    "requireSignedTwoActorSyntheticLiveBackendReadbackAndRestore": true,
+    "requireRevisionRollbackOnAnyFailure": true,
+    "noHostingPromotionInThisFunctionGate": true,
+    "noRulesAuthOtherFunctionsOrRealFinancialWrites": true,
+    "historicalR8LiveHostingMustStayUnchangedUntilHostingGate": true,
+    "nextGate": "EXACT_IMMUTABLE_PREVIEW_SITE_TO_DUAL_ORIGIN_LIVE_AFTER_PAYMENT_BACKEND_PASS"
+  },
   "i66OperativeInvoiceRosterPreviewQuotaRecovery20261113": {
     "status": "R8_CURRENT_PREVIEW_LIVE_EXACT_BACKUP_AUTHORIZED_SINGLE_CHANNEL",
     "authority": "Paula Dirección 2026-11-13: solucionar selector desde Equipos, fecha factura, vigencia contractual y persistencia, probar por lote y publicar tras certificación sin acumular.",

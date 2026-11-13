@@ -1,4 +1,4 @@
-# I6.6 P0 payment backend only: promote exact immutable source after QA + Preview, fail-closed rollback.
+# I6.6 invoice-date payment backend only: exact immutable source after signed Preview, rollback.
 # Does NOT deploy Hosting, touch Firestore records, Rules/Auth, other Functions, or new Firebase.
 name: Gravicentra I6.6 Payment Exact LIVE Backend Hotfix P0
 on:
@@ -19,13 +19,14 @@ jobs:
     timeout-minutes: 50
     env:
       PROJECT_ID: ays-orbit-360-lab
-      SOURCE_SHA: 1dd675ed59ac51fd122915ca8056f85f82fa12d6
-      ARTIFACT_RUN: '43305281214'
-      ARTIFACT_ID: '13984026378'
-      ARTIFACT_DIGEST: sha256:f51907a610ca467b7bf840652a3f3e9983a7f9913f5d279e01fa34a539123dbc
-      QA_RUN: '43305281266'
-      CONTROL_RUN: '43305281448'
-      PREVIEW_FUNCTION_RUN: '43306217923'
+      SOURCE_SHA: 586401bfbe1a80cfef2820982f432743af36b108
+      ARTIFACT_RUN: '43463160506'
+      ARTIFACT_ID: '14057935092'
+      ARTIFACT_DIGEST: sha256:1621f236b9d1b9e49ea42fc53e338a695d5872080361ada2a84183fa7d52207f
+      QA_RUN: '43465087494'
+      CONTROL_RUN: '43467912651'
+      PREVIEW_FUNCTION_RUN: '43467007164'
+      PREVIEW_URL: https://ays-orbit-360-lab--gi-i66-rc-42868854629-abj14q6n.web.app
       SA_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
       SA_ALT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
       SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
@@ -42,26 +43,33 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          node tools/gravicentra-i6-6-carlos-payment-preview-synthetic-gate.test.cjs
           node tools/gravicentra-i6-6-payment-replay-ledger-guard.test.cjs
+          node --check tools/gravicentra-i6-6-carlos-payment-signed-synthetic-preview-uat.cjs
           node - <<'NODE'
           const assert=require('node:assert/strict'),fs=require('node:fs');
           (async()=>{
             const c=JSON.parse(fs.readFileSync('artifacts/orbit360-recovery/release-control/I6_6_RELEASE_TRANSPORT_CONTROL_20261110.json'));
-            assert.equal(c.status,'PAYMENT_LIVE_FUNCTION_PROMOTION_AUTHORIZED');
-            assert.equal(c.livePromotionAuthorized,true);
-            assert.equal(c.previewApproved,true);
+            assert.equal(c.status,'PAYMENT_INVOICE_BACKEND_PREVIEW_AUTHORIZED');
+            assert.equal(c.livePromotionAuthorized,false);
+            assert.equal(c.previewApproved,false);
             assert.equal(c.forbidFirestoreRulesDataAuthWrites,true);
             assert.equal(c.noHostingPromotion,true);
-            assert.equal(c.forbidBackendLiveFunctionDeploy,false);
-            assert.equal(c.liveFunctionScope,'orbit360CobrosReconciliationCommand');
-            assert.equal(c.carlosPaymentPreviewNextSource20261112?.signedCarlosPaulaPaymentUat,'PASS_43306217923');
-            for(const [k,v] of [['approvedSourceSha',process.env.SOURCE_SHA],['sourceBuildWorkflowRunId',Number(process.env.ARTIFACT_RUN)],['immutableArtifactId',Number(process.env.ARTIFACT_ID)],['immutableArtifactZipDigest',process.env.ARTIFACT_DIGEST],['previewFunctionRunId',Number(process.env.PREVIEW_FUNCTION_RUN)]])assert.equal(c[k],v,k);
+            assert.equal(c.forbidBackendLiveFunctionDeploy,true);
+            assert.equal(c.forbidBackendFunctionDeploy,true);
+            const gate=c.i66PaymentInvoiceLiveTargetedAuthorization20261113||{};
+            assert.equal(gate.status,'EXACT_PREVIEW_PASSED_ONE_LIVE_PAYMENT_FUNCTION_ROLLBACK_AUTHORIZED');
+            for(const [k,v] of [['sourceSha',process.env.SOURCE_SHA],['immutableBuildRunId',Number(process.env.ARTIFACT_RUN)],['immutableArtifactId',Number(process.env.ARTIFACT_ID)],['immutableArtifactDigest',process.env.ARTIFACT_DIGEST],['signedTwoActorsPreviewFunctionRunId',Number(process.env.PREVIEW_FUNCTION_RUN)],['governanceSynchronizationPassRunId',Number(process.env.CONTROL_RUN)],['singleAllowedLiveFunction','orbit360CobrosReconciliationCommand'],['region','us-central1']])assert.equal(gate[k],v,k);
+            for(const k of ['onlyDeployExactBackendFromSamePreviewArtifact','requireSignedTwoActorSyntheticLiveBackendReadbackAndRestore','requireRevisionRollbackOnAnyFailure','noHostingPromotionInThisFunctionGate','noRulesAuthOtherFunctionsOrRealFinancialWrites','historicalR8LiveHostingMustStayUnchangedUntilHostingGate'])assert.equal(gate[k],true,k);
             const h={Authorization:'Bearer '+process.env.GH_TOKEN,Accept:'application/vnd.github+json','User-Agent':'GI-I66-Payment-Live-Scoped'};
             const base='https://api.github.com/repos/paulaosoriof86/orbit360-core/actions/';
             const names=[['EMULATOR',process.env.QA_RUN],['CONTROL',process.env.CONTROL_RUN],['BUILD',process.env.ARTIFACT_RUN],['PREVIEW_FUNCTION',process.env.PREVIEW_FUNCTION_RUN]];
             const runs=await Promise.all(names.map(async ([name,n])=>({name,run:await fetch(base+'runs/'+n,{headers:h}).then(r=>r.json())})));
-            for(const {name,run} of runs){assert.equal(run.conclusion,'success',name);if(name!=='PREVIEW_FUNCTION')assert.equal(run.head_sha,process.env.SOURCE_SHA,name+' sha');}
+            for(const {name,run} of runs){assert.equal(run.conclusion,'success',name);}
+            assert.equal(runs.find(r=>r.name==='BUILD').run.head_sha,process.env.SOURCE_SHA,'build SHA');
+            for(const {name,run} of runs.filter(r=>r.name!=='BUILD')){
+              const changed=require('node:child_process').execFileSync('git',['diff','--name-only',process.env.SOURCE_SHA,run.head_sha,'--','functions/','orbit360-platform/'],{encoding:'utf8'}).trim();
+              assert.equal(changed,'',name+' product drift');
+            }
             const a=await fetch(base+'artifacts/'+process.env.ARTIFACT_ID,{headers:h}).then(r=>r.json());
             assert.equal(a.digest,process.env.ARTIFACT_DIGEST);assert.equal(a.workflow_run.id,Number(process.env.ARTIFACT_RUN));assert.equal(a.expired,false);
             console.log('I66_PAYMENT_LIVE_OWNER_EXACT_ARTIFACT_CARLOS_PAULA_SIGNED_QA_PASS');
@@ -69,8 +77,8 @@ jobs:
           NODE
       - uses: actions/download-artifact@v4
         with:
-          artifact-ids: 13984026378
-          run-id: 43305281214
+          artifact-ids: 14057935092
+          run-id: 43463160506
           github-token: ${{ github.token }}
           path: ${{ runner.temp }}/payment-live-packet-download
       - name: Verify exact immutable TAR/backend bytes before any deployment
@@ -95,6 +103,7 @@ jobs:
           // bootstrap.js has the exact deterministic B4-003 Preview export injected by the certified package builder.
           assert(fs.existsSync(b+'backend/bootstrap.js')&&fs.existsSync(b+'backend/index.js'));
           assert(fs.readFileSync(b+'backend/cobros-reconciliation-domain.js','utf8').includes('PAYMENT_ALREADY_APPLIED'));
+          assert(fs.readFileSync(b+'backend/cobros-reconciliation-domain.js','utf8').includes('confirmedReceipt.invoiceDate'));
           console.log('I66_PAYMENT_LIVE_EXACT_SOURCE_BACKEND_AND_INFERENCE_ENGINE_PASS');
           NODE
       - name: Select configured current Firebase authority and pinned tooling
@@ -124,6 +133,8 @@ jobs:
           chmod 600 "$RUNNER_TEMP/payment-live-auth/selected.json"
           echo "GOOGLE_APPLICATION_CREDENTIALS=$RUNNER_TEMP/payment-live-auth/selected.json" >> "$GITHUB_ENV"
           echo "FIREBASE_CLI_BIN=$CLI" >> "$GITHUB_ENV"
+          npm install --no-save --package-lock=false --ignore-scripts --no-audit --no-fund firebase-admin@13.4.0 playwright@1.55.0 >/dev/null
+          node node_modules/playwright/cli.js install --with-deps chromium >/dev/null
       - uses: google-github-actions/setup-gcloud@v2
         with:
           version: '>= 483.0.0'
@@ -226,6 +237,8 @@ jobs:
           test "$STATUS" = 401
           grep -q 'UNAUTHENTICATED' "$RUNNER_TEMP/payment-live-unauth.json"
           echo 'I66_PAYMENT_LIVE_AUTH_GUARD_401_PASS'
+          I66_PAYMENT_LIVE_BACKEND_ONLY=true I66_PREVIEW_ORIGIN="$PREVIEW_URL" node tools/gravicentra-i6-6-carlos-payment-signed-synthetic-preview-uat.cjs
+          echo 'I66_PAYMENT_LIVE_BACKEND_SIGNED_CARLOS_PAULA_SYNTHETIC_INVOICE_DATE_PERSISTENCE_AND_RESTORE_PASS'
           curl -fsSL --max-time 30 'https://ays-orbit-360-lab.web.app/' | sha256sum > "$RUNNER_TEMP/payment-live-host-after.sha"
           curl -fsSL --max-time 30 'https://app.aysseguros.com/' | sha256sum > "$RUNNER_TEMP/payment-live-app-after.sha"
           cmp "$RUNNER_TEMP/payment-live-host-before.sha" "$RUNNER_TEMP/payment-live-host-after.sha"
