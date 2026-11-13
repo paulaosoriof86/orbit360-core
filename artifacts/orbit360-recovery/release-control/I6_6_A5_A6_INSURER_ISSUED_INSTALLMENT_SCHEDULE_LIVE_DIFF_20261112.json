@@ -68,6 +68,14 @@
     "firstFocalRunId": 43340119256,
     "secondFocalRunId": 43340415262,
     "secondEvidenceArtifactId": 13999800393,
+    "thirdDocumentLedPreflightRunId": 43367579700,
+    "thirdDocumentLedPreflightSourceCommit": "99d56b19b0840617c5ada37e16e95d8e40840ae5",
+    "thirdEvidenceArtifactId": 14010942393,
+    "thirdControlGuardRunId": 43367579615,
+    "thirdPreflightResult": {
+      "aseguradoraGeneral": "12_OF_12_INTERNAL_QUOTAS_UNIQUE_12_OTHER_SOURCE_REF_ROWS_1_PAYMENT_OR_REPORT_PROTECTED_10_ISSUED_QUOTAS",
+      "columna": "12_OF_12_INTERNAL_QUOTAS_UNIQUE_7_OTHER_SOURCE_REF_ROWS_7_PAYMENT_OR_REPORT_PROTECTED_Q0_04_LIVE_TOTAL_OVERAGE"
+    },
     "doubleReadbackStable": true,
     "financialWrites": 0,
     "sourceCasesApplied": 0

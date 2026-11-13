@@ -10,7 +10,7 @@
   "branch": "recovery/fase-a-clean-20260831",
   "forensicOriginSha": "9c95f31461f2eabe9804625b5659bee772f5602a",
   "createdAtUtc": "2026-08-31T18:00:00Z",
-  "updatedAtUtc": "2026-11-13T01:01:12Z",
+  "updatedAtUtc": "2026-11-13T04:48:28Z",
   "status": "I6_6_LIVE_CONTROLLED_PORTFOLIO_UPDATE_IN_PROGRESS",
   "currentIteration": 6,
   "lastCompletedIteration": 5,
@@ -194,6 +194,39 @@
         "financialWrites": 0,
         "causalBoundary": "OBSERVED_FINANCIAL_SCHEDULE_AND_REFERENCE_MISMATCH_PROVEN_IMPORTER_DEFAULT_CAUSE_NOT_YET_PROVEN",
         "next": "Correct document-led installment schedules with protected transaction, before image, idempotency, audit and rollback only after no-conflict receipt classification and Preview QA, then exact LIVE mini-batch paid CAS."
+      },
+      "insurerIssuedScheduleSignedLivePreflight20261112": {
+        "status": "SIGNED_LIVE_READONLY_PREFLIGHT_PASS_WITH_EXISTING_PAYMENT_REPORT_AND_SOURCE_REFERENCE_CONFLICT_HOLD",
+        "sourceCommit": "99d56b19b0840617c5ada37e16e95d8e40840ae5",
+        "workflowRunId": 43367579700,
+        "workflowConclusion": "SUCCESS",
+        "controlGuardRunId": 43367579615,
+        "controlGuardConclusion": "SUCCESS",
+        "signedReadOnlyEvidenceArtifactId": 14010942393,
+        "officialSchedulesFixtureChecks": 24,
+        "confirmedA5P7": {
+          "issuedQuotas": 10,
+          "issuedTotalCents": 325860,
+          "liveQuotas": 12,
+          "liveTotalCents": 325860,
+          "distinctInternalQuotas": 12,
+          "preexistingExternalReferenceRows": 12,
+          "paymentOrReportEvidenceRows": 1,
+          "liveCobrosRows": 0
+        },
+        "confirmedA6P4": {
+          "issuedQuotas": 12,
+          "issuedTotalCents": 177632,
+          "liveQuotas": 12,
+          "liveTotalCents": 177636,
+          "distinctInternalQuotas": 12,
+          "preexistingExternalReferenceRows": 7,
+          "paymentOrReportEvidenceRows": 7,
+          "liveCobrosRows": 0
+        },
+        "sourceCasesApplied": 0,
+        "realFinancialWrites": 0,
+        "next": "Classify existing insurer source references and distinguish reported versus paid status for each protected receipt. Prepare document-led patch with full preimages, audit, idempotency and reviewer-gated Preview, never overwrite one of the 1 plus 7 payment-or-report-protected receipts or replace a valid external reference without proof."
       },
       "freshSignedA1A4A7CurrentLiveReadback20261112": {
         "runId": 43326553828,
