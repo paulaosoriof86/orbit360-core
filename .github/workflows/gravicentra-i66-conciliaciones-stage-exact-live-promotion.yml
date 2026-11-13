@@ -167,6 +167,9 @@ jobs:
             if GOOGLE_APPLICATION_CREDENTIALS="$candidate" node "$CLI" functions:list --project "$PROJECT_ID" --non-interactive --json >/dev/null 2>&1;then selected="$candidate";break;fi
           done < "$RUNNER_TEMP/i66-stage-auth/candidates"
           test -n "$selected"
+          # GITHUB_ENV is only loaded by subsequent steps. The functions:list
+          # and gcloud snapshot below also need this exact account now.
+          export GOOGLE_APPLICATION_CREDENTIALS="$selected"
           echo "GOOGLE_APPLICATION_CREDENTIALS=$selected" >> "$GITHUB_ENV"
           echo "FIREBASE_CLI_BIN=$CLI" >> "$GITHUB_ENV"
           gcloud auth activate-service-account --key-file="$selected" --quiet >/dev/null
