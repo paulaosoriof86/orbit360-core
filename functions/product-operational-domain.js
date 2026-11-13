@@ -197,7 +197,8 @@ function effectiveScope(member,accessConfig,role,moduleKey){
   const roleKey=Object.keys(configured).find(k=>norm(k)===norm(role));
   const explicitRoleScope=roleKey?normalizedScope(configured[roleKey]):'';
   if(['operativo','direccion','superadmin','super_admin','admintenant','admin_tenant','admin'].includes(norm(role))&&
-     ['polizas','cliente360','cobros','ops','leads','cancelaciones','siniestros','comisiones'].includes(norm(moduleKey))&&
+     (['polizas','cliente360','cobros','ops','leads'].includes(norm(moduleKey)) ||
+      ['cancelaciones','siniestros','comisiones'].includes(norm(moduleKey)))&&
      explicitRoleScope==='all'&&requested!=='none')return 'all';
   if(!requested)return ceiling;return scopeRank(requested)<=scopeRank(ceiling)?requested:ceiling;
 }

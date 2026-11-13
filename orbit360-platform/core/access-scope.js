@@ -191,10 +191,12 @@ Orbit.access = (function () {
     // Module visibility/edit rights and the signed country/tenant boundaries
     // are checked separately. No direct finance/secret writer is added here.
     var privileged = ['operativo', 'admin', 'admintenant', 'superadmin', 'direccion'];
-    var business = ['polizas', 'cliente360', 'cobros', 'ops', 'leads', 'cancelaciones', 'siniestros', 'comisiones'];
+    var business = ['polizas', 'cliente360', 'cobros', 'cancelaciones', 'siniestros', 'comisiones'];
+    var operationalWorkflow = moduleKey === 'ops' || moduleKey === 'leads';
     var configuredKey = Object.keys(scopes).find(function (key) { return norm(key) === norm(role); });
-    return privileged.indexOf(norm(role)) >= 0 && business.indexOf(moduleKey) >= 0 &&
-      configuredKey !== undefined && normalizeScope(scopes[configuredKey]) === 'all';
+    return privileged.indexOf(norm(role)) >= 0 && (business.indexOf(moduleKey) >= 0 || operationalWorkflow) &&
+      (normalizeScope(scopes[role]) === 'all' ||
+       (configuredKey !== undefined && normalizeScope(scopes[configuredKey]) === 'all'));
   }
   function dataScope(moduleKey) {
     if (!roleIsAssigned()) return 'none';
