@@ -1,4 +1,5 @@
 # I6.6 R11 signed renewals and Drive feedback frontend ONLY.
+# Re-run with signed LIVE causal booleans after R10 controlled rollback and R10 signed baseline PASS.
 # One immutable R11 Preview Hosting version -> existing LIVE site; automatic
 # same-project Hosting rollback on failure. No backend, rules or data writes.
 name: Gravicentra I6.6 R11 Renewals Drive Exact LIVE Hosting and Rollback
