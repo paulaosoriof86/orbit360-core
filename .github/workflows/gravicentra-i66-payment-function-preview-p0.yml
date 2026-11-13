@@ -49,7 +49,7 @@ jobs:
             const c=JSON.parse(fs.readFileSync('artifacts/orbit360-recovery/release-control/I6_6_RELEASE_TRANSPORT_CONTROL_20261110.json'));
             assert.equal(c.status,'PAYMENT_INVOICE_BACKEND_PREVIEW_AUTHORIZED');
             assert.equal(c.backendFunctionPreviewOnly,true);
-            assert.equal(c.forbidBackendFunctionDeploy,false);
+            assert.equal(c.forbidBackendFunctionDeploy,true);
             assert.equal(c.forbidBackendLiveFunctionDeploy,true);
             assert.equal(c.forbidFirestoreRulesDataAuthWrites,true);
             assert.equal(c.livePromotionAuthorized,false);

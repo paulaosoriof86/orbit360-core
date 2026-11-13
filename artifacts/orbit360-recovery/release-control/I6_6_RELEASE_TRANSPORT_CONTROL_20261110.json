@@ -21,7 +21,18 @@
     "forbidRealFinancialWrites": true,
     "requireLiveFunctionRevisionBeforeAfterIdentity": true,
     "requireExactBackendBlobInArtifact": true,
-    "nextGate": "SIGNED_PAYMENT_AND_INVOICE_DATE_SYNTHETIC_PREVIEW_UAT"
+    "completedPreviewProof": {
+      "runId": 43467007164,
+      "conclusion": "SUCCESS",
+      "appliedAndReconciledInvoiceDatePersistedReloaded": ["Carlos Operativo", "Paula Direccion"],
+      "separateInvoiceDate": "2026-11-11",
+      "livePaymentFunctionRevisionTrafficUnchanged": true,
+      "bothLiveHostingOriginsUnchanged": true,
+      "syntheticRecordsAndAuditRestored": true,
+      "realFinancialWrites": 0,
+      "liveDeploymentAuthorized": false
+    },
+    "nextGate": "EXACT_SAME_ARTIFACT_LIVE_PROMOTION_WITH_ROLLBACK_AND_SIGNED_LIVE_UAT"
   },
   "i66OperativeInvoiceRosterPreviewQuotaRecovery20261113": {
     "status": "R8_CURRENT_PREVIEW_LIVE_EXACT_BACKUP_AUTHORIZED_SINGLE_CHANNEL",
@@ -429,7 +440,7 @@
   "requiredCanonicalOrigin": "https://ays-orbit-360-lab.web.app",
   "requiredStaffOrigin": "https://app.aysseguros.com",
   "originReadbackRequirement": "BOTH_HOSTS_IDENTICAL_TO_SAME_ARTIFACT_OR_ROLLBACK",
-  "forbidBackendFunctionDeploy": false,
+  "forbidBackendFunctionDeploy": true,
   "forbidFirestoreRulesDataAuthWrites": true,
   "rollback": "FRONTEND_TOPBAR_PREVIEW_FIRST; KEEP BOTH LIVE HOSTING ORIGINS AND COBROS FUNCTION UNCHANGED UNTIL EXACT_ARTIFACT_PREVIEW_PASS; THEN BACKUP_AND_ATOMIC_EXACT_ARTIFACT_LIVE_PROMOTION_WITH_REHASH_AND_ROLLBACK",
   "immutableArtifactId": 14048803073,
