@@ -19,12 +19,27 @@ async function main(){
   const p=await data('cobrosLedgerControl').doc('active').get();
   const activeRunId=String(p.data()?.activeRunId||'');
   assert.ok(!activeRunId||/^[a-zA-Z0-9][a-zA-Z0-9._:-]{1,179}$/.test(activeRunId),'I66_CONCILIACIONES_ACTIVE_RUN_INVALID');
-  let stage=null,manifestExists=false,manifestStatus='';
+  let stage=null,manifestExists=false,manifestStatus='',stageProposalShape=null;
   if(activeRunId){
     const run=data('cobrosLedgerRuns').doc(activeRunId);
     const m=await run.get();manifestExists=m.exists;
     manifestStatus=String(m.data()?.status||m.data()?.estado||m.data()?.result||'').slice(0,64);
     stage=Object.fromEntries(await Promise.all(['propuestasConciliacion','evidenciasCobro','conciliacionHolds'].map(async k=>[k,await count(run.collection(k))])));
+    if(stage.propuestasConciliacion>0){
+      const ss=await run.collection('propuestasConciliacion').limit(250).get();
+      assert.ok(stage.propuestasConciliacion<=250&&ss.size===stage.propuestasConciliacion,'I66_CONCILIACIONES_STAGE_PROPOSAL_SCAN_BOUND');
+      const rows=ss.docs.map(x=>x.data()||{}), keys=new Set();
+      const has=(r,fields)=>fields.some(k=>r[k]!==undefined&&r[k]!==null&&r[k]!=='');
+      rows.forEach(r=>Object.keys(r).filter(k=>/^[a-zA-Z][a-zA-Z0-9_]{0,44}$/.test(k)).forEach(k=>keys.add(k)));
+      stageProposalShape={sampled:rows.length,fieldNames:[...keys].sort(),
+        withPolicyLink:rows.filter(r=>has(r,['polizaId','policyId','poliza_id'])).length,
+        withClientLink:rows.filter(r=>has(r,['clienteId','clientId','cliente_id'])).length,
+        withReceiptLink:rows.filter(r=>has(r,['reciboId','receiptId','recibo_id'])).length,
+        withCountry:rows.filter(r=>has(r,['pais','country'])).length,
+        withAdvisor:rows.filter(r=>has(r,['asesorId','advisorId'])).length,
+        withAmount:rows.filter(r=>has(r,['monto','total','saldo','montoAplicar','importe'])).length,
+        withSourceReference:rows.filter(r=>has(r,['source_ref','sourceRef','fuente','sourceId'])).length};
+    }
   }
   const verdict=!activeRunId?'HOLD_NO_ACTIVE_LEDGER_POINTER':!manifestExists?'HOLD_ACTIVE_LEDGER_RUN_MISSING':
     (collections.conciliaciones+collections.conciliacionesPrimas===0&&stage.propuestasConciliacion>0)?'MISMATCH_STAGE_PROPOSALS_NOT_CANONICAL_VISIBLE':
@@ -32,7 +47,7 @@ async function main(){
     'CANONICAL_PROPOSALS_PRESENT_REQUIRE_SIGNED_UI_READBACK';
   console.log('I66_CONCILIACIONES_LIVE_CANONICAL_VS_STAGE_COUNTS_READONLY='+JSON.stringify({
     collections,activeLedgerPointerPresent:!!activeRunId,manifestExists,manifestStatus,
-    stage,verdict,writes:0,guaranteedNoImports:true
+    stage,stageProposalShape,verdict,writes:0,guaranteedNoImports:true
   }));
   assert.ok(p.exists,'I66_CONCILIACIONES_CENSUS_LEDGER_POINTER_ABSENT_HOLD');
 }
