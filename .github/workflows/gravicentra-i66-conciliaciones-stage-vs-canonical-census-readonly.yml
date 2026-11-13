@@ -1,0 +1,38 @@
+name: Gravicentra I6.6 Conciliaciones LIVE Canonical Stage Census READONLY
+on:
+  push:
+    branches: [recovery/fase-a-clean-20260831]
+    paths:
+      - .github/workflows/gravicentra-i66-conciliaciones-stage-vs-canonical-census-readonly.yml
+      - tools/gravicentra-i66-conciliaciones-stage-vs-canonical-census-readonly.cjs
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  exact-live-readonly-census:
+    if: github.repository == 'paulaosoriof86/orbit360-core' && github.ref == 'refs/heads/recovery/fase-a-clean-20260831'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    env:
+      SA_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_ALT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Require same exact R7 source owners, no financial mutation
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor 0153f5cbbe00c3732e11ebae59b32bd357e38bfd HEAD
+          test -z "$(git diff --name-only 0153f5cbbe00c3732e11ebae59b32bd357e38bfd HEAD -- orbit360-platform functions ':!orbit360-platform/docs/**')"
+          node --check tools/gravicentra-i66-conciliaciones-stage-vs-canonical-census-readonly.cjs
+      - name: Read aggregate counts for current real tenant and active ledger stage
+        run: |
+          set -euo pipefail
+          npm install --no-save --package-lock=false --ignore-scripts --no-audit --no-fund firebase-admin@13.4.0 >/dev/null
+          node tools/gravicentra-i66-conciliaciones-stage-vs-canonical-census-readonly.cjs
