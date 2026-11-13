@@ -64,6 +64,17 @@ async function statusFor(actor){
     method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+token},
     body:JSON.stringify({data:{tenantId:TENANT,activeRole:actor.role}})});
   const data=await res.json().catch(()=>({}));
+  if(res.status!==200){
+    const er=data.error&&typeof data.error==='object'?data.error:{};
+    const details=er.details&&typeof er.details==='object'?er.details:{};
+    console.error('DRIVE_LIVE_SIGNED_STATUS_BACKEND_ERROR '+JSON.stringify({
+      actor:actor.key,http:res.status,
+      status:String(er.status||'').slice(0,60),
+      message:String(er.message||'').slice(0,170),
+      vaultState:String(details.vaultState||'').slice(0,50),
+      code:String(details.code||'').slice(0,12)
+    }));
+  }
   assert.equal(res.status,200,'DRIVE_LIVE_SIGNED_STATUS_CALL_FAILED_'+actor.key);
   const out=data.result||{};
   const safe={actor:actor.key,callableHttp:res.status,status:String(out.status||''),available:out.available===true,
