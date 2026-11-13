@@ -48,7 +48,8 @@ jobs:
           node tools/gravicentra-i6-6-delta-guard.mjs
           git cat-file -e "$SOURCE_SHA^{commit}"
           git merge-base --is-ancestor "$SOURCE_SHA" HEAD
-          test -z "$(git diff --name-only "$SOURCE_SHA" HEAD -- orbit360-platform functions firebase.json firestore.rules storage.rules)"
+          # Exact runtime bytes only: recovery-state is mutable governance, not executable product.
+          test -z "$(git diff --name-only "$SOURCE_SHA" HEAD -- orbit360-platform functions firebase.json firestore.rules storage.rules ':(exclude)orbit360-platform/docs/recovery/orbit360-recovery-state-v1.json')"
           node --check tools/gravicentra-i66-conciliaciones-human-names-exact-live-transport.mjs
           node --check tools/gravicentra-i66-conciliaciones-stage-signed-preview-ui-readonly.cjs
           node - <<'NODE'
