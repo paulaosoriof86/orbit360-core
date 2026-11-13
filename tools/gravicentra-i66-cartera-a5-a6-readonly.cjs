@@ -131,7 +131,11 @@ async function scan(db){
       hasClient:snapshot.clientExists,
       receiptCount:snapshot.receipts.length,
       cobroCount:snapshot.cobros.length,
-      receiptCandidates:snapshot.receipts.filter(r=>
+      policyDateEvidence:Object.fromEntries(Object.entries(snapshot.policies[0]||{})
+        .filter(([k,v])=>/^(fechaInicio|fechaFin|inicioVigencia|finVigencia|vigenciaDesde|vigenciaHasta|fechaVencimiento|periodicidad)$/i.test(k)
+          &&typeof v==='string'&&v.length<=35)
+        .map(([k,v])=>[k,v])),
+      receiptCandidates:snapshot.receipts.filter(r=>one.id==='A5.P7'||
         amount(r)===one.cents||[r.secuencia,r.cuota,r.numeroCuota,r.cuotaNumero]
           .some(v=>v!=null&&Number(v)===Number(one.quota)))
         .slice(0,12).map(r=>({
