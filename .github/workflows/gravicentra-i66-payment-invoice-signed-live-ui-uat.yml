@@ -1,0 +1,63 @@
+# I6.6 exact post-Hosting LIVE UI payment+invoice readback with actual Carlos/Paula
+# identities, only synthetic financial fixtures and verified cleanup.
+name: Gravicentra I6.6 Payment Invoice Signed LIVE UI UAT
+on:
+  push:
+    branches: [recovery/fase-a-clean-20260831]
+    paths:
+      - .github/workflows/gravicentra-i66-payment-invoice-signed-live-ui-uat.yml
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: gi-i66-payment-signed-live-ui-after-hosting
+  cancel-in-progress: false
+jobs:
+  signed-live-ui:
+    if: github.repository == 'paulaosoriof86/orbit360-core' && github.ref == 'refs/heads/recovery/fase-a-clean-20260831'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    env:
+      SOURCE_SHA: 586401bfbe1a80cfef2820982f432743af36b108
+      I66_PREVIEW_ORIGIN: https://app.aysseguros.com
+      I66_PAYMENT_LIVE_SIGNED_UI: 'true'
+      SA_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_ALT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Require exact LIVE approved Hosting, same artifact and zero source drift
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor "$SOURCE_SHA" HEAD
+          test -z "$(git diff --name-only "$SOURCE_SHA" HEAD -- orbit360-platform functions firebase.json firestore.rules storage.rules)"
+          node --check tools/gravicentra-i6-6-carlos-payment-signed-synthetic-preview-uat.cjs
+          node - <<'NODE'
+          const assert=require('node:assert/strict');
+          (async()=>{
+            const h={Authorization:'Bearer '+process.env.GH_TOKEN,Accept:'application/vnd.github+json','User-Agent':'GI-I66-Payment-LiveUI'};
+            const r=await fetch('https://api.github.com/repos/paulaosoriof86/orbit360-core/actions/runs/43472800270',{headers:h}).then(x=>x.json());
+            assert.equal(r.conclusion,'success','I66_HOSTING_SIGNED_LIVE_UAT_NOT_ACCEPTED');
+            for(const origin of ['https://app.aysseguros.com','https://ays-orbit-360-lab.web.app']){
+              const resp=await fetch(origin+'/__recovery__/build.json',{headers:{'cache-control':'no-cache'}});
+              assert.equal(resp.ok,true,'I66_LIVE_ORIGIN_UNAVAILABLE');
+              const b=await resp.json();
+              assert.equal(b.sourceSha,process.env.SOURCE_SHA,'I66_LIVE_EXACT_SOURCE_DRIFT');
+            }
+            console.log('I66_PAYMENT_SIGNED_LIVE_UI_EXACT_HOSTING_ARTIFACT_AND_DEPLOY_GATE_PASS');
+          })().catch(e=>{console.error(e.message);process.exitCode=1;});
+          NODE
+      - name: Install signed synthetic browser and Firebase runtime
+        run: |
+          set -euo pipefail
+          npm install --no-save --package-lock=false --ignore-scripts --no-audit --no-fund firebase-admin@13.4.0 playwright@1.55.0 >/dev/null
+          node node_modules/playwright/cli.js install --with-deps chromium >/dev/null
+      - name: Verify signed Carlos and Paula payment, invoice reconciliation, date and persistence in LIVE UI
+        run: node tools/gravicentra-i6-6-carlos-payment-signed-synthetic-preview-uat.cjs

@@ -1,16 +1,20 @@
 'use strict';
-// Signed Firebase Preview-only payment UAT. Every document has a unique QA
-// prefix, an exact preflight, and a guarded finally cleanup. Never targets LIVE.
+// Signed Preview payment UAT, or explicitly gated exact LIVE synthetic UI UAT.
+// Every document has a unique QA prefix and guarded finally cleanup.
 const assert=require('node:assert/strict');
 const crypto=require('node:crypto');
 const admin=require('firebase-admin');
 const {chromium}=require('playwright');
 const PREVIEW=process.env.I66_PREVIEW_ORIGIN;
 const TEST_LIVE_BACKEND=process.env.I66_PAYMENT_LIVE_BACKEND_ONLY==='true';
+const TEST_LIVE_UI=process.env.I66_PAYMENT_LIVE_SIGNED_UI==='true';
+const USE_LIVE_BACKEND=TEST_LIVE_BACKEND||TEST_LIVE_UI;
 const LIVE_PAYMENT_URL='https://us-central1-ays-orbit-360-lab.cloudfunctions.net/orbit360CobrosReconciliationCommand';
 const TENANT='alianzas-soluciones';
 const PROJECT='ays-orbit-360-lab';
-assert.ok(/^https:\/\/ays-orbit-360-lab--gi-i66-rc-[0-9]+-[a-z0-9]+\.web\.app$/.test(PREVIEW||''),'PAYMENT_UAT_EXACT_PREVIEW_ORIGIN_REQUIRED');
+assert.ok(TEST_LIVE_UI?PREVIEW==='https://app.aysseguros.com':
+  /^https:\/\/ays-orbit-360-lab--gi-i66-rc-[0-9]+-[a-z0-9]+\.web\.app$/.test(PREVIEW||''),
+  'PAYMENT_UAT_EXACT_AUTHORIZED_ORIGIN_REQUIRED');
 const service=['SA_LAB','SA_ALT','SA_DEFAULT'].map(k=>process.env[k]).filter(Boolean).map(x=>{try{return JSON.parse(x);}catch{return null;}})
   .find(s=>s&&s.type==='service_account'&&s.project_id===PROJECT&&s.private_key);
 assert.ok(service,'PAYMENT_UAT_CONFIGURED_SAME_PROJECT_CREDENTIAL_REQUIRED');
@@ -53,7 +57,7 @@ async function testActor(browser,actor){
   const events=requestIds.map(r=>'payevt_'+hash(TENANT+'|'+ids.receipt+'|'+r).slice(0,28));
   const cobroId='cob_'+hash(TENANT+'|receipt|'+ids.receipt).slice(0,28);
   const refs=[['clientes',ids.client],['polizas',ids.policy],['recibosEsperados',ids.receipt],['carteraPrimas',ids.portfolio],['cobros',cobroId]];
-  const auxiliary=[...requestIds.map(id=>[TEST_LIVE_BACKEND?'reconciliationRequests':'previewReconciliationRequests',id]),...events.map(id=>[TEST_LIVE_BACKEND?'reconciliationEvents':'previewReconciliationEvents',id])];
+  const auxiliary=[...requestIds.map(id=>[USE_LIVE_BACKEND?'reconciliationRequests':'previewReconciliationRequests',id]),...events.map(id=>[USE_LIVE_BACKEND?'reconciliationEvents':'previewReconciliationEvents',id])];
   const created=[];const pageContext=await browser.newContext({viewport:{width:1280,height:880}});
   const fixture={id:ids.receipt,tenantId:TENANT,polizaId:ids.policy,clienteId:ids.client,asesorId:ids.advisor,pais:'GT',moneda:'GTQ',monto:173.23,estado:'Pendiente',cuota:'1',fechaVencimiento:'2026-11-20',__syntheticQa:true};
   try{
@@ -77,9 +81,9 @@ async function testActor(browser,actor){
         clientReady:!!Orbit.reconciliationDomain,available:Orbit.reconciliationDomain?.available?.(),
         endpoint:Orbit.reconciliationDomain?.status?.()};
     },actor.token);
-    assert.ok(login.started&&login.preview&&login.clientReady&&login.available,'PAYMENT_PREVIEW_SIGNED_UI_CLIENT_NOT_READY_'+actor.role);
+    assert.ok(login.started&&login.preview===!TEST_LIVE_UI&&login.clientReady&&login.available,'PAYMENT_SIGNED_UI_CLIENT_NOT_READY_'+actor.role);
     assert.ok(norm(login.role).includes(actor.role),'PAYMENT_SIGNED_ACTIVE_ROLE_MISMATCH');
-    assert.equal(login.endpoint.functionName,'orbit360CobrosReconciliationCommandPreview');
+    assert.equal(login.endpoint.functionName,TEST_LIVE_UI?'orbit360CobrosReconciliationCommand':'orbit360CobrosReconciliationCommandPreview');
     assert.equal(login.endpoint.region,'us-central1');
     const liveToken=TEST_LIVE_BACKEND?await page.evaluate(async()=>{
       const p=Orbit.productRuntimeBrowserProvidersP0,c=await p.initialize();
@@ -106,7 +110,7 @@ async function testActor(browser,actor){
       idRef('recibosEsperados',ids.receipt).get(),idRef('carteraPrimas',ids.portfolio).get(),idRef('cobros',cobroId).get()]);
     assert.equal(receiptAfter.data()?.estado,'Pagado');assert.equal(portfolioAfter.data()?.estado,'Pagado');
     assert.equal(cobroAfter.data()?.paymentState,'PAID_DIRECT');
-    if(!TEST_LIVE_BACKEND)assert.equal(cobroAfter.data()?.__syntheticQa,true);
+    if(!USE_LIVE_BACKEND)assert.equal(cobroAfter.data()?.__syntheticQa,true);
     const enriched=await callPayment('reconcile_payment',{
       sourceType:'insurer_invoice',applicationDate:'2026-11-12',invoiceDate:'2026-11-11',
       invoiceNumber:'QA-INVOICE-ONLY-'+suffix,amount:173.23,forceReconciliation:true},requestIds[1]);
@@ -123,13 +127,13 @@ async function testActor(browser,actor){
     assert.equal((await idRef('recibosEsperados',ids.receipt).get()).data()?.estado,'Pagado');
     assert.equal((await idRef('cobros',cobroId).get()).data()?.applicationState,'APPLIED_DIRECT');
     assert.equal((await idRef('cobros',cobroId).get()).data()?.invoiceDate,'2026-11-11','PAYMENT_INVOICE_DATE_NOT_RELOADED');
-    console.log('I66_SIGNED_'+actor.role.toUpperCase()+'_'+(TEST_LIVE_BACKEND?'LIVE_BACKEND':'PREVIEW_BACKEND')+'_SYNTHETIC_PAYMENT_APPLY_RECONCILE_INVOICE_DATE_RECEIPT_COBRO_PORTFOLIO_RELOAD_PASS');
+    console.log('I66_SIGNED_'+actor.role.toUpperCase()+'_'+(TEST_LIVE_UI?'LIVE_UI':TEST_LIVE_BACKEND?'LIVE_BACKEND':'PREVIEW_BACKEND')+'_SYNTHETIC_PAYMENT_APPLY_RECONCILE_INVOICE_DATE_RECEIPT_COBRO_PORTFOLIO_RELOAD_PASS');
   }finally{
     const errors=[];
     for(const [c,id] of refs.slice().reverse()){
       const r=idRef(c,id);const exists=await r.get();if(!exists.exists)continue;
       const d=exists.data()||{};
-      const linkedLiveCobro=TEST_LIVE_BACKEND&&c==='cobros'&&id===cobroId&&
+      const linkedLiveCobro=USE_LIVE_BACKEND&&c==='cobros'&&id===cobroId&&
         d.reciboId===ids.receipt&&d.polizaId===ids.policy&&d.clienteId===ids.client&&d.monto===173.23;
       if((d.__syntheticQa!==true&&!linkedLiveCobro)||d.id!==id||d.tenantId!==TENANT||d.pais!=='GT'){
         errors.push('PROVENANCE_'+c);continue;
@@ -145,11 +149,11 @@ async function testActor(browser,actor){
     }
     await pageContext.close();
     if(errors.length)throw Error('PAYMENT_SYNTHETIC_RESTORE_HOLD:'+errors.join(','));
-    console.log('I66_SIGNED_'+actor.role.toUpperCase()+'_'+(TEST_LIVE_BACKEND?'LIVE_BACKEND':'PREVIEW_BACKEND')+'_PAYMENT_SYNTHETIC_DATA_AND_AUDIT_RESTORED_PASS');
+    console.log('I66_SIGNED_'+actor.role.toUpperCase()+'_'+(TEST_LIVE_UI?'LIVE_UI':TEST_LIVE_BACKEND?'LIVE_BACKEND':'PREVIEW_BACKEND')+'_PAYMENT_SYNTHETIC_DATA_AND_AUDIT_RESTORED_PASS');
   }
 }
 (async()=>{const staff=await actors(),browser=await chromium.launch({headless:true,args:['--no-sandbox']});
   try{for(const actor of staff)await testActor(browser,actor);
-    console.log('I66_SIGNED_CARLOS_PAULA_PAYMENT_'+(TEST_LIVE_BACKEND?'LIVE_BACKEND':'PREVIEW_BACKEND')+'_TWO_ACTORS_PASS real_customer_writes=0 auth_changes=0 synthetic_restored=true');
+    console.log('I66_SIGNED_CARLOS_PAULA_PAYMENT_'+(TEST_LIVE_UI?'LIVE_UI':TEST_LIVE_BACKEND?'LIVE_BACKEND':'PREVIEW_BACKEND')+'_TWO_ACTORS_PASS real_customer_writes=0 auth_changes=0 synthetic_restored=true');
   }finally{await browser.close();}
 })().catch(e=>{console.error('I66_CARLOS_PAYMENT_SIGNED_PREVIEW_HOLD '+String(e.code||e.message||'UNKNOWN').replace(/[^\w.:-]+/g,'_').slice(0,210));process.exitCode=1;});
