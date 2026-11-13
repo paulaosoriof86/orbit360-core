@@ -79,6 +79,42 @@ async function checkActor(browser,actor){
     const count=Object.values(rights.rights).filter(x=>x.view).length;
     assert.ok(count>=7,'I66_SIGNED_ROLE_MIN_SEVEN_VISIBLE_MODULES_REQUIRED');
     console.log('I66_SIGNED_'+actor.role.toUpperCase()+'_VISIBLE_MODULES_CREATE_EDIT_ALL_PASS count='+count+' origin='+(ORIGIN===PREVIEW?'preview':'live')+' writes=0');
+    if (actor.role==='direccion' && ORIGIN===PREVIEW) {
+      // The owner-visible Equipos matrix must agree with signed protected
+      // access policy. This is a READ-ONLY UI test, never a permission save.
+      await page.evaluate(()=>Orbit.router.go('equipo'));
+      await page.locator('[data-t="permisos"]').click({timeout:30000});
+      await page.waitForFunction(()=>{
+        const b=document.querySelector('#perm-save');
+        return !!b && !b.disabled;
+      },null,{timeout:30000});
+      const current=await page.locator('input[data-perm]').evaluateAll(inputs=>{
+        const out={};
+        for(const el of inputs){
+          const [role,moduleKey,action]=String(el.getAttribute('data-perm')||'').split('|');
+          if(!role||!moduleKey||!action)continue;
+          (out[role] ||= {})[moduleKey] ||= {};
+          out[role][moduleKey][action]=el.checked===true;
+        }
+        return out;
+      });
+      const critical=['cliente360','polizas','renovaciones','cobros','ops','leads','aseguradoras'];
+      const testedRoles=['Dirección','SuperAdmin','AdminTenant','Admin','Operativo'];
+      for(const role of testedRoles){
+        for(const moduleKey of critical){
+          const grant=current[role]?.[moduleKey]||{};
+          assert.equal(grant.ver,true,'I66_EQUIPOS_PROTECTED_MATRIX_VIEW_DENIED_'+role+'_'+moduleKey);
+          assert.equal(grant.editar,true,'I66_EQUIPOS_PROTECTED_MATRIX_EDIT_DENIED_'+role+'_'+moduleKey);
+        }
+      }
+      for(const role of ['Dirección','SuperAdmin','AdminTenant','Admin']){
+        const visible=Object.entries(current[role]||{}).filter(([,v])=>v.ver===true);
+        assert.ok(visible.length>=critical.length,'I66_EQUIPOS_PRIVILEGED_MODULES_MISSING_'+role);
+        for(const [moduleKey,v]of visible)assert.equal(v.editar,true,
+          'I66_EQUIPOS_PRIVILEGED_VISIBLE_READ_ONLY_'+role+'_'+moduleKey);
+      }
+      console.log('I66_SIGNED_PREVIEW_EQUIPOS_PROTECTED_MATRIX_5_ROLES_7_CRITICAL_ALL_VIEW_EDIT_PASS noWrites=true');
+    }
   }finally{await context.close();}
 }
 (async()=>{const all=await actors(),browser=await chromium.launch({headless:true,args:['--no-sandbox']});

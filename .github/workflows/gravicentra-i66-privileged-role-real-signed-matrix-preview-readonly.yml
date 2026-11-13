@@ -1,5 +1,5 @@
 # Browser signed as the actual two existing users, isolated Preview, NO WRITES.
-name: Gravicentra I6.6 Signed Actual Eight Module Matrix Preview READ ONLY
+name: Gravicentra I6.6 Signed Current Preview Role Matrix READ ONLY
 on:
   push:
     branches: [recovery/fase-a-clean-20260831]
@@ -28,8 +28,8 @@ jobs:
       - name: Assert all product owners still match immutable Preview source
         run: |
           set -euo pipefail
-          git merge-base --is-ancestor 0153f5cbbe00c3732e11ebae59b32bd357e38bfd HEAD
-          test -z "$(git diff --name-only 0153f5cbbe00c3732e11ebae59b32bd357e38bfd HEAD -- orbit360-platform functions)"
+          git merge-base --is-ancestor 8a0e904500cbb3c961d83f16517caab69df88a2b HEAD
+          test -z "$(git diff --name-only 8a0e904500cbb3c961d83f16517caab69df88a2b HEAD -- orbit360-platform functions)"
           node --check tools/gravicentra-i66-privileged-role-signed-ui-permissions-readonly.cjs
       - name: Sign in as actual Carlos and Paula to existing Preview and verify eight modules
         run: |
