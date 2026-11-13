@@ -50,7 +50,17 @@
       "operativoCarlosLiveVisibleModulesCreateEditPortfolioAll": 8,
       "paulaDirectionLiveVisibleModulesCreateEditPortfolioAll": 10,
       "signedOpsLeadsTasksCreateUpdateResolveReloadClean": "PASS_BOTH_ACTORS_SYNTHETIC_ONLY",
-      "adminAdminTenantSuperAdminPhysicalSignedLiveAcceptance": "HOLD_SOURCE_SYNTHETIC_ONLY",
+      "adminAdminTenantSuperAdminPhysicalSignedLiveAcceptance": "PARTIAL_REAL_SIGNED_UI_RIGHTS_ADMINTENANT_1_OF_2_ACTIVE_AND_SUPERADMIN_1_OF_1_ACTIVE_10_OF_10_PASS_43377947560; ONE_ADMINTENANT_EMAIL_UNVERIFIED_NO_SIGNIN; ADMIN_ZERO_ACTIVE; WRITER_E2E_HOLD",
+      "higherPrivilegeLiveSignedReadonly20261112": {
+        "runId": 43377947560,
+        "workflowConclusion": "FAIL_CLOSED_EXPECTED_NONVERIFIED_ADMIN_TENANT_ACCOUNT",
+        "adminTenantSignedPass": "1_OF_2_ACTIVE_10_OF_10_VISIBLE_MODULES_ALL_CREATE_EDIT_SCOPE",
+        "superAdminSignedPass": "1_OF_1_ACTIVE_10_OF_10_VISIBLE_MODULES_ALL_CREATE_EDIT_SCOPE",
+        "remainingAdminTenantHold": "EMAIL_UNVERIFIED_AUTH_USER_NOT_SIGNED_IN_AND_NOT_MODIFIED",
+        "adminRoleActiveTenantMembers": 0,
+        "customerDataWrites": 0,
+        "fullRoleAcceptance": false
+      },
       "actualFinancialWrites": 0,
       "realInsurerIssuedRenewal": "HOLD",
       "operativoRoleExplicitlyHiddenModules": ["cancelaciones", "comisiones"]

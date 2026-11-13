@@ -35,7 +35,14 @@
     "signedBothActorsOpsLeadsTasksSyntheticCreateUpdateResolveReloadRestore": true,
     "signedCarlosExistingGtOpsCompletedTaskReadOnlyCount": 1,
     "signedRealCustomerFinancialWrites": 0,
-    "syntheticAuditRecordsRestored": true
+    "syntheticAuditRecordsRestored": true,
+    "higherRoleLiveReadOnlyRunId": 43377947560,
+    "higherRoleLiveReadOnlyRunConclusion": "EXPECTED_HOLD_ONE_REAL_ADMINTENANT_EMAIL_UNVERIFIED",
+    "higherRoleSignedReadyAdminTenant": 1,
+    "higherRoleSignedReadySuperAdmin": 1,
+    "higherRoleVisibleAuthorizedWriteMatrices": "10_OF_10_EACH_READONLY_RIGHTS_CHECK",
+    "higherRoleUnverifiedAdminTenantMember": 1,
+    "higherRoleRealCustomerWrites": 0
   },
   "authorizationBoundary": {
     "operativoAllowedModulesVerified": [
@@ -50,7 +57,7 @@
     ],
     "operativoDeniedInActualTenantConfigNotSilentlyGranted": ["cancelaciones", "comisiones"],
     "direccionAllowedModuleCount": 10,
-    "otherActualAdminAdminTenantSuperAdminSignedLive": "HOLD",
+    "otherActualAdminAdminTenantSuperAdminSignedLive": "ADMIN_ROLE_NO_ACTIVE_MEMBER; ADMINTENANT_1_OF_2_ACTIVE_SIGNED_LIVE_PASS_1_EMAIL_UNVERIFIED_HOLD; SUPERADMIN_1_OF_1_ACTIVE_SIGNED_LIVE_PASS; SOURCE_FIVE_ROLE_MATRIX_PASS; TRUE_OPERATIONS_NOT_TESTED_IN_THIS_READONLY_GATE",
     "legalAcceptanceButtonPhysicalClick": "HOLD_REAL_LEGAL_ACCEPTANCE_REQUIRED",
     "realInsurerCredentialEdit": "HOLD",
     "authenticInsurerIssuedRenewal": "HOLD",
@@ -58,7 +65,7 @@
     "conciliaciones": "READ_ONLY_PROTECTED_PREVIEW_LIVE_PASS_43324845568_WRITER_PARITY_HOLD"
   },
   "nextGates": [
-    "Real AdminTenant and SuperAdmin signed authorization and country module matrix; include physical UI writes with legal acceptance, no forged consent",
+    "Resolve one unverified active AdminTenant identity through legitimate account confirmation; Admin has zero active members; finish country matrix and higher-role physical write UAT with legitimate legal acceptance",
     "Authentic insurer-issued renewal and credential edit audit including insurer account and logo",
     "Protected Conciliaciones true writer parity and safe matched financial source-to-receipt CAS before any real update",
     "A1-A7 matched cartera batch processing only after exact insurer installment discrepancy resolution",
