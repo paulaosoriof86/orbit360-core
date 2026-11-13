@@ -442,7 +442,7 @@ jobs:
           // version supersedes the R8 quota-recovery anchor. The historic R7
           // receipt remains immutable in control; only an explicit new gate
           // may authorize reusing this one known channel.
-          const a=control.i66ConciliacionesHumanNamesPreviewQuotaRecovery20261113||{};
+          const a=control.i66R11RenewalDrivePreviewQuotaRecovery20261113||{};
           assert.equal(control.status,'PREVIEW_BUILD_REQUESTED','I66_QUOTA_RECOVERY_GATE_NOT_REQUESTED');
           assert.ok(control.livePromotionAuthorized===false&&control.forbidBackendFunctionDeploy===true&&
             control.forbidBackendLiveFunctionDeploy===true&&control.noHostingPromotion===true&&
@@ -450,12 +450,12 @@ jobs:
           assert.ok(a.allowOnlyKnownSinglePreviewChannel===true&&a.denyLiveHostingOrBackendDataWrites===true&&
             a.denyChannelDeletion===true&&a.stopOnAnySourceVersionOrArtifactMismatch===true&&
             a.authorizedExistingChannelId===process.env.REUSE_ID&&
-            a.status==='R9_CURRENT_PREVIEW_LIVE_EXACT_BACKUP_AUTHORIZED_SINGLE_CHANNEL'&&
-            a.expectedCurrentSourceSha==='586401bfbe1a80cfef2820982f432743af36b108'&&
-            a.expectedCurrentHostingVersion==='1dd873081501d7fb'&&
+            a.status==='R10_CURRENT_PREVIEW_LIVE_EXACT_BACKUP_AUTHORIZED_SINGLE_CHANNEL'&&
+            a.expectedCurrentSourceSha==='851d68441b819eac6dd37ec1d5d15fb971e35bf2'&&
+            a.expectedCurrentHostingVersion==='23037b2a726a8def'&&
             a.expectedCurrentPreviewUrl==='https://ays-orbit-360-lab--gi-i66-rc-42868854629-abj14q6n.web.app'&&
-            a.recoverableSourceRunId===43463160506&&a.recoverableArtifactId===14057935092&&
-            a.recoverableArtifactDigest==='sha256:1621f236b9d1b9e49ea42fc53e338a695d5872080361ada2a84183fa7d52207f'&&
+            a.recoverableSourceRunId===43484031398&&a.recoverableArtifactId===14066487146&&
+            a.recoverableArtifactDigest==='sha256:f0d45ff58490d53c434f7285d98818439cfabdafb9bbc0f8e814787927df5f3d'&&
             a.allowOnlyNewSourceInIsolatedPreview===true&&a.realBusinessDataWritesAllowed===false,
             'I66_QUOTA_RECOVERY_EXACT_OWNER_AUTHORIZATION_MISSING');
           const j=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/gi-i66-reuse-before.json','utf8'));

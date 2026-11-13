@@ -1833,5 +1833,14 @@
         "financeDataWritten": 0
       }
     }
-  ]
+  ],
+  "i66R11PreviewBuildRequest20261113": {
+    "status": "SCOPED_IMMUTABLE_PREVIEW_PACKAGE_REQUESTED",
+    "approvedByDirection": true,
+    "sourceDeltaCommit": "9cc674f528a5216bea7ad8e7abe7cdab98799de2",
+    "qa": "14/14 local synthetic PASS",
+    "liveTouchAuthorized": false,
+    "existingPreviewChannelOnly": true,
+    "oneBuildOneArtifact": true
+  }
 }
