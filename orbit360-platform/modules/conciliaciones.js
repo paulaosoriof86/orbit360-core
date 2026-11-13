@@ -26,6 +26,7 @@
   const esc = value => U().esc ? U().esc(text(value)) : text(value).replace(/[&<>"']/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
   const money = (value, currency) => U().money ? U().money(Number(value || 0), currency || '') : `${currency || ''} ${Number(value || 0).toFixed(2)}`.trim();
   const safeAll = collection => { try { return S() && S().all ? (S().all(collection) || []) : []; } catch (error) { return []; } };
+  const safeGet = (collection,id) => { try { return S() && S().get && id ? S().get(collection,id) : null; } catch (_) { return null; } };
   const parseAmount = value => {
     if (value == null || value === '') return 0;
     const cleaned = String(value).replace(/[^0-9,.-]/g, '').replace(/\.(?=\d{3}(?:\D|$))/g, '').replace(',', '.');
@@ -41,6 +42,49 @@
     return raw.slice(0, 10);
   };
   const first = (row, keys) => { for (const key of keys) if (row && text(row[key])) return row[key]; return ''; };
+  const isTechnicalId = value => /^(?:cli_|client_|pol_|rec_|cob_|proposal_|prima:|[0-9a-f]{12,}$)/i.test(text(value));
+  function clientDisplayName(row) {
+    const id = text(first(row,['clienteId','cliente_id']));
+    const fromServer = text(first(row,['clienteNombre','nombreCliente','razonSocialCliente']));
+    if (fromServer && !isTechnicalId(fromServer)) return fromServer;
+    const client = safeGet('clientes',id);
+    const fromClient = client && text(client.nombre || client.razonSocial || client.nombreCompleto ||
+      [client.nombres,client.apellidos].filter(Boolean).join(' '));
+    if (fromClient && !isTechnicalId(fromClient)) return fromClient;
+    const legacy = text(first(row,['cliente']));
+    return legacy && !isTechnicalId(legacy) ? legacy : 'Cliente por identificar';
+  }
+  function policyDisplayNumber(row) {
+    const direct = text(first(row,['polizaNumero','numeroPoliza']));
+    if (direct) return direct;
+    const id = text(first(row,['polizaId','poliza_id']));
+    const policy = safeGet('polizas',id);
+    const fromPolicy = policy && text(policy.numero);
+    if (fromPolicy) return fromPolicy;
+    const legacy = text(first(row,['poliza']));
+    return legacy && !isTechnicalId(legacy) ? legacy : '';
+  }
+  const stateLabel = state => ({
+    PROPUESTA:'Pendiente de revisión',EN_REVISION:'En revisión',REQUIERE_VALIDACION:'Validación necesaria',
+    VALIDADA:'Validada',RECHAZADA:'Rechazada',BLOQUEADA:'Bloqueada'
+  }[state] || 'Por revisar');
+  const scoreLabel = score => ({
+    MATCH_PROBABLE:'Coincidencia probable',MATCH_EXACTO:'Coincidencia exacta',
+    REQUIERE_VALIDACION:'Requiere validación',BLOQUEADO:'No conciliable'
+  }[score] || 'Por comprobar');
+  const sourceDocumentLabel = value => text(value) === 'Libro activo' ? 'Libro de cobros' : text(value);
+  const sourceSheetLabel = value => text(value) === 'Propuestas' ? 'Propuestas de conciliación' : text(value);
+  function sourceTraceLabel(row) {
+    const parts = [sourceDocumentLabel(row.archivo),sourceSheetLabel(row.hoja)];
+    if (/^\d+$/.test(text(row.fila))) parts.push(`Fila ${row.fila}`);
+    if (row.periodo) parts.push(row.periodo);
+    return parts.filter(Boolean).join(' · ') || 'Documento de origen';
+  }
+  function countryCurrencyLabel(row) {
+    const country = ({GT:'Guatemala',CO:'Colombia'})[row.pais] || row.pais;
+    const currency = ({GTQ:'Quetzales',COP:'Pesos colombianos',USD:'Dólares'})[row.moneda] || row.moneda;
+    return [country,currency].filter(Boolean).join(' / ') || '—';
+  }
   const sourceRef = row => {
     const ref = row && (row.source_ref || row.sourceRef) || {};
     return {
@@ -83,9 +127,9 @@
       fuente: text(first(row,['fuente','source_type','sourceType','origen'])) || 'Fuente de conciliación',
       pais: text(first(row,['pais','country'])), moneda: text(first(row,['moneda','currency'])),
       monto: parseAmount(first(row,['monto','total','saldo','primaTotal'])),
-      cliente: text(first(row,['clienteNombre','cliente','clienteId','cliente_id'])),
-      poliza: text(first(row,['polizaNumero','poliza','polizaId','poliza_id'])),
-      recibo: text(first(row,['reciboNumero','requerimiento','reciboId','recibo_id'])),
+      cliente: clientDisplayName(row),
+      poliza: policyDisplayNumber(row),
+      recibo: text(first(row,['reciboNumero','requerimiento'])),
       archivo: ref.file, hoja: ref.sheet, fila: ref.row, bloque: ref.block, periodo: ref.period,
       motivo: text(first(row,['reason','motivo','estado_revision','review_state'])),
       sourceDifferences: Array.isArray(row && row.sourceDifferences) ? row.sourceDifferences.slice() : [],
@@ -227,7 +271,7 @@
       ${notice}
       <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px">${filters.map(state => `<button class="btn ${filterState===state?'primary':'ghost'} sm" data-conc-filter="${state}">${state?state.replaceAll('_',' '):'Todos'}${state?` · ${counts[state]||0}`:''}</button>`).join('')}</div>
       <div class="card" style="overflow:hidden"><div style="overflow-x:auto"><table class="tbl"><thead><tr><th>Estado</th><th>Coincidencia</th><th>Fuente</th><th>País / moneda</th><th>Cliente · póliza · recibo</th><th class="num">Monto</th><th>Trazabilidad</th><th></th></tr></thead><tbody>
-      ${rows.map(row => `<tr><td><span class="badge ${tone(row.estado)}">${esc(row.estado.replaceAll('_',' '))}</span></td><td>${esc(row.score.replaceAll('_',' '))}</td><td>${esc(row.fuente)}</td><td>${esc([row.pais,row.moneda].filter(Boolean).join(' / ')||'—')}</td><td>${esc([row.cliente,row.poliza,row.recibo].filter(Boolean).join(' · ')||'—')}</td><td class="num">${row.moneda?money(row.monto,row.moneda):esc(row.monto||'—')}</td><td class="mono" style="font-size:10.5px">${esc([row.archivo,row.hoja,row.fila?`fila ${row.fila}`:'',row.periodo].filter(Boolean).join(' · ')||'—')}</td><td><button class="btn ghost sm" data-conc-id="${esc(row.id)}">Ver</button></td></tr>`).join('') || `<tr><td colspan="8" class="muted" style="text-align:center;padding:30px">${esc(noRows)}</td></tr>`}
+      ${rows.map(row => `<tr><td><span class="badge ${tone(row.estado)}">${esc(stateLabel(row.estado))}</span></td><td>${esc(scoreLabel(row.score))}</td><td>${esc(row.fuente)}</td><td>${esc(countryCurrencyLabel(row))}</td><td>${esc([row.cliente,row.poliza,row.recibo].filter(Boolean).join(' · ')||'—')}</td><td class="num">${row.moneda?money(row.monto,row.moneda):esc(row.monto||'—')}</td><td style="font-size:12px">${esc(sourceTraceLabel(row))}</td><td><button class="btn ghost sm" data-conc-id="${esc(row.id)}">Ver</button></td></tr>`).join('') || `<tr><td colspan="8" class="muted" style="text-align:center;padding:30px">${esc(noRows)}</td></tr>`}
       </tbody></table></div></div></div>`;
     host.querySelectorAll('[data-conc-filter]').forEach(button => button.addEventListener('click', () => { filterState = button.dataset.concFilter || ''; render(host); }));
     host.querySelectorAll('[data-conc-id]').forEach(button => button.addEventListener('click', () => detalle(button.dataset.concId)));
@@ -236,9 +280,9 @@
   function detalle(id) {
     const row = proposalRows().find(item => item.id === id); if (!row) return;
     const summary = [
-      ['Estado',row.estado.replaceAll('_',' ')],['Coincidencia',row.score.replaceAll('_',' ')],['Fuente',row.fuente],
-      ['País / moneda',[row.pais,row.moneda].filter(Boolean).join(' / ')||'—'],['Cliente',row.cliente||'—'],['Póliza',row.poliza||'—'],['Recibo',row.recibo||'—'],
-      ['Monto',row.moneda?money(row.monto,row.moneda):row.monto||'—'],['Archivo',row.archivo||'—'],['Hoja / fila',[row.hoja,row.fila].filter(Boolean).join(' / ')||'—']
+      ['Estado',stateLabel(row.estado)],['Coincidencia',scoreLabel(row.score)],['Fuente',row.fuente],
+      ['País / moneda',countryCurrencyLabel(row)],['Cliente',row.cliente||'—'],['Póliza',row.poliza||'—'],['Recibo',row.recibo||'—'],
+      ['Monto',row.moneda?money(row.monto,row.moneda):row.monto||'—'],['Documento de origen',sourceTraceLabel(row)]
     ];
     let back = document.getElementById('conc-readonly-detail'); if (back) back.remove();
     back = document.createElement('div'); back.id='conc-readonly-detail'; back.className='drawer-back open'; back.style.cssText='display:grid;place-items:center;z-index:210';

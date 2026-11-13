@@ -31,10 +31,12 @@ function projectionRow({proposal,stageId,policy,policyId,client,tenantId,runId,c
  if(!['GT','CO'].includes(country)||country!==ctx.country)
    throw new Denied('STAGE_PARENT_COUNTRY_DENIED');
  const advisor=clean(policy.asesorId||policy.advisorId||policy.ownerAdvisorId);
+ const clientName=clean(client.nombre||client.razonSocial||client.nombreCompleto||client.name||
+   [client.nombres,client.apellidos].filter(Boolean).join(' '));
  const amount=Math.round((Number(proposal.amount)+Number.EPSILON)*100)/100;
  return {
    id:stageId,canonicalDocumentId:stageId,tenantId,pais:country,asesorId:advisor,
-   polizaId:policyId,clienteId:clientId,polizaNumero:clean(policy.numero),
+   polizaId:policyId,clienteId:clientId,clienteNombre:clientName,polizaNumero:clean(policy.numero),
    monto:amount,moneda:clean(proposal.currency),
    estado:'PROPUESTA',status:'PROPUESTA',fuente:'Libro activo de cobros',
    motivo:'Propuesta pendiente de validación; aplicación de pagos deshabilitada',

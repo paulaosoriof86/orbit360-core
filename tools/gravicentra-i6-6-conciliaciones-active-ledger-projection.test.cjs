@@ -31,7 +31,7 @@ for(let i=0;i<132;i++){
    const country=i<26?'GT':'CO';
    stores.polizas['policy_'+i]={tenantId,numero:number,clienteId:'client_'+i,
      pais:country,asesorId:i%2?'advisor_b':'advisor_a'};
-   stores.clientes['client_'+i]={tenantId,pais:country};
+   stores.clientes['client_'+i]={tenantId,pais:country,nombre:'Cliente verificado '+i};
  }else if(i%2===0){
    const id=Math.floor((i-52)/2);
    stores.polizas['ambig_a_'+id]={tenantId,numero:number,clienteId:'client_0',pais:'GT',asesorId:'advisor_a'};
@@ -87,7 +87,8 @@ const denied=(fn,code)=>assert.rejects(fn,error=>error instanceof Denied&&error.
  assert.equal(gt.rows.length,26);assert.equal(co.rows.length,26);
  assert.equal(gt.rows.length+co.rows.length,52,'ONLY_UNIQUE_52_PRESENT');
  assert.ok(gt.rows.every(x=>x.pais==='GT'&&x.readOnly===true&&x.applicationPermitted===false&&
-  x.polizaId&&x.clienteId&&x.proposalIdentity&&x.source_ref.row_hash===x.proposalIdentity));
+  x.polizaId&&x.clienteId&&x.clienteNombre.startsWith('Cliente verificado ')&&
+  x.proposalIdentity&&x.source_ref.row_hash===x.proposalIdentity));
  assert.equal(new Set(gt.rows.map(x=>x.proposalIdentity)).size,26);
  const clientStore={all:name=>name==='conciliaciones'?gt.rows.concat(co.rows):[],
    _productStatus:()=>({serverConfirmedCollections:['conciliaciones','conciliacionesPrimas'],
@@ -102,7 +103,12 @@ const denied=(fn,code)=>assert.rejects(fn,error=>error instanceof Denied&&error.
  const host={innerHTML:'',querySelectorAll:()=>[]};
  browser.Orbit.modules.conciliaciones.render(host);
  assert.equal((host.innerHTML.match(/data-conc-id=/g)||[]).length,52,'UI_RENDER_52_PROPOSALS');
- assert.ok(host.innerHTML.includes('Libro activo')&&host.innerHTML.includes('Propuestas'));
+ assert.ok(host.innerHTML.includes('Libro activo')&&host.innerHTML.includes('Propuestas de conciliación'));
+ assert.ok(host.innerHTML.includes('Cliente verificado 0'),'CANONICAL_CLIENT_NAME_SHOWN');
+ assert.ok(!host.innerHTML.includes('client_0')&&!host.innerHTML.includes('fila aaaaaaaaa'),
+   'NO_TECHNICAL_CLIENT_OR_ROW_HASH_VISIBLE');
+ assert.ok(host.innerHTML.includes('Coincidencia probable')&&host.innerHTML.includes('Pendiente de revisión'),
+   'BUSINESS_LABELS_INSTEAD_OF_STATUS_CODES');
  assert.ok(co.rows.every(x=>x.pais==='CO'));
  assert.ok(!gt.rows.some(x=>x.polizaNumero.startsWith('DUP_')),'AMBIGUOUS_80_QUARANTINED');
  assert.ok(!co.rows.some(x=>x.polizaNumero.startsWith('DUP_')));

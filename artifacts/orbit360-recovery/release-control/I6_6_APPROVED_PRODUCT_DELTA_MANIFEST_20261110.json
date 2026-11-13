@@ -1645,6 +1645,22 @@
         }
       ],
       "tests": [{"path": "tools/gravicentra-i6-6-roles-payment-expiry-hotfix.test.cjs", "gitBlobSha": "dc717555e60d0405ba14c38f0a4739dfb1056130"}]
+    },
+    {
+      "id": "I6_6_CONCILIACIONES_HUMAN_CLIENT_NAMES_20261113",
+      "approvedByDirection": true,
+      "receipt": "Paula Dirección 2026-11-13: en Conciliaciones mostrar cliente real y estados comprensibles, sin identificadores técnicos visibles; conservar auditoría y no aplicar propuestas automáticamente",
+      "sourceStatus": "SOURCE_TESTED_LOCAL_PENDING_IMMUTABLE_PREVIEW_AND_LIVE_PROOF",
+      "capabilityOwners": ["CONCILIACIONES_ACTIVE_LEDGER_SCOPED_READ", "CONCILIACIONES_UI"],
+      "scope": "El servidor proyecta el nombre desde el cliente canónico previamente validado. La interfaz usa nombre autorizado o ficha local, oculta referencias técnicas y traduce estados. Se conservan 52 propuestas con vínculo único, 80 ambiguas en espera y cero escrituras financieras.",
+      "dataWrites": 0,
+      "paths": [
+        {"path": "functions/i66-conciliaciones-active-ledger-projection.js", "gitBlobSha": "4951c7e93f102e475152375997870421f7600b56", "replaces": {"path": "functions/i66-conciliaciones-active-ledger-projection.js", "priorGitBlobSha": "1fc919f1b6a5356e21c3811e09aab4182adca25c", "priorChangeId": "I6_6_ACTIVE_LEDGER_STAGE_INDEXED_UI_READONLY_P0"}},
+        {"path": "orbit360-platform/modules/conciliaciones.js", "gitBlobSha": "c0c6ffb403e7121c5bbd087b2a52533805c1fdbb", "replaces": {"path": "orbit360-platform/modules/conciliaciones.js", "priorGitBlobSha": "9b9e7cb1ef049b84ff2b4ac01edcf945edd8544c", "priorChangeId": "I6_6_CONCILIACIONES_PROTECTED_SCOPED_READ_BRIDGE_P0"}}
+      ],
+      "tests": [
+        {"path": "tools/gravicentra-i6-6-conciliaciones-active-ledger-projection.test.cjs", "gitBlobSha": "6a045149287ae54cbfec0223b1cb0739b0a94176", "replaces": {"path": "tools/gravicentra-i6-6-conciliaciones-active-ledger-projection.test.cjs", "priorGitBlobSha": "93a314e05a840bfa664503f0cf7d49468a51b24d", "priorChangeId": "I6_6_ACTIVE_LEDGER_STAGE_INDEXED_UI_READONLY_P0"}}
+      ]
     }
   ]
 }
