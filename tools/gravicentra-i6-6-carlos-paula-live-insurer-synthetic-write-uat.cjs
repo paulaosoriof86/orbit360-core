@@ -6,7 +6,7 @@ const crypto=require('node:crypto');
 const admin=require('firebase-admin');
 const {chromium}=require('playwright');
 const ORIGIN='https://app.aysseguros.com',TENANT='alianzas-soluciones';
-const SHA='1dd675ed59ac51fd122915ca8056f85f82fa12d6';
+const SHA=process.env.I66_APPROVED_LIVE_SOURCE_SHA||'1dd675ed59ac51fd122915ca8056f85f82fa12d6';
 const norm=x=>String(x||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();
 const hash=x=>crypto.createHash('sha256').update(x).digest('hex');
 assert.equal(process.env.I66_LIVE_ORIGIN,ORIGIN,'I66_INSURER_LIVE_ORIGIN_MISMATCH');
@@ -81,7 +81,7 @@ async function signedLive(browser,actor){
         mutations:[{action:x.op,collection:'aseguradoras',id:x.id,payload:x.payload,auditReason:x.reason}]});
     const fixture={id,tenantId:TENANT,pais:'GT',moneda:'GTQ',nombre:'I6.6 QA reversible insurer '+actor.role,
       canonicalName:'I6.6 QA reversible insurer',activo:true,vinculada:true,estado:'Activa',
-      ramos:['Auto'],portales:[],cuentas:[],contactos:[],docsRequeridos:[],__syntheticQa:true};
+      ramos:['Auto'],portales:[{id:'i66qa_portal',nombre:'Portal QA',tipo:'Portal general',usuario:'qa-only',estadoAcceso:'Sin verificar',pais:'GT'}],cuentas:[],contactos:[],docsRequeridos:[],__syntheticQa:true};
     const create=await command({op:'insert',id,payload:fixture,req:operations[0].req,reason:'Creación sintética QA'});
     assert.ok(create?.ok&&create.serverOwned,'I66_INSURER_LIVE_CREATE_NOT_COMMITTED_'+actor.role);
     const created=(await item(id).get()).data()||{};
@@ -99,10 +99,13 @@ async function signedLive(browser,actor){
       Orbit.modules.aseguradoras.ficha(id,true);
       const editable=!!document.querySelector('#asg-ficha #af-guardar');
       const logo=!!document.querySelector('#asg-ficha #af-logo-file');
+      document.querySelector('#asg-ficha [data-tab="plataformas"]')?.click();
+      const passwordEditable=!!document.querySelector('#asg-ficha [data-ppass]');
+      const secureCredentialProvider=typeof Orbit.productInsurerCredentialProviderP0?.importCredentials==='function';
       document.getElementById('asg-ficha')?.remove();
-      return{allowed,editable,logo};
+      return{allowed,editable,logo,passwordEditable,secureCredentialProvider};
     },id);
-    assert.ok(editUi.allowed&&editUi.editable&&editUi.logo,
+    assert.ok(editUi.allowed&&editUi.editable&&editUi.logo&&editUi.passwordEditable&&editUi.secureCredentialProvider,
       'I66_INSURER_SIGNED_CARLOS_PAULA_EDIT_FORM_NOT_AVAILABLE_'+actor.role);
     const accounts=[{id:'i66qa_account',banco:'Banco de prueba',tipo:'Monetaria',
       numero:'QA-ONLY-001234',moneda:'GTQ',titular:'I6.6 QA reversible'}];

@@ -17,6 +17,7 @@ jobs:
     timeout-minutes: 20
     env:
       I66_LIVE_ORIGIN: https://app.aysseguros.com
+      I66_APPROVED_LIVE_SOURCE_SHA: 8a0e904500cbb3c961d83f16517caab69df88a2b
       SA_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
       SA_ALT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
       SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
@@ -33,18 +34,18 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          git merge-base --is-ancestor 1dd675ed59ac51fd122915ca8056f85f82fa12d6 HEAD
+          git merge-base --is-ancestor 8a0e904500cbb3c961d83f16517caab69df88a2b HEAD
           node --check tools/gravicentra-i6-6-carlos-paula-live-insurer-synthetic-write-uat.cjs
           node - <<'NODE'
           const assert=require('node:assert/strict');
           (async()=>{
             const h={Authorization:'Bearer '+process.env.GH_TOKEN,Accept:'application/vnd.github+json','User-Agent':'GI-I66-Insurer-Reversible'};
-            for(const id of [43309935816,43310610618,43312896784,43315196712]){
+            for(const id of [43309935816,43310610618,43312896784,43315196712,43451818931]){
               const r=await fetch('https://api.github.com/repos/paulaosoriof86/orbit360-core/actions/runs/'+id,{headers:h}).then(x=>x.json());
               assert.equal(r.conclusion,'success','I66_LIVE_PRECONDITION_FAIL_'+id);
             }
             const b=await fetch('https://app.aysseguros.com/__recovery__/build.json',{headers:{'cache-control':'no-cache'}}).then(x=>x.json());
-            assert.equal(b.sourceSha,'1dd675ed59ac51fd122915ca8056f85f82fa12d6');
+            assert.equal(b.sourceSha,process.env.I66_APPROVED_LIVE_SOURCE_SHA);
             console.log('I66_LIVE_INSURER_SIGNED_QA_PRECONDITIONS_PASS');
           })().catch(e=>{console.error(e.message);process.exitCode=1;});
           NODE
