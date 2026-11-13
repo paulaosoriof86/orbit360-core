@@ -1269,6 +1269,21 @@
         {"path": "tools/gravicentra-i6-6-privileged-role-portfolio-parity.test.cjs", "gitBlobSha": "d03e289d61d040f7d3aebfac359755b9f7ee247e"},
         {"path": "tools/gravicentra-i6-6-privileged-role-writer-transaction.test.cjs", "gitBlobSha": "8097b029670e42fb8325308008611f1842725023"}
       ]
+    },
+    {
+      "id": "I6_6_ACTIVE_LEDGER_STAGE_INDEXED_UI_READONLY_P0",
+      "approvedByDirection": true,
+      "receipt": "Dirección Paula 2026-11-13: continuar el primer gate I6.6 pendiente, conectar la lectura de Conciliaciones con el libro activo sin reimportar datos ni escribir pagos; solo Preview probado antes de mismo artifact LIVE; retener las 80 propuestas con póliza ambigua.",
+      "sourceStatus": "SOURCE_SYNTHETIC_52_UNIQUE_80_AMBIGUOUS_HOLD_PREVIEW_SIGNED_AND_LIVE_NOT_CERTIFIED",
+      "capabilityOwners": ["CONCILIACIONES_READONLY", "SCOPED_SERVER_READER", "COBROS_ACTIVE_LEDGER"],
+      "scope": "Read the active, contract-verified Cobros ledger proposal stage only while canonical Conciliaciones is empty; use bounded indexed exact policy-number batches, verify the unique canonical policy and client, enforce tenant/country/advisor roles, and project a sanitized read-only row. No catalogue scan, stage writes, payment application, role expansion, Rules/Auth or LIVE deployment without exact preview and signed readback.",
+      "paths": [
+        {"path":"functions/i66-conciliaciones-active-ledger-projection.js","gitBlobSha":"7c09617026f37c4300c15463d8cecac9f7c8b4b0"},
+        {"path":"functions/b4-003-scoped-related-reader.js","gitBlobSha":"34cb6c09c63fb9e45feb6c9d55c3e1c514ab17b2","replaces":{"path":"functions/b4-003-scoped-related-reader.js","priorGitBlobSha":"849cc33c7bf048787b3f1a35e176a3baa5285fc7","priorChangeId":"I6_6_CONCILIACIONES_PROTECTED_SCOPED_READ_BRIDGE_P0"}}
+      ],
+      "tests": [
+        {"path":"tools/gravicentra-i6-6-conciliaciones-active-ledger-projection.test.cjs","gitBlobSha":"afc078b5352bc1411348d7be779f540564fd8757"}
+      ]
     }
   ]
 }

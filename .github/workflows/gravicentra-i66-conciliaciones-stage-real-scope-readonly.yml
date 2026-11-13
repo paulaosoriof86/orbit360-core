@@ -1,0 +1,42 @@
+name: Gravicentra I6.6 Conciliaciones Active Stage Source Real Readonly QA
+on:
+  push:
+    branches: [recovery/fase-a-clean-20260831]
+    paths:
+      - .github/workflows/gravicentra-i66-conciliaciones-stage-real-scope-readonly.yml
+      - tools/gravicentra-i66-conciliaciones-stage-real-scope-readonly.cjs
+      - functions/i66-conciliaciones-active-ledger-projection.js
+      - functions/b4-003-scoped-related-reader.js
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  real-source-no-writes:
+    if: github.repository == 'paulaosoriof86/orbit360-core' && github.ref == 'refs/heads/recovery/fase-a-clean-20260831'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      SA_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_ALT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Require bounded exact source owners, active I6.6 and no business mutation
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor 0153f5cbbe00c3732e11ebae59b32bd357e38bfd HEAD
+          test -z "$(git diff --name-only 0153f5cbbe00c3732e11ebae59b32bd357e38bfd HEAD -- orbit360-platform functions | grep -Ev '^functions/(b4-003-scoped-related-reader|i66-conciliaciones-active-ledger-projection)\.js$' || true)"
+          node --check functions/i66-conciliaciones-active-ledger-projection.js
+          node --check tools/gravicentra-i66-conciliaciones-stage-real-scope-readonly.cjs
+          node tools/gravicentra-i6-6-conciliaciones-active-ledger-projection.test.cjs
+      - name: Verify live source projection for active ledger 52 unique and 80 HOLD without writes
+        run: |
+          set -euo pipefail
+          npm install --no-save --package-lock=false --ignore-scripts --no-audit --no-fund firebase-admin@13.4.0 >/dev/null
+          node tools/gravicentra-i66-conciliaciones-stage-real-scope-readonly.cjs

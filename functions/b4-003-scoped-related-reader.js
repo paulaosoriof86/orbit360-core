@@ -4,6 +4,7 @@
 const {resolve,allowRow,Denied}=require('./b4-003-scoped-access-boundary');
 const {clientCountryNeedsInsurer,resolveClientCountry}=require('./b4-003-client-country-authority');
 const {projectScopedClientList}=require('./b4-003-client-country-list-projection');
+const {readActiveLedgerProposalPage}=require('./i66-conciliaciones-active-ledger-projection');
 const collections=new Set(['clientes','vehiculos','recibosEsperados','carteraPrimas','cobros','comisiones','finmovs','conciliaciones','conciliacionesPrimas','tareas','negocios','gestiones','actividades','metas','cancelaciones','reclamos','auditoria']);
 const workflowCollections=new Set(['negocios','gestiones','actividades']);
 const financeCollections=new Set(['vehiculos','recibosEsperados','carteraPrimas','cobros','comisiones','conciliaciones','conciliacionesPrimas']);
@@ -283,6 +284,15 @@ async function readScopedRelatedList({db,auth,request}){
  // A caller-supplied policy anchor cannot select a different reader path.
  if((coll==='conciliaciones'||coll==='conciliacionesPrimas')&&(policyId||hasBatch))
    throw new Denied('RELATION_ANCHOR_UNEXPECTED');
+
+ // I6.6: the authoritative active ledger contains staged proposals, while the
+ // old canonical `conciliaciones` collection is physically empty. Only route
+ // to the verified stage projection when no canonical proposal exists; preserve
+ // the accepted existing reader unchanged if canonical records appear.
+ if(coll==='conciliaciones'){
+   const canonical=await target.limit(1).get();
+   if(!canonical.docs?.length)return readActiveLedgerProposalPage({db,tenant,tenantId,ctx,pageSize,cursor});
+ }
 
  // The indexed `where(pais == country)` query cannot return a physically
  // present client with missing/ambiguous country. Reconcile every client with
