@@ -99,7 +99,7 @@ jobs:
           assert.ok(String(x.createTime||'').startsWith('2026-11-10T')&&
             String(x.expireTime||'')>'2026-11-16T'&&x.channelId!=='live',
             'I66_GC_CHANNEL_AGE_OR_SCOPE_HOLD');
-          const live=rows.find(r=>r.channelId==='live');
+          const live=rows.find(r=>String(r.channelId||r.name||'').split('/').pop()==='live');
           assert.ok(live&&String(live.release?.version?.name||'').split('/').pop()!==version,
             'I66_GC_ARCHIVED_VERSION_IS_CURRENT_LIVE_STOP');
           console.log('I66_GC_EXACT_PREVIEW_TARGET_NO_LIVE_COLLISION_PASS');
