@@ -24,9 +24,11 @@ jobs:
       ARTIFACT_RUN: '43463160506'
       ARTIFACT_ID: '14057935092'
       ARTIFACT_DIGEST: sha256:1621f236b9d1b9e49ea42fc53e338a695d5872080361ada2a84183fa7d52207f
-      PAYMENT_LIVE_RUN: '43469115944'
+      PAYMENT_LIVE_RUN: '43471877267'
       PREVIEW_PAYMENT_RUN: '43467007164'
-      SIGNED_POLICY_PREVIEW_RUN: '43465087494'
+      SIGNED_POLICY_PREVIEW_RUN: '43472346558'
+      LIVE_ORPHAN_CLEANUP_RUN: '43471612256'
+      PREVIEW_ORPHAN_CLEANUP_RUN: '43472648366'
       SOURCE_PREVIEW_URL: https://ays-orbit-360-lab--gi-i66-rc-42868854629-abj14q6n.web.app
       PREVIEW_CHANNEL: gi-i66-rc-42868854629
       SA_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
@@ -60,7 +62,7 @@ jobs:
             for(const k of ['onlyOneSameFirebaseHostingSite','sameImmutablePreviewVersionBothLiveDomains','rollbackOldHostingAndOldPaymentRevisionOnFailure','noNewBuild','noRulesAuthOtherFunctionsOrRealFinancialWrites','signedTwoRolesNewPolicyAndClient360LiveUatRequired'])assert.equal(a[k],true,k);
             const h={Authorization:'Bearer '+process.env.GH_TOKEN,Accept:'application/vnd.github+json','User-Agent':'GI-I66-Exact-LIVE-Invoice'};
             const base='https://api.github.com/repos/paulaosoriof86/orbit360-core/actions/';
-            const ids=[+process.env.ARTIFACT_RUN,+process.env.PAYMENT_LIVE_RUN,+process.env.PREVIEW_PAYMENT_RUN,+process.env.SIGNED_POLICY_PREVIEW_RUN];
+            const ids=[+process.env.ARTIFACT_RUN,+process.env.PAYMENT_LIVE_RUN,+process.env.PREVIEW_PAYMENT_RUN,+process.env.SIGNED_POLICY_PREVIEW_RUN,+process.env.LIVE_ORPHAN_CLEANUP_RUN,+process.env.PREVIEW_ORPHAN_CLEANUP_RUN];
             const [runs,artifact]=await Promise.all([Promise.all(ids.map(id=>fetch(base+'runs/'+id,{headers:h}).then(r=>r.json()))),fetch(base+'artifacts/'+process.env.ARTIFACT_ID,{headers:h}).then(r=>r.json())]);
             for(let i=0;i<ids.length;i++){assert.equal(runs[i].id,ids[i]);assert.equal(runs[i].conclusion,'success','required run '+ids[i]);}
             assert.equal(runs[0].head_sha,process.env.SOURCE_SHA);
@@ -78,7 +80,7 @@ jobs:
           path: ${{ runner.temp }}/invoice-exact-site
       - uses: actions/download-artifact@v4
         with:
-          run-id: 43469115944
+          run-id: 43471877267
           pattern: gi-i66-payment-live-backend-proof-*
           merge-multiple: true
           github-token: ${{ github.token }}
