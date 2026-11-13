@@ -856,7 +856,11 @@
       "approvedByDirection": true,
       "receipt": "artifacts/orbit360-recovery/release-control/I6_6_TOPBAR_POLICY_BATCH_CONTEXT_AND_SCOPE_20261111.json",
       "sourceStatus": "SOURCE_CORRECTED_LOCAL_QA_PASS_PREVIEW_AND_LIVE_PENDING",
-      "capabilityOwners": ["GLOBAL_SHELL_SEARCH", "ROLE_SCOPE_RUNTIME", "STARTUP_PERFORMANCE"],
+      "capabilityOwners": [
+        "GLOBAL_SHELL_SEARCH",
+        "ROLE_SCOPE_RUNTIME",
+        "STARTUP_PERFORMANCE"
+      ],
       "scope": "Eliminate O(clients*policies) on initial global topbar search projection by passing scoped policyClientIds once; never fetch or link an excluded client outside the current role/country snapshot. Preserve searchable policy, vehicle and cobro reference; no backend, financial or auth changes.",
       "paths": [
         {
@@ -881,7 +885,11 @@
       "approvedByDirection": true,
       "receipt": "artifacts/orbit360-recovery/release-control/I6_6_GLOBAL_TOPBAR_CONFIRMED_PROJECTION_LATENCY_20261111.json",
       "sourceStatus": "ROOT_CAUSE_REAL_BROWSER_8573MS_EVIDENCE_SOURCE_QA_PASS_NEW_IMMUTABLE_PREVIEW_AND_LIVE_PENDING",
-      "capabilityOwners": ["GLOBAL_SHELL_SEARCH", "ROLE_SCOPE_RUNTIME", "STARTUP_PERFORMANCE"],
+      "capabilityOwners": [
+        "GLOBAL_SHELL_SEARCH",
+        "ROLE_SCOPE_RUNTIME",
+        "STARTUP_PERFORMANCE"
+      ],
       "scope": "Actual signed Carlos Operativo Preview Chrome measured 444 redundant canonical projectClient() calls / 8362.4ms after scopedStore().all('clientes') had already returned projected rows; exact fix indexes only six aliases from the authorized already-projected read without reprojecting, storing or changing country/role visibility. Preserve orphan links to scoped modules and accent folding; zero business data or backend mutations.",
       "paths": [
         {
@@ -915,7 +923,11 @@
       "approvedByDirection": true,
       "receipt": "artifacts/orbit360-recovery/release-control/I6_6_GLOBAL_TOPBAR_ENTER_LIVE_REGRESSION_FIX_20261111.json",
       "sourceStatus": "SOURCE_UNIT_15_PASS_PREVIEW_AND_LIVE_CHROME_QA_PENDING",
-      "capabilityOwners": ["GLOBAL_SHELL_SEARCH", "ROLE_SCOPE_RUNTIME", "STARTUP_PERFORMANCE"],
+      "capabilityOwners": [
+        "GLOBAL_SHELL_SEARCH",
+        "ROLE_SCOPE_RUNTIME",
+        "STARTUP_PERFORMANCE"
+      ],
       "scope": "Live Paula Direccion keyboard Enter does nothing on existing topbar matches; Enter must select authorized first result including fast input, Escape closes, only visible duplicate editions collapsed. Preserve signed performance fix, role/country isolation, no backend or data writes.",
       "paths": [
         {
@@ -945,7 +957,11 @@
       "approvedByDirection": true,
       "receipt": "artifacts/orbit360-recovery/release-control/I6_6_COBROS_LEGACY_PAID_APPLICATION_RECONCILIATION_20261111.json",
       "sourceStatus": "SOURCE_UNIT_PASS_EMULATOR_AUTHORIZED_PENDING_NO_LIVE_WRITES",
-      "capabilityOwners": ["COBROS_PRIMARY_RUNTIME", "CLIENTE360_PRIMARY_RUNTIME", "CROSS_MODULE_RELATIONSHIPS"],
+      "capabilityOwners": [
+        "COBROS_PRIMARY_RUNTIME",
+        "CLIENTE360_PRIMARY_RUNTIME",
+        "CROSS_MODULE_RELATIONSHIPS"
+      ],
       "scope": "Manual insurer application for pre-existing paid receipts with no physical cobro is an idempotent reconciliation, never a new payment. Preserve historical direct/inferred provenance and fail closed on conflicting linked states or deterministic ID collisions; cross-role and cross-country owner is unchanged.",
       "paths": [
         {
@@ -975,7 +991,11 @@
       "approvedByDirection": true,
       "receipt": "artifacts/orbit360-recovery/release-control/I6_6_GLOBAL_TOPBAR_CROSSMODULE_HYDRATION_20261111.json",
       "sourceStatus": "SOURCE_UNIT_PASS_PREVIEW_AND_LIVE_PENDING",
-      "capabilityOwners": ["GLOBAL_SHELL_SEARCH", "ROLE_SCOPE_RUNTIME", "STARTUP_PERFORMANCE"],
+      "capabilityOwners": [
+        "GLOBAL_SHELL_SEARCH",
+        "ROLE_SCOPE_RUNTIME",
+        "STARTUP_PERFORMANCE"
+      ],
       "scope": "A cross-module topbar search must request missing approved sources only after user input, once per role and country, and refresh when an authorized snapshot arrives; it must not show false empty results on Cobros or leak an insurer to a disallowed role.",
       "paths": [
         {
@@ -1001,12 +1021,22 @@
       "receipt": "artifacts/orbit360-recovery/release-control/I6_6_CONCILIACIONES_PROTECTED_BRIDGE_RECEIPT_20261111.json",
       "sourceCommit": "30406dc6cc23684f8d97e6f25ff36dd6a7e0186d",
       "sourceStatus": "SOURCE_SYNTHETIC_QA_PASS_PREVIEW_AND_LIVE_NOT_DEPLOYED",
-      "capabilityOwners": ["COBROS_RECONCILIATION", "ROLE_SCOPE_RUNTIME", "GLOBAL_SHELL_ROUTER"],
+      "capabilityOwners": [
+        "COBROS_RECONCILIATION",
+        "ROLE_SCOPE_RUNTIME",
+        "GLOBAL_SHELL_ROUTER"
+      ],
       "scope": "Expose only securely signed existing conciliaciones and conciliacionesPrimas proposals, verified country by canonical parent policy/client, and precise UI pending/error states. No payment, account, user, role or data write.",
       "dataWrites": 0,
       "paths": [
-        {"path": "functions/b4-003-scoped-access-boundary.js", "gitBlobSha": "38fa8cee808be6b92b65150625e69b0f93639564"},
-        {"path": "functions/b4-003-scoped-related-reader.js", "gitBlobSha": "849cc33c7bf048787b3f1a35e176a3baa5285fc7"},
+        {
+          "path": "functions/b4-003-scoped-access-boundary.js",
+          "gitBlobSha": "38fa8cee808be6b92b65150625e69b0f93639564"
+        },
+        {
+          "path": "functions/b4-003-scoped-related-reader.js",
+          "gitBlobSha": "849cc33c7bf048787b3f1a35e176a3baa5285fc7"
+        },
         {
           "path": "orbit360-platform/core/product-runtime-browser-providers-p0.js",
           "gitBlobSha": "76555ee036149eb7eb003b528f54d996a75c00eb",
@@ -1025,7 +1055,10 @@
             "priorChangeId": "I6_6_GLOBAL_TOPBAR_CROSSMODULE_PROTECTED_HYDRATION_P0"
           }
         },
-        {"path": "orbit360-platform/core/tenant-access-policy-contract-p0.js", "gitBlobSha": "6ea240869a3c0d70b28380c3f7c017bdcbd71621"},
+        {
+          "path": "orbit360-platform/core/tenant-access-policy-contract-p0.js",
+          "gitBlobSha": "6ea240869a3c0d70b28380c3f7c017bdcbd71621"
+        },
         {
           "path": "orbit360-platform/data/store-firestore-product-readonly-p0.js",
           "gitBlobSha": "062e5633e97ba830a4149fcf4d4ef49cd9f7f8cb",
@@ -1035,10 +1068,16 @@
             "priorChangeId": "I6_6_CROSS_MODULE_AUTHORIZED_READ_BULK_CLONE_PERFORMANCE_P0"
           }
         },
-        {"path": "orbit360-platform/modules/conciliaciones.js", "gitBlobSha": "9b9e7cb1ef049b84ff2b4ac01edcf945edd8544c"}
+        {
+          "path": "orbit360-platform/modules/conciliaciones.js",
+          "gitBlobSha": "9b9e7cb1ef049b84ff2b4ac01edcf945edd8544c"
+        }
       ],
       "tests": [
-        {"path": "tools/gravicentra-i6-6-conciliaciones-protected-bridge.test.cjs", "gitBlobSha": "f4d439f4b03865a51e48bfd2442bd03e6d6499d8"}
+        {
+          "path": "tools/gravicentra-i6-6-conciliaciones-protected-bridge.test.cjs",
+          "gitBlobSha": "f4d439f4b03865a51e48bfd2442bd03e6d6499d8"
+        }
       ]
     },
     {
@@ -1046,7 +1085,11 @@
       "approvedByDirection": true,
       "receipt": "artifacts/orbit360-recovery/release-control/I6_6_REAL_INSURER_SAVE_ROOTCAUSE_20261111.json#additionalTransversalCausalFinding20261111",
       "sourceStatus": "SOURCE_UNIT_13_PASS_NEW_IMMUTABLE_PREVIEW_AND_SIGNED_LIVE_UAT_PENDING",
-      "capabilityOwners": ["ASEGURADORAS_PRIMARY_RUNTIME", "ASEGURADORAS_OPERATIONAL_DIRECTORY", "ROLE_SCOPE_RUNTIME"],
+      "capabilityOwners": [
+        "ASEGURADORAS_PRIMARY_RUNTIME",
+        "ASEGURADORAS_OPERATIONAL_DIRECTORY",
+        "ROLE_SCOPE_RUNTIME"
+      ],
       "scope": "Dirección and Operativo insurer edits must not fail because unchanged historical username/password keys coexist on the real row. Record/country permissions use full row; secure-field blocking uses only actual durable delta. No credential replay or relaxation, no financial or insurer data writes during source QA.",
       "paths": [
         {
@@ -1060,7 +1103,10 @@
         }
       ],
       "tests": [
-        {"path": "tools/gravicentra-i6-6-insurer-legacy-credential-update.test.cjs", "gitBlobSha": "905ed1b0b307549c4bee11d03960674d76d41486"}
+        {
+          "path": "tools/gravicentra-i6-6-insurer-legacy-credential-update.test.cjs",
+          "gitBlobSha": "905ed1b0b307549c4bee11d03960674d76d41486"
+        }
       ]
     },
     {
@@ -1068,7 +1114,11 @@
       "approvedByDirection": true,
       "receipt": "artifacts/orbit360-recovery/release-control/I6_6_REAL_INSURER_SAVE_ROOTCAUSE_20261111.json#portalCredentialReferenceRuntimeCorrection20261111",
       "sourceStatus": "SOURCE_UNIT_11_PASS_ISOLATED_PREVIEW_BUILD_REQUIRED_NO_LIVE_DATA_WRITES",
-      "capabilityOwners": ["ASEGURADORAS_PRIMARY_RUNTIME", "ASEGURADORAS_CREDENTIAL_REVEAL", "ROLE_SCOPE_RUNTIME"],
+      "capabilityOwners": [
+        "ASEGURADORAS_PRIMARY_RUNTIME",
+        "ASEGURADORAS_CREDENTIAL_REVEAL",
+        "ROLE_SCOPE_RUNTIME"
+      ],
       "scope": "In the reachable primary Aseguradoras module, a missing vault ref or legacy backend_required sentinel must never be introduced on portal edits. Preserve server-issued cred_ references; the reachable secure credential provider enforces actual reference format. Bank-account numbers remain editable for Dirección and approved Operativo in the main insurer editor; Asesor cannot edit. The dormant July P02 DOM decorator is intentionally excluded from this canonical product build; it is not the owner. No insurer/financial writes in source tests.",
       "paths": [
         {
@@ -1082,7 +1132,10 @@
         }
       ],
       "tests": [
-        {"path": "tools/gravicentra-i6-6-insurer-credential-placeholder-integrity.test.cjs", "gitBlobSha": "1318806a77c34a3b8dd017db1eec09d7a10c6aa7"}
+        {
+          "path": "tools/gravicentra-i6-6-insurer-credential-placeholder-integrity.test.cjs",
+          "gitBlobSha": "1318806a77c34a3b8dd017db1eec09d7a10c6aa7"
+        }
       ]
     },
     {
@@ -1090,7 +1143,10 @@
       "approvedByDirection": true,
       "receipt": "artifacts/orbit360-recovery/release-control/I6_6_REAL_INSURER_SAVE_ROOTCAUSE_20261111.json#insurerLogoStorageDefectProof20261112",
       "sourceStatus": "UNIT_8_PASS_TARGETED_TWO_FUNCTION_PREVIEW_AND_LIVE_RUN_PENDING_SIGNED_ASSET_QA",
-      "capabilityOwners": ["ASEGURADORAS_PRIMARY_RUNTIME", "ASEGURADORAS_PRODUCT_ASSET_BACKEND"],
+      "capabilityOwners": [
+        "ASEGURADORAS_PRIMARY_RUNTIME",
+        "ASEGURADORAS_PRODUCT_ASSET_BACKEND"
+      ],
       "scope": "Use the already provisioned Gravicentra project asset bucket (metadata inventory run 43155071269) for exactly the insurer-logo upload/read functions. Preserve environment override, project binding, actor authorization and tenant/insurer scope. No data reimport; synthetic signed upload/read/restore required to claim functional PASS.",
       "paths": [
         {
@@ -1104,7 +1160,10 @@
         }
       ],
       "tests": [
-        {"path": "tools/gravicentra-i6-6-insurer-assets-bucket.test.cjs", "gitBlobSha": "ad37d539a97fbcb94429f6ad4540397acff60053"}
+        {
+          "path": "tools/gravicentra-i6-6-insurer-assets-bucket.test.cjs",
+          "gitBlobSha": "ad37d539a97fbcb94429f6ad4540397acff60053"
+        }
       ]
     },
     {
@@ -1112,7 +1171,10 @@
       "approvedByDirection": true,
       "receipt": "artifacts/orbit360-recovery/release-control/I6_6_REAL_INSURER_SAVE_ROOTCAUSE_20261111.json#insurerLogoStorageDefectProof20261112",
       "sourceStatus": "SOURCE_UNIT_9_PASS_OLD_SYNTHETIC_FIXTURE_RESTORED_RUN_43156475613_FINAL_SIGNED_QA_PENDING",
-      "capabilityOwners": ["ASEGURADORAS_PRIMARY_RUNTIME", "ASEGURADORAS_PRODUCT_ASSET_BACKEND"],
+      "capabilityOwners": [
+        "ASEGURADORAS_PRIMARY_RUNTIME",
+        "ASEGURADORAS_PRODUCT_ASSET_BACKEND"
+      ],
       "scope": "Exact SHA-256 of uploaded binary bytes must equal the independently read hash. Legacy sha(Buffer) coerced binary PNG data to UTF-8 and generated a different content hash. Preserve correct preexisting asset bucket, exact two-function deployment scope, tenant/role guards and reversible synthetic QA. No real insurer or financial record writes.",
       "paths": [
         {
@@ -1142,14 +1204,27 @@
       "approvedByDirection": true,
       "receipt": "artifacts/orbit360-recovery/release-control/I6_6_CARLOS_RENEWAL_OPS_HANDOFF_GATE_20261112.json#sourceDeltas",
       "sourceStatus": "SOURCE_SYNTHETIC_QA_PASS_PREVIEW_SIGNED_LIVE_HOLD",
-      "capabilityOwners": ["RENEWALS_PRIMARY_RUNTIME", "POLIZAS_PRIMARY_RUNTIME", "RECIBOS_CARTERA_PRIMARY_RUNTIME"],
+      "capabilityOwners": [
+        "RENEWALS_PRIMARY_RUNTIME",
+        "POLIZAS_PRIMARY_RUNTIME",
+        "RECIBOS_CARTERA_PRIMARY_RUNTIME"
+      ],
       "scope": "One managed renewal entry allows configured Operativo and admin/director roles to choose direct issue or Ops management. Advisor cannot issue. Reuse existing canonical issuance engine, secure approval/document gates and same management id; no financial data writes during source QA.",
       "paths": [
-        {"path": "orbit360-platform/modules/renewals-v1200-operational-bridge.js", "gitBlobSha": "0735c097ee69e5346421a07400628d58090e2949"},
-        {"path": "orbit360-platform/modules/issuance-endosos-v1201-bridge.js", "gitBlobSha": "e2eb436a18af192eea89dc39aa4ec29a40dbdbb8"}
+        {
+          "path": "orbit360-platform/modules/renewals-v1200-operational-bridge.js",
+          "gitBlobSha": "0735c097ee69e5346421a07400628d58090e2949"
+        },
+        {
+          "path": "orbit360-platform/modules/issuance-endosos-v1201-bridge.js",
+          "gitBlobSha": "e2eb436a18af192eea89dc39aa4ec29a40dbdbb8"
+        }
       ],
       "tests": [
-        {"path": "tools/gravicentra-i6-6-operational-renewal-entry.test.cjs", "gitBlobSha": "8cbc67612d7c25ddf27e76edeb56d99e62bc5d60"}
+        {
+          "path": "tools/gravicentra-i6-6-operational-renewal-entry.test.cjs",
+          "gitBlobSha": "8cbc67612d7c25ddf27e76edeb56d99e62bc5d60"
+        }
       ]
     },
     {
@@ -1157,13 +1232,22 @@
       "approvedByDirection": true,
       "receipt": "artifacts/orbit360-recovery/release-control/I6_6_CARLOS_RENEWAL_OPS_HANDOFF_GATE_20261112.json#sourceDeltas",
       "sourceStatus": "SOURCE_SYNTHETIC_QA_PASS_PREVIEW_SIGNED_LIVE_HOLD",
-      "capabilityOwners": ["OPS_PRIMARY_RUNTIME", "LEADS_PRIMARY_RUNTIME"],
+      "capabilityOwners": [
+        "OPS_PRIMARY_RUNTIME",
+        "LEADS_PRIMARY_RUNTIME"
+      ],
       "scope": "Project only server-confirmed unresolved authorized Leads handoffs already sharing the canonical negocio outside Ops stages, plus direct access to existing signed shared inbox. No second gestion, stage shift, or Firestore write.",
       "paths": [
-        {"path": "orbit360-platform/modules/ops.js", "gitBlobSha": "538fc271b8708bff662e23e5786a06b0f1f81f5a"}
+        {
+          "path": "orbit360-platform/modules/ops.js",
+          "gitBlobSha": "538fc271b8708bff662e23e5786a06b0f1f81f5a"
+        }
       ],
       "tests": [
-        {"path": "tools/gravicentra-i6-6-ops-leads-inbox-projection.test.cjs", "gitBlobSha": "b036fbbf7827305d9a998ec645406c98d4496b3a"}
+        {
+          "path": "tools/gravicentra-i6-6-ops-leads-inbox-projection.test.cjs",
+          "gitBlobSha": "b036fbbf7827305d9a998ec645406c98d4496b3a"
+        }
       ]
     },
     {
@@ -1171,19 +1255,85 @@
       "approvedByDirection": true,
       "receipt": "artifacts/orbit360-recovery/release-control/I6_6_CARLOS_TRANSVERSAL_OPS_TASKS_GATE_20261112.json",
       "sourceStatus": "SOURCE_SYNTHETIC_7_OF_7_PASS_IMMUTABLE_PREVIEW_AND_LIVE_UAT_HOLD",
-      "capabilityOwners": ["OPS_PRIMARY_RUNTIME", "LEADS_PRIMARY_RUNTIME", "CRONOGRAMA_TASKS_PRIMARY_RUNTIME", "ROLE_SCOPE_CLIENT_SERVER", "SCOPED_READER", "OPERATIONAL_WRITERS"],
+      "capabilityOwners": [
+        "OPS_PRIMARY_RUNTIME",
+        "LEADS_PRIMARY_RUNTIME",
+        "CRONOGRAMA_TASKS_PRIMARY_RUNTIME",
+        "ROLE_SCOPE_CLIENT_SERVER",
+        "SCOPED_READER",
+        "OPERATIONAL_WRITERS"
+      ],
       "scope": "Preserve signed Operativo tenant-country boundaries while aligning cross-advisor workflow CRUD with already-approved all-scope Pólizas/Cobros. Display the same protected Cronograma tasks in Ops, add Ops task creation/completion, require explicit task country in TODOS mode. Never convert a tarea into a duplicated gestion. All source QA synthetic; Preview/LIVE functional write and exact release not yet accepted.",
       "paths": [
-        {"path":"functions/b4-003-scoped-access-boundary.js","gitBlobSha":"f68d6120b4b379223bbc0a31d9c494b27d857b34","replaces":{"path":"functions/b4-003-scoped-access-boundary.js","priorGitBlobSha":"38fa8cee808be6b92b65150625e69b0f93639564","priorChangeId":"I6_6_CONCILIACIONES_PROTECTED_SCOPED_READ_BRIDGE_P0"}},
-        {"path":"functions/product-operational-domain.js","gitBlobSha":"6c5c7f767e306169d882d05231dcbd74c9daffc4","replaces":{"path":"functions/product-operational-domain.js","priorGitBlobSha":"416775a865e8b23ae7e8bbb604c8d7c519297517","priorChangeId":"I6_6_INSURER_LOGO_BINARY_DIGEST_PARITY_P0"}},
-        {"path":"functions/product-ops-leads-domain.js","gitBlobSha":"93cd0a64f64de01c1b6d73804f2247c4ae62ee50","replaces":{"path":"functions/product-ops-leads-domain.js","priorGitBlobSha":"ad208454627584b81875b950fbe37040cc7f1ffc","priorChangeId":"I6_6_OPS_PROTECTED_ENDORSEMENT_BOARD_HIDE_TRANSVERSAL_P0"}},
-        {"path":"orbit360-platform/core/access-scope.js","gitBlobSha":"cfc5c96fbff5dce241fd86d622b3ca107e8ed7df","replaces":{"path":"orbit360-platform/core/access-scope.js","priorGitBlobSha":"207b8c59be6d72f732e6549f06bba6ad04c0a103","priorChangeId":"I6_6_REAL_INSURER_OPERATIVO_SAVE_ROLE_COUNTRY_SCOPE_P0"}},
-        {"path":"orbit360-platform/core/router.js","gitBlobSha":"2b4f347bca3a8f864b398c0d893d831745dbcf9c","replaces":{"path":"orbit360-platform/core/router.js","priorGitBlobSha":"7c8648c8cf41d7132dad1c594838240bf8a1291a","priorChangeId":"I6_6_CONCILIACIONES_PROTECTED_SCOPED_READ_BRIDGE_P0"}},
-        {"path":"orbit360-platform/modules/cronograma.js","gitBlobSha":"50bc02a8f56675497b42d0983c6d29e0276ee975","replaces":{"path":"orbit360-platform/modules/cronograma.js","priorGitBlobSha":"ecbed8de9f6767b7ecf2720cc21f4f70fd734d99","priorChangeId":"I6_6_PROTECTED_READONLY_HOST_ROUTING_AND_WRITE_DENIAL_ALL_SURFACES"}},
-        {"path":"orbit360-platform/modules/ops.js","gitBlobSha":"eb5b54b8edb1f1df4b120cac73c42af18b2d2608","replaces":{"path":"orbit360-platform/modules/ops.js","priorGitBlobSha":"538fc271b8708bff662e23e5786a06b0f1f81f5a","priorChangeId":"I6_6_OPS_INBOX_PENDING_LEADS_PROJECTION"}}
+        {
+          "path": "functions/b4-003-scoped-access-boundary.js",
+          "gitBlobSha": "f68d6120b4b379223bbc0a31d9c494b27d857b34",
+          "replaces": {
+            "path": "functions/b4-003-scoped-access-boundary.js",
+            "priorGitBlobSha": "38fa8cee808be6b92b65150625e69b0f93639564",
+            "priorChangeId": "I6_6_CONCILIACIONES_PROTECTED_SCOPED_READ_BRIDGE_P0"
+          }
+        },
+        {
+          "path": "functions/product-operational-domain.js",
+          "gitBlobSha": "6c5c7f767e306169d882d05231dcbd74c9daffc4",
+          "replaces": {
+            "path": "functions/product-operational-domain.js",
+            "priorGitBlobSha": "416775a865e8b23ae7e8bbb604c8d7c519297517",
+            "priorChangeId": "I6_6_INSURER_LOGO_BINARY_DIGEST_PARITY_P0"
+          }
+        },
+        {
+          "path": "functions/product-ops-leads-domain.js",
+          "gitBlobSha": "93cd0a64f64de01c1b6d73804f2247c4ae62ee50",
+          "replaces": {
+            "path": "functions/product-ops-leads-domain.js",
+            "priorGitBlobSha": "ad208454627584b81875b950fbe37040cc7f1ffc",
+            "priorChangeId": "I6_6_OPS_PROTECTED_ENDORSEMENT_BOARD_HIDE_TRANSVERSAL_P0"
+          }
+        },
+        {
+          "path": "orbit360-platform/core/access-scope.js",
+          "gitBlobSha": "cfc5c96fbff5dce241fd86d622b3ca107e8ed7df",
+          "replaces": {
+            "path": "orbit360-platform/core/access-scope.js",
+            "priorGitBlobSha": "207b8c59be6d72f732e6549f06bba6ad04c0a103",
+            "priorChangeId": "I6_6_REAL_INSURER_OPERATIVO_SAVE_ROLE_COUNTRY_SCOPE_P0"
+          }
+        },
+        {
+          "path": "orbit360-platform/core/router.js",
+          "gitBlobSha": "2b4f347bca3a8f864b398c0d893d831745dbcf9c",
+          "replaces": {
+            "path": "orbit360-platform/core/router.js",
+            "priorGitBlobSha": "7c8648c8cf41d7132dad1c594838240bf8a1291a",
+            "priorChangeId": "I6_6_CONCILIACIONES_PROTECTED_SCOPED_READ_BRIDGE_P0"
+          }
+        },
+        {
+          "path": "orbit360-platform/modules/cronograma.js",
+          "gitBlobSha": "50bc02a8f56675497b42d0983c6d29e0276ee975",
+          "replaces": {
+            "path": "orbit360-platform/modules/cronograma.js",
+            "priorGitBlobSha": "ecbed8de9f6767b7ecf2720cc21f4f70fd734d99",
+            "priorChangeId": "I6_6_PROTECTED_READONLY_HOST_ROUTING_AND_WRITE_DENIAL_ALL_SURFACES"
+          }
+        },
+        {
+          "path": "orbit360-platform/modules/ops.js",
+          "gitBlobSha": "eb5b54b8edb1f1df4b120cac73c42af18b2d2608",
+          "replaces": {
+            "path": "orbit360-platform/modules/ops.js",
+            "priorGitBlobSha": "538fc271b8708bff662e23e5786a06b0f1f81f5a",
+            "priorChangeId": "I6_6_OPS_INBOX_PENDING_LEADS_PROJECTION"
+          }
+        }
       ],
       "tests": [
-        {"path":"tools/gravicentra-i6-6-carlos-ops-tasks-transversal.test.cjs","gitBlobSha":"8514a2c3593a59c0c4534d1312f1476524888efa"}
+        {
+          "path": "tools/gravicentra-i6-6-carlos-ops-tasks-transversal.test.cjs",
+          "gitBlobSha": "8514a2c3593a59c0c4534d1312f1476524888efa"
+        }
       ]
     },
     {
@@ -1191,14 +1341,36 @@
       "approvedByDirection": true,
       "receipt": "artifacts/orbit360-recovery/release-control/I6_6_CARLOS_PREVIEW_UAT_SYNTHETIC_ONLY_20261112.json",
       "sourceStatus": "SYNTHETIC_TRANSPORT_UNIT_16_PASS_PENDING_IMMUTABLE_PREVIEW_SIGNED_UAT",
-      "capabilityOwners": ["PRODUCT_RUNTIME_PROVIDER", "OPS_LEADS_SERVER_WRITER"],
+      "capabilityOwners": [
+        "PRODUCT_RUNTIME_PROVIDER",
+        "OPS_LEADS_SERVER_WRITER"
+      ],
       "scope": "Same I6.6 candidate and Firebase. Enable only b4003qa and b3004qa synthetic operations in I6.6 Hosting Preview, deny all real IDs and live-callable routing. Server Preview enforces synthetic Ops/Leads IDs, no real client/policy links, and no policy emission. LIVE source permissions unchanged. Rebuild exact successor once from new source, certify and promote only after signed UAT and readback.",
       "paths": [
-        {"path":"orbit360-platform/core/product-runtime-browser-providers-p0.js","gitBlobSha":"debea657f837464d57c326ebd9e9043b2b085156","replaces":{"path":"orbit360-platform/core/product-runtime-browser-providers-p0.js","priorGitBlobSha":"76555ee036149eb7eb003b528f54d996a75c00eb","priorChangeId":"I6_6_CONCILIACIONES_PROTECTED_SCOPED_READ_BRIDGE_P0"}},
-        {"path":"functions/product-ops-leads-domain.js","gitBlobSha":"43a87e86d7e0a7ffb71227c687d1acca512a217d","replaces":{"path":"functions/product-ops-leads-domain.js","priorGitBlobSha":"93cd0a64f64de01c1b6d73804f2247c4ae62ee50","priorChangeId":"I6_6_CARLOS_TRANSVERSAL_OPS_TASKS_ROLE_WRITE_PARITY_P0"}}
+        {
+          "path": "orbit360-platform/core/product-runtime-browser-providers-p0.js",
+          "gitBlobSha": "debea657f837464d57c326ebd9e9043b2b085156",
+          "replaces": {
+            "path": "orbit360-platform/core/product-runtime-browser-providers-p0.js",
+            "priorGitBlobSha": "76555ee036149eb7eb003b528f54d996a75c00eb",
+            "priorChangeId": "I6_6_CONCILIACIONES_PROTECTED_SCOPED_READ_BRIDGE_P0"
+          }
+        },
+        {
+          "path": "functions/product-ops-leads-domain.js",
+          "gitBlobSha": "43a87e86d7e0a7ffb71227c687d1acca512a217d",
+          "replaces": {
+            "path": "functions/product-ops-leads-domain.js",
+            "priorGitBlobSha": "93cd0a64f64de01c1b6d73804f2247c4ae62ee50",
+            "priorChangeId": "I6_6_CARLOS_TRANSVERSAL_OPS_TASKS_ROLE_WRITE_PARITY_P0"
+          }
+        }
       ],
       "tests": [
-        {"path":"tools/gravicentra-i6-6-carlos-preview-synthetic-write-gate.test.cjs","gitBlobSha":"305703b6f82b1b99e23aa141ba99198598a1e4e5"}
+        {
+          "path": "tools/gravicentra-i6-6-carlos-preview-synthetic-write-gate.test.cjs",
+          "gitBlobSha": "305703b6f82b1b99e23aa141ba99198598a1e4e5"
+        }
       ]
     },
     {
@@ -1206,14 +1378,37 @@
       "approvedByDirection": true,
       "receipt": "Paula Dirección 2026-11-12: completar Cobros para Carlos con paridad Preview y publicar únicamente después de QA; autorización restringida a fixtures sintéticas",
       "sourceStatus": "PREVIEW_PACKAGE_REQUESTED_SIGNED_PAYMENT_UAT_PENDING_NO_LIVE",
-      "capabilityOwners": ["COBROS_PRIMARY_RUNTIME", "PRODUCT_RUNTIME_PROVIDER", "RECONCILIACION_PAYMENT_BACKEND"],
+      "capabilityOwners": [
+        "COBROS_PRIMARY_RUNTIME",
+        "PRODUCT_RUNTIME_PROVIDER",
+        "RECONCILIACION_PAYMENT_BACKEND"
+      ],
       "scope": "Permitir en el Hosting Preview I6.6 solamente lectura/aplicación/conciliación de pago de fixtures sintéticas por callable preexistente us-central1. Exigir marcas QA en recibo, póliza, cliente, cartera, cobro y relaciones; aislar request/event de Preview para no afectar ledger LIVE. Denegar otras operaciones, nombres LIVE y referencias auténticas. Ningún cambio de permisos de asesor, país, Auth, Rules ni dato real.",
       "paths": [
-        {"path":"orbit360-platform/core/product-runtime-browser-providers-p0.js","gitBlobSha":"4a220bafcfd1a4f0b1326673be8b77548539c7c5","replaces":{"path":"orbit360-platform/core/product-runtime-browser-providers-p0.js","priorGitBlobSha":"debea657f837464d57c326ebd9e9043b2b085156","priorChangeId":"I6_6_CARLOS_PREVIEW_SYNTHETIC_WRITE_TRANSPORT_PARITY_P0"}},
-        {"path":"functions/cobros-reconciliation-domain.js","gitBlobSha":"494cc2eb78f7d9431bcf5c1772f0762169b8877f","replaces":{"path":"functions/cobros-reconciliation-domain.js","priorGitBlobSha":"e707884baa8c6c87f8d3875c9701b350b49ccfcc","priorChangeId":"I6_6_LEGACY_PAID_RECEIPT_APPLICATION_WITHOUT_DOUBLE_PAYMENT_P0"}}
+        {
+          "path": "orbit360-platform/core/product-runtime-browser-providers-p0.js",
+          "gitBlobSha": "4a220bafcfd1a4f0b1326673be8b77548539c7c5",
+          "replaces": {
+            "path": "orbit360-platform/core/product-runtime-browser-providers-p0.js",
+            "priorGitBlobSha": "debea657f837464d57c326ebd9e9043b2b085156",
+            "priorChangeId": "I6_6_CARLOS_PREVIEW_SYNTHETIC_WRITE_TRANSPORT_PARITY_P0"
+          }
+        },
+        {
+          "path": "functions/cobros-reconciliation-domain.js",
+          "gitBlobSha": "494cc2eb78f7d9431bcf5c1772f0762169b8877f",
+          "replaces": {
+            "path": "functions/cobros-reconciliation-domain.js",
+            "priorGitBlobSha": "e707884baa8c6c87f8d3875c9701b350b49ccfcc",
+            "priorChangeId": "I6_6_LEGACY_PAID_RECEIPT_APPLICATION_WITHOUT_DOUBLE_PAYMENT_P0"
+          }
+        }
       ],
       "tests": [
-        {"path":"tools/gravicentra-i6-6-carlos-payment-preview-synthetic-gate.test.cjs","gitBlobSha":"d36338e2d70d9b7ea4a36df7d975f4b7c4a5b3a6"}
+        {
+          "path": "tools/gravicentra-i6-6-carlos-payment-preview-synthetic-gate.test.cjs",
+          "gitBlobSha": "d36338e2d70d9b7ea4a36df7d975f4b7c4a5b3a6"
+        }
       ]
     },
     {
@@ -1221,7 +1416,11 @@
       "approvedByDirection": true,
       "receipt": "Paula Dirección 2026-11-12: Carlos debe poder aplicar cobros LIVE, no acumular correcciones; signed LIVE test 43311517495 detected Firebase CallableResponse bound to previewOnly, with synthetic cleanup PASS. Scoped exact backend Preview to LIVE hotfix authorized by existing publication rule.",
       "sourceStatus": "SECOND_ARGUMENT_CAUSE_ROOT_CONFIRMED_REGRESSION_PASS_EXACT_BACKEND_PREVIEW_LIVE_SIGNED_UAT_IN_PROGRESS",
-      "capabilityOwners": ["COBROS_PRIMARY_RUNTIME", "RECONCILIACION_PAYMENT_BACKEND", "FIREBASE_CALLABLE_BRIDGE"],
+      "capabilityOwners": [
+        "COBROS_PRIMARY_RUNTIME",
+        "RECONCILIACION_PAYMENT_BACKEND",
+        "FIREBASE_CALLABLE_BRIDGE"
+      ],
       "scope": "Bind the CallableRequest explicitly to execute(request,false) for LIVE/LAB, executePreview(request) for Preview. Never infer previewOnly from the optional CallableResponse argument. Regression test both modes with second argument, deploy one immutable backend package to existing Preview and LIVE only after real Carlos/Paula signed synthetic UAT, preserve frontend 1dd unchanged and roll back LIVE function on failure.",
       "paths": [
         {
@@ -1235,7 +1434,10 @@
         }
       ],
       "tests": [
-        {"path": "tools/gravicentra-i6-6-payment-oncall-second-argument-guard.test.cjs", "gitBlobSha": "0bc29b4fb3c4121b53d29e5c3386df58df9d0990"}
+        {
+          "path": "tools/gravicentra-i6-6-payment-oncall-second-argument-guard.test.cjs",
+          "gitBlobSha": "0bc29b4fb3c4121b53d29e5c3386df58df9d0990"
+        }
       ]
     },
     {
@@ -1243,13 +1445,23 @@
       "approvedByDirection": true,
       "receipt": "artifacts/orbit360-recovery/release-control/I6_6_CARLOS_DIRECT_RENEWAL_EXPLICIT_HYDRATION_20261112.json",
       "sourceStatus": "FOCAL_SOURCE_AND_UNIT_PASS_PREVIEW_EXACT_ARTIFACT_AND_SIGNED_LIVE_HOLD",
-      "capabilityOwners": ["RENEWAL_DIRECT", "ISSUANCE_WORKFLOW", "PROTECTED_READ_RUNTIME"],
+      "capabilityOwners": [
+        "RENEWAL_DIRECT",
+        "ISSUANCE_WORKFLOW",
+        "PROTECTED_READ_RUNTIME"
+      ],
       "scope": "A signed explicit renewal/issuance action must request authoritative deferred Ops, policies, clients and vehicles before waiting. Fail closed if the request cannot be scheduled. No authorization expansion, source data import, tenant/country alteration, bypassed insurer document, or backend deployment. Release Preview then the same immutable Hosting artifact LIVE only after signed dual-role QA and readback.",
       "paths": [
-        {"path": "orbit360-platform/core/issuance-workflow-v1201.js", "gitBlobSha": "fbe47eeabe99bab80c047ba201098b767c455c04"}
+        {
+          "path": "orbit360-platform/core/issuance-workflow-v1201.js",
+          "gitBlobSha": "fbe47eeabe99bab80c047ba201098b767c455c04"
+        }
       ],
       "tests": [
-        {"path": "tools/gravicentra-i6-6-direct-renewal-explicit-protected-hydration.test.cjs", "gitBlobSha": "b769eb628dadb04dcbee58c73c52927ac57f8955"}
+        {
+          "path": "tools/gravicentra-i6-6-direct-renewal-explicit-protected-hydration.test.cjs",
+          "gitBlobSha": "b769eb628dadb04dcbee58c73c52927ac57f8955"
+        }
       ]
     },
     {
@@ -1257,17 +1469,60 @@
       "approvedByDirection": true,
       "receipt": "Paula Dirección 2026-11-12: Operativo escribe todos los módulos operativos autorizados, igual o superior Dirección/Admin/AdminTenant/SuperAdmin; aplicar transversalmente los hallazgos de Carlos, respetar países/tenant, no ampliar Asesor ni el libro financiero y certificar Preview antes de LIVE.",
       "sourceStatus": "SOURCE_5_ROLES_12_DOMAINS_SYNTHETIC_TRANSACTION_AND_NEGATIVES_PASS_PREVIEW_BACKEND_AND_LIVE_NOT_YET_ACCEPTED",
-      "capabilityOwners": ["ROLE_SCOPE_CLIENT_SERVER", "SCOPED_READER", "OPS_LEADS_SERVER_WRITER", "OPERATIONAL_WRITER"],
+      "capabilityOwners": [
+        "ROLE_SCOPE_CLIENT_SERVER",
+        "SCOPED_READER",
+        "OPS_LEADS_SERVER_WRITER",
+        "OPERATIONAL_WRITER"
+      ],
       "scope": "Use explicit tenant roleScope all, not an obsolete personal advisor own default, for business portfolios of Operativo and its four superior roles. Keep signed module denies, country/tenant boundaries, Asesor own-only, finance-ledger and insurer-secret separation. Fix cross-tenant UI record guard. Test all 5 roles and 12 operational collections with transactional synthetic insert/update, readback and denied country, without real writes; exact immutable Preview and authenticated LIVE UAT remain mandatory.",
       "paths": [
-        {"path": "functions/b4-003-scoped-access-boundary.js", "gitBlobSha": "bc4cfabae86027657d08aaac21963fb605f5f17a", "replaces": {"path": "functions/b4-003-scoped-access-boundary.js", "priorGitBlobSha": "f68d6120b4b379223bbc0a31d9c494b27d857b34", "priorChangeId": "I6_6_CARLOS_TRANSVERSAL_OPS_TASKS_ROLE_WRITE_PARITY_P0"}},
-        {"path": "functions/product-operational-domain.js", "gitBlobSha": "a49d14b71a6b4dd94074d8fba13f00bb9ca69a82", "replaces": {"path": "functions/product-operational-domain.js", "priorGitBlobSha": "6c5c7f767e306169d882d05231dcbd74c9daffc4", "priorChangeId": "I6_6_CARLOS_TRANSVERSAL_OPS_TASKS_ROLE_WRITE_PARITY_P0"}},
-        {"path": "functions/product-ops-leads-domain.js", "gitBlobSha": "0f7ecc4119a8e85a108bf51872771f8a7e86c241", "replaces": {"path": "functions/product-ops-leads-domain.js", "priorGitBlobSha": "43a87e86d7e0a7ffb71227c687d1acca512a217d", "priorChangeId": "I6_6_CARLOS_PREVIEW_SYNTHETIC_WRITE_TRANSPORT_PARITY_P0"}},
-        {"path": "orbit360-platform/core/access-scope.js", "gitBlobSha": "763affc51cb6553872ffcb08ecc1af5ccd3f41ed", "replaces": {"path": "orbit360-platform/core/access-scope.js", "priorGitBlobSha": "cfc5c96fbff5dce241fd86d622b3ca107e8ed7df", "priorChangeId": "I6_6_CARLOS_TRANSVERSAL_OPS_TASKS_ROLE_WRITE_PARITY_P0"}}
+        {
+          "path": "functions/b4-003-scoped-access-boundary.js",
+          "gitBlobSha": "bc4cfabae86027657d08aaac21963fb605f5f17a",
+          "replaces": {
+            "path": "functions/b4-003-scoped-access-boundary.js",
+            "priorGitBlobSha": "f68d6120b4b379223bbc0a31d9c494b27d857b34",
+            "priorChangeId": "I6_6_CARLOS_TRANSVERSAL_OPS_TASKS_ROLE_WRITE_PARITY_P0"
+          }
+        },
+        {
+          "path": "functions/product-operational-domain.js",
+          "gitBlobSha": "a49d14b71a6b4dd94074d8fba13f00bb9ca69a82",
+          "replaces": {
+            "path": "functions/product-operational-domain.js",
+            "priorGitBlobSha": "6c5c7f767e306169d882d05231dcbd74c9daffc4",
+            "priorChangeId": "I6_6_CARLOS_TRANSVERSAL_OPS_TASKS_ROLE_WRITE_PARITY_P0"
+          }
+        },
+        {
+          "path": "functions/product-ops-leads-domain.js",
+          "gitBlobSha": "0f7ecc4119a8e85a108bf51872771f8a7e86c241",
+          "replaces": {
+            "path": "functions/product-ops-leads-domain.js",
+            "priorGitBlobSha": "43a87e86d7e0a7ffb71227c687d1acca512a217d",
+            "priorChangeId": "I6_6_CARLOS_PREVIEW_SYNTHETIC_WRITE_TRANSPORT_PARITY_P0"
+          }
+        },
+        {
+          "path": "orbit360-platform/core/access-scope.js",
+          "gitBlobSha": "763affc51cb6553872ffcb08ecc1af5ccd3f41ed",
+          "replaces": {
+            "path": "orbit360-platform/core/access-scope.js",
+            "priorGitBlobSha": "cfc5c96fbff5dce241fd86d622b3ca107e8ed7df",
+            "priorChangeId": "I6_6_CARLOS_TRANSVERSAL_OPS_TASKS_ROLE_WRITE_PARITY_P0"
+          }
+        }
       ],
       "tests": [
-        {"path": "tools/gravicentra-i6-6-privileged-role-portfolio-parity.test.cjs", "gitBlobSha": "d03e289d61d040f7d3aebfac359755b9f7ee247e"},
-        {"path": "tools/gravicentra-i6-6-privileged-role-writer-transaction.test.cjs", "gitBlobSha": "8097b029670e42fb8325308008611f1842725023"}
+        {
+          "path": "tools/gravicentra-i6-6-privileged-role-portfolio-parity.test.cjs",
+          "gitBlobSha": "d03e289d61d040f7d3aebfac359755b9f7ee247e"
+        },
+        {
+          "path": "tools/gravicentra-i6-6-privileged-role-writer-transaction.test.cjs",
+          "gitBlobSha": "8097b029670e42fb8325308008611f1842725023"
+        }
       ]
     },
     {
@@ -1275,14 +1530,57 @@
       "approvedByDirection": true,
       "receipt": "Dirección Paula 2026-11-13: continuar el primer gate I6.6 pendiente, conectar la lectura de Conciliaciones con el libro activo sin reimportar datos ni escribir pagos; solo Preview probado antes de mismo artifact LIVE; retener las 80 propuestas con póliza ambigua.",
       "sourceStatus": "SOURCE_SYNTHETIC_52_UNIQUE_80_AMBIGUOUS_HOLD_PREVIEW_SIGNED_AND_LIVE_NOT_CERTIFIED",
-      "capabilityOwners": ["CONCILIACIONES_READONLY", "SCOPED_SERVER_READER", "COBROS_ACTIVE_LEDGER"],
+      "capabilityOwners": [
+        "CONCILIACIONES_READONLY",
+        "SCOPED_SERVER_READER",
+        "COBROS_ACTIVE_LEDGER"
+      ],
       "scope": "Read the active, contract-verified Cobros ledger proposal stage only while canonical Conciliaciones is empty; use bounded indexed exact policy-number batches, verify the unique canonical policy and client, enforce tenant/country/advisor roles, and project a sanitized read-only row. No catalogue scan, stage writes, payment application, role expansion, Rules/Auth or LIVE deployment without exact preview and signed readback.",
       "paths": [
-        {"path":"functions/i66-conciliaciones-active-ledger-projection.js","gitBlobSha":"1fc919f1b6a5356e21c3811e09aab4182adca25c"},
-        {"path":"functions/b4-003-scoped-related-reader.js","gitBlobSha":"34cb6c09c63fb9e45feb6c9d55c3e1c514ab17b2","replaces":{"path":"functions/b4-003-scoped-related-reader.js","priorGitBlobSha":"849cc33c7bf048787b3f1a35e176a3baa5285fc7","priorChangeId":"I6_6_CONCILIACIONES_PROTECTED_SCOPED_READ_BRIDGE_P0"}}
+        {
+          "path": "functions/i66-conciliaciones-active-ledger-projection.js",
+          "gitBlobSha": "1fc919f1b6a5356e21c3811e09aab4182adca25c"
+        },
+        {
+          "path": "functions/b4-003-scoped-related-reader.js",
+          "gitBlobSha": "34cb6c09c63fb9e45feb6c9d55c3e1c514ab17b2",
+          "replaces": {
+            "path": "functions/b4-003-scoped-related-reader.js",
+            "priorGitBlobSha": "849cc33c7bf048787b3f1a35e176a3baa5285fc7",
+            "priorChangeId": "I6_6_CONCILIACIONES_PROTECTED_SCOPED_READ_BRIDGE_P0"
+          }
+        }
       ],
       "tests": [
-        {"path":"tools/gravicentra-i6-6-conciliaciones-active-ledger-projection.test.cjs","gitBlobSha":"93a314e05a840bfa664503f0cf7d49468a51b24d"}
+        {
+          "path": "tools/gravicentra-i6-6-conciliaciones-active-ledger-projection.test.cjs",
+          "gitBlobSha": "93a314e05a840bfa664503f0cf7d49468a51b24d"
+        }
+      ]
+    },
+    {
+      "id": "I6_6_EQUIPOS_ROLE_DEFAULTS_DIRECCION_SUPERADMIN_ADMIN_OPERATIVO_P0",
+      "approvedByDirection": true,
+      "receipt": "Paula Andrea Osorio Franco, Dirección, instrucción expresa 2026-11-13: terminar escritura transversal, priorizar Operativo y garantizar SuperAdmin/Admin/Dirección, gestionar permisos por Equipos y certificar antes de LIVE; autorización de corrección y publicación sujeta a PASS real.",
+      "sourceCommit": "e2859e8ce8c29a48ed8f34b1f32e752558ca032d",
+      "sourceStatus": "SOURCE_17_OF_17_SYNTHETIC_PASS_HISTORICAL_GUARD_PREVIEW_SIGNED_LIVE_HOLD",
+      "capabilityOwners": [
+        "ROLE_SCOPE_RUNTIME",
+        "EQUIPOS_ROLE_PERMISSIONS"
+      ],
+      "scope": "Repair Equipos default permission matrix when canonical memberships omit legacy nivel: Admin/Dirección/SuperAdmin full defaults and Operativo edit on assigned operational modules, preserving configurable server-protected overrides, tenant/country hard boundaries and no new grants to Asesor; zero data writes.",
+      "dataWrites": 0,
+      "paths": [
+        {
+          "path": "orbit360-platform/modules/equipo.js",
+          "gitBlobSha": "2c0967040526e96e60b210125545f23ee754b47b"
+        }
+      ],
+      "tests": [
+        {
+          "path": "tools/gravicentra-i6-6-equipo-protected-role-defaults.test.cjs",
+          "gitBlobSha": "7c8f591ad014795c4618a1cf426a1fa68b803f6d"
+        }
       ]
     }
   ]
