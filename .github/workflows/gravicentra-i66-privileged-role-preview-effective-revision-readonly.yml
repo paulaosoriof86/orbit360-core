@@ -1,0 +1,88 @@
+# I6.6: confirm that signed Preview UAT reached the NEW effective function
+# revisions, not old pinned Cloud Run traffic. Read-only, LIVE untouched.
+name: Gravicentra I6.6 Three Preview Effective Revisions READONLY
+on:
+  push:
+    branches: [recovery/fase-a-clean-20260831]
+    paths:
+      - .github/workflows/gravicentra-i66-privileged-role-preview-effective-revision-readonly.yml
+permissions:
+  contents: read
+  actions: read
+jobs:
+  effective-preview-traffic:
+    if: github.repository == 'paulaosoriof86/orbit360-core' && github.ref == 'refs/heads/recovery/fase-a-clean-20260831'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 16
+    env:
+      PROJECT_ID: ays-orbit-360-lab
+      SOURCE_SHA: 0153f5cbbe00c3732e11ebae59b32bd357e38bfd
+      SIGNED_PREVIEW_RUN: '43372778111'
+      GH_TOKEN: ${{ github.token }}
+      SA_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_ALT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Prove signed isolated Preview and no product source drift
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor "$SOURCE_SHA" HEAD
+          test -z "$(git diff --name-only "$SOURCE_SHA" HEAD -- functions orbit360-platform)"
+          node - <<'NODE'
+          const assert=require('node:assert/strict');
+          (async()=>{
+            const h={Authorization:'Bearer '+process.env.GH_TOKEN,Accept:'application/vnd.github+json','User-Agent':'GI-I66-Preview-Traffic'};
+            const url='https://api.github.com/repos/paulaosoriof86/orbit360-core/actions/runs/'+process.env.SIGNED_PREVIEW_RUN;
+            const r=await fetch(url,{headers:h});assert.equal(r.ok,true);
+            const x=await r.json();assert.equal(x.conclusion,'success','I66_SIGNED_PREVIEW_NOT_ACCEPTED');
+            console.log('I66_SIGNED_TWO_ACTOR_PREVIEW_PREREQUISITE_PASS');
+          })().catch(e=>{console.error(e.message);process.exitCode=1;});
+          NODE
+      - uses: google-github-actions/setup-gcloud@v2
+        with:
+          version: '>= 483.0.0'
+      - name: Select configured existing LAB service account for metadata only
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/gi-i66-preview-revision-auth"
+          python3 - <<'PY'
+          import json,os,pathlib
+          target=pathlib.Path(os.environ['RUNNER_TEMP'])/'gi-i66-preview-revision-auth/selected.json'
+          for key in ('SA_LAB','SA_ALT','SA_DEFAULT'):
+              try:v=json.loads(os.environ.get(key,''))
+              except (ValueError,TypeError):continue
+              if v.get('type')=='service_account' and v.get('project_id')==os.environ['PROJECT_ID'] and v.get('private_key'):
+                  target.write_text(json.dumps(v));target.chmod(0o600);break
+          if not target.exists():raise SystemExit('I66_PREVIEW_METADATA_CREDENTIAL_MISSING')
+          PY
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$RUNNER_TEMP/gi-i66-preview-revision-auth/selected.json" >> "$GITHUB_ENV"
+      - name: Verify latest deployed Preview revision really serves 100 percent traffic
+        run: |
+          set -euo pipefail
+          gcloud auth activate-service-account --key-file="$GOOGLE_APPLICATION_CREDENTIALS" --quiet >/dev/null
+          gcloud config set project "$PROJECT_ID" --quiet >/dev/null
+          for FN in orbit360OpsLeadsCommandPreview orbit360ProductOperationalCommandPreview orbit360ScopedPolicyReadPreview;do
+            export FN
+            gcloud functions describe "$FN" --gen2 --region us-east1 --project "$PROJECT_ID" --format=json > "$RUNNER_TEMP/gi-role-fn.json"
+            SERVICE=$(node -e 'const f=require(process.env.RUNNER_TEMP+"/gi-role-fn.json");const s=String(f.serviceConfig?.service||"").split("/").pop();if(!/^orbit360[a-z0-9-]+preview$/.test(s))process.exit(2);process.stdout.write(s)')
+            gcloud run services describe "$SERVICE" --region us-east1 --project "$PROJECT_ID" --format=json > "$RUNNER_TEMP/gi-role-service.json"
+            node - <<'NODE'
+          const assert=require('node:assert/strict');
+          const f=require(process.env.RUNNER_TEMP+'/gi-role-fn.json');
+          const s=require(process.env.RUNNER_TEMP+'/gi-role-service.json');
+          const update=new Date(f.updateTime||0).getTime();
+          assert.ok(update>=new Date('2026-11-13T05:31:50Z').getTime(),'I66_PREVIEW_FUNCTION_LAST_UPDATED_BEFORE_NEW_ARTIFACT');
+          const latest=s.status?.latestReadyRevisionName;
+          const active=(s.status?.traffic||[]).filter(t=>Number(t.percent)>0);
+          assert.ok(latest&&active.length===1,'I66_PREVIEW_ACTIVE_TRAFFIC_UNRESOLVED');
+          assert.equal(Number(active[0].percent),100,'I66_PREVIEW_TRAFFIC_SPLIT');
+          assert.equal(active[0].revisionName,latest,'I66_PREVIEW_OLD_PINNED_REVISION_STILL_ACTIVE');
+          console.log('I66_PREVIEW_EFFECTIVE_NEW_REVISION_100_PERCENT_PASS function='+process.env.FN+
+            ' revision='+latest+' updateTime='+f.updateTime);
+          NODE
+          done
+          echo 'I66_THREE_PREVIEW_EFFECTIVE_REVISIONS_3_OF_3_PASS_METADATA_ONLY_LIVE_WRITES_0'
