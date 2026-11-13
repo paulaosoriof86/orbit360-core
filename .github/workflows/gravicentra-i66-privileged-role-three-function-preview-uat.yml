@@ -104,12 +104,15 @@ jobs:
         run: |
           set -euo pipefail
           DL="$RUNNER_TEMP/gi-role-artifact"
-          test -f "$DL/gi-i66-exact-package.tar.gz"
-          test -f "$DL/gi-i66-exact-package.sha256"
-          (cd "$DL" && sha256sum -c gi-i66-exact-package.sha256)
+          mapfile -t TARS < <(find "$DL" -maxdepth 3 -type f -name 'gi-i66-exact-package.tar.gz')
+          mapfile -t SUMS < <(find "$DL" -maxdepth 3 -type f -name 'gi-i66-exact-package.sha256')
+          test "${#TARS[@]}" -eq 1 && test "${#SUMS[@]}" -eq 1
+          TAR="${TARS[0]}";SUM="${SUMS[0]}"
+          test "$(dirname "$TAR")" = "$(dirname "$SUM")"
+          test "$(sha256sum "$TAR" | awk '{print $1}')" = "$(awk '{print $1}' "$SUM")"
           FROOT="$RUNNER_TEMP/gi-role-preview-only"
           mkdir -p "$FROOT"
-          tar -xzf "$DL/gi-i66-exact-package.tar.gz" -C "$FROOT" --no-same-owner
+          tar -xzf "$TAR" -C "$FROOT" --no-same-owner
           BACKEND="$FROOT/bundle/backend"
           for p in b4-003-scoped-access-boundary.js product-operational-domain.js product-ops-leads-domain.js;do
             git show "$SOURCE_SHA:functions/$p" > "$RUNNER_TEMP/i66-source-$p"
