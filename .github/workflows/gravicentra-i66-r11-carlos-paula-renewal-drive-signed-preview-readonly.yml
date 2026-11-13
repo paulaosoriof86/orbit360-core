@@ -1,0 +1,72 @@
+# Exact immutable I6.6 Preview; signed two-role hydration regression, no writes.
+name: Gravicentra I6.6 R11 Carlos Paula Renewal Drive Signed Preview READONLY UAT
+on:
+  push:
+    branches: [recovery/fase-a-clean-20260831]
+    paths:
+      - .github/workflows/gravicentra-i66-r11-carlos-paula-renewal-drive-signed-preview-readonly.yml
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: gi-i66-r11-carlos-paula-renewal-drive-signed-preview-readonly
+  cancel-in-progress: false
+jobs:
+  signed-carlos-direction-preview:
+    if: github.repository == 'paulaosoriof86/orbit360-core' && github.ref_name == 'recovery/fase-a-clean-20260831'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 18
+    env:
+      I66_SOURCE_SHA: 84769378eb2014addebfefdbdd63091bddc4b817
+      I66_PREVIEW_ORIGIN: https://ays-orbit-360-lab--gi-i66-rc-42868854629-abj14q6n.web.app
+      I66_PACKAGE_RUN_ID: '43503721126'
+      I66_PACKAGE_ARTIFACT_ID: '14075022275'
+      I66_PACKAGE_DIGEST: sha256:b0f3bacb68511cdfc91ac934602c51f55afec5c1d6428d886d13a72a706ee283
+      SA_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_ALT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Prove exact immutable preview artifact and unchanged product source
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor "$I66_SOURCE_SHA" HEAD
+          test -z "$(git diff --name-only "$I66_SOURCE_SHA" HEAD -- orbit360-platform functions firebase.json firestore.rules storage.rules)"
+          node --check tools/gravicentra-i66-carlos-paula-signed-direct-renewal-preview-hydration-readonly.cjs
+          node --test tools/gravicentra-i6-6-direct-renewal-explicit-protected-hydration.test.cjs
+          node --test tools/gravicentra-i6-6-operational-renewal-entry.test.cjs tools/gravicentra-i6-6-renovaciones-read-index.test.cjs tools/gravicentra-i6-6-drive-upload-feedback.test.cjs
+          node - <<'NODE'
+          const assert=require('node:assert/strict');
+          (async()=>{
+            const h={Authorization:'Bearer '+process.env.GH_TOKEN,Accept:'application/vnd.github+json','User-Agent':'GI-I66-Carlos-Preview-Hydration'};
+            const base='https://api.github.com/repos/paulaosoriof86/orbit360-core/actions/';
+            const [run,art]=await Promise.all([
+              fetch(base+'runs/'+process.env.I66_PACKAGE_RUN_ID,{headers:h}),
+              fetch(base+'artifacts/'+process.env.I66_PACKAGE_ARTIFACT_ID,{headers:h})]);
+            assert.ok(run.ok&&art.ok,'I66_PREVIEW_PACKAGE_PROOF_UNAVAILABLE');
+            const r=await run.json(),a=await art.json();
+            assert.ok(r.conclusion==='success'&&r.head_sha===process.env.I66_SOURCE_SHA&&
+              a.expired===false&&a.workflow_run?.id===r.id&&a.digest===process.env.I66_PACKAGE_DIGEST,
+              'I66_PREVIEW_BUILD_ARTIFACT_DRIFT');
+            const res=await fetch(process.env.I66_PREVIEW_ORIGIN+'/__recovery__/build.json',
+              {headers:{'cache-control':'no-cache'}});
+            assert.equal(res.ok,true,'I66_PREVIEW_BUILD_MARKER_MISSING');
+            assert.equal((await res.json()).sourceSha,process.env.I66_SOURCE_SHA,'I66_PREVIEW_EXACT_SOURCE_DRIFT');
+            console.log('I66_IMMUTABLE_PREVIEW_EXACT_ARTIFACT_AND_SOURCE_PASS');
+          })().catch(e=>{console.error(e.message);process.exitCode=1;});
+          NODE
+      - name: Install bounded signed read-only browser prerequisites
+        run: |
+          set -euo pipefail
+          npm install --no-save --package-lock=false --ignore-scripts --no-audit --no-fund firebase-admin@13.4.0 playwright@1.55.0 >/dev/null
+          node node_modules/playwright/cli.js install --with-deps chromium >/dev/null
+      - name: Signed actual Carlos and Direccion explicit hydration without data writes
+        run: node tools/gravicentra-i66-carlos-paula-signed-direct-renewal-preview-hydration-readonly.cjs
