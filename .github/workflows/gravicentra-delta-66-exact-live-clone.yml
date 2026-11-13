@@ -13,6 +13,7 @@ on:
       - artifacts/orbit360-recovery/release-control/I6_6_EXACT_HOSTING_LIVE_PROMOTION_REQUEST_20261111_R4.json
       - artifacts/orbit360-recovery/release-control/I6_6_EXACT_HOSTING_LIVE_PROMOTION_REQUEST_20261112_R5.json
       - artifacts/orbit360-recovery/release-control/I6_6_EXACT_HOSTING_LIVE_PROMOTION_REQUEST_20261112_R6.json
+      - artifacts/orbit360-recovery/release-control/I6_6_EXACT_HOSTING_LIVE_PROMOTION_REQUEST_20261113_R8.json
 
 permissions:
   contents: read
@@ -33,7 +34,7 @@ jobs:
       SA_LAB_ALT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
       SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
       I66_PACKAGE_ROOT: /tmp/gi-i66-promote-package
-      I66_APPROVED_RELEASE_REQUEST: artifacts/orbit360-recovery/release-control/I6_6_EXACT_HOSTING_LIVE_PROMOTION_REQUEST_20261112_R6.json
+      I66_APPROVED_RELEASE_REQUEST: artifacts/orbit360-recovery/release-control/I6_6_EXACT_HOSTING_LIVE_PROMOTION_REQUEST_20261113_R8.json
     steps:
       - uses: actions/checkout@v4
         with:
@@ -61,8 +62,21 @@ jobs:
             const api='https://api.github.com/repos/paulaosoriof86/orbit360-core/actions/';
             const heads={Authorization:'Bearer '+process.env.GITHUB_TOKEN,'User-Agent':'GI-I66-Exact-Hosting-Clone','X-GitHub-Api-Version':'2022-11-28'};
             const ev=j.qaEvidence||{};
-            const supporting=[ev.signedDualRolePreviewRunId,ev.controlPlaneRunId];
-            if(supporting.length!==2||supporting.some(x=>!Number.isSafeInteger(x)||x<=0)||
+            const permissionRepair=ev.releaseKind==='TRANSVERSAL_ROLE_PERMISSION_REPAIR';
+            const supporting=permissionRepair
+              ? [ev.signedActualRoleAndEquipoMatrixPreviewRunId,ev.controlPlaneRunId,ev.sourceRoleQaRunId]
+              : [ev.signedDualRolePreviewRunId,ev.controlPlaneRunId];
+            if(permissionRepair){
+              if(supporting.some(x=>!Number.isSafeInteger(x)||x<=0)||
+                 ev.sourceTestsPassed!==17||
+                 JSON.stringify(ev.actualSignedPreviewRoleActions)!==JSON.stringify({Operativo:8,Direccion:10})||
+                 JSON.stringify(ev.equiposProtectedMatrixRoles)!==JSON.stringify(['Direccion','SuperAdmin','AdminTenant','Admin','Operativo'])||
+                 ev.equiposProtectedMatrixCriticalModules!==7||ev.equiposProtectedMatrixVerifiedCells!==35||
+                 ev.signedPreviewNoDataWrites!==true||ev.noClaimOfActualRenewalOrPaymentWriteAcceptance!==true||
+                 ev.noRealInsurerDocumentAcceptanceClaim!==true||ev.noAuthRulesTenantCountryOrBackendChanges!==true||
+                 ev.noClaimOfFullModuleRoleCountryAcceptance!==true||ev.noClaimOfAllLivePersistedWriteFlows!==true)
+                throw Error('I66_PRIVILEGED_PERMISSION_REPAIR_SIGNED_PREVIEW_EVIDENCE_INCOMPLETE');
+            }else if(supporting.length!==2||supporting.some(x=>!Number.isSafeInteger(x)||x<=0)||
                ev.sourceTestsPassed!==43||!Array.isArray(ev.previewRolesActuallyVerified)||
                !ev.previewRolesActuallyVerified.includes('Direccion')||!ev.previewRolesActuallyVerified.includes('Operativo')||
                JSON.stringify(ev.explicitHydrationCollections)!==JSON.stringify(['gestiones','polizas','vehiculos','clientes'])||
@@ -78,8 +92,14 @@ jobs:
             if(qa.status!=='completed'||qa.conclusion!=='success'||qa.head_sha!==j.sourceSha||a.workflow_run?.id!==j.buildRunId||a.workflow_run?.head_sha!==j.sourceSha||
                a.digest!=='sha256:'+j.artifactZipSha256||a.expired===true)throw Error('I66_QA_OR_PACKAGE_SUCCESS_PROOF_DRIFT');
             if(proofs.some(p=>p.status!=='completed'||p.conclusion!=='success'))throw Error('I66_TARGETED_QA_RUN_NOT_SUCCESS');
+            if(permissionRepair &&
+              (proofs[0].path!=='.github/workflows/gravicentra-i66-privileged-role-real-signed-matrix-preview-readonly.yml'||
+               proofs[1].path!=='.github/workflows/gravicentra-release-lock-sync.yml'||
+               proofs[2].path!=='.github/workflows/gravicentra-i66-privileged-role-parity-source-qa.yml'||
+               proofs[1].head_sha!==j.sourceSha||proofs[2].head_sha!==j.sourceSha))
+              throw Error('I66_PRIVILEGED_PERMISSION_QA_PROOF_WORKFLOW_OR_SOURCE_DRIFT');
             for(const p of proofs)cp.execFileSync('git',['merge-base','--is-ancestor',j.sourceSha,p.head_sha]);
-            console.log('I66_SIGNED_CARLOS_AND_DIRECCION_PROTECTED_PREVIEW_AND_CONTROL_PROOFS_PASS');
+            console.log(permissionRepair?'I66_SIGNED_CARLOS_DIRECTION_35_EQUIPOS_RULES_AND_SOURCE_PASS':'I66_SIGNED_CARLOS_AND_DIRECCION_PROTECTED_PREVIEW_AND_CONTROL_PROOFS_PASS');
             fs.appendFileSync(process.env.GITHUB_OUTPUT,`artifact_id=${j.artifactId}\nbuild_run_id=${j.buildRunId}\n`);
             console.log('I66_PINNED_PREVIEW_QA_AND_PACKAGE_SUCCESS_PROOFS_PASS');
           })().catch(e=>{console.error(e.message);process.exitCode=1;});

@@ -88,7 +88,14 @@ function validateRequest(){
   need(request.schema==='I6_6_EXACT_HOSTING_LIVE_PROMOTION_V1'&&request.status==='LIVE_HOSTING_CLONE_APPROVED_AFTER_TARGETED_PREVIEW_QA_PASS','I66_LIVE_PROMOTION_NOT_APPROVED');
   need(request.approvedByDirection===true&&request.historicalGateClosed==='B4-007'&&request.noBackendDeploy===true&&request.noFirestoreAuthOrDataWrites===true,'I66_PROMOTION_SCOPE_INVALID');
   need(request.activeGate==='I6.6'&&Number.isSafeInteger(request.qaRunId)&&request.qaRunId>0&&request.buildRunId===request.qaRunId&&Number.isSafeInteger(request.artifactId)&&request.artifactId>0,'I66_APPROVAL_PROOFS_INVALID');
-  need(/^[0-9a-f]{40}$/.test(request.sourceSha||'')&&request.previewChannel==='gi-i66-rc-'+request.buildRunId,'I66_APPROVED_SOURCE_OR_CHANNEL_DRIFT');
+  const standardChannel='gi-i66-rc-'+request.buildRunId;
+  const controlledQuotaReuse=request.reusedPreviewChannelAfterQuota429===true&&
+    request.sourceSha==='8a0e904500cbb3c961d83f16517caab69df88a2b'&&
+    request.buildRunId===43448848169&&
+    request.previewChannel==='gi-i66-rc-42868854629'&&
+    request.expectedOldHostingVersion==='sites/ays-orbit-360-lab/versions/dae5d5235978cefe';
+  need(/^[0-9a-f]{40}$/.test(request.sourceSha||'')&&
+    (request.previewChannel===standardChannel||controlledQuotaReuse),'I66_APPROVED_SOURCE_OR_CHANNEL_DRIFT');
   need(request.buildId==='gi-i66-'+request.sourceSha.slice(0,12)+'-57f234755dc1','I66_APPROVED_BUILD_ID_DRIFT');
   need(new RegExp('^https://ays-orbit-360-lab--'+request.previewChannel+'-[a-z0-9]+\\.web\\.app$').test(request.previewUrl||''),'I66_PREVIEW_ORIGIN_DRIFT');
   need(/^[0-9a-f]{64}$/.test(request.artifactZipSha256||''),'I66_ARTIFACT_DIGEST_INVALID');
@@ -110,6 +117,7 @@ try{
   need(firebaseBefore.sourceSha===request.expectedOldSourceSha&&customBefore.sourceSha===request.expectedOldSourceSha&&
     firebaseBefore.buildId===request.expectedOldBuildId&&customBefore.buildId===request.expectedOldBuildId,
     'I66_LIVE_ORIGIN_BASE_CHANGED_BEFORE_CLONE');
+  if(request.expectedOldHostingVersion)need(old===request.expectedOldHostingVersion,'I66_LIVE_HOSTING_VERSION_CHANGED_BEFORE_CLONE');
   oldVersion=old;evidence.liveBeforeVersion=old;evidence.previewVersion=previewVersion;
   need(old!==previewVersion,'I66_SOURCE_AND_TARGET_ALREADY_EQUAL');
   const [beforeAgain,oldAgain]=await Promise.all([marker('https://ays-orbit-360-lab.web.app'),getLatestRelease('live')]);
