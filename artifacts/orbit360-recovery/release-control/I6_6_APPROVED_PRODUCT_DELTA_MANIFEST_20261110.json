@@ -1237,6 +1237,20 @@
       "tests": [
         {"path": "tools/gravicentra-i6-6-payment-oncall-second-argument-guard.test.cjs", "gitBlobSha": "0bc29b4fb3c4121b53d29e5c3386df58df9d0990"}
       ]
+    },
+    {
+      "id": "I6_6_CARLOS_DIRECT_RENEWAL_EXPLICIT_HYDRATION_P0",
+      "approvedByDirection": true,
+      "receipt": "artifacts/orbit360-recovery/release-control/I6_6_CARLOS_DIRECT_RENEWAL_EXPLICIT_HYDRATION_20261112.json",
+      "sourceStatus": "FOCAL_SOURCE_AND_UNIT_PASS_PREVIEW_EXACT_ARTIFACT_AND_SIGNED_LIVE_HOLD",
+      "capabilityOwners": ["RENEWAL_DIRECT", "ISSUANCE_WORKFLOW", "PROTECTED_READ_RUNTIME"],
+      "scope": "A signed explicit renewal/issuance action must request authoritative deferred Ops, policies, clients and vehicles before waiting. Fail closed if the request cannot be scheduled. No authorization expansion, source data import, tenant/country alteration, bypassed insurer document, or backend deployment. Release Preview then the same immutable Hosting artifact LIVE only after signed dual-role QA and readback.",
+      "paths": [
+        {"path": "orbit360-platform/core/issuance-workflow-v1201.js", "gitBlobSha": "fbe47eeabe99bab80c047ba201098b767c455c04"}
+      ],
+      "tests": [
+        {"path": "tools/gravicentra-i6-6-direct-renewal-explicit-protected-hydration.test.cjs", "gitBlobSha": "b769eb628dadb04dcbee58c73c52927ac57f8955"}
+      ]
     }
   ]
 }

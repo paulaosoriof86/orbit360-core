@@ -43,6 +43,19 @@ Orbit.issuance = (function () {
     if (!wanted.length || !store || typeof store._productStatus !== 'function') return { ok: true, bypass: true };
     const initial = store._productStatus() || {};
     if (initial.fullHydrationDeferred !== true) return { ok: true, bypass: true };
+    // A direct issuance or renewal is an explicit user action. The previous
+    // implementation waited for optional read snapshots but never requested
+    // them; deep links and modules whose route prefetch omits 'gestiones'
+    // could therefore time out even when the actor had valid write rights.
+    if (typeof store._ensureCollections !== 'function')
+      return { ok: false, errors: ['datos_autoritativos_solicitud_no_disponible'] };
+    try {
+      const started = store._ensureCollections(wanted);
+      if (!Array.isArray(started) || wanted.some(name => !started.includes(name)))
+        return { ok: false, errors: ['datos_autoritativos_solicitud_incompleta'] };
+    } catch (_) {
+      return { ok: false, errors: ['datos_autoritativos_solicitud_fallida'] };
+    }
     const inspect = () => {
       const st = store._productStatus() || {}, confirmed = [].concat(st.serverConfirmedCollections || []);
       const denied = [].concat(st.deniedCollections || []), errors = st.snapshotErrors || {};

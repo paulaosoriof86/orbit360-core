@@ -1,0 +1,23 @@
+{
+  "schema": "GRAVICENTRA_I6_6_CARLOS_EXPLICIT_RENEWAL_HYDRATION_SOURCE_RECEIPT_V1",
+  "project": "Gravicentra Insurance",
+  "branch": "recovery/fase-a-clean-20260831",
+  "ownerApproval": "Paula Osorio, 2026-11-12: reparar escritura operativa transversal de Carlos y superiores y publicar cada mejora probada inmediatamente en el mismo artefacto tras Preview.",
+  "historicalClosedGate": "B4-007",
+  "activeGate": "I6.6",
+  "currentLivePreservedSourceSha": "1dd675ed59ac51fd122915ca8056f85f82fa12d6",
+  "issue": "Deferred protected read hydration can remain pending without an explicit request when direct renewal is invoked from a deep link or a route without all issuance dependencies prefetched.",
+  "fix": "At entry to explicit issuance/renewal, call the existing store._ensureCollections for the narrowly requested authoritative collections; reject if unavailable/incomplete/fails, then retain previous server-confirmed read barrier and document/role checks.",
+  "sourcePath": "orbit360-platform/core/issuance-workflow-v1201.js",
+  "sourceGitBlobSha": "fbe47eeabe99bab80c047ba201098b767c455c04",
+  "testPath": "tools/gravicentra-i6-6-direct-renewal-explicit-protected-hydration.test.cjs",
+  "testGitBlobSha": "b769eb628dadb04dcbee58c73c52927ac57f8955",
+  "localRegression": {"passed": 3, "total": 3, "scope": "request protected collections, missing API denial, scheduling error denial"},
+  "previewSignedDualRole": "HOLD",
+  "liveSameArtifactPromotion": "HOLD",
+  "liveRealInsurerDocumentGate": "HOLD",
+  "allowRealCustomerWrites": false,
+  "allowAuthRulesIamChanges": false,
+  "allowRealInsurerCredentialWrites": false,
+  "publicationRule": "Never promote source code until the exact immutable preview package and signed dual-role UAT pass; rollback on readback failure."
+}
