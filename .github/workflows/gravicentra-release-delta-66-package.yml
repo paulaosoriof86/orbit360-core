@@ -425,7 +425,11 @@ jobs:
           // Deployment step runs inside the immutable bundle, not the source checkout.
           // Consult the exact checked-out control document, never a file from the bundle.
           const control=JSON.parse(fs.readFileSync(process.env.GITHUB_WORKSPACE+'/candidate/artifacts/orbit360-recovery/release-control/I6_6_RELEASE_TRANSPORT_CONTROL_20261110.json','utf8'));
-          const a=control.i66ConciliacionesStagePreviewQuotaRecovery20261113||{};
+          // I6.6 successor: the previously certified R8 Preview+LIVE exact
+          // version supersedes the R7 quota-recovery anchor. The historic R7
+          // receipt remains immutable in control; only an explicit new gate
+          // may authorize reusing this one known channel.
+          const a=control.i66OperativeInvoiceRosterPreviewQuotaRecovery20261113||{};
           assert.equal(control.status,'PREVIEW_BUILD_REQUESTED','I66_QUOTA_RECOVERY_GATE_NOT_REQUESTED');
           assert.ok(control.livePromotionAuthorized===false&&control.forbidBackendFunctionDeploy===true&&
             control.forbidBackendLiveFunctionDeploy===true&&control.noHostingPromotion===true&&
@@ -433,11 +437,13 @@ jobs:
           assert.ok(a.allowOnlyKnownSinglePreviewChannel===true&&a.denyLiveHostingOrBackendDataWrites===true&&
             a.denyChannelDeletion===true&&a.stopOnAnySourceVersionOrArtifactMismatch===true&&
             a.authorizedExistingChannelId===process.env.REUSE_ID&&
-            a.expectedCurrentSourceSha==='e6183a9f1da68243cc935e222d98b2d21b5f17b8'&&
-            a.expectedCurrentHostingVersion==='dae5d5235978cefe'&&
+            a.status==='R8_CURRENT_PREVIEW_LIVE_EXACT_BACKUP_AUTHORIZED_SINGLE_CHANNEL'&&
+            a.expectedCurrentSourceSha==='8a0e904500cbb3c961d83f16517caab69df88a2b'&&
+            a.expectedCurrentHostingVersion==='162340ae18a9e6f7'&&
             a.expectedCurrentPreviewUrl==='https://ays-orbit-360-lab--gi-i66-rc-42868854629-abj14q6n.web.app'&&
-            a.recoverableR7SourceRunId===43385953587&&a.recoverableR7ArtifactId===14018512857&&
-            a.recoverableR7ArtifactDigest==='sha256:64ccf09525abf48d8c707deb366ca1cf0122c6cd7765a7ae98c5ea5380dcec31',
+            a.recoverableR8SourceRunId===43448848169&&a.recoverableR8ArtifactId===14048803073&&
+            a.recoverableR8ArtifactDigest==='sha256:e85a0b86975b288dab24a916208c905229cf071ce579141653e9f88080f69abe'&&
+            a.allowOnlyNewSourceInIsolatedPreview===true&&a.realBusinessDataWritesAllowed===false,
             'I66_QUOTA_RECOVERY_EXACT_OWNER_AUTHORIZATION_MISSING');
           const j=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/gi-i66-reuse-before.json','utf8'));
           const channels=Array.isArray(j.result)?j.result:j.result?.channels||[];
@@ -445,28 +451,28 @@ jobs:
           const target=channels.filter(x=>id(x)===process.env.REUSE_ID);
           assert.equal(target.length,1,'I66_REUSE_EXACT_PREVIEW_NOT_UNIQUE');
           assert.equal(String(target[0].release?.version?.name||'').split('/').pop(),
-            a.expectedCurrentHostingVersion,'I66_REUSE_R7_PREVIEW_VERSION_CHANGED_STOP');
+            a.expectedCurrentHostingVersion,'I66_REUSE_R8_PREVIEW_VERSION_CHANGED_STOP');
           assert.ok(String(target[0].createTime||'').startsWith('2026-11-10T')&&
-            id(target[0])!=='live','I66_REUSE_R7_PREVIEW_SCOPE_DRIFT');
+            id(target[0])!=='live','I66_REUSE_R8_PREVIEW_SCOPE_DRIFT');
           const live=channels.find(x=>id(x)==='live');
           assert.ok(live&&String(live.release?.version?.name||'').split('/').pop()===a.expectedCurrentHostingVersion,
-            'I66_REUSE_R7_LIVE_VERSION_DRIFT');
+            'I66_REUSE_R8_LIVE_VERSION_DRIFT');
           (async()=>{
             const h={Authorization:'Bearer '+process.env.GH_TOKEN,Accept:'application/vnd.github+json',
-              'User-Agent':'GI-I66-Exact-R7-Preview-Quota-Recovery'};
+              'User-Agent':'GI-I66-Exact-R8-Preview-Quota-Recovery'};
             const root='https://api.github.com/repos/paulaosoriof86/orbit360-core/actions/';
-            const [r,b,p]=await Promise.all([fetch(root+'runs/'+a.recoverableR7SourceRunId,{headers:h}),
-              fetch(root+'artifacts/'+a.recoverableR7ArtifactId,{headers:h}),
+            const [r,b,p]=await Promise.all([fetch(root+'runs/'+a.recoverableR8SourceRunId,{headers:h}),
+              fetch(root+'artifacts/'+a.recoverableR8ArtifactId,{headers:h}),
               fetch(a.expectedCurrentPreviewUrl+'/__recovery__/build.json',{cache:'no-store'})]);
-            assert.ok(r.ok&&b.ok&&p.ok,'I66_REUSE_R7_PREVIEW_OR_ARTIFACT_PROOF_UNAVAILABLE');
+            assert.ok(r.ok&&b.ok&&p.ok,'I66_REUSE_R8_PREVIEW_OR_ARTIFACT_PROOF_UNAVAILABLE');
             const run=await r.json(),artifact=await b.json();
             const build=await p.json();
             assert.ok(run.conclusion==='success'&&
               run.head_sha===a.expectedCurrentSourceSha&&
-              artifact.expired===false&&artifact.workflow_run?.id===a.recoverableR7SourceRunId&&
-              artifact.digest===a.recoverableR7ArtifactDigest&&
+              artifact.expired===false&&artifact.workflow_run?.id===a.recoverableR8SourceRunId&&
+              artifact.digest===a.recoverableR8ArtifactDigest&&
               build.sourceSha===a.expectedCurrentSourceSha,
-              'I66_REUSE_R7_EXACT_IMMUTABLE_ARTIFACT_NOT_RECOVERABLE');
+              'I66_REUSE_R8_EXACT_IMMUTABLE_ARTIFACT_NOT_RECOVERABLE');
             console.log('I66_KNOWN_CURRENT_LIVE_PREVIEW_EXACT_VERSION_SOURCE_AND_BACKUP_PASS');
           })().catch(e=>{console.error(e.message);process.exitCode=1;});
           NODE
