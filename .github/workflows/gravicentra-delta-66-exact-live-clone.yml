@@ -12,6 +12,7 @@ on:
       - artifacts/orbit360-recovery/release-control/I6_6_EXACT_HOSTING_LIVE_PROMOTION_REQUEST_20261111_R3.json
       - artifacts/orbit360-recovery/release-control/I6_6_EXACT_HOSTING_LIVE_PROMOTION_REQUEST_20261111_R4.json
       - artifacts/orbit360-recovery/release-control/I6_6_EXACT_HOSTING_LIVE_PROMOTION_REQUEST_20261112_R5.json
+      - artifacts/orbit360-recovery/release-control/I6_6_EXACT_HOSTING_LIVE_PROMOTION_REQUEST_20261112_R6.json
 
 permissions:
   contents: read
@@ -32,7 +33,7 @@ jobs:
       SA_LAB_ALT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
       SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
       I66_PACKAGE_ROOT: /tmp/gi-i66-promote-package
-      I66_APPROVED_RELEASE_REQUEST: artifacts/orbit360-recovery/release-control/I6_6_EXACT_HOSTING_LIVE_PROMOTION_REQUEST_20261112_R5.json
+      I66_APPROVED_RELEASE_REQUEST: artifacts/orbit360-recovery/release-control/I6_6_EXACT_HOSTING_LIVE_PROMOTION_REQUEST_20261112_R6.json
     steps:
       - uses: actions/checkout@v4
         with:
@@ -62,16 +63,15 @@ jobs:
             const ev=j.qaEvidence||{};
             const supporting=[ev.signedDualRolePreviewRunId,ev.controlPlaneRunId];
             if(supporting.length!==2||supporting.some(x=>!Number.isSafeInteger(x)||x<=0)||
-               ev.sourceTestsPassed!==38||!Array.isArray(ev.previewRolesActuallyVerified)||
+               ev.sourceTestsPassed!==43||!Array.isArray(ev.previewRolesActuallyVerified)||
                !ev.previewRolesActuallyVerified.includes('Direccion')||!ev.previewRolesActuallyVerified.includes('Operativo')||
-               ev.operativoDirectRenewalEntryAndScopedIssuanceEngine!==true||
-               ev.operativoCobrosEditAndCallableUiPreflight!==true||
-               ev.signedLeadsOpsServerConfirmedWithoutPageErrors!==true||
-               ev.directionSignedProtectedConciliacionesPreviewTwoCollectionsReady!==true||
+               JSON.stringify(ev.explicitHydrationCollections)!==JSON.stringify(['gestiones','polizas','vehiculos','clientes'])||
+               ev.signedCarlosAndDirectionHydrationPass!==true||
+               ev.missingManagementFailClosedAfterHydration!==true||
                ev.signedPreviewNoDataWrites!==true||ev.noClaimOfActualRenewalOrPaymentWriteAcceptance!==true||
-               ev.liveProtectedConciliacionesReaderNotPartOfHostingPromotion!==true||
+               ev.noRealInsurerDocumentAcceptanceClaim!==true||ev.noAuthRulesTenantCountryOrBackendChanges!==true||
                ev.noClaimOfWholePlatformPerformancePass!==true||ev.noClaimOfFullModuleRoleCountryAcceptance!==true)
-              throw Error('I66_TARGETED_RENEWAL_OPS_AND_PROTECTED_PREVIEW_QA_EVIDENCE_INCOMPLETE');
+              throw Error('I66_TARGETED_EXPLICIT_RENEWAL_HYDRATION_PREVIEW_QA_EVIDENCE_INCOMPLETE');
             const [qr,ar,...probes]=await Promise.all([fetch(api+'runs/'+j.qaRunId,{headers:heads}),fetch(api+'artifacts/'+j.artifactId,{headers:heads}),...supporting.map(id=>fetch(api+'runs/'+id,{headers:heads}))]);
             if(!qr.ok||!ar.ok||probes.some(p=>!p.ok))throw Error('I66_SUCCESS_PROOF_UNAVAILABLE');
             const qa=await qr.json(),a=await ar.json(),proofs=await Promise.all(probes.map(p=>p.json()));
