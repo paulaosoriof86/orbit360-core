@@ -56,6 +56,8 @@
   "liveOpsPendingLeadsProjection": "SIGNED_LEADS_CRUD_PASS_43310610618_AND_REAL_CARLOS_PENDING_BUSINESS_SHARED_INBOX_ONE_EXACT_OPS_CARD_READBACK_43315196712_PAULA_ZERO_PENDING",
   "liveInsurerOperationalAccountSignedUat": "SIGNED_CARLOS_AND_PAULA_LIVE_SYNTHETIC_INSURER_ACCOUNT_CREATE_UPDATE_AUDIT_RELOAD_ROLE_COUNTRY_NEGATIVE_RESTORE_PASS_RUN_43316460352_NO_REAL_INSURER_OR_CREDENTIAL_WRITES",
   "liveDirectionProtectedConciliaciones": "PASS_NEW_READER_SOURCE_F0853986_ACTIVE_TRAFFIC_00005_SIGNED_PREVIEW_LIVE_43324845568_READ_ONLY",
+  "conciliacionesStageReadOnlyGapConfirmed20261113": "TWO_CANONICAL_COLLECTIONS_ZERO_VS_ACTIVE_LEDGER_132_PROPOSALS_365_EVIDENCES_233_HOLDS; 52_UNIQUE_POLICY_NUMBER_LINK_CANDIDATES_80_AMBIGUOUS_HOLD; SIGNED_LIVE_READONLY_RUNS_43378603985_AND_43379037882; UI_PROJECTION_NOT_YET_PUBLISHED_NO_FINANCIAL_WRITES",
+  "conciliacionesStageGapReceipt": "artifacts/orbit360-recovery/release-control/I6_6_CONCILIACIONES_ACTIVE_LEDGER_VIEW_GAP_20261113.json",
   "actualPaymentRenewalAndLeadWriteUat": "OPS_LEADS_TASKS_SIGNED_LIVE_PASS_43310610618_PAYMENT_APPLY_RECONCILE_NO_DUPLICATE_AND_POLICY_RENEWABLE_CAS_43312896784_DIRECT_RENEWAL_EXPLICIT_HYDRATION_AND_SYNTHETIC_POLICY_RECEIPT_CARTERA_OPS_RELOAD_IDEMPOTENCE_CLEANUP_43338068508_PASS_REAL_INSURER_DOCUMENT_HOLD",
   "liveProtectedReaderBackend": "PASS_LATEST_EXACT_SCOPED_READER_LIVE_ACTIVE_REVISION_ORBIT360SCOPEDPOLICYREAD_00005_YES_SIGNED_CARLOS_PAULA_43324845568",
   "carlosDirectionR6SignedPreviewAndLive": {
@@ -87,6 +89,6 @@
   },
   "fullRoleCountryTenantLiveAcceptance": false,
   "liveCarteraSync": "A1_A7_0_OF_7_APPLIED_37_A1A4A7_PLUS_28_UNIQUE_A5A6_SOURCE_CASES_SIGNED_READONLY_NO_SAFE_PAID_MATCH_NO_REAL_FINANCIAL_WRITES",
-  "nextAction": "Current LIVE is exact R7 source 0153f5c artifact 14013250472 run 43375687134 with signed Carlos 8/8 and Direction 10/10 visible modules and reversible Ops/Leads/tasks UAT. Next certify real AdminTenant/SuperAdmin role-country module matrix, real insurer-issued renewal and password/insurer edits, protected Conciliaciones write parity and A1-A7 exact requirement/source identity before any safe small LIVE financial CAS. Automatic Preview channel retention remains pending; no claim of 7/7 applied or complete I6.6 acceptance.",
+  "nextAction": "Current LIVE exact R7 source 0153f5c artifact 14013250472 run 43375687134 unchanged. First P0: 132 ACTIVE ledger proposals vs 0 canonical visible, 52 uniquely linked policy candidates vs 80 ambiguous edition HOLD: implement signed server-protected policy/country/advisor read-only projection to Conciliaciones in isolated Preview with fast bounded reads then promote same immutable artifact LIVE, no financial writes. AdminTenant 1/2 active and SuperAdmin 1/1 active signed LIVE rights 10/10 each; second AdminTenant email unverified HOLD, Admin no active. Follow real insurer-issued renewal/secure password UI and protected financial writer parity, safe A1-A7 source-exact receipts; automatic Preview retention pending; no I6.6 full acceptance claim.",
   "doNotClaimWholePlatformQaPass": true
 }

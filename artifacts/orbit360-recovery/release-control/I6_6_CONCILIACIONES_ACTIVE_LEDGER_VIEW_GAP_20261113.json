@@ -1,0 +1,51 @@
+{
+  "schema": "GI_I66_CONCILIACIONES_ACTIVE_LEDGER_VS_CANONICAL_PROPOSALS_GAP_V1",
+  "dateGuatemala": "2026-11-13",
+  "gate": "I6.6",
+  "repositoryBranch": "recovery/fase-a-clean-20260831",
+  "status": "P0_ROOT_CAUSE_CONFIRMED_READONLY_PROJECTION_NOT_YET_IMPLEMENTED_OR_PUBLISHED",
+  "currentPublishedR7SourceSha": "0153f5cbbe00c3732e11ebae59b32bd357e38bfd",
+  "evidence": {
+    "liveAggregateCensusRunId": 43378603985,
+    "livePolicyJoinReadOnlyRunId": 43379037882,
+    "bothWorkflowConclusions": "SUCCESS_READ_ONLY",
+    "currentActiveLedgerPointerExists": true,
+    "currentActiveLedgerManifestState": "ACTIVE",
+    "canonicalConciliacionesRows": 0,
+    "canonicalConciliacionesPrimasRows": 0,
+    "activeRunPropuestasConciliacionRows": 132,
+    "activeRunEvidenciasCobroRows": 365,
+    "activeRunConciliacionHoldsRows": 233,
+    "firestoreCanonicalPolicyDocsExamined": 1427,
+    "stageProposalsWithPolicyNumber": 132,
+    "stageProposalsWithDirectPolicyId": 0,
+    "stageProposalsWithDirectClientId": 0,
+    "stageProposalsWithDirectCountry": 0,
+    "stageProposalsWithDirectAdvisorId": 0,
+    "uniqueNormalizedPolicyNumberMatchCandidates": 52,
+    "uniqueCandidatesWithPolicyCountryClientAdvisor": 52,
+    "ambiguousPolicyNumberMatchCandidates": 80,
+    "policyNumberNotFound": 0,
+    "readOnlyFinancialOrCustomerWrites": 0
+  },
+  "causalInterpretation": "The current frontend conciliaciones owner reads canonical conciliaciones and conciliacionesPrimas, both empty. The active ledger instead stores 132 staged proposals in the cobrosLedgerRuns active run child propuestasConciliacion. Stage proposals have policyNumber, amount, currency, sourceRowId and status but lack a direct verified policyId, clientId, country and advisor; a naive client-side copy or unconditional global list violates tenant/country/advisor scope. Exactly 52 are uniquely matched to canonical policy numbers; 80 map to multiple policy editions or records and must fail closed pending evidence.",
+  "mandatoryFixContract": [
+    "One server-owned read-only projection path from active run proposals to Conciliaciones, no data reimport or ledger mutation",
+    "Resolve proposal policyNumber to one canonical policy edition before user projection, check real tenant, country, advisor and authorized module scope on server",
+    "Show only cryptographically/current-active-ledger anchored and uniquely resolved authorized proposals; quarantine all 80 ambiguous until edition/insurer/date proof",
+    "Project canonical frontend fields from stage amount, currency, status and sourceRowId while preserving original run/source IDs and pending/held distinctions",
+    "Bound query count, paging, cold-start latency, error states and fail-closed behavior; do not bulk scan the 1427 policies for each click without an optimized plan",
+    "Source tests then isolated immutable Preview signed Carlos and Direccion UAT by role and country, then same artifact LIVE, 223-file and backend revision readback, before/after and rollback",
+    "No automatic payment application, Cobros or cartera changes from this proposal browser"
+  ],
+  "progress": {
+    "diagnosticReadOnlyCensus": "2_OF_2_SUCCESS",
+    "uniqueIdentityCandidates": "52_OF_132_NOT_YET_AUTHORIZED_OR_DISPLAYED",
+    "ambiguousIdentityCasesQuarantined": 80,
+    "stageProposalsCurrentlyPublishedToUi": 0,
+    "safeBackendProjectionPreviewAndLive": "HOLD_NO_CODE_RELEASE",
+    "realCustomerFinancialWrites": 0
+  },
+  "authority": "orbit360-platform/docs/recovery/orbit360-recovery-state-v1.json#currentLiveSuccessorAcceptance",
+  "notAProductionAcceptance": true
+}
