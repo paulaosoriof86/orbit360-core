@@ -41,8 +41,8 @@ jobs:
           set -euo pipefail
           test "$GCLOUD_PROJECT" = 'ays-orbit-360-lab'
           test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
-          echo 'f7f82cc29feab2e333eb9a6a7361216121e6f86938bf81756ba70a52535ec289  tools/gravicentra-i66-bantrab-seven-protected-cas.cjs' | sha256sum -c -
-          echo '059f574986276039541c0d763f1030c192b3e4279300fbb1edc558ce10c28671  tools/gravicentra-i66-bantrab-seven-protected-cas.test.cjs' | sha256sum -c -
+          echo 'ea5f230c621a53076438f3ba4735971b631f28a96774cf50e0ae02f095d1817f  tools/gravicentra-i66-bantrab-seven-protected-cas.cjs' | sha256sum -c -
+          echo '8696a3508483ed42a309ddc376047f468a1f2efe85da8d330274c8fc695ac866  tools/gravicentra-i66-bantrab-seven-protected-cas.test.cjs' | sha256sum -c -
           node --check tools/gravicentra-i66-bantrab-seven-protected-cas.cjs
           node tools/gravicentra-i66-bantrab-seven-protected-cas.test.cjs
       - name: Select existing project credential and install isolated dependency
@@ -105,8 +105,8 @@ jobs:
           set -euo pipefail
           test "$GITHUB_REF_NAME" = recovery/fase-a-clean-20260831
           test "$GCLOUD_PROJECT" = ays-orbit-360-lab
-          echo 'f7f82cc29feab2e333eb9a6a7361216121e6f86938bf81756ba70a52535ec289  tools/gravicentra-i66-bantrab-seven-protected-cas.cjs' | sha256sum -c -
-          echo '059f574986276039541c0d763f1030c192b3e4279300fbb1edc558ce10c28671  tools/gravicentra-i66-bantrab-seven-protected-cas.test.cjs' | sha256sum -c -
+          echo 'ea5f230c621a53076438f3ba4735971b631f28a96774cf50e0ae02f095d1817f  tools/gravicentra-i66-bantrab-seven-protected-cas.cjs' | sha256sum -c -
+          echo '8696a3508483ed42a309ddc376047f468a1f2efe85da8d330274c8fc695ac866  tools/gravicentra-i66-bantrab-seven-protected-cas.test.cjs' | sha256sum -c -
           node tools/gravicentra-i66-bantrab-seven-protected-cas.test.cjs
       - name: Select same existing Firebase LAB credential
         shell: bash

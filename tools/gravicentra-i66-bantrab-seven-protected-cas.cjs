@@ -23,8 +23,20 @@ const fail=code=>{throw Error('I66_BANTRAB_7_HOLD_'+code);};
 const validIso=x=>/^\d{4}-\d{2}-\d{2}$/.test(str(x))?str(x):'';
 const moneyCents=r=>{const v=r.monto??r.montoTotal??r.primaTotal;if(v==null||v==='')return null;return Number.isFinite(+v)?Math.round((+v+Number.EPSILON)*100):null;};
 const due=r=>validIso(r.fechaLimite||r.vence||r.fechaVencimiento);
-const paid=r=>r.pagado===true||r.conciliadoPago===true||r.conciliado===true||!!str(r.fechaPago||r.paidDate)||/^(pagado|paid)$/i.test(str(r.estado))||/^PAID_/i.test(str(r.paymentState));
+const paid=r=>r.pagado===true||r.conciliadoPago===true||r.conciliado===true||r.reportado===true||
+  r.validadoReporte===true||!!str(r.fechaPago||r.fechaPagoReportada||r.paidDate)||
+  /^(pagado|paid|pago.?reportado|conciliado)$/i.test(str(r.estado))||
+  /^(pago_reportado_asesor|pago_reportado|pago_inferido)$/i.test(str(r.estadoOperativo))||
+  /^PAID_/i.test(str(r.paymentState));
 const norm=s=>str(s).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
+const EXTERNAL_REFERENCE_FIELDS=['numeroReciboAseguradora','numeroRequerimiento','requerimiento','numeroBoleta','sourceNumber','referenciaCobro','receiptNumber'];
+function internalOnlyPlaceholder(value){
+  const s=str(value);
+  if(!s)return true;
+  if(/^rec_[a-f0-9]{16,64}$/i.test(s))return true;
+  const quota=s.match(/^(\d{1,2})\s*\/\s*(\d{1,2})$/);
+  return !!quota&&Number(quota[1])>=1&&Number(quota[1])<=Number(quota[2])&&Number(quota[2])<=24;
+}
 const dataRef=(db,name)=>db.collection('tenants').doc(TENANT).collection('data').doc(name).collection('items');
 const requestRef=db=>db.collection('tenants').doc(TENANT).collection('operationalRequests');
 function chooseSeven(policy,receipts,cobros,existingSourceNumberMatches){
@@ -41,6 +53,12 @@ function chooseSeven(policy,receipts,cobros,existingSourceNumberMatches){
     if(!rid||ids.has(rid)||str(receipt.polizaId)!==str(policy.id))fail('RECEIPT_LINK_OR_DUPLICATE_'+source.id);
     if(paid(receipt)||cobros.some(c=>str(c.reciboId)===rid))fail('RECEIPT_ALREADY_PAID_OR_LINKED_'+source.id);
     if(str(receipt.numeroReciboFuente)===source.number)fail('SOURCE_NUMBER_RACE_'+source.id);
+    // An insurer reference is NOT replaceable merely because due and amount
+    // match. Only an empty value or an internally generated quota/rec_ marker
+    // can be replaced; any other external number must stop this mini-batch.
+    if(!internalOnlyPlaceholder(receipt.numeroReciboFuente)||
+      EXTERNAL_REFERENCE_FIELDS.some(key=>str(receipt[key])&&str(receipt[key])!==source.number))
+      fail('PREEXISTING_EXTERNAL_SOURCE_REFERENCE_NOT_PROVEN_INTERNAL_'+source.id);
     ids.add(rid);
     selected.push({id:rid,caseId:source.id,newSourceNumber:source.number,
       oldSourceNumber:receipt.numeroReciboFuente===undefined?null:receipt.numeroReciboFuente,
