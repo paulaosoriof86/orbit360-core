@@ -1,0 +1,127 @@
+{
+  "schema": "GRAVICENTRA_I6_6_MAPFRE_SC79829_RENEWAL_BATCH_STAGING_V1",
+  "gate": "I6.6",
+  "dateGuatemala": "2026-11-13",
+  "status": "READONLY_SOURCES_RECONCILED_AND_LIVE_DUPLICATE_CHECKED_WRITES_HOLD",
+  "approvedByDirection": true,
+  "approvalContext": "Paula confirma renovada SC-79829 y autoriza continuar lote, 2026-11-13; adjunta requerimiento noviembre y detalle de tres certificados.",
+  "tenant": "alianzas-soluciones",
+  "country": "GT",
+  "insurer": "MAPFRE SEGUROS",
+  "policyNumber": "SC-79829",
+  "clientBusinessName": "OUTSOURCING Y SERVICIOS GLOBALES",
+  "newPolicyTerm": {
+    "from": "2026-06-01",
+    "to": "2027-06-01",
+    "source": "REQPAGOSC-79829.PDF",
+    "ownerConfirmedRenewed": true,
+    "newEditionAlreadyInLive": false,
+    "paymentFrequency": "MONTHLY_CANDIDATE_SAME_PREVIOUS_EDITION_AND_MULTIPLE_DATED_ISSUER_REQUIREMENTS",
+    "annualNetPremium": null,
+    "annualTotalPremium": null,
+    "contractualInstallmentCount": null,
+    "doNotTreatSingleInvoicePago1de1AsAnnualInstallmentCount": true
+  },
+  "ownerProvidedDocuments": [
+    {
+      "filename": "REQPAGOSC-79829.PDF",
+      "sha256": "76aa067ec7f4b376cd1fa7322a3abfa1888d1afe42578971e1152091ffbeda62",
+      "type": "NOVEMBER_ISSUER_PAYMENT_REQUIREMENT_NOT_PAYMENT_RECEIPT",
+      "requirement": "140557498",
+      "due": "2026-11-30",
+      "net": 756,
+      "emission": 34.05,
+      "vat": 94.81,
+      "total": 884.86
+    },
+    {
+      "filename": "SC-79829 .pdf",
+      "sha256": "e0d5868cdf6a319e239d9213dc240f1480f0850edfde4fffbcdd00e09185ed05",
+      "type": "NOVEMBER_2026_THREE_CERTIFICATES_BREAKDOWN_NOT_PAYMENT_RECEIPT",
+      "numberOfCertificates": 3,
+      "netPerCertificate": 252,
+      "totalNet": 756,
+      "totalDue": 884.86
+    }
+  ],
+  "insurerStatement": {
+    "title": "Mapfre - Estado de cuenta al 2026-11-02.html",
+    "driveFileId": "1hBTi5YJ1_AAdBba2MZI7nMxQFIks6rrf",
+    "driveUrl": "https://drive.google.com/file/d/1hBTi5YJ1_AAdBba2MZI7nMxQFIks6rrf/view",
+    "reportType": "REPORTE_DE_PRIMAS_POR_COBRAR_PENDIENTES_PROYECTADO_A_2026_11_30",
+    "oldTermRequirementsExcludedFromNewEdition": [
+      {
+        "reference": "128419795",
+        "due": "2026-04-30",
+        "pendingTotal": 824.88
+      },
+      {
+        "reference": "130326306",
+        "due": "2026-05-31",
+        "pendingTotal": 824.88
+      }
+    ],
+    "newTermPendingRequirements": [
+      {
+        "reference": "132044877",
+        "due": "2026-07-31",
+        "total": 884.86
+      },
+      {
+        "reference": "135226671",
+        "due": "2026-08-31",
+        "total": 884.86
+      },
+      {
+        "reference": "137345069",
+        "due": "2026-09-30",
+        "total": 884.86
+      },
+      {
+        "reference": "138847044",
+        "due": "2026-10-31",
+        "total": 884.86
+      },
+      {
+        "reference": "140557498",
+        "due": "2026-11-30",
+        "total": 884.86
+      }
+    ],
+    "newTermKnownOpenCount": 5,
+    "newTermKnownOpenTotalGtq": 4424.3,
+    "june2026NotOnPendingStatement": "DO_NOT_INFER_PAID_OR_NONEXISTENT"
+  },
+  "liveReadback20261113": {
+    "url": "https://app.aysseguros.com/#/polizas",
+    "query": "SC-79829",
+    "editionCount": 4,
+    "knownEditionVigenciaEnds": [
+      "2023-06-01",
+      "2024-06-01",
+      "2025-06-01",
+      "2026-06-01"
+    ],
+    "lastEditionTerm": {
+      "from": "2025-06-01",
+      "to": "2026-06-01"
+    },
+    "lastEditionStatus": "Historica",
+    "lastEditionPaymentFrequency": "Mensual",
+    "lastEditionPaymentMethod": "Transferencia",
+    "historicalReceiptCalendarWasIncomplete": true,
+    "newTermNotVisible": true
+  },
+  "writePlanAfterPreflight": [
+    "READ_ONLY: identify canonical clientId and historical policyId by tenant, issuer, policy number, insured business and term; reject duplicates or ambiguous policy editions",
+    "READ_ONLY: confirm policy edition document and annual premium / installment agreement; do not fabricate from the November invoice",
+    "RENEW: create exactly one 2026-06-01 to 2027-06-01 linked edition, preserving 2025-2026 historical record and avoiding colliding number-based dedupe",
+    "REQUIREMENTS: upsert only five issuer-identified pending items with deterministic reference-and-vigencia keys, no paid flag, no invented June payment",
+    "VERIFY: tenant/country permissions, before-after counts, policy and each requirement persisted readback, rollback receipts and LIVE UI after deploy"
+  ],
+  "dataWritesInThisStaging": 0,
+  "requirementsCreated": 0,
+  "policiesCreated": 0,
+  "paymentsApplied": 0,
+  "releaseStatus": "HOLD_UNTIL_SOURCE_AND_SIGNED_SAFE_CAS"
+}

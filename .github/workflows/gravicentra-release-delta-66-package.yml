@@ -413,8 +413,8 @@ jobs:
           console.error('I66_PREVIEW_DEPLOY_DIAGNOSTIC '+JSON.stringify(errors));
           NODE
             # A 429 for new channels is a quota, not a source QA failure.
-            # Direction authorizes a single known R7 Preview channel rollover
-            # only after exact current version/source and R7 rollback artifact
+            # Direction authorizes a single known current-LIVE-backed Preview channel rollover
+            # only after exact current version/source and recoverable rollback artifact
             # are proved; LIVE and all business data remain untouched.
             if ! grep -Eqi 'HTTP Error: 429.*channel quota' "$RUNNER_TEMP/gi-i66-preview-result.json"; then exit 1; fi
             REUSE_ID='gi-i66-rc-42868854629'
@@ -433,11 +433,11 @@ jobs:
           assert.ok(a.allowOnlyKnownSinglePreviewChannel===true&&a.denyLiveHostingOrBackendDataWrites===true&&
             a.denyChannelDeletion===true&&a.stopOnAnySourceVersionOrArtifactMismatch===true&&
             a.authorizedExistingChannelId===process.env.REUSE_ID&&
-            a.expectedCurrentSourceSha==='0153f5cbbe00c3732e11ebae59b32bd357e38bfd'&&
-            a.expectedCurrentHostingVersion==='9cedc5ecda75bb2a'&&
+            a.expectedCurrentSourceSha==='e6183a9f1da68243cc935e222d98b2d21b5f17b8'&&
+            a.expectedCurrentHostingVersion==='dae5d5235978cefe'&&
             a.expectedCurrentPreviewUrl==='https://ays-orbit-360-lab--gi-i66-rc-42868854629-abj14q6n.web.app'&&
-            a.recoverableR7SourceRunId===43371940341&&a.recoverableR7ArtifactId===14013250472&&
-            a.recoverableR7ArtifactDigest==='sha256:a1e16528689cc02336a3d753e3086c95eeedce92f753d14de20e790552b9f461',
+            a.recoverableR7SourceRunId===43385953587&&a.recoverableR7ArtifactId===14018512857&&
+            a.recoverableR7ArtifactDigest==='sha256:64ccf09525abf48d8c707deb366ca1cf0122c6cd7765a7ae98c5ea5380dcec31',
             'I66_QUOTA_RECOVERY_EXACT_OWNER_AUTHORIZATION_MISSING');
           const j=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/gi-i66-reuse-before.json','utf8'));
           const channels=Array.isArray(j.result)?j.result:j.result?.channels||[];
@@ -467,12 +467,12 @@ jobs:
               artifact.digest===a.recoverableR7ArtifactDigest&&
               build.sourceSha===a.expectedCurrentSourceSha,
               'I66_REUSE_R7_EXACT_IMMUTABLE_ARTIFACT_NOT_RECOVERABLE');
-            console.log('I66_KNOWN_R7_PREVIEW_EXACT_VERSION_SOURCE_AND_BACKUP_PASS');
+            console.log('I66_KNOWN_CURRENT_LIVE_PREVIEW_EXACT_VERSION_SOURCE_AND_BACKUP_PASS');
           })().catch(e=>{console.error(e.message);process.exitCode=1;});
           NODE
             CHANNEL_ID="$REUSE_ID"
             node "$FIREBASE_CLI_BIN" hosting:channel:deploy "$CHANNEL_ID" --config firebase.json --project "$PROJECT_ID" --expires 7d --non-interactive --json > "$RUNNER_TEMP/gi-i66-preview-result.json"
-            echo 'I66_PREVIEW_CHANNEL_QUOTA_RECOVERY_R7_BACKED_ROLLOVER_NO_DELETION'
+            echo 'I66_PREVIEW_CHANNEL_QUOTA_RECOVERY_CURRENT_LIVE_BACKED_ROLLOVER_NO_DELETION'
           fi
           echo "channel=$CHANNEL_ID" >> "$GITHUB_OUTPUT"
           export CHANNEL_ID

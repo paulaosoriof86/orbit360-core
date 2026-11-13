@@ -117,18 +117,21 @@
     "liveDeployAuthorized": false
   },
   "i66ConciliacionesStagePreviewQuotaRecovery20261113": {
-    "status": "PREVIEW_CHANNEL_QUOTA_429_REUSE_EXISTING_R7_CHANNEL_ONLY_AFTER_EXACT_BACKUP_AND_VERSION_READBACK",
+    "status": "PREVIEW_CHANNEL_QUOTA_429_REUSE_EXISTING_ONLY_AFTER_CURRENT_LIVE_EXACT_SOURCE_AND_ARTIFACT_BACKUP",
     "authorizedExistingChannelId": "gi-i66-rc-42868854629",
-    "expectedCurrentSourceSha": "0153f5cbbe00c3732e11ebae59b32bd357e38bfd",
-    "expectedCurrentHostingVersion": "9cedc5ecda75bb2a",
+    "expectedCurrentSourceSha": "e6183a9f1da68243cc935e222d98b2d21b5f17b8",
+    "expectedCurrentHostingVersion": "dae5d5235978cefe",
     "expectedCurrentPreviewUrl": "https://ays-orbit-360-lab--gi-i66-rc-42868854629-abj14q6n.web.app",
-    "recoverableR7SourceRunId": 43371940341,
-    "recoverableR7ArtifactId": 14013250472,
-    "recoverableR7ArtifactDigest": "sha256:a1e16528689cc02336a3d753e3086c95eeedce92f753d14de20e790552b9f461",
+    "recoverableR7SourceRunId": 43385953587,
+    "recoverableR7ArtifactId": 14018512857,
+    "recoverableR7ArtifactDigest": "sha256:64ccf09525abf48d8c707deb366ca1cf0122c6cd7765a7ae98c5ea5380dcec31",
     "allowOnlyKnownSinglePreviewChannel": true,
     "denyLiveHostingOrBackendDataWrites": true,
     "denyChannelDeletion": true,
-    "stopOnAnySourceVersionOrArtifactMismatch": true
+    "stopOnAnySourceVersionOrArtifactMismatch": true,
+    "backupEpoch": "CURRENT_SIGNED_I66_STAGE_LIVE_E618_20261113_NOT_OLDER_R7",
+    "backupProvenance": "GitHub run 43385953587 SUCCESS at e6183a9f; artifact 14018512857 digest sha256:64ccf... unexpired; signed dual-LIVE 43388747480 223/223 each origin, Hosting version dae5d5235978cefe",
+    "explicitNoRollbackToOlderR7": true
   },
   "i66ConciliacionesStageReaderPreviewAuthorization20261113": {
     "status": "EXACT_IMMUTABLE_HOSTING_PREVIEW_223_OF_223_READBACK_PASS_READER_ONLY_DEPLOY_REQUESTED",
@@ -711,6 +714,9 @@
       "no console/page errors",
       "protected role matrix save/reload audit"
     ],
-    "releaseSuccessorAfterCertifiedPreviewOnly": true
+    "releaseSuccessorAfterCertifiedPreviewOnly": true,
+    "priorFailedBuildRun": 43447365290,
+    "priorFailedBuildScope": "IMMUTABLE_ARTIFACT_CREATED_PREVIEW_429_STALE_BACKUP_GUARD_STOP_NO_LIVE",
+    "newSourceAfterGuardChangeRequiresNewArtifact": true
   }
 }

@@ -1563,7 +1563,7 @@
       "approvedByDirection": true,
       "receipt": "Paula Andrea Osorio Franco, Dirección, instrucción expresa 2026-11-13: terminar escritura transversal, priorizar Operativo y garantizar SuperAdmin/Admin/Dirección, gestionar permisos por Equipos y certificar antes de LIVE; autorización de corrección y publicación sujeta a PASS real.",
       "sourceCommit": "e2859e8ce8c29a48ed8f34b1f32e752558ca032d",
-      "sourceStatus": "SOURCE_GOVERNANCE_17_OF_17_SYNTHETIC_PASS_CONTROL_PLANE_PASS_PREVIEW_REQUESTED_LIVE_HOLD",
+      "sourceStatus": "SOURCE_QA_17_OF_17_PASS_PREVIEW_QUOTA_RECOVERY_CURRENT_LIVE_BACKUP_REBUILD_REQUESTED_LIVE_HOLD",
       "capabilityOwners": [
         "ROLE_SCOPE_RUNTIME",
         "EQUIPOS_ROLE_PERMISSIONS"
@@ -1588,7 +1588,12 @@
         "governanceRun": 43445860818,
         "governanceConclusion": "SUCCESS",
         "productionDeployed": false,
-        "realSignedRoleWritesAccepted": false
+        "realSignedRoleWritesAccepted": false,
+        "previewBlockedRun": 43447365290,
+        "previewBlockedReason": "FIREBASE_HOSTING_429_NEW_CHANNEL_PREVIOUS_BACKUP_GUARD_EXPECTED_OLD_R7_WHILE_PREVIEW_CURRENT_DAE5_NO_LIVE_WRITES",
+        "currentBackupRun": 43385953587,
+        "currentBackupArtifact": 14018512857,
+        "currentBackupHostingVersion": "dae5d5235978cefe"
       }
     }
   ]
