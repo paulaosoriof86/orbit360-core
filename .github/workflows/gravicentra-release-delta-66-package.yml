@@ -403,47 +403,65 @@ jobs:
           if(errors.length===0)errors.push('OUTPUT_LENGTH_'+raw.length);
           console.error('I66_PREVIEW_DEPLOY_DIAGNOSTIC '+JSON.stringify(errors));
           NODE
-            # A 429 for new channels is a resource quota, not a product QA
-            # failure. Reuse only this exact archived, unreferenced Preview.
-            # Its original artifact is recoverable; LIVE is never targeted.
+            # A 429 for new channels is a quota, not a source QA failure.
+            # Direction authorizes a single known R7 Preview channel rollover
+            # only after exact current version/source and R7 rollback artifact
+            # are proved; LIVE and all business data remain untouched.
             if ! grep -Eqi 'HTTP Error: 429.*channel quota' "$RUNNER_TEMP/gi-i66-preview-result.json"; then exit 1; fi
             REUSE_ID='gi-i66-rc-42868854629'
-            REUSE_VERSION='18f010edde22015e'
-            test -z "$(git grep -n '42868854629' -- . ':!.github/workflows/gravicentra-release-delta-66-package.yml' || true)"
             node "$FIREBASE_CLI_BIN" hosting:channel:list --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/gi-i66-reuse-before.json"
-            export REUSE_ID REUSE_VERSION
+            export REUSE_ID
             node - <<'NODE'
           const fs=require('node:fs'),assert=require('node:assert/strict');
+          const control=JSON.parse(fs.readFileSync('artifacts/orbit360-recovery/release-control/I6_6_RELEASE_TRANSPORT_CONTROL_20261110.json','utf8'));
+          const a=control.i66ConciliacionesStagePreviewQuotaRecovery20261113||{};
+          assert.equal(control.status,'PREVIEW_BUILD_REQUESTED','I66_QUOTA_RECOVERY_GATE_NOT_REQUESTED');
+          assert.ok(control.livePromotionAuthorized===false&&control.forbidBackendFunctionDeploy===true&&
+            control.forbidBackendLiveFunctionDeploy===true&&control.noHostingPromotion===true&&
+            control.forbidFirestoreRulesDataAuthWrites===true,'I66_QUOTA_RECOVERY_WRITE_BOUNDARY_DRIFT');
+          assert.ok(a.allowOnlyKnownSinglePreviewChannel===true&&a.denyLiveHostingOrBackendDataWrites===true&&
+            a.denyChannelDeletion===true&&a.stopOnAnySourceVersionOrArtifactMismatch===true&&
+            a.authorizedExistingChannelId===process.env.REUSE_ID&&
+            a.expectedCurrentSourceSha==='0153f5cbbe00c3732e11ebae59b32bd357e38bfd'&&
+            a.expectedCurrentHostingVersion==='9cedc5ecda75bb2a'&&
+            a.expectedCurrentPreviewUrl==='https://ays-orbit-360-lab--gi-i66-rc-42868854629-abj14q6n.web.app'&&
+            a.recoverableR7SourceRunId===43371940341&&a.recoverableR7ArtifactId===14013250472&&
+            a.recoverableR7ArtifactDigest==='sha256:a1e16528689cc02336a3d753e3086c95eeedce92f753d14de20e790552b9f461',
+            'I66_QUOTA_RECOVERY_EXACT_OWNER_AUTHORIZATION_MISSING');
           const j=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/gi-i66-reuse-before.json','utf8'));
-          const a=Array.isArray(j.result)?j.result:j.result?.channels||[];
+          const channels=Array.isArray(j.result)?j.result:j.result?.channels||[];
           const id=x=>String(x.channelId||x.name||'').split('/').pop();
-          const target=a.filter(x=>id(x)===process.env.REUSE_ID);
+          const target=channels.filter(x=>id(x)===process.env.REUSE_ID);
           assert.equal(target.length,1,'I66_REUSE_EXACT_PREVIEW_NOT_UNIQUE');
           assert.equal(String(target[0].release?.version?.name||'').split('/').pop(),
-            process.env.REUSE_VERSION,'I66_REUSE_ARCHIVED_VERSION_CHANGED_STOP');
+            a.expectedCurrentHostingVersion,'I66_REUSE_R7_PREVIEW_VERSION_CHANGED_STOP');
           assert.ok(String(target[0].createTime||'').startsWith('2026-11-10T')&&
-            id(target[0])!=='live','I66_REUSE_ARCHIVED_PREVIEW_SCOPE_DRIFT');
-          const live=a.find(x=>id(x)==='live');
-          assert.ok(live&&String(live.release?.version?.name||'').split('/').pop()!==process.env.REUSE_VERSION,
-            'I66_REUSE_ARCHIVED_VERSION_IS_LIVE');
+            id(target[0])!=='live','I66_REUSE_R7_PREVIEW_SCOPE_DRIFT');
+          const live=channels.find(x=>id(x)==='live');
+          assert.ok(live&&String(live.release?.version?.name||'').split('/').pop()===a.expectedCurrentHostingVersion,
+            'I66_REUSE_R7_LIVE_VERSION_DRIFT');
           (async()=>{
             const h={Authorization:'Bearer '+process.env.GH_TOKEN,Accept:'application/vnd.github+json',
-              'User-Agent':'GI-I66-Archived-Preview-Reuse'};
+              'User-Agent':'GI-I66-Exact-R7-Preview-Quota-Recovery'};
             const root='https://api.github.com/repos/paulaosoriof86/orbit360-core/actions/';
-            const [r,b]=await Promise.all([fetch(root+'runs/42868854629',{headers:h}),fetch(root+'artifacts/13787853794',{headers:h})]);
-            assert.ok(r.ok&&b.ok,'I66_REUSE_ARCHIVED_ARTIFACT_PROOF_UNAVAILABLE');
+            const [r,b,p]=await Promise.all([fetch(root+'runs/'+a.recoverableR7SourceRunId,{headers:h}),
+              fetch(root+'artifacts/'+a.recoverableR7ArtifactId,{headers:h}),
+              fetch(a.expectedCurrentPreviewUrl+'/__recovery__/build.json',{cache:'no-store'})]);
+            assert.ok(r.ok&&b.ok&&p.ok,'I66_REUSE_R7_PREVIEW_OR_ARTIFACT_PROOF_UNAVAILABLE');
             const run=await r.json(),artifact=await b.json();
+            const build=await p.json();
             assert.ok(run.conclusion==='success'&&
-              run.head_sha==='b87ab67c14671276557292854b5ee8ae590b2458'&&
-              artifact.expired===false&&artifact.workflow_run?.id===42868854629&&
-              artifact.digest==='sha256:f27c6f4a48cf1f22b718311bf1ab288bca9de7dd6e2f178f93032527b64a3866',
-              'I66_REUSE_OLD_EXACT_IMMUTABLE_ARTIFACT_NOT_RECOVERABLE');
-            console.log('I66_ARCHIVED_UNREFERENCED_PREVIEW_EXACT_ID_VERSION_AND_BACKUP_PASS');
+              run.head_sha===a.expectedCurrentSourceSha&&
+              artifact.expired===false&&artifact.workflow_run?.id===a.recoverableR7SourceRunId&&
+              artifact.digest===a.recoverableR7ArtifactDigest&&
+              build.sourceSha===a.expectedCurrentSourceSha,
+              'I66_REUSE_R7_EXACT_IMMUTABLE_ARTIFACT_NOT_RECOVERABLE');
+            console.log('I66_KNOWN_R7_PREVIEW_EXACT_VERSION_SOURCE_AND_BACKUP_PASS');
           })().catch(e=>{console.error(e.message);process.exitCode=1;});
           NODE
             CHANNEL_ID="$REUSE_ID"
             node "$FIREBASE_CLI_BIN" hosting:channel:deploy "$CHANNEL_ID" --config firebase.json --project "$PROJECT_ID" --expires 7d --non-interactive --json > "$RUNNER_TEMP/gi-i66-preview-result.json"
-            echo 'I66_PREVIEW_CHANNEL_QUOTA_RECOVERY_REUSED_ARCHIVED_CHANNEL_NO_DELETION'
+            echo 'I66_PREVIEW_CHANNEL_QUOTA_RECOVERY_R7_BACKED_ROLLOVER_NO_DELETION'
           fi
           echo "channel=$CHANNEL_ID" >> "$GITHUB_OUTPUT"
           export CHANNEL_ID
