@@ -1,0 +1,35 @@
+# Delete ONLY unique synthetic UAT remnants from I6.6 failed LIVE rollback.
+# No production deployment, no genuine business payment or policy changes.
+name: Gravicentra I6.6 LIVE Signed Synthetic Orphan Cleanup
+on:
+  push:
+    branches: [recovery/fase-a-clean-20260831]
+    paths:
+      - .github/workflows/gravicentra-i66-signed-live-synthetic-orphans-cleanup.yml
+permissions:
+  contents: read
+concurrency:
+  group: gi-i66-signed-live-synthetic-only-cleanup
+  cancel-in-progress: false
+jobs:
+  exact-synthetic:
+    if: github.repository == 'paulaosoriof86/orbit360-core' && github.ref == 'refs/heads/recovery/fase-a-clean-20260831'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      SA_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_ALT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify bounded synthetic operation proof and safely delete only orphan UAT rows
+        run: |
+          set -euo pipefail
+          node --check tools/gravicentra-i6-6-signed-live-synthetic-orphans-cleanup.cjs
+          npm install --no-save --package-lock=false --ignore-scripts --no-audit --no-fund firebase-admin@13.4.0 >/dev/null
+          node tools/gravicentra-i6-6-signed-live-synthetic-orphans-cleanup.cjs
