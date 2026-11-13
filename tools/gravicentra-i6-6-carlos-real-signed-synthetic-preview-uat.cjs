@@ -7,13 +7,16 @@ const admin=require('firebase-admin');
 const {chromium}=require('playwright');
 
 const PREVIEW=process.env.I66_PREVIEW_ORIGIN;
+const PREVIEW_CHANNEL=process.env.I66_SIGNED_QA_CHANNEL_ID||'gi-i66-rc-43299843267';
 const TENANT='alianzas-soluciones';
 const normalize=x=>String(x||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();
 const service=['SA_LAB','SA_ALT','SA_DEFAULT'].map(x=>process.env[x]).filter(Boolean)
   .map(x=>{try{return JSON.parse(x);}catch{return null;}})
   .find(s=>s&&s.type==='service_account'&&s.project_id==='ays-orbit-360-lab'&&s.private_key);
 assert.ok(service,'I66_SIGNED_QA_EXISTING_LAB_AUTHORITY_REQUIRED');
-assert.ok(/^https:\/\/ays-orbit-360-lab--gi-i66-rc-43299843267-[a-z0-9]+\.web\.app$/.test(PREVIEW||''),'I66_QA_EXACT_PREVIEW_ORIGIN_REQUIRED');
+assert.ok(/^gi-i66-rc-[0-9]+$/.test(PREVIEW_CHANNEL) &&
+  new RegExp('^https://ays-orbit-360-lab--'+PREVIEW_CHANNEL+'-[a-z0-9]+\\.web\\.app$').test(PREVIEW||''),
+  'I66_QA_EXACT_PREVIEW_ORIGIN_REQUIRED');
 admin.initializeApp({credential:admin.credential.cert(service),projectId:'ays-orbit-360-lab'});
 const db=admin.firestore(),auth=admin.auth(),root=db.collection('tenants').doc(TENANT);
 const ref=(collection,id)=>root.collection('data').doc(collection).collection('items').doc(id);

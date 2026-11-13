@@ -1,0 +1,190 @@
+# I6.6 authorized successor: three existing synthetic-only Preview callables,
+# extracted from the EXACT immutable Hosting Preview artifact. Never LIVE.
+name: Gravicentra I6.6 Five Role Exact Backend Preview And Signed Carlos UAT
+on:
+  push:
+    branches: [recovery/fase-a-clean-20260831]
+    paths:
+      - .github/workflows/gravicentra-i66-privileged-role-three-function-preview-uat.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: gi-i66-privileged-role-exact-preview-three-functions
+  cancel-in-progress: false
+jobs:
+  exact-preview-only:
+    if: github.repository == 'paulaosoriof86/orbit360-core' && github.ref == 'refs/heads/recovery/fase-a-clean-20260831'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 55
+    env:
+      PROJECT_ID: ays-orbit-360-lab
+      SOURCE_SHA: 0153f5cbbe00c3732e11ebae59b32bd357e38bfd
+      SOURCE_PACKAGE_RUN: '43371940341'
+      SOURCE_ARTIFACT_ID: '14013250472'
+      SOURCE_ARTIFACT_DIGEST: sha256:a1e16528689cc02336a3d753e3086c95eeedce92f753d14de20e790552b9f461
+      I66_PREVIEW_ORIGIN: https://ays-orbit-360-lab--gi-i66-rc-42868854629-abj14q6n.web.app
+      I66_SIGNED_QA_CHANNEL_ID: gi-i66-rc-42868854629
+      GH_TOKEN: ${{ github.token }}
+      SA_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_ALT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Prove owner-scoped Preview authorization, immutable artifact and sealed source
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor "$SOURCE_SHA" HEAD
+          test -z "$(git diff --name-only "$SOURCE_SHA" HEAD -- functions orbit360-platform firebase.json firestore.rules storage.rules)"
+          node tools/gravicentra-i6-6-delta-guard.mjs > "$RUNNER_TEMP/i66-role-delta-guard.log"
+          node --test tools/gravicentra-i6-6-privileged-role-portfolio-parity.test.cjs tools/gravicentra-i6-6-privileged-role-writer-transaction.test.cjs
+          node - <<'NODE'
+          const fs=require('node:fs'),assert=require('node:assert/strict');
+          const c=require('./artifacts/orbit360-recovery/release-control/I6_6_RELEASE_TRANSPORT_CONTROL_20261110.json');
+          const p=c.i66PrivilegedRolePreviewCandidate20261112||{};
+          assert.equal(c.status,'PRIVILEGED_ROLE_BACKEND_PREVIEW_AUTHORIZED');
+          assert.equal(c.forbidBackendFunctionDeploy,false);
+          assert.equal(c.backendFunctionPreviewOnly,true);
+          assert.equal(c.forbidBackendLiveFunctionDeploy,true);
+          assert.equal(c.forbidFirestoreRulesDataAuthWrites,true);
+          assert.equal(c.livePromotionAuthorized,false);
+          assert.equal(c.previewApproved,false);
+          assert.equal(c.noHostingPromotion,true);
+          assert.equal(p.backendPreviewAuthorized,true);
+          assert.equal(p.backendPreviewSyntheticRecordsOnly,true);
+          assert.equal(p.backendPreviewCustomerDataWritesPermitted,false);
+          assert.equal(p.backendPreviewLiveDeploymentPermitted,false);
+          assert.equal(p.hostingPreviewSourceSha,process.env.SOURCE_SHA);
+          assert.equal(p.hostingPreviewBuildRunId,Number(process.env.SOURCE_PACKAGE_RUN));
+          assert.equal(p.hostingPreviewArtifactId,Number(process.env.SOURCE_ARTIFACT_ID));
+          assert.equal(p.hostingPreviewArtifactDigest,process.env.SOURCE_ARTIFACT_DIGEST);
+          assert.equal(p.hostingPreviewUrl,process.env.I66_PREVIEW_ORIGIN);
+          assert.equal(p.hostingPreviewChannelId,process.env.I66_SIGNED_QA_CHANNEL_ID);
+          assert.equal(p.backendPreviewRegion,'us-east1');
+          assert.deepEqual(p.backendPreviewTargets,
+            ['orbit360OpsLeadsCommandPreview','orbit360ProductOperationalCommandPreview','orbit360ScopedPolicyReadPreview']);
+          (async()=>{
+            const h={Authorization:'Bearer '+process.env.GH_TOKEN,Accept:'application/vnd.github+json','User-Agent':'GI-I66-Five-Role-Preview'};
+            const b='https://api.github.com/repos/paulaosoriof86/orbit360-core/actions/';
+            const [runR,artR,qaR]=await Promise.all([
+              fetch(b+'runs/'+process.env.SOURCE_PACKAGE_RUN,{headers:h}),
+              fetch(b+'artifacts/'+process.env.SOURCE_ARTIFACT_ID,{headers:h}),
+              fetch(b+'runs/43371135912',{headers:h})]);
+            assert.ok(runR.ok&&artR.ok&&qaR.ok,'I66_PREVIEW_SOURCE_PROOF_API_UNAVAILABLE');
+            const run=await runR.json(),artifact=await artR.json(),qa=await qaR.json();
+            assert.equal(run.conclusion,'success');
+            assert.equal(run.head_sha,process.env.SOURCE_SHA);
+            assert.equal(artifact.digest,process.env.SOURCE_ARTIFACT_DIGEST);
+            assert.equal(artifact.expired,false);
+            assert.equal(artifact.workflow_run.id,Number(process.env.SOURCE_PACKAGE_RUN));
+            assert.equal(qa.conclusion,'success');
+            console.log('I66_FIVE_ROLE_EXACT_PREVIEW_SOURCE_ARTIFACT_AND_OWNER_AUTHORITY_PASS');
+          })().catch(e=>{console.error(e.message);process.exitCode=1;});
+          NODE
+          curl -fsSL --max-time 30 "$I66_PREVIEW_ORIGIN/__recovery__/build.json" > "$RUNNER_TEMP/i66-role-preview-build.json"
+          node - <<'NODE'
+          const b=require(process.env.RUNNER_TEMP+'/i66-role-preview-build.json');
+          if(b.sourceSha!==process.env.SOURCE_SHA||b.gate!=='I6.6')throw Error('I66_PREVIEW_HOSTING_SOURCE_READBACK_DRIFT');
+          console.log('I66_ROLE_PREVIEW_HOSTING_EXACT_SOURCE_READBACK_PASS');
+          NODE
+      - uses: actions/download-artifact@v4
+        with:
+          artifact-ids: 14013250472
+          run-id: 43371940341
+          github-token: ${{ github.token }}
+          path: ${{ runner.temp }}/gi-role-artifact
+      - name: Prove exact immutable backend bytes and prepare isolated Firebase config
+        run: |
+          set -euo pipefail
+          DL="$RUNNER_TEMP/gi-role-artifact"
+          test -f "$DL/gi-i66-exact-package.tar.gz"
+          test -f "$DL/gi-i66-exact-package.sha256"
+          (cd "$DL" && sha256sum -c gi-i66-exact-package.sha256)
+          FROOT="$RUNNER_TEMP/gi-role-preview-only"
+          mkdir -p "$FROOT"
+          tar -xzf "$DL/gi-i66-exact-package.tar.gz" -C "$FROOT" --no-same-owner
+          BACKEND="$FROOT/bundle/backend"
+          for p in b4-003-scoped-access-boundary.js product-operational-domain.js product-ops-leads-domain.js;do
+            git show "$SOURCE_SHA:functions/$p" > "$RUNNER_TEMP/i66-source-$p"
+            cmp "$RUNNER_TEMP/i66-source-$p" "$BACKEND/$p"
+          done
+          test -f "$BACKEND/index.js"
+          node --check "$BACKEND/index.js"
+          test -f "$BACKEND/package-lock.json"
+          (cd "$BACKEND" && npm ci --ignore-scripts --no-audit --no-fund >/dev/null)
+          printf '{"functions":{"source":"backend","runtime":"nodejs22"}}\n' > "$FROOT/bundle/firebase.json"
+          echo "I66_ROLE_PREVIEW_FIREBASE_CONFIG=$FROOT/bundle/firebase.json" >> "$GITHUB_ENV"
+          echo 'I66_ROLE_EXACT_IMMUTABLE_BACKEND_BYTES_MATCH_CERTIFIED_PREVIEW_ARTIFACT_PASS'
+      - name: Resolve existing LAB credentials and preserve LIVE hosting fingerprints
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/gi-role-auth"
+          python3 - <<'PY'
+          import json,os,pathlib
+          root=pathlib.Path(os.environ['RUNNER_TEMP'])/'gi-role-auth'
+          found=[]
+          for n,k in enumerate(('SA_LAB','SA_ALT','SA_DEFAULT')):
+              try:v=json.loads(os.environ.get(k,''))
+              except (ValueError,TypeError):continue
+              if v.get('type')=='service_account' and v.get('project_id')==os.environ['PROJECT_ID'] and v.get('private_key'):
+                  p=root/f'{n}.json';p.write_text(json.dumps(v));p.chmod(0o600);found.append(str(p))
+          if not found:raise SystemExit('I66_PREVIEW_CONFIGURED_LAB_CREDENTIAL_MISSING')
+          (root/'candidates').write_text('\n'.join(found)+'\n')
+          PY
+          npm install --prefix "$RUNNER_TEMP/gi-role-cli" --no-save --ignore-scripts --no-audit --no-fund firebase-tools@14.10.1 >/dev/null
+          node tools/gravicentra-firebase-tools-empty-extensions-workaround-v1.mjs "$RUNNER_TEMP/gi-role-cli"
+          CLI="$RUNNER_TEMP/gi-role-cli/node_modules/firebase-tools/lib/bin/firebase.js"
+          selected=''
+          while IFS= read -r p;do
+            if GOOGLE_APPLICATION_CREDENTIALS="$p" node "$CLI" functions:list --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/gi-role-functions-before.json" 2>/dev/null;then selected="$p";break;fi
+          done < "$RUNNER_TEMP/gi-role-auth/candidates"
+          test -n "$selected"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$selected" >> "$GITHUB_ENV"
+          echo "I66_ROLE_FIREBASE_CLI=$CLI" >> "$GITHUB_ENV"
+          for o in https://ays-orbit-360-lab.web.app https://app.aysseguros.com;do
+            curl -fsSL --max-time 30 "$o/" | sha256sum
+          done > "$RUNNER_TEMP/gi-role-live-before.sha"
+      - name: Verify exact three preexisting Preview callables then deploy only those
+        run: |
+          set -euo pipefail
+          node - <<'NODE'
+          const fs=require('node:fs'),assert=require('node:assert/strict');
+          const a=require(process.env.RUNNER_TEMP+'/gi-role-functions-before.json');
+          const rows=Array.isArray(a.result)?a.result:Array.isArray(a)?a:[];
+          const id=r=>String(r.entryPoint||r.id||r.name||'').split('/').pop();
+          for(const n of ['orbit360OpsLeadsCommandPreview','orbit360ProductOperationalCommandPreview','orbit360ScopedPolicyReadPreview']){
+            const found=rows.filter(r=>id(r)===n);assert.equal(found.length,1,'I66_PREVIEW_EXISTING_FUNCTION_NOT_UNIQUE_'+n);
+            assert.equal(String(found[0].region||found[0].location||'us-east1'),'us-east1');
+          }
+          console.log('I66_ONLY_THREE_PREEXISTING_US_EAST1_PREVIEW_CALLABLES_ALLOWED_PASS');
+          NODE
+          node "$I66_ROLE_FIREBASE_CLI" deploy \
+            --only functions:orbit360OpsLeadsCommandPreview,functions:orbit360ProductOperationalCommandPreview,functions:orbit360ScopedPolicyReadPreview \
+            --config "$I66_ROLE_PREVIEW_FIREBASE_CONFIG" --project "$PROJECT_ID" --non-interactive
+          node "$I66_ROLE_FIREBASE_CLI" functions:list --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/gi-role-functions-after.json"
+          node - <<'NODE'
+          const assert=require('node:assert/strict'),a=require(process.env.RUNNER_TEMP+'/gi-role-functions-before.json'),b=require(process.env.RUNNER_TEMP+'/gi-role-functions-after.json');
+          const rows=x=>Array.isArray(x.result)?x.result:Array.isArray(x)?x:[];
+          const id=x=>String(x.entryPoint||x.id||x.name||'').split('/').pop();
+          assert.deepEqual(rows(a).map(id).sort(),rows(b).map(id).sort(),'I66_PREVIEW_OTHER_FUNCTION_INVENTORY_CHANGED');
+          console.log('I66_EXACT_THREE_BACKEND_PREVIEW_FUNCTIONS_DEPLOYED_INVENTORY_READBACK_PASS');
+          NODE
+          for o in https://ays-orbit-360-lab.web.app https://app.aysseguros.com;do
+            curl -fsSL --max-time 30 "$o/" | sha256sum
+          done > "$RUNNER_TEMP/gi-role-live-after.sha"
+          cmp "$RUNNER_TEMP/gi-role-live-before.sha" "$RUNNER_TEMP/gi-role-live-after.sha"
+          echo 'I66_PREVIEW_BACKEND_ONLY_ZERO_LIVE_HOSTING_CHANGES_PASS'
+      - name: Signed Carlos and Paula real-auth synthetic CRUD, durable readback, reload and restore
+        run: |
+          set -euo pipefail
+          npm install --no-save --package-lock=false --ignore-scripts --no-audit --no-fund firebase-admin@13.4.0 playwright@1.55.0 >/dev/null
+          node node_modules/playwright/cli.js install --with-deps chromium >/dev/null
+          node tools/gravicentra-i6-6-carlos-real-signed-synthetic-preview-uat.cjs
+          echo 'I66_ROLE_PREVIEW_SIGNED_CARLOS_PAULA_SYNTHETIC_FUNCTIONAL_UAT_PASS_ZERO_REAL_CUSTOMER_WRITES'
