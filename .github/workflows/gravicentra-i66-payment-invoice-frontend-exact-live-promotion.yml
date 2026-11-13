@@ -1,0 +1,215 @@
+# I6.6: exact previously certified Preview Hosting version to both LIVE origins.
+# Requires independently signed LIVE payment backend, rollback proof and new-policy/Cliente360 signed LIVE UAT.
+name: Gravicentra I6.6 Invoice Policy Exact LIVE Hosting
+on:
+  push:
+    branches: [recovery/fase-a-clean-20260831]
+    paths:
+      - .github/workflows/gravicentra-i66-payment-invoice-frontend-exact-live-promotion.yml
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: gi-i66-payment-invoice-exact-hosting-live
+  cancel-in-progress: false
+jobs:
+  exact-live:
+    if: github.repository == 'paulaosoriof86/orbit360-core' && github.ref == 'refs/heads/recovery/fase-a-clean-20260831'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 65
+    env:
+      PROJECT_ID: ays-orbit-360-lab
+      SITE: ays-orbit-360-lab
+      SOURCE_SHA: 586401bfbe1a80cfef2820982f432743af36b108
+      ARTIFACT_RUN: '43463160506'
+      ARTIFACT_ID: '14057935092'
+      ARTIFACT_DIGEST: sha256:1621f236b9d1b9e49ea42fc53e338a695d5872080361ada2a84183fa7d52207f
+      PAYMENT_LIVE_RUN: '43469115944'
+      PREVIEW_PAYMENT_RUN: '43467007164'
+      SIGNED_POLICY_PREVIEW_RUN: '43465087494'
+      SOURCE_PREVIEW_URL: https://ays-orbit-360-lab--gi-i66-rc-42868854629-abj14q6n.web.app
+      PREVIEW_CHANNEL: gi-i66-rc-42868854629
+      SA_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_ALT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate signed immutable artifact, last LIVE pointer and source isolation
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor "$SOURCE_SHA" HEAD
+          test -z "$(git diff --name-only "$SOURCE_SHA" HEAD -- orbit360-platform functions firebase.json firestore.rules storage.rules)"
+          node --check tools/gravicentra-i6-6-carlos-paula-new-policy-client360-preview-uat.cjs
+          node - <<'NODE'
+          const assert=require('node:assert/strict'),fs=require('node:fs');
+          (async()=>{
+            const c=JSON.parse(fs.readFileSync('artifacts/orbit360-recovery/release-control/I6_6_RELEASE_TRANSPORT_CONTROL_20261110.json'));
+            const a=c.i66PaymentInvoiceHostingLiveAuthorization20261113||{};
+            assert.equal(c.status,'PAYMENT_INVOICE_BACKEND_PREVIEW_AUTHORIZED');
+            assert.equal(c.forbidBackendFunctionDeploy,true);assert.equal(c.forbidBackendLiveFunctionDeploy,true);
+            assert.equal(c.forbidFirestoreRulesDataAuthWrites,true);
+            assert.equal(a.status,'SIGNED_PAYMENT_LIVE_AND_POLICY_PREVIEW_SAME_ARTIFACT_HOSTING_EXACT_AUTHORIZED');
+            for(const [k,v] of [['sourceSha',process.env.SOURCE_SHA],['buildRunId',+process.env.ARTIFACT_RUN],['artifactId',+process.env.ARTIFACT_ID],['artifactDigest',process.env.ARTIFACT_DIGEST],['paymentLiveBackendUatRunId',+process.env.PAYMENT_LIVE_RUN],['previewChannel',process.env.PREVIEW_CHANNEL],['signedPolicyPreviewUatRunId',+process.env.SIGNED_POLICY_PREVIEW_RUN]])assert.equal(a[k],v,k);
+            for(const k of ['onlyOneSameFirebaseHostingSite','sameImmutablePreviewVersionBothLiveDomains','rollbackOldHostingAndOldPaymentRevisionOnFailure','noNewBuild','noRulesAuthOtherFunctionsOrRealFinancialWrites','signedTwoRolesNewPolicyAndClient360LiveUatRequired'])assert.equal(a[k],true,k);
+            const h={Authorization:'Bearer '+process.env.GH_TOKEN,Accept:'application/vnd.github+json','User-Agent':'GI-I66-Exact-LIVE-Invoice'};
+            const base='https://api.github.com/repos/paulaosoriof86/orbit360-core/actions/';
+            const ids=[+process.env.ARTIFACT_RUN,+process.env.PAYMENT_LIVE_RUN,+process.env.PREVIEW_PAYMENT_RUN,+process.env.SIGNED_POLICY_PREVIEW_RUN];
+            const [runs,artifact]=await Promise.all([Promise.all(ids.map(id=>fetch(base+'runs/'+id,{headers:h}).then(r=>r.json()))),fetch(base+'artifacts/'+process.env.ARTIFACT_ID,{headers:h}).then(r=>r.json())]);
+            for(let i=0;i<ids.length;i++){assert.equal(runs[i].id,ids[i]);assert.equal(runs[i].conclusion,'success','required run '+ids[i]);}
+            assert.equal(runs[0].head_sha,process.env.SOURCE_SHA);
+            assert.equal(artifact.digest,process.env.ARTIFACT_DIGEST);
+            assert.equal(artifact.workflow_run.id,+process.env.ARTIFACT_RUN);
+            assert.equal(artifact.expired,false);
+            console.log('I66_EXACT_HOSTING_SIGNED_PREVIEW_AND_LIVE_BACKEND_PIN_PASS');
+          })().catch(e=>{console.error(e.message);process.exitCode=1;});
+          NODE
+      - uses: actions/download-artifact@v4
+        with:
+          artifact-ids: 14057935092
+          run-id: 43463160506
+          github-token: ${{ github.token }}
+          path: ${{ runner.temp }}/invoice-exact-site
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 43469115944
+          pattern: gi-i66-payment-live-backend-proof-*
+          merge-multiple: true
+          github-token: ${{ github.token }}
+          path: ${{ runner.temp }}/invoice-payment-rollback-proof
+      - name: Verify original site and payment revision rollback artifact
+        run: |
+          set -euo pipefail
+          DL="$RUNNER_TEMP/invoice-exact-site"
+          TAR=$(find "$DL" -type f -name gi-i66-exact-package.tar.gz -print -quit)
+          SUM=$(find "$DL" -type f -name gi-i66-exact-package.sha256 -print -quit)
+          test -n "$TAR" && test -n "$SUM"
+          test "$(sha256sum "$TAR" | cut -d' ' -f1)" = "$(cut -d' ' -f1 "$SUM")"
+          mkdir -p "$RUNNER_TEMP/invoice-exact-package"
+          tar -xzf "$TAR" -C "$RUNNER_TEMP/invoice-exact-package" --no-same-owner
+          node - <<'NODE'
+          const assert=require('node:assert/strict'),fs=require('node:fs'),p=process.env.RUNNER_TEMP;
+          const m=JSON.parse(fs.readFileSync(p+'/invoice-exact-package/bundle/site/__recovery__/build.json'));
+          assert.equal(m.sourceSha,process.env.SOURCE_SHA);assert.equal(m.gate,'I6.6');
+          const before=JSON.parse(fs.readFileSync(p+'/invoice-payment-rollback-proof/payment-live-run-before.json'));
+          const after=JSON.parse(fs.readFileSync(p+'/invoice-payment-rollback-proof/payment-live-run-verified.json'));
+          const rev=x=>(x.status?.traffic||x.traffic||[]).filter(t=>Number(t.percent)===100).map(t=>t.revisionName||t.revision);
+          assert.equal(rev(before).length,1);assert.equal(rev(after).length,1);assert.notEqual(rev(before)[0],rev(after)[0]);
+          fs.writeFileSync(p+'/invoice-old-payment-revision',rev(before)[0]);
+          fs.writeFileSync(p+'/invoice-new-payment-revision',rev(after)[0]);
+          console.log('I66_EXACT_SITE_ARCHIVE_AND_PAYMENT_ROLLBACK_PROOF_PASS');
+          NODE
+      - name: Authenticate same Firebase project and install one pinned CLI
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/invoice-live-auth"
+          python3 - <<'PY'
+          import json,os,pathlib
+          root=pathlib.Path(os.environ['RUNNER_TEMP'])/'invoice-live-auth';found=[]
+          for i,k in enumerate(('SA_LAB','SA_ALT','SA_DEFAULT')):
+            try:x=json.loads(os.environ.get(k,''))
+            except (ValueError,TypeError):continue
+            if x.get('type')=='service_account' and x.get('project_id')==os.environ['PROJECT_ID'] and x.get('private_key'):
+              p=root/f'{i}.json';p.write_text(json.dumps(x));p.chmod(0o600);found.append(str(p))
+          if not found:raise SystemExit('I66_LIVE_CONFIGURED_CREDENTIAL_MISSING')
+          (root/'candidates').write_text('\n'.join(found)+'\n')
+          PY
+          npm install --prefix "$RUNNER_TEMP/invoice-live-cli" --no-save --ignore-scripts --no-audit --no-fund firebase-tools@14.10.1 >/dev/null
+          node tools/gravicentra-firebase-tools-empty-extensions-workaround-v1.mjs "$RUNNER_TEMP/invoice-live-cli"
+          CLI="$RUNNER_TEMP/invoice-live-cli/node_modules/firebase-tools/lib/bin/firebase.js"
+          SEL=''
+          while IFS= read -r f;do
+            if GOOGLE_APPLICATION_CREDENTIALS="$f" node "$CLI" functions:list --project "$PROJECT_ID" --non-interactive --json >/dev/null 2>&1;then SEL="$f";break;fi
+          done < "$RUNNER_TEMP/invoice-live-auth/candidates"
+          test -n "$SEL"
+          cp "$SEL" "$RUNNER_TEMP/invoice-live-auth/selected.json";chmod 600 "$RUNNER_TEMP/invoice-live-auth/selected.json"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$RUNNER_TEMP/invoice-live-auth/selected.json" >> "$GITHUB_ENV"
+          echo "FIREBASE_CLI_BIN=$CLI" >> "$GITHUB_ENV"
+          npm install --no-save --package-lock=false --ignore-scripts --no-audit --no-fund firebase-admin@13.4.0 playwright@1.55.0 >/dev/null
+          node node_modules/playwright/cli.js install --with-deps chromium >/dev/null
+      - uses: google-github-actions/setup-gcloud@v2
+        with:
+          version: '>= 483.0.0'
+      - name: Clone same immutable Preview version and signed new-policy LIVE UAT or rollback both
+        run: |
+          set -euo pipefail
+          gcloud auth activate-service-account --key-file="$GOOGLE_APPLICATION_CREDENTIALS" --quiet >/dev/null
+          gcloud config set project "$PROJECT_ID" --quiet >/dev/null
+          OLD_PAY=$(< "$RUNNER_TEMP/invoice-old-payment-revision")
+          NEW_PAY=$(< "$RUNNER_TEMP/invoice-new-payment-revision")
+          export NEW_PAY
+          gcloud functions describe orbit360CobrosReconciliationCommand --gen2 --region us-central1 --project "$PROJECT_ID" --format=json > "$RUNNER_TEMP/invoice-payment-fn-current.json"
+          SERVICE=$(node - <<'NODE'
+          const x=require(process.env.RUNNER_TEMP+'/invoice-payment-fn-current.json');
+          const s=String(x.serviceConfig?.service||''),n=s.split('/').pop();
+          if(!s.includes('/locations/us-central1/services/')||!/^[a-z][a-z0-9-]+$/.test(n))throw Error('I66_PAYMENT_LIVE_SERVICE_NOT_PINNED');
+          process.stdout.write(n);
+          NODE
+          )
+          gcloud run services describe "$SERVICE" --region us-central1 --project "$PROJECT_ID" --format=json > "$RUNNER_TEMP/invoice-payment-run-current.json"
+          node - <<'NODE'
+          const a=require(process.env.RUNNER_TEMP+'/invoice-payment-run-current.json');
+          const t=(a.status?.traffic||a.traffic||[]).filter(x=>Number(x.percent)>0);
+          if(t.length!==1||Number(t[0].percent)!==100||String(t[0].revisionName||t[0].revision)!==process.env.NEW_PAY)throw Error('I66_PAYMENT_LIVE_CURRENT_REVISION_DRIFT');
+          NODE
+          TOKEN=$(gcloud auth print-access-token)
+          curl -fsSL -H "Authorization: Bearer $TOKEN" "https://firebasehosting.googleapis.com/v1beta1/sites/$SITE/channels/live/releases?pageSize=1" > "$RUNNER_TEMP/invoice-host-before.json"
+          curl -fsSL -H "Authorization: Bearer $TOKEN" "https://firebasehosting.googleapis.com/v1beta1/sites/$SITE/channels/$PREVIEW_CHANNEL/releases?pageSize=1" > "$RUNNER_TEMP/invoice-preview-release.json"
+          unset TOKEN
+          node - <<'NODE'
+          const fs=require('node:fs'),p=process.env.RUNNER_TEMP;
+          const live=require(p+'/invoice-host-before.json'),preview=require(p+'/invoice-preview-release.json');
+          const v=x=>String(x.releases?.[0]?.version?.name||'');
+          if(!/^sites\/ays-orbit-360-lab\/versions\/[a-zA-Z0-9_-]+$/.test(v(live))||
+            !/^sites\/ays-orbit-360-lab\/versions\/[a-zA-Z0-9_-]+$/.test(v(preview))||v(live)===v(preview))throw Error('I66_HOSTING_LIVE_OR_PREVIEW_VERSION_INVALID');
+          fs.writeFileSync(p+'/invoice-old-host-version',v(live).split('/').pop());
+          fs.writeFileSync(p+'/invoice-approved-preview-version',v(preview).split('/').pop());
+          NODE
+          curl -fsSL --max-time 25 'https://ays-orbit-360-lab.web.app/__recovery__/build.json' -o "$RUNNER_TEMP/invoice-firebase-before.json"
+          curl -fsSL --max-time 25 'https://app.aysseguros.com/__recovery__/build.json' -o "$RUNNER_TEMP/invoice-custom-before.json"
+          node - <<'NODE'
+          const a=require(process.env.RUNNER_TEMP+'/invoice-firebase-before.json');
+          const b=require(process.env.RUNNER_TEMP+'/invoice-custom-before.json');
+          if(a.sourceSha!=='8a0e904500cbb3c961d83f16517caab69df88a2b'||b.sourceSha!==a.sourceSha)throw Error('I66_LIVE_R8_ORIGIN_DRIFT_BEFORE_CLONE');
+          NODE
+          OLD_HOST=$(< "$RUNNER_TEMP/invoice-old-host-version")
+          PRE_HOST=$(< "$RUNNER_TEMP/invoice-approved-preview-version")
+          promoted=0;completed=0
+          rollback(){
+            code=$?
+            if test "$promoted" = 1 && test "$completed" != 1;then
+              set +e;failed=0
+              node "$FIREBASE_CLI_BIN" hosting:clone "$SITE@$OLD_HOST" "$SITE:live" --project "$PROJECT_ID" --non-interactive || failed=1
+              gcloud run services update-traffic "$SERVICE" --region us-central1 --project "$PROJECT_ID" --to-revisions="$OLD_PAY=100" --quiet || failed=1
+              echo "I66_INVOICE_LIVE_AUTO_ROLLBACK_FAILURE_COUNT=$failed"
+            fi
+            exit "$code"
+          }
+          trap rollback EXIT
+          promoted=1
+          node "$FIREBASE_CLI_BIN" hosting:clone "$SITE@$PRE_HOST" "$SITE:live" --project "$PROJECT_ID" --non-interactive
+          I66_SITE_PACKAGE_ROOT="$RUNNER_TEMP/invoice-exact-package" node tools/gravicentra-i6-6-invoice-hosting-byte-readback.mjs
+          I66_NEW_POLICY_SIGNED_LIVE_ONLY=true I66_PREVIEW_ORIGIN='https://app.aysseguros.com' I66_PREVIEW_SOURCE_SHA="$SOURCE_SHA" node tools/gravicentra-i6-6-carlos-paula-new-policy-client360-preview-uat.cjs
+          completed=1
+          echo 'I66_INVOICE_EXACT_LIVE_TWO_HOSTS_READBACK_AND_SIGNED_CARLOS_PAULA_POLICY_CLIENT360_PASS'
+          echo "I66_LIVE_HOST_VERSION=$PRE_HOST" >> "$GITHUB_STEP_SUMMARY"
+          echo "I66_LIVE_PRODUCT_SOURCE=$SOURCE_SHA" >> "$GITHUB_STEP_SUMMARY"
+      - name: Retain scope, rollback and signed LIVE proof
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gi-i66-invoice-policy-exact-live-proof-${{ github.run_id }}
+          path: |
+            ${{ runner.temp }}/invoice-host-before.json
+            ${{ runner.temp }}/invoice-preview-release.json
+            ${{ runner.temp }}/invoice-payment-run-current.json
+            ${{ runner.temp }}/invoice-old-host-version
+            ${{ runner.temp }}/invoice-approved-preview-version
+          if-no-files-found: warn
+          retention-days: 30

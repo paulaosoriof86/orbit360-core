@@ -53,6 +53,24 @@
     "historicalR8LiveHostingMustStayUnchangedUntilHostingGate": true,
     "nextGate": "EXACT_IMMUTABLE_PREVIEW_SITE_TO_DUAL_ORIGIN_LIVE_AFTER_PAYMENT_BACKEND_PASS"
   },
+  "i66PaymentInvoiceHostingLiveAuthorization20261113": {
+    "status": "SIGNED_PAYMENT_LIVE_AND_POLICY_PREVIEW_SAME_ARTIFACT_HOSTING_EXACT_AUTHORIZED",
+    "authority": "Paula Dirección 2026-11-13: publicar por lotes corregidos y certificados, confirmar pólizas desde cero, Cliente360 y conciliación en producción.",
+    "sourceSha": "586401bfbe1a80cfef2820982f432743af36b108",
+    "buildRunId": 43463160506,
+    "artifactId": 14057935092,
+    "artifactDigest": "sha256:1621f236b9d1b9e49ea42fc53e338a695d5872080361ada2a84183fa7d52207f",
+    "paymentLiveBackendUatRunId": 43469115944,
+    "signedPolicyPreviewUatRunId": 43465087494,
+    "previewChannel": "gi-i66-rc-42868854629",
+    "onlyOneSameFirebaseHostingSite": true,
+    "sameImmutablePreviewVersionBothLiveDomains": true,
+    "rollbackOldHostingAndOldPaymentRevisionOnFailure": true,
+    "noNewBuild": true,
+    "noRulesAuthOtherFunctionsOrRealFinancialWrites": true,
+    "signedTwoRolesNewPolicyAndClient360LiveUatRequired": true,
+    "nextGate": "THREE_ORIGIN_EXACT_BYTE_READBACK_AND_SIGNED_LIVE_OPERATIONAL_ACCEPTANCE"
+  },
   "i66OperativeInvoiceRosterPreviewQuotaRecovery20261113": {
     "status": "R8_CURRENT_PREVIEW_LIVE_EXACT_BACKUP_AUTHORIZED_SINGLE_CHANNEL",
     "authority": "Paula Dirección 2026-11-13: solucionar selector desde Equipos, fecha factura, vigencia contractual y persistencia, probar por lote y publicar tras certificación sin acumular.",

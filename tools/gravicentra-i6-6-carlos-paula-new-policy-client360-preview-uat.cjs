@@ -1,14 +1,15 @@
 'use strict';
-// Signed, reversible Preview QA for a new policy, vehicle, receipts, portfolio,
-// scoped advisor selector and Cliente 360 hydration. Never touches real records.
+// Signed, reversible QA on exact pinned Preview or separately authorized LIVE;
+// new policy, vehicle, receipts, portfolio, selector and Cliente 360 hydration.
 const assert=require('node:assert/strict');
 const crypto=require('node:crypto');
 const admin=require('firebase-admin');
 const {chromium}=require('playwright');
-const ORIGIN='https://ays-orbit-360-lab--gi-i66-rc-42868854629-abj14q6n.web.app';
+const LIVE=process.env.I66_NEW_POLICY_SIGNED_LIVE_ONLY==='true';
+const ORIGIN=LIVE?'https://app.aysseguros.com':'https://ays-orbit-360-lab--gi-i66-rc-42868854629-abj14q6n.web.app';
 const SOURCE='586401bfbe1a80cfef2820982f432743af36b108';
 const TENANT='alianzas-soluciones';
-assert.equal(process.env.I66_PREVIEW_ORIGIN,ORIGIN,'QA_PREVIEW_ORIGIN_DRIFT');
+assert.equal(process.env.I66_PREVIEW_ORIGIN,ORIGIN,'QA_AUTHORIZED_ORIGIN_DRIFT');
 assert.equal(process.env.I66_PREVIEW_SOURCE_SHA,SOURCE,'QA_PREVIEW_SOURCE_DRIFT');
 const credential=['SA_LAB','SA_ALT','SA_DEFAULT'].map(k=>process.env[k]).filter(Boolean)
   .map(value=>{try{return JSON.parse(value);}catch{return null;}})
@@ -78,7 +79,7 @@ async function runOne(browser,actor){
         preview:provider.isI66PreviewHost(),managePolicy:Orbit.policyReceipts?.canManagePolicies?.(),
         canEdit:Orbit.access?.can?.('polizas','edit'),newPolicy:!!Orbit.modules?.cliente360?.nuevaPoliza};
     },actor.token);
-    assert.ok(session.started&&session.preview&&norm(session.role)===actor.role&&
+    assert.ok(session.started&&session.preview===!LIVE&&norm(session.role)===actor.role&&
       session.managePolicy&&session.canEdit&&session.newPolicy,
     'QA_SIGNED_ROLE_CAPABILITY_DENIED_'+actor.role+':'+JSON.stringify(session));
     await page.evaluate(async()=>{await Orbit.store._ensureCollections(['clientes','aseguradoras','polizas','vehiculos','recibosEsperados','carteraPrimas']);});
@@ -191,7 +192,7 @@ async function runOne(browser,actor){
     assert.ok(readback.policy===ids.policy&&readback.client===ids.client&&readback.linked&&
       readback.receipt&&readback.portfolio&&readback.vehicle,
     'QA_CLIENT360_RELOAD_LINKED_READBACK_HOLD_'+actor.role+':'+JSON.stringify(readback));
-    console.log('I66_NEW_POLICY_'+actor.role.toUpperCase()+'_SIGNED_PREVIEW_ATOMIC_CREATE_CLIENT360_RELOAD_PASS');
+    console.log('I66_NEW_POLICY_'+actor.role.toUpperCase()+'_SIGNED_'+(LIVE?'LIVE':'PREVIEW')+'_ATOMIC_CREATE_CLIENT360_RELOAD_PASS');
   }finally{
     const errors=[];
     for(const name of ['actividades','vehiculos','carteraPrimas','recibosEsperados','polizas']){
@@ -229,5 +230,5 @@ async function runOne(browser,actor){
   const browser=await chromium.launch({headless:true,args:['--no-sandbox']});
   try{for(const user of users)await runOne(browser,user);}
   finally{await browser.close();}
-  console.log('I66_NEW_POLICY_CLIENT360_CARLOS_PAULA_PREVIEW_SIGNED_UAT_PASS');
+  console.log('I66_NEW_POLICY_CLIENT360_CARLOS_PAULA_'+(LIVE?'LIVE':'PREVIEW')+'_SIGNED_UAT_PASS_SYNTHETIC_RESTORED');
 })().catch(error=>{console.error(error.stack||error);process.exitCode=1;});
