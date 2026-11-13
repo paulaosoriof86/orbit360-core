@@ -1,0 +1,23 @@
+{
+  "schema": "GI_I66_GOVERNANCE_CURRENT_POINTER_HISTORICAL_TRIGGER_CAUSAL_REPAIR_V1",
+  "dateGuatemala": "2026-11-13",
+  "status": "PATCH_APPLIED_SOURCE_PENDING_NEW_CENTRAL_GUARD_GITHUB_CERTIFICATION",
+  "activeGate": "I6.6",
+  "branch": "recovery/fase-a-clean-20260831",
+  "publishedProductReleaseUnaffected": "e6183a9f1da68243cc935e222d98b2d21b5f17b8",
+  "currentLiveReleaseRunId": 43388747480,
+  "currentExactHostingVersion": "sites/ays-orbit-360-lab/versions/dae5d5235978cefe",
+  "documentationSyncCommit": "499d219bf5522fa909d06682f9129f31f09241fb",
+  "centralGuardFailureRunId": 43391031562,
+  "centralGuardFailureCode": "I6_6_EXACT_LIVE_RELEASE_POINTER_OR_READER_AUTHORIZATION_DRIFT",
+  "causalGuardMismatch": "Validator hard-coded immutable 2026-11-12 R7 pointer and only allowed R7 publication statuses; 2026-11-13 exact LIVE evidence was correctly published but unrecognized by the global preflight.",
+  "correction": "Resolve dated release pointer using current CONTROL_PLANE I6.6 release record; cross-check exact source, artifact, build run, dual Hosting version, signed reader, 52+80 stage reconciliation, 0 finance writes and retired authorization flags; preserve historical R7 branch verification.",
+  "historicalUnexpectedTriggerRuns": [43391031613, 43391031682, 43391031657, 43391031635, 43391031744, 43391031838],
+  "causalHistoricalTrigger": "Old B4-001/B4-002/B4-003 and I6.5 jobs watched any CONTROL_PLANE.json update, despite those release gates already closed; they then evaluated historical source pins in a current I6.6 commit.",
+  "triggerCorrection": "Remove current CONTROL_PLANE and workflow-self changes from historical Preview push paths; retain explicit manually dispatched gates and narrowly scoped historical source-driven diagnostics. Keep the single universal release-lock governance guard on every push.",
+  "historicGateSourceOrTestDeleted": false,
+  "hostingOrBackendDeployment": false,
+  "dataMutation": false,
+  "customerFinancialWrites": 0,
+  "fullI66ProductionAccepted": false
+}

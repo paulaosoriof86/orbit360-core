@@ -2,12 +2,6 @@ name: Gravicentra B4-002 Notification Processor Preview
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - recovery/fase-a-clean-20260831
-    paths:
-      - '.github/workflows/gravicentra-b4-002-executor.yml'
-      - 'artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json'
 
 permissions:
   contents: write

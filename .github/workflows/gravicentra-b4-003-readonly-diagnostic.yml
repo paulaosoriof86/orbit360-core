@@ -12,8 +12,6 @@ on:
     branches:
       - recovery/fase-a-clean-20260831
     paths:
-      - '.github/workflows/gravicentra-b4-003-readonly-diagnostic.yml'
-      - 'artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json'
       - 'tools/gravicentra-i6-5-b4-003-r18-readonly-forensic.mjs'
       - 'tools/gravicentra-b4-003-one-pass-readonly-integrity.cjs'
       - 'artifacts/orbit360-recovery/release-control/I6_5_B4_003_INTEGRAL_AUDIT_REQUEST_20261016.json'

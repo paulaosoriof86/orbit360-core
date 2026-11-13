@@ -35,31 +35,79 @@ const i66Active=i6Active&&control.gateState?.gates?.I6?.activeSubgate==='I6.6';
 // and fail closed if mutable release summaries disagree on actual LIVE bytes.
 if(i66Active){
   const transport=JSON.parse(fs.readFileSync('artifacts/orbit360-recovery/release-control/I6_6_RELEASE_TRANSPORT_CONTROL_20261110.json','utf8'));
-  // Release pointers are immutable daily snapshots. The 11-Nov R4 pointer
-  // remains historical; the exact R5 LIVE successor is the active sidecar.
-  const pointer='artifacts/orbit360-recovery/release-control/I6_6_LATEST_EXACT_LIVE_POINTER_20261112.json';
+  // Release receipts are immutable historical snapshots. Resolve the current
+  // pointer from the latest formally recorded LIVE successor, never from an
+  // older hard-coded release date or a reusable deployment authorization.
+  const stageRelease=control.i66LatestExactLiveRelease20261113;
+  const stageCurrent=stageRelease?.status==='CURRENT_STAGE_READONLY_SIGNED_EXACT_LIVE_PASS_FINANCIAL_AND_FULL_I66_HOLD';
+  const pointer=stageCurrent
+    ?'artifacts/orbit360-recovery/release-control/I6_6_LATEST_EXACT_LIVE_POINTER_20261113.json'
+    :'artifacts/orbit360-recovery/release-control/I6_6_LATEST_EXACT_LIVE_POINTER_20261112.json';
   const latest=fs.existsSync(pointer)?JSON.parse(fs.readFileSync(pointer,'utf8')):
     control.i66LatestExactLiveRelease20261111;
   const live=transport.currentExactHostingRelease;
   const r4=transport.latestExactHostingPromotionR4;
-  const fields=[
-    [latest?.latestProductSourceSha,live?.sourceSha],
-    [latest?.latestProductBuildId,live?.buildId],
-    [latest?.immutableArtifactId,live?.artifactId],
-    [latest?.immutableArtifactZipSha256,live?.artifactDigest],
-    [latest?.releaseRunId,live?.liveCloneRunId],
-    [latest?.latestPreviewBuildRunId,live?.previewRunId],
-    [latest?.latestReleaseReceipt,live?.receipt]
-  ];
-  if(!live||!['PUBLISHED_EXACT_NOT_FULL_FUNCTIONAL_UAT','PUBLISHED_EXACT_FUNCTIONAL_UAT_PASS'].includes(live.status)||
-     fields.some(([a,b])=>!a||!b||a!==b)||
-     (live.sourceSha===r4?.sourceSha&&
-       (live.artifactId!==r4.artifactId||live.liveCloneRunId!==r4.liveCloneRunId))||
-     transport.authorizationFlagScopeClarification20261111?.exactR4LiveHostingPromotionConfirmed!==true||
-     (transport.scope==='I6_6_ACTIVE_READER_PREVIEW_AUTHORIZATION_FLAGS_WITH_HISTORICAL_EXACT_R4_LIVE_HOSTING_RECEIPT'&&
-       (transport.livePromotionAuthorized!==false||transport.previewApproved!==false))||
-     (live.status==='PUBLISHED_EXACT_NOT_FULL_FUNCTIONAL_UAT'&&latest.doNotClaimWholePlatformQaPass!==true))
-    throw new Error('I6_6_EXACT_LIVE_RELEASE_POINTER_OR_READER_AUTHORIZATION_DRIFT');
+  const guard='I6_6_EXACT_LIVE_RELEASE_POINTER_OR_READER_AUTHORIZATION_DRIFT';
+  if(stageCurrent){
+    const receipt=transport.i66ConciliacionesStageExactLiveCompleted20261113;
+    const currentState=JSON.parse(fs.readFileSync('orbit360-platform/docs/recovery/orbit360-recovery-state-v1.json','utf8'));
+    const preceding=JSON.parse(fs.readFileSync('artifacts/orbit360-recovery/release-control/I6_6_LATEST_EXACT_LIVE_POINTER_20261112.json','utf8'));
+    const fields=[
+      [latest.currentLiveSourceSha,live?.sourceSha],
+      [latest.currentLiveSourceSha,stageRelease.sourceSha],
+      [latest.currentLiveSourceSha,receipt?.sourceSha],
+      [latest.currentLiveSourceSha,currentState.currentLiveSuccessorAcceptance?.sourceSha],
+      [latest.currentLiveArtifactId,live?.artifactId],
+      [latest.currentLiveArtifactId,stageRelease.immutableArtifactId],
+      [latest.currentLiveArtifactId,receipt?.immutableArtifactId],
+      [latest.currentLiveArtifactDigest,live?.artifactDigest],
+      [latest.currentLiveArtifactDigest,receipt?.immutableArtifactDigest],
+      [latest.currentLiveDeployAndSignedQaRunId,live?.liveCloneRunId],
+      [latest.currentLiveDeployAndSignedQaRunId,receipt?.signedLiveDeployAndQaRun],
+      [latest.currentLiveHostingVersion,live?.liveHostingVersion],
+      [latest.currentLiveHostingVersion,stageRelease.immutableLiveVersionBothOrigins],
+      [latest.currentLiveHostingVersion,receipt?.effectiveLiveHostingVersion],
+      [latest.currentLiveImmutableBuildRunId,live?.previewRunId],
+      [latest.currentLiveReceipt,receipt?.receipt],
+      [latest.currentLiveDeployAndSignedQaRunId,currentState.currentLiveSuccessorAcceptance?.currentExactHostingRunId],
+      [pointer,live?.receipt],
+      [preceding.deployedHostingVersion,receipt?.priorR7HostingRollback]
+    ];
+    if(fields.some(([a,b])=>a==null||b==null||a!==b)||
+       live?.status!=='PUBLISHED_EXACT_STAGE_READONLY_SIGNED_DUAL_ORIGIN_NOT_FULL_FINANCIAL_UAT'||
+       latest.status!=='LATEST_STAGE_READONLY_EXACT_ARTIFACT_DUAL_ORIGIN_SIGNED_LIVE_PASS_FULL_I66_FINANCIAL_ACCEPTANCE_HOLD'||
+       latest.currentLiveArtifactId!==14018512857||latest.currentLiveDeployAndSignedQaRunId!==43388747480||
+       receipt?.directionRealSignedLive!=='52_OF_52_UNIQUE_STAGE_PROPOSALS_UI_VISIBLE_READONLY_BOTH_ORIGINS_PASS'||
+       receipt?.operativoCarlosRealSignedLive!=='CONCILIACIONES_UNASSIGNED_DENIED_BOTH_ORIGINS_PASS'||
+       receipt?.stagedProposals!==132||receipt.uniqueRendered!==52||receipt.ambiguousHold!==80||
+       receipt.financialWrites!==0||stageRelease.realFinancialWritesInCurrentRelease!==0||
+       receipt.fullI66FinancialProductionAcceptance!==false||stageRelease.currentI66ProductionAccepted!==false||
+       currentState.currentLiveSuccessorAcceptance?.currentSuccessorProductionAccepted!==false||
+       latest.fullI66ProductionAccepted!==false||
+       transport.livePromotionAuthorized!==false||transport.previewApproved!==false||
+       transport.forbidBackendFunctionDeploy!==true||transport.forbidBackendLiveFunctionDeploy!==true||
+       transport.forbidFirestoreRulesDataAuthWrites!==true||transport.noHostingPromotion!==true)
+      throw new Error(guard);
+  }else{
+    const fields=[
+      [latest?.latestProductSourceSha,live?.sourceSha],
+      [latest?.latestProductBuildId,live?.buildId],
+      [latest?.immutableArtifactId,live?.artifactId],
+      [latest?.immutableArtifactZipSha256,live?.artifactDigest],
+      [latest?.releaseRunId,live?.liveCloneRunId],
+      [latest?.latestPreviewBuildRunId,live?.previewRunId],
+      [latest?.latestReleaseReceipt,live?.receipt]
+    ];
+    if(!live||!['PUBLISHED_EXACT_NOT_FULL_FUNCTIONAL_UAT','PUBLISHED_EXACT_FUNCTIONAL_UAT_PASS'].includes(live.status)||
+       fields.some(([a,b])=>!a||!b||a!==b)||
+       (live.sourceSha===r4?.sourceSha&&
+         (live.artifactId!==r4.artifactId||live.liveCloneRunId!==r4.liveCloneRunId))||
+       transport.authorizationFlagScopeClarification20261111?.exactR4LiveHostingPromotionConfirmed!==true||
+       (transport.scope==='I6_6_ACTIVE_READER_PREVIEW_AUTHORIZATION_FLAGS_WITH_HISTORICAL_EXACT_R4_LIVE_HOSTING_RECEIPT'&&
+         (transport.livePromotionAuthorized!==false||transport.previewApproved!==false))||
+       (live.status==='PUBLISHED_EXACT_NOT_FULL_FUNCTIONAL_UAT'&&latest.doNotClaimWholePlatformQaPass!==true))
+      throw new Error(guard);
+  }
 }
 const activeGuard=i66Active?i66Guard:(i6Active?i6Guard:(postI5?postI5Guard:preI5Guard));
 const evergreenGuard='tools/gravicentra-evergreen-sources-invariant-v2.mjs';

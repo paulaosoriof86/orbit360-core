@@ -39,7 +39,6 @@ on:
     branches:
       - recovery/fase-a-clean-20260831
     paths:
-      - '.github/workflows/gravicentra-b4-003-executor.yml'
       - 'tools/gravicentra-b4-003-isolated-tenant-config-package.cjs'
       - 'tools/gravicentra-b4-003-live-tenant-config-readback.cjs'
       - 'tools/gravicentra-b4-003-live-tenant-config-transport.test.cjs'
@@ -78,7 +77,6 @@ on:
       - 'tools/gravicentra-live-preexisting-drift-snapshot.mjs'
       - 'tools/gravicentra-quote-authority-contract-v1.mjs'
       - 'orbit360-platform/core/quote-authority-contract-v1.js'
-      - 'artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json'
 
 permissions:
   contents: write

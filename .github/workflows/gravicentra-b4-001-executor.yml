@@ -2,11 +2,6 @@ name: Gravicentra B4-001 Canonical Gestion Preview
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - recovery/fase-a-clean-20260831
-    paths:
-      - 'artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json'
 
 permissions:
   contents: write

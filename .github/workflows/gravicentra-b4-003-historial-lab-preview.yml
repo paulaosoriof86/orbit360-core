@@ -6,8 +6,6 @@ on:
     branches:
       - recovery/fase-a-clean-20260831
     paths:
-      - .github/workflows/gravicentra-b4-003-historial-lab-preview.yml
-      - artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json
       - artifacts/orbit360-recovery/release-control/I6_5_B4_003_HISTORIAL_ROLE_PARITY_SUCCESSOR_20261028.json
       - artifacts/orbit360-recovery/release-control/I6_5_B4_003_HISTORIAL_CI_DEPENDENCY_20261028.json
       - artifacts/orbit360-recovery/release-control/I6_5_B4_003_HISTORIAL_READER_SUCCESSOR_20261028.json

@@ -10,7 +10,6 @@ on:
    branches:
     - recovery/fase-a-clean-20260831
    paths:
-    - 'artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json'
     - 'artifacts/orbit360-recovery/release-control/I6_3_CLIENTES_SOURCE_INTAKE_20260918.json'
     - 'artifacts/orbit360-recovery/release-control/I6_4_POLIZAS_RIESGOS_SOURCE_INTAKE_20260918.json'
     - 'artifacts/orbit360-recovery/release-control/I6_5_RECIBOS_CARTERA_SOURCE_INTAKE_20260918.json'
