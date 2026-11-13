@@ -1,0 +1,282 @@
+# I6.6 critical-role release. Same immutable artifact as signed Preview; only
+# three existing production functions, followed by exact Hosting version clone.
+# Entire three-function/dual-origin change rolls back on any missing evidence.
+name: Gravicentra I6.6 Five Role Three Function Exact LIVE With Rollback
+on:
+  push:
+    branches: [recovery/fase-a-clean-20260831]
+    paths:
+      - .github/workflows/gravicentra-i66-privileged-role-exact-live-promotion.yml
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: gi-i66-privileged-role-three-function-exact-live
+  cancel-in-progress: false
+jobs:
+  exact-role-live:
+    if: github.repository == 'paulaosoriof86/orbit360-core' && github.ref == 'refs/heads/recovery/fase-a-clean-20260831'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 65
+    env:
+      PROJECT_ID: ays-orbit-360-lab
+      SITE: ays-orbit-360-lab
+      I66_ROLE_SOURCE_SHA: 0153f5cbbe00c3732e11ebae59b32bd357e38bfd
+      I66_ROLE_BUILD_RUN: '43371940341'
+      I66_ROLE_ARTIFACT_ID: '14013250472'
+      I66_ROLE_ARTIFACT_DIGEST: sha256:a1e16528689cc02336a3d753e3086c95eeedce92f753d14de20e790552b9f461
+      I66_ROLE_PREVIEW_CHANNEL: gi-i66-rc-42868854629
+      I66_ROLE_PREVIEW_ORIGIN: https://ays-orbit-360-lab--gi-i66-rc-42868854629-abj14q6n.web.app
+      I66_ROLE_SIGNED_MATRIX_RUN: '43375403003'
+      GH_TOKEN: ${{ github.token }}
+      SA_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_ALT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Gate exact signed Preview, unchanged product owners and immutable artifact
+        run: |
+          set -euo pipefail
+          git cat-file -e "$I66_ROLE_SOURCE_SHA^{commit}"
+          git merge-base --is-ancestor "$I66_ROLE_SOURCE_SHA" HEAD
+          test -z "$(git diff --name-only "$I66_ROLE_SOURCE_SHA" HEAD -- orbit360-platform functions firebase.json firestore.rules storage.rules)"
+          node --check tools/gravicentra-i6-6-carlos-paula-live-synthetic-ops-leads-uat.cjs
+          node --check tools/gravicentra-i66-privileged-role-signed-ui-permissions-readonly.cjs
+          node --check tools/gravicentra-i66-privileged-role-exact-live-transport.mjs
+          node tools/gravicentra-i6-6-delta-guard.mjs > "$RUNNER_TEMP/gi-role-source-guard.log"
+          node --test tools/gravicentra-i6-6-privileged-role-portfolio-parity.test.cjs tools/gravicentra-i6-6-privileged-role-writer-transaction.test.cjs
+          node - <<'NODE'
+          const assert=require('node:assert/strict');
+          const c=require('./artifacts/orbit360-recovery/release-control/I6_6_RELEASE_TRANSPORT_CONTROL_20261110.json');
+          const p=c.i66PrivilegedRoleLiveAuthorization20261112||{};
+          assert.equal(c.status,'PRIVILEGED_ROLE_EXACT_LIVE_PROMOTION_AUTHORIZED');
+          assert.equal(c.gate,'I6.6');assert.equal(c.historicalClosedGate,'B4-007');
+          assert.equal(c.livePromotionAuthorized,true);assert.equal(c.previewApproved,true);
+          assert.equal(c.backendFunctionPreviewOnly,false);assert.equal(c.forbidBackendLiveFunctionDeploy,false);
+          assert.equal(c.noHostingPromotion,false);assert.equal(c.forbidFirestoreRulesDataAuthWrites,true);
+          assert.equal(p.status,'EXACT_PREVIEW_SIGNED_TWO_ACTORS_THREE_NEW_REVISIONS_LIVE_AUTHORIZED');
+          assert.equal(p.sourceSha,process.env.I66_ROLE_SOURCE_SHA);
+          assert.equal(p.artifactId,Number(process.env.I66_ROLE_ARTIFACT_ID));
+          assert.equal(p.artifactDigest,process.env.I66_ROLE_ARTIFACT_DIGEST);
+          assert.equal(p.buildRun,Number(process.env.I66_ROLE_BUILD_RUN));
+          assert.equal(p.signedRealRoleMatrixPreviewRun,Number(process.env.I66_ROLE_SIGNED_MATRIX_RUN));
+          assert.deepEqual(p.liveTargets,[
+            {name:'orbit360ProductOperationalCommand',region:'us-central1'},
+            {name:'orbit360OpsLeadsCommand',region:'us-central1'},
+            {name:'orbit360ScopedPolicyRead',region:'us-east1'}]);
+          assert.equal(p.frontendClonePreviewVersionOnly,true);
+          assert.equal(p.noBusinessOrRealFinancialWrites,true);
+          assert.equal(p.rollbackThreeBackendRevisionsAndHosting,true);
+          assert.deepEqual(p.intentionallyInvisibleOperativoModules,['cancelaciones','comisiones']);
+          (async()=>{
+            const h={Authorization:'Bearer '+process.env.GH_TOKEN,Accept:'application/vnd.github+json','User-Agent':'GI-I66-Role-Exact-LIVE'};
+            const url='https://api.github.com/repos/paulaosoriof86/orbit360-core/actions/';
+            const ids=[43371135912,Number(process.env.I66_ROLE_BUILD_RUN),43372778111,43373253757,43374139073,Number(process.env.I66_ROLE_SIGNED_MATRIX_RUN)];
+            const runs=await Promise.all(ids.map(id=>fetch(url+'runs/'+id,{headers:h}).then(r=>{assert.ok(r.ok);return r.json();})));
+            for(let i=0;i<runs.length;i++)assert.equal(runs[i].conclusion,'success','I66_ROLE_PREREQUISITE_NOT_ACCEPTED_'+ids[i]);
+            assert.equal(runs[1].head_sha,process.env.I66_ROLE_SOURCE_SHA);
+            const a=await fetch(url+'artifacts/'+process.env.I66_ROLE_ARTIFACT_ID,{headers:h}).then(r=>{assert.ok(r.ok);return r.json();});
+            assert.equal(a.workflow_run.id,Number(process.env.I66_ROLE_BUILD_RUN));
+            assert.equal(a.digest,process.env.I66_ROLE_ARTIFACT_DIGEST);
+            assert.equal(a.expired,false);
+            console.log('I66_EXACT_ROLE_LIVE_ALL_SIX_PRIOR_GATES_AND_IMMUTABLE_ARCHIVE_PASS');
+          })().catch(e=>{console.error(e.message);process.exitCode=1;});
+          NODE
+      - uses: actions/download-artifact@v4
+        with:
+          artifact-ids: 14013250472
+          run-id: 43371940341
+          github-token: ${{ github.token }}
+          path: ${{ runner.temp }}/gi-i66-role-live-archive
+      - name: Read immutable TAR and exact backend and frontend source without rebuilding
+        run: |
+          set -euo pipefail
+          DL="$RUNNER_TEMP/gi-i66-role-live-archive"
+          mapfile -t TARS < <(find "$DL" -maxdepth 3 -type f -name 'gi-i66-exact-package.tar.gz')
+          mapfile -t SUMS < <(find "$DL" -maxdepth 3 -type f -name 'gi-i66-exact-package.sha256')
+          test "${#TARS[@]}" -eq 1 && test "${#SUMS[@]}" -eq 1
+          test "$(dirname "${TARS[0]}")" = "$(dirname "${SUMS[0]}")"
+          test "$(sha256sum "${TARS[0]}" | awk '{print $1}')" = "$(awk '{print $1}' "${SUMS[0]}")"
+          FROOT="$RUNNER_TEMP/gi-i66-role-live-package"
+          mkdir -p "$FROOT"
+          tar -xzf "${TARS[0]}" -C "$FROOT" --no-same-owner
+          export I66_PACKAGE_ROOT="$FROOT"
+          node - <<'NODE'
+          const assert=require('node:assert/strict'),fs=require('node:fs'),{execFileSync}=require('node:child_process');
+          const p=process.env.I66_PACKAGE_ROOT+'/bundle';
+          const m=JSON.parse(fs.readFileSync(p+'/site/__recovery__/build.json','utf8'));
+          assert.equal(m.sourceSha,process.env.I66_ROLE_SOURCE_SHA);
+          assert.equal(m.gate,'I6.6');assert.equal(m.product,'Gravicentra Insurance');
+          for(const [target,source] of [
+            ['backend/b4-003-scoped-access-boundary.js','functions/b4-003-scoped-access-boundary.js'],
+            ['backend/product-operational-domain.js','functions/product-operational-domain.js'],
+            ['backend/product-ops-leads-domain.js','functions/product-ops-leads-domain.js'],
+            ['site/core/access-scope.js','orbit360-platform/core/access-scope.js']
+          ])assert.ok(fs.readFileSync(p+'/'+target).equals(execFileSync('git',['show',process.env.I66_ROLE_SOURCE_SHA+':'+source])),'I66_ROLE_PRODUCT_OWNER_BYTES_DIFFER:'+source);
+          assert.ok(fs.existsSync(p+'/backend/bootstrap.js')&&fs.existsSync(p+'/backend/package-lock.json'));
+          console.log('I66_ROLE_ORIGINAL_PREVIEW_ARTIFACT_EXACT_BACKEND_AND_FRONTEND_BYTES_PASS');
+          NODE
+          (cd "$FROOT/bundle/backend" && npm ci --ignore-scripts --no-audit --no-fund >/dev/null)
+          printf '{"functions":{"source":"backend","runtime":"nodejs22"}}\n' > "$FROOT/bundle/firebase.json"
+          echo "I66_PACKAGE_ROOT=$FROOT" >> "$GITHUB_ENV"
+          echo "I66_LIVE_FIREBASE_CONFIG=$FROOT/bundle/firebase.json" >> "$GITHUB_ENV"
+      - name: Authenticate existing same-project LAB credentials and install pinned tools
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/gi-role-live-auth"
+          python3 - <<'PY'
+          import os,json,pathlib
+          root=pathlib.Path(os.environ['RUNNER_TEMP'])/'gi-role-live-auth'
+          found=[]
+          for i,k in enumerate(('SA_LAB','SA_ALT','SA_DEFAULT')):
+              try:v=json.loads(os.environ.get(k,''))
+              except (ValueError,TypeError):continue
+              if v.get('type')=='service_account' and v.get('project_id')=='ays-orbit-360-lab' and v.get('private_key'):
+                  f=root/f'{i}.json';f.write_text(json.dumps(v));f.chmod(0o600);found.append(str(f))
+          if not found:raise SystemExit('I66_ROLE_SIGNED_CONFIGURED_CREDENTIAL_MISSING')
+          (root/'candidates').write_text('\n'.join(found)+'\n')
+          PY
+          npm install --prefix "$RUNNER_TEMP/gi-role-live-cli" --no-save --ignore-scripts --no-audit --no-fund firebase-tools@14.10.1 >/dev/null
+          node tools/gravicentra-firebase-tools-empty-extensions-workaround-v1.mjs "$RUNNER_TEMP/gi-role-live-cli"
+          CLI="$RUNNER_TEMP/gi-role-live-cli/node_modules/firebase-tools/lib/bin/firebase.js"
+          selected=''
+          while IFS= read -r f;do
+            if GOOGLE_APPLICATION_CREDENTIALS="$f" node "$CLI" functions:list --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/gi-role-live-functions-before.json" 2>/dev/null;then selected="$f";break;fi
+          done < "$RUNNER_TEMP/gi-role-live-auth/candidates"
+          test -n "$selected"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$selected" >> "$GITHUB_ENV"
+          echo "FIREBASE_CLI_BIN=$CLI" >> "$GITHUB_ENV"
+          npm install --no-save --package-lock=false --ignore-scripts --no-audit --no-fund google-auth-library@10.9.1 firebase-admin@13.4.0 playwright@1.55.0 >/dev/null
+          node node_modules/playwright/cli.js install --with-deps chromium >/dev/null
+      - uses: google-github-actions/setup-gcloud@v2
+        with:
+          version: '>= 483.0.0'
+      - name: Test signed existing Carlos and Direction Preview eight-module permissions before touching LIVE
+        run: |
+          set -euo pipefail
+          node tools/gravicentra-i66-privileged-role-signed-ui-permissions-readonly.cjs
+          echo 'I66_LIVE_PREFLIGHT_TWO_REAL_SIGNED_ACTORS_ALL_VISIBLE_MODULES_PERMISSIONS_PASS_NO_WRITES'
+      - name: Snapshot exact LIVE function revisions, inventory and previous Hosting version for rollback
+        run: |
+          set -euo pipefail
+          gcloud auth activate-service-account --key-file="$GOOGLE_APPLICATION_CREDENTIALS" --quiet >/dev/null
+          gcloud config set project "$PROJECT_ID" --quiet >/dev/null
+          node - <<'NODE'
+          const assert=require('node:assert/strict'),a=require(process.env.RUNNER_TEMP+'/gi-role-live-functions-before.json');
+          const rows=Array.isArray(a.result)?a.result:Array.isArray(a)?a:[];
+          const id=x=>String(x.entryPoint||x.id||x.name||'').split('/').pop();
+          for(const [name,region] of [['orbit360ProductOperationalCommand','us-central1'],['orbit360OpsLeadsCommand','us-central1'],['orbit360ScopedPolicyRead','us-east1']]){
+            const match=rows.filter(x=>id(x)===name);assert.equal(match.length,1,'I66_ROLE_EXISTING_LIVE_TARGET_NOT_UNIQUE_'+name);
+            assert.equal(String(match[0].region||match[0].location||region),region,'I66_ROLE_LIVE_TARGET_REGION_DRIFT');
+          }
+          console.log('I66_ROLE_THREE_PREEXISTING_LIVE_TARGETS_ONLY_PASS');
+          NODE
+          : > "$RUNNER_TEMP/gi-role-live-old-revisions.tsv"
+          for PAIR in orbit360ProductOperationalCommand:us-central1 orbit360OpsLeadsCommand:us-central1 orbit360ScopedPolicyRead:us-east1;do
+            FN="${PAIR%:*}";REGION="${PAIR#*:}";export FN REGION
+            gcloud functions describe "$FN" --gen2 --region "$REGION" --project "$PROJECT_ID" --format=json > "$RUNNER_TEMP/gi-role-before-fn.json"
+            SERVICE=$(node - <<'NODE'
+          const f=require(process.env.RUNNER_TEMP+'/gi-role-before-fn.json');
+          const route=String(f.serviceConfig?.service||''),s=route.split('/').at(-1);
+          if(!route.includes('/locations/'+process.env.REGION+'/services/')||!/^[a-z][a-z0-9-]+$/.test(s))throw Error('I66_ROLE_PREVIOUS_FUNCTION_SCOPE_NOT_EXACT');
+          process.stdout.write(s);
+          NODE
+            )
+            export SERVICE
+            gcloud run services describe "$SERVICE" --region "$REGION" --project "$PROJECT_ID" --format=json > "$RUNNER_TEMP/gi-role-before-service.json"
+            OLD_REV=$(node - <<'NODE'
+          const r=require(process.env.RUNNER_TEMP+'/gi-role-before-service.json');
+          const active=(r.status?.traffic||r.traffic||[]).filter(x=>Number(x.percent)>0);
+          const rev=String(active[0]?.revisionName||active[0]?.revision||'');
+          if(active.length!==1||Number(active[0].percent)!==100||!rev.startsWith(process.env.SERVICE+'-'))throw Error('I66_ROLE_PREVIOUS_LIVE_TRAFFIC_NOT_PINNED');
+          process.stdout.write(rev);
+          NODE
+            )
+            printf '%s|%s|%s|%s\n' "$FN" "$REGION" "$SERVICE" "$OLD_REV" >> "$RUNNER_TEMP/gi-role-live-old-revisions.tsv"
+          done
+          test "$(wc -l < "$RUNNER_TEMP/gi-role-live-old-revisions.tsv")" -eq 3
+          TOKEN="$(gcloud auth print-access-token)"
+          curl -fsSL --max-time 25 -H "Authorization: Bearer $TOKEN" \
+            "https://firebasehosting.googleapis.com/v1beta1/sites/$SITE/channels/live/releases?pageSize=1" \
+            > "$RUNNER_TEMP/gi-role-live-before-hosting.json"
+          unset TOKEN
+          OLD_VERSION=$(node - <<'NODE'
+          const r=require(process.env.RUNNER_TEMP+'/gi-role-live-before-hosting.json');
+          const s=String(r.releases?.[0]?.version?.name||'');
+          const m=s.match(/^sites\/ays-orbit-360-lab\/versions\/([A-Za-z0-9_-]+)$/);
+          if(!m)throw Error('I66_ROLE_PREVIOUS_HOSTING_VERSION_NOT_PINNED');
+          process.stdout.write(m[1]);
+          NODE
+          )
+          echo "I66_ROLE_ROLLBACK_HOSTING_VERSION=$OLD_VERSION" >> "$GITHUB_ENV"
+          echo 'I66_ROLE_PREVIOUS_THREE_REVISIONS_AND_HOSTING_IMMUTABLE_ROLLBACK_POINTER_PASS'
+      - name: Deploy exact three LIVE backend revisions and clone exact Preview artifact with automatic rollback
+        env:
+          I66_APPROVED_LIVE_SOURCE_SHA: 0153f5cbbe00c3732e11ebae59b32bd357e38bfd
+          I66_LIVE_ORIGIN: https://app.aysseguros.com
+        run: |
+          set -euo pipefail
+          completed=0;started=0
+          rollback(){
+            code=$?
+            if test "$started" = 1 && test "$completed" != 1;then
+              set +e;failed=0
+              while IFS='|' read -r FN REGION SERVICE OLD_REV;do
+                gcloud run services update-traffic "$SERVICE" --region "$REGION" --project "$PROJECT_ID" --to-revisions="$OLD_REV=100" --quiet || failed=1
+              done < "$RUNNER_TEMP/gi-role-live-old-revisions.tsv"
+              node "$FIREBASE_CLI_BIN" hosting:clone "$SITE@$I66_ROLE_ROLLBACK_HOSTING_VERSION" "$SITE:live" --project "$PROJECT_ID" --non-interactive || failed=1
+              echo "I66_ROLE_AUTO_ROLLBACK_FAILURE_COUNT=$failed"
+              if test "$failed" != 0;then echo 'I66_ROLE_CRITICAL_ROLLBACK_NOT_VERIFIED';fi
+            fi
+            exit "$code"
+          }
+          trap rollback EXIT
+          started=1
+          node "$FIREBASE_CLI_BIN" deploy \
+            --only functions:orbit360ProductOperationalCommand,functions:orbit360OpsLeadsCommand,functions:orbit360ScopedPolicyRead \
+            --config "$I66_LIVE_FIREBASE_CONFIG" --project "$PROJECT_ID" --non-interactive
+          while IFS='|' read -r FN REGION SERVICE OLD_REV;do
+            gcloud run services update-traffic "$SERVICE" --region "$REGION" --project "$PROJECT_ID" --to-latest --quiet
+            export FN REGION SERVICE OLD_REV
+            gcloud functions describe "$FN" --gen2 --region "$REGION" --project "$PROJECT_ID" --format=json > "$RUNNER_TEMP/gi-role-after-fn.json"
+            gcloud run services describe "$SERVICE" --region "$REGION" --project "$PROJECT_ID" --format=json > "$RUNNER_TEMP/gi-role-after-service.json"
+            node - <<'NODE'
+          const f=require(process.env.RUNNER_TEMP+'/gi-role-after-fn.json');
+          const s=require(process.env.RUNNER_TEMP+'/gi-role-after-service.json');
+          const newRev=String(f.serviceConfig?.revision||''),active=(s.status?.traffic||s.traffic||[]).filter(x=>Number(x.percent)>0);
+          if(!['ACTIVE','READY'].includes(String(f.state||'').toUpperCase())||newRev===process.env.OLD_REV||
+            active.length!==1||Number(active[0].percent)!==100||
+            String(active[0].revisionName||active[0].revision)!==newRev)throw Error('I66_ROLE_NEW_LIVE_FUNCTION_REVISION_NOT_EFFECTIVE:'+process.env.FN);
+          console.log('I66_ROLE_NEW_LIVE_FUNCTION_EFFECTIVE_100_PERCENT_PASS '+process.env.FN);
+          NODE
+          done < "$RUNNER_TEMP/gi-role-live-old-revisions.tsv"
+          node tools/gravicentra-i66-privileged-role-exact-live-transport.mjs
+          I66_SIGNED_MATRIX_ORIGIN=https://app.aysseguros.com node tools/gravicentra-i66-privileged-role-signed-ui-permissions-readonly.cjs
+          node tools/gravicentra-i6-6-carlos-paula-live-synthetic-ops-leads-uat.cjs
+          node "$FIREBASE_CLI_BIN" functions:list --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/gi-role-live-functions-after.json"
+          node - <<'NODE'
+          const assert=require('node:assert/strict');
+          const before=require(process.env.RUNNER_TEMP+'/gi-role-live-functions-before.json');
+          const after=require(process.env.RUNNER_TEMP+'/gi-role-live-functions-after.json');
+          const rows=x=>Array.isArray(x.result)?x.result:Array.isArray(x)?x:[];
+          const id=x=>String(x.entryPoint||x.id||x.name||'').split('/').pop();
+          assert.deepEqual(rows(before).map(id).sort(),rows(after).map(id).sort(),'I66_ROLE_NON_TARGET_FUNCTION_INVENTORY_CHANGED');
+          console.log('I66_ROLE_LIVE_FUNCTION_INVENTORY_NON_TARGET_UNCHANGED_PASS');
+          NODE
+          completed=1
+          trap - EXIT
+          echo 'I66_ROLE_THREE_FUNCTIONS_SAME_IMMUTABLE_HOSTING_SIGNED_CARLOS_PAULA_LIVE_PASS'
+      - name: Preserve PII-free immutable release proof
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gi-i66-role-exact-live-proof-${{ github.run_id }}
+          path: ${{ runner.temp }}/i66-role-live-exact-proof.json
+          retention-days: 30
+          if-no-files-found: warn

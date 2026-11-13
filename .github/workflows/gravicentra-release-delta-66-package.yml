@@ -86,6 +86,25 @@ jobs:
             privileged.hostingPreviewChannelId==='gi-i66-rc-42868854629'&&
             JSON.stringify(privileged.backendPreviewTargets)===JSON.stringify(carlosTargets)&&
             privileged.backendPreviewRegion==='us-east1';
+          const liveRole=c.i66PrivilegedRoleLiveAuthorization20261112||{};
+          const privilegedLive=c.status==='PRIVILEGED_ROLE_EXACT_LIVE_PROMOTION_AUTHORIZED'&&
+            c.forbidBackendFunctionDeploy===false&&c.backendFunctionPreviewOnly===false&&
+            c.forbidBackendLiveFunctionDeploy===false&&c.livePromotionAuthorized===true&&
+            c.previewApproved===true&&c.forbidFirestoreRulesDataAuthWrites===true&&c.noHostingPromotion===false&&
+            liveRole.status==='EXACT_PREVIEW_SIGNED_TWO_ACTORS_THREE_NEW_REVISIONS_LIVE_AUTHORIZED'&&
+            liveRole.sourceSha==='0153f5cbbe00c3732e11ebae59b32bd357e38bfd'&&
+            liveRole.buildRun===43371940341&&liveRole.artifactId===14013250472&&
+            liveRole.artifactDigest==='sha256:a1e16528689cc02336a3d753e3086c95eeedce92f753d14de20e790552b9f461'&&
+            liveRole.signedCarlosAndDirectionWorkflowPreviewRun===43372778111&&
+            liveRole.threePreviewEffectiveRevisionRun===43373253757&&
+            liveRole.realTenantRoleMatrixReadOnlyRun===43374139073&&
+            Number.isSafeInteger(liveRole.signedRealRoleMatrixPreviewRun)&&liveRole.signedRealRoleMatrixPreviewRun>0&&
+            JSON.stringify(liveRole.liveTargets)===JSON.stringify([
+              {name:'orbit360ProductOperationalCommand',region:'us-central1'},
+              {name:'orbit360OpsLeadsCommand',region:'us-central1'},
+              {name:'orbit360ScopedPolicyRead',region:'us-east1'}])&&
+            liveRole.frontendClonePreviewVersionOnly===true&&liveRole.noBusinessOrRealFinancialWrites===true&&
+            liveRole.rollbackThreeBackendRevisionsAndHosting===true;
           const reader=c.readerPreviewAuthorization||{};
           const readerPreview=c.status==='CONCILIACIONES_READER_PREVIEW_AUTHORIZED'&&
             c.backendFunctionPreviewOnly===true&&c.forbidBackendLiveFunctionDeploy===true&&
@@ -102,7 +121,7 @@ jobs:
             c.immutableArtifactZipDigest==='sha256:dc22a21b1bda7812196303442256df18759b3cd6544db53df3f11c634250368d'&&
             c.sourcePreviewChannelId==='gi-i66-rc-43139926207'&&
             c.sourcePreviewUrl==='https://ays-orbit-360-lab--gi-i66-rc-43139926207-ua8r8jvc.web.app';
-          if(c.schema!=='GRAVICENTRA_I6_6_SINGLE_ARTIFACT_RELEASE_TRANSPORT_V1'||c.gate!=='I6.6'||c.historicalClosedGate!=='B4-007'||(c.forbidBackendFunctionDeploy!==true&&!scopedPreview&&!scopedLive&&!scopedCarlosLive&&!readerPreview&&!carlosFunctionPreview&&!privilegedPreview)||c.forbidFirestoreRulesDataAuthWrites!==true)throw Error('I66_TRANSPORT_SCOPE_INVALID');
+          if(c.schema!=='GRAVICENTRA_I6_6_SINGLE_ARTIFACT_RELEASE_TRANSPORT_V1'||c.gate!=='I6.6'||c.historicalClosedGate!=='B4-007'||(c.forbidBackendFunctionDeploy!==true&&!scopedPreview&&!scopedLive&&!scopedCarlosLive&&!readerPreview&&!carlosFunctionPreview&&!privilegedPreview&&!privilegedLive)||c.forbidFirestoreRulesDataAuthWrites!==true)throw Error('I66_TRANSPORT_SCOPE_INVALID');
           if((scopedPreview||scopedLive||scopedCarlosLive||readerPreview)&&(!/^[0-9a-f]{40}$/.test(c.approvedSourceSha||'')||!(c.sourceBuildWorkflowRunId>0)||!(c.immutableArtifactId>0)||!/^[0-9a-f]{64}$/.test(String(c.immutableArtifactZipDigest||'').replace(/^sha256:/,''))))throw Error('I66_SCOPED_RELEASE_PROOF_MISSING');
           let mode='disabled',source='';
           if(c.status==='PREVIEW_BUILD_REQUESTED'&&c.livePromotionAuthorized===false)mode='package';

@@ -7,7 +7,10 @@ const crypto=require('node:crypto');
 const admin=require('firebase-admin');
 const {chromium}=require('playwright');
 const LIVE='https://app.aysseguros.com',TENANT='alianzas-soluciones';
-const SHA='1dd675ed59ac51fd122915ca8056f85f82fa12d6';
+// Historical UAT keeps its original pin. A new exact-artifact LIVE gate may
+// explicitly select its own certified source without mutating customer data.
+const SHA=process.env.I66_APPROVED_LIVE_SOURCE_SHA||'1dd675ed59ac51fd122915ca8056f85f82fa12d6';
+assert.match(SHA,/^[0-9a-f]{40}$/,'I66_LIVE_UAT_SOURCE_PIN_REQUIRED');
 const norm=x=>String(x||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();
 const hash=x=>crypto.createHash('sha256').update(x).digest('hex');
 const tokenSecrets=['SA_LAB','SA_ALT','SA_DEFAULT'].map(k=>process.env[k]).filter(Boolean)
