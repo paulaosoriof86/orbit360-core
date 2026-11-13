@@ -51,6 +51,14 @@ if(i66Active){
     control.i66LatestExactLiveRelease20261111;
   const live=transport.currentExactHostingRelease;
   const r4=transport.latestExactHostingPromotionR4;
+  const previewReaderScope=['CONCILIACIONES_STAGE_READER_PREVIEW_AUTHORIZED',
+    'CONCILIACIONES_STAGE_SIGNED_PREVIEW_UAT_REQUESTED'].includes(transport.status)&&
+    transport.forbidBackendFunctionDeploy===false&&
+    transport.forbidBackendLiveFunctionDeploy===true&&
+    transport.backendFunctionPreviewOnly===true&&
+    transport.i66ConciliacionesHumanNameReaderPreviewAuthorization20261113?.targetFunction==='orbit360ScopedPolicyReadPreview'&&
+    transport.i66ConciliacionesHumanNameReaderPreviewAuthorization20261113?.dataWritesPermitted===false&&
+    transport.noHostingPromotion===true&&transport.forbidFirestoreRulesDataAuthWrites===true;
   const guard='I6_6_EXACT_LIVE_RELEASE_POINTER_OR_READER_AUTHORIZATION_DRIFT';
   if(r9Current){
     const receipt=JSON.parse(fs.readFileSync('artifacts/orbit360-recovery/release-control/I6_6_PAYMENT_INVOICE_POLICY_R9_LIVE_RECEIPT_20261113.json','utf8'));
@@ -110,7 +118,7 @@ if(i66Active){
        priorR8.schema!=='GI_I66_ROLE_TRANSVERSAL_R8_LIVE_RECEIPT_V1'||
        priorR8.sourceSha!=='8a0e904500cbb3c961d83f16517caab69df88a2b'||
        stageRelease.sourceSha!=='e6183a9f1da68243cc935e222d98b2d21b5f17b8'||
-       transport.forbidBackendFunctionDeploy!==true||transport.forbidBackendLiveFunctionDeploy!==true||
+       (transport.forbidBackendFunctionDeploy!==true&&!previewReaderScope)||transport.forbidBackendLiveFunctionDeploy!==true||
        transport.forbidFirestoreRulesDataAuthWrites!==true||transport.noHostingPromotion!==true)
       throw new Error(guard);
   }else if(roleCurrent){
