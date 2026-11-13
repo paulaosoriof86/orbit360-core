@@ -125,7 +125,7 @@ jobs:
             c.immutableArtifactZipDigest==='sha256:dc22a21b1bda7812196303442256df18759b3cd6544db53df3f11c634250368d'&&
             c.sourcePreviewChannelId==='gi-i66-rc-43139926207'&&
             c.sourcePreviewUrl==='https://ays-orbit-360-lab--gi-i66-rc-43139926207-ua8r8jvc.web.app';
-          const stage=c.i66ConciliacionesStageReaderPreviewAuthorization20261113||{};
+          const stage=c.i66ConciliacionesHumanNameReaderPreviewAuthorization20261113||{};
           const stageReaderPreview=c.status==='CONCILIACIONES_STAGE_READER_PREVIEW_AUTHORIZED'&&
             c.backendFunctionPreviewOnly===true&&c.forbidBackendLiveFunctionDeploy===true&&
             c.forbidBackendFunctionDeploy===false&&c.livePromotionAuthorized===false&&
@@ -579,7 +579,7 @@ jobs:
           const fs=require('node:fs');
           const c=JSON.parse(fs.readFileSync('artifacts/orbit360-recovery/release-control/I6_6_RELEASE_TRANSPORT_CONTROL_20261110.json','utf8'));
           const stage=c.status==='CONCILIACIONES_STAGE_READER_PREVIEW_AUTHORIZED';
-          const r=stage?(c.i66ConciliacionesStageReaderPreviewAuthorization20261113||{}):(c.readerPreviewAuthorization||{});
+          const r=stage?(c.i66ConciliacionesHumanNameReaderPreviewAuthorization20261113||{}):(c.readerPreviewAuthorization||{});
           if(!['CONCILIACIONES_READER_PREVIEW_AUTHORIZED','CONCILIACIONES_STAGE_READER_PREVIEW_AUTHORIZED'].includes(c.status)||
              c.forbidFirestoreRulesDataAuthWrites!==true||c.forbidBackendLiveFunctionDeploy!==true||
              c.forbidBackendFunctionDeploy!==false||c.backendFunctionPreviewOnly!==true||

@@ -29,6 +29,16 @@
     "existingSignedR9Release": "artifacts/orbit360-recovery/release-control/I6_6_PAYMENT_INVOICE_POLICY_R9_LIVE_RECEIPT_20261113.json",
     "approvedScope": "Reuse one known isolated Preview channel after exact R9 immutable backup and LIVE/Preview readback; zero financial and zero LIVE writes"
   },
+  "humanNameReaderPreviewRequest20261113": {
+    "status": "EXACT_READER_PREVIEW_ONLY_REQUESTED_NOT_YET_SIGNED",
+    "approvedSourceSha": "851d68441b819eac6dd37ec1d5d15fb971e35bf2",
+    "immutablePreviewBuildRunId": 43484031398,
+    "immutableArtifactId": 14066487146,
+    "immutableArtifactDigest": "sha256:f0d45ff58490d53c434f7285d98818439cfabdafb9bbc0f8e814787927df5f3d",
+    "previewOnlyExistingFunction": "orbit360ScopedPolicyReadPreview",
+    "forbidLiveAndFinancialWrites": true,
+    "signedPreviewRoleCountryUatStillRequired": true
+  },
   "approvalModel": "Every future I6.6 product delta must carry an owner-approved receipt, exact Git blobs, and pinned passing tests; all other paths are refused by CI.",
   "changes": [
     {
