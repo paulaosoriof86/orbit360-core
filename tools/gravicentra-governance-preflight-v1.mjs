@@ -42,7 +42,9 @@ if(i66Active){
   const stageCurrent=stageRelease?.status==='CURRENT_STAGE_READONLY_SIGNED_EXACT_LIVE_PASS_FINANCIAL_AND_FULL_I66_HOLD';
   const roleRelease=control.i66RolePermissionExactLiveRelease20261113;
   const roleCurrent=roleRelease?.status==='CURRENT_R8_ROLE_PERMISSIONS_EXACT_LIVE_SIGNED_SYNTHETIC_PASS_FULL_I66_HOLD';
-  const pointer=(roleCurrent||stageCurrent)
+  const r9Release=control.i66PaymentInvoicePolicyR9ExactLiveRelease20261113;
+  const r9Current=r9Release?.status==='CURRENT_R9_PAYMENT_INVOICE_POLICY_DUAL_ORIGIN_SIGNED_LIVE_PASS_FULL_I66_HOLD';
+  const pointer=(r9Current||roleCurrent||stageCurrent)
     ?'artifacts/orbit360-recovery/release-control/I6_6_LATEST_EXACT_LIVE_POINTER_20261113.json'
     :'artifacts/orbit360-recovery/release-control/I6_6_LATEST_EXACT_LIVE_POINTER_20261112.json';
   const latest=fs.existsSync(pointer)?JSON.parse(fs.readFileSync(pointer,'utf8')):
@@ -50,7 +52,68 @@ if(i66Active){
   const live=transport.currentExactHostingRelease;
   const r4=transport.latestExactHostingPromotionR4;
   const guard='I6_6_EXACT_LIVE_RELEASE_POINTER_OR_READER_AUTHORIZATION_DRIFT';
-  if(roleCurrent){
+  if(r9Current){
+    const receipt=JSON.parse(fs.readFileSync('artifacts/orbit360-recovery/release-control/I6_6_PAYMENT_INVOICE_POLICY_R9_LIVE_RECEIPT_20261113.json','utf8'));
+    const priorR8=JSON.parse(fs.readFileSync('artifacts/orbit360-recovery/release-control/I6_6_ROLE_TRANSVERSAL_R8_LIVE_RECEIPT_20261113.json','utf8'));
+    const state=JSON.parse(fs.readFileSync('orbit360-platform/docs/recovery/orbit360-recovery-state-v1.json','utf8'));
+    const s=state.currentLiveSuccessorAcceptance||{};
+    const previous=transport.previousExactHostingReleaseR8||{};
+    const fields=[
+      [latest.currentLiveSourceSha,live?.sourceSha],
+      [latest.currentLiveSourceSha,r9Release.sourceSha],
+      [latest.currentLiveSourceSha,receipt.sourceSha],
+      [latest.currentLiveSourceSha,s.sourceSha],
+      [latest.currentLiveArtifactId,live?.artifactId],
+      [latest.currentLiveArtifactId,r9Release.artifactId],
+      [latest.currentLiveArtifactId,receipt.immutableArtifactId],
+      [latest.currentLiveArtifactDigest,live?.artifactDigest],
+      [latest.currentLiveArtifactDigest,r9Release.artifactDigest],
+      [latest.currentLiveArtifactDigest,receipt.immutableArtifactDigest],
+      [latest.currentLiveImmutableBuildRunId,live?.previewRunId],
+      [latest.currentLiveImmutableBuildRunId,r9Release.buildRunId],
+      [latest.currentLiveImmutableBuildRunId,receipt.immutableBuildRunId],
+      [latest.currentLiveDeployAndSignedQaRunId,live?.liveCloneRunId],
+      [latest.currentLiveDeployAndSignedQaRunId,r9Release.liveCloneRunId],
+      [latest.currentLiveDeployAndSignedQaRunId,receipt.exactCloneAndSignedNewPolicyLiveRunId],
+      [latest.currentLiveHostingVersion,live?.liveHostingVersion],
+      [latest.currentLiveHostingVersion,r9Release.hostingVersion],
+      [latest.currentLiveHostingVersion,receipt.hostingVersion],
+      [latest.currentLiveReceipt,live?.receipt],
+      [latest.currentLiveReceipt,r9Release.receipt],
+      [latest.currentLiveReceipt,r9Release.currentPointer==='artifacts/orbit360-recovery/release-control/I6_6_LATEST_EXACT_LIVE_POINTER_20261113.json'?receipt&&r9Release.receipt:null],
+      [latest.previousLiveVersionForRollback,previous.liveHostingVersion],
+      [receipt.previousLiveVersionForRollback,previous.liveHostingVersion],
+      [receipt.signedPaymentBackendLiveRunId,r9Release.signedBackendRunId],
+      [receipt.signedPaymentUserInterfaceLiveRunId,r9Release.signedPaymentLiveUiRunId],
+      [receipt.signedPaymentUserInterfaceLiveRunId,latest.currentR9SignedPaymentInvoicePolicyLiveAcceptance20261113?.paymentUserInterfaceSignedLiveRunId],
+      [priorR8.liveHostingVersion,previous.liveHostingVersion],
+      [priorR8.sourceSha,previous.sourceSha]
+    ];
+    if(fields.some(([a,b])=>a==null||b==null||a!==b)||
+       control.currentExecutionDecisionPointer!=='i66PaymentInvoicePolicyR9ExactLiveRelease20261113'||
+       state.currentExecutionDecisionPointer!=='artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json#i66PaymentInvoicePolicyR9ExactLiveRelease20261113'||
+       live?.status!=='PUBLISHED_EXACT_R9_223_FILES_SIGNED_PAYMENT_AND_NEW_POLICY_PARTIAL'||
+       latest.status!=='LATEST_R9_PAYMENT_INVOICE_AND_POLICY_SIGNED_LIVE_PASS_I66_FULL_ACCEPTANCE_HOLD'||
+       receipt.schema!=='GI_I66_PAYMENT_INVOICE_POLICY_R9_LIVE_RECEIPT_V1'||
+       receipt.status!=='PUBLISHED_EXACT_ARTIFACT_SIGNED_CARLOS_PAULA_PAYMENT_AND_NEW_POLICY_LIVE_PASS_SCOPE_HOLD'||
+       receipt.immutableArtifactId!==14057935092||receipt.exactCloneAndSignedNewPolicyLiveRunId!==43472800270||
+       receipt.sameFiles.preview!==223||receipt.sameFiles.firebaseLive!==223||receipt.sameFiles.staffCustomDomain!==223||
+       r9Release.sameFilesBothOrigins!==223||
+       receipt.signedRoleAcceptance?.operativoCarlos?.syntheticFixturesRestored!==true||
+       receipt.signedRoleAcceptance?.directionPaula?.syntheticFixturesRestored!==true||
+       receipt.finance?.actualBusinessPaymentWritesThisRelease!==0||
+       receipt.finance?.actualBusinessPolicyWritesThisRelease!==0||
+       receipt.finance?.activeLedgerUniqueVisible!==52||receipt.finance?.activeLedgerAmbiguousHold!==80||
+       receipt.finance?.actualInsurerInvoicePdfUploadRetrievalCertified!==false||
+       r9Release.financialActualWrites!==0||latest.fullI66ProductionAccepted!==false||
+       receipt.fullI66ProductionAccepted!==false||r9Release.fullI66ProductionAccepted!==false||
+       priorR8.schema!=='GI_I66_ROLE_TRANSVERSAL_R8_LIVE_RECEIPT_V1'||
+       priorR8.sourceSha!=='8a0e904500cbb3c961d83f16517caab69df88a2b'||
+       stageRelease.sourceSha!=='e6183a9f1da68243cc935e222d98b2d21b5f17b8'||
+       transport.forbidBackendFunctionDeploy!==true||transport.forbidBackendLiveFunctionDeploy!==true||
+       transport.forbidFirestoreRulesDataAuthWrites!==true||transport.noHostingPromotion!==true)
+      throw new Error(guard);
+  }else if(roleCurrent){
     const receipt=JSON.parse(fs.readFileSync('artifacts/orbit360-recovery/release-control/I6_6_ROLE_TRANSVERSAL_R8_LIVE_RECEIPT_20261113.json','utf8'));
     const currentState=JSON.parse(fs.readFileSync('orbit360-platform/docs/recovery/orbit360-recovery-state-v1.json','utf8'));
     const historicStage=transport.i66ConciliacionesStageExactLiveCompleted20261113;

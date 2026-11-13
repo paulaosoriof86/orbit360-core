@@ -1,0 +1,68 @@
+{
+  "schema": "GI_I66_PAYMENT_INVOICE_POLICY_R9_LIVE_RECEIPT_V1",
+  "status": "PUBLISHED_EXACT_ARTIFACT_SIGNED_CARLOS_PAULA_PAYMENT_AND_NEW_POLICY_LIVE_PASS_SCOPE_HOLD",
+  "dateGuatemala": "2026-11-13",
+  "product": "Gravicentra Insurance",
+  "sourceSha": "586401bfbe1a80cfef2820982f432743af36b108",
+  "buildId": "gi-i66-586401bfbe1a-57f234755dc1",
+  "immutableBuildRunId": 43463160506,
+  "immutableArtifactId": 14057935092,
+  "immutableArtifactDigest": "sha256:1621f236b9d1b9e49ea42fc53e338a695d5872080361ada2a84183fa7d52207f",
+  "previewChannel": "gi-i66-rc-42868854629",
+  "hostingVersion": "sites/ays-orbit-360-lab/versions/1dd873081501d7fb",
+  "exactCloneAndSignedNewPolicyLiveRunId": 43472800270,
+  "signedPaymentBackendLiveRunId": 43471877267,
+  "signedPaymentUserInterfaceLiveRunId": 43473378992,
+  "signedNewPolicyPreviewRunId": 43472346558,
+  "signedPaymentPreviewRunId": 43467007164,
+  "syntheticLiveOrphanCleanupRunId": 43471612256,
+  "syntheticPreviewOrphanCleanupRunId": 43472648366,
+  "successfulRollbackOfFailedFirstAttemptRunId": 43470315730,
+  "liveHostingProofArtifactId": 14059959240,
+  "sameFiles": {
+    "preview": 223,
+    "firebaseLive": 223,
+    "staffCustomDomain": 223
+  },
+  "signedRoleAcceptance": {
+    "operativoCarlos": {
+      "createPolicyVehicleReceiptPortfolioClient360Reload": "PASS",
+      "applyReconcilePaymentInvoiceNumberDateReceiptPortfolioReload": "PASS",
+      "syntheticFixturesRestored": true
+    },
+    "directionPaula": {
+      "createPolicyVehicleReceiptPortfolioClient360Reload": "PASS",
+      "applyReconcilePaymentInvoiceNumberDateReceiptPortfolioReload": "PASS",
+      "syntheticFixturesRestored": true
+    }
+  },
+  "finance": {
+    "actualBusinessPaymentWritesThisRelease": 0,
+    "actualBusinessPolicyWritesThisRelease": 0,
+    "actualBantrabSevenApplied": 0,
+    "actualMapfreFiveRequirementsApplied": 0,
+    "activeLedgerStageProposals": 132,
+    "activeLedgerUniqueVisible": 52,
+    "activeLedgerAmbiguousHold": 80,
+    "invoiceNumberAndDateSyntheticLivePersisted": true,
+    "actualInsurerInvoicePdfUploadRetrievalCertified": false
+  },
+  "preservedR8Receipt": "artifacts/orbit360-recovery/release-control/I6_6_ROLE_TRANSVERSAL_R8_LIVE_RECEIPT_20261113.json",
+  "previousLiveVersionForRollback": "sites/ays-orbit-360-lab/versions/162340ae18a9e6f7",
+  "noFreshBuild": true,
+  "noFirestoreRulesAuthOrOtherFunctionDeployments": true,
+  "noRealBusinessDataWrittenByUat": true,
+  "fullModuleRoleCountryRealWriteAcceptance": false,
+  "fullI66ProductionAccepted": false,
+  "holds": [
+    "REAL_INSURER_INVOICE_PDF_UPLOAD_AND_RETRIEVAL_NOT_SIGNED",
+    "ONE_ADMIN_TENANT_EMAIL_UNVERIFIED",
+    "INSURER_SECRET_AND_LOGO_REAL_DURABLE_WRITE_NOT_SIGNED",
+    "PORTAL_CLIENT360_OPS_REQUEST_AND_LEADS_ALL_ENTRIES_NOT_SIGNED_IN_R9",
+    "GREEN_API_REAL_WHATSAPP_DELIVERY_NOT_CERTIFIED",
+    "NOTIFICATION_SOUND_NOT_CERTIFIED",
+    "BANTRAB_SEVEN_REAL_ENTRIES_PROTECTED_REVIEW_PENDING",
+    "MAPFRE_SC79829_CONTRACT_PREMIUM_AND_ISSUED_DOCUMENT_LINK_PENDING",
+    "EIGHTY_AMBIGUOUS_LEDGER_PROPOSALS_HOLD"
+  ]
+}

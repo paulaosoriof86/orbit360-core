@@ -22,8 +22,10 @@
   "productionAcceptedScope": "HISTORICAL_I5_CERTIFIED_BASE_IN_CONTROL_PLANE_NOT_I6_6_LATEST_SUCCESSOR",
   "currentLiveSuccessorAcceptance": {
     "gate": "I6.6",
-    "sourceSha": "8a0e904500cbb3c961d83f16517caab69df88a2b",
-    "frontEndExactLiveReadback": "EXACT_223_OF_223_PREVIEW_FIREBASE_AND_APP_LIVE_43451818931",
+    "sourceSha": "586401bfbe1a80cfef2820982f432743af36b108",
+    "frontEndExactLiveReadback": "EXACT_223_OF_223_PREVIEW_FIREBASE_AND_APP_LIVE_43472800270",
+    "currentR9SignedLiveReceipt": "artifacts/orbit360-recovery/release-control/I6_6_PAYMENT_INVOICE_POLICY_R9_LIVE_RECEIPT_20261113.json",
+    "currentR9SignedPaymentsAndPolicies": "CARLOS_AND_PAULA_NEW_POLICY_CLIENT360_RELOAD_43472800270_PAYMENT_INVOICE_APPLY_RECONCILE_RELOAD_43473378992_SYNTHETIC_RESTORED",
     "signedCrossRouteReadOnly": "PASS_43250591471_SIGNED_LIVE_OPS_LEADS_TASKS_43310610618_REAL_PENDING_LEADS_OPS_43315196712_AND_ACTUAL_CARLOS_TASK_DOM_43332642537",
     "fullPerModuleRoleCountryWriteUat": "HOLD_NOT_CERTIFIED",
     "protectedConciliacionesLiveBackend": "LATEST_EXACT_STAGE_READONLY_SOURCE_E6183A9F1DA6_SINGLE_EXISTING_LIVE_READER_NEW_REVISION_100_PERCENT_SIGNED_DIRECTION_52_OF_52_BOTH_LIVE_ORIGINS_CARLOS_UNASSIGNED_DENIAL_43388747480; HISTORICAL_F0853986_READER_43324845568_PRESERVED; FINANCIAL_WRITES_HOLD",
@@ -65,14 +67,14 @@
       "fullI66ProductionAccepted": false,
       "latestReleaseReceipt": "artifacts/orbit360-recovery/release-control/I6_6_CONCILIACIONES_STAGE_READONLY_LIVE_RECEIPT_20261113.json"
     },
-    "currentExactHostingRunId": 43451818931,
-    "currentExactHostingArtifactId": 14048803073,
-    "currentExactHostingBuildId": "gi-i66-8a0e904500cb-57f234755dc1",
+    "currentExactHostingRunId": 43472800270,
+    "currentExactHostingArtifactId": 14057935092,
+    "currentExactHostingBuildId": "gi-i66-586401bfbe1a-57f234755dc1",
     "liveTwoActorOpsLeadsTasksCrudRunId": 43310610618,
     "liveTwoActorPaymentAndRenewabilityRunId": 43312896784,
     "targetedCobrosBackendSourceSha": "a49f5f76bc85b5df211a865efed94d9821cdd680",
     "targetedCobrosBackendImmutableTarSha256": "3bc2599c42e01dca2e4b9c9053b2a8990885cd0c762fe3117f78b851c5f791ec",
-    "backendTransportInterpretation": "Current successor R8 8a0e904500cb artifact 14048803073 exact LIVE Hosting 162340ae18a9e6f7 cloned with 223/223 bytes on Preview Firebase and staff domain. Signed LIVE Carlos 8/8 and Direccion 10/10 43452158412; synthetic Ops Leads task 43452502778, payment and renovability 43452656400, insurer account 43452980131, direct renewal and policy editor 43453049866; all QA records restored. Existing Conciliaciones protected reader/staged 52 unique of 132 stays, 80 ambiguous HOLD. Financial A1-A7 still waits environment reviewer and Mapfre requires full contract proof. No real customer/financial writes. I6.6 full production acceptance HOLD.",
+    "backendTransportInterpretation": "Current R9 source 586401bfbe1a artifact 14057935092 Preview/Firebase/APP 223/223 exact 43472800270. Carlos and Direccion signed synthetic LIVE policy/vehicle/receipt/portfolio/Cliente360 reload PASS; same roles apply and reconcile invoice number/date from LIVE UI 43473378992 PASS with cleanup. Prior R8 8a0e904500cb 43451818931 and role 8/8,10/10 preserved as historical. Stage Conciliaciones 52 unique of 132, 80 ambiguous HOLD. Actual insurer PDF upload, WA delivery, A1-A7 environment review and Mapfre contract proof remain HOLD. Zero real customer/financial writes in R9 QA. I6.6 full acceptance remains HOLD.",
     "privilegedRoleExactLiveSuccessor20261112": {
       "status": "PUBLISHED_TARGETED_PASS_NOT_FULL_I6_6_PRODUCTION_ACCEPTANCE",
       "sourceSha": "0153f5cbbe00c3732e11ebae59b32bd357e38bfd",
@@ -1120,7 +1122,7 @@
     "noNewIterationsOrParallelReleaseMethod": true,
     "noGlobalSynchronizationClaim": true
   },
-  "currentExecutionDecisionPointer": "artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json#i66LatestExactLiveRelease20261113",
+  "currentExecutionDecisionPointer": "artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json#i66PaymentInvoicePolicyR9ExactLiveRelease20261113",
   "b4003CausalFrontendSuccessor20261107": {
     "schema": "GRAVICENTRA_B4_003_CAUSAL_FRONTEND_SUCCESSOR_CURSOR_V1",
     "status": "FRONTEND_SUCCESSOR_LIVE_BYTES_PASS_FOCAL_LIVE_PENDING",
