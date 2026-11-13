@@ -413,7 +413,9 @@ jobs:
             export REUSE_ID
             node - <<'NODE'
           const fs=require('node:fs'),assert=require('node:assert/strict');
-          const control=JSON.parse(fs.readFileSync('artifacts/orbit360-recovery/release-control/I6_6_RELEASE_TRANSPORT_CONTROL_20261110.json','utf8'));
+          // Deployment step runs inside the immutable bundle, not the source checkout.
+          // Consult the exact checked-out control document, never a file from the bundle.
+          const control=JSON.parse(fs.readFileSync(process.env.GITHUB_WORKSPACE+'/candidate/artifacts/orbit360-recovery/release-control/I6_6_RELEASE_TRANSPORT_CONTROL_20261110.json','utf8'));
           const a=control.i66ConciliacionesStagePreviewQuotaRecovery20261113||{};
           assert.equal(control.status,'PREVIEW_BUILD_REQUESTED','I66_QUOTA_RECOVERY_GATE_NOT_REQUESTED');
           assert.ok(control.livePromotionAuthorized===false&&control.forbidBackendFunctionDeploy===true&&
