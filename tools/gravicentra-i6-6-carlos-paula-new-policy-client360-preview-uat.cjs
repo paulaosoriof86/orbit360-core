@@ -147,8 +147,39 @@ async function runOne(browser,actor){
       await provider.initialize();await provider.waitForUser();await Orbit.productAppP0.activate();
       await Orbit.store._ensureCollections(['clientes','polizas','vehiculos','recibosEsperados','carteraPrimas']);
     });
-    await page.waitForFunction(ids=>!!Orbit.store?.get?.('polizas',ids.policy)&&
-      Orbit.store.get('polizas',ids.policy).clienteId===ids.client,ids,{timeout:30000});
+    // _ensureCollections requests protected lazy hydration, it does not
+    // synchronously return the related rows. Readback must await all five
+    // server-confirmed collections and actual linked relations after reload.
+    try{
+      await page.waitForFunction(ids=>{
+        const store=Orbit.store,s=store?._productStatus?.()||{},
+          confirmed=s.serverConfirmedCollections||[];
+        return ['clientes','polizas','vehiculos','recibosEsperados','carteraPrimas']
+          .every(name=>confirmed.includes(name))&&
+          !!store?.get?.('polizas',ids.policy)&&
+          store.get('polizas',ids.policy).clienteId===ids.client&&
+          (store.all('recibosEsperados')||[]).some(row=>row.polizaId===ids.policy)&&
+          (store.all('carteraPrimas')||[]).some(row=>row.polizaId===ids.policy)&&
+          (store.all('vehiculos')||[]).some(row=>row.polizaId===ids.policy);
+      },ids,{timeout:35000});
+    }catch(error){
+      const diagnostic=await page.evaluate(ids=>{
+        const store=Orbit.store,s=store?._productStatus?.()||{},
+          names=['clientes','polizas','vehiculos','recibosEsperados','carteraPrimas'];
+        return{
+          confirmed:names.filter(name=>(s.serverConfirmedCollections||[]).includes(name)),
+          denied:names.filter(name=>(s.deniedCollections||[]).includes(name)),
+          errors:Object.fromEntries(names.filter(name=>s.snapshotErrors?.[name])
+            .map(name=>[name,String(s.snapshotErrors[name]).slice(0,120)])),
+          queryPlans:Object.fromEntries(names.map(name=>[name,s.queryPlans?.[name]?.scope||'missing'])),
+          counts:Object.fromEntries(names.map(name=>[name,store?.all(name)?.length||0])),
+          links:Object.fromEntries(['vehiculos','recibosEsperados','carteraPrimas']
+            .map(name=>[name,(store?.all(name)||[]).filter(row=>row.polizaId===ids.policy).length]))
+        };
+      },ids);
+      console.log('I66_NEW_POLICY_'+actor.role.toUpperCase()+'_HYDRATION_DIAGNOSTIC '+JSON.stringify(diagnostic));
+      throw error;
+    }
     const readback=await page.evaluate(ids=>{
       const p=Orbit.store.get('polizas',ids.policy),c=Orbit.store.get('clientes',ids.client);
       const linked=(Orbit.store.all('polizas')||[]).filter(row=>row.clienteId===ids.client);
