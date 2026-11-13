@@ -11,6 +11,15 @@
   "baselineRunUrl": "https://github.com/paulaosoriof86/orbit360-core/actions/runs/42840283468",
   "dataMutationAuthorized": false,
   "deploymentAuthorized": false,
+  "previewBuildRequest20261113": {
+    "status": "IMMUTABLE_PREVIEW_BUILD_REQUESTED_NOT_YET_ACCEPTED",
+    "initiatedBy": "Paula Direccion — urgente corregir y certificar por lote antes de LIVE",
+    "approvedProductSourceCommit": "36d997b7b696e471344faaa84e927253f1dfafd9",
+    "controlPlaneCommit": "f965372c0714090a85a3dfe3baf1056ba59d2a41",
+    "authorizedScope": "Existing isolated I6.6 Preview Hosting only; no live Hosting, Firestore business data, Rules/Auth, or backend function deploy",
+    "requiresSignedPreviewUatBeforeLive": true,
+    "productionAccepted": false
+  },
   "approvalModel": "Every future I6.6 product delta must carry an owner-approved receipt, exact Git blobs, and pinned passing tests; all other paths are refused by CI.",
   "changes": [
     {
