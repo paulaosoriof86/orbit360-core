@@ -1,9 +1,12 @@
-# I6.6 GREENAPI METADATA PROBE -- OFFLINE CANDIDATE, NOT YET COMMITTED.
+# I6.6 GREENAPI METADATA PROBE -- read-only evidence, no delivery.
 # Manual read-only inventory of existing GCP Secret Manager/Functions/Cloud Run.
 # No GreenAPI HTTP, no Secret Manager payload read, no Firestore, no deployment.
 name: Gravicentra I6.6 GreenAPI Secure Metadata ONLY
 
 on:
+  push:
+    branches: [recovery/fase-a-clean-20260831]
+    paths: [.github/workflows/gravicentra-i66-greenapi-metadata-readonly.yml]
   workflow_dispatch:
     inputs:
       scope_confirmation:
@@ -24,7 +27,7 @@ jobs:
     if: >-
       github.repository == 'paulaosoriof86/orbit360-core' &&
       github.ref == 'refs/heads/recovery/fase-a-clean-20260831' &&
-      inputs.scope_confirmation == 'READ_ONLY_NO_SEND'
+      (github.event_name == 'push' || inputs.scope_confirmation == 'READ_ONLY_NO_SEND')
     runs-on: ubuntu-24.04
     timeout-minutes: 12
     env:
