@@ -324,12 +324,17 @@ jobs:
           let errors=[];
           try{
             const j=JSON.parse(raw),e=j.error||j.result?.error||{};
-            errors=[clean(e.code||e.status||''),clean(e.message||j.message||'')].filter(Boolean);
+            errors=[clean(j.status||''),clean(e.code||e.status||''),
+              clean(typeof e==='string'?e:e.message||''),
+              clean(j.message||''),clean(j.result?.message||''),
+              ...[].concat(j.messages||[]).slice(-2).map(clean),
+              'rootKeys:'+Object.keys(j).sort().join(',')].filter(Boolean);
           }catch(_){
             errors=raw.split('\n').filter(x=>/(?:error|denied|forbidden|quota|limit|channel|http)/i.test(x))
               .slice(-5).map(clean);
           }
-          console.error('I66_PREVIEW_DEPLOY_DIAGNOSTIC '+JSON.stringify(errors.length?errors:['NO_STRUCTURED_ERROR_RETURNED']));
+          if(errors.length===0)errors.push('OUTPUT_LENGTH_'+raw.length);
+          console.error('I66_PREVIEW_DEPLOY_DIAGNOSTIC '+JSON.stringify(errors));
           NODE
             exit 1
           fi
