@@ -123,11 +123,36 @@ async function scan(db){
       quotaExact!==1?'HOLD_EXACT_QUOTA_NOT_LINKED':
       one.paidDate?'PAID_SOURCE_EXACT_RECEIPT_ELIGIBILITY_REVIEW_NOT_WRITE':
       'PENDING_SOURCE_EXACT_RECEIPT_ELIGIBILITY_REVIEW_NOT_WRITE';
+    // Focal read-only investigation of documented 2026 insurer-issued policy
+    // editions. Never include customer names, raw policy IDs or receipt IDs.
+    const focal=one.id==='A5.P7'||one.id==='A6.P4';
+    const receiptCandidateReview=focal?snapshots.map((snapshot,index)=>({
+      editionOrdinal:index+1,
+      hasClient:snapshot.clientExists,
+      receiptCount:snapshot.receipts.length,
+      cobroCount:snapshot.cobros.length,
+      receiptCandidates:snapshot.receipts.filter(r=>
+        amount(r)===one.cents||[r.secuencia,r.cuota,r.numeroCuota,r.cuotaNumero]
+          .some(v=>v!=null&&Number(v)===Number(one.quota)))
+        .slice(0,12).map(r=>({
+          cents:amount(r),
+          quota:[r.secuencia,r.cuota,r.numeroCuota,r.cuotaNumero]
+            .map(v=>v==null?null:Number(v)).find(Number.isSafeInteger)||null,
+          sourceRequirementMatched:numbers(r).includes(one.requirement),
+          hasDifferentSourceNumber:numbers(r).some(n=>n!==one.requirement),
+          hasAnySourceNumber:numbers(r).length>0,
+          dateDue:/^\d{4}-\d{2}-\d{2}$/.test(String(r.fechaVencimiento||r.fechaLimite||r.vence||''))
+            ?String(r.fechaVencimiento||r.fechaLimite||r.vence):null,
+          state:['Pendiente','Vencido','Pagado','Anulado'].includes(String(r.estado||''))
+            ?r.estado:'OTHER'
+        }))
+    })):undefined;
     output.push({id:one.id,sourceKind:one.sourceKind,sourceCaseRow:one.row,
       policyEditionsMatchingInsurer:matches.length,linkedExactRequirements:linked,
       exactAmountLinked:sourceAmountExact,exactQuotaLinked:quotaExact,
       candidateEditionCount:result.exactAmountEditions||0,
-      status,writes:0,snapshotFingerprint:h(snapshots.map(s=>s.fingerprint))});
+      status,writes:0,snapshotFingerprint:h(snapshots.map(s=>s.fingerprint)),
+      ...(focal?{focalReceiptsForDocumentaryReconciliation:receiptCandidateReview}:{})});
   }
   return output;
 }
