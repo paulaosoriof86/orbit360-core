@@ -19,9 +19,10 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 25
     env:
-      I66_SOURCE_SHA: 1dd675ed59ac51fd122915ca8056f85f82fa12d6
+      I66_SOURCE_SHA: 8a0e904500cbb3c961d83f16517caab69df88a2b
       I66_LIVE_ORIGIN: https://app.aysseguros.com
-      I66_LIVE_TRANSPORT_RUN: '43309935816'
+      I66_LIVE_TRANSPORT_RUN: '43451818931'
+      I66_APPROVED_LIVE_SOURCE_SHA: 8a0e904500cbb3c961d83f16517caab69df88a2b
       SA_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
       SA_ALT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
       SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
@@ -62,7 +63,7 @@ jobs:
               const x=await fetch(origin+'/__recovery__/build.json',{headers:{'cache-control':'no-cache'}});
               assert.ok(x.ok,'I66_LIVE_MARKER_FETCH_FAILED');
               const b=await x.json();assert.equal(b.sourceSha,process.env.I66_SOURCE_SHA,'I66_LIVE_PRODUCT_SOURCE_DRIFT');
-              assert.equal(b.buildId,'gi-i66-1dd675ed59ac-57f234755dc1');
+              assert.equal(b.buildId,'gi-i66-8a0e904500cb-57f234755dc1');
             }
             console.log('I66_CARLOS_PAULA_LIVE_TWO_SERVICES_AND_DUAL_ORIGIN_BUILD_EXACT_PASS');
           })().catch(e=>{console.error(e.message);process.exitCode=1;});
