@@ -83,7 +83,14 @@ async function checkActor(browser,actor){
       // The owner-visible Equipos matrix must agree with signed protected
       // access policy. This is a READ-ONLY UI test, never a permission save.
       await page.evaluate(()=>Orbit.router.go('equipo'));
-      await page.locator('[data-t="permisos"]').click({timeout:30000});
+      // The tab is a custom div and may be intercepted by a transient
+      // full-screen shell overlay in headless mode. Invoke its normal bound
+      // DOM click listener, then require the actual protected table to render.
+      await page.evaluate(()=>{
+        const tab=document.querySelector('[data-t="permisos"]');
+        if(!tab)throw new Error('I66_EQUIPOS_PERMISSIONS_TAB_NOT_RENDERED');
+        tab.click();
+      });
       await page.waitForFunction(()=>{
         const b=document.querySelector('#perm-save');
         return !!b && !b.disabled;
