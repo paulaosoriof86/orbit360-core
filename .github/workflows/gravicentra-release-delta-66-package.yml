@@ -31,6 +31,12 @@ jobs:
     outputs:
       mode: ${{ steps.release.outputs.mode }}
       source: ${{ steps.release.outputs.source }}
+      source_run: ${{ steps.release.outputs.source_run }}
+      artifact_id: ${{ steps.release.outputs.artifact_id }}
+      artifact_digest: ${{ steps.release.outputs.artifact_digest }}
+      access_sha: ${{ steps.release.outputs.access_sha }}
+      reader_sha: ${{ steps.release.outputs.reader_sha }}
+      preview_channel: ${{ steps.release.outputs.preview_channel }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -121,16 +127,43 @@ jobs:
             c.immutableArtifactZipDigest==='sha256:dc22a21b1bda7812196303442256df18759b3cd6544db53df3f11c634250368d'&&
             c.sourcePreviewChannelId==='gi-i66-rc-43139926207'&&
             c.sourcePreviewUrl==='https://ays-orbit-360-lab--gi-i66-rc-43139926207-ua8r8jvc.web.app';
-          if(c.schema!=='GRAVICENTRA_I6_6_SINGLE_ARTIFACT_RELEASE_TRANSPORT_V1'||c.gate!=='I6.6'||c.historicalClosedGate!=='B4-007'||(c.forbidBackendFunctionDeploy!==true&&!scopedPreview&&!scopedLive&&!scopedCarlosLive&&!readerPreview&&!carlosFunctionPreview&&!privilegedPreview&&!privilegedLive)||c.forbidFirestoreRulesDataAuthWrites!==true)throw Error('I66_TRANSPORT_SCOPE_INVALID');
+          const stage=c.i66ConciliacionesStageReaderPreviewAuthorization20261113||{};
+          const stageReaderPreview=c.status==='CONCILIACIONES_STAGE_READER_PREVIEW_AUTHORIZED'&&
+            c.backendFunctionPreviewOnly===true&&c.forbidBackendLiveFunctionDeploy===true&&
+            c.forbidBackendFunctionDeploy===false&&c.livePromotionAuthorized===false&&
+            c.previewApproved===false&&c.noHostingPromotion===true&&
+            c.forbidFirestoreRulesDataAuthWrites===true&&
+            stage.targetFunction==='orbit360ScopedPolicyReadPreview'&&stage.region==='us-east1'&&
+            stage.dataWritesPermitted===false&&stage.liveBackendDeployPermitted===false&&
+            stage.hostingPromotionPermitted===false&&stage.previewFunctionOnly===true&&
+            stage.realSourceReadOnlyRun===43383902368&&
+            /^[0-9a-f]{40}$/.test(stage.sourceCommit||'')&&
+            Number.isSafeInteger(stage.sourceWorkflowRunId)&&stage.sourceWorkflowRunId>0&&
+            Number.isSafeInteger(stage.sourceArtifactId)&&stage.sourceArtifactId>0&&
+            /^sha256:[0-9a-f]{64}$/.test(stage.sourceArtifactDigest||'')&&
+            /^gi-i66-rc-[0-9]+$/.test(stage.hostingPreviewChannel||'')&&
+            c.approvedSourceSha===stage.sourceCommit&&
+            c.sourceBuildWorkflowRunId===stage.sourceWorkflowRunId&&
+            c.immutableArtifactId===stage.sourceArtifactId&&
+            c.immutableArtifactZipDigest===stage.sourceArtifactDigest&&
+            c.sourcePreviewChannelId===stage.hostingPreviewChannel;
+          if(c.schema!=='GRAVICENTRA_I6_6_SINGLE_ARTIFACT_RELEASE_TRANSPORT_V1'||c.gate!=='I6.6'||c.historicalClosedGate!=='B4-007'||(c.forbidBackendFunctionDeploy!==true&&!scopedPreview&&!scopedLive&&!scopedCarlosLive&&!readerPreview&&!stageReaderPreview&&!carlosFunctionPreview&&!privilegedPreview&&!privilegedLive)||c.forbidFirestoreRulesDataAuthWrites!==true)throw Error('I66_TRANSPORT_SCOPE_INVALID');
           if((scopedPreview||scopedLive||scopedCarlosLive||readerPreview)&&(!/^[0-9a-f]{40}$/.test(c.approvedSourceSha||'')||!(c.sourceBuildWorkflowRunId>0)||!(c.immutableArtifactId>0)||!/^[0-9a-f]{64}$/.test(String(c.immutableArtifactZipDigest||'').replace(/^sha256:/,''))))throw Error('I66_SCOPED_RELEASE_PROOF_MISSING');
-          let mode='disabled',source='';
+          let mode='disabled',source='',sourceRun='',artifactId='',artifactDigest='',accessSha='',readerSha='',previewChannel='';
           if(c.status==='PREVIEW_BUILD_REQUESTED'&&c.livePromotionAuthorized===false)mode='package';
-          if(readerPreview){mode='reader-preview';source=reader.sourceCommit;}
+          if(readerPreview){mode='reader-preview';source=reader.sourceCommit;
+            sourceRun=reader.sourceWorkflowRunId;artifactId=reader.sourceArtifactId;
+            artifactDigest=c.immutableArtifactZipDigest;accessSha='38fa8cee808be6b92b65150625e69b0f93639564';
+            readerSha='849cc33c7bf048787b3f1a35e176a3baa5285fc7';previewChannel=c.sourcePreviewChannelId;}
+          if(stageReaderPreview){mode='reader-preview';source=stage.sourceCommit;
+            sourceRun=stage.sourceWorkflowRunId;artifactId=stage.sourceArtifactId;
+            artifactDigest=stage.sourceArtifactDigest;accessSha='bc4cfabae86027657d08aaac21963fb605f5f17a';
+            readerSha='34cb6c09c63fb9e45feb6c9d55c3e1c514ab17b2';previewChannel=stage.hostingPreviewChannel;}
           if(c.status==='LIVE_PROMOTION_APPROVED'&&c.livePromotionAuthorized===true&&c.previewApproved===true){
             if(!/^[0-9a-f]{40}$/.test(c.approvedSourceSha||'')||!(c.sourceBuildWorkflowRunId>0)||!/^[0-9a-f]{64}$/.test(c.immutableTarSha256||'')||!/^gi-i66-rc-[0-9]+$/.test(c.sourcePreviewChannelId||''))throw Error('I66_LIVE_PROMOTION_PROOF_MISSING');
             throw Error('I66_LIVE_PROMOTION_REQUIRES_SEPARATE_APPROVED_EXACT_ARTIFACT_TRANSPORT');
           }
-          fs.appendFileSync(process.env.GITHUB_OUTPUT,`mode=${mode}\nsource=${source}\n`);
+          fs.appendFileSync(process.env.GITHUB_OUTPUT,`mode=${mode}\nsource=${source}\nsource_run=${sourceRun}\nartifact_id=${artifactId}\nartifact_digest=${artifactDigest}\naccess_sha=${accessSha}\nreader_sha=${readerSha}\npreview_channel=${previewChannel}\n`);
           console.log('I66_TRANSPORT_MODE='+mode);
           NODE
   immutable-package:
@@ -468,10 +501,13 @@ jobs:
     timeout-minutes: 40
     env:
       PROJECT_ID: ays-orbit-360-lab
-      SOURCE_SHA: a4763f794559d15d5462ae71d12bc0b61dd1120c
-      SOURCE_RUN: '43139926207'
-      ARTIFACT_ID: '13908838564'
-      ARTIFACT_DIGEST: sha256:dc22a21b1bda7812196303442256df18759b3cd6544db53df3f11c634250368d
+      SOURCE_SHA: ${{ needs.gate.outputs.source }}
+      SOURCE_RUN: ${{ needs.gate.outputs.source_run }}
+      ARTIFACT_ID: ${{ needs.gate.outputs.artifact_id }}
+      ARTIFACT_DIGEST: ${{ needs.gate.outputs.artifact_digest }}
+      ACCESS_BLOB_SHA: ${{ needs.gate.outputs.access_sha }}
+      READER_BLOB_SHA: ${{ needs.gate.outputs.reader_sha }}
+      PREVIEW_CHANNEL_ID: ${{ needs.gate.outputs.preview_channel }}
       TARGET_FUNCTION: orbit360ScopedPolicyReadPreview
       TARGET_REGION: us-east1
       SA_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
@@ -494,8 +530,9 @@ jobs:
           node - <<'NODE'
           const fs=require('node:fs');
           const c=JSON.parse(fs.readFileSync('artifacts/orbit360-recovery/release-control/I6_6_RELEASE_TRANSPORT_CONTROL_20261110.json','utf8'));
-          const r=c.readerPreviewAuthorization||{};
-          if(c.status!=='CONCILIACIONES_READER_PREVIEW_AUTHORIZED'||
+          const stage=c.status==='CONCILIACIONES_STAGE_READER_PREVIEW_AUTHORIZED';
+          const r=stage?(c.i66ConciliacionesStageReaderPreviewAuthorization20261113||{}):(c.readerPreviewAuthorization||{});
+          if(!['CONCILIACIONES_READER_PREVIEW_AUTHORIZED','CONCILIACIONES_STAGE_READER_PREVIEW_AUTHORIZED'].includes(c.status)||
              c.forbidFirestoreRulesDataAuthWrites!==true||c.forbidBackendLiveFunctionDeploy!==true||
              c.forbidBackendFunctionDeploy!==false||c.backendFunctionPreviewOnly!==true||
              c.livePromotionAuthorized!==false||c.previewApproved!==false||
@@ -506,7 +543,9 @@ jobs:
              r.hostingPromotionPermitted!==false||
              c.immutableArtifactZipDigest!==process.env.ARTIFACT_DIGEST||
              c.approvedSourceSha!==process.env.SOURCE_SHA||
-             c.sourcePreviewChannelId!=='gi-i66-rc-43139926207')
+             c.sourcePreviewChannelId!==process.env.PREVIEW_CHANNEL_ID||
+             (stage&&(r.previewFunctionOnly!==true||r.realSourceReadOnlyRun!==43383902368||
+               r.sourceArtifactDigest!==process.env.ARTIFACT_DIGEST)))
             throw Error('I66_READER_PREVIEW_AUTHORIZATION_OR_IMMUTABLE_SOURCE_DRIFT');
           NODE
           curl -fsSL --retry 3 --retry-delay 2 -H "Authorization: Bearer $GH_READ_TOKEN" \
@@ -531,8 +570,8 @@ jobs:
       - name: Download existing certified immutable artifact; never rebuild
         uses: actions/download-artifact@v4
         with:
-          run-id: 43139926207
-          artifact-ids: 13908838564
+          run-id: ${{ needs.gate.outputs.source_run }}
+          artifact-ids: ${{ needs.gate.outputs.artifact_id }}
           github-token: ${{ github.token }}
           path: ${{ runner.temp }}/gi-i66-reader-artifact
 
@@ -560,8 +599,8 @@ jobs:
           test -f "$PACKAGE/bundle/site/__recovery__/build.json"
           test -f "$BACKEND/bootstrap.js"
           test -f "$BACKEND/b4-003-scoped-policy-callable.js"
-          test "$(git hash-object "$BACKEND/b4-003-scoped-access-boundary.js")" = 38fa8cee808be6b92b65150625e69b0f93639564
-          test "$(git hash-object "$BACKEND/b4-003-scoped-related-reader.js")" = 849cc33c7bf048787b3f1a35e176a3baa5285fc7
+          test "$(git hash-object "$BACKEND/b4-003-scoped-access-boundary.js")" = "$ACCESS_BLOB_SHA"
+          test "$(git hash-object "$BACKEND/b4-003-scoped-related-reader.js")" = "$READER_BLOB_SHA"
           node --check "$BACKEND/b4-003-scoped-policy-callable.js"
           node --check "$BACKEND/b4-003-scoped-related-reader.js"
           node --check "$BACKEND/bootstrap.js"
