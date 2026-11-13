@@ -23,23 +23,37 @@ async function readBuild(origin){
  assert.equal(r.status,200,'I66_BUILD_ORIGIN_UNAVAILABLE');return r.json();
 }
 async function actors(){
- const members=await tenant.collection('members').limit(200).get();
- assert.ok(members.size<200,'I66_SIGNED_STAFF_SCAN_LIMIT');
- const active=m=>m.active!==false&&m.activo!==false&&
-  ['active','activo'].includes(norm(m.status||m.estado));
- const hasRole=(m,role)=>[...(m.roles||[]),...(m.rolesAsignados||[]),m.activeRole,m.rol,m.role]
-  .map(norm).includes(role);
- const gt=m=>[].concat(m.countries||m.paises||[]).map(x=>String(x).toUpperCase()).includes('GT');
- const directors=members.docs.filter(d=>{const m=d.data()||{};return active(m)&&gt(m)&&hasRole(m,'direccion');});
- const operatives=members.docs.filter(d=>{const m=d.data()||{};return active(m)&&gt(m)&&hasRole(m,'operativo')&&
-  [m.nombre,m.nombreCompleto,m.displayName,m.name].some(x=>norm(x).startsWith('carloscastro'));});
- assert.ok(directors.length>0&&operatives.length===1,'I66_SIGNED_DIRECTION_OR_CARLOS_NOT_UNIQUE');
- const accept=async docs=>{
-  for(const doc of docs){const user=await auth.getUser(doc.id);
-   if(!user.disabled&&user.emailVerified)return {uid:doc.id,token:await auth.createCustomToken(doc.id)};}
-  throw Error('I66_AUTHENTICATED_MEMBER_NOT_READY');
+ // Exactly the already certified tenant-member/advisor-link resolver used in
+ // signed Ops/Leads UAT; no guessed identity and no broad role impersonation.
+ const [members,advisors]=await Promise.all([tenant.collection('members').limit(150).get(),
+   tenant.collection('data').doc('asesores').collection('items').limit(400).get()]);
+ assert.ok(members.size<150&&advisors.size<400,'I66_SIGNED_STAFF_SCAN_LIMIT');
+ const resolve=(predicate,role)=>{
+  const advisorIds=new Set(),uids=new Set();
+  for(const doc of advisors.docs){const a=doc.data()||{};
+   if([a.nombre,a.nombreCompleto,a.displayName,a.name].some(x=>predicate(norm(x)))){
+    advisorIds.add(doc.id);[a.authUid,a.uid,a.userId].filter(Boolean).forEach(x=>uids.add(String(x)));
+   }
+  }
+  const found=members.docs.filter(doc=>{const m=doc.data()||{};
+   const identified=[m.nombre,m.nombreCompleto,m.name,m.displayName,m.fullName]
+    .some(x=>predicate(norm(x)))||advisorIds.has(String(m.advisorId||m.asesorId||''))||uids.has(doc.id);
+   return identified&&norm(m.activeRole)===role&&m.active!==false&&m.activo!==false&&
+    ['active','activo'].includes(norm(m.status||m.estado))&&
+    [].concat(m.countries||m.paises||[]).map(x=>String(x).toUpperCase()).includes('GT');
+  });
+  assert.equal(found.length,1,'I66_SIGNED_REAL_ACTOR_NOT_UNIQUE_'+role);
+  return found[0].id;
  };
- return {direction:await accept(directors),carlos:await accept(operatives)};
+ const selected={direction:resolve(v=>v.includes('paula')&&v.includes('osorio'),'direccion'),
+  carlos:resolve(v=>v.startsWith('carloscastro'),'operativo')};
+ const people={};
+ for(const [key,uid] of Object.entries(selected)){
+  const user=await auth.getUser(uid);
+  assert.ok(!user.disabled&&user.emailVerified,'I66_AUTHENTICATED_MEMBER_NOT_READY_'+key);
+  people[key]={uid,token:await auth.createCustomToken(uid)};
+ }
+ return people;
 }
 async function signedPage(browser,{token},role){
  const context=await browser.newContext({viewport:{width:1280,height:850}});
