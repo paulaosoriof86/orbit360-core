@@ -87,17 +87,17 @@ function issuerSchedulePreview(caseId,snapshot){
 function issuerScheduleAdjudication(caseId,snapshot){
   const issued=issuerInstallments(caseId),receipts=snapshot.receipts||[];
   if(!issued.length)return null;
-  const byQuota=new Map(),duplicates=[];
+  const byQuota=Object.create(null),duplicates=[];
   for(const row of receipts){
     const quota=receiptOrdinal(row);
-    if(quota==null||byQuota.has(quota))duplicates.push(quota);
-    else byQuota.set(quota,row);
+    if(quota==null||Object.hasOwn(byQuota,quota))duplicates.push(quota);
+    else byQuota[quota]=row;
   }
   const officialRefs=new Set(issued.map(x=>x.requirement));
   const cases=[];
-  for(let quota=1;quota<=Math.max(issued.length,...byQuota.keys(),0);quota++){
+  for(let quota=1;quota<=Math.max(issued.length,...Object.keys(byQuota).map(Number),0);quota++){
     const document=issued.find(x=>x.quota===quota)||null;
-    const live=byQuota.get(quota)||null;
+    const live=byQuota[quota]||null;
     const actualReferences=live?EXTERNAL_REFERENCE_FIELDS.filter(k=>text(live[k]))
       .map(k=>({field:k,value:text(live[k])})):[];
     const actualDue=live?text(live.fechaLimite||live.vence||live.fechaVencimiento):'';
@@ -126,7 +126,7 @@ function issuerScheduleAdjudication(caseId,snapshot){
   const statusCounts=cases.reduce((out,x)=>(out[x.decision]=(out[x.decision]||0)+1,out),{});
   return {mode:'READ_ONLY_FULL_REFERENCE_ADJUDICATION_NO_AUTO_WRITE',
     caseId,insurerQuotaCount:issued.length,liveQuotaCount:receipts.length,
-    completeQuotaIdentity:duplicates.length===0&&byQuota.size===receipts.length,
+    completeQuotaIdentity:duplicates.length===0&&Object.keys(byQuota).length===receipts.length,
     duplicateOrUnparseableQuotas:duplicates,
     issuerTotalCents:cents(issued),liveTotalCents:receipts.reduce((s,r)=>s+(amount(r)||0),0),
     cases,statusCounts,safeToAutoApply:false,writes:0};
