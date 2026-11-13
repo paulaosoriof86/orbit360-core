@@ -1,0 +1,123 @@
+# Single-purpose recovery from confirmed Firebase HTTP 429 Preview channel quota.
+# Deletes one exact, unreferenced, archived I6.6 QA channel after immutable
+# source/artifact and version identity readback. Never touches LIVE channel.
+name: Gravicentra I6.6 GC One Archived Preview Channel
+on:
+  push:
+    branches: [recovery/fase-a-clean-20260831]
+    paths:
+      - .github/workflows/gravicentra-i66-one-unused-preview-channel-gc.yml
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: gi-i66-hosting-preview-channel-quota-recovery
+  cancel-in-progress: false
+jobs:
+  gc-single-explicit-target:
+    if: github.repository == 'paulaosoriof86/orbit360-core' && github.ref_name == 'recovery/fase-a-clean-20260831'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 13
+    env:
+      PROJECT_ID: ays-orbit-360-lab
+      GC_EXACT_ID: gi-i66-rc-42867453751
+      GC_EXACT_VERSION: d14168818d739eb7
+      GC_ARCHIVED_SOURCE: 6c5997f43fbfa39273e7b33dea095155c7c0703a
+      GC_ARCHIVED_ARTIFACT: '13787029475'
+      SA_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_ALT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify obsolete channel has recoverable source and immutable artifact, no current references
+        run: |
+          set -euo pipefail
+          test -z "$(git grep -n '42867453751' -- ':!'.github/workflows/gravicentra-i66-one-unused-preview-channel-gc.yml || true)"
+          node - <<'NODE'
+          const assert=require('node:assert/strict');
+          (async()=>{
+            const h={Authorization:'Bearer '+process.env.GH_TOKEN,Accept:'application/vnd.github+json','User-Agent':'GI-I66-One-Archived-Channel-GC'};
+            const base='https://api.github.com/repos/paulaosoriof86/orbit360-core/actions/';
+            const [r,a]=await Promise.all([
+              fetch(base+'runs/42867453751',{headers:h}),
+              fetch(base+'artifacts/'+process.env.GC_ARCHIVED_ARTIFACT,{headers:h})]);
+            assert.ok(r.ok&&a.ok,'I66_GC_ARCHIVED_PROOF_UNAVAILABLE');
+            const run=await r.json(),art=await a.json();
+            assert.ok(run.conclusion==='success'&&run.head_sha===process.env.GC_ARCHIVED_SOURCE&&
+              art.expired===false&&art.workflow_run?.id===42867453751&&
+              art.digest==='sha256:fac39bf515e4441c99f9465ee30afb8e2136331f3d967998e693c3fd0589f5ce',
+              'I66_GC_ARCHIVED_SOURCE_ARTIFACT_DRIFT');
+            console.log('I66_GC_TARGET_SOURCE_AND_IMMUTABLE_ARTIFACT_RECOVERABLE_PASS');
+          })().catch(e=>{console.error(e.message);process.exitCode=1;});
+          NODE
+      - name: Resolve existing project credentials for exact Preview-only GC
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/gi-i66-gc-auth"
+          python3 - <<'PY'
+          import json,os,pathlib
+          root=pathlib.Path(os.environ['RUNNER_TEMP'])/'gi-i66-gc-auth';candidates=[]
+          for n,key in enumerate(('SA_LAB','SA_ALT','SA_DEFAULT')):
+              try:v=json.loads(os.environ.get(key,''))
+              except (ValueError,TypeError):continue
+              if v.get('type')=='service_account' and v.get('project_id')==os.environ['PROJECT_ID'] and v.get('private_key'):
+                  p=root/f'{n}.json';p.write_text(json.dumps(v));p.chmod(0o600);candidates.append(str(p))
+          if not candidates:raise SystemExit('I66_GC_SERVICE_ACCOUNT_HOLD')
+          (root/'candidates').write_text('\n'.join(candidates)+'\n')
+          PY
+          npm install --prefix "$RUNNER_TEMP/gi-i66-gc-cli" --no-save --ignore-scripts --no-audit --no-fund firebase-tools@14.10.1 >/dev/null
+          node tools/gravicentra-firebase-tools-empty-extensions-workaround-v1.mjs "$RUNNER_TEMP/gi-i66-gc-cli"
+          CLI="$RUNNER_TEMP/gi-i66-gc-cli/node_modules/firebase-tools/lib/bin/firebase.js"
+          selected=''
+          while IFS= read -r c; do
+            if GOOGLE_APPLICATION_CREDENTIALS="$c" node "$CLI" apps:list WEB --project "$PROJECT_ID" --non-interactive --json >/dev/null 2>&1; then selected="$c";break;fi
+          done < "$RUNNER_TEMP/gi-i66-gc-auth/candidates"
+          test -n "$selected"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$selected" >> "$GITHUB_ENV"
+          echo "CLI=$CLI" >> "$GITHUB_ENV"
+      - name: Read exact channel identity and delete only this archived Preview
+        run: |
+          set -euo pipefail
+          node "$CLI" hosting:channel:list --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/gi-i66-gc-before.json"
+          node - <<'NODE'
+          const fs=require('node:fs'),assert=require('node:assert/strict');
+          const j=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/gi-i66-gc-before.json','utf8'));
+          const rows=Array.isArray(j.result)?j.result:j.result?.channels||[];
+          assert.ok(rows.length>=50,'I66_GC_NOT_AT_CHANNEL_QUOTA');
+          const exact=rows.filter(x=>String(x.channelId||x.name||'').split('/').pop()===process.env.GC_EXACT_ID);
+          assert.equal(exact.length,1,'I66_GC_EXACT_TARGET_NOT_UNIQUE');
+          const x=exact[0],version=String(x.release?.version?.name||'').split('/').pop();
+          assert.equal(version,process.env.GC_EXACT_VERSION,'I66_GC_PREVIEW_VERSION_CHANGED_STOP');
+          assert.ok(String(x.createTime||'').startsWith('2026-11-10T')&&
+            String(x.expireTime||'')>'2026-11-16T'&&x.channelId!=='live',
+            'I66_GC_CHANNEL_AGE_OR_SCOPE_HOLD');
+          const live=rows.find(r=>r.channelId==='live');
+          assert.ok(live&&String(live.release?.version?.name||'').split('/').pop()!==version,
+            'I66_GC_ARCHIVED_VERSION_IS_CURRENT_LIVE_STOP');
+          console.log('I66_GC_EXACT_PREVIEW_TARGET_NO_LIVE_COLLISION_PASS');
+          NODE
+          node tools/gravicentra-preview-channel-gc.mjs "$CLI" "$PROJECT_ID" "gi-i66-rc-43335375097" "$RUNNER_TEMP" "$GC_EXACT_ID"
+          node "$CLI" hosting:channel:list --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/gi-i66-gc-after.json"
+          node - <<'NODE'
+          const fs=require('node:fs'),assert=require('node:assert/strict');
+          const before=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/gi-i66-gc-before.json','utf8'));
+          const after=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/gi-i66-gc-after.json','utf8'));
+          const a=Array.isArray(after.result)?after.result:after.result?.channels||[];
+          const b=Array.isArray(before.result)?before.result:before.result?.channels||[];
+          const id=x=>String(x.channelId||x.name||'').split('/').pop();
+          assert.equal(a.filter(x=>id(x)===process.env.GC_EXACT_ID).length,0,'I66_GC_TARGET_STILL_PRESENT');
+          assert.equal(a.length,b.length-1,'I66_GC_CHANGED_MORE_THAN_ONE_CHANNEL');
+          const oldLive=b.find(x=>id(x)==='live'),newLive=a.find(x=>id(x)==='live');
+          assert.equal(newLive?.release?.version?.name,oldLive?.release?.version?.name,
+            'I66_GC_LIVE_VERSION_CHANGED');
+          console.log('I66_ONE_ARCHIVED_PREVIEW_CHANNEL_REMOVED_PASS id='+process.env.GC_EXACT_ID+
+            ' before='+b.length+' after='+a.length+' live_same_version=true customer_writes=0');
+          NODE
