@@ -308,10 +308,11 @@ jobs:
           curl --fail --location --silent --show-error --max-time 30 https://app.aysseguros.com/ | sha256sum > "$RUNNER_TEMP/gi-i66-staff-before.sha"
       - name: Publish exact immutable site only to isolated Hosting Preview
         id: preview
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
           CHANNEL_ID="gi-i66-rc-${GITHUB_RUN_ID}"
-          echo "channel=$CHANNEL_ID" >> "$GITHUB_OUTPUT"
           cd "$RUNNER_TEMP/gi-i66-package/bundle"
           if ! node "$FIREBASE_CLI_BIN" hosting:channel:deploy "$CHANNEL_ID" --config firebase.json --project "$PROJECT_ID" --expires 7d --non-interactive --json > "$RUNNER_TEMP/gi-i66-preview-result.json" 2>&1; then
             node - <<'NODE'
@@ -336,8 +337,49 @@ jobs:
           if(errors.length===0)errors.push('OUTPUT_LENGTH_'+raw.length);
           console.error('I66_PREVIEW_DEPLOY_DIAGNOSTIC '+JSON.stringify(errors));
           NODE
-            exit 1
+            # A 429 for new channels is a resource quota, not a product QA
+            # failure. Reuse only this exact archived, unreferenced Preview.
+            # Its original artifact is recoverable; LIVE is never targeted.
+            if ! grep -Eqi 'HTTP Error: 429.*channel quota' "$RUNNER_TEMP/gi-i66-preview-result.json"; then exit 1; fi
+            REUSE_ID='gi-i66-rc-42868854629'
+            REUSE_VERSION='18f010edde22015e'
+            test -z "$(git grep -n '42868854629' -- . ':!.github/workflows/gravicentra-release-delta-66-package.yml' || true)"
+            node "$FIREBASE_CLI_BIN" hosting:channel:list --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/gi-i66-reuse-before.json"
+            export REUSE_ID REUSE_VERSION
+            node - <<'NODE'
+          const fs=require('node:fs'),assert=require('node:assert/strict');
+          const j=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/gi-i66-reuse-before.json','utf8'));
+          const a=Array.isArray(j.result)?j.result:j.result?.channels||[];
+          const id=x=>String(x.channelId||x.name||'').split('/').pop();
+          const target=a.filter(x=>id(x)===process.env.REUSE_ID);
+          assert.equal(target.length,1,'I66_REUSE_EXACT_PREVIEW_NOT_UNIQUE');
+          assert.equal(String(target[0].release?.version?.name||'').split('/').pop(),
+            process.env.REUSE_VERSION,'I66_REUSE_ARCHIVED_VERSION_CHANGED_STOP');
+          assert.ok(String(target[0].createTime||'').startsWith('2026-11-10T')&&
+            id(target[0])!=='live','I66_REUSE_ARCHIVED_PREVIEW_SCOPE_DRIFT');
+          const live=a.find(x=>id(x)==='live');
+          assert.ok(live&&String(live.release?.version?.name||'').split('/').pop()!==process.env.REUSE_VERSION,
+            'I66_REUSE_ARCHIVED_VERSION_IS_LIVE');
+          (async()=>{
+            const h={Authorization:'Bearer '+process.env.GH_TOKEN,Accept:'application/vnd.github+json',
+              'User-Agent':'GI-I66-Archived-Preview-Reuse'};
+            const root='https://api.github.com/repos/paulaosoriof86/orbit360-core/actions/';
+            const [r,b]=await Promise.all([fetch(root+'runs/42868854629',{headers:h}),fetch(root+'artifacts/13787853794',{headers:h})]);
+            assert.ok(r.ok&&b.ok,'I66_REUSE_ARCHIVED_ARTIFACT_PROOF_UNAVAILABLE');
+            const run=await r.json(),artifact=await b.json();
+            assert.ok(run.conclusion==='success'&&
+              run.head_sha==='b87ab67c14671276557292854b5ee8ae590b2458'&&
+              artifact.expired===false&&artifact.workflow_run?.id===42868854629&&
+              artifact.digest==='sha256:f27c6f4a48cf1f22b718311bf1ab288bca9de7dd6e2f178f93032527b64a3866',
+              'I66_REUSE_OLD_EXACT_IMMUTABLE_ARTIFACT_NOT_RECOVERABLE');
+            console.log('I66_ARCHIVED_UNREFERENCED_PREVIEW_EXACT_ID_VERSION_AND_BACKUP_PASS');
+          })().catch(e=>{console.error(e.message);process.exitCode=1;});
+          NODE
+            CHANNEL_ID="$REUSE_ID"
+            node "$FIREBASE_CLI_BIN" hosting:channel:deploy "$CHANNEL_ID" --config firebase.json --project "$PROJECT_ID" --expires 7d --non-interactive --json > "$RUNNER_TEMP/gi-i66-preview-result.json"
+            echo 'I66_PREVIEW_CHANNEL_QUOTA_RECOVERY_REUSED_ARCHIVED_CHANNEL_NO_DELETION'
           fi
+          echo "channel=$CHANNEL_ID" >> "$GITHUB_OUTPUT"
           export CHANNEL_ID
           python3 - <<'PY' >> "$GITHUB_OUTPUT"
           import os,re
