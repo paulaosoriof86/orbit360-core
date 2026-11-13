@@ -43,16 +43,25 @@ async function main(){
       const policies=await data('polizas').limit(3500).get();
       assert.ok(policies.size<3500,'I66_CONCILIACIONES_POLICY_CATALOG_SCAN_LIMIT');
       const normalize=v=>String(v??'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toUpperCase().replace(/[^A-Z0-9]/g,'');
-      const byNumber=new Map();
+      const policyAliases=['numero','numeroPoliza','numero_poliza','numPoliza','polizaNumero','policyNumber'];
+      const byNumber=new Map(),policyFieldCounts=Object.fromEntries(policyAliases.map(key=>[key,0]));
       for(const doc of policies.docs){
-        const p=doc.data()||{}, aliases=new Set(['numero','numeroPoliza','numero_poliza','numPoliza','polizaNumero','policyNumber']
+        const p=doc.data()||{};
+        policyAliases.forEach(key=>{if(String(p[key]??'').trim())policyFieldCounts[key]++;});
+        const aliases=new Set(policyAliases
           .map(k=>normalize(p[k])).filter(Boolean));
         for(const key of aliases){if(!byNumber.has(key))byNumber.set(key,[]);byNumber.get(key).push(p);}
       }
       const matches=rows.map(r=>byNumber.get(normalize(r.policyNumber||r.numeroPoliza||r.polizaNumero))||[]);
       const unique=matches.filter(x=>x.length===1).map(x=>x[0]);
+      const uniqueExactByField=Object.fromEntries(policyAliases.map(key=>[key,
+        rows.filter((r,i)=>matches[i].length===1&&String(matches[i][0][key]??'').trim()===String(r.policyNumber??'').trim()).length]));
+      const uniqueNormalizedByField=Object.fromEntries(policyAliases.map(key=>[key,
+        rows.filter((r,i)=>matches[i].length===1&&normalize(matches[i][0][key])===normalize(r.policyNumber)).length]));
       stageProposalShape.policyJoinReadOnly={
         canonicalPolicyDocsScanned:policies.size,
+        canonicalPolicyNumberFieldCounts:policyFieldCounts,
+        uniqueExactByField,uniqueNormalizedByField,
         uniquePolicyNumberMatches:matches.filter(x=>x.length===1).length,
         policyNumberNotFound:matches.filter(x=>x.length===0).length,
         ambiguousPolicyNumberMatches:matches.filter(x=>x.length>1).length,
