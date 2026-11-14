@@ -22787,7 +22787,7 @@
     "priorLiveHostingVersion": "sites/ays-orbit-360-lab/versions/dae5d5235978cefe",
     "currentPointer": "artifacts/orbit360-recovery/release-control/I6_6_LATEST_EXACT_LIVE_POINTER_20261113.json",
     "signedReleaseReceipt": "artifacts/orbit360-recovery/release-control/I6_6_ROLE_TRANSVERSAL_R8_LIVE_RECEIPT_20261113.json",
-    "next": "BANTRAB_PROTECTED_REVIEW_43438038880_AND_MAPFRE_SC79829_ANNUAL_CONTRACT"
+    "next": "BANTRAB_7_SOURCE_REFERENCE_CAS_COMPLETED_43438038880_ZERO_PAYMENTS; NEXT_SEPARATE_PROTECTED_PAYMENT_APPLICATION_AND_MAPFRE_SC79829_ANNUAL_CONTRACT"
   },
   "i66ConciliacionesHumanNamesR10ExactLiveRelease20261113": {
     "schema": "GI_I66_R10_CONCILIACIONES_HUMAN_CLIENT_NAMES_EXACT_LIVE_SUCCESSOR_V1",
@@ -22839,6 +22839,27 @@
     "roleCountrySigned": "CARLOS_OPERATIVO_AND_PAULA_DIRECCION_SOURCE_HYDRATION_PASS",
     "financialActualWrites": 0,
     "documentDriveRealUploadCertified": false,
+    "fullI66ProductionAccepted": false
+  },
+  "i66BantrabA3SevenSourceRefsLiveRelease20261113": {
+    "schema": "GI_I66_BANTRAB_SEVEN_SOURCE_CAS_PROTECTED_LIVE_RECEIPT_V1",
+    "status": "SEVEN_EXACT_SOURCE_REFERENCES_LIVE_WRITTEN_AND_POSTIMAGE_VERIFIED_NO_PAYMENT_APPLICATION",
+    "dateGuatemala": "2026-11-13",
+    "policyNumber": "AUTO-45580",
+    "tenant": "alianzas-soluciones",
+    "country": "GT",
+    "protectedEnvironment": "gravicentra-live-data-writes",
+    "workflowRunId": 43438038880,
+    "protectedJobId": 131931680041,
+    "workflowConclusion": "success",
+    "receiptSourceReferenceWrites": 7,
+    "paymentWrites": 0,
+    "amountDateStatusWrites": 0,
+    "auditAndRollback": "PASS_IN_WORKFLOW_POSTIMAGE_GUARD",
+    "evidenceArtifactId": 14095802597,
+    "evidenceDigest": "sha256:3f55af224f9b7be72e1f0f9d6bc1330529b4ce853e86acb5ad06211e5496eb62",
+    "canonicalReceipt": "artifacts/orbit360-recovery/release-control/I6_6_BANTRAB_SEVEN_SOURCE_REFS_LIVE_RECEIPT_20261113.json",
+    "next": "DO_NOT_REPEAT_THIS_CAS; SOURCE_EXACT_PAYMENT_EVIDENCE_AND_SEPARATE_PROTECTED_PAYMENT_COMMAND_REQUIRED",
     "fullI66ProductionAccepted": false
   }
 }
