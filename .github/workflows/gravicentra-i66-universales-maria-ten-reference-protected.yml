@@ -1,0 +1,97 @@
+# I6.6 production data: source references only, ten insurer receipts.
+# No hosting deployment, payment creation, client/policy creation, date rewrite.
+# Every write requires the existing GitHub protected environment and Paula's
+# explicit review of THIS run and EXACT current branch commit.
+name: Gravicentra I6.6 Universales Maria 10 references PROTECTED
+
+on:
+  push:
+    branches: [recovery/fase-a-clean-20260831]
+    paths:
+      - .github/workflows/gravicentra-i66-universales-maria-ten-reference-protected.yml
+
+permissions:
+  actions: read
+  contents: read
+
+concurrency:
+  group: gravicentra-live-data-writes-i66
+  cancel-in-progress: false
+
+jobs:
+  static-preflight:
+    if: github.repository == 'paulaosoriof86/orbit360-core' && github.ref_name == 'recovery/fase-a-clean-20260831'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - name: Frozen source digest, syntax and no-write guard regressions
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git hash-object artifacts/orbit360-recovery/release-control/i6-6-p0-checkpoints/I66_UNIVERSALES_MARIA_10_PATCH_ONLY_NOT_APPLIED_20261110.tar.gz.b64.md)" = '0938c08daa1238b77007eb785ab5bd955dfac3ab'
+          node --check tools/gravicentra-i66-universales-maria-10-source-numbers-protected.cjs
+          node --test tools/gravicentra-i66-universales-maria-10-source-numbers-protected.test.cjs
+
+  apply-reviewed-ten-references:
+    needs: [static-preflight]
+    if: github.repository == 'paulaosoriof86/orbit360-core' && github.ref_name == 'recovery/fase-a-clean-20260831'
+    environment:
+      name: gravicentra-live-data-writes
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      GCLOUD_PROJECT: ays-orbit-360-lab
+      GI_I66_MARIA_MODE: apply
+      GI_I66_MARIA_WRITE_ENABLED: YES_REVIEWED_TEN_REFERENCE_FIELDS_ONLY
+      GI_I66_ENVIRONMENT: gravicentra-live-data-writes
+      GI_I66_INTENT: UNIVERSALES_MARIA_10_SOURCE_NUMBER_ONLY_NO_PAYMENT_NO_DATE
+      GI_I66_GITHUB_ACTIONS_READ_TOKEN: ${{ github.token }}
+      SA_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_LAB_ALT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - name: Extract exact immutable insurer source; never trust old LIVE document IDs
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git hash-object artifacts/orbit360-recovery/release-control/i6-6-p0-checkpoints/I66_UNIVERSALES_MARIA_10_PATCH_ONLY_NOT_APPLIED_20261110.tar.gz.b64.md)" = '0938c08daa1238b77007eb785ab5bd955dfac3ab'
+          SRC=artifacts/orbit360-recovery/release-control/i6-6-p0-checkpoints/I66_UNIVERSALES_MARIA_10_PATCH_ONLY_NOT_APPLIED_20261110.tar.gz.b64.md
+          awk '/^```base64$/{on=1;next} /^```$/{on=0} on{print}' "$SRC" | base64 --decode > "$RUNNER_TEMP/gi-i66-universales-source.tar.gz"
+          test "$(tar -tzf "$RUNNER_TEMP/gi-i66-universales-source.tar.gz" | grep -Ec '(^/|(^|/)\.\.(/|$))' || true)" = 0
+          tar -xOzf "$RUNNER_TEMP/gi-i66-universales-source.tar.gz" i66_universales_maria_source_PATCH_ONLY_NOT_APPLIED.json > "$RUNNER_TEMP/gi-i66-universales-source.json"
+          echo "GI_I66_MARIA_FIXTURE_PATH=$RUNNER_TEMP/gi-i66-universales-source.json" >> "$GITHUB_ENV"
+      - name: Use preconfigured LAB credential without copying it into artifacts
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF_NAME" = 'recovery/fase-a-clean-20260831'
+          test "$GCLOUD_PROJECT" = 'ays-orbit-360-lab'
+          test -z "${FIRESTORE_EMULATOR_HOST:-}"
+          npm install --prefix "$RUNNER_TEMP/gi-i66-universales-admin" --no-audit --no-fund --ignore-scripts firebase-admin@13.4.0 >/dev/null
+          echo "NODE_PATH=$RUNNER_TEMP/gi-i66-universales-admin/node_modules" >> "$GITHUB_ENV"
+          python3 - <<'PY'
+          import json,os,pathlib
+          p=pathlib.Path(os.environ['RUNNER_TEMP'])/'gi-i66-universales-sa.json'
+          for key in ('SA_LAB','SA_LAB_ALT','SA_DEFAULT'):
+              try: item=json.loads(os.environ.get(key,''))
+              except (TypeError,ValueError): continue
+              if item.get('type')!='service_account' or item.get('project_id')!='ays-orbit-360-lab' or not item.get('private_key'): continue
+              p.write_text(json.dumps(item),encoding='utf8');p.chmod(0o600)
+              with open(os.environ['GITHUB_ENV'],'a') as output: output.write('GOOGLE_APPLICATION_CREDENTIALS='+str(p)+'\n')
+              print('GI_I66_UNIVERSALES_EXISTING_LAB_IDENTITY_SELECTED')
+              break
+          else: raise SystemExit('GI_I66_UNIVERSALES_NO_VALID_EXISTING_LAB_IDENTITY_HOLD')
+          PY
+      - name: Apply ONLY ten external source numbers after reviewer + exact SHA proof; read back
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/gravicentra-i66-universales-maria-10-source-numbers-protected.cjs
