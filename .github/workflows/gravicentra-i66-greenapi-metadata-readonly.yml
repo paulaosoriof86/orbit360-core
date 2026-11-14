@@ -4,9 +4,6 @@
 name: Gravicentra I6.6 GreenAPI Secure Metadata ONLY
 
 on:
-  push:
-    branches: [recovery/fase-a-clean-20260831]
-    paths: [.github/workflows/gravicentra-i66-greenapi-metadata-readonly.yml]
   workflow_dispatch:
     inputs:
       scope_confirmation:
@@ -27,7 +24,7 @@ jobs:
     if: >-
       github.repository == 'paulaosoriof86/orbit360-core' &&
       github.ref == 'refs/heads/recovery/fase-a-clean-20260831' &&
-      (github.event_name == 'push' || inputs.scope_confirmation == 'READ_ONLY_NO_SEND')
+      inputs.scope_confirmation == 'READ_ONLY_NO_SEND'
     runs-on: ubuntu-24.04
     timeout-minutes: 12
     env:
