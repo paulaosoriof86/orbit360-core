@@ -1,0 +1,58 @@
+{
+  "schema": "GI_I6_6_UNIVERSALES_MARIA_RECOVERED_PROVENANCE_V1",
+  "recordedForLocalDate": "2026-11-13",
+  "target": {
+    "repository": "paulaosoriof86/orbit360-core",
+    "branch": "recovery/fase-a-clean-20260831",
+    "environment": "LIVE",
+    "tenant": "alianzas-soluciones",
+    "carrier": "Seguros Universales",
+    "case": "MARIA_EXACT_17"
+  },
+  "originalHistoricalProtectedWrite": {
+    "status": "PASS_POSTREADBACK",
+    "executedAtUtc": "2026-11-10T22:44:19Z",
+    "runId": 42914107853,
+    "jobId": 130171951236,
+    "sourceHead": "52a4ac68f68377859d1687529dc1144341c471af",
+    "artifactId": 13809098566,
+    "artifactDigestSha256": "3f0847f5dbf90e80457ab8e7824ce3f414add54e70eddd1f141676f2f50fe458",
+    "receiptSourceReferences": 10,
+    "portfolioDateCorrections": 7,
+    "protectedReadbackResult": "PASS_READBACK_17_SPARSE_DOCS_AUDIT",
+    "paymentFieldsModified": 0
+  },
+  "recentAuthorizedNoDuplicateAttempt": {
+    "runId": 43553830616,
+    "jobId": 132322095520,
+    "conclusion": "FAIL_CLOSED_PREWRITE",
+    "sourceHead": "5bbe5a44655e105b75ab563abcdeeb3f7bcd5758",
+    "financialWrites": 0,
+    "reason": "PREIMAGE_OR_CONCURRENT_DATE_DRIFT_SET_CHANGED_UNAUDITED_PARTIAL_SOURCE_APPLICATION"
+  },
+  "freshSignedLiveReadOnly": {
+    "reExecutedOriginalRunId": 42904276754,
+    "readOnlyRerunJobId": 132336308577,
+    "artifactId": 14099215995,
+    "artifactDigestSha256": "778e407b1fc111da8c9ab3fa1f5e33166926ba6d2ff8cc8d721e05ad8f7e5502",
+    "readAtUtc": "2026-11-14T04:47:59Z",
+    "liveReceipts": 12,
+    "externalSourceReferencesPresent": 10,
+    "sourceReferencePatchesStillNeeded": 0,
+    "dueDateMismatchesStillRemaining": 0,
+    "operationalAnd15Diff": 0,
+    "portfolioLinkedDateDiff": 0,
+    "guardAnomalies": 0,
+    "financialWrites": 0,
+    "receiptDigest": "6b9a49e5ae656e74ca3388997907eef1ad6365e9d1b4a1643daba5f45241d46",
+    "portfolioDigest": "afd0ba55d4fbac97619efc32628190cf85d1f4940007f5ee106d7477e9d413fe"
+  },
+  "decisions": {
+    "repeatWrites": false,
+    "markAsAlreadyApplied": true,
+    "doNotCountAsNewCurrentIterationWrites": true,
+    "doNotClassifyAsPayments": true,
+    "fullI66Accepted": false,
+    "next": "Identify genuinely unapplied exact source-bound cases; no blanket Bantrab/Mapfre payment or policy editions without insurer evidence and safe CAS."
+  }
+}
