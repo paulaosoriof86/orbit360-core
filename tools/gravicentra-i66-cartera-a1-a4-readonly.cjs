@@ -54,6 +54,7 @@ const SOURCE_SHA256=Object.freeze({
   mapfrePendingNov:'29a42705ae6f7b2b42693f51a27a0b1f4ced279e2259b28ce021ff7b21ccefb0',
   bantrabNov04:'b945a98c7c572909c643be4c849a7526a363eb490cdcf24ac8d0ae54ca3025b7'
 });
+const BANTRAB_PREVIOUSLY_WRITTEN=Object.freeze(['A3.B1','A3.B4','A3.B5','A3.B6','A3.B7','A3.B8','A3.B9']);
 const PROJECT='ays-orbit-360-lab',text=x=>String(x==null?'':x).trim();
 const digest=x=>crypto.createHash('sha256').update(JSON.stringify(x,(k,v)=>v&&typeof v.toJSON==='function'?v.toJSON():v)).digest('hex').slice(0,16);
 const cents=x=>x==null||text(x)===''?null:Number.isFinite(+x)?Math.round((+x+Number.EPSILON)*100):null;
@@ -219,9 +220,22 @@ async function main(){
   const db=getFirestore(getApps()[0]||initializeApp({projectId:PROJECT}));
   const first=await scan(db),second=await scan(db);
   if(first.length!==CASES.length||JSON.stringify(first)!==JSON.stringify(second))throw Error('I66_A1_A4_CONCURRENT_CHANGE');
-  const report={schema:'gi.i66.cartera.a1-a4-a7.readonly.v3',dateGuatemala:'2026-11-12',
+  const bantrabRows=first.filter(x=>x.id.startsWith('A3.'));
+  const previous=bantrabRows.filter(x=>BANTRAB_PREVIOUSLY_WRITTEN.includes(x.id));
+  const remaining=bantrabRows.filter(x=>!BANTRAB_PREVIOUSLY_WRITTEN.includes(x.id));
+  const matched=x=>x.exactRequirementMatches===1&&x.exactAmountEditions===1;
+  const report={schema:'gi.i66.cartera.a1-a4-a7.readonly.v4',dateGuatemala:'2026-11-13',
     project:'ays-orbit-360-lab',cases:first,totalCases:first.length,writes:0,
     sourceSha256:SOURCE_SHA256,
+    bantrabPostProtectedBatchReadback:{priorProtectedRunId:43438038880,
+      priorProtectedSourceReferenceWrites:7,priorProtectedPaymentWrites:0,
+      previousSevenExactReferenceAndAmountReadback:previous.filter(matched).length,
+      previousSevenUnexpectedOrUnlinked:previous.filter(x=>!matched(x)).map(x=>x.id),
+      remainingSevenSourceCaseIds:remaining.map(x=>x.id),
+      remainingSevenAlreadyExactReferenced:remaining.filter(matched).length,
+      remainingSevenPotentialUnlinked:remaining.filter(x=>!matched(x)).length,
+      remainingSevenMissingPolicy:remaining.filter(x=>x.currentStatus==='HOLD_POLICY_NOT_FOUND').length,
+      paymentApplicationsDuringThisRead:0},
     paidSourceUnique:CASES.filter(x=>x.paidDate).length,
     pendingSourceRequirements:CASES.filter(x=>x.due&&!x.paidDate).length,certifiedApplied:0,
     pendingByInsurer:{MAPFRE:CASES.filter(x=>x.id.startsWith('A2.')).length,
@@ -238,4 +252,4 @@ async function main(){
   console.log('I66_CARTERA_A1_A4_READONLY='+JSON.stringify(report));
 }
 if(require.main===module)main().catch(e=>{console.error(safeError(e));process.exitCode=1});
-module.exports={CASES,SOURCE_SHA256,assess,resolveEditions,numbers,amount,paid,policyVariants};
+module.exports={CASES,SOURCE_SHA256,BANTRAB_PREVIOUSLY_WRITTEN,assess,resolveEditions,numbers,amount,paid,policyVariants};

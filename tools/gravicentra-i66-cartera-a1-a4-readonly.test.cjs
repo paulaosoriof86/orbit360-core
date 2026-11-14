@@ -1,7 +1,7 @@
 'use strict';
 const assert=require('node:assert/strict');
 const fs=require('node:fs');
-const {CASES,SOURCE_SHA256,assess,resolveEditions,policyVariants}=require('./gravicentra-i66-cartera-a1-a4-readonly.cjs');
+const {CASES,SOURCE_SHA256,BANTRAB_PREVIOUSLY_WRITTEN,assess,resolveEditions,policyVariants}=require('./gravicentra-i66-cartera-a1-a4-readonly.cjs');
 assert.equal(SOURCE_SHA256.mapfrePendingNov,'29a42705ae6f7b2b42693f51a27a0b1f4ced279e2259b28ce021ff7b21ccefb0');
 assert.equal(SOURCE_SHA256.bantrabNov04,'b945a98c7c572909c643be4c849a7526a363eb490cdcf24ac8d0ae54ca3025b7');
 assert.equal(CASES.length,37,'A1_PAID_THREE_A2_SEVENTEEN_A3_FOURTEEN_A4_TWO_A7_ONE');
@@ -9,6 +9,9 @@ assert.equal(new Set(CASES.map(x=>x.id)).size,CASES.length,'UNIQUE_SOURCE_CASE_I
 assert.equal(CASES.filter(x=>x.id.startsWith('A1.')).length,3);
 assert.equal(CASES.filter(x=>x.id.startsWith('A2.')).length,17);
 assert.equal(CASES.filter(x=>x.id.startsWith('A3.')).length,14);
+assert.equal(BANTRAB_PREVIOUSLY_WRITTEN.length,7);
+assert.equal(new Set(BANTRAB_PREVIOUSLY_WRITTEN).size,7);
+assert.ok(BANTRAB_PREVIOUSLY_WRITTEN.every(id=>CASES.some(x=>x.id===id&&x.insurer==='BANTRAB')));
 assert.equal(CASES.filter(x=>x.id.startsWith('A4.')).length,2);
 assert.equal(CASES.filter(x=>x.id.startsWith('A7.')).length,1);
 assert.equal(CASES.filter(x=>x.id.startsWith('A2.')).reduce((s,x)=>s+x.cents,0),1061230,'SOURCE_MAPFRE_DETAILS_NO_DOUBLE_SUBTOTAL');
