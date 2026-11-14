@@ -45,7 +45,27 @@
     "actualInsurerInvoicePdfUploadReadback": "HOLD_NOT_SIGNED",
     "newRealFinancialRecordsWrittenByRelease": 0
   },
-  "nextAction": "DRIVE_ADMIN_OAUTH_CONSENT_REAL_CARLOS_PDF_UPLOAD; BANTRAB_PROTECTED_REVIEW_43438038880_ZERO_WRITES; MAPFRE_ANNUAL_PREMIUM_AND_DOCUMENT; SIGNED_REAL_ISSUED_RENEWAL_READBACK; GREENAPI_REAL_DELIVERY_TEST",
+  "postR11ProtectedBantrabDataSuccessor20261113": {
+    "frontendArtifactUnchanged": true,
+    "workflowRunId": 43438038880,
+    "workflowConclusion": "success",
+    "tenantBound": "alianzas-soluciones",
+    "policyBound": "AUTO-45580",
+    "exactSourceReferenceWritesCommitted": 7,
+    "sourceReferenceWriteReadback": "PROTECTED_LIVE_BANTRAB_SEVEN_SOURCE_REFERENCES_PASS",
+    "actualPaymentWrites": 0,
+    "amountDateOrStatusWrites": 0,
+    "auditAndRollbackRecorded": true,
+    "successorReceipt": "artifacts/orbit360-recovery/release-control/I6_6_BANTRAB_SEVEN_SOURCE_REFS_LIVE_RECEIPT_20261113.json"
+  },
+  "postR11OperatorBrowserReloadCheck20261113": {
+    "surface": "https://app.aysseguros.com/#/conciliaciones",
+    "priorOpenTabWasStale": true,
+    "afterReloadRowsWithHumanClientNames": 52,
+    "afterReloadTechnicalClientLabels": 0,
+    "persistentOpenTabUpdateNotification": "NOT_CERTIFIED"
+  },
+  "nextAction": "A1_A7_EXACT_SOURCE_PAID_VS_PENDING_CAS_GUARDS_ZERO_BLIND_PAYMENTS; MAPFRE_SC79829_2026_2027_ANNUAL_PREMIUM_OR_ISSUED_ANNEX; REAL_CARLOS_PAYMENT_ERROR_AND_INSURER_PASSWORD_LOGO_UAT; DRIVE_ADMIN_OAUTH_CONSENT; GREENAPI_SERVER_SECRET_BRIDGE_WEBHOOK_REAL_ACK; PREEXISTING_TAB_VERSION_UPDATE_CHECK",
   "historicalR8ExactPublishedRoleRightsAndUat20261113": {
     "receipt": "artifacts/orbit360-recovery/release-control/I6_6_ROLE_TRANSVERSAL_R8_LIVE_RECEIPT_20261113.json",
     "qa": {
