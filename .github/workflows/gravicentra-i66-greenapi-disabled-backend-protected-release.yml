@@ -1,0 +1,192 @@
+# I6.6 — Publish the existing, tested server bridge with both outbound and webhook OFF.
+# An existing protected LIVE environment must approve the deployment separately.
+# This never sends WhatsApp, reads provider credentials, changes Firestore business
+# data or enables routes. The two exact new function names are the whole scope.
+name: Gravicentra I6.6 GreenAPI bridge disabled protected LIVE
+
+on:
+  push:
+    branches: [recovery/fase-a-clean-20260831]
+    paths: [.github/workflows/gravicentra-i66-greenapi-disabled-backend-protected-release.yml]
+  workflow_dispatch:
+    inputs:
+      scope_confirmation:
+        description: "Deploy TWO existing GreenAPI functions with sending and webhook OFF; no messages"
+        required: true
+        type: choice
+        options: [DEPLOY_DISABLED_NO_SEND]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: gi-i66-greenapi-disabled-backend-live
+  cancel-in-progress: false
+
+jobs:
+  source-and-tests:
+    if: >-
+      github.repository == 'paulaosoriof86/orbit360-core' &&
+      github.ref == 'refs/heads/recovery/fase-a-clean-20260831' &&
+      (github.event_name == 'push' || inputs.scope_confirmation == 'DEPLOY_DISABLED_NO_SEND')
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - name: Pin six approved GreenAPI source blobs and verify disabled default
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git hash-object functions/greenapi-firebase-bridge.js)" = 5ef0205765b77a5d16772dc17acf3f11c3cc6f28
+          test "$(git hash-object functions/greenapi-outbox-core.js)" = 2e9b4594e48dae0a596756f62481dea2f27c8d33
+          test "$(git hash-object functions/greenapi-direct-transport.js)" = f302694f5f764870d6c1d2b6d29c0cd64d714aef
+          test "$(git hash-object functions/greenapi-delivery-plan.js)" = 7f674c846a782a5ed7829836e998b79808dd5ed8
+          test "$(git hash-object functions/bootstrap.js)" = 160f943dd993bb4dfa88e24fd00ede422e3d5a7b
+          test "$(git hash-object functions/package-lock.json)" = 868690d441b0073c550aea2de56c35950fafa9d1
+          node --check functions/greenapi-firebase-bridge.js
+          node --check functions/greenapi-outbox-core.js
+          node --check functions/greenapi-direct-transport.js
+          node --check functions/greenapi-delivery-plan.js
+          node - <<'NODE'
+          const fs=require('fs');
+          const bridge=fs.readFileSync('functions/greenapi-firebase-bridge.js','utf8');
+          const bootstrap=fs.readFileSync('functions/bootstrap.js','utf8');
+          if(!bridge.includes("process.env.ORBIT360_GREENAPI_ENABLED === 'true'")||
+            !bootstrap.includes("require('./greenapi-firebase-bridge')"))
+            throw Error('GI_GREENAPI_DISABLED_BOOTSTRAP_SOURCE_CONTRACT_DRIFT');
+          console.log('GI_GREENAPI_SIX_EXACT_SOURCE_BLOBS_AND_DISABLED_DEFAULT_PASS');
+          NODE
+      - name: Run 44 tests without credentials or network
+        run: |
+          set -euo pipefail
+          node --test \
+            tools/gravicentra-i6-6-greenapi-delivery-contract.test.cjs \
+            tools/gravicentra-i6-6-greenapi-outbox-core.test.cjs \
+            tools/gravicentra-i6-6-greenapi-firebase-emulated.test.cjs \
+            tools/gravicentra-i6-6-greenapi-firebase-scaffold.test.cjs
+
+  protected-deploy-disabled:
+    needs: source-and-tests
+    if: >-
+      github.repository == 'paulaosoriof86/orbit360-core' &&
+      github.ref == 'refs/heads/recovery/fase-a-clean-20260831'
+    environment:
+      name: gravicentra-live-data-writes
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    env:
+      PROJECT_ID: ays-orbit-360-lab
+      REGION: us-central1
+      SA_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_ALT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+      EXPECTED_A: orbit360GreenApiOutboxUpdated
+      EXPECTED_B: orbit360GreenApiDeliveryStatus
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: google-github-actions/setup-gcloud@v2
+        with:
+          version: '>= 483.0.0'
+      - name: Resolve existing same-project deployment credential without printing it
+        shell: bash
+        run: |
+          set -euo pipefail
+          set +x
+          python3 - <<'PY'
+          import json,os,pathlib
+          root=pathlib.Path(os.environ['RUNNER_TEMP'])/'gi-i66-greenapi-disabled-auth'
+          root.mkdir(mode=0o700)
+          for k in ('SA_LAB','SA_ALT','SA_DEFAULT'):
+              try: row=json.loads(os.environ.get(k) or '{}')
+              except (TypeError,ValueError):continue
+              if row.get('type')=='service_account' and row.get('project_id')=='ays-orbit-360-lab' and row.get('private_key'):
+                  path=root/'selected.json';path.write_text(json.dumps(row));path.chmod(0o600)
+                  with open(os.environ['GITHUB_ENV'],'a') as f:f.write('GOOGLE_APPLICATION_CREDENTIALS='+str(path)+'\n')
+                  print('GI_GREENAPI_EXISTING_SAME_PROJECT_CREDENTIAL_PASS')
+                  break
+          else:raise SystemExit('GI_GREENAPI_CREDENTIAL_MISSING_FAIL_CLOSED')
+          PY
+          gcloud auth activate-service-account --key-file="$(find "$RUNNER_TEMP/gi-i66-greenapi-disabled-auth" -type f -name selected.json)" --quiet >/dev/null 2>&1
+          gcloud config set project "$PROJECT_ID" --quiet >/dev/null 2>&1
+      - name: Verify EXACT target functions absent; inventory all existing functions
+        shell: bash
+        run: |
+          set -euo pipefail
+          gcloud functions list --v2 --regions="$REGION" --project="$PROJECT_ID" --format=json > "$RUNNER_TEMP/gi-i66-greenapi-before.json"
+          python3 - <<'PY'
+          import os,json
+          rows=json.load(open(os.environ['RUNNER_TEMP']+'/gi-i66-greenapi-before.json'))
+          assert isinstance(rows,list)
+          ids={str(x.get('name','')).split('/')[-1] for x in rows}
+          assert not ({'orbit360GreenApiOutboxUpdated','orbit360GreenApiDeliveryStatus'}&ids),'GREENAPI_PREEXISTING_FUNCTION_DRIFT_HOLD'
+          print('GI_GREENAPI_TWO_TARGETS_ABSENT_NO_DUPLICATE_DEPLOY_PASS')
+          PY
+          test ! -e functions/.env
+          test ! -e functions/.env.ays-orbit-360-lab
+      - name: Install pinned Firebase CLI and locked server dependencies
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm ci --prefix functions --ignore-scripts --no-audit --no-fund >/dev/null
+          npm install --prefix "$RUNNER_TEMP/gi-greenapi-firebase-cli" --no-save --ignore-scripts --no-audit --no-fund firebase-tools@14.10.1 >/dev/null
+          node tools/gravicentra-firebase-tools-empty-extensions-workaround-v1.mjs "$RUNNER_TEMP/gi-greenapi-firebase-cli"
+          echo "GI_GREENAPI_FIREBASE_CLI=$RUNNER_TEMP/gi-greenapi-firebase-cli/node_modules/firebase-tools/lib/bin/firebase.js" >> "$GITHUB_ENV"
+      - name: Deploy two disabled functions with scoped rollback and verify metadata
+        shell: bash
+        run: |
+          set -euo pipefail
+          deployment_started=0;verified=0
+          rollback(){
+            code=$?
+            if test "$deployment_started" = 1 && test "$verified" != 1;then
+              set +e
+              # Both were absent in the verified preimage. No other target is deleted.
+              for name in "$EXPECTED_A" "$EXPECTED_B";do
+                gcloud functions delete "$name" --gen2 --region "$REGION" --project "$PROJECT_ID" --quiet >/dev/null 2>&1 || true
+              done
+              echo GI_GREENAPI_ROLLBACK_TWO_NEW_FUNCTIONS_ATTEMPTED
+            fi
+            exit "$code"
+          }
+          trap rollback EXIT
+          deployment_started=1
+          node "$GI_GREENAPI_FIREBASE_CLI" deploy \
+            --only functions:orbit360GreenApiOutboxUpdated,functions:orbit360GreenApiDeliveryStatus \
+            --config firebase.json --project "$PROJECT_ID" --non-interactive
+          gcloud functions list --v2 --regions="$REGION" --project "$PROJECT_ID" --format=json > "$RUNNER_TEMP/gi-i66-greenapi-after.json"
+          python3 - <<'PY'
+          import os,json
+          root=os.environ['RUNNER_TEMP']
+          before=json.load(open(root+'/gi-i66-greenapi-before.json'))
+          after=json.load(open(root+'/gi-i66-greenapi-after.json'))
+          def names(rows):return {str(x.get('name','')).split('/')[-1] for x in rows}
+          assert names(after)-names(before)=={'orbit360GreenApiOutboxUpdated','orbit360GreenApiDeliveryStatus'},'GREENAPI_DEPLOYMENT_SCOPE_CHANGED'
+          assert names(before)<=names(after),'GREENAPI_PREEXISTING_FUNCTION_REMOVED'
+          print('GI_GREENAPI_EXISTING_FUNCTION_INVENTORY_PRESERVED_PASS')
+          PY
+          for fn in "$EXPECTED_A" "$EXPECTED_B";do
+            gcloud functions describe "$fn" --gen2 --region "$REGION" --project "$PROJECT_ID" --format=json > "$RUNNER_TEMP/gi-i66-greenapi-$fn.json"
+          done
+          python3 - <<'PY'
+          import json,os
+          root=os.environ['RUNNER_TEMP']
+          for fn in ('orbit360GreenApiOutboxUpdated','orbit360GreenApiDeliveryStatus'):
+              f=json.load(open(root+'/gi-i66-greenapi-'+fn+'.json'))
+              env=(f.get('serviceConfig') or {}).get('environmentVariables') or {}
+              assert env.get('ORBIT360_GREENAPI_ENABLED')!='true','GREENAPI_ENABLED_WITHOUT_APPROVAL'
+              assert 'ORBIT360_GREENAPI_GT_SECRET_VERSION' not in env,'GREENAPI_UNEXPECTED_SECRET_REF'
+              assert str(f.get('state','')).upper() in ('ACTIVE','READY'),'GREENAPI_FUNCTION_NOT_ACTIVE'
+          print('GI_GREENAPI_TWO_FUNCTIONS_LIVE_DISABLED_NO_SECRET_REF_PASS')
+          PY
+          verified=1
+          trap - EXIT
+          echo 'GI_GREENAPI_DISABLED_BACKEND_PUBLISHED_TWO_FUNCTIONS_NO_MESSAGE_SEND_NO_FINANCIAL_WRITE_PASS'
