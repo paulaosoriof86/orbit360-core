@@ -167,6 +167,71 @@ function safeFailureEvidence(error,stage){
     failureLocation:location?{file:'gravicentra-i6-6-advisor-payables-signed-uat.cjs',line:Number(location[1]),column:Number(location[2])}:null};
 }
 
+// Diagnostics describe actionability only. Never retain visible text, the
+// legal scope (which contains the actor's email), arbitrary attributes or URLs.
+function safeFinanceUiSnapshot(value){
+  const input=value&&typeof value==='object'?value:{};
+  const boolean=key=>typeof input[key]==='boolean'?input[key]:null;
+  const count=key=>Number.isSafeInteger(input[key])&&input[key]>=0&&input[key]<=10000?input[key]:null;
+  const coordinate=value=>typeof value==='number'&&Number.isFinite(value)&&Math.abs(value)<=100000?Math.round(value):null;
+  const tags=new Set(['DIV','SPAN','BUTTON','INPUT','LABEL','H1','H2','H3','P','UL','LI','SVG','PATH','BODY','HTML','MAIN','SECTION']);
+  const ids=new Set(['lg-chk','lg-ok','lg-print','fin-body','auth-restoring','login','app','main','content']);
+  const classes=new Set(['drawer-back','open','conf-modal','conf-h','conf-body','conf-chk','conf-f','tab','active','tabs','tabs-scroll','page','btn','primary','ghost','hidden']);
+  const rect=input.rect&&typeof input.rect==='object'?Object.fromEntries(['x','y','width','height'].map(key=>[key,coordinate(input.rect[key])])):null;
+  return {snapshotStatus:input.snapshotStatus==='CAPTURED'?'CAPTURED':'UNAVAILABLE',
+    route:['FINANZAS','OTHER','UNKNOWN'].includes(input.route)?input.route:'UNKNOWN',
+    tabCount:count('tabCount'),tabConnected:boolean('tabConnected'),tabVisible:boolean('tabVisible'),tabEnabled:boolean('tabEnabled'),rect,
+    centerInViewport:boolean('centerInViewport'),targetReceivesPointer:boolean('targetReceivesPointer'),
+    topTag:tags.has(input.topTag)?input.topTag:null,topId:ids.has(input.topId)?input.topId:null,
+    topClasses:Array.isArray(input.topClasses)?[...new Set(input.topClasses.filter(value=>classes.has(value)))].sort():[],
+    legalOverlayPresent:boolean('legalOverlayPresent'),legalOverlayAtTarget:boolean('legalOverlayAtTarget'),
+    legalOverlayCount:count('legalOverlayCount'),modalCount:count('modalCount'),authRestoring:boolean('authRestoring')};
+}
+const CLICK_ACTIONABILITY_KEYS=Object.freeze(['pointerInterception','detached','notVisible','notEnabled','notStable','outsideViewport']);
+function safeClickActionability(error){
+  const message=String(error?.message||'');
+  return {pointerInterception:/intercepts pointer events/i.test(message),
+    detached:/element (?:was|is) detached|not attached to the DOM/i.test(message),
+    notVisible:/element is not visible/i.test(message),notEnabled:/element is not enabled/i.test(message),
+    notStable:/element is not stable/i.test(message),outsideViewport:/element is outside of the viewport/i.test(message)};
+}
+function safeFinanceUiDiagnostics(value){
+  if(!value||typeof value!=='object')return null;
+  const out={};
+  for(const key of ['beforeClick','onFailure'])if(Object.prototype.hasOwnProperty.call(value,key))out[key]=safeFinanceUiSnapshot(value[key]);
+  if(value.actionability&&typeof value.actionability==='object')out.actionability=Object.fromEntries(
+    CLICK_ACTIONABILITY_KEYS.map(key=>[key,typeof value.actionability[key]==='boolean'?value.actionability[key]:false]));
+  return out;
+}
+async function captureFinanceUiSnapshot(page){
+  try{
+    const snapshot=await page.evaluate(()=>{
+      const tabs=document.querySelectorAll('.tab[data-t="asesores"]'),tab=tabs[0]||null;
+      const rect=tab?.getBoundingClientRect(),style=tab?window.getComputedStyle(tab):null;
+      const x=rect?rect.left+rect.width/2:null,y=rect?rect.top+rect.height/2:null;
+      const inViewport=!!rect&&x>=0&&y>=0&&x<window.innerWidth&&y<window.innerHeight;
+      const top=inViewport?document.elementFromPoint(x,y):null;
+      const gates=document.querySelectorAll('[data-legal-gate]');
+      const knownIds=new Set(['lg-chk','lg-ok','lg-print','fin-body','auth-restoring','login','app','main','content']);
+      const knownClasses=new Set(['drawer-back','open','conf-modal','conf-h','conf-body','conf-chk','conf-f','tab','active','tabs','tabs-scroll','page','btn','primary','ghost','hidden']);
+      return {snapshotStatus:'CAPTURED',route:location.hash.split('?')[0]==='#/finanzas'?'FINANZAS':location.hash?'OTHER':'UNKNOWN',
+        tabCount:tabs.length,tabConnected:!!tab?.isConnected,
+        tabVisible:!!rect&&rect.width>0&&rect.height>0&&style?.display!=='none'&&style?.visibility!=='hidden',
+        tabEnabled:!!tab&&tab.disabled!==true&&tab.getAttribute('aria-disabled')!=='true'&&!tab.closest('[inert]'),
+        rect:rect?{x:rect.x,y:rect.y,width:rect.width,height:rect.height}:null,centerInViewport:inViewport,
+        targetReceivesPointer:!!tab&&!!top&&(tab===top||tab.contains(top)),topTag:top?.tagName||null,
+        topId:knownIds.has(top?.id)?top.id:null,topClasses:top?Array.from(top.classList||[]).filter(value=>knownClasses.has(value)):[],
+        legalOverlayPresent:gates.length>0,legalOverlayAtTarget:!!top?.closest('[data-legal-gate]'),
+        legalOverlayCount:gates.length,modalCount:document.querySelectorAll('.drawer-back.open').length,
+        authRestoring:document.documentElement.getAttribute('data-auth-restoring')==='1'};
+    });
+    return safeFinanceUiSnapshot(snapshot);
+  }catch{
+    // Diagnostics cannot replace the original click failure or alter cleanup.
+    return safeFinanceUiSnapshot(null);
+  }
+}
+
 async function main(){
   const cfg=configuration(process.env),runId='b4003qa_i66_cxp_'+Date.now().toString(36)+'_'+crypto.randomBytes(5).toString('hex');
   const report={schemaVersion:'gravicentra-i66-advisor-payables-signed-uat-v1',phase:cfg.phase,sourceSha:cfg.source,
@@ -258,7 +323,14 @@ async function main(){
     await direction.page.waitForSelector('.tab[data-t="asesores"]',{state:'visible',timeout:30000});
     await direction.page.evaluate(async()=>{await Orbit.store._ensureCollections(['asesores','clientes','polizas','comisiones','finmovs']);});
     await direction.page.waitForFunction(ids=>!!Orbit.store.get('asesores',ids.advisor70)&&!!Orbit.store.get('asesores',ids.advisor60)&&!!Orbit.store.get('polizas',ids.policy70)&&!!Orbit.store.get('finmovs',ids.ordinary),fx.ids,{timeout:30000});
-    await direction.page.locator('.tab[data-t="asesores"]').click();
+    report.financeUiDiagnostics={beforeClick:await captureFinanceUiSnapshot(direction.page)};
+    try{
+      await direction.page.locator('.tab[data-t="asesores"]').click();
+    }catch(error){
+      report.financeUiDiagnostics.onFailure=await captureFinanceUiSnapshot(direction.page);
+      report.financeUiDiagnostics.actionability=safeClickActionability(error);
+      throw error;
+    }
     const responseFor=operation=>direction.page.waitForResponse(response=>{
       try{return response.url()==='https://'+cfg.region+'-'+PROJECT+'.cloudfunctions.net/'+cfg.functionName&&response.request().postDataJSON()?.data?.advisorPayable?.operation===operation;}catch{return false;}
     },{timeout:30000});
@@ -386,11 +458,15 @@ async function main(){
     // never error messages/values, tokens, actor UIDs, customer rows or paths.
     const failure=originalFailure?safeFailureEvidence(originalFailure,stage):cleanupFailure?safeFailureEvidence(cleanupFailure,'SYNTHETIC_RESTORE'):{};
     Object.assign(report,failure);
+    if(report.financeUiDiagnostics){
+      report.financeUiDiagnostics=safeFinanceUiDiagnostics(report.financeUiDiagnostics);
+      console.log('I66_ADVISOR_FINANCE_UI_DIAGNOSTIC '+JSON.stringify(report.financeUiDiagnostics));
+    }
     fs.writeFileSync(cfg.reportPath,JSON.stringify(report,null,2)+'\n',{flag:'wx',mode:0o600});
     console.log('I66_ADVISOR_PAYABLE_SIGNED_'+cfg.phase+'_'+report.status+' '+JSON.stringify({checks:report.checks.length,cleanup:report.cleanup.status,remaining:report.cleanup.remaining,realCustomerWritesRequested:0,bankMovements:0,financialPayments:0,authOrMembershipMutations:0,...failure}));
   }
   if(originalFailure||cleanupFailure)throw Error('ADVISOR_PAYABLE_SIGNED_UAT_HOLD');
   return report;
 }
-module.exports={configuration,sourceIdentity,fixtures,assertGenerated,sourceAuditGuard,genericAuditGuard,unchangedSeed,configuredCredential,assertServerDenial,safeFailureEvidence,main};
+module.exports={configuration,sourceIdentity,fixtures,assertGenerated,sourceAuditGuard,genericAuditGuard,unchangedSeed,configuredCredential,assertServerDenial,safeFailureEvidence,safeFinanceUiSnapshot,safeClickActionability,safeFinanceUiDiagnostics,captureFinanceUiSnapshot,main};
 if(require.main===module)main().catch(error=>{console.error('I66_ADVISOR_PAYABLE_SIGNED_UAT_HOLD '+String(error.code||'ASSERTION_OR_RUNTIME_FAILURE').replace(/[^A-Za-z0-9_./:-]+/g,'_').slice(0,120));process.exitCode=1;});

@@ -1,0 +1,82 @@
+{
+  "schema": "GI_I66_RESUME_SYNC_AND_SAFE_FINANCE_CLICK_DIAGNOSTIC_V1",
+  "dateLocal": "2026-11-15",
+  "authority": "Direction requested recovery of the interrupted interaction, corrected October liquidations, synchronization verification, and execution of the frozen operational plan.",
+  "activeGate": "I6.6",
+  "closedHistoricalGatePreserved": "B4-007",
+  "metadataSynchronization": {
+    "commit": "9b021c3cb37968c27d978691e0e852fc1215d575",
+    "remoteGuardRunId": 43758186160,
+    "remoteGuardConclusion": "success",
+    "projectNormativeSourceMatches": 9,
+    "projectNormativeSourceCount": 9,
+    "corrections": [
+      "current completed mini-gate I6.4 to I6.5",
+      "current state advisor-A roster12 to13 after private owner correction",
+      "Control Plane and recovery state nextAction point to the same actual Finance/CxP signed Preview HOLD"
+    ],
+    "acceptedLivePointerUnchanged": true
+  },
+  "newDiagnostic": {
+    "status": "SOURCE_TESTS_PASS_RUNTIME_OBSERVATION_PENDING",
+    "sourceTestsPassed": 17,
+    "sourceTestsFailed": 0,
+    "originalPinnedTestUnmodified": true,
+    "dedicatedTest": "tools/gravicentra-i6-6-finance-ui-diagnostics.test.cjs",
+    "normalClickAndTimeoutUnchanged": true,
+    "originalFailureRethrown": true,
+    "cleanupUnchanged": true,
+    "retainedFields": [
+      "beforeClick and onFailure structural geometry",
+      "allowlisted pointer interceptor attributes",
+      "legal overlay presence and hit target",
+      "authentication restoring indicator",
+      "safe boolean actionability classes",
+      "exact driver source failure location"
+    ],
+    "sensitiveValuesExcluded": [
+      "DOM text",
+      "arbitrary attributes",
+      "legal scope",
+      "actor identifiers",
+      "email",
+      "tokens",
+      "raw exceptions",
+      "URLs"
+    ],
+    "workflowFailureArtifactTransportBehaviorallyTested": true
+  },
+  "localCausalEvidence": {
+    "scope": "LOCAL_VM_ACTUAL_AUTH_AND_LEGAL_OWNERS_NOT_REMOTE_UI_PROOF",
+    "observedDelayedLegalOverlayMs": 350,
+    "zeroLegalAcceptanceWrites": true,
+    "remoteInterceptorNotYetObserved": true,
+    "productCodeUnmodified": true
+  },
+  "knownFailedPreview": {
+    "sourceSha": "02463e625e11daea7f5a609613bd67a5890ba270",
+    "buildRunId": 43756113933,
+    "signedQaRunId": 43756837089,
+    "status": "HOLD_NOT_ACCEPTED_NOT_PROMOTABLE",
+    "cleanupRemaining": 0
+  },
+  "preservedLive": {
+    "sourceSha": "84769378eb2014addebfefdbdd63091bddc4b817",
+    "liveRunId": 43506971214,
+    "hostingVersion": "sites/ays-orbit-360-lab/versions/0766db29b338befc"
+  },
+  "nextStep": "Read fresh metadata-only Preview channel inventory and source identities; bind the exact current failed candidate and structured cleanup evidence before preparing a new immutable build. Then signed four-driver QA and only a passed same-artifact LIVE promotion.",
+  "constraints": {
+    "noArtifactPatch": true,
+    "noForcedClick": true,
+    "noConsentChanges": true,
+    "noAuthMembershipChanges": true,
+    "noLiveDeployment": true,
+    "realNewPayables": 0,
+    "realFinancialPayments": 0,
+    "bankTransfers": 0,
+    "newPreviewAcceptance": false,
+    "newLiveAcceptance": false,
+    "operationalAcceptanceMetricUnchanged": "19/31 = 61.3%"
+  }
+}

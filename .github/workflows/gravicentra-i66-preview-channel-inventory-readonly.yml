@@ -1,6 +1,6 @@
 # Read-only inventory to resolve Firebase Hosting's confirmed HTTP 429 channel quota.
 # Never deletes, creates, deploys or changes Hosting versions, Firestore or Auth.
-# I6.6 2026-11-15: refresh exact candidate Hosting version after signed CxP Preview failure; metadata only.
+# I6.6 2026-11-15: read exact 02463 candidate and R11 LIVE identities after signed Finance tab timeout; zero mutations.
 name: Gravicentra I6.6 Preview Channels Inventory READONLY
 on:
   push:
@@ -74,4 +74,34 @@ jobs:
           console.log('I66_PREVIEW_CHANNEL_INVENTORY_READONLY total='+output.length+' i66='+output.filter(x=>x.id.startsWith('gi-i66-')).length);
           for(const c of output)console.log('I66_HOSTING_CHANNEL_METADATA '+JSON.stringify(c));
           console.log('I66_HOSTING_CHANNEL_MUTATIONS=0');
+          NODE
+      - name: Read current Preview and both LIVE build identities without changing their versions
+        run: |
+          set -euo pipefail
+          node - <<'NODE'
+          const fs=require('node:fs'),assert=require('node:assert/strict');
+          const root='artifacts/orbit360-recovery/release-control/';
+          const plan=JSON.parse(fs.readFileSync(root+'I6_6_OPERATIONAL_CONTINUATION_20261115.json','utf8'));
+          const transport=JSON.parse(fs.readFileSync(root+'I6_6_RELEASE_TRANSPORT_CONTROL_20261110.json','utf8'));
+          const preview=transport.previewChannelReuseAuthorization.expectedPreviewUrl;
+          assert.equal(preview,'https://ays-orbit-360-lab--gi-i66-rc-42868854629-abj14q6n.web.app');
+          const targets=[
+            {name:'PREVIEW',origin:preview,source:plan.currentEvidenceBoundaries.failedPreviewSource},
+            {name:'LIVE_FIREBASE',origin:'https://ays-orbit-360-lab.web.app',source:plan.lastProvenLive.sourceSha},
+            {name:'LIVE_DOMAIN',origin:'https://app.aysseguros.com',source:plan.lastProvenLive.sourceSha}
+          ];
+          (async()=>{
+            const results=await Promise.all(targets.map(async target=>{
+              assert.match(target.source,/^[0-9a-f]{40}$/);
+              const response=await fetch(target.origin+'/__recovery__/build.json',{headers:{'cache-control':'no-cache'},signal:AbortSignal.timeout(20000)});
+              assert.equal(response.ok,true,'I66_CURRENT_BUILD_MARKER_HTTP_'+target.name);
+              const marker=await response.json();
+              assert.equal(marker.sourceSha,target.source,'I66_CURRENT_BUILD_MARKER_SOURCE_DRIFT_'+target.name);
+              assert.equal(marker.gate,'I6.6','I66_CURRENT_BUILD_MARKER_GATE_DRIFT_'+target.name);
+              assert.match(String(marker.buildId||''),/^gi-i66-[0-9a-f]{12}-[0-9a-f]{12}$/);
+              return {target:target.name,sourceSha:marker.sourceSha,buildId:marker.buildId,gate:marker.gate};
+            }));
+            for(const result of results)console.log('I66_CURRENT_HOSTING_BUILD_IDENTITY '+JSON.stringify(result));
+            console.log('I66_CURRENT_PREVIEW_AND_DUAL_LIVE_IDENTITY_READONLY_PASS');
+          })().catch(()=>{console.error('I66_CURRENT_HOSTING_BUILD_IDENTITY_READONLY_HOLD');process.exitCode=1;});
           NODE

@@ -52,6 +52,7 @@
     "Editing only a policy advisor could rebuild financial values from missing fields and replace a receipt schedule; a metadata-only change must preserve canonical premiums and receipts instead of recalculating them."
   ],
   "currentEvidenceBoundaries": {
+    "resumeSyncAndClickDiagnostics20261115": {"receipt": "artifacts/orbit360-recovery/release-control/I6_6_RESUME_SYNC_AND_FINANCE_CLICK_DIAGNOSTIC_20261115.json", "status": "METADATA_SYNC_PUBLISHED_SOURCE_DIAGNOSTIC_TESTS_PASS_RUNTIME_PENDING", "metadataCommit": "9b021c3cb37968c27d978691e0e852fc1215d575", "metadataGuardRunId": 43758186160, "diagnosticTests": "17/17", "sourceNormativeMatches": "9/9", "newAcceptanceClaimed": false, "newFinancialWrites": 0},
     "conciliationPriorCensus": {"stageProposals": 132, "uniquePolicyMatches": 52, "nonUniquePolicyEditions": 80, "sourceEvidence": 365, "stageHolds": 233, "notPaymentMatches": true},
     "bantrabA3": {"sourceReferenceWritesAlreadyProven": 7, "runId": 43438038880, "paymentsApplied": 0, "doNotRepeatReferenceBatch": true},
     "baselineAcceptanceMetric": {"verified": 19, "required": 31, "percent": 61.3, "scope": "Five frozen operational blocks only; not total product or elapsed work; source tests do not raise LIVE acceptance."},

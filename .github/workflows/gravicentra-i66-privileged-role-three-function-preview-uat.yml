@@ -61,6 +61,7 @@ jobs:
         run: |
           set -euo pipefail
           node --test tools/gravicentra-i6-6-operational-release-candidate.test.cjs
+          node --test tools/gravicentra-i6-6-advisor-payables-signed-uat.test.cjs tools/gravicentra-i6-6-finance-ui-diagnostics.test.cjs
           node tools/gravicentra-i6-6-operational-release-candidate.cjs preview
           node tools/gravicentra-i6-6-delta-guard.mjs > "$RUNNER_TEMP/i66-role-delta-guard.log"
           node --test tools/gravicentra-i6-6-privileged-role-portfolio-parity.test.cjs tools/gravicentra-i6-6-privileged-role-writer-transaction.test.cjs
@@ -211,6 +212,7 @@ jobs:
           set -euo pipefail
           node - <<'NODE'
           const fs=require('node:fs'),path=require('node:path');
+          const {safeFinanceUiDiagnostics}=require('./tools/gravicentra-i6-6-advisor-payables-signed-uat.cjs');
           const candidates=[
             path.join(process.env.RUNNER_TEMP,'gravicentra-i66-advisor-payables-signed-uat-preview.json'),
             process.env.I66_PACKAGE_ROOT?path.join(process.env.I66_PACKAGE_ROOT,'evidence','i66-proposal-application-signed-uat-preview.json'):null
@@ -221,6 +223,10 @@ jobs:
             if(!fs.existsSync(file))continue;
             const r=JSON.parse(fs.readFileSync(file,'utf8')),out={};
             for(const k of keys){const v=r[k];if(typeof v==='number'&&Number.isSafeInteger(v))out[k]=v;else if(typeof v==='string'&&/^[A-Za-z0-9_.:-]{1,160}$/.test(v))out[k]=v;}
+            const location=r.failureLocation;
+            if(location?.file==='gravicentra-i6-6-advisor-payables-signed-uat.cjs'&&Number.isSafeInteger(location.line)&&location.line>0&&Number.isSafeInteger(location.column)&&location.column>0)
+              out.failureLocation={file:location.file,line:location.line,column:location.column};
+            if(r.financeUiDiagnostics)out.financeUiDiagnostics=safeFinanceUiDiagnostics(r.financeUiDiagnostics);
             out.checks=Array.isArray(r.checks)?r.checks.length:0;
             if(r.cleanup){out.cleanupStatus=['PASS','HOLD'].includes(r.cleanup.status)?r.cleanup.status:'UNKNOWN';out.remaining=Number.isSafeInteger(r.cleanup.remaining)?r.cleanup.remaining:null;}
             safe.reports.push(out);
