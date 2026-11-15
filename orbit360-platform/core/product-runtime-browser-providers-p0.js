@@ -61,6 +61,31 @@
       return '';
     }
     if(name==='orbit360ProductOperationalCommandPreview'){
+      // CxP is a distinct server-owned command, not a generic mutation batch.
+      // Only the already authorized disposable QA envelope may cross Preview;
+      // the server still enforces signed roles, ownership, scope and restoration.
+      if(data&&data.advisorPayable){
+        var payable=data.advisorPayable;
+        var qaId=function(value){return typeof value==='string'&&/^(?:b3004qa|b4003qa)_[A-Za-z0-9._:-]+$/.test(value);};
+        if(String(data.tenantId||'')!=='alianzas-soluciones'||typeof payable!=='object'||Array.isArray(payable)||
+           payable.version!==1||payable.syntheticQa!==true||
+           (data.mutations!==undefined&&(!Array.isArray(data.mutations)||data.mutations.length!==0)))
+          return 'I66_PREVIEW_MUTATION_CALLABLE_DENIED';
+        if(payable.operation==='restoreSynthetic'){
+          return /^advisorpay_[a-f0-9]{32}$/.test(String(payable.preparedRequestId||''))&&
+            payable.advisorId===undefined&&payable.lines===undefined&&payable.commissionIds===undefined
+            ?'':'I66_PREVIEW_MUTATION_CALLABLE_DENIED';
+        }
+        var refs=payable.commissionIds===undefined?[]:payable.commissionIds;
+        var lines=payable.lines===undefined?[]:payable.lines;
+        if(!['preview','prepare'].includes(payable.operation)||!qaId(payable.advisorId)||
+           !/^\d{4}-\d{2}-\d{2}$/.test(String(payable.cutoff||''))||
+           !Array.isArray(refs)||!Array.isArray(lines)||refs.length+lines.length<1||refs.length+lines.length>40||
+           (refs.length&&lines.length)||refs.some(function(id){return !qaId(id);})||
+           lines.some(function(row){return !row||typeof row!=='object'||Array.isArray(row)||!qaId(row.polizaId)||
+             Object.prototype.hasOwnProperty.call(row,'commissionId');}))return 'I66_PREVIEW_MUTATION_CALLABLE_DENIED';
+        return '';
+      }
       var mutations=data&&data.mutations;
       if(String(data&&data.tenantId||'')!=='alianzas-soluciones'||!Array.isArray(mutations)||mutations.length<1||mutations.length>8||
          mutations.some(function(m){return !m||!['insert','update','remove'].includes(String(m.action||''))||

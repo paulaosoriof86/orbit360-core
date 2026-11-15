@@ -4,7 +4,7 @@
   "productBrand": "Gravicentra Insurance",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
-  "status": "OPERATIONAL_BACKEND_PREVIEW_AUTHORIZED",
+  "status": "PREVIEW_BUILD_REQUESTED",
   "previewChannelReuseAuthorization": {
     "status": "CURRENT_LIVE_BACKED_SINGLE_PREVIEW_REUSE_AUTHORIZED",
     "approvedByDirection": true,
@@ -19,7 +19,44 @@
     "noLiveChanges": true,
     "noBusinessDataWrites": true,
     "noChannelDeletion": true,
-    "stopOnIdentityDrift": true
+    "stopOnIdentityDrift": true,
+    "failedCandidateRestore": {
+      "schema": "GI_I66_EXACT_FAILED_PREVIEW_RESTORE_V1",
+      "status": "EXACT_FAILED_PREVIEW_TO_R11_PREVIEW_RESTORE_AUTHORIZED",
+      "approvedByDirection": true,
+      "channelId": "gi-i66-rc-42868854629",
+      "previewUrl": "https://ays-orbit-360-lab--gi-i66-rc-42868854629-abj14q6n.web.app",
+      "failedCandidate": {
+        "sourceSha": "5426093a7ba08d813c96c6175e0331c2fad4d078",
+        "buildRunId": 43735740850,
+        "artifactId": 14170362087,
+        "artifactDigest": "sha256:5d25c2122c53af4638e58a2e6aab625c1a33d400bae5135feb4d4e0559cef38d",
+        "hostingVersion": "sites/ays-orbit-360-lab/versions/487edcc93d8b758c",
+        "qaRunId": 43736456884,
+        "qaHeadSha": "80364c639c519b31d0b5b9e73469478f492d34c6",
+        "qaJobId": 132880077958
+      },
+      "currentLive": {
+        "sourceSha": "84769378eb2014addebfefdbdd63091bddc4b817",
+        "buildRunId": 43503721126,
+        "artifactId": 14075022275,
+        "artifactDigest": "sha256:b0f3bacb68511cdfc91ac934602c51f55afec5c1d6428d886d13a72a706ee283",
+        "hostingVersion": "sites/ays-orbit-360-lab/versions/0766db29b338befc",
+        "liveRunId": 43506971214,
+        "liveHeadSha": "2a733fd4a28294bf57f3136b44501981a38c0c92"
+      },
+      "inventoryRunId": 43753990648,
+      "inventoryHeadSha": "e985e5f1a3aa3da02b79a105149ded52a2cc335c",
+      "expectedChannelCreatedAt": "2026-11-10T17:50:59.307316958Z",
+      "expectedSiteFileCount": 223,
+      "backupBeforeOverwrite": true,
+      "readbackBeforeAndAfter": true,
+      "noLiveChanges": true,
+      "noBusinessDataWrites": true,
+      "noBackendChanges": true,
+      "noRulesAuthIamChanges": true,
+      "noChannelDeletion": true
+    }
   },
   "i66PaymentInvoicePreviewRelease20261113": {
     "status": "SIGNED_POLICY_AND_CLIENT360_PREVIEW_PASS_PAYMENT_BACKEND_PREVIEW_ONLY",
@@ -542,13 +579,13 @@
   "requiredCanonicalOrigin": "https://ays-orbit-360-lab.web.app",
   "requiredStaffOrigin": "https://app.aysseguros.com",
   "originReadbackRequirement": "BOTH_HOSTS_IDENTICAL_TO_SAME_ARTIFACT_OR_ROLLBACK",
-  "forbidBackendFunctionDeploy": false,
+  "forbidBackendFunctionDeploy": true,
   "forbidFirestoreRulesDataAuthWrites": true,
   "rollback": "FRONTEND_TOPBAR_PREVIEW_FIRST; KEEP BOTH LIVE HOSTING ORIGINS AND COBROS FUNCTION UNCHANGED UNTIL EXACT_ARTIFACT_PREVIEW_PASS; THEN BACKUP_AND_ATOMIC_EXACT_ARTIFACT_LIVE_PROMOTION_WITH_REHASH_AND_ROLLBACK",
   "immutableArtifactId": 14170362087,
   "immutableArtifactZipDigest": "sha256:5d25c2122c53af4638e58a2e6aab625c1a33d400bae5135feb4d4e0559cef38d",
   "sourcePreviewUrl": "https://ays-orbit-360-lab--gi-i66-rc-42868854629-abj14q6n.web.app",
-  "backendFunctionPreviewOnly": true,
+  "backendFunctionPreviewOnly": false,
   "carlosSignedTransversalQaReceipt20261112": {
     "sourceSha": "b86cad550fadc050e8574678f02f3097caa8b5bd",
     "immutableHostingPreviewRunId": 43299843267,
@@ -1199,7 +1236,12 @@
     "priorFailedRollbackRunId": 43505948038,
     "priorFailedRollbackCount": 0
   },
-  "operationalReleaseCandidate": {
+  "failedOperationalReleaseCandidate20261115": {
+    "attemptOutcome": "SIGNED_PREVIEW_FAILED_NOT_ACCEPTED_NOT_PROMOTABLE",
+    "failedQaRunId": 43736456884,
+    "cleanup": "PASS_REMAINING_ZERO",
+    "hostingVersionObservedByInventory": "sites/ays-orbit-360-lab/versions/487edcc93d8b758c",
+    "inventoryRunId": 43753990648,
     "schema": "I6_6_OPERATIONAL_EXACT_RELEASE_V1",
     "approvedByDirection": true,
     "status": "EXACT_BACKEND_PREVIEW_SIGNED_QA_AUTHORIZED",

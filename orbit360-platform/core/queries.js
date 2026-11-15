@@ -374,6 +374,28 @@ Orbit.q = (function () {
   function paisActivo() { const p = Orbit.pais; return (p && p !== 'TODOS') ? p : null; }
   function monedaPais() { const p = paisActivo(); return p === 'CO' ? 'COP' : 'GTQ'; }
   const norm = (m, cur) => { const n = finite(m); if (n == null) return 0; if (paisActivo()) return n; return cur === 'COP' ? n / TC_COP_GTQ : n; };
+  // Financial obligations have an explicit currency. This projection never
+  // applies legacy display FX, infers currency from country, or mutates rows.
+  function financeCurrencyBuckets(rows, valueOf) {
+    const cents = {}, counts = {};
+    let unverified = 0;
+    (rows || []).forEach(row => {
+      const currency = String(row && row.moneda || '').trim().toUpperCase();
+      const value = row && (valueOf ? valueOf(row) : row.valor);
+      const n = value == null || !['number', 'string'].includes(typeof value) || (typeof value === 'string' && !value.trim()) ? null : finite(value);
+      if (!['GTQ', 'USD', 'COP'].includes(currency) || n == null || !Number.isFinite(n) || Math.abs(n) > 1e12) { unverified++; return; }
+      const rounded = Math.round((n + Math.sign(n) * Number.EPSILON) * 100);
+      if (!Number.isSafeInteger(rounded) || !Number.isSafeInteger((cents[currency] || 0) + rounded)) { unverified++; return; }
+      cents[currency] = (cents[currency] || 0) + rounded;
+      counts[currency] = (counts[currency] || 0) + 1;
+    });
+    return { amounts: Object.fromEntries(Object.keys(cents).sort().map(currency => [currency, cents[currency] / 100])), counts, unverified };
+  }
+  function financeMoneyText(value, moneda) {
+    const currency = String(moneda || '').trim().toUpperCase();
+    const result = financeCurrencyBuckets([{ valor: value, moneda: currency }]);
+    return result.unverified ? 'Importe o moneda no verificados' : currency + ' ' + result.amounts[currency].toFixed(2);
+  }
   function clientIndex() { return new Map((S().all('clientes') || []).filter(c => c && c.id).map(c => [c.id, c])); }
   function countryCode(v) { return String(v || '').trim().toUpperCase(); }
   function policyLinkedCountry(row, clients, policies) {
@@ -784,6 +806,6 @@ Orbit.q = (function () {
     asesor, aseguradora, polizasDe, policyDisplayStatus, recibosEsperadosDe, carteraPrimasDe, carteraPendienteDe, carteraVencidaDe, cobrosDe, comisionesDe, actividadesDe, cancelacionesDe,
     clienteResumen, clientesResumenIndex, saludCliente, carteraGlobal, carteraPendienteRows, carteraVencidaRows, cobrosConfirmadosRows, carteraGlobalPorMoneda, primaVigenteGlobal, renovacionesProximas, cobrosVencidos, leaderboard,
     clientesScoped, polizasScoped, isSyntheticQaRecord, realizedPaymentRows, currentMonthKey, produccionMesPorMoneda, recaudoMesPorMoneda, metaAdvisorMes, leaderboardMes,
-    agingVencido, agingVencidoPorMoneda, portfolioAmountProof, portfolioAmountContext, portfolioValuedRowsCount, portfolioDue, portfolioOpen, portfolioClassification, portfolioIsOverdue, expectedReceiptClassification, expectedReceiptIsOverdue, expectedReceiptDisplayStatus, comisionesPor, clienteNombre, norm, monedaPais, policyLinkedClientId, policyLinkedCountry, vehiculosDe, vehiculoDePoliza, postRecaudo
+    agingVencido, agingVencidoPorMoneda, portfolioAmountProof, portfolioAmountContext, portfolioValuedRowsCount, portfolioDue, portfolioOpen, portfolioClassification, portfolioIsOverdue, expectedReceiptClassification, expectedReceiptIsOverdue, expectedReceiptDisplayStatus, comisionesPor, clienteNombre, norm, monedaPais, financeCurrencyBuckets, financeMoneyText, policyLinkedClientId, policyLinkedCountry, vehiculosDe, vehiculoDePoliza, postRecaudo
   };
 })();

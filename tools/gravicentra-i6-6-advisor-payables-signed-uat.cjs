@@ -138,16 +138,44 @@ function configuredCredential(env){
     .find(value=>value?.type==='service_account'&&value.project_id===PROJECT&&value.private_key);
   assert.ok(candidate,'ADVISOR_UAT_CONFIGURED_SAME_PROJECT_CREDENTIAL_REQUIRED');return candidate;
 }
+function assertServerDenial(out,code,reason){
+  assert.equal(out.ok,false,'ADVISOR_UAT_UNEXPECTED_PERMISSION_GRANT');
+  // A browser guard or runtime exception has no Functions status code. It
+  // cannot count as evidence that the signed backend denied the operation.
+  assert.ok(typeof out.code==='string'&&out.code.length>0,'ADVISOR_UAT_SERVER_DENIAL_NOT_REACHED');
+  assert.ok(out.code.endsWith(code),'ADVISOR_UAT_DENIAL_CLASS_MISMATCH');
+  if(reason)assert.equal(out.reason,reason,'ADVISOR_UAT_DENIAL_REASON_MISMATCH');
+}
+function safeFailureEvidence(error,stage){
+  const stages=new Set(['BUILD_IDENTITY','FIXTURE_SETUP','SIGNED_SESSION','OPERATIVE_FINANCIAL_DENIAL',
+    'FINANCE_UI_HYDRATION','DOCUMENT_FILE_UI_70','DOCUMENT_FILE_UI_60','REPLAY_AND_SOURCE_GUARDS',
+    'LEGACY_GUARDS','LEGACY_FINANCE_EDIT','PENDING_CXP_RELOAD','SYNTHETIC_RESTORE']);
+  const checks=['ADVISOR_UAT_SERVER_DENIAL_NOT_REACHED','ADVISOR_UAT_DENIAL_CLASS_MISMATCH',
+    'ADVISOR_UAT_DENIAL_REASON_MISMATCH','ADVISOR_UAT_UNEXPECTED_PERMISSION_GRANT',
+    'ADVISOR_UAT_SIGNED_COMMAND_REJECTED','ADVISOR_UAT_FILE_PREVIEW_NOT_CONFIRMED',
+    'ADVISOR_UAT_UI_COMMIT_READBACK_MISSING','ADVISOR_UAT_BUSINESS_LIQUIDATION_SEMANTICS',
+    'ADVISOR_UAT_REPLAY_DUPLICATED_DEBT','ADVISOR_UAT_ORDINARY_FINANCE_REGRESSION',
+    'ADVISOR_UAT_PROTECTED_RELOAD_MISMATCH','ADVISOR_UAT_DIRECTION_PAGE_ERROR',
+    'ADVISOR_UAT_OPERATIVE_PAGE_ERROR','ADVISOR_UAT_FIRST_PARTY_ASSET_ERROR',
+    'ADVISOR_UAT_SIGNED_SESSION_MISMATCH','ADVISOR_UAT_BUILD_SOURCE_DRIFT',
+    'ADVISOR_UAT_ARTIFACT_MARKER_DRIFT','ADVISOR_UAT_CLEANUP_HOLD'];
+  const message=String(error?.message||'');
+  const check=checks.find(value=>message===value||message.startsWith(value+'_')||message.startsWith(value+'\n'));
+  const location=String(error?.stack||'').match(/(?:^|[/\\])gravicentra-i6-6-advisor-payables-signed-uat\.cjs:(\d+):(\d+)/);
+  return {failureClass:error?.code==='ERR_ASSERTION'?'ERR_ASSERTION':error?.name==='TimeoutError'?'TIMEOUT_ERROR':'ASSERTION_OR_RUNTIME_FAILURE',
+    failureStage:stages.has(stage)?stage:'UNKNOWN_STAGE',failureCheck:check||'ASSERTION_OR_RUNTIME_FAILURE',
+    failureLocation:location?{file:'gravicentra-i6-6-advisor-payables-signed-uat.cjs',line:Number(location[1]),column:Number(location[2])}:null};
+}
 
 async function main(){
   const cfg=configuration(process.env),runId='b4003qa_i66_cxp_'+Date.now().toString(36)+'_'+crypto.randomBytes(5).toString('hex');
   const report={schemaVersion:'gravicentra-i66-advisor-payables-signed-uat-v1',phase:cfg.phase,sourceSha:cfg.source,
     status:'HOLD',checks:[],realCustomerWritesRequested:0,bankMovements:0,financialPayments:0,
     authOrMembershipMutations:0,cleanup:{status:'NOT_STARTED',seeded:0,remaining:0}};
-  const pass=name=>report.checks.push({name,status:'PASS'});
+  const pass=name=>{report.checks.push({name,status:'PASS'});console.log('I66_ADVISOR_UAT_CHECK='+name);};
   let admin,browser,direction,operator,tenant,db,fx,sourceRequests=[],genericRequest,generated=[],seeds=[],allTargets=[],memberBefore=[];
   const observedAbsent=new Set();
-  let originalFailure=null,cleanupFailure=null;
+  let originalFailure=null,cleanupFailure=null,stage='BUILD_IDENTITY';
   const rowRef=(collection,id)=>tenant.collection('data').doc(collection).collection('items').doc(id);
   const auditRef=(kind,id)=>tenant.collection(kind==='request'?'operationalRequests':'operationalEvents').doc(id);
   const exactBefore=async refs=>{
@@ -161,7 +189,7 @@ async function main(){
     }catch(error){return{ok:false,code:String(error.code||''),reason:String(error.details?.reason||'')};}
   },{cfg:{functionName:cfg.functionName,region:cfg.region},input});
   const call=async(session,input)=>{const out=await rawCall(session,input);assert.equal(out.ok,true,'ADVISOR_UAT_SIGNED_COMMAND_REJECTED_'+out.code+'_'+out.reason);return out.result;};
-  const deny=async(session,input,code,reason)=>{const out=await rawCall(session,input);assert.equal(out.ok,false,'ADVISOR_UAT_UNEXPECTED_PERMISSION_GRANT');assert.ok(out.code.endsWith(code),'ADVISOR_UAT_DENIAL_CLASS_MISMATCH');if(reason)assert.equal(out.reason,reason);};
+  const deny=async(session,input,code,reason)=>assertServerDenial(await rawCall(session,input),code,reason);
   try{
     const markerResponse=await fetch(cfg.origin+'/__recovery__/build.json',{headers:{'cache-control':'no-cache'}});
     assert.equal(markerResponse.ok,true,'ADVISOR_UAT_BUILD_MARKER_MISSING');const markerText=await markerResponse.text(),marker=JSON.parse(markerText);
@@ -172,6 +200,7 @@ async function main(){
       assert.equal(hash(fs.readFileSync(paths[0],'utf8')),report.buildMarkerSha256,'ADVISOR_UAT_ARTIFACT_MARKER_DRIFT');
     }
     pass('EXACT_SOURCE_AND_IMMUTABLE_BUILD_MARKER');
+    stage='FIXTURE_SETUP';
     admin=require('firebase-admin');admin.initializeApp({credential:admin.credential.cert(configuredCredential(process.env)),projectId:PROJECT});
     db=admin.firestore();tenant=db.collection('tenants').doc(TENANT);
     const [members,advisors]=await Promise.all([tenant.collection('members').limit(150).get(),rowRef('asesores','unused').parent.limit(400).get()]);
@@ -204,6 +233,7 @@ async function main(){
     await exactBefore(refs);pass('EVERY_FIXTURE_AND_AUDIT_TARGET_ORIGINALLY_ABSENT');
     for(const [collection,row] of fx.rows){const ref=rowRef(collection,row.id);await ref.create(row);seeds.push({ref,expected:row});}
     report.cleanup.seeded=seeds.length;
+    stage='SIGNED_SESSION';
     const {chromium}=require('playwright');browser=await chromium.launch({headless:true,args:['--no-sandbox']});
     const openActor=async actor=>{
       const user=await admin.auth().getUser(actor.uid);assert.ok(!user.disabled&&user.emailVerified,'ADVISOR_UAT_ACTOR_AUTH_NOT_READY');
@@ -219,9 +249,11 @@ async function main(){
     };
     direction=await openActor(actors[0]);operator=await openActor(actors[1]);
     pass('EXISTING_DIRECTION_AND_OPERATIVE_SIGNED_WITH_UNCHANGED_MEMBERSHIP');
+    stage='OPERATIVE_FINANCIAL_DENIAL';
     await deny(operator,{advisorPayable:fx.specs[0]},'permission-denied');
     for(const item of generated)assert.equal((await rowRef(item.collection,item.expected.id).get()).exists,false);
     pass('OPERATIVE_FINANCIAL_WRITE_DENIED_SERVER_SIDE_WITH_ZERO_DEBT');
+    stage='FINANCE_UI_HYDRATION';
     await direction.page.evaluate(()=>Orbit.router.go('finanzas'));
     await direction.page.waitForSelector('.tab[data-t="asesores"]',{state:'visible',timeout:30000});
     await direction.page.evaluate(async()=>{await Orbit.store._ensureCollections(['asesores','clientes','polizas','comisiones','finmovs']);});
@@ -232,6 +264,7 @@ async function main(){
     },{timeout:30000});
     for(let index=0;index<fx.specs.length;index++){
       const spec=fx.specs[index],plan=fx.plans[index];
+      stage=index===0?'DOCUMENT_FILE_UI_70':'DOCUMENT_FILE_UI_60';
       await direction.page.getByRole('button',{name:'Cargar liquidación documentada',exact:true}).click();
       await direction.page.locator('#fuente-asesor').selectOption(spec.advisorId);await direction.page.locator('#fuente-corte').fill(spec.cutoff);
       const batch={schemaVersion:SOURCE_SCHEMA,advisorId:spec.advisorId,cutoff:spec.cutoff,syntheticQa:true,lines:spec.lines};
@@ -258,6 +291,7 @@ async function main(){
       assert.ok(replay.reused&&replay.newPayables===0&&replay.reusedPayables===1&&replay.totals.GTQ===0&&replay.canonicalReadback,'ADVISOR_UAT_REPLAY_DUPLICATED_DEBT');
       pass('DOCUMENT_FILE_UI_TO_PENDING_CXP_'+spec.lines[0].participation.pct+'_PERCENT_WITH_AUDIT_AND_IDEMPOTENCE');
     }
+    stage='REPLAY_AND_SOURCE_GUARDS';
     const laterPreview=await call(direction,{advisorPayable:laterSpec});
     assert.equal(laterPreview.newPayables,0);assert.equal(laterPreview.reusedPayables,1);assert.equal(laterPreview.totals.GTQ,0);
     const later=await call(direction,{advisorPayable:{...laterSpec,operation:'prepare',previewDigest:laterPreview.previewDigest}});
@@ -266,11 +300,13 @@ async function main(){
     const changed={...fx.specs[0],lines:[{...fx.specs[0].lines[0],ordinaryCommission:102}]};
     await deny(direction,{advisorPayable:changed},'failed-precondition','SOURCE_LINE_ALREADY_INTERPRETED');
     pass('CROSS_CUTOFF_REUSES_DEBT_AND_CROSS_ADVISOR_OR_CHANGED_SOURCE_DENIED');
+    stage='LEGACY_GUARDS';
     await deny(direction,{advisorPayable:fx.historical[0]},'failed-precondition','HISTORICAL_ADVISOR_BALANCE_LINK_REQUIRED');
     await deny(direction,{advisorPayable:fx.historical[1]},'failed-precondition','HISTORICAL_COMMISSION_LINK_REQUIRED');
     await deny(direction,{mutations:[{collection:'comisiones',id:fx.ids.oldCommission,action:'update',payload:{estado:'liquidada',__syntheticQa:true}}]},'failed-precondition');
     await deny(direction,{mutations:[{collection:'finmovs',id:fx.plans[0].payable.id,action:'update',payload:{estado:'pagado',pagada:true,__syntheticQa:true}}]},'failed-precondition');
     pass('LEGACY_PAYMENTS_COMMISSIONS_AND_PROTECTED_PAID_TOGGLE_PREVENT_DUPLICATION');
+    stage='LEGACY_FINANCE_EDIT';
     const genericPayload={mutations:[{collection:'finmovs',id:fx.ids.ordinary,action:'update',payload:{concepto:'QA servicio editado',__syntheticQa:true}}],requestId:genericRequest.requestId};
     const generic=await call(direction,genericPayload);assert.ok(generic.ok&&generic.canonicalReadback,'ADVISOR_UAT_ORDINARY_FINANCE_REGRESSION');
     const ordinary=seeds.find(item=>item.expected.id===fx.ids.ordinary),ordinaryAfter=(await ordinary.ref.get()).data();
@@ -279,6 +315,7 @@ async function main(){
     genericAuditGuard('request',(await auditRef('request',genericRequest.requestId).get()).data(),genericRequest,direction.uid);
     genericAuditGuard('event',(await auditRef('event',genericRequest.eventId).get()).data(),genericRequest,direction.uid);
     pass('UNRELATED_LEGACY_FINANCE_RETAINS_AUTHORIZED_EDIT');
+    stage='PENDING_CXP_RELOAD';
     await direction.page.reload({waitUntil:'commit',timeout:30000});
     await direction.page.waitForFunction(()=>!!window.Orbit?.productRuntimeBrowserProvidersP0&&!!window.Orbit?.productAppP0,null,{timeout:30000});
     const reloaded=await direction.page.evaluate(async()=>{const p=Orbit.productRuntimeBrowserProvidersP0;await p.initialize();const uid=(await p.waitForUser())?.uid;const ready=(await Orbit.productAppP0.activate())?.started===true;Orbit.router.go('finanzas');await Orbit.store._ensureCollections(['finmovs','comisiones']);return{uid,ready};});
@@ -345,13 +382,15 @@ async function main(){
     }
     if(browser)await browser.close();
     if(!originalFailure&&!cleanupFailure&&report.cleanup.status==='PASS')report.status='PASS';
-    // Never serialize error messages, tokens, actor UIDs, customer rows, or key material.
-    if(originalFailure){report.failureClass=String(originalFailure.code||'ASSERTION_OR_RUNTIME_FAILURE').replace(/[^A-Za-z0-9_./:-]+/g,'_').slice(0,120);report.failureCheck=String(originalFailure.message||'').match(/^ADVISOR_UAT_[A-Z0-9_]+/)?.[0]||'ASSERTION_OR_RUNTIME_FAILURE';}
+    // Only constant allowlisted diagnostics and a source line may be exposed;
+    // never error messages/values, tokens, actor UIDs, customer rows or paths.
+    const failure=originalFailure?safeFailureEvidence(originalFailure,stage):cleanupFailure?safeFailureEvidence(cleanupFailure,'SYNTHETIC_RESTORE'):{};
+    Object.assign(report,failure);
     fs.writeFileSync(cfg.reportPath,JSON.stringify(report,null,2)+'\n',{flag:'wx',mode:0o600});
-    console.log('I66_ADVISOR_PAYABLE_SIGNED_'+cfg.phase+'_'+report.status+' '+JSON.stringify({checks:report.checks.length,cleanup:report.cleanup.status,remaining:report.cleanup.remaining,realCustomerWritesRequested:0,bankMovements:0,financialPayments:0,authOrMembershipMutations:0}));
+    console.log('I66_ADVISOR_PAYABLE_SIGNED_'+cfg.phase+'_'+report.status+' '+JSON.stringify({checks:report.checks.length,cleanup:report.cleanup.status,remaining:report.cleanup.remaining,realCustomerWritesRequested:0,bankMovements:0,financialPayments:0,authOrMembershipMutations:0,...failure}));
   }
   if(originalFailure||cleanupFailure)throw Error('ADVISOR_PAYABLE_SIGNED_UAT_HOLD');
   return report;
 }
-module.exports={configuration,sourceIdentity,fixtures,assertGenerated,sourceAuditGuard,genericAuditGuard,unchangedSeed,configuredCredential,main};
+module.exports={configuration,sourceIdentity,fixtures,assertGenerated,sourceAuditGuard,genericAuditGuard,unchangedSeed,configuredCredential,assertServerDenial,safeFailureEvidence,main};
 if(require.main===module)main().catch(error=>{console.error('I66_ADVISOR_PAYABLE_SIGNED_UAT_HOLD '+String(error.code||'ASSERTION_OR_RUNTIME_FAILURE').replace(/[^A-Za-z0-9_./:-]+/g,'_').slice(0,120));process.exitCode=1;});

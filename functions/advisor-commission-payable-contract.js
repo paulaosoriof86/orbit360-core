@@ -36,6 +36,19 @@ function share(participation, advisor) {
   if (!supplied && advisor.comModo && advisor.comModo !== 'comision') fail('PARTICIPATION_MODE_UNSUPPORTED', 'Esta liquidación es participación sobre comisión ordinaria, no sobre prima ni importe fijo.');
   return { pct, authorityRef: authorityRef || 'canonical-advisor:' + advisor.id };
 }
+function documentedBasis(raw) {
+  const fields = {};
+  // Optional source metadata, never a substitute for the ordinary amount
+  // credited by the insurer and never inferred from the current policy rate.
+  if (Object.prototype.hasOwnProperty.call(raw, 'base')) fields.base = cents(raw.base, 'Prima neta documental') / 100;
+  if (Object.prototype.hasOwnProperty.call(raw, 'pct')) {
+    const pct = raw.pct;
+    if (typeof pct !== 'number' || !Number.isFinite(pct) || pct <= 0 || pct > 100 || Math.abs(pct * 10000 - Math.round(pct * 10000)) > 0.00001)
+      fail('INVALID_INSURER_RATE', 'El porcentaje documental de aseguradora debe ser positivo, hasta 100 y con máximo cuatro decimales.');
+    fields.pct = pct;
+  }
+  return fields;
+}
 function normalizeLine(raw, context) {
   const { tenantId, advisor, policy, cutoff } = context;
   if (!policy || !policy.id) fail('POLICY_NOT_FOUND', 'La póliza exacta de la línea no está registrada.');
@@ -63,6 +76,7 @@ function normalizeLine(raw, context) {
   if (policy.moneda && text(policy.moneda).toUpperCase() !== currency) fail('POLICY_CURRENCY_CONFLICT', 'Moneda de comisión y póliza no coinciden; no se convierte automáticamente.');
   if (raw.commissionKind !== 'ordinary') fail('ORDINARY_COMMISSION_REQUIRED', 'Debe identificarse la base ordinaria aprobada, separada de IVA e incentivos extraordinarios.');
   const amountCents = cents(raw.ordinaryCommission, 'Comisión ordinaria acreditada');
+  const basis = documentedBasis(raw);
   const participation = share(raw.participation, advisor);
   const advisorCents = Math.round(amountCents * Math.round(participation.pct * 100) / 10000);
   if (advisorCents <= 0) fail('EMPTY_PAYABLE', 'El importe resultante de la CxP es cero.');
@@ -96,12 +110,13 @@ function normalizeLine(raw, context) {
     source: { fileId, lineId, sha256: source.sha256.toLowerCase(), reference, requirementRef },
     sourceKey, economicKey, payableKey, accreditationStatus: accreditation.status, sourceProvenance,
     concepto: `Comisión ${policy.numero || policy.id} · ${raw.collectionPeriod} · ${advisor.nombre || advisor.id}`,
-    noBankMovement: true, serverOwned: true
+    noBankMovement: true, serverOwned: true, ...basis
   };
   row.financialDigest = fingerprint({ economicKey, asesorId: row.asesorId, polizaId: row.polizaId,
     reciboId: row.reciboId, moneda: currency, ordinaryCents: amountCents, advisorCents,
     share: participation.pct, sourceDigest: row.source.sha256, accreditationDate,
-    accreditationStatus: accreditation.status, collectionPeriod: raw.collectionPeriod });
+    accreditationStatus: accreditation.status, collectionPeriod: raw.collectionPeriod,
+    ...(Object.keys(basis).length ? { documentedCommissionBasis: basis } : {}) });
   if (context.synthetic) row.__syntheticQa = true;
   const commission = {
     id: commissionId, tenantId, schemaVersion: SCHEMA, pais: country, moneda: currency,
@@ -111,7 +126,7 @@ function normalizeLine(raw, context) {
     montoAsesor: advisorCents / 100, pctAsesor: participation.pct,
     origen: 'planilla_comision_acreditada', source: row.source, sourceKey, economicKey, sourceProvenance,
     commissionKind: 'ordinary', commissionAccreditation: { status: accreditation.status, date: accreditationDate },
-    participation, financialDigest: row.financialDigest, cxpAsesorId: payableId, serverOwned: true,
+    participation, financialDigest: row.financialDigest, cxpAsesorId: payableId, serverOwned: true, ...basis,
     ...(context.synthetic ? { __syntheticQa: true } : {})
   };
   return { payable: row, commission, financialDigest: row.financialDigest };
@@ -126,14 +141,16 @@ function fromCanonicalCommission(commission) {
     accreditation: commission.commissionAccreditation,
     collectionPeriod: commission.periodo, moneda: commission.moneda,
     participation: commission.participation || (commission.pctAsesor != null
-      ? { pct: commission.pctAsesor, authorityRef: commission.participationAuthorityRef } : null)
+      ? { pct: commission.pctAsesor, authorityRef: commission.participationAuthorityRef } : null),
+    ...(Object.prototype.hasOwnProperty.call(commission, 'base') ? { base: commission.base } : {}),
+    ...(Object.prototype.hasOwnProperty.call(commission, 'pct') ? { pct: commission.pct } : {})
   };
 }
 function compatiblePayable(existing, planned) {
   // A retained digest is not proof when a stored amount/beneficiary was edited
   // out of band. Only payment state/balances may legitimately evolve later.
   const immutable=['id','tenantId','asesorId','polizaId','clienteId','comisionId','moneda','pais','valor',
-    'comisionOrdinariaAcreditada','pctAsesor','economicKey','payableKey','periodoRecaudo'];
+    'comisionOrdinariaAcreditada','pctAsesor','economicKey','payableKey','periodoRecaudo','base','pct'];
   return !!existing && existing.schemaVersion === SCHEMA && existing.financialDigest === planned.financialDigest &&
     immutable.every(key=>existing[key]===planned[key]);
 }

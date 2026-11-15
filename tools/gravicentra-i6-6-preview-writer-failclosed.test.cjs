@@ -73,5 +73,46 @@ const deny=[
   const preview=providerFor(newPreview);
   for(const [name,region,data] of deny)
     await assert.rejects(preview.callFunction(name,data,region),/I66_PREVIEW_/,'I6.6 Preview must reject '+name+' before network');
+  const fx=require('./gravicentra-i6-6-advisor-payables-signed-uat.cjs').fixtures('b4003qa_i66_cxp_transport_unit');
+  const base={tenantId:'alianzas-soluciones',activeRole:'Dirección',advisorPayable:fx.specs[0]};
+  const changed=patch=>({...base,advisorPayable:{...base.advisorPayable,...patch}});
+  const canonical={version:1,operation:'preview',advisorId:fx.ids.advisor70,cutoff:'2026-11-15',syntheticQa:true,commissionIds:[fx.plans[0].commission.id]};
+  const restore={version:1,operation:'restoreSynthetic',syntheticQa:true,preparedRequestId:'advisorpay_'+'a'.repeat(32)};
+  const allowed=[base,{...base,activeRole:'Operativo'},changed({operation:'prepare',previewDigest:'b'.repeat(64)}),
+    {...base,advisorPayable:canonical},{...base,advisorPayable:restore},{...base,mutations:[]}];
+  for(const input of allowed){
+    // The harness has no Firebase config/SDK/network. This exact error proves
+    // the bounded transport reached initialization, not that authorization or
+    // a business write passed. The signed server denial remains mandatory.
+    await assert.rejects(preview.callFunction('orbit360ProductOperationalCommandPreview',input,'us-east1'),
+      /^Error: PRODUCT_RUNTIME_NOT_CONFIGURED$/,'authorized synthetic CxP transport must reach signed initialization');
+  }
+  const denied=[
+    {...base,tenantId:'foreign-tenant'},changed({version:2}),changed({operation:'pay'}),
+    changed({syntheticQa:false}),changed({syntheticQa:undefined}),changed({advisorId:'advisor-real'}),
+    changed({advisorId:'real_b4003qa_suffix'}),changed({cutoff:''}),changed({cutoff:'not-a-date'}),
+    changed({lines:[]}),changed({lines:null}),changed({lines:{}}),changed({commissionIds:null}),
+    changed({commissionIds:{}}),changed({lines:Array(41).fill(fx.specs[0].lines[0])}),
+    changed({lines:[null]}),changed({lines:[[]]}),changed({lines:[{polizaId:'policy-real'}]}),
+    changed({lines:[{...fx.specs[0].lines[0],commissionId:'real-commission'}]}),
+    changed({commissionIds:[fx.plans[0].commission.id]}),
+    {...base,advisorPayable:{...canonical,commissionIds:['real-commission']}},
+    {...base,advisorPayable:{...restore,preparedRequestId:'request-real'}},
+    {...base,advisorPayable:{...restore,advisorId:'advisor-real'}},
+    {...base,advisorPayable:{...restore,lines:[]}},
+    {...base,advisorPayable:{...restore,commissionIds:[]}},
+    {...base,advisorPayable:{...restore,syntheticQa:false}},
+    {...base,mutations:null},{...base,mutations:{}},
+    {...base,mutations:[{collection:'finmovs',id:'real-debt',action:'update',payload:{estado:'pagado'}}]},
+    {...base,mutations:[{collection:'finmovs',id:fx.ids.ordinary,action:'update',payload:{__syntheticQa:true}}]}
+  ];
+  for(const input of denied)await assert.rejects(preview.callFunction('orbit360ProductOperationalCommandPreview',input,'us-east1'),
+    /I66_PREVIEW_MUTATION_CALLABLE_DENIED/,'real, malformed, mixed or out-of-contract CxP remains blocked before network');
+  for(const input of allowed){
+    await assert.rejects(preview.callFunction('orbit360ProductOperationalCommandPreview',input,'us-central1'),/I66_PREVIEW_REGION_DENIED/);
+    await assert.rejects(preview.callFunction('orbit360ProductOperationalCommand',input,'us-central1'),/I66_PREVIEW_REGION_DENIED/);
+    await assert.rejects(preview.callFunction('orbit360ProductOperationalCommand',input,'us-east1'),/I66_PREVIEW_MUTATION_CALLABLE_DENIED/);
+  }
+  console.log('I6_6_PREVIEW_CXP_BOUNDED_SYNTHETIC_TRANSPORT_REGRESSION_PASS accepted='+allowed.length+' rejected='+denied.length+' liveAndWrongRegionRejected='+allowed.length*3);
   console.log('I6_6_PREVIEW_ALL_WRITE_CALLABLES_FAIL_CLOSED_PASS');
 })().catch(error=>{console.error(error);process.exitCode=1;});

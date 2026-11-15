@@ -8,21 +8,34 @@ Orbit.modules.comisiones = (function () {
   const U = Orbit.ui, q = Orbit.q, K = Orbit.kit, S = () => Orbit.store;
   let vista = 'asesor'; // asesor | aseguradora | periodo | conciliacion
   let fAnio = '', fEstado = '';
+  const buckets = (rows, valueOf) => q.financeCurrencyBuckets(rows, valueOf || (c => c.monto));
+  function moneyBuckets(summary) {
+    const values = Object.entries(summary.amounts).map(([currency, value]) => q.financeMoneyText(value, currency));
+    if (summary.unverified) values.push(summary.unverified + ' importe(s) sin moneda o valor verificado');
+    return values.join(' · ') || '—';
+  }
+  const exactMoney = (value, moneda) => moneyBuckets(buckets([{ monto: value, moneda }]));
 
   function render(host) {
     if (vista === 'conciliacion') return renderConciliacion(host);
     let all = S().all('comisiones');
     if (fAnio) all = all.filter(c => (c.periodo || '').startsWith(fAnio));
     if (fEstado) all = all.filter(c => fEstado === 'Liquidada' ? c.estado === 'Liquidada' : c.estado !== 'Liquidada');
-    const tot = all.reduce((s, c) => s + q.norm(c.monto, c.moneda), 0);
-    const liq = all.filter(c => c.estado === 'Liquidada').reduce((s, c) => s + q.norm(c.monto, c.moneda), 0);
+    const tot = buckets(all), liq = buckets(all.filter(c => c.estado === 'Liquidada'));
+    const pending = buckets(all.filter(c => c.estado !== 'Liquidada'));
 
     const campo = vista === 'asesor' ? 'asesorId' : vista === 'aseguradora' ? 'aseguradoraId' : 'periodo';
     // agregación sobre el set filtrado (no q.comisionesPor que ignora filtros)
     const agg = {};
-    all.forEach(c => { const k = campo === 'asesorId' ? c.asesorId : campo === 'aseguradoraId' ? c.aseguradoraId : c.periodo; if (!k) return; agg[k] = agg[k] || { total: 0, liquidada: 0, devengada: 0 }; const v = q.norm(c.monto, c.moneda); agg[k].total += v; if (c.estado === 'Liquidada') agg[k].liquidada += v; else agg[k].devengada += v; });
-    const entries = Object.entries(agg).sort((a, b) => vista === 'periodo' ? b[0].localeCompare(a[0]) : b[1].total - a[1].total);
-    const max = Math.max(...entries.map(e => e[1].total), 1);
+    all.forEach(c => { const groupKey = c[campo]; if (!groupKey) return;
+      const moneda = String(c.moneda || '').trim().toUpperCase(), k = JSON.stringify([groupKey, moneda]);
+      agg[k] = agg[k] || { groupKey, moneda, items: [] }; agg[k].items.push(c); });
+    const entries = Object.values(agg).map(g => [g.groupKey, { ...g,
+      total: buckets(g.items).amounts[g.moneda] || 0,
+      liquidada: buckets(g.items.filter(c => c.estado === 'Liquidada')).amounts[g.moneda] || 0,
+      devengada: buckets(g.items.filter(c => c.estado !== 'Liquidada')).amounts[g.moneda] || 0
+    }]).sort((a, b) => a[1].moneda.localeCompare(b[1].moneda) || (vista === 'periodo' ? b[0].localeCompare(a[0]) : b[1].total - a[1].total));
+    const max = {}; entries.forEach(([, v]) => { max[v.moneda] = Math.max(max[v.moneda] || 1, v.total); });
 
     function labelOf(k) {
       if (vista === 'asesor') { const a = q.asesor(k); return a ? `<span style="display:flex;align-items:center;gap:8px">${U.avatar(a.nombre, a.color, 'sm')}${U.esc(a.nombre)}</span>` : k; }
@@ -33,9 +46,9 @@ Orbit.modules.comisiones = (function () {
     host.innerHTML = `<div class="page">
       ${K.bannerFor('comisiones', `<button class="btn ghost" onclick="location.hash='#/equipo'" style="background:rgba(255,255,255,.1);color:#fff;border-color:rgba(255,255,255,.2)">⚙ Tarifas y % (en Equipo)</button>`)}
       ${K.kpis([
-        { label: 'Comisión generada', val: U.moneyShort(tot, Orbit.q.monedaPais()), color: 'var(--red)', foot: 'total cartera' },
-        { label: 'Liquidada', val: U.moneyShort(liq, Orbit.q.monedaPais()), color: 'var(--ok)', foot: 'pagada', footTone: 'up' },
-        { label: 'Por liquidar', onclick: "location.hash='#/finanzas'", val: U.moneyShort(tot - liq, Orbit.q.monedaPais()), color: 'var(--warn)', foot: 'devengada' },
+        { label: 'Comisión generada', val: moneyBuckets(tot), color: 'var(--red)', foot: 'total cartera · por moneda' },
+        { label: 'Liquidada', val: moneyBuckets(liq), color: 'var(--ok)', foot: 'pagada', footTone: 'up' },
+        { label: 'Por liquidar', onclick: "location.hash='#/finanzas'", val: moneyBuckets(pending), color: 'var(--warn)', foot: 'devengada' },
         { label: 'Registros', val: all.length, color: 'var(--info)', foot: 'cuotas con comisión' }
       ])}
 
@@ -53,10 +66,10 @@ Orbit.modules.comisiones = (function () {
         <thead><tr><th>${vista === 'asesor' ? 'Asesor' : vista === 'aseguradora' ? 'Aseguradora' : 'Periodo'}</th><th></th><th class="num">Liquidada</th><th class="num">Por liquidar</th><th class="num">Total</th><th></th></tr></thead>
         <tbody>${entries.map(([k, v]) => `<tr class="clickable" onclick="Orbit.modules.comisiones.detalle('${campo}','${k}')">
           <td style="min-width:180px">${labelOf(k)}</td>
-          <td style="width:34%"><div class="bar"><i style="width:${v.total / max * 100}%"></i></div></td>
-          <td class="num" style="color:var(--ok)">${U.moneyShort(v.liquidada, Orbit.q.monedaPais())}</td>
-          <td class="num" style="color:var(--warn)">${U.moneyShort(v.devengada, Orbit.q.monedaPais())}</td>
-          <td class="num"><b>${U.money(v.total, Orbit.q.monedaPais())}</b></td>
+          <td style="width:34%"><div class="muted">${U.esc(v.moneda || 'Moneda no verificada')}</div><div class="bar"><i style="width:${v.total / max[v.moneda] * 100}%"></i></div></td>
+          <td class="num" style="color:var(--ok)">${exactMoney(v.liquidada, v.moneda)}</td>
+          <td class="num" style="color:var(--warn)">${exactMoney(v.devengada, v.moneda)}</td>
+          <td class="num"><b>${moneyBuckets(buckets(v.items))}</b></td>
           <td style="text-align:right;color:var(--ink-3)">›</td>
         </tr>`).join('')}</tbody>
       </table></div></div>
@@ -72,15 +85,16 @@ Orbit.modules.comisiones = (function () {
   /* ---- Conciliación de statement: esperado (tarifa vigente) vs pagado/registrado ---- */
   function renderConciliacion(host) {
     const c = Orbit.comeng.conciliarStatement();
-    const M = n => U.money(n, Orbit.q.monedaPais()), MS = n => U.moneyShort(n, Orbit.q.monedaPais());
+    c.rows = c.rows.map(r => ({ ...r, moneda: (S().get('comisiones', r.comId) || {}).moneda || (S().get('polizas', r.polizaId) || {}).moneda || '' }));
+    const M = (n, currency) => exactMoney(n, currency);
     const desvColor = d => Math.abs(d) < 0.5 ? 'var(--ok)' : d < 0 ? 'var(--danger)' : 'var(--warn)';
     const conDesv = c.rows.filter(r => Math.abs(r.desv) >= 0.5).sort((a, b) => Math.abs(b.desv) - Math.abs(a.desv));
     host.innerHTML = `<div class="page">
       ${K.bannerFor('comisiones', `<button class="btn ghost" onclick="Orbit.importa.open('planillas-comision')" style="background:rgba(255,255,255,.1);color:#fff;border-color:rgba(255,255,255,.2)">📄 Importar planilla</button>`)}
       ${K.kpis([
-        { label: 'Comisión esperada', val: MS(c.totEsperado), color: 'var(--info)', foot: 'según tarifa vigente' },
-        { label: 'Registrada / pagada', val: MS(c.totPagado), color: 'var(--red)', foot: c.n + ' registros' },
-        { label: 'Desviación', val: (c.desviacion >= 0 ? '+' : '') + MS(c.desviacion), color: desvColor(c.desviacion), foot: c.desviacion < 0 ? 'pagan de menos' : c.desviacion > 0 ? 'pagan de más' : 'cuadra', footTone: c.desviacion < 0 ? 'down' : 'up' },
+        { label: 'Comisión esperada', val: moneyBuckets(buckets(c.rows, r => r.esperado)), color: 'var(--info)', foot: 'según tarifa vigente · por moneda' },
+        { label: 'Registrada / pagada', val: moneyBuckets(buckets(c.rows, r => r.pagado)), color: 'var(--red)', foot: c.n + ' registros' },
+        { label: 'Desviación', val: moneyBuckets(buckets(c.rows, r => r.desv)), color: c.conDesviacion ? 'var(--warn)' : 'var(--ok)', foot: 'diferencias por moneda; sin conversión' },
         { label: 'Con desviación', val: c.conDesviacion, color: c.conDesviacion ? 'var(--warn)' : 'var(--ok)', foot: 'de ' + c.n + ' pólizas' }
       ])}
       <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:14px">
@@ -95,12 +109,12 @@ Orbit.modules.comisiones = (function () {
         <tbody>${conDesv.slice(0, 40).map(r => `<tr class="clickable" onclick="Orbit.modules.cliente360.verPoliza('${r.polizaId}')">
           <td class="mono" style="font-size:11.5px"><b>${U.esc(r.ref)}</b></td>
           <td class="mono" style="font-size:11px">${U.esc(r.periodo || '—')}</td>
-          <td class="num">${M(r.base)}</td>
-          <td class="num" style="color:var(--info)">${M(r.esperado)}</td>
-          <td class="num">${M(r.pagado)}</td>
-          <td class="num muted">${r.retencion ? M(r.retencion) : '—'}</td>
-          <td class="num muted">${r.ajuste ? M(r.ajuste) : '—'}</td>
-          <td class="num" style="color:${desvColor(r.desv)}"><b>${r.desv >= 0 ? '+' : ''}${M(r.desv)}</b></td>
+          <td class="num">${M(r.base, r.moneda)}</td>
+          <td class="num" style="color:var(--info)">${M(r.esperado, r.moneda)}</td>
+          <td class="num">${M(r.pagado, r.moneda)}</td>
+          <td class="num muted">${r.retencion ? M(r.retencion, r.moneda) : '—'}</td>
+          <td class="num muted">${r.ajuste ? M(r.ajuste, r.moneda) : '—'}</td>
+          <td class="num" style="color:${desvColor(r.desv)}"><b>${r.desv >= 0 ? '+' : ''}${M(r.desv, r.moneda)}</b></td>
           <td class="num" style="color:${desvColor(r.desv)}">${r.pct >= 0 ? '+' : ''}${r.pct}%</td>
           <td>${scoreBadge(r)}</td></tr>`).join('') || '<tr><td colspan="10" class="muted" style="text-align:center;padding:20px">Sin diferencias detectadas — comisiones conciliadas con las tarifas vigentes.</td></tr>'}</tbody>
       </table></div></div>
@@ -125,8 +139,7 @@ Orbit.modules.comisiones = (function () {
     let titulo = key;
     if (campo === 'asesorId') { const a = q.asesor(key); titulo = a ? a.nombre : key; }
     else if (campo === 'aseguradoraId') { const a = q.aseguradora(key); titulo = a ? a.nombre : key; }
-    const tot = regs.reduce((s, c) => s + q.norm(c.monto, c.moneda), 0);
-    const liq = regs.filter(c => c.estado === 'Liquidada').reduce((s, c) => s + q.norm(c.monto, c.moneda), 0);
+    const tot = buckets(regs), liq = buckets(regs.filter(c => c.estado === 'Liquidada'));
     let back = document.getElementById('com-det'); if (back) back.remove();
     back = document.createElement('div'); back.id = 'com-det'; back.className = 'drawer-back open';
     back.style.display = 'grid'; back.style.placeItems = 'center'; back.style.zIndex = 96;
@@ -134,7 +147,7 @@ Orbit.modules.comisiones = (function () {
       <div style="padding:17px 20px;background:linear-gradient(120deg,var(--graph),#10141a);display:flex;justify-content:space-between;align-items:flex-start;gap:12px">
         <div><div class="crumb" style="margin-bottom:4px;color:rgba(255,255,255,.8)">Detalle de comisiones</div>
           <b style="font-family:var(--f-display);font-size:18px;color:#fff">${U.esc(titulo)}</b>
-          <div style="font-size:12.5px;margin-top:3px;color:rgba(255,255,255,.85)">${regs.length} registros · ${U.money(tot, Orbit.q.monedaPais())} total · ${U.money(liq, Orbit.q.monedaPais())} liquidada</div></div>
+          <div style="font-size:12.5px;margin-top:3px;color:rgba(255,255,255,.85)">${regs.length} registros · ${moneyBuckets(tot)} total · ${moneyBuckets(liq)} liquidada</div></div>
         <button class="imp-x" id="cd-x" style="background:rgba(255,255,255,.16);border-color:rgba(255,255,255,.3);color:#fff">✕</button>
       </div>
       <div style="overflow:auto;flex:1"><table class="tbl">
@@ -143,9 +156,9 @@ Orbit.modules.comisiones = (function () {
           <td class="mono" style="font-size:11.5px">${c.periodo || '—'}</td>
           <td style="font-size:12.5px">${cli ? U.esc(cli.nombre) : '—'}</td>
           <td class="mono" style="font-size:11.5px">${p ? `<a style="color:var(--red);cursor:pointer" onclick="document.getElementById('com-det').remove();Orbit.modules.cliente360.verPoliza('${c.polizaId}')">${p.numero}</a>` : '—'}</td>
-          <td class="num">${U.money(c.base, c.moneda)}</td>
-          <td class="num">${c.pct}%</td>
-          <td class="num"><b>${U.money(c.monto, c.moneda)}</b></td>
+          <td class="num">${exactMoney(c.base, c.moneda)}</td>
+          <td class="num">${c.pct == null || String(c.pct).trim() === '' ? '—' : U.esc(c.pct) + '%'}</td>
+          <td class="num"><b>${exactMoney(c.monto, c.moneda)}</b></td>
           <td><span class="badge ${c.estado === 'Liquidada' ? 'ok' : 'warn'}" title="Estado financiero: no se modifica con un clic">${U.esc(c.estado || 'Devengada')}</span></td>
           <td><button class="btn ghost sm" style="color:var(--danger,var(--red))" onclick="event.stopPropagation();Orbit.modules.comisiones.eliminar('${c.id}','${campo}','${key}')">Eliminar</button></td></tr>`; }).join('') || '<tr><td colspan="8" class="muted" style="text-align:center;padding:20px">Sin registros.</td></tr>'}</tbody>
       </table></div>

@@ -883,7 +883,7 @@ async function executeAdvisorPayable(request, previewOnly) {
       // Existing untyped historic commissions are not silently overwritten by
       // a new interpretation of "monto" or "Liquidada".
       if(existingCommission&&(existingCommission.financialDigest!==plan.financialDigest||
-         ['id','tenantId','asesorId','polizaId','clienteId','moneda','pais','monto','montoAsesor','pctAsesor','economicKey','cxpAsesorId'].some(key=>existingCommission[key]!==plan.commission[key])))
+         ['id','tenantId','asesorId','polizaId','clienteId','moneda','pais','monto','montoAsesor','pctAsesor','economicKey','cxpAsesorId','base','pct'].some(key=>existingCommission[key]!==plan.commission[key])))
         throw new HttpsError('failed-precondition','La comisión ya existe con otro contenido; conserva el original y resuelve la diferencia.',{reason:'COMMISSION_SOURCE_CONFLICT',commissionId:plan.commission.id});
       const payableSnap=await tx.get(canonicalRef(tenantId,'finmovs',plan.payable.id));
       const existingPayable=payableSnap.exists?payableSnap.data():null;
@@ -920,7 +920,7 @@ async function executeAdvisorPayable(request, previewOnly) {
     return committed;
   });
   if(spec.operation==='preview'&&!result.committed)return result;
-  const readback=[],canonicalPayables=[];
+  const readback=[],canonicalPayables=[],canonicalCommissions=[],commissionReadback=[];
   for(const row of result.payables){
     const snap=await canonicalRef(tenantId,'finmovs',row.id).get();
     if(!snap.exists||!advisorPayables.compatiblePayable(snap.data(),row))throw new HttpsError('internal','No se confirmó la CxP guardada: '+row.id);
@@ -930,8 +930,21 @@ async function executeAdvisorPayable(request, previewOnly) {
     readback.push({collection:'finmovs',id:row.id,exists:true,estado:actual.estado,pendiente:actual.pendiente,financialDigest:actual.financialDigest});
     const commission=await canonicalRef(tenantId,'comisiones',row.comisionId).get();
     if(!commission.exists||commission.data().financialDigest!==row.financialDigest)throw new HttpsError('internal','No se confirmó la comisión vinculada.');
+    const actualCommission=commission.data();
+    if(actualCommission.id!==row.comisionId||actualCommission.tenantId!==tenantId||actualCommission.asesorId!==advisorId||
+       actualCommission.cxpAsesorId!==row.id||actualCommission.polizaId!==row.polizaId||actualCommission.clienteId!==row.clienteId||
+       actualCommission.moneda!==row.moneda||actualCommission.pais!==row.pais||actualCommission.monto!==row.comisionOrdinariaAcreditada||
+       actualCommission.montoAsesor!==row.valor||actualCommission.pctAsesor!==row.pctAsesor||actualCommission.base!==row.base||actualCommission.pct!==row.pct||
+       !withinScope(actor,'comisiones','comisiones',actualCommission))
+      throw new HttpsError('internal','La comisión vinculada cambió de relación, importe o base documental durante el readback.');
+    canonicalCommissions.push(actualCommission);
+    commissionReadback.push({collection:'comisiones',id:actualCommission.id,exists:true,financialDigest:actualCommission.financialDigest,
+      cxpAsesorId:row.id,monto:actualCommission.monto,montoAsesor:actualCommission.montoAsesor,
+      ...(Object.prototype.hasOwnProperty.call(actualCommission,'base')?{base:actualCommission.base}:{}),
+      ...(Object.prototype.hasOwnProperty.call(actualCommission,'pct')?{pct:actualCommission.pct}:{})});
   }
-  return Object.assign({},result,{payables:canonicalPayables,canonicalReadback:true,canonicalReadbackCount:readback.length,readback});
+  return Object.assign({},result,{payables:canonicalPayables,commissions:canonicalCommissions,commissionReadback,
+    canonicalReadback:true,canonicalReadbackCount:readback.length,readback});
 }
 
 async function restoreAdvisorPayableSynthetic(request,previewOnly){

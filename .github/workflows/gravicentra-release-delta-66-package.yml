@@ -231,6 +231,8 @@ jobs:
           node --check tools/gravicentra-governance-preflight-v1.mjs
           node --check tools/gravicentra-i6-6-delta-guard.mjs
           node --check tools/gravicentra-i6-1-preview-package.mjs
+          node --check tools/gravicentra-i6-6-preview-current-live-restore.cjs
+          node --test tools/gravicentra-i6-6-preview-current-live-restore.test.cjs
           node --test tools/gravicentra-i6-6-preview-channel-reuse-guard.test.cjs
           node tools/gravicentra-governance-preflight-v1.mjs --mode=i6
       - name: Set up existing Firebase LAB credentials for read-only public config and tenant branding
@@ -439,6 +441,12 @@ jobs:
             if ! grep -Eqi 'HTTP Error: 429.*channel quota' "$RUNNER_TEMP/gi-i66-preview-result.json"; then exit 1; fi
             REUSE_ID='gi-i66-rc-42868854629'
             node "$FIREBASE_CLI_BIN" hosting:channel:list --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/gi-i66-reuse-before.json"
+            # A failed signed candidate may occupy this exact Preview. Only the
+            # separately pinned failed-candidate -> R11 authorization may restore
+            # it, after archive backups/cleanup and before the UNCHANGED guard.
+            # This helper cannot clone to LIVE or modify Functions/data/Auth.
+            node "$GITHUB_WORKSPACE/candidate/tools/gravicentra-i6-6-preview-current-live-restore.cjs"
+            node "$FIREBASE_CLI_BIN" hosting:channel:list --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/gi-i66-reuse-before.json"
             export REUSE_ID
             node - <<'NODE'
           const fs=require('node:fs'),assert=require('node:assert/strict');
@@ -479,6 +487,17 @@ jobs:
           if len(urls)!=1:raise SystemExit('I66_PREVIEW_URL_NOT_UNIQUE')
           print('url='+urls[0])
           PY
+      - name: Preserve exact Preview restore backups and receipt even on failure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gi-i66-preview-restore-evidence-${{ github.run_id }}
+          path: |
+            ${{ runner.temp }}/gi-i66-preview-restore-*/restore-receipt.json
+            ${{ runner.temp }}/gi-i66-preview-restore-*/failed/verified-backup.zip
+            ${{ runner.temp }}/gi-i66-preview-restore-*/r11/verified-backup.zip
+          retention-days: 30
+          if-no-files-found: ignore
       - name: Preview readback all artifact files and confirm both LIVE origins are untouched
         env:
           PREVIEW_URL: ${{ steps.preview.outputs.url }}

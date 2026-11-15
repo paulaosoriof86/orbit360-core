@@ -62,3 +62,22 @@ test('restore audit cleanup requires exact recorded disposable targets, not mere
   driver.sourceAuditGuard('restore',row,identity,'actor',false,[fx.plans[0].payable.id],[fx.plans[0].payable.id]);
   assert.throws(()=>driver.sourceAuditGuard('restore',row,identity,'actor',false,[fx.plans[0].payable.id],['b4003qa_other']));
 });
+test('a client-side Preview envelope rejection cannot count as signed backend permission denial',()=>{
+  driver.assertServerDenial({ok:false,code:'functions/permission-denied',reason:''},'permission-denied');
+  assert.throws(()=>driver.assertServerDenial({ok:false,code:'',reason:''},'permission-denied'),/ADVISOR_UAT_SERVER_DENIAL_NOT_REACHED/);
+  assert.throws(()=>driver.assertServerDenial({ok:false,code:'functions/internal',reason:''},'permission-denied'),/ADVISOR_UAT_DENIAL_CLASS_MISMATCH/);
+  assert.throws(()=>driver.assertServerDenial({ok:true,result:{}},'permission-denied'),/ADVISOR_UAT_UNEXPECTED_PERMISSION_GRANT/);
+  assert.throws(()=>driver.assertServerDenial({ok:false,code:'functions/failed-precondition',reason:'unexpected'},'failed-precondition','ADVISOR_POLICY_CONFLICT'),/ADVISOR_UAT_DENIAL_REASON_MISMATCH/);
+});
+test('failure evidence preserves precise controlled stage/check/line without message, identity, path or secret disclosure',()=>{
+  const secret='CUSTOMER_NAME_TOKEN_SHOULD_NOT_LEAK';
+  const error={code:'ERR_ASSERTION',message:'ADVISOR_UAT_SERVER_DENIAL_NOT_REACHED\n'+secret,
+    stack:'AssertionError: '+secret+'\n    at assertServerDenial (/private/customer-path/gravicentra-i6-6-advisor-payables-signed-uat.cjs:142:10)'};
+  const result=driver.safeFailureEvidence(error,'OPERATIVE_FINANCIAL_DENIAL');
+  assert.deepEqual(result,{failureClass:'ERR_ASSERTION',failureStage:'OPERATIVE_FINANCIAL_DENIAL',failureCheck:'ADVISOR_UAT_SERVER_DENIAL_NOT_REACHED',
+    failureLocation:{file:'gravicentra-i6-6-advisor-payables-signed-uat.cjs',line:142,column:10}});
+  assert.doesNotMatch(JSON.stringify(result),/CUSTOMER_NAME|private|customer-path/);
+  const unknown=driver.safeFailureEvidence({code:secret,name:secret,message:'ADVISOR_UAT_'+secret,stack:secret},secret);
+  assert.deepEqual(unknown,{failureClass:'ASSERTION_OR_RUNTIME_FAILURE',failureStage:'UNKNOWN_STAGE',failureCheck:'ASSERTION_OR_RUNTIME_FAILURE',failureLocation:null});
+  assert.equal(driver.safeFailureEvidence({name:'TimeoutError'},'FINANCE_UI_HYDRATION').failureClass,'TIMEOUT_ERROR');
+});

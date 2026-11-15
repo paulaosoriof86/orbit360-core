@@ -2016,6 +2016,113 @@
           "gitBlobSha": "e3a70bd72b7a07b5b670ed1946f68af1065154e2"
         }
       ]
+    },
+    {
+      "id": "I6_6_ADVISOR_CXP_PREVIEW_ENVELOPE_READBACK_CURRENCY_20261115",
+      "approvedByDirection": true,
+      "receipt": "Paula Dirección 15/11/2026: liquidar octubre de Paula y Samuel además de Fernando y Germán; registrar en Finanzas donde corresponde, corregir y probar la escritura y publicar el mismo artifact certificado. Los PDFs no acreditan una escritura ni pago. Restauración exclusiva Preview respaldada por autorización exacta y recibo de inventario; LIVE permanece R11 hasta nuevo QA completo.",
+      "paths": [
+        {
+          "path": "functions/advisor-commission-payable-contract.js",
+          "gitBlobSha": "2f26fbbc171b34fb86fc5c87e3243077bdf7b92f",
+          "replaces": {
+            "path": "functions/advisor-commission-payable-contract.js",
+            "priorGitBlobSha": "b4e7451bca86c00981be426e3f7500c4cf050f4b",
+            "priorChangeId": "I6_6_CONCILIATION_APPROVAL_AND_ADVISOR_CXP_20261115"
+          }
+        },
+        {
+          "path": "functions/product-operational-domain.js",
+          "gitBlobSha": "cecf4d02ba5bca054a28862b51c7416f2b852ed1",
+          "replaces": {
+            "path": "functions/product-operational-domain.js",
+            "priorGitBlobSha": "9e0ae0db1a30d1fb94924fd4fc2e9fd27818a561",
+            "priorChangeId": "I6_6_CONCILIATION_APPROVAL_AND_ADVISOR_CXP_20261115"
+          }
+        },
+        {
+          "path": "orbit360-platform/core/product-runtime-browser-providers-p0.js",
+          "gitBlobSha": "76e0615e0de0272bf315f09f3fa2a30ac80348ea",
+          "replaces": {
+            "path": "orbit360-platform/core/product-runtime-browser-providers-p0.js",
+            "priorGitBlobSha": "804d541550e2d5e8056f0fc2c7705e029b6d653f",
+            "priorChangeId": "I6_6_CONCILIATION_APPROVAL_AND_ADVISOR_CXP_20261115"
+          }
+        },
+        {
+          "path": "orbit360-platform/core/queries.js",
+          "gitBlobSha": "018d924dc7cfa8d0e3621e2742e589432b805e76",
+          "replaces": {
+            "path": "orbit360-platform/core/queries.js",
+            "priorGitBlobSha": "c3b9ccf39d3ef8a6e5c06e3965df159ad65288b7",
+            "priorChangeId": "I6_6_OPERATIVE_ADVISOR_PAYMENT_INVOICE_EXPIRY_BATCH_20261113"
+          }
+        },
+        {
+          "path": "orbit360-platform/data/store-firestore-product-operational-p0.js",
+          "gitBlobSha": "ff7be0bef5c9e786b4efc5287c5e23a6955b7d2a",
+          "replaces": {
+            "path": "orbit360-platform/data/store-firestore-product-operational-p0.js",
+            "priorGitBlobSha": "7fe8969a15232ba93e54db86a3b69d7d338dcb60",
+            "priorChangeId": "I6_6_CONCILIATION_APPROVAL_AND_ADVISOR_CXP_20261115"
+          }
+        },
+        {
+          "path": "orbit360-platform/modules/comisiones.js",
+          "gitBlobSha": "07b00f00bb31c6f2aa2523731d85ebb259758fd6",
+          "replaces": {
+            "path": "orbit360-platform/modules/comisiones.js",
+            "priorGitBlobSha": "5b0b600c350547072e4496bef3a00129ac1516eb",
+            "priorChangeId": "I6_6_CONCILIATION_APPROVAL_AND_ADVISOR_CXP_20261115"
+          }
+        },
+        {
+          "path": "orbit360-platform/modules/finanzas.js",
+          "gitBlobSha": "e1dfbda6584515d5729573d7835558ce058980a1",
+          "replaces": {
+            "path": "orbit360-platform/modules/finanzas.js",
+            "priorGitBlobSha": "4253d142f1aaf5f5fc44f5f594cec2b21f4aaba7",
+            "priorChangeId": "I6_6_CONCILIATION_APPROVAL_AND_ADVISOR_CXP_20261115"
+          }
+        }
+      ],
+      "tests": [
+        {
+          "path": "tools/gravicentra-i6-6-advisor-payables-signed-uat.test.cjs",
+          "gitBlobSha": "07e1016187cc8fb9bbcffa324984f5eb4a5cc206",
+          "replaces": {
+            "path": "tools/gravicentra-i6-6-advisor-payables-signed-uat.test.cjs",
+            "priorGitBlobSha": "fdb796c0bc567436a52035fcad567b35f9c66e2b",
+            "priorChangeId": "I6_6_CONCILIATION_APPROVAL_AND_ADVISOR_CXP_20261115"
+          }
+        },
+        {
+          "path": "tools/gravicentra-i6-6-advisor-payables.test.cjs",
+          "gitBlobSha": "8db5b19ce57891b6911c999a4f5443cd96773f6e",
+          "replaces": {
+            "path": "tools/gravicentra-i6-6-advisor-payables.test.cjs",
+            "priorGitBlobSha": "cdffaa98af58f87d796091474353d6435cc2f308",
+            "priorChangeId": "I6_6_CONCILIATION_APPROVAL_AND_ADVISOR_CXP_20261115"
+          }
+        },
+        {
+          "path": "tools/gravicentra-i6-6-finance-currency-buckets.test.cjs",
+          "gitBlobSha": "debf9ad8f460347cd9b9ae86da0c01165a666e66"
+        },
+        {
+          "path": "tools/gravicentra-i6-6-preview-current-live-restore.test.cjs",
+          "gitBlobSha": "3617b3e5d4644007bd399913da849ce0ee55c0b1"
+        },
+        {
+          "path": "tools/gravicentra-i6-6-preview-writer-failclosed.test.cjs",
+          "gitBlobSha": "f98aaa9185f4b9d6d3de9c8cbdfaa6b6057c9a99",
+          "replaces": {
+            "path": "tools/gravicentra-i6-6-preview-writer-failclosed.test.cjs",
+            "priorGitBlobSha": "a0dbb67c82687e40a2e2b07cadb42fa680bc5137",
+            "priorChangeId": "I6_6_PROTECTED_READONLY_HOST_ROUTING_AND_WRITE_DENIAL_ALL_SURFACES"
+          }
+        }
+      ]
     }
   ],
   "i66R11PreviewBuildRequest20261113": {

@@ -661,9 +661,26 @@
           var proof=result.readback.find(function(r){return r.collection==='finmovs'&&r.id===row.id&&r.exists===true&&r.financialDigest===row.financialDigest&&r.estado===row.estado&&r.pendiente===row.pendiente;});
           if(!proof)throw new Error('ADVISOR_PAYABLE_ROW_READBACK_MISSING');
         });
+        if(!Array.isArray(result.commissions)||!Array.isArray(result.commissionReadback)||
+           result.commissions.length!==result.payables.length||result.commissionReadback.length!==result.payables.length)
+          throw new Error('ADVISOR_COMMISSION_CANONICAL_READBACK_REQUIRED');
+        var commissionIds=new Set();
+        result.commissions.forEach(function(row){
+          var payable=result.payables.find(function(p){return p.comisionId===row.id&&p.id===row.cxpAsesorId;});
+          var proof=result.commissionReadback.find(function(r){return r.collection==='comisiones'&&r.id===row.id&&r.exists===true&&
+            r.financialDigest===row.financialDigest&&r.cxpAsesorId===row.cxpAsesorId&&r.monto===row.monto&&r.montoAsesor===row.montoAsesor&&r.base===row.base&&r.pct===row.pct;});
+          if(!payable||!proof||commissionIds.has(row.id)||row.tenantId!==m.tenantId||row.asesorId!==input.advisorId||
+             row.financialDigest!==payable.financialDigest||row.polizaId!==payable.polizaId||row.clienteId!==payable.clienteId||
+             row.moneda!==payable.moneda||row.pais!==payable.pais||row.monto!==payable.comisionOrdinariaAcreditada||
+             row.montoAsesor!==payable.valor||row.pctAsesor!==payable.pctAsesor||row.base!==payable.base||row.pct!==payable.pct)
+            throw new Error('ADVISOR_COMMISSION_ROW_READBACK_MISSING');
+          commissionIds.add(row.id);
+        });
         // No optimistic creation. Only a server-committed and reread row enters
         // the shared projection; a reload still uses the protected reader.
+        result.commissions.forEach(function(row){setPending('comisiones',row.id,clone(row),{kind:'insert'});});
         result.payables.forEach(function(row){setPending('finmovs',row.id,clone(row),{kind:'insert'});});
+        emit('comisiones');
         emit('finmovs');
       }
       return result;
