@@ -26,6 +26,10 @@ window.Orbit = window.Orbit || {};
   E.updatePolicy = function (id, patch, options) {
     const current = Orbit.store && Orbit.store.get ? Orbit.store.get('polizas', id) : null;
     if (!current || !patch || !E.preparePolicy) return updatePolicy(id, patch, options);
+    // Metadata-only edits must reach the narrow audited patch owner untouched;
+    // even comparison normalization can manufacture financial changes/defaults.
+    if(Object.keys(patch).length&&Object.keys(patch).every(k=>k==='asesorId'||k==='renovable'))
+      return updatePolicy(id,patch,options);
     const before = E.preparePolicy(current, current, 'compare');
     const after = E.preparePolicy(Object.assign({}, current, patch, { id }), current, 'compare_after');
     const reduced = {};

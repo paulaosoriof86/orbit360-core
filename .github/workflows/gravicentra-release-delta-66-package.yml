@@ -169,7 +169,13 @@ jobs:
             invoicePreview.forbidRealFinancialWrites===true&&
             invoicePreview.requireLiveFunctionRevisionBeforeAfterIdentity===true&&
             invoicePreview.requireExactBackendBlobInArtifact===true;
-          if(c.schema!=='GRAVICENTRA_I6_6_SINGLE_ARTIFACT_RELEASE_TRANSPORT_V1'||c.gate!=='I6.6'||c.historicalClosedGate!=='B4-007'||(c.forbidBackendFunctionDeploy!==true&&!scopedPreview&&!scopedLive&&!scopedCarlosLive&&!readerPreview&&!stageReaderPreview&&!stageLive&&!carlosFunctionPreview&&!privilegedPreview&&!privilegedLive&&!paymentInvoicePreview)||c.forbidFirestoreRulesDataAuthWrites!==true)throw Error('I66_TRANSPORT_SCOPE_INVALID');
+          let operationalTransport=false;
+          if(['OPERATIONAL_BACKEND_PREVIEW_AUTHORIZED','OPERATIONAL_EXACT_LIVE_PROMOTION_AUTHORIZED'].includes(c.status)){
+            require('./tools/gravicentra-i6-6-operational-release-candidate.cjs').candidateForPhase(c,
+              c.status==='OPERATIONAL_BACKEND_PREVIEW_AUTHORIZED'?'preview':'live');
+            operationalTransport=true;
+          }
+          if(c.schema!=='GRAVICENTRA_I6_6_SINGLE_ARTIFACT_RELEASE_TRANSPORT_V1'||c.gate!=='I6.6'||c.historicalClosedGate!=='B4-007'||(c.forbidBackendFunctionDeploy!==true&&!scopedPreview&&!scopedLive&&!scopedCarlosLive&&!readerPreview&&!stageReaderPreview&&!stageLive&&!carlosFunctionPreview&&!privilegedPreview&&!privilegedLive&&!paymentInvoicePreview&&!operationalTransport)||c.forbidFirestoreRulesDataAuthWrites!==true)throw Error('I66_TRANSPORT_SCOPE_INVALID');
           if((scopedPreview||scopedLive||scopedCarlosLive||readerPreview)&&(!/^[0-9a-f]{40}$/.test(c.approvedSourceSha||'')||!(c.sourceBuildWorkflowRunId>0)||!(c.immutableArtifactId>0)||!/^[0-9a-f]{64}$/.test(String(c.immutableArtifactZipDigest||'').replace(/^sha256:/,''))))throw Error('I66_SCOPED_RELEASE_PROOF_MISSING');
           let mode='disabled',source='',sourceRun='',artifactId='',artifactDigest='',accessSha='',readerSha='',previewChannel='';
           if(c.status==='PREVIEW_BUILD_REQUESTED'&&c.livePromotionAuthorized===false)mode='package';
@@ -225,6 +231,7 @@ jobs:
           node --check tools/gravicentra-governance-preflight-v1.mjs
           node --check tools/gravicentra-i6-6-delta-guard.mjs
           node --check tools/gravicentra-i6-1-preview-package.mjs
+          node --test tools/gravicentra-i6-6-preview-channel-reuse-guard.test.cjs
           node tools/gravicentra-governance-preflight-v1.mjs --mode=i6
       - name: Set up existing Firebase LAB credentials for read-only public config and tenant branding
         working-directory: candidate
@@ -435,57 +442,26 @@ jobs:
             export REUSE_ID
             node - <<'NODE'
           const fs=require('node:fs'),assert=require('node:assert/strict');
+          const {validateChannels,validateRecoverableArtifact}=require(process.env.GITHUB_WORKSPACE+'/candidate/tools/gravicentra-i6-6-preview-channel-reuse-guard.cjs');
           // Deployment step runs inside the immutable bundle, not the source checkout.
           // Consult the exact checked-out control document, never a file from the bundle.
           const control=JSON.parse(fs.readFileSync(process.env.GITHUB_WORKSPACE+'/candidate/artifacts/orbit360-recovery/release-control/I6_6_RELEASE_TRANSPORT_CONTROL_20261110.json','utf8'));
-          // I6.6 successor: the currently certified R9 Preview+LIVE exact
-          // version supersedes the R8 quota-recovery anchor. The historic R7
-          // receipt remains immutable in control; only an explicit new gate
-          // may authorize reusing this one known channel.
-          const a=control.i66R11RenewalDrivePreviewQuotaRecovery20261113||{};
-          assert.equal(control.status,'PREVIEW_BUILD_REQUESTED','I66_QUOTA_RECOVERY_GATE_NOT_REQUESTED');
-          assert.ok(control.livePromotionAuthorized===false&&control.forbidBackendFunctionDeploy===true&&
-            control.forbidBackendLiveFunctionDeploy===true&&control.noHostingPromotion===true&&
-            control.forbidFirestoreRulesDataAuthWrites===true,'I66_QUOTA_RECOVERY_WRITE_BOUNDARY_DRIFT');
-          assert.ok(a.allowOnlyKnownSinglePreviewChannel===true&&a.denyLiveHostingOrBackendDataWrites===true&&
-            a.denyChannelDeletion===true&&a.stopOnAnySourceVersionOrArtifactMismatch===true&&
-            a.authorizedExistingChannelId===process.env.REUSE_ID&&
-            a.status==='R10_CURRENT_PREVIEW_LIVE_EXACT_BACKUP_AUTHORIZED_SINGLE_CHANNEL'&&
-            a.expectedCurrentSourceSha==='851d68441b819eac6dd37ec1d5d15fb971e35bf2'&&
-            a.expectedCurrentHostingVersion==='23037b2a726a8def'&&
-            a.expectedCurrentPreviewUrl==='https://ays-orbit-360-lab--gi-i66-rc-42868854629-abj14q6n.web.app'&&
-            a.recoverableSourceRunId===43484031398&&a.recoverableArtifactId===14066487146&&
-            a.recoverableArtifactDigest==='sha256:f0d45ff58490d53c434f7285d98818439cfabdafb9bbc0f8e814787927df5f3d'&&
-            a.allowOnlyNewSourceInIsolatedPreview===true&&a.realBusinessDataWritesAllowed===false,
-            'I66_QUOTA_RECOVERY_EXACT_OWNER_AUTHORIZATION_MISSING');
+          // Reuse authority is paired with the current immutable LIVE pointer,
+          // never with a superseded R-number. Historic receipts stay unchanged.
           const j=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/gi-i66-reuse-before.json','utf8'));
-          const channels=Array.isArray(j.result)?j.result:j.result?.channels||[];
-          const id=x=>String(x.channelId||x.name||'').split('/').pop();
-          const target=channels.filter(x=>id(x)===process.env.REUSE_ID);
-          assert.equal(target.length,1,'I66_REUSE_EXACT_PREVIEW_NOT_UNIQUE');
-          assert.equal(String(target[0].release?.version?.name||'').split('/').pop(),
-            a.expectedCurrentHostingVersion,'I66_REUSE_R9_PREVIEW_VERSION_CHANGED_STOP');
-          assert.ok(String(target[0].createTime||'').startsWith('2026-11-10T')&&
-            id(target[0])!=='live','I66_REUSE_R9_PREVIEW_SCOPE_DRIFT');
-          const live=channels.find(x=>id(x)==='live');
-          assert.ok(live&&String(live.release?.version?.name||'').split('/').pop()===a.expectedCurrentHostingVersion,
-            'I66_REUSE_R9_LIVE_VERSION_DRIFT');
+          const a=validateChannels(control,j);
+          assert.equal(a.authorizedChannelId,process.env.REUSE_ID);
           (async()=>{
             const h={Authorization:'Bearer '+process.env.GH_TOKEN,Accept:'application/vnd.github+json',
-              'User-Agent':'GI-I66-Exact-R9-Preview-Quota-Recovery'};
+              'User-Agent':'GI-I66-Exact-Preview-Quota-Recovery'};
             const root='https://api.github.com/repos/paulaosoriof86/orbit360-core/actions/';
-            const [r,b,p]=await Promise.all([fetch(root+'runs/'+a.recoverableSourceRunId,{headers:h}),
+            const [r,b,p,l]=await Promise.all([fetch(root+'runs/'+a.recoverableBuildRunId,{headers:h}),
               fetch(root+'artifacts/'+a.recoverableArtifactId,{headers:h}),
-              fetch(a.expectedCurrentPreviewUrl+'/__recovery__/build.json',{cache:'no-store'})]);
-            assert.ok(r.ok&&b.ok&&p.ok,'I66_REUSE_R9_PREVIEW_OR_ARTIFACT_PROOF_UNAVAILABLE');
-            const run=await r.json(),artifact=await b.json();
-            const build=await p.json();
-            assert.ok(run.conclusion==='success'&&
-              run.head_sha===a.expectedCurrentSourceSha&&
-              artifact.expired===false&&artifact.workflow_run?.id===a.recoverableSourceRunId&&
-              artifact.digest===a.recoverableArtifactDigest&&
-              build.sourceSha===a.expectedCurrentSourceSha,
-              'I66_REUSE_R9_EXACT_IMMUTABLE_ARTIFACT_NOT_RECOVERABLE');
+              fetch(a.expectedPreviewUrl+'/__recovery__/build.json',{cache:'no-store'}),
+              fetch(root+'runs/'+control.currentExactHostingRelease.liveCloneRunId,{headers:h})]);
+            assert.ok(r.ok&&b.ok&&p.ok&&l.ok,'I66_REUSE_PREVIEW_OR_ARTIFACT_PROOF_UNAVAILABLE');
+            validateRecoverableArtifact(control,{buildRun:await r.json(),artifact:await b.json(),
+              previewBuild:await p.json(),liveRun:await l.json()});
             console.log('I66_KNOWN_CURRENT_LIVE_PREVIEW_EXACT_VERSION_SOURCE_AND_BACKUP_PASS');
           })().catch(e=>{console.error(e.message);process.exitCode=1;});
           NODE

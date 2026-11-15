@@ -8,6 +8,7 @@ const { HttpsError, onCall } = require('firebase-functions/v2/https');
 const { resolveProductActiveRole } = require('./product-active-role-contract');
 const { validarCambioParticipacion } = require('./goal-participation-contract');
 const { projectInsurerActivity } = require('./b4-003-scoped-bootstrap-reader');
+const advisorPayables = require('./advisor-commission-payable-contract');
 
 const REGION = process.env.ORBIT360_FUNCTIONS_REGION || 'us-central1';
 const PREVIEW_REGION = 'us-east1';
@@ -485,6 +486,10 @@ function normalizeMutation(raw, allowMetaFixtureRemove = false) {
   const id = cleanId(mutation.id || mutation.payload && mutation.payload.id, 'documentId');
   const payload = mutation.payload && typeof mutation.payload === 'object' ? stable(mutation.payload) : null;
   if (action !== 'remove' && !payload) throw new HttpsError('invalid-argument', 'Payload requerido.');
+  if(['comisiones','finmovs'].includes(collection)&&payload?.schemaVersion===advisorPayables.SCHEMA)
+    throw new HttpsError('failed-precondition','La liquidación de asesor requiere su comando semántico, no una escritura genérica.');
+  if(collection==='comisiones'&&(['liquidada','liquidado','pagada','pagado'].includes(norm(payload?.estado))||payload?.pagada===true))
+    throw new HttpsError('failed-precondition','Una comisión no se marca liquidada mediante cambio de etiqueta. Requiere pago documentado al asesor.');
   // CAS is opt-in solely for classification-only policy updates; it cannot
   // be used to bypass a module's existing role/country authorization.
   let expectedBefore;
@@ -562,6 +567,7 @@ function mutationPayloadMatches(actual,payload){
 
 async function execute(request, metaPreviewContext = null) {
   const input = request.data || {};
+  if (input.advisorPayable) return executeAdvisorPayable(request, false);
   const tenantId = cleanId(input.tenantId, 'tenantId');
   if(!metaPreviewContext&&(input.metaPreviewQa||[].concat(input.mutations||[]).some(m=>m?.payload?.__metasPreviewQa===true)))
     throw new HttpsError('permission-denied','El modo de prueba de metas está reservado al comando Preview.');
@@ -625,6 +631,11 @@ async function execute(request, metaPreviewContext = null) {
     for (const item of reads) {
       const { mutation, ref, snap, parents, linkedMemberRef, linkedMemberSnap } = item;
       const before = snap.exists ? snap.data() : null;
+      if(['comisiones','finmovs'].includes(mutation.collection)&&before?.schemaVersion===advisorPayables.SCHEMA)
+        throw new HttpsError('failed-precondition','La comisión/CxP protegida no admite edición genérica ni cambio manual a pagada.');
+      if(mutation.collection==='finmovs'&&(before?.clase==='Comisiones asesores'||mutation.payload?.clase==='Comisiones asesores')&&
+         (['pagado','pagada','liquidado','liquidada'].includes(norm(mutation.payload?.estado))||mutation.payload?.pagada===true))
+        throw new HttpsError('failed-precondition','Crear una CxP no equivale a pagarla. El pago requiere comprobante y su proceso financiero.');
       if(!metaPreviewContext&&before?.__metasPreviewQa===true)throw new HttpsError('permission-denied','El fixture requiere su contexto de prueba y actor originales.');
       if (mutation.action === 'insert' && before) throw new HttpsError('already-exists', `${mutation.collection}/${mutation.id} ya existe.`);
       if ((mutation.action === 'update' || mutation.action === 'remove') && !before) throw new HttpsError('not-found', `${mutation.collection}/${mutation.id} no existe.`);
@@ -746,6 +757,219 @@ async function execute(request, metaPreviewContext = null) {
   return response;
 }
 
+// Reuses the existing signed operational callable and Firestore authority.
+// Neither a premium collection nor a commission statement is a cash payment
+// to an advisor. This command only records a documented commission + CxP.
+async function executeAdvisorPayable(request, previewOnly) {
+  const input=request.data||{}, spec=input.advisorPayable||{};
+  if(spec.operation==='restoreSynthetic')return restoreAdvisorPayableSynthetic(request,previewOnly);
+  const tenantId=cleanId(input.tenantId,'tenantId'), advisorId=cleanId(spec.advisorId,'advisorId');
+  if ([].concat(input.mutations||[]).length || spec.version!==1 || !['preview','prepare'].includes(spec.operation))
+    throw new HttpsError('invalid-argument','Contrato de preparación de comisiones inválido.');
+  let cutoff;
+  try { cutoff=advisorPayables.date(spec.cutoff,'Corte'); }
+  catch(error) { throw new HttpsError('invalid-argument',error.message,{reason:error.code}); }
+  const refs=[].concat(spec.commissionIds||[]), supplied=[].concat(spec.lines||[]);
+  if ((!refs.length&&!supplied.length)||refs.length+supplied.length>40 || (refs.length&&supplied.length))
+    throw new HttpsError('invalid-argument','Usa de 1 a 40 comisiones canónicas o líneas de fuente, sin mezclar ambos modos.');
+  if(supplied.some(row=>row&&Object.prototype.hasOwnProperty.call(row,'commissionId')))
+    throw new HttpsError('invalid-argument','Una línea fuente no puede elegir el ID de una comisión. Usa commissionIds para registros canónicos.');
+  const syntheticId=value=>/(?:^|_)(?:b3004qa|b4003qa)_[A-Za-z0-9._:-]+$/i.test(text(value,256));
+  const syntheticRun=spec.syntheticQa===true&&syntheticId(advisorId)&&refs.every(syntheticId)&&supplied.every(row=>syntheticId(row?.polizaId));
+  if((previewOnly||spec.syntheticQa===true)&&!syntheticRun)
+    throw new HttpsError('permission-denied','Preview solo admite asesor, comisiones y pólizas sintéticos autorizados.');
+  // Authorization is separate for the source commission and the financial CxP.
+  // Existing tenant roles/matrix/country/scope remain in force.
+  const actor=await authorize(request,tenantId,[{collection:'comisiones'},{collection:'finmovs'}]);
+  if(!TEAM_ROLES.has(norm(actor.activeRole))&&!FINANCE_ROLES.has(norm(actor.activeRole)))
+    throw new HttpsError('permission-denied','La preparación de CxP requiere un rol financiero o administrativo autorizado.');
+  const inputDigest=digest({advisorId,cutoff,refs,supplied,syntheticRun,previewOnly});
+  const requestId=cleanId(input.requestId||'advisorpay_'+sha(tenantId+'|'+actor.uid+'|'+inputDigest).slice(0,32),'requestId');
+  const reqRef=requestRef(tenantId,requestId), eventId='opevt_'+sha(tenantId+'|'+requestId).slice(0,28);
+  const result=await db.runTransaction(async tx=>{
+    const previous=await tx.get(reqRef);
+    let committedPrevious=null;
+    if(previous.exists){
+      const old=previous.data()||{};
+      if(old.payloadDigest!==inputDigest||old.actorUid!==actor.uid)throw new HttpsError('already-exists','Solicitud de liquidación con otro contenido o actor.');
+      if(old.status==='restored')throw new HttpsError('failed-precondition','La prueba ya fue restaurada; inicia otra con referencias sintéticas nuevas.');
+      if(old.status==='committed')committedPrevious=old.result;
+    }
+    const advisorSnap=await tx.get(canonicalRef(tenantId,'asesores',advisorId));
+    if(!advisorSnap.exists)throw new HttpsError('not-found','El asesor no está en el equipo canónico.');
+    const advisor=Object.assign({},advisorSnap.data(),{id:advisorId});
+    if(advisor.tenantId&&advisor.tenantId!==tenantId)throw new HttpsError('permission-denied','Asesor fuera del tenant.');
+    if(syntheticRun&&advisor.__syntheticQa!==true)throw new HttpsError('permission-denied','El asesor de QA debe estar marcado como sintético.');
+    // An advisor can receive a payable without an Auth/login account.
+    const lines=[],canonicalProvenances=new Map();
+    for(const value of refs){
+      const commissionId=cleanId(value,'commissionId'), snap=await tx.get(canonicalRef(tenantId,'comisiones',commissionId));
+      if(!snap.exists)throw new HttpsError('not-found','Comisión canónica no encontrada: '+commissionId);
+      const commission=Object.assign({},snap.data(),{id:commissionId});
+      canonicalProvenances.set(commissionId,commission.sourceProvenance||null);
+      if((commission.tenantId&&commission.tenantId!==tenantId)||commission.asesorId!==advisorId||!withinScope(actor,'comisiones','comisiones',commission))
+        throw new HttpsError('permission-denied','La comisión no pertenece al asesor o alcance seleccionado.');
+      try{lines.push(advisorPayables.fromCanonicalCommission(commission));}
+      catch(error){throw new HttpsError('failed-precondition',error.message,{reason:error.code,commissionId});}
+    }
+    for(const line of supplied)lines.push(line);
+    const historicalMovements=await tx.get(db.collection('tenants').doc(tenantId).collection('data').doc('finmovs').collection('items'));
+    const historicalCommissions=await tx.get(db.collection('tenants').doc(tenantId).collection('data').doc('comisiones').collection('items'));
+    const historicalRows=[...historicalCommissions.docs,...historicalMovements.docs].map(doc=>Object.assign({id:doc.id},doc.data()));
+    const requirementIdentity=row=>[text(row.polizaId),text(row.source?.requirementRef).toUpperCase().replace(/\s+/g,''),text(row.moneda).toUpperCase()].join('|');
+    const planned=[],seen=new Set(),seenSources=new Set(),seenRequirements=new Set();
+    for(const line of lines){
+      const policyId=cleanId(line?.polizaId,'polizaId'), policySnap=await tx.get(canonicalRef(tenantId,'polizas',policyId));
+      const policy=policySnap.exists?Object.assign({},policySnap.data(),{id:policyId}):null;
+      if(policy?.tenantId&&policy.tenantId!==tenantId)throw new HttpsError('permission-denied','La póliza no pertenece al tenant autorizado.');
+      if(syntheticRun&&policy?.__syntheticQa!==true)throw new HttpsError('permission-denied','La póliza de QA debe estar marcada como sintética.');
+      if(policy&&!withinScope(actor,'polizas','polizas',policy))throw new HttpsError('permission-denied','La póliza está fuera del alcance autorizado.');
+      if(policy){
+        const clientId=cleanId(policy.clienteId,'clienteId'),clientSnap=await tx.get(canonicalRef(tenantId,'clientes',clientId));
+        if(!clientSnap.exists)throw new HttpsError('failed-precondition','Falta el cliente canónico de la póliza.',{reason:'POLICY_CLIENT_NOT_FOUND',polizaId:policyId,clienteId:clientId});
+        if(clientSnap.data().tenantId&&clientSnap.data().tenantId!==tenantId)throw new HttpsError('permission-denied','El cliente vinculado está fuera del tenant.');
+        // Policy country/ownership is authoritative; the client's domicile may
+        // legitimately have changed since the credited insurance transaction.
+        if(line.reciboId){
+          const receiptSnap=await tx.get(canonicalRef(tenantId,'recibosEsperados',cleanId(line.reciboId,'reciboId'))),receipt=receiptSnap.exists?receiptSnap.data():null;
+          if(!receipt||(receipt.tenantId&&receipt.tenantId!==tenantId)||text(receipt.polizaId)!==policyId)
+            throw new HttpsError('failed-precondition','El recibo no corresponde a la póliza canónica.',{reason:'COMMISSION_RECEIPT_RELATION_CONFLICT',polizaId:policyId,reciboId:line.reciboId});
+        }
+      }
+      let plan;
+      try{plan=advisorPayables.normalizeLine(line,{tenantId,advisor,policy,cutoff,synthetic:syntheticRun,
+        sourceMode:refs.length?'canonical':'declared',sourceProvenance:refs.length?canonicalProvenances.get(line.commissionId):null});}
+      catch(error){throw new HttpsError('failed-precondition',error.message,{reason:error.code,polizaId:policyId,sourceLine:line?.source?.lineId||''});}
+      if(seen.has(plan.payable.id)||seen.has(plan.commission.id))throw new HttpsError('invalid-argument','La misma línea de fuente aparece dos veces en el lote.');
+      seen.add(plan.payable.id);seen.add(plan.commission.id);
+      const sourceDigestLine=plan.payable.source.sha256+'|'+plan.payable.source.lineId;
+      if(seenSources.has(plan.payable.sourceKey)||seenSources.has(sourceDigestLine))
+        throw new HttpsError('failed-precondition','Una línea fuente no puede interpretarse dos veces en el mismo lote.',{reason:'SOURCE_LINE_ALREADY_INTERPRETED',sourceLine:plan.payable.source.lineId});
+      seenSources.add(plan.payable.sourceKey);seenSources.add(sourceDigestLine);
+      if(!withinScope(actor,'finmovs','conciliaciones',plan.payable)||!withinScope(actor,'comisiones','comisiones',plan.commission))
+        throw new HttpsError('permission-denied','País o alcance financiero no autorizado.');
+      const sourceConflicts=historicalRows.filter(row=>
+        row.schemaVersion===advisorPayables.SCHEMA&&
+        (row.sourceKey===plan.payable.sourceKey||(row.source?.sha256===plan.payable.source.sha256&&row.source?.lineId===plan.payable.source.lineId))&&
+        (row.economicKey!==plan.payable.economicKey||row.financialDigest!==plan.financialDigest||row.asesorId!==advisorId));
+      if(sourceConflicts.length)throw new HttpsError('failed-precondition','La línea fuente ya fue interpretada con otra póliza, periodo o participación; no se crea otra deuda.',
+        {reason:'SOURCE_LINE_ALREADY_INTERPRETED',sourceLine:plan.payable.source.lineId,recordIds:sourceConflicts.map(row=>row.id)});
+      // A different statement copy or collection-period label must not turn an
+      // already credited insurer requirement into a second economic obligation.
+      const requirementKey=requirementIdentity(plan.payable);
+      const requirementConflicts=historicalRows.filter(row=>row.schemaVersion===advisorPayables.SCHEMA&&requirementIdentity(row)===requirementKey&&row.economicKey!==plan.payable.economicKey);
+      if(seenRequirements.has(requirementKey)||requirementConflicts.length)
+        throw new HttpsError('failed-precondition','El requerimiento de esta póliza ya figura en otra interpretación o periodo; no se genera otra CxP.',
+          {reason:'REQUIREMENT_ALREADY_INTERPRETED',requirementRef:plan.payable.source.requirementRef,polizaId:policyId,recordIds:requirementConflicts.map(row=>row.id)});
+      seenRequirements.add(requirementKey);
+      const legacyMovements=historicalMovements.docs.map(doc=>Object.assign({id:doc.id},doc.data())).filter(row=>
+        row.schemaVersion!==advisorPayables.SCHEMA&&/comision|anticipo/.test(norm(row.clase))&&row.pais===plan.payable.pais&&row.moneda===plan.payable.moneda&&
+        (text(row.asesorId||row.advisorId)===advisorId||(!row.asesorId&&!row.advisorId&&norm(row.beneficiario)===norm(advisor.nombre)))&&
+        !['anulada','anulado','cancelado','cancelada'].includes(norm(row.estado))&&
+        (text(row.comisionId)===plan.commission.id||[].concat(row.comisionIds||[]).includes(plan.commission.id)||
+         (text(row.polizaId)===policyId&&(!row.periodo||[line.collectionPeriod,cutoff.slice(0,7)].includes(row.periodo)))||
+         (!row.polizaId&&!row.comisionId&&[line.collectionPeriod,cutoff.slice(0,7)].includes(row.periodo))||
+         (/anticipo/.test(norm([row.clase,row.categoria,row.concepto].join(' ')))&&Number(row.saldoPendiente??row.pendiente??row.valor)>0)));
+      if(legacyMovements.length)throw new HttpsError('failed-precondition','Existen CxP, pagos o anticipos históricos de este asesor que deben cruzarse antes de crear otra deuda.',
+        {reason:'HISTORICAL_ADVISOR_BALANCE_LINK_REQUIRED',advisorId,movements:legacyMovements.map(row=>({id:row.id,periodo:row.periodo||'',estado:row.estado||'',valor:row.valor||0,moneda:row.moneda}))});
+      const legacyCommissions=historicalCommissions.docs.map(doc=>Object.assign({id:doc.id},doc.data())).filter(row=>
+        row.id!==plan.commission.id&&row.schemaVersion!==advisorPayables.SCHEMA&&text(row.polizaId)===policyId&&text(row.periodo)===plan.commission.periodo&&
+        (!text(row.source?.requirementRef||row.requerimiento||row.reciboNumero)||
+         norm(row.source?.requirementRef||row.requerimiento||row.reciboNumero)===norm(plan.payable.source.requirementRef)));
+      if(legacyCommissions.length)throw new HttpsError('failed-precondition','Ya existe comisión histórica de esta póliza y periodo; vincula la fuente al registro existente, sin duplicarlo.',
+        {reason:'HISTORICAL_COMMISSION_LINK_REQUIRED',commissionIds:legacyCommissions.map(row=>row.id),polizaId:policyId});
+      const commissionSnap=await tx.get(canonicalRef(tenantId,'comisiones',plan.commission.id));
+      const existingCommission=commissionSnap.exists?commissionSnap.data():null;
+      // Existing untyped historic commissions are not silently overwritten by
+      // a new interpretation of "monto" or "Liquidada".
+      if(existingCommission&&(existingCommission.financialDigest!==plan.financialDigest||
+         ['id','tenantId','asesorId','polizaId','clienteId','moneda','pais','monto','montoAsesor','pctAsesor','economicKey','cxpAsesorId'].some(key=>existingCommission[key]!==plan.commission[key])))
+        throw new HttpsError('failed-precondition','La comisión ya existe con otro contenido; conserva el original y resuelve la diferencia.',{reason:'COMMISSION_SOURCE_CONFLICT',commissionId:plan.commission.id});
+      const payableSnap=await tx.get(canonicalRef(tenantId,'finmovs',plan.payable.id));
+      const existingPayable=payableSnap.exists?payableSnap.data():null;
+      if(existingPayable&&!advisorPayables.compatiblePayable(existingPayable,plan.payable))
+        throw new HttpsError('failed-precondition','La CxP ya existe con otro contenido; no se duplica ni se reemplaza.',{reason:'PAYABLE_SOURCE_CONFLICT',payableId:plan.payable.id});
+      planned.push({...plan,existingCommission,existingPayable});
+    }
+    if(committedPrevious)return Object.assign({},committedPrevious,{reused:true,newPayables:0,reusedPayables:planned.length,
+      totals:Object.fromEntries(planned.map(row=>[row.payable.moneda,0])),payables:planned.map(row=>row.existingPayable||row.payable)});
+    const previewDigest=digest(planned.map(row=>({id:row.payable.id,financialDigest:row.financialDigest,existing:!!row.existingPayable,estado:row.existingPayable?.estado||'pendiente',pendiente:row.existingPayable?.pendiente??row.payable.pendiente})));
+    const totals={};
+    for(const row of planned){const currency=row.payable.moneda;totals[currency]=Math.round(((totals[currency]||0)+(row.existingPayable?0:row.payable.valor))*100)/100;}
+    const receipt={ok:true,schemaVersion:advisorPayables.SCHEMA,serverOwned:true,readOnly:spec.operation==='preview',
+      previewDigest,advisorId,cutoff,requestId,eventId,totals,
+      sourceInputMode:refs.length?'CANONICAL_COMMISSION_RECORDS':'DIRECTION_DECLARED_DOCUMENTED_IMPORT',
+      newPayables:planned.filter(row=>!row.existingPayable).length,reusedPayables:planned.filter(row=>row.existingPayable).length,
+      payables:planned.map(row=>row.existingPayable||row.payable),
+      financialPayments:0,bankMovements:0,previewIsolated:previewOnly,syntheticQa:syntheticRun};
+    if(spec.operation==='preview')return receipt;
+    if(text(spec.previewDigest)!==previewDigest)throw new HttpsError('failed-precondition','La vista previa cambió. Revisa el lote actualizado antes de crear las CxP.');
+    // All reads finish before the first write. A conflicting row aborts the
+    // whole transaction, not half of a commission/payable pair.
+    for(const row of planned){
+      if(!row.existingCommission)tx.set(canonicalRef(tenantId,'comisiones',row.commission.id),Object.assign({},row.commission,{preparationRequestId:requestId,createdAt:now(),createdByUid:actor.uid,updatedAt:now(),updatedByUid:actor.uid}));
+      if(!row.existingPayable)tx.set(canonicalRef(tenantId,'finmovs',row.payable.id),Object.assign({},row.payable,{preparationRequestId:requestId,createdAt:now(),createdByUid:actor.uid,updatedAt:now(),updatedByUid:actor.uid}));
+    }
+    const committed=Object.assign({},receipt,{readOnly:false,committed:true,
+      createdCommissionIds:planned.filter(row=>!row.existingCommission).map(row=>row.commission.id),
+      createdPayableIds:planned.filter(row=>!row.existingPayable).map(row=>row.payable.id)});
+    tx.set(eventRef(tenantId,eventId),{schemaVersion:advisorPayables.SCHEMA,tenantId,eventId,requestId,actorUid:actor.uid,activeRole:actor.activeRole,payloadDigest:inputDigest,
+      advisorId,cutoff,sourceKeys:planned.map(row=>row.payable.sourceKey),payableIds:planned.map(row=>row.payable.id),
+      action:'prepare_advisor_commission_payables',financialPayments:0,bankMovements:0,createdAt:now()});
+    tx.set(reqRef,{status:'committed',payloadDigest:inputDigest,actorUid:actor.uid,result:committed,committedAt:now()});
+    return committed;
+  });
+  if(spec.operation==='preview'&&!result.committed)return result;
+  const readback=[],canonicalPayables=[];
+  for(const row of result.payables){
+    const snap=await canonicalRef(tenantId,'finmovs',row.id).get();
+    if(!snap.exists||!advisorPayables.compatiblePayable(snap.data(),row))throw new HttpsError('internal','No se confirmó la CxP guardada: '+row.id);
+    const actual=snap.data();
+    if(!withinScope(actor,'finmovs','conciliaciones',actual)||actual.asesorId!==advisorId)throw new HttpsError('permission-denied','El readback de CxP cambió de alcance.');
+    canonicalPayables.push(actual);
+    readback.push({collection:'finmovs',id:row.id,exists:true,estado:actual.estado,pendiente:actual.pendiente,financialDigest:actual.financialDigest});
+    const commission=await canonicalRef(tenantId,'comisiones',row.comisionId).get();
+    if(!commission.exists||commission.data().financialDigest!==row.financialDigest)throw new HttpsError('internal','No se confirmó la comisión vinculada.');
+  }
+  return Object.assign({},result,{payables:canonicalPayables,canonicalReadback:true,canonicalReadbackCount:readback.length,readback});
+}
+
+async function restoreAdvisorPayableSynthetic(request,previewOnly){
+  const input=request.data||{},spec=input.advisorPayable||{},tenantId=cleanId(input.tenantId,'tenantId');
+  if(spec.version!==1||[].concat(input.mutations||[]).length||spec.syntheticQa!==true)
+    throw new HttpsError('permission-denied','Restauración disponible únicamente para un recibo de QA sintética.');
+  const preparedRequestId=cleanId(spec.preparedRequestId,'preparedRequestId');
+  const actor=await authorize(request,tenantId,[{collection:'comisiones'},{collection:'finmovs'}]);
+  const reqRef=requestRef(tenantId,preparedRequestId);
+  const result=await db.runTransaction(async tx=>{
+    const prior=await tx.get(reqRef),stored=prior.exists?prior.data():null,receipt=stored?.result;
+    if(!stored||stored.actorUid!==actor.uid||receipt?.syntheticQa!==true||receipt?.schemaVersion!==advisorPayables.SCHEMA||receipt.previewIsolated!==previewOnly)
+      throw new HttpsError('permission-denied','El recibo no corresponde a una prueba sintética de este actor y ambiente.');
+    const targets=[...[].concat(receipt.createdCommissionIds||[]).map(id=>({collection:'comisiones',id})),
+      ...[].concat(receipt.createdPayableIds||[]).map(id=>({collection:'finmovs',id}))];
+    const reads=[];
+    for(const target of targets){
+      if(!/^b4003qa_/.test(target.id))throw new HttpsError('permission-denied','Restauración denegada para un ID no sintético.');
+      const ref=canonicalRef(tenantId,target.collection,target.id),snap=await tx.get(ref);
+      if(snap.exists){
+        const row=snap.data(),expected=receipt.payables.find(p=>p.id===target.id||p.comisionId===target.id);
+        if(!expected||row.__syntheticQa!==true||row.preparationRequestId!==preparedRequestId||row.createdByUid!==actor.uid||
+           row.financialDigest!==expected.financialDigest||!withinScope(actor,target.collection,COLLECTION_MODULE[target.collection],row)||
+           (target.collection==='finmovs'&&(row.estado!=='pendiente'||row.pagado!==0||row.pendiente!==row.valor)))
+          throw new HttpsError('failed-precondition','La prueba cambió desde su creación; no se elimina un registro no reconocido.');
+      }else if(stored.status!=='restored')throw new HttpsError('failed-precondition','Falta un registro de la prueba antes de restaurar.');
+      reads.push({ref,snap,target});
+    }
+    for(const item of reads)if(item.snap.exists)tx.delete(item.ref);
+    tx.set(reqRef,{...stored,status:'restored',restoredAt:now(),restoredByUid:actor.uid});
+    tx.set(eventRef(tenantId,'opevt_'+sha(tenantId+'|'+preparedRequestId+'|restore').slice(0,28)),{schemaVersion:advisorPayables.SCHEMA,tenantId,actorUid:actor.uid,action:'restore_advisor_payable_synthetic',preparedRequestId,targets,createdAt:now()});
+    return {ok:true,serverOwned:true,restored:true,syntheticQa:true,targets,financialPayments:0,bankMovements:0};
+  });
+  for(const target of result.targets)if((await canonicalRef(tenantId,target.collection,target.id).get()).exists)
+    throw new HttpsError('internal','No se confirmó la ausencia del fixture.');
+  return {...result,canonicalReadback:true};
+}
+
 async function uploadProductAsset(request, previewOnly) {
   const input=request.data||{},tenantId=cleanId(input.tenantId,'tenantId'),insurerId=cleanId(input.insurerId,'insurerId');
   if(previewOnly===true && !/^(?:b2-asg-[a-z0-9-]+|b4003qa_[A-Za-z0-9._:-]+)$/i.test(insurerId)) throw new HttpsError('permission-denied','El upload aislado de Preview solo admite fixtures sintéticos B2.');
@@ -851,6 +1075,7 @@ exports.orbit360ProductAssetRead = onCall({ region: REGION, cors: true, timeoutS
 exports.orbit360ProductAssetReadPreview = onCall({ region: PREVIEW_REGION, cors: true, timeoutSeconds: 60, memory: '256MiB' }, request=>readProductAsset(request,true));
 async function executePreview(request) {
   const input=request.data||{},raw=[].concat(input.mutations||[]);
+  if(input.advisorPayable)return executeAdvisorPayable(request,true);
   // Empty, read-only probe fails closed against an older deployed writer.
   // Inspection also survives reload without relying on projected row markers.
   if(['probe','inspect'].includes(input.metaPreviewQa?.operation))return inspectMetaPreview(request);

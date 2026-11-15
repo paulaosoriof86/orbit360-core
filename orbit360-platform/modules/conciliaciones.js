@@ -1,18 +1,22 @@
 /* ============================================================
-   Orbit 360 · Cobros/Conciliación · owner canónico read-only
+   Orbit 360 · Cobros/Conciliación · owner canónico
    Fecha: 2026-08-01
 
    La bandeja canónica lee propuestas generales y proyecta
    conciliaciones de primas sin duplicar escrituras. Durante esta
-   fase ninguna acción aplica pagos, modifica cartera ni crea finmovs.
+   La aplicación delega exclusivamente al command autenticado: el
+   servidor recupera la evidencia y verifica el recibo antes de escribir.
    ============================================================ */
 (function () {
   'use strict';
   window.Orbit = window.Orbit || {};
   Orbit.modules = Orbit.modules || {};
 
-  const VERSION = '20260930-b3004r9-operational-payment-owner-restored';
+  const VERSION = '20261115-i66-proposal-server-application';
+  // The staging projection and FIFO simulator still never write. Only the
+  // authenticated domain owns the separately audited application capability.
   const PHASE = 'READ_ONLY_PROPOSALS_WITH_OPERATIONAL_PAYMENT_OWNER';
+  const APPLICATION_PHASE = 'SERVER_VERIFIED_PROPOSAL_APPLICATION';
   const CANONICAL_COLLECTION = 'conciliaciones';
   const DOMAIN_COLLECTION = 'conciliacionesPrimas';
   let filterState = '';
@@ -66,7 +70,7 @@
   }
   const stateLabel = state => ({
     PROPUESTA:'Pendiente de revisión',EN_REVISION:'En revisión',REQUIERE_VALIDACION:'Validación necesaria',
-    VALIDADA:'Validada',RECHAZADA:'Rechazada',BLOQUEADA:'Bloqueada'
+    VALIDADA:'Validada',APLICADA:'Aplicada',RECHAZADA:'Rechazada',BLOQUEADA:'Bloqueada'
   }[state] || 'Por revisar');
   const scoreLabel = score => ({
     MATCH_PROBABLE:'Coincidencia probable',MATCH_EXACTO:'Coincidencia exacta',
@@ -105,6 +109,7 @@
 
   function stateFor(row) {
     const raw = norm(first(row,['queue_state','estado_bandeja','estado','status','review_state','estado_revision']));
+    if (raw==='aplicada' || raw==='applied') return 'APLICADA';
     if (raw.includes('bloque')) return 'BLOQUEADA';
     if (raw.includes('rechaz')) return 'RECHAZADA';
     if (raw.includes('validada')) return 'VALIDADA';
@@ -229,6 +234,123 @@
     if (U().toast) U().toast('Esta acción estará disponible después de validar la conciliación y autorizar la aplicación.');
     return false;
   }
+  function applicationRole() {
+    try{return ['direccion','admin','admintenant','superadmin','operativo','finanzas'].includes(norm(Orbit.session&&Orbit.session.rol&&Orbit.session.rol()).replace(/ /g,'_'));}
+    catch(_){return false;}
+  }
+  function renderResolution(row,back,assessment) {
+    const panel=back.querySelector('[data-conc-application-targets]');
+    const status=back.querySelector('[data-conc-application-status]');
+    const domain=Orbit.reconciliationDomain;
+    const options=assessment&&assessment.resolutionOptions;
+    if(!panel||!status||!Array.isArray(options)||!options.length||
+        !domain||typeof domain.resolveProposalApplication!=='function')return;
+    const source=assessment.source||{};
+    const kinds=[['','Selecciona el documento revisado'],['BANK_STATEMENT_MATCH','Pago bancario confirmado'],
+      ['INVOICE_INSTALLMENT_N','Factura de aplicación de la aseguradora'],
+      ['COMMISSION_STATEMENT_INSTALLMENT_N','Planilla de comisiones'],
+      ['INSURER_STATEMENT_PENDING_FROM_N','Estado de cuenta: pendientes desde esta cuota']];
+    panel.innerHTML='<section class="card pad" data-conc-resolution><h3>Vincular el recibo exacto</h3>'+
+      '<p>Esta decisión se conserva separada del documento original. Guardar la vinculación no aplica pagos.</p>'+
+      '<p class="muted">Fuente: '+esc(source.policyNumber||row.poliza)+' · '+esc(money(source.amount,source.currency))+
+      ' · Corte '+esc(source.reportedDate||'por confirmar')+'</p>'+
+      '<label>Recibo y vigencia<select class="input" data-conc-resolution-receipt><option value="">Selecciona el recibo</option>'+
+      options.map((o,i)=>'<option value="'+i+'"'+(o.alreadyPaid?' disabled':'')+'>'+esc([
+        o.policyTerm,o.installment?'Cuota '+o.installment:'',o.receiptNumber?'Recibo '+o.receiptNumber:'',
+        o.dueDate?'Vence '+o.dueDate:'',money(o.amount,o.currency),o.alreadyPaid?'Ya pagado':''].filter(Boolean).join(' · '))+'</option>').join('')+
+      '</select></label><label>Tipo de fuente<select class="input" data-conc-resolution-type>'+kinds.map(([value,label])=>
+        '<option value="'+value+'"'+(source.evidenceType===value?' selected':'')+'>'+label+'</option>').join('')+
+      '</select></label><label>Fecha de corte del documento<input class="input" type="date" data-conc-resolution-date value="'+esc(ymd(source.reportedDate))+'"></label>'+
+      '<label>Fecha real de pago (obligatoria para soporte bancario)<input class="input" type="date" data-conc-resolution-paid value="'+esc(ymd(source.paidDate))+'"></label>'+
+      '<label style="display:flex;gap:8px;margin:12px 0"><input type="checkbox" data-conc-resolution-attested>Confirmo que revisé la fuente y que su tipo, fechas y recibo son los indicados.</label>'+
+      '<label>Nota de la decisión<input class="input" data-conc-resolution-reason placeholder="Referencia revisada o aclaración"></label>'+
+      (assessment.resolutionOptionsTruncated?'<p role="alert">La lista supera el límite seguro. Se muestran las primeras 100 opciones; no elijas una aproximada.</p>':'')+
+      '<button class="btn primary" data-conc-resolve>Guardar vinculación</button></section>';
+    const save=back.querySelector('[data-conc-resolve]');
+    if(!save)return;
+    let saving=false;
+    save.onclick=async()=>{
+      if(saving)return;
+      const field=key=>back.querySelector('[data-conc-resolution-'+key+']');
+      const index=field('receipt')&&field('receipt').value;
+      const chosen=index!==''&&index!=null&&options[Number(index)];
+      if(!chosen||chosen.alreadyPaid||!field('attested')||field('attested').checked!==true){
+        status.textContent='Selecciona el recibo exacto y confirma que revisaste la fuente. No se ha cambiado ningún pago.';return;
+      }
+      const binding={policyId:chosen.policyId,receiptId:chosen.receiptId,
+        evidenceType:text(field('type')&&field('type').value),evidenceAsOfDate:text(field('date')&&field('date').value),
+        paidDate:text(field('paid')&&field('paid').value),sourceAttestation:true,
+        reason:text(field('reason')&&field('reason').value)||'Fuente revisada y recibo exacto confirmado en Conciliaciones'};
+      if(!binding.evidenceType||!binding.evidenceAsOfDate||binding.evidenceType==='BANK_STATEMENT_MATCH'&&!binding.paidDate){
+        status.textContent='Completa el tipo, el corte de la fuente y, si es bancario, la fecha real del pago.';return;
+      }
+      saving=true;save.disabled=true;save.textContent='Guardando…';
+      try{
+        const result=await domain.resolveProposalApplication(row.sourceEntityId,row.original.sourceRunId,binding);
+        if(result&&result.status==='REVIEW_REQUIRED'){status.textContent=result.question||result.reason;return;}
+        if(!result||result.readbackConfirmed!==true||!result.resolutionId)throw new Error('PROPOSAL_RESOLUTION_NOT_CONFIRMED');
+        panel.innerHTML='';
+        status.textContent='Vinculación guardada y auditada, sin aplicar pagos. Verificando la aplicación…';
+        await verificarAplicacion(row,back);
+      }catch(error){status.textContent='No se confirmó la vinculación. Actualiza antes de reintentar; no se aplicó ningún pago desde esta acción.';}
+      finally{saving=false;save.disabled=false;save.textContent='Guardar vinculación';}
+    };
+  }
+  async function verificarAplicacion(row,back) {
+    const status=back.querySelector('[data-conc-application-status]');
+    const targets=back.querySelector('[data-conc-application-targets]');
+    const apply=back.querySelector('[data-conc-apply]');
+    if(!status||!targets||!apply)return;
+    apply.hidden=true;apply.disabled=true;
+    if(!applicationRole()){status.textContent='El rol activo puede consultar, pero no aprobar ni aplicar conciliaciones.';return;}
+    const domain=Orbit.reconciliationDomain,original=row.original||{};
+    if(!original.origenLibroActivo||!original.sourceRunId||!row.sourceEntityId){
+      status.textContent='Falta una referencia acreditada al libro de origen. La propuesta no se convertirá en pago.';return;
+    }
+    if(!domain||typeof domain.previewProposalApplication!=='function'||typeof domain.applyProposalApplication!=='function'){
+      status.textContent='El servicio de aplicación de propuestas no está disponible en esta versión.';return;
+    }
+    status.textContent='Verificando la evidencia, la edición de la póliza y el recibo en el servidor…';
+    try{
+      const assessment=await domain.previewProposalApplication(row.sourceEntityId,original.sourceRunId);
+      if(assessment&&assessment.readbackConfirmed===true&&assessment.applicationId){
+        status.textContent='Aplicada y comprobada en el servidor. No se generará otro cobro.';return;
+      }
+      if(!assessment||assessment.eligible!==true||!assessment.planDigest||!Array.isArray(assessment.targets)||!assessment.targets.length){
+        status.textContent=assessment&&(assessment.question||assessment.reason)||'No se confirmó una aplicación elegible. No se han cambiado pagos.';
+        renderResolution(row,back,assessment);return;
+      }
+      targets.innerHTML='<table class="tbl"><thead><tr><th>Cuota</th><th>Tipo</th><th class="num">Importe a aplicar</th></tr></thead><tbody>'+assessment.targets.map(t=>
+        '<tr><td>'+esc(t.installment)+'</td><td>'+esc(t.mode==='INFERRED'?'Inferida por evidencia':'Evidencia directa')+'</td><td class="num">'+esc(money(t.amount,assessment.currency))+'</td></tr>').join('')+'</tbody></table>';
+      status.textContent='Coincidencia verificada en el servidor. Esta aprobación aplica únicamente las cuotas detalladas; no vuelve a liquidar pagos existentes.';
+      apply.hidden=false;apply.disabled=false;
+      let inFlight=false;
+      apply.onclick=async()=>{
+        if(inFlight)return;inFlight=true;apply.disabled=true;apply.textContent='Aplicando…';
+        status.textContent='Aplicando y comprobando la persistencia. No cierres esta ficha.';
+        try{
+          const result=await domain.applyProposalApplication(row.sourceEntityId,original.sourceRunId,assessment.planDigest);
+          if(result&&result.status==='REVIEW_REQUIRED'){
+            status.textContent=result.question||result.reason;apply.hidden=true;return;
+          }
+          if(!result||result.ok!==true||result.readbackConfirmed!==true||!result.applicationId)
+            throw new Error('PROPOSAL_RESULT_NOT_CONFIRMED');
+          status.textContent='Aplicación confirmada y auditada. Actualizando saldos y estado…';
+          apply.textContent='Aplicada';
+          // Canonical store owns hydration. Reload prevents stale protected
+          // page caches from showing the now-applied proposal as pending.
+          if(window.location&&typeof window.location.reload==='function')window.location.reload();
+        }catch(error){
+          const code=text(error&&(error.code||error.message)).replace(/[^a-zA-Z0-9_/-]/g,'').slice(0,80);
+          status.textContent='No se confirmó el resultado. Actualiza la ficha antes de reintentar; el servidor impide duplicar la misma aplicación. '+code;
+          apply.hidden=true;
+        }
+      };
+    }catch(error){
+      const code=text(error&&(error.code||error.message)).replace(/[^a-zA-Z0-9_/-]/g,'').slice(0,80);
+      status.textContent='No fue posible verificar la propuesta. No se aplicaron pagos desde esta ficha. '+code;
+    }
+  }
   function disableLegacyActions() {
     // R9: this module owns only the read-only proposal browser. It must never disable
     // canonical Cobros actions now served by the authenticated reconciliation domain.
@@ -245,14 +367,14 @@
   }
 
   function tone(state) {
-    return state === 'VALIDADA' ? 'ok' : state === 'BLOQUEADA' || state === 'RECHAZADA' ? 'danger' : state === 'REQUIERE_VALIDACION' ? 'warn' : 'info';
+    return state === 'VALIDADA'||state==='APLICADA' ? 'ok' : state === 'BLOQUEADA' || state === 'RECHAZADA' ? 'danger' : state === 'REQUIERE_VALIDACION' ? 'warn' : 'info';
   }
   function render(host) {
     freezeCobrosModule();
     const readiness = proposalReadiness();
     const rows = readiness === 'ready' || readiness === 'legacy' ? proposalRows() : [];
     const counts = rows.reduce((acc,row) => { acc[row.estado] = (acc[row.estado] || 0) + 1; return acc; },{});
-    const filters = ['', 'PROPUESTA','EN_REVISION','REQUIERE_VALIDACION','VALIDADA','RECHAZADA','BLOQUEADA'];
+    const filters = ['', 'PROPUESTA','EN_REVISION','REQUIERE_VALIDACION','VALIDADA','APLICADA','RECHAZADA','BLOQUEADA'];
     const banner = K().banner ? K().banner({icon:'🔗',title:'Bandeja de conciliaciones',sub:'Revisión de coincidencias. Ninguna propuesta aplica pagos por sí sola.',features:[]}) : '<div class="card pad"><b>Bandeja de conciliaciones</b><div class="muted">Revisión de coincidencias. Ninguna propuesta aplica pagos por sí sola.</div></div>';
     const noRows = readiness === 'pending'
       ? 'Cargando propuestas autorizadas…'
@@ -286,16 +408,17 @@
     ];
     let back = document.getElementById('conc-readonly-detail'); if (back) back.remove();
     back = document.createElement('div'); back.id='conc-readonly-detail'; back.className='drawer-back open'; back.style.cssText='display:grid;place-items:center;z-index:210';
-    back.innerHTML = `<div class="card" style="width:min(520px,94vw);max-height:88vh;overflow:auto"><div style="padding:18px"><div style="display:flex;justify-content:space-between;gap:12px"><b style="font-family:var(--f-display);font-size:17px">Detalle de conciliación</b><button class="imp-x" data-close>✕</button></div><div class="cfg-note" style="margin:12px 0">Esta propuesta está en revisión y no aplica pagos automáticamente.</div>${summary.map(([label,value])=>`<div class="vp-row"><span class="vp-l">${esc(label)}</span><span class="vp-v">${esc(value)}</span></div>`).join('')}</div><div style="padding:13px 18px;border-top:1px solid var(--line);display:flex;justify-content:flex-end"><button class="btn ghost" data-close>Cerrar</button></div></div>`;
+    back.innerHTML = `<div class="card" style="width:min(620px,94vw);max-height:88vh;overflow:auto"><div style="padding:18px"><div style="display:flex;justify-content:space-between;gap:12px"><b style="font-family:var(--f-display);font-size:17px">Detalle de conciliación</b><button class="imp-x" data-close>✕</button></div><div class="cfg-note" style="margin:12px 0" role="status" aria-live="polite" data-conc-application-status>Verificando la posibilidad de aplicación…</div>${summary.map(([label,value])=>`<div class="vp-row"><span class="vp-l">${esc(label)}</span><span class="vp-v">${esc(value)}</span></div>`).join('')}<div style="overflow-x:auto;margin-top:12px" data-conc-application-targets></div></div><div style="padding:13px 18px;border-top:1px solid var(--line);display:flex;justify-content:flex-end;gap:8px;flex-wrap:wrap"><button class="btn ghost" data-close>Cerrar</button><button class="btn primary" data-conc-apply hidden disabled>Aprobar y aplicar</button></div></div>`;
     document.body.appendChild(back);
     const close=()=>back.remove(); back.querySelectorAll('[data-close]').forEach(button=>button.addEventListener('click',close)); back.addEventListener('click',event=>{if(event.target===back)close();});
+    verificarAplicacion(row,back);
   }
 
   Orbit.cobrosConciliacionReadOnly = Object.freeze({
-    version: VERSION, phase: PHASE, canonicalCollection: CANONICAL_COLLECTION, domainCollection: DOMAIN_COLLECTION,
+    version: VERSION, phase: PHASE, applicationPhase: APPLICATION_PHASE, canonicalCollection: CANONICAL_COLLECTION, domainCollection: DOMAIN_COLLECTION,
     proposalRows, proposalReadiness, simulateFifo, freezeCobrosModule, operationalWrites: 0, firestoreWrites: 0, autoApply: false
   });
-  Orbit.modules.conciliaciones = Object.freeze({render, detalle, accion: blocked, filtro(value){filterState=value||'';const host=document.getElementById('host');if(host)render(host);}});
+  Orbit.modules.conciliaciones = Object.freeze({render, detalle, verificarAplicacion,renderResolution, applicationRole, accion: blocked, filtro(value){filterState=value||'';const host=document.getElementById('host');if(host)render(host);}});
   freezeCobrosModule();
   if (document && document.addEventListener) document.addEventListener('orbit:store', freezeCobrosModule);
 })();

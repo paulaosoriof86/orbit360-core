@@ -446,9 +446,28 @@
         return Promise.reject(new Error('PRODUCT_RENEWABILITY_PATCH_CONTRACT_INVALID'));
       }
     }
+    if(options.policyMetadataOnly===true){
+      var metadataPolicies=mutations.filter(function(m){return m&&m.collection==='polizas';});
+      var metadataActivities=mutations.filter(function(m){return m&&m.collection==='actividades';});
+      var metadataPatch=metadataPolicies[0]&&metadataPolicies[0].payload;
+      if(mutations.length!==2||metadataPolicies.length!==1||metadataActivities.length!==1||
+         metadataPolicies[0].action!=='update'||metadataActivities[0].action!=='insert'||
+         !metadataPatch||!text(metadataPatch.asesorId)||
+         Object.keys(metadataPatch).some(function(k){return k!=='asesorId'&&k!=='renovable';})||
+         (Object.prototype.hasOwnProperty.call(metadataPatch,'renovable')&&![true,false,null].includes(metadataPatch.renovable))){
+        return Promise.reject(new Error('PRODUCT_POLICY_METADATA_PATCH_CONTRACT_INVALID'));
+      }
+    }
     var m=member(),seen={},prepared=[],backups=[],serverCommitted=false,previewBatch=isB2PreviewHost(),metaPreviewQa=null;
     var syntheticId=function(v){return /(?:^|_)(?:b3004qa|b4003qa)_[A-Za-z0-9._:-]+$/i.test(text(v));};
-    var rootSynthetic=previewBatch?mutations.find(function(x){return text(x&&x.collection)==='polizas'&&syntheticId(x&&(x.id||(x.payload&&x.payload.id)))&&x.payload&&x.payload.__syntheticQa===true;}):null;
+    var rootSynthetic=previewBatch?mutations.find(function(x){
+      if(text(x&&x.collection)!=='polizas'||!syntheticId(x&&(x.id||(x.payload&&x.payload.id))))return false;
+      if(x.payload&&x.payload.__syntheticQa===true)return true;
+      // A narrow metadata patch intentionally omits the full policy, including
+      // its QA flag. Reuse only an already marked, uniquely prefixed fixture.
+      var prior=options.policyMetadataOnly===true&&x.action==='update'?get('polizas',x.id):null;
+      return !!(prior&&prior.__syntheticQa===true);
+    }):null;
     var linkedSynthetic=function(payload){return !!payload&&['id','polizaId','clienteId','reciboId'].some(function(k){return syntheticId(payload[k]);});};
     try{
       if(options.metaPreviewQa){
@@ -494,7 +513,8 @@
       var input={tenantId:m.tenantId,activeRole:m.activeRole,requestId:requestId,mutations:prepared.map(function(x){
         // For existing insurer obligations, transmit only the changed fields. The server merges the patch in a Firestore transaction with the latest row; a cached complete row could erase concurrent LIVE changes.
         var preserveConcurrentFields=x.action==='update'&&(x.collection==='recibosEsperados'||x.collection==='carteraPrimas')||
-          (x.action==='update'&&x.collection==='polizas'&&options.policyRenewabilityOnly===true);
+          (x.action==='update'&&x.collection==='polizas'&&options.policyRenewabilityOnly===true)||
+          (x.action==='update'&&x.collection==='polizas'&&options.policyMetadataOnly===true);
         var mutation={action:x.action,collection:x.collection,id:x.id,payload:x.action==='remove'?null:clone(preserveConcurrentFields?x.payload:x.row)};
         if(x.collection==='polizas'&&x.action==='update'&&options.policyRenewabilityOnly===true){
           mutation.expectedBefore={renovable:x.prior&&Object.prototype.hasOwnProperty.call(x.prior,'renovable')?clone(x.prior.renovable):null};
@@ -619,6 +639,36 @@
     authorize(collection,'remove',prior);deletedBucket(collection)[id]=true;clearPending(collection,id);emit(collection);
     return callDurable('remove',collection,id,null,prior).then(function(){return true;});
   }
+  function prepareAdvisorPayables(spec){
+    var m=member(),input=clone(spec)||{};
+    if(input.version!==1||['preview','prepare'].indexOf(input.operation)<0)return Promise.reject(new Error('ADVISOR_PAYABLE_CONTRACT_REQUIRED'));
+    if(!Orbit.access||Orbit.access.can('comisiones','create')!==true||Orbit.access.can('conciliaciones','create')!==true)
+      return Promise.reject(new Error('ADVISOR_PAYABLE_ACCESS_DENIED'));
+    return signedContext(provider,m).then(function(){
+      var preview=isB2PreviewHost();
+      return provider.callFunction(preview?previewGeneralCommand():GENERAL_COMMAND,
+        {tenantId:m.tenantId,activeRole:m.activeRole,advisorPayable:input},preview?'us-east1':'us-central1');
+    }).then(function(result){
+      if(!result||result.ok!==true||result.serverOwned!==true||result.schemaVersion!=='gravicentra-advisor-commission-payable-v1'||
+         result.advisorId!==input.advisorId||result.financialPayments!==0||result.bankMovements!==0||!Array.isArray(result.payables))
+        throw new Error('ADVISOR_PAYABLE_SERVER_PROOF_REQUIRED');
+      if(result.payables.some(function(row){return row.asesorId!==input.advisorId||row.tenantId!==m.tenantId;}))
+        throw new Error('ADVISOR_PAYABLE_SERVER_SCOPE_MISMATCH');
+      if(input.operation==='prepare'){
+        if(result.committed!==true||result.canonicalReadback!==true||!Array.isArray(result.readback)||result.readback.length!==result.payables.length)
+          throw new Error('ADVISOR_PAYABLE_CANONICAL_READBACK_REQUIRED');
+        result.payables.forEach(function(row){
+          var proof=result.readback.find(function(r){return r.collection==='finmovs'&&r.id===row.id&&r.exists===true&&r.financialDigest===row.financialDigest&&r.estado===row.estado&&r.pendiente===row.pendiente;});
+          if(!proof)throw new Error('ADVISOR_PAYABLE_ROW_READBACK_MISSING');
+        });
+        // No optimistic creation. Only a server-committed and reread row enters
+        // the shared projection; a reload still uses the protected reader.
+        result.payables.forEach(function(row){setPending('finmovs',row.id,clone(row),{kind:'insert'});});
+        emit('finmovs');
+      }
+      return result;
+    });
+  }
   function status(){
     var bs=base&&typeof base._productStatus==='function'?base._productStatus():{};
     return Object.assign({},state,{ready:installed===true&&bs.ready===true&&bs.status==='ready-read-only',readAuthority:'store-firestore-product-readonly-p0',writeAuthority:'product-operational-write-p0',writeTransport:'firebase-functions',generalCommand:GENERAL_COMMAND,generalPreviewCommand:previewGeneralCommand(),workflowCommand:WORKFLOW_COMMAND,browserFirestoreWriteAuthorized:false,workflowSemanticOwner:true,urlTenantAllowed:false,labModeAllowed:false,seedFallback:false,localStorageBusinessPersistence:false,pendingReconcile:'expected-field-match',noFallback:true});
@@ -637,6 +687,7 @@
       all:mergedAll,get:get,where:where,find:find,insert:insert,update:update,remove:remove,
       insertDurable:insertDurable,updateDurable:updateDurable,removeDurable:removeDurable,batchDurable:batchDurable,
       classifyAdvisorDurable:classifyAdvisorDurable,
+      prepareAdvisorPayables:prepareAdvisorPayables,
       metaPreviewEnabled:isB2PreviewHost,metaPreviewFixtures:metaPreviewFixtures,
       metaPreviewQaProbe:function(input){return metaPreviewQaRead(input,'probe');},metaPreviewQaInspect:function(input){return metaPreviewQaRead(input,'inspect');},
       on:function(collection,callback){if(typeof collection==='function'){callback=collection;}if(typeof callback!=='function')return function(){};listeners.push(callback);return function(){listeners=listeners.filter(function(x){return x!==callback;});};},

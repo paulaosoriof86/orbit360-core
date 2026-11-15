@@ -146,7 +146,7 @@ Orbit.modules.comisiones = (function () {
           <td class="num">${U.money(c.base, c.moneda)}</td>
           <td class="num">${c.pct}%</td>
           <td class="num"><b>${U.money(c.monto, c.moneda)}</b></td>
-          <td><span class="badge ${c.estado === 'Liquidada' ? 'ok' : 'warn'}" style="cursor:pointer" title="Clic: conciliar / cambiar estado" onclick="Orbit.modules.comisiones.toggleEstado('${c.id}','${campo}','${key}')">${c.estado}</span></td>
+          <td><span class="badge ${c.estado === 'Liquidada' ? 'ok' : 'warn'}" title="Estado financiero: no se modifica con un clic">${U.esc(c.estado || 'Devengada')}</span></td>
           <td><button class="btn ghost sm" style="color:var(--danger,var(--red))" onclick="event.stopPropagation();Orbit.modules.comisiones.eliminar('${c.id}','${campo}','${key}')">Eliminar</button></td></tr>`; }).join('') || '<tr><td colspan="8" class="muted" style="text-align:center;padding:20px">Sin registros.</td></tr>'}</tbody>
       </table></div>
       <div style="padding:13px 20px;border-top:1px solid var(--line);display:flex;justify-content:flex-end"><button class="btn primary" id="cd-ok">Cerrar</button></div>
@@ -189,9 +189,6 @@ Orbit.modules.comisiones = (function () {
   }
 
   function toggleEstado(id, campo, key) {
-    const c = S().get('comisiones', id); if (!c) return;
-    S().update('comisiones', id, { estado: c.estado === 'Liquidada' ? 'Devengada' : 'Liquidada' });
-    detalle(campo, key); // reabrir con datos frescos
-    const h = document.getElementById('host'); if (h) render(h);
+    return U.toast('La liquidación se prepara como CxP en Finanzas. No se marca pagada sin su proceso de pago documentado.');
   }
 })();

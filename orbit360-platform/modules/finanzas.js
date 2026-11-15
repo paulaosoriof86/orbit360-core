@@ -191,6 +191,8 @@ Orbit.modules.finanzas = (function () {
   }
   function toggleEstado(id) {
     const m = S().get('finmovs', id); if (!m) return;
+    if(m.clase==='Comisiones asesores'||m.schemaVersion==='gravicentra-advisor-commission-payable-v1')
+      return U.toast('Esta CxP no se paga cambiando una etiqueta. Conserva el saldo hasta registrar un pago documentado.');
     const next = m.tipo === 'ingreso'
       ? { esperado: 'facturado', facturado: 'recaudado', recaudado: 'esperado' }
       : { pendiente: 'pagado', pagado: 'pendiente', presupuestado: 'pendiente' };
@@ -326,25 +328,23 @@ Orbit.modules.finanzas = (function () {
     return map;
   }
   function comisionAsesor() {
-    return S().all('asesores').map(a => {
-      const coms = S().where('comisiones', c => c.asesorId === a.id);
-      const baseRecaudada = coms.reduce((s, c) => s + q.norm(c.base, c.moneda), 0); // prima neta recaudada (cuota pagada)
-      const generada = coms.reduce((s, c) => s + q.norm(c.monto, c.moneda), 0); // comisión de aseguradora sobre lo recaudado
-      // MODELO UNIFICADO con el motor de comisiones (comeng): respeta el modo del asesor
-      // (comision % sobre comisión aseguradora · neta % sobre prima neta · fijo monto) y su shareCom.
-      // Antes usaba una fórmula simple comPct×base que contradecía Equipo/core.
-      const m = (Orbit.comeng && Orbit.comeng.modeloVendedor) ? Orbit.comeng.modeloVendedor(a.id) : { modo: 'comision', pct: a.comPct || 12, valor: 0 };
-      let aPagar;
-      if (Orbit.comeng && Orbit.comeng.comVendedorDe) {
-        // suma por cuota: comisión del vendedor sobre la comisión de aseguradora y base neta de cada recibo
-        aPagar = Math.round(coms.reduce((s, c) => s + Orbit.comeng.comVendedorDe(q.norm(c.monto, c.moneda), q.norm(c.base, c.moneda), a.id), 0));
-      } else {
-        aPagar = m.modo === 'fijo' ? Math.round(m.valor) : m.modo === 'neta' ? Math.round(baseRecaudada * m.pct / 100) : Math.round(generada * m.pct / 100);
-      }
-      const pctLbl = m.modo === 'fijo' ? 0 : m.pct;
-      const liquidada = coms.filter(c => c.estado === 'Liquidada').reduce((s, c) => s + q.norm(c.monto, c.moneda), 0);
-      return { a, baseRecaudada, generada, pct: pctLbl, modo: m.modo, tipo: a.comTipo || 'variable', aPagar, liquidada, pendiente: Math.max(0, aPagar - liquidada) };
-    }).sort((x, y) => y.aPagar - x.aPagar);
+    const p=paisFin(),r2=n=>Math.round((n+Number.EPSILON)*100)/100,rows=[];
+    S().all('asesores').forEach(a=>{
+      const coms=S().all('comisiones').filter(c=>c.asesorId===a.id&&(!p||c.pais===p));
+      const payables=S().all('finmovs').filter(m=>m.asesorId===a.id&&m.schemaVersion==='gravicentra-advisor-commission-payable-v1'&&(!p||m.pais===p));
+      const currencies=[...new Set([...coms.map(c=>c.moneda),...payables.map(m=>m.moneda)].filter(Boolean))];
+      currencies.forEach(moneda=>{
+        const cs=coms.filter(c=>c.moneda===moneda),ps=payables.filter(m=>m.moneda===moneda);
+        // Paid advisor participation is a distinct ledger value. Never subtract
+        // the insurer's gross commission or round an advisor payment to units.
+        const aPagar=r2(ps.reduce((s,m)=>s+Number(m.valor||0),0));
+        const liquidada=r2(ps.reduce((s,m)=>s+Number(m.pagado||0),0));
+        const pendiente=r2(ps.reduce((s,m)=>s+Number(m.pendiente==null?m.valor:m.pendiente),0));
+        rows.push({a,moneda,sourceCount:cs.length,payableCount:ps.length,aPagar,liquidada,pendiente,
+          baseRecaudada:r2(ps.reduce((s,m)=>s+Number(m.comisionOrdinariaAcreditada||0),0))});
+      });
+    });
+    return rows.sort((x,y)=>y.pendiente-x.pendiente);
   }
 
   /* (Eliminada la función muerta `resumen()` — tenía un array de movimientos HARDCODEADO
@@ -772,84 +772,125 @@ Orbit.modules.finanzas = (function () {
 
   /* ---------- LIQUIDACIÓN ASESORES ---------- */
   function asesores() {
-    const yo = (Orbit.auth && Orbit.auth.user()) || {};
-    const esAsesor = !['Dirección', 'Admin', 'Finanzas'].includes(ROLE());
+    const yo = (Orbit.auth && Orbit.auth.productUser) || {};
+    const esAsesor = !['direccion','superadmin','super_admin','admintenant','admin_tenant','admin','finanzas','finance'].includes(String(ROLE()).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase());
     let rows = comisionAsesor();
-    if (esAsesor) rows = rows.filter(r => r.a.nombre === yo.nombre); // el asesor solo ve lo suyo
-    const totalPagar = rows.reduce((s, r) => s + r.pendiente, 0);
-    return `<div class="cfg-note" style="margin-bottom:14px">👥 Comisión a <b>pagar a cada asesor</b>: % (fijo o variable) sobre la <b>prima neta recaudada</b> de su cartera — no sobre venta. ${esAsesor ? 'Ves <b>tu</b> liquidación.' : 'El % se configura en Configuración › Usuarios.'} Los pagos se <b>cruzan con la liquidación</b> y son ajustables.</div>
-    ${K.kpis([
-      { label: esAsesor ? 'Mi comisión a cobrar' : 'Total a pagar', val: U.moneyShort(totalPagar, Orbit.q.monedaPais()), color: 'var(--warn)', foot: 'pendiente' },
-      { label: 'Ya liquidado', val: U.moneyShort(rows.reduce((s, r) => s + r.liquidada, 0), Orbit.q.monedaPais()), color: 'var(--ok)', foot: 'pagado', footTone: 'up' },
-      { label: esAsesor ? 'Mi base recaudada' : 'Asesores', val: esAsesor ? U.moneyShort(rows.reduce((s, r) => s + r.baseRecaudada, 0), Orbit.q.monedaPais()) : rows.length, color: 'var(--info)', foot: esAsesor ? 'prima neta' : 'con comisión' },
-      { label: 'Base recaudada', val: U.moneyShort(rows.reduce((s, r) => s + r.baseRecaudada, 0), Orbit.q.monedaPais()), color: 'var(--graph)', foot: 'prima neta' }
-    ])}
+    if (esAsesor) rows = rows.filter(r => r.a.id === yo.advisorId);
+    const historical=S().all('finmovs').filter(row=>row.clase==='Comisiones asesores'&&row.schemaVersion!=='gravicentra-advisor-commission-payable-v1'&&(!paisFin()||row.pais===paisFin())&&(!esAsesor||row.asesorId===yo.advisorId));
+    return `<div class="cfg-note" style="margin-bottom:14px">La participación del asesor se calcula sobre la <b>comisión ordinaria pagada o acreditada a A&amp;S</b>, con la base de reparto aprobada. No sobre la prima, IVA ni incentivos extraordinarios. Una planilla acreditada es válida: no se exige otra transferencia bancaria. <b>Preparar crea una CxP pendiente; no registra un pago.</b> Los saldos de abajo proceden de CxP documentadas y las monedas se mantienen separadas.</div>
+    ${esAsesor?'':'<div style="margin-bottom:14px"><button class="btn primary" onclick="Orbit.modules.finanzas.abrirFuentesAsesor()">Cargar liquidación documentada</button><span class="muted" style="margin-left:12px">Revisa las líneas de planilla antes de crear sus CxP.</span></div>'}
     <div class="card" style="overflow:hidden"><div style="overflow-x:auto"><table class="tbl">
-      <thead><tr><th>Asesor</th><th>Esquema</th><th class="num">Base recaudada</th><th class="num">%</th><th class="num">A pagar</th><th class="num">Pagado</th><th class="num">Pendiente</th>${esAsesor ? '' : '<th></th>'}</tr></thead>
+      <thead><tr><th>Asesor</th><th>Moneda</th><th class="num">Comisión ordinaria</th><th class="num">CxP generada</th><th class="num">Pagado al asesor</th><th class="num">Pendiente</th>${esAsesor ? '' : '<th></th>'}</tr></thead>
       <tbody>${rows.map(r => `<tr>
         <td><div style="display:flex;align-items:center;gap:9px">${U.avatar(r.a.nombre, r.a.color, 'sm')}<b>${U.esc(r.a.nombre)}</b></div></td>
-        <td><span class="badge ${r.tipo === 'variable' ? 'info' : 'neutral'}">${r.tipo}</span></td>
-        <td class="num">${U.money(r.baseRecaudada, Orbit.q.monedaPais())}</td>
-        <td class="num">${r.pct}%</td>
-        <td class="num"><b>${U.money(r.aPagar, Orbit.q.monedaPais())}</b></td>
-        <td class="num" style="color:var(--ok)">${U.money(r.liquidada, Orbit.q.monedaPais())}</td>
-        <td class="num" style="color:${r.pendiente > 0 ? 'var(--warn)' : 'var(--ok)'}">${U.money(r.pendiente, Orbit.q.monedaPais())}</td>
-        ${esAsesor ? '' : `<td style="text-align:right;display:flex;gap:6px;justify-content:flex-end"><button class="btn ghost sm" onclick="Orbit.modules.finanzas.detLiq('asesorId','${r.a.id}')">Detalle</button><button class="btn primary sm" onclick="Orbit.modules.finanzas.lote('${r.a.id}')">Preparar lote</button></td>`}
-      </tr>`).join('')}</tbody>
+        <td>${U.esc(r.moneda)}<div class="muted">${r.sourceCount} fuentes · ${r.payableCount} CxP</div></td>
+        <td class="num">${U.money(r.baseRecaudada,r.moneda)}</td>
+        <td class="num"><b>${U.money(r.aPagar,r.moneda)}</b></td>
+        <td class="num" style="color:var(--ok)">${U.money(r.liquidada,r.moneda)}</td>
+        <td class="num" style="color:var(--warn)">${U.money(r.pendiente,r.moneda)}</td>
+        ${esAsesor ? '' : `<td><button class="btn ghost sm" onclick="Orbit.modules.finanzas.detLiq('asesorId','${r.a.id}')">Fuentes</button><button class="btn primary sm" onclick="Orbit.modules.finanzas.lote('${r.a.id}')">Preparar CxP</button><button class="btn ghost sm" onclick="Orbit.modules.finanzas.verLiquidacionAsesor('${r.a.id}')">Liquidación</button></td>`}
+      </tr>`).join('')||'<tr><td colspan="7" style="padding:20px">No hay comisiones canónicas para el alcance activo. Las líneas de planilla deben identificarse por póliza y asesor antes de preparar la liquidación.</td></tr>'}</tbody>
     </table></div></div>
-    ${esAsesor ? `<div class="card pad" style="margin-top:14px"><b style="font-family:var(--f-display);font-size:14px">Mis ajustes de producción</b><div class="muted" style="font-size:12.5px;margin-top:6px">Las cancelaciones de tu cartera descuentan prima neta no devengada. Revisa el detalle en <a style="color:var(--red);cursor:pointer" onclick="location.hash='#/cancelaciones'">Cancelaciones</a>.</div></div>`
-      : `<div style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap"><button class="btn primary" onclick="Orbit.modules.finanzas.lote('')">📦 Preparar lote de pago (todos)</button></div>`}`;
+    <div class="cfg-note" style="margin-top:14px">No se pagan otras CxP al preparar un asesor. Las comisiones históricas sin fuente o acreditación se conservan, pero no se convierten automáticamente en pagos.</div>
+    ${historical.length?`<div class="card pad" style="margin-top:14px"><b>Movimientos históricos por vincular (${historical.length})</b><p>No se toman como cero ni se suman de nuevo. Deben cruzarse con las fuentes antes de crear otra CxP del mismo asesor.</p><table class="tbl"><thead><tr><th>Beneficiario</th><th>Periodo</th><th>Estado</th><th>Importe</th><th>Referencia</th></tr></thead><tbody>${historical.map(row=>`<tr><td>${U.esc(row.beneficiario||row.asesorId||'Sin identificar')}</td><td>${U.esc(row.periodo)}</td><td>${U.esc(row.estado)}</td><td>${U.money(row.valor,row.moneda)}</td><td>${U.esc(row.id)}</td></tr>`).join('')}</tbody></table></div>`:''}`;
   }
 
   /* ---------- PREPARAR LOTE DE LIQUIDACIÓN ---------- */
-  // Reúne pagos pendientes (comisión del mes + CxP de meses pasados); se pueden
-  // retirar partidas del lote antes de confirmar; muestra total en vivo.
+  // Reúne únicamente fuentes acreditadas del asesor seleccionado. La creación
+  // y la lectura posterior pertenecen al servidor; nunca representa un pago.
   function lote(asesorId) {
-    const rows = comisionAsesor().filter(r => r.pendiente > 0 && (!asesorId || r.a.id === asesorId));
-    // partidas del lote: comisión pendiente por asesor + CxP de finanzas (egresos comisiones asesores no pagados de meses pasados)
-    const partidas = [];
-    rows.forEach(r => partidas.push({ id: 'liq-' + r.a.id, tipo: 'Comisión del periodo', quien: r.a.nombre, color: r.a.color, monto: r.pendiente, cur: 'GTQ' }));
-    S().all('finmovs').filter(m => m.tipo === 'egreso' && m.clase === 'Comisiones asesores' && m.estado === 'pendiente').forEach(m => {
-      partidas.push({ id: m.id, tipo: 'CxP ' + m.periodo, quien: m.beneficiario, color: '#6b7280', monto: norm(m.pendiente || m.valor, m.moneda), cur: 'GTQ', cxp: true });
+    if(!asesorId)return U.toast('Selecciona un asesor para preparar sus CxP; no se mezclan beneficiarios.');
+    const candidates=S().all('comisiones').filter(c=>c.asesorId===asesorId&&c.estado!=='Liquidada'&&(!paisFin()||c.pais===paisFin()));
+    const eligible=candidates.filter(c=>c.schemaVersion==='gravicentra-advisor-commission-payable-v1'&&c.source&&c.commissionAccreditation&&['paid','accredited'].includes(c.commissionAccreditation.status)&&c.commissionAccreditation.date<=U.today()&&(!c.cxpAsesorId||!S().get('finmovs',c.cxpAsesorId)));
+    const ids=eligible.slice(0,40).map(c=>c.id);
+    if(!ids.length)return U.toast('No hay comisiones canónicas pendientes para este asesor. Identifica sus líneas de planilla antes de crear la CxP.');
+    if(candidates.length>ids.length)U.toast(ids.length+' líneas acreditadas en este bloque; '+(candidates.length-ids.length)+' históricas o adicionales se conservan fuera del lote, sin aplicación.');
+    return prepararLiquidacion({version:1,operation:'preview',advisorId:asesorId,cutoff:U.today(),commissionIds:ids});
+  }
+  function prepararComisionesFuente(lines,options){
+    options=options||{};
+    return prepararLiquidacion({version:1,operation:'preview',advisorId:options.advisorId,cutoff:options.cutoff||U.today(),lines:lines,...(options.syntheticQa===true?{syntheticQa:true}:{})});
+  }
+  function abrirFuentesAsesor(advisorId){
+    let back=document.getElementById('fin-fuentes-asesor');if(back)back.remove();
+    back=document.createElement('div');back.id='fin-fuentes-asesor';back.className='drawer-back open';back.style.cssText='display:grid;place-items:center;z-index:95';
+    const advisors=S().all('asesores');
+    back.innerHTML=`<div class="card" style="width:min(820px,95vw);max-height:92vh;overflow:auto;padding:22px"><h3>Cargar liquidación documentada</h3><p>Selecciona el asesor y el corte. Carga el lote estructurado preparado a partir de las planillas, con referencia de documento y renglón por cada comisión. La vista previa no escribe; la creación requiere confirmar después.</p><div style="display:flex;gap:12px;flex-wrap:wrap"><label>Asesor<select id="fuente-asesor" class="ins-ctl"><option value="">Selecciona un asesor</option>${advisors.map(a=>`<option value="${U.esc(a.id)}" ${a.id===advisorId?'selected':''}>${U.esc(a.nombre||a.id)}</option>`).join('')}</select></label><label>Corte<input id="fuente-corte" class="ins-ctl" type="date" value="${U.esc(U.today())}"></label></div><label style="display:block;margin-top:16px">Archivo de lote documentado<input id="fuente-archivo" type="file" accept="application/json,.json"></label><label style="display:block;margin-top:14px">Contenido del lote (JSON)<textarea id="fuente-lote" rows="10" style="display:block;box-sizing:border-box;width:100%;font-family:monospace" placeholder="Lote documentado por asesor: referencias, pólizas, comisiones acreditadas y participación aprobada"></textarea></label><p id="fuente-error" role="alert" style="color:var(--danger)"></p><div style="display:flex;justify-content:flex-end;gap:10px"><button id="fuente-cerrar" class="btn ghost">Cerrar</button><button id="fuente-preview" class="btn primary">Verificar y previsualizar</button></div></div>`;
+    document.body.appendChild(back);
+    back.querySelector('#fuente-cerrar').addEventListener('click',()=>back.remove());
+    back.querySelector('#fuente-archivo').addEventListener('change',async event=>{
+      const file=event.target.files&&event.target.files[0];if(!file)return;
+      const error=back.querySelector('#fuente-error');error.textContent='';
+      try{if(file.size>512000)throw new Error('El lote supera 500 KB. Divide las fuentes en bloques de hasta 40 líneas.');back.querySelector('#fuente-lote').value=await file.text();}
+      catch(e){error.textContent=e.message||'No se pudo leer el archivo de lote.';}
     });
-    const incluidos = new Set(partidas.map(p => p.id));
+    back.querySelector('#fuente-preview').addEventListener('click',async()=>{
+      const error=back.querySelector('#fuente-error'),button=back.querySelector('#fuente-preview');error.textContent='';
+      try{
+        const selected=back.querySelector('#fuente-asesor').value,cutoff=back.querySelector('#fuente-corte').value;
+        if(!selected)throw new Error('Selecciona el asesor beneficiario.');
+        const sourceText=back.querySelector('#fuente-lote').value||'';
+        if(sourceText.length>512000)throw new Error('El lote supera 500 KB.');
+        let batch;try{batch=JSON.parse(sourceText);}catch(e){throw new Error('El lote no es un JSON válido; no se envió ninguna línea.');}
+        if(!batch||batch.schemaVersion!=='gravicentra-advisor-commission-source-batch-v1'||!Array.isArray(batch.lines)||batch.lines.length<1||batch.lines.length>40)
+          throw new Error('Usa un lote documentado de 1 a 40 líneas con su versión de formato.');
+        if(batch.advisorId!==selected)throw new Error('El asesor del lote no coincide con el beneficiario seleccionado.');
+        if(batch.cutoff!==cutoff)throw new Error('El corte del lote no coincide con la fecha seleccionada.');
+        // Only explicit disposable IDs may request QA. Their canonical marks
+        // and current signed permissions are verified again by the server;
+        // never turn a real advisor/policy into a test from this form.
+        const syntheticQa=batch.syntheticQa===true;
+        if(syntheticQa&&(!/^b4003qa_[A-Za-z0-9._:-]+$/.test(selected)||batch.lines.some(line=>!/^b4003qa_[A-Za-z0-9._:-]+$/.test(String(line&&line.polizaId||'')))))
+          throw new Error('El lote de prueba requiere exclusivamente asesor y pólizas sintéticos identificados.');
+        button.disabled=true;
+        const preview=await prepararComisionesFuente(batch.lines,{advisorId:selected,cutoff,syntheticQa});
+        if(preview&&preview.ok===true)back.remove();else button.disabled=false;
+      }catch(e){error.textContent=e.message||'No se pudo verificar el lote.';button.disabled=false;}
+    });
+  }
+  async function prepararLiquidacion(spec){
+    if(!S().prepareAdvisorPayables)return U.toast('El comando protegido de CxP no está disponible. No se escribió ningún movimiento.');
     let back = document.getElementById('fin-lote'); if (back) back.remove();
     back = document.createElement('div'); back.id = 'fin-lote'; back.className = 'drawer-back open';
     back.style.display = 'grid'; back.style.placeItems = 'center'; back.style.zIndex = 96;
-    function paint() {
-      const sel = partidas.filter(p => incluidos.has(p.id));
-      const total = sel.reduce((s, p) => s + p.monto, 0);
-      back.querySelector('#lote-body').innerHTML = partidas.map(p => `
-        <label class="lote-row ${incluidos.has(p.id) ? '' : 'off'}">
-          <input type="checkbox" data-lid="${p.id}" ${incluidos.has(p.id) ? 'checked' : ''}>
-          <span class="dot-s" style="background:${p.color}"></span>
-          <span style="flex:1"><b>${U.esc(p.quien)}</b><span class="muted" style="font-size:11.5px"> · ${p.tipo}</span>${p.cxp ? ' <span class="badge warn" style="font-size:9px">mes anterior</span>' : ''}</span>
-          <span class="mono">${U.money(p.monto, p.cur)}</span>
-        </label>`).join('') || '<div class="muted" style="padding:18px;text-align:center">No hay pagos pendientes.</div>';
-      back.querySelector('#lote-total').textContent = U.money(total, Orbit.q.monedaPais());
-      back.querySelector('#lote-count').textContent = sel.length + ' de ' + partidas.length + ' partidas';
-      back.querySelectorAll('[data-lid]').forEach(c => c.addEventListener('change', () => { c.checked ? incluidos.add(c.dataset.lid) : incluidos.delete(c.dataset.lid); paint(); }));
-    }
-    back.innerHTML = `<div class="card" style="width:min(560px,95vw);max-height:92vh;display:flex;flex-direction:column;padding:0">
-      <div style="padding:17px 20px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center">
-        <b style="font-family:var(--f-display);font-size:16px">📦 Lote de pago de comisiones</b><button class="imp-x" id="lt-x">✕</button></div>
-      <div class="cfg-note" style="margin:14px 16px 0">Revisá el lote: podés <b>retirar partidas</b> y se incluyen <b>cuentas por pagar de meses anteriores</b>. El total se actualiza en vivo.</div>
-      <div id="lote-body" style="padding:12px 16px;overflow:auto;flex:1;display:grid;gap:7px"></div>
-      <div style="padding:14px 20px;border-top:1px solid var(--line)">
-        <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:12px"><span class="muted" id="lote-count"></span><span style="font-family:var(--f-display);font-weight:800;font-size:22px" id="lote-total"></span></div>
-        <div style="display:flex;gap:8px;justify-content:flex-end"><button class="btn ghost" id="lt-cancel">Cancelar</button><button class="btn primary" id="lt-ok">Confirmar pago del lote</button></div>
-      </div></div>`;
+    back.innerHTML=`<div class="card" style="width:min(820px,95vw);max-height:92vh;overflow:auto;padding:20px"><h3>Preparar liquidación y CxP</h3><p class="cfg-note">${spec.lines&&spec.lines.length?'Fuente declarada/documentada y aprobada por Dirección. El sistema valida cálculos y relaciones; no autentica el documento remoto.':'Comisiones canónicas registradas. El sistema valida cálculos y relaciones; no vuelve a autenticar el documento remoto.'}</p><div id="lote-body">Validando cálculos, pólizas y beneficiario en el servidor…</div><div id="lote-total" style="margin:14px 0"></div><div style="display:flex;justify-content:flex-end;gap:8px"><button class="btn ghost" id="lt-cancel">Cerrar</button><button class="btn primary" id="lt-ok" disabled>Crear CxP pendientes</button></div></div>`;
     document.body.appendChild(back);
-    const close = () => back.remove();
-    back.addEventListener('click', e => { if (e.target === back) close(); });
-    back.querySelector('#lt-x').addEventListener('click', close);
-    back.querySelector('#lt-cancel').addEventListener('click', close);
-    back.querySelector('#lt-ok').addEventListener('click', () => {
-      // marca las CxP incluidas como pagadas (las de comisión del periodo son partidas agregadas)
-      partidas.filter(p => incluidos.has(p.id) && p.cxp).forEach(p => S().update('finmovs', p.id, { estado: 'pagado', pendiente: 0 }));
-      close(); const host = document.getElementById('host'); if (host) render(host);
+    const button=back.querySelector('#lt-ok'),body=back.querySelector('#lote-body');
+    back.querySelector('#lt-cancel').addEventListener('click',()=>back.remove());
+    try{
+      const preview=await S().prepareAdvisorPayables(spec);
+      body.innerHTML=liquidacionTabla(preview.payables);
+      back.querySelector('#lote-total').textContent=preview.newPayables+' CxP nuevas · '+preview.reusedPayables+' ya existentes. Nuevo importe: '+Object.entries(preview.totals).map(([currency,value])=>U.money(value,currency)).join(' · ');
+      button.disabled=false;
+      button.addEventListener('click',async()=>{
+        button.disabled=true;button.textContent='Guardando y verificando…';
+        try{
+          const receipt=await S().prepareAdvisorPayables(Object.assign({},spec,{operation:'prepare',previewDigest:preview.previewDigest}));
+          back.remove();const host=document.getElementById('host');if(host)render(host);
+          U.toast('CxP confirmadas en el servidor. No se registraron pagos ni movimientos bancarios.');
+          verLiquidacionAsesor(spec.advisorId,receipt.payables);
+        }catch(error){body.insertAdjacentHTML('beforeend','<div class="cfg-note">'+U.esc(error.message||'No se pudo confirmar la CxP. Recarga antes de reintentar.')+'</div>');button.disabled=true;button.textContent='Recarga la vista previa';}
+      });
+      return preview;
+    }catch(error){body.textContent=error.message||'No se pudo verificar la fuente. No se creó ninguna CxP.';button.disabled=true;return {ok:false,error:error.message};}
+  }
+  function liquidacionTabla(rows){
+    return `<div style="overflow:auto"><table class="tbl"><thead><tr><th>Cliente / póliza</th><th>Recaudo</th><th>Comisión ordinaria</th><th>% asesor</th><th>CxP</th><th>Estado</th></tr></thead><tbody>${rows.map(row=>`<tr><td>${U.esc((S().get('clientes',row.clienteId)||{}).nombre||row.clienteId)}<div>${U.esc(row.polizaNumero||row.polizaId)}</div><div class="muted">Requerimiento: ${U.esc(row.source?.requirementRef||'')} · Fuente: ${U.esc(row.source?.fileId||'')} / ${U.esc(row.source?.lineId||'')}</div></td><td>${U.esc(row.periodoRecaudo)}</td><td>${U.money(row.comisionOrdinariaAcreditada,row.moneda)}</td><td>${row.pctAsesor}%</td><td>${U.money(row.valor,row.moneda)}</td><td>${U.esc(row.estado)}</td></tr>`).join('')}</tbody></table></div>`;
+  }
+  function verLiquidacionAsesor(advisorId,providedRows){
+    const rows=(providedRows||S().all('finmovs')).filter(row=>row.asesorId===advisorId&&row.schemaVersion==='gravicentra-advisor-commission-payable-v1'&&(!paisFin()||row.pais===paisFin()));
+    if(!rows.length)return U.toast('No hay CxP documentadas para imprimir de este asesor.');
+    const advisor=S().get('asesores',advisorId)||{},tenant=(Orbit.tenant&&Orbit.tenant.get&&Orbit.tenant.get())||{};
+    const company=tenant.nombreLegal||tenant.razonSocial||tenant.empresa||tenant.nombre||'Gravicentra Insurance';
+    const totals={};rows.forEach(row=>{totals[row.moneda]=Math.round(((totals[row.moneda]||0)+Number(row.pendiente||0))*100)/100;});
+    let back=document.getElementById('fin-liquidacion-asesor');if(back)back.remove();
+    back=document.createElement('div');back.id='fin-liquidacion-asesor';back.className='drawer-back open';back.style.cssText='display:grid;place-items:center;z-index:97';
+    back.innerHTML=`<div class="card" style="width:min(900px,95vw);max-height:94vh;overflow:auto;padding:24px"><div id="liq-document"><h2>${U.esc(company)}</h2><h3>Liquidación de comisiones · Cuenta por pagar</h3><p>Beneficiario: <b>${U.esc(advisor.nombre||rows[0].beneficiario)}</b></p><p>Corte(s): ${[...new Set(rows.map(row=>row.fechaCorte))].map(U.esc).join(' · ')}</p>${liquidacionTabla(rows)}<p><b>Saldo pendiente: ${Object.entries(totals).map(([currency,value])=>U.money(value,currency)).join(' · ')}</b></p><p>Documento de liquidación; no es comprobante de pago. La base ordinaria de reparto es la aprobada para las fuentes indicadas, sin IVA ni incentivos extraordinarios. Los pagos al asesor se registran por separado.</p><p style="font-size:10px;word-break:break-word">Trazabilidad: ${rows.map(row=>U.esc(row.id)).join(' · ')}</p></div><div style="display:flex;gap:10px;justify-content:flex-end"><button id="liq-close" class="btn ghost">Cerrar</button><button id="liq-print" class="btn primary">Imprimir / guardar PDF</button></div></div>`;
+    document.body.appendChild(back);back.querySelector('#liq-close').addEventListener('click',()=>back.remove());
+    back.querySelector('#liq-print').addEventListener('click',()=>{
+      const popup=window.open('','_blank');if(!popup)return U.toast('Permite abrir la ventana de impresión.');
+      popup.document.write('<html><head><title>Liquidación de comisiones</title><style>body{font:12px Arial;color:#192e48;margin:30px}h2{border-bottom:3px solid #0f7184;padding-bottom:12px}table{width:100%;border-collapse:collapse}th,td{padding:8px;border-bottom:1px solid #dbe1e8;text-align:left}th{background:#edf4f6}.muted{font-size:10px;color:#596775}@page{size:A4 landscape;margin:15mm}</style></head><body>'+back.querySelector('#liq-document').innerHTML+'</body></html>');popup.document.close();popup.print();
     });
-    paint();
   }
 
   /* ---------- CONCILIACIÓN BANCARIA ---------- */
@@ -1124,7 +1165,7 @@ Orbit.modules.finanzas = (function () {
       <div style="padding:17px 20px;background:linear-gradient(120deg,var(--graph),#10141a);display:flex;justify-content:space-between;align-items:flex-start;gap:12px">
         <div><div class="crumb" style="margin-bottom:4px;color:rgba(255,255,255,.8)">Detalle de liquidación</div>
           <b style="font-family:var(--f-display);font-size:18px;color:#fff">${U.esc(titulo || '—')}</b>
-          <div style="font-size:12.5px;margin-top:3px;color:rgba(255,255,255,.85)">${regs.length} registros · ${U.money(tot, Orbit.q.monedaPais())} total · ${U.money(liq, Orbit.q.monedaPais())} liquidado · clic en estado para cambiar</div></div>
+          <div style="font-size:12.5px;margin-top:3px;color:rgba(255,255,255,.85)">${regs.length} registros · ${U.money(tot, Orbit.q.monedaPais())} comisión de aseguradora · no equivale a pago al asesor</div></div>
         <button class="imp-x" id="dl-x" style="background:rgba(255,255,255,.16);border-color:rgba(255,255,255,.3);color:#fff">✕</button></div>
       <div style="overflow:auto;flex:1"><table class="tbl">
         <thead><tr><th>Periodo</th><th>Cliente</th><th>Póliza</th><th class="num">Base neta</th><th class="num">%</th><th class="num">Comisión</th><th>Estado</th></tr></thead>
@@ -1134,7 +1175,7 @@ Orbit.modules.finanzas = (function () {
           <td class="mono" style="font-size:11.5px">${p ? p.numero : '—'}</td>
           <td class="num">${U.money(c.base, c.moneda)}</td><td class="num">${c.pct}%</td>
           <td class="num"><b>${U.money(c.monto, c.moneda)}</b></td>
-          <td style="cursor:pointer" onclick="Orbit.modules.finanzas.toggleComEstado('${c.id}','${campo}','${key}')"><span class="badge ${c.estado === 'Liquidada' ? 'ok' : 'warn'}">${c.estado}</span></td></tr>`; }).join('') || '<tr><td colspan="7" class="muted" style="text-align:center;padding:20px">Sin registros.</td></tr>'}</tbody>
+          <td><span class="badge ${c.estado === 'Liquidada' ? 'ok' : 'warn'}">${U.esc(c.estado||'Devengada')}</span></td></tr>`; }).join('') || '<tr><td colspan="7" class="muted" style="text-align:center;padding:20px">Sin registros.</td></tr>'}</tbody>
       </table></div>
       <div style="padding:13px 20px;border-top:1px solid var(--line);display:flex;justify-content:flex-end"><button class="btn primary" id="dl-ok">Cerrar</button></div>
     </div>`;
@@ -1145,9 +1186,7 @@ Orbit.modules.finanzas = (function () {
     back.querySelector('#dl-ok').addEventListener('click', close);
   }
   function toggleComEstado(comId, campo, key) {
-    const c = S().get('comisiones', comId); if (!c) return;
-    S().update('comisiones', comId, { estado: c.estado === 'Liquidada' ? 'Devengada' : 'Liquidada' });
-    detLiq(campo, key);
+    return U.toast('Preparar una CxP no equivale a pagarla. No se cambia el estado financiero manualmente.');
   }
 
   function wire(host) {
@@ -1197,7 +1236,7 @@ Orbit.modules.finanzas = (function () {
     back.querySelector('#cat-save').onclick = () => { Orbit.tenant.setDeep('catalogoFinanciero', cat); close(); const el = document.createElement('div'); el.className = 'ciclo-toast'; el.textContent = '✓ Categorías guardadas'; document.body.appendChild(el); setTimeout(() => el.remove(), 2200); const h = document.getElementById('host'); if (h) render(h); };
   }
 
-  return { render, toggleEstado, lote, nuevoMov, editarMov, crearMes, crearMeta, metasSugerir, facturaAseg, facturaAccion, verFactura, regFinanciacion, detLiq, toggleComEstado, drillKey, editarPresup, replicarPresup, editarCategorias };
+  return { render, toggleEstado, lote, prepararComisionesFuente, abrirFuentesAsesor, verLiquidacionAsesor, nuevoMov, editarMov, crearMes, crearMeta, metasSugerir, facturaAseg, facturaAccion, verFactura, regFinanciacion, detLiq, toggleComEstado, drillKey, editarPresup, replicarPresup, editarCategorias };
 })();
 
 // ORBIT360 V1330 M5 CONCILIACIONES GATES PATCH START

@@ -7,6 +7,8 @@ const { HttpsError, onCall } = require('firebase-functions/v2/https');
 const { validateActiveLedgerContract } = require('./cobros-ledger-contract');
 const { normalizeRole, resolveProductActiveRole } = require('./product-active-role-contract');
 const { planEvidence } = require('./payment-inference-engine');
+const proposalBoundary = require('./proposal-application-boundary');
+const proposalAccess = require('./b4-003-scoped-access-boundary');
 
 const REGION = process.env.ORBIT360_FUNCTIONS_REGION || 'us-central1';
 const VERSION = 'orbit360-cobros-reconciliation-domain-v6-b3005-inference-owner';
@@ -16,7 +18,7 @@ const db = getFirestore(app);
 const ADMIN_ROLES = new Set(['superadmin', 'admintenant', 'direccion', 'admin', 'operativo', 'finanzas']);
 const ADVISOR_REPORT_ROLES = new Set(['asesor', 'asesora', 'asesor_sr', 'asesora_sr', 'asesor_jr', 'asesora_jr', 'comercial']);
 const PERMISSIONS = new Set(['cobros_manage', 'conciliaciones_manage', 'payments_reconcile']);
-const OPERATIONS = new Set(['preview_policy', 'report_advisor_payment', 'apply_payment', 'reconcile_payment', 'reconcile_evidence', 'register_evidence', 'confirm_application', 'hold_proposal', 'reopen_proposal']);
+const OPERATIONS = new Set(['preview_policy', 'preview_proposal_application', 'resolve_proposal_application', 'apply_proposal_application', 'report_advisor_payment', 'apply_payment', 'reconcile_payment', 'reconcile_evidence', 'register_evidence', 'confirm_application', 'hold_proposal', 'reopen_proposal']);
 
 const text = (value, max = 1000) => String(value == null ? '' : value).replace(/\u0000/g, '').trim().slice(0, max);
 const norm = value => text(value, 180).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').replace(/\s+/g, ' ').trim();
@@ -125,6 +127,7 @@ async function authorize(request, operation) {
   return {
     tenantId,
     member,
+    auth: request.auth,
     actor: {
       uid: request.auth.uid,
       advisorId: text(member.advisorId || member.asesorId, 180),
@@ -729,7 +732,158 @@ function evidenceSourceType(type) {
   if (type === 'INSURER_STATEMENT_PENDING_FROM_N') return 'insurer_statement';
   return 'insurer_invoice';
 }
-async function reconcileEvidence(authz, data, payload, previewOnly) {
+function assertProposalWrite(authz,accessConfig) {
+  if (!ADMIN_ROLES.has(authz.actor.activeRole)) throw new HttpsError('permission-denied','PROPOSAL_MANAGEMENT_ROLE_REQUIRED');
+  const restricted=unique(authz.member.modulesRestricted||authz.member.modulosRestringidos).map(norm);
+  if(restricted.includes('conciliaciones'))throw new HttpsError('permission-denied','PROPOSAL_MODULE_WRITE_DENIED');
+  const matrix=accessConfig&&accessConfig.rolePermissions||{};
+  const roleKey=Object.keys(matrix).find(key=>normalizeRole(key)===authz.actor.activeRole);
+  const modules=roleKey&&matrix[roleKey]||{};
+  const moduleKey=Object.keys(modules).find(key=>norm(key)==='conciliaciones');
+  const rights=moduleKey&&modules[moduleKey]||{};
+  if(rights.ver===false||rights.editar===false||rights.write===false)
+    throw new HttpsError('permission-denied','PROPOSAL_MODULE_WRITE_DENIED');
+}
+function syntheticProposalRun(tenantId,payload) {
+  return tenantId==='alianzas-soluciones'&&/^cobledgerqa_[a-z0-9_]{12,80}$/.test(text(payload.sourceRunId,180))&&
+    /^b3005qa_i66_proposal_[a-z0-9_]{12,100}$/.test(text(payload.proposalId,180))?text(payload.sourceRunId,180):'';
+}
+function assertReconciliationFinancialTarget(authz,policy,receipt,row,kind) {
+  const currency=text(receipt.moneda||receipt.currency||policy.moneda,12).toUpperCase();
+  const rowCurrency=text(row.moneda||row.currency,12).toUpperCase();
+  const policyId=text(policy.id,180),clientId=text(receipt.clienteId||policy.clienteId,180);
+  const mismatch=field=>{const error=new HttpsError('failed-precondition','RECONCILIATION_'+kind+'_TARGET_MISMATCH');
+    error.targetIssue={destination:kind==='COBRO'?'Cobro':'Cartera',field};throw error;};
+  try{assertPaymentCountryScope(authz,policy,row);}catch(_){mismatch('país');}
+  if(row.tenantId&&row.tenantId!==authz.tenantId)mismatch('empresa');
+  if(row.reciboId!==receipt.id)mismatch('recibo');
+  if((row.polizaId||row.policyId)&&text(row.polizaId||row.policyId,180)!==policyId||
+      row.matchedPolicyId&&text(row.matchedPolicyId,180)!==policyId)mismatch('póliza');
+  if((row.clienteId||row.clientId)&&text(row.clienteId||row.clientId,180)!==clientId)mismatch('cliente');
+  if(!rowCurrency||rowCurrency!==currency)mismatch('moneda');
+  let matchingAmount=false;try{matchingAmount=receiptAmount(row)===receiptAmount(receipt);}catch(_){}
+  if(!matchingAmount)mismatch('importe');
+}
+async function proposalApplicationContext(authz, payload, read,requireWrite=false) {
+  const configSnap = await read(reconciliationConfigRef(authz.tenantId));
+  const accessSnap = await read(db.collection('tenants').doc(authz.tenantId).collection('config').doc('access'));
+  const accessConfig = accessSnap.exists?accessSnap.data():{};
+  if(requireWrite)assertProposalWrite(authz,accessConfig);
+  if(!configSnap.exists)return proposalBoundary.review('TENANT_RECONCILIATION_CONFIG_REQUIRED');
+  const qaRun=syntheticProposalRun(authz.tenantId,payload);
+  const assessment=await proposalBoundary.assessProposalApplication({tenantId:authz.tenantId,payload,read,syntheticQaRun:qaRun,
+    items:collection=>tenantData(authz.tenantId,collection),
+    control:()=>qaRun?tenantData(authz.tenantId,'cobrosLedgerQaControl').doc(qaRun):controlRef(authz.tenantId),
+    runRef:runId=>qaRun?tenantData(authz.tenantId,'cobrosLedgerQaRuns').doc(runId):runRef(authz.tenantId,runId),
+    assertScope:(policy,receipt)=>{
+      const country=assertPaymentCountryScope(authz,policy,receipt);
+      try {
+        const ctx=proposalAccess.resolve({auth:authz.auth,member:authz.member,config:accessConfig,
+          tenantId:authz.tenantId,activeRole:authz.actor.activeRole,collection:'conciliaciones',country});
+        proposalAccess.allowRow(ctx,policy,receipt?[receipt]:[]);
+      } catch(error) { throw new HttpsError('permission-denied',text(error&&error.code||'PROPOSAL_SCOPE_DENIED',180)); }
+      return country;
+    },
+    config:configSnap.exists?configSnap.data():{}});
+  if(assessment.eligible)for(const target of assessment.plan.targets){
+    const receipt=assessment.receipts.find(row=>row.id===target.receiptId);
+    const [cobros,portfolio]=await Promise.all([
+      read(tenantData(authz.tenantId,'cobros').where('reciboId','==',target.receiptId).limit(3)),
+      read(tenantData(authz.tenantId,'carteraPrimas').where('reciboId','==',target.receiptId).limit(3))]);
+    const activeRows=portfolio.docs.filter(doc=>activePortfolio(doc.data()||{}));
+    if(cobros.docs.length>1||activeRows.length!==1)return proposalBoundary.review('PROPOSAL_FINANCIAL_TARGET_NOT_UNIQUE');
+    try{for(const doc of cobros.docs)assertReconciliationFinancialTarget(authz,assessment.policy,receipt,doc.data(),'COBRO');
+      for(const doc of activeRows)assertReconciliationFinancialTarget(authz,assessment.policy,receipt,doc.data(),'PORTFOLIO');
+    }catch(error){const issue=error.targetIssue||{destination:'Destino financiero',field:'integridad'};
+      return proposalBoundary.review('PROPOSAL_FINANCIAL_TARGET_MISMATCH',{targetIssue:issue,
+        question:'La relación de '+issue.destination.toLowerCase()+' no coincide en '+issue.field+'. No se aplicó dinero; debe corregirse ese dato del destino.'});}
+  }
+  return assessment;
+}
+async function verifyProposalReadback(authz, result) {
+  if (!result || !result.applicationId || !Array.isArray(result.results) || !result.results.length)
+    throw new HttpsError('data-loss','PROPOSAL_APPLICATION_RECORD_NOT_CONFIRMED');
+  const record = await tenantData(authz.tenantId,'reconciliationApplications').doc(result.applicationId).get();
+  const durableResult=Object.assign({},result);delete durableResult.reused;delete durableResult.readbackConfirmed;
+  if (!record.exists || record.data().status!=='APPLIED' || digest(record.data().result)!==digest(durableResult))
+    throw new HttpsError('data-loss','PROPOSAL_APPLICATION_RECORD_NOT_CONFIRMED');
+  assertPaymentCountryScope(authz,{pais:record.data().pais});
+  const policySnapshot=await tenantData(authz.tenantId,'polizas').doc(result.policyId).get();
+  if(!policySnapshot.exists)throw new HttpsError('data-loss','PROPOSAL_APPLICATION_POLICY_READBACK_MISSING');
+  const policy=Object.assign({id:policySnapshot.id},policySnapshot.data());
+  for (const target of result.results || []) {
+    const [receipt,cobro] = await Promise.all([
+      tenantData(authz.tenantId,'recibosEsperados').doc(target.receiptId).get(),
+      tenantData(authz.tenantId,'cobros').doc(target.cobroId).get()
+    ]);
+    if (!receipt.exists || !cobro.exists || receipt.data().paymentState!==target.paymentState ||
+        cobro.data().paymentState!==target.paymentState || receipt.data().applicationState!==target.applicationState ||
+        cobro.data().applicationState!==target.applicationState || cobro.data().reciboId!==target.receiptId ||
+        Number(cobro.data().monto)!==target.amount || text(cobro.data().moneda,12)!==target.currency ||
+        receiptAmount(receipt.data())!==target.amount || text(receipt.data().moneda||receipt.data().currency,12)!==target.currency)
+      throw new HttpsError('data-loss','PROPOSAL_APPLICATION_READBACK_MISMATCH');
+    try{assertReconciliationFinancialTarget(authz,policy,Object.assign({id:receipt.id},receipt.data()),cobro.data(),'COBRO');}
+    catch(_){throw new HttpsError('data-loss','PROPOSAL_APPLICATION_FINANCIAL_TARGET_READBACK_MISMATCH');}
+    if (target.portfolioId) {
+      const portfolio = await tenantData(authz.tenantId,'carteraPrimas').doc(target.portfolioId).get();
+      if (!portfolio.exists || portfolio.data().carteraActiva!==false || portfolio.data().cobroId!==target.cobroId)
+        throw new HttpsError('data-loss','PROPOSAL_APPLICATION_PORTFOLIO_READBACK_MISMATCH');
+      try{assertReconciliationFinancialTarget(authz,policy,Object.assign({id:receipt.id},receipt.data()),portfolio.data(),'PORTFOLIO');}
+      catch(_){throw new HttpsError('data-loss','PROPOSAL_APPLICATION_PORTFOLIO_TARGET_READBACK_MISMATCH');}
+    }
+  }
+  return Object.assign({},result,{readbackConfirmed:true});
+}
+async function proposalApplication(authz,data,payload,apply,previewOnly) {
+  // Financial amounts, receipt IDs, paid dates and evidence are read from the
+  // server. Caller-supplied financial overrides are never accepted here.
+  if (Object.keys(payload).some(key=>!['proposalId','sourceRunId','planDigest'].includes(key)))
+    throw new HttpsError('invalid-argument','PROPOSAL_CALLER_FINANCIAL_PAYLOAD_DENIED');
+  if (!ADMIN_ROLES.has(authz.actor.activeRole)) throw new HttpsError('permission-denied','PROPOSAL_MANAGEMENT_ROLE_REQUIRED');
+  if (previewOnly && apply && !syntheticProposalRun(authz.tenantId,payload)) throw new HttpsError('permission-denied','PROPOSAL_PREVIEW_MUTATION_NOT_AUTHORIZED');
+  const context = await proposalApplicationContext(authz,payload,ref=>ref.get(),apply);
+  if (context.status==='ALREADY_APPLIED') {
+    const verified = await verifyProposalReadback(authz,context.result);
+    return Object.assign({},verified,{reused:true});
+  }
+  if (!apply || !context.eligible) return proposalBoundary.publicAssessment(context);
+  reason(data,true);
+  if (!payload.planDigest || payload.planDigest!==context.planDigest) return proposalBoundary.review('PROPOSAL_PLAN_CHANGED');
+  return reconcileEvidence(authz,Object.assign({},data,{requestId:context.applicationId}),
+    context.evidencePayload,false,{payload:{proposalId:context.proposalId,sourceRunId:context.sourceRunId},
+      planDigest:context.planDigest,applicationId:context.applicationId});
+}
+async function resolveProposalApplication(authz,data,payload,previewOnly) {
+  if(previewOnly&&!syntheticProposalRun(authz.tenantId,payload))throw new HttpsError('permission-denied','PROPOSAL_PREVIEW_MUTATION_NOT_AUTHORIZED');
+  const motive=reason(data,true);
+  const outcome=await db.runTransaction(async tx=>{
+    const context=await proposalApplicationContext(authz,
+      {proposalId:payload.proposalId,sourceRunId:payload.sourceRunId,resolutionDraft:true},ref=>tx.get(ref),true);
+    if(context.status==='ALREADY_APPLIED')return {alreadyApplied:context.result};
+    const prepared=proposalBoundary.prepareResolution(context,payload,authz.actor);
+    if(prepared.status!=='RESOLUTION_READY')return proposalBoundary.publicAssessment(prepared);
+    const record=prepared.record,previous=prepared.previous;
+    if(previous&&previous.resolutionDigest===record.resolutionDigest)
+      return {ok:true,status:'RESOLUTION_SAVED',resolutionId:prepared.resolutionRef.id,resolutionDigest:record.resolutionDigest,
+        reused:true,writes:0,financialWrites:0,serverOwned:true};
+    const eventId='propresolve_'+digest({resolutionId:prepared.resolutionRef.id,digest:record.resolutionDigest}).slice(0,28);
+    const qaMark=context.syntheticQaRun?{__syntheticQa:true,qaRunId:context.syntheticQaRun}:{};
+    const saved=Object.assign({},record,{reason:motive,createdAt:now(),updatedAt:now()},qaMark);
+    tx.set(prepared.resolutionRef,saved,{merge:false});
+    tx.set(eventRef(authz.tenantId,eventId),{schemaVersion:VERSION,tenantId:authz.tenantId,eventId,
+      operation:'resolve_proposal_application',actor:authz.actor,reason:motive,
+      before:previous||null,after:saved,createdAt:now(),...qaMark},{merge:false});
+    return {ok:true,status:'RESOLUTION_SAVED',resolutionId:prepared.resolutionRef.id,resolutionDigest:record.resolutionDigest,
+      writes:2,financialWrites:0,serverOwned:true};
+  });
+  if(outcome.alreadyApplied)return Object.assign({},await verifyProposalReadback(authz,outcome.alreadyApplied),{reused:true});
+  if(outcome.status!=='RESOLUTION_SAVED')return outcome;
+  const verified=await tenantData(authz.tenantId,'reconciliationResolutions').doc(outcome.resolutionId).get();
+  if(!verified.exists||verified.data().resolutionDigest!==outcome.resolutionDigest)
+    throw new HttpsError('data-loss','PROPOSAL_RESOLUTION_READBACK_MISMATCH');
+  return Object.assign({},outcome,{readbackConfirmed:true});
+}
+async function reconcileEvidence(authz, data, payload, previewOnly, proposalRequest = null) {
   const policyId = id(payload.policyId || payload.polizaId, 'polizaId');
   const reconciliationConfig = await readReconciliationConfig(authz.tenantId, previewOnly === true);
   const evidencePayload = {
@@ -766,16 +920,21 @@ async function reconcileEvidence(authz, data, payload, previewOnly) {
   const policyRef = tenantData(authz.tenantId, 'polizas').doc(policyId);
   const receiptQuery = tenantData(authz.tenantId, 'recibosEsperados').where('polizaId', '==', policyId);
 
-  return db.runTransaction(async tx => {
+  const transactionResult = await db.runTransaction(async tx => {
     const previous = await tx.get(reqRef);
     if (previous.exists && (previous.data() || {}).status === 'committed') return Object.assign({ reused: true }, (previous.data() || {}).result || {});
+    const trustedProposal = proposalRequest ? await proposalApplicationContext(authz,proposalRequest.payload,ref=>tx.get(ref),true) : null;
+    if (proposalRequest && (!trustedProposal.eligible || trustedProposal.planDigest!==proposalRequest.planDigest))
+      return proposalBoundary.review(trustedProposal.reason||'PROPOSAL_PLAN_CHANGED');
+    if (proposalRequest && digest(trustedProposal.evidencePayload)!==digest(payload))
+      return proposalBoundary.review('PROPOSAL_PLAN_CHANGED');
     const [policySnap, receiptSnap] = await Promise.all([tx.get(policyRef), tx.get(receiptQuery)]);
     if (!policySnap.exists) throw new HttpsError('not-found', 'La póliza no existe.');
     const policy = Object.assign({ id: policySnap.id }, policySnap.data() || {});
     assertPaymentCountryScope(authz, policy);
     const receipts = receiptSnap.docs.map(doc => Object.assign({ id: doc.id }, doc.data() || {}));
     for (const receipt of receipts) assertPaymentCountryScope(authz, policy, receipt);
-    const plan = planEvidence({ policy, receipts, evidence: evidencePayload, reconciliationConfig });
+    const plan = trustedProposal ? trustedProposal.plan : planEvidence({ policy, receipts, evidence: evidencePayload, reconciliationConfig });
     if (!plan || plan.ok !== true) throw new HttpsError('failed-precondition', 'No fue posible evaluar la evidencia.');
     if (plan.autoCommit !== true || plan.status === 'REVIEW_REQUIRED') {
       return {
@@ -812,10 +971,18 @@ async function reconcileEvidence(authz, data, payload, previewOnly) {
       if (cobroSnap.size > 1) throw new HttpsError('failed-precondition', 'Más de un cobro corresponde al mismo recibo.');
       const activePortfolioRows = portfolioSnap.docs.filter(doc => activePortfolio(doc.data() || {}));
       if (activePortfolioRows.length > 1) throw new HttpsError('failed-precondition', 'Más de una obligación activa corresponde al mismo recibo.');
+      if (proposalRequest && activePortfolioRows.length!==1)
+        throw new HttpsError('failed-precondition','PROPOSAL_ACTIVE_PORTFOLIO_REQUIRED');
+      for(const doc of cobroSnap.docs)assertReconciliationFinancialTarget(authz,policy,receipt,doc.data(),'COBRO');
+      for(const doc of activePortfolioRows)assertReconciliationFinancialTarget(authz,policy,receipt,doc.data(),'PORTFOLIO');
+      if(trustedProposal&&trustedProposal.syntheticQaRun&&[...cobroSnap.docs,...activePortfolioRows].some(doc=>
+          doc.data().__syntheticQa!==true||doc.data().qaRunId!==trustedProposal.syntheticQaRun))
+        throw new HttpsError('permission-denied','PROPOSAL_QA_FINANCIAL_TARGET_NOT_SYNTHETIC');
       states.push({ target, receipt, cobroDoc: cobroSnap.empty ? null : cobroSnap.docs[0], activePortfolioRows });
     }
 
-    const technicalNow = now(), results = [];
+    const technicalNow = now(), results = [], beforeAfter = [];
+    const qaMark=trustedProposal&&trustedProposal.syntheticQaRun?{__syntheticQa:true,qaRunId:trustedProposal.syntheticQaRun}:{};
     const origin = evidenceOrigin(plan.evidenceType), source = evidenceSourceType(plan.evidenceType);
     for (const state of states) {
       const target = state.target, receipt = state.receipt, receiptId = receipt.id;
@@ -836,7 +1003,9 @@ async function reconcileEvidence(authz, data, payload, previewOnly) {
       const paymentState = isInferred && existingDirect ? text(beforeCobro.paymentState, 80) : target.paymentState;
       const applicationState = isInferred && text(beforeCobro.applicationState, 80) === 'APPLIED_DIRECT' ? 'APPLIED_DIRECT' : target.applicationState;
       const directOrInferred = isInferred && !existingDirect ? 'INFERRED' : 'DIRECT';
-      const amount = (!isInferred && evidencePayload.amount != null) ? evidencePayload.amount : receiptAmount(receipt);
+      // A commission figure is not the premium settled. The canonical receipt
+      // provides the payment amount for commission-based inference.
+      const amount = (!isInferred && plan.evidenceType!=='COMMISSION_STATEMENT_INSTALLMENT_N' && evidencePayload.amount != null) ? evidencePayload.amount : receiptAmount(receipt);
       if (amount == null || amount <= 0) throw new HttpsError('failed-precondition', 'El recibo no tiene monto válido.');
       const paidDate = !isInferred && evidencePayload.paidDate && (plan.evidenceType === 'BANK_STATEMENT_MATCH' || evidencePayload.actualPaidDateEvidence === true) ? evidencePayload.paidDate : text(beforeCobro.paidDate || beforeCobro.fechaPago, 32);
       const applicationDate = !isInferred ? (evidencePayload.applicationDate || text(beforeCobro.applicationDate, 32)) : text(beforeCobro.applicationDate, 32);
@@ -851,6 +1020,7 @@ async function reconcileEvidence(authz, data, payload, previewOnly) {
         confidence: plan.confidence
       } : priorInference;
       const shared = {
+        ...qaMark,
         paymentState,
         applicationState,
         directOrInferred,
@@ -913,6 +1083,9 @@ async function reconcileEvidence(authz, data, payload, previewOnly) {
       if (paidDate) receiptPatch.fechaPago = paidDate;
       if (!isInferred && evidencePayload.invoiceNumber) receiptPatch.numeroFactura = evidencePayload.invoiceNumber;
       tx.set(tenantData(authz.tenantId, 'recibosEsperados').doc(receiptId), receiptPatch, { merge: true });
+      if (proposalRequest) beforeAfter.push(
+        {collection:'recibosEsperados',id:receiptId,before:receipt,after:Object.assign({},receipt,receiptPatch)},
+        {collection:'cobros',id:cobroId,before:cobroDoc?beforeCobro:null,after:cobro});
 
       if (state.activePortfolioRows.length === 1) {
         const portfolioPatch = {
@@ -937,8 +1110,12 @@ async function reconcileEvidence(authz, data, payload, previewOnly) {
         if (paidDate) portfolioPatch.fechaPago = paidDate;
         if (applicationDate) portfolioPatch.applicationDate = applicationDate;
         tx.set(state.activePortfolioRows[0].ref, portfolioPatch, { merge: true });
+        if (proposalRequest) beforeAfter.push({collection:'carteraPrimas',id:state.activePortfolioRows[0].id,
+          before:state.activePortfolioRows[0].data(),after:Object.assign({},state.activePortfolioRows[0].data(),portfolioPatch)});
       }
-      results.push({ receiptId, cobroId, installment: target.installment, directOrInferred, paymentState, applicationState });
+      results.push({ receiptId, cobroId, installment: target.installment, directOrInferred, paymentState, applicationState,
+        amount,currency:text(receipt.moneda||policy.moneda,12).toUpperCase(),
+        portfolioId:state.activePortfolioRows.length?state.activePortfolioRows[0].id:'' });
     }
 
     const committed = {
@@ -958,6 +1135,20 @@ async function reconcileEvidence(authz, data, payload, previewOnly) {
       idempotent: true,
       humanApprovalRequired: false
     };
+    if (proposalRequest) {
+      committed.applicationId=proposalRequest.applicationId;
+      committed.proposalId=trustedProposal.proposalId;
+      committed.sourceRunId=trustedProposal.sourceRunId;
+      committed.operation='apply_proposal_application';
+      committed.status='APPLIED_WITH_MANUAL_APPROVAL';
+      committed.approvalMode='MANUAL_AUTHORIZED';
+      tx.set(trustedProposal.applicationRef,{id:proposalRequest.applicationId,status:'APPLIED',tenantId:authz.tenantId,
+        pais:assertPaymentCountryScope(authz,policy),proposalId:trustedProposal.proposalId,sourceRunId:trustedProposal.sourceRunId,
+        scopeAnchor:{tenantId:authz.tenantId,pais:text(policy.pais),asesorId:text(policy.asesorId||policy.advisorId),polizaId:policyId},
+        sourceProposalDigest:trustedProposal.sourceProposalDigest,sourceEvidenceDigest:trustedProposal.sourceEvidenceDigest,
+        planDigest:trustedProposal.planDigest,resolutionId:trustedProposal.resolutionId||null,sourceAmount:trustedProposal.sourceAmount,actor:authz.actor,
+        beforeAfter,result:committed,createdAt:technicalNow,...qaMark},{merge:false});
+    }
     tx.set(eventRef(authz.tenantId, evtId), {
       schemaVersion: VERSION,
       contractVersion: CONTRACT_VERSION,
@@ -972,11 +1163,13 @@ async function reconcileEvidence(authz, data, payload, previewOnly) {
       confidence: plan.confidence,
       payloadDigest: digest(evidencePayload),
       resultDigest: digest(committed),
-      createdAt: technicalNow
+      createdAt: technicalNow,
+      ...qaMark
     }, { merge: false });
-    tx.set(reqRef, { status: 'committed', operation: 'reconcile_evidence', eventId: evtId, payloadDigest: digest(evidencePayload), result: committed, committedAt: technicalNow }, { merge: true });
+    tx.set(reqRef, { status: 'committed', operation: 'reconcile_evidence', eventId: evtId, payloadDigest: digest(evidencePayload), result: committed, committedAt: technicalNow,...qaMark }, { merge: true });
     return committed;
   });
+  return proposalRequest && transactionResult.applicationId ? verifyProposalReadback(authz,transactionResult) : transactionResult;
 }
 
 function unsupportedMutation(operation) {
@@ -995,6 +1188,11 @@ async function executePreview(request) {
   const data = request.data || {}, payload = data.payload || {};
   const targetId = text(payload.receiptId || payload.reciboId || payload.polizaId || payload.policyId || payload.proposalId, 180);
   const op=norm(data.operation).replace(/ /g, '_');
+  // Preview may inspect a real proposal without mutation; the signed command
+  // still enforces membership, module visibility, country and data scope.
+  if(op==='preview_proposal_application')return execute(request,true);
+  if(['resolve_proposal_application','apply_proposal_application'].includes(op)&&syntheticProposalRun(data.tenantId,payload))
+    return execute(request,true);
   if (!['preview_policy','apply_payment','reconcile_payment'].includes(op) || !previewSyntheticId(targetId))
     throw new HttpsError('permission-denied', 'Preview de Cobros solo admite pagos y lectura de fixtures sintéticas autorizadas.');
   if (text(data.tenantId,180)!=='alianzas-soluciones')
@@ -1011,10 +1209,15 @@ async function execute(request, previewOnly = false) {
   const data = request.data || {};
   const operation = norm(data.operation).replace(/ /g, '_');
   if (!OPERATIONS.has(operation)) throw new HttpsError('invalid-argument', 'Operación no soportada.');
+  if (/^propapp_/.test(text(data.requestId,180)) && operation!=='apply_proposal_application')
+    throw new HttpsError('invalid-argument','PROPOSAL_REQUEST_ID_RESERVED');
   const authz = await authorize(request, operation);
   const payload = data.payload && typeof data.payload === 'object' ? data.payload : {};
 
   if (operation === 'preview_policy') return previewPolicy(authz, payload);
+  if (operation === 'preview_proposal_application') return proposalApplication(authz,data,payload,false,previewOnly);
+  if (operation === 'resolve_proposal_application') return resolveProposalApplication(authz,data,payload,previewOnly);
+  if (operation === 'apply_proposal_application') return proposalApplication(authz,data,payload,true,previewOnly);
   if (operation === 'report_advisor_payment') return reportAdvisorPayment(authz, data, payload);
   if (operation === 'apply_payment') return applyPayment(authz, data, payload, 'apply_payment', previewOnly);
   if (operation === 'reconcile_payment') {

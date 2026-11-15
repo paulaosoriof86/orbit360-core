@@ -5,14 +5,19 @@ import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
 import {execFileSync} from 'node:child_process';
+import {createRequire} from 'node:module';
 import {GoogleAuth} from 'google-auth-library';
 
 const SITE='ays-orbit-360-lab',PROJECT=SITE;
-const SOURCE='0153f5cbbe00c3732e11ebae59b32bd357e38bfd';
+const require=createRequire(import.meta.url);
+const operationalGuard=require('./gravicentra-i6-6-operational-release-candidate.cjs');
+const operational=process.env.I66_OPERATIONAL_CANDIDATE==='true'?
+  operationalGuard.candidateForPhase(JSON.parse(fs.readFileSync(operationalGuard.CONTROL,'utf8')),'live'):null;
+const SOURCE=operational?.sourceSha||'0153f5cbbe00c3732e11ebae59b32bd357e38bfd';
 const PREVIEW='https://ays-orbit-360-lab--gi-i66-rc-42868854629-abj14q6n.web.app';
 const CHANNEL='gi-i66-rc-42868854629';
-const PREVIOUS='7e9b2b915535cfcc20285142d57bfb0afcda1057';
-const PREVIOUS_BUILD='gi-i66-7e9b2b915535-57f234755dc1';
+const PREVIOUS=operational?.currentLive.sourceSha||'7e9b2b915535cfcc20285142d57bfb0afcda1057';
+const PREVIOUS_BUILD=operational?.currentLive.buildId||'gi-i66-7e9b2b915535-57f234755dc1';
 const LIVE=['https://ays-orbit-360-lab.web.app','https://app.aysseguros.com'];
 const root=process.env.I66_PACKAGE_ROOT||'',cli=process.env.FIREBASE_CLI_BIN||'';
 const credential=process.env.GOOGLE_APPLICATION_CREDENTIALS||'';
@@ -22,7 +27,8 @@ const digest=b=>crypto.createHash('sha256').update(b).digest('hex');
 const versionIsValid=v=>/^sites\/ays-orbit-360-lab\/versions\/[A-Za-z0-9_-]+$/.test(String(v||''));
 const pause=ms=>new Promise(r=>setTimeout(r,ms));
 const evidence={schema:'I66_FIVE_PRIVILEGED_ROLES_IMMUTABLE_LIVE_TRANSPORT_V1',sourceSha:SOURCE,
-  previewChannel:CHANNEL,artifactId:14013250472,previewFiles:0,liveSiteFiles:0,customSiteFiles:0,
+  previewChannel:CHANNEL,artifactId:operational?.artifactId||14013250472,
+  artifactDigest:operational?.artifactDigest||null,previewFiles:0,liveSiteFiles:0,customSiteFiles:0,
   previousHostingVersion:'',previewHostingVersion:'',liveHostingVersion:'',status:'HOLD',
   realCustomerWrites:0,firestoreRuleOrAuthWrites:0,rollback:'OUTER_FUNCTION_ROLLBACK_GUARD_ACTIVE'};
 async function bytes(origin,rel){
@@ -89,7 +95,7 @@ try{
     'I66_ROLE_SOURCE_OR_PREVIEW_PIN_DRIFT');
   const pkg=JSON.parse(fs.readFileSync(path.join(root,'bundle/site/__recovery__/build.json'),'utf8'));
   need(pkg.gate==='I6.6'&&pkg.product==='Gravicentra Insurance'&&pkg.sourceSha===SOURCE&&
-    /^gi-i66-0153f5cbbe00-/.test(pkg.buildId),'I66_ROLE_IMMUTABLE_BUILD_NOT_CERTIFIED');
+    new RegExp('^gi-i66-'+SOURCE.slice(0,12)+'-').test(pkg.buildId),'I66_ROLE_IMMUTABLE_BUILD_NOT_CERTIFIED');
   const rows=manifestRows();
   evidence.previewFiles=await verify(PREVIEW,rows);
   google=await new GoogleAuth({keyFile:credential,scopes:['https://www.googleapis.com/auth/firebase.hosting']}).getClient();
@@ -99,6 +105,7 @@ try{
   need(beforeSite.sourceSha===PREVIOUS&&beforeCustom.sourceSha===PREVIOUS&&
     beforeSite.buildId===PREVIOUS_BUILD&&beforeCustom.buildId===PREVIOUS_BUILD,
     'I66_ROLE_PREVIOUS_LIVE_SOURCE_CHANGED_BLOCK_PROMOTION');
+  if(operational)need(old===operational.currentLive.hostingVersion,'I66_OPERATIONAL_PREVIOUS_HOSTING_VERSION_CHANGED');
   need(old!==preview,'I66_ROLE_PREVIEW_ALREADY_LIVE');
   evidence.previousHostingVersion=old;evidence.previewHostingVersion=preview;
   need((await getVersion('live'))===old,'I66_ROLE_CONCURRENT_LIVE_RELEASE_CHANGED');

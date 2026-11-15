@@ -11,10 +11,10 @@ let checks=0;
 try{
  const p=dual.plan(source);
  assert.equal(p.region,'us-east1');checks++;
- assert.equal(p.localDependencyClosure.length,9);checks++;
- assert.deepEqual(p.localDependencyClosure.filter(name=>name==='i66-conciliaciones-active-ledger-projection.js'||name==='cobros-ledger-contract.js'),
-   ['cobros-ledger-contract.js','i66-conciliaciones-active-ledger-projection.js']);checks++;
- assert.equal(Object.keys(p.sourceFiles).length,12);checks++;
+ assert.equal(p.localDependencyClosure.length,11);checks++;
+ assert.deepEqual(p.localDependencyClosure.filter(name=>['i66-conciliaciones-active-ledger-projection.js','cobros-ledger-contract.js','proposal-application-boundary.js','payment-inference-engine.js'].includes(name)),
+   ['cobros-ledger-contract.js','i66-conciliaciones-active-ledger-projection.js','payment-inference-engine.js','proposal-application-boundary.js']);checks++;
+ assert.equal(Object.keys(p.sourceFiles).length,14);checks++;
  const before=fs.readFileSync(path.join(source,'bootstrap.js'));
  const staged=path.join(tmp,'staged');
  const d=dual.stage(source,staged);
@@ -44,5 +44,13 @@ try{
  fs.appendFileSync(path.join(unreviewed,'i66-conciliaciones-active-ledger-projection.js'),
    "\nrequire('./not-reviewed');\n");
  assert.throws(()=>dual.plan(unreviewed),/UNREVIEWED_LOCAL_DEPENDENCY/);checks++;
- console.log('I66_DUAL_ISOLATED_READER_PACKAGE_PASS checks='+checks+' one-source twelve-file dual export closed-dependency exact-byte staging');
+ // Keep the allowlist exact: a node builtin used for hashing does not admit
+ // network, filesystem, arbitrary exports, or unreviewed package imports.
+ const badExternal=path.join(tmp,'bad-external');
+ fs.mkdirSync(badExternal);
+ for(const name of dual.FILES.filter(name=>name!=='bootstrap.js'))
+   fs.copyFileSync(path.join(source,name),path.join(badExternal,name));
+ fs.appendFileSync(path.join(badExternal,'proposal-application-boundary.js'),"\nrequire('node:fs');\n");
+ assert.throws(()=>dual.plan(badExternal),/UNREVIEWED_EXTERNAL_DEPENDENCY/);checks++;
+ console.log('I66_DUAL_ISOLATED_READER_PACKAGE_PASS checks='+checks+' one-source fourteen-file dual export closed-dependency exact-byte staging');
 }finally{fs.rmSync(tmp,{recursive:true,force:true});}

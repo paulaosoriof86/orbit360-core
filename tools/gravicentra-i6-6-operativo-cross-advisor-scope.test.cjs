@@ -14,6 +14,7 @@ function scopeDomain(){
     'firebase-functions/v2/https':{HttpsError:class HttpsError extends Error{constructor(code,message){super(message||code);this.code=code;}},onCall:()=>()=>{}},
     './product-active-role-contract':{resolveProductActiveRole:()=>({activeRole:'Operativo'})},
     './goal-participation-contract':{validarCambioParticipacion:()=>null},
+    './advisor-commission-payable-contract':require('../functions/advisor-commission-payable-contract'),
     './b4-003-scoped-bootstrap-reader':{projectInsurerActivity:()=>[]}
   };
   const sandbox={require:name=>{if(!mocks[name])throw Error('Unexpected dependency '+name);return mocks[name];},

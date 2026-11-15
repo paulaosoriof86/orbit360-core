@@ -1832,6 +1832,190 @@
         "realSignedRoleWriteAccepted": false,
         "financeDataWritten": 0
       }
+    },
+    {
+      "id": "I6_6_CONCILIATION_APPROVAL_AND_ADVISOR_CXP_20261115",
+      "approvedByDirection": true,
+      "receipt": "artifacts/orbit360-recovery/release-control/I6_6_OPERATIONAL_CONTINUATION_20261115.json",
+      "sourceStatus": "LOCAL_SOURCE_TESTS_307_PASS_PREVIEW_LIVE_NOT_CERTIFIED",
+      "parentSourceSha": "508601e75350def551e99161af95caebe633b61c",
+      "scope": "Source-bound reconciliation resolution/preview/application; all unresolved edition holds visible without invented binding; exact financial target identity and amount boundary; documented ordinary advisor commission to pending payable; metadata-only advisor changes preserve financial schedule; no actual business writes in source/build gate.",
+      "paths": [
+        {
+          "path": "functions/advisor-commission-payable-contract.js",
+          "gitBlobSha": "b4e7451bca86c00981be426e3f7500c4cf050f4b"
+        },
+        {
+          "path": "functions/cobros-reconciliation-domain.js",
+          "gitBlobSha": "e862b49284e55beed48a91282474ec124e693d2a",
+          "replaces": {
+            "path": "functions/cobros-reconciliation-domain.js",
+            "priorGitBlobSha": "0e4d42737ad8e14a70ccf882533269cd61e95a60",
+            "priorChangeId": "I6_6_OPERATIVE_ADVISOR_PAYMENT_INVOICE_EXPIRY_BATCH_20261113"
+          }
+        },
+        {
+          "path": "functions/i66-conciliaciones-active-ledger-projection.js",
+          "gitBlobSha": "4f134de15e21dc5349211d3a77b99252016be3c0",
+          "replaces": {
+            "path": "functions/i66-conciliaciones-active-ledger-projection.js",
+            "priorGitBlobSha": "4951c7e93f102e475152375997870421f7600b56",
+            "priorChangeId": "I6_6_CONCILIACIONES_HUMAN_CLIENT_NAMES_20261113"
+          }
+        },
+        {
+          "path": "functions/payment-inference-engine.js",
+          "gitBlobSha": "5bebc3d134a129c608125b36da0109dfc52b812f"
+        },
+        {
+          "path": "functions/product-operational-domain.js",
+          "gitBlobSha": "9e0ae0db1a30d1fb94924fd4fc2e9fd27818a561",
+          "replaces": {
+            "path": "functions/product-operational-domain.js",
+            "priorGitBlobSha": "a49d14b71a6b4dd94074d8fba13f00bb9ca69a82",
+            "priorChangeId": "I6_6_OPERATIVO_SUPERIORS_BUSINESS_WRITE_ROLE_PARITY_P0"
+          }
+        },
+        {
+          "path": "functions/proposal-application-boundary.js",
+          "gitBlobSha": "bb707e15ac1af4025930e04481354872d14f7bbe"
+        },
+        {
+          "path": "orbit360-platform/core/cobros-reconciliation-domain-client.js",
+          "gitBlobSha": "ee730bfae6f5dad8e0ccc229575b49ad7e8475c1"
+        },
+        {
+          "path": "orbit360-platform/core/policy-receipts-engine.js",
+          "gitBlobSha": "df46447d133f7c7a6e811a1190521b52069bb574",
+          "replaces": {
+            "path": "orbit360-platform/core/policy-receipts-engine.js",
+            "priorGitBlobSha": "cfb24efa661e31f11e41d8246f8d0c574bcce0a3",
+            "priorChangeId": "I6_6_FORWARD_ONLY_UTC_MONTHLY_CADENCE_WITH_TERM_GUARD"
+          }
+        },
+        {
+          "path": "orbit360-platform/core/policy-receipts-v1199-refinements.js",
+          "gitBlobSha": "5a5c42157b47778bd559738fd693f367d0bce230"
+        },
+        {
+          "path": "orbit360-platform/core/product-runtime-browser-providers-p0.js",
+          "gitBlobSha": "804d541550e2d5e8056f0fc2c7705e029b6d653f",
+          "replaces": {
+            "path": "orbit360-platform/core/product-runtime-browser-providers-p0.js",
+            "priorGitBlobSha": "4a220bafcfd1a4f0b1326673be8b77548539c7c5",
+            "priorChangeId": "I6_6_CARLOS_PAYMENT_SYNTHETIC_PREVIEW_TRANSPORT_AND_LEDGER_P0"
+          }
+        },
+        {
+          "path": "orbit360-platform/core/router.js",
+          "gitBlobSha": "9202937311b58664917e2ee423a56a8f5c052c8a",
+          "replaces": {
+            "path": "orbit360-platform/core/router.js",
+            "priorGitBlobSha": "2b4f347bca3a8f864b398c0d893d831745dbcf9c",
+            "priorChangeId": "I6_6_CARLOS_TRANSVERSAL_OPS_TASKS_ROLE_WRITE_PARITY_P0"
+          }
+        },
+        {
+          "path": "orbit360-platform/data/store-firestore-product-operational-p0.js",
+          "gitBlobSha": "7fe8969a15232ba93e54db86a3b69d7d338dcb60",
+          "replaces": {
+            "path": "orbit360-platform/data/store-firestore-product-operational-p0.js",
+            "priorGitBlobSha": "7214bad37a5d5609397964c3eef55b71a347e004",
+            "priorChangeId": "I6_6_INSURER_LEGACY_CREDENTIAL_SURVIVOR_SAFE_UPDATE_P0"
+          }
+        },
+        {
+          "path": "orbit360-platform/modules/comisiones.js",
+          "gitBlobSha": "5b0b600c350547072e4496bef3a00129ac1516eb"
+        },
+        {
+          "path": "orbit360-platform/modules/conciliaciones.js",
+          "gitBlobSha": "05db10ecf2e4da3ffa3fd263bb828668fc28e482",
+          "replaces": {
+            "path": "orbit360-platform/modules/conciliaciones.js",
+            "priorGitBlobSha": "c0c6ffb403e7121c5bbd087b2a52533805c1fdbb",
+            "priorChangeId": "I6_6_CONCILIACIONES_HUMAN_CLIENT_NAMES_20261113"
+          }
+        },
+        {
+          "path": "orbit360-platform/modules/finanzas.js",
+          "gitBlobSha": "4253d142f1aaf5f5fc44f5f594cec2b21f4aaba7"
+        },
+        {
+          "path": "orbit360-platform/modules/policy-receipts-v1199-bridge.js",
+          "gitBlobSha": "388ab78aaac0d1b55a55612df051021640bd2cd4",
+          "replaces": {
+            "path": "orbit360-platform/modules/policy-receipts-v1199-bridge.js",
+            "priorGitBlobSha": "c01aa549e1b62ae892d225fc584094a1767088e3",
+            "priorChangeId": "I6_6_OPERATIVE_ADVISOR_PAYMENT_INVOICE_EXPIRY_BATCH_20261113"
+          }
+        }
+      ],
+      "tests": [
+        {
+          "path": "tools/gravicentra-i6-6-advisor-payables-signed-uat.test.cjs",
+          "gitBlobSha": "fdb796c0bc567436a52035fcad567b35f9c66e2b"
+        },
+        {
+          "path": "tools/gravicentra-i6-6-advisor-payables.test.cjs",
+          "gitBlobSha": "cdffaa98af58f87d796091474353d6435cc2f308"
+        },
+        {
+          "path": "tools/gravicentra-i6-6-auth-session-write-coherence.test.cjs",
+          "gitBlobSha": "98d8940340f91680baf9dac695604fa2215f021f",
+          "replaces": {
+            "path": "tools/gravicentra-i6-6-auth-session-write-coherence.test.cjs",
+            "priorGitBlobSha": "a52724c81ed84f66bf0989998571c73563582ded",
+            "priorChangeId": "I6_6_SIGNED_AUTH_WRITER_AND_GLOBAL_SEARCH_INDEX_TRANSVERSAL_P0"
+          }
+        },
+        {
+          "path": "tools/gravicentra-i6-6-conciliaciones-active-ledger-projection.test.cjs",
+          "gitBlobSha": "53b1cc32733adfaf59550925586dd573d1afc596",
+          "replaces": {
+            "path": "tools/gravicentra-i6-6-conciliaciones-active-ledger-projection.test.cjs",
+            "priorGitBlobSha": "6a045149287ae54cbfec0223b1cb0739b0a94176",
+            "priorChangeId": "I6_6_CONCILIACIONES_HUMAN_CLIENT_NAMES_20261113"
+          }
+        },
+        {
+          "path": "tools/gravicentra-i6-6-conciliaciones-application-ui.test.cjs",
+          "gitBlobSha": "c0ae0f6e4fcfc75da8c9de4650c1fd745ee673fa"
+        },
+        {
+          "path": "tools/gravicentra-i6-6-inference-bank-exact-amount.test.cjs",
+          "gitBlobSha": "91ab3f317cb02067ab4954ff3e55800060228521"
+        },
+        {
+          "path": "tools/gravicentra-i6-6-operational-release-candidate.test.cjs",
+          "gitBlobSha": "33b284b913ca5c87cae0f740011dec533fb98ce5"
+        },
+        {
+          "path": "tools/gravicentra-i6-6-operativo-cross-advisor-scope.test.cjs",
+          "gitBlobSha": "10654434bf7e020dd43a9d71a7c1cad143c3ddc9",
+          "replaces": {
+            "path": "tools/gravicentra-i6-6-operativo-cross-advisor-scope.test.cjs",
+            "priorGitBlobSha": "21a14c76fbe8ca5861568a9e62bc8d96490f4392",
+            "priorChangeId": "I6_6_CARLOS_POLICY_RENEWABILITY_ONLY_CAS_OPERATIVE_SCOPE_P0"
+          }
+        },
+        {
+          "path": "tools/gravicentra-i6-6-policy-metadata-preservation.test.cjs",
+          "gitBlobSha": "8b0c9f183535edd8831c9fed7b1025fca4c270c8"
+        },
+        {
+          "path": "tools/gravicentra-i6-6-preview-channel-reuse-guard.test.cjs",
+          "gitBlobSha": "28e3ef8a2ff46890e7ff1267b67b85adc547634a"
+        },
+        {
+          "path": "tools/gravicentra-i6-6-proposal-application-boundary.test.cjs",
+          "gitBlobSha": "33041b180c9e1f27f925852900aa1e86726f9e5f"
+        },
+        {
+          "path": "tools/gravicentra-i6-6-proposal-application-signed-uat.test.cjs",
+          "gitBlobSha": "e3a70bd72b7a07b5b670ed1946f68af1065154e2"
+        }
+      ]
     }
   ],
   "i66R11PreviewBuildRequest20261113": {

@@ -25,13 +25,13 @@ Orbit.router = (function () {
     // operational payment owner and is not requested merely for this table.
     conciliaciones: ['conciliaciones', 'conciliacionesPrimas'],
     renovaciones: ['polizas', 'clientes', 'aseguradoras', 'gestiones'],
-    comisiones: ['comisiones', 'polizas', 'clientes'],
+    comisiones: ['comisiones', 'polizas', 'clientes', 'asesores'],
     calidad: ['clientes', 'polizas', 'asesores'],
     historial: ['actividades', 'clientes', 'polizas', 'asesores'],
     equipo: ['asesores','metas'],
     cancelaciones: ['cancelaciones','polizas','clientes'],
     siniestros: ['reclamos','polizas','clientes'],
-    finanzas: ['metas','polizas','clientes','cobros','comisiones']
+    finanzas: ['metas','polizas','clientes','cobros','comisiones','finmovs','asesores','aseguradoras']
   };
   function badgeHtml(estado) { if (!estado) return ''; let hide = false; try { hide = !!(Orbit.tenant && Orbit.tenant.get && Orbit.tenant.get().hideTechnicalBadges); } catch (e) {} if (hide) return ''; const txt = { core: 'NÚCLEO', beta: 'BETA', road: 'PRÓX.' }[estado] || ''; return `<span class="nav-badge ${estado}">${txt}</span>`; }
   function buildSidebar() {

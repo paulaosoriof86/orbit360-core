@@ -3,6 +3,7 @@
 // Never materialize proposals, infer payments, or authorize writes from staging.
 const {validateActiveLedgerContract}=require('./cobros-ledger-contract');
 const {allowRow,Denied}=require('./b4-003-scoped-access-boundary');
+const {applicationIdFor}=require('./proposal-application-boundary');
 
 const clean=value=>String(value??'').trim();
 const SAFE_ID=/^[A-Za-z0-9][A-Za-z0-9._:-]{1,179}$/;
@@ -39,7 +40,7 @@ function projectionRow({proposal,stageId,policy,policyId,client,tenantId,runId,c
    polizaId:policyId,clienteId:clientId,clienteNombre:clientName,polizaNumero:clean(policy.numero),
    monto:amount,moneda:clean(proposal.currency),
    estado:'PROPUESTA',status:'PROPUESTA',fuente:'Libro activo de cobros',
-   motivo:'Propuesta pendiente de validación; aplicación de pagos deshabilitada',
+   motivo:'Verifica la fuente y el recibo exactos antes de aprobar y aplicar',
    proposalIdentity:clean(proposal.sourceRowIdSha256),
    source_ref:{file:'Libro activo',sheet:'Propuestas',
      row:clean(proposal.sourceRowIdSha256).slice(0,12),
@@ -69,8 +70,9 @@ async function readActiveLedgerProposalPage({db,tenant,tenantId,ctx,pageSize,cur
  const numbers=[...new Set(proposals.map(d=>clean((d.data()||{}).policyNumber)).filter(Boolean))];
  if(!numbers.length)throw new Denied('STAGE_PROPOSAL_NUMBER_MISSING');
  // LIVE census: all 1,427 canonical policies use the indexed `numero` field.
- // Exact-equality IN batches cover all 52 unique matches; remaining 80 stage
- // proposals have duplicate policy numbers and are deliberately quarantined.
+ // Exact-equality IN batches retain unique matches AND unresolved editions.
+ // Multiple editions are a selectable HOLD, not an invisible dead end. Scope
+ // is checked before resolving any candidate's client or displaying a row.
  const byNumber=new Map();let matchedDocs=0;
  for(let i=0;i<numbers.length;i+=QUERY_BATCH){
    const selected=numbers.slice(i,i+QUERY_BATCH);
@@ -85,20 +87,25 @@ async function readActiveLedgerProposalPage({db,tenant,tenantId,ctx,pageSize,cur
      byNumber.get(key).push({id:doc.id,row:p});
    }
  }
- const uniquePairs=[];
+ const candidatePairs=[];
  for(const doc of proposals){
    const proposal=doc.data()||{},matches=byNumber.get(clean(proposal.policyNumber))||[];
-   if(matches.length!==1)continue;
-   const policy=matches[0];
-   if(!SAFE_ID.test(policy.id)||!SAFE_ID.test(doc.id))continue;
-   const clientId=clean(policy.row.clienteId||policy.row.clientId);
-   if(!SAFE_ID.test(clientId))continue;
-   uniquePairs.push({proposal,id:doc.id,policy,clientId});
+   if(!SAFE_ID.test(doc.id))continue;
+   const authorized=[];
+   for(const policy of matches){
+     if(!SAFE_ID.test(policy.id)||policy.row.tenantId&&policy.row.tenantId!==tenantId)continue;
+     try{allowRow(ctx,policy.row);}catch(error){if(error instanceof Denied)continue;throw error;}
+     if(clean(policy.row.pais||policy.row.country).toUpperCase()!==ctx.country)continue;
+     const clientId=clean(policy.row.clienteId||policy.row.clientId);
+     if(SAFE_ID.test(clientId))authorized.push({policy,clientId});
+   }
+   if(authorized.length)candidatePairs.push({proposal,id:doc.id,candidates:authorized,multipleEditions:matches.length!==1});
  }
- // Resolve only parents of unambiguous proposals; no client or policy source
- // is trusted solely because a staged row names its number.
+ // A source's number alone never assigns a customer. Only authorized parents
+ // are loaded; HOLD rows redact money and identities until an exact receipt is
+ // linked by the separately authenticated resolution owner.
  const clients=new Map();
- const clientIds=[...new Set(uniquePairs.map(p=>p.clientId))];
+ const clientIds=[...new Set(candidatePairs.flatMap(p=>p.candidates.map(c=>c.clientId)))];
  for(let i=0;i<clientIds.length;i+=20){
    const batch=clientIds.slice(i,i+20);
    const refs=batch.map(id=>items('clientes').doc(id));
@@ -109,25 +116,53 @@ async function readActiveLedgerProposalPage({db,tenant,tenantId,ctx,pageSize,cur
    docs.forEach((d,index)=>clients.set(batch[index],d.exists?d.data()||{}:null));
  }
  const verified=[];
- for(const pair of uniquePairs){
-   const client=clients.get(pair.clientId);
-   if(!client)continue;
+ for(const pair of candidatePairs){
    try{
      if(pair.proposal.sourceLedgerDigest!==manifest.sourceLedgerDigest||
         pair.proposal.packageLogicalSha256!==manifest.packageLogicalSha256)
        throw new Denied('STAGE_PROPOSAL_MANIFEST_MISMATCH');
+     const available=pair.candidates.filter(candidate=>{
+       const client=clients.get(candidate.clientId);return client&&(!client.tenantId||client.tenantId===tenantId);
+     });
+     if(!available.length)continue;
+     const candidate=available[0],client=clients.get(candidate.clientId);
      const row=projectionRow({proposal:pair.proposal,stageId:pair.id,
-       policy:pair.policy.row,policyId:pair.policy.id,client,tenantId,runId,ctx});
+       policy:candidate.policy.row,policyId:candidate.policy.id,client,tenantId,runId,ctx});
+     if(pair.multipleEditions){
+       Object.assign(row,{estado:'REQUIERE_VALIDACION',status:'REQUIERE_VALIDACION',
+         motivo:'Póliza con varias ediciones: vincula el recibo exacto; no se ha seleccionado una edición ni aplicado dinero',
+         requiresReceiptSelection:true,canonicalCandidateCount:available.length,
+         polizaId:'',clienteId:'',clienteNombre:'Cliente por confirmar con el recibo',asesorId:'',monto:null,moneda:''});
+     }
      verified.push(row);
    }catch(error){if(!(error instanceof Denied))throw error;}
  }
  const at=cursor?verified.findIndex(row=>row.canonicalDocumentId===cursor):-1;
  if(cursor&&at<0)throw new Denied('CURSOR_DENIED');
  const rows=verified.slice(at+1,at+1+pageSize);
+ // Application is a separate audited record, never a mutation of staging.
+ // Rehydrate its state so a successfully applied proposal does not return to
+ // "pending review" after reload. Read only this authorized page's records.
+ for(let i=0;i<rows.length;i+=20){
+   const batch=rows.slice(i,i+20);
+   const refs=batch.map(row=>items('reconciliationApplications').doc(applicationIdFor(tenantId,runId,row.canonicalDocumentId)));
+   const docs=typeof db?.getAll==='function'?await db.getAll(...refs):await Promise.all(refs.map(ref=>ref.get()));
+   docs.forEach((doc,index)=>{
+     if(!doc.exists)return;
+     const applied=doc.data()||{},row=batch[index];
+     const original=candidatePairs.find(pair=>pair.id===row.canonicalDocumentId);
+     try{allowRow(ctx,applied.scopeAnchor||{});}catch(error){if(error instanceof Denied)return;throw error;}
+     if(applied.status==='APPLIED'&&applied.tenantId===tenantId&&applied.sourceRunId===runId&&
+        applied.proposalId===row.canonicalDocumentId&&original&&applied.sourceProposalDigest===original.proposal.payloadDigest){
+       row.estado='APLICADA';row.status='APLICADA';row.applicationStatus='APPLIED';
+       row.applicationId=doc.id;row.motivo='Aplicada mediante evidencia y recibo verificados; registro auditado independiente del libro de origen';
+     }
+   });
+ }
  const more=verified.length>at+1+pageSize;
  return {ok:true,serverScoped:true,collection:'conciliaciones',country:ctx.country,scope:ctx.scope,
    rows,nextCursor:more?rows[rows.length-1].canonicalDocumentId:null,
-   anchoring:'active_ledger_exact_unique_policy_number_verified_canonical_country_advisor_readonly'};
+   anchoring:'active_ledger_authorized_unique_or_explicit_edition_hold_verified_canonical_scope_readonly'};
 }
 
 module.exports={readActiveLedgerProposalPage,projectionRow};

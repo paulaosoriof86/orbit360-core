@@ -67,7 +67,13 @@
   function reconcileEvidence(policyId,evidence,options){options=options||{};const payload=Object.assign({policyId},evidence||{},options.payload||{});return command('reconcile_evidence',{payload,reason:options.reason||options.motivo||'Conciliación inferencial de evidencia',requestId:options.requestId});}
   function enrichApplication(receiptId,options){options=options||{};return applyPayment(receiptId,{payload:Object.assign({},options.payload||{},{sourceType:options.sourceType||'insurer_invoice'}),reason:options.reason||'Aplicación de aseguradora'});}
   function confirmProposal(proposalId,options){options=options||{};return command('confirm_application',{payload:Object.assign({proposalId},options.payload||{}),reason:options.reason||options.motivo||'Conciliación confirmada por usuario autorizado'});}
+  function previewProposalApplication(proposalId,sourceRunId){return command('preview_proposal_application',{payload:{proposalId,sourceRunId},reason:'Verificación de fuente y recibo sin escrituras'});}
+  function resolveProposalApplication(proposalId,sourceRunId,binding){binding=binding||{};return command('resolve_proposal_application',{
+    payload:{proposalId,sourceRunId,policyId:binding.policyId,receiptId:binding.receiptId,evidenceType:binding.evidenceType,
+      evidenceAsOfDate:binding.evidenceAsOfDate,paidDate:binding.paidDate||'',sourceAttestation:binding.sourceAttestation===true},
+    reason:binding.reason||'Vinculación expresa de fuente y recibo por usuario autorizado; sin aplicar pagos'});}
+  function applyProposalApplication(proposalId,sourceRunId,planDigest){return command('apply_proposal_application',{payload:{proposalId,sourceRunId,planDigest},reason:'Aprobación y aplicación de conciliación con evidencia server-side'});}
   function holdProposal(proposalId,motivo,accionRequerida){return command('hold_proposal',{payload:{proposalId,accionRequerida},reason:motivo});}
   function status(){return Object.freeze({version:VERSION,functionName:functionName(),tenantId:tenantId(),activeRole:activeRole(),region:region(),productContextReady:productContextReady(),enabled:enabled(),available:available(),transport:'firebase-functions-modular'});}
-  Orbit.reconciliationDomain=Object.freeze({VERSION,enabled,available,classifyPaymentOrigin,command,previewPolicy,applyPayment,reportClientPayment,reportAdvisorPayment,reconcilePayment,reconcileEvidence,enrichApplication,confirmProposal,holdProposal,status});
+  Orbit.reconciliationDomain=Object.freeze({VERSION,enabled,available,classifyPaymentOrigin,command,previewPolicy,previewProposalApplication,resolveProposalApplication,applyProposalApplication,applyPayment,reportClientPayment,reportAdvisorPayment,reconcilePayment,reconcileEvidence,enrichApplication,confirmProposal,holdProposal,status});
 })();

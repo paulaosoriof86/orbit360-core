@@ -7,11 +7,14 @@ const crypto=require('node:crypto');
 const single=require('./gravicentra-b4-003-isolated-reader-package.cjs');
 const ENTRYPOINT="'use strict';\nconst r=require('./b4-003-scoped-policy-callable');\nmodule.exports={orbit360ScopedPolicyReadPreview:r.orbit360ScopedPolicyReadPreview,orbit360ScopedPolicyRead:r.orbit360ScopedPolicyRead};\n";
 // The B4-003 packaging contract remains historically pinned. I6.6 explicitly
-// owns the two later reviewed, read-only ledger dependencies.
+// owns the reviewed read-only ledger dependencies, including the pure
+// application identity helper. The helper imports inference planning only;
+// neither module exports or reaches a Firestore writer from this entrypoint.
 const MODULES=Object.freeze([...single.MODULES,
-  'i66-conciliaciones-active-ledger-projection.js','cobros-ledger-contract.js']);
+  'i66-conciliaciones-active-ledger-projection.js','cobros-ledger-contract.js',
+  'proposal-application-boundary.js','payment-inference-engine.js']);
 const FILES=Object.freeze(['bootstrap.js','package.json','package-lock.json',...MODULES]);
-const EXTERNAL=new Set(['firebase-admin/app','firebase-admin/firestore','firebase-functions/v2/https']);
+const EXTERNAL=new Set(['firebase-admin/app','firebase-admin/firestore','firebase-functions/v2/https','node:crypto']);
 const sha=b=>crypto.createHash('sha256').update(b).digest('hex');
 function closedDependencyGraph(source){
   const pkg=JSON.parse(fs.readFileSync(path.join(source,'package.json'),'utf8'));

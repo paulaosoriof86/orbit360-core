@@ -3,6 +3,16 @@
   "controlPlaneId": "GRAVICENTRA-INSURANCE-FASE-A",
   "status": "PRODUCTION_ACCEPTED",
   "productBrand": "Gravicentra Insurance",
+  "i66OperationalContinuation20261115": {
+    "status": "EXECUTING_SOURCE_QA_NOT_NEW_LIVE_ACCEPTANCE",
+    "canonicalPlan": "artifacts/orbit360-recovery/release-control/I6_6_OPERATIONAL_CONTINUATION_20261115.json",
+    "activeGate": "I6.6",
+    "closedHistoricalGate": "B4-007",
+    "latestProvenLiveSource": "84769378eb2014addebfefdbdd63091bddc4b817",
+    "currentWork": "Conciliation resolution/approval/application and October advisor pending payables, same artifact release after signed Preview; no blind payment or new backend.",
+    "newFinancialWrites": 0,
+    "newLiveAcceptanceClaimed": false
+  },
   "b4003ActiveCertificationCursor20261106": {
     "schema": "GRAVICENTRA_B4_003_SINGLE_ACTIVE_CERTIFICATION_CURSOR_V1",
     "asOfLocal": "2026-11-06",

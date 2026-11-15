@@ -121,8 +121,13 @@ function planEvidence(input) {
   const policy = input.policy || {}, evidence = input.evidence || {}, config = input.reconciliationConfig || {};
   const type = evidenceKind(evidence.evidenceType || evidence.type || evidence.sourceType);
   if (!type) return review('EVIDENCE_TYPE_UNSUPPORTED');
-  if (config.autoCommitHighConfidence !== true) return review('TENANT_HIGH_CONFIDENCE_AUTO_COMMIT_NOT_ENABLED');
-  if (config.humanConfirmationRequiredForHighConfidence === true || config.humanConfirmationRequired === true) return review('TENANT_CONFIG_REQUIRES_HUMAN_CONFIRMATION');
+  // Only the server-owned proposal command supplies this separate trusted
+  // context. A browser evidence payload can never self-approve an inference.
+  const manualApproval = input.humanApproval && input.humanApproval.authorized === true &&
+    !!text(input.humanApproval.reference,500);
+  if (manualApproval && config.manualApplicationEnabled === false) return review('PROPOSAL_MANUAL_APPLICATION_DISABLED');
+  if (!manualApproval && config.autoCommitHighConfidence !== true) return review('TENANT_HIGH_CONFIDENCE_AUTO_COMMIT_NOT_ENABLED');
+  if (!manualApproval && (config.humanConfirmationRequiredForHighConfidence === true || config.humanConfirmationRequired === true)) return review('TENANT_CONFIG_REQUIRES_HUMAN_CONFIRMATION');
 
   const rows = sortedReceipts(input.receipts);
   if (!rows.length) return review('NO_ACTIVE_NUMBERED_RECEIPTS');
@@ -233,10 +238,37 @@ function planEvidence(input) {
   if (evidence.uniqueMatch === false) return review('MATCH_NOT_UNIQUE');
   if (evidence.conflictingEvidence === true || evidence.partialPayment === true || evidence.reversal === true) return review('EVIDENCE_CONTRADICTION');
 
+  // A bank match proves only the exact amount/currency allocated to its receipt.
+  // A policy or installment match alone must never settle a different amount.
+  // Commission statements may express the commission, not the premium; keep
+  // their independent inference semantics unchanged.
+  if (type === 'BANK_STATEMENT_MATCH') {
+    const rawAmount = evidence.amount != null ? evidence.amount : evidence.monto;
+    const bankAmount = rawAmount == null || rawAmount === '' ? NaN : Number(rawAmount);
+    if (!Number.isFinite(bankAmount) || bankAmount <= 0) return review('BANK_AMOUNT_REQUIRED');
+    const bankCents = Math.round(bankAmount * 100);
+    if (Math.abs(bankAmount * 100 - bankCents) > 1e-6) return review('BANK_AMOUNT_PRECISION_INVALID');
+    let expectedAmount = null;
+    for (const key of ['monto', 'montoTotal', 'primaTotal', 'saldo']) {
+      if (anchorReceipt[key] == null || anchorReceipt[key] === '') continue;
+      const candidate = Number(anchorReceipt[key]);
+      if (Number.isFinite(candidate) && candidate > 0) { expectedAmount = candidate; break; }
+    }
+    if (expectedAmount == null) return review('BANK_RECEIPT_AMOUNT_REQUIRED');
+    if (Math.abs(expectedAmount * 100 - Math.round(expectedAmount * 100)) > 1e-6 ||
+        bankCents !== Math.round(expectedAmount * 100)) return review('BANK_AMOUNT_RECEIPT_MISMATCH');
+    const bankCurrency = text(evidence.currency || evidence.moneda, 12).toUpperCase();
+    const receiptCurrency = text(anchorReceipt.moneda || anchorReceipt.currency || policy.moneda, 12).toUpperCase();
+    if (!bankCurrency || !receiptCurrency) return review('BANK_CURRENCY_REQUIRED');
+    if (bankCurrency !== receiptCurrency || (policyCurrency && receiptCurrency !== policyCurrency))
+      return review('BANK_RECEIPT_CURRENCY_MISMATCH');
+  }
+
   return {
     ok: true,
-    status: targets.length ? 'AUTO_COMMIT' : 'NOOP_ALREADY_SATISFIED',
+    status: targets.length ? (manualApproval ? 'MANUAL_AUTHORIZED' : 'AUTO_COMMIT') : 'NOOP_ALREADY_SATISFIED',
     autoCommit: true,
+    approvalMode: manualApproval ? 'MANUAL_AUTHORIZED' : 'AUTO_HIGH_CONFIDENCE',
     confidence: 'HIGH',
     humanReviewRequired: false,
     writes: 0,

@@ -9,6 +9,7 @@ const {readActiveLedgerProposalPage}=require('../functions/i66-conciliaciones-ac
 const {readScopedRelatedList}=require('../functions/b4-003-scoped-related-reader');
 const {Denied}=require('../functions/b4-003-scoped-access-boundary');
 const contract=require('../functions/cobros-ledger-contract');
+const {applicationIdFor}=require('../functions/proposal-application-boundary');
 const tenantId='synthetic-tenant',runId='cobledger_'+'a'.repeat(28),sha='a'.repeat(64),sha2='b'.repeat(64);
 const pointer={id:'active',schemaVersion:contract.POINTER_SCHEMA,status:'ACTIVE',activeRunId:runId,
  sourceLedgerCount:contract.SOURCE_LEDGER_COUNT,sourceLedgerDigest:contract.SOURCE_LEDGER_DIGEST,
@@ -84,12 +85,17 @@ const denied=(fn,code)=>assert.rejects(fn,error=>error instanceof Denied&&error.
    p.sourceRowIdSha256=crypto.createHash('sha256').update(id).digest('hex');
  });
  const gt=await direct();const co=await direct('CO');
- assert.equal(gt.rows.length,26);assert.equal(co.rows.length,26);
- assert.equal(gt.rows.length+co.rows.length,52,'ONLY_UNIQUE_52_PRESENT');
- assert.ok(gt.rows.every(x=>x.pais==='GT'&&x.readOnly===true&&x.applicationPermitted===false&&
+ assert.equal(gt.rows.length,106);assert.equal(co.rows.length,106);
+ const uniqueGt=gt.rows.filter(row=>!row.requiresReceiptSelection),uniqueCo=co.rows.filter(row=>!row.requiresReceiptSelection);
+ assert.equal(uniqueGt.length+uniqueCo.length,52,'ORIGINAL_UNIQUE_52_PRESERVED');
+ assert.ok(uniqueGt.every(x=>x.pais==='GT'&&x.readOnly===true&&x.applicationPermitted===false&&
   x.polizaId&&x.clienteId&&x.clienteNombre.startsWith('Cliente verificado ')&&
   x.proposalIdentity&&x.source_ref.row_hash===x.proposalIdentity));
- assert.equal(new Set(gt.rows.map(x=>x.proposalIdentity)).size,26);
+ assert.equal(new Set(gt.rows.map(x=>x.proposalIdentity)).size,106);
+ const holds=gt.rows.filter(row=>row.requiresReceiptSelection);
+ assert.equal(holds.length,80,'ALL_AUTHORIZED_EDITION_HOLDS_VISIBLE');
+ assert.ok(holds.every(row=>row.estado==='REQUIERE_VALIDACION'&&row.monto===null&&row.moneda===''&&row.polizaId===''&&row.clienteId===''&&row.canonicalCandidateCount===1));
+ assert.ok(!JSON.stringify(holds).includes('ambig_b_'),'NO_FOREIGN_CANDIDATE_IDS_EXPOSED');
  const clientStore={all:name=>name==='conciliaciones'?gt.rows.concat(co.rows):[],
    _productStatus:()=>({serverConfirmedCollections:['conciliaciones','conciliacionesPrimas'],
      deniedCollections:[],snapshotErrors:{}})};
@@ -99,10 +105,10 @@ const denied=(fn,code)=>assert.rejects(fn,error=>error instanceof Denied&&error.
  const uiSource=fs.readFileSync(path.resolve(__dirname,'../orbit360-platform/modules/conciliaciones.js'),'utf8');
  vm.runInNewContext(uiSource,browser);
  assert.equal(browser.Orbit.cobrosConciliacionReadOnly.proposalReadiness(),'ready');
- assert.equal(browser.Orbit.cobrosConciliacionReadOnly.proposalRows().length,52,'UI_NOT_TO_COLLAPSE_UNIQUE_PROPOSALS');
+ assert.equal(browser.Orbit.cobrosConciliacionReadOnly.proposalRows().length,132,'UI_ALL_132_PROPOSALS_ACCESSIBLE_WITHOUT_DUPLICATES');
  const host={innerHTML:'',querySelectorAll:()=>[]};
  browser.Orbit.modules.conciliaciones.render(host);
- assert.equal((host.innerHTML.match(/data-conc-id=/g)||[]).length,52,'UI_RENDER_52_PROPOSALS');
+ assert.equal((host.innerHTML.match(/data-conc-id=/g)||[]).length,132,'UI_RENDER_52_UNIQUE_AND_80_ACTIONABLE_HOLDS');
  assert.ok(host.innerHTML.includes('Libro activo')&&host.innerHTML.includes('Propuestas de conciliación'));
  assert.ok(host.innerHTML.includes('Cliente verificado 0'),'CANONICAL_CLIENT_NAME_SHOWN');
  assert.ok(!host.innerHTML.includes('client_0')&&!host.innerHTML.includes('fila aaaaaaaaa'),
@@ -110,26 +116,41 @@ const denied=(fn,code)=>assert.rejects(fn,error=>error instanceof Denied&&error.
  assert.ok(host.innerHTML.includes('Coincidencia probable')&&host.innerHTML.includes('Pendiente de revisión'),
    'BUSINESS_LABELS_INSTEAD_OF_STATUS_CODES');
  assert.ok(co.rows.every(x=>x.pais==='CO'));
- assert.ok(!gt.rows.some(x=>x.polizaNumero.startsWith('DUP_')),'AMBIGUOUS_80_QUARANTINED');
- assert.ok(!co.rows.some(x=>x.polizaNumero.startsWith('DUP_')));
- const own=await direct('GT','own');assert.equal(own.rows.length,13);
+ assert.equal(gt.rows.filter(x=>x.polizaNumero.startsWith('DUP_')).length,80);
+ assert.equal(co.rows.filter(x=>x.polizaNumero.startsWith('DUP_')).length,80);
+ const own=await direct('GT','own');assert.equal(own.rows.length,93);
+ const foreignOwner=await direct('CO','own');assert.equal(foreignOwner.rows.length,13,'HOLDS_WITH_NO_AUTHORIZED_CANDIDATE_NOT_EXPOSED');
  const first=await direct('GT','all',10);assert.equal(first.rows.length,10);
  assert.ok(first.nextCursor);
  const second=await direct('GT','all',10,first.nextCursor);
  assert.equal(second.rows.length,10);
  assert.equal(new Set([...first.rows,...second.rows].map(x=>x.canonicalDocumentId)).size,20);
- await denied(()=>direct('GT','all',10,'proposal_130'),'CURSOR_DENIED');
- const fromReader=await integrated('Dirección','GT');assert.equal(fromReader.rows.length,26);
+ await denied(()=>direct('GT','all',10,'proposal_030'),'CURSOR_DENIED');
+ const fromReader=await integrated('Dirección','GT');assert.equal(fromReader.rows.length,106);
  await denied(()=>integrated('Operativo','GT'),'MODULE_DENIED');
  await denied(()=>integrated('Asesor','GT'),'MODULE_DENIED');
  const stage=stores.stage.proposal_000;
  stage.sourceLedgerDigest='wrong';
- const reduced=await direct();assert.equal(reduced.rows.length,25,'INVALID_SOURCE_DIGEST_QUARANTINED');
+ const reduced=await direct();assert.equal(reduced.rows.length,105,'INVALID_SOURCE_DIGEST_QUARANTINED');
  stage.sourceLedgerDigest=contract.SOURCE_LEDGER_DIGEST;
  const original=manifest.status;manifest.status='DRAFT';
  await denied(()=>direct(),'STAGE_ACTIVE_MANIFEST_INVALID');manifest.status=original;
+ // Application state is durable outside the immutable stage and survives a
+ // fresh projection/reload only when the exact source digest matches.
+ const applicationId=applicationIdFor(tenantId,runId,'proposal_000');
+ stores.reconciliationApplications={[applicationId]:{id:applicationId,status:'APPLIED',tenantId,
+   sourceRunId:runId,proposalId:'proposal_000',sourceProposalDigest:stores.stage.proposal_000.payloadDigest,
+   scopeAnchor:{tenantId,pais:'GT',asesorId:'advisor_a'}}};
+ const appliedView=await direct();
+ const appliedRow=appliedView.rows.find(row=>row.id==='proposal_000');
+ assert.equal(appliedRow.estado,'APLICADA');assert.equal(appliedRow.applicationId,applicationId);
+ assert.equal(stores.stage.proposal_000.status,'PROPOSED','STAGE_NOT_MUTATED_BY_APPLICATION_PROJECTION');
+ stores.reconciliationApplications[applicationId].sourceProposalDigest='wrong';
+ const mismatchedView=await direct();
+ assert.equal(mismatchedView.rows.find(row=>row.id==='proposal_000').estado,'PROPUESTA',
+   'APPLICATION_RECORD_CANNOT_OVERRIDE_ANOTHER_SOURCE_DIGEST');
  assert.ok(counters.policyIndexed>0&&counters.policyFullScan===0,'INDEXED_NO_FULL_CATALOG_SCAN');
  assert.ok(counters.clientBatchRead>0,'BATCHED_CANONICAL_CLIENT_READS');
  assert.equal(counters.writes,0);
- console.log('I66_CONCILIACIONES_STAGE_PROJECTION_PASS unique_52_of_132 ui_52_rendered ambiguous_80_hold role_country_advisor_paging_manifest_guard indexed_number_batches no_scan writes_0');
+ console.log('I66_CONCILIACIONES_STAGE_PROJECTION_PASS unique_52_preserved ui_132_rendered authorized_80_actionable_holds sensitive_fields_redacted foreign_scope_denied role_country_advisor_paging_manifest_guard indexed_number_batches application_state_reload_exact_source no_scan writes_0');
 })().catch(error=>{console.error(error);process.exitCode=1;});

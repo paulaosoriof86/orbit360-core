@@ -32,6 +32,17 @@
       if(region!=='us-central1')return 'I66_PREVIEW_REGION_DENIED';
       var paymentOp=String(data&&data.operation||'');
       var paymentPayload=data&&data.payload;
+      if(String(data&&data.tenantId||'')!=='alianzas-soluciones'||!paymentPayload||typeof paymentPayload!=='object')
+        return 'I66_PREVIEW_MUTATION_CALLABLE_DENIED';
+      var proposalId=String(paymentPayload.proposalId||''),proposalRun=String(paymentPayload.sourceRunId||'');
+      if(paymentOp==='preview_proposal_application'){
+        return /^[A-Za-z0-9][A-Za-z0-9._:-]{1,179}$/.test(proposalId)&&
+          /^(?:cobledger_[a-f0-9]{28}|cobledgerqa_[a-z0-9_]{12,80})$/.test(proposalRun)?'':'I66_PREVIEW_MUTATION_CALLABLE_DENIED';
+      }
+      if(['resolve_proposal_application','apply_proposal_application'].includes(paymentOp)){
+        return /^b3005qa_i66_proposal_[a-z0-9_]{12,100}$/.test(proposalId)&&
+          /^cobledgerqa_[a-z0-9_]{12,80}$/.test(proposalRun)?'':'I66_PREVIEW_MUTATION_CALLABLE_DENIED';
+      }
       var paymentId=String(paymentPayload&&(paymentPayload.receiptId||paymentPayload.reciboId||paymentPayload.polizaId||paymentPayload.policyId)||'');
       if(String(data&&data.tenantId||'')!=='alianzas-soluciones'||
          !['preview_policy','apply_payment','reconcile_payment'].includes(paymentOp)||

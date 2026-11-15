@@ -41,6 +41,7 @@ Orbit.modules = Orbit.modules || {};
     vigencia_invalida: 'La fecha final debe ser posterior a la inicial.', prima_neta_requerida: 'La prima neta debe ser mayor que cero.',
     cuotas_requeridas: 'La cantidad de recibos no es válida.', motivo_requerido: 'Explica el motivo del cambio.',
     renovabilidad_sin_cambios: 'La renovabilidad ya tiene ese valor. No se modificó la póliza.',
+    poliza_sin_cambios: 'No se detectaron cambios para guardar. La póliza y sus recibos se conservaron.',
     permiso_poliza_denegado: 'Tu rol activo no puede modificar pólizas.', permiso_cobro_denegado: 'Tu rol activo no puede aplicar cobros.',
     reporte_cliente_requiere_validacion: 'Valida primero el pago reportado por el cliente.', poliza_sin_cartera_activa: 'La póliza no tiene cartera activa.',
     pagos_existentes_requieren_endoso: 'La póliza tiene pagos aplicados. Los cambios financieros o de asignación requieren un endoso/gestión controlada.',
@@ -319,14 +320,21 @@ Orbit.modules = Orbit.modules || {};
       };
     }
     function preview() {
-      const prepared = E.preparePolicy(raw(), existing || null, 'preview'), recs = E.expectedReceipts(prepared), active = E.isActiveState(prepared.estado);
+      const preserve=!!existing&&(!nonRenewalBaseline||metadataOnlyPatch()!==null);
+      const prepared=preserve?existing:E.preparePolicy(raw(),existing||null,'preview');
+      const recs=preserve?(S().where('recibosEsperados',r=>r.polizaId===existing.id&&String(r.estado||'').toLowerCase()!=='anulado')||[]):E.expectedReceipts(prepared);
+      const active=E.isActiveState(prepared.estado);
       const preview=$('[data-preview]');
-      preview.innerHTML = `<div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start"><div><small class="muted">Resultado antes de guardar</small><b style="display:block">${active ? recs.length + ' recibo(s) en cartera' : 'Histórico · sin cartera nueva'}</b></div><b>${money(prepared.moneda, prepared.primaTotal)}</b></div><div class="asg197-info-grid" style="margin-top:10px"><div><small>Prima neta</small><b>${money(prepared.moneda, prepared.primaNeta)}</b></div><div><small>Gastos financieros</small><b>${money(prepared.moneda, prepared.gastosFinan)}</b></div><div><small>IVA</small><b>${money(prepared.moneda, prepared.ivaMonto)}</b></div><div><small>Total</small><b>${money(prepared.moneda, prepared.primaTotal)}</b></div></div>`;
-      if(active&&recs.length)preview.insertAdjacentHTML('beforeend','<div style="margin-top:12px"><div style="font-weight:800;font-size:14px;margin-bottom:7px">🧾 Calendario que quedará guardado</div><div style="max-height:190px;overflow:auto;border:1px solid var(--line);border-radius:10px"><table class="tbl"><thead><tr><th>Recibo</th><th>Vence</th><th class="num">Monto</th></tr></thead><tbody>'+recs.map((r,i)=>'<tr><td>'+(i+1)+'</td><td>'+esc(r.fechaLimite||r.vence||r.fechaVencimiento||'—')+'</td><td class="num">'+esc(money(prepared.moneda,r.montoTotal!=null?r.montoTotal:r.monto))+'</td></tr>').join('')+'</tbody></table></div></div>');
+      const total=prepared.primaTotal!=null?prepared.primaTotal:prepared.prima;
+      const amount=value=>preserve&&value==null?'No desglosado en el registro':money(prepared.moneda,value);
+      preview.innerHTML = `<div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start"><div><small class="muted">${preserve?'Valores existentes · sin recálculo por asesor o renovabilidad':'Resultado antes de guardar'}</small><b style="display:block">${active ? recs.length + ' recibo(s) '+(preserve?'existente(s) cargado(s)':'en cartera') : 'Histórico · sin cartera nueva'}</b></div><b>${amount(total)}</b></div><div class="asg197-info-grid" style="margin-top:10px"><div><small>Prima neta</small><b>${amount(prepared.primaNeta)}</b></div><div><small>Gastos financieros</small><b>${amount(prepared.gastosFinan)}</b></div><div><small>IVA</small><b>${amount(prepared.ivaMonto)}</b></div><div><small>Total</small><b>${amount(total)}</b></div></div>`;
+      $('[data-save]').textContent=preserve?'Guardar sin recalcular recibos':existing?'Guardar y sincronizar recibos':'Crear póliza y recibos';
+      if(active&&recs.length)preview.insertAdjacentHTML('beforeend','<div style="margin-top:12px"><div style="font-weight:800;font-size:14px;margin-bottom:7px">🧾 '+(preserve?'Calendario existente que se conserva':'Calendario que quedará guardado')+'</div><div style="max-height:190px;overflow:auto;border:1px solid var(--line);border-radius:10px"><table class="tbl"><thead><tr><th>Recibo</th><th>Vence</th><th class="num">Monto</th></tr></thead><tbody>'+recs.map((r,i)=>'<tr><td>'+(i+1)+'</td><td>'+esc(r.fechaLimite||r.vence||r.fechaVencimiento||'—')+'</td><td class="num">'+esc(money(prepared.moneda,r.montoTotal!=null?r.montoTotal:r.monto))+'</td></tr>').join('')+'</tbody></table></div></div>');
+      if(preserve&&!recs.length)preview.insertAdjacentHTML('beforeend','<p class="cfg-note">No hay recibos cargados en esta vista. Esta edición conserva el plan existente: no crea, elimina ni recalcula recibos.</p>');
     }
     clientEl.addEventListener('change', () => { refreshCountry(); resetNewCommissions(); }); ramoEl.addEventListener('change', () => refreshProducts('', false));
     [insurerEl, ramoEl, productEl].forEach(el => el.addEventListener('change', () => resetNewCommissions('insurer')));
-    advisorEl.addEventListener('change', () => resetNewCommissions('seller'));
+    advisorEl.addEventListener('change', () => { resetNewCommissions('seller'); if(existing)preview(); });
     $('[data-start]').addEventListener('change', () => { if (!$('[data-end]').value) $('[data-end]').value = plusYear($('[data-start]').value); preview(); });
     $('[data-frequency]').addEventListener('change', syncInstallments);
     b.querySelectorAll('input,select').forEach(el => el.addEventListener('input', preview));
@@ -353,6 +361,16 @@ Orbit.modules = Orbit.modules || {};
         return item.el.isConnected && item.el.value === item.value;
       });
     }
+    function metadataOnlyPatch(){
+      if(!existing||!nonRenewalBaseline)return null;
+      if(!nonRenewalBaseline.every(item=>item.el.isConnected&&
+          (item.el.matches('[data-advisor]')||item.el.value===item.value)))return null;
+      const patch={},selectedAdvisor=advisorEl.value||initialAdvisorId;
+      if(selectedAdvisor!==initialAdvisorId)patch.asesorId=selectedAdvisor;
+      const renewal=$('[data-renewable]').value==='yes'?true:$('[data-renewable]').value==='no'?false:null;
+      if((renewal===true?'YES':renewal===false?'NO':'UNKNOWN')!==renewabilityState(existing))patch.renovable=renewal;
+      return patch;
+    }
     $('[data-save]').addEventListener('click', async () => {
       const save = $('[data-save]'), payload = raw(), reason = existing ? $('[data-reason]').value.trim() : 'Alta operativa desde plataforma';
       const err = $('[data-error]'), originalText = save.textContent;
@@ -375,6 +393,7 @@ Orbit.modules = Orbit.modules || {};
       const renewableNow=payload.renovable===true?'YES':payload.renovable===false?'NO':'UNKNOWN';
       const otherFieldsSame=!!existing&&otherPolicyFieldsUnchanged();
       const renewabilityOnly=otherFieldsSame&&renewableNow!==renewabilityState(existing);
+      const metadataPatch=metadataOnlyPatch(),metadataOnly=!!metadataPatch&&Object.prototype.hasOwnProperty.call(metadataPatch,'asesorId');
       if(otherFieldsSame&&!renewabilityOnly){
         err.style.display='';err.textContent='No se detectaron otros cambios. Selecciona un valor distinto en Renovabilidad para registrar su actualización.';return;
       }
@@ -382,7 +401,7 @@ Orbit.modules = Orbit.modules || {};
       save.disabled = true; save.textContent = 'Guardando…';
       try {
         const result = existing
-          ? await E.updatePolicy(existing.id,renewabilityOnly?{renovable:payload.renovable}:payload,{motivo:reason})
+          ? await E.updatePolicy(existing.id,metadataOnly?metadataPatch:(renewabilityOnly?{renovable:payload.renovable}:payload),{motivo:reason})
           : await E.createPolicy(payload,{motivo:reason});
         if (!result.ok) {
           err.style.display='';err.textContent=errorText(result.errors);
@@ -397,7 +416,7 @@ Orbit.modules = Orbit.modules || {};
           }
           save.disabled=false;save.textContent=originalText;return;
         }
-        err.style.display = 'none'; b.remove(); toast(renewabilityOnly ? 'Renovabilidad actualizada y auditada; cartera y recibos preservados' : existing ? 'Póliza actualizada; recibos y vehículo confirmados' : 'Póliza creada; recibos y vehículo confirmados');
+        err.style.display = 'none'; b.remove(); toast(metadataOnly ? 'Responsable actualizado y auditado; importes, cartera y recibos preservados' : renewabilityOnly ? 'Renovabilidad actualizada y auditada; cartera y recibos preservados' : existing ? 'Póliza actualizada; recibos y vehículo confirmados' : 'Póliza creada; recibos y vehículo confirmados');
         location.hash = '#/cliente360?c=' + encodeURIComponent(result.policy.clienteId) + '&t=polizas';
       } catch (error) {
         err.style.display = ''; err.textContent = 'No fue posible confirmar el guardado. Revisa y reintenta.';
@@ -409,7 +428,7 @@ Orbit.modules = Orbit.modules || {};
     // Snapshot after default normalization: classify only user-originated form changes.
     nonRenewalBaseline=existing?Array.from(b.querySelectorAll('input,select'))
       .filter(el=>!el.matches('[data-client-search],[data-country],[data-renewable]'))
-      .map(el=>({el,value:el.value})):null;
+      .map(el=>({el,value:el.matches('[data-advisor]')?initialAdvisorId:el.value})):null;
   }
 
   function openVehicleForm(vehicleId) {
