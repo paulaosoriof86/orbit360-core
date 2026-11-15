@@ -59,6 +59,86 @@ test('proof refuses different source artifact missing driver or incomplete resto
 });
 module.exports={fixture};
 
+function continuationFixture(phase='build'){
+  const fs=require('node:fs');
+  const control=JSON.parse(fs.readFileSync('artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json','utf8'));
+  const state=JSON.parse(fs.readFileSync('orbit360-platform/docs/recovery/orbit360-recovery-state-v1.json','utf8'));
+  const transport=JSON.parse(fs.readFileSync(g.CONTROL,'utf8'));
+  const old=transport.currentExactHostingRelease;
+  control.currentExecutionDecisionPointer='i66R11RenewalDriveExactLiveRelease20261113';
+  control.i66OperationalContinuation20261115={status:'EXECUTING_SOURCE_QA_NOT_NEW_LIVE_ACCEPTANCE',canonicalPlan:'artifacts/orbit360-recovery/release-control/I6_6_OPERATIONAL_CONTINUATION_20261115.json',activeGate:'I6.6',closedHistoricalGate:'B4-007',latestProvenLiveSource:old.sourceSha,newFinancialWrites:0,newLiveAcceptanceClaimed:false};
+  state.currentExecutionDecisionPointer='artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json#i66R11RenewalDriveExactLiveRelease20261113';
+  state.currentOperationalWorkPointer='artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json#i66OperationalContinuation20261115';
+  if(phase==='build'||phase==='locked'){
+    Object.assign(transport,{status:phase==='build'?'PREVIEW_BUILD_REQUESTED':'R11_RENEWAL_DRIVE_EXACT_LIVE_ACCEPTED_LOCKED',livePromotionAuthorized:false,previewApproved:false,forbidBackendFunctionDeploy:true,forbidBackendLiveFunctionDeploy:true,noHostingPromotion:true,forbidFirestoreRulesDataAuthWrites:true,backendFunctionPreviewOnly:false});
+    delete transport.operationalReleaseCandidate;
+    transport.previewChannelReuseAuthorization={status:'CURRENT_LIVE_BACKED_SINGLE_PREVIEW_REUSE_AUTHORIZED',approvedByDirection:true,authorizedChannelId:g.CHANNEL,expectedPreviewUrl:g.PREVIEW,noLiveChanges:true,noBusinessDataWrites:true,noChannelDeletion:true,stopOnIdentityDrift:true,expectedSourceSha:old.sourceSha,expectedHostingVersion:old.liveHostingVersion,recoverableBuildRunId:old.previewRunId,recoverableArtifactId:old.artifactId,recoverableArtifactDigest:old.artifactDigest};
+  }else{
+    Object.assign(transport,fixture(phase),{currentExactHostingRelease:old});
+    transport.operationalReleaseCandidate.currentLive={sourceSha:old.sourceSha,buildId:old.buildId,artifactId:old.artifactId,artifactDigest:old.artifactDigest,buildRunId:old.previewRunId,liveRunId:old.liveCloneRunId,hostingVersion:old.liveHostingVersion};
+  }
+  return {control,state,transport};
+}
+function runHistoricalPreflight({control,state,transport},mutateFile){
+  const fs=require('node:fs'),vm=require('node:vm');
+  const source=fs.readFileSync('tools/gravicentra-governance-preflight-v1.mjs','utf8').split('const activeGuard=')[0].replace(/^import .*;\n/gm,'');
+  const replacements={'artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json':control,'orbit360-platform/docs/recovery/orbit360-recovery-state-v1.json':state,[g.CONTROL]:transport};
+  const readFileSync=(p,encoding)=>{
+    if(Object.hasOwn(replacements,p))return JSON.stringify(replacements[p]);
+    const text=fs.readFileSync(p,encoding);
+    return mutateFile?mutateFile(p,text):text;
+  };
+  vm.runInNewContext(source,{JSON,fs:{readFileSync,existsSync:fs.existsSync},process:{argv:['node','preflight','--mode=i6'],execPath:process.execPath},operationalRelease:g,spawnSync(){throw Error('PREFLIGHT_TEST_UNEXPECTED_PROCESS');}},{filename:'governance-preflight-authority-test.mjs'});
+}
+test('historical R11 acceptance remains valid and locked without any successor request',()=>{
+  const f=continuationFixture('locked');delete f.control.i66OperationalContinuation20261115;delete f.state.currentOperationalWorkPointer;
+  assert.equal(g.continuationForPreflight(f.control,f.state,f.transport),null);runHistoricalPreflight(f);
+});
+for(const phase of ['build','preview','live'])test('R11 stays authoritative during closed operational '+phase+' phase',()=>{
+  const f=continuationFixture(phase),before=clone(f);
+  assert.equal(g.continuationForPreflight(f.control,f.state,f.transport),phase);runHistoricalPreflight(f);assert.deepEqual(f,before);
+});
+test('successor build cannot relabel acceptance or allow deployment/data writes',()=>{
+  const changes=[
+    f=>f.control.currentExecutionDecisionPointer='i66OperationalContinuation20261115',
+    f=>f.state.currentExecutionDecisionPointer=f.state.currentOperationalWorkPointer,
+    f=>delete f.state.currentOperationalWorkPointer,
+    f=>delete f.control.i66OperationalContinuation20261115,
+    f=>f.control.i66OperationalContinuation20261115.newLiveAcceptanceClaimed=true,
+    f=>f.control.i66OperationalContinuation20261115.newFinancialWrites=1,
+    f=>f.control.i66OperationalContinuation20261115.latestProvenLiveSource='0'.repeat(40),
+    f=>f.transport.status='UNREVIEWED_PHASE',
+    f=>f.transport.previewChannelReuseAuthorization.approvedByDirection=false,
+    f=>f.transport.previewChannelReuseAuthorization.noBusinessDataWrites=false,
+    f=>f.transport.previewChannelReuseAuthorization.expectedSourceSha='0'.repeat(40),
+    f=>f.transport.livePromotionAuthorized=true,
+    f=>f.transport.forbidBackendFunctionDeploy=false,
+    f=>f.transport.forbidBackendLiveFunctionDeploy=false,
+    f=>f.transport.forbidFirestoreRulesDataAuthWrites=false,
+    f=>f.transport.noHostingPromotion=false,
+    f=>f.transport.backendFunctionPreviewOnly=true,
+    f=>f.transport.operationalReleaseCandidate=fixture().operationalReleaseCandidate
+  ];
+  for(const change of changes){const f=continuationFixture();change(f);assert.throws(()=>runHistoricalPreflight(f));}
+});
+test('successor Preview and LIVE preflight retain existing candidate and signed-QA guards',()=>{
+  for(const phase of ['preview','live'])for(const [label,change] of mutations){const f=continuationFixture(phase);if(phase==='live'&&label==='preview may promote')f.transport.livePromotionAuthorized=false;else change(f.transport);assert.throws(()=>runHistoricalPreflight(f));}
+  const f=continuationFixture('live');delete f.transport.operationalReleaseCandidate.previewQa;assert.throws(()=>runHistoricalPreflight(f));
+});
+test('an authorized successor never suppresses previous R11 source receipt or readback drift',()=>{
+  const changes=[
+    f=>f.state.currentLiveSuccessorAcceptance.sourceSha='0'.repeat(40),
+    f=>f.control.i66R11RenewalDriveExactLiveRelease20261113.artifactDigest='sha256:'+'0'.repeat(64),
+    f=>f.transport.i66R11RenewalDriveExactLiveCompleted20261113.hostingVersion='sites/ays-orbit-360-lab/versions/wrong'
+  ];
+  for(const phase of ['build','preview','live']){
+    for(const change of changes){const f=continuationFixture(phase);change(f);assert.throws(()=>runHistoricalPreflight(f),/I6_6_EXACT_LIVE_RELEASE_POINTER_OR_READER_AUTHORIZATION_DRIFT/);}
+    for(const mutation of [r=>r.realFinancialWrites=1,r=>r.sameFiles.preview=222,r=>r.fullI66ProductionAccepted=true]){
+      assert.throws(()=>runHistoricalPreflight(continuationFixture(phase),(file,text)=>{if(file.endsWith('I6_6_R11_RENEWAL_DRIVE_EXACT_LIVE_RECEIPT_20261113.json')){const r=JSON.parse(text);mutation(r);return JSON.stringify(r);}return text;}),/I6_6_EXACT_LIVE_RELEASE_POINTER_OR_READER_AUTHORIZATION_DRIFT/);
+    }
+  }
+});
+
 test('signed focused reports must prove same source, restored synthetic scope and no actual payments',()=>{
   const p=fixture().operationalReleaseCandidate;
   const a={sourceSha:p.sourceSha,phase:'PREVIEW',status:'PASS',cleanup:{status:'PASS',remaining:0},checks:[{status:'PASS'}],realCustomerWritesRequested:0,bankMovements:0,financialPayments:0,authOrMembershipMutations:0};

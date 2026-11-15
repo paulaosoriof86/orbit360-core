@@ -108,6 +108,34 @@ function candidateForPhase(control,phase) {
   }
   return p;
 }
+function continuationForPreflight(control,state,transport) {
+  if(transport.status==='R11_RENEWAL_DRIVE_EXACT_LIVE_ACCEPTED_LOCKED')return null;
+  const phases={PREVIEW_BUILD_REQUESTED:'build',OPERATIONAL_BACKEND_PREVIEW_AUTHORIZED:'preview',OPERATIONAL_EXACT_LIVE_PROMOTION_AUTHORIZED:'live'};
+  const phase=phases[transport.status];
+  assert.ok(phase,'I66_OPERATIONAL_PREFLIGHT_PHASE_NOT_AUTHORIZED');
+  const work=control.i66OperationalContinuation20261115;
+  assert.ok(work,'I66_OPERATIONAL_PREFLIGHT_CONTINUATION_REQUIRED');
+  assert.equal(work.status,'EXECUTING_SOURCE_QA_NOT_NEW_LIVE_ACCEPTANCE');
+  assert.equal(work.canonicalPlan,'artifacts/orbit360-recovery/release-control/I6_6_OPERATIONAL_CONTINUATION_20261115.json');
+  assert.equal(work.activeGate,'I6.6');assert.equal(work.closedHistoricalGate,'B4-007');
+  assert.equal(work.latestProvenLiveSource,transport.currentExactHostingRelease?.sourceSha);
+  assert.equal(work.newFinancialWrites,0);assert.equal(work.newLiveAcceptanceClaimed,false);
+  assert.equal(state.currentOperationalWorkPointer,'artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json#i66OperationalContinuation20261115');
+  // Historical acceptance and current work must remain separate even while
+  // Preview/production transport is explicitly authorized for a successor.
+  assert.equal(control.currentExecutionDecisionPointer,'i66R11RenewalDriveExactLiveRelease20261113');
+  assert.equal(state.currentExecutionDecisionPointer,'artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json#i66R11RenewalDriveExactLiveRelease20261113');
+  if(phase==='build'){
+    require('./gravicentra-i6-6-preview-channel-reuse-guard.cjs').validateAuthorization(transport);
+    assert.equal(transport.backendFunctionPreviewOnly,false);
+    assert.equal(transport.operationalReleaseCandidate,undefined,'I66_OPERATIONAL_BUILD_MUST_NOT_REUSE_PRIOR_CANDIDATE');
+  }else{
+    // Same validators used by the protected workflow before artifact download,
+    // signed QA and exact promotion. Preflight itself grants no deployment.
+    candidateForPhase(transport,phase);
+  }
+  return phase;
+}
 function validateArtifact(p,run,artifact) {
   assert.equal(run.id,p.buildRunId);assert.equal(run.conclusion,'success');
   assert.equal(run.head_sha,p.sourceSha);assert.equal(run.path,BUILD_WORKFLOW);
@@ -192,5 +220,5 @@ async function main(){
   fs.appendFileSync(process.env.GITHUB_ENV,Object.entries(envFor(p)).map(([k,v])=>k+'='+v).join('\n')+'\n');
   console.log('I66_OPERATIONAL_'+phase.toUpperCase()+'_SOURCE_ARTIFACT_AUTHORITY_PASS');
 }
-module.exports={CONTROL,PREVIEW,CHANNEL,TARGETS,DRIVERS,PROPOSAL_QA_ISOLATION,ADVISOR_QA_ISOLATION,PINNED_OWNER_PATHS,candidateForPhase,validateArtifact,validatePreviewQa,validateProof,validateFocusedReports,focusedReportsFromDisk,envFor};
+module.exports={CONTROL,PREVIEW,CHANNEL,TARGETS,DRIVERS,PROPOSAL_QA_ISOLATION,ADVISOR_QA_ISOLATION,PINNED_OWNER_PATHS,candidateForPhase,continuationForPreflight,validateArtifact,validatePreviewQa,validateProof,validateFocusedReports,focusedReportsFromDisk,envFor};
 if(require.main===module)main().catch(error=>{console.error(String(error.message||error));process.exitCode=1;});

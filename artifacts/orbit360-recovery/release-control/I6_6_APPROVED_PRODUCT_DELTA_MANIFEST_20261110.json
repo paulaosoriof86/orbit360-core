@@ -1837,7 +1837,7 @@
       "id": "I6_6_CONCILIATION_APPROVAL_AND_ADVISOR_CXP_20261115",
       "approvedByDirection": true,
       "receipt": "artifacts/orbit360-recovery/release-control/I6_6_OPERATIONAL_CONTINUATION_20261115.json",
-      "sourceStatus": "LOCAL_SOURCE_TESTS_307_PASS_PREVIEW_LIVE_NOT_CERTIFIED",
+      "sourceStatus": "LOCAL_SOURCE_TESTS_PASS_PREVIEW_LIVE_NOT_CERTIFIED",
       "parentSourceSha": "508601e75350def551e99161af95caebe633b61c",
       "scope": "Source-bound reconciliation resolution/preview/application; all unresolved edition holds visible without invented binding; exact financial target identity and amount boundary; documented ordinary advisor commission to pending payable; metadata-only advisor changes preserve financial schedule; no actual business writes in source/build gate.",
       "paths": [
@@ -1988,7 +1988,7 @@
         },
         {
           "path": "tools/gravicentra-i6-6-operational-release-candidate.test.cjs",
-          "gitBlobSha": "33b284b913ca5c87cae0f740011dec533fb98ce5"
+          "gitBlobSha": "739c5fb2c3eb2919f45c228b0db416a97caa846b"
         },
         {
           "path": "tools/gravicentra-i6-6-operativo-cross-advisor-scope.test.cjs",

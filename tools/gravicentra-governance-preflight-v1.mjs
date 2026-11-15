@@ -1,5 +1,6 @@
 import fs from 'node:fs';
 import {spawnSync} from 'node:child_process';
+import operationalRelease from './gravicentra-i6-6-operational-release-candidate.cjs';
 
 const allowedModes=new Set(['governance','i2','i3','i4a','i4b','i5','i6','certified']);
 const arg=process.argv.find(x=>x.startsWith('--mode='));
@@ -68,6 +69,10 @@ if(i66Active){
     const r10=JSON.parse(fs.readFileSync('artifacts/orbit360-recovery/release-control/I6_6_CONCILIACIONES_HUMAN_NAMES_R10_LIVE_RECEIPT_20261113.json','utf8'));
     const r11=JSON.parse(fs.readFileSync('artifacts/orbit360-recovery/release-control/I6_6_R11_RENEWAL_DRIVE_EXACT_LIVE_RECEIPT_20261113.json','utf8'));
     const state=JSON.parse(fs.readFileSync('orbit360-platform/docs/recovery/orbit360-recovery-state-v1.json','utf8'));
+    // A pending successor is work authority, never a replacement for the last
+    // accepted LIVE receipt. Retain every R11 identity/readback assertion below;
+    // only its transport phase may advance through the existing closed guards.
+    const successorPhase=operationalRelease.continuationForPreflight(control,state,transport);
     const current=state.currentLiveSuccessorAcceptance||{};
     const prior=transport.previousExactHostingReleaseR10||{};
     const confirmed=transport.i66R11RenewalDriveExactLiveCompleted20261113||{};
@@ -113,11 +118,11 @@ if(i66Active){
        r10.sourceSha!=='851d68441b819eac6dd37ec1d5d15fb971e35bf2'||
        r10.hostingVersion!=='sites/ays-orbit-360-lab/versions/23037b2a726a8def'||
        r10Release?.status!=='PREVIOUS_R10_CONCILIACIONES_HUMAN_NAMES_EXACT_LIVE_PRESERVED'||
-       transport.status!=='R11_RENEWAL_DRIVE_EXACT_LIVE_ACCEPTED_LOCKED'||
+       (!successorPhase&&(transport.status!=='R11_RENEWAL_DRIVE_EXACT_LIVE_ACCEPTED_LOCKED'||
        transport.livePromotionAuthorized!==false||transport.previewApproved!==false||
        transport.forbidBackendFunctionDeploy!==true||
        transport.forbidBackendLiveFunctionDeploy!==true||
-       transport.noHostingPromotion!==true||
+       transport.noHostingPromotion!==true))||
        transport.forbidFirestoreRulesDataAuthWrites!==true||
        r11Release.financialActualWrites!==0||
        current.currentR11RenewalDriveSignedLiveReceipt!==r11Release.receipt||
