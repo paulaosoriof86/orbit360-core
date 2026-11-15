@@ -55,7 +55,13 @@ function validateChannels(control, inventory) {
   assert.equal(targets.length, 1, 'I66_REUSE_EXACT_PREVIEW_NOT_UNIQUE');
   assert.equal(live.length, 1, 'I66_REUSE_LIVE_NOT_UNIQUE');
   for (const row of [targets[0], live[0]]) {
-    assert.equal(String(row.release?.version?.name || ''), a.expectedHostingVersion,
+    // Firebase may return the same version with its exact project-qualified
+    // resource name. Strip only this project's literal prefix, never arbitrary
+    // project/site segments or just the final version ID.
+    const name = String(row.release?.version?.name || '');
+    const projectPrefix = 'projects/' + SITE + '/';
+    const version = name.startsWith(projectPrefix) ? name.slice(projectPrefix.length) : name;
+    assert.equal(version, a.expectedHostingVersion,
       'I66_REUSE_CURRENT_PREVIEW_OR_LIVE_VERSION_CHANGED_STOP');
   }
   assert.ok(String(targets[0].createTime || '').startsWith('2026-11-10T'),

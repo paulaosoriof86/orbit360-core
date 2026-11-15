@@ -46,6 +46,38 @@ test('current R11 exact Preview/LIVE backup is recoverable without R10 hardcode'
   assert.equal(validateChannels(f.control, f.inventory).expectedSourceSha, f.proofs.previewBuild.sourceSha);
   assert.equal(validateRecoverableArtifact(f.control, f.proofs).recoverableArtifactId, 14075022275);
 });
+test('accepts the exact project-qualified Firebase API version observed in the build', () => {
+  const f = fixture();
+  for (const row of f.inventory.result) row.release.version.name = 'projects/ays-orbit-360-lab/sites/ays-orbit-360-lab/versions/0766db29b338befc';
+  assert.equal(validateChannels(f.control, f.inventory).expectedHostingVersion, 'sites/ays-orbit-360-lab/versions/0766db29b338befc');
+});
+test('short and project-qualified resource names identify the same exact version on either channel', () => {
+  for (const index of [0, 1]) {
+    const f = fixture();
+    f.inventory.result[index].release.version.name = 'projects/ays-orbit-360-lab/' + f.control.currentExactHostingRelease.liveHostingVersion;
+    const rows = f.inventory.result.map(row => ({ ...row, name: 'projects/ays-orbit-360-lab/sites/ays-orbit-360-lab/channels/' + row.channelId, channelId: undefined }));
+    assert.doesNotThrow(() => validateChannels(f.control, { result: { channels: rows } }));
+  }
+});
+test('normalization cannot accept another project, site, version or malformed resource', () => {
+  const invalid = [
+    'projects/another-project/sites/ays-orbit-360-lab/versions/0766db29b338befc',
+    'projects/ays-orbit-360-lab-other/sites/ays-orbit-360-lab/versions/0766db29b338befc',
+    'projects/ays-orbit-360-lab/sites/another-site/versions/0766db29b338befc',
+    'sites/another-site/versions/0766db29b338befc',
+    'projects/ays-orbit-360-lab/sites/ays-orbit-360-lab/versions/different-version',
+    'sites/ays-orbit-360-lab/versions/different-version',
+    'projects/ays-orbit-360-lab/projects/ays-orbit-360-lab/sites/ays-orbit-360-lab/versions/0766db29b338befc',
+    '/projects/ays-orbit-360-lab/sites/ays-orbit-360-lab/versions/0766db29b338befc',
+    'projects/ays-orbit-360-lab/sites/ays-orbit-360-lab/versions/0766db29b338befc/',
+    'projects/ays-orbit-360-lab/sites/ays-orbit-360-lab/versions/0766db29b338befc?alternate=true',
+    '0766db29b338befc', ''
+  ];
+  for (const name of invalid) for (const index of [0, 1]) {
+    const f = fixture();f.inventory.result[index].release.version.name = name;
+    assert.throws(() => validateChannels(f.control, f.inventory), /I66_REUSE_CURRENT_PREVIEW_OR_LIVE_VERSION_CHANGED_STOP/);
+  }
+});
 for (const flag of ['forbidBackendFunctionDeploy', 'forbidBackendLiveFunctionDeploy', 'noHostingPromotion', 'forbidFirestoreRulesDataAuthWrites']) {
   test('rejects weakened scope ' + flag, () => { const f = fixture(); f.control[flag] = false; assert.throws(() => validateAuthorization(f.control)); });
 }

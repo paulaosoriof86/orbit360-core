@@ -73,6 +73,16 @@
     {"id":"PHASEB-FINANCE-01","state":"QUEUED_WITH_NECESSARY_COMMISSION_CXP_EXCEPTION_ACTIVE","scope":"Broader company Finance after operational prerequisites; immediate advisor CxP is explicitly authorized and does not claim entire Finance complete."},
     {"id":"MKT-INFORMES-INTELIGENCIA","state":"QA_DESIGN_ONLY_CANONICAL_HANDOFF_PENDING","scope":"Within Marketing only; AYS-TECH-HO-MKT-RPT-GI-001 and candidateays.mkt.report.v1 must be validated by technology authority. No productive deployment authority inferred from this operational release."}
   ],
+  "remainingFrozenPostproduction": {
+    "sourcePlan": "artifacts/orbit360-recovery/release-control/I6_POSTSALIDA_PLAN_LOCK_20260914.json",
+    "sourceAddendum": "artifacts/orbit360-recovery/release-control/FASE_A_POSTSALIDA_I6_ADDENDUM_20260914.md",
+    "authorityRemainsControlPlane": true,
+    "I6_7": "Full commission-company receivable/advisor payable reconciliation, configured commission or net-premium basis, canonical cross-module calculation, and advisor-only visibility. The urgent October CxP scope does not certify all I6.7.",
+    "I6_8": "History provenance/filter/reload; basic Academy routes for CRM and insurer directory by role; verified user/module enablement; company Finance only within tested operational scope.",
+    "I6_9": "Final same-artifact module-role-viewport and user lifecycle matrix, relationships, financial inference, errors, exact production readback, rollback and certified distribution payload for Firebase/HostDime. Never replace the current accepted release with an unproven source pointer.",
+    "phaseBSource": "artifacts/orbit360-recovery/release-control/PHASE_B_WORK_PLAN_LOCK_20260917.json",
+    "phaseBEntry": "I6.9 / FASE_A_POSTSALIDA_PRODUCTION_ACCEPTED; no additional Phase B execution inferred from the urgent commission exception."
+  },
   "executionRules": [
     "Do not restart I0-I5 or claim old source tests as new production progress.",
     "During active operation, a newly reported blocking issue interrupts the appropriate lane, receives a causal regression test and returns to this same gate.",
