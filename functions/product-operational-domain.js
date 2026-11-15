@@ -9,6 +9,7 @@ const { resolveProductActiveRole } = require('./product-active-role-contract');
 const { validarCambioParticipacion } = require('./goal-participation-contract');
 const { projectInsurerActivity } = require('./b4-003-scoped-bootstrap-reader');
 const advisorPayables = require('./advisor-commission-payable-contract');
+const advisorAssignment = require('./advisor-assignment-correction-contract');
 
 const REGION = process.env.ORBIT360_FUNCTIONS_REGION || 'us-central1';
 const PREVIEW_REGION = 'us-east1';
@@ -490,18 +491,24 @@ function normalizeMutation(raw, allowMetaFixtureRemove = false) {
     throw new HttpsError('failed-precondition','La liquidación de asesor requiere su comando semántico, no una escritura genérica.');
   if(collection==='comisiones'&&(['liquidada','liquidado','pagada','pagado'].includes(norm(payload?.estado))||payload?.pagada===true))
     throw new HttpsError('failed-precondition','Una comisión no se marca liquidada mediante cambio de etiqueta. Requiere pago documentado al asesor.');
-  // CAS is opt-in solely for classification-only policy updates; it cannot
-  // be used to bypass a module's existing role/country authorization.
+  // Sparse classification/assignment changes bind their original values.
+  // This does not bypass role/country checks or the paid-policy lock.
   let expectedBefore;
   if(mutation.expectedBefore!==undefined){
     const e=mutation.expectedBefore;
+    const metadataKeys=Object.keys(payload||{}).filter(key=>key!=='__syntheticQa');
+    const syntheticMetadata=!Object.prototype.hasOwnProperty.call(payload||{},'__syntheticQa')||
+      (payload.__syntheticQa===true&&/^(?:b3004qa|b4003qa)_/.test(id));
     if(collection!=='polizas'||action!=='update'||!payload||
-       Object.keys(payload).length!==1||!Object.prototype.hasOwnProperty.call(payload,'renovable')||
-       !e||typeof e!=='object'||Array.isArray(e)||Object.keys(e).length!==1||
-       !Object.prototype.hasOwnProperty.call(e,'renovable')||
-       (e.renovable!==null&&typeof e.renovable!=='boolean'&&typeof e.renovable!=='string')||
-       (typeof e.renovable==='string'&&e.renovable.length>80))
-      throw new HttpsError('invalid-argument','Precondición de renovabilidad inválida.');
+       !metadataKeys.length||!syntheticMetadata||metadataKeys.some(k=>!['renovable','asesorId'].includes(k))||
+       !e||typeof e!=='object'||Array.isArray(e)||!Object.keys(e).length||
+       Object.keys(e).some(k=>!metadataKeys.includes(k))||
+       metadataKeys.some(k=>!Object.prototype.hasOwnProperty.call(e,k))||
+       (Object.prototype.hasOwnProperty.call(e,'renovable')&&e.renovable!==null&&typeof e.renovable!=='boolean'&&typeof e.renovable!=='string')||
+       (typeof e.renovable==='string'&&e.renovable.length>80)||
+       (Object.prototype.hasOwnProperty.call(e,'asesorId')&&(typeof e.asesorId!=='string'||e.asesorId.length>256)))
+      throw new HttpsError('invalid-argument',Object.prototype.hasOwnProperty.call(e||{},'asesorId')?
+        'Precondición de asesor de póliza inválida.':'Precondición de renovabilidad inválida.');
     expectedBefore=stable(e);
   }
   let auditReason;
@@ -565,8 +572,116 @@ function mutationPayloadMatches(actual,payload){
   return Object.keys(payload).filter(key=>!ignore.has(key)).every(key=>JSON.stringify(stable(actual[key]))===JSON.stringify(stable(payload[key])));
 }
 
+// Read linked history using canonical policy/client relationships, including
+// the previously supported English aliases. Do not infer absence from the
+// browser projection, and do not scan unrelated tenant portfolios.
+async function assignmentRelatedRows(tx,tenantId,collection,spec){
+  const base=db.collection('tenants').doc(tenantId).collection('data').doc(collection).collection('items');
+  const ids=spec.policyIds,queries=[];
+  for(const key of ['polizaId','policyId'])queries.push(base.where(key,ids.length===1?'==':'in',ids.length===1?ids[0]:ids));
+  if(spec.clientId)for(const key of ['clienteId','clientId'])queries.push(base.where(key,'==',spec.clientId));
+  const snaps=await Promise.all(queries.map(query=>tx.get(query))),byId=new Map();
+  for(const snap of snaps)for(const doc of snap.docs){
+    const row=JSON.parse(JSON.stringify(doc.data()||{}));
+    if(row.tenantId&&row.tenantId!==tenantId)throw new HttpsError('permission-denied','La historia relacionada contiene otro tenant.');
+    // Bind both storage identity and stored payload identity without rewriting
+    // legacy records whose embedded ID differs from their canonical path.
+    byId.set(doc.id,Object.assign({},row,{id:doc.id,__assignmentStoredId:row.id??null}));
+  }
+  return [...byId.values()].sort((a,b)=>a.id.localeCompare(b.id));
+}
+function correctionCanonicalRow(snap,label){
+  if(!snap.exists)throw new HttpsError('not-found',label+' no encontrado.');
+  const row=JSON.parse(JSON.stringify(snap.data()||{}));
+  if(row.id&&row.id!==snap.id)throw new HttpsError('failed-precondition',label+' requiere resolver su identidad canónica.');
+  return Object.assign({},row,{id:snap.id});
+}
+async function readAssignmentContext(tx,tenantId,spec,actor,previewOnly){
+  const refs=[canonicalRef(tenantId,'clientes',spec.clientId),
+    ...spec.policyIds.map(id=>canonicalRef(tenantId,'polizas',id)),
+    canonicalRef(tenantId,'asesores',spec.targetAdvisorId)];
+  const snaps=await Promise.all(refs.map(ref=>tx.get(ref)));
+  const client=correctionCanonicalRow(snaps[0],'Cliente'),
+    policies=snaps.slice(1,-1).map(snap=>correctionCanonicalRow(snap,'Póliza')),
+    targetAdvisor=correctionCanonicalRow(snaps[snaps.length-1],'Asesor');
+  for(const [collection,row] of [['clientes',client],...policies.map(row=>['polizas',row]),['asesores',targetAdvisor]]){
+    if(!moduleVisibleForWrite(actor.member,actor.accessConfig,actor.activeRole,COLLECTION_MODULE[collection])||
+       !withinScope(actor,collection,COLLECTION_MODULE[collection],row))
+      throw new HttpsError('permission-denied','El alcance activo no autoriza los registros de la corrección.');
+    if(previewOnly&&(row.__syntheticQa!==true||!/^b4003qa_[A-Za-z0-9._:-]+$/.test(row.id)))
+      throw new HttpsError('permission-denied','La corrección Preview solo admite registros canónicos sintéticos.');
+    if(collection==='polizas'||(collection==='clientes'&&spec.updateClient)){
+      if(!withinScope(actor,collection,COLLECTION_MODULE[collection],Object.assign({},row,{asesorId:spec.targetAdvisorId})))
+        throw new HttpsError('permission-denied','El asesor destino queda fuera del alcance autorizado.');
+    }
+  }
+  const histories=await Promise.all(advisorAssignment.PRESERVED_COLLECTIONS.map(async collection=>
+    [collection,await assignmentRelatedRows(tx,tenantId,collection,spec)]));
+  const preservedRows=Object.fromEntries(histories);
+  if(previewOnly&&histories.some(([,rows])=>rows.some(row=>row.__syntheticQa!==true||!/^b4003qa_[A-Za-z0-9._:-]+$/.test(row.id))))
+    throw new HttpsError('permission-denied','La historia Preview debe pertenecer íntegramente al fixture sintético.');
+  return{tenantId,actor,scopeAuthorized:true,client,policies,targetAdvisor,preservedRows};
+}
+function assignmentContractError(error){
+  if(error instanceof HttpsError)return error;
+  const denied=/DIRECTION|SCOPE|TENANT|COUNTRY_DENIED/.test(error?.code||'');
+  return new HttpsError(denied?'permission-denied':'failed-precondition',error?.message||'Corrección no confirmada.',{reason:error?.code||'CORRECTION_INVALID'});
+}
+async function executeAdvisorAssignmentCorrection(request,previewOnly){
+  const input=request.data||{};
+  if(Object.keys(input).some(key=>!['tenantId','activeRole','requestId','advisorAssignmentCorrection'].includes(key)))
+    throw new HttpsError('invalid-argument','La corrección de asesor no admite otras operaciones en el mismo lote.');
+  const tenantId=cleanId(input.tenantId,'tenantId');let spec;
+  try{spec=advisorAssignment.normalizeSpec(input.advisorAssignmentCorrection);}catch(error){throw assignmentContractError(error);}
+  if(previewOnly&&[spec.clientId,spec.targetAdvisorId,...spec.policyIds].some(id=>!/^b4003qa_[A-Za-z0-9._:-]+$/.test(id)))
+    throw new HttpsError('permission-denied','La corrección Preview requiere identidades sintéticas explícitas.');
+  const actor=await authorize(request,tenantId,[{collection:'polizas'},...(spec.updateClient?[{collection:'clientes'}]:[])]);
+  if(norm(actor.activeRole)!=='direccion')throw new HttpsError('permission-denied','La corrección documentada de asesor requiere Dirección.');
+  const inputDigest=digest({tenantId,actorUid:actor.uid,previewOnly,spec}),
+    requestId=cleanId(input.requestId||'advcorr_'+sha(inputDigest).slice(0,40),'requestId'),
+    reqRef=requestRef(tenantId,requestId),eventId='opevt_'+sha(tenantId+'|'+requestId).slice(0,28);
+  let result;
+  try{
+    result=await db.runTransaction(async tx=>{
+      const prior=await tx.get(reqRef),stored=prior.exists?prior.data():null;
+      if(stored&&(stored.schemaVersion!==advisorAssignment.SCHEMA||stored.actorUid!==actor.uid||stored.payloadDigest!==inputDigest||stored.previewIsolated!==previewOnly))
+        throw new HttpsError('already-exists','El requestId corresponde a otra corrección, actor o ambiente.');
+      const context=await readAssignmentContext(tx,tenantId,spec,actor,previewOnly);
+      if(stored){
+        if(stored.status!=='committed'||!stored.result?.committed)throw new HttpsError('failed-precondition','El recibo de corrección no acredita una confirmación.');
+        advisorAssignment.verifyReadback(stored.result,context);
+        return Object.assign({},stored.result,{reused:true});
+      }
+      const plan=advisorAssignment.buildPlan(spec,context);
+      const receipt=Object.assign({ok:true,requestId,eventId,previewIsolated:previewOnly},plan);
+      if(spec.operation==='preview')return receipt;
+      for(const change of plan.changes)
+        tx.set(canonicalRef(tenantId,change.collection,change.id),change.patch,{merge:true});
+      const committed=Object.assign({},receipt,{readOnly:false,committed:true});
+      tx.set(eventRef(tenantId,eventId),{schemaVersion:advisorAssignment.SCHEMA,tenantId,eventId,requestId,actorUid:actor.uid,
+        activeRole:actor.activeRole,action:'correct_advisor_assignment',intent:plan.intent,sourceProvenance:plan.sourceProvenance,
+        payloadDigest:plan.payloadDigest,previewDigest:plan.previewDigest,expectedBefore:plan.expectedBefore,changes:plan.changes,
+        preservationFingerprints:plan.preservationFingerprints,financialWrites:0,historicalAssignmentsPreserved:true,createdAt:now()});
+      tx.set(reqRef,{schemaVersion:advisorAssignment.SCHEMA,status:'committed',payloadDigest:inputDigest,actorUid:actor.uid,
+        previewIsolated:previewOnly,result:committed,committedAt:now()});
+      return committed;
+    });
+    if(spec.operation==='preview')return result;
+    // A consistent second server read proves the sparse patches and unchanged
+    // receipts, payments, commissions, payables and vehicles before hydration.
+    const proof=await db.runTransaction(async tx=>{
+      const context=await readAssignmentContext(tx,tenantId,spec,actor,previewOnly);
+      const verification=advisorAssignment.verifyReadback(result,context);
+      return Object.assign({},verification,{readback:[{collection:'clientes',id:context.client.id,record:context.client},
+        ...context.policies.map(row=>({collection:'polizas',id:row.id,record:row}))]});
+    });
+    return Object.assign({},result,proof);
+  }catch(error){throw assignmentContractError(error);}
+}
+
 async function execute(request, metaPreviewContext = null) {
   const input = request.data || {};
+  if (input.advisorAssignmentCorrection) return executeAdvisorAssignmentCorrection(request, false);
   if (input.advisorPayable) return executeAdvisorPayable(request, false);
   const tenantId = cleanId(input.tenantId, 'tenantId');
   if(!metaPreviewContext&&(input.metaPreviewQa||[].concat(input.mutations||[]).some(m=>m?.payload?.__metasPreviewQa===true)))
@@ -613,6 +728,24 @@ async function execute(request, metaPreviewContext = null) {
       const ref = canonicalRef(tenantId, mutation.collection, mutation.id);
       const snap = await tx.get(ref);
       const parents=await readOperationalParents(tx,tenantId,mutation,snap.exists?snap.data():null);
+      const assignmentBefore=snap.exists?snap.data():null;
+      if(mutation.collection==='polizas'&&mutation.action==='update'&&
+         Object.prototype.hasOwnProperty.call(mutation.payload||{},'asesorId')&&
+         text(mutation.payload.asesorId)!==text(assignmentBefore?.asesorId)){
+        if(!mutation.expectedBefore||!Object.prototype.hasOwnProperty.call(mutation.expectedBefore,'asesorId'))
+          throw new HttpsError('failed-precondition','El cambio de asesor requiere la imagen previa canónica y su flujo de corrección.');
+        const paymentRows=await assignmentRelatedRows(tx,tenantId,'cobros',{clientId:'',policyIds:[mutation.id]});
+        if(paymentRows.some(row=>['pagado','conciliado'].includes(norm(row.estado))||!!row.fechaPago||Number(row.pagado||row.montoPagado||0)>0))
+          throw new HttpsError('failed-precondition','La póliza tiene pagos; utiliza la corrección documentada de asesor.',{reason:'PAID_POLICY_ADVISOR_CORRECTION_REQUIRED'});
+        const advisorSnap=await tx.get(canonicalRef(tenantId,'asesores',cleanId(mutation.payload.asesorId,'asesorId')));
+        if(!advisorSnap.exists)throw new HttpsError('failed-precondition','El asesor destino no existe.');
+        const advisor=advisorSnap.data()||{},roles=unique([...(advisor.roles||[]),advisor.rol,advisor.rolDefault,advisor.defaultRole]).map(norm);
+        const countries=unique([...(advisor.paises||[]),...(advisor.countries||[]),advisor.pais,advisor.country,advisor.paisDefault]).map(v=>v.toUpperCase());
+        if((advisor.tenantId&&advisor.tenantId!==tenantId)||advisor.activo===false||advisor.active===false||advisor.inactivo===true||
+           ['inactivo','inactive','blocked','bloqueado','suspendido','suspended','deleted','eliminado'].includes(norm(advisor.estado||advisor.status))||
+           !roles.some(r=>['asesor','comercial'].includes(r))||!countries.includes(text(assignmentBefore?.pais||assignmentBefore?.country).toUpperCase()))
+          throw new HttpsError('failed-precondition','El asesor destino no está habilitado para esta póliza.');
+      }
       let linkedMemberRef = null, linkedMemberSnap = null;
       if (mutation.collection === 'asesores' && mutation.action !== 'remove') {
         const before = snap.exists ? snap.data() || {} : {};
@@ -640,9 +773,15 @@ async function execute(request, metaPreviewContext = null) {
       if (mutation.action === 'insert' && before) throw new HttpsError('already-exists', `${mutation.collection}/${mutation.id} ya existe.`);
       if ((mutation.action === 'update' || mutation.action === 'remove') && !before) throw new HttpsError('not-found', `${mutation.collection}/${mutation.id} no existe.`);
       if(mutation.expectedBefore){
-        const actualRenewable=before&&Object.prototype.hasOwnProperty.call(before,'renovable')?before.renovable:null;
-        if(JSON.stringify(stable(actualRenewable))!==JSON.stringify(stable(mutation.expectedBefore.renovable)))
-          throw new HttpsError('failed-precondition','La renovabilidad cambió desde la lectura anterior; recarga y revisa antes de guardar.');
+        if(mutation.payload?.__syntheticQa===true&&before?.__syntheticQa!==true)
+          throw new HttpsError('permission-denied','La preimagen no acredita una póliza sintética.');
+        for(const [key,expected] of Object.entries(mutation.expectedBefore)){
+          const actual=before&&Object.prototype.hasOwnProperty.call(before,key)?before[key]:(key==='asesorId'?'':null);
+          if(JSON.stringify(stable(actual))!==JSON.stringify(stable(expected)))
+            throw new HttpsError('failed-precondition',key==='renovable'?
+              'La renovabilidad cambió desde la lectura anterior; recarga y revisa antes de guardar.':
+              'El asesor cambió desde la lectura anterior; recarga y revisa antes de guardar.');
+        }
       }
       if(before && !withinScope(actor,mutation.collection,COLLECTION_MODULE[mutation.collection],Object.assign({id:mutation.id,tenantId},before))) throw new HttpsError('permission-denied','No autorizado para modificar el registro original.');
       let participationChange=null;
@@ -842,15 +981,15 @@ async function executeAdvisorPayable(request, previewOnly) {
       catch(error){throw new HttpsError('failed-precondition',error.message,{reason:error.code,polizaId:policyId,sourceLine:line?.source?.lineId||''});}
       if(seen.has(plan.payable.id)||seen.has(plan.commission.id))throw new HttpsError('invalid-argument','La misma línea de fuente aparece dos veces en el lote.');
       seen.add(plan.payable.id);seen.add(plan.commission.id);
-      const sourceDigestLine=plan.payable.source.sha256+'|'+plan.payable.source.lineId;
-      if(seenSources.has(plan.payable.sourceKey)||seenSources.has(sourceDigestLine))
+      const sourceIdentities=advisorPayables.sourceIdentities(plan.payable);
+      if(sourceIdentities.some(source=>seenSources.has(source.sourceKey)||seenSources.has(source.digestLine)))
         throw new HttpsError('failed-precondition','Una línea fuente no puede interpretarse dos veces en el mismo lote.',{reason:'SOURCE_LINE_ALREADY_INTERPRETED',sourceLine:plan.payable.source.lineId});
-      seenSources.add(plan.payable.sourceKey);seenSources.add(sourceDigestLine);
+      for(const source of sourceIdentities){seenSources.add(source.sourceKey);seenSources.add(source.digestLine);}
       if(!withinScope(actor,'finmovs','conciliaciones',plan.payable)||!withinScope(actor,'comisiones','comisiones',plan.commission))
         throw new HttpsError('permission-denied','País o alcance financiero no autorizado.');
       const sourceConflicts=historicalRows.filter(row=>
         row.schemaVersion===advisorPayables.SCHEMA&&
-        (row.sourceKey===plan.payable.sourceKey||(row.source?.sha256===plan.payable.source.sha256&&row.source?.lineId===plan.payable.source.lineId))&&
+        advisorPayables.sourceIdentities(row).some(prior=>sourceIdentities.some(source=>prior.sourceKey===source.sourceKey||prior.digestLine===source.digestLine))&&
         (row.economicKey!==plan.payable.economicKey||row.financialDigest!==plan.financialDigest||row.asesorId!==advisorId));
       if(sourceConflicts.length)throw new HttpsError('failed-precondition','La línea fuente ya fue interpretada con otra póliza, periodo o participación; no se crea otra deuda.',
         {reason:'SOURCE_LINE_ALREADY_INTERPRETED',sourceLine:plan.payable.source.lineId,recordIds:sourceConflicts.map(row=>row.id)});
@@ -883,7 +1022,8 @@ async function executeAdvisorPayable(request, previewOnly) {
       // Existing untyped historic commissions are not silently overwritten by
       // a new interpretation of "monto" or "Liquidada".
       if(existingCommission&&(existingCommission.financialDigest!==plan.financialDigest||
-         ['id','tenantId','asesorId','polizaId','clienteId','moneda','pais','monto','montoAsesor','pctAsesor','economicKey','cxpAsesorId','base','pct'].some(key=>existingCommission[key]!==plan.commission[key])))
+         ['id','tenantId','asesorId','polizaId','clienteId','moneda','pais','monto','montoAsesor','pctAsesor','economicKey','cxpAsesorId','base','pct'].some(key=>existingCommission[key]!==plan.commission[key])||
+         !advisorPayables.compatibleComponents(existingCommission,plan.commission)))
         throw new HttpsError('failed-precondition','La comisión ya existe con otro contenido; conserva el original y resuelve la diferencia.',{reason:'COMMISSION_SOURCE_CONFLICT',commissionId:plan.commission.id});
       const payableSnap=await tx.get(canonicalRef(tenantId,'finmovs',plan.payable.id));
       const existingPayable=payableSnap.exists?payableSnap.data():null;
@@ -914,7 +1054,7 @@ async function executeAdvisorPayable(request, previewOnly) {
       createdCommissionIds:planned.filter(row=>!row.existingCommission).map(row=>row.commission.id),
       createdPayableIds:planned.filter(row=>!row.existingPayable).map(row=>row.payable.id)});
     tx.set(eventRef(tenantId,eventId),{schemaVersion:advisorPayables.SCHEMA,tenantId,eventId,requestId,actorUid:actor.uid,activeRole:actor.activeRole,payloadDigest:inputDigest,
-      advisorId,cutoff,sourceKeys:planned.map(row=>row.payable.sourceKey),payableIds:planned.map(row=>row.payable.id),
+      advisorId,cutoff,sourceKeys:planned.flatMap(row=>advisorPayables.sourceIdentities(row.payable).map(source=>source.sourceKey)),payableIds:planned.map(row=>row.payable.id),
       action:'prepare_advisor_commission_payables',financialPayments:0,bankMovements:0,createdAt:now()});
     tx.set(reqRef,{status:'committed',payloadDigest:inputDigest,actorUid:actor.uid,result:committed,committedAt:now()});
     return committed;
@@ -927,7 +1067,8 @@ async function executeAdvisorPayable(request, previewOnly) {
     const actual=snap.data();
     if(!withinScope(actor,'finmovs','conciliaciones',actual)||actual.asesorId!==advisorId)throw new HttpsError('permission-denied','El readback de CxP cambió de alcance.');
     canonicalPayables.push(actual);
-    readback.push({collection:'finmovs',id:row.id,exists:true,estado:actual.estado,pendiente:actual.pendiente,financialDigest:actual.financialDigest});
+    readback.push({collection:'finmovs',id:row.id,exists:true,estado:actual.estado,pendiente:actual.pendiente,financialDigest:actual.financialDigest,
+      ...(actual.sourceComponents?{sourceComponents:actual.sourceComponents,sourceComponentsDigest:actual.sourceComponentsDigest}:{})});
     const commission=await canonicalRef(tenantId,'comisiones',row.comisionId).get();
     if(!commission.exists||commission.data().financialDigest!==row.financialDigest)throw new HttpsError('internal','No se confirmó la comisión vinculada.');
     const actualCommission=commission.data();
@@ -935,13 +1076,15 @@ async function executeAdvisorPayable(request, previewOnly) {
        actualCommission.cxpAsesorId!==row.id||actualCommission.polizaId!==row.polizaId||actualCommission.clienteId!==row.clienteId||
        actualCommission.moneda!==row.moneda||actualCommission.pais!==row.pais||actualCommission.monto!==row.comisionOrdinariaAcreditada||
        actualCommission.montoAsesor!==row.valor||actualCommission.pctAsesor!==row.pctAsesor||actualCommission.base!==row.base||actualCommission.pct!==row.pct||
+       !advisorPayables.compatibleComponents(actualCommission,row)||
        !withinScope(actor,'comisiones','comisiones',actualCommission))
       throw new HttpsError('internal','La comisión vinculada cambió de relación, importe o base documental durante el readback.');
     canonicalCommissions.push(actualCommission);
     commissionReadback.push({collection:'comisiones',id:actualCommission.id,exists:true,financialDigest:actualCommission.financialDigest,
       cxpAsesorId:row.id,monto:actualCommission.monto,montoAsesor:actualCommission.montoAsesor,
       ...(Object.prototype.hasOwnProperty.call(actualCommission,'base')?{base:actualCommission.base}:{}),
-      ...(Object.prototype.hasOwnProperty.call(actualCommission,'pct')?{pct:actualCommission.pct}:{})});
+      ...(Object.prototype.hasOwnProperty.call(actualCommission,'pct')?{pct:actualCommission.pct}:{}),
+      ...(actualCommission.sourceComponents?{sourceComponents:actualCommission.sourceComponents,sourceComponentsDigest:actualCommission.sourceComponentsDigest}:{})});
   }
   return Object.assign({},result,{payables:canonicalPayables,commissions:canonicalCommissions,commissionReadback,
     canonicalReadback:true,canonicalReadbackCount:readback.length,readback});
@@ -1088,6 +1231,7 @@ exports.orbit360ProductAssetRead = onCall({ region: REGION, cors: true, timeoutS
 exports.orbit360ProductAssetReadPreview = onCall({ region: PREVIEW_REGION, cors: true, timeoutSeconds: 60, memory: '256MiB' }, request=>readProductAsset(request,true));
 async function executePreview(request) {
   const input=request.data||{},raw=[].concat(input.mutations||[]);
+  if(input.advisorAssignmentCorrection)return executeAdvisorAssignmentCorrection(request,true);
   if(input.advisorPayable)return executeAdvisorPayable(request,true);
   // Empty, read-only probe fails closed against an older deployed writer.
   // Inspection also survives reload without relying on projected row markers.

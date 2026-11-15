@@ -61,6 +61,19 @@
       return '';
     }
     if(name==='orbit360ProductOperationalCommandPreview'){
+      if(data&&data.advisorAssignmentCorrection){
+        var correction=data.advisorAssignmentCorrection;
+        var correctionQaId=function(value){return typeof value==='string'&&/^b4003qa_[A-Za-z0-9._:-]+$/.test(value);};
+        if(String(data.tenantId||'')!=='alianzas-soluciones'||typeof correction!=='object'||Array.isArray(correction)||
+           data.advisorPayable!==undefined||data.mutations!==undefined||correction.version!==1||
+           !['preview','commit'].includes(correction.operation)||typeof correction.updateClient!=='boolean'||
+           !correctionQaId(correction.clientId)||!correctionQaId(correction.targetAdvisorId)||
+           !Array.isArray(correction.policyIds)||!correction.policyIds.length||
+           correction.policyIds.length+(correction.updateClient?1:0)>20||
+           new Set(correction.policyIds).size!==correction.policyIds.length||correction.policyIds.some(function(id){return!correctionQaId(id);}))
+          return 'I66_PREVIEW_MUTATION_CALLABLE_DENIED';
+        return '';
+      }
       // CxP is a distinct server-owned command, not a generic mutation batch.
       // Only the already authorized disposable QA envelope may cross Preview;
       // the server still enforces signed roles, ownership, scope and restoration.

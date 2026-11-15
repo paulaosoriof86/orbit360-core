@@ -49,6 +49,89 @@ function documentedBasis(raw) {
   }
   return fields;
 }
+function normalizedSource(source) {
+  source = source || {};
+  const fileId = id(source.fileId, 'Archivo fuente'), lineId = text(source.lineId);
+  if (!lineId || lineId.length > 300 || /[\r\n]/.test(lineId)) fail('SOURCE_LINE_REQUIRED', 'Se requiere hoja/renglón o referencia exacta de la planilla.');
+  if (!/^[a-f0-9]{64}$/i.test(text(source.sha256))) fail('SOURCE_DIGEST_REQUIRED', 'La planilla necesita su digest SHA-256.');
+  const reference = text(source.reference);
+  if (!reference || reference.length > 1500) fail('SOURCE_REFERENCE_REQUIRED', 'Se requiere la referencia documental de la planilla.');
+  const requirementRef = text(source.requirementRef);
+  if (!requirementRef || requirementRef.length > 180) fail('SOURCE_REQUIREMENT_REQUIRED', 'Se requiere el requerimiento o recibo acreditado para impedir duplicados entre archivos.');
+  return { fileId, lineId, sha256: source.sha256.toLowerCase(), reference, requirementRef };
+}
+const requirementCode = value => text(value).toUpperCase().replace(/\s+/g, '');
+function componentFinancialView(component) {
+  return {
+    coverageCode: component.coverageCode,
+    sourceDigest: component.source.sha256, sourceLine: component.source.lineId,
+    ordinaryCommission: component.ordinaryCommission, advisorAmount: component.advisorAmount,
+    ...(Object.prototype.hasOwnProperty.call(component, 'base') ? { base: component.base } : {}),
+    ...(Object.prototype.hasOwnProperty.call(component, 'pct') ? { pct: component.pct } : {})
+  };
+}
+function componentsDigest(components) {
+  if (!Array.isArray(components) || components.length < 2 || components.length > 20)
+    fail('SOURCE_COMPONENTS_REQUIRED', 'Un requerimiento desglosado necesita de 2 a 20 renglones documentados.');
+  return fingerprint(components.map(componentFinancialView).sort((a, b) =>
+    a.coverageCode.localeCompare(b.coverageCode) || a.sourceLine.localeCompare(b.sourceLine)));
+}
+function sourceIdentities(row) {
+  const sources = Array.isArray(row.sourceComponents) ? row.sourceComponents.map(component => component.source) : [row.source];
+  return sources.filter(Boolean).map(source => ({
+    sourceKey: `${row.tenantId}|${source.fileId}|${source.lineId}`,
+    digestLine: `${source.sha256}|${source.lineId}`
+  }));
+}
+function compatibleComponents(existing, planned) {
+  if (!existing.sourceComponents && !planned.sourceComponents)
+    return !existing.sourceComponentsDigest && !planned.sourceComponentsDigest;
+  try {
+    return existing.sourceComponentsDigest === planned.sourceComponentsDigest &&
+      componentsDigest(existing.sourceComponents) === planned.sourceComponentsDigest &&
+      componentsDigest(planned.sourceComponents) === planned.sourceComponentsDigest;
+  } catch (_) { return false; }
+}
+function normalizeComponents(raw, source, amountCents, participation, outerBasis) {
+  if (!Object.prototype.hasOwnProperty.call(raw, 'components')) return null;
+  if (!Array.isArray(raw.components) || raw.components.length < 2 || raw.components.length > 20)
+    fail('SOURCE_COMPONENTS_REQUIRED', 'Un requerimiento desglosado necesita de 2 a 20 renglones documentados.');
+  const seenLines = new Set(), seenCoverages = new Set();
+  const components = raw.components.map(component => {
+    if (!component || typeof component !== 'object' || Array.isArray(component))
+      fail('INVALID_SOURCE_COMPONENT', 'Cada cobertura necesita su renglón e importe originales.');
+    const coverageCode = text(component.coverageCode).toUpperCase();
+    if (!/^[A-Z0-9][A-Z0-9_-]{0,39}$/.test(coverageCode))
+      fail('SOURCE_COMPONENT_COVERAGE_REQUIRED', 'Se requiere el código de cobertura de cada renglón, no un nombre inventado.');
+    const componentSource = normalizedSource(component.source);
+    if (componentSource.fileId !== source.fileId || componentSource.sha256 !== source.sha256 ||
+        requirementCode(componentSource.requirementRef) !== requirementCode(source.requirementRef))
+      fail('SOURCE_COMPONENT_REQUIREMENT_CONFLICT', 'Las coberturas deben pertenecer al mismo documento y requerimiento.');
+    const sourceLine = componentSource.sha256 + '|' + componentSource.lineId;
+    if (seenLines.has(sourceLine) || seenCoverages.has(coverageCode))
+      fail('SOURCE_COMPONENT_DUPLICATE', 'No se admite dos veces una línea fuente ni una cobertura del mismo requerimiento.');
+    seenLines.add(sourceLine); seenCoverages.add(coverageCode);
+    const ordinaryCents = cents(component.ordinaryCommission, 'Comisión ordinaria de la cobertura');
+    const advisorCents = Math.round(ordinaryCents * Math.round(participation.pct * 100) / 10000);
+    if (advisorCents <= 0) fail('EMPTY_PAYABLE', 'El importe resultante de una cobertura es cero.');
+    return { coverageCode, source: componentSource, ordinaryCommission: ordinaryCents / 100,
+      advisorAmount: advisorCents / 100, ...documentedBasis(component) };
+  }).sort((a, b) => a.coverageCode.localeCompare(b.coverageCode) || a.source.lineId.localeCompare(b.source.lineId));
+  if (!components.some(component => component.source.lineId === source.lineId))
+    fail('SOURCE_COMPONENT_ANCHOR_REQUIRED', 'La línea principal debe ser uno de los renglones originales del desglose.');
+  if (components.reduce((sum, component) => sum + cents(component.ordinaryCommission, 'Comisión de cobertura'), 0) !== amountCents)
+    fail('SOURCE_COMPONENT_TOTAL_CONFLICT', 'La comisión total debe coincidir exactamente con la suma de sus renglones.');
+  const basis = {};
+  if (components.every(component => Object.prototype.hasOwnProperty.call(component, 'base')))
+    basis.base = components.reduce((sum, component) => sum + cents(component.base, 'Prima neta de cobertura'), 0) / 100;
+  if (components.every(component => Object.prototype.hasOwnProperty.call(component, 'pct') && component.pct === components[0].pct))
+    basis.pct = components[0].pct;
+  for (const key of Object.keys(outerBasis)) if (outerBasis[key] !== basis[key])
+    fail('SOURCE_COMPONENT_BASIS_CONFLICT', 'La base o porcentaje total no coincide con el desglose documental.');
+  return { source: components[0].source, sourceComponents: components,
+    sourceComponentsDigest: componentsDigest(components), basis,
+    advisorCents: components.reduce((sum, component) => sum + cents(component.advisorAmount, 'Participación de cobertura'), 0) };
+}
 function normalizeLine(raw, context) {
   const { tenantId, advisor, policy, cutoff } = context;
   if (!policy || !policy.id) fail('POLICY_NOT_FOUND', 'La póliza exacta de la línea no está registrada.');
@@ -57,14 +140,7 @@ function normalizeLine(raw, context) {
   const country = text(policy.pais || policy.country).toUpperCase();
   if (!['GT', 'CO'].includes(country)) fail('POLICY_COUNTRY_REQUIRED', 'La póliza necesita país canónico.');
   if (!text(policy.clienteId)) fail('POLICY_CLIENT_REQUIRED', 'La póliza necesita cliente canónico.');
-  const source = raw.source || {};
-  const fileId = id(source.fileId, 'Archivo fuente'), lineId = text(source.lineId);
-  if (!lineId || lineId.length > 300 || /[\r\n]/.test(lineId)) fail('SOURCE_LINE_REQUIRED', 'Se requiere hoja/renglón o referencia exacta de la planilla.');
-  if (!/^[a-f0-9]{64}$/i.test(text(source.sha256))) fail('SOURCE_DIGEST_REQUIRED', 'La planilla necesita su digest SHA-256.');
-  const reference = text(source.reference);
-  if (!reference || reference.length > 1500) fail('SOURCE_REFERENCE_REQUIRED', 'Se requiere la referencia documental de la planilla.');
-  const requirementRef=text(source.requirementRef);
-  if(!requirementRef||requirementRef.length>180)fail('SOURCE_REQUIREMENT_REQUIRED','Se requiere el requerimiento o recibo acreditado para impedir duplicados entre archivos.');
+  let source = normalizedSource(raw.source);
   const accreditation = raw.accreditation || {};
   if (!['paid', 'accredited'].includes(accreditation.status))
     fail('COMMISSION_NOT_ACCREDITED', 'La línea debe acreditar o pagar comisión a A&S; una proyección o factura por cobrar no basta.');
@@ -76,9 +152,12 @@ function normalizeLine(raw, context) {
   if (policy.moneda && text(policy.moneda).toUpperCase() !== currency) fail('POLICY_CURRENCY_CONFLICT', 'Moneda de comisión y póliza no coinciden; no se convierte automáticamente.');
   if (raw.commissionKind !== 'ordinary') fail('ORDINARY_COMMISSION_REQUIRED', 'Debe identificarse la base ordinaria aprobada, separada de IVA e incentivos extraordinarios.');
   const amountCents = cents(raw.ordinaryCommission, 'Comisión ordinaria acreditada');
-  const basis = documentedBasis(raw);
+  let basis = documentedBasis(raw);
   const participation = share(raw.participation, advisor);
-  const advisorCents = Math.round(amountCents * Math.round(participation.pct * 100) / 10000);
+  const grouped = normalizeComponents(raw, source, amountCents, participation, basis);
+  if (grouped) { source = grouped.source; basis = grouped.basis; }
+  const { fileId, lineId, reference, requirementRef } = source;
+  const advisorCents = grouped ? grouped.advisorCents : Math.round(amountCents * Math.round(participation.pct * 100) / 10000);
   if (advisorCents <= 0) fail('EMPTY_PAYABLE', 'El importe resultante de la CxP es cero.');
   const sourceKey = `${tenantId}|${fileId}|${lineId}`;
   const economicKey=`${tenantId}|${policy.id}|${requirementRef.toUpperCase().replace(/\s+/g,'')}|${raw.collectionPeriod}|${currency}`;
@@ -110,13 +189,15 @@ function normalizeLine(raw, context) {
     source: { fileId, lineId, sha256: source.sha256.toLowerCase(), reference, requirementRef },
     sourceKey, economicKey, payableKey, accreditationStatus: accreditation.status, sourceProvenance,
     concepto: `Comisión ${policy.numero || policy.id} · ${raw.collectionPeriod} · ${advisor.nombre || advisor.id}`,
-    noBankMovement: true, serverOwned: true, ...basis
+    noBankMovement: true, serverOwned: true, ...basis,
+    ...(grouped ? { sourceComponents: grouped.sourceComponents, sourceComponentsDigest: grouped.sourceComponentsDigest } : {})
   };
   row.financialDigest = fingerprint({ economicKey, asesorId: row.asesorId, polizaId: row.polizaId,
     reciboId: row.reciboId, moneda: currency, ordinaryCents: amountCents, advisorCents,
     share: participation.pct, sourceDigest: row.source.sha256, accreditationDate,
     accreditationStatus: accreditation.status, collectionPeriod: raw.collectionPeriod,
-    ...(Object.keys(basis).length ? { documentedCommissionBasis: basis } : {}) });
+    ...(Object.keys(basis).length ? { documentedCommissionBasis: basis } : {}),
+    ...(grouped ? { sourceComponentsDigest: grouped.sourceComponentsDigest } : {}) });
   if (context.synthetic) row.__syntheticQa = true;
   const commission = {
     id: commissionId, tenantId, schemaVersion: SCHEMA, pais: country, moneda: currency,
@@ -127,6 +208,7 @@ function normalizeLine(raw, context) {
     origen: 'planilla_comision_acreditada', source: row.source, sourceKey, economicKey, sourceProvenance,
     commissionKind: 'ordinary', commissionAccreditation: { status: accreditation.status, date: accreditationDate },
     participation, financialDigest: row.financialDigest, cxpAsesorId: payableId, serverOwned: true, ...basis,
+    ...(grouped ? { sourceComponents: grouped.sourceComponents, sourceComponentsDigest: grouped.sourceComponentsDigest } : {}),
     ...(context.synthetic ? { __syntheticQa: true } : {})
   };
   return { payable: row, commission, financialDigest: row.financialDigest };
@@ -143,7 +225,12 @@ function fromCanonicalCommission(commission) {
     participation: commission.participation || (commission.pctAsesor != null
       ? { pct: commission.pctAsesor, authorityRef: commission.participationAuthorityRef } : null),
     ...(Object.prototype.hasOwnProperty.call(commission, 'base') ? { base: commission.base } : {}),
-    ...(Object.prototype.hasOwnProperty.call(commission, 'pct') ? { pct: commission.pct } : {})
+    ...(Object.prototype.hasOwnProperty.call(commission, 'pct') ? { pct: commission.pct } : {}),
+    ...(commission.sourceComponents ? { components: commission.sourceComponents.map(component => ({
+      coverageCode: component.coverageCode, source: component.source, ordinaryCommission: component.ordinaryCommission,
+      ...(Object.prototype.hasOwnProperty.call(component, 'base') ? { base: component.base } : {}),
+      ...(Object.prototype.hasOwnProperty.call(component, 'pct') ? { pct: component.pct } : {})
+    })) } : {})
   };
 }
 function compatiblePayable(existing, planned) {
@@ -152,6 +239,6 @@ function compatiblePayable(existing, planned) {
   const immutable=['id','tenantId','asesorId','polizaId','clienteId','comisionId','moneda','pais','valor',
     'comisionOrdinariaAcreditada','pctAsesor','economicKey','payableKey','periodoRecaudo','base','pct'];
   return !!existing && existing.schemaVersion === SCHEMA && existing.financialDigest === planned.financialDigest &&
-    immutable.every(key=>existing[key]===planned[key]);
+    immutable.every(key=>existing[key]===planned[key]) && compatibleComponents(existing, planned);
 }
-module.exports = { SCHEMA, normalizeLine, fromCanonicalCommission, compatiblePayable, fingerprint, date, id };
+module.exports = { SCHEMA, normalizeLine, fromCanonicalCommission, compatiblePayable, compatibleComponents, sourceIdentities, componentsDigest, fingerprint, date, id };

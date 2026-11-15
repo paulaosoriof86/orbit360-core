@@ -171,9 +171,39 @@ async function verifiedOperationalRow(ctx,tenant,tenantId,collection,row,id,cach
   if(!client||client.tenantId&&client.tenantId!==tenantId)throw new Denied('RELATION_CLIENT_NOT_FOUND');
   verifiedLinkedClient(ctx,client,policy);
   const canonical=policy||client;
-  allowRow(ctx,canonical);
   const country=countryOf(canonical);
   if(!country||country!==ctx.country)throw new Denied('COUNTRY_DENIED');
+  if(collection==='comisiones'){
+    // A commission belongs to its recorded beneficiary. A later change of
+    // policy responsibility must neither move that financial entitlement nor
+    // disclose it to the new advisor. Parents still prove tenant/country and
+    // relationships; their current advisor is never a beneficiary fallback.
+    const clientId=policy?clean(policy.clienteId):inputClientId;
+    if((row.id&&clean(row.id)!==id)||
+       (policy&&policy.id&&clean(policy.id)!==policyId)||
+       (client.id&&clean(client.id)!==clientId)||
+       (row.polizaId&&row.policyId&&clean(row.polizaId)!==clean(row.policyId))||
+       (row.clienteId&&row.clientId&&clean(row.clienteId)!==clean(row.clientId)))
+      throw new Denied('COMMISSION_RELATION_CONFLICT');
+    const countries=[row.pais,row.country,canonical.pais,canonical.country]
+      .map(value=>clean(value).toUpperCase()).filter(Boolean);
+    if(countries.some(value=>value!==country))throw new Denied('COUNTRY_DENIED');
+    const beneficiaries=[...new Set([row.asesorId,row.advisorId,row.ownerAdvisorId]
+      .map(clean).filter(Boolean))];
+    if(beneficiaries.length!==1)throw new Denied('COMMISSION_BENEFICIARY_UNVERIFIED');
+    const beneficiaryAdvisorId=beneficiaries[0];
+    allowRow(ctx,{tenantId,pais:country,asesorId:beneficiaryAdvisorId});
+    const projected=Object.assign({},row,{id,canonicalDocumentId:id,tenantId,pais:country,
+      asesorId:beneficiaryAdvisorId,beneficiaryAdvisorId,clienteId:clientId,
+      ...(policy?{polizaId:policyId}:{})});
+    // This context is useful to Dirección, but grants no financial scope and
+    // does not reveal another advisor's current assignment in own/team reads.
+    delete projected.currentPolicyAdvisorId;
+    if(ctx.scope==='all'&&policy)
+      projected.currentPolicyAdvisorId=clean(policy.asesorId||policy.advisorId||policy.ownerAdvisorId);
+    return projected;
+  }
+  allowRow(ctx,canonical);
   if(collection==='tareas'&&policy&&client&&clean(policy.clienteId)!==clean(row.clienteId||row.clientId||policy.clienteId))
     throw new Denied('RELATION_CLIENT_MISMATCH');
   return Object.assign({},row,{id:row.id||id,canonicalDocumentId:id,tenantId,pais:country,
@@ -373,6 +403,7 @@ async function readScopedRelatedList({db,auth,request}){
   return {ok:true,serverScoped:true,collection:coll,country,scope:ctx.scope,rows,
    nextCursor:verified.length>pageSize?rows[rows.length-1].canonicalDocumentId:null,
    anchoring:coll==='finmovs'?'country_and_finance_all_scope':
+    coll==='comisiones'?'verified_financial_beneficiary_and_canonical_parent':
     coll==='tareas'?'explicit_advisor_or_verified_client_policy':'verified_canonical_policy_or_client'};
  }
 

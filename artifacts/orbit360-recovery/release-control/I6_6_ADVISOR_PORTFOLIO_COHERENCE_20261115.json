@@ -1,0 +1,154 @@
+{
+  "schema": "GI_I66_ADVISOR_PORTFOLIO_COHERENCE_V1",
+  "dateGuatemala": "2026-11-15",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "activeGate": "I6.6",
+  "lastClosedReleaseGate": "B4-007",
+  "lastCompletedMiniGate": "I6.5",
+  "status": "SOURCE_FOCAL_TESTS_PASS_IMMUTABLE_BUILD_REQUESTED_NO_NEW_PREVIEW_OR_LIVE_ACCEPTANCE",
+  "ownerAuthority": "Paula Dirección requested comparison of client/policy advisors with the approved October liquidations and current platform, correction of advisors, premiums and commissions wherever documentary evidence establishes the change, complete synchronization, and completion of the pending operational/transversal work within the frozen plan.",
+  "predecessorCanonicalHead": "d5d4f7b27c62c814d3cf431f9860891fb455db49",
+  "canonicalContinuation": "artifacts/orbit360-recovery/release-control/I6_6_OPERATIONAL_CONTINUATION_20261115.json",
+  "lastAcceptedLivePreserved": {
+    "release": "R11",
+    "sourceSha": "84769378eb2014addebfefdbdd63091bddc4b817",
+    "buildRunId": 43503721126,
+    "artifactId": 14075022275,
+    "artifactDigest": "sha256:b0f3bacb68511cdfc91ac934602c51f55afec5c1d6428d886d13a72a706ee283",
+    "hostingVersion": "sites/ays-orbit-360-lab/versions/0766db29b338befc",
+    "liveRunId": 43506971214
+  },
+  "privateDocumentaryEvidence": {
+    "requestedAdvisorDatasets": 3,
+    "originalStatementFilesVerified": 10,
+    "documentaryRows": 76,
+    "positiveCommissionComponents": 74,
+    "economicObligations": 70,
+    "multipleCoverageObligations": 4,
+    "zeroCommissionDocumentaryRowsPreserved": 2,
+    "currentApprovedLiquidationPdfs": 3,
+    "perLineRoundingBeforeSummation": true,
+    "currenciesRemainSeparated": true,
+    "customerNamesPoliciesAmountsAndRawDocumentsExcludedFromPublicRepository": true,
+    "privateExpectedRowsSha256": "dfde96382eadf3b4d8e15f331c4e114eb456babb93b4e14b6bd705bf1679e469",
+    "privateExpectedEconomicGroupsSha256": "8412e7ca8d06d66a1891c6d4a506ffe3c416d81ceed7f8f31bd0512eae6eca61"
+  },
+  "freshLiveReadObservations": {
+    "method": "Existing signed Direction browser session; DOM-backed policy and client views, no business writes",
+    "policyAdvisorMismatchesConfirmed": 6,
+    "sourceOriginalPoliciesAvailableForTheseCases": 5,
+    "additionalCaseSupportedByDatedStatementOnly": 1,
+    "annualPremiumMustNotBeInferredFromCommissionBase": true,
+    "missingReceiptProjectionIsNotProofOfMissingFirestoreDocument": true,
+    "mixedGenericAndInsurerNumberedSchedulesObserved": true,
+    "documentaryRoundingDifferencesRetainedForReconciliation": true,
+    "vehicleMismatchAgainstAvailableOriginalsObserved": true,
+    "unmatchedSearchesRemainUnresolvedNotMissingCanonicalRecords": true,
+    "realRecordMutations": 0
+  },
+  "causalProductChanges": [
+    "One advisor commission/payable per economic requirement retains each original coverage source and per-component rounded advisor amount; single-line legacy identities and bytes remain unchanged.",
+    "Documented Direction correction within the existing operational command changes only explicit client/policy advisor fields, with server preview, exact preimages, historical financial fingerprints, atomic audit, replay protection and full canonical readback.",
+    "Ordinary unpaid advisor metadata changes retain existing authorized roles and now require advisor CAS; generic changes cannot bypass paid-policy protection.",
+    "A commission reader must preserve the historical financial beneficiary instead of overwriting it with the current policy advisor; current portfolio responsibility remains separate from historical commission/payable ownership.",
+    "Current-advisor collection KPI must remain coherent immediately after a verified policy correction and after reload, without rewriting historical payment records.",
+    "Bind the failed Preview restoration to the exact current failed candidate, structured cleanup diagnostic and fresh inventory; retain ordinary Finance click diagnostics without forced clicks or consent changes."
+  ],
+  "releaseRequirements": {
+    "newImmutableBuildRequired": true,
+    "samePreviewChannel": "gi-i66-rc-42868854629",
+    "sameThreeExistingBackendFunctions": true,
+    "sameFourRequiredSignedDrivers": true,
+    "signedAssignmentAndCompensatingCorrectionCoveredInsideExistingAdvisorPayableDriver": true,
+    "historicalPaidCommissionAndPayablePreservationMustBeTested": true,
+    "sameArtifactPreviewToLiveOnlyAfterAllRequiredEvidence": true,
+    "sourceOrDriverChangeAfterBuildRequiresNewArtifact": true,
+    "failedCandidateNotPromotable": true
+  },
+  "operationalAcceptance": {
+    "carlosOpsVerified": 6,
+    "carlosOpsRequired": 8,
+    "carlosOpsPercent": 75,
+    "fiveFrozenBlocksVerified": 19,
+    "fiveFrozenBlocksRequired": 31,
+    "fiveFrozenBlocksPercent": 61.3,
+    "sourceTestsDoNotIncreaseLiveAcceptance": true,
+    "remainingOpsCriteria": [
+      "SIGNED_CARLOS_FULL_DIRECT_RENEWAL_ISSUANCE_CROSS_MODULE_READBACK_WITH_APPROVAL_AND_REAL_DOCUMENT_GATES",
+      "SIGNED_COMPLETE_COUNTRY_TENANT_ROLE_AND_DIRECTION_ADMIN_SUPERADMIN_TRANSVERSAL_REGRESSION"
+    ],
+    "humanLegalAcceptanceAndTenantDriveConsentMayNotBeForged": true,
+    "inactiveUnverifiedOrUnassignedRolesMayNotBeManufacturedForMatrix": true
+  },
+  "businessWrites": {
+    "realAdvisorCorrections": 0,
+    "realPremiumCorrections": 0,
+    "realNewCommissions": 0,
+    "realNewPayables": 0,
+    "financialPayments": 0,
+    "bankTransfers": 0
+  },
+  "nextGate": "Finish source QA, exact immutable build and existing signed Preview drivers; promote only the same accepted artifact, then execute source-bound real corrections with before/after/reload and preservation proof. Preserve unresolved source/edition/rounding holds and the six existing Ops PASS criteria.",
+  "localFocusedEvidence": {
+    "assignmentPure": {
+      "pass": 13,
+      "fail": 0
+    },
+    "assignmentAdapter": {
+      "pass": 10,
+      "fail": 0
+    },
+    "assignmentDomain": {
+      "pass": 12,
+      "fail": 0
+    },
+    "policyMetadataUI": {
+      "pass": 17,
+      "fail": 0
+    },
+    "historicalFinancialOwnership": {
+      "pass": 34,
+      "fail": 0
+    },
+    "historicalPayables": {
+      "pass": 60,
+      "fail": 0
+    },
+    "payableComponents": {
+      "pass": 16,
+      "fail": 0
+    },
+    "financeDiagnosticsAndSignedDriver": {
+      "pass": 28,
+      "fail": 0
+    },
+    "ordinaryRoleScope": {
+      "pass": 7,
+      "fail": 0
+    },
+    "remoteAcceptance": false,
+    "signedSessionGuard": {
+      "pass": 14,
+      "fail": 0
+    }
+  },
+  "historicalReaderTestCausalSuccessor": {
+    "path": "tools/gravicentra-b4-003-scoped-related-reader.test.cjs",
+    "priorGitBlobSha": "c4db75bfa217304bf4ea123fd0d12bb5af73395a",
+    "gitBlobSha": "8c3907ea01615a68af0309fdb22807a9eeb7e1b6",
+    "scope": "Three commission fixtures now declare their actual historical beneficiary explicitly; beneficiary-absent denial is covered by the new I6.6 ownership suite. Historical release proof remains at its original source SHA."
+  },
+  "receiptCalendarHold": {
+    "currentGenericPlusExternalSchedulesReproducedInMemory": true,
+    "readOnlyReproductionRows": 21,
+    "writes": 0,
+    "canonicalAdjudicationPending": true,
+    "calendarRegenerationNotUsedAsRepair": true
+  },
+  "declaredDeltaTestFiles": {
+    "verified": 67,
+    "failed": 0,
+    "scope": "All66manifest test files plus historical scoped-reader regression; signed-session count strengthened to include the sixth writer."
+  }
+}

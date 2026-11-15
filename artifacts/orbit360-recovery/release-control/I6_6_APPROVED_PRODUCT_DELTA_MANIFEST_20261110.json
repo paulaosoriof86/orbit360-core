@@ -2123,6 +2123,162 @@
           }
         }
       ]
+    },
+    {
+      "id": "I6_6_ADVISOR_PORTFOLIO_HISTORICAL_BENEFICIARY_AND_COMPONENT_ROUNDING_20261115",
+      "approvedByDirection": true,
+      "receipt": "artifacts/orbit360-recovery/release-control/I6_6_ADVISOR_PORTFOLIO_COHERENCE_20261115.json",
+      "parentSourceSha": "d5d4f7b27c62c814d3cf431f9860891fb455db49",
+      "scope": "Documented advisor-only correction preserving paid records, historical commission/CxP beneficiary read authority and current portfolio KPIs, per-coverage source/rounding preservation, exact failed-Preview restoration and signed native UI evidence inside the existing four-driver gate. No real data writes or new LIVE acceptance in this source/build request.",
+      "paths": [
+        {
+          "path": "functions/advisor-assignment-correction-contract.js",
+          "gitBlobSha": "547f64ef7daf7374a7538b4c6d5fc9408601656a"
+        },
+        {
+          "path": "functions/advisor-commission-payable-contract.js",
+          "gitBlobSha": "63c9cee4fe57f2162bbbaae89a295f351bccf013",
+          "replaces": {
+            "path": "functions/advisor-commission-payable-contract.js",
+            "priorGitBlobSha": "2f26fbbc171b34fb86fc5c87e3243077bdf7b92f",
+            "priorChangeId": "I6_6_ADVISOR_CXP_PREVIEW_ENVELOPE_READBACK_CURRENCY_20261115"
+          }
+        },
+        {
+          "path": "functions/b4-003-scoped-related-reader.js",
+          "gitBlobSha": "aafdbe3384506b1772c7e409d565de88bf287b21",
+          "replaces": {
+            "path": "functions/b4-003-scoped-related-reader.js",
+            "priorGitBlobSha": "34cb6c09c63fb9e45feb6c9d55c3e1c514ab17b2",
+            "priorChangeId": "I6_6_ACTIVE_LEDGER_STAGE_INDEXED_UI_READONLY_P0"
+          }
+        },
+        {
+          "path": "functions/product-operational-domain.js",
+          "gitBlobSha": "513b89d8d58ef8ba780a614032591f4f0ad3e6f7",
+          "replaces": {
+            "path": "functions/product-operational-domain.js",
+            "priorGitBlobSha": "cecf4d02ba5bca054a28862b51c7416f2b852ed1",
+            "priorChangeId": "I6_6_ADVISOR_CXP_PREVIEW_ENVELOPE_READBACK_CURRENCY_20261115"
+          }
+        },
+        {
+          "path": "orbit360-platform/core/policy-receipts-engine.js",
+          "gitBlobSha": "967db92922e310796bae6f8ca53ba6c7d1a92855",
+          "replaces": {
+            "path": "orbit360-platform/core/policy-receipts-engine.js",
+            "priorGitBlobSha": "df46447d133f7c7a6e811a1190521b52069bb574",
+            "priorChangeId": "I6_6_CONCILIATION_APPROVAL_AND_ADVISOR_CXP_20261115"
+          }
+        },
+        {
+          "path": "orbit360-platform/core/product-runtime-browser-providers-p0.js",
+          "gitBlobSha": "609385b78af54b70f05718df4f32a8f9f788bfd0",
+          "replaces": {
+            "path": "orbit360-platform/core/product-runtime-browser-providers-p0.js",
+            "priorGitBlobSha": "76e0615e0de0272bf315f09f3fa2a30ac80348ea",
+            "priorChangeId": "I6_6_ADVISOR_CXP_PREVIEW_ENVELOPE_READBACK_CURRENCY_20261115"
+          }
+        },
+        {
+          "path": "orbit360-platform/core/queries.js",
+          "gitBlobSha": "8d08aa5bc96b3da6025e10d5f3018996edf7bab8",
+          "replaces": {
+            "path": "orbit360-platform/core/queries.js",
+            "priorGitBlobSha": "018d924dc7cfa8d0e3621e2742e589432b805e76",
+            "priorChangeId": "I6_6_ADVISOR_CXP_PREVIEW_ENVELOPE_READBACK_CURRENCY_20261115"
+          }
+        },
+        {
+          "path": "orbit360-platform/data/store-firestore-product-operational-p0.js",
+          "gitBlobSha": "0138ba3d11b767d38a664db76e8a4d4b2c948919",
+          "replaces": {
+            "path": "orbit360-platform/data/store-firestore-product-operational-p0.js",
+            "priorGitBlobSha": "ff7be0bef5c9e786b4efc5287c5e23a6955b7d2a",
+            "priorChangeId": "I6_6_ADVISOR_CXP_PREVIEW_ENVELOPE_READBACK_CURRENCY_20261115"
+          }
+        },
+        {
+          "path": "orbit360-platform/modules/finanzas.js",
+          "gitBlobSha": "88136dc14b462eab3136b759a5abbf3ad2cded0b",
+          "replaces": {
+            "path": "orbit360-platform/modules/finanzas.js",
+            "priorGitBlobSha": "e1dfbda6584515d5729573d7835558ce058980a1",
+            "priorChangeId": "I6_6_ADVISOR_CXP_PREVIEW_ENVELOPE_READBACK_CURRENCY_20261115"
+          }
+        },
+        {
+          "path": "orbit360-platform/modules/policy-receipts-v1199-bridge.js",
+          "gitBlobSha": "e5d0e9baaf9aac6e76f4c5b45b7def9711087fab",
+          "replaces": {
+            "path": "orbit360-platform/modules/policy-receipts-v1199-bridge.js",
+            "priorGitBlobSha": "388ab78aaac0d1b55a55612df051021640bd2cd4",
+            "priorChangeId": "I6_6_CONCILIATION_APPROVAL_AND_ADVISOR_CXP_20261115"
+          }
+        }
+      ],
+      "tests": [
+        {
+          "path": "tools/gravicentra-i6-6-advisor-assignment-adapter.test.cjs",
+          "gitBlobSha": "1a4d7729e127dbe15225be01376d024230796364"
+        },
+        {
+          "path": "tools/gravicentra-i6-6-advisor-assignment-correction.test.cjs",
+          "gitBlobSha": "b9ba586b144023d2c1b6b2f184928e82aed3db4e"
+        },
+        {
+          "path": "tools/gravicentra-i6-6-advisor-assignment-domain.test.cjs",
+          "gitBlobSha": "40934eb44820ab0702a1904e43035d7642a02451"
+        },
+        {
+          "path": "tools/gravicentra-i6-6-advisor-financial-ownership.test.cjs",
+          "gitBlobSha": "e6ef8567a773b7d9eca9c163c296b9a6cc40ec5d"
+        },
+        {
+          "path": "tools/gravicentra-i6-6-advisor-payables-components.test.cjs",
+          "gitBlobSha": "52f2ea63d0dac7a9751be94a3e9ebc32479ec267"
+        },
+        {
+          "path": "tools/gravicentra-i6-6-auth-session-write-coherence.test.cjs",
+          "gitBlobSha": "da67cb0eba39e05de1b251f1534dd66023a1393f",
+          "replaces": {
+            "path": "tools/gravicentra-i6-6-auth-session-write-coherence.test.cjs",
+            "priorGitBlobSha": "98d8940340f91680baf9dac695604fa2215f021f",
+            "priorChangeId": "I6_6_CONCILIATION_APPROVAL_AND_ADVISOR_CXP_20261115"
+          }
+        },
+        {
+          "path": "tools/gravicentra-i6-6-finance-ui-diagnostics.test.cjs",
+          "gitBlobSha": "e83224c5d81017cc961bc5f4be70389ed35d235e"
+        },
+        {
+          "path": "tools/gravicentra-i6-6-operativo-cross-advisor-scope.test.cjs",
+          "gitBlobSha": "1b30f3dd1e6f8ab9a25f51a36e6ebdf1336f94fd",
+          "replaces": {
+            "path": "tools/gravicentra-i6-6-operativo-cross-advisor-scope.test.cjs",
+            "priorGitBlobSha": "10654434bf7e020dd43a9d71a7c1cad143c3ddc9",
+            "priorChangeId": "I6_6_CONCILIATION_APPROVAL_AND_ADVISOR_CXP_20261115"
+          }
+        },
+        {
+          "path": "tools/gravicentra-i6-6-policy-metadata-preservation.test.cjs",
+          "gitBlobSha": "7f792f1a0f50214b4532f056abaa2bc9e946fa51",
+          "replaces": {
+            "path": "tools/gravicentra-i6-6-policy-metadata-preservation.test.cjs",
+            "priorGitBlobSha": "8b0c9f183535edd8831c9fed7b1025fca4c270c8",
+            "priorChangeId": "I6_6_CONCILIATION_APPROVAL_AND_ADVISOR_CXP_20261115"
+          }
+        },
+        {
+          "path": "tools/gravicentra-i6-6-preview-current-live-restore.test.cjs",
+          "gitBlobSha": "15d2da3955883cf1a385ed47668e5eef242fa9d5",
+          "replaces": {
+            "path": "tools/gravicentra-i6-6-preview-current-live-restore.test.cjs",
+            "priorGitBlobSha": "3617b3e5d4644007bd399913da849ce0ee55c0b1",
+            "priorChangeId": "I6_6_ADVISOR_CXP_PREVIEW_ENVELOPE_READBACK_CURRENCY_20261115"
+          }
+        }
+      ]
     }
   ],
   "i66R11PreviewBuildRequest20261113": {

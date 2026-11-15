@@ -494,6 +494,8 @@ jobs:
           name: gi-i66-preview-restore-evidence-${{ github.run_id }}
           path: |
             ${{ runner.temp }}/gi-i66-preview-restore-*/restore-receipt.json
+            ${{ runner.temp }}/gi-i66-preview-restore-*/failed-qa/verified-diagnostic.zip
+            ${{ runner.temp }}/gi-i66-preview-restore-*/failed-qa/i66-preview-failure-diagnostic.json
             ${{ runner.temp }}/gi-i66-preview-restore-*/failed/verified-backup.zip
             ${{ runner.temp }}/gi-i66-preview-restore-*/r11/verified-backup.zip
           retention-days: 30

@@ -114,10 +114,12 @@ jobs:
           assert.equal(m.gate,'I6.6');assert.equal(m.product,'Gravicentra Insurance');
           for(const [target,source] of [
             ['backend/b4-003-scoped-access-boundary.js','functions/b4-003-scoped-access-boundary.js'],
+            ['backend/b4-003-scoped-related-reader.js','functions/b4-003-scoped-related-reader.js'],
             ['backend/product-operational-domain.js','functions/product-operational-domain.js'],
             ['backend/product-ops-leads-domain.js','functions/product-ops-leads-domain.js'],
             ['backend/cobros-reconciliation-domain.js','functions/cobros-reconciliation-domain.js'],
             ['backend/advisor-commission-payable-contract.js','functions/advisor-commission-payable-contract.js'],
+            ['backend/advisor-assignment-correction-contract.js','functions/advisor-assignment-correction-contract.js'],
             ['backend/proposal-application-boundary.js','functions/proposal-application-boundary.js'],
             ['backend/payment-inference-engine.js','functions/payment-inference-engine.js'],
             ['backend/i66-conciliaciones-active-ledger-projection.js','functions/i66-conciliaciones-active-ledger-projection.js'],

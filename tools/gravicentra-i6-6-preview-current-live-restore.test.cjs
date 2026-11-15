@@ -1,11 +1,14 @@
 'use strict';
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs');
 const restore=require('./gravicentra-i6-6-preview-current-live-restore.cjs');
-const {AUTHORIZATION:A,FAILED:F,CURRENT:C,CHANNEL,PREVIEW,LIVE_ORIGINS}=restore;
+const {AUTHORIZATION:A,FAILED:F,DIAGNOSTIC:D,CURRENT:C,CHANNEL,PREVIEW,LIVE_ORIGINS}=restore;
 const clone=value=>JSON.parse(JSON.stringify(value));
 const BUILD='.github/workflows/gravicentra-release-delta-66-package.yml';
 const BRANCH='recovery/fase-a-clean-20260831';
 const stamp='2026-11-15T16:40:18.1624532Z ';
+// Exact sanitized artifact14178511809, independently retrieved and hashed.
+// Contains no actor, credential, business row, raw error or URL.
+const diagnosticBytes=Buffer.from('UEsDBBQACAAIADGib10AAAAAAAAAAAAAAAAjAAAAaTY2LXByZXZpZXctZmFpbHVyZS1kaWFnbm9zdGljLmpzb25lkM1uwjAQhO95CivnHhJCHOBmJaZYojayEypUVdYSDEGFgPJzQrx7ZYMaVVz2MPvNzu7ePIT8tqzMGfwZ8hnWWK8kXTP6qTNG3rlQOUu14MuNXof+m8M76PrW4nPCljTTXOSapCld5TR7IE1fs50/Q+MoifEkSoLJ9GG99E1pVOXCgtEYRwaPYhOGOzCQ7GPAwRSH0XaHE4gn02ALoyR4jjTXS9PZ2C8PIYRurv5bZyGWj3ynXytojZWf9wydPRxPfWNUBwcHzBknPKW6YHqxySTJmeAvdFqZ8sfSRCkqLaKF1LLgOfug2n6ikPTVdYLW7WYpUeSaSinkgJV2qgXiQToZqPur+jtrRZQaHI05w7E+1gd/hgIn3j2Evr279wtQSwcI3gS3eyABAADMAQAAUEsBAi0DFAAIAAgAMaJvXd4Et3sgAQAAzAEAACMAAAAAAAAAAAAgAKSBAAAAAGk2Ni1wcmV2aWV3LWZhaWx1cmUtZGlhZ25vc3RpYy5qc29uUEsFBgAAAAABAAEAUQAAAHEBAAAAAA==','base64');
 function run(id,head,path=BUILD,conclusion='success'){
   return {id,head_sha:head,head_branch:BRANCH,path,status:'completed',conclusion};
 }
@@ -28,21 +31,30 @@ function fixture(){
     {channelId:'untouched-preview',release:{version:{name:'sites/ays-orbit-360-lab/versions/unrelated'}}}
   ]};
   const after=clone(initial);after.result[0].release.version.name=C.hostingVersion;
-  const qaReceipt={checks:4,cleanup:'PASS',remaining:0,realCustomerWritesRequested:0,bankMovements:0,financialPayments:0,authOrMembershipMutations:0};
+  const qaReceipt={checks:5,cleanup:'PASS',remaining:0,realCustomerWritesRequested:0,bankMovements:0,financialPayments:0,authOrMembershipMutations:0,
+    failureClass:'TIMEOUT_ERROR',failureStage:'FINANCE_UI_HYDRATION',failureCheck:'ASSERTION_OR_RUNTIME_FAILURE',
+    failureLocation:{file:'gravicentra-i6-6-advisor-payables-signed-uat.cjs',line:261,column:61}};
   const qaLog=[stamp+'I66_SOURCE_SHA: '+F.sourceSha,stamp+'SOURCE_PACKAGE_RUN: '+F.buildRunId,
     stamp+'SOURCE_ARTIFACT_ID: '+F.artifactId,stamp+'I66_PREVIEW_BACKEND_ONLY_ZERO_LIVE_HOSTING_CHANGES_PASS',
-    stamp+'I66_ADVISOR_PAYABLE_SIGNED_PREVIEW_HOLD '+JSON.stringify(qaReceipt).replace(/^\{/,'***').replace(/\}$/,'***')].join('\n');
+    stamp+'I66_ADVISOR_PAYABLE_SIGNED_PREVIEW_HOLD '+JSON.stringify(qaReceipt).replace(/^\{/,'***').replace('"failureLocation":{','"failureLocation":***').replace(/\}\}$/,'***')].join('\n');
+  const diagnostic={schema:'I6_6_PREVIEW_DIAGNOSTIC_ONLY_V1',status:'FAILED_NOT_ACCEPTED',runId:F.qaRunId,sourceSha:F.sourceSha,
+    reports:[{status:'HOLD',phase:'PREVIEW',failureStage:'FINANCE_UI_HYDRATION',failureCheck:'ASSERTION_OR_RUNTIME_FAILURE',
+      failureClass:'TIMEOUT_ERROR',checks:5,cleanupStatus:'PASS',remaining:0}]};
+  const diagnosticText=JSON.stringify(diagnostic,null,2)+'\n';
   const meta={failedRun:run(F.buildRunId,F.sourceSha),failedArtifact:artifact(F),liveBuildRun:run(C.buildRunId,C.sourceSha),liveArtifact:artifact(C),
     liveRun:run(C.liveRunId,C.liveHeadSha,'.github/workflows/gravicentra-i66-r11-renewal-drive-frontend-exact-live-promotion.yml'),
     inventoryRun:run(A.inventoryRunId,A.inventoryHeadSha,'.github/workflows/gravicentra-i66-preview-channel-inventory-readonly.yml'),
     failedQaRun:run(F.qaRunId,F.qaHeadSha,'.github/workflows/gravicentra-i66-privileged-role-three-function-preview-uat.yml','failure'),
-    failedQaJob:{id:F.qaJobId,run_id:F.qaRunId,name:'exact-preview-only',status:'completed',conclusion:'failure'},failedQaLog:qaLog};
+    failedQaJob:{id:F.qaJobId,run_id:F.qaRunId,name:'exact-preview-only',status:'completed',conclusion:'failure'},failedQaLog:qaLog,
+    failedQaDiagnosticArtifact:{id:D.artifactId,name:D.artifactName,digest:D.artifactDigest,size_in_bytes:D.archiveSize,expired:false,
+      workflow_run:{id:F.qaRunId,head_sha:F.qaHeadSha,head_branch:BRANCH}}};
   const report={status:'HOLD',checks:[],previewClonePerformed:false,previewCloneRequested:false,productAccepted:false};
-  return {control,initial,after,meta,report};
+  return {control,initial,after,meta,report,qaReceipt,diagnosticText};
 }
 function ioFixture(f){
   const events=[];let inventories=0;
   const io={async metadata(){events.push('metadata');return f.meta;},
+    async diagnostic(){events.push('diagnostic');return {bytes:Buffer.from(diagnosticBytes),text:f.diagnosticText};},
     async backup(expected,label){events.push('backup:'+label);return {marker:{sourceSha:expected.sourceSha,gate:'I6.6'},label};},
     async readback(origin,bundle){events.push('readback:'+origin+':'+bundle.label);},
     async waitForPreview(bundle){events.push('wait-exact:'+bundle.label);},
@@ -64,7 +76,7 @@ for(const key of Object.keys(A))test('exact restore authorization rejects missin
   const g=fixture();g.control.previewChannelReuseAuthorization.failedCandidateRestore[key]=false;
   assert.throws(()=>restore.validateAuthorization(g.control));
 });
-for(const owner of ['failedCandidate','currentLive'])for(const key of Object.keys(A[owner]))test('rejects '+owner+' identity drift '+key,()=>{
+for(const owner of ['failedCandidate','failedQaDiagnostic','currentLive'])for(const key of Object.keys(A[owner]))test('rejects '+owner+' identity drift '+key,()=>{
   const f=fixture();f.control.previewChannelReuseAuthorization.failedCandidateRestore[owner][key]='different';
   assert.throws(()=>restore.validateAuthorization(f.control));
 });
@@ -104,9 +116,9 @@ for(const [name,edit] of [
   ['wrong artifact name',f=>f.meta.failedArtifact.name='alternate']
 ])test('artifact denies '+name,()=>{const f=fixture();edit(f);assert.throws(()=>restore.validateArtifact(f.meta.failedRun,f.meta.failedArtifact,F));});
 
-test('exact masked or unmasked failed QA cleanup is proven without inventing PASS',()=>{
+test('exact masked or unmasked failed QA control receipt is checked without repairing JSON or inventing PASS',()=>{
   const f=fixture();assert.match(restore.validateFailedQa(f.meta.failedQaRun,f.meta.failedQaJob,f.meta.failedQaLog),/^[a-f0-9]{64}$/);
-  const unmasked=f.meta.failedQaLog.replace('HOLD ***','HOLD {').replace(/\*\*\*$/,'}');
+  const unmasked=f.meta.failedQaLog.replace(/HOLD .+$/,'HOLD '+JSON.stringify(f.qaReceipt));
   assert.match(restore.validateFailedQa(f.meta.failedQaRun,f.meta.failedQaJob,unmasked),/^[a-f0-9]{64}$/);
 });
 for(const key of ['remaining','realCustomerWritesRequested','bankMovements','financialPayments','authOrMembershipMutations'])
@@ -124,11 +136,58 @@ for(const [name,edit] of [
   ['no executed LIVE proof',f=>f.meta.failedQaLog=f.meta.failedQaLog.replace('Z I66_PREVIEW_BACKEND_ONLY','Z echo I66_PREVIEW_BACKEND_ONLY')],
   ['no executed cleanup',f=>f.meta.failedQaLog=f.meta.failedQaLog.replace('Z I66_ADVISOR_PAYABLE','Z echo I66_ADVISOR_PAYABLE')],
   ['cleanup failed',f=>f.meta.failedQaLog=f.meta.failedQaLog.replace('"cleanup":"PASS"','"cleanup":"HOLD"')],
-  ['wrong checks',f=>f.meta.failedQaLog=f.meta.failedQaLog.replace('"checks":4','"checks":40')],
+  ['wrong checks',f=>f.meta.failedQaLog=f.meta.failedQaLog.replace('"checks":5','"checks":50')],
+  ['wrong failure class',f=>f.meta.failedQaLog=f.meta.failedQaLog.replace('TIMEOUT_ERROR','OTHER')],
+  ['wrong source location',f=>f.meta.failedQaLog=f.meta.failedQaLog.replace('"line":261','"line":262')],
+  ['ambiguous masking',f=>f.meta.failedQaLog=f.meta.failedQaLog.replace('"failureLocation":***','"failureLocation":****')],
   ['duplicate cleanup',f=>f.meta.failedQaLog+='\n'+f.meta.failedQaLog.split('\n').pop()],
   ['duplicate field',f=>f.meta.failedQaLog=f.meta.failedQaLog.replace('"remaining":0','"remaining":1,"remaining":0')],
   ['invented PASS',f=>f.meta.failedQaLog+='\n'+stamp+'I66_ADVISOR_PAYABLE_SIGNED_PREVIEW_PASS {}']
 ])test('QA evidence denies '+name,()=>{const f=fixture();edit(f);assert.throws(()=>restore.validateFailedQa(f.meta.failedQaRun,f.meta.failedQaJob,f.meta.failedQaLog));});
+
+test('structured cleanup binds exact run, artifact metadata, archive bytes and private-free JSON bytes',()=>{
+  const f=fixture(),proof=restore.validateStructuredCleanup(f.meta.failedQaDiagnosticArtifact,diagnosticBytes,f.diagnosticText);
+  assert.equal(diagnosticBytes.length,472);assert.equal(proof.cleanupStatus,'PASS');assert.equal(proof.remaining,0);
+  assert.equal(proof.status,'FAILED_NOT_ACCEPTED');assert.equal(proof.artifactId,14178511809);
+  assert.equal(proof.entrySha256,D.entrySha256);
+  assert.doesNotMatch(JSON.stringify(proof),/actor|email|token|scope|https?:/i);
+});
+for(const [name,edit] of [
+  ['wrong artifact ID',a=>a.id++],['wrong artifact name',a=>a.name='other'],
+  ['wrong artifact digest',a=>a.digest='sha256:'+'0'.repeat(64)],['wrong archive size',a=>a.size_in_bytes++],
+  ['expired artifact',a=>a.expired=true],['wrong QA run',a=>a.workflow_run.id++],
+  ['wrong QA head',a=>a.workflow_run.head_sha=C.sourceSha],['wrong branch',a=>a.workflow_run.head_branch='main']
+])test('structured cleanup refuses '+name+' before download or clone',async()=>{
+  const f=fixture();edit(f.meta.failedQaDiagnosticArtifact);
+  assert.throws(()=>restore.validateStructuredCleanup(f.meta.failedQaDiagnosticArtifact,diagnosticBytes,f.diagnosticText));
+  const {io,events}=ioFixture(f);await assert.rejects(restore.restorePreview(f.control,f.initial,io,f.report));
+  assert.deepEqual(events,['metadata']);assert.equal(f.report.previewCloneRequested,false);
+});
+test('altered same-length archive and truncated archive cannot authorize restoration',async()=>{
+  const changed=Buffer.from(diagnosticBytes);changed[100]^=1;
+  for(const bytes of [changed,diagnosticBytes.subarray(0,diagnosticBytes.length-1)]){
+    assert.throws(()=>restore.validateDiagnosticBytes(bytes));
+    const f=fixture(),{io,events}=ioFixture(f);io.diagnostic=async()=>({bytes,text:f.diagnosticText});
+    await assert.rejects(restore.restorePreview(f.control,f.initial,io,f.report));
+    assert.deepEqual(events,['metadata']);assert.equal(f.report.previewCloneRequested,false);
+  }
+});
+for(const [name,edit] of [
+  ['positive remaining',s=>s.replace('"remaining": 0','"remaining": 1')],
+  ['fractional remaining',s=>s.replace('"remaining": 0','"remaining": 0.1')],
+  ['string remaining',s=>s.replace('"remaining": 0','"remaining": "0"')],
+  ['duplicate overridden remaining',s=>s.replace('"remaining": 0','"remaining": 1, "remaining": 0')],
+  ['changed failure phase',s=>s.replace('"phase": "PREVIEW"','"phase": "LIVE"')],
+  ['substituted source',s=>s.replace(F.sourceSha,C.sourceSha)],
+  ['new private field',s=>s.replace('"remaining": 0','"remaining": 0, "private": "SECRET_ACTOR_TOKEN"')],
+  ['invented acceptance',s=>s.replace('FAILED_NOT_ACCEPTED','PASS')]
+])test('structured cleanup rejects '+name+' even alongside the correct archive',async()=>{
+  const f=fixture(),text=edit(f.diagnosticText);
+  assert.throws(()=>restore.validateStructuredCleanup(f.meta.failedQaDiagnosticArtifact,diagnosticBytes,text));
+  const {io,events}=ioFixture(f);io.diagnostic=async()=>({bytes:diagnosticBytes,text});
+  await assert.rejects(restore.restorePreview(f.control,f.initial,io,f.report));
+  assert.deepEqual(events,['metadata']);assert.equal(f.report.previewCloneRequested,false);
+});
 
 const manifest=()=>Array.from({length:223},(_,i)=>'a'.repeat(64)+'  core/test-'+i+'.js').join('\n')+'\n';
 test('exact 223-file manifest and fixed CLI command only',()=>{
@@ -145,10 +204,12 @@ for(const [name,change] of [
 
 test('restore sequence backs up both before one exact clone, then verifies all origins and unchanged reuse guard',async()=>{
   const f=fixture(),{io,events}=ioFixture(f);await restore.restorePreview(f.control,f.initial,io,f.report);
-  assert.deepEqual(events,['metadata','backup:failed','backup:r11','readback:'+PREVIEW+':failed',
+  assert.deepEqual(events,['metadata','diagnostic','backup:failed','backup:r11','readback:'+PREVIEW+':failed',
     ...LIVE_ORIGINS.map(x=>'readback:'+x+':r11'),'inventory','clone-exact-preview','inventory','wait-exact:r11',
     'readback:'+PREVIEW+':r11',...LIVE_ORIGINS.map(x=>'readback:'+x+':r11')]);
   assert.equal(f.report.previewClonePerformed,true);assert.equal(f.report.productAccepted,false);
+  assert.deepEqual(f.report.failedQaStructuredCleanup,{artifactId:D.artifactId,artifactDigest:D.artifactDigest,entrySha256:D.entrySha256,
+    status:'FAILED_NOT_ACCEPTED',cleanupStatus:'PASS',remaining:0});
   assert.equal(f.report.status,'EXACT_R11_PREVIEW_RESTORED_VERIFIED_NOT_PRODUCT_ACCEPTANCE');
 });
 test('already R11 does not clone, fetch artifacts or mutate anything',async()=>{
@@ -158,6 +219,7 @@ test('already R11 does not clone, fetch artifacts or mutate anything',async()=>{
 });
 for(const [name,edit] of [
   ['metadata failed',io=>io.metadata=async()=>{throw Error('metadata unavailable');}],
+  ['structured cleanup download failed',io=>io.diagnostic=async()=>{throw Error('diagnostic unavailable');}],
   ['backup failed',io=>io.backup=async()=>{throw Error('archive drift');}],
   ['readback failed',io=>io.readback=async()=>{throw Error('hash drift');}],
   ['concurrent channel changed',io=>io.inventory=async()=>{const f=fixture();f.initial.result[0].release.version.name+='changed';return f.initial;}]
@@ -207,6 +269,8 @@ test('only the existing build workflow invokes restoration before the unchanged 
   assert.ok(call>0&&guard>call);assert.ok(source.slice(call,guard).includes('hosting:channel:list'));
   assert.match(source,/name: Preserve exact Preview restore backups and receipt even on failure\n\s+if: always\(\)/);
   assert.ok(source.includes('gi-i66-preview-restore-*/restore-receipt.json'));
+  assert.ok(source.includes('gi-i66-preview-restore-*/failed-qa/verified-diagnostic.zip'));
+  assert.ok(source.includes('gi-i66-preview-restore-*/failed-qa/i66-preview-failure-diagnostic.json'));
   assert.ok(source.includes('gi-i66-preview-restore-*/failed/verified-backup.zip'));
   assert.ok(source.includes('gi-i66-preview-restore-*/r11/verified-backup.zip'));
 });

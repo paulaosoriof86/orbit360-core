@@ -30,7 +30,18 @@
     "fernandoRequestedClients": 13,
     "germanRequestedClients": 4,
     "advisorAssignmentAuthority": "La cartera de clientes identificada privadamente por Dirección contiene trece clientes de Fernando y cuatro de Germán tras la corrección expresa adicional del 15 de noviembre. Identidades, pólizas, importes y documentos originales se mantienen fuera del repositorio público.",
-    "latestPrivateOwnerReassignment": {"date":"2026-11-15","source":"El Roble October statement","fromAdvisor":"Paula","toAdvisor":"Fernando","sourceLines":2,"newAdvisorParticipationPercent":70,"retainSourceIdentitiesAndAmounts":true,"previousDocumentsAndImportDerivativesSuperseded":true,"privateEvidence":"commissions_work/paula_juan_francisco_correction_20261115.json","realFinancialWrites":0},
+    "latestPrivateOwnerReassignment": {
+      "date": "2026-11-15",
+      "source": "El Roble October statement",
+      "fromAdvisor": "Paula",
+      "toAdvisor": "Fernando",
+      "sourceLines": 2,
+      "newAdvisorParticipationPercent": 70,
+      "retainSourceIdentitiesAndAmounts": true,
+      "previousDocumentsAndImportDerivativesSuperseded": true,
+      "privateEvidence": "commissions_work/paula_juan_francisco_correction_20261115.json",
+      "realFinancialWrites": 0
+    },
     "guatemaltecaBase": "COMISION_VENTA_ONLY_EXCLUDE_COM_COBRO_AND_VAT",
     "septemberPreviouslyPaid": "EXCLUDED_ALREADY_PAID_CONFIRMED_BY_DIRECTION",
     "commissionEligibility": "Ordinary commission paid OR credited by insurer, supported by original statement; not contingent on inventing a bank receipt.",
@@ -49,42 +60,195 @@
     "Preview channel reuse fallback retained an old release pin although R11 is LIVE; guard now derives an explicit current-LIVE-backed single-channel authorization.",
     "Several commission-source policy numbers are insurer-specific shortened aliases; absence from one text query is not proof the canonical policy is absent.",
     "Independent transaction tests reproduced cross-scope/amount mismatches in linked cartera and cobro; the new boundary now rejects the mismatched field before preview and inside transaction, with zero writes in twelve negative cases.",
-    "Editing only a policy advisor could rebuild financial values from missing fields and replace a receipt schedule; a metadata-only change must preserve canonical premiums and receipts instead of recalculating them."
+    "Editing only a policy advisor could rebuild financial values from missing fields and replace a receipt schedule; a metadata-only change must preserve canonical premiums and receipts instead of recalculating them.",
+    "Multiple documented coverage lines for the same insurer requirement previously collided or could be rounded after aggregation; component-level provenance and rounding preserve the approved liquidation.",
+    "Generic assignment updates lacked a documented paid-policy correction and current-value compare-and-swap; a semantic metadata-only correction preserves all linked financial records.",
+    "The scoped commission reader overwrote historical financial beneficiary with current policy ownership, diverging from unchanged advisor payables; source-level causal correction preserves both meanings."
   ],
   "currentEvidenceBoundaries": {
-    "resumeSyncAndClickDiagnostics20261115": {"receipt": "artifacts/orbit360-recovery/release-control/I6_6_RESUME_SYNC_AND_FINANCE_CLICK_DIAGNOSTIC_20261115.json", "status": "SYNC_AND_READONLY_HOSTING_IDENTITIES_PASS_SIGNED_FINANCIAL_QA_HOLD", "metadataCommit": "9b021c3cb37968c27d978691e0e852fc1215d575", "metadataGuardRunId": 43758186160, "diagnosticTests": "17/17", "sourceNormativeMatches": "9/9", "newAcceptanceClaimed": false, "newFinancialWrites": 0, "diagnosticSourceCommit": "ce176e1244d74c55a5453559d3f11f7b9822a0e6", "diagnosticGuardRunId": 43758700659, "freshInventoryRunId": 43758700651, "previewHostingVersionObserved": "sites/ays-orbit-360-lab/versions/77f99c0f0893d8d5", "bothLiveOriginsIdentity": "R11_MATCH_2_OF_2", "nextOnly": "EXACT_FAILED_PREVIEW_RESTORE_BINDING_THEN_NEW_IMMUTABLE_BUILD_AND_SIGNED_FINANCE_UI_DIAGNOSTIC", "noNewRuntimeAcceptance": true},
-    "conciliationPriorCensus": {"stageProposals": 132, "uniquePolicyMatches": 52, "nonUniquePolicyEditions": 80, "sourceEvidence": 365, "stageHolds": 233, "notPaymentMatches": true},
-    "bantrabA3": {"sourceReferenceWritesAlreadyProven": 7, "runId": 43438038880, "paymentsApplied": 0, "doNotRepeatReferenceBatch": true},
-    "baselineAcceptanceMetric": {"verified": 19, "required": 31, "percent": 61.3, "scope": "Five frozen operational blocks only; not total product or elapsed work; source tests do not raise LIVE acceptance."},
+    "resumeSyncAndClickDiagnostics20261115": {
+      "receipt": "artifacts/orbit360-recovery/release-control/I6_6_RESUME_SYNC_AND_FINANCE_CLICK_DIAGNOSTIC_20261115.json",
+      "status": "SYNC_AND_READONLY_HOSTING_IDENTITIES_PASS_SIGNED_FINANCIAL_QA_HOLD",
+      "metadataCommit": "9b021c3cb37968c27d978691e0e852fc1215d575",
+      "metadataGuardRunId": 43758186160,
+      "diagnosticTests": "17/17",
+      "sourceNormativeMatches": "9/9",
+      "newAcceptanceClaimed": false,
+      "newFinancialWrites": 0,
+      "diagnosticSourceCommit": "ce176e1244d74c55a5453559d3f11f7b9822a0e6",
+      "diagnosticGuardRunId": 43758700659,
+      "freshInventoryRunId": 43758700651,
+      "previewHostingVersionObserved": "sites/ays-orbit-360-lab/versions/77f99c0f0893d8d5",
+      "bothLiveOriginsIdentity": "R11_MATCH_2_OF_2",
+      "nextOnly": "EXACT_FAILED_PREVIEW_RESTORE_BINDING_THEN_NEW_IMMUTABLE_BUILD_AND_SIGNED_FINANCE_UI_DIAGNOSTIC",
+      "noNewRuntimeAcceptance": true
+    },
+    "conciliationPriorCensus": {
+      "stageProposals": 132,
+      "uniquePolicyMatches": 52,
+      "nonUniquePolicyEditions": 80,
+      "sourceEvidence": 365,
+      "stageHolds": 233,
+      "notPaymentMatches": true
+    },
+    "bantrabA3": {
+      "sourceReferenceWritesAlreadyProven": 7,
+      "runId": 43438038880,
+      "paymentsApplied": 0,
+      "doNotRepeatReferenceBatch": true
+    },
+    "baselineAcceptanceMetric": {
+      "verified": 19,
+      "required": 31,
+      "percent": 61.3,
+      "scope": "Five frozen operational blocks only; not total product or elapsed work; source tests do not raise LIVE acceptance."
+    },
     "newPreviewAcceptance": "EXACT_BUILD_PASS_SIGNED_CXP_FINANCE_TAB_CLICK_TIMEOUT_NOT_ACCEPTED",
     "newLiveAcceptance": "NOT_EXECUTED",
     "failedPreviewRun": 43756837089,
     "failedPreviewSource": "02463e625e11daea7f5a609613bd67a5890ba270",
-    "previousFailedPreview": {"runId":43736456884,"sourceSha":"5426093a7ba08d813c96c6175e0331c2fad4d078","cause":"BROWSER_REJECTED_ADVISOR_ENVELOPE_BEFORE_SERVER","supersedingRunProvedSignedOperativeServerDenial":true},
-    "latestPreviewEvidence": {"buildRunId":43756113933,"buildConclusion":"SUCCESS","artifactId":14178232379,"artifactDigest":"sha256:778baa27265eb0bde998a2102571255294d517a1284cc07a3325a0b9e07f7921","hostingFileReadback":223,"liveHostingUnchanged":true,"controlHeadSha":"27b18fb30eecccf828c2907d920b1abcd6541bde","signedQaRunId":43756837089,"signedQaConclusion":"FAILURE","permissionDriver":"PASS","opsLeadsDriver":"PASS_SYNTHETIC_RESTORED_3_PLUS_3","advisorPayablesDriver":"HOLD_FINANCE_UI_HYDRATION_TIMEOUT_AT_TAB_CLICK_LINE_261","proposalApplicationDriver":"NOT_EXECUTED","failureDiagnosticArtifactId":14178511809,"failureDiagnosticDigest":"sha256:b8c9a0e5a7007b16f10eb819a785e82e65b042837eeb3995f655c745a8d5800b","cleanupRemaining":0,"realFinancialWrites":0,"acceptanceProofProduced":false,"mustNotPromote":true},
+    "previousFailedPreview": {
+      "runId": 43736456884,
+      "sourceSha": "5426093a7ba08d813c96c6175e0331c2fad4d078",
+      "cause": "BROWSER_REJECTED_ADVISOR_ENVELOPE_BEFORE_SERVER",
+      "supersedingRunProvedSignedOperativeServerDenial": true
+    },
+    "latestPreviewEvidence": {
+      "buildRunId": 43756113933,
+      "buildConclusion": "SUCCESS",
+      "artifactId": 14178232379,
+      "artifactDigest": "sha256:778baa27265eb0bde998a2102571255294d517a1284cc07a3325a0b9e07f7921",
+      "hostingFileReadback": 223,
+      "liveHostingUnchanged": true,
+      "controlHeadSha": "27b18fb30eecccf828c2907d920b1abcd6541bde",
+      "signedQaRunId": 43756837089,
+      "signedQaConclusion": "FAILURE",
+      "permissionDriver": "PASS",
+      "opsLeadsDriver": "PASS_SYNTHETIC_RESTORED_3_PLUS_3",
+      "advisorPayablesDriver": "HOLD_FINANCE_UI_HYDRATION_TIMEOUT_AT_TAB_CLICK_LINE_261",
+      "proposalApplicationDriver": "NOT_EXECUTED",
+      "failureDiagnosticArtifactId": 14178511809,
+      "failureDiagnosticDigest": "sha256:b8c9a0e5a7007b16f10eb819a785e82e65b042837eeb3995f655c745a8d5800b",
+      "cleanupRemaining": 0,
+      "realFinancialWrites": 0,
+      "acceptanceProofProduced": false,
+      "mustNotPromote": true
+    },
     "failedPreviewCleanup": "PASS_REMAINING_ZERO",
     "failedPreviewArtifactMustNotPromote": true,
     "readOnlyPreviewInventoryRun": 43758700651,
-    "documentaryLiquidations": {"status":"PAULA_AND_FERNANDO_V2_CORRECTION_CONTENT_AND_LAYOUT_VERIFIED_SAMUEL_UNCHANGED_NOT_POSTED","sourceFiles":10,"insurers":9,"sourceLines":79,"paulaLines":62,"fernandoLines":12,"samuelLines":2,"germanLines":3,"newFinancialWrites":0,"currenciesMustRemainSeparated":true},
+    "documentaryLiquidations": {
+      "status": "PAULA_AND_FERNANDO_V2_CORRECTION_CONTENT_AND_LAYOUT_VERIFIED_SAMUEL_UNCHANGED_NOT_POSTED",
+      "sourceFiles": 10,
+      "insurers": 9,
+      "sourceLines": 79,
+      "paulaLines": 62,
+      "fernandoLines": 12,
+      "samuelLines": 2,
+      "germanLines": 3,
+      "newFinancialWrites": 0,
+      "currenciesMustRemainSeparated": true
+    },
     "realNewPayablesCreated": 0,
-    "realNewPaymentsApplied": 0
+    "realNewPaymentsApplied": 0,
+    "advisorPortfolioCoherence20261115": {
+      "receipt": "artifacts/orbit360-recovery/release-control/I6_6_ADVISOR_PORTFOLIO_COHERENCE_20261115.json",
+      "status": "SOURCE_QA_AND_IMMUTABLE_PREVIEW_BUILD_PENDING",
+      "privateSourceRows": 76,
+      "positiveComponents": 74,
+      "economicObligations": 70,
+      "liveAdvisorMismatchesObserved": 6,
+      "newRealRecordWrites": 0,
+      "newLiveAcceptanceClaimed": false
+    }
   },
   "orderedWork": [
-    {"id":"P0-CONCILIATION","state":"SOURCE_IMPLEMENTATION_AND_QA_IN_PROGRESS","scope":"Canonical source resolution, exact edition/receipt selection, preview, Direction approval, same payment owner, source/preimage digest, replay protection, audit and readback; preserve immutable historical stage.","doneWhen":"Signed Preview and LIVE UI plus backend write/reload/replay/negative scope and reversible synthetic cleanup; then exact real-source batch."},
-    {"id":"URGENT-ADVISOR-CXP","state":"FOUR_ADVISOR_DOCUMENTARY_DATASETS_VERIFIED_CXP_NOT_POSTED","scope":"October ordinary sale commission, Fernando/Germán/Paula/Samuel mappings, original evidence hashes, existing commission/CxP/advance/reversal checks, CxP pending, business liquidation; zero bank transfers. Preserve source premium/rate when documented, canonical readback of both commissions and payables, and currency separation in affected consumers.","doneWhen":"Authenticated upload-preview-confirm creates linked commission and CxP once; readback/reload and per-advisor liquidation equals pending liability."},
-    {"id":"P0-PUBLISH-CURRENT-DELTA","state":"EXACT_BUILD_223_READBACK_PASS_SIGNED_FINANCE_TAB_CLICK_HOLD","scope":"One immutable build, existing isolated Preview, three exact current domain functions only, signed tests, same artifact to both LIVE origins, rollback ready. Never promote a failed signed candidate or patch its artifact; preserve exact diagnostic and refresh Preview inventory before any reuse restoration. Next diagnosis is the Finance advisor-tab timeout at line261, not the already corrected signed-envelope denial.","doneWhen":"Real workflow receipts, exact digests and post-deploy business-function verification. Successful build alone is not acceptance."},
-    {"id":"P0-CARLOS-TRANSVERSAL","state":"PRIOR_LIVE_SYNTHETIC_6_OF_8_ACCEPTANCE_CHECKS","scope":"Ops create/edit/respond/resolve/archive, Leads create/manage and exact Ops projection, policy writes, report/apply/reconcile payment, no-renovable, direct issued renewal, client creation from Cliente360, authorized superior roles and country boundaries.","doneWhen":"Preserve prior PASS and complete only remaining causal tests; genuine-document flow and all affected module/role write contracts survive reload."},
-    {"id":"P0-CARTERA-A1-A7","state":"SOURCE_SCHEDULE_AND_LINK_APPLICATION_PENDING","scope":"States of account vs commission statements, paid/current/overdue/future distinction, exact requirements and editions, no cross-period payments. A3 seven references already applied. A5 official10 vs LIVE12 quotas; A6 due dates/refs and Q0.04 total difference require protected correction, never erase existing reports.","doneWhen":"Document-led before/after, exact dedupe, correct schedule, exact payment records and cross-module totals, then signed LIVE readback per completed batch."},
-    {"id":"P1-ASEGURADORAS","state":"PRIOR_LIVE_3_OF_5_ACCEPTANCE_CHECKS","scope":"Complete directory for Dirección/Operativo and approved superiors; logo upload, bank account edit, secure password update/reveal without advisor requirement; no hidden-UI-only security.","doneWhen":"Real authorized logo/document/secret paths plus reload/audit and negative Asesor access, not merely synthetic account CRUD."},
-    {"id":"P1-ADJUNTOS-DRIVE","state":"NINE_FUNCTIONS_RESTORED_TENANT_OAUTH_CONSENT_REQUIRED","scope":"Existing same-project document workflow, valid metadata and real PDF upload/readback; no new provider or secret copying.","doneWhen":"Required human OAuth consent followed by real approved upload/download and two-role persistence test. Do not bypass consent."},
-    {"id":"P1-NOTIFICATIONS","state":"GREEN_API_PROVIDER_ACTIVE_SERVER_BRIDGE_AND_DELIVERY_PENDING","scope":"Paid Green API instance, existing Make, in-app bell, operative/payments/advisor routing; verify sender/backend secret binding and safe delivery proof.","doneWhen":"Authorized server access and scoped real delivery/receipt; active provider is not proof of end-to-end application delivery."},
-    {"id":"P1-PERFORMANCE-REGRESSION","state":"PRIOR_IMPROVEMENT_PRESERVED_FOCAL_REGRESSION_PENDING","scope":"Login/startup, global and module search, dropdowns, Cliente360/insurers/renewals/cobros route changes, mobile tables, PWA refresh, no30/120second successful path.","doneWhen":"Same-build repeatable current timings and role/viewport checks; no loss of approved capabilities."},
-    {"id":"P1-COMPLETENESS-JULY-NOVEMBER","state":"QUEUED_AFTER_SAFE_FINANCIAL_WRITES","scope":"Read recent customer dossiers July1–November15 and match latest2026 policy/vehicle/receipts against LIVE without duplicate imports.","doneWhen":"Source-backed difference list with created/updated/excluded/unresolved counts, original decisions recovered, only exact residual questions."},
-    {"id":"P1-MODULE-WRITE-MATRIX","state":"FOCAL_AND_EXISTING_COVERAGE_INVENTORY_REQUIRED_NOT_GLOBAL_PASS","scope":"Login, Inicio, Cliente360, Aseguradoras, Ops, Leads, Pólizas, Vehículos, Recibos/Cartera, Cobros, Renovaciones, Cancelaciones, Siniestros, Comisiones, Finanzas, reports, attachments, roles/scopes, relations, shell/router, hydration and PWA.","doneWhen":"For every affected module: source/blob/build, correct route/UI/data, create/edit/apply/attach where approved, persist/reload, permitted and denied roles/countries, relations, console/404 absence and applicable responsive verification."},
-    {"id":"PHASEB-DATA-IMPORTER-01","state":"QUEUED_AFTER_OPERATIONAL_CLOSURE","scope":"Evolve existing importer using proven delta/idempotency/provenance/rollback; no parallel importer or backend migration."},
-    {"id":"PHASEB-INTEGRATION-MAIL-01","state":"QUEUED_SEPARATE_FROM_PENDING_TRANSACTIONAL_MAIL","scope":"Personal per-user mailbox integration; do not confuse with current platform transactional notification closure."},
-    {"id":"PHASEB-FINANCE-01","state":"QUEUED_WITH_NECESSARY_COMMISSION_CXP_EXCEPTION_ACTIVE","scope":"Broader company Finance after operational prerequisites; immediate advisor CxP is explicitly authorized and does not claim entire Finance complete."},
-    {"id":"MKT-INFORMES-INTELIGENCIA","state":"QA_DESIGN_ONLY_CANONICAL_HANDOFF_PENDING","scope":"Within Marketing only; AYS-TECH-HO-MKT-RPT-GI-001 and candidateays.mkt.report.v1 must be validated by technology authority. No productive deployment authority inferred from this operational release."}
+    {
+      "id": "P0-CONCILIATION",
+      "state": "SOURCE_IMPLEMENTATION_AND_QA_IN_PROGRESS",
+      "scope": "Canonical source resolution, exact edition/receipt selection, preview, Direction approval, same payment owner, source/preimage digest, replay protection, audit and readback; preserve immutable historical stage.",
+      "doneWhen": "Signed Preview and LIVE UI plus backend write/reload/replay/negative scope and reversible synthetic cleanup; then exact real-source batch."
+    },
+    {
+      "id": "URGENT-ADVISOR-CXP",
+      "state": "DOCUMENTED_TOTALS_PRESERVED_ADVISOR_COHERENCE_AND_COMPONENT_SOURCE_QA_NO_REAL_POSTING",
+      "scope": "October ordinary sale commission, Fernando/Germán/Paula/Samuel mappings, original evidence hashes, existing commission/CxP/advance/reversal checks, CxP pending, business liquidation; zero bank transfers. Preserve source premium/rate when documented, canonical readback of both commissions and payables, and currency separation in affected consumers.",
+      "doneWhen": "Authenticated upload-preview-confirm creates linked commission and CxP once; readback/reload and per-advisor liquidation equals pending liability."
+    },
+    {
+      "id": "P0-PUBLISH-CURRENT-DELTA",
+      "state": "NEW_CAUSAL_SOURCE_IMMUTABLE_BUILD_REQUESTED_PRIOR_FAILED_PREVIEW_NOT_PROMOTABLE",
+      "scope": "One immutable build, existing isolated Preview, three exact current domain functions only, signed tests, same artifact to both LIVE origins, rollback ready. Never promote a failed signed candidate or patch its artifact; preserve exact diagnostic and refresh Preview inventory before any reuse restoration. Next diagnosis is the Finance advisor-tab timeout at line261, not the already corrected signed-envelope denial.",
+      "doneWhen": "Real workflow receipts, exact digests and post-deploy business-function verification. Successful build alone is not acceptance."
+    },
+    {
+      "id": "P0-CARLOS-TRANSVERSAL",
+      "state": "PRIOR_LIVE_SYNTHETIC_6_OF_8_ACCEPTANCE_CHECKS",
+      "scope": "Ops create/edit/respond/resolve/archive, Leads create/manage and exact Ops projection, policy writes, report/apply/reconcile payment, no-renovable, direct issued renewal, client creation from Cliente360, authorized superior roles and country boundaries.",
+      "doneWhen": "Preserve prior PASS and complete only remaining causal tests; genuine-document flow and all affected module/role write contracts survive reload."
+    },
+    {
+      "id": "P0-CARTERA-A1-A7",
+      "state": "SOURCE_SCHEDULE_AND_LINK_APPLICATION_PENDING",
+      "scope": "States of account vs commission statements, paid/current/overdue/future distinction, exact requirements and editions, no cross-period payments. A3 seven references already applied. A5 official10 vs LIVE12 quotas; A6 due dates/refs and Q0.04 total difference require protected correction, never erase existing reports.",
+      "doneWhen": "Document-led before/after, exact dedupe, correct schedule, exact payment records and cross-module totals, then signed LIVE readback per completed batch."
+    },
+    {
+      "id": "P1-ASEGURADORAS",
+      "state": "PRIOR_LIVE_3_OF_5_ACCEPTANCE_CHECKS",
+      "scope": "Complete directory for Dirección/Operativo and approved superiors; logo upload, bank account edit, secure password update/reveal without advisor requirement; no hidden-UI-only security.",
+      "doneWhen": "Real authorized logo/document/secret paths plus reload/audit and negative Asesor access, not merely synthetic account CRUD."
+    },
+    {
+      "id": "P1-ADJUNTOS-DRIVE",
+      "state": "NINE_FUNCTIONS_RESTORED_TENANT_OAUTH_CONSENT_REQUIRED",
+      "scope": "Existing same-project document workflow, valid metadata and real PDF upload/readback; no new provider or secret copying.",
+      "doneWhen": "Required human OAuth consent followed by real approved upload/download and two-role persistence test. Do not bypass consent."
+    },
+    {
+      "id": "P1-NOTIFICATIONS",
+      "state": "GREEN_API_PROVIDER_ACTIVE_SERVER_BRIDGE_AND_DELIVERY_PENDING",
+      "scope": "Paid Green API instance, existing Make, in-app bell, operative/payments/advisor routing; verify sender/backend secret binding and safe delivery proof.",
+      "doneWhen": "Authorized server access and scoped real delivery/receipt; active provider is not proof of end-to-end application delivery."
+    },
+    {
+      "id": "P1-PERFORMANCE-REGRESSION",
+      "state": "PRIOR_IMPROVEMENT_PRESERVED_FOCAL_REGRESSION_PENDING",
+      "scope": "Login/startup, global and module search, dropdowns, Cliente360/insurers/renewals/cobros route changes, mobile tables, PWA refresh, no30/120second successful path.",
+      "doneWhen": "Same-build repeatable current timings and role/viewport checks; no loss of approved capabilities."
+    },
+    {
+      "id": "P1-COMPLETENESS-JULY-NOVEMBER",
+      "state": "QUEUED_AFTER_SAFE_FINANCIAL_WRITES",
+      "scope": "Read recent customer dossiers July1–November15 and match latest2026 policy/vehicle/receipts against LIVE without duplicate imports.",
+      "doneWhen": "Source-backed difference list with created/updated/excluded/unresolved counts, original decisions recovered, only exact residual questions."
+    },
+    {
+      "id": "P1-MODULE-WRITE-MATRIX",
+      "state": "FOCAL_AND_EXISTING_COVERAGE_INVENTORY_REQUIRED_NOT_GLOBAL_PASS",
+      "scope": "Login, Inicio, Cliente360, Aseguradoras, Ops, Leads, Pólizas, Vehículos, Recibos/Cartera, Cobros, Renovaciones, Cancelaciones, Siniestros, Comisiones, Finanzas, reports, attachments, roles/scopes, relations, shell/router, hydration and PWA.",
+      "doneWhen": "For every affected module: source/blob/build, correct route/UI/data, create/edit/apply/attach where approved, persist/reload, permitted and denied roles/countries, relations, console/404 absence and applicable responsive verification."
+    },
+    {
+      "id": "PHASEB-DATA-IMPORTER-01",
+      "state": "QUEUED_AFTER_OPERATIONAL_CLOSURE",
+      "scope": "Evolve existing importer using proven delta/idempotency/provenance/rollback; no parallel importer or backend migration."
+    },
+    {
+      "id": "PHASEB-INTEGRATION-MAIL-01",
+      "state": "QUEUED_SEPARATE_FROM_PENDING_TRANSACTIONAL_MAIL",
+      "scope": "Personal per-user mailbox integration; do not confuse with current platform transactional notification closure."
+    },
+    {
+      "id": "PHASEB-FINANCE-01",
+      "state": "QUEUED_WITH_NECESSARY_COMMISSION_CXP_EXCEPTION_ACTIVE",
+      "scope": "Broader company Finance after operational prerequisites; immediate advisor CxP is explicitly authorized and does not claim entire Finance complete."
+    },
+    {
+      "id": "MKT-INFORMES-INTELIGENCIA",
+      "state": "QA_DESIGN_ONLY_CANONICAL_HANDOFF_PENDING",
+      "scope": "Within Marketing only; AYS-TECH-HO-MKT-RPT-GI-001 and candidateays.mkt.report.v1 must be validated by technology authority. No productive deployment authority inferred from this operational release."
+    }
   ],
   "remainingFrozenPostproduction": {
     "sourcePlan": "artifacts/orbit360-recovery/release-control/I6_POSTSALIDA_PLAN_LOCK_20260914.json",

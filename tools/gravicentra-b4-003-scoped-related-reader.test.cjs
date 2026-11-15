@@ -641,9 +641,9 @@ const docs={
   claimForeign:{id:'claimForeign',polizaId:'p1',clienteId:'c1',tenantId:'other'}
  },
  comisiones:{
-  com1:{id:'com1',polizaId:'p1',clienteId:'c1',monto:10},
-  comClientOnly:{id:'comClientOnly',clienteId:'c1',monto:4},
-  comOther:{id:'comOther',polizaId:'p2',clienteId:'c2',monto:12}
+  com1:{id:'com1',polizaId:'p1',clienteId:'c1',asesorId:'a1',monto:10},
+  comClientOnly:{id:'comClientOnly',clienteId:'c1',asesorId:'a1',monto:4},
+  comOther:{id:'comOther',polizaId:'p2',clienteId:'c2',asesorId:'a2',monto:12}
  },
  finmovs:{
   fmGT:{id:'fmGT',tenantId,pais:'GT',valor:30},
@@ -708,7 +708,7 @@ const read=async(collection,documentId,role='Asesor',country='GT')=>readScopedRe
  await assert.rejects(()=>read('reclamos','claimCO'),e=>e instanceof Denied&&e.code==='RECORD_NOT_FOUND_OR_DENIED','cross-country claim denied');
  await assert.rejects(()=>read('reclamos','claimForeign'),e=>e instanceof Denied&&e.code==='RECORD_NOT_FOUND_OR_DENIED','cross-tenant claim denied');
  const coms=await list('comisiones');
- assert.deepEqual(coms.rows.map(x=>x.id),['com1','comClientOnly'],'commissions are restricted through canonical policy/client assignments');
+ assert.deepEqual(coms.rows.map(x=>x.id),['com1','comClientOnly'],'commissions use their explicit beneficiary with verified canonical policy/client relations');
  await assert.rejects(()=>read('comisiones','comOther'),e=>e instanceof Denied&&e.code==='RECORD_NOT_FOUND_OR_DENIED','foreign advisor commission denied');
  const tasks=await list('tareas');
  assert.deepEqual(tasks.rows.map(x=>x.id),['taskOwn','taskPolicy'],'tasks require own advisor or verified client/policy relation; team and orphan rows withheld');

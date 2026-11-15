@@ -16,6 +16,7 @@
   var base=null, facade=null, provider=null, installed=false;
   var listeners=[], pending={}, pendingExpected={}, deleted={}, prefOverlay={};
   var metaPreviewCache={};
+  var advisorCorrectionPreviews={};
   var state={ready:false,failClosed:true,pending:0,committed:0,failed:0,lastError:'',lastCommittedAt:'',tenantId:'',version:VERSION};
 
   var SURFACE=Object.freeze({
@@ -519,6 +520,11 @@
         if(x.collection==='polizas'&&x.action==='update'&&options.policyRenewabilityOnly===true){
           mutation.expectedBefore={renovable:x.prior&&Object.prototype.hasOwnProperty.call(x.prior,'renovable')?clone(x.prior.renovable):null};
         }
+        if(x.collection==='polizas'&&x.action==='update'&&options.policyMetadataOnly===true){
+          mutation.expectedBefore={asesorId:text(x.prior&&x.prior.asesorId)};
+          if(Object.prototype.hasOwnProperty.call(x.payload,'renovable'))
+            mutation.expectedBefore.renovable=x.prior&&Object.prototype.hasOwnProperty.call(x.prior,'renovable')?clone(x.prior.renovable):null;
+        }
         if(x.collection==='aseguradoras'&&x.action!=='remove'){
           mutation.payload=x.action==='update'?clone(x.payload):insurerWritePayload(x.action,x.row,x.prior);
           mutation.auditReason=x.auditReason;
@@ -639,8 +645,114 @@
     authorize(collection,'remove',prior);deletedBucket(collection)[id]=true;clearPending(collection,id);emit(collection);
     return callDurable('remove',collection,id,null,prior).then(function(){return true;});
   }
+  function correctAdvisorAssignment(spec,options){
+    options=options||{};
+    var m=member(),input=clone(spec)||{},schema='gravicentra-advisor-assignment-correction-v1';
+    var allowed=['version','operation','clientId','policyIds','updateClient','targetAdvisorId','reason','sourceAuthority','expectedBefore','expectedPreviewDigest'];
+    var role=text(m.activeRole).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
+    var preserved=['recibosEsperados','carteraPrimas','cobros','comisiones','finmovs','vehiculos'];
+    var validId=function(value){return typeof value==='string'&&/^[A-Za-z0-9][A-Za-z0-9._:-]{1,255}$/.test(value);};
+    var validDigest=function(value){return typeof value==='string'&&/^[a-f0-9]{64}$/.test(value);};
+    function stable(value){return Array.isArray(value)?value.map(stable):value&&typeof value==='object'?Object.fromEntries(Object.keys(value).sort().map(function(key){return[key,stable(value[key])];})):value;}
+    function same(left,right){return JSON.stringify(stable(left))===JSON.stringify(stable(right));}
+    function rowDigest(row){
+      if(!window.crypto||!window.crypto.subtle||typeof TextEncoder!=='function')return Promise.reject(new Error('CORRECTION_DIGEST_BROWSER_UNAVAILABLE'));
+      return window.crypto.subtle.digest('SHA-256',new TextEncoder().encode(JSON.stringify(stable(row)))).then(function(bytes){
+        return Array.from(new Uint8Array(bytes),function(value){return value.toString(16).padStart(2,'0');}).join('');
+      });
+    }
+    if(role!=='direccion')return Promise.reject(new Error('CORRECTION_DIRECTION_REQUIRED'));
+    if(Object.keys(input).some(function(key){return allowed.indexOf(key)<0;})||input.version!==1||
+       ['preview','commit'].indexOf(input.operation)<0||typeof input.updateClient!=='boolean'||
+       !validId(input.clientId)||!validId(input.targetAdvisorId)||!Array.isArray(input.policyIds)||
+       !input.policyIds.length||input.policyIds.length+(input.updateClient?1:0)>20||
+       input.policyIds.some(function(id){return!validId(id);})||new Set(input.policyIds).size!==input.policyIds.length)
+      return Promise.reject(new Error('CORRECTION_CONTRACT_INVALID'));
+    if(!Orbit.access||Orbit.access.can('polizas','edit')!==true||input.updateClient&&Orbit.access.can('cliente360','edit')!==true)
+      return Promise.reject(new Error('CORRECTION_ACCESS_DENIED'));
+    input.policyIds=input.policyIds.slice().sort();
+    input.reason=text(input.reason);
+    var source=input.sourceAuthority;
+    if(!source||typeof source!=='object'||Array.isArray(source)||Object.keys(source).some(function(key){return['decisionRef','sourceReference','sourceSha256','lineRef','period'].indexOf(key)<0;}))
+      return Promise.reject(new Error('CORRECTION_SOURCE_REQUIRED'));
+    input.sourceAuthority={decisionRef:text(source.decisionRef),sourceReference:text(source.sourceReference),
+      sourceSha256:text(source.sourceSha256).toLowerCase(),lineRef:text(source.lineRef),period:text(source.period)};
+    var intent={clientId:input.clientId,policyIds:input.policyIds,updateClient:input.updateClient,
+      targetAdvisorId:input.targetAdvisorId,reason:input.reason,sourceAuthority:input.sourceAuthority};
+    var cachePrefix=m.tenantId+'|'+m.uid+'|',cached=input.operation==='commit'?advisorCorrectionPreviews[cachePrefix+input.expectedPreviewDigest]:null;
+    if(input.operation==='commit'&&(!cached||!same(cached.intent,intent)||!same(cached.expectedBefore,input.expectedBefore)))
+      return Promise.reject(new Error('CORRECTION_PREVIEW_REQUIRED'));
+    return signedContext(provider,m).then(function(){
+      var preview=isB2PreviewHost(),payload={tenantId:m.tenantId,activeRole:m.activeRole,advisorAssignmentCorrection:input};
+      if(text(options.requestId))payload.requestId=text(options.requestId);
+      return provider.callFunction(preview?previewGeneralCommand():GENERAL_COMMAND,payload,preview?'us-east1':'us-central1');
+    }).then(async function(result){
+      var current=member();
+      if(current.uid!==m.uid||current.tenantId!==m.tenantId||current.activeRole!==m.activeRole)
+        throw new Error('CORRECTION_ACTOR_CHANGED');
+      if(!result||result.ok!==true||result.serverOwned!==true||result.schemaVersion!==schema||result.tenantId!==m.tenantId||
+         result.actorUid!==m.uid||result.financialWrites!==0||result.historicalAssignmentsPreserved!==true||
+         !validDigest(result.previewDigest)||!validDigest(result.payloadDigest)||!same(result.intent,intent)||
+         !Array.isArray(result.expectedBefore)||!Array.isArray(result.changes)||!result.changes.length||
+         !result.preservationFingerprints)
+        throw new Error('CORRECTION_SERVER_PROOF_REQUIRED');
+      var wanted=['clientes|'+input.clientId].concat(input.policyIds.map(function(id){return'polizas|'+id;})).sort();
+      var beforeKeys=result.expectedBefore.map(function(row){return text(row.collection)+'|'+text(row.id);}).sort();
+      if(!same(wanted,beforeKeys)||new Set(beforeKeys).size!==beforeKeys.length||result.expectedBefore.some(function(row){return!validDigest(row.recordDigest)||typeof row.asesorId!=='string';}))
+        throw new Error('CORRECTION_PREIMAGE_TARGET_MISMATCH');
+      if(preserved.some(function(collection){var proof=result.preservationFingerprints[collection];return!proof||!Number.isInteger(proof.count)||proof.count<0||!validDigest(proof.digest);}))
+        throw new Error('CORRECTION_PRESERVATION_PROOF_REQUIRED');
+      var changeKeys=new Set();
+      result.changes.forEach(function(change){
+        var key=text(change.collection)+'|'+text(change.id),before=result.expectedBefore.find(function(row){return row.collection===change.collection&&row.id===change.id;});
+        if(!before||changeKeys.has(key)||(change.collection==='clientes'&&!input.updateClient)||
+           change.fromAdvisorId!==before.asesorId||change.toAdvisorId!==input.targetAdvisorId||
+           change.beforeDigest!==before.recordDigest||!same(change.patch,{asesorId:input.targetAdvisorId})||
+           !validDigest(change.afterDigest)||!validDigest(change.protectedDigest))
+          throw new Error('CORRECTION_CHANGE_PROOF_MISMATCH');
+        changeKeys.add(key);
+      });
+      if(input.operation==='preview'){
+        if(result.readOnly!==true||result.committed===true)throw new Error('CORRECTION_PREVIEW_NOT_READONLY');
+        advisorCorrectionPreviews[cachePrefix+result.previewDigest]=clone(result);
+        var keys=Object.keys(advisorCorrectionPreviews);if(keys.length>20)delete advisorCorrectionPreviews[keys[0]];
+        return result;
+      }
+      if(result.committed!==true||result.canonicalReadback!==true||result.preservationVerified!==true||
+         result.previewDigest!==input.expectedPreviewDigest||!same(result.expectedBefore,cached.expectedBefore)||
+         !same(result.changes,cached.changes)||!same(result.preservationFingerprints,cached.preservationFingerprints)||
+         !Array.isArray(result.readback))throw new Error('CORRECTION_READBACK_REQUIRED');
+      var afterKeys=result.readback.map(function(row){return text(row.collection)+'|'+text(row.id);}).sort();
+      if(!same(afterKeys,wanted)||new Set(afterKeys).size!==afterKeys.length)throw new Error('CORRECTION_READBACK_TARGET_MISMATCH');
+      for(var proof of result.readback){
+        var row=proof.record,before=result.expectedBefore.find(function(item){return item.collection===proof.collection&&item.id===proof.id;}),
+          change=result.changes.find(function(item){return item.collection===proof.collection&&item.id===proof.id;});
+        if(!row||row.id!==proof.id||(row.tenantId&&row.tenantId!==m.tenantId)||
+           proof.collection==='polizas'&&row.clienteId!==input.clientId||
+           await rowDigest(row)!==(change?change.afterDigest:before.recordDigest))
+          throw new Error('CORRECTION_READBACK_RECORD_MISMATCH');
+        if(change){
+          var protectedRow=clone(row);delete protectedRow.asesorId;
+          if(row.asesorId!==input.targetAdvisorId||await rowDigest(protectedRow)!==change.protectedDigest)
+            throw new Error('CORRECTION_PROTECTED_FIELDS_CHANGED');
+        }
+      }
+      // No optimistic correction. Publish only the fully verified canonical
+      // records; the original reader still owns reload and future hydration.
+      result.changes.forEach(function(change){
+        var row=result.readback.find(function(proof){return proof.collection===change.collection&&proof.id===change.id;}).record;
+        setPending(change.collection,change.id,clone(row),{kind:'update',patch:{asesorId:input.targetAdvisorId}});
+      });
+      Array.from(new Set(result.changes.map(function(change){return change.collection;}))).forEach(emit);
+      return result;
+    });
+  }
   function prepareAdvisorPayables(spec){
     var m=member(),input=clone(spec)||{};
+    function sameComponents(left,right){
+      return left.sourceComponentsDigest===right.sourceComponentsDigest&&
+        JSON.stringify(left.sourceComponents||null)===JSON.stringify(right.sourceComponents||null);
+    }
     if(input.version!==1||['preview','prepare'].indexOf(input.operation)<0)return Promise.reject(new Error('ADVISOR_PAYABLE_CONTRACT_REQUIRED'));
     if(!Orbit.access||Orbit.access.can('comisiones','create')!==true||Orbit.access.can('conciliaciones','create')!==true)
       return Promise.reject(new Error('ADVISOR_PAYABLE_ACCESS_DENIED'));
@@ -658,7 +770,7 @@
         if(result.committed!==true||result.canonicalReadback!==true||!Array.isArray(result.readback)||result.readback.length!==result.payables.length)
           throw new Error('ADVISOR_PAYABLE_CANONICAL_READBACK_REQUIRED');
         result.payables.forEach(function(row){
-          var proof=result.readback.find(function(r){return r.collection==='finmovs'&&r.id===row.id&&r.exists===true&&r.financialDigest===row.financialDigest&&r.estado===row.estado&&r.pendiente===row.pendiente;});
+          var proof=result.readback.find(function(r){return r.collection==='finmovs'&&r.id===row.id&&r.exists===true&&r.financialDigest===row.financialDigest&&r.estado===row.estado&&r.pendiente===row.pendiente&&sameComponents(r,row);});
           if(!proof)throw new Error('ADVISOR_PAYABLE_ROW_READBACK_MISSING');
         });
         if(!Array.isArray(result.commissions)||!Array.isArray(result.commissionReadback)||
@@ -668,11 +780,11 @@
         result.commissions.forEach(function(row){
           var payable=result.payables.find(function(p){return p.comisionId===row.id&&p.id===row.cxpAsesorId;});
           var proof=result.commissionReadback.find(function(r){return r.collection==='comisiones'&&r.id===row.id&&r.exists===true&&
-            r.financialDigest===row.financialDigest&&r.cxpAsesorId===row.cxpAsesorId&&r.monto===row.monto&&r.montoAsesor===row.montoAsesor&&r.base===row.base&&r.pct===row.pct;});
+            r.financialDigest===row.financialDigest&&r.cxpAsesorId===row.cxpAsesorId&&r.monto===row.monto&&r.montoAsesor===row.montoAsesor&&r.base===row.base&&r.pct===row.pct&&sameComponents(r,row);});
           if(!payable||!proof||commissionIds.has(row.id)||row.tenantId!==m.tenantId||row.asesorId!==input.advisorId||
              row.financialDigest!==payable.financialDigest||row.polizaId!==payable.polizaId||row.clienteId!==payable.clienteId||
              row.moneda!==payable.moneda||row.pais!==payable.pais||row.monto!==payable.comisionOrdinariaAcreditada||
-             row.montoAsesor!==payable.valor||row.pctAsesor!==payable.pctAsesor||row.base!==payable.base||row.pct!==payable.pct)
+             row.montoAsesor!==payable.valor||row.pctAsesor!==payable.pctAsesor||row.base!==payable.base||row.pct!==payable.pct||!sameComponents(row,payable))
             throw new Error('ADVISOR_COMMISSION_ROW_READBACK_MISSING');
           commissionIds.add(row.id);
         });
@@ -704,6 +816,7 @@
       all:mergedAll,get:get,where:where,find:find,insert:insert,update:update,remove:remove,
       insertDurable:insertDurable,updateDurable:updateDurable,removeDurable:removeDurable,batchDurable:batchDurable,
       classifyAdvisorDurable:classifyAdvisorDurable,
+      correctAdvisorAssignment:correctAdvisorAssignment,
       prepareAdvisorPayables:prepareAdvisorPayables,
       metaPreviewEnabled:isB2PreviewHost,metaPreviewFixtures:metaPreviewFixtures,
       metaPreviewQaProbe:function(input){return metaPreviewQaRead(input,'probe');},metaPreviewQaInspect:function(input){return metaPreviewQaRead(input,'inspect');},

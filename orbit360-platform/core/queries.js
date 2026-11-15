@@ -566,8 +566,12 @@ Orbit.q = (function () {
       if (requestedAdvisor) {
         const policy = r.polizaId != null ? policies.get(r.polizaId) : null;
         const policyAdvisor = String(policy && policy.asesorId || '').trim();
-        const declaredAdvisor = String(r.asesorId || '').trim();
-        if (!policyAdvisor || policyAdvisor !== requestedAdvisor || (declaredAdvisor && declaredAdvisor !== policyAdvisor)) return;
+        // Parent/client/country were verified above. Operational recaudo follows
+        // this exact policy's current responsible advisor, including immediately
+        // after a documented correction while child projections await reload.
+        // Historical commission/CxP beneficiaries are a separate financial scope.
+        if (!policy || String(policy.id) !== String(r.polizaId) ||
+            !policyAdvisor || policyAdvisor !== requestedAdvisor) return;
       }
       const n = finite(r.monto);
       if (n == null) return;

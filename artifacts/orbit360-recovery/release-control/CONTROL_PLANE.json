@@ -9,7 +9,7 @@
     "activeGate": "I6.6",
     "closedHistoricalGate": "B4-007",
     "latestProvenLiveSource": "84769378eb2014addebfefdbdd63091bddc4b817",
-    "currentWork": "Conciliation resolution/approval/application and October advisor pending payables, same artifact release after signed Preview; no blind payment or new backend.",
+    "currentWork": "Documented advisor/client/policy coherence, ordinary-commission component rounding, historical financial beneficiary preservation, and exact immutable Preview/LIVE delivery before real source-bound corrections.",
     "newFinancialWrites": 0,
     "newLiveAcceptanceClaimed": false
   },
@@ -3344,7 +3344,7 @@
     "i63LiveReadbackPass": true,
     "i63DeterministicDiffReady": true
   },
-  "nextAction": "I6_6_CONTINUATION_20261115: RESOLVE_SIGNED_PREVIEW_43756837089_FINANCE_ADVISOR_TAB_TIMEOUT_AT_LINE_261_WITH_CAUSAL_UI_EVIDENCE; PRESERVE_PERMISSIONS_AND_OPS_LEADS_PASS_AND_CLEANUP_ZERO. SOURCE_OR_DRIVER_CHANGE_REQUIRES_NEW_IMMUTABLE_ARTIFACT_AND_FOUR_SIGNED_PREVIEW_DRIVERS_BEFORE_SAME_ARTIFACT_LIVE. R11_SOURCE_84769378EB20_ARTIFACT_14075022275_REMAINS_LAST_PROVEN_LIVE. OCTOBER_DOCUMENTARY_V2_NOT_POSTED; BANTRAB_A3_7_SOURCE_REFERENCES_ALREADY_APPLIED_43438038880_ZERO_PAYMENTS_DO_NOT_REPEAT. ALL_15_ORDERED_WORK_ITEMS_PRESERVED_IN_I6_6_OPERATIONAL_CONTINUATION_20261115_JSON; NO_NEW_ACCEPTANCE_OR_REAL_FINANCIAL_WRITES.",
+  "nextAction": "I6_6_ADVISOR_PORTFOLIO_COHERENCE_20261115: COMPLETE_SOURCE_QA_AND_BUILD_NEW_IMMUTABLE_ARTIFACT_WITH_EXACT_FAILED_PREVIEW_RESTORE_BINDING; RUN_SAME_FOUR_SIGNED_DRIVERS_INCLUDING_DOCUMENTED_ADVISOR_CORRECTION_AND_HISTORICAL_FINANCIAL_BENEFICIARY_PRESERVATION. ONLY_THEN_PROMOTE_SAME_ARTIFACT_AND_APPLY_SOURCE_BOUND_REAL_CORRECTIONS_WITH_CAS_READBACK_RELOAD. R11_REMAINS_LAST_ACCEPTED_LIVE; OPS_6_OF_8_AND_OVERALL_19_OF_31_UNCHANGED; NO_REAL_NEW_PAYMENTS_OR_PAYABLES; ALL_FROZEN_ORDERED_WORK_PRESERVED.",
   "postproductionExitProgress": {
     "formalPercent": 60,
     "frozenMiniGates": 6,
@@ -22871,5 +22871,13 @@
     "canonicalReceipt": "artifacts/orbit360-recovery/release-control/I6_6_BANTRAB_SEVEN_SOURCE_REFS_LIVE_RECEIPT_20261113.json",
     "next": "DO_NOT_REPEAT_THIS_CAS; SOURCE_EXACT_PAYMENT_EVIDENCE_AND_SEPARATE_PROTECTED_PAYMENT_COMMAND_REQUIRED",
     "fullI66ProductionAccepted": false
+  },
+  "i66AdvisorPortfolioCoherence20261115": {
+    "status": "SOURCE_QA_AND_IMMUTABLE_PREVIEW_BUILD_PENDING",
+    "receipt": "artifacts/orbit360-recovery/release-control/I6_6_ADVISOR_PORTFOLIO_COHERENCE_20261115.json",
+    "activeGate": "I6.6",
+    "lastAcceptedLiveUnchanged": true,
+    "realRecordWrites": 0,
+    "newLiveAcceptanceClaimed": false
   }
 }

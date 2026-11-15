@@ -15,6 +15,7 @@ function scopeDomain(){
     './product-active-role-contract':{resolveProductActiveRole:()=>({activeRole:'Operativo'})},
     './goal-participation-contract':{validarCambioParticipacion:()=>null},
     './advisor-commission-payable-contract':require('../functions/advisor-commission-payable-contract'),
+    './advisor-assignment-correction-contract':require('../functions/advisor-assignment-correction-contract'),
     './b4-003-scoped-bootstrap-reader':{projectInsurerActivity:()=>[]}
   };
   const sandbox={require:name=>{if(!mocks[name])throw Error('Unexpected dependency '+name);return mocks[name];},

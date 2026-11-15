@@ -95,7 +95,7 @@ jobs:
           tar -xzf "$TAR" -C "$FROOT" --no-same-owner
           BACKEND="$FROOT/bundle/backend"
           (cd "$BACKEND" && sha256sum --check --quiet "$FROOT/evidence/backend-manifest.sha256")
-          for p in b4-003-scoped-access-boundary.js product-operational-domain.js product-ops-leads-domain.js cobros-reconciliation-domain.js advisor-commission-payable-contract.js proposal-application-boundary.js payment-inference-engine.js i66-conciliaciones-active-ledger-projection.js;do
+          for p in b4-003-scoped-access-boundary.js b4-003-scoped-related-reader.js product-operational-domain.js product-ops-leads-domain.js cobros-reconciliation-domain.js advisor-commission-payable-contract.js advisor-assignment-correction-contract.js proposal-application-boundary.js payment-inference-engine.js i66-conciliaciones-active-ledger-projection.js;do
             git show "$SOURCE_SHA:functions/$p" > "$RUNNER_TEMP/i66-source-$p"
             cmp "$RUNNER_TEMP/i66-source-$p" "$BACKEND/$p"
           done

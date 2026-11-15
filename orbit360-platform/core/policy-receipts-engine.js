@@ -496,6 +496,36 @@ Orbit.policyReceipts = (function () {
       (!Object.prototype.hasOwnProperty.call(patch,'renovable')||[true,false,null].includes(patch.renovable));
   }
 
+  async function correctAdvisorAssignment(spec, options) {
+    options = options || {}; spec = spec || {};
+    if (norm(role()) !== 'direccion' || !canManagePolicies())
+      return { ok: false, errors: ['CORRECTION_DIRECTION_REQUIRED'] };
+    if (!S() || typeof S().correctAdvisorAssignment !== 'function')
+      return { ok: false, errors: ['CORRECTION_TRANSPORT_UNAVAILABLE'] };
+    if (spec.version !== 1 || !['preview', 'commit'].includes(spec.operation))
+      return { ok: false, errors: ['INVALID_CORRECTION_OPERATION'] };
+    const requestId = clean(options.requestId || options.operationId ||
+      (spec.operation === 'commit' && /^[a-f0-9]{64}$/i.test(clean(spec.expectedPreviewDigest))
+        ? 'advcorr_' + clean(spec.expectedPreviewDigest).slice(0, 40) : ''));
+    try {
+      const result = await S().correctAdvisorAssignment(clone(spec), { requestId });
+      if (!result || result.ok !== true || result.serverOwned !== true ||
+          result.schemaVersion !== 'gravicentra-advisor-assignment-correction-v1' ||
+          result.financialWrites !== 0 || !/^[a-f0-9]{64}$/i.test(clean(result.previewDigest)))
+        return { ok: false, errors: ['CORRECTION_SERVER_PROOF_REQUIRED'], operationId: requestId };
+      if (spec.operation === 'preview' && (result.readOnly !== true || !Array.isArray(result.expectedBefore) ||
+          !Array.isArray(result.changes) || !result.changes.length || !result.preservationFingerprints))
+        return { ok: false, errors: ['CORRECTION_SERVER_PROOF_REQUIRED'], operationId: requestId };
+      if (spec.operation === 'commit' && (result.committed !== true || result.canonicalReadback !== true ||
+          result.preservationVerified !== true || result.previewDigest !== spec.expectedPreviewDigest))
+        return { ok: false, errors: ['CORRECTION_READBACK_MISMATCH'], operationId: requestId };
+      return Object.assign({}, result, { operationId: result.requestId || requestId });
+    } catch (error) {
+      return { ok: false, errors: [String(error && error.details && error.details.reason || 'CORRECTION_NOT_CONFIRMED')],
+        error: String(error && (error.message || error.code) || error), operationId: requestId };
+    }
+  }
+
   async function updatePolicy(id, patch, options) {
     options=options||{};if(!canManagePolicies())return{ok:false,errors:['permiso_poliza_denegado']};if(!S()||typeof S().batchDurable!=='function')return{ok:false,errors:['contrato_atomico_no_disponible']};
     const current=S().get('polizas',id);if(!current)return{ok:false,errors:['poliza_no_encontrada']};
@@ -660,7 +690,7 @@ Orbit.policyReceipts = (function () {
   return {
     ACTIVE, isActiveState, isPaidReceipt, canManagePolicies, canApplyPayments,
     canonicalPolicyKey, policyVersionKey, validatePolicy, preparePolicy, normalizeVehicle, expectedReceipts, syncReceipts, syncPortfolio, buildAtomicWritePlan,
-    createPolicy, updatePolicy, linkVehicleToPolicy, updateReceipt, receiptEditLocked, applyPayment, createReconciliationProposal, updateClientState,
+    createPolicy, updatePolicy, correctAdvisorAssignment, linkVehicleToPolicy, updateReceipt, receiptEditLocked, applyPayment, createReconciliationProposal, updateClientState,
     receiptId, sequenceOf, installmentsForFrequency, policyCurrencies
   };
 })();

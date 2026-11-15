@@ -46,7 +46,15 @@ Orbit.modules = Orbit.modules || {};
     reporte_cliente_requiere_validacion: 'Valida primero el pago reportado por el cliente.', poliza_sin_cartera_activa: 'La póliza no tiene cartera activa.',
     pagos_existentes_requieren_endoso: 'La póliza tiene pagos aplicados. Los cambios financieros o de asignación requieren un endoso/gestión controlada.',
     operacion_incompleta: 'La operación quedó marcada para revisión; no la repitas sin verificar.',
-    operacion_atomica_no_confirmada: 'No fue posible confirmar el guardado en el servidor. Ningún cambio debe darse por aplicado hasta obtener readback.'
+    operacion_atomica_no_confirmada: 'No fue posible confirmar el guardado en el servidor. Ningún cambio debe darse por aplicado hasta obtener readback.',
+    CORRECTION_DIRECTION_REQUIRED: 'La corrección documentada de asesor requiere Dirección como rol activo.',
+    CORRECTION_TRANSPORT_UNAVAILABLE: 'La corrección documentada aún no está disponible en esta versión.',
+    CORRECTION_STALE_PREIMAGE: 'El cliente o la póliza cambió. Revisa una nueva previsualización antes de confirmar.',
+    CORRECTION_STALE_PREVIEW: 'La información cambió desde la previsualización. Revísala nuevamente.',
+    CORRECTION_NO_CHANGE: 'Los registros seleccionados ya tienen el asesor indicado.',
+    CORRECTION_NOT_CONFIRMED: 'No se pudo confirmar la corrección. Consulta el registro antes de repetirla.',
+    CORRECTION_READBACK_MISMATCH: 'La verificación posterior necesita revisión; no se declara aplicada la corrección.',
+    CORRECTION_SERVER_PROOF_REQUIRED: 'Falta la confirmación canónica del servidor.'
   };
   function errorText(errors) { return (errors || []).map(x => ERROR_LABELS[String(x).split(':')[0]] || 'No fue posible confirmar esta operación.').join(' · '); }
   function protectedPreviewRealPolicy(id){
@@ -155,6 +163,8 @@ Orbit.modules = Orbit.modules || {};
     const frequencies = Object.keys(Orbit.primas.FRECUENCIAS || { Contado: 1 });
     const forms = Orbit.primas.FORMAS_PAGO || ['Transferencia'];
     const status = ['Vigente','Por renovar','Vencida','Cancelada','Anulada','Rechazada','Requiere validación'];
+    const assignmentCorrectionAvailable = !!existing && String(A.activeRole ? A.activeRole() : '')
+      .normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase() === 'direccion';
     const inner = `
       <div style="padding:17px 20px;background:linear-gradient(120deg,var(--graph),#10141a);display:flex;justify-content:space-between;align-items:center;gap:12px">
         <div><small style="color:rgba(255,255,255,.65)">📑 Pólizas · operación controlada</small><b style="display:block;font-family:var(--f-display);font-size:18px;color:#fff">${existing ? 'Editar póliza' : 'Nueva póliza'}</b></div>
@@ -197,10 +207,13 @@ Orbit.modules = Orbit.modules || {};
         <div class="card pad gi-policy-preview" data-preview></div>
         <div data-vehicle class="gi-vehicle-panel" style="display:none"><div class="gi-form-section-title"><span>🚘</span><div>Vehículo asegurado<small>Completa el riesgo vinculado a esta póliza.</small></div></div><div class="cgrid" style="margin-top:12px"><label class="ce-l">Marca<input class="o-sel" data-vbrand value="${esc(existingVehicle && existingVehicle.marca || '')}"></label><label class="ce-l">Línea<input class="o-sel" data-vline value="${esc(existingVehicle && existingVehicle.linea || '')}"></label><label class="ce-l">Placa<input class="o-sel" data-vplate value="${esc(existingVehicle && existingVehicle.placa || '')}"></label><label class="ce-l">Año<input type="number" class="o-sel" data-vyear value="${esc(existingVehicle && existingVehicle.anio || '')}"></label><label class="ce-l">Uso<input class="o-sel" data-vuse value="${esc(existingVehicle && existingVehicle.uso || 'Particular')}"></label><label class="ce-l">Color<input class="o-sel" data-vcolor value="${esc(existingVehicle && existingVehicle.color || '')}"></label><label class="ce-l">VIN<input class="o-sel" data-vvin value="${esc(existingVehicle && existingVehicle.vin || '')}"></label><label class="ce-l">Chasis<input class="o-sel" data-vchasis value="${esc(existingVehicle && existingVehicle.chasis || '')}"></label><label class="ce-l">Motor<input class="o-sel" data-vmotor value="${esc(existingVehicle && existingVehicle.motor || '')}"></label></div></div>
         ${existing ? '<label class="ce-l">Motivo del cambio *<textarea class="o-sel" data-reason style="min-height:58px"></textarea></label>' : ''}
+        ${assignmentCorrectionAvailable ? '<label class="ce-l"><span><input type="checkbox" data-assignment-mode data-assignment-field> Corregir asesor con respaldo documental</span></label><div class="card pad" data-assignment-panel style="display:none"><p class="cfg-note">Revisa el cambio de responsable con la fuente confirmada por Dirección. La prima, el calendario, los pagos y las comisiones históricas conservan sus valores y atribución originales.</p><label class="ce-l"><span><input type="checkbox" data-assignment-client data-assignment-field> Actualizar también responsable del cliente</span></label><div class="cgrid" style="margin-top:10px"><label class="ce-l">Referencia de la decisión de Dirección *<input class="o-sel" data-assignment-decision data-assignment-field placeholder="Decisión o instrucción documentada"></label><label class="ce-l">Periodo del documento *<input type="month" class="o-sel" data-assignment-period data-assignment-field></label><label class="ce-l">Documento / referencia *<input class="o-sel" data-assignment-source data-assignment-field placeholder="Archivo o referencia del expediente"></label><label class="ce-l">Hoja / renglón *<input class="o-sel" data-assignment-line data-assignment-field placeholder="Referencia exacta en el documento"></label></div><label class="ce-l" style="margin-top:10px">Seleccionar documento para verificarlo<input type="file" class="o-sel" data-assignment-file data-assignment-field accept=".xlsx,.xls,.csv,.pdf,.json,.txt"></label><details style="margin-top:10px"><summary>Verificación documental</summary><label class="ce-l">Huella SHA-256 del documento original<input class="o-sel mono" data-assignment-sha data-assignment-field maxlength="64" placeholder="Se completa al seleccionar el documento"></label></details><div data-assignment-summary class="cfg-note" style="margin-top:12px">La previsualización consultará esta póliza y su cliente antes de habilitar la confirmación.</div><div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px"><button class="btn ghost" data-assignment-preview>Previsualizar corrección</button><button class="btn primary" data-assignment-confirm disabled>Confirmar corrección</button></div></div>' : ''}
         <div class="hint error" data-error style="display:none"></div>
       </div>
       <div style="padding:14px 20px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;position:sticky;bottom:0;background:var(--card)">${existing ? '<button class="btn ghost" data-delete style="margin-right:auto;color:var(--danger,var(--red))">Eliminar</button>' : ''}<button class="btn ghost" data-close>Cancelar</button><button class="btn primary" data-save>${existing ? 'Guardar y sincronizar recibos' : 'Crear póliza y recibos'}</button></div>`;
     const b = modal('policy-v1199', inner, 800), $ = s => b.querySelector(s);
+    const assignmentMode = $('[data-assignment-mode]');
+    let assignmentReceipt = null, assignmentIntent = '', assignmentFileSequence = 0;
     if(opts.focusField==='renovabilidad')setTimeout(()=>{const el=$('[data-renewable]');if(el&&el.scrollIntoView)el.scrollIntoView({block:'center'});if(el)el.focus();},0);
     const clientEl = $('[data-client]'), advisorEl = $('[data-advisor]'), insurerEl = $('[data-insurer]'), ramoEl = $('[data-ramo]'), productEl = $('[data-product]');
     const currencyEl = $('[data-currency]');
@@ -328,7 +341,8 @@ Orbit.modules = Orbit.modules || {};
       const total=prepared.primaTotal!=null?prepared.primaTotal:prepared.prima;
       const amount=value=>preserve&&value==null?'No desglosado en el registro':money(prepared.moneda,value);
       preview.innerHTML = `<div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start"><div><small class="muted">${preserve?'Valores existentes · sin recálculo por asesor o renovabilidad':'Resultado antes de guardar'}</small><b style="display:block">${active ? recs.length + ' recibo(s) '+(preserve?'existente(s) cargado(s)':'en cartera') : 'Histórico · sin cartera nueva'}</b></div><b>${amount(total)}</b></div><div class="asg197-info-grid" style="margin-top:10px"><div><small>Prima neta</small><b>${amount(prepared.primaNeta)}</b></div><div><small>Gastos financieros</small><b>${amount(prepared.gastosFinan)}</b></div><div><small>IVA</small><b>${amount(prepared.ivaMonto)}</b></div><div><small>Total</small><b>${amount(total)}</b></div></div>`;
-      $('[data-save]').textContent=preserve?'Guardar sin recalcular recibos':existing?'Guardar y sincronizar recibos':'Crear póliza y recibos';
+      $('[data-save]').textContent=assignmentMode&&assignmentMode.checked?'Confirma en la corrección documentada':preserve?'Guardar sin recalcular recibos':existing?'Guardar y sincronizar recibos':'Crear póliza y recibos';
+      if(assignmentMode&&assignmentMode.checked)$('[data-save]').disabled=true;
       if(active&&recs.length)preview.insertAdjacentHTML('beforeend','<div style="margin-top:12px"><div style="font-weight:800;font-size:14px;margin-bottom:7px">🧾 '+(preserve?'Calendario existente que se conserva':'Calendario que quedará guardado')+'</div><div style="max-height:190px;overflow:auto;border:1px solid var(--line);border-radius:10px"><table class="tbl"><thead><tr><th>Recibo</th><th>Vence</th><th class="num">Monto</th></tr></thead><tbody>'+recs.map((r,i)=>'<tr><td>'+(i+1)+'</td><td>'+esc(r.fechaLimite||r.vence||r.fechaVencimiento||'—')+'</td><td class="num">'+esc(money(prepared.moneda,r.montoTotal!=null?r.montoTotal:r.monto))+'</td></tr>').join('')+'</tbody></table></div></div>');
       if(preserve&&!recs.length)preview.insertAdjacentHTML('beforeend','<p class="cfg-note">No hay recibos cargados en esta vista. Esta edición conserva el plan existente: no crea, elimina ni recalcula recibos.</p>');
     }
@@ -371,9 +385,96 @@ Orbit.modules = Orbit.modules || {};
       if((renewal===true?'YES':renewal===false?'NO':'UNKNOWN')!==renewabilityState(existing))patch.renovable=renewal;
       return patch;
     }
+    function invalidateAssignmentPreview() {
+      if (!assignmentMode) return;
+      assignmentReceipt = null; assignmentIntent = '';
+      $('[data-assignment-confirm]').disabled = true;
+      $('[data-assignment-summary]').textContent = 'Previsualiza los registros actuales antes de confirmar la corrección.';
+    }
+    function assignmentSpec() {
+      const patch = metadataOnlyPatch(), updateClient = $('[data-assignment-client]').checked === true;
+      if (!assignmentMode || !assignmentMode.checked || !existing || !patch ||
+          Object.keys(patch).some(key => key !== 'asesorId'))
+        throw new Error('La corrección documentada cambia únicamente el asesor. Guarda otros cambios por separado.');
+      if (!patch.asesorId && !updateClient) throw new Error('Selecciona un asesor distinto o revisa el responsable del cliente.');
+      if (!advisorRosterConfirmed || !advisors.some(row => row.id === advisorEl.value))
+        throw new Error('Selecciona un asesor habilitado para el país desde Equipos.');
+      const reason = $('[data-reason]').value.trim(), sourceAuthority = {
+        decisionRef: $('[data-assignment-decision]').value.trim(), sourceReference: $('[data-assignment-source]').value.trim(),
+        sourceSha256: $('[data-assignment-sha]').value.trim().toLowerCase(), lineRef: $('[data-assignment-line]').value.trim(),
+        period: $('[data-assignment-period]').value.trim()
+      };
+      if (reason.length < 8 || sourceAuthority.decisionRef.length < 4 || !sourceAuthority.sourceReference || !sourceAuthority.lineRef ||
+          !/^\d{4}-(0[1-9]|1[0-2])$/.test(sourceAuthority.period) || !/^[a-f0-9]{64}$/.test(sourceAuthority.sourceSha256))
+        throw new Error('Completa el motivo, la decisión, el periodo y la referencia exacta del documento verificado.');
+      return { version: 1, operation: 'preview', clientId: existing.clienteId, policyIds: [existing.id],
+        updateClient, targetAdvisorId: advisorEl.value, reason, sourceAuthority };
+    }
+    if (assignmentMode) {
+      assignmentMode.addEventListener('change', () => {
+        invalidateAssignmentPreview();
+        $('[data-assignment-panel]').style.display = assignmentMode.checked ? '' : 'none';
+        $('[data-save]').disabled = assignmentMode.checked === true;
+        preview();
+      });
+      b.querySelectorAll('input,select').forEach(el => {
+        el.addEventListener('input', invalidateAssignmentPreview);
+        el.addEventListener('change', invalidateAssignmentPreview);
+      });
+      $('[data-reason]').addEventListener('input', invalidateAssignmentPreview);
+      $('[data-assignment-file]').addEventListener('change', async () => {
+        const file = $('[data-assignment-file]').files && $('[data-assignment-file]').files[0], sequence = ++assignmentFileSequence;
+        $('[data-assignment-sha]').value = '';
+        if (!file) return;
+        try {
+          if (file.size > 30 * 1024 * 1024) throw new Error('El documento supera 30 MB. Usa su referencia documental y la huella ya verificada.');
+          if (!window.crypto || !window.crypto.subtle || typeof file.arrayBuffer !== 'function')
+            throw new Error('Este navegador no pudo verificar el archivo. Usa la huella documental ya confirmada.');
+          const bytes = await file.arrayBuffer(), digest = await window.crypto.subtle.digest('SHA-256', bytes);
+          if (sequence !== assignmentFileSequence || !b.isConnected) return;
+          $('[data-assignment-sha]').value = Array.from(new Uint8Array(digest), value => value.toString(16).padStart(2, '0')).join('');
+          if (!$('[data-assignment-source]').value.trim()) $('[data-assignment-source]').value = file.name;
+          invalidateAssignmentPreview();
+        } catch (error) {
+          $('[data-error]').style.display = ''; $('[data-error]').textContent = String(error.message || error);
+        }
+      });
+      $('[data-assignment-preview]').addEventListener('click', async () => {
+        const button = $('[data-assignment-preview]'), err = $('[data-error]');
+        invalidateAssignmentPreview(); err.style.display = 'none';
+        try {
+          if (protectedPreviewRealPolicy(existing.id)) throw new Error('Esta Preview admite únicamente pólizas sintéticas para probar la corrección.');
+          const spec = assignmentSpec(); button.disabled = true;
+          const result = await E.correctAdvisorAssignment(spec);
+          if (!result.ok) throw new Error(errorText(result.errors));
+          assignmentReceipt = result; assignmentIntent = JSON.stringify(spec);
+          const summary = result.summary || {}, fingerprints = result.preservationFingerprints;
+          $('[data-assignment-summary]').innerHTML = '<b>Corrección verificada para '+esc(summary.targetAdvisorName || advisorEl.value)+'</b><p>'+Number(summary.changedPolicyCount || 0)+' póliza(s) cambiarán de asesor. '+(summary.clientChanged?'El responsable del cliente también cambiará.':'El responsable del cliente conserva su asignación.')+'</p><p>Se preservan '+Number(fingerprints.recibosEsperados && fingerprints.recibosEsperados.count || 0)+' recibos, '+Number(fingerprints.cobros && fingerprints.cobros.count || 0)+' cobros y '+Number(fingerprints.comisiones && fingerprints.comisiones.count || 0)+' comisiones históricas. Revisa estos cambios y confirma.</p>';
+          $('[data-assignment-confirm]').disabled = false;
+        } catch (error) { err.style.display = ''; err.textContent = String(error.message || error); }
+        finally { button.disabled = false; }
+      });
+      $('[data-assignment-confirm]').addEventListener('click', async () => {
+        const button = $('[data-assignment-confirm]'), err = $('[data-error]');
+        try {
+          const spec = assignmentSpec();
+          if (!assignmentReceipt || assignmentIntent !== JSON.stringify(spec)) throw new Error('La selección cambió. Genera una nueva previsualización.');
+          const commit = Object.assign({}, spec, { operation: 'commit', expectedBefore: assignmentReceipt.expectedBefore,
+            expectedPreviewDigest: assignmentReceipt.previewDigest });
+          button.disabled = true;
+          const result = await E.correctAdvisorAssignment(commit);
+          if (!result.ok) throw new Error(errorText(result.errors));
+          b.remove(); toast('Asesor corregido y auditado; prima, recibos, pagos y comisiones históricas preservados.');
+          location.hash = '#/cliente360?c=' + encodeURIComponent(existing.clienteId) + '&t=polizas';
+        } catch (error) {
+          invalidateAssignmentPreview(); err.style.display = ''; err.textContent = String(error.message || error);
+        }
+      });
+    }
     $('[data-save]').addEventListener('click', async () => {
       const save = $('[data-save]'), payload = raw(), reason = existing ? $('[data-reason]').value.trim() : 'Alta operativa desde plataforma';
       const err = $('[data-error]'), originalText = save.textContent;
+      if (assignmentMode && assignmentMode.checked) { err.style.display = ''; err.textContent = 'Usa la previsualización y confirmación de la corrección documentada.'; return; }
       if (!advisorRosterConfirmed || !payload.asesorId ||
           (!advisors.some(a => a.id === payload.asesorId) && !(existing && payload.asesorId === initialAdvisorId))) {
         err.style.display=''; err.textContent='Selecciona un asesor habilitado para el país desde Equipos. Si falta, revisa su rol y país allí.';
@@ -427,7 +528,7 @@ Orbit.modules = Orbit.modules || {};
     refreshAdvisors(initialAdvisorId);
     // Snapshot after default normalization: classify only user-originated form changes.
     nonRenewalBaseline=existing?Array.from(b.querySelectorAll('input,select'))
-      .filter(el=>!el.matches('[data-client-search],[data-country],[data-renewable]'))
+      .filter(el=>!el.matches('[data-client-search],[data-country],[data-renewable],[data-assignment-field]'))
       .map(el=>({el,value:el.matches('[data-advisor]')?initialAdvisorId:el.value})):null;
   }
 

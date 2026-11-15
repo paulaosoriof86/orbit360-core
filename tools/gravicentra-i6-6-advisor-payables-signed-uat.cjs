@@ -8,6 +8,7 @@ const fs=require('node:fs');
 const path=require('node:path');
 const os=require('node:os');
 const contract=require('../functions/advisor-commission-payable-contract');
+const assignment=require('../functions/advisor-assignment-correction-contract');
 const PROJECT='ays-orbit-360-lab',TENANT='alianzas-soluciones';
 const SOURCE_SCHEMA='gravicentra-advisor-commission-source-batch-v1';
 const hash=value=>crypto.createHash('sha256').update(String(value)).digest('hex');
@@ -67,6 +68,191 @@ function fixtures(runId){
     policy:rows.find(([collection,row])=>collection==='polizas'&&row.id===spec.lines[0].polizaId)[1]}));
   return {runId,ids,rows,specs,historical,plans};
 }
+function signedDocumentaryFixtures(runId){
+  // Keep the historical single-line fixture available to its pinned tests.
+  // The signed run exercises the two documented coverages of one requirement.
+  const fx=fixtures(runId),spec=fx.specs[0],original=spec.lines[0];
+  const components=[
+    {coverageCode:'VICO',ordinaryCommission:3.06,base:24.50,pct:12.5,
+      source:{...original.source,lineId:'QA-sheet:1:VICO'}},
+    {coverageCode:'GAME',ordinaryCommission:35.59,base:296.56,pct:12,
+      source:{...original.source,lineId:'QA-sheet:1:GAME'}}
+  ];
+  const line={...original,source:components[0].source,ordinaryCommission:38.65,base:321.06,components};
+  fx.specs[0]={...spec,lines:[line]};
+  fx.plans[0]=contract.normalizeLine(line,{tenantId:TENANT,cutoff:spec.cutoff,synthetic:true,
+    advisor:fx.rows.find(([collection,row])=>collection==='asesores'&&row.id===spec.advisorId)[1],
+    policy:fx.rows.find(([collection,row])=>collection==='polizas'&&row.id===line.polizaId)[1]});
+  // An independent cent oracle prevents both sides of a signed assertion from
+  // agreeing on the same erroneous aggregate rounding (38.65 * 70% = 27.06).
+  const plan=fx.plans[0];
+  assert.equal(plan.payable.valor,27.05,'ADVISOR_UAT_DOCUMENT_COMPONENTS_MISMATCH');
+  assert.equal(plan.commission.monto,38.65,'ADVISOR_UAT_DOCUMENT_COMPONENTS_MISMATCH');
+  assert.deepEqual(plan.payable.sourceComponents.map(row=>[row.coverageCode,row.ordinaryCommission,row.advisorAmount]),
+    [['GAME',35.59,24.91],['VICO',3.06,2.14]],'ADVISOR_UAT_DOCUMENT_COMPONENTS_MISMATCH');
+  return fx;
+}
+function withAssignmentFixtures(original){
+  const fx=JSON.parse(JSON.stringify(original)),{runId,ids}=fx;
+  assert.match(runId,/^b4003qa_i66_cxp_[a-z0-9_]+$/,'ADVISOR_UAT_DISPOSABLE_RUN_ID_REQUIRED');
+  const client=fx.rows.find(([collection,row])=>collection==='clientes'&&row.id===ids.client)[1];
+  client.asesorId=ids.advisor60;
+  const policy=fx.rows.find(([collection,row])=>collection==='polizas'&&row.id===ids.policy60)[1];
+  Object.assign(policy,{primaNeta:321.06,baseGravable:321.06,ivaPct:12,ivaMonto:38.53,
+    prima:359.59,primaTotal:359.59,gastosEmision:0,gastosFinan:0,otros:0,frecuencia:'Mensual',cuotas:12});
+  Object.assign(ids,{assignmentReceipt:runId+'_assignment_receipt',assignmentPortfolio:runId+'_assignment_portfolio',
+    assignmentPayment:runId+'_assignment_payment',assignmentVehicle:runId+'_assignment_vehicle',
+    assignmentHistoricalCommission:runId+'_assignment_september_commission',assignmentHistoricalPayable:runId+'_assignment_september_payable'});
+  const base=id=>({id,tenantId:TENANT,pais:'GT',moneda:'GTQ',__syntheticQa:true,__qaRunId:runId,
+    clienteId:ids.client,polizaId:ids.policy60,asesorId:ids.advisor60});
+  fx.rows.push(
+    ['recibosEsperados',{...base(ids.assignmentReceipt),cuota:1,montoTotal:29.97,monto:29.97,neta:26.76,iva:3.21,
+      fechaLimite:'2026-10-15',estado:'Pagado',pagado:29.97,pendiente:0}],
+    ['carteraPrimas',{...base(ids.assignmentPortfolio),reciboId:ids.assignmentReceipt,monto:29.97,
+      pagado:29.97,pendiente:0,saldo:0,estado:'Pagado'}],
+    ['cobros',{...base(ids.assignmentPayment),reciboId:ids.assignmentReceipt,cuota:1,monto:29.97,
+      fechaPago:'2026-10-14',estado:'Pagado',metodo:'Transferencia QA histórica'}],
+    ['vehiculos',{...base(ids.assignmentVehicle),placa:'QA-ONLY',marca:'QA',linea:'QA',estado:'Vigente'}],
+    ['comisiones',{...base(ids.assignmentHistoricalCommission),periodo:'2026-09',monto:17.79,montoAsesor:10.67,
+      pctAsesor:60,estado:'Liquidada',cxpAsesorId:ids.assignmentHistoricalPayable}],
+    ['finmovs',{...base(ids.assignmentHistoricalPayable),periodo:'2026-09',comisionId:ids.assignmentHistoricalCommission,
+      tipo:'egreso',clase:'Comisiones asesores',estado:'pagado',pagada:true,valor:10.67,pagado:10.67,pendiente:0}]
+  );
+  return fx;
+}
+function assignmentIdentity(spec,uid,previewOnly,explicitRequestId){
+  const inputDigest=digest({tenantId:TENANT,actorUid:uid,previewOnly,spec:assignment.normalizeSpec(spec)});
+  const requestId=explicitRequestId||'advcorr_'+hash(inputDigest).slice(0,40);
+  return {requestId,inputDigest,eventId:'opevt_'+hash(TENANT+'|'+requestId).slice(0,28)};
+}
+function assignmentStepsFor(fx,uid,live){
+  let rows=JSON.parse(JSON.stringify(fx.rows));
+  return [fx.ids.advisor70,fx.ids.advisor60].map((targetAdvisorId,index)=>{
+    const fileName='qa-advisor-assignment-'+(index?'restore':'forward')+'.json';
+    const bytes=JSON.stringify({syntheticQa:true,runId:fx.runId,clientId:fx.ids.client,policyId:fx.ids.policy60,
+      fromAdvisorId:index?fx.ids.advisor70:fx.ids.advisor60,targetAdvisorId});
+    const spec={version:1,operation:'preview',clientId:fx.ids.client,policyIds:[fx.ids.policy60],updateClient:true,
+      targetAdvisorId,reason:index?'QA compensación exacta del asesor original':'QA corrección documentada de asesor',
+      sourceAuthority:{decisionRef:'QA-only-'+fx.runId+'-'+index,sourceReference:fileName,sourceSha256:hash(bytes),
+        lineRef:'QA-decision:'+(index+1),period:'2026-10'}};
+    const get=(collection,id)=>rows.find(([c,row])=>c===collection&&row.id===id)[1];
+    const preservedRows=Object.fromEntries(assignment.PRESERVED_COLLECTIONS.map(collection=>[collection,
+      rows.filter(([c,row])=>c===collection&&(row.polizaId===fx.ids.policy60||row.policyId===fx.ids.policy60||
+        row.clienteId===fx.ids.client||row.clientId===fx.ids.client)).map(([,row])=>({...row,__assignmentStoredId:row.id}))]));
+    const context={tenantId:TENANT,actor:{uid,activeRole:'direccion',countries:['GT']},scopeAuthorized:true,
+      client:get('clientes',fx.ids.client),policies:[get('polizas',fx.ids.policy60)],
+      targetAdvisor:get('asesores',targetAdvisorId),preservedRows};
+    const previewPlan=assignment.buildPlan(spec,context);
+    const commitSpec={...spec,operation:'commit',expectedBefore:previewPlan.expectedBefore,expectedPreviewDigest:previewPlan.previewDigest};
+    const commitPlan=assignment.buildPlan(commitSpec,context),previewIdentity=assignmentIdentity(spec,uid,!live);
+    // The existing UI core binds commit retries to the exact preview digest.
+    const commitIdentity=assignmentIdentity(commitSpec,uid,!live,'advcorr_'+previewPlan.previewDigest.slice(0,40));
+    const beforeRows=rows;
+    rows=rows.map(([collection,row])=>[collection,commitPlan.changes.some(change=>change.collection===collection&&change.id===row.id)
+      ?{...row,asesorId:targetAdvisorId}:{...row}]);
+    return {fileName,bytes,spec,previewPlan,commitSpec,commitPlan,previewIdentity,commitIdentity,beforeRows,afterRows:rows};
+  });
+}
+function assignmentReceiptFor(step,committed,live){
+  const identity=committed?step.commitIdentity:step.previewIdentity;
+  return {ok:true,requestId:identity.requestId,eventId:identity.eventId,previewIsolated:!live,
+    ...(committed?step.commitPlan:step.previewPlan),...(committed?{readOnly:false,committed:true}:{})};
+}
+function assignmentProjectionRows(step){
+  // Operational child access follows the current policy owner on signed
+  // reload. Financial beneficiaries remain attached to their original ledger.
+  const operational=new Set(['recibosEsperados','carteraPrimas','cobros','vehiculos']);
+  return step.afterRows.filter(([collection])=>collection!=='asesores').map(([collection,row])=>[
+    collection,operational.has(collection)&&step.spec.policyIds.includes(row.polizaId)
+      ?{...row,asesorId:step.spec.targetAdvisorId}:row]);
+}
+function assertAssignmentReceipt(receipt,step,committed,live){
+  const expected=assignmentReceiptFor(step,committed,live);
+  assert.ok(receipt&&typeof receipt==='object','ADVISOR_UAT_ASSIGNMENT_PROOF_MISMATCH');
+  for(const [key,value] of Object.entries(expected))assert.deepEqual(receipt[key],value,'ADVISOR_UAT_ASSIGNMENT_PROOF_MISMATCH_'+key);
+  if(!committed){assert.notEqual(receipt.committed,true,'ADVISOR_UAT_ASSIGNMENT_PROOF_MISMATCH');return;}
+  assert.equal(receipt.canonicalReadback,true,'ADVISOR_UAT_ASSIGNMENT_PROOF_MISMATCH');
+  assert.equal(receipt.preservationVerified,true,'ADVISOR_UAT_ASSIGNMENT_PROOF_MISMATCH');
+  const expectedRows=step.afterRows.filter(([collection,row])=>collection==='clientes'&&row.id===step.spec.clientId||
+    collection==='polizas'&&step.spec.policyIds.includes(row.id));
+  assert.deepEqual(receipt.readback,expectedRows.map(([collection,record])=>({collection,id:record.id,record})),
+    'ADVISOR_UAT_ASSIGNMENT_PROOF_MISMATCH_readback');
+}
+function assignmentAuditGuard(kind,row,step,uid,live){
+  assert.ok(row,'ADVISOR_UAT_ASSIGNMENT_AUDIT_MISMATCH');
+  if(kind==='request'){
+    const {committedAt,...actual}=row;
+    assert.ok(committedAt,'ADVISOR_UAT_ASSIGNMENT_AUDIT_MISMATCH');
+    assert.deepEqual(actual,{schemaVersion:assignment.SCHEMA,status:'committed',payloadDigest:step.commitIdentity.inputDigest,
+      actorUid:uid,previewIsolated:!live,result:assignmentReceiptFor(step,true,live)},'ADVISOR_UAT_ASSIGNMENT_AUDIT_MISMATCH');
+  }else{
+    const {createdAt,activeRole,...actual}=row,plan=step.commitPlan;
+    assert.ok(createdAt&&norm(activeRole)==='direccion','ADVISOR_UAT_ASSIGNMENT_AUDIT_MISMATCH');
+    assert.deepEqual(actual,{schemaVersion:assignment.SCHEMA,tenantId:TENANT,eventId:step.commitIdentity.eventId,
+      requestId:step.commitIdentity.requestId,actorUid:uid,action:'correct_advisor_assignment',intent:plan.intent,
+      sourceProvenance:plan.sourceProvenance,payloadDigest:plan.payloadDigest,previewDigest:plan.previewDigest,
+      expectedBefore:plan.expectedBefore,changes:plan.changes,preservationFingerprints:plan.preservationFingerprints,
+      financialWrites:0,historicalAssignmentsPreserved:true},'ADVISOR_UAT_ASSIGNMENT_AUDIT_MISMATCH');
+  }
+}
+const DOCUMENTARY_COMMON_FIELDS=Object.freeze(['id','tenantId','asesorId','polizaId','clienteId','moneda','pais',
+  'pctAsesor','sourceKey','economicKey','financialDigest','base','pct','source','sourceComponents','sourceComponentsDigest']);
+const DOCUMENTARY_PAYABLE_FIELDS=Object.freeze([...DOCUMENTARY_COMMON_FIELDS,'comisionId','estado','valor',
+  'pendiente','pagado','pagada','noBankMovement','comisionOrdinariaAcreditada']);
+const DOCUMENTARY_COMMISSION_FIELDS=Object.freeze([...DOCUMENTARY_COMMON_FIELDS,'cxpAsesorId','estado','monto','montoAsesor']);
+function assertDocumentaryRow(row,expected,kind){
+  const fields=kind==='finmovs'?DOCUMENTARY_PAYABLE_FIELDS:DOCUMENTARY_COMMISSION_FIELDS;
+  assert.ok(row&&typeof row==='object','ADVISOR_UAT_DOCUMENT_COMPONENTS_MISMATCH');
+  for(const key of fields)assert.deepEqual(row[key],expected[key],'ADVISOR_UAT_DOCUMENT_COMPONENTS_MISMATCH_'+key);
+}
+function assertDocumentaryReceipt(receipt,plan,canonical=false){
+  assert.equal(receipt?.financialPayments,0,'ADVISOR_UAT_DOCUMENT_COMPONENTS_MISMATCH');
+  assert.equal(receipt?.bankMovements,0,'ADVISOR_UAT_DOCUMENT_COMPONENTS_MISMATCH');
+  assert.equal(receipt?.payables?.length,1,'ADVISOR_UAT_DOCUMENT_COMPONENTS_MISMATCH');
+  assertDocumentaryRow(receipt.payables[0],plan.payable,'finmovs');
+  if(!canonical)return;
+  assert.equal(receipt.canonicalReadback,true,'ADVISOR_UAT_DOCUMENT_COMPONENTS_MISMATCH');
+  assert.equal(receipt.canonicalReadbackCount,1,'ADVISOR_UAT_DOCUMENT_COMPONENTS_MISMATCH');
+  assert.equal(receipt.commissions?.length,1,'ADVISOR_UAT_DOCUMENT_COMPONENTS_MISMATCH');
+  assertDocumentaryRow(receipt.commissions[0],plan.commission,'comisiones');
+  for(const [proofs,expected,collection] of [[receipt.readback,plan.payable,'finmovs'],[receipt.commissionReadback,plan.commission,'comisiones']]){
+    assert.equal(proofs?.length,1,'ADVISOR_UAT_DOCUMENT_COMPONENTS_MISMATCH');
+    const proof=proofs[0];
+    assert.equal(proof?.collection,collection,'ADVISOR_UAT_DOCUMENT_COMPONENTS_MISMATCH');
+    assert.equal(proof?.exists,true,'ADVISOR_UAT_DOCUMENT_COMPONENTS_MISMATCH');
+    for(const key of ['id','financialDigest','sourceComponents','sourceComponentsDigest',
+      ...(collection==='finmovs'?['estado','pendiente']:['cxpAsesorId','monto','montoAsesor','base','pct'])])
+      assert.deepEqual(proof[key],expected[key],'ADVISOR_UAT_DOCUMENT_COMPONENTS_MISMATCH_'+key);
+  }
+}
+function assertDocumentaryView(view,plan){
+  const row=plan.payable,money=value=>row.moneda+' '+value.toFixed(2);
+  assert.equal(view?.economicRowsVisible,true,'ADVISOR_UAT_DOCUMENT_COMPONENTS_MISMATCH');
+  assert.equal(view?.componentRowsVisible,true,'ADVISOR_UAT_DOCUMENT_COMPONENTS_MISMATCH');
+  assert.deepEqual(view?.economicRows,[[row.periodoRecaudo,money(row.comisionOrdinariaAcreditada),row.pctAsesor+'%',
+    money(row.valor),row.estado]],'ADVISOR_UAT_DOCUMENT_COMPONENTS_MISMATCH');
+  assert.deepEqual(view?.componentRows,(row.sourceComponents||[]).map(component=>[
+    component.coverageCode+' '+component.source.lineId,
+    component.base===undefined?'No informada':money(component.base),
+    component.pct===undefined?'No informado':component.pct+'%',
+    money(component.ordinaryCommission),money(component.advisorAmount)]),'ADVISOR_UAT_DOCUMENT_COMPONENTS_MISMATCH');
+}
+async function assertVisibleDocumentaryView(page,selector,plan){
+  // Read only the financial cells of the currently opened synthetic document;
+  // no customer names, page text or screenshots are retained as evidence.
+  const view=await page.locator(selector).evaluate(root=>{
+    const table=root.querySelector('table'),rows=Array.from(table?.tBodies[0]?.rows||[]);
+    const text=cell=>(cell?.innerText||'').replace(/\s+/g,' ').trim();
+    const economicRows=rows.filter(row=>row.cells.length===6);
+    const componentRows=rows.flatMap(row=>Array.from(row.querySelectorAll('table > tbody > tr')));
+    const visible=row=>{const rect=row.getBoundingClientRect(),style=getComputedStyle(row);
+      return rect.width>0&&rect.height>0&&style.display!=='none'&&style.visibility!=='hidden';};
+    return {economicRows:economicRows.map(row=>Array.from(row.cells).slice(1).map(text)),
+      componentRows:componentRows.map(component=>Array.from(component.cells).map(text)),
+      economicRowsVisible:economicRows.every(visible),componentRowsVisible:componentRows.every(visible)};
+  });
+  assertDocumentaryView(view,plan);
+}
 function assertGenerated(row,expected,requestId,uid,kind){
   assert.ok(row&&row.__syntheticQa===true&&/^b4003qa_/.test(row.id),'ADVISOR_UAT_NON_SYNTHETIC_CLEANUP_DENIED');
   assert.equal(row.tenantId,TENANT,'ADVISOR_UAT_CLEANUP_TENANT_CONFLICT');
@@ -86,7 +272,7 @@ function assertGenerated(row,expected,requestId,uid,kind){
     assert.equal(row.estado,'Devengada');
   }
 }
-function sourceAuditGuard(kind,row,identity,uid,live,expectedIds,expectedTargetIds=[]){
+function sourceAuditGuard(kind,row,identity,uid,live,expectedIds,expectedTargetIds=[],expectedSourceKeys){
   assert.ok(row,'ADVISOR_UAT_SOURCE_AUDIT_MISSING');
   if(kind==='request'){
     assert.equal(row.actorUid,uid);assert.equal(row.payloadDigest,identity.inputDigest);
@@ -94,6 +280,8 @@ function sourceAuditGuard(kind,row,identity,uid,live,expectedIds,expectedTargetI
     assert.equal(row.result?.schemaVersion,contract.SCHEMA);assert.equal(row.result?.syntheticQa,true);
     assert.equal(row.result?.previewIsolated,!live);assert.equal(row.result?.requestId,identity.requestId);
     assert.deepEqual(row.result.payables.map(item=>item.id).sort(),expectedIds.slice().sort());
+    if(expectedSourceKeys!==undefined)assert.deepEqual(row.result.payables.flatMap(item=>contract.sourceIdentities(item).map(source=>source.sourceKey)).sort(),
+      expectedSourceKeys.slice().sort(),'ADVISOR_UAT_SOURCE_COMPONENT_AUDIT_MISMATCH');
     assert.equal(row.result.financialPayments,0);assert.equal(row.result.bankMovements,0);
   }else{
     assert.equal(row.tenantId,TENANT);assert.equal(row.actorUid,uid);assert.equal(row.schemaVersion,contract.SCHEMA);
@@ -101,6 +289,8 @@ function sourceAuditGuard(kind,row,identity,uid,live,expectedIds,expectedTargetI
       assert.equal(row.requestId,identity.requestId);assert.equal(row.payloadDigest,identity.inputDigest);
       assert.equal(row.action,'prepare_advisor_commission_payables');
       assert.deepEqual(row.payableIds.slice().sort(),expectedIds.slice().sort());
+      if(expectedSourceKeys!==undefined)assert.deepEqual(row.sourceKeys?.slice().sort(),expectedSourceKeys.slice().sort(),
+        'ADVISOR_UAT_SOURCE_COMPONENT_AUDIT_MISMATCH');
       assert.equal(row.financialPayments,0);assert.equal(row.bankMovements,0);
     }else{
       assert.equal(row.preparedRequestId,identity.requestId);assert.equal(row.action,'restore_advisor_payable_synthetic');
@@ -149,11 +339,13 @@ function assertServerDenial(out,code,reason){
 function safeFailureEvidence(error,stage){
   const stages=new Set(['BUILD_IDENTITY','FIXTURE_SETUP','SIGNED_SESSION','OPERATIVE_FINANCIAL_DENIAL',
     'FINANCE_UI_HYDRATION','DOCUMENT_FILE_UI_70','DOCUMENT_FILE_UI_60','REPLAY_AND_SOURCE_GUARDS',
-    'LEGACY_GUARDS','LEGACY_FINANCE_EDIT','PENDING_CXP_RELOAD','SYNTHETIC_RESTORE']);
+    'ASSIGNMENT_DOCUMENTARY_UI','ASSIGNMENT_RELOAD','LEGACY_GUARDS','LEGACY_FINANCE_EDIT','PENDING_CXP_RELOAD','SYNTHETIC_RESTORE']);
   const checks=['ADVISOR_UAT_SERVER_DENIAL_NOT_REACHED','ADVISOR_UAT_DENIAL_CLASS_MISMATCH',
     'ADVISOR_UAT_DENIAL_REASON_MISMATCH','ADVISOR_UAT_UNEXPECTED_PERMISSION_GRANT',
     'ADVISOR_UAT_SIGNED_COMMAND_REJECTED','ADVISOR_UAT_FILE_PREVIEW_NOT_CONFIRMED',
     'ADVISOR_UAT_UI_COMMIT_READBACK_MISSING','ADVISOR_UAT_BUSINESS_LIQUIDATION_SEMANTICS',
+    'ADVISOR_UAT_DOCUMENT_COMPONENTS_MISMATCH','ADVISOR_UAT_SOURCE_COMPONENT_AUDIT_MISMATCH',
+    'ADVISOR_UAT_ASSIGNMENT_PROOF_MISMATCH','ADVISOR_UAT_ASSIGNMENT_AUDIT_MISMATCH',
     'ADVISOR_UAT_REPLAY_DUPLICATED_DEBT','ADVISOR_UAT_ORDINARY_FINANCE_REGRESSION',
     'ADVISOR_UAT_PROTECTED_RELOAD_MISMATCH','ADVISOR_UAT_DIRECTION_PAGE_ERROR',
     'ADVISOR_UAT_OPERATIVE_PAGE_ERROR','ADVISOR_UAT_FIRST_PARTY_ASSET_ERROR',
@@ -238,7 +430,7 @@ async function main(){
     status:'HOLD',checks:[],realCustomerWritesRequested:0,bankMovements:0,financialPayments:0,
     authOrMembershipMutations:0,cleanup:{status:'NOT_STARTED',seeded:0,remaining:0}};
   const pass=name=>{report.checks.push({name,status:'PASS'});console.log('I66_ADVISOR_UAT_CHECK='+name);};
-  let admin,browser,direction,operator,tenant,db,fx,sourceRequests=[],genericRequest,generated=[],seeds=[],allTargets=[],memberBefore=[];
+  let admin,browser,direction,operator,tenant,db,fx,sourceRequests=[],assignmentSteps=[],genericRequest,generated=[],seeds=[],allTargets=[],memberBefore=[];
   const observedAbsent=new Set();
   let originalFailure=null,cleanupFailure=null,stage='BUILD_IDENTITY';
   const rowRef=(collection,id)=>tenant.collection('data').doc(collection).collection('items').doc(id);
@@ -284,16 +476,21 @@ async function main(){
     const actors=[choose(value=>value.includes('paula')&&value.includes('osorio'),'direccion'),choose(value=>value.startsWith('carlos castro'),'operativo')];
     const accessRef=tenant.collection('config').doc('access'),accessSnap=await accessRef.get();
     memberBefore.push({ref:accessRef,digest:accessSnap.exists?digest(accessSnap.data()):null});
-    fx=fixtures(runId);
+    fx=signedDocumentaryFixtures(runId);
+    fx=withAssignmentFixtures(fx);assignmentSteps=assignmentStepsFor(fx,actors[0].uid,cfg.live);
     const identities=fx.specs.map(spec=>sourceIdentity(spec,actors[0].uid,!cfg.live));
-    sourceRequests=identities.map((identity,index)=>({...identity,expectedIds:[fx.plans[index].payable.id]}));
+    sourceRequests=identities.map((identity,index)=>({...identity,expectedIds:[fx.plans[index].payable.id],
+      expectedSourceKeys:contract.sourceIdentities(fx.plans[index].payable).map(source=>source.sourceKey)}));
     const laterSpec={...fx.specs[0],cutoff:'2026-12-15'};
-    sourceRequests.push({...sourceIdentity(laterSpec,actors[0].uid,!cfg.live),expectedIds:[fx.plans[0].payable.id]});
+    sourceRequests.push({...sourceIdentity(laterSpec,actors[0].uid,!cfg.live),expectedIds:[fx.plans[0].payable.id],
+      expectedSourceKeys:sourceRequests[0].expectedSourceKeys});
     generated=fx.plans.flatMap((plan,index)=>[['comisiones',plan.commission],['finmovs',plan.payable]].map(([collection,expected])=>({collection,expected,requestId:identities[index].requestId,uid:actors[0].uid})));
     genericRequest={requestId:runId+'_legacy_update',eventId:'opevt_'+hash(TENANT+'|'+runId+'_legacy_update').slice(0,28),
       payloadDigest:digest([{collection:'finmovs',id:fx.ids.ordinary,action:'update',payload:{concepto:'QA servicio editado',__syntheticQa:true}}])};
     const refs=[...fx.rows.map(([collection,row])=>rowRef(collection,row.id)),...generated.map(item=>rowRef(item.collection,item.expected.id)),
       ...sourceRequests.flatMap(item=>[auditRef('request',item.requestId),auditRef('event',item.eventId),auditRef('event',item.restoreEventId)]),
+      ...assignmentSteps.flatMap(step=>[step.previewIdentity,step.commitIdentity].flatMap(identity=>[
+        auditRef('request',identity.requestId),auditRef('event',identity.eventId)])),
       auditRef('request',genericRequest.requestId),auditRef('event',genericRequest.eventId)];
     await exactBefore(refs);pass('EVERY_FIXTURE_AND_AUDIT_TARGET_ORIGINALLY_ABSENT');
     for(const [collection,row] of fx.rows){const ref=rowRef(collection,row.id);await ref.create(row);seeds.push({ref,expected:row});}
@@ -323,14 +520,94 @@ async function main(){
     await direction.page.waitForSelector('.tab[data-t="asesores"]',{state:'visible',timeout:30000});
     await direction.page.evaluate(async()=>{await Orbit.store._ensureCollections(['asesores','clientes','polizas','comisiones','finmovs']);});
     await direction.page.waitForFunction(ids=>!!Orbit.store.get('asesores',ids.advisor70)&&!!Orbit.store.get('asesores',ids.advisor60)&&!!Orbit.store.get('polizas',ids.policy70)&&!!Orbit.store.get('finmovs',ids.ordinary),fx.ids,{timeout:30000});
-    report.financeUiDiagnostics={beforeClick:await captureFinanceUiSnapshot(direction.page)};
-    try{
-      await direction.page.locator('.tab[data-t="asesores"]').click();
-    }catch(error){
-      report.financeUiDiagnostics.onFailure=await captureFinanceUiSnapshot(direction.page);
-      report.financeUiDiagnostics.actionability=safeClickActionability(error);
-      throw error;
+    const openAdvisorTab=async()=>{
+      report.financeUiDiagnostics={beforeClick:await captureFinanceUiSnapshot(direction.page)};
+      try{
+        await direction.page.locator('.tab[data-t="asesores"]').click();
+      }catch(error){
+        report.financeUiDiagnostics.onFailure=await captureFinanceUiSnapshot(direction.page);
+        report.financeUiDiagnostics.actionability=safeClickActionability(error);
+        throw error;
+      }
+    };
+    await openAdvisorTab();
+    stage='ASSIGNMENT_DOCUMENTARY_UI';
+    await deny(operator,{advisorAssignmentCorrection:assignmentSteps[0].spec},'permission-denied');
+    const assignmentResponseFor=operation=>direction.page.waitForResponse(response=>{
+      try{return response.url()==='https://'+cfg.region+'-'+PROJECT+'.cloudfunctions.net/'+cfg.functionName&&
+        response.request().postDataJSON()?.data?.advisorAssignmentCorrection?.operation===operation;}catch{return false;}
+    },{timeout:30000});
+    const assignmentCollections=['asesores','clientes','polizas',...assignment.PRESERVED_COLLECTIONS];
+    const openAssignmentEditor=async expectedAdvisor=>{
+      await direction.page.goto(cfg.origin+'/#/cliente360?c='+fx.ids.client+'&t=polizas',{waitUntil:'commit',timeout:30000});
+      await direction.page.waitForSelector('[data-client-policy-row="1"][data-policy-id="'+fx.ids.policy60+'"]',{state:'visible',timeout:30000});
+      await direction.page.locator('[data-client-policy-row="1"][data-policy-id="'+fx.ids.policy60+'"]').click();
+      await direction.page.locator('#c360-edit button[onclick="Orbit.modules.cliente360.editarPoliza(\''+fx.ids.policy60+'\')"]').click();
+      await direction.page.waitForSelector('#policy-v1199 [data-advisor]:not([disabled])',{state:'visible',timeout:30000});
+      assert.equal(await direction.page.locator('#policy-v1199 [data-advisor]').inputValue(),expectedAdvisor,'ADVISOR_UAT_ASSIGNMENT_PROOF_MISMATCH_ui_advisor');
+      assert.equal(await direction.page.locator('#policy-v1199 [data-net]').inputValue(),'321.06','ADVISOR_UAT_ASSIGNMENT_PROOF_MISMATCH_ui_premium');
+      assert.equal(await direction.page.locator('#policy-v1199 [data-installments]').inputValue(),'12','ADVISOR_UAT_ASSIGNMENT_PROOF_MISMATCH_ui_schedule');
+    };
+    await direction.page.evaluate(async collections=>{await Orbit.store._ensureCollections(collections);},assignmentCollections);
+    for(const step of assignmentSteps){
+      stage='ASSIGNMENT_DOCUMENTARY_UI';
+      await openAssignmentEditor(step.previewPlan.expectedBefore.find(row=>row.collection==='polizas').asesorId);
+      const form=direction.page.locator('#policy-v1199');
+      await form.locator('[data-advisor]').selectOption(step.spec.targetAdvisorId);
+      await form.locator('[data-reason]').fill(step.spec.reason);
+      await form.locator('[data-assignment-mode]').check();await form.locator('[data-assignment-client]').check();
+      for(const [field,value] of Object.entries({decision:step.spec.sourceAuthority.decisionRef,source:step.spec.sourceAuthority.sourceReference,
+        line:step.spec.sourceAuthority.lineRef,period:step.spec.sourceAuthority.period}))
+        await form.locator('[data-assignment-'+field+']').fill(value);
+      await form.locator('[data-assignment-file]').setInputFiles({name:step.fileName,mimeType:'application/json',buffer:Buffer.from(step.bytes)});
+      await direction.page.waitForFunction(sha=>document.querySelector('#policy-v1199 [data-assignment-sha]')?.value===sha,step.spec.sourceAuthority.sourceSha256,{timeout:30000});
+      assert.equal(await form.locator('[data-save]').isDisabled(),true,'ADVISOR_UAT_ASSIGNMENT_PROOF_MISMATCH_normal_save');
+      const previewResponse=assignmentResponseFor('preview');await form.locator('[data-assignment-preview]').click();
+      const preview=(await (await previewResponse).json()).result;
+      assertAssignmentReceipt(preview,step,false,cfg.live);
+      for(const [collection,expected] of step.beforeRows)
+        assert.deepEqual((await rowRef(collection,expected.id).get()).data(),expected,'ADVISOR_UAT_ASSIGNMENT_PROOF_MISMATCH_preview_write');
+      for(const identity of [step.previewIdentity,step.commitIdentity])for(const kind of ['request','event'])
+        assert.equal((await auditRef(kind,kind==='request'?identity.requestId:identity.eventId).get()).exists,false,'ADVISOR_UAT_ASSIGNMENT_PROOF_MISMATCH_preview_audit');
+      await direction.page.waitForFunction(()=>document.querySelector('#policy-v1199 [data-assignment-confirm]')?.disabled===false);
+      const commitResponse=assignmentResponseFor('commit');await form.locator('[data-assignment-confirm]').click();
+      const receipt=(await (await commitResponse).json()).result;
+      assertAssignmentReceipt(receipt,step,true,cfg.live);
+      for(const [collection,expected] of step.afterRows)
+        assert.deepEqual((await rowRef(collection,expected.id).get()).data(),expected,'ADVISOR_UAT_ASSIGNMENT_PROOF_MISMATCH_committed_record');
+      const requestRow=(await auditRef('request',receipt.requestId).get()).data(),eventRow=(await auditRef('event',receipt.eventId).get()).data();
+      assignmentAuditGuard('request',requestRow,step,direction.uid,cfg.live);assignmentAuditGuard('event',eventRow,step,direction.uid,cfg.live);
+      const replay=await call(direction,{requestId:receipt.requestId,advisorAssignmentCorrection:step.commitSpec});
+      assert.equal(replay.reused,true,'ADVISOR_UAT_ASSIGNMENT_PROOF_MISMATCH_replay');assertAssignmentReceipt(replay,step,true,cfg.live);
+      assert.equal(digest((await auditRef('request',receipt.requestId).get()).data()),digest(requestRow),'ADVISOR_UAT_ASSIGNMENT_AUDIT_MISMATCH');
+      assert.equal(digest((await auditRef('event',receipt.eventId).get()).data()),digest(eventRow),'ADVISOR_UAT_ASSIGNMENT_AUDIT_MISMATCH');
+      await direction.page.waitForSelector('#policy-v1199',{state:'detached',timeout:30000});
+      stage='ASSIGNMENT_RELOAD';
+      await direction.page.reload({waitUntil:'commit',timeout:30000});
+      await direction.page.waitForFunction(()=>!!window.Orbit?.productRuntimeBrowserProvidersP0&&!!window.Orbit?.productAppP0,null,{timeout:30000});
+      const restoredSession=await direction.page.evaluate(async collections=>{
+        const p=Orbit.productRuntimeBrowserProvidersP0;await p.initialize();const uid=(await p.waitForUser())?.uid;
+        const ready=(await Orbit.productAppP0.activate())?.started===true;await Orbit.store._ensureCollections(collections);return{uid,ready};
+      },assignmentCollections);
+      assert.equal(restoredSession.uid,direction.uid);assert.equal(restoredSession.ready,true);
+      const expectedProjection=assignmentProjectionRows(step);
+      const targets=expectedProjection.map(([collection,row])=>({collection,id:row.id,fields:Object.keys(row)}));
+      await direction.page.waitForFunction(targets=>targets.every(target=>!!Orbit.store.get(target.collection,target.id)),targets,{timeout:30000});
+      const persisted=await direction.page.evaluate(targets=>targets.map(target=>{
+        const row=Orbit.store.get(target.collection,target.id);return Object.fromEntries(target.fields.map(key=>[key,row[key]]));
+      }),targets);
+      assert.deepEqual(persisted,expectedProjection.map(([,row])=>row),
+        'ADVISOR_UAT_ASSIGNMENT_PROOF_MISMATCH_reload');
     }
+    await openAssignmentEditor(fx.ids.advisor60);
+    await direction.page.locator('#policy-v1199').getByRole('button',{name:'Cancelar',exact:true}).click();
+    await direction.page.locator('#vp-x').click();
+    for(const [collection,expected] of fx.rows)
+      assert.deepEqual((await rowRef(collection,expected.id).get()).data(),expected,'ADVISOR_UAT_ASSIGNMENT_PROOF_MISMATCH_compensation');
+    pass('DOCUMENTED_ASSIGNMENT_NATIVE_UI_PREVIEW_CONFIRM_RELOAD_REPLAY_COMPENSATION_PRESERVES_ALL_FINANCIAL_RELATIONS');
+    await direction.page.goto(cfg.origin+'/#/finanzas',{waitUntil:'commit',timeout:30000});
+    await direction.page.waitForSelector('.tab[data-t="asesores"]',{state:'visible',timeout:30000});
+    stage='FINANCE_UI_HYDRATION';await openAdvisorTab();
     const responseFor=operation=>direction.page.waitForResponse(response=>{
       try{return response.url()==='https://'+cfg.region+'-'+PROJECT+'.cloudfunctions.net/'+cfg.functionName&&response.request().postDataJSON()?.data?.advisorPayable?.operation===operation;}catch{return false;}
     },{timeout:30000});
@@ -346,21 +623,28 @@ async function main(){
       const preview=(await (await previewResponse).json()).result;
       assert.ok(preview?.ok&&preview.readOnly&&preview.syntheticQa&&preview.newPayables===1,'ADVISOR_UAT_FILE_PREVIEW_NOT_CONFIRMED');
       assert.equal(preview.totals.GTQ,plan.payable.valor);assert.equal(preview.requestId,identities[index].requestId);
+      assertDocumentaryReceipt(preview,plan);
       assert.equal((await rowRef('finmovs',plan.payable.id).get()).exists,false);assert.equal((await auditRef('request',preview.requestId).get()).exists,false);
       await direction.page.waitForFunction(()=>document.querySelector('#lt-ok')?.disabled===false);
+      await assertVisibleDocumentaryView(direction.page,'#lote-body',plan);
       const prepareResponse=responseFor('prepare');await direction.page.locator('#lt-ok').click();
       const receipt=(await (await prepareResponse).json()).result;
       assert.ok(receipt?.ok&&receipt.committed&&receipt.canonicalReadback&&receipt.canonicalReadbackCount===1,'ADVISOR_UAT_UI_COMMIT_READBACK_MISSING');
       assert.equal(receipt.financialPayments,0);assert.equal(receipt.bankMovements,0);assert.equal(receipt.payables[0].id,plan.payable.id);
+      assert.deepEqual(receipt.createdPayableIds,[plan.payable.id]);assert.deepEqual(receipt.createdCommissionIds,[plan.commission.id]);
+      assertDocumentaryReceipt(receipt,plan,true);
       await direction.page.waitForSelector('#fin-liquidacion-asesor #liq-document',{state:'visible',timeout:30000});
+      await assertVisibleDocumentaryView(direction.page,'#liq-document',plan);
       const documentText=await direction.page.locator('#liq-document').innerText();
       assert.ok(documentText.includes('no es comprobante de pago')&&documentText.includes(spec.advisorId===fx.ids.advisor70?'70%':'60%'),'ADVISOR_UAT_BUSINESS_LIQUIDATION_SEMANTICS');
       await direction.page.locator('#liq-close').click();
       for(const item of generated.filter(item=>item.requestId===receipt.requestId))assertGenerated((await rowRef(item.collection,item.expected.id).get()).data(),item.expected,item.requestId,direction.uid,item.collection);
-      sourceAuditGuard('request',(await auditRef('request',receipt.requestId).get()).data(),identities[index],direction.uid,cfg.live,[plan.payable.id]);
-      sourceAuditGuard('event',(await auditRef('event',receipt.eventId).get()).data(),identities[index],direction.uid,cfg.live,[plan.payable.id]);
+      sourceAuditGuard('request',(await auditRef('request',receipt.requestId).get()).data(),identities[index],direction.uid,cfg.live,[plan.payable.id],[],sourceRequests[index].expectedSourceKeys);
+      sourceAuditGuard('event',(await auditRef('event',receipt.eventId).get()).data(),identities[index],direction.uid,cfg.live,[plan.payable.id],[],sourceRequests[index].expectedSourceKeys);
       const replay=await call(direction,{advisorPayable:{...spec,operation:'prepare',previewDigest:preview.previewDigest}});
       assert.ok(replay.reused&&replay.newPayables===0&&replay.reusedPayables===1&&replay.totals.GTQ===0&&replay.canonicalReadback,'ADVISOR_UAT_REPLAY_DUPLICATED_DEBT');
+      assertDocumentaryReceipt(replay,plan,true);
+      if(index===0)pass('MULTICOMPONENT_VICO_GAME_CENTS_VISIBLE_ONE_CXP_TWO_SOURCE_LINES_REPLAY_VERIFIED');
       pass('DOCUMENT_FILE_UI_TO_PENDING_CXP_'+spec.lines[0].participation.pct+'_PERCENT_WITH_AUDIT_AND_IDEMPOTENCE');
     }
     stage='REPLAY_AND_SOURCE_GUARDS';
@@ -368,8 +652,12 @@ async function main(){
     assert.equal(laterPreview.newPayables,0);assert.equal(laterPreview.reusedPayables,1);assert.equal(laterPreview.totals.GTQ,0);
     const later=await call(direction,{advisorPayable:{...laterSpec,operation:'prepare',previewDigest:laterPreview.previewDigest}});
     assert.equal(later.payables[0].id,fx.plans[0].payable.id);assert.equal(later.newPayables,0);assert.equal(later.canonicalReadback,true);
+    assertDocumentaryReceipt(later,fx.plans[0],true);
+    sourceAuditGuard('event',(await auditRef('event',later.eventId).get()).data(),sourceRequests[2],direction.uid,cfg.live,
+      sourceRequests[2].expectedIds,[],sourceRequests[2].expectedSourceKeys);
     await deny(direction,{advisorPayable:{...fx.specs[0],advisorId:fx.ids.advisor60}},'failed-precondition','ADVISOR_POLICY_CONFLICT');
-    const changed={...fx.specs[0],lines:[{...fx.specs[0].lines[0],ordinaryCommission:102}]};
+    const changed={...fx.specs[0],lines:[{...fx.specs[0].lines[0],ordinaryCommission:38.66,
+      components:fx.specs[0].lines[0].components.map(component=>component.coverageCode==='GAME'?{...component,ordinaryCommission:35.60}:component)}]};
     await deny(direction,{advisorPayable:changed},'failed-precondition','SOURCE_LINE_ALREADY_INTERPRETED');
     pass('CROSS_CUTOFF_REUSES_DEBT_AND_CROSS_ADVISOR_OR_CHANGED_SOURCE_DENIED');
     stage='LEGACY_GUARDS';
@@ -390,11 +678,27 @@ async function main(){
     stage='PENDING_CXP_RELOAD';
     await direction.page.reload({waitUntil:'commit',timeout:30000});
     await direction.page.waitForFunction(()=>!!window.Orbit?.productRuntimeBrowserProvidersP0&&!!window.Orbit?.productAppP0,null,{timeout:30000});
-    const reloaded=await direction.page.evaluate(async()=>{const p=Orbit.productRuntimeBrowserProvidersP0;await p.initialize();const uid=(await p.waitForUser())?.uid;const ready=(await Orbit.productAppP0.activate())?.started===true;Orbit.router.go('finanzas');await Orbit.store._ensureCollections(['finmovs','comisiones']);return{uid,ready};});
+    const reloaded=await direction.page.evaluate(async()=>{const p=Orbit.productRuntimeBrowserProvidersP0;await p.initialize();const uid=(await p.waitForUser())?.uid;const ready=(await Orbit.productAppP0.activate())?.started===true;Orbit.router.go('finanzas');await Orbit.store._ensureCollections(['asesores','clientes','polizas','finmovs','comisiones']);return{uid,ready};});
     assert.equal(reloaded.uid,direction.uid);assert.equal(reloaded.ready,true);
-    await direction.page.waitForFunction(ids=>ids.every(id=>!!Orbit.store.get('finmovs',id)),fx.plans.map(plan=>plan.payable.id),{timeout:30000});
-    const reread=await direction.page.evaluate(ids=>ids.map(id=>{const row=Orbit.store.get('finmovs',id);return{id:row.id,estado:row.estado,pendiente:row.pendiente,pagado:row.pagado,pctAsesor:row.pctAsesor,asesorId:row.asesorId,source:row.source,financialDigest:row.financialDigest};}),fx.plans.map(plan=>plan.payable.id));
-    reread.forEach((row,index)=>{const expected=fx.plans[index].payable;for(const key of ['id','estado','pendiente','pagado','pctAsesor','asesorId','financialDigest'])assert.equal(row[key],expected[key],'ADVISOR_UAT_PROTECTED_RELOAD_MISMATCH_'+key);assert.deepEqual(row.source,expected.source);});
+    const ledgerTargets=fx.plans.flatMap(plan=>[
+      {collection:'finmovs',id:plan.payable.id,fields:DOCUMENTARY_PAYABLE_FIELDS,expected:plan.payable},
+      {collection:'comisiones',id:plan.commission.id,fields:DOCUMENTARY_COMMISSION_FIELDS,expected:plan.commission}]);
+    await direction.page.waitForFunction(targets=>targets.every(target=>!!Orbit.store.get(target.collection,target.id)),
+      ledgerTargets.map(({collection,id})=>({collection,id})),{timeout:30000});
+    const reread=await direction.page.evaluate(targets=>targets.map(target=>{
+      const row=Orbit.store.get(target.collection,target.id);
+      return Object.fromEntries(target.fields.map(key=>[key,row[key]]));
+    }),ledgerTargets.map(({collection,id,fields})=>({collection,id,fields})));
+    reread.forEach((row,index)=>assertDocumentaryRow(row,ledgerTargets[index].expected,ledgerTargets[index].collection));
+    await direction.page.waitForSelector('.tab[data-t="asesores"]',{state:'visible',timeout:30000});
+    await openAdvisorTab();
+    for(let index=0;index<fx.specs.length;index++){
+      await direction.page.locator('button[onclick="Orbit.modules.finanzas.verLiquidacionAsesor(\''+fx.specs[index].advisorId+'\')"]').click();
+      await direction.page.waitForSelector('#fin-liquidacion-asesor #liq-document',{state:'visible',timeout:30000});
+      await assertVisibleDocumentaryView(direction.page,'#liq-document',fx.plans[index]);
+      await direction.page.locator('#liq-close').click();
+    }
+    pass('MULTICOMPONENT_CENTS_BOTH_CANONICAL_LEDGERS_AND_VISIBLE_DOCUMENTS_SURVIVE_RELOAD');
     assert.equal(direction.pageErrors.length,0,'ADVISOR_UAT_DIRECTION_PAGE_ERROR');assert.equal(operator.pageErrors.length,0,'ADVISOR_UAT_OPERATIVE_PAGE_ERROR');
     assert.equal(direction.assetErrors.length+operator.assetErrors.length,0,'ADVISOR_UAT_FIRST_PARTY_ASSET_ERROR');
     // Expected HTTP denials from this security matrix are not asset failures.
@@ -410,7 +714,13 @@ async function main(){
         try{
           const ref=auditRef('request',identity.requestId);if(!observedAbsent.has(ref.path))continue;
           const snap=await ref.get();if(!snap.exists)continue;
-          sourceAuditGuard('request',snap.data(),identity,direction?.uid||memberBefore[0]?.ref.id,cfg.live,identity.expectedIds);
+          sourceAuditGuard('request',snap.data(),identity,direction?.uid||memberBefore[0]?.ref.id,cfg.live,identity.expectedIds,[],identity.expectedSourceKeys);
+          // Validate full known source/amounts before either deletion path;
+          // a retained financialDigest alone cannot authorize signed cleanup.
+          for(const item of generated.filter(item=>item.requestId===identity.requestId)){
+            const current=await rowRef(item.collection,item.expected.id).get();
+            if(current.exists)assertGenerated(current.data(),item.expected,item.requestId,item.uid,item.collection);
+          }
           if(direction){const out=await call(direction,{advisorPayable:{version:1,operation:'restoreSynthetic',syntheticQa:true,preparedRequestId:identity.requestId}});assert.ok(out.restored&&out.canonicalReadback&&out.financialPayments===0&&out.bankMovements===0);}
           else throw Error('ADVISOR_UAT_SIGNED_RESTORE_SESSION_UNAVAILABLE');
         }catch(error){cleanupErrors.push('SIGNED_RESTORE');}
@@ -427,7 +737,7 @@ async function main(){
           try{const ref=auditRef(kind,id);if(!observedAbsent.has(ref.path))continue;
             const snap=await ref.get();if(!snap.exists)continue;
             sourceAuditGuard(kind,snap.data(),identity,memberBefore[0].ref.id,cfg.live,identity.expectedIds,
-              generated.filter(item=>item.requestId===identity.requestId).map(item=>item.expected.id));
+              generated.filter(item=>item.requestId===identity.requestId).map(item=>item.expected.id),identity.expectedSourceKeys);
             await ref.delete({lastUpdateTime:snap.updateTime});assert.equal((await ref.get()).exists,false);
           }catch(error){cleanupErrors.push('SOURCE_AUDIT_PROVENANCE_OR_DELETE');}
         }
@@ -441,6 +751,35 @@ async function main(){
           }catch(error){cleanupErrors.push('GENERIC_AUDIT_PROVENANCE_OR_DELETE');}
         }
       }
+      try{
+        const correctionAudits=[];let latestCorrection;
+        for(const step of assignmentSteps){
+          const ref=auditRef('request',step.commitIdentity.requestId);
+          if(!observedAbsent.has(ref.path))continue;
+          const snap=await ref.get();
+          if(!snap.exists){
+            assert.equal((await auditRef('event',step.commitIdentity.eventId).get()).exists,false,'ADVISOR_UAT_ASSIGNMENT_AUDIT_MISMATCH');
+            continue;
+          }
+          const row=snap.data();assignmentAuditGuard('request',row,step,memberBefore[0].ref.id,cfg.live);
+          // Use the validated server receipt IDs, including after response loss.
+          const event=auditRef('event',row.result.eventId),eventSnap=await event.get();
+          assert.ok(observedAbsent.has(event.path),'ADVISOR_UAT_ASSIGNMENT_AUDIT_MISMATCH');
+          assignmentAuditGuard('event',eventSnap.data(),step,memberBefore[0].ref.id,cfg.live);
+          correctionAudits.push({ref,snap},{ref:event,snap:eventSnap});latestCorrection=step;
+        }
+        if(latestCorrection)for(const change of latestCorrection.commitPlan.changes){
+          const seed=seeds.find(item=>item.expected.id===change.id&&item.ref.parent.parent.id===change.collection);
+          assert.ok(seed,'ADVISOR_UAT_ASSIGNMENT_AUDIT_MISMATCH');
+          const expected=latestCorrection.afterRows.find(([collection,row])=>collection===change.collection&&row.id===change.id)[1];
+          const current=await seed.ref.get();
+          if(current.exists)assert.deepEqual(current.data(),expected,'ADVISOR_UAT_ASSIGNMENT_AUDIT_MISMATCH');
+          seed.expected=expected;
+        }
+        for(const item of correctionAudits){
+          await item.ref.delete({lastUpdateTime:item.snap.updateTime});assert.equal((await item.ref.get()).exists,false);
+        }
+      }catch(error){cleanupErrors.push('ASSIGNMENT_AUDIT_PROVENANCE_OR_DELETE');}
       for(const item of seeds.slice().reverse()){
         try{const snap=await item.ref.get();if(!snap.exists)continue;const row=snap.data();
           assert.ok(row.__syntheticQa===true&&row.__qaRunId===runId&&row.tenantId===TENANT&&unchangedSeed(row,item.expected,fx.ids.ordinary,memberBefore[0].ref.id),'ADVISOR_UAT_SEED_CHANGED');
@@ -468,5 +807,5 @@ async function main(){
   if(originalFailure||cleanupFailure)throw Error('ADVISOR_PAYABLE_SIGNED_UAT_HOLD');
   return report;
 }
-module.exports={configuration,sourceIdentity,fixtures,assertGenerated,sourceAuditGuard,genericAuditGuard,unchangedSeed,configuredCredential,assertServerDenial,safeFailureEvidence,safeFinanceUiSnapshot,safeClickActionability,safeFinanceUiDiagnostics,captureFinanceUiSnapshot,main};
+module.exports={configuration,sourceIdentity,fixtures,signedDocumentaryFixtures,withAssignmentFixtures,assignmentIdentity,assignmentStepsFor,assignmentReceiptFor,assignmentProjectionRows,assertAssignmentReceipt,assignmentAuditGuard,assertDocumentaryRow,assertDocumentaryReceipt,assertDocumentaryView,assertVisibleDocumentaryView,assertGenerated,sourceAuditGuard,genericAuditGuard,unchangedSeed,configuredCredential,assertServerDenial,safeFailureEvidence,safeFinanceUiSnapshot,safeClickActionability,safeFinanceUiDiagnostics,captureFinanceUiSnapshot,main};
 if(require.main===module)main().catch(error=>{console.error('I66_ADVISOR_PAYABLE_SIGNED_UAT_HOLD '+String(error.code||'ASSERTION_OR_RUNTIME_FAILURE').replace(/[^A-Za-z0-9_./:-]+/g,'_').slice(0,120));process.exitCode=1;});
