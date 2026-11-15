@@ -1,5 +1,6 @@
 # Read-only inventory to resolve Firebase Hosting's confirmed HTTP 429 channel quota.
 # Never deletes, creates, deploys or changes Hosting versions, Firestore or Auth.
+# I6.6 2026-11-15: refresh exact candidate Hosting version after signed CxP Preview failure; metadata only.
 name: Gravicentra I6.6 Preview Channels Inventory READONLY
 on:
   push:
