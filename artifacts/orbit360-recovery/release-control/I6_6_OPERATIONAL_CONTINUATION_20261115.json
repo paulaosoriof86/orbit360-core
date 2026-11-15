@@ -177,7 +177,7 @@
     },
     {
       "id": "P0-PUBLISH-CURRENT-DELTA",
-      "state": "NEW_CAUSAL_SOURCE_IMMUTABLE_BUILD_REQUESTED_PRIOR_FAILED_PREVIEW_NOT_PROMOTABLE",
+      "state": "IMMUTABLE_HOSTING_PREVIEW_READBACK_PASS_BACKEND_SIGNED_QA_PENDING",
       "scope": "One immutable build, existing isolated Preview, three exact current domain functions only, signed tests, same artifact to both LIVE origins, rollback ready. Never promote a failed signed candidate or patch its artifact; preserve exact diagnostic and refresh Preview inventory before any reuse restoration. Next diagnosis is the Finance advisor-tab timeout at line261, not the already corrected signed-envelope denial.",
       "doneWhen": "Real workflow receipts, exact digests and post-deploy business-function verification. Successful build alone is not acceptance."
     },
@@ -267,5 +267,11 @@
     "Synthetic QA may use only approved marked namespaces inside the same tenant, existing actors and credentials, exact cleanup of objects created by the run; no Auth/membership/IAM changes or real ledger control/active mutation.",
     "An approval/access stop is reported precisely to Paula; it is not circumvented or disguised as a test PASS.",
     "Report implemented, locally tested, Preview accepted, LIVE published and real records applied separately; retain exact evidence for continuation."
-  ]
+  ],
+  "advisorPortfolioPreviewBuildEvidence20261115": {
+    "receipt": "artifacts/orbit360-recovery/release-control/I6_6_ADVISOR_PORTFOLIO_PREVIEW_BUILD_20261115.json",
+    "status": "IMMUTABLE_HOSTING_PREVIEW_READBACK_PASS_BACKEND_SIGNED_QA_PENDING",
+    "lastAcceptedLiveUnchanged": true,
+    "realWrites": 0
+  }
 }

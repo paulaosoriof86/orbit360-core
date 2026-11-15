@@ -1,0 +1,63 @@
+{
+  "schema": "I6_6_ADVISOR_PORTFOLIO_PREVIEW_BUILD_RECEIPT_V1",
+  "status": "IMMUTABLE_HOSTING_PREVIEW_READBACK_PASS_BACKEND_SIGNED_QA_PENDING",
+  "activeGate": "I6.6",
+  "sourceSha": "257695e19749a4e18f38be972b37b6b47b2225af",
+  "buildId": "gi-i66-257695e19749-57f234755dc1",
+  "buildRunId": 43765252188,
+  "buildJobId": 132968846435,
+  "artifactId": 14181847038,
+  "artifactDigest": "sha256:3159ae024a6a119b11cb3f9521bd9819b0663198a1cffcd340eac4fdb91d9bf2",
+  "artifactTarSha256": "b9a9162b9ba28df1ad89a87899c83430ffbdb631fc6c58c9101f0204dae9f475",
+  "previewChannelId": "gi-i66-rc-42868854629",
+  "previewUrl": "https://ays-orbit-360-lab--gi-i66-rc-42868854629-abj14q6n.web.app",
+  "hostedFileCount": 223,
+  "backendFileCount": 44,
+  "previewBuildMarkerIndependentlyReadInBrowser": true,
+  "sourceDeltaGuard": {
+    "status": "PASS",
+    "declaredTestFiles": 66,
+    "approvedProductDeltaFiles": 60
+  },
+  "controlPlaneGuard": {
+    "runId": 43765252096,
+    "status": "PASS"
+  },
+  "sameFrozenSignedDriverBlobs": {
+    "tools/gravicentra-i66-privileged-role-signed-ui-permissions-readonly.cjs": "a2e9b190e7301ccbf0a401cdcbfe0e37360a1650",
+    "tools/gravicentra-i6-6-carlos-real-signed-synthetic-preview-uat.cjs": "22cfb1d86b047ef842aee498393a13bc9e8c2894",
+    "tools/gravicentra-i6-6-advisor-payables-signed-uat.cjs": "e85f0ba0d926b61b6890345aaaa46695b1da926c",
+    "tools/gravicentra-i6-6-proposal-application-signed-uat.cjs": "cfb157a253936b583d98337f818d38b85e58d06e"
+  },
+  "failedPreviewRestore": {
+    "evidenceArtifactId": 14182191504,
+    "evidenceArtifactDigest": "sha256:fc9a7ed476ebed21e7595a51b905cb68f7f86b1dc14050200871e4908f46d641",
+    "status": "EXACT_R11_PREVIEW_RESTORED_VERIFIED_NOT_PRODUCT_ACCEPTANCE",
+    "beforeAndAfterFileCount": 223,
+    "liveWrites": 0,
+    "backendWrites": 0,
+    "businessDataWrites": 0,
+    "authIamWrites": 0
+  },
+  "bothLiveOriginsUnchanged": true,
+  "lastAcceptedLiveSourceSha": "84769378eb2014addebfefdbdd63091bddc4b817",
+  "backendSignedPreviewQa": "PENDING",
+  "newLiveAcceptanceClaimed": false,
+  "realCustomerOrFinancialWrites": 0,
+  "operationsAcceptedChecks": 6,
+  "operationsRequiredChecks": 8,
+  "overallAcceptedChecks": 19,
+  "overallRequiredChecks": 31,
+  "historicalAutomaticChecks": {
+    "E4": {
+      "runId": 43765252150,
+      "conclusion": "failure",
+      "cause": "Test mock lacks policyDisplayStatus; same test and Cliente360 blobs reproduce on R11 and parent. Not caused by this delta. Historical result is not relabeled PASS."
+    },
+    "conciliacionesStageSource": {
+      "runId": 43765252198,
+      "conclusion": "failure",
+      "cause": "Legacy source whitelist pinned to 0153f5c rejects already accepted R11 and prior parent product deltas. Not current release authority."
+    }
+  }
+}
