@@ -52,7 +52,7 @@
     "Editing only a policy advisor could rebuild financial values from missing fields and replace a receipt schedule; a metadata-only change must preserve canonical premiums and receipts instead of recalculating them."
   ],
   "currentEvidenceBoundaries": {
-    "resumeSyncAndClickDiagnostics20261115": {"receipt": "artifacts/orbit360-recovery/release-control/I6_6_RESUME_SYNC_AND_FINANCE_CLICK_DIAGNOSTIC_20261115.json", "status": "METADATA_SYNC_PUBLISHED_SOURCE_DIAGNOSTIC_TESTS_PASS_RUNTIME_PENDING", "metadataCommit": "9b021c3cb37968c27d978691e0e852fc1215d575", "metadataGuardRunId": 43758186160, "diagnosticTests": "17/17", "sourceNormativeMatches": "9/9", "newAcceptanceClaimed": false, "newFinancialWrites": 0},
+    "resumeSyncAndClickDiagnostics20261115": {"receipt": "artifacts/orbit360-recovery/release-control/I6_6_RESUME_SYNC_AND_FINANCE_CLICK_DIAGNOSTIC_20261115.json", "status": "SYNC_AND_READONLY_HOSTING_IDENTITIES_PASS_SIGNED_FINANCIAL_QA_HOLD", "metadataCommit": "9b021c3cb37968c27d978691e0e852fc1215d575", "metadataGuardRunId": 43758186160, "diagnosticTests": "17/17", "sourceNormativeMatches": "9/9", "newAcceptanceClaimed": false, "newFinancialWrites": 0, "diagnosticSourceCommit": "ce176e1244d74c55a5453559d3f11f7b9822a0e6", "diagnosticGuardRunId": 43758700659, "freshInventoryRunId": 43758700651, "previewHostingVersionObserved": "sites/ays-orbit-360-lab/versions/77f99c0f0893d8d5", "bothLiveOriginsIdentity": "R11_MATCH_2_OF_2", "nextOnly": "EXACT_FAILED_PREVIEW_RESTORE_BINDING_THEN_NEW_IMMUTABLE_BUILD_AND_SIGNED_FINANCE_UI_DIAGNOSTIC", "noNewRuntimeAcceptance": true},
     "conciliationPriorCensus": {"stageProposals": 132, "uniquePolicyMatches": 52, "nonUniquePolicyEditions": 80, "sourceEvidence": 365, "stageHolds": 233, "notPaymentMatches": true},
     "bantrabA3": {"sourceReferenceWritesAlreadyProven": 7, "runId": 43438038880, "paymentsApplied": 0, "doNotRepeatReferenceBatch": true},
     "baselineAcceptanceMetric": {"verified": 19, "required": 31, "percent": 61.3, "scope": "Five frozen operational blocks only; not total product or elapsed work; source tests do not raise LIVE acceptance."},
@@ -64,7 +64,7 @@
     "latestPreviewEvidence": {"buildRunId":43756113933,"buildConclusion":"SUCCESS","artifactId":14178232379,"artifactDigest":"sha256:778baa27265eb0bde998a2102571255294d517a1284cc07a3325a0b9e07f7921","hostingFileReadback":223,"liveHostingUnchanged":true,"controlHeadSha":"27b18fb30eecccf828c2907d920b1abcd6541bde","signedQaRunId":43756837089,"signedQaConclusion":"FAILURE","permissionDriver":"PASS","opsLeadsDriver":"PASS_SYNTHETIC_RESTORED_3_PLUS_3","advisorPayablesDriver":"HOLD_FINANCE_UI_HYDRATION_TIMEOUT_AT_TAB_CLICK_LINE_261","proposalApplicationDriver":"NOT_EXECUTED","failureDiagnosticArtifactId":14178511809,"failureDiagnosticDigest":"sha256:b8c9a0e5a7007b16f10eb819a785e82e65b042837eeb3995f655c745a8d5800b","cleanupRemaining":0,"realFinancialWrites":0,"acceptanceProofProduced":false,"mustNotPromote":true},
     "failedPreviewCleanup": "PASS_REMAINING_ZERO",
     "failedPreviewArtifactMustNotPromote": true,
-    "readOnlyPreviewInventoryRun": 43753990648,
+    "readOnlyPreviewInventoryRun": 43758700651,
     "documentaryLiquidations": {"status":"PAULA_AND_FERNANDO_V2_CORRECTION_CONTENT_AND_LAYOUT_VERIFIED_SAMUEL_UNCHANGED_NOT_POSTED","sourceFiles":10,"insurers":9,"sourceLines":79,"paulaLines":62,"fernandoLines":12,"samuelLines":2,"germanLines":3,"newFinancialWrites":0,"currenciesMustRemainSeparated":true},
     "realNewPayablesCreated": 0,
     "realNewPaymentsApplied": 0

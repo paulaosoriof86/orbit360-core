@@ -65,7 +65,7 @@
     "liveRunId": 43506971214,
     "hostingVersion": "sites/ays-orbit-360-lab/versions/0766db29b338befc"
   },
-  "nextStep": "Read fresh metadata-only Preview channel inventory and source identities; bind the exact current failed candidate and structured cleanup evidence before preparing a new immutable build. Then signed four-driver QA and only a passed same-artifact LIVE promotion.",
+  "nextStep": "Bind failed Preview source02463 Hosting77f99c0f0893d8d5 and structured cleanup evidence artifact14178511809/digestsha256:b8c9a0e5a7007b16f10eb819a785e82e65b042837eeb3995f655c745a8d5800b to the existing exact Preview restoration helper before the next immutable build. Preserve R11 and failed candidate backups. The prior helper only binds older5426093, checks4 flat log; do not weaken it or reuse its stale inventory. Then new immutable candidate, same four signed drivers with retained click diagnostics, and only a passed same-artifact LIVE promotion.",
   "constraints": {
     "noArtifactPatch": true,
     "noForcedClick": true,
@@ -78,5 +78,28 @@
     "newPreviewAcceptance": false,
     "newLiveAcceptance": false,
     "operationalAcceptanceMetricUnchanged": "19/31 = 61.3%"
+  },
+  "publishedDiagnosticSource": {
+    "commit": "ce176e1244d74c55a5453559d3f11f7b9822a0e6",
+    "remoteGuardRunId": 43758700659,
+    "remoteGuardConclusion": "success"
+  },
+  "freshReadOnlyVerification": {
+    "runId": 43758700651,
+    "jobId": 132948379399,
+    "headSha": "ce176e1244d74c55a5453559d3f11f7b9822a0e6",
+    "workflowConclusion": "success",
+    "observedAtUtc": "2026-11-15T20:33:31Z",
+    "channelId": "gi-i66-rc-42868854629",
+    "channelCreatedAt": "2026-11-10T17:50:59.307316958Z",
+    "previewHostingVersion": "sites/ays-orbit-360-lab/versions/77f99c0f0893d8d5",
+    "previewSourceSha": "02463e625e11daea7f5a609613bd67a5890ba270",
+    "previewBuildId": "gi-i66-02463e625e11-57f234755dc1",
+    "liveHostingVersion": "sites/ays-orbit-360-lab/versions/0766db29b338befc",
+    "bothLiveOriginsSourceSha": "84769378eb2014addebfefdbdd63091bddc4b817",
+    "bothLiveOriginsBuildId": "gi-i66-84769378eb20-57f234755dc1",
+    "liveOriginsMatched": 2,
+    "hostingMutations": 0,
+    "scope": "Hosting metadata plus build marker identity only; not a new full-file hash or signed financial acceptance"
   }
 }
