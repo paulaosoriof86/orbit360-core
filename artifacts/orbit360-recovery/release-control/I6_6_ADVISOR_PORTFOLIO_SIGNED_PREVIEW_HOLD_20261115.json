@@ -1,0 +1,155 @@
+{
+  "schema": "I6_6_ADVISOR_PORTFOLIO_SIGNED_PREVIEW_HOLD_V1",
+  "status": "SIGNED_PREVIEW_HOLD_GENUINE_LEGAL_ACCEPTANCE_REQUIRED_NOT_PRODUCT_ACCEPTANCE",
+  "gate": "I6.6",
+  "sourceSha": "257695e19749a4e18f38be972b37b6b47b2225af",
+  "buildRunId": 43765252188,
+  "artifactId": 14181847038,
+  "artifactDigest": "sha256:3159ae024a6a119b11cb3f9521bd9819b0663198a1cffcd340eac4fdb91d9bf2",
+  "qaRunId": 43766053717,
+  "qaHeadSha": "588a759a7063e8d70be26ca2c7e04bda40a7596c",
+  "qaJobId": 132971308790,
+  "diagnosticArtifact": {
+    "id": 14182616271,
+    "digest": "sha256:c998b365fad780bcadff0f8b773139b4d6f30af272c7dd24d61d00dada056b4b",
+    "size": 882,
+    "entry": "i66-preview-failure-diagnostic.json",
+    "entrySha256": "f35aff0a6344248d4bebf0e92c896345a4837be8e710e183b05604706727f88d"
+  },
+  "diagnostic": {
+    "schema": "I6_6_PREVIEW_DIAGNOSTIC_ONLY_V1",
+    "status": "FAILED_NOT_ACCEPTED",
+    "runId": 43766053717,
+    "sourceSha": "257695e19749a4e18f38be972b37b6b47b2225af",
+    "reports": [
+      {
+        "status": "HOLD",
+        "phase": "PREVIEW",
+        "failureStage": "FINANCE_UI_HYDRATION",
+        "failureCheck": "ASSERTION_OR_RUNTIME_FAILURE",
+        "failureClass": "TIMEOUT_ERROR",
+        "failureLocation": {
+          "file": "gravicentra-i6-6-advisor-payables-signed-uat.cjs",
+          "line": 526,
+          "column": 65
+        },
+        "financeUiDiagnostics": {
+          "beforeClick": {
+            "snapshotStatus": "CAPTURED",
+            "route": "FINANZAS",
+            "tabCount": 1,
+            "tabConnected": true,
+            "tabVisible": true,
+            "tabEnabled": true,
+            "rect": {
+              "x": 1056,
+              "y": 183,
+              "width": 132,
+              "height": 34
+            },
+            "centerInViewport": true,
+            "targetReceivesPointer": false,
+            "topTag": "DIV",
+            "topId": null,
+            "topClasses": [
+              "drawer-back",
+              "open"
+            ],
+            "legalOverlayPresent": true,
+            "legalOverlayAtTarget": true,
+            "legalOverlayCount": 1,
+            "modalCount": 1,
+            "authRestoring": false
+          },
+          "onFailure": {
+            "snapshotStatus": "CAPTURED",
+            "route": "FINANZAS",
+            "tabCount": 1,
+            "tabConnected": true,
+            "tabVisible": true,
+            "tabEnabled": true,
+            "rect": {
+              "x": 770,
+              "y": 183,
+              "width": 132,
+              "height": 34
+            },
+            "centerInViewport": true,
+            "targetReceivesPointer": false,
+            "topTag": "DIV",
+            "topId": null,
+            "topClasses": [],
+            "legalOverlayPresent": true,
+            "legalOverlayAtTarget": true,
+            "legalOverlayCount": 1,
+            "modalCount": 1,
+            "authRestoring": false
+          },
+          "actionability": {
+            "pointerInterception": true,
+            "detached": true,
+            "notVisible": false,
+            "notEnabled": false,
+            "notStable": false,
+            "outsideViewport": false
+          }
+        },
+        "checks": 5,
+        "cleanupStatus": "PASS",
+        "remaining": 0
+      }
+    ]
+  },
+  "executedDrivers": {
+    "permissions": "SIGNED_DIRECTION_AND_OPERATIVE_READONLY_CHECKS_PASS_NOT_FIVE_ACTOR_WRITE_ACCEPTANCE",
+    "opsLeads": "SIGNED_DIRECTION_AND_OPERATIVE_SYNTHETIC_CHECKS_AND_RESTORE_PASS",
+    "advisorPayables": "HOLD_AT_FINANCE_ASSESSOR_TAB_BEFORE_DOCUMENTED_CORRECTION_OR_PAYABLE_CONFIRMATION",
+    "proposalApplication": "NOT_EXECUTED_AFTER_PRIOR_FAILURE"
+  },
+  "exactThreePreviewFunctionsDeployed": true,
+  "newLiveDeployment": false,
+  "liveSourcePreserved": "84769378eb2014addebfefdbdd63091bddc4b817",
+  "syntheticCleanup": {
+    "status": "PASS",
+    "remaining": 0
+  },
+  "realCustomerWrites": 0,
+  "realFinancialWrites": 0,
+  "bankMovements": 0,
+  "financialPayments": 0,
+  "authOrMembershipMutations": 0,
+  "legalAcceptanceRecordedByAutomation": false,
+  "causalScope": {
+    "overlay": "Acuerdos legales",
+    "legalVersion": "2.0",
+    "actorType": "interno",
+    "clauseKeys": [
+      "confidencialidad",
+      "tratamiento_datos",
+      "descargo_ia"
+    ],
+    "sourceDelayMs": 350,
+    "storage": "Per-origin localStorage and memory; fresh QA browser context has no accepted state",
+    "noRemoteFullModalTextClaim": true,
+    "clickTargetVisibleAndEnabled": true,
+    "pointerInterceptedByLegalOverlayBeforeAndAfter": true,
+    "calculationAndCorrectionRuntimeNotReached": true
+  },
+  "continuation": {
+    "firstIncompleteGate": "I6.6 signed Preview",
+    "requiredDecision": "Genuine explicit actor review of the exact legal clauses before any acceptance. A different-browser acceptance alone does not resolve the isolated CI context.",
+    "technicalRequirement": "Any authorized acceptance transport must bind the genuine actor, origin and exact clause version; never insert invented consent or bypass the overlay. If a pinned owner/harness changes, produce a new immutable source/artifact.",
+    "frozenArtifactPreserved": true,
+    "realCorrectionsRemainPending": true,
+    "operationsAcceptedChecks": 6,
+    "operationsRequiredChecks": 8,
+    "overallAcceptedChecks": 19,
+    "overallRequiredChecks": 31
+  },
+  "privateCustomerReadbackSummary": {
+    "policyAdvisorMismatches": 6,
+    "clientAdvisorMismatches": 5,
+    "clientAdvisorAlreadyCorrect": 1,
+    "sourceSha256": "0bb6827c6b47359237a2a1e9d3814367ccbbebe3047aa57fdaecbfed3c082d77"
+  }
+}
