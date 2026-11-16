@@ -9,7 +9,7 @@
     "activeGate": "I6.6",
     "closedHistoricalGate": "B4-007",
     "latestProvenLiveSource": "84769378eb2014addebfefdbdd63091bddc4b817",
-    "currentWork": "Resolve the reproduced legal company/country composition defect and prove the original Direction Preview decision through normal visible UI on one new immutable successor. Retain R11 LIVE and all real records.",
+    "currentWork": "Execute exact-source signed Preview validation with the current genuine Direction legal decision; preserve R11 and all financial/customer records until exact acceptance and separate LIVE prerequisites.",
     "newFinancialWrites": 0,
     "newLiveAcceptanceClaimed": false
   },
@@ -3344,7 +3344,7 @@
     "i63LiveReadbackPass": true,
     "i63DeterministicDiffReady": true
   },
-  "nextAction": "I6_6_DIRECTION_LEGAL_CONTEXT_CAUSAL_RETRY_20261116: FAILED_2D4_SIGNED_PREVIEW_RESTORED_ALL_SYNTHETICS_REMAINING_ZERO. FIX_EFFECTIVE_COMPANY_AUTHORITY_AND_EXPLICIT_LEGAL_COUNTRY_SELECTION_WITH_UNCHANGED_TERMS; NEW_IMMUTABLE_BUILD_AND_EXISTING_SIGNED_PREVIEW_REQUIRED. ORIGINAL_DIRECTION_GT_V2_PREVIEW_DECISION_PRESERVED_FOR_THIS_EXACT_RETRY_ONLY. R11_LIVE_UNCHANGED; NO_REAL_WRITES_OR_NEW_LIVE_PASS. MAPFRE_SAME_CONDITIONS_ALREADY_APPROVED. OPS_6_OF_8_OVERALL_19_OF_31.",
+  "nextAction": "I6_6_DIRECTION_LEGAL_CONTEXT_PREVIEW_BUILD_20261116: EXACT_SOURCE_47F4D2D_ARTIFACT_14282155921_PREVIEW_223_FILES_VERIFIED. EXECUTE_EXISTING_FOUR_SIGNED_PREVIEW_DRIVERS_AND_EXACT_THREE_PREVIEW_FUNCTIONS_WITH_GENUINE_DIRECTION_DECISION; NO_REAL_RECORD_WRITES. R11_REMAINS_LAST_ACCEPTED_LIVE. PREVIEW_ACCEPTANCE_IS_NOT_LIVE_CONSENT. MAPFRE_SAME_CONDITIONS_RENEWAL_ALREADY_APPROVED. OPS_6_OF_8_OVERALL_19_OF_31_UNCHANGED.",
   "postproductionExitProgress": {
     "formalPercent": 60,
     "frozenMiniGates": 6,
@@ -22917,6 +22917,16 @@
     "sourceParent": "b28b6c2de2da30f34b0e6e6abb96b4d238d84af7",
     "originalDecisionReceipt": "artifacts/orbit360-recovery/release-control/I6_6_DIRECTION_PREVIEW_LEGAL_ACCEPTANCE_20261116.json",
     "originalDecisionSha256": "68d3961987e19acdc223b7d2adf01eb39c540ca6ae8aa72c64752cab45fddbae",
+    "lastAcceptedLiveUnchanged": true,
+    "realRecordWrites": 0,
+    "newLiveAcceptanceClaimed": false
+  },
+  "i66DirectionLegalContextPreviewBuild20261116": {
+    "status": "IMMUTABLE_PREVIEW_BUILD_READBACK_PASS_SIGNED_QA_AUTHORIZED_NOT_ACCEPTED",
+    "receipt": "artifacts/orbit360-recovery/release-control/I6_6_DIRECTION_LEGAL_CONTEXT_PREVIEW_BUILD_20261116.json",
+    "sourceSha": "47f4d2de26e02d1792f31563288a64819e4b64d1",
+    "buildRunId": 43978039744,
+    "artifactId": 14282155921,
     "lastAcceptedLiveUnchanged": true,
     "realRecordWrites": 0,
     "newLiveAcceptanceClaimed": false

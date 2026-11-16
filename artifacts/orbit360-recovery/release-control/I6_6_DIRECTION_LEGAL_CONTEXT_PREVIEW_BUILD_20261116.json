@@ -1,0 +1,62 @@
+{
+  "schema": "GI_I66_DIRECTION_LEGAL_CONTEXT_PREVIEW_BUILD_V1",
+  "status": "IMMUTABLE_PREVIEW_BUILD_READBACK_PASS_SIGNED_QA_AUTHORIZED_NOT_ACCEPTED",
+  "activeGate": "I6.6",
+  "dateGuatemala": "2026-11-16",
+  "sourceSha": "47f4d2de26e02d1792f31563288a64819e4b64d1",
+  "buildRunId": 43978039744,
+  "buildJobId": 133687101618,
+  "buildConclusion": "success",
+  "artifactId": 14282155921,
+  "artifactDigest": "sha256:b35146189da52846bc03580cb3d5b6fdc82bdc5b51e2c6574474c53d97c39a32",
+  "immutableTarSha256": "c300bce1b733c60d3dc6d21a90df77d752fc0eaaf4f4a3dfe6a0e5c896075a51",
+  "buildId": "gi-i66-47f4d2de26e0-57f234755dc1",
+  "previewUrl": "https://ays-orbit-360-lab--gi-i66-rc-42868854629-abj14q6n.web.app",
+  "previewChannelId": "gi-i66-rc-42868854629",
+  "verifiedManifests": {
+    "site": {
+      "files": 223,
+      "manifestSha256": "e1833f4186d3d12fdb1da268c998003c374c6c0e08edce2ba0a8702669481110"
+    },
+    "backend": {
+      "files": 44,
+      "manifestSha256": "0690d628e4b548040de4f4cb4e688c3243c3573fc111cf283ca800fffb57cdc0"
+    },
+    "bundle": {
+      "files": 269,
+      "manifestSha256": "5e95e9ee6b1e94ce88cf3671ac2f1505035c900c5eb7805ba6cfb046a1c3d4f9"
+    }
+  },
+  "archiveDigestIndependentlyVerified": true,
+  "allPreviewSiteFilesReadBackByBuild": 223,
+  "restoreEvidence": {
+    "artifactId": 14281451641,
+    "artifactDigest": "sha256:17dd8653c235cdc8df510ec689dc9b0988a400a737863d55c6a6f41fdbd6c097",
+    "status": "EXACT_R11_PREVIEW_RESTORED_VERIFIED_NOT_PRODUCT_ACCEPTANCE",
+    "failedCandidate": "2d4e2d007d42560ca0ed0e7ce4108c889b416539",
+    "bothImmutableBackupsPresent": true,
+    "bothBackupsAndRestoreArchiveDigestVerified": true,
+    "full223FileBeforeAfterChecks": true,
+    "otherChannelsUnchanged": true
+  },
+  "legalAcceptance": {
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_DIRECTION_PREVIEW_LEGAL_ACCEPTANCE_20261116.json",
+    "receiptSha256": "68d3961987e19acdc223b7d2adf01eb39c540ca6ae8aa72c64752cab45fddbae",
+    "decisionId": "DIRECTION_PREVIEW_INTERNAL_LEGAL_V2_ACCEPTED_20261116",
+    "sourceSha": "47f4d2de26e02d1792f31563288a64819e4b64d1",
+    "phase": "PREVIEW",
+    "actorRole": "direccion"
+  },
+  "signedPreviewStatus": "NOT_YET_EXECUTED",
+  "lastAcceptedLiveSource": "84769378eb2014addebfefdbdd63091bddc4b817",
+  "bothLiveOriginsUnchanged": true,
+  "newLiveAcceptanceClaimed": false,
+  "realCustomerOrFinancialWrites": 0,
+  "progress": {
+    "opsVerified": 6,
+    "opsRequired": 8,
+    "fiveBlockVerified": 19,
+    "fiveBlockRequired": 31
+  },
+  "knownLivePrerequisite": "Preview-specific acceptance is not a new LIVE legal decision. Do not promote a known fresh-context legal block without resolving that distinct scope."
+}

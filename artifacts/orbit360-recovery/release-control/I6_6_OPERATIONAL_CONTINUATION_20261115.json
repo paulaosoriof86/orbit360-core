@@ -195,8 +195,8 @@
     },
     {
       "id": "P0-PUBLISH-CURRENT-DELTA",
-      "state": "CAUSAL_LEGAL_CONTEXT_REPAIR_NEW_IMMUTABLE_BUILD_REQUIRED",
-      "scope": "Same existing Preview channel and four signed drivers. Reuse the original exact Direction GT/version2.0 terms acceptance via visible country selection and checkbox/button after actor/terms checks. No LIVE acceptance or real corrections inferred.",
+      "state": "IMMUTABLE_PREVIEW_BUILT_SIGNED_QA_AUTHORIZED",
+      "scope": "Exact source 47f4d2d and artifact14282155921; four existing signed drivers, three exact Preview functions, genuine Direction acceptance of unchanged version2.0 by normal UI. No new LIVE acceptance or real corrections inferred.",
       "doneWhen": "Real workflow receipts, exact digests and post-deploy business-function verification. Successful build alone is not acceptance."
     },
     {
@@ -316,6 +316,16 @@
     "sourceParent": "b28b6c2de2da30f34b0e6e6abb96b4d238d84af7",
     "originalDecisionReceipt": "artifacts/orbit360-recovery/release-control/I6_6_DIRECTION_PREVIEW_LEGAL_ACCEPTANCE_20261116.json",
     "originalDecisionSha256": "68d3961987e19acdc223b7d2adf01eb39c540ca6ae8aa72c64752cab45fddbae",
+    "lastAcceptedLiveUnchanged": true,
+    "realRecordWrites": 0,
+    "newLiveAcceptanceClaimed": false
+  },
+  "directionLegalContextPreviewBuild20261116": {
+    "status": "IMMUTABLE_PREVIEW_BUILD_READBACK_PASS_SIGNED_QA_AUTHORIZED_NOT_ACCEPTED",
+    "receipt": "artifacts/orbit360-recovery/release-control/I6_6_DIRECTION_LEGAL_CONTEXT_PREVIEW_BUILD_20261116.json",
+    "sourceSha": "47f4d2de26e02d1792f31563288a64819e4b64d1",
+    "buildRunId": 43978039744,
+    "artifactId": 14282155921,
     "lastAcceptedLiveUnchanged": true,
     "realRecordWrites": 0,
     "newLiveAcceptanceClaimed": false
