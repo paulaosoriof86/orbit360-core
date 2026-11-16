@@ -9,7 +9,7 @@ const path=require('node:path');
 const os=require('node:os');
 const contract=require('../functions/advisor-commission-payable-contract');
 const assignment=require('../functions/advisor-assignment-correction-contract');
-const {acceptDirectionPreviewLegal}=require('./gravicentra-i6-6-direction-preview-legal-acceptance.cjs');
+const {acceptDirectionPreviewLegal,LEGAL_FAILURE_CHECKS,safeLegalFailureSubstage}=require('./gravicentra-i6-6-direction-preview-legal-acceptance.cjs');
 const PROJECT='ays-orbit-360-lab',TENANT='alianzas-soluciones';
 const SOURCE_SCHEMA='gravicentra-advisor-commission-source-batch-v1';
 const hash=value=>crypto.createHash('sha256').update(String(value)).digest('hex');
@@ -353,15 +353,20 @@ function safeFailureEvidence(error,stage){
     'ADVISOR_UAT_SIGNED_SESSION_MISMATCH','ADVISOR_UAT_BUILD_SOURCE_DRIFT',
     'ADVISOR_UAT_ARTIFACT_MARKER_DRIFT','ADVISOR_UAT_CLEANUP_HOLD','DIRECTION_LEGAL'];
   const message=String(error?.message||'');
-  const check=checks.find(value=>message===value||message.startsWith(value+'_')||message.startsWith(value+'\n'));
+  // Exact source-owned codes only; never retain compared values or exception text.
+  const exactLegalChecks=new Set(LEGAL_FAILURE_CHECKS);
+  const firstLine=message.split(/\r?\n/,1)[0];
+  const check=exactLegalChecks.has(firstLine)?firstLine:checks.find(value=>message===value||message.startsWith(value+'_')||message.startsWith(value+'\n'));
+  const legalSubstage=stage==='DIRECTION_LEGAL_ACCEPTANCE'?safeLegalFailureSubstage(error?.directionLegalSubstage):null;
   const location=String(error?.stack||'').match(/(?:^|[/\\])gravicentra-i6-6-advisor-payables-signed-uat\.cjs:(\d+):(\d+)/);
   return {failureClass:error?.code==='ERR_ASSERTION'?'ERR_ASSERTION':error?.name==='TimeoutError'?'TIMEOUT_ERROR':'ASSERTION_OR_RUNTIME_FAILURE',
     failureStage:stages.has(stage)?stage:'UNKNOWN_STAGE',failureCheck:check||'ASSERTION_OR_RUNTIME_FAILURE',
+    ...(legalSubstage?{failureLegalSubstage:legalSubstage}:{}),
     failureLocation:location?{file:'gravicentra-i6-6-advisor-payables-signed-uat.cjs',line:Number(location[1]),column:Number(location[2])}:null};
 }
 
 // Diagnostics describe actionability only. Never retain visible text, the
-// legal scope (which contains the actor's email), arbitrary attributes or URLs.
+// legal scope (which contains the actor's identity), arbitrary attributes or URLs.
 function safeFinanceUiSnapshot(value){
   const input=value&&typeof value==='object'?value:{};
   const boolean=key=>typeof input[key]==='boolean'?input[key]:null;
@@ -813,5 +818,5 @@ async function main(){
   if(originalFailure||cleanupFailure)throw Error('ADVISOR_PAYABLE_SIGNED_UAT_HOLD');
   return report;
 }
-module.exports={configuration,sourceIdentity,fixtures,signedDocumentaryFixtures,withAssignmentFixtures,assignmentIdentity,assignmentStepsFor,assignmentReceiptFor,assignmentProjectionRows,assertAssignmentReceipt,assignmentAuditGuard,assertDocumentaryRow,assertDocumentaryReceipt,assertDocumentaryView,assertVisibleDocumentaryView,assertGenerated,sourceAuditGuard,genericAuditGuard,unchangedSeed,configuredCredential,assertServerDenial,safeFailureEvidence,safeFinanceUiSnapshot,safeClickActionability,safeFinanceUiDiagnostics,captureFinanceUiSnapshot,main};
+module.exports={configuration,sourceIdentity,fixtures,signedDocumentaryFixtures,withAssignmentFixtures,assignmentIdentity,assignmentStepsFor,assignmentReceiptFor,assignmentProjectionRows,assertAssignmentReceipt,assignmentAuditGuard,assertDocumentaryRow,assertDocumentaryReceipt,assertDocumentaryView,assertVisibleDocumentaryView,assertGenerated,sourceAuditGuard,genericAuditGuard,unchangedSeed,configuredCredential,assertServerDenial,safeFailureEvidence,safeLegalFailureSubstage,safeFinanceUiSnapshot,safeClickActionability,safeFinanceUiDiagnostics,captureFinanceUiSnapshot,main};
 if(require.main===module)main().catch(error=>{console.error('I66_ADVISOR_PAYABLE_SIGNED_UAT_HOLD '+String(error.code||'ASSERTION_OR_RUNTIME_FAILURE').replace(/[^A-Za-z0-9_./:-]+/g,'_').slice(0,120));process.exitCode=1;});

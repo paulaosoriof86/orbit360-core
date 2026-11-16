@@ -1,0 +1,100 @@
+{
+  "schema": "GI_I66_DIRECTION_LEGAL_CONTEXT_CAUSAL_RETRY_V1",
+  "dateGuatemala": "2026-11-16",
+  "observedAtUtc": "2026-11-16T23:14:57.596232Z",
+  "status": "REPRODUCIBLE_COMPOSITION_CAUSE_REPAIRED_NEW_IMMUTABLE_SIGNED_PREVIEW_REQUIRED",
+  "activeGate": "I6.6",
+  "firstIncompleteGate": "SIGNED_PREVIEW",
+  "sourceParent": "b28b6c2de2da30f34b0e6e6abb96b4d238d84af7",
+  "originalConsentReceipt": "artifacts/orbit360-recovery/release-control/I6_6_DIRECTION_PREVIEW_LEGAL_ACCEPTANCE_20261116.json",
+  "originalConsentReceiptSha256": "68d3961987e19acdc223b7d2adf01eb39c540ca6ae8aa72c64752cab45fddbae",
+  "decisionScopeUnchanged": {
+    "actorAdvisorId": "ase-paula-osorio",
+    "role": "direccion",
+    "tenantId": "alianzas-soluciones",
+    "country": "GT",
+    "version": "2.0",
+    "origin": "https://ays-orbit-360-lab--gi-i66-rc-42868854629-abj14q6n.web.app",
+    "termsProjectionSha256": "485b07887091063cc7a5d1dc8f11a9bb547f2ef059490bb04d4acee73404f6b2"
+  },
+  "technicalRebindingOnly": true,
+  "acceptanceTermsChanged": false,
+  "newConsentInvented": false,
+  "futureAutomaticSuccessorsAuthorized": false,
+  "liveConsentGranted": false,
+  "previousFailedCandidate": {
+    "status": "SIGNED_PREVIEW_HOLD_NOT_PROMOTABLE",
+    "qaRunId": 43972678411,
+    "qaHeadSha": "b28b6c2de2da30f34b0e6e6abb96b4d238d84af7",
+    "qaJobId": 133668693924,
+    "failureStage": "DIRECTION_LEGAL_ACCEPTANCE",
+    "failureCheck": "DIRECTION_LEGAL",
+    "failureClass": "ERR_ASSERTION",
+    "failureLocation": {
+      "file": "gravicentra-i6-6-advisor-payables-signed-uat.cjs",
+      "line": 517,
+      "column": 39
+    },
+    "checks": 4,
+    "cleanup": "PASS",
+    "remaining": 0,
+    "diagnosticArtifact": {
+      "artifactId": 14279251913,
+      "artifactDigest": "sha256:0d50ba33a130acb3273166552f36903d76918a209fdec070dd612d371970ae4b",
+      "artifactName": "gi-i66-preview-failure-diagnostic-43972678411",
+      "archiveSize": 533,
+      "entryName": "i66-preview-failure-diagnostic.json",
+      "entrySha256": "9e05ef64f30996724e64d527af00df702690e2e34bbc12dadba3d6c0a029ca6c"
+    },
+    "signedLogSha256": "ec47ade585661bdd8ebec0b0af6e0554f8d2232336551835565c46dc3704873e",
+    "exactAssertionAndPreOrPostClickNotRecoverableFromOldSanitizer": true,
+    "legalAcceptanceProofProduced": false,
+    "realCustomerWritesRequested": 0,
+    "bankMovements": 0,
+    "financialPayments": 0,
+    "authOrMembershipMutations": 0,
+    "livePromotion": false,
+    "fullI66Acceptance": false
+  },
+  "reproducedCauses": [
+    "The effective product legal owner reads legacy tenant.nombre while the existing publicTenantBranding owner holds the certified company displayName; a fresh context renders el Intermediario and changes the reviewed clause text.",
+    "TODOS is a multi-country view preference, not a legal jurisdiction. A fresh multi-country product session may pass TODOS to legal.pais; no single jurisdiction may be silently inferred."
+  ],
+  "causalCorrection": [
+    "Resolve company identity from the existing public branding authority in the same tenant.",
+    "Require an explicit visible valid jurisdiction selection when the legal context is ambiguous; selection does not change operational countries or permissions.",
+    "Render the unchanged clauses for the chosen country, invalidate previous checkbox state on change, and record exactly the displayed country on genuine acceptance.",
+    "The signed Preview driver verifies actor/origin/scope/version before normal UI country selection, then validates every reviewed clause before normal checkbox and button actions.",
+    "Retain only enumerated diagnostic assertion codes and substages; no identities, raw terms or sensitive exception strings leave signed QA."
+  ],
+  "evidenceLimits": [
+    "The old signed diagnostic does not identify the exact assertion or whether the attempted action occurred before or after click. No successful acceptance proof exists.",
+    "Local DOM and startup reproduction establishes a real composition defect, not a signed Preview or LIVE pass.",
+    "Source context and local tests do not authorize skipping the existing immutable build, signed QA or LIVE gates."
+  ],
+  "freshReadOnlyPreviewInventory": {
+    "runId": 43758700651,
+    "attempt": 3,
+    "jobId": 133672702088,
+    "observedAtUtc": "2026-11-16T22:51:18Z",
+    "metadataRead": "PASS",
+    "previewHostingVersion": "sites/ays-orbit-360-lab/versions/e0ed1d19de94ea7d",
+    "liveHostingVersion": "sites/ays-orbit-360-lab/versions/0766db29b338befc",
+    "mutations": 0,
+    "finalHistoricalIdentityAssertion": "HOLD_OLD_SOURCE_EXPECTATION_NOT_CURRENT_INVENTORY"
+  },
+  "sourceQa": "REQUIRED_BEFORE_PUBLISH",
+  "previewQa": "NOT_EXECUTED_FOR_THIS_SOURCE",
+  "liveQa": "NOT_EXECUTED_FOR_THIS_SOURCE",
+  "originalReceiptBytesUnchanged": true,
+  "lastAcceptedLiveUnchanged": true,
+  "realRecordWrites": 0,
+  "newLiveAcceptanceClaimed": false,
+  "progress": {
+    "opsVerified": 6,
+    "opsRequired": 8,
+    "fiveBlockVerified": 19,
+    "fiveBlockRequired": 31
+  },
+  "mapfreSameConditionsApprovalPreserved": true
+}

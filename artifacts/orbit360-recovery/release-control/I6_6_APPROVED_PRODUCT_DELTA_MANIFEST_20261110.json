@@ -2316,6 +2316,57 @@
           }
         }
       ]
+    },
+    {
+      "id": "I6_6_DIRECTION_LEGAL_COMPANY_COUNTRY_CONTEXT_20261116",
+      "approvedByDirection": true,
+      "receipt": "artifacts/orbit360-recovery/release-control/I6_6_DIRECTION_LEGAL_CONTEXT_CAUSAL_RETRY_20261116.json",
+      "parentSourceSha": "b28b6c2de2da30f34b0e6e6abb96b4d238d84af7",
+      "scope": "Causal correction of effective legal company and explicit country context with unchanged exact version2.0 clauses; original Direction Preview decision, enumerated diagnostic substages and exact failed2d4 restore only.",
+      "paths": [
+        {
+          "path": "orbit360-platform/core/legal.js",
+          "gitBlobSha": "b1d22182d41e2a7fee3f542993d7154c2ead5eca",
+          "replaces": {
+            "path": "orbit360-platform/core/legal.js",
+            "priorGitBlobSha": "0b5cb9953fb267123276b719d2e5135c78dd7638",
+            "priorChangeId": "I6_6_DIRECTION_LEGAL_EXPLICIT_PREVIEW_ACCEPTANCE_20261116"
+          }
+        }
+      ],
+      "tests": [
+        {
+          "path": "tools/gravicentra-i6-6-direction-preview-legal-acceptance.test.cjs",
+          "gitBlobSha": "9987876b1f9b87f14f2d75d910484f06b5c945b0",
+          "replaces": {
+            "path": "tools/gravicentra-i6-6-direction-preview-legal-acceptance.test.cjs",
+            "priorGitBlobSha": "2ba58ec74e926897330fbdc5fa319ade4f941e7d",
+            "priorChangeId": "I6_6_DIRECTION_LEGAL_EXPLICIT_PREVIEW_ACCEPTANCE_20261116"
+          }
+        },
+        {
+          "path": "tools/gravicentra-i6-6-legal-product-context.test.cjs",
+          "gitBlobSha": "29dc109f9feeb2a02720f4171f2a3df0216701c1"
+        },
+        {
+          "path": "tools/gravicentra-i6-6-finance-ui-diagnostics.test.cjs",
+          "gitBlobSha": "786ae40694d36f1ab6d109fac1cb188e89bebf4d",
+          "replaces": {
+            "path": "tools/gravicentra-i6-6-finance-ui-diagnostics.test.cjs",
+            "priorGitBlobSha": "e83224c5d81017cc961bc5f4be70389ed35d235e",
+            "priorChangeId": "I6_6_ADVISOR_PORTFOLIO_HISTORICAL_BENEFICIARY_AND_COMPONENT_ROUNDING_20261115"
+          }
+        },
+        {
+          "path": "tools/gravicentra-i6-6-preview-current-live-restore.test.cjs",
+          "gitBlobSha": "a45ca5b5043c35472328fc5e8591e40a033d5e43",
+          "replaces": {
+            "path": "tools/gravicentra-i6-6-preview-current-live-restore.test.cjs",
+            "priorGitBlobSha": "60056ca5033928add7c0a163de12d42f238ab75c",
+            "priorChangeId": "I6_6_DIRECTION_LEGAL_EXPLICIT_PREVIEW_ACCEPTANCE_20261116"
+          }
+        }
+      ]
     }
   ],
   "i66R11PreviewBuildRequest20261113": {

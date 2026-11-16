@@ -53,6 +53,38 @@ test('click diagnostics classify Playwright actionability without retaining the 
   assert.deepEqual(evidence,{pointerInterception:true,detached:false,notVisible:false,notEnabled:false,notStable:true,outsideViewport:true});
   assert.doesNotMatch(JSON.stringify(evidence),/PRIVATE_SCOPE|user@|SECRET|<div>/);
 });
+test('exact legal scope failure survives sanitization without exposing either compared identity',()=>{
+  let failure;
+  try{assert.equal('user:PRIVATE_ACTOR_UID','user:private-account@example.invalid','DIRECTION_LEGAL_RUNTIME_SCOPE_MISMATCH');}catch(error){failure=error;}
+  const evidence=driver.safeFailureEvidence(failure,'DIRECTION_LEGAL_ACCEPTANCE');
+  assert.equal(evidence.failureClass,'ERR_ASSERTION');
+  assert.equal(evidence.failureStage,'DIRECTION_LEGAL_ACCEPTANCE');
+  assert.equal(evidence.failureCheck,'DIRECTION_LEGAL_RUNTIME_SCOPE_MISMATCH');
+  assert.doesNotMatch(JSON.stringify(evidence),/PRIVATE_ACTOR|private-account|example\.invalid|user:|expected|actual/);
+  for(const message of ['DIRECTION_LEGAL_RUNTIME_SCOPE_MISMATCH_PRIVATE_ACTOR_UID','DIRECTION_LEGAL_UNKNOWN_PRIVATE_ACTOR_UID']){
+    const other=driver.safeFailureEvidence(new Error(message),'DIRECTION_LEGAL_ACCEPTANCE');
+    assert.equal(other.failureCheck,'DIRECTION_LEGAL','an unknown suffix cannot impersonate the exact allowlisted code');
+    assert.doesNotMatch(JSON.stringify(other),/PRIVATE_ACTOR/);
+  }
+});
+test('legal exact-code and substage diagnostics distinguish presentation from post-click failure without private values',()=>{
+  const legal=require('./gravicentra-i6-6-direction-preview-legal-acceptance.cjs');
+  for(const check of legal.LEGAL_FAILURE_CHECKS){
+    let failure;try{assert.equal('PRIVATE_ACTUAL','PRIVATE_EXPECTED',check);}catch(error){failure=error;}
+    failure.directionLegalSubstage='PRE_CLICK_PRESENTATION';
+    const out=driver.safeFailureEvidence(failure,'DIRECTION_LEGAL_ACCEPTANCE');
+    assert.equal(out.failureCheck,check);assert.equal(out.failureLegalSubstage,'PRE_CLICK_PRESENTATION');
+    assert.doesNotMatch(JSON.stringify(out),/PRIVATE_ACTUAL|PRIVATE_EXPECTED/);
+  }
+  for(const substage of legal.LEGAL_FAILURE_SUBSTAGES){
+    const out=driver.safeFailureEvidence({message:'DIRECTION_LEGAL_ACCEPTANCE_NOT_PERSISTED',directionLegalSubstage:substage},'DIRECTION_LEGAL_ACCEPTANCE');
+    assert.equal(out.failureLegalSubstage,substage);
+  }
+  const forged=driver.safeFailureEvidence({message:'DIRECTION_LEGAL_DISPLAYED_TEXT_CHANGED_PRIVATE_VALUE',directionLegalSubstage:'PRIVATE_ACTOR_VALUE'},'DIRECTION_LEGAL_ACCEPTANCE');
+  assert.equal(forged.failureCheck,'DIRECTION_LEGAL');assert.equal(forged.failureLegalSubstage,undefined);
+  assert.doesNotMatch(JSON.stringify(forged),/PRIVATE/);
+  assert.equal(driver.safeFailureEvidence({directionLegalSubstage:'BUTTON_ACTION'},'FINANCE_UI_HYDRATION').failureLegalSubstage,undefined);
+});
 test('finance DOM capture sanitizes captured data and unavailable diagnostics cannot replace a click failure',async()=>{
   let calls=0;
   const captured=await driver.captureFinanceUiSnapshot({evaluate:async fn=>{calls+=1;assert.equal(typeof fn,'function');return{snapshotStatus:'CAPTURED',route:'FINANZAS',topId:'SECRET',tabCount:1,legalOverlayPresent:true};}});
@@ -67,7 +99,9 @@ test('failed-preview artifact transports sanitized click evidence and exact sour
   const section=yaml.split('- name: Preserve sanitized failure diagnostics without an acceptance proof')[1].split('- name: Upload diagnostics only')[0];
   const code=section.split("node - <<'NODE'\n")[1].split('\n          NODE')[0].split('\n').map(line=>line.replace(/^          /,'')).join('\n');
   const secret='PRIVATE_ACTOR_CUSTOMER_TOKEN';
-  const report={status:'HOLD',phase:'PREVIEW',failureStage:'FINANCE_UI_HYDRATION',failureClass:'TIMEOUT_ERROR',
+  const report={status:'HOLD',phase:'PREVIEW',failureStage:'DIRECTION_LEGAL_ACCEPTANCE',failureClass:'ERR_ASSERTION',
+    failureLegalSubstage:'PRE_CLICK_PRESENTATION',
+    failureCheck:driver.safeFailureEvidence({code:'ERR_ASSERTION',message:'DIRECTION_LEGAL_RUNTIME_SCOPE_MISMATCH\nPRIVATE_ACTOR_CUSTOMER_TOKEN'},'DIRECTION_LEGAL_ACCEPTANCE').failureCheck,
     failureLocation:{file:'gravicentra-i6-6-advisor-payables-signed-uat.cjs',line:261,column:60},
     financeUiDiagnostics:{beforeClick:{snapshotStatus:'CAPTURED',route:'FINANZAS',tabCount:1,legalOverlayPresent:true,topId:secret,text:secret},
       onFailure:{snapshotStatus:'CAPTURED',route:secret,legalOverlayAtTarget:true},actionability:{pointerInterception:true,message:secret},actorUid:secret},
@@ -81,11 +115,17 @@ test('failed-preview artifact transports sanitized click evidence and exact sour
   },process:{env:{RUNNER_TEMP:'/tmp/qa',GITHUB_RUN_ID:'71',SOURCE_SHA:'a'.repeat(40)}}});
   assert.equal(written.status,'FAILED_NOT_ACCEPTED');assert.equal(written.reports.length,1);
   assert.deepEqual(written.reports[0].failureLocation,report.failureLocation);
+  assert.equal(written.reports[0].failureCheck,'DIRECTION_LEGAL_RUNTIME_SCOPE_MISMATCH');
+  assert.equal(written.reports[0].failureLegalSubstage,'PRE_CLICK_PRESENTATION');
   assert.equal(written.reports[0].financeUiDiagnostics.beforeClick.legalOverlayPresent,true);
   assert.equal(written.reports[0].financeUiDiagnostics.onFailure.legalOverlayAtTarget,true);
   assert.equal(written.reports[0].financeUiDiagnostics.actionability.pointerInterception,true);
   assert.equal(written.reports[0].remaining,0);
   assert.doesNotMatch(JSON.stringify(written),/PRIVATE_ACTOR|rawError|actorUid|"message"/);
+  report.failureLegalSubstage=secret;
+  vm.runInNewContext(code,{require:name=>name==='node:fs'?fakeFs:name==='node:path'?path:driver,process:{env:{RUNNER_TEMP:'/tmp/qa',GITHUB_RUN_ID:'71',SOURCE_SHA:'a'.repeat(40)}}});
+  assert.equal(written.reports[0].failureLegalSubstage,undefined);
+  assert.doesNotMatch(JSON.stringify(written),/PRIVATE_ACTOR/);
 });
 test('signed runtime fixture uses two coverage lines of one requirement with per-line cents and unchanged economic IDs',()=>{
   const historical=driver.fixtures(documentary.runId),spec=documentary.specs[0],line=spec.lines[0];

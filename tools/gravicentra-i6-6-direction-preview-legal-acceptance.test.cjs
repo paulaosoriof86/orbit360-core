@@ -20,7 +20,7 @@ function fixture(){
     constraints:{ordinaryUiOnly:true,otherActors:false,live:false,futureSourceSuccessors:false,storageSeeding:false,gateBypass:false}};
   const candidate={sourceSha:cfg.source,status:'EXACT_BACKEND_PREVIEW_SIGNED_QA_AUTHORIZED',
     legalAcceptance:{receiptPath:g.RECEIPT,receiptSha256,decisionId:g.DECISION,sourceSha:cfg.source,phase:'PREVIEW',actorRole:'direccion'}};
-  return{receipt,receiptSha256,candidate,cfg,sourceParent:g.SOURCE_BASE,actor:{role:'Dirección',advisorId:g.ADVISOR,uid:'test-direction-uid'}};
+  return{receipt,receiptSha256,candidate,cfg,sourceParent:g.SOURCE_PARENT,actor:{role:'Dirección',advisorId:g.ADVISOR,uid:'test-direction-uid'}};
 }
 function presentation(){
   const o=owner(),scope='user:'+o.user.email;
@@ -90,4 +90,62 @@ test('signed UI entry points call consent only for Direction Preview and retain 
   const proposal=fs.readFileSync(path.join(__dirname,'gravicentra-i6-6-proposal-application-signed-uat.cjs'),'utf8');
   assert.match(proposal,/if\(cfg\.phase==='PREVIEW'\)\{[\s\S]*?acceptDirectionPreviewLegal\(\{page:direction,actor:actors\[0\]/);
   assert.ok(require('./gravicentra-i6-6-operational-release-candidate.cjs').PINNED_OWNER_PATHS.includes('tools/gravicentra-i6-6-direction-preview-legal-acceptance.cjs'));
+});
+function diagnosticHarness(options={}){
+  const f=fixture(),crypto=require('node:crypto'),receiptBytes=Buffer.from(JSON.stringify(f.receipt)),ownerBytes=Buffer.from(source);
+  f.receiptSha256=crypto.createHash('sha256').update(receiptBytes).digest('hex');
+  f.candidate.legalAcceptance.receiptSha256=f.receiptSha256;
+  f.cfg.packageRoot='/synthetic/exact-package';
+  const calls={checks:0,clicks:0,presentations:0,records:0};let selected=false;
+  const control={status:'OPERATIONAL_BACKEND_PREVIEW_AUTHORIZED',operationalReleaseCandidate:f.candidate};
+  const module={exports:{}};
+  const load=Function('module','exports','require','Buffer','fetch',fs.readFileSync(path.join(__dirname,'gravicentra-i6-6-direction-preview-legal-acceptance.cjs'),'utf8'));
+  load(module,module.exports,name=>{
+    if(name==='node:fs')return{readFileSync:file=>file===g.RECEIPT?receiptBytes:file===g.CONTROL?JSON.stringify(control):ownerBytes};
+    if(name==='node:child_process')return{execFileSync:(_cmd,args)=>args[0]==='rev-parse'?g.SOURCE_PARENT:args[1].endsWith(':'+g.RECEIPT)?receiptBytes:ownerBytes};
+    return require(name);
+  },Buffer,async()=>({status:200,arrayBuffer:async()=>ownerBytes}));
+  let clickedAt;
+  const page={waitForSelector:async()=>{},evaluate:async(_fn,arg)=>{
+    if(arg===undefined){calls.presentations++;return{...presentation(),...(options.presentation||{}),...(options.needsCountry&&!selected?{country:'',countrySelectionRequired:true,countrySelectionValue:'',countryOptions:['GT','CO'],checkboxDisabled:true,terms:[]}:selected?{country:'GT',countrySelectionRequired:true,countrySelectionValue:'GT',countryOptions:['GT','CO'],checkboxDisabled:false}:{})};}
+    calls.records++;
+    if(options.missingRecord)return null;
+    return{aceptado:true,version:'2.0',actorUid:f.actor.uid,scopeId:arg,origin:g.ORIGIN,pais:'GT',tipo:'interno',clausulas:[...g.CLAUSES],acceptanceMethod:'VISIBLE_CHECKBOX_AND_BUTTON',ip:null,ipSource:'NOT_COLLECTED',fecha:clickedAt};
+  },locator:()=>({locator:selector=>({selectOption:async value=>{assert.equal(selector,'#lg-country');assert.equal(value,'GT');if(options.failCountry)throw Error('PRIVATE_COUNTRY_DETAIL');selected=true;},check:async()=>{assert.equal(selector,'#lg-chk');calls.checks++;if(options.failCheckbox)throw Error('PRIVATE_CHECKBOX_DETAIL');},click:async()=>{assert.equal(selector,'#lg-ok');calls.clicks++;clickedAt=new Date().toISOString();if(options.failButton)throw Error('PRIVATE_BUTTON_DETAIL');}})})};
+  if(options.actor)Object.assign(f.actor,options.actor);
+  return{calls,selected:()=>selected,run:()=>module.exports.acceptDirectionPreviewLegal({page,actor:f.actor,cfg:f.cfg})};
+}
+test('signed helper reports pre-click presentation failure and attempts no ordinary UI action',async()=>{
+  const h=diagnosticHarness({presentation:{country:'TODOS'}});
+  await assert.rejects(h.run(),error=>error.directionLegalSubstage==='PRE_CLICK_PRESENTATION'&&error.message.startsWith('DIRECTION_LEGAL_RUNTIME_COUNTRY_MISMATCH'));
+  assert.deepEqual(h.calls,{checks:0,clicks:0,presentations:1,records:0});
+});
+test('signed helper retains checkbox, button and persistence substages without assuming a failed click did not apply',async()=>{
+  for(const [options,stage,expected]of [
+    [{failCheckbox:true},'CHECKBOX_ACTION',{checks:1,clicks:0,presentations:1,records:0}],
+    [{failButton:true},'BUTTON_ACTION',{checks:1,clicks:1,presentations:1,records:0}],
+    [{missingRecord:true},'POST_CLICK_PERSISTENCE',{checks:1,clicks:1,presentations:1,records:1}]
+  ]){const h=diagnosticHarness(options);await assert.rejects(h.run(),error=>error.directionLegalSubstage===stage);assert.deepEqual(h.calls,expected);}
+  const success=diagnosticHarness(),proof=await success.run();
+  assert.equal(proof.status,'EXPLICIT_OWNER_DECISION_APPLIED_BY_NORMAL_UI');
+  assert.deepEqual(success.calls,{checks:1,clicks:1,presentations:1,records:1});
+});
+
+test('signed helper selects only the authorized GT country by ordinary UI, then revalidates the full presentation',async()=>{
+  const h=diagnosticHarness({needsCountry:true});await h.run();
+  assert.equal(h.selected(),true);assert.deepEqual(h.calls,{checks:1,clicks:1,presentations:2,records:1});
+  const failed=diagnosticHarness({needsCountry:true,failCountry:true});
+  await assert.rejects(failed.run(),error=>error.directionLegalSubstage==='COUNTRY_SELECTION');
+  assert.equal(failed.selected(),false);assert.deepEqual(failed.calls,{checks:0,clicks:0,presentations:1,records:0});
+  const identity=diagnosticHarness({needsCountry:true,presentation:{actorUid:'other-actor'}});
+  await assert.rejects(identity.run(),error=>error.directionLegalSubstage==='PRE_CLICK_PRESENTATION'&&error.message.startsWith('DIRECTION_LEGAL_SIGNED_UID_MISMATCH'));
+  assert.equal(identity.selected(),false);assert.deepEqual(identity.calls,{checks:0,clicks:0,presentations:1,records:0});
+  const text=diagnosticHarness({needsCountry:true,presentation:{terms:[]}});
+  await assert.rejects(text.run(),error=>error.directionLegalSubstage==='PRE_CLICK_PRESENTATION'&&error.message.startsWith('DIRECTION_LEGAL_DISPLAYED_TEXT_CHANGED'));
+  assert.equal(text.selected(),true);assert.deepEqual(text.calls,{checks:0,clicks:0,presentations:2,records:0});
+});
+test('legal country choice rejects seeded selection, foreign options and premature text',()=>{
+  const p={country:'',countrySelectionValue:'',countryOptions:['GT','CO'],checkboxDisabled:true,terms:[]};
+  assert.equal(g.validateCountrySelection(p),true);
+  for(const patch of [{country:'GT'},{countrySelectionValue:'GT'},{countryOptions:['GT','OTHER']},{countryOptions:['GT','CO','CO']},{checkboxDisabled:false},{terms:[{title:'Premature'}]}])assert.throws(()=>g.validateCountrySelection({...p,...patch}));
 });

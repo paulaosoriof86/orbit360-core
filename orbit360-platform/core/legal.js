@@ -24,7 +24,32 @@ Orbit.legal = (function () {
   const callbacks = Object.create(null);
 
   function pais() { try { return (Orbit.tenant && Orbit.tenant.get && Orbit.tenant.get().paisDefault) || Orbit.pais || 'GT'; } catch (e) { return 'GT'; } }
-  function empresa() { try { return (Orbit.tenant && Orbit.tenant.get && Orbit.tenant.get().nombre) || 'el Intermediario'; } catch (e) { return 'el Intermediario'; } }
+  function empresa() {
+    try {
+      const cfg = window.__ORBIT360_PRODUCT_PUBLIC_CONFIG__ || {};
+      const tenantId = String(cfg.tenantHint || '').trim();
+      if (cfg.enabled === true && tenantId) {
+        // Public identity belongs to the canonical branding owner, not the
+        // browser's unrelated local tenant configuration.
+        const owner = Orbit.publicTenantBranding;
+        const user = (Orbit.auth && Orbit.auth.user && Orbit.auth.user()) || {};
+        const brand = owner && owner.current && owner.current();
+        const snapshot = window.__ORBIT360_TENANT_BRANDING_SNAPSHOT__;
+        const scoped = user.tenantId === tenantId && owner && owner.companyConfigAuthority === 'server';
+        const boundSnapshot = snapshot && snapshot.tenantId === tenantId && snapshot.sourcePath === 'tenants/' + tenantId + '/config/branding';
+        const trusted = brand && (brand.source === 'tenant-config-live' || (brand.source === 'build-snapshot' && boundSnapshot));
+        return scoped && trusted && String(brand.displayName || '').trim() || 'el Intermediario';
+      }
+      return (Orbit.tenant && Orbit.tenant.get && Orbit.tenant.get().nombre) || 'el Intermediario';
+    } catch (e) { return 'el Intermediario'; }
+  }
+  function memberCountries(tipo) {
+    try {
+      const user = (Orbit.auth && Orbit.auth.user && Orbit.auth.user()) || {};
+      if (tipo !== 'interno' || user.productReadOnly !== true || !Array.isArray(user.countries)) return null;
+      return Array.from(new Set(user.countries.filter(p => p === 'GT' || p === 'CO')));
+    } catch (e) { return null; }
+  }
   function titular() { return 'el titular de Orbit 360'; }
 
   function normaDatos(p) {
@@ -43,8 +68,8 @@ Orbit.legal = (function () {
     return 'la autoridad de protección de datos competente';
   }
 
-  function catalogo() {
-    const p = pais(), norma = normaDatos(p), L = leyPais(p), emp = empresa();
+  function catalogo(country, company) {
+    const p = country || pais(), norma = normaDatos(p), L = leyPais(p), emp = company || empresa();
     return {
       confidencialidad: {
         ic: '🔒', titulo: 'Acuerdo de confidencialidad y manejo de información',
@@ -228,28 +253,52 @@ Orbit.legal = (function () {
     if (pendingScopes[scope]) return;
     pendingScopes[scope] = true;
 
-    const cat = catalogo(); const claves = clausulasPara(tipo);
-    const cuerpo = claves.map(k => clausulaHTML(cat[k])).join('');
+    const claves = clausulasPara(tipo), countries = memberCountries(tipo);
+    // In product sessions the confirmed country view is the context. A stale
+    // browser-local paisDefault must not turn TODOS into a legal jurisdiction.
+    const currentCountry = countries !== null ? Orbit.pais : pais(), company = empresa();
+    let country = countries ? (countries.includes(currentCountry) ? currentCountry : (countries.length === 1 ? countries[0] : '')) : currentCountry;
+    const requiresCountry = countries !== null && !country;
     const titulo = tipo === 'cliente' ? 'Bienvenido/a — antes de continuar' : (tipo === 'socio' ? 'Acuerdo de socio / aliado' : (tipo === 'licenciatario' ? 'Contrato de licencia — antes de comenzar' : 'Antes de continuar'));
     const back = document.createElement('div');
     back.setAttribute('data-legal-gate', scope.replace(/"/g, ''));
     back.setAttribute('data-legal-version', VERSION);
     back.setAttribute('data-legal-type', String(tipo || 'interno'));
-    back.setAttribute('data-legal-country', pais());
+    back.setAttribute('data-legal-country-required', requiresCountry ? '1' : '0');
     back.setAttribute('data-legal-clauses', claves.join(' '));
     back.className = 'drawer-back open';
     back.style.cssText = 'display:grid;place-items:center;z-index:262';
-    back.innerHTML = '<div class="conf-modal" style="max-width:660px"><div class="conf-h"><span class="conf-ic">📜</span><div><div class="nov-eyebrow">' + titulo + '</div><h2>Acuerdos legales</h2><p id="lg-identity" class="hint" data-legal-identity="1"></p></div></div><div class="conf-body" style="max-height:56vh;overflow:auto">' + cuerpo + '</div><label class="conf-chk"><input type="checkbox" id="lg-chk"> He leído y <b>acepto</b> íntegramente los acuerdos anteriores.</label><div class="conf-f" style="display:flex;gap:8px;justify-content:space-between"><button class="btn ghost" id="lg-print">🖨️ Imprimir / PDF</button><button class="btn primary" id="lg-ok" disabled>Aceptar y continuar</button></div></div>';
+    const countryField = requiresCountry ? '<label class="hint" for="lg-country">País para estos acuerdos<select id="lg-country"><option value="">Selecciona el país</option>' + countries.map(p => '<option value="' + p + '">' + (p === 'GT' ? 'Guatemala' : 'Colombia') + '</option>').join('') + '</select></label>' : '';
+    back.innerHTML = '<div class="conf-modal" style="max-width:660px"><div class="conf-h"><span class="conf-ic">📜</span><div><div class="nov-eyebrow">' + titulo + '</div><h2>Acuerdos legales</h2><p id="lg-identity" class="hint" data-legal-identity="1"></p>' + countryField + '</div></div><div id="lg-clauses" class="conf-body" style="max-height:56vh;overflow:auto"></div><label class="conf-chk"><input type="checkbox" id="lg-chk"> He leído y <b>acepto</b> íntegramente los acuerdos anteriores.</label><div class="conf-f" style="display:flex;gap:8px;justify-content:space-between"><button class="btn ghost" id="lg-print">🖨️ Imprimir / PDF</button><button class="btn primary" id="lg-ok" disabled>Aceptar y continuar</button></div></div>';
     document.body.appendChild(back);
-    back.querySelector('#lg-identity').textContent = 'Versión ' + VERSION + ' · País ' + pais() + ' · Cuenta ' + scope.replace(/^user:/, '');
-    const chk = back.querySelector('#lg-chk'), ok = back.querySelector('#lg-ok');
-    chk.addEventListener('change', () => { ok.disabled = !chk.checked; });
-    back.querySelector('#lg-print').addEventListener('click', () => imprimir(tipo));
-    ok.addEventListener('click', () => { registrar(scope, { tipo: tipo, clausulas: claves, acceptanceMethod: 'VISIBLE_CHECKBOX_AND_BUTTON' }); finish(scope); });
+    const chk = back.querySelector('#lg-chk'), ok = back.querySelector('#lg-ok'), print = back.querySelector('#lg-print');
+    function renderCountry() {
+      back.setAttribute('data-legal-country', country);
+      back.querySelector('#lg-identity').textContent = 'Versión ' + VERSION + ' · País ' + (country || 'pendiente de selección') + ' · Cuenta ' + scope.replace(/^user:/, '');
+      const cat = country ? catalogo(country, company) : null;
+      back.querySelector('#lg-clauses').innerHTML = cat ? claves.map(k => clausulaHTML(cat[k])).join('') : '<p class="hint">Selecciona el país para consultar y aceptar los acuerdos que corresponden.</p>';
+      chk.checked = false; chk.disabled = !country; ok.disabled = true; print.disabled = !country;
+    }
+    renderCountry();
+    if (requiresCountry) back.querySelector('#lg-country').addEventListener('change', event => {
+      country = countries.includes(event.target.value) ? event.target.value : '';
+      renderCountry();
+    });
+    chk.addEventListener('change', () => { ok.disabled = !country || !chk.checked; });
+    print.addEventListener('click', () => { if (country) imprimir(tipo, country, company); });
+    ok.addEventListener('click', () => {
+      if (!country || chk.disabled || !chk.checked || ok.disabled) return;
+      // Record the context actually presented, even if an unrelated country
+      // view or branding refresh changes while the modal remains open.
+      registrar(scope, { tipo: tipo, clausulas: claves, pais: country, empresa: company,
+        acceptanceMethod: 'VISIBLE_CHECKBOX_AND_BUTTON', countrySelectionMethod: requiresCountry ? 'VISIBLE_LEGAL_SELECTOR' : 'CURRENT_COUNTRY' });
+      finish(scope);
+    });
   }
 
-  function imprimir(tipo) {
-    const cat = catalogo(); const claves = clausulasPara(tipo); const emp = empresa();
+  function imprimir(tipo, country, company) {
+    const selectedCountry = country || pais(), emp = company || empresa();
+    const cat = catalogo(selectedCountry, emp); const claves = clausulasPara(tipo);
     const w = window.open('', '_blank'); if (!w) return;
     const body = claves.map(k => {
       const c = cat[k];
@@ -263,7 +312,7 @@ Orbit.legal = (function () {
       if (mm.length) s += '<p class="mt"><small>' + mm.join(' · ') + '</small></p>';
       return s;
     }).join('<hr>');
-    w.document.write('<html><head><title>Acuerdos legales · Orbit 360</title><style>body{font-family:Georgia,serif;max-width:740px;margin:40px auto;padding:0 28px;line-height:1.6;color:#1E2227}h1{font-family:sans-serif}h3{margin-top:26px;color:#C5162E}h4{margin:14px 0 4px;font-size:14px}ul{margin:6px 0}hr{border:0;border-top:1px solid #e0e0e0;margin:24px 0}.mt small{color:#666}.firmas{margin-top:48px;display:flex;gap:48px}.firma{flex:1;border-top:1px solid #333;padding-top:8px;font-size:13px}</style></head><body><h1>Acuerdos legales · Orbit 360</h1><p><b>Parte:</b> ' + emp + ' · <b>País:</b> ' + pais() + ' · <b>Versión:</b> ' + VERSION + ' · <b>Fecha:</b> ' + new Date().toLocaleDateString() + '</p>' + body + '<div class="firmas"><div class="firma">Nombre y firma · Aceptante<br><br>Documento: ____________</div><div class="firma">Por ' + emp + '<br><br>Representante legal</div></div><p class="mt"><small>Documento generado por Orbit 360. Debe ser revisado y adaptado por asesoría legal antes de su uso definitivo.</small></p></body></html>');
+    w.document.write('<html><head><title>Acuerdos legales · Orbit 360</title><style>body{font-family:Georgia,serif;max-width:740px;margin:40px auto;padding:0 28px;line-height:1.6;color:#1E2227}h1{font-family:sans-serif}h3{margin-top:26px;color:#C5162E}h4{margin:14px 0 4px;font-size:14px}ul{margin:6px 0}hr{border:0;border-top:1px solid #e0e0e0;margin:24px 0}.mt small{color:#666}.firmas{margin-top:48px;display:flex;gap:48px}.firma{flex:1;border-top:1px solid #333;padding-top:8px;font-size:13px}</style></head><body><h1>Acuerdos legales · Orbit 360</h1><p><b>Parte:</b> ' + emp + ' · <b>País:</b> ' + selectedCountry + ' · <b>Versión:</b> ' + VERSION + ' · <b>Fecha:</b> ' + new Date().toLocaleDateString() + '</p>' + body + '<div class="firmas"><div class="firma">Nombre y firma · Aceptante<br><br>Documento: ____________</div><div class="firma">Por ' + emp + '<br><br>Representante legal</div></div><p class="mt"><small>Documento generado por Orbit 360. Debe ser revisado y adaptado por asesoría legal antes de su uso definitivo.</small></p></body></html>');
     w.document.close(); setTimeout(() => w.print(), 300);
   }
 

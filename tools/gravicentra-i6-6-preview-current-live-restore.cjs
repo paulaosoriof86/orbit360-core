@@ -9,17 +9,17 @@ const CHANNEL='gi-i66-rc-42868854629',PREVIEW='https://ays-orbit-360-lab--'+CHAN
 const LIVE_ORIGINS=Object.freeze(['https://ays-orbit-360-lab.web.app','https://app.aysseguros.com']);
 const BUILD_WORKFLOW='.github/workflows/gravicentra-release-delta-66-package.yml';
 const CONTROL='artifacts/orbit360-recovery/release-control/I6_6_RELEASE_TRANSPORT_CONTROL_20261110.json';
-const FAILED=Object.freeze({sourceSha:'257695e19749a4e18f38be972b37b6b47b2225af',buildRunId:43765252188,
-  artifactId:14181847038,artifactDigest:'sha256:3159ae024a6a119b11cb3f9521bd9819b0663198a1cffcd340eac4fdb91d9bf2',
-  // Observed, not inferred: inventory run43758700651 attempt2/job133658728277.
+const FAILED=Object.freeze({sourceSha:'2d4e2d007d42560ca0ed0e7ce4108c889b416539',buildRunId:43971611822,
+  artifactId:14280030529,artifactDigest:'sha256:c3ad66b82378f9f4361339ab4e13c9904d2c238155e158aa64748f7ad2aad78f',
+  // Observed, not inferred: inventory run43758700651 attempt3/job133672702088.
   // The final old-source marker assertion failed; channel inventory itself was read-only and exact.
-  hostingVersion:'sites/ays-orbit-360-lab/versions/1cccc93a6136f6f8',qaRunId:43766053717,
-  qaHeadSha:'588a759a7063e8d70be26ca2c7e04bda40a7596c',qaJobId:132971308790});
-const DIAGNOSTIC=Object.freeze({artifactId:14182616271,
-  artifactDigest:'sha256:c998b365fad780bcadff0f8b773139b4d6f30af272c7dd24d61d00dada056b4b',
-  artifactName:'gi-i66-preview-failure-diagnostic-43766053717',archiveSize:882,
+  hostingVersion:'sites/ays-orbit-360-lab/versions/e0ed1d19de94ea7d',qaRunId:43972678411,
+  qaHeadSha:'b28b6c2de2da30f34b0e6e6abb96b4d238d84af7',qaJobId:133668693924});
+const DIAGNOSTIC=Object.freeze({artifactId:14279251913,
+  artifactDigest:'sha256:0d50ba33a130acb3273166552f36903d76918a209fdec070dd612d371970ae4b',
+  artifactName:'gi-i66-preview-failure-diagnostic-43972678411',archiveSize:533,
   entryName:'i66-preview-failure-diagnostic.json',
-  entrySha256:'f35aff0a6344248d4bebf0e92c896345a4837be8e710e183b05604706727f88d'});
+  entrySha256:'9e05ef64f30996724e64d527af00df702690e2e34bbc12dadba3d6c0a029ca6c'});
 const CURRENT=Object.freeze({sourceSha:'84769378eb2014addebfefdbdd63091bddc4b817',buildRunId:43503721126,
   artifactId:14075022275,artifactDigest:'sha256:b0f3bacb68511cdfc91ac934602c51f55afec5c1d6428d886d13a72a706ee283',
   hostingVersion:'sites/ays-orbit-360-lab/versions/0766db29b338befc',liveRunId:43506971214,
@@ -94,9 +94,9 @@ function validateFailedQa(run,job,log){
   // pinned failure; structured cleanup is additionally required below.
   const receipt=lines[0].match(/^\d{4}-\d\d-\d\dT[\d:.]+Z I66_ADVISOR_PAYABLE_SIGNED_PREVIEW_HOLD (.+)$/)?.[1];
   assert.ok(receipt,'I66_RESTORE_QA_CLEANUP_EXECUTION_MISSING');
-  const expected={checks:5,cleanup:'PASS',remaining:0,realCustomerWritesRequested:0,bankMovements:0,financialPayments:0,authOrMembershipMutations:0,
-    failureClass:'TIMEOUT_ERROR',failureStage:'FINANCE_UI_HYDRATION',failureCheck:'ASSERTION_OR_RUNTIME_FAILURE',
-    failureLocation:{file:'gravicentra-i6-6-advisor-payables-signed-uat.cjs',line:526,column:65}};
+  const expected={checks:4,cleanup:'PASS',remaining:0,realCustomerWritesRequested:0,bankMovements:0,financialPayments:0,authOrMembershipMutations:0,
+    failureClass:'ERR_ASSERTION',failureStage:'DIRECTION_LEGAL_ACCEPTANCE',failureCheck:'DIRECTION_LEGAL',
+    failureLocation:{file:'gravicentra-i6-6-advisor-payables-signed-uat.cjs',line:517,column:39}};
   const json=JSON.stringify(expected);
   const observedMasked=json.replace(/^\{/,'***').replace('"failureLocation":{','"failureLocation":***').replace(/\}\}$/,'***');
   assert.ok(receipt===json||receipt===observedMasked,'I66_RESTORE_QA_ZERO_EFFECT_RECEIPT_NOT_EXACT');
@@ -123,17 +123,9 @@ function validateStructuredCleanup(artifact,bytes,text){
   assert.equal(sha(text),DIAGNOSTIC.entrySha256,'I66_RESTORE_DIAGNOSTIC_CONTENT_BYTES_DRIFT');
   let parsed;try{parsed=JSON.parse(text);}catch(_){assert.fail('I66_RESTORE_DIAGNOSTIC_JSON_INVALID');}
   const expected={schema:'I6_6_PREVIEW_DIAGNOSTIC_ONLY_V1',status:'FAILED_NOT_ACCEPTED',runId:FAILED.qaRunId,sourceSha:FAILED.sourceSha,
-    reports:[{status:'HOLD',phase:'PREVIEW',failureStage:'FINANCE_UI_HYDRATION',failureCheck:'ASSERTION_OR_RUNTIME_FAILURE',
-      failureClass:'TIMEOUT_ERROR',failureLocation:{file:'gravicentra-i6-6-advisor-payables-signed-uat.cjs',line:526,column:65},
-      financeUiDiagnostics:{
-        beforeClick:{snapshotStatus:'CAPTURED',route:'FINANZAS',tabCount:1,tabConnected:true,tabVisible:true,tabEnabled:true,
-          rect:{x:1056,y:183,width:132,height:34},centerInViewport:true,targetReceivesPointer:false,topTag:'DIV',topId:null,topClasses:['drawer-back','open'],
-          legalOverlayPresent:true,legalOverlayAtTarget:true,legalOverlayCount:1,modalCount:1,authRestoring:false},
-        onFailure:{snapshotStatus:'CAPTURED',route:'FINANZAS',tabCount:1,tabConnected:true,tabVisible:true,tabEnabled:true,
-          rect:{x:770,y:183,width:132,height:34},centerInViewport:true,targetReceivesPointer:false,topTag:'DIV',topId:null,topClasses:[],
-          legalOverlayPresent:true,legalOverlayAtTarget:true,legalOverlayCount:1,modalCount:1,authRestoring:false},
-        actionability:{pointerInterception:true,detached:true,notVisible:false,notEnabled:false,notStable:false,outsideViewport:false}},
-      checks:5,cleanupStatus:'PASS',remaining:0}]};
+    reports:[{status:'HOLD',phase:'PREVIEW',failureStage:'DIRECTION_LEGAL_ACCEPTANCE',failureCheck:'DIRECTION_LEGAL',
+      failureClass:'ERR_ASSERTION',failureLocation:{file:'gravicentra-i6-6-advisor-payables-signed-uat.cjs',line:517,column:39},
+      checks:4,cleanupStatus:'PASS',remaining:0}]};
   assert.deepEqual(parsed,expected,'I66_RESTORE_DIAGNOSTIC_CLEANUP_NOT_PROVEN');
   return {artifactId:DIAGNOSTIC.artifactId,artifactDigest:DIAGNOSTIC.artifactDigest,entrySha256:DIAGNOSTIC.entrySha256,
     status:'FAILED_NOT_ACCEPTED',cleanupStatus:'PASS',remaining:0};
