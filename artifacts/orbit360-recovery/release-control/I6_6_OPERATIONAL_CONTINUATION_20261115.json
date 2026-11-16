@@ -51,7 +51,15 @@
     "previousAnswersMustNotBeReopened": true,
     "remainingBusinessAmbiguityHandling": "Present only the exact unresolved decision to Paula; technical inability is not a business ambiguity.",
     "conciliationDirectionControl": "Dirección puede resolver vínculo con póliza/recibo exactos, previsualizar efecto, aprobar y aplicar con auditoría y sin duplicar; evidencia ambigua no se convierte en pago por coincidencia de nombre o número de póliza.",
-    "financialWriteSemantics": "Binding a source is not applying a payment; creating an advisor payable is not paying it; bank proof must match amount and currency; commission amount is not premium amount."
+    "financialWriteSemantics": "Binding a source is not applying a payment; creating an advisor payable is not paying it; bank proof must match amount and currency; commission amount is not premium amount.",
+    "mapfreSameConditionsReaffirmation20261116": {
+      "alreadyApproved": true,
+      "latestOwnerStatement": "yo ya te confirmé que renovar con las mismas condiciones",
+      "doNotRepeatRenewalApprovalQuestion": true,
+      "recordedLocalDate": "2026-11-16",
+      "sourceDocumentaryAmountsRemainExact": true,
+      "noFixedAnnualPremiumInvented": true
+    }
   },
   "provenCausesThisContinuation": [
     "LIVE Conciliaciones renders 52 staged policy-number matches with Ver only; staged projection was read-only and confirm_application rejected proposals. This is an implementation gap, not an unanswered owner questionnaire.",
@@ -160,6 +168,16 @@
       "liveAdvisorMismatchesObserved": 6,
       "newRealRecordWrites": 0,
       "newLiveAcceptanceClaimed": false
+    },
+    "directionLegalResumption20261116": {
+      "status": "EXPLICIT_OWNER_ACCEPTANCE_RECORDED_SOURCE_QA_PASS_NEW_IMMUTABLE_BUILD_REQUIRED",
+      "receipt": "artifacts/orbit360-recovery/release-control/I6_6_DIRECTION_LEGAL_PREVIEW_RESUMPTION_20261116.json",
+      "decisionReceipt": "artifacts/orbit360-recovery/release-control/I6_6_DIRECTION_PREVIEW_LEGAL_ACCEPTANCE_20261116.json",
+      "decisionReceiptSha256": "68d3961987e19acdc223b7d2adf01eb39c540ca6ae8aa72c64752cab45fddbae",
+      "activeGate": "I6.6",
+      "lastAcceptedLiveUnchanged": true,
+      "realRecordWrites": 0,
+      "newLiveAcceptanceClaimed": false
     }
   },
   "orderedWork": [
@@ -177,8 +195,8 @@
     },
     {
       "id": "P0-PUBLISH-CURRENT-DELTA",
-      "state": "EXACT_PREVIEW_DEPLOYED_SIGNED_QA_HOLD_GENUINE_LEGAL_ACCEPTANCE_REQUIRED",
-      "scope": "One immutable build, existing isolated Preview, three exact current domain functions only, signed tests, same artifact to both LIVE origins, rollback ready. Never promote a failed signed candidate or patch its artifact; preserve exact diagnostic and refresh Preview inventory before any reuse restoration. Next diagnosis is the Finance advisor-tab timeout at line261, not the already corrected signed-envelope denial.",
+      "state": "GENUINE_DIRECTION_PREVIEW_ACCEPTANCE_RECEIVED_NEW_IMMUTABLE_BUILD_REQUESTED",
+      "scope": "One new immutable build and the same existing isolated Preview channel, exact current three domain functions and four signed drivers. Preserve the failed257 artifact; apply genuine Direction legal decision by ordinary UI with exact actor/origin/version/text verification. R11 remains last accepted LIVE until successful signed proof and exact promotion.",
       "doneWhen": "Real workflow receipts, exact digests and post-deploy business-function verification. Successful build alone is not acceptance."
     },
     {

@@ -4,11 +4,11 @@
   "productBrand": "Gravicentra Insurance",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
-  "status": "R11_RENEWAL_DRIVE_EXACT_LIVE_ACCEPTED_LOCKED",
+  "status": "PREVIEW_BUILD_REQUESTED",
   "previewChannelReuseAuthorization": {
     "status": "CURRENT_LIVE_BACKED_SINGLE_PREVIEW_REUSE_AUTHORIZED",
     "approvedByDirection": true,
-    "authority": "Paula Dirección 2026-11-15: ejecutar conciliación y comisiones de octubre; probar, certificar y publicar sin acumular, preservando exactamente el último LIVE aprobado.",
+    "authority": "Paula Dirección 2026-11-16: continue evidenced corrections and current plan; preserve accepted R11, back up and verify the exact failed257 candidate before reusing the same isolated Preview.",
     "authorizedChannelId": "gi-i66-rc-42868854629",
     "expectedPreviewUrl": "https://ays-orbit-360-lab--gi-i66-rc-42868854629-abj14q6n.web.app",
     "expectedSourceSha": "84769378eb2014addebfefdbdd63091bddc4b817",
@@ -27,22 +27,22 @@
       "channelId": "gi-i66-rc-42868854629",
       "previewUrl": "https://ays-orbit-360-lab--gi-i66-rc-42868854629-abj14q6n.web.app",
       "failedCandidate": {
-        "sourceSha": "02463e625e11daea7f5a609613bd67a5890ba270",
-        "buildRunId": 43756113933,
-        "artifactId": 14178232379,
-        "artifactDigest": "sha256:778baa27265eb0bde998a2102571255294d517a1284cc07a3325a0b9e07f7921",
-        "hostingVersion": "sites/ays-orbit-360-lab/versions/77f99c0f0893d8d5",
-        "qaRunId": 43756837089,
-        "qaHeadSha": "27b18fb30eecccf828c2907d920b1abcd6541bde",
-        "qaJobId": 132942738399
+        "sourceSha": "257695e19749a4e18f38be972b37b6b47b2225af",
+        "buildRunId": 43765252188,
+        "artifactId": 14181847038,
+        "artifactDigest": "sha256:3159ae024a6a119b11cb3f9521bd9819b0663198a1cffcd340eac4fdb91d9bf2",
+        "hostingVersion": "sites/ays-orbit-360-lab/versions/1cccc93a6136f6f8",
+        "qaRunId": 43766053717,
+        "qaHeadSha": "588a759a7063e8d70be26ca2c7e04bda40a7596c",
+        "qaJobId": 132971308790
       },
       "failedQaDiagnostic": {
-        "artifactId": 14178511809,
-        "artifactDigest": "sha256:b8c9a0e5a7007b16f10eb819a785e82e65b042837eeb3995f655c745a8d5800b",
-        "artifactName": "gi-i66-preview-failure-diagnostic-43756837089",
-        "archiveSize": 472,
+        "artifactId": 14182616271,
+        "artifactDigest": "sha256:c998b365fad780bcadff0f8b773139b4d6f30af272c7dd24d61d00dada056b4b",
+        "artifactName": "gi-i66-preview-failure-diagnostic-43766053717",
+        "archiveSize": 882,
         "entryName": "i66-preview-failure-diagnostic.json",
-        "entrySha256": "b9997de855619bb99ae2c8ad27bca755df3d67ca6c6feb6a0e86b42f82e7a636"
+        "entrySha256": "f35aff0a6344248d4bebf0e92c896345a4837be8e710e183b05604706727f88d"
       },
       "currentLive": {
         "sourceSha": "84769378eb2014addebfefdbdd63091bddc4b817",
@@ -55,6 +55,8 @@
       },
       "inventoryRunId": 43758700651,
       "inventoryHeadSha": "ce176e1244d74c55a5453559d3f11f7b9822a0e6",
+      "inventoryRunAttempt": 1,
+      "inventoryEvidenceUse": "ARCHIVED_READONLY_WORKFLOW_PROVENANCE_NOT_CURRENT_CHANNEL_STATE",
       "expectedChannelCreatedAt": "2026-11-10T17:50:59.307316958Z",
       "expectedSiteFileCount": 223,
       "backupBeforeOverwrite": true,
@@ -396,8 +398,8 @@
     "priorR7HostingRollback": "sites/ays-orbit-360-lab/versions/9cedc5ecda75bb2a",
     "fullI66FinancialProductionAcceptance": false
   },
-  "currentReleaseStatus": "R11_LAST_ACCEPTED_LIVE_PRESERVED_ADVISOR_PREVIEW_HELD_FOR_GENUINE_LEGAL_ACCEPTANCE",
-  "scope": "I6.6 same active gate. Exact candidate artifact preserved after signed legal-overlay interruption; no further deployment or real correction authorized by this transport until explicit review and verified continuation.",
+  "currentReleaseStatus": "R11_RETAINED_DIRECTION_LEGAL_CAUSAL_SUCCESSOR_PREVIEW_BUILD_ONLY",
+  "scope": "I6.6 same active gate. Genuine Direction acceptance permits the current causal source successor and a new immutable Preview build. Archive and verify failed257 before same-channel reuse; keep R11 accepted LIVE and all real financial/data writes locked until signed evidence and exact promotion.",
   "historicalClosedGate": "B4-007",
   "approvedProductDeltaManifest": "artifacts/orbit360-recovery/release-control/I6_6_APPROVED_PRODUCT_DELTA_MANIFEST_20261110.json",
   "ownerAuthority": "Paula Osorio Dirección 2026-11-12: Operativo tiene escritura integral en cada módulo autorizado, con paridad funcional para roles superiores según sus permisos, país, tenant y auditoría; cada arreglo probado pasa inmediatamente a LIVE desde un artefacto exacto. Alcance R7 autorizado, Preview firmado PASS 43375403003 y LIVE exacto publicado con tres funciones y hosting 223/223 en ambas URL, actores reales Carlos y Dirección y escrituras sintéticas reversibles PASS 43375687134. Mantener el resto de UAT real por país/rol, documentación real de aseguradora, UI legal y escrituras financieras en HOLD hasta prueba específica, sin tocar Firestore Rules, Auth ni IAM. Histórico R5/R6 se conserva como linaje, no como estado actual.",
@@ -1564,5 +1566,15 @@
       "immutableArtifactZipDigest": "sha256:3159ae024a6a119b11cb3f9521bd9819b0663198a1cffcd340eac4fdb91d9bf2",
       "immutableTarSha256": "b9a9162b9ba28df1ad89a87899c83430ffbdb631fc6c58c9101f0204dae9f475"
     }
+  },
+  "directionLegalBuildRequest20261116": {
+    "receipt": "artifacts/orbit360-recovery/release-control/I6_6_DIRECTION_LEGAL_PREVIEW_RESUMPTION_20261116.json",
+    "decisionReceipt": "artifacts/orbit360-recovery/release-control/I6_6_DIRECTION_PREVIEW_LEGAL_ACCEPTANCE_20261116.json",
+    "decisionReceiptSha256": "68d3961987e19acdc223b7d2adf01eb39c540ca6ae8aa72c64752cab45fddbae",
+    "approvedByDirection": true,
+    "sameChannelOnly": true,
+    "newImmutableArtifactRequired": true,
+    "realFinancialWrites": 0,
+    "livePromotionAuthorized": false
   }
 }

@@ -6,9 +6,9 @@ const clone=value=>JSON.parse(JSON.stringify(value));
 const BUILD='.github/workflows/gravicentra-release-delta-66-package.yml';
 const BRANCH='recovery/fase-a-clean-20260831';
 const stamp='2026-11-15T16:40:18.1624532Z ';
-// Exact sanitized artifact14178511809, independently retrieved and hashed.
+// Exact sanitized artifact14182616271, independently retrieved and hashed.
 // Contains no actor, credential, business row, raw error or URL.
-const diagnosticBytes=Buffer.from('UEsDBBQACAAIADGib10AAAAAAAAAAAAAAAAjAAAAaTY2LXByZXZpZXctZmFpbHVyZS1kaWFnbm9zdGljLmpzb25lkM1uwjAQhO95CivnHhJCHOBmJaZYojayEypUVdYSDEGFgPJzQrx7ZYMaVVz2MPvNzu7ePIT8tqzMGfwZ8hnWWK8kXTP6qTNG3rlQOUu14MuNXof+m8M76PrW4nPCljTTXOSapCld5TR7IE1fs50/Q+MoifEkSoLJ9GG99E1pVOXCgtEYRwaPYhOGOzCQ7GPAwRSH0XaHE4gn02ALoyR4jjTXS9PZ2C8PIYRurv5bZyGWj3ynXytojZWf9wydPRxPfWNUBwcHzBknPKW6YHqxySTJmeAvdFqZ8sfSRCkqLaKF1LLgOfug2n6ikPTVdYLW7WYpUeSaSinkgJV2qgXiQToZqPur+jtrRZQaHI05w7E+1gd/hgIn3j2Evr279wtQSwcI3gS3eyABAADMAQAAUEsBAi0DFAAIAAgAMaJvXd4Et3sgAQAAzAEAACMAAAAAAAAAAAAgAKSBAAAAAGk2Ni1wcmV2aWV3LWZhaWx1cmUtZGlhZ25vc3RpYy5qc29uUEsFBgAAAAABAAEAUQAAAHEBAAAAAA==','base64');
+const diagnosticBytes=Buffer.from('UEsDBBQACAAIAAKvb10AAAAAAAAAAAAAAAAjAAAAaTY2LXByZXZpZXctZmFpbHVyZS1kaWFnbm9zdGljLmpzb27lVU1v2kAQvfMrLJ9DxacduFngNJYoRrahSqvIGi+DvY3ZtXbXpCjKf6/WEAyGqvfmsod5b2bn443mrWUYpiQZbsEcG6ZnxVa8CNyV536Pp57zde6HkTeJ/fnsKV51zbuKrkCVUtMfHG/mTuO5H8XOZOIuInd6oIiSeWtzbAz6tmV1hn27ax9ceSkIhln1WW9oW6Mhdkf2YAQD7N5v+vcJjuxe0rcTKxnYSa/XG8LmGBILLpT+9mfLMAzjrXov0nn0Z4f/K3uRgURtPtZTIxugeSkwVJBWhAdv7swnbrz04senaeBEnj+/Yk8yJC+a7YShG2hK7AdxsJxH3jc31p1YBu61Vw6yyk2z/GUUu0HgB1e0GSegKGfm+FSXBmle5ZcK2FGCTAloU6tttWG9o5KLdgF7SHKUbUlThut2CeoL+SVP4Q3DzCnTMYY968xIeF5u9WfW8Gh8rzOiDBjBJZ1SSBmXihJ5mVaCG64ro1U/akDPgkEhM67C00wmziJaBu70LCc9TF6quvU/nPASVpBMeMmUOTa61wBjSBRqeSlRYhNfUUmTqm+3UJfpht30FUhUox7DMH/rHDpD6+7SvNfm+37D+krXKtNIv9dAMqRppsP3B2fA+0UCesIoPLai+Kq1frsEkaIKkCDdoVxwql3MsbGBXDaYvIgg1T2eeiuzCVXbyco8bwKVYLFesxO2FvCKop0AeTEbxfECmXlmer4ImmMKub9DkcN+IVAiu1nZOc1RUVXnv3i3RbLla8hvQ1CqLECpuKAs/WjbiXA2DpOzh8Nqfg6J23bnEyr8fxAqEH04IKE5VfumWItD+zz9ECyOJ+Yq1TUqINltzTCuar1dD4FxVQvuJhwq+JszL5WkazyTQ6POq+tE9BXWsxvWphyBlUW9jwsnrJfNFLgFyg5d7LQ+oj633lt/AFBLBwjf+Hy5ugIAAPwIAABQSwECLQMUAAgACAACr29d3/h8uboCAAD8CAAAIwAAAAAAAAAAACAApIEAAAAAaTY2LXByZXZpZXctZmFpbHVyZS1kaWFnbm9zdGljLmpzb25QSwUGAAAAAAEAAQBRAAAACwMAAAAA','base64');
 function run(id,head,path=BUILD,conclusion='success'){
   return {id,head_sha:head,head_branch:BRANCH,path,status:'completed',conclusion};
 }
@@ -33,17 +33,26 @@ function fixture(){
   const after=clone(initial);after.result[0].release.version.name=C.hostingVersion;
   const qaReceipt={checks:5,cleanup:'PASS',remaining:0,realCustomerWritesRequested:0,bankMovements:0,financialPayments:0,authOrMembershipMutations:0,
     failureClass:'TIMEOUT_ERROR',failureStage:'FINANCE_UI_HYDRATION',failureCheck:'ASSERTION_OR_RUNTIME_FAILURE',
-    failureLocation:{file:'gravicentra-i6-6-advisor-payables-signed-uat.cjs',line:261,column:61}};
+    failureLocation:{file:'gravicentra-i6-6-advisor-payables-signed-uat.cjs',line:526,column:65}};
   const qaLog=[stamp+'I66_SOURCE_SHA: '+F.sourceSha,stamp+'SOURCE_PACKAGE_RUN: '+F.buildRunId,
     stamp+'SOURCE_ARTIFACT_ID: '+F.artifactId,stamp+'I66_PREVIEW_BACKEND_ONLY_ZERO_LIVE_HOSTING_CHANGES_PASS',
     stamp+'I66_ADVISOR_PAYABLE_SIGNED_PREVIEW_HOLD '+JSON.stringify(qaReceipt).replace(/^\{/,'***').replace('"failureLocation":{','"failureLocation":***').replace(/\}\}$/,'***')].join('\n');
   const diagnostic={schema:'I6_6_PREVIEW_DIAGNOSTIC_ONLY_V1',status:'FAILED_NOT_ACCEPTED',runId:F.qaRunId,sourceSha:F.sourceSha,
     reports:[{status:'HOLD',phase:'PREVIEW',failureStage:'FINANCE_UI_HYDRATION',failureCheck:'ASSERTION_OR_RUNTIME_FAILURE',
-      failureClass:'TIMEOUT_ERROR',checks:5,cleanupStatus:'PASS',remaining:0}]};
+      failureClass:'TIMEOUT_ERROR',failureLocation:{file:'gravicentra-i6-6-advisor-payables-signed-uat.cjs',line:526,column:65},
+      financeUiDiagnostics:{
+        beforeClick:{snapshotStatus:'CAPTURED',route:'FINANZAS',tabCount:1,tabConnected:true,tabVisible:true,tabEnabled:true,
+          rect:{x:1056,y:183,width:132,height:34},centerInViewport:true,targetReceivesPointer:false,topTag:'DIV',topId:null,topClasses:['drawer-back','open'],
+          legalOverlayPresent:true,legalOverlayAtTarget:true,legalOverlayCount:1,modalCount:1,authRestoring:false},
+        onFailure:{snapshotStatus:'CAPTURED',route:'FINANZAS',tabCount:1,tabConnected:true,tabVisible:true,tabEnabled:true,
+          rect:{x:770,y:183,width:132,height:34},centerInViewport:true,targetReceivesPointer:false,topTag:'DIV',topId:null,topClasses:[],
+          legalOverlayPresent:true,legalOverlayAtTarget:true,legalOverlayCount:1,modalCount:1,authRestoring:false},
+        actionability:{pointerInterception:true,detached:true,notVisible:false,notEnabled:false,notStable:false,outsideViewport:false}},
+      checks:5,cleanupStatus:'PASS',remaining:0}]};
   const diagnosticText=JSON.stringify(diagnostic,null,2)+'\n';
   const meta={failedRun:run(F.buildRunId,F.sourceSha),failedArtifact:artifact(F),liveBuildRun:run(C.buildRunId,C.sourceSha),liveArtifact:artifact(C),
     liveRun:run(C.liveRunId,C.liveHeadSha,'.github/workflows/gravicentra-i66-r11-renewal-drive-frontend-exact-live-promotion.yml'),
-    inventoryRun:run(A.inventoryRunId,A.inventoryHeadSha,'.github/workflows/gravicentra-i66-preview-channel-inventory-readonly.yml'),
+    inventoryRun:{...run(A.inventoryRunId,A.inventoryHeadSha,'.github/workflows/gravicentra-i66-preview-channel-inventory-readonly.yml'),run_attempt:A.inventoryRunAttempt},
     failedQaRun:run(F.qaRunId,F.qaHeadSha,'.github/workflows/gravicentra-i66-privileged-role-three-function-preview-uat.yml','failure'),
     failedQaJob:{id:F.qaJobId,run_id:F.qaRunId,name:'exact-preview-only',status:'completed',conclusion:'failure'},failedQaLog:qaLog,
     failedQaDiagnosticArtifact:{id:D.artifactId,name:D.artifactName,digest:D.artifactDigest,size_in_bytes:D.archiveSize,expired:false,
@@ -69,6 +78,24 @@ test('exact failed Preview pair uses the unmodified R11 reuse authority',()=>{
   assert.equal(restore.assessInventory(f.control,f.after),'ALREADY_CURRENT_LIVE');
   const g=clone(f.initial);for(const row of g.result)row.release.version.name='projects/ays-orbit-360-lab/'+row.release.version.name;
   assert.equal(restore.assessInventory(f.control,{result:{channels:g.result}}),'RESTORE_EXACT_FAILED_PREVIEW');
+});
+test('the current restore target is observed failed257, never the archived failed024 version',()=>{
+  assert.equal(F.sourceSha,'257695e19749a4e18f38be972b37b6b47b2225af');
+  assert.equal(F.artifactId,14181847038);assert.equal(F.qaRunId,43766053717);
+  assert.equal(F.hostingVersion,'sites/ays-orbit-360-lab/versions/1cccc93a6136f6f8');
+  const f=fixture();f.initial.result[0].release.version.name='sites/ays-orbit-360-lab/versions/77f99c0f0893d8d5';
+  assert.throws(()=>restore.assessInventory(f.control,f.initial),/I66_RESTORE_UNAPPROVED_PREVIEW_VERSION/);
+});
+test('archived inventory attempt is provenance only and a later failed old-pin attempt cannot replace it',async()=>{
+  assert.equal(A.inventoryRunAttempt,1);
+  assert.equal(A.inventoryEvidenceUse,'ARCHIVED_READONLY_WORKFLOW_PROVENANCE_NOT_CURRENT_CHANNEL_STATE');
+  for(const change of [r=>r.run_attempt=2,r=>r.conclusion='failure',r=>delete r.run_attempt]){
+    const f=fixture();change(f.meta.inventoryRun);const {io,events}=ioFixture(f);
+    await assert.rejects(restore.restorePreview(f.control,f.initial,io,f.report));
+    assert.deepEqual(events,['metadata']);assert.equal(f.report.previewCloneRequested,false);
+  }
+  const owner=fs.readFileSync('tools/gravicentra-i6-6-preview-current-live-restore.cjs','utf8');
+  assert.ok(owner.includes("json('runs/'+AUTHORIZATION.inventoryRunId+'/attempts/'+AUTHORIZATION.inventoryRunAttempt)"));
 });
 for(const key of Object.keys(A))test('exact restore authorization rejects missing/changed '+key,()=>{
   const f=fixture();delete f.control.previewChannelReuseAuthorization.failedCandidateRestore[key];
@@ -138,7 +165,7 @@ for(const [name,edit] of [
   ['cleanup failed',f=>f.meta.failedQaLog=f.meta.failedQaLog.replace('"cleanup":"PASS"','"cleanup":"HOLD"')],
   ['wrong checks',f=>f.meta.failedQaLog=f.meta.failedQaLog.replace('"checks":5','"checks":50')],
   ['wrong failure class',f=>f.meta.failedQaLog=f.meta.failedQaLog.replace('TIMEOUT_ERROR','OTHER')],
-  ['wrong source location',f=>f.meta.failedQaLog=f.meta.failedQaLog.replace('"line":261','"line":262')],
+  ['wrong source location',f=>f.meta.failedQaLog=f.meta.failedQaLog.replace('"line":526','"line":527')],
   ['ambiguous masking',f=>f.meta.failedQaLog=f.meta.failedQaLog.replace('"failureLocation":***','"failureLocation":****')],
   ['duplicate cleanup',f=>f.meta.failedQaLog+='\n'+f.meta.failedQaLog.split('\n').pop()],
   ['duplicate field',f=>f.meta.failedQaLog=f.meta.failedQaLog.replace('"remaining":0','"remaining":1,"remaining":0')],
@@ -147,8 +174,8 @@ for(const [name,edit] of [
 
 test('structured cleanup binds exact run, artifact metadata, archive bytes and private-free JSON bytes',()=>{
   const f=fixture(),proof=restore.validateStructuredCleanup(f.meta.failedQaDiagnosticArtifact,diagnosticBytes,f.diagnosticText);
-  assert.equal(diagnosticBytes.length,472);assert.equal(proof.cleanupStatus,'PASS');assert.equal(proof.remaining,0);
-  assert.equal(proof.status,'FAILED_NOT_ACCEPTED');assert.equal(proof.artifactId,14178511809);
+  assert.equal(diagnosticBytes.length,882);assert.equal(proof.cleanupStatus,'PASS');assert.equal(proof.remaining,0);
+  assert.equal(proof.status,'FAILED_NOT_ACCEPTED');assert.equal(proof.artifactId,14182616271);
   assert.equal(proof.entrySha256,D.entrySha256);
   assert.doesNotMatch(JSON.stringify(proof),/actor|email|token|scope|https?:/i);
 });

@@ -1,0 +1,56 @@
+{
+  "schema": "GI_I66_DIRECTION_LEGAL_PREVIEW_RESUMPTION_V1",
+  "dateGuatemala": "2026-11-16",
+  "status": "EXPLICIT_OWNER_ACCEPTANCE_RECORDED_SOURCE_QA_PASS_NEW_IMMUTABLE_BUILD_REQUIRED",
+  "activeGate": "I6.6",
+  "sourceBaseHead": "76cb5f5182fad3c0da11aa99ac906d8bb706dc23",
+  "firstIncompleteGate": "SIGNED_PREVIEW",
+  "decisionReceipt": "artifacts/orbit360-recovery/release-control/I6_6_DIRECTION_PREVIEW_LEGAL_ACCEPTANCE_20261116.json",
+  "decisionReceiptSha256": "68d3961987e19acdc223b7d2adf01eb39c540ca6ae8aa72c64752cab45fddbae",
+  "authority": "Paula explicitly replied Acepto to the prior concrete three-clause version2.0 Direction Preview acceptance request and instructed completion of the evidenced advisor, premium, receipt, commission, Ops and MAPFRE corrections.",
+  "productScope": [
+    "Real actor/origin/scope audit metadata replaces fabricated random IP for new legal acceptances; historical records untouched.",
+    "Visible exact version/country/scope and clause metadata; all accepted clause text unchanged."
+  ],
+  "signedQaScope": [
+    "Direction-only exact-origin normal checkbox/button acceptance bound to genuine current decision and immutable candidate; other actors unchanged.",
+    "Both advisor-payable and proposal UI reports must prove the same actor/scope/decision/version/text digest before acceptance."
+  ],
+  "acceptedClauseTextChanged": false,
+  "otherActorConsentGranted": false,
+  "liveLegalConsentGranted": false,
+  "previousFailedCandidate": {
+    "sourceSha": "257695e19749a4e18f38be972b37b6b47b2225af",
+    "artifactId": 14181847038,
+    "qaRunId": 43766053717,
+    "cleanup": "PASS_REMAINING_ZERO",
+    "promotable": false
+  },
+  "previewInventory": {
+    "runId": 43758700651,
+    "runAttempt": 2,
+    "jobId": 133658728277,
+    "metadataStep": "SUCCESS",
+    "mutations": 0,
+    "observedAtUtc": "2026-11-16T22:25:22Z",
+    "previewHostingVersion": "sites/ays-orbit-360-lab/versions/1cccc93a6136f6f8",
+    "liveHostingVersion": "sites/ays-orbit-360-lab/versions/0766db29b338befc",
+    "finalIdentityStep": "HOLD_OLDER_SOURCE_PIN_EXPECTED_02463_INSTEAD_OF_CURRENT_257695",
+    "notProductRegressionOrAcceptance": true
+  },
+  "lastAcceptedLiveUnchanged": true,
+  "realRecordWrites": 0,
+  "newLiveAcceptanceClaimed": false,
+  "progress": {
+    "opsVerified": 6,
+    "opsRequired": 8,
+    "fiveBlockVerified": 19,
+    "fiveBlockRequired": 31
+  },
+  "followupsRemainIndependent": [
+    "Source-bound advisor correction after exact LIVE acceptance.",
+    "Protected receipt-calendar correction with canonical preimages and paid/report preservation.",
+    "MAPFRE same-conditions renewal already authorized; current issued requirements remain exact and no undocumented fixed annual premium is invented.",
+    "Drive normal UI reproduced Google400 origin_mismatch at the existing custom LIVE origin; no Google consent, credentials, origin configuration or IAM changed."
+  ]
+}

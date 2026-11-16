@@ -148,6 +148,25 @@ test('signed focused reports must prove same source, restored synthetic scope an
   assert.throws(()=>g.validateFocusedReports(p,'PREVIEW',a,{...q,realControlUnchanged:false}));
 });
 
+test('a current genuine-consent candidate cannot seal focused reports without matching normal-UI evidence',()=>{
+  const legal=require('./gravicentra-i6-6-direction-preview-legal-acceptance.cjs'),p=fixture().operationalReleaseCandidate;
+  p.legalAcceptance={receiptSha256:'f'.repeat(64)};
+  const accepted={status:'EXPLICIT_OWNER_DECISION_APPLIED_BY_NORMAL_UI',decisionId:legal.DECISION,receiptSha256:p.legalAcceptance.receiptSha256,
+    sourceSha:p.sourceSha,origin:legal.ORIGIN,version:legal.VERSION,clauseIds:[...legal.CLAUSES],termsProjectionSha256:legal.TERMS_SHA256,
+    actorUidSha256:'a'.repeat(64),scopeSha256:'b'.repeat(64),acceptedAt:'2026-11-16T18:30:00.000Z',
+    acceptedForOtherActors:false,liveAcceptance:false,storageSeeded:false,gateBypassed:false};
+  const base={sourceSha:p.sourceSha,phase:'PREVIEW',status:'PASS',cleanup:{status:'PASS',remaining:0},checks:[{status:'PASS'}],directionLegalAcceptance:accepted};
+  const a={...clone(base),realCustomerWritesRequested:0,bankMovements:0,financialPayments:0,authOrMembershipMutations:0};
+  const q={...clone(base),syntheticOnly:true,realControlUnchanged:true};
+  g.validateFocusedReports(p,'PREVIEW',a,q);
+  for(const mutate of [x=>delete x.directionLegalAcceptance,x=>x.directionLegalAcceptance.status='HOLD',
+    x=>x.directionLegalAcceptance.receiptSha256='0'.repeat(64),x=>x.directionLegalAcceptance.sourceSha='0'.repeat(40),
+    x=>x.directionLegalAcceptance.version='2.1',x=>x.directionLegalAcceptance.termsProjectionSha256='0'.repeat(64),
+    x=>x.directionLegalAcceptance.actorUidSha256='c'.repeat(64),x=>x.directionLegalAcceptance.scopeSha256='d'.repeat(64),
+    x=>x.directionLegalAcceptance.gateBypassed=true,x=>x.directionLegalAcceptance.acceptedForOtherActors=true,
+    x=>x.directionLegalAcceptance.storageSeeded=true]){const bad=clone(q);mutate(bad);assert.throws(()=>g.validateFocusedReports(p,'PREVIEW',a,bad));}
+});
+
 test('existing workflows use dynamic artifact pins and closed targets, preserving prior signed regressions',()=>{
   const fs=require('node:fs');
   const preview=fs.readFileSync('.github/workflows/gravicentra-i66-privileged-role-three-function-preview-uat.yml','utf8');

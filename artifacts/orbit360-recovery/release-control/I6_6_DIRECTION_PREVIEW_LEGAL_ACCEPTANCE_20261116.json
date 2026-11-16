@@ -1,0 +1,39 @@
+{
+  "schema": "I6_6_EXPLICIT_DIRECTION_PREVIEW_LEGAL_ACCEPTANCE_V1",
+  "decisionId": "DIRECTION_PREVIEW_INTERNAL_LEGAL_V2_ACCEPTED_20261116",
+  "sourceBaseHead": "76cb5f5182fad3c0da11aa99ac906d8bb706dc23",
+  "decision": {
+    "status": "EXPLICIT_ACCEPTANCE",
+    "response": "Acepto",
+    "receivedLocalDate": "2026-11-16",
+    "reviewDocumentSha256": "c368d591a5b533a4c047cbffa265171e464c3574a70520398b967f243588d0e9",
+    "scopeExplanation": "The owner replied Acepto to the concrete prior request to accept the three internal version2.0 clauses for her Direction account in this exact Preview. Existing work authorization remains distinct from other actors and LIVE legal acceptance."
+  },
+  "subject": {
+    "advisorId": "ase-paula-osorio",
+    "role": "direccion",
+    "tenantId": "alianzas-soluciones",
+    "country": "GT"
+  },
+  "environment": {
+    "phase": "PREVIEW",
+    "origin": "https://ays-orbit-360-lab--gi-i66-rc-42868854629-abj14q6n.web.app"
+  },
+  "legal": {
+    "version": "2.0",
+    "clauseIds": [
+      "confidencialidad",
+      "tratamiento_datos",
+      "descargo_ia"
+    ],
+    "termsProjectionSha256": "485b07887091063cc7a5d1dc8f11a9bb547f2ef059490bb04d4acee73404f6b2"
+  },
+  "constraints": {
+    "ordinaryUiOnly": true,
+    "otherActors": false,
+    "live": false,
+    "futureSourceSuccessors": false,
+    "storageSeeding": false,
+    "gateBypass": false
+  }
+}

@@ -9,16 +9,17 @@ const CHANNEL='gi-i66-rc-42868854629',PREVIEW='https://ays-orbit-360-lab--'+CHAN
 const LIVE_ORIGINS=Object.freeze(['https://ays-orbit-360-lab.web.app','https://app.aysseguros.com']);
 const BUILD_WORKFLOW='.github/workflows/gravicentra-release-delta-66-package.yml';
 const CONTROL='artifacts/orbit360-recovery/release-control/I6_6_RELEASE_TRANSPORT_CONTROL_20261110.json';
-const FAILED=Object.freeze({sourceSha:'02463e625e11daea7f5a609613bd67a5890ba270',buildRunId:43756113933,
-  artifactId:14178232379,artifactDigest:'sha256:778baa27265eb0bde998a2102571255294d517a1284cc07a3325a0b9e07f7921',
-  // Observed, not inferred: inventory run43758700651/job132948379399.
-  hostingVersion:'sites/ays-orbit-360-lab/versions/77f99c0f0893d8d5',qaRunId:43756837089,
-  qaHeadSha:'27b18fb30eecccf828c2907d920b1abcd6541bde',qaJobId:132942738399});
-const DIAGNOSTIC=Object.freeze({artifactId:14178511809,
-  artifactDigest:'sha256:b8c9a0e5a7007b16f10eb819a785e82e65b042837eeb3995f655c745a8d5800b',
-  artifactName:'gi-i66-preview-failure-diagnostic-43756837089',archiveSize:472,
+const FAILED=Object.freeze({sourceSha:'257695e19749a4e18f38be972b37b6b47b2225af',buildRunId:43765252188,
+  artifactId:14181847038,artifactDigest:'sha256:3159ae024a6a119b11cb3f9521bd9819b0663198a1cffcd340eac4fdb91d9bf2',
+  // Observed, not inferred: inventory run43758700651 attempt2/job133658728277.
+  // The final old-source marker assertion failed; channel inventory itself was read-only and exact.
+  hostingVersion:'sites/ays-orbit-360-lab/versions/1cccc93a6136f6f8',qaRunId:43766053717,
+  qaHeadSha:'588a759a7063e8d70be26ca2c7e04bda40a7596c',qaJobId:132971308790});
+const DIAGNOSTIC=Object.freeze({artifactId:14182616271,
+  artifactDigest:'sha256:c998b365fad780bcadff0f8b773139b4d6f30af272c7dd24d61d00dada056b4b',
+  artifactName:'gi-i66-preview-failure-diagnostic-43766053717',archiveSize:882,
   entryName:'i66-preview-failure-diagnostic.json',
-  entrySha256:'b9997de855619bb99ae2c8ad27bca755df3d67ca6c6feb6a0e86b42f82e7a636'});
+  entrySha256:'f35aff0a6344248d4bebf0e92c896345a4837be8e710e183b05604706727f88d'});
 const CURRENT=Object.freeze({sourceSha:'84769378eb2014addebfefdbdd63091bddc4b817',buildRunId:43503721126,
   artifactId:14075022275,artifactDigest:'sha256:b0f3bacb68511cdfc91ac934602c51f55afec5c1d6428d886d13a72a706ee283',
   hostingVersion:'sites/ays-orbit-360-lab/versions/0766db29b338befc',liveRunId:43506971214,
@@ -26,7 +27,8 @@ const CURRENT=Object.freeze({sourceSha:'84769378eb2014addebfefdbdd63091bddc4b817
 const AUTHORIZATION=Object.freeze({schema:'GI_I66_EXACT_FAILED_PREVIEW_RESTORE_V1',
   status:'EXACT_FAILED_PREVIEW_TO_R11_PREVIEW_RESTORE_AUTHORIZED',approvedByDirection:true,
   channelId:CHANNEL,previewUrl:PREVIEW,failedCandidate:FAILED,failedQaDiagnostic:DIAGNOSTIC,currentLive:CURRENT,
-  inventoryRunId:43758700651,inventoryHeadSha:'ce176e1244d74c55a5453559d3f11f7b9822a0e6',
+  inventoryRunId:43758700651,inventoryHeadSha:'ce176e1244d74c55a5453559d3f11f7b9822a0e6',inventoryRunAttempt:1,
+  inventoryEvidenceUse:'ARCHIVED_READONLY_WORKFLOW_PROVENANCE_NOT_CURRENT_CHANNEL_STATE',
   expectedChannelCreatedAt:'2026-11-10T17:50:59.307316958Z',
   expectedSiteFileCount:223,backupBeforeOverwrite:true,readbackBeforeAndAfter:true,
   noLiveChanges:true,noBusinessDataWrites:true,noBackendChanges:true,noRulesAuthIamChanges:true,noChannelDeletion:true});
@@ -94,7 +96,7 @@ function validateFailedQa(run,job,log){
   assert.ok(receipt,'I66_RESTORE_QA_CLEANUP_EXECUTION_MISSING');
   const expected={checks:5,cleanup:'PASS',remaining:0,realCustomerWritesRequested:0,bankMovements:0,financialPayments:0,authOrMembershipMutations:0,
     failureClass:'TIMEOUT_ERROR',failureStage:'FINANCE_UI_HYDRATION',failureCheck:'ASSERTION_OR_RUNTIME_FAILURE',
-    failureLocation:{file:'gravicentra-i6-6-advisor-payables-signed-uat.cjs',line:261,column:61}};
+    failureLocation:{file:'gravicentra-i6-6-advisor-payables-signed-uat.cjs',line:526,column:65}};
   const json=JSON.stringify(expected);
   const observedMasked=json.replace(/^\{/,'***').replace('"failureLocation":{','"failureLocation":***').replace(/\}\}$/,'***');
   assert.ok(receipt===json||receipt===observedMasked,'I66_RESTORE_QA_ZERO_EFFECT_RECEIPT_NOT_EXACT');
@@ -122,7 +124,16 @@ function validateStructuredCleanup(artifact,bytes,text){
   let parsed;try{parsed=JSON.parse(text);}catch(_){assert.fail('I66_RESTORE_DIAGNOSTIC_JSON_INVALID');}
   const expected={schema:'I6_6_PREVIEW_DIAGNOSTIC_ONLY_V1',status:'FAILED_NOT_ACCEPTED',runId:FAILED.qaRunId,sourceSha:FAILED.sourceSha,
     reports:[{status:'HOLD',phase:'PREVIEW',failureStage:'FINANCE_UI_HYDRATION',failureCheck:'ASSERTION_OR_RUNTIME_FAILURE',
-      failureClass:'TIMEOUT_ERROR',checks:5,cleanupStatus:'PASS',remaining:0}]};
+      failureClass:'TIMEOUT_ERROR',failureLocation:{file:'gravicentra-i6-6-advisor-payables-signed-uat.cjs',line:526,column:65},
+      financeUiDiagnostics:{
+        beforeClick:{snapshotStatus:'CAPTURED',route:'FINANZAS',tabCount:1,tabConnected:true,tabVisible:true,tabEnabled:true,
+          rect:{x:1056,y:183,width:132,height:34},centerInViewport:true,targetReceivesPointer:false,topTag:'DIV',topId:null,topClasses:['drawer-back','open'],
+          legalOverlayPresent:true,legalOverlayAtTarget:true,legalOverlayCount:1,modalCount:1,authRestoring:false},
+        onFailure:{snapshotStatus:'CAPTURED',route:'FINANZAS',tabCount:1,tabConnected:true,tabVisible:true,tabEnabled:true,
+          rect:{x:770,y:183,width:132,height:34},centerInViewport:true,targetReceivesPointer:false,topTag:'DIV',topId:null,topClasses:[],
+          legalOverlayPresent:true,legalOverlayAtTarget:true,legalOverlayCount:1,modalCount:1,authRestoring:false},
+        actionability:{pointerInterception:true,detached:true,notVisible:false,notEnabled:false,notStable:false,outsideViewport:false}},
+      checks:5,cleanupStatus:'PASS',remaining:0}]};
   assert.deepEqual(parsed,expected,'I66_RESTORE_DIAGNOSTIC_CLEANUP_NOT_PROVEN');
   return {artifactId:DIAGNOSTIC.artifactId,artifactDigest:DIAGNOSTIC.artifactDigest,entrySha256:DIAGNOSTIC.entrySha256,
     status:'FAILED_NOT_ACCEPTED',cleanupStatus:'PASS',remaining:0};
@@ -152,7 +163,10 @@ async function restorePreview(control,initial,io,report){
   report.stage='IMMUTABLE_ARTIFACTS_AND_FAILED_QA_CLEANUP';const meta=await io.metadata();
   validateArtifact(meta.failedRun,meta.failedArtifact,FAILED);validateArtifact(meta.liveBuildRun,meta.liveArtifact,CURRENT);
   validateRun(meta.liveRun,{id:CURRENT.liveRunId,head:CURRENT.liveHeadSha,path:'.github/workflows/gravicentra-i66-r11-renewal-drive-frontend-exact-live-promotion.yml'});
+  // Attempt-specific archived provenance survives later read-only reruns.
+  // It never substitutes for initial/fresh inventory or full current byte proof.
   validateRun(meta.inventoryRun,{id:AUTHORIZATION.inventoryRunId,head:AUTHORIZATION.inventoryHeadSha,path:'.github/workflows/gravicentra-i66-preview-channel-inventory-readonly.yml'});
+  assert.equal(meta.inventoryRun.run_attempt,AUTHORIZATION.inventoryRunAttempt,'I66_RESTORE_ARCHIVED_INVENTORY_ATTEMPT_DRIFT');
   report.failedQaLogSha256=validateFailedQa(meta.failedQaRun,meta.failedQaJob,meta.failedQaLog);
   validateDiagnosticArtifact(meta.failedQaDiagnosticArtifact);
   const diagnostic=await io.diagnostic(meta.failedQaDiagnosticArtifact);
@@ -193,7 +207,7 @@ function runtimeIo(env,root){
     async metadata(){
       const values=await Promise.all([json('runs/'+FAILED.buildRunId),json('artifacts/'+FAILED.artifactId),json('runs/'+CURRENT.buildRunId),json('artifacts/'+CURRENT.artifactId),
         json('runs/'+CURRENT.liveRunId),json('runs/'+FAILED.qaRunId),json('jobs/'+FAILED.qaJobId),
-        get(api+'jobs/'+FAILED.qaJobId+'/logs',{headers}).then(r=>r.text()),json('runs/'+AUTHORIZATION.inventoryRunId),json('artifacts/'+DIAGNOSTIC.artifactId)]);
+        get(api+'jobs/'+FAILED.qaJobId+'/logs',{headers}).then(r=>r.text()),json('runs/'+AUTHORIZATION.inventoryRunId+'/attempts/'+AUTHORIZATION.inventoryRunAttempt),json('artifacts/'+DIAGNOSTIC.artifactId)]);
       return Object.fromEntries(['failedRun','failedArtifact','liveBuildRun','liveArtifact','liveRun','failedQaRun','failedQaJob','failedQaLog','inventoryRun','failedQaDiagnosticArtifact'].map((key,i)=>[key,values[i]]));
     },
     async diagnostic(artifact){

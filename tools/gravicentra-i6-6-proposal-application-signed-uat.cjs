@@ -3,6 +3,7 @@
 // ledger pointer, real customer, real membership, rule or IAM change is allowed.
 const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),crypto=require('node:crypto');
 const {digest,applicationIdFor}=require('../functions/proposal-application-boundary');
+const {acceptDirectionPreviewLegal}=require('./gravicentra-i6-6-direction-preview-legal-acceptance.cjs');
 const TENANT='alianzas-soluciones',PROJECT='ays-orbit-360-lab';
 const norm=v=>String(v??'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]/g,'');
 const hash=v=>crypto.createHash('sha256').update(v).digest('hex');
@@ -58,7 +59,7 @@ async function main(){
    const found=members.docs.filter(d=>{const m=d.data()||{};return ([m.nombre,m.nombreCompleto,m.displayName,m.name,m.fullName].some(v=>predicate(norm(v)))||links.has(m.advisorId||m.asesorId)||uids.has(d.id))&&
     norm(m.activeRole)===role&&m.active!==false&&m.activo!==false&&['active','activo'].includes(norm(m.status||m.estado))&&[].concat(m.countries||m.paises||[]).includes('GT');});
    assert.equal(found.length,1,'I66_PROPOSAL_REAL_ACTOR_NOT_UNIQUE_'+role);
-   return{uid:found[0].id,role,member:found[0].data()};
+   return{uid:found[0].id,role,advisorId:String(found[0].data().advisorId||found[0].data().asesorId||''),member:found[0].data()};
   };
   const actors=[select(v=>v.includes('paula')&&v.includes('osorio'),'direccion'),select(v=>v.startsWith('carloscastro'),'operativo')];
   for(const actor of actors){const u=await auth.getUser(actor.uid);assert.ok(!u.disabled&&u.emailVerified,'I66_PROPOSAL_ACTOR_AUTH_NOT_READY');actor.token=await auth.createCustomToken(actor.uid);}
@@ -97,6 +98,10 @@ async function main(){
   cleanupArmed=true;
   const actors=await staff();browser=await chromium.launch({headless:true,args:['--no-sandbox']});
   const direction=await sign(actors[0]),carlos=await sign(actors[1]);
+  if(cfg.phase==='PREVIEW'){
+    report.directionLegalAcceptance=await acceptDirectionPreviewLegal({page:direction,actor:actors[0],cfg:{...cfg,source:cfg.sourceSha}});
+    checked('EXPLICIT_DIRECTION_PREVIEW_LEGAL_DECISION_APPLIED_BY_NORMAL_UI');
+  }
   const source={sourceRowId:prefix+'_source_row',sourceRowIdSha256:hash(prefix+'_source_row'),policyNumber:'QA-I66-'+nonce,currency:'GTQ',amount:173.23,reportedDate:'2026-11-15'};
   const hashes={sourceLedgerDigest:digest(source),packageLogicalSha256:digest({source,runId})};
   const stageProposal=makeStage('propuestasConciliacion',ids.proposal,TENANT,runId,source,hashes),stageEvidence=makeStage('evidenciasCobro',ids.source,TENANT,runId,source,hashes);

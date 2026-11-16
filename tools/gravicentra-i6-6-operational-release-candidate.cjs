@@ -45,6 +45,7 @@ const ADVISOR_QA_ISOLATION = Object.freeze({
 const PINNED_OWNER_PATHS = Object.freeze([
   'functions','orbit360-platform','firebase.json','firestore.rules','storage.rules',
   ...DRIVERS,'tools/gravicentra-i6-6-carlos-paula-live-synthetic-ops-leads-uat.cjs',
+  'tools/gravicentra-i6-6-direction-preview-legal-acceptance.cjs',
   'tools/gravicentra-i6-6-operational-release-candidate.cjs',
   'tools/gravicentra-i66-privileged-role-exact-live-transport.mjs',
   PREVIEW_WORKFLOW,'.github/workflows/gravicentra-i66-privileged-role-exact-live-promotion.yml',
@@ -175,6 +176,11 @@ function validateFocusedReports(p,phase,advisor,proposal){
   }
   for(const field of ['realCustomerWritesRequested','bankMovements','financialPayments','authOrMembershipMutations'])assert.equal(advisor[field],0);
   assert.equal(proposal.syntheticOnly,true);assert.equal(proposal.realControlUnchanged,true);
+  if(phase==='PREVIEW'&&p.legalAcceptance){
+    const {validateAcceptanceProof}=require('./gravicentra-i6-6-direction-preview-legal-acceptance.cjs');
+    for(const report of [advisor,proposal])validateAcceptanceProof(report.directionLegalAcceptance,p);
+    for(const key of ['actorUidSha256','scopeSha256'])assert.equal(advisor.directionLegalAcceptance[key],proposal.directionLegalAcceptance[key],'I66_OPERATIONAL_LEGAL_SIGNED_ACTOR_SCOPE_DRIFT');
+  }
 }
 function focusedReportsFromDisk(p,phase,env=process.env){
   assert.ok(['PREVIEW','LIVE'].includes(phase));

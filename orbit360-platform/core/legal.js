@@ -12,7 +12,8 @@
 
    Cada cláusula tiene texto legal estructurado en bloques + metadatos
    (vigencia, penalidad, ley aplicable, jurisdicción). Parametrizado por país.
-   Cada aceptación se registra con fecha, usuario, país, IP (simulada) y versión.
+   Cada aceptación se registra con fecha, usuario, país, origen y versión.
+   No se inventa una dirección IP que el navegador no puede acreditar.
    ============================================================ */
 window.Orbit = window.Orbit || {};
 Orbit.legal = (function () {
@@ -158,12 +159,13 @@ Orbit.legal = (function () {
 
   function aceptaciones() { try { return JSON.parse(localStorage.getItem(AKEY) || '{}'); } catch (e) { return {}; } }
   function yaAcepto(scopeId) { const a = aceptaciones(); return !!(a[scopeId] && a[scopeId].version === VERSION); }
-  function fakeIP() { return '186.' + Math.floor(Math.random() * 255) + '.' + Math.floor(Math.random() * 255) + '.' + Math.floor(Math.random() * 255); }
   function registrar(scopeId, meta) {
     const a = aceptaciones();
-    let usuario = '';
-    try { usuario = (Orbit.auth && Orbit.auth.user && Orbit.auth.user() && (Orbit.auth.user().nombre || Orbit.auth.user().email)) || ''; } catch (e) {}
-    a[scopeId] = Object.assign({ aceptado: true, version: VERSION, fecha: new Date().toISOString(), pais: pais(), usuario: usuario, ip: fakeIP() }, meta || {});
+    let usuario = '', actorUid = '', origin = '';
+    try { const u = (Orbit.auth && Orbit.auth.user && Orbit.auth.user()) || {}; usuario = u.nombre || u.email || ''; actorUid = u.uid || ''; } catch (e) {}
+    try { origin = window.location.origin || ''; } catch (e) {}
+    a[scopeId] = Object.assign({ aceptado: true, version: VERSION, fecha: new Date().toISOString(), pais: pais(), usuario: usuario }, meta || {},
+      { actorUid: actorUid, origin: origin, scopeId: String(scopeId || ''), ip: null, ipSource: 'NOT_COLLECTED' });
     try { localStorage.setItem(AKEY, JSON.stringify(a)); } catch (e) {}
   }
 
@@ -231,14 +233,19 @@ Orbit.legal = (function () {
     const titulo = tipo === 'cliente' ? 'Bienvenido/a — antes de continuar' : (tipo === 'socio' ? 'Acuerdo de socio / aliado' : (tipo === 'licenciatario' ? 'Contrato de licencia — antes de comenzar' : 'Antes de continuar'));
     const back = document.createElement('div');
     back.setAttribute('data-legal-gate', scope.replace(/"/g, ''));
+    back.setAttribute('data-legal-version', VERSION);
+    back.setAttribute('data-legal-type', String(tipo || 'interno'));
+    back.setAttribute('data-legal-country', pais());
+    back.setAttribute('data-legal-clauses', claves.join(' '));
     back.className = 'drawer-back open';
     back.style.cssText = 'display:grid;place-items:center;z-index:262';
-    back.innerHTML = '<div class="conf-modal" style="max-width:660px"><div class="conf-h"><span class="conf-ic">📜</span><div><div class="nov-eyebrow">' + titulo + '</div><h2>Acuerdos legales</h2></div></div><div class="conf-body" style="max-height:56vh;overflow:auto">' + cuerpo + '</div><label class="conf-chk"><input type="checkbox" id="lg-chk"> He leído y <b>acepto</b> íntegramente los acuerdos anteriores.</label><div class="conf-f" style="display:flex;gap:8px;justify-content:space-between"><button class="btn ghost" id="lg-print">🖨️ Imprimir / PDF</button><button class="btn primary" id="lg-ok" disabled>Aceptar y continuar</button></div></div>';
+    back.innerHTML = '<div class="conf-modal" style="max-width:660px"><div class="conf-h"><span class="conf-ic">📜</span><div><div class="nov-eyebrow">' + titulo + '</div><h2>Acuerdos legales</h2><p id="lg-identity" class="hint" data-legal-identity="1"></p></div></div><div class="conf-body" style="max-height:56vh;overflow:auto">' + cuerpo + '</div><label class="conf-chk"><input type="checkbox" id="lg-chk"> He leído y <b>acepto</b> íntegramente los acuerdos anteriores.</label><div class="conf-f" style="display:flex;gap:8px;justify-content:space-between"><button class="btn ghost" id="lg-print">🖨️ Imprimir / PDF</button><button class="btn primary" id="lg-ok" disabled>Aceptar y continuar</button></div></div>';
     document.body.appendChild(back);
+    back.querySelector('#lg-identity').textContent = 'Versión ' + VERSION + ' · País ' + pais() + ' · Cuenta ' + scope.replace(/^user:/, '');
     const chk = back.querySelector('#lg-chk'), ok = back.querySelector('#lg-ok');
     chk.addEventListener('change', () => { ok.disabled = !chk.checked; });
     back.querySelector('#lg-print').addEventListener('click', () => imprimir(tipo));
-    ok.addEventListener('click', () => { registrar(scope, { tipo: tipo, clausulas: claves }); finish(scope); });
+    ok.addEventListener('click', () => { registrar(scope, { tipo: tipo, clausulas: claves, acceptanceMethod: 'VISIBLE_CHECKBOX_AND_BUTTON' }); finish(scope); });
   }
 
   function imprimir(tipo) {

@@ -2279,6 +2279,43 @@
           }
         }
       ]
+    },
+    {
+      "id": "I6_6_DIRECTION_LEGAL_EXPLICIT_PREVIEW_ACCEPTANCE_20261116",
+      "approvedByDirection": true,
+      "receipt": "artifacts/orbit360-recovery/release-control/I6_6_DIRECTION_LEGAL_PREVIEW_RESUMPTION_20261116.json",
+      "parentSourceSha": "76cb5f5182fad3c0da11aa99ac906d8bb706dc23",
+      "scope": "Causal legal-gate remediation with genuine Direction-only Preview acceptance and unchanged exact agreement text; no real records or accepted LIVE changes. Existing Preview restore rebinding is exact failed257 only with current full-byte checks.",
+      "paths": [
+        {
+          "path": "orbit360-platform/core/legal.js",
+          "gitBlobSha": "0b5cb9953fb267123276b719d2e5135c78dd7638"
+        }
+      ],
+      "tests": [
+        {
+          "path": "tools/gravicentra-i6-6-direction-preview-legal-acceptance.test.cjs",
+          "gitBlobSha": "2ba58ec74e926897330fbdc5fa319ade4f941e7d"
+        },
+        {
+          "path": "tools/gravicentra-i6-6-operational-release-candidate.test.cjs",
+          "gitBlobSha": "ab8ff145996fd3b0fd38ca08c4e9524c0e2c971c",
+          "replaces": {
+            "path": "tools/gravicentra-i6-6-operational-release-candidate.test.cjs",
+            "priorGitBlobSha": "739c5fb2c3eb2919f45c228b0db416a97caa846b",
+            "priorChangeId": "I6_6_CONCILIATION_APPROVAL_AND_ADVISOR_CXP_20261115"
+          }
+        },
+        {
+          "path": "tools/gravicentra-i6-6-preview-current-live-restore.test.cjs",
+          "gitBlobSha": "60056ca5033928add7c0a163de12d42f238ab75c",
+          "replaces": {
+            "path": "tools/gravicentra-i6-6-preview-current-live-restore.test.cjs",
+            "priorGitBlobSha": "15d2da3955883cf1a385ed47668e5eef242fa9d5",
+            "priorChangeId": "I6_6_ADVISOR_PORTFOLIO_HISTORICAL_BENEFICIARY_AND_COMPONENT_ROUNDING_20261115"
+          }
+        }
+      ]
     }
   ],
   "i66R11PreviewBuildRequest20261113": {

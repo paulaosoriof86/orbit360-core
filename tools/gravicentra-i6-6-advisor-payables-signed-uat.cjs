@@ -9,6 +9,7 @@ const path=require('node:path');
 const os=require('node:os');
 const contract=require('../functions/advisor-commission-payable-contract');
 const assignment=require('../functions/advisor-assignment-correction-contract');
+const {acceptDirectionPreviewLegal}=require('./gravicentra-i6-6-direction-preview-legal-acceptance.cjs');
 const PROJECT='ays-orbit-360-lab',TENANT='alianzas-soluciones';
 const SOURCE_SCHEMA='gravicentra-advisor-commission-source-batch-v1';
 const hash=value=>crypto.createHash('sha256').update(String(value)).digest('hex');
@@ -337,7 +338,7 @@ function assertServerDenial(out,code,reason){
   if(reason)assert.equal(out.reason,reason,'ADVISOR_UAT_DENIAL_REASON_MISMATCH');
 }
 function safeFailureEvidence(error,stage){
-  const stages=new Set(['BUILD_IDENTITY','FIXTURE_SETUP','SIGNED_SESSION','OPERATIVE_FINANCIAL_DENIAL',
+  const stages=new Set(['BUILD_IDENTITY','FIXTURE_SETUP','SIGNED_SESSION','DIRECTION_LEGAL_ACCEPTANCE','OPERATIVE_FINANCIAL_DENIAL',
     'FINANCE_UI_HYDRATION','DOCUMENT_FILE_UI_70','DOCUMENT_FILE_UI_60','REPLAY_AND_SOURCE_GUARDS',
     'ASSIGNMENT_DOCUMENTARY_UI','ASSIGNMENT_RELOAD','LEGACY_GUARDS','LEGACY_FINANCE_EDIT','PENDING_CXP_RELOAD','SYNTHETIC_RESTORE']);
   const checks=['ADVISOR_UAT_SERVER_DENIAL_NOT_REACHED','ADVISOR_UAT_DENIAL_CLASS_MISMATCH',
@@ -350,7 +351,7 @@ function safeFailureEvidence(error,stage){
     'ADVISOR_UAT_PROTECTED_RELOAD_MISMATCH','ADVISOR_UAT_DIRECTION_PAGE_ERROR',
     'ADVISOR_UAT_OPERATIVE_PAGE_ERROR','ADVISOR_UAT_FIRST_PARTY_ASSET_ERROR',
     'ADVISOR_UAT_SIGNED_SESSION_MISMATCH','ADVISOR_UAT_BUILD_SOURCE_DRIFT',
-    'ADVISOR_UAT_ARTIFACT_MARKER_DRIFT','ADVISOR_UAT_CLEANUP_HOLD'];
+    'ADVISOR_UAT_ARTIFACT_MARKER_DRIFT','ADVISOR_UAT_CLEANUP_HOLD','DIRECTION_LEGAL'];
   const message=String(error?.message||'');
   const check=checks.find(value=>message===value||message.startsWith(value+'_')||message.startsWith(value+'\n'));
   const location=String(error?.stack||'').match(/(?:^|[/\\])gravicentra-i6-6-advisor-payables-signed-uat\.cjs:(\d+):(\d+)/);
@@ -471,7 +472,7 @@ async function main(){
         row.active!==false&&row.activo!==false&&['active','activo'].includes(norm(row.status||row.estado))&&
         [].concat(row.countries||row.paises||[]).map(value=>String(value).toUpperCase()).includes('GT');});
       assert.equal(hits.length,1,'ADVISOR_UAT_SIGNED_ACTOR_NOT_UNIQUE_'+role);
-      memberBefore.push({ref:hits[0].ref,digest:digest(hits[0].data())});return{uid:hits[0].id,role};
+      memberBefore.push({ref:hits[0].ref,digest:digest(hits[0].data())});return{uid:hits[0].id,role,advisorId:String(hits[0].data().advisorId||hits[0].data().asesorId||'')};
     };
     const actors=[choose(value=>value.includes('paula')&&value.includes('osorio'),'direccion'),choose(value=>value.startsWith('carlos castro'),'operativo')];
     const accessRef=tenant.collection('config').doc('access'),accessSnap=await accessRef.get();
@@ -511,6 +512,11 @@ async function main(){
     };
     direction=await openActor(actors[0]);operator=await openActor(actors[1]);
     pass('EXISTING_DIRECTION_AND_OPERATIVE_SIGNED_WITH_UNCHANGED_MEMBERSHIP');
+    if(!cfg.live){
+      stage='DIRECTION_LEGAL_ACCEPTANCE';
+      report.directionLegalAcceptance=await acceptDirectionPreviewLegal({page:direction.page,actor:actors[0],cfg});
+      pass('EXPLICIT_DIRECTION_PREVIEW_LEGAL_DECISION_APPLIED_BY_NORMAL_UI');
+    }
     stage='OPERATIVE_FINANCIAL_DENIAL';
     await deny(operator,{advisorPayable:fx.specs[0]},'permission-denied');
     for(const item of generated)assert.equal((await rowRef(item.collection,item.expected.id).get()).exists,false);
