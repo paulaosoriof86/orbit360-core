@@ -553,7 +553,7 @@ async function main(){
       await direction.page.goto(cfg.origin+'/#/cliente360?c='+fx.ids.client+'&t=polizas',{waitUntil:'commit',timeout:30000});
       await direction.page.waitForSelector('[data-client-policy-row="1"][data-policy-id="'+fx.ids.policy60+'"]',{state:'visible',timeout:30000});
       await direction.page.locator('[data-client-policy-row="1"][data-policy-id="'+fx.ids.policy60+'"]').click();
-      await direction.page.locator('#c360-edit button[onclick="Orbit.modules.cliente360.editarPoliza(\''+fx.ids.policy60+'\')"]').click();
+      await direction.page.locator('[data-policy-fullpage="1"] button[onclick="Orbit.modules.cliente360.editarPoliza(\''+fx.ids.policy60+'\')"]').click();
       await direction.page.waitForSelector('#policy-v1199 [data-advisor]:not([disabled])',{state:'visible',timeout:30000});
       assert.equal(await direction.page.locator('#policy-v1199 [data-advisor]').inputValue(),expectedAdvisor,'ADVISOR_UAT_ASSIGNMENT_PROOF_MISMATCH_ui_advisor');
       assert.equal(await direction.page.locator('#policy-v1199 [data-net]').inputValue(),'321.06','ADVISOR_UAT_ASSIGNMENT_PROOF_MISMATCH_ui_premium');
@@ -612,7 +612,9 @@ async function main(){
     }
     await openAssignmentEditor(fx.ids.advisor60);
     await direction.page.locator('#policy-v1199').getByRole('button',{name:'Cancelar',exact:true}).click();
-    await direction.page.locator('#vp-x').click();
+    await direction.page.waitForSelector('#policy-v1199',{state:'detached',timeout:30000});
+    await direction.page.locator('[data-policy-fullpage="1"]').getByRole('link',{name:'👤 Cliente 360',exact:true}).click();
+    await direction.page.waitForSelector('[data-client-policy-row="1"][data-policy-id="'+fx.ids.policy60+'"]',{state:'visible',timeout:30000});
     for(const [collection,expected] of fx.rows)
       assert.deepEqual((await rowRef(collection,expected.id).get()).data(),expected,'ADVISOR_UAT_ASSIGNMENT_PROOF_MISMATCH_compensation');
     pass('DOCUMENTED_ASSIGNMENT_NATIVE_UI_PREVIEW_CONFIRM_RELOAD_REPLAY_COMPENSATION_PRESERVES_ALL_FINANCIAL_RELATIONS');

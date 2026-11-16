@@ -13,6 +13,16 @@ on:
     paths:
       - artifacts/orbit360-recovery/release-control/I6_6_APPROVED_PRODUCT_DELTA_MANIFEST_20261110.json
       - tools/gravicentra-i6-6-delta-guard.mjs
+      # QA owners and their transport are immutable build/proof inputs too.
+      - .github/workflows/gravicentra-release-delta-66-package.yml
+      - .github/workflows/gravicentra-i66-privileged-role-three-function-preview-uat.yml
+      - tools/gravicentra-i6-6-advisor-payables-signed-uat.cjs
+      - tools/gravicentra-i6-6-direction-preview-legal-acceptance.cjs
+      - tools/gravicentra-i6-6-preview-current-live-restore.cjs
+      - tools/gravicentra-i6-6-operational-release-candidate.cjs
+      - tools/gravicentra-i6-6-assignment-detail-navigation.test.cjs
+      - tools/gravicentra-i6-6-direction-preview-qa-navigation-retry.test.cjs
+      - tools/gravicentra-i6-6-preview-current-live-restore-47f4.test.cjs
 
 permissions:
   contents: read
@@ -234,6 +244,7 @@ jobs:
           node --check tools/gravicentra-i6-6-preview-current-live-restore.cjs
           node --test tools/gravicentra-i6-6-preview-current-live-restore.test.cjs
           node --test tools/gravicentra-i6-6-preview-channel-reuse-guard.test.cjs
+          node --test tools/gravicentra-i6-6-assignment-detail-navigation.test.cjs tools/gravicentra-i6-6-direction-preview-qa-navigation-retry.test.cjs tools/gravicentra-i6-6-preview-current-live-restore-47f4.test.cjs
           node tools/gravicentra-governance-preflight-v1.mjs --mode=i6
       - name: Set up existing Firebase LAB credentials for read-only public config and tenant branding
         working-directory: candidate

@@ -1,0 +1,65 @@
+{
+  "schema": "GI_I66_DIRECTION_PREVIEW_QA_NAVIGATION_RETRY_V1",
+  "status": "EXACT_TECHNICAL_RETRY_SAME_OWNER_DECISION",
+  "activeGate": "I6.6",
+  "firstIncompleteGate": "SIGNED_PREVIEW",
+  "sourceParent": "b9bf7ffaff28124dbae4c67b7a255b8f2326cf16",
+  "originalConsentReceipt": "artifacts/orbit360-recovery/release-control/I6_6_DIRECTION_PREVIEW_LEGAL_ACCEPTANCE_20261116.json",
+  "originalConsentReceiptSha256": "68d3961987e19acdc223b7d2adf01eb39c540ca6ae8aa72c64752cab45fddbae",
+  "decisionId": "DIRECTION_PREVIEW_INTERNAL_LEGAL_V2_ACCEPTED_20261116",
+  "decisionScopeUnchanged": {
+    "actorAdvisorId": "ase-paula-osorio",
+    "role": "direccion",
+    "tenantId": "alianzas-soluciones",
+    "country": "GT",
+    "version": "2.0",
+    "origin": "https://ays-orbit-360-lab--gi-i66-rc-42868854629-abj14q6n.web.app",
+    "clauseIds": [
+      "confidencialidad",
+      "tratamiento_datos",
+      "descargo_ia"
+    ],
+    "termsProjectionSha256": "485b07887091063cc7a5d1dc8f11a9bb547f2ef059490bb04d4acee73404f6b2"
+  },
+  "unchangedLegalOwner": {
+    "path": "orbit360-platform/core/legal.js",
+    "sourceSha": "47f4d2de26e02d1792f31563288a64819e4b64d1",
+    "sha256": "b74a965b7be0d67862d82bcf73dacc0d5a8293dcf30cb4f5f3fdeaa6ee1c68a3"
+  },
+  "previousAttempt": {
+    "sourceSha": "47f4d2de26e02d1792f31563288a64819e4b64d1",
+    "qaHeadSha": "b9bf7ffaff28124dbae4c67b7a255b8f2326cf16",
+    "qaRunId": 43978867873,
+    "qaJobId": 133689959216,
+    "legalAcceptanceStep": "PASS_NORMAL_UI_AND_PERSISTENCE_VALIDATION",
+    "failureStage": "ASSIGNMENT_DOCUMENTARY_UI",
+    "failureClass": "TIMEOUT_ERROR",
+    "failureLocation": {
+      "file": "gravicentra-i6-6-advisor-payables-signed-uat.cjs",
+      "line": 556,
+      "column": 131
+    },
+    "checks": 6,
+    "cleanup": "PASS",
+    "remaining": 0,
+    "signedPreviewAccepted": false,
+    "livePromoted": false
+  },
+  "causalQaCorrection": [
+    "Use the current full-page policy Edit button scoped to the exact policy ID; the old detail modal is not rendered.",
+    "After cancelling the editor, return via the visible Cliente 360 link owned by the full-page view; the old vp-x modal close control does not exist."
+  ],
+  "constraints": {
+    "technicalRebindingOnly": true,
+    "newConsentInvented": false,
+    "originalReceiptBytesUnchanged": true,
+    "acceptanceTermsChanged": false,
+    "legalProductOwnerChanged": false,
+    "ordinaryUiOnly": true,
+    "otherActors": false,
+    "live": false,
+    "futureAutomaticSuccessors": false,
+    "storageSeeding": false,
+    "gateBypass": false
+  }
+}

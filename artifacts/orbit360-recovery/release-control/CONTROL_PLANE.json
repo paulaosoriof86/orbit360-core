@@ -9,7 +9,7 @@
     "activeGate": "I6.6",
     "closedHistoricalGate": "B4-007",
     "latestProvenLiveSource": "84769378eb2014addebfefdbdd63091bddc4b817",
-    "currentWork": "Execute exact-source signed Preview validation with the current genuine Direction legal decision; preserve R11 and all financial/customer records until exact acceptance and separate LIVE prerequisites.",
+    "currentWork": "Repair two legacy QA selectors against the current accepted full-page policy owner, with no product changes. Rebuild and prove the exact signed Preview gate; preserve R11 and all real records.",
     "newFinancialWrites": 0,
     "newLiveAcceptanceClaimed": false
   },
@@ -3344,7 +3344,7 @@
     "i63LiveReadbackPass": true,
     "i63DeterministicDiffReady": true
   },
-  "nextAction": "I6_6_DIRECTION_LEGAL_CONTEXT_PREVIEW_BUILD_20261116: EXACT_SOURCE_47F4D2D_ARTIFACT_14282155921_PREVIEW_223_FILES_VERIFIED. EXECUTE_EXISTING_FOUR_SIGNED_PREVIEW_DRIVERS_AND_EXACT_THREE_PREVIEW_FUNCTIONS_WITH_GENUINE_DIRECTION_DECISION; NO_REAL_RECORD_WRITES. R11_REMAINS_LAST_ACCEPTED_LIVE. PREVIEW_ACCEPTANCE_IS_NOT_LIVE_CONSENT. MAPFRE_SAME_CONDITIONS_RENEWAL_ALREADY_APPROVED. OPS_6_OF_8_OVERALL_19_OF_31_UNCHANGED.",
+  "nextAction": "I6_6_QA_NAVIGATION_CAUSAL_RETRY_20261116: FAILED47_LEGAL_AND_FINANCE_STEPS_PASSED_THEN_LEGACY_EDIT_SELECTOR_FAILED; SYNTHETICS_RESTORED_REMAINING_ZERO. UPDATE_QA_TO_ACCEPTED_FULL_PAGE_OWNER_WITH_PRODUCT_BYTES_UNCHANGED; NEW_IMMUTABLE_BUILD_THEN_EXISTING_FOUR_SIGNED_PREVIEW_DRIVERS. EXACT_FAILED47_PREVIEW_RESTORE_AUTHORIZED_NOT_YET_EXECUTED. R11_LIVE_UNCHANGED. ORIGINAL_DIRECTION_PREVIEW_DECISION_RETAINED_FOR_EXACT_RETRY_ONLY. MAPFRE_SAME_CONDITIONS_ALREADY_APPROVED. OPS_6_OF_8_OVERALL_19_OF_31; NO_REAL_WRITES.",
   "postproductionExitProgress": {
     "formalPercent": 60,
     "frozenMiniGates": 6,
@@ -22927,6 +22927,15 @@
     "sourceSha": "47f4d2de26e02d1792f31563288a64819e4b64d1",
     "buildRunId": 43978039744,
     "artifactId": 14282155921,
+    "lastAcceptedLiveUnchanged": true,
+    "realRecordWrites": 0,
+    "newLiveAcceptanceClaimed": false
+  },
+  "i66QaNavigationCausalRetry20261116": {
+    "status": "CAUSAL_QA_ONLY_REPAIR_NEW_IMMUTABLE_BUILD_AND_SIGNED_PREVIEW_REQUIRED",
+    "receipt": "artifacts/orbit360-recovery/release-control/I6_6_QA_NAVIGATION_CAUSAL_RETRY_20261116.json",
+    "sourceParent": "b9bf7ffaff28124dbae4c67b7a255b8f2326cf16",
+    "productSourceChanges": 0,
     "lastAcceptedLiveUnchanged": true,
     "realRecordWrites": 0,
     "newLiveAcceptanceClaimed": false

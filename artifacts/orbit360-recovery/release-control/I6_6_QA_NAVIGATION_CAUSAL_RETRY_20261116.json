@@ -1,0 +1,184 @@
+{
+  "schema": "GI_I66_QA_NAVIGATION_CAUSAL_RETRY_V1",
+  "dateGuatemala": "2026-11-16",
+  "observedAtUtc": "2026-11-16T23:44:50.661715Z",
+  "status": "CAUSAL_QA_ONLY_REPAIR_NEW_IMMUTABLE_BUILD_AND_SIGNED_PREVIEW_REQUIRED",
+  "activeGate": "I6.6",
+  "firstIncompleteGate": "SIGNED_PREVIEW",
+  "sourceParent": "b9bf7ffaff28124dbae4c67b7a255b8f2326cf16",
+  "previousAttempt": {
+    "status": "SIGNED_PREVIEW_HOLD_NOT_PROMOTABLE",
+    "qaRunId": 43978867873,
+    "qaHeadSha": "b9bf7ffaff28124dbae4c67b7a255b8f2326cf16",
+    "qaJobId": 133689959216,
+    "failureStage": "ASSIGNMENT_DOCUMENTARY_UI",
+    "failureCheck": "ASSERTION_OR_RUNTIME_FAILURE",
+    "failureClass": "TIMEOUT_ERROR",
+    "failureLocation": {
+      "file": "gravicentra-i6-6-advisor-payables-signed-uat.cjs",
+      "line": 556,
+      "column": 131
+    },
+    "checks": 6,
+    "cleanup": "PASS",
+    "remaining": 0,
+    "legalAcceptanceStep": "PASSED_NORMAL_UI_AND_PERSISTENCE_VALIDATION_BEFORE_LATER_SELECTOR_FAILURE",
+    "diagnosticArtifact": {
+      "artifactId": 14282532244,
+      "artifactDigest": "sha256:fb5834274d39b8862c03d1dd32346957f92b1bb324d6a51c4b1f854dd62f450c",
+      "artifactName": "gi-i66-preview-failure-diagnostic-43978867873",
+      "archiveSize": 796,
+      "entryName": "i66-preview-failure-diagnostic.json",
+      "entrySha256": "20155e29e65291632b664d4d4267d442cbf783276df64c82d8e8c5aaae505e36"
+    },
+    "signedLogSha256": "c5f681a6149a12134eb36a7edbd8a67f0411d0913b1a267115aaf16d0f386d2d",
+    "realCustomerWritesRequested": 0,
+    "bankMovements": 0,
+    "financialPayments": 0,
+    "authOrMembershipMutations": 0,
+    "livePromotion": false,
+    "fullI66Acceptance": false
+  },
+  "causalEvidence": {
+    "effectiveOwner": "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js",
+    "ownerBlobSha": "d1a6d06feb91e32a6da500f426f0877057f42c1d",
+    "legacyEditSelectorMatches": 0,
+    "exactFullPageEditSelectorMatches": 1,
+    "legacyCloseControlAbsent": true,
+    "returnViaExistingVisibleClientLink": true,
+    "ownerRenderedInLocalRegression": true,
+    "newSignedBrowserPassClaimed": false
+  },
+  "productSourceChanges": 0,
+  "productManifestChanged": false,
+  "historicalPinnedTestsChanged": false,
+  "qaSourceBindings": [
+    {
+      "path": "tools/gravicentra-i6-6-advisor-payables-signed-uat.cjs",
+      "gitBlobSha": "06168e5f85b3b4709946e475cef18fd2ddbf1f8d",
+      "sha256": "daf9db3fbb9421a6d50ab10370c45d0720e9fc7f27d8a1280ae186918cb9cab1"
+    },
+    {
+      "path": "tools/gravicentra-i6-6-direction-preview-legal-acceptance.cjs",
+      "gitBlobSha": "29a2dedc35c27b51fd257ec97edf78b23a7ef6ba",
+      "sha256": "ad047651fd4e19a3f541c1ac4c25c3f690facf198ff3b14650e8d85b79ffc729"
+    },
+    {
+      "path": "tools/gravicentra-i6-6-preview-current-live-restore.cjs",
+      "gitBlobSha": "21cedbb42ec85dc22f0b3d0e32741d110ddcb733",
+      "sha256": "8dd60d1af82b6bef998b6e9fff0f23d91cc3cfdb6d17a538ebfebdc4505fda83"
+    },
+    {
+      "path": "tools/gravicentra-i6-6-operational-release-candidate.cjs",
+      "gitBlobSha": "1bee02b70418dfc1e8090ea1bc51922b96ccdecb",
+      "sha256": "3dea5a14e86b37c1914cb4c216a36ed1ce0744d7885ace391398c8c2fd3d7283"
+    },
+    {
+      "path": ".github/workflows/gravicentra-release-delta-66-package.yml",
+      "gitBlobSha": "265ef37680000f3267dc8ab87dee1e029e256d9d",
+      "sha256": "73b26c44120432ad877c1975f52bf3361c8a1c2bdef077684ca49d1950d570e0"
+    },
+    {
+      "path": ".github/workflows/gravicentra-i66-privileged-role-three-function-preview-uat.yml",
+      "gitBlobSha": "e853c16fbac92693df0de52cfb726ca78d5adca4",
+      "sha256": "9c514f713f15004dc95c179888d1ef313a5b3940a6f5234b33e241811411f07c"
+    },
+    {
+      "path": "tools/gravicentra-i6-6-assignment-detail-navigation.test.cjs",
+      "gitBlobSha": "49043851e468b37f54700172566670f778d61f13",
+      "sha256": "7703f0010e2aa2855a0956cf210ab0ba0791f2187423fbdfecf32cacb97d65c3"
+    },
+    {
+      "path": "tools/gravicentra-i6-6-direction-preview-qa-navigation-retry.test.cjs",
+      "gitBlobSha": "d6ad57e8516f9dbf239107c0e7263e9e9c44e5b7",
+      "sha256": "eea91284e1efb37a252b6e62de83f890d397b1cff72ff55ab63d5d4c5e33c715"
+    },
+    {
+      "path": "tools/gravicentra-i6-6-preview-current-live-restore-47f4.test.cjs",
+      "gitBlobSha": "c18f0f8687ee16df435b3083103d45e1400ed85b",
+      "sha256": "f43549ad66abbf68ff2c83a4cda4e8d8348f6c49cfb00d958d36c01a15e5b2fb"
+    },
+    {
+      "path": "artifacts/orbit360-recovery/release-control/I6_6_DIRECTION_PREVIEW_QA_NAVIGATION_RETRY_20261116.json",
+      "gitBlobSha": "d85042517f0bde059d49514beb443f8b544eaa8d",
+      "sha256": "d6297a5c2c59424470119d20aaf912c7353ae895bf7bc1196d8d2e9d8c1f8431"
+    }
+  ],
+  "originalDecisionReceipt": "artifacts/orbit360-recovery/release-control/I6_6_DIRECTION_PREVIEW_LEGAL_ACCEPTANCE_20261116.json",
+  "originalDecisionReceiptSha256": "68d3961987e19acdc223b7d2adf01eb39c540ca6ae8aa72c64752cab45fddbae",
+  "technicalDecisionBindingReceipt": "artifacts/orbit360-recovery/release-control/I6_6_DIRECTION_PREVIEW_QA_NAVIGATION_RETRY_20261116.json",
+  "technicalDecisionBindingReceiptSha256": "d6297a5c2c59424470119d20aaf912c7353ae895bf7bc1196d8d2e9d8c1f8431",
+  "originalTermsAndLegalOwnerUnchanged": true,
+  "newConsentInvented": false,
+  "liveConsentGranted": false,
+  "freshReadOnlyPreviewInventory": {
+    "runId": 43758700651,
+    "attempt": 4,
+    "jobId": 133697464760,
+    "observedAtUtc": "2026-11-16T23:39:40Z",
+    "previewHostingVersion": "sites/ays-orbit-360-lab/versions/bcc2259b8a2d7d5b",
+    "liveHostingVersion": "sites/ays-orbit-360-lab/versions/0766db29b338befc",
+    "metadataRead": "PASS",
+    "mutations": 0,
+    "historicalMarkerAssertion": "HOLD_OLD_SOURCE_EXPECTATION_NOT_CURRENT_INVENTORY"
+  },
+  "restoreAuthorization": {
+    "schema": "GI_I66_EXACT_FAILED_PREVIEW_RESTORE_V1",
+    "status": "EXACT_FAILED_PREVIEW_TO_R11_PREVIEW_RESTORE_AUTHORIZED",
+    "approvedByDirection": true,
+    "channelId": "gi-i66-rc-42868854629",
+    "previewUrl": "https://ays-orbit-360-lab--gi-i66-rc-42868854629-abj14q6n.web.app",
+    "failedCandidate": {
+      "sourceSha": "47f4d2de26e02d1792f31563288a64819e4b64d1",
+      "buildRunId": 43978039744,
+      "artifactId": 14282155921,
+      "artifactDigest": "sha256:b35146189da52846bc03580cb3d5b6fdc82bdc5b51e2c6574474c53d97c39a32",
+      "hostingVersion": "sites/ays-orbit-360-lab/versions/bcc2259b8a2d7d5b",
+      "qaRunId": 43978867873,
+      "qaHeadSha": "b9bf7ffaff28124dbae4c67b7a255b8f2326cf16",
+      "qaJobId": 133689959216
+    },
+    "failedQaDiagnostic": {
+      "artifactId": 14282532244,
+      "artifactDigest": "sha256:fb5834274d39b8862c03d1dd32346957f92b1bb324d6a51c4b1f854dd62f450c",
+      "artifactName": "gi-i66-preview-failure-diagnostic-43978867873",
+      "archiveSize": 796,
+      "entryName": "i66-preview-failure-diagnostic.json",
+      "entrySha256": "20155e29e65291632b664d4d4267d442cbf783276df64c82d8e8c5aaae505e36"
+    },
+    "currentLive": {
+      "sourceSha": "84769378eb2014addebfefdbdd63091bddc4b817",
+      "buildRunId": 43503721126,
+      "artifactId": 14075022275,
+      "artifactDigest": "sha256:b0f3bacb68511cdfc91ac934602c51f55afec5c1d6428d886d13a72a706ee283",
+      "hostingVersion": "sites/ays-orbit-360-lab/versions/0766db29b338befc",
+      "liveRunId": 43506971214,
+      "liveHeadSha": "2a733fd4a28294bf57f3136b44501981a38c0c92"
+    },
+    "inventoryRunId": 43758700651,
+    "inventoryHeadSha": "ce176e1244d74c55a5453559d3f11f7b9822a0e6",
+    "inventoryRunAttempt": 1,
+    "inventoryEvidenceUse": "ARCHIVED_READONLY_WORKFLOW_PROVENANCE_NOT_CURRENT_CHANNEL_STATE",
+    "expectedChannelCreatedAt": "2026-11-10T17:50:59.307316958Z",
+    "expectedSiteFileCount": 223,
+    "backupBeforeOverwrite": true,
+    "readbackBeforeAndAfter": true,
+    "noLiveChanges": true,
+    "noBusinessDataWrites": true,
+    "noBackendChanges": true,
+    "noRulesAuthIamChanges": true,
+    "noChannelDeletion": true
+  },
+  "sourceQa": "REQUIRED_BEFORE_PUBLISH",
+  "newImmutableBuild": "NOT_EXECUTED",
+  "newSignedPreview": "NOT_EXECUTED",
+  "lastAcceptedLiveSource": "84769378eb2014addebfefdbdd63091bddc4b817",
+  "realRecordWrites": 0,
+  "progress": {
+    "opsVerified": 6,
+    "opsRequired": 8,
+    "fiveBlockVerified": 19,
+    "fiveBlockRequired": 31
+  },
+  "mapfreSameConditionsAlreadyApproved": true
+}

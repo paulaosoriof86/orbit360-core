@@ -62,6 +62,7 @@ jobs:
           set -euo pipefail
           node --test tools/gravicentra-i6-6-operational-release-candidate.test.cjs
           node --test tools/gravicentra-i6-6-advisor-payables-signed-uat.test.cjs tools/gravicentra-i6-6-finance-ui-diagnostics.test.cjs
+          node --test tools/gravicentra-i6-6-assignment-detail-navigation.test.cjs tools/gravicentra-i6-6-direction-preview-qa-navigation-retry.test.cjs tools/gravicentra-i6-6-preview-current-live-restore-47f4.test.cjs
           node tools/gravicentra-i6-6-operational-release-candidate.cjs preview
           node tools/gravicentra-i6-6-delta-guard.mjs > "$RUNNER_TEMP/i66-role-delta-guard.log"
           node --test tools/gravicentra-i6-6-privileged-role-portfolio-parity.test.cjs tools/gravicentra-i6-6-privileged-role-writer-transaction.test.cjs
