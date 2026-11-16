@@ -195,8 +195,8 @@
     },
     {
       "id": "P0-PUBLISH-CURRENT-DELTA",
-      "state": "GENUINE_DIRECTION_PREVIEW_ACCEPTANCE_RECEIVED_NEW_IMMUTABLE_BUILD_REQUESTED",
-      "scope": "One new immutable build and the same existing isolated Preview channel, exact current three domain functions and four signed drivers. Preserve the failed257 artifact; apply genuine Direction legal decision by ordinary UI with exact actor/origin/version/text verification. R11 remains last accepted LIVE until successful signed proof and exact promotion.",
+      "state": "IMMUTABLE_PREVIEW_BUILT_SIGNED_QA_AUTHORIZED",
+      "scope": "Exact source 2d4e2d0 and artifact14280030529; four existing signed drivers, three exact Preview functions, genuine Direction acceptance of unchanged version2.0 by normal UI. No new LIVE acceptance or real corrections inferred.",
       "doneWhen": "Real workflow receipts, exact digests and post-deploy business-function verification. Successful build alone is not acceptance."
     },
     {
@@ -299,5 +299,15 @@
     "realWrites": 0,
     "cleanup": "PASS_ZERO_REMAINING",
     "lastAcceptedLiveUnchanged": true
+  },
+  "directionLegalPreviewBuild20261116": {
+    "status": "IMMUTABLE_PREVIEW_BUILD_READBACK_PASS_SIGNED_QA_AUTHORIZED_NOT_ACCEPTED",
+    "receipt": "artifacts/orbit360-recovery/release-control/I6_6_DIRECTION_LEGAL_PREVIEW_BUILD_20261116.json",
+    "sourceSha": "2d4e2d007d42560ca0ed0e7ce4108c889b416539",
+    "buildRunId": 43971611822,
+    "artifactId": 14280030529,
+    "lastAcceptedLiveUnchanged": true,
+    "realRecordWrites": 0,
+    "newLiveAcceptanceClaimed": false
   }
 }
