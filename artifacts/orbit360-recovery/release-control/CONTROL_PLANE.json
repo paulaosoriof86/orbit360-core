@@ -9,7 +9,7 @@
     "activeGate": "I6.6",
     "closedHistoricalGate": "B4-007",
     "latestProvenLiveSource": "84769378eb2014addebfefdbdd63091bddc4b817",
-    "currentWork": "Repair two legacy QA selectors against the current accepted full-page policy owner, with no product changes. Rebuild and prove the exact signed Preview gate; preserve R11 and all real records.",
+    "currentWork": "Execute exact immutable39f signed Preview after QA navigation correction; preserve R11 and all real operational/financial records until proven gates.",
     "newFinancialWrites": 0,
     "newLiveAcceptanceClaimed": false
   },
@@ -3344,7 +3344,7 @@
     "i63LiveReadbackPass": true,
     "i63DeterministicDiffReady": true
   },
-  "nextAction": "I6_6_QA_NAVIGATION_CAUSAL_RETRY_20261116: FAILED47_LEGAL_AND_FINANCE_STEPS_PASSED_THEN_LEGACY_EDIT_SELECTOR_FAILED; SYNTHETICS_RESTORED_REMAINING_ZERO. UPDATE_QA_TO_ACCEPTED_FULL_PAGE_OWNER_WITH_PRODUCT_BYTES_UNCHANGED; NEW_IMMUTABLE_BUILD_THEN_EXISTING_FOUR_SIGNED_PREVIEW_DRIVERS. EXACT_FAILED47_PREVIEW_RESTORE_AUTHORIZED_NOT_YET_EXECUTED. R11_LIVE_UNCHANGED. ORIGINAL_DIRECTION_PREVIEW_DECISION_RETAINED_FOR_EXACT_RETRY_ONLY. MAPFRE_SAME_CONDITIONS_ALREADY_APPROVED. OPS_6_OF_8_OVERALL_19_OF_31; NO_REAL_WRITES.",
+  "nextAction": "I6_6_QA_NAVIGATION_PREVIEW_BUILD_20261116: EXACT39F54E24_ARTIFACT14283796218_BUILD_AND223_FILE_PREVIEW_READBACK_PASS; PRODUCT_BYTES_UNCHANGED_FROM47. EXECUTE_EXISTING_FOUR_SIGNED_PREVIEW_DRIVERS_USING_CURRENT_FULL_PAGE_POLICY_CONTROLS_AND_EXACT_EXISTING_DIRECTION_PREVIEW_DECISION. THREE_PREVIEW_FUNCTIONS_ONLY; NO_REAL_RECORD_WRITES_OR_LIVE_PROMOTION. R11_REMAINS_LAST_ACCEPTED_LIVE. MAPFRE_SAME_CONDITIONS_ALREADY_APPROVED. OPS6_OF8_OVERALL19_OF31.",
   "postproductionExitProgress": {
     "formalPercent": 60,
     "frozenMiniGates": 6,
@@ -22936,6 +22936,16 @@
     "receipt": "artifacts/orbit360-recovery/release-control/I6_6_QA_NAVIGATION_CAUSAL_RETRY_20261116.json",
     "sourceParent": "b9bf7ffaff28124dbae4c67b7a255b8f2326cf16",
     "productSourceChanges": 0,
+    "lastAcceptedLiveUnchanged": true,
+    "realRecordWrites": 0,
+    "newLiveAcceptanceClaimed": false
+  },
+  "i66QaNavigationPreviewBuild20261116": {
+    "status": "IMMUTABLE_PREVIEW_BUILD_READBACK_PASS_SIGNED_QA_AUTHORIZED_NOT_ACCEPTED",
+    "receipt": "artifacts/orbit360-recovery/release-control/I6_6_QA_NAVIGATION_PREVIEW_BUILD_20261116.json",
+    "sourceSha": "39f54e24e59983a59a7c9a41912e0eed154efa18",
+    "buildRunId": 43982177239,
+    "artifactId": 14283796218,
     "lastAcceptedLiveUnchanged": true,
     "realRecordWrites": 0,
     "newLiveAcceptanceClaimed": false

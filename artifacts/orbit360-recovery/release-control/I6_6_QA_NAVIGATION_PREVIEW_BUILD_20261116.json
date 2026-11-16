@@ -1,0 +1,75 @@
+{
+  "schema": "GI_I66_QA_NAVIGATION_PREVIEW_BUILD_V1",
+  "dateGuatemala": "2026-11-16",
+  "status": "IMMUTABLE_PREVIEW_BUILD_READBACK_PASS_SIGNED_QA_AUTHORIZED_NOT_ACCEPTED",
+  "activeGate": "I6.6",
+  "sourceSha": "39f54e24e59983a59a7c9a41912e0eed154efa18",
+  "sourceParent": "b9bf7ffaff28124dbae4c67b7a255b8f2326cf16",
+  "buildRunId": 43982177239,
+  "buildJobId": 133701319485,
+  "buildConclusion": "success",
+  "artifactId": 14283796218,
+  "artifactDigest": "sha256:ba90d53bd4bafdea75748df779539e8efab75e75bf93845215dd20ba8c34e0d8",
+  "immutableTarSha256": "f366fb16987b9071fce7246a4541973b5bc0f2d4457fb54574a5998808d5b6fe",
+  "buildId": "gi-i66-39f54e24e599-57f234755dc1",
+  "previewUrl": "https://ays-orbit-360-lab--gi-i66-rc-42868854629-abj14q6n.web.app",
+  "previewChannelId": "gi-i66-rc-42868854629",
+  "verifiedManifests": {
+    "site": {
+      "files": 223,
+      "manifestSha256": "71e92413aa5a703c5cd0f086491bcc712c11721057eb02d352d5eff7f0c18e7f"
+    },
+    "backend": {
+      "files": 44,
+      "manifestSha256": "0690d628e4b548040de4f4cb4e688c3243c3573fc111cf283ca800fffb57cdc0"
+    },
+    "bundle": {
+      "files": 269,
+      "manifestSha256": "3bd9b5f09fb80288a0d0c667a4d52b8ad1b3da165ae0eb1dcefa135aec5d30f2"
+    }
+  },
+  "archiveAndAllPackageFileDigestsIndependentlyVerified": true,
+  "allPreviewSiteFilesReadBackByBuild": 223,
+  "localPreflight": "PASS_68_PINNED_TEST_SUITES_AND_33_NEW_CASES",
+  "productSourceChangedFrom47": false,
+  "restoreEvidence": {
+    "artifactId": 14281869510,
+    "artifactDigest": "sha256:04d8b252a3d00f2b4bbf62fb8b1fd30c55d99389ea02ea26762baf2f3f58bae8",
+    "status": "EXACT_R11_PREVIEW_RESTORED_VERIFIED_NOT_PRODUCT_ACCEPTANCE",
+    "failedCandidate": "47f4d2de26e02d1792f31563288a64819e4b64d1",
+    "bothImmutableBackupsAndArchiveDigestsIndependentlyVerified": true,
+    "full223FileBeforeAfterChecks": true,
+    "otherChannelsUnchanged": true,
+    "liveWrites": 0,
+    "backendWrites": 0,
+    "businessDataWrites": 0,
+    "authIamWrites": 0
+  },
+  "legalAcceptance": {
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_DIRECTION_PREVIEW_LEGAL_ACCEPTANCE_20261116.json",
+    "receiptSha256": "68d3961987e19acdc223b7d2adf01eb39c540ca6ae8aa72c64752cab45fddbae",
+    "decisionId": "DIRECTION_PREVIEW_INTERNAL_LEGAL_V2_ACCEPTED_20261116",
+    "sourceSha": "39f54e24e59983a59a7c9a41912e0eed154efa18",
+    "phase": "PREVIEW",
+    "actorRole": "direccion"
+  },
+  "legalTechnicalRetry": {
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_DIRECTION_PREVIEW_QA_NAVIGATION_RETRY_20261116.json",
+    "receiptSha256": "d6297a5c2c59424470119d20aaf912c7353ae895bf7bc1196d8d2e9d8c1f8431",
+    "sourceParent": "b9bf7ffaff28124dbae4c67b7a255b8f2326cf16",
+    "sourceSha": "39f54e24e59983a59a7c9a41912e0eed154efa18",
+    "legalOwnerSha256": "b74a965b7be0d67862d82bcf73dacc0d5a8293dcf30cb4f5f3fdeaa6ee1c68a3"
+  },
+  "signedPreviewStatus": "NOT_YET_EXECUTED_FOR_THIS_SOURCE",
+  "lastAcceptedLiveSource": "84769378eb2014addebfefdbdd63091bddc4b817",
+  "bothLiveOriginsUnchanged": true,
+  "newLiveAcceptanceClaimed": false,
+  "realCustomerOrFinancialWrites": 0,
+  "progress": {
+    "opsVerified": 6,
+    "opsRequired": 8,
+    "fiveBlockVerified": 19,
+    "fiveBlockRequired": 31
+  },
+  "knownLivePrerequisite": "Existing consent is explicitly Preview-only; LIVE and other actors require their own genuine decision and reviewed technical path."
+}

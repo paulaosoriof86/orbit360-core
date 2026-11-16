@@ -197,8 +197,8 @@
     },
     {
       "id": "P0-PUBLISH-CURRENT-DELTA",
-      "state": "CAUSAL_QA_NAVIGATION_REPAIR_NEW_IMMUTABLE_BUILD_REQUIRED",
-      "scope": "QA-only exact full-page navigation, same product and legal clauses. New immutable source/build, same three Preview functions and four signed drivers, real records untouched. LIVE legal scope remains distinct.",
+      "state": "IMMUTABLE_QA_NAVIGATION_PREVIEW_BUILT_SIGNED_QA_AUTHORIZED",
+      "scope": "Exact39f source/artifact14283796218, four existing signed drivers and three exact Preview functions. No product delta, original exact Direction Preview decision preserved. No new LIVE acceptance or real corrections inferred.",
       "doneWhen": "Real workflow receipts, exact digests and post-deploy business-function verification. Successful build alone is not acceptance."
     },
     {
@@ -337,6 +337,16 @@
     "receipt": "artifacts/orbit360-recovery/release-control/I6_6_QA_NAVIGATION_CAUSAL_RETRY_20261116.json",
     "sourceParent": "b9bf7ffaff28124dbae4c67b7a255b8f2326cf16",
     "productSourceChanges": 0,
+    "lastAcceptedLiveUnchanged": true,
+    "realRecordWrites": 0,
+    "newLiveAcceptanceClaimed": false
+  },
+  "qaNavigationPreviewBuild20261116": {
+    "status": "IMMUTABLE_PREVIEW_BUILD_READBACK_PASS_SIGNED_QA_AUTHORIZED_NOT_ACCEPTED",
+    "receipt": "artifacts/orbit360-recovery/release-control/I6_6_QA_NAVIGATION_PREVIEW_BUILD_20261116.json",
+    "sourceSha": "39f54e24e59983a59a7c9a41912e0eed154efa18",
+    "buildRunId": 43982177239,
+    "artifactId": 14283796218,
     "lastAcceptedLiveUnchanged": true,
     "realRecordWrites": 0,
     "newLiveAcceptanceClaimed": false
