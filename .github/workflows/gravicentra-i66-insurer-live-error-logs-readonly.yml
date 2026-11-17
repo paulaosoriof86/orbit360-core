@@ -1,6 +1,6 @@
-# I6.6: classify LIVE insurer and Cobros callable failures, without printing
+# I6.6: classify bounded PREVIEW proposal and LIVE callable failures, without printing
 # customer fields, identity, receipt numbers or full log messages.
-name: Gravicentra I6.6 Insurer LIVE Error Classification Readonly
+name: Gravicentra I6.6 Callable Error Classification Readonly
 on:
   push:
     branches: [recovery/fase-a-clean-20260831]
@@ -33,12 +33,12 @@ jobs:
           (async()=>{
             const client=await new GoogleAuth({credentials:service,scopes:['https://www.googleapis.com/auth/logging.read']}).getClient();
             const token=await client.getAccessToken();
-            const filter='timestamp>="2026-11-10T12:00:00Z" AND timestamp<="2026-11-12T06:00:00Z" AND (resource.type="cloud_run_revision" OR resource.type="cloud_function") AND (resource.labels.service_name="orbit360productoperationalcommand" OR resource.labels.function_name="orbit360ProductOperationalCommand" OR resource.labels.service_name="orbit360cobrosreconciliationcommand" OR resource.labels.function_name="orbit360CobrosReconciliationCommand")';
+            const filter='timestamp>="2026-11-17T02:00:00Z" AND timestamp<="2026-11-17T02:45:00Z" AND (resource.type="cloud_run_revision" OR resource.type="cloud_function") AND (resource.labels.service_name="orbit360productoperationalcommand" OR resource.labels.function_name="orbit360ProductOperationalCommand" OR resource.labels.service_name="orbit360cobrosreconciliationcommand" OR resource.labels.function_name="orbit360CobrosReconciliationCommand" OR resource.labels.service_name="orbit360cobrosreconciliationcommandpreview" OR resource.labels.function_name="orbit360CobrosReconciliationCommandPreview")';
             const req=await fetch('https://logging.googleapis.com/v2/entries:list',{method:'POST',headers:{Authorization:'Bearer '+token.token,'content-type':'application/json'},
               body:JSON.stringify({resourceNames:['projects/ays-orbit-360-lab'],filter,pageSize:250,orderBy:'timestamp desc'}),signal:AbortSignal.timeout(30000)});
             console.log('I66_LOGGING_HTTP_STATUS='+req.status);
             if(!req.ok){console.log('I66_LOGGING_ACCESS_HOLD_NO_BYPASS=true');process.exitCode=1;return;}
-            const response=await req.json(),entries=response.entries||[],counts={},byService={};
+            const response=await req.json(),entries=response.entries||[],counts={},byService={},bySeverity={},safeStackFrames={};
             const patterns=[
               ['CLOUD_FUNCTION_ERROR',/function execution|callable error|exception/i],
               ['INSURER_SCOPE',/insurer.*scope|aseguradora.*alcance|no autorizado para modificar|permission.denied/i],
@@ -50,16 +50,27 @@ jobs:
               ['NETWORK_OR_TIMEOUT',/deadline.exceeded|timeout|unavailable|resource.exhausted/i],
               ['ALREADY_PAID_OR_CONFLICT',/already.paid|payment.already.applied|duplicate|conflict|ya pagad/i],
               ['MISSING_PAYMENT_EVIDENCE',/source.evidence|insurance.statement|source.*not.found|evidencia/i],
-              ['AUTHORIZATION',/unauthenticated|authorization|not.authorized/i]
+              ['AUTHORIZATION',/unauthenticated|authorization|not.authorized/i],
+              ['FIRESTORE_UNDEFINED',/undefined|invalid firestore data|unsupported field value|cannot use undefined/i],
+              ['FIRESTORE_TRANSACTION_ORDER',/all reads before writes|reads.*before.*writes|read after write/i],
+              ['FIRESTORE_TRANSACTION_ABORT',/transaction.*failed|aborted|too much contention|transaction retry/i],
+              ['FIRESTORE_INDEX',/requires an index|index.*needed|failed.precondition|query requires/i],
+              ['TYPE_ERROR',/TypeError|Cannot read properties of/i],
+              ['REFERENCE_ERROR',/ReferenceError|is not defined/i],
+              ['PROPOSAL_DOMAIN_STACK',/cobros-reconciliation-domain\.js|proposal-application-boundary\.js/i]
             ];
             for(const e of entries){
               const s=String(e.textPayload||'')+' '+JSON.stringify(e.jsonPayload||{});
               const tags=patterns.filter(([_,re])=>re.test(s)).map(([tag])=>tag);
               for(const tag of tags.length?tags:['UNCLASSIFIED'])counts[tag]=(counts[tag]||0)+1;
+              const severity=String(e.severity||'DEFAULT');bySeverity[severity]=(bySeverity[severity]||0)+1;
+              for(const m of s.matchAll(/(?:cobros-reconciliation-domain|proposal-application-boundary)\.js:(\d{1,4})/g)){
+                const frame=(m[0].startsWith('cobros')?'DOMAIN:':'BOUNDARY:')+m[1];safeStackFrames[frame]=(safeStackFrames[frame]||0)+1;
+              }
               const service=String(e.resource?.labels?.service_name||e.resource?.labels?.function_name||'unknown').toLowerCase();
-              const bucket=service.includes('cobros')?'COBROS':service.includes('operational')?'INSURER_AND_GENERAL':'OTHER';
+              const bucket=service.includes('cobros')?(service.includes('preview')?'COBROS_PREVIEW':'COBROS_LIVE'):service.includes('operational')?'INSURER_AND_GENERAL':'OTHER';
               byService[bucket]=(byService[bucket]||0)+1;
             }
-            console.log('I66_LIVE_INSURER_COBROS_FUNCTION_LOG_READONLY='+JSON.stringify({entries:entries.length,byService,classifiedCounts:counts,more:Boolean(response.nextPageToken),boundedUtc:'2026-11-10T12:00:00Z/2026-11-12T06:00:00Z',noLogBodyOrPersonalData:true,zeroWrites:true}));
+            console.log('I66_LIVE_INSURER_COBROS_FUNCTION_LOG_READONLY='+JSON.stringify({entries:entries.length,byService,bySeverity,classifiedCounts:counts,safeStackFrames,more:Boolean(response.nextPageToken),boundedUtc:'2026-11-17T02:00:00Z/2026-11-17T02:45:00Z',noLogBodyOrPersonalData:true,zeroWrites:true}));
           })().catch(e=>{console.log('I66_LOGGING_UNAVAILABLE_CLASS='+String(e?.code||e?.name||'ERROR').replace(/[^A-Za-z0-9_]/g,'').slice(0,40));process.exitCode=1;});
           NODE
