@@ -1,0 +1,121 @@
+{
+  "schema": "GI_I66_CURRENT_TECHNICAL_PREVIEW_ROLLOVER_V1",
+  "status": "EXACT_CURRENT_TASK_PREVIEW_PASSIVE_NETWORK_DIAGNOSTIC_REBUILD",
+  "gate": "I6.6",
+  "phase": "PREVIEW",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "projectId": "ays-orbit-360-lab",
+  "sourceBaseHead": "181264419c614c9a8a0843fc834a95542e0f297a",
+  "executionAuthority": {
+    "kind": "EXISTING_I66_CONTINUE_CORRECT_TEST_AND_PUBLISH_SCOPE",
+    "canonicalPlan": "artifacts/orbit360-recovery/release-control/I6_6_OPERATIONAL_CONTINUATION_20261115.json",
+    "scope": "Replace only the current isolated technical Preview with the next immutable I6.6 candidate under the existing instruction to continue correction and signed verification. This is not an extension of the separate legal consent decision and not permission to delete any channel, change LIVE or apply payments.",
+    "newLegalConsentGrantUsedForHosting": false,
+    "mustStopOnBeforeStateDrift": true
+  },
+  "channel": {
+    "id": "gi-i66-rc-44009981499",
+    "origin": "https://ays-orbit-360-lab--gi-i66-rc-44009981499-d08psr2y.web.app",
+    "createdAt": "2026-11-17T03:34:28.874524705Z",
+    "expectedVersion": "sites/ays-orbit-360-lab/versions/0edf4cfe763bf50a"
+  },
+  "previousCandidate": {
+    "sourceSha": "62d50052a9b9196ebce8c4acd1bc66778ae89c06",
+    "buildRunId": 44173813709,
+    "buildRunAttempt": 1,
+    "artifactId": 14369500963,
+    "artifactDigest": "sha256:e31583c35aa76e2fcd904ffd1caa61bf589c9ada9acc4dd307a30e731e814c81",
+    "expectedSiteFileCount": 223,
+    "runtimeProofRequired": "DOWNLOAD_HASH_ARCHIVE_VALIDATE_MANIFEST_AND_COMPARE_EVERY_HOSTED_FILE_INCLUDING_BUILD_JSON_BEFORE_REPLACEMENT"
+  },
+  "protectedLive": {
+    "sourceSha": "84769378eb2014addebfefdbdd63091bddc4b817",
+    "buildRunId": 43503721126,
+    "artifactId": 14075022275,
+    "artifactDigest": "sha256:b0f3bacb68511cdfc91ac934602c51f55afec5c1d6428d886d13a72a706ee283",
+    "liveRunId": 43506971214,
+    "version": "sites/ays-orbit-360-lab/versions/0766db29b338befc",
+    "origins": [
+      "https://ays-orbit-360-lab.web.app",
+      "https://app.aysseguros.com"
+    ]
+  },
+  "freshInventoryEvidence": {
+    "runId": 44173813709,
+    "runAttempt": 1,
+    "jobId": 134359885977,
+    "totalChannels": 51,
+    "inventoryStep": "SUCCESS",
+    "wholeJob": "SUCCESS",
+    "rolloverEvidenceArtifactId": 14369695981,
+    "rolloverEvidenceArtifactDigest": "sha256:fc5300210d9902dfcdef34e58fc1d0b6979e8f3e4e6f825e3399a31493615fe8",
+    "afterInventorySha256": "9f0925f33cfdcfa29838818807a38cd04d011ef03fd1494ff2df1bffcf1353c8",
+    "comparison": "FULL_OTHER_FIFTY_CHANNEL_METADATA_EXACT_BEFORE_AFTER",
+    "otherChannelsIdenticalFullMetadata": 50,
+    "writes": 0,
+    "freshRuntimeInventoryRequiredAgain": true
+  },
+  "constraints": {
+    "onlyWhenNewChannelQuotaIsExhausted": true,
+    "backupBeforeOverwrite": true,
+    "readbackBeforeAndAfter": true,
+    "sameNewImmutableArtifact": true,
+    "noLiveChanges": true,
+    "noOtherChannelChanges": true,
+    "noChannelDeletion": true,
+    "noBackendChanges": true,
+    "noBusinessDataWrites": true,
+    "noRulesAuthIamChanges": true,
+    "stopOnIdentityDrift": true
+  },
+  "notAcceptance": {
+    "hostingReplacementIsNotSignedFunctionalPass": true,
+    "hostingReplacementIsNotProductionAcceptance": true,
+    "noOperationalPercentIncrease": true
+  },
+  "priorRolloverReceipt": {
+    "path": "artifacts/orbit360-recovery/release-control/I6_6_TECHNICAL_PREVIEW_SOURCE_INTAKE_RELOAD_REBUILD_20261117.json",
+    "sha256": "ae6d48b0260af9e9db7b7ba69e799a4a17e7adf23a24f1893168079dce05bf35",
+    "preserveBytes": true
+  },
+  "causalRetry": {
+    "defect": "The current exact signed Preview completed all five observed startup waits and restored synthetic records, but failed browser observability on one scoped-reader NETWORK_FAILURE and two native console errors. The subsequent readonly historical Logging query returned HTTP 403 before reading any page. Transport and prior startup causes remain unproven.",
+    "failedPreviewRunId": 44175297317,
+    "failedPreviewRunAttempt": 1,
+    "failedPreviewJobId": 134365013822,
+    "diagnosticArtifactId": 14369897476,
+    "diagnosticArtifactDigest": "sha256:7533108c8ae3358aeed1b16e2041efe138a53dbed9d43a409421efe5164c272b",
+    "failedRunRemainsFailed": true,
+    "observedFailureStage": "ASSIGNMENT_DOCUMENTARY_UI",
+    "failureCheck": "ADVISOR_UAT_BROWSER_OBSERVABILITY_HOLD",
+    "networkRequestStartedStage": "FINANCE_UI_HYDRATION",
+    "observedConsoleErrors": 10,
+    "observedNetworkFailures": 1,
+    "historicalRootCauseProven": false,
+    "priorStartupTimeoutCauseProven": false,
+    "readonlyLoggingRunId": 44178934101,
+    "readonlyLoggingHttpStatus": 403,
+    "readonlyLoggingPagesRead": 0,
+    "priorSyntheticCleanup": "PASS",
+    "priorSyntheticRemaining": 0,
+    "correction": "Retain allowlisted passive network failure reason metadata inside the existing observer and sanitizer. Preserve the exact functional, permissions, fixture, timeout, navigation, error and cleanup criteria; no product/backend/service-worker algorithm change.",
+    "preserveFunctionalChecksAndCleanup": true,
+    "doNotRetroactivelyClassifyConsole": true,
+    "unexpectedErrorsRemainHold": true,
+    "newSourceRequiresNewBuildDigest": true,
+    "noLiveOrRealPaymentAuthority": true,
+    "noReuseOfPriorPreviewPassForNewSource": true,
+    "noRebuildOfCertifiedArtifactInPlace": true,
+    "unexpectedConsoleErrors": 2
+  },
+  "previousPreviewReadback": {
+    "status": "EXACT_PREVIEW_REPLACEMENT_READBACK_PASS_NOT_FUNCTIONAL_ACCEPTANCE",
+    "recordedAtUtc": "2026-11-17T20:55:52.989Z",
+    "files": 223,
+    "manifestSha256": "4bdd76cbfe0722343c1a9a909bc0b3d6c25cb386cf152a70275fb4e03aee4d85",
+    "hostingVersion": "sites/ays-orbit-360-lab/versions/0edf4cfe763bf50a",
+    "currentBuildReceipt": "artifacts/orbit360-recovery/release-control/I6_6_STARTUP_DIAGNOSTICS_PREVIEW_BUILD_20261117.json",
+    "runtimeFullReadbackRequiredAgain": true
+  }
+}

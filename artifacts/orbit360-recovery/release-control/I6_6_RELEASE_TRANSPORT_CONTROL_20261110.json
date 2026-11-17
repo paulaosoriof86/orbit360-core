@@ -4,10 +4,10 @@
   "productBrand": "Gravicentra Insurance",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
-  "status": "R11_RENEWAL_DRIVE_EXACT_LIVE_ACCEPTED_LOCKED",
+  "status": "PREVIEW_BUILD_REQUESTED",
   "currentTechnicalPreviewRollover": {
-    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_TECHNICAL_PREVIEW_SOURCE_INTAKE_RELOAD_REBUILD_20261117.json",
-    "receiptSha256": "ae6d48b0260af9e9db7b7ba69e799a4a17e7adf23a24f1893168079dce05bf35"
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_TECHNICAL_PREVIEW_NETWORK_DIAGNOSTIC_REBUILD_20261117.json",
+    "receiptSha256": "42b558b0720fdb5d8c8a907a8ed5415cb769232e2409efbb4dde9fdaef724c04"
   },
   "directionSameTermsPreviewScope": {
     "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_DIRECTION_PREVIEW_V2_SCOPE_AUTHORIZATION_20261116.json",
@@ -408,8 +408,8 @@
     "priorR7HostingRollback": "sites/ays-orbit-360-lab/versions/9cedc5ecda75bb2a",
     "fullI66FinancialProductionAcceptance": false
   },
-  "currentReleaseStatus": "LIVE_NOCHANGE_SIGNED_PREVIEW_NETWORK_HOLD_DIAGNOSTIC_READ_PENDING",
-  "scope": "Current R11 LIVE remains accepted and locked. Exact 62d500 Preview build and executed rollover are retained, but signed QA failed on an unexplained scoped-reader network error. Only existing Cloud Run log reading is next. No acceptance, grant, deployment, build, signed rerun or real business writes.",
+  "currentReleaseStatus": "R11_RETAINED_LOGGING_403_PASSIVE_NETWORK_QA_DIAGNOSTIC_BUILD_REQUESTED",
+  "scope": "Existing I6.6 block 2: immutable build for passive network diagnostics and exact current Preview rollover pins only. Product/backend, permissions, fixtures, reloads, timeouts, error verdicts and historical evidence are preserved. Current R11 remains protected. No LIVE, financial, Rules/Auth/IAM or other-channel authority.",
   "historicalClosedGate": "B4-007",
   "approvedProductDeltaManifest": "artifacts/orbit360-recovery/release-control/I6_6_APPROVED_PRODUCT_DELTA_MANIFEST_20261110.json",
   "ownerAuthority": "Paula Osorio Dirección 2026-11-12: Operativo tiene escritura integral en cada módulo autorizado, con paridad funcional para roles superiores según sus permisos, país, tenant y auditoría; cada arreglo probado pasa inmediatamente a LIVE desde un artefacto exacto. Alcance R7 autorizado, Preview firmado PASS 43375403003 y LIVE exacto publicado con tres funciones y hosting 223/223 en ambas URL, actores reales Carlos y Dirección y escrituras sintéticas reversibles PASS 43375687134. Mantener el resto de UAT real por país/rol, documentación real de aseguradora, UI legal y escrituras financieras en HOLD hasta prueba específica, sin tocar Firestore Rules, Auth ni IAM. Histórico R5/R6 se conserva como linaje, no como estado actual.",
@@ -736,11 +736,16 @@
     "conclusion": "This real GT insurer saves as Direccion now; generic role denial not supported."
   },
   "nextImmutablePreviewBuildRequest": {
-    "status": "DIAGNOSTIC_READ_ONLY_CAUSE_PENDING_NO_NEW_BUILD_REQUESTED",
-    "sourceSha": "62d50052a9b9196ebce8c4acd1bc66778ae89c06",
-    "buildRunId": 44173813709,
-    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_STARTUP_DIAGNOSTICS_PREVIEW_BUILD_20261117.json",
-    "newImmutableBuildRequired": false
+    "status": "REQUESTED_FOR_PASSIVE_NETWORK_QA_DIAGNOSTICS",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_SCOPED_READER_LOGGING_HOLD_AND_PASSIVE_NETWORK_DIAGNOSTIC_SOURCE_20261117.json",
+    "sourceSha": "EXACT_TRIGGERING_COMMIT",
+    "sourceBaseHead": "181264419c614c9a8a0843fc834a95542e0f297a",
+    "newImmutableBuildRequired": true,
+    "newBuildIdKnown": false,
+    "productAndBackendSourceUnchanged": true,
+    "livePromotion": false,
+    "technicalRolloverReceipt": "artifacts/orbit360-recovery/release-control/I6_6_TECHNICAL_PREVIEW_NETWORK_DIAGNOSTIC_REBUILD_20261117.json",
+    "technicalRolloverReceiptSha256": "42b558b0720fdb5d8c8a907a8ed5415cb769232e2409efbb4dde9fdaef724c04"
   },
   "emulatorQaRunId": 43127221947,
   "controlPlaneGuardRunId": 44175298256,
@@ -755,7 +760,7 @@
   "liveAccessGuard": "UNAUTHENTICATED_401_PASS",
   "hostingOriginsUntouched": true,
   "liveCustomerDataWrites": 0,
-  "releaseStatus": "LIVE_NOCHANGE_SIGNED_PREVIEW_NETWORK_HOLD_DIAGNOSTIC_READ_PENDING",
+  "releaseStatus": "R11_RETAINED_LOGGING_403_PASSIVE_NETWORK_QA_DIAGNOSTIC_BUILD_REQUESTED",
   "pendingFrontendTopbarRelease": {
     "receipt": "artifacts/orbit360-recovery/release-control/I6_6_GLOBAL_TOPBAR_CROSSMODULE_HYDRATION_20261111.json",
     "currentStatus": "SOURCE_UNIT_PASS_IMMUTABLE_BUILD_REQUESTED",
@@ -3055,7 +3060,7 @@
     "sourceQaReceipt": "artifacts/orbit360-recovery/release-control/I6_6_SOURCE_INTAKE_V2_PRECISION_CAUSAL_SOURCE_QA_20261117.json",
     "sourceQaTerminalTestFilesPass": 79
   },
-  "approvedSourceSha": "62d50052a9b9196ebce8c4acd1bc66778ae89c06",
+  "approvedSourceSha": null,
   "sourceIntakePrecisionPreviewBuild20261117": {
     "status": "IMMUTABLE_PREVIEW_EXACT_READBACK_PASS_SIGNED_FUNCTIONAL_QA_PENDING",
     "sourceSha": "6b6e8bbba3371b32a1bfb80b903c40377e11d727",
@@ -3846,5 +3851,50 @@
     },
     "newPreviewAcceptance": false,
     "newLiveAcceptance": false
+  },
+  "priorTechnicalPreviewRolloverBeforeNetworkDiagnosticBuild20261117": {
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_TECHNICAL_PREVIEW_SOURCE_INTAKE_RELOAD_REBUILD_20261117.json",
+    "receiptSha256": "ae6d48b0260af9e9db7b7ba69e799a4a17e7adf23a24f1893168079dce05bf35"
+  },
+  "priorBuildRequestBeforeNetworkDiagnosticBuild20261117": {
+    "status": "DIAGNOSTIC_READ_ONLY_CAUSE_PENDING_NO_NEW_BUILD_REQUESTED",
+    "sourceSha": "62d50052a9b9196ebce8c4acd1bc66778ae89c06",
+    "buildRunId": 44173813709,
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_STARTUP_DIAGNOSTICS_PREVIEW_BUILD_20261117.json",
+    "newImmutableBuildRequired": false
+  },
+  "networkDiagnosticBuildRequest20261117": {
+    "status": "REQUESTED_FOR_PASSIVE_NETWORK_QA_DIAGNOSTICS",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_SCOPED_READER_LOGGING_HOLD_AND_PASSIVE_NETWORK_DIAGNOSTIC_SOURCE_20261117.json",
+    "sourceSha": "EXACT_TRIGGERING_COMMIT",
+    "sourceBaseHead": "181264419c614c9a8a0843fc834a95542e0f297a",
+    "newImmutableBuildRequired": true,
+    "newBuildIdKnown": false,
+    "productAndBackendSourceUnchanged": true,
+    "livePromotion": false,
+    "technicalRolloverReceipt": "artifacts/orbit360-recovery/release-control/I6_6_TECHNICAL_PREVIEW_NETWORK_DIAGNOSTIC_REBUILD_20261117.json",
+    "technicalRolloverReceiptSha256": "42b558b0720fdb5d8c8a907a8ed5415cb769232e2409efbb4dde9fdaef724c04"
+  },
+  "loggingReadOnlyAccessHold20261117": {
+    "status": "READONLY_QUERY_HOLD_HTTP403_NO_PAGES_NOT_FUNCTIONAL_ACCEPTANCE",
+    "runId": 44178934101,
+    "jobId": 134377724028,
+    "headSha": "181264419c614c9a8a0843fc834a95542e0f297a",
+    "artifactId": 14370893169,
+    "artifactDigest": "sha256:99f7267dacc646801e6be197eed130dbe5dca12a33b7b668f6e19b4435c75824",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_SCOPED_READER_LOGGING_HOLD_AND_PASSIVE_NETWORK_DIAGNOSTIC_SOURCE_20261117.json",
+    "rawProofPath": "artifacts/orbit360-recovery/release-control/I6_6_SCOPED_READER_LOGGING_READONLY_HOLD_20261117.json",
+    "rawProofSha256": "6e429c8d755e5eaa9d8821f77aa2c11623c0b4bfb729ee1aa15ae79c639d0ef6",
+    "loggingApiHttpStatuses": [
+      403
+    ],
+    "pagesRead": 0,
+    "entriesSeen": 0,
+    "zeroCountersProveNoErrors": false,
+    "rootCauseProven": false,
+    "requestStatusLatencyRevisionAvailable": false,
+    "functionalAcceptance": false,
+    "zeroWrites": true,
+    "noRetryOrPermissionChange": true
   }
 }

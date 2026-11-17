@@ -159,6 +159,96 @@ test('noncancelled network failure and expected-request cancellation fail closed
   const item=catalog[0],other=harness('operativo'),token=start(other,item);other.ledger.onRequest(wire(item));other.ledger.onLoadingFailed({requestId:item.id,canceled:true});
   await assert.rejects(other.ledger.confirmDenial(token,sdk(item),1));assert.doesNotMatch(JSON.stringify(other.ledger.summary()),new RegExp(secret));
 });
+test('late CORS transport failure retains observed codes and both stages but still fails after all eight denials pass',async()=>{
+  const h=await complete(),ledger=h.direction.ledger;
+  h.direction.setStage('FINANCE_UI_HYDRATION');
+  ledger.onRequest({requestId:'scoped-reader',timestamp:100,type:'Fetch',request:{method:'POST',
+    url:'https://us-east1-ays-orbit-360-lab.cloudfunctions.net/orbit360ScopedPolicyReadPreview?token='+secret,
+    headers:{Authorization:secret},postData:secret}});
+  h.direction.setStage('ASSIGNMENT_DOCUMENTARY_UI');
+  ledger.onLoadingFailed({requestId:'scoped-reader',timestamp:102.75,canceled:false,errorText:'net::ERR_FAILED',blockedReason:'origin',
+    corsErrorStatus:{corsError:'PreflightMissingAllowOriginHeader',failedParameter:secret},url:secret});
+  const report=h.report(),row=report.actors[0].events.find(event=>event.eventType==='NETWORK_FAILURE');
+  assert.equal(report.totals.verifiedExpectedDenials,8);assert.equal(report.totals.unexpectedHttpErrors,1);
+  assert.equal(report.status,'HOLD');assert.equal(row.classification,'UNEXPECTED');assert.equal(row.stage,'FINANCE_UI_HYDRATION');
+  assert.deepEqual(row.networkFailureDiagnostic,{netError:'net::ERR_FAILED',blockedReason:'origin',corsError:'PreflightMissingAllowOriginHeader',
+    requestMethod:'POST',responseObserved:false,responseStatus:null,responseExtraInfoStatus:null,requestStage:'FINANCE_UI_HYDRATION',observedStage:'ASSIGNMENT_DOCUMENTARY_UI',elapsedMs:2750});
+  assert.throws(()=>driver.validateBrowserObservability(report),/BROWSER_OBSERVABILITY_HOLD/);
+  assert.doesNotMatch(JSON.stringify(report),new RegExp(secret));assert.doesNotMatch(JSON.stringify(row),/failedParameter|errorText|Authorization|https:/);
+});
+test('a received response is distinct from no response and does not excuse the later network failure',async()=>{
+  for(const status of [204,0]){
+    const h=await complete(),ledger=h.direction.ledger;
+    h.direction.setStage('FINANCE_UI_HYDRATION');ledger.onRequest({requestId:'partial',timestamp:2,type:'Fetch',request:{url:cfg.origin+'/reader',method:'GET'}});
+    ledger.onResponse({requestId:'partial',response:{url:cfg.origin+'/reader',status}});
+    h.direction.setStage('ASSIGNMENT_DOCUMENTARY_UI');ledger.onLoadingFailed({requestId:'partial',timestamp:3,errorText:'net::ERR_CONNECTION_RESET'});
+    const report=h.report(),detail=report.actors[0].events.find(event=>event.eventType==='NETWORK_FAILURE').networkFailureDiagnostic;
+    assert.equal(detail.responseObserved,true);assert.equal(detail.responseStatus,status===204?204:null);
+    assert.equal(detail.corsError,null);assert.equal(detail.blockedReason,null);assert.equal(detail.elapsedMs,1000);
+    assert.equal(report.status,'HOLD');assert.throws(()=>driver.validateBrowserObservability(report));
+  }
+});
+test('unmatched failure and private suffixes remain unknown without manufacturing response or duration',async()=>{
+  const h=await complete();h.direction.setStage('ASSIGNMENT_DOCUMENTARY_UI');
+  h.direction.ledger.onLoadingFailed({requestId:'unseen',timestamp:500,errorText:'net::ERR_FAILED '+secret,blockedReason:'origin '+secret,
+    corsErrorStatus:{corsError:'MissingAllowOriginHeader '+secret,failedParameter:secret},request:{method:'POST'}});
+  const report=h.report(),detail=report.actors[0].events.find(event=>event.eventType==='NETWORK_FAILURE').networkFailureDiagnostic;
+  assert.deepEqual(detail,{netError:null,blockedReason:null,corsError:null,requestMethod:null,responseObserved:null,responseStatus:null,responseExtraInfoStatus:null,
+    requestStage:'UNKNOWN_STAGE',observedStage:'ASSIGNMENT_DOCUMENTARY_UI',elapsedMs:null});
+  assert.equal(report.status,'HOLD');assert.throws(()=>driver.validateBrowserObservability(report));assert.doesNotMatch(JSON.stringify(report),new RegExp(secret));
+});
+test('duration uses only matching monotonic observations and preserves missing, reversed and over-bound times as null',()=>{
+  for(const [started,failed,expected] of [[undefined,5,null],[null,5,null],[10,9,null],[10,610.001,null],[10,Infinity,null],[0,0,0],[10,610,600000]]){
+    const h=harness('direccion');h.setStage('FINANCE_UI_HYDRATION');
+    h.ledger.onRequest({requestId:'timed',timestamp:started,type:'Fetch',request:{url:cfg.origin,method:secret}});
+    h.ledger.onLoadingFailed({requestId:'timed',timestamp:failed,errorText:'net::ERR_TIMED_OUT'});
+    const detail=h.ledger.summary().events[0].networkFailureDiagnostic;
+    assert.equal(detail.elapsedMs,expected);assert.equal(detail.requestMethod,null);assert.equal(detail.responseObserved,false);assert.equal(detail.responseStatus,null);
+  }
+});
+test('canceled requests keep the exact historical event schema even when CDP provides diagnostic fields',async()=>{
+  const h=await complete(),ledger=h.direction.ledger;h.direction.setStage('PENDING_CXP_RELOAD');
+  ledger.onRequest({requestId:'canceled-listener',timestamp:1,type:'Fetch',request:{url:'https://firestore.googleapis.com/listen',method:'POST'}});
+  ledger.onLoadingFailed({requestId:'canceled-listener',timestamp:2,canceled:true,errorText:'net::ERR_ABORTED',blockedReason:'origin',
+    corsErrorStatus:{corsError:'MissingAllowOriginHeader',failedParameter:secret}});
+  const report=h.report(),row=report.actors[0].events.find(event=>event.eventType==='NETWORK_CANCELLED');
+  assert.deepEqual(Object.keys(row).sort(),['eventType','actorRole','stage','requestKey','endpointClass','resourceType'].sort());
+  assert.equal(report.status,'PASS');driver.validateBrowserObservability(report);assert.doesNotMatch(JSON.stringify(report),new RegExp(secret));
+});
+test('CORS extra-info status survives without a responseReceived event and never reads headers or grants a denial',async()=>{
+  for(const statusCode of [429,503,500])for(const late of [false,true]){
+    const h=await complete(),ledger=h.direction.ledger;h.direction.setStage('FINANCE_UI_HYDRATION');
+    ledger.onRequest({requestId:'cors-reader',timestamp:10,type:'Fetch',request:{url:cfg.origin+'/reader',method:'POST'}});
+    const extra={requestId:'cors-reader',statusCode,get headers(){throw Error(secret);},get blockedCookies(){throw Error(secret);}};
+    if(!late)ledger.onResponseExtraInfo(extra);
+    h.direction.setStage('ASSIGNMENT_DOCUMENTARY_UI');
+    ledger.onLoadingFailed({requestId:'cors-reader',timestamp:12,errorText:'net::ERR_FAILED',corsErrorStatus:{corsError:'MissingAllowOriginHeader',failedParameter:secret}});
+    if(late){
+      assert.equal(ledger.summary().events.find(event=>event.eventType==='NETWORK_FAILURE').networkFailureDiagnostic.responseExtraInfoStatus,null);
+      ledger.onResponseExtraInfo(extra);
+    }
+    const report=h.report(),detail=report.actors[0].events.find(event=>event.eventType==='NETWORK_FAILURE').networkFailureDiagnostic;
+    assert.equal(detail.responseObserved,false);assert.equal(detail.responseStatus,null);assert.equal(detail.responseExtraInfoStatus,statusCode);
+    assert.equal(report.totals.unexpectedHttpErrors,1);assert.equal(report.status,'HOLD');assert.throws(()=>driver.validateBrowserObservability(report));
+    assert.doesNotMatch(JSON.stringify(report),new RegExp(secret));
+  }
+});
+test('extra-info cannot invent a request or coerce a status',()=>{
+  for(const statusCode of ['503',0,600,null,secret]){
+    const h=harness('direccion');h.setStage('FINANCE_UI_HYDRATION');
+    h.ledger.onResponseExtraInfo({requestId:'unseen',statusCode:503});h.ledger.onLoadingFailed({requestId:'unseen',errorText:'net::ERR_FAILED'});
+    assert.equal(h.ledger.summary().events[0].networkFailureDiagnostic.responseExtraInfoStatus,null);
+    h.ledger.onRequest({requestId:'seen',type:'Fetch',request:{url:cfg.origin,method:'POST'}});
+    h.ledger.onResponseExtraInfo({requestId:'seen',statusCode});h.ledger.onLoadingFailed({requestId:'seen',errorText:'net::ERR_FAILED'});
+    assert.equal(h.ledger.summary().events[1].networkFailureDiagnostic.responseExtraInfoStatus,null);
+  }
+});
+test('extra-info status alone cannot satisfy an expected denial response',async()=>{
+  const h=harness('operativo'),item=catalog[0],token=start(h,item);
+  h.ledger.onRequest(wire(item));h.ledger.onResponseExtraInfo({requestId:item.id,statusCode:item.httpStatus});h.ledger.onBody(item.id,body(item));
+  await assert.rejects(h.ledger.confirmDenial(token,sdk(item),10));assert.equal(h.ledger.summary().status,'HOLD');
+  assert.equal(h.ledger.summary().verifiedExpectedDenials,0);
+});
 test('retry, redirect and repeated native request IDs do not reuse the previous exemption',async()=>{
   for(const mode of ['retry','redirect','duplicate']){
     const h=harness('operativo'),item=catalog[0];await verified(h,item);const request=wire(item,mode==='retry'?'second-id':item.id);
@@ -216,6 +306,17 @@ test('CDP adapter correlates actual protocol IDs and observes without page inter
     assert.ok(cdp.commands.every(row=>['Network.enable','Log.enable','Runtime.enable','Network.getResponseBody','Runtime.evaluate'].includes(row.name)));
   }
   driver.validateBrowserObservability(driver.browserObservabilityReport(observers));
+});
+test('existing CDP extra-info listener captures only correlated status without issuing any extra protocol call',async()=>{
+  const cdp=new FakeCdp();let stage='FINANCE_UI_HYDRATION';
+  const observer=await driver.attachBrowserObservability({context:{newCDPSession:async()=>cdp},page:new EventEmitter(),cfg,actorRole:'direccion',getStage:()=>stage,catalog});
+  const before=structuredClone(cdp.commands);
+  cdp.emit('Network.requestWillBeSent',{requestId:'reader',timestamp:1,type:'Fetch',request:{url:cfg.origin+'/reader',method:'POST'}});
+  stage='ASSIGNMENT_DOCUMENTARY_UI';cdp.emit('Network.loadingFailed',{requestId:'reader',timestamp:2,errorText:'net::ERR_FAILED',corsErrorStatus:{corsError:'MissingAllowOriginHeader',failedParameter:secret}});
+  cdp.emit('Network.responseReceivedExtraInfo',{requestId:'reader',statusCode:503,get headers(){throw Error(secret);},get blockedCookies(){throw Error(secret);}});
+  const row=observer.summary().events.find(event=>event.eventType==='NETWORK_FAILURE');
+  assert.equal(row.networkFailureDiagnostic.responseExtraInfoStatus,503);assert.equal(row.networkFailureDiagnostic.responseObserved,false);
+  assert.deepEqual(cdp.commands,before);assert.doesNotMatch(JSON.stringify(observer.summary()),new RegExp(secret));
 });
 test('body observer failures, CDP attach errors and callback exceptions are retained as safe HOLD diagnostics',async()=>{
   const item=catalog[0],cdp=new FakeCdp(),page=new EventEmitter();cdp.failBody=true;

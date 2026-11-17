@@ -10,12 +10,12 @@
   "branch": "recovery/fase-a-clean-20260831",
   "forensicOriginSha": "9c95f31461f2eabe9804625b5659bee772f5602a",
   "createdAtUtc": "2026-08-31T18:00:00Z",
-  "updatedAtUtc": "2026-11-17T21:18:02Z",
+  "updatedAtUtc": "2026-11-17T21:33:33Z",
   "status": "I6_6_LIVE_CONTROLLED_PORTFOLIO_UPDATE_IN_PROGRESS",
   "currentIteration": 6,
   "lastCompletedIteration": 5,
   "i66OwnerPlanContinuation20261115": {
-    "status": "LIVE_NOCHANGE_SIGNED_PREVIEW_NETWORK_HOLD_DIAGNOSTIC_READ_PENDING",
+    "status": "EXECUTING_SOURCE_QA_NOT_NEW_LIVE_ACCEPTANCE",
     "canonicalPlan": "artifacts/orbit360-recovery/release-control/I6_6_OPERATIONAL_CONTINUATION_20261115.json",
     "firstIncompleteGate": "I6.6",
     "preserveHistoricalB4007Accepted": true,
@@ -23,8 +23,8 @@
     "latestHostingPreviewEvidence": "artifacts/orbit360-recovery/release-control/I6_6_STARTUP_DIAGNOSTICS_PREVIEW_BUILD_20261117.json",
     "latestHostingPreviewSource": "62d50052a9b9196ebce8c4acd1bc66778ae89c06",
     "documentaryFocalReadbackEvidence": "artifacts/orbit360-recovery/release-control/I6_6_EXISTING_CLIENT_INDEPENDENT_GESTIONES_READBACK_20261116.json",
-    "signedPreviewCandidateStatus": "LIVE_NOCHANGE_SIGNED_PREVIEW_NETWORK_HOLD_DIAGNOSTIC_READ_PENDING",
-    "technicalPreviewCausalRetryReceipt": "artifacts/orbit360-recovery/release-control/I6_6_TECHNICAL_PREVIEW_SOURCE_INTAKE_RELOAD_REBUILD_20261117.json",
+    "signedPreviewCandidateStatus": "FAILED_PRIOR_SIGNED_PREVIEW_PASSIVE_NETWORK_DIAGNOSTIC_NEW_BUILD_REQUIRED",
+    "technicalPreviewCausalRetryReceipt": "artifacts/orbit360-recovery/release-control/I6_6_TECHNICAL_PREVIEW_NETWORK_DIAGNOSTIC_REBUILD_20261117.json",
     "operationsEvidenceReview": "artifacts/orbit360-recovery/release-control/I6_6_OPS_EVIDENCE_AND_PREVIEW_BINDING_REVIEW_20261116.json",
     "legalScopeAuthorizationReceipt": "artifacts/orbit360-recovery/release-control/I6_6_DIRECTION_PREVIEW_V2_SCOPE_AUTHORIZATION_20261116.json",
     "legalScopeAuthorizationReceiptSha256": "d3309675c753bd1b31f9163d506aba2e29ac70583a7b8d54cb5b8503b5c50a44",
@@ -52,7 +52,7 @@
         "previousArtifactId": 14314985190,
         "previousArtifactDigest": "sha256:e97f86355181a8c685b8dd800626a4885f8e34b45222f178d15355d76cbf499f"
       },
-      "status": "LIVE_NOCHANGE_SIGNED_PREVIEW_NETWORK_HOLD_DIAGNOSTIC_READ_PENDING",
+      "status": "FAILED_PRIOR_SIGNED_PREVIEW_PASSIVE_NETWORK_DIAGNOSTIC_NEW_BUILD_REQUIRED",
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_STARTUP_DIAGNOSTICS_PREVIEW_BUILD_20261117.json",
       "signedOutcomeReceipt": "artifacts/orbit360-recovery/release-control/I6_6_STARTUP_DIAGNOSTICS_NETWORK_HOLD_20261117.json",
       "signedPreviewAccepted": false,
@@ -61,7 +61,19 @@
       "liveLegalConsentGranted": false,
       "realFinancialWrites": 0,
       "underlyingStartupCauseProven": false,
-      "underlyingNetworkCauseProven": false
+      "underlyingNetworkCauseProven": false,
+      "pendingSuccessorBuildRequest": {
+        "status": "REQUESTED_FOR_PASSIVE_NETWORK_QA_DIAGNOSTICS",
+        "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_SCOPED_READER_LOGGING_HOLD_AND_PASSIVE_NETWORK_DIAGNOSTIC_SOURCE_20261117.json",
+        "sourceSha": "EXACT_TRIGGERING_COMMIT",
+        "sourceBaseHead": "181264419c614c9a8a0843fc834a95542e0f297a",
+        "newImmutableBuildRequired": true,
+        "newBuildIdKnown": false,
+        "productAndBackendSourceUnchanged": true,
+        "livePromotion": false,
+        "technicalRolloverReceipt": "artifacts/orbit360-recovery/release-control/I6_6_TECHNICAL_PREVIEW_NETWORK_DIAGNOSTIC_REBUILD_20261117.json",
+        "technicalRolloverReceiptSha256": "42b558b0720fdb5d8c8a907a8ed5415cb769232e2409efbb4dde9fdaef724c04"
+      }
     },
     "latestSignedQaOutcome": {
       "status": "FAILED_NOT_ACCEPTED",
@@ -255,7 +267,7 @@
     "dailyExecutionPlanPointer": "artifacts/orbit360-recovery/release-control/I6_6_OPERATIONAL_CONTINUATION_20261115.json#dailyExecutionPlan20261117",
     "currentPreviewSourceSha": "62d50052a9b9196ebce8c4acd1bc66778ae89c06",
     "currentPreviewBuildReceipt": "artifacts/orbit360-recovery/release-control/I6_6_STARTUP_DIAGNOSTICS_PREVIEW_BUILD_20261117.json",
-    "nextAction": "I6_6_EXISTING_BLOCK2_PREVIEW_NETWORK_HOLD: R11_REMAINS_LIVE_AND_TRANSPORT_LOCKED; EXACT_62D500_BUILD_44173813709_RETAINED_WITH_OBSERVED_ROLLOVER. READ_EXISTING_CLOUD_RUN_LOGS_ONLY_FOR_SCOPED_POLICY_PREVIEW_2026_11_17_21_03_TO_21_07_UTC; NO_BUILD_NO_SIGNED_RERUN_NO_BUSINESS_WRITES. NETWORK_CAUSE_UNPROVEN; FIVE_CURRENT_STARTUP_WAITS_COMPLETED_BUT_PRIOR_FDBC_TIMEOUT_CAUSE_UNPROVEN. AFTER_CAUSAL_DIAGNOSIS_RETURN_TO_EXISTING_GATE; LIVE_REQUIRES_EXACT_FOUR_DRIVER_PREVIEW_PASS_AND_MISSING_BOUNDED_LEGAL_SCOPE. GENUINE_OPS_INSURER_DRIVE_WORKFLOWS_AND_PRIVATE_FINANCIAL_CANONICAL_READBACKS_REMAIN_PENDING. ONE_OF_SIX_DAILY_BLOCKS_CLOSED_FROZEN_19_OF_31_UNCHANGED.",
+    "nextAction": "I6_6_EXISTING_BLOCK2_LOGGING_ACCESS_HOLD: REAL_LOGGING_44178934101_HTTP403_ZERO_PAGES_NOT_ZERO_ERRORS; PREVIEW_NETWORK_FAILURE_AND_PRIOR_STARTUP_TIMEOUT_CAUSES_REMAIN_UNPROVEN. SOURCE_QA_PASS_FOR_PASSIVE_NETWORK_REASON_DIAGNOSTICS_ONLY; BUILD_EXACT_TRIGGERING_COMMIT_ONCE. IF_QUOTA429_BACK_UP_AND_REHASH_ACTUAL_CURRENT_SINGLE_PREVIEW_WITH_NEW_EXACT_TECHNICAL_RECEIPT_THEN_COMPARE_ALL223_FILES_AND_BOTH_R11_ORIGINS. BIND_NEW_IMMUTABLE_ARTIFACT_THEN_EXISTING_FOUR_SIGNED_DRIVERS_WITH_UNCHANGED_FIXTURES_ROLES_NAVIGATION_TIMEOUTS_AND_ERROR_THRESHOLDS. R11_REMAINS_LIVE; NO_IAM_CHANGE_NO_LOGGING_RETRY_NO_PRODUCT_BACKEND_CHANGE_NO_REAL_FINANCIAL_WRITES. NO_LIVE_PROMOTION_UNTIL_EXACT_PREVIEW_PASS_AND_MISSING_BOUNDED_LEGAL_SCOPE; GENUINE_OPS_INSURER_DRIVE_REMAIN_PENDING. ONE_OF_SIX_DAILY_BLOCKS_CLOSED_FROZEN19_OF31_UNCHANGED.",
     "dailyPlanFreeze20261117": {
       "status": "FROZEN_APPROVED_BY_DIRECTION",
       "approvedAtUtc": "2026-11-17T19:14:47Z",
@@ -312,7 +324,7 @@
       "conditionBasis": "SOURCE_PATH_PROVEN_NOT_AN_OBSERVED_LIVE_RUNTIME_FAILURE",
       "actualLiveFailure44161850833RemainsAuthorizationPhaseMismatch": true,
       "existingPreviewAuthorizationUnchanged": true,
-      "technicalState": "CURRENT_EXACT_SIGNED_PREVIEW_NETWORK_HOLD_READONLY_DIAGNOSIS_PENDING_NO_LIVE_GRANT",
+      "technicalState": "PASSIVE_NETWORK_QA_SOURCE_READY_NEW_IMMUTABLE_BUILD_AND_EXACT_SIGNED_PREVIEW_REQUIRED",
       "reviewContextGenerated": false,
       "currentExactPreviewSourceSha": "62d50052a9b9196ebce8c4acd1bc66778ae89c06",
       "currentExactPreviewBuildId": "gi-i66-62d50052a9b9-57f234755dc1",
@@ -464,8 +476,43 @@
       "technicalPreviewCausalRetryReceipt": "artifacts/orbit360-recovery/release-control/I6_6_TECHNICAL_PREVIEW_OBSERVABILITY_REBUILD_20261116.json"
     },
     "priorTechnicalPreviewCausalRetryReceiptBeforeNetworkHold20261117": "artifacts/orbit360-recovery/release-control/I6_6_TECHNICAL_PREVIEW_OBSERVABILITY_REBUILD_20261116.json",
-    "firstIncompleteWork": "READONLY_CAUSAL_DIAGNOSIS_OF_CURRENT_PREVIEW_SCOPED_READER_NETWORK_FAILURE",
-    "currentSignedPreviewAccepted": false
+    "firstIncompleteWork": "BUILD_PASSIVE_NETWORK_DIAGNOSTIC_QA_SUCCESSOR_THEN_EXACT_SIGNED_PREVIEW",
+    "currentSignedPreviewAccepted": false,
+    "priorTechnicalPreviewCausalRetryReceiptBeforeNetworkDiagnosticBuild20261117": "artifacts/orbit360-recovery/release-control/I6_6_TECHNICAL_PREVIEW_SOURCE_INTAKE_RELOAD_REBUILD_20261117.json",
+    "loggingReadOnlyAccessHold20261117": {
+      "status": "READONLY_QUERY_HOLD_HTTP403_NO_PAGES_NOT_FUNCTIONAL_ACCEPTANCE",
+      "runId": 44178934101,
+      "jobId": 134377724028,
+      "headSha": "181264419c614c9a8a0843fc834a95542e0f297a",
+      "artifactId": 14370893169,
+      "artifactDigest": "sha256:99f7267dacc646801e6be197eed130dbe5dca12a33b7b668f6e19b4435c75824",
+      "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_SCOPED_READER_LOGGING_HOLD_AND_PASSIVE_NETWORK_DIAGNOSTIC_SOURCE_20261117.json",
+      "rawProofPath": "artifacts/orbit360-recovery/release-control/I6_6_SCOPED_READER_LOGGING_READONLY_HOLD_20261117.json",
+      "rawProofSha256": "6e429c8d755e5eaa9d8821f77aa2c11623c0b4bfb729ee1aa15ae79c639d0ef6",
+      "loggingApiHttpStatuses": [
+        403
+      ],
+      "pagesRead": 0,
+      "entriesSeen": 0,
+      "zeroCountersProveNoErrors": false,
+      "rootCauseProven": false,
+      "requestStatusLatencyRevisionAvailable": false,
+      "functionalAcceptance": false,
+      "zeroWrites": true,
+      "noRetryOrPermissionChange": true
+    },
+    "networkDiagnosticBuildRequest20261117": {
+      "status": "REQUESTED_FOR_PASSIVE_NETWORK_QA_DIAGNOSTICS",
+      "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_SCOPED_READER_LOGGING_HOLD_AND_PASSIVE_NETWORK_DIAGNOSTIC_SOURCE_20261117.json",
+      "sourceSha": "EXACT_TRIGGERING_COMMIT",
+      "sourceBaseHead": "181264419c614c9a8a0843fc834a95542e0f297a",
+      "newImmutableBuildRequired": true,
+      "newBuildIdKnown": false,
+      "productAndBackendSourceUnchanged": true,
+      "livePromotion": false,
+      "technicalRolloverReceipt": "artifacts/orbit360-recovery/release-control/I6_6_TECHNICAL_PREVIEW_NETWORK_DIAGNOSTIC_REBUILD_20261117.json",
+      "technicalRolloverReceiptSha256": "42b558b0720fdb5d8c8a907a8ed5415cb769232e2409efbb4dde9fdaef724c04"
+    }
   },
   "iterationProgressAuthority": "CONTROL_PLANE.json#gateState: I0-I5 certified in earlier release epoch; I6.6 active for current successor. Timestamped iterationN evidence snapshots remain immutable historical observations.",
   "productionTargetIteration": 5,
@@ -1169,7 +1216,7 @@
     "phaseAIterationStatuses": "HISTORICAL_FIELDS_ABOVE_PRESERVED_UNTIL_FORMAL_GATE_EVIDENCE;_NO_NEW_PASS_INFERRED",
     "labDataWriteScope": "ONLY_35_AUTHORIZED_COUNTRY_FIELDS;_NO_AUGUST_REFRESH"
   },
-  "nextAction": "I6_6_EXISTING_BLOCK2_PREVIEW_NETWORK_HOLD: R11_REMAINS_LIVE_AND_TRANSPORT_LOCKED; EXACT_62D500_BUILD_44173813709_RETAINED_WITH_OBSERVED_ROLLOVER. READ_EXISTING_CLOUD_RUN_LOGS_ONLY_FOR_SCOPED_POLICY_PREVIEW_2026_11_17_21_03_TO_21_07_UTC; NO_BUILD_NO_SIGNED_RERUN_NO_BUSINESS_WRITES. NETWORK_CAUSE_UNPROVEN; FIVE_CURRENT_STARTUP_WAITS_COMPLETED_BUT_PRIOR_FDBC_TIMEOUT_CAUSE_UNPROVEN. AFTER_CAUSAL_DIAGNOSIS_RETURN_TO_EXISTING_GATE; LIVE_REQUIRES_EXACT_FOUR_DRIVER_PREVIEW_PASS_AND_MISSING_BOUNDED_LEGAL_SCOPE. GENUINE_OPS_INSURER_DRIVE_WORKFLOWS_AND_PRIVATE_FINANCIAL_CANONICAL_READBACKS_REMAIN_PENDING. ONE_OF_SIX_DAILY_BLOCKS_CLOSED_FROZEN_19_OF_31_UNCHANGED.",
+  "nextAction": "I6_6_EXISTING_BLOCK2_LOGGING_ACCESS_HOLD: REAL_LOGGING_44178934101_HTTP403_ZERO_PAGES_NOT_ZERO_ERRORS; PREVIEW_NETWORK_FAILURE_AND_PRIOR_STARTUP_TIMEOUT_CAUSES_REMAIN_UNPROVEN. SOURCE_QA_PASS_FOR_PASSIVE_NETWORK_REASON_DIAGNOSTICS_ONLY; BUILD_EXACT_TRIGGERING_COMMIT_ONCE. IF_QUOTA429_BACK_UP_AND_REHASH_ACTUAL_CURRENT_SINGLE_PREVIEW_WITH_NEW_EXACT_TECHNICAL_RECEIPT_THEN_COMPARE_ALL223_FILES_AND_BOTH_R11_ORIGINS. BIND_NEW_IMMUTABLE_ARTIFACT_THEN_EXISTING_FOUR_SIGNED_DRIVERS_WITH_UNCHANGED_FIXTURES_ROLES_NAVIGATION_TIMEOUTS_AND_ERROR_THRESHOLDS. R11_REMAINS_LIVE; NO_IAM_CHANGE_NO_LOGGING_RETRY_NO_PRODUCT_BACKEND_CHANGE_NO_REAL_FINANCIAL_WRITES. NO_LIVE_PROMOTION_UNTIL_EXACT_PREVIEW_PASS_AND_MISSING_BOUNDED_LEGAL_SCOPE; GENUINE_OPS_INSURER_DRIVE_REMAIN_PENDING. ONE_OF_SIX_DAILY_BLOCKS_CLOSED_FROZEN19_OF31_UNCHANGED.",
   "sourceOfTruth": {
     "projectBoundaryPrevalentAddendum": "orbit360-platform/docs/recovery/ADDENDUM_PREVALENTE_CHATGPT_PROJECT_BOUNDARY_20260831.md",
     "mutableState": "orbit360-platform/docs/recovery/orbit360-recovery-state-v1.json",
@@ -2914,7 +2961,7 @@
     "conditionBasis": "SOURCE_PATH_PROVEN_NOT_AN_OBSERVED_LIVE_RUNTIME_FAILURE",
     "actualLiveFailure44161850833RemainsAuthorizationPhaseMismatch": true,
     "existingPreviewAuthorizationUnchanged": true,
-    "technicalState": "CURRENT_EXACT_SIGNED_PREVIEW_NETWORK_HOLD_READONLY_DIAGNOSIS_PENDING_NO_LIVE_GRANT",
+    "technicalState": "PASSIVE_NETWORK_QA_SOURCE_READY_NEW_IMMUTABLE_BUILD_AND_EXACT_SIGNED_PREVIEW_REQUIRED",
     "reviewContextGenerated": false,
     "currentExactPreviewSourceSha": "62d50052a9b9196ebce8c4acd1bc66778ae89c06",
     "currentExactPreviewBuildId": "gi-i66-62d50052a9b9-57f234755dc1",
@@ -3165,5 +3212,27 @@
     "newPreviewAcceptance": false,
     "newLiveAcceptance": false,
     "realFinancialWritesApplied": 0
+  },
+  "i66LoggingReadOnlyAccessHold20261117": {
+    "status": "READONLY_QUERY_HOLD_HTTP403_NO_PAGES_NOT_FUNCTIONAL_ACCEPTANCE",
+    "runId": 44178934101,
+    "jobId": 134377724028,
+    "headSha": "181264419c614c9a8a0843fc834a95542e0f297a",
+    "artifactId": 14370893169,
+    "artifactDigest": "sha256:99f7267dacc646801e6be197eed130dbe5dca12a33b7b668f6e19b4435c75824",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_SCOPED_READER_LOGGING_HOLD_AND_PASSIVE_NETWORK_DIAGNOSTIC_SOURCE_20261117.json",
+    "rawProofPath": "artifacts/orbit360-recovery/release-control/I6_6_SCOPED_READER_LOGGING_READONLY_HOLD_20261117.json",
+    "rawProofSha256": "6e429c8d755e5eaa9d8821f77aa2c11623c0b4bfb729ee1aa15ae79c639d0ef6",
+    "loggingApiHttpStatuses": [
+      403
+    ],
+    "pagesRead": 0,
+    "entriesSeen": 0,
+    "zeroCountersProveNoErrors": false,
+    "rootCauseProven": false,
+    "requestStatusLatencyRevisionAvailable": false,
+    "functionalAcceptance": false,
+    "zeroWrites": true,
+    "noRetryOrPermissionChange": true
   }
 }

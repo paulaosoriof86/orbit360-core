@@ -384,6 +384,37 @@ function safeBrowserLocation(value,cfg){
     return {endpointClass,pathSha256:hash(cfg.source+'|'+url.origin+url.pathname)};
   }catch{return {endpointClass:'UNKNOWN',pathSha256:null};}
 }
+// Diagnostic-only closed enums from CDP Network.BlockedReason/CorsError and
+// Chromium net/base/net_error_list.h. Never retain error text or failedParameter.
+const NETWORK_FAILURE_NET_ERRORS=new Set(['net::ERR_FAILED','net::ERR_ABORTED','net::ERR_BLOCKED_BY_CLIENT','net::ERR_BLOCKED_BY_RESPONSE',
+  'net::ERR_CONNECTION_RESET','net::ERR_CONNECTION_CLOSED','net::ERR_CONNECTION_REFUSED','net::ERR_CONNECTION_ABORTED',
+  'net::ERR_CONNECTION_TIMED_OUT','net::ERR_TIMED_OUT','net::ERR_NAME_NOT_RESOLVED','net::ERR_INTERNET_DISCONNECTED',
+  'net::ERR_NETWORK_CHANGED','net::ERR_CERT_AUTHORITY_INVALID','net::ERR_CERT_DATE_INVALID','net::ERR_CERT_COMMON_NAME_INVALID',
+  'net::ERR_SSL_PROTOCOL_ERROR','net::ERR_EMPTY_RESPONSE','net::ERR_CONTENT_LENGTH_MISMATCH','net::ERR_HTTP2_PROTOCOL_ERROR',
+  'net::ERR_HTTP_RESPONSE_CODE_FAILURE']);
+const NETWORK_FAILURE_BLOCKED_REASONS=new Set(['other','csp','mixed-content','origin','inspector','integrity','subresource-filter','content-type',
+  'coep-frame-resource-needs-coep-header','coop-sandboxed-iframe-cannot-navigate-to-coop-page','corp-not-same-origin',
+  'corp-not-same-origin-after-defaulted-to-same-origin-by-coep','corp-not-same-origin-after-defaulted-to-same-origin-by-dip',
+  'corp-not-same-origin-after-defaulted-to-same-origin-by-coep-and-dip','corp-not-same-site','sri-message-signature-mismatch']);
+const NETWORK_FAILURE_CORS_ERRORS=new Set(['DisallowedByMode','InvalidResponse','WildcardOriginNotAllowed','MissingAllowOriginHeader',
+  'MultipleAllowOriginValues','InvalidAllowOriginValue','AllowOriginMismatch','InvalidAllowCredentials','CorsDisabledScheme',
+  'PreflightInvalidStatus','PreflightDisallowedRedirect','PreflightWildcardOriginNotAllowed','PreflightMissingAllowOriginHeader',
+  'PreflightMultipleAllowOriginValues','PreflightInvalidAllowOriginValue','PreflightAllowOriginMismatch','PreflightInvalidAllowCredentials',
+  'PreflightMissingAllowExternal','PreflightInvalidAllowExternal','InvalidAllowMethodsPreflightResponse','InvalidAllowHeadersPreflightResponse',
+  'MethodDisallowedByPreflightResponse','HeaderDisallowedByPreflightResponse','RedirectContainsCredentials','InsecureLocalNetwork',
+  'InvalidLocalNetworkAccess','NoCorsRedirectModeNotFollow','LocalNetworkAccessPermissionDenied']);
+function safeNetworkFailureDiagnostic(value){
+  const row=value&&typeof value==='object'&&!Array.isArray(value)?value:{};
+  const responseObserved=typeof row.responseObserved==='boolean'?row.responseObserved:null;
+  return {netError:NETWORK_FAILURE_NET_ERRORS.has(row.netError)?row.netError:null,
+    blockedReason:NETWORK_FAILURE_BLOCKED_REASONS.has(row.blockedReason)?row.blockedReason:null,
+    corsError:NETWORK_FAILURE_CORS_ERRORS.has(row.corsError)?row.corsError:null,
+    requestMethod:['GET','POST','OPTIONS','HEAD','PUT','PATCH','DELETE'].includes(row.requestMethod)?row.requestMethod:null,
+    responseObserved,responseStatus:responseObserved===true&&Number.isInteger(row.responseStatus)&&row.responseStatus>=100&&row.responseStatus<=599?row.responseStatus:null,
+    responseExtraInfoStatus:Number.isInteger(row.responseExtraInfoStatus)&&row.responseExtraInfoStatus>=100&&row.responseExtraInfoStatus<=599?row.responseExtraInfoStatus:null,
+    requestStage:browserStage(row.requestStage),observedStage:browserStage(row.observedStage),
+    elapsedMs:Number.isSafeInteger(row.elapsedMs)&&row.elapsedMs>=0&&row.elapsedMs<=600000?row.elapsedMs:null};
+}
 function createBrowserErrorLedger({cfg,actorRole,getStage,catalog,maxEvents=500,maxRequests=8192}){
   assert.ok(['direccion','operativo'].includes(actorRole),'ADVISOR_UAT_DENIAL_ACTOR_SCOPE');
   const planned=catalog.filter(item=>item.actorRole===actorRole),requests=new Map(),expectations=new Map(),events=[];
@@ -415,7 +446,8 @@ function createBrowserErrorLedger({cfg,actorRole,getStage,catalog,maxEvents=500,
     const previous=requests.get(id);
     if(previous?.expected){previous.expected.httpVerified=false;telemetry(event.redirectResponse?'DENIAL_REDIRECT':'DUPLICATE_NATIVE_REQUEST');}
     const meta={id,stage:browserStage(getStage()),...safeBrowserLocation(request.url,cfg),resourceType:resourceType(event.type),
-      method:['GET','POST','OPTIONS','HEAD','PUT','PATCH','DELETE'].includes(request.method)?request.method:'OTHER',expected:null,status:0};
+      method:['GET','POST','OPTIONS','HEAD','PUT','PATCH','DELETE'].includes(request.method)?request.method:'OTHER',expected:null,status:0,
+      requestTimestamp:Number.isFinite(event.timestamp)&&event.timestamp>=0?event.timestamp:null,responseObserved:false,observedResponseStatus:null,responseExtraInfoStatus:null};
     if(request.url===endpoint&&request.method==='POST'){
       try{
         const envelope=JSON.parse(String(request.postData||''));
@@ -435,11 +467,22 @@ function createBrowserErrorLedger({cfg,actorRole,getStage,catalog,maxEvents=500,
   }
   function onResponse(event){
     const id=String(event.requestId||''),meta=requests.get(id),response=event.response||{},status=httpStatus(response.status);
-    if(meta)meta.status=status;
+    if(meta){meta.status=status;meta.responseObserved=true;meta.observedResponseStatus=status||null;}
     if(status>=400)emit('HTTP_ERROR',{requestKey:requestKey(id),stage:meta?.stage||browserStage(getStage()),status,
       resourceType:meta?.resourceType||resourceType(event.type),...safeBrowserLocation(response.url,cfg),
       ...(meta?.expected?{denialId:meta.expected.id,endpointClass:'OWNED_NEGATIVE_CALLABLE'}:{})});
     if(meta?.expected&&status!==meta.expected.httpStatus)telemetry('DENIAL_HTTP_MISMATCH');
+  }
+  function onResponseExtraInfo(event){
+    const meta=requests.get(String(event.requestId||''));
+    // CORS can suppress responseReceived. Preserve only this already-delivered
+    // numeric status; never inspect headers/cookies or use it for acceptance.
+    if(meta){
+      meta.responseExtraInfoStatus=httpStatus(event.statusCode)||null;
+      // ExtraInfo can arrive after loadingFailed. This internal reference is
+      // never serialized; only the same request's numeric diagnostic is updated.
+      if(meta.failureDiagnostic)meta.failureDiagnostic.responseExtraInfoStatus=meta.responseExtraInfoStatus;
+    }
   }
   function onBody(id,body){
     const meta=requests.get(String(id)),expected=meta?.expected;if(!expected)return;
@@ -459,11 +502,19 @@ function createBrowserErrorLedger({cfg,actorRole,getStage,catalog,maxEvents=500,
     telemetry('DENIAL_BODY_UNAVAILABLE');expected.transportComplete=true;expected.resolve();
   }
   function onLoadingFailed(event){
-    const id=String(event.requestId||''),meta=requests.get(id);
+    const id=String(event.requestId||''),meta=requests.get(id),observedStage=browserStage(getStage());
+    const elapsed=meta?.requestTimestamp!==null&&Number.isFinite(meta?.requestTimestamp)&&Number.isFinite(event.timestamp)&&
+      event.timestamp>=meta.requestTimestamp?(event.timestamp-meta.requestTimestamp)*1000:null;
+    const failureDiagnostic=event.canceled===true?null:safeNetworkFailureDiagnostic({netError:event.errorText,blockedReason:event.blockedReason,
+      corsError:event.corsErrorStatus?.corsError,requestMethod:meta?.method,responseObserved:meta?.responseObserved,
+      responseStatus:meta?.observedResponseStatus,responseExtraInfoStatus:meta?.responseExtraInfoStatus,requestStage:meta?.stage,observedStage,
+      elapsedMs:elapsed!==null&&elapsed<=600000?Math.round(elapsed):null});
+    if(meta&&failureDiagnostic)meta.failureDiagnostic=failureDiagnostic;
     // Navigation cancels long-lived listeners. Cancellation is recorded, never
     // used to excuse a HTTP/console error or complete an expected denial.
-    emit(event.canceled===true?'NETWORK_CANCELLED':'NETWORK_FAILURE',{requestKey:requestKey(id),stage:meta?.stage||browserStage(getStage()),
-      endpointClass:meta?.endpointClass||'UNKNOWN',resourceType:meta?.resourceType||resourceType(event.type)});
+    emit(event.canceled===true?'NETWORK_CANCELLED':'NETWORK_FAILURE',{requestKey:requestKey(id),stage:meta?.stage||observedStage,
+      endpointClass:meta?.endpointClass||'UNKNOWN',resourceType:meta?.resourceType||resourceType(event.type),
+      ...(failureDiagnostic?{networkFailureDiagnostic:failureDiagnostic}:{})});
     if(meta?.expected)onBodyUnavailable(id);
   }
   function onLog(entry){
@@ -525,7 +576,7 @@ function createBrowserErrorLedger({cfg,actorRole,getStage,catalog,maxEvents=500,
         httpVerified:actual?.httpVerified===true,sdkVerified:actual?.sdkVerified===true,
         status:actual?.httpVerified&&actual.sdkVerified&&actual.transportComplete?'PASS':'HOLD'};}),events:classified};
   }
-  return {expectDenial,confirmDenial,onRequest,onResponse,onBody,onBodyUnavailable,onLoadingFailed,onLog,onRuntimeConsole,onPageConsole,onPageError,telemetry,
+  return {expectDenial,confirmDenial,onRequest,onResponse,onResponseExtraInfo,onBody,onBodyUnavailable,onLoadingFailed,onLog,onRuntimeConsole,onPageConsole,onPageError,telemetry,
     wantsBody:id=>!!requests.get(String(id))?.expected,summary};
 }
 const STARTUP_STAGES=Object.freeze(['SIGNED_SESSION','ASSIGNMENT_RELOAD','PENDING_CXP_RELOAD']);
@@ -573,6 +624,7 @@ async function attachBrowserObservability({context,page,cfg,actorRole,getStage,c
   cdp.on('Network.requestWillBeSent',startupEvent('onRequest'));cdp.on('Network.responseReceived',startupEvent('onResponse'));
   cdp.on('Network.loadingFinished',startupEvent('onLoadingFinished'));cdp.on('Network.loadingFailed',startupEvent('onLoadingFailed'));
   cdp.on('Network.requestWillBeSent',safe(ledger.onRequest));cdp.on('Network.responseReceived',safe(ledger.onResponse));
+  cdp.on('Network.responseReceivedExtraInfo',safe(ledger.onResponseExtraInfo));
   cdp.on('Network.loadingFailed',safe(ledger.onLoadingFailed));cdp.on('Log.entryAdded',safe(event=>ledger.onLog(event.entry)));
   cdp.on('Runtime.consoleAPICalled',safe(ledger.onRuntimeConsole));
   cdp.on('Network.loadingFinished',safe(event=>{
@@ -1177,5 +1229,5 @@ async function main(){
   if(originalFailure||cleanupFailure)throw Error('ADVISOR_PAYABLE_SIGNED_UAT_HOLD');
   return report;
 }
-module.exports={configuration,sourceIdentity,fixtures,signedDocumentaryFixtures,withAssignmentFixtures,assignmentIdentity,assignmentStepsFor,assignmentReceiptFor,assignmentProjectionRows,assertAssignmentReceipt,assignmentAuditGuard,assertDocumentaryRow,assertDocumentaryReceipt,assertDocumentaryView,assertVisibleDocumentaryView,assertGenerated,sourceAuditGuard,genericAuditGuard,unchangedSeed,configuredCredential,assertServerDenial,browserDenialCatalog,safeBrowserLocation,createBrowserErrorLedger,attachBrowserObservability,waitForStartupGlobals,safeStartupDiagnostics,safeCleanupFailureClasses,CLEANUP_FAILURE_CLASSES,browserObservabilityReport,finalizeBrowserObservability,validateBrowserObservability,safeFailureEvidence,safeLegalFailureSubstage,safeFinanceUiSnapshot,safeClickActionability,safeFinanceUiDiagnostics,captureFinanceUiSnapshot,main};
+module.exports={configuration,sourceIdentity,fixtures,signedDocumentaryFixtures,withAssignmentFixtures,assignmentIdentity,assignmentStepsFor,assignmentReceiptFor,assignmentProjectionRows,assertAssignmentReceipt,assignmentAuditGuard,assertDocumentaryRow,assertDocumentaryReceipt,assertDocumentaryView,assertVisibleDocumentaryView,assertGenerated,sourceAuditGuard,genericAuditGuard,unchangedSeed,configuredCredential,assertServerDenial,browserDenialCatalog,safeBrowserLocation,safeNetworkFailureDiagnostic,createBrowserErrorLedger,attachBrowserObservability,waitForStartupGlobals,safeStartupDiagnostics,safeCleanupFailureClasses,CLEANUP_FAILURE_CLASSES,browserObservabilityReport,finalizeBrowserObservability,validateBrowserObservability,safeFailureEvidence,safeLegalFailureSubstage,safeFinanceUiSnapshot,safeClickActionability,safeFinanceUiDiagnostics,captureFinanceUiSnapshot,main};
 if(require.main===module)main().catch(error=>{console.error('I66_ADVISOR_PAYABLE_SIGNED_UAT_HOLD '+String(error.code||'ASSERTION_OR_RUNTIME_FAILURE').replace(/[^A-Za-z0-9_./:-]+/g,'_').slice(0,120));process.exitCode=1;});

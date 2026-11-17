@@ -1,0 +1,40 @@
+{
+  "schema": "GI_I66_SCOPED_READER_LOGGING_READONLY_V1",
+  "status": "READONLY_QUERY_HOLD",
+  "diagnosticOnly": true,
+  "project": "ays-orbit-360-lab",
+  "service": "orbit360scopedpolicyreadpreview",
+  "function": "orbit360ScopedPolicyReadPreview",
+  "fromUtc": "2026-11-17T21:03:00Z",
+  "throughUtc": "2026-11-17T21:07:00Z",
+  "pageSize": 250,
+  "maxPages": 8,
+  "pagesRead": 0,
+  "entriesSeen": 0,
+  "entriesIncluded": 0,
+  "entriesRejectedOutsideExactScope": 0,
+  "payloadClassificationsTruncated": 0,
+  "hasMore": false,
+  "truncated": true,
+  "loggingApiHttpStatuses": [
+    403
+  ],
+  "classifiedCounts": {
+    "OOM": 0,
+    "NO_AVAILABLE_INSTANCE": 0,
+    "HTTP_429": 0,
+    "HTTP_503": 0,
+    "TIMEOUT": 0,
+    "UNCLASSIFIED": 0
+  },
+  "byHttpStatus": {},
+  "byMethod": {},
+  "byRevision": {},
+  "rows": [],
+  "failureClass": "LOGGING_ACCESS_HOLD",
+  "noLogBodyOrPersonalData": true,
+  "noUrlsHeadersOrIdentity": true,
+  "zeroWrites": true,
+  "functionalAcceptance": false,
+  "rootCauseProven": false
+}
