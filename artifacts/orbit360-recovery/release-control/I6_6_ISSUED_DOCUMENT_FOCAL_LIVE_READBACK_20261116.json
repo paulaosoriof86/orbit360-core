@@ -1,0 +1,68 @@
+{
+  "schema": "GI_I66_PRIVATE_ISSUED_DOCUMENT_LIVE_READBACK_INDEX_V1",
+  "runId": 44022009750,
+  "runConclusion": "success",
+  "artifactId": 14301715369,
+  "artifactDigest": "sha256:33774c68db41370fcc407529c3be320cf8034209441219b7217fdf08690bab68",
+  "independentZipRehash": true,
+  "observedAtUtc": "2026-11-17T05:09:14.469Z",
+  "workflowSourceSha": "bd564d5c48e4a55ac08adb101fbe8e1bd270ea8e",
+  "documentaryFocalReadback": {
+    "id": "ISSUED.DOC.1",
+    "sourceKind": "ISSUED_REQUIREMENT_NOT_PAYMENT",
+    "sourcePdfSha256": "cf74d644ca819810d6302da17d323dd3a628e841a1be883d7c3ee27b2767c3a9",
+    "sourcePaid": false,
+    "paymentApplicationAuthorized": false,
+    "writes": 0,
+    "certifiedApplied": 0,
+    "scannedPolicyCount": 1428,
+    "policyNumberMatches": 0,
+    "exactEditionMatches": 0,
+    "exactRequirementMatches": 0,
+    "currentStatus": "HOLD_FOCAL_POLICY_NOT_FOUND",
+    "scanCoverage": {
+      "policyAliasFields": 11,
+      "policyCap": 2000,
+      "linkedCap": 80,
+      "proposalCap": 250
+    },
+    "opsLinkedCount": null,
+    "opsLinkCoverage": "gestiones.polizaId_only",
+    "opsAbsenceProven": false,
+    "activeProposalMatches": 0,
+    "activeLedgerPresent": true,
+    "snapshotFingerprint": "1a8ebf90c4211ca7624496242d998de7a2f35caf601bfe431b9115430c5ac5c4"
+  },
+  "totalCases": 37,
+  "counts": {
+    "HOLD_POLICY_NOT_FOUND": 9,
+    "HOLD_NO_EXACT_REQUIREMENT_IN_ANY_EDITION": 19,
+    "PENDING_OVERDUE_NO_PAID_WRITE": 3,
+    "PENDING_FUTURE_NO_PAID_WRITE": 6
+  },
+  "bantrabPostProtectedBatchReadback": {
+    "priorProtectedRunId": 43438038880,
+    "priorProtectedSourceReferenceWrites": 7,
+    "priorProtectedPaymentWrites": 0,
+    "previousSevenExactReferenceAndAmountReadback": 7,
+    "previousSevenUnexpectedOrUnlinked": [],
+    "remainingSevenSourceCaseIds": [
+      "A3.B2",
+      "A3.B3",
+      "A3.B10",
+      "A3.B11",
+      "A3.B12",
+      "A3.B13",
+      "A3.B14"
+    ],
+    "remainingSevenAlreadyExactReferenced": 0,
+    "remainingSevenPotentialUnlinked": 7,
+    "remainingSevenMissingPolicy": 5,
+    "paymentApplicationsDuringThisRead": 0
+  },
+  "noRawCustomerIdentityInPublicIndex": true,
+  "newOperationalCredits": 0,
+  "realPayments": 0,
+  "realDataWrites": 0,
+  "next": "VERIFY_EXISTING_CLIENT_AND_GESTIONES_BY_PRIVATE_DOCUMENT_IDENTITY_THEN_PREPARE_DOCUMENTED_POLICY_AND_EXPECTED_RECEIPT_DELTA_NO_PAYMENT"
+}

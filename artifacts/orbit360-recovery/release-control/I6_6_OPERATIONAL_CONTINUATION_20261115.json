@@ -87,6 +87,17 @@
     "Operational candidate validation, the signed permission-matrix driver and exact LIVE transport retained an old Preview channel independently. All signed drivers must consume one source-bound candidate; a successful test on an older frontend cannot certify the current artifact."
   ],
   "currentEvidenceBoundaries": {
+    "immutablePreviewTransportAndParallelCartera20261116": {
+      "previewTransportReceipt": "artifacts/orbit360-recovery/release-control/I6_6_PREVIEW_TRANSPORT_BD564_READBACK_20261116.json",
+      "previewSourceSha": "bd564d5c48e4a55ac08adb101fbe8e1bd270ea8e",
+      "buildRunId": 44022009808,
+      "buildAndFullReadback": "PASS_NOT_FUNCTIONAL_ACCEPTANCE",
+      "signedQaStatus": "AUTHORIZED_EXACT_CANDIDATE_NOT_YET_PASSED",
+      "documentaryFocalReadbackReceipt": "artifacts/orbit360-recovery/release-control/I6_6_ISSUED_DOCUMENT_FOCAL_LIVE_READBACK_20261116.json",
+      "documentaryFocalStatus": "HOLD_POLICY_NOT_LOCATED_IN_BOUNDED_ALIAS_CENSUS",
+      "newFinancialWrites": 0,
+      "newLiveAcceptanceClaimed": false
+    },
     "canonicalV7ConfigurationObservations20261116": {
       "receipt": "artifacts/orbit360-recovery/release-control/I6_6_V7_CANONICAL_CONFIG_OBSERVATIONAL_READBACK_20261116.json",
       "canonicalDocumentObservedAbsentThenPresent": true,

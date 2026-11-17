@@ -9,16 +9,25 @@
     "activeGate": "I6.6",
     "closedHistoricalGate": "B4-007",
     "latestProvenLiveSource": "84769378eb2014addebfefdbdd63091bddc4b817",
-    "currentWork": "Correct the reproduced immutable-bundle config lookup in the existing rollover verifier, retain the failed attempt as unaccepted evidence, verify recoverable backups and all untouched channels, build a new immutable candidate, then run the existing signed Preview gate. V2.0 consent remains Direction/GT/I6.6/Preview only. No real financial writes or new LIVE acceptance.",
-    "latestHostingPreviewEvidence": "artifacts/orbit360-recovery/release-control/I6_6_TECHNICAL_PREVIEW_AFTER_HOLD_AND_CAUSAL_REPAIR_20261116.json",
-    "latestHostingPreviewSource": "3820817d8fcac86a99229cefdc46dfc03e1a8c36",
+    "currentWork": "The repaired immutable build and full before/after readbacks passed. Execute only the four existing signed Preview drivers on the exact source/build/artifact and three preexisting Preview functions. Same V2.0 Direction/GT consent scope; no real financial writes or LIVE promotion. Parallel issued-document focal readback completed with no matching policy in the bounded alias census; verify existing client and management before any documentary delta.",
+    "latestHostingPreviewEvidence": "artifacts/orbit360-recovery/release-control/I6_6_PREVIEW_TRANSPORT_BD564_READBACK_20261116.json",
+    "latestHostingPreviewSource": "bd564d5c48e4a55ac08adb101fbe8e1bd270ea8e",
     "operationsEvidenceReview": "artifacts/orbit360-recovery/release-control/I6_6_OPS_EVIDENCE_AND_PREVIEW_BINDING_REVIEW_20261116.json",
     "legalSuccessorAcceptance": "SEPARATELY_AUTHORIZED_SAME_V2_TERMS_DIRECTION_GT_I66_PREVIEW_ONLY_NOT_YET_EXECUTED",
     "legalScopeAuthorizationReceipt": "artifacts/orbit360-recovery/release-control/I6_6_DIRECTION_PREVIEW_V2_SCOPE_AUTHORIZATION_20261116.json",
     "legalScopeAuthorizationReceiptSha256": "d3309675c753bd1b31f9163d506aba2e29ac70583a7b8d54cb5b8503b5c50a44",
     "newFinancialWrites": 0,
     "newLiveAcceptanceClaimed": false,
-    "technicalPreviewCausalRetryReceipt": "artifacts/orbit360-recovery/release-control/I6_6_TECHNICAL_PREVIEW_ROLLOVER_CAUSAL_RETRY_20261116.json"
+    "technicalPreviewCausalRetryReceipt": "artifacts/orbit360-recovery/release-control/I6_6_TECHNICAL_PREVIEW_ROLLOVER_CAUSAL_RETRY_20261116.json",
+    "signedPreviewCandidate": {
+      "sourceSha": "bd564d5c48e4a55ac08adb101fbe8e1bd270ea8e",
+      "buildId": "gi-i66-bd564d5c48e4-57f234755dc1",
+      "buildRunId": 44022009808,
+      "artifactId": 14300394824,
+      "artifactDigest": "sha256:d6ae5c953fc2c71c55fdaed15ca93b0a571ff4f6a36d4536eac73192564afcd7",
+      "status": "SIGNED_PREVIEW_AUTHORIZED_NOT_YET_PASSED"
+    },
+    "documentaryFocalReadbackEvidence": "artifacts/orbit360-recovery/release-control/I6_6_ISSUED_DOCUMENT_FOCAL_LIVE_READBACK_20261116.json"
   },
   "b4003ActiveCertificationCursor20261106": {
     "schema": "GRAVICENTRA_B4_003_SINGLE_ACTIVE_CERTIFICATION_CURSOR_V1",
