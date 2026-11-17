@@ -135,3 +135,155 @@ test('driver keeps denial assertions, ordinary UI, and ownership cleanup intact'
  assert.ok(driver.indexOf('await context.close()')<driver.indexOf('await Promise.allSettled(diagnosticReads)'));
  assert.doesNotMatch(driver,/route\.fulfill|route\.continue|force:\s*true|setCustomUserClaims|recursiveDelete/);
 });
+
+const {EventEmitter}=require('node:events');
+const uiFacts=()=>Object.fromEntries(d.UI_CAUSAL_FIELDS.map(key=>[key,true]));
+function uiFixture(){
+ const expected={phase:'PREVIEW',origin:'https://ays-orbit-360-lab--gi-i66-rc-123-fixture.web.app',actorRole:'direccion',planDigest:'b'.repeat(64),
+  proposalId:'qa_proposal_'+privateValue,sourceRunId:'cobledgerqa_'+privateValue,applicationId:'propapp_'+privateValue,
+  policyId:'qa_policy_'+privateValue,receiptId:'qa_receipt_'+privateValue,cobroId:'qa_cobro_'+privateValue,portfolioId:'qa_portfolio_'+privateValue,amount:173.23,currency:'GTQ'};
+ expected.navigationUrl=expected.origin+'/#/conciliaciones';
+ const page=new EventEmitter(),frame={url:()=>expected.navigationUrl};page.mainFrame=()=>frame;
+ const requestBody={data:{tenantId:'alianzas-soluciones',activeRole:'Dirección',operation:'apply_proposal_application',payload:{proposalId:expected.proposalId,sourceRunId:expected.sourceRunId,planDigest:expected.planDigest}}};
+ const request={url:()=> 'https://us-central1-ays-orbit-360-lab.cloudfunctions.net/orbit360CobrosReconciliationCommandPreview',method:()=> 'POST',frame:()=>frame,postDataJSON:()=>requestBody};
+ const result={ok:true,readbackConfirmed:true,serverOwned:true,operation:'apply_proposal_application',status:'APPLIED_WITH_MANUAL_APPROVAL',approvalMode:'MANUAL_AUTHORIZED',
+  applicationId:expected.applicationId,sourceRunId:expected.sourceRunId,proposalId:expected.proposalId,policyId:expected.policyId,
+  results:[{receiptId:expected.receiptId,cobroId:expected.cobroId,portfolioId:expected.portfolioId,amount:expected.amount,currency:expected.currency,paymentState:'PAID_DIRECT',applicationState:'PENDING_APPLICATION'}]};
+ const response={request:()=>request,status:()=>200,json:async()=>({result})};
+ return{expected,page,frame,requestBody,request,result,response};
+}
+async function captureUi(change=()=>{},events){
+ const x=uiFixture();change(x);const observer=d.observeUiApplication(x.page,x.expected);
+ if(events)await events(x,observer);else{x.page.emit('request',x.request);x.page.emit('response',x.response);x.page.emit('requestfinished',x.request);x.page.emit('framenavigated',x.frame);}
+ return{x,observer,observation:await observer.seal()};
+}
+const unavailable=()=>new Error('response.body: Protocol error (Network.getResponseBody): No resource with given identifier found');
+test('passive UI response proves exact command and preserves privacy without replacing UI action',async()=>{
+ const {observation,x}=await captureUi();const evidence=d.validateUiApplicationEvidence(observation,uiFacts());
+ assert.equal(evidence.mode,'UI_RESPONSE_CAPTURED_EXACT');assert.equal(evidence.status,'PASS');assert.equal(evidence.observation.observerFailed,false);
+ assert.equal(evidence.observation.responseConfirmed,true);assert.equal(evidence.observation.sealed,true);noPrivate(evidence);
+ for(const event of ['request','response','requestfinished','requestfailed','framenavigated'])assert.equal(x.page.listenerCount(event),0);
+});
+test('body unavailable across UI reload is observer failure only, with exact causal proof',async()=>{
+ const {observation}=await captureUi(x=>x.response.json=async()=>{throw unavailable();});
+ const evidence=d.validateUiApplicationEvidence(observation,uiFacts());assert.equal(evidence.mode,'UI_REQUEST_RELOAD_DURABLE_READBACK_EXACT');
+ assert.equal(observation.bodyReadState,'UNAVAILABLE');assert.equal(observation.observerFailureClass,'BROWSER_RESPONSE_BODY_UNAVAILABLE');
+ assert.equal(observation.responseConfirmed,null);noPrivate(evidence);
+ const diagnostic=d.projectUiObservationFailure(unavailable(),'apply_proposal_application','UI_APPLICATION_CONFIRM',privateValue);
+ assert.equal(diagnostic.observerFailed,true);assert.equal(diagnostic.driverFailed,false);assert.equal(diagnostic.denied,false);noPrivate(diagnostic);
+});
+test('subsequent signed DRIVER replay never enters UI request or response evidence',async()=>{
+ const {observation}=await captureUi(()=>{},async x=>{
+  x.page.emit('request',x.request);x.page.emit('response',x.response);x.page.emit('requestfinished',x.request);x.page.emit('framenavigated',x.frame);
+  const replay={...x.request};x.page.emit('request',replay);x.page.emit('response',{...x.response,request:()=>replay,json:async()=>({result:{...x.result,reused:true}})});x.page.emit('requestfinished',replay);
+ });assert.equal(observation.requestCount,1);assert.equal(observation.responseCount,1);assert.equal(d.validateUiApplicationEvidence(observation,uiFacts()).status,'PASS');
+});
+test('unrelated subframe navigation cannot supply reload causality',async()=>{
+ const {observation}=await captureUi(()=>{},async x=>{x.page.emit('request',x.request);x.page.emit('response',x.response);x.page.emit('requestfinished',x.request);x.page.emit('framenavigated',{url:()=>x.expected.navigationUrl});});
+ assert.equal(observation.mainFrameNavigationCount,0);assert.throws(()=>d.validateUiApplicationEvidence(observation,uiFacts()),/I66_PROPOSAL_UI_RELOAD_NOT_CONFIRMED/);
+});
+for(const [name,change]of [
+ ['plan drift',x=>x.requestBody.data.payload.planDigest='c'.repeat(64)],
+ ['other role',x=>x.requestBody.data.activeRole='Asesor'],
+ ['money override',x=>x.requestBody.data.payload.amount=173.23],
+ ['GET method',x=>x.request.method=()=> 'GET'],
+ ['subframe request',x=>x.request.frame=()=>({})],
+ ['other tenant',x=>x.requestBody.data.tenantId='other'],
+ ['other proposal',x=>x.requestBody.data.payload.proposalId='other'],
+ ['other ledger run',x=>x.requestBody.data.payload.sourceRunId='other'],
+ ['query URL',x=>x.request.url=()=> 'https://us-central1-ays-orbit-360-lab.cloudfunctions.net/orbit360CobrosReconciliationCommandPreview?secret='+privateValue],
+ ['redirected endpoint',x=>x.request.url=()=> 'https://example.invalid/orbit360CobrosReconciliationCommandPreview'],
+ ['LIVE endpoint during Preview',x=>x.request.url=()=> 'https://us-central1-ays-orbit-360-lab.cloudfunctions.net/orbit360CobrosReconciliationCommand']
+])test('UI observation rejects '+name,async()=>{const {observation}=await captureUi(change);assert.throws(()=>d.validateUiApplicationEvidence(observation,uiFacts()));noPrivate(observation);});
+for(const [name,events]of [
+ ['no request',x=>{x.page.emit('response',x.response);x.page.emit('requestfinished',x.request);x.page.emit('framenavigated',x.frame);} ],
+ ['two UI requests',x=>{x.page.emit('request',x.request);x.page.emit('request',{...x.request});x.page.emit('response',x.response);x.page.emit('requestfinished',x.request);x.page.emit('framenavigated',x.frame);} ],
+ ['no response',x=>{x.page.emit('request',x.request);x.page.emit('requestfinished',x.request);x.page.emit('framenavigated',x.frame);} ],
+ ['two responses',x=>{x.page.emit('request',x.request);x.page.emit('response',x.response);x.page.emit('response',x.response);x.page.emit('requestfinished',x.request);x.page.emit('framenavigated',x.frame);} ],
+ ['no request finish',x=>{x.page.emit('request',x.request);x.page.emit('response',x.response);x.page.emit('framenavigated',x.frame);} ],
+ ['failed request',x=>{x.page.emit('request',x.request);x.page.emit('response',x.response);x.page.emit('requestfinished',x.request);x.page.emit('requestfailed',x.request);x.page.emit('framenavigated',x.frame);} ],
+ ['no main reload',x=>{x.page.emit('request',x.request);x.page.emit('response',x.response);x.page.emit('requestfinished',x.request);} ],
+ ['two main reloads',x=>{x.page.emit('request',x.request);x.page.emit('response',x.response);x.page.emit('requestfinished',x.request);x.page.emit('framenavigated',x.frame);x.page.emit('framenavigated',x.frame);} ],
+ ['response after reload',x=>{x.page.emit('request',x.request);x.page.emit('framenavigated',x.frame);x.page.emit('response',x.response);x.page.emit('requestfinished',x.request);} ],
+ ['different main URL',x=>{x.page.emit('request',x.request);x.page.emit('response',x.response);x.page.emit('requestfinished',x.request);x.frame.url=()=> 'https://example.invalid/';x.page.emit('framenavigated',x.frame);} ]
+])test('UI observation rejects '+name,async()=>{const {observation}=await captureUi(()=>{},events);assert.throws(()=>d.validateUiApplicationEvidence(observation,uiFacts()));});
+for(const status of [201,204,302,400,403,500])test('UI observation rejects HTTP '+status,async()=>{
+ const {observation}=await captureUi(x=>x.response.status=()=>status);assert.throws(()=>d.validateUiApplicationEvidence(observation,uiFacts()),/I66_PROPOSAL_UI_RESPONSE_NOT_CONFIRMED/);
+});
+for(const key of d.UI_CAUSAL_FIELDS)test('response and unavailable-body paths both require causal evidence '+key,async()=>{
+ for(const change of [()=>{},x=>x.response.json=async()=>{throw unavailable();}]){const {observation}=await captureUi(change);for(const value of [false,null,undefined,'true',privateValue]){const facts={...uiFacts(),[key]:value};assert.throws(()=>d.validateUiApplicationEvidence(observation,facts),/I66_PROPOSAL_UI_CAUSAL_EVIDENCE_INCOMPLETE/);}}
+});
+for(const [name,change]of [
+ ['command error',x=>x.response.json=async()=>({error:{status:'PERMISSION_DENIED',message:privateValue}})],
+ ['missing result',x=>x.response.json=async()=>({})],['not ok',x=>x.result.ok=false],['no readback',x=>x.result.readbackConfirmed=false],
+ ['reused response',x=>x.result.reused=true],['not server owned',x=>x.result.serverOwned=false],['wrong operation',x=>x.result.operation='apply_payment'],
+ ['review required',x=>x.result.status='REVIEW_REQUIRED'],['nonmanual approval',x=>x.result.approvalMode='AUTO'],
+ ['wrong application',x=>x.result.applicationId='other'],['wrong proposal',x=>x.result.proposalId='other'],['wrong source run',x=>x.result.sourceRunId='other'],
+ ['wrong policy',x=>x.result.policyId='other'],['wrong receipt',x=>x.result.results[0].receiptId='other'],['wrong cobro',x=>x.result.results[0].cobroId='other'],
+ ['wrong portfolio',x=>x.result.results[0].portfolioId='other'],['wrong amount',x=>x.result.results[0].amount=1],['wrong currency',x=>x.result.results[0].currency='USD'],
+ ['wrong payment state',x=>x.result.results[0].paymentState='PAID_INFERRED'],['wrong application state',x=>x.result.results[0].applicationState='APPLIED_DIRECT'],
+ ['two results',x=>x.result.results.push({...x.result.results[0]})]
+])test('captured UI response rejects '+name+' without falling back to readback',async()=>{
+ const {observation}=await captureUi(change);assert.equal(observation.bodyReadState,'CAPTURED');assert.throws(()=>d.validateUiApplicationEvidence(observation,uiFacts()),/I66_PROPOSAL_UI_RESPONSE_NOT_CONFIRMED/);noPrivate(observation);
+});
+for(const error of [new SyntaxError(privateValue),new Error(privateValue),Object.assign(new Error(privateValue),{name:'TimeoutError',code:'ETIMEDOUT'}),Object.assign(new TypeError(privateValue),{code:privateValue})])test('unclassified body failure is never a reload waiver: '+error.name,async()=>{
+ const {observation}=await captureUi(x=>x.response.json=async()=>{throw error;});assert.equal(observation.bodyReadState,'FAILED');assert.throws(()=>d.validateUiApplicationEvidence(observation,uiFacts()),/I66_PROPOSAL_UI_BODY_OBSERVATION_UNCLASSIFIED/);noPrivate(observation);
+});
+test('pending body capture has a bounded HOLD and late response cannot change sealed evidence',async()=>{
+ const x=uiFixture();let resolve;x.response.json=()=>new Promise(r=>{resolve=r;});const observer=d.observeUiApplication(x.page,x.expected);
+ x.page.emit('request',x.request);x.page.emit('response',x.response);x.page.emit('requestfinished',x.request);x.page.emit('framenavigated',x.frame);
+ const observation=await observer.seal(5);assert.equal(observation.observerFailureClass,'TIMEOUT');assert.throws(()=>d.validateUiApplicationEvidence(observation,uiFacts()));
+ resolve({result:x.result});await new Promise(r=>setImmediate(r));assert.deepEqual(observer.snapshot(),observation);noPrivate(observation);
+});
+for(const [key,value]of [['phase','OTHER'],['actorRole','operativo'],['planDigest','b'.repeat(64)+'\n'],['navigationUrl','https://example.invalid/'],['amount',1],['currency','USD'],['applicationId','']])test('observer construction refuses invalid '+key,()=>{
+ const x=uiFixture();x.expected[key]=value;assert.throws(()=>d.observeUiApplication(x.page,x.expected),/I66_PROPOSAL_UI_OBSERVER_SCOPE_INVALID/);assert.equal(x.page.eventNames().length,0);
+});
+test('UI confirmation projection keeps no IDs, amounts, messages, unbounded fields or invented PASS',async()=>{
+ const {observation}=await captureUi();const value=d.safeUiApplicationEvidence({status:privateValue,mode:privateValue,message:privateValue,observation:{...observation,httpStatus:privateValue,requestCount:999999,raw:privateValue,observerFailureClass:privateValue,observerFailureCode:privateValue},causalEvidence:{...uiFacts(),private:privateValue}});
+ assert.equal(value.status,'HOLD');assert.equal(value.mode,null);assert.equal(value.observation.httpStatus,null);assert.equal(value.observation.requestCount,null);assert.equal(value.observation.observerFailureClass,null);noPrivate(value);
+ assert.doesNotThrow(()=>d.safeUiApplicationEvidence(null));assert.doesNotThrow(()=>d.safeUiApplicationObservation(null));
+ for(const value of [undefined,null,{},[],privateValue])assert.throws(()=>d.validateUiApplicationEvidence(value,uiFacts()));
+});
+test('new signed driver seals passive observation and explicit causal facts before functional PASS',()=>{
+ assert.match(driver,/uiApplicationObserver=observeUiApplication\(direction/);assert.match(driver,/predicate:frame=>frame===direction\.mainFrame\(\)/);
+ assert.match(driver,/report\.uiApplicationConfirmation=validateUiApplicationEvidence\(observation,uiCausalEvidence\)/);
+ for(const key of d.UI_CAUSAL_FIELDS)assert.match(driver,new RegExp('uiCausalEvidence\\.'+key+'=true'));
+ assert.match(driver,/application\.actor\?\.uid===actors\[0\]\.uid/);assert.match(driver,/sourceProposalDigest:stageProposal\.payloadDigest,sourceEvidenceDigest:stageEvidence\.payloadDigest/);
+ assert.match(driver,/application\.beforeAfter\.map/);assert.match(driver,/UI_APPLICATION_RESPONSE_OR_CAUSAL_RELOAD_READBACK_EXACT/);
+ assert.doesNotMatch(driver,/projectCallableResult\(\{driverFailed:true[^\n]+,'UI'\)/);assert.doesNotMatch(driver,/page\.route\(|direction\.route\(|setExtraHTTPHeaders|route\.fulfill|route\.continue|force:\s*true/);
+});
+test('contradictory observer classes and unknown codes never qualify as successful capture or known reload loss',async()=>{
+ const {observation}=await captureUi();
+ for(const patch of [{observerFailureClass:'TIMEOUT'},{observerFailureCode:'UNKNOWN_CODE'},{observerFailed:true},{sealed:false}])assert.throws(()=>d.validateUiApplicationEvidence({...observation,...patch},uiFacts()));
+ const missing=await captureUi(x=>x.response.json=async()=>{throw unavailable();});
+ for(const patch of [{observerFailureCode:'UNKNOWN_CODE'},{observerFailureCode:'ERR_ASSERTION'},{responseConfirmed:true},{observerFailed:false}])assert.throws(()=>d.validateUiApplicationEvidence({...missing.observation,...patch},uiFacts()));
+});
+async function actualAuditReadback(change=()=>{}){
+ const ids={proposal:'qa_proposal',receipt:'qa_receipt',portfolio:'qa_portfolio',policy:'qa_policy'};
+ const receipt={id:ids.receipt,moneda:'GTQ',monto:173.23},portfolio={id:ids.portfolio,reciboId:ids.receipt,carteraActiva:true};
+ const seed={ids,receipt,portfolio,applicationId:'propapp_qa',resolutionId:'propres_qa',cobroId:'cob_qa',runId:'cobledgerqa_qa',TENANT:'alianzas-soluciones',
+  ready:{result:{planDigest:'b'.repeat(64)}},stageProposal:{payloadDigest:'c'.repeat(64)},stageEvidence:{payloadDigest:'d'.repeat(64)},actors:[{uid:'qa_actor',role:'direccion'}]};
+ seed.rows={application:{id:seed.applicationId,tenantId:seed.TENANT,proposalId:ids.proposal,sourceRunId:seed.runId,planDigest:seed.ready.result.planDigest,resolutionId:seed.resolutionId,
+  sourceProposalDigest:seed.stageProposal.payloadDigest,sourceEvidenceDigest:seed.stageEvidence.payloadDigest,actor:{uid:'qa_actor',activeRole:'Dirección'},
+  __syntheticQa:true,qaRunId:seed.runId,status:'APPLIED',beforeAfter:[{collection:'recibosEsperados',id:ids.receipt,before:receipt},{collection:'cobros',id:seed.cobroId,before:null},{collection:'carteraPrimas',id:ids.portfolio,before:portfolio}]},
+  paid:{paymentState:'PAID_DIRECT',cobroId:seed.cobroId},cobro:{monto:173.23,moneda:'GTQ',applicationState:'PENDING_APPLICATION',reciboId:ids.receipt,polizaId:ids.policy},
+  closed:{carteraActiva:false,cobroId:seed.cobroId,reciboId:ids.receipt}};
+ change(seed);
+ const begin=driver.indexOf("  enter('APPLICATION_READBACK');"),end=driver.indexOf("  enter('IDEMPOTENT_REPLAY');",begin);assert.ok(begin>0&&end>begin);
+ const code='(async()=>{const seed=JSON.parse('+JSON.stringify(JSON.stringify(seed))+');const {ids,receipt,portfolio,applicationId,resolutionId,cobroId,runId,TENANT,ready,stageProposal,stageEvidence,actors}=seed;'+
+  'const uiCausalEvidence={},enter=()=>{},checked=()=>{},applicationRef="application",item=(collection)=>({recibosEsperados:"paid",cobros:"cobro",carteraPrimas:"closed"})[collection],snapshot=async ref=>seed.rows[ref],owned=(row,id)=>row?.__syntheticQa===true&&row.qaRunId===id,norm=v=>String(v).normalize("NFD").replace(/[\\u0300-\\u036f]/g,"").toLowerCase();'+
+  driver.slice(begin,end)+'return uiCausalEvidence;})()';
+ return vm.runInNewContext(code,{assert});
+}
+test('actual signed driver audit block credits only exact actor/source/targets and durable financial readback',async()=>{
+ const value=await actualAuditReadback();assert.equal(value.applicationAuditExact,true);assert.equal(value.atomicTargetsReadback,true);
+});
+for(const [name,change]of [
+ ['actor',x=>x.rows.application.actor.uid='other'],['role',x=>x.rows.application.actor.activeRole='Operativo'],
+ ['application ID',x=>x.rows.application.id='other'],['source run',x=>x.rows.application.sourceRunId='other'],['plan',x=>x.rows.application.planDigest='e'.repeat(64)],
+ ['proposal source',x=>x.rows.application.sourceProposalDigest='e'.repeat(64)],['evidence source',x=>x.rows.application.sourceEvidenceDigest='e'.repeat(64)],
+ ['tenant',x=>x.rows.application.tenantId='other'],['audit target',x=>x.rows.application.beforeAfter[0].id='other'],
+ ['preexisting cobro',x=>x.rows.application.beforeAfter[1].before={monto:173.23}],['not paid',x=>x.rows.paid.paymentState='PENDING'],
+ ['wrong currency',x=>x.rows.cobro.moneda='USD'],['wrong amount',x=>x.rows.cobro.monto=173.24],['wrong receipt',x=>x.rows.cobro.reciboId='other'],
+ ['wrong policy',x=>x.rows.cobro.polizaId='other'],['active portfolio',x=>x.rows.closed.carteraActiva=true],['unlinked portfolio',x=>x.rows.closed.cobroId='other']
+])test('actual application readback rejects '+name,async()=>assert.rejects(actualAuditReadback(change)));

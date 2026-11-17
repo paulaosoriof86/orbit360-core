@@ -4,7 +4,7 @@
 const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),crypto=require('node:crypto');
 const {digest,applicationIdFor}=require('../functions/proposal-application-boundary');
 const {acceptDirectionPreviewLegal}=require('./gravicentra-i6-6-direction-preview-legal-acceptance.cjs');
-const {REASONS,CALLABLE_CODES,safeCode,safeStage,projectCallableResult,ownedUiRequest,projectUiResponse,failureDetails,safePrerequisites,diagnoseProposalPrerequisites}=require('./gravicentra-i6-6-proposal-uat-diagnostics.cjs');
+const {REASONS,CALLABLE_CODES,UI_CAUSAL_FIELDS,safeCode,safeStage,projectCallableResult,safeCallableDiagnostic,ownedUiRequest,projectUiResponse,projectUiObservationFailure,observeUiApplication,validateUiApplicationEvidence,safeUiApplicationEvidence,failureDetails,safePrerequisites,diagnoseProposalPrerequisites}=require('./gravicentra-i6-6-proposal-uat-diagnostics.cjs');
 const TENANT='alianzas-soluciones',PROJECT='ays-orbit-360-lab';
 const norm=v=>String(v??'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]/g,'');
 const hash=v=>crypto.createHash('sha256').update(v).digest('hex');
@@ -25,6 +25,7 @@ async function main(){
  const cfg=validateEnvironment(process.env);
  const reportPath=path.join(cfg.packageRoot,'evidence','i66-proposal-application-signed-uat-'+cfg.phase.toLowerCase()+'.json');
  const report={sourceSha:cfg.sourceSha,phase:cfg.phase,status:'HOLD',syntheticOnly:true,realControlUnchanged:false,checks:[],cleanup:{status:'HOLD',remaining:null},proposalDiagnostics:{prerequisites:null,calls:[]}};
+ const uiCausalEvidence=Object.fromEntries(UI_CAUSAL_FIELDS.map(key=>[key,false]));let uiApplicationObserver=null;
  let stage='BOOT';const enter=name=>{stage=safeStage(name);};
  const admin=require('firebase-admin'),{chromium}=require('playwright');
  const credentialPath=process.env.GOOGLE_APPLICATION_CREDENTIALS;
@@ -104,6 +105,7 @@ async function main(){
    assert.equal(response.status,200);assert.equal(hash(Buffer.from(await response.arrayBuffer())),hash(bytes),'I66_PROPOSAL_UI_ARTIFACT_DRIFT');
   }
   checked('EXACT_BUILD_AND_UI_BYTES');
+  uiCausalEvidence.uiBytesExact=true;
   enter('CANONICAL_CONTROL_READ');
   const realControlRef=item('cobrosLedgerControl','active');originalControl=await snapshot(realControlRef);
   assert.ok(originalControl?.activeRunId,'I66_PROPOSAL_REAL_CONTROL_MISSING');activeManifestRef=item('cobrosLedgerRuns',originalControl.activeRunId);originalManifest=await snapshot(activeManifestRef);
@@ -123,8 +125,11 @@ async function main(){
    let body;try{body=request.postDataJSON();}catch(_){return;}
    if(!ownedUiRequest(response.url(),body,cfg.phase,ids.proposal,runId))return;
    const operation=body.data.operation;
+   // The apply observer below owns the response and its request/reload lineage.
+   // Other UI observations remain diagnostic, never command failure evidence.
+   if(operation==='apply_proposal_application'&&uiStage==='UI_APPLICATION_CONFIRM')return;
    diagnosticReads.push(response.json().then(result=>report.proposalDiagnostics.calls.push(projectUiResponse(result,operation,uiStage,ids.receipt)))
-    .catch(error=>report.proposalDiagnostics.calls.push(projectCallableResult({driverFailed:true,code:safeCode(error?.code)},operation,uiStage,ids.receipt,'UI'))));
+    .catch(error=>report.proposalDiagnostics.calls.push(projectUiObservationFailure(error,operation,uiStage,ids.receipt))));
   });
   if(cfg.phase==='PREVIEW'){
     enter('DIRECTION_LEGAL_ACCEPTANCE');
@@ -224,21 +229,51 @@ async function main(){
   const stale=await rawCall(direction,'apply_proposal_application',{...proposalPayload,planDigest:ready.result.planDigest});assert.equal(stale.result?.eligible,false);assert.equal(await snapshot(item('cobros',cobroId)),null);
   await restoreQa(runRef.collection('evidenciasCobro').doc(ids.source),stageEvidence);checked('STALE_SOURCE_APPLICATION_DENIED');
   enter('UI_APPLICATION_CONFIRM');
-  await Promise.all([direction.waitForEvent('framenavigated',{timeout:30000}),direction.locator('[data-conc-apply]').click()]);
+  assert.equal(await snapshot(applicationRef),null,'I66_PROPOSAL_UI_AUDIT_IDENTITY_DRIFT');
+  assert.equal(await snapshot(item('cobros',cobroId)),null,'I66_PROPOSAL_UI_AUDIT_IDENTITY_DRIFT');
+  assert.deepEqual(await snapshot(item('recibosEsperados',ids.receipt)),receipt,'I66_PROPOSAL_UI_AUDIT_IDENTITY_DRIFT');
+  assert.deepEqual(await snapshot(item('carteraPrimas',ids.portfolio)),portfolio,'I66_PROPOSAL_UI_AUDIT_IDENTITY_DRIFT');
+  uiCausalEvidence.beforeTargetsUnapplied=true;
+  uiApplicationObserver=observeUiApplication(direction,{phase:cfg.phase,origin:cfg.origin,navigationUrl:direction.url(),actorRole:actors[0].role,
+   proposalId:ids.proposal,sourceRunId:runId,planDigest:ready.result.planDigest,applicationId,policyId:ids.policy,receiptId:ids.receipt,
+   cobroId,portfolioId:ids.portfolio,amount:173.23,currency:'GTQ'});
+  await Promise.all([direction.waitForEvent('framenavigated',{predicate:frame=>frame===direction.mainFrame(),timeout:30000}),direction.locator('[data-conc-apply]').click()]);
   await direction.waitForFunction(()=>!!window.Orbit?.productRuntimeBrowserProvidersP0&&!!window.Orbit?.productAppP0,null,{timeout:30000});
   enter('APPLICATION_RELOAD');
-  const reload=await direction.evaluate(async()=>{const p=Orbit.productRuntimeBrowserProvidersP0;await p.initialize();await p.waitForUser();return(await Orbit.productAppP0.activate())?.started===true;});assert.equal(reload,true);
+  const reload=await direction.evaluate(async()=>{const p=Orbit.productRuntimeBrowserProvidersP0;await p.initialize();const user=await p.waitForUser();const active=await Orbit.productAppP0.activate();return{started:active?.started===true,uid:user?.uid,role:Orbit.session?.rol?.()};});
+  assert.ok(reload.started&&reload.uid===actors[0].uid&&norm(reload.role)===actors[0].role,'I66_PROPOSAL_UI_RELOAD_ACTOR_DRIFT');
+  uiCausalEvidence.signedActorPreserved=true;
   enter('APPLICATION_READBACK');
   const [application,paid,cobro,closed]=await Promise.all([snapshot(applicationRef),snapshot(item('recibosEsperados',ids.receipt)),snapshot(item('cobros',cobroId)),snapshot(item('carteraPrimas',ids.portfolio))]);
   assert.ok(owned(application,runId)&&application.status==='APPLIED'&&application.beforeAfter.length===3);
+  assert.deepEqual(Object.fromEntries(['id','tenantId','proposalId','sourceRunId','planDigest','resolutionId','sourceProposalDigest','sourceEvidenceDigest'].map(key=>[key,application[key]])),
+   {id:applicationId,tenantId:TENANT,proposalId:ids.proposal,sourceRunId:runId,planDigest:ready.result.planDigest,resolutionId,
+    sourceProposalDigest:stageProposal.payloadDigest,sourceEvidenceDigest:stageEvidence.payloadDigest},'I66_PROPOSAL_UI_AUDIT_IDENTITY_DRIFT');
+  assert.ok(application.actor?.uid===actors[0].uid&&norm(application.actor?.activeRole)===actors[0].role,'I66_PROPOSAL_UI_AUDIT_IDENTITY_DRIFT');
+  assert.deepEqual(application.beforeAfter.map(row=>({collection:row.collection,id:row.id,before:row.before})),[
+   {collection:'recibosEsperados',id:ids.receipt,before:receipt},{collection:'cobros',id:cobroId,before:null},
+   {collection:'carteraPrimas',id:ids.portfolio,before:portfolio}],'I66_PROPOSAL_UI_AUDIT_IDENTITY_DRIFT');
+  uiCausalEvidence.applicationAuditExact=true;
   assert.equal(paid.paymentState,'PAID_DIRECT');assert.equal(cobro.monto,173.23);assert.equal(cobro.moneda,'GTQ');assert.equal(cobro.applicationState,'PENDING_APPLICATION');assert.equal(closed.carteraActiva,false);assert.equal(closed.cobroId,cobroId);
+  assert.ok(paid.cobroId===cobroId&&cobro.reciboId===ids.receipt&&cobro.polizaId===ids.policy&&closed.reciboId===ids.receipt,'I66_PROPOSAL_UI_AUDIT_IDENTITY_DRIFT');
+  uiCausalEvidence.atomicTargetsReadback=true;
   checked('UI_APPLY_RECEIPT_COBRO_PORTFOLIO_ATOMIC_PERSISTENCE_RELOAD');
   enter('IDEMPOTENT_REPLAY');
   const repeated=await rawCall(direction,'apply_proposal_application',{...proposalPayload,planDigest:ready.result.planDigest});assert.equal(repeated.result?.reused,true);assert.equal(repeated.result?.readbackConfirmed,true);
   assert.equal((await items('cobros').where('reciboId','==',ids.receipt).get()).size,1);checked('SECOND_APPLY_IDEMPOTENT_NO_DOUBLE_PAYMENT');
+  uiCausalEvidence.idempotentReplayConfirmed=true;
   enter('SOURCE_IMMUTABILITY');
   assert.deepEqual(await snapshot(runRef.collection('propuestasConciliacion').doc(ids.proposal)),stageProposal);assert.deepEqual(await snapshot(runRef.collection('evidenciasCobro').doc(ids.source)),stageEvidence);
   checked('IMMUTABLE_SOURCE_UNCHANGED_AFTER_APPLICATION');
+  uiCausalEvidence.immutableSourceUnchanged=true;
+  const observation=await uiApplicationObserver.seal();
+  report.uiApplicationConfirmation=safeUiApplicationEvidence({status:'HOLD',observation,causalEvidence:uiCausalEvidence});
+  report.proposalDiagnostics.calls.push(safeCallableDiagnostic({stage:'UI_APPLICATION_CONFIRM',channel:'UI',operation:'apply_proposal_application',
+   resultPresent:observation.bodyReadState==='CAPTURED',denied:observation.commandDenied,driverFailed:false,observerFailed:observation.observerFailed,
+   observerFailureClass:observation.observerFailureClass,observerFailureCode:observation.observerFailureCode,
+   readbackConfirmed:observation.responseConfirmed===true?true:null,reason:'NO_REASON'}));
+  report.uiApplicationConfirmation=validateUiApplicationEvidence(observation,uiCausalEvidence);
+  checked('UI_APPLICATION_RESPONSE_OR_CAUSAL_RELOAD_READBACK_EXACT');
  }catch(error){failure=error;Object.assign(report,failureDetails(error,stage));}
  finally{
   enter('SYNTHETIC_RESTORE');
@@ -260,6 +295,10 @@ async function main(){
    report.cleanup={status:cleanupErrors.length||remaining?'HOLD':'PASS',remaining,removedOwnedTargets:removed,errors:cleanupErrors};
   }catch(error){report.cleanup={status:'HOLD',remaining:null,errorCode:safeCode(error?.code)};if(!failure)Object.assign(report,failureDetails(error,stage));failure=failure||error;}
   for(const context of sessions)try{await context.close();}catch(_){}
+  if(uiApplicationObserver){
+   if(!report.uiApplicationConfirmation)report.uiApplicationConfirmation=safeUiApplicationEvidence({status:'HOLD',observation:uiApplicationObserver.snapshot(),causalEvidence:uiCausalEvidence});
+   uiApplicationObserver.dispose();
+  }
   // Closing contexts settles body reads even when an observed UI request failed.
   // Observational diagnostics must never hold the ownership cleanup/report open.
   await Promise.allSettled(diagnosticReads);

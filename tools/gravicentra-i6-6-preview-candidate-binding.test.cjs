@@ -44,6 +44,70 @@ function proof(p){return {schema:'I6_6_OPERATIONAL_SIGNED_PREVIEW_PROOF_V1',
   focusedReports:Object.fromEntries(['advisorPayables','proposalApplication'].map(key=>[key,
     {status:'PASS',cleanup:'PASS',checks:5,digest:'sha256:'+'e'.repeat(64)}]))};}
 
+function observabilityCandidate(){
+  const c=fixture(),p=c.operationalReleaseCandidate;
+  p.buildRunId=44030000001;
+  p.previewRollover=require('./gravicentra-i6-6-preview-channel-reuse-guard.cjs').technicalRolloverCandidatePin();
+  p.previewUrl=p.previewRollover.origin;p.previewChannelId=p.previewRollover.channel;
+  p.signedObservabilityProfile=g.SIGNED_OBSERVABILITY_PROFILE;
+  return c;
+}
+function observabilityProof(p){
+  const q=proof(p);
+  q.focusedReports.advisorPayables.observability={profile:g.SIGNED_OBSERVABILITY_PROFILE,status:'PASS',
+    unexpectedConsoleErrors:0,unexpectedHttpErrors:0,pageErrorCount:0,telemetryFailures:0};
+  q.focusedReports.proposalApplication.observability={profile:g.SIGNED_OBSERVABILITY_PROFILE,status:'PASS',mode:'UI_RESPONSE_CAPTURED_EXACT'};
+  return q;
+}
+test('current exact rollover requires the signed browser observability profile',()=>{
+  const c=observabilityCandidate();assert.equal(g.SIGNED_OBSERVABILITY_PROFILE,'I66_SIGNED_BROWSER_OBSERVABILITY_V1');
+  g.candidateForPhase(c,'preview');g.validateProof(c.operationalReleaseCandidate,observabilityProof(c.operationalReleaseCandidate));
+  for(const value of [undefined,null,false,'PASS','different']){
+    const bad=copy(c);bad.operationalReleaseCandidate.signedObservabilityProfile=value;
+    assert.throws(()=>g.candidateForPhase(bad,'preview'),/OBSERVABILITY_PROFILE/);
+  }
+});
+for(const key of ['profile','status','unexpectedConsoleErrors','unexpectedHttpErrors','pageErrorCount','telemetryFailures']){
+  test('signed acceptance proof cannot omit or dilute browser attribution '+key,()=>{
+    const p=observabilityCandidate().operationalReleaseCandidate;
+    for(const value of [undefined,null,1,'0',false]){
+      const q=observabilityProof(p);q.focusedReports.advisorPayables.observability[key]=value;
+      assert.throws(()=>g.validateProof(p,q),/ATTRIBUTION_PROOF_REQUIRED/);
+    }
+  });
+}
+test('signed proof requires classified UI response or exact causal readback, not workflow success alone',()=>{
+  const p=observabilityCandidate().operationalReleaseCandidate;
+  for(const mode of ['UI_RESPONSE_CAPTURED_EXACT','UI_REQUEST_RELOAD_DURABLE_READBACK_EXACT']){
+    const q=observabilityProof(p);q.focusedReports.proposalApplication.observability.mode=mode;g.validateProof(p,q);
+  }
+  for(const mutate of [q=>delete q.focusedReports.advisorPayables.observability,
+    q=>delete q.focusedReports.proposalApplication.observability,
+    q=>q.focusedReports.proposalApplication.observability.profile='different',
+    q=>q.focusedReports.proposalApplication.observability.status='HOLD',
+    q=>q.focusedReports.proposalApplication.observability.mode='WORKFLOW_SUCCESS']){
+    const q=observabilityProof(p);mutate(q);assert.throws(()=>g.validateProof(p,q));
+  }
+});
+test('focused-report validation delegates to both exact pure validators and propagates their holds',()=>{
+  const calls=[],browser={fixture:'exact-browser-proof'},ui={status:'PASS',mode:'UI_RESPONSE_CAPTURED_EXACT',observation:{fixture:'exact-ui'},causalEvidence:{fixture:'exact-causal'}};
+  let rejectBrowser=false,rejectUi=false;
+  const module={exports:{}};
+  const wrappedRequire=name=>{
+    if(name==='./gravicentra-i6-6-advisor-payables-signed-uat.cjs')return {validateBrowserObservability(value){calls.push('browser');assert.deepEqual(value,browser);if(rejectBrowser)throw Error('BROWSER_HOLD');}};
+    if(name==='./gravicentra-i6-6-proposal-uat-diagnostics.cjs')return {validateUiApplicationEvidence(o,c){calls.push('ui');assert.deepEqual(o,ui.observation);assert.deepEqual(c,ui.causalEvidence);if(rejectUi)throw Error('UI_HOLD');return ui;}};
+    return require(name);
+  };
+  vm.runInNewContext(read('tools/gravicentra-i6-6-operational-release-candidate.cjs'),{require:wrappedRequire,module,exports:module.exports,process,console,Buffer});
+  const p={sourceSha:'9'.repeat(40),signedObservabilityProfile:g.SIGNED_OBSERVABILITY_PROFILE};
+  const common={sourceSha:p.sourceSha,phase:'PREVIEW',status:'PASS',cleanup:{status:'PASS',remaining:0},checks:['verified']};
+  const a={...common,realCustomerWritesRequested:0,bankMovements:0,financialPayments:0,authOrMembershipMutations:0,browserObservability:browser};
+  const q={...common,syntheticOnly:true,realControlUnchanged:true,uiApplicationConfirmation:ui};
+  module.exports.validateFocusedReports(p,'PREVIEW',a,q);assert.deepEqual(calls,['browser','ui']);
+  rejectBrowser=true;assert.throws(()=>module.exports.validateFocusedReports(p,'PREVIEW',a,q),/BROWSER_HOLD/);
+  rejectBrowser=false;rejectUi=true;assert.throws(()=>module.exports.validateFocusedReports(p,'PREVIEW',a,q),/UI_HOLD/);
+});
+
 for(const phase of ['preview','live'])for(const historical of [false,true]){
   test(phase+' binds '+(historical?'the exact historical endpoint':'the same-build new endpoint'),()=>{
     const c=fixture(phase,historical),p=c.operationalReleaseCandidate;

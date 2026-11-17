@@ -97,14 +97,22 @@ const fs = require('node:fs');
 const path = require('node:path');
 const crypto = require('node:crypto');
 const { execFileSync } = require('node:child_process');
-const TECHNICAL_RECEIPT_PATH = 'artifacts/orbit360-recovery/release-control/I6_6_TECHNICAL_PREVIEW_ROLLOVER_CAUSAL_RETRY_20261116.json';
-const TECHNICAL_RECEIPT_SHA256 = 'f0c17d2597caa8d83b281fa5b42d02016c6223035a34d894fc8e65bea687cd5d';
+const TECHNICAL_RECEIPT_PATH = 'artifacts/orbit360-recovery/release-control/I6_6_TECHNICAL_PREVIEW_OBSERVABILITY_REBUILD_20261116.json';
+const TECHNICAL_RECEIPT_SHA256 = '215bfcc8fc5cffdf5c630a6696944791ea8859f0ffdd4cf35e8ba98e231eee41';
 const TECHNICAL_CHANNEL = 'gi-i66-rc-44009981499';
 const TECHNICAL_ORIGIN = 'https://ays-orbit-360-lab--gi-i66-rc-44009981499-d08psr2y.web.app';
 const TECHNICAL_REPO = 'paulaosoriof86/orbit360-core';
 const TECHNICAL_BRANCH = 'recovery/fase-a-clean-20260831';
-const TECHNICAL_BASE = '3820817d8fcac86a99229cefdc46dfc03e1a8c36';
-const TECHNICAL_OLD_SOURCE = TECHNICAL_BASE;
+const TECHNICAL_BASE = 'e0625cd99712af4887f8f4527c6dedd0a88a64d5';
+// Current successful immutable package is backed up before the observability
+// successor. Its functional checks do not waive the separate console-quality gate.
+const TECHNICAL_PREVIOUS_SOURCE = 'bd564d5c48e4a55ac08adb101fbe8e1bd270ea8e';
+const TECHNICAL_PREVIOUS_BUILD = 44022009808;
+const TECHNICAL_PREVIOUS_ARTIFACT = 14300394824;
+const TECHNICAL_PREVIOUS_DIGEST = 'sha256:d6ae5c953fc2c71c55fdaed15ca93b0a571ff4f6a36d4536eac73192564afcd7';
+// Historical failed-residual exception remains byte/identity scoped to 382.
+// It is not activated by the current successful-package backup.
+const TECHNICAL_OLD_SOURCE = '3820817d8fcac86a99229cefdc46dfc03e1a8c36';
 const TECHNICAL_OLD_BUILD = 44019383153;
 const TECHNICAL_OLD_ARTIFACT = 14300731005;
 const TECHNICAL_OLD_DIGEST = 'sha256:78aa4879a9836e1fe2e64d298833f36afb4a7a71a98ef4bdda0f9941d7b95fbb';
@@ -124,8 +132,8 @@ function technicalRolloverCandidatePin() {
   return {
     receiptPath: TECHNICAL_RECEIPT_PATH, receiptSha256: TECHNICAL_RECEIPT_SHA256,
     channel: TECHNICAL_CHANNEL, origin: TECHNICAL_ORIGIN,
-    previousSourceSha: TECHNICAL_OLD_SOURCE, previousArtifactId: TECHNICAL_OLD_ARTIFACT,
-    previousArtifactDigest: TECHNICAL_OLD_DIGEST
+    previousSourceSha: TECHNICAL_PREVIOUS_SOURCE, previousArtifactId: TECHNICAL_PREVIOUS_ARTIFACT,
+    previousArtifactDigest: TECHNICAL_PREVIOUS_DIGEST
   };
 }
 
@@ -133,8 +141,8 @@ function validateTechnicalRolloverCandidate(p) {
   assert.deepEqual(p?.previewRollover, technicalRolloverCandidatePin(), 'I66_TECHNICAL_ROLLOVER_CANDIDATE_PIN_DRIFT');
   assert.equal(p.previewChannelId, TECHNICAL_CHANNEL, 'I66_TECHNICAL_ROLLOVER_CANDIDATE_CHANNEL_DRIFT');
   assert.equal(p.previewUrl, TECHNICAL_ORIGIN, 'I66_TECHNICAL_ROLLOVER_CANDIDATE_ORIGIN_DRIFT');
-  technicalFail(/^[a-f0-9]{40}$/.test(p.sourceSha || '') && p.sourceSha !== TECHNICAL_OLD_SOURCE, 'NEW_SOURCE_REQUIRED');
-  technicalFail(Number.isSafeInteger(p.buildRunId) && p.buildRunId > 0 && ![44009981499, TECHNICAL_OLD_BUILD].includes(p.buildRunId), 'NEW_BUILD_RUN_REQUIRED');
+  technicalFail(/^[a-f0-9]{40}$/.test(p.sourceSha || '') && ![TECHNICAL_OLD_SOURCE, TECHNICAL_PREVIOUS_SOURCE].includes(p.sourceSha), 'NEW_SOURCE_REQUIRED');
+  technicalFail(Number.isSafeInteger(p.buildRunId) && p.buildRunId > 0 && ![44009981499, TECHNICAL_OLD_BUILD, TECHNICAL_PREVIOUS_BUILD].includes(p.buildRunId), 'NEW_BUILD_RUN_REQUIRED');
   return technicalRolloverCandidatePin();
 }
 
@@ -338,8 +346,8 @@ function technicalEnvironment(env) {
   assert.equal(env.PROJECT_ID, SITE, 'I66_TECHNICAL_ROLLOVER_PROJECT_DENIED');
   technicalFail(env.RUNNER_TEMP && path.isAbsolute(env.RUNNER_TEMP), 'RUNNER_TEMP_REQUIRED');
   technicalFail(env.FIREBASE_CLI_BIN && path.isAbsolute(env.FIREBASE_CLI_BIN), 'PINNED_CLI_REQUIRED');
-  technicalFail(/^[a-f0-9]{40}$/.test(env.SOURCE_SHA || '') && env.SOURCE_SHA !== TECHNICAL_OLD_SOURCE, 'SOURCE_INVALID');
-  technicalFail(Number.isSafeInteger(Number(env.GITHUB_RUN_ID)) && Number(env.GITHUB_RUN_ID) > 0 && ![44009981499, TECHNICAL_OLD_BUILD].includes(Number(env.GITHUB_RUN_ID)), 'RUN_ID_INVALID');
+  technicalFail(/^[a-f0-9]{40}$/.test(env.SOURCE_SHA || '') && ![TECHNICAL_OLD_SOURCE, TECHNICAL_PREVIOUS_SOURCE].includes(env.SOURCE_SHA), 'SOURCE_INVALID');
+  technicalFail(Number.isSafeInteger(Number(env.GITHUB_RUN_ID)) && Number(env.GITHUB_RUN_ID) > 0 && ![44009981499, TECHNICAL_OLD_BUILD, TECHNICAL_PREVIOUS_BUILD].includes(Number(env.GITHUB_RUN_ID)), 'RUN_ID_INVALID');
   const repo = path.resolve(__dirname, '..');
   technicalFail(env.GITHUB_WORKSPACE && [path.resolve(env.GITHUB_WORKSPACE), path.resolve(env.GITHUB_WORKSPACE, 'candidate')].includes(repo), 'CHECKOUT_PATH_DRIFT');
   assert.equal(execFileSync('git', ['rev-parse', 'HEAD'], { cwd: repo, encoding: 'utf8', stdio: 'pipe' }).trim(), env.SOURCE_SHA, 'I66_TECHNICAL_ROLLOVER_CHECKOUT_SOURCE_DRIFT');

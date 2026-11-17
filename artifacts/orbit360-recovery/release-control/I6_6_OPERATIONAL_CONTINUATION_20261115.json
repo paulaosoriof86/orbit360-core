@@ -259,6 +259,20 @@
       "historicalMarkerAssertion": "HOLD_OLD_SOURCE_EXPECTATION_NOT_CURRENT_INVENTORY",
       "logSha256": "2d2eff7059acc07ba596c3a72da03f480003b61990a7b32c1f404f7a94088819",
       "snapshotOnlyCurrentReadbackStillRequired": true
+    },
+    "signedPreviewBd564FunctionalAndObservability": {
+      "evidence": "artifacts/orbit360-recovery/release-control/I6_6_SIGNED_PREVIEW_BD564_FUNCTIONAL_AND_OBSERVABILITY_READBACK_20261116.json",
+      "runId": 44023553726,
+      "sourceSha": "bd564d5c48e4a55ac08adb101fbe8e1bd270ea8e",
+      "signedDriversPassed": 4,
+      "advisorPayablesChecks": 15,
+      "proposalApplicationChecks": 13,
+      "syntheticRemaining": 0,
+      "status": "FUNCTIONAL_CHECKS_PASS_CONSOLE_ATTRIBUTION_HOLD",
+      "fullPreviewQualityAcceptance": false,
+      "newLiveAcceptanceClaimed": false,
+      "newFinancialWrites": 0,
+      "nextImmutableRolloverReceipt": "artifacts/orbit360-recovery/release-control/I6_6_TECHNICAL_PREVIEW_OBSERVABILITY_REBUILD_20261116.json"
     }
   },
   "orderedWork": [

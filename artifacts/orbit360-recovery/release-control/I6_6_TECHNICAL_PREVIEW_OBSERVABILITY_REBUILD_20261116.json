@@ -1,0 +1,94 @@
+{
+  "schema": "GI_I66_CURRENT_TECHNICAL_PREVIEW_ROLLOVER_V1",
+  "status": "EXACT_CURRENT_TASK_PREVIEW_OBSERVABILITY_CLOSURE_REBUILD",
+  "gate": "I6.6",
+  "phase": "PREVIEW",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "projectId": "ays-orbit-360-lab",
+  "sourceBaseHead": "e0625cd99712af4887f8f4527c6dedd0a88a64d5",
+  "executionAuthority": {
+    "kind": "EXISTING_I66_CONTINUE_CORRECT_TEST_AND_PUBLISH_SCOPE",
+    "canonicalPlan": "artifacts/orbit360-recovery/release-control/I6_6_OPERATIONAL_CONTINUATION_20261115.json",
+    "scope": "Replace only the current isolated technical Preview with the next immutable I6.6 candidate under the existing instruction to continue correction and signed verification. This is not an extension of the separate legal consent decision and not permission to delete any channel, change LIVE or apply payments.",
+    "newLegalConsentGrantUsedForHosting": false,
+    "mustStopOnBeforeStateDrift": true
+  },
+  "channel": {
+    "id": "gi-i66-rc-44009981499",
+    "origin": "https://ays-orbit-360-lab--gi-i66-rc-44009981499-d08psr2y.web.app",
+    "createdAt": "2026-11-17T03:34:28.874524705Z",
+    "expectedVersion": "sites/ays-orbit-360-lab/versions/2cbcf2b6f687383b"
+  },
+  "previousCandidate": {
+    "sourceSha": "bd564d5c48e4a55ac08adb101fbe8e1bd270ea8e",
+    "buildRunId": 44022009808,
+    "buildRunAttempt": 1,
+    "artifactId": 14300394824,
+    "artifactDigest": "sha256:d6ae5c953fc2c71c55fdaed15ca93b0a571ff4f6a36d4536eac73192564afcd7",
+    "expectedSiteFileCount": 223,
+    "runtimeProofRequired": "DOWNLOAD_HASH_ARCHIVE_VALIDATE_MANIFEST_AND_COMPARE_EVERY_HOSTED_FILE_INCLUDING_BUILD_JSON_BEFORE_REPLACEMENT"
+  },
+  "protectedLive": {
+    "sourceSha": "84769378eb2014addebfefdbdd63091bddc4b817",
+    "buildRunId": 43503721126,
+    "artifactId": 14075022275,
+    "artifactDigest": "sha256:b0f3bacb68511cdfc91ac934602c51f55afec5c1d6428d886d13a72a706ee283",
+    "liveRunId": 43506971214,
+    "version": "sites/ays-orbit-360-lab/versions/0766db29b338befc",
+    "origins": [
+      "https://ays-orbit-360-lab.web.app",
+      "https://app.aysseguros.com"
+    ]
+  },
+  "freshInventoryEvidence": {
+    "runId": 44022009808,
+    "runAttempt": 1,
+    "jobId": 133833572420,
+    "totalChannels": 51,
+    "inventoryStep": "SUCCESS",
+    "wholeJob": "SUCCESS",
+    "rolloverEvidenceArtifactId": 14301955339,
+    "rolloverEvidenceArtifactDigest": "sha256:8f8f538826160520477279124492067af0d6eb48cec81602fddd89fc489d4a2d",
+    "afterInventorySha256": "2f4cd24a5227cdc458a0d4349adbc9c2f0703ee95177d65a835ce85a4f6b27a7",
+    "comparison": "FULL_OTHER_FIFTY_CHANNEL_METADATA_EXACT_BEFORE_AFTER",
+    "otherChannelsIdenticalFullMetadata": 50,
+    "writes": 0,
+    "freshRuntimeInventoryRequiredAgain": true
+  },
+  "constraints": {
+    "onlyWhenNewChannelQuotaIsExhausted": true,
+    "backupBeforeOverwrite": true,
+    "readbackBeforeAndAfter": true,
+    "sameNewImmutableArtifact": true,
+    "noLiveChanges": true,
+    "noOtherChannelChanges": true,
+    "noChannelDeletion": true,
+    "noBackendChanges": true,
+    "noBusinessDataWrites": true,
+    "noRulesAuthIamChanges": true,
+    "stopOnIdentityDrift": true
+  },
+  "notAcceptance": {
+    "hostingReplacementIsNotSignedFunctionalPass": true,
+    "hostingReplacementIsNotProductionAcceptance": true,
+    "noOperationalPercentIncrease": true
+  },
+  "priorRolloverReceipt": {
+    "path": "artifacts/orbit360-recovery/release-control/I6_6_TECHNICAL_PREVIEW_ROLLOVER_CAUSAL_RETRY_20261116.json",
+    "sha256": "f0c17d2597caa8d83b281fa5b42d02016c6223035a34d894fc8e65bea687cd5d",
+    "preserveBytes": true
+  },
+  "causalRetry": {
+    "defect": "Signed functional run passed its checks, but ten console events were not correlated with expected negative requests and a passive UI response-body read failed without observer classification.",
+    "signedFunctionalRunId": 44023553726,
+    "signedFunctionalProofArtifactId": 14302621117,
+    "signedFunctionalProofArtifactDigest": "sha256:ea3bb7dd7baea1036fe12d4bab841c9331e9c5f6037a2cdf946b3eb6d2dc4ffa",
+    "preserveFunctionalChecksAndCleanup": true,
+    "doNotRetroactivelyClassifyConsole": true,
+    "correction": "Capture sanitized actor/stage/request-bound browser diagnostics; distinguish observer failure from business result and fail closed on unexplained errors. Independently extend the existing read-only focal client/management join.",
+    "newSourceRequiresNewBuildDigest": true,
+    "noProductRuntimeOrFinancialRulesChange": true,
+    "noLiveOrRealPaymentAuthority": true
+  }
+}

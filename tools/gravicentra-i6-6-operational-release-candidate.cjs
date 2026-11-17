@@ -14,6 +14,7 @@ const CHANNEL = 'gi-i66-rc-42868854629';
 const LIVE = 'https://app.aysseguros.com';
 const PREVIEW_WORKFLOW = '.github/workflows/gravicentra-i66-privileged-role-three-function-preview-uat.yml';
 const BUILD_WORKFLOW = '.github/workflows/gravicentra-release-delta-66-package.yml';
+const SIGNED_OBSERVABILITY_PROFILE = 'I66_SIGNED_BROWSER_OBSERVABILITY_V1';
 const TARGETS = Object.freeze({
   preview: [
     {name:'orbit360ProductOperationalCommandPreview',region:'us-east1'},
@@ -54,6 +55,10 @@ const PINNED_OWNER_PATHS = Object.freeze([
   'tools/gravicentra-i6-6-technical-preview-rollover.test.cjs',
   'artifacts/orbit360-recovery/release-control/I6_6_CURRENT_TECHNICAL_PREVIEW_ROLLOVER_20261116.json',
   'artifacts/orbit360-recovery/release-control/I6_6_TECHNICAL_PREVIEW_ROLLOVER_CAUSAL_RETRY_20261116.json',
+  'artifacts/orbit360-recovery/release-control/I6_6_TECHNICAL_PREVIEW_OBSERVABILITY_REBUILD_20261116.json',
+  'tools/gravicentra-i6-6-advisor-browser-observability.test.cjs',
+  'tools/gravicentra-i66-cartera-a1-a4-readonly.cjs',
+  'tools/gravicentra-i66-cartera-a1-a4-readonly.test.cjs',
   // Preserve the exact QA-only navigation retry and its restore proof after build.
   'tools/gravicentra-i6-6-preview-current-live-restore.cjs',
   '.github/workflows/gravicentra-release-delta-66-package.yml',
@@ -155,6 +160,10 @@ function candidateForPhase(control,phase) {
   checkId(p.artifactId,'I66_OPERATIONAL_ARTIFACT_PIN');
   checkDigest(p.artifactDigest,'I66_OPERATIONAL_DIGEST_PIN');
   previewIdentity(p);
+  if(p.previewRollover!==undefined)
+    assert.equal(p.signedObservabilityProfile,SIGNED_OBSERVABILITY_PROFILE,'I66_OPERATIONAL_SIGNED_OBSERVABILITY_PROFILE_REQUIRED');
+  if(p.signedObservabilityProfile!==undefined)
+    assert.equal(p.signedObservabilityProfile,SIGNED_OBSERVABILITY_PROFILE,'I66_OPERATIONAL_SIGNED_OBSERVABILITY_PROFILE_UNKNOWN');
   assert.deepEqual(p.targets,TARGETS,'I66_OPERATIONAL_TARGET_SCOPE_DRIFT');
   assert.deepEqual(p.requiredPreviewDrivers,DRIVERS,'I66_OPERATIONAL_QA_DRIVER_SCOPE_DRIFT');
   assert.equal(p.sameImmutableArtifactOnly,true);
@@ -244,6 +253,32 @@ function validateProof(p,proof) {
     assert.ok(Number.isSafeInteger(report.checks)&&report.checks>0);
     checkDigest(report.digest,'I66_OPERATIONAL_FOCUSED_REPORT_DIGEST_REQUIRED');
   }
+  if(p.signedObservabilityProfile===SIGNED_OBSERVABILITY_PROFILE){
+    assert.deepEqual(proof.focusedReports.advisorPayables.observability,
+      {profile:SIGNED_OBSERVABILITY_PROFILE,status:'PASS',unexpectedConsoleErrors:0,
+        unexpectedHttpErrors:0,pageErrorCount:0,telemetryFailures:0},'I66_OPERATIONAL_BROWSER_ERROR_ATTRIBUTION_PROOF_REQUIRED');
+    const ui=proof.focusedReports.proposalApplication.observability;
+    assert.equal(ui?.profile,SIGNED_OBSERVABILITY_PROFILE,'I66_OPERATIONAL_UI_OBSERVABILITY_PROFILE_REQUIRED');
+    assert.equal(ui.status,'PASS','I66_OPERATIONAL_UI_OBSERVABILITY_NOT_PASS');
+    assert.ok(['UI_RESPONSE_CAPTURED_EXACT','UI_REQUEST_RELOAD_DURABLE_READBACK_EXACT'].includes(ui.mode),
+      'I66_OPERATIONAL_UI_APPLICATION_CAUSAL_PROOF_REQUIRED');
+  }
+}
+function signedObservabilityReports(p,advisor,proposal){
+  if(p.signedObservabilityProfile===undefined)return null; // Preserve historical proof interpretation.
+  assert.equal(p.signedObservabilityProfile,SIGNED_OBSERVABILITY_PROFILE,'I66_OPERATIONAL_SIGNED_OBSERVABILITY_PROFILE_UNKNOWN');
+  const {validateBrowserObservability}=require('./gravicentra-i6-6-advisor-payables-signed-uat.cjs');
+  validateBrowserObservability(advisor.browserObservability);
+  const ui=proposal.uiApplicationConfirmation;
+  assert.ok(ui,'I66_OPERATIONAL_UI_APPLICATION_CONFIRMATION_REQUIRED');
+  const {validateUiApplicationEvidence}=require('./gravicentra-i6-6-proposal-uat-diagnostics.cjs');
+  assert.deepEqual(ui,validateUiApplicationEvidence(ui.observation,ui.causalEvidence),
+    'I66_OPERATIONAL_UI_APPLICATION_CONFIRMATION_DRIFT');
+  return {
+    advisorPayables:{profile:SIGNED_OBSERVABILITY_PROFILE,status:'PASS',unexpectedConsoleErrors:0,
+      unexpectedHttpErrors:0,pageErrorCount:0,telemetryFailures:0},
+    proposalApplication:{profile:SIGNED_OBSERVABILITY_PROFILE,status:'PASS',mode:ui.mode}
+  };
 }
 function validateFocusedReports(p,phase,advisor,proposal){
   for(const report of [advisor,proposal]){
@@ -254,6 +289,7 @@ function validateFocusedReports(p,phase,advisor,proposal){
   }
   for(const field of ['realCustomerWritesRequested','bankMovements','financialPayments','authOrMembershipMutations'])assert.equal(advisor[field],0);
   assert.equal(proposal.syntheticOnly,true);assert.equal(proposal.realControlUnchanged,true);
+  signedObservabilityReports(p,advisor,proposal);
   if(phase==='PREVIEW'&&p.legalAcceptance){
     const {validateAcceptanceProof}=require('./gravicentra-i6-6-direction-preview-legal-acceptance.cjs');
     for(const report of [advisor,proposal])validateAcceptanceProof(report.directionLegalAcceptance,p);
@@ -267,7 +303,8 @@ function focusedReportsFromDisk(p,phase,env=process.env){
   const bytes=Object.fromEntries(Object.entries(paths).map(([k,file])=>[k,fs.readFileSync(file)]));
   const reports=Object.fromEntries(Object.entries(bytes).map(([k,b])=>[k,JSON.parse(b)]));
   validateFocusedReports(p,phase,reports.advisorPayables,reports.proposalApplication);
-  return Object.fromEntries(Object.entries(reports).map(([key,r])=>[key,{status:r.status,cleanup:r.cleanup.status,checks:r.checks.length,digest:'sha256:'+crypto.createHash('sha256').update(bytes[key]).digest('hex')}]));
+  const observability=signedObservabilityReports(p,reports.advisorPayables,reports.proposalApplication);
+  return Object.fromEntries(Object.entries(reports).map(([key,r])=>[key,{status:r.status,cleanup:r.cleanup.status,checks:r.checks.length,digest:'sha256:'+crypto.createHash('sha256').update(bytes[key]).digest('hex'),...(observability?{observability:observability[key]}:{})}]));
 }
 function verifyPinnedOwners(p) {
   execFileSync('git',['merge-base','--is-ancestor',p.sourceSha,'HEAD'],{stdio:'pipe'});
@@ -305,5 +342,5 @@ async function main(){
   fs.appendFileSync(process.env.GITHUB_ENV,Object.entries(envFor(p)).map(([k,v])=>k+'='+v).join('\n')+'\n');
   console.log('I66_OPERATIONAL_'+phase.toUpperCase()+'_SOURCE_ARTIFACT_AUTHORITY_PASS');
 }
-module.exports={CONTROL,SITE,PREVIEW,CHANNEL,LIVE,TARGETS,DRIVERS,PROPOSAL_QA_ISOLATION,ADVISOR_QA_ISOLATION,PINNED_OWNER_PATHS,previewIdentity,validateBuildMarker,signedMatrixBinding,candidateForPhase,continuationForPreflight,validateArtifact,validatePreviewQa,validateProof,validateFocusedReports,focusedReportsFromDisk,envFor};
+module.exports={CONTROL,SITE,PREVIEW,CHANNEL,LIVE,TARGETS,DRIVERS,PROPOSAL_QA_ISOLATION,ADVISOR_QA_ISOLATION,PINNED_OWNER_PATHS,SIGNED_OBSERVABILITY_PROFILE,previewIdentity,validateBuildMarker,signedMatrixBinding,candidateForPhase,continuationForPreflight,validateArtifact,validatePreviewQa,validateProof,validateFocusedReports,signedObservabilityReports,focusedReportsFromDisk,envFor};
 if(require.main===module)main().catch(error=>{console.error(String(error.message||error));process.exitCode=1;});

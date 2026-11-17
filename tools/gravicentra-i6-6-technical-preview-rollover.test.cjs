@@ -35,7 +35,7 @@ function fixture() {
     { channelId: 'live', release: { version: { name: p.version } } },
     ...Array.from({ length: 49 }, (_, i) => ({ channelId: 'untouched-' + i, release: { version: { name: 'sites/ays-orbit-360-lab/versions/untouched-' + i } } }))
   ] };
-  const expected = a.previousCandidate;
+  const expected = clone(priorReceipt.previousCandidate);
   const run = { id: expected.buildRunId, head_sha: expected.sourceSha, head_branch: a.branch,
     path: '.github/workflows/gravicentra-release-delta-66-package.yml', status: 'completed', conclusion: 'failure', run_attempt: 1 };
   const artifact = { id: expected.artifactId, name: 'gi-i66-immutable-' + expected.sourceSha,
@@ -51,7 +51,7 @@ function fixture() {
 // arguments. They do not claim that synthetic rows have the real archive hash.
 // Runtime independently calculates those hashes before calling this validator.
 function residualFixture() {
-  const p = receipt.previousCandidate, boundary = p.backupOnlyPostDeployFailure;
+  const p = priorReceipt.previousCandidate, boundary = p.backupOnlyPostDeployFailure;
   const run = { id: p.buildRunId, run_attempt: 1, head_sha: p.sourceSha, head_branch: receipt.branch,
     path: '.github/workflows/gravicentra-release-delta-66-package.yml', status: 'completed', conclusion: 'failure' };
   const artifact = { id: boundary.evidenceArtifactId, name: 'gi-i66-technical-preview-rollover-' + p.buildRunId,
@@ -81,7 +81,7 @@ function residualFixture() {
 }
 
 function acceptedBackupFixture() {
-  const f = fixture(), expected = clone(priorReceipt.previousCandidate);
+  const f = fixture(), expected = clone(receipt.previousCandidate);
   return { ...f, expected, run: { ...f.run, id: expected.buildRunId, head_sha: expected.sourceSha,
     conclusion: 'success', run_attempt: expected.buildRunAttempt }, artifact: { ...f.artifact,
     id: expected.artifactId, name: 'gi-i66-immutable-' + expected.sourceSha, digest: expected.artifactDigest,
@@ -93,22 +93,25 @@ function manifest() {
 }
 
 test('exact independently authorized technical receipt has immutable bytes, not legal authorization', () => {
-  assert.equal(digest(receiptText), 'f0c17d2597caa8d83b281fa5b42d02016c6223035a34d894fc8e65bea687cd5d');
+  assert.equal(digest(receiptText), '215bfcc8fc5cffdf5c630a6696944791ea8859f0ffdd4cf35e8ba98e231eee41');
   assert.equal(receipt.executionAuthority.newLegalConsentGrantUsedForHosting, false);
   assert.equal(api.validateAuthorization(fixture().control, receiptText).channel.id, 'gi-i66-rc-44009981499');
 });
-test('causal retry preserves exact prior receipt and keeps the failed build unaccepted', () => {
-  assert.equal(digest(priorReceiptText), 'db754d7a0b26f6396e4320c7d60e09c3aba608b5ad29a32abaf03fe3d8157fb7');
+test('observability successor preserves exact prior receipt and keeps the historical failed build unaccepted', () => {
+  assert.equal(digest(priorReceiptText), 'f0c17d2597caa8d83b281fa5b42d02016c6223035a34d894fc8e65bea687cd5d');
   assert.equal(receipt.priorRolloverReceipt.preserveBytes, true);
-  assert.equal(receipt.causalRetry.failedRunRemainsFailed, true);
+  assert.equal(priorReceipt.causalRetry.failedRunRemainsFailed, true);
   assert.equal(receipt.causalRetry.newSourceRequiresNewBuildDigest, true);
-  assert.equal(receipt.previousCandidate.backupOnlyPostDeployFailure.noFunctionalAcceptance, true);
-  assert.equal(receipt.previousCandidate.backupOnlyPostDeployFailure.neverEligibleForLive, true);
+  assert.equal(priorReceipt.previousCandidate.backupOnlyPostDeployFailure.noFunctionalAcceptance, true);
+  assert.equal(priorReceipt.previousCandidate.backupOnlyPostDeployFailure.neverEligibleForLive, true);
+  assert.equal(receipt.previousCandidate.backupOnlyPostDeployFailure, undefined);
+  assert.equal(receipt.causalRetry.doNotRetroactivelyClassifyConsole, true);
+  assert.equal(receipt.causalRetry.preserveFunctionalChecksAndCleanup, true);
 });
 test('candidate pin is a fresh exact object with the recoverable previous artifact', () => {
   const changed = guard.technicalRolloverCandidatePin(); changed.channel = 'live';
   assert.equal(guard.technicalRolloverCandidatePin().channel, 'gi-i66-rc-44009981499');
-  assert.equal(pin.previousArtifactId, 14300731005);
+  assert.equal(pin.previousArtifactId, 14300394824);
   assert.equal(api.validateCandidateReuse(fixture().candidate).receiptSha256, pin.receiptSha256);
 });
 test('fixed current Preview and accepted R11 channels validate, including project-qualified resources', () => {
@@ -172,8 +175,8 @@ test('another project or site cannot be normalized into the exact target', () =>
   const f = fixture(); f.inventory.result[0].name = 'projects/other/sites/ays-orbit-360-lab/channels/' + f.a.channel.id;
   assert.throws(() => api.validateChannels(f.control, receiptText, f.inventory), /CHANNEL_RESOURCE_SCOPE_DENIED/);
 });
-test('previous build must be its exact successful second attempt and unexpired artifact', () => {
-  const f = acceptedBackupFixture(); assert.equal(api.validateArtifact(f.run, f.artifact, f.expected).artifactId, 14296328231);
+test('current backup must be its exact successful whole build and unexpired artifact', () => {
+  const f = acceptedBackupFixture(); assert.equal(api.validateArtifact(f.run, f.artifact, f.expected).artifactId, 14300394824);
 });
 for (const key of ['id', 'head_sha', 'head_branch', 'path', 'status', 'conclusion', 'run_attempt']) {
   test('previous artifact rejects build provenance drift ' + key, () => {
@@ -238,7 +241,7 @@ test('technical helper has no cloud mutation commands and preserves old public e
 });
 
 test('exact failed residual yields backup-only proof and never functional or release acceptance', () => {
-  const f = residualFixture(), p = receipt.previousCandidate;
+  const f = residualFixture(), p = priorReceipt.previousCandidate;
   const proof = api.validateResidualBackup(f);
   assert.deepEqual(proof, { purpose: 'RECOVERABLE_UNACCEPTED_PREVIEW_BACKUP_ONLY', sourceSha: p.sourceSha,
     buildRunId: p.buildRunId, artifactId: p.artifactId, artifactDigest: p.artifactDigest,
@@ -300,7 +303,7 @@ for (const key of ['id', 'run_id', 'status', 'conclusion']) {
     const f = residualFixture(); f.jobs[1][key] = 'drift'; assert.throws(() => api.validateResidualBackup(f));
   });
 }
-for (const number of receipt.previousCandidate.backupOnlyPostDeployFailure.requiredSuccessSteps) {
+for (const number of priorReceipt.previousCandidate.backupOnlyPostDeployFailure.requiredSuccessSteps) {
   for (const conclusion of ['failure', 'skipped', null]) {
     test('residual backup requires successful step ' + number + ', rejects ' + conclusion, () => {
       const f = residualFixture(); f.jobs[1].steps.find(s => s.number === number).conclusion = conclusion;

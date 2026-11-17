@@ -86,7 +86,7 @@ const DOCUMENTARY_FOCAL=Object.freeze({
   termStart:'2026-09-25',termEnd:'2027-09-25',due:'2026-11-06',cents:97878,currency:'GTQ',
   sourcePaid:false,paymentApplicationAuthorized:false
 });
-const FOCAL_POLICY_CAP=2000,FOCAL_LINKED_CAP=80,FOCAL_PROPOSAL_CAP=250;
+const FOCAL_POLICY_CAP=2000,FOCAL_LINKED_CAP=80,FOCAL_PROPOSAL_CAP=250,FOCAL_CLIENT_CAP=1000;
 const FOCAL_NUMBER_KEYS=Object.freeze(['numero','numeroPoliza','numero_poliza','numPoliza',
   'numeroDePoliza','noPoliza','polizaNumero','policyNumber','policyNo','polizaNo','numeroContrato']);
 const FOCAL_START_KEYS=['vigenciaInicio','vigenciaIni','fechaInicio','inicioVigencia','vigenciaDesde','fechaInicioVigencia','startDate'];
@@ -99,6 +99,16 @@ const FOCAL_POLICY_FIELDS=[...FOCAL_NUMBER_KEYS,...FOCAL_START_KEYS,...FOCAL_END
   ...FOCAL_CLIENT_REFS,...FOCAL_INSURER_REFS,...FOCAL_COUNTRY_KEYS,...FOCAL_CURRENCY_KEYS];
 const FOCAL_NAME_FIELDS=['nombreCompleto','nombreCliente','fullName','name','nombre','razonSocial',
   'razon_social','nombres','apellidos'];
+const FOCAL_CLIENT_NAME_FIELDS=Object.freeze(['nombreCompleto','nombreCliente','clienteNombre',
+  'fullName','name','nombre','razonSocial','razon_social','nombres','apellidos']);
+const FOCAL_CLIENT_FIELDS=Object.freeze([...FOCAL_CLIENT_NAME_FIELDS,...FOCAL_COUNTRY_KEYS,
+  'id','tenantId','fusionado','mergedIntoClientId','archivado','eliminado','deleted','active','activo']);
+// Both aliases are accepted by the existing management owner and protected
+// reader. They are relationship coverage, not evidence of every possible Ops row.
+const FOCAL_MANAGEMENT_CLIENT_REFS=Object.freeze(['clienteId','clientId']);
+const FOCAL_MANAGEMENT_FIELDS=Object.freeze(['id','tenantId',...FOCAL_COUNTRY_KEYS,
+  ...FOCAL_MANAGEMENT_CLIENT_REFS,'polizaId','policyId','aseguradoraId','insurerId',
+  'archivado','eliminado','deleted','estado','tipo']);
 const FOCAL_RECEIPT_FIELDS=[...reqKeys,...FOCAL_COUNTRY_KEYS,...FOCAL_CURRENCY_KEYS,'polizaId','policyId','reciboId',
   'monto','montoTotal','primaTotal','saldo','valor','fechaLimite','vence','fechaVencimiento',
   'estado','pagado','conciliado','conciliadoPago','reportado','validadoReporte','fechaPago',
@@ -130,6 +140,90 @@ function focalExactDate(row,keys,expected){
   return raw.length>0&&raw.every(v=>focalDate(v)===expected);
 }
 const focalPaymentProtected=r=>paid(r)||!!(r&&(r.conciliado||r.reportado||r.validadoReporte||r.fechaPagoReportada));
+function focalClientFullNames(row){
+  const names=FOCAL_CLIENT_NAME_FIELDS.filter(k=>!['nombres','apellidos'].includes(k))
+    .filter(k=>!(k==='nombre'&&text(row?.apellidos))).map(k=>text(row?.[k]));
+  if(text(row?.nombres))names.push([row.nombres,row.apellidos].map(text).filter(Boolean).join(' '));
+  else if(text(row?.nombre)&&text(row?.apellidos))names.push([row.nombre,row.apellidos].map(text).join(' '));
+  return focalUnique(names.map(focalNormalize));
+}
+async function readFocalClientManagement(col,spec=DOCUMENTARY_FOCAL){
+  if(typeof spec.clientNameHash!=='string'||spec.clientNameHash.length!==64||
+    !/^[a-f0-9]{64}$/.test(spec.clientNameHash))throw Error('I66_A1_A4_FOCAL_CLIENT_BINDING_INVALID');
+  const report={status:'HOLD_FOCAL_CLIENT_UNVERIFIED',scannedClientCount:0,exactSourceNameMatches:0,
+    clientIdentityBasis:'EXACT_ISSUED_ORIGINAL_NORMALIZED_FULL_NAME_HASH_NOT_NIT_VERIFICATION',
+    clientLookupCoverage:{nameFields:FOCAL_CLIENT_NAME_FIELDS.length,clientCap:FOCAL_CLIENT_CAP,
+      physicalTenantPathBound:true,unlistedNameAliasesChecked:false},
+    clientScanTruncated:false,clientAbsenceProven:false,canonicalClientUnique:false,
+    clientScopeVerified:false,clientNameAliasesConsistent:false,clientDocumentIdCoherent:false,
+    managementQueriesPerformed:false,managementQueryFields:[...FOCAL_MANAGEMENT_CLIENT_REFS],
+    managementPerQueryCap:FOCAL_LINKED_CAP,managementScanTruncated:false,
+    managementLinkedCount:null,managementWithPolicyReferenceCount:null,
+    managementWithoutPolicyReferenceCount:null,managementArchivedCount:null,
+    managementCountryDerivedFromClientCount:null,managementAbsenceProven:false,
+    managementSourceDocumentAssociationVerified:false,policyCreationAuthorized:false,
+    paymentApplicationAuthorized:false,writes:0};
+  const snap=await col('clientes').select(...FOCAL_CLIENT_FIELDS).limit(FOCAL_CLIENT_CAP).get();
+  const projected=snap.docs.map(d=>({documentId:d.id,row:d.data()||{}}))
+    .sort((a,b)=>a.documentId.localeCompare(b.documentId));
+  const evidence={clientProjectionSha256:crypto.createHash('sha256').update(JSON.stringify(projected)).digest('hex'),
+    matchingClients:[],managementRows:[]};
+  report.scannedClientCount=snap.size;report.clientScanTruncated=snap.size>=FOCAL_CLIENT_CAP;
+  if(report.clientScanTruncated){report.status='HOLD_FOCAL_CLIENT_SCAN_TRUNCATED';return{report,evidence};}
+  evidence.matchingClients=projected.filter(x=>focalClientFullNames(x.row)
+    .some(v=>focalHash(v)===spec.clientNameHash));
+  report.exactSourceNameMatches=evidence.matchingClients.length;
+  if(!evidence.matchingClients.length){report.status='HOLD_FOCAL_CLIENT_NOT_FOUND_IN_DECLARED_ALIASES';return{report,evidence};}
+  if(evidence.matchingClients.length!==1){report.status='HOLD_FOCAL_DUPLICATE_CLIENT_IDENTITY';return{report,evidence};}
+  const selected=evidence.matchingClients[0],client=selected.row,id=selected.documentId;
+  report.clientNameAliasesConsistent=focalClientFullNames(client).every(v=>focalHash(v)===spec.clientNameHash);
+  if(!report.clientNameAliasesConsistent){report.status='HOLD_FOCAL_CLIENT_NAME_ALIAS_CONFLICT';return{report,evidence};}
+  report.clientDocumentIdCoherent=typeof id==='string'&&id===text(id)&&
+    /^[A-Za-z0-9._:-]{1,180}$/.test(id)&&
+    (client.id===undefined||client.id===null||client.id===''||client.id===id);
+  if(!report.clientDocumentIdCoherent){report.status='HOLD_FOCAL_CLIENT_CANONICAL_ID_CONFLICT';return{report,evidence};}
+  if(text(client.tenantId)&&text(client.tenantId)!=='alianzas-soluciones'){
+    report.status='HOLD_FOCAL_CLIENT_TENANT_CONFLICT';return{report,evidence};}
+  if(!focalCountryGT(client)){report.status='HOLD_FOCAL_CLIENT_COUNTRY';return{report,evidence};}
+  if(client.fusionado===true||text(client.mergedIntoClientId)||client.archivado===true||
+    client.eliminado===true||client.deleted===true||client.active===false||client.activo===false){
+    report.status='HOLD_FOCAL_CLIENT_MERGED_OR_INACTIVE';return{report,evidence};}
+  report.canonicalClientUnique=true;report.clientScopeVerified=true;
+  const reads=await Promise.all(FOCAL_MANAGEMENT_CLIENT_REFS.map(field=>col('gestiones')
+    .where(field,'==',id).select(...FOCAL_MANAGEMENT_FIELDS).limit(FOCAL_LINKED_CAP).get()));
+  report.managementQueriesPerformed=true;
+  report.managementScanTruncated=reads.some(s=>s.size>=FOCAL_LINKED_CAP);
+  const seen=Object.create(null);let concurrentAlias=false;
+  for(const read of reads)for(const d of read.docs){
+    const row={documentId:d.id,row:d.data()||{}};
+    if(seen[d.id]&&JSON.stringify(seen[d.id])!==JSON.stringify(row))concurrentAlias=true;
+    else if(!seen[d.id])seen[d.id]=row;
+  }
+  evidence.managementRows=Object.values(seen).sort((a,b)=>a.documentId.localeCompare(b.documentId));
+  if(report.managementScanTruncated){report.status='HOLD_FOCAL_MANAGEMENT_SCAN_TRUNCATED';return{report,evidence};}
+  if(concurrentAlias){report.status='HOLD_FOCAL_MANAGEMENT_CONCURRENT_ALIAS_READ';return{report,evidence};}
+  const linked=evidence.managementRows;
+  if(linked.some(x=>text(x.row.tenantId)&&text(x.row.tenantId)!=='alianzas-soluciones')){
+    report.status='HOLD_FOCAL_MANAGEMENT_TENANT_CONFLICT';return{report,evidence};}
+  if(linked.some(x=>!x.documentId||x.documentId!==text(x.documentId)||
+    x.row.id!==undefined&&x.row.id!==null&&x.row.id!==''&&x.row.id!==x.documentId)){
+    report.status='HOLD_FOCAL_MANAGEMENT_CANONICAL_ID_CONFLICT';return{report,evidence};}
+  if(linked.some(x=>focalRef(x.row,FOCAL_MANAGEMENT_CLIENT_REFS)!==id||
+    FOCAL_MANAGEMENT_CLIENT_REFS.some(k=>text(x.row[k])&&x.row[k]!==id))){
+    report.status='HOLD_FOCAL_MANAGEMENT_CLIENT_REFERENCE_CONFLICT';return{report,evidence};}
+  if(linked.some(x=>focalCountries(x.row).some(value=>value!=='GT'))){
+    report.status='HOLD_FOCAL_MANAGEMENT_COUNTRY_CONFLICT';return{report,evidence};}
+  if(linked.some(x=>focalUnique(['polizaId','policyId'].map(k=>text(x.row[k]))).length>1)){
+    report.status='HOLD_FOCAL_MANAGEMENT_POLICY_REFERENCE_CONFLICT';return{report,evidence};}
+  report.managementLinkedCount=linked.length;
+  report.managementWithPolicyReferenceCount=linked.filter(x=>text(x.row.polizaId||x.row.policyId)).length;
+  report.managementWithoutPolicyReferenceCount=linked.length-report.managementWithPolicyReferenceCount;
+  report.managementArchivedCount=linked.filter(x=>x.row.archivado===true||x.row.eliminado===true||x.row.deleted===true).length;
+  report.managementCountryDerivedFromClientCount=linked.filter(x=>focalCountries(x.row).length===0).length;
+  report.status=linked.length?'EXISTING_CLIENT_AND_REFERENCED_GESTIONES_SOURCE_REVIEW_REQUIRED':
+    'EXISTING_CLIENT_NO_GESTION_IN_CLIENT_REFERENCE_COVERAGE';
+  return{report,evidence};
+}
 function focalIdentity(spec,entry){
   const p=entry.policy||{},aliases=focalUnique(FOCAL_NUMBER_KEYS.map(k=>focalNormalize(p[k])));
   const hashes=aliases.map(v=>crypto.createHash('sha256').update(v).digest('hex'));
@@ -191,14 +285,26 @@ function assessDocumentaryFocal(spec,snapshot){
 async function scanDocumentaryFocal(db,spec=DOCUMENTARY_FOCAL){
   const tenant=db.collection('tenants').doc('alianzas-soluciones');
   const col=name=>tenant.collection('data').doc(name).collection('items');
-  const policyRead=await col('polizas').select(...FOCAL_POLICY_FIELDS).limit(FOCAL_POLICY_CAP).get();
+  // Client identity is independent of policy presence. Both raw projections
+  // stay in memory; only sanitized counters and a double-read digest leave CI.
+  const [policyRead,independentClient]=await Promise.all([
+    col('polizas').select(...FOCAL_POLICY_FIELDS).limit(FOCAL_POLICY_CAP).get(),
+    readFocalClientManagement(col,spec)
+  ]);
   const snapshot={scannedPolicyCount:policyRead.size,policyScanTruncated:policyRead.size>=FOCAL_POLICY_CAP,
     linkedScanTruncated:false,proposalScanTruncated:false,editions:[],opsLinkedCount:null,
     activeProposalMatches:null,activeLedgerPresent:false};
-  if(snapshot.policyScanTruncated)return assessDocumentaryFocal(spec,snapshot);
+  const rawEvidence={independentClient:independentClient.evidence,policies:[],editions:[],ops:[],proposals:[]};
+  const finish=()=>{
+    const out=assessDocumentaryFocal(spec,snapshot);
+    out.clientManagementReadback=independentClient.report;
+    out.snapshotFingerprint=crypto.createHash('sha256').update(JSON.stringify(rawEvidence)).digest('hex');
+    return out;
+  };
+  if(snapshot.policyScanTruncated)return finish();
   const found=policyRead.docs.filter(d=>FOCAL_NUMBER_KEYS.some(k=>text(d.data()?.[k])&&focalHash(d.data()[k])===spec.policyNumberHash));
-  if(found.length>=24){snapshot.linkedScanTruncated=true;return assessDocumentaryFocal(spec,snapshot);}
-  const rawEvidence={policies:found.map(d=>({...d.data(),id:d.id})),editions:[],ops:[],proposals:[]};
+  rawEvidence.policies=found.map(d=>({...d.data(),id:d.id}));
+  if(found.length>=24){snapshot.linkedScanTruncated=true;return finish();}
   const linkedRows=async(name,id,fields)=>{
     const read=await col(name).where('polizaId','==',id).select(...fields).limit(FOCAL_LINKED_CAP).get();
     if(read.size>=FOCAL_LINKED_CAP)snapshot.linkedScanTruncated=true;
@@ -234,9 +340,7 @@ async function scanDocumentaryFocal(db,spec=DOCUMENTARY_FOCAL){
     snapshot.activeProposalMatches=rawEvidence.proposals.length;
     rawEvidence.activeRunId=runId;
   }
-  const out=assessDocumentaryFocal(spec,snapshot);
-  out.snapshotFingerprint=crypto.createHash('sha256').update(JSON.stringify(rawEvidence)).digest('hex');
-  return out;
+  return finish();
 }
 function observationMetadata(now=new Date(),sourceSha=process.env.GITHUB_SHA){
   const parts=Object.fromEntries(new Intl.DateTimeFormat('en-CA',{
@@ -437,5 +541,7 @@ async function main(){
 }
 if(require.main===module)main().catch(e=>{console.error(safeError(e));process.exitCode=1});
 module.exports={CASES,SOURCE_SHA256,BANTRAB_PREVIOUSLY_WRITTEN,assess,resolveEditions,numbers,amount,paid,policyVariants,
-  DOCUMENTARY_FOCAL,FOCAL_POLICY_CAP,FOCAL_LINKED_CAP,FOCAL_PROPOSAL_CAP,FOCAL_NUMBER_KEYS,
-  focalNormalize,focalHash,focalRequirementHash,focalIdentity,assessDocumentaryFocal,scanDocumentaryFocal,observationMetadata};
+  DOCUMENTARY_FOCAL,FOCAL_POLICY_CAP,FOCAL_LINKED_CAP,FOCAL_PROPOSAL_CAP,FOCAL_CLIENT_CAP,FOCAL_NUMBER_KEYS,
+  FOCAL_CLIENT_NAME_FIELDS,FOCAL_MANAGEMENT_CLIENT_REFS,
+  focalNormalize,focalHash,focalRequirementHash,focalClientFullNames,readFocalClientManagement,
+  focalIdentity,assessDocumentaryFocal,scanDocumentaryFocal,observationMetadata};

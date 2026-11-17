@@ -60,13 +60,19 @@ assert.equal(clue.policyValidity.start,null);
 assert.equal(clue.sourceDueExactAmountMatches,null);
 const dueCase=CASES.find(x=>x.id==='A2.M1');
 assert.equal(assess(dueCase,snap({receipts:[{...receipt,numeroReciboFuente:'',monto:2497.15,fechaVencimiento:'2026-11-30'}]})).sourceDueExactAmountMatches,1,'READONLY_DUE_AMOUNT_CANDIDATE_NOT_PAYMENT_PROOF');
-const {DOCUMENTARY_FOCAL,FOCAL_POLICY_CAP,FOCAL_LINKED_CAP,FOCAL_PROPOSAL_CAP,FOCAL_NUMBER_KEYS,
+const {DOCUMENTARY_FOCAL,FOCAL_POLICY_CAP,FOCAL_LINKED_CAP,FOCAL_PROPOSAL_CAP,FOCAL_CLIENT_CAP,FOCAL_NUMBER_KEYS,
+ FOCAL_CLIENT_NAME_FIELDS,FOCAL_MANAGEMENT_CLIENT_REFS,focalClientFullNames,readFocalClientManagement,
  focalNormalize,focalHash,focalRequirementHash,assessDocumentaryFocal,scanDocumentaryFocal,observationMetadata}=require('./gravicentra-i66-cartera-a1-a4-readonly.cjs');
 let focalChecks=0;
 const check=(actual,expected,label)=>{assert.deepEqual(actual,expected,label);focalChecks++;};
 check(FOCAL_POLICY_CAP,2000,'bounded server-side policy projection');
 check(FOCAL_LINKED_CAP,80,'bounded linked records');
 check(FOCAL_PROPOSAL_CAP,250,'bounded active ledger projection');
+check(FOCAL_CLIENT_CAP,1000,'bounded independent client projection');
+check(FOCAL_MANAGEMENT_CLIENT_REFS,['clienteId','clientId'],'only product-demonstrated management client aliases');
+check(FOCAL_CLIENT_NAME_FIELDS.includes('nombreCompleto'),true,'canonical client full-name field');
+check(focalClientFullNames({nombre:'Clíente',apellidos:'Prueba'}),['CLIENTEPRUEBA'],'split client name composes once');
+check(focalClientFullNames({nombreCompleto:'Cliente Prueba',nombres:'Clíente',apellidos:'Prueba'}),['CLIENTEPRUEBA'],'full and component names normalize exactly');
 check(FOCAL_NUMBER_KEYS.length,11,'all exact existing policy number aliases');
 check(DOCUMENTARY_FOCAL.sourcePaid,false,'issued requirement is not proof of paid');
 check(DOCUMENTARY_FOCAL.paymentApplicationAuthorized,false,'no payment permit');
@@ -159,15 +165,19 @@ async function runtimeFocalChecks(){
   [at('recibosEsperados')]:[{id:fr.id,data:{...fr}}],
   [at('cobros')]:[],[at('gestiones')]:[],[at('cobrosLedgerControl')]:[]
  };
- const calls=[];
+ const calls=[];let onRead=null;
  function query(path='',filters=[],bound=Infinity,fields=null,document=false){return{
   collection:k=>query(path?path+'/'+k:k),doc:k=>query(path+'/'+k,[],Infinity,null,true),
   where:(k,op,v)=>{assert.equal(op,'==');return query(path,[...filters,[k,v]],bound,fields);},
   select:(...keys)=>query(path,filters,bound,keys),limit:n=>query(path,filters,n,fields),
-  get:async()=>{calls.push({path,fields,bound,document});
+  get:async()=>{calls.push({path,fields,bound,document,filters});
    if(document){const parts=path.split('/'),id=parts.pop(),r=(rows[parts.join('/')]||[]).find(x=>x.id===id);return{exists:!!r,data:()=>r?.data};}
    const selected=(rows[path]||[]).filter(r=>filters.every(([k,v])=>r.data[k]===v)).slice(0,bound);
-   return{size:selected.length,docs:selected.map(r=>({id:r.id,data:()=>fields?Object.fromEntries(fields.filter(k=>r.data[k]!==undefined).map(k=>[k,r.data[k]])):r.data}))};
+   const result={size:selected.length,docs:selected.map(r=>{
+    const data=structuredClone(fields?Object.fromEntries(fields.filter(k=>r.data[k]!==undefined).map(k=>[k,r.data[k]])):r.data);
+    return{id:r.id,data:()=>data};
+   })};
+   if(onRead)onRead({path,filters});return result;
   }
  };}
  const db=query(),first=await scanDocumentaryFocal(db,spec),second=await scanDocumentaryFocal(db,spec);
@@ -187,6 +197,134 @@ async function runtimeFocalChecks(){
  const capped=await scanDocumentaryFocal(db,spec);
  check(capped.currentStatus,'HOLD_FOCAL_POLICY_SCAN_TRUNCATED','capped scan is not absence');
  check(capped.scannedPolicyCount,2000,'actual cap disclosed');
+ check(capped.clientManagementReadback.canonicalClientUnique,true,'client independent even when policy census capped');
+ check(/^[a-f0-9]{64}$/.test(capped.snapshotFingerprint),true,'early HOLD still includes private snapshot fingerprint');
+
+ // The independently bound client may exist before this issued policy. No
+ // source names, numbers or original identifiers are embedded in these tests.
+ rows[at('polizas')]=[];rows[at('recibosEsperados')]=[];
+ const goodClient=()=>({id:'private-client-01',data:{nombreCompleto:'Clíente Prueba',pais:'GT',
+  tenantId:'alianzas-soluciones',id:'private-client-01',unneededContact:'omit-me'}});
+ const goodManagement=()=>({id:'private-management-01',data:{id:'private-management-01',
+  clienteId:'private-client-01',pais:'GT',tenantId:'alianzas-soluciones',estado:'Pendiente',
+  titulo:'Private synthetic title must not be projected',nota:'Private synthetic note'}});
+ const independent=()=>readFocalClientManagement(name=>query(at(name)),spec);
+ const status=async()=> (await independent()).report.status;
+ rows[at('clientes')]=[goodClient()];rows[at('gestiones')]=[];
+ let probe=await independent();
+ check(probe.report.status,'EXISTING_CLIENT_NO_GESTION_IN_CLIENT_REFERENCE_COVERAGE','client present without policy or management');
+ check(probe.report.canonicalClientUnique,true,'exact unique normalized full-name identity');
+ check(probe.report.clientScopeVerified,true,'GT and canonical tenant verified');
+ check(probe.report.managementLinkedCount,0,'zero only in explicit client-reference coverage');
+ check(probe.report.managementAbsenceProven,false,'zero linked rows never global Ops absence');
+ check(probe.report.clientAbsenceProven,false,'no broad client absence claim');
+ check(probe.report.policyCreationAuthorized,false,'read does not permit policy creation');
+ check(probe.report.managementSourceDocumentAssociationVerified,false,'client join is not document association');
+ check(probe.report.paymentApplicationAuthorized,false,'read not payment permission');
+ check(probe.report.writes,0,'independent read never writes');
+ check(calls.filter(x=>x.path===at('clientes')&&!x.document).every(x=>x.bound===1000&&
+  x.fields.includes('nombreCompleto')&&!x.fields.includes('unneededContact')),true,'minimal client projection and server cap');
+
+ rows[at('gestiones')]=[goodManagement()];
+ rows[at('gestiones')][0].data.clientId='private-client-01';
+ probe=await independent();
+ check(probe.report.status,'EXISTING_CLIENT_AND_REFERENCED_GESTIONES_SOURCE_REVIEW_REQUIRED','existing management linked to client only');
+ check(probe.report.managementLinkedCount,1,'same physical management deduplicated across two aliases');
+ check(probe.report.managementWithoutPolicyReferenceCount,1,'client-only management counted without inventing policy');
+ check(probe.evidence.managementRows.length,1,'private evidence physical ID deduplication');
+ check(probe.evidence.managementRows[0].row.titulo,undefined,'management title not projected');
+ check(probe.evidence.managementRows[0].row.nota,undefined,'management note not projected');
+ check(calls.filter(x=>x.path===at('gestiones')&&x.filters.some(([k])=>FOCAL_MANAGEMENT_CLIENT_REFS.includes(k)))
+  .every(x=>x.bound===80&&x.fields.includes('clienteId')&&!x.fields.includes('titulo')),true,'bounded exact management-reference projection');
+ const withoutPolicy=await scanDocumentaryFocal(db,spec);
+ check(withoutPolicy.currentStatus,'HOLD_FOCAL_POLICY_NOT_FOUND','old policy status not rewritten as data applied');
+ check(withoutPolicy.opsLinkedCount,null,'old polizaId-only count stays unknown');
+ check(withoutPolicy.clientManagementReadback.managementLinkedCount,1,'new client-reference count independent of policy');
+ check(withoutPolicy.clientManagementReadback.canonicalClientUnique,true,'client read performed despite no policy');
+ check(await scanDocumentaryFocal(db,spec),withoutPolicy,'new whole focal double snapshot stable');
+ for(const privateValue of ['private-client-01','private-management-01','Cliente Prueba','Clíente Prueba','omit-me',
+  'Private synthetic title must not be projected','Private synthetic note'])
+  check(JSON.stringify(withoutPolicy).includes(privateValue),false,'independent readback no private identity output');
+ rows[at('clientes')][0].data.country='GT';
+ check((await scanDocumentaryFocal(db,spec)).snapshotFingerprint!==withoutPolicy.snapshotFingerprint,true,'client preimage change included in fingerprint');
+ rows[at('clientes')]=[goodClient()];
+ rows[at('gestiones')][0].data.estado='En proceso';
+ check((await scanDocumentaryFocal(db,spec)).snapshotFingerprint!==withoutPolicy.snapshotFingerprint,true,'management preimage change included in fingerprint');
+
+ rows[at('clientes')]=[];
+ const callsBeforeMissing=calls.length;probe=await independent();
+ check(probe.report.status,'HOLD_FOCAL_CLIENT_NOT_FOUND_IN_DECLARED_ALIASES','no client match is bounded identity HOLD');
+ check(probe.report.clientAbsenceProven,false,'missing known aliases cannot prove client absence');
+ check(probe.report.managementQueriesPerformed,false,'never query unrelated management without verified client');
+ check(calls.slice(callsBeforeMissing).some(x=>x.path===at('gestiones')),false,'no management query for absent client identity');
+ rows[at('clientes')]=[{id:'private-client-01',data:{full_name:'Cliente Prueba',pais:'GT'}}];
+ check(await status(),'HOLD_FOCAL_CLIENT_NOT_FOUND_IN_DECLARED_ALIASES','unlisted name alias explicitly not an absence proof');
+ rows[at('clientes')]=[{id:'private-client-01',data:{nombreCompleto:'Cliente Prueba Adicional',pais:'GT'}}];
+ check(await status(),'HOLD_FOCAL_CLIENT_NOT_FOUND_IN_DECLARED_ALIASES','no substring client matching');
+ rows[at('clientes')]=[goodClient(),{...goodClient(),id:'private-client-02'}];
+ check(await status(),'HOLD_FOCAL_DUPLICATE_CLIENT_IDENTITY','two physical client matches cannot be auto-selected');
+ rows[at('clientes')]=[goodClient()];rows[at('clientes')][0].data.fullName='Cliente Distinto';
+ check(await status(),'HOLD_FOCAL_CLIENT_NAME_ALIAS_CONFLICT','contradictory full-name alias');
+ for(const value of [{pais:'CO'},{pais:'GT',country:'CO'},{pais:''}]){
+  rows[at('clientes')]=[goodClient()];Object.assign(rows[at('clientes')][0].data,value);
+  check(await status(),'HOLD_FOCAL_CLIENT_COUNTRY','country absent or conflict never inferred');
+ }
+ rows[at('clientes')]=[goodClient()];rows[at('clientes')][0].data.tenantId='other-tenant';
+ check(await status(),'HOLD_FOCAL_CLIENT_TENANT_CONFLICT','foreign explicit tenant blocked');
+ for(const id of ['different-id','private-client-01\n']){
+  rows[at('clientes')]=[goodClient()];rows[at('clientes')][0].data.id=id;
+  check(await status(),'HOLD_FOCAL_CLIENT_CANONICAL_ID_CONFLICT','physical logical client ID exact');
+ }
+ rows[at('clientes')]=[{...goodClient(),id:'private-client-01\n'}];
+ check(await status(),'HOLD_FOCAL_CLIENT_CANONICAL_ID_CONFLICT','physical client ID newline rejected');
+ for(const change of [{fusionado:true},{mergedIntoClientId:'other-client'},{archivado:true},
+  {eliminado:true},{deleted:true},{active:false},{activo:false}]){
+  rows[at('clientes')]=[goodClient()];Object.assign(rows[at('clientes')][0].data,change);
+  check(await status(),'HOLD_FOCAL_CLIENT_MERGED_OR_INACTIVE','merged or inactive client not reused');
+ }
+ rows[at('clientes')]=Array.from({length:1000},(_,i)=>({id:'client-'+i,data:{nombreCompleto:'QA Other '+i,pais:'GT'}}));
+ probe=await independent();
+ check(probe.report.status,'HOLD_FOCAL_CLIENT_SCAN_TRUNCATED','client cap not absence');
+ check(probe.report.scannedClientCount,1000,'actual client cap disclosed');
+ check(probe.report.managementQueriesPerformed,false,'no management lookup after truncated client census');
+ check(probe.report.clientAbsenceProven,false,'capped client census no absence claim');
+ rows[at('clientes')]=[goodClient()];
+ rows[at('clientes')][0].data={nombres:'Clíente',apellidos:'Prueba',pais:'GT'};
+ rows[at('gestiones')]=[];
+ check((await independent()).report.canonicalClientUnique,true,'split full-name original binding supported');
+ rows[at('clientes')]=[goodClient()];rows[at('gestiones')]=[goodManagement()];
+ delete rows[at('gestiones')][0].data.pais;
+ probe=await independent();
+ check(probe.report.managementLinkedCount,1,'client-only scope can follow verified GT parent');
+ check(probe.report.managementCountryDerivedFromClientCount,1,'derived management country explicitly labeled');
+ rows[at('gestiones')]=[goodManagement()];rows[at('gestiones')][0].data.polizaId='other-policy';
+ probe=await independent();
+ check(probe.report.managementWithPolicyReferenceCount,1,'pre-existing linked policy counted without reading unrelated finance');
+ check(probe.report.managementSourceDocumentAssociationVerified,false,'other policy reference cannot bind this original');
+ rows[at('gestiones')][0].data.archivado=true;
+ check((await independent()).report.managementArchivedCount,1,'archived gestiones retained for duplicate review');
+ rows[at('gestiones')]=Array.from({length:80},(_,i)=>({id:'management-'+i,data:{clienteId:'private-client-01',pais:'GT'}}));
+ probe=await independent();
+ check(probe.report.status,'HOLD_FOCAL_MANAGEMENT_SCAN_TRUNCATED','management alias cap fails closed');
+ check(probe.report.managementLinkedCount,null,'truncated management cardinality never treated complete');
+ for(const [change,expected] of [
+  [{tenantId:'other-tenant'},'HOLD_FOCAL_MANAGEMENT_TENANT_CONFLICT'],
+  [{id:'other-management'},'HOLD_FOCAL_MANAGEMENT_CANONICAL_ID_CONFLICT'],
+  [{clientId:'other-client'},'HOLD_FOCAL_MANAGEMENT_CLIENT_REFERENCE_CONFLICT'],
+  [{clientId:'private-client-01\n'},'HOLD_FOCAL_MANAGEMENT_CLIENT_REFERENCE_CONFLICT'],
+  [{pais:'CO'},'HOLD_FOCAL_MANAGEMENT_COUNTRY_CONFLICT'],
+  [{country:'CO'},'HOLD_FOCAL_MANAGEMENT_COUNTRY_CONFLICT'],
+  [{polizaId:'one-policy',policyId:'another-policy'},'HOLD_FOCAL_MANAGEMENT_POLICY_REFERENCE_CONFLICT']
+ ]){
+  rows[at('gestiones')]=[goodManagement()];Object.assign(rows[at('gestiones')][0].data,change);
+  check(await status(),expected,'management scope/reference negative');
+ }
+ rows[at('gestiones')]=[goodManagement()];rows[at('gestiones')][0].data.clientId='private-client-01';
+ onRead=call=>{if(call.path===at('gestiones')&&call.filters[0]?.[0]==='clienteId')rows[at('gestiones')][0].data.estado='En proceso';};
+ check(await status(),'HOLD_FOCAL_MANAGEMENT_CONCURRENT_ALIAS_READ','two alias reads cannot hide concurrent preimage change');
+ onRead=null;
+ await assert.rejects(()=>readFocalClientManagement(name=>query(at(name)),{...spec,clientNameHash:'bad'}),
+  /I66_A1_A4_FOCAL_CLIENT_BINDING_INVALID/);focalChecks++;
 }
 runtimeFocalChecks().then(()=>console.log('I66_CARTERA_A1_A4_A7_PROTECTED_SOURCE_RECONCILIATION_PASS source_only no_data_writes focal_checks='+focalChecks))
  .catch(error=>{console.error(error);process.exitCode=1;});

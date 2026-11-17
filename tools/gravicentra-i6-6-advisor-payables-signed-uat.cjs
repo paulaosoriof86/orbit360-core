@@ -337,10 +337,298 @@ function assertServerDenial(out,code,reason){
   assert.ok(out.code.endsWith(code),'ADVISOR_UAT_DENIAL_CLASS_MISMATCH');
   if(reason)assert.equal(out.reason,reason,'ADVISOR_UAT_DENIAL_REASON_MISMATCH');
 }
+const BROWSER_STAGES=new Set(['BUILD_IDENTITY','FIXTURE_SETUP','SIGNED_SESSION','DIRECTION_LEGAL_ACCEPTANCE','OPERATIVE_FINANCIAL_DENIAL',
+  'FINANCE_UI_HYDRATION','DOCUMENT_FILE_UI_70','DOCUMENT_FILE_UI_60','REPLAY_AND_SOURCE_GUARDS',
+  'ASSIGNMENT_DOCUMENTARY_UI','ASSIGNMENT_RELOAD','LEGACY_GUARDS','LEGACY_FINANCE_EDIT','PENDING_CXP_RELOAD','SYNTHETIC_RESTORE']);
+const browserStage=value=>BROWSER_STAGES.has(value)?value:'UNKNOWN_STAGE';
+const BROWSER_DENIALS=Object.freeze([
+  ['OPERATIVE_CXP','operativo','OPERATIVE_FINANCIAL_DENIAL','permission-denied',''],
+  ['OPERATIVE_ASSIGNMENT','operativo','ASSIGNMENT_DOCUMENTARY_UI','permission-denied',''],
+  ['ADVISOR_CONFLICT','direccion','REPLAY_AND_SOURCE_GUARDS','failed-precondition','ADVISOR_POLICY_CONFLICT'],
+  ['SOURCE_REINTERPRETATION','direccion','REPLAY_AND_SOURCE_GUARDS','failed-precondition','SOURCE_LINE_ALREADY_INTERPRETED'],
+  ['HISTORICAL_PAYABLE','direccion','LEGACY_GUARDS','failed-precondition','HISTORICAL_ADVISOR_BALANCE_LINK_REQUIRED'],
+  ['HISTORICAL_COMMISSION','direccion','LEGACY_GUARDS','failed-precondition','HISTORICAL_COMMISSION_LINK_REQUIRED'],
+  ['PROTECTED_COMMISSION','direccion','LEGACY_GUARDS','failed-precondition',''],
+  ['PROTECTED_PAID_TOGGLE','direccion','LEGACY_GUARDS','failed-precondition','']
+].map(([id,actorRole,stage,code,reason])=>Object.freeze({id,actorRole,stage,code,reason,
+  httpStatus:code==='permission-denied'?403:400,errorStatus:code==='permission-denied'?'PERMISSION_DENIED':'FAILED_PRECONDITION'})));
+// These are the eight exact negative commands in THIS signed matrix. A status,
+// QA-looking prefix, message substring, or nearby console event is not authority
+// to exempt any other request. No real-record or generic 400/403 allowlist.
+function browserDenialCatalog(fx,steps){
+  assert.match(fx.runId,/^b4003qa_i66_cxp_[a-z0-9_]+$/,'ADVISOR_UAT_DENIAL_FIXTURE_SCOPE');
+  assert.equal(digest(fx),digest(withAssignmentFixtures(signedDocumentaryFixtures(fx.runId))),'ADVISOR_UAT_DENIAL_FIXTURE_SCOPE');
+  assert.deepEqual(steps?.[0]?.spec,assignmentStepsFor(fx,'browser-observability-only',false)[0].spec,'ADVISOR_UAT_DENIAL_FIXTURE_SCOPE');
+  const changed={...fx.specs[0],lines:[{...fx.specs[0].lines[0],ordinaryCommission:38.66,
+    components:fx.specs[0].lines[0].components.map(component=>component.coverageCode==='GAME'?{...component,ordinaryCommission:35.60}:component)}]};
+  const entry=(id,input)=>({...BROWSER_DENIALS.find(item=>item.id===id),inputDigest:digest(input)});
+  return [
+    entry('OPERATIVE_CXP',{advisorPayable:fx.specs[0]}),
+    entry('OPERATIVE_ASSIGNMENT',{advisorAssignmentCorrection:steps[0].spec}),
+    entry('ADVISOR_CONFLICT',{advisorPayable:{...fx.specs[0],advisorId:fx.ids.advisor60}}),
+    entry('SOURCE_REINTERPRETATION',{advisorPayable:changed}),
+    entry('HISTORICAL_PAYABLE',{advisorPayable:fx.historical[0]}),
+    entry('HISTORICAL_COMMISSION',{advisorPayable:fx.historical[1]}),
+    entry('PROTECTED_COMMISSION',{mutations:[{collection:'comisiones',id:fx.ids.oldCommission,action:'update',payload:{estado:'liquidada',__syntheticQa:true}}]}),
+    entry('PROTECTED_PAID_TOGGLE',{mutations:[{collection:'finmovs',id:fx.plans[0].payable.id,action:'update',payload:{estado:'pagado',pagada:true,__syntheticQa:true}}]})
+  ];
+}
+function safeBrowserLocation(value,cfg){
+  try{
+    const url=new URL(String(value||''));
+    const endpointClass=url.origin===cfg.origin?(url.pathname.endsWith('.js')?'FIRST_PARTY_SCRIPT':'FIRST_PARTY'):
+      url.hostname.endsWith('.cloudfunctions.net')?'FUNCTIONS':url.hostname.endsWith('.googleapis.com')?'GOOGLE_API':'EXTERNAL';
+    // Never retain query strings, fragments, headers, resource paths or text.
+    return {endpointClass,pathSha256:hash(cfg.source+'|'+url.origin+url.pathname)};
+  }catch{return {endpointClass:'UNKNOWN',pathSha256:null};}
+}
+function createBrowserErrorLedger({cfg,actorRole,getStage,catalog,maxEvents=500,maxRequests=8192}){
+  assert.ok(['direccion','operativo'].includes(actorRole),'ADVISOR_UAT_DENIAL_ACTOR_SCOPE');
+  const planned=catalog.filter(item=>item.actorRole===actorRole),requests=new Map(),expectations=new Map(),events=[];
+  let observedConsoleErrors=0,pageErrorCount=0,overflow=false;
+  const endpoint='https://'+cfg.region+'-'+PROJECT+'.cloudfunctions.net/'+cfg.functionName;
+  const requestKey=id=>hash(cfg.source+'|'+actorRole+'|'+String(id));
+  const emit=(eventType,fields={})=>{
+    if(events.length>=maxEvents){overflow=true;return;}
+    events.push({eventType,actorRole,stage:browserStage(getStage()),...fields});
+  };
+  const telemetryCodes=new Set(['CDP_ATTACH_FAILED','CDP_ENABLE_FAILED','CDP_CALLBACK_FAILED','CDP_BARRIER_FAILED','DENIAL_BODY_UNAVAILABLE',
+    'DENIAL_BODY_INVALID','DENIAL_HTTP_MISMATCH','DENIAL_SDK_MISMATCH','DENIAL_REQUEST_MISSING','DENIAL_REQUEST_REUSED','DENIAL_REDIRECT',
+    'DENIAL_CATALOG_MISMATCH','REQUEST_LIMIT_EXCEEDED','DUPLICATE_NATIVE_REQUEST','DENIAL_RESPONSE_TIMEOUT','BROWSER_CLOSE_FAILED']);
+  const telemetry=code=>emit('TELEMETRY_FAILURE',{code:telemetryCodes.has(code)?code:'CDP_CALLBACK_FAILED'});
+  const resourceType=value=>new Set(['Document','Stylesheet','Image','Media','Font','Script','TextTrack','XHR','Fetch','Prefetch','EventSource','WebSocket','Manifest','SignedExchange','Ping','CSPViolationReport','Preflight','Other']).has(value)?value:'Other';
+  const httpStatus=value=>Number.isInteger(value)&&value>=100&&value<=599?value:0;
+  function expectDenial(input,code,reason=''){
+    const matches=planned.filter(item=>item.stage===getStage()&&item.inputDigest===digest(input)&&item.code===code&&item.reason===reason);
+    if(matches.length!==1||expectations.has(matches[0]?.id)){
+      telemetry('DENIAL_CATALOG_MISMATCH');throw Error('ADVISOR_UAT_DENIAL_HTTP_PROOF_HOLD');
+    }
+    const expected={...matches[0],requestId:null,sdkVerified:false,httpVerified:false,transportComplete:false,bodyReasonDigest:null};
+    expected.ready=new Promise(resolve=>{expected.resolve=resolve;});expectations.set(expected.id,expected);return expected.id;
+  }
+  function onRequest(event){
+    const id=String(event.requestId||''),request=event.request||{};
+    if(!id){telemetry('CDP_CALLBACK_FAILED');return;}
+    if(requests.size>=maxRequests&&!requests.has(id)){telemetry('REQUEST_LIMIT_EXCEEDED');return;}
+    const previous=requests.get(id);
+    if(previous?.expected){previous.expected.httpVerified=false;telemetry(event.redirectResponse?'DENIAL_REDIRECT':'DUPLICATE_NATIVE_REQUEST');}
+    const meta={id,stage:browserStage(getStage()),...safeBrowserLocation(request.url,cfg),resourceType:resourceType(event.type),
+      method:['GET','POST','OPTIONS','HEAD','PUT','PATCH','DELETE'].includes(request.method)?request.method:'OTHER',expected:null,status:0};
+    if(request.url===endpoint&&request.method==='POST'){
+      try{
+        const envelope=JSON.parse(String(request.postData||''));
+        if(envelope&&Object.keys(envelope).length===1&&envelope.data&&typeof envelope.data==='object'&&!Array.isArray(envelope.data)){
+          const {tenantId,activeRole,...input}=envelope.data;
+          if(tenantId===TENANT&&norm(activeRole)===actorRole){
+            const hits=[...expectations.values()].filter(item=>item.stage===meta.stage&&item.inputDigest===digest(input));
+            if(hits.length===1){
+              if(hits[0].requestId!==null)telemetry('DENIAL_REQUEST_REUSED');
+              else {meta.expected=hits[0];meta.expected.requestId=id;meta.endpointClass='OWNED_NEGATIVE_CALLABLE';}
+            }
+          }
+        }
+      }catch{/* Missing/malformed/foreign payload never acquires an exemption. */}
+    }
+    requests.set(id,meta);
+  }
+  function onResponse(event){
+    const id=String(event.requestId||''),meta=requests.get(id),response=event.response||{},status=httpStatus(response.status);
+    if(meta)meta.status=status;
+    if(status>=400)emit('HTTP_ERROR',{requestKey:requestKey(id),stage:meta?.stage||browserStage(getStage()),status,
+      resourceType:meta?.resourceType||resourceType(event.type),...safeBrowserLocation(response.url,cfg),
+      ...(meta?.expected?{denialId:meta.expected.id,endpointClass:'OWNED_NEGATIVE_CALLABLE'}:{})});
+    if(meta?.expected&&status!==meta.expected.httpStatus)telemetry('DENIAL_HTTP_MISMATCH');
+  }
+  function onBody(id,body){
+    const meta=requests.get(String(id)),expected=meta?.expected;if(!expected)return;
+    try{
+      if(typeof body!=='string'||body.length>131072)throw Error('INVALID');
+      const parsed=JSON.parse(body),error=parsed?.error;
+      if(!error||typeof error!=='object'||Array.isArray(error)||Object.hasOwn(parsed,'result')||Object.hasOwn(parsed,'data')||
+        error.status!==expected.errorStatus||meta.status!==expected.httpStatus)throw Error('INVALID');
+      const reason=error.details?.reason===undefined?'':error.details.reason;
+      if(typeof reason!=='string'||(expected.reason&&reason!==expected.reason))throw Error('INVALID');
+      expected.bodyReasonDigest=hash(cfg.source+'|'+reason);expected.httpVerified=true;
+    }catch{telemetry('DENIAL_BODY_INVALID');}
+    expected.transportComplete=true;expected.resolve();
+  }
+  function onBodyUnavailable(id){
+    const expected=requests.get(String(id))?.expected;if(!expected)return;
+    telemetry('DENIAL_BODY_UNAVAILABLE');expected.transportComplete=true;expected.resolve();
+  }
+  function onLoadingFailed(event){
+    const id=String(event.requestId||''),meta=requests.get(id);
+    // Navigation cancels long-lived listeners. Cancellation is recorded, never
+    // used to excuse a HTTP/console error or complete an expected denial.
+    emit(event.canceled===true?'NETWORK_CANCELLED':'NETWORK_FAILURE',{requestKey:requestKey(id),stage:meta?.stage||browserStage(getStage()),
+      endpointClass:meta?.endpointClass||'UNKNOWN',resourceType:meta?.resourceType||resourceType(event.type)});
+    if(meta?.expected)onBodyUnavailable(id);
+  }
+  function onLog(entry){
+    if(entry?.level!=='error')return;
+    const sources=new Set(['xml','javascript','network','storage','appcache','rendering','security','deprecation','worker','violation','intervention','recommendation','other']);
+    const source=sources.has(entry.source)?entry.source:'other';
+    const id=typeof entry.networkRequestId==='string'?entry.networkRequestId:null;
+    emit('NATIVE_CONSOLE_ERROR',{source,...safeBrowserLocation(entry.url,cfg),
+      ...(id?{requestKey:requestKey(id)}:{}),line:Number.isInteger(entry.lineNumber)&&entry.lineNumber>=0?entry.lineNumber:null});
+  }
+  function onRuntimeConsole(event){
+    if(!['error','assert'].includes(event.type))return;
+    const frame=event.stackTrace?.callFrames?.[0]||{},types=new Set(['object','function','undefined','string','number','boolean','symbol','bigint']);
+    emit('APPLICATION_CONSOLE_ERROR',{source:'javascript',...safeBrowserLocation(frame.url,cfg),
+      line:Number.isInteger(frame.lineNumber)&&frame.lineNumber>=0?frame.lineNumber:null,
+      column:Number.isInteger(frame.columnNumber)&&frame.columnNumber>=0?frame.columnNumber:null,
+      argumentTypes:[].concat(event.args||[]).slice(0,8).map(arg=>types.has(arg?.type)?arg.type:'unknown')});
+  }
+  function onPageConsole(type){if(type==='error'||type==='assert')observedConsoleErrors++;}
+  function onPageError(){pageErrorCount++;emit('PAGE_ERROR');}
+  async function confirmDenial(id,out,timeoutMs=10000){
+    const expected=expectations.get(id);
+    if(!expected)throw Error('ADVISOR_UAT_DENIAL_HTTP_PROOF_HOLD');
+    const sdkOk=out?.ok===false&&out.code==='functions/'+expected.code&&typeof out.reason==='string'&&(!expected.reason||out.reason===expected.reason);
+    if(!sdkOk){telemetry('DENIAL_SDK_MISMATCH');throw Error('ADVISOR_UAT_DENIAL_HTTP_PROOF_HOLD');}
+    let timer;
+    try{
+      await Promise.race([expected.ready,new Promise(resolve=>{timer=setTimeout(()=>{telemetry('DENIAL_RESPONSE_TIMEOUT');resolve();},timeoutMs);})]);
+    }finally{clearTimeout(timer);}
+    if(expected.requestId===null)telemetry('DENIAL_REQUEST_MISSING');
+    expected.sdkVerified=sdkOk&&expected.transportComplete&&expected.httpVerified&&expected.bodyReasonDigest===hash(cfg.source+'|'+out.reason);
+    if(!expected.sdkVerified){telemetry('DENIAL_SDK_MISMATCH');throw Error('ADVISOR_UAT_DENIAL_HTTP_PROOF_HOLD');}
+  }
+  function summary(){
+    const verified=[...expectations.values()].filter(item=>item.httpVerified&&item.sdkVerified&&item.transportComplete),
+      verifiedRequests=new Set(verified.map(item=>requestKey(item.requestId))),seenConsole=new Set();
+    let expectedNetworkConsoleErrors=0,unexpectedConsoleErrors=0,unexpectedHttpErrors=0;
+    const classified=events.map(event=>{
+      let expected=false;
+      if(event.eventType==='NATIVE_CONSOLE_ERROR'){
+        expected=event.source==='network'&&verifiedRequests.has(event.requestKey)&&!seenConsole.has(event.requestKey);
+        if(expected){seenConsole.add(event.requestKey);expectedNetworkConsoleErrors++;}else unexpectedConsoleErrors++;
+      }else if(event.eventType==='APPLICATION_CONSOLE_ERROR')unexpectedConsoleErrors++;
+      else if(event.eventType==='HTTP_ERROR'){expected=verifiedRequests.has(event.requestKey);if(!expected)unexpectedHttpErrors++;}
+      else if(event.eventType==='NETWORK_FAILURE')unexpectedHttpErrors++;
+      return {...event,...(['NATIVE_CONSOLE_ERROR','APPLICATION_CONSOLE_ERROR','HTTP_ERROR','NETWORK_FAILURE'].includes(event.eventType)?{classification:expected?'VERIFIED_EXPECTED_DENIAL':'UNEXPECTED'}:{})};
+    });
+    const capturedConsoleErrors=events.filter(event=>['NATIVE_CONSOLE_ERROR','APPLICATION_CONSOLE_ERROR'].includes(event.eventType)).length;
+    const telemetryFailures=events.filter(event=>event.eventType==='TELEMETRY_FAILURE').length+
+      Number(overflow)+Number(observedConsoleErrors!==capturedConsoleErrors);
+    if(overflow)classified.push({eventType:'TELEMETRY_FAILURE',actorRole,stage:browserStage(getStage()),code:'EVENT_LIMIT_EXCEEDED'});
+    if(observedConsoleErrors!==capturedConsoleErrors)classified.push({eventType:'TELEMETRY_FAILURE',actorRole,stage:browserStage(getStage()),code:'CONSOLE_EVENT_COVERAGE_MISMATCH'});
+    const counts={expectedDenials:planned.length,verifiedExpectedDenials:verified.length,observedConsoleErrors,capturedConsoleErrors,
+      expectedNetworkConsoleErrors,unexpectedConsoleErrors,pageErrorCount,unexpectedHttpErrors,telemetryFailures};
+    return {actorRole,status:verified.length===planned.length&&!unexpectedConsoleErrors&&!pageErrorCount&&!unexpectedHttpErrors&&!telemetryFailures?'PASS':'HOLD',...counts,
+      denials:planned.map(item=>{const actual=expectations.get(item.id);return {denialId:item.id,actorRole,stage:item.stage,expectedHttpStatus:item.httpStatus,
+        expectedFunctionsCode:'functions/'+item.code,expectedReason:item.reason||null,
+        registered:!!actual,requestKey:actual?.requestId?requestKey(actual.requestId):null,
+        httpVerified:actual?.httpVerified===true,sdkVerified:actual?.sdkVerified===true,
+        status:actual?.httpVerified&&actual.sdkVerified&&actual.transportComplete?'PASS':'HOLD'};}),events:classified};
+  }
+  return {expectDenial,confirmDenial,onRequest,onResponse,onBody,onBodyUnavailable,onLoadingFailed,onLog,onRuntimeConsole,onPageConsole,onPageError,telemetry,
+    wantsBody:id=>!!requests.get(String(id))?.expected,summary};
+}
+async function attachBrowserObservability({context,page,cfg,actorRole,getStage,catalog,protocolTimeoutMs=5000}){
+  assert.ok(Number.isSafeInteger(protocolTimeoutMs)&&protocolTimeoutMs>0&&protocolTimeoutMs<=10000,'ADVISOR_UAT_BROWSER_OBSERVABILITY_HOLD');
+  const ledger=createBrowserErrorLedger({cfg,actorRole,getStage,catalog}),pending=new Set();let cdp;
+  const safe=fn=>event=>{try{fn(event);}catch{ledger.telemetry('CDP_CALLBACK_FAILED');}};
+  const send=async(name,args)=>{let timer;try{return await Promise.race([cdp.send(name,args),new Promise((resolve,reject)=>{
+    timer=setTimeout(()=>reject(Error('CDP_PROTOCOL_DEADLINE')),protocolTimeoutMs);
+  })]);}finally{clearTimeout(timer);}};
+  page.on('pageerror',()=>ledger.onPageError());page.on('console',message=>ledger.onPageConsole(message.type()));
+  try{cdp=await context.newCDPSession(page);}catch{ledger.telemetry('CDP_ATTACH_FAILED');return {...ledger,flush:async()=>{},drain:async()=>{}};}
+  cdp.on('Network.requestWillBeSent',safe(ledger.onRequest));cdp.on('Network.responseReceived',safe(ledger.onResponse));
+  cdp.on('Network.loadingFailed',safe(ledger.onLoadingFailed));cdp.on('Log.entryAdded',safe(event=>ledger.onLog(event.entry)));
+  cdp.on('Runtime.consoleAPICalled',safe(ledger.onRuntimeConsole));
+  cdp.on('Network.loadingFinished',safe(event=>{
+    if(!ledger.wantsBody(event.requestId))return;
+    const task=send('Network.getResponseBody',{requestId:event.requestId}).then(result=>{
+      if(typeof result.body!=='string'||result.body.length>180000)throw Error('BODY_UNAVAILABLE');
+      ledger.onBody(event.requestId,result.base64Encoded?Buffer.from(result.body,'base64').toString('utf8'):result.body);
+    }).catch(()=>ledger.onBodyUnavailable(event.requestId));
+    pending.add(task);task.finally(()=>pending.delete(task));
+  }));
+  try{await send('Network.enable',{maxPostDataSize:131072});await send('Log.enable');await send('Runtime.enable');}
+  catch{ledger.telemetry('CDP_ENABLE_FAILED');}
+  return {...ledger,drain:async()=>{await Promise.all([...pending]);},flush:async()=>{
+    // Read-only protocol round-trip drains already emitted browser events; no
+    // console replacement, route interception, app bypass, or fixed sleep.
+    try{await Promise.all([send('Runtime.evaluate',{expression:'void 0',returnByValue:true}),...pending]);}
+    catch{ledger.telemetry('CDP_BARRIER_FAILED');}
+  }};
+}
+function browserObservabilityReport(observers){
+  const actors=observers.map(observer=>observer.summary()),totals={expectedDenials:0,verifiedExpectedDenials:0,observedConsoleErrors:0,capturedConsoleErrors:0,
+    expectedNetworkConsoleErrors:0,unexpectedConsoleErrors:0,pageErrorCount:0,unexpectedHttpErrors:0,telemetryFailures:0};
+  for(const actor of actors)for(const key of Object.keys(totals))totals[key]+=actor[key];
+  const roles=actors.map(actor=>actor.actorRole).sort();
+  return {schemaVersion:'gravicentra-i66-browser-observability-v1',status:JSON.stringify(roles)===JSON.stringify(['direccion','operativo'])&&
+    actors.every(actor=>actor.status==='PASS')&&totals.expectedDenials===8?'PASS':'HOLD',actors,totals};
+}
+async function finalizeBrowserObservability(observers,closeBrowser){
+  for(const observer of observers)await observer.flush();
+  // Keep listeners active until browser.close resolves. Taking the acceptance
+  // snapshot before this await would lose late console/HTTP/page failures.
+  try{await closeBrowser();}catch{for(const observer of observers)observer.telemetry('BROWSER_CLOSE_FAILED');}
+  // Complete bounded captures already started during close. Do not send a new
+  // protocol command to a deliberately closed browser or suppress new errors.
+  for(const observer of observers)await observer.drain();
+  return browserObservabilityReport(observers);
+}
+function validateBrowserObservability(value){
+  const check=condition=>assert.ok(condition,'ADVISOR_UAT_BROWSER_OBSERVABILITY_HOLD');
+  const exactKeys=(row,keys)=>check(row&&typeof row==='object'&&!Array.isArray(row)&&
+    JSON.stringify(Object.keys(row).sort())===JSON.stringify(keys.slice().sort()));
+  const countKeys=['expectedDenials','verifiedExpectedDenials','observedConsoleErrors','capturedConsoleErrors',
+    'expectedNetworkConsoleErrors','unexpectedConsoleErrors','pageErrorCount','unexpectedHttpErrors','telemetryFailures'];
+  const sha=value=>typeof value==='string'&&/^[a-f0-9]{64}$/.test(value),integer=value=>Number.isSafeInteger(value)&&value>=0;
+  const endpointClasses=new Set(['FIRST_PARTY_SCRIPT','FIRST_PARTY','FUNCTIONS','GOOGLE_API','EXTERNAL','UNKNOWN','OWNED_NEGATIVE_CALLABLE']);
+  const resourceTypes=new Set(['Document','Stylesheet','Image','Media','Font','Script','TextTrack','XHR','Fetch','Prefetch','EventSource','WebSocket','Manifest','SignedExchange','Ping','CSPViolationReport','Preflight','Other']);
+  exactKeys(value,['schemaVersion','status','actors','totals']);
+  check(value.schemaVersion==='gravicentra-i66-browser-observability-v1'&&value.status==='PASS');
+  check(Array.isArray(value.actors)&&value.actors.length===2);
+  check(JSON.stringify(value.actors.map(row=>row.actorRole).sort())===JSON.stringify(['direccion','operativo']));
+  exactKeys(value.totals,countKeys);const totals=Object.fromEntries(countKeys.map(key=>[key,0])),allRequests=new Set();
+  for(const actor of value.actors){
+    exactKeys(actor,['actorRole','status','denials','events',...countKeys]);
+    for(const key of countKeys){check(integer(actor[key]));totals[key]+=actor[key];}
+    const planned=BROWSER_DENIALS.filter(row=>row.actorRole===actor.actorRole);
+    check(actor.status==='PASS'&&actor.expectedDenials===planned.length&&actor.verifiedExpectedDenials===planned.length);
+    check(Array.isArray(actor.denials)&&actor.denials.length===planned.length&&Array.isArray(actor.events)&&actor.events.length<=502);
+    check(JSON.stringify(actor.denials.map(row=>row.denialId).sort())===JSON.stringify(planned.map(row=>row.id).sort()));
+    const requests=new Map();
+    for(const denial of actor.denials){
+      exactKeys(denial,['denialId','actorRole','stage','expectedHttpStatus','expectedFunctionsCode','expectedReason','registered','requestKey','httpVerified','sdkVerified','status']);
+      const expected=planned.find(row=>row.id===denial.denialId);
+      check(denial.actorRole===actor.actorRole&&denial.stage===expected.stage&&denial.expectedHttpStatus===expected.httpStatus&&
+        denial.expectedFunctionsCode==='functions/'+expected.code&&denial.expectedReason===(expected.reason||null));
+      check(denial.registered===true&&denial.httpVerified===true&&denial.sdkVerified===true&&denial.status==='PASS'&&sha(denial.requestKey));
+      check(!allRequests.has(denial.requestKey));allRequests.add(denial.requestKey);requests.set(denial.requestKey,denial);
+    }
+    const http=new Set(),native=new Set();
+    for(const event of actor.events){
+      check(event.actorRole===actor.actorRole&&BROWSER_STAGES.has(event.stage)&&endpointClasses.has(event.endpointClass)&&sha(event.requestKey));
+      if(event.eventType==='HTTP_ERROR'){
+        exactKeys(event,['eventType','actorRole','stage','requestKey','status','resourceType','endpointClass','pathSha256','denialId','classification']);
+        const denial=requests.get(event.requestKey);check(!!denial&&!http.has(event.requestKey));http.add(event.requestKey);
+        check(event.status===denial.expectedHttpStatus&&event.stage===denial.stage&&event.denialId===denial.denialId&&
+          event.endpointClass==='OWNED_NEGATIVE_CALLABLE'&&event.classification==='VERIFIED_EXPECTED_DENIAL'&&resourceTypes.has(event.resourceType)&&sha(event.pathSha256));
+      }else if(event.eventType==='NATIVE_CONSOLE_ERROR'){
+        exactKeys(event,['eventType','actorRole','stage','source','endpointClass','pathSha256','requestKey','line','classification']);
+        check(requests.has(event.requestKey)&&!native.has(event.requestKey)&&event.source==='network'&&event.classification==='VERIFIED_EXPECTED_DENIAL');
+        check((event.pathSha256===null||sha(event.pathSha256))&&(event.line===null||integer(event.line)));native.add(event.requestKey);
+      }else if(event.eventType==='NETWORK_CANCELLED'){
+        exactKeys(event,['eventType','actorRole','stage','requestKey','endpointClass','resourceType']);
+        check(!requests.has(event.requestKey)&&resourceTypes.has(event.resourceType));
+      }else check(false);
+    }
+    check(http.size===planned.length&&actor.observedConsoleErrors===native.size&&actor.capturedConsoleErrors===native.size&&actor.expectedNetworkConsoleErrors===native.size);
+    for(const key of ['unexpectedConsoleErrors','pageErrorCount','unexpectedHttpErrors','telemetryFailures'])check(actor[key]===0);
+  }
+  for(const key of countKeys)check(integer(value.totals[key])&&value.totals[key]===totals[key]);
+  check(totals.expectedDenials===8&&totals.verifiedExpectedDenials===8);
+  return true;
+}
 function safeFailureEvidence(error,stage){
-  const stages=new Set(['BUILD_IDENTITY','FIXTURE_SETUP','SIGNED_SESSION','DIRECTION_LEGAL_ACCEPTANCE','OPERATIVE_FINANCIAL_DENIAL',
-    'FINANCE_UI_HYDRATION','DOCUMENT_FILE_UI_70','DOCUMENT_FILE_UI_60','REPLAY_AND_SOURCE_GUARDS',
-    'ASSIGNMENT_DOCUMENTARY_UI','ASSIGNMENT_RELOAD','LEGACY_GUARDS','LEGACY_FINANCE_EDIT','PENDING_CXP_RELOAD','SYNTHETIC_RESTORE']);
+  const stages=BROWSER_STAGES;
   const checks=['ADVISOR_UAT_SERVER_DENIAL_NOT_REACHED','ADVISOR_UAT_DENIAL_CLASS_MISMATCH',
     'ADVISOR_UAT_DENIAL_REASON_MISMATCH','ADVISOR_UAT_UNEXPECTED_PERMISSION_GRANT',
     'ADVISOR_UAT_SIGNED_COMMAND_REJECTED','ADVISOR_UAT_FILE_PREVIEW_NOT_CONFIRMED',
@@ -351,7 +639,7 @@ function safeFailureEvidence(error,stage){
     'ADVISOR_UAT_PROTECTED_RELOAD_MISMATCH','ADVISOR_UAT_DIRECTION_PAGE_ERROR',
     'ADVISOR_UAT_OPERATIVE_PAGE_ERROR','ADVISOR_UAT_FIRST_PARTY_ASSET_ERROR',
     'ADVISOR_UAT_SIGNED_SESSION_MISMATCH','ADVISOR_UAT_BUILD_SOURCE_DRIFT',
-    'ADVISOR_UAT_ARTIFACT_MARKER_DRIFT','ADVISOR_UAT_CLEANUP_HOLD','DIRECTION_LEGAL'];
+    'ADVISOR_UAT_ARTIFACT_MARKER_DRIFT','ADVISOR_UAT_CLEANUP_HOLD','ADVISOR_UAT_BROWSER_OBSERVABILITY_HOLD','ADVISOR_UAT_DENIAL_HTTP_PROOF_HOLD','DIRECTION_LEGAL'];
   const message=String(error?.message||'');
   // Exact source-owned codes only; never retain compared values or exception text.
   const exactLegalChecks=new Set(LEGAL_FAILURE_CHECKS);
@@ -437,8 +725,8 @@ async function main(){
     authOrMembershipMutations:0,cleanup:{status:'NOT_STARTED',seeded:0,remaining:0}};
   const pass=name=>{report.checks.push({name,status:'PASS'});console.log('I66_ADVISOR_UAT_CHECK='+name);};
   let admin,browser,direction,operator,tenant,db,fx,sourceRequests=[],assignmentSteps=[],genericRequest,generated=[],seeds=[],allTargets=[],memberBefore=[];
-  const observedAbsent=new Set();
-  let originalFailure=null,cleanupFailure=null,stage='BUILD_IDENTITY';
+  const observedAbsent=new Set(),browserObservers=[];
+  let originalFailure=null,cleanupFailure=null,stage='BUILD_IDENTITY',originalFailureStage=null,denialCatalog=[];
   const rowRef=(collection,id)=>tenant.collection('data').doc(collection).collection('items').doc(id);
   const auditRef=(kind,id)=>tenant.collection(kind==='request'?'operationalRequests':'operationalEvents').doc(id);
   const exactBefore=async refs=>{
@@ -452,7 +740,10 @@ async function main(){
     }catch(error){return{ok:false,code:String(error.code||''),reason:String(error.details?.reason||'')};}
   },{cfg:{functionName:cfg.functionName,region:cfg.region},input});
   const call=async(session,input)=>{const out=await rawCall(session,input);assert.equal(out.ok,true,'ADVISOR_UAT_SIGNED_COMMAND_REJECTED_'+out.code+'_'+out.reason);return out.result;};
-  const deny=async(session,input,code,reason)=>assertServerDenial(await rawCall(session,input),code,reason);
+  const deny=async(session,input,code,reason='')=>{
+    const expected=session.observer.expectDenial(input,code,reason),out=await rawCall(session,input);
+    assertServerDenial(out,code,reason);await session.observer.confirmDenial(expected,out);
+  };
   try{
     const markerResponse=await fetch(cfg.origin+'/__recovery__/build.json',{headers:{'cache-control':'no-cache'}});
     assert.equal(markerResponse.ok,true,'ADVISOR_UAT_BUILD_MARKER_MISSING');const markerText=await markerResponse.text(),marker=JSON.parse(markerText);
@@ -484,6 +775,7 @@ async function main(){
     memberBefore.push({ref:accessRef,digest:accessSnap.exists?digest(accessSnap.data()):null});
     fx=signedDocumentaryFixtures(runId);
     fx=withAssignmentFixtures(fx);assignmentSteps=assignmentStepsFor(fx,actors[0].uid,cfg.live);
+    denialCatalog=browserDenialCatalog(fx,assignmentSteps);
     const identities=fx.specs.map(spec=>sourceIdentity(spec,actors[0].uid,!cfg.live));
     sourceRequests=identities.map((identity,index)=>({...identity,expectedIds:[fx.plans[index].payable.id],
       expectedSourceKeys:contract.sourceIdentities(fx.plans[index].payable).map(source=>source.sourceKey)}));
@@ -506,14 +798,15 @@ async function main(){
     const openActor=async actor=>{
       const user=await admin.auth().getUser(actor.uid);assert.ok(!user.disabled&&user.emailVerified,'ADVISOR_UAT_ACTOR_AUTH_NOT_READY');
       const token=await admin.auth().createCustomToken(actor.uid),context=await browser.newContext({viewport:{width:1280,height:900}}),page=await context.newPage();
-      const pageErrors=[],assetErrors=[],consoleErrors=[];page.on('pageerror',()=>pageErrors.push('PAGE_ERROR'));
+      const pageErrors=[],assetErrors=[];page.on('pageerror',()=>pageErrors.push('PAGE_ERROR'));
       page.on('response',response=>{if(response.url().startsWith(cfg.origin+'/')&&response.status()>=400)assetErrors.push('FIRST_PARTY_HTTP_ERROR');});
-      page.on('console',message=>{if(message.type()==='error')consoleErrors.push('CONSOLE_ERROR');});
+      const observer=await attachBrowserObservability({context,page,cfg,actorRole:actor.role,getStage:()=>stage,catalog:denialCatalog});
+      browserObservers.push(observer);
       await page.goto(cfg.origin+'/#/inicio',{waitUntil:'commit',timeout:30000});
       await page.waitForFunction(()=>!!window.Orbit?.productRuntimeBrowserProvidersP0&&!!window.Orbit?.productAppP0,null,{timeout:30000});
       const result=await page.evaluate(async token=>{const p=Orbit.productRuntimeBrowserProvidersP0,c=await p.initialize();await c.modules.auth.setPersistence(c.auth,c.modules.auth.browserSessionPersistence);await c.modules.auth.signInWithCustomToken(c.auth,token);const started=await Orbit.productAppP0.activate();return{started:started?.started===true,role:Orbit.session?.rol?.(),preview:p.isI66PreviewHost()};},token);
       assert.ok(result.started&&result.preview===!cfg.live&&norm(result.role)===actor.role,'ADVISOR_UAT_SIGNED_SESSION_MISMATCH');
-      return{...actor,context,page,pageErrors,assetErrors,consoleErrors};
+      return{...actor,context,page,pageErrors,assetErrors,observer};
     };
     direction=await openActor(actors[0]);operator=await openActor(actors[1]);
     pass('EXISTING_DIRECTION_AND_OPERATIVE_SIGNED_WITH_UNCHANGED_MEMBERSHIP');
@@ -714,11 +1007,12 @@ async function main(){
     pass('MULTICOMPONENT_CENTS_BOTH_CANONICAL_LEDGERS_AND_VISIBLE_DOCUMENTS_SURVIVE_RELOAD');
     assert.equal(direction.pageErrors.length,0,'ADVISOR_UAT_DIRECTION_PAGE_ERROR');assert.equal(operator.pageErrors.length,0,'ADVISOR_UAT_OPERATIVE_PAGE_ERROR');
     assert.equal(direction.assetErrors.length+operator.assetErrors.length,0,'ADVISOR_UAT_FIRST_PARTY_ASSET_ERROR');
-    // Expected HTTP denials from this security matrix are not asset failures.
-    report.consoleErrorCount=direction.consoleErrors.length+operator.consoleErrors.length;
+    // Raw counts are not acceptance: final native request/SDK correlation below
+    // also includes errors emitted during signed synthetic restoration.
     pass('PENDING_CXP_BOTH_ADVISORS_PERSIST_THROUGH_RELOAD_NO_PAGE_ERRORS');
-  }catch(error){originalFailure=error;}
+  }catch(error){originalFailure=error;originalFailureStage=stage;}
   finally{
+    stage='SYNTHETIC_RESTORE';
     if(tenant&&fx){
       report.cleanup.status='IN_PROGRESS';const cleanupErrors=[];
       // Signed restore is exercised first. Guarded admin fallback is ONLY for
@@ -804,21 +1098,26 @@ async function main(){
       if(cleanupErrors.length||report.cleanup.remaining){cleanupFailure=Error('ADVISOR_UAT_CLEANUP_HOLD');report.cleanup.status='HOLD';report.cleanup.failureClasses=[...new Set(cleanupErrors)];}
       else{report.cleanup.status='PASS';pass('EXACT_SYNTHETIC_DATA_AND_AUDIT_ABSENCE_RESTORED_MEMBERSHIP_UNCHANGED');}
     }
-    if(browser)await browser.close();
+    report.browserObservability=await finalizeBrowserObservability(browserObservers,async()=>{if(browser)await browser.close();});
+    report.consoleErrorCount=report.browserObservability.totals.observedConsoleErrors;
+    try{validateBrowserObservability(report.browserObservability);pass('BROWSER_ERRORS_EXACTLY_ATTRIBUTED_TO_EIGHT_OWNED_VERIFIED_DENIALS');}
+    catch{report.browserObservability.status='HOLD';if(!originalFailure){originalFailure=Error('ADVISOR_UAT_BROWSER_OBSERVABILITY_HOLD');
+      originalFailureStage=report.browserObservability.actors.flatMap(actor=>actor.events).find(event=>event.classification==='UNEXPECTED'||['PAGE_ERROR','TELEMETRY_FAILURE'].includes(event.eventType))?.stage||stage;}}
     if(!originalFailure&&!cleanupFailure&&report.cleanup.status==='PASS')report.status='PASS';
     // Only constant allowlisted diagnostics and a source line may be exposed;
     // never error messages/values, tokens, actor UIDs, customer rows or paths.
-    const failure=originalFailure?safeFailureEvidence(originalFailure,stage):cleanupFailure?safeFailureEvidence(cleanupFailure,'SYNTHETIC_RESTORE'):{};
+    const failure=originalFailure?safeFailureEvidence(originalFailure,originalFailureStage||stage):cleanupFailure?safeFailureEvidence(cleanupFailure,'SYNTHETIC_RESTORE'):{};
     Object.assign(report,failure);
     if(report.financeUiDiagnostics){
       report.financeUiDiagnostics=safeFinanceUiDiagnostics(report.financeUiDiagnostics);
       console.log('I66_ADVISOR_FINANCE_UI_DIAGNOSTIC '+JSON.stringify(report.financeUiDiagnostics));
     }
+    console.log('I66_ADVISOR_BROWSER_OBSERVABILITY '+JSON.stringify({status:report.browserObservability.status,...report.browserObservability.totals}));
     fs.writeFileSync(cfg.reportPath,JSON.stringify(report,null,2)+'\n',{flag:'wx',mode:0o600});
     console.log('I66_ADVISOR_PAYABLE_SIGNED_'+cfg.phase+'_'+report.status+' '+JSON.stringify({checks:report.checks.length,cleanup:report.cleanup.status,remaining:report.cleanup.remaining,realCustomerWritesRequested:0,bankMovements:0,financialPayments:0,authOrMembershipMutations:0,...failure}));
   }
   if(originalFailure||cleanupFailure)throw Error('ADVISOR_PAYABLE_SIGNED_UAT_HOLD');
   return report;
 }
-module.exports={configuration,sourceIdentity,fixtures,signedDocumentaryFixtures,withAssignmentFixtures,assignmentIdentity,assignmentStepsFor,assignmentReceiptFor,assignmentProjectionRows,assertAssignmentReceipt,assignmentAuditGuard,assertDocumentaryRow,assertDocumentaryReceipt,assertDocumentaryView,assertVisibleDocumentaryView,assertGenerated,sourceAuditGuard,genericAuditGuard,unchangedSeed,configuredCredential,assertServerDenial,safeFailureEvidence,safeLegalFailureSubstage,safeFinanceUiSnapshot,safeClickActionability,safeFinanceUiDiagnostics,captureFinanceUiSnapshot,main};
+module.exports={configuration,sourceIdentity,fixtures,signedDocumentaryFixtures,withAssignmentFixtures,assignmentIdentity,assignmentStepsFor,assignmentReceiptFor,assignmentProjectionRows,assertAssignmentReceipt,assignmentAuditGuard,assertDocumentaryRow,assertDocumentaryReceipt,assertDocumentaryView,assertVisibleDocumentaryView,assertGenerated,sourceAuditGuard,genericAuditGuard,unchangedSeed,configuredCredential,assertServerDenial,browserDenialCatalog,safeBrowserLocation,createBrowserErrorLedger,attachBrowserObservability,browserObservabilityReport,finalizeBrowserObservability,validateBrowserObservability,safeFailureEvidence,safeLegalFailureSubstage,safeFinanceUiSnapshot,safeClickActionability,safeFinanceUiDiagnostics,captureFinanceUiSnapshot,main};
 if(require.main===module)main().catch(error=>{console.error('I66_ADVISOR_PAYABLE_SIGNED_UAT_HOLD '+String(error.code||'ASSERTION_OR_RUNTIME_FAILURE').replace(/[^A-Za-z0-9_./:-]+/g,'_').slice(0,120));process.exitCode=1;});

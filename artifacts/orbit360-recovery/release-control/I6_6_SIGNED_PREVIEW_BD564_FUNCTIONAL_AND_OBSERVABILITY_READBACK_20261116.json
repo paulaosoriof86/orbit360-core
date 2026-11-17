@@ -1,0 +1,308 @@
+{
+  "schema": "GI_I66_SIGNED_PREVIEW_FUNCTIONAL_AND_OBSERVABILITY_READBACK_V1",
+  "dateGuatemala": "2026-11-16",
+  "gate": "I6.6",
+  "branch": "recovery/fase-a-clean-20260831",
+  "status": "SIGNED_FUNCTIONAL_CHECKS_PASS_CONSOLE_ATTRIBUTION_HOLD_NOT_FULL_PREVIEW_ACCEPTANCE",
+  "run": {
+    "id": 44023553726,
+    "attempt": 1,
+    "headSha": "e0625cd99712af4887f8f4527c6dedd0a88a64d5",
+    "conclusion": "success",
+    "finishedAtUtc": "2026-11-17T05:26:39Z"
+  },
+  "proofArtifact": {
+    "id": 14302621117,
+    "digest": "sha256:ea3bb7dd7baea1036fe12d4bab841c9331e9c5f6037a2cdf946b3eb6d2dc4ffa",
+    "bytes": 5209,
+    "downloadedAndRehashed": true
+  },
+  "signedProof": {
+    "schema": "I6_6_OPERATIONAL_SIGNED_PREVIEW_PROOF_V1",
+    "status": "SIGNED_DRIVERS_DURABLE_READBACK_RELOAD_RESTORE_PASS",
+    "sourceSha": "bd564d5c48e4a55ac08adb101fbe8e1bd270ea8e",
+    "buildRunId": 44022009808,
+    "artifactId": 14300394824,
+    "artifactDigest": "sha256:d6ae5c953fc2c71c55fdaed15ca93b0a571ff4f6a36d4536eac73192564afcd7",
+    "previewUrl": "https://ays-orbit-360-lab--gi-i66-rc-44009981499-d08psr2y.web.app",
+    "previewChannelId": "gi-i66-rc-44009981499",
+    "buildId": "gi-i66-bd564d5c48e4-57f234755dc1",
+    "targets": [
+      {
+        "name": "orbit360ProductOperationalCommandPreview",
+        "region": "us-east1"
+      },
+      {
+        "name": "orbit360CobrosReconciliationCommandPreview",
+        "region": "us-central1"
+      },
+      {
+        "name": "orbit360ScopedPolicyReadPreview",
+        "region": "us-east1"
+      }
+    ],
+    "signedDrivers": [
+      "tools/gravicentra-i66-privileged-role-signed-ui-permissions-readonly.cjs",
+      "tools/gravicentra-i6-6-carlos-real-signed-synthetic-preview-uat.cjs",
+      "tools/gravicentra-i6-6-advisor-payables-signed-uat.cjs",
+      "tools/gravicentra-i6-6-proposal-application-signed-uat.cjs"
+    ],
+    "realFinancialOrCustomerWrites": 0,
+    "syntheticRestoreComplete": true,
+    "liveHostingUnchanged": true,
+    "liveBackendUnchanged": true,
+    "focusedReports": {
+      "advisorPayables": {
+        "status": "PASS",
+        "cleanup": "PASS",
+        "checks": 15,
+        "digest": "sha256:db731c68b7e4afd980ef7360ea0e959ea42fa1168da9d6a67d355be4d9f629a7"
+      },
+      "proposalApplication": {
+        "status": "PASS",
+        "cleanup": "PASS",
+        "checks": 13,
+        "digest": "sha256:ed32e439291e895e16365fe6c26c9b7efcc6be48ca2d41361a741303a2c979f6"
+      }
+    },
+    "runId": 44023553726,
+    "headSha": "e0625cd99712af4887f8f4527c6dedd0a88a64d5"
+  },
+  "verifiedFunctionalEvidence": {
+    "permissions": {
+      "signedActors": [
+        "operativo",
+        "direccion"
+      ],
+      "operativeVisibleModules": 8,
+      "directionVisibleModules": 10,
+      "protectedMatrixRoles": 5,
+      "protectedMatrixCriticalModules": 7,
+      "fullFiveActorWriteMatrix": false
+    },
+    "operations": {
+      "signedActors": 2,
+      "syntheticCrudReloadRestored": true,
+      "restoredObjectsPerActor": 3,
+      "realCustomerWrites": 0
+    },
+    "advisorPayables": {
+      "checks": [
+        {
+          "name": "EXACT_SOURCE_AND_IMMUTABLE_BUILD_MARKER",
+          "status": "PASS"
+        },
+        {
+          "name": "EVERY_FIXTURE_AND_AUDIT_TARGET_ORIGINALLY_ABSENT",
+          "status": "PASS"
+        },
+        {
+          "name": "EXISTING_DIRECTION_AND_OPERATIVE_SIGNED_WITH_UNCHANGED_MEMBERSHIP",
+          "status": "PASS"
+        },
+        {
+          "name": "EXPLICIT_DIRECTION_PREVIEW_LEGAL_DECISION_APPLIED_BY_NORMAL_UI",
+          "status": "PASS"
+        },
+        {
+          "name": "OPERATIVE_FINANCIAL_WRITE_DENIED_SERVER_SIDE_WITH_ZERO_DEBT",
+          "status": "PASS"
+        },
+        {
+          "name": "DOCUMENTED_ASSIGNMENT_NATIVE_UI_PREVIEW_CONFIRM_RELOAD_REPLAY_COMPENSATION_PRESERVES_ALL_FINANCIAL_RELATIONS",
+          "status": "PASS"
+        },
+        {
+          "name": "MULTICOMPONENT_VICO_GAME_CENTS_VISIBLE_ONE_CXP_TWO_SOURCE_LINES_REPLAY_VERIFIED",
+          "status": "PASS"
+        },
+        {
+          "name": "DOCUMENT_FILE_UI_TO_PENDING_CXP_70_PERCENT_WITH_AUDIT_AND_IDEMPOTENCE",
+          "status": "PASS"
+        },
+        {
+          "name": "DOCUMENT_FILE_UI_TO_PENDING_CXP_60_PERCENT_WITH_AUDIT_AND_IDEMPOTENCE",
+          "status": "PASS"
+        },
+        {
+          "name": "CROSS_CUTOFF_REUSES_DEBT_AND_CROSS_ADVISOR_OR_CHANGED_SOURCE_DENIED",
+          "status": "PASS"
+        },
+        {
+          "name": "LEGACY_PAYMENTS_COMMISSIONS_AND_PROTECTED_PAID_TOGGLE_PREVENT_DUPLICATION",
+          "status": "PASS"
+        },
+        {
+          "name": "UNRELATED_LEGACY_FINANCE_RETAINS_AUTHORIZED_EDIT",
+          "status": "PASS"
+        },
+        {
+          "name": "MULTICOMPONENT_CENTS_BOTH_CANONICAL_LEDGERS_AND_VISIBLE_DOCUMENTS_SURVIVE_RELOAD",
+          "status": "PASS"
+        },
+        {
+          "name": "PENDING_CXP_BOTH_ADVISORS_PERSIST_THROUGH_RELOAD_NO_PAGE_ERRORS",
+          "status": "PASS"
+        },
+        {
+          "name": "EXACT_SYNTHETIC_DATA_AND_AUDIT_ABSENCE_RESTORED_MEMBERSHIP_UNCHANGED",
+          "status": "PASS"
+        }
+      ],
+      "cleanup": {
+        "status": "PASS",
+        "seeded": 16,
+        "remaining": 0
+      },
+      "directionLegalAcceptance": {
+        "status": "EXPLICIT_OWNER_DECISION_APPLIED_BY_NORMAL_UI",
+        "decisionId": "DIRECTION_I66_PREVIEW_SAME_LEGAL_V2_TECHNICAL_SUCCESSORS_AUTHORIZED_20261116",
+        "receiptSha256": "d3309675c753bd1b31f9163d506aba2e29ac70583a7b8d54cb5b8503b5c50a44",
+        "sourceSha": "bd564d5c48e4a55ac08adb101fbe8e1bd270ea8e",
+        "origin": "https://ays-orbit-360-lab--gi-i66-rc-44009981499-d08psr2y.web.app",
+        "version": "2.0",
+        "clauseIds": [
+          "confidencialidad",
+          "tratamiento_datos",
+          "descargo_ia"
+        ],
+        "termsProjectionSha256": "485b07887091063cc7a5d1dc8f11a9bb547f2ef059490bb04d4acee73404f6b2",
+        "authorizationScope": "I6_6_PREVIEW_IDENTICAL_V2_TERMS",
+        "gate": "I6.6",
+        "buildId": "gi-i66-bd564d5c48e4-57f234755dc1",
+        "immediateReadback": true,
+        "reloadReadback": true,
+        "reloadActorVerified": true,
+        "actorUidSha256": "f612197b077c598edd61d757c1e2995be7a3b17300602ce4802bccefed216a72",
+        "scopeSha256": "c2736ab7324560363b1ba518a8cadcd86c31835434b1aab0a02135d505372f85",
+        "acceptedAt": "2026-11-17T05:24:59.672Z",
+        "acceptedForOtherActors": false,
+        "liveAcceptance": false,
+        "storageSeeded": false,
+        "gateBypassed": false
+      },
+      "realCustomerWritesRequested": 0,
+      "bankMovements": 0,
+      "financialPayments": 0,
+      "authOrMembershipMutations": 0
+    },
+    "proposalApplication": {
+      "checks": [
+        "EXACT_BUILD_AND_UI_BYTES",
+        "EXPLICIT_DIRECTION_PREVIEW_LEGAL_DECISION_APPLIED_BY_NORMAL_UI",
+        "ISOLATED_SYNTHETIC_STAGE_NO_REAL_POINTER_CHANGE",
+        "SERVER_LOADED_EXACT_CANDIDATE",
+        "SIGNED_OPERATIVO_UNASSIGNED_MODULE_DENIED",
+        "SIGNED_ADVISOR_RESOLUTION_REQUEST_DENIED",
+        "CALLER_MONEY_OVERRIDE_DENIED",
+        "OUT_OF_SCOPE_COUNTRY_DENIED",
+        "UI_BINDING_PERSISTED_WITH_ZERO_FINANCIAL_WRITES",
+        "STALE_SOURCE_APPLICATION_DENIED",
+        "UI_APPLY_RECEIPT_COBRO_PORTFOLIO_ATOMIC_PERSISTENCE_RELOAD",
+        "SECOND_APPLY_IDEMPOTENT_NO_DOUBLE_PAYMENT",
+        "IMMUTABLE_SOURCE_UNCHANGED_AFTER_APPLICATION"
+      ],
+      "cleanup": {
+        "status": "PASS",
+        "remaining": 0,
+        "removedOwnedTargets": 14,
+        "errors": []
+      },
+      "directionLegalAcceptance": {
+        "status": "EXPLICIT_OWNER_DECISION_APPLIED_BY_NORMAL_UI",
+        "decisionId": "DIRECTION_I66_PREVIEW_SAME_LEGAL_V2_TECHNICAL_SUCCESSORS_AUTHORIZED_20261116",
+        "receiptSha256": "d3309675c753bd1b31f9163d506aba2e29ac70583a7b8d54cb5b8503b5c50a44",
+        "sourceSha": "bd564d5c48e4a55ac08adb101fbe8e1bd270ea8e",
+        "origin": "https://ays-orbit-360-lab--gi-i66-rc-44009981499-d08psr2y.web.app",
+        "version": "2.0",
+        "clauseIds": [
+          "confidencialidad",
+          "tratamiento_datos",
+          "descargo_ia"
+        ],
+        "termsProjectionSha256": "485b07887091063cc7a5d1dc8f11a9bb547f2ef059490bb04d4acee73404f6b2",
+        "authorizationScope": "I6_6_PREVIEW_IDENTICAL_V2_TERMS",
+        "gate": "I6.6",
+        "buildId": "gi-i66-bd564d5c48e4-57f234755dc1",
+        "immediateReadback": true,
+        "reloadReadback": true,
+        "reloadActorVerified": true,
+        "actorUidSha256": "f612197b077c598edd61d757c1e2995be7a3b17300602ce4802bccefed216a72",
+        "scopeSha256": "c2736ab7324560363b1ba518a8cadcd86c31835434b1aab0a02135d505372f85",
+        "acceptedAt": "2026-11-17T05:26:20.687Z",
+        "acceptedForOtherActors": false,
+        "liveAcceptance": false,
+        "storageSeeded": false,
+        "gateBypassed": false
+      },
+      "syntheticOnly": true,
+      "realControlUnchanged": true
+    }
+  },
+  "v7Readback": {
+    "canonicalPath": "tenants/alianzas-soluciones/config/reconciliation",
+    "configExists": true,
+    "configFlags": {
+      "autoCommitHighConfidence": true,
+      "manualApplicationEnabled": null,
+      "humanConfirmationRequiredForHighConfidence": false,
+      "humanConfirmationRequired": false,
+      "requireSameCurrency": true
+    },
+    "manualApplicationEnabledNullIsSanitizedNotProofOfAbsence": true,
+    "fullConfigurationPayloadOrOriginalWriterTransactionCertified": false,
+    "currentTurnConfigurationWrites": 0
+  },
+  "observabilityHold": {
+    "consoleErrorEvents": 10,
+    "intentionalDenyCallsInSource": 8,
+    "individualConsoleCauseRetained": false,
+    "unexpectedConsoleCount": null,
+    "pageErrorAssertionsPassed": true,
+    "firstPartyAssetHttpErrorAssertionsPassed": true,
+    "uiApplicationObserver": {
+      "stage": "UI_APPLICATION_CONFIRM",
+      "channel": "UI",
+      "operation": "apply_proposal_application",
+      "resultPresent": false,
+      "denied": false,
+      "driverFailed": true,
+      "code": "NO_CODE",
+      "reason": "NO_REASON",
+      "status": null,
+      "eligible": null,
+      "resolutionOptionsPresent": false,
+      "candidateCount": null,
+      "expectedReceiptPresent": null,
+      "targetCount": null,
+      "reused": null,
+      "readbackConfirmed": null
+    },
+    "uiApplicationBusinessResult": "PERSISTED_APPLIED_WITH_THREE_BEFORE_AFTER_TARGETS_RELOAD_AND_IDEMPOTENT_UNIQUE_COBRO",
+    "observerFailureIsNotBusinessFailure": true,
+    "observerOriginalErrorNotRetained": true,
+    "fullPreviewQualityAcceptance": false
+  },
+  "nextOnly": "RETAIN_THIS_SIGNED_RESULT; REBUILD_SOURCE_BOUND_SANITIZED_REQUEST_ACTOR_STAGE_OBSERVABILITY; RERUN_FOUR_EXISTING_SIGNED_DRIVERS; NO_LIVE_PROMOTION_OR_REAL_PAYMENTS",
+  "formalProgress": {
+    "operations": {
+      "completed": 6,
+      "total": 8,
+      "percent": 75
+    },
+    "frozenBlocks": {
+      "completed": 19,
+      "total": 31,
+      "percent": 61.3
+    },
+    "postproductionI6": {
+      "completed": 6,
+      "total": 10,
+      "percent": 60
+    },
+    "newOperationalCredits": 0,
+    "newLiveAcceptance": false
+  },
+  "preservedLiveSource": "84769378eb2014addebfefdbdd63091bddc4b817",
+  "realPayments": 0
+}
