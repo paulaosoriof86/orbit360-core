@@ -45,8 +45,6 @@ jobs:
     env:
       PROJECT_ID: ays-orbit-360-lab
       SITE: ays-orbit-360-lab
-      I66_ROLE_PREVIEW_CHANNEL: gi-i66-rc-42868854629
-      I66_ROLE_PREVIEW_ORIGIN: https://ays-orbit-360-lab--gi-i66-rc-42868854629-abj14q6n.web.app
       GH_TOKEN: ${{ github.token }}
       SA_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
       SA_ALT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
@@ -63,6 +61,7 @@ jobs:
         run: |
           set -euo pipefail
           node --test tools/gravicentra-i6-6-operational-release-candidate.test.cjs
+          node --test tools/gravicentra-i6-6-preview-candidate-binding.test.cjs
           node tools/gravicentra-i6-6-operational-release-candidate.cjs live
           node --check tools/gravicentra-i6-6-carlos-paula-live-synthetic-ops-leads-uat.cjs
           node --check tools/gravicentra-i66-privileged-role-signed-ui-permissions-readonly.cjs
@@ -110,6 +109,8 @@ jobs:
           const assert=require('node:assert/strict'),fs=require('node:fs'),{execFileSync}=require('node:child_process');
           const p=process.env.I66_PACKAGE_ROOT+'/bundle';
           const m=JSON.parse(fs.readFileSync(p+'/site/__recovery__/build.json','utf8'));
+          const g=require('./tools/gravicentra-i6-6-operational-release-candidate.cjs');
+          g.validateBuildMarker(g.candidateForPhase(require('./'+g.CONTROL),'live'),m);
           assert.equal(m.sourceSha,process.env.I66_ROLE_SOURCE_SHA);
           assert.equal(m.gate,'I6.6');assert.equal(m.product,'Gravicentra Insurance');
           for(const [target,source] of [

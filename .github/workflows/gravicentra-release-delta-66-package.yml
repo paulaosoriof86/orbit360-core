@@ -20,6 +20,10 @@ on:
       - tools/gravicentra-i6-6-direction-preview-legal-acceptance.cjs
       - tools/gravicentra-i6-6-preview-current-live-restore.cjs
       - tools/gravicentra-i6-6-operational-release-candidate.cjs
+      - tools/gravicentra-i6-6-preview-candidate-binding.test.cjs
+      - tools/gravicentra-i66-privileged-role-signed-ui-permissions-readonly.cjs
+      - tools/gravicentra-i66-privileged-role-exact-live-transport.mjs
+      - .github/workflows/gravicentra-i66-privileged-role-exact-live-promotion.yml
       - tools/gravicentra-i6-6-assignment-detail-navigation.test.cjs
       - tools/gravicentra-i6-6-direction-preview-qa-navigation-retry.test.cjs
       - tools/gravicentra-i6-6-preview-current-live-restore-47f4.test.cjs
@@ -250,6 +254,7 @@ jobs:
           node --check tools/gravicentra-i6-6-preview-current-live-restore.cjs
           node --test tools/gravicentra-i6-6-preview-current-live-restore.test.cjs
           node --test tools/gravicentra-i6-6-preview-channel-reuse-guard.test.cjs
+          node --test tools/gravicentra-i6-6-preview-candidate-binding.test.cjs
           node --test tools/gravicentra-i6-6-assignment-detail-navigation.test.cjs tools/gravicentra-i6-6-direction-preview-qa-navigation-retry.test.cjs tools/gravicentra-i6-6-preview-current-live-restore-47f4.test.cjs
           node --test tools/gravicentra-i6-6-proposal-uat-diagnostics.test.cjs tools/gravicentra-i6-6-direction-preview-proposal-diagnostic-retry.test.cjs tools/gravicentra-i6-6-preview-current-live-restore-39f54e2.test.cjs
           node tools/gravicentra-governance-preflight-v1.mjs --mode=i6

@@ -71,7 +71,9 @@
     "Editing only a policy advisor could rebuild financial values from missing fields and replace a receipt schedule; a metadata-only change must preserve canonical premiums and receipts instead of recalculating them.",
     "Multiple documented coverage lines for the same insurer requirement previously collided or could be rounded after aggregation; component-level provenance and rounding preserve the approved liquidation.",
     "Generic assignment updates lacked a documented paid-policy correction and current-value compare-and-swap; a semantic metadata-only correction preserves all linked financial records.",
-    "The scoped commission reader overwrote historical financial beneficiary with current policy ownership, diverging from unchanged advisor payables; source-level causal correction preserves both meanings."
+    "The scoped commission reader overwrote historical financial beneficiary with current policy ownership, diverging from unchanged advisor payables; source-level causal correction preserves both meanings.",
+    "A strict local Firestore transaction double rejects serverTimestamp transforms nested in the beforeAfter audit array. The source repair serializes an audit-only marker while preserving operational document transforms; this local reproducer does not retroactively prove the unretained failure from the earlier signed run.",
+    "Operational candidate validation, the signed permission-matrix driver and exact LIVE transport retained an old Preview channel independently. All signed drivers must consume one source-bound candidate; a successful test on an older frontend cannot certify the current artifact."
   ],
   "currentEvidenceBoundaries": {
     "resumeSyncAndClickDiagnostics20261115": {
@@ -111,7 +113,8 @@
       "percent": 61.3,
       "scope": "Five frozen operational blocks only; not total product or elapsed work; source tests do not raise LIVE acceptance."
     },
-    "newPreviewAcceptance": "ADVISOR_CXP_15_CHECKS_PASS_PROPOSAL_3_CHECKS_HOLD_NOT_GLOBALLY_ACCEPTED",
+    "newPreviewAcceptance": "LATEST_HOSTING_READBACK_PASS_FUNCTIONAL_BACKEND_QA_NOT_EXECUTED",
+    "lastSignedPreviewAcceptance": "ADVISOR_CXP_15_CHECKS_PASS_PROPOSAL_3_CHECKS_HOLD_NOT_GLOBALLY_ACCEPTED",
     "newLiveAcceptance": "NOT_EXECUTED",
     "failedPreviewRun": 43982928603,
     "failedPreviewSource": "39f54e24e59983a59a7c9a41912e0eed154efa18",
@@ -121,7 +124,7 @@
       "cause": "BROWSER_REJECTED_ADVISOR_ENVELOPE_BEFORE_SERVER",
       "supersedingRunProvedSignedOperativeServerDenial": true
     },
-    "latestPreviewEvidence": {
+    "lastSignedPreviewEvidence": {
       "buildRunId": 43982177239,
       "buildConclusion": "SUCCESS",
       "artifactId": 14283796218,
@@ -150,6 +153,23 @@
       "acceptanceProofProduced": false,
       "mustNotPromote": true
     },
+    "latestPreviewEvidence": {
+      "receipt": "artifacts/orbit360-recovery/release-control/I6_6_V7_TIMESTAMP_FIX_QUOTA_RECOVERY_PREVIEW_READBACK_20261116.json",
+      "sourceSha": "d5e64e2f4ab9acb89d8765f48da33cba2df089a5",
+      "buildRunId": 44009981499,
+      "runAttempt": 2,
+      "buildConclusion": "SUCCESS",
+      "artifactId": 14296328231,
+      "artifactDigest": "sha256:1c6e92158eea25d47b1765791bf57a9b36e2e09311351008d41fa8e64583ac9f",
+      "previewChannelId": "gi-i66-rc-44009981499",
+      "previewUrl": "https://ays-orbit-360-lab--gi-i66-rc-44009981499-d08psr2y.web.app",
+      "hostingFileReadback": "PASS",
+      "liveHostingUnchanged": true,
+      "signedFunctionalQa": "NOT_EXECUTED_ON_THIS_SOURCE",
+      "newFunctionalAcceptance": false,
+      "mustNotPromote": true
+    },
+    "operationsEvidenceReview": "artifacts/orbit360-recovery/release-control/I6_6_OPS_EVIDENCE_AND_PREVIEW_BINDING_REVIEW_20261116.json",
     "failedPreviewCleanup": "BOTH_FOCUSED_DRIVERS_PASS_REMAINING_ZERO",
     "failedPreviewArtifactMustNotPromote": true,
     "readOnlyPreviewInventoryRun": 43758700651,

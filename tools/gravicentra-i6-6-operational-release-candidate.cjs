@@ -8,8 +8,10 @@ const path = require('node:path');
 const crypto = require('node:crypto');
 const {execFileSync} = require('node:child_process');
 const CONTROL = 'artifacts/orbit360-recovery/release-control/I6_6_RELEASE_TRANSPORT_CONTROL_20261110.json';
+const SITE = 'ays-orbit-360-lab';
 const PREVIEW = 'https://ays-orbit-360-lab--gi-i66-rc-42868854629-abj14q6n.web.app';
 const CHANNEL = 'gi-i66-rc-42868854629';
+const LIVE = 'https://app.aysseguros.com';
 const PREVIEW_WORKFLOW = '.github/workflows/gravicentra-i66-privileged-role-three-function-preview-uat.yml';
 const BUILD_WORKFLOW = '.github/workflows/gravicentra-release-delta-66-package.yml';
 const TARGETS = Object.freeze({
@@ -62,6 +64,7 @@ const PINNED_OWNER_PATHS = Object.freeze([
   'artifacts/orbit360-recovery/release-control/I6_6_DIRECTION_PREVIEW_PROPOSAL_DIAGNOSTIC_RETRY_20261117.json',
   'artifacts/orbit360-recovery/release-control/I6_6_PROPOSAL_DIAGNOSTIC_CAUSAL_RETRY_20261117.json',
   'tools/gravicentra-i6-6-operational-release-candidate.cjs',
+  'tools/gravicentra-i6-6-preview-candidate-binding.test.cjs',
   'tools/gravicentra-i66-privileged-role-exact-live-transport.mjs',
   PREVIEW_WORKFLOW,'.github/workflows/gravicentra-i66-privileged-role-exact-live-promotion.yml',
   // Same sole governance exception as the canonical delta guard. Recording
@@ -71,6 +74,57 @@ const PINNED_OWNER_PATHS = Object.freeze([
 const checkSha = (v,label) => assert.match(String(v||''),/^[0-9a-f]{40}$/,label);
 const checkDigest = (v,label) => assert.match(String(v||''),/^sha256:[0-9a-f]{64}$/,label);
 const checkId = (v,label) => assert.ok(Number.isSafeInteger(v)&&v>0,label);
+const checkBuildId = (v,source,label) => {
+  assert.equal(typeof v,'string',label);assert.equal(v.trim(),v,label);
+  assert.match(v,new RegExp('^gi-i66-'+source.slice(0,12)+'-[a-f0-9]{12}$'),label);
+};
+function previewIdentity(p) {
+  checkId(p.buildRunId,'I66_OPERATIONAL_BUILD_RUN_PIN');
+  checkSha(p.sourceSha,'I66_OPERATIONAL_SOURCE_PIN');
+  // Retain the exact historical reusable channel, not arbitrary reuse. New
+  // endpoints belong to this build run and must be literal same-site origins.
+  const historical=p.previewUrl===PREVIEW&&p.previewChannelId===CHANNEL;
+  if(!historical){
+    assert.equal(p.previewChannelId,'gi-i66-rc-'+p.buildRunId,'I66_OPERATIONAL_PREVIEW_CHANNEL_RUN_DRIFT');
+    assert.match(String(p.previewUrl||''),new RegExp('^https://'+SITE+'--'+p.previewChannelId+'-[a-z0-9]+\\.web\\.app$'),'I66_OPERATIONAL_PREVIEW_ORIGIN_DRIFT');
+    checkBuildId(p.buildId,p.sourceSha,'I66_OPERATIONAL_BUILD_ID_PIN');
+  }
+  // An exact origin rejects even default-port spelling, trailing paths and
+  // URL normalization. No userinfo, query, fragment or encoded hostname.
+  const url=new URL(p.previewUrl);
+  assert.equal(url.origin,p.previewUrl,'I66_OPERATIONAL_PREVIEW_NOT_LITERAL_ORIGIN');
+  assert.equal(url.protocol,'https:');assert.equal(url.username,'');assert.equal(url.password,'');
+  assert.equal(url.port,'');assert.equal(url.pathname,'/');assert.equal(url.search,'');assert.equal(url.hash,'');
+  return {origin:p.previewUrl,channelId:p.previewChannelId,historical};
+}
+function validateBuildMarker(p,marker,packageMarker) {
+  previewIdentity(p);
+  assert.ok(marker&&typeof marker==='object'&&!Array.isArray(marker),'I66_OPERATIONAL_BUILD_MARKER_REQUIRED');
+  assert.equal(marker.sourceSha,p.sourceSha,'I66_OPERATIONAL_BUILD_MARKER_SOURCE_DRIFT');
+  assert.equal(marker.gate,'I6.6','I66_OPERATIONAL_BUILD_MARKER_GATE_DRIFT');
+  assert.equal(marker.product,'Gravicentra Insurance','I66_OPERATIONAL_BUILD_MARKER_PRODUCT_DRIFT');
+  checkBuildId(marker.buildId,p.sourceSha,'I66_OPERATIONAL_BUILD_MARKER_ID_DRIFT');
+  if(p.buildId!==undefined)assert.equal(marker.buildId,p.buildId,'I66_OPERATIONAL_BUILD_MARKER_ID_DRIFT');
+  if(packageMarker!==undefined){
+    validateBuildMarker(p,packageMarker);
+    assert.deepEqual(marker,packageMarker,'I66_OPERATIONAL_HOSTED_PACKAGE_MARKER_DRIFT');
+  }
+  return marker;
+}
+function signedMatrixBinding(env,control) {
+  if(env.I66_OPERATIONAL_CANDIDATE==='true'){
+    const origin=String(env.I66_SIGNED_MATRIX_ORIGIN||'');
+    const phase=origin===LIVE?'live':'preview',p=candidateForPhase(control,phase);
+    assert.equal(origin,phase==='live'?LIVE:p.previewUrl,'I66_SIGNED_MATRIX_CANDIDATE_ORIGIN_DRIFT');
+    assert.equal(env.I66_SOURCE_SHA,p.sourceSha,'I66_SIGNED_MATRIX_CANDIDATE_SOURCE_DRIFT');
+    assert.equal(env.I66_PREVIEW_ORIGIN,p.previewUrl,'I66_SIGNED_MATRIX_PREVIEW_ENV_DRIFT');
+    assert.equal(env.I66_SIGNED_QA_CHANNEL_ID,p.previewChannelId,'I66_SIGNED_MATRIX_CHANNEL_ENV_DRIFT');
+    return {origin,preview:p.previewUrl,phase,candidate:p};
+  }
+  const origin=env.I66_SIGNED_MATRIX_ORIGIN||PREVIEW;
+  assert.ok(origin===PREVIEW||origin===LIVE,'I66_SIGNED_MATRIX_UNKNOWN_ORIGIN');
+  return {origin,preview:PREVIEW,phase:origin===LIVE?'live':'preview',candidate:null};
+}
 function candidateForPhase(control,phase) {
   assert.ok(['preview','live'].includes(phase),'I66_OPERATIONAL_PHASE_INVALID');
   assert.equal(control.gate,'I6.6');
@@ -92,7 +146,7 @@ function candidateForPhase(control,phase) {
   checkId(p.buildRunId,'I66_OPERATIONAL_BUILD_RUN_PIN');
   checkId(p.artifactId,'I66_OPERATIONAL_ARTIFACT_PIN');
   checkDigest(p.artifactDigest,'I66_OPERATIONAL_DIGEST_PIN');
-  assert.equal(p.previewUrl,PREVIEW);assert.equal(p.previewChannelId,CHANNEL);
+  previewIdentity(p);
   assert.deepEqual(p.targets,TARGETS,'I66_OPERATIONAL_TARGET_SCOPE_DRIFT');
   assert.deepEqual(p.requiredPreviewDrivers,DRIVERS,'I66_OPERATIONAL_QA_DRIVER_SCOPE_DRIFT');
   assert.equal(p.sameImmutableArtifactOnly,true);
@@ -172,6 +226,7 @@ function validateProof(p,proof) {
   assert.equal(proof.schema,'I6_6_OPERATIONAL_SIGNED_PREVIEW_PROOF_V1');
   assert.equal(proof.status,'SIGNED_DRIVERS_DURABLE_READBACK_RELOAD_RESTORE_PASS');
   for(const key of ['sourceSha','buildRunId','artifactId','artifactDigest','previewUrl','previewChannelId'])assert.equal(proof[key],p[key]);
+  if(p.buildId!==undefined)assert.equal(proof.buildId,p.buildId,'I66_OPERATIONAL_PROOF_BUILD_ID_DRIFT');
   assert.deepEqual(proof.targets,TARGETS.preview);assert.deepEqual(proof.signedDrivers,DRIVERS);
   assert.equal(proof.realFinancialOrCustomerWrites,0);assert.equal(proof.syntheticRestoreComplete,true);
   assert.equal(proof.liveHostingUnchanged,true);assert.equal(proof.liveBackendUnchanged,true);
@@ -222,7 +277,8 @@ function envFor(p){return {
   I66_OPERATIONAL_CANDIDATE:'true',SOURCE_SHA:p.sourceSha,I66_SOURCE_SHA:p.sourceSha,
   SOURCE_PACKAGE_RUN:p.buildRunId,SOURCE_ARTIFACT_ID:p.artifactId,SOURCE_ARTIFACT_DIGEST:p.artifactDigest,
   I66_ROLE_SOURCE_SHA:p.sourceSha,I66_ROLE_BUILD_RUN:p.buildRunId,I66_ROLE_ARTIFACT_ID:p.artifactId,I66_ROLE_ARTIFACT_DIGEST:p.artifactDigest,
-  I66_PREVIEW_ORIGIN:p.previewUrl,I66_ROLE_PREVIEW_ORIGIN:p.previewUrl,I66_SIGNED_QA_CHANNEL_ID:p.previewChannelId,I66_ROLE_PREVIEW_CHANNEL:p.previewChannelId,
+  I66_PREVIEW_ORIGIN:p.previewUrl,I66_ROLE_PREVIEW_ORIGIN:p.previewUrl,I66_SIGNED_MATRIX_ORIGIN:p.previewUrl,I66_SIGNED_QA_CHANNEL_ID:p.previewChannelId,I66_ROLE_PREVIEW_CHANNEL:p.previewChannelId,
+  I66_EXPECTED_BUILD_ID:p.buildId||'',
   I66_APPROVED_LIVE_SOURCE_SHA:p.sourceSha,I66_PREVIOUS_SOURCE_SHA:p.currentLive.sourceSha,I66_PREVIOUS_BUILD_ID:p.currentLive.buildId,
   I66_PREVIOUS_HOSTING_VERSION:p.currentLive.hostingVersion,I66_EXPECTED_SITE_FILE_COUNT:p.expectedSiteFileCount,
   I66_PREVIEW_QA_ARTIFACT_ID:p.previewQa?.receiptArtifactId||'',I66_PREVIEW_QA_RUN_ID:p.previewQa?.runId||''
@@ -241,5 +297,5 @@ async function main(){
   fs.appendFileSync(process.env.GITHUB_ENV,Object.entries(envFor(p)).map(([k,v])=>k+'='+v).join('\n')+'\n');
   console.log('I66_OPERATIONAL_'+phase.toUpperCase()+'_SOURCE_ARTIFACT_AUTHORITY_PASS');
 }
-module.exports={CONTROL,PREVIEW,CHANNEL,TARGETS,DRIVERS,PROPOSAL_QA_ISOLATION,ADVISOR_QA_ISOLATION,PINNED_OWNER_PATHS,candidateForPhase,continuationForPreflight,validateArtifact,validatePreviewQa,validateProof,validateFocusedReports,focusedReportsFromDisk,envFor};
+module.exports={CONTROL,SITE,PREVIEW,CHANNEL,LIVE,TARGETS,DRIVERS,PROPOSAL_QA_ISOLATION,ADVISOR_QA_ISOLATION,PINNED_OWNER_PATHS,previewIdentity,validateBuildMarker,signedMatrixBinding,candidateForPhase,continuationForPreflight,validateArtifact,validatePreviewQa,validateProof,validateFocusedReports,focusedReportsFromDisk,envFor};
 if(require.main===module)main().catch(error=>{console.error(String(error.message||error));process.exitCode=1;});

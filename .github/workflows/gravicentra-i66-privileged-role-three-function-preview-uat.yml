@@ -43,8 +43,6 @@ jobs:
     timeout-minutes: 55
     env:
       PROJECT_ID: ays-orbit-360-lab
-      I66_PREVIEW_ORIGIN: https://ays-orbit-360-lab--gi-i66-rc-42868854629-abj14q6n.web.app
-      I66_SIGNED_QA_CHANNEL_ID: gi-i66-rc-42868854629
       GH_TOKEN: ${{ github.token }}
       SA_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
       SA_ALT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
@@ -61,6 +59,7 @@ jobs:
         run: |
           set -euo pipefail
           node --test tools/gravicentra-i6-6-operational-release-candidate.test.cjs
+          node --test tools/gravicentra-i6-6-preview-candidate-binding.test.cjs
           node --test tools/gravicentra-i6-6-advisor-payables-signed-uat.test.cjs tools/gravicentra-i6-6-finance-ui-diagnostics.test.cjs
           node --test tools/gravicentra-i6-6-assignment-detail-navigation.test.cjs tools/gravicentra-i6-6-direction-preview-qa-navigation-retry.test.cjs tools/gravicentra-i6-6-preview-current-live-restore-47f4.test.cjs
           node --test tools/gravicentra-i6-6-proposal-uat-diagnostics.test.cjs tools/gravicentra-i6-6-direction-preview-proposal-diagnostic-retry.test.cjs tools/gravicentra-i6-6-preview-current-live-restore-39f54e2.test.cjs
@@ -72,8 +71,10 @@ jobs:
           set -euo pipefail
           curl -fsSL --max-time 30 "$I66_PREVIEW_ORIGIN/__recovery__/build.json" > "$RUNNER_TEMP/i66-role-preview-build.json"
           node - <<'NODE'
+          const g=require('./tools/gravicentra-i6-6-operational-release-candidate.cjs');
+          const p=g.candidateForPhase(require('./'+g.CONTROL),'preview');
           const b=require(process.env.RUNNER_TEMP+'/i66-role-preview-build.json');
-          if(b.sourceSha!==process.env.SOURCE_SHA||b.gate!=='I6.6')throw Error('I66_PREVIEW_HOSTING_SOURCE_READBACK_DRIFT');
+          g.validateBuildMarker(p,b);
           console.log('I66_ROLE_PREVIEW_HOSTING_EXACT_SOURCE_READBACK_PASS');
           NODE
       - uses: actions/download-artifact@v4
@@ -95,6 +96,16 @@ jobs:
           FROOT="$RUNNER_TEMP/gi-role-preview-only"
           mkdir -p "$FROOT"
           tar -xzf "$TAR" -C "$FROOT" --no-same-owner
+          export I66_PACKAGE_ROOT="$FROOT"
+          (cd "$FROOT/bundle/site" && sha256sum --check --quiet "$FROOT/evidence/site-manifest.sha256")
+          node - <<'NODE'
+          const fs=require('node:fs'),g=require('./tools/gravicentra-i6-6-operational-release-candidate.cjs');
+          const p=g.candidateForPhase(require('./'+g.CONTROL),'preview');
+          const hosted=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/i66-role-preview-build.json','utf8'));
+          const packaged=JSON.parse(fs.readFileSync(process.env.I66_PACKAGE_ROOT+'/bundle/site/__recovery__/build.json','utf8'));
+          g.validateBuildMarker(p,hosted,packaged);
+          console.log('I66_PREVIEW_HOSTED_MARKER_EQUALS_EXACT_ARTIFACT_MARKER_PASS');
+          NODE
           BACKEND="$FROOT/bundle/backend"
           (cd "$BACKEND" && sha256sum --check --quiet "$FROOT/evidence/backend-manifest.sha256")
           for p in b4-003-scoped-access-boundary.js b4-003-scoped-related-reader.js product-operational-domain.js product-ops-leads-domain.js cobros-reconciliation-domain.js advisor-commission-payable-contract.js advisor-assignment-correction-contract.js proposal-application-boundary.js payment-inference-engine.js i66-conciliaciones-active-ledger-projection.js;do
@@ -191,6 +202,7 @@ jobs:
           const receipt={schema:'I6_6_OPERATIONAL_SIGNED_PREVIEW_PROOF_V1',
             status:'SIGNED_DRIVERS_DURABLE_READBACK_RELOAD_RESTORE_PASS',
             ...Object.fromEntries(['sourceSha','buildRunId','artifactId','artifactDigest','previewUrl','previewChannelId'].map(k=>[k,p[k]])),
+            ...(p.buildId===undefined?{}:{buildId:p.buildId}),
             targets:g.TARGETS.preview,signedDrivers:g.DRIVERS,realFinancialOrCustomerWrites:0,
             syntheticRestoreComplete:true,liveHostingUnchanged:true,liveBackendUnchanged:true,
             focusedReports:g.focusedReportsFromDisk(p,'PREVIEW'),

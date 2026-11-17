@@ -14,8 +14,8 @@ const operationalGuard=require('./gravicentra-i6-6-operational-release-candidate
 const operational=process.env.I66_OPERATIONAL_CANDIDATE==='true'?
   operationalGuard.candidateForPhase(JSON.parse(fs.readFileSync(operationalGuard.CONTROL,'utf8')),'live'):null;
 const SOURCE=operational?.sourceSha||'0153f5cbbe00c3732e11ebae59b32bd357e38bfd';
-const PREVIEW='https://ays-orbit-360-lab--gi-i66-rc-42868854629-abj14q6n.web.app';
-const CHANNEL='gi-i66-rc-42868854629';
+const PREVIEW=operational?operational.previewUrl:operationalGuard.PREVIEW;
+const CHANNEL=operational?operational.previewChannelId:operationalGuard.CHANNEL;
 const PREVIOUS=operational?.currentLive.sourceSha||'7e9b2b915535cfcc20285142d57bfb0afcda1057';
 const PREVIOUS_BUILD=operational?.currentLive.buildId||'gi-i66-7e9b2b915535-57f234755dc1';
 const LIVE=['https://ays-orbit-360-lab.web.app','https://app.aysseguros.com'];
@@ -94,6 +94,11 @@ try{
   need(process.env.I66_ROLE_SOURCE_SHA===SOURCE&&process.env.I66_ROLE_PREVIEW_ORIGIN===PREVIEW,
     'I66_ROLE_SOURCE_OR_PREVIEW_PIN_DRIFT');
   const pkg=JSON.parse(fs.readFileSync(path.join(root,'bundle/site/__recovery__/build.json'),'utf8'));
+  if(operational){
+    need(process.env.I66_ROLE_PREVIEW_CHANNEL===CHANNEL,'I66_ROLE_PREVIEW_CHANNEL_PIN_DRIFT');
+    operationalGuard.validateBuildMarker(operational,pkg);
+    operationalGuard.validateBuildMarker(operational,await marker(PREVIEW),pkg);
+  }
   need(pkg.gate==='I6.6'&&pkg.product==='Gravicentra Insurance'&&pkg.sourceSha===SOURCE&&
     new RegExp('^gi-i66-'+SOURCE.slice(0,12)+'-').test(pkg.buildId),'I66_ROLE_IMMUTABLE_BUILD_NOT_CERTIFIED');
   const rows=manifestRows();

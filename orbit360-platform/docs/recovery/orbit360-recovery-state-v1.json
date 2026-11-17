@@ -20,6 +20,10 @@
     "firstIncompleteGate": "I6.6_CONCILIATION_APPLICATION_AND_ADVISOR_CXP_PREVIEW_SIGNED_QA",
     "preserveHistoricalB4007Accepted": true,
     "latestProvenLiveSource": "84769378eb2014addebfefdbdd63091bddc4b817",
+    "latestHostingPreviewEvidence": "artifacts/orbit360-recovery/release-control/I6_6_V7_TIMESTAMP_FIX_QUOTA_RECOVERY_PREVIEW_READBACK_20261116.json",
+    "latestHostingPreviewSource": "d5e64e2f4ab9acb89d8765f48da33cba2df089a5",
+    "operationsEvidenceReview": "artifacts/orbit360-recovery/release-control/I6_6_OPS_EVIDENCE_AND_PREVIEW_BINDING_REVIEW_20261116.json",
+    "latestHostingPreviewIsFunctionalAcceptance": false,
     "newPreviewOrLiveAcceptanceClaimed": false,
     "ownerQuestionsAnswered": "October only; sale commission only; private roster 13 advisor-A clients at70% and4 advisor-B clients at60%; previously paid September commissions excluded. Identities and liquidation remain outside this public repository.",
     "bankTransfersAuthorized": false

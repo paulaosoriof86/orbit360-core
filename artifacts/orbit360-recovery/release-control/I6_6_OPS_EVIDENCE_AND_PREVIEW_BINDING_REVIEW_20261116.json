@@ -1,0 +1,122 @@
+{
+  "schema": "GI_I66_OPS_EVIDENCE_AND_PREVIEW_BINDING_REVIEW_V1",
+  "dateGuatemala": "2026-11-16",
+  "gate": "I6.6",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "reviewedSourceHead": "53b50498c5ded8e9ee0ee03a82ae4246269c2f46",
+  "status": "SOURCE_TRANSPORT_REPAIR_PREPARED_FUNCTIONAL_QA_AND_LIVE_HOLD",
+  "ownerRequest": "Confirm whether every Operations finding is corrected and proven, and continue the next incomplete block. Preserve existing V7 and controlled-test authority; do not infer real-payment or new legal-consent authority.",
+  "operationsAnswer": {
+    "allReportedFindingsCertified": false,
+    "completed": 6,
+    "required": 8,
+    "percent": 75,
+    "criteriaAuthority": "orbit360-platform/docs/recovery/orbit360-recovery-state-v1.json#i66OwnerFrozenUrgentWorkPlan20261112.blocks.carlosOpsLeadsRenovalsCobros",
+    "certifiedCriteria": [
+      {"criterion": "Ops create/update/resolve/reload/restore", "scope": "SIGNED_CARLOS_AND_DIRECTION_SYNTHETIC", "runIds": [43310610618, 43452502778]},
+      {"criterion": "Leads create/update/reload/restore", "scope": "SIGNED_CARLOS_AND_DIRECTION_SYNTHETIC", "runIds": [43310610618, 43452502778]},
+      {"criterion": "Tasks create/complete/reload/restore and Ops projection", "scope": "SYNTHETIC_PLUS_EXISTING_REAL_TASK_READONLY", "runIds": [43310610618, 43452502778, 43332642537]},
+      {"criterion": "Non-renewable to renewable with compare-and-swap and restoration", "scope": "SIGNED_SYNTHETIC", "runIds": [43312896784, 43452656400]},
+      {"criterion": "Apply/reconcile once with receipt/cartera/reload and restoration", "scope": "SIGNED_SYNTHETIC_NOT_REAL_PAYMENTS", "runIds": [43312896784, 43452656400, 43473378992]},
+      {"criterion": "Existing pending Leads business projects to exact Ops card without duplicate", "scope": "SIGNED_REAL_CASE_READONLY", "runIds": [43315196712]}
+    ],
+    "remainingCriteria": [
+      "Complete direct renewal with genuine insurer-issued document and cross-module readback",
+      "Complete country/tenant/role regression including Direction, Admin, AdminTenant and SuperAdmin"
+    ],
+    "notProvenByTheseRuns": [
+      "Functional delete/archive for the operative role; administrative synthetic cleanup is not that test",
+      "Every respond/entry path or creation of a new customer from Cliente360",
+      "Genuine invoice PDF upload and retrieval",
+      "Complete real insurer logo/password path and all higher-role regressions",
+      "Latest V7 proposal application end-to-end on the new immutable source"
+    ]
+  },
+  "sourceTransportRootCause": {
+    "before": "Independent hard-coded old Preview origins in candidate validation, signed permissions driver and exact LIVE transport; matrix origin missing from candidate environment.",
+    "requiredAfter": "One validated source-bound Preview endpoint across all signed drivers and exact transport; build/run/artifact/digest and hosted/package marker identity remain fail-closed.",
+    "productOrFinancialRulesChanged": false,
+    "legalHelperChanged": false,
+    "historicalAcceptanceChanged": false,
+    "immutableArtifactPatched": false,
+    "newImmutableBuildRequiredBeforeSignedQa": true,
+    "localRegression": {
+      "status": "PASS_LOCAL_SOURCE_ONLY_NOT_SIGNED_FUNCTIONAL_QA",
+      "newBindingTestsPassed": 46,
+      "existingRegressionTestsPassed": 366,
+      "totalTestsPassed": 412,
+      "testFiles": 15,
+      "commandPrefix": "node --test",
+      "testPaths": [
+        "tools/gravicentra-i6-6-preview-candidate-binding.test.cjs",
+        "tools/gravicentra-i6-6-operational-release-candidate.test.cjs",
+        "tools/gravicentra-i6-6-direction-preview-legal-acceptance.test.cjs",
+        "tools/gravicentra-i6-6-privileged-role-portfolio-parity.test.cjs",
+        "tools/gravicentra-i6-6-privileged-role-writer-transaction.test.cjs",
+        "tools/gravicentra-i6-6-advisor-payables-signed-uat.test.cjs",
+        "tools/gravicentra-i6-6-finance-ui-diagnostics.test.cjs",
+        "tools/gravicentra-i6-6-assignment-detail-navigation.test.cjs",
+        "tools/gravicentra-i6-6-direction-preview-qa-navigation-retry.test.cjs",
+        "tools/gravicentra-i6-6-proposal-uat-diagnostics.test.cjs",
+        "tools/gravicentra-i6-6-direction-preview-proposal-diagnostic-retry.test.cjs",
+        "tools/gravicentra-i6-6-preview-channel-reuse-guard.test.cjs",
+        "tools/gravicentra-i6-6-preview-current-live-restore.test.cjs",
+        "tools/gravicentra-i6-6-preview-current-live-restore-47f4.test.cjs",
+        "tools/gravicentra-i6-6-preview-current-live-restore-39f54e2.test.cjs"
+      ],
+      "javascriptSyntaxChecksPassed": 4,
+      "workflowJavascriptBlocksSyntaxPassed": 28,
+      "diffWhitespaceCheck": "PASS",
+      "beforeAfter": "The original source owner blob 4c1c249328175f76a5ca40cae90d0de54d5a9592 rejects the same valid new-channel candidate that the repaired owner accepts; negative endpoint/source/marker/consent tests remain fail-closed.",
+      "metadataInvariantChecksPassed": 8,
+      "legalHelperDiff": "UNCHANGED",
+      "cloudWrites": 0,
+      "signedPreviewQaPerformed": false,
+      "liveAcceptanceClaimed": false
+    }
+  },
+  "metadataBeforeAfter": {
+    "beforeLatestPreviewSource": "39f54e24e59983a59a7c9a41912e0eed154efa18",
+    "beforeLatestPreviewBuildRunId": 43982177239,
+    "afterLatestHostingPreviewSource": "d5e64e2f4ab9acb89d8765f48da33cba2df089a5",
+    "afterLatestHostingPreviewBuildRunId": 44009981499,
+    "afterLatestHostingPreviewRunAttempt": 2,
+    "afterLatestHostingPreviewArtifactId": 14296328231,
+    "preservedEarlierSignedFailureEvidence": true,
+    "hostingOnlyMustNotBeCalledFunctionalAcceptance": true,
+    "synchronizedOwners": [
+      "artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json#i66OperationalContinuation20261115",
+      "orbit360-platform/docs/recovery/orbit360-recovery-state-v1.json#i66OwnerPlanContinuation20261115",
+      "artifacts/orbit360-recovery/release-control/I6_6_OPERATIONAL_CONTINUATION_20261115.json#currentEvidenceBoundaries"
+    ]
+  },
+  "authorityBoundary": {
+    "historicalLegalReceipt": "artifacts/orbit360-recovery/release-control/I6_6_DIRECTION_PREVIEW_LEGAL_ACCEPTANCE_20261116.json",
+    "historicalLegalReceiptAllowsFutureSourceSuccessors": false,
+    "newLegalAcceptanceGranted": false,
+    "newLegalAcceptancePerformed": false,
+    "consentStorageSeeded": false,
+    "signedBackendQaMustWaitForApplicableLegalAuthority": true,
+    "livePromotionAuthorizedByThisReceipt": false,
+    "realPaymentsAuthorizedByThisReceipt": false,
+    "realCustomerOrFinancialWrites": 0,
+    "newBackendDeployments": 0,
+    "newHostingDeployments": 0
+  },
+  "formalProgress": {
+    "historicalPhaseA": {"beforePercent": 100, "afterPercent": 100, "deltaPercentagePoints": 0},
+    "operations": {"beforePercent": 75, "afterPercent": 75, "completed": 6, "required": 8, "deltaPercentagePoints": 0},
+    "frozenTransversalBlocks": {"beforePercent": 61.3, "afterPercent": 61.3, "completed": 19, "required": 31, "deltaPercentagePoints": 0},
+    "postproductionI6": {"beforePercent": 60, "afterPercent": 60, "completed": 6, "required": 10, "deltaPercentagePoints": 0},
+    "phaseB": {"beforePercent": 0, "afterPercent": 0, "deltaPercentagePoints": 0, "entryGate": "I6.9_FASE_A_POSTSALIDA_PRODUCTION_ACCEPTED"},
+    "newFunctionalCriteriaCertified": 0
+  },
+  "nextOnly": [
+    "Obtain applicable explicit Direction-only V2 consent authority for the exact next candidate; do not reinterpret generic continue authorization",
+    "Build one new immutable artifact including the repaired and tested QA owners",
+    "Run the existing signed Preview gate, before/after, durable readback, replay and negative-scope tests with complete synthetic cleanup",
+    "Promote only the identical proven artifact under the existing separate LIVE authority and verify both LIVE origins",
+    "Resolve the genuine renewal-document and full role/country criteria without reopening already certified routine flows"
+  ]
+}

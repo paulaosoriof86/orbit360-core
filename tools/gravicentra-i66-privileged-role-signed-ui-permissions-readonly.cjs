@@ -1,12 +1,23 @@
 'use strict';
 // Real signed product roles, permission assertions only; no Firestore writes.
 const assert=require('node:assert/strict');
+const fs=require('node:fs'),path=require('node:path');
 const admin=require('firebase-admin');
 const {chromium}=require('playwright');
-const TENANT='alianzas-soluciones',PREVIEW='https://ays-orbit-360-lab--gi-i66-rc-42868854629-abj14q6n.web.app';
-const LIVE='https://app.aysseguros.com';
-const ORIGIN=process.env.I66_SIGNED_MATRIX_ORIGIN||PREVIEW;
-assert.ok(ORIGIN===PREVIEW||ORIGIN===LIVE,'I66_SIGNED_MATRIX_UNKNOWN_ORIGIN');
+const release=require('./gravicentra-i6-6-operational-release-candidate.cjs');
+const control=process.env.I66_OPERATIONAL_CANDIDATE==='true'?JSON.parse(fs.readFileSync(release.CONTROL,'utf8')):null;
+const binding=release.signedMatrixBinding(process.env,control);
+const TENANT='alianzas-soluciones',PREVIEW=binding.preview,ORIGIN=binding.origin;
+async function proveCandidateMarker(){
+  if(!binding.candidate)return;
+  const root=process.env.I66_PACKAGE_ROOT;
+  assert.ok(root&&path.isAbsolute(root),'I66_SIGNED_MATRIX_IMMUTABLE_PACKAGE_REQUIRED');
+  const packaged=JSON.parse(fs.readFileSync(path.join(root,'bundle/site/__recovery__/build.json'),'utf8'));
+  const response=await fetch(ORIGIN+'/__recovery__/build.json',{redirect:'error',headers:{'cache-control':'no-cache'},signal:AbortSignal.timeout(30000)});
+  assert.equal(response.status,200,'I66_SIGNED_MATRIX_BUILD_MARKER_READBACK_FAILED');
+  release.validateBuildMarker(binding.candidate,await response.json(),packaged);
+  console.log('I66_SIGNED_MATRIX_EXACT_CANDIDATE_PACKAGE_MARKER_PASS');
+}
 const credential=['SA_LAB','SA_ALT','SA_DEFAULT'].map(k=>{try{return JSON.parse(process.env[k]||'');}catch{return null;}})
   .find(x=>x?.type==='service_account'&&x.project_id==='ays-orbit-360-lab'&&x.private_key);
 assert.ok(credential,'I66_SIGNED_PERMISSION_CONFIGURED_LAB_CREDENTIAL_MISSING');
@@ -124,7 +135,7 @@ async function checkActor(browser,actor){
     }
   }finally{await context.close();}
 }
-(async()=>{const all=await actors(),browser=await chromium.launch({headless:true,args:['--no-sandbox']});
+(async()=>{await proveCandidateMarker();const all=await actors(),browser=await chromium.launch({headless:true,args:['--no-sandbox']});
   try{for(const actor of all)await checkActor(browser,actor);}
   finally{await browser.close();}
   console.log('I66_REAL_SIGNED_TENANT_UI_ROLE_MATRIX_2_ACTORS_VISIBLE_MODULES_READONLY_PASS origin='+(ORIGIN===PREVIEW?'preview':'live'));
