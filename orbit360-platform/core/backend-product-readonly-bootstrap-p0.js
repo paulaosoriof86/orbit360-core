@@ -39,7 +39,36 @@
   // B4-003 scoped-only resolution of a stale static module visibility check.
   // The effective module gate and the server callable must BOTH authorize.
   // Never promote a denied/foreign scope or a malformed tenant plan.
-  function protectedReadRolePlan(collection, membership, selected, compiled) {
+  function protectedReadRolePlan(collection, membership, selected, compiled, protectedAccess) {
+    // Membership defaults enumerate modules; they are not authority to ignore
+    // an explicit denial in the authenticated tenant matrix. Apply only a
+    // veto here: a true/absent matrix entry never repairs a denied query plan.
+    if (protectedAccess && compiled && typeof compiled === 'object') {
+      var normalized = function (value) {
+        return String(value == null ? '' : value).trim().normalize('NFD')
+          .replace(/[\u0300-\u036f]/g, '').toLowerCase()
+          .replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '');
+      };
+      var permissions = protectedAccess.rolePermissions || {};
+      var denied = Object.keys(permissions).some(function (roleKey) {
+        if (normalized(roleKey) !== normalized(selected)) return false;
+        var modules = permissions[roleKey];
+        return modules && typeof modules === 'object' && !Array.isArray(modules) &&
+          Object.keys(modules).some(function (moduleKey) {
+            return normalized(moduleKey) === normalized(compiled.module) &&
+              modules[moduleKey] && modules[moduleKey].ver === false;
+          });
+      });
+      if (denied) {
+        return Object.assign({}, compiled, { ok: false, denied: true,
+          scope: 'none', writeAuthorized: false,
+          constraints: (Array.isArray(compiled.constraints) ? compiled.constraints : [])
+            .concat([{ field: '__deny__', op: '==', value: true }]),
+          errors: (Array.isArray(compiled.errors) ? compiled.errors : [])
+            .concat(['PROTECTED_TENANT_MODULE_EXPLICIT_DENIAL']),
+          protectedReadAuthorization: 'PROTECTED_TENANT_MODULE_EXPLICIT_DENIAL' });
+      }
+    }
     var moduleKey = collection === 'negocios' ? 'leads' :
       collection === 'gestiones' ? 'ops' : '';
     if(!moduleKey || String(selected||'').toLowerCase() !== 'operativo' ||
@@ -101,6 +130,61 @@
     return protectedRoleMembership(membership, selected || membership.activeRole);
   }
   // B4_003_PROTECTED_ROLE_QUERY_PARITY_END
+
+  function protectedAccessPolicy(membership) {
+    var owner = window.Orbit && window.Orbit.domainConfig;
+    if (!owner || typeof owner.ensure !== 'function' || typeof owner.status !== 'function' ||
+        typeof owner.peekReadOnly !== 'function')
+      throw new Error('PROTECTED_ACCESS_POLICY_OWNER_REQUIRED');
+    var status = owner.status();
+    if (!status || status.tenantId !== membership.tenantId)
+      throw new Error('PROTECTED_ACCESS_POLICY_TENANT_MISMATCH');
+    var access = (Array.isArray(status.domains) ? status.domains : [])
+      .find(function (row) { return row && row.domain === 'access'; });
+    if (!access || access.source !== 'protected' || access.syncPending !== false)
+      throw new Error('PROTECTED_ACCESS_POLICY_NOT_CONFIRMED');
+    var config = owner.peekReadOnly('access');
+    if (!config || config.schemaVersion !== 'gravicentra-access-policy-v1' ||
+        !config.rolePermissions || typeof config.rolePermissions !== 'object' ||
+        Array.isArray(config.rolePermissions))
+      throw new Error('PROTECTED_ACCESS_POLICY_INVALID');
+    return config;
+  }
+
+  async function ensureProtectedAccessPolicy(membership) {
+    var owner = window.Orbit && window.Orbit.domainConfig;
+    if (!owner || typeof owner.ensure !== 'function')
+      throw new Error('PROTECTED_ACCESS_POLICY_OWNER_REQUIRED');
+    // Reuse the existing protected read and its in-flight deduplication before
+    // any startup/deferred collection attaches. A local/fallback policy never
+    // becomes a temporary permanent denial, nor permits an early HTTP request.
+    var result = await owner.ensure('access');
+    // Fresh get() preserves the backend source; cached ensure() returns
+    // "protected". In both cases the owner's metadata below must independently
+    // confirm a protected, synchronized snapshot for this authenticated tenant.
+    if (!result || result.ok !== true ||
+        ['protected','canonical','canonical_readonly_baseline','preview_uat'].indexOf(result.source) < 0 ||
+        result.exists === false ||
+        result.syncPending === true)
+      throw new Error('PROTECTED_ACCESS_POLICY_NOT_CONFIRMED');
+    var policy = protectedAccessPolicy(membership);
+    // ensure() does not retain existence in its cached result. Its empty
+    // defaults must not be confused with an explicitly empty server document.
+    // Re-read only this ambiguous cache case through the existing read owner;
+    // an already configured A&S matrix needs no extra request or new state.
+    if (result.cached === true && Object.keys(policy.rolePermissions).length === 0) {
+      if (typeof owner.get !== 'function')
+        throw new Error('PROTECTED_ACCESS_POLICY_OWNER_REQUIRED');
+      result = await owner.get('access');
+      if (!result || result.ok !== true || result.exists !== true ||
+          ['canonical','canonical_readonly_baseline','preview_uat'].indexOf(result.source) < 0 ||
+          result.syncPending === true || !result.config ||
+          typeof result.config !== 'object' || Array.isArray(result.config))
+        throw new Error('PROTECTED_ACCESS_POLICY_NOT_CONFIRMED');
+      policy = protectedAccessPolicy(membership);
+    }
+    return policy;
+  }
 
   function unique(values) {
     var out = [];
@@ -408,6 +492,8 @@
       state.countries = membership.countries.slice();
 
       transition(state, 'planning');
+      if (options.protectedReadCandidate === true)
+        await ensureProtectedAccessPolicy(membership);
       var accessPolicy = window.Orbit.tenantAccessPolicyProductP0;
       var queryPlanner = window.Orbit.productQueryPlannerP0.createPlanner(membership, { accessPolicy: accessPolicy });
       if(options.protectedReadCandidate===true){
@@ -420,7 +506,8 @@
             return {ok:false,hardError:true,constraints:[],errors:['PROTECTED_ROLE_NOT_ASSIGNED']};
           var compiled=window.Orbit.productQueryPlannerP0.compile(collection,
             protectedRoleMembership(membership,selected),{accessPolicy:accessPolicy});
-          return protectedReadRolePlan(collection,membership,selected,compiled);
+          return protectedReadRolePlan(collection,membership,selected,compiled,
+            protectedAccessPolicy(membership));
         };
       }
       // A protected Preview must never pass Firestore references, query helpers

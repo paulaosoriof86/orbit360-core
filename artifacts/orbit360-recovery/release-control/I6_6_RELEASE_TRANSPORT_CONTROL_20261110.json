@@ -4,10 +4,10 @@
   "productBrand": "Gravicentra Insurance",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
-  "status": "OPERATIONAL_BACKEND_PREVIEW_AUTHORIZED",
+  "status": "PREVIEW_BUILD_REQUESTED",
   "currentTechnicalPreviewRollover": {
-    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_TECHNICAL_PREVIEW_DIAGNOSTIC_RETENTION_REBUILD_20261117.json",
-    "receiptSha256": "2ebd606814ca551e548bbc7537fc6016b7e0926d4806083957aa9fc65e70b8ab"
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_TECHNICAL_PREVIEW_HYDRATION_AND_BALANCE_REBUILD_20261117.json",
+    "receiptSha256": "6db064d9494103f4cd31ecf9a34e589f66455d2a818f3c0b945839872b1c6e8a"
   },
   "directionSameTermsPreviewScope": {
     "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_DIRECTION_PREVIEW_V2_SCOPE_AUTHORIZATION_20261116.json",
@@ -408,8 +408,8 @@
     "priorR7HostingRollback": "sites/ays-orbit-360-lab/versions/9cedc5ecda75bb2a",
     "fullI66FinancialProductionAcceptance": false
   },
-  "currentReleaseStatus": "R11_RETAINED_PROPOSAL_DIAGNOSTIC_PREVIEW_BUILT_SIGNED_QA_REQUIRED",
-  "scope": "Exact immutable QA diagnostic source and unchanged product. Three existing Preview functions and four existing signed drivers only. Preserve the existing own Direction Preview legal decision. Capture allowlisted Proposal response/prerequisites without private customer data. No LIVE promotion or real records/payments.",
+  "currentReleaseStatus": "R11_RETAINED_HYDRATION_AND_CURRENT_BALANCE_SUCCESSOR_BUILD_REQUESTED",
+  "scope": "Build the next immutable I6.6 Preview with causal protected-role hydration and canonical current-balance presentation corrections. Back up the exact existing technical Preview and protect both LIVE origins before any quota rollover. This build phase does not authorize backend deployment, LIVE promotion, customer/payment writes or new legal acceptance. Preserve failed signed QA28ab as HOLD and require the existing full signed Preview gate after exact build activation.",
   "historicalClosedGate": "B4-007",
   "approvedProductDeltaManifest": "artifacts/orbit360-recovery/release-control/I6_6_APPROVED_PRODUCT_DELTA_MANIFEST_20261110.json",
   "ownerAuthority": "Paula Osorio Dirección 2026-11-12: Operativo tiene escritura integral en cada módulo autorizado, con paridad funcional para roles superiores según sus permisos, país, tenant y auditoría; cada arreglo probado pasa inmediatamente a LIVE desde un artefacto exacto. Alcance R7 autorizado, Preview firmado PASS 43375403003 y LIVE exacto publicado con tres funciones y hosting 223/223 en ambas URL, actores reales Carlos y Dirección y escrituras sintéticas reversibles PASS 43375687134. Mantener el resto de UAT real por país/rol, documentación real de aseguradora, UI legal y escrituras financieras en HOLD hasta prueba específica, sin tocar Firestore Rules, Auth ni IAM. Histórico R5/R6 se conserva como linaje, no como estado actual.",
@@ -596,11 +596,11 @@
   "requiredCanonicalOrigin": "https://ays-orbit-360-lab.web.app",
   "requiredStaffOrigin": "https://app.aysseguros.com",
   "originReadbackRequirement": "BOTH_HOSTS_IDENTICAL_TO_SAME_ARTIFACT_OR_ROLLBACK",
-  "forbidBackendFunctionDeploy": false,
+  "forbidBackendFunctionDeploy": true,
   "forbidFirestoreRulesDataAuthWrites": true,
   "rollback": "FRONTEND_TOPBAR_PREVIEW_FIRST; KEEP BOTH LIVE HOSTING ORIGINS AND COBROS FUNCTION UNCHANGED UNTIL EXACT_ARTIFACT_PREVIEW_PASS; THEN BACKUP_AND_ATOMIC_EXACT_ARTIFACT_LIVE_PROMOTION_WITH_REHASH_AND_ROLLBACK",
   "sourcePreviewUrl": "https://ays-orbit-360-lab--gi-i66-rc-42868854629-abj14q6n.web.app",
-  "backendFunctionPreviewOnly": true,
+  "backendFunctionPreviewOnly": false,
   "carlosSignedTransversalQaReceipt20261112": {
     "sourceSha": "b86cad550fadc050e8574678f02f3097caa8b5bd",
     "immutableHostingPreviewRunId": 43299843267,
@@ -764,7 +764,7 @@
   "liveAccessGuard": "UNAUTHENTICATED_401_PASS",
   "hostingOriginsUntouched": true,
   "liveCustomerDataWrites": 0,
-  "releaseStatus": "R11_RETAINED_PROPOSAL_DIAGNOSTIC_PREVIEW_BUILT_SIGNED_QA_REQUIRED",
+  "releaseStatus": "R11_RETAINED_HYDRATION_AND_CURRENT_BALANCE_SUCCESSOR_BUILD_REQUESTED",
   "pendingFrontendTopbarRelease": {
     "receipt": "artifacts/orbit360-recovery/release-control/I6_6_GLOBAL_TOPBAR_CROSSMODULE_HYDRATION_20261111.json",
     "currentStatus": "SOURCE_UNIT_PASS_IMMUTABLE_BUILD_REQUESTED",
@@ -2514,7 +2514,71 @@
     },
     "signedObservabilityProfile": "I66_SIGNED_BROWSER_OBSERVABILITY_V1"
   },
-  "operationalReleaseCandidate": {
+  "failedSignedPreview28abHydrationAndBalance20261117": {
+    "status": "HOLD_OPERATIVO_INICIO_HYDRATION_2_HTTP403_2_CONSOLE",
+    "candidatePointer": "supersededOperationalReleaseCandidate28ab",
+    "sourceSha": "28ab17993de5297b887c0c0376d7b314f5bee6b1",
+    "sourceMetadataHeadAtSuccessorRequest": "d0235c6d925e52ced887dbc794f7bc19e5de9b62",
+    "runId": 44036302099,
+    "runAttempt": 1,
+    "jobId": 133879992708,
+    "conclusion": "FAILURE",
+    "diagnosticArtifactId": 14308105281,
+    "diagnosticArtifactDigest": "sha256:16374d7c199531c075b49d5d677d37cfa04c0aa76285069dab9e8292e296f391",
+    "receipt": "artifacts/orbit360-recovery/release-control/I6_6_TECHNICAL_PREVIEW_HYDRATION_AND_BALANCE_REBUILD_20261117.json",
+    "observedStage": "FINANCE_UI_HYDRATION",
+    "observedContext": "Global driver stage; only Direction navigates Finance, Operativo remains at Inicio with deferred hydration; collection not retained.",
+    "observedEndpoint": "orbit360ScopedPolicyReadPreview",
+    "unexpectedHttpErrors": 2,
+    "unexpectedHttpStatusCodes": [
+      403,
+      403
+    ],
+    "unexpectedConsoleErrors": 2,
+    "pageErrorCount": 0,
+    "historicalRequestedCollection": null,
+    "historicalRequestedCollectionRetained": false,
+    "proposalDriverExecuted": false,
+    "failedRunRemainsFailed": true,
+    "retrospectivePassClaimed": false,
+    "previewAccepted": false,
+    "livePromotion": false,
+    "noOperationalPercentIncrease": true
+  },
+  "hydrationAndBalanceBuildRequest20261117": {
+    "status": "SOURCE_CAUSAL_CORRECTIONS_REQUESTED_NEW_IMMUTABLE_PREVIEW_BUILD_REQUIRED",
+    "gate": "I6.6",
+    "sourceBaseHead": "d0235c6d925e52ced887dbc794f7bc19e5de9b62",
+    "previousPreviewSourceSha": "28ab17993de5297b887c0c0376d7b314f5bee6b1",
+    "previousCandidatePointer": "supersededOperationalReleaseCandidate28ab",
+    "failedSignedPreviewPointer": "failedSignedPreview28abHydrationAndBalance20261117",
+    "rolloverReceiptPath": "artifacts/orbit360-recovery/release-control/I6_6_TECHNICAL_PREVIEW_HYDRATION_AND_BALANCE_REBUILD_20261117.json",
+    "rolloverReceiptSha256": "6db064d9494103f4cd31ecf9a34e589f66455d2a818f3c0b945839872b1c6e8a",
+    "currentLiveSourceSha": "84769378eb2014addebfefdbdd63091bddc4b817",
+    "causalOwnerPaths": [
+      "orbit360-platform/core/backend-product-readonly-bootstrap-p0.js",
+      "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js"
+    ],
+    "requiredRegressionTests": [
+      "tools/gravicentra-i6-6-protected-role-policy-hydration.test.cjs",
+      "tools/gravicentra-i6-6-receipt-current-balance.test.cjs",
+      "tools/gravicentra-b4-003-protected-hydration.test.cjs",
+      "tools/gravicentra-b4-003-post-auth-bootstrap-diagnostic.test.cjs"
+    ],
+    "exactNewImmutableArtifactRequired": true,
+    "buildPhaseOnly": true,
+    "backendFunctionDeploy": false,
+    "livePromotion": false,
+    "realDataOrPaymentWrites": false,
+    "noNewClosureCredit": true,
+    "requiredNext": [
+      "Build one new exact I6.6 artifact from the successor source; do not reuse or patch the 28ab artifact.",
+      "If normal isolated channel creation reaches quota, back up and verify only the exact current technical Preview and both protected LIVE origins before the authorized same-channel rollover.",
+      "Verify all 223 hosted files against the new artifact and preserve every other channel and both LIVE origins.",
+      "Only after successful immutable build and exact metadata activation, rerun the existing three-function Preview and all four signed drivers; preserve the failed 28ab run as HOLD."
+    ]
+  },
+  "supersededOperationalReleaseCandidate28ab": {
     "schema": "I6_6_OPERATIONAL_EXACT_RELEASE_V1",
     "approvedByDirection": true,
     "status": "EXACT_BACKEND_PREVIEW_SIGNED_QA_AUTHORIZED",

@@ -1,0 +1,112 @@
+{
+  "schema": "GI_I66_CURRENT_TECHNICAL_PREVIEW_ROLLOVER_V1",
+  "status": "EXACT_CURRENT_TASK_PREVIEW_HYDRATION_AND_BALANCE_REBUILD",
+  "gate": "I6.6",
+  "phase": "PREVIEW",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "projectId": "ays-orbit-360-lab",
+  "sourceBaseHead": "d0235c6d925e52ced887dbc794f7bc19e5de9b62",
+  "executionAuthority": {
+    "kind": "EXISTING_I66_CONTINUE_CORRECT_TEST_AND_PUBLISH_SCOPE",
+    "canonicalPlan": "artifacts/orbit360-recovery/release-control/I6_6_OPERATIONAL_CONTINUATION_20261115.json",
+    "scope": "Replace only the current isolated technical Preview with the next immutable I6.6 candidate under the existing instruction to continue correction and signed verification. This is not an extension of the separate legal consent decision and not permission to delete any channel, change LIVE or apply payments.",
+    "newLegalConsentGrantUsedForHosting": false,
+    "mustStopOnBeforeStateDrift": true
+  },
+  "channel": {
+    "id": "gi-i66-rc-44009981499",
+    "origin": "https://ays-orbit-360-lab--gi-i66-rc-44009981499-d08psr2y.web.app",
+    "createdAt": "2026-11-17T03:34:28.874524705Z",
+    "expectedVersion": "sites/ays-orbit-360-lab/versions/ff88e2fc56df59a9"
+  },
+  "previousCandidate": {
+    "sourceSha": "28ab17993de5297b887c0c0376d7b314f5bee6b1",
+    "buildRunId": 44035140913,
+    "buildRunAttempt": 1,
+    "artifactId": 14306747672,
+    "artifactDigest": "sha256:0bcd5331ee022b5f76eea47b3ede3eb295c21f45cef6fedf19b35cd9dadf6df7",
+    "expectedSiteFileCount": 223,
+    "runtimeProofRequired": "DOWNLOAD_HASH_ARCHIVE_VALIDATE_MANIFEST_AND_COMPARE_EVERY_HOSTED_FILE_INCLUDING_BUILD_JSON_BEFORE_REPLACEMENT"
+  },
+  "protectedLive": {
+    "sourceSha": "84769378eb2014addebfefdbdd63091bddc4b817",
+    "buildRunId": 43503721126,
+    "artifactId": 14075022275,
+    "artifactDigest": "sha256:b0f3bacb68511cdfc91ac934602c51f55afec5c1d6428d886d13a72a706ee283",
+    "liveRunId": 43506971214,
+    "version": "sites/ays-orbit-360-lab/versions/0766db29b338befc",
+    "origins": [
+      "https://ays-orbit-360-lab.web.app",
+      "https://app.aysseguros.com"
+    ]
+  },
+  "freshInventoryEvidence": {
+    "runId": 44035140913,
+    "runAttempt": 1,
+    "jobId": 133876196314,
+    "totalChannels": 51,
+    "inventoryStep": "SUCCESS",
+    "wholeJob": "SUCCESS",
+    "rolloverEvidenceArtifactId": 14307536020,
+    "rolloverEvidenceArtifactDigest": "sha256:e35cb95259f36dc93203d40ba17802387ae401f5fbbc2efc72c0a224f1ef10c6",
+    "afterInventorySha256": "85a8ccaa96591dd9d208506543c385375be9d887aff15591e205c21090f28f27",
+    "comparison": "FULL_OTHER_FIFTY_CHANNEL_METADATA_EXACT_BEFORE_AFTER",
+    "otherChannelsIdenticalFullMetadata": 50,
+    "writes": 0,
+    "freshRuntimeInventoryRequiredAgain": true
+  },
+  "constraints": {
+    "onlyWhenNewChannelQuotaIsExhausted": true,
+    "backupBeforeOverwrite": true,
+    "readbackBeforeAndAfter": true,
+    "sameNewImmutableArtifact": true,
+    "noLiveChanges": true,
+    "noOtherChannelChanges": true,
+    "noChannelDeletion": true,
+    "noBackendChanges": true,
+    "noBusinessDataWrites": true,
+    "noRulesAuthIamChanges": true,
+    "stopOnIdentityDrift": true
+  },
+  "notAcceptance": {
+    "hostingReplacementIsNotSignedFunctionalPass": true,
+    "hostingReplacementIsNotProductionAcceptance": true,
+    "noOperationalPercentIncrease": true
+  },
+  "priorRolloverReceipt": {
+    "path": "artifacts/orbit360-recovery/release-control/I6_6_TECHNICAL_PREVIEW_DIAGNOSTIC_RETENTION_REBUILD_20261117.json",
+    "sha256": "2ebd606814ca551e548bbc7537fc6016b7e0926d4806083957aa9fc65e70b8ab",
+    "preserveBytes": true
+  },
+  "causalRetry": {
+    "defect": "Signed QA remains HOLD for two HTTP 403 responses and two browser console errors at the recorded FINANCE_UI_HYDRATION stage. The retained diagnostic proves the scoped reader Preview endpoint, but does not retain the requested collection. A source-level caller defect separately reproduces static catalog fallback despite explicit protected role-matrix denial. Native receipt presentation also displayed retained nominal premium as current portfolio balance instead of delegating to the canonical query owner.",
+    "failedSignedRunId": 44036302099,
+    "failedSignedRunAttempt": 1,
+    "failedSignedJobId": 133879992708,
+    "failedSignedRunRemainsFailed": true,
+    "failedDiagnosticArtifactId": 14308105281,
+    "failedDiagnosticArtifactDigest": "sha256:16374d7c199531c075b49d5d677d37cfa04c0aa76285069dab9e8292e296f391",
+    "observedStage": "FINANCE_UI_HYDRATION",
+    "observedContext": "Global driver stage; only Direction navigates Finance, Operativo remains at Inicio with deferred hydration; collection not retained.",
+    "observedEndpoint": "orbit360ScopedPolicyReadPreview",
+    "observedHttpStatusCodes": [
+      403,
+      403
+    ],
+    "observedHttpErrorCount": 2,
+    "observedConsoleErrorCount": 2,
+    "observedPageErrorCount": 0,
+    "historicalRequestedCollection": null,
+    "historicalRequestedCollectionRetained": false,
+    "proposalDriverExecuted": false,
+    "preserveFunctionalChecksAndCleanup": true,
+    "doNotRetroactivelyClassifyConsole": true,
+    "unexpectedErrorsRemainHold": true,
+    "correction": "The existing hydration planner must respect explicit protected active-role module denials and hydration ordering without widening backend permissions. The existing native receipt and portfolio presentation must reuse portfolioOpen and portfolioAmountProof for current balance, preserving nominal receipt values, evidence-unknown state and currency separation. These are source-only causal corrections until the new exact build and signed Preview drivers pass.",
+    "newSourceRequiresNewBuildDigest": true,
+    "noBackendOrFinancialRulesChange": true,
+    "frontendReadModelAndHydrationOnly": true,
+    "noLiveOrRealPaymentAuthority": true
+  }
+}

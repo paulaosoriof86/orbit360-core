@@ -2420,6 +2420,63 @@
           "gitBlobSha": "c4b27328a8c02f469ad0b43128c772d95d0ff53c"
         }
       ]
+    },
+    {
+      "id": "I6_6_RECEIPT_CANONICAL_CURRENT_BALANCE_PRESENTATION_20261117",
+      "approvedByDirection": true,
+      "receipt": "artifacts/orbit360-recovery/release-control/I6_6_TECHNICAL_PREVIEW_HYDRATION_AND_BALANCE_REBUILD_20261117.json",
+      "sourceStatus": "SOURCE_REGRESSION_PASS_IMMUTABLE_PREVIEW_AND_LIVE_NOT_YET_ACCEPTED",
+      "parentSourceSha": "d0235c6d925e52ced887dbc794f7bc19e5de9b62",
+      "scope": "Receipt detail and native portfolio summaries delegate current outstanding balance to canonical portfolioOpen and portfolioAmountProof. Preserve nominal premiums and every stored record, explicit zero and currency, payment-vs-application provenance and unknown-amount states. No payment, financial rule, backend, role or authorization change; new immutable artifact and signed Preview/LIVE remain mandatory.",
+      "paths": [
+        {
+          "path": "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js",
+          "gitBlobSha": "93050f77216cc61d637f8e596155cd43a59ef83d",
+          "replaces": {
+            "path": "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js",
+            "priorGitBlobSha": "0eeff59805548418a58d45625f12564c4e009ed7",
+            "priorChangeId": "I6_6_RECEIPT_EDIT_FAIL_CLOSED_SAFE_DIAGNOSTICS_20261117"
+          }
+        }
+      ],
+      "tests": [
+        {
+          "path": "tools/gravicentra-i6-6-receipt-current-balance.test.cjs",
+          "gitBlobSha": "600f437695725e3a8c69c6441faae5423b95cce9"
+        }
+      ]
+    },
+    {
+      "id": "I6_6_PROTECTED_ROLE_MATRIX_HYDRATION_ORDER_20261117",
+      "approvedByDirection": true,
+      "receipt": "artifacts/orbit360-recovery/release-control/I6_6_TECHNICAL_PREVIEW_HYDRATION_AND_BALANCE_REBUILD_20261117.json",
+      "sourceStatus": "SOURCE_CONTRACT_AND_REAL_OWNER_FIXTURE_PASS_SIGNED_PREVIEW_AND_LIVE_NOT_YET_ACCEPTED",
+      "parentSourceSha": "d0235c6d925e52ced887dbc794f7bc19e5de9b62",
+      "scope": "Await the existing authenticated access-policy owner after membership and before protected store creation. Apply only explicit false module-view vetoes for the selected assigned role from the exact protected tenant matrix. Preserve canonical query constraints, read-only status, backend authority, approved positive reads and unconfirmed denied collections. Synthetic integration exercises real domain owner and callable provider before auth projection. Historical two HTTP403 requests retain unknown collection and failed QA status; no permissions are widened or errors waived.",
+      "paths": [
+        {
+          "path": "orbit360-platform/core/backend-product-readonly-bootstrap-p0.js",
+          "gitBlobSha": "e2ea6e0a3464b84ce3ebb291cc643dce93644568"
+        }
+      ],
+      "tests": [
+        {
+          "path": "tools/gravicentra-i6-6-protected-role-policy-hydration.test.cjs",
+          "gitBlobSha": "ed356dd4e7bcb9cd20e0f43215f7dbc38b7dbdbd"
+        }
+      ],
+      "historicalFixtureAdaptation": [
+        {
+          "path": "tools/gravicentra-b4-003-protected-hydration.test.cjs",
+          "gitBlobSha": "901c948d55d3598fa91685254560dc4a2ebcf005",
+          "scope": "Add protected access-owner fixture required by the real bootstrap; all historical assertions preserved. Explicitly executed by the immutable build workflow."
+        },
+        {
+          "path": "tools/gravicentra-b4-003-post-auth-bootstrap-diagnostic.test.cjs",
+          "gitBlobSha": "88963a62a1b80c6742095dd51b78d9295a6ca076",
+          "scope": "Add protected access-owner fixture and reuse the actual provider host classifier; dependency transport remains synthetic. All historical assertions preserved. Explicitly executed by the immutable build workflow."
+        }
+      ]
     }
   ],
   "i66R11PreviewBuildRequest20261113": {

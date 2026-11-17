@@ -15,6 +15,8 @@ const receiptText = fs.readFileSync(path.join(__dirname, '..', pin.receiptPath),
 const receipt = JSON.parse(receiptText);
 const priorReceiptText = fs.readFileSync(path.join(__dirname, '..', receipt.priorRolloverReceipt.path), 'utf8');
 const priorReceipt = JSON.parse(priorReceiptText);
+const observabilityReceiptText = fs.readFileSync(path.join(__dirname, '..', priorReceipt.priorRolloverReceipt.path), 'utf8');
+const observabilityReceipt = JSON.parse(observabilityReceiptText);
 // Historical failed-residual tests stay bound to their original immutable
 // receipt, independently of how many successful Preview backups follow it.
 const residualReceiptText = fs.readFileSync(path.join(__dirname, '..',
@@ -98,15 +100,18 @@ function manifest() {
 }
 
 test('exact independently authorized technical receipt has immutable bytes, not legal authorization', () => {
-  assert.equal(digest(receiptText), '2ebd606814ca551e548bbc7537fc6016b7e0926d4806083957aa9fc65e70b8ab');
+  assert.equal(digest(receiptText), '6db064d9494103f4cd31ecf9a34e589f66455d2a818f3c0b945839872b1c6e8a');
   assert.equal(receipt.executionAuthority.newLegalConsentGrantUsedForHosting, false);
   assert.equal(api.validateAuthorization(fixture().control, receiptText).channel.id, 'gi-i66-rc-44009981499');
 });
-test('diagnostic retention successor preserves prior receipts and keeps the historical failed build unaccepted', () => {
-  assert.equal(digest(priorReceiptText), '215bfcc8fc5cffdf5c630a6696944791ea8859f0ffdd4cf35e8ba98e231eee41');
+test('hydration and balance successor preserves exact prior receipts and the historical failed build', () => {
+  assert.equal(digest(priorReceiptText), '2ebd606814ca551e548bbc7537fc6016b7e0926d4806083957aa9fc65e70b8ab');
+  assert.equal(digest(observabilityReceiptText), '215bfcc8fc5cffdf5c630a6696944791ea8859f0ffdd4cf35e8ba98e231eee41');
   assert.equal(digest(residualReceiptText), 'f0c17d2597caa8d83b281fa5b42d02016c6223035a34d894fc8e65bea687cd5d');
   assert.equal(receipt.priorRolloverReceipt.preserveBytes, true);
-  assert.equal(priorReceipt.priorRolloverReceipt.sha256, digest(residualReceiptText));
+  assert.equal(receipt.priorRolloverReceipt.sha256, digest(priorReceiptText));
+  assert.equal(priorReceipt.priorRolloverReceipt.sha256, digest(observabilityReceiptText));
+  assert.equal(observabilityReceipt.priorRolloverReceipt.sha256, digest(residualReceiptText));
   assert.equal(residualReceipt.causalRetry.failedRunRemainsFailed, true);
   assert.equal(receipt.causalRetry.newSourceRequiresNewBuildDigest, true);
   assert.equal(residualReceipt.previousCandidate.backupOnlyPostDeployFailure.noFunctionalAcceptance, true);
@@ -118,37 +123,55 @@ test('diagnostic retention successor preserves prior receipts and keeps the hist
 test('candidate pin is a fresh exact object with the recoverable previous artifact', () => {
   const changed = guard.technicalRolloverCandidatePin(); changed.channel = 'live';
   assert.equal(guard.technicalRolloverCandidatePin().channel, 'gi-i66-rc-44009981499');
-  assert.equal(pin.previousArtifactId, 14303601582);
+  assert.equal(pin.previousArtifactId, 14306747672);
   assert.equal(api.validateCandidateReuse(fixture().candidate).receiptSha256, pin.receiptSha256);
 });
-test('retention rebuild is based on the exact current 42a package and latest metadata source', () => {
-  assert.equal(receipt.sourceBaseHead, 'cbbae0f2406a33fc4703044d28273b9e08f9692c');
+test('hydration and balance rebuild pins the exact current 28ab package and metadata source', () => {
+  assert.equal(receipt.sourceBaseHead, 'd0235c6d925e52ced887dbc794f7bc19e5de9b62');
   assert.deepEqual(receipt.previousCandidate, {
-    sourceSha: '42a6764125f18106debc52edcb79741fe49e829c', buildRunId: 44026819055,
-    buildRunAttempt: 1, artifactId: 14303601582,
-    artifactDigest: 'sha256:210fb130f998f367faecefbc34c6287bf59cafcbede8002f345cfb813d4ed1b6',
+    sourceSha: '28ab17993de5297b887c0c0376d7b314f5bee6b1', buildRunId: 44035140913,
+    buildRunAttempt: 1, artifactId: 14306747672,
+    artifactDigest: 'sha256:0bcd5331ee022b5f76eea47b3ede3eb295c21f45cef6fedf19b35cd9dadf6df7',
     expectedSiteFileCount: 223,
     runtimeProofRequired: 'DOWNLOAD_HASH_ARCHIVE_VALIDATE_MANIFEST_AND_COMPARE_EVERY_HOSTED_FILE_INCLUDING_BUILD_JSON_BEFORE_REPLACEMENT'
   });
-  assert.equal(receipt.channel.expectedVersion, 'sites/ays-orbit-360-lab/versions/0872d76b5697c205');
+  assert.equal(receipt.channel.expectedVersion, 'sites/ays-orbit-360-lab/versions/ff88e2fc56df59a9');
   assert.equal(receipt.freshInventoryEvidence.totalChannels, 51);
   assert.equal(receipt.freshInventoryEvidence.otherChannelsIdenticalFullMetadata, 50);
   assert.equal(receipt.freshInventoryEvidence.freshRuntimeInventoryRequiredAgain, true);
   assert.equal(receipt.freshInventoryEvidence.afterInventorySha256,
-    'b7774ec0068043a5f80054942e46d9132f284b742a274502df548f6631b9bfb2');
+    '85a8ccaa96591dd9d208506543c385375be9d887aff15591e205c21090f28f27');
+  assert.equal(receipt.freshInventoryEvidence.runId, 44035140913);
+  assert.equal(receipt.freshInventoryEvidence.runAttempt, 1);
+  assert.equal(receipt.freshInventoryEvidence.jobId, 133876196314);
+  assert.equal(receipt.freshInventoryEvidence.rolloverEvidenceArtifactId, 14307536020);
+  assert.equal(receipt.freshInventoryEvidence.rolloverEvidenceArtifactDigest,
+    'sha256:e35cb95259f36dc93203d40ba17802387ae401f5fbbc2efc72c0a224f1ef10c6');
   assert.deepEqual(receipt.protectedLive, priorReceipt.protectedLive);
 });
-test('retention correction leaves the failed signed run and unexplained errors on HOLD', () => {
-  assert.equal(receipt.causalRetry.failedSignedRunId, 44027761291);
+test('causal successor preserves the actual 28ab signed HOLD without inventing the missing collection', () => {
+  assert.equal(receipt.causalRetry.failedSignedRunId, 44036302099);
   assert.equal(receipt.causalRetry.failedSignedRunAttempt, 1);
+  assert.equal(receipt.causalRetry.failedSignedJobId, 133879992708);
   assert.equal(receipt.causalRetry.failedSignedRunRemainsFailed, true);
-  assert.equal(receipt.causalRetry.failedDiagnosticArtifactId, 14303254179);
+  assert.equal(receipt.causalRetry.failedDiagnosticArtifactId, 14308105281);
   assert.equal(receipt.causalRetry.failedDiagnosticArtifactDigest,
-    'sha256:ed783225f8acf54ad0ca581e8752bd417209f00396f8a510cff4c369364320ae');
+    'sha256:16374d7c199531c075b49d5d677d37cfa04c0aa76285069dab9e8292e296f391');
+  assert.equal(receipt.causalRetry.observedStage, 'FINANCE_UI_HYDRATION');
+  assert.equal(receipt.causalRetry.observedContext, 'Global driver stage; only Direction navigates Finance, Operativo remains at Inicio with deferred hydration; collection not retained.');
+  assert.equal(receipt.causalRetry.observedEndpoint, 'orbit360ScopedPolicyReadPreview');
+  assert.deepEqual(receipt.causalRetry.observedHttpStatusCodes, [403, 403]);
+  assert.equal(receipt.causalRetry.observedHttpErrorCount, 2);
+  assert.equal(receipt.causalRetry.observedConsoleErrorCount, 2);
+  assert.equal(receipt.causalRetry.observedPageErrorCount, 0);
+  assert.equal(receipt.causalRetry.historicalRequestedCollectionRetained, false);
+  assert.equal(receipt.causalRetry.historicalRequestedCollection, null);
+  assert.equal(receipt.causalRetry.proposalDriverExecuted, false);
   assert.equal(receipt.causalRetry.unexpectedErrorsRemainHold, true);
   assert.equal(receipt.causalRetry.doNotRetroactivelyClassifyConsole, true);
   assert.equal(receipt.causalRetry.noBackendOrFinancialRulesChange, true);
-  assert.equal(receipt.causalRetry.frontendDiagnosticOnly, true);
+  assert.equal(receipt.causalRetry.frontendDiagnosticOnly, undefined);
+  assert.equal(receipt.causalRetry.frontendReadModelAndHydrationOnly, true);
   assert.equal(receipt.causalRetry.noProductRuntimeOrFinancialRulesChange, undefined);
   assert.equal(receipt.causalRetry.noLiveOrRealPaymentAuthority, true);
   assert.deepEqual(receipt.notAcceptance, priorReceipt.notAcceptance);
@@ -165,10 +188,10 @@ test('current backup requires build success and never borrows historical residua
   assert.throws(() => api.validateArtifact(f.run, f.artifact, f.expected,
     { residualBackupProof: f.residualBackupProof }), /BACKUP_BUILD_NOT_SUCCESS/);
   assert.throws(() => candidateGuard.validateArtifact(f.expected, f.run, f.artifact));
-  f.run.id = 44027761291;
+  f.run.id = 44036302099;
   assert.throws(() => api.validateArtifact(f.run, f.artifact, f.expected), /BUILD_ID_DRIFT/);
 });
-test('new receipt and diagnostic retention test are pinned immutable owners and existing build triggers', () => {
+test('new receipt and retained diagnostic test are pinned immutable owners and existing build triggers', () => {
   const workflow = fs.readFileSync(path.join(__dirname, '..', '.github/workflows/gravicentra-release-delta-66-package.yml'), 'utf8');
   const paths = workflow.split('\npermissions:')[0];
   for (const owner of [pin.receiptPath, 'tools/gravicentra-i6-6-preview-failure-diagnostics-retention.test.cjs']) {
@@ -176,6 +199,16 @@ test('new receipt and diagnostic retention test are pinned immutable owners and 
     assert.equal(paths.split('\n').filter(line => line.trim() === '- ' + owner).length, 1);
   }
   assert.ok(workflow.includes('node --test tools/gravicentra-i6-6-preview-failure-diagnostics-retention.test.cjs'));
+});
+test('both new regressions and protected hydration fixtures are pinned without changing the gate', () => {
+  for (const owner of [
+    'tools/gravicentra-i6-6-receipt-current-balance.test.cjs',
+    'tools/gravicentra-i6-6-protected-role-policy-hydration.test.cjs',
+    'tools/gravicentra-b4-003-protected-hydration.test.cjs',
+    'tools/gravicentra-b4-003-post-auth-bootstrap-diagnostic.test.cjs'
+  ]) assert.equal(candidateGuard.PINNED_OWNER_PATHS.filter(value => value === owner).length, 1);
+  const workflow = fs.readFileSync(path.join(__dirname, '..', '.github/workflows/gravicentra-release-delta-66-package.yml'), 'utf8');
+  assert.ok(workflow.includes('node --test tools/gravicentra-b4-003-protected-hydration.test.cjs tools/gravicentra-b4-003-post-auth-bootstrap-diagnostic.test.cjs'));
 });
 test('fixed current Preview and accepted R11 channels validate, including project-qualified resources', () => {
   const f = fixture();
@@ -239,7 +272,7 @@ test('another project or site cannot be normalized into the exact target', () =>
   assert.throws(() => api.validateChannels(f.control, receiptText, f.inventory), /CHANNEL_RESOURCE_SCOPE_DENIED/);
 });
 test('current backup must be its exact successful whole build and unexpired artifact', () => {
-  const f = acceptedBackupFixture(); assert.equal(api.validateArtifact(f.run, f.artifact, f.expected).artifactId, 14303601582);
+  const f = acceptedBackupFixture(); assert.equal(api.validateArtifact(f.run, f.artifact, f.expected).artifactId, 14306747672);
 });
 for (const key of ['id', 'head_sha', 'head_branch', 'path', 'status', 'conclusion', 'run_attempt']) {
   test('previous artifact rejects build provenance drift ' + key, () => {

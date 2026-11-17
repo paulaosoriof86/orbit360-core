@@ -100,10 +100,11 @@
     var own=clean(r&&r.moneda).toUpperCase(),linked=clean(p&&(p.moneda||p.divisa)).toUpperCase();
     return own&&linked&&own!==linked?'SIN_MONEDA':own||linked||'SIN_MONEDA';
   }
-  function sumByCurrency(rows){
+  function sumByCurrency(rows,valueOf){
     var by=Object.create(null);
     (rows||[]).forEach(function(r){
-      var n=numberOrNull(r&&(r.primaTotal!=null?r.primaTotal:(r.montoTotal!=null?r.montoTotal:(r.montoFuente!=null?r.montoFuente:r.monto))));
+      var raw=typeof valueOf==='function'?valueOf(r):(r&&(r.primaTotal!=null?r.primaTotal:(r.montoTotal!=null?r.montoTotal:(r.montoFuente!=null?r.montoFuente:r.monto))));
+      var n=numberOrNull(raw);
       if(n==null)return;
       var currency=originalCurrency(r);by[currency]=(by[currency]||0)+n;
     });
@@ -285,11 +286,26 @@
     return'<button class="btn primary sm" data-rp-apply-payment="'+id+'" data-rp-reported="'+(a.kind==='reported'?'1':'0')+'" data-rp-advisor-report="'+(a.kind==='advisor_report'?'1':'0')+'">'+a.label+'</button>';
   }
 
+  // Presentation delegates financial authority to the canonical query owner.
+  // A retained nominal premium is not an open balance; an unknown balance is
+  // never replaced with the receipt total or silently displayed as zero.
+  function currentPortfolioBalance(row,context){
+    var q=Orbit.q;
+    if(!row||!q||typeof q.portfolioOpen!=='function')return{open:null,value:null,source:'UNVERIFIED'};
+    var open=q.portfolioOpen(row);
+    if(!open)return{open:false,value:0,source:'CLOSED_OBLIGATION'};
+    if(typeof q.portfolioAmountProof!=='function')return{open:true,value:null,source:'UNVERIFIED'};
+    var ctx=context||(typeof q.portfolioAmountContext==='function'?q.portfolioAmountContext():null),proof=q.portfolioAmountProof(row,ctx);
+    return{open:true,value:numberOrNull(proof&&proof.value),source:clean(proof&&proof.source)||'UNVERIFIED'};
+  }
+
   function portfolioSummary(cid){
     var rows=Orbit.store.where('carteraPrimas',function(r){return r&&r.clienteId===cid;}),historical=rows.filter(function(r){return isHistorical(r)&&portfolioClass(r).open;}),review=rows.filter(isCalendarReview),active=rows.filter(function(r){return calendarClass(r)==='current'&&portfolioClass(r).open;});
     var future=active.filter(isFuture),due=active.filter(function(r){return portfolioClass(r).overdue;}),undated=active.filter(function(r){return portfolioClass(r).unknownDate;});
     var reconciled=active.filter(isPortfolioReconciled);
-    var futureByCurrency=sumByCurrency(future),dueByCurrency=sumByCurrency(due),historicalByCurrency=sumByCurrency(historical),reviewByCurrency=sumByCurrency(review),reconciledByCurrency=sumByCurrency(reconciled),activeByCurrency=sumByCurrency(active),undatedByCurrency=sumByCurrency(undated);
+    var context=Orbit.q&&typeof Orbit.q.portfolioAmountContext==='function'?Orbit.q.portfolioAmountContext():null;
+    var balanceOf=function(row){return currentPortfolioBalance(row,context).value;};
+    var futureByCurrency=sumByCurrency(future,balanceOf),dueByCurrency=sumByCurrency(due,balanceOf),historicalByCurrency=sumByCurrency(historical,balanceOf),reviewByCurrency=sumByCurrency(review,balanceOf),reconciledByCurrency=sumByCurrency(reconciled,balanceOf),activeByCurrency=sumByCurrency(active,balanceOf),undatedByCurrency=sumByCurrency(undated,balanceOf);
     return{rows:rows,future:future,due:due,undated:undated,historical:historical,review:review,active:active,reconciled:reconciled,
       futureByCurrency:futureByCurrency,dueByCurrency:dueByCurrency,undatedByCurrency:undatedByCurrency,historicalByCurrency:historicalByCurrency,reviewByCurrency:reviewByCurrency,reconciledByCurrency:reconciledByCurrency,activeByCurrency:activeByCurrency,
       futureAmount:homogeneousAmount(futureByCurrency),dueAmount:homogeneousAmount(dueByCurrency),historicalAmount:homogeneousAmount(historicalByCurrency),reviewAmount:homogeneousAmount(reviewByCurrency),reconciledAmount:homogeneousAmount(reconciledByCurrency),totalAmount:homogeneousAmount(activeByCurrency)};
@@ -337,7 +353,8 @@
     var provenance=paymentProvenanceKind(r,payment),evidence=payment&&clean(payment.id)?payment:r;
     if(provenance==='INFERRED')return'Pago inferido a partir de evidencia autoritativa. La fecha real de pago no se inventa; la conciliación se muestra como una dimensión separada.';
     if(isPaymentReconciled(evidence))return'Este pago confirmado ya fue conciliado contra fuentes autoritativas.';
-    if(isPortfolioReconciled(portfolio))return'El saldo pendiente fue conciliado contra la fuente de autoridad de la aseguradora. Esto confirma cartera; no equivale a un pago.';
+    if(provenance==='DIRECT')return'El pago está confirmado. Su aplicación o conciliación con la aseguradora se controla por separado.';
+    if(isPortfolioReconciled(portfolio)&&portfolioClass(portfolio).open)return'El saldo pendiente fue conciliado contra la fuente de autoridad de la aseguradora. Esto confirma cartera; no equivale a un pago.';
     var s=clean(r&&r.estadoOperativo);
     if(s==='pago_reportado'){
       var origin=paymentOriginKind(r);
@@ -431,6 +448,7 @@
     var back='#/cliente360?c='+encodeURIComponent(cid||r.clienteId||p.clienteId||'')+'&t=recibos';
     var cell=function(k,val){var shown=val==null||clean(val)===''||/^(undefined|null)$/i.test(clean(val))?'Pendiente de completar':val;return'<div><div style="font-size:12px;font-weight:600;color:var(--ink-2);text-transform:uppercase;letter-spacing:.035em">'+esc(k)+'</div><div style="font-size:13.5px;font-weight:500;line-height:1.42;margin-top:3px">'+esc(shown)+'</div></div>';};
     var provenance=paymentProvenanceKind(r,payment);
+    var balance=currentPortfolioBalance(portfolio),balanceState=balance.open===false?'closed':balance.value==null?'unverified':'open',balanceText=balance.value==null?'Importe por verificar':moneyDetail(balance.value,cur);
     var badgeRows=[st];if(payment&&clean(payment.id)&&rec&&clean(rec.t)!==clean(st.t))badgeRows.push(rec);
     var badges=badgeRows.filter(Boolean).map(function(x){return'<span class="badge '+x.c+'">'+esc(x.t)+'</span>';}).join('');
     var asOf=payment.evidenceAsOfDate||(payment.inferenceProvenance&&payment.inferenceProvenance.evidenceAsOfDate)||(portfolio&&portfolio.fechaCorteFuente)||r.fechaCorteFuente||'';
@@ -448,7 +466,8 @@
       +'<div class="orbit-detail-layout" data-rp-detail-layout="1" style="display:grid;grid-template-columns:minmax(0,1.2fr) minmax(300px,.8fr);gap:16px"><section class="card pad"><h3 style="margin-top:0;font-size:17px;font-weight:800">🧾 Desglose del recibo</h3><div class="orbit-detail-grid" data-rp-detail-values="1" style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px">'
       +cell('Prima neta',moneyDetail(r.primaNeta,cur))+cell('Gastos de expedición',moneyDetail(r.gastosExpedicion,cur))+cell('Gastos financieros',moneyDetail(r.gastosFinanciamiento,cur))+cell('Descuento / ajuste',moneyDetail(r.descuento,cur))+cell('IVA / impuestos',moneyDetail(r.impuestosIVA,cur))+cell('Prima total',moneyDetail(r.primaTotal!=null?r.primaTotal:(r.montoTotal!=null?r.montoTotal:r.monto),cur))+cell('Vencimiento de cuota',fmtDate(r.vence))+cell('Fecha límite operativa',fmtDate(dueDate(r)))+cell('Fecha real de pago',paidDate?fmtDate(paidDate):'No informada')+cell('Fecha operativa inferida',r.inferredEffectiveDate?fmtDate(r.inferredEffectiveDate):'No aplica')+cell('Fecha de aplicación',applicationDate?fmtDate(applicationDate):'Pendiente / no informada')+cell('Número de factura',invoiceNumber||'No informado')+receiptDocumentHtml('Soporte de pago',paymentSupportRef,'payment_support')+receiptDocumentHtml('Factura / soporte de aplicación',invoiceDocumentRef,'insurer_invoice')
       +'</div></section><div style="display:grid;gap:16px"><section class="card pad"><h3 style="margin-top:0;font-size:17px;font-weight:800">🔎 Estado del recibo</h3><div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">'+badges+'</div>'+(provenance==='INFERRED'?'<div data-rp-payment-provenance="inferred" class="cfg-note" style="margin-bottom:10px"><b>Pago inferido</b> · fecha real de pago no informada'+(sourceRef?' · evidencia: '+esc(sourceRef):'')+'</div>':'')+'<div class="muted" style="line-height:1.5">'+esc(receiptStateNote(r,portfolio,payment))+'</div>'
-      +(portfolio?'<div style="margin-top:10px">En cartera: <span style="font-weight:600">'+esc(moneyDetail(portfolio.primaTotal||portfolio.montoTotal||portfolio.monto||r.primaTotal||r.montoTotal||r.monto,cur))+'</span></div>':'')
+      +'<div data-rp-current-balance="'+balanceState+'" style="margin-top:10px">Saldo pendiente: <span style="font-weight:600">'+esc(balanceText)+'</span></div>'
+      +(balance.open===false?'<div class="muted" style="font-size:12px;margin-top:4px">La obligación está cerrada; el importe original del recibo se conserva como histórico.</div>':'')
       +'</section><section class="card pad"><h3 style="margin-top:0;font-size:17px;font-weight:800">📅 Información del registro</h3><div class="orbit-detail-grid" style="display:grid;grid-template-columns:1fr;gap:12px">'+(operationalAsOf||'<div class="muted">Sin fecha adicional reportada.</div>')+'</div><details class="gi-technical-origin" style="margin-top:14px"><summary>Detalles de origen y auditoría</summary><div class="orbit-detail-grid" style="display:grid;grid-template-columns:1fr;gap:12px;margin-top:12px">'+trace+'</div></details></section></div></div></div>';
     wireReceiptDocuments(target,r,p,c);
     var clientIdForBack=clean(cid||r.clienteId||p.clienteId),cliente360Mod=Orbit.modules&&Orbit.modules.cliente360;if(target.id==='host'&&clientIdForBack&&cliente360Mod&&typeof cliente360Mod.prepareReceiptReturn==='function')cliente360Mod.prepareReceiptReturn(clientIdForBack);var backLocal=target.querySelector('[data-rp-back-local="1"]');if(backLocal)backLocal.addEventListener('click',function(e){var clientId=clean(cid||r.clienteId||p.clienteId),body=document.getElementById('c360-body'),mod=Orbit.modules&&Orbit.modules.cliente360;if(clientId&&body&&target===body){e.preventDefault();e.stopPropagation();var t0=(window.performance&&performance.now)?performance.now():Date.now();renderReceipts(clientId);var t1=(window.performance&&performance.now)?performance.now():Date.now();window.OrbitRuntimeDiagnostics=window.OrbitRuntimeDiagnostics||{};OrbitRuntimeDiagnostics.receiptsBack={mode:'local_receipts_body',renderMs:Math.max(0,t1-t0),clientId:clientId,writes:0,fullCliente360Rebuild:false,routerReload:false};return;}if(clientId&&mod&&typeof mod.reabrir==='function'){e.preventDefault();e.stopPropagation();var f0=(window.performance&&performance.now)?performance.now():Date.now();mod.reabrir(clientId,'recibos');try{history.replaceState(history.state||null,'',back);}catch(_){}var f1=(window.performance&&performance.now)?performance.now():Date.now();window.OrbitRuntimeDiagnostics=window.OrbitRuntimeDiagnostics||{};OrbitRuntimeDiagnostics.receiptsBack={mode:'prefetched_cliente360_receipts',renderMs:Math.max(0,f1-f0),clientId:clientId,writes:0,fullCliente360Rebuild:true,summaryPrefetched:true,routerReload:false};}});

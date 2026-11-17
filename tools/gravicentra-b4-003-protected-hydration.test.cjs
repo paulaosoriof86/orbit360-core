@@ -365,6 +365,11 @@ const pause=()=>new Promise(ok=>setTimeout(ok,30));
    modulesExtra:[],modulesRestricted:[]};
  const mockOrbit={
    session:{rol:()=>bootstrapRole},
+   domainConfig:{
+     ensure:async domain=>({ok:true,domain,source:'protected',syncPending:false}),
+     status:()=>({tenantId:tenant,domains:[{domain:'access',source:'protected',syncPending:false}]}),
+     peekReadOnly:()=>({schemaVersion:'gravicentra-access-policy-v1',rolePermissions:{}})
+   },
    membershipMultirolEffectiveP0:{
      normalize:m=>m,validate:m=>({ok:true,membership:m,errors:[]}),effectiveModules:()=>[]
    },

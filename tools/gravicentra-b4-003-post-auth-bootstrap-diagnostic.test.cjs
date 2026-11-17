@@ -7,10 +7,16 @@ const vm=require('node:vm');
 const bootstrap=fs.readFileSync('orbit360-platform/core/backend-product-readonly-bootstrap-p0.js','utf8');
 const app=fs.readFileSync('orbit360-platform/core/product-app-p0.js','utf8');
 const auth=fs.readFileSync('orbit360-platform/core/auth-product-runtime-p0.js','utf8');
+const providers=fs.readFileSync('orbit360-platform/core/product-runtime-browser-providers-p0.js','utf8');
 const tenant='synthetic-tenant';
 const role={uid:'test-uid',email:'test@example.invalid',tenantId:tenant,
   status:'active',activeRole:'asesor',roles:['asesor'],countries:['GT'],modulesExtra:[],modulesRestricted:[]};
 const bootOwner={
+  domainConfig:{
+    ensure:async domain=>({ok:true,domain,source:'protected',syncPending:false}),
+    status:()=>({tenantId:tenant,domains:[{domain:'access',source:'protected',syncPending:false}]}),
+    peekReadOnly:()=>({schemaVersion:'gravicentra-access-policy-v1',rolePermissions:{}})
+  },
   membershipMultirolEffectiveP0:{normalize:x=>x,validate:x=>({ok:true,membership:x,errors:[]}),effectiveModules:()=>[]},
   tenantCanonicalPathsP0:{VERSION:'mock',validateTenantId:x=>({ok:x===tenant,tenantId:x})},
   tenantAccessPolicyProductP0:{VERSION:'mock'},
@@ -57,6 +63,13 @@ const opts={mode:'product',authorizedProductReadOnly:true,runtimeAuthorized:true
     productHydrationRequiredOptionalP0:{contract:()=>({required:['clientes']})}
   },location:{hostname:'ays-orbit-360-lab--gi-i65-b4-synthetic.web.app'},
     __ORBIT360_PRODUCT_PUBLIC_CONFIG__:{enabled:true,scopedReadPreviewCandidate:true}};
+  // Retain the actual exact-host classifier; only its dependency transport is
+  // synthetic. The historical stub omitted the now-required shared classifier.
+  vm.runInNewContext(providers,{window:appWindow,Promise,Set,Map,console},{timeout:1000});
+  appWindow.Orbit.productRuntimeBrowserProvidersP0={
+    protectedHostMode:appWindow.Orbit.productRuntimeBrowserProvidersP0.protectedHostMode,
+    dependencies:()=>({})
+  };
   vm.runInNewContext(app,{window:appWindow,Orbit:appWindow.Orbit,Promise,
     console:{warn:(...args)=>warnings.push(args)},
     document:{querySelector:()=>null,dispatchEvent:()=>{}},CustomEvent:function(){}},{timeout:1000});
