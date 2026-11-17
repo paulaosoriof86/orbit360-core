@@ -9,6 +9,7 @@ const { normalizeRole, resolveProductActiveRole } = require('./product-active-ro
 const { planEvidence } = require('./payment-inference-engine');
 const proposalBoundary = require('./proposal-application-boundary');
 const proposalAccess = require('./b4-003-scoped-access-boundary');
+const sourceIntake = require('./cobros-source-intake-v2');
 
 const REGION = process.env.ORBIT360_FUNCTIONS_REGION || 'us-central1';
 const VERSION = 'orbit360-cobros-reconciliation-domain-v6-b3005-inference-owner';
@@ -18,7 +19,7 @@ const db = getFirestore(app);
 const ADMIN_ROLES = new Set(['superadmin', 'admintenant', 'direccion', 'admin', 'operativo', 'finanzas']);
 const ADVISOR_REPORT_ROLES = new Set(['asesor', 'asesora', 'asesor_sr', 'asesora_sr', 'asesor_jr', 'asesora_jr', 'comercial']);
 const PERMISSIONS = new Set(['cobros_manage', 'conciliaciones_manage', 'payments_reconcile']);
-const OPERATIONS = new Set(['preview_policy', 'preview_proposal_application', 'resolve_proposal_application', 'apply_proposal_application', 'report_advisor_payment', 'apply_payment', 'reconcile_payment', 'reconcile_evidence', 'register_evidence', 'confirm_application', 'hold_proposal', 'reopen_proposal']);
+const OPERATIONS = new Set(['preview_policy', 'preview_proposal_application', 'resolve_proposal_application', 'apply_proposal_application', 'intake_source_run', 'report_advisor_payment', 'apply_payment', 'reconcile_payment', 'reconcile_evidence', 'register_evidence', 'confirm_application', 'hold_proposal', 'reopen_proposal']);
 
 const text = (value, max = 1000) => String(value == null ? '' : value).replace(/\u0000/g, '').trim().slice(0, max);
 const norm = value => text(value, 180).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').replace(/\s+/g, ' ').trim();
@@ -771,12 +772,39 @@ async function proposalApplicationContext(authz, payload, read,requireWrite=fals
   if(requireWrite)assertProposalWrite(authz,accessConfig);
   if(!configSnap.exists)return proposalBoundary.review('TENANT_RECONCILIATION_CONFIG_REQUIRED');
   const qaRun=syntheticProposalRun(authz.tenantId,payload);
-  const assessment=await proposalBoundary.assessProposalApplication({tenantId:authz.tenantId,payload,read,syntheticQaRun:qaRun,
+  let selected=null;
+  if(!qaRun){
+    try{selected=await sourceIntake.selectedLedger({tenantId:authz.tenantId,requestedRun:text(payload.sourceRunId,180),read,
+      controlRef:controlRef(authz.tenantId),runRef:runId=>runRef(authz.tenantId,runId),validate:validateActiveLedgerContract});}
+    catch(error){return proposalBoundary.review(error.code==='SOURCE_ACTIVE_RUN_CHANGED'?error.code:'SOURCE_LEDGER_INTEGRITY_MISMATCH');}
+  }
+  const qaManifest=qaRun?await read(tenantData(authz.tenantId,'cobrosLedgerQaRuns').doc(qaRun)):null;
+  const sourceManifest=selected&&selected.manifest||qaManifest&&qaManifest.exists&&qaManifest.data();
+  let admittedProposal=null;
+  if(sourceManifest&&sourceManifest.schemaVersion===sourceIntake.MANIFEST_SCHEMA){
+    const proposalRun=qaRun?tenantData(authz.tenantId,'cobrosLedgerQaRuns').doc(qaRun):runRef(authz.tenantId,sourceManifest.runId);
+    const sourceRow=await read(proposalRun.collection('propuestasConciliacion').doc(id(payload.proposalId,'proposalId')));
+    if(sourceRow.exists)admittedProposal=sourceRow.data();
+  }
+  // Only a server-verified retained run can substitute the active pointer for
+  // this assessment. Its original runId preserves prior application identity.
+  const scopedRead=async ref=>selected&&ref.path===controlRef(authz.tenantId).path?
+    {exists:true,data:()=>selected.pointer}:read(ref);
+  const assessment=await proposalBoundary.assessProposalApplication({tenantId:authz.tenantId,payload,read:scopedRead,syntheticQaRun:qaRun,
     items:collection=>tenantData(authz.tenantId,collection),
     control:()=>qaRun?tenantData(authz.tenantId,'cobrosLedgerQaControl').doc(qaRun):controlRef(authz.tenantId),
     runRef:runId=>qaRun?tenantData(authz.tenantId,'cobrosLedgerQaRuns').doc(runId):runRef(authz.tenantId,runId),
     assertScope:(policy,receipt)=>{
       const country=assertPaymentCountryScope(authz,policy,receipt);
+      if(admittedProposal&&!qaRun&&(policy.__syntheticQa===true||/^b3005qa_/.test(String(policy.id||policy.polizaId||''))||
+          receipt&&(receipt.__syntheticQa===true||/^b3005qa_/.test(String(receipt.id||'')))))
+        throw new HttpsError('permission-denied','SOURCE_REAL_INTAKE_SYNTHETIC_TARGET_DENIED');
+      if(sourceManifest&&sourceManifest.schemaVersion===sourceIntake.MANIFEST_SCHEMA&&
+          (country!==sourceManifest.source.country||text(policy.aseguradoraId||policy.insurerId,180)!==sourceManifest.source.insurerId))
+        throw new HttpsError('permission-denied','SOURCE_POLICY_INSURER_OR_COUNTRY_MISMATCH');
+      if(admittedProposal&&(admittedProposal.policyStartDate&&sourceIntake.canonicalPolicyDate(policy,'start')!==admittedProposal.policyStartDate||
+          admittedProposal.policyEndDate&&sourceIntake.canonicalPolicyDate(policy,'end')!==admittedProposal.policyEndDate))
+        throw new HttpsError('failed-precondition','SOURCE_POLICY_TERM_MISMATCH');
       try {
         const ctx=proposalAccess.resolve({auth:authz.auth,member:authz.member,config:accessConfig,
           tenantId:authz.tenantId,activeRole:authz.actor.activeRole,collection:'conciliaciones',country});
@@ -785,6 +813,20 @@ async function proposalApplicationContext(authz, payload, read,requireWrite=fals
       return country;
     },
     config:configSnap.exists?configSnap.data():{}});
+  if(admittedProposal&&admittedProposal.installment){
+    // The source quota identifies the anchor, not every prior quota inferred
+    // by the existing planner. Apply this constraint to selection/anchor only.
+    const matchesSourceQuota=(policy,receipt)=>sourceIntake.matchesCanonicalInstallment(admittedProposal,policy,receipt);
+    if(assessment.status==='RESOLUTION_DRAFT'){
+      assessment.candidates=assessment.candidates.filter(candidate=>matchesSourceQuota(candidate.policy,candidate.receipt));
+      const allowed=new Set(assessment.candidates.map(candidate=>candidate.policy.id+'|'+candidate.receipt.id));
+      assessment.resolutionView.resolutionOptions=assessment.resolutionView.resolutionOptions.filter(option=>allowed.has(option.policyId+'|'+option.receiptId));
+    }else if(assessment.eligible&&!matchesSourceQuota(assessment.policy,assessment.receipts.find(row=>row.id===assessment.evidencePayload.receiptId)))
+      return proposalBoundary.review('SOURCE_RECEIPT_INSTALLMENT_MISMATCH');
+  }
+  if(admittedProposal&&assessment.eligible&&assessment.evidencePayload.evidenceType==='BANK_STATEMENT_MATCH'&&
+      (!assessment.evidencePayload.paidDate||assessment.evidencePayload.actualPaidDateEvidence!==true))
+    return proposalBoundary.review('SOURCE_BANK_PAID_DATE_REQUIRED');
   if(assessment.eligible)for(const target of assessment.plan.targets){
     const receipt=assessment.receipts.find(row=>row.id===target.receiptId);
     const [cobros,portfolio]=await Promise.all([
@@ -799,6 +841,96 @@ async function proposalApplicationContext(authz, payload, read,requireWrite=fals
         question:'La relación de '+issue.destination.toLowerCase()+' no coincide en '+issue.field+'. No se aplicó dinero; debe corregirse ese dato del destino.'});}
   }
   return assessment;
+}
+
+async function intakeSourceRun(authz,data,payload,previewOnly){
+  let input;
+  try{input=sourceIntake.prepareInput(authz.tenantId,payload);}
+  catch(error){throw new HttpsError('invalid-argument',error.code||'SOURCE_INTAKE_INVALID');}
+  const synthetic=sourceIntake.QA_SOURCE.test(input.source.sourceId);
+  if(!synthetic&&(/^b3005qa_/.test(input.source.sourceId)||input.rows.some(row=>/^b3005qa_/.test(row.policyId)||/^b3005qa_/.test(row.receiptId))))
+    throw new HttpsError('permission-denied','SOURCE_REAL_INTAKE_SYNTHETIC_TARGET_DENIED');
+  if(previewOnly&&!synthetic)throw new HttpsError('permission-denied','SOURCE_INTAKE_PREVIEW_REAL_DATA_DENIED');
+  if(synthetic){
+    if(authz.tenantId!=='alianzas-soluciones')throw new HttpsError('permission-denied','SOURCE_QA_TENANT_DENIED');
+    input.runId='cobledgerqa_'+input.batchDigest.slice(0,28);input.qaRunId=input.runId;
+  }
+  const qa=input.qaRunId||'';
+  const targetRun=id=>tenantData(authz.tenantId,qa?'cobrosLedgerQaRuns':'cobrosLedgerRuns').doc(id);
+  const targetControl=qa?tenantData(authz.tenantId,'cobrosLedgerQaControl').doc(qa):controlRef(authz.tenantId);
+  const registryNames={sources:'cobrosLedgerSources',rows:'cobrosLedgerSourceRows',groups:'cobrosLedgerSourceGroups'};
+  const registryRef=(kind,key)=>qa?targetRun(qa).collection('intake_'+kind).doc(key):tenantData(authz.tenantId,registryNames[kind]).doc(key);
+  const bindRows=async(read,prepared)=>{
+    const access=await read(db.collection('tenants').doc(authz.tenantId).collection('config').doc('access'));
+    const accessConfig=access.exists?access.data():{};
+    assertProposalWrite(authz,accessConfig);
+    assertPaymentCountryScope(authz,{pais:prepared.source.country});
+    let ctx;
+    try{ctx=proposalAccess.resolve({auth:authz.auth,member:authz.member,config:accessConfig,tenantId:authz.tenantId,
+      activeRole:authz.actor.activeRole,collection:'conciliaciones',country:prepared.source.country});}
+    catch(error){throw new HttpsError('permission-denied',text(error.code||'SOURCE_INTAKE_SCOPE_DENIED',180));}
+    const insurer=await read(tenantData(authz.tenantId,'aseguradoras').doc(prepared.source.insurerId));
+    if(!insurer.exists||insurer.data().tenantId&&insurer.data().tenantId!==authz.tenantId||
+       insurer.data().pais&&paymentCountry(insurer.data().pais)!==prepared.source.country)
+      throw new HttpsError('failed-precondition','SOURCE_INSURER_CANONICAL_NOT_FOUND');
+    if(!qa){
+      const canonical=await read(tenantData(authz.tenantId,'conciliaciones').limit(1));
+      if(canonical.docs.length)throw new HttpsError('failed-precondition','SOURCE_CANONICAL_PROJECTION_CONFLICT');
+    }
+    const policies=new Map(),receipts=new Map(),bindings=new Map();
+    for(const row of prepared.rows){
+      if(!policies.has(row.policyNumber)){
+        const snap=await read(tenantData(authz.tenantId,'polizas').where('numero','==',row.policyNumber).limit(21));
+        policies.set(row.policyNumber,snap.docs.map(doc=>Object.assign({id:doc.id},doc.data())));
+      }
+      const all=policies.get(row.policyNumber);
+      if(all.length>20){bindings.set(row.key,{reason:'SOURCE_POLICY_EDITION_AMBIGUOUS'});continue;}
+      const matches=all.filter(policy=>{
+        if(policy.tenantId&&policy.tenantId!==authz.tenantId||text(policy.aseguradoraId||policy.insurerId,180)!==prepared.source.insurerId||
+           paymentCountry(policy.pais)!==prepared.source.country||text(policy.moneda||policy.currency,12).toUpperCase()!==prepared.source.currency||
+           row.policyId&&policy.id!==row.policyId||row.policyStartDate&&sourceIntake.canonicalPolicyDate(policy,'start')!==row.policyStartDate||
+           row.policyEndDate&&sourceIntake.canonicalPolicyDate(policy,'end')!==row.policyEndDate)return false;
+        try{proposalAccess.allowRow(ctx,policy);return true;}catch(_){return false;}
+      });
+      if(matches.length!==1){
+        if(ctx.scope!=='all')throw new HttpsError('permission-denied','SOURCE_UNRESOLVED_SCOPE_DENIED');
+        if(qa)throw new HttpsError('permission-denied','SOURCE_QA_POLICY_REQUIRED');
+        bindings.set(row.key,{reason:matches.length?'SOURCE_POLICY_EDITION_AMBIGUOUS':'SOURCE_POLICY_EDITION_NOT_FOUND'});continue;
+      }
+      const policy=matches[0];
+      if(!qa&&(policy.__syntheticQa===true||/^b3005qa_/.test(policy.id)))throw new HttpsError('permission-denied','SOURCE_REAL_INTAKE_SYNTHETIC_TARGET_DENIED');
+      if(qa&&(!row.policyId||!row.receiptId||policy.__syntheticQa!==true||policy.qaRunId!==qa||!/^b3005qa_/.test(policy.id)))
+        throw new HttpsError('permission-denied','SOURCE_QA_POLICY_REQUIRED');
+      if(!receipts.has(policy.id)){
+        const snap=await read(tenantData(authz.tenantId,'recibosEsperados').where('polizaId','==',policy.id).limit(101));
+        receipts.set(policy.id,snap.docs.map(doc=>Object.assign({id:doc.id},doc.data())));
+      }
+      const canonicalReceipts=receipts.get(policy.id);
+      const exact=canonicalReceipts.filter(receipt=>{
+        if(receipt.tenantId&&receipt.tenantId!==authz.tenantId||receipt.clienteId&&policy.clienteId&&receipt.clienteId!==policy.clienteId)return false;
+        try{assertPaymentCountryScope(authz,policy,receipt);proposalAccess.allowRow(ctx,policy,[receipt]);}catch(_){return false;}
+        if(text(receipt.moneda||receipt.currency||policy.moneda,12).toUpperCase()!==prepared.source.currency)return false;
+        if(row.receiptId)return receipt.id===row.receiptId;
+        if(row.receiptNumber)return ['numeroReciboFuente','numeroRecibo','reciboNumero','numero','requerimiento'].some(k=>text(receipt[k],180)===row.receiptNumber);
+        return false;
+      });
+      if(qa&&(exact.length!==1||exact[0].__syntheticQa!==true||exact[0].qaRunId!==qa||!/^b3005qa_/.test(exact[0].id)))
+        throw new HttpsError('permission-denied','SOURCE_QA_RECEIPT_REQUIRED');
+      let hold=canonicalReceipts.length>100?'SOURCE_RECEIPT_NOT_UNIQUE':exact.length!==1?'SOURCE_RECEIPT_IDENTITY_MISSING':'';
+      const receipt=exact.length===1?exact[0]:null;
+      if(!qa&&receipt&&(receipt.__syntheticQa===true||/^b3005qa_/.test(receipt.id)))throw new HttpsError('permission-denied','SOURCE_REAL_INTAKE_SYNTHETIC_TARGET_DENIED');
+      if(receipt&&row.installmentIndex&&!sourceIntake.matchesCanonicalInstallment(row,policy,receipt))hold='SOURCE_RECEIPT_INSTALLMENT_MISMATCH';
+      if(receipt&&['INVOICE_INSTALLMENT_N','BANK_STATEMENT_MATCH'].includes(prepared.source.evidenceType)&&
+          (row.amount==null||receiptAmount(receipt)!==row.amount))hold='SOURCE_RECEIPT_AMOUNT_MISMATCH';
+      bindings.set(row.key,{policyId:policy.id,receiptId:receipt&&receipt.id||'',reason:hold});
+    }
+    return bindings;
+  };
+  try{return await sourceIntake.commitIntake({input,db,items:collection=>tenantData(authz.tenantId,collection),runRef:targetRun,
+    controlRef:targetControl,registryRef,requestRef:id=>qa?targetRun(qa).collection('intakeRequests').doc(id):requestRef(authz.tenantId,id),
+    eventRef:id=>qa?targetRun(qa).collection('intakeAudit').doc(id):eventRef(authz.tenantId,id),actor:authz.actor,reason:reason(data,true),now,
+    validate:validateActiveLedgerContract,bindRows,qaPermission:synthetic});}
+  catch(error){if(error instanceof HttpsError)throw error;throw new HttpsError('failed-precondition',error.code||'SOURCE_INTAKE_COMMIT_FAILED');}
 }
 async function verifyProposalReadback(authz, result) {
   if (!result || !result.applicationId || !Array.isArray(result.results) || !result.results.length)
@@ -1150,7 +1282,9 @@ async function reconcileEvidence(authz, data, payload, previewOnly, proposalRequ
       committed.approvalMode='MANUAL_AUTHORIZED';
       tx.set(trustedProposal.applicationRef,{id:proposalRequest.applicationId,status:'APPLIED',tenantId:authz.tenantId,
         pais:assertPaymentCountryScope(authz,policy),proposalId:trustedProposal.proposalId,sourceRunId:trustedProposal.sourceRunId,
-        scopeAnchor:{tenantId:authz.tenantId,pais:text(policy.pais),asesorId:text(policy.asesorId||policy.advisorId),polizaId:policyId},
+        scopeAnchor:{tenantId:authz.tenantId,pais:text(policy.pais),asesorId:text(policy.asesorId||policy.advisorId),polizaId:policyId,
+          aseguradoraId:text(policy.aseguradoraId||policy.insurerId,180),vigenciaInicio:sourceIntake.canonicalPolicyDate(policy,'start'),
+          vigenciaFin:sourceIntake.canonicalPolicyDate(policy,'end')},
         sourceProposalDigest:trustedProposal.sourceProposalDigest,sourceEvidenceDigest:trustedProposal.sourceEvidenceDigest,
         planDigest:trustedProposal.planDigest,resolutionId:trustedProposal.resolutionId||null,sourceAmount:trustedProposal.sourceAmount,actor:authz.actor,
         beforeAfter,result:committed,createdAt:technicalNow,...qaMark},{merge:false});
@@ -1194,6 +1328,7 @@ async function executePreview(request) {
   const data = request.data || {}, payload = data.payload || {};
   const targetId = text(payload.receiptId || payload.reciboId || payload.polizaId || payload.policyId || payload.proposalId, 180);
   const op=norm(data.operation).replace(/ /g, '_');
+  if(op==='intake_source_run')return execute(request,true);
   // Preview may inspect a real proposal without mutation; the signed command
   // still enforces membership, module visibility, country and data scope.
   if(op==='preview_proposal_application')return execute(request,true);
@@ -1220,6 +1355,7 @@ async function execute(request, previewOnly = false) {
   const authz = await authorize(request, operation);
   const payload = data.payload && typeof data.payload === 'object' ? data.payload : {};
 
+  if (operation === 'intake_source_run') return intakeSourceRun(authz,data,payload,previewOnly===true);
   if (operation === 'preview_policy') return previewPolicy(authz, payload);
   if (operation === 'preview_proposal_application') return proposalApplication(authz,data,payload,false,previewOnly);
   if (operation === 'resolve_proposal_application') return resolveProposalApplication(authz,data,payload,previewOnly);

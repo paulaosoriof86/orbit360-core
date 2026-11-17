@@ -74,6 +74,58 @@
     reason:binding.reason||'Vinculación expresa de fuente y recibo por usuario autorizado; sin aplicar pagos'});}
   function applyProposalApplication(proposalId,sourceRunId,planDigest){return command('apply_proposal_application',{payload:{proposalId,sourceRunId,planDigest},reason:'Aprobación y aplicación de conciliación con evidencia server-side'});}
   function holdProposal(proposalId,motivo,accionRequerida){return command('hold_proposal',{payload:{proposalId,accionRequerida},reason:motivo});}
+  const SOURCE_INTAKE_SCHEMA='gi-cobros-source-intake-v2';
+  const SOURCE_INTAKE_TYPES=Object.freeze(['INSURER_STATEMENT_PENDING_FROM_N','COMMISSION_STATEMENT_INSTALLMENT_N','INVOICE_INSTALLMENT_N','BANK_STATEMENT_MATCH']);
+  const intakeInFlight=new Map();
+  function sourceDocumentRef(value){
+    const raw=text(value),id='[A-Za-z0-9_-]{10,180}';
+    if(new RegExp('^(?:(?:g?drive):)?'+id+'$').test(raw))return raw;
+    try{const u=new URL(raw);if(u.protocol!=='https:'||u.hostname!=='drive.google.com'||u.username||u.password||u.port||u.hash)return'';
+      if(new RegExp('^/file/d/'+id+'/view$').test(u.pathname)&&Array.from(u.searchParams.keys()).every(k=>k==='usp'))return u.origin+u.pathname;
+      if(u.pathname==='/open'&&new RegExp('^'+id+'$').test(u.searchParams.get('id')||'')&&Array.from(u.searchParams.keys()).every(k=>k==='id'))return raw;
+    }catch(e){}return'';
+  }
+  function sourceIntakePayload(input){
+    if(!input||input.schemaVersion!==SOURCE_INTAKE_SCHEMA||input.sourceAttestation!==true)throw new Error('SOURCE_INTAKE_ATTESTATION_REQUIRED');
+    const source=input.source||{},rows=input.rows;
+    if(!/^[a-f0-9]{64}$/.test(source.sha256||'')||!text(source.sourceId)||!sourceDocumentRef(source.documentRef)||!text(source.fileName)||!text(source.insurerId))throw new Error('SOURCE_INTAKE_ORIGINAL_DOCUMENT_REQUIRED');
+    if(!SOURCE_INTAKE_TYPES.includes(source.evidenceType)||!['GT','CO'].includes(source.country)||!['GTQ','COP','USD'].includes(source.currency)||source.country==='GT'&&source.currency==='COP'||source.country==='CO'&&source.currency==='GTQ')throw new Error('SOURCE_INTAKE_SOURCE_SCOPE_REQUIRED');
+    if(!/^\d{4}-\d{2}-\d{2}$/.test(source.evidenceAsOfDate||'')||Number.isNaN(Date.parse(source.evidenceAsOfDate+'T00:00:00Z'))||new Date(source.evidenceAsOfDate+'T00:00:00Z').toISOString().slice(0,10)!==source.evidenceAsOfDate)throw new Error('SOURCE_INTAKE_CUTOFF_REQUIRED');
+    if(!Array.isArray(rows)||!rows.length||rows.length>100)throw new Error('SOURCE_INTAKE_BATCH_ROWS_OUT_OF_BOUNDS');
+    if(source.evidenceType==='INSURER_STATEMENT_PENDING_FROM_N'&&source.completePolicyGroups!==true)throw new Error('SOURCE_INTAKE_COMPLETE_POLICY_GROUPS_REQUIRED');
+    const seen=new Set();for(const row of rows){if(!row||!text(row.rowId)||seen.has(row.rowId)||!text(row.policyNumber))throw new Error('SOURCE_INTAKE_ROW_IDENTITY_REQUIRED');seen.add(row.rowId);
+      if(row.paidDate&&row.actualPaidDateEvidence!==true)throw new Error('SOURCE_INTAKE_ACTUAL_PAID_DATE_EVIDENCE_REQUIRED');
+      if(source.evidenceType==='INSURER_STATEMENT_PENDING_FROM_N'&&(row.paidDate||row.actualPaidDateEvidence||row.paymentConfirmed))throw new Error('SOURCE_INTAKE_PENDING_IS_NOT_PAYMENT');
+      if(row.explicitInstallmentException===true&&!sourceDocumentRef(row.installmentExceptionReference)||row.explicitInstallmentException!==true&&row.installmentExceptionReference)throw new Error('SOURCE_INTAKE_INSTALLMENT_EXCEPTION_REFERENCE_REQUIRED');
+      if(row.amount!=null&&(!Number.isFinite(row.amount)||row.amount<0||row.amount>1000000000||Math.abs(row.amount*100-Math.round(row.amount*100))>1e-6))throw new Error('SOURCE_INTAKE_AMOUNT_INVALID');
+    }
+    const copy=JSON.parse(JSON.stringify(input));copy.source.documentRef=sourceDocumentRef(source.documentRef);return copy;
+  }
+  function validateSourceIntakeReadback(payload,out){
+    if(!out||out.ok!==true||!['SOURCE_RUN_STORED','SOURCE_RUN_REUSED'].includes(out.status)||out.readbackConfirmed!==true||out.financialWrites!==0||out.sourceSha256!==payload.source.sha256||!/^[a-f0-9]{64}$/.test(out.sourceDigest||''))throw new Error('SOURCE_INTAKE_DURABLE_READBACK_REQUIRED');
+    if(out.submittedRows!==payload.rows.length||!Number.isSafeInteger(out.intakeWrites)||out.intakeWrites<0||out.status==='SOURCE_RUN_REUSED'&&out.intakeWrites!==0)throw new Error('SOURCE_INTAKE_READBACK_COUNT_MISMATCH');
+    const counts=out.counts||{};for(const k of ['sourceRows','proposals','holds','supportingRows','duplicates'])if(!Number.isSafeInteger(counts[k])||counts[k]<0||counts[k]>payload.rows.length)throw new Error('SOURCE_INTAKE_READBACK_COUNT_MISMATCH');
+    if(counts.sourceRows+counts.duplicates!==payload.rows.length||counts.proposals+counts.supportingRows!==counts.sourceRows||counts.holds>counts.proposals)throw new Error('SOURCE_INTAKE_READBACK_COUNT_MISMATCH');
+    if(!text(out.sourceRunId)&&!(out.sourceRunId===null&&out.status==='SOURCE_RUN_REUSED'&&counts.duplicates===payload.rows.length&&Array.isArray(out.reusedRunIds)&&out.reusedRunIds.length&&out.reusedRunIds.every(id=>text(id))))throw new Error('SOURCE_INTAKE_DURABLE_READBACK_REQUIRED');
+    if(!Array.isArray(out.proposalIds)||out.proposalIds.length!==counts.proposals||out.proposalIds.some(id=>!text(id))||new Set(out.proposalIds).size!==out.proposalIds.length)throw new Error('SOURCE_INTAKE_READBACK_PROPOSALS_MISMATCH');
+    return out;
+  }
+  async function intakeSourceRun(input,options){
+    const payload=sourceIntakePayload(input);options=options||{};
+    if(!available())throw new Error('COBROS_RECONCILIATION_BACKEND_NOT_ACTIVE');
+    const actor={tenantId:tenantId(),activeRole:activeRole()},marker=JSON.stringify(stable({tenantId:actor.tenantId,activeRole:actor.activeRole,payload}));
+    if(intakeInFlight.has(marker))return intakeInFlight.get(marker);
+    const work=(async()=>{
+      if(!window.crypto||!window.crypto.subtle||typeof TextEncoder!=='function')throw new Error('SOURCE_INTAKE_HASH_UNAVAILABLE');
+      const bytes=await window.crypto.subtle.digest('SHA-256',new TextEncoder().encode(marker));
+      const digest=Array.from(new Uint8Array(bytes)).map(n=>n.toString(16).padStart(2,'0')).join('');
+      if(actor.tenantId!==tenantId()||actor.activeRole!==activeRole())throw new Error('SOURCE_INTAKE_SESSION_CHANGED');
+      const out=await command('intake_source_run',{payload,requestId:'srcui_'+digest,reason:options.reason||'Ingreso documental confirmado: solo fuentes y propuestas, sin aplicar pagos'});
+      return validateSourceIntakeReadback(payload,out);
+    })();
+    intakeInFlight.set(marker,work);
+    try{return await work;}finally{if(intakeInFlight.get(marker)===work)intakeInFlight.delete(marker);}
+  }
   function status(){return Object.freeze({version:VERSION,functionName:functionName(),tenantId:tenantId(),activeRole:activeRole(),region:region(),productContextReady:productContextReady(),enabled:enabled(),available:available(),transport:'firebase-functions-modular'});}
-  Orbit.reconciliationDomain=Object.freeze({VERSION,enabled,available,classifyPaymentOrigin,command,previewPolicy,previewProposalApplication,resolveProposalApplication,applyProposalApplication,applyPayment,reportClientPayment,reportAdvisorPayment,reconcilePayment,reconcileEvidence,enrichApplication,confirmProposal,holdProposal,status});
+  Orbit.reconciliationDomain=Object.freeze({VERSION,enabled,available,classifyPaymentOrigin,command,previewPolicy,previewProposalApplication,resolveProposalApplication,applyProposalApplication,applyPayment,reportClientPayment,reportAdvisorPayment,reconcilePayment,reconcileEvidence,enrichApplication,confirmProposal,holdProposal,SOURCE_INTAKE_SCHEMA,SOURCE_INTAKE_TYPES,sourceDocumentRef,sourceIntakePayload,validateSourceIntakeReadback,intakeSourceRun,status});
 })();

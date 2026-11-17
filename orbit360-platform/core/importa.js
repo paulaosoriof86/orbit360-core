@@ -11,6 +11,17 @@ window.Orbit = window.Orbit || {};
 Orbit.importa = (function () {
   const U = Orbit.ui;
   function clean(v) { return String(v == null ? '' : v).trim(); }
+  function isSourceIntake() { return !!state && state.modo !== 'documental' && ['estados-cuenta', 'planillas-comision'].includes(state.kind); }
+  let sourceIntakeUiLoad = null;
+  function sourceIntakeUi() {
+    if (Orbit.importarP0Confirmacion && typeof Orbit.importarP0Confirmacion.mountSourceIntake === 'function') return Promise.resolve(Orbit.importarP0Confirmacion);
+    if (!sourceIntakeUiLoad) sourceIntakeUiLoad = new Promise((resolve, reject) => {
+      const script = document.createElement('script'); script.src = 'modules/importar-p0-confirmacion.js?v=20261117-source-intake-v2';
+      script.onload = () => Orbit.importarP0Confirmacion && typeof Orbit.importarP0Confirmacion.mountSourceIntake === 'function' ? resolve(Orbit.importarP0Confirmacion) : reject(new Error('SOURCE_INTAKE_UI_NOT_READY'));
+      script.onerror = () => reject(new Error('SOURCE_INTAKE_UI_LOAD_FAILED')); document.head.appendChild(script);
+    }).catch(error => { sourceIntakeUiLoad = null; throw error; });
+    return sourceIntakeUiLoad;
+  }
 
   /* ---- Motor de extracción REAL (CSV/TSV/TXT) ----------------------
      Lee el archivo del cliente, detecta delimitador, mapea encabezados
@@ -954,6 +965,8 @@ Orbit.importa = (function () {
     paint();
   }
   function close() {
+    if (isSourceIntake() && state.sourceIntakeController && state.sourceIntakeController.status().busy) { if (U.toast) U.toast('La fuente sigue esperando confirmación del servidor.'); return; }
+    if (isSourceIntake() && state.sourceIntakeController) state.sourceIntakeController.dispose();
     document.getElementById('imp-back') && document.getElementById('imp-back').classList.remove('open');
     document.getElementById('imp-drawer') && document.getElementById('imp-drawer').classList.remove('open');
   }
@@ -961,7 +974,7 @@ Orbit.importa = (function () {
   function paint() {
     const dr = document.getElementById('imp-drawer');
     const m = state.meta;
-    const steps = state.kind === 'docs-aseguradora' ? ['Cargar archivo', 'Clasificar fuente', 'Guardar y vincular'] : ['Cargar archivo', 'Extracción inteligente', 'Confirmar'];
+    const steps = state.kind === 'docs-aseguradora' ? ['Cargar archivo', 'Clasificar fuente', 'Guardar y vincular'] : isSourceIntake() ? ['Original documental', 'Revisar e ingresar fuente'] : ['Cargar archivo', 'Extracción inteligente', 'Confirmar'];
     dr.innerHTML = `<div class="imp-head">
         <div><div class="imp-eyebrow">Importación inteligente</div>
         <div class="imp-title">${m.icon} ${U.esc(m.title)}</div></div>
@@ -991,6 +1004,7 @@ Orbit.importa = (function () {
       <div class="imp-note">${state.modo === 'documental' ? '📁 Modo documental: el archivo se guardará en <b>Drive únicamente después de confirmar</b> y de recibir readback del proveedor documental. Si Drive no está conectado, la operación se bloquea sin falso éxito.' : '🧠 Modo inteligente: reconoce el formato, <b>extrae los datos y los mapea</b> a Orbit 360 (cruza y complementa sin duplicar). Para documentos de expediente, el archivo original también debe quedar confirmado en Drive.'}</div>`;
   }
   function step2(m) {
+    if (isSourceIntake()) return '<div data-source-intake-host role="status">Cargando revisión documental de conciliación…</div>';
     if (state.kind === 'docs-aseguradora') {
       const insurerName=clean(state.scope&&state.scope.aseguradoraNombre)||'Aseguradora';
       const files=(state.files||[]).map(n=>'<span class="mail-chip">📎 '+U.esc(n)+'</span>').join('');
@@ -1015,6 +1029,7 @@ Orbit.importa = (function () {
       let best = 'clientes', score = -1;['clientes', 'polizas', 'vehiculos', 'movimientos-finanzas', 'estados-cuenta'].forEach(k => { const n = Object.keys(mapHeaders(k, state.parsed.headers)).length; if (n > score) { score = n; best = k; } });
       state.kind = best; state.meta = KINDS[best] || state.meta; m = state.meta;
     }
+    if (isSourceIntake()) return '<div data-source-intake-host role="status">Cargando revisión documental de conciliación…</div>';
     const scopeNote = state.scope ? `<div class="imp-note" style="margin-top:0;margin-bottom:12px">🔗 Se vinculará a <b>${U.esc(state.scope.nombre)}</b>.</div>` : '';
     const scopeB = scopeBanner(state.kind);
     const assoc = state.kind === 'vehiculos' ? `<div class="card pad" style="margin-top:12px"><b style="font-family:var(--f-display);font-size:13px">Asociar a</b>
@@ -1152,6 +1167,7 @@ Orbit.importa = (function () {
     </div>`;
   }
   function step3(m) {
+    if (isSourceIntake()) return '<div data-source-intake-host role="status">Cargando revisión documental de conciliación…</div>';
     const documentary = state.modo === 'documental';
     const clientDocument = state.kind === 'documentos' && state.scope && state.scope.cid;
     const filesCount = (state.filesReal || []).length;
@@ -1319,6 +1335,7 @@ Orbit.importa = (function () {
       if (fl) fl.innerHTML = state.files.map(n => `<span class="mail-chip">📎 ${U.esc(n)}</span>`).join('');
       if (!files.length) return;
       const f0 = files[0];
+      if (isSourceIntake()) { state.step = 2; paint(); return; }
       const ext = (f0.name.split('.').pop() || '').toLowerCase();
       const goPreview = () => {
         state.processing = null;
@@ -1444,6 +1461,19 @@ Orbit.importa = (function () {
         if (fl) fl.innerHTML = state.files.map(n => `<span class="mail-chip">📎 ${U.esc(n)}</span>`).join('');
         state.step = 2; paint();
       });
+    }
+    if (isSourceIntake()) {
+      const holder = dr.querySelector('[data-source-intake-host]'), current = state;
+      if (holder) sourceIntakeUi().then(ui => {
+        if (state !== current || !holder.isConnected) return;
+        current.sourceIntakeController = ui.mountSourceIntake(holder, {
+          kind: current.kind, filesReal: current.filesReal, scope: current.scope, sourceMetadata: current.opts && current.opts.sourceMetadata,
+          spreadsheetReader: () => loadLib('https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js', 'XLSX'),
+          onBack: () => { current.sourceIntakeController.dispose(); current.sourceIntakeController = null; current.step = 1; paint(); },
+          onNavigate: () => close(), onComplete: out => { current.sourceIntakeReadback = out; }
+        });
+      }).catch(() => { if (state === current && holder.isConnected) holder.textContent = 'Ingreso bloqueado: no se pudo cargar la revisión documental. No se ejecutó el importador legado. Vuelve a abrir esta fuente.'; });
+      return; // Source runs never reach sample previews, direct store writes, or the legacy finish handler.
     }
     if (state.step === 2) {
       const it = dr.querySelector('#imp-iterar');

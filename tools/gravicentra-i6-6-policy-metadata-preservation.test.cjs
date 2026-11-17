@@ -51,7 +51,7 @@ test('metadata-only advisor change preserves authoritative premium, plan and all
  assert.deepEqual(h.rows.polizas[0],{...before.polizas[0],asesorId:'b4003qa_new_advisor'});assert.equal(h.batches[0].mutations.length,2);
 });
 test('opening the effective existing-policy editor previews persisted total and calendar, not a normalized 12-installment recalculation',async()=>{
- const h=harness(),{field}=await h.open();assert.match(field('preview').innerHTML,/2534\.57/);assert.doesNotMatch(field('preview').innerHTML,/1904\.00/);assert.match(field('preview').innerHTML,/211\.21/);assert.equal(h.batches.length,0);
+ const h=harness(),{field}=await h.open();assert.match(field('preview').innerHTML,/<b>Q 2,534\.57<\/b>/);assert.doesNotMatch(field('preview').innerHTML,/<b>Q 1,904\.00<\/b>/);assert.match(field('preview').innerHTML,/211\.21/);assert.equal(h.batches.length,0);
 });
 test('advisor-only form save submits a minimal patch, audited without financial normalization',async()=>{
  const h=harness(),before=clone(h.rows),{field}=await h.open();field('advisor').value='b4003qa_new_advisor';await field('advisor').fire('change');await field('advisor').fire('input');field('reason').value='Asignación confirmada por Dirección';await field('save').fire('click');
@@ -63,7 +63,7 @@ test('advisor plus renewability remains one audited metadata-only change',async(
  assert.equal(h.batches.length,1);assert.deepEqual(h.batches[0].mutations[0].payload,{asesorId:'b4003qa_new_advisor',renovable:false});assert.equal(h.rows.polizas[0].primaTotal,2534.57);
 });
 test('financial field intentionally changed still takes the existing financial path',async()=>{
- const h=harness(),{field}=await h.open();field('net').value='2000';await field('net').fire('input');assert.match(field('preview').innerHTML,/2240\.00/);field('reason').value='Cambio financiero documentado de prueba';await field('save').fire('click');
+ const h=harness(),{field}=await h.open();field('net').value='2000';await field('net').fire('input');assert.match(field('preview').innerHTML,/<b>Q 2,240\.00<\/b>/);field('reason').value='Cambio financiero documentado de prueba';await field('save').fire('click');
  assert.equal(h.batches.length,1);assert.equal(h.batches[0].options.policyMetadataOnly,undefined);assert.equal(h.rows.polizas[0].primaTotal,2240);assert.ok(h.batches[0].mutations.some(m=>m.collection==='recibosEsperados'));
 });
 test('existing paid-assignment protection and Asesor role denial are not relaxed',async()=>{

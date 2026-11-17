@@ -2563,6 +2563,158 @@
           "gitBlobSha": "ab2ba60b1b2529d0ead1456565627235b44b4d4d"
         }
       ]
+    },
+    {
+      "id": "I6_6_DOCUMENTED_POLICY_CENT_PRECISION_AND_DIAGNOSTIC_RETENTION_20261117",
+      "approvedByDirection": true,
+      "receipt": "artifacts/orbit360-recovery/release-control/I6_6_SOURCE_INTAKE_V2_PRECISION_CAUSAL_SOURCE_QA_20261117.json",
+      "sourceStatus": "SOURCE_QA_PASS_NEW_EXACT_ARTIFACT_AND_SIGNED_PREVIEW_REQUIRED_NOT_LIVE",
+      "scope": "Preserve exact cents in financial policy/detail forms without changing global rounded KPI formatter; retain sanitized documentary substep and cleanup evidence. No calculation, payment or identity permission relaxation.",
+      "paths": [
+        {
+          "path": "orbit360-platform/modules/policy-receipts-v1199-bridge.js",
+          "gitBlobSha": "0a967871c8594f776139fc797c7123ab75061d80",
+          "replaces": {
+            "path": "orbit360-platform/modules/policy-receipts-v1199-bridge.js",
+            "priorGitBlobSha": "87a04b56c7358b8eebe963faebe7652daae983b4",
+            "priorChangeId": "I6_6_DOCUMENTED_NON_TAXED_CHARGE_AND_CONTRACTUAL_RECEIPT_CALENDAR_20261117"
+          }
+        }
+      ],
+      "tests": [
+        {
+          "path": "tools/gravicentra-i6-6-policy-preview-money-precision.test.cjs",
+          "gitBlobSha": "a3e2c29749845a3db1af58860203a300f6d0fb78"
+        },
+        {
+          "path": "tools/gravicentra-i6-6-policy-metadata-preservation.test.cjs",
+          "gitBlobSha": "4bfc9c554e27bcb004df361ffec27346d3b0eace",
+          "replaces": {
+            "path": "tools/gravicentra-i6-6-policy-metadata-preservation.test.cjs",
+            "priorGitBlobSha": "7f792f1a0f50214b4532f056abaa2bc9e946fa51",
+            "priorChangeId": "I6_6_ADVISOR_PORTFOLIO_HISTORICAL_BENEFICIARY_AND_COMPONENT_ROUNDING_20261115"
+          }
+        },
+        {
+          "path": "tools/gravicentra-i6-6-documented-terms-signed-check.test.cjs",
+          "gitBlobSha": "b0d09f44af919bba4b10797a65417d9bd9b3fde8",
+          "replaces": {
+            "path": "tools/gravicentra-i6-6-documented-terms-signed-check.test.cjs",
+            "priorGitBlobSha": "ab2ba60b1b2529d0ead1456565627235b44b4d4d",
+            "priorChangeId": "I6_6_DOCUMENTED_NON_TAXED_CHARGE_AND_CONTRACTUAL_RECEIPT_CALENDAR_20261117"
+          }
+        },
+        {
+          "path": "tools/gravicentra-i6-6-preview-failure-diagnostics-retention.test.cjs",
+          "gitBlobSha": "1377a2f1f6924a901cdd12b4ba3b05c4bc5ea3d9"
+        },
+        {
+          "path": "tools/gravicentra-i6-6-finance-ui-diagnostics.test.cjs",
+          "gitBlobSha": "c37fa124c67427b265c9c4f6cc63ea63735e4bbb",
+          "replaces": {
+            "path": "tools/gravicentra-i6-6-finance-ui-diagnostics.test.cjs",
+            "priorGitBlobSha": "786ae40694d36f1ab6d109fac1cb188e89bebf4d",
+            "priorChangeId": "I6_6_DIRECTION_LEGAL_COMPANY_COUNTRY_CONTEXT_20261116"
+          }
+        }
+      ]
+    },
+    {
+      "id": "I6_6_AUTHENTICATED_INCREMENTAL_SOURCE_INTAKE_V2_20261117",
+      "approvedByDirection": true,
+      "receipt": "artifacts/orbit360-recovery/release-control/I6_6_SOURCE_INTAKE_V2_PRECISION_CAUSAL_SOURCE_QA_20261117.json",
+      "sourceStatus": "SOURCE_QA_PASS_NEW_EXACT_ARTIFACT_AND_SIGNED_PREVIEW_REQUIRED_NOT_LIVE",
+      "scope": "Versioned immutable insurer source intake through existing authenticated reconciliation command. Only sources/proposals/HOLD are admitted; existing signed application owner remains the sole payment path. Preserve V1 ledger, source references and unknown dates; tightly isolated synthetic Preview envelope.",
+      "paths": [
+        {
+          "path": "functions/cobros-source-intake-v2.js",
+          "gitBlobSha": "31bb921f5c58cd47af606ec43217b445be519c4a"
+        },
+        {
+          "path": "functions/cobros-ledger-contract.js",
+          "gitBlobSha": "6d11841dcf743837c6ffd255e4f5e2ac0c48f229"
+        },
+        {
+          "path": "functions/cobros-reconciliation-domain.js",
+          "gitBlobSha": "6143c52d76e803421c49c443fb1b692d85ccdf14",
+          "replaces": {
+            "path": "functions/cobros-reconciliation-domain.js",
+            "priorGitBlobSha": "05634ccf5035b599a7d3ceddd860201ca4a451a5",
+            "priorChangeId": "I6_6_PROPOSAL_APPLICATION_FIRESTORE_AUDIT_ARRAY_TIMESTAMP_20261116"
+          }
+        },
+        {
+          "path": "functions/i66-conciliaciones-active-ledger-projection.js",
+          "gitBlobSha": "92ba74ebc1bc60970386a5fef25807716528b18d",
+          "replaces": {
+            "path": "functions/i66-conciliaciones-active-ledger-projection.js",
+            "priorGitBlobSha": "4f134de15e21dc5349211d3a77b99252016be3c0",
+            "priorChangeId": "I6_6_CONCILIATION_APPROVAL_AND_ADVISOR_CXP_20261115"
+          }
+        },
+        {
+          "path": "functions/proposal-application-boundary.js",
+          "gitBlobSha": "ba807d0573c8a06a27ed06341d970407e2b4f521",
+          "replaces": {
+            "path": "functions/proposal-application-boundary.js",
+            "priorGitBlobSha": "bb707e15ac1af4025930e04481354872d14f7bbe",
+            "priorChangeId": "I6_6_CONCILIATION_APPROVAL_AND_ADVISOR_CXP_20261115"
+          }
+        },
+        {
+          "path": "orbit360-platform/core/importa.js",
+          "gitBlobSha": "3009c50f83806666a2a75d543e03936d52ac9ae1",
+          "replaces": {
+            "path": "orbit360-platform/core/importa.js",
+            "priorGitBlobSha": "11c76a35e2568ab367024ce32b67e6b1f680486c",
+            "priorChangeId": "I6_6_DOCUMENTED_NON_TAXED_CHARGE_AND_CONTRACTUAL_RECEIPT_CALENDAR_20261117"
+          }
+        },
+        {
+          "path": "orbit360-platform/modules/importar.js",
+          "gitBlobSha": "f78296730dccfae496167d18f3923c5b8e8924b2"
+        },
+        {
+          "path": "orbit360-platform/modules/importar-p0-confirmacion.js",
+          "gitBlobSha": "720fb357f9a37e215a77a5cbc5ddf345c8def535"
+        },
+        {
+          "path": "orbit360-platform/core/cobros-reconciliation-domain-client.js",
+          "gitBlobSha": "1e4b42f2096d6f89de2eae63e98ea5e775db0917",
+          "replaces": {
+            "path": "orbit360-platform/core/cobros-reconciliation-domain-client.js",
+            "priorGitBlobSha": "ee730bfae6f5dad8e0ccc229575b49ad7e8475c1",
+            "priorChangeId": "I6_6_CONCILIATION_APPROVAL_AND_ADVISOR_CXP_20261115"
+          }
+        },
+        {
+          "path": "orbit360-platform/core/product-runtime-browser-providers-p0.js",
+          "gitBlobSha": "1a43a9a297908b7131bc245320894cb92195f065",
+          "replaces": {
+            "path": "orbit360-platform/core/product-runtime-browser-providers-p0.js",
+            "priorGitBlobSha": "609385b78af54b70f05718df4f32a8f9f788bfd0",
+            "priorChangeId": "I6_6_ADVISOR_PORTFOLIO_HISTORICAL_BENEFICIARY_AND_COMPONENT_ROUNDING_20261115"
+          }
+        }
+      ],
+      "tests": [
+        {
+          "path": "tools/gravicentra-i6-6-source-intake-v2.test.cjs",
+          "gitBlobSha": "f2e83ef77ff6f441d3eafb141c044a5a99c3df47"
+        },
+        {
+          "path": "tools/gravicentra-i6-6-source-intake-ui.test.cjs",
+          "gitBlobSha": "377f5b3b1e3835e127733871486fdf675d7e47a5"
+        },
+        {
+          "path": "tools/gravicentra-i6-6-source-intake-preview-transport.test.cjs",
+          "gitBlobSha": "b9d07b978bb15d63b86b451d5974565a497a259e"
+        },
+        {
+          "path": "tools/gravicentra-i6-6-proposal-uat-diagnostics.test.cjs",
+          "gitBlobSha": "59a558de0e9eca7caef5ad4daf805b72976e6466"
+        }
+      ]
     }
   ],
   "i66R11PreviewBuildRequest20261113": {

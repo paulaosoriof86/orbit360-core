@@ -86,7 +86,19 @@ Orbit.modules = Orbit.modules || {};
     if(p.renovable===false || ['false','no','no renovable'].includes(v)) return 'NO';
     return 'UNKNOWN';
   }
-  function money(cur, n) { return U.money ? U.money(+n || 0, cur || '') : (cur + ' ' + (+n || 0)); }
+  function money(cur, n) {
+    // Policy/receipt forms need documentary cents; the shared compact KPI
+    // formatter intentionally rounds and must not be changed by this view.
+    if (typeof n !== 'number' && typeof n !== 'string' || typeof n === 'string' && !n.trim()) return '—';
+    const value = Number(n), currency = typeof cur === 'string' ? cur.trim().toUpperCase() : '';
+    if (!Number.isFinite(value) || !/^[A-Z]{3}$/.test(currency)) return '—';
+    const symbol = currency === 'GTQ' ? 'Q' : currency === 'USD' ? 'US$' : currency === 'COP' ? '$' : currency;
+    const amount = Object.is(value, -0) ? 0 : value;
+    let formatted;
+    try { formatted = amount.toLocaleString('es-GT', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+    catch (e) { formatted = amount.toFixed(2); }
+    return symbol + ' ' + formatted;
+  }
 
   function explicitCommission(value) {
     if (value == null || String(value).trim() === '') return null;

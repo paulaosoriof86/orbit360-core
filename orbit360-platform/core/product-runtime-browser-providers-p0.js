@@ -34,6 +34,28 @@
       var paymentPayload=data&&data.payload;
       if(String(data&&data.tenantId||'')!=='alianzas-soluciones'||!paymentPayload||typeof paymentPayload!=='object')
         return 'I66_PREVIEW_MUTATION_CALLABLE_DENIED';
+      if(paymentOp==='intake_source_run'){
+        // This only transports the disposable signed-UAT envelope. It grants
+        // no intake authority: the server still requires the pre-existing
+        // exact actor/source-hash/batch-digest permit and synthetic targets.
+        var intakeSource=paymentPayload.source,intakeRows=paymentPayload.rows;
+        if(Array.isArray(paymentPayload)||paymentPayload.schemaVersion!=='gi-cobros-source-intake-v2'||
+           paymentPayload.sourceAttestation!==true||!intakeSource||typeof intakeSource!=='object'||Array.isArray(intakeSource)||
+           typeof intakeSource.sourceId!=='string'||!/^b3005qa_i66_intake_[a-z0-9_]{12,80}(?![\s\S])/.test(intakeSource.sourceId)||
+           typeof intakeSource.sha256!=='string'||!/^[a-f0-9]{64}(?![\s\S])/.test(intakeSource.sha256)||
+           !Array.isArray(intakeRows)||intakeRows.length<1||intakeRows.length>100)
+          return 'I66_PREVIEW_MUTATION_CALLABLE_DENIED';
+        var intakePolicyId=new RegExp('^'+intakeSource.sourceId+'_policy(?:_[a-z0-9_]{1,40})?(?![\\s\\S])');
+        var intakeReceiptId=new RegExp('^'+intakeSource.sourceId+'_receipt(?:_[a-z0-9_]{1,40})?(?![\\s\\S])');
+        for(var intakeIndex=0;intakeIndex<intakeRows.length;intakeIndex++){
+          var intakeRow=intakeRows[intakeIndex];
+          if(!intakeRow||typeof intakeRow!=='object'||Array.isArray(intakeRow)||
+             typeof intakeRow.policyId!=='string'||!intakePolicyId.test(intakeRow.policyId)||
+             typeof intakeRow.receiptId!=='string'||!intakeReceiptId.test(intakeRow.receiptId))
+            return 'I66_PREVIEW_MUTATION_CALLABLE_DENIED';
+        }
+        return '';
+      }
       var proposalId=String(paymentPayload.proposalId||''),proposalRun=String(paymentPayload.sourceRunId||'');
       if(paymentOp==='preview_proposal_application'){
         return /^[A-Za-z0-9][A-Za-z0-9._:-]{1,179}$/.test(proposalId)&&

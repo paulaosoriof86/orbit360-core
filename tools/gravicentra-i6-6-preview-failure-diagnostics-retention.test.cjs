@@ -4,6 +4,7 @@
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),vm=require('node:vm');
 const advisor=require('./gravicentra-i6-6-advisor-payables-signed-uat.cjs');
 const proposal=require('./gravicentra-i6-6-proposal-uat-diagnostics.cjs');
+const documented=require('./gravicentra-i6-6-documented-terms-signed-check.cjs');
 const workflow=path.join(__dirname,'../.github/workflows/gravicentra-i66-privileged-role-three-function-preview-uat.yml');
 const yaml=fs.readFileSync(workflow,'utf8');
 const section=yaml.split('- name: Preserve sanitized failure diagnostics without an acceptance proof')[1].split('- name: Upload diagnostics only')[0];
@@ -23,12 +24,23 @@ function execute({advisor:advisorReport,proposal:proposalReport,raw={},readError
     if(name==='node:fs')return fakeFs;if(name==='node:path')return path;
     if(name==='./tools/gravicentra-i6-6-advisor-payables-signed-uat.cjs')return advisor;
     if(name==='./tools/gravicentra-i6-6-proposal-uat-diagnostics.cjs')return proposal;
+    if(name==='./tools/gravicentra-i6-6-documented-terms-signed-check.cjs')return documented;
     throw Error('UNEXPECTED_DIAGNOSTIC_DEPENDENCY');
   },process:{env:{RUNNER_TEMP:'/tmp/i66-retention',I66_PACKAGE_ROOT:'/tmp/i66-package',GITHUB_RUN_ID:'44027761291',SOURCE_SHA:'a'.repeat(40),...env}}});
   assert.deepEqual(writes,['/tmp/i66-retention/i66-preview-failure-diagnostic.json']);return written;
 }
 const counts={expectedDenials:8,verifiedExpectedDenials:8,observedConsoleErrors:10,capturedConsoleErrors:10,
   expectedNetworkConsoleErrors:8,unexpectedConsoleErrors:2,pageErrorCount:0,unexpectedHttpErrors:2,telemetryFailures:0};
+test('failed workflow retains documentary substep, no-write observation and exact cleanup without private values',()=>{
+  const report={status:'HOLD',phase:'PREVIEW',failureStage:'DOCUMENTED_PREMIUM_TERMS',failureCheck:'I66_DOCUMENTED_TERMS_SIGNED_HOLD',checks:[],
+    documentedTerms:{schemaVersion:documented.SCHEMA,status:'HOLD',sourceSha:'a'.repeat(40),phase:'PREVIEW',step:'FORM_PREVIEW',failureCode:'I66_DOCUMENTED_TERMS_UI_PREVIEW_MISMATCH',
+      ui:'NOT_RUN',writeAttempted:false,durableReadbackCount:0,reloadPerformed:false,sessionPreserved:false,modalCancelled:true,realCustomerWrites:0,financialPayments:0,bankMovements:0,
+      cleanup:{status:'PASS',remaining:0},uiChecks:{unknownPaymentPreserved:true,totalExact:false,dateExact:true},actorUid:secret,client:secret,rawText:secret}};
+  const out=execute({advisor:report});assert.equal(out.status,'FAILED_NOT_ACCEPTED');assert.equal(out.reports[0].failureStage,'DOCUMENTED_PREMIUM_TERMS');
+  assert.equal(out.reports[0].failureCheck,'I66_DOCUMENTED_TERMS_SIGNED_HOLD');assert.equal(out.reports[0].documentedTerms.step,'FORM_PREVIEW');
+  assert.equal(out.reports[0].documentedTerms.writeAttempted,false);assert.equal(out.reports[0].documentedTerms.cleanup.remaining,0);
+  assert.equal(JSON.stringify(out).includes(secret),false);
+});
 function fixture(){
   const http={eventType:'HTTP_ERROR',actorRole:'direccion',stage:'FINANCE_UI_HYDRATION',requestKey:'b'.repeat(64),
     status:403,resourceType:'Fetch',endpointClass:'FUNCTIONS',pathSha256:'c'.repeat(64),classification:'UNEXPECTED'};

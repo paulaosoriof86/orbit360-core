@@ -23,6 +23,19 @@ test('unknown strings are removed even when shaped like technical codes',()=>{
  const value=d.projectCallableResult({denied:true,code:privateValue,reason:privateValue},privateValue,privateValue,privateValue);
  assert.equal(value.code,'UNKNOWN_CODE');assert.equal(value.reason,'UNKNOWN_REASON');assert.equal(value.stage,'UNKNOWN_STAGE');assert.equal(value.operation,'UNKNOWN_OPERATION');noPrivate(value);
 });
+test('source-intake stages and assertion codes are closed and retain no private source identity',()=>{
+ for(const stage of d.SOURCE_INTAKE_STAGES){const value=d.failureDetails({name:'AssertionError',code:'ERR_ASSERTION',message:'I66_INTAKE_UI_READBACK\n'+privateValue},stage);assert.equal(value.failureStage,stage);assert.equal(value.failureCheck,'I66_INTAKE_UI_READBACK');noPrivate(value);}
+ const value=d.safeSourceIntakeEvidence({status:'PASS',stage:'SOURCE_INTAKE_COMPLETE',syntheticOnly:true,financialWrites:0,sourceRows:1,proposals:1,holds:0,normalUiRequest:true,
+  sourceFileHashVerified:true,sourceMetadataDigestVerified:true,readbackAfterReload:true,signedActorPreserved:true,normalUiIdempotentReplay:true,replayIntakeWrites:0,consoleErrors:0,pageErrors:0,httpErrors:0,
+  sourceId:privateValue,sourceRunId:privateValue,actorUid:privateValue,policyNumber:privateValue,documentRef:privateValue,amount:1234.56,filename:privateValue});
+ assert.equal(value.stage,'SOURCE_INTAKE_COMPLETE');assert.equal(value.financialWrites,0);assert.equal(value.sourceRows,1);assert.equal(value.normalUiRequest,true);assert.equal(value.consoleErrors,0);noPrivate(value);assert.equal(JSON.stringify(value).includes('1234.56'),false);
+ const malformed=d.safeSourceIntakeEvidence({status:privateValue,stage:privateValue,sourceRows:900000,financialWrites:privateValue,normalUiRequest:privateValue,consoleErrors:-1});assert.equal(malformed.status,'HOLD');assert.equal(malformed.stage,'UNKNOWN_STAGE');assert.equal(malformed.sourceRows,null);assert.equal(malformed.normalUiRequest,null);assert.equal(malformed.consoleErrors,null);noPrivate(malformed);
+});
+test('failure report preserves safe source-intake diagnostics without granting old proposal checks',()=>{
+ const report=d.safeProposalDiagnosticReport({status:'HOLD',phase:'PREVIEW',failureStage:'SOURCE_INTAKE_UI_SUBMIT',failureClass:'ASSERTION',failureCheck:'I66_INTAKE_UI_HTTP',failureCode:'ERR_ASSERTION',sourceIntake:{status:'HOLD',stage:'SOURCE_INTAKE_UI_SUBMIT',financialWrites:null,sourceId:privateValue,httpErrors:1},raw:privateValue});
+ assert.equal(report.failureStage,'SOURCE_INTAKE_UI_SUBMIT');assert.equal(report.failureCheck,'I66_INTAKE_UI_HTTP');assert.equal(report.sourceIntake.status,'HOLD');assert.equal(report.sourceIntake.financialWrites,null);assert.equal(report.sourceIntake.httpErrors,1);noPrivate(report);
+ assert.ok(driver.includes("enter('SOURCE_INTAKE_PREPARE')"));assert.ok(driver.includes('safeSourceIntakeEvidence(report.sourceIntake)'));assert.ok(driver.includes('additionalTargetOwners.get(ref.path)||runId'));
+});
 test('malformed results do not become false candidate evidence',()=>{
  for(const result of [null,[],{resolutionOptions:privateValue},{resolutionOptions:{receiptId:privateValue}}]){
   const value=d.projectCallableResult({result},'preview_proposal_application','FIRST_PROPOSAL_PREVIEW',privateValue);
@@ -125,6 +138,7 @@ test('actual workflow failure sanitizer uses the closed Proposal projection',()=
   if(name==='node:path')return path;
   if(name.endsWith('proposal-uat-diagnostics.cjs'))return d;
   if(name.endsWith('advisor-payables-signed-uat.cjs'))return{safeFinanceUiDiagnostics:()=>{throw Error('UNEXPECTED_CXP_READ');},safeLegalFailureSubstage:()=>null};
+  if(name==='./tools/gravicentra-i6-6-documented-terms-signed-check.cjs')return require('./gravicentra-i6-6-documented-terms-signed-check.cjs');
   throw Error('UNEXPECTED_DEPENDENCY');
  }});
  assert.equal(saved.status,'FAILED_NOT_ACCEPTED');assert.equal(saved.reports.length,1);assert.equal(saved.reports[0].owner,'PROPOSAL');assert.equal(saved.reports[0].proposalDiagnostics.calls[0].candidateCount,0);assert.equal(saved.reports[0].failureCheck,'I66_PROPOSAL_FIRST_PREVIEW_CANDIDATE');noPrivate(saved);

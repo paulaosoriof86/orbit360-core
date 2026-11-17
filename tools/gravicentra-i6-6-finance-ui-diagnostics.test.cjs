@@ -108,11 +108,13 @@ test('failed-preview artifact transports sanitized click evidence and exact sour
     checks:[{name:'EXACT_SOURCE',status:'PASS'}],cleanup:{status:'PASS',remaining:0},rawError:secret};
   let written;
   const fakeFs={existsSync:()=>true,readFileSync:()=>JSON.stringify(report),writeFileSync:(name,value)=>{assert.equal(name,'/tmp/qa/i66-preview-failure-diagnostic.json');written=JSON.parse(value);}};
-  vm.runInNewContext(code,{require:name=>{
+  const fixtureRequire=name=>{
     if(name==='node:fs')return fakeFs;if(name==='node:path')return path;
     if(name==='./tools/gravicentra-i6-6-advisor-payables-signed-uat.cjs')return driver;
+    if(name==='./tools/gravicentra-i6-6-documented-terms-signed-check.cjs')return require('./gravicentra-i6-6-documented-terms-signed-check.cjs');
     throw Error('UNEXPECTED_DIAGNOSTIC_DEPENDENCY');
-  },process:{env:{RUNNER_TEMP:'/tmp/qa',GITHUB_RUN_ID:'71',SOURCE_SHA:'a'.repeat(40)}}});
+  };
+  vm.runInNewContext(code,{require:fixtureRequire,process:{env:{RUNNER_TEMP:'/tmp/qa',GITHUB_RUN_ID:'71',SOURCE_SHA:'a'.repeat(40)}}});
   assert.equal(written.status,'FAILED_NOT_ACCEPTED');assert.equal(written.reports.length,1);
   assert.deepEqual(written.reports[0].failureLocation,report.failureLocation);
   assert.equal(written.reports[0].failureCheck,'DIRECTION_LEGAL_RUNTIME_SCOPE_MISMATCH');
@@ -123,7 +125,7 @@ test('failed-preview artifact transports sanitized click evidence and exact sour
   assert.equal(written.reports[0].remaining,0);
   assert.doesNotMatch(JSON.stringify(written),/PRIVATE_ACTOR|rawError|actorUid|"message"/);
   report.failureLegalSubstage=secret;
-  vm.runInNewContext(code,{require:name=>name==='node:fs'?fakeFs:name==='node:path'?path:driver,process:{env:{RUNNER_TEMP:'/tmp/qa',GITHUB_RUN_ID:'71',SOURCE_SHA:'a'.repeat(40)}}});
+  vm.runInNewContext(code,{require:fixtureRequire,process:{env:{RUNNER_TEMP:'/tmp/qa',GITHUB_RUN_ID:'71',SOURCE_SHA:'a'.repeat(40)}}});
   assert.equal(written.reports[0].failureLegalSubstage,undefined);
   assert.doesNotMatch(JSON.stringify(written),/PRIVATE_ACTOR/);
 });

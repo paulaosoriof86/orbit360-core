@@ -231,6 +231,7 @@ jobs:
           node - <<'NODE'
           const fs=require('node:fs'),path=require('node:path');
           const {safeFinanceUiDiagnostics,safeLegalFailureSubstage,safeFailureEvidence}=require('./tools/gravicentra-i6-6-advisor-payables-signed-uat.cjs');
+          const {safeDocumentedTermsProof}=require('./tools/gravicentra-i6-6-documented-terms-signed-check.cjs');
           // Diagnostic projection only: never validate or reclassify a HOLD as
           // acceptance. Preserve correlated evidence without arbitrary text,
           // URLs, request payloads, headers, identity or console argument values.
@@ -241,7 +242,7 @@ jobs:
           const record=v=>v&&typeof v==='object'&&!Array.isArray(v)?v:{};
           const stages=['BUILD_IDENTITY','FIXTURE_SETUP','SIGNED_SESSION','DIRECTION_LEGAL_ACCEPTANCE','OPERATIVE_FINANCIAL_DENIAL',
             'FINANCE_UI_HYDRATION','DOCUMENT_FILE_UI_70','DOCUMENT_FILE_UI_60','REPLAY_AND_SOURCE_GUARDS','ASSIGNMENT_DOCUMENTARY_UI',
-            'ASSIGNMENT_RELOAD','LEGACY_GUARDS','LEGACY_FINANCE_EDIT','PENDING_CXP_RELOAD','SYNTHETIC_RESTORE','UNKNOWN_STAGE'];
+            'ASSIGNMENT_RELOAD','DOCUMENTED_PREMIUM_TERMS','LEGACY_GUARDS','LEGACY_FINANCE_EDIT','PENDING_CXP_RELOAD','SYNTHETIC_RESTORE','UNKNOWN_STAGE'];
           const countKeys=['expectedDenials','verifiedExpectedDenials','observedConsoleErrors','capturedConsoleErrors',
             'expectedNetworkConsoleErrors','unexpectedConsoleErrors','pageErrorCount','unexpectedHttpErrors','telemetryFailures'];
           const denialIds=['OPERATIVE_CXP','OPERATIVE_ASSIGNMENT','ADVISOR_CONFLICT','SOURCE_REINTERPRETATION',
@@ -314,6 +315,7 @@ jobs:
             if(location?.file==='gravicentra-i6-6-advisor-payables-signed-uat.cjs'&&Number.isSafeInteger(location.line)&&location.line>0&&Number.isSafeInteger(location.column)&&location.column>0)
               out.failureLocation={file:location.file,line:location.line,column:location.column};
             if(r.financeUiDiagnostics)out.financeUiDiagnostics=safeFinanceUiDiagnostics(r.financeUiDiagnostics);
+            if(r.documentedTerms!==undefined)out.documentedTerms=safeDocumentedTermsProof(r.documentedTerms);
             if(r.browserObservability!==undefined)out.browserObservability=safeBrowserObservability(r.browserObservability);
             out.checks=Array.isArray(r.checks)?r.checks.length:0;
             if(r.cleanup){out.cleanupStatus=['PASS','HOLD'].includes(r.cleanup.status)?r.cleanup.status:'UNKNOWN';out.remaining=Number.isSafeInteger(r.cleanup.remaining)?r.cleanup.remaining:null;}

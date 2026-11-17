@@ -3,6 +3,25 @@
 // applicable legal acceptance. No login, consent, transport override or seed API.
 const crypto=require('node:crypto');
 const TENANT='alianzas-soluciones',SCHEMA='GI_I66_DOCUMENTED_TERMS_SIGNED_CHECK_V1';
+const STEPS=Object.freeze(['CONTEXT','SIGNED_SOURCE','TARGET_ABSENCE','CLIENT_HYDRATION','FORM_OPEN','FORM_DEFAULTS','FORM_FIELDS','FORM_PREVIEW','FORM_CANCEL','CALCULATION','CANONICAL_WRITE','DURABLE_READBACK','SESSION_READBACK']);
+const FAILURE_CODES=Object.freeze(['ACTOR_REQUIRED','SCOPE_REQUIRED','EXACT_SYNTHETIC_CLIENT_REQUIRED','SOURCE_REQUIRED','ORIGIN_REQUIRED','CLIENT_NOT_OWNED_QA','NONCE_INVALID','CALCULATION_MISSING','AMOUNT_MISMATCH','PROVENANCE_MISMATCH','FIXTURE_SCOPE_MISMATCH','UNKNOWN_PAYMENT_MISMATCH','IDENTITY_OR_IVA_MISMATCH','CALENDAR_MISMATCH','COMMISSION_OR_PAYMENT_MISMATCH','PERSISTED_OWNER_MISMATCH','PERSISTED_PAYLOAD_MISMATCH','PERSISTED_UNEXPECTED_FIELD','REQUEST_PROOF_MISMATCH','EVENT_PROOF_MISMATCH','AUDIT_COLLECTION_MISMATCH','UI_FIELD_MISMATCH','UI_PREVIEW_MISMATCH','PAGE_ORIGIN_DRIFT','SIGNED_SESSION_DRIFT','LEGAL_GATE_BLOCKED','EXISTING_MODAL_BLOCKED','SERVED_SOURCE_DRIFT','TARGET_COLLISION','UI_CLIENT_DRIFT','UI_UNKNOWN_DEFAULT_MISMATCH','SERVER_READBACK_MISSING','CLIENT_CHANGED','SESSION_OR_ROUTE_CHANGED','UNEXPECTED_RECORD','UNEXPECTED_AUDIT','RUNTIME_HOLD','SIGNED_HOLD'].map(code=>'I66_DOCUMENTED_TERMS_'+code));
+function safeDocumentedTermsProof(value){
+  const row=value&&typeof value==='object'&&!Array.isArray(value)?value:{},pick=(v,values,fallback)=>values.includes(v)?v:fallback;
+  const count=v=>Number.isSafeInteger(v)&&v>=0&&v<=4?v:null,bool=v=>typeof v==='boolean'?v:null;
+  const source=typeof row.sourceSha==='string'&&/^[a-f0-9]{40}(?![\s\S])/.test(row.sourceSha)?row.sourceSha:null;
+  const cleanup=row.cleanup&&typeof row.cleanup==='object'?row.cleanup:{};
+  const proof={schemaVersion:SCHEMA,diagnosticOnly:true,status:pick(row.status,['PASS','HOLD'],'HOLD'),sourceSha:source,
+    phase:pick(row.phase,['PREVIEW','LIVE'],null),step:pick(row.step,STEPS,'CONTEXT'),ui:pick(row.ui,['NOT_RUN','PASS'],'NOT_RUN'),
+    durableReadbackCount:count(row.durableReadbackCount),writeAttempted:bool(row.writeAttempted),reloadPerformed:bool(row.reloadPerformed),
+    sessionPreserved:bool(row.sessionPreserved),modalCancelled:bool(row.modalCancelled),
+    realCustomerWrites:row.realCustomerWrites===0?0:null,financialPayments:row.financialPayments===0?0:null,bankMovements:row.bankMovements===0?0:null,
+    cleanup:{status:pick(cleanup.status,['NOT_STARTED','PASS','HOLD'],'NOT_STARTED'),remaining:count(cleanup.remaining)}};
+  if(source&&typeof row.buildId==='string'&&new RegExp('^gi-i66-'+source.slice(0,12)+'-[a-f0-9]{12}(?![\\s\\S])').test(row.buildId))proof.buildId=row.buildId;
+  if(row.failureCode!==undefined)proof.failureCode=pick(row.failureCode,FAILURE_CODES,'I66_DOCUMENTED_TERMS_RUNTIME_HOLD');
+  if(Array.isArray(cleanup.failureClasses))proof.cleanup.failureClasses=[...new Set(cleanup.failureClasses.filter(code=>['MODAL_RESTORE','RECORD_RESTORE','AUDIT_RESTORE','ABSENCE_READBACK','CLIENT_CHANGED'].includes(code)))];
+  if(row.uiChecks&&typeof row.uiChecks==='object')proof.uiChecks=Object.fromEntries(['unknownPaymentPreserved','totalExact','dateExact'].map(key=>[key,bool(row.uiChecks[key])]));
+  return proof;
+}
 const stable=v=>Array.isArray(v)?v.map(stable):v&&typeof v==='object'?Object.fromEntries(Object.keys(v).sort().map(k=>[k,stable(v[k])])):v;
 const hash=v=>crypto.createHash('sha256').update(typeof v==='string'?v:(JSON.stringify(stable(v))??'__undefined__')).digest('hex');
 const normalized=v=>String(v||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
@@ -63,7 +82,7 @@ async function runDocumentedTermsCheck({page,role,actorUid,tenantId,live,db,clie
   const tenant=db.collection('tenants').doc(tenantId),ref=(c,id)=>tenant.collection('data').doc(c).collection('items').doc(id);
   const clientRef=ref('clientes',clientId),clientBefore=await clientRef.get();clientProof(clientBefore.exists&&clientBefore.data(),cfg);
   const clientDigest=hash(clientBefore.data()),recordRefs=[ref('polizas',ids.policyId),ref('recibosEsperados',ids.receiptId)],requestRef=tenant.collection('operationalRequests').doc(ids.requestId),eventRef=tenant.collection('operationalEvents').doc(ids.eventId),targets=[...recordRefs,requestRef,eventRef];
-  const proof={schemaVersion:SCHEMA,sourceSha:cfg.source,phase:live?'LIVE':'PREVIEW',status:'HOLD',ui:'NOT_RUN',durableReadbackCount:0,reloadPerformed:false,sessionPreserved:false,modalCancelled:false,realCustomerWrites:0,financialPayments:0,bankMovements:0,cleanup:{status:'NOT_STARTED',remaining:null}};
+  const proof={schemaVersion:SCHEMA,sourceSha:cfg.source,phase:live?'LIVE':'PREVIEW',status:'HOLD',step:'SIGNED_SOURCE',ui:'NOT_RUN',durableReadbackCount:0,writeAttempted:false,reloadPerformed:false,sessionPreserved:false,modalCancelled:false,realCustomerWrites:0,financialPayments:0,bankMovements:0,cleanup:{status:'NOT_STARTED',remaining:null}};
   let armed=false,mutations=null,failure=null,opened=false;
   try{
     const state=await page.evaluate(async expected=>{
@@ -77,18 +96,22 @@ async function runDocumentedTermsCheck({page,role,actorUid,tenantId,live,db,clie
     check(!state.legalGate,'LEGAL_GATE_BLOCKED');check(!state.modalOpen,'EXISTING_MODAL_BLOCKED');
     check(state.markerSource===cfg.source&&state.gate==='I6.6'&&state.product==='Gravicentra Insurance'&&typeof state.buildId==='string'&&
       new RegExp('^gi-i66-'+cfg.source.slice(0,12)+'-[a-f0-9]{12}(?![\\s\\S])').test(state.buildId)&&state.buildId===process.env.I66_EXPECTED_BUILD_ID,'SERVED_SOURCE_DRIFT');proof.buildId=state.buildId;
-    for(const target of targets)check(!(await target.get()).exists,'TARGET_COLLISION');armed=true;
+    proof.step='TARGET_ABSENCE';for(const target of targets)check(!(await target.get()).exists,'TARGET_COLLISION');armed=true;
+    proof.step='CLIENT_HYDRATION';
     await page.evaluate(async id=>{await Orbit.store._ensureCollections(['clientes','aseguradoras','polizas','recibosEsperados']);},clientId);
     await page.waitForFunction(id=>Orbit.store.get('clientes',id)?.__syntheticQa===true,clientId,{timeout:30000});
-    await page.evaluate(id=>Orbit.modules.cliente360.nuevaPoliza(id),clientId);opened=true;
+    proof.step='FORM_OPEN';await page.evaluate(id=>Orbit.modules.cliente360.nuevaPoliza(id),clientId);opened=true;
     const form=page.locator('#policy-v1199');await form.waitFor({state:'visible',timeout:30000});
-    check(await form.locator('[data-client]').inputValue()===clientId,'UI_CLIENT_DRIFT');
+    proof.step='FORM_DEFAULTS';check(await form.locator('[data-client]').inputValue()===clientId,'UI_CLIENT_DRIFT');
     check(await form.locator('[data-payment-form]').inputValue()===''&&await form.locator('[data-conduct]').inputValue()==='','UI_UNKNOWN_DEFAULT_MISMATCH');
-    await form.locator('[data-frequency]').selectOption('Contado');
+    proof.step='FORM_FIELDS';await form.locator('[data-frequency]').selectOption('Contado');
     for(const [field,value]of Object.entries({start:'2026-10-20',end:'2027-10-20',net:'630',issue:'41.50',other:'200',surcharge:'0',nonvat:'2.70','nonvat-concept':'Bomberos','nonvat-ref':'QA-DOCUMENTED-TERMS','documented-calendar':'1 | 2026-11-06 | QA-DOCUMENTED-TERMS'}))await form.locator('[data-'+field+']').fill(value);
-    const values=await form.evaluate(node=>{const value=name=>node.querySelector('[data-'+name+']').value,text=node.querySelector('[data-preview]').textContent;return{payment:value('payment-form'),conduct:value('conduct'),charge:value('nonvat'),concept:value('nonvat-concept'),reference:value('nonvat-ref'),calendar:value('documented-calendar'),totalVisible:/978[.,]78/.test(text),dateVisible:text.includes('2026-11-06')};});validateUi(values);
+    proof.step='FORM_PREVIEW';
+    const values=await form.evaluate(node=>{const value=name=>node.querySelector('[data-'+name+']').value,text=node.querySelector('[data-preview]').textContent;return{payment:value('payment-form'),conduct:value('conduct'),charge:value('nonvat'),concept:value('nonvat-concept'),reference:value('nonvat-ref'),calendar:value('documented-calendar'),totalVisible:/978[.,]78/.test(text),dateVisible:text.includes('2026-11-06')};});
+    proof.uiChecks={unknownPaymentPreserved:values.payment===''&&values.conduct==='',totalExact:values.totalVisible===true,dateExact:values.dateVisible===true};validateUi(values);
+    proof.step='FORM_CANCEL';
     await form.getByRole('button',{name:'Cancelar',exact:true}).click();await form.waitFor({state:'detached',timeout:30000});opened=false;proof.modalCancelled=true;proof.ui='PASS';
-    const computed=await page.evaluate(({ids,cfg})=>{
+    proof.step='CALCULATION';const computed=await page.evaluate(({ids,cfg})=>{
       const mark={tenantId:cfg.tenantId,pais:'GT',moneda:'GTQ',__syntheticQa:true,__qaRunId:ids.runId,__qaActorUid:cfg.actorUid};
       const input={...mark,id:ids.policyId,clienteId:cfg.clientId,asesorId:'',aseguradoraId:'',numero:'QA-DOCUMENTED-TERMS',ramo:'AUTOMOVILES',producto:'QA',estado:'Vigente',
         vigenciaInicio:'2026-10-20',vigenciaFin:'2027-10-20',frecuencia:'Contado',cuotas:1,formaPago:'',conducto:'',primaNeta:630,gastosEmision:41.5,otros:200,recargoFinPct:0,ivaPct:12,
@@ -100,14 +123,16 @@ async function runDocumentedTermsCheck({page,role,actorUid,tenantId,live,db,clie
       return JSON.parse(JSON.stringify({policy,receipt}));
     },{ids,cfg});
     mutations=validateCalculation(computed,ids,cfg);
+    proof.step='CANONICAL_WRITE';proof.writeAttempted=true;
     const result=await page.evaluate(async({cfg,ids,mutations})=>Orbit.productRuntimeBrowserProvidersP0.callFunction(cfg.functionName,{tenantId:cfg.tenantId,activeRole:cfg.role,requestId:ids.requestId,mutations},cfg.region),{cfg,ids,mutations});
+    proof.step='DURABLE_READBACK';
     check(result?.ok===true&&result.canonicalReadback===true&&result.canonicalReadbackCount===2&&result.requestId===ids.requestId&&result.eventId===ids.eventId,'SERVER_READBACK_MISSING');
     for(let i=0;i<2;i++)assertPersisted((await recordRefs[i].get()).data(),mutations[i],ids,cfg);
     auditProof((await requestRef.get()).data(),(await eventRef.get()).data(),ids,cfg,hash(mutations));proof.durableReadbackCount=2;
     check(hash((await clientRef.get()).data())===clientDigest,'CLIENT_CHANGED');
-    const after=await page.evaluate(()=>({uid:Orbit.auth?.productUser?.uid||'',role:Orbit.session.rol(),modal:!!document.querySelector('#policy-v1199'),gate:!!document.querySelector('[data-legal-gate]')}));
+    proof.step='SESSION_READBACK';const after=await page.evaluate(()=>({uid:Orbit.auth?.productUser?.uid||'',role:Orbit.session.rol(),modal:!!document.querySelector('#policy-v1199'),gate:!!document.querySelector('[data-legal-gate]')}));
     check(after.uid===actorUid&&normalized(after.role)==='direccion'&&!after.modal&&!after.gate&&page.url()===routeBefore,'SESSION_OR_ROUTE_CHANGED');proof.sessionPreserved=true;
-  }catch(error){failure=error;proof.failureCode=typeof error?.code==='string'&&/^I66_DOCUMENTED_TERMS_[A-Z_]+(?![\s\S])/.test(error.code)?error.code:'I66_DOCUMENTED_TERMS_RUNTIME_HOLD';}
+  }catch(error){failure=error;proof.failureCode=FAILURE_CODES.includes(error?.code)?error.code:'I66_DOCUMENTED_TERMS_RUNTIME_HOLD';}
   finally{
     const cleanupErrors=[];
     if(opened)try{const form=page.locator('#policy-v1199');await form.getByRole('button',{name:'Cancelar',exact:true}).click();await form.waitFor({state:'detached',timeout:10000});proof.modalCancelled=true;}catch{cleanupErrors.push('MODAL_RESTORE');}
@@ -123,4 +148,4 @@ async function runDocumentedTermsCheck({page,role,actorUid,tenantId,live,db,clie
   if(proof.status!=='PASS'){const error=Error('I66_DOCUMENTED_TERMS_SIGNED_HOLD');error.code='I66_DOCUMENTED_TERMS_SIGNED_HOLD';error.documentedTermsProof=proof;throw error;}
   return proof;
 }
-module.exports={SCHEMA,contextIdentity,clientProof,fixtureIdentity,validateCalculation,assertPersisted,auditProof,validateUi,hash,runDocumentedTermsCheck};
+module.exports={SCHEMA,STEPS,FAILURE_CODES,safeDocumentedTermsProof,contextIdentity,clientProof,fixtureIdentity,validateCalculation,assertPersisted,auditProof,validateUi,hash,runDocumentedTermsCheck};

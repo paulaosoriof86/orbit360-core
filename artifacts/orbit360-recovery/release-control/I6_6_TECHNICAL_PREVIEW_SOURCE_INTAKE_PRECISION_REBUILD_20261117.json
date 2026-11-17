@@ -1,0 +1,102 @@
+{
+  "schema": "GI_I66_CURRENT_TECHNICAL_PREVIEW_ROLLOVER_V1",
+  "status": "EXACT_CURRENT_TASK_PREVIEW_SOURCE_INTAKE_AND_PRECISION_REBUILD",
+  "gate": "I6.6",
+  "phase": "PREVIEW",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "projectId": "ays-orbit-360-lab",
+  "sourceBaseHead": "a04f5c04680c797e938009cca3e1f595eff1315c",
+  "executionAuthority": {
+    "kind": "EXISTING_I66_CONTINUE_CORRECT_TEST_AND_PUBLISH_SCOPE",
+    "canonicalPlan": "artifacts/orbit360-recovery/release-control/I6_6_OPERATIONAL_CONTINUATION_20261115.json",
+    "scope": "Replace only the current isolated technical Preview with the next immutable I6.6 candidate under the existing instruction to continue correction and signed verification. This is not an extension of the separate legal consent decision and not permission to delete any channel, change LIVE or apply payments.",
+    "newLegalConsentGrantUsedForHosting": false,
+    "mustStopOnBeforeStateDrift": true
+  },
+  "channel": {
+    "id": "gi-i66-rc-44009981499",
+    "origin": "https://ays-orbit-360-lab--gi-i66-rc-44009981499-d08psr2y.web.app",
+    "createdAt": "2026-11-17T03:34:28.874524705Z",
+    "expectedVersion": "sites/ays-orbit-360-lab/versions/02be9eaa1b58e335"
+  },
+  "previousCandidate": {
+    "sourceSha": "cef42d7713aa83c73f1f0d0e35afb38a9165e433",
+    "buildRunId": 44047311664,
+    "buildRunAttempt": 1,
+    "artifactId": 14312141615,
+    "artifactDigest": "sha256:5389e7d1c32db4eb02056b4d7d2b04cf10de10e539df739b8cca4fe7d7b60731",
+    "expectedSiteFileCount": 223,
+    "runtimeProofRequired": "DOWNLOAD_HASH_ARCHIVE_VALIDATE_MANIFEST_AND_COMPARE_EVERY_HOSTED_FILE_INCLUDING_BUILD_JSON_BEFORE_REPLACEMENT"
+  },
+  "protectedLive": {
+    "sourceSha": "84769378eb2014addebfefdbdd63091bddc4b817",
+    "buildRunId": 43503721126,
+    "artifactId": 14075022275,
+    "artifactDigest": "sha256:b0f3bacb68511cdfc91ac934602c51f55afec5c1d6428d886d13a72a706ee283",
+    "liveRunId": 43506971214,
+    "version": "sites/ays-orbit-360-lab/versions/0766db29b338befc",
+    "origins": [
+      "https://ays-orbit-360-lab.web.app",
+      "https://app.aysseguros.com"
+    ]
+  },
+  "freshInventoryEvidence": {
+    "runId": 44047311664,
+    "runAttempt": 1,
+    "jobId": 133916268189,
+    "totalChannels": 51,
+    "inventoryStep": "SUCCESS",
+    "wholeJob": "SUCCESS",
+    "rolloverEvidenceArtifactId": 14311489044,
+    "rolloverEvidenceArtifactDigest": "sha256:7da370e97f2dba69a976e6a38559b38ebfed69f81d81de66a24424ef1ec59c7f",
+    "afterInventorySha256": "89089a45d40da050eec991690fe88a1a20abb96c3e8ef44c33fa42e61819980a",
+    "comparison": "FULL_OTHER_FIFTY_CHANNEL_METADATA_EXACT_BEFORE_AFTER",
+    "otherChannelsIdenticalFullMetadata": 50,
+    "writes": 0,
+    "freshRuntimeInventoryRequiredAgain": true
+  },
+  "constraints": {
+    "onlyWhenNewChannelQuotaIsExhausted": true,
+    "backupBeforeOverwrite": true,
+    "readbackBeforeAndAfter": true,
+    "sameNewImmutableArtifact": true,
+    "noLiveChanges": true,
+    "noOtherChannelChanges": true,
+    "noChannelDeletion": true,
+    "noBackendChanges": true,
+    "noBusinessDataWrites": true,
+    "noRulesAuthIamChanges": true,
+    "stopOnIdentityDrift": true
+  },
+  "notAcceptance": {
+    "hostingReplacementIsNotSignedFunctionalPass": true,
+    "hostingReplacementIsNotProductionAcceptance": true,
+    "noOperationalPercentIncrease": true
+  },
+  "priorRolloverReceipt": {
+    "path": "artifacts/orbit360-recovery/release-control/I6_6_TECHNICAL_PREVIEW_DOCUMENTED_SOURCE_AND_TRANSPORT_REBUILD_20261117.json",
+    "sha256": "dc85b2690778aa92452663f03e3f5e5c1c3df50d37f7914aeb6fef1d83577d41",
+    "preserveBytes": true
+  },
+  "causalRetry": {
+    "defect": "The signed Preview stopped at the documented premium helper; its diagnostic omitted the helper subproof. Independent execution of the exact served UI and calculator reproduced a cent-precision defect: the policy form used the global rounded KPI formatter. Fix only that financial detail formatter and retain sanitized helper substep/write/cleanup proof. The already tested authenticated source-intake continuation is included in the same new immutable candidate under the existing operational update request.",
+    "failedPreviewRunId": 44048179414,
+    "failedPreviewRunAttempt": 1,
+    "diagnosticArtifactId": 14312547286,
+    "diagnosticArtifactDigest": "sha256:3256551e8363132605f8dbb4c7a27c273f89bb5f142fb7d1aa74dc9d5d3b0553",
+    "failedRunRemainsFailed": true,
+    "lastProvenStage": "DOCUMENTED_ASSIGNMENT_NATIVE_UI_PREVIEW_CONFIRM_RELOAD_REPLAY_COMPENSATION_PRESERVES_ALL_FINANCIAL_RELATIONS",
+    "helperRuntimeFailureCodeNotRetained": true,
+    "locallyReproducedCode": "I66_DOCUMENTED_TERMS_UI_PREVIEW_MISMATCH",
+    "previousHelperCleanupNotDemonstrated": true,
+    "correction": "Exact two-decimal policy detail presentation; allowlisted documentary proof retained on failure; existing callable source intake with immutable lineage, source hashing, deduplication and signed UI readback. No change to global KPI formatting, role grants, QA acceptance criteria or payment application owner.",
+    "preserveFunctionalChecksAndCleanup": true,
+    "doNotRetroactivelyClassifyConsole": true,
+    "unexpectedErrorsRemainHold": true,
+    "newSourceRequiresNewBuildDigest": true,
+    "noLiveOrRealPaymentAuthority": true,
+    "noReuseOfPriorPreviewPassForNewSource": true,
+    "noRebuildOfCertifiedArtifactInPlace": true
+  }
+}

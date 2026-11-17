@@ -6,7 +6,9 @@ const proposalAccess=require('../functions/b4-003-scoped-access-boundary');
 const {resolveProductActiveRole}=require('../functions/product-active-role-contract');
 const {LEGAL_FAILURE_CHECKS,safeLegalFailureSubstage}=require('./gravicentra-i6-6-direction-preview-legal-acceptance.cjs');
 const DRIVER='gravicentra-i6-6-proposal-application-signed-uat.cjs';
-const STAGES=Object.freeze(`BOOT BUILD_IDENTITY CANONICAL_CONTROL_READ FIXTURE_ABSENCE SIGNED_SESSION DIRECTION_LEGAL_ACCEPTANCE SYNTHETIC_STAGE_SETUP FIRST_PROPOSAL_PREREQUISITES FIRST_PROPOSAL_PREVIEW OPERATIVE_ACCESS OPERATIVE_PROPOSAL_PREVIEW ADVISOR_ROLE_DENIAL CALLER_MONEY_DENIAL FOREIGN_COUNTRY_DENIAL UI_RESOLUTION_OPEN UI_RESOLUTION_CONFIRM RESOLUTION_READBACK READY_PREVIEW SOURCE_CHANGE_GUARD UI_APPLICATION_CONFIRM APPLICATION_RELOAD APPLICATION_READBACK IDEMPOTENT_REPLAY SOURCE_IMMUTABILITY SYNTHETIC_RESTORE`.split(' '));
+const SOURCE_INTAKE_STAGES=Object.freeze('SOURCE_INTAKE_PREPARE SOURCE_INTAKE_UI_OPEN SOURCE_INTAKE_UI_SUBMIT SOURCE_INTAKE_RELOAD_READBACK SOURCE_INTAKE_UI_REPLAY SOURCE_INTAKE_COMPLETE'.split(' '));
+const STAGES=Object.freeze([...`BOOT BUILD_IDENTITY CANONICAL_CONTROL_READ FIXTURE_ABSENCE SIGNED_SESSION DIRECTION_LEGAL_ACCEPTANCE SYNTHETIC_STAGE_SETUP FIRST_PROPOSAL_PREREQUISITES FIRST_PROPOSAL_PREVIEW OPERATIVE_ACCESS OPERATIVE_PROPOSAL_PREVIEW ADVISOR_ROLE_DENIAL CALLER_MONEY_DENIAL FOREIGN_COUNTRY_DENIAL UI_RESOLUTION_OPEN UI_RESOLUTION_CONFIRM RESOLUTION_READBACK READY_PREVIEW SOURCE_CHANGE_GUARD UI_APPLICATION_CONFIRM APPLICATION_RELOAD APPLICATION_READBACK IDEMPOTENT_REPLAY SOURCE_IMMUTABILITY SYNTHETIC_RESTORE`.split(' '),...SOURCE_INTAKE_STAGES]);
+const SOURCE_INTAKE_FAILURE_CHECKS=Object.freeze('I66_INTAKE_SYNTHETIC_NONCE_REQUIRED I66_INTAKE_INSURER_BOUND I66_INTAKE_CANONICAL_INSURER_REQUIRED I66_INTAKE_TARGET_PREEXISTED I66_INTAKE_UI_HTTP I66_INTAKE_UI_READBACK I66_INTAKE_UI_COUNTS I66_INTAKE_RELOAD_ACTOR I66_INTAKE_READBACK_OWNERSHIP I66_INTAKE_COMMIT_RECEIPT_EXACT I66_INTAKE_NO_PAYMENT_EVENTS I66_INTAKE_FINANCIAL_TARGET_UNCHANGED I66_INTAKE_SOURCE_IMMUTABLE I66_INTAKE_REPLAY_EXACT I66_INTAKE_BROWSER_ERRORS'.split(' '));
 const OPERATIONS=Object.freeze(['preview_proposal_application','resolve_proposal_application','apply_proposal_application']);
 const SCOPES=Object.freeze(['none','own','team','all']);
 const SCOPE_OUTCOMES=Object.freeze(`ALLOWED MEMBERSHIP_DENIED ROLE_NOT_PROVIDED SIGNED_ACTIVE_ROLE_MISMATCH ROLE_DENIED COLLECTION_DENIED DIRECTORY_DENIED TEAM_DIRECTORY_DENIED MODULE_DENIED COUNTRY_DENIED SCOPE_NONE ROLE_TEAM_CONFIG_INVALID ADVISOR_MAPPING_REQUIRED RECORD_REQUIRED TENANT_DENIED ADVISOR_AMBIGUOUS FOREIGN_RECORD_DENIED PRODUCT_ASSIGNED_ROLES_MISSING PRODUCT_ACTIVE_ROLE_NOT_ASSIGNED FIXTURE_COUNTRY_NOT_EXPECTED UNKNOWN_SCOPE_FAILURE`.split(' '));
@@ -170,7 +172,7 @@ function failureDetails(error,stage){
  const failureClass=assertion?'ASSERTION':error?.name==='TimeoutError'?'TIMEOUT':error?.name==='TypeError'?'TYPE_ERROR':error?.name==='ReferenceError'?'REFERENCE_ERROR':CALLABLE_CODES.includes(safeCode(error?.code))?'CALLABLE':'ERROR';
  const match=typeof error?.stack==='string'?error.stack.match(/(?:^|[\/\\\s(])gravicentra-i6-6-proposal-application-signed-uat\.cjs:(\d+):(\d+)(?:\)|\s|$)/m):null;
  const location=match?safeFailureLocation({file:DRIVER,line:Number(match[1]),column:Number(match[2])}):null;
- const result={failureStage:safeStage(stage),failureClass,failureCheck:pick(message,FAILURE_CHECKS,assertion?'UNNAMED_ASSERTION':'UNNAMED_FAILURE'),failureCode:safeCode(error?.code)};
+ const result={failureStage:safeStage(stage),failureClass,failureCheck:pick(message,[...FAILURE_CHECKS,...SOURCE_INTAKE_FAILURE_CHECKS],assertion?'UNNAMED_ASSERTION':'UNNAMED_FAILURE'),failureCode:safeCode(error?.code)};
  if(location){result.failureLocation=location;result.failureLine=location.line;}
  const substage=safeLegalFailureSubstage(error?.directionLegalSubstage);
  if(stage==='DIRECTION_LEGAL_ACCEPTANCE'&&substage)result.failureLegalSubstage=substage;
@@ -203,18 +205,26 @@ function diagnoseProposalPrerequisites({member,accessConfig,reconciliationConfig
  }
  return safePrerequisites(out);
 }
+function safeSourceIntakeEvidence(value={}){
+ value=value&&typeof value==='object'&&!Array.isArray(value)?value:{};
+ const out={status:pick(value.status,['PASS','HOLD'],'HOLD'),stage:pick(value.stage,SOURCE_INTAKE_STAGES,'UNKNOWN_STAGE')};
+ for(const key of ['syntheticOnly','sourceFileHashVerified','sourceMetadataDigestVerified','normalUiRequest','normalUiResponseConfirmed','readbackAfterReload','signedActorPreserved','realLedgerPointerUnchanged','countsExact','qaAuthorityExact','normalUiIdempotentReplay'])out[key]=bool(value[key]);
+ for(const key of ['financialWrites','sourceRows','proposals','holds','replayIntakeWrites','consoleErrors','pageErrors','httpErrors'])out[key]=count(value[key],500);
+ return out;
+}
 function safeProposalDiagnosticReport(report={}){
  const out={owner:'PROPOSAL',status:pick(report.status,['PASS','HOLD','FAIL'],'HOLD'),phase:pick(report.phase,['PREVIEW','LIVE']),checks:count(Array.isArray(report.checks)?report.checks.length:report.checks,100),realControlUnchanged:bool(report.realControlUnchanged)};
  if(report.failureStage!==undefined){
   out.failureStage=safeStage(report.failureStage);out.failureClass=pick(report.failureClass,FAILURE_CLASSES,'ERROR');
-  out.failureCheck=pick(report.failureCheck,[...FAILURE_CHECKS,...FALLBACK_CHECKS],'UNNAMED_FAILURE');out.failureCode=safeCode(report.failureCode);
+  out.failureCheck=pick(report.failureCheck,[...FAILURE_CHECKS,...SOURCE_INTAKE_FAILURE_CHECKS,...FALLBACK_CHECKS],'UNNAMED_FAILURE');out.failureCode=safeCode(report.failureCode);
   const location=safeFailureLocation(report.failureLocation);if(location){out.failureLocation=location;out.failureLine=location.line;}
   const substage=safeLegalFailureSubstage(report.failureLegalSubstage);if(out.failureStage==='DIRECTION_LEGAL_ACCEPTANCE'&&substage)out.failureLegalSubstage=substage;
  }
  const diagnostics=report.proposalDiagnostics||{};
  out.proposalDiagnostics={prerequisites:safePrerequisites(diagnostics.prerequisites),calls:Array.isArray(diagnostics.calls)?diagnostics.calls.slice(-32).map(safeCallableDiagnostic):[]};
  if(report.uiApplicationConfirmation)out.uiApplicationConfirmation=safeUiApplicationEvidence(report.uiApplicationConfirmation);
+ if(report.sourceIntake)out.sourceIntake=safeSourceIntakeEvidence(report.sourceIntake);
  if(report.cleanup){out.cleanupStatus=pick(report.cleanup.status,['PASS','HOLD'],'HOLD');out.remaining=count(report.cleanup.remaining,100);out.removedOwnedTargets=count(report.cleanup.removedOwnedTargets,100);out.cleanupErrorCode=safeCode(report.cleanup.errorCode);out.cleanupNonOwnedTarget=Array.isArray(report.cleanup.errors)&&report.cleanup.errors.includes('NON_OWNED_TARGET');}
  return out;
 }
-module.exports=Object.freeze({DRIVER,STAGES,OPERATIONS,REASONS,CALLABLE_CODES,FAILURE_CHECKS,UI_CAUSAL_FIELDS,safeCode,safeReason,safeStage,projectCallableResult,safeCallableDiagnostic,ownedUiRequest,projectUiResponse,observerFailure,projectUiObservationFailure,uiApplicationResultMatches,safeUiApplicationObservation,safeUiApplicationEvidence,validateUiApplicationEvidence,observeUiApplication,failureDetails,safePrerequisites,diagnoseProposalPrerequisites,safeProposalDiagnosticReport});
+module.exports=Object.freeze({DRIVER,STAGES,OPERATIONS,REASONS,CALLABLE_CODES,FAILURE_CHECKS,UI_CAUSAL_FIELDS,SOURCE_INTAKE_STAGES,SOURCE_INTAKE_FAILURE_CHECKS,safeCode,safeReason,safeStage,projectCallableResult,safeCallableDiagnostic,ownedUiRequest,projectUiResponse,observerFailure,projectUiObservationFailure,uiApplicationResultMatches,safeUiApplicationObservation,safeUiApplicationEvidence,validateUiApplicationEvidence,observeUiApplication,failureDetails,safePrerequisites,diagnoseProposalPrerequisites,safeSourceIntakeEvidence,safeProposalDiagnosticReport});

@@ -153,7 +153,7 @@ Orbit.modules.importar = (function () {
     if (Orbit.importarP0Confirmacion) { if (onload) onload(); return; }
     if (Orbit.__importarP0ConfirmacionLoader) return;
     Orbit.__importarP0ConfirmacionLoader = true;
-    addScript('modules/importar-p0-confirmacion.js?v=20260709', onload);
+    addScript('modules/importar-p0-confirmacion.js?v=20261117-source-intake-v2', onload);
   }
 
   function loadP0Rules() {
@@ -207,9 +207,16 @@ Orbit.modules.importar = (function () {
   function mountP0Confirmacion(host) {
     const conf = host.querySelector('#importar-p0-confirmacion');
     if (!conf) return;
-    const sampleBatch = { status: 'sin_lote', operations: [] };
-    if (Orbit.importarP0Confirmacion) Orbit.importarP0Confirmacion.mount(conf, sampleBatch);
-    else loadP0Confirmacion(function () { if (Orbit.importarP0Confirmacion) Orbit.importarP0Confirmacion.mount(conf, sampleBatch); });
+    const readback = Orbit.__lastSourceIntakeReadback;
+    if (readback && readback.ok === true && readback.financialWrites === 0 && Array.isArray(readback.results) && readback.results.every(r => r.readbackConfirmed === true)) {
+      conf.innerHTML = '<div class="card pad" style="margin-top:16px"><b>Último ingreso documental confirmado</b><p>' + U.esc(readback.counts.sourceRows) + ' filas de fuente; ' + U.esc(readback.counts.proposals) + ' propuestas; ' + U.esc(readback.counts.holds) + ' en revisión. Pagos aplicados: 0.</p><a class="btn ghost" href="#/conciliaciones">Revisar en Conciliaciones →</a></div>';
+      return;
+    }
+    const actual = Orbit.__p0DryRunLastReport;
+    const batch = actual && actual.batch && Array.isArray(actual.batch.operations) ? actual.batch : actual && Array.isArray(actual.operations) ? actual : null;
+    if (!batch) { conf.innerHTML = '<div class="card pad muted" style="margin-top:16px">Selecciona una fuente real para revisar su mapeo. Los estados y las planillas ingresan como fuentes/propuestas con evidencia y confirmación del servidor, sin aplicar pagos.</div>'; return; }
+    if (Orbit.importarP0Confirmacion) Orbit.importarP0Confirmacion.mount(conf, batch);
+    else loadP0Confirmacion(function () { if (Orbit.importarP0Confirmacion) Orbit.importarP0Confirmacion.mount(conf, batch); });
   }
 
   function render(host) {

@@ -103,6 +103,13 @@ function canonicalEvidence(proposal,evidence,policy,receipt,evidenceRef) {
 }
 
 function syntheticLedgerValid(pointer,manifest,tenantId,runId) {
+  const sourceIntake=require('./cobros-source-intake-v2');
+  if(pointer&&pointer.schemaVersion===sourceIntake.POINTER_SCHEMA||manifest&&manifest.schemaVersion===sourceIntake.MANIFEST_SCHEMA){
+    if(!sourceIntake.QA_RUN.test(runId)||!pointer||!manifest||pointer.__syntheticQa!==true||manifest.__syntheticQa!==true||
+       pointer.qaRunId!==runId||manifest.qaRunId!==runId||pointer.activeRunId!==runId||manifest.runId!==runId||
+       !Array.isArray(manifest.retainedRuns)||manifest.retainedRuns.length!==0)return false;
+    try{sourceIntake.validateSourceRunContract(pointer,manifest,tenantId);return true;}catch(_){return false;}
+  }
   return /^cobledgerqa_[a-z0-9_]{12,80}$/.test(runId)&&pointer&&manifest&&
     pointer.__syntheticQa===true&&manifest.__syntheticQa===true&&pointer.qaRunId===runId&&manifest.qaRunId===runId&&
     pointer.activeRunId===runId&&manifest.id===runId&&manifest.runId===runId&&manifest.tenantId===tenantId&&
@@ -171,10 +178,10 @@ async function assessProposalApplication({tenantId,payload,read,items,runRef,con
   let policies=policySnap.docs.map(d=>Object.assign({id:d.id},d.data()));
   const expectedPolicy=text(first(evidence,['policyId','polizaId'])||first(proposal,['policyId','polizaId']));
   if(expectedPolicy)policies=policies.filter(p=>p.id===expectedPolicy);
-  const sourceStart=text(first(evidence,['vigenciaDesde','inicioVigencia','policyStartDate']));
-  const sourceEnd=text(first(evidence,['vigenciaHasta','finVigencia','policyEndDate']));
-  if(sourceStart)policies=policies.filter(p=>text(first(p,['vigenciaDesde','inicioVigencia','fechaInicio']))===sourceStart);
-  if(sourceEnd)policies=policies.filter(p=>text(first(p,['vigenciaHasta','finVigencia','fechaFin']))===sourceEnd);
+  const sourceStart=text(first(evidence,['vigenciaDesde','inicioVigencia','vigenciaInicio','policyStartDate']));
+  const sourceEnd=text(first(evidence,['vigenciaHasta','finVigencia','vigenciaFin','policyEndDate']));
+  if(sourceStart)policies=policies.filter(p=>text(first(p,['vigenciaDesde','inicioVigencia','fechaInicio','vigenciaInicio']))===sourceStart);
+  if(sourceEnd)policies=policies.filter(p=>text(first(p,['vigenciaHasta','finVigencia','fechaFin','vigenciaFin']))===sourceEnd);
   const insurer=text(first(evidence,['aseguradoraId','insurerId']));
   if(insurer)policies=policies.filter(p=>text(p.aseguradoraId||p.insurerId)===insurer);
   if(!policies.length)return review('SOURCE_POLICY_EDITION_NOT_FOUND');
@@ -206,7 +213,7 @@ async function assessProposalApplication({tenantId,payload,read,items,runRef,con
   }
   const resolutionOptions=candidates.slice(0,100).map(({policy,receipt})=>({
     policyId:policy.id,receiptId:receipt.id,policyNumber:text(policy.numero),
-    policyTerm:[text(first(policy,['vigenciaDesde','inicioVigencia','fechaInicio'])),text(first(policy,['vigenciaHasta','finVigencia','fechaFin']))].filter(Boolean).join(' — '),
+    policyTerm:[text(first(policy,['vigenciaDesde','inicioVigencia','fechaInicio','vigenciaInicio'])),text(first(policy,['vigenciaHasta','finVigencia','fechaFin','vigenciaFin']))].filter(Boolean).join(' — '),
     installment:text(first(receipt,['cuota','numeroCuota','secuencia'])),
     receiptNumber:text(first(receipt,['numeroReciboFuente','numeroRecibo','reciboNumero','requerimiento','numero'])),
     dueDate:text(first(receipt,['vence','fechaVencimiento','fechaLimite'])),amount:amount(receipt),

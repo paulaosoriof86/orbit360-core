@@ -10,7 +10,7 @@ const os=require('node:os');
 const contract=require('../functions/advisor-commission-payable-contract');
 const assignment=require('../functions/advisor-assignment-correction-contract');
 const {acceptDirectionPreviewLegal,LEGAL_FAILURE_CHECKS,safeLegalFailureSubstage}=require('./gravicentra-i6-6-direction-preview-legal-acceptance.cjs');
-const {runDocumentedTermsCheck}=require('./gravicentra-i6-6-documented-terms-signed-check.cjs');
+const {runDocumentedTermsCheck,safeDocumentedTermsProof,FAILURE_CODES:DOCUMENTED_TERMS_FAILURE_CODES}=require('./gravicentra-i6-6-documented-terms-signed-check.cjs');
 const PROJECT='ays-orbit-360-lab',TENANT='alianzas-soluciones';
 const SOURCE_SCHEMA='gravicentra-advisor-commission-source-batch-v1';
 const hash=value=>crypto.createHash('sha256').update(String(value)).digest('hex');
@@ -340,7 +340,7 @@ function assertServerDenial(out,code,reason){
 }
 const BROWSER_STAGES=new Set(['BUILD_IDENTITY','FIXTURE_SETUP','SIGNED_SESSION','DIRECTION_LEGAL_ACCEPTANCE','OPERATIVE_FINANCIAL_DENIAL',
   'FINANCE_UI_HYDRATION','DOCUMENT_FILE_UI_70','DOCUMENT_FILE_UI_60','REPLAY_AND_SOURCE_GUARDS',
-  'ASSIGNMENT_DOCUMENTARY_UI','ASSIGNMENT_RELOAD','LEGACY_GUARDS','LEGACY_FINANCE_EDIT','PENDING_CXP_RELOAD','SYNTHETIC_RESTORE']);
+  'ASSIGNMENT_DOCUMENTARY_UI','ASSIGNMENT_RELOAD','DOCUMENTED_PREMIUM_TERMS','LEGACY_GUARDS','LEGACY_FINANCE_EDIT','PENDING_CXP_RELOAD','SYNTHETIC_RESTORE']);
 const browserStage=value=>BROWSER_STAGES.has(value)?value:'UNKNOWN_STAGE';
 const BROWSER_DENIALS=Object.freeze([
   ['OPERATIVE_CXP','operativo','OPERATIVE_FINANCIAL_DENIAL','permission-denied',''],
@@ -645,7 +645,7 @@ function safeFailureEvidence(error,stage){
   // Exact source-owned codes only; never retain compared values or exception text.
   const exactLegalChecks=new Set(LEGAL_FAILURE_CHECKS);
   const firstLine=message.split(/\r?\n/,1)[0];
-  const check=exactLegalChecks.has(firstLine)?firstLine:checks.find(value=>message===value||message.startsWith(value+'_')||message.startsWith(value+'\n'));
+  const check=exactLegalChecks.has(firstLine)?firstLine:DOCUMENTED_TERMS_FAILURE_CODES.includes(message)?message:checks.find(value=>message===value||message.startsWith(value+'_')||message.startsWith(value+'\n'));
   const legalSubstage=stage==='DIRECTION_LEGAL_ACCEPTANCE'?safeLegalFailureSubstage(error?.directionLegalSubstage):null;
   const location=String(error?.stack||'').match(/(?:^|[/\\])gravicentra-i6-6-advisor-payables-signed-uat\.cjs:(\d+):(\d+)/);
   return {failureClass:error?.code==='ERR_ASSERTION'?'ERR_ASSERTION':error?.name==='TimeoutError'?'TIMEOUT_ERROR':'ASSERTION_OR_RUNTIME_FAILURE',
@@ -1122,6 +1122,7 @@ async function main(){
       report.financeUiDiagnostics=safeFinanceUiDiagnostics(report.financeUiDiagnostics);
       console.log('I66_ADVISOR_FINANCE_UI_DIAGNOSTIC '+JSON.stringify(report.financeUiDiagnostics));
     }
+    if(report.documentedTerms)console.log('I66_DOCUMENTED_TERMS_DIAGNOSTIC '+JSON.stringify(safeDocumentedTermsProof(report.documentedTerms)));
     console.log('I66_ADVISOR_BROWSER_OBSERVABILITY '+JSON.stringify({status:report.browserObservability.status,...report.browserObservability.totals}));
     fs.writeFileSync(cfg.reportPath,JSON.stringify(report,null,2)+'\n',{flag:'wx',mode:0o600});
     console.log('I66_ADVISOR_PAYABLE_SIGNED_'+cfg.phase+'_'+report.status+' '+JSON.stringify({checks:report.checks.length,cleanup:report.cleanup.status,remaining:report.cleanup.remaining,realCustomerWritesRequested:0,bankMovements:0,financialPayments:0,authOrMembershipMutations:0,...failure}));

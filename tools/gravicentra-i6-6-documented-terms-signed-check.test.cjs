@@ -80,3 +80,26 @@ test('calculation validator rejects extra fee, altered IVA/amount and invented p
 test('sanitized proof does not disclose actor/client IDs, payload, errors or a claimed reload',async()=>{
   const h=await run({denied:true}),serialized=JSON.stringify(h.proof);assert.ok(!serialized.includes(actorUid));assert.ok(!serialized.includes(clientId));assert.ok(!serialized.includes('permission-denied'));assert.equal(h.proof.reloadPerformed,false);assert.equal(h.proof.financialPayments,0);assert.equal(h.proof.realCustomerWrites,0);
 });
+test('UI failure records exact step without writing and keeps helper cleanup visible',async()=>{
+  const h=await run({badUi:true});assert.equal(h.proof.step,'FORM_PREVIEW');assert.equal(h.proof.failureCode,'I66_DOCUMENTED_TERMS_UI_PREVIEW_MISMATCH');
+  assert.equal(h.proof.writeAttempted,false);assert.equal(h.proof.cleanup.status,'PASS');assert.equal(h.proof.cleanup.remaining,0);
+  const safe=H.safeDocumentedTermsProof(h.proof);assert.equal(safe.diagnosticOnly,true);assert.equal(safe.status,'HOLD');assert.equal(safe.step,'FORM_PREVIEW');
+  assert.equal(safe.uiChecks.totalExact,false);assert.equal(safe.writeAttempted,false);assert.equal(safe.cleanup.remaining,0);
+});
+test('diagnostic projection admits only bounded source-owned codes, counts and booleans',()=>{
+  const sentinel='PRIVATE_CUSTOMER_TOKEN_URL';const proof=H.safeDocumentedTermsProof({schemaVersion:sentinel,status:sentinel,sourceSha:sentinel,phase:sentinel,step:sentinel,ui:sentinel,
+    buildId:sentinel,durableReadbackCount:5,writeAttempted:sentinel,reloadPerformed:sentinel,sessionPreserved:sentinel,modalCancelled:sentinel,realCustomerWrites:1,
+    financialPayments:sentinel,bankMovements:sentinel,failureCode:'I66_DOCUMENTED_TERMS_'+sentinel,payload:sentinel,error:sentinel,actorUid:sentinel,
+    cleanup:{status:sentinel,remaining:9,failureClasses:[sentinel,'RECORD_RESTORE','RECORD_RESTORE']},uiChecks:{unknownPaymentPreserved:true,totalExact:sentinel,dateExact:false,rawText:sentinel}});
+  assert.equal(JSON.stringify(proof).includes(sentinel),false);assert.equal(proof.status,'HOLD');assert.equal(proof.sourceSha,null);assert.equal(proof.durableReadbackCount,null);
+  assert.deepEqual(proof.cleanup,{status:'NOT_STARTED',remaining:null,failureClasses:['RECORD_RESTORE']});assert.equal(proof.failureCode,'I66_DOCUMENTED_TERMS_RUNTIME_HOLD');
+  assert.equal(proof.realCustomerWrites,null);assert.equal(proof.uiChecks.totalExact,null);
+});
+test('signed advisor and failed workflow preserve safe documentary proof and known stage',()=>{
+  const advisor=require('./gravicentra-i6-6-advisor-payables-signed-uat.cjs');
+  const failure=advisor.safeFailureEvidence({message:'I66_DOCUMENTED_TERMS_SIGNED_HOLD'},'DOCUMENTED_PREMIUM_TERMS');
+  assert.equal(failure.failureStage,'DOCUMENTED_PREMIUM_TERMS');assert.equal(failure.failureCheck,'I66_DOCUMENTED_TERMS_SIGNED_HOLD');
+  const w=fs.readFileSync(path.join(__dirname,'../.github/workflows/gravicentra-i66-privileged-role-three-function-preview-uat.yml'),'utf8');
+  assert.ok(w.includes('out.documentedTerms=safeDocumentedTermsProof(r.documentedTerms)'));
+  assert.ok(w.includes("'DOCUMENTED_PREMIUM_TERMS'"));
+});

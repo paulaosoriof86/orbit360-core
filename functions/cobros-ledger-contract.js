@@ -33,6 +33,12 @@ function requireSha(value, code) {
 }
 
 function validateActiveLedgerContract(pointer, manifest, tenantId) {
+  // The fixed 365-row historical contract below is unchanged. New admitted
+  // source runs use an explicit server-owned successor, never historical pins.
+  const v2 = require('./cobros-source-intake-v2');
+  if (pointer && pointer.schemaVersion === v2.POINTER_SCHEMA || manifest && manifest.schemaVersion === v2.MANIFEST_SCHEMA) {
+    return v2.validateSourceRunContract(pointer, manifest, tenantId);
+  }
   if (!pointer || typeof pointer !== 'object') fail('COBROS_LEDGER_ACTIVE_POINTER_INVALID');
   if (!manifest || typeof manifest !== 'object') fail('COBROS_LEDGER_ACTIVE_RUN_INVALID');
 

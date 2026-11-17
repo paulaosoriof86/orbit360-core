@@ -1,0 +1,264 @@
+{
+  "schema": "GI_I66_SOURCE_INTAKE_PRECISION_CAUSAL_SOURCE_QA_V1",
+  "date": "2026-11-17",
+  "gate": "I6.6",
+  "closedHistoricalGate": "B4-007",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "sourceBaseHead": "a04f5c04680c797e938009cca3e1f595eff1315c",
+  "status": "TERMINAL_MANIFEST_SOURCE_QA_PASS_NEW_IMMUTABLE_SIGNED_PREVIEW_AND_LIVE_REQUIRED",
+  "directionAuthority": "EXISTING_REQUEST_UPDATE_ALL_INSURER_STATEMENTS_AND_COMMISSION_SHEETS_CORRECT_TEST_AND_PUBLISH_WITHOUT_ACCUMULATION",
+  "productOwners": [
+    {
+      "path": "orbit360-platform/modules/policy-receipts-v1199-bridge.js",
+      "bytes": 74328,
+      "sha256": "07bb7d779d2c31c7afbc5328a4769fb51e8cc8dfa1e8857251e13dd0cf2fa826",
+      "gitBlobSha": "0a967871c8594f776139fc797c7123ab75061d80"
+    },
+    {
+      "path": "functions/cobros-source-intake-v2.js",
+      "bytes": 30718,
+      "sha256": "b5d53d4f02be84543db049074fce210529bda8588e2df2bea54544dcc7cc2a6d",
+      "gitBlobSha": "31bb921f5c58cd47af606ec43217b445be519c4a"
+    },
+    {
+      "path": "functions/cobros-ledger-contract.js",
+      "bytes": 4380,
+      "sha256": "37ea0fbadd8a70dbd398721141d90bfb684a1e38705f24f999751c5f24eaaca9",
+      "gitBlobSha": "6d11841dcf743837c6ffd255e4f5e2ac0c48f229"
+    },
+    {
+      "path": "functions/cobros-reconciliation-domain.js",
+      "bytes": 92080,
+      "sha256": "dd613675083199c9ed7d013762ac4d484d6b710262f7710e205b9f83a1e16429",
+      "gitBlobSha": "6143c52d76e803421c49c443fb1b692d85ccdf14"
+    },
+    {
+      "path": "functions/i66-conciliaciones-active-ledger-projection.js",
+      "bytes": 14985,
+      "sha256": "0ef7e8d100bb5e5ff75338680780f86377ac07f4e2cdc433c93983260f75e6dd",
+      "gitBlobSha": "92ba74ebc1bc60970386a5fef25807716528b18d"
+    },
+    {
+      "path": "functions/proposal-application-boundary.js",
+      "bytes": 26920,
+      "sha256": "80b3e0941bae0a24b902446affb75178410e0cb70893398034f92da8e9b047aa",
+      "gitBlobSha": "ba807d0573c8a06a27ed06341d970407e2b4f521"
+    },
+    {
+      "path": "orbit360-platform/core/importa.js",
+      "bytes": 136007,
+      "sha256": "2a616e324473c24ccf7c638d20a7440e5749b35823bf9ccbd0b94173a55b26ed",
+      "gitBlobSha": "3009c50f83806666a2a75d543e03936d52ac9ae1"
+    },
+    {
+      "path": "orbit360-platform/modules/importar.js",
+      "bytes": 11506,
+      "sha256": "a77d1cb6dff1b6962190e7c2686f8ddf6d55302851d79a5ead026b74e6477938",
+      "gitBlobSha": "f78296730dccfae496167d18f3923c5b8e8924b2"
+    },
+    {
+      "path": "orbit360-platform/modules/importar-p0-confirmacion.js",
+      "bytes": 40248,
+      "sha256": "9210c6ec332d0a4d515d5f5769c24f7cb76e8434a0fc727200ba630e78f57e5b",
+      "gitBlobSha": "720fb357f9a37e215a77a5cbc5ddf345c8def535"
+    },
+    {
+      "path": "orbit360-platform/core/cobros-reconciliation-domain-client.js",
+      "bytes": 15132,
+      "sha256": "dca074682bba1af538f2632b1895e51115946e4cc893d36488ca716930c17b72",
+      "gitBlobSha": "1e4b42f2096d6f89de2eae63e98ea5e775db0917"
+    },
+    {
+      "path": "orbit360-platform/core/product-runtime-browser-providers-p0.js",
+      "bytes": 21254,
+      "sha256": "63f14d32afb134d961fbe4d7eb819885d38db9f02135830b8ab10e6f3bc6fc52",
+      "gitBlobSha": "1a43a9a297908b7131bc245320894cb92195f065"
+    }
+  ],
+  "testOwners": [
+    {
+      "path": "tools/gravicentra-i6-6-policy-preview-money-precision.test.cjs",
+      "bytes": 11756,
+      "sha256": "0eb27ce67675ada966b1ee56ccacdaafef1882b328b5fe089953d90175359bc4",
+      "gitBlobSha": "a3e2c29749845a3db1af58860203a300f6d0fb78"
+    },
+    {
+      "path": "tools/gravicentra-i6-6-policy-metadata-preservation.test.cjs",
+      "bytes": 20264,
+      "sha256": "1de3070a1df20fdd8c8b6737675215ed24efe084b1ee0518367948cb7e8f9a3e",
+      "gitBlobSha": "4bfc9c554e27bcb004df361ffec27346d3b0eace"
+    },
+    {
+      "path": "tools/gravicentra-i6-6-documented-terms-signed-check.test.cjs",
+      "bytes": 14957,
+      "sha256": "fa0ce7887ce6b79625d8d376fa8859317362b3143011ea3ee6e3faaa2cca1fa1",
+      "gitBlobSha": "b0d09f44af919bba4b10797a65417d9bd9b3fde8"
+    },
+    {
+      "path": "tools/gravicentra-i6-6-preview-failure-diagnostics-retention.test.cjs",
+      "bytes": 16125,
+      "sha256": "0c3e78f555aafb4796a6da8bb3532be303f0be6529dec97ec8499a22784b60b0",
+      "gitBlobSha": "1377a2f1f6924a901cdd12b4ba3b05c4bc5ea3d9"
+    },
+    {
+      "path": "tools/gravicentra-i6-6-source-intake-v2.test.cjs",
+      "bytes": 46192,
+      "sha256": "2940069d966943b55f8bb6b24486941406658ba15ccbc4721a1d99918b9a3b8a",
+      "gitBlobSha": "f2e83ef77ff6f441d3eafb141c044a5a99c3df47"
+    },
+    {
+      "path": "tools/gravicentra-i6-6-source-intake-ui.test.cjs",
+      "bytes": 20266,
+      "sha256": "b4bc60a816e2681b472e51d647065e2d087b101ab5b32f752178ad7d7f77b342",
+      "gitBlobSha": "377f5b3b1e3835e127733871486fdf675d7e47a5"
+    },
+    {
+      "path": "tools/gravicentra-i6-6-source-intake-preview-transport.test.cjs",
+      "bytes": 7913,
+      "sha256": "a90a341d8d05433c7e84c6b29d761fc703e1f08b2500f4a5f81d10c4b0b005c5",
+      "gitBlobSha": "b9d07b978bb15d63b86b451d5974565a497a259e"
+    },
+    {
+      "path": "tools/gravicentra-i6-6-finance-ui-diagnostics.test.cjs",
+      "bytes": 25474,
+      "sha256": "01a897cb031d6f8077e9b1a1c7316b4286f2e7719158876f0c0ab543befaa51b",
+      "gitBlobSha": "c37fa124c67427b265c9c4f6cc63ea63735e4bbb"
+    },
+    {
+      "path": "tools/gravicentra-i6-6-proposal-uat-diagnostics.test.cjs",
+      "bytes": 38175,
+      "sha256": "c6396b74455f1e49c1209243340fdb442dd81e8971cd27a1412d0c6cdc14110d",
+      "gitBlobSha": "59a558de0e9eca7caef5ad4daf805b72976e6466"
+    }
+  ],
+  "sourceQa": {
+    "intakeIntegratedOffline": {
+      "tests": 443,
+      "pass": 443,
+      "fail": 0,
+      "skipped": 0,
+      "includesThirteenUiClientDomainApplicationSyntheticCases": true
+    },
+    "policyPrecisionFocal": {
+      "tests": 155,
+      "pass": 155,
+      "fail": 0,
+      "skipped": 0
+    },
+    "documentedProofRetention": {
+      "tests": 164,
+      "pass": 164,
+      "fail": 0,
+      "skipped": 0
+    },
+    "syntheticPreviewTransport": {
+      "tests": 92,
+      "pass": 92,
+      "fail": 0,
+      "skipped": 0
+    },
+    "technicalPreviewRollover": {
+      "tests": 264,
+      "pass": 264,
+      "fail": 0,
+      "skipped": 0
+    },
+    "countsOverlapDoNotSum": true,
+    "allTerminalManifestTests": {
+      "files": 79,
+      "passed": 79,
+      "failed": 0,
+      "terminalOwnersVerified": true
+    },
+    "diagnosticVmFixtureDependencies": {
+      "tests": 134,
+      "pass": 134,
+      "fail": 0,
+      "skipped": 0,
+      "closedExactHelperDependencyOnly": true,
+      "acceptanceAssertionsPreserved": true
+    }
+  },
+  "causes": [
+    {
+      "code": "POLICY_DETAIL_CENT_PRECISION",
+      "before": "Real policy form delegated financial cents to rounded global KPI formatter.",
+      "after": "Financial policy detail uses exact two-decimal locale formatting; global KPI formatter unchanged.",
+      "acceptanceCriterionNotRelaxed": true
+    },
+    {
+      "code": "SOURCE_RUN_ADMISSION",
+      "before": "Legacy in-memory intake did not persist a new immutable sourceRun for the existing application boundary.",
+      "after": "Authenticated existing reconciliation command admits immutable V2 source/proposal/HOLD records, validates original source provenance, scopes, dates, whole policy groups and replay; existing signed application remains separate."
+    },
+    {
+      "code": "PREVIEW_SOURCE_INTAKE_ENVELOPE",
+      "before": "Preview provider denied the new isolated synthetic operation before HTTP.",
+      "after": "Exact schema/hash/namespace/tenant/region synthetic envelope can reach the backend, which still requires its independently preauthorized actor/source/digest QA permission."
+    },
+    {
+      "code": "DOCUMENTED_FAILURE_RETENTION",
+      "before": "Failed signed Preview omitted helper subproof and cleanup status.",
+      "after": "Closed enum/hash/boolean/count projection preserves helper step, write attempt and cleanup on HOLD without identity, customer rows, payloads, URLs or error messages."
+    }
+  ],
+  "boundaries": {
+    "newBackend": false,
+    "newCallable": false,
+    "newFirebase": false,
+    "newBranch": false,
+    "noRulesAuthIamChanges": true,
+    "noBusinessDataWritesByBuildOrQa": true,
+    "sourceIntakeFinancialWrites": 0,
+    "existingApplyCommandOnly": true,
+    "realCustomerDataInThisReceipt": false,
+    "historicalV1LedgerPreserved": true,
+    "paidReportedReconciledReceiptProtectionPreserved": true,
+    "sourceMonthNotPaymentMonth": true,
+    "paymentDateNotInferredFromInvoiceOrApplication": true,
+    "thirteenInstallmentsRequiresExplicitDocumentedException": true,
+    "realSourcesDeniedInPreview": true,
+    "unknownPaymentMethodPreserved": true
+  },
+  "priorSignedRun": {
+    "runId": 44048179414,
+    "status": "FAILED_NOT_ACCEPTED",
+    "sourceSha": "cef42d7713aa83c73f1f0d0e35afb38a9165e433",
+    "helperCleanupProofAvailable": false,
+    "mainDriverCleanupRemaining": 0,
+    "proposalDriverExecuted": false,
+    "noRetroactivePass": true
+  },
+  "knownSeparateOfflineFailures": [
+    {
+      "test": "tools/gravicentra-b4-003-cobros-unassigned-country.test.cjs",
+      "reproducedUnchangedAgainst": [
+        "e73cdb18deca517580490e28b56c646b693095fe",
+        "cef42d7713aa83c73f1f0d0e35afb38a9165e433"
+      ],
+      "changedByThisDelta": false,
+      "globalPassClaimed": false
+    },
+    {
+      "test": "tools/gravicentra-b4-004-policy-form-currency-commission.test.cjs",
+      "reproducedUnchangedAgainst": [
+        "cef42d7713aa83c73f1f0d0e35afb38a9165e433"
+      ],
+      "fixtureRosterFailures": 6,
+      "changedByThisDelta": false,
+      "globalPassClaimed": false
+    }
+  ],
+  "nextAcceptance": {
+    "newImmutableBuild": true,
+    "sameArtifactPreviewToLive": true,
+    "requiredSignedDrivers": 4,
+    "documentedTermsProofMustPass": true,
+    "sourceIntakeUiReloadAndReplayMustPass": true,
+    "cleanupAndUnexpectedErrorsMustPass": true,
+    "previewAccepted": false,
+    "liveAccepted": false,
+    "newOperationalPercentClaimed": false
+  }
+}
