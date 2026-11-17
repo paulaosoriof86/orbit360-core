@@ -8,13 +8,13 @@
     "receipt": "artifacts/orbit360-recovery/release-control/I6_6_DIRECTION_PREVIEW_V2_SCOPE_AUTHORIZATION_20261116.json",
     "receiptSha256": "d3309675c753bd1b31f9163d506aba2e29ac70583a7b8d54cb5b8503b5c50a44",
     "status": "SAME_V2_TERMS_DIRECTION_GT_I66_PREVIEW_TECHNICAL_SUCCESSORS_AUTHORIZED",
-    "newImmutableBuildRequired": true,
+    "newImmutableBuildRequired": false,
     "historicalConsentReceiptsUnchanged": true,
     "otherActors": false,
     "liveAcceptance": false,
     "realPayments": false,
-    "signedExecutionProof": "PREVIOUS_59C37_PREVIEW_PASS_PRESERVED_NEW_QA_SOURCE_REQUIRES_NEW_EXACT_SIGNED_PROOF",
-    "existingImmutableBuildRunId": 44158877469
+    "signedExecutionProof": "NEW_EXACT_SIGNED_PREVIEW_AUTHORIZED_NOT_YET_ACCEPTED",
+    "existingImmutableBuildRunId": 44167538384
   },
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
@@ -157,9 +157,9 @@
       "percent": 61.3,
       "scope": "Five frozen operational blocks only; not total product or elapsed work; source tests do not raise LIVE acceptance."
     },
-    "newPreviewAcceptance": "EXACT_FOUR_SIGNED_DRIVERS_PASS",
+    "newPreviewAcceptance": "PENDING_NEW_EXACT_SIGNED_DRIVERS",
     "lastSignedPreviewAcceptance": "59C37_SOURCE_INTAKE_RELOAD_READBACK_REPLAY_AND_CLEANUP_PASS",
-    "newLiveAcceptance": "NOT_DEPLOYED_PREDEPLOY_VALIDATOR_HOLD",
+    "newLiveAcceptance": "NOT_AUTHORIZED_FOR_LEGAL_SCOPE_NOT_EXECUTED_FOR_NEW_CANDIDATE",
     "failedPreviewRun": 43982928603,
     "failedPreviewSource": "39f54e24e59983a59a7c9a41912e0eed154efa18",
     "previousFailedPreview": {
@@ -210,27 +210,20 @@
       "realFinancialWritesApplied": 0
     },
     "latestPreviewEvidence": {
-      "sourceSha": "59c37ac9a2142c24ccb5a95f3d6df82eb62dfd94",
-      "buildRunId": 44158877469,
-      "artifactId": 14360954951,
-      "artifactDigest": "sha256:0a58c3e7398d5e44a50ca6a290a980111df17b03375ee19ee8d19c5b68067c17",
-      "buildId": "gi-i66-59c37ac9a214-57f234755dc1",
-      "previewUrl": "https://ays-orbit-360-lab--gi-i66-rc-44158877469-13g9931i.web.app",
-      "previewChannelId": "gi-i66-rc-44158877469",
-      "status": "EXACT_SIGNED_PREVIEW_PASS_SAME_ARTIFACT_LIVE_AUTHORIZED",
-      "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_SOURCE_INTAKE_RELOAD_PREVIEW_BUILD_20261117.json",
-      "signedPreviewAccepted": true,
+      "sourceSha": "fdbc65a59114d2858ce6884374eaf6c44d8ae9a9",
+      "buildRunId": 44167538384,
+      "artifactId": 14365204653,
+      "artifactDigest": "sha256:472cc909d2621c54ce79e3ca2c1f260805ef1591ad735251ccac161ff9e1e27c",
+      "buildId": "gi-i66-fdbc65a59114-57f234755dc1",
+      "previewUrl": "https://ays-orbit-360-lab--gi-i66-rc-44167538384-rhzff43z.web.app",
+      "previewChannelId": "gi-i66-rc-44167538384",
+      "status": "EXACT_IMMUTABLE_PREVIEW_BUILT_FOUR_SIGNED_DRIVERS_AUTHORIZED",
+      "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_CAUSAL_RELEASE_READINESS_PREVIEW_BUILD_20261117.json",
+      "signedPreviewAccepted": false,
       "liveAccepted": false,
       "realFinancialWrites": 0,
       "signedObservabilityProfile": "I66_SIGNED_BROWSER_OBSERVABILITY_V1",
-      "previewQa": {
-        "runId": 44160169601,
-        "headSha": "c4e30d730825e1255b82a300ab5d7c5eee643042",
-        "receiptArtifactId": 14361764826,
-        "receiptArtifactDigest": "sha256:93d3ac61bbcdcb4140434ccb8e6c320e83a48988c162458c250a63cba6a8b6a2",
-        "status": "SIGNED_DRIVERS_DURABLE_READBACK_RELOAD_RESTORE_PASS"
-      },
-      "signedOutcomeReceipt": "artifacts/orbit360-recovery/release-control/I6_6_SOURCE_INTAKE_RELOAD_SIGNED_PREVIEW_PASS_20261117.json"
+      "liveLegalConsentGranted": false
     },
     "operationsEvidenceReview": "artifacts/orbit360-recovery/release-control/I6_6_OPS_EVIDENCE_AND_PREVIEW_BINDING_REVIEW_20261116.json",
     "failedPreviewCleanup": "BOTH_FOCUSED_DRIVERS_PASS_REMAINING_ZERO",
@@ -519,7 +512,7 @@
       "conditionBasis": "SOURCE_PATH_PROVEN_NOT_AN_OBSERVED_LIVE_RUNTIME_FAILURE",
       "actualLiveFailure44161850833RemainsAuthorizationPhaseMismatch": true,
       "existingPreviewAuthorizationUnchanged": true,
-      "technicalState": "IMPLEMENTED_INACTIVE_522_LOCAL_TESTS_PASS_IMMUTABLE_PREVIEW_BUILD_PENDING"
+      "technicalState": "SOURCE_BUILT_UNCHANGED_TERMS_EXACT_SIGNED_PREVIEW_PENDING_NO_LIVE_GRANT"
     },
     "privateFinancialFocalPreparation20261117": {
       "status": "PRIVATE_FOCAL_INPUTS_PRESERVED_NOT_APPLIED",
@@ -543,6 +536,29 @@
       "productSourceChanged": false,
       "liveLegalConsentGranted": false,
       "newLiveAcceptance": false
+    },
+    "priorPreviewEvidenceBeforeReadinessBuild20261117": {
+      "sourceSha": "59c37ac9a2142c24ccb5a95f3d6df82eb62dfd94",
+      "buildRunId": 44158877469,
+      "artifactId": 14360954951,
+      "artifactDigest": "sha256:0a58c3e7398d5e44a50ca6a290a980111df17b03375ee19ee8d19c5b68067c17",
+      "buildId": "gi-i66-59c37ac9a214-57f234755dc1",
+      "previewUrl": "https://ays-orbit-360-lab--gi-i66-rc-44158877469-13g9931i.web.app",
+      "previewChannelId": "gi-i66-rc-44158877469",
+      "status": "EXACT_SIGNED_PREVIEW_PASS_SAME_ARTIFACT_LIVE_AUTHORIZED",
+      "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_SOURCE_INTAKE_RELOAD_PREVIEW_BUILD_20261117.json",
+      "signedPreviewAccepted": true,
+      "liveAccepted": false,
+      "realFinancialWrites": 0,
+      "signedObservabilityProfile": "I66_SIGNED_BROWSER_OBSERVABILITY_V1",
+      "previewQa": {
+        "runId": 44160169601,
+        "headSha": "c4e30d730825e1255b82a300ab5d7c5eee643042",
+        "receiptArtifactId": 14361764826,
+        "receiptArtifactDigest": "sha256:93d3ac61bbcdcb4140434ccb8e6c320e83a48988c162458c250a63cba6a8b6a2",
+        "status": "SIGNED_DRIVERS_DURABLE_READBACK_RELOAD_RESTORE_PASS"
+      },
+      "signedOutcomeReceipt": "artifacts/orbit360-recovery/release-control/I6_6_SOURCE_INTAKE_RELOAD_SIGNED_PREVIEW_PASS_20261117.json"
     }
   },
   "orderedWork": [
@@ -560,8 +576,8 @@
     },
     {
       "id": "P0-PUBLISH-CURRENT-DELTA",
-      "state": "PRIOR_SIGNED_PREVIEW_PASS_LIVE_PREDEPLOY_VALIDATOR_HOLD_CAUSAL_FIX_NEW_BUILD",
-      "scope": "Finish current immutable candidate with bounded QA readiness/diagnostic correction; retain all accumulated approved product changes and prior successful evidence. Execute exact authenticated Preview and immediately promote identical package after acceptance under existing Direction instruction; signed LIVE readback/rollback and synchronized successor receipt required. No unproven release or real-source financial application inferred from synthetic QA.",
+      "state": "EXACT_CAUSAL_BUILD_BOUND_SIGNED_PREVIEW_PENDING_LIVE_LEGAL_SCOPE_REQUIRED",
+      "scope": "Preserve accumulated approved product changes and prior proof. Certify the exact rebuilt causal QA source with the four existing authenticated Preview drivers. Preserve the unchanged artifact and request only the missing bounded LIVE legal consent explicitly excluded by the prior Preview receipt. After actual consent, promote the same accepted artifact under existing release authorization, verify signed LIVE readback and rollback, and synchronize successor receipts. No financial application inferred from synthetic QA.",
       "doneWhen": "Real workflow receipts, exact digests and post-deploy business-function verification. Successful build alone is not acceptance."
     },
     {
@@ -776,8 +792,8 @@
         "guardRunId": 44149681319,
         "signedRunId": 44149681372,
         "functionalAcceptanceNotClaimed": true,
-        "currentExactBuildSource": "59c37ac9a2142c24ccb5a95f3d6df82eb62dfd94",
-        "currentBuildReceipt": "artifacts/orbit360-recovery/release-control/I6_6_SOURCE_INTAKE_RELOAD_PREVIEW_BUILD_20261117.json"
+        "currentExactBuildSource": "fdbc65a59114d2858ce6884374eaf6c44d8ae9a9",
+        "currentBuildReceipt": "artifacts/orbit360-recovery/release-control/I6_6_CAUSAL_RELEASE_READINESS_PREVIEW_BUILD_20261117.json"
       },
       {
         "id": "QA-NOOP-20261117",
@@ -877,19 +893,20 @@
       {
         "id": "QA-LIVE-PREDEPLOY-PHASE-20261117",
         "kind": "PIPELINE/VALIDATOR",
-        "state": "CAUSE_REPRODUCED_FIXED_153_TESTS_PASS_NEW_IMMUTABLE_CERTIFICATION_REQUIRED",
+        "state": "CAUSAL_FIX_BUILT_EXACT_SIGNED_PREVIEW_PENDING_LIVE_PRECHECK_PROOF_STILL_REQUIRED",
         "evidenceRun": 44161850833,
         "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_LIVE_PREDEPLOY_PHASE_HOLD_AND_CAUSAL_REPAIR_20261117.json",
         "cause": "The readonly Preview observation immediately before production derived authorization phase from the observed origin. Its control was correctly in LIVE authorization, so it rejected before any LIVE deployment.",
         "closure": "Causal regression passes; exact new Preview certification passes; existing readonly predeployment Preview check executes under full LIVE authorization; same-artifact LIVE and cleanup proofs pass.",
         "priorPreviewPassPreserved": true,
         "priorLiveUnchanged": true,
-        "localTestsPassed": 153
+        "localTestsPassed": 153,
+        "newBuildReceipt": "artifacts/orbit360-recovery/release-control/I6_6_CAUSAL_RELEASE_READINESS_PREVIEW_BUILD_20261117.json"
       },
       {
         "id": "QA-LIVE-LEGAL-SESSION-20261117",
         "kind": "AUTHORITY/EXECUTION_READINESS",
-        "state": "SOURCE_PATH_PROVEN_BOUNDED_LIVE_CONSENT_PROPOSED_NOT_AUTHORIZED",
+        "state": "INACTIVE_SUPPORT_BUILT_EXACT_SIGNED_PREVIEW_PENDING_BOUNDED_LIVE_CONSENT_NOT_GRANTED",
         "cause": "Signed LIVE financial drivers create fresh browser contexts; the product stores legal acceptance only in localStorage and shows its gate after activation. Existing driver acceptance is Preview-only and its explicit owner scope excludes LIVE.",
         "sourceEvidence": [
           "orbit360-platform/core/legal.js",
@@ -901,7 +918,8 @@
         "proposalPath": "artifacts/orbit360-recovery/release-control/I6_6_DIRECTION_LIVE_V2_SCOPE_PROPOSAL_20261117.json",
         "closure": "Prepare exact unchanged terms and inactive support; require explicit owner LIVE scope before deployment; verify normal UI consent, signed actor, immediate and reload readbacks with exact candidate source/build/origin and receipt.",
         "noLiveFailureObservedForThisCondition": true,
-        "noConsentGranted": true
+        "noConsentGranted": true,
+        "newBuildReceipt": "artifacts/orbit360-recovery/release-control/I6_6_CAUSAL_RELEASE_READINESS_PREVIEW_BUILD_20261117.json"
       }
     ],
     "blocks": [
@@ -920,7 +938,11 @@
         "currentBlockerReceipt": "artifacts/orbit360-recovery/release-control/I6_6_SOURCE_INTAKE_PRECISION_SIGNED_PREVIEW_OUTCOME_20261117.json",
         "currentBuildReceipt": "artifacts/orbit360-recovery/release-control/I6_6_SOURCE_INTAKE_RELOAD_PREVIEW_BUILD_20261117.json",
         "closedAtUtc": "2026-11-17T19:42:52Z",
-        "closureReceipt": "artifacts/orbit360-recovery/release-control/I6_6_SOURCE_INTAKE_RELOAD_SIGNED_PREVIEW_PASS_20261117.json"
+        "closureReceipt": "artifacts/orbit360-recovery/release-control/I6_6_SOURCE_INTAKE_RELOAD_SIGNED_PREVIEW_PASS_20261117.json",
+        "successorRevalidation": {
+          "status": "PENDING_NEW_EXACT_SIGNED_PREVIEW",
+          "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_CAUSAL_RELEASE_READINESS_PREVIEW_BUILD_20261117.json"
+        }
       },
       {
         "sequence": 2,
@@ -932,14 +954,15 @@
           "P1-ADJUNTOS-DRIVE"
         ],
         "gate": "I6.6",
-        "state": "CAUSAL_LIVE_PREDEPLOY_VALIDATOR_REPAIR_NEW_IMMUTABLE_QA_BUILD_REQUIRED",
+        "state": "EXACT_CAUSAL_BUILD_BOUND_SIGNED_PREVIEW_PENDING_LIVE_LEGAL_SCOPE_REQUIRED",
         "timeboxReassessmentMinutes": 90,
         "deliverable": "Same accepted artifact LIVE; Carlos and superior-role affected writes, documented renewal, insurer/Drive paths verified.",
         "doneWhen": "Exact frontend/backend binding and authenticated LIVE server commit/readback/reload; bounded genuine-document and denied-scope tests; rollback available.",
         "publicationRule": "Publish each causally complete accepted correction immediately; unrelated findings stay in their existing scope.",
         "previewAcceptanceReceipt": "artifacts/orbit360-recovery/release-control/I6_6_SOURCE_INTAKE_RELOAD_SIGNED_PREVIEW_PASS_20261117.json",
         "currentBlockerReceipt": "artifacts/orbit360-recovery/release-control/I6_6_LIVE_PREDEPLOY_PHASE_HOLD_AND_CAUSAL_REPAIR_20261117.json",
-        "pendingOwnerDecisionProposal": "artifacts/orbit360-recovery/release-control/I6_6_DIRECTION_LIVE_V2_SCOPE_PROPOSAL_20261117.json"
+        "pendingOwnerDecisionProposal": "artifacts/orbit360-recovery/release-control/I6_6_DIRECTION_LIVE_V2_SCOPE_PROPOSAL_20261117.json",
+        "currentBuildReceipt": "artifacts/orbit360-recovery/release-control/I6_6_CAUSAL_RELEASE_READINESS_PREVIEW_BUILD_20261117.json"
       },
       {
         "sequence": 3,
@@ -1017,13 +1040,13 @@
       ]
     },
     "completionOfThisAuditIsNotProductionCompletion": true,
-    "updatedAtUtc": "2026-11-17T19:50:58Z",
+    "updatedAtUtc": "2026-11-17T20:22:34Z",
     "latestExecutedIteration": {
-      "kind": "EXACT_LIVE_PREDEPLOY_ATTEMPT",
-      "status": "HOLD_BEFORE_LIVE_DEPLOY_CAUSE_IDENTIFIED",
-      "functionalRunId": 44161850833,
-      "guardRunId": 44161850815,
-      "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_LIVE_PREDEPLOY_PHASE_HOLD_AND_CAUSAL_REPAIR_20261117.json",
+      "kind": "EXISTING_BLOCK2_CAUSAL_QA_IMMUTABLE_BUILD",
+      "status": "BUILD_AND_GUARD_PASS_SIGNED_PREVIEW_PENDING",
+      "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_CAUSAL_RELEASE_READINESS_PREVIEW_BUILD_20261117.json",
+      "buildRunId": 44167538384,
+      "guardRunId": 44167538530,
       "newFormalPercentagePoints": 0
     },
     "freeze": {
@@ -1040,7 +1063,7 @@
       "newBankTransferAuthority": false
     }
   },
-  "nextAction": "I6_6_EXISTING_BLOCK2_CAUSAL_RELEASE_READINESS: BUILD_NEW_IMMUTABLE_QA_SOURCE_WITH_FIXED_AUTHORIZATION_PHASE_AND_INACTIVE_BOUNDED_LIVE_LEGAL_SUPPORT; PRODUCT_AND_TERMS_UNCHANGED. CERTIFY_EXACT_NEW_PREVIEW_WITH_EXISTING_FOUR_SIGNED_DRIVERS. PRIOR_59C37_PREVIEW_PASS_AND_R11_LIVE_RETAINED. LIVE_LEGAL_SCOPE_IS_PROPOSED_NOT_AUTHORIZED: EXISTING_RECEIPT_EXPLICITLY_PREVIEW_ONLY. BEFORE_ANY_NEW_LIVE_DEPLOY_REQUIRE_EXPLICIT_DIRECTION_APPROVAL_OF_REVIEW_DOCUMENT_F8FD153E_AND_EXACT_GRANT_METADATA; NEVER_INFER_IT_FROM_RELEASE_AUTHORIZATION. AFTER_NEW_PREVIEW_PASS_LOCK_EXISTING_R11_TRANSPORT_AND_PRESERVE_EXACT_PENDING_CANDIDATE_FOR_SAME_ARTIFACT_PROMOTION_AFTER_OWNER_DECISION. FINANCIAL_PRIVATE_INPUTS_PREPARED; FIVE_CURRENT_AUTHENTICATED_READS_AND_SERVER_DIGESTS_REQUIRED_BEFORE_POSTING; NO_DUPLICATES_OR_BANK_TRANSFERS.",
+  "nextAction": "I6_6_EXISTING_BLOCK2_EXACT_CAUSAL_RELEASE_READINESS: NEW_IMMUTABLE_BUILD_44167538384_AND_GUARD_44167538530_PASS; CERTIFY_FOUR_SIGNED_DRIVERS_AGAINST_EXACT_FDBC65_ARTIFACT. SOURCE_AND_QA_BYTES_FROZEN. PRIOR_59C37_SIGNED_PREVIEW_EVIDENCE_AND_R11_CURRENT_LIVE_PRESERVED. LIVE_LEGAL_SCOPE_IS_PROPOSED_NOT_AUTHORIZED; EXISTING_PREVIEW_RECEIPT_EXPLICITLY_EXCLUDES_LIVE. AFTER_NEW_SIGNED_PREVIEW_PASS_LOCK_R11_TRANSPORT_AND_PRESERVE_EXACT_PENDING_CANDIDATE_AND_REVIEW_CONTEXT; OBTAIN_EXPLICIT_DIRECTION_LIVE_SCOPE_BEFORE_DEPLOYMENT. FUTURE_AUTHORITY_IS_METADATA_ONLY_SAME_ARTIFACT_NO_REBUILD. PRIVATE_FINANCIAL_INPUTS_PREPARED; FIVE_AUTHENTICATED_CURRENT_READS_AND_SERVER_PREVIEWS_REQUIRED_BEFORE_APPLY. FROZEN_SIX_BLOCKS_AND_19_OF_31_CRITERIA_UNCHANGED.",
   "sourceIntakePrecisionPreviewBuild20261117": {
     "receipt": "artifacts/orbit360-recovery/release-control/I6_6_SOURCE_INTAKE_PRECISION_PREVIEW_BUILD_20261117.json",
     "status": "IMMUTABLE_PREVIEW_EXACT_READBACK_PASS_SIGNED_FUNCTIONAL_QA_PENDING",
@@ -1177,5 +1200,21 @@
     "deployConclusion": "skipped",
     "guardRunId": 44161850815,
     "guardConclusion": "success"
+  },
+  "causalReleaseReadinessPreviewBuild20261117": {
+    "sourceSha": "fdbc65a59114d2858ce6884374eaf6c44d8ae9a9",
+    "buildRunId": 44167538384,
+    "artifactId": 14365204653,
+    "artifactDigest": "sha256:472cc909d2621c54ce79e3ca2c1f260805ef1591ad735251ccac161ff9e1e27c",
+    "buildId": "gi-i66-fdbc65a59114-57f234755dc1",
+    "previewUrl": "https://ays-orbit-360-lab--gi-i66-rc-44167538384-rhzff43z.web.app",
+    "previewChannelId": "gi-i66-rc-44167538384",
+    "status": "EXACT_IMMUTABLE_PREVIEW_BUILT_FOUR_SIGNED_DRIVERS_AUTHORIZED",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_CAUSAL_RELEASE_READINESS_PREVIEW_BUILD_20261117.json",
+    "signedPreviewAccepted": false,
+    "liveAccepted": false,
+    "realFinancialWrites": 0,
+    "signedObservabilityProfile": "I66_SIGNED_BROWSER_OBSERVABILITY_V1",
+    "liveLegalConsentGranted": false
   }
 }
