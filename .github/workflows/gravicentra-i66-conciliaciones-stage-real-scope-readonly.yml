@@ -5,6 +5,7 @@ on:
     paths:
       - .github/workflows/gravicentra-i66-conciliaciones-stage-real-scope-readonly.yml
       - tools/gravicentra-i66-conciliaciones-stage-real-scope-readonly.cjs
+      - tools/gravicentra-i6-6-stage-real-scope-readonly-binding.test.cjs
       - functions/i66-conciliaciones-active-ledger-projection.js
       - functions/b4-003-scoped-related-reader.js
   workflow_dispatch:
@@ -30,13 +31,22 @@ jobs:
       - name: Require bounded exact source owners, active I6.6 and no business mutation
         run: |
           set -euo pipefail
-          git merge-base --is-ancestor 0153f5cbbe00c3732e11ebae59b32bd357e38bfd HEAD
-          test -z "$(git diff --name-only 0153f5cbbe00c3732e11ebae59b32bd357e38bfd HEAD -- orbit360-platform functions ':(exclude)orbit360-platform/docs/recovery/orbit360-recovery-state-v1.json' | grep -Ev '^functions/(b4-003-scoped-related-reader|i66-conciliaciones-active-ledger-projection)\.js$' || true)"
+          node tools/gravicentra-governance-preflight-v1.mjs --mode=governance
           node --check functions/i66-conciliaciones-active-ledger-projection.js
           node --check tools/gravicentra-i66-conciliaciones-stage-real-scope-readonly.cjs
           node tools/gravicentra-i6-6-conciliaciones-active-ledger-projection.test.cjs
-      - name: Verify live source projection for active ledger 52 unique and 80 HOLD without writes
+          node --test tools/gravicentra-i6-6-stage-real-scope-readonly-binding.test.cjs
+      - name: Verify current source projection and manifest-bound unique or HOLD rows without writes
+        env:
+          I66_READONLY_REPORT: ${{ runner.temp }}/i66-real-source-scope-readonly.json
         run: |
           set -euo pipefail
           npm install --no-save --package-lock=false --ignore-scripts --no-audit --no-fund firebase-admin@13.4.0 >/dev/null
           node tools/gravicentra-i66-conciliaciones-stage-real-scope-readonly.cjs
+      - name: Preserve readonly source evidence without a deployment acceptance
+        uses: actions/upload-artifact@v4
+        with:
+          name: gi-i66-real-source-scope-readonly-${{ github.run_id }}
+          path: ${{ runner.temp }}/i66-real-source-scope-readonly.json
+          if-no-files-found: error
+          retention-days: 30

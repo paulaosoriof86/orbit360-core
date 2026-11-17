@@ -1,0 +1,178 @@
+{
+  "schema": "GI_I66_SOURCE_INTAKE_RELOAD_IMMUTABLE_PREVIEW_BUILD_V1",
+  "recordedAtUtc": "2026-11-17T19:34:17Z",
+  "gate": "I6.6",
+  "status": "IMMUTABLE_PREVIEW_EXACT_READBACK_PASS_SIGNED_FUNCTIONAL_QA_PENDING",
+  "buildEvidence": {
+    "status": "BUILD_TERMINAL_SUCCESS_PREVIEW_BINDING_PROPOSAL_NOT_APPLIED",
+    "sourceSha": "59c37ac9a2142c24ccb5a95f3d6df82eb62dfd94",
+    "sourceTree": "0ea06b9b2dc1a88a859275ed5319e5a516271686",
+    "buildId": "gi-i66-59c37ac9a214-57f234755dc1",
+    "buildRunId": 44158877469,
+    "buildJobId": 134307109688,
+    "guardRunId": 44158877449,
+    "guardJobId": 134306971979,
+    "artifactId": 14360954951,
+    "artifactDigest": "sha256:0a58c3e7398d5e44a50ca6a290a980111df17b03375ee19ee8d19c5b68067c17",
+    "artifactCreatedAt": "2026-11-17T19:30:00Z",
+    "artifactExpiresAt": "2026-12-17T19:29:59Z",
+    "tarSha256": "a6b9c2be2bad5b5e26bba13148276e8118f84b893f6c32b63605151ac61421ff",
+    "previewChannel": "gi-i66-rc-44158877469",
+    "previewOrigin": "https://ays-orbit-360-lab--gi-i66-rc-44158877469-13g9931i.web.app",
+    "hostingVersion": null,
+    "hostingVersionEvidence": "NOT_EMITTED_IN_LOG_OR_IMMUTABLE_ARTIFACT; actual version must be observed by existing signed Preview workflow",
+    "technicalRolloverExecuted": false,
+    "technicalRolloverArtifact": null,
+    "reason": "NEW_CHANNEL_CREATED_SUCCESSFULLY; no quota fallback executed",
+    "buildRunCompletedAt": "2026-11-17T19:30:52Z",
+    "previewDeployStepLogStart": "2026-11-17T19:30:01.2436791Z",
+    "previewReadbackStepLogStart": "2026-11-17T19:30:13.0835185Z",
+    "previewReadbackStepLogEnd": "2026-11-17T19:30:49.3999961Z",
+    "previewReadback": {
+      "status": "SUCCESS",
+      "fileCount": 223,
+      "manifestSha256": "6e803151e22fa14c89c190141257e11bbf1419534c833c099e855b59297c3328",
+      "manifestPath": "/workspace/scratch/3c07c381bc55/implementation_work/release_plan/build_44158877469/immutable/package/evidence/site-manifest.sha256",
+      "method": "for each manifest file curl plus cmp against immutable bundle; hosted build marker cmp; all strict bash commands completed successfully",
+      "proofSource": "GitHub job 134307109688 step12 conclusion success plus exact workflow/log"
+    },
+    "liveUnchanged": {
+      "status": "SUCCESS",
+      "origins": [
+        "https://ays-orbit-360-lab.web.app/",
+        "https://app.aysseguros.com/"
+      ],
+      "method": "index sha256 before/after cmp",
+      "scope": "root fingerprints only, not a new signed LIVE acceptance"
+    },
+    "packageOutput": {
+      "buildId": "gi-i66-59c37ac9a214-57f234755dc1",
+      "buildBoundAssetCount": 138,
+      "hostedFileCount": 223,
+      "hostedPayloadDigest": "6e803151e22fa14c89c190141257e11bbf1419534c833c099e855b59297c3328",
+      "backendFileCount": 45,
+      "backendSourceDigest": "357aaaf4c43df83aad873614cea25b3f04faca7a40e814a834de0d1574eac366",
+      "bundleFileCount": 270,
+      "bundleDigest": "dbc5146d6a2444d2f88ebe0fa3a569ee67608d95e26dec465cb20673f27ff3bb",
+      "reachableProductFiles": 217
+    },
+    "localBindingChecks": [
+      "candidateForPhase(preview)",
+      "validateArtifact",
+      "validateBuildMarker(package marker)",
+      "validateI66ScopeCandidate",
+      "legal receipt sha256"
+    ],
+    "signedPreviewPass": false,
+    "livePass": false
+  },
+  "candidate": {
+    "schema": "I6_6_OPERATIONAL_EXACT_RELEASE_V1",
+    "approvedByDirection": true,
+    "status": "EXACT_BACKEND_PREVIEW_SIGNED_QA_AUTHORIZED",
+    "sourceSha": "59c37ac9a2142c24ccb5a95f3d6df82eb62dfd94",
+    "buildId": "gi-i66-59c37ac9a214-57f234755dc1",
+    "buildRunId": 44158877469,
+    "artifactId": 14360954951,
+    "artifactDigest": "sha256:0a58c3e7398d5e44a50ca6a290a980111df17b03375ee19ee8d19c5b68067c17",
+    "previewUrl": "https://ays-orbit-360-lab--gi-i66-rc-44158877469-13g9931i.web.app",
+    "previewChannelId": "gi-i66-rc-44158877469",
+    "signedObservabilityProfile": "I66_SIGNED_BROWSER_OBSERVABILITY_V1",
+    "targets": {
+      "preview": [
+        {
+          "name": "orbit360ProductOperationalCommandPreview",
+          "region": "us-east1"
+        },
+        {
+          "name": "orbit360CobrosReconciliationCommandPreview",
+          "region": "us-central1"
+        },
+        {
+          "name": "orbit360ScopedPolicyReadPreview",
+          "region": "us-east1"
+        }
+      ],
+      "live": [
+        {
+          "name": "orbit360ProductOperationalCommand",
+          "region": "us-central1"
+        },
+        {
+          "name": "orbit360CobrosReconciliationCommand",
+          "region": "us-central1"
+        },
+        {
+          "name": "orbit360ScopedPolicyRead",
+          "region": "us-east1"
+        }
+      ]
+    },
+    "requiredPreviewDrivers": [
+      "tools/gravicentra-i66-privileged-role-signed-ui-permissions-readonly.cjs",
+      "tools/gravicentra-i6-6-carlos-real-signed-synthetic-preview-uat.cjs",
+      "tools/gravicentra-i6-6-advisor-payables-signed-uat.cjs",
+      "tools/gravicentra-i6-6-proposal-application-signed-uat.cjs"
+    ],
+    "sameImmutableArtifactOnly": true,
+    "syntheticRecordsOnly": true,
+    "noRealFinancialOrCustomerWrites": true,
+    "noRulesAuthIamWrites": true,
+    "rollbackThreeBackendRevisionsAndHosting": true,
+    "expectedSiteFileCount": 223,
+    "syntheticQaIsolation": {
+      "tenantId": "alianzas-soluciones",
+      "runIdPrefix": "cobledgerqa_",
+      "entityIdPrefix": "b3005qa_",
+      "runCollection": "cobrosLedgerQaRuns",
+      "controlCollection": "cobrosLedgerQaControl",
+      "requireSameQaRunId": true,
+      "requireSyntheticMarker": true,
+      "allowRealControlPointerMutation": false,
+      "restoreAllSyntheticRecords": true
+    },
+    "advisorPayableQaIsolation": {
+      "tenantId": "alianzas-soluciones",
+      "runIdPrefix": "b4003qa_i66_cxp_",
+      "payableIdPrefix": "b4003qa_cxpase_",
+      "commissionIdPrefix": "b4003qa_comsrc_",
+      "requireSameQaRunId": true,
+      "requireSyntheticMarker": true,
+      "restoreAllSyntheticRecords": true,
+      "financialPayments": 0,
+      "bankMovements": 0,
+      "authOrMembershipMutations": 0
+    },
+    "currentLive": {
+      "sourceSha": "84769378eb2014addebfefdbdd63091bddc4b817",
+      "buildId": "gi-i66-84769378eb20-57f234755dc1",
+      "artifactId": 14075022275,
+      "artifactDigest": "sha256:b0f3bacb68511cdfc91ac934602c51f55afec5c1d6428d886d13a72a706ee283",
+      "buildRunId": 43503721126,
+      "liveRunId": 43506971214,
+      "hostingVersion": "sites/ays-orbit-360-lab/versions/0766db29b338befc"
+    },
+    "legalAcceptance": {
+      "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_DIRECTION_PREVIEW_V2_SCOPE_AUTHORIZATION_20261116.json",
+      "receiptSha256": "d3309675c753bd1b31f9163d506aba2e29ac70583a7b8d54cb5b8503b5c50a44",
+      "decisionId": "DIRECTION_I66_PREVIEW_SAME_LEGAL_V2_TECHNICAL_SUCCESSORS_AUTHORIZED_20261116",
+      "authorizationScope": "I6_6_PREVIEW_IDENTICAL_V2_TERMS",
+      "gate": "I6.6",
+      "phase": "PREVIEW",
+      "origin": "https://ays-orbit-360-lab--gi-i66-rc-44158877469-13g9931i.web.app",
+      "sourceSha": "59c37ac9a2142c24ccb5a95f3d6df82eb62dfd94",
+      "actorRole": "direccion",
+      "termsProjectionSha256": "485b07887091063cc7a5d1dc8f11a9bb547f2ef059490bb04d4acee73404f6b2",
+      "buildId": "gi-i66-59c37ac9a214-57f234755dc1"
+    }
+  },
+  "sourceFreezeReceipt": "artifacts/orbit360-recovery/release-control/I6_6_DAILY_PLAN_FREEZE_AND_SOURCE_INTAKE_RELOAD_20261117.json",
+  "previousFailedSignedReceipt": "artifacts/orbit360-recovery/release-control/I6_6_SOURCE_INTAKE_PRECISION_SIGNED_PREVIEW_OUTCOME_20261117.json",
+  "previewChannelDisposition": "NEW_BUILD_RUN_BOUND_ISOLATED_CHANNEL_CREATED_ROLLOVER_NOT_EXECUTED",
+  "historicalFailedEvidencePreserved": true,
+  "newSignedPreviewAcceptance": false,
+  "newLiveAcceptance": false,
+  "realFinancialWrites": 0,
+  "newFormalPercentagePoints": 0,
+  "next": "EXECUTE_FOUR_EXISTING_SIGNED_PREVIEW_DRIVERS_AGAINST_EXACT_NEW_ARTIFACT; REQUIRE_RELOAD_REPLAY_CLEANUP_AND_ZERO_UNEXPECTED_ERRORS"
+}

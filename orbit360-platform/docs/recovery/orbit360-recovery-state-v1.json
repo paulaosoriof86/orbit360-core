@@ -10,7 +10,7 @@
   "branch": "recovery/fase-a-clean-20260831",
   "forensicOriginSha": "9c95f31461f2eabe9804625b5659bee772f5602a",
   "createdAtUtc": "2026-08-31T18:00:00Z",
-  "updatedAtUtc": "2026-11-17T19:14:47Z",
+  "updatedAtUtc": "2026-11-17T19:34:17Z",
   "status": "I6_6_LIVE_CONTROLLED_PORTFOLIO_UPDATE_IN_PROGRESS",
   "currentIteration": 6,
   "lastCompletedIteration": 5,
@@ -20,10 +20,10 @@
     "firstIncompleteGate": "I6.6_CONCILIATION_APPLICATION_AND_ADVISOR_CXP_PREVIEW_SIGNED_QA",
     "preserveHistoricalB4007Accepted": true,
     "latestProvenLiveSource": "84769378eb2014addebfefdbdd63091bddc4b817",
-    "latestHostingPreviewEvidence": "artifacts/orbit360-recovery/release-control/I6_6_PREVIEW_TRANSPORT_42A676_READBACK_20261116.json",
-    "latestHostingPreviewSource": "42a6764125f18106debc52edcb79741fe49e829c",
+    "latestHostingPreviewEvidence": "artifacts/orbit360-recovery/release-control/I6_6_SOURCE_INTAKE_RELOAD_PREVIEW_BUILD_20261117.json",
+    "latestHostingPreviewSource": "59c37ac9a2142c24ccb5a95f3d6df82eb62dfd94",
     "documentaryFocalReadbackEvidence": "artifacts/orbit360-recovery/release-control/I6_6_EXISTING_CLIENT_INDEPENDENT_GESTIONES_READBACK_20261116.json",
-    "signedPreviewCandidateStatus": "HOLD_UNEXPECTED_FINANCE_CONSOLE_AND_HTTP_ERRORS",
+    "signedPreviewCandidateStatus": "EXACT_IMMUTABLE_PREVIEW_BUILT_FOUR_SIGNED_DRIVERS_AUTHORIZED",
     "technicalPreviewCausalRetryReceipt": "artifacts/orbit360-recovery/release-control/I6_6_TECHNICAL_PREVIEW_OBSERVABILITY_REBUILD_20261116.json",
     "operationsEvidenceReview": "artifacts/orbit360-recovery/release-control/I6_6_OPS_EVIDENCE_AND_PREVIEW_BINDING_REVIEW_20261116.json",
     "legalScopeAuthorizationReceipt": "artifacts/orbit360-recovery/release-control/I6_6_DIRECTION_PREVIEW_V2_SCOPE_AUTHORIZATION_20261116.json",
@@ -35,12 +35,18 @@
     "bankTransfersAuthorized": false,
     "signedPreviewEvidence": "artifacts/orbit360-recovery/release-control/I6_6_SIGNED_PREVIEW_42A676_HOLD_AND_STATEMENT_INTAKE_20261117.json",
     "currentSignedCandidate": {
-      "sourceSha": "42a6764125f18106debc52edcb79741fe49e829c",
-      "buildId": "gi-i66-42a6764125f1-57f234755dc1",
-      "buildRunId": 44026819055,
-      "artifactId": 14303601582,
-      "artifactDigest": "sha256:210fb130f998f367faecefbc34c6287bf59cafcbede8002f345cfb813d4ed1b6",
-      "status": "HOLD_UNEXPECTED_FINANCE_CONSOLE_AND_HTTP_ERRORS",
+      "sourceSha": "59c37ac9a2142c24ccb5a95f3d6df82eb62dfd94",
+      "buildRunId": 44158877469,
+      "artifactId": 14360954951,
+      "artifactDigest": "sha256:0a58c3e7398d5e44a50ca6a290a980111df17b03375ee19ee8d19c5b68067c17",
+      "buildId": "gi-i66-59c37ac9a214-57f234755dc1",
+      "previewUrl": "https://ays-orbit-360-lab--gi-i66-rc-44158877469-13g9931i.web.app",
+      "previewChannelId": "gi-i66-rc-44158877469",
+      "status": "EXACT_IMMUTABLE_PREVIEW_BUILT_FOUR_SIGNED_DRIVERS_AUTHORIZED",
+      "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_SOURCE_INTAKE_RELOAD_PREVIEW_BUILD_20261117.json",
+      "signedPreviewAccepted": false,
+      "liveAccepted": false,
+      "realFinancialWrites": 0,
       "signedObservabilityProfile": "I66_SIGNED_BROWSER_OBSERVABILITY_V1"
     },
     "latestSignedQaOutcome": {
@@ -83,9 +89,9 @@
       "newPayments": 0
     },
     "dailyExecutionPlanPointer": "artifacts/orbit360-recovery/release-control/I6_6_OPERATIONAL_CONTINUATION_20261115.json#dailyExecutionPlan20261117",
-    "currentPreviewSourceSha": "6b6e8bbba3371b32a1bfb80b903c40377e11d727",
-    "currentPreviewBuildReceipt": "artifacts/orbit360-recovery/release-control/I6_6_SOURCE_INTAKE_PRECISION_PREVIEW_BUILD_20261117.json",
-    "nextAction": "I6_6_SOURCE_INTAKE_RELOAD_CAUSAL_QA_CORRECTION: DAILY_SIX_BLOCK_PLAN_FROZEN_BY_DIRECTION; BUILD_NEW_IMMUTABLE_PACKAGE_FROM_THIS_COMMIT_WITH_EXISTING_WORKFLOW. QA_READINESS_DEFECT_REPRODUCED_AND_CORRECTED_BOTH_NAVIGATION_WAITS; SANITIZED_PAGEERROR_CAUSE_RETAINED; HISTORICAL_44149681372_ERROR_NOT_RETROACTIVELY_RECLASSIFIED. BACK_UP_EXACT_6B6_PREVIEW_BEFORE_REPLACEMENT; PRESERVE_R11_LIVE_AND_ALL_PRIOR_PASS. AFTER_BUILD_BIND_EXACT_SOURCE_ARTIFACT_AND_EXECUTE_EXISTING_FOUR_SIGNED_PREVIEW_DRIVERS; REQUIRE_SOURCE_RELOAD_ACTOR_READBACK_REPLAY_ZERO_UNEXPECTED_ERRORS_AND_CLEANUP. ONLY_AFTER_EXACT_PREVIEW_ACCEPTANCE_PROMOTE_SAME_ARTIFACT_WITH_EXISTING_LIVE_GUARDS_AND_READBACK; ALIGN_SUCCESSOR_STATE_ONLY_WITH_REAL_LIVE_RECEIPT. PARALLEL_READONLY_FINANCIAL_PREPARATION; NO_BLIND_PAYMENT_RETRY; PRESERVE_PHASE_A100_I6_60_OPS6_OF8_OVERALL19_OF31_UNTIL_CRITERION_CLOSURE.",
+    "currentPreviewSourceSha": "59c37ac9a2142c24ccb5a95f3d6df82eb62dfd94",
+    "currentPreviewBuildReceipt": "artifacts/orbit360-recovery/release-control/I6_6_SOURCE_INTAKE_RELOAD_PREVIEW_BUILD_20261117.json",
+    "nextAction": "I6_6_EXACT_SOURCE_INTAKE_RELOAD_SIGNED_PREVIEW: BUILD_44158877469_AND_GUARD_44158877449_PASS; EXECUTE_EXISTING_FOUR_SIGNED_DRIVERS_ON_EXACT_59C37_ARTIFACT_AND_NEW_BUILD_BOUND_ISOLATED_CHANNEL. SOURCE_AND_QA_BYTES_FROZEN; NO_REBUILD_FOR_METADATA. REQUIRE_SOURCE_INTAKE_RELOAD_ACTOR_READBACK_REPLAY_ZERO_UNEXPECTED_ERRORS_AND_SYNTHETIC_CLEANUP. AFTER_PASS_PROMOTE_SAME_ARTIFACT_WITH_THREE_FUNCTION_ROLLBACK_AND_FULL_EXACT_LIVE_READBACK; ALIGN_SUCCESSOR_POINTERS_ONLY_FROM_REAL_SIGNED_LIVE_PROOF. KEEP_R11_AS_CURRENT_ACCEPTED_LIVE_UNTIL_THEN. PARALLEL_READONLY_FINANCIAL_PREPARATION; NO_BLIND_PAYMENT_RETRY; RETAIN_FROZEN_CRITERIA_AND_PERCENTAGES.",
     "dailyPlanFreeze20261117": {
       "status": "FROZEN_APPROVED_BY_DIRECTION",
       "approvedAtUtc": "2026-11-17T19:14:47Z",
@@ -99,7 +105,16 @@
       "newLegalConsentGranted": false,
       "newBankTransferAuthority": false
     },
-    "sourceIntakeReloadSourceQaReceipt": "artifacts/orbit360-recovery/release-control/I6_6_DAILY_PLAN_FREEZE_AND_SOURCE_INTAKE_RELOAD_20261117.json"
+    "sourceIntakeReloadSourceQaReceipt": "artifacts/orbit360-recovery/release-control/I6_6_DAILY_PLAN_FREEZE_AND_SOURCE_INTAKE_RELOAD_20261117.json",
+    "priorSignedCandidateAtRebuild20261117": {
+      "sourceSha": "42a6764125f18106debc52edcb79741fe49e829c",
+      "buildId": "gi-i66-42a6764125f1-57f234755dc1",
+      "buildRunId": 44026819055,
+      "artifactId": 14303601582,
+      "artifactDigest": "sha256:210fb130f998f367faecefbc34c6287bf59cafcbede8002f345cfb813d4ed1b6",
+      "status": "HOLD_UNEXPECTED_FINANCE_CONSOLE_AND_HTTP_ERRORS",
+      "signedObservabilityProfile": "I66_SIGNED_BROWSER_OBSERVABILITY_V1"
+    }
   },
   "iterationProgressAuthority": "CONTROL_PLANE.json#gateState: I0-I5 certified in earlier release epoch; I6.6 active for current successor. Timestamped iterationN evidence snapshots remain immutable historical observations.",
   "productionTargetIteration": 5,
@@ -803,7 +818,7 @@
     "phaseAIterationStatuses": "HISTORICAL_FIELDS_ABOVE_PRESERVED_UNTIL_FORMAL_GATE_EVIDENCE;_NO_NEW_PASS_INFERRED",
     "labDataWriteScope": "ONLY_35_AUTHORIZED_COUNTRY_FIELDS;_NO_AUGUST_REFRESH"
   },
-  "nextAction": "I6_6_SOURCE_INTAKE_RELOAD_CAUSAL_QA_CORRECTION: DAILY_SIX_BLOCK_PLAN_FROZEN_BY_DIRECTION; BUILD_NEW_IMMUTABLE_PACKAGE_FROM_THIS_COMMIT_WITH_EXISTING_WORKFLOW. QA_READINESS_DEFECT_REPRODUCED_AND_CORRECTED_BOTH_NAVIGATION_WAITS; SANITIZED_PAGEERROR_CAUSE_RETAINED; HISTORICAL_44149681372_ERROR_NOT_RETROACTIVELY_RECLASSIFIED. BACK_UP_EXACT_6B6_PREVIEW_BEFORE_REPLACEMENT; PRESERVE_R11_LIVE_AND_ALL_PRIOR_PASS. AFTER_BUILD_BIND_EXACT_SOURCE_ARTIFACT_AND_EXECUTE_EXISTING_FOUR_SIGNED_PREVIEW_DRIVERS; REQUIRE_SOURCE_RELOAD_ACTOR_READBACK_REPLAY_ZERO_UNEXPECTED_ERRORS_AND_CLEANUP. ONLY_AFTER_EXACT_PREVIEW_ACCEPTANCE_PROMOTE_SAME_ARTIFACT_WITH_EXISTING_LIVE_GUARDS_AND_READBACK; ALIGN_SUCCESSOR_STATE_ONLY_WITH_REAL_LIVE_RECEIPT. PARALLEL_READONLY_FINANCIAL_PREPARATION; NO_BLIND_PAYMENT_RETRY; PRESERVE_PHASE_A100_I6_60_OPS6_OF8_OVERALL19_OF31_UNTIL_CRITERION_CLOSURE.",
+  "nextAction": "I6_6_EXACT_SOURCE_INTAKE_RELOAD_SIGNED_PREVIEW: BUILD_44158877469_AND_GUARD_44158877449_PASS; EXECUTE_EXISTING_FOUR_SIGNED_DRIVERS_ON_EXACT_59C37_ARTIFACT_AND_NEW_BUILD_BOUND_ISOLATED_CHANNEL. SOURCE_AND_QA_BYTES_FROZEN; NO_REBUILD_FOR_METADATA. REQUIRE_SOURCE_INTAKE_RELOAD_ACTOR_READBACK_REPLAY_ZERO_UNEXPECTED_ERRORS_AND_SYNTHETIC_CLEANUP. AFTER_PASS_PROMOTE_SAME_ARTIFACT_WITH_THREE_FUNCTION_ROLLBACK_AND_FULL_EXACT_LIVE_READBACK; ALIGN_SUCCESSOR_POINTERS_ONLY_FROM_REAL_SIGNED_LIVE_PROOF. KEEP_R11_AS_CURRENT_ACCEPTED_LIVE_UNTIL_THEN. PARALLEL_READONLY_FINANCIAL_PREPARATION; NO_BLIND_PAYMENT_RETRY; RETAIN_FROZEN_CRITERIA_AND_PERCENTAGES.",
   "sourceOfTruth": {
     "projectBoundaryPrevalentAddendum": "orbit360-platform/docs/recovery/ADDENDUM_PREVALENTE_CHATGPT_PROJECT_BOUNDARY_20260831.md",
     "mutableState": "orbit360-platform/docs/recovery/orbit360-recovery-state-v1.json",
@@ -2438,5 +2453,20 @@
     "realRecordWrites": 0,
     "newLiveAcceptanceClaimed": false,
     "authority": "artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json#i66ProposalDiagnosticPreviewBuild20261117"
+  },
+  "i66SourceIntakeReloadPreviewBuild20261117": {
+    "sourceSha": "59c37ac9a2142c24ccb5a95f3d6df82eb62dfd94",
+    "buildRunId": 44158877469,
+    "artifactId": 14360954951,
+    "artifactDigest": "sha256:0a58c3e7398d5e44a50ca6a290a980111df17b03375ee19ee8d19c5b68067c17",
+    "buildId": "gi-i66-59c37ac9a214-57f234755dc1",
+    "previewUrl": "https://ays-orbit-360-lab--gi-i66-rc-44158877469-13g9931i.web.app",
+    "previewChannelId": "gi-i66-rc-44158877469",
+    "status": "EXACT_IMMUTABLE_PREVIEW_BUILT_FOUR_SIGNED_DRIVERS_AUTHORIZED",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_SOURCE_INTAKE_RELOAD_PREVIEW_BUILD_20261117.json",
+    "signedPreviewAccepted": false,
+    "liveAccepted": false,
+    "realFinancialWrites": 0,
+    "signedObservabilityProfile": "I66_SIGNED_BROWSER_OBSERVABILITY_V1"
   }
 }
