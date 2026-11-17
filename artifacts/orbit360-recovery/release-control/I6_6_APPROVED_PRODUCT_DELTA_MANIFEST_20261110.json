@@ -2367,6 +2367,34 @@
           }
         }
       ]
+    },
+    {
+      "id": "I6_6_PROPOSAL_APPLICATION_FIRESTORE_AUDIT_ARRAY_TIMESTAMP_20261116",
+      "approvedByDirection": true,
+      "receipt": "Paula Direccion 2026-11-16: solucionar el bloqueo de conciliacion, materializar configuracion canonica V7, antes/despues, pruebas firmadas y readback. Evidencia local antes: transaccion sintetica falla por FieldValue.serverTimestamp anidado en beforeAfter; despues: 82 comprobaciones PASS, cero pagos reales. Fuente certificada y LIVE requieren QA aislada y aprobacion separada.",
+      "scope": "Correccion causal del error de Firestore en arreglos de auditoria. El servidor mantiene las marcas de tiempo operativas; el diario usa SERVER_TIMESTAMP_ON_COMMIT. Sin reimportaciones, pagos reales, cambio de reglas, IAM ni promocion LIVE.",
+      "paths": [
+        {
+          "path": "functions/cobros-reconciliation-domain.js",
+          "gitBlobSha": "05634ccf5035b599a7d3ceddd860201ca4a451a5",
+          "replaces": {
+            "path": "functions/cobros-reconciliation-domain.js",
+            "priorGitBlobSha": "e862b49284e55beed48a91282474ec124e693d2a",
+            "priorChangeId": "I6_6_CONCILIATION_APPROVAL_AND_ADVISOR_CXP_20261115"
+          }
+        }
+      ],
+      "tests": [
+        {
+          "path": "tools/gravicentra-i6-6-proposal-application-boundary.test.cjs",
+          "gitBlobSha": "30bd73a9d8031bef8288185adaa9dd0c2992518e",
+          "replaces": {
+            "path": "tools/gravicentra-i6-6-proposal-application-boundary.test.cjs",
+            "priorGitBlobSha": "33041b180c9e1f27f925852900aa1e86726f9e5f",
+            "priorChangeId": "I6_6_CONCILIATION_APPROVAL_AND_ADVISOR_CXP_20261115"
+          }
+        }
+      ]
     }
   ],
   "i66R11PreviewBuildRequest20261113": {
