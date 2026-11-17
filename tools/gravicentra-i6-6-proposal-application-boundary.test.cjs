@@ -8,6 +8,15 @@ const root=path.resolve(__dirname,'..'),fromDomain=createRequire(path.join(root,
 const contract=require('../functions/cobros-ledger-contract');
 const {digest}=require('../functions/proposal-application-boundary');
 const copy=x=>x==null?x:structuredClone(x);
+// Firestore field transforms are legal in map fields, but never inside arrays.
+// The previous in-memory transaction double accepted these invalid writes,
+// masking the production callable failure at application commit.
+function assertNoArrayTransforms(value,inArray=false){
+ if(value&&typeof value==='object'&&value.__testServerTimestamp===true)
+  assert.equal(inArray,false,'Firestore FieldValue.serverTimestamp() cannot be used inside arrays');
+ if(Array.isArray(value))for(const item of value)assertNoArrayTransforms(item,true);
+ else if(value&&typeof value==='object')for(const item of Object.values(value))assertNoArrayTransforms(item,inArray);
+}
 let documents=new Map(),writeCount=0,transactionTail=Promise.resolve();
 class Ref{
  constructor(parts,filters=[],max=Infinity){this.parts=parts;this.filters=filters;this.max=max;this.id=parts[parts.length-1];this.path=parts.join('/');}
@@ -26,7 +35,7 @@ const db={collection:name=>new Ref([name]),runTransaction:fn=>{
  const pending=transactionTail.then(async()=>{
   const working=new Map([...documents.entries()].map(([k,v])=>[k,copy(v)]));let writes=0,writing=false;
   const tx={get:async ref=>{assert.equal(writing,false,'Firestore transactions must finish all reads before writes');return snapshot(ref,working);},
-   set:(ref,data,options)=>{writing=true;writes++;working.set(ref.path,options&&options.merge?Object.assign({},working.get(ref.path)||{},copy(data)):copy(data));}};
+   set:(ref,data,options)=>{assertNoArrayTransforms(data);writing=true;writes++;working.set(ref.path,options&&options.merge?Object.assign({},working.get(ref.path)||{},copy(data)):copy(data));}};
   const out=await fn(tx);documents=working;writeCount+=writes;return out;
  });
  transactionTail=pending.catch(()=>{});return pending;
@@ -128,6 +137,11 @@ const checkReview=async(extraEvidence,reason)=>{
  assert.deepEqual([...documents.entries()].filter(([key])=>key.includes('/'+runId+'/')),stageBefore,'staging must remain unchanged');checks++;
  const app=documents.get(item('reconciliationApplications',one.applicationId));
  assert.equal(app.status,'APPLIED');assert.equal(app.beforeAfter.length,3);assert.equal(app.actor.activeRole,'direccion');checks++;
+ for(const row of app.beforeAfter){
+  assertNoArrayTransforms(row.after,true);
+  assert.equal(row.after.updatedAt,'SERVER_TIMESTAMP_ON_COMMIT','audit documents must declare the server-owned timestamp transform explicitly');
+ }
+ checks++;
  const priorWrites=writeCount;const reload=await preview();assert.equal(reload.readbackConfirmed,true);assert.equal(reload.reused,true);assert.equal(writeCount,priorWrites);checks++;
  // Different request IDs cannot create another application from the same source.
  const forged=request('apply_proposal_application',{proposalId,sourceRunId:runId,planDigest:ready.planDigest});forged.data.requestId='random-browser-retry';
