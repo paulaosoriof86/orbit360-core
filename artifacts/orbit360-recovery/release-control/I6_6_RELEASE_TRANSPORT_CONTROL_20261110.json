@@ -4,7 +4,7 @@
   "productBrand": "Gravicentra Insurance",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
-  "status": "OPERATIONAL_BACKEND_PREVIEW_AUTHORIZED",
+  "status": "OPERATIONAL_EXACT_LIVE_PROMOTION_AUTHORIZED",
   "currentTechnicalPreviewRollover": {
     "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_TECHNICAL_PREVIEW_HYDRATION_AND_BALANCE_REBUILD_20261117.json",
     "receiptSha256": "6db064d9494103f4cd31ecf9a34e589f66455d2a818f3c0b945839872b1c6e8a"
@@ -408,13 +408,13 @@
     "priorR7HostingRollback": "sites/ays-orbit-360-lab/versions/9cedc5ecda75bb2a",
     "fullI66FinancialProductionAcceptance": false
   },
-  "currentReleaseStatus": "R11_RETAINED_HYDRATION_AND_CURRENT_BALANCE_PREVIEW_BUILT_SIGNED_QA_REQUIRED",
+  "currentReleaseStatus": "R11_RETAINED_AA200_SIGNED_PREVIEW_PASS_EXACT_LIVE_PROMOTION_AUTHORIZED",
   "scope": "Exact aa200 immutable Preview artifact with protected role-matrix hydration and canonical receipt current-balance corrections. Three existing Preview functions and four existing signed synthetic-only drivers; preserve the same Direction Preview legal-v2 decision, failed 28ab evidence, and last proven LIVE. This activation authorizes no LIVE promotion, real financial/customer writes, Rules/Auth/IAM change or additional targets.",
   "historicalClosedGate": "B4-007",
   "approvedProductDeltaManifest": "artifacts/orbit360-recovery/release-control/I6_6_APPROVED_PRODUCT_DELTA_MANIFEST_20261110.json",
   "ownerAuthority": "Paula Osorio Dirección 2026-11-12: Operativo tiene escritura integral en cada módulo autorizado, con paridad funcional para roles superiores según sus permisos, país, tenant y auditoría; cada arreglo probado pasa inmediatamente a LIVE desde un artefacto exacto. Alcance R7 autorizado, Preview firmado PASS 43375403003 y LIVE exacto publicado con tres funciones y hosting 223/223 en ambas URL, actores reales Carlos y Dirección y escrituras sintéticas reversibles PASS 43375687134. Mantener el resto de UAT real por país/rol, documentación real de aseguradora, UI legal y escrituras financieras en HOLD hasta prueba específica, sin tocar Firestore Rules, Auth ni IAM. Histórico R5/R6 se conserva como linaje, no como estado actual.",
-  "livePromotionAuthorized": false,
-  "previewApproved": false,
+  "livePromotionAuthorized": true,
+  "previewApproved": true,
   "carlosOpsLiveAuthorization20261112": {
     "status": "EXACT_TWO_WRITERS_AND_HOSTING_AUTHORIZED_AFTER_SIGNED_PREVIEW",
     "sourceSha": "1dd675ed59ac51fd122915ca8056f85f82fa12d6",
@@ -600,7 +600,7 @@
   "forbidFirestoreRulesDataAuthWrites": true,
   "rollback": "FRONTEND_TOPBAR_PREVIEW_FIRST; KEEP BOTH LIVE HOSTING ORIGINS AND COBROS FUNCTION UNCHANGED UNTIL EXACT_ARTIFACT_PREVIEW_PASS; THEN BACKUP_AND_ATOMIC_EXACT_ARTIFACT_LIVE_PROMOTION_WITH_REHASH_AND_ROLLBACK",
   "sourcePreviewUrl": "https://ays-orbit-360-lab--gi-i66-rc-42868854629-abj14q6n.web.app",
-  "backendFunctionPreviewOnly": true,
+  "backendFunctionPreviewOnly": false,
   "carlosSignedTransversalQaReceipt20261112": {
     "sourceSha": "b86cad550fadc050e8574678f02f3097caa8b5bd",
     "immutableHostingPreviewRunId": 43299843267,
@@ -648,7 +648,7 @@
     "syntheticLedgerRequestEventRestored": true,
     "livePromotionAccepted": false
   },
-  "forbidBackendLiveFunctionDeploy": true,
+  "forbidBackendLiveFunctionDeploy": false,
   "readerPreviewAuthorization": {
     "authorizedBy": "Paula Andrea Osorio Franco, Direccion",
     "authorizedAtGuatemala": "2026-11-11",
@@ -756,7 +756,7 @@
   "previewFunctionRunId": 43306217923,
   "previewFunctionStatus": "EXACT_ARTIFACT_PREVIEW_FUNCTION_ACTIVE_401_AND_LIVE_BACKEND_TWO_HOSTS_UNCHANGED_PASS",
   "liveFunctionScope": "orbit360CobrosReconciliationCommand",
-  "noHostingPromotion": true,
+  "noHostingPromotion": false,
   "liveFunctionRunId": 43129008894,
   "liveFunctionOldRevision": "orbit360cobrosreconciliationcommand-00003-kax",
   "liveFunctionNewRevision": "orbit360cobrosreconciliationcommand-00006-viw",
@@ -764,7 +764,7 @@
   "liveAccessGuard": "UNAUTHENTICATED_401_PASS",
   "hostingOriginsUntouched": true,
   "liveCustomerDataWrites": 0,
-  "releaseStatus": "R11_RETAINED_HYDRATION_AND_CURRENT_BALANCE_PREVIEW_BUILT_SIGNED_QA_REQUIRED",
+  "releaseStatus": "R11_RETAINED_AA200_SIGNED_PREVIEW_PASS_EXACT_LIVE_PROMOTION_AUTHORIZED",
   "pendingFrontendTopbarRelease": {
     "receipt": "artifacts/orbit360-recovery/release-control/I6_6_GLOBAL_TOPBAR_CROSSMODULE_HYDRATION_20261111.json",
     "currentStatus": "SOURCE_UNIT_PASS_IMMUTABLE_BUILD_REQUESTED",
@@ -2711,7 +2711,7 @@
   "operationalReleaseCandidate": {
     "schema": "I6_6_OPERATIONAL_EXACT_RELEASE_V1",
     "approvedByDirection": true,
-    "status": "EXACT_BACKEND_PREVIEW_SIGNED_QA_AUTHORIZED",
+    "status": "EXACT_PREVIEW_SIGNED_LIVE_AUTHORIZED",
     "sourceSha": "aa200b1de0aa5c654338b2f7de8bec9e38af86ec",
     "buildRunId": 44040873624,
     "artifactId": 14309566018,
@@ -2815,6 +2815,47 @@
       "termsProjectionSha256": "485b07887091063cc7a5d1dc8f11a9bb547f2ef059490bb04d4acee73404f6b2",
       "buildId": "gi-i66-aa200b1de0aa-57f234755dc1"
     },
-    "signedObservabilityProfile": "I66_SIGNED_BROWSER_OBSERVABILITY_V1"
+    "signedObservabilityProfile": "I66_SIGNED_BROWSER_OBSERVABILITY_V1",
+    "previewQa": {
+      "runId": 44041870642,
+      "headSha": "8e26fdf501b5073977390d15e070e2b431277f53",
+      "receiptArtifactId": 14310490418,
+      "receiptArtifactDigest": "sha256:de4672e0cc5bcd7a2b1f3aa3cc79c869aadd05629ab4a9de883271119a5969fd",
+      "status": "SIGNED_DRIVERS_DURABLE_READBACK_RELOAD_RESTORE_PASS"
+    }
+  },
+  "hydrationAndBalanceSignedPreview20261117": {
+    "schema": "I6_6_SIGNED_PREVIEW_EXACT_LIVE_AUTHORIZATION_V1",
+    "date": "2026-11-17",
+    "sourceSha": "aa200b1de0aa5c654338b2f7de8bec9e38af86ec",
+    "buildId": "gi-i66-aa200b1de0aa-57f234755dc1",
+    "buildRunId": 44040873624,
+    "artifactId": 14309566018,
+    "artifactDigest": "sha256:06567c6f22974677d314ddc51e63896cca02c95ed762da24a7874cf9deafa72b",
+    "qaRunId": 44041870642,
+    "qaHeadSha": "8e26fdf501b5073977390d15e070e2b431277f53",
+    "qaArtifactId": 14310490418,
+    "qaArtifactDigest": "sha256:de4672e0cc5bcd7a2b1f3aa3cc79c869aadd05629ab4a9de883271119a5969fd",
+    "proofSha256": "b3bfcd4c6dea33d9daef05fe56a38223be2309af34b692907ab82a081e49be21",
+    "status": "SIGNED_DRIVERS_DURABLE_READBACK_RELOAD_RESTORE_PASS",
+    "focusedChecks": {
+      "advisorPayables": 16,
+      "proposalApplication": 14
+    },
+    "proposalUiConfirmationMode": "UI_REQUEST_RELOAD_DURABLE_READBACK_EXACT",
+    "unexpectedConsoleErrors": 0,
+    "unexpectedHttpErrors": 0,
+    "pageErrorCount": 0,
+    "telemetryFailures": 0,
+    "syntheticRestoreComplete": true,
+    "realFinancialOrCustomerWrites": 0,
+    "liveHostingUnchangedAtPreviewProof": true,
+    "liveBackendUnchangedAtPreviewProof": true,
+    "authorization": "USER_REQUEST_CONTINUE_CERTIFY_AND_PUBLISH_EXISTING_I66_SAME_ARTIFACT",
+    "exactLivePromotionOnly": true,
+    "liveFunctionalAcceptanceClaimed": false,
+    "preservePriorFailures": true,
+    "noRulesAuthIamWrites": true,
+    "includesUnbuiltSuccessorSource": false
   }
 }
