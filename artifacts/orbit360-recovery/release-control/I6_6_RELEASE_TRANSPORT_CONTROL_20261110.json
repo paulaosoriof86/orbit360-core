@@ -4,7 +4,7 @@
   "productBrand": "Gravicentra Insurance",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
-  "status": "PREVIEW_BUILD_REQUESTED",
+  "status": "OPERATIONAL_BACKEND_PREVIEW_AUTHORIZED",
   "currentTechnicalPreviewRollover": {
     "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_TECHNICAL_PREVIEW_OBSERVABILITY_REBUILD_20261116.json",
     "receiptSha256": "215bfcc8fc5cffdf5c630a6696944791ea8859f0ffdd4cf35e8ba98e231eee41"
@@ -596,11 +596,11 @@
   "requiredCanonicalOrigin": "https://ays-orbit-360-lab.web.app",
   "requiredStaffOrigin": "https://app.aysseguros.com",
   "originReadbackRequirement": "BOTH_HOSTS_IDENTICAL_TO_SAME_ARTIFACT_OR_ROLLBACK",
-  "forbidBackendFunctionDeploy": true,
+  "forbidBackendFunctionDeploy": false,
   "forbidFirestoreRulesDataAuthWrites": true,
   "rollback": "FRONTEND_TOPBAR_PREVIEW_FIRST; KEEP BOTH LIVE HOSTING ORIGINS AND COBROS FUNCTION UNCHANGED UNTIL EXACT_ARTIFACT_PREVIEW_PASS; THEN BACKUP_AND_ATOMIC_EXACT_ARTIFACT_LIVE_PROMOTION_WITH_REHASH_AND_ROLLBACK",
   "sourcePreviewUrl": "https://ays-orbit-360-lab--gi-i66-rc-42868854629-abj14q6n.web.app",
-  "backendFunctionPreviewOnly": false,
+  "backendFunctionPreviewOnly": true,
   "carlosSignedTransversalQaReceipt20261112": {
     "sourceSha": "b86cad550fadc050e8574678f02f3097caa8b5bd",
     "immutableHostingPreviewRunId": 43299843267,
@@ -2395,5 +2395,114 @@
     "status": "FUNCTIONAL_CHECKS_PASS_OBSERVABILITY_HOLD_NOT_FULL_ACCEPTANCE",
     "evidence": "artifacts/orbit360-recovery/release-control/I6_6_SIGNED_PREVIEW_BD564_FUNCTIONAL_AND_OBSERVABILITY_READBACK_20261116.json",
     "realPayments": 0
+  },
+  "operationalReleaseCandidate": {
+    "schema": "I6_6_OPERATIONAL_EXACT_RELEASE_V1",
+    "approvedByDirection": true,
+    "status": "EXACT_BACKEND_PREVIEW_SIGNED_QA_AUTHORIZED",
+    "sourceSha": "42a6764125f18106debc52edcb79741fe49e829c",
+    "buildRunId": 44026819055,
+    "artifactId": 14303601582,
+    "artifactDigest": "sha256:210fb130f998f367faecefbc34c6287bf59cafcbede8002f345cfb813d4ed1b6",
+    "buildId": "gi-i66-42a6764125f1-57f234755dc1",
+    "previewUrl": "https://ays-orbit-360-lab--gi-i66-rc-44009981499-d08psr2y.web.app",
+    "previewChannelId": "gi-i66-rc-44009981499",
+    "previewRollover": {
+      "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_TECHNICAL_PREVIEW_OBSERVABILITY_REBUILD_20261116.json",
+      "receiptSha256": "215bfcc8fc5cffdf5c630a6696944791ea8859f0ffdd4cf35e8ba98e231eee41",
+      "channel": "gi-i66-rc-44009981499",
+      "origin": "https://ays-orbit-360-lab--gi-i66-rc-44009981499-d08psr2y.web.app",
+      "previousSourceSha": "bd564d5c48e4a55ac08adb101fbe8e1bd270ea8e",
+      "previousArtifactId": 14300394824,
+      "previousArtifactDigest": "sha256:d6ae5c953fc2c71c55fdaed15ca93b0a571ff4f6a36d4536eac73192564afcd7"
+    },
+    "targets": {
+      "preview": [
+        {
+          "name": "orbit360ProductOperationalCommandPreview",
+          "region": "us-east1"
+        },
+        {
+          "name": "orbit360CobrosReconciliationCommandPreview",
+          "region": "us-central1"
+        },
+        {
+          "name": "orbit360ScopedPolicyReadPreview",
+          "region": "us-east1"
+        }
+      ],
+      "live": [
+        {
+          "name": "orbit360ProductOperationalCommand",
+          "region": "us-central1"
+        },
+        {
+          "name": "orbit360CobrosReconciliationCommand",
+          "region": "us-central1"
+        },
+        {
+          "name": "orbit360ScopedPolicyRead",
+          "region": "us-east1"
+        }
+      ]
+    },
+    "requiredPreviewDrivers": [
+      "tools/gravicentra-i66-privileged-role-signed-ui-permissions-readonly.cjs",
+      "tools/gravicentra-i6-6-carlos-real-signed-synthetic-preview-uat.cjs",
+      "tools/gravicentra-i6-6-advisor-payables-signed-uat.cjs",
+      "tools/gravicentra-i6-6-proposal-application-signed-uat.cjs"
+    ],
+    "sameImmutableArtifactOnly": true,
+    "syntheticRecordsOnly": true,
+    "noRealFinancialOrCustomerWrites": true,
+    "noRulesAuthIamWrites": true,
+    "rollbackThreeBackendRevisionsAndHosting": true,
+    "expectedSiteFileCount": 223,
+    "syntheticQaIsolation": {
+      "tenantId": "alianzas-soluciones",
+      "runIdPrefix": "cobledgerqa_",
+      "entityIdPrefix": "b3005qa_",
+      "runCollection": "cobrosLedgerQaRuns",
+      "controlCollection": "cobrosLedgerQaControl",
+      "requireSameQaRunId": true,
+      "requireSyntheticMarker": true,
+      "allowRealControlPointerMutation": false,
+      "restoreAllSyntheticRecords": true
+    },
+    "advisorPayableQaIsolation": {
+      "tenantId": "alianzas-soluciones",
+      "runIdPrefix": "b4003qa_i66_cxp_",
+      "payableIdPrefix": "b4003qa_cxpase_",
+      "commissionIdPrefix": "b4003qa_comsrc_",
+      "requireSameQaRunId": true,
+      "requireSyntheticMarker": true,
+      "restoreAllSyntheticRecords": true,
+      "financialPayments": 0,
+      "bankMovements": 0,
+      "authOrMembershipMutations": 0
+    },
+    "currentLive": {
+      "sourceSha": "84769378eb2014addebfefdbdd63091bddc4b817",
+      "buildId": "gi-i66-84769378eb20-57f234755dc1",
+      "artifactId": 14075022275,
+      "artifactDigest": "sha256:b0f3bacb68511cdfc91ac934602c51f55afec5c1d6428d886d13a72a706ee283",
+      "buildRunId": 43503721126,
+      "liveRunId": 43506971214,
+      "hostingVersion": "sites/ays-orbit-360-lab/versions/0766db29b338befc"
+    },
+    "legalAcceptance": {
+      "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_DIRECTION_PREVIEW_V2_SCOPE_AUTHORIZATION_20261116.json",
+      "receiptSha256": "d3309675c753bd1b31f9163d506aba2e29ac70583a7b8d54cb5b8503b5c50a44",
+      "decisionId": "DIRECTION_I66_PREVIEW_SAME_LEGAL_V2_TECHNICAL_SUCCESSORS_AUTHORIZED_20261116",
+      "authorizationScope": "I6_6_PREVIEW_IDENTICAL_V2_TERMS",
+      "gate": "I6.6",
+      "phase": "PREVIEW",
+      "origin": "https://ays-orbit-360-lab--gi-i66-rc-44009981499-d08psr2y.web.app",
+      "sourceSha": "42a6764125f18106debc52edcb79741fe49e829c",
+      "actorRole": "direccion",
+      "termsProjectionSha256": "485b07887091063cc7a5d1dc8f11a9bb547f2ef059490bb04d4acee73404f6b2",
+      "buildId": "gi-i66-42a6764125f1-57f234755dc1"
+    },
+    "signedObservabilityProfile": "I66_SIGNED_BROWSER_OBSERVABILITY_V1"
   }
 }

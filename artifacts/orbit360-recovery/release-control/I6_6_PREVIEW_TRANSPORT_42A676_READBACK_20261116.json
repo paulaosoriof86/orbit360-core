@@ -1,0 +1,210 @@
+{
+  "schema": "GI_I66_EXACT_PREVIEW_BUILD_AND_READBACK_RECEIPT_V1",
+  "dateGuatemala": "2026-11-16",
+  "gate": "I6.6",
+  "status": "BUILD_AND_223_FILE_READBACK_PASS_SIGNED_QA_NOT_YET_ACCEPTED",
+  "sourceSha": "42a6764125f18106debc52edcb79741fe49e829c",
+  "buildRun": {
+    "id": 44026819055,
+    "attempt": 1,
+    "conclusion": "success",
+    "path": ".github/workflows/gravicentra-release-delta-66-package.yml",
+    "completedAtUtc": "2026-11-17T05:53:13Z"
+  },
+  "immutable": {
+    "artifactId": 14303601582,
+    "artifactDigest": "sha256:210fb130f998f367faecefbc34c6287bf59cafcbede8002f345cfb813d4ed1b6",
+    "tarSha256": "215aac9704307a6633957d1917f575b1aacc50d3b0343526079b40c5caa229fc",
+    "buildId": "gi-i66-42a6764125f1-57f234755dc1"
+  },
+  "rollover": {
+    "artifactId": 14303068423,
+    "artifactDigest": "sha256:849986abb5dd10086f9f84cd524bcec1a4a2dc207a9c3fcbf4f9f1c36fc19f96",
+    "before": {
+      "schema": "GI_I66_TECHNICAL_PREVIEW_BEFORE_V1",
+      "status": "PREPARED_READONLY_NOT_ACCEPTED",
+      "channelId": "gi-i66-rc-44009981499",
+      "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_TECHNICAL_PREVIEW_OBSERVABILITY_REBUILD_20261116.json",
+      "receiptSha256": "215bfcc8fc5cffdf5c630a6696944791ea8859f0ffdd4cf35e8ba98e231eee41",
+      "sourceSha": "42a6764125f18106debc52edcb79741fe49e829c",
+      "buildRunId": 44026819055,
+      "newCandidate": {
+        "sourceSha": "42a6764125f18106debc52edcb79741fe49e829c",
+        "buildRunId": 44026819055,
+        "artifactId": 14303601582,
+        "artifactDigest": "sha256:210fb130f998f367faecefbc34c6287bf59cafcbede8002f345cfb813d4ed1b6"
+      },
+      "previewWrites": 0,
+      "liveWrites": 0,
+      "backendWrites": 0,
+      "businessDataWrites": 0,
+      "channelDeletions": 0,
+      "authRulesIamWrites": 0,
+      "productAccepted": false,
+      "checks": [
+        "EXACT_AUTHORITY_AND_QUOTA",
+        "PREVIOUS_LIVE_AND_NEW_ARCHIVES_DIGEST_VERIFIED",
+        "PREVIOUS_AND_DUAL_LIVE_223_FILES_EACH_EXACT",
+        "NEW_LOCAL_PACKAGE_EQUALS_UPLOADED_ARCHIVE",
+        "FRESH_INVENTORY_UNCHANGED"
+      ],
+      "totalChannels": 51,
+      "inventorySha256": "925151e4a02ee390db4066db69803a4cf1966a2f0aa7745c84c646acb87e2c82",
+      "backups": {
+        "previous": {
+          "artifactId": 14300394824,
+          "zipSha256": "d6ae5c953fc2c71c55fdaed15ca93b0a571ff4f6a36d4536eac73192564afcd7",
+          "tarSha256": "da1790390870508d35a78823077eb447a2887879d27dded3309fd5c7040fc28b",
+          "marker": {
+            "product": "Gravicentra Insurance",
+            "gate": "I6.6",
+            "sourceSha": "bd564d5c48e4a55ac08adb101fbe8e1bd270ea8e",
+            "buildId": "gi-i66-bd564d5c48e4-57f234755dc1",
+            "environmentRef": "firebase-hosting-preview-i6-6"
+          }
+        },
+        "live": {
+          "artifactId": 14075022275,
+          "zipSha256": "b0f3bacb68511cdfc91ac934602c51f55afec5c1d6428d886d13a72a706ee283",
+          "tarSha256": "0ca3a020ee1f4435b8bfcd9abb2e5a980f11fdb55201875e267c108abc349fd0",
+          "marker": {
+            "product": "Gravicentra Insurance",
+            "gate": "I6.6",
+            "sourceSha": "84769378eb2014addebfefdbdd63091bddc4b817",
+            "buildId": "gi-i66-84769378eb20-57f234755dc1",
+            "environmentRef": "firebase-hosting-preview-i6-6"
+          }
+        },
+        "next": {
+          "artifactId": 14303601582,
+          "zipSha256": "210fb130f998f367faecefbc34c6287bf59cafcbede8002f345cfb813d4ed1b6",
+          "tarSha256": "215aac9704307a6633957d1917f575b1aacc50d3b0343526079b40c5caa229fc",
+          "marker": {
+            "product": "Gravicentra Insurance",
+            "gate": "I6.6",
+            "sourceSha": "42a6764125f18106debc52edcb79741fe49e829c",
+            "buildId": "gi-i66-42a6764125f1-57f234755dc1",
+            "environmentRef": "firebase-hosting-preview-i6-6"
+          }
+        }
+      },
+      "readbacks": [
+        {
+          "origin": "https://ays-orbit-360-lab--gi-i66-rc-44009981499-d08psr2y.web.app",
+          "files": 223,
+          "manifestSha256": "ca430942b64149d5c9512d1744d87f97f9b4a96ba43042cbc65f3c5d5bb87225",
+          "marker": {
+            "product": "Gravicentra Insurance",
+            "gate": "I6.6",
+            "sourceSha": "bd564d5c48e4a55ac08adb101fbe8e1bd270ea8e",
+            "buildId": "gi-i66-bd564d5c48e4-57f234755dc1",
+            "environmentRef": "firebase-hosting-preview-i6-6"
+          }
+        },
+        {
+          "origin": "https://ays-orbit-360-lab.web.app",
+          "files": 223,
+          "manifestSha256": "9ee9f79286c75008b7ee7dae6962f0be0710db188196bbab2f0951d6ffac116f",
+          "marker": {
+            "product": "Gravicentra Insurance",
+            "gate": "I6.6",
+            "sourceSha": "84769378eb2014addebfefdbdd63091bddc4b817",
+            "buildId": "gi-i66-84769378eb20-57f234755dc1",
+            "environmentRef": "firebase-hosting-preview-i6-6"
+          }
+        },
+        {
+          "origin": "https://app.aysseguros.com",
+          "files": 223,
+          "manifestSha256": "9ee9f79286c75008b7ee7dae6962f0be0710db188196bbab2f0951d6ffac116f",
+          "marker": {
+            "product": "Gravicentra Insurance",
+            "gate": "I6.6",
+            "sourceSha": "84769378eb2014addebfefdbdd63091bddc4b817",
+            "buildId": "gi-i66-84769378eb20-57f234755dc1",
+            "environmentRef": "firebase-hosting-preview-i6-6"
+          }
+        }
+      ],
+      "recordedAtUtc": "2026-11-17T05:52:06.912Z"
+    },
+    "after": {
+      "schema": "GI_I66_TECHNICAL_PREVIEW_AFTER_V1",
+      "status": "EXACT_PREVIEW_REPLACEMENT_READBACK_PASS_NOT_FUNCTIONAL_ACCEPTANCE",
+      "channelId": "gi-i66-rc-44009981499",
+      "sourceSha": "42a6764125f18106debc52edcb79741fe49e829c",
+      "receiptSha256": "215bfcc8fc5cffdf5c630a6696944791ea8859f0ffdd4cf35e8ba98e231eee41",
+      "buildRunId": 44026819055,
+      "readOnlyVerifierWrites": 0,
+      "liveWrites": 0,
+      "backendWrites": 0,
+      "businessDataWrites": 0,
+      "channelDeletions": 0,
+      "authRulesIamWrites": 0,
+      "productAccepted": false,
+      "signedFunctionalPass": false,
+      "readbacks": [
+        {
+          "origin": "https://ays-orbit-360-lab--gi-i66-rc-44009981499-d08psr2y.web.app",
+          "files": 223,
+          "manifestSha256": "689e95a73d6f071dfad596ee49e41177934e29ac5fa2a2f199e6f9c573c092b9",
+          "marker": {
+            "product": "Gravicentra Insurance",
+            "gate": "I6.6",
+            "sourceSha": "42a6764125f18106debc52edcb79741fe49e829c",
+            "buildId": "gi-i66-42a6764125f1-57f234755dc1",
+            "environmentRef": "firebase-hosting-preview-i6-6"
+          }
+        },
+        {
+          "origin": "https://ays-orbit-360-lab.web.app",
+          "files": 223,
+          "manifestSha256": "9ee9f79286c75008b7ee7dae6962f0be0710db188196bbab2f0951d6ffac116f",
+          "marker": {
+            "product": "Gravicentra Insurance",
+            "gate": "I6.6",
+            "sourceSha": "84769378eb2014addebfefdbdd63091bddc4b817",
+            "buildId": "gi-i66-84769378eb20-57f234755dc1",
+            "environmentRef": "firebase-hosting-preview-i6-6"
+          }
+        },
+        {
+          "origin": "https://app.aysseguros.com",
+          "files": 223,
+          "manifestSha256": "9ee9f79286c75008b7ee7dae6962f0be0710db188196bbab2f0951d6ffac116f",
+          "marker": {
+            "product": "Gravicentra Insurance",
+            "gate": "I6.6",
+            "sourceSha": "84769378eb2014addebfefdbdd63091bddc4b817",
+            "buildId": "gi-i66-84769378eb20-57f234755dc1",
+            "environmentRef": "firebase-hosting-preview-i6-6"
+          }
+        }
+      ],
+      "hostingVersion": "sites/ays-orbit-360-lab/versions/0872d76b5697c205",
+      "totalChannels": 51,
+      "newArtifactId": 14303601582,
+      "newArtifactDigest": "sha256:210fb130f998f367faecefbc34c6287bf59cafcbede8002f345cfb813d4ed1b6",
+      "inventorySha256": "b7774ec0068043a5f80054942e46d9132f284b742a274502df548f6631b9bfb2",
+      "recordedAtUtc": "2026-11-17T05:53:05.026Z"
+    }
+  },
+  "verification": {
+    "sourceFilesExactReadback": 19,
+    "localNodeTestCases": 816,
+    "localFailed": 0,
+    "localTestFiles": 22,
+    "independentCodeReviews": 3,
+    "immutableZipRehashed": true,
+    "rolloverZipRehashed": true,
+    "previewFilesExact": 223,
+    "liveFilesExactEachOrigin": 223,
+    "signedFunctionalAcceptance": false,
+    "newLiveAcceptance": false,
+    "realFinancialWrites": 0,
+    "backendWritesInBuild": 0,
+    "requiresSignedObservabilityProfile": "I66_SIGNED_BROWSER_OBSERVABILITY_V1"
+  },
+  "parallelReadback": "artifacts/orbit360-recovery/release-control/I6_6_EXISTING_CLIENT_INDEPENDENT_GESTIONES_READBACK_20261116.json",
+  "next": "Run the existing four signed Preview drivers on this exact source/artifact with bounded same-V2 Direction acceptance. No source edits, real payments, LIVE promotion or percentage credit."
+}

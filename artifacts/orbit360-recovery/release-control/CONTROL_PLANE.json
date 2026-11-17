@@ -9,9 +9,9 @@
     "activeGate": "I6.6",
     "closedHistoricalGate": "B4-007",
     "latestProvenLiveSource": "84769378eb2014addebfefdbdd63091bddc4b817",
-    "currentWork": "Preserve the successful four-driver signed functional run and bounded V2 consent. Close missing console attribution and passive UI body observability with a newly built immutable successor, then rerun the same four signed drivers. Parallel existing read-only reader gains independent client/gestiones lookup. No full Preview acceptance, LIVE promotion, customer/financial writes or percentage credit is claimed.",
-    "latestHostingPreviewEvidence": "artifacts/orbit360-recovery/release-control/I6_6_PREVIEW_TRANSPORT_BD564_READBACK_20261116.json",
-    "latestHostingPreviewSource": "bd564d5c48e4a55ac08adb101fbe8e1bd270ea8e",
+    "currentWork": "Exact 42a676 immutable Preview and dual-LIVE readback completed. Run the same four signed drivers with source-pinned native console attribution and causal UI-response proof; no source changes after build. Independent read-only portfolio lookup confirmed one existing focal client and zero gestiones under two exact client-reference fields. Do not duplicate that client or infer payment. No new LIVE acceptance or percentage credit.",
+    "latestHostingPreviewEvidence": "artifacts/orbit360-recovery/release-control/I6_6_PREVIEW_TRANSPORT_42A676_READBACK_20261116.json",
+    "latestHostingPreviewSource": "42a6764125f18106debc52edcb79741fe49e829c",
     "operationsEvidenceReview": "artifacts/orbit360-recovery/release-control/I6_6_OPS_EVIDENCE_AND_PREVIEW_BINDING_REVIEW_20261116.json",
     "legalSuccessorAcceptance": "BOUND_V2_SCOPE_EXECUTED_FOR_BD564_WITH_NORMAL_UI_IMMEDIATE_AND_RELOAD_PROOF",
     "legalScopeAuthorizationReceipt": "artifacts/orbit360-recovery/release-control/I6_6_DIRECTION_PREVIEW_V2_SCOPE_AUTHORIZATION_20261116.json",
@@ -20,16 +20,17 @@
     "newLiveAcceptanceClaimed": false,
     "technicalPreviewCausalRetryReceipt": "artifacts/orbit360-recovery/release-control/I6_6_TECHNICAL_PREVIEW_OBSERVABILITY_REBUILD_20261116.json",
     "signedPreviewCandidate": {
-      "sourceSha": "bd564d5c48e4a55ac08adb101fbe8e1bd270ea8e",
-      "buildId": "gi-i66-bd564d5c48e4-57f234755dc1",
-      "buildRunId": 44022009808,
-      "artifactId": 14300394824,
-      "artifactDigest": "sha256:d6ae5c953fc2c71c55fdaed15ca93b0a571ff4f6a36d4536eac73192564afcd7",
-      "status": "SIGNED_FUNCTIONAL_CHECKS_PASS_CONSOLE_ATTRIBUTION_HOLD"
+      "sourceSha": "42a6764125f18106debc52edcb79741fe49e829c",
+      "buildId": "gi-i66-42a6764125f1-57f234755dc1",
+      "buildRunId": 44026819055,
+      "artifactId": 14303601582,
+      "artifactDigest": "sha256:210fb130f998f367faecefbc34c6287bf59cafcbede8002f345cfb813d4ed1b6",
+      "status": "AUTHORIZED_EXACT_CANDIDATE_SIGNED_QA_NOT_YET_PASSED",
+      "signedObservabilityProfile": "I66_SIGNED_BROWSER_OBSERVABILITY_V1"
     },
-    "documentaryFocalReadbackEvidence": "artifacts/orbit360-recovery/release-control/I6_6_ISSUED_DOCUMENT_FOCAL_LIVE_READBACK_20261116.json",
+    "documentaryFocalReadbackEvidence": "artifacts/orbit360-recovery/release-control/I6_6_EXISTING_CLIENT_INDEPENDENT_GESTIONES_READBACK_20261116.json",
     "signedPreviewEvidence": "artifacts/orbit360-recovery/release-control/I6_6_SIGNED_PREVIEW_BD564_FUNCTIONAL_AND_OBSERVABILITY_READBACK_20261116.json",
-    "nextSourceWork": "QA_OBSERVABILITY_AND_INDEPENDENT_READONLY_CLIENT_GESTIONES_JOIN"
+    "nextSourceWork": "NONE_SOURCE_FROZEN_RUN_EXACT_SIGNED_PREVIEW_AND_READBACK"
   },
   "b4003ActiveCertificationCursor20261106": {
     "schema": "GRAVICENTRA_B4_003_SINGLE_ACTIVE_CERTIFICATION_CURSOR_V1",

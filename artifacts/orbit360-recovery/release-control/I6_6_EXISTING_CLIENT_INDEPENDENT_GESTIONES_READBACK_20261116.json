@@ -1,0 +1,110 @@
+{
+  "schema": "GI_I66_INDEPENDENT_CLIENT_AND_GESTIONES_READONLY_RECEIPT_V1",
+  "gate": "I6.6",
+  "dateGuatemala": "2026-11-16",
+  "status": "EXISTING_CLIENT_UNIQUE_POLICY_AND_REQUIREMENT_NOT_FOUND_HOLD_NO_WRITES",
+  "purpose": "Preserve real independent client lookup so a missing focal policy does not trigger a duplicate customer or a claim of global operations absence.",
+  "execution": {
+    "sourceSha": "42a6764125f18106debc52edcb79741fe49e829c",
+    "runId": 44026818958,
+    "runAttempt": 1,
+    "conclusion": "success",
+    "workflowPath": ".github/workflows/gravicentra-i66-cartera-a1-a4-readonly.yml",
+    "artifactId": 14303146891,
+    "artifactDigest": "sha256:abff02164ead7f886e79e7db3338eeda71543cb988e13691e592b179249cefce",
+    "reportSha256": "b674adb4fbf802087595da52bfb337c0b4ee54378b52dd9459b1ab13e85c4c1b",
+    "observedAtUtc": "2026-11-17T05:50:10.840Z",
+    "observationDateGuatemala": "2026-11-16",
+    "archiveRehashedByTwoReviewers": true
+  },
+  "priorEvidence": {
+    "path": "artifacts/orbit360-recovery/release-control/I6_6_ISSUED_DOCUMENT_FOCAL_LIVE_READBACK_20261116.json",
+    "runId": 44022009750,
+    "clientAndGestionesWereNotDetermined": true,
+    "preserveBytes": true
+  },
+  "before": {
+    "policyNotFound": true,
+    "clientStatus": "NOT_DETERMINED",
+    "gestionesStatus": "NOT_DETERMINED"
+  },
+  "after": {
+    "id": "ISSUED.DOC.1",
+    "sourceKind": "ISSUED_REQUIREMENT_NOT_PAYMENT",
+    "sourcePdfSha256": "cf74d644ca819810d6302da17d323dd3a628e841a1be883d7c3ee27b2767c3a9",
+    "sourcePaid": false,
+    "paymentApplicationAuthorized": false,
+    "writes": 0,
+    "certifiedApplied": 0,
+    "scannedPolicyCount": 1428,
+    "policyNumberMatches": 0,
+    "exactEditionMatches": 0,
+    "exactRequirementMatches": 0,
+    "currentStatus": "HOLD_FOCAL_POLICY_NOT_FOUND",
+    "scanCoverage": {
+      "policyAliasFields": 11,
+      "policyCap": 2000,
+      "linkedCap": 80,
+      "proposalCap": 250
+    },
+    "opsLinkedCount": null,
+    "opsLinkCoverage": "gestiones.polizaId_only",
+    "opsAbsenceProven": false,
+    "activeProposalMatches": 0,
+    "activeLedgerPresent": true,
+    "clientManagementReadback": {
+      "status": "EXISTING_CLIENT_NO_GESTION_IN_CLIENT_REFERENCE_COVERAGE",
+      "scannedClientCount": 448,
+      "exactSourceNameMatches": 1,
+      "clientIdentityBasis": "EXACT_ISSUED_ORIGINAL_NORMALIZED_FULL_NAME_HASH_NOT_NIT_VERIFICATION",
+      "clientLookupCoverage": {
+        "nameFields": 10,
+        "clientCap": 1000,
+        "physicalTenantPathBound": true,
+        "unlistedNameAliasesChecked": false
+      },
+      "clientScanTruncated": false,
+      "clientAbsenceProven": false,
+      "canonicalClientUnique": true,
+      "clientScopeVerified": true,
+      "clientNameAliasesConsistent": true,
+      "clientDocumentIdCoherent": true,
+      "managementQueriesPerformed": true,
+      "managementQueryFields": [
+        "clienteId",
+        "clientId"
+      ],
+      "managementPerQueryCap": 80,
+      "managementScanTruncated": false,
+      "managementLinkedCount": 0,
+      "managementWithPolicyReferenceCount": 0,
+      "managementWithoutPolicyReferenceCount": 0,
+      "managementArchivedCount": 0,
+      "managementCountryDerivedFromClientCount": 0,
+      "managementAbsenceProven": false,
+      "managementSourceDocumentAssociationVerified": false,
+      "policyCreationAuthorized": false,
+      "paymentApplicationAuthorized": false,
+      "writes": 0
+    },
+    "snapshotFingerprint": "24376e157ef503444f9b97c7d4e78fca5668385aec360070c36f497bb8052e3d"
+  },
+  "semanticBoundary": {
+    "originalSource": "ISSUED_REQUIREMENT_NOT_PAYMENT",
+    "paymentEvidence": false,
+    "paymentAuthorization": false,
+    "clientMustNotBeDuplicated": true,
+    "identityIsNotNitVerification": true,
+    "gestionesAbsenceLimitedToTwoExactClientReferenceFields": true,
+    "noClaimOfGlobalGestionesAbsence": true,
+    "noSourceDocumentAssociationProven": true,
+    "policyCreationAuthorizedByThisReadback": false,
+    "bankFinancialPolicyOrClientWrites": 0,
+    "liveProductAcceptanceCredit": 0,
+    "opsCertifiedNumerator": 6,
+    "opsFrozenDenominator": 8,
+    "noAuthRulesIamChange": true,
+    "noNewWorkflowOrBackend": true
+  },
+  "next": "Use the existing canonical client and the original issued document through the approved product operation, only after the exact actor, document linkage and business-write authority are verified. Do not create a duplicate client, infer a payment, or manufacture an operations record from search absence."
+}
