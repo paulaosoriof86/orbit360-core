@@ -3,7 +3,7 @@
   "dateGuatemala": "2026-11-15",
   "activeGate": "I6.6",
   "historicalClosedGate": "B4-007",
-  "status": "EXECUTING_SOURCE_QA_NOT_NEW_LIVE_ACCEPTANCE",
+  "status": "LIVE_NOCHANGE_SIGNED_PREVIEW_NETWORK_HOLD_DIAGNOSTIC_READ_PENDING",
   "currentAuthorization": {
     "receipt": "artifacts/orbit360-recovery/release-control/I6_6_DIRECTION_PREVIEW_V2_SCOPE_AUTHORIZATION_20261116.json",
     "receiptSha256": "d3309675c753bd1b31f9163d506aba2e29ac70583a7b8d54cb5b8503b5c50a44",
@@ -13,8 +13,9 @@
     "otherActors": false,
     "liveAcceptance": false,
     "realPayments": false,
-    "signedExecutionProof": "NEW_EXACT_SIGNED_PREVIEW_AUTHORIZED_NOT_YET_ACCEPTED",
-    "existingImmutableBuildRunId": 44173813709
+    "signedExecutionProof": "CURRENT_EXACT_SIGNED_PREVIEW_FAILED_NOT_ACCEPTED_READONLY_DIAGNOSIS_PENDING",
+    "existingImmutableBuildRunId": 44173813709,
+    "signedExecutionReceipt": "artifacts/orbit360-recovery/release-control/I6_6_STARTUP_DIAGNOSTICS_NETWORK_HOLD_20261117.json"
   },
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
@@ -157,9 +158,9 @@
       "percent": 61.3,
       "scope": "Five frozen operational blocks only; not total product or elapsed work; source tests do not raise LIVE acceptance."
     },
-    "newPreviewAcceptance": "PENDING_NEW_EXACT_SIGNED_DRIVERS",
+    "newPreviewAcceptance": "FAILED_CURRENT_EXACT_SIGNED_PREVIEW_NOT_ACCEPTED",
     "lastSignedPreviewAcceptance": "59C37_SOURCE_INTAKE_RELOAD_READBACK_REPLAY_AND_CLEANUP_PASS",
-    "newLiveAcceptance": "NOT_AUTHORIZED_FOR_LEGAL_SCOPE_NOT_EXECUTED_FOR_NEW_CANDIDATE",
+    "newLiveAcceptance": "NO_NEW_LIVE_DEPLOYMENT_OR_ACCEPTANCE_R11_RETAINED",
     "failedPreviewRun": 43982928603,
     "failedPreviewSource": "39f54e24e59983a59a7c9a41912e0eed154efa18",
     "previousFailedPreview": {
@@ -211,19 +212,32 @@
     },
     "latestPreviewEvidence": {
       "sourceSha": "62d50052a9b9196ebce8c4acd1bc66778ae89c06",
+      "buildId": "gi-i66-62d50052a9b9-57f234755dc1",
       "buildRunId": 44173813709,
       "artifactId": 14369500963,
       "artifactDigest": "sha256:e31583c35aa76e2fcd904ffd1caa61bf589c9ada9acc4dd307a30e731e814c81",
-      "buildId": "gi-i66-62d50052a9b9-57f234755dc1",
       "previewUrl": "https://ays-orbit-360-lab--gi-i66-rc-44009981499-d08psr2y.web.app",
       "previewChannelId": "gi-i66-rc-44009981499",
-      "status": "EXACT_IMMUTABLE_PREVIEW_BUILT_FOUR_SIGNED_DRIVERS_AUTHORIZED",
-      "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_STARTUP_DIAGNOSTICS_PREVIEW_BUILD_20261117.json",
-      "signedPreviewAccepted": false,
-      "liveAccepted": false,
-      "realFinancialWrites": 0,
       "signedObservabilityProfile": "I66_SIGNED_BROWSER_OBSERVABILITY_V1",
-      "liveLegalConsentGranted": false
+      "previewRollover": {
+        "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_TECHNICAL_PREVIEW_SOURCE_INTAKE_RELOAD_REBUILD_20261117.json",
+        "receiptSha256": "ae6d48b0260af9e9db7b7ba69e799a4a17e7adf23a24f1893168079dce05bf35",
+        "channel": "gi-i66-rc-44009981499",
+        "origin": "https://ays-orbit-360-lab--gi-i66-rc-44009981499-d08psr2y.web.app",
+        "previousSourceSha": "6b6e8bbba3371b32a1bfb80b903c40377e11d727",
+        "previousArtifactId": 14314985190,
+        "previousArtifactDigest": "sha256:e97f86355181a8c685b8dd800626a4885f8e34b45222f178d15355d76cbf499f"
+      },
+      "status": "LIVE_NOCHANGE_SIGNED_PREVIEW_NETWORK_HOLD_DIAGNOSTIC_READ_PENDING",
+      "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_STARTUP_DIAGNOSTICS_PREVIEW_BUILD_20261117.json",
+      "signedOutcomeReceipt": "artifacts/orbit360-recovery/release-control/I6_6_STARTUP_DIAGNOSTICS_NETWORK_HOLD_20261117.json",
+      "signedPreviewAccepted": false,
+      "newPreviewAcceptance": false,
+      "liveAccepted": false,
+      "liveLegalConsentGranted": false,
+      "realFinancialWrites": 0,
+      "underlyingStartupCauseProven": false,
+      "underlyingNetworkCauseProven": false
     },
     "operationsEvidenceReview": "artifacts/orbit360-recovery/release-control/I6_6_OPS_EVIDENCE_AND_PREVIEW_BINDING_REVIEW_20261116.json",
     "failedPreviewCleanup": "BOTH_FOCUSED_DRIVERS_PASS_REMAINING_ZERO",
@@ -364,17 +378,186 @@
       "mustNotPromote": true
     },
     "currentSignedObservabilityHold": {
-      "status": "CURRENT_SOURCE_INTAKE_RELOAD_HOLD_NOT_ACCEPTED",
-      "runId": 44149681372,
-      "sourceSha": "6b6e8bbba3371b32a1bfb80b903c40377e11d727",
-      "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_SOURCE_INTAKE_PRECISION_SIGNED_PREVIEW_OUTCOME_20261117.json",
+      "status": "FAILED_NOT_ACCEPTED",
+      "runId": 44175297317,
+      "jobId": 134365013822,
+      "conclusion": "failure",
+      "sourceSha": "62d50052a9b9196ebce8c4acd1bc66778ae89c06",
+      "buildId": "gi-i66-62d50052a9b9-57f234755dc1",
+      "buildRunId": 44173813709,
+      "workflowHeadSha": "7b33a51230e7ae17ffa2406b042191db775dcb1e",
+      "diagnosticArtifactId": 14369897476,
+      "diagnosticArtifactDigest": "sha256:7533108c8ae3358aeed1b16e2041efe138a53dbed9d43a409421efe5164c272b",
+      "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_STARTUP_DIAGNOSTICS_NETWORK_HOLD_20261117.json",
+      "rawDiagnosticPath": "artifacts/orbit360-recovery/release-control/I6_6_STARTUP_DIAGNOSTICS_FAILED_PREVIEW_DIAGNOSTIC_20261117.json",
+      "rawDiagnosticSha256": "2bf370a227d7e7c1bbbe02bfd0aa3d3fd71da65a3ab7c88d8ea034a1fe96bfcd",
+      "failureStage": "ASSIGNMENT_DOCUMENTARY_UI",
+      "failureClass": "ASSERTION_OR_RUNTIME_FAILURE",
+      "failureCheck": "ADVISOR_UAT_BROWSER_OBSERVABILITY_HOLD",
+      "failureLocation": {
+        "file": "gravicentra-i6-6-advisor-payables-signed-uat.cjs",
+        "line": 1156,
+        "column": 90
+      },
+      "advisorChecks": 15,
+      "advisorDriverStatus": "HOLD",
+      "proposalDriverStatus": "NOT_EXECUTED",
+      "syntheticCleanupStatus": "PASS",
+      "syntheticRemaining": 0,
+      "cleanupFailureClasses": [],
+      "cleanupAccepted": true,
+      "browserObservability": {
+        "status": "HOLD",
+        "totals": {
+          "expectedDenials": 8,
+          "verifiedExpectedDenials": 8,
+          "observedConsoleErrors": 10,
+          "capturedConsoleErrors": 10,
+          "expectedNetworkConsoleErrors": 8,
+          "unexpectedConsoleErrors": 2,
+          "pageErrorCount": 0,
+          "unexpectedHttpErrors": 1,
+          "telemetryFailures": 0
+        },
+        "unexpectedEvents": [
+          {
+            "eventType": "NATIVE_CONSOLE_ERROR",
+            "actorRole": "direccion",
+            "stage": "ASSIGNMENT_DOCUMENTARY_UI",
+            "endpointClass": "FIRST_PARTY",
+            "pathSha256": "9876b32868731cd300c3b8c0df60b8691219ecc36c0a29bbed206c1311fcca5c",
+            "classification": "UNEXPECTED",
+            "source": "javascript",
+            "line": null
+          },
+          {
+            "eventType": "NETWORK_FAILURE",
+            "actorRole": "direccion",
+            "stage": "FINANCE_UI_HYDRATION",
+            "requestKey": "8204fe65eab21ae198ba0bb06a40f0ab349b303b7cc9ce882980c67fc441f4a6",
+            "resourceType": "Fetch",
+            "endpointClass": "FUNCTIONS",
+            "classification": "UNEXPECTED"
+          },
+          {
+            "eventType": "NATIVE_CONSOLE_ERROR",
+            "actorRole": "direccion",
+            "stage": "ASSIGNMENT_DOCUMENTARY_UI",
+            "requestKey": "8204fe65eab21ae198ba0bb06a40f0ab349b303b7cc9ce882980c67fc441f4a6",
+            "endpointClass": "FUNCTIONS",
+            "pathSha256": "691c5270e9684a2ec10413dd7c1262f7e96476f2a83b9514fa5177e9033b5eb7",
+            "classification": "UNEXPECTED",
+            "source": "network",
+            "line": null
+          }
+        ]
+      },
+      "startupDiagnostics": {
+        "diagnosticOnly": true,
+        "observedCount": 5,
+        "expectedCount": 5,
+        "waitOutcomes": {
+          "completed": 5,
+          "failed": 0,
+          "unknown": 0
+        },
+        "snapshots": [
+          {
+            "actorRole": "direccion",
+            "stage": "SIGNED_SESSION",
+            "waitOutcome": "ORIGINAL_WAIT_COMPLETED",
+            "status": "CAPTURED",
+            "elapsedMs": 484,
+            "providerPresent": true,
+            "appPresent": true,
+            "readyState": "interactive",
+            "serviceWorker": {
+              "supported": true,
+              "controllerPresent": false,
+              "controllerState": "ABSENT",
+              "controllerPathSha256": null,
+              "controllerBuildMatches": null
+            }
+          },
+          {
+            "actorRole": "operativo",
+            "stage": "SIGNED_SESSION",
+            "waitOutcome": "ORIGINAL_WAIT_COMPLETED",
+            "status": "CAPTURED",
+            "elapsedMs": 590,
+            "providerPresent": true,
+            "appPresent": true,
+            "readyState": "interactive",
+            "serviceWorker": {
+              "supported": true,
+              "controllerPresent": false,
+              "controllerState": "ABSENT",
+              "controllerPathSha256": null,
+              "controllerBuildMatches": null
+            }
+          },
+          {
+            "actorRole": "direccion",
+            "stage": "ASSIGNMENT_RELOAD",
+            "waitOutcome": "ORIGINAL_WAIT_COMPLETED",
+            "status": "CAPTURED",
+            "elapsedMs": 568,
+            "providerPresent": true,
+            "appPresent": true,
+            "readyState": "interactive",
+            "serviceWorker": {
+              "supported": true,
+              "controllerPresent": true,
+              "controllerState": "activated",
+              "controllerPathSha256": "edae1aad03e427838f4b3ce8b9cff24fb9a676def8297715b906aa14599e18c3",
+              "controllerBuildMatches": true
+            }
+          },
+          {
+            "actorRole": "direccion",
+            "stage": "ASSIGNMENT_RELOAD",
+            "waitOutcome": "ORIGINAL_WAIT_COMPLETED",
+            "status": "CAPTURED",
+            "elapsedMs": 495,
+            "providerPresent": true,
+            "appPresent": true,
+            "readyState": "interactive",
+            "serviceWorker": {
+              "supported": true,
+              "controllerPresent": true,
+              "controllerState": "activated",
+              "controllerPathSha256": "edae1aad03e427838f4b3ce8b9cff24fb9a676def8297715b906aa14599e18c3",
+              "controllerBuildMatches": true
+            }
+          },
+          {
+            "actorRole": "direccion",
+            "stage": "PENDING_CXP_RELOAD",
+            "waitOutcome": "ORIGINAL_WAIT_COMPLETED",
+            "status": "CAPTURED",
+            "elapsedMs": 558,
+            "providerPresent": true,
+            "appPresent": true,
+            "readyState": "interactive",
+            "serviceWorker": {
+              "supported": true,
+              "controllerPresent": true,
+              "controllerState": "activated",
+              "controllerPathSha256": "edae1aad03e427838f4b3ce8b9cff24fb9a676def8297715b906aa14599e18c3",
+              "controllerBuildMatches": true
+            }
+          }
+        ],
+        "historicalFailureCause": "NOT_DEDUCIBLE_FROM_THIS_RUN"
+      },
+      "documentedTermsHelperStatus": "PASS",
+      "documentedTermsHelperReloadPerformed": false,
+      "sourceIntakeNewProofAvailable": false,
       "rootCauseProven": false,
-      "historicalObservabilityHoldPreserved": {
-        "status": "HISTORICAL_42A676_HOLD_PRESERVED_SUPERSEDED_AS_CURRENT_EXECUTION",
-        "latestSignedAttempt": 44048179414,
-        "latestCandidateSource": "6b6e8bbba3371b32a1bfb80b903c40377e11d727",
-        "currentSignedQa": "NOT_EXECUTED_NOT_ACCEPTED"
-      }
+      "previousTimeoutRootCauseProven": false,
+      "newPreviewAcceptance": false,
+      "newLiveAcceptance": false,
+      "realFinancialWritesApplied": 0
     },
     "updatedInsurerStatements20261117": {
       "evidence": "artifacts/orbit360-recovery/release-control/I6_6_SIGNED_PREVIEW_42A676_HOLD_AND_STATEMENT_INTAKE_20261117.json",
@@ -388,33 +571,183 @@
     },
     "latestSignedQaOutcome": {
       "status": "FAILED_NOT_ACCEPTED",
-      "runId": 44149681372,
-      "jobId": 134274317530,
-      "sourceSha": "6b6e8bbba3371b32a1bfb80b903c40377e11d727",
-      "workflowHeadSha": "f1df4e7f2d5652dc8d57ea7408266296d8c217fd",
-      "diagnosticArtifactId": 14359840043,
-      "diagnosticArtifactDigest": "sha256:19fb4390b1b15274372eb974ab28bb0839e99a750f20ea0618385708ef50a657",
-      "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_SOURCE_INTAKE_PRECISION_SIGNED_PREVIEW_OUTCOME_20261117.json",
-      "failureStage": "SOURCE_INTAKE_RELOAD_READBACK",
+      "runId": 44175297317,
+      "jobId": 134365013822,
+      "conclusion": "failure",
+      "sourceSha": "62d50052a9b9196ebce8c4acd1bc66778ae89c06",
+      "buildId": "gi-i66-62d50052a9b9-57f234755dc1",
+      "buildRunId": 44173813709,
+      "workflowHeadSha": "7b33a51230e7ae17ffa2406b042191db775dcb1e",
+      "diagnosticArtifactId": 14369897476,
+      "diagnosticArtifactDigest": "sha256:7533108c8ae3358aeed1b16e2041efe138a53dbed9d43a409421efe5164c272b",
+      "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_STARTUP_DIAGNOSTICS_NETWORK_HOLD_20261117.json",
+      "rawDiagnosticPath": "artifacts/orbit360-recovery/release-control/I6_6_STARTUP_DIAGNOSTICS_FAILED_PREVIEW_DIAGNOSTIC_20261117.json",
+      "rawDiagnosticSha256": "2bf370a227d7e7c1bbbe02bfd0aa3d3fd71da65a3ab7c88d8ea034a1fe96bfcd",
+      "failureStage": "ASSIGNMENT_DOCUMENTARY_UI",
+      "failureClass": "ASSERTION_OR_RUNTIME_FAILURE",
+      "failureCheck": "ADVISOR_UAT_BROWSER_OBSERVABILITY_HOLD",
       "failureLocation": {
-        "file": "gravicentra-i6-6-proposal-application-signed-uat.cjs",
-        "line": 350,
-        "column": 19
+        "file": "gravicentra-i6-6-advisor-payables-signed-uat.cjs",
+        "line": 1156,
+        "column": 90
       },
-      "failureClass": "ERROR",
-      "failureCode": "NO_CODE",
-      "failureCheck": "UNNAMED_FAILURE",
-      "rootCauseProven": false,
-      "sourceIntakePageErrors": 1,
-      "advisorDriverStatus": "PASS",
-      "advisorChecks": 16,
-      "documentedTermsHelperStatus": "PASS",
-      "proposalDriverStatus": "HOLD",
-      "proposalChecksBeforeHold": 16,
+      "advisorChecks": 15,
+      "advisorDriverStatus": "HOLD",
+      "proposalDriverStatus": "NOT_EXECUTED",
       "syntheticCleanupStatus": "PASS",
       "syntheticRemaining": 0,
-      "proposalRemovedOwnedTargets": 26,
-      "realControlUnchanged": true,
+      "cleanupFailureClasses": [],
+      "cleanupAccepted": true,
+      "browserObservability": {
+        "status": "HOLD",
+        "totals": {
+          "expectedDenials": 8,
+          "verifiedExpectedDenials": 8,
+          "observedConsoleErrors": 10,
+          "capturedConsoleErrors": 10,
+          "expectedNetworkConsoleErrors": 8,
+          "unexpectedConsoleErrors": 2,
+          "pageErrorCount": 0,
+          "unexpectedHttpErrors": 1,
+          "telemetryFailures": 0
+        },
+        "unexpectedEvents": [
+          {
+            "eventType": "NATIVE_CONSOLE_ERROR",
+            "actorRole": "direccion",
+            "stage": "ASSIGNMENT_DOCUMENTARY_UI",
+            "endpointClass": "FIRST_PARTY",
+            "pathSha256": "9876b32868731cd300c3b8c0df60b8691219ecc36c0a29bbed206c1311fcca5c",
+            "classification": "UNEXPECTED",
+            "source": "javascript",
+            "line": null
+          },
+          {
+            "eventType": "NETWORK_FAILURE",
+            "actorRole": "direccion",
+            "stage": "FINANCE_UI_HYDRATION",
+            "requestKey": "8204fe65eab21ae198ba0bb06a40f0ab349b303b7cc9ce882980c67fc441f4a6",
+            "resourceType": "Fetch",
+            "endpointClass": "FUNCTIONS",
+            "classification": "UNEXPECTED"
+          },
+          {
+            "eventType": "NATIVE_CONSOLE_ERROR",
+            "actorRole": "direccion",
+            "stage": "ASSIGNMENT_DOCUMENTARY_UI",
+            "requestKey": "8204fe65eab21ae198ba0bb06a40f0ab349b303b7cc9ce882980c67fc441f4a6",
+            "endpointClass": "FUNCTIONS",
+            "pathSha256": "691c5270e9684a2ec10413dd7c1262f7e96476f2a83b9514fa5177e9033b5eb7",
+            "classification": "UNEXPECTED",
+            "source": "network",
+            "line": null
+          }
+        ]
+      },
+      "startupDiagnostics": {
+        "diagnosticOnly": true,
+        "observedCount": 5,
+        "expectedCount": 5,
+        "waitOutcomes": {
+          "completed": 5,
+          "failed": 0,
+          "unknown": 0
+        },
+        "snapshots": [
+          {
+            "actorRole": "direccion",
+            "stage": "SIGNED_SESSION",
+            "waitOutcome": "ORIGINAL_WAIT_COMPLETED",
+            "status": "CAPTURED",
+            "elapsedMs": 484,
+            "providerPresent": true,
+            "appPresent": true,
+            "readyState": "interactive",
+            "serviceWorker": {
+              "supported": true,
+              "controllerPresent": false,
+              "controllerState": "ABSENT",
+              "controllerPathSha256": null,
+              "controllerBuildMatches": null
+            }
+          },
+          {
+            "actorRole": "operativo",
+            "stage": "SIGNED_SESSION",
+            "waitOutcome": "ORIGINAL_WAIT_COMPLETED",
+            "status": "CAPTURED",
+            "elapsedMs": 590,
+            "providerPresent": true,
+            "appPresent": true,
+            "readyState": "interactive",
+            "serviceWorker": {
+              "supported": true,
+              "controllerPresent": false,
+              "controllerState": "ABSENT",
+              "controllerPathSha256": null,
+              "controllerBuildMatches": null
+            }
+          },
+          {
+            "actorRole": "direccion",
+            "stage": "ASSIGNMENT_RELOAD",
+            "waitOutcome": "ORIGINAL_WAIT_COMPLETED",
+            "status": "CAPTURED",
+            "elapsedMs": 568,
+            "providerPresent": true,
+            "appPresent": true,
+            "readyState": "interactive",
+            "serviceWorker": {
+              "supported": true,
+              "controllerPresent": true,
+              "controllerState": "activated",
+              "controllerPathSha256": "edae1aad03e427838f4b3ce8b9cff24fb9a676def8297715b906aa14599e18c3",
+              "controllerBuildMatches": true
+            }
+          },
+          {
+            "actorRole": "direccion",
+            "stage": "ASSIGNMENT_RELOAD",
+            "waitOutcome": "ORIGINAL_WAIT_COMPLETED",
+            "status": "CAPTURED",
+            "elapsedMs": 495,
+            "providerPresent": true,
+            "appPresent": true,
+            "readyState": "interactive",
+            "serviceWorker": {
+              "supported": true,
+              "controllerPresent": true,
+              "controllerState": "activated",
+              "controllerPathSha256": "edae1aad03e427838f4b3ce8b9cff24fb9a676def8297715b906aa14599e18c3",
+              "controllerBuildMatches": true
+            }
+          },
+          {
+            "actorRole": "direccion",
+            "stage": "PENDING_CXP_RELOAD",
+            "waitOutcome": "ORIGINAL_WAIT_COMPLETED",
+            "status": "CAPTURED",
+            "elapsedMs": 558,
+            "providerPresent": true,
+            "appPresent": true,
+            "readyState": "interactive",
+            "serviceWorker": {
+              "supported": true,
+              "controllerPresent": true,
+              "controllerState": "activated",
+              "controllerPathSha256": "edae1aad03e427838f4b3ce8b9cff24fb9a676def8297715b906aa14599e18c3",
+              "controllerBuildMatches": true
+            }
+          }
+        ],
+        "historicalFailureCause": "NOT_DEDUCIBLE_FROM_THIS_RUN"
+      },
+      "documentedTermsHelperStatus": "PASS",
+      "documentedTermsHelperReloadPerformed": false,
+      "sourceIntakeNewProofAvailable": false,
+      "rootCauseProven": false,
+      "previousTimeoutRootCauseProven": false,
+      "newPreviewAcceptance": false,
       "newLiveAcceptance": false,
       "realFinancialWritesApplied": 0
     },
@@ -512,8 +845,12 @@
       "conditionBasis": "SOURCE_PATH_PROVEN_NOT_AN_OBSERVED_LIVE_RUNTIME_FAILURE",
       "actualLiveFailure44161850833RemainsAuthorizationPhaseMismatch": true,
       "existingPreviewAuthorizationUnchanged": true,
-      "technicalState": "PASSIVE_STARTUP_DIAGNOSTIC_SOURCE_BUILT_EXACT_SIGNED_PREVIEW_PENDING_NO_LIVE_GRANT",
-      "reviewContextGenerated": false
+      "technicalState": "CURRENT_EXACT_SIGNED_PREVIEW_NETWORK_HOLD_READONLY_DIAGNOSIS_PENDING_NO_LIVE_GRANT",
+      "reviewContextGenerated": false,
+      "currentExactPreviewSourceSha": "62d50052a9b9196ebce8c4acd1bc66778ae89c06",
+      "currentExactPreviewBuildId": "gi-i66-62d50052a9b9-57f234755dc1",
+      "currentExactPreviewRunId": 44175297317,
+      "currentExactPreviewOutcomeReceipt": "artifacts/orbit360-recovery/release-control/I6_6_STARTUP_DIAGNOSTICS_NETWORK_HOLD_20261117.json"
     },
     "privateFinancialFocalPreparation20261117": {
       "status": "PRIVATE_FOCAL_INPUTS_PRESERVED_NOT_APPLIED",
@@ -564,32 +901,183 @@
     },
     "lastSignedPreviewOutcome": {
       "status": "FAILED_NOT_ACCEPTED",
-      "runId": 44169173376,
-      "jobId": 134343459567,
-      "sourceSha": "fdbc65a59114d2858ce6884374eaf6c44d8ae9a9",
-      "workflowHeadSha": "69b677906dcaaa50860535ff653fee3254fc8665",
-      "diagnosticArtifactId": 14366593195,
-      "diagnosticArtifactDigest": "sha256:d6f0a0fe81b70bde770eecdd1ac456f9bd0abe71c6b0d0b8de4372b0ac38defd",
-      "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_ADVISOR_RELOAD_READINESS_HOLD_AND_DIAGNOSTIC_SOURCE_20261117.json",
-      "rawDiagnosticPath": "artifacts/orbit360-recovery/release-control/I6_6_ADVISOR_RELOAD_FAILED_PREVIEW_DIAGNOSTIC_20261117.json",
-      "rawDiagnosticSha256": "dd36fb1d6670a0504cf5dd86c086064bba4cbe054751f0d5c9f9a4d192035590",
-      "failureStage": "PENDING_CXP_RELOAD",
-      "failureClass": "TIMEOUT_ERROR",
+      "runId": 44175297317,
+      "jobId": 134365013822,
+      "conclusion": "failure",
+      "sourceSha": "62d50052a9b9196ebce8c4acd1bc66778ae89c06",
+      "buildId": "gi-i66-62d50052a9b9-57f234755dc1",
+      "buildRunId": 44173813709,
+      "workflowHeadSha": "7b33a51230e7ae17ffa2406b042191db775dcb1e",
+      "diagnosticArtifactId": 14369897476,
+      "diagnosticArtifactDigest": "sha256:7533108c8ae3358aeed1b16e2041efe138a53dbed9d43a409421efe5164c272b",
+      "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_STARTUP_DIAGNOSTICS_NETWORK_HOLD_20261117.json",
+      "rawDiagnosticPath": "artifacts/orbit360-recovery/release-control/I6_6_STARTUP_DIAGNOSTICS_FAILED_PREVIEW_DIAGNOSTIC_20261117.json",
+      "rawDiagnosticSha256": "2bf370a227d7e7c1bbbe02bfd0aa3d3fd71da65a3ab7c88d8ea034a1fe96bfcd",
+      "failureStage": "ASSIGNMENT_DOCUMENTARY_UI",
+      "failureClass": "ASSERTION_OR_RUNTIME_FAILURE",
+      "failureCheck": "ADVISOR_UAT_BROWSER_OBSERVABILITY_HOLD",
       "failureLocation": {
         "file": "gravicentra-i6-6-advisor-payables-signed-uat.cjs",
-        "line": 999,
-        "column": 26
+        "line": 1156,
+        "column": 90
       },
-      "rootCauseProven": false,
-      "advisorChecks": 13,
+      "advisorChecks": 15,
       "advisorDriverStatus": "HOLD",
-      "syntheticCleanupStatus": "HOLD",
-      "syntheticRemaining": 0,
-      "cleanupAccepted": false,
       "proposalDriverStatus": "NOT_EXECUTED",
-      "sourceIntakeNewProofAvailable": false,
+      "syntheticCleanupStatus": "PASS",
+      "syntheticRemaining": 0,
+      "cleanupFailureClasses": [],
+      "cleanupAccepted": true,
+      "browserObservability": {
+        "status": "HOLD",
+        "totals": {
+          "expectedDenials": 8,
+          "verifiedExpectedDenials": 8,
+          "observedConsoleErrors": 10,
+          "capturedConsoleErrors": 10,
+          "expectedNetworkConsoleErrors": 8,
+          "unexpectedConsoleErrors": 2,
+          "pageErrorCount": 0,
+          "unexpectedHttpErrors": 1,
+          "telemetryFailures": 0
+        },
+        "unexpectedEvents": [
+          {
+            "eventType": "NATIVE_CONSOLE_ERROR",
+            "actorRole": "direccion",
+            "stage": "ASSIGNMENT_DOCUMENTARY_UI",
+            "endpointClass": "FIRST_PARTY",
+            "pathSha256": "9876b32868731cd300c3b8c0df60b8691219ecc36c0a29bbed206c1311fcca5c",
+            "classification": "UNEXPECTED",
+            "source": "javascript",
+            "line": null
+          },
+          {
+            "eventType": "NETWORK_FAILURE",
+            "actorRole": "direccion",
+            "stage": "FINANCE_UI_HYDRATION",
+            "requestKey": "8204fe65eab21ae198ba0bb06a40f0ab349b303b7cc9ce882980c67fc441f4a6",
+            "resourceType": "Fetch",
+            "endpointClass": "FUNCTIONS",
+            "classification": "UNEXPECTED"
+          },
+          {
+            "eventType": "NATIVE_CONSOLE_ERROR",
+            "actorRole": "direccion",
+            "stage": "ASSIGNMENT_DOCUMENTARY_UI",
+            "requestKey": "8204fe65eab21ae198ba0bb06a40f0ab349b303b7cc9ce882980c67fc441f4a6",
+            "endpointClass": "FUNCTIONS",
+            "pathSha256": "691c5270e9684a2ec10413dd7c1262f7e96476f2a83b9514fa5177e9033b5eb7",
+            "classification": "UNEXPECTED",
+            "source": "network",
+            "line": null
+          }
+        ]
+      },
+      "startupDiagnostics": {
+        "diagnosticOnly": true,
+        "observedCount": 5,
+        "expectedCount": 5,
+        "waitOutcomes": {
+          "completed": 5,
+          "failed": 0,
+          "unknown": 0
+        },
+        "snapshots": [
+          {
+            "actorRole": "direccion",
+            "stage": "SIGNED_SESSION",
+            "waitOutcome": "ORIGINAL_WAIT_COMPLETED",
+            "status": "CAPTURED",
+            "elapsedMs": 484,
+            "providerPresent": true,
+            "appPresent": true,
+            "readyState": "interactive",
+            "serviceWorker": {
+              "supported": true,
+              "controllerPresent": false,
+              "controllerState": "ABSENT",
+              "controllerPathSha256": null,
+              "controllerBuildMatches": null
+            }
+          },
+          {
+            "actorRole": "operativo",
+            "stage": "SIGNED_SESSION",
+            "waitOutcome": "ORIGINAL_WAIT_COMPLETED",
+            "status": "CAPTURED",
+            "elapsedMs": 590,
+            "providerPresent": true,
+            "appPresent": true,
+            "readyState": "interactive",
+            "serviceWorker": {
+              "supported": true,
+              "controllerPresent": false,
+              "controllerState": "ABSENT",
+              "controllerPathSha256": null,
+              "controllerBuildMatches": null
+            }
+          },
+          {
+            "actorRole": "direccion",
+            "stage": "ASSIGNMENT_RELOAD",
+            "waitOutcome": "ORIGINAL_WAIT_COMPLETED",
+            "status": "CAPTURED",
+            "elapsedMs": 568,
+            "providerPresent": true,
+            "appPresent": true,
+            "readyState": "interactive",
+            "serviceWorker": {
+              "supported": true,
+              "controllerPresent": true,
+              "controllerState": "activated",
+              "controllerPathSha256": "edae1aad03e427838f4b3ce8b9cff24fb9a676def8297715b906aa14599e18c3",
+              "controllerBuildMatches": true
+            }
+          },
+          {
+            "actorRole": "direccion",
+            "stage": "ASSIGNMENT_RELOAD",
+            "waitOutcome": "ORIGINAL_WAIT_COMPLETED",
+            "status": "CAPTURED",
+            "elapsedMs": 495,
+            "providerPresent": true,
+            "appPresent": true,
+            "readyState": "interactive",
+            "serviceWorker": {
+              "supported": true,
+              "controllerPresent": true,
+              "controllerState": "activated",
+              "controllerPathSha256": "edae1aad03e427838f4b3ce8b9cff24fb9a676def8297715b906aa14599e18c3",
+              "controllerBuildMatches": true
+            }
+          },
+          {
+            "actorRole": "direccion",
+            "stage": "PENDING_CXP_RELOAD",
+            "waitOutcome": "ORIGINAL_WAIT_COMPLETED",
+            "status": "CAPTURED",
+            "elapsedMs": 558,
+            "providerPresent": true,
+            "appPresent": true,
+            "readyState": "interactive",
+            "serviceWorker": {
+              "supported": true,
+              "controllerPresent": true,
+              "controllerState": "activated",
+              "controllerPathSha256": "edae1aad03e427838f4b3ce8b9cff24fb9a676def8297715b906aa14599e18c3",
+              "controllerBuildMatches": true
+            }
+          }
+        ],
+        "historicalFailureCause": "NOT_DEDUCIBLE_FROM_THIS_RUN"
+      },
       "documentedTermsHelperStatus": "PASS",
       "documentedTermsHelperReloadPerformed": false,
+      "sourceIntakeNewProofAvailable": false,
+      "rootCauseProven": false,
+      "previousTimeoutRootCauseProven": false,
+      "newPreviewAcceptance": false,
       "newLiveAcceptance": false,
       "realFinancialWritesApplied": 0
     },
@@ -611,6 +1099,100 @@
       "signedOutcomeReceipt": "artifacts/orbit360-recovery/release-control/I6_6_ADVISOR_RELOAD_READINESS_HOLD_AND_DIAGNOSTIC_SOURCE_20261117.json",
       "newPreviewAcceptance": false,
       "underlyingStartupCauseProven": false
+    },
+    "priorCurrentEvidenceBeforeStartupDiagnosticNetworkHold20261117": {
+      "latestPreviewEvidence": {
+        "sourceSha": "62d50052a9b9196ebce8c4acd1bc66778ae89c06",
+        "buildRunId": 44173813709,
+        "artifactId": 14369500963,
+        "artifactDigest": "sha256:e31583c35aa76e2fcd904ffd1caa61bf589c9ada9acc4dd307a30e731e814c81",
+        "buildId": "gi-i66-62d50052a9b9-57f234755dc1",
+        "previewUrl": "https://ays-orbit-360-lab--gi-i66-rc-44009981499-d08psr2y.web.app",
+        "previewChannelId": "gi-i66-rc-44009981499",
+        "status": "EXACT_IMMUTABLE_PREVIEW_BUILT_FOUR_SIGNED_DRIVERS_AUTHORIZED",
+        "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_STARTUP_DIAGNOSTICS_PREVIEW_BUILD_20261117.json",
+        "signedPreviewAccepted": false,
+        "liveAccepted": false,
+        "realFinancialWrites": 0,
+        "signedObservabilityProfile": "I66_SIGNED_BROWSER_OBSERVABILITY_V1",
+        "liveLegalConsentGranted": false
+      },
+      "latestSignedQaOutcome": {
+        "status": "FAILED_NOT_ACCEPTED",
+        "runId": 44149681372,
+        "jobId": 134274317530,
+        "sourceSha": "6b6e8bbba3371b32a1bfb80b903c40377e11d727",
+        "workflowHeadSha": "f1df4e7f2d5652dc8d57ea7408266296d8c217fd",
+        "diagnosticArtifactId": 14359840043,
+        "diagnosticArtifactDigest": "sha256:19fb4390b1b15274372eb974ab28bb0839e99a750f20ea0618385708ef50a657",
+        "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_SOURCE_INTAKE_PRECISION_SIGNED_PREVIEW_OUTCOME_20261117.json",
+        "failureStage": "SOURCE_INTAKE_RELOAD_READBACK",
+        "failureLocation": {
+          "file": "gravicentra-i6-6-proposal-application-signed-uat.cjs",
+          "line": 350,
+          "column": 19
+        },
+        "failureClass": "ERROR",
+        "failureCode": "NO_CODE",
+        "failureCheck": "UNNAMED_FAILURE",
+        "rootCauseProven": false,
+        "sourceIntakePageErrors": 1,
+        "advisorDriverStatus": "PASS",
+        "advisorChecks": 16,
+        "documentedTermsHelperStatus": "PASS",
+        "proposalDriverStatus": "HOLD",
+        "proposalChecksBeforeHold": 16,
+        "syntheticCleanupStatus": "PASS",
+        "syntheticRemaining": 0,
+        "proposalRemovedOwnedTargets": 26,
+        "realControlUnchanged": true,
+        "newLiveAcceptance": false,
+        "realFinancialWritesApplied": 0
+      },
+      "lastSignedPreviewOutcome": {
+        "status": "FAILED_NOT_ACCEPTED",
+        "runId": 44169173376,
+        "jobId": 134343459567,
+        "sourceSha": "fdbc65a59114d2858ce6884374eaf6c44d8ae9a9",
+        "workflowHeadSha": "69b677906dcaaa50860535ff653fee3254fc8665",
+        "diagnosticArtifactId": 14366593195,
+        "diagnosticArtifactDigest": "sha256:d6f0a0fe81b70bde770eecdd1ac456f9bd0abe71c6b0d0b8de4372b0ac38defd",
+        "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_ADVISOR_RELOAD_READINESS_HOLD_AND_DIAGNOSTIC_SOURCE_20261117.json",
+        "rawDiagnosticPath": "artifacts/orbit360-recovery/release-control/I6_6_ADVISOR_RELOAD_FAILED_PREVIEW_DIAGNOSTIC_20261117.json",
+        "rawDiagnosticSha256": "dd36fb1d6670a0504cf5dd86c086064bba4cbe054751f0d5c9f9a4d192035590",
+        "failureStage": "PENDING_CXP_RELOAD",
+        "failureClass": "TIMEOUT_ERROR",
+        "failureLocation": {
+          "file": "gravicentra-i6-6-advisor-payables-signed-uat.cjs",
+          "line": 999,
+          "column": 26
+        },
+        "rootCauseProven": false,
+        "advisorChecks": 13,
+        "advisorDriverStatus": "HOLD",
+        "syntheticCleanupStatus": "HOLD",
+        "syntheticRemaining": 0,
+        "cleanupAccepted": false,
+        "proposalDriverStatus": "NOT_EXECUTED",
+        "sourceIntakeNewProofAvailable": false,
+        "documentedTermsHelperStatus": "PASS",
+        "documentedTermsHelperReloadPerformed": false,
+        "newLiveAcceptance": false,
+        "realFinancialWritesApplied": 0
+      },
+      "currentSignedObservabilityHold": {
+        "status": "CURRENT_SOURCE_INTAKE_RELOAD_HOLD_NOT_ACCEPTED",
+        "runId": 44149681372,
+        "sourceSha": "6b6e8bbba3371b32a1bfb80b903c40377e11d727",
+        "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_SOURCE_INTAKE_PRECISION_SIGNED_PREVIEW_OUTCOME_20261117.json",
+        "rootCauseProven": false,
+        "historicalObservabilityHoldPreserved": {
+          "status": "HISTORICAL_42A676_HOLD_PRESERVED_SUPERSEDED_AS_CURRENT_EXECUTION",
+          "latestSignedAttempt": 44048179414,
+          "latestCandidateSource": "6b6e8bbba3371b32a1bfb80b903c40377e11d727",
+          "currentSignedQa": "NOT_EXECUTED_NOT_ACCEPTED"
+        }
+      }
     }
   },
   "orderedWork": [
@@ -628,9 +1210,10 @@
     },
     {
       "id": "P0-PUBLISH-CURRENT-DELTA",
-      "state": "EXACT_PASSIVE_DIAGNOSTIC_BUILD_BOUND_SIGNED_PREVIEW_PENDING_LIVE_LEGAL_SCOPE_REQUIRED",
-      "scope": "Preserve accumulated approved product changes, the prior59c37 PASS and the failedfdbc Preview evidence. Execute the same four authenticated Preview drivers with passive startup diagnostics and unchanged original waits/fixtures. A new PASS requires the actual full proof and signed restore; diagnostic capture alone grants none. After an actual new exact PASS, request only the missing bounded LIVE legal scope and promote the same accepted artifact under existing release authorization with signed LIVE readback and rollback. No financial application inferred from synthetic QA.",
-      "doneWhen": "Real workflow receipts, exact digests and post-deploy business-function verification. Successful build alone is not acceptance."
+      "state": "LIVE_NOCHANGE_SIGNED_PREVIEW_NETWORK_HOLD_DIAGNOSTIC_READ_PENDING",
+      "scope": "Current exact signed Preview is HOLD on unexplained scoped-reader transport failure; preserve its build and executed rollover. Read existing Cloud Run logs only, then return to this same gate. R11 remains LIVE. Exact Preview acceptance, bounded LIVE legal scope, genuine Ops, insurer and Drive workflows remain pending; no new block or metric credit.",
+      "doneWhen": "Real workflow receipts, exact digests and post-deploy business-function verification. Successful build alone is not acceptance.",
+      "currentSignedPreviewOutcomeReceipt": "artifacts/orbit360-recovery/release-control/I6_6_STARTUP_DIAGNOSTICS_NETWORK_HOLD_20261117.json"
     },
     {
       "id": "P0-CARLOS-TRANSVERSAL",
@@ -846,7 +1429,14 @@
         "functionalAcceptanceNotClaimed": true,
         "currentExactBuildSource": "62d50052a9b9196ebce8c4acd1bc66778ae89c06",
         "currentBuildReceipt": "artifacts/orbit360-recovery/release-control/I6_6_STARTUP_DIAGNOSTICS_PREVIEW_BUILD_20261117.json",
-        "currentSignedOutcome": "artifacts/orbit360-recovery/release-control/I6_6_ADVISOR_RELOAD_READINESS_HOLD_AND_DIAGNOSTIC_SOURCE_20261117.json"
+        "currentSignedOutcome": "artifacts/orbit360-recovery/release-control/I6_6_ADVISOR_RELOAD_READINESS_HOLD_AND_DIAGNOSTIC_SOURCE_20261117.json",
+        "currentEvidenceCommit": "7b33a51230e7ae17ffa2406b042191db775dcb1e",
+        "currentGuardRunId": 44175298256,
+        "currentFailedSignedRunId": 44175297317,
+        "currentOutcomeReceipt": "artifacts/orbit360-recovery/release-control/I6_6_STARTUP_DIAGNOSTICS_NETWORK_HOLD_20261117.json",
+        "technicalPreviewCausalRetryAliasesAligned": true,
+        "aliasAlignmentIsFailureCause": false,
+        "currentPreviewAccepted": false
       },
       {
         "id": "QA-NOOP-20261117",
@@ -977,7 +1567,7 @@
       {
         "id": "QA-ADVISOR-RELOAD-READINESS-20261117",
         "kind": "STARTUP/QA_DIAGNOSTICS",
-        "state": "PASSIVE_DIAGNOSTICS_BUILT_NEW_EXACT_SIGNED_READINESS_AND_RESTORE_PROOF_PENDING",
+        "state": "CURRENT_FIVE_WAITS_COMPLETED_PRIOR_TIMEOUT_CAUSE_UNPROVEN_PREVIEW_NETWORK_HOLD",
         "evidenceRun": 44169173376,
         "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_ADVISOR_RELOAD_READINESS_HOLD_AND_DIAGNOSTIC_SOURCE_20261117.json",
         "observed": "At least one of provider/app globals unavailable after final CxP reload; which one, pending resources and SW state were not retained.",
@@ -985,9 +1575,135 @@
         "diagnosticOmissionProven": true,
         "cleanupStatus": "HOLD",
         "remaining": 0,
-        "closure": "Exact source-bound passive readiness/network observations, full existing signed Preview and signed restore PASS, then same-artifact LIVE. Preserve original failed evidence and never equate zero remaining to complete restore.",
+        "closure": "The five existing waits completed in this attempt. Preserve the prior timeout and its HOLD cleanup as historical failures with unproven cause. Current run is not accepted because browser observability failed; no LIVE proof exists.",
         "newBuildReceipt": "artifacts/orbit360-recovery/release-control/I6_6_STARTUP_DIAGNOSTICS_PREVIEW_BUILD_20261117.json",
-        "underlyingStartupCauseProven": false
+        "underlyingStartupCauseProven": false,
+        "currentDiagnosticRunId": 44175297317,
+        "currentDiagnosticReceipt": "artifacts/orbit360-recovery/release-control/I6_6_STARTUP_DIAGNOSTICS_NETWORK_HOLD_20261117.json",
+        "currentStartupObservations": {
+          "diagnosticOnly": true,
+          "observedCount": 5,
+          "expectedCount": 5,
+          "waitOutcomes": {
+            "completed": 5,
+            "failed": 0,
+            "unknown": 0
+          },
+          "snapshots": [
+            {
+              "actorRole": "direccion",
+              "stage": "SIGNED_SESSION",
+              "waitOutcome": "ORIGINAL_WAIT_COMPLETED",
+              "status": "CAPTURED",
+              "elapsedMs": 484,
+              "providerPresent": true,
+              "appPresent": true,
+              "readyState": "interactive",
+              "serviceWorker": {
+                "supported": true,
+                "controllerPresent": false,
+                "controllerState": "ABSENT",
+                "controllerPathSha256": null,
+                "controllerBuildMatches": null
+              }
+            },
+            {
+              "actorRole": "operativo",
+              "stage": "SIGNED_SESSION",
+              "waitOutcome": "ORIGINAL_WAIT_COMPLETED",
+              "status": "CAPTURED",
+              "elapsedMs": 590,
+              "providerPresent": true,
+              "appPresent": true,
+              "readyState": "interactive",
+              "serviceWorker": {
+                "supported": true,
+                "controllerPresent": false,
+                "controllerState": "ABSENT",
+                "controllerPathSha256": null,
+                "controllerBuildMatches": null
+              }
+            },
+            {
+              "actorRole": "direccion",
+              "stage": "ASSIGNMENT_RELOAD",
+              "waitOutcome": "ORIGINAL_WAIT_COMPLETED",
+              "status": "CAPTURED",
+              "elapsedMs": 568,
+              "providerPresent": true,
+              "appPresent": true,
+              "readyState": "interactive",
+              "serviceWorker": {
+                "supported": true,
+                "controllerPresent": true,
+                "controllerState": "activated",
+                "controllerPathSha256": "edae1aad03e427838f4b3ce8b9cff24fb9a676def8297715b906aa14599e18c3",
+                "controllerBuildMatches": true
+              }
+            },
+            {
+              "actorRole": "direccion",
+              "stage": "ASSIGNMENT_RELOAD",
+              "waitOutcome": "ORIGINAL_WAIT_COMPLETED",
+              "status": "CAPTURED",
+              "elapsedMs": 495,
+              "providerPresent": true,
+              "appPresent": true,
+              "readyState": "interactive",
+              "serviceWorker": {
+                "supported": true,
+                "controllerPresent": true,
+                "controllerState": "activated",
+                "controllerPathSha256": "edae1aad03e427838f4b3ce8b9cff24fb9a676def8297715b906aa14599e18c3",
+                "controllerBuildMatches": true
+              }
+            },
+            {
+              "actorRole": "direccion",
+              "stage": "PENDING_CXP_RELOAD",
+              "waitOutcome": "ORIGINAL_WAIT_COMPLETED",
+              "status": "CAPTURED",
+              "elapsedMs": 558,
+              "providerPresent": true,
+              "appPresent": true,
+              "readyState": "interactive",
+              "serviceWorker": {
+                "supported": true,
+                "controllerPresent": true,
+                "controllerState": "activated",
+                "controllerPathSha256": "edae1aad03e427838f4b3ce8b9cff24fb9a676def8297715b906aa14599e18c3",
+                "controllerBuildMatches": true
+              }
+            }
+          ],
+          "historicalFailureCause": "NOT_DEDUCIBLE_FROM_THIS_RUN"
+        },
+        "currentCleanupStatus": "PASS",
+        "currentCleanupRemaining": 0
+      },
+      {
+        "id": "QA-SCOPED-PREVIEW-NETWORK-20261117",
+        "kind": "TRANSPORT/READONLY_DIAGNOSTICS",
+        "gate": "I6.6",
+        "dailyBlock": 2,
+        "state": "CAUSE_UNPROVEN_READONLY_CLOUD_RUN_LOG_DIAGNOSIS_PENDING",
+        "evidenceRun": 44175297317,
+        "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_STARTUP_DIAGNOSTICS_NETWORK_HOLD_20261117.json",
+        "rawDiagnosticPath": "artifacts/orbit360-recovery/release-control/I6_6_STARTUP_DIAGNOSTICS_FAILED_PREVIEW_DIAGNOSTIC_20261117.json",
+        "observed": "One non-cancelled scoped Preview Fetch failed; two unexpected native console errors were retained. No response status, transport reason or causal CORS evidence was retained.",
+        "unexpectedConsoleErrors": 2,
+        "unexpectedNetworkFailures": 1,
+        "unexpectedHttpResponseStatusProven": false,
+        "cleanupStatus": "PASS",
+        "remaining": 0,
+        "rootCauseProven": false,
+        "currentPublicCorsOptions": {
+          "status": 204,
+          "recordedAtUtc": "2026-11-17T21:11:12Z",
+          "diagnosticOnly": true,
+          "historicalFailureCauseProven": false
+        },
+        "next": "Read only existing scoped-reader Cloud Run logs for 2026-11-17T21:03:00Z through 21:07:00Z in the existing diagnostic workflow. No build, rerun, payload or financial mutation."
       }
     ],
     "blocks": [
@@ -1008,8 +1724,10 @@
         "closedAtUtc": "2026-11-17T19:42:52Z",
         "closureReceipt": "artifacts/orbit360-recovery/release-control/I6_6_SOURCE_INTAKE_RELOAD_SIGNED_PREVIEW_PASS_20261117.json",
         "successorRevalidation": {
-          "status": "PENDING_NEW_EXACT_SIGNED_PREVIEW",
-          "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_STARTUP_DIAGNOSTICS_PREVIEW_BUILD_20261117.json"
+          "status": "FAILED_CURRENT_EXACT_SIGNED_PREVIEW_NETWORK_HOLD",
+          "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_STARTUP_DIAGNOSTICS_NETWORK_HOLD_20261117.json",
+          "runId": 44175297317,
+          "historicalBlockClosureUnchanged": true
         }
       },
       {
@@ -1022,17 +1740,23 @@
           "P1-ADJUNTOS-DRIVE"
         ],
         "gate": "I6.6",
-        "state": "EXACT_PASSIVE_DIAGNOSTIC_BUILD_BOUND_SIGNED_PREVIEW_PENDING_LIVE_LEGAL_SCOPE_REQUIRED",
+        "state": "HOLD_PREVIEW_NETWORK_CAUSE_UNPROVEN_READONLY_DIAGNOSIS_PENDING",
         "timeboxReassessmentMinutes": 90,
         "deliverable": "Same accepted artifact LIVE; Carlos and superior-role affected writes, documented renewal, insurer/Drive paths verified.",
         "doneWhen": "Exact frontend/backend binding and authenticated LIVE server commit/readback/reload; bounded genuine-document and denied-scope tests; rollback available.",
         "publicationRule": "Publish each causally complete accepted correction immediately; unrelated findings stay in their existing scope.",
         "previewAcceptanceReceipt": "artifacts/orbit360-recovery/release-control/I6_6_SOURCE_INTAKE_RELOAD_SIGNED_PREVIEW_PASS_20261117.json",
-        "currentBlockerReceipt": "artifacts/orbit360-recovery/release-control/I6_6_ADVISOR_RELOAD_READINESS_HOLD_AND_DIAGNOSTIC_SOURCE_20261117.json",
+        "currentBlockerReceipt": "artifacts/orbit360-recovery/release-control/I6_6_STARTUP_DIAGNOSTICS_NETWORK_HOLD_20261117.json",
         "pendingOwnerDecisionProposal": "artifacts/orbit360-recovery/release-control/I6_6_DIRECTION_LIVE_V2_SCOPE_PROPOSAL_20261117.json",
         "currentBuildReceipt": "artifacts/orbit360-recovery/release-control/I6_6_STARTUP_DIAGNOSTICS_PREVIEW_BUILD_20261117.json",
         "publicationCompleted": false,
-        "fullBlockClosed": false
+        "fullBlockClosed": false,
+        "currentSignedPreviewOutcomeReceipt": "artifacts/orbit360-recovery/release-control/I6_6_STARTUP_DIAGNOSTICS_NETWORK_HOLD_20261117.json",
+        "pendingGenuineWorkflowScope": [
+          "Carlos and superior-role affected Ops writes and documented renewal",
+          "Insurer approved operational paths",
+          "Drive genuine-document paths"
+        ]
       },
       {
         "sequence": 3,
@@ -1110,14 +1834,18 @@
       ]
     },
     "completionOfThisAuditIsNotProductionCompletion": true,
-    "updatedAtUtc": "2026-11-17T21:00:13Z",
+    "updatedAtUtc": "2026-11-17T21:18:02Z",
     "latestExecutedIteration": {
-      "kind": "EXISTING_BLOCK2_PASSIVE_STARTUP_DIAGNOSTIC_IMMUTABLE_BUILD",
-      "status": "BUILD_AND_GUARD_PASS_SIGNED_PREVIEW_PENDING",
-      "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_STARTUP_DIAGNOSTICS_PREVIEW_BUILD_20261117.json",
-      "buildRunId": 44173813709,
-      "guardRunId": 44173813749,
-      "newFormalPercentagePoints": 0
+      "kind": "EXISTING_BLOCK2_SIGNED_PREVIEW_NETWORK_HOLD",
+      "status": "LIVE_NOCHANGE_SIGNED_PREVIEW_NETWORK_HOLD_DIAGNOSTIC_READ_PENDING",
+      "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_STARTUP_DIAGNOSTICS_NETWORK_HOLD_20261117.json",
+      "functionalRunId": 44175297317,
+      "guardRunId": 44175298256,
+      "closedDailyBlocks": 1,
+      "totalDailyBlocks": 6,
+      "newFormalPercentagePoints": 0,
+      "newLiveAcceptance": false,
+      "realFinancialWrites": 0
     },
     "freeze": {
       "status": "FROZEN_APPROVED_BY_DIRECTION",
@@ -1133,7 +1861,7 @@
       "newBankTransferAuthority": false
     }
   },
-  "nextAction": "I6_6_EXISTING_BLOCK2_PASSIVE_STARTUP_DIAGNOSTICS: NEW_IMMUTABLE_BUILD_44173813709_AND_GUARD_44173813749_PASS; EXECUTE_FOUR_EXISTING_SIGNED_DRIVERS_AGAINST_EXACT_62D500_ARTIFACT. CAPTURE_READINESS_FOR_EACH_EXISTING_WAIT_AND_ALLOWLISTED_CLEANUP_FAILURE_CLASSES_WITH_NO_EXTRA_RELOADS_OR_TIMEOUT_CHANGES. PRESERVE_FDBC_FAILED_PREVIEW_44169173376_AND_ITS_UNPROVEN_STARTUP_CAUSE; PRESERVE_PRIOR_59C37_SIGNED_PREVIEW_EVIDENCE_AND_R11_CURRENT_LIVE. SOURCE_AND_QA_BYTES_FROZEN. NO_REAL_FINANCIAL_RETRY; NEW_SYNTHETIC_IDS_AND_ORIGINAL_ABSENCE_GUARDS_ONLY. LIVE_LEGAL_SCOPE_IS_PROPOSED_NOT_AUTHORIZED. ONLY_AFTER_ACTUAL_NEW_SIGNED_PREVIEW_PASS_PRESERVE_EXACT_PENDING_CANDIDATE_AND_REVIEW_CONTEXT_WITH_TRANSPORT_LOCKED; OBTAIN_MISSING_EXPLICIT_DIRECTION_LIVE_SCOPE_BEFORE_DEPLOYMENT. FUTURE_AUTHORITY_IS_METADATA_ONLY_SAME_ARTIFACT_NO_REBUILD. PRIVATE_FINANCIAL_INPUTS_PREPARED; FIVE_AUTHENTICATED_CURRENT_READS_AND_SERVER_PREVIEWS_REQUIRED_BEFORE_APPLY. FROZEN_SIX_BLOCKS_AND_19_OF_31_CRITERIA_UNCHANGED.",
+  "nextAction": "I6_6_EXISTING_BLOCK2_PREVIEW_NETWORK_HOLD: R11_REMAINS_LIVE_AND_TRANSPORT_LOCKED; EXACT_62D500_BUILD_44173813709_RETAINED_WITH_OBSERVED_ROLLOVER. READ_EXISTING_CLOUD_RUN_LOGS_ONLY_FOR_SCOPED_POLICY_PREVIEW_2026_11_17_21_03_TO_21_07_UTC; NO_BUILD_NO_SIGNED_RERUN_NO_BUSINESS_WRITES. NETWORK_CAUSE_UNPROVEN; FIVE_CURRENT_STARTUP_WAITS_COMPLETED_BUT_PRIOR_FDBC_TIMEOUT_CAUSE_UNPROVEN. AFTER_CAUSAL_DIAGNOSIS_RETURN_TO_EXISTING_GATE; LIVE_REQUIRES_EXACT_FOUR_DRIVER_PREVIEW_PASS_AND_MISSING_BOUNDED_LEGAL_SCOPE. GENUINE_OPS_INSURER_DRIVE_WORKFLOWS_AND_PRIVATE_FINANCIAL_CANONICAL_READBACKS_REMAIN_PENDING. ONE_OF_SIX_DAILY_BLOCKS_CLOSED_FROZEN_19_OF_31_UNCHANGED.",
   "sourceIntakePrecisionPreviewBuild20261117": {
     "receipt": "artifacts/orbit360-recovery/release-control/I6_6_SOURCE_INTAKE_PRECISION_PREVIEW_BUILD_20261117.json",
     "status": "IMMUTABLE_PREVIEW_EXACT_READBACK_PASS_SIGNED_FUNCTIONAL_QA_PENDING",
@@ -1333,5 +2061,187 @@
     "realFinancialWrites": 0,
     "signedObservabilityProfile": "I66_SIGNED_BROWSER_OBSERVABILITY_V1",
     "liveLegalConsentGranted": false
+  },
+  "startupDiagnosticsNetworkHold20261117": {
+    "status": "FAILED_NOT_ACCEPTED",
+    "runId": 44175297317,
+    "jobId": 134365013822,
+    "conclusion": "failure",
+    "sourceSha": "62d50052a9b9196ebce8c4acd1bc66778ae89c06",
+    "buildId": "gi-i66-62d50052a9b9-57f234755dc1",
+    "buildRunId": 44173813709,
+    "workflowHeadSha": "7b33a51230e7ae17ffa2406b042191db775dcb1e",
+    "diagnosticArtifactId": 14369897476,
+    "diagnosticArtifactDigest": "sha256:7533108c8ae3358aeed1b16e2041efe138a53dbed9d43a409421efe5164c272b",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_STARTUP_DIAGNOSTICS_NETWORK_HOLD_20261117.json",
+    "rawDiagnosticPath": "artifacts/orbit360-recovery/release-control/I6_6_STARTUP_DIAGNOSTICS_FAILED_PREVIEW_DIAGNOSTIC_20261117.json",
+    "rawDiagnosticSha256": "2bf370a227d7e7c1bbbe02bfd0aa3d3fd71da65a3ab7c88d8ea034a1fe96bfcd",
+    "failureStage": "ASSIGNMENT_DOCUMENTARY_UI",
+    "failureClass": "ASSERTION_OR_RUNTIME_FAILURE",
+    "failureCheck": "ADVISOR_UAT_BROWSER_OBSERVABILITY_HOLD",
+    "failureLocation": {
+      "file": "gravicentra-i6-6-advisor-payables-signed-uat.cjs",
+      "line": 1156,
+      "column": 90
+    },
+    "advisorChecks": 15,
+    "advisorDriverStatus": "HOLD",
+    "proposalDriverStatus": "NOT_EXECUTED",
+    "syntheticCleanupStatus": "PASS",
+    "syntheticRemaining": 0,
+    "cleanupFailureClasses": [],
+    "cleanupAccepted": true,
+    "browserObservability": {
+      "status": "HOLD",
+      "totals": {
+        "expectedDenials": 8,
+        "verifiedExpectedDenials": 8,
+        "observedConsoleErrors": 10,
+        "capturedConsoleErrors": 10,
+        "expectedNetworkConsoleErrors": 8,
+        "unexpectedConsoleErrors": 2,
+        "pageErrorCount": 0,
+        "unexpectedHttpErrors": 1,
+        "telemetryFailures": 0
+      },
+      "unexpectedEvents": [
+        {
+          "eventType": "NATIVE_CONSOLE_ERROR",
+          "actorRole": "direccion",
+          "stage": "ASSIGNMENT_DOCUMENTARY_UI",
+          "endpointClass": "FIRST_PARTY",
+          "pathSha256": "9876b32868731cd300c3b8c0df60b8691219ecc36c0a29bbed206c1311fcca5c",
+          "classification": "UNEXPECTED",
+          "source": "javascript",
+          "line": null
+        },
+        {
+          "eventType": "NETWORK_FAILURE",
+          "actorRole": "direccion",
+          "stage": "FINANCE_UI_HYDRATION",
+          "requestKey": "8204fe65eab21ae198ba0bb06a40f0ab349b303b7cc9ce882980c67fc441f4a6",
+          "resourceType": "Fetch",
+          "endpointClass": "FUNCTIONS",
+          "classification": "UNEXPECTED"
+        },
+        {
+          "eventType": "NATIVE_CONSOLE_ERROR",
+          "actorRole": "direccion",
+          "stage": "ASSIGNMENT_DOCUMENTARY_UI",
+          "requestKey": "8204fe65eab21ae198ba0bb06a40f0ab349b303b7cc9ce882980c67fc441f4a6",
+          "endpointClass": "FUNCTIONS",
+          "pathSha256": "691c5270e9684a2ec10413dd7c1262f7e96476f2a83b9514fa5177e9033b5eb7",
+          "classification": "UNEXPECTED",
+          "source": "network",
+          "line": null
+        }
+      ]
+    },
+    "startupDiagnostics": {
+      "diagnosticOnly": true,
+      "observedCount": 5,
+      "expectedCount": 5,
+      "waitOutcomes": {
+        "completed": 5,
+        "failed": 0,
+        "unknown": 0
+      },
+      "snapshots": [
+        {
+          "actorRole": "direccion",
+          "stage": "SIGNED_SESSION",
+          "waitOutcome": "ORIGINAL_WAIT_COMPLETED",
+          "status": "CAPTURED",
+          "elapsedMs": 484,
+          "providerPresent": true,
+          "appPresent": true,
+          "readyState": "interactive",
+          "serviceWorker": {
+            "supported": true,
+            "controllerPresent": false,
+            "controllerState": "ABSENT",
+            "controllerPathSha256": null,
+            "controllerBuildMatches": null
+          }
+        },
+        {
+          "actorRole": "operativo",
+          "stage": "SIGNED_SESSION",
+          "waitOutcome": "ORIGINAL_WAIT_COMPLETED",
+          "status": "CAPTURED",
+          "elapsedMs": 590,
+          "providerPresent": true,
+          "appPresent": true,
+          "readyState": "interactive",
+          "serviceWorker": {
+            "supported": true,
+            "controllerPresent": false,
+            "controllerState": "ABSENT",
+            "controllerPathSha256": null,
+            "controllerBuildMatches": null
+          }
+        },
+        {
+          "actorRole": "direccion",
+          "stage": "ASSIGNMENT_RELOAD",
+          "waitOutcome": "ORIGINAL_WAIT_COMPLETED",
+          "status": "CAPTURED",
+          "elapsedMs": 568,
+          "providerPresent": true,
+          "appPresent": true,
+          "readyState": "interactive",
+          "serviceWorker": {
+            "supported": true,
+            "controllerPresent": true,
+            "controllerState": "activated",
+            "controllerPathSha256": "edae1aad03e427838f4b3ce8b9cff24fb9a676def8297715b906aa14599e18c3",
+            "controllerBuildMatches": true
+          }
+        },
+        {
+          "actorRole": "direccion",
+          "stage": "ASSIGNMENT_RELOAD",
+          "waitOutcome": "ORIGINAL_WAIT_COMPLETED",
+          "status": "CAPTURED",
+          "elapsedMs": 495,
+          "providerPresent": true,
+          "appPresent": true,
+          "readyState": "interactive",
+          "serviceWorker": {
+            "supported": true,
+            "controllerPresent": true,
+            "controllerState": "activated",
+            "controllerPathSha256": "edae1aad03e427838f4b3ce8b9cff24fb9a676def8297715b906aa14599e18c3",
+            "controllerBuildMatches": true
+          }
+        },
+        {
+          "actorRole": "direccion",
+          "stage": "PENDING_CXP_RELOAD",
+          "waitOutcome": "ORIGINAL_WAIT_COMPLETED",
+          "status": "CAPTURED",
+          "elapsedMs": 558,
+          "providerPresent": true,
+          "appPresent": true,
+          "readyState": "interactive",
+          "serviceWorker": {
+            "supported": true,
+            "controllerPresent": true,
+            "controllerState": "activated",
+            "controllerPathSha256": "edae1aad03e427838f4b3ce8b9cff24fb9a676def8297715b906aa14599e18c3",
+            "controllerBuildMatches": true
+          }
+        }
+      ],
+      "historicalFailureCause": "NOT_DEDUCIBLE_FROM_THIS_RUN"
+    },
+    "documentedTermsHelperStatus": "PASS",
+    "documentedTermsHelperReloadPerformed": false,
+    "sourceIntakeNewProofAvailable": false,
+    "rootCauseProven": false,
+    "previousTimeoutRootCauseProven": false,
+    "newPreviewAcceptance": false,
+    "newLiveAcceptance": false,
+    "realFinancialWritesApplied": 0
   }
 }

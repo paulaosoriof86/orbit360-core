@@ -1,5 +1,5 @@
-# I6.6: classify bounded PREVIEW proposal and LIVE callable failures, without printing
-# customer fields, identity, receipt numbers or full log messages.
+# I6.6: read existing Cloud Logging for one exact Preview reader and UTC window.
+# Never emit log bodies, URLs, headers, identity or account details.
 name: Gravicentra I6.6 Callable Error Classification Readonly
 on:
   push:
@@ -22,55 +22,109 @@ jobs:
         with: {node-version: '22'}
       - name: Install read-only authenticated Google Logging API client
         run: npm install --no-save --package-lock=false --ignore-scripts --no-audit --no-fund google-auth-library@9.15.1 >/dev/null
-      - name: Query recent function error classifications without personal data
+      - name: Read exact Preview reader window with sanitized bounded pagination
         run: |
           node - <<'NODE'
-          const assert=require('node:assert/strict'),{GoogleAuth}=require('google-auth-library');
-          const service=['SA_LAB','SA_ALT','SA_DEFAULT'].map(n=>process.env[n]).filter(Boolean)
-            .map(s=>{try{return JSON.parse(s);}catch(_){return null;}})
-            .find(s=>s&&s.type==='service_account'&&s.project_id==='ays-orbit-360-lab'&&s.private_key);
-          assert.ok(service,'I66_LOG_READ_EXISTING_ACCOUNT_REQUIRED');
-          (async()=>{
-            const client=await new GoogleAuth({credentials:service,scopes:['https://www.googleapis.com/auth/logging.read']}).getClient();
-            const token=await client.getAccessToken();
-            const filter='timestamp>="2026-11-17T02:00:00Z" AND timestamp<="2026-11-17T02:45:00Z" AND (resource.type="cloud_run_revision" OR resource.type="cloud_function") AND (resource.labels.service_name="orbit360productoperationalcommand" OR resource.labels.function_name="orbit360ProductOperationalCommand" OR resource.labels.service_name="orbit360cobrosreconciliationcommand" OR resource.labels.function_name="orbit360CobrosReconciliationCommand" OR resource.labels.service_name="orbit360cobrosreconciliationcommandpreview" OR resource.labels.function_name="orbit360CobrosReconciliationCommandPreview")';
-            const req=await fetch('https://logging.googleapis.com/v2/entries:list',{method:'POST',headers:{Authorization:'Bearer '+token.token,'content-type':'application/json'},
-              body:JSON.stringify({resourceNames:['projects/ays-orbit-360-lab'],filter,pageSize:250,orderBy:'timestamp desc'}),signal:AbortSignal.timeout(30000)});
-            console.log('I66_LOGGING_HTTP_STATUS='+req.status);
-            if(!req.ok){console.log('I66_LOGGING_ACCESS_HOLD_NO_BYPASS=true');process.exitCode=1;return;}
-            const response=await req.json(),entries=response.entries||[],counts={},byService={},bySeverity={},safeStackFrames={};
-            const patterns=[
-              ['CLOUD_FUNCTION_ERROR',/function execution|callable error|exception/i],
-              ['INSURER_SCOPE',/insurer.*scope|aseguradora.*alcance|no autorizado para modificar|permission.denied/i],
-              ['INSURER_AUDIT',/historial can[oó]nico|actividad.*commit|insurer.*activity/i],
-              ['SECRET_PAYLOAD',/material secreto no permitido|containsSecret|secretos/i],
-              ['SERVER_READBACK',/canonical.*readback|falta el recibo can[oó]nico|readback.*mismatch/i],
-              ['INVALID_ARGUMENT',/invalid.argument|argumento inv[aá]lido|payload requerido/i],
-              ['FUNCTION_NOT_FOUND',/not.found|function not found/i],
-              ['NETWORK_OR_TIMEOUT',/deadline.exceeded|timeout|unavailable|resource.exhausted/i],
-              ['ALREADY_PAID_OR_CONFLICT',/already.paid|payment.already.applied|duplicate|conflict|ya pagad/i],
-              ['MISSING_PAYMENT_EVIDENCE',/source.evidence|insurance.statement|source.*not.found|evidencia/i],
-              ['AUTHORIZATION',/unauthenticated|authorization|not.authorized/i],
-              ['FIRESTORE_UNDEFINED',/undefined|invalid firestore data|unsupported field value|cannot use undefined/i],
-              ['FIRESTORE_TRANSACTION_ORDER',/all reads before writes|reads.*before.*writes|read after write/i],
-              ['FIRESTORE_TRANSACTION_ABORT',/transaction.*failed|aborted|too much contention|transaction retry/i],
-              ['FIRESTORE_INDEX',/requires an index|index.*needed|failed.precondition|query requires/i],
-              ['TYPE_ERROR',/TypeError|Cannot read properties of/i],
-              ['REFERENCE_ERROR',/ReferenceError|is not defined/i],
-              ['PROPOSAL_DOMAIN_STACK',/cobros-reconciliation-domain\.js|proposal-application-boundary\.js/i]
-            ];
-            for(const e of entries){
-              const s=String(e.textPayload||'')+' '+JSON.stringify(e.jsonPayload||{});
-              const tags=patterns.filter(([_,re])=>re.test(s)).map(([tag])=>tag);
-              for(const tag of tags.length?tags:['UNCLASSIFIED'])counts[tag]=(counts[tag]||0)+1;
-              const severity=String(e.severity||'DEFAULT');bySeverity[severity]=(bySeverity[severity]||0)+1;
-              for(const m of s.matchAll(/(?:cobros-reconciliation-domain|proposal-application-boundary)\.js:(\d{1,4})/g)){
-                const frame=(m[0].startsWith('cobros')?'DOMAIN:':'BOUNDARY:')+m[1];safeStackFrames[frame]=(safeStackFrames[frame]||0)+1;
-              }
-              const service=String(e.resource?.labels?.service_name||e.resource?.labels?.function_name||'unknown').toLowerCase();
-              const bucket=service.includes('cobros')?(service.includes('preview')?'COBROS_PREVIEW':'COBROS_LIVE'):service.includes('operational')?'INSURER_AND_GENERAL':'OTHER';
-              byService[bucket]=(byService[bucket]||0)+1;
+          const fs=require('node:fs'),path=require('node:path'),{GoogleAuth}=require('google-auth-library');
+          const PROJECT='ays-orbit-360-lab',SERVICE='orbit360scopedpolicyreadpreview',FUNCTION='orbit360ScopedPolicyReadPreview';
+          const FROM='2026-11-17T21:03:00Z',THROUGH='2026-11-17T21:07:00Z',MAX_PAGES=8,PAGE_SIZE=250;
+          const report={schema:'GI_I66_SCOPED_READER_LOGGING_READONLY_V1',status:'READONLY_QUERY_NOT_COMPLETED',
+            diagnosticOnly:true,project:PROJECT,service:SERVICE,function:FUNCTION,fromUtc:FROM,throughUtc:THROUGH,
+            pageSize:PAGE_SIZE,maxPages:MAX_PAGES,pagesRead:0,entriesSeen:0,entriesIncluded:0,
+            entriesRejectedOutsideExactScope:0,payloadClassificationsTruncated:0,hasMore:false,truncated:false,
+            loggingApiHttpStatuses:[],classifiedCounts:{OOM:0,NO_AVAILABLE_INSTANCE:0,HTTP_429:0,HTTP_503:0,TIMEOUT:0,UNCLASSIFIED:0},
+            byHttpStatus:{},byMethod:{},byRevision:{},rows:[],failureClass:null,
+            noLogBodyOrPersonalData:true,noUrlsHeadersOrIdentity:true,zeroWrites:true,
+            functionalAcceptance:false,rootCauseProven:false};
+          const methods=new Set(['GET','POST','OPTIONS','HEAD','PUT','PATCH','DELETE']);
+          const revisionPattern=/^orbit360scopedpolicyreadpreview-[0-9]{5,8}-[a-z0-9]{3,10}$/;
+          const timestampPattern=/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,9})?Z$/;
+          const patterns=[
+            ['OOM',/\bout[\s-]of[\s-]memory\b|\boom\b|memory limit[^\n]{0,100}exceeded|memory usage[^\n]{0,100}exceeded/i],
+            ['NO_AVAILABLE_INSTANCE',/no available (?:container )?instances?|no instances? (?:was |were |are )?available/i],
+            ['TIMEOUT',/\btimeout\b|\btimed out\b|deadline[ _.-]?exceeded|upstream[^\n]{0,80}timeout/i]
+          ];
+          function classify(entry){
+            const labels=entry?.resource?.labels||{},type=entry?.resource?.type;
+            const exact=type==='cloud_run_revision'&&labels.service_name===SERVICE||type==='cloud_function'&&labels.function_name===FUNCTION;
+            const timestamp=typeof entry?.timestamp==='string'&&timestampPattern.test(entry.timestamp)?entry.timestamp:null;
+            const when=timestamp?Date.parse(timestamp):NaN;
+            if(!exact||!Number.isFinite(when)||when<Date.parse(FROM)||when>Date.parse(THROUGH)){
+              report.entriesRejectedOutsideExactScope++;return;
             }
-            console.log('I66_LIVE_INSURER_COBROS_FUNCTION_LOG_READONLY='+JSON.stringify({entries:entries.length,byService,bySeverity,classifiedCounts:counts,safeStackFrames,more:Boolean(response.nextPageToken),boundedUtc:'2026-11-17T02:00:00Z/2026-11-17T02:45:00Z',noLogBodyOrPersonalData:true,zeroWrites:true}));
-          })().catch(e=>{console.log('I66_LOGGING_UNAVAILABLE_CLASS='+String(e?.code||e?.name||'ERROR').replace(/[^A-Za-z0-9_]/g,'').slice(0,40));process.exitCode=1;});
+            const http=entry.httpRequest||{};
+            const httpStatus=Number.isInteger(http.status)&&http.status>=100&&http.status<=599?http.status:null;
+            const method=methods.has(http.requestMethod)?http.requestMethod:'UNKNOWN';
+            const latency=typeof http.latency==='string'&&/^[0-9]{1,5}(?:\.[0-9]{1,9})?s$/.test(http.latency)?Number(http.latency.slice(0,-1)):NaN;
+            const latencyMs=Number.isFinite(latency)&&latency>=0&&latency<=86400?Math.round(latency*1000000)/1000:null;
+            const revision=typeof labels.revision_name==='string'&&revisionPattern.test(labels.revision_name)?labels.revision_name:null;
+            // Raw payload is inspected only in memory for finite categories. It
+            // is never serialized into the report, logs, artifact or failures.
+            const raw=String(entry.textPayload||'')+' '+JSON.stringify(entry.jsonPayload||{});
+            if(raw.length>65536)report.payloadClassificationsTruncated++;
+            const text=raw.slice(0,65536),categories=patterns.filter(([,regex])=>regex.test(text)).map(([tag])=>tag);
+            if(httpStatus===429)categories.push('HTTP_429');if(httpStatus===503)categories.push('HTTP_503');
+            if(categories.length===0)categories.push('UNCLASSIFIED');
+            for(const category of categories)report.classifiedCounts[category]++;
+            const code=httpStatus===null?'UNKNOWN':String(httpStatus);report.byHttpStatus[code]=(report.byHttpStatus[code]||0)+1;
+            report.byMethod[method]=(report.byMethod[method]||0)+1;
+            const revisionKey=revision||'UNKNOWN';report.byRevision[revisionKey]=(report.byRevision[revisionKey]||0)+1;
+            report.rows.push({timestampUtc:timestamp,resourceType:type==='cloud_run_revision'?'CLOUD_RUN_REVISION':'CLOUD_FUNCTION',method,httpStatus,latencyMs,revision,categories});
+            report.entriesIncluded++;
+          }
+          function safeFailure(error){
+            if(error?.name==='AbortError'||error?.name==='TimeoutError')return'LOGGING_REQUEST_TIMEOUT';
+            if(error?.message==='EXISTING_ACCOUNT_REQUIRED')return'EXISTING_ACCOUNT_REQUIRED';
+            if(error?.message==='ACCESS_TOKEN_UNAVAILABLE')return'ACCESS_TOKEN_UNAVAILABLE';
+            if(error?.message==='LOGGING_ACCESS_HOLD')return'LOGGING_ACCESS_HOLD';
+            if(error?.message==='LOGGING_RESPONSE_SHAPE')return'LOGGING_RESPONSE_SHAPE';
+            if(error?.message==='LOGGING_PAGINATION_SHAPE')return'LOGGING_PAGINATION_SHAPE';
+            return'LOGGING_QUERY_UNAVAILABLE';
+          }
+          (async()=>{
+            try{
+              const account=['SA_LAB','SA_ALT','SA_DEFAULT'].map(n=>process.env[n]).filter(Boolean)
+                .map(s=>{try{return JSON.parse(s);}catch{return null;}})
+                .find(s=>s?.type==='service_account'&&s.project_id===PROJECT&&s.private_key);
+              if(!account)throw Error('EXISTING_ACCOUNT_REQUIRED');
+              const client=await new GoogleAuth({credentials:account,scopes:['https://www.googleapis.com/auth/logging.read']}).getClient();
+              const token=await client.getAccessToken();if(!token?.token)throw Error('ACCESS_TOKEN_UNAVAILABLE');
+              const filter='timestamp>="'+FROM+'" AND timestamp<="'+THROUGH+'" AND ((resource.type="cloud_run_revision" AND resource.labels.service_name="'+SERVICE+'") OR (resource.type="cloud_function" AND resource.labels.function_name="'+FUNCTION+'"))';
+              let pageToken;
+              for(let page=0;page<MAX_PAGES;page++){
+                const response=await fetch('https://logging.googleapis.com/v2/entries:list',{method:'POST',
+                  headers:{Authorization:'Bearer '+token.token,'content-type':'application/json'},
+                  body:JSON.stringify({resourceNames:['projects/'+PROJECT],filter,pageSize:PAGE_SIZE,orderBy:'timestamp asc',...(pageToken?{pageToken}:{})}),
+                  signal:AbortSignal.timeout(30000)});
+                report.loggingApiHttpStatuses.push(response.status);
+                if(!response.ok)throw Error('LOGGING_ACCESS_HOLD');
+                const body=await response.json();
+                if(!body||typeof body!=='object'||Array.isArray(body)||body.entries!==undefined&&!Array.isArray(body.entries))throw Error('LOGGING_RESPONSE_SHAPE');
+                const entries=body.entries||[];if(entries.length>PAGE_SIZE)throw Error('LOGGING_RESPONSE_SHAPE');
+                report.pagesRead++;report.entriesSeen+=entries.length;
+                for(const entry of entries)classify(entry);
+                const next=body.nextPageToken;
+                if(next!==undefined&&(typeof next!=='string'||next.length>16384))throw Error('LOGGING_PAGINATION_SHAPE');
+                report.hasMore=typeof next==='string'&&next.length>0;
+                if(!report.hasMore)break;
+                pageToken=next;
+              }
+              report.truncated=report.hasMore||report.payloadClassificationsTruncated>0||report.entriesRejectedOutsideExactScope>0;
+              report.status=report.truncated?'READONLY_QUERY_BOUNDED_INCOMPLETE':'READONLY_QUERY_COMPLETE';
+            }catch(error){
+              report.status='READONLY_QUERY_HOLD';report.failureClass=safeFailure(error);report.truncated=true;process.exitCode=1;
+            }finally{
+              const output=JSON.stringify(report,null,2)+'\n';
+              fs.writeFileSync(path.join(process.env.RUNNER_TEMP,'i66-scoped-read-preview-logs-readonly.json'),output,{mode:0o600});
+              console.log('I66_SCOPED_READ_PREVIEW_LOGGING_READONLY='+JSON.stringify(report));
+            }
+          })().catch(()=>{console.log('I66_LOGGING_OUTPUT_HOLD=true');process.exitCode=1;});
           NODE
+      - name: Preserve sanitized read-only logging evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gi-i66-scoped-read-preview-logs-readonly-${{ github.run_id }}
+          path: ${{ runner.temp }}/i66-scoped-read-preview-logs-readonly.json
+          if-no-files-found: warn
+          retention-days: 14
