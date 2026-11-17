@@ -1,0 +1,102 @@
+{
+  "schema": "gi.i66.v7.parallel-cartera-live-readback.v1",
+  "dateGuatemala": "2026-11-16",
+  "gate": "I6.6",
+  "status": "SIGNED_READONLY_BATCHES_PASS_APPLY_HOLD",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "authority": {
+    "sourceOfTruth": "Firestore LIVE, matching frozen insurer statements and issued policies",
+    "configDocument": "tenants/alianzas-soluciones/config/reconciliation",
+    "configRules": "V7 previously approved; persisted/readback confirmed separately",
+    "realPaymentApplicationAuthorized": false,
+    "realPaymentApplicationsPerformed": 0
+  },
+  "freshSignedCarteraReadbacks": [
+    {
+      "sourceBatch": "A1-A4+A7",
+      "workflowRunId": 44006595194,
+      "sourceCommit": "3025b841b650f7ce210af26f16b479af1d9fec71",
+      "evidenceArtifactId": 14294857317,
+      "evidenceArtifactDigest": "sha256:6c77aa0e85427831e1dee137bca58d07cef7723268ed55c6d591e6ae8c83ce5d",
+      "workflowConclusion": "success",
+      "cases": 37,
+      "uniqueSourcePaidEvidence": 4,
+      "sourcePendingRequirements": 33,
+      "statuses": {
+        "HOLD_POLICY_NOT_FOUND": 9,
+        "HOLD_NO_EXACT_REQUIREMENT_IN_ANY_EDITION": 19,
+        "PENDING_OVERDUE_NO_PAID_WRITE": 3,
+        "PENDING_FUTURE_NO_PAID_WRITE": 6
+      },
+      "previousProtectedBantrabSourceReferenceWritesPreserved": 7,
+      "newWrites": 0,
+      "certifiedApplied": 0
+    },
+    {
+      "sourceBatch": "A5-A6",
+      "workflowRunId": 44006597633,
+      "sourceCommit": "ec055242ea1ea8a2e247de49f118f2e3088a03c0",
+      "evidenceArtifactId": 14295125697,
+      "evidenceArtifactDigest": "sha256:5630f1e60245a874924344a8399a260a6d471393daa354f6e9d143c280a89375",
+      "workflowConclusion": "success",
+      "cases": 28,
+      "statuses": {
+        "HOLD_REQUIREMENT_NOT_LINKED": 22,
+        "HOLD_EXACT_INSURER_POLICY_NOT_FOUND": 6
+      },
+      "focalA5P7": {
+        "insurer": "ASEGURADORA GENERAL",
+        "issuedInstallments": 10,
+        "liveExpectedReceipts": 12,
+        "safeToAutoApply": false
+      },
+      "focalA6P4": {
+        "insurer": "COLUMNA",
+        "issuedInstallments": 12,
+        "liveExpectedReceipts": 12,
+        "safeToAutoApply": false
+      },
+      "newWrites": 0,
+      "certifiedApplied": 0
+    }
+  ],
+  "aggregate": {
+    "casesComparedToLive": 65,
+    "newDataWrites": 0,
+    "realPaymentApplications": 0,
+    "safeNewApplicationsEstablished": 0,
+    "closedFormalI66": false
+  },
+  "proposalSignedPreviewCurrentHold": {
+    "sourceSha": "c10979992a4e91da2396453749b1bd620c0b2c06",
+    "failedPreviewRunId": 43988425431,
+    "failureStage": "UI_APPLICATION_CONFIRM",
+    "observedCallableCode": "internal",
+    "syntheticObjectsRemoved": 10,
+    "realFinancialWrites": 0,
+    "serverErrorLoggingReadOnlyRunId": 44006461603,
+    "serverErrorLoggingHttpStatus": 403,
+    "serverErrorLogsRead": false,
+    "permissionChangeAuthorized": false
+  },
+  "formalProgress": {
+    "phaseAProductionAcceptedPercent": 100,
+    "postproductionI6ClosedGates": 6,
+    "postproductionI6TotalGates": 10,
+    "postproductionI6Percent": 60,
+    "operationsCompleted": 6,
+    "operationsTotal": 8,
+    "operationsPercent": 75,
+    "transversalCompleted": 19,
+    "transversalTotal": 31,
+    "transversalPercent": 61.3,
+    "phaseBPercent": 0
+  },
+  "nextActions": [
+    "Resolve Preview callable internal via an authorized server diagnostic or reproducible strict local test; no speculative LIVE writes",
+    "Adjudicate exact policy edition and insurer external requirement for retained cases using issued documents and protected CAS preflight",
+    "Separate source-paid evidence from confirmed payment application; require evidence, approval, before/after, audit and LIVE readback",
+    "Only increment formal I6 from 60% after signed I6.6 Preview and LIVE gates PASS"
+  ]
+}
