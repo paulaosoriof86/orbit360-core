@@ -105,3 +105,4 @@ jobs:
             console.log('I66_CURRENT_PREVIEW_AND_DUAL_LIVE_IDENTITY_READONLY_PASS');
           })().catch(()=>{console.error('I66_CURRENT_HOSTING_BUILD_IDENTITY_READONLY_HOLD');process.exitCode=1;});
           NODE
+# I6.6 2026-11-16: refresh read-only inventory after signed immutable build 44009981499 returned Firebase 429.
