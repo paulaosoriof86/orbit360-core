@@ -10,7 +10,7 @@
   "branch": "recovery/fase-a-clean-20260831",
   "forensicOriginSha": "9c95f31461f2eabe9804625b5659bee772f5602a",
   "createdAtUtc": "2026-08-31T18:00:00Z",
-  "updatedAtUtc": "2026-11-17T19:42:52Z",
+  "updatedAtUtc": "2026-11-17T19:50:58Z",
   "status": "I6_6_LIVE_CONTROLLED_PORTFOLIO_UPDATE_IN_PROGRESS",
   "currentIteration": 6,
   "lastCompletedIteration": 5,
@@ -23,7 +23,7 @@
     "latestHostingPreviewEvidence": "artifacts/orbit360-recovery/release-control/I6_6_SOURCE_INTAKE_RELOAD_PREVIEW_BUILD_20261117.json",
     "latestHostingPreviewSource": "59c37ac9a2142c24ccb5a95f3d6df82eb62dfd94",
     "documentaryFocalReadbackEvidence": "artifacts/orbit360-recovery/release-control/I6_6_EXISTING_CLIENT_INDEPENDENT_GESTIONES_READBACK_20261116.json",
-    "signedPreviewCandidateStatus": "EXACT_SIGNED_PREVIEW_PASS_SAME_ARTIFACT_LIVE_AUTHORIZED",
+    "signedPreviewCandidateStatus": "PRIOR_EXACT_PREVIEW_PASS_NEW_CAUSAL_QA_BUILD_REQUIRED",
     "technicalPreviewCausalRetryReceipt": "artifacts/orbit360-recovery/release-control/I6_6_TECHNICAL_PREVIEW_OBSERVABILITY_REBUILD_20261116.json",
     "operationsEvidenceReview": "artifacts/orbit360-recovery/release-control/I6_6_OPS_EVIDENCE_AND_PREVIEW_BINDING_REVIEW_20261116.json",
     "legalScopeAuthorizationReceipt": "artifacts/orbit360-recovery/release-control/I6_6_DIRECTION_PREVIEW_V2_SCOPE_AUTHORIZATION_20261116.json",
@@ -42,7 +42,7 @@
       "buildId": "gi-i66-59c37ac9a214-57f234755dc1",
       "previewUrl": "https://ays-orbit-360-lab--gi-i66-rc-44158877469-13g9931i.web.app",
       "previewChannelId": "gi-i66-rc-44158877469",
-      "status": "EXACT_SIGNED_PREVIEW_PASS_SAME_ARTIFACT_LIVE_AUTHORIZED",
+      "status": "PREVIEW_PASS_LIVE_PREDEPLOY_VALIDATOR_HOLD_SUPERSEDING_QA_SOURCE_BUILD_REQUIRED",
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_SOURCE_INTAKE_RELOAD_PREVIEW_BUILD_20261117.json",
       "signedPreviewAccepted": true,
       "liveAccepted": false,
@@ -55,7 +55,8 @@
         "receiptArtifactId": 14361764826,
         "receiptArtifactDigest": "sha256:93d3ac61bbcdcb4140434ccb8e6c320e83a48988c162458c250a63cba6a8b6a2",
         "status": "SIGNED_DRIVERS_DURABLE_READBACK_RELOAD_RESTORE_PASS"
-      }
+      },
+      "liveHoldReceipt": "artifacts/orbit360-recovery/release-control/I6_6_LIVE_PREDEPLOY_PHASE_HOLD_AND_CAUSAL_REPAIR_20261117.json"
     },
     "latestSignedQaOutcome": {
       "status": "SIGNED_PREVIEW_ACCEPTED_LIVE_PENDING",
@@ -108,7 +109,7 @@
     "dailyExecutionPlanPointer": "artifacts/orbit360-recovery/release-control/I6_6_OPERATIONAL_CONTINUATION_20261115.json#dailyExecutionPlan20261117",
     "currentPreviewSourceSha": "59c37ac9a2142c24ccb5a95f3d6df82eb62dfd94",
     "currentPreviewBuildReceipt": "artifacts/orbit360-recovery/release-control/I6_6_SOURCE_INTAKE_RELOAD_PREVIEW_BUILD_20261117.json",
-    "nextAction": "I6_6_SAME_ARTIFACT_EXACT_LIVE: FOUR_SIGNED_PREVIEW_DRIVERS_44160169601_AND_GUARD_44160169239_PASS; PROMOTE_ARTIFACT_14360954951_WITHOUT_REBUILD_USING_EXISTING_THREE_FUNCTION_AND_HOSTING_ROLLBACK. SOURCE_INTAKE_RELOAD_ACTOR_READBACK_REPLAY_ERROR_FREE_AND_CLEANUP_PROVEN. REQUIRE_223_FILES_ON_PREVIEW_AND_BOTH_LIVE_ORIGINS_PLUS_FOUR_SIGNED_LIVE_DRIVERS_AND_SYNTHETIC_RESTORE; ONLY_THEN_RECORD_OPERATIONAL_SUCCESSOR_ACCEPTANCE_AND_ALIGN_CP_STATE_PLAN_TRANSPORT_LATEST_POINTER. FULL_I66_AND_REAL_FINANCIAL_APPLICATIONS_REMAIN_PENDING_WITH_FROZEN_DENOMINATORS.",
+    "nextAction": "I6_6_EXISTING_BLOCK2_CAUSAL_RELEASE_READINESS: BUILD_NEW_IMMUTABLE_QA_SOURCE_WITH_FIXED_AUTHORIZATION_PHASE_AND_INACTIVE_BOUNDED_LIVE_LEGAL_SUPPORT; PRODUCT_AND_TERMS_UNCHANGED. CERTIFY_EXACT_NEW_PREVIEW_WITH_EXISTING_FOUR_SIGNED_DRIVERS. PRIOR_59C37_PREVIEW_PASS_AND_R11_LIVE_RETAINED. LIVE_LEGAL_SCOPE_IS_PROPOSED_NOT_AUTHORIZED: EXISTING_RECEIPT_EXPLICITLY_PREVIEW_ONLY. BEFORE_ANY_NEW_LIVE_DEPLOY_REQUIRE_EXPLICIT_DIRECTION_APPROVAL_OF_REVIEW_DOCUMENT_F8FD153E_AND_EXACT_GRANT_METADATA; NEVER_INFER_IT_FROM_RELEASE_AUTHORIZATION. AFTER_NEW_PREVIEW_PASS_LOCK_EXISTING_R11_TRANSPORT_AND_PRESERVE_EXACT_PENDING_CANDIDATE_FOR_SAME_ARTIFACT_PROMOTION_AFTER_OWNER_DECISION. FINANCIAL_PRIVATE_INPUTS_PREPARED; FIVE_CURRENT_AUTHENTICATED_READS_AND_SERVER_DIGESTS_REQUIRED_BEFORE_POSTING; NO_DUPLICATES_OR_BANK_TRANSFERS.",
     "dailyPlanFreeze20261117": {
       "status": "FROZEN_APPROVED_BY_DIRECTION",
       "approvedAtUtc": "2026-11-17T19:14:47Z",
@@ -131,6 +132,40 @@
       "artifactDigest": "sha256:210fb130f998f367faecefbc34c6287bf59cafcbede8002f345cfb813d4ed1b6",
       "status": "HOLD_UNEXPECTED_FINANCE_CONSOLE_AND_HTTP_ERRORS",
       "signedObservabilityProfile": "I66_SIGNED_BROWSER_OBSERVABILITY_V1"
+    },
+    "latestLiveAttempt": {
+      "runId": 44161850833,
+      "jobId": 134317651935,
+      "headSha": "fb693a8d836ce1b4b6d30672b31f25df268b1d7d",
+      "status": "completed",
+      "conclusion": "failure",
+      "failedStep": 11,
+      "failedStepName": "Test signed existing Carlos and Direction Preview eight-module permissions before touching LIVE",
+      "rollbackSnapshotStep": 12,
+      "rollbackSnapshotConclusion": "skipped",
+      "deployStep": 13,
+      "deployConclusion": "skipped",
+      "guardRunId": 44161850815,
+      "guardConclusion": "success"
+    },
+    "livePredeployPhaseHoldReceipt": "artifacts/orbit360-recovery/release-control/I6_6_LIVE_PREDEPLOY_PHASE_HOLD_AND_CAUSAL_REPAIR_20261117.json",
+    "liveLegalReadiness20261117": {
+      "status": "PROPOSED_NOT_AUTHORIZED",
+      "proposalPath": "artifacts/orbit360-recovery/release-control/I6_6_DIRECTION_LIVE_V2_SCOPE_PROPOSAL_20261117.json",
+      "reviewDocumentSha256": "f8fd153e864892c8c4720003f1b72d4ade64fc3c866266c3719729c5a0369d4f",
+      "reviewLibraryFileId": "libfile_650fc78f92448191a82bddfd92c0ec60",
+      "termsProjectionSha256": "485b07887091063cc7a5d1dc8f11a9bb547f2ef059490bb04d4acee73404f6b2",
+      "origin": "https://app.aysseguros.com",
+      "phase": "LIVE",
+      "gate": "I6.6",
+      "actorRole": "direccion",
+      "tenantId": "alianzas-soluciones",
+      "country": "GT",
+      "newLegalConsentGranted": false,
+      "authorizedReceiptExists": false,
+      "conditionBasis": "SOURCE_PATH_PROVEN_NOT_AN_OBSERVED_LIVE_RUNTIME_FAILURE",
+      "actualLiveFailure44161850833RemainsAuthorizationPhaseMismatch": true,
+      "existingPreviewAuthorizationUnchanged": true
     }
   },
   "iterationProgressAuthority": "CONTROL_PLANE.json#gateState: I0-I5 certified in earlier release epoch; I6.6 active for current successor. Timestamped iterationN evidence snapshots remain immutable historical observations.",
@@ -835,7 +870,7 @@
     "phaseAIterationStatuses": "HISTORICAL_FIELDS_ABOVE_PRESERVED_UNTIL_FORMAL_GATE_EVIDENCE;_NO_NEW_PASS_INFERRED",
     "labDataWriteScope": "ONLY_35_AUTHORIZED_COUNTRY_FIELDS;_NO_AUGUST_REFRESH"
   },
-  "nextAction": "I6_6_SAME_ARTIFACT_EXACT_LIVE: FOUR_SIGNED_PREVIEW_DRIVERS_44160169601_AND_GUARD_44160169239_PASS; PROMOTE_ARTIFACT_14360954951_WITHOUT_REBUILD_USING_EXISTING_THREE_FUNCTION_AND_HOSTING_ROLLBACK. SOURCE_INTAKE_RELOAD_ACTOR_READBACK_REPLAY_ERROR_FREE_AND_CLEANUP_PROVEN. REQUIRE_223_FILES_ON_PREVIEW_AND_BOTH_LIVE_ORIGINS_PLUS_FOUR_SIGNED_LIVE_DRIVERS_AND_SYNTHETIC_RESTORE; ONLY_THEN_RECORD_OPERATIONAL_SUCCESSOR_ACCEPTANCE_AND_ALIGN_CP_STATE_PLAN_TRANSPORT_LATEST_POINTER. FULL_I66_AND_REAL_FINANCIAL_APPLICATIONS_REMAIN_PENDING_WITH_FROZEN_DENOMINATORS.",
+  "nextAction": "I6_6_EXISTING_BLOCK2_CAUSAL_RELEASE_READINESS: BUILD_NEW_IMMUTABLE_QA_SOURCE_WITH_FIXED_AUTHORIZATION_PHASE_AND_INACTIVE_BOUNDED_LIVE_LEGAL_SUPPORT; PRODUCT_AND_TERMS_UNCHANGED. CERTIFY_EXACT_NEW_PREVIEW_WITH_EXISTING_FOUR_SIGNED_DRIVERS. PRIOR_59C37_PREVIEW_PASS_AND_R11_LIVE_RETAINED. LIVE_LEGAL_SCOPE_IS_PROPOSED_NOT_AUTHORIZED: EXISTING_RECEIPT_EXPLICITLY_PREVIEW_ONLY. BEFORE_ANY_NEW_LIVE_DEPLOY_REQUIRE_EXPLICIT_DIRECTION_APPROVAL_OF_REVIEW_DOCUMENT_F8FD153E_AND_EXACT_GRANT_METADATA; NEVER_INFER_IT_FROM_RELEASE_AUTHORIZATION. AFTER_NEW_PREVIEW_PASS_LOCK_EXISTING_R11_TRANSPORT_AND_PRESERVE_EXACT_PENDING_CANDIDATE_FOR_SAME_ARTIFACT_PROMOTION_AFTER_OWNER_DECISION. FINANCIAL_PRIVATE_INPUTS_PREPARED; FIVE_CURRENT_AUTHENTICATED_READS_AND_SERVER_DIGESTS_REQUIRED_BEFORE_POSTING; NO_DUPLICATES_OR_BANK_TRANSFERS.",
   "sourceOfTruth": {
     "projectBoundaryPrevalentAddendum": "orbit360-platform/docs/recovery/ADDENDUM_PREVALENTE_CHATGPT_PROJECT_BOUNDARY_20260831.md",
     "mutableState": "orbit360-platform/docs/recovery/orbit360-recovery-state-v1.json",
@@ -2544,5 +2579,41 @@
     "signedUiAcceptance": false,
     "servedBackendRuntimeCertified": false,
     "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_SCOPE_READONLY_CLOSURE_20261117.json"
+  },
+  "i66LivePredeployPhaseHold20261117": {
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_LIVE_PREDEPLOY_PHASE_HOLD_AND_CAUSAL_REPAIR_20261117.json",
+    "runId": 44161850833,
+    "jobId": 134317651935,
+    "headSha": "fb693a8d836ce1b4b6d30672b31f25df268b1d7d",
+    "status": "completed",
+    "conclusion": "failure",
+    "failedStep": 11,
+    "failedStepName": "Test signed existing Carlos and Direction Preview eight-module permissions before touching LIVE",
+    "rollbackSnapshotStep": 12,
+    "rollbackSnapshotConclusion": "skipped",
+    "deployStep": 13,
+    "deployConclusion": "skipped",
+    "guardRunId": 44161850815,
+    "guardConclusion": "success",
+    "newLiveAcceptance": false,
+    "realFinancialWrites": 0
+  },
+  "i66LiveLegalReadiness20261117": {
+    "status": "PROPOSED_NOT_AUTHORIZED",
+    "proposalPath": "artifacts/orbit360-recovery/release-control/I6_6_DIRECTION_LIVE_V2_SCOPE_PROPOSAL_20261117.json",
+    "reviewDocumentSha256": "f8fd153e864892c8c4720003f1b72d4ade64fc3c866266c3719729c5a0369d4f",
+    "reviewLibraryFileId": "libfile_650fc78f92448191a82bddfd92c0ec60",
+    "termsProjectionSha256": "485b07887091063cc7a5d1dc8f11a9bb547f2ef059490bb04d4acee73404f6b2",
+    "origin": "https://app.aysseguros.com",
+    "phase": "LIVE",
+    "gate": "I6.6",
+    "actorRole": "direccion",
+    "tenantId": "alianzas-soluciones",
+    "country": "GT",
+    "newLegalConsentGranted": false,
+    "authorizedReceiptExists": false,
+    "conditionBasis": "SOURCE_PATH_PROVEN_NOT_AN_OBSERVED_LIVE_RUNTIME_FAILURE",
+    "actualLiveFailure44161850833RemainsAuthorizationPhaseMismatch": true,
+    "existingPreviewAuthorizationUnchanged": true
   }
 }

@@ -1,0 +1,66 @@
+{
+  "schema": "I6_6_DIRECTION_LIVE_SCOPE_PROPOSAL_V1",
+  "status": "PROPOSED_NOT_AUTHORIZED",
+  "sourceBaseHead": "fb693a8d836ce1b4b6d30672b31f25df268b1d7d",
+  "reviewDocument": {
+    "sha256": "f8fd153e864892c8c4720003f1b72d4ade64fc3c866266c3719729c5a0369d4f",
+    "libraryFileId": "libfile_650fc78f92448191a82bddfd92c0ec60"
+  },
+  "subject": {
+    "advisorId": "ase-paula-osorio",
+    "role": "direccion",
+    "tenantId": "alianzas-soluciones",
+    "country": "GT"
+  },
+  "environment": {
+    "gate": "I6.6",
+    "phase": "LIVE",
+    "repository": "paulaosoriof86/orbit360-core",
+    "branch": "recovery/fase-a-clean-20260831",
+    "firebaseProject": "ays-orbit-360-lab",
+    "origin": "https://app.aysseguros.com"
+  },
+  "legal": {
+    "version": "2.0",
+    "clauseIds": [
+      "confidencialidad",
+      "tratamiento_datos",
+      "descargo_ia"
+    ],
+    "termsProjectionSha256": "485b07887091063cc7a5d1dc8f11a9bb547f2ef059490bb04d4acee73404f6b2",
+    "legalOwnerSha256": "b74a965b7be0d67862d82bcf73dacc0d5a8293dcf30cb4f5f3fdeaa6ee1c68a3"
+  },
+  "constraints": {
+    "ordinaryUiOnly": true,
+    "sameTermsI66LiveTechnicalSuccessors": true,
+    "otherActors": false,
+    "otherTenants": false,
+    "otherCountries": false,
+    "otherOrigins": false,
+    "futureGates": false,
+    "changedTerms": false,
+    "realPayments": false,
+    "storageSeeding": false,
+    "gateBypass": false
+  },
+  "proposedConfirmationQuote": "Autorizo, exclusivamente para mí, Paula Osorio, en el rol Dirección de Alianzas & Soluciones (A&S; tenant alianzas-soluciones), país Guatemala (GT), dentro del gate I6.6 y únicamente en https://app.aysseguros.com, que el asistente registre en mi sesión firmada, mediante la casilla y el botón normales de la plataforma, mi aceptación de las tres cláusulas internas versión 2.0 reproducidas íntegramente en este documento: confidencialidad, tratamiento de datos personales y descargo sobre inteligencia artificial, con huella SHA-256 485b07887091063cc7a5d1dc8f11a9bb547f2ef059490bb04d4acee73404f6b2. Esta autorización comprenderá los sucesores técnicos de I6.6 solo mientras conserven exactamente el mismo texto, versión, conjunto de cláusulas y huella. No autoriza otros actores, tenants, países ni gates; pagos reales; cambios de términos; precarga de aceptación en almacenamiento; ni elusión del gate legal.",
+  "authorizationNotReceived": true,
+  "authorizationReceiptPath": "artifacts/orbit360-recovery/release-control/I6_6_DIRECTION_LIVE_V2_SCOPE_AUTHORIZATION_20261117.json",
+  "historicalPreviewAuthorization": {
+    "path": "artifacts/orbit360-recovery/release-control/I6_6_DIRECTION_PREVIEW_V2_SCOPE_AUTHORIZATION_20261116.json",
+    "sha256": "d3309675c753bd1b31f9163d506aba2e29ac70583a7b8d54cb5b8503b5c50a44",
+    "live": false,
+    "unchanged": true
+  },
+  "executionAcceptance": {
+    "authorizationIsNotExecutionProof": true,
+    "requireSignedActor": true,
+    "requireSourcePackagePreviewLegalOwnerEqualityBeforeDeploy": true,
+    "requireExactLiveBuildAndLegalOwnerAfterClone": true,
+    "requireDisplayedTermsDigestBeforeClick": true,
+    "requireNormalCheckboxAndButton": true,
+    "requireImmediateAndReloadReadback": true,
+    "requireCandidateSourceBuildIdOriginAndReceiptInProof": true,
+    "productionAcceptanceUnchanged": true
+  }
+}

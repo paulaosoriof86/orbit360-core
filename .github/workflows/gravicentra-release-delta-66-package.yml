@@ -22,7 +22,9 @@ on:
       - tools/gravicentra-i6-6-receipt-edit-safe-diagnostics.test.cjs
       - tools/gravicentra-i6-6-direction-preview-legal-acceptance.cjs
       - tools/gravicentra-i6-6-direction-preview-i66-consent-scope.test.cjs
+      - tools/gravicentra-i6-6-direction-live-legal-acceptance.test.cjs
       - artifacts/orbit360-recovery/release-control/I6_6_DIRECTION_PREVIEW_V2_SCOPE_AUTHORIZATION_20261116.json
+      - artifacts/orbit360-recovery/release-control/I6_6_DIRECTION_LIVE_V2_SCOPE_PROPOSAL_20261117.json
       - tools/gravicentra-i6-6-preview-channel-reuse-guard.cjs
       - tools/gravicentra-i6-6-technical-preview-rollover.test.cjs
       - artifacts/orbit360-recovery/release-control/I6_6_TECHNICAL_PREVIEW_ROLLOVER_CAUSAL_RETRY_20261116.json
@@ -283,6 +285,7 @@ jobs:
           node --test tools/gravicentra-i6-6-preview-channel-reuse-guard.test.cjs
           node --test tools/gravicentra-i6-6-preview-candidate-binding.test.cjs
           node --test tools/gravicentra-i6-6-direction-preview-i66-consent-scope.test.cjs
+          node --test tools/gravicentra-i6-6-direction-live-legal-acceptance.test.cjs
           node --test tools/gravicentra-i6-6-technical-preview-rollover.test.cjs
           node --test tools/gravicentra-i6-6-live-proof-artifact-layout.test.cjs
           node --test tools/gravicentra-i6-6-advisor-browser-observability.test.cjs

@@ -9,7 +9,7 @@ const path=require('node:path');
 const os=require('node:os');
 const contract=require('../functions/advisor-commission-payable-contract');
 const assignment=require('../functions/advisor-assignment-correction-contract');
-const {acceptDirectionPreviewLegal,LEGAL_FAILURE_CHECKS,safeLegalFailureSubstage}=require('./gravicentra-i6-6-direction-preview-legal-acceptance.cjs');
+const {acceptDirectionPreviewLegal,assertDirectionLiveLegalAuthority,acceptDirectionLiveLegal,LEGAL_FAILURE_CHECKS,safeLegalFailureSubstage}=require('./gravicentra-i6-6-direction-preview-legal-acceptance.cjs');
 const {runDocumentedTermsCheck,safeDocumentedTermsProof,FAILURE_CODES:DOCUMENTED_TERMS_FAILURE_CODES}=require('./gravicentra-i6-6-documented-terms-signed-check.cjs');
 const PROJECT='ays-orbit-360-lab',TENANT='alianzas-soluciones';
 const SOURCE_SCHEMA='gravicentra-advisor-commission-source-batch-v1';
@@ -720,7 +720,9 @@ async function captureFinanceUiSnapshot(page){
 }
 
 async function main(){
-  const cfg=configuration(process.env),runId='b4003qa_i66_cxp_'+Date.now().toString(36)+'_'+crypto.randomBytes(5).toString('hex');
+  const cfg=configuration(process.env);
+  if(cfg.live)assertDirectionLiveLegalAuthority({sourceSha:cfg.source});
+  const runId='b4003qa_i66_cxp_'+Date.now().toString(36)+'_'+crypto.randomBytes(5).toString('hex');
   const report={schemaVersion:'gravicentra-i66-advisor-payables-signed-uat-v1',phase:cfg.phase,sourceSha:cfg.source,
     status:'HOLD',checks:[],realCustomerWritesRequested:0,bankMovements:0,financialPayments:0,
     authOrMembershipMutations:0,cleanup:{status:'NOT_STARTED',seeded:0,remaining:0}};
@@ -815,6 +817,10 @@ async function main(){
       stage='DIRECTION_LEGAL_ACCEPTANCE';
       report.directionLegalAcceptance=await acceptDirectionPreviewLegal({page:direction.page,actor:actors[0],cfg});
       pass('EXPLICIT_DIRECTION_PREVIEW_LEGAL_DECISION_APPLIED_BY_NORMAL_UI');
+    }else{
+      stage='DIRECTION_LEGAL_ACCEPTANCE';
+      report.directionLiveLegalAcceptance=await acceptDirectionLiveLegal({page:direction.page,actor:actors[0],cfg});
+      pass('EXPLICIT_DIRECTION_LIVE_LEGAL_DECISION_APPLIED_BY_NORMAL_UI');
     }
     stage='OPERATIVE_FINANCIAL_DENIAL';
     await deny(operator,{advisorPayable:fx.specs[0]},'permission-denied');

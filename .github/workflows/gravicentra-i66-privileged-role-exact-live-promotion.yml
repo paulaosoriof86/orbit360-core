@@ -60,9 +60,11 @@ jobs:
       - name: Gate exact signed Preview, unchanged product owners and immutable artifact
         run: |
           set -euo pipefail
+          node tools/gravicentra-i6-6-direction-preview-legal-acceptance.cjs --preflight-live-authority
           node --test tools/gravicentra-i6-6-operational-release-candidate.test.cjs
           node --test tools/gravicentra-i6-6-preview-candidate-binding.test.cjs
           node --test tools/gravicentra-i6-6-direction-preview-i66-consent-scope.test.cjs
+          node --test tools/gravicentra-i6-6-direction-live-legal-acceptance.test.cjs
           node --test tools/gravicentra-i6-6-technical-preview-rollover.test.cjs
           node --test tools/gravicentra-i6-6-source-intake-readiness.test.cjs
           node --test tools/gravicentra-i6-6-operational-live-acceptance.test.cjs
@@ -135,6 +137,7 @@ jobs:
           assert.ok(fs.existsSync(p+'/backend/bootstrap.js')&&fs.existsSync(p+'/backend/package-lock.json'));
           console.log('I66_ROLE_ORIGINAL_PREVIEW_ARTIFACT_EXACT_BACKEND_AND_FRONTEND_BYTES_PASS');
           NODE
+          node tools/gravicentra-i6-6-direction-preview-legal-acceptance.cjs --preflight-live-package
           (cd "$FROOT/bundle/backend" && npm ci --ignore-scripts --no-audit --no-fund >/dev/null)
           printf '{"functions":{"source":"bundle/backend","runtime":"nodejs22"}}\n' > "$FROOT/firebase.functions-transport.json"
           echo "I66_PACKAGE_ROOT=$FROOT" >> "$GITHUB_ENV"
@@ -328,6 +331,8 @@ jobs:
           p.functionsInventoryUnchangedExceptTargets=true;p.rollbackSnapshotReady=true;
           p.fullI66ProductionAccepted=false;
           const proposal=JSON.parse(fs.readFileSync(process.env.I66_PACKAGE_ROOT+'/evidence/i66-proposal-application-signed-uat-live.json','utf8'));
+          const advisor=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/gravicentra-i66-advisor-payables-signed-uat-live.json','utf8'));
+          p.directionLiveLegalAcceptance={advisorPayables:advisor.directionLiveLegalAcceptance,proposalApplication:proposal.directionLiveLegalAcceptance};
           p.sourceIntake=require('./tools/gravicentra-i6-6-proposal-uat-diagnostics.cjs').safeSourceIntakeEvidence(proposal.sourceIntake);
           p.runId=Number(process.env.GITHUB_RUN_ID);p.headSha=process.env.GITHUB_SHA;
           g.validateLiveProof(candidate,p);

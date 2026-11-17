@@ -4,7 +4,7 @@
 const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),crypto=require('node:crypto');
 const {digest,applicationIdFor}=require('../functions/proposal-application-boundary');
 const sourceIntake=require('../functions/cobros-source-intake-v2');
-const {acceptDirectionPreviewLegal}=require('./gravicentra-i6-6-direction-preview-legal-acceptance.cjs');
+const {acceptDirectionPreviewLegal,assertDirectionLiveLegalAuthority,acceptDirectionLiveLegal}=require('./gravicentra-i6-6-direction-preview-legal-acceptance.cjs');
 const {REASONS,CALLABLE_CODES,UI_CAUSAL_FIELDS,safeCode,safeStage,projectCallableResult,safeCallableDiagnostic,ownedUiRequest,projectUiResponse,projectUiObservationFailure,observeUiApplication,validateUiApplicationEvidence,safeUiApplicationEvidence,failureDetails,safePrerequisites,diagnoseProposalPrerequisites,safeSourceIntakeEvidence,recordSourceIntakePageError}=require('./gravicentra-i6-6-proposal-uat-diagnostics.cjs');
 const TENANT='alianzas-soluciones',PROJECT='ays-orbit-360-lab';
 const norm=v=>String(v??'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]/g,'');
@@ -47,6 +47,7 @@ function intakeUiRequest(request,fixture,cfg){
 }
 async function main(){
  const cfg=validateEnvironment(process.env);
+ if(cfg.phase==='LIVE')assertDirectionLiveLegalAuthority({sourceSha:cfg.sourceSha});
  const reportPath=path.join(cfg.packageRoot,'evidence','i66-proposal-application-signed-uat-'+cfg.phase.toLowerCase()+'.json');
  const report={sourceSha:cfg.sourceSha,phase:cfg.phase,status:'HOLD',syntheticOnly:true,realControlUnchanged:false,checks:[],cleanup:{status:'HOLD',remaining:null},proposalDiagnostics:{prerequisites:null,calls:[]}};
  const uiCausalEvidence=Object.fromEntries(UI_CAUSAL_FIELDS.map(key=>[key,false]));let uiApplicationObserver=null,intakeDiagnosticsStop=null;
@@ -160,6 +161,10 @@ async function main(){
     enter('DIRECTION_LEGAL_ACCEPTANCE');
     report.directionLegalAcceptance=await acceptDirectionPreviewLegal({page:direction,actor:actors[0],cfg:{...cfg,source:cfg.sourceSha}});
     checked('EXPLICIT_DIRECTION_PREVIEW_LEGAL_DECISION_APPLIED_BY_NORMAL_UI');
+  }else{
+    enter('DIRECTION_LEGAL_ACCEPTANCE');
+    report.directionLiveLegalAcceptance=await acceptDirectionLiveLegal({page:direction,actor:actors[0],cfg:{...cfg,source:cfg.sourceSha}});
+    checked('EXPLICIT_DIRECTION_LIVE_LEGAL_DECISION_APPLIED_BY_NORMAL_UI');
   }
   enter('SYNTHETIC_STAGE_SETUP');
   const source={sourceRowId:prefix+'_source_row',sourceRowIdSha256:hash(prefix+'_source_row'),policyNumber:'QA-I66-'+nonce,currency:'GTQ',amount:173.23,reportedDate:'2026-11-15'};

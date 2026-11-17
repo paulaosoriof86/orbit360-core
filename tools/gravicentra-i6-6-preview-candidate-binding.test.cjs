@@ -197,6 +197,58 @@ test('matrix legacy fallback is available only outside operational mode',()=>{
   assert.throws(()=>g.signedMatrixBinding({I66_SIGNED_MATRIX_ORIGIN:fixture().operationalReleaseCandidate.previewUrl},null));
   assert.throws(()=>g.signedMatrixBinding({I66_OPERATIONAL_CANDIDATE:'true'},{}));
 });
+test('LIVE authorization rechecks the exact Preview before production and then reads exact LIVE',()=>{
+  const c=fixture('live'),p=c.operationalReleaseCandidate,env=g.envFor(p),before=copy(c);
+  const preview=g.signedMatrixBinding(env,c);
+  assert.equal(preview.phase,'preview');assert.equal(preview.origin,p.previewUrl);
+  assert.equal(preview.preview,p.previewUrl);assert.equal(preview.candidate,p);
+  const live=g.signedMatrixBinding({...env,I66_SIGNED_MATRIX_ORIGIN:g.LIVE},c);
+  assert.equal(live.phase,'live');assert.equal(live.origin,g.LIVE);
+  assert.equal(live.preview,p.previewUrl);assert.equal(live.candidate,p);
+  assert.deepEqual(c,before,'read-only binding must not change deployment authorization');
+});
+test('Preview authorization cannot read LIVE even with well-formed Preview proof metadata',()=>{
+  const c=fixture(),p=c.operationalReleaseCandidate;
+  p.previewQa=copy(fixture('live').operationalReleaseCandidate.previewQa);
+  assert.throws(()=>g.signedMatrixBinding({...g.envFor(p),I66_SIGNED_MATRIX_ORIGIN:g.LIVE},c));
+});
+const liveRecheckAuthorityMutations=[
+  ['closed control',c=>c.status='R11_RENEWAL_DRIVE_EXACT_LIVE_ACCEPTED_LOCKED'],
+  ['build phase',c=>c.status='PREVIEW_BUILD_REQUESTED'],
+  ['unapproved candidate',c=>c.operationalReleaseCandidate.approvedByDirection=false],
+  ['LIVE deployment forbidden',c=>c.forbidBackendLiveFunctionDeploy=true],
+  ['backend deployment forbidden',c=>c.forbidBackendFunctionDeploy=true],
+  ['LIVE authorization absent',c=>c.livePromotionAuthorized=false],
+  ['Preview approval absent',c=>c.previewApproved=false],
+  ['Preview-only backend scope',c=>c.backendFunctionPreviewOnly=true],
+  ['Hosting promotion forbidden',c=>c.noHostingPromotion=true],
+  ['Firestore or Auth writes unlocked',c=>c.forbidFirestoreRulesDataAuthWrites=false]
+];
+for(const [label,mutate] of liveRecheckAuthorityMutations)test('LIVE Preview recheck preserves full authorization checks: '+label,()=>{
+  const c=fixture('live'),env=g.envFor(c.operationalReleaseCandidate);mutate(c);
+  assert.throws(()=>g.signedMatrixBinding(env,c));
+});
+const liveRecheckProofMutations=[
+  ['missing proof',p=>delete p.previewQa],
+  ['unaccepted proof',p=>p.previewQa.status='HOLD'],
+  ['missing run',p=>delete p.previewQa.runId],
+  ['invalid head',p=>p.previewQa.headSha='latest'],
+  ['invalid artifact',p=>p.previewQa.receiptArtifactId=0],
+  ['invalid artifact digest',p=>p.previewQa.receiptArtifactDigest='PASS']
+];
+for(const [label,mutate] of liveRecheckProofMutations)test('LIVE Preview recheck cannot bypass signed proof: '+label,()=>{
+  const c=fixture('live'),env=g.envFor(c.operationalReleaseCandidate);mutate(c.operationalReleaseCandidate);
+  assert.throws(()=>g.signedMatrixBinding(env,c));
+});
+test('LIVE authorized Preview recheck rejects every stale origin and source environment pin',()=>{
+  const c=fixture('live'),env=g.envFor(c.operationalReleaseCandidate);
+  for(const mutate of [e=>e.I66_SIGNED_MATRIX_ORIGIN=g.PREVIEW,e=>delete e.I66_SIGNED_MATRIX_ORIGIN,
+    e=>e.I66_SIGNED_MATRIX_ORIGIN+='/',e=>e.I66_SIGNED_MATRIX_ORIGIN='https://other.invalid',
+    e=>e.I66_SOURCE_SHA='1'.repeat(40),e=>e.I66_PREVIEW_ORIGIN=g.PREVIEW,
+    e=>e.I66_SIGNED_QA_CHANNEL_ID=g.CHANNEL]){
+    const bad={...env};mutate(bad);assert.throws(()=>g.signedMatrixBinding(bad,c));
+  }
+});
 test('signed proof cannot substitute channel build run buildId or digest',()=>{
   const p=fixture('live').operationalReleaseCandidate;
   for(const mutate of [x=>x.previewChannelId=g.CHANNEL,x=>x.previewUrl=g.PREVIEW,x=>x.buildRunId++,

@@ -50,6 +50,8 @@ const PINNED_OWNER_PATHS = Object.freeze([
   ...DRIVERS,'tools/gravicentra-i6-6-carlos-paula-live-synthetic-ops-leads-uat.cjs',
   'tools/gravicentra-i6-6-direction-preview-legal-acceptance.cjs',
   'tools/gravicentra-i6-6-direction-preview-i66-consent-scope.test.cjs',
+  'tools/gravicentra-i6-6-direction-live-legal-acceptance.test.cjs',
+  'artifacts/orbit360-recovery/release-control/I6_6_DIRECTION_LIVE_V2_SCOPE_PROPOSAL_20261117.json',
   'artifacts/orbit360-recovery/release-control/I6_6_DIRECTION_PREVIEW_V2_SCOPE_AUTHORIZATION_20261116.json',
   'tools/gravicentra-i6-6-preview-channel-reuse-guard.cjs',
   'tools/gravicentra-i6-6-technical-preview-rollover.test.cjs',
@@ -152,7 +154,14 @@ function validateBuildMarker(p,marker,packageMarker) {
 function signedMatrixBinding(env,control) {
   if(env.I66_OPERATIONAL_CANDIDATE==='true'){
     const origin=String(env.I66_SIGNED_MATRIX_ORIGIN||'');
-    const phase=origin===LIVE?'live':'preview',p=candidateForPhase(control,phase);
+    // The LIVE workflow rechecks its approved Preview before touching LIVE.
+    // Validate the complete canonical authorization independently of which of
+    // those two exact origins this read-only invocation observes.
+    const authorizationPhase=control?.status==='OPERATIONAL_EXACT_LIVE_PROMOTION_AUTHORIZED'?'live':
+      control?.status==='OPERATIONAL_BACKEND_PREVIEW_AUTHORIZED'?'preview':null;
+    assert.ok(authorizationPhase,'I66_SIGNED_MATRIX_CONTROL_PHASE_UNAUTHORIZED');
+    const p=candidateForPhase(control,authorizationPhase),phase=origin===LIVE?'live':'preview';
+    if(phase==='live')assert.equal(authorizationPhase,'live','I66_SIGNED_MATRIX_LIVE_ORIGIN_NOT_AUTHORIZED');
     assert.equal(origin,phase==='live'?LIVE:p.previewUrl,'I66_SIGNED_MATRIX_CANDIDATE_ORIGIN_DRIFT');
     assert.equal(env.I66_SOURCE_SHA,p.sourceSha,'I66_SIGNED_MATRIX_CANDIDATE_SOURCE_DRIFT');
     assert.equal(env.I66_PREVIEW_ORIGIN,p.previewUrl,'I66_SIGNED_MATRIX_PREVIEW_ENV_DRIFT');
@@ -315,6 +324,11 @@ function validateFocusedReports(p,phase,advisor,proposal){
   for(const field of ['realCustomerWritesRequested','bankMovements','financialPayments','authOrMembershipMutations'])assert.equal(advisor[field],0);
   assert.equal(proposal.syntheticOnly,true);assert.equal(proposal.realControlUnchanged,true);
   signedObservabilityReports(p,advisor,proposal);
+  if(phase==='LIVE'){
+    const {validateLiveAcceptanceProof}=require('./gravicentra-i6-6-direction-preview-legal-acceptance.cjs');
+    for(const report of [advisor,proposal])validateLiveAcceptanceProof(report.directionLiveLegalAcceptance,p);
+    for(const key of ['actorUidSha256','scopeSha256','receiptSha256'])assert.equal(advisor.directionLiveLegalAcceptance[key],proposal.directionLiveLegalAcceptance[key],'I66_OPERATIONAL_LIVE_LEGAL_SIGNED_ACTOR_SCOPE_DRIFT');
+  }
   if(phase==='PREVIEW'&&p.legalAcceptance){
     const {validateAcceptanceProof}=require('./gravicentra-i6-6-direction-preview-legal-acceptance.cjs');
     for(const report of [advisor,proposal])validateAcceptanceProof(report.directionLegalAcceptance,p);
@@ -421,6 +435,10 @@ function validateLiveProof(p,proof){
   for(const key of ['syntheticOnly','sourceFileHashVerified','sourceMetadataDigestVerified','normalUiRequest','normalUiResponseConfirmed','readbackAfterReload','signedActorPreserved','realLedgerPointerUnchanged','countsExact','qaAuthorityExact','normalUiIdempotentReplay'])assert.equal(intake[key],true,'I66_OPERATIONAL_LIVE_INTAKE_'+key);
   for(const key of ['financialWrites','holds','replayIntakeWrites','consoleErrors','pageErrors','httpErrors'])assert.equal(intake[key],0,'I66_OPERATIONAL_LIVE_INTAKE_'+key);
   assert.equal(intake.sourceRows,1);assert.equal(intake.proposals,1);
+  const legal=proof.directionLiveLegalAcceptance||{},owner=require('./gravicentra-i6-6-direction-preview-legal-acceptance.cjs');
+  assert.deepEqual(Object.keys(legal).sort(),['advisorPayables','proposalApplication'],'I66_OPERATIONAL_LIVE_LEGAL_PROOFS_REQUIRED');
+  for(const entry of Object.values(legal))owner.validateLiveAcceptanceProof(entry,p);
+  for(const key of ['actorUidSha256','scopeSha256','receiptSha256'])assert.equal(legal.advisorPayables[key],legal.proposalApplication[key],'I66_OPERATIONAL_LIVE_LEGAL_PROOFS_DIFFER');
   return proof;
 }
 function acceptedForPreflight(control,state,transport,latest,io=fs){
@@ -441,7 +459,9 @@ function acceptedForPreflight(control,state,transport,latest,io=fs){
   assert.deepEqual(transport.previousExactHostingReleaseR11,previous,'I66_OPERATIONAL_ACCEPTANCE_PREVIOUS_TRANSPORT');
   assert.equal(control.i66R11RenewalDriveExactLiveRelease20261113?.status,'PREVIOUS_R11_RENEWAL_DRIVE_EXACT_LIVE_PRESERVED');
   for(const [key,value] of Object.entries({sourceSha:r11.sourceSha,artifactId:r11.immutableArtifactId,artifactDigest:r11.immutableArtifactDigest,hostingVersion:r11.hostingVersion,receipt:R11_RECEIPT}))assert.equal(control.i66R11RenewalDriveExactLiveRelease20261113[key],value,'I66_OPERATIONAL_ACCEPTANCE_R11_SUMMARY_'+key);
-  candidateForPhase({gate:'I6.6',historicalClosedGate:'B4-007',status:'OPERATIONAL_EXACT_LIVE_PROMOTION_AUTHORIZED',forbidBackendFunctionDeploy:false,forbidFirestoreRulesDataAuthWrites:true,backendFunctionPreviewOnly:false,forbidBackendLiveFunctionDeploy:false,livePromotionAuthorized:true,previewApproved:true,noHostingPromotion:false,currentExactHostingRelease:previous,operationalReleaseCandidate:p},'live');
+  const liveControl={gate:'I6.6',historicalClosedGate:'B4-007',status:'OPERATIONAL_EXACT_LIVE_PROMOTION_AUTHORIZED',forbidBackendFunctionDeploy:false,forbidFirestoreRulesDataAuthWrites:true,backendFunctionPreviewOnly:false,forbidBackendLiveFunctionDeploy:false,livePromotionAuthorized:true,previewApproved:true,noHostingPromotion:false,currentExactHostingRelease:previous,operationalReleaseCandidate:p};
+  candidateForPhase(liveControl,'live');
+  require('./gravicentra-i6-6-direction-preview-legal-acceptance.cjs').readLiveScopeAuthorization(liveControl,p,io);
   validateArtifact(p,receipt.buildRun,receipt.buildArtifact);validatePreviewQa(p,receipt.previewRun,receipt.previewArtifact);
   validateProof(p,receipt.signedPreviewProof);validateLiveProof(p,proof);
   assert.equal(receipt.signedPreviewProof.runId,p.previewQa.runId);assert.equal(receipt.signedPreviewProof.headSha,p.previewQa.headSha);

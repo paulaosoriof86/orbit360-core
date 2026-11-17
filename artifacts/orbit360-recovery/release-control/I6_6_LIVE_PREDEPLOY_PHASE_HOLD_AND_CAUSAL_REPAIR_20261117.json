@@ -1,0 +1,165 @@
+{
+  "schema": "GI_I66_EXACT_LIVE_PREDEPLOY_AUTHORIZATION_PHASE_HOLD_V1",
+  "recordedAtUtc": "2026-11-17T19:50:58Z",
+  "gate": "I6.6",
+  "status": "SIGNED_PREVIEW_PASS_LIVE_PREDEPLOY_VALIDATOR_HOLD_NEW_QA_SOURCE_BUILD_REQUIRED",
+  "sourceSha": "59c37ac9a2142c24ccb5a95f3d6df82eb62dfd94",
+  "buildRunId": 44158877469,
+  "artifactId": 14360954951,
+  "artifactDigest": "sha256:0a58c3e7398d5e44a50ca6a290a980111df17b03375ee19ee8d19c5b68067c17",
+  "acceptedPreviewRunId": 44160169601,
+  "previewReceipt": "artifacts/orbit360-recovery/release-control/I6_6_SOURCE_INTAKE_RELOAD_SIGNED_PREVIEW_PASS_20261117.json",
+  "liveAttempt": {
+    "runId": 44161850833,
+    "jobId": 134317651935,
+    "headSha": "fb693a8d836ce1b4b6d30672b31f25df268b1d7d",
+    "status": "completed",
+    "conclusion": "failure",
+    "failedStep": 11,
+    "failedStepName": "Test signed existing Carlos and Direction Preview eight-module permissions before touching LIVE",
+    "rollbackSnapshotStep": 12,
+    "rollbackSnapshotConclusion": "skipped",
+    "deployStep": 13,
+    "deployConclusion": "skipped",
+    "guardRunId": 44161850815,
+    "guardConclusion": "success"
+  },
+  "cause": {
+    "classification": "PIPELINE/VALIDATOR",
+    "proven": true,
+    "code": "ERR_ASSERTION",
+    "actual": "OPERATIONAL_EXACT_LIVE_PROMOTION_AUTHORIZED",
+    "expected": "OPERATIONAL_BACKEND_PREVIEW_AUTHORIZED",
+    "owner": "tools/gravicentra-i6-6-operational-release-candidate.cjs",
+    "function": "signedMatrixBinding",
+    "failureLine": 155,
+    "mechanism": "The readonly Preview observation immediately before production derived authorization phase from the observed origin. Its control was correctly in LIVE authorization, so it rejected before any LIVE deployment."
+  },
+  "repair": {
+    "scope": "Separate authorized transport phase from exact observed origin; validate full LIVE authorization and its exact accepted Preview receipt before permitting predeployment readonly Preview observation. Preview authorization never permits a LIVE origin.",
+    "doNotRelaxCandidatePins": true,
+    "doNotChangeProductOrBackendSource": true,
+    "newQaSourceRequiresNewImmutableBuild": true,
+    "doNotPatchCertifiedArtifact": true,
+    "localTests": {
+      "passed": 153,
+      "failed": 0,
+      "skipped": 0,
+      "logSha256": "d630f8b05896b93b179081bda2d42e993a5251e9b9f0327919e23e08a3ebd7b6"
+    },
+    "redReproduction": "SAME_ERR_ASSERTION_FOR_REAL_FB693_CONTROL_AND_ENVFOR",
+    "fixedExactInput": "PREVIEW_READ_THEN_LIVE_READ_PASS_WITH_UNCHANGED_FULL_AUTHORIZATION",
+    "phaseFixOnlyIntermediateHelperBlobSha": "52d49a247072d983a4159e509ef1b3627d5b10e7",
+    "phaseFixOnlyIntermediateTestBlobSha": "7bdfc80ee9a10aded4f3ac123c4c2ecfbb475903",
+    "notFinalCombinedSourceIdentity": true,
+    "finalCombinedSourceQa": {
+      "status": "PREPARATORY_SOURCE_QA_PASS_LIVE_CONSENT_NOT_AUTHORIZED",
+      "tests": {
+        "total": 522,
+        "pass": 522,
+        "fail": 0,
+        "skipped": 0,
+        "logSha256": "40a75c4601c32deef81d027516af31e3181953a5038ef0f2387d40b1421a7fe8"
+      },
+      "workflowSyntax": {
+        "yaml": "PASS",
+        "bashRunBlocks": 32
+      },
+      "authorizationFileExists": false,
+      "proposalStatus": "PROPOSED_NOT_AUTHORIZED",
+      "owners": [
+        {
+          "path": ".github/workflows/gravicentra-release-delta-66-package.yml",
+          "blobSha": "b9a49862f11d61aad2596f9dfaa12371b2d188a8",
+          "sha256": "af2d76f164faf2672bc9c93893aa223fcbf2536ccfdc81dc0742ab0c3f899ed4"
+        },
+        {
+          "path": ".github/workflows/gravicentra-i66-privileged-role-three-function-preview-uat.yml",
+          "blobSha": "1c82b9630fec6995fc4d3b7335fd06b18b25267c",
+          "sha256": "70985dd2965d2c7a8d5c9ab9bb1c8c437a2301f262ada54f8c2c50626684d497"
+        },
+        {
+          "path": ".github/workflows/gravicentra-i66-privileged-role-exact-live-promotion.yml",
+          "blobSha": "9ea6b320449ad1086c7799cc70389676cb0a315c",
+          "sha256": "c9ded3f29ee54f6022a169dba81c5bf6a8a8657a9d97c1e033bab755b7452dc1"
+        },
+        {
+          "path": "tools/gravicentra-i6-6-operational-release-candidate.cjs",
+          "blobSha": "29ffdd678863830c529e594ad7a0f633bea113ad",
+          "sha256": "3f1542176a08f9ad136b84c82df42037fbf37564ed17697b63632144c6c81d8a"
+        },
+        {
+          "path": "tools/gravicentra-i6-6-preview-candidate-binding.test.cjs",
+          "blobSha": "7bdfc80ee9a10aded4f3ac123c4c2ecfbb475903",
+          "sha256": "d25eb475c07137fd6985f47d609b803fae03de5e74f68acd54d8909034c6c2bb"
+        },
+        {
+          "path": "tools/gravicentra-i6-6-direction-preview-legal-acceptance.cjs",
+          "blobSha": "2bf72915a7c2445c85b247ebf2ee416dbab3b5d0",
+          "sha256": "edd977fd9e7dd84b102f0f0bba7b7a87e80126e0c28f7e28dc078f4b875a767e"
+        },
+        {
+          "path": "tools/gravicentra-i6-6-direction-live-legal-acceptance.test.cjs",
+          "blobSha": "240a0924d1164971ed4d5aa088c239b4d93a6d71",
+          "sha256": "2b01538b8d18ab4c78e7f7b985f89a3f2ac517a58675f6e674935ffbe55e4487"
+        },
+        {
+          "path": "tools/gravicentra-i6-6-operational-live-acceptance.test.cjs",
+          "blobSha": "38ffd0f0f71ee299af54ed8a535e1dc9659c2da8",
+          "sha256": "3260d5a1e7ac8e8c3d612ce8f872b751194a6a5b9c3168f5505fa53bfb524b1a"
+        },
+        {
+          "path": "tools/gravicentra-i6-6-advisor-payables-signed-uat.cjs",
+          "blobSha": "89db7fc603b0113728404e9ee92ccbb11ce85cc6",
+          "sha256": "e10ba5af2731dc2e99f81dab3ce1e2352d19f43c45d25d46c6bb8287c8bd4493"
+        },
+        {
+          "path": "tools/gravicentra-i6-6-proposal-application-signed-uat.cjs",
+          "blobSha": "e58c0c275346b2caf95c5f267df1a1185f2756de",
+          "sha256": "a45b6196f4ef6e0a234747d1837e416411ac3e155f55a85fb905494bc586ce36"
+        },
+        {
+          "path": "artifacts/orbit360-recovery/release-control/I6_6_DIRECTION_LIVE_V2_SCOPE_PROPOSAL_20261117.json",
+          "blobSha": "c131fb241fdbf712b30d50eb99746294216844e7",
+          "sha256": "e9e1b369d166242cfff2145b08fd36ca8ad3288b302ce6980e00a36e3165e04a"
+        }
+      ]
+    },
+    "currentDisposition": "PHASE_FIX_AND_INACTIVE_LIVE_LEGAL_SUPPORT_522_LOCAL_TESTS_PASS_NEW_IMMUTABLE_PREVIEW_REQUIRED"
+  },
+  "postFailureLiveReadback": {
+    "origins": [
+      "https://app.aysseguros.com",
+      "https://ays-orbit-360-lab.web.app"
+    ],
+    "httpStatusEach": 200,
+    "sourceSha": "84769378eb2014addebfefdbdd63091bddc4b817",
+    "buildId": "gi-i66-84769378eb20-57f234755dc1",
+    "markerSha256Each": "22a6f4698c81eb07fc392bceac345a4299ba502f65b689236dcf55f4f87e1355"
+  },
+  "liveDeploymentAttempted": false,
+  "liveBackendDeployments": 0,
+  "realFinancialWrites": 0,
+  "newLiveAcceptance": false,
+  "fullI66ProductionAccepted": false,
+  "newFormalPercentagePoints": 0,
+  "priorPreviewPassPreserved": true,
+  "additionalPredeploymentReadinessCondition": {
+    "status": "PROPOSED_NOT_AUTHORIZED",
+    "proposalPath": "artifacts/orbit360-recovery/release-control/I6_6_DIRECTION_LIVE_V2_SCOPE_PROPOSAL_20261117.json",
+    "reviewDocumentSha256": "f8fd153e864892c8c4720003f1b72d4ade64fc3c866266c3719729c5a0369d4f",
+    "reviewLibraryFileId": "libfile_650fc78f92448191a82bddfd92c0ec60",
+    "termsProjectionSha256": "485b07887091063cc7a5d1dc8f11a9bb547f2ef059490bb04d4acee73404f6b2",
+    "origin": "https://app.aysseguros.com",
+    "phase": "LIVE",
+    "gate": "I6.6",
+    "actorRole": "direccion",
+    "tenantId": "alianzas-soluciones",
+    "country": "GT",
+    "newLegalConsentGranted": false,
+    "authorizedReceiptExists": false,
+    "conditionBasis": "SOURCE_PATH_PROVEN_NOT_AN_OBSERVED_LIVE_RUNTIME_FAILURE",
+    "actualLiveFailure44161850833RemainsAuthorizationPhaseMismatch": true,
+    "existingPreviewAuthorizationUnchanged": true
+  }
+}
