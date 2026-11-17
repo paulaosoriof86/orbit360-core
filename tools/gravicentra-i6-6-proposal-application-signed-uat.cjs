@@ -5,7 +5,7 @@ const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('n
 const {digest,applicationIdFor}=require('../functions/proposal-application-boundary');
 const sourceIntake=require('../functions/cobros-source-intake-v2');
 const {acceptDirectionPreviewLegal}=require('./gravicentra-i6-6-direction-preview-legal-acceptance.cjs');
-const {REASONS,CALLABLE_CODES,UI_CAUSAL_FIELDS,safeCode,safeStage,projectCallableResult,safeCallableDiagnostic,ownedUiRequest,projectUiResponse,projectUiObservationFailure,observeUiApplication,validateUiApplicationEvidence,safeUiApplicationEvidence,failureDetails,safePrerequisites,diagnoseProposalPrerequisites,safeSourceIntakeEvidence}=require('./gravicentra-i6-6-proposal-uat-diagnostics.cjs');
+const {REASONS,CALLABLE_CODES,UI_CAUSAL_FIELDS,safeCode,safeStage,projectCallableResult,safeCallableDiagnostic,ownedUiRequest,projectUiResponse,projectUiObservationFailure,observeUiApplication,validateUiApplicationEvidence,safeUiApplicationEvidence,failureDetails,safePrerequisites,diagnoseProposalPrerequisites,safeSourceIntakeEvidence,recordSourceIntakePageError}=require('./gravicentra-i6-6-proposal-uat-diagnostics.cjs');
 const TENANT='alianzas-soluciones',PROJECT='ays-orbit-360-lab';
 const norm=v=>String(v??'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]/g,'');
 const hash=v=>crypto.createHash('sha256').update(v).digest('hex');
@@ -304,7 +304,7 @@ async function main(){
   // mapping/review, source-only command and durable readback. The exact permit
   // is seeded here, never by the UI, and never under the real ledger pointer.
   enter('SOURCE_INTAKE_PREPARE');report.sourceIntake={status:'HOLD',syntheticOnly:true,stage:'SOURCE_INTAKE_PREPARE',consoleErrors:0,pageErrors:0,httpErrors:0};
-  const intakeConsole=message=>{if(message.type()==='error')report.sourceIntake.consoleErrors++;},intakePageError=()=>{report.sourceIntake.pageErrors++;};
+  const intakeConsole=message=>{if(message.type()==='error')report.sourceIntake.consoleErrors++;},intakePageError=error=>{recordSourceIntakePageError(report.sourceIntake,error,stage);};
   const intakeHttp=response=>{if(response.status()>=400&&(response.url().startsWith(cfg.origin+'/')||response.url().startsWith('https://us-central1-'+PROJECT+'.cloudfunctions.net/')))report.sourceIntake.httpErrors++;};
   direction.on('console',intakeConsole);direction.on('pageerror',intakePageError);direction.on('response',intakeHttp);
   intakeDiagnosticsStop=()=>{direction.off('console',intakeConsole);direction.off('pageerror',intakePageError);direction.off('response',intakeHttp);};
@@ -323,7 +323,7 @@ async function main(){
   const openSourceUi=async()=>{
   enter('SOURCE_INTAKE_UI_OPEN');report.sourceIntake.stage='SOURCE_INTAKE_UI_OPEN';
   await direction.goto(cfg.origin+'/#/importar',{waitUntil:'commit',timeout:30000});
-  await direction.waitForFunction(()=>!!Orbit.modules?.importar&&!!Orbit.importa,null,{timeout:30000});
+  await direction.waitForFunction(()=>!!window.Orbit?.modules?.importar&&!!window.Orbit?.importa,null,{timeout:30000});
   await direction.waitForFunction(()=>!!document.querySelector('[data-k="estados-cuenta"]'),null,{timeout:30000});
   await direction.locator('[data-k="estados-cuenta"]').click();
   await direction.locator('#imp-file').setInputFiles({name:fixture.payload.source.fileName,mimeType:'text/csv',buffer:fixture.bytes});
@@ -347,7 +347,7 @@ async function main(){
   checked('SOURCE_INTAKE_NORMAL_UI_EXACT_BYTES_DURABLE_RESPONSE');
   enter('SOURCE_INTAKE_RELOAD_READBACK');report.sourceIntake.stage='SOURCE_INTAKE_RELOAD_READBACK';
   await direction.locator('[data-intake-conciliaciones]').click();await direction.reload({waitUntil:'commit',timeout:30000});
-  await direction.waitForFunction(()=>!!Orbit.productAppP0&&!!Orbit.productRuntimeBrowserProvidersP0,null,{timeout:30000});
+  await direction.waitForFunction(()=>!!window.Orbit?.productAppP0&&!!window.Orbit?.productRuntimeBrowserProvidersP0,null,{timeout:30000});
   const intakeActor=await direction.evaluate(async()=>{const p=Orbit.productRuntimeBrowserProvidersP0;await p.initialize();const user=await p.waitForUser();await Orbit.productAppP0.activate();return{uid:user?.uid,role:Orbit.session?.rol?.()};});
   assert.ok(intakeActor.uid===actors[0].uid&&norm(intakeActor.role)==='direccion','I66_INTAKE_RELOAD_ACTOR');
   const manifest=await snapshot(intakeRun),pointer=await snapshot(intakeControl),requestRecord=await snapshot(intakeRun.collection('intakeRequests').doc(requestKey));

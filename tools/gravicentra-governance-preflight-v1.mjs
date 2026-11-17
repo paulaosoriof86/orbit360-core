@@ -49,7 +49,8 @@ if(i66Active){
   const r10Current=r10Release?.status==='CURRENT_R10_CONCILIACIONES_HUMAN_NAMES_EXACT_LIVE_PASS_FULL_I66_HOLD';
   const r11Release=control.i66R11RenewalDriveExactLiveRelease20261113;
   const r11Current=r11Release?.status==='CURRENT_R11_RENEWAL_DRIVE_EXACT_LIVE_SIGNED_PASS_FULL_I66_HOLD';
-  const pointer=(r11Current||r10Current||r9Current||roleCurrent||stageCurrent)
+  const operationalCurrent=control[operationalRelease.ACCEPTANCE_KEY]!==undefined;
+  const pointer=(operationalCurrent||r11Current||r10Current||r9Current||roleCurrent||stageCurrent)
     ?'artifacts/orbit360-recovery/release-control/I6_6_LATEST_EXACT_LIVE_POINTER_20261113.json'
     :'artifacts/orbit360-recovery/release-control/I6_6_LATEST_EXACT_LIVE_POINTER_20261112.json';
   const latest=fs.existsSync(pointer)?JSON.parse(fs.readFileSync(pointer,'utf8')):
@@ -65,7 +66,10 @@ if(i66Active){
     transport.i66ConciliacionesHumanNameReaderPreviewAuthorization20261113?.dataWritesPermitted===false&&
     transport.noHostingPromotion===true&&transport.forbidFirestoreRulesDataAuthWrites===true;
   const guard='I6_6_EXACT_LIVE_RELEASE_POINTER_OR_READER_AUTHORIZATION_DRIFT';
-  if(r11Current){
+  if(operationalCurrent){
+    const state=JSON.parse(fs.readFileSync('orbit360-platform/docs/recovery/orbit360-recovery-state-v1.json','utf8'));
+    operationalRelease.acceptedForPreflight(control,state,transport,latest,fs);
+  }else if(r11Current){
     const r10=JSON.parse(fs.readFileSync('artifacts/orbit360-recovery/release-control/I6_6_CONCILIACIONES_HUMAN_NAMES_R10_LIVE_RECEIPT_20261113.json','utf8'));
     const r11=JSON.parse(fs.readFileSync('artifacts/orbit360-recovery/release-control/I6_6_R11_RENEWAL_DRIVE_EXACT_LIVE_RECEIPT_20261113.json','utf8'));
     const state=JSON.parse(fs.readFileSync('orbit360-platform/docs/recovery/orbit360-recovery-state-v1.json','utf8'));

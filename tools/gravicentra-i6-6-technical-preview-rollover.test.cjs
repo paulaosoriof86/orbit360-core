@@ -15,6 +15,9 @@ const receiptText = fs.readFileSync(path.join(__dirname, '..', pin.receiptPath),
 const receipt = JSON.parse(receiptText);
 // Name every immutable historical receipt explicitly. A new successor must not
 // rebind old ENOENT/hydration/retention tests by changing their chain depth.
+const precisionReceiptPath = 'artifacts/orbit360-recovery/release-control/I6_6_TECHNICAL_PREVIEW_SOURCE_INTAKE_PRECISION_REBUILD_20261117.json';
+const precisionReceiptText = fs.readFileSync(path.join(__dirname, '..', precisionReceiptPath), 'utf8');
+const precisionReceipt = JSON.parse(precisionReceiptText);
 const documentedReceiptPath = 'artifacts/orbit360-recovery/release-control/I6_6_TECHNICAL_PREVIEW_DOCUMENTED_SOURCE_AND_TRANSPORT_REBUILD_20261117.json';
 const documentedReceiptText = fs.readFileSync(path.join(__dirname, '..', documentedReceiptPath), 'utf8');
 const documentedReceipt = JSON.parse(documentedReceiptText);
@@ -110,20 +113,22 @@ function manifest() {
 }
 
 test('exact independently authorized technical receipt has immutable bytes, not legal authorization', () => {
-  assert.equal(pin.receiptPath, 'artifacts/orbit360-recovery/release-control/I6_6_TECHNICAL_PREVIEW_SOURCE_INTAKE_PRECISION_REBUILD_20261117.json');
-  assert.equal(digest(receiptText), '25ad1090222d97dcc86d0670088658f92e8e33cb459b4fdaaa669b66ad84d7ba');
+  assert.equal(pin.receiptPath, 'artifacts/orbit360-recovery/release-control/I6_6_TECHNICAL_PREVIEW_SOURCE_INTAKE_RELOAD_REBUILD_20261117.json');
+  assert.equal(digest(receiptText), 'ae6d48b0260af9e9db7b7ba69e799a4a17e7adf23a24f1893168079dce05bf35');
   assert.equal(pin.receiptSha256, digest(receiptText));
   assert.equal(receipt.executionAuthority.newLegalConsentGrantUsedForHosting, false);
   assert.equal(api.validateAuthorization(fixture().control, receiptText).channel.id, 'gi-i66-rc-44009981499');
 });
 test('documented source successor preserves all exact prior receipts and the historical failed build', () => {
+  assert.equal(digest(precisionReceiptText), '25ad1090222d97dcc86d0670088658f92e8e33cb459b4fdaaa669b66ad84d7ba');
   assert.equal(digest(documentedReceiptText), 'dc85b2690778aa92452663f03e3f5e5c1c3df50d37f7914aeb6fef1d83577d41');
   assert.equal(digest(hydrationReceiptText), '6db064d9494103f4cd31ecf9a34e589f66455d2a818f3c0b945839872b1c6e8a');
   assert.equal(digest(retentionReceiptText), '2ebd606814ca551e548bbc7537fc6016b7e0926d4806083957aa9fc65e70b8ab');
   assert.equal(digest(observabilityReceiptText), '215bfcc8fc5cffdf5c630a6696944791ea8859f0ffdd4cf35e8ba98e231eee41');
   assert.equal(digest(residualReceiptText), 'f0c17d2597caa8d83b281fa5b42d02016c6223035a34d894fc8e65bea687cd5d');
   for (const [successor, historicalPath, historicalText] of [
-    [receipt, documentedReceiptPath, documentedReceiptText],
+    [receipt, precisionReceiptPath, precisionReceiptText],
+    [precisionReceipt, documentedReceiptPath, documentedReceiptText],
     [documentedReceipt, hydrationReceiptPath, hydrationReceiptText],
     [hydrationReceipt, retentionReceiptPath, retentionReceiptText],
     [retentionReceipt, observabilityReceiptPath, observabilityReceiptText],
@@ -143,7 +148,7 @@ test('documented source successor preserves all exact prior receipts and the his
 test('candidate pin is a fresh exact object with the recoverable previous artifact', () => {
   const changed = guard.technicalRolloverCandidatePin(); changed.channel = 'live';
   assert.equal(guard.technicalRolloverCandidatePin().channel, 'gi-i66-rc-44009981499');
-  assert.equal(pin.previousArtifactId, 14312141615);
+  assert.equal(pin.previousArtifactId, 14314985190);
   assert.equal(api.validateCandidateReuse(fixture().candidate).receiptSha256, pin.receiptSha256);
 });
 test('historical documented source rebuild retains exact signed aa200 package and metadata source', () => {
@@ -169,27 +174,27 @@ test('historical documented source rebuild retains exact signed aa200 package an
     'sha256:1709891d5d7b609ce77bc46b8d74829db4fc94314f87c13a412de70f94f8bc7f');
   assert.deepEqual(documentedReceipt.protectedLive, hydrationReceipt.protectedLive);
 });
-test('current source intake precision rebuild pins CEF42 backup, a04 source and exact full channel inventory', () => {
-  assert.equal(receipt.sourceBaseHead, 'a04f5c04680c797e938009cca3e1f595eff1315c');
+test('current source intake reload rebuild pins 6b6 backup, e71 source and exact full channel inventory', () => {
+  assert.equal(receipt.sourceBaseHead, 'e71b3deffda0143cfef0e0ecd1153921277c3d52');
   assert.deepEqual(receipt.previousCandidate, {
-    sourceSha: 'cef42d7713aa83c73f1f0d0e35afb38a9165e433', buildRunId: 44047311664,
-    buildRunAttempt: 1, artifactId: 14312141615,
-    artifactDigest: 'sha256:5389e7d1c32db4eb02056b4d7d2b04cf10de10e539df739b8cca4fe7d7b60731',
+    sourceSha: '6b6e8bbba3371b32a1bfb80b903c40377e11d727', buildRunId: 44052221474,
+    buildRunAttempt: 1, artifactId: 14314985190,
+    artifactDigest: 'sha256:e97f86355181a8c685b8dd800626a4885f8e34b45222f178d15355d76cbf499f',
     expectedSiteFileCount: 223,
     runtimeProofRequired: 'DOWNLOAD_HASH_ARCHIVE_VALIDATE_MANIFEST_AND_COMPARE_EVERY_HOSTED_FILE_INCLUDING_BUILD_JSON_BEFORE_REPLACEMENT'
   });
-  assert.equal(receipt.channel.expectedVersion, 'sites/ays-orbit-360-lab/versions/02be9eaa1b58e335');
+  assert.equal(receipt.channel.expectedVersion, 'sites/ays-orbit-360-lab/versions/0964cef6b576a2ad');
   assert.deepEqual(receipt.freshInventoryEvidence, {
-    runId: 44047311664, runAttempt: 1, jobId: 133916268189,
+    runId: 44052221474, runAttempt: 1, jobId: 133932744471,
     totalChannels: 51, inventoryStep: 'SUCCESS', wholeJob: 'SUCCESS',
-    rolloverEvidenceArtifactId: 14311489044,
-    rolloverEvidenceArtifactDigest: 'sha256:7da370e97f2dba69a976e6a38559b38ebfed69f81d81de66a24424ef1ec59c7f',
-    afterInventorySha256: '89089a45d40da050eec991690fe88a1a20abb96c3e8ef44c33fa42e61819980a',
+    rolloverEvidenceArtifactId: 14314815423,
+    rolloverEvidenceArtifactDigest: 'sha256:e21b2db71930cd866f2d1870012a3353c09fc62790fdaa18428c52e526fe63b5',
+    afterInventorySha256: '43f892b0006b0a0d606bacf08b89b931ede062cc7205f00729a9bb742a69a2e5',
     comparison: 'FULL_OTHER_FIFTY_CHANNEL_METADATA_EXACT_BEFORE_AFTER',
     otherChannelsIdenticalFullMetadata: 50, writes: 0, freshRuntimeInventoryRequiredAgain: true
   });
 });
-test('current source intake precision rebuild preserves exact LIVE847 without authorizing LIVE changes', () => {
+test('current source intake reload rebuild preserves exact LIVE847 without authorizing LIVE changes', () => {
   assert.deepEqual(receipt.protectedLive, {
     sourceSha: '84769378eb2014addebfefdbdd63091bddc4b817', buildRunId: 43503721126,
     artifactId: 14075022275,
@@ -197,7 +202,7 @@ test('current source intake precision rebuild preserves exact LIVE847 without au
     liveRunId: 43506971214, version: 'sites/ays-orbit-360-lab/versions/0766db29b338befc',
     origins: ['https://ays-orbit-360-lab.web.app', 'https://app.aysseguros.com']
   });
-  for (const historical of [documentedReceipt, hydrationReceipt, retentionReceipt, observabilityReceipt, residualReceipt])
+  for (const historical of [precisionReceipt, documentedReceipt, hydrationReceipt, retentionReceipt, observabilityReceipt, residualReceipt])
     assert.deepEqual(receipt.protectedLive, historical.protectedLive);
   assert.equal(receipt.phase, 'PREVIEW');
   assert.equal(receipt.constraints.noLiveChanges, true);
@@ -247,6 +252,7 @@ test('failed LIVE layout never becomes acceptance or bypasses a fresh signed Pre
 });
 
 test('failed CEF42 helper remains HOLD with unknown cleanup and cannot become LIVE acceptance', () => {
+  const receipt = precisionReceipt;
   assert.equal(receipt.causalRetry.failedPreviewRunId, 44048179414);
   assert.equal(receipt.causalRetry.failedPreviewRunAttempt, 1);
   assert.equal(receipt.causalRetry.diagnosticArtifactId, 14312547286);
@@ -269,6 +275,25 @@ test('failed CEF42 helper remains HOLD with unknown cleanup and cannot become LI
   assert.equal(api.validateAuthorization(f.control, receiptText).phase, 'PREVIEW');
   f.control.livePromotionAuthorized = true;
   assert.throws(() => api.validateAuthorization(f.control, receiptText), /SCOPE_DRIFT/);
+});
+
+test('failed 6b6 source-intake reload remains HOLD with preserved cleanup and unproven historical cause', () => {
+  assert.equal(receipt.causalRetry.failedPreviewRunId, 44149681372);
+  assert.equal(receipt.causalRetry.failedPreviewJobId, 134274317530);
+  assert.equal(receipt.causalRetry.diagnosticArtifactId, 14359840043);
+  assert.equal(receipt.causalRetry.diagnosticArtifactDigest,
+    'sha256:19fb4390b1b15274372eb974ab28bb0839e99a750f20ea0618385708ef50a657');
+  assert.equal(receipt.causalRetry.observedFailureStage, 'SOURCE_INTAKE_RELOAD_READBACK');
+  assert.equal(receipt.causalRetry.historicalRootCauseProven, false);
+  assert.equal(receipt.causalRetry.observedPageErrors, 1);
+  assert.equal(receipt.causalRetry.priorSyntheticCleanup, 'PASS');
+  assert.equal(receipt.causalRetry.priorSyntheticRemaining, 0);
+  assert.equal(receipt.causalRetry.priorProposalOwnedRecordsRemoved, 26);
+  assert.equal(receipt.causalRetry.priorRealControlUnchanged, true);
+  assert.equal(receipt.causalRetry.failedRunRemainsFailed, true);
+  assert.equal(receipt.causalRetry.unexpectedErrorsRemainHold, true);
+  assert.equal(receipt.causalRetry.noReuseOfPriorPreviewPassForNewSource, true);
+  assert.equal(receipt.notAcceptance.hostingReplacementIsNotProductionAcceptance, true);
 });
 
 test('stale successful backup receipt or stale before version cannot authorize the current rollover', () => {
@@ -367,7 +392,7 @@ test('another project or site cannot be normalized into the exact target', () =>
   assert.throws(() => api.validateChannels(f.control, receiptText, f.inventory), /CHANNEL_RESOURCE_SCOPE_DENIED/);
 });
 test('current backup must be its exact successful whole build and unexpired artifact', () => {
-  const f = acceptedBackupFixture(); assert.equal(api.validateArtifact(f.run, f.artifact, f.expected).artifactId, 14312141615);
+  const f = acceptedBackupFixture(); assert.equal(api.validateArtifact(f.run, f.artifact, f.expected).artifactId, 14314985190);
 });
 for (const key of ['id', 'head_sha', 'head_branch', 'path', 'status', 'conclusion', 'run_attempt']) {
   test('previous artifact rejects build provenance drift ' + key, () => {

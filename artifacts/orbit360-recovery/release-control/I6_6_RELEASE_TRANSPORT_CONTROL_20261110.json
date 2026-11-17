@@ -4,10 +4,10 @@
   "productBrand": "Gravicentra Insurance",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
-  "status": "OPERATIONAL_BACKEND_PREVIEW_AUTHORIZED",
+  "status": "PREVIEW_BUILD_REQUESTED",
   "currentTechnicalPreviewRollover": {
-    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_TECHNICAL_PREVIEW_SOURCE_INTAKE_PRECISION_REBUILD_20261117.json",
-    "receiptSha256": "25ad1090222d97dcc86d0670088658f92e8e33cb459b4fdaaa669b66ad84d7ba"
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_TECHNICAL_PREVIEW_SOURCE_INTAKE_RELOAD_REBUILD_20261117.json",
+    "receiptSha256": "ae6d48b0260af9e9db7b7ba69e799a4a17e7adf23a24f1893168079dce05bf35"
   },
   "directionSameTermsPreviewScope": {
     "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_DIRECTION_PREVIEW_V2_SCOPE_AUTHORIZATION_20261116.json",
@@ -408,8 +408,8 @@
     "priorR7HostingRollback": "sites/ays-orbit-360-lab/versions/9cedc5ecda75bb2a",
     "fullI66FinancialProductionAcceptance": false
   },
-  "currentReleaseStatus": "R11_RETAINED_SOURCE_INTAKE_AND_EXACT_CENTS_SIGNED_PREVIEW_PENDING",
-  "scope": "Exact 6b6e8bb immutable Preview artifact with source-intake V2, exact policy cents and retained documented-helper diagnostics. Three existing Preview functions and four existing signed synthetic-only drivers; preserve the same Direction Preview legal-v2 decision, failed cef42 evidence and last proven LIVE. This activation authorizes no LIVE promotion, real financial/customer writes, Rules/Auth/IAM change or additional targets.",
+  "currentReleaseStatus": "R11_RETAINED_FROZEN_PLAN_SOURCE_INTAKE_RELOAD_IMMUTABLE_BUILD_REQUESTED",
+  "scope": "Existing I6.6 causal QA successor: guarded source-intake navigation/reload readiness and sanitized pageerror diagnostics, existing functional checks intact. Build a new immutable package from the exact triggering commit; back up current6b6 Preview and preserve R11 LIVE. Current phase authorizes Hosting Preview only; signed Preview and exact LIVE require their existing separately recorded proof gates. No real customer/financial writes or Rules/Auth/IAM changes.",
   "historicalClosedGate": "B4-007",
   "approvedProductDeltaManifest": "artifacts/orbit360-recovery/release-control/I6_6_APPROVED_PRODUCT_DELTA_MANIFEST_20261110.json",
   "ownerAuthority": "Paula Osorio Dirección 2026-11-12: Operativo tiene escritura integral en cada módulo autorizado, con paridad funcional para roles superiores según sus permisos, país, tenant y auditoría; cada arreglo probado pasa inmediatamente a LIVE desde un artefacto exacto. Alcance R7 autorizado, Preview firmado PASS 43375403003 y LIVE exacto publicado con tres funciones y hosting 223/223 en ambas URL, actores reales Carlos y Dirección y escrituras sintéticas reversibles PASS 43375687134. Mantener el resto de UAT real por país/rol, documentación real de aseguradora, UI legal y escrituras financieras en HOLD hasta prueba específica, sin tocar Firestore Rules, Auth ni IAM. Histórico R5/R6 se conserva como linaje, no como estado actual.",
@@ -596,11 +596,11 @@
   "requiredCanonicalOrigin": "https://ays-orbit-360-lab.web.app",
   "requiredStaffOrigin": "https://app.aysseguros.com",
   "originReadbackRequirement": "BOTH_HOSTS_IDENTICAL_TO_SAME_ARTIFACT_OR_ROLLBACK",
-  "forbidBackendFunctionDeploy": false,
+  "forbidBackendFunctionDeploy": true,
   "forbidFirestoreRulesDataAuthWrites": true,
   "rollback": "FRONTEND_TOPBAR_PREVIEW_FIRST; KEEP BOTH LIVE HOSTING ORIGINS AND COBROS FUNCTION UNCHANGED UNTIL EXACT_ARTIFACT_PREVIEW_PASS; THEN BACKUP_AND_ATOMIC_EXACT_ARTIFACT_LIVE_PROMOTION_WITH_REHASH_AND_ROLLBACK",
   "sourcePreviewUrl": "https://ays-orbit-360-lab--gi-i66-rc-44009981499-d08psr2y.web.app",
-  "backendFunctionPreviewOnly": true,
+  "backendFunctionPreviewOnly": false,
   "carlosSignedTransversalQaReceipt20261112": {
     "sourceSha": "b86cad550fadc050e8574678f02f3097caa8b5bd",
     "immutableHostingPreviewRunId": 43299843267,
@@ -764,7 +764,7 @@
   "liveAccessGuard": "UNAUTHENTICATED_401_PASS",
   "hostingOriginsUntouched": true,
   "liveCustomerDataWrites": 0,
-  "releaseStatus": "R11_RETAINED_SOURCE_INTAKE_AND_EXACT_CENTS_SIGNED_PREVIEW_PENDING",
+  "releaseStatus": "R11_RETAINED_FROZEN_PLAN_SOURCE_INTAKE_RELOAD_IMMUTABLE_BUILD_REQUESTED",
   "pendingFrontendTopbarRelease": {
     "receipt": "artifacts/orbit360-recovery/release-control/I6_6_GLOBAL_TOPBAR_CROSSMODULE_HYDRATION_20261111.json",
     "currentStatus": "SOURCE_UNIT_PASS_IMMUTABLE_BUILD_REQUESTED",
@@ -3064,8 +3064,40 @@
     "sourceQaReceipt": "artifacts/orbit360-recovery/release-control/I6_6_SOURCE_INTAKE_V2_PRECISION_CAUSAL_SOURCE_QA_20261117.json",
     "sourceQaTerminalTestFilesPass": 79
   },
-  "approvedSourceSha": "6b6e8bbba3371b32a1bfb80b903c40377e11d727",
-  "operationalReleaseCandidate": {
+  "approvedSourceSha": null,
+  "sourceIntakePrecisionPreviewBuild20261117": {
+    "status": "IMMUTABLE_PREVIEW_EXACT_READBACK_PASS_SIGNED_FUNCTIONAL_QA_PENDING",
+    "sourceSha": "6b6e8bbba3371b32a1bfb80b903c40377e11d727",
+    "buildRunId": 44052221474,
+    "buildJobId": 133932744471,
+    "artifactId": 14314985190,
+    "artifactDigest": "sha256:e97f86355181a8c685b8dd800626a4885f8e34b45222f178d15355d76cbf499f",
+    "tarSha256": "c63b356550cc307e43b81e18770a7df3342fce9854c029c544a122c68690545c",
+    "buildId": "gi-i66-6b6e8bbba337-57f234755dc1",
+    "hostingVersion": "sites/ays-orbit-360-lab/versions/0964cef6b576a2ad",
+    "previewUrl": "https://ays-orbit-360-lab--gi-i66-rc-44009981499-d08psr2y.web.app",
+    "readback": {
+      "previewFiles": 223,
+      "liveFilesEach": 223,
+      "liveOriginsUnchanged": 2,
+      "siteManifestSha256": "e1de8f3d24ee2fdf305f4334f905a0fcd64e0a65d5019316166ca7dc4a766ab2",
+      "readbackRecordedAtUtc": "2026-11-17T09:08:05.243Z"
+    },
+    "rolloverEvidence": {
+      "artifactId": 14314815423,
+      "artifactDigest": "sha256:e21b2db71930cd866f2d1870012a3353c09fc62790fdaa18428c52e526fe63b5",
+      "inventoryAfterSha256": "43f892b0006b0a0d606bacf08b89b931ede062cc7205f00729a9bb742a69a2e5",
+      "afterReceiptSha256": "036c2fb271fe3b85c5aee35c8e6b1127ee45a82a2a60d4b72d7d473757f5218f",
+      "channelCount": 51,
+      "otherChannelsUnchanged": 50
+    },
+    "sourceIntakeV2Included": true,
+    "realFinancialWrites": 0,
+    "signedPreviewAccepted": false,
+    "liveAccepted": false,
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_SOURCE_INTAKE_PRECISION_PREVIEW_BUILD_20261117.json"
+  },
+  "priorSourceIntakePrecisionCandidate20261117": {
     "schema": "I6_6_OPERATIONAL_EXACT_RELEASE_V1",
     "approvedByDirection": true,
     "status": "EXACT_BACKEND_PREVIEW_SIGNED_QA_AUTHORIZED",
@@ -3174,36 +3206,15 @@
     },
     "signedObservabilityProfile": "I66_SIGNED_BROWSER_OBSERVABILITY_V1"
   },
-  "sourceIntakePrecisionPreviewBuild20261117": {
-    "status": "IMMUTABLE_PREVIEW_EXACT_READBACK_PASS_SIGNED_FUNCTIONAL_QA_PENDING",
-    "sourceSha": "6b6e8bbba3371b32a1bfb80b903c40377e11d727",
-    "buildRunId": 44052221474,
-    "buildJobId": 133932744471,
-    "artifactId": 14314985190,
-    "artifactDigest": "sha256:e97f86355181a8c685b8dd800626a4885f8e34b45222f178d15355d76cbf499f",
-    "tarSha256": "c63b356550cc307e43b81e18770a7df3342fce9854c029c544a122c68690545c",
-    "buildId": "gi-i66-6b6e8bbba337-57f234755dc1",
-    "hostingVersion": "sites/ays-orbit-360-lab/versions/0964cef6b576a2ad",
-    "previewUrl": "https://ays-orbit-360-lab--gi-i66-rc-44009981499-d08psr2y.web.app",
-    "readback": {
-      "previewFiles": 223,
-      "liveFilesEach": 223,
-      "liveOriginsUnchanged": 2,
-      "siteManifestSha256": "e1de8f3d24ee2fdf305f4334f905a0fcd64e0a65d5019316166ca7dc4a766ab2",
-      "readbackRecordedAtUtc": "2026-11-17T09:08:05.243Z"
-    },
-    "rolloverEvidence": {
-      "artifactId": 14314815423,
-      "artifactDigest": "sha256:e21b2db71930cd866f2d1870012a3353c09fc62790fdaa18428c52e526fe63b5",
-      "inventoryAfterSha256": "43f892b0006b0a0d606bacf08b89b931ede062cc7205f00729a9bb742a69a2e5",
-      "afterReceiptSha256": "036c2fb271fe3b85c5aee35c8e6b1127ee45a82a2a60d4b72d7d473757f5218f",
-      "channelCount": 51,
-      "otherChannelsUnchanged": 50
-    },
-    "sourceIntakeV2Included": true,
-    "realFinancialWrites": 0,
-    "signedPreviewAccepted": false,
-    "liveAccepted": false,
-    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_SOURCE_INTAKE_PRECISION_PREVIEW_BUILD_20261117.json"
+  "sourceIntakeReloadBuildRequest20261117": {
+    "status": "NEW_IMMUTABLE_BUILD_REQUIRED_AFTER_PINNED_QA_SOURCE_CHANGE",
+    "sourceShaAtBuild": "EXACT_TRIGGER_COMMIT",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_DAILY_PLAN_FREEZE_AND_SOURCE_INTAKE_RELOAD_20261117.json",
+    "previousSourceSha": "6b6e8bbba3371b32a1bfb80b903c40377e11d727",
+    "previousSignedRunId": 44149681372,
+    "previousSignedOutcome": "FAILED_NOT_ACCEPTED",
+    "previousEvidencePreserved": true,
+    "newPreviewAcceptance": false,
+    "newLiveAcceptance": false
   }
 }

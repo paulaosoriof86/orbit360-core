@@ -8,12 +8,12 @@
     "receipt": "artifacts/orbit360-recovery/release-control/I6_6_DIRECTION_PREVIEW_V2_SCOPE_AUTHORIZATION_20261116.json",
     "receiptSha256": "d3309675c753bd1b31f9163d506aba2e29ac70583a7b8d54cb5b8503b5c50a44",
     "status": "SAME_V2_TERMS_DIRECTION_GT_I66_PREVIEW_TECHNICAL_SUCCESSORS_AUTHORIZED",
-    "newImmutableBuildRequired": false,
+    "newImmutableBuildRequired": true,
     "historicalConsentReceiptsUnchanged": true,
     "otherActors": false,
     "liveAcceptance": false,
     "realPayments": false,
-    "signedExecutionProof": "CURRENT_SOURCE_SIGNED_QA_EXECUTED_FAILED_NOT_ACCEPTED",
+    "signedExecutionProof": "HISTORICAL_6B6_HOLD_PRESERVED_NEW_QA_SOURCE_SIGNED_PROOF_REQUIRED",
     "existingImmutableBuildRunId": 44052221474
   },
   "repository": "paulaosoriof86/orbit360-core",
@@ -411,6 +411,14 @@
       "realControlUnchanged": true,
       "newLiveAcceptance": false,
       "realFinancialWritesApplied": 0
+    },
+    "sourceIntakeReloadCorrection": {
+      "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_DAILY_PLAN_FREEZE_AND_SOURCE_INTAKE_RELOAD_20261117.json",
+      "readinessDefectReproduced": true,
+      "historicalRootCauseProven": false,
+      "newBuildRequired": true,
+      "newPreviewAcceptance": false,
+      "newLiveAcceptance": false
     }
   },
   "orderedWork": [
@@ -428,8 +436,8 @@
     },
     {
       "id": "P0-PUBLISH-CURRENT-DELTA",
-      "state": "IMMUTABLE_PROPOSAL_DIAGNOSTIC_PREVIEW_BUILT_SIGNED_QA_AUTHORIZED",
-      "scope": "Exact immutable QA diagnostic source and unchanged product. Three existing Preview functions and four existing signed drivers only. Preserve the existing own Direction Preview legal decision. Capture allowlisted Proposal response/prerequisites without private customer data. No LIVE promotion or real records/payments.",
+      "state": "CAUSAL_SOURCE_INTAKE_RELOAD_FIX_LOCAL_QA_PASS_NEW_BUILD_REQUESTED",
+      "scope": "Finish current immutable candidate with bounded QA readiness/diagnostic correction; retain all accumulated approved product changes and prior successful evidence. Execute exact authenticated Preview and immediately promote identical package after acceptance under existing Direction instruction; signed LIVE readback/rollback and synchronized successor receipt required. No unproven release or real-source financial application inferred from synthetic QA.",
       "doneWhen": "Real workflow receipts, exact digests and post-deploy business-function verification. Successful build alone is not acceptance."
     },
     {
@@ -707,8 +715,8 @@
       },
       {
         "id": "QA-SOURCE-INTAKE-RELOAD-20261117",
-        "kind": "PRODUCT_OR_VALIDATOR_CAUSE_UNRESOLVED",
-        "state": "HOLD_OBSERVED_CAUSE_NOT_YET_PROVEN",
+        "kind": "PIPELINE/VALIDATOR",
+        "state": "READINESS_DEFECT_REPRODUCED_CORRECTED_LOCAL_PASS_NEW_SIGNED_PROOF_PENDING",
         "evidenceRun": 44149681372,
         "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_SOURCE_INTAKE_PRECISION_SIGNED_PREVIEW_OUTCOME_20261117.json",
         "failureLocation": {
@@ -720,7 +728,10 @@
         "sourceIntakePageErrors": 1,
         "cause": "Not yet proven; exact failure is after reload at readiness wait. Diagnostic retained ERROR/NO_CODE/UNNAMED_FAILURE.",
         "hypothesisOnly": "Line350 uses unguarded Orbit after reload(commit); lines99 and266 use window.Orbit?. safely. Raw error name/message not retained.",
-        "closure": "Prove causal failure, correct appropriate owner and safe diagnostic retention, then immutable exact signed reload/readback/replay/error-free proof; preserve original failure and existing successful subproofs."
+        "closure": "Prove causal failure, correct appropriate owner and safe diagnostic retention, then immutable exact signed reload/readback/replay/error-free proof; preserve original failure and existing successful subproofs.",
+        "historicalRootCauseProven": false,
+        "causalQaReceipt": "artifacts/orbit360-recovery/release-control/I6_6_DAILY_PLAN_FREEZE_AND_SOURCE_INTAKE_RELOAD_20261117.json",
+        "preserveHistoricalFailedEvidence": true
       }
     ],
     "blocks": [
@@ -731,7 +742,7 @@
           "P0-PUBLISH-CURRENT-DELTA"
         ],
         "gate": "I6.6",
-        "state": "IN_PROGRESS_CURRENT_SIGNED_PREVIEW_HOLD_CAUSAL_DIAGNOSIS_REQUIRED",
+        "state": "CAUSAL_QA_CORRECTION_TESTED_NEW_IMMUTABLE_BUILD_REQUESTED",
         "timeboxReassessmentMinutes": 45,
         "deliverable": "Current immutable package bound, causal transport/preflight defects classified, four real signed drivers with complete receipts.",
         "doneWhen": "Exact Preview signed acceptance including documented terms, source intake, replay, cleanup and no unexpected errors; required guard PASS.",
@@ -830,7 +841,7 @@
       ]
     },
     "completionOfThisAuditIsNotProductionCompletion": true,
-    "updatedAtUtc": "2026-11-17T18:48:28Z",
+    "updatedAtUtc": "2026-11-17T19:14:47Z",
     "latestExecutedIteration": {
       "kind": "AUDIT_METADATA_ALIGNMENT_AND_EXACT_SIGNED_PREVIEW",
       "status": "AUDIT_COMPLETE_CURRENT_FUNCTIONAL_GATE_HOLD",
@@ -838,9 +849,22 @@
       "guardRunId": 44149681319,
       "functionalRunId": 44149681372,
       "newFormalPercentagePoints": 0
+    },
+    "freeze": {
+      "status": "FROZEN_APPROVED_BY_DIRECTION",
+      "approvedAtUtc": "2026-11-17T19:14:47Z",
+      "userInstruction": "congela decisiones y plan de trabajo y arranca agilmente",
+      "canonicalPlan": "artifacts/orbit360-recovery/release-control/I6_6_OPERATIONAL_CONTINUATION_20261115.json#dailyExecutionPlan20261117",
+      "definitionSha256": "89c5e24825334976fd10d00f3de2b204c1470dbf25786ca1ed6b376c4c185bed",
+      "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_DAILY_PLAN_FREEZE_AND_SOURCE_INTAKE_RELOAD_20261117.json",
+      "blockCount": 6,
+      "findingsAtApproval": 9,
+      "scope": "Continue the existing six blocks within the existing I6 gates; retain frozen denominators and prior PASS. New causal findings remain in the current gate and are added with evidence; publication and actual applications determine formal closure.",
+      "newLegalConsentGranted": false,
+      "newBankTransferAuthority": false
     }
   },
-  "nextAction": "I6_6_CURRENT_SIGNED_PREVIEW_HOLD: RUN 44149681372 SOURCE 6b6e8bbba3371b32a1bfb80b903c40377e11d727 FAILED_NOT_ACCEPTED AT SOURCE_INTAKE_RELOAD_READBACK tools/gravicentra-i6-6-proposal-application-signed-uat.cjs:350:19; ONE_PAGE_ERROR; ROOT_CAUSE_NOT_YET_PROVEN. FIRST_DIAGNOSE_RELOAD_READINESS_AND_CAPTURE_SAFE_PAGEERROR_CAUSE; DO_NOT_BLINDLY_RETRY_OR_PROMOTE. PRESERVE_SIGNED_ROLE_OPS_ADVISOR_AND_DOCUMENTED_TERMS_BOUNDED_EVIDENCE; SOURCE_INTAKE_RELOAD_REPLAY_NOT_ACCEPTED. ALL_SYNTHETIC_CLEANUP_PASS_REMAINING_ZERO_REAL_CONTROL_UNCHANGED. R11_REMAINS_LAST_ACCEPTED_LIVE; NO_NEW_REAL_FINANCIAL_WRITES. IF_PRODUCT_OR_PINNED_QA_SOURCE_CHANGES_BUILD_NEW_IMMUTABLE_ARTIFACT_THEN_EXACT_PREVIEW_AND_SAME_ARTIFACT_LIVE. PRESERVE_PHASE_A100_I6_60_OPS6_OF8_OVERALL19_OF31; CONTINUE_EXISTING_DAILY_PLAN_AND_PARALLEL_READONLY_SOURCE_PREPARATION.",
+  "nextAction": "I6_6_SOURCE_INTAKE_RELOAD_CAUSAL_QA_CORRECTION: DAILY_SIX_BLOCK_PLAN_FROZEN_BY_DIRECTION; BUILD_NEW_IMMUTABLE_PACKAGE_FROM_THIS_COMMIT_WITH_EXISTING_WORKFLOW. QA_READINESS_DEFECT_REPRODUCED_AND_CORRECTED_BOTH_NAVIGATION_WAITS; SANITIZED_PAGEERROR_CAUSE_RETAINED; HISTORICAL_44149681372_ERROR_NOT_RETROACTIVELY_RECLASSIFIED. BACK_UP_EXACT_6B6_PREVIEW_BEFORE_REPLACEMENT; PRESERVE_R11_LIVE_AND_ALL_PRIOR_PASS. AFTER_BUILD_BIND_EXACT_SOURCE_ARTIFACT_AND_EXECUTE_EXISTING_FOUR_SIGNED_PREVIEW_DRIVERS; REQUIRE_SOURCE_RELOAD_ACTOR_READBACK_REPLAY_ZERO_UNEXPECTED_ERRORS_AND_CLEANUP. ONLY_AFTER_EXACT_PREVIEW_ACCEPTANCE_PROMOTE_SAME_ARTIFACT_WITH_EXISTING_LIVE_GUARDS_AND_READBACK; ALIGN_SUCCESSOR_STATE_ONLY_WITH_REAL_LIVE_RECEIPT. PARALLEL_READONLY_FINANCIAL_PREPARATION; NO_BLIND_PAYMENT_RETRY; PRESERVE_PHASE_A100_I6_60_OPS6_OF8_OVERALL19_OF31_UNTIL_CRITERION_CLOSURE.",
   "sourceIntakePrecisionPreviewBuild20261117": {
     "receipt": "artifacts/orbit360-recovery/release-control/I6_6_SOURCE_INTAKE_PRECISION_PREVIEW_BUILD_20261117.json",
     "status": "IMMUTABLE_PREVIEW_EXACT_READBACK_PASS_SIGNED_FUNCTIONAL_QA_PENDING",

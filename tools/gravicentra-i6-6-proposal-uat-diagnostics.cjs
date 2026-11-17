@@ -18,7 +18,8 @@ const FAILURE_CHECKS=Object.freeze([...LEGAL_FAILURE_CHECKS,...`I66_PROPOSAL_AUT
 const RESULT_STATUSES=Object.freeze(['REVIEW_REQUIRED','ALREADY_APPLIED','RESOLUTION_DRAFT','RESOLUTION_READY','RESOLVED','READY_TO_APPLY','NOOP_ALREADY_SATISFIED','APPLIED']);
 const FAILURE_CLASSES=Object.freeze(['ASSERTION','TIMEOUT','CALLABLE','TYPE_ERROR','REFERENCE_ERROR','ERROR']);
 const EXTRA_CODES=Object.freeze(['ERR_ASSERTION','ENOENT','EACCES','ETIMEDOUT','ECONNRESET','ECONNREFUSED','UNKNOWN_CODE','NO_CODE']);
-const FALLBACK_CHECKS=Object.freeze(['UNNAMED_ASSERTION','UNNAMED_FAILURE']);
+const FALLBACK_CHECKS=Object.freeze(['UNNAMED_ASSERTION','UNNAMED_FAILURE','I66_PROPOSAL_ORBIT_GLOBAL_UNDEFINED']);
+const SOURCE_INTAKE_RUNTIME_FILES=Object.freeze(['importar.js','conciliaciones.js','product-app-p0.js','product-runtime-browser-providers-p0.js']);
 const GRPC_CODES=Object.freeze(['GRPC_OK','GRPC_CANCELLED','GRPC_UNKNOWN','GRPC_INVALID_ARGUMENT','GRPC_DEADLINE_EXCEEDED','GRPC_NOT_FOUND','GRPC_ALREADY_EXISTS','GRPC_PERMISSION_DENIED','GRPC_RESOURCE_EXHAUSTED','GRPC_FAILED_PRECONDITION','GRPC_ABORTED','GRPC_OUT_OF_RANGE','GRPC_UNIMPLEMENTED','GRPC_INTERNAL','GRPC_UNAVAILABLE','GRPC_DATA_LOSS','GRPC_UNAUTHENTICATED']);
 const OBSERVER_FAILURE_CLASSES=Object.freeze(['BROWSER_RESPONSE_BODY_UNAVAILABLE','INVALID_JSON','TIMEOUT','TYPE_ERROR','REFERENCE_ERROR','ERROR']);
 const UI_BODY_STATES=Object.freeze(['PENDING','CAPTURED','UNAVAILABLE','FAILED']);
@@ -169,14 +170,37 @@ function safeFailureLocation(value){
 function failureDetails(error,stage){
  const message=typeof error?.message==='string'?error.message.split('\n',1)[0]:'';
  const assertion=error?.code==='ERR_ASSERTION'||error?.name==='AssertionError';
- const failureClass=assertion?'ASSERTION':error?.name==='TimeoutError'?'TIMEOUT':error?.name==='TypeError'?'TYPE_ERROR':error?.name==='ReferenceError'?'REFERENCE_ERROR':CALLABLE_CODES.includes(safeCode(error?.code))?'CALLABLE':'ERROR';
+ // Playwright transports page exceptions as Error with a fixed wrapper. Read
+ // only the class/known global condition; never retain the raw text or stack.
+ const wrapped=message.match(/^page\.(?:waitForFunction|evaluate): (ReferenceError|TypeError): /);
+ const kind=wrapped?.[1]||error?.name;
+ const orbitUndefined=/^(?:page\.(?:waitForFunction|evaluate): )?(?:ReferenceError: )?Orbit is not defined$/.test(message);
+ const failureClass=assertion?'ASSERTION':kind==='TimeoutError'?'TIMEOUT':kind==='TypeError'?'TYPE_ERROR':kind==='ReferenceError'||orbitUndefined?'REFERENCE_ERROR':CALLABLE_CODES.includes(safeCode(error?.code))?'CALLABLE':'ERROR';
  const match=typeof error?.stack==='string'?error.stack.match(/(?:^|[\/\\\s(])gravicentra-i6-6-proposal-application-signed-uat\.cjs:(\d+):(\d+)(?:\)|\s|$)/m):null;
  const location=match?safeFailureLocation({file:DRIVER,line:Number(match[1]),column:Number(match[2])}):null;
- const result={failureStage:safeStage(stage),failureClass,failureCheck:pick(message,[...FAILURE_CHECKS,...SOURCE_INTAKE_FAILURE_CHECKS],assertion?'UNNAMED_ASSERTION':'UNNAMED_FAILURE'),failureCode:safeCode(error?.code)};
+ const result={failureStage:safeStage(stage),failureClass,failureCheck:orbitUndefined?'I66_PROPOSAL_ORBIT_GLOBAL_UNDEFINED':pick(message,[...FAILURE_CHECKS,...SOURCE_INTAKE_FAILURE_CHECKS],assertion?'UNNAMED_ASSERTION':'UNNAMED_FAILURE'),failureCode:safeCode(error?.code)};
  if(location){result.failureLocation=location;result.failureLine=location.line;}
  const substage=safeLegalFailureSubstage(error?.directionLegalSubstage);
  if(stage==='DIRECTION_LEGAL_ACCEPTANCE'&&substage)result.failureLegalSubstage=substage;
  return result;
+}
+function safeSourceIntakePageError(value={}){
+ value=value&&typeof value==='object'&&!Array.isArray(value)?value:{};
+ const out={stage:pick(value.stage,SOURCE_INTAKE_STAGES,'UNKNOWN_STAGE'),failureClass:pick(value.failureClass,FAILURE_CLASSES,'ERROR'),
+  failureCheck:pick(value.failureCheck,[...FAILURE_CHECKS,...SOURCE_INTAKE_FAILURE_CHECKS,...FALLBACK_CHECKS],'UNNAMED_FAILURE'),failureCode:safeCode(value.failureCode)};
+ const location=value.runtimeLocation;
+ if(SOURCE_INTAKE_RUNTIME_FILES.includes(location?.file)&&count(location.line,20000)>0&&count(location.column,20000)>0)
+  out.runtimeLocation={file:location.file,line:location.line,column:location.column};
+ return out;
+}
+function recordSourceIntakePageError(intake,error,stage){
+ intake.pageErrors=(Number.isSafeInteger(intake.pageErrors)&&intake.pageErrors>=0?intake.pageErrors:0)+1;
+ if(!Array.isArray(intake.pageErrorDetails))intake.pageErrorDetails=[];
+ if(intake.pageErrorDetails.length>=5)return;
+ const detail=failureDetails(error,stage),stack=typeof error?.stack==='string'?error.stack.slice(0,16000):'';
+ const match=stack.match(/(?:^|[\/\\\s(])(importar\.js|conciliaciones\.js|product-app-p0\.js|product-runtime-browser-providers-p0\.js)(?:\?[^\s)#]{0,2048})?:(\d+):(\d+)(?:\)|\s|$)/m);
+ const runtimeLocation=match?{file:match[1],line:Number(match[2]),column:Number(match[3])}:null;
+ intake.pageErrorDetails.push(safeSourceIntakePageError({...detail,stage,runtimeLocation}));
 }
 const CONFIG_FLAGS=Object.freeze(['autoCommitHighConfidence','manualApplicationEnabled','humanConfirmationRequiredForHighConfidence','humanConfirmationRequired','requireSameCurrency']);
 function safePrerequisites(value={}){
@@ -210,6 +234,7 @@ function safeSourceIntakeEvidence(value={}){
  const out={status:pick(value.status,['PASS','HOLD'],'HOLD'),stage:pick(value.stage,SOURCE_INTAKE_STAGES,'UNKNOWN_STAGE')};
  for(const key of ['syntheticOnly','sourceFileHashVerified','sourceMetadataDigestVerified','normalUiRequest','normalUiResponseConfirmed','readbackAfterReload','signedActorPreserved','realLedgerPointerUnchanged','countsExact','qaAuthorityExact','normalUiIdempotentReplay'])out[key]=bool(value[key]);
  for(const key of ['financialWrites','sourceRows','proposals','holds','replayIntakeWrites','consoleErrors','pageErrors','httpErrors'])out[key]=count(value[key],500);
+ if(Array.isArray(value.pageErrorDetails))out.pageErrorDetails=value.pageErrorDetails.slice(0,5).map(safeSourceIntakePageError);
  return out;
 }
 function safeProposalDiagnosticReport(report={}){
@@ -227,4 +252,4 @@ function safeProposalDiagnosticReport(report={}){
  if(report.cleanup){out.cleanupStatus=pick(report.cleanup.status,['PASS','HOLD'],'HOLD');out.remaining=count(report.cleanup.remaining,100);out.removedOwnedTargets=count(report.cleanup.removedOwnedTargets,100);out.cleanupErrorCode=safeCode(report.cleanup.errorCode);out.cleanupNonOwnedTarget=Array.isArray(report.cleanup.errors)&&report.cleanup.errors.includes('NON_OWNED_TARGET');}
  return out;
 }
-module.exports=Object.freeze({DRIVER,STAGES,OPERATIONS,REASONS,CALLABLE_CODES,FAILURE_CHECKS,UI_CAUSAL_FIELDS,SOURCE_INTAKE_STAGES,SOURCE_INTAKE_FAILURE_CHECKS,safeCode,safeReason,safeStage,projectCallableResult,safeCallableDiagnostic,ownedUiRequest,projectUiResponse,observerFailure,projectUiObservationFailure,uiApplicationResultMatches,safeUiApplicationObservation,safeUiApplicationEvidence,validateUiApplicationEvidence,observeUiApplication,failureDetails,safePrerequisites,diagnoseProposalPrerequisites,safeSourceIntakeEvidence,safeProposalDiagnosticReport});
+module.exports=Object.freeze({DRIVER,STAGES,OPERATIONS,REASONS,CALLABLE_CODES,FAILURE_CHECKS,UI_CAUSAL_FIELDS,SOURCE_INTAKE_STAGES,SOURCE_INTAKE_FAILURE_CHECKS,safeCode,safeReason,safeStage,projectCallableResult,safeCallableDiagnostic,ownedUiRequest,projectUiResponse,observerFailure,projectUiObservationFailure,uiApplicationResultMatches,safeUiApplicationObservation,safeUiApplicationEvidence,validateUiApplicationEvidence,observeUiApplication,failureDetails,safePrerequisites,diagnoseProposalPrerequisites,recordSourceIntakePageError,safeSourceIntakeEvidence,safeProposalDiagnosticReport});

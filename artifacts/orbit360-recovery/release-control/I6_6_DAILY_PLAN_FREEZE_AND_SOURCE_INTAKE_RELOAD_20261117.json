@@ -1,0 +1,261 @@
+{
+  "schema": "GI_I66_DIRECTION_FROZEN_DAILY_PLAN_AND_CAUSAL_QA_V1",
+  "dateGuatemala": "2026-11-17",
+  "recordedAtUtc": "2026-11-17T19:14:47Z",
+  "gate": "I6.6",
+  "status": "PLAN_FROZEN_CAUSAL_SOURCE_QA_PASS_NEW_IMMUTABLE_BUILD_REQUIRED",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "parentHead": "e71b3deffda0143cfef0e0ecd1153921277c3d52",
+  "freeze": {
+    "status": "FROZEN_APPROVED_BY_DIRECTION",
+    "approvedAtUtc": "2026-11-17T19:14:47Z",
+    "userInstruction": "congela decisiones y plan de trabajo y arranca agilmente",
+    "canonicalPlan": "artifacts/orbit360-recovery/release-control/I6_6_OPERATIONAL_CONTINUATION_20261115.json#dailyExecutionPlan20261117",
+    "definitionSha256": "89c5e24825334976fd10d00f3de2b204c1470dbf25786ca1ed6b376c4c185bed",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_DAILY_PLAN_FREEZE_AND_SOURCE_INTAKE_RELOAD_20261117.json",
+    "blockCount": 6,
+    "findingsAtApproval": 9,
+    "scope": "Continue the existing six blocks within the existing I6 gates; retain frozen denominators and prior PASS. New causal findings remain in the current gate and are added with evidence; publication and actual applications determine formal closure.",
+    "newLegalConsentGranted": false,
+    "newBankTransferAuthority": false
+  },
+  "frozenDefinition": {
+    "decisions": {
+      "commissionPeriod": "2026-10",
+      "commissionPeriodMeaning": "Comisiones de octubre contenidas en la planilla de octubre; no trasladar septiembre por fecha de factura o fecha actual.",
+      "fernandoParticipationPercent": 70,
+      "germanParticipationPercent": 60,
+      "paulaParticipationPercent": 80,
+      "samuelParticipationPercent": 70,
+      "additionalAdvisorScope": "Dirección ratificó liquidar su cartera restante y emitir también el documento individual de Samuel; conservar la excepción de cartera Samuel ya aprobada y la reasignación expresa prevalente a Paula. Fuentes, nombres de clientes, pólizas e importes individuales permanecen en el expediente privado.",
+      "fernandoRequestedClients": 13,
+      "germanRequestedClients": 4,
+      "advisorAssignmentAuthority": "La cartera de clientes identificada privadamente por Dirección contiene trece clientes de Fernando y cuatro de Germán tras la corrección expresa adicional del 15 de noviembre. Identidades, pólizas, importes y documentos originales se mantienen fuera del repositorio público.",
+      "latestPrivateOwnerReassignment": {
+        "date": "2026-11-15",
+        "source": "El Roble October statement",
+        "fromAdvisor": "Paula",
+        "toAdvisor": "Fernando",
+        "sourceLines": 2,
+        "newAdvisorParticipationPercent": 70,
+        "retainSourceIdentitiesAndAmounts": true,
+        "previousDocumentsAndImportDerivativesSuperseded": true,
+        "privateEvidence": "commissions_work/paula_juan_francisco_correction_20261115.json",
+        "realFinancialWrites": 0
+      },
+      "guatemaltecaBase": "COMISION_VENTA_ONLY_EXCLUDE_COM_COBRO_AND_VAT",
+      "septemberPreviouslyPaid": "EXCLUDED_ALREADY_PAID_CONFIRMED_BY_DIRECTION",
+      "commissionEligibility": "Ordinary commission paid OR credited by insurer, supported by original statement; not contingent on inventing a bank receipt.",
+      "payableState": "PENDIENTE_NOT_PAID",
+      "bankTransfersAuthorizedByThisBatch": false,
+      "paymentDateMustNotBeInvented": true,
+      "previousAnswersMustNotBeReopened": true,
+      "remainingBusinessAmbiguityHandling": "Present only the exact unresolved decision to Paula; technical inability is not a business ambiguity.",
+      "conciliationDirectionControl": "Dirección puede resolver vínculo con póliza/recibo exactos, previsualizar efecto, aprobar y aplicar con auditoría y sin duplicar; evidencia ambigua no se convierte en pago por coincidencia de nombre o número de póliza.",
+      "financialWriteSemantics": "Binding a source is not applying a payment; creating an advisor payable is not paying it; bank proof must match amount and currency; commission amount is not premium amount.",
+      "mapfreSameConditionsReaffirmation20261116": {
+        "alreadyApproved": true,
+        "latestOwnerStatement": "yo ya te confirmé que renovar con las mismas condiciones",
+        "doNotRepeatRenewalApprovalQuestion": true,
+        "recordedLocalDate": "2026-11-16",
+        "sourceDocumentaryAmountsRemainExact": true,
+        "noFixedAnnualPremiumInvented": true
+      }
+    },
+    "baseline": {
+      "phaseAHistoricalProductionAcceptedPercent": 100,
+      "postproductionI6": {
+        "closed": 6,
+        "total": 10,
+        "percent": 60
+      },
+      "operationsFrozenCriteria": {
+        "closed": 6,
+        "total": 8,
+        "percent": 75
+      },
+      "transversalFrozenCriteria": {
+        "closed": 19,
+        "total": 31,
+        "percent": 61.3
+      },
+      "phaseBPercent": 0,
+      "newFormalPercentagePointsFromThisAudit": 0,
+      "coverageCaveat": "Frozen criteria are not exhaustive proof of every new operational finding. Track missing coverage explicitly without silently changing denominators."
+    },
+    "blocks": [
+      {
+        "sequence": 1,
+        "name": "Synchronize exact release and close current signed Preview",
+        "existingPlanIds": [
+          "P0-PUBLISH-CURRENT-DELTA"
+        ],
+        "gate": "I6.6",
+        "deliverable": "Current immutable package bound, causal transport/preflight defects classified, four real signed drivers with complete receipts.",
+        "doneWhen": "Exact Preview signed acceptance including documented terms, source intake, replay, cleanup and no unexpected errors; required guard PASS.",
+        "publicationRule": "No rebuild for metadata; product/QA owner changes require new immutable artifact.",
+        "timeboxReassessmentMinutes": 45
+      },
+      {
+        "sequence": 2,
+        "name": "Publish accepted delta and verify operational writers",
+        "existingPlanIds": [
+          "P0-PUBLISH-CURRENT-DELTA",
+          "P0-CARLOS-TRANSVERSAL",
+          "P1-ASEGURADORAS",
+          "P1-ADJUNTOS-DRIVE"
+        ],
+        "gate": "I6.6",
+        "deliverable": "Same accepted artifact LIVE; Carlos and superior-role affected writes, documented renewal, insurer/Drive paths verified.",
+        "doneWhen": "Exact frontend/backend binding and authenticated LIVE server commit/readback/reload; bounded genuine-document and denied-scope tests; rollback available.",
+        "publicationRule": "Publish each causally complete accepted correction immediately; unrelated findings stay in their existing scope.",
+        "timeboxReassessmentMinutes": 90
+      },
+      {
+        "sequence": 3,
+        "name": "Apply insurer-source deltas to receipts, portfolio and collections",
+        "existingPlanIds": [
+          "P0-CONCILIATION",
+          "P0-CARTERA-A1-A7",
+          "P1-COMPLETENESS-JULY-NOVEMBER"
+        ],
+        "gate": "I6.6",
+        "deliverable": "All available insurers processed by original source; dossiers1 July–15 November and latest2026 policy/vehicle/receipts compared against LIVE; exact additions/updates/no-change/holds and totals reported without duplicates.",
+        "doneWhen": "Deterministic deduped applications with before/after/audit/readback; confirmed collections remain visible even before reconciliation; inferred payments tagged with provenance in contractual period, not inflated into reconciliation month. A5 calendar and A6 dates/references/Q0.04 conflict resolved per record, preserving existing reports/payments.",
+        "publicationRule": "Data-only deterministic updates through already certified writers do not require product rebuild. Preserve existing payments/references and user-confirmed identities.",
+        "timeboxReassessmentMinutes": 120
+      },
+      {
+        "sequence": 4,
+        "name": "Post documented advisor commissions and payables",
+        "existingPlanIds": [
+          "URGENT-ADVISOR-CXP",
+          "PHASEB-FINANCE-01"
+        ],
+        "gate": "I6.6_URGENT_SCOPE_THEN_I6.7_FULL_RECONCILIATION",
+        "deliverable": "Approved advisor corrections and October liabilities registered, currencies separated, documentary totals equal persisted Finance.",
+        "doneWhen": "Commission/CxP created exactly once; historic beneficiaries preserved; dedupe of prior advances/payments; no bank transfers. Full I6.7 requires its whole frozen scope.",
+        "publicationRule": null,
+        "timeboxReassessmentMinutes": 90
+      },
+      {
+        "sequence": 5,
+        "name": "Close remaining operational integrations and I6.8 coverage",
+        "existingPlanIds": [
+          "P1-NOTIFICATIONS",
+          "P1-PERFORMANCE-REGRESSION",
+          "P1-MODULE-WRITE-MATRIX",
+          "P1-COMPLETENESS-JULY-NOVEMBER"
+        ],
+        "gate": "I6.6_REMAINDERS_THEN_I6.8_AFTER_I6.7",
+        "deliverable": "Verified notification path under existing consent; required document integration, measured performance, history/Academy/enabled users coverage.",
+        "doneWhen": "Actual authorized acknowledgment where required, scope/persistence/reload and no new causally reproduced regression. Unavailable consent/access affects only exact dependent flow.",
+        "publicationRule": null,
+        "timeboxReassessmentMinutes": 60
+      },
+      {
+        "sequence": 6,
+        "name": "Final exact LIVE acceptance and durable handoff",
+        "existingPlanIds": [
+          "P1-MODULE-WRITE-MATRIX"
+        ],
+        "gate": "I6.9_AFTER_PREDECESSORS",
+        "deliverable": "Complete frozen I6.9 required final matrix, user lifecycle, relations, financial integrity, cleanup, error checks, responsive, exact readback, rollback and certified Firebase/HostDime payload; synchronized final state.",
+        "doneWhen": "All required frozen criteria proven on accepted release; Control Plane, ledger, build/served bytes and final guard agree. Only then close postproduction100%.",
+        "publicationRule": "No backlog of already accepted unpublished fixes; no claim of completion from outer green workflows.",
+        "timeboxReassessmentMinutes": 45
+      }
+    ],
+    "cadence": {
+      "oneActiveProductCandidate": true,
+      "oneFinancialWriterAtATime": true,
+      "parallelReadonlySourcePreparation": true,
+      "acceptedDeltaPublishesBeforeUnrelatedScopeExpansion": true,
+      "existingAuthorizationsNotRequestedAgain": true,
+      "noBlindPaymentRetry": true,
+      "doNotReopenUnaffectedPass": true,
+      "timeboxesAreReassessmentTargetsNotCompletionGuarantees": true,
+      "iterationReport": [
+        "completed plan criteria and evidence",
+        "published exact release",
+        "real records applied and amounts by currency",
+        "before/delta/after progress with stable denominator",
+        "remaining exact blockers and next action",
+        "source/build/Preview/LIVE/backend/data synchronization status"
+      ]
+    }
+  },
+  "sourceQa": {
+    "scope": "I6.6 source-intake QA readiness and sanitized diagnostics",
+    "observedFailedRunId": 44149681372,
+    "observedSourceSha": "6b6e8bbba3371b32a1bfb80b903c40377e11d727",
+    "observedFailureStage": "SOURCE_INTAKE_RELOAD_READBACK",
+    "observedFailureLine": 350,
+    "historicalExactRootCauseProven": false,
+    "readinessDefectReproduced": true,
+    "reproduction": "Original predicate throws ReferenceError while Orbit is absent. Actual corrected opening/reload predicates remain false for absent/partial runtime and true only after all required components exist.",
+    "localBrowserIntegration": "NOT_EXECUTED_BROWSER_LAUNCH_SOCKET_PERMISSION_DENIED_NO_RETRY_OR_ESCALATION",
+    "verificationCommand": "node --test tools/gravicentra-i6-6-source-intake-readiness.test.cjs tools/gravicentra-i6-6-proposal-uat-diagnostics.test.cjs tools/gravicentra-i6-6-proposal-application-signed-uat.test.cjs",
+    "nodeTests": {
+      "tests": 125,
+      "pass": 125,
+      "fail": 0,
+      "skipped": 0,
+      "newCausalTests": 8,
+      "existingOfflineDriverChecks": 26
+    },
+    "changedOwners": [
+      {
+        "path": "tools/gravicentra-i6-6-proposal-application-signed-uat.cjs",
+        "oldBlobSha": "e1c9f888205c773794e2ebd442722a4f65026782",
+        "newBlobSha": "55a94e207d28c01fed6975452baed52d8eceb67e"
+      },
+      {
+        "path": "tools/gravicentra-i6-6-proposal-uat-diagnostics.cjs",
+        "oldBlobSha": "cbc13f6bc4a87a3e6c7eaf2526b5db6cbbf7272c",
+        "newBlobSha": "7299e11f62f25975d2811b47ec8d56da6a8f3a65"
+      },
+      {
+        "path": "tools/gravicentra-i6-6-source-intake-readiness.test.cjs",
+        "newBlobSha": "f5294207d4d39fe46ba7d493d84f277d16d1b3bf"
+      }
+    ],
+    "preservedBoundaries": {
+      "timeoutsUnchanged": true,
+      "requireZeroUnexpectedErrors": true,
+      "requireSignedActorReadback": true,
+      "requireSourceReloadReadback": true,
+      "requireSourceReplayIdempotence": true,
+      "requireOwnedSyntheticCleanup": true,
+      "rawErrorMessagesOrStacksRetained": false,
+      "historicalTestsModified": false,
+      "productCodeModified": false,
+      "cloudWrites": 0,
+      "liveAcceptanceClaimed": false
+    },
+    "remainingRequiredEvidence": "New immutable package and authenticated Preview source-intake reload/readback/replay with zero unexpected errors. Existing failed run cannot be retroactively reclassified."
+  },
+  "newBuildSourceIdentity": "EXACT_GITHUB_SHA_OF_COMMIT_CONTAINING_THIS_RECEIPT_RESOLVED_BY_EXISTING_BUILD",
+  "rolloverReceipt": "artifacts/orbit360-recovery/release-control/I6_6_TECHNICAL_PREVIEW_SOURCE_INTAKE_RELOAD_REBUILD_20261117.json",
+  "rolloverReceiptSha256": "ae6d48b0260af9e9db7b7ba69e799a4a17e7adf23a24f1893168079dce05bf35",
+  "sameImmutableArtifactPreviewToLiveRequired": true,
+  "productAndBackendCodeUnchanged": true,
+  "financialRealWrites": 0,
+  "newPreviewAcceptance": false,
+  "newLiveAcceptance": false,
+  "newFormalPercentagePoints": 0,
+  "nextAction": "I6_6_SOURCE_INTAKE_RELOAD_CAUSAL_QA_CORRECTION: DAILY_SIX_BLOCK_PLAN_FROZEN_BY_DIRECTION; BUILD_NEW_IMMUTABLE_PACKAGE_FROM_THIS_COMMIT_WITH_EXISTING_WORKFLOW. QA_READINESS_DEFECT_REPRODUCED_AND_CORRECTED_BOTH_NAVIGATION_WAITS; SANITIZED_PAGEERROR_CAUSE_RETAINED; HISTORICAL_44149681372_ERROR_NOT_RETROACTIVELY_RECLASSIFIED. BACK_UP_EXACT_6B6_PREVIEW_BEFORE_REPLACEMENT; PRESERVE_R11_LIVE_AND_ALL_PRIOR_PASS. AFTER_BUILD_BIND_EXACT_SOURCE_ARTIFACT_AND_EXECUTE_EXISTING_FOUR_SIGNED_PREVIEW_DRIVERS; REQUIRE_SOURCE_RELOAD_ACTOR_READBACK_REPLAY_ZERO_UNEXPECTED_ERRORS_AND_CLEANUP. ONLY_AFTER_EXACT_PREVIEW_ACCEPTANCE_PROMOTE_SAME_ARTIFACT_WITH_EXISTING_LIVE_GUARDS_AND_READBACK; ALIGN_SUCCESSOR_STATE_ONLY_WITH_REAL_LIVE_RECEIPT. PARALLEL_READONLY_FINANCIAL_PREPARATION; NO_BLIND_PAYMENT_RETRY; PRESERVE_PHASE_A100_I6_60_OPS6_OF8_OVERALL19_OF31_UNTIL_CRITERION_CLOSURE.",
+  "releaseMechanismVerification": {
+    "tests": 422,
+    "passed": 422,
+    "failed": 0,
+    "skipped": 0,
+    "newAcceptanceTests": 43,
+    "logSha256": "83cfd30aab75a43c81bc2de2996b68823407274442d7ad40bddd7de4c733f7e3",
+    "workflowYamlAndBashSyntax": "PASS_3_WORKFLOWS_32_RUN_BLOCKS",
+    "acceptanceBranchScope": "Validate a real exact LIVE successor and align CP/state/transport/latest pointer; preserve immutable R11 predecessor and every existing release boundary. No accepted receipt exists before actual signed LIVE outcome.",
+    "newPreviewAcceptance": false,
+    "newLiveAcceptance": false
+  }
+}

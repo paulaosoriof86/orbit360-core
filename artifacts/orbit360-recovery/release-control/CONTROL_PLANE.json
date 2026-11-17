@@ -9,7 +9,7 @@
     "activeGate": "I6.6",
     "closedHistoricalGate": "B4-007",
     "latestProvenLiveSource": "84769378eb2014addebfefdbdd63091bddc4b817",
-    "currentWork": "Daily audit and metadata synchronization completed; exact current signed Preview executed and HOLD at source-intake reload. Bounded successful checks preserved; next work is causal readiness/pageerror diagnosis, not a new global audit or blind retry. R11 remains last accepted LIVE.",
+    "currentWork": "Direction froze the existing six-block daily plan; execute causal source-intake readiness correction and complete exact immutable Preview/LIVE chain without reopening prior accepted capabilities. Existing HOLD remains evidence until new signed acceptance.",
     "latestHostingPreviewEvidence": "artifacts/orbit360-recovery/release-control/I6_6_SOURCE_INTAKE_PRECISION_PREVIEW_BUILD_20261117.json",
     "latestHostingPreviewSource": "6b6e8bbba3371b32a1bfb80b903c40377e11d727",
     "operationsEvidenceReview": "artifacts/orbit360-recovery/release-control/I6_6_OPS_EVIDENCE_AND_PREVIEW_BINDING_REVIEW_20261116.json",
@@ -20,7 +20,7 @@
     "newLiveAcceptanceClaimed": false,
     "technicalPreviewCausalRetryReceipt": "artifacts/orbit360-recovery/release-control/I6_6_TECHNICAL_PREVIEW_OBSERVABILITY_REBUILD_20261116.json",
     "signedPreviewCandidate": {
-      "status": "SIGNED_PREVIEW_HOLD_NOT_ACCEPTED",
+      "status": "PREVIOUS_6B6_SIGNED_HOLD_NEW_QA_SOURCE_BUILD_PENDING",
       "sourceSha": "6b6e8bbba3371b32a1bfb80b903c40377e11d727",
       "buildRunId": 44052221474,
       "buildJobId": 133932744471,
@@ -54,7 +54,7 @@
     },
     "documentaryFocalReadbackEvidence": "artifacts/orbit360-recovery/release-control/I6_6_EXISTING_CLIENT_INDEPENDENT_GESTIONES_READBACK_20261116.json",
     "signedPreviewEvidence": "artifacts/orbit360-recovery/release-control/I6_6_SIGNED_PREVIEW_42A676_HOLD_AND_STATEMENT_INTAKE_20261117.json",
-    "nextSourceWork": "DIAGNOSE_SOURCE_INTAKE_RELOAD_LINE350_AND_ONE_PAGEERROR; ROOT_CAUSE_UNPROVEN; PRESERVE_BOUNDED_PASS; PARALLEL_READONLY_SOURCE_DEDUPE",
+    "nextSourceWork": "NEW_IMMUTABLE_BUILD_FOR_CAUSAL_QA_SOURCE_CHANGE_THEN_EXACT_SIGNED_PREVIEW_AND_SAME_ARTIFACT_LIVE",
     "latestSignedQaOutcome": {
       "status": "FAILED_NOT_ACCEPTED",
       "runId": 44149681372,
@@ -106,6 +106,26 @@
       "bindingCommit": "f1df4e7f2d5652dc8d57ea7408266296d8c217fd",
       "guardRunId": 44149681319,
       "signedOutcomeReceipt": "artifacts/orbit360-recovery/release-control/I6_6_SOURCE_INTAKE_PRECISION_SIGNED_PREVIEW_OUTCOME_20261117.json"
+    },
+    "dailyPlanFreeze20261117": {
+      "status": "FROZEN_APPROVED_BY_DIRECTION",
+      "approvedAtUtc": "2026-11-17T19:14:47Z",
+      "userInstruction": "congela decisiones y plan de trabajo y arranca agilmente",
+      "canonicalPlan": "artifacts/orbit360-recovery/release-control/I6_6_OPERATIONAL_CONTINUATION_20261115.json#dailyExecutionPlan20261117",
+      "definitionSha256": "89c5e24825334976fd10d00f3de2b204c1470dbf25786ca1ed6b376c4c185bed",
+      "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_DAILY_PLAN_FREEZE_AND_SOURCE_INTAKE_RELOAD_20261117.json",
+      "blockCount": 6,
+      "findingsAtApproval": 9,
+      "scope": "Continue the existing six blocks within the existing I6 gates; retain frozen denominators and prior PASS. New causal findings remain in the current gate and are added with evidence; publication and actual applications determine formal closure.",
+      "newLegalConsentGranted": false,
+      "newBankTransferAuthority": false
+    },
+    "sourceIntakeReloadSourceQa20261117": {
+      "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_DAILY_PLAN_FREEZE_AND_SOURCE_INTAKE_RELOAD_20261117.json",
+      "status": "LOCAL_CAUSAL_QA_PASS_NEW_BUILD_REQUIRED",
+      "localTestsPass": 125,
+      "newPreviewAcceptance": false,
+      "newLiveAcceptance": false
     }
   },
   "b4003ActiveCertificationCursor20261106": {
@@ -3439,7 +3459,7 @@
     "i63LiveReadbackPass": true,
     "i63DeterministicDiffReady": true
   },
-  "nextAction": "I6_6_CURRENT_SIGNED_PREVIEW_HOLD: RUN 44149681372 SOURCE 6b6e8bbba3371b32a1bfb80b903c40377e11d727 FAILED_NOT_ACCEPTED AT SOURCE_INTAKE_RELOAD_READBACK tools/gravicentra-i6-6-proposal-application-signed-uat.cjs:350:19; ONE_PAGE_ERROR; ROOT_CAUSE_NOT_YET_PROVEN. FIRST_DIAGNOSE_RELOAD_READINESS_AND_CAPTURE_SAFE_PAGEERROR_CAUSE; DO_NOT_BLINDLY_RETRY_OR_PROMOTE. PRESERVE_SIGNED_ROLE_OPS_ADVISOR_AND_DOCUMENTED_TERMS_BOUNDED_EVIDENCE; SOURCE_INTAKE_RELOAD_REPLAY_NOT_ACCEPTED. ALL_SYNTHETIC_CLEANUP_PASS_REMAINING_ZERO_REAL_CONTROL_UNCHANGED. R11_REMAINS_LAST_ACCEPTED_LIVE; NO_NEW_REAL_FINANCIAL_WRITES. IF_PRODUCT_OR_PINNED_QA_SOURCE_CHANGES_BUILD_NEW_IMMUTABLE_ARTIFACT_THEN_EXACT_PREVIEW_AND_SAME_ARTIFACT_LIVE. PRESERVE_PHASE_A100_I6_60_OPS6_OF8_OVERALL19_OF31; CONTINUE_EXISTING_DAILY_PLAN_AND_PARALLEL_READONLY_SOURCE_PREPARATION.",
+  "nextAction": "I6_6_SOURCE_INTAKE_RELOAD_CAUSAL_QA_CORRECTION: DAILY_SIX_BLOCK_PLAN_FROZEN_BY_DIRECTION; BUILD_NEW_IMMUTABLE_PACKAGE_FROM_THIS_COMMIT_WITH_EXISTING_WORKFLOW. QA_READINESS_DEFECT_REPRODUCED_AND_CORRECTED_BOTH_NAVIGATION_WAITS; SANITIZED_PAGEERROR_CAUSE_RETAINED; HISTORICAL_44149681372_ERROR_NOT_RETROACTIVELY_RECLASSIFIED. BACK_UP_EXACT_6B6_PREVIEW_BEFORE_REPLACEMENT; PRESERVE_R11_LIVE_AND_ALL_PRIOR_PASS. AFTER_BUILD_BIND_EXACT_SOURCE_ARTIFACT_AND_EXECUTE_EXISTING_FOUR_SIGNED_PREVIEW_DRIVERS; REQUIRE_SOURCE_RELOAD_ACTOR_READBACK_REPLAY_ZERO_UNEXPECTED_ERRORS_AND_CLEANUP. ONLY_AFTER_EXACT_PREVIEW_ACCEPTANCE_PROMOTE_SAME_ARTIFACT_WITH_EXISTING_LIVE_GUARDS_AND_READBACK; ALIGN_SUCCESSOR_STATE_ONLY_WITH_REAL_LIVE_RECEIPT. PARALLEL_READONLY_FINANCIAL_PREPARATION; NO_BLIND_PAYMENT_RETRY; PRESERVE_PHASE_A100_I6_60_OPS6_OF8_OVERALL19_OF31_UNTIL_CRITERION_CLOSURE.",
   "postproductionExitProgress": {
     "formalPercent": 60,
     "frozenMiniGates": 6,

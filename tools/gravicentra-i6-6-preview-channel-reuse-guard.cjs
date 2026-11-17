@@ -97,19 +97,19 @@ const fs = require('node:fs');
 const path = require('node:path');
 const crypto = require('node:crypto');
 const { execFileSync } = require('node:child_process');
-const TECHNICAL_RECEIPT_PATH = 'artifacts/orbit360-recovery/release-control/I6_6_TECHNICAL_PREVIEW_SOURCE_INTAKE_PRECISION_REBUILD_20261117.json';
-const TECHNICAL_RECEIPT_SHA256 = '25ad1090222d97dcc86d0670088658f92e8e33cb459b4fdaaa669b66ad84d7ba';
+const TECHNICAL_RECEIPT_PATH = 'artifacts/orbit360-recovery/release-control/I6_6_TECHNICAL_PREVIEW_SOURCE_INTAKE_RELOAD_REBUILD_20261117.json';
+const TECHNICAL_RECEIPT_SHA256 = 'ae6d48b0260af9e9db7b7ba69e799a4a17e7adf23a24f1893168079dce05bf35';
 const TECHNICAL_CHANNEL = 'gi-i66-rc-44009981499';
 const TECHNICAL_ORIGIN = 'https://ays-orbit-360-lab--gi-i66-rc-44009981499-d08psr2y.web.app';
 const TECHNICAL_REPO = 'paulaosoriof86/orbit360-core';
 const TECHNICAL_BRANCH = 'recovery/fase-a-clean-20260831';
-const TECHNICAL_BASE = 'a04f5c04680c797e938009cca3e1f595eff1315c';
-// Back up the exact CEF42 Preview before its causal precision/intake successor.
+const TECHNICAL_BASE = 'e71b3deffda0143cfef0e0ecd1153921277c3d52';
+// Back up the exact 6b6 Preview before its causal source-intake reload successor.
 // Its signed QA remained HOLD; exact Hosting bytes are not functional acceptance.
-const TECHNICAL_PREVIOUS_SOURCE = 'cef42d7713aa83c73f1f0d0e35afb38a9165e433';
-const TECHNICAL_PREVIOUS_BUILD = 44047311664;
-const TECHNICAL_PREVIOUS_ARTIFACT = 14312141615;
-const TECHNICAL_PREVIOUS_DIGEST = 'sha256:5389e7d1c32db4eb02056b4d7d2b04cf10de10e539df739b8cca4fe7d7b60731';
+const TECHNICAL_PREVIOUS_SOURCE = '6b6e8bbba3371b32a1bfb80b903c40377e11d727';
+const TECHNICAL_PREVIOUS_BUILD = 44052221474;
+const TECHNICAL_PREVIOUS_ARTIFACT = 14314985190;
+const TECHNICAL_PREVIOUS_DIGEST = 'sha256:e97f86355181a8c685b8dd800626a4885f8e34b45222f178d15355d76cbf499f';
 // Historical failed-residual exception remains byte/identity scoped to 382.
 // It is not activated by the current successful-package backup.
 const TECHNICAL_OLD_SOURCE = '3820817d8fcac86a99229cefdc46dfc03e1a8c36';

@@ -64,6 +64,8 @@ jobs:
           node --test tools/gravicentra-i6-6-preview-candidate-binding.test.cjs
           node --test tools/gravicentra-i6-6-direction-preview-i66-consent-scope.test.cjs
           node --test tools/gravicentra-i6-6-technical-preview-rollover.test.cjs
+          node --test tools/gravicentra-i6-6-source-intake-readiness.test.cjs
+          node --test tools/gravicentra-i6-6-operational-live-acceptance.test.cjs
           node --test tools/gravicentra-i6-6-live-proof-artifact-layout.test.cjs
           node tools/gravicentra-i6-6-operational-release-candidate.cjs live
           node --check tools/gravicentra-i6-6-carlos-paula-live-synthetic-ops-leads-uat.cjs
@@ -264,6 +266,7 @@ jobs:
             exit "$code"
           }
           trap rollback EXIT
+          printf '[]\n' > "$RUNNER_TEMP/gi-role-effective-revisions.json"
           started=1
           node "$FIREBASE_CLI_BIN" deploy \
             --only functions:orbit360ProductOperationalCommand,functions:orbit360CobrosReconciliationCommand,functions:orbit360ScopedPolicyRead \
@@ -280,6 +283,12 @@ jobs:
           if(!['ACTIVE','READY'].includes(String(f.state||'').toUpperCase())||newRev===process.env.OLD_REV||
             active.length!==1||Number(active[0].percent)!==100||
             String(active[0].revisionName||active[0].revision)!==newRev)throw Error('I66_ROLE_NEW_LIVE_FUNCTION_REVISION_NOT_EFFECTIVE:'+process.env.FN);
+          const fs=require('node:fs'),file=process.env.RUNNER_TEMP+'/gi-role-effective-revisions.json';
+          const revisions=JSON.parse(fs.readFileSync(file,'utf8'));
+          if(revisions.some(row=>row.name===process.env.FN))throw Error('I66_ROLE_DUPLICATE_REVISION_RECEIPT');
+          revisions.push({name:process.env.FN,region:process.env.REGION,service:process.env.SERVICE,
+            previousRevision:process.env.OLD_REV,currentRevision:newRev,trafficPercent:100,ready:true});
+          fs.writeFileSync(file,JSON.stringify(revisions,null,2)+'\n');
           console.log('I66_ROLE_NEW_LIVE_FUNCTION_EFFECTIVE_100_PERCENT_PASS '+process.env.FN);
           NODE
           done < "$RUNNER_TEMP/gi-role-live-old-revisions.tsv"
@@ -310,8 +319,18 @@ jobs:
           p.signedDrivers=['privileged-role-permissions','carlos-paula-ops-leads','advisor-payables','proposal-application'];
           p.syntheticRestoreComplete=true;p.realFinancialOrCustomerWrites=0;
           const g=require('./tools/gravicentra-i6-6-operational-release-candidate.cjs');
-          p.focusedReports=g.focusedReportsFromDisk(g.candidateForPhase(require('./'+g.CONTROL),'live'),'LIVE');
+          const candidate=g.candidateForPhase(require('./'+g.CONTROL),'live');
+          p.focusedReports=g.focusedReportsFromDisk(candidate,'LIVE');
+          p.buildId=candidate.buildId;p.buildRunId=candidate.buildRunId;p.previewQa=candidate.previewQa;
+          p.previousLive=candidate.currentLive;p.targets=g.TARGETS.live;
+          p.backendRevisions=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/gi-role-effective-revisions.json','utf8'));
+          p.sameImmutableArtifact=true;p.liveBackendSameArtifact=true;
+          p.functionsInventoryUnchangedExceptTargets=true;p.rollbackSnapshotReady=true;
+          p.fullI66ProductionAccepted=false;
+          const proposal=JSON.parse(fs.readFileSync(process.env.I66_PACKAGE_ROOT+'/evidence/i66-proposal-application-signed-uat-live.json','utf8'));
+          p.sourceIntake=require('./tools/gravicentra-i6-6-proposal-uat-diagnostics.cjs').safeSourceIntakeEvidence(proposal.sourceIntake);
           p.runId=Number(process.env.GITHUB_RUN_ID);p.headSha=process.env.GITHUB_SHA;
+          g.validateLiveProof(candidate,p);
           fs.writeFileSync(path,JSON.stringify(p,null,2)+'\n');
           NODE
           completed=1

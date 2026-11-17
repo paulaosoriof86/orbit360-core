@@ -31,6 +31,10 @@ on:
       - artifacts/orbit360-recovery/release-control/I6_6_TECHNICAL_PREVIEW_HYDRATION_AND_BALANCE_REBUILD_20261117.json
       - artifacts/orbit360-recovery/release-control/I6_6_TECHNICAL_PREVIEW_DOCUMENTED_SOURCE_AND_TRANSPORT_REBUILD_20261117.json
       - artifacts/orbit360-recovery/release-control/I6_6_TECHNICAL_PREVIEW_SOURCE_INTAKE_PRECISION_REBUILD_20261117.json
+      - artifacts/orbit360-recovery/release-control/I6_6_TECHNICAL_PREVIEW_SOURCE_INTAKE_RELOAD_REBUILD_20261117.json
+      - tools/gravicentra-i6-6-source-intake-readiness.test.cjs
+      - tools/gravicentra-i6-6-operational-live-acceptance.test.cjs
+      - tools/gravicentra-governance-preflight-v1.mjs
       - artifacts/orbit360-recovery/release-control/I6_6_SOURCE_INTAKE_V2_PRECISION_CAUSAL_SOURCE_QA_20261117.json
       - tools/gravicentra-i6-6-policy-preview-money-precision.test.cjs
       - tools/gravicentra-i6-6-source-intake-v2.test.cjs
@@ -286,6 +290,8 @@ jobs:
           node --test tools/gravicentra-b4-003-protected-hydration.test.cjs tools/gravicentra-b4-003-post-auth-bootstrap-diagnostic.test.cjs
           node --test tools/gravicentra-i6-6-assignment-detail-navigation.test.cjs tools/gravicentra-i6-6-direction-preview-qa-navigation-retry.test.cjs tools/gravicentra-i6-6-preview-current-live-restore-47f4.test.cjs
           node --test tools/gravicentra-i6-6-proposal-uat-diagnostics.test.cjs tools/gravicentra-i6-6-direction-preview-proposal-diagnostic-retry.test.cjs tools/gravicentra-i6-6-preview-current-live-restore-39f54e2.test.cjs
+          node --test tools/gravicentra-i6-6-source-intake-readiness.test.cjs
+          node --test tools/gravicentra-i6-6-operational-live-acceptance.test.cjs
           node tools/gravicentra-governance-preflight-v1.mjs --mode=i6
       - name: Set up existing Firebase LAB credentials for read-only public config and tenant branding
         working-directory: candidate

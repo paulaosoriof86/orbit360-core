@@ -60,6 +60,11 @@ const PINNED_OWNER_PATHS = Object.freeze([
   'artifacts/orbit360-recovery/release-control/I6_6_TECHNICAL_PREVIEW_HYDRATION_AND_BALANCE_REBUILD_20261117.json',
   'artifacts/orbit360-recovery/release-control/I6_6_TECHNICAL_PREVIEW_DOCUMENTED_SOURCE_AND_TRANSPORT_REBUILD_20261117.json',
   'artifacts/orbit360-recovery/release-control/I6_6_TECHNICAL_PREVIEW_SOURCE_INTAKE_PRECISION_REBUILD_20261117.json',
+  'artifacts/orbit360-recovery/release-control/I6_6_TECHNICAL_PREVIEW_SOURCE_INTAKE_RELOAD_REBUILD_20261117.json',
+  'tools/gravicentra-i6-6-source-intake-readiness.test.cjs',
+  'artifacts/orbit360-recovery/release-control/I6_6_DAILY_PLAN_FREEZE_AND_SOURCE_INTAKE_RELOAD_20261117.json',
+  'tools/gravicentra-i6-6-operational-live-acceptance.test.cjs',
+  'tools/gravicentra-governance-preflight-v1.mjs',
   'artifacts/orbit360-recovery/release-control/I6_6_SOURCE_INTAKE_V2_PRECISION_CAUSAL_SOURCE_QA_20261117.json',
   'tools/gravicentra-i6-6-policy-preview-money-precision.test.cjs',
   'tools/gravicentra-i6-6-source-intake-v2.test.cjs',
@@ -362,5 +367,115 @@ async function main(){
   fs.appendFileSync(process.env.GITHUB_ENV,Object.entries(envFor(p)).map(([k,v])=>k+'='+v).join('\n')+'\n');
   console.log('I66_OPERATIONAL_'+phase.toUpperCase()+'_SOURCE_ARTIFACT_AUTHORITY_PASS');
 }
-module.exports={CONTROL,SITE,PREVIEW,CHANNEL,LIVE,TARGETS,DRIVERS,PROPOSAL_QA_ISOLATION,ADVISOR_QA_ISOLATION,PINNED_OWNER_PATHS,SIGNED_OBSERVABILITY_PROFILE,previewIdentity,validateBuildMarker,signedMatrixBinding,candidateForPhase,continuationForPreflight,validateArtifact,validatePreviewQa,validateProof,validateFocusedReports,signedObservabilityReports,focusedReportsFromDisk,envFor};
+// A completed operational successor is accepted only through durable evidence.
+// This reads evidence and checks concordance; it grants no deployment or writes.
+const ACCEPTANCE_KEY='i66OperationalExactLiveAcceptance20261117';
+const ACCEPTANCE_RECEIPT='artifacts/orbit360-recovery/release-control/I6_6_OPERATIONAL_EXACT_LIVE_ACCEPTANCE_20261117.json';
+const ACCEPTANCE_PROOF='artifacts/orbit360-recovery/release-control/I6_6_OPERATIONAL_EXACT_LIVE_PROOF_20261117.json';
+const R11_RECEIPT='artifacts/orbit360-recovery/release-control/I6_6_R11_RENEWAL_DRIVE_EXACT_LIVE_RECEIPT_20261113.json';
+const R11_RECEIPT_SHA256='d92c3e24dbbc4a8636fa8293e4615ad9e1646fe4af29e5718c5f85cda4115d85';
+const LIVE_WORKFLOW='.github/workflows/gravicentra-i66-privileged-role-exact-live-promotion.yml';
+const LIVE_SIGNED_STATUS='SAME_ARTIFACT_THREE_FUNCTIONS_SIGNED_LIVE_READBACK_RELOAD_RESTORE_PASS';
+const ACCEPTED_STATUS='CURRENT_OPERATIONAL_EXACT_SIGNED_LIVE_PASS_FULL_I66_HOLD';
+const sha256=value=>crypto.createHash('sha256').update(value).digest('hex');
+function validateLiveProof(p,proof){
+  assert.equal(proof.schema,'I66_FIVE_PRIVILEGED_ROLES_IMMUTABLE_LIVE_TRANSPORT_V1');
+  assert.equal(proof.status,LIVE_SIGNED_STATUS,'I66_OPERATIONAL_LIVE_NOT_ACCEPTED');
+  for(const key of ['sourceSha','buildId','buildRunId','artifactId','artifactDigest'])assert.equal(proof[key],p[key],'I66_OPERATIONAL_LIVE_IDENTITY_'+key);
+  checkBuildId(proof.buildId,p.sourceSha,'I66_OPERATIONAL_LIVE_BUILD_ID');
+  checkId(proof.runId,'I66_OPERATIONAL_LIVE_RUN_ID');checkSha(proof.headSha,'I66_OPERATIONAL_LIVE_RUN_HEAD');
+  assert.equal(proof.previewChannel,p.previewChannelId);
+  assert.deepEqual(proof.previewQa,p.previewQa,'I66_OPERATIONAL_LIVE_PREVIEW_PROOF_IDENTITY');
+  assert.deepEqual(proof.previousLive,p.currentLive,'I66_OPERATIONAL_LIVE_ROLLBACK_IDENTITY');
+  assert.equal(proof.previousHostingVersion,p.currentLive.hostingVersion);
+  assert.match(String(proof.liveHostingVersion||''),/^sites\/ays-orbit-360-lab\/versions\/[A-Za-z0-9_-]+$/);
+  assert.equal(proof.liveHostingVersion,proof.previewHostingVersion);
+  assert.notEqual(proof.liveHostingVersion,proof.previousHostingVersion);
+  for(const key of ['previewFiles','liveSiteFiles','customSiteFiles'])assert.equal(proof[key],223,'I66_OPERATIONAL_LIVE_READBACK_'+key);
+  assert.deepEqual(proof.targets,TARGETS.live,'I66_OPERATIONAL_LIVE_TARGETS');
+  assert.deepEqual(proof.signedDrivers,['privileged-role-permissions','carlos-paula-ops-leads','advisor-payables','proposal-application']);
+  for(const key of ['syntheticRestoreComplete','sameImmutableArtifact','liveBackendSameArtifact','functionsInventoryUnchangedExceptTargets','rollbackSnapshotReady'])assert.equal(proof[key],true,'I66_OPERATIONAL_LIVE_REQUIRED_'+key);
+  for(const key of ['realCustomerWrites','realFinancialOrCustomerWrites','firestoreRuleOrAuthWrites'])assert.equal(proof[key],0,'I66_OPERATIONAL_LIVE_FORBIDDEN_'+key);
+  assert.equal(proof.fullI66ProductionAccepted,false,'I66_OPERATIONAL_LIVE_SCOPE_OVERCLAIM');
+  assert.equal(proof.rollback,'OUTER_FUNCTION_ROLLBACK_GUARD_ACTIVE');
+  assert.ok(Array.isArray(proof.backendRevisions));assert.equal(proof.backendRevisions.length,3);
+  assert.deepEqual(proof.backendRevisions.map(({name,region})=>({name,region})),TARGETS.live);
+  for(const row of proof.backendRevisions){
+    assert.match(row.service,/^[a-z][a-z0-9-]+$/);
+    for(const key of ['previousRevision','currentRevision'])assert.ok(typeof row[key]==='string'&&row[key].startsWith(row.service+'-'),'I66_OPERATIONAL_LIVE_REVISION_MISSING');
+    assert.notEqual(row.previousRevision,row.currentRevision);assert.equal(row.trafficPercent,100);assert.equal(row.ready,true);
+  }
+  const focus=proof.focusedReports||{};
+  assert.deepEqual(Object.keys(focus).sort(),['advisorPayables','proposalApplication']);
+  for(const report of Object.values(focus)){
+    assert.equal(report.status,'PASS');assert.equal(report.cleanup,'PASS');
+    assert.ok(Number.isSafeInteger(report.checks)&&report.checks>0);checkDigest(report.digest,'I66_OPERATIONAL_LIVE_FOCUSED_DIGEST');
+  }
+  assert.equal(p.signedObservabilityProfile,SIGNED_OBSERVABILITY_PROFILE);
+  assert.deepEqual(focus.advisorPayables.observability,{profile:SIGNED_OBSERVABILITY_PROFILE,status:'PASS',unexpectedConsoleErrors:0,unexpectedHttpErrors:0,pageErrorCount:0,telemetryFailures:0});
+  assert.equal(focus.proposalApplication.observability?.profile,SIGNED_OBSERVABILITY_PROFILE);
+  assert.equal(focus.proposalApplication.observability.status,'PASS');
+  assert.ok(['UI_RESPONSE_CAPTURED_EXACT','UI_REQUEST_RELOAD_DURABLE_READBACK_EXACT'].includes(focus.proposalApplication.observability.mode));
+  const intake=proof.sourceIntake||{};
+  assert.equal(intake.status,'PASS');assert.equal(intake.stage,'SOURCE_INTAKE_COMPLETE');
+  for(const key of ['syntheticOnly','sourceFileHashVerified','sourceMetadataDigestVerified','normalUiRequest','normalUiResponseConfirmed','readbackAfterReload','signedActorPreserved','realLedgerPointerUnchanged','countsExact','qaAuthorityExact','normalUiIdempotentReplay'])assert.equal(intake[key],true,'I66_OPERATIONAL_LIVE_INTAKE_'+key);
+  for(const key of ['financialWrites','holds','replayIntakeWrites','consoleErrors','pageErrors','httpErrors'])assert.equal(intake[key],0,'I66_OPERATIONAL_LIVE_INTAKE_'+key);
+  assert.equal(intake.sourceRows,1);assert.equal(intake.proposals,1);
+  return proof;
+}
+function acceptedForPreflight(control,state,transport,latest,io=fs){
+  const summary=control[ACCEPTANCE_KEY];assert.ok(summary,'I66_OPERATIONAL_ACCEPTANCE_SUMMARY_MISSING');
+  assert.equal(summary.status,ACCEPTED_STATUS);assert.equal(summary.receipt,ACCEPTANCE_RECEIPT);
+  const text=io.readFileSync(ACCEPTANCE_RECEIPT,'utf8');
+  assert.equal(sha256(text),summary.receiptSha256,'I66_OPERATIONAL_ACCEPTANCE_RECEIPT_DIGEST');
+  const receipt=JSON.parse(text);
+  assert.equal(receipt.schema,'GI_I66_OPERATIONAL_EXACT_LIVE_ACCEPTANCE_V1');
+  assert.equal(receipt.status,'SIGNED_LIVE_ACCEPTED_FULL_I66_HOLD');
+  assert.equal(receipt.gate,'I6.6');assert.equal(receipt.fullI66ProductionAccepted,false);assert.equal(receipt.realFinancialWrites,0);
+  assert.equal(receipt.liveProof?.path,ACCEPTANCE_PROOF);
+  const proofText=io.readFileSync(ACCEPTANCE_PROOF,'utf8');assert.equal(sha256(proofText),receipt.liveProof.sha256,'I66_OPERATIONAL_ACCEPTANCE_PROOF_DIGEST');
+  const proof=JSON.parse(proofText),p=receipt.candidate;
+  const r11Text=io.readFileSync(R11_RECEIPT,'utf8');assert.equal(sha256(r11Text),R11_RECEIPT_SHA256,'I66_OPERATIONAL_ACCEPTANCE_R11_HISTORY_DRIFT');
+  const r11=JSON.parse(r11Text),previous=receipt.previousExactHostingRelease;
+  for(const [key,value] of Object.entries({sourceSha:r11.sourceSha,buildId:r11.immutableBuildId,artifactId:r11.immutableArtifactId,artifactDigest:r11.immutableArtifactDigest,previewRunId:r11.immutableBuildRunId,liveCloneRunId:r11.liveSignedUatRunId,liveHostingVersion:r11.hostingVersion,receipt:R11_RECEIPT}))assert.equal(previous?.[key],value,'I66_OPERATIONAL_ACCEPTANCE_R11_BACKUP_'+key);
+  assert.deepEqual(transport.previousExactHostingReleaseR11,previous,'I66_OPERATIONAL_ACCEPTANCE_PREVIOUS_TRANSPORT');
+  assert.equal(control.i66R11RenewalDriveExactLiveRelease20261113?.status,'PREVIOUS_R11_RENEWAL_DRIVE_EXACT_LIVE_PRESERVED');
+  for(const [key,value] of Object.entries({sourceSha:r11.sourceSha,artifactId:r11.immutableArtifactId,artifactDigest:r11.immutableArtifactDigest,hostingVersion:r11.hostingVersion,receipt:R11_RECEIPT}))assert.equal(control.i66R11RenewalDriveExactLiveRelease20261113[key],value,'I66_OPERATIONAL_ACCEPTANCE_R11_SUMMARY_'+key);
+  candidateForPhase({gate:'I6.6',historicalClosedGate:'B4-007',status:'OPERATIONAL_EXACT_LIVE_PROMOTION_AUTHORIZED',forbidBackendFunctionDeploy:false,forbidFirestoreRulesDataAuthWrites:true,backendFunctionPreviewOnly:false,forbidBackendLiveFunctionDeploy:false,livePromotionAuthorized:true,previewApproved:true,noHostingPromotion:false,currentExactHostingRelease:previous,operationalReleaseCandidate:p},'live');
+  validateArtifact(p,receipt.buildRun,receipt.buildArtifact);validatePreviewQa(p,receipt.previewRun,receipt.previewArtifact);
+  validateProof(p,receipt.signedPreviewProof);validateLiveProof(p,proof);
+  assert.equal(receipt.signedPreviewProof.runId,p.previewQa.runId);assert.equal(receipt.signedPreviewProof.headSha,p.previewQa.headSha);
+  const runs=[['build',receipt.buildRun,BUILD_WORKFLOW,'immutable-package'],['preview',receipt.previewRun,PREVIEW_WORKFLOW,'exact-preview-only'],['live',receipt.liveRun,LIVE_WORKFLOW,'exact-role-live']];
+  for(const [key,run,workflow,jobName] of runs){
+    assert.equal(run?.status,'completed');assert.equal(run.conclusion,'success');assert.equal(run.path,workflow);assert.equal(run.head_branch,'recovery/fase-a-clean-20260831');
+    checkSha(run.head_sha,'I66_OPERATIONAL_ACCEPTANCE_RUN_HEAD');
+    const job=receipt.jobs?.[key];assert.equal(job?.name,jobName);checkId(job.id,'I66_OPERATIONAL_ACCEPTANCE_JOB_ID');
+    assert.equal(job.run_id,run.id);assert.equal(job.status,'completed');assert.equal(job.conclusion,'success','I66_OPERATIONAL_ACCEPTANCE_SKIPPED_OR_FAILED_JOB');
+  }
+  assert.equal(receipt.liveRun.id,proof.runId);assert.equal(receipt.liveRun.head_sha,proof.headSha);
+  const artifact=receipt.liveArtifact;checkId(artifact?.id,'I66_OPERATIONAL_ACCEPTANCE_LIVE_ARTIFACT');checkDigest(artifact.digest,'I66_OPERATIONAL_ACCEPTANCE_LIVE_ARTIFACT_DIGEST');
+  assert.equal(artifact.expired,false);assert.equal(artifact.name,'gi-i66-role-exact-live-proof-'+proof.runId);
+  assert.equal(artifact.workflow_run?.id,proof.runId);assert.equal(artifact.workflow_run?.head_sha,proof.headSha);
+  const facts={sourceSha:p.sourceSha,buildId:p.buildId,buildRunId:p.buildRunId,artifactId:p.artifactId,artifactDigest:p.artifactDigest,liveRunId:proof.runId,liveEvidenceArtifactId:artifact.id,liveEvidenceArtifactDigest:artifact.digest,hostingVersion:proof.liveHostingVersion,receipt:ACCEPTANCE_RECEIPT};
+  for(const [key,value] of Object.entries(facts)){
+    assert.equal(summary[key],value,'I66_OPERATIONAL_ACCEPTANCE_CP_'+key);
+    assert.equal(state.currentLiveSuccessorAcceptance?.[key],value,'I66_OPERATIONAL_ACCEPTANCE_STATE_'+key);
+  }
+  assert.equal(control.currentExecutionDecisionPointer,ACCEPTANCE_KEY);
+  assert.equal(state.currentExecutionDecisionPointer,'artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json#'+ACCEPTANCE_KEY);
+  const work=control.i66OperationalContinuation20261115;
+  assert.equal(work?.activeGate,'I6.6');assert.equal(work.closedHistoricalGate,'B4-007');assert.equal(work.latestProvenLiveSource,p.sourceSha);assert.equal(work.newLiveAcceptanceClaimed,true);
+  assert.equal(transport.status,'OPERATIONAL_EXACT_LIVE_ACCEPTED_LOCKED');
+  for(const [key,value] of Object.entries({livePromotionAuthorized:false,previewApproved:false,forbidBackendFunctionDeploy:true,backendFunctionPreviewOnly:false,forbidBackendLiveFunctionDeploy:true,noHostingPromotion:true,forbidFirestoreRulesDataAuthWrites:true}))assert.equal(transport[key],value,'I66_OPERATIONAL_ACCEPTANCE_LOCK_'+key);
+  assert.equal(transport.operationalReleaseCandidate,undefined,'I66_OPERATIONAL_ACCEPTANCE_UNCONSUMED_AUTHORIZATION');
+  const live=transport.currentExactHostingRelease;
+  assert.equal(live?.status,'PUBLISHED_EXACT_OPERATIONAL_223_FILES_THREE_FUNCTIONS_SIGNED_LIVE_PARTIAL');
+  for(const [key,target] of Object.entries({sourceSha:'sourceSha',buildId:'buildId',buildRunId:'previewRunId',artifactId:'artifactId',artifactDigest:'artifactDigest',liveRunId:'liveCloneRunId',hostingVersion:'liveHostingVersion',receipt:'receipt'}))assert.equal(live[target],facts[key],'I66_OPERATIONAL_ACCEPTANCE_TRANSPORT_'+key);
+  assert.equal(live.readbackEachOrigin,223);
+  assert.equal(latest.status,'LATEST_OPERATIONAL_EXACT_SIGNED_LIVE_PASS_FULL_I66_HOLD');assert.equal(latest.fullI66ProductionAccepted,false);
+  for(const [key,target] of Object.entries({sourceSha:'currentLiveSourceSha',buildId:'currentLiveBuildId',buildRunId:'currentLiveImmutableBuildRunId',artifactId:'currentLiveArtifactId',artifactDigest:'currentLiveArtifactDigest',liveRunId:'currentLiveDeployAndSignedQaRunId',liveEvidenceArtifactId:'currentLiveEvidenceArtifactId',liveEvidenceArtifactDigest:'currentLiveEvidenceArtifactDigest',hostingVersion:'currentLiveHostingVersion',receipt:'currentLiveReceipt'}))assert.equal(latest[target],facts[key],'I66_OPERATIONAL_ACCEPTANCE_LATEST_'+key);
+  assert.equal(latest.previousLiveVersionForRollback,r11.hostingVersion);
+  return {status:ACCEPTED_STATUS,sourceSha:p.sourceSha,receipt:ACCEPTANCE_RECEIPT};
+}
+module.exports={CONTROL,SITE,PREVIEW,CHANNEL,LIVE,TARGETS,DRIVERS,PROPOSAL_QA_ISOLATION,ADVISOR_QA_ISOLATION,PINNED_OWNER_PATHS,SIGNED_OBSERVABILITY_PROFILE,previewIdentity,validateBuildMarker,signedMatrixBinding,candidateForPhase,continuationForPreflight,validateArtifact,validatePreviewQa,validateProof,validateFocusedReports,signedObservabilityReports,focusedReportsFromDisk,envFor,ACCEPTANCE_KEY,ACCEPTANCE_RECEIPT,ACCEPTANCE_PROOF,ACCEPTED_STATUS,LIVE_SIGNED_STATUS,validateLiveProof,acceptedForPreflight};
 if(require.main===module)main().catch(error=>{console.error(String(error.message||error));process.exitCode=1;});

@@ -1,0 +1,115 @@
+{
+  "schema": "GI_I66_CURRENT_TECHNICAL_PREVIEW_ROLLOVER_V1",
+  "status": "EXACT_CURRENT_TASK_PREVIEW_SOURCE_INTAKE_RELOAD_REBUILD",
+  "gate": "I6.6",
+  "phase": "PREVIEW",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "projectId": "ays-orbit-360-lab",
+  "sourceBaseHead": "e71b3deffda0143cfef0e0ecd1153921277c3d52",
+  "executionAuthority": {
+    "kind": "EXISTING_I66_CONTINUE_CORRECT_TEST_AND_PUBLISH_SCOPE",
+    "canonicalPlan": "artifacts/orbit360-recovery/release-control/I6_6_OPERATIONAL_CONTINUATION_20261115.json",
+    "scope": "Replace only the current isolated technical Preview with the next immutable I6.6 candidate under the existing instruction to continue correction and signed verification. This is not an extension of the separate legal consent decision and not permission to delete any channel, change LIVE or apply payments.",
+    "newLegalConsentGrantUsedForHosting": false,
+    "mustStopOnBeforeStateDrift": true
+  },
+  "channel": {
+    "id": "gi-i66-rc-44009981499",
+    "origin": "https://ays-orbit-360-lab--gi-i66-rc-44009981499-d08psr2y.web.app",
+    "createdAt": "2026-11-17T03:34:28.874524705Z",
+    "expectedVersion": "sites/ays-orbit-360-lab/versions/0964cef6b576a2ad"
+  },
+  "previousCandidate": {
+    "sourceSha": "6b6e8bbba3371b32a1bfb80b903c40377e11d727",
+    "buildRunId": 44052221474,
+    "buildRunAttempt": 1,
+    "artifactId": 14314985190,
+    "artifactDigest": "sha256:e97f86355181a8c685b8dd800626a4885f8e34b45222f178d15355d76cbf499f",
+    "expectedSiteFileCount": 223,
+    "runtimeProofRequired": "DOWNLOAD_HASH_ARCHIVE_VALIDATE_MANIFEST_AND_COMPARE_EVERY_HOSTED_FILE_INCLUDING_BUILD_JSON_BEFORE_REPLACEMENT"
+  },
+  "protectedLive": {
+    "sourceSha": "84769378eb2014addebfefdbdd63091bddc4b817",
+    "buildRunId": 43503721126,
+    "artifactId": 14075022275,
+    "artifactDigest": "sha256:b0f3bacb68511cdfc91ac934602c51f55afec5c1d6428d886d13a72a706ee283",
+    "liveRunId": 43506971214,
+    "version": "sites/ays-orbit-360-lab/versions/0766db29b338befc",
+    "origins": [
+      "https://ays-orbit-360-lab.web.app",
+      "https://app.aysseguros.com"
+    ]
+  },
+  "freshInventoryEvidence": {
+    "runId": 44052221474,
+    "runAttempt": 1,
+    "jobId": 133932744471,
+    "totalChannels": 51,
+    "inventoryStep": "SUCCESS",
+    "wholeJob": "SUCCESS",
+    "rolloverEvidenceArtifactId": 14314815423,
+    "rolloverEvidenceArtifactDigest": "sha256:e21b2db71930cd866f2d1870012a3353c09fc62790fdaa18428c52e526fe63b5",
+    "afterInventorySha256": "43f892b0006b0a0d606bacf08b89b931ede062cc7205f00729a9bb742a69a2e5",
+    "comparison": "FULL_OTHER_FIFTY_CHANNEL_METADATA_EXACT_BEFORE_AFTER",
+    "otherChannelsIdenticalFullMetadata": 50,
+    "writes": 0,
+    "freshRuntimeInventoryRequiredAgain": true
+  },
+  "constraints": {
+    "onlyWhenNewChannelQuotaIsExhausted": true,
+    "backupBeforeOverwrite": true,
+    "readbackBeforeAndAfter": true,
+    "sameNewImmutableArtifact": true,
+    "noLiveChanges": true,
+    "noOtherChannelChanges": true,
+    "noChannelDeletion": true,
+    "noBackendChanges": true,
+    "noBusinessDataWrites": true,
+    "noRulesAuthIamChanges": true,
+    "stopOnIdentityDrift": true
+  },
+  "notAcceptance": {
+    "hostingReplacementIsNotSignedFunctionalPass": true,
+    "hostingReplacementIsNotProductionAcceptance": true,
+    "noOperationalPercentIncrease": true
+  },
+  "priorRolloverReceipt": {
+    "path": "artifacts/orbit360-recovery/release-control/I6_6_TECHNICAL_PREVIEW_SOURCE_INTAKE_PRECISION_REBUILD_20261117.json",
+    "sha256": "25ad1090222d97dcc86d0670088658f92e8e33cb459b4fdaaa669b66ad84d7ba",
+    "preserveBytes": true
+  },
+  "causalRetry": {
+    "defect": "The exact signed Preview reached source-intake durable UI response and failed after navigation/reload at the readiness predicate, retaining one pageerror but only ERROR/NO_CODE/UNNAMED_FAILURE. The successor corrects the bounded readiness/diagnostic owner; the historical raw runtime cause remains unproven until independently reproduced or observed.",
+    "failedPreviewRunId": 44149681372,
+    "failedPreviewRunAttempt": 1,
+    "failedPreviewJobId": 134274317530,
+    "diagnosticArtifactId": 14359840043,
+    "diagnosticArtifactDigest": "sha256:19fb4390b1b15274372eb974ab28bb0839e99a750f20ea0618385708ef50a657",
+    "failedRunRemainsFailed": true,
+    "lastProvenStage": "SOURCE_INTAKE_NORMAL_UI_EXACT_BYTES_DURABLE_RESPONSE",
+    "observedFailureStage": "SOURCE_INTAKE_RELOAD_READBACK",
+    "observedFailureLocation": {
+      "file": "gravicentra-i6-6-proposal-application-signed-uat.cjs",
+      "line": 350,
+      "column": 19
+    },
+    "observedPageErrors": 1,
+    "observedConsoleErrors": 0,
+    "observedHttpErrors": 0,
+    "historicalRootCauseProven": false,
+    "historicalErrorNameAndMessageRetained": false,
+    "priorSyntheticCleanup": "PASS",
+    "priorSyntheticRemaining": 0,
+    "priorProposalOwnedRecordsRemoved": 26,
+    "priorRealControlUnchanged": true,
+    "correction": "Wait for the existing browser runtime safely across reload; retain bounded sanitized readiness/pageerror diagnostics. Preserve all real-action, actor, durable-readback, idempotence, financial-isolation, error and cleanup acceptance checks.",
+    "preserveFunctionalChecksAndCleanup": true,
+    "doNotRetroactivelyClassifyConsole": true,
+    "unexpectedErrorsRemainHold": true,
+    "newSourceRequiresNewBuildDigest": true,
+    "noLiveOrRealPaymentAuthority": true,
+    "noReuseOfPriorPreviewPassForNewSource": true,
+    "noRebuildOfCertifiedArtifactInPlace": true
+  }
+}
