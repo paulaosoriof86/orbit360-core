@@ -1,0 +1,90 @@
+{
+  "schema": "I6_6_DIRECTION_LIVE_REVIEW_CONTEXT_V1",
+  "status": "PROPOSED_NOT_AUTHORIZED",
+  "decisionId": "DIRECTION_I66_LIVE_SAME_LEGAL_V2_TECHNICAL_SUCCESSORS_AUTHORIZED_20261117",
+  "sourceBaseHead": "1b65a790530d49fe1d1fb451f02838fd9a713c53",
+  "proposal": {
+    "path": "artifacts/orbit360-recovery/release-control/I6_6_DIRECTION_LIVE_V2_SCOPE_PROPOSAL_20261117.json",
+    "sha256": "e9e1b369d166242cfff2145b08fd36ca8ad3288b302ce6980e00a36e3165e04a"
+  },
+  "subject": {
+    "advisorId": "ase-paula-osorio",
+    "role": "direccion",
+    "tenantId": "alianzas-soluciones",
+    "country": "GT",
+    "actorUidSha256": "f612197b077c598edd61d757c1e2995be7a3b17300602ce4802bccefed216a72"
+  },
+  "environment": {
+    "gate": "I6.6",
+    "phase": "LIVE",
+    "repository": "paulaosoriof86/orbit360-core",
+    "branch": "recovery/fase-a-clean-20260831",
+    "firebaseProject": "ays-orbit-360-lab",
+    "origin": "https://app.aysseguros.com"
+  },
+  "legal": {
+    "version": "2.0",
+    "clauseIds": [
+      "confidencialidad",
+      "tratamiento_datos",
+      "descargo_ia"
+    ],
+    "termsProjectionSha256": "485b07887091063cc7a5d1dc8f11a9bb547f2ef059490bb04d4acee73404f6b2",
+    "legalOwnerSha256": "b74a965b7be0d67862d82bcf73dacc0d5a8293dcf30cb4f5f3fdeaa6ee1c68a3"
+  },
+  "constraints": {
+    "ordinaryUiOnly": true,
+    "sameTermsI66LiveTechnicalSuccessors": true,
+    "otherActors": false,
+    "otherTenants": false,
+    "otherCountries": false,
+    "otherOrigins": false,
+    "futureGates": false,
+    "changedTerms": false,
+    "realPayments": false,
+    "storageSeeding": false,
+    "gateBypass": false
+  },
+  "executionAcceptance": {
+    "authorizationIsNotExecutionProof": true,
+    "requireSignedActor": true,
+    "requireSourcePackagePreviewLegalOwnerEqualityBeforeDeploy": true,
+    "requireExactLiveBuildAndLegalOwnerAfterClone": true,
+    "requireDisplayedTermsDigestBeforeClick": true,
+    "requireNormalCheckboxAndButton": true,
+    "requireImmediateAndReloadReadback": true,
+    "requireCandidateSourceBuildIdOriginAndReceiptInProof": true,
+    "productionAcceptanceUnchanged": true
+  },
+  "historicalPreviewAuthorization": {
+    "path": "artifacts/orbit360-recovery/release-control/I6_6_DIRECTION_PREVIEW_V2_SCOPE_AUTHORIZATION_20261116.json",
+    "sha256": "d3309675c753bd1b31f9163d506aba2e29ac70583a7b8d54cb5b8503b5c50a44",
+    "live": false,
+    "unchanged": true
+  },
+  "approvedCandidate": {
+    "sourceSha": "1b65a790530d49fe1d1fb451f02838fd9a713c53",
+    "buildId": "gi-i66-1b65a790530d-57f234755dc1",
+    "buildRunId": 44183659786,
+    "artifactId": 14373955326,
+    "artifactDigest": "sha256:fc6d8f2616141aa4388ec7df497917690fc54400d18a376f15550380334725a5",
+    "previewUrl": "https://ays-orbit-360-lab--gi-i66-rc-44009981499-d08psr2y.web.app",
+    "previewChannelId": "gi-i66-rc-44009981499",
+    "previewQa": {
+      "runId": 44185021402,
+      "headSha": "1f996d3ad6a52e41a1a670dcab19fb4e3c319bf1",
+      "receiptArtifactId": 14374251840,
+      "receiptArtifactDigest": "sha256:049ad6ac46d0e604d0cc3fca882a2ef002813d52bebf355e72d5b3c790ea9270",
+      "status": "SIGNED_DRIVERS_DURABLE_READBACK_RELOAD_RESTORE_PASS"
+    }
+  },
+  "decision": {
+    "status": "AWAITING_EXPLICIT_OWNER_APPROVAL",
+    "question": "Paula, ¿autorizas el alcance del documento «Gravicentra Insurance — Propuesta de alcance legal LIVE» para tu cuenta Dirección de Alianzas & Soluciones (A&S, Guatemala), únicamente en https://app.aysseguros.com y dentro de I6.6? Comprende registrar, mediante la casilla y el botón normales, tu aceptación de las tres cláusulas internas V2.0: confidencialidad, tratamiento de datos personales y descargo de IA, con verificación inmediata y después de recargar. Se aplicará al build gi-i66-1b65a790530d-57f234755dc1, artifact 14373955326, y a sus sucesores técnicos de I6.6 sólo con términos idénticos. No comprende otros actores, tenants, países, orígenes o gates, pagos reales, precarga del consentimiento ni elusión del gate. Responde «Autorizo el alcance LIVE propuesto».",
+    "questionSha256": "2636b54f968adab768ce899f12c22fe7e0c6906d03446f1a0d1e506a4c82c3c3",
+    "responseContext": "REVIEWED_LIVE_SCOPE_AND_EXACT_CANDIDATE",
+    "reviewDocumentSha256": "f8fd153e864892c8c4720003f1b72d4ade64fc3c866266c3719729c5a0369d4f",
+    "reviewDocumentLibraryId": "libfile_650fc78f92448191a82bddfd92c0ec60",
+    "reviewContextSha256": "4b4eabe3febe6e5dc483fb674bcdb657ba0b25958705aa8025c1cd56c814ba2d"
+  }
+}
