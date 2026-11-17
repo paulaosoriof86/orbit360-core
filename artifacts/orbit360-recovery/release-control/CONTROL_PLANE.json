@@ -9,15 +9,16 @@
     "activeGate": "I6.6",
     "closedHistoricalGate": "B4-007",
     "latestProvenLiveSource": "84769378eb2014addebfefdbdd63091bddc4b817",
-    "currentWork": "Apply the separately authorized same-terms V2.0 Direction-only I6.6 Preview scope, preserve historical source-limited receipts, build the repaired source and all QA owners once, then run the existing signed Preview gate against that exact immutable candidate. No real financial writes or LIVE acceptance is granted by this authorization.",
-    "latestHostingPreviewEvidence": "artifacts/orbit360-recovery/release-control/I6_6_V7_TIMESTAMP_FIX_QUOTA_RECOVERY_PREVIEW_READBACK_20261116.json",
-    "latestHostingPreviewSource": "d5e64e2f4ab9acb89d8765f48da33cba2df089a5",
+    "currentWork": "Correct the reproduced immutable-bundle config lookup in the existing rollover verifier, retain the failed attempt as unaccepted evidence, verify recoverable backups and all untouched channels, build a new immutable candidate, then run the existing signed Preview gate. V2.0 consent remains Direction/GT/I6.6/Preview only. No real financial writes or new LIVE acceptance.",
+    "latestHostingPreviewEvidence": "artifacts/orbit360-recovery/release-control/I6_6_TECHNICAL_PREVIEW_AFTER_HOLD_AND_CAUSAL_REPAIR_20261116.json",
+    "latestHostingPreviewSource": "3820817d8fcac86a99229cefdc46dfc03e1a8c36",
     "operationsEvidenceReview": "artifacts/orbit360-recovery/release-control/I6_6_OPS_EVIDENCE_AND_PREVIEW_BINDING_REVIEW_20261116.json",
     "legalSuccessorAcceptance": "SEPARATELY_AUTHORIZED_SAME_V2_TERMS_DIRECTION_GT_I66_PREVIEW_ONLY_NOT_YET_EXECUTED",
     "legalScopeAuthorizationReceipt": "artifacts/orbit360-recovery/release-control/I6_6_DIRECTION_PREVIEW_V2_SCOPE_AUTHORIZATION_20261116.json",
     "legalScopeAuthorizationReceiptSha256": "d3309675c753bd1b31f9163d506aba2e29ac70583a7b8d54cb5b8503b5c50a44",
     "newFinancialWrites": 0,
-    "newLiveAcceptanceClaimed": false
+    "newLiveAcceptanceClaimed": false,
+    "technicalPreviewCausalRetryReceipt": "artifacts/orbit360-recovery/release-control/I6_6_TECHNICAL_PREVIEW_ROLLOVER_CAUSAL_RETRY_20261116.json"
   },
   "b4003ActiveCertificationCursor20261106": {
     "schema": "GRAVICENTRA_B4_003_SINGLE_ACTIVE_CERTIFICATION_CURSOR_V1",

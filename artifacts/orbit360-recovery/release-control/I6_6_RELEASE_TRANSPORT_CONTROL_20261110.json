@@ -6,8 +6,8 @@
   "branch": "recovery/fase-a-clean-20260831",
   "status": "PREVIEW_BUILD_REQUESTED",
   "currentTechnicalPreviewRollover": {
-    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_TECHNICAL_PREVIEW_ROLLOVER_20261116.json",
-    "receiptSha256": "db754d7a0b26f6396e4320c7d60e09c3aba608b5ad29a32abaf03fe3d8157fb7"
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_TECHNICAL_PREVIEW_ROLLOVER_CAUSAL_RETRY_20261116.json",
+    "receiptSha256": "f0c17d2597caa8d83b281fa5b42d02016c6223035a34d894fc8e65bea687cd5d"
   },
   "directionSameTermsPreviewScope": {
     "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_DIRECTION_PREVIEW_V2_SCOPE_AUTHORIZATION_20261116.json",

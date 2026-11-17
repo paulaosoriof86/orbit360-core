@@ -1,0 +1,119 @@
+{
+  "schema": "GI_I66_CURRENT_TECHNICAL_PREVIEW_ROLLOVER_V1",
+  "status": "EXACT_CURRENT_TASK_PREVIEW_CAUSAL_RETRY_WITH_UNACCEPTED_BACKUP",
+  "gate": "I6.6",
+  "phase": "PREVIEW",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "projectId": "ays-orbit-360-lab",
+  "sourceBaseHead": "3820817d8fcac86a99229cefdc46dfc03e1a8c36",
+  "executionAuthority": {
+    "kind": "EXISTING_I66_CONTINUE_CORRECT_TEST_AND_PUBLISH_SCOPE",
+    "canonicalPlan": "artifacts/orbit360-recovery/release-control/I6_6_OPERATIONAL_CONTINUATION_20261115.json",
+    "scope": "Replace only the current isolated technical Preview with the next immutable I6.6 candidate under the existing instruction to continue correction and signed verification. This is not an extension of the separate legal consent decision and not permission to delete any channel, change LIVE or apply payments.",
+    "newLegalConsentGrantUsedForHosting": false,
+    "mustStopOnBeforeStateDrift": true
+  },
+  "channel": {
+    "id": "gi-i66-rc-44009981499",
+    "origin": "https://ays-orbit-360-lab--gi-i66-rc-44009981499-d08psr2y.web.app",
+    "createdAt": "2026-11-17T03:34:28.874524705Z",
+    "expectedVersion": "sites/ays-orbit-360-lab/versions/f15089db94f5f855"
+  },
+  "previousCandidate": {
+    "sourceSha": "3820817d8fcac86a99229cefdc46dfc03e1a8c36",
+    "buildRunId": 44019383153,
+    "buildRunAttempt": 1,
+    "artifactId": 14300731005,
+    "artifactDigest": "sha256:78aa4879a9836e1fe2e64d298833f36afb4a7a71a98ef4bdda0f9941d7b95fbb",
+    "expectedSiteFileCount": 223,
+    "runtimeProofRequired": "DOWNLOAD_HASH_ARCHIVE_VALIDATE_MANIFEST_AND_COMPARE_EVERY_HOSTED_FILE_INCLUDING_BUILD_JSON_BEFORE_REPLACEMENT",
+    "backupOnlyPostDeployFailure": {
+      "status": "UNACCEPTED_RESIDUAL_PREVIEW_NOT_RELEASE_ELIGIBLE",
+      "jobId": 133825035748,
+      "failedStepNumber": 13,
+      "failedStepName": "Verify current technical Preview rollover and preserve every other channel",
+      "evidenceArtifactId": 14300467008,
+      "evidenceArtifactDigest": "sha256:9c0cacb543674cf2e222e1ffdf65cec0f0cadccbf7052ef4536b1a766f27e5ae",
+      "priorReceiptSha256": "db754d7a0b26f6396e4320c7d60e09c3aba608b5ad29a32abaf03fe3d8157fb7",
+      "beforeInventorySha256": "676b2c90bc876b223cd0b904c4b9caaaef4720be9bbbece3e4ce0d952ec87820",
+      "beforeStatus": "PREPARED_READONLY_NOT_ACCEPTED",
+      "afterStatus": "HOLD",
+      "failureCode": "I66_TECHNICAL_ROLLOVER_RUNTIME_HOLD",
+      "requiredSuccessSteps": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        14,
+        28,
+        29
+      ],
+      "noFunctionalAcceptance": true,
+      "neverEligibleForLive": true
+    }
+  },
+  "protectedLive": {
+    "sourceSha": "84769378eb2014addebfefdbdd63091bddc4b817",
+    "buildRunId": 43503721126,
+    "artifactId": 14075022275,
+    "artifactDigest": "sha256:b0f3bacb68511cdfc91ac934602c51f55afec5c1d6428d886d13a72a706ee283",
+    "liveRunId": 43506971214,
+    "version": "sites/ays-orbit-360-lab/versions/0766db29b338befc",
+    "origins": [
+      "https://ays-orbit-360-lab.web.app",
+      "https://app.aysseguros.com"
+    ]
+  },
+  "freshInventoryEvidence": {
+    "runId": 44010597588,
+    "runAttempt": 3,
+    "jobId": 133828369851,
+    "totalChannels": 51,
+    "inventoryStep": "SUCCESS",
+    "wholeJob": "FAILURE_STALE_HISTORICAL_MARKER_ASSERTION_NOT_INVENTORY",
+    "comparison": "ONLY_TARGET_CHANGED_IN_ID_CREATED_EXPIRY_RELEASE_TIME_VERSION_PROJECTION",
+    "otherChannelsIdenticalInProjection": 50,
+    "fullPreviousInventoryComparisonRequiredAtRuntime": true,
+    "writes": 0,
+    "freshRuntimeInventoryRequiredAgain": true
+  },
+  "constraints": {
+    "onlyWhenNewChannelQuotaIsExhausted": true,
+    "backupBeforeOverwrite": true,
+    "readbackBeforeAndAfter": true,
+    "sameNewImmutableArtifact": true,
+    "noLiveChanges": true,
+    "noOtherChannelChanges": true,
+    "noChannelDeletion": true,
+    "noBackendChanges": true,
+    "noBusinessDataWrites": true,
+    "noRulesAuthIamChanges": true,
+    "stopOnIdentityDrift": true
+  },
+  "notAcceptance": {
+    "hostingReplacementIsNotSignedFunctionalPass": true,
+    "hostingReplacementIsNotProductionAcceptance": true,
+    "noOperationalPercentIncrease": true
+  },
+  "priorRolloverReceipt": {
+    "path": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_TECHNICAL_PREVIEW_ROLLOVER_20261116.json",
+    "sha256": "db754d7a0b26f6396e4320c7d60e09c3aba608b5ad29a32abaf03fe3d8157fb7",
+    "preserveBytes": true
+  },
+  "causalRetry": {
+    "defect": "Channel inventory inherited caller cwd; prepare used the bundle, finish used the workspace above candidate and could not discover firebase.json.",
+    "attribution": "REPRODUCIBLE_CONFIGURATION_DEFECT_CONSISTENT_WITH_RUNTIME_HOLD_NOT_RETROSPECTIVE_STDERR_RECOVERY",
+    "correction": "Use the exact immutable bundle config and cwd for every inventory call; retain fail-closed sanitized diagnostics.",
+    "failedRunRemainsFailed": true,
+    "newSourceRequiresNewBuildDigest": true
+  }
+}

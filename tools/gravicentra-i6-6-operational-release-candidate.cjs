@@ -53,6 +53,7 @@ const PINNED_OWNER_PATHS = Object.freeze([
   'tools/gravicentra-i6-6-preview-channel-reuse-guard.cjs',
   'tools/gravicentra-i6-6-technical-preview-rollover.test.cjs',
   'artifacts/orbit360-recovery/release-control/I6_6_CURRENT_TECHNICAL_PREVIEW_ROLLOVER_20261116.json',
+  'artifacts/orbit360-recovery/release-control/I6_6_TECHNICAL_PREVIEW_ROLLOVER_CAUSAL_RETRY_20261116.json',
   // Preserve the exact QA-only navigation retry and its restore proof after build.
   'tools/gravicentra-i6-6-preview-current-live-restore.cjs',
   '.github/workflows/gravicentra-release-delta-66-package.yml',

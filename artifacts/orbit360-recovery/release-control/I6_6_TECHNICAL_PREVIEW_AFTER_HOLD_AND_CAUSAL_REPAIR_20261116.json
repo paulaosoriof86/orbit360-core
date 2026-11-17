@@ -1,0 +1,71 @@
+{
+  "schema": "GI_I66_TECHNICAL_PREVIEW_CAUSAL_REPAIR_EVIDENCE_V1",
+  "dateGuatemala": "2026-11-16",
+  "timezone": "America/Guatemala",
+  "activeGate": "I6.6",
+  "sourceSha": "3820817d8fcac86a99229cefdc46dfc03e1a8c36",
+  "buildRunId": 44019383153,
+  "buildRunAttempt": 1,
+  "wholeRunConclusion": "failure",
+  "immutableArtifact": {
+    "id": 14300731005,
+    "digest": "sha256:78aa4879a9836e1fe2e64d298833f36afb4a7a71a98ef4bdda0f9941d7b95fbb",
+    "independentZipReadback": "EXACT",
+    "buildId": "gi-i66-3820817d8fca-57f234755dc1"
+  },
+  "runtime": {
+    "jobId": 133825035748,
+    "buildStep6": "success",
+    "deployStep10": "success",
+    "preview223AndLiveIndexReadbackStep12": "success",
+    "inventoryFinishStep13": "failure",
+    "failureCode": "I66_TECHNICAL_ROLLOVER_RUNTIME_HOLD",
+    "functionalAcceptance": false
+  },
+  "beforeAfterArtifact": {
+    "id": 14300467008,
+    "digest": "sha256:9c0cacb543674cf2e222e1ffdf65cec0f0cadccbf7052ef4536b1a766f27e5ae",
+    "independentZipReadback": "EXACT",
+    "beforeStatus": "PREPARED_READONLY_NOT_ACCEPTED",
+    "afterStatus": "HOLD",
+    "inventoryBeforeSha256": "676b2c90bc876b223cd0b904c4b9caaaef4720be9bbbece3e4ce0d952ec87820",
+    "inventoryAfterRetained": false
+  },
+  "laterReadOnlyInventory": {
+    "runId": 44010597588,
+    "runAttempt": 3,
+    "jobId": 133828369851,
+    "observedAtUtc": "2026-11-17T04:55:41Z",
+    "inventoryStep": "success",
+    "wholeJob": "failure",
+    "wholeJobReason": "STALE_HISTORICAL_MARKER_CHECK",
+    "totalChannels": 51,
+    "newOrRemovedChannelIds": 0,
+    "untouchedChannels": 50,
+    "comparedFields": [
+      "id",
+      "expireTime",
+      "createTime",
+      "releaseTime",
+      "releaseVersionId"
+    ],
+    "fullMetadataComparison": false,
+    "currentTechnicalVersion": "sites/ays-orbit-360-lab/versions/f15089db94f5f855",
+    "liveVersion": "sites/ays-orbit-360-lab/versions/0766db29b338befc"
+  },
+  "cause": {
+    "reproduction": "Inventory command inherits wrong cwd in finish; the exact CLI requires firebase.json. Real subprocess fixture reproduces old prepare success / old finish failure and corrected both success.",
+    "historicalStderrRecovered": false,
+    "fix": "Explicit immutable bundle --config and cwd; same project and site; closed sanitized error codes."
+  },
+  "retryReceipt": "artifacts/orbit360-recovery/release-control/I6_6_TECHNICAL_PREVIEW_ROLLOVER_CAUSAL_RETRY_20261116.json",
+  "acceptance": {
+    "priorFailedRunRemainsFailed": true,
+    "backupOnlyResidualIsNotReleaseEligible": true,
+    "newSourceRequiresNewSuccessfulBuild": true,
+    "newSignedQaRequired": true,
+    "newOperationalCredits": 0,
+    "realPayments": 0,
+    "liveChanges": 0
+  }
+}

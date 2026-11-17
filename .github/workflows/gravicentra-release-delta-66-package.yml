@@ -22,6 +22,7 @@ on:
       - artifacts/orbit360-recovery/release-control/I6_6_DIRECTION_PREVIEW_V2_SCOPE_AUTHORIZATION_20261116.json
       - tools/gravicentra-i6-6-preview-channel-reuse-guard.cjs
       - tools/gravicentra-i6-6-technical-preview-rollover.test.cjs
+      - artifacts/orbit360-recovery/release-control/I6_6_TECHNICAL_PREVIEW_ROLLOVER_CAUSAL_RETRY_20261116.json
       - artifacts/orbit360-recovery/release-control/I6_6_CURRENT_TECHNICAL_PREVIEW_ROLLOVER_20261116.json
       - tools/gravicentra-i6-6-preview-current-live-restore.cjs
       - tools/gravicentra-i6-6-operational-release-candidate.cjs

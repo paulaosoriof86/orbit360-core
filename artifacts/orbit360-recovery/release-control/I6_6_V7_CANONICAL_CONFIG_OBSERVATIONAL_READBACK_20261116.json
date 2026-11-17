@@ -1,0 +1,178 @@
+{
+  "schema": "GI_I66_V7_CANONICAL_CONFIG_OBSERVATIONAL_BEFORE_AFTER_V1",
+  "reviewDateGuatemala": "2026-11-16",
+  "status": "CANONICAL_CONFIG_EXISTENCE_AND_FOUR_BOOLEAN_FLAGS_OBSERVED_WRITE_RECEIPT_INCOMPLETE",
+  "scope": {
+    "repository": "paulaosoriof86/orbit360-core",
+    "branch": "recovery/fase-a-clean-20260831",
+    "reviewedCanonicalHead": "25f5112e9b4586a28ded0c49fe91973d1d5dd401",
+    "project": "ays-orbit-360-lab",
+    "documentPath": "tenants/alianzas-soluciones/config/reconciliation",
+    "gate": "I6.6",
+    "reviewMode": "READ_ONLY_EVIDENCE_RECOVERY"
+  },
+  "verifiedSourceReadOwner": {
+    "sourceSha": "c10979992a4e91da2396453749b1bd620c0b2c06",
+    "path": "tools/gravicentra-i6-6-proposal-application-signed-uat.cjs",
+    "gitBlobSha": "0c159b0f155662aa55f7633d300c5ffb47266029",
+    "sourceUrl": "https://github.com/paulaosoriof86/orbit360-core/blob/c10979992a4e91da2396453749b1bd620c0b2c06/tools/gravicentra-i6-6-proposal-application-signed-uat.cjs",
+    "readOperation": "tenant.collection('config').doc('reconciliation').get()",
+    "readUsesCanonicalConfigNotPreviewUatConfig": true,
+    "readSessionRole": "direccion",
+    "sanitizedOutputContainsNoActorUid": true
+  },
+  "signedRun": {
+    "runId": 43988425431,
+    "controlHeadSha": "00b5f62ec65df4dfcb517c90b547a01394bc1430",
+    "candidateSourceSha": "c10979992a4e91da2396453749b1bd620c0b2c06",
+    "runUrl": "https://github.com/paulaosoriof86/orbit360-core/actions/runs/43988425431",
+    "bothAttemptsOverallConclusion": "failure",
+    "globalQaPassClaimed": false
+  },
+  "before": {
+    "attempt": 1,
+    "jobId": 133722603962,
+    "jobStartedAtUtc": "2026-11-17T00:32:38Z",
+    "jobCompletedAtUtc": "2026-11-17T00:37:37Z",
+    "observationWindowUtc": {
+      "after": "2026-11-17T00:37:28.7048775Z",
+      "before": "2026-11-17T00:37:32.4622007Z"
+    },
+    "jobUrl": "https://github.com/paulaosoriof86/orbit360-core/actions/runs/43988425431/job/133722603962",
+    "decodedJobLogUtf8Sha256": "e335f866f4edaf4564c9502da3751512369922930931ccf91da36da47190c0e7",
+    "artifact": {
+      "id": 14286477555,
+      "name": "gi-i66-preview-failure-diagnostic-43988425431",
+      "sizeBytes": 1289,
+      "createdAtUtc": "2026-11-17T00:37:33Z",
+      "zipSha256": "24da8b7d974d2ac66013864ab482f24801167ddec80572396cef0f83ed68b33c",
+      "zipHashRecomputedAndMatchedGithub": true,
+      "metadataUrl": "https://api.github.com/repos/paulaosoriof86/orbit360-core/actions/artifacts/14286477555",
+      "entryName": "i66-preview-failure-diagnostic.json",
+      "entrySha256": "e84892ee744381cce27eb621eca9ba980466236373a3933583ad058381fde01c"
+    },
+    "observedPrerequisites": {
+      "status": "COMPLETE",
+      "code": "NO_CODE",
+      "configExists": false,
+      "accessConfigExists": true,
+      "authUidMatchesSelected": true,
+      "memberUidMatchesAuth": true,
+      "memberTenantMatches": true,
+      "assignedRoleValid": true,
+      "signedRolePresent": false,
+      "effectiveScope": "all",
+      "policyAllowed": true,
+      "receiptAllowed": true,
+      "policyScopeOutcome": "ALLOWED",
+      "receiptScopeOutcome": "ALLOWED",
+      "configFlags": {
+        "autoCommitHighConfidence": null,
+        "manualApplicationEnabled": null,
+        "humanConfirmationRequiredForHighConfidence": null,
+        "humanConfirmationRequired": null,
+        "requireSameCurrency": null
+      }
+    },
+    "firstReason": "TENANT_RECONCILIATION_CONFIG_REQUIRED",
+    "proposalChecks": 3,
+    "cleanup": {
+      "status": "PASS",
+      "remaining": 0,
+      "removedOwnedTargets": 8
+    }
+  },
+  "after": {
+    "attempt": 2,
+    "jobId": 133766529260,
+    "jobStartedAtUtc": "2026-11-17T02:14:43Z",
+    "jobCompletedAtUtc": "2026-11-17T02:20:35Z",
+    "observationWindowUtc": {
+      "after": "2026-11-17T02:19:49.0728591Z",
+      "before": "2026-11-17T02:19:50.7124529Z"
+    },
+    "jobUrl": "https://github.com/paulaosoriof86/orbit360-core/actions/runs/43988425431/job/133766529260",
+    "decodedJobLogUtf8Sha256": "018dfce2db7cc99f2ea6aef2d3db1b84d7dcc3eb9178c107cdcb23196940d067",
+    "artifact": {
+      "id": 14293066098,
+      "name": "gi-i66-preview-failure-diagnostic-43988425431",
+      "sizeBytes": 1668,
+      "createdAtUtc": "2026-11-17T02:20:31Z",
+      "zipSha256": "2b28c16755564fb7388ec7551d3ccc594751697b2772064440892e9ccedd00a0",
+      "zipHashRecomputedAndMatchedGithub": true,
+      "metadataUrl": "https://api.github.com/repos/paulaosoriof86/orbit360-core/actions/artifacts/14293066098",
+      "entryName": "i66-preview-failure-diagnostic.json",
+      "entrySha256": "e30bfe03fea122b72a3dff75c4fdc8e90918168b91ea6245d9507ade5eb27220"
+    },
+    "observedPrerequisites": {
+      "status": "COMPLETE",
+      "code": "NO_CODE",
+      "configExists": true,
+      "accessConfigExists": true,
+      "authUidMatchesSelected": true,
+      "memberUidMatchesAuth": true,
+      "memberTenantMatches": true,
+      "assignedRoleValid": true,
+      "signedRolePresent": false,
+      "effectiveScope": "all",
+      "policyAllowed": true,
+      "receiptAllowed": true,
+      "policyScopeOutcome": "ALLOWED",
+      "receiptScopeOutcome": "ALLOWED",
+      "configFlags": {
+        "autoCommitHighConfidence": true,
+        "manualApplicationEnabled": null,
+        "humanConfirmationRequiredForHighConfidence": false,
+        "humanConfirmationRequired": false,
+        "requireSameCurrency": true
+      }
+    },
+    "syntheticProposalReadyToApplyObserved": true,
+    "uiResolutionReadbackConfirmed": true,
+    "failureStage": "UI_APPLICATION_CONFIRM",
+    "applicationFailure": {
+      "operation": "apply_proposal_application",
+      "channel": "UI",
+      "code": "internal",
+      "reason": "UNKNOWN_REASON"
+    },
+    "proposalChecks": 10,
+    "cleanup": {
+      "status": "PASS",
+      "remaining": 0,
+      "removedOwnedTargets": 10
+    }
+  },
+  "conclusions": {
+    "configWasAbsentInAttempt1": true,
+    "configWasPresentInAttempt2": true,
+    "observedBooleanFlagsAfter": {
+      "autoCommitHighConfidence": true,
+      "humanConfirmationRequiredForHighConfidence": false,
+      "humanConfirmationRequired": false,
+      "requireSameCurrency": true
+    },
+    "manualApplicationEnabledInterpretation": "Sanitized null is not an observed boolean; it does not prove false, absence, or the full underlying value.",
+    "configurationWriteActor": "NOT_AVAILABLE_FROM_RETAINED_ARTIFACTS",
+    "configurationWriteTransactionId": "NOT_AVAILABLE_FROM_RETAINED_ARTIFACTS",
+    "configurationWriteTimestamp": "NOT_AVAILABLE_FROM_RETAINED_ARTIFACTS",
+    "fullBeforeAfterConfigDigest": "NOT_AVAILABLE_FROM_RETAINED_ARTIFACTS",
+    "fullV7ConfigurationEqualityCertified": false,
+    "writeExecutionReceiptCertified": false,
+    "currentStateAfterLastObservation": "NOT_NEWLY_READ_IN_THIS_REVIEW",
+    "newConfigurationWriteRequired": false,
+    "paymentApplicationCertified": false,
+    "existingSafeNextAction": "Read canonical config again in the new already-authorized signed Preview QA; compare retained flags and do not repeat materialization solely because its original transaction receipt is missing."
+  },
+  "reviewActions": {
+    "githubSourceMetadataAndLogsRead": true,
+    "artifactZipReadAndRehash": true,
+    "filesDownloadedToPersistentUserData": false,
+    "cloudWrites": 0,
+    "configurationWrites": 0,
+    "realPayments": 0,
+    "deployments": 0,
+    "testsExecutedAgainstRealSessions": 0
+  },
+  "evidenceBoundary": "These are independently retained before/after observations of the canonical document inside an authenticated Preview QA run. They are not an attestation of who performed the intervening configuration write, its exact payload, or complete V7 conformance. Both runs remained overall failed and must not be promoted."
+}

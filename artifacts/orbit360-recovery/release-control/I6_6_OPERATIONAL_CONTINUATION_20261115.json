@@ -87,6 +87,24 @@
     "Operational candidate validation, the signed permission-matrix driver and exact LIVE transport retained an old Preview channel independently. All signed drivers must consume one source-bound candidate; a successful test on an older frontend cannot certify the current artifact."
   ],
   "currentEvidenceBoundaries": {
+    "canonicalV7ConfigurationObservations20261116": {
+      "receipt": "artifacts/orbit360-recovery/release-control/I6_6_V7_CANONICAL_CONFIG_OBSERVATIONAL_READBACK_20261116.json",
+      "canonicalDocumentObservedAbsentThenPresent": true,
+      "fullWriteReceiptAndV7EqualityCertified": false,
+      "doNotRewriteOnlyForMissingHistoricalReceipt": true,
+      "next": "FRESH_CANONICAL_CONFIG_READBACK_IN_SIGNED_QA"
+    },
+    "currentTechnicalPreviewCausalRepair20261116": {
+      "receipt": "artifacts/orbit360-recovery/release-control/I6_6_TECHNICAL_PREVIEW_AFTER_HOLD_AND_CAUSAL_REPAIR_20261116.json",
+      "failedBuildRunId": 44019383153,
+      "deployedSource": "3820817d8fcac86a99229cefdc46dfc03e1a8c36",
+      "preview223Readback": "PASS_NOT_FUNCTIONAL_ACCEPTANCE",
+      "finalVerifier": "HOLD_REPRODUCED_CONFIG_CONTEXT_DEFECT",
+      "retryReceipt": "artifacts/orbit360-recovery/release-control/I6_6_TECHNICAL_PREVIEW_ROLLOVER_CAUSAL_RETRY_20261116.json",
+      "newSuccessfulImmutableBuildRequired": true,
+      "newFinancialWrites": 0,
+      "newAcceptanceClaimed": false
+    },
     "resumeSyncAndClickDiagnostics20261115": {
       "receipt": "artifacts/orbit360-recovery/release-control/I6_6_RESUME_SYNC_AND_FINANCE_CLICK_DIAGNOSTIC_20261115.json",
       "status": "SYNC_AND_READONLY_HOSTING_IDENTITIES_PASS_SIGNED_FINANCIAL_QA_HOLD",

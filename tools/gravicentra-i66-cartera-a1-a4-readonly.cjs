@@ -68,6 +68,186 @@ const due=r=>safeIso(r&& (r.fechaLimite||r.vence||r.fechaVencimiento));
 const paid=r=>!!r&&(r.pagado===true||r.conciliadoPago===true||!!text(r.fechaPago||r.paidDate)||/^(Pagado|Paid)$/i.test(text(r.estado))||/^PAID_/.test(text(r.paymentState)));
 const safeError=e=>/^I66_A1_A4_[A-Z0-9_]+$/.test(text(e&&e.message))?text(e.message):'I66_A1_A4_PRIVATE_READ_ERROR';
 
+// One issued-document focal read joins the existing reader, not its 37
+// insurer-statement cases. Public source contains only normalized identity
+// hashes and the private original's byte digest. Never a payment permission.
+const DOCUMENTARY_FOCAL=Object.freeze({
+  id:'ISSUED.DOC.1',sourceKind:'ISSUED_REQUIREMENT_NOT_PAYMENT',
+  sourcePdfSha256:'cf74d644ca819810d6302da17d323dd3a628e841a1be883d7c3ee27b2767c3a9',
+  policyNumberHash:'7219ede83091f1e0674185e3611197f8be50ac1d62fad604cba4d951e2f3fdd1',
+  requirementHash:'4534fefe381922c38b5ee1f4201881ec15cd3d02b297e6d15a3858141f9a8e3e',
+  clientNameHash:'97d8ae2820b6cfd3a4e1931de08b1a60d6dec082e1665f8f037e0c6d8dd90d2d',
+  insurerNameHashes:Object.freeze([
+    '53ebc0de63c6ae86c0f8ffb71c9a410252d6ae6aadad4d22ad32c10ce8874624',
+    '72c1db0e106ef4740d1d2f9f2aee82f868cf8cd504f058c05109e15c5e7bee5a',
+    'f9b86b0c4860ebb6701992f78f9e50a98dbded887d93521fef608d2a9995f1e2',
+    'd1c7a8b4edb344d29024829814a7acc3402917ac9c5eca17b5c3ade4f50a5d06'
+  ]),
+  termStart:'2026-09-25',termEnd:'2027-09-25',due:'2026-11-06',cents:97878,currency:'GTQ',
+  sourcePaid:false,paymentApplicationAuthorized:false
+});
+const FOCAL_POLICY_CAP=2000,FOCAL_LINKED_CAP=80,FOCAL_PROPOSAL_CAP=250;
+const FOCAL_NUMBER_KEYS=Object.freeze(['numero','numeroPoliza','numero_poliza','numPoliza',
+  'numeroDePoliza','noPoliza','polizaNumero','policyNumber','policyNo','polizaNo','numeroContrato']);
+const FOCAL_START_KEYS=['vigenciaInicio','vigenciaIni','fechaInicio','inicioVigencia','vigenciaDesde','fechaInicioVigencia','startDate'];
+const FOCAL_END_KEYS=['vigenciaFin','vigenciaFinal','fechaFin','finVigencia','vigenciaHasta','fechaFinVigencia','endDate'];
+const FOCAL_CLIENT_REFS=['clienteId','clientId','contratanteId'];
+const FOCAL_INSURER_REFS=['aseguradoraId','insurerId','companiaId'];
+const FOCAL_COUNTRY_KEYS=['pais','country','paisCodigo','countryCode'];
+const FOCAL_CURRENCY_KEYS=['moneda','currency','currencyCode'];
+const FOCAL_POLICY_FIELDS=[...FOCAL_NUMBER_KEYS,...FOCAL_START_KEYS,...FOCAL_END_KEYS,
+  ...FOCAL_CLIENT_REFS,...FOCAL_INSURER_REFS,...FOCAL_COUNTRY_KEYS,...FOCAL_CURRENCY_KEYS];
+const FOCAL_NAME_FIELDS=['nombreCompleto','nombreCliente','fullName','name','nombre','razonSocial',
+  'razon_social','nombres','apellidos'];
+const FOCAL_RECEIPT_FIELDS=[...reqKeys,...FOCAL_COUNTRY_KEYS,...FOCAL_CURRENCY_KEYS,'polizaId','policyId','reciboId',
+  'monto','montoTotal','primaTotal','saldo','valor','fechaLimite','vence','fechaVencimiento',
+  'estado','pagado','conciliado','conciliadoPago','reportado','validadoReporte','fechaPago',
+  'paidDate','fechaPagoReportada','paymentState','secuencia','numeroCuota'];
+const focalNormalize=v=>text(v).normalize('NFKD').replace(/[\u0300-\u036f]/g,'').toUpperCase().replace(/[^A-Z0-9]/g,'');
+const focalHash=v=>crypto.createHash('sha256').update(focalNormalize(v)).digest('hex');
+function focalRequirementHash(value){
+  const normalized=text(value).normalize('NFKD').toUpperCase().replace(/^REQ\s*-\s*/,'').replace(/\s+/g,'');
+  return /^\d+$/.test(normalized)?crypto.createHash('sha256').update(normalized).digest('hex'):null;
+}
+const focalUnique=values=>Array.from(new Set(values.filter(Boolean)));
+const focalCountries=row=>focalUnique(FOCAL_COUNTRY_KEYS.map(k=>focalNormalize(row?.[k])).map(v=>v==='GUATEMALA'?'GT':v));
+const focalCountryGT=row=>{const values=focalCountries(row);return values.length===1&&values[0]==='GT';};
+const focalCurrencyGTQ=row=>{const values=focalUnique(FOCAL_CURRENCY_KEYS.map(k=>focalNormalize(row?.[k]))
+  .map(v=>v==='QUETZALES'||v==='QUETZAL'||v==='Q'?'GTQ':v));return values.length===1&&values[0]==='GTQ';};
+const focalNames=row=>focalUnique([...FOCAL_NAME_FIELDS.map(k=>text(row?.[k])),
+  [row?.nombres,row?.apellidos].map(text).filter(Boolean).join(' ')]);
+const focalRef=(row,fields)=>{const refs=focalUnique(fields.map(k=>text(row?.[k])));
+  return refs.length===1&&/^[A-Za-z0-9._:-]{1,180}$/.test(refs[0])?refs[0]:null;};
+function focalDate(value){
+  if(value&&typeof value.toDate==='function')return value.toDate().toISOString().slice(0,10);
+  const raw=text(value),match=raw.match(/^(\d{4}-\d{2}-\d{2})(?:T00:00:00(?:\.000)?Z)?$/);
+  if(!match)return null;
+  const parsed=new Date(match[1]+'T00:00:00.000Z');
+  return Number.isFinite(parsed.getTime())&&parsed.toISOString().slice(0,10)===match[1]?match[1]:null;
+}
+function focalExactDate(row,keys,expected){
+  const raw=keys.map(k=>row?.[k]).filter(v=>v!==undefined&&v!==null&&text(v)!=='');
+  return raw.length>0&&raw.every(v=>focalDate(v)===expected);
+}
+const focalPaymentProtected=r=>paid(r)||!!(r&&(r.conciliado||r.reportado||r.validadoReporte||r.fechaPagoReportada));
+function focalIdentity(spec,entry){
+  const p=entry.policy||{},aliases=focalUnique(FOCAL_NUMBER_KEYS.map(k=>focalNormalize(p[k])));
+  const hashes=aliases.map(v=>crypto.createHash('sha256').update(v).digest('hex'));
+  return {
+    numberMatched:hashes.includes(spec.policyNumberHash),numberAliasesConflict:hashes.length!==1,
+    countryVerified:focalCountryGT(p),currencyVerified:focalCurrencyGTQ(p),
+    clientVerified:!!entry.client&&!!focalRef(p,FOCAL_CLIENT_REFS)&&focalCountryGT(entry.client)&&
+      focalNames(entry.client).some(v=>focalHash(v)===spec.clientNameHash),
+    insurerVerified:!!entry.insurer&&!!focalRef(p,FOCAL_INSURER_REFS)&&
+      focalNames(entry.insurer).some(v=>spec.insurerNameHashes.includes(focalHash(v))),
+    termVerified:focalExactDate(p,FOCAL_START_KEYS,spec.termStart)&&focalExactDate(p,FOCAL_END_KEYS,spec.termEnd)
+  };
+}
+function assessDocumentaryFocal(spec,snapshot){
+  const entries=snapshot.editions||[],out={id:spec.id,sourceKind:spec.sourceKind,
+    sourcePdfSha256:spec.sourcePdfSha256,sourcePaid:false,paymentApplicationAuthorized:false,
+    writes:0,certifiedApplied:0,scannedPolicyCount:snapshot.scannedPolicyCount||0,
+    policyNumberMatches:entries.length,exactEditionMatches:0,exactRequirementMatches:0,
+    currentStatus:'HOLD_FOCAL_UNVERIFIED',scanCoverage:{policyAliasFields:FOCAL_NUMBER_KEYS.length,
+      policyCap:FOCAL_POLICY_CAP,linkedCap:FOCAL_LINKED_CAP,proposalCap:FOCAL_PROPOSAL_CAP},
+    opsLinkedCount:snapshot.opsLinkedCount??null,opsLinkCoverage:'gestiones.polizaId_only',
+    opsAbsenceProven:false,activeProposalMatches:snapshot.activeProposalMatches??null,
+    activeLedgerPresent:snapshot.activeLedgerPresent===true};
+  if(spec.currency!=='GTQ'){out.currentStatus='HOLD_FOCAL_SOURCE_CURRENCY';return out;}
+  if(snapshot.policyScanTruncated){out.currentStatus='HOLD_FOCAL_POLICY_SCAN_TRUNCATED';return out;}
+  if(snapshot.linkedScanTruncated||snapshot.proposalScanTruncated){out.currentStatus='HOLD_FOCAL_LINKED_SCAN_TRUNCATED';return out;}
+  if(!entries.length){out.currentStatus='HOLD_FOCAL_POLICY_NOT_FOUND';return out;}
+  const identities=entries.map(e=>focalIdentity(spec,e));out.editionChecks=identities;
+  if(identities.some(x=>!x.numberMatched||x.numberAliasesConflict)){out.currentStatus='HOLD_FOCAL_POLICY_ALIAS_CONFLICT';return out;}
+  if(identities.some(x=>!x.countryVerified)){out.currentStatus='HOLD_FOCAL_POLICY_COUNTRY';return out;}
+  const eligible=identities.map((x,i)=>({x,i})).filter(({x})=>x.termVerified&&x.clientVerified&&x.insurerVerified);
+  out.exactEditionMatches=eligible.length;
+  if(eligible.length!==1){out.currentStatus=eligible.length?'HOLD_FOCAL_DUPLICATE_EXACT_EDITION':
+    identities.some(x=>x.termVerified)?'HOLD_FOCAL_CLIENT_OR_INSURER_IDENTITY':'HOLD_FOCAL_CURRENT_EDITION_NOT_FOUND';return out;}
+  const index=eligible[0].i,target=entries[index],receipts=target.receipts||[],payments=target.cobros||[];
+  if(!identities[index].currencyVerified){out.currentStatus='HOLD_FOCAL_POLICY_CURRENCY';return out;}
+  const matches=entries.flatMap((e,i)=>(e.receipts||[]).filter(r=>numbers(r).some(v=>focalRequirementHash(v)===spec.requirementHash)).map(r=>({r,i})));
+  out.receiptCount=receipts.length;out.cobroCount=payments.length;out.exactRequirementMatches=matches.length;
+  out.sameDueAmountCandidates=receipts.filter(r=>amount(r)===spec.cents&&focalExactDate(r,['fechaLimite','vence','fechaVencimiento'],spec.due)).length;
+  if(matches.length!==1){out.currentStatus=matches.length?'HOLD_FOCAL_DUPLICATE_REQUIREMENT':'HOLD_FOCAL_REQUIREMENT_NOT_LINKED';return out;}
+  if(matches[0].i!==index){out.currentStatus='HOLD_FOCAL_REQUIREMENT_OTHER_EDITION';return out;}
+  const receipt=matches[0].r;
+  if(focalCountries(receipt).some(x=>x!=='GT')){out.currentStatus='HOLD_FOCAL_RECEIPT_COUNTRY';return out;}
+  out.receiptCurrencyVerified=focalCurrencyGTQ(receipt);
+  if(!out.receiptCurrencyVerified){out.currentStatus='HOLD_FOCAL_RECEIPT_CURRENCY';return out;}
+  out.amountVerified=amount(receipt)===spec.cents;
+  out.dueVerified=focalExactDate(receipt,['fechaLimite','vence','fechaVencimiento'],spec.due);
+  const explicitSourceRefs=sourceRefKeys.map(k=>text(receipt[k])).filter(Boolean);
+  out.sourceReferencesConsistent=explicitSourceRefs.length>0&&explicitSourceRefs
+    .every(v=>focalRequirementHash(v)===spec.requirementHash);
+  if(!out.amountVerified||!out.dueVerified){out.currentStatus='HOLD_FOCAL_DUE_OR_AMOUNT';return out;}
+  if(!out.sourceReferencesConsistent){out.currentStatus='HOLD_FOCAL_EXTERNAL_REFERENCE_CONFLICT';return out;}
+  out.linkedPaymentCount=payments.filter(c=>text(c.reciboId)===text(receipt.id)).length;
+  out.paymentOrReportEvidence=focalPaymentProtected(receipt)||payments.some(c=>text(c.reciboId)===text(receipt.id)&&focalPaymentProtected(c));
+  if(out.linkedPaymentCount>1){out.currentStatus='HOLD_FOCAL_DUPLICATE_LINKED_PAYMENT';return out;}
+  out.currentStatus=out.paymentOrReportEvidence?'ALREADY_PAID_OR_REPORTED_PROTECTED_NO_WRITE':'ALREADY_PRESENT_PENDING_NO_WRITE';
+  return out;
+}
+async function scanDocumentaryFocal(db,spec=DOCUMENTARY_FOCAL){
+  const tenant=db.collection('tenants').doc('alianzas-soluciones');
+  const col=name=>tenant.collection('data').doc(name).collection('items');
+  const policyRead=await col('polizas').select(...FOCAL_POLICY_FIELDS).limit(FOCAL_POLICY_CAP).get();
+  const snapshot={scannedPolicyCount:policyRead.size,policyScanTruncated:policyRead.size>=FOCAL_POLICY_CAP,
+    linkedScanTruncated:false,proposalScanTruncated:false,editions:[],opsLinkedCount:null,
+    activeProposalMatches:null,activeLedgerPresent:false};
+  if(snapshot.policyScanTruncated)return assessDocumentaryFocal(spec,snapshot);
+  const found=policyRead.docs.filter(d=>FOCAL_NUMBER_KEYS.some(k=>text(d.data()?.[k])&&focalHash(d.data()[k])===spec.policyNumberHash));
+  if(found.length>=24){snapshot.linkedScanTruncated=true;return assessDocumentaryFocal(spec,snapshot);}
+  const rawEvidence={policies:found.map(d=>({...d.data(),id:d.id})),editions:[],ops:[],proposals:[]};
+  const linkedRows=async(name,id,fields)=>{
+    const read=await col(name).where('polizaId','==',id).select(...fields).limit(FOCAL_LINKED_CAP).get();
+    if(read.size>=FOCAL_LINKED_CAP)snapshot.linkedScanTruncated=true;
+    return read.docs.map(d=>({...d.data(),id:d.id})).sort((a,b)=>a.id.localeCompare(b.id));
+  };
+  for(const document of found){
+    const policy=document.data()||{},clientId=focalRef(policy,FOCAL_CLIENT_REFS),insurerId=focalRef(policy,FOCAL_INSURER_REFS);
+    const [clientRead,insurerRead,receipts,cobros,ops]=await Promise.all([
+      clientId?col('clientes').doc(clientId).get():null,
+      insurerId?col('aseguradoras').doc(insurerId).get():null,
+      linkedRows('recibosEsperados',document.id,FOCAL_RECEIPT_FIELDS),
+      linkedRows('cobros',document.id,FOCAL_RECEIPT_FIELDS),
+      linkedRows('gestiones',document.id,['polizaId','policyId','clienteId','estado','tipo'])
+    ]);
+    const project=(read,fields)=>read?.exists?Object.fromEntries(fields.filter(k=>read.data()?.[k]!==undefined).map(k=>[k,read.data()[k]])):null;
+    const entry={policy,client:project(clientRead,[...FOCAL_NAME_FIELDS,...FOCAL_COUNTRY_KEYS]),
+      insurer:project(insurerRead,FOCAL_NAME_FIELDS),receipts,cobros};
+    snapshot.editions.push(entry);rawEvidence.editions.push(entry);rawEvidence.ops.push(...ops);
+  }
+  snapshot.opsLinkedCount=found.length?new Set(rawEvidence.ops.map(r=>r.id)).size:null;
+  const pointer=await col('cobrosLedgerControl').doc('active').get();
+  const runId=text(pointer.data()?.activeRunId);snapshot.activeLedgerPresent=!!runId;
+  if(runId){
+    if(!/^[a-zA-Z0-9][a-zA-Z0-9._:-]{1,179}$/.test(runId))throw Error('I66_A1_A4_FOCAL_LEDGER_ID_INVALID');
+    const proposals=await col('cobrosLedgerRuns').doc(runId).collection('propuestasConciliacion')
+      .select('policyNumber','numeroPoliza','polizaNumero','polizaId','policyId','reciboId','receiptId','estado','status')
+      .limit(FOCAL_PROPOSAL_CAP).get();
+    snapshot.proposalScanTruncated=proposals.size>=FOCAL_PROPOSAL_CAP;
+    const policyIds=found.map(d=>d.id);
+    rawEvidence.proposals=proposals.docs.map(d=>({...d.data(),id:d.id})).filter(r=>
+      ['policyNumber','numeroPoliza','polizaNumero'].some(k=>text(r[k])&&focalHash(r[k])===spec.policyNumberHash)||
+      ['polizaId','policyId'].some(k=>policyIds.includes(text(r[k]))));
+    snapshot.activeProposalMatches=rawEvidence.proposals.length;
+    rawEvidence.activeRunId=runId;
+  }
+  const out=assessDocumentaryFocal(spec,snapshot);
+  out.snapshotFingerprint=crypto.createHash('sha256').update(JSON.stringify(rawEvidence)).digest('hex');
+  return out;
+}
+function observationMetadata(now=new Date(),sourceSha=process.env.GITHUB_SHA){
+  const parts=Object.fromEntries(new Intl.DateTimeFormat('en-CA',{
+    timeZone:'America/Guatemala',year:'numeric',month:'2-digit',day:'2-digit'
+  }).formatToParts(now).filter(p=>p.type!=='literal').map(p=>[p.type,p.value]));
+  return {observedAtUtc:now.toISOString(),
+    observationDateGuatemala:parts.year+'-'+parts.month+'-'+parts.day,
+    sourceReviewDateGuatemala:'2026-11-13',
+    ...(typeof sourceSha==='string'&&/^[a-f0-9]{40}$/.test(sourceSha)&&sourceSha.length===40?{workflowSourceSha:sourceSha}:{})};
+}
+
 function assess(one,snapshot){
   const policies=snapshot.policies||[],out={id:one.id,sourcePaid:!!one.paidDate,
     sourceBasis:one.sourceBasis||'INSURER_STATEMENT',
@@ -220,12 +400,16 @@ async function main(){
   const db=getFirestore(getApps()[0]||initializeApp({projectId:PROJECT}));
   const first=await scan(db),second=await scan(db);
   if(first.length!==CASES.length||JSON.stringify(first)!==JSON.stringify(second))throw Error('I66_A1_A4_CONCURRENT_CHANGE');
+  const focalFirst=await scanDocumentaryFocal(db),focalSecond=await scanDocumentaryFocal(db);
+  if(JSON.stringify(focalFirst)!==JSON.stringify(focalSecond))throw Error('I66_A1_A4_FOCAL_CONCURRENT_CHANGE');
   const bantrabRows=first.filter(x=>x.id.startsWith('A3.'));
   const previous=bantrabRows.filter(x=>BANTRAB_PREVIOUSLY_WRITTEN.includes(x.id));
   const remaining=bantrabRows.filter(x=>!BANTRAB_PREVIOUSLY_WRITTEN.includes(x.id));
   const matched=x=>x.exactRequirementMatches===1&&x.exactAmountEditions===1;
   const report={schema:'gi.i66.cartera.a1-a4-a7.readonly.v4',dateGuatemala:'2026-11-13',
+    ...observationMetadata(),
     project:'ays-orbit-360-lab',cases:first,totalCases:first.length,writes:0,
+    documentaryFocalReadback:focalFirst,
     sourceSha256:SOURCE_SHA256,
     bantrabPostProtectedBatchReadback:{priorProtectedRunId:43438038880,
       priorProtectedSourceReferenceWrites:7,priorProtectedPaymentWrites:0,
@@ -252,4 +436,6 @@ async function main(){
   console.log('I66_CARTERA_A1_A4_READONLY='+JSON.stringify(report));
 }
 if(require.main===module)main().catch(e=>{console.error(safeError(e));process.exitCode=1});
-module.exports={CASES,SOURCE_SHA256,BANTRAB_PREVIOUSLY_WRITTEN,assess,resolveEditions,numbers,amount,paid,policyVariants};
+module.exports={CASES,SOURCE_SHA256,BANTRAB_PREVIOUSLY_WRITTEN,assess,resolveEditions,numbers,amount,paid,policyVariants,
+  DOCUMENTARY_FOCAL,FOCAL_POLICY_CAP,FOCAL_LINKED_CAP,FOCAL_PROPOSAL_CAP,FOCAL_NUMBER_KEYS,
+  focalNormalize,focalHash,focalRequirementHash,focalIdentity,assessDocumentaryFocal,scanDocumentaryFocal,observationMetadata};
