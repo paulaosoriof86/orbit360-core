@@ -9,7 +9,7 @@
     "activeGate": "I6.6",
     "closedHistoricalGate": "B4-007",
     "latestProvenLiveSource": "84769378eb2014addebfefdbdd63091bddc4b817",
-    "currentWork": "Exact 42a676 immutable Preview and dual-LIVE readback completed. Run the same four signed drivers with source-pinned native console attribution and causal UI-response proof; no source changes after build. Independent read-only portfolio lookup confirmed one existing focal client and zero gestiones under two exact client-reference fields. Do not duplicate that client or infer payment. No new LIVE acceptance or percentage credit.",
+    "currentWork": "Current exact signed Preview run44027761291 is HOLD: fifteen advisor checks and cleanup passed, but two unexpected HTTP/console events occurred in finance UI hydration; proposal driver was not executed. Eight deliberate negative calls are exactly attributed. The failure artifact retained totals/stage but not complete sanitized events. No LIVE acceptance or promotion. Eight updated insurer statement files were located in Drive, but no new inference batch or real application has run. Process changed source statements independently in parallel with the bounded QA repair; do not duplicate the existing focal client or guess conflicting document identity.",
     "latestHostingPreviewEvidence": "artifacts/orbit360-recovery/release-control/I6_6_PREVIEW_TRANSPORT_42A676_READBACK_20261116.json",
     "latestHostingPreviewSource": "42a6764125f18106debc52edcb79741fe49e829c",
     "operationsEvidenceReview": "artifacts/orbit360-recovery/release-control/I6_6_OPS_EVIDENCE_AND_PREVIEW_BINDING_REVIEW_20261116.json",
@@ -25,12 +25,34 @@
       "buildRunId": 44026819055,
       "artifactId": 14303601582,
       "artifactDigest": "sha256:210fb130f998f367faecefbc34c6287bf59cafcbede8002f345cfb813d4ed1b6",
-      "status": "AUTHORIZED_EXACT_CANDIDATE_SIGNED_QA_NOT_YET_PASSED",
+      "status": "HOLD_UNEXPECTED_FINANCE_CONSOLE_AND_HTTP_ERRORS",
       "signedObservabilityProfile": "I66_SIGNED_BROWSER_OBSERVABILITY_V1"
     },
     "documentaryFocalReadbackEvidence": "artifacts/orbit360-recovery/release-control/I6_6_EXISTING_CLIENT_INDEPENDENT_GESTIONES_READBACK_20261116.json",
-    "signedPreviewEvidence": "artifacts/orbit360-recovery/release-control/I6_6_SIGNED_PREVIEW_BD564_FUNCTIONAL_AND_OBSERVABILITY_READBACK_20261116.json",
-    "nextSourceWork": "NONE_SOURCE_FROZEN_RUN_EXACT_SIGNED_PREVIEW_AND_READBACK"
+    "signedPreviewEvidence": "artifacts/orbit360-recovery/release-control/I6_6_SIGNED_PREVIEW_42A676_HOLD_AND_STATEMENT_INTAKE_20261117.json",
+    "nextSourceWork": "PARALLEL_CHANGED_STATEMENT_INGESTION_AND_FAILURE_DIAGNOSTIC_RETENTION_REPAIR",
+    "latestSignedQaOutcome": {
+      "runId": 44027761291,
+      "conclusion": "FAILURE",
+      "status": "HOLD_UNEXPECTED_FINANCE_CONSOLE_AND_HTTP_ERRORS",
+      "sourceSha": "42a6764125f18106debc52edcb79741fe49e829c",
+      "advisorChecksPassed": 15,
+      "unexpectedConsoleErrors": 2,
+      "unexpectedHttpErrors": 2,
+      "pageErrors": 0,
+      "telemetryFailures": 0,
+      "cleanupRemaining": 0,
+      "proposalDriverExecuted": false,
+      "realFinancialWrites": 0,
+      "fullPreviewAcceptance": false
+    },
+    "updatedStatementIntake": {
+      "evidence": "artifacts/orbit360-recovery/release-control/I6_6_SIGNED_PREVIEW_42A676_HOLD_AND_STATEMENT_INTAKE_20261117.json",
+      "identifiedFiles": 8,
+      "insurers": 5,
+      "inferenceBatchesExecuted": 0,
+      "newPayments": 0
+    }
   },
   "b4003ActiveCertificationCursor20261106": {
     "schema": "GRAVICENTRA_B4_003_SINGLE_ACTIVE_CERTIFICATION_CURSOR_V1",

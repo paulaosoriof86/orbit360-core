@@ -1,0 +1,151 @@
+{
+  "schema": "GI_I66_SIGNED_PREVIEW_HOLD_AND_PARALLEL_STATEMENT_INTAKE_V1",
+  "dateGuatemala": "2026-11-17",
+  "gate": "I6.6",
+  "status": "SIGNED_PREVIEW_HOLD_UNEXPECTED_FINANCE_HTTP_ERRORS_NO_LIVE_PROMOTION",
+  "sourceSha": "42a6764125f18106debc52edcb79741fe49e829c",
+  "activationCommit": "5469b7ab040523f3e4b033b1bf6a463f4989eae0",
+  "execution": {
+    "runId": 44027761291,
+    "attempt": 1,
+    "jobId": 133852204843,
+    "conclusion": "failure",
+    "completedAtUtc": "2026-11-17T06:03:38Z",
+    "workflowPath": ".github/workflows/gravicentra-i66-privileged-role-three-function-preview-uat.yml",
+    "failureArtifactId": 14303254179,
+    "failureArtifactDigest": "sha256:ed783225f8acf54ad0ca581e8752bd417209f00396f8a510cff4c369364320ae",
+    "evidenceBasis": "GITHUB_RUN_JOBS_ARTIFACT_METADATA_AND_DECODED_JOB_LOGS"
+  },
+  "immutableBuild": {
+    "runId": 44026819055,
+    "conclusion": "success",
+    "artifactId": 14303601582,
+    "artifactDigest": "sha256:210fb130f998f367faecefbc34c6287bf59cafcbede8002f345cfb813d4ed1b6",
+    "sourceUnchangedAfterBuild": true,
+    "previewFilesExact": 223,
+    "liveFilesExactEachOrigin": 223,
+    "otherChannelsPreserved": 50
+  },
+  "actualSignedResults": {
+    "permissions": {
+      "status": "PASS_READONLY_TWO_SIGNED_ACTORS",
+      "operativeModules": 8,
+      "directionModules": 10,
+      "protectedRoleMatrix": {
+        "roles": 5,
+        "criticalCapabilities": 7,
+        "readOnly": true,
+        "notFiveSignedWriteActors": true
+      }
+    },
+    "opsLeadsTasks": {
+      "status": "PASS_TWO_SIGNED_ACTORS_CREATE_UPDATE_RESOLVE_RELOAD",
+      "syntheticRestoredEachActor": 3,
+      "customerRecordsTouched": 0,
+      "authChanges": 0,
+      "liveCalls": 0
+    },
+    "advisorPayables": {
+      "status": "HOLD",
+      "functionalChecksPassed": 15,
+      "cleanup": "PASS",
+      "remaining": 0,
+      "financialPayments": 0,
+      "bankMovements": 0,
+      "realCustomerWritesRequested": 0,
+      "authOrMembershipMutations": 0,
+      "failureStage": "FINANCE_UI_HYDRATION",
+      "failureCheck": "ADVISOR_UAT_BROWSER_OBSERVABILITY_HOLD",
+      "observability": {
+        "status": "HOLD",
+        "expectedDenials": 8,
+        "verifiedExpectedDenials": 8,
+        "observedConsoleErrors": 10,
+        "capturedConsoleErrors": 10,
+        "expectedNetworkConsoleErrors": 8,
+        "unexpectedConsoleErrors": 2,
+        "unexpectedHttpErrors": 2,
+        "pageErrorCount": 0,
+        "telemetryFailures": 0
+      }
+    },
+    "proposalApplication": {
+      "status": "NOT_EXECUTED_ON_THIS_SOURCE_AFTER_ADVISOR_HOLD",
+      "previousSuccessfulRunId": 44023553726,
+      "previousSourceSha": "bd564d5c48e4a55ac08adb101fbe8e1bd270ea8e",
+      "previousChecks": 13,
+      "noTransferOfAcceptance": true
+    }
+  },
+  "evidenceRetentionGap": {
+    "fullSanitizedBrowserEventsInFailureArtifact": false,
+    "stdoutRetainsTotalsAndStageOnly": true,
+    "exactUnexpectedEndpointAndRequestNotRecoverableFromCurrentEvidence": true,
+    "noRetrospectiveExceptionOrReclassificationAllowed": true,
+    "requiredRepair": "Preserve complete sanitized diagnostics on failure in the existing workflow, with a regression test; never emit acceptance from diagnostic collection."
+  },
+  "updatedInsurerStatementIntake": {
+    "metadataReadAtUtc": "2026-11-17T06:07:40Z",
+    "sourceCutDate": "2026-11-16",
+    "newOrUpdatedFilesIdentified": 8,
+    "insurers": 5,
+    "spreadsheets": 6,
+    "pdfs": 2,
+    "contentsConsumedByInferenceEngine": 0,
+    "newInferenceBatchExecuted": false,
+    "newRealApplications": 0,
+    "newPayments": 0,
+    "privateProviderIdsAndDocumentContentsExcluded": true,
+    "next": "Process the changed insurer statements through the existing V7 source/evidence/deduplication path in parallel with the bounded QA repair; do not claim that a metadata discovery or technical readback updated business records."
+  },
+  "documentaryFocalCorrection": {
+    "id": "ISSUED.DOC.1",
+    "sourcePdfSha256": "cf74d644ca819810d6302da17d323dd3a628e841a1be883d7c3ee27b2767c3a9",
+    "originalPdfReviewedAll14Pages": true,
+    "fullSinglePaymentSchedulePresent": true,
+    "paymentSchedulePage": 14,
+    "insuredIdentityConflictBetweenPolicyPages": true,
+    "conflictingPages": [
+      2,
+      9
+    ],
+    "netPremiumAndTaxSplitNotExplicitlyVerified": true,
+    "paymentEvidence": false,
+    "existingClientMustNotBeDuplicated": true,
+    "noClaimOfMissingPaymentSchedule": true,
+    "needsCanonicalInsuredIdentityClarificationBeforePolicyConsolidation": true,
+    "thisExceptionMustNotBlockOtherInsurerSources": true
+  },
+  "canonicalMetrics": {
+    "operations": {
+      "completed": 6,
+      "total": 8,
+      "percent": 75
+    },
+    "fiveOperationalBlocks": {
+      "completed": 19,
+      "total": 31,
+      "percent": 61.3
+    },
+    "postproductionI6": {
+      "completed": 6,
+      "total": 10,
+      "percent": 60
+    },
+    "newAcceptanceCredits": 0
+  },
+  "boundaries": {
+    "historicalI5AndB4007RemainAccepted": true,
+    "currentLiveSourceSha": "84769378eb2014addebfefdbdd63091bddc4b817",
+    "livePromotionAuthorized": false,
+    "realPayments": 0,
+    "realCustomerWrites": 0,
+    "noNewAuthRulesIam": true
+  },
+  "next": [
+    "RETURN_COMPLETE_VERIFIED_STATUS_TO_OWNER",
+    "INGEST_CHANGED_INSURER_STATEMENTS_IN_PARALLEL_READONLY_FIRST",
+    "RETAIN_FULL_FAILURE_DIAGNOSTICS_WITHOUT_ALTERING_ACCEPTANCE_CRITERIA",
+    "RESOLVE_EXACT_UNEXPECTED_FINANCE_ERRORS_BEFORE_PREVIEW_OR_LIVE_ACCEPTANCE"
+  ]
+}

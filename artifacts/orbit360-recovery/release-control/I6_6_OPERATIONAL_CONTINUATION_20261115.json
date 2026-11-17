@@ -92,7 +92,7 @@
       "previewSourceSha": "42a6764125f18106debc52edcb79741fe49e829c",
       "buildRunId": 44026819055,
       "buildAndFullReadback": "PASS_NOT_FUNCTIONAL_ACCEPTANCE",
-      "signedQaStatus": "AUTHORIZED_EXACT_CANDIDATE_NOT_YET_PASSED",
+      "signedQaStatus": "HOLD_UNEXPECTED_FINANCE_CONSOLE_AND_HTTP_ERRORS",
       "documentaryFocalReadbackReceipt": "artifacts/orbit360-recovery/release-control/I6_6_EXISTING_CLIENT_INDEPENDENT_GESTIONES_READBACK_20261116.json",
       "documentaryFocalStatus": "EXISTING_CLIENT_UNIQUE_POLICY_AND_REQUIREMENT_NOT_FOUND_NO_GESTIONES_IN_TWO_REFERENCE_FIELDS",
       "newFinancialWrites": 0,
@@ -156,8 +156,8 @@
       "percent": 61.3,
       "scope": "Five frozen operational blocks only; not total product or elapsed work; source tests do not raise LIVE acceptance."
     },
-    "newPreviewAcceptance": "42A676_EXACT_TRANSPORT_PASS_SIGNED_OBSERVABILITY_QA_PENDING",
-    "lastSignedPreviewAcceptance": "BD564_FOUR_FUNCTIONAL_DRIVERS_PASS_15_ADVISOR_13_PROPOSAL_CHECKS_CONSOLE_ATTRIBUTION_HOLD",
+    "newPreviewAcceptance": "HOLD_UNEXPECTED_FINANCE_CONSOLE_AND_HTTP_ERRORS",
+    "lastSignedPreviewAcceptance": "42A676_HOLD_15_ADVISOR_CHECKS_PASS_TWO_UNEXPECTED_FINANCE_ERRORS_PROPOSAL_NOT_EXECUTED",
     "newLiveAcceptance": "NOT_EXECUTED",
     "failedPreviewRun": 43982928603,
     "failedPreviewSource": "39f54e24e59983a59a7c9a41912e0eed154efa18",
@@ -168,16 +168,20 @@
       "supersedingRunProvedSignedOperativeServerDenial": true
     },
     "lastSignedPreviewEvidence": {
-      "receipt": "artifacts/orbit360-recovery/release-control/I6_6_SIGNED_PREVIEW_BD564_FUNCTIONAL_AND_OBSERVABILITY_READBACK_20261116.json",
-      "sourceSha": "bd564d5c48e4a55ac08adb101fbe8e1bd270ea8e",
-      "signedQaRunId": 44023553726,
-      "conclusion": "SUCCESS_FUNCTIONAL_CHECKS_ONLY",
-      "advisorChecks": 15,
-      "proposalChecks": 13,
+      "receipt": "artifacts/orbit360-recovery/release-control/I6_6_SIGNED_PREVIEW_42A676_HOLD_AND_STATEMENT_INTAKE_20261117.json",
+      "runId": 44027761291,
+      "conclusion": "FAILURE",
+      "status": "HOLD_UNEXPECTED_FINANCE_CONSOLE_AND_HTTP_ERRORS",
+      "sourceSha": "42a6764125f18106debc52edcb79741fe49e829c",
+      "advisorChecksPassed": 15,
+      "unexpectedConsoleErrors": 2,
+      "unexpectedHttpErrors": 2,
+      "pageErrors": 0,
+      "telemetryFailures": 0,
       "cleanupRemaining": 0,
-      "unclassifiedConsoleEvents": 10,
-      "fullQualityAcceptance": false,
-      "mustNotPromote": true
+      "proposalDriverExecuted": false,
+      "realFinancialWrites": 0,
+      "fullPreviewAcceptance": false
     },
     "latestPreviewEvidence": {
       "receipt": "artifacts/orbit360-recovery/release-control/I6_6_PREVIEW_TRANSPORT_42A676_READBACK_20261116.json",
@@ -193,7 +197,7 @@
       "previewUrl": "https://ays-orbit-360-lab--gi-i66-rc-44009981499-d08psr2y.web.app",
       "hostingFileReadback": 223,
       "liveHostingUnchanged": true,
-      "signedFunctionalQa": "PENDING_EXACT_FOUR_DRIVER_EXECUTION",
+      "signedFunctionalQa": "HOLD_UNEXPECTED_FINANCE_CONSOLE_AND_HTTP_ERRORS",
       "newFunctionalAcceptance": false,
       "mustNotPromote": true
     },
@@ -318,7 +322,49 @@
       "policyCreationAuthorizedByReadback": false,
       "paymentEvidence": false,
       "paymentAuthorization": false,
-      "newFinancialWrites": 0
+      "newFinancialWrites": 0,
+      "originalPdfFullPaymentSchedulePresent": true,
+      "originalPdfInsuredIdentityConflict": true,
+      "originalDocumentClarificationEvidence": "artifacts/orbit360-recovery/release-control/I6_6_SIGNED_PREVIEW_42A676_HOLD_AND_STATEMENT_INTAKE_20261117.json"
+    },
+    "previousSignedPreviewEvidenceBefore42a676": {
+      "receipt": "artifacts/orbit360-recovery/release-control/I6_6_SIGNED_PREVIEW_BD564_FUNCTIONAL_AND_OBSERVABILITY_READBACK_20261116.json",
+      "sourceSha": "bd564d5c48e4a55ac08adb101fbe8e1bd270ea8e",
+      "signedQaRunId": 44023553726,
+      "conclusion": "SUCCESS_FUNCTIONAL_CHECKS_ONLY",
+      "advisorChecks": 15,
+      "proposalChecks": 13,
+      "cleanupRemaining": 0,
+      "unclassifiedConsoleEvents": 10,
+      "fullQualityAcceptance": false,
+      "mustNotPromote": true
+    },
+    "currentSignedObservabilityHold": {
+      "evidence": "artifacts/orbit360-recovery/release-control/I6_6_SIGNED_PREVIEW_42A676_HOLD_AND_STATEMENT_INTAKE_20261117.json",
+      "runId": 44027761291,
+      "conclusion": "FAILURE",
+      "status": "HOLD_UNEXPECTED_FINANCE_CONSOLE_AND_HTTP_ERRORS",
+      "sourceSha": "42a6764125f18106debc52edcb79741fe49e829c",
+      "advisorChecksPassed": 15,
+      "unexpectedConsoleErrors": 2,
+      "unexpectedHttpErrors": 2,
+      "pageErrors": 0,
+      "telemetryFailures": 0,
+      "cleanupRemaining": 0,
+      "proposalDriverExecuted": false,
+      "realFinancialWrites": 0,
+      "fullPreviewAcceptance": false,
+      "completeFailureEventRetention": "NOT_AVAILABLE_REPAIR_REQUIRED"
+    },
+    "updatedInsurerStatements20261117": {
+      "evidence": "artifacts/orbit360-recovery/release-control/I6_6_SIGNED_PREVIEW_42A676_HOLD_AND_STATEMENT_INTAKE_20261117.json",
+      "sourceCutDate": "2026-11-16",
+      "metadataIdentified": 8,
+      "insurers": 5,
+      "contentsConsumedByInferenceEngine": 0,
+      "newBatchExecuted": false,
+      "newRealApplications": 0,
+      "newPayments": 0
     }
   },
   "orderedWork": [
