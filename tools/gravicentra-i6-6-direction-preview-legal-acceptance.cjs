@@ -25,6 +25,15 @@ const TECHNICAL_RETRY=Object.freeze({
   originalReceiptSha256:'68d3961987e19acdc223b7d2adf01eb39c540ca6ae8aa72c64752cab45fddbae',
   legalOwnerSha256:'b74a965b7be0d67862d82bcf73dacc0d5a8293dcf30cb4f5f3fdeaa6ee1c68a3'
 });
+// One separate QA-only diagnostic successor. Historical receipts and their
+// validation paths stay exact; no actor, origin, clause or future-source grant.
+const PROPOSAL_DIAGNOSTIC_RETRY=Object.freeze({
+  receiptPath:'artifacts/orbit360-recovery/release-control/I6_6_DIRECTION_PREVIEW_PROPOSAL_DIAGNOSTIC_RETRY_20261117.json',
+  receiptSha256:'e2c123a1a4a250815b295d2b8aa3b9432bc84bed06b242c174a4b9cc8f7f8634',
+  sourceParent:'3076026cdfd900cf8e99037c3220682b3be68943',
+  originalReceiptSha256:'68d3961987e19acdc223b7d2adf01eb39c540ca6ae8aa72c64752cab45fddbae',
+  legalOwnerSha256:'b74a965b7be0d67862d82bcf73dacc0d5a8293dcf30cb4f5f3fdeaa6ee1c68a3'
+});
 
 // Only these source-owned diagnostic codes may leave the signed session.
 const LEGAL_FAILURE_CHECKS=Object.freeze([
@@ -136,6 +145,18 @@ function validateTechnicalRetry({technicalRetryBytes,receiptSha256,candidate,cfg
   assert.deepEqual(candidate?.legalTechnicalRetry,technicalRetryCandidatePin(cfg.source),'DIRECTION_LEGAL_TECHNICAL_RETRY_BINDING_MISMATCH');
   return true;
 }
+function proposalDiagnosticRetryCandidatePin(sourceSha){
+  return{receiptPath:PROPOSAL_DIAGNOSTIC_RETRY.receiptPath,receiptSha256:PROPOSAL_DIAGNOSTIC_RETRY.receiptSha256,
+    sourceParent:PROPOSAL_DIAGNOSTIC_RETRY.sourceParent,sourceSha,legalOwnerSha256:PROPOSAL_DIAGNOSTIC_RETRY.legalOwnerSha256};
+}
+function validateProposalDiagnosticRetry({technicalRetryBytes,receiptSha256,candidate,cfg,sourceParent}){
+  assert.equal(sourceParent,PROPOSAL_DIAGNOSTIC_RETRY.sourceParent,'DIRECTION_LEGAL_DECISION_IS_NOT_FOR_THIS_SUCCESSOR');
+  assert.ok(Buffer.isBuffer(technicalRetryBytes),'DIRECTION_LEGAL_TECHNICAL_RETRY_BYTES_REQUIRED');
+  assert.equal(hash(technicalRetryBytes),PROPOSAL_DIAGNOSTIC_RETRY.receiptSha256,'DIRECTION_LEGAL_TECHNICAL_RETRY_RECEIPT_MISMATCH');
+  assert.equal(receiptSha256,PROPOSAL_DIAGNOSTIC_RETRY.originalReceiptSha256,'DIRECTION_LEGAL_TECHNICAL_RETRY_RECEIPT_MISMATCH');
+  assert.deepEqual(candidate?.legalTechnicalRetry,proposalDiagnosticRetryCandidatePin(cfg.source),'DIRECTION_LEGAL_TECHNICAL_RETRY_BINDING_MISMATCH');
+  return true;
+}
 function validateDecision({receipt,receiptSha256,candidate,cfg,sourceParent,actor,technicalRetryBytes}){
   assert.match(receiptSha256,/^[a-f0-9]{64}$/,'DIRECTION_LEGAL_RECEIPT_DIGEST_REQUIRED');
   assert.equal(cfg.phase,'PREVIEW','DIRECTION_LEGAL_PREVIEW_ONLY');
@@ -144,6 +165,8 @@ function validateDecision({receipt,receiptSha256,candidate,cfg,sourceParent,acto
   if(sourceParent===SOURCE_PARENT){
     assert.equal(technicalRetryBytes,undefined,'DIRECTION_LEGAL_TECHNICAL_RETRY_BINDING_MISMATCH');
     assert.equal(candidate?.legalTechnicalRetry,undefined,'DIRECTION_LEGAL_TECHNICAL_RETRY_BINDING_MISMATCH');
+  }else if(sourceParent===PROPOSAL_DIAGNOSTIC_RETRY.sourceParent){
+    validateProposalDiagnosticRetry({technicalRetryBytes,receiptSha256,candidate,cfg,sourceParent});
   }else validateTechnicalRetry({technicalRetryBytes,receiptSha256,candidate,cfg,sourceParent});
   assert.equal(candidate?.sourceSha,cfg.source,'DIRECTION_LEGAL_CANDIDATE_SOURCE_MISMATCH');
   assert.equal(candidate?.status,'EXACT_BACKEND_PREVIEW_SIGNED_QA_AUTHORIZED','DIRECTION_LEGAL_CANDIDATE_NOT_AUTHORIZED');
@@ -233,15 +256,17 @@ async function acceptDirectionPreviewLegal({page,actor,cfg}){
   const control=JSON.parse(fs.readFileSync(CONTROL,'utf8'));
   assert.equal(control.status,'OPERATIONAL_BACKEND_PREVIEW_AUTHORIZED','DIRECTION_LEGAL_PREVIEW_GATE_NOT_ACTIVE');
   const sourceParent=execFileSync('git',['rev-parse',cfg.source+'^'],{encoding:'utf8'}).trim();
-  const technicalRetryBytes=sourceParent===TECHNICAL_RETRY.sourceParent?fs.readFileSync(TECHNICAL_RETRY.receiptPath):undefined;
+  const technicalRetry=sourceParent===PROPOSAL_DIAGNOSTIC_RETRY.sourceParent?PROPOSAL_DIAGNOSTIC_RETRY:
+    sourceParent===TECHNICAL_RETRY.sourceParent?TECHNICAL_RETRY:undefined;
+  const technicalRetryBytes=technicalRetry?fs.readFileSync(technicalRetry.receiptPath):undefined;
   validateDecision({receipt,receiptSha256,candidate:control.operationalReleaseCandidate,cfg,sourceParent,actor,technicalRetryBytes});
-  if(technicalRetryBytes)assert.equal(hash(execFileSync('git',['show',cfg.source+':'+TECHNICAL_RETRY.receiptPath])),TECHNICAL_RETRY.receiptSha256,'DIRECTION_LEGAL_TECHNICAL_RETRY_NOT_IN_SOURCE');
+  if(technicalRetryBytes)assert.equal(hash(execFileSync('git',['show',cfg.source+':'+technicalRetry.receiptPath])),technicalRetry.receiptSha256,'DIRECTION_LEGAL_TECHNICAL_RETRY_NOT_IN_SOURCE');
   assert.equal(hash(execFileSync('git',['show',cfg.source+':'+RECEIPT])),receiptSha256,'DIRECTION_LEGAL_DECISION_NOT_IN_SOURCE');
   assert.ok(cfg.packageRoot&&path.isAbsolute(cfg.packageRoot),'DIRECTION_LEGAL_PACKAGE_ROOT_REQUIRED');
   legalSubstage='OWNER_READBACK';
   const bundled=fs.readFileSync(path.join(cfg.packageRoot,'bundle/site/core/legal.js'));
   const source=execFileSync('git',['show',cfg.source+':orbit360-platform/core/legal.js']);
-  if(technicalRetryBytes)assert.equal(hash(source),TECHNICAL_RETRY.legalOwnerSha256,'DIRECTION_LEGAL_TECHNICAL_RETRY_OWNER_CHANGED');
+  if(technicalRetryBytes)assert.equal(hash(source),technicalRetry.legalOwnerSha256,'DIRECTION_LEGAL_TECHNICAL_RETRY_OWNER_CHANGED');
   assert.equal(hash(bundled),hash(source),'DIRECTION_LEGAL_PACKAGE_SOURCE_MISMATCH');
   const response=await fetch(cfg.origin+'/core/legal.js',{headers:{'cache-control':'no-cache'}});
   assert.equal(response.status,200,'DIRECTION_LEGAL_OWNER_READBACK_FAILED');
@@ -294,4 +319,5 @@ async function acceptDirectionPreviewLegal({page,actor,cfg}){
   }
 }
 module.exports={CONTROL,RECEIPT,DECISION,SOURCE_BASE,SOURCE_PARENT,ORIGIN,ADVISOR,TENANT,VERSION,CLAUSES,TERMS_SHA256,REVIEW_SHA256,TECHNICAL_RETRY,technicalRetryCandidatePin,validateTechnicalRetry,
+  PROPOSAL_DIAGNOSTIC_RETRY,proposalDiagnosticRetryCandidatePin,validateProposalDiagnosticRetry,
   LEGAL_FAILURE_CHECKS,LEGAL_FAILURE_SUBSTAGES,safeLegalFailureSubstage,digest,projectCatalog,validateDecision,validatePresentationIdentity,validatePresentation,validateCountrySelection,validateAccepted,validateAcceptanceProof,acceptDirectionPreviewLegal};

@@ -33,9 +33,9 @@ const AUTHORIZATION=Object.freeze({schema:'GI_I66_EXACT_FAILED_PREVIEW_RESTORE_V
   expectedSiteFileCount:223,backupBeforeOverwrite:true,readbackBeforeAndAfter:true,
   noLiveChanges:true,noBusinessDataWrites:true,noBackendChanges:true,noRulesAuthIamChanges:true,noChannelDeletion:true});
 
-// Historical 2d4 fixtures above remain byte-exact through the existing pinned
-// regression test. The executable entrypoint below accepts only this observed
-// failed47 candidate. No runtime caller can construct or select another context.
+// Historical 2d4 and failed47 contexts remain pinned regression APIs. The
+// executable entrypoint is bound below to the separately observed failed39.
+// No runtime caller can construct or select an arbitrary context.
 const CURRENT_FAILED=Object.freeze({sourceSha:'47f4d2de26e02d1792f31563288a64819e4b64d1',buildRunId:43978039744,
   artifactId:14282155921,artifactDigest:'sha256:b35146189da52846bc03580cb3d5b6fdc82bdc5b51e2c6574474c53d97c39a32',
   // Observed inventory43758700651 attempt4/job133697464760, 2026-11-16T23:39:40Z.
@@ -53,6 +53,55 @@ const HISTORICAL_QA_RECEIPT={"checks":4,"cleanup":"PASS","remaining":0,"realCust
 const CURRENT_QA_RECEIPT={"checks":6,"cleanup":"PASS","remaining":0,"realCustomerWritesRequested":0,"bankMovements":0,"financialPayments":0,"authOrMembershipMutations":0,"failureClass":"TIMEOUT_ERROR","failureStage":"ASSIGNMENT_DOCUMENTARY_UI","failureCheck":"ASSERTION_OR_RUNTIME_FAILURE","failureLocation":{"file":"gravicentra-i6-6-advisor-payables-signed-uat.cjs","line":556,"column":131}};
 const HISTORICAL_DIAGNOSTIC_BODY={"schema":"I6_6_PREVIEW_DIAGNOSTIC_ONLY_V1","status":"FAILED_NOT_ACCEPTED","runId":43972678411,"sourceSha":"2d4e2d007d42560ca0ed0e7ce4108c889b416539","reports":[{"status":"HOLD","phase":"PREVIEW","failureStage":"DIRECTION_LEGAL_ACCEPTANCE","failureCheck":"DIRECTION_LEGAL","failureClass":"ERR_ASSERTION","failureLocation":{"file":"gravicentra-i6-6-advisor-payables-signed-uat.cjs","line":517,"column":39},"checks":4,"cleanupStatus":"PASS","remaining":0}]};
 const CURRENT_DIAGNOSTIC_BODY={"schema":"I6_6_PREVIEW_DIAGNOSTIC_ONLY_V1","status":"FAILED_NOT_ACCEPTED","runId":43978867873,"sourceSha":"47f4d2de26e02d1792f31563288a64819e4b64d1","reports":[{"status":"HOLD","phase":"PREVIEW","failureStage":"ASSIGNMENT_DOCUMENTARY_UI","failureCheck":"ASSERTION_OR_RUNTIME_FAILURE","failureClass":"TIMEOUT_ERROR","failureLocation":{"file":"gravicentra-i6-6-advisor-payables-signed-uat.cjs","line":556,"column":131},"financeUiDiagnostics":{"beforeClick":{"snapshotStatus":"CAPTURED","route":"FINANZAS","tabCount":1,"tabConnected":true,"tabVisible":true,"tabEnabled":true,"rect":{"x":1056,"y":183,"width":132,"height":34},"centerInViewport":true,"targetReceivesPointer":true,"topTag":"DIV","topId":null,"topClasses":["tab"],"legalOverlayPresent":false,"legalOverlayAtTarget":false,"legalOverlayCount":0,"modalCount":0,"authRestoring":false}},"checks":6,"cleanupStatus":"PASS","remaining":0}]};
+// Observed failed39: CxP passed, while Proposal stopped after three checks.
+// Inventory43758700651 attempt5/job133710557557 at 2026-11-17T00:07:31.5627805Z
+// proves the channel version only; its later historical-marker assertion HOLD
+// is never treated as complete QA or release acceptance.
+const ACTIVE_FAILED=Object.freeze({sourceSha:'39f54e24e59983a59a7c9a41912e0eed154efa18',buildRunId:43982177239,
+  artifactId:14283796218,artifactDigest:'sha256:ba90d53bd4bafdea75748df779539e8efab75e75bf93845215dd20ba8c34e0d8',
+  hostingVersion:'sites/ays-orbit-360-lab/versions/e05fb7764246f298',qaRunId:43982928603,
+  qaHeadSha:'3076026cdfd900cf8e99037c3220682b3be68943',qaJobId:133703764371});
+const ACTIVE_DIAGNOSTIC=Object.freeze({artifactId:14283479018,
+  artifactDigest:'sha256:f183fce7b9c46faacf78ef63e5218f90e8d962cebf20c69768926cff61717938',
+  artifactName:'gi-i66-preview-failure-diagnostic-43982928603',archiveSize:672,
+  entryName:'i66-preview-failure-diagnostic.json',
+  entrySha256:'07ec4b5e86ed64cbd66970f61712319040c6d0af34a22b511da2366823c72bfe'});
+const ACTIVE_AUTHORIZATION=Object.freeze({...AUTHORIZATION,
+  failedCandidate:ACTIVE_FAILED,failedQaDiagnostic:ACTIVE_DIAGNOSTIC});
+const ACTIVE_PAYABLE_QA_RECEIPT=Object.freeze({checks:15,cleanup:'PASS',remaining:0,realCustomerWritesRequested:0,
+  bankMovements:0,financialPayments:0,authOrMembershipMutations:0});
+const ACTIVE_PROPOSAL_QA_RECEIPT=Object.freeze({sourceSha:ACTIVE_FAILED.sourceSha,phase:'PREVIEW',status:'HOLD',checks:3,
+  cleanup:{status:'PASS',remaining:0,removedOwnedTargets:8,errors:[]},realControlUnchanged:true});
+const ACTIVE_DIAGNOSTIC_BODY={"schema":"I6_6_PREVIEW_DIAGNOSTIC_ONLY_V1","status":"FAILED_NOT_ACCEPTED","runId":43982928603,"sourceSha":"39f54e24e59983a59a7c9a41912e0eed154efa18","reports":[{"status":"PASS","phase":"PREVIEW","financeUiDiagnostics":{"beforeClick":{"snapshotStatus":"CAPTURED","route":"FINANZAS","tabCount":1,"tabConnected":true,"tabVisible":true,"tabEnabled":true,"rect":{"x":1056,"y":183,"width":132,"height":34},"centerInViewport":true,"targetReceivesPointer":true,"topTag":"DIV","topId":null,"topClasses":["tab"],"legalOverlayPresent":false,"legalOverlayAtTarget":false,"legalOverlayCount":0,"modalCount":0,"authRestoring":false}},"checks":15,"cleanupStatus":"PASS","remaining":0},{"status":"HOLD","phase":"PREVIEW","checks":3,"cleanupStatus":"PASS","remaining":0}]};
+function validateProposalQaReceipts(text){
+  const lines=text.split(/\r?\n/),stamp=/^\d{4}-\d\d-\d\dT[\d:.]+Z /;
+  const payableLines=lines.filter(line=>line.includes('I66_ADVISOR_PAYABLE_SIGNED_PREVIEW_PASS '));
+  assert.equal(payableLines.length,1,'I66_RESTORE_QA_PAYABLE_RECEIPT_NOT_UNIQUE');
+  const payable=payableLines[0].match(/^\d{4}-\d\d-\d\dT[\d:.]+Z I66_ADVISOR_PAYABLE_SIGNED_PREVIEW_PASS (.+)$/)?.[1];
+  const payableJson=JSON.stringify(ACTIVE_PAYABLE_QA_RECEIPT),payableMasked=payableJson.replace(/^\{/,'***').replace(/\}$/,'***');
+  assert.ok(payable===payableJson||payable===payableMasked,'I66_RESTORE_QA_PAYABLE_ZERO_EFFECT_RECEIPT_NOT_EXACT');
+  assert.ok(!text.includes('I66_ADVISOR_PAYABLE_SIGNED_PREVIEW_HOLD '),'I66_RESTORE_QA_PAYABLE_STATUS_CONFLICT');
+  const checks=lines.filter(line=>stamp.test(line)&&line.replace(stamp,'').startsWith('I66_PROPOSAL_UAT_CHECK='))
+    .map(line=>line.replace(stamp,'').slice('I66_PROPOSAL_UAT_CHECK='.length));
+  assert.deepEqual(checks,['EXACT_BUILD_AND_UI_BYTES','EXPLICIT_DIRECTION_PREVIEW_LEGAL_DECISION_APPLIED_BY_NORMAL_UI',
+    'ISOLATED_SYNTHETIC_STAGE_NO_REAL_POINTER_CHANGE'],'I66_RESTORE_QA_PROPOSAL_CHECKS_NOT_EXACT');
+  const proposalLines=lines.filter(line=>line.includes('"sourceSha":')&&line.includes('"realControlUnchanged":'));
+  assert.equal(proposalLines.length,1,'I66_RESTORE_QA_PROPOSAL_RECEIPT_NOT_UNIQUE');
+  assert.ok(stamp.test(proposalLines[0]),'I66_RESTORE_QA_PROPOSAL_EXECUTION_MISSING');
+  const proposal=proposalLines[0].replace(stamp,''),proposalJson=JSON.stringify(ACTIVE_PROPOSAL_QA_RECEIPT);
+  const proposalMasked=proposalJson.replace(/^\{/,'***').replace('"cleanup":{','"cleanup":***')
+    .replace('},"realControlUnchanged"','***,"realControlUnchanged"').replace(/\}$/,'***');
+  assert.ok(proposal===proposalJson||proposal===proposalMasked,'I66_RESTORE_QA_PROPOSAL_ZERO_EFFECT_RECEIPT_NOT_EXACT');
+  const holds=lines.filter(line=>line.includes('I66_PROPOSAL_SIGNED_UAT_HOLD '));
+  assert.equal(holds.length,1,'I66_RESTORE_QA_PROPOSAL_HOLD_NOT_UNIQUE');
+  assert.ok(stamp.test(holds[0])&&holds[0].replace(stamp,'')==='I66_PROPOSAL_SIGNED_UAT_HOLD ERR_ASSERTION',
+    'I66_RESTORE_QA_PROPOSAL_FAILURE_NOT_EXACT');
+  assert.ok(!text.includes('I66_PROPOSAL_SIGNED_UAT_PASS'),'I66_RESTORE_FAILED_QA_MISREPRESENTED');
+  assert.ok(!lines.some(line=>stamp.test(line)&&line.replace(stamp,'')==='I66_ROLE_PREVIEW_SIGNED_CARLOS_PAULA_SYNTHETIC_FUNCTIONAL_UAT_PASS_ZERO_REAL_CUSTOMER_WRITES'),
+    'I66_RESTORE_FAILED_QA_MISREPRESENTED');
+  // The historical artifact did not retain stage/check/location or the callable
+  // result. Never invent those fields from the assertion order or its message.
+}
 // Private mechanism shared with immutable historical regression fixtures.
 // Neither this factory nor arbitrary configuration is exported or read from env.
 function exactRestoreImplementation(AUTHORIZATION,QA_RECEIPT,DIAGNOSTIC_BODY){
@@ -112,6 +161,8 @@ function validateFailedQa(run,job,log){
     assert.ok(text.includes(value),'I66_RESTORE_QA_SOURCE_OR_LIVE_PROOF_MISSING');
   assert.match(text,/(?:^|\n)\d{4}-\d\d-\d\dT[\d:.]+Z I66_PREVIEW_BACKEND_ONLY_ZERO_LIVE_HOSTING_CHANGES_PASS(?:\r?\n|$)/,
     'I66_RESTORE_QA_LIVE_PROOF_EXECUTION_MISSING');
+  // Closed private branch; the historical receipt validators below are unchanged.
+  if(AUTHORIZATION===ACTIVE_AUTHORIZATION){validateProposalQaReceipts(text);return sha(text);}
   const lines=text.split(/\r?\n/).filter(line=>line.includes('I66_ADVISOR_PAYABLE_SIGNED_PREVIEW_HOLD '));
   assert.equal(lines.length,1,'I66_RESTORE_QA_CLEANUP_RECEIPT_NOT_UNIQUE');
   // The observed nested receipt is GitHub-masked. Never repair or partially
@@ -301,8 +352,12 @@ async function main(env=process.env){
 return Object.freeze({FAILED,DIAGNOSTIC,CURRENT,AUTHORIZATION,PREVIEW,CHANNEL,LIVE_ORIGINS,validateAuthorization,assessInventory,validateArtifact,validateFailedQa,validateDiagnosticArtifact,validateDiagnosticBytes,validateStructuredCleanup,parseManifest,cloneArguments,unchangedOtherChannels,restorePreview,main});
 }
 const HISTORICAL_RESTORE=exactRestoreImplementation(AUTHORIZATION,HISTORICAL_QA_RECEIPT,HISTORICAL_DIAGNOSTIC_BODY);
-const ACTIVE_RESTORE=exactRestoreImplementation(CURRENT_AUTHORIZATION,CURRENT_QA_RECEIPT,CURRENT_DIAGNOSTIC_BODY);
-// The historical API is retained only to run its unmodified pinned regression
-// suite. Both the public main and actual CLI are bound exclusively to failed47.
-module.exports=Object.freeze({...HISTORICAL_RESTORE,CURRENT_FAILED,CURRENT_DIAGNOSTIC,CURRENT_AUTHORIZATION,currentRestore:ACTIVE_RESTORE,main:ACTIVE_RESTORE.main});
+const CURRENT_RESTORE=exactRestoreImplementation(CURRENT_AUTHORIZATION,CURRENT_QA_RECEIPT,CURRENT_DIAGNOSTIC_BODY);
+const ACTIVE_RESTORE=exactRestoreImplementation(ACTIVE_AUTHORIZATION,ACTIVE_PROPOSAL_QA_RECEIPT,ACTIVE_DIAGNOSTIC_BODY);
+// Historical export names (including main/currentRestore) retain their exact
+// failed47 compatibility behavior for the unmodified pinned tests. Runtime CLI
+// dispatch is only failed39. New integration must use activeRestore/activeMain.
+module.exports=Object.freeze({...HISTORICAL_RESTORE,CURRENT_FAILED,CURRENT_DIAGNOSTIC,CURRENT_AUTHORIZATION,
+  currentRestore:CURRENT_RESTORE,main:CURRENT_RESTORE.main,
+  ACTIVE_FAILED,ACTIVE_DIAGNOSTIC,ACTIVE_AUTHORIZATION,activeRestore:ACTIVE_RESTORE,activeMain:ACTIVE_RESTORE.main});
 if(require.main===module)ACTIVE_RESTORE.main().catch(()=>{console.error('I66_PREVIEW_RESTORE_HOLD_FAIL_CLOSED');process.exitCode=1;});

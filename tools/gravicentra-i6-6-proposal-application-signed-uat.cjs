@@ -4,6 +4,7 @@
 const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),crypto=require('node:crypto');
 const {digest,applicationIdFor}=require('../functions/proposal-application-boundary');
 const {acceptDirectionPreviewLegal}=require('./gravicentra-i6-6-direction-preview-legal-acceptance.cjs');
+const {REASONS,CALLABLE_CODES,safeCode,safeStage,projectCallableResult,ownedUiRequest,projectUiResponse,failureDetails,safePrerequisites,diagnoseProposalPrerequisites}=require('./gravicentra-i6-6-proposal-uat-diagnostics.cjs');
 const TENANT='alianzas-soluciones',PROJECT='ays-orbit-360-lab';
 const norm=v=>String(v??'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]/g,'');
 const hash=v=>crypto.createHash('sha256').update(v).digest('hex');
@@ -23,7 +24,8 @@ function makeStage(kind,id,tenant,runId,source,hashes){
 async function main(){
  const cfg=validateEnvironment(process.env);
  const reportPath=path.join(cfg.packageRoot,'evidence','i66-proposal-application-signed-uat-'+cfg.phase.toLowerCase()+'.json');
- const report={sourceSha:cfg.sourceSha,phase:cfg.phase,status:'HOLD',syntheticOnly:true,realControlUnchanged:false,checks:[],cleanup:{status:'HOLD',remaining:null}};
+ const report={sourceSha:cfg.sourceSha,phase:cfg.phase,status:'HOLD',syntheticOnly:true,realControlUnchanged:false,checks:[],cleanup:{status:'HOLD',remaining:null},proposalDiagnostics:{prerequisites:null,calls:[]}};
+ let stage='BOOT';const enter=name=>{stage=safeStage(name);};
  const admin=require('firebase-admin'),{chromium}=require('playwright');
  const credentialPath=process.env.GOOGLE_APPLICATION_CREDENTIALS;
  const credential=credentialPath?JSON.parse(fs.readFileSync(credentialPath,'utf8')):
@@ -44,7 +46,7 @@ async function main(){
  const targetRefs=[item('clientes',ids.client),item('polizas',ids.policy),item('recibosEsperados',ids.receipt),item('carteraPrimas',ids.portfolio),item('cobros',cobroId),applicationRef,resolutionRef,
    tenant.collection('reconciliationRequests').doc(applicationId),tenant.collection('reconciliationEvents').doc(paymentEventId),
    runRef.collection('propuestasConciliacion').doc(ids.proposal),runRef.collection('evidenciasCobro').doc(ids.source),runRef,controlRef];
- const sessions=[];let browser=null,originalControl=null,originalManifest=null,activeManifestRef=null,failure=null,cleanupArmed=false;
+ const sessions=[],diagnosticReads=[];let browser=null,originalControl=null,originalManifest=null,activeManifestRef=null,failure=null,cleanupArmed=false;
  const mark={tenantId:TENANT,__syntheticQa:true,qaRunId:runId};
  const checked=name=>{report.checks.push(name);console.log('I66_PROPOSAL_UAT_CHECK='+name);};
  const snapshot=async ref=>{const s=await ref.get();return s.exists?s.data():null;};
@@ -76,13 +78,24 @@ async function main(){
   assert.equal(result.endpoint,cfg.phase==='LIVE'?'orbit360CobrosReconciliationCommand':'orbit360CobrosReconciliationCommandPreview');
   return page;
  }
- const rawCall=(page,operation,payload,activeRole)=>page.evaluate(async x=>{
-  try{const p=Orbit.productRuntimeBrowserProvidersP0,name=Orbit.reconciliationDomain.status().functionName;
-   return{result:await p.callFunction(name,{tenantId:x.tenantId,activeRole:x.activeRole||Orbit.session.rol(),operation:x.operation,payload:x.payload,reason:'I6.6 prueba firmada totalmente sintética y reversible'},'us-central1')};
-  }catch(error){return{denied:true,code:String(error.code||''),message:String(error.message||'').slice(0,180)};}
- },{tenantId:TENANT,operation,payload,activeRole});
+ const rawCall=async(page,operation,payload,activeRole)=>{
+  let response;
+  try{response=await page.evaluate(async x=>{
+   try{const p=Orbit.productRuntimeBrowserProvidersP0,name=Orbit.reconciliationDomain.status().functionName;
+    return{result:await p.callFunction(name,{tenantId:x.tenantId,activeRole:x.activeRole||Orbit.session.rol(),operation:x.operation,payload:x.payload,reason:'I6.6 prueba firmada totalmente sintética y reversible'},'us-central1')};
+   }catch(error){
+    const code=typeof error?.code==='string'?error.code.replace(/^functions\//,''):'';
+    const reason=[error?.details?.reason,error?.message].find(value=>x.reasons.includes(value));
+    return{denied:true,code:x.codes.includes(code)?code:'UNKNOWN_CODE',reason:reason||'UNKNOWN_REASON'};
+   }
+  },{tenantId:TENANT,operation,payload,activeRole,reasons:REASONS,codes:CALLABLE_CODES});
+  }catch(error){report.proposalDiagnostics.calls.push(projectCallableResult({driverFailed:true,code:safeCode(error?.code)},operation,stage,ids.receipt));throw error;}
+  report.proposalDiagnostics.calls.push(projectCallableResult(response,operation,stage,ids.receipt));
+  return response;
+ };
  const proposalPayload={proposalId:ids.proposal,sourceRunId:runId};
  try{
+  enter('BUILD_IDENTITY');
   const bundled=JSON.parse(fs.readFileSync(path.join(cfg.packageRoot,'bundle/site/__recovery__/build.json'),'utf8'));
   const remote=await fetch(cfg.origin+'/__recovery__/build.json',{headers:{'cache-control':'no-cache'}});assert.equal(remote.status,200,'I66_PROPOSAL_BUILD_UNAVAILABLE');
   const build=await remote.json();assert.equal(build.sourceSha,cfg.sourceSha);assert.equal(bundled.sourceSha,cfg.sourceSha);assert.equal(build.buildId,bundled.buildId);report.buildId=build.buildId;
@@ -91,17 +104,34 @@ async function main(){
    assert.equal(response.status,200);assert.equal(hash(Buffer.from(await response.arrayBuffer())),hash(bytes),'I66_PROPOSAL_UI_ARTIFACT_DRIFT');
   }
   checked('EXACT_BUILD_AND_UI_BYTES');
+  enter('CANONICAL_CONTROL_READ');
   const realControlRef=item('cobrosLedgerControl','active');originalControl=await snapshot(realControlRef);
   assert.ok(originalControl?.activeRunId,'I66_PROPOSAL_REAL_CONTROL_MISSING');activeManifestRef=item('cobrosLedgerRuns',originalControl.activeRunId);originalManifest=await snapshot(activeManifestRef);
+  enter('FIXTURE_ABSENCE');
   for(const ref of targetRefs)assert.equal((await ref.get()).exists,false,'I66_PROPOSAL_TARGET_PREEXISTED');
   assert.equal((await tenant.collection('reconciliationEvents').where('qaRunId','==',runId).limit(1).get()).empty,true,'I66_PROPOSAL_AUDIT_NAMESPACE_PREEXISTED');
   cleanupArmed=true;
+  enter('SIGNED_SESSION');
   const actors=await staff();browser=await chromium.launch({headless:true,args:['--no-sandbox']});
   const direction=await sign(actors[0]),carlos=await sign(actors[1]);
+  // Observe normal UI responses only for this exact synthetic proposal. Never
+  // intercept, replay or modify a request. Real proposal responses are ignored.
+  const requestStages=new WeakMap();
+  direction.on('request',request=>{if(['UI_RESOLUTION_OPEN','UI_RESOLUTION_CONFIRM','UI_APPLICATION_CONFIRM'].includes(stage))requestStages.set(request,stage);});
+  direction.on('response',response=>{
+   const request=response.request(),uiStage=requestStages.get(request);if(!uiStage)return;
+   let body;try{body=request.postDataJSON();}catch(_){return;}
+   if(!ownedUiRequest(response.url(),body,cfg.phase,ids.proposal,runId))return;
+   const operation=body.data.operation;
+   diagnosticReads.push(response.json().then(result=>report.proposalDiagnostics.calls.push(projectUiResponse(result,operation,uiStage,ids.receipt)))
+    .catch(error=>report.proposalDiagnostics.calls.push(projectCallableResult({driverFailed:true,code:safeCode(error?.code)},operation,uiStage,ids.receipt,'UI'))));
+  });
   if(cfg.phase==='PREVIEW'){
+    enter('DIRECTION_LEGAL_ACCEPTANCE');
     report.directionLegalAcceptance=await acceptDirectionPreviewLegal({page:direction,actor:actors[0],cfg:{...cfg,source:cfg.sourceSha}});
     checked('EXPLICIT_DIRECTION_PREVIEW_LEGAL_DECISION_APPLIED_BY_NORMAL_UI');
   }
+  enter('SYNTHETIC_STAGE_SETUP');
   const source={sourceRowId:prefix+'_source_row',sourceRowIdSha256:hash(prefix+'_source_row'),policyNumber:'QA-I66-'+nonce,currency:'GTQ',amount:173.23,reportedDate:'2026-11-15'};
   const hashes={sourceLedgerDigest:digest(source),packageLogicalSha256:digest({source,runId})};
   const stageProposal=makeStage('propuestasConciliacion',ids.proposal,TENANT,runId,source,hashes),stageEvidence=makeStage('evidenciasCobro',ids.source,TENANT,runId,source,hashes);
@@ -114,14 +144,31 @@ async function main(){
   await create(controlRef,{...mark,activeRunId:runId,schemaVersion:'gi-i66-synthetic-proposal-pointer-v1',status:'ACTIVE',...hashes});
   await create(runRef.collection('propuestasConciliacion').doc(ids.proposal),stageProposal);await create(runRef.collection('evidenciasCobro').doc(ids.source),stageEvidence);
   checked('ISOLATED_SYNTHETIC_STAGE_NO_REAL_POINTER_CHANGE');
-  const first=await rawCall(direction,'preview_proposal_application',proposalPayload);assert.equal(first.result?.reason,'SOURCE_RECEIPT_IDENTITY_MISSING');
-  assert.ok(first.result.resolutionOptions.some(row=>row.receiptId===ids.receipt));checked('SERVER_LOADED_EXACT_CANDIDATE');
+  enter('FIRST_PROPOSAL_PREREQUISITES');
+  // Read-only observation of the same server-owned inputs used by the callable.
+  // Only booleans and closed scope/outcome enums are retained in the report.
+  try{
+   const [configSnap,accessSnap,signed]=await Promise.all([
+    tenant.collection('config').doc('reconciliation').get(),tenant.collection('config').doc('access').get(),
+    direction.evaluate(async()=>{const p=Orbit.productRuntimeBrowserProvidersP0;await p.initialize();const user=await p.waitForUser();const token=await user.getIdTokenResult();
+     return{uid:user.uid,activeRole:Orbit.session.rol(),giActiveRole:token.claims.giActiveRole??null};})
+   ]);
+   report.proposalDiagnostics.prerequisites=diagnoseProposalPrerequisites({member:actors[0].member,selectedUid:actors[0].uid,
+    auth:{uid:signed.uid,token:{giActiveRole:signed.giActiveRole}},activeRole:signed.activeRole,tenantId:TENANT,policy,receipt,
+    configExists:configSnap.exists,accessConfigExists:accessSnap.exists,reconciliationConfig:configSnap.exists?configSnap.data():{},accessConfig:accessSnap.exists?accessSnap.data():{}});
+  }catch(error){report.proposalDiagnostics.prerequisites=safePrerequisites({status:'READ_FAILED',code:safeCode(error?.code)});}
+  enter('FIRST_PROPOSAL_PREVIEW');
+  const first=await rawCall(direction,'preview_proposal_application',proposalPayload);
+  assert.equal(first.result?.reason,'SOURCE_RECEIPT_IDENTITY_MISSING','I66_PROPOSAL_FIRST_PREVIEW_REASON');
+  assert.ok(Array.isArray(first.result?.resolutionOptions)&&first.result.resolutionOptions.some(row=>row.receiptId===ids.receipt),'I66_PROPOSAL_FIRST_PREVIEW_CANDIDATE');checked('SERVER_LOADED_EXACT_CANDIDATE');
+  enter('OPERATIVE_ACCESS');
   const carlosAccess=await carlos.evaluate(async()=>{
    const canView=Orbit.access?.can('conciliaciones','view')===true;
    try{const result=await Orbit.productRuntimeBrowserProvidersP0.protectedReadPage({tenantId:'alianzas-soluciones',collection:'conciliaciones',country:'GT',activeRole:Orbit.session.rol(),pageSize:1});
      return {canView,serverAllowed:result?.ok===true,scope:result?.scope||''};}
    catch(_){return{canView,serverAllowed:false,scope:''};}
   });
+  enter('OPERATIVE_PROPOSAL_PREVIEW');
   const operativoAssessment=await rawCall(carlos,'preview_proposal_application',proposalPayload);
   if(!carlosAccess.canView){
    assert.equal(carlosAccess.serverAllowed,false,'I66_PROPOSAL_OPERATIVO_UI_SERVER_VISIBILITY_DRIFT');
@@ -137,12 +184,16 @@ async function main(){
     checked('SIGNED_OPERATIVO_ASSIGNED_MODULE_DATA_SCOPE_PRESERVED');
    }
   }
+  enter('ADVISOR_ROLE_DENIAL');
   const advisorDenied=await rawCall(direction,'resolve_proposal_application',{...proposalPayload,policyId:ids.policy,receiptId:ids.receipt},'Asesor');assert.equal(advisorDenied.denied,true);
   checked('SIGNED_ADVISOR_RESOLUTION_REQUEST_DENIED');
+  enter('CALLER_MONEY_DENIAL');
   const forbidden=await rawCall(direction,'apply_proposal_application',{...proposalPayload,amount:999});assert.equal(forbidden.denied,true);checked('CALLER_MONEY_OVERRIDE_DENIED');
+  enter('FOREIGN_COUNTRY_DENIAL');
   await restoreQa(item('polizas',ids.policy),{...policy,pais:'ZZ'});
   const foreign=await rawCall(direction,'preview_proposal_application',proposalPayload);assert.ok(!foreign.result?.eligible&&!(foreign.result?.resolutionOptions||[]).length);
   await restoreQa(item('polizas',ids.policy),policy);checked('OUT_OF_SCOPE_COUNTRY_DENIED');
+  enter('UI_RESOLUTION_OPEN');
   await direction.waitForFunction(()=>!!Orbit.modules?.conciliaciones?.verificarAplicacion,null,{timeout:30000});
   // Exercise the production UI owner with a clearly synthetic drawer; the QA
   // namespace is intentionally excluded from the customer's real proposal list.
@@ -156,31 +207,41 @@ async function main(){
   await direction.locator('[data-conc-resolution-type]').selectOption('BANK_STATEMENT_MATCH');
   await direction.locator('[data-conc-resolution-date]').fill('2026-11-15');await direction.locator('[data-conc-resolution-paid]').fill('2026-11-14');
   await direction.locator('[data-conc-resolution-reason]').fill('UAT sintética autorizada I6.6; no cliente real');await direction.locator('[data-conc-resolution-attested]').check();
+  enter('UI_RESOLUTION_CONFIRM');
   await direction.locator('[data-conc-resolve]').click();
   await direction.waitForFunction(()=>{const button=document.querySelector('#i66-proposal-uat-drawer [data-conc-apply]');return button&&!button.hidden&&!button.disabled;},null,{timeout:30000});
+  enter('RESOLUTION_READBACK');
   const resolved=await snapshot(resolutionRef);assert.ok(owned(resolved,runId)&&resolved.sourceAttestation===true);
   assert.deepEqual(await snapshot(item('recibosEsperados',ids.receipt)),receipt);assert.deepEqual(await snapshot(item('carteraPrimas',ids.portfolio)),portfolio);assert.equal(await snapshot(item('cobros',cobroId)),null);
   checked('UI_BINDING_PERSISTED_WITH_ZERO_FINANCIAL_WRITES');
+  enter('READY_PREVIEW');
   const ready=await rawCall(direction,'preview_proposal_application',proposalPayload);assert.equal(ready.result?.eligible,true);assert.equal(ready.result.targets[0].amount,173.23);
   // Replace only our own synthetic evidence, then verify a formerly valid
   // approval digest cannot apply while source facts have changed.
+  enter('SOURCE_CHANGE_GUARD');
   const changed=makeStage('evidenciasCobro',ids.source,TENANT,runId,{...source,amount:174.23},hashes);
   await restoreQa(runRef.collection('evidenciasCobro').doc(ids.source),changed);
   const stale=await rawCall(direction,'apply_proposal_application',{...proposalPayload,planDigest:ready.result.planDigest});assert.equal(stale.result?.eligible,false);assert.equal(await snapshot(item('cobros',cobroId)),null);
   await restoreQa(runRef.collection('evidenciasCobro').doc(ids.source),stageEvidence);checked('STALE_SOURCE_APPLICATION_DENIED');
+  enter('UI_APPLICATION_CONFIRM');
   await Promise.all([direction.waitForEvent('framenavigated',{timeout:30000}),direction.locator('[data-conc-apply]').click()]);
   await direction.waitForFunction(()=>!!window.Orbit?.productRuntimeBrowserProvidersP0&&!!window.Orbit?.productAppP0,null,{timeout:30000});
+  enter('APPLICATION_RELOAD');
   const reload=await direction.evaluate(async()=>{const p=Orbit.productRuntimeBrowserProvidersP0;await p.initialize();await p.waitForUser();return(await Orbit.productAppP0.activate())?.started===true;});assert.equal(reload,true);
+  enter('APPLICATION_READBACK');
   const [application,paid,cobro,closed]=await Promise.all([snapshot(applicationRef),snapshot(item('recibosEsperados',ids.receipt)),snapshot(item('cobros',cobroId)),snapshot(item('carteraPrimas',ids.portfolio))]);
   assert.ok(owned(application,runId)&&application.status==='APPLIED'&&application.beforeAfter.length===3);
   assert.equal(paid.paymentState,'PAID_DIRECT');assert.equal(cobro.monto,173.23);assert.equal(cobro.moneda,'GTQ');assert.equal(cobro.applicationState,'PENDING_APPLICATION');assert.equal(closed.carteraActiva,false);assert.equal(closed.cobroId,cobroId);
   checked('UI_APPLY_RECEIPT_COBRO_PORTFOLIO_ATOMIC_PERSISTENCE_RELOAD');
+  enter('IDEMPOTENT_REPLAY');
   const repeated=await rawCall(direction,'apply_proposal_application',{...proposalPayload,planDigest:ready.result.planDigest});assert.equal(repeated.result?.reused,true);assert.equal(repeated.result?.readbackConfirmed,true);
   assert.equal((await items('cobros').where('reciboId','==',ids.receipt).get()).size,1);checked('SECOND_APPLY_IDEMPOTENT_NO_DOUBLE_PAYMENT');
+  enter('SOURCE_IMMUTABILITY');
   assert.deepEqual(await snapshot(runRef.collection('propuestasConciliacion').doc(ids.proposal)),stageProposal);assert.deepEqual(await snapshot(runRef.collection('evidenciasCobro').doc(ids.source)),stageEvidence);
   checked('IMMUTABLE_SOURCE_UNCHANGED_AFTER_APPLICATION');
- }catch(error){failure=error;report.failureCode=String(error.code||error.message||'UNKNOWN').replace(/[^A-Za-z0-9_.:-]/g,'_').slice(0,180);}
+ }catch(error){failure=error;Object.assign(report,failureDetails(error,stage));}
  finally{
+  enter('SYNTHETIC_RESTORE');
   const cleanupErrors=[];
   // Only records proven to belong to this exact QA execution are removable.
   // No collection deletion, broad prefix deletion, or real record restoration.
@@ -197,8 +258,11 @@ async function main(){
    const remaining=cleanupArmed?(await Promise.all(targetRefs.map(ref=>ref.get()))).filter(s=>s.exists).length:0;
    if(originalControl){assert.deepEqual(await snapshot(item('cobrosLedgerControl','active')),originalControl);assert.deepEqual(await snapshot(activeManifestRef),originalManifest);report.realControlUnchanged=true;}
    report.cleanup={status:cleanupErrors.length||remaining?'HOLD':'PASS',remaining,removedOwnedTargets:removed,errors:cleanupErrors};
-  }catch(error){report.cleanup={status:'HOLD',remaining:null,errorCode:String(error.code||'CLEANUP_CHECK_FAILED')};failure=failure||error;}
+  }catch(error){report.cleanup={status:'HOLD',remaining:null,errorCode:safeCode(error?.code)};if(!failure)Object.assign(report,failureDetails(error,stage));failure=failure||error;}
   for(const context of sessions)try{await context.close();}catch(_){}
+  // Closing contexts settles body reads even when an observed UI request failed.
+  // Observational diagnostics must never hold the ownership cleanup/report open.
+  await Promise.allSettled(diagnosticReads);
   if(browser)await browser.close();
   report.status=!failure&&report.cleanup.status==='PASS'&&report.realControlUnchanged?'PASS':'HOLD';
   fs.mkdirSync(path.dirname(reportPath),{recursive:true});fs.writeFileSync(reportPath,JSON.stringify(report,null,2)+'\n');
@@ -207,4 +271,4 @@ async function main(){
  if(report.status!=='PASS')throw failure||Error('I66_PROPOSAL_SIGNED_UAT_HOLD');
 }
 module.exports={validateEnvironment,owned,makeStage};
-if(require.main===module)main().catch(error=>{console.error('I66_PROPOSAL_SIGNED_UAT_HOLD '+String(error.code||error.message||'UNKNOWN').replace(/[^A-Za-z0-9_.:-]/g,'_').slice(0,180));process.exitCode=1;});
+if(require.main===module)main().catch(error=>{const safe=failureDetails(error,'BOOT');console.error('I66_PROPOSAL_SIGNED_UAT_HOLD '+safe.failureCode+' '+safe.failureCheck);process.exitCode=1;});

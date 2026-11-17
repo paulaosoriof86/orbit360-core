@@ -54,6 +54,13 @@ const PINNED_OWNER_PATHS = Object.freeze([
   'tools/gravicentra-i6-6-preview-current-live-restore-47f4.test.cjs',
   'artifacts/orbit360-recovery/release-control/I6_6_DIRECTION_PREVIEW_QA_NAVIGATION_RETRY_20261116.json',
   'artifacts/orbit360-recovery/release-control/I6_6_QA_NAVIGATION_CAUSAL_RETRY_20261116.json',
+  // Proposal diagnostics change QA evidence only; their exact bytes remain pinned.
+  'tools/gravicentra-i6-6-proposal-uat-diagnostics.cjs',
+  'tools/gravicentra-i6-6-proposal-uat-diagnostics.test.cjs',
+  'tools/gravicentra-i6-6-direction-preview-proposal-diagnostic-retry.test.cjs',
+  'tools/gravicentra-i6-6-preview-current-live-restore-39f54e2.test.cjs',
+  'artifacts/orbit360-recovery/release-control/I6_6_DIRECTION_PREVIEW_PROPOSAL_DIAGNOSTIC_RETRY_20261117.json',
+  'artifacts/orbit360-recovery/release-control/I6_6_PROPOSAL_DIAGNOSTIC_CAUSAL_RETRY_20261117.json',
   'tools/gravicentra-i6-6-operational-release-candidate.cjs',
   'tools/gravicentra-i66-privileged-role-exact-live-transport.mjs',
   PREVIEW_WORKFLOW,'.github/workflows/gravicentra-i66-privileged-role-exact-live-promotion.yml',

@@ -23,6 +23,12 @@ on:
       - tools/gravicentra-i6-6-assignment-detail-navigation.test.cjs
       - tools/gravicentra-i6-6-direction-preview-qa-navigation-retry.test.cjs
       - tools/gravicentra-i6-6-preview-current-live-restore-47f4.test.cjs
+      # Preserve exact Proposal diagnostic inputs in the same immutable build.
+      - tools/gravicentra-i6-6-proposal-application-signed-uat.cjs
+      - tools/gravicentra-i6-6-proposal-uat-diagnostics.cjs
+      - tools/gravicentra-i6-6-proposal-uat-diagnostics.test.cjs
+      - tools/gravicentra-i6-6-direction-preview-proposal-diagnostic-retry.test.cjs
+      - tools/gravicentra-i6-6-preview-current-live-restore-39f54e2.test.cjs
 
 permissions:
   contents: read
@@ -245,6 +251,7 @@ jobs:
           node --test tools/gravicentra-i6-6-preview-current-live-restore.test.cjs
           node --test tools/gravicentra-i6-6-preview-channel-reuse-guard.test.cjs
           node --test tools/gravicentra-i6-6-assignment-detail-navigation.test.cjs tools/gravicentra-i6-6-direction-preview-qa-navigation-retry.test.cjs tools/gravicentra-i6-6-preview-current-live-restore-47f4.test.cjs
+          node --test tools/gravicentra-i6-6-proposal-uat-diagnostics.test.cjs tools/gravicentra-i6-6-direction-preview-proposal-diagnostic-retry.test.cjs tools/gravicentra-i6-6-preview-current-live-restore-39f54e2.test.cjs
           node tools/gravicentra-governance-preflight-v1.mjs --mode=i6
       - name: Set up existing Firebase LAB credentials for read-only public config and tenant branding
         working-directory: candidate

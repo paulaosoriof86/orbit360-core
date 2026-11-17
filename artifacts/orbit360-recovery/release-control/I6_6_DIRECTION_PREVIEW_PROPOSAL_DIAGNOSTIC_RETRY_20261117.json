@@ -1,0 +1,87 @@
+{
+  "schema": "GI_I66_DIRECTION_PREVIEW_PROPOSAL_DIAGNOSTIC_RETRY_V1",
+  "status": "EXACT_TECHNICAL_RETRY_SAME_OWNER_DECISION",
+  "activeGate": "I6.6",
+  "firstIncompleteGate": "SIGNED_PREVIEW",
+  "recordedUtcDate": "2026-11-17",
+  "originalDecisionLocalDate": "2026-11-16",
+  "sourceParent": "3076026cdfd900cf8e99037c3220682b3be68943",
+  "originalConsentReceipt": "artifacts/orbit360-recovery/release-control/I6_6_DIRECTION_PREVIEW_LEGAL_ACCEPTANCE_20261116.json",
+  "originalConsentReceiptSha256": "68d3961987e19acdc223b7d2adf01eb39c540ca6ae8aa72c64752cab45fddbae",
+  "decisionId": "DIRECTION_PREVIEW_INTERNAL_LEGAL_V2_ACCEPTED_20261116",
+  "decisionScopeUnchanged": {
+    "actorAdvisorId": "ase-paula-osorio",
+    "role": "direccion",
+    "tenantId": "alianzas-soluciones",
+    "country": "GT",
+    "version": "2.0",
+    "origin": "https://ays-orbit-360-lab--gi-i66-rc-42868854629-abj14q6n.web.app",
+    "clauseIds": [
+      "confidencialidad",
+      "tratamiento_datos",
+      "descargo_ia"
+    ],
+    "termsProjectionSha256": "485b07887091063cc7a5d1dc8f11a9bb547f2ef059490bb04d4acee73404f6b2"
+  },
+  "unchangedLegalOwner": {
+    "path": "orbit360-platform/core/legal.js",
+    "sourceSha": "39f54e24e59983a59a7c9a41912e0eed154efa18",
+    "sha256": "b74a965b7be0d67862d82bcf73dacc0d5a8293dcf30cb4f5f3fdeaa6ee1c68a3"
+  },
+  "previousAttempt": {
+    "sourceSha": "39f54e24e59983a59a7c9a41912e0eed154efa18",
+    "qaHeadSha": "3076026cdfd900cf8e99037c3220682b3be68943",
+    "qaRunId": 43982928603,
+    "qaJobId": 133703764371,
+    "legalAcceptanceStep": "PASS_NORMAL_UI_AND_PERSISTENCE_VALIDATION",
+    "advisorPayables": {
+      "status": "PASS",
+      "checks": 15,
+      "cleanup": "PASS",
+      "remaining": 0
+    },
+    "proposal": {
+      "status": "HOLD",
+      "checks": 3,
+      "failureCode": "ERR_ASSERTION",
+      "failureStageRetained": false,
+      "failureLocationRetained": false,
+      "backendOutcomeRetained": false,
+      "cleanup": "PASS",
+      "remaining": 0,
+      "removedOwnedTargets": 8,
+      "cleanupErrors": [],
+      "realControlUnchanged": true
+    },
+    "diagnostic": {
+      "artifactId": 14283479018,
+      "artifactName": "gi-i66-preview-failure-diagnostic-43982928603",
+      "archiveSize": 672,
+      "artifactDigest": "sha256:f183fce7b9c46faacf78ef63e5218f90e8d962cebf20c69768926cff61717938",
+      "entryName": "i66-preview-failure-diagnostic.json",
+      "entrySha256": "07ec4b5e86ed64cbd66970f61712319040c6d0af34a22b511da2366823c72bfe"
+    },
+    "signedPreviewAccepted": false,
+    "livePromoted": false
+  },
+  "causalQaCorrection": [
+    "Retain only allowlisted Proposal failure stage, check, class and source location in the signed synthetic Preview diagnostic.",
+    "Retain only the closed diagnostic projection of the Proposal result; no raw response, actor identifiers, business rows or error text.",
+    "Preserve the existing Proposal assertions, product owners, legal terms and ordinary visible acceptance flow."
+  ],
+  "constraints": {
+    "technicalRebindingOnly": true,
+    "newConsentInvented": false,
+    "originalReceiptBytesUnchanged": true,
+    "acceptanceTermsChanged": false,
+    "legalProductOwnerChanged": false,
+    "ordinaryUiOnly": true,
+    "otherActors": false,
+    "live": false,
+    "futureAutomaticSuccessors": false,
+    "storageSeeding": false,
+    "gateBypass": false,
+    "qaDiagnosticsOnly": true,
+    "productSourceChanges": 0
+  }
+}

@@ -1,0 +1,221 @@
+{
+  "schema": "GI_I66_PROPOSAL_DIAGNOSTIC_CAUSAL_RETRY_V1",
+  "dateGuatemala": "2026-11-16",
+  "observedAtUtc": "2026-11-17T00:19:20Z",
+  "status": "QA_ONLY_PROPOSAL_FAILURE_DIAGNOSTICS_NEW_IMMUTABLE_BUILD_AND_SIGNED_PREVIEW_REQUIRED",
+  "activeGate": "I6.6",
+  "firstIncompleteGate": "SIGNED_PREVIEW",
+  "sourceParent": "3076026cdfd900cf8e99037c3220682b3be68943",
+  "previousAttempt": {
+    "status": "SIGNED_PREVIEW_HOLD_NOT_PROMOTABLE",
+    "qaRunId": 43982928603,
+    "qaHeadSha": "3076026cdfd900cf8e99037c3220682b3be68943",
+    "qaJobId": 133703764371,
+    "advisorPayables": {
+      "checks": 15,
+      "cleanup": "PASS",
+      "remaining": 0,
+      "realCustomerWritesRequested": 0,
+      "bankMovements": 0,
+      "financialPayments": 0,
+      "authOrMembershipMutations": 0,
+      "status": "PASS"
+    },
+    "proposalApplication": {
+      "status": "HOLD",
+      "checks": 3,
+      "cleanup": "PASS",
+      "remaining": 0,
+      "removedOwnedTargets": 8,
+      "realControlUnchanged": true,
+      "observedFailureCode": "ERR_ASSERTION",
+      "exactFailureLocationRecorded": false,
+      "actualBackendResult": "NOT_RETAINED"
+    },
+    "inferredControlFlowWindow": {
+      "isInference": true,
+      "file": "tools/gravicentra-i6-6-proposal-application-signed-uat.cjs",
+      "lines": [
+        117,
+        118
+      ],
+      "basedOnSource": "39f54e24e59983a59a7c9a41912e0eed154efa18",
+      "basis": "Three emitted checks passed; SERVER_LOADED_EXACT_CANDIDATE not emitted. Individual assertion and backend response are not retained."
+    },
+    "legalAcceptanceStep": "PASSED_NORMAL_UI_FOR_DIRECTION_IN_BOTH_FOCUSED_DRIVERS",
+    "diagnosticArtifact": {
+      "artifactId": 14283479018,
+      "artifactDigest": "sha256:f183fce7b9c46faacf78ef63e5218f90e8d962cebf20c69768926cff61717938",
+      "artifactName": "gi-i66-preview-failure-diagnostic-43982928603",
+      "archiveSize": 672,
+      "entryName": "i66-preview-failure-diagnostic.json",
+      "entrySha256": "07ec4b5e86ed64cbd66970f61712319040c6d0af34a22b511da2366823c72bfe"
+    },
+    "signedLogSha256": "3cbc81841c802feb89efa0810204ee19eb45a5e9fed08464b323d2ada0d1e1f2",
+    "realCustomerWritesRequested": 0,
+    "bankMovements": 0,
+    "financialPayments": 0,
+    "authOrMembershipMutations": 0,
+    "acceptanceProofProduced": false,
+    "livePromotion": false,
+    "fullI66Acceptance": false
+  },
+  "causalEvidence": {
+    "provenGap": "Existing Proposal driver reduced the error to error.code; public diagnostic omitted the individual assertion and backend assessment. The first three emitted checks passed, then ERR_ASSERTION was observed.",
+    "backendRootCause": "NOT_DEMONSTRATED",
+    "productBugFixClaimed": false,
+    "nextOnly": "Add a closed safe diagnostic projection and stage/check evidence, then repeat the existing signed Preview gate on one new immutable source. Do not change the expected assessment or the financial/backend behavior to make it pass."
+  },
+  "productSourceChanges": 0,
+  "productManifestChanged": false,
+  "historicalPinnedTestsChanged": false,
+  "historicalManifestTestCount": 68,
+  "previousAdditionalQaTestsUnchanged": [
+    "tools/gravicentra-i6-6-assignment-detail-navigation.test.cjs",
+    "tools/gravicentra-i6-6-direction-preview-qa-navigation-retry.test.cjs",
+    "tools/gravicentra-i6-6-preview-current-live-restore-47f4.test.cjs"
+  ],
+  "qaSourceBindings": [
+    {
+      "path": "tools/gravicentra-i6-6-proposal-application-signed-uat.cjs",
+      "gitBlobSha": "0c159b0f155662aa55f7633d300c5ffb47266029",
+      "sha256": "ef4c372b5cb8f67e4302a11324f858d88ada8d0c0ecf8083db122c6f3ca5c492"
+    },
+    {
+      "path": "tools/gravicentra-i6-6-proposal-uat-diagnostics.cjs",
+      "gitBlobSha": "03d5a5a49376ceabb808499754ff8eb64c790b2c",
+      "sha256": "55dd6c14ef776cfc431f59d2cfb4dc6f80e870504946e3e19e959e21ac3e99c6"
+    },
+    {
+      "path": "tools/gravicentra-i6-6-direction-preview-legal-acceptance.cjs",
+      "gitBlobSha": "f09bb3b9a2b8c3efd4b37b4c341c2c81134f6612",
+      "sha256": "b6dde6f19640b9536b7ac62f1b3663310fc8e38cacbccb0b2b904cd0135317fb"
+    },
+    {
+      "path": "tools/gravicentra-i6-6-preview-current-live-restore.cjs",
+      "gitBlobSha": "e4f2bf4e43f7d33fbc4edaefe2bfa3c28e68e694",
+      "sha256": "f8ef9f83ea52f4c38f6f8577d79476047a87c45e4a1b5219b4c3e4b670ed34a9"
+    },
+    {
+      "path": "tools/gravicentra-i6-6-operational-release-candidate.cjs",
+      "gitBlobSha": "4c1c249328175f76a5ca40cae90d0de54d5a9592",
+      "sha256": "cca8e36f7f426c16f217c581514bacbd833cb3a6e237cc8fd34800d43d740a65"
+    },
+    {
+      "path": ".github/workflows/gravicentra-release-delta-66-package.yml",
+      "gitBlobSha": "4915e785db0c4ac27ba51f1e722de1c8962639bf",
+      "sha256": "61f53853431a009f3f77006c4f0483dddd32b5b5a5feb4dcd56d7a694468d69c"
+    },
+    {
+      "path": ".github/workflows/gravicentra-i66-privileged-role-three-function-preview-uat.yml",
+      "gitBlobSha": "ec9fbe8c9e87880ebb1e63e0675d805c6ce8e245",
+      "sha256": "b50286e13d7537a44fbec0a196747f972b4d4d07acf02cb41dde33ba0f7cfbbf"
+    },
+    {
+      "path": "tools/gravicentra-i6-6-proposal-uat-diagnostics.test.cjs",
+      "gitBlobSha": "984ebfeb2543ddcdf8b79ca11ded46805ba05f52",
+      "sha256": "bd0f2a2aa20213f29436858d4dfa8ed4f28f6f11b3d1604fe2a9be3bc91ac485"
+    },
+    {
+      "path": "tools/gravicentra-i6-6-direction-preview-proposal-diagnostic-retry.test.cjs",
+      "gitBlobSha": "d70ef4a1416145ff5df2fe9a3007ccfaea87e432",
+      "sha256": "1b75e35b8ec6596000733b39d9e237358004d37fe2feb2ccfa981d9639f6a134"
+    },
+    {
+      "path": "tools/gravicentra-i6-6-preview-current-live-restore-39f54e2.test.cjs",
+      "gitBlobSha": "b01cb41a6f4e8c52c0e1f342c76aa6bd22decb54",
+      "sha256": "0d7f19f0dcbe09207952c5db7c79d9ffb052cc2162a333d73738d7b4b6fa72b2"
+    },
+    {
+      "path": "artifacts/orbit360-recovery/release-control/I6_6_DIRECTION_PREVIEW_PROPOSAL_DIAGNOSTIC_RETRY_20261117.json",
+      "gitBlobSha": "7791cfcf81eea1edac612eb9b8f12cca217e4d09",
+      "sha256": "e2c123a1a4a250815b295d2b8aa3b9432bc84bed06b242c174a4b9cc8f7f8634"
+    }
+  ],
+  "requiredNewTests": [
+    "tools/gravicentra-i6-6-proposal-uat-diagnostics.test.cjs",
+    "tools/gravicentra-i6-6-direction-preview-proposal-diagnostic-retry.test.cjs",
+    "tools/gravicentra-i6-6-preview-current-live-restore-39f54e2.test.cjs"
+  ],
+  "originalDecisionReceipt": "artifacts/orbit360-recovery/release-control/I6_6_DIRECTION_PREVIEW_LEGAL_ACCEPTANCE_20261116.json",
+  "originalDecisionReceiptSha256": "68d3961987e19acdc223b7d2adf01eb39c540ca6ae8aa72c64752cab45fddbae",
+  "technicalDecisionBindingReceipt": "artifacts/orbit360-recovery/release-control/I6_6_DIRECTION_PREVIEW_PROPOSAL_DIAGNOSTIC_RETRY_20261117.json",
+  "technicalDecisionBindingReceiptSha256": "e2c123a1a4a250815b295d2b8aa3b9432bc84bed06b242c174a4b9cc8f7f8634",
+  "originalTermsAndLegalOwnerUnchanged": true,
+  "newConsentInvented": false,
+  "liveConsentGranted": false,
+  "freshReadOnlyPreviewInventory": {
+    "runId": 43758700651,
+    "attempt": 5,
+    "jobId": 133710557557,
+    "observedAtUtc": "2026-11-17T00:07:31Z",
+    "previewHostingVersion": "sites/ays-orbit-360-lab/versions/e05fb7764246f298",
+    "liveHostingVersion": "sites/ays-orbit-360-lab/versions/0766db29b338befc",
+    "metadataRead": "PASS",
+    "mutations": 0,
+    "historicalMarkerAssertion": "HOLD_OLD_SOURCE_EXPECTATION_NOT_CURRENT_INVENTORY",
+    "logSha256": "2d2eff7059acc07ba596c3a72da03f480003b61990a7b32c1f404f7a94088819",
+    "snapshotOnlyCurrentReadbackStillRequired": true
+  },
+  "restoreAuthorization": {
+    "schema": "GI_I66_EXACT_FAILED_PREVIEW_RESTORE_V1",
+    "status": "EXACT_FAILED_PREVIEW_TO_R11_PREVIEW_RESTORE_AUTHORIZED",
+    "approvedByDirection": true,
+    "channelId": "gi-i66-rc-42868854629",
+    "previewUrl": "https://ays-orbit-360-lab--gi-i66-rc-42868854629-abj14q6n.web.app",
+    "failedCandidate": {
+      "sourceSha": "39f54e24e59983a59a7c9a41912e0eed154efa18",
+      "buildRunId": 43982177239,
+      "artifactId": 14283796218,
+      "artifactDigest": "sha256:ba90d53bd4bafdea75748df779539e8efab75e75bf93845215dd20ba8c34e0d8",
+      "hostingVersion": "sites/ays-orbit-360-lab/versions/e05fb7764246f298",
+      "qaRunId": 43982928603,
+      "qaHeadSha": "3076026cdfd900cf8e99037c3220682b3be68943",
+      "qaJobId": 133703764371
+    },
+    "failedQaDiagnostic": {
+      "artifactId": 14283479018,
+      "artifactDigest": "sha256:f183fce7b9c46faacf78ef63e5218f90e8d962cebf20c69768926cff61717938",
+      "artifactName": "gi-i66-preview-failure-diagnostic-43982928603",
+      "archiveSize": 672,
+      "entryName": "i66-preview-failure-diagnostic.json",
+      "entrySha256": "07ec4b5e86ed64cbd66970f61712319040c6d0af34a22b511da2366823c72bfe"
+    },
+    "currentLive": {
+      "sourceSha": "84769378eb2014addebfefdbdd63091bddc4b817",
+      "buildRunId": 43503721126,
+      "artifactId": 14075022275,
+      "artifactDigest": "sha256:b0f3bacb68511cdfc91ac934602c51f55afec5c1d6428d886d13a72a706ee283",
+      "hostingVersion": "sites/ays-orbit-360-lab/versions/0766db29b338befc",
+      "liveRunId": 43506971214,
+      "liveHeadSha": "2a733fd4a28294bf57f3136b44501981a38c0c92"
+    },
+    "inventoryRunId": 43758700651,
+    "inventoryHeadSha": "ce176e1244d74c55a5453559d3f11f7b9822a0e6",
+    "inventoryRunAttempt": 1,
+    "inventoryEvidenceUse": "ARCHIVED_READONLY_WORKFLOW_PROVENANCE_NOT_CURRENT_CHANNEL_STATE",
+    "expectedChannelCreatedAt": "2026-11-10T17:50:59.307316958Z",
+    "expectedSiteFileCount": 223,
+    "backupBeforeOverwrite": true,
+    "readbackBeforeAndAfter": true,
+    "noLiveChanges": true,
+    "noBusinessDataWrites": true,
+    "noBackendChanges": true,
+    "noRulesAuthIamChanges": true,
+    "noChannelDeletion": true
+  },
+  "sourceQa": "REQUIRED_BEFORE_PUBLISH_NOT_EXECUTED_BY_THIS_SCRIPT",
+  "newImmutableBuild": "NOT_EXECUTED",
+  "newSignedPreview": "NOT_EXECUTED",
+  "lastAcceptedLiveSource": "84769378eb2014addebfefdbdd63091bddc4b817",
+  "realRecordWrites": 0,
+  "progress": {
+    "opsVerified": 6,
+    "opsRequired": 8,
+    "fiveBlockVerified": 19,
+    "fiveBlockRequired": 31
+  },
+  "mapfreSameConditionsAlreadyApproved": true,
+  "oneExactNextBuildRequest": true,
+  "automaticFutureRetryAuthorization": false
+}
