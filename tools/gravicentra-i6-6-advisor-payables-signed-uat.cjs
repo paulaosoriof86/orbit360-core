@@ -10,6 +10,7 @@ const os=require('node:os');
 const contract=require('../functions/advisor-commission-payable-contract');
 const assignment=require('../functions/advisor-assignment-correction-contract');
 const {acceptDirectionPreviewLegal,LEGAL_FAILURE_CHECKS,safeLegalFailureSubstage}=require('./gravicentra-i6-6-direction-preview-legal-acceptance.cjs');
+const {runDocumentedTermsCheck}=require('./gravicentra-i6-6-documented-terms-signed-check.cjs');
 const PROJECT='ays-orbit-360-lab',TENANT='alianzas-soluciones';
 const SOURCE_SCHEMA='gravicentra-advisor-commission-source-batch-v1';
 const hash=value=>crypto.createHash('sha256').update(String(value)).digest('hex');
@@ -911,6 +912,12 @@ async function main(){
     for(const [collection,expected] of fx.rows)
       assert.deepEqual((await rowRef(collection,expected.id).get()).data(),expected,'ADVISOR_UAT_ASSIGNMENT_PROOF_MISMATCH_compensation');
     pass('DOCUMENTED_ASSIGNMENT_NATIVE_UI_PREVIEW_CONFIRM_RELOAD_REPLAY_COMPENSATION_PRESERVES_ALL_FINANCIAL_RELATIONS');
+    // Same signed Direction session and the exact client already seeded by
+    // this driver. The helper neither changes legal consent nor real data.
+    stage='DOCUMENTED_PREMIUM_TERMS';
+    report.documentedTerms=await runDocumentedTermsCheck({page:direction.page,role:direction.role,
+      actorUid:direction.uid,tenantId:TENANT,live:cfg.live,db,clientId:fx.ids.client});
+    assert.equal(report.documentedTerms.status,'PASS','ADVISOR_UAT_DOCUMENTED_TERMS_NOT_ACCEPTED');
     await direction.page.goto(cfg.origin+'/#/finanzas',{waitUntil:'commit',timeout:30000});
     await direction.page.waitForSelector('.tab[data-t="asesores"]',{state:'visible',timeout:30000});
     stage='FINANCE_UI_HYDRATION';await openAdvisorTab();
@@ -1010,7 +1017,10 @@ async function main(){
     // Raw counts are not acceptance: final native request/SDK correlation below
     // also includes errors emitted during signed synthetic restoration.
     pass('PENDING_CXP_BOTH_ADVISORS_PERSIST_THROUGH_RELOAD_NO_PAGE_ERRORS');
-  }catch(error){originalFailure=error;originalFailureStage=stage;}
+  }catch(error){
+    if(error&&error.documentedTermsProof)report.documentedTerms=error.documentedTermsProof;
+    originalFailure=error;originalFailureStage=stage;
+  }
   finally{
     stage='SYNTHETIC_RESTORE';
     if(tenant&&fx){

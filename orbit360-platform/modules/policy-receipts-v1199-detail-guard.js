@@ -289,7 +289,7 @@ Orbit.modules = Orbit.modules || {};
     const rowsAll=[].concat(all||[]),projection=activePolicy(policy)?receiptCalendarProjection(policy,rowsAll):{current:[],replaced:rowsAll,review:[],authority:'POLICY_INACTIVE',expected:0},rows=projection.current;
     const sum=key=>{const vals=rows.map(r=>numberOrNull(r[key])).filter(v=>v!=null);return vals.length?vals.reduce((a,b)=>a+b,0):null;};
     const shadowRows=projection.replaced.filter(r=>r&&r.__calendarShadowReason==='LEGACY_UNDENOMINATED_DUPLICATE');
-    return {rows,historicalRows:projection.replaced,reviewRows:projection.review,shadowRows,calendarAuthority:projection.authority,net:sum('primaNeta'),expedition:sum('gastosExpedicion'),finance:sum('gastosFinanciamiento'),sourceAdjustment:sum('descuento'),iva:sum('impuestosIVA'),total:sum('primaTotal')};
+    return {rows,historicalRows:projection.replaced,reviewRows:projection.review,shadowRows,calendarAuthority:projection.authority,net:sum('primaNeta'),expedition:sum('gastosExpedicion'),finance:sum('gastosFinanciamiento'),sourceAdjustment:sum('descuento'),nonVat:sum('cargoNoGravadoMonto'),iva:sum('impuestosIVA'),total:sum('primaTotal')};
   }
   function receiptSchedule(policyId) {
     const policy=S().get('polizas',policyId)||{},all=(S().all('recibosEsperados') || []).filter(r=>r.polizaId===policyId);
@@ -322,6 +322,7 @@ Orbit.modules = Orbit.modules || {};
       finance:numberOrNull(first(p.gastosFinan,p.gastosFinanciamiento)) ?? sch.finance,
       sourceAdjustment:numberOrNull(first(p.descuento,p.montoDescuento)) ?? sch.sourceAdjustment,
       other:numberOrNull(first(p.otros,p.asistencias,p.otrosGastos)),
+      nonVat:numberOrNull(p.cargoNoGravadoMonto) ?? sch.nonVat ?? 0,
       taxable:numberOrNull(first(p.baseGravable,p.baseIVA,p.baseImponible)),
       iva:numberOrNull(first(p.ivaMonto,p.iva,p.impuestos,p.impuestosIVA)) ?? sch.iva,
       total:numberOrNull(first(p.primaTotal,p.prima)),
@@ -337,14 +338,14 @@ Orbit.modules = Orbit.modules || {};
     const applied = (S().all('cobros') || []).filter(r => r.polizaId === policyId);
     const rows = expected.length ? expected : applied;
     if (!rows.length) return '<div class="muted">Histórico sin calendario de recibos disponible o fuente pendiente de completar.</div>';
-    return `<div style="overflow-x:auto"><table class="tbl"><thead><tr><th>Recibo</th><th>Vence</th><th class="num">Prima neta</th><th class="num">Expedición</th><th class="num">Financiamiento</th><th class="num">Descuento / ajuste</th><th class="num">IVA / impuestos</th><th class="num">Total</th><th>Estado</th></tr></thead><tbody>${rows.map((r, i) => {
+    return `<div style="overflow-x:auto"><table class="tbl"><thead><tr><th>Recibo</th><th>Vencimiento</th><th>Límite operativo</th><th class="num">Prima neta</th><th class="num">Expedición</th><th class="num">Financiamiento</th><th class="num">Otros / asistencias</th><th class="num">Descuento / ajuste</th><th class="num">IVA / impuestos</th><th class="num">Cargo no gravado</th><th class="num">Total</th><th>Estado</th></tr></thead><tbody>${rows.map((r, i) => {
       const total = first(r.primaTotal, r.montoTotal, r.monto, r.total);
-      const due = first(r.fechaLimite, r.vence, r.fechaVencimiento);
+      const due = first(r.fechaVencimientoContractual, r.vence, r.fechaVencimiento, r.fechaLimite);
       const state = Orbit.q && Orbit.q.expectedReceiptDisplayStatus
         ? Orbit.q.expectedReceiptDisplayStatus(r)
         : first(r.estadoVisual, r.estadoOperativo, r.estado, r.estadoCartera, r.status, 'Pendiente');
       const rid=safe(r.id);
-      return `<tr class="${rid?'clickable':''}" ${rid?`onclick="Orbit.receiptsPortfolioProjection&&Orbit.receiptsPortfolioProjection.openReceiptDetail&&Orbit.receiptsPortfolioProjection.openReceiptDetail('${esc(rid)}','${esc(r.clienteId||'')}')"`:''}><td>${esc(first(r.serie, r.numero, r.cuota, i + 1))}</td><td>${esc(fmtDate(due))}</td><td class="num">${esc(moneyDetail(r.primaNeta, r.moneda || cur))}</td><td class="num">${esc(moneyDetail(r.gastosExpedicion, r.moneda || cur))}</td><td class="num">${esc(moneyDetail(r.gastosFinanciamiento, r.moneda || cur))}</td><td class="num">${esc(moneyDetail(r.descuento, r.moneda || cur))}</td><td class="num">${esc(moneyDetail(r.impuestosIVA, r.moneda || cur))}</td><td class="num"><b>${esc(moneyDetail(total, r.moneda || cur))}</b></td><td>${badge(state)}</td></tr>`;
+      return `<tr class="${rid?'clickable':''}" ${rid?`onclick="Orbit.receiptsPortfolioProjection&&Orbit.receiptsPortfolioProjection.openReceiptDetail&&Orbit.receiptsPortfolioProjection.openReceiptDetail('${esc(rid)}','${esc(r.clienteId||'')}')"`:''}><td>${esc(first(r.serie, r.numero, r.cuota, i + 1))}</td><td>${esc(fmtDate(due))}</td><td>${esc(fmtDate(r.fechaLimite))}</td><td class="num">${esc(moneyDetail(r.primaNeta, r.moneda || cur))}</td><td class="num">${esc(moneyDetail(r.gastosExpedicion, r.moneda || cur))}</td><td class="num">${esc(moneyDetail(r.gastosFinanciamiento, r.moneda || cur))}</td><td class="num">${esc(moneyDetail(r.otros, r.moneda || cur))}</td><td class="num">${esc(moneyDetail(r.descuento, r.moneda || cur))}</td><td class="num">${esc(moneyDetail(r.impuestosIVA, r.moneda || cur))}</td><td class="num" title="${esc(r.cargoNoGravadoConcepto||'Sin cargo adicional registrado')}">${esc(moneyDetail(r.cargoNoGravadoMonto||0,r.moneda||cur))}</td><td class="num"><b>${esc(moneyDetail(total, r.moneda || cur))}</b></td><td>${badge(state)}</td></tr>`;
     }).join('')}</tbody></table></div>`;
   }
   function vehicleIdentity(item) {
@@ -503,8 +504,9 @@ Orbit.modules = Orbit.modules || {};
           </div>
           <div class="gi-payment-subtitle">Desglose de prima</div>
           <div class="orbit-premium-grid gi-premium-contract">${[
-            ['Gastos de expedición', pb.expedition], ['Gastos financieros', pb.finance], ['Descuento / ajuste', pb.sourceAdjustment], ['Otros / asistencias', pb.other], ...(pb.taxable == null ? [] : [['Base imponible para IVA', pb.taxable]]), [ivaLabel, pb.iva]
+            ['Gastos de expedición', pb.expedition], ['Gastos financieros', pb.finance], ['Descuento / ajuste', pb.sourceAdjustment], ['Otros / asistencias', pb.other], ...(pb.taxable == null ? [] : [['Base imponible para IVA', pb.taxable]]), [ivaLabel, pb.iva], ['Cargo no gravado'+(p.cargoNoGravadoConcepto?' · '+p.cargoNoGravadoConcepto:''), pb.nonVat]
           ].map(([k,v])=>`<div class="gi-premium-row"><span>${esc(k)}</span><b>${esc(moneyDetail(v,cur))}</b></div>`).join('')}</div>
+          ${p.cargoNoGravadoDocumentRef?`<div class="cfg-note">Documento del cargo no gravado: ${esc(p.cargoNoGravadoDocumentRef)}. No integra la base del IVA ni de la comisión sobre prima neta.</div>`:''}
           ${scheduleDelta!=null&&Math.abs(scheduleDelta)>scheduleTolerance?`<div class="badge warn gi-schedule-delta">Diferencia póliza vs calendario: ${esc(moneyDetail(scheduleDelta,cur))} · supera tolerancia ${esc(moneyDetail(scheduleTolerance,cur))} y requiere conciliación</div>`:''}
           <div class="gi-payment-subtitle">Condiciones de pago</div>
           <div class="gi-payment-conditions">${grid([

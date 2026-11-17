@@ -313,13 +313,20 @@ Orbit.importa = (function () {
         primaNeta: ['prima neta', 'neta', 'prima base'],
         primaTotal: ['prima total', 'total', 'total a pagar', 'prima bruta'],
         gastos: ['gastos', 'gastos emision', 'gastos de emision', 'gasto emision', 'derechos'],
+        otros: ['otros', 'asistencias', 'asistencia', 'otros asistencias'],
+        cargoNoGravadoMonto: ['cargo no gravado', 'importe cargo no gravado', 'bomberos', 'impuesto bomberos'],
+        cargoNoGravadoConcepto: ['concepto cargo no gravado'],
+        cargoNoGravadoDocumentRef: ['documento cargo no gravado', 'referencia cargo no gravado'],
+        vencimientosDocumentadosTexto: ['vencimientos documentados', 'calendario documentado'],
+        cuotas: ['cantidad de pagos', 'cantidad de recibos', 'cuotas'],
         iva: ['iva', 'impuesto', 'igv'],
         pais: ['pais', 'país', 'country'], moneda: ['moneda', 'divisa', 'currency'],
         clienteNombre: ['cliente', 'asegurado', 'contratante', 'tomador', 'nombre'],
         vigenciaIni: ['vigencia inicio', 'inicio vigencia', 'desde', 'fecha inicio', 'vigencia desde'],
         vigenciaFin: ['vigencia fin', 'fin vigencia', 'hasta', 'fecha fin', 'vencimiento', 'vigencia hasta'],
         frecuencia: ['frecuencia', 'forma de pago', 'fraccionamiento', 'periodicidad', 'modo pago'],
-        formaPago: ['medio de pago', 'medio', 'metodo de pago', 'metodo pago', 'conducto'],
+        formaPago: ['medio de pago', 'medio', 'metodo de pago', 'metodo pago'],
+        conducto: ['conducto', 'conducto de cobro'],
         estadoPol: ['estado', 'status', 'situacion', 'vigente'],
         sumaAsegurada: ['suma asegurada', 'suma', 'valor asegurado']
       },
@@ -327,14 +334,21 @@ Orbit.importa = (function () {
         // P1-04: separar prima neta / gastos / IVA / total; NO colapsar todo a un solo campo.
         rec.primaNeta = parseNum(rec.primaNeta); rec.primaTotal = parseNum(rec.primaTotal);
         rec.gastos = parseNum(rec.gastos); rec.iva = parseNum(rec.iva);
+        rec.otros = parseNum(rec.otros);
+        if (['cargoNoGravadoMonto','cargoNoGravadoConcepto','cargoNoGravadoDocumentRef'].some(key => Object.prototype.hasOwnProperty.call(rec,key))) {
+          const rawCharge = String(rec.cargoNoGravadoMonto == null ? '' : rec.cargoNoGravadoMonto).trim().replace(/^(?:GTQ|USD|COP|Q|\$)\s*/i,'');
+          if (rawCharge && !/^\d+(?:[.,]\d{1,2})?(?![\s\S])/.test(rawCharge)) throw new RangeError('cargo_no_gravado_monto_invalido');
+          rec.cargoNoGravadoMonto = rawCharge ? Number(rawCharge.replace(',','.')) : 0;
+          Object.assign(rec, Orbit.primas.cargoNoGravado(rec));
+        }
         const primaGen = parseNum(rec.prima);
         // Si no viene neta explícita: si hay total y componentes, derivar; si no, marcar validación.
         if (!rec.primaNeta) {
           if (primaGen && !rec.primaTotal) { rec.primaTotal = primaGen; }
-          if (rec.primaTotal && (rec.gastos || rec.iva)) { rec.primaNeta = Math.max(0, rec.primaTotal - rec.gastos - rec.iva); }
+          if (rec.primaTotal && (rec.gastos || rec.iva)) { rec.primaNeta = Math.max(0, rec.primaTotal - rec.gastos - rec.iva - rec.otros - (rec.cargoNoGravadoMonto || 0)); }
           else { rec._primaAmbigua = true; }   // no sabemos cuál es neta → requiere_validacion
         }
-        if (!rec.primaTotal) rec.primaTotal = rec.primaNeta + rec.gastos + rec.iva || rec.primaNeta;
+        if (!rec.primaTotal) rec.primaTotal = rec.primaNeta + rec.gastos + rec.iva + rec.otros + (rec.cargoNoGravadoMonto || 0) || rec.primaNeta;
         rec.prima = rec.primaTotal || rec.primaNeta;   // compat: 'prima' visible = total
         rec.ramo = rec.ramo || '';
         rec.sumaAsegurada = parseNum(rec.sumaAsegurada);
@@ -344,6 +358,12 @@ Orbit.importa = (function () {
         else rec.estado = ne.indexOf('cancel') >= 0 ? 'Cancelada' : ne.indexOf('venc') >= 0 ? 'Vencida' : ne.indexOf('renov') >= 0 ? 'Por renovar' : ne.indexOf('vig') >= 0 ? 'Vigente' : 'Requiere validación';
         delete rec.estadoPol;
         rec.frecuencia = rec.frecuencia || 'Contado'; rec.forma = rec.frecuencia; rec.formaPago = rec.formaPago || '';
+        rec.conducto = rec.conducto || '';
+        if (rec.vencimientosDocumentadosTexto != null) {
+          const count = Orbit.policyReceipts.installmentsForFrequency(rec.frecuencia, rec.cuotas);
+          rec.vencimientosDocumentados = Orbit.primas.parseCalendarioDocumentado(String(rec.vencimientosDocumentadosTexto), count);
+          delete rec.vencimientosDocumentadosTexto;
+        }
         rec.renovable = true;
         // País/moneda: de la fila; si no, del cliente vinculado; NUNCA asumir GT. Moneda solo EXPLÍCITA (P0-02).
         rec.pais = normPais(rec.pais);
@@ -649,7 +669,7 @@ Orbit.importa = (function () {
     const out = Object.assign({}, rec || {});
     out.vigenciaInicio = out.vigenciaInicio || out.vigenciaIni || '';
     if (out.gastosEmision == null && out.gastos != null) out.gastosEmision = out.gastos;
-    out.conducto = out.conducto || out.formaPago || '';
+    out.conducto = out.conducto || '';
     out.fuente = 'importacion_poliza_controlada';
     out.importado = true;
     delete out.vigenciaIni;
@@ -672,13 +692,14 @@ Orbit.importa = (function () {
       Object.keys(idx).forEach(f => { const v = cells[idx[f]]; if (v != null && v !== '') rec[f] = v; });
       copyRowMeta(cells, rec);
       if (!Object.keys(rec).length) continue;
-      if (cfg.build) cfg.build(rec);
-      if (rec._excluir) continue;
-      const payload = canonicalPolicyImportPayload(rec);
-      const existing = payload.numero ? Orbit.store.all('polizas').find(row => norm(row.numero) === norm(payload.numero)) : null;
+      let payload = rec, existing = null;
       const reason = 'Importación controlada de póliza';
       let result;
       try {
+        if (cfg.build) cfg.build(rec);
+        if (rec._excluir) continue;
+        payload = canonicalPolicyImportPayload(rec);
+        existing = payload.numero ? Orbit.store.all('polizas').find(row => norm(row.numero) === norm(payload.numero)) : null;
         result = existing
           ? await engine.updatePolicy(existing.id, payload, { motivo: reason })
           : await engine.createPolicy(payload, { motivo: reason });

@@ -1,0 +1,107 @@
+{
+  "schema": "GI_I66_CURRENT_TECHNICAL_PREVIEW_ROLLOVER_V1",
+  "status": "EXACT_CURRENT_TASK_PREVIEW_DOCUMENTED_SOURCE_AND_LIVE_TRANSPORT_REBUILD",
+  "gate": "I6.6",
+  "phase": "PREVIEW",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "projectId": "ays-orbit-360-lab",
+  "sourceBaseHead": "e73cdb18deca517580490e28b56c646b693095fe",
+  "executionAuthority": {
+    "kind": "EXISTING_I66_CONTINUE_CORRECT_TEST_AND_PUBLISH_SCOPE",
+    "canonicalPlan": "artifacts/orbit360-recovery/release-control/I6_6_OPERATIONAL_CONTINUATION_20261115.json",
+    "scope": "Replace only the current isolated technical Preview with the next immutable I6.6 candidate under the existing instruction to continue correction and signed verification. This is not an extension of the separate legal consent decision and not permission to delete any channel, change LIVE or apply payments.",
+    "newLegalConsentGrantUsedForHosting": false,
+    "mustStopOnBeforeStateDrift": true
+  },
+  "channel": {
+    "id": "gi-i66-rc-44009981499",
+    "origin": "https://ays-orbit-360-lab--gi-i66-rc-44009981499-d08psr2y.web.app",
+    "createdAt": "2026-11-17T03:34:28.874524705Z",
+    "expectedVersion": "sites/ays-orbit-360-lab/versions/0036a44c481df7ee"
+  },
+  "previousCandidate": {
+    "sourceSha": "aa200b1de0aa5c654338b2f7de8bec9e38af86ec",
+    "buildRunId": 44040873624,
+    "buildRunAttempt": 1,
+    "artifactId": 14309566018,
+    "artifactDigest": "sha256:06567c6f22974677d314ddc51e63896cca02c95ed762da24a7874cf9deafa72b",
+    "expectedSiteFileCount": 223,
+    "runtimeProofRequired": "DOWNLOAD_HASH_ARCHIVE_VALIDATE_MANIFEST_AND_COMPARE_EVERY_HOSTED_FILE_INCLUDING_BUILD_JSON_BEFORE_REPLACEMENT"
+  },
+  "protectedLive": {
+    "sourceSha": "84769378eb2014addebfefdbdd63091bddc4b817",
+    "buildRunId": 43503721126,
+    "artifactId": 14075022275,
+    "artifactDigest": "sha256:b0f3bacb68511cdfc91ac934602c51f55afec5c1d6428d886d13a72a706ee283",
+    "liveRunId": 43506971214,
+    "version": "sites/ays-orbit-360-lab/versions/0766db29b338befc",
+    "origins": [
+      "https://ays-orbit-360-lab.web.app",
+      "https://app.aysseguros.com"
+    ]
+  },
+  "freshInventoryEvidence": {
+    "runId": 44040873624,
+    "runAttempt": 1,
+    "jobId": 133894973811,
+    "totalChannels": 51,
+    "inventoryStep": "SUCCESS",
+    "wholeJob": "SUCCESS",
+    "rolloverEvidenceArtifactId": 14310135272,
+    "rolloverEvidenceArtifactDigest": "sha256:1709891d5d7b609ce77bc46b8d74829db4fc94314f87c13a412de70f94f8bc7f",
+    "afterInventorySha256": "21750b8644c121746258d05efad90601c7e8d72f4405c3a4abf375ef8d12e4be",
+    "comparison": "FULL_OTHER_FIFTY_CHANNEL_METADATA_EXACT_BEFORE_AFTER",
+    "otherChannelsIdenticalFullMetadata": 50,
+    "writes": 0,
+    "freshRuntimeInventoryRequiredAgain": true
+  },
+  "constraints": {
+    "onlyWhenNewChannelQuotaIsExhausted": true,
+    "backupBeforeOverwrite": true,
+    "readbackBeforeAndAfter": true,
+    "sameNewImmutableArtifact": true,
+    "noLiveChanges": true,
+    "noOtherChannelChanges": true,
+    "noChannelDeletion": true,
+    "noBackendChanges": true,
+    "noBusinessDataWrites": true,
+    "noRulesAuthIamChanges": true,
+    "stopOnIdentityDrift": true
+  },
+  "notAcceptance": {
+    "hostingReplacementIsNotSignedFunctionalPass": true,
+    "hostingReplacementIsNotProductionAcceptance": true,
+    "noOperationalPercentIncrease": true
+  },
+  "priorRolloverReceipt": {
+    "path": "artifacts/orbit360-recovery/release-control/I6_6_TECHNICAL_PREVIEW_HYDRATION_AND_BALANCE_REBUILD_20261117.json",
+    "sha256": "6db064d9494103f4cd31ecf9a34e589f66455d2a818f3c0b945839872b1c6e8a",
+    "preserveBytes": true
+  },
+  "causalRetry": {
+    "defect": "The exact LIVE transport downloaded the correct signed QA archive under an artifact-name subdirectory but the verifier read one level above and failed ENOENT before credentials, backend, Hosting or LIVE writes. The next source also implements the user's documented receipt/source updates; it must be rebuilt, tested in signed Preview and promoted as a new exact artifact.",
+    "failedLiveRunId": 44043379496,
+    "failedLiveRunAttempt": 1,
+    "failedLiveJobId": 133903202885,
+    "failedRunRemainsFailed": true,
+    "failedStep": "Verify durable signed Preview proof is for this same immutable source and artifact",
+    "observedFailureCode": "ENOENT",
+    "failedBeforeCredentialsAndDeploy": true,
+    "priorSignedPreview": {
+      "runId": 44041870642,
+      "headSha": "8e26fdf501b5073977390d15e070e2b431277f53",
+      "artifactId": 14310490418,
+      "artifactDigest": "sha256:de4672e0cc5bcd7a2b1f3aa3cc79c869aadd05629ab4a9de883271119a5969fd",
+      "status": "SIGNED_DRIVERS_DURABLE_READBACK_RELOAD_RESTORE_PASS"
+    },
+    "correction": "Use merge-multiple:true only for the single already pinned QA artifact so the literal verifier path is exact; preserve source/run/digest validation, all four signed drivers and automatic three-function/Hosting rollback. Receipt/source product updates require their own exact owner blobs and tests before the new build.",
+    "preserveFunctionalChecksAndCleanup": true,
+    "doNotRetroactivelyClassifyConsole": true,
+    "unexpectedErrorsRemainHold": true,
+    "newSourceRequiresNewBuildDigest": true,
+    "noLiveOrRealPaymentAuthority": true,
+    "noReuseOfPriorPreviewPassForNewSource": true,
+    "noRebuildOfCertifiedArtifactInPlace": true
+  }
+}

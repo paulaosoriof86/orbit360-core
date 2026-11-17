@@ -64,6 +64,7 @@ jobs:
           node --test tools/gravicentra-i6-6-preview-candidate-binding.test.cjs
           node --test tools/gravicentra-i6-6-direction-preview-i66-consent-scope.test.cjs
           node --test tools/gravicentra-i6-6-technical-preview-rollover.test.cjs
+          node --test tools/gravicentra-i6-6-live-proof-artifact-layout.test.cjs
           node tools/gravicentra-i6-6-operational-release-candidate.cjs live
           node --check tools/gravicentra-i6-6-carlos-paula-live-synthetic-ops-leads-uat.cjs
           node --check tools/gravicentra-i66-privileged-role-signed-ui-permissions-readonly.cjs
@@ -75,6 +76,7 @@ jobs:
           artifact-ids: ${{ env.I66_PREVIEW_QA_ARTIFACT_ID }}
           run-id: ${{ env.I66_PREVIEW_QA_RUN_ID }}
           github-token: ${{ github.token }}
+          merge-multiple: true
           path: ${{ runner.temp }}/gi-i66-operational-preview-proof
       - name: Verify durable signed Preview proof is for this same immutable source and artifact
         run: |

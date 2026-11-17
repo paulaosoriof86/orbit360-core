@@ -38,6 +38,24 @@ Orbit.issuance = (function () {
     return MANAGE_ROLES.has(activeRole()) || extras.includes('emisiones_gestionar');
   }
   function operationId(prefix) { return (prefix || 'emi') + '_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 7); }
+  function explicitPaymentValue(input, key, fallback) {
+    return clean(Object.prototype.hasOwnProperty.call(input || {}, key) ? input[key] : fallback);
+  }
+  function documentedTerms(input, fallback, count, renewal) {
+    const out = {}, chargeKeys = ['cargoNoGravadoMonto','cargoNoGravadoConcepto','cargoNoGravadoDocumentRef'];
+    const hasInputCharge = chargeKeys.some(key => Object.prototype.hasOwnProperty.call(input || {}, key));
+    const hasFallbackCharge = chargeKeys.some(key => Object.prototype.hasOwnProperty.call(fallback || {}, key));
+    if (renewal && Number(fallback && fallback.cargoNoGravadoMonto) > 0 && !hasInputCharge) throw new RangeError('cargo_no_gravado_documento_renovacion_requerido');
+    if (hasInputCharge || !renewal && hasFallbackCharge) Object.assign(out, Orbit.primas.cargoNoGravado(hasInputCharge ? input : fallback));
+    if (Object.prototype.hasOwnProperty.call(input || {}, 'vencimientosDocumentados')) {
+      out.vencimientosDocumentados = Orbit.primas.calendarioDocumentado(input.vencimientosDocumentados, count);
+    } else if (!renewal && fallback && Object.prototype.hasOwnProperty.call(fallback, 'vencimientosDocumentados')) {
+      out.vencimientosDocumentados = Orbit.primas.calendarioDocumentado(fallback.vencimientosDocumentados, count);
+    } else if (renewal && fallback && Array.isArray(fallback.vencimientosDocumentados) && fallback.vencimientosDocumentados.length) {
+      throw new RangeError('calendario_documentado_renovacion_requerido');
+    }
+    return out;
+  }
   async function ensureAuthoritativeCollections(names, timeoutMs) {
     const store = S(), wanted = [...new Set([].concat(names || []).map(clean).filter(Boolean))];
     if (!wanted.length || !store || typeof store._productStatus !== 'function') return { ok: true, bypass: true };
@@ -274,8 +292,8 @@ Orbit.issuance = (function () {
       producto: clean(policyInput.producto || request.producto), estado: 'Vigente',
       vigenciaInicio: clean(policyInput.vigenciaInicio), vigenciaFin: clean(policyInput.vigenciaFin),
       frecuencia: clean(policyInput.frecuencia || offer.frecuencia || 'Contado'),
-      formaPago: clean(policyInput.formaPago || offer.formaPago), cuotas: Math.max(1, +(policyInput.cuotas || offer.cuotas) || 1),
-      conducto: clean(policyInput.conducto || offer.conducto),
+      formaPago: explicitPaymentValue(policyInput, 'formaPago', offer.formaPago), cuotas: Math.max(1, +(policyInput.cuotas || offer.cuotas) || 1),
+      conducto: explicitPaymentValue(policyInput, 'conducto', offer.conducto),
       primaNeta: +(policyInput.primaNeta != null ? policyInput.primaNeta : offer.primaNeta) || 0,
       gastosEmision: +(policyInput.gastosEmision != null ? policyInput.gastosEmision : offer.gastosEmision) || 0,
       gastosFinan: +(policyInput.gastosFinan != null ? policyInput.gastosFinan : offer.gastosFinan) || 0,
@@ -295,6 +313,8 @@ Orbit.issuance = (function () {
     if (!raw.numero) return { ok: false, errors: ['numero_poliza_real_requerido'] };
     if (!raw.vigenciaInicio || !raw.vigenciaFin) return { ok: false, errors: ['vigencia_real_requerida'] };
     if (!raw.documentRef) return { ok: false, errors: ['documento_poliza_emitida_requerido'] };
+    try { Object.assign(raw, documentedTerms(policyInput, offer, P().installmentsForFrequency ? P().installmentsForFrequency(raw.frecuencia, raw.cuotas) : raw.cuotas, false)); }
+    catch (error) { return { ok: false, errors: [String(error && error.message || 'calendario_documentado_invalido')] }; }
     const opId = options.operationId || operationId('emit');
     raw.emissionOperationId = opId;
     const created = await P().createPolicy(raw, { operationId: opId, motivo: options.motivo || 'Conversión de solicitud de emisión con número real' });
@@ -363,8 +383,8 @@ Orbit.issuance = (function () {
       producto: clean(input.producto || source.producto || source.subramo), estado: 'Vigente',
       vigenciaInicio: clean(input.vigenciaInicio), vigenciaFin: clean(input.vigenciaFin),
       frecuencia: clean(input.frecuencia || source.frecuencia || 'Contado'),
-      formaPago: clean(input.formaPago || source.formaPago), cuotas: Math.max(1, +(input.cuotas || source.cuotas) || 1),
-      conducto: clean(input.conducto || source.conducto),
+      formaPago: explicitPaymentValue(input, 'formaPago', source.formaPago), cuotas: Math.max(1, +(input.cuotas || source.cuotas) || 1),
+      conducto: explicitPaymentValue(input, 'conducto', source.conducto),
       primaNeta: +(input.primaNeta != null ? input.primaNeta : source.primaNeta) || 0,
       gastosEmision: +(input.gastosEmision != null ? input.gastosEmision : source.gastosEmision) || 0,
       gastosFinan: +(input.gastosFinan != null ? input.gastosFinan : source.gastosFinan) || 0,
@@ -383,6 +403,8 @@ Orbit.issuance = (function () {
     if (source.vigenciaFin && raw.vigenciaInicio && String(raw.vigenciaInicio) < String(source.vigenciaFin)) return { ok: false, errors: ['traslape_requiere_regla_tenant'], sourceEnd: source.vigenciaFin, newStart: raw.vigenciaInicio };
     if (!raw.documentRef) return { ok: false, errors: ['documento_renovacion_en_firme_requerido'] };
     if (/^(prueba|test|x|na|n\/a)$/i.test(raw.documentRef) || raw.documentRef.length < 6) return { ok: false, errors: ['soporte_renovacion_en_firme_invalido'] };
+    try { Object.assign(raw, documentedTerms(input, source, P().installmentsForFrequency ? P().installmentsForFrequency(raw.frecuencia, raw.cuotas) : raw.cuotas, true)); }
+    catch (error) { return { ok: false, errors: [String(error && error.message || 'calendario_documentado_invalido')] }; }
     const created = await P().createPolicy(raw, { operationId: opId, motivo: options.motivo || 'Renovación en firme recibida y aprobada por el cliente' });
     if (!created.ok) return created;
     const policy = created.policy;

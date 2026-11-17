@@ -36,6 +36,79 @@ Orbit.primas = (function () {
   function cuotasDe(frecuencia) { return FRECUENCIAS[frecuencia] || 1; }
   function r2(n) { return Math.round((n + Number.EPSILON) * 100) / 100; }
 
+  // An amount printed separately by the issuer is not an inferred tax rate.
+  // Missing legacy fields mean zero for calculation; they do not manufacture
+  // a documentary claim or alter the existing taxable components.
+  function cargoNoGravado(o) {
+    o = o || {};
+    const raw = o.cargoNoGravadoMonto;
+    const amount = raw == null || raw === '' ? 0 : Number(raw);
+    if ((raw != null && typeof raw !== 'number' && typeof raw !== 'string') ||
+        !Number.isFinite(amount) || amount < 0 || !Number.isSafeInteger(Math.round(amount * 100)) ||
+        Math.abs(amount * 100 - Math.round(amount * 100)) > 0.000001) {
+      throw new RangeError('cargo_no_gravado_monto_invalido');
+    }
+    const text = value => value == null ? '' : typeof value === 'string' ? value.trim() : null;
+    const concepto = text(o.cargoNoGravadoConcepto), documentRef = text(o.cargoNoGravadoDocumentRef);
+    if (concepto === null || documentRef === null || (concepto || '').length > 160 ||
+        (documentRef || '').length > 2000 || /[\r\n\u0000]/.test((concepto || '') + (documentRef || ''))) {
+      throw new RangeError('cargo_no_gravado_proveniencia_invalida');
+    }
+    if (amount > 0 && (!concepto || !documentRef)) throw new RangeError('cargo_no_gravado_documento_requerido');
+    return { cargoNoGravadoMonto: r2(amount), cargoNoGravadoConcepto: concepto || '', cargoNoGravadoDocumentRef: documentRef || '' };
+  }
+
+  function fechaCivilDocumentada(value) {
+    if (typeof value !== 'string' || !/^\d{4}-\d{2}-\d{2}(?![\s\S])/.test(value)) throw new RangeError('calendario_documentado_fecha_invalida');
+    const d = new Date(value + 'T00:00:00.000Z');
+    if (!Number.isFinite(d.getTime()) || d.toISOString().slice(0, 10) !== value) throw new RangeError('calendario_documentado_fecha_invalida');
+    return value;
+  }
+
+  function calendarioDocumentado(value, count) {
+    if (value === undefined || (Array.isArray(value) && !value.length)) return [];
+    if (!Array.isArray(value) || !Number.isInteger(count) || count < 1 || count > 24 || value.length !== count) {
+      throw new RangeError('calendario_documentado_cantidad_invalida');
+    }
+    const allowed = ['secuencia', 'fechaVencimiento', 'documentRef', 'fechaLimiteOperativa'];
+    let lastDate = '';
+    return value.map((row, index) => {
+      if (!row || typeof row !== 'object' || Array.isArray(row) || Object.keys(row).some(key => !allowed.includes(key)) ||
+          !Number.isInteger(row.secuencia) || row.secuencia !== index + 1) throw new RangeError('calendario_documentado_secuencia_invalida');
+      const date = fechaCivilDocumentada(row.fechaVencimiento);
+      if (lastDate && date < lastDate) throw new RangeError('calendario_documentado_orden_invalido');
+      lastDate = date;
+      if (typeof row.documentRef !== 'string' || !row.documentRef.trim() || row.documentRef.length > 2000 || /[\r\n\u0000|]/.test(row.documentRef)) {
+        throw new RangeError('calendario_documentado_documento_requerido');
+      }
+      const out = { secuencia: row.secuencia, fechaVencimiento: date, documentRef: row.documentRef.trim() };
+      if (row.fechaLimiteOperativa !== undefined && row.fechaLimiteOperativa !== '') {
+        out.fechaLimiteOperativa = fechaCivilDocumentada(row.fechaLimiteOperativa);
+      }
+      return out;
+    });
+  }
+
+  // The same plain-language input is used by policy, issuance and renewal UI.
+  // No generated date is silently substituted for an incomplete source row.
+  function parseCalendarioDocumentado(text, count) {
+    if (typeof text !== 'string') throw new RangeError('calendario_documentado_formato_invalido');
+    if (!text.trim()) return [];
+    const rows = text.split(/\r?\n/).filter(line => line.trim()).map(line => {
+      const parts = line.split('|').map(part => part.trim());
+      if (parts.length < 3 || parts.length > 4 || !/^[1-9]\d*(?![\s\S])/.test(parts[0])) throw new RangeError('calendario_documentado_formato_invalido');
+      const row = { secuencia: Number(parts[0]), fechaVencimiento: parts[1], documentRef: parts[2] };
+      if (parts[3]) row.fechaLimiteOperativa = parts[3];
+      return row;
+    });
+    return calendarioDocumentado(rows, count);
+  }
+
+  function formatCalendarioDocumentado(rows) {
+    return (rows || []).map(row => [row.secuencia, row.fechaVencimiento, row.documentRef,
+      ...(row.fechaLimiteOperativa ? [row.fechaLimiteOperativa] : [])].join(' | ')).join('\n');
+  }
+
   /* ---- País → tasas (configurables al dar de alta el país) ---- */
   function cfgPais(pais) {
     const c = (Orbit.paisCfg ? Orbit.paisCfg(pais) : null) || {};
@@ -59,10 +132,12 @@ Orbit.primas = (function () {
     const gastosFinan = o.fraccionado ? r2(neta * recargoPct / 100) : 0;
     const baseGravable = r2(neta + gastosEmision + gastosFinan + otros);
     const iva = r2(baseGravable * ivaPct / 100);
-    const total = r2(baseGravable + iva);
+    const documentedCharge = cargoNoGravado(o);
+    const total = r2(baseGravable + iva + documentedCharge.cargoNoGravadoMonto);
     return {
       neta: r2(neta), gastosEmision: r2(gastosEmision), gastosFinan, otros: r2(otros),
-      baseGravable, iva, ivaPct, recargoPct, total, fraccionado: !!o.fraccionado
+      baseGravable, iva, ivaPct, recargoPct, total, fraccionado: !!o.fraccionado,
+      ...documentedCharge
     };
   }
 
@@ -109,6 +184,8 @@ Orbit.primas = (function () {
   function recibos(d, opts) {
     opts = opts || {};
     const n = Math.max(1, +opts.cuotas || cuotasDe(opts.frecuencia || 'Contado'));
+    const documentedDues = calendarioDocumentado(opts.vencimientosDocumentados, n);
+    const documentedCharge = cargoNoGravado(d);
     const legacyCalendar = opts.calendarMode === 'legacy_local_v0';
     const inicio = legacyCalendar
       ? (opts.vigenciaInicio ? new Date(opts.vigenciaInicio) : new Date())
@@ -136,26 +213,41 @@ Orbit.primas = (function () {
       const gastosEmision = splitK(d.gastosEmision, i, emisionEn);
       const gastosFinan = splitK(d.gastosFinan, i, recargoEn);
       const otros = split(d.otros, i);
+      const chargeCents = Math.round(documentedCharge.cargoNoGravadoMonto * 100), chargeBase = Math.floor(chargeCents / n);
+      const cargoNoGravadoMonto = (i === n - 1 ? chargeCents - chargeBase * (n - 1) : chargeBase) / 100;
       const baseGrav = r2(neta + gastosEmision + gastosFinan + otros);
       // IVA por recibo = 12%/19% sobre la base de ESE recibo (cuadra exacto al sumar)
       const iva = i === n - 1 ? r2(d.iva - rows.reduce((s, r) => s + r.iva, 0)) : r2(baseGrav * (d.ivaPct || 0) / 100);
-      const total = r2(baseGrav + iva);
+      const total = r2(baseGrav + iva + cargoNoGravadoMonto);
       const months = Math.round(i * pasoMeses);
       const venc = legacyCalendar ? new Date(inicio) : dueAtCalendarMonthUtc(inicio, months);
       if (legacyCalendar) venc.setMonth(venc.getMonth() + months);
-      if (finCivil && venc.getTime() > finCivil.getTime()) throw new RangeError('cuotas_fuera_vigencia');
+      if (!documentedDues.length && finCivil && venc.getTime() > finCivil.getTime()) throw new RangeError('cuotas_fuera_vigencia');
       const lim = new Date(venc);
       if (legacyCalendar) lim.setDate(lim.getDate() + 15);
       else lim.setUTCDate(lim.getUTCDate() + 15);
       const comAseguradora = r2(neta * comAsegPct / 100);
+      const due = documentedDues[i];
       rows.push({
         n: (i + 1) + '/' + n,
         neta, gastosEmision, gastosFinan, otros, iva, total,
         comAseguradora,
         comVendedor: r2(comAseguradora * comVendPct / 100),
-        vence: venc.toISOString().slice(0, 10),
-        fechaLimite: lim.toISOString().slice(0, 10)
+        cargoNoGravadoMonto,
+        cargoNoGravadoConcepto: documentedCharge.cargoNoGravadoConcepto,
+        cargoNoGravadoDocumentRef: documentedCharge.cargoNoGravadoDocumentRef,
+        vence: due ? due.fechaVencimiento : venc.toISOString().slice(0, 10),
+        fechaLimite: due ? (due.fechaLimiteOperativa || due.fechaVencimiento) : lim.toISOString().slice(0, 10),
+        ...(due ? { fechaVencimientoContractual: due.fechaVencimiento, vencimientoDocumentRef: due.documentRef,
+          fechaLimiteDocumentada: !!due.fechaLimiteOperativa } : {})
       });
+    }
+    if (documentedCharge.cargoNoGravadoMonto || documentedDues.length) {
+      const cents = key => rows.reduce((sum, row) => sum + Math.round(row[key] * 100), 0);
+      if (rows.length !== n || cents('total') !== Math.round(d.total * 100) ||
+          cents('cargoNoGravadoMonto') !== Math.round(documentedCharge.cargoNoGravadoMonto * 100)) {
+        throw new RangeError('calendario_documentado_suma_inconsistente');
+      }
     }
     return rows;
   }
@@ -166,5 +258,6 @@ Orbit.primas = (function () {
     return false; // tarjeta/visa cuotas fraccionada SÍ genera N recibos
   }
 
-  return { FRECUENCIAS, FORMAS_PAGO, CONDUCTOS, cuotasDe, cfgPais, desglose, recibos, esContado, r2 };
+  return { FRECUENCIAS, FORMAS_PAGO, CONDUCTOS, cuotasDe, cfgPais, desglose, recibos, esContado, r2,
+    cargoNoGravado, calendarioDocumentado, parseCalendarioDocumentado, formatCalendarioDocumentado, fechaCivilDocumentada };
 })();

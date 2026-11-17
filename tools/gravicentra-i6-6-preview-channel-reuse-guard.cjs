@@ -97,19 +97,19 @@ const fs = require('node:fs');
 const path = require('node:path');
 const crypto = require('node:crypto');
 const { execFileSync } = require('node:child_process');
-const TECHNICAL_RECEIPT_PATH = 'artifacts/orbit360-recovery/release-control/I6_6_TECHNICAL_PREVIEW_HYDRATION_AND_BALANCE_REBUILD_20261117.json';
-const TECHNICAL_RECEIPT_SHA256 = '6db064d9494103f4cd31ecf9a34e589f66455d2a818f3c0b945839872b1c6e8a';
+const TECHNICAL_RECEIPT_PATH = 'artifacts/orbit360-recovery/release-control/I6_6_TECHNICAL_PREVIEW_DOCUMENTED_SOURCE_AND_TRANSPORT_REBUILD_20261117.json';
+const TECHNICAL_RECEIPT_SHA256 = 'dc85b2690778aa92452663f03e3f5e5c1c3df50d37f7914aeb6fef1d83577d41';
 const TECHNICAL_CHANNEL = 'gi-i66-rc-44009981499';
 const TECHNICAL_ORIGIN = 'https://ays-orbit-360-lab--gi-i66-rc-44009981499-d08psr2y.web.app';
 const TECHNICAL_REPO = 'paulaosoriof86/orbit360-core';
 const TECHNICAL_BRANCH = 'recovery/fase-a-clean-20260831';
-const TECHNICAL_BASE = 'd0235c6d925e52ced887dbc794f7bc19e5de9b62';
-// Back up the current successful immutable 28ab package before the hydration
-// and current-balance successor. Its failed signed QA remains HOLD.
-const TECHNICAL_PREVIOUS_SOURCE = '28ab17993de5297b887c0c0376d7b314f5bee6b1';
-const TECHNICAL_PREVIOUS_BUILD = 44035140913;
-const TECHNICAL_PREVIOUS_ARTIFACT = 14306747672;
-const TECHNICAL_PREVIOUS_DIGEST = 'sha256:0bcd5331ee022b5f76eea47b3ede3eb295c21f45cef6fedf19b35cd9dadf6df7';
+const TECHNICAL_BASE = 'e73cdb18deca517580490e28b56c646b693095fe';
+// Back up signed Preview aa200 before the documented-source successor.
+// Its LIVE attempt failed before credentials/deploy; no LIVE acceptance is implied.
+const TECHNICAL_PREVIOUS_SOURCE = 'aa200b1de0aa5c654338b2f7de8bec9e38af86ec';
+const TECHNICAL_PREVIOUS_BUILD = 44040873624;
+const TECHNICAL_PREVIOUS_ARTIFACT = 14309566018;
+const TECHNICAL_PREVIOUS_DIGEST = 'sha256:06567c6f22974677d314ddc51e63896cca02c95ed762da24a7874cf9deafa72b';
 // Historical failed-residual exception remains byte/identity scoped to 382.
 // It is not activated by the current successful-package backup.
 const TECHNICAL_OLD_SOURCE = '3820817d8fcac86a99229cefdc46dfc03e1a8c36';

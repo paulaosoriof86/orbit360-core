@@ -43,6 +43,25 @@ Orbit.modules = Orbit.modules || {};
   function renewalDefaultPayments(source) { const expected=paymentsFromFrequency(source&&source.frecuencia||'Contado'), raw=Math.max(0,+(source&&source.cuotas)||0); return raw>0&&raw===expected?raw:expected; }
   function normKey(v) { return String(v == null ? '' : v).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,''); }
   function r2(v) { return Math.round(((+v || 0) + Number.EPSILON) * 100) / 100; }
+  function documentedFieldsHtml(prefix, value, renewal) {
+    value = value || {};
+    const calendar = !renewal && Array.isArray(value.vencimientosDocumentados) && value.vencimientosDocumentados.length
+      ? Orbit.primas.formatCalendarioDocumentado(value.vencimientosDocumentados) : '';
+    return `<label class="ce-l">Cargo documentado no gravado con IVA<input id="${prefix}-nonvat" type="number" min="0" step="0.01" class="o-sel" value="${esc(value.cargoNoGravadoMonto || 0)}"></label>
+      <label class="ce-l">Concepto del cargo no gravado<input id="${prefix}-nonvat-concept" class="o-sel" value="${esc(value.cargoNoGravadoConcepto || '')}"></label>
+      <label class="ce-l">Documento del cargo no gravado<input id="${prefix}-nonvat-ref" class="o-sel" value="${esc(!renewal && value.cargoNoGravadoDocumentRef || '')}" placeholder="O usa la póliza emitida confirmada en este formulario"></label>
+      <label class="ce-l" style="grid-column:1/-1">Vencimientos del documento<textarea id="${prefix}-documented-calendar" class="o-sel" rows="3" placeholder="1 | AAAA-MM-DD | referencia del documento">${esc(calendar)}</textarea><small>Una línea por recibo: cuota | vencimiento contractual | referencia. Límite operativo opcional como cuarta columna. Las fechas de la vigencia anterior no se copian a la renovación.</small></label>`;
+  }
+  function documentedFieldsPayload($, prefix, count, documentRef) {
+    const value = suffix => String($('#' + prefix + '-' + suffix).value || '').trim();
+    const amount = value('nonvat'), concept = value('nonvat-concept'), ref = value('nonvat-ref'), out = {};
+    if (Number(amount) !== 0 || concept || ref) Object.assign(out, Orbit.primas.cargoNoGravado({
+      cargoNoGravadoMonto: amount, cargoNoGravadoConcepto: concept, cargoNoGravadoDocumentRef: ref || documentRef || ''
+    }));
+    const calendar = value('documented-calendar');
+    if (calendar) out.vencimientosDocumentados = Orbit.primas.parseCalendarioDocumentado(calendar, count);
+    return out;
+  }
   function validatedRenewalTariff(insurerId, source, payments) {
     const insurer = insurerId ? S().get('aseguradoras', insurerId) : null;
     if (!insurer) return null;
@@ -320,13 +339,18 @@ Orbit.modules = Orbit.modules || {};
       <label class="ce-l">Gastos emisión<input id="iss-gem" type="number" class="o-sel" value="${+offer.gastosEmision || 0}"></label>
       <label class="ce-l">Gastos financieros<input id="iss-gfin" type="number" class="o-sel" value="${+offer.gastosFinan || 0}"></label>
       <label class="ce-l">Otros<input id="iss-other" type="number" class="o-sel" value="${+offer.otros || 0}"></label>
+      ${documentedFieldsHtml('iss', offer, false)}
       <label class="ce-l">Referencia aseguradora<input id="iss-source" class="o-sel" value="${esc(offer.sourceRef || '')}"></label>
     </div>`;
     const b = modal('issue-policy-v1201','Registrar emisión real',body,'<button class="btn primary" data-issue>Crear póliza y recibos</button>',760);
     const $ = s => b.querySelector(s);
     b.querySelector('[data-issue]').onclick = async () => {
       const issueBtn = b.querySelector('[data-issue]'), originalText = issueBtn.textContent; issueBtn.disabled = true; issueBtn.textContent = 'Guardando…';
+      let documented;
+      try { documented = documentedFieldsPayload($, 'iss', +$('#iss-payments').value || 1, $('#iss-doc').value.trim()); }
+      catch (error) { issueBtn.disabled = false; issueBtn.textContent = originalText; return toast('Revisa el importe, concepto y documento del cargo no gravado y el calendario completo por recibo. No se creó ninguna póliza.'); }
       const result = await I.issueRequest(request.id, {
+        ...documented,
         numero: $('#iss-num').value.trim(), documentRef: $('#iss-doc').value.trim(),
         vigenciaInicio: $('#iss-start').value, vigenciaFin: $('#iss-end').value,
         frecuencia: $('#iss-freq').value, cuotas: +$('#iss-payments').value || 1,
@@ -497,6 +521,7 @@ Orbit.modules = Orbit.modules || {};
       <label class="ce-l">Gastos emisión<input id="rend-gem" type="number" step="0.01" class="o-sel" value="${+source.gastosEmision||0}"></label>
       <label class="ce-l">Gastos financieros<input id="rend-gfin" type="number" step="0.01" class="o-sel" value="${+source.gastosFinan||0}"></label>
       <label class="ce-l">Otros / asistencias<input id="rend-other" type="number" step="0.01" class="o-sel" value="${+source.otros||0}"></label>
+      ${documentedFieldsHtml('rend', source, true)}
       <label class="ce-l">IVA / impuestos %<input id="rend-iva" type="number" step="0.01" class="o-sel" value="${source.ivaPct!=null?+source.ivaPct:((Orbit.primas&&Orbit.primas.cfgPais&&Orbit.primas.cfgPais(source.pais).iva)||0)}"></label>
       <label class="ce-l">Prima total calculada<input id="rend-total" class="o-sel" readonly></label>
       <label class="ce-l">Referencia aseguradora<input id="rend-source" class="o-sel" placeholder="N.º propuesta, correo o referencia"></label>
@@ -524,10 +549,13 @@ Orbit.modules = Orbit.modules || {};
     }
     let paymentsTouched=false;
     const paintTotal=()=>{
+      try {
       const net=+$('#rend-net').value||0,gem=+$('#rend-gem').value||0,gfin=+$('#rend-gfin').value||0,other=+$('#rend-other').value||0,iva=+$('#rend-iva').value||0,n=Math.max(1,+$('#rend-payments').value||1);
       const recargo=net>0?gfin/net*100:0;
-      const d=Orbit.primas.desglose(net,source.pais,{fraccionado:n>1,gastosEmision:gem,otros:other,recargoFinPct:recargo,ivaPct:iva});
+      const documented=documentedFieldsPayload($,'rend',n,docInput.value.trim());
+      const d=Orbit.primas.desglose(net,source.pais,{fraccionado:n>1,gastosEmision:gem,otros:other,recargoFinPct:recargo,ivaPct:iva,...documented});
       $('#rend-total').value=(source.moneda||'')+' '+Number(d.total||0).toLocaleString('es-GT',{minimumFractionDigits:2,maximumFractionDigits:2});
+      }catch(error){$('#rend-total').value='Revisa el cargo y el calendario documentados';}
     };
     const applyValidatedTariff=()=>{
       const net=+$('#rend-net').value||0,n=Math.max(1,+$('#rend-payments').value||1),t=validatedRenewalTariff($('#rend-asg').value,source,n);
@@ -545,7 +573,7 @@ Orbit.modules = Orbit.modules || {};
     $('#rend-payments').addEventListener('input',()=>{paymentsTouched=true;applyValidatedTariff();});
     $('#rend-asg').addEventListener('change',applyValidatedTariff);
     $('#rend-net').addEventListener('input',applyValidatedTariff);
-    ['#rend-gem','#rend-gfin','#rend-other','#rend-iva'].forEach(sel=>$(sel).addEventListener('input',paintTotal));
+    ['#rend-gem','#rend-gfin','#rend-other','#rend-iva','#rend-nonvat','#rend-nonvat-concept','#rend-nonvat-ref','#rend-documented-calendar','#rend-doc'].forEach(sel=>$(sel).addEventListener('input',paintTotal));
     applyValidatedTariff();
     btn.onclick=async()=>{
       const original=btn.textContent;btn.disabled=true;btn.textContent='Guardando…';
@@ -571,6 +599,7 @@ Orbit.modules = Orbit.modules || {};
       if(!confirmedDocumentRef){btn.disabled=false;btn.textContent=original;return toast('Selecciona o carga el soporte de renovación en firme.');}
       let result;
       try{result=await I.createDirectRenewal(g.id,{
+        ...documentedFieldsPayload($,'rend',+$('#rend-payments').value||1,confirmedDocumentRef),
         aseguradoraId:$('#rend-asg').value,numero:$('#rend-num').value.trim(),
         vigenciaInicio:$('#rend-start').value,vigenciaFin:$('#rend-end').value,producto:$('#rend-prod').value.trim(),
         frecuencia:$('#rend-freq').value,cuotas:+$('#rend-payments').value||1,formaPago:$('#rend-form').value.trim(),

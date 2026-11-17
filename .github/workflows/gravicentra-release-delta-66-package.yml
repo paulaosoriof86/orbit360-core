@@ -29,6 +29,12 @@ on:
       - artifacts/orbit360-recovery/release-control/I6_6_CURRENT_TECHNICAL_PREVIEW_ROLLOVER_20261116.json
       - artifacts/orbit360-recovery/release-control/I6_6_TECHNICAL_PREVIEW_DIAGNOSTIC_RETENTION_REBUILD_20261117.json
       - artifacts/orbit360-recovery/release-control/I6_6_TECHNICAL_PREVIEW_HYDRATION_AND_BALANCE_REBUILD_20261117.json
+      - artifacts/orbit360-recovery/release-control/I6_6_TECHNICAL_PREVIEW_DOCUMENTED_SOURCE_AND_TRANSPORT_REBUILD_20261117.json
+      - tools/gravicentra-i6-6-live-proof-artifact-layout.test.cjs
+      - tools/gravicentra-i6-6-documented-premium-terms.test.cjs
+      - tools/gravicentra-i6-6-documented-terms-signed-check.cjs
+      - tools/gravicentra-i6-6-documented-terms-signed-check.test.cjs
+      - artifacts/orbit360-recovery/release-control/I6_6_DOCUMENTED_PREMIUM_CALENDAR_SOURCE_QA_20261117.json
       - tools/gravicentra-i6-6-preview-current-live-restore.cjs
       - tools/gravicentra-i6-6-operational-release-candidate.cjs
       - tools/gravicentra-i6-6-preview-candidate-binding.test.cjs
@@ -268,6 +274,7 @@ jobs:
           node --test tools/gravicentra-i6-6-preview-candidate-binding.test.cjs
           node --test tools/gravicentra-i6-6-direction-preview-i66-consent-scope.test.cjs
           node --test tools/gravicentra-i6-6-technical-preview-rollover.test.cjs
+          node --test tools/gravicentra-i6-6-live-proof-artifact-layout.test.cjs
           node --test tools/gravicentra-i6-6-advisor-browser-observability.test.cjs
           node --test tools/gravicentra-i6-6-preview-failure-diagnostics-retention.test.cjs
           node --test tools/gravicentra-b4-003-protected-hydration.test.cjs tools/gravicentra-b4-003-post-auth-bootstrap-diagnostic.test.cjs

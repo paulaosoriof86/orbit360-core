@@ -56,7 +56,10 @@ Orbit.modules = Orbit.modules || {};
     CORRECTION_READBACK_MISMATCH: 'La verificación posterior necesita revisión; no se declara aplicada la corrección.',
     CORRECTION_SERVER_PROOF_REQUIRED: 'Falta la confirmación canónica del servidor.'
   };
-  function errorText(errors) { return (errors || []).map(x => ERROR_LABELS[String(x).split(':')[0]] || 'No fue posible confirmar esta operación.').join(' · '); }
+  function errorText(errors) { return (errors || []).map(x => ERROR_LABELS[String(x).split(':')[0]] ||
+    (/^cargo_no_gravado_/.test(x) ? 'Revisa el cargo no gravado: importe no negativo con dos decimales, concepto y documento de respaldo.' :
+      /^calendario_documentado_/.test(x) ? 'Revisa los vencimientos del documento: una línea por recibo, secuencia desde 1, fecha válida y referencia. El límite operativo se valida como una fecha independiente.' :
+      'No fue posible confirmar esta operación.')).join(' · '); }
   function protectedPreviewRealPolicy(id){
     const host=String(location&&location.hostname||''),runtime=Orbit.productRuntimeBrowserProvidersP0;
     const releasePreview=runtime&&typeof runtime.protectedHostMode==='function'&&runtime.protectedHostMode()==='preview';
@@ -161,7 +164,10 @@ Orbit.modules = Orbit.modules || {};
     const existingVehicle = existingVehicleRaw && E.normalizeVehicle ? E.normalizeVehicle(existingVehicleRaw) : existingVehicleRaw;
     const initialAdvisorId = existing && existing.asesorId || selectedClient.asesorId || '';
     const frequencies = Object.keys(Orbit.primas.FRECUENCIAS || { Contado: 1 });
-    const forms = Orbit.primas.FORMAS_PAGO || ['Transferencia'];
+    const forms = (Orbit.primas.FORMAS_PAGO || ['Transferencia']).slice();
+    const conducts = (Orbit.primas.CONDUCTOS || ['Cobro directo del intermediario','Cobro de la aseguradora']).slice();
+    if (existing && existing.formaPago && !forms.includes(existing.formaPago)) forms.unshift(existing.formaPago);
+    if (existing && existing.conducto && !conducts.includes(existing.conducto)) conducts.unshift(existing.conducto);
     const status = ['Vigente','Por renovar','Vencida','Cancelada','Anulada','Rechazada','Requiere validación'];
     const assignmentCorrectionAvailable = !!existing && String(A.activeRole ? A.activeRole() : '')
       .normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase() === 'direccion';
@@ -192,14 +198,18 @@ Orbit.modules = Orbit.modules || {};
           <label class="ce-l">Fin vigencia *<input type="date" class="o-sel" data-end value="${esc(end)}"></label>
           <label class="ce-l">Frecuencia<select class="o-sel" data-frequency>${frequencies.map(x => `<option ${existing && x === existing.frecuencia ? 'selected' : ''}>${esc(x)}</option>`).join('')}</select></label>
           <label class="ce-l">Cantidad de recibos<input type="number" min="1" max="24" class="o-sel" data-installments value="${esc(existing && existing.cuotas || Orbit.primas.cuotasDe(existing && existing.frecuencia || 'Contado'))}"><small data-installments-hint></small></label>
-          <label class="ce-l">Forma de pago<select class="o-sel" data-payment-form>${forms.map(x => `<option ${existing && x === existing.formaPago ? 'selected' : ''}>${esc(x)}</option>`).join('')}</select></label>
-          <label class="ce-l">Conducto<select class="o-sel" data-conduct>${(Orbit.primas.CONDUCTOS || ['Cobro directo del intermediario','Cobro de la aseguradora']).map(x => `<option ${existing && x === existing.conducto ? 'selected' : ''}>${esc(x)}</option>`).join('')}</select></label>
+          <label class="ce-l">Forma de pago<select class="o-sel" data-payment-form><option value="" ${!existing || !existing.formaPago ? 'selected' : ''}>Pendiente de validar</option>${forms.map(x => `<option ${existing && x === existing.formaPago ? 'selected' : ''}>${esc(x)}</option>`).join('')}</select></label>
+          <label class="ce-l">Conducto<select class="o-sel" data-conduct><option value="" ${!existing || !existing.conducto ? 'selected' : ''}>Pendiente de validar</option>${conducts.map(x => `<option ${existing && x === existing.conducto ? 'selected' : ''}>${esc(x)}</option>`).join('')}</select></label>
         </div>
+        <label class="ce-l">Vencimientos del documento (opcional)<textarea class="o-sel" data-documented-calendar rows="3" placeholder="1 | AAAA-MM-DD | referencia del documento">${esc(Orbit.primas.formatCalendarioDocumentado(existing && existing.vencimientosDocumentados))}</textarea><small>Una línea por recibo: cuota | vencimiento contractual | referencia. Puedes añadir | fecha límite operativa si está documentada. Sin estas líneas se conserva el calendario habitual; una fecha de pago no sustituye el vencimiento.</small></label>
         <div class="gi-form-section-title"><span>💰</span><div>Prima y condiciones<small data-tax-note>IVA ${countryTaxPct(country)}% según país. Emisión, asistencia y recargo continúan editables para conservar excepciones reales.</small></div></div>
         <div class="cgrid">
           <label class="ce-l">Prima neta *<input type="number" min="0" step="0.01" class="o-sel" data-net value="${esc(existing && existing.primaNeta || 0)}"></label>
           <label class="ce-l">Gastos de emisión<input type="number" min="0" step="0.01" class="o-sel" data-issue value="${esc(existing && existing.gastosEmision || 0)}"></label>
           <label class="ce-l">Otros / asistencias<input type="number" min="0" step="0.01" class="o-sel" data-other value="${esc(existing && existing.otros || 0)}"></label>
+          <label class="ce-l">Cargo documentado no gravado con IVA<input type="number" min="0" step="0.01" class="o-sel" data-nonvat value="${esc(existing && existing.cargoNoGravadoMonto || 0)}"></label>
+          <label class="ce-l">Concepto del cargo no gravado<input class="o-sel" data-nonvat-concept value="${esc(existing && existing.cargoNoGravadoConcepto || '')}" placeholder="Concepto indicado por la aseguradora"></label>
+          <label class="ce-l">Documento del cargo no gravado<input class="o-sel" data-nonvat-ref value="${esc(existing && existing.cargoNoGravadoDocumentRef || '')}" placeholder="Referencia verificable del documento"></label>
           <label class="ce-l">Recargo financiero %<input type="number" min="0" step="0.01" class="o-sel" data-surcharge value="${esc(existing && existing.recargoFinPct != null ? existing.recargoFinPct : '')}"></label>
           <label class="ce-l">Suma asegurada<input type="number" min="0" step="0.01" class="o-sel" data-sum value="${esc(existing && existing.sumaAsegurada || 0)}"></label>
         </div>
@@ -319,7 +329,16 @@ Orbit.modules = Orbit.modules || {};
     }
     function raw() {
       const c = client(), country2 = c.pais || '', currency2 = currencyEl.value;
+      const documented = {}, amount = $('[data-nonvat]').value, concept = $('[data-nonvat-concept]').value.trim(), ref = $('[data-nonvat-ref]').value.trim();
+      if (Number(amount) !== 0 || concept || ref || existing && Object.prototype.hasOwnProperty.call(existing,'cargoNoGravadoMonto')) {
+        Object.assign(documented, Orbit.primas.cargoNoGravado({ cargoNoGravadoMonto: amount, cargoNoGravadoConcepto: concept, cargoNoGravadoDocumentRef: ref }));
+      }
+      const calendar = $('[data-documented-calendar]').value;
+      if (calendar.trim() || existing && Object.prototype.hasOwnProperty.call(existing,'vencimientosDocumentados')) {
+        documented.vencimientosDocumentados = Orbit.primas.parseCalendarioDocumentado(calendar, E.installmentsForFrequency($('[data-frequency]').value, +$('[data-installments]').value));
+      }
       return {
+        ...documented,
         id: existing && existing.id, tenantId: existing && existing.tenantId || A.tenantId(), clienteId: c.id, asesorId: advisorEl && advisorEl.value || c.asesorId,
         pais: country2, moneda: currency2, aseguradoraId: insurerEl.value, numero: $('[data-number]').value.trim(), estado: $('[data-status]').value,
         ramo: ramoEl.value, subramo: productEl.value, producto: productEl.value, renovable: $('[data-renewable]').value==='yes' ? true : ($('[data-renewable]').value==='no' ? false : null), vigenciaInicio: $('[data-start]').value, vigenciaFin: $('[data-end]').value,
@@ -333,6 +352,7 @@ Orbit.modules = Orbit.modules || {};
       };
     }
     function preview() {
+      try {
       const preserve=!!existing&&(!nonRenewalBaseline||metadataOnlyPatch()!==null);
       const prepared=preserve?existing:E.preparePolicy(raw(),existing||null,'preview');
       const recs=preserve?(S().where('recibosEsperados',r=>r.polizaId===existing.id&&String(r.estado||'').toLowerCase()!=='anulado')||[]):E.expectedReceipts(prepared);
@@ -340,11 +360,15 @@ Orbit.modules = Orbit.modules || {};
       const preview=$('[data-preview]');
       const total=prepared.primaTotal!=null?prepared.primaTotal:prepared.prima;
       const amount=value=>preserve&&value==null?'No desglosado en el registro':money(prepared.moneda,value);
-      preview.innerHTML = `<div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start"><div><small class="muted">${preserve?'Valores existentes · sin recálculo por asesor o renovabilidad':'Resultado antes de guardar'}</small><b style="display:block">${active ? recs.length + ' recibo(s) '+(preserve?'existente(s) cargado(s)':'en cartera') : 'Histórico · sin cartera nueva'}</b></div><b>${amount(total)}</b></div><div class="asg197-info-grid" style="margin-top:10px"><div><small>Prima neta</small><b>${amount(prepared.primaNeta)}</b></div><div><small>Gastos financieros</small><b>${amount(prepared.gastosFinan)}</b></div><div><small>IVA</small><b>${amount(prepared.ivaMonto)}</b></div><div><small>Total</small><b>${amount(total)}</b></div></div>`;
+      preview.innerHTML = `<div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start"><div><small class="muted">${preserve?'Valores existentes · sin recálculo por asesor o renovabilidad':'Resultado antes de guardar'}</small><b style="display:block">${active ? recs.length + ' recibo(s) '+(preserve?'existente(s) cargado(s)':'en cartera') : 'Histórico · sin cartera nueva'}</b></div><b>${amount(total)}</b></div><div class="asg197-info-grid" style="margin-top:10px"><div><small>Prima neta</small><b>${amount(prepared.primaNeta)}</b></div><div><small>Gastos financieros</small><b>${amount(prepared.gastosFinan)}</b></div><div><small>IVA</small><b>${amount(prepared.ivaMonto)}</b></div><div><small>Cargo no gravado${prepared.cargoNoGravadoConcepto?' · '+esc(prepared.cargoNoGravadoConcepto):''}</small><b>${money(prepared.moneda,prepared.cargoNoGravadoMonto||0)}</b></div><div><small>Total</small><b>${amount(total)}</b></div></div>`;
       $('[data-save]').textContent=assignmentMode&&assignmentMode.checked?'Confirma en la corrección documentada':preserve?'Guardar sin recalcular recibos':existing?'Guardar y sincronizar recibos':'Crear póliza y recibos';
-      if(assignmentMode&&assignmentMode.checked)$('[data-save]').disabled=true;
-      if(active&&recs.length)preview.insertAdjacentHTML('beforeend','<div style="margin-top:12px"><div style="font-weight:800;font-size:14px;margin-bottom:7px">🧾 '+(preserve?'Calendario existente que se conserva':'Calendario que quedará guardado')+'</div><div style="max-height:190px;overflow:auto;border:1px solid var(--line);border-radius:10px"><table class="tbl"><thead><tr><th>Recibo</th><th>Vence</th><th class="num">Monto</th></tr></thead><tbody>'+recs.map((r,i)=>'<tr><td>'+(i+1)+'</td><td>'+esc(r.fechaLimite||r.vence||r.fechaVencimiento||'—')+'</td><td class="num">'+esc(money(prepared.moneda,r.montoTotal!=null?r.montoTotal:r.monto))+'</td></tr>').join('')+'</tbody></table></div></div>');
+      $('[data-save]').disabled=!advisorRosterConfirmed||!!(assignmentMode&&assignmentMode.checked);
+      if(active&&recs.length)preview.insertAdjacentHTML('beforeend','<div style="margin-top:12px"><div style="font-weight:800;font-size:14px;margin-bottom:7px">🧾 '+(preserve?'Calendario existente que se conserva':'Calendario que quedará guardado')+'</div><div style="max-height:190px;overflow:auto;border:1px solid var(--line);border-radius:10px"><table class="tbl"><thead><tr><th>Recibo</th><th>Vencimiento</th><th>Límite operativo</th><th class="num">Monto</th></tr></thead><tbody>'+recs.map((r,i)=>'<tr><td>'+(i+1)+'</td><td>'+esc(r.fechaVencimientoContractual||r.vence||r.fechaVencimiento||'—')+'</td><td>'+esc(r.fechaLimite||'—')+'</td><td class="num">'+esc(money(prepared.moneda,r.montoTotal!=null?r.montoTotal:r.monto))+'</td></tr>').join('')+'</tbody></table></div></div>');
       if(preserve&&!recs.length)preview.insertAdjacentHTML('beforeend','<p class="cfg-note">No hay recibos cargados en esta vista. Esta edición conserva el plan existente: no crea, elimina ni recalcula recibos.</p>');
+      } catch(error) {
+        $('[data-preview]').textContent=errorText([String(error&&error.message||'')]);
+        $('[data-save]').disabled=true;
+      }
     }
     clientEl.addEventListener('change', () => { refreshCountry(); resetNewCommissions(); }); ramoEl.addEventListener('change', () => refreshProducts('', false));
     [insurerEl, ramoEl, productEl].forEach(el => el.addEventListener('change', () => resetNewCommissions('insurer')));
@@ -352,6 +376,7 @@ Orbit.modules = Orbit.modules || {};
     $('[data-start]').addEventListener('change', () => { if (!$('[data-end]').value) $('[data-end]').value = plusYear($('[data-start]').value); preview(); });
     $('[data-frequency]').addEventListener('change', syncInstallments);
     b.querySelectorAll('input,select').forEach(el => el.addEventListener('input', preview));
+    $('[data-documented-calendar]').addEventListener('input', preview);
     $('[data-import]').addEventListener('click', () => { b.remove(); Orbit.importa.open('polizas', { scope: { clienteId: selectedClient.id } }); });
     const deletePolicy = $('[data-delete]');
     if (deletePolicy && existing) deletePolicy.addEventListener('click', async () => {
@@ -472,8 +497,9 @@ Orbit.modules = Orbit.modules || {};
       });
     }
     $('[data-save]').addEventListener('click', async () => {
-      const save = $('[data-save]'), payload = raw(), reason = existing ? $('[data-reason]').value.trim() : 'Alta operativa desde plataforma';
+      const save = $('[data-save]'), reason = existing ? $('[data-reason]').value.trim() : 'Alta operativa desde plataforma';
       const err = $('[data-error]'), originalText = save.textContent;
+      let payload;try{payload=raw();}catch(error){err.style.display='';err.textContent=errorText([String(error&&error.message||'')]);return;}
       if (assignmentMode && assignmentMode.checked) { err.style.display = ''; err.textContent = 'Usa la previsualización y confirmación de la corrección documentada.'; return; }
       if (!advisorRosterConfirmed || !payload.asesorId ||
           (!advisors.some(a => a.id === payload.asesorId) && !(existing && payload.asesorId === initialAdvisorId))) {
@@ -527,7 +553,7 @@ Orbit.modules = Orbit.modules || {};
     refreshProducts(initialProduct, true); syncInstallments(); resetNewCommissions(); preview();
     refreshAdvisors(initialAdvisorId);
     // Snapshot after default normalization: classify only user-originated form changes.
-    nonRenewalBaseline=existing?Array.from(b.querySelectorAll('input,select'))
+    nonRenewalBaseline=existing?Array.from(b.querySelectorAll('input,select')).concat($('[data-documented-calendar]'))
       .filter(el=>!el.matches('[data-client-search],[data-country],[data-renewable],[data-assignment-field]'))
       .map(el=>({el,value:el.matches('[data-advisor]')?initialAdvisorId:el.value})):null;
   }

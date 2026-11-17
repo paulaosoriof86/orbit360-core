@@ -1,0 +1,138 @@
+{
+  "schema": "GI_I66_DOCUMENTED_PREMIUM_CALENDAR_SOURCE_QA_V1",
+  "activeGate": "I6.6",
+  "lastClosedReleaseGate": "B4-007",
+  "approvedByDirection": true,
+  "authority": "Direction authorization to complete operational corrections and record documented policy/receipt/payment updates without accumulating unshipped tested changes.",
+  "status": "SOURCE_QA_PASS_PREVIEW_AND_LIVE_NOT_CLAIMED",
+  "baseSourceSha": "e73cdb18deca517580490e28b56c646b693095fe",
+  "changes": [
+    "Explicit non-taxed documentary amount added after IVA, with concept and document reference required for positive values.",
+    "Contractual installment dates retained from a complete validated document calendar, separate from operational dates.",
+    "Unknown payment method and collection channel remain unknown instead of being invented.",
+    "Paid, reported and reconciled receipts retain their contractual-change locks.",
+    "Same owner paths cover manual creation, detail, plan editing, issuance, renewal and policy import."
+  ],
+  "sourceFiles": [
+    {
+      "path": "orbit360-platform/core/primas.js",
+      "gitBlobSha": "3619b15230d15b2224fa5408324703bdfa0cf22b",
+      "sha256": "5189f873215072a91a5adc3b423b70e228697bbadc8d356567d8f14a6614a46e"
+    },
+    {
+      "path": "orbit360-platform/core/policy-receipts-engine.js",
+      "gitBlobSha": "43b5297f8fbfaef6a3192d3fa9642113aeed2e44",
+      "sha256": "9ceebc97f91e96e38d39bcf254cded9db7bd7c9d414071d5c8c95576ef9e5e07"
+    },
+    {
+      "path": "orbit360-platform/modules/policy-receipts-v1199-bridge.js",
+      "gitBlobSha": "87a04b56c7358b8eebe963faebe7652daae983b4",
+      "sha256": "f1a2ee2c4bee1a48ca5840418a26b31ced8e9c08c08a092eb2931d9aead5ecb9"
+    },
+    {
+      "path": "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js",
+      "gitBlobSha": "25f557054a37c7116fa88863a7357ed79d8a82e0",
+      "sha256": "fd927d16e6fdcd521e68a48f3d42cad88e13238ac79bf2f1496281ac1489fea1"
+    },
+    {
+      "path": "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js",
+      "gitBlobSha": "1866fd392be49b8506c83d1392092a715b3983dd",
+      "sha256": "a2821a0948abff9ef5ddddf13ea36968628a14f378924246d9165b6934d356ec"
+    },
+    {
+      "path": "orbit360-platform/core/issuance-workflow-v1201.js",
+      "gitBlobSha": "716c66579e077bced15d2150010eef792bf2d9c3",
+      "sha256": "230d810719fc0f0a19ae0be1984944d22be2aa55475bf11633bb7c15638e7e17"
+    },
+    {
+      "path": "orbit360-platform/modules/issuance-endosos-v1201-bridge.js",
+      "gitBlobSha": "27e82715e095db03aa83b44427b8e269620cc91f",
+      "sha256": "ec1f8e63edc370cd6b4a0165ee8e6aefbf719d9baadaeef24f3a982fd3f815da"
+    },
+    {
+      "path": "orbit360-platform/core/importa.js",
+      "gitBlobSha": "11c76a35e2568ab367024ce32b67e6b1f680486c",
+      "sha256": "28e7d1202f36825131f1098246c33cb18e9bc9afd62c7d2c1d7772395912c4e8"
+    },
+    {
+      "path": "tools/gravicentra-i6-6-documented-premium-terms.test.cjs",
+      "gitBlobSha": "b413bb380c2361f3607bcf841147c5e340393a90",
+      "sha256": "fa031eda189dc83f145c584812d90f24d0266a90753e39a5a0e317cac477c991"
+    },
+    {
+      "path": "tools/gravicentra-i6-6-documented-terms-signed-check.cjs",
+      "gitBlobSha": "3df7ed896e80b23303e7b56c7ae819735e33fbad",
+      "sha256": "d834c068ee8db3797df357c1ff769f1a5a4c4df4630eca9a46df036263d79df2"
+    },
+    {
+      "path": "tools/gravicentra-i6-6-documented-terms-signed-check.test.cjs",
+      "gitBlobSha": "ab2ba60b1b2529d0ead1456565627235b44b4d4d",
+      "sha256": "4d14fca03a0a066f92cd4c8bb7773c46e2898ebfb26678c9584132bb4fdeef32"
+    }
+  ],
+  "sourceTests": {
+    "focal": {
+      "tests": 76,
+      "pass": 76,
+      "fail": 0
+    },
+    "beforeAfter": {
+      "beforeCausalFailures": 4,
+      "afterSameCasesPass": 4
+    },
+    "retainedHistoricalSuites": {
+      "tests": 109,
+      "pass": 109,
+      "fail": 0
+    },
+    "manifestTerminalTestFiles": {
+      "tests": 73,
+      "pass": 73,
+      "fail": 0
+    },
+    "transportRegression": {
+      "tests": 264,
+      "pass": 264,
+      "fail": 0
+    },
+    "documentedTermsSignedHelperUnit": {
+      "tests": 36,
+      "pass": 36,
+      "fail": 0,
+      "externalSignedQa": false
+    },
+    "releaseAdvisorAndProofRegression": {
+      "tests": 186,
+      "pass": 186,
+      "fail": 0
+    }
+  },
+  "separateTransportCorrection": {
+    "failedLiveRun": 44043379496,
+    "source": "aa200b1de0aa5c654338b2f7de8bec9e38af86ec",
+    "failure": "Single pinned signed QA artifact extracted into an extra wrapper directory; proof verifier stopped before credentials or deployment.",
+    "fix": "actions/download-artifact uses merge-multiple true only with the single exact artifact ID and exact run ID; integrity gates retained.",
+    "failedRunMadeLiveChanges": false
+  },
+  "sourceIntakeV2": {
+    "included": false,
+    "reason": "Separate bounded atomic source-run intake work is still being tested and must not delay this completed documentary correction."
+  },
+  "realFinancialWrites": 0,
+  "customerRecordWrites": 0,
+  "sourceCommitImpliesDeployment": false,
+  "previewAccepted": false,
+  "liveAccepted": false,
+  "requiredNext": [
+    "Build a new immutable artifact from exactly this source and preserve the existing LIVE snapshot.",
+    "Run the existing signed Preview suite with this artifact; do not reuse the earlier candidate PASS.",
+    "Promote exactly the same artifact, rehash and verify signed LIVE plus the normal-user documentary case.",
+    "Record business writes separately, with before/after and no duplicated inference."
+  ],
+  "signedDocumentaryCheck": {
+    "status": "REQUIRED_IN_NEW_SIGNED_RUN_NOT_YET_EXECUTED",
+    "owner": "tools/gravicentra-i6-6-documented-terms-signed-check.cjs",
+    "driver": "tools/gravicentra-i6-6-advisor-payables-signed-uat.cjs",
+    "scope": "Existing signed Direction session after its ordinary assignment UI check; exact owned synthetic client is read-only; own policy and receipt are written with the canonical operational command then exactly restored with audit records; no internal reload or invented reload proof."
+  }
+}

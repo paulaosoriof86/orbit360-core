@@ -2477,6 +2477,92 @@
           "scope": "Add protected access-owner fixture and reuse the actual provider host classifier; dependency transport remains synthetic. All historical assertions preserved. Explicitly executed by the immutable build workflow."
         }
       ]
+    },
+    {
+      "id": "I6_6_DOCUMENTED_NON_TAXED_CHARGE_AND_CONTRACTUAL_RECEIPT_CALENDAR_20261117",
+      "approvedByDirection": true,
+      "receipt": "artifacts/orbit360-recovery/release-control/I6_6_DOCUMENTED_PREMIUM_CALENDAR_SOURCE_QA_20261117.json",
+      "sourceStatus": "SOURCE_QA_PASS_NEW_EXACT_ARTIFACT_AND_SIGNED_PREVIEW_REQUIRED_NOT_LIVE",
+      "scope": "Separate explicit documentary non-taxed charge after IVA; exact documentary due calendar and independent operational deadline; preserve paid/reported receipts and unknown payment method; no financial writes by this source change.",
+      "paths": [
+        {
+          "path": "orbit360-platform/core/primas.js",
+          "gitBlobSha": "3619b15230d15b2224fa5408324703bdfa0cf22b",
+          "replaces": {
+            "path": "orbit360-platform/core/primas.js",
+            "priorGitBlobSha": "2a8f86459c66c459da1fdb5d14e99f5f70341ee2",
+            "priorChangeId": "I6_6_FORWARD_ONLY_UTC_MONTHLY_CADENCE_WITH_TERM_GUARD"
+          }
+        },
+        {
+          "path": "orbit360-platform/core/policy-receipts-engine.js",
+          "gitBlobSha": "43b5297f8fbfaef6a3192d3fa9642113aeed2e44",
+          "replaces": {
+            "path": "orbit360-platform/core/policy-receipts-engine.js",
+            "priorGitBlobSha": "967db92922e310796bae6f8ca53ba6c7d1a92855",
+            "priorChangeId": "I6_6_ADVISOR_PORTFOLIO_HISTORICAL_BENEFICIARY_AND_COMPONENT_ROUNDING_20261115"
+          }
+        },
+        {
+          "path": "orbit360-platform/modules/policy-receipts-v1199-bridge.js",
+          "gitBlobSha": "87a04b56c7358b8eebe963faebe7652daae983b4",
+          "replaces": {
+            "path": "orbit360-platform/modules/policy-receipts-v1199-bridge.js",
+            "priorGitBlobSha": "e5d0e9baaf9aac6e76f4c5b45b7def9711087fab",
+            "priorChangeId": "I6_6_ADVISOR_PORTFOLIO_HISTORICAL_BENEFICIARY_AND_COMPONENT_ROUNDING_20261115"
+          }
+        },
+        {
+          "path": "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js",
+          "gitBlobSha": "25f557054a37c7116fa88863a7357ed79d8a82e0",
+          "replaces": {
+            "path": "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js",
+            "priorGitBlobSha": "d1a6d06feb91e32a6da500f426f0877057f42c1d",
+            "priorChangeId": "I6_6_COBROS_APPLICATION_TEMPORAL_STATUS_AND_GLOBAL_SEARCH_P0"
+          }
+        },
+        {
+          "path": "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js",
+          "gitBlobSha": "1866fd392be49b8506c83d1392092a715b3983dd",
+          "replaces": {
+            "path": "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js",
+            "priorGitBlobSha": "93050f77216cc61d637f8e596155cd43a59ef83d",
+            "priorChangeId": "I6_6_RECEIPT_CANONICAL_CURRENT_BALANCE_PRESENTATION_20261117"
+          }
+        },
+        {
+          "path": "orbit360-platform/core/issuance-workflow-v1201.js",
+          "gitBlobSha": "716c66579e077bced15d2150010eef792bf2d9c3",
+          "replaces": {
+            "path": "orbit360-platform/core/issuance-workflow-v1201.js",
+            "priorGitBlobSha": "fbe47eeabe99bab80c047ba201098b767c455c04",
+            "priorChangeId": "I6_6_CARLOS_DIRECT_RENEWAL_EXPLICIT_HYDRATION_P0"
+          }
+        },
+        {
+          "path": "orbit360-platform/modules/issuance-endosos-v1201-bridge.js",
+          "gitBlobSha": "27e82715e095db03aa83b44427b8e269620cc91f",
+          "replaces": {
+            "path": "orbit360-platform/modules/issuance-endosos-v1201-bridge.js",
+            "priorGitBlobSha": "b5bb89070166cf73f0f1b5c013c9747b8dcff0fc",
+            "priorChangeId": "I6_6_RENEWAL_KANBAN_ISSUED_DIRECT_AND_DRIVE_FEEDBACK_R11_20261113"
+          }
+        },
+        {
+          "path": "orbit360-platform/core/importa.js",
+          "gitBlobSha": "11c76a35e2568ab367024ce32b67e6b1f680486c"
+        }
+      ],
+      "tests": [
+        {
+          "path": "tools/gravicentra-i6-6-documented-premium-terms.test.cjs",
+          "gitBlobSha": "b413bb380c2361f3607bcf841147c5e340393a90"
+        },
+        {
+          "path": "tools/gravicentra-i6-6-documented-terms-signed-check.test.cjs",
+          "gitBlobSha": "ab2ba60b1b2529d0ead1456565627235b44b4d4d"
+        }
+      ]
     }
   ],
   "i66R11PreviewBuildRequest20261113": {
