@@ -20,10 +20,10 @@ jobs:
     timeout-minutes: 13
     env:
       PROJECT_ID: ays-orbit-360-lab
-      GC_EXACT_ID: gi-i66-rc-42867453751
-      GC_EXACT_VERSION: d14168818d739eb7
-      GC_ARCHIVED_SOURCE: 6c5997f43fbfa39273e7b33dea095155c7c0703a
-      GC_ARCHIVED_ARTIFACT: '13787029475'
+      GC_EXACT_ID: gi-i66-rc-42869400709
+      GC_EXACT_VERSION: d8e80083b13083f8
+      GC_ARCHIVED_SOURCE: 30bb09d2b4537f8ae5fe50ff25e3ca90406c1068
+      GC_ARCHIVED_ARTIFACT: '13787779500'
       SA_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
       SA_ALT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
       SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
@@ -40,20 +40,20 @@ jobs:
       - name: Verify obsolete channel has recoverable source and immutable artifact, no current references
         run: |
           set -euo pipefail
-          test -z "$(git grep -n '42867453751' -- ':!'.github/workflows/gravicentra-i66-one-unused-preview-channel-gc.yml || true)"
+          test -z "$(git grep -n '42869400709' -- ':!'.github/workflows/gravicentra-i66-one-unused-preview-channel-gc.yml || true)"
           node - <<'NODE'
           const assert=require('node:assert/strict');
           (async()=>{
             const h={Authorization:'Bearer '+process.env.GH_TOKEN,Accept:'application/vnd.github+json','User-Agent':'GI-I66-One-Archived-Channel-GC'};
             const base='https://api.github.com/repos/paulaosoriof86/orbit360-core/actions/';
             const [r,a]=await Promise.all([
-              fetch(base+'runs/42867453751',{headers:h}),
+              fetch(base+'runs/42869400709',{headers:h}),
               fetch(base+'artifacts/'+process.env.GC_ARCHIVED_ARTIFACT,{headers:h})]);
             assert.ok(r.ok&&a.ok,'I66_GC_ARCHIVED_PROOF_UNAVAILABLE');
             const run=await r.json(),art=await a.json();
             assert.ok(run.conclusion==='success'&&run.head_sha===process.env.GC_ARCHIVED_SOURCE&&
-              art.expired===false&&art.workflow_run?.id===42867453751&&
-              art.digest==='sha256:fac39bf515e4441c99f9465ee30afb8e2136331f3d967998e693c3fd0589f5ce',
+              art.expired===false&&art.workflow_run?.id===42869400709&&
+              art.digest==='sha256:a02808ad16acedb2859b28c83f6e939b82da442ebd96ba6ab411b26119b7b98c',
               'I66_GC_ARCHIVED_SOURCE_ARTIFACT_DRIFT');
             console.log('I66_GC_TARGET_SOURCE_AND_IMMUTABLE_ARTIFACT_RECOVERABLE_PASS');
           })().catch(e=>{console.error(e.message);process.exitCode=1;});
