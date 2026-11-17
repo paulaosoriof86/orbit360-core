@@ -1,0 +1,91 @@
+{
+  "schema": "gi.i66.v7.timestamp-fix-quota-recovery-preview-readback.v1",
+  "dateGuatemala": "2026-11-16",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "gate": "I6.6",
+  "status": "HOSTING_PREVIEW_SIGNED_PASS_FUNCTIONAL_BACKEND_AND_LIVE_HOLD",
+  "ownerDecision": {
+    "canonicalReconciliation": "V7 approved configuration; do not infer new receipts or paid status",
+    "realPaymentWritesAuthorized": false,
+    "realFinancialApplicationsPerformedInThisIteration": 0,
+    "phaseAReopened": false
+  },
+  "rootCauseAndSourceFix": {
+    "failure": "FieldValue.serverTimestamp() sentinel in nested beforeAfter audit array of Firestore reconciliationApplications transaction",
+    "before": "strict synthetic Firestore test rejects server timestamp transform nested in array",
+    "after": "audit after snapshots serialize timestamp placeholder SERVER_TIMESTAMP_ON_COMMIT; operational documents retain serverTimestamp transform",
+    "sourceCommits": [
+      "7ccd23175e7910e08fbe1586b25486e144edf0f7",
+      "bae2257b5090e7de05284fd45fcf6f10decca1bc"
+    ],
+    "localStrictTransactionTest": {
+      "command": "node tools/gravicentra-i6-6-proposal-application-boundary.test.cjs",
+      "status": "PASS",
+      "checks": 82,
+      "cloudWrites": 0
+    },
+    "signedSourceQaRunId": 44009981628,
+    "signedSourceQaConclusion": "success",
+    "signedPerformanceQaRunId": 44009981486,
+    "signedPerformanceQaConclusion": "success"
+  },
+  "previewQuotaRecovery": {
+    "initialImmutableBuildRunId": 44009981499,
+    "firstAttempt": "HOSTING_PREVIEW_HTTP_429_AND_EXACT_OLD_CHANNEL_RESTORE_HOLD_UNAPPROVED_VERSION",
+    "readonlyChannelInventoryRunId": 44010597588,
+    "inventoryStepConclusion": "success",
+    "inventoryWholeJobConclusion": "failure_due_to_stale_preview_marker_expected_after_inventory",
+    "channelsBefore": 51,
+    "canonicalOldPreviewChannel": "gi-i66-rc-42868854629",
+    "observedOldPreviewHostingVersion": "sites/ays-orbit-360-lab/versions/92324e9ae84d2c12",
+    "archivedChannelDeleted": "gi-i66-rc-42869400709",
+    "archivedChannelVersion": "sites/ays-orbit-360-lab/versions/d8e80083b13083f8",
+    "archivedSource": "30bb09d2b4537f8ae5fe50ff25e3ca90406c1068",
+    "recoverableArchivedArtifactId": 13787779500,
+    "recoverableArchivedArtifactDigest": "sha256:a02808ad16acedb2859b28c83f6e939b82da442ebd96ba6ab411b26119b7b98c",
+    "singleExactArchivedChannelGcRunId": 44010809865,
+    "gcConclusion": "success",
+    "channelsAfter": 50,
+    "liveHostingVersionUnchanged": true,
+    "otherChannelDeletions": 0,
+    "realCustomerWrites": 0
+  },
+  "newImmutablePreview": {
+    "sourceSha": "d5e64e2f4ab9acb89d8765f48da33cba2df089a5",
+    "buildRunId": 44009981499,
+    "runAttempt": 2,
+    "workflowConclusion": "success",
+    "canonicalLatestRunArtifactId": 14296328231,
+    "canonicalLatestRunArtifactZipDigest": "sha256:1c6e92158eea25d47b1765791bf57a9b36e2e09311351008d41fa8e64583ac9f",
+    "priorFailedAttemptArtifactId": 14295434270,
+    "priorFailedAttemptZipDigest": "sha256:95c6a10e62d31dbfe690d0e1b49b051d697658b5d42c401cd1d0bbe835069d47",
+    "previewChannelId": "gi-i66-rc-44009981499",
+    "previewUrl": "https://ays-orbit-360-lab--gi-i66-rc-44009981499-d08psr2y.web.app",
+    "hostingDeployment": "PASS",
+    "immutablePackageSiteReadback": "PASS",
+    "bothLiveOriginsUnchanged": "PASS",
+    "backendPreviewFunctionalQa": "NOT_YET_EXECUTED_ON_NEW_SOURCE",
+    "releaseStatus": "PREVIEW_HOSTING_ONLY_NOT_PRODUCTION_ACCEPTED"
+  },
+  "remainingGates": [
+    "Reconcile current signed Preview candidate and three-function QA to new exact Preview channel while preventing overwrite of the older concurrently updated channel",
+    "Obtain fresh explicit Dirección legal acceptance scoped to this successor if internal legal V2 gate appears; historical decision explicitly excluded future-source successors",
+    "Deploy existing three synthetic-only Preview functions from the identical immutable source artifact with backend rollback, then signed roles/ops/cobros/proposal UAT, cleanup and before-after",
+    "Only after Preview PASS: authorize same-artifact LIVE transport, readback dual production origins and perform controlled permitted writes; never real payments without item-specific evidence and approval",
+    "Reconcile 65 retained V7 cartera cases with exact issued policies and insurer requirements, keeping unmatched or ambiguous cases HOLD"
+  ],
+  "formalProgressUnchanged": {
+    "phaseAProductionAcceptedPercent": 100,
+    "postproductionI6ClosedGates": 6,
+    "postproductionI6TotalGates": 10,
+    "postproductionI6Percent": 60,
+    "operationsCompleted": 6,
+    "operationsTotal": 8,
+    "operationsPercent": 75,
+    "transversalCompleted": 19,
+    "transversalTotal": 31,
+    "transversalPercent": 61.3,
+    "phaseBPercent": 0
+  }
+}
