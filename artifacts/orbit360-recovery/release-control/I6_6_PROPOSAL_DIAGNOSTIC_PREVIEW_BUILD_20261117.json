@@ -1,0 +1,82 @@
+{
+  "sourceSha": "c10979992a4e91da2396453749b1bd620c0b2c06",
+  "buildRunId": 43987367095,
+  "buildJobId": 133719082364,
+  "buildConclusion": "success",
+  "artifactId": 14286775455,
+  "artifactDigest": "sha256:c7f750d3bedd06d54de1b5622efce8b33a5dbc8020d6006c5ace66002a139e35",
+  "immutableTarSha256": "81528c2fba219eee0aa3a04a6bfc81427c093931fb709fc16a4a6862c6e1cc25",
+  "buildId": "gi-i66-c10979992a4e-57f234755dc1",
+  "archiveAndAllPackageFileDigestsIndependentlyVerified": true,
+  "verifiedManifests": {
+    "site": {
+      "files": 223,
+      "exactSet": true,
+      "allHashesMatch": true,
+      "manifestSha256": "511015a9895d96f0d0660c81453bdd652a66514fb5d747a5b3d28967a4ba3977"
+    },
+    "backend": {
+      "files": 44,
+      "exactSet": true,
+      "allHashesMatch": true,
+      "manifestSha256": "0690d628e4b548040de4f4cb4e688c3243c3573fc111cf283ca800fffb57cdc0"
+    },
+    "bundle": {
+      "files": 269,
+      "exactSet": true,
+      "allHashesMatch": true,
+      "manifestSha256": "20e7cbfb79c0cb1237bce883f645f24c6d2985d3ee3a0cd8ff1ac04013e46902"
+    }
+  },
+  "allPreviewSiteFilesReadBackByBuild": 223,
+  "bothLiveOriginsUnchanged": true,
+  "localPreflight": "PASS_68_PINNED_TEST_SUITES_276_REQUIRED_QA_TESTS_AND40_COMPATIBILITY_TESTS",
+  "localPreflightSource": "77d261bdc984bc79eabad68baf0e6d40affef327",
+  "sourceTree": "7600e089e574364c98350c63ae46d7c7f96e1e7b",
+  "restoreEvidence": {
+    "artifactId": 14286650701,
+    "artifactDigest": "sha256:f444655c9081947cab017ecc08e395bc743a0b5b5389fafcb3c1219a938d18bb",
+    "status": "EXACT_R11_PREVIEW_RESTORED_VERIFIED_NOT_PRODUCT_ACCEPTANCE",
+    "failedCandidate": "39f54e24e59983a59a7c9a41912e0eed154efa18",
+    "bothImmutableBackupsAndArchiveDigestsIndependentlyVerified": true,
+    "full223FileBeforeAfterChecks": true,
+    "otherChannelsUnchanged": true,
+    "liveWrites": 0,
+    "backendWrites": 0,
+    "businessDataWrites": 0,
+    "authIamWrites": 0
+  },
+  "schema": "GI_I66_PROPOSAL_DIAGNOSTIC_PREVIEW_BUILD_V1",
+  "status": "IMMUTABLE_PREVIEW_BUILD_READBACK_PASS_SIGNED_QA_AUTHORIZED_NOT_ACCEPTED",
+  "activeGate": "I6.6",
+  "sourceParent": "3076026cdfd900cf8e99037c3220682b3be68943",
+  "previewUrl": "https://ays-orbit-360-lab--gi-i66-rc-42868854629-abj14q6n.web.app",
+  "previewChannelId": "gi-i66-rc-42868854629",
+  "productSourceChangedFrom39": false,
+  "legalAcceptance": {
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_DIRECTION_PREVIEW_LEGAL_ACCEPTANCE_20261116.json",
+    "receiptSha256": "68d3961987e19acdc223b7d2adf01eb39c540ca6ae8aa72c64752cab45fddbae",
+    "decisionId": "DIRECTION_PREVIEW_INTERNAL_LEGAL_V2_ACCEPTED_20261116",
+    "sourceSha": "c10979992a4e91da2396453749b1bd620c0b2c06",
+    "phase": "PREVIEW",
+    "actorRole": "direccion"
+  },
+  "legalTechnicalRetry": {
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_DIRECTION_PREVIEW_PROPOSAL_DIAGNOSTIC_RETRY_20261117.json",
+    "receiptSha256": "e2c123a1a4a250815b295d2b8aa3b9432bc84bed06b242c174a4b9cc8f7f8634",
+    "sourceParent": "3076026cdfd900cf8e99037c3220682b3be68943",
+    "sourceSha": "c10979992a4e91da2396453749b1bd620c0b2c06",
+    "legalOwnerSha256": "b74a965b7be0d67862d82bcf73dacc0d5a8293dcf30cb4f5f3fdeaa6ee1c68a3"
+  },
+  "signedPreviewStatus": "NOT_YET_EXECUTED_FOR_THIS_SOURCE",
+  "lastAcceptedLiveSource": "84769378eb2014addebfefdbdd63091bddc4b817",
+  "newLiveAcceptanceClaimed": false,
+  "realCustomerOrFinancialWrites": 0,
+  "progress": {
+    "opsVerified": 6,
+    "opsRequired": 8,
+    "fiveBlockVerified": 19,
+    "fiveBlockRequired": 31
+  },
+  "knownLivePrerequisite": "Existing own consent is Preview-only; LIVE and other actors require their own genuine decision and reviewed technical path."
+}

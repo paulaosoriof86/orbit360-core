@@ -216,8 +216,8 @@
     },
     {
       "id": "P0-PUBLISH-CURRENT-DELTA",
-      "state": "CAUSAL_QA_PROPOSAL_DIAGNOSTICS_NEW_IMMUTABLE_BUILD_REQUIRED",
-      "scope": "QA-only safe Proposal failure evidence, same product and legal clauses. Preserve CxP PASS15; do not assume the failing Proposal assertion or backend reason. One new immutable source/build, same three Preview functions and four signed drivers, real records untouched. LIVE legal scope remains distinct.",
+      "state": "IMMUTABLE_PROPOSAL_DIAGNOSTIC_PREVIEW_BUILT_SIGNED_QA_AUTHORIZED",
+      "scope": "Exact immutable QA diagnostic source and unchanged product. Three existing Preview functions and four existing signed drivers only. Preserve the existing own Direction Preview legal decision. Capture allowlisted Proposal response/prerequisites without private customer data. No LIVE promotion or real records/payments.",
       "doneWhen": "Real workflow receipts, exact digests and post-deploy business-function verification. Successful build alone is not acceptance."
     },
     {
@@ -375,6 +375,16 @@
     "receipt": "artifacts/orbit360-recovery/release-control/I6_6_PROPOSAL_DIAGNOSTIC_CAUSAL_RETRY_20261117.json",
     "sourceParent": "3076026cdfd900cf8e99037c3220682b3be68943",
     "productSourceChanges": 0,
+    "lastAcceptedLiveUnchanged": true,
+    "realRecordWrites": 0,
+    "newLiveAcceptanceClaimed": false
+  },
+  "proposalDiagnosticPreviewBuild20261117": {
+    "status": "IMMUTABLE_PREVIEW_BUILD_READBACK_PASS_SIGNED_QA_AUTHORIZED_NOT_ACCEPTED",
+    "receipt": "artifacts/orbit360-recovery/release-control/I6_6_PROPOSAL_DIAGNOSTIC_PREVIEW_BUILD_20261117.json",
+    "sourceSha": "c10979992a4e91da2396453749b1bd620c0b2c06",
+    "buildRunId": 43987367095,
+    "artifactId": 14286775455,
     "lastAcceptedLiveUnchanged": true,
     "realRecordWrites": 0,
     "newLiveAcceptanceClaimed": false
