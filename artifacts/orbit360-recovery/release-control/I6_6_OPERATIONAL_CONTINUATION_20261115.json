@@ -13,7 +13,7 @@
     "otherActors": false,
     "liveAcceptance": false,
     "realPayments": false,
-    "signedExecutionProof": "PENDING_ON_CURRENT_SOURCE_NOT_CLAIMED",
+    "signedExecutionProof": "CURRENT_SOURCE_SIGNED_QA_EXECUTED_FAILED_NOT_ACCEPTED",
     "existingImmutableBuildRunId": 44052221474
   },
   "repository": "paulaosoriof86/orbit360-core",
@@ -358,10 +358,17 @@
       "mustNotPromote": true
     },
     "currentSignedObservabilityHold": {
-      "status": "HISTORICAL_42A676_HOLD_PRESERVED_SUPERSEDED_AS_CURRENT_EXECUTION",
-      "latestSignedAttempt": 44048179414,
-      "latestCandidateSource": "6b6e8bbba3371b32a1bfb80b903c40377e11d727",
-      "currentSignedQa": "NOT_EXECUTED_NOT_ACCEPTED"
+      "status": "CURRENT_SOURCE_INTAKE_RELOAD_HOLD_NOT_ACCEPTED",
+      "runId": 44149681372,
+      "sourceSha": "6b6e8bbba3371b32a1bfb80b903c40377e11d727",
+      "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_SOURCE_INTAKE_PRECISION_SIGNED_PREVIEW_OUTCOME_20261117.json",
+      "rootCauseProven": false,
+      "historicalObservabilityHoldPreserved": {
+        "status": "HISTORICAL_42A676_HOLD_PRESERVED_SUPERSEDED_AS_CURRENT_EXECUTION",
+        "latestSignedAttempt": 44048179414,
+        "latestCandidateSource": "6b6e8bbba3371b32a1bfb80b903c40377e11d727",
+        "currentSignedQa": "NOT_EXECUTED_NOT_ACCEPTED"
+      }
     },
     "updatedInsurerStatements20261117": {
       "evidence": "artifacts/orbit360-recovery/release-control/I6_6_SIGNED_PREVIEW_42A676_HOLD_AND_STATEMENT_INTAKE_20261117.json",
@@ -374,12 +381,36 @@
       "newPayments": 0
     },
     "latestSignedQaOutcome": {
-      "runId": 44048179414,
       "status": "FAILED_NOT_ACCEPTED",
-      "sourceSha": "cef42d7713aa83c73f1f0d0e35afb38a9165e433",
-      "cause": "DOCUMENTED_PREMIUM_TERMS",
-      "mainDriverCleanupRemaining": 0,
-      "helperCleanupProofAvailable": false
+      "runId": 44149681372,
+      "jobId": 134274317530,
+      "sourceSha": "6b6e8bbba3371b32a1bfb80b903c40377e11d727",
+      "workflowHeadSha": "f1df4e7f2d5652dc8d57ea7408266296d8c217fd",
+      "diagnosticArtifactId": 14359840043,
+      "diagnosticArtifactDigest": "sha256:19fb4390b1b15274372eb974ab28bb0839e99a750f20ea0618385708ef50a657",
+      "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_SOURCE_INTAKE_PRECISION_SIGNED_PREVIEW_OUTCOME_20261117.json",
+      "failureStage": "SOURCE_INTAKE_RELOAD_READBACK",
+      "failureLocation": {
+        "file": "gravicentra-i6-6-proposal-application-signed-uat.cjs",
+        "line": 350,
+        "column": 19
+      },
+      "failureClass": "ERROR",
+      "failureCode": "NO_CODE",
+      "failureCheck": "UNNAMED_FAILURE",
+      "rootCauseProven": false,
+      "sourceIntakePageErrors": 1,
+      "advisorDriverStatus": "PASS",
+      "advisorChecks": 16,
+      "documentedTermsHelperStatus": "PASS",
+      "proposalDriverStatus": "HOLD",
+      "proposalChecksBeforeHold": 16,
+      "syntheticCleanupStatus": "PASS",
+      "syntheticRemaining": 0,
+      "proposalRemovedOwnedTargets": 26,
+      "realControlUnchanged": true,
+      "newLiveAcceptance": false,
+      "realFinancialWritesApplied": 0
     }
   },
   "orderedWork": [
@@ -606,9 +637,13 @@
       {
         "id": "SYNC-CURSOR-20261117",
         "kind": "RELEASE/COMPOSITION",
-        "state": "METADATA_CORRECTION_STAGED_PENDING_POSTCOMMIT_GUARD",
+        "state": "RESOLVED_CURRENT_BINDING_GUARD_AND_EXECUTED_SIGNED_GATE",
         "cause": "Build 44052221474 completed but transport still requested build; CP/plan/state pointed to older candidates.",
-        "closure": "One exact 6b6 candidate across current execution metadata and substantive signed Preview job actually executes; preserve historical LIVE identity."
+        "closure": "One exact 6b6 candidate across current execution metadata and substantive signed Preview job actually executes; preserve historical LIVE identity.",
+        "evidenceCommit": "f1df4e7f2d5652dc8d57ea7408266296d8c217fd",
+        "guardRunId": 44149681319,
+        "signedRunId": 44149681372,
+        "functionalAcceptanceNotClaimed": true
       },
       {
         "id": "QA-NOOP-20261117",
@@ -641,10 +676,13 @@
       {
         "id": "QA-DOCUMENTED-TERMS-20261117",
         "kind": "PRODUCT",
-        "state": "SOURCE_FIX_IN_CURRENT_PREVIEW_SIGNED_REPROOF_REQUIRED",
+        "state": "SIGNED_PREVIEW_HELPER_PASS_BOUNDED_UI_AND_SESSION_READBACK_LIVE_PENDING",
         "evidenceRun": 44048179414,
         "cause": "Contractual cents rendered with rounded KPI formatter; helper diagnostics incomplete.",
-        "closure": "Signed documented terms helper, persist/reload, helper cleanup and zero unexpected errors."
+        "closure": "Signed documented terms helper, persist/reload, helper cleanup and zero unexpected errors.",
+        "currentEvidenceRun": 44149681372,
+        "reloadPerformedByHelper": false,
+        "cleanupRemaining": 0
       },
       {
         "id": "RELEASE-FANOUT-20261117",
@@ -666,6 +704,23 @@
         "state": "OPEN_PRESERVE_PRIOR_PASS",
         "cause": "Ops6/8 is bounded coverage; genuine-document renewal, remaining approved CRUD entries, insurer logo/password and Drive need explicit evidence.",
         "closure": "Close only affected real workflows and roles with reload; do not certify whole coverage from visibility or synthetic-only evidence."
+      },
+      {
+        "id": "QA-SOURCE-INTAKE-RELOAD-20261117",
+        "kind": "PRODUCT_OR_VALIDATOR_CAUSE_UNRESOLVED",
+        "state": "HOLD_OBSERVED_CAUSE_NOT_YET_PROVEN",
+        "evidenceRun": 44149681372,
+        "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_SOURCE_INTAKE_PRECISION_SIGNED_PREVIEW_OUTCOME_20261117.json",
+        "failureLocation": {
+          "file": "gravicentra-i6-6-proposal-application-signed-uat.cjs",
+          "line": 350,
+          "column": 19
+        },
+        "driverBlobSha": "e1c9f888205c773794e2ebd442722a4f65026782",
+        "sourceIntakePageErrors": 1,
+        "cause": "Not yet proven; exact failure is after reload at readiness wait. Diagnostic retained ERROR/NO_CODE/UNNAMED_FAILURE.",
+        "hypothesisOnly": "Line350 uses unguarded Orbit after reload(commit); lines99 and266 use window.Orbit?. safely. Raw error name/message not retained.",
+        "closure": "Prove causal failure, correct appropriate owner and safe diagnostic retention, then immutable exact signed reload/readback/replay/error-free proof; preserve original failure and existing successful subproofs."
       }
     ],
     "blocks": [
@@ -676,11 +731,12 @@
           "P0-PUBLISH-CURRENT-DELTA"
         ],
         "gate": "I6.6",
-        "state": "IN_PROGRESS",
+        "state": "IN_PROGRESS_CURRENT_SIGNED_PREVIEW_HOLD_CAUSAL_DIAGNOSIS_REQUIRED",
         "timeboxReassessmentMinutes": 45,
         "deliverable": "Current immutable package bound, causal transport/preflight defects classified, four real signed drivers with complete receipts.",
         "doneWhen": "Exact Preview signed acceptance including documented terms, source intake, replay, cleanup and no unexpected errors; required guard PASS.",
-        "publicationRule": "No rebuild for metadata; product/QA owner changes require new immutable artifact."
+        "publicationRule": "No rebuild for metadata; product/QA owner changes require new immutable artifact.",
+        "currentBlockerReceipt": "artifacts/orbit360-recovery/release-control/I6_6_SOURCE_INTAKE_PRECISION_SIGNED_PREVIEW_OUTCOME_20261117.json"
       },
       {
         "sequence": 2,
@@ -709,8 +765,8 @@
         "gate": "I6.6",
         "state": "SOURCE_READAHEAD_CAN_PROCEED_PARALLEL_APPLY_AFTER_SAFE_WRITER",
         "timeboxReassessmentMinutes": 120,
-        "deliverable": "All available insurers processed by original source; exact additions/updates/no-change/holds and monetary totals reported.",
-        "doneWhen": "Deterministic source-bound deduped applications with before/after, audit, persisted readback and cross-module totals; isolated unresolved records only.",
+        "deliverable": "All available insurers processed by original source; dossiers1 July–15 November and latest2026 policy/vehicle/receipts compared against LIVE; exact additions/updates/no-change/holds and totals reported without duplicates.",
+        "doneWhen": "Deterministic deduped applications with before/after/audit/readback; confirmed collections remain visible even before reconciliation; inferred payments tagged with provenance in contractual period, not inflated into reconciliation month. A5 calendar and A6 dates/references/Q0.04 conflict resolved per record, preserving existing reports/payments.",
         "publicationRule": "Data-only deterministic updates through already certified writers do not require product rebuild. Preserve existing payments/references and user-confirmed identities."
       },
       {
@@ -750,7 +806,7 @@
         "gate": "I6.9_AFTER_PREDECESSORS",
         "state": "PENDING_PREDECESSOR_ACCEPTANCE",
         "timeboxReassessmentMinutes": 45,
-        "deliverable": "Module/role/country/viewport evidence, financial coherence, exact distribution identity and synchronized next action.",
+        "deliverable": "Complete frozen I6.9 required final matrix, user lifecycle, relations, financial integrity, cleanup, error checks, responsive, exact readback, rollback and certified Firebase/HostDime payload; synchronized final state.",
         "doneWhen": "All required frozen criteria proven on accepted release; Control Plane, ledger, build/served bytes and final guard agree. Only then close postproduction100%.",
         "publicationRule": "No backlog of already accepted unpublished fixes; no claim of completion from outer green workflows."
       }
@@ -773,9 +829,18 @@
         "source/build/Preview/LIVE/backend/data synchronization status"
       ]
     },
-    "completionOfThisAuditIsNotProductionCompletion": true
+    "completionOfThisAuditIsNotProductionCompletion": true,
+    "updatedAtUtc": "2026-11-17T18:48:28Z",
+    "latestExecutedIteration": {
+      "kind": "AUDIT_METADATA_ALIGNMENT_AND_EXACT_SIGNED_PREVIEW",
+      "status": "AUDIT_COMPLETE_CURRENT_FUNCTIONAL_GATE_HOLD",
+      "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_SOURCE_INTAKE_PRECISION_SIGNED_PREVIEW_OUTCOME_20261117.json",
+      "guardRunId": 44149681319,
+      "functionalRunId": 44149681372,
+      "newFormalPercentagePoints": 0
+    }
   },
-  "nextAction": "I6_6_CURRENT_SOURCE_INTAKE_PRECISION_PREVIEW: BUILD 44052221474 ARTIFACT 14314985190 SOURCE 6b6e8bbba3371b32a1bfb80b903c40377e11d727 ALREADY_BUILT_AND_223_FILE_PREVIEW_READBACK_PASS; EXECUTE_EXISTING_FOUR_SIGNED_PREVIEW_DRIVERS_ON_THIS_EXACT_PACKAGE. REQUIRE_DOCUMENTED_TERMS_AND_SOURCE_INTAKE_RELOAD_REPLAY_AND_COMPLETE_CLEANUP. NO_REBUILD_FOR_METADATA. R11_REMAINS_LAST_ACCEPTED_LIVE; NO_LIVE_PROMOTION_OR_REAL_FINANCIAL_WRITES_UNTIL_REQUIRED_EVIDENCE. PRESERVE_PHASE_A100_I6_60_OPS6_OF8_OVERALL19_OF31; FOLLOW_EXISTING_OPERATIONAL_PLAN.dailyExecutionPlan20261117.",
+  "nextAction": "I6_6_CURRENT_SIGNED_PREVIEW_HOLD: RUN 44149681372 SOURCE 6b6e8bbba3371b32a1bfb80b903c40377e11d727 FAILED_NOT_ACCEPTED AT SOURCE_INTAKE_RELOAD_READBACK tools/gravicentra-i6-6-proposal-application-signed-uat.cjs:350:19; ONE_PAGE_ERROR; ROOT_CAUSE_NOT_YET_PROVEN. FIRST_DIAGNOSE_RELOAD_READINESS_AND_CAPTURE_SAFE_PAGEERROR_CAUSE; DO_NOT_BLINDLY_RETRY_OR_PROMOTE. PRESERVE_SIGNED_ROLE_OPS_ADVISOR_AND_DOCUMENTED_TERMS_BOUNDED_EVIDENCE; SOURCE_INTAKE_RELOAD_REPLAY_NOT_ACCEPTED. ALL_SYNTHETIC_CLEANUP_PASS_REMAINING_ZERO_REAL_CONTROL_UNCHANGED. R11_REMAINS_LAST_ACCEPTED_LIVE; NO_NEW_REAL_FINANCIAL_WRITES. IF_PRODUCT_OR_PINNED_QA_SOURCE_CHANGES_BUILD_NEW_IMMUTABLE_ARTIFACT_THEN_EXACT_PREVIEW_AND_SAME_ARTIFACT_LIVE. PRESERVE_PHASE_A100_I6_60_OPS6_OF8_OVERALL19_OF31; CONTINUE_EXISTING_DAILY_PLAN_AND_PARALLEL_READONLY_SOURCE_PREPARATION.",
   "sourceIntakePrecisionPreviewBuild20261117": {
     "receipt": "artifacts/orbit360-recovery/release-control/I6_6_SOURCE_INTAKE_PRECISION_PREVIEW_BUILD_20261117.json",
     "status": "IMMUTABLE_PREVIEW_EXACT_READBACK_PASS_SIGNED_FUNCTIONAL_QA_PENDING",
@@ -808,5 +873,37 @@
     "signedPreviewAccepted": false,
     "liveAccepted": false,
     "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_SOURCE_INTAKE_PRECISION_PREVIEW_BUILD_20261117.json"
+  },
+  "sourceIntakePrecisionSignedOutcome20261117": {
+    "status": "FAILED_NOT_ACCEPTED",
+    "runId": 44149681372,
+    "jobId": 134274317530,
+    "sourceSha": "6b6e8bbba3371b32a1bfb80b903c40377e11d727",
+    "workflowHeadSha": "f1df4e7f2d5652dc8d57ea7408266296d8c217fd",
+    "diagnosticArtifactId": 14359840043,
+    "diagnosticArtifactDigest": "sha256:19fb4390b1b15274372eb974ab28bb0839e99a750f20ea0618385708ef50a657",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_SOURCE_INTAKE_PRECISION_SIGNED_PREVIEW_OUTCOME_20261117.json",
+    "failureStage": "SOURCE_INTAKE_RELOAD_READBACK",
+    "failureLocation": {
+      "file": "gravicentra-i6-6-proposal-application-signed-uat.cjs",
+      "line": 350,
+      "column": 19
+    },
+    "failureClass": "ERROR",
+    "failureCode": "NO_CODE",
+    "failureCheck": "UNNAMED_FAILURE",
+    "rootCauseProven": false,
+    "sourceIntakePageErrors": 1,
+    "advisorDriverStatus": "PASS",
+    "advisorChecks": 16,
+    "documentedTermsHelperStatus": "PASS",
+    "proposalDriverStatus": "HOLD",
+    "proposalChecksBeforeHold": 16,
+    "syntheticCleanupStatus": "PASS",
+    "syntheticRemaining": 0,
+    "proposalRemovedOwnedTargets": 26,
+    "realControlUnchanged": true,
+    "newLiveAcceptance": false,
+    "realFinancialWritesApplied": 0
   }
 }

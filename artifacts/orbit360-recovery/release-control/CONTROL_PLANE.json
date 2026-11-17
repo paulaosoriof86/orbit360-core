@@ -9,7 +9,7 @@
     "activeGate": "I6.6",
     "closedHistoricalGate": "B4-007",
     "latestProvenLiveSource": "84769378eb2014addebfefdbdd63091bddc4b817",
-    "currentWork": "Bind completed immutable source-intake/precision package6b6 to existing four signed Preview drivers. Build/readback physically passed; functional acceptance remains pending. Daily audit and execution blocks are integrated into the existing canonical plan. Preserve R11 LIVE.",
+    "currentWork": "Daily audit and metadata synchronization completed; exact current signed Preview executed and HOLD at source-intake reload. Bounded successful checks preserved; next work is causal readiness/pageerror diagnosis, not a new global audit or blind retry. R11 remains last accepted LIVE.",
     "latestHostingPreviewEvidence": "artifacts/orbit360-recovery/release-control/I6_6_SOURCE_INTAKE_PRECISION_PREVIEW_BUILD_20261117.json",
     "latestHostingPreviewSource": "6b6e8bbba3371b32a1bfb80b903c40377e11d727",
     "operationsEvidenceReview": "artifacts/orbit360-recovery/release-control/I6_6_OPS_EVIDENCE_AND_PREVIEW_BINDING_REVIEW_20261116.json",
@@ -20,7 +20,7 @@
     "newLiveAcceptanceClaimed": false,
     "technicalPreviewCausalRetryReceipt": "artifacts/orbit360-recovery/release-control/I6_6_TECHNICAL_PREVIEW_OBSERVABILITY_REBUILD_20261116.json",
     "signedPreviewCandidate": {
-      "status": "EXACT_CANDIDATE_BOUND_SIGNED_QA_PENDING",
+      "status": "SIGNED_PREVIEW_HOLD_NOT_ACCEPTED",
       "sourceSha": "6b6e8bbba3371b32a1bfb80b903c40377e11d727",
       "buildRunId": 44052221474,
       "buildJobId": 133932744471,
@@ -49,18 +49,43 @@
       "realFinancialWrites": 0,
       "signedPreviewAccepted": false,
       "liveAccepted": false,
-      "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_SOURCE_INTAKE_PRECISION_PREVIEW_BUILD_20261117.json"
+      "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_SOURCE_INTAKE_PRECISION_PREVIEW_BUILD_20261117.json",
+      "signedOutcomeReceipt": "artifacts/orbit360-recovery/release-control/I6_6_SOURCE_INTAKE_PRECISION_SIGNED_PREVIEW_OUTCOME_20261117.json"
     },
     "documentaryFocalReadbackEvidence": "artifacts/orbit360-recovery/release-control/I6_6_EXISTING_CLIENT_INDEPENDENT_GESTIONES_READBACK_20261116.json",
     "signedPreviewEvidence": "artifacts/orbit360-recovery/release-control/I6_6_SIGNED_PREVIEW_42A676_HOLD_AND_STATEMENT_INTAKE_20261117.json",
-    "nextSourceWork": "EXECUTE_EXACT_SIGNED_PREVIEW_ON_EXISTING_ARTIFACT; PARALLEL_READONLY_SOURCE_AND_FINANCIAL_DEDUPE_PREPARATION",
+    "nextSourceWork": "DIAGNOSE_SOURCE_INTAKE_RELOAD_LINE350_AND_ONE_PAGEERROR; ROOT_CAUSE_UNPROVEN; PRESERVE_BOUNDED_PASS; PARALLEL_READONLY_SOURCE_DEDUPE",
     "latestSignedQaOutcome": {
-      "runId": 44048179414,
       "status": "FAILED_NOT_ACCEPTED",
-      "sourceSha": "cef42d7713aa83c73f1f0d0e35afb38a9165e433",
-      "cause": "DOCUMENTED_PREMIUM_TERMS",
-      "mainDriverCleanupRemaining": 0,
-      "helperCleanupProofAvailable": false
+      "runId": 44149681372,
+      "jobId": 134274317530,
+      "sourceSha": "6b6e8bbba3371b32a1bfb80b903c40377e11d727",
+      "workflowHeadSha": "f1df4e7f2d5652dc8d57ea7408266296d8c217fd",
+      "diagnosticArtifactId": 14359840043,
+      "diagnosticArtifactDigest": "sha256:19fb4390b1b15274372eb974ab28bb0839e99a750f20ea0618385708ef50a657",
+      "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_SOURCE_INTAKE_PRECISION_SIGNED_PREVIEW_OUTCOME_20261117.json",
+      "failureStage": "SOURCE_INTAKE_RELOAD_READBACK",
+      "failureLocation": {
+        "file": "gravicentra-i6-6-proposal-application-signed-uat.cjs",
+        "line": 350,
+        "column": 19
+      },
+      "failureClass": "ERROR",
+      "failureCode": "NO_CODE",
+      "failureCheck": "UNNAMED_FAILURE",
+      "rootCauseProven": false,
+      "sourceIntakePageErrors": 1,
+      "advisorDriverStatus": "PASS",
+      "advisorChecks": 16,
+      "documentedTermsHelperStatus": "PASS",
+      "proposalDriverStatus": "HOLD",
+      "proposalChecksBeforeHold": 16,
+      "syntheticCleanupStatus": "PASS",
+      "syntheticRemaining": 0,
+      "proposalRemovedOwnedTargets": 26,
+      "realControlUnchanged": true,
+      "newLiveAcceptance": false,
+      "realFinancialWritesApplied": 0
     },
     "updatedStatementIntake": {
       "evidence": "artifacts/orbit360-recovery/release-control/I6_6_SIGNED_PREVIEW_42A676_HOLD_AND_STATEMENT_INTAKE_20261117.json",
@@ -71,13 +96,16 @@
     },
     "dailyExecutionPlanPointer": "artifacts/orbit360-recovery/release-control/I6_6_OPERATIONAL_CONTINUATION_20261115.json#dailyExecutionPlan20261117",
     "auditReconciliation20261117": {
-      "status": "METADATA_BOUND_PENDING_POSTCOMMIT_GUARD_AND_SIGNED_QA",
+      "status": "METADATA_SYNC_GUARD_PASS_CURRENT_SIGNED_QA_HOLD",
       "sourceSha": "6b6e8bbba3371b32a1bfb80b903c40377e11d727",
       "buildRunId": 44052221474,
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_SOURCE_INTAKE_PRECISION_PREVIEW_BUILD_20261117.json",
       "newProductWrites": 0,
       "newFinancialWrites": 0,
-      "newFormalPercentagePoints": 0
+      "newFormalPercentagePoints": 0,
+      "bindingCommit": "f1df4e7f2d5652dc8d57ea7408266296d8c217fd",
+      "guardRunId": 44149681319,
+      "signedOutcomeReceipt": "artifacts/orbit360-recovery/release-control/I6_6_SOURCE_INTAKE_PRECISION_SIGNED_PREVIEW_OUTCOME_20261117.json"
     }
   },
   "b4003ActiveCertificationCursor20261106": {
@@ -3411,7 +3439,7 @@
     "i63LiveReadbackPass": true,
     "i63DeterministicDiffReady": true
   },
-  "nextAction": "I6_6_CURRENT_SOURCE_INTAKE_PRECISION_PREVIEW: BUILD 44052221474 ARTIFACT 14314985190 SOURCE 6b6e8bbba3371b32a1bfb80b903c40377e11d727 ALREADY_BUILT_AND_223_FILE_PREVIEW_READBACK_PASS; EXECUTE_EXISTING_FOUR_SIGNED_PREVIEW_DRIVERS_ON_THIS_EXACT_PACKAGE. REQUIRE_DOCUMENTED_TERMS_AND_SOURCE_INTAKE_RELOAD_REPLAY_AND_COMPLETE_CLEANUP. NO_REBUILD_FOR_METADATA. R11_REMAINS_LAST_ACCEPTED_LIVE; NO_LIVE_PROMOTION_OR_REAL_FINANCIAL_WRITES_UNTIL_REQUIRED_EVIDENCE. PRESERVE_PHASE_A100_I6_60_OPS6_OF8_OVERALL19_OF31; FOLLOW_EXISTING_OPERATIONAL_PLAN.dailyExecutionPlan20261117.",
+  "nextAction": "I6_6_CURRENT_SIGNED_PREVIEW_HOLD: RUN 44149681372 SOURCE 6b6e8bbba3371b32a1bfb80b903c40377e11d727 FAILED_NOT_ACCEPTED AT SOURCE_INTAKE_RELOAD_READBACK tools/gravicentra-i6-6-proposal-application-signed-uat.cjs:350:19; ONE_PAGE_ERROR; ROOT_CAUSE_NOT_YET_PROVEN. FIRST_DIAGNOSE_RELOAD_READINESS_AND_CAPTURE_SAFE_PAGEERROR_CAUSE; DO_NOT_BLINDLY_RETRY_OR_PROMOTE. PRESERVE_SIGNED_ROLE_OPS_ADVISOR_AND_DOCUMENTED_TERMS_BOUNDED_EVIDENCE; SOURCE_INTAKE_RELOAD_REPLAY_NOT_ACCEPTED. ALL_SYNTHETIC_CLEANUP_PASS_REMAINING_ZERO_REAL_CONTROL_UNCHANGED. R11_REMAINS_LAST_ACCEPTED_LIVE; NO_NEW_REAL_FINANCIAL_WRITES. IF_PRODUCT_OR_PINNED_QA_SOURCE_CHANGES_BUILD_NEW_IMMUTABLE_ARTIFACT_THEN_EXACT_PREVIEW_AND_SAME_ARTIFACT_LIVE. PRESERVE_PHASE_A100_I6_60_OPS6_OF8_OVERALL19_OF31; CONTINUE_EXISTING_DAILY_PLAN_AND_PARALLEL_READONLY_SOURCE_PREPARATION.",
   "postproductionExitProgress": {
     "formalPercent": 60,
     "frozenMiniGates": 6,
