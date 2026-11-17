@@ -982,6 +982,12 @@ async function reconcileEvidence(authz, data, payload, previewOnly, proposalRequ
     }
 
     const technicalNow = now(), results = [], beforeAfter = [];
+    // FieldValue.serverTimestamp() is a write transform, not a serializable
+    // field value inside a Firestore array. The operational documents retain
+    // the server-owned transform; the audit snapshot explicitly records its
+    // commit-time semantics without nesting a sentinel in beforeAfter[].
+    const auditAfter = value => Object.fromEntries(Object.entries(value).map(([field, fieldValue]) =>
+      [field, fieldValue === technicalNow ? 'SERVER_TIMESTAMP_ON_COMMIT' : fieldValue]));
     const qaMark=trustedProposal&&trustedProposal.syntheticQaRun?{__syntheticQa:true,qaRunId:trustedProposal.syntheticQaRun}:{};
     const origin = evidenceOrigin(plan.evidenceType), source = evidenceSourceType(plan.evidenceType);
     for (const state of states) {
@@ -1084,8 +1090,8 @@ async function reconcileEvidence(authz, data, payload, previewOnly, proposalRequ
       if (!isInferred && evidencePayload.invoiceNumber) receiptPatch.numeroFactura = evidencePayload.invoiceNumber;
       tx.set(tenantData(authz.tenantId, 'recibosEsperados').doc(receiptId), receiptPatch, { merge: true });
       if (proposalRequest) beforeAfter.push(
-        {collection:'recibosEsperados',id:receiptId,before:receipt,after:Object.assign({},receipt,receiptPatch)},
-        {collection:'cobros',id:cobroId,before:cobroDoc?beforeCobro:null,after:cobro});
+        {collection:'recibosEsperados',id:receiptId,before:receipt,after:auditAfter(Object.assign({},receipt,receiptPatch))},
+        {collection:'cobros',id:cobroId,before:cobroDoc?beforeCobro:null,after:auditAfter(cobro)});
 
       if (state.activePortfolioRows.length === 1) {
         const portfolioPatch = {
@@ -1111,7 +1117,7 @@ async function reconcileEvidence(authz, data, payload, previewOnly, proposalRequ
         if (applicationDate) portfolioPatch.applicationDate = applicationDate;
         tx.set(state.activePortfolioRows[0].ref, portfolioPatch, { merge: true });
         if (proposalRequest) beforeAfter.push({collection:'carteraPrimas',id:state.activePortfolioRows[0].id,
-          before:state.activePortfolioRows[0].data(),after:Object.assign({},state.activePortfolioRows[0].data(),portfolioPatch)});
+          before:state.activePortfolioRows[0].data(),after:auditAfter(Object.assign({},state.activePortfolioRows[0].data(),portfolioPatch))});
       }
       results.push({ receiptId, cobroId, installment: target.installment, directOrInferred, paymentState, applicationState,
         amount,currency:text(receipt.moneda||policy.moneda,12).toUpperCase(),
