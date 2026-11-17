@@ -48,6 +48,9 @@ const ADVISOR_QA_ISOLATION = Object.freeze({
 const PINNED_OWNER_PATHS = Object.freeze([
   'functions','orbit360-platform','firebase.json','firestore.rules','storage.rules',
   ...DRIVERS,'tools/gravicentra-i6-6-carlos-paula-live-synthetic-ops-leads-uat.cjs',
+  'tools/gravicentra-i6-6-startup-readiness-diagnostics.cjs',
+  'tools/gravicentra-i6-6-startup-readiness-diagnostics.test.cjs',
+  'tools/gravicentra-i6-6-advisor-startup-diagnostics.test.cjs',
   'tools/gravicentra-i6-6-direction-preview-legal-acceptance.cjs',
   'tools/gravicentra-i6-6-direction-preview-i66-consent-scope.test.cjs',
   'tools/gravicentra-i6-6-direction-live-legal-acceptance.test.cjs',

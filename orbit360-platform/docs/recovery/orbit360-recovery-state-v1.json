@@ -10,7 +10,7 @@
   "branch": "recovery/fase-a-clean-20260831",
   "forensicOriginSha": "9c95f31461f2eabe9804625b5659bee772f5602a",
   "createdAtUtc": "2026-08-31T18:00:00Z",
-  "updatedAtUtc": "2026-11-17T20:22:34Z",
+  "updatedAtUtc": "2026-11-17T20:51:02Z",
   "status": "I6_6_LIVE_CONTROLLED_PORTFOLIO_UPDATE_IN_PROGRESS",
   "currentIteration": 6,
   "lastCompletedIteration": 5,
@@ -23,7 +23,7 @@
     "latestHostingPreviewEvidence": "artifacts/orbit360-recovery/release-control/I6_6_CAUSAL_RELEASE_READINESS_PREVIEW_BUILD_20261117.json",
     "latestHostingPreviewSource": "fdbc65a59114d2858ce6884374eaf6c44d8ae9a9",
     "documentaryFocalReadbackEvidence": "artifacts/orbit360-recovery/release-control/I6_6_EXISTING_CLIENT_INDEPENDENT_GESTIONES_READBACK_20261116.json",
-    "signedPreviewCandidateStatus": "EXACT_IMMUTABLE_PREVIEW_BUILT_FOUR_SIGNED_DRIVERS_AUTHORIZED",
+    "signedPreviewCandidateStatus": "FAILED_SIGNED_PREVIEW_PASSIVE_DIAGNOSTIC_SOURCE_BUILD_REQUIRED",
     "technicalPreviewCausalRetryReceipt": "artifacts/orbit360-recovery/release-control/I6_6_TECHNICAL_PREVIEW_OBSERVABILITY_REBUILD_20261116.json",
     "operationsEvidenceReview": "artifacts/orbit360-recovery/release-control/I6_6_OPS_EVIDENCE_AND_PREVIEW_BINDING_REVIEW_20261116.json",
     "legalScopeAuthorizationReceipt": "artifacts/orbit360-recovery/release-control/I6_6_DIRECTION_PREVIEW_V2_SCOPE_AUTHORIZATION_20261116.json",
@@ -33,7 +33,7 @@
     "newPreviewOrLiveAcceptanceClaimed": false,
     "ownerQuestionsAnswered": "October only; sale commission only; private roster 13 advisor-A clients at70% and4 advisor-B clients at60%; previously paid September commissions excluded. Identities and liquidation remain outside this public repository.",
     "bankTransfersAuthorized": false,
-    "signedPreviewEvidence": null,
+    "signedPreviewEvidence": "artifacts/orbit360-recovery/release-control/I6_6_ADVISOR_RELOAD_READINESS_HOLD_AND_DIAGNOSTIC_SOURCE_20261117.json",
     "currentSignedCandidate": {
       "sourceSha": "fdbc65a59114d2858ce6884374eaf6c44d8ae9a9",
       "buildRunId": 44167538384,
@@ -42,19 +42,45 @@
       "buildId": "gi-i66-fdbc65a59114-57f234755dc1",
       "previewUrl": "https://ays-orbit-360-lab--gi-i66-rc-44167538384-rhzff43z.web.app",
       "previewChannelId": "gi-i66-rc-44167538384",
-      "status": "EXACT_IMMUTABLE_PREVIEW_BUILT_FOUR_SIGNED_DRIVERS_AUTHORIZED",
+      "status": "FAILED_SIGNED_PREVIEW_PASSIVE_DIAGNOSTIC_SOURCE_BUILD_REQUIRED",
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_CAUSAL_RELEASE_READINESS_PREVIEW_BUILD_20261117.json",
       "signedPreviewAccepted": false,
       "liveAccepted": false,
       "realFinancialWrites": 0,
       "signedObservabilityProfile": "I66_SIGNED_BROWSER_OBSERVABILITY_V1",
-      "liveLegalConsentGranted": false
+      "liveLegalConsentGranted": false,
+      "signedOutcomeReceipt": "artifacts/orbit360-recovery/release-control/I6_6_ADVISOR_RELOAD_READINESS_HOLD_AND_DIAGNOSTIC_SOURCE_20261117.json",
+      "newPreviewAcceptance": false,
+      "underlyingStartupCauseProven": false
     },
     "latestSignedQaOutcome": {
-      "status": "PENDING_EXACT_NEW_SIGNED_PREVIEW",
+      "status": "FAILED_NOT_ACCEPTED",
+      "runId": 44169173376,
+      "jobId": 134343459567,
       "sourceSha": "fdbc65a59114d2858ce6884374eaf6c44d8ae9a9",
-      "buildRunId": 44167538384,
-      "buildReceiptPath": "artifacts/orbit360-recovery/release-control/I6_6_CAUSAL_RELEASE_READINESS_PREVIEW_BUILD_20261117.json",
+      "workflowHeadSha": "69b677906dcaaa50860535ff653fee3254fc8665",
+      "diagnosticArtifactId": 14366593195,
+      "diagnosticArtifactDigest": "sha256:d6f0a0fe81b70bde770eecdd1ac456f9bd0abe71c6b0d0b8de4372b0ac38defd",
+      "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_ADVISOR_RELOAD_READINESS_HOLD_AND_DIAGNOSTIC_SOURCE_20261117.json",
+      "rawDiagnosticPath": "artifacts/orbit360-recovery/release-control/I6_6_ADVISOR_RELOAD_FAILED_PREVIEW_DIAGNOSTIC_20261117.json",
+      "rawDiagnosticSha256": "dd36fb1d6670a0504cf5dd86c086064bba4cbe054751f0d5c9f9a4d192035590",
+      "failureStage": "PENDING_CXP_RELOAD",
+      "failureClass": "TIMEOUT_ERROR",
+      "failureLocation": {
+        "file": "gravicentra-i6-6-advisor-payables-signed-uat.cjs",
+        "line": 999,
+        "column": 26
+      },
+      "rootCauseProven": false,
+      "advisorChecks": 13,
+      "advisorDriverStatus": "HOLD",
+      "syntheticCleanupStatus": "HOLD",
+      "syntheticRemaining": 0,
+      "cleanupAccepted": false,
+      "proposalDriverStatus": "NOT_EXECUTED",
+      "sourceIntakeNewProofAvailable": false,
+      "documentedTermsHelperStatus": "PASS",
+      "documentedTermsHelperReloadPerformed": false,
       "newLiveAcceptance": false,
       "realFinancialWritesApplied": 0
     },
@@ -68,7 +94,7 @@
     "dailyExecutionPlanPointer": "artifacts/orbit360-recovery/release-control/I6_6_OPERATIONAL_CONTINUATION_20261115.json#dailyExecutionPlan20261117",
     "currentPreviewSourceSha": "fdbc65a59114d2858ce6884374eaf6c44d8ae9a9",
     "currentPreviewBuildReceipt": "artifacts/orbit360-recovery/release-control/I6_6_CAUSAL_RELEASE_READINESS_PREVIEW_BUILD_20261117.json",
-    "nextAction": "I6_6_EXISTING_BLOCK2_EXACT_CAUSAL_RELEASE_READINESS: NEW_IMMUTABLE_BUILD_44167538384_AND_GUARD_44167538530_PASS; CERTIFY_FOUR_SIGNED_DRIVERS_AGAINST_EXACT_FDBC65_ARTIFACT. SOURCE_AND_QA_BYTES_FROZEN. PRIOR_59C37_SIGNED_PREVIEW_EVIDENCE_AND_R11_CURRENT_LIVE_PRESERVED. LIVE_LEGAL_SCOPE_IS_PROPOSED_NOT_AUTHORIZED; EXISTING_PREVIEW_RECEIPT_EXPLICITLY_EXCLUDES_LIVE. AFTER_NEW_SIGNED_PREVIEW_PASS_LOCK_R11_TRANSPORT_AND_PRESERVE_EXACT_PENDING_CANDIDATE_AND_REVIEW_CONTEXT; OBTAIN_EXPLICIT_DIRECTION_LIVE_SCOPE_BEFORE_DEPLOYMENT. FUTURE_AUTHORITY_IS_METADATA_ONLY_SAME_ARTIFACT_NO_REBUILD. PRIVATE_FINANCIAL_INPUTS_PREPARED; FIVE_AUTHENTICATED_CURRENT_READS_AND_SERVER_PREVIEWS_REQUIRED_BEFORE_APPLY. FROZEN_SIX_BLOCKS_AND_19_OF_31_CRITERIA_UNCHANGED.",
+    "nextAction": "I6_6_EXISTING_BLOCK2_ADVISOR_FINAL_RELOAD_HOLD: EXACT_FDBC_PREVIEW_44169173376_FAILED_AT_READINESS_LINE999; AT_LEAST_ONE_REQUIRED_GLOBAL_ABSENT_BUT_DEEP_CAUSE_NOT_CAPTURED. PRESERVE_PRIOR_59C37_PASS_AND_CURRENT_R11_LIVE; NO_PROPOSAL_OR_SOURCE_INTAKE_PASS_FOR_FDBC. BUILD_PASSIVE_QA_DIAGNOSTIC_SUCCESSOR_WITH_EXISTING_FIXTURE_ORDER_THREE_READINESS_WAITS_AND_TIMEOUTS_UNCHANGED. RETAIN_ORIGINAL_FAILURE_AND_ALLOWLISTED_RESTORE_FAILURE_CLASSES; ZERO_REMAINING_IS_NOT_RESTORE_PASS. THEN_BIND_EXACT_NEW_ARTIFACT_AND_EXECUTE_EXISTING_FOUR_SIGNED_DRIVERS_WITH_FRESH_SYNTHETIC_IDS_AND_EXACT_ABSENCE_GUARDS; NO_REAL_FINANCIAL_RETRY. NO_LIVE_UNTIL_EXACT_PREVIEW_ACCEPTANCE_AND_MISSING_EXPLICIT_DIRECTION_LIVE_LEGAL_SCOPE. PRIVATE_FINANCIAL_PREPARATION_PRESERVED_AUTHENTICATED_READBACK_PENDING. SIX_BLOCKS_AND_FROZEN_19_OF_31_UNCHANGED.",
     "dailyPlanFreeze20261117": {
       "status": "FROZEN_APPROVED_BY_DIRECTION",
       "approvedAtUtc": "2026-11-17T19:14:47Z",
@@ -125,7 +151,8 @@
       "conditionBasis": "SOURCE_PATH_PROVEN_NOT_AN_OBSERVED_LIVE_RUNTIME_FAILURE",
       "actualLiveFailure44161850833RemainsAuthorizationPhaseMismatch": true,
       "existingPreviewAuthorizationUnchanged": true,
-      "technicalState": "SOURCE_BUILT_UNCHANGED_TERMS_EXACT_SIGNED_PREVIEW_PENDING_NO_LIVE_GRANT"
+      "technicalState": "PASSIVE_STARTUP_DIAGNOSTIC_SUCCESSOR_REQUIRED_NEW_EXACT_SIGNED_PREVIEW_NOT_ACCEPTED",
+      "reviewContextGenerated": false
     },
     "priorSignedCandidateBeforeReadinessBuild20261117": {
       "sourceSha": "59c37ac9a2142c24ccb5a95f3d6df82eb62dfd94",
@@ -191,7 +218,8 @@
       "documentedTermsHelperReloadPerformed": false,
       "newLiveAcceptance": false,
       "realFinancialWritesApplied": 0
-    }
+    },
+    "newLiveAcceptanceClaimed": false
   },
   "iterationProgressAuthority": "CONTROL_PLANE.json#gateState: I0-I5 certified in earlier release epoch; I6.6 active for current successor. Timestamped iterationN evidence snapshots remain immutable historical observations.",
   "productionTargetIteration": 5,
@@ -895,7 +923,7 @@
     "phaseAIterationStatuses": "HISTORICAL_FIELDS_ABOVE_PRESERVED_UNTIL_FORMAL_GATE_EVIDENCE;_NO_NEW_PASS_INFERRED",
     "labDataWriteScope": "ONLY_35_AUTHORIZED_COUNTRY_FIELDS;_NO_AUGUST_REFRESH"
   },
-  "nextAction": "I6_6_EXISTING_BLOCK2_EXACT_CAUSAL_RELEASE_READINESS: NEW_IMMUTABLE_BUILD_44167538384_AND_GUARD_44167538530_PASS; CERTIFY_FOUR_SIGNED_DRIVERS_AGAINST_EXACT_FDBC65_ARTIFACT. SOURCE_AND_QA_BYTES_FROZEN. PRIOR_59C37_SIGNED_PREVIEW_EVIDENCE_AND_R11_CURRENT_LIVE_PRESERVED. LIVE_LEGAL_SCOPE_IS_PROPOSED_NOT_AUTHORIZED; EXISTING_PREVIEW_RECEIPT_EXPLICITLY_EXCLUDES_LIVE. AFTER_NEW_SIGNED_PREVIEW_PASS_LOCK_R11_TRANSPORT_AND_PRESERVE_EXACT_PENDING_CANDIDATE_AND_REVIEW_CONTEXT; OBTAIN_EXPLICIT_DIRECTION_LIVE_SCOPE_BEFORE_DEPLOYMENT. FUTURE_AUTHORITY_IS_METADATA_ONLY_SAME_ARTIFACT_NO_REBUILD. PRIVATE_FINANCIAL_INPUTS_PREPARED; FIVE_AUTHENTICATED_CURRENT_READS_AND_SERVER_PREVIEWS_REQUIRED_BEFORE_APPLY. FROZEN_SIX_BLOCKS_AND_19_OF_31_CRITERIA_UNCHANGED.",
+  "nextAction": "I6_6_EXISTING_BLOCK2_ADVISOR_FINAL_RELOAD_HOLD: EXACT_FDBC_PREVIEW_44169173376_FAILED_AT_READINESS_LINE999; AT_LEAST_ONE_REQUIRED_GLOBAL_ABSENT_BUT_DEEP_CAUSE_NOT_CAPTURED. PRESERVE_PRIOR_59C37_PASS_AND_CURRENT_R11_LIVE; NO_PROPOSAL_OR_SOURCE_INTAKE_PASS_FOR_FDBC. BUILD_PASSIVE_QA_DIAGNOSTIC_SUCCESSOR_WITH_EXISTING_FIXTURE_ORDER_THREE_READINESS_WAITS_AND_TIMEOUTS_UNCHANGED. RETAIN_ORIGINAL_FAILURE_AND_ALLOWLISTED_RESTORE_FAILURE_CLASSES; ZERO_REMAINING_IS_NOT_RESTORE_PASS. THEN_BIND_EXACT_NEW_ARTIFACT_AND_EXECUTE_EXISTING_FOUR_SIGNED_DRIVERS_WITH_FRESH_SYNTHETIC_IDS_AND_EXACT_ABSENCE_GUARDS; NO_REAL_FINANCIAL_RETRY. NO_LIVE_UNTIL_EXACT_PREVIEW_ACCEPTANCE_AND_MISSING_EXPLICIT_DIRECTION_LIVE_LEGAL_SCOPE. PRIVATE_FINANCIAL_PREPARATION_PRESERVED_AUTHENTICATED_READBACK_PENDING. SIX_BLOCKS_AND_FROZEN_19_OF_31_UNCHANGED.",
   "sourceOfTruth": {
     "projectBoundaryPrevalentAddendum": "orbit360-platform/docs/recovery/ADDENDUM_PREVALENTE_CHATGPT_PROJECT_BOUNDARY_20260831.md",
     "mutableState": "orbit360-platform/docs/recovery/orbit360-recovery-state-v1.json",
@@ -2640,7 +2668,8 @@
     "conditionBasis": "SOURCE_PATH_PROVEN_NOT_AN_OBSERVED_LIVE_RUNTIME_FAILURE",
     "actualLiveFailure44161850833RemainsAuthorizationPhaseMismatch": true,
     "existingPreviewAuthorizationUnchanged": true,
-    "technicalState": "SOURCE_BUILT_UNCHANGED_TERMS_EXACT_SIGNED_PREVIEW_PENDING_NO_LIVE_GRANT"
+    "technicalState": "PASSIVE_STARTUP_DIAGNOSTIC_SUCCESSOR_REQUIRED_NEW_EXACT_SIGNED_PREVIEW_NOT_ACCEPTED",
+    "reviewContextGenerated": false
   },
   "i66CausalReleaseReadinessPreviewBuild20261117": {
     "sourceSha": "fdbc65a59114d2858ce6884374eaf6c44d8ae9a9",
@@ -2657,5 +2686,36 @@
     "realFinancialWrites": 0,
     "signedObservabilityProfile": "I66_SIGNED_BROWSER_OBSERVABILITY_V1",
     "liveLegalConsentGranted": false
+  },
+  "i66AdvisorFinalReloadHold20261117": {
+    "status": "FAILED_NOT_ACCEPTED",
+    "runId": 44169173376,
+    "jobId": 134343459567,
+    "sourceSha": "fdbc65a59114d2858ce6884374eaf6c44d8ae9a9",
+    "workflowHeadSha": "69b677906dcaaa50860535ff653fee3254fc8665",
+    "diagnosticArtifactId": 14366593195,
+    "diagnosticArtifactDigest": "sha256:d6f0a0fe81b70bde770eecdd1ac456f9bd0abe71c6b0d0b8de4372b0ac38defd",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_ADVISOR_RELOAD_READINESS_HOLD_AND_DIAGNOSTIC_SOURCE_20261117.json",
+    "rawDiagnosticPath": "artifacts/orbit360-recovery/release-control/I6_6_ADVISOR_RELOAD_FAILED_PREVIEW_DIAGNOSTIC_20261117.json",
+    "rawDiagnosticSha256": "dd36fb1d6670a0504cf5dd86c086064bba4cbe054751f0d5c9f9a4d192035590",
+    "failureStage": "PENDING_CXP_RELOAD",
+    "failureClass": "TIMEOUT_ERROR",
+    "failureLocation": {
+      "file": "gravicentra-i6-6-advisor-payables-signed-uat.cjs",
+      "line": 999,
+      "column": 26
+    },
+    "rootCauseProven": false,
+    "advisorChecks": 13,
+    "advisorDriverStatus": "HOLD",
+    "syntheticCleanupStatus": "HOLD",
+    "syntheticRemaining": 0,
+    "cleanupAccepted": false,
+    "proposalDriverStatus": "NOT_EXECUTED",
+    "sourceIntakeNewProofAvailable": false,
+    "documentedTermsHelperStatus": "PASS",
+    "documentedTermsHelperReloadPerformed": false,
+    "newLiveAcceptance": false,
+    "realFinancialWritesApplied": 0
   }
 }

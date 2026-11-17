@@ -11,6 +11,7 @@ const contract=require('../functions/advisor-commission-payable-contract');
 const assignment=require('../functions/advisor-assignment-correction-contract');
 const {acceptDirectionPreviewLegal,assertDirectionLiveLegalAuthority,acceptDirectionLiveLegal,LEGAL_FAILURE_CHECKS,safeLegalFailureSubstage}=require('./gravicentra-i6-6-direction-preview-legal-acceptance.cjs');
 const {runDocumentedTermsCheck,safeDocumentedTermsProof,FAILURE_CODES:DOCUMENTED_TERMS_FAILURE_CODES}=require('./gravicentra-i6-6-documented-terms-signed-check.cjs');
+const {createStartupReadinessObserver,safeStartupReadinessDiagnostic}=require('./gravicentra-i6-6-startup-readiness-diagnostics.cjs');
 const PROJECT='ays-orbit-360-lab',TENANT='alianzas-soluciones';
 const SOURCE_SCHEMA='gravicentra-advisor-commission-source-batch-v1';
 const hash=value=>crypto.createHash('sha256').update(String(value)).digest('hex');
@@ -527,15 +528,50 @@ function createBrowserErrorLedger({cfg,actorRole,getStage,catalog,maxEvents=500,
   return {expectDenial,confirmDenial,onRequest,onResponse,onBody,onBodyUnavailable,onLoadingFailed,onLog,onRuntimeConsole,onPageConsole,onPageError,telemetry,
     wantsBody:id=>!!requests.get(String(id))?.expected,summary};
 }
-async function attachBrowserObservability({context,page,cfg,actorRole,getStage,catalog,protocolTimeoutMs=5000}){
+const STARTUP_STAGES=Object.freeze(['SIGNED_SESSION','ASSIGNMENT_RELOAD','PENDING_CXP_RELOAD']);
+const CLEANUP_FAILURE_CLASSES=Object.freeze(['SIGNED_RESTORE','GENERATED_RECORD_PROVENANCE_OR_DELETE',
+  'SOURCE_AUDIT_PROVENANCE_OR_DELETE','GENERIC_AUDIT_PROVENANCE_OR_DELETE','ASSIGNMENT_AUDIT_PROVENANCE_OR_DELETE',
+  'SEED_PROVENANCE_OR_DELETE','MEMBERSHIP_CHANGED','FINAL_ABSENCE_READ_FAILED']);
+function safeCleanupFailureClasses(value){
+  return Array.isArray(value)?[...new Set(value.filter(code=>CLEANUP_FAILURE_CLASSES.includes(code)))]:[];
+}
+function safeStartupDiagnostics(value){
+  return (Array.isArray(value)?value:[]).slice(0,24).map(row=>({
+    actorRole:['direccion','operativo'].includes(row?.actorRole)?row.actorRole:'UNKNOWN_ACTOR',
+    stage:STARTUP_STAGES.includes(row?.stage)?row.stage:'UNKNOWN_STAGE',
+    waitOutcome:['ORIGINAL_WAIT_COMPLETED','ORIGINAL_WAIT_FAILED'].includes(row?.waitOutcome)?row.waitOutcome:'UNKNOWN',
+    diagnostic:safeStartupReadinessDiagnostic(row?.diagnostic)
+  }));
+}
+async function waitForStartupGlobals({page,startup,navigate,report,actorRole,stage}){
+  // Preserve the original navigation, predicate, 30s wait and thrown object.
+  // Capture is passive and occurs before the caller's finally/restore path.
+  try{startup.markReload();}catch{}
+  let originalError,waitFailed=false;
+  try{
+    await navigate();
+    await page.waitForFunction(()=>!!window.Orbit?.productRuntimeBrowserProvidersP0&&!!window.Orbit?.productAppP0,null,{timeout:30000});
+  }catch(error){originalError=error;waitFailed=true;}
+  let diagnostic;
+  try{diagnostic=await startup.capture();}catch{}
+  if(!Array.isArray(report.startupDiagnostics))report.startupDiagnostics=[];
+  report.startupDiagnostics.push(...safeStartupDiagnostics([{actorRole,stage,
+    waitOutcome:waitFailed?'ORIGINAL_WAIT_FAILED':'ORIGINAL_WAIT_COMPLETED',diagnostic}]));
+  if(waitFailed)throw originalError;
+}
+async function attachBrowserObservability({context,page,cfg,actorRole,getStage,catalog,buildId,protocolTimeoutMs=5000}){
   assert.ok(Number.isSafeInteger(protocolTimeoutMs)&&protocolTimeoutMs>0&&protocolTimeoutMs<=10000,'ADVISOR_UAT_BROWSER_OBSERVABILITY_HOLD');
   const ledger=createBrowserErrorLedger({cfg,actorRole,getStage,catalog}),pending=new Set();let cdp;
+  const startup=createStartupReadinessObserver({page,origin:cfg.origin,sourceSha:cfg.source,buildId,actorRole,getStage});
+  const startupEvent=method=>event=>{try{startup[method](event);}catch{try{startup.telemetry('CDP_CALLBACK_FAILED');}catch{}}};
   const safe=fn=>event=>{try{fn(event);}catch{ledger.telemetry('CDP_CALLBACK_FAILED');}};
   const send=async(name,args)=>{let timer;try{return await Promise.race([cdp.send(name,args),new Promise((resolve,reject)=>{
     timer=setTimeout(()=>reject(Error('CDP_PROTOCOL_DEADLINE')),protocolTimeoutMs);
   })]);}finally{clearTimeout(timer);}};
   page.on('pageerror',()=>ledger.onPageError());page.on('console',message=>ledger.onPageConsole(message.type()));
-  try{cdp=await context.newCDPSession(page);}catch{ledger.telemetry('CDP_ATTACH_FAILED');return {...ledger,flush:async()=>{},drain:async()=>{}};}
+  try{cdp=await context.newCDPSession(page);}catch{ledger.telemetry('CDP_ATTACH_FAILED');startup.telemetry('CDP_UNAVAILABLE');return {...ledger,startup,flush:async()=>{},drain:async()=>{}};}
+  cdp.on('Network.requestWillBeSent',startupEvent('onRequest'));cdp.on('Network.responseReceived',startupEvent('onResponse'));
+  cdp.on('Network.loadingFinished',startupEvent('onLoadingFinished'));cdp.on('Network.loadingFailed',startupEvent('onLoadingFailed'));
   cdp.on('Network.requestWillBeSent',safe(ledger.onRequest));cdp.on('Network.responseReceived',safe(ledger.onResponse));
   cdp.on('Network.loadingFailed',safe(ledger.onLoadingFailed));cdp.on('Log.entryAdded',safe(event=>ledger.onLog(event.entry)));
   cdp.on('Runtime.consoleAPICalled',safe(ledger.onRuntimeConsole));
@@ -547,9 +583,9 @@ async function attachBrowserObservability({context,page,cfg,actorRole,getStage,c
     }).catch(()=>ledger.onBodyUnavailable(event.requestId));
     pending.add(task);task.finally(()=>pending.delete(task));
   }));
-  try{await send('Network.enable',{maxPostDataSize:131072});await send('Log.enable');await send('Runtime.enable');}
-  catch{ledger.telemetry('CDP_ENABLE_FAILED');}
-  return {...ledger,drain:async()=>{await Promise.all([...pending]);},flush:async()=>{
+  try{await send('Network.enable',{maxPostDataSize:131072});startup.networkReady();await send('Log.enable');await send('Runtime.enable');}
+  catch{ledger.telemetry('CDP_ENABLE_FAILED');startup.telemetry('CDP_ENABLE_FAILED');}
+  return {...ledger,startup,drain:async()=>{await Promise.all([...pending]);},flush:async()=>{
     // Read-only protocol round-trip drains already emitted browser events; no
     // console replacement, route interception, app bypass, or fixed sleep.
     try{await Promise.all([send('Runtime.evaluate',{expression:'void 0',returnByValue:true}),...pending]);}
@@ -803,10 +839,10 @@ async function main(){
       const token=await admin.auth().createCustomToken(actor.uid),context=await browser.newContext({viewport:{width:1280,height:900}}),page=await context.newPage();
       const pageErrors=[],assetErrors=[];page.on('pageerror',()=>pageErrors.push('PAGE_ERROR'));
       page.on('response',response=>{if(response.url().startsWith(cfg.origin+'/')&&response.status()>=400)assetErrors.push('FIRST_PARTY_HTTP_ERROR');});
-      const observer=await attachBrowserObservability({context,page,cfg,actorRole:actor.role,getStage:()=>stage,catalog:denialCatalog});
+      const observer=await attachBrowserObservability({context,page,cfg,actorRole:actor.role,getStage:()=>stage,catalog:denialCatalog,buildId:marker.buildId});
       browserObservers.push(observer);
-      await page.goto(cfg.origin+'/#/inicio',{waitUntil:'commit',timeout:30000});
-      await page.waitForFunction(()=>!!window.Orbit?.productRuntimeBrowserProvidersP0&&!!window.Orbit?.productAppP0,null,{timeout:30000});
+      await waitForStartupGlobals({page,startup:observer.startup,report,actorRole:actor.role,stage,
+        navigate:()=>page.goto(cfg.origin+'/#/inicio',{waitUntil:'commit',timeout:30000})});
       const result=await page.evaluate(async token=>{const p=Orbit.productRuntimeBrowserProvidersP0,c=await p.initialize();await c.modules.auth.setPersistence(c.auth,c.modules.auth.browserSessionPersistence);await c.modules.auth.signInWithCustomToken(c.auth,token);const started=await Orbit.productAppP0.activate();return{started:started?.started===true,role:Orbit.session?.rol?.(),preview:p.isI66PreviewHost()};},token);
       assert.ok(result.started&&result.preview===!cfg.live&&norm(result.role)===actor.role,'ADVISOR_UAT_SIGNED_SESSION_MISMATCH');
       return{...actor,context,page,pageErrors,assetErrors,observer};
@@ -894,8 +930,8 @@ async function main(){
       assert.equal(digest((await auditRef('event',receipt.eventId).get()).data()),digest(eventRow),'ADVISOR_UAT_ASSIGNMENT_AUDIT_MISMATCH');
       await direction.page.waitForSelector('#policy-v1199',{state:'detached',timeout:30000});
       stage='ASSIGNMENT_RELOAD';
-      await direction.page.reload({waitUntil:'commit',timeout:30000});
-      await direction.page.waitForFunction(()=>!!window.Orbit?.productRuntimeBrowserProvidersP0&&!!window.Orbit?.productAppP0,null,{timeout:30000});
+      await waitForStartupGlobals({page:direction.page,startup:direction.observer.startup,report,actorRole:direction.role,stage,
+        navigate:()=>direction.page.reload({waitUntil:'commit',timeout:30000})});
       const restoredSession=await direction.page.evaluate(async collections=>{
         const p=Orbit.productRuntimeBrowserProvidersP0;await p.initialize();const uid=(await p.waitForUser())?.uid;
         const ready=(await Orbit.productAppP0.activate())?.started===true;await Orbit.store._ensureCollections(collections);return{uid,ready};
@@ -995,8 +1031,8 @@ async function main(){
     genericAuditGuard('event',(await auditRef('event',genericRequest.eventId).get()).data(),genericRequest,direction.uid);
     pass('UNRELATED_LEGACY_FINANCE_RETAINS_AUTHORIZED_EDIT');
     stage='PENDING_CXP_RELOAD';
-    await direction.page.reload({waitUntil:'commit',timeout:30000});
-    await direction.page.waitForFunction(()=>!!window.Orbit?.productRuntimeBrowserProvidersP0&&!!window.Orbit?.productAppP0,null,{timeout:30000});
+    await waitForStartupGlobals({page:direction.page,startup:direction.observer.startup,report,actorRole:direction.role,stage,
+      navigate:()=>direction.page.reload({waitUntil:'commit',timeout:30000})});
     const reloaded=await direction.page.evaluate(async()=>{const p=Orbit.productRuntimeBrowserProvidersP0;await p.initialize();const uid=(await p.waitForUser())?.uid;const ready=(await Orbit.productAppP0.activate())?.started===true;Orbit.router.go('finanzas');await Orbit.store._ensureCollections(['asesores','clientes','polizas','finmovs','comisiones']);return{uid,ready};});
     assert.equal(reloaded.uid,direction.uid);assert.equal(reloaded.ready,true);
     const ledgerTargets=fx.plans.flatMap(plan=>[
@@ -1111,7 +1147,7 @@ async function main(){
       }
       for(const before of memberBefore){try{const snap=await before.ref.get();assert.equal(snap.exists?digest(snap.data()):null,before.digest,'ADVISOR_UAT_MEMBERSHIP_OR_ACCESS_CHANGED');}catch(error){cleanupErrors.push('MEMBERSHIP_CHANGED');}}
       for(const ref of allTargets){try{if((await ref.get()).exists)report.cleanup.remaining+=1;}catch(error){cleanupErrors.push('FINAL_ABSENCE_READ_FAILED');}}
-      if(cleanupErrors.length||report.cleanup.remaining){cleanupFailure=Error('ADVISOR_UAT_CLEANUP_HOLD');report.cleanup.status='HOLD';report.cleanup.failureClasses=[...new Set(cleanupErrors)];}
+      if(cleanupErrors.length||report.cleanup.remaining){cleanupFailure=Error('ADVISOR_UAT_CLEANUP_HOLD');report.cleanup.status='HOLD';report.cleanup.failureClasses=safeCleanupFailureClasses(cleanupErrors);}
       else{report.cleanup.status='PASS';pass('EXACT_SYNTHETIC_DATA_AND_AUDIT_ABSENCE_RESTORED_MEMBERSHIP_UNCHANGED');}
     }
     report.browserObservability=await finalizeBrowserObservability(browserObservers,async()=>{if(browser)await browser.close();});
@@ -1128,13 +1164,18 @@ async function main(){
       report.financeUiDiagnostics=safeFinanceUiDiagnostics(report.financeUiDiagnostics);
       console.log('I66_ADVISOR_FINANCE_UI_DIAGNOSTIC '+JSON.stringify(report.financeUiDiagnostics));
     }
+    if(report.startupDiagnostics){
+      report.startupDiagnostics=safeStartupDiagnostics(report.startupDiagnostics);
+      console.log('I66_ADVISOR_STARTUP_DIAGNOSTIC '+JSON.stringify(report.startupDiagnostics));
+    }
+    if(report.cleanup.failureClasses)report.cleanup.failureClasses=safeCleanupFailureClasses(report.cleanup.failureClasses);
     if(report.documentedTerms)console.log('I66_DOCUMENTED_TERMS_DIAGNOSTIC '+JSON.stringify(safeDocumentedTermsProof(report.documentedTerms)));
     console.log('I66_ADVISOR_BROWSER_OBSERVABILITY '+JSON.stringify({status:report.browserObservability.status,...report.browserObservability.totals}));
     fs.writeFileSync(cfg.reportPath,JSON.stringify(report,null,2)+'\n',{flag:'wx',mode:0o600});
-    console.log('I66_ADVISOR_PAYABLE_SIGNED_'+cfg.phase+'_'+report.status+' '+JSON.stringify({checks:report.checks.length,cleanup:report.cleanup.status,remaining:report.cleanup.remaining,realCustomerWritesRequested:0,bankMovements:0,financialPayments:0,authOrMembershipMutations:0,...failure}));
+    console.log('I66_ADVISOR_PAYABLE_SIGNED_'+cfg.phase+'_'+report.status+' '+JSON.stringify({checks:report.checks.length,cleanup:report.cleanup.status,remaining:report.cleanup.remaining,realCustomerWritesRequested:0,bankMovements:0,financialPayments:0,authOrMembershipMutations:0,cleanupFailureClasses:safeCleanupFailureClasses(report.cleanup.failureClasses),...failure}));
   }
   if(originalFailure||cleanupFailure)throw Error('ADVISOR_PAYABLE_SIGNED_UAT_HOLD');
   return report;
 }
-module.exports={configuration,sourceIdentity,fixtures,signedDocumentaryFixtures,withAssignmentFixtures,assignmentIdentity,assignmentStepsFor,assignmentReceiptFor,assignmentProjectionRows,assertAssignmentReceipt,assignmentAuditGuard,assertDocumentaryRow,assertDocumentaryReceipt,assertDocumentaryView,assertVisibleDocumentaryView,assertGenerated,sourceAuditGuard,genericAuditGuard,unchangedSeed,configuredCredential,assertServerDenial,browserDenialCatalog,safeBrowserLocation,createBrowserErrorLedger,attachBrowserObservability,browserObservabilityReport,finalizeBrowserObservability,validateBrowserObservability,safeFailureEvidence,safeLegalFailureSubstage,safeFinanceUiSnapshot,safeClickActionability,safeFinanceUiDiagnostics,captureFinanceUiSnapshot,main};
+module.exports={configuration,sourceIdentity,fixtures,signedDocumentaryFixtures,withAssignmentFixtures,assignmentIdentity,assignmentStepsFor,assignmentReceiptFor,assignmentProjectionRows,assertAssignmentReceipt,assignmentAuditGuard,assertDocumentaryRow,assertDocumentaryReceipt,assertDocumentaryView,assertVisibleDocumentaryView,assertGenerated,sourceAuditGuard,genericAuditGuard,unchangedSeed,configuredCredential,assertServerDenial,browserDenialCatalog,safeBrowserLocation,createBrowserErrorLedger,attachBrowserObservability,waitForStartupGlobals,safeStartupDiagnostics,safeCleanupFailureClasses,CLEANUP_FAILURE_CLASSES,browserObservabilityReport,finalizeBrowserObservability,validateBrowserObservability,safeFailureEvidence,safeLegalFailureSubstage,safeFinanceUiSnapshot,safeClickActionability,safeFinanceUiDiagnostics,captureFinanceUiSnapshot,main};
 if(require.main===module)main().catch(error=>{console.error('I66_ADVISOR_PAYABLE_SIGNED_UAT_HOLD '+String(error.code||'ASSERTION_OR_RUNTIME_FAILURE').replace(/[^A-Za-z0-9_./:-]+/g,'_').slice(0,120));process.exitCode=1;});

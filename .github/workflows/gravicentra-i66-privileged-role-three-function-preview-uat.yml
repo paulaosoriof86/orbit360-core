@@ -233,7 +233,7 @@ jobs:
           set -euo pipefail
           node - <<'NODE'
           const fs=require('node:fs'),path=require('node:path');
-          const {safeFinanceUiDiagnostics,safeLegalFailureSubstage,safeFailureEvidence}=require('./tools/gravicentra-i6-6-advisor-payables-signed-uat.cjs');
+          const {safeFinanceUiDiagnostics,safeLegalFailureSubstage,safeFailureEvidence,safeStartupDiagnostics,safeCleanupFailureClasses}=require('./tools/gravicentra-i6-6-advisor-payables-signed-uat.cjs');
           const {safeDocumentedTermsProof}=require('./tools/gravicentra-i6-6-documented-terms-signed-check.cjs');
           // Diagnostic projection only: never validate or reclassify a HOLD as
           // acceptance. Preserve correlated evidence without arbitrary text,
@@ -317,11 +317,12 @@ jobs:
             const location=r.failureLocation;
             if(location?.file==='gravicentra-i6-6-advisor-payables-signed-uat.cjs'&&Number.isSafeInteger(location.line)&&location.line>0&&Number.isSafeInteger(location.column)&&location.column>0)
               out.failureLocation={file:location.file,line:location.line,column:location.column};
+            if(r.startupDiagnostics!==undefined)out.startupDiagnostics=safeStartupDiagnostics(r.startupDiagnostics);
             if(r.financeUiDiagnostics)out.financeUiDiagnostics=safeFinanceUiDiagnostics(r.financeUiDiagnostics);
             if(r.documentedTerms!==undefined)out.documentedTerms=safeDocumentedTermsProof(r.documentedTerms);
             if(r.browserObservability!==undefined)out.browserObservability=safeBrowserObservability(r.browserObservability);
             out.checks=Array.isArray(r.checks)?r.checks.length:0;
-            if(r.cleanup){out.cleanupStatus=['PASS','HOLD'].includes(r.cleanup.status)?r.cleanup.status:'UNKNOWN';out.remaining=Number.isSafeInteger(r.cleanup.remaining)?r.cleanup.remaining:null;}
+            if(r.cleanup){out.cleanupStatus=['PASS','HOLD'].includes(r.cleanup.status)?r.cleanup.status:'UNKNOWN';out.remaining=Number.isSafeInteger(r.cleanup.remaining)?r.cleanup.remaining:null;out.cleanupFailureClasses=safeCleanupFailureClasses(r.cleanup.failureClasses);}
             safe.reports.push(out);
           }
           fs.writeFileSync(path.join(process.env.RUNNER_TEMP,'i66-preview-failure-diagnostic.json'),JSON.stringify(safe,null,2)+'\n');

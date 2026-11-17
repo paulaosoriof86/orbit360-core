@@ -1,0 +1,487 @@
+{
+  "schema": "GI_I66_ADVISOR_RELOAD_READINESS_HOLD_AND_PASSIVE_DIAGNOSTICS_V1",
+  "recordedAtUtc": "2026-11-17T20:51:02Z",
+  "gate": "I6.6",
+  "status": "FAILED_SIGNED_PREVIEW_STARTUP_CAUSE_UNPROVEN_PASSIVE_QA_DIAGNOSTICS_NEW_BUILD_REQUIRED",
+  "failedCandidate": {
+    "schema": "I6_6_OPERATIONAL_EXACT_RELEASE_V1",
+    "approvedByDirection": true,
+    "status": "EXACT_BACKEND_PREVIEW_SIGNED_QA_AUTHORIZED",
+    "sourceSha": "fdbc65a59114d2858ce6884374eaf6c44d8ae9a9",
+    "buildId": "gi-i66-fdbc65a59114-57f234755dc1",
+    "buildRunId": 44167538384,
+    "artifactId": 14365204653,
+    "artifactDigest": "sha256:472cc909d2621c54ce79e3ca2c1f260805ef1591ad735251ccac161ff9e1e27c",
+    "previewUrl": "https://ays-orbit-360-lab--gi-i66-rc-44167538384-rhzff43z.web.app",
+    "previewChannelId": "gi-i66-rc-44167538384",
+    "signedObservabilityProfile": "I66_SIGNED_BROWSER_OBSERVABILITY_V1",
+    "targets": {
+      "preview": [
+        {
+          "name": "orbit360ProductOperationalCommandPreview",
+          "region": "us-east1"
+        },
+        {
+          "name": "orbit360CobrosReconciliationCommandPreview",
+          "region": "us-central1"
+        },
+        {
+          "name": "orbit360ScopedPolicyReadPreview",
+          "region": "us-east1"
+        }
+      ],
+      "live": [
+        {
+          "name": "orbit360ProductOperationalCommand",
+          "region": "us-central1"
+        },
+        {
+          "name": "orbit360CobrosReconciliationCommand",
+          "region": "us-central1"
+        },
+        {
+          "name": "orbit360ScopedPolicyRead",
+          "region": "us-east1"
+        }
+      ]
+    },
+    "requiredPreviewDrivers": [
+      "tools/gravicentra-i66-privileged-role-signed-ui-permissions-readonly.cjs",
+      "tools/gravicentra-i6-6-carlos-real-signed-synthetic-preview-uat.cjs",
+      "tools/gravicentra-i6-6-advisor-payables-signed-uat.cjs",
+      "tools/gravicentra-i6-6-proposal-application-signed-uat.cjs"
+    ],
+    "sameImmutableArtifactOnly": true,
+    "syntheticRecordsOnly": true,
+    "noRealFinancialOrCustomerWrites": true,
+    "noRulesAuthIamWrites": true,
+    "rollbackThreeBackendRevisionsAndHosting": true,
+    "expectedSiteFileCount": 223,
+    "syntheticQaIsolation": {
+      "tenantId": "alianzas-soluciones",
+      "runIdPrefix": "cobledgerqa_",
+      "entityIdPrefix": "b3005qa_",
+      "runCollection": "cobrosLedgerQaRuns",
+      "controlCollection": "cobrosLedgerQaControl",
+      "requireSameQaRunId": true,
+      "requireSyntheticMarker": true,
+      "allowRealControlPointerMutation": false,
+      "restoreAllSyntheticRecords": true
+    },
+    "advisorPayableQaIsolation": {
+      "tenantId": "alianzas-soluciones",
+      "runIdPrefix": "b4003qa_i66_cxp_",
+      "payableIdPrefix": "b4003qa_cxpase_",
+      "commissionIdPrefix": "b4003qa_comsrc_",
+      "requireSameQaRunId": true,
+      "requireSyntheticMarker": true,
+      "restoreAllSyntheticRecords": true,
+      "financialPayments": 0,
+      "bankMovements": 0,
+      "authOrMembershipMutations": 0
+    },
+    "currentLive": {
+      "sourceSha": "84769378eb2014addebfefdbdd63091bddc4b817",
+      "buildId": "gi-i66-84769378eb20-57f234755dc1",
+      "artifactId": 14075022275,
+      "artifactDigest": "sha256:b0f3bacb68511cdfc91ac934602c51f55afec5c1d6428d886d13a72a706ee283",
+      "buildRunId": 43503721126,
+      "liveRunId": 43506971214,
+      "hostingVersion": "sites/ays-orbit-360-lab/versions/0766db29b338befc"
+    },
+    "legalAcceptance": {
+      "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_DIRECTION_PREVIEW_V2_SCOPE_AUTHORIZATION_20261116.json",
+      "receiptSha256": "d3309675c753bd1b31f9163d506aba2e29ac70583a7b8d54cb5b8503b5c50a44",
+      "decisionId": "DIRECTION_I66_PREVIEW_SAME_LEGAL_V2_TECHNICAL_SUCCESSORS_AUTHORIZED_20261116",
+      "authorizationScope": "I6_6_PREVIEW_IDENTICAL_V2_TERMS",
+      "gate": "I6.6",
+      "phase": "PREVIEW",
+      "origin": "https://ays-orbit-360-lab--gi-i66-rc-44167538384-rhzff43z.web.app",
+      "sourceSha": "fdbc65a59114d2858ce6884374eaf6c44d8ae9a9",
+      "actorRole": "direccion",
+      "termsProjectionSha256": "485b07887091063cc7a5d1dc8f11a9bb547f2ef059490bb04d4acee73404f6b2",
+      "buildId": "gi-i66-fdbc65a59114-57f234755dc1"
+    }
+  },
+  "failedPreview": {
+    "status": "RAW_FAILURE_DIAGNOSTIC_VERIFIED_NOT_ACCEPTED",
+    "runId": 44169173376,
+    "jobId": 134343459567,
+    "bindingHead": "69b677906dcaaa50860535ff653fee3254fc8665",
+    "sourceSha": "fdbc65a59114d2858ce6884374eaf6c44d8ae9a9",
+    "artifactId": 14366593195,
+    "artifactDigest": "sha256:d6f0a0fe81b70bde770eecdd1ac456f9bd0abe71c6b0d0b8de4372b0ac38defd",
+    "rawPath": "diagnostic/i66-preview-failure-diagnostic.json",
+    "rawSha256": "dd36fb1d6670a0504cf5dd86c086064bba4cbe054751f0d5c9f9a4d192035590",
+    "failure": {
+      "owner": "ADVISOR",
+      "status": "HOLD",
+      "phase": "PREVIEW",
+      "failureStage": "PENDING_CXP_RELOAD",
+      "failureClass": "TIMEOUT_ERROR",
+      "failureCheck": "ASSERTION_OR_RUNTIME_FAILURE",
+      "failureLocation": {
+        "file": "gravicentra-i6-6-advisor-payables-signed-uat.cjs",
+        "line": 999,
+        "column": 26
+      },
+      "checks": 13,
+      "cleanupStatus": "HOLD",
+      "remaining": 0
+    },
+    "reportAvailability": [
+      {
+        "owner": "ADVISOR",
+        "status": "REPORT_CAPTURED"
+      },
+      {
+        "owner": "PROPOSAL",
+        "status": "REPORT_NOT_FOUND"
+      }
+    ],
+    "documentedTerms": {
+      "schemaVersion": "GI_I66_DOCUMENTED_TERMS_SIGNED_CHECK_V1",
+      "diagnosticOnly": true,
+      "status": "PASS",
+      "sourceSha": "fdbc65a59114d2858ce6884374eaf6c44d8ae9a9",
+      "phase": "PREVIEW",
+      "step": "SESSION_READBACK",
+      "ui": "PASS",
+      "durableReadbackCount": 2,
+      "writeAttempted": true,
+      "reloadPerformed": false,
+      "sessionPreserved": true,
+      "modalCancelled": true,
+      "realCustomerWrites": 0,
+      "financialPayments": 0,
+      "bankMovements": 0,
+      "cleanup": {
+        "status": "PASS",
+        "remaining": 0
+      },
+      "buildId": "gi-i66-fdbc65a59114-57f234755dc1",
+      "uiChecks": {
+        "unknownPaymentPreserved": true,
+        "totalExact": true,
+        "dateExact": true
+      }
+    },
+    "browserObservability": {
+      "status": "PASS",
+      "totals": {
+        "expectedDenials": 8,
+        "verifiedExpectedDenials": 8,
+        "observedConsoleErrors": 8,
+        "capturedConsoleErrors": 8,
+        "expectedNetworkConsoleErrors": 8,
+        "unexpectedConsoleErrors": 0,
+        "pageErrorCount": 0,
+        "unexpectedHttpErrors": 0,
+        "telemetryFailures": 0
+      }
+    },
+    "fourSignedDriversPassed": false,
+    "proposalProofAvailable": false,
+    "sourceIntakeNewProofAvailable": false,
+    "cleanupAccepted": false,
+    "actorUidSha256Available": false,
+    "reviewContextGenerated": false,
+    "newLiveAcceptance": false,
+    "underlyingTimeoutCause": "NOT_ESTABLISHED_BY_ARTIFACT; source/log analysis delegated to release agent"
+  },
+  "rawDiagnostic": {
+    "path": "artifacts/orbit360-recovery/release-control/I6_6_ADVISOR_RELOAD_FAILED_PREVIEW_DIAGNOSTIC_20261117.json",
+    "sha256": "dd36fb1d6670a0504cf5dd86c086064bba4cbe054751f0d5c9f9a4d192035590"
+  },
+  "logAndSourceComparison": {
+    "status": "FAILED_NOT_ACCEPTED_CAUSE_BOUNDARY_CONFIRMED_ROOT_CAUSE_NOT_YET_OBSERVABLE",
+    "runId": 44169173376,
+    "jobId": 134343459567,
+    "bindingHead": "69b677906dcaaa50860535ff653fee3254fc8665",
+    "sourceSha": "fdbc65a59114d2858ce6884374eaf6c44d8ae9a9",
+    "buildRunId": 44167538384,
+    "artifactId": 14365204653,
+    "failure": {
+      "failureStage": "PENDING_CXP_RELOAD",
+      "failureClass": "TIMEOUT_ERROR",
+      "failureCheck": "ASSERTION_OR_RUNTIME_FAILURE",
+      "failureLocation": {
+        "file": "gravicentra-i6-6-advisor-payables-signed-uat.cjs",
+        "line": 999,
+        "column": 26
+      }
+    },
+    "failedStatement": "await direction.page.waitForFunction(()=>!!window.Orbit?.productRuntimeBrowserProvidersP0&&!!window.Orbit?.productAppP0,null,{timeout:30000});",
+    "previousStatement": "await direction.page.reload({waitUntil:'commit',timeout:30000});",
+    "changedDriverLines": {
+      "previewBehavior": "No changed Preview branch; added LIVE authority preflight and LIVE helper branch are inactive in PREVIEW",
+      "reloadBlockComparedTo": "59c37ac9a2142c24ccb5a95f3d6df82eb62dfd94",
+      "reloadBlockByteIdentical": true,
+      "reloadBlockSha256": "7b72ba23836a985674077e680b3bbbd877de8789f5ddd143b92acb17f297c1cd"
+    },
+    "productAndBackendDiff": [
+      "M\torbit360-platform/docs/recovery/orbit360-recovery-state-v1.json"
+    ],
+    "observedOutcome": {
+      "readonlyRoleDriver": "PASS_IN_LOG",
+      "signedSyntheticCarlosPaulaDriver": "PASS_IN_LOG",
+      "advisorDriver": "HOLD",
+      "advisorChecks": 13,
+      "proposalDriver": "REPORT_NOT_FOUND_NOT_EXECUTED",
+      "previewSealing": "SKIPPED",
+      "previewReceipt": "SKIPPED",
+      "livePromotion": "NOT_EXECUTED"
+    },
+    "advisorCleanup": {
+      "status": "HOLD",
+      "remaining": 0,
+      "failureClasses": "NOT_PRESERVED_BY_SANITIZED_DIAGNOSTIC_OR_LOG"
+    },
+    "advisorObservability": {
+      "expectedDenials": 8,
+      "verifiedExpectedDenials": 8,
+      "observedConsoleErrors": 8,
+      "capturedConsoleErrors": 8,
+      "expectedNetworkConsoleErrors": 8,
+      "unexpectedConsoleErrors": 0,
+      "pageErrorCount": 0,
+      "unexpectedHttpErrors": 0,
+      "telemetryFailures": 0
+    },
+    "documentedTerms": {
+      "schemaVersion": "GI_I66_DOCUMENTED_TERMS_SIGNED_CHECK_V1",
+      "diagnosticOnly": true,
+      "status": "PASS",
+      "sourceSha": "fdbc65a59114d2858ce6884374eaf6c44d8ae9a9",
+      "phase": "PREVIEW",
+      "step": "SESSION_READBACK",
+      "ui": "PASS",
+      "durableReadbackCount": 2,
+      "writeAttempted": true,
+      "reloadPerformed": false,
+      "sessionPreserved": true,
+      "modalCancelled": true,
+      "realCustomerWrites": 0,
+      "financialPayments": 0,
+      "bankMovements": 0,
+      "cleanup": {
+        "status": "PASS",
+        "remaining": 0
+      },
+      "buildId": "gi-i66-fdbc65a59114-57f234755dc1",
+      "uiChecks": {
+        "unknownPaymentPreserved": true,
+        "totalExact": true,
+        "dateExact": true
+      }
+    },
+    "missingCausalObservations": [
+      "post-reload document readyState and safe route identity",
+      "which of two waited globals remained unavailable",
+      "post-reload scripts/styles completion or pending-resource class",
+      "cleanup failureClasses"
+    ],
+    "diagnosticLimits": [
+      "No evidence attributing failure to legal support change",
+      "No evidence of a product/backend source regression in this delta",
+      "No source-intake proof produced in this run because proposal driver was not reached",
+      "remaining zero does not make cleanup HOLD a PASS",
+      "Browser observability zero errors does not prove absence of a resource still pending"
+    ],
+    "nextMinimalActionProposal": "Capture the actual post-reload startup state and pending critical resource categories in a read-only diagnostic against the frozen Preview; do not rerun signed mutations blindly or increase timeout. Any source fix requires a newly built immutable artifact.",
+    "evidenceSha256": {
+      "preview_job.log": "0aa4ff622cb8fba1156c9ca65cf0de6ac3c7c09b9effa1c1c24b0468ee014f9d",
+      "terminal_metadata.json": "b154d99af9a500d80cd58fa53542d536ee24043b8ab7bfd1802c4f356c738bad",
+      "diagnostic.zip": "d6f0a0fe81b70bde770eecdd1ac456f9bd0abe71c6b0d0b8de4372b0ac38defd",
+      "diagnostic/i66-preview-failure-diagnostic.json": "dd36fb1d6670a0504cf5dd86c086064bba4cbe054751f0d5c9f9a4d192035590"
+    }
+  },
+  "observedFailure": {
+    "predicate": "providerPresent AND productAppPresent after reload(commit)",
+    "atLeastOneRequiredGlobalUnavailable": true,
+    "whichGlobalUnavailable": "NOT_CAPTURED",
+    "documentReadyState": "NOT_CAPTURED",
+    "pendingCriticalRequests": "NOT_CAPTURED",
+    "serviceWorkerControlled": "NOT_CAPTURED",
+    "cleanupFailureClasses": "NOT_RETAINED",
+    "underlyingStartupCauseProven": false,
+    "sameWaitAsPrior59c37AcceptedSource": true,
+    "productBackendDifference59c37ToFdbc": false
+  },
+  "provenDiagnosticDefect": {
+    "snapshotMissingAtReadinessFailure": true,
+    "cleanupFailureClassesDroppedBySanitizedExport": true,
+    "remainingZeroIsNotRestorePass": true,
+    "noUnexpectedErrorsDoesNotProveNoPendingRequests": true
+  },
+  "offlineMechanism": {
+    "status": "POSSIBLE_MECHANISM_REPRODUCED_NOT_CI_ROOT_CAUSE",
+    "result": {
+      "status": "OFFLINE_MECHANISM_REPRODUCED_NOT_CI_ROOT_CAUSE",
+      "source": "fdbc65a59114d2858ce6884374eaf6c44d8ae9a9",
+      "buildRunId": 44167538384,
+      "artifactServiceWorkerSha256": "42c303a1bd56e1bd165ff5ffa1533b061aebab4f7ec50c2fefbdf87f234aa6fb",
+      "synchronousOwnerExport": {
+        "providerPresent": true,
+        "appPresent": true,
+        "documentAccessRequired": false,
+        "navigatorAccessRequired": false,
+        "initializeOrActivateInvoked": false,
+        "ownerFiles": [
+          {
+            "file": "core/product-runtime-browser-providers-p0.js",
+            "sha256": "63f14d32afb134d961fbe4d7eb819885d38db9f02135830b8ab10e6f3bc6fc52"
+          },
+          {
+            "file": "core/product-app-p0.js",
+            "sha256": "da0f270815c7693dc1d20867110ba8c993f489252737e0f11bf873eab1de7190"
+          }
+        ]
+      },
+      "serviceWorkerPendingFetch": [
+        {
+          "pathname": "/core/product-runtime-browser-providers-p0.js",
+          "initial": {
+            "networkStarted": true,
+            "settled": false,
+            "timersMs": [],
+            "cacheLookups": 0
+          },
+          "afterAllOwnerTimers": {
+            "settled": false,
+            "cacheLookups": 0
+          },
+          "network": [
+            {
+              "url": "https://fixture.test/core/product-runtime-browser-providers-p0.js?v=fixture",
+              "cache": "no-store",
+              "abortSignal": false
+            }
+          ]
+        },
+        {
+          "pathname": "/core/product-app-p0.js",
+          "initial": {
+            "networkStarted": true,
+            "settled": false,
+            "timersMs": [],
+            "cacheLookups": 0
+          },
+          "afterAllOwnerTimers": {
+            "settled": false,
+            "cacheLookups": 0
+          },
+          "network": [
+            {
+              "url": "https://fixture.test/core/product-app-p0.js?v=fixture&orbitBuild=gi-i66-fdbc65a59114-57f234755dc1&criticalRelease=gi-i66-fdbc65a59114-57f234755dc1",
+              "cache": "no-store",
+              "abortSignal": false
+            }
+          ]
+        },
+        {
+          "pathname": "/styles/base.css",
+          "initial": {
+            "networkStarted": true,
+            "settled": false,
+            "timersMs": [],
+            "cacheLookups": 0
+          },
+          "afterAllOwnerTimers": {
+            "settled": false,
+            "cacheLookups": 0
+          },
+          "network": [
+            {
+              "url": "https://fixture.test/styles/base.css?v=fixture&orbitBuild=gi-i66-fdbc65a59114-57f234755dc1&criticalRelease=gi-i66-fdbc65a59114-57f234755dc1",
+              "cache": "no-store",
+              "abortSignal": false
+            }
+          ]
+        },
+        {
+          "pathname": "/core/access-role-session-owner-v20260728.js",
+          "initial": {
+            "networkStarted": true,
+            "settled": false,
+            "timersMs": [
+              8000
+            ],
+            "cacheLookups": 0
+          },
+          "afterAllOwnerTimers": {
+            "settled": true,
+            "cacheLookups": 1
+          },
+          "network": [
+            {
+              "url": "https://fixture.test/core/access-role-session-owner-v20260728.js?v=fixture",
+              "cache": "no-store",
+              "abortSignal": true
+            }
+          ]
+        }
+      ],
+      "conclusion": "Original SW generic requests can remain pending without cache fallback or owner timer even when a cached response exists. Runtime-contract requests exercise bounded fallback. CI resource/controller state was not retained, so this remains a possible mechanism."
+    },
+    "reproductionScriptSha256": "4a27d92f16a31bc747551c65bffe9bfd52f162b309f3d0bd7a70d751a751a900",
+    "reproductionScript": "'use strict';\n// Offline mechanism check. No network or production/Preview writes.\n// This does not establish which resource, if any, stalled in CI run 44169173376.\nconst fs=require('node:fs'),path=require('node:path'),vm=require('node:vm'),assert=require('node:assert/strict'),crypto=require('node:crypto');\nconst root=path.resolve(__dirname,'../repo');\nconst packageRoot=path.resolve(__dirname,'../release_plan/build_44167538384/immutable/package/bundle/site');\nconst sha=b=>crypto.createHash('sha256').update(b).digest('hex');\nconst swBytes=fs.readFileSync(path.join(packageRoot,'sw.js'));\nconst nextMicrotasks=async()=>{for(let i=0;i<40;i++)await Promise.resolve();};\nasync function workerPending(pathname){\n  const handlers={},timers=[],calls=[],matches=[];\n  const origin='https://fixture.test';\n  const cache={put:async()=>{},match:async key=>{matches.push(typeof key==='string'?key:key.url);return new Response('cached exact response',{status:200,headers:{'content-type':pathname.endsWith('.css')?'text/css':'text/javascript'}});}};\n  const sandbox={Request,Response,URL,AbortController,Promise,Error,\n    self:{location:{origin},addEventListener:(name,handler)=>{handlers[name]=handler;}},\n    caches:{open:async()=>cache},setTimeout:(fn,ms)=>{timers.push({fn,ms});return timers.length;},clearTimeout:()=>{},\n    fetch:(request,options)=>{calls.push({url:request.url,cache:options?.cache,abortSignal:!!options?.signal});return new Promise((resolve,reject)=>{\n      if(options?.signal)options.signal.addEventListener('abort',()=>reject(new Error('fixture request aborted')),{once:true});\n    });}};\n  vm.runInNewContext(swBytes.toString('utf8'),sandbox,{filename:'original-artifact-sw.js'});\n  let response,settled=false;\n  handlers.fetch({request:new Request(origin+pathname+'?v=fixture'),respondWith:p=>{response=p;}});\n  requirePromise(response);response.then(()=>{settled=true;},()=>{settled=true;});\n  await nextMicrotasks();\n  const initial={networkStarted:calls.length>0,settled,timersMs:timers.map(t=>t.ms),cacheLookups:matches.length};\n  for(const timer of [...timers])timer.fn();\n  await nextMicrotasks();\n  return {pathname,initial,afterAllOwnerTimers:{settled,cacheLookups:matches.length},network:calls};\n}\nfunction requirePromise(value){assert.ok(value&&typeof value.then==='function');}\nasync function main(){\n  const ownerContext={};ownerContext.window=ownerContext;\n  for(const key of ['document','navigator'])Object.defineProperty(ownerContext,key,{get(){throw new Error('UNEXPECTED_SYNCHRONOUS_'+key);}});\n  vm.createContext(ownerContext);\n  const ownerFiles=['core/product-runtime-browser-providers-p0.js','core/product-app-p0.js'];\n  const ownerEvidence=[];\n  for(const file of ownerFiles){const bytes=fs.readFileSync(path.join(root,'orbit360-platform',file));vm.runInContext(bytes.toString('utf8'),ownerContext,{filename:file});ownerEvidence.push({file,sha256:sha(bytes)});}\n  assert.equal(typeof ownerContext.Orbit.productRuntimeBrowserProvidersP0.initialize,'function');\n  assert.equal(typeof ownerContext.Orbit.productAppP0.activate,'function');\n  assert.equal(ownerContext.Orbit.productAppP0.status().started,false);\n  const rows=[];\n  for(const pathname of ['/core/product-runtime-browser-providers-p0.js','/core/product-app-p0.js','/styles/base.css','/core/access-role-session-owner-v20260728.js'])rows.push(await workerPending(pathname));\n  for(const row of rows.slice(0,3)){\n    assert.equal(row.initial.networkStarted,true);assert.deepEqual(row.initial.timersMs,[]);\n    assert.equal(row.afterAllOwnerTimers.settled,false);assert.equal(row.afterAllOwnerTimers.cacheLookups,0);\n  }\n  const bounded=rows[3];assert.deepEqual(bounded.initial.timersMs,[8000]);\n  assert.equal(bounded.afterAllOwnerTimers.settled,true);assert.ok(bounded.afterAllOwnerTimers.cacheLookups>0);\n  const result={status:'OFFLINE_MECHANISM_REPRODUCED_NOT_CI_ROOT_CAUSE',source:'fdbc65a59114d2858ce6884374eaf6c44d8ae9a9',\n    buildRunId:44167538384,artifactServiceWorkerSha256:sha(swBytes),\n    synchronousOwnerExport:{providerPresent:true,appPresent:true,documentAccessRequired:false,navigatorAccessRequired:false,\n      initializeOrActivateInvoked:false,ownerFiles:ownerEvidence},\n    serviceWorkerPendingFetch:rows,\n    conclusion:'Original SW generic requests can remain pending without cache fallback or owner timer even when a cached response exists. Runtime-contract requests exercise bounded fallback. CI resource/controller state was not retained, so this remains a possible mechanism.'};\n  fs.writeFileSync(path.join(__dirname,'readiness_mechanism_result.json'),JSON.stringify(result,null,2)+'\\n');\n  console.log(JSON.stringify(result,null,2));\n}\nmain().catch(error=>{console.error(error);process.exitCode=1;});\n",
+    "productionSourceModified": false
+  },
+  "sourceQa": {
+    "status": "PASS",
+    "passed": 192,
+    "failed": 0,
+    "skipped": 0,
+    "productSourceChanged": false,
+    "timeoutsChanged": false,
+    "logPath": "/workspace/scratch/3c07c381bc55/implementation_work/release_plan/startup_diagnostic_focused_tests.tap",
+    "logSha256": "ac4b8c25b06b6e46ccd4fade8080889d5238bd778686324e565667a21e12e0d7",
+    "ownerPaths": [
+      "tools/gravicentra-i6-6-advisor-payables-signed-uat.cjs",
+      ".github/workflows/gravicentra-i66-privileged-role-three-function-preview-uat.yml",
+      "tools/gravicentra-i6-6-operational-release-candidate.cjs",
+      ".github/workflows/gravicentra-release-delta-66-package.yml",
+      "tools/gravicentra-i6-6-advisor-startup-diagnostics.test.cjs",
+      "tools/gravicentra-i6-6-startup-readiness-diagnostics.cjs",
+      "tools/gravicentra-i6-6-startup-readiness-diagnostics.test.cjs"
+    ],
+    "ownerBlobShas": {
+      "tools/gravicentra-i6-6-advisor-payables-signed-uat.cjs": "a0ad3722d20ca8bf28f996f4080aa5b74c9418a3",
+      ".github/workflows/gravicentra-i66-privileged-role-three-function-preview-uat.yml": "9463107fc5f269a7a7506e0eda0c18dc093faecf",
+      "tools/gravicentra-i6-6-operational-release-candidate.cjs": "537e74d7989e85cbf8c5f2dbb20c7fbcbc521b7c",
+      ".github/workflows/gravicentra-release-delta-66-package.yml": "dffe401fabf10830a06525126c64779879f899b7",
+      "tools/gravicentra-i6-6-advisor-startup-diagnostics.test.cjs": "2917f358cbf7add83d604c7c93fc68a14f43a9f2",
+      "tools/gravicentra-i6-6-startup-readiness-diagnostics.cjs": "e5f7eac10f38e58679ac64d5a6d334820b3566cb",
+      "tools/gravicentra-i6-6-startup-readiness-diagnostics.test.cjs": "05ef466ca0dfea1d9944e82d83d6b54a359d5821"
+    },
+    "commands": [
+      "node --test tools/gravicentra-i6-6-startup-readiness-diagnostics.test.cjs tools/gravicentra-i6-6-advisor-startup-diagnostics.test.cjs tools/gravicentra-i6-6-advisor-browser-observability.test.cjs tools/gravicentra-i6-6-preview-failure-diagnostics-retention.test.cjs tools/gravicentra-i6-6-advisor-payables-signed-uat.test.cjs"
+    ]
+  },
+  "diagnosticSuccessorScope": {
+    "existingGate": "I6.6",
+    "existingDailyBlock": 2,
+    "existingFourDriversPreserved": true,
+    "existingThreeReadinessWaitsOnly": true,
+    "newReloadsAdded": 0,
+    "fixtureOrderUnchanged": true,
+    "timeoutsUnchanged": true,
+    "productAndBackendSourceUnchanged": true,
+    "serviceWorkerPolicyUnchanged": true,
+    "passiveReadOnlyDiagnosticsOnly": true,
+    "originalFailurePreserved": true,
+    "noNewLiveLegalAuthorization": true,
+    "newBuildRequiredForChangedQaOwners": true,
+    "newSourceIdentity": "EXACT_COMMIT_CONTAINING_THIS_RECEIPT_RESOLVED_BY_EXISTING_BUILD",
+    "retryScope": "Existing synthetic namespaces with fresh unique IDs and every target originally absent; no real financial retry or reimport."
+  },
+  "newSignedPreviewAcceptance": false,
+  "newLiveAcceptance": false,
+  "realFinancialWrites": 0,
+  "fullI66ProductionAccepted": false,
+  "newFormalPercentagePoints": 0,
+  "prior59c37SignedPreviewPassPreserved": true,
+  "currentLiveRemainsR11": true,
+  "next": "BUILD_EXACT_PASSIVE_QA_DIAGNOSTIC_SUCCESSOR_THEN_EXISTING_FOUR_SIGNED_DRIVERS; CAPTURE_ACTUAL_READINESS_BEFORE_ANY_RESTORE; LIVE_REQUIRES_NEW_EXACT_PASS_AND_MISSING_BOUNDED_LEGAL_CONSENT"
+}

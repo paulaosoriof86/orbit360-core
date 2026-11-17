@@ -1,0 +1,503 @@
+{
+  "schema": "I6_6_PREVIEW_DIAGNOSTIC_ONLY_V1",
+  "status": "FAILED_NOT_ACCEPTED",
+  "runId": 44169173376,
+  "sourceSha": "fdbc65a59114d2858ce6884374eaf6c44d8ae9a9",
+  "reports": [
+    {
+      "owner": "ADVISOR",
+      "status": "HOLD",
+      "phase": "PREVIEW",
+      "failureStage": "PENDING_CXP_RELOAD",
+      "failureClass": "TIMEOUT_ERROR",
+      "failureCheck": "ASSERTION_OR_RUNTIME_FAILURE",
+      "failureLocation": {
+        "file": "gravicentra-i6-6-advisor-payables-signed-uat.cjs",
+        "line": 999,
+        "column": 26
+      },
+      "financeUiDiagnostics": {
+        "beforeClick": {
+          "snapshotStatus": "CAPTURED",
+          "route": "FINANZAS",
+          "tabCount": 1,
+          "tabConnected": true,
+          "tabVisible": true,
+          "tabEnabled": true,
+          "rect": {
+            "x": 1056,
+            "y": 183,
+            "width": 132,
+            "height": 34
+          },
+          "centerInViewport": true,
+          "targetReceivesPointer": true,
+          "topTag": "DIV",
+          "topId": null,
+          "topClasses": [
+            "tab"
+          ],
+          "legalOverlayPresent": false,
+          "legalOverlayAtTarget": false,
+          "legalOverlayCount": 0,
+          "modalCount": 0,
+          "authRestoring": false
+        }
+      },
+      "documentedTerms": {
+        "schemaVersion": "GI_I66_DOCUMENTED_TERMS_SIGNED_CHECK_V1",
+        "diagnosticOnly": true,
+        "status": "PASS",
+        "sourceSha": "fdbc65a59114d2858ce6884374eaf6c44d8ae9a9",
+        "phase": "PREVIEW",
+        "step": "SESSION_READBACK",
+        "ui": "PASS",
+        "durableReadbackCount": 2,
+        "writeAttempted": true,
+        "reloadPerformed": false,
+        "sessionPreserved": true,
+        "modalCancelled": true,
+        "realCustomerWrites": 0,
+        "financialPayments": 0,
+        "bankMovements": 0,
+        "cleanup": {
+          "status": "PASS",
+          "remaining": 0
+        },
+        "buildId": "gi-i66-fdbc65a59114-57f234755dc1",
+        "uiChecks": {
+          "unknownPaymentPreserved": true,
+          "totalExact": true,
+          "dateExact": true
+        }
+      },
+      "browserObservability": {
+        "schemaVersion": "gravicentra-i66-browser-observability-v1",
+        "diagnosticOnly": true,
+        "status": "PASS",
+        "totals": {
+          "expectedDenials": 8,
+          "verifiedExpectedDenials": 8,
+          "observedConsoleErrors": 8,
+          "capturedConsoleErrors": 8,
+          "expectedNetworkConsoleErrors": 8,
+          "unexpectedConsoleErrors": 0,
+          "pageErrorCount": 0,
+          "unexpectedHttpErrors": 0,
+          "telemetryFailures": 0
+        },
+        "actorsSeen": 2,
+        "actorsTruncated": false,
+        "actors": [
+          {
+            "actorRole": "direccion",
+            "status": "PASS",
+            "expectedDenials": 6,
+            "verifiedExpectedDenials": 6,
+            "observedConsoleErrors": 6,
+            "capturedConsoleErrors": 6,
+            "expectedNetworkConsoleErrors": 6,
+            "unexpectedConsoleErrors": 0,
+            "pageErrorCount": 0,
+            "unexpectedHttpErrors": 0,
+            "telemetryFailures": 0,
+            "eventsSeen": 20,
+            "eventsTruncated": false,
+            "denialsSeen": 6,
+            "denialsTruncated": false,
+            "events": [
+              {
+                "eventType": "NETWORK_CANCELLED",
+                "actorRole": "direccion",
+                "stage": "SIGNED_SESSION",
+                "requestKey": "0d17eca463553c3b38bc93bed4c76af774cca25808a19bd85aa278f98afd4217",
+                "resourceType": "Fetch",
+                "endpointClass": "FUNCTIONS"
+              },
+              {
+                "eventType": "NETWORK_CANCELLED",
+                "actorRole": "direccion",
+                "stage": "SIGNED_SESSION",
+                "requestKey": "c04e497b4e0d2e15673ad4368213160c352aba0c319ae7e978a1249a6524f83f",
+                "resourceType": "Fetch",
+                "endpointClass": "FUNCTIONS"
+              },
+              {
+                "eventType": "NETWORK_CANCELLED",
+                "actorRole": "direccion",
+                "stage": "SIGNED_SESSION",
+                "requestKey": "726d794574cbf0f6f2e68b0a37c7b30f34c02cc7b91ecbcfe03807124511d7f3",
+                "resourceType": "Fetch",
+                "endpointClass": "FUNCTIONS"
+              },
+              {
+                "eventType": "NETWORK_CANCELLED",
+                "actorRole": "direccion",
+                "stage": "SIGNED_SESSION",
+                "requestKey": "a1f53fa5600c17cd85fa3fd46b7738bd137db9e8f0219e3d50f85911a8bb7a67",
+                "resourceType": "Fetch",
+                "endpointClass": "FUNCTIONS"
+              },
+              {
+                "eventType": "NETWORK_CANCELLED",
+                "actorRole": "direccion",
+                "stage": "DIRECTION_LEGAL_ACCEPTANCE",
+                "requestKey": "aaa411871ba98f08051e6348535cdb3481c7eab995c94d2ea283dbd16a4ec462",
+                "resourceType": "Fetch",
+                "endpointClass": "FUNCTIONS"
+              },
+              {
+                "eventType": "NETWORK_CANCELLED",
+                "actorRole": "direccion",
+                "stage": "SIGNED_SESSION",
+                "requestKey": "5e1ad8356d8a5bd2db380b257152d5f7b64083346e3738c28ea09f5cdcd1c399",
+                "resourceType": "Fetch",
+                "endpointClass": "FUNCTIONS"
+              },
+              {
+                "eventType": "NETWORK_CANCELLED",
+                "actorRole": "direccion",
+                "stage": "SIGNED_SESSION",
+                "requestKey": "c4186a96cb87470784342d41f07a7bd2b00eddf94c5c77be358b614e68ae3874",
+                "resourceType": "Fetch",
+                "endpointClass": "FUNCTIONS"
+              },
+              {
+                "eventType": "NETWORK_CANCELLED",
+                "actorRole": "direccion",
+                "stage": "ASSIGNMENT_DOCUMENTARY_UI",
+                "requestKey": "3c77170f17806daf5e2b97d96abc390393b6d4c852b2f81fac80b6a3781ee84f",
+                "resourceType": "Fetch",
+                "endpointClass": "FUNCTIONS"
+              },
+              {
+                "eventType": "HTTP_ERROR",
+                "actorRole": "direccion",
+                "stage": "REPLAY_AND_SOURCE_GUARDS",
+                "requestKey": "8289d3afc9a26acc4bfedcc667ce7f481c200566fa1fc7a563a25685e99bcb3b",
+                "status": 400,
+                "resourceType": "Fetch",
+                "endpointClass": "OWNED_NEGATIVE_CALLABLE",
+                "pathSha256": "0e237708b43bedf38eb826d30ffadd4c6b4e2a19987568d28ed0f86b72bdc2d1",
+                "denialId": "ADVISOR_CONFLICT",
+                "classification": "VERIFIED_EXPECTED_DENIAL"
+              },
+              {
+                "eventType": "NATIVE_CONSOLE_ERROR",
+                "actorRole": "direccion",
+                "stage": "REPLAY_AND_SOURCE_GUARDS",
+                "requestKey": "8289d3afc9a26acc4bfedcc667ce7f481c200566fa1fc7a563a25685e99bcb3b",
+                "endpointClass": "FUNCTIONS",
+                "pathSha256": "0e237708b43bedf38eb826d30ffadd4c6b4e2a19987568d28ed0f86b72bdc2d1",
+                "classification": "VERIFIED_EXPECTED_DENIAL",
+                "source": "network",
+                "line": null
+              },
+              {
+                "eventType": "HTTP_ERROR",
+                "actorRole": "direccion",
+                "stage": "REPLAY_AND_SOURCE_GUARDS",
+                "requestKey": "0b15f37d3c854ee5f1f663ab3789596419c0bbd97cc715fb46ebf2cc7aa94b84",
+                "status": 400,
+                "resourceType": "Fetch",
+                "endpointClass": "OWNED_NEGATIVE_CALLABLE",
+                "pathSha256": "0e237708b43bedf38eb826d30ffadd4c6b4e2a19987568d28ed0f86b72bdc2d1",
+                "denialId": "SOURCE_REINTERPRETATION",
+                "classification": "VERIFIED_EXPECTED_DENIAL"
+              },
+              {
+                "eventType": "NATIVE_CONSOLE_ERROR",
+                "actorRole": "direccion",
+                "stage": "REPLAY_AND_SOURCE_GUARDS",
+                "requestKey": "0b15f37d3c854ee5f1f663ab3789596419c0bbd97cc715fb46ebf2cc7aa94b84",
+                "endpointClass": "FUNCTIONS",
+                "pathSha256": "0e237708b43bedf38eb826d30ffadd4c6b4e2a19987568d28ed0f86b72bdc2d1",
+                "classification": "VERIFIED_EXPECTED_DENIAL",
+                "source": "network",
+                "line": null
+              },
+              {
+                "eventType": "HTTP_ERROR",
+                "actorRole": "direccion",
+                "stage": "LEGACY_GUARDS",
+                "requestKey": "a7d0551f57f219cf944ad9310d4b5c6671860461d592f72ac88ecf56a431b627",
+                "status": 400,
+                "resourceType": "Fetch",
+                "endpointClass": "OWNED_NEGATIVE_CALLABLE",
+                "pathSha256": "0e237708b43bedf38eb826d30ffadd4c6b4e2a19987568d28ed0f86b72bdc2d1",
+                "denialId": "HISTORICAL_PAYABLE",
+                "classification": "VERIFIED_EXPECTED_DENIAL"
+              },
+              {
+                "eventType": "NATIVE_CONSOLE_ERROR",
+                "actorRole": "direccion",
+                "stage": "LEGACY_GUARDS",
+                "requestKey": "a7d0551f57f219cf944ad9310d4b5c6671860461d592f72ac88ecf56a431b627",
+                "endpointClass": "FUNCTIONS",
+                "pathSha256": "0e237708b43bedf38eb826d30ffadd4c6b4e2a19987568d28ed0f86b72bdc2d1",
+                "classification": "VERIFIED_EXPECTED_DENIAL",
+                "source": "network",
+                "line": null
+              },
+              {
+                "eventType": "HTTP_ERROR",
+                "actorRole": "direccion",
+                "stage": "LEGACY_GUARDS",
+                "requestKey": "10275c8824ee5dfa4d18e155883290f776b97eda40197b0bc6a81401e2f02265",
+                "status": 400,
+                "resourceType": "Fetch",
+                "endpointClass": "OWNED_NEGATIVE_CALLABLE",
+                "pathSha256": "0e237708b43bedf38eb826d30ffadd4c6b4e2a19987568d28ed0f86b72bdc2d1",
+                "denialId": "HISTORICAL_COMMISSION",
+                "classification": "VERIFIED_EXPECTED_DENIAL"
+              },
+              {
+                "eventType": "NATIVE_CONSOLE_ERROR",
+                "actorRole": "direccion",
+                "stage": "LEGACY_GUARDS",
+                "requestKey": "10275c8824ee5dfa4d18e155883290f776b97eda40197b0bc6a81401e2f02265",
+                "endpointClass": "FUNCTIONS",
+                "pathSha256": "0e237708b43bedf38eb826d30ffadd4c6b4e2a19987568d28ed0f86b72bdc2d1",
+                "classification": "VERIFIED_EXPECTED_DENIAL",
+                "source": "network",
+                "line": null
+              },
+              {
+                "eventType": "HTTP_ERROR",
+                "actorRole": "direccion",
+                "stage": "LEGACY_GUARDS",
+                "requestKey": "7d617837d1035f3e4e6263660bac378e030f50d0222154eb6f4a26c14b623b05",
+                "status": 400,
+                "resourceType": "Fetch",
+                "endpointClass": "OWNED_NEGATIVE_CALLABLE",
+                "pathSha256": "0e237708b43bedf38eb826d30ffadd4c6b4e2a19987568d28ed0f86b72bdc2d1",
+                "denialId": "PROTECTED_COMMISSION",
+                "classification": "VERIFIED_EXPECTED_DENIAL"
+              },
+              {
+                "eventType": "NATIVE_CONSOLE_ERROR",
+                "actorRole": "direccion",
+                "stage": "LEGACY_GUARDS",
+                "requestKey": "7d617837d1035f3e4e6263660bac378e030f50d0222154eb6f4a26c14b623b05",
+                "endpointClass": "FUNCTIONS",
+                "pathSha256": "0e237708b43bedf38eb826d30ffadd4c6b4e2a19987568d28ed0f86b72bdc2d1",
+                "classification": "VERIFIED_EXPECTED_DENIAL",
+                "source": "network",
+                "line": null
+              },
+              {
+                "eventType": "HTTP_ERROR",
+                "actorRole": "direccion",
+                "stage": "LEGACY_GUARDS",
+                "requestKey": "10df1ec25a636097a95e5f3c970667dcf2095e0c50a754d9286b9dd31ee5ec4d",
+                "status": 400,
+                "resourceType": "Fetch",
+                "endpointClass": "OWNED_NEGATIVE_CALLABLE",
+                "pathSha256": "0e237708b43bedf38eb826d30ffadd4c6b4e2a19987568d28ed0f86b72bdc2d1",
+                "denialId": "PROTECTED_PAID_TOGGLE",
+                "classification": "VERIFIED_EXPECTED_DENIAL"
+              },
+              {
+                "eventType": "NATIVE_CONSOLE_ERROR",
+                "actorRole": "direccion",
+                "stage": "LEGACY_GUARDS",
+                "requestKey": "10df1ec25a636097a95e5f3c970667dcf2095e0c50a754d9286b9dd31ee5ec4d",
+                "endpointClass": "FUNCTIONS",
+                "pathSha256": "0e237708b43bedf38eb826d30ffadd4c6b4e2a19987568d28ed0f86b72bdc2d1",
+                "classification": "VERIFIED_EXPECTED_DENIAL",
+                "source": "network",
+                "line": null
+              }
+            ],
+            "denials": [
+              {
+                "denialId": "ADVISOR_CONFLICT",
+                "actorRole": "direccion",
+                "stage": "REPLAY_AND_SOURCE_GUARDS",
+                "expectedHttpStatus": 400,
+                "expectedFunctionsCode": "functions/failed-precondition",
+                "expectedReason": "ADVISOR_POLICY_CONFLICT",
+                "registered": true,
+                "requestKey": "8289d3afc9a26acc4bfedcc667ce7f481c200566fa1fc7a563a25685e99bcb3b",
+                "httpVerified": true,
+                "sdkVerified": true,
+                "status": "PASS"
+              },
+              {
+                "denialId": "SOURCE_REINTERPRETATION",
+                "actorRole": "direccion",
+                "stage": "REPLAY_AND_SOURCE_GUARDS",
+                "expectedHttpStatus": 400,
+                "expectedFunctionsCode": "functions/failed-precondition",
+                "expectedReason": "SOURCE_LINE_ALREADY_INTERPRETED",
+                "registered": true,
+                "requestKey": "0b15f37d3c854ee5f1f663ab3789596419c0bbd97cc715fb46ebf2cc7aa94b84",
+                "httpVerified": true,
+                "sdkVerified": true,
+                "status": "PASS"
+              },
+              {
+                "denialId": "HISTORICAL_PAYABLE",
+                "actorRole": "direccion",
+                "stage": "LEGACY_GUARDS",
+                "expectedHttpStatus": 400,
+                "expectedFunctionsCode": "functions/failed-precondition",
+                "expectedReason": "HISTORICAL_ADVISOR_BALANCE_LINK_REQUIRED",
+                "registered": true,
+                "requestKey": "a7d0551f57f219cf944ad9310d4b5c6671860461d592f72ac88ecf56a431b627",
+                "httpVerified": true,
+                "sdkVerified": true,
+                "status": "PASS"
+              },
+              {
+                "denialId": "HISTORICAL_COMMISSION",
+                "actorRole": "direccion",
+                "stage": "LEGACY_GUARDS",
+                "expectedHttpStatus": 400,
+                "expectedFunctionsCode": "functions/failed-precondition",
+                "expectedReason": "HISTORICAL_COMMISSION_LINK_REQUIRED",
+                "registered": true,
+                "requestKey": "10275c8824ee5dfa4d18e155883290f776b97eda40197b0bc6a81401e2f02265",
+                "httpVerified": true,
+                "sdkVerified": true,
+                "status": "PASS"
+              },
+              {
+                "denialId": "PROTECTED_COMMISSION",
+                "actorRole": "direccion",
+                "stage": "LEGACY_GUARDS",
+                "expectedHttpStatus": 400,
+                "expectedFunctionsCode": "functions/failed-precondition",
+                "expectedReason": null,
+                "registered": true,
+                "requestKey": "7d617837d1035f3e4e6263660bac378e030f50d0222154eb6f4a26c14b623b05",
+                "httpVerified": true,
+                "sdkVerified": true,
+                "status": "PASS"
+              },
+              {
+                "denialId": "PROTECTED_PAID_TOGGLE",
+                "actorRole": "direccion",
+                "stage": "LEGACY_GUARDS",
+                "expectedHttpStatus": 400,
+                "expectedFunctionsCode": "functions/failed-precondition",
+                "expectedReason": null,
+                "registered": true,
+                "requestKey": "10df1ec25a636097a95e5f3c970667dcf2095e0c50a754d9286b9dd31ee5ec4d",
+                "httpVerified": true,
+                "sdkVerified": true,
+                "status": "PASS"
+              }
+            ]
+          },
+          {
+            "actorRole": "operativo",
+            "status": "PASS",
+            "expectedDenials": 2,
+            "verifiedExpectedDenials": 2,
+            "observedConsoleErrors": 2,
+            "capturedConsoleErrors": 2,
+            "expectedNetworkConsoleErrors": 2,
+            "unexpectedConsoleErrors": 0,
+            "pageErrorCount": 0,
+            "unexpectedHttpErrors": 0,
+            "telemetryFailures": 0,
+            "eventsSeen": 4,
+            "eventsTruncated": false,
+            "denialsSeen": 2,
+            "denialsTruncated": false,
+            "events": [
+              {
+                "eventType": "HTTP_ERROR",
+                "actorRole": "operativo",
+                "stage": "OPERATIVE_FINANCIAL_DENIAL",
+                "requestKey": "6589d4797526fa2c15ab0bf5c19fee161254d960ba447b382b41b893cbf93dc3",
+                "status": 403,
+                "resourceType": "Fetch",
+                "endpointClass": "OWNED_NEGATIVE_CALLABLE",
+                "pathSha256": "0e237708b43bedf38eb826d30ffadd4c6b4e2a19987568d28ed0f86b72bdc2d1",
+                "denialId": "OPERATIVE_CXP",
+                "classification": "VERIFIED_EXPECTED_DENIAL"
+              },
+              {
+                "eventType": "NATIVE_CONSOLE_ERROR",
+                "actorRole": "operativo",
+                "stage": "OPERATIVE_FINANCIAL_DENIAL",
+                "requestKey": "6589d4797526fa2c15ab0bf5c19fee161254d960ba447b382b41b893cbf93dc3",
+                "endpointClass": "FUNCTIONS",
+                "pathSha256": "0e237708b43bedf38eb826d30ffadd4c6b4e2a19987568d28ed0f86b72bdc2d1",
+                "classification": "VERIFIED_EXPECTED_DENIAL",
+                "source": "network",
+                "line": null
+              },
+              {
+                "eventType": "HTTP_ERROR",
+                "actorRole": "operativo",
+                "stage": "ASSIGNMENT_DOCUMENTARY_UI",
+                "requestKey": "d7b17904403fca153df3edc9e55f367fd086958fceab002f132756dd4b952bad",
+                "status": 403,
+                "resourceType": "Fetch",
+                "endpointClass": "OWNED_NEGATIVE_CALLABLE",
+                "pathSha256": "0e237708b43bedf38eb826d30ffadd4c6b4e2a19987568d28ed0f86b72bdc2d1",
+                "denialId": "OPERATIVE_ASSIGNMENT",
+                "classification": "VERIFIED_EXPECTED_DENIAL"
+              },
+              {
+                "eventType": "NATIVE_CONSOLE_ERROR",
+                "actorRole": "operativo",
+                "stage": "ASSIGNMENT_DOCUMENTARY_UI",
+                "requestKey": "d7b17904403fca153df3edc9e55f367fd086958fceab002f132756dd4b952bad",
+                "endpointClass": "FUNCTIONS",
+                "pathSha256": "0e237708b43bedf38eb826d30ffadd4c6b4e2a19987568d28ed0f86b72bdc2d1",
+                "classification": "VERIFIED_EXPECTED_DENIAL",
+                "source": "network",
+                "line": null
+              }
+            ],
+            "denials": [
+              {
+                "denialId": "OPERATIVE_CXP",
+                "actorRole": "operativo",
+                "stage": "OPERATIVE_FINANCIAL_DENIAL",
+                "expectedHttpStatus": 403,
+                "expectedFunctionsCode": "functions/permission-denied",
+                "expectedReason": null,
+                "registered": true,
+                "requestKey": "6589d4797526fa2c15ab0bf5c19fee161254d960ba447b382b41b893cbf93dc3",
+                "httpVerified": true,
+                "sdkVerified": true,
+                "status": "PASS"
+              },
+              {
+                "denialId": "OPERATIVE_ASSIGNMENT",
+                "actorRole": "operativo",
+                "stage": "ASSIGNMENT_DOCUMENTARY_UI",
+                "expectedHttpStatus": 403,
+                "expectedFunctionsCode": "functions/permission-denied",
+                "expectedReason": null,
+                "registered": true,
+                "requestKey": "d7b17904403fca153df3edc9e55f367fd086958fceab002f132756dd4b952bad",
+                "httpVerified": true,
+                "sdkVerified": true,
+                "status": "PASS"
+              }
+            ]
+          }
+        ]
+      },
+      "checks": 13,
+      "cleanupStatus": "HOLD",
+      "remaining": 0
+    }
+  ],
+  "reportAvailability": [
+    {
+      "owner": "ADVISOR",
+      "status": "REPORT_CAPTURED"
+    },
+    {
+      "owner": "PROPOSAL",
+      "status": "REPORT_NOT_FOUND"
+    }
+  ]
+}
