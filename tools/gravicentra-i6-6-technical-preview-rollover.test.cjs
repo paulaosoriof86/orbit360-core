@@ -15,6 +15,11 @@ const receiptText = fs.readFileSync(path.join(__dirname, '..', pin.receiptPath),
 const receipt = JSON.parse(receiptText);
 const priorReceiptText = fs.readFileSync(path.join(__dirname, '..', receipt.priorRolloverReceipt.path), 'utf8');
 const priorReceipt = JSON.parse(priorReceiptText);
+// Historical failed-residual tests stay bound to their original immutable
+// receipt, independently of how many successful Preview backups follow it.
+const residualReceiptText = fs.readFileSync(path.join(__dirname, '..',
+  'artifacts/orbit360-recovery/release-control/I6_6_TECHNICAL_PREVIEW_ROLLOVER_CAUSAL_RETRY_20261116.json'), 'utf8');
+const residualReceipt = JSON.parse(residualReceiptText);
 const clone = value => structuredClone(value);
 const digest = text => crypto.createHash('sha256').update(text).digest('hex');
 
@@ -35,7 +40,7 @@ function fixture() {
     { channelId: 'live', release: { version: { name: p.version } } },
     ...Array.from({ length: 49 }, (_, i) => ({ channelId: 'untouched-' + i, release: { version: { name: 'sites/ays-orbit-360-lab/versions/untouched-' + i } } }))
   ] };
-  const expected = clone(priorReceipt.previousCandidate);
+  const expected = clone(residualReceipt.previousCandidate);
   const run = { id: expected.buildRunId, head_sha: expected.sourceSha, head_branch: a.branch,
     path: '.github/workflows/gravicentra-release-delta-66-package.yml', status: 'completed', conclusion: 'failure', run_attempt: 1 };
   const artifact = { id: expected.artifactId, name: 'gi-i66-immutable-' + expected.sourceSha,
@@ -51,7 +56,7 @@ function fixture() {
 // arguments. They do not claim that synthetic rows have the real archive hash.
 // Runtime independently calculates those hashes before calling this validator.
 function residualFixture() {
-  const p = priorReceipt.previousCandidate, boundary = p.backupOnlyPostDeployFailure;
+  const p = residualReceipt.previousCandidate, boundary = p.backupOnlyPostDeployFailure;
   const run = { id: p.buildRunId, run_attempt: 1, head_sha: p.sourceSha, head_branch: receipt.branch,
     path: '.github/workflows/gravicentra-release-delta-66-package.yml', status: 'completed', conclusion: 'failure' };
   const artifact = { id: boundary.evidenceArtifactId, name: 'gi-i66-technical-preview-rollover-' + p.buildRunId,
@@ -93,17 +98,19 @@ function manifest() {
 }
 
 test('exact independently authorized technical receipt has immutable bytes, not legal authorization', () => {
-  assert.equal(digest(receiptText), '215bfcc8fc5cffdf5c630a6696944791ea8859f0ffdd4cf35e8ba98e231eee41');
+  assert.equal(digest(receiptText), '2ebd606814ca551e548bbc7537fc6016b7e0926d4806083957aa9fc65e70b8ab');
   assert.equal(receipt.executionAuthority.newLegalConsentGrantUsedForHosting, false);
   assert.equal(api.validateAuthorization(fixture().control, receiptText).channel.id, 'gi-i66-rc-44009981499');
 });
-test('observability successor preserves exact prior receipt and keeps the historical failed build unaccepted', () => {
-  assert.equal(digest(priorReceiptText), 'f0c17d2597caa8d83b281fa5b42d02016c6223035a34d894fc8e65bea687cd5d');
+test('diagnostic retention successor preserves prior receipts and keeps the historical failed build unaccepted', () => {
+  assert.equal(digest(priorReceiptText), '215bfcc8fc5cffdf5c630a6696944791ea8859f0ffdd4cf35e8ba98e231eee41');
+  assert.equal(digest(residualReceiptText), 'f0c17d2597caa8d83b281fa5b42d02016c6223035a34d894fc8e65bea687cd5d');
   assert.equal(receipt.priorRolloverReceipt.preserveBytes, true);
-  assert.equal(priorReceipt.causalRetry.failedRunRemainsFailed, true);
+  assert.equal(priorReceipt.priorRolloverReceipt.sha256, digest(residualReceiptText));
+  assert.equal(residualReceipt.causalRetry.failedRunRemainsFailed, true);
   assert.equal(receipt.causalRetry.newSourceRequiresNewBuildDigest, true);
-  assert.equal(priorReceipt.previousCandidate.backupOnlyPostDeployFailure.noFunctionalAcceptance, true);
-  assert.equal(priorReceipt.previousCandidate.backupOnlyPostDeployFailure.neverEligibleForLive, true);
+  assert.equal(residualReceipt.previousCandidate.backupOnlyPostDeployFailure.noFunctionalAcceptance, true);
+  assert.equal(residualReceipt.previousCandidate.backupOnlyPostDeployFailure.neverEligibleForLive, true);
   assert.equal(receipt.previousCandidate.backupOnlyPostDeployFailure, undefined);
   assert.equal(receipt.causalRetry.doNotRetroactivelyClassifyConsole, true);
   assert.equal(receipt.causalRetry.preserveFunctionalChecksAndCleanup, true);
@@ -111,8 +118,64 @@ test('observability successor preserves exact prior receipt and keeps the histor
 test('candidate pin is a fresh exact object with the recoverable previous artifact', () => {
   const changed = guard.technicalRolloverCandidatePin(); changed.channel = 'live';
   assert.equal(guard.technicalRolloverCandidatePin().channel, 'gi-i66-rc-44009981499');
-  assert.equal(pin.previousArtifactId, 14300394824);
+  assert.equal(pin.previousArtifactId, 14303601582);
   assert.equal(api.validateCandidateReuse(fixture().candidate).receiptSha256, pin.receiptSha256);
+});
+test('retention rebuild is based on the exact current 42a package and latest metadata source', () => {
+  assert.equal(receipt.sourceBaseHead, 'cbbae0f2406a33fc4703044d28273b9e08f9692c');
+  assert.deepEqual(receipt.previousCandidate, {
+    sourceSha: '42a6764125f18106debc52edcb79741fe49e829c', buildRunId: 44026819055,
+    buildRunAttempt: 1, artifactId: 14303601582,
+    artifactDigest: 'sha256:210fb130f998f367faecefbc34c6287bf59cafcbede8002f345cfb813d4ed1b6',
+    expectedSiteFileCount: 223,
+    runtimeProofRequired: 'DOWNLOAD_HASH_ARCHIVE_VALIDATE_MANIFEST_AND_COMPARE_EVERY_HOSTED_FILE_INCLUDING_BUILD_JSON_BEFORE_REPLACEMENT'
+  });
+  assert.equal(receipt.channel.expectedVersion, 'sites/ays-orbit-360-lab/versions/0872d76b5697c205');
+  assert.equal(receipt.freshInventoryEvidence.totalChannels, 51);
+  assert.equal(receipt.freshInventoryEvidence.otherChannelsIdenticalFullMetadata, 50);
+  assert.equal(receipt.freshInventoryEvidence.freshRuntimeInventoryRequiredAgain, true);
+  assert.equal(receipt.freshInventoryEvidence.afterInventorySha256,
+    'b7774ec0068043a5f80054942e46d9132f284b742a274502df548f6631b9bfb2');
+  assert.deepEqual(receipt.protectedLive, priorReceipt.protectedLive);
+});
+test('retention correction leaves the failed signed run and unexplained errors on HOLD', () => {
+  assert.equal(receipt.causalRetry.failedSignedRunId, 44027761291);
+  assert.equal(receipt.causalRetry.failedSignedRunAttempt, 1);
+  assert.equal(receipt.causalRetry.failedSignedRunRemainsFailed, true);
+  assert.equal(receipt.causalRetry.failedDiagnosticArtifactId, 14303254179);
+  assert.equal(receipt.causalRetry.failedDiagnosticArtifactDigest,
+    'sha256:ed783225f8acf54ad0ca581e8752bd417209f00396f8a510cff4c369364320ae');
+  assert.equal(receipt.causalRetry.unexpectedErrorsRemainHold, true);
+  assert.equal(receipt.causalRetry.doNotRetroactivelyClassifyConsole, true);
+  assert.equal(receipt.causalRetry.noBackendOrFinancialRulesChange, true);
+  assert.equal(receipt.causalRetry.frontendDiagnosticOnly, true);
+  assert.equal(receipt.causalRetry.noProductRuntimeOrFinancialRulesChange, undefined);
+  assert.equal(receipt.causalRetry.noLiveOrRealPaymentAuthority, true);
+  assert.deepEqual(receipt.notAcceptance, priorReceipt.notAcceptance);
+});
+test('stale successful backup receipt or stale before version cannot authorize the current rollover', () => {
+  const f = fixture();
+  assert.throws(() => api.validateAuthorization(f.control, priorReceiptText), /EXACT_RECEIPT_BYTES_REQUIRED/);
+  f.inventory.result[0].release.version.name = priorReceipt.channel.expectedVersion;
+  assert.throws(() => api.validateChannels(f.control, receiptText, f.inventory), /PREVIEW_VERSION_DRIFT/);
+});
+test('current backup requires build success and never borrows historical residual or signed-QA failure', () => {
+  const f = acceptedBackupFixture();
+  f.run.conclusion = 'failure';
+  assert.throws(() => api.validateArtifact(f.run, f.artifact, f.expected,
+    { residualBackupProof: f.residualBackupProof }), /BACKUP_BUILD_NOT_SUCCESS/);
+  assert.throws(() => candidateGuard.validateArtifact(f.expected, f.run, f.artifact));
+  f.run.id = 44027761291;
+  assert.throws(() => api.validateArtifact(f.run, f.artifact, f.expected), /BUILD_ID_DRIFT/);
+});
+test('new receipt and diagnostic retention test are pinned immutable owners and existing build triggers', () => {
+  const workflow = fs.readFileSync(path.join(__dirname, '..', '.github/workflows/gravicentra-release-delta-66-package.yml'), 'utf8');
+  const paths = workflow.split('\npermissions:')[0];
+  for (const owner of [pin.receiptPath, 'tools/gravicentra-i6-6-preview-failure-diagnostics-retention.test.cjs']) {
+    assert.equal(candidateGuard.PINNED_OWNER_PATHS.filter(value => value === owner).length, 1);
+    assert.equal(paths.split('\n').filter(line => line.trim() === '- ' + owner).length, 1);
+  }
+  assert.ok(workflow.includes('node --test tools/gravicentra-i6-6-preview-failure-diagnostics-retention.test.cjs'));
 });
 test('fixed current Preview and accepted R11 channels validate, including project-qualified resources', () => {
   const f = fixture();
@@ -176,7 +239,7 @@ test('another project or site cannot be normalized into the exact target', () =>
   assert.throws(() => api.validateChannels(f.control, receiptText, f.inventory), /CHANNEL_RESOURCE_SCOPE_DENIED/);
 });
 test('current backup must be its exact successful whole build and unexpired artifact', () => {
-  const f = acceptedBackupFixture(); assert.equal(api.validateArtifact(f.run, f.artifact, f.expected).artifactId, 14300394824);
+  const f = acceptedBackupFixture(); assert.equal(api.validateArtifact(f.run, f.artifact, f.expected).artifactId, 14303601582);
 });
 for (const key of ['id', 'head_sha', 'head_branch', 'path', 'status', 'conclusion', 'run_attempt']) {
   test('previous artifact rejects build provenance drift ' + key, () => {
@@ -241,7 +304,7 @@ test('technical helper has no cloud mutation commands and preserves old public e
 });
 
 test('exact failed residual yields backup-only proof and never functional or release acceptance', () => {
-  const f = residualFixture(), p = priorReceipt.previousCandidate;
+  const f = residualFixture(), p = residualReceipt.previousCandidate;
   const proof = api.validateResidualBackup(f);
   assert.deepEqual(proof, { purpose: 'RECOVERABLE_UNACCEPTED_PREVIEW_BACKUP_ONLY', sourceSha: p.sourceSha,
     buildRunId: p.buildRunId, artifactId: p.artifactId, artifactDigest: p.artifactDigest,
@@ -303,7 +366,7 @@ for (const key of ['id', 'run_id', 'status', 'conclusion']) {
     const f = residualFixture(); f.jobs[1][key] = 'drift'; assert.throws(() => api.validateResidualBackup(f));
   });
 }
-for (const number of priorReceipt.previousCandidate.backupOnlyPostDeployFailure.requiredSuccessSteps) {
+for (const number of residualReceipt.previousCandidate.backupOnlyPostDeployFailure.requiredSuccessSteps) {
   for (const conclusion of ['failure', 'skipped', null]) {
     test('residual backup requires successful step ' + number + ', rejects ' + conclusion, () => {
       const f = residualFixture(); f.jobs[1].steps.find(s => s.number === number).conclusion = conclusion;

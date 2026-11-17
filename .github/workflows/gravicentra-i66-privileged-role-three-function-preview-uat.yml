@@ -64,6 +64,7 @@ jobs:
           node --test tools/gravicentra-i6-6-technical-preview-rollover.test.cjs
           node --test tools/gravicentra-i6-6-advisor-payables-signed-uat.test.cjs tools/gravicentra-i6-6-finance-ui-diagnostics.test.cjs
           node --test tools/gravicentra-i6-6-advisor-browser-observability.test.cjs
+          node --test tools/gravicentra-i6-6-preview-failure-diagnostics-retention.test.cjs
           node --test tools/gravicentra-i6-6-assignment-detail-navigation.test.cjs tools/gravicentra-i6-6-direction-preview-qa-navigation-retry.test.cjs tools/gravicentra-i6-6-preview-current-live-restore-47f4.test.cjs
           node --test tools/gravicentra-i6-6-proposal-uat-diagnostics.test.cjs tools/gravicentra-i6-6-direction-preview-proposal-diagnostic-retry.test.cjs tools/gravicentra-i6-6-preview-current-live-restore-39f54e2.test.cjs
           node tools/gravicentra-i6-6-operational-release-candidate.cjs preview
@@ -229,27 +230,91 @@ jobs:
           set -euo pipefail
           node - <<'NODE'
           const fs=require('node:fs'),path=require('node:path');
-          const {safeFinanceUiDiagnostics,safeLegalFailureSubstage}=require('./tools/gravicentra-i6-6-advisor-payables-signed-uat.cjs');
+          const {safeFinanceUiDiagnostics,safeLegalFailureSubstage,safeFailureEvidence}=require('./tools/gravicentra-i6-6-advisor-payables-signed-uat.cjs');
+          // Diagnostic projection only: never validate or reclassify a HOLD as
+          // acceptance. Preserve correlated evidence without arbitrary text,
+          // URLs, request payloads, headers, identity or console argument values.
+          const pick=(v,values,fallback=null)=>values.includes(v)?v:fallback;
+          const count=v=>Number.isSafeInteger(v)&&v>=0&&v<=1000000?v:null;
+          const bool=v=>typeof v==='boolean'?v:null;
+          const sha=v=>typeof v==='string'&&v.length===64&&/^[a-f0-9]{64}$/.test(v)?v:null;
+          const record=v=>v&&typeof v==='object'&&!Array.isArray(v)?v:{};
+          const stages=['BUILD_IDENTITY','FIXTURE_SETUP','SIGNED_SESSION','DIRECTION_LEGAL_ACCEPTANCE','OPERATIVE_FINANCIAL_DENIAL',
+            'FINANCE_UI_HYDRATION','DOCUMENT_FILE_UI_70','DOCUMENT_FILE_UI_60','REPLAY_AND_SOURCE_GUARDS','ASSIGNMENT_DOCUMENTARY_UI',
+            'ASSIGNMENT_RELOAD','LEGACY_GUARDS','LEGACY_FINANCE_EDIT','PENDING_CXP_RELOAD','SYNTHETIC_RESTORE','UNKNOWN_STAGE'];
+          const countKeys=['expectedDenials','verifiedExpectedDenials','observedConsoleErrors','capturedConsoleErrors',
+            'expectedNetworkConsoleErrors','unexpectedConsoleErrors','pageErrorCount','unexpectedHttpErrors','telemetryFailures'];
+          const denialIds=['OPERATIVE_CXP','OPERATIVE_ASSIGNMENT','ADVISOR_CONFLICT','SOURCE_REINTERPRETATION',
+            'HISTORICAL_PAYABLE','HISTORICAL_COMMISSION','PROTECTED_COMMISSION','PROTECTED_PAID_TOGGLE'];
+          const reasons=['ADVISOR_POLICY_CONFLICT','SOURCE_LINE_ALREADY_INTERPRETED','HISTORICAL_ADVISOR_BALANCE_LINK_REQUIRED','HISTORICAL_COMMISSION_LINK_REQUIRED'];
+          const endpointClasses=['FIRST_PARTY_SCRIPT','FIRST_PARTY','FUNCTIONS','GOOGLE_API','EXTERNAL','UNKNOWN','OWNED_NEGATIVE_CALLABLE'];
+          const resourceTypes=['Document','Stylesheet','Image','Media','Font','Script','TextTrack','XHR','Fetch','Prefetch','EventSource',
+            'WebSocket','Manifest','SignedExchange','Ping','CSPViolationReport','Preflight','Other'];
+          const telemetryCodes=['CDP_ATTACH_FAILED','CDP_ENABLE_FAILED','CDP_CALLBACK_FAILED','CDP_BARRIER_FAILED','BROWSER_CLOSE_FAILED',
+            'DENIAL_BODY_UNAVAILABLE','DENIAL_BODY_INVALID','DENIAL_HTTP_MISMATCH','DENIAL_SDK_MISMATCH','DENIAL_REQUEST_MISSING',
+            'DENIAL_REQUEST_REUSED','DENIAL_REDIRECT','DENIAL_CATALOG_MISMATCH','REQUEST_LIMIT_EXCEEDED','DUPLICATE_NATIVE_REQUEST',
+            'DENIAL_RESPONSE_TIMEOUT','EVENT_LIMIT_EXCEEDED','CONSOLE_EVENT_COVERAGE_MISMATCH'];
+          const counters=v=>Object.fromEntries(countKeys.map(k=>[k,count(record(v)[k])]));
+          function safeBrowserObservability(value){
+            const input=record(value),actors=Array.isArray(input.actors)?input.actors:[];
+            const actorRole=v=>pick(v,['direccion','operativo'],'UNKNOWN_ACTOR');
+            const stage=v=>pick(v,stages,'UNKNOWN_STAGE');
+            const fields=(value,schema)=>{const row=record(value);return Object.fromEntries(Object.entries(schema)
+              .filter(([key])=>Object.prototype.hasOwnProperty.call(row,key)).map(([key,project])=>[key,project(row[key])]));};
+            const eventSchema={eventType:v=>pick(v,['HTTP_ERROR','NATIVE_CONSOLE_ERROR','APPLICATION_CONSOLE_ERROR','NETWORK_FAILURE',
+              'NETWORK_CANCELLED','PAGE_ERROR','TELEMETRY_FAILURE'],'UNKNOWN_EVENT'),actorRole,stage,requestKey:sha,
+              status:v=>Number.isInteger(v)&&v>=100&&v<=599?v:null,resourceType:v=>pick(v,resourceTypes,'Other'),
+              endpointClass:v=>pick(v,endpointClasses,'UNKNOWN'),pathSha256:sha,denialId:v=>pick(v,denialIds),
+              classification:v=>pick(v,['VERIFIED_EXPECTED_DENIAL','UNEXPECTED'],'UNKNOWN'),
+              source:v=>pick(v,['xml','javascript','network','storage','appcache','rendering','security','deprecation','worker',
+                'violation','intervention','recommendation','other'],'other'),line:count,column:count,
+              argumentTypes:v=>Array.isArray(v)?v.slice(0,8).map(t=>pick(t,['object','function','undefined','string','number','boolean','symbol','bigint','unknown'],'unknown')):[],
+              code:v=>pick(v,telemetryCodes,'UNKNOWN_TELEMETRY')};
+            const denialSchema={denialId:v=>pick(v,denialIds),actorRole,stage,expectedHttpStatus:v=>pick(v,[400,403]),
+              expectedFunctionsCode:v=>pick(v,['functions/permission-denied','functions/failed-precondition']),expectedReason:v=>pick(v,reasons),
+              registered:bool,requestKey:sha,httpVerified:bool,sdkVerified:bool,status:v=>pick(v,['PASS','HOLD'],'UNKNOWN')};
+            return {schemaVersion:pick(input.schemaVersion,['gravicentra-i66-browser-observability-v1'],'UNKNOWN'),
+              diagnosticOnly:true,status:pick(input.status,['PASS','HOLD'],'UNKNOWN'),totals:counters(input.totals),
+              actorsSeen:Array.isArray(input.actors)?count(input.actors.length):null,actorsTruncated:actors.length>2,
+              actors:actors.slice(0,2).map(value=>{const row=record(value),events=Array.isArray(row.events)?row.events:[],denials=Array.isArray(row.denials)?row.denials:[];
+                return {actorRole:actorRole(row.actorRole),status:pick(row.status,['PASS','HOLD'],'UNKNOWN'),...counters(row),
+                  eventsSeen:Array.isArray(row.events)?count(row.events.length):null,eventsTruncated:events.length>502,
+                  denialsSeen:Array.isArray(row.denials)?count(row.denials.length):null,denialsTruncated:denials.length>8,
+                  events:events.slice(0,502).map(v=>fields(v,eventSchema)),denials:denials.slice(0,8).map(v=>fields(v,denialSchema))};})};
+          }
           const candidates=[
             path.join(process.env.RUNNER_TEMP,'gravicentra-i66-advisor-payables-signed-uat-preview.json'),
             process.env.I66_PACKAGE_ROOT?path.join(process.env.I66_PACKAGE_ROOT,'evidence','i66-proposal-application-signed-uat-preview.json'):null
           ].filter(Boolean);
-          const safe={schema:'I6_6_PREVIEW_DIAGNOSTIC_ONLY_V1',status:'FAILED_NOT_ACCEPTED',runId:Number(process.env.GITHUB_RUN_ID),sourceSha:process.env.SOURCE_SHA||null,reports:[]};
-          const keys=['status','phase','failureStage','failureCheck','failureLine','failureClass'];
+          const source=process.env.SOURCE_SHA,workflowRunId=Number(process.env.GITHUB_RUN_ID);
+          const safe={schema:'I6_6_PREVIEW_DIAGNOSTIC_ONLY_V1',status:'FAILED_NOT_ACCEPTED',runId:Number.isSafeInteger(workflowRunId)&&workflowRunId>0?workflowRunId:null,
+            sourceSha:typeof source==='string'&&source.length===40&&/^[a-f0-9]{40}$/.test(source)?source:null,reports:[],reportAvailability:[]};
+          if(!process.env.I66_PACKAGE_ROOT)safe.reportAvailability.push({owner:'PROPOSAL',status:'REPORT_PATH_UNAVAILABLE'});
           for(const file of candidates){
-            if(!fs.existsSync(file))continue;
-            const r=JSON.parse(fs.readFileSync(file,'utf8')),out={};
+            const owner=path.basename(file)==='i66-proposal-application-signed-uat-preview.json'?'PROPOSAL':'ADVISOR';
+            if(!fs.existsSync(file)){safe.reportAvailability.push({owner,status:'REPORT_NOT_FOUND'});continue;}
+            let r;
+            try{const bytes=fs.readFileSync(file,'utf8');if(bytes.length>4194304)throw Error('REPORT_BOUND');r=JSON.parse(bytes);if(!r||typeof r!=='object'||Array.isArray(r))throw Error('REPORT_SHAPE');}
+            catch{safe.reportAvailability.push({owner,status:'REPORT_UNREADABLE'});continue;}
+            safe.reportAvailability.push({owner,status:'REPORT_CAPTURED'});const out={owner};
             if(path.basename(file)==='i66-proposal-application-signed-uat-preview.json'){
               const {safeProposalDiagnosticReport}=require('./tools/gravicentra-i6-6-proposal-uat-diagnostics.cjs');
               safe.reports.push(safeProposalDiagnosticReport(r));continue;
             }
-            for(const k of keys){const v=r[k];if(typeof v==='number'&&Number.isSafeInteger(v))out[k]=v;else if(typeof v==='string'&&/^[A-Za-z0-9_.:-]{1,160}$/.test(v))out[k]=v;}
+            out.status=pick(r.status,['PASS','HOLD','FAIL'],'HOLD');out.phase=pick(r.phase,['PREVIEW','LIVE']);
+            if(r.failureStage!==undefined){
+              out.failureStage=pick(r.failureStage,stages,'UNKNOWN_STAGE');
+              out.failureClass=pick(r.failureClass,['ERR_ASSERTION','TIMEOUT_ERROR','ASSERTION_OR_RUNTIME_FAILURE'],'ASSERTION_OR_RUNTIME_FAILURE');
+              out.failureCheck=safeFailureEvidence({message:typeof r.failureCheck==='string'?r.failureCheck:''},out.failureStage).failureCheck;
+              if(r.failureLine!==undefined)out.failureLine=count(r.failureLine);
+            }
             const legalSubstage=safeLegalFailureSubstage(r.failureLegalSubstage);
             if(r.failureStage==='DIRECTION_LEGAL_ACCEPTANCE'&&legalSubstage)out.failureLegalSubstage=legalSubstage;
             const location=r.failureLocation;
             if(location?.file==='gravicentra-i6-6-advisor-payables-signed-uat.cjs'&&Number.isSafeInteger(location.line)&&location.line>0&&Number.isSafeInteger(location.column)&&location.column>0)
               out.failureLocation={file:location.file,line:location.line,column:location.column};
             if(r.financeUiDiagnostics)out.financeUiDiagnostics=safeFinanceUiDiagnostics(r.financeUiDiagnostics);
+            if(r.browserObservability!==undefined)out.browserObservability=safeBrowserObservability(r.browserObservability);
             out.checks=Array.isArray(r.checks)?r.checks.length:0;
             if(r.cleanup){out.cleanupStatus=['PASS','HOLD'].includes(r.cleanup.status)?r.cleanup.status:'UNKNOWN';out.remaining=Number.isSafeInteger(r.cleanup.remaining)?r.cleanup.remaining:null;}
             safe.reports.push(out);

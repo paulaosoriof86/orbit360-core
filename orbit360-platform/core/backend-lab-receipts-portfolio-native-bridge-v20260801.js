@@ -365,6 +365,26 @@
   function receiptLockedForEdit(r){
     var op=low(r&&r.estadoOperativo);return !!(r&&(r.fechaPago||r.conciliado===true||r.conciliadoPago===true||op==='pago_reportado'||clean(r.fechaPagoReportada)||clean(r.reportado)||low(r.estado)==='pagado'||low(r.estado)==='conciliado'));
   }
+  // The engine retains a callable/transport code, never display its raw message.
+  // This diagnostic does not imply that a failed or unconfirmed write was applied.
+  function receiptEditFailureText(out){
+    var localCodes=['permiso_poliza_denegado','contrato_atomico_no_disponible','recibo_no_encontrado','recibo_con_evidencia_pago_protegido','motivo_requerido','poliza_no_encontrada','recibo_fecha_invalida','recibo_edit_readback_missing','recibo_edit_commit_failed'];
+    var transportCodes=['PRODUCT_BATCH_INVALID','PRODUCT_BATCH_MUTATION_INVALID','PRODUCT_BATCH_DUPLICATE_TARGET','PRODUCT_BATCH_INSERT_ALREADY_EXISTS','PRODUCT_BATCH_UPDATE_NOT_FOUND','PRODUCT_BATCH_REMOVE_NOT_FOUND','PRODUCT_WRITE_MEMBERSHIP_REQUIRED','PRODUCT_WRITE_AUTH_CONTEXT_MISSING','PRODUCT_WRITE_AUTH_CONTEXT_MISMATCH','PRODUCT_WRITE_AUTH_RESTORE_TIMEOUT','PRODUCT_WRITE_ACCESS_OWNER_MISSING','PRODUCT_WRITE_ACCESS_DENIED','PRODUCT_WRITE_RECORD_SCOPE_DENIED','PRODUCT_WRITE_COLLECTION_NOT_AUTHORIZED','PRODUCT_WRITE_SERVER_TRANSPORT_REQUIRED','PRODUCT_SERVER_CANONICAL_READBACK_REQUIRED','PRODUCT_RUNTIME_NOT_CONFIGURED','PROTECTED_READ_CANDIDATE_DISABLED','PROTECTED_READ_HOST_DENIED'];
+    var callableCodes=['cancelled','unknown','invalid-argument','deadline-exceeded','not-found','already-exists','permission-denied','resource-exhausted','failed-precondition','aborted','out-of-range','unimplemented','internal','unavailable','data-loss','unauthenticated'];
+    var readbackCodes=['PRODUCT_SERVER_CANONICAL_READBACK_TARGET_MISSING','PRODUCT_SERVER_CANONICAL_DELETE_NOT_CONFIRMED','PRODUCT_SERVER_CANONICAL_WRITE_NOT_CONFIRMED'];
+    var errors=out&&Array.isArray(out.errors)?out.errors.slice(0,4):[],safeErrors=[];
+    errors.forEach(function(value){
+      if(typeof value!=='string')return;
+      if(localCodes.indexOf(value)>=0&&safeErrors.indexOf(value)<0)safeErrors.push(value);
+      else if(/^recibo_valor_invalido:(primaNeta|gastosExpedicion|gastosFinanciamiento|descuento|impuestosIVA|primaTotal)(?![\s\S])/.test(value)&&safeErrors.indexOf('recibo_valor_invalido')<0)safeErrors.push('recibo_valor_invalido');
+    });
+    var raw=out&&typeof out.error==='string'?out.error:'',code='ERROR_NO_CLASIFICADO';
+    if(transportCodes.indexOf(raw)>=0)code=raw;
+    else if(callableCodes.indexOf(raw.replace(/^functions\//,''))>=0)code=raw;
+    else readbackCodes.forEach(function(value){if(raw===value||raw.indexOf(value+':')===0)code=value;});
+    var op=out&&typeof out.operationId==='string'&&/^recedit_[a-z0-9]{8,12}_[a-z0-9]{1,5}(?![\s\S])/.test(out.operationId)?out.operationId:'';
+    return 'No fue posible actualizar este recibo: '+(safeErrors.join(', ')||'recibo_edit_no_confirmado')+'. Código: '+code+'.'+(op?' Operación: '+op+'.':'')+' Revisa el recibo antes de reintentar; esta respuesta no confirma que el cambio se haya aplicado.';
+  }
   function editReceipt(receiptId,cid){
     var r=Orbit.store.get('recibosEsperados',receiptId);if(!r)return false;
     if(receiptLockedForEdit(r)){try{Orbit.ui.toast('La edición está bloqueada porque existe evidencia de pago. Usa una gestión controlada para corregirlo.');}catch(e){}return false;}
@@ -397,7 +417,7 @@
       if(!Object.keys(patch).length){error.style.display='';error.textContent='No hay cambios en los datos del recibo.';return;}
       save.disabled=true;save.textContent='Guardando…';
       var out=await Orbit.policyReceipts.updateReceipt(receiptId,patch,{motivo:reason});
-      if(!out||out.ok!==true){error.style.display='';error.textContent='No fue posible actualizar este recibo: '+[].concat(out&&out.errors||[]).join(', ');save.disabled=false;save.textContent='Guardar recibo';return;}
+      if(!out||out.ok!==true){error.style.display='';error.textContent=receiptEditFailureText(out);save.disabled=false;save.textContent='Guardar recibo';return;}
       close();renderReceiptDetail(receiptId,cid||r.clienteId);try{Orbit.ui.toast('Recibo actualizado y confirmado en servidor.');}catch(e){}
     });
     return true;

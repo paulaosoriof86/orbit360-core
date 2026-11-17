@@ -2395,6 +2395,31 @@
           }
         }
       ]
+    },
+    {
+      "id": "I6_6_RECEIPT_EDIT_FAIL_CLOSED_SAFE_DIAGNOSTICS_20261117",
+      "approvedByDirection": true,
+      "receipt": "artifacts/orbit360-recovery/release-control/I6_6_TECHNICAL_PREVIEW_DIAGNOSTIC_RETENTION_REBUILD_20261117.json",
+      "sourceStatus": "LOCAL_DIAGNOSTIC_TESTS_PASS_BUSINESS_WRITE_FAILURE_UNRESOLVED_PREVIEW_AND_LIVE_PENDING",
+      "parentSourceSha": "cbbae0f2406a33fc4703044d28273b9e08f9692c",
+      "scope": "Existing receipt editor exposes only allowlisted failure codes and a strictly validated operation reference. Preserve the failed form, sparse request, writer, role/country/tenant scope and success path. No backend cause or successful operational write is claimed. No backend, financial rule, payment, LIVE or authorization change; signed Preview and exact-artifact gates remain mandatory.",
+      "paths": [
+        {
+          "path": "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js",
+          "gitBlobSha": "0eeff59805548418a58d45625f12564c4e009ed7",
+          "replaces": {
+            "path": "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js",
+            "priorGitBlobSha": "abf7ada42b69c7d2cdf21558255b964f2f76b087",
+            "priorChangeId": "I6_6_RECEIPT_SOURCE_NUMBER_AND_SPARSE_DURABLE_PATCH"
+          }
+        }
+      ],
+      "tests": [
+        {
+          "path": "tools/gravicentra-i6-6-receipt-edit-safe-diagnostics.test.cjs",
+          "gitBlobSha": "c4b27328a8c02f469ad0b43128c772d95d0ff53c"
+        }
+      ]
     }
   ],
   "i66R11PreviewBuildRequest20261113": {

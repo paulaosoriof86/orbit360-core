@@ -18,6 +18,8 @@ on:
       - .github/workflows/gravicentra-i66-privileged-role-three-function-preview-uat.yml
       - tools/gravicentra-i6-6-advisor-payables-signed-uat.cjs
       - tools/gravicentra-i6-6-advisor-browser-observability.test.cjs
+      - tools/gravicentra-i6-6-preview-failure-diagnostics-retention.test.cjs
+      - tools/gravicentra-i6-6-receipt-edit-safe-diagnostics.test.cjs
       - tools/gravicentra-i6-6-direction-preview-legal-acceptance.cjs
       - tools/gravicentra-i6-6-direction-preview-i66-consent-scope.test.cjs
       - artifacts/orbit360-recovery/release-control/I6_6_DIRECTION_PREVIEW_V2_SCOPE_AUTHORIZATION_20261116.json
@@ -25,6 +27,7 @@ on:
       - tools/gravicentra-i6-6-technical-preview-rollover.test.cjs
       - artifacts/orbit360-recovery/release-control/I6_6_TECHNICAL_PREVIEW_ROLLOVER_CAUSAL_RETRY_20261116.json
       - artifacts/orbit360-recovery/release-control/I6_6_CURRENT_TECHNICAL_PREVIEW_ROLLOVER_20261116.json
+      - artifacts/orbit360-recovery/release-control/I6_6_TECHNICAL_PREVIEW_DIAGNOSTIC_RETENTION_REBUILD_20261117.json
       - tools/gravicentra-i6-6-preview-current-live-restore.cjs
       - tools/gravicentra-i6-6-operational-release-candidate.cjs
       - tools/gravicentra-i6-6-preview-candidate-binding.test.cjs
@@ -265,6 +268,7 @@ jobs:
           node --test tools/gravicentra-i6-6-direction-preview-i66-consent-scope.test.cjs
           node --test tools/gravicentra-i6-6-technical-preview-rollover.test.cjs
           node --test tools/gravicentra-i6-6-advisor-browser-observability.test.cjs
+          node --test tools/gravicentra-i6-6-preview-failure-diagnostics-retention.test.cjs
           node --test tools/gravicentra-i6-6-assignment-detail-navigation.test.cjs tools/gravicentra-i6-6-direction-preview-qa-navigation-retry.test.cjs tools/gravicentra-i6-6-preview-current-live-restore-47f4.test.cjs
           node --test tools/gravicentra-i6-6-proposal-uat-diagnostics.test.cjs tools/gravicentra-i6-6-direction-preview-proposal-diagnostic-retry.test.cjs tools/gravicentra-i6-6-preview-current-live-restore-39f54e2.test.cjs
           node tools/gravicentra-governance-preflight-v1.mjs --mode=i6

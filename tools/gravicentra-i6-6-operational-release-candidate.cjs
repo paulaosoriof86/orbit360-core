@@ -56,7 +56,10 @@ const PINNED_OWNER_PATHS = Object.freeze([
   'artifacts/orbit360-recovery/release-control/I6_6_CURRENT_TECHNICAL_PREVIEW_ROLLOVER_20261116.json',
   'artifacts/orbit360-recovery/release-control/I6_6_TECHNICAL_PREVIEW_ROLLOVER_CAUSAL_RETRY_20261116.json',
   'artifacts/orbit360-recovery/release-control/I6_6_TECHNICAL_PREVIEW_OBSERVABILITY_REBUILD_20261116.json',
+  'artifacts/orbit360-recovery/release-control/I6_6_TECHNICAL_PREVIEW_DIAGNOSTIC_RETENTION_REBUILD_20261117.json',
   'tools/gravicentra-i6-6-advisor-browser-observability.test.cjs',
+  'tools/gravicentra-i6-6-preview-failure-diagnostics-retention.test.cjs',
+  'tools/gravicentra-i6-6-receipt-edit-safe-diagnostics.test.cjs',
   'tools/gravicentra-i66-cartera-a1-a4-readonly.cjs',
   'tools/gravicentra-i66-cartera-a1-a4-readonly.test.cjs',
   // Preserve the exact QA-only navigation retry and its restore proof after build.
