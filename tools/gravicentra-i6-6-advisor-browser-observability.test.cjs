@@ -369,3 +369,80 @@ test('driver final report follows synthetic restoration, browser close and captu
   assert.match(source,/originalFailureStage=stage/);assert.match(source,/validateBrowserObservability\(report\.browserObservability\)/);
   assert.doesNotMatch(source,/console\.error\s*=|route\(|page\.on\('console',[^\n]*\.text\(/);
 });
+
+// Keep the product-manifest-sealed retention suite byte-identical. These four
+// added cases exercise the same failure exporter here without importing a suite.
+{
+const advisor=driver,vm=require('node:vm'),documented=require('./gravicentra-i6-6-documented-terms-signed-check.cjs');
+const clone=value=>JSON.parse(JSON.stringify(value)),secret='PRIVATE_CUSTOMER_EMAIL_TOKEN_DO_NOT_EXPORT';
+const yaml=fs.readFileSync(path.join(__dirname,'../.github/workflows/gravicentra-i66-privileged-role-three-function-preview-uat.yml'),'utf8');
+const section=yaml.split('- name: Preserve sanitized failure diagnostics without an acceptance proof')[1].split('- name: Upload diagnostics only')[0];
+const code=section.split("node - <<'NODE'\n")[1].split('\n          NODE')[0].split('\n').map(line=>line.replace(/^          /,'')).join('\n');
+function execute({advisor:advisorReport}){
+  const name='/tmp/i66-network-retention/gravicentra-i66-advisor-payables-signed-uat-preview.json';
+  const files=new Map([[name,JSON.stringify(advisorReport)]]),writes=[];let written;
+  const fakeFs={existsSync:name=>files.has(name),readFileSync:name=>files.get(name),
+    writeFileSync:(name,value)=>{writes.push(name);written=JSON.parse(value);}};
+  vm.runInNewContext(code,{require:name=>{
+    if(name==='node:fs')return fakeFs;if(name==='node:path')return path;
+    if(name==='./tools/gravicentra-i6-6-advisor-payables-signed-uat.cjs')return advisor;
+    if(name==='./tools/gravicentra-i6-6-documented-terms-signed-check.cjs')return documented;
+    throw Error('UNEXPECTED_DIAGNOSTIC_DEPENDENCY');
+  },process:{env:{RUNNER_TEMP:'/tmp/i66-network-retention',I66_PACKAGE_ROOT:'/tmp/i66-package',GITHUB_RUN_ID:'44027761291',SOURCE_SHA:'a'.repeat(40)}}});
+  assert.deepEqual(writes,['/tmp/i66-network-retention/i66-preview-failure-diagnostic.json']);return written;
+}
+const counts={expectedDenials:8,verifiedExpectedDenials:8,observedConsoleErrors:10,capturedConsoleErrors:10,
+  expectedNetworkConsoleErrors:8,unexpectedConsoleErrors:2,pageErrorCount:0,unexpectedHttpErrors:2,telemetryFailures:0};
+function fixture(){
+  const http={eventType:'HTTP_ERROR',actorRole:'direccion',stage:'FINANCE_UI_HYDRATION',requestKey:'b'.repeat(64),
+    status:403,resourceType:'Fetch',endpointClass:'FUNCTIONS',pathSha256:'c'.repeat(64),classification:'UNEXPECTED'};
+  const native={eventType:'NATIVE_CONSOLE_ERROR',actorRole:'direccion',stage:'FINANCE_UI_HYDRATION',requestKey:'b'.repeat(64),
+    source:'network',endpointClass:'FUNCTIONS',pathSha256:'c'.repeat(64),line:0,classification:'UNEXPECTED'};
+  return {status:'HOLD',phase:'PREVIEW',sourceSha:'a'.repeat(40),failureStage:'FINANCE_UI_HYDRATION',
+    failureCheck:'ADVISOR_UAT_BROWSER_OBSERVABILITY_HOLD',failureClass:'ASSERTION_OR_RUNTIME_FAILURE',
+    failureLocation:{file:'gravicentra-i6-6-advisor-payables-signed-uat.cjs',line:1104,column:90},
+    checks:Array.from({length:15},(_,i)=>({name:'SYNTHETIC_CHECK_'+i,status:'PASS'})),cleanup:{status:'PASS',remaining:0},
+    browserObservability:{schemaVersion:'gravicentra-i66-browser-observability-v1',status:'HOLD',totals:{...counts},actors:[
+      {actorRole:'direccion',status:'HOLD',...counts,events:[http,native],denials:[{denialId:'ADVISOR_CONFLICT',actorRole:'direccion',stage:'REPLAY_AND_SOURCE_GUARDS',
+        expectedHttpStatus:400,expectedFunctionsCode:'functions/failed-precondition',expectedReason:'ADVISOR_POLICY_CONFLICT',registered:true,
+        requestKey:'d'.repeat(64),httpVerified:true,sdkVerified:true,status:'PASS'}]},
+      {actorRole:'operativo',status:'PASS',...counts,events:[],denials:[]}
+    ]}};
+}
+test('failure export preserves normalized network diagnosis and delayed observation without granting acceptance',()=>{
+  const input=fixture(),detail={netError:'net::ERR_FAILED',blockedReason:'origin',corsError:'PreflightMissingAllowOriginHeader',
+    requestMethod:'POST',responseObserved:false,responseStatus:null,responseExtraInfoStatus:503,requestStage:'FINANCE_UI_HYDRATION',observedStage:'ASSIGNMENT_DOCUMENTARY_UI',elapsedMs:2750};
+  input.browserObservability.actors[0].events=[{eventType:'NETWORK_FAILURE',actorRole:'direccion',stage:'FINANCE_UI_HYDRATION',
+    requestKey:'b'.repeat(64),endpointClass:'FUNCTIONS',resourceType:'Fetch',classification:'UNEXPECTED',networkFailureDiagnostic:detail}];
+  const out=execute({advisor:input}),obs=out.reports[0].browserObservability;
+  assert.deepEqual(obs.actors[0].events[0].networkFailureDiagnostic,detail);assert.equal(obs.status,'HOLD');assert.equal(out.status,'FAILED_NOT_ACCEPTED');
+  assert.throws(()=>advisor.validateBrowserObservability(obs),/BROWSER_OBSERVABILITY_HOLD/);
+});
+test('second network projection removes private fields and rejects unknown values instead of false zeros',()=>{
+  const input=fixture(),event={eventType:'NETWORK_FAILURE',actorRole:'direccion',stage:'FINANCE_UI_HYDRATION',
+    networkFailureDiagnostic:{netError:'net::ERR_FAILED '+secret,blockedReason:'origin '+secret,corsError:secret,requestMethod:secret,
+      responseObserved:secret,responseStatus:0,responseExtraInfoStatus:secret,requestStage:secret,observedStage:secret,elapsedMs:secret,
+      errorText:secret,failedParameter:secret,url:'https://example.invalid/'+secret,headers:{Authorization:secret},requestBody:secret}};
+  input.browserObservability.actors[0].events=[event];const out=execute({advisor:input}),row=out.reports[0].browserObservability.actors[0].events[0];
+  assert.deepEqual(row.networkFailureDiagnostic,{netError:null,blockedReason:null,corsError:null,requestMethod:null,responseObserved:null,responseStatus:null,responseExtraInfoStatus:null,
+    requestStage:'UNKNOWN_STAGE',observedStage:'UNKNOWN_STAGE',elapsedMs:null});
+  assert.doesNotMatch(JSON.stringify(out),new RegExp(secret));assert.doesNotMatch(JSON.stringify(out),/errorText|failedParameter|https:|Authorization|requestBody/);
+});
+test('response and elapsed evidence cannot be coerced or invented by the failure projection',()=>{
+  for(const [observed,status,duration,expectedStatus,expectedDuration] of [[false,200,0,null,0],[null,200,null,null,null],[true,204,42,204,42],
+    [true,'200','42',null,null],[true,0,-1,null,null],[true,600,600001,null,null]]){
+    const input=fixture();input.browserObservability.actors[0].events=[{eventType:'NETWORK_FAILURE',networkFailureDiagnostic:{
+      responseObserved:observed,responseStatus:status,elapsedMs:duration}}];
+    const detail=execute({advisor:input}).reports[0].browserObservability.actors[0].events[0].networkFailureDiagnostic;
+    assert.equal(detail.responseObserved,observed);assert.equal(detail.responseStatus,expectedStatus);assert.equal(detail.elapsedMs,expectedDuration);
+    assert.equal(detail.responseExtraInfoStatus,null);
+  }
+});
+test('network detail is never attached to cancelled or expected PASS events during failure export',()=>{
+  const input=fixture(),actor=input.browserObservability.actors[0];
+  actor.events.push({eventType:'NETWORK_CANCELLED',actorRole:'direccion',stage:'SYNTHETIC_RESTORE',requestKey:'e'.repeat(64),endpointClass:'GOOGLE_API',resourceType:'Fetch'});
+  const originals=clone(actor.events);
+  for(const event of actor.events)event.networkFailureDiagnostic={netError:'net::ERR_FAILED',errorText:secret};
+  assert.deepEqual(execute({advisor:input}).reports[0].browserObservability.actors[0].events,originals);
+});
+}

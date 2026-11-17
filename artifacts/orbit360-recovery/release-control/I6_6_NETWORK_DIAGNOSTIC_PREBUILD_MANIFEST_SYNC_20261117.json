@@ -1,0 +1,693 @@
+{
+  "schema": "GI_I66_NETWORK_DIAGNOSTIC_PREBUILD_MANIFEST_SYNC_V1",
+  "recordedAtUtc": "2026-11-17T21:47:47Z",
+  "status": "R11_RETAINED_PREBUILD_MANIFEST_SYNC_REPAIRED_NEW_BUILD_REQUIRED",
+  "gate": "I6.6",
+  "existingDailyBlock": 2,
+  "findingId": "SYNC-CURSOR-20261117",
+  "sourceBaseHead": "a909d09947268a5c51082e0cdbe3cfd3b9e50b35",
+  "newSourceIdentity": "EXACT_TRIGGERING_COMMIT",
+  "previousSourceReceipt": {
+    "path": "artifacts/orbit360-recovery/release-control/I6_6_SCOPED_READER_LOGGING_HOLD_AND_PASSIVE_NETWORK_DIAGNOSTIC_SOURCE_20261117.json",
+    "sha256": "942b25c9770e7a88a474df0f05683992463d7c6051543556c5b08db1c7a73836"
+  },
+  "prebuildFailure": {
+    "status": "PREBUILD_GUARD_FAILURE_NO_PACKAGE_NO_DEPLOY_NO_ACCEPTANCE",
+    "sourceSha": "a909d09947268a5c51082e0cdbe3cfd3b9e50b35",
+    "sourceTree": "78bf721caf32ae7e8533d16dea95c111d9b22111",
+    "buildRunId": 44181192482,
+    "buildJobId": 134385805789,
+    "guardRunId": 44181192363,
+    "guardJobId": 134385643299,
+    "buildConclusion": "failure",
+    "guardConclusion": "failure",
+    "cause": "I6_6_DELTA_GUARD:TEST_BLOB_CHANGED_WITHOUT_MANIFEST:tools/gravicentra-i6-6-preview-failure-diagnostics-retention.test.cjs",
+    "causeProvenForThisPrebuildFailure": true,
+    "manifestPath": "artifacts/orbit360-recovery/release-control/I6_6_APPROVED_PRODUCT_DELTA_MANIFEST_20261110.json",
+    "sealedTestPath": "tools/gravicentra-i6-6-preview-failure-diagnostics-retention.test.cjs",
+    "approvedTestBlob": "1377a2f1f6924a901cdd12b4ba3b05c4bc5ea3d9",
+    "failedSourceTestBlob": "0a3b83270959398ae1df4ae347ce58c9b5a79aca",
+    "artifactCount": 0,
+    "artifactId": null,
+    "artifactDigest": null,
+    "technicalRolloverExecuted": false,
+    "newHostingDeployExecuted": false,
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_NETWORK_DIAGNOSTIC_PREBUILD_MANIFEST_SYNC_20261117.json",
+    "newSignedPreviewAcceptance": false,
+    "newLiveAcceptance": false,
+    "priorBrowserNetworkAndStartupRootCausesRemainUnproven": true
+  },
+  "buildSummary": {
+    "schema": "GI_I66_NETWORK_DIAGNOSTIC_BUILD_FAILURE_V1",
+    "status": "BUILD_TERMINAL_FAILURE_NO_ARTIFACT_NOT_ACCEPTED",
+    "sourceSha": "a909d09947268a5c51082e0cdbe3cfd3b9e50b35",
+    "sourceTree": "78bf721caf32ae7e8533d16dea95c111d9b22111",
+    "buildRunId": 44181192482,
+    "buildJobId": 134385805789,
+    "guardRunId": 44181192363,
+    "guardJobId": 134385643299,
+    "buildConclusion": "failure",
+    "guardConclusion": "failure",
+    "artifactCount": 0,
+    "artifactId": null,
+    "artifactDigest": null,
+    "candidateProposalCreated": false,
+    "technicalRolloverExecuted": false,
+    "newHostingDeployExecuted": false,
+    "cause": "I6_6_DELTA_GUARD:TEST_BLOB_CHANGED_WITHOUT_MANIFEST:tools/gravicentra-i6-6-preview-failure-diagnostics-retention.test.cjs",
+    "guardLocation": "tools/gravicentra-i6-6-delta-guard.mjs:106",
+    "manifestPath": "artifacts/orbit360-recovery/release-control/I6_6_APPROVED_PRODUCT_DELTA_MANIFEST_20261110.json",
+    "testPath": "tools/gravicentra-i6-6-preview-failure-diagnostics-retention.test.cjs",
+    "approvedTestBlob": "1377a2f1f6924a901cdd12b4ba3b05c4bc5ea3d9",
+    "actualTestBlob": "0a3b83270959398ae1df4ae347ce58c9b5a79aca",
+    "signedPreviewPass": false,
+    "livePass": false,
+    "rerunTriggered": false
+  },
+  "buildSummarySha256": "903b1ab8ba55ba40d3d74921901337f8297a9ceb04cf2dbe558602ba60820e2f",
+  "apiMetadataSha256": "f63d8497d538d41a9537ae69df9d09f2c2db9d16f2a640ff722cff90c4fb8aa5",
+  "actualRuns": {
+    "build": {
+      "id": 44181192482,
+      "head_sha": "a909d09947268a5c51082e0cdbe3cfd3b9e50b35",
+      "head_branch": "recovery/fase-a-clean-20260831",
+      "path": ".github/workflows/gravicentra-release-delta-66-package.yml",
+      "status": "completed",
+      "conclusion": "failure",
+      "html_url": "https://github.com/paulaosoriof86/orbit360-core/actions/runs/44181192482",
+      "created_at": "2026-11-17T21:34:18Z",
+      "updated_at": "2026-11-17T21:35:19Z"
+    },
+    "guard": {
+      "id": 44181192363,
+      "head_sha": "a909d09947268a5c51082e0cdbe3cfd3b9e50b35",
+      "head_branch": "recovery/fase-a-clean-20260831",
+      "path": ".github/workflows/gravicentra-release-lock-sync.yml",
+      "status": "completed",
+      "conclusion": "failure",
+      "html_url": "https://github.com/paulaosoriof86/orbit360-core/actions/runs/44181192363",
+      "created_at": "2026-11-17T21:34:18Z",
+      "updated_at": "2026-11-17T21:34:55Z"
+    }
+  },
+  "actualJobs": {
+    "build": {
+      "id": 134385805789,
+      "run_id": 44181192482,
+      "name": "immutable-package",
+      "status": "completed",
+      "conclusion": "failure",
+      "started_at": "2026-11-17T21:34:38Z",
+      "completed_at": "2026-11-17T21:35:18Z",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2026-11-17T21:34:38Z",
+          "completed_at": "2026-11-17T21:34:41Z"
+        },
+        {
+          "name": "Checkout exactly the selected canonical SHA with complete ancestry",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2026-11-17T21:34:41Z",
+          "completed_at": "2026-11-17T21:34:51Z"
+        },
+        {
+          "name": "Run actions/setup-node@v4",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2026-11-17T21:34:51Z",
+          "completed_at": "2026-11-17T21:34:57Z"
+        },
+        {
+          "name": "Verify latest I6.6 source and historical B4 seals without reopening B4",
+          "status": "completed",
+          "conclusion": "failure",
+          "number": 4,
+          "started_at": "2026-11-17T21:34:57Z",
+          "completed_at": "2026-11-17T21:35:14Z"
+        },
+        {
+          "name": "Set up existing Firebase LAB credentials for read-only public config and tenant branding",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 5,
+          "started_at": "2026-11-17T21:35:14Z",
+          "completed_at": "2026-11-17T21:35:14Z"
+        },
+        {
+          "name": "Build a single immutable package from the exact I6.6 source and config snapshot",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 6,
+          "started_at": "2026-11-17T21:35:14Z",
+          "completed_at": "2026-11-17T21:35:14Z"
+        },
+        {
+          "name": "Preserve byte-exact package, digest and source identity for Preview then LIVE",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 7,
+          "started_at": "2026-11-17T21:35:14Z",
+          "completed_at": "2026-11-17T21:35:14Z"
+        },
+        {
+          "name": "Run actions/upload-artifact@v4",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 8,
+          "started_at": "2026-11-17T21:35:14Z",
+          "completed_at": "2026-11-17T21:35:14Z"
+        },
+        {
+          "name": "Fingerprint both existing LIVE origins before isolated Preview deployment",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 9,
+          "started_at": "2026-11-17T21:35:14Z",
+          "completed_at": "2026-11-17T21:35:14Z"
+        },
+        {
+          "name": "Publish exact immutable site only to isolated Hosting Preview",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 10,
+          "started_at": "2026-11-17T21:35:14Z",
+          "completed_at": "2026-11-17T21:35:14Z"
+        },
+        {
+          "name": "Preserve exact Preview restore backups and receipt even on failure",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 11,
+          "started_at": "2026-11-17T21:35:14Z",
+          "completed_at": "2026-11-17T21:35:14Z"
+        },
+        {
+          "name": "Preview readback all artifact files and confirm both LIVE origins are untouched",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 12,
+          "started_at": "2026-11-17T21:35:14Z",
+          "completed_at": "2026-11-17T21:35:14Z"
+        },
+        {
+          "name": "Verify current technical Preview rollover and preserve every other channel",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 13,
+          "started_at": "2026-11-17T21:35:14Z",
+          "completed_at": "2026-11-17T21:35:14Z"
+        },
+        {
+          "name": "Retain actual technical Preview before-after and verified rollback backups",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 14,
+          "started_at": "2026-11-17T21:35:14Z",
+          "completed_at": "2026-11-17T21:35:14Z"
+        },
+        {
+          "name": "Post Run actions/setup-node@v4",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 27,
+          "started_at": "2026-11-17T21:35:14Z",
+          "completed_at": "2026-11-17T21:35:14Z"
+        },
+        {
+          "name": "Post Checkout exactly the selected canonical SHA with complete ancestry",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 28,
+          "started_at": "2026-11-17T21:35:14Z",
+          "completed_at": "2026-11-17T21:35:14Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 29,
+          "started_at": "2026-11-17T21:35:14Z",
+          "completed_at": "2026-11-17T21:35:14Z"
+        }
+      ]
+    },
+    "guard": {
+      "id": 134385643299,
+      "run_id": 44181192363,
+      "name": "verify-control-plane",
+      "status": "completed",
+      "conclusion": "failure",
+      "started_at": "2026-11-17T21:34:21Z",
+      "completed_at": "2026-11-17T21:34:47Z",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2026-11-17T21:34:22Z",
+          "completed_at": "2026-11-17T21:34:23Z"
+        },
+        {
+          "name": "Checkout Recovery control plane with complete ancestry",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2026-11-17T21:34:23Z",
+          "completed_at": "2026-11-17T21:34:28Z"
+        },
+        {
+          "name": "Run actions/setup-node@v4",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2026-11-17T21:34:28Z",
+          "completed_at": "2026-11-17T21:34:31Z"
+        },
+        {
+          "name": "Fail closed through canonical shared governance preflight",
+          "status": "completed",
+          "conclusion": "failure",
+          "number": 4,
+          "started_at": "2026-11-17T21:34:31Z",
+          "completed_at": "2026-11-17T21:34:45Z"
+        },
+        {
+          "name": "Post Run actions/setup-node@v4",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 7,
+          "started_at": "2026-11-17T21:34:45Z",
+          "completed_at": "2026-11-17T21:34:45Z"
+        },
+        {
+          "name": "Post Checkout Recovery control plane with complete ancestry",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 8,
+          "started_at": "2026-11-17T21:34:45Z",
+          "completed_at": "2026-11-17T21:34:45Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 9,
+          "started_at": "2026-11-17T21:34:45Z",
+          "completed_at": "2026-11-17T21:34:45Z"
+        }
+      ]
+    }
+  },
+  "originalLogs": {
+    "build": {
+      "path": "failed/build_job.log",
+      "sha256": "0fac80f6d76ca9ed8f913f0fa24b3105c268306a03c7d299c9da6443f60cccea",
+      "exactCauseLine": "2026-11-17T21:35:14.0806419Z Error: I6_6_DELTA_GUARD:TEST_BLOB_CHANGED_WITHOUT_MANIFEST:tools/gravicentra-i6-6-preview-failure-diagnostics-retention.test.cjs"
+    },
+    "guard": {
+      "path": "failed/guard_job.log",
+      "sha256": "37bbcc8fdfb761f3cbd18c626b2c3d3b059028462fa4186c7515032a5e7d343d",
+      "exactCauseLine": "2026-11-17T21:34:45.0630156Z Error: I6_6_DELTA_GUARD:TEST_BLOB_CHANGED_WITHOUT_MANIFEST:tools/gravicentra-i6-6-preview-failure-diagnostics-retention.test.cjs"
+    }
+  },
+  "sourceQa": {
+    "schema": "GI_I66_NETWORK_DIAGNOSTIC_TEST_RELOCATION_QA_V1",
+    "status": "PASS",
+    "baseHeadSha": "a909d09947268a5c51082e0cdbe3cfd3b9e50b35",
+    "sourceBase": "a909d09947268a5c51082e0cdbe3cfd3b9e50b35",
+    "passed": 126,
+    "failed": 0,
+    "skipped": 0,
+    "cancelled": 0,
+    "productSourceChanged": false,
+    "timeoutsChanged": false,
+    "driverChanged": false,
+    "workflowChanged": false,
+    "manifestChanged": false,
+    "guardChanged": false,
+    "acceptanceCriteriaChanged": false,
+    "acceptanceAllowlistsChanged": false,
+    "fixturesChanged": false,
+    "logPath": "/workspace/scratch/3c07c381bc55/implementation_work/release_plan/network_diagnostic_test_relocation_tests.tap",
+    "logSha256": "c78a5622d1d155edb734579fd4a877fbbb7aa0fb8683e2df635c4b366912e8c7",
+    "ownerPaths": [
+      "tools/gravicentra-i6-6-advisor-browser-observability.test.cjs",
+      "tools/gravicentra-i6-6-preview-failure-diagnostics-retention.test.cjs"
+    ],
+    "ownerBlobShas": {
+      "tools/gravicentra-i6-6-advisor-browser-observability.test.cjs": "a4fba5598331a2691ef3663d744f9f217895610f",
+      "tools/gravicentra-i6-6-preview-failure-diagnostics-retention.test.cjs": "1377a2f1f6924a901cdd12b4ba3b05c4bc5ea3d9"
+    },
+    "ownerSha256s": {
+      "tools/gravicentra-i6-6-advisor-browser-observability.test.cjs": "6d76e5df56f8fa930f6da1adb131eff9764a1365135a904931b2ad41bbf0c3dc",
+      "tools/gravicentra-i6-6-preview-failure-diagnostics-retention.test.cjs": "0c3e78f555aafb4796a6da8bb3532be303f0be6529dec97ec8499a22784b60b0"
+    },
+    "commands": [
+      "node --test --test-reporter=tap tools/gravicentra-i6-6-advisor-browser-observability.test.cjs tools/gravicentra-i6-6-preview-failure-diagnostics-retention.test.cjs"
+    ],
+    "sealedRetentionRestored": {
+      "blob": "1377a2f1f6924a901cdd12b4ba3b05c4bc5ea3d9",
+      "referenceCommit": "181264419c614c9a8a0843fc834a95542e0f297a",
+      "byteIdentical": true
+    },
+    "coveragePreservation": {
+      "movedCases": 4,
+      "movedCaseSourceSha256": "413daac579a2cf8653c215726cf2256d958e78a093942bcc5ab1e6ca1b590e16",
+      "caseSourceBytesPreserved": true,
+      "priorLogPath": "/workspace/scratch/3c07c381bc55/implementation_work/release_plan/network_failure_diagnostic_focused_tests.tap",
+      "priorLogSha256": "8413eeefc27896140f75d588bebde7619b7bd4b120edf25c1fb10220d4532195",
+      "testNameMultisetUnchanged": true,
+      "testSuiteImported": false,
+      "duplicateTestExecution": false
+    },
+    "diffCheck": "PASS",
+    "signedMatrixRerunPerformed": false,
+    "functionalAcceptance": false,
+    "newImmutableBuildRequired": true,
+    "reason": "Restore the product-manifest-sealed retention test and move only the four new network failure projection cases to the existing QA browser observability owner. Gate, manifest, driver and workflow remain unchanged."
+  },
+  "sourceQaReceiptSha256": "5433736418f5115418a2765da9fe664a132f3e559ab624f921aa399c0be2761f",
+  "sourceOwners": [
+    "tools/gravicentra-i6-6-advisor-browser-observability.test.cjs",
+    "tools/gravicentra-i6-6-preview-failure-diagnostics-retention.test.cjs"
+  ],
+  "manifestIdentity": {
+    "status": "EXACT_WORKTREE_MANIFEST_PINS_MATCH_NOT_SUITE_EXECUTION",
+    "baseHeadSha": "a909d09947268a5c51082e0cdbe3cfd3b9e50b35",
+    "manifestPath": "artifacts/orbit360-recovery/release-control/I6_6_APPROVED_PRODUCT_DELTA_MANIFEST_20261110.json",
+    "manifestSha256": "a5483aadad803dac063aa190841ca670981ffbef2909cc54d42520306fd500e3",
+    "manifestGitBlobSha": "2441afbe581b39671c5d379d1e7cd2d8d9aaa4da",
+    "manifestUnchanged": true,
+    "productFiles": 67,
+    "testFiles": 79,
+    "mismatches": [],
+    "productPinMapSha256": "261d1576c1f05a11a5d225437bf2d804878e76869bbee00c25328dbbfa6b8a54",
+    "testPinMapSha256": "be8c3789516dadae530f845af9a672a387520588234d353c96ade47edede1e84",
+    "selection": "Last entry for each path in manifest.changes",
+    "suitesExecutedByThisIdentityCheck": 0,
+    "newCommitGuardStillRequired": true,
+    "newFunctionalAcceptance": false
+  },
+  "independentManifestIdentity": {
+    "status": "EXACT_WORKTREE_MANIFEST_PINS_MATCH_NOT_SUITE_EXECUTION",
+    "observedAtUtc": "2026-11-17T21:42:44Z",
+    "baseHeadSha": "a909d09947268a5c51082e0cdbe3cfd3b9e50b35",
+    "manifestPath": "artifacts/orbit360-recovery/release-control/I6_6_APPROVED_PRODUCT_DELTA_MANIFEST_20261110.json",
+    "manifestSha256": "a5483aadad803dac063aa190841ca670981ffbef2909cc54d42520306fd500e3",
+    "manifestUnchanged": true,
+    "productFiles": 67,
+    "testFiles": 79,
+    "mismatches": [],
+    "newFunctionalAcceptance": false
+  },
+  "independentManifestIdentitySha256": "a08cb4a8526c5e0b8a04c5bd592163dd808931caf5baa57a8a61ebe82dc61586",
+  "repair": {
+    "restoredSealedRetentionBlob": "1377a2f1f6924a901cdd12b4ba3b05c4bc5ea3d9",
+    "movedCases": 4,
+    "destinationOwner": "tools/gravicentra-i6-6-advisor-browser-observability.test.cjs",
+    "scope": "Two existing test owners only; no changed checks or omitted cases.",
+    "manifestGuardDriverWorkflowProductBackendUnchanged": true,
+    "newCommitGuardStillRequired": true
+  },
+  "priorSyncFinding": {
+    "id": "SYNC-CURSOR-20261117",
+    "kind": "RELEASE/COMPOSITION",
+    "state": "RESOLVED_CURRENT_BINDING_GUARD_AND_EXECUTED_SIGNED_GATE",
+    "cause": "Build 44052221474 completed but transport still requested build; CP/plan/state pointed to older candidates.",
+    "closure": "One exact 6b6 candidate across current execution metadata and substantive signed Preview job actually executes; preserve historical LIVE identity.",
+    "evidenceCommit": "69b677906dcaaa50860535ff653fee3254fc8665",
+    "guardRunId": 44169173575,
+    "signedRunId": 44169173376,
+    "functionalAcceptanceNotClaimed": true,
+    "currentExactBuildSource": "62d50052a9b9196ebce8c4acd1bc66778ae89c06",
+    "currentBuildReceipt": "artifacts/orbit360-recovery/release-control/I6_6_STARTUP_DIAGNOSTICS_PREVIEW_BUILD_20261117.json",
+    "currentSignedOutcome": "artifacts/orbit360-recovery/release-control/I6_6_ADVISOR_RELOAD_READINESS_HOLD_AND_DIAGNOSTIC_SOURCE_20261117.json",
+    "currentEvidenceCommit": "7b33a51230e7ae17ffa2406b042191db775dcb1e",
+    "currentGuardRunId": 44175298256,
+    "currentFailedSignedRunId": 44175297317,
+    "currentOutcomeReceipt": "artifacts/orbit360-recovery/release-control/I6_6_STARTUP_DIAGNOSTICS_NETWORK_HOLD_20261117.json",
+    "technicalPreviewCausalRetryAliasesAligned": true,
+    "aliasAlignmentIsFailureCause": false,
+    "currentPreviewAccepted": false
+  },
+  "continuedBuildRequest": {
+    "status": "REQUESTED_FOR_PASSIVE_NETWORK_QA_DIAGNOSTICS",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_NETWORK_DIAGNOSTIC_PREBUILD_MANIFEST_SYNC_20261117.json",
+    "sourceSha": "EXACT_TRIGGERING_COMMIT",
+    "sourceBaseHead": "a909d09947268a5c51082e0cdbe3cfd3b9e50b35",
+    "newImmutableBuildRequired": true,
+    "newBuildIdKnown": false,
+    "productAndBackendSourceUnchanged": true,
+    "livePromotion": false,
+    "technicalRolloverReceipt": "artifacts/orbit360-recovery/release-control/I6_6_TECHNICAL_PREVIEW_NETWORK_DIAGNOSTIC_REBUILD_20261117.json",
+    "technicalRolloverReceiptSha256": "42b558b0720fdb5d8c8a907a8ed5415cb769232e2409efbb4dde9fdaef724c04",
+    "priorSourceReceipt": "artifacts/orbit360-recovery/release-control/I6_6_SCOPED_READER_LOGGING_HOLD_AND_PASSIVE_NETWORK_DIAGNOSTIC_SOURCE_20261117.json",
+    "priorFailedBuildRunId": 44181192482,
+    "testRelocationQaReceiptSha256": "5433736418f5115418a2765da9fe664a132f3e559ab624f921aa399c0be2761f",
+    "manifestPinIdentityVerified": true
+  },
+  "technicalRollover": {
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_TECHNICAL_PREVIEW_NETWORK_DIAGNOSTIC_REBUILD_20261117.json",
+    "receiptSha256": "42b558b0720fdb5d8c8a907a8ed5415cb769232e2409efbb4dde9fdaef724c04",
+    "backup": {
+      "sourceSha": "62d50052a9b9196ebce8c4acd1bc66778ae89c06",
+      "buildRunId": 44173813709,
+      "buildRunAttempt": 1,
+      "artifactId": 14369500963,
+      "artifactDigest": "sha256:e31583c35aa76e2fcd904ffd1caa61bf589c9ada9acc4dd307a30e731e814c81",
+      "expectedSiteFileCount": 223,
+      "runtimeProofRequired": "DOWNLOAD_HASH_ARCHIVE_VALIDATE_MANIFEST_AND_COMPARE_EVERY_HOSTED_FILE_INCLUDING_BUILD_JSON_BEFORE_REPLACEMENT"
+    },
+    "channel": {
+      "id": "gi-i66-rc-44009981499",
+      "origin": "https://ays-orbit-360-lab--gi-i66-rc-44009981499-d08psr2y.web.app",
+      "createdAt": "2026-11-17T03:34:28.874524705Z",
+      "expectedVersion": "sites/ays-orbit-360-lab/versions/0edf4cfe763bf50a"
+    },
+    "unchangedBecauseFailedBuildNeverReachedDeploy": true
+  },
+  "lastSignedQaOutcome": {
+    "status": "FAILED_NOT_ACCEPTED",
+    "runId": 44175297317,
+    "jobId": 134365013822,
+    "conclusion": "failure",
+    "sourceSha": "62d50052a9b9196ebce8c4acd1bc66778ae89c06",
+    "buildId": "gi-i66-62d50052a9b9-57f234755dc1",
+    "buildRunId": 44173813709,
+    "workflowHeadSha": "7b33a51230e7ae17ffa2406b042191db775dcb1e",
+    "diagnosticArtifactId": 14369897476,
+    "diagnosticArtifactDigest": "sha256:7533108c8ae3358aeed1b16e2041efe138a53dbed9d43a409421efe5164c272b",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_STARTUP_DIAGNOSTICS_NETWORK_HOLD_20261117.json",
+    "rawDiagnosticPath": "artifacts/orbit360-recovery/release-control/I6_6_STARTUP_DIAGNOSTICS_FAILED_PREVIEW_DIAGNOSTIC_20261117.json",
+    "rawDiagnosticSha256": "2bf370a227d7e7c1bbbe02bfd0aa3d3fd71da65a3ab7c88d8ea034a1fe96bfcd",
+    "failureStage": "ASSIGNMENT_DOCUMENTARY_UI",
+    "failureClass": "ASSERTION_OR_RUNTIME_FAILURE",
+    "failureCheck": "ADVISOR_UAT_BROWSER_OBSERVABILITY_HOLD",
+    "failureLocation": {
+      "file": "gravicentra-i6-6-advisor-payables-signed-uat.cjs",
+      "line": 1156,
+      "column": 90
+    },
+    "advisorChecks": 15,
+    "advisorDriverStatus": "HOLD",
+    "proposalDriverStatus": "NOT_EXECUTED",
+    "syntheticCleanupStatus": "PASS",
+    "syntheticRemaining": 0,
+    "cleanupFailureClasses": [],
+    "cleanupAccepted": true,
+    "browserObservability": {
+      "status": "HOLD",
+      "totals": {
+        "expectedDenials": 8,
+        "verifiedExpectedDenials": 8,
+        "observedConsoleErrors": 10,
+        "capturedConsoleErrors": 10,
+        "expectedNetworkConsoleErrors": 8,
+        "unexpectedConsoleErrors": 2,
+        "pageErrorCount": 0,
+        "unexpectedHttpErrors": 1,
+        "telemetryFailures": 0
+      },
+      "unexpectedEvents": [
+        {
+          "eventType": "NATIVE_CONSOLE_ERROR",
+          "actorRole": "direccion",
+          "stage": "ASSIGNMENT_DOCUMENTARY_UI",
+          "endpointClass": "FIRST_PARTY",
+          "pathSha256": "9876b32868731cd300c3b8c0df60b8691219ecc36c0a29bbed206c1311fcca5c",
+          "classification": "UNEXPECTED",
+          "source": "javascript",
+          "line": null
+        },
+        {
+          "eventType": "NETWORK_FAILURE",
+          "actorRole": "direccion",
+          "stage": "FINANCE_UI_HYDRATION",
+          "requestKey": "8204fe65eab21ae198ba0bb06a40f0ab349b303b7cc9ce882980c67fc441f4a6",
+          "resourceType": "Fetch",
+          "endpointClass": "FUNCTIONS",
+          "classification": "UNEXPECTED"
+        },
+        {
+          "eventType": "NATIVE_CONSOLE_ERROR",
+          "actorRole": "direccion",
+          "stage": "ASSIGNMENT_DOCUMENTARY_UI",
+          "requestKey": "8204fe65eab21ae198ba0bb06a40f0ab349b303b7cc9ce882980c67fc441f4a6",
+          "endpointClass": "FUNCTIONS",
+          "pathSha256": "691c5270e9684a2ec10413dd7c1262f7e96476f2a83b9514fa5177e9033b5eb7",
+          "classification": "UNEXPECTED",
+          "source": "network",
+          "line": null
+        }
+      ]
+    },
+    "startupDiagnostics": {
+      "diagnosticOnly": true,
+      "observedCount": 5,
+      "expectedCount": 5,
+      "waitOutcomes": {
+        "completed": 5,
+        "failed": 0,
+        "unknown": 0
+      },
+      "snapshots": [
+        {
+          "actorRole": "direccion",
+          "stage": "SIGNED_SESSION",
+          "waitOutcome": "ORIGINAL_WAIT_COMPLETED",
+          "status": "CAPTURED",
+          "elapsedMs": 484,
+          "providerPresent": true,
+          "appPresent": true,
+          "readyState": "interactive",
+          "serviceWorker": {
+            "supported": true,
+            "controllerPresent": false,
+            "controllerState": "ABSENT",
+            "controllerPathSha256": null,
+            "controllerBuildMatches": null
+          }
+        },
+        {
+          "actorRole": "operativo",
+          "stage": "SIGNED_SESSION",
+          "waitOutcome": "ORIGINAL_WAIT_COMPLETED",
+          "status": "CAPTURED",
+          "elapsedMs": 590,
+          "providerPresent": true,
+          "appPresent": true,
+          "readyState": "interactive",
+          "serviceWorker": {
+            "supported": true,
+            "controllerPresent": false,
+            "controllerState": "ABSENT",
+            "controllerPathSha256": null,
+            "controllerBuildMatches": null
+          }
+        },
+        {
+          "actorRole": "direccion",
+          "stage": "ASSIGNMENT_RELOAD",
+          "waitOutcome": "ORIGINAL_WAIT_COMPLETED",
+          "status": "CAPTURED",
+          "elapsedMs": 568,
+          "providerPresent": true,
+          "appPresent": true,
+          "readyState": "interactive",
+          "serviceWorker": {
+            "supported": true,
+            "controllerPresent": true,
+            "controllerState": "activated",
+            "controllerPathSha256": "edae1aad03e427838f4b3ce8b9cff24fb9a676def8297715b906aa14599e18c3",
+            "controllerBuildMatches": true
+          }
+        },
+        {
+          "actorRole": "direccion",
+          "stage": "ASSIGNMENT_RELOAD",
+          "waitOutcome": "ORIGINAL_WAIT_COMPLETED",
+          "status": "CAPTURED",
+          "elapsedMs": 495,
+          "providerPresent": true,
+          "appPresent": true,
+          "readyState": "interactive",
+          "serviceWorker": {
+            "supported": true,
+            "controllerPresent": true,
+            "controllerState": "activated",
+            "controllerPathSha256": "edae1aad03e427838f4b3ce8b9cff24fb9a676def8297715b906aa14599e18c3",
+            "controllerBuildMatches": true
+          }
+        },
+        {
+          "actorRole": "direccion",
+          "stage": "PENDING_CXP_RELOAD",
+          "waitOutcome": "ORIGINAL_WAIT_COMPLETED",
+          "status": "CAPTURED",
+          "elapsedMs": 558,
+          "providerPresent": true,
+          "appPresent": true,
+          "readyState": "interactive",
+          "serviceWorker": {
+            "supported": true,
+            "controllerPresent": true,
+            "controllerState": "activated",
+            "controllerPathSha256": "edae1aad03e427838f4b3ce8b9cff24fb9a676def8297715b906aa14599e18c3",
+            "controllerBuildMatches": true
+          }
+        }
+      ],
+      "historicalFailureCause": "NOT_DEDUCIBLE_FROM_THIS_RUN"
+    },
+    "documentedTermsHelperStatus": "PASS",
+    "documentedTermsHelperReloadPerformed": false,
+    "sourceIntakeNewProofAvailable": false,
+    "rootCauseProven": false,
+    "previousTimeoutRootCauseProven": false,
+    "newPreviewAcceptance": false,
+    "newLiveAcceptance": false,
+    "realFinancialWritesApplied": 0
+  },
+  "loggingReadOnlyHold": {
+    "status": "READONLY_QUERY_HOLD_HTTP403_NO_PAGES_NOT_FUNCTIONAL_ACCEPTANCE",
+    "runId": 44178934101,
+    "jobId": 134377724028,
+    "headSha": "181264419c614c9a8a0843fc834a95542e0f297a",
+    "artifactId": 14370893169,
+    "artifactDigest": "sha256:99f7267dacc646801e6be197eed130dbe5dca12a33b7b668f6e19b4435c75824",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_SCOPED_READER_LOGGING_HOLD_AND_PASSIVE_NETWORK_DIAGNOSTIC_SOURCE_20261117.json",
+    "rawProofPath": "artifacts/orbit360-recovery/release-control/I6_6_SCOPED_READER_LOGGING_READONLY_HOLD_20261117.json",
+    "rawProofSha256": "6e429c8d755e5eaa9d8821f77aa2c11623c0b4bfb729ee1aa15ae79c639d0ef6",
+    "loggingApiHttpStatuses": [
+      403
+    ],
+    "pagesRead": 0,
+    "entriesSeen": 0,
+    "zeroCountersProveNoErrors": false,
+    "rootCauseProven": false,
+    "requestStatusLatencyRevisionAvailable": false,
+    "functionalAcceptance": false,
+    "zeroWrites": true,
+    "noRetryOrPermissionChange": true
+  },
+  "newSignedPreviewAcceptance": false,
+  "newLiveAcceptance": false,
+  "fullI66ProductionAccepted": false,
+  "newConsentOrLegalGrant": false,
+  "reviewContextGenerated": false,
+  "realFinancialWrites": 0,
+  "closedDailyBlocks": 1,
+  "totalDailyBlocks": 6,
+  "transversalFrozenCriteria": "19/31",
+  "newFormalPercentagePoints": 0,
+  "currentLiveRemainsR11": true,
+  "next": "I6_6_EXISTING_BLOCK2: A909_BUILD44181192482_AND_GUARD44181192363_FAILED_BEFORE_PACKAGE_OR_DEPLOY; SEALED_RETENTION_TEST_BLOB_RESTORED_AND_FOUR_CASES_RELOCATED_WITH126_PASS_IN_TWO_EXISTING_TEST_FILES. MANIFEST_UNCHANGED_67_PRODUCT_AND79_TEST_BLOBS_MATCH_NOT79_SUITES_EXECUTED. BUILD_EXACT_TRIGGERING_COMMIT_ONCE_UNDER_EXISTING_GUARD; BIND_ONLY_REAL_SUCCESS_ARTIFACT_BEFORE_EXISTING_FOUR_SIGNED_PREVIEW_DRIVERS. SAME_SINGLE_CHANNEL_BACKUP62_AND_TECHNICAL_RECEIPT42B558; R11_REMAINS_LIVE. PRIOR_NETWORK_AND_STARTUP_CAUSES_UNPROVEN; LOGGING403_ZERO_PAGES_PRESERVED. LIVE_LEGAL_SCOPE_AND_GENUINE_OPS_INSURER_DRIVE_REMAIN_PENDING; ONE_OF_SIX_BLOCKS_AND19_OF31_UNCHANGED."
+}

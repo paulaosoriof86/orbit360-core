@@ -79,42 +79,6 @@ test('safe telemetry, page, cancellation and application events survive even tho
       endpointClass:'FIRST_PARTY_SCRIPT',pathSha256:'f'.repeat(64),line:41,column:9,argumentTypes:['string','object']}
   ];actor.events=events;assert.deepEqual(execute({advisor:input}).reports[0].browserObservability.actors[0].events,events);
 });
-test('failure export preserves normalized network diagnosis and delayed observation without granting acceptance',()=>{
-  const input=fixture(),detail={netError:'net::ERR_FAILED',blockedReason:'origin',corsError:'PreflightMissingAllowOriginHeader',
-    requestMethod:'POST',responseObserved:false,responseStatus:null,responseExtraInfoStatus:503,requestStage:'FINANCE_UI_HYDRATION',observedStage:'ASSIGNMENT_DOCUMENTARY_UI',elapsedMs:2750};
-  input.browserObservability.actors[0].events=[{eventType:'NETWORK_FAILURE',actorRole:'direccion',stage:'FINANCE_UI_HYDRATION',
-    requestKey:'b'.repeat(64),endpointClass:'FUNCTIONS',resourceType:'Fetch',classification:'UNEXPECTED',networkFailureDiagnostic:detail}];
-  const out=execute({advisor:input}),obs=out.reports[0].browserObservability;
-  assert.deepEqual(obs.actors[0].events[0].networkFailureDiagnostic,detail);assert.equal(obs.status,'HOLD');assert.equal(out.status,'FAILED_NOT_ACCEPTED');
-  assert.throws(()=>advisor.validateBrowserObservability(obs),/BROWSER_OBSERVABILITY_HOLD/);
-});
-test('second network projection removes private fields and rejects unknown values instead of false zeros',()=>{
-  const input=fixture(),event={eventType:'NETWORK_FAILURE',actorRole:'direccion',stage:'FINANCE_UI_HYDRATION',
-    networkFailureDiagnostic:{netError:'net::ERR_FAILED '+secret,blockedReason:'origin '+secret,corsError:secret,requestMethod:secret,
-      responseObserved:secret,responseStatus:0,responseExtraInfoStatus:secret,requestStage:secret,observedStage:secret,elapsedMs:secret,
-      errorText:secret,failedParameter:secret,url:'https://example.invalid/'+secret,headers:{Authorization:secret},requestBody:secret}};
-  input.browserObservability.actors[0].events=[event];const out=execute({advisor:input}),row=out.reports[0].browserObservability.actors[0].events[0];
-  assert.deepEqual(row.networkFailureDiagnostic,{netError:null,blockedReason:null,corsError:null,requestMethod:null,responseObserved:null,responseStatus:null,responseExtraInfoStatus:null,
-    requestStage:'UNKNOWN_STAGE',observedStage:'UNKNOWN_STAGE',elapsedMs:null});
-  assert.doesNotMatch(JSON.stringify(out),new RegExp(secret));assert.doesNotMatch(JSON.stringify(out),/errorText|failedParameter|https:|Authorization|requestBody/);
-});
-test('response and elapsed evidence cannot be coerced or invented by the failure projection',()=>{
-  for(const [observed,status,duration,expectedStatus,expectedDuration] of [[false,200,0,null,0],[null,200,null,null,null],[true,204,42,204,42],
-    [true,'200','42',null,null],[true,0,-1,null,null],[true,600,600001,null,null]]){
-    const input=fixture();input.browserObservability.actors[0].events=[{eventType:'NETWORK_FAILURE',networkFailureDiagnostic:{
-      responseObserved:observed,responseStatus:status,elapsedMs:duration}}];
-    const detail=execute({advisor:input}).reports[0].browserObservability.actors[0].events[0].networkFailureDiagnostic;
-    assert.equal(detail.responseObserved,observed);assert.equal(detail.responseStatus,expectedStatus);assert.equal(detail.elapsedMs,expectedDuration);
-    assert.equal(detail.responseExtraInfoStatus,null);
-  }
-});
-test('network detail is never attached to cancelled or expected PASS events during failure export',()=>{
-  const input=fixture(),actor=input.browserObservability.actors[0];
-  actor.events.push({eventType:'NETWORK_CANCELLED',actorRole:'direccion',stage:'SYNTHETIC_RESTORE',requestKey:'e'.repeat(64),endpointClass:'GOOGLE_API',resourceType:'Fetch'});
-  const originals=clone(actor.events);
-  for(const event of actor.events)event.networkFailureDiagnostic={netError:'net::ERR_FAILED',errorText:secret};
-  assert.deepEqual(execute({advisor:input}).reports[0].browserObservability.actors[0].events,originals);
-});
 test('no raw messages, URLs, headers, payloads, arguments or identity escape the projection at any level',()=>{
   const input=fixture(),obs=input.browserObservability,actor=obs.actors[0];
   input.rawError=secret;input.actorUid=secret;obs.identity=secret;obs.totals.token=secret;actor.email=secret;

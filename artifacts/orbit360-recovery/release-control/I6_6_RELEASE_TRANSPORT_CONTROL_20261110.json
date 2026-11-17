@@ -408,7 +408,7 @@
     "priorR7HostingRollback": "sites/ays-orbit-360-lab/versions/9cedc5ecda75bb2a",
     "fullI66FinancialProductionAcceptance": false
   },
-  "currentReleaseStatus": "R11_RETAINED_LOGGING_403_PASSIVE_NETWORK_QA_DIAGNOSTIC_BUILD_REQUESTED",
+  "currentReleaseStatus": "R11_RETAINED_PREBUILD_MANIFEST_SYNC_REPAIRED_NEW_BUILD_REQUIRED",
   "scope": "Existing I6.6 block 2: immutable build for passive network diagnostics and exact current Preview rollover pins only. Product/backend, permissions, fixtures, reloads, timeouts, error verdicts and historical evidence are preserved. Current R11 remains protected. No LIVE, financial, Rules/Auth/IAM or other-channel authority.",
   "historicalClosedGate": "B4-007",
   "approvedProductDeltaManifest": "artifacts/orbit360-recovery/release-control/I6_6_APPROVED_PRODUCT_DELTA_MANIFEST_20261110.json",
@@ -737,15 +737,19 @@
   },
   "nextImmutablePreviewBuildRequest": {
     "status": "REQUESTED_FOR_PASSIVE_NETWORK_QA_DIAGNOSTICS",
-    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_SCOPED_READER_LOGGING_HOLD_AND_PASSIVE_NETWORK_DIAGNOSTIC_SOURCE_20261117.json",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_NETWORK_DIAGNOSTIC_PREBUILD_MANIFEST_SYNC_20261117.json",
     "sourceSha": "EXACT_TRIGGERING_COMMIT",
-    "sourceBaseHead": "181264419c614c9a8a0843fc834a95542e0f297a",
+    "sourceBaseHead": "a909d09947268a5c51082e0cdbe3cfd3b9e50b35",
     "newImmutableBuildRequired": true,
     "newBuildIdKnown": false,
     "productAndBackendSourceUnchanged": true,
     "livePromotion": false,
     "technicalRolloverReceipt": "artifacts/orbit360-recovery/release-control/I6_6_TECHNICAL_PREVIEW_NETWORK_DIAGNOSTIC_REBUILD_20261117.json",
-    "technicalRolloverReceiptSha256": "42b558b0720fdb5d8c8a907a8ed5415cb769232e2409efbb4dde9fdaef724c04"
+    "technicalRolloverReceiptSha256": "42b558b0720fdb5d8c8a907a8ed5415cb769232e2409efbb4dde9fdaef724c04",
+    "priorSourceReceipt": "artifacts/orbit360-recovery/release-control/I6_6_SCOPED_READER_LOGGING_HOLD_AND_PASSIVE_NETWORK_DIAGNOSTIC_SOURCE_20261117.json",
+    "priorFailedBuildRunId": 44181192482,
+    "testRelocationQaReceiptSha256": "5433736418f5115418a2765da9fe664a132f3e559ab624f921aa399c0be2761f",
+    "manifestPinIdentityVerified": true
   },
   "emulatorQaRunId": 43127221947,
   "controlPlaneGuardRunId": 44175298256,
@@ -760,7 +764,7 @@
   "liveAccessGuard": "UNAUTHENTICATED_401_PASS",
   "hostingOriginsUntouched": true,
   "liveCustomerDataWrites": 0,
-  "releaseStatus": "R11_RETAINED_LOGGING_403_PASSIVE_NETWORK_QA_DIAGNOSTIC_BUILD_REQUESTED",
+  "releaseStatus": "R11_RETAINED_PREBUILD_MANIFEST_SYNC_REPAIRED_NEW_BUILD_REQUIRED",
   "pendingFrontendTopbarRelease": {
     "receipt": "artifacts/orbit360-recovery/release-control/I6_6_GLOBAL_TOPBAR_CROSSMODULE_HYDRATION_20261111.json",
     "currentStatus": "SOURCE_UNIT_PASS_IMMUTABLE_BUILD_REQUESTED",
@@ -3865,15 +3869,19 @@
   },
   "networkDiagnosticBuildRequest20261117": {
     "status": "REQUESTED_FOR_PASSIVE_NETWORK_QA_DIAGNOSTICS",
-    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_SCOPED_READER_LOGGING_HOLD_AND_PASSIVE_NETWORK_DIAGNOSTIC_SOURCE_20261117.json",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_NETWORK_DIAGNOSTIC_PREBUILD_MANIFEST_SYNC_20261117.json",
     "sourceSha": "EXACT_TRIGGERING_COMMIT",
-    "sourceBaseHead": "181264419c614c9a8a0843fc834a95542e0f297a",
+    "sourceBaseHead": "a909d09947268a5c51082e0cdbe3cfd3b9e50b35",
     "newImmutableBuildRequired": true,
     "newBuildIdKnown": false,
     "productAndBackendSourceUnchanged": true,
     "livePromotion": false,
     "technicalRolloverReceipt": "artifacts/orbit360-recovery/release-control/I6_6_TECHNICAL_PREVIEW_NETWORK_DIAGNOSTIC_REBUILD_20261117.json",
-    "technicalRolloverReceiptSha256": "42b558b0720fdb5d8c8a907a8ed5415cb769232e2409efbb4dde9fdaef724c04"
+    "technicalRolloverReceiptSha256": "42b558b0720fdb5d8c8a907a8ed5415cb769232e2409efbb4dde9fdaef724c04",
+    "priorSourceReceipt": "artifacts/orbit360-recovery/release-control/I6_6_SCOPED_READER_LOGGING_HOLD_AND_PASSIVE_NETWORK_DIAGNOSTIC_SOURCE_20261117.json",
+    "priorFailedBuildRunId": 44181192482,
+    "testRelocationQaReceiptSha256": "5433736418f5115418a2765da9fe664a132f3e559ab624f921aa399c0be2761f",
+    "manifestPinIdentityVerified": true
   },
   "loggingReadOnlyAccessHold20261117": {
     "status": "READONLY_QUERY_HOLD_HTTP403_NO_PAGES_NOT_FUNCTIONAL_ACCEPTANCE",
@@ -3896,5 +3904,43 @@
     "functionalAcceptance": false,
     "zeroWrites": true,
     "noRetryOrPermissionChange": true
+  },
+  "priorNetworkDiagnosticBuildRequestBeforeTestRelocation20261117": {
+    "status": "REQUESTED_FOR_PASSIVE_NETWORK_QA_DIAGNOSTICS",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_SCOPED_READER_LOGGING_HOLD_AND_PASSIVE_NETWORK_DIAGNOSTIC_SOURCE_20261117.json",
+    "sourceSha": "EXACT_TRIGGERING_COMMIT",
+    "sourceBaseHead": "181264419c614c9a8a0843fc834a95542e0f297a",
+    "newImmutableBuildRequired": true,
+    "newBuildIdKnown": false,
+    "productAndBackendSourceUnchanged": true,
+    "livePromotion": false,
+    "technicalRolloverReceipt": "artifacts/orbit360-recovery/release-control/I6_6_TECHNICAL_PREVIEW_NETWORK_DIAGNOSTIC_REBUILD_20261117.json",
+    "technicalRolloverReceiptSha256": "42b558b0720fdb5d8c8a907a8ed5415cb769232e2409efbb4dde9fdaef724c04"
+  },
+  "networkDiagnosticPrebuildFailure20261117": {
+    "status": "PREBUILD_GUARD_FAILURE_NO_PACKAGE_NO_DEPLOY_NO_ACCEPTANCE",
+    "sourceSha": "a909d09947268a5c51082e0cdbe3cfd3b9e50b35",
+    "sourceTree": "78bf721caf32ae7e8533d16dea95c111d9b22111",
+    "buildRunId": 44181192482,
+    "buildJobId": 134385805789,
+    "guardRunId": 44181192363,
+    "guardJobId": 134385643299,
+    "buildConclusion": "failure",
+    "guardConclusion": "failure",
+    "cause": "I6_6_DELTA_GUARD:TEST_BLOB_CHANGED_WITHOUT_MANIFEST:tools/gravicentra-i6-6-preview-failure-diagnostics-retention.test.cjs",
+    "causeProvenForThisPrebuildFailure": true,
+    "manifestPath": "artifacts/orbit360-recovery/release-control/I6_6_APPROVED_PRODUCT_DELTA_MANIFEST_20261110.json",
+    "sealedTestPath": "tools/gravicentra-i6-6-preview-failure-diagnostics-retention.test.cjs",
+    "approvedTestBlob": "1377a2f1f6924a901cdd12b4ba3b05c4bc5ea3d9",
+    "failedSourceTestBlob": "0a3b83270959398ae1df4ae347ce58c9b5a79aca",
+    "artifactCount": 0,
+    "artifactId": null,
+    "artifactDigest": null,
+    "technicalRolloverExecuted": false,
+    "newHostingDeployExecuted": false,
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_NETWORK_DIAGNOSTIC_PREBUILD_MANIFEST_SYNC_20261117.json",
+    "newSignedPreviewAcceptance": false,
+    "newLiveAcceptance": false,
+    "priorBrowserNetworkAndStartupRootCausesRemainUnproven": true
   }
 }
