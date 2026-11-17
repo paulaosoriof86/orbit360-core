@@ -4,7 +4,7 @@
   "productBrand": "Gravicentra Insurance",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
-  "status": "OPERATIONAL_BACKEND_PREVIEW_AUTHORIZED",
+  "status": "PREVIEW_BUILD_REQUESTED",
   "previewChannelReuseAuthorization": {
     "status": "CURRENT_LIVE_BACKED_SINGLE_PREVIEW_REUSE_AUTHORIZED",
     "approvedByDirection": true,
@@ -586,11 +586,11 @@
   "requiredCanonicalOrigin": "https://ays-orbit-360-lab.web.app",
   "requiredStaffOrigin": "https://app.aysseguros.com",
   "originReadbackRequirement": "BOTH_HOSTS_IDENTICAL_TO_SAME_ARTIFACT_OR_ROLLBACK",
-  "forbidBackendFunctionDeploy": false,
+  "forbidBackendFunctionDeploy": true,
   "forbidFirestoreRulesDataAuthWrites": true,
   "rollback": "FRONTEND_TOPBAR_PREVIEW_FIRST; KEEP BOTH LIVE HOSTING ORIGINS AND COBROS FUNCTION UNCHANGED UNTIL EXACT_ARTIFACT_PREVIEW_PASS; THEN BACKUP_AND_ATOMIC_EXACT_ARTIFACT_LIVE_PROMOTION_WITH_REHASH_AND_ROLLBACK",
   "sourcePreviewUrl": "https://ays-orbit-360-lab--gi-i66-rc-42868854629-abj14q6n.web.app",
-  "backendFunctionPreviewOnly": true,
+  "backendFunctionPreviewOnly": false,
   "carlosSignedTransversalQaReceipt20261112": {
     "sourceSha": "b86cad550fadc050e8574678f02f3097caa8b5bd",
     "immutableHostingPreviewRunId": 43299843267,
@@ -2123,7 +2123,7 @@
     "realRecordWrites": 0,
     "newLiveAcceptanceClaimed": false
   },
-  "operationalReleaseCandidate": {
+  "supersededOperationalReleaseCandidateC109": {
     "schema": "I6_6_OPERATIONAL_EXACT_RELEASE_V1",
     "approvedByDirection": true,
     "status": "EXACT_BACKEND_PREVIEW_SIGNED_QA_AUTHORIZED",
