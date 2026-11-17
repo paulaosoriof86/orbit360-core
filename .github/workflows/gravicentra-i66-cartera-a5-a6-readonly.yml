@@ -1,3 +1,4 @@
+# I6.6 2026-11-16: replay fresh LIVE read-only diff after V7 reconciliation config materialization; zero financial writes.
 # I6.6 Aseguradora General + Columna exact November sources versus LIVE tenant.
 # Read-only: no application of money, no changes to customer or policy records.
 name: Gravicentra I6.6 Cartera A5 A6 LIVE Exact Readback ONLY
