@@ -4,7 +4,7 @@
   "productBrand": "Gravicentra Insurance",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
-  "status": "OPERATIONAL_BACKEND_PREVIEW_AUTHORIZED",
+  "status": "OPERATIONAL_EXACT_LIVE_PROMOTION_AUTHORIZED",
   "currentTechnicalPreviewRollover": {
     "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_TECHNICAL_PREVIEW_SOURCE_INTAKE_RELOAD_REBUILD_20261117.json",
     "receiptSha256": "ae6d48b0260af9e9db7b7ba69e799a4a17e7adf23a24f1893168079dce05bf35"
@@ -413,8 +413,8 @@
   "historicalClosedGate": "B4-007",
   "approvedProductDeltaManifest": "artifacts/orbit360-recovery/release-control/I6_6_APPROVED_PRODUCT_DELTA_MANIFEST_20261110.json",
   "ownerAuthority": "Paula Osorio Dirección 2026-11-12: Operativo tiene escritura integral en cada módulo autorizado, con paridad funcional para roles superiores según sus permisos, país, tenant y auditoría; cada arreglo probado pasa inmediatamente a LIVE desde un artefacto exacto. Alcance R7 autorizado, Preview firmado PASS 43375403003 y LIVE exacto publicado con tres funciones y hosting 223/223 en ambas URL, actores reales Carlos y Dirección y escrituras sintéticas reversibles PASS 43375687134. Mantener el resto de UAT real por país/rol, documentación real de aseguradora, UI legal y escrituras financieras en HOLD hasta prueba específica, sin tocar Firestore Rules, Auth ni IAM. Histórico R5/R6 se conserva como linaje, no como estado actual.",
-  "livePromotionAuthorized": false,
-  "previewApproved": false,
+  "livePromotionAuthorized": true,
+  "previewApproved": true,
   "carlosOpsLiveAuthorization20261112": {
     "status": "EXACT_TWO_WRITERS_AND_HOSTING_AUTHORIZED_AFTER_SIGNED_PREVIEW",
     "sourceSha": "1dd675ed59ac51fd122915ca8056f85f82fa12d6",
@@ -600,7 +600,7 @@
   "forbidFirestoreRulesDataAuthWrites": true,
   "rollback": "FRONTEND_TOPBAR_PREVIEW_FIRST; KEEP BOTH LIVE HOSTING ORIGINS AND COBROS FUNCTION UNCHANGED UNTIL EXACT_ARTIFACT_PREVIEW_PASS; THEN BACKUP_AND_ATOMIC_EXACT_ARTIFACT_LIVE_PROMOTION_WITH_REHASH_AND_ROLLBACK",
   "sourcePreviewUrl": "https://ays-orbit-360-lab--gi-i66-rc-44009981499-d08psr2y.web.app",
-  "backendFunctionPreviewOnly": true,
+  "backendFunctionPreviewOnly": false,
   "carlosSignedTransversalQaReceipt20261112": {
     "sourceSha": "b86cad550fadc050e8574678f02f3097caa8b5bd",
     "immutableHostingPreviewRunId": 43299843267,
@@ -648,7 +648,7 @@
     "syntheticLedgerRequestEventRestored": true,
     "livePromotionAccepted": false
   },
-  "forbidBackendLiveFunctionDeploy": true,
+  "forbidBackendLiveFunctionDeploy": false,
   "readerPreviewAuthorization": {
     "authorizedBy": "Paula Andrea Osorio Franco, Direccion",
     "authorizedAtGuatemala": "2026-11-11",
@@ -756,7 +756,7 @@
   "previewFunctionRunId": 43306217923,
   "previewFunctionStatus": "EXACT_ARTIFACT_PREVIEW_FUNCTION_ACTIVE_401_AND_LIVE_BACKEND_TWO_HOSTS_UNCHANGED_PASS",
   "liveFunctionScope": "orbit360CobrosReconciliationCommand",
-  "noHostingPromotion": true,
+  "noHostingPromotion": false,
   "liveFunctionRunId": 43129008894,
   "liveFunctionOldRevision": "orbit360cobrosreconciliationcommand-00003-kax",
   "liveFunctionNewRevision": "orbit360cobrosreconciliationcommand-00006-viw",
@@ -3220,7 +3220,7 @@
   "operationalReleaseCandidate": {
     "schema": "I6_6_OPERATIONAL_EXACT_RELEASE_V1",
     "approvedByDirection": true,
-    "status": "EXACT_BACKEND_PREVIEW_SIGNED_QA_AUTHORIZED",
+    "status": "EXACT_PREVIEW_SIGNED_LIVE_AUTHORIZED",
     "sourceSha": "59c37ac9a2142c24ccb5a95f3d6df82eb62dfd94",
     "buildId": "gi-i66-59c37ac9a214-57f234755dc1",
     "buildRunId": 44158877469,
@@ -3315,6 +3315,13 @@
       "actorRole": "direccion",
       "termsProjectionSha256": "485b07887091063cc7a5d1dc8f11a9bb547f2ef059490bb04d4acee73404f6b2",
       "buildId": "gi-i66-59c37ac9a214-57f234755dc1"
+    },
+    "previewQa": {
+      "runId": 44160169601,
+      "headSha": "c4e30d730825e1255b82a300ab5d7c5eee643042",
+      "receiptArtifactId": 14361764826,
+      "receiptArtifactDigest": "sha256:93d3ac61bbcdcb4140434ccb8e6c320e83a48988c162458c250a63cba6a8b6a2",
+      "status": "SIGNED_DRIVERS_DURABLE_READBACK_RELOAD_RESTORE_PASS"
     }
   }
 }

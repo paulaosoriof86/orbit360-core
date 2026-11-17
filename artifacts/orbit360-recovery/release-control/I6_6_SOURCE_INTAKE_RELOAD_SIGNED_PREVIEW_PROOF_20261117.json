@@ -1,0 +1,64 @@
+{
+  "schema": "I6_6_OPERATIONAL_SIGNED_PREVIEW_PROOF_V1",
+  "status": "SIGNED_DRIVERS_DURABLE_READBACK_RELOAD_RESTORE_PASS",
+  "sourceSha": "59c37ac9a2142c24ccb5a95f3d6df82eb62dfd94",
+  "buildRunId": 44158877469,
+  "artifactId": 14360954951,
+  "artifactDigest": "sha256:0a58c3e7398d5e44a50ca6a290a980111df17b03375ee19ee8d19c5b68067c17",
+  "previewUrl": "https://ays-orbit-360-lab--gi-i66-rc-44158877469-13g9931i.web.app",
+  "previewChannelId": "gi-i66-rc-44158877469",
+  "buildId": "gi-i66-59c37ac9a214-57f234755dc1",
+  "targets": [
+    {
+      "name": "orbit360ProductOperationalCommandPreview",
+      "region": "us-east1"
+    },
+    {
+      "name": "orbit360CobrosReconciliationCommandPreview",
+      "region": "us-central1"
+    },
+    {
+      "name": "orbit360ScopedPolicyReadPreview",
+      "region": "us-east1"
+    }
+  ],
+  "signedDrivers": [
+    "tools/gravicentra-i66-privileged-role-signed-ui-permissions-readonly.cjs",
+    "tools/gravicentra-i6-6-carlos-real-signed-synthetic-preview-uat.cjs",
+    "tools/gravicentra-i6-6-advisor-payables-signed-uat.cjs",
+    "tools/gravicentra-i6-6-proposal-application-signed-uat.cjs"
+  ],
+  "realFinancialOrCustomerWrites": 0,
+  "syntheticRestoreComplete": true,
+  "liveHostingUnchanged": true,
+  "liveBackendUnchanged": true,
+  "focusedReports": {
+    "advisorPayables": {
+      "status": "PASS",
+      "cleanup": "PASS",
+      "checks": 16,
+      "digest": "sha256:89eadd86650f46e8015f474d2a6688098b2fabd456031b6f0fbb7bb1d8172f2f",
+      "observability": {
+        "profile": "I66_SIGNED_BROWSER_OBSERVABILITY_V1",
+        "status": "PASS",
+        "unexpectedConsoleErrors": 0,
+        "unexpectedHttpErrors": 0,
+        "pageErrorCount": 0,
+        "telemetryFailures": 0
+      }
+    },
+    "proposalApplication": {
+      "status": "PASS",
+      "cleanup": "PASS",
+      "checks": 18,
+      "digest": "sha256:1ee4a2f202aa3f9ba618c7b1e052a2ed9c831020d146cba7a4c91dd2833921ac",
+      "observability": {
+        "profile": "I66_SIGNED_BROWSER_OBSERVABILITY_V1",
+        "status": "PASS",
+        "mode": "UI_RESPONSE_CAPTURED_EXACT"
+      }
+    }
+  },
+  "runId": 44160169601,
+  "headSha": "c4e30d730825e1255b82a300ab5d7c5eee643042"
+}

@@ -1,0 +1,57 @@
+{
+  "schema": "GI_I66_CANONICAL_SOURCE_REAL_SCOPE_READONLY_V2",
+  "status": "PASS_SOURCE_READONLY_NOT_LIVE_UI_ACCEPTANCE",
+  "observedAtUtc": "2026-11-17T19:36:38.807Z",
+  "executionSourceSha": "c4e30d730825e1255b82a300ab5d7c5eee643042",
+  "executedOwnerBlobs": {
+    "functions/i66-conciliaciones-active-ledger-projection.js": "92ba74ebc1bc60970386a5fef25807716528b18d",
+    "functions/b4-003-scoped-related-reader.js": "aafdbe3384506b1772c7e409d565de88bf287b21",
+    "orbit360-platform/modules/conciliaciones.js": "05db10ecf2e4da3ffa3fd263bb828668fc28e482"
+  },
+  "servedHosting": {
+    "sourceSha": "84769378eb2014addebfefdbdd63091bddc4b817",
+    "buildId": "gi-i66-84769378eb20-57f234755dc1",
+    "origins": [
+      "https://app.aysseguros.com",
+      "https://ays-orbit-360-lab.web.app"
+    ]
+  },
+  "activeRunId": "cobledger_ed27a5d87d3c9a10d8919bc85c00",
+  "catalogRuns": 1,
+  "expectedStagedProposals": 132,
+  "uniqueVisibleProposals": 132,
+  "identityHoldProposals": 80,
+  "linkedProposals": 52,
+  "authorizedProjectionByCountry": {
+    "GT": {
+      "rows": 132,
+      "identityHolds": 80,
+      "sourceHolds": 80,
+      "linked": 52,
+      "applied": 0
+    },
+    "CO": {
+      "rows": 0,
+      "identityHolds": 0,
+      "sourceHolds": 0,
+      "linked": 0,
+      "applied": 0
+    }
+  },
+  "repeatedCountryViews": 0,
+  "sourceCatalogDigest": "281fc84cc984311adde6336f5fdc6b3b68da922a7438814e5511aa7e92f8c936",
+  "sourceUiProjectionCounts": {
+    "GT": 132,
+    "CO": 0,
+    "union": 132
+  },
+  "activeVerifiedDirectionMembers": 1,
+  "indexedLookup": true,
+  "scopedReads": true,
+  "realBusinessWrites": 0,
+  "sourceProjectionOnLiveData": true,
+  "signedUiAcceptance": false,
+  "servedBackendRuntimeCertified": false,
+  "previewCallableDeployed": false,
+  "liveCodeDeployed": false
+}

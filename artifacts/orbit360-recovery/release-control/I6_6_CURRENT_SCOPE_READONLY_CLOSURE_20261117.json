@@ -1,0 +1,121 @@
+{
+  "schema": "GI_I66_READONLY_CURRENT_SOURCE_CERTIFICATION_CLOSURE_V1",
+  "status": "PASS_SOURCE_READONLY_NOT_LIVE_UI_ACCEPTANCE",
+  "sourceSha": "c4e30d730825e1255b82a300ab5d7c5eee643042",
+  "runId": 44160169484,
+  "jobId": 134311517871,
+  "artifactId": 14362113626,
+  "artifactDigest": "sha256:f23ffda61de8c1251a89b7b7d5469e3f15d04386c15c120be4675c3bd5445785",
+  "proofPath": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_SCOPE_READONLY_PROOF_20261117.json",
+  "proofSha256": "56ef570a2e53f1497e746457170fea260aab61d92e2b9c86be50853256e656da",
+  "expectedStagedProposals": 132,
+  "uniqueVisibleProposals": 132,
+  "linkedProposals": 52,
+  "identityHoldProposals": 80,
+  "realBusinessWrites": 0,
+  "signedUiAcceptance": false,
+  "servedBackendRuntimeCertified": false,
+  "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_SCOPE_READONLY_CLOSURE_20261117.json",
+  "independentVerification": {
+    "schema": "GI_I66_READONLY_ARTIFACT_INDEPENDENT_VERIFICATION_V1",
+    "status": "PASS_SOURCE_READONLY_PROOF_VERIFIED",
+    "runId": 44160169484,
+    "runAttempt": 1,
+    "jobId": 134311517871,
+    "workflowUrl": "https://github.com/paulaosoriof86/orbit360-core/actions/runs/44160169484",
+    "executionSourceSha": "c4e30d730825e1255b82a300ab5d7c5eee643042",
+    "artifactId": 14362113626,
+    "artifactName": "gi-i66-real-source-scope-readonly-44160169484",
+    "artifactDigest": "sha256:f23ffda61de8c1251a89b7b7d5469e3f15d04386c15c120be4675c3bd5445785",
+    "artifactBytes": 1088,
+    "entryName": "i66-real-source-scope-readonly.json",
+    "entrySha256": "56ef570a2e53f1497e746457170fea260aab61d92e2b9c86be50853256e656da",
+    "workflowAndRunnerBlobs": {
+      ".github/workflows/gravicentra-i66-conciliaciones-stage-real-scope-readonly.yml": "6c66fb2eb4a8244060eae7afdb9b018ac9680b36",
+      "tools/gravicentra-i66-conciliaciones-stage-real-scope-readonly.cjs": "6596a240a0734dd99ce64bab8f4b023ff67ecf91",
+      "tools/gravicentra-i6-6-stage-real-scope-readonly-binding.test.cjs": "13b6cfae12e8baab7e9e465079f9a19bc1d0bb11"
+    },
+    "productOwnerBlobs": {
+      "functions/i66-conciliaciones-active-ledger-projection.js": "92ba74ebc1bc60970386a5fef25807716528b18d",
+      "functions/b4-003-scoped-related-reader.js": "aafdbe3384506b1772c7e409d565de88bf287b21",
+      "orbit360-platform/modules/conciliaciones.js": "05db10ecf2e4da3ffa3fd263bb828668fc28e482"
+    },
+    "productOwnersMatchImmutableBuildSourceSha": "59c37ac9a2142c24ccb5a95f3d6df82eb62dfd94",
+    "authority": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_6_RELEASE_TRANSPORT_CONTROL_20261110.json",
+      "blobSha": "df704deabd32ecbf20832bb3e94f68df8af42c1d",
+      "sha256": "1102ba977fccf080461f870059d7e2b37ec2379100e5aaa622767395923ac9ac"
+    },
+    "checks": {
+      "downloadMatchesApiDigestAndSize": true,
+      "runArtifactJobExactIdentity": true,
+      "allWorkflowStepsSucceeded": true,
+      "artifactJsonMatchesMaskedJobLog": true,
+      "governancePreflightPass": true,
+      "executedOwnersMatchRunCommit": true,
+      "executedProductOwnersMatchBuildCommit": true,
+      "servedHostingMatchesCommitAuthority": true,
+      "countArithmeticAndUiParity": true,
+      "timestampsConsistent": true
+    },
+    "proof": {
+      "schema": "GI_I66_CANONICAL_SOURCE_REAL_SCOPE_READONLY_V2",
+      "status": "PASS_SOURCE_READONLY_NOT_LIVE_UI_ACCEPTANCE",
+      "observedAtUtc": "2026-11-17T19:36:38.807Z",
+      "executionSourceSha": "c4e30d730825e1255b82a300ab5d7c5eee643042",
+      "executedOwnerBlobs": {
+        "functions/i66-conciliaciones-active-ledger-projection.js": "92ba74ebc1bc60970386a5fef25807716528b18d",
+        "functions/b4-003-scoped-related-reader.js": "aafdbe3384506b1772c7e409d565de88bf287b21",
+        "orbit360-platform/modules/conciliaciones.js": "05db10ecf2e4da3ffa3fd263bb828668fc28e482"
+      },
+      "servedHosting": {
+        "sourceSha": "84769378eb2014addebfefdbdd63091bddc4b817",
+        "buildId": "gi-i66-84769378eb20-57f234755dc1",
+        "origins": [
+          "https://app.aysseguros.com",
+          "https://ays-orbit-360-lab.web.app"
+        ]
+      },
+      "activeRunId": "cobledger_ed27a5d87d3c9a10d8919bc85c00",
+      "catalogRuns": 1,
+      "expectedStagedProposals": 132,
+      "uniqueVisibleProposals": 132,
+      "identityHoldProposals": 80,
+      "linkedProposals": 52,
+      "authorizedProjectionByCountry": {
+        "GT": {
+          "rows": 132,
+          "identityHolds": 80,
+          "sourceHolds": 80,
+          "linked": 52,
+          "applied": 0
+        },
+        "CO": {
+          "rows": 0,
+          "identityHolds": 0,
+          "sourceHolds": 0,
+          "linked": 0,
+          "applied": 0
+        }
+      },
+      "repeatedCountryViews": 0,
+      "sourceCatalogDigest": "281fc84cc984311adde6336f5fdc6b3b68da922a7438814e5511aa7e92f8c936",
+      "sourceUiProjectionCounts": {
+        "GT": 132,
+        "CO": 0,
+        "union": 132
+      },
+      "activeVerifiedDirectionMembers": 1,
+      "indexedLookup": true,
+      "scopedReads": true,
+      "realBusinessWrites": 0,
+      "sourceProjectionOnLiveData": true,
+      "signedUiAcceptance": false,
+      "servedBackendRuntimeCertified": false,
+      "previewCallableDeployed": false,
+      "liveCodeDeployed": false
+    },
+    "acceptanceScope": "Readonly source projection on live data; no signed UI or served backend runtime acceptance",
+    "sourceModifications": false
+  }
+}
