@@ -1,0 +1,68 @@
+{
+  "schema": "GI_I66_SOURCE_INTAKE_PRECISION_PREVIEW_BUILD_READBACK_V1",
+  "dateGuatemala": "2026-11-17",
+  "recordedAtUtc": "2026-11-17T18:35:25Z",
+  "gate": "I6.6",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "status": "IMMUTABLE_PREVIEW_EXACT_READBACK_PASS_SIGNED_FUNCTIONAL_QA_PENDING",
+  "sourceSha": "6b6e8bbba3371b32a1bfb80b903c40377e11d727",
+  "buildRunId": 44052221474,
+  "buildJobId": 133932744471,
+  "artifactId": 14314985190,
+  "artifactDigest": "sha256:e97f86355181a8c685b8dd800626a4885f8e34b45222f178d15355d76cbf499f",
+  "tarSha256": "c63b356550cc307e43b81e18770a7df3342fce9854c029c544a122c68690545c",
+  "buildId": "gi-i66-6b6e8bbba337-57f234755dc1",
+  "hostingVersion": "sites/ays-orbit-360-lab/versions/0964cef6b576a2ad",
+  "previewUrl": "https://ays-orbit-360-lab--gi-i66-rc-44009981499-d08psr2y.web.app",
+  "readback": {
+    "previewFiles": 223,
+    "liveFilesEach": 223,
+    "liveOriginsUnchanged": 2,
+    "siteManifestSha256": "e1de8f3d24ee2fdf305f4334f905a0fcd64e0a65d5019316166ca7dc4a766ab2",
+    "readbackRecordedAtUtc": "2026-11-17T09:08:05.243Z"
+  },
+  "rolloverEvidence": {
+    "artifactId": 14314815423,
+    "artifactDigest": "sha256:e21b2db71930cd866f2d1870012a3353c09fc62790fdaa18428c52e526fe63b5",
+    "inventoryAfterSha256": "43f892b0006b0a0d606bacf08b89b931ede062cc7205f00729a9bb742a69a2e5",
+    "afterReceiptSha256": "036c2fb271fe3b85c5aee35c8e6b1127ee45a82a2a60d4b72d7d473757f5218f",
+    "channelCount": 51,
+    "otherChannelsUnchanged": 50
+  },
+  "sourceIntakeV2Included": true,
+  "realFinancialWrites": 0,
+  "signedPreviewAccepted": false,
+  "liveAccepted": false,
+  "evidenceScope": "Existing immutable build and Hosting readback only. This receipt is not signed functional acceptance or LIVE acceptance.",
+  "acceptedLivePreserved": {
+    "sourceSha": "84769378eb2014addebfefdbdd63091bddc4b817",
+    "buildId": "gi-i66-84769378eb20-57f234755dc1",
+    "artifactId": 14075022275,
+    "artifactDigest": "sha256:b0f3bacb68511cdfc91ac934602c51f55afec5c1d6428d886d13a72a706ee283",
+    "buildRunId": 43503721126,
+    "liveRunId": 43506971214,
+    "hostingVersion": "sites/ays-orbit-360-lab/versions/0766db29b338befc"
+  },
+  "previousSignedAttempt": {
+    "runId": 44048179414,
+    "status": "FAILED_NOT_ACCEPTED",
+    "sourceSha": "cef42d7713aa83c73f1f0d0e35afb38a9165e433",
+    "cause": "DOCUMENTED_PREMIUM_TERMS",
+    "mainDriverCleanupRemaining": 0,
+    "helperCleanupProofAvailable": false
+  },
+  "nextRequiredEvidence": [
+    "same-source signed role matrix",
+    "Carlos and Direction Ops/Leads synthetic persistence and restore",
+    "documented financial terms helper PASS with cleanup",
+    "normal UI source intake and idempotent replay PASS",
+    "proposal application PASS with cleanup",
+    "unexpected errors zero and LIVE unchanged"
+  ],
+  "productSourceChangedByBinding": false,
+  "buildReusedWithoutRebuild": true,
+  "newFunctionalAcceptance": false,
+  "newLiveAcceptance": false,
+  "realBusinessWritesByThisBinding": 0
+}

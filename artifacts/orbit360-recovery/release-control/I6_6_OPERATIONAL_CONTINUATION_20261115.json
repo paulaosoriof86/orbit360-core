@@ -8,12 +8,13 @@
     "receipt": "artifacts/orbit360-recovery/release-control/I6_6_DIRECTION_PREVIEW_V2_SCOPE_AUTHORIZATION_20261116.json",
     "receiptSha256": "d3309675c753bd1b31f9163d506aba2e29ac70583a7b8d54cb5b8503b5c50a44",
     "status": "SAME_V2_TERMS_DIRECTION_GT_I66_PREVIEW_TECHNICAL_SUCCESSORS_AUTHORIZED",
-    "newImmutableBuildRequired": true,
+    "newImmutableBuildRequired": false,
     "historicalConsentReceiptsUnchanged": true,
     "otherActors": false,
     "liveAcceptance": false,
     "realPayments": false,
-    "signedExecutionProof": "PENDING_NOT_CLAIMED"
+    "signedExecutionProof": "PENDING_ON_CURRENT_SOURCE_NOT_CLAIMED",
+    "existingImmutableBuildRunId": 44052221474
   },
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
@@ -184,20 +185,37 @@
       "fullPreviewAcceptance": false
     },
     "latestPreviewEvidence": {
-      "receipt": "artifacts/orbit360-recovery/release-control/I6_6_PREVIEW_TRANSPORT_42A676_READBACK_20261116.json",
-      "sourceSha": "42a6764125f18106debc52edcb79741fe49e829c",
-      "buildId": "gi-i66-42a6764125f1-57f234755dc1",
-      "buildRunId": 44026819055,
-      "artifactId": 14303601582,
-      "artifactDigest": "sha256:210fb130f998f367faecefbc34c6287bf59cafcbede8002f345cfb813d4ed1b6",
-      "status": "AUTHORIZED_EXACT_CANDIDATE_SIGNED_QA_NOT_YET_PASSED",
-      "signedObservabilityProfile": "I66_SIGNED_BROWSER_OBSERVABILITY_V1",
-      "buildConclusion": "SUCCESS",
-      "previewChannelId": "gi-i66-rc-44009981499",
+      "status": "IMMUTABLE_PREVIEW_EXACT_READBACK_PASS_SIGNED_FUNCTIONAL_QA_PENDING",
+      "sourceSha": "6b6e8bbba3371b32a1bfb80b903c40377e11d727",
+      "buildRunId": 44052221474,
+      "buildJobId": 133932744471,
+      "artifactId": 14314985190,
+      "artifactDigest": "sha256:e97f86355181a8c685b8dd800626a4885f8e34b45222f178d15355d76cbf499f",
+      "tarSha256": "c63b356550cc307e43b81e18770a7df3342fce9854c029c544a122c68690545c",
+      "buildId": "gi-i66-6b6e8bbba337-57f234755dc1",
+      "hostingVersion": "sites/ays-orbit-360-lab/versions/0964cef6b576a2ad",
       "previewUrl": "https://ays-orbit-360-lab--gi-i66-rc-44009981499-d08psr2y.web.app",
-      "hostingFileReadback": 223,
-      "liveHostingUnchanged": true,
-      "signedFunctionalQa": "HOLD_UNEXPECTED_FINANCE_CONSOLE_AND_HTTP_ERRORS",
+      "readback": {
+        "previewFiles": 223,
+        "liveFilesEach": 223,
+        "liveOriginsUnchanged": 2,
+        "siteManifestSha256": "e1de8f3d24ee2fdf305f4334f905a0fcd64e0a65d5019316166ca7dc4a766ab2",
+        "readbackRecordedAtUtc": "2026-11-17T09:08:05.243Z"
+      },
+      "rolloverEvidence": {
+        "artifactId": 14314815423,
+        "artifactDigest": "sha256:e21b2db71930cd866f2d1870012a3353c09fc62790fdaa18428c52e526fe63b5",
+        "inventoryAfterSha256": "43f892b0006b0a0d606bacf08b89b931ede062cc7205f00729a9bb742a69a2e5",
+        "afterReceiptSha256": "036c2fb271fe3b85c5aee35c8e6b1127ee45a82a2a60d4b72d7d473757f5218f",
+        "channelCount": 51,
+        "otherChannelsUnchanged": 50
+      },
+      "sourceIntakeV2Included": true,
+      "realFinancialWrites": 0,
+      "signedPreviewAccepted": false,
+      "liveAccepted": false,
+      "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_SOURCE_INTAKE_PRECISION_PREVIEW_BUILD_20261117.json",
+      "receipt": "artifacts/orbit360-recovery/release-control/I6_6_SOURCE_INTAKE_PRECISION_PREVIEW_BUILD_20261117.json",
       "newFunctionalAcceptance": false,
       "mustNotPromote": true
     },
@@ -340,21 +358,10 @@
       "mustNotPromote": true
     },
     "currentSignedObservabilityHold": {
-      "evidence": "artifacts/orbit360-recovery/release-control/I6_6_SIGNED_PREVIEW_42A676_HOLD_AND_STATEMENT_INTAKE_20261117.json",
-      "runId": 44027761291,
-      "conclusion": "FAILURE",
-      "status": "HOLD_UNEXPECTED_FINANCE_CONSOLE_AND_HTTP_ERRORS",
-      "sourceSha": "42a6764125f18106debc52edcb79741fe49e829c",
-      "advisorChecksPassed": 15,
-      "unexpectedConsoleErrors": 2,
-      "unexpectedHttpErrors": 2,
-      "pageErrors": 0,
-      "telemetryFailures": 0,
-      "cleanupRemaining": 0,
-      "proposalDriverExecuted": false,
-      "realFinancialWrites": 0,
-      "fullPreviewAcceptance": false,
-      "completeFailureEventRetention": "NOT_AVAILABLE_REPAIR_REQUIRED"
+      "status": "HISTORICAL_42A676_HOLD_PRESERVED_SUPERSEDED_AS_CURRENT_EXECUTION",
+      "latestSignedAttempt": 44048179414,
+      "latestCandidateSource": "6b6e8bbba3371b32a1bfb80b903c40377e11d727",
+      "currentSignedQa": "NOT_EXECUTED_NOT_ACCEPTED"
     },
     "updatedInsurerStatements20261117": {
       "evidence": "artifacts/orbit360-recovery/release-control/I6_6_SIGNED_PREVIEW_42A676_HOLD_AND_STATEMENT_INTAKE_20261117.json",
@@ -365,6 +372,14 @@
       "newBatchExecuted": false,
       "newRealApplications": 0,
       "newPayments": 0
+    },
+    "latestSignedQaOutcome": {
+      "runId": 44048179414,
+      "status": "FAILED_NOT_ACCEPTED",
+      "sourceSha": "cef42d7713aa83c73f1f0d0e35afb38a9165e433",
+      "cause": "DOCUMENTED_PREMIUM_TERMS",
+      "mainDriverCleanupRemaining": 0,
+      "helperCleanupProofAvailable": false
     }
   },
   "orderedWork": [
@@ -554,5 +569,244 @@
     "lastAcceptedLiveUnchanged": true,
     "realRecordWrites": 0,
     "newLiveAcceptanceClaimed": false
+  },
+  "dailyExecutionPlan20261117": {
+    "schema": "GI_I66_EXISTING_PLAN_DAILY_EXECUTION_V1",
+    "dateGuatemala": "2026-11-17",
+    "recordedAtUtc": "2026-11-17T18:35:25Z",
+    "scope": "Continuation of frozen plan; these execution blocks do not create new gates or replace existing authorities.",
+    "auditWindowGuatemala": [
+      "2026-11-14",
+      "2026-11-15",
+      "2026-11-16"
+    ],
+    "sourceHeadAtAudit": "6b6e8bbba3371b32a1bfb80b903c40377e11d727",
+    "baseline": {
+      "phaseAHistoricalProductionAcceptedPercent": 100,
+      "postproductionI6": {
+        "closed": 6,
+        "total": 10,
+        "percent": 60
+      },
+      "operationsFrozenCriteria": {
+        "closed": 6,
+        "total": 8,
+        "percent": 75
+      },
+      "transversalFrozenCriteria": {
+        "closed": 19,
+        "total": 31,
+        "percent": 61.3
+      },
+      "phaseBPercent": 0,
+      "newFormalPercentagePointsFromThisAudit": 0,
+      "coverageCaveat": "Frozen criteria are not exhaustive proof of every new operational finding. Track missing coverage explicitly without silently changing denominators."
+    },
+    "findings": [
+      {
+        "id": "SYNC-CURSOR-20261117",
+        "kind": "RELEASE/COMPOSITION",
+        "state": "METADATA_CORRECTION_STAGED_PENDING_POSTCOMMIT_GUARD",
+        "cause": "Build 44052221474 completed but transport still requested build; CP/plan/state pointed to older candidates.",
+        "closure": "One exact 6b6 candidate across current execution metadata and substantive signed Preview job actually executes; preserve historical LIVE identity."
+      },
+      {
+        "id": "QA-NOOP-20261117",
+        "kind": "PIPELINE/VALIDATOR",
+        "state": "OPEN_EXPLICIT_NON_ACCEPTANCE_RECORDED",
+        "evidenceRuns": [
+          44052221536,
+          44052221714,
+          44052221759
+        ],
+        "cause": "Outer workflow success with substantive job skipped.",
+        "closure": "Consumer requires substantive job success plus exact durable receipt; skipped/NOOP never counts as functional PASS."
+      },
+      {
+        "id": "QA-STALE-SOURCE-PREFLIGHT-20261117",
+        "kind": "PIPELINE/VALIDATOR",
+        "state": "OPEN_CAUSE_PROVEN",
+        "evidenceRun": 44052221446,
+        "cause": "Readonly Conciliaciones workflow still compares cumulative source against old 0153f5 fixed two-file allowlist.",
+        "closure": "Use existing canonical exact composition and current owner blobs while preserving readonly/tenant boundaries; rerun targeted reader, not all product."
+      },
+      {
+        "id": "QA-PROOF-TRANSPORT-20261117",
+        "kind": "PIPELINE/VALIDATOR",
+        "state": "SOURCE_FIX_INCLUDED_AWAITING_EXECUTED_LIVE_GATE",
+        "evidenceRun": 44043379496,
+        "cause": "Downloaded proof subdirectory did not match fixed path; ENOENT before deployment.",
+        "closure": "Current merge-multiple layout passes actual same-artifact proof verification before authorized promotion."
+      },
+      {
+        "id": "QA-DOCUMENTED-TERMS-20261117",
+        "kind": "PRODUCT",
+        "state": "SOURCE_FIX_IN_CURRENT_PREVIEW_SIGNED_REPROOF_REQUIRED",
+        "evidenceRun": 44048179414,
+        "cause": "Contractual cents rendered with rounded KPI formatter; helper diagnostics incomplete.",
+        "closure": "Signed documented terms helper, persist/reload, helper cleanup and zero unexpected errors."
+      },
+      {
+        "id": "RELEASE-FANOUT-20261117",
+        "kind": "PIPELINE/VALIDATOR",
+        "state": "OPEN_SCOPE_REDUCTION_REQUIRED",
+        "cause": "Ten push workflows observed for source HEAD, including inactive functional jobs.",
+        "closure": "Within existing workflows keep required guard and execute only active causal gate; separate historical diagnostics and metadata-only events without weakening release criteria."
+      },
+      {
+        "id": "FINANCIAL-EVIDENCE-CONTINUITY-20261117",
+        "kind": "DATA",
+        "state": "OPEN_READBACK_REQUIRED_BEFORE_ANY_RETRY",
+        "cause": "Conversation reports payment applications not yet linked to a verified current repository receipt.",
+        "closure": "Recover canonical IDs, before/after and existing audit before any reapply; never duplicate or assume absence."
+      },
+      {
+        "id": "SIGNED-REAL-COVERAGE-20261117",
+        "kind": "PRODUCT",
+        "state": "OPEN_PRESERVE_PRIOR_PASS",
+        "cause": "Ops6/8 is bounded coverage; genuine-document renewal, remaining approved CRUD entries, insurer logo/password and Drive need explicit evidence.",
+        "closure": "Close only affected real workflows and roles with reload; do not certify whole coverage from visibility or synthetic-only evidence."
+      }
+    ],
+    "blocks": [
+      {
+        "sequence": 1,
+        "name": "Synchronize exact release and close current signed Preview",
+        "existingPlanIds": [
+          "P0-PUBLISH-CURRENT-DELTA"
+        ],
+        "gate": "I6.6",
+        "state": "IN_PROGRESS",
+        "timeboxReassessmentMinutes": 45,
+        "deliverable": "Current immutable package bound, causal transport/preflight defects classified, four real signed drivers with complete receipts.",
+        "doneWhen": "Exact Preview signed acceptance including documented terms, source intake, replay, cleanup and no unexpected errors; required guard PASS.",
+        "publicationRule": "No rebuild for metadata; product/QA owner changes require new immutable artifact."
+      },
+      {
+        "sequence": 2,
+        "name": "Publish accepted delta and verify operational writers",
+        "existingPlanIds": [
+          "P0-PUBLISH-CURRENT-DELTA",
+          "P0-CARLOS-TRANSVERSAL",
+          "P1-ASEGURADORAS",
+          "P1-ADJUNTOS-DRIVE"
+        ],
+        "gate": "I6.6",
+        "state": "PENDING_BLOCK1",
+        "timeboxReassessmentMinutes": 90,
+        "deliverable": "Same accepted artifact LIVE; Carlos and superior-role affected writes, documented renewal, insurer/Drive paths verified.",
+        "doneWhen": "Exact frontend/backend binding and authenticated LIVE server commit/readback/reload; bounded genuine-document and denied-scope tests; rollback available.",
+        "publicationRule": "Publish each causally complete accepted correction immediately; unrelated findings stay in their existing scope."
+      },
+      {
+        "sequence": 3,
+        "name": "Apply insurer-source deltas to receipts, portfolio and collections",
+        "existingPlanIds": [
+          "P0-CONCILIATION",
+          "P0-CARTERA-A1-A7",
+          "P1-COMPLETENESS-JULY-NOVEMBER"
+        ],
+        "gate": "I6.6",
+        "state": "SOURCE_READAHEAD_CAN_PROCEED_PARALLEL_APPLY_AFTER_SAFE_WRITER",
+        "timeboxReassessmentMinutes": 120,
+        "deliverable": "All available insurers processed by original source; exact additions/updates/no-change/holds and monetary totals reported.",
+        "doneWhen": "Deterministic source-bound deduped applications with before/after, audit, persisted readback and cross-module totals; isolated unresolved records only.",
+        "publicationRule": "Data-only deterministic updates through already certified writers do not require product rebuild. Preserve existing payments/references and user-confirmed identities."
+      },
+      {
+        "sequence": 4,
+        "name": "Post documented advisor commissions and payables",
+        "existingPlanIds": [
+          "URGENT-ADVISOR-CXP",
+          "PHASEB-FINANCE-01"
+        ],
+        "gate": "I6.6_URGENT_SCOPE_THEN_I6.7_FULL_RECONCILIATION",
+        "state": "DOCUMENTARY_READAHEAD_PARALLEL_POST_AFTER_SAFE_WRITER",
+        "timeboxReassessmentMinutes": 90,
+        "deliverable": "Approved advisor corrections and October liabilities registered, currencies separated, documentary totals equal persisted Finance.",
+        "doneWhen": "Commission/CxP created exactly once; historic beneficiaries preserved; dedupe of prior advances/payments; no bank transfers. Full I6.7 requires its whole frozen scope."
+      },
+      {
+        "sequence": 5,
+        "name": "Close remaining operational integrations and I6.8 coverage",
+        "existingPlanIds": [
+          "P1-NOTIFICATIONS",
+          "P1-PERFORMANCE-REGRESSION",
+          "P1-MODULE-WRITE-MATRIX",
+          "P1-COMPLETENESS-JULY-NOVEMBER"
+        ],
+        "gate": "I6.6_REMAINDERS_THEN_I6.8_AFTER_I6.7",
+        "state": "PENDING_CAUSAL_DEPENDENCIES",
+        "timeboxReassessmentMinutes": 60,
+        "deliverable": "Verified notification path under existing consent; required document integration, measured performance, history/Academy/enabled users coverage.",
+        "doneWhen": "Actual authorized acknowledgment where required, scope/persistence/reload and no new causally reproduced regression. Unavailable consent/access affects only exact dependent flow."
+      },
+      {
+        "sequence": 6,
+        "name": "Final exact LIVE acceptance and durable handoff",
+        "existingPlanIds": [
+          "P1-MODULE-WRITE-MATRIX"
+        ],
+        "gate": "I6.9_AFTER_PREDECESSORS",
+        "state": "PENDING_PREDECESSOR_ACCEPTANCE",
+        "timeboxReassessmentMinutes": 45,
+        "deliverable": "Module/role/country/viewport evidence, financial coherence, exact distribution identity and synchronized next action.",
+        "doneWhen": "All required frozen criteria proven on accepted release; Control Plane, ledger, build/served bytes and final guard agree. Only then close postproduction100%.",
+        "publicationRule": "No backlog of already accepted unpublished fixes; no claim of completion from outer green workflows."
+      }
+    ],
+    "cadence": {
+      "oneActiveProductCandidate": true,
+      "oneFinancialWriterAtATime": true,
+      "parallelReadonlySourcePreparation": true,
+      "acceptedDeltaPublishesBeforeUnrelatedScopeExpansion": true,
+      "existingAuthorizationsNotRequestedAgain": true,
+      "noBlindPaymentRetry": true,
+      "doNotReopenUnaffectedPass": true,
+      "timeboxesAreReassessmentTargetsNotCompletionGuarantees": true,
+      "iterationReport": [
+        "completed plan criteria and evidence",
+        "published exact release",
+        "real records applied and amounts by currency",
+        "before/delta/after progress with stable denominator",
+        "remaining exact blockers and next action",
+        "source/build/Preview/LIVE/backend/data synchronization status"
+      ]
+    },
+    "completionOfThisAuditIsNotProductionCompletion": true
+  },
+  "nextAction": "I6_6_CURRENT_SOURCE_INTAKE_PRECISION_PREVIEW: BUILD 44052221474 ARTIFACT 14314985190 SOURCE 6b6e8bbba3371b32a1bfb80b903c40377e11d727 ALREADY_BUILT_AND_223_FILE_PREVIEW_READBACK_PASS; EXECUTE_EXISTING_FOUR_SIGNED_PREVIEW_DRIVERS_ON_THIS_EXACT_PACKAGE. REQUIRE_DOCUMENTED_TERMS_AND_SOURCE_INTAKE_RELOAD_REPLAY_AND_COMPLETE_CLEANUP. NO_REBUILD_FOR_METADATA. R11_REMAINS_LAST_ACCEPTED_LIVE; NO_LIVE_PROMOTION_OR_REAL_FINANCIAL_WRITES_UNTIL_REQUIRED_EVIDENCE. PRESERVE_PHASE_A100_I6_60_OPS6_OF8_OVERALL19_OF31; FOLLOW_EXISTING_OPERATIONAL_PLAN.dailyExecutionPlan20261117.",
+  "sourceIntakePrecisionPreviewBuild20261117": {
+    "receipt": "artifacts/orbit360-recovery/release-control/I6_6_SOURCE_INTAKE_PRECISION_PREVIEW_BUILD_20261117.json",
+    "status": "IMMUTABLE_PREVIEW_EXACT_READBACK_PASS_SIGNED_FUNCTIONAL_QA_PENDING",
+    "sourceSha": "6b6e8bbba3371b32a1bfb80b903c40377e11d727",
+    "buildRunId": 44052221474,
+    "buildJobId": 133932744471,
+    "artifactId": 14314985190,
+    "artifactDigest": "sha256:e97f86355181a8c685b8dd800626a4885f8e34b45222f178d15355d76cbf499f",
+    "tarSha256": "c63b356550cc307e43b81e18770a7df3342fce9854c029c544a122c68690545c",
+    "buildId": "gi-i66-6b6e8bbba337-57f234755dc1",
+    "hostingVersion": "sites/ays-orbit-360-lab/versions/0964cef6b576a2ad",
+    "previewUrl": "https://ays-orbit-360-lab--gi-i66-rc-44009981499-d08psr2y.web.app",
+    "readback": {
+      "previewFiles": 223,
+      "liveFilesEach": 223,
+      "liveOriginsUnchanged": 2,
+      "siteManifestSha256": "e1de8f3d24ee2fdf305f4334f905a0fcd64e0a65d5019316166ca7dc4a766ab2",
+      "readbackRecordedAtUtc": "2026-11-17T09:08:05.243Z"
+    },
+    "rolloverEvidence": {
+      "artifactId": 14314815423,
+      "artifactDigest": "sha256:e21b2db71930cd866f2d1870012a3353c09fc62790fdaa18428c52e526fe63b5",
+      "inventoryAfterSha256": "43f892b0006b0a0d606bacf08b89b931ede062cc7205f00729a9bb742a69a2e5",
+      "afterReceiptSha256": "036c2fb271fe3b85c5aee35c8e6b1127ee45a82a2a60d4b72d7d473757f5218f",
+      "channelCount": 51,
+      "otherChannelsUnchanged": 50
+    },
+    "sourceIntakeV2Included": true,
+    "realFinancialWrites": 0,
+    "signedPreviewAccepted": false,
+    "liveAccepted": false,
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_SOURCE_INTAKE_PRECISION_PREVIEW_BUILD_20261117.json"
   }
 }
