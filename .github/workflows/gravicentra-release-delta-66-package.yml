@@ -18,6 +18,11 @@ on:
       - .github/workflows/gravicentra-i66-privileged-role-three-function-preview-uat.yml
       - tools/gravicentra-i6-6-advisor-payables-signed-uat.cjs
       - tools/gravicentra-i6-6-direction-preview-legal-acceptance.cjs
+      - tools/gravicentra-i6-6-direction-preview-i66-consent-scope.test.cjs
+      - artifacts/orbit360-recovery/release-control/I6_6_DIRECTION_PREVIEW_V2_SCOPE_AUTHORIZATION_20261116.json
+      - tools/gravicentra-i6-6-preview-channel-reuse-guard.cjs
+      - tools/gravicentra-i6-6-technical-preview-rollover.test.cjs
+      - artifacts/orbit360-recovery/release-control/I6_6_CURRENT_TECHNICAL_PREVIEW_ROLLOVER_20261116.json
       - tools/gravicentra-i6-6-preview-current-live-restore.cjs
       - tools/gravicentra-i6-6-operational-release-candidate.cjs
       - tools/gravicentra-i6-6-preview-candidate-binding.test.cjs
@@ -255,6 +260,8 @@ jobs:
           node --test tools/gravicentra-i6-6-preview-current-live-restore.test.cjs
           node --test tools/gravicentra-i6-6-preview-channel-reuse-guard.test.cjs
           node --test tools/gravicentra-i6-6-preview-candidate-binding.test.cjs
+          node --test tools/gravicentra-i6-6-direction-preview-i66-consent-scope.test.cjs
+          node --test tools/gravicentra-i6-6-technical-preview-rollover.test.cjs
           node --test tools/gravicentra-i6-6-assignment-detail-navigation.test.cjs tools/gravicentra-i6-6-direction-preview-qa-navigation-retry.test.cjs tools/gravicentra-i6-6-preview-current-live-restore-47f4.test.cjs
           node --test tools/gravicentra-i6-6-proposal-uat-diagnostics.test.cjs tools/gravicentra-i6-6-direction-preview-proposal-diagnostic-retry.test.cjs tools/gravicentra-i6-6-preview-current-live-restore-39f54e2.test.cjs
           node tools/gravicentra-governance-preflight-v1.mjs --mode=i6
@@ -430,6 +437,8 @@ jobs:
         id: preview
         env:
           GH_TOKEN: ${{ github.token }}
+          ARTIFACT_ID: ${{ steps.immutable_artifact.outputs.artifact-id }}
+          ARTIFACT_DIGEST: ${{ steps.immutable_artifact.outputs.artifact-digest }}
         run: |
           set -euo pipefail
           CHANNEL_ID="gi-i66-rc-${GITHUB_RUN_ID}"
@@ -462,6 +471,13 @@ jobs:
             # only after exact current version/source and recoverable rollback artifact
             # are proved; LIVE and all business data remain untouched.
             if ! grep -Eqi 'HTTP Error: 429.*channel quota' "$RUNNER_TEMP/gi-i66-preview-result.json"; then exit 1; fi
+            # Current task Preview replacement has its own exact backup and
+            # fresh-inventory lease. It never consumes the legal consent grant
+            # as deployment authority or modifies the historical fallback.
+            if node -e 'const fs=require("fs");const c=JSON.parse(fs.readFileSync(process.env.GITHUB_WORKSPACE+"/candidate/artifacts/orbit360-recovery/release-control/I6_6_RELEASE_TRANSPORT_CONTROL_20261110.json","utf8"));process.exit(c.currentTechnicalPreviewRollover?0:1)'; then
+              node "$GITHUB_WORKSPACE/candidate/tools/gravicentra-i6-6-preview-channel-reuse-guard.cjs" --prepare-technical-rollover
+              REUSE_ID="$(node -p 'JSON.parse(require("fs").readFileSync(process.env.RUNNER_TEMP+"/gi-i66-technical-preview-rollover/before.json","utf8")).channelId')"
+            else
             REUSE_ID='gi-i66-rc-42868854629'
             node "$FIREBASE_CLI_BIN" hosting:channel:list --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/gi-i66-reuse-before.json"
             # A failed signed candidate may occupy this exact Preview. Only the
@@ -496,9 +512,10 @@ jobs:
             console.log('I66_KNOWN_CURRENT_LIVE_PREVIEW_EXACT_VERSION_SOURCE_AND_BACKUP_PASS');
           })().catch(e=>{console.error(e.message);process.exitCode=1;});
           NODE
+            fi
             CHANNEL_ID="$REUSE_ID"
             node "$FIREBASE_CLI_BIN" hosting:channel:deploy "$CHANNEL_ID" --config firebase.json --project "$PROJECT_ID" --expires 7d --non-interactive --json > "$RUNNER_TEMP/gi-i66-preview-result.json"
-            echo 'I66_PREVIEW_CHANNEL_QUOTA_RECOVERY_CURRENT_LIVE_BACKED_ROLLOVER_NO_DELETION'
+            echo 'I66_PREVIEW_CHANNEL_QUOTA_RECOVERY_EXACT_BACKUP_ROLLOVER_NO_DELETION'
           fi
           echo "channel=$CHANNEL_ID" >> "$GITHUB_OUTPUT"
           export CHANNEL_ID
@@ -558,6 +575,30 @@ jobs:
           echo "- Preview URL: $PREVIEW_URL" >> "$GITHUB_STEP_SUMMARY"
           echo "- LIVE and staff-origin fingerprints: UNCHANGED" >> "$GITHUB_STEP_SUMMARY"
           echo "- LIVE promotion: REQUIRES SEPARATE HUMAN GATE" >> "$GITHUB_STEP_SUMMARY"
+      - name: Verify current technical Preview rollover and preserve every other channel
+        if: always()
+        env:
+          PREVIEW_URL: ${{ steps.preview.outputs.url }}
+          PREVIEW_CHANNEL: ${{ steps.preview.outputs.channel }}
+        run: |
+          set -euo pipefail
+          if test -f "$RUNNER_TEMP/gi-i66-technical-preview-rollover/before.json" &&
+             node -e 'const r=JSON.parse(require("fs").readFileSync(process.env.RUNNER_TEMP+"/gi-i66-technical-preview-rollover/before.json","utf8"));process.exit(r.status==="PREPARED_READONLY_NOT_ACCEPTED"?0:1)'; then
+            # Even if deployment/readback reports a failure, record the actual
+            # post-attempt state. This read-only check never changes job failure
+            # into functional acceptance or performs an automatic rollback.
+            export PREVIEW_CHANNEL="${PREVIEW_CHANNEL:-gi-i66-rc-44009981499}"
+            export PREVIEW_URL="${PREVIEW_URL:-https://ays-orbit-360-lab--gi-i66-rc-44009981499-d08psr2y.web.app}"
+            node "$GITHUB_WORKSPACE/candidate/tools/gravicentra-i6-6-preview-channel-reuse-guard.cjs" --finish-technical-rollover
+          fi
+      - name: Retain actual technical Preview before-after and verified rollback backups
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gi-i66-technical-preview-rollover-${{ github.run_id }}
+          path: ${{ runner.temp }}/gi-i66-technical-preview-rollover
+          retention-days: 30
+          if-no-files-found: ignore
 
   protected-conciliaciones-reader-preview:
     needs: gate

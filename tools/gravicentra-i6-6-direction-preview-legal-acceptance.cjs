@@ -1,7 +1,8 @@
 'use strict';
 // Implements the owner's explicit 2026-11-16 decision in her signed Preview
 // session. It never seeds acceptance storage, dismisses a gate or accepts for
-// another actor. This decision is bound to one source successor, not future QA.
+// another actor. Historical one-successor decisions stay exact. The separate
+// I6.6 scope decision below permits only identical V2 Preview technical retries.
 const assert=require('node:assert/strict'),crypto=require('node:crypto'),fs=require('node:fs'),path=require('node:path');
 const {execFileSync}=require('node:child_process');
 const CONTROL='artifacts/orbit360-recovery/release-control/I6_6_RELEASE_TRANSPORT_CONTROL_20261110.json';
@@ -32,6 +33,16 @@ const PROPOSAL_DIAGNOSTIC_RETRY=Object.freeze({
   receiptSha256:'e2c123a1a4a250815b295d2b8aa3b9432bc84bed06b242c174a4b9cc8f7f8634',
   sourceParent:'3076026cdfd900cf8e99037c3220682b3be68943',
   originalReceiptSha256:'68d3961987e19acdc223b7d2adf01eb39c540ca6ae8aa72c64752cab45fddbae',
+  legalOwnerSha256:'b74a965b7be0d67862d82bcf73dacc0d5a8293dcf30cb4f5f3fdeaa6ee1c68a3'
+});
+const I66_SCOPE=Object.freeze({
+  receiptPath:'artifacts/orbit360-recovery/release-control/I6_6_DIRECTION_PREVIEW_V2_SCOPE_AUTHORIZATION_20261116.json',
+  receiptSha256:'d3309675c753bd1b31f9163d506aba2e29ac70583a7b8d54cb5b8503b5c50a44',
+  schema:'I6_6_DIRECTION_PREVIEW_SAME_TERMS_SCOPE_AUTHORIZATION_V1',
+  decisionId:'DIRECTION_I66_PREVIEW_SAME_LEGAL_V2_TECHNICAL_SUCCESSORS_AUTHORIZED_20261116',
+  authorizationScope:'I6_6_PREVIEW_IDENTICAL_V2_TERMS',
+  sourceBaseHead:'25f5112e9b4586a28ded0c49fe91973d1d5dd401',
+  historicalReceiptSha256:'68d3961987e19acdc223b7d2adf01eb39c540ca6ae8aa72c64752cab45fddbae',
   legalOwnerSha256:'b74a965b7be0d67862d82bcf73dacc0d5a8293dcf30cb4f5f3fdeaa6ee1c68a3'
 });
 
@@ -89,6 +100,19 @@ const LEGAL_FAILURE_CHECKS=Object.freeze([
   'DIRECTION_LEGAL_RUNTIME_TENANT_MISMATCH',
   'DIRECTION_LEGAL_RUNTIME_VERSION_MISMATCH',
   'DIRECTION_LEGAL_SCOPE_MISMATCH',
+  'DIRECTION_LEGAL_SCOPE_AUTHORITY_DRIFT',
+  'DIRECTION_LEGAL_SCOPE_BUILD_ID_REQUIRED',
+  'DIRECTION_LEGAL_SCOPE_CANDIDATE_DRIFT',
+  'DIRECTION_LEGAL_SCOPE_HISTORICAL_RECEIPT_CHANGED',
+  'DIRECTION_LEGAL_SCOPE_MARKER_READBACK_FAILED',
+  'DIRECTION_LEGAL_SCOPE_OWNER_CHANGED',
+  'DIRECTION_LEGAL_SCOPE_RECEIPT_MISMATCH',
+  'DIRECTION_LEGAL_SCOPE_SOURCE_NOT_DESCENDANT',
+  'DIRECTION_LEGAL_RELOAD_ACTOR_MISMATCH',
+  'DIRECTION_LEGAL_RELOAD_APP_NOT_READY',
+  'DIRECTION_LEGAL_RELOAD_GATE_PENDING',
+  'DIRECTION_LEGAL_RELOAD_PROOF_REQUIRED',
+  'DIRECTION_LEGAL_RELOAD_RECORD_CHANGED',
   'DIRECTION_LEGAL_SIGNED_ACTOR_REQUIRED',
   'DIRECTION_LEGAL_SIGNED_PROOF_CLAUSES_MISMATCH',
   'DIRECTION_LEGAL_SIGNED_PROOF_DECISION_MISMATCH',
@@ -115,7 +139,8 @@ const LEGAL_FAILURE_CHECKS=Object.freeze([
   'DIRECTION_LEGAL_UNCHECKED_BOX_REQUIRED'
 ]);
 const LEGAL_FAILURE_SUBSTAGES=Object.freeze(['AUTHORITY_VALIDATION','OWNER_READBACK','VISIBLE_GATE_WAIT',
-  'PRE_CLICK_PRESENTATION','COUNTRY_SELECTION','CHECKBOX_ACTION','BUTTON_ACTION','POST_CLICK_GATE_CLOSE','POST_CLICK_PERSISTENCE']);
+  'PRE_CLICK_PRESENTATION','COUNTRY_SELECTION','CHECKBOX_ACTION','BUTTON_ACTION','POST_CLICK_GATE_CLOSE','POST_CLICK_PERSISTENCE',
+  'RELOAD_READBACK','RELOAD_ACTOR_VALIDATION']);
 function safeLegalFailureSubstage(value){return LEGAL_FAILURE_SUBSTAGES.includes(value)?value:null;}
 const normalize=v=>String(v||'').replace(/\s+/g,' ').trim();
 const role=v=>String(v||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z]/g,'');
@@ -157,7 +182,66 @@ function validateProposalDiagnosticRetry({technicalRetryBytes,receiptSha256,cand
   assert.deepEqual(candidate?.legalTechnicalRetry,proposalDiagnosticRetryCandidatePin(cfg.source),'DIRECTION_LEGAL_TECHNICAL_RETRY_BINDING_MISMATCH');
   return true;
 }
-function validateDecision({receipt,receiptSha256,candidate,cfg,sourceParent,actor,technicalRetryBytes}){
+function usesI66Scope(candidate){return candidate?.legalAcceptance?.decisionId===I66_SCOPE.decisionId;}
+function i66ScopeCandidatePin(candidate){
+  return {receiptPath:I66_SCOPE.receiptPath,receiptSha256:I66_SCOPE.receiptSha256,decisionId:I66_SCOPE.decisionId,
+    authorizationScope:I66_SCOPE.authorizationScope,gate:'I6.6',phase:'PREVIEW',origin:candidate.previewUrl,
+    sourceSha:candidate.sourceSha,actorRole:'direccion',termsProjectionSha256:TERMS_SHA256,buildId:candidate.buildId};
+}
+function validateI66ScopeCandidate(candidate){
+  const guard=require('./gravicentra-i6-6-operational-release-candidate.cjs');
+  guard.previewIdentity(candidate);
+  assert.ok(typeof candidate.buildId==='string'&&candidate.buildId.trim()===candidate.buildId,'DIRECTION_LEGAL_SCOPE_BUILD_ID_REQUIRED');
+  guard.validateBuildMarker(candidate,{product:'Gravicentra Insurance',gate:'I6.6',sourceSha:candidate.sourceSha,buildId:candidate.buildId});
+  assert.deepEqual(candidate.legalAcceptance,i66ScopeCandidatePin(candidate),'DIRECTION_LEGAL_CANDIDATE_DECISION_PIN_MISMATCH');
+  assert.equal(candidate.legalTechnicalRetry,undefined,'DIRECTION_LEGAL_TECHNICAL_RETRY_BINDING_MISMATCH');
+  return true;
+}
+function validateI66ScopeDecision({receipt,receiptSha256,candidate,cfg,actor,technicalRetryBytes,control}){
+  assert.equal(cfg.phase,'PREVIEW','DIRECTION_LEGAL_PREVIEW_ONLY');
+  const guard=require('./gravicentra-i6-6-operational-release-candidate.cjs');
+  assert.deepEqual(guard.candidateForPhase(control,'preview'),candidate,'DIRECTION_LEGAL_SCOPE_CANDIDATE_DRIFT');
+  validateI66ScopeCandidate(candidate);
+  assert.equal(cfg.origin,candidate.previewUrl,'DIRECTION_LEGAL_ORIGIN_MISMATCH');
+  assert.equal(cfg.source,candidate.sourceSha,'DIRECTION_LEGAL_CANDIDATE_SOURCE_MISMATCH');
+  assert.equal(technicalRetryBytes,undefined,'DIRECTION_LEGAL_TECHNICAL_RETRY_BINDING_MISMATCH');
+  assert.equal(receiptSha256,I66_SCOPE.receiptSha256,'DIRECTION_LEGAL_SCOPE_RECEIPT_MISMATCH');
+  assert.equal(receipt.schema,I66_SCOPE.schema,'DIRECTION_LEGAL_RECEIPT_SCHEMA');
+  assert.equal(receipt.decisionId,I66_SCOPE.decisionId,'DIRECTION_LEGAL_DECISION_MISMATCH');
+  assert.equal(receipt.sourceBaseHead,I66_SCOPE.sourceBaseHead,'DIRECTION_LEGAL_SOURCE_BASE_MISMATCH');
+  const decision=receipt.decision||{};
+  assert.equal(decision.status,'EXPLICIT_BOUNDED_SCOPE_AUTHORIZATION','DIRECTION_LEGAL_GENUINE_ACCEPTANCE_REQUIRED');
+  assert.equal(decision.response,'autorizo','DIRECTION_LEGAL_GENUINE_ACCEPTANCE_REQUIRED');
+  assert.equal(decision.normalizedResponse,'AUTORIZO','DIRECTION_LEGAL_GENUINE_ACCEPTANCE_REQUIRED');
+  assert.equal(decision.receivedLocalDate,'2026-11-16','DIRECTION_LEGAL_DECISION_DATE_MISMATCH');
+  assert.equal(decision.timezone,'America/Guatemala','DIRECTION_LEGAL_DECISION_DATE_MISMATCH');
+  assert.equal(decision.reviewDocumentSha256,REVIEW_SHA256,'DIRECTION_LEGAL_REVIEW_DOCUMENT_MISMATCH');
+  assert.deepEqual(receipt.subject,{advisorId:ADVISOR,role:'direccion',tenantId:TENANT,country:'GT'},'DIRECTION_LEGAL_SUBJECT_MISMATCH');
+  assert.deepEqual(receipt.environment,{gate:'I6.6',phase:'PREVIEW',repository:'paulaosoriof86/orbit360-core',
+    branch:'recovery/fase-a-clean-20260831',firebaseProject:'ays-orbit-360-lab',
+    originBinding:'EXACT_VALIDATED_IMMUTABLE_CANDIDATE_PREVIEW_ORIGIN'},'DIRECTION_LEGAL_SCOPE_MISMATCH');
+  assert.deepEqual(receipt.legal,{version:VERSION,clauseIds:[...CLAUSES],termsProjectionSha256:TERMS_SHA256,
+    legalOwnerSha256:I66_SCOPE.legalOwnerSha256},'DIRECTION_LEGAL_TERMS_MISMATCH');
+  assert.deepEqual(receipt.constraints,{ordinaryUiOnly:true,sameTermsI66PreviewTechnicalSuccessors:true,
+    otherActors:false,otherTenants:false,otherCountries:false,live:false,futureGates:false,changedTerms:false,
+    realPayments:false,storageSeeding:false,gateBypass:false},'DIRECTION_LEGAL_CONSTRAINT_MISMATCH');
+  assert.deepEqual(receipt.historicalReceipt,{path:RECEIPT,sha256:I66_SCOPE.historicalReceiptSha256,unchanged:true,
+    pastConstraintsRemainHistorical:true},'DIRECTION_LEGAL_SCOPE_HISTORICAL_RECEIPT_CHANGED');
+  assert.deepEqual(receipt.executionAcceptance,{authorizationIsNotExecutionProof:true,requireSignedActor:true,
+    requireSourceAndImmutablePackageAndHostedLegalOwnerEquality:true,requireDisplayedTermsDigestBeforeClick:true,
+    requireNormalCheckboxAndButton:true,requireImmediateAndReloadReadback:true,
+    requireCandidateSourceBuildIdOriginAndReceiptInProof:true,productionAcceptanceUnchanged:true},'DIRECTION_LEGAL_SCOPE_AUTHORITY_DRIFT');
+  assert.equal(role(actor.role),'direccion','DIRECTION_LEGAL_OTHER_ACTOR_FORBIDDEN');
+  assert.equal(actor.advisorId,ADVISOR,'DIRECTION_LEGAL_OTHER_ADVISOR_FORBIDDEN');
+  assert.ok(typeof actor.uid==='string'&&actor.uid.length>0,'DIRECTION_LEGAL_SIGNED_ACTOR_REQUIRED');
+  return true;
+}
+function expectedOrigin(candidate){
+  if(!usesI66Scope(candidate))return ORIGIN;
+  validateI66ScopeCandidate(candidate);return candidate.previewUrl;
+}
+function validateDecision({receipt,receiptSha256,candidate,cfg,sourceParent,actor,technicalRetryBytes,control}){
+  if(usesI66Scope(candidate))return validateI66ScopeDecision({receipt,receiptSha256,candidate,cfg,actor,technicalRetryBytes,control});
   assert.match(receiptSha256,/^[a-f0-9]{64}$/,'DIRECTION_LEGAL_RECEIPT_DIGEST_REQUIRED');
   assert.equal(cfg.phase,'PREVIEW','DIRECTION_LEGAL_PREVIEW_ONLY');
   assert.equal(cfg.origin,ORIGIN,'DIRECTION_LEGAL_ORIGIN_MISMATCH');
@@ -190,10 +274,17 @@ function validateDecision({receipt,receiptSha256,candidate,cfg,sourceParent,acto
 function validateAcceptanceProof(proof,candidate){
   assert.ok(proof,'DIRECTION_LEGAL_SIGNED_PROOF_REQUIRED');
   assert.equal(proof.status,'EXPLICIT_OWNER_DECISION_APPLIED_BY_NORMAL_UI','DIRECTION_LEGAL_SIGNED_PROOF_NOT_ACCEPTED');
-  assert.equal(proof.decisionId,DECISION,'DIRECTION_LEGAL_SIGNED_PROOF_DECISION_MISMATCH');
+  const scoped=usesI66Scope(candidate),origin=expectedOrigin(candidate);
+  assert.equal(proof.decisionId,scoped?I66_SCOPE.decisionId:DECISION,'DIRECTION_LEGAL_SIGNED_PROOF_DECISION_MISMATCH');
   assert.equal(proof.receiptSha256,candidate.legalAcceptance?.receiptSha256,'DIRECTION_LEGAL_SIGNED_PROOF_RECEIPT_MISMATCH');
   assert.equal(proof.sourceSha,candidate.sourceSha,'DIRECTION_LEGAL_SIGNED_PROOF_SOURCE_MISMATCH');
-  assert.equal(proof.origin,ORIGIN,'DIRECTION_LEGAL_SIGNED_PROOF_ORIGIN_MISMATCH');
+  assert.equal(proof.origin,origin,'DIRECTION_LEGAL_SIGNED_PROOF_ORIGIN_MISMATCH');
+  if(scoped){
+    assert.equal(proof.authorizationScope,I66_SCOPE.authorizationScope,'DIRECTION_LEGAL_SIGNED_PROOF_SCOPE_MISMATCH');
+    assert.equal(proof.gate,'I6.6','DIRECTION_LEGAL_SIGNED_PROOF_SCOPE_MISMATCH');
+    assert.equal(proof.buildId,candidate.buildId,'DIRECTION_LEGAL_SCOPE_BUILD_ID_REQUIRED');
+    for(const key of ['immediateReadback','reloadReadback','reloadActorVerified'])assert.equal(proof[key],true,'DIRECTION_LEGAL_RELOAD_PROOF_REQUIRED');
+  }
   assert.equal(proof.version,VERSION,'DIRECTION_LEGAL_SIGNED_PROOF_VERSION_MISMATCH');
   assert.deepEqual(proof.clauseIds,[...CLAUSES],'DIRECTION_LEGAL_SIGNED_PROOF_CLAUSES_MISMATCH');
   assert.equal(proof.termsProjectionSha256,TERMS_SHA256,'DIRECTION_LEGAL_SIGNED_PROOF_TERMS_MISMATCH');
@@ -202,8 +293,8 @@ function validateAcceptanceProof(proof,candidate){
   for(const key of ['acceptedForOtherActors','liveAcceptance','storageSeeded','gateBypassed'])assert.equal(proof[key],false,'DIRECTION_LEGAL_SIGNED_PROOF_SCOPE_MISMATCH');
   return true;
 }
-function validatePresentationIdentity(snapshot,actor){
-  assert.equal(snapshot.origin,ORIGIN,'DIRECTION_LEGAL_RUNTIME_ORIGIN_MISMATCH');
+function validatePresentationIdentity(snapshot,actor,candidate){
+  assert.equal(snapshot.origin,expectedOrigin(candidate),'DIRECTION_LEGAL_RUNTIME_ORIGIN_MISMATCH');
   assert.equal(snapshot.actorUid,actor.uid,'DIRECTION_LEGAL_SIGNED_UID_MISMATCH');
   assert.equal(snapshot.advisorId,ADVISOR,'DIRECTION_LEGAL_RUNTIME_ADVISOR_MISMATCH');
   assert.equal(role(snapshot.role),'direccion','DIRECTION_LEGAL_RUNTIME_ROLE_MISMATCH');
@@ -218,8 +309,8 @@ function validatePresentationIdentity(snapshot,actor){
   assert.equal(snapshot.buttonDisabled,true,'DIRECTION_LEGAL_DISABLED_BUTTON_REQUIRED');
   return true;
 }
-function validatePresentation(snapshot,actor){
-  validatePresentationIdentity(snapshot,actor);
+function validatePresentation(snapshot,actor,candidate){
+  validatePresentationIdentity(snapshot,actor,candidate);
   assert.equal(snapshot.country,'GT','DIRECTION_LEGAL_RUNTIME_COUNTRY_MISMATCH');
   assert.equal(digest(snapshot.terms),TERMS_SHA256,'DIRECTION_LEGAL_DISPLAYED_TEXT_CHANGED');
   if(snapshot.checkboxDisabled!==undefined)assert.equal(snapshot.checkboxDisabled,false,'DIRECTION_LEGAL_COUNTRY_NOT_READY');
@@ -233,12 +324,12 @@ function validateCountrySelection(snapshot){
   assert.equal(snapshot.terms.length,0,'DIRECTION_LEGAL_COUNTRY_SELECTION_TEXT_MUST_WAIT');
   return true;
 }
-function validateAccepted(record,actor,scope,startedAt,finishedAt){
+function validateAccepted(record,actor,scope,startedAt,finishedAt,candidate){
   assert.ok(record&&record.aceptado===true,'DIRECTION_LEGAL_ACCEPTANCE_NOT_PERSISTED');
   assert.equal(record.version,VERSION,'DIRECTION_LEGAL_ACCEPTED_VERSION_MISMATCH');
   assert.equal(record.actorUid,actor.uid,'DIRECTION_LEGAL_ACCEPTED_ACTOR_MISMATCH');
   assert.equal(record.scopeId,scope,'DIRECTION_LEGAL_ACCEPTED_SCOPE_MISMATCH');
-  assert.equal(record.origin,ORIGIN,'DIRECTION_LEGAL_ACCEPTED_ORIGIN_MISMATCH');
+  assert.equal(record.origin,expectedOrigin(candidate),'DIRECTION_LEGAL_ACCEPTED_ORIGIN_MISMATCH');
   assert.equal(record.pais,'GT','DIRECTION_LEGAL_ACCEPTED_COUNTRY_MISMATCH');
   assert.equal(record.tipo,'interno','DIRECTION_LEGAL_ACCEPTED_TYPE_MISMATCH');
   assert.deepEqual(record.clausulas,[...CLAUSES],'DIRECTION_LEGAL_ACCEPTED_CLAUSES_MISMATCH');
@@ -249,23 +340,58 @@ function validateAccepted(record,actor,scope,startedAt,finishedAt){
   assert.ok(Number.isFinite(at)&&at>=startedAt&&at<=finishedAt,'DIRECTION_LEGAL_ACCEPTANCE_TIME_MISMATCH');
   return true;
 }
+function validateReloadReadback(snapshot,actor,scope,immediate,startedAt,finishedAt,candidate){
+  assert.equal(snapshot.origin,expectedOrigin(candidate),'DIRECTION_LEGAL_RUNTIME_ORIGIN_MISMATCH');
+  assert.equal(snapshot.actorUid,actor.uid,'DIRECTION_LEGAL_RELOAD_ACTOR_MISMATCH');
+  assert.equal(snapshot.signedActorUid,actor.uid,'DIRECTION_LEGAL_RELOAD_ACTOR_MISMATCH');
+  assert.equal(snapshot.appStarted,true,'DIRECTION_LEGAL_RELOAD_APP_NOT_READY');
+  assert.equal(snapshot.legalSatisfied,true,'DIRECTION_LEGAL_RELOAD_GATE_PENDING');
+  assert.equal(snapshot.advisorId,ADVISOR,'DIRECTION_LEGAL_RUNTIME_ADVISOR_MISMATCH');
+  assert.equal(role(snapshot.role),'direccion','DIRECTION_LEGAL_RUNTIME_ROLE_MISMATCH');
+  assert.equal(snapshot.tenantId,TENANT,'DIRECTION_LEGAL_RUNTIME_TENANT_MISMATCH');
+  assert.equal(snapshot.scope,scope,'DIRECTION_LEGAL_RUNTIME_SCOPE_MISMATCH');
+  assert.equal(snapshot.scope,'user:'+(snapshot.email||snapshot.actorUid),'DIRECTION_LEGAL_RUNTIME_SCOPE_MISMATCH');
+  assert.equal(snapshot.gateCount,0,'DIRECTION_LEGAL_RELOAD_GATE_PENDING');
+  validateAccepted(snapshot.record,actor,scope,startedAt,finishedAt,candidate);
+  assert.deepEqual(snapshot.record,immediate,'DIRECTION_LEGAL_RELOAD_RECORD_CHANGED');
+  return true;
+}
 async function acceptDirectionPreviewLegal({page,actor,cfg}){
   let legalSubstage='AUTHORITY_VALIDATION';
   try{
-  const receiptBytes=fs.readFileSync(RECEIPT),receipt=JSON.parse(receiptBytes),receiptSha256=hash(receiptBytes);
   const control=JSON.parse(fs.readFileSync(CONTROL,'utf8'));
   assert.equal(control.status,'OPERATIONAL_BACKEND_PREVIEW_AUTHORIZED','DIRECTION_LEGAL_PREVIEW_GATE_NOT_ACTIVE');
-  const sourceParent=execFileSync('git',['rev-parse',cfg.source+'^'],{encoding:'utf8'}).trim();
-  const technicalRetry=sourceParent===PROPOSAL_DIAGNOSTIC_RETRY.sourceParent?PROPOSAL_DIAGNOSTIC_RETRY:
+  const candidate=control.operationalReleaseCandidate,scoped=usesI66Scope(candidate);
+  const receiptPath=scoped?I66_SCOPE.receiptPath:RECEIPT;
+  const receiptBytes=fs.readFileSync(receiptPath),receipt=JSON.parse(receiptBytes),receiptSha256=hash(receiptBytes);
+  const sourceParent=scoped?undefined:execFileSync('git',['rev-parse',cfg.source+'^'],{encoding:'utf8'}).trim();
+  const technicalRetry=scoped?undefined:sourceParent===PROPOSAL_DIAGNOSTIC_RETRY.sourceParent?PROPOSAL_DIAGNOSTIC_RETRY:
     sourceParent===TECHNICAL_RETRY.sourceParent?TECHNICAL_RETRY:undefined;
   const technicalRetryBytes=technicalRetry?fs.readFileSync(technicalRetry.receiptPath):undefined;
-  validateDecision({receipt,receiptSha256,candidate:control.operationalReleaseCandidate,cfg,sourceParent,actor,technicalRetryBytes});
+  validateDecision({receipt,receiptSha256,candidate,cfg,sourceParent,actor,technicalRetryBytes,control});
+  if(scoped){
+    // The once-approved scope may cover descendant technical candidates, not
+    // unrelated or pre-authorization source trees. CI checks out full history.
+    try{execFileSync('git',['merge-base','--is-ancestor',I66_SCOPE.sourceBaseHead,cfg.source],{stdio:'pipe'});}
+    catch(_){throw new Error('DIRECTION_LEGAL_SCOPE_SOURCE_NOT_DESCENDANT');}
+    assert.equal(hash(fs.readFileSync(RECEIPT)),I66_SCOPE.historicalReceiptSha256,'DIRECTION_LEGAL_SCOPE_HISTORICAL_RECEIPT_CHANGED');
+    assert.equal(hash(execFileSync('git',['show',cfg.source+':'+RECEIPT])),I66_SCOPE.historicalReceiptSha256,'DIRECTION_LEGAL_SCOPE_HISTORICAL_RECEIPT_CHANGED');
+  }
   if(technicalRetryBytes)assert.equal(hash(execFileSync('git',['show',cfg.source+':'+technicalRetry.receiptPath])),technicalRetry.receiptSha256,'DIRECTION_LEGAL_TECHNICAL_RETRY_NOT_IN_SOURCE');
-  assert.equal(hash(execFileSync('git',['show',cfg.source+':'+RECEIPT])),receiptSha256,'DIRECTION_LEGAL_DECISION_NOT_IN_SOURCE');
+  assert.equal(hash(execFileSync('git',['show',cfg.source+':'+receiptPath])),receiptSha256,'DIRECTION_LEGAL_DECISION_NOT_IN_SOURCE');
   assert.ok(cfg.packageRoot&&path.isAbsolute(cfg.packageRoot),'DIRECTION_LEGAL_PACKAGE_ROOT_REQUIRED');
   legalSubstage='OWNER_READBACK';
+  const packageMarker=scoped?JSON.parse(fs.readFileSync(path.join(cfg.packageRoot,'bundle/site/__recovery__/build.json'),'utf8')):null;
+  const verifyScopeMarker=async()=>{
+    if(!scoped)return;
+    const response=await fetch(cfg.origin+'/__recovery__/build.json',{redirect:'error',headers:{'cache-control':'no-cache'},signal:AbortSignal.timeout(30000)});
+    assert.equal(response.status,200,'DIRECTION_LEGAL_SCOPE_MARKER_READBACK_FAILED');
+    require('./gravicentra-i6-6-operational-release-candidate.cjs').validateBuildMarker(candidate,await response.json(),packageMarker);
+  };
+  await verifyScopeMarker();
   const bundled=fs.readFileSync(path.join(cfg.packageRoot,'bundle/site/core/legal.js'));
   const source=execFileSync('git',['show',cfg.source+':orbit360-platform/core/legal.js']);
+  if(scoped)assert.equal(hash(source),I66_SCOPE.legalOwnerSha256,'DIRECTION_LEGAL_SCOPE_OWNER_CHANGED');
   if(technicalRetryBytes)assert.equal(hash(source),technicalRetry.legalOwnerSha256,'DIRECTION_LEGAL_TECHNICAL_RETRY_OWNER_CHANGED');
   assert.equal(hash(bundled),hash(source),'DIRECTION_LEGAL_PACKAGE_SOURCE_MISMATCH');
   const response=await fetch(cfg.origin+'/core/legal.js',{headers:{'cache-control':'no-cache'}});
@@ -288,7 +414,7 @@ async function acceptDirectionPreviewLegal({page,actor,cfg}){
         metadata:w(c.querySelector('.lg-meta')?.textContent)}))};
   });
   let snapshot=await readPresentation();
-  validatePresentationIdentity(snapshot,actor);
+  validatePresentationIdentity(snapshot,actor,candidate);
   if(snapshot.countrySelectionRequired){
     validateCountrySelection(snapshot);
     legalSubstage='COUNTRY_SELECTION';
@@ -296,7 +422,7 @@ async function acceptDirectionPreviewLegal({page,actor,cfg}){
     legalSubstage='PRE_CLICK_PRESENTATION';
     snapshot=await readPresentation();
   }
-  validatePresentation(snapshot,actor);
+  validatePresentation(snapshot,actor,candidate);
   const startedAt=Date.now(),gate=page.locator('[data-legal-gate]');
   legalSubstage='CHECKBOX_ACTION';
   await gate.locator('#lg-chk').check();
@@ -306,9 +432,33 @@ async function acceptDirectionPreviewLegal({page,actor,cfg}){
   await page.waitForSelector('[data-legal-gate]',{state:'detached',timeout:10000});
   legalSubstage='POST_CLICK_PERSISTENCE';
   const record=await page.evaluate(scope=>Orbit.legal.aceptaciones()[scope]||null,snapshot.scope);
-  validateAccepted(record,actor,snapshot.scope,startedAt,Date.now());
-  return{status:'EXPLICIT_OWNER_DECISION_APPLIED_BY_NORMAL_UI',decisionId:DECISION,receiptSha256,
-    sourceSha:cfg.source,origin:ORIGIN,version:VERSION,clauseIds:[...CLAUSES],termsProjectionSha256:TERMS_SHA256,
+  const immediateAt=Date.now();
+  validateAccepted(record,actor,snapshot.scope,startedAt,immediateAt,candidate);
+  if(scoped){
+    legalSubstage='RELOAD_READBACK';
+    await page.reload({waitUntil:'commit',timeout:30000});
+    await page.waitForFunction(()=>{
+      const u=window.Orbit?.auth?.user?.();
+      return !!(u?.uid&&u.tenantId&&window.Orbit?.session?.rol?.()&&window.Orbit?.legal?.aceptaciones&&
+        window.Orbit?.productAppP0?.isStarted?.()===true&&window.Orbit?.productRuntimeBrowserProvidersP0?.initialUser);
+    },null,{timeout:30000});
+    legalSubstage='RELOAD_ACTOR_VALIDATION';
+    const reloaded=await page.evaluate(async scope=>{
+      const signed=await Orbit.productRuntimeBrowserProvidersP0.initialUser();
+      const u=Orbit.auth.user()||{};
+      return {origin:location.origin,actorUid:u.uid,advisorId:u.advisorId,role:Orbit.session.rol(),tenantId:u.tenantId,
+        signedActorUid:signed?.uid||'',appStarted:Orbit.productAppP0.isStarted()===true,
+        legalSatisfied:Orbit.legal.yaAcepto(scope)===true,email:u.email||'',scope,
+        gateCount:document.querySelectorAll('[data-legal-gate]').length,
+        record:Orbit.legal.aceptaciones()[scope]||null};
+    },snapshot.scope);
+    validateReloadReadback(reloaded,actor,snapshot.scope,record,startedAt,immediateAt,candidate);
+    await verifyScopeMarker();
+  }
+  return{status:'EXPLICIT_OWNER_DECISION_APPLIED_BY_NORMAL_UI',decisionId:scoped?I66_SCOPE.decisionId:DECISION,receiptSha256,
+    sourceSha:cfg.source,origin:expectedOrigin(candidate),version:VERSION,clauseIds:[...CLAUSES],termsProjectionSha256:TERMS_SHA256,
+    ...(scoped?{authorizationScope:I66_SCOPE.authorizationScope,gate:'I6.6',buildId:candidate.buildId,
+      immediateReadback:true,reloadReadback:true,reloadActorVerified:true}:{}),
     actorUidSha256:hash(actor.uid),scopeSha256:hash(snapshot.scope),acceptedAt:record.fecha,
     acceptedForOtherActors:false,liveAcceptance:false,storageSeeded:false,gateBypassed:false};
   }catch(error){
@@ -319,5 +469,5 @@ async function acceptDirectionPreviewLegal({page,actor,cfg}){
   }
 }
 module.exports={CONTROL,RECEIPT,DECISION,SOURCE_BASE,SOURCE_PARENT,ORIGIN,ADVISOR,TENANT,VERSION,CLAUSES,TERMS_SHA256,REVIEW_SHA256,TECHNICAL_RETRY,technicalRetryCandidatePin,validateTechnicalRetry,
-  PROPOSAL_DIAGNOSTIC_RETRY,proposalDiagnosticRetryCandidatePin,validateProposalDiagnosticRetry,
+  PROPOSAL_DIAGNOSTIC_RETRY,proposalDiagnosticRetryCandidatePin,validateProposalDiagnosticRetry,I66_SCOPE,usesI66Scope,i66ScopeCandidatePin,validateI66ScopeCandidate,validateI66ScopeDecision,validateReloadReadback,
   LEGAL_FAILURE_CHECKS,LEGAL_FAILURE_SUBSTAGES,safeLegalFailureSubstage,digest,projectCatalog,validateDecision,validatePresentationIdentity,validatePresentation,validateCountrySelection,validateAccepted,validateAcceptanceProof,acceptDirectionPreviewLegal};

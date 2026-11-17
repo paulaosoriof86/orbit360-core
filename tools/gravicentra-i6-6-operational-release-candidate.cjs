@@ -48,6 +48,11 @@ const PINNED_OWNER_PATHS = Object.freeze([
   'functions','orbit360-platform','firebase.json','firestore.rules','storage.rules',
   ...DRIVERS,'tools/gravicentra-i6-6-carlos-paula-live-synthetic-ops-leads-uat.cjs',
   'tools/gravicentra-i6-6-direction-preview-legal-acceptance.cjs',
+  'tools/gravicentra-i6-6-direction-preview-i66-consent-scope.test.cjs',
+  'artifacts/orbit360-recovery/release-control/I6_6_DIRECTION_PREVIEW_V2_SCOPE_AUTHORIZATION_20261116.json',
+  'tools/gravicentra-i6-6-preview-channel-reuse-guard.cjs',
+  'tools/gravicentra-i6-6-technical-preview-rollover.test.cjs',
+  'artifacts/orbit360-recovery/release-control/I6_6_CURRENT_TECHNICAL_PREVIEW_ROLLOVER_20261116.json',
   // Preserve the exact QA-only navigation retry and its restore proof after build.
   'tools/gravicentra-i6-6-preview-current-live-restore.cjs',
   '.github/workflows/gravicentra-release-delta-66-package.yml',
@@ -81,11 +86,13 @@ const checkBuildId = (v,source,label) => {
 function previewIdentity(p) {
   checkId(p.buildRunId,'I66_OPERATIONAL_BUILD_RUN_PIN');
   checkSha(p.sourceSha,'I66_OPERATIONAL_SOURCE_PIN');
-  // Retain the exact historical reusable channel, not arbitrary reuse. New
-  // endpoints belong to this build run and must be literal same-site origins.
+  // Retain the historical channel and permit only the separately source-pinned
+  // current-task rollover. Otherwise a new endpoint belongs to this build run.
   const historical=p.previewUrl===PREVIEW&&p.previewChannelId===CHANNEL;
   if(!historical){
-    assert.equal(p.previewChannelId,'gi-i66-rc-'+p.buildRunId,'I66_OPERATIONAL_PREVIEW_CHANNEL_RUN_DRIFT');
+    if(p.previewRollover!==undefined){
+      require('./gravicentra-i6-6-preview-channel-reuse-guard.cjs').validateTechnicalRolloverCandidate(p);
+    }else assert.equal(p.previewChannelId,'gi-i66-rc-'+p.buildRunId,'I66_OPERATIONAL_PREVIEW_CHANNEL_RUN_DRIFT');
     assert.match(String(p.previewUrl||''),new RegExp('^https://'+SITE+'--'+p.previewChannelId+'-[a-z0-9]+\\.web\\.app$'),'I66_OPERATIONAL_PREVIEW_ORIGIN_DRIFT');
     checkBuildId(p.buildId,p.sourceSha,'I66_OPERATIONAL_BUILD_ID_PIN');
   }

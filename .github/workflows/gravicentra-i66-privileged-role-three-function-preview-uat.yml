@@ -60,6 +60,8 @@ jobs:
           set -euo pipefail
           node --test tools/gravicentra-i6-6-operational-release-candidate.test.cjs
           node --test tools/gravicentra-i6-6-preview-candidate-binding.test.cjs
+          node --test tools/gravicentra-i6-6-direction-preview-i66-consent-scope.test.cjs
+          node --test tools/gravicentra-i6-6-technical-preview-rollover.test.cjs
           node --test tools/gravicentra-i6-6-advisor-payables-signed-uat.test.cjs tools/gravicentra-i6-6-finance-ui-diagnostics.test.cjs
           node --test tools/gravicentra-i6-6-assignment-detail-navigation.test.cjs tools/gravicentra-i6-6-direction-preview-qa-navigation-retry.test.cjs tools/gravicentra-i6-6-preview-current-live-restore-47f4.test.cjs
           node --test tools/gravicentra-i6-6-proposal-uat-diagnostics.test.cjs tools/gravicentra-i6-6-direction-preview-proposal-diagnostic-retry.test.cjs tools/gravicentra-i6-6-preview-current-live-restore-39f54e2.test.cjs

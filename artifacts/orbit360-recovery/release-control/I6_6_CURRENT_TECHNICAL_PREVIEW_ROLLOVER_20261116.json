@@ -1,0 +1,73 @@
+{
+  "schema": "GI_I66_CURRENT_TECHNICAL_PREVIEW_ROLLOVER_V1",
+  "status": "EXACT_CURRENT_TASK_PREVIEW_REPLACEMENT_WITH_RECOVERABLE_BACKUP",
+  "gate": "I6.6",
+  "phase": "PREVIEW",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "projectId": "ays-orbit-360-lab",
+  "sourceBaseHead": "25f5112e9b4586a28ded0c49fe91973d1d5dd401",
+  "executionAuthority": {
+    "kind": "EXISTING_I66_CONTINUE_CORRECT_TEST_AND_PUBLISH_SCOPE",
+    "canonicalPlan": "artifacts/orbit360-recovery/release-control/I6_6_OPERATIONAL_CONTINUATION_20261115.json",
+    "scope": "Replace only the current isolated technical Preview with the next immutable I6.6 candidate under the existing instruction to continue correction and signed verification. This is not an extension of the separate legal consent decision and not permission to delete any channel, change LIVE or apply payments.",
+    "newLegalConsentGrantUsedForHosting": false,
+    "mustStopOnBeforeStateDrift": true
+  },
+  "channel": {
+    "id": "gi-i66-rc-44009981499",
+    "origin": "https://ays-orbit-360-lab--gi-i66-rc-44009981499-d08psr2y.web.app",
+    "createdAt": "2026-11-17T03:34:28.874524705Z",
+    "expectedVersion": "sites/ays-orbit-360-lab/versions/2ce3c5f70cf345e4"
+  },
+  "previousCandidate": {
+    "sourceSha": "d5e64e2f4ab9acb89d8765f48da33cba2df089a5",
+    "buildRunId": 44009981499,
+    "buildRunAttempt": 2,
+    "artifactId": 14296328231,
+    "artifactDigest": "sha256:1c6e92158eea25d47b1765791bf57a9b36e2e09311351008d41fa8e64583ac9f",
+    "expectedSiteFileCount": 223,
+    "runtimeProofRequired": "DOWNLOAD_HASH_ARCHIVE_VALIDATE_MANIFEST_AND_COMPARE_EVERY_HOSTED_FILE_INCLUDING_BUILD_JSON_BEFORE_REPLACEMENT"
+  },
+  "protectedLive": {
+    "sourceSha": "84769378eb2014addebfefdbdd63091bddc4b817",
+    "buildRunId": 43503721126,
+    "artifactId": 14075022275,
+    "artifactDigest": "sha256:b0f3bacb68511cdfc91ac934602c51f55afec5c1d6428d886d13a72a706ee283",
+    "liveRunId": 43506971214,
+    "version": "sites/ays-orbit-360-lab/versions/0766db29b338befc",
+    "origins": [
+      "https://ays-orbit-360-lab.web.app",
+      "https://app.aysseguros.com"
+    ]
+  },
+  "freshInventoryEvidence": {
+    "runId": 44010597588,
+    "runAttempt": 2,
+    "jobId": 133820781108,
+    "observedAtUtc": "2026-11-17T04:35:01Z",
+    "totalChannels": 51,
+    "inventoryStep": "SUCCESS",
+    "wholeJob": "FAILURE_STALE_HISTORICAL_MARKER_ASSERTION_NOT_INVENTORY",
+    "writes": 0,
+    "freshRuntimeInventoryRequiredAgain": true
+  },
+  "constraints": {
+    "onlyWhenNewChannelQuotaIsExhausted": true,
+    "backupBeforeOverwrite": true,
+    "readbackBeforeAndAfter": true,
+    "sameNewImmutableArtifact": true,
+    "noLiveChanges": true,
+    "noOtherChannelChanges": true,
+    "noChannelDeletion": true,
+    "noBackendChanges": true,
+    "noBusinessDataWrites": true,
+    "noRulesAuthIamChanges": true,
+    "stopOnIdentityDrift": true
+  },
+  "notAcceptance": {
+    "hostingReplacementIsNotSignedFunctionalPass": true,
+    "hostingReplacementIsNotProductionAcceptance": true,
+    "noOperationalPercentIncrease": true
+  }
+}

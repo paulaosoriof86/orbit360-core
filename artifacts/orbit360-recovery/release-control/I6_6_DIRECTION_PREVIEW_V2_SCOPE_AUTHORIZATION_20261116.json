@@ -1,0 +1,67 @@
+{
+  "schema": "I6_6_DIRECTION_PREVIEW_SAME_TERMS_SCOPE_AUTHORIZATION_V1",
+  "decisionId": "DIRECTION_I66_PREVIEW_SAME_LEGAL_V2_TECHNICAL_SUCCESSORS_AUTHORIZED_20261116",
+  "sourceBaseHead": "25f5112e9b4586a28ded0c49fe91973d1d5dd401",
+  "decision": {
+    "status": "EXPLICIT_BOUNDED_SCOPE_AUTHORIZATION",
+    "response": "autorizo",
+    "normalizedResponse": "AUTORIZO",
+    "receivedLocalDate": "2026-11-16",
+    "timezone": "America/Guatemala",
+    "reviewDocumentSha256": "c368d591a5b533a4c047cbffa265171e464c3574a70520398b967f243588d0e9",
+    "scopeExplanation": "Paula authorized applying her existing acceptance of the same three internal legal V2.0 clauses to candidates and technical retries within I6.6, only her Direction account and A&S Guatemala, with identical text. This is not authorization for other users, LIVE legal acceptance, changed terms, future gates, or real payments."
+  },
+  "subject": {
+    "advisorId": "ase-paula-osorio",
+    "role": "direccion",
+    "tenantId": "alianzas-soluciones",
+    "country": "GT"
+  },
+  "environment": {
+    "gate": "I6.6",
+    "phase": "PREVIEW",
+    "repository": "paulaosoriof86/orbit360-core",
+    "branch": "recovery/fase-a-clean-20260831",
+    "firebaseProject": "ays-orbit-360-lab",
+    "originBinding": "EXACT_VALIDATED_IMMUTABLE_CANDIDATE_PREVIEW_ORIGIN"
+  },
+  "legal": {
+    "version": "2.0",
+    "clauseIds": [
+      "confidencialidad",
+      "tratamiento_datos",
+      "descargo_ia"
+    ],
+    "termsProjectionSha256": "485b07887091063cc7a5d1dc8f11a9bb547f2ef059490bb04d4acee73404f6b2",
+    "legalOwnerSha256": "b74a965b7be0d67862d82bcf73dacc0d5a8293dcf30cb4f5f3fdeaa6ee1c68a3"
+  },
+  "constraints": {
+    "ordinaryUiOnly": true,
+    "sameTermsI66PreviewTechnicalSuccessors": true,
+    "otherActors": false,
+    "otherTenants": false,
+    "otherCountries": false,
+    "live": false,
+    "futureGates": false,
+    "changedTerms": false,
+    "realPayments": false,
+    "storageSeeding": false,
+    "gateBypass": false
+  },
+  "historicalReceipt": {
+    "path": "artifacts/orbit360-recovery/release-control/I6_6_DIRECTION_PREVIEW_LEGAL_ACCEPTANCE_20261116.json",
+    "sha256": "68d3961987e19acdc223b7d2adf01eb39c540ca6ae8aa72c64752cab45fddbae",
+    "unchanged": true,
+    "pastConstraintsRemainHistorical": true
+  },
+  "executionAcceptance": {
+    "authorizationIsNotExecutionProof": true,
+    "requireSignedActor": true,
+    "requireSourceAndImmutablePackageAndHostedLegalOwnerEquality": true,
+    "requireDisplayedTermsDigestBeforeClick": true,
+    "requireNormalCheckboxAndButton": true,
+    "requireImmediateAndReloadReadback": true,
+    "requireCandidateSourceBuildIdOriginAndReceiptInProof": true,
+    "productionAcceptanceUnchanged": true
+  }
+}

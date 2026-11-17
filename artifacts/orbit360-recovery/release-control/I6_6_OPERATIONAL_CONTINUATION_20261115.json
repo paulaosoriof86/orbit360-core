@@ -4,6 +4,17 @@
   "activeGate": "I6.6",
   "historicalClosedGate": "B4-007",
   "status": "EXECUTING_SOURCE_QA_NOT_NEW_LIVE_ACCEPTANCE",
+  "currentAuthorization": {
+    "receipt": "artifacts/orbit360-recovery/release-control/I6_6_DIRECTION_PREVIEW_V2_SCOPE_AUTHORIZATION_20261116.json",
+    "receiptSha256": "d3309675c753bd1b31f9163d506aba2e29ac70583a7b8d54cb5b8503b5c50a44",
+    "status": "SAME_V2_TERMS_DIRECTION_GT_I66_PREVIEW_TECHNICAL_SUCCESSORS_AUTHORIZED",
+    "newImmutableBuildRequired": true,
+    "historicalConsentReceiptsUnchanged": true,
+    "otherActors": false,
+    "liveAcceptance": false,
+    "realPayments": false,
+    "signedExecutionProof": "PENDING_NOT_CLAIMED"
+  },
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
   "ownerAuthority": "Paula Dirección: continuar el plan sin reiniciarlo, cerrar parciales, solucionar hallazgos transversales, probar y publicar cada lote; prioridad conciliación y liquidación documentada de asesores. Respuestas y ampliación de clientes recibidas el 15 de noviembre.",

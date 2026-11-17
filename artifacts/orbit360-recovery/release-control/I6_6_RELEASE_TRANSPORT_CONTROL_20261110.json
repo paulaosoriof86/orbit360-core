@@ -5,6 +5,16 @@
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
   "status": "PREVIEW_BUILD_REQUESTED",
+  "currentTechnicalPreviewRollover": {
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_TECHNICAL_PREVIEW_ROLLOVER_20261116.json",
+    "receiptSha256": "db754d7a0b26f6396e4320c7d60e09c3aba608b5ad29a32abaf03fe3d8157fb7"
+  },
+  "directionSameTermsPreviewScope": {
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_DIRECTION_PREVIEW_V2_SCOPE_AUTHORIZATION_20261116.json",
+    "receiptSha256": "d3309675c753bd1b31f9163d506aba2e29ac70583a7b8d54cb5b8503b5c50a44",
+    "liveAcceptance": false,
+    "realPayments": false
+  },
   "previewChannelReuseAuthorization": {
     "status": "CURRENT_LIVE_BACKED_SINGLE_PREVIEW_REUSE_AUTHORIZED",
     "approvedByDirection": true,
