@@ -132,6 +132,46 @@ jobs:
             }
           })().catch(e=>{console.error(String(e.name||'error'));process.exitCode=1;});
           NODE
+
+      - name: Read current Sergio client policy receipt vehicle relations without PII or writes
+        shell: bash
+        run: |
+          set -euo pipefail
+          node - <<'NODE'
+          'use strict';
+          const assert=require('node:assert/strict'),crypto=require('node:crypto');
+          const firebase=require(process.env.RUNNER_TEMP+'/i66-readonly/node_modules/firebase-admin');
+          const credential=['SA_LAB','SA_ALT','SA_DEFAULT']
+            .map(key=>{try{return JSON.parse(process.env[key]||'');}catch{return null;}})
+            .find(v=>v&&v.type==='service_account'&&v.project_id==='ays-orbit-360-lab'&&v.private_key);
+          assert.ok(credential,'GI_SERGIO_READONLY_AUTH_UNAVAILABLE');
+          if(!firebase.apps.length)firebase.initializeApp({credential:firebase.credential.cert(credential),projectId:'ays-orbit-360-lab'});
+          const db=firebase.firestore(),root=db.collection('tenants').doc('alianzas-soluciones'),clientId='cli_mwmivdmb';
+          const col=name=>root.collection('data').doc(name).collection('items');
+          (async()=>{
+            const client=await col('clientes').doc(clientId).get();
+            const collections=['polizas','recibosEsperados','carteraPrimas','cobros','vehiculos','actividades'];
+            const result={clientExists:client.exists,counts:{},duplicatePolicyVersions:0,unlinkedReceipts:0,unlinkedPortfolio:0,possiblePaymentRecords:0};
+            const snapshots=new Map();
+            for(const name of collections){
+              const snap=await col(name).where('clienteId','==',clientId).limit(60).get();
+              snapshots.set(name,snap.docs.map(d=>({id:d.id,...d.data()})));
+              result.counts[name]=snap.size;
+            }
+            const policies=snapshots.get('polizas'),ids=new Set(policies.map(p=>p.id));
+            const keys=new Set();
+            for(const p of policies){
+              const key=String(p.numero||'')+'|'+String(p.vigenciaInicio||'');
+              if(keys.has(key))result.duplicatePolicyVersions++;keys.add(key);
+            }
+            result.unlinkedReceipts=snapshots.get('recibosEsperados').filter(r=>!ids.has(String(r.polizaId||''))).length;
+            result.unlinkedPortfolio=snapshots.get('carteraPrimas').filter(r=>!ids.has(String(r.polizaId||''))).length;
+            result.possiblePaymentRecords=snapshots.get('cobros').filter(r=>r.estado==='Pagado'||r.fechaPago).length;
+            console.log('GI_SERGIO_P0_CANONICAL_COUNTS '+JSON.stringify(result));
+            if(!client.exists)throw Error('GI_SERGIO_CANONICAL_CLIENT_MISSING');
+          })().catch(error=>{console.error('GI_SERGIO_P0_READONLY_HOLD '+String(error&&error.code||error&&error.message||'UNKNOWN').slice(0,90));process.exitCode=1;});
+          NODE
+
   inspect-live-revision-traffic:
     if: github.repository == 'paulaosoriof86/orbit360-core' && github.ref == 'refs/heads/recovery/fase-a-clean-20260831'
     runs-on: ubuntu-24.04
