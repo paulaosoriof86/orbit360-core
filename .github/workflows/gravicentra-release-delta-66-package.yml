@@ -95,6 +95,8 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
       - id: release
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
           node - <<'NODE'
@@ -222,18 +224,40 @@ jobs:
             invoicePreview.forbidRealFinancialWrites===true&&
             invoicePreview.requireLiveFunctionRevisionBeforeAfterIdentity===true&&
             invoicePreview.requireExactBackendBlobInArtifact===true;
-          const successor=c.postAcceptanceProductSourcePreviewBuildRequest20261118||null;
+          // A successor never mutates the original approved request. This
+          // exact new request must attest an already successful source CI run
+          // and a manifest blob pinned to this immutable source tree.
+          const financeSuccessor=!!c.postAcceptanceInsurerTotalsPreviewBuildRequest20261118;
+          const successor=c.postAcceptanceInsurerTotalsPreviewBuildRequest20261118||
+            c.postAcceptanceProductSourcePreviewBuildRequest20261118||null;
           let successorBuild=false;
           if(successor){
             const {execFileSync}=require('node:child_process');
             const sha=execFileSync('git',['rev-parse','HEAD:artifacts/orbit360-recovery/release-control/I6_6_APPROVED_PRODUCT_DELTA_MANIFEST_20261110.json'],{encoding:'utf8'}).trim();
             const live=c.currentExactHostingRelease||{};
+            let qaTrusted=successor.sourceQaRunId===44378705804&&
+              successor.sourceQaHead==='e4eced4f01d3a5d5ea6565e72f168a448fe5898c';
+            if(financeSuccessor){
+              const expectedWorkflow='.github/workflows/gravicentra-i66-privileged-role-parity-source-qa.yml';
+              const runId=successor.sourceQaRunId;
+              const sourceHead=successor.sourceQaHead;
+              if(!Number.isSafeInteger(runId)||runId<=0||!/^[0-9a-f]{40}$/.test(sourceHead)||
+                  successor.sourceQaWorkflow!==expectedWorkflow||
+                  successor.releaseScope!=='EXACT_IMMUTABLE_PREVIEW_ONLY_INSURER_GROSS_RECEIPT_APPLICATION'||
+                  successor.sourceQaLocalFinancialTests!==113||successor.sourceQaLocalFinancialWrites!==0||
+                  successor.sourceReadyForNewImmutablePackage!==true||successor.previewOnlyNoLive!==true)
+                throw Error('I66_FINANCE_PREVIEW_SOURCE_AUTH_INVALID');
+              const qa=JSON.parse(execFileSync('gh',['api',`repos/${process.env.GITHUB_REPOSITORY}/actions/runs/${runId}`],
+                {encoding:'utf8',env:{...process.env,GH_TOKEN:process.env.GITHUB_TOKEN}}));
+              qaTrusted=qa.head_sha===sourceHead&&qa.head_branch===successor.authorizedBranch&&
+                qa.event==='push'&&qa.status==='completed'&&qa.conclusion==='success'&&
+                qa.path===expectedWorkflow;
+            }
             const ok=successor.status==='OWNER_APPROVED_SOURCE_PREVIEW_ONLY'&&
               successor.approvedByDirection===true&&successor.gate==='I6.6'&&
               successor.authorizedBranch==='recovery/fase-a-clean-20260831'&&
               successor.approvedManifestBlobSha===sha&&
-              successor.sourceQaRunId===44378705804&&
-              successor.sourceQaHead==='e4eced4f01d3a5d5ea6565e72f168a448fe5898c'&&
+              qaTrusted&&
               c.status==='OPERATIONAL_EXACT_LIVE_ACCEPTED_LOCKED'&&
               c.livePromotionAuthorized===false&&c.forbidBackendLiveFunctionDeploy===true&&
               c.forbidBackendFunctionDeploy===true&&
@@ -328,6 +352,10 @@ jobs:
           node --test tools/gravicentra-i6-6-assignment-detail-navigation.test.cjs tools/gravicentra-i6-6-direction-preview-qa-navigation-retry.test.cjs tools/gravicentra-i6-6-preview-current-live-restore-47f4.test.cjs
           node --test tools/gravicentra-i6-6-proposal-uat-diagnostics.test.cjs tools/gravicentra-i6-6-direction-preview-proposal-diagnostic-retry.test.cjs tools/gravicentra-i6-6-preview-current-live-restore-39f54e2.test.cjs
           node --test tools/gravicentra-i6-6-source-intake-readiness.test.cjs
+          # Financial writes are not authorized by this QA. Exercise the real
+          # callable with synthetic transactional Firestore doubles, including
+          # insurer total priority, source row identity and idempotent readback.
+          node --test tools/gravicentra-i6-6-source-intake-v2.test.cjs tools/gravicentra-i6-6-proposal-application-boundary.test.cjs tools/gravicentra-i6-6-cobros-application-and-temporal-search.test.cjs tools/gravicentra-i6-6-proposal-application-signed-uat.test.cjs
           node --test tools/gravicentra-i6-6-operational-live-acceptance.test.cjs
           node tools/gravicentra-governance-preflight-v1.mjs --mode=i6
       - name: Set up existing Firebase LAB credentials for read-only public config and tenant branding

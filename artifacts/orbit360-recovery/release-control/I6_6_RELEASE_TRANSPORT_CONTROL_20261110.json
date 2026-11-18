@@ -4157,5 +4157,33 @@
     "sourceReadyForNewImmutablePackage": true,
     "priorManifestSha": "b5fc5814100bd87103490d05d9ce4bb648bf790c",
     "previewOnlyNoLive": true
+  },
+  "postAcceptanceInsurerTotalsPreviewBuildRequest20261118": {
+    "status": "OWNER_APPROVED_SOURCE_PREVIEW_ONLY",
+    "gate": "I6.6",
+    "approvedByDirection": true,
+    "authorizedBranch": "recovery/fase-a-clean-20260831",
+    "sourceQaHead": "0d76078fb5ef71c887ffaa2b10ea8d8edbbcf4d3",
+    "sourceQaRunId": 44413402516,
+    "sourceQaWorkflow": ".github/workflows/gravicentra-i66-privileged-role-parity-source-qa.yml",
+    "approvedManifestBlobSha": "b2ff3d9f01baee5427e53983a8537f575290bf63",
+    "sourceQaLocalFinancialTests": 113,
+    "sourceQaLocalFinancialWrites": 0,
+    "releaseScope": "EXACT_IMMUTABLE_PREVIEW_ONLY_INSURER_GROSS_RECEIPT_APPLICATION",
+    "previousLiveSourceSha": "1b65a790530d49fe1d1fb451f02838fd9a713c53",
+    "previousLiveArtifactId": 14373955326,
+    "previousLiveArtifactDigest": "sha256:fc6d8f2616141aa4388ec7df497917690fc54400d18a376f15550380334725a5",
+    "previousLiveHostingVersion": "sites/ays-orbit-360-lab/versions/bf40099201b2ea51",
+    "strictlyNewImmutableSource": true,
+    "existingBuildJobOnly": true,
+    "previewHostingChannelOnly": true,
+    "liveDeploy": false,
+    "backendLiveDeploy": false,
+    "realOperationalDataWrites": false,
+    "legalChanges": false,
+    "newFirebase": false,
+    "rollbackMustPreserveCurrentLive": true,
+    "sourceReadyForNewImmutablePackage": true,
+    "previewOnlyNoLive": true
   }
 }
