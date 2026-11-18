@@ -4138,7 +4138,7 @@
     "authorizedBranch": "recovery/fase-a-clean-20260831",
     "sourceQaHead": "e4eced4f01d3a5d5ea6565e72f168a448fe5898c",
     "sourceQaRunId": 44378705804,
-    "approvedManifestBlobSha": "b5fc5814100bd87103490d05d9ce4bb648bf790c",
+    "approvedManifestBlobSha": "4d4a8a9b493a88cb1025a2ccb59c7debbd3a6ee9",
     "previousLiveSourceSha": "1b65a790530d49fe1d1fb451f02838fd9a713c53",
     "previousLiveArtifactId": 14373955326,
     "previousLiveArtifactDigest": "sha256:fc6d8f2616141aa4388ec7df497917690fc54400d18a376f15550380334725a5",
@@ -4151,6 +4151,11 @@
     "realOperationalDataWrites": false,
     "legalChanges": false,
     "newFirebase": false,
-    "rollbackMustPreserveCurrentLive": true
+    "rollbackMustPreserveCurrentLive": true,
+    "currentValidatedSourceQaRunId": 44391029675,
+    "currentValidatedSourceQaCommit": "e5b0be43bf1a6ee4be1c644da18cdc938e051d3e",
+    "sourceReadyForNewImmutablePackage": true,
+    "priorManifestSha": "b5fc5814100bd87103490d05d9ce4bb648bf790c",
+    "previewOnlyNoLive": true
   }
 }

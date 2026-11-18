@@ -3,7 +3,7 @@
   "gate": "I6.6",
   "dateGuatemala": "2026-11-18",
   "status": "OWNER_APPROVED_PREVIEW_BUILD_ONLY_LIVE_ACCEPTED_LOCK_RETAINED",
-  "approvedManifestBlobSha": "b5fc5814100bd87103490d05d9ce4bb648bf790c",
+  "approvedManifestBlobSha": "4d4a8a9b493a88cb1025a2ccb59c7debbd3a6ee9",
   "sourceQaRunId": 44378705804,
   "sourceQaConclusion": "success",
   "sourceQaHead": "e4eced4f01d3a5d5ea6565e72f168a448fe5898c",
@@ -20,5 +20,9 @@
   "live": false,
   "realBusinessWrites": false,
   "rollbackOnPreviewFailure": true,
-  "fullGateAccepted": false
+  "fullGateAccepted": false,
+  "currentValidatedSourceQaRunId": 44391029675,
+  "currentValidatedSourceQaCommit": "e5b0be43bf1a6ee4be1c644da18cdc938e051d3e",
+  "sourceReadyForNewImmutablePackage": true,
+  "previousManifestBlobSha": "b5fc5814100bd87103490d05d9ce4bb648bf790c"
 }
