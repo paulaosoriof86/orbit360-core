@@ -208,24 +208,26 @@ async function testInsurerTotalProposal(browser,actor){
       estado:'Vigente',vigenciaDesde:'2026-01-01',vigenciaHasta:'2027-01-01'});
     await receiptRef.create(originalReceipt);await portfolioRef.create(originalPortfolio);await cobroRef.create(originalCobro);
     browserContext=await browser.newContext({viewport:{width:1280,height:900}});
-    const page=await browserContext.newPage();await page.goto(PREVIEW+'/#/conciliaciones',{waitUntil:'commit',timeout:30000});
+    const page=await browserContext.newPage();await page.goto(PREVIEW+'/#/cobros',{waitUntil:'commit',timeout:30000});
     await page.waitForFunction(()=>!!window.Orbit?.productRuntimeBrowserProvidersP0&&!!window.Orbit?.productAppP0,null,{timeout:30000});
+    console.log('I66_INSURER_TOTAL_SIGNED_PAGE_BOOTSTRAPPED');
     const signed=await page.evaluate(async token=>{
-      const provider=Orbit.productRuntimeBrowserProvidersP0,ctx=await provider.initialize();
+      const runtime=window.Orbit,provider=runtime.productRuntimeBrowserProvidersP0,ctx=await provider.initialize();
       await ctx.modules.auth.setPersistence(ctx.auth,ctx.modules.auth.browserSessionPersistence);
       await ctx.modules.auth.signInWithCustomToken(ctx.auth,token);
-      const app=await Orbit.productAppP0.activate();
-      return {started:app?.started===true,role:Orbit.session?.rol?.(),
-        endpoint:Orbit.reconciliationDomain?.status?.().functionName};
+      const app=await runtime.productAppP0.activate();
+      return {started:app?.started===true,role:runtime.session?.rol?.(),
+        endpoint:runtime.reconciliationDomain?.status?.().functionName};
     },actor.token);
+    console.log('I66_INSURER_TOTAL_SIGNED_DIRECTION_READY');
     assert.ok(signed.started&&norm(signed.role)==='direccion','INSURER_TOTAL_SIGNED_ACTOR_MISMATCH');
     assert.equal(signed.endpoint,'orbit360CobrosReconciliationCommandPreview');
     const request={proposalId:ids.proposal,sourceRunId:runId};
-    const initial=await page.evaluate(input=>Orbit.reconciliationDomain.previewProposalApplication(input.proposalId,input.sourceRunId),request);
+    const initial=await page.evaluate(input=>window.Orbit.reconciliationDomain.previewProposalApplication(input.proposalId,input.sourceRunId),request);
     assert.equal(initial.status,'READY_TO_APPLY','INSURER_TOTAL_NOT_READY:'+String(initial.reason||initial.status));
     assert.equal(initial.eligible,true);assert.equal(initial.targets?.[0]?.amount,100.01);
     assert.equal((await cobroRef.get()).data().monto,100);
-    const applied=await page.evaluate(input=>Orbit.reconciliationDomain.applyProposalApplication(input.proposalId,input.sourceRunId,input.digest),
+    const applied=await page.evaluate(input=>window.Orbit.reconciliationDomain.applyProposalApplication(input.proposalId,input.sourceRunId,input.digest),
       {...request,digest:initial.planDigest});
     assert.equal(applied.readbackConfirmed,true,'INSURER_TOTAL_APPLY_NOT_CONFIRMED');
     assert.equal(applied.applicationId,applicationId);
@@ -240,14 +242,15 @@ async function testInsurerTotalProposal(browser,actor){
     assert.equal(application.data().status,'APPLIED');assert.equal(application.data().beforeAfter.length,3);
     assert.equal(application.data().beforeAfter.find(x=>x.collection==='recibosEsperados')?.before?.monto,100);
     assert.equal(application.data().beforeAfter.find(x=>x.collection==='recibosEsperados')?.after?.monto,100.01);
-    const repeated=await page.evaluate(input=>Orbit.reconciliationDomain.applyProposalApplication(input.proposalId,input.sourceRunId,input.digest),
+    const repeated=await page.evaluate(input=>window.Orbit.reconciliationDomain.applyProposalApplication(input.proposalId,input.sourceRunId,input.digest),
       {...request,digest:initial.planDigest});
     assert.ok(repeated.reused&&repeated.readbackConfirmed,'INSURER_TOTAL_IDEMPOTENCE_FAILED');
     assert.equal((await col('cobros').where('reciboId','==',ids.receipt).get()).size,1);
     await page.reload({waitUntil:'commit',timeout:30000});
+    await page.waitForFunction(()=>!!window.Orbit?.productRuntimeBrowserProvidersP0&&!!window.Orbit?.productAppP0,null,{timeout:30000});
     const reloaded=await page.evaluate(async()=>{
-      const provider=Orbit.productRuntimeBrowserProvidersP0;await provider.initialize();
-      const user=await provider.waitForUser();return {uid:user?.uid,started:(await Orbit.productAppP0.activate())?.started===true};
+      const runtime=window.Orbit,provider=runtime.productRuntimeBrowserProvidersP0;await provider.initialize();
+      const user=await provider.waitForUser();return {uid:user?.uid,started:(await runtime.productAppP0.activate())?.started===true};
     });
     assert.equal(reloaded.uid,actor.uid);assert.equal(reloaded.started,true);
     assert.equal((await receiptRef.get()).data().monto,100.01);assert.equal((await cobroRef.get()).data().primaTotal,100.01);

@@ -211,7 +211,7 @@ jobs:
           set -euo pipefail
           npm install --no-save --package-lock=false --ignore-scripts --no-audit --no-fund firebase-admin@13.4.0 playwright@1.55.0 >/dev/null
           node node_modules/playwright/cli.js install --with-deps chromium >/dev/null
-      - name: Signed Carlos and Paula payment plus Dirección insurer gross invoice correction in isolated Preview
+      - name: Signed Carlos and Paula payments and synchronized Dirección insurer-total proposal in Preview
         env:
           I66_PREVIEW_ORIGIN: ${{ env.PREVIEW_URL }}
         run: node tools/gravicentra-i6-6-carlos-payment-signed-synthetic-preview-uat.cjs
