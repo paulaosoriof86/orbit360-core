@@ -1,0 +1,654 @@
+{
+  "schema": "GI_I66_OPERATIONAL_EXACT_LIVE_ACCEPTANCE_V1",
+  "status": "SIGNED_LIVE_ACCEPTED_FULL_I66_HOLD",
+  "dateGuatemala": "2026-11-17",
+  "recordedAtUtc": "2026-11-18T01:09:53.344Z",
+  "gate": "I6.6",
+  "fullI66ProductionAccepted": false,
+  "realFinancialWrites": 0,
+  "financialWriteCounterScope": "THIS_IMMUTABLE_RELEASE_TRANSPORT_ONLY_NOT_OTHER_AUTHORIZED_OPERATIONAL_SESSIONS",
+  "candidate": {
+    "schema": "I6_6_OPERATIONAL_EXACT_RELEASE_V1",
+    "approvedByDirection": true,
+    "status": "EXACT_PREVIEW_SIGNED_LIVE_AUTHORIZED",
+    "sourceSha": "1b65a790530d49fe1d1fb451f02838fd9a713c53",
+    "buildId": "gi-i66-1b65a790530d-57f234755dc1",
+    "buildRunId": 44183659786,
+    "artifactId": 14373955326,
+    "artifactDigest": "sha256:fc6d8f2616141aa4388ec7df497917690fc54400d18a376f15550380334725a5",
+    "previewUrl": "https://ays-orbit-360-lab--gi-i66-rc-44009981499-d08psr2y.web.app",
+    "previewChannelId": "gi-i66-rc-44009981499",
+    "signedObservabilityProfile": "I66_SIGNED_BROWSER_OBSERVABILITY_V1",
+    "targets": {
+      "preview": [
+        {
+          "name": "orbit360ProductOperationalCommandPreview",
+          "region": "us-east1"
+        },
+        {
+          "name": "orbit360CobrosReconciliationCommandPreview",
+          "region": "us-central1"
+        },
+        {
+          "name": "orbit360ScopedPolicyReadPreview",
+          "region": "us-east1"
+        }
+      ],
+      "live": [
+        {
+          "name": "orbit360ProductOperationalCommand",
+          "region": "us-central1"
+        },
+        {
+          "name": "orbit360CobrosReconciliationCommand",
+          "region": "us-central1"
+        },
+        {
+          "name": "orbit360ScopedPolicyRead",
+          "region": "us-east1"
+        }
+      ]
+    },
+    "requiredPreviewDrivers": [
+      "tools/gravicentra-i66-privileged-role-signed-ui-permissions-readonly.cjs",
+      "tools/gravicentra-i6-6-carlos-real-signed-synthetic-preview-uat.cjs",
+      "tools/gravicentra-i6-6-advisor-payables-signed-uat.cjs",
+      "tools/gravicentra-i6-6-proposal-application-signed-uat.cjs"
+    ],
+    "sameImmutableArtifactOnly": true,
+    "syntheticRecordsOnly": true,
+    "noRealFinancialOrCustomerWrites": true,
+    "noRulesAuthIamWrites": true,
+    "rollbackThreeBackendRevisionsAndHosting": true,
+    "expectedSiteFileCount": 223,
+    "syntheticQaIsolation": {
+      "tenantId": "alianzas-soluciones",
+      "runIdPrefix": "cobledgerqa_",
+      "entityIdPrefix": "b3005qa_",
+      "runCollection": "cobrosLedgerQaRuns",
+      "controlCollection": "cobrosLedgerQaControl",
+      "requireSameQaRunId": true,
+      "requireSyntheticMarker": true,
+      "allowRealControlPointerMutation": false,
+      "restoreAllSyntheticRecords": true
+    },
+    "advisorPayableQaIsolation": {
+      "tenantId": "alianzas-soluciones",
+      "runIdPrefix": "b4003qa_i66_cxp_",
+      "payableIdPrefix": "b4003qa_cxpase_",
+      "commissionIdPrefix": "b4003qa_comsrc_",
+      "requireSameQaRunId": true,
+      "requireSyntheticMarker": true,
+      "restoreAllSyntheticRecords": true,
+      "financialPayments": 0,
+      "bankMovements": 0,
+      "authOrMembershipMutations": 0
+    },
+    "currentLive": {
+      "sourceSha": "84769378eb2014addebfefdbdd63091bddc4b817",
+      "buildId": "gi-i66-84769378eb20-57f234755dc1",
+      "artifactId": 14075022275,
+      "artifactDigest": "sha256:b0f3bacb68511cdfc91ac934602c51f55afec5c1d6428d886d13a72a706ee283",
+      "buildRunId": 43503721126,
+      "liveRunId": 43506971214,
+      "hostingVersion": "sites/ays-orbit-360-lab/versions/0766db29b338befc"
+    },
+    "legalAcceptance": {
+      "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_DIRECTION_PREVIEW_V2_SCOPE_AUTHORIZATION_20261116.json",
+      "receiptSha256": "d3309675c753bd1b31f9163d506aba2e29ac70583a7b8d54cb5b8503b5c50a44",
+      "decisionId": "DIRECTION_I66_PREVIEW_SAME_LEGAL_V2_TECHNICAL_SUCCESSORS_AUTHORIZED_20261116",
+      "authorizationScope": "I6_6_PREVIEW_IDENTICAL_V2_TERMS",
+      "gate": "I6.6",
+      "phase": "PREVIEW",
+      "origin": "https://ays-orbit-360-lab--gi-i66-rc-44009981499-d08psr2y.web.app",
+      "sourceSha": "1b65a790530d49fe1d1fb451f02838fd9a713c53",
+      "actorRole": "direccion",
+      "termsProjectionSha256": "485b07887091063cc7a5d1dc8f11a9bb547f2ef059490bb04d4acee73404f6b2",
+      "buildId": "gi-i66-1b65a790530d-57f234755dc1"
+    },
+    "previewRollover": {
+      "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_TECHNICAL_PREVIEW_NETWORK_DIAGNOSTIC_REBUILD_20261117.json",
+      "receiptSha256": "42b558b0720fdb5d8c8a907a8ed5415cb769232e2409efbb4dde9fdaef724c04",
+      "channel": "gi-i66-rc-44009981499",
+      "origin": "https://ays-orbit-360-lab--gi-i66-rc-44009981499-d08psr2y.web.app",
+      "previousSourceSha": "62d50052a9b9196ebce8c4acd1bc66778ae89c06",
+      "previousArtifactId": 14369500963,
+      "previousArtifactDigest": "sha256:e31583c35aa76e2fcd904ffd1caa61bf589c9ada9acc4dd307a30e731e814c81"
+    },
+    "previewQa": {
+      "runId": 44185021402,
+      "headSha": "1f996d3ad6a52e41a1a670dcab19fb4e3c319bf1",
+      "receiptArtifactId": 14374251840,
+      "receiptArtifactDigest": "sha256:049ad6ac46d0e604d0cc3fca882a2ef002813d52bebf355e72d5b3c790ea9270",
+      "status": "SIGNED_DRIVERS_DURABLE_READBACK_RELOAD_RESTORE_PASS"
+    },
+    "liveLegalAcceptance": {
+      "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_DIRECTION_LIVE_V2_SCOPE_AUTHORIZATION_20261117.json",
+      "receiptSha256": "8fe8a9cd20c3511ed341656c18282bc809536c3b5f4a312abce15f9a6f9479a6",
+      "decisionId": "DIRECTION_I66_LIVE_SAME_LEGAL_V2_TECHNICAL_SUCCESSORS_AUTHORIZED_20261117",
+      "authorizationScope": "I6_6_LIVE_IDENTICAL_V2_TERMS",
+      "gate": "I6.6",
+      "phase": "LIVE",
+      "origin": "https://app.aysseguros.com",
+      "sourceBaseHead": "1b65a790530d49fe1d1fb451f02838fd9a713c53",
+      "sourceSha": "1b65a790530d49fe1d1fb451f02838fd9a713c53",
+      "buildId": "gi-i66-1b65a790530d-57f234755dc1",
+      "buildRunId": 44183659786,
+      "artifactId": 14373955326,
+      "artifactDigest": "sha256:fc6d8f2616141aa4388ec7df497917690fc54400d18a376f15550380334725a5",
+      "previewQa": {
+        "runId": 44185021402,
+        "headSha": "1f996d3ad6a52e41a1a670dcab19fb4e3c319bf1",
+        "receiptArtifactId": 14374251840,
+        "receiptArtifactDigest": "sha256:049ad6ac46d0e604d0cc3fca882a2ef002813d52bebf355e72d5b3c790ea9270",
+        "status": "SIGNED_DRIVERS_DURABLE_READBACK_RELOAD_RESTORE_PASS"
+      },
+      "actorUidSha256": "f612197b077c598edd61d757c1e2995be7a3b17300602ce4802bccefed216a72",
+      "advisorId": "ase-paula-osorio",
+      "actorRole": "direccion",
+      "tenantId": "alianzas-soluciones",
+      "country": "GT",
+      "termsProjectionSha256": "485b07887091063cc7a5d1dc8f11a9bb547f2ef059490bb04d4acee73404f6b2",
+      "proposalSha256": "e9e1b369d166242cfff2145b08fd36ca8ad3288b302ce6980e00a36e3165e04a",
+      "reviewDocumentSha256": "f8fd153e864892c8c4720003f1b72d4ade64fc3c866266c3719729c5a0369d4f"
+    }
+  },
+  "previousExactHostingRelease": {
+    "status": "PUBLISHED_EXACT_R11_223_FILES_SIGNED_FRONTEND_HOSTING_ONLY_PARTIAL",
+    "sourceSha": "84769378eb2014addebfefdbdd63091bddc4b817",
+    "artifactId": 14075022275,
+    "artifactDigest": "sha256:b0f3bacb68511cdfc91ac934602c51f55afec5c1d6428d886d13a72a706ee283",
+    "previewRunId": 43503721126,
+    "liveCloneRunId": 43506971214,
+    "receipt": "artifacts/orbit360-recovery/release-control/I6_6_R11_RENEWAL_DRIVE_EXACT_LIVE_RECEIPT_20261113.json",
+    "readbackEachOrigin": 223,
+    "liveHostingVersion": "sites/ays-orbit-360-lab/versions/0766db29b338befc",
+    "previousLiveHostingVersion": "sites/ays-orbit-360-lab/versions/23037b2a726a8def",
+    "actualFinancialWrites": 0,
+    "realInsurerDocumentUploadCertified": false,
+    "buildId": "gi-i66-84769378eb20-57f234755dc1",
+    "backendFunctionsChanged": 0
+  },
+  "liveProof": {
+    "path": "artifacts/orbit360-recovery/release-control/I6_6_OPERATIONAL_EXACT_LIVE_PROOF_20261117.json",
+    "sha256": "0a7f3862343721d9bdcee85224536adee35d4ba71dc9ccf7322af6fd2d85fbc1"
+  },
+  "buildRun": {
+    "id": 44183659786,
+    "name": "Gravicentra I6.6 Build Immutable Release Package",
+    "head_sha": "1b65a790530d49fe1d1fb451f02838fd9a713c53",
+    "head_branch": "recovery/fase-a-clean-20260831",
+    "path": ".github/workflows/gravicentra-release-delta-66-package.yml",
+    "status": "completed",
+    "conclusion": "success",
+    "html_url": "https://github.com/paulaosoriof86/orbit360-core/actions/runs/44183659786",
+    "run_attempt": 1,
+    "created_at": "2026-11-17T21:48:37Z",
+    "updated_at": "2026-11-17T21:52:08Z"
+  },
+  "previewRun": {
+    "id": 44185021402,
+    "name": "Gravicentra I6.6 Five Role Exact Backend Preview And Signed Carlos UAT",
+    "head_sha": "1f996d3ad6a52e41a1a670dcab19fb4e3c319bf1",
+    "head_branch": "recovery/fase-a-clean-20260831",
+    "path": ".github/workflows/gravicentra-i66-privileged-role-three-function-preview-uat.yml",
+    "status": "completed",
+    "conclusion": "success",
+    "html_url": "https://github.com/paulaosoriof86/orbit360-core/actions/runs/44185021402",
+    "run_attempt": 1,
+    "created_at": "2026-11-17T21:56:35Z",
+    "updated_at": "2026-11-17T22:03:34Z"
+  },
+  "liveRun": {
+    "id": 44211496307,
+    "name": "Gravicentra I6.6 Five Role Three Function Exact LIVE With Rollback",
+    "head_sha": "bd44be5ac6c469951f56c7118b0344848c24b239",
+    "head_branch": "recovery/fase-a-clean-20260831",
+    "path": ".github/workflows/gravicentra-i66-privileged-role-exact-live-promotion.yml",
+    "status": "completed",
+    "conclusion": "success",
+    "html_url": "https://github.com/paulaosoriof86/orbit360-core/actions/runs/44211496307",
+    "run_attempt": 1,
+    "created_at": "2026-11-18T00:53:28Z",
+    "updated_at": "2026-11-18T00:59:45Z"
+  },
+  "buildArtifact": {
+    "id": 14373955326,
+    "name": "gi-i66-immutable-1b65a790530d49fe1d1fb451f02838fd9a713c53",
+    "digest": "sha256:fc6d8f2616141aa4388ec7df497917690fc54400d18a376f15550380334725a5",
+    "size_in_bytes": 1797962,
+    "expired": false,
+    "created_at": "2026-11-17T21:50:37Z",
+    "expires_at": "2026-12-17T21:50:36Z",
+    "workflow_run": {
+      "id": 44183659786,
+      "repository_id": 1275672866,
+      "head_repository_id": 1275672866,
+      "head_branch": "recovery/fase-a-clean-20260831",
+      "head_sha": "1b65a790530d49fe1d1fb451f02838fd9a713c53"
+    }
+  },
+  "previewArtifact": {
+    "id": 14374251840,
+    "name": "gi-i66-operational-preview-proof-44185021402",
+    "digest": "sha256:049ad6ac46d0e604d0cc3fca882a2ef002813d52bebf355e72d5b3c790ea9270",
+    "size_in_bytes": 89197,
+    "expired": false,
+    "created_at": "2026-11-17T22:03:29Z",
+    "expires_at": "2026-12-17T22:03:28Z",
+    "workflow_run": {
+      "id": 44185021402,
+      "repository_id": 1275672866,
+      "head_repository_id": 1275672866,
+      "head_branch": "recovery/fase-a-clean-20260831",
+      "head_sha": "1f996d3ad6a52e41a1a670dcab19fb4e3c319bf1"
+    }
+  },
+  "liveArtifact": {
+    "id": 14385689680,
+    "name": "gi-i66-role-exact-live-proof-44211496307",
+    "digest": "sha256:0f7bf749847ca03da2131e931a157f9335738ffbf0f8ad1dd8da5bc60ef0a3ea",
+    "size_in_bytes": 91976,
+    "expired": false,
+    "created_at": "2026-11-18T00:59:40Z",
+    "expires_at": "2026-12-18T00:59:39Z",
+    "workflow_run": {
+      "id": 44211496307,
+      "repository_id": 1275672866,
+      "head_repository_id": 1275672866,
+      "head_branch": "recovery/fase-a-clean-20260831",
+      "head_sha": "bd44be5ac6c469951f56c7118b0344848c24b239"
+    }
+  },
+  "signedPreviewProof": {
+    "schema": "I6_6_OPERATIONAL_SIGNED_PREVIEW_PROOF_V1",
+    "status": "SIGNED_DRIVERS_DURABLE_READBACK_RELOAD_RESTORE_PASS",
+    "sourceSha": "1b65a790530d49fe1d1fb451f02838fd9a713c53",
+    "buildRunId": 44183659786,
+    "artifactId": 14373955326,
+    "artifactDigest": "sha256:fc6d8f2616141aa4388ec7df497917690fc54400d18a376f15550380334725a5",
+    "previewUrl": "https://ays-orbit-360-lab--gi-i66-rc-44009981499-d08psr2y.web.app",
+    "previewChannelId": "gi-i66-rc-44009981499",
+    "buildId": "gi-i66-1b65a790530d-57f234755dc1",
+    "targets": [
+      {
+        "name": "orbit360ProductOperationalCommandPreview",
+        "region": "us-east1"
+      },
+      {
+        "name": "orbit360CobrosReconciliationCommandPreview",
+        "region": "us-central1"
+      },
+      {
+        "name": "orbit360ScopedPolicyReadPreview",
+        "region": "us-east1"
+      }
+    ],
+    "signedDrivers": [
+      "tools/gravicentra-i66-privileged-role-signed-ui-permissions-readonly.cjs",
+      "tools/gravicentra-i6-6-carlos-real-signed-synthetic-preview-uat.cjs",
+      "tools/gravicentra-i6-6-advisor-payables-signed-uat.cjs",
+      "tools/gravicentra-i6-6-proposal-application-signed-uat.cjs"
+    ],
+    "realFinancialOrCustomerWrites": 0,
+    "syntheticRestoreComplete": true,
+    "liveHostingUnchanged": true,
+    "liveBackendUnchanged": true,
+    "focusedReports": {
+      "advisorPayables": {
+        "status": "PASS",
+        "cleanup": "PASS",
+        "checks": 16,
+        "digest": "sha256:95765e0142f59adb43b0c16b0587184baf9e56cd8d70682584ba94976b9d46aa",
+        "observability": {
+          "profile": "I66_SIGNED_BROWSER_OBSERVABILITY_V1",
+          "status": "PASS",
+          "unexpectedConsoleErrors": 0,
+          "unexpectedHttpErrors": 0,
+          "pageErrorCount": 0,
+          "telemetryFailures": 0
+        }
+      },
+      "proposalApplication": {
+        "status": "PASS",
+        "cleanup": "PASS",
+        "checks": 18,
+        "digest": "sha256:2f01c35fcc6a6fd2779ac595d97f9f2ecbd710de6510a22fc9929969e270e5de",
+        "observability": {
+          "profile": "I66_SIGNED_BROWSER_OBSERVABILITY_V1",
+          "status": "PASS",
+          "mode": "UI_RESPONSE_CAPTURED_EXACT"
+        }
+      }
+    },
+    "runId": 44185021402,
+    "headSha": "1f996d3ad6a52e41a1a670dcab19fb4e3c319bf1"
+  },
+  "jobs": {
+    "build": {
+      "id": 134394463718,
+      "run_id": 44183659786,
+      "name": "immutable-package",
+      "head_sha": "1b65a790530d49fe1d1fb451f02838fd9a713c53",
+      "head_branch": "recovery/fase-a-clean-20260831",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/paulaosoriof86/orbit360-core/actions/runs/44183659786/job/134394463718",
+      "started_at": "2026-11-17T21:48:54Z",
+      "completed_at": "2026-11-17T21:52:08Z"
+    },
+    "preview": {
+      "id": 134399276480,
+      "run_id": 44185021402,
+      "name": "exact-preview-only",
+      "head_sha": "1f996d3ad6a52e41a1a670dcab19fb4e3c319bf1",
+      "head_branch": "recovery/fase-a-clean-20260831",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/paulaosoriof86/orbit360-core/actions/runs/44185021402/job/134399276480",
+      "started_at": "2026-11-17T21:56:54Z",
+      "completed_at": "2026-11-17T22:03:34Z"
+    },
+    "live": {
+      "id": 134490781138,
+      "run_id": 44211496307,
+      "name": "exact-role-live",
+      "head_sha": "bd44be5ac6c469951f56c7118b0344848c24b239",
+      "head_branch": "recovery/fase-a-clean-20260831",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/paulaosoriof86/orbit360-core/actions/runs/44211496307/job/134490781138",
+      "started_at": "2026-11-18T00:53:38Z",
+      "completed_at": "2026-11-18T00:59:44Z",
+      "verifiedSteps": [
+        {
+          "name": "Gate exact signed Preview, unchanged product owners and immutable artifact",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2026-11-18T00:53:46Z",
+          "completed_at": "2026-11-18T00:54:00Z"
+        },
+        {
+          "name": "Verify durable signed Preview proof is for this same immutable source and artifact",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6,
+          "started_at": "2026-11-18T00:54:01Z",
+          "completed_at": "2026-11-18T00:54:01Z"
+        },
+        {
+          "name": "Read immutable TAR and exact backend and frontend source without rebuilding",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 8,
+          "started_at": "2026-11-18T00:54:02Z",
+          "completed_at": "2026-11-18T00:54:04Z"
+        },
+        {
+          "name": "Test signed existing Carlos and Direction Preview eight-module permissions before touching LIVE",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 11,
+          "started_at": "2026-11-18T00:54:58Z",
+          "completed_at": "2026-11-18T00:55:13Z"
+        },
+        {
+          "name": "Snapshot exact LIVE function revisions, inventory and previous Hosting version for rollback",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 12,
+          "started_at": "2026-11-18T00:55:13Z",
+          "completed_at": "2026-11-18T00:55:19Z"
+        },
+        {
+          "name": "Deploy exact three LIVE backend revisions and clone exact Preview artifact with automatic rollback",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 13,
+          "started_at": "2026-11-18T00:55:19Z",
+          "completed_at": "2026-11-18T00:59:39Z"
+        },
+        {
+          "name": "Preserve PII-free immutable release proof",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 14,
+          "started_at": "2026-11-18T00:59:39Z",
+          "completed_at": "2026-11-18T00:59:40Z"
+        }
+      ]
+    }
+  },
+  "evidenceProvenance": {
+    "buildReceipt": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_6_NETWORK_DIAGNOSTICS_PREVIEW_BUILD_20261117.json",
+      "sha256": "ec3df651497146415ad0891763bd35545d29bc9fa45600fe8c1c9a252b69f590"
+    },
+    "previewReceipt": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_6_NETWORK_DIAGNOSTICS_SIGNED_PREVIEW_PASS_20261117.json",
+      "sha256": "126eaa11284bdc742c78a88baedae61c8323bf46bbcf71e43dc8db966b8a9e57"
+    },
+    "originalLiveProofEntry": "i66-role-live-exact-proof.json",
+    "originalLiveArtifactZipSha256": "0f7bf749847ca03da2131e931a157f9335738ffbf0f8ad1dd8da5bc60ef0a3ea",
+    "originalApiMetadataSha256": {
+      "run": "464f1ef4db18047edac090d151647abc905d7bcecdad81c5b33ab9476376e0d7",
+      "jobs": "74bd6d89ef32cff59b3649599f27452ba64c34eecd5ed99d225772d885abc77c",
+      "artifacts": "a605506b970065d46353ec185d9280b94ace000cbfcc1e511504f78c5f09945d"
+    },
+    "focusedReports": {
+      "advisorPayables": {
+        "artifactEntry": "gravicentra-i66-advisor-payables-signed-uat-live.json",
+        "sha256": "470f0cebe052bcd244345266002828e43237d5ec042941448198fd924f3155b8"
+      },
+      "proposalApplication": {
+        "artifactEntry": "gi-i66-role-live-package/evidence/i66-proposal-application-signed-uat-live.json",
+        "sha256": "04e3d6104f87580907d34f011b32b81acd9e7b05e326180d994c3982a578b9c3"
+      }
+    }
+  },
+  "documentedTerms": {
+    "schemaVersion": "GI_I66_DOCUMENTED_TERMS_SIGNED_CHECK_V1",
+    "sourceSha": "1b65a790530d49fe1d1fb451f02838fd9a713c53",
+    "phase": "LIVE",
+    "status": "PASS",
+    "step": "SESSION_READBACK",
+    "ui": "PASS",
+    "durableReadbackCount": 2,
+    "writeAttempted": true,
+    "reloadPerformed": false,
+    "sessionPreserved": true,
+    "modalCancelled": true,
+    "realCustomerWrites": 0,
+    "financialPayments": 0,
+    "bankMovements": 0,
+    "cleanup": {
+      "status": "PASS",
+      "remaining": 0
+    },
+    "buildId": "gi-i66-1b65a790530d-57f234755dc1",
+    "uiChecks": {
+      "unknownPaymentPreserved": true,
+      "totalExact": true,
+      "dateExact": true
+    }
+  },
+  "startupDiagnostics": {
+    "diagnosticOnly": true,
+    "observedCount": 5,
+    "expectedCount": 5,
+    "waitOutcomes": {
+      "completed": 5,
+      "failed": 0
+    },
+    "snapshots": [
+      {
+        "actorRole": "direccion",
+        "stage": "SIGNED_SESSION",
+        "waitOutcome": "ORIGINAL_WAIT_COMPLETED",
+        "status": "CAPTURED",
+        "elapsedMs": 563,
+        "providerPresent": true,
+        "appPresent": true,
+        "readyState": "interactive",
+        "serviceWorker": {
+          "supported": true,
+          "controllerPresent": false,
+          "controllerState": "ABSENT",
+          "controllerPathSha256": null,
+          "controllerBuildMatches": null
+        }
+      },
+      {
+        "actorRole": "operativo",
+        "stage": "SIGNED_SESSION",
+        "waitOutcome": "ORIGINAL_WAIT_COMPLETED",
+        "status": "CAPTURED",
+        "elapsedMs": 522,
+        "providerPresent": true,
+        "appPresent": true,
+        "readyState": "loading",
+        "serviceWorker": {
+          "supported": true,
+          "controllerPresent": false,
+          "controllerState": "ABSENT",
+          "controllerPathSha256": null,
+          "controllerBuildMatches": null
+        }
+      },
+      {
+        "actorRole": "direccion",
+        "stage": "ASSIGNMENT_RELOAD",
+        "waitOutcome": "ORIGINAL_WAIT_COMPLETED",
+        "status": "CAPTURED",
+        "elapsedMs": 503,
+        "providerPresent": true,
+        "appPresent": true,
+        "readyState": "interactive",
+        "serviceWorker": {
+          "supported": true,
+          "controllerPresent": true,
+          "controllerState": "activated",
+          "controllerPathSha256": "edae1aad03e427838f4b3ce8b9cff24fb9a676def8297715b906aa14599e18c3",
+          "controllerBuildMatches": true
+        }
+      },
+      {
+        "actorRole": "direccion",
+        "stage": "ASSIGNMENT_RELOAD",
+        "waitOutcome": "ORIGINAL_WAIT_COMPLETED",
+        "status": "CAPTURED",
+        "elapsedMs": 482,
+        "providerPresent": true,
+        "appPresent": true,
+        "readyState": "interactive",
+        "serviceWorker": {
+          "supported": true,
+          "controllerPresent": true,
+          "controllerState": "activated",
+          "controllerPathSha256": "edae1aad03e427838f4b3ce8b9cff24fb9a676def8297715b906aa14599e18c3",
+          "controllerBuildMatches": true
+        }
+      },
+      {
+        "actorRole": "direccion",
+        "stage": "PENDING_CXP_RELOAD",
+        "waitOutcome": "ORIGINAL_WAIT_COMPLETED",
+        "status": "CAPTURED",
+        "elapsedMs": 527,
+        "providerPresent": true,
+        "appPresent": true,
+        "readyState": "interactive",
+        "serviceWorker": {
+          "supported": true,
+          "controllerPresent": true,
+          "controllerState": "activated",
+          "controllerPathSha256": "edae1aad03e427838f4b3ce8b9cff24fb9a676def8297715b906aa14599e18c3",
+          "controllerBuildMatches": true
+        }
+      }
+    ],
+    "historicalFailureCause": "NOT_DEDUCIBLE_FROM_THIS_RUN",
+    "underlyingStartupCauseProven": false
+  },
+  "historyBoundaries": {
+    "priorStartupTimeoutCauseProven": false,
+    "priorNetworkFailureCauseProven": false,
+    "originalFailuresAndLogging403Preserved": true,
+    "originalR11ReceiptUnchanged": true,
+    "originalLegalAuthorizationUnchanged": true,
+    "fullDailyBlock2Closed": false,
+    "closedDailyBlocks": 1,
+    "totalDailyBlocks": 6,
+    "newFormalPercentagePoints": 0,
+    "genuinePolicyAndRenewalCoverageClosed": false,
+    "documentaryGeneralConflictClosed": false
+  },
+  "findingStatusTransitions": [
+    {
+      "id": "SYNC-CURSOR-20261117",
+      "priorState": "RESOLVED_CURRENT_BINDING_GUARD_AND_EXACT_SIGNED_PREVIEW_PASS",
+      "priorClosure": "One exact current candidate across continuation metadata, actual signed Preview job and durable proof; R11 remains LIVE.",
+      "priorNext": "Exact new signed Preview is accepted and frozen; transport remains locked pending only the bounded LIVE scope and remaining block 2 workflows.",
+      "currentState": "RESOLVED_EXACT_BUILD_PREVIEW_LIVE_AND_CURRENT_POINTERS_ALIGNED",
+      "closure": "Same 1b65 exact immutable package is now signed LIVE on both origins with three exact backend revisions; current canonical pointers are aligned and the consumed transport is locked."
+    },
+    {
+      "id": "QA-NOOP-20261117",
+      "priorState": "EXACT_SUBSTANTIVE_PREVIEW_JOB_AND_DURABLE_RECEIPT_PASS_LIVE_PENDING",
+      "priorClosure": "Consumer requires substantive job success plus exact durable receipt; skipped/NOOP never counts as functional PASS.",
+      "currentState": "RESOLVED_SUBSTANTIVE_PREVIEW_AND_LIVE_JOBS_DURABLE_PROOFS_PASS",
+      "closure": "Both substantive jobs completed successfully and exact durable Preview/LIVE receipts passed canonical validators; outer green or skipped jobs are not acceptance."
+    },
+    {
+      "id": "QA-PROOF-TRANSPORT-20261117",
+      "priorState": "RESOLVED_ACTUAL_SAME_ARTIFACT_SIGNED_PROOF_VERIFICATION_PASS",
+      "priorClosure": "Current merge-multiple layout passes actual same-artifact proof verification before authorized promotion.",
+      "currentState": "RESOLVED_ACTUAL_SAME_ARTIFACT_PREVIEW_AND_LIVE_PROOF_VERIFICATION_PASS",
+      "closure": "Original signed Preview proof was verified by the successful LIVE job before deployment; original final LIVE proof and focused report digests validated."
+    },
+    {
+      "id": "QA-DOCUMENTED-TERMS-20261117",
+      "priorState": "CURRENT_SIGNED_PREVIEW_UI_AND_TWO_SESSION_READBACKS_PASS_LIVE_PENDING",
+      "priorClosure": "Signed documented terms helper, persist/reload, helper cleanup and zero unexpected errors.",
+      "currentState": "CURRENT_SIGNED_PREVIEW_AND_LIVE_UI_TWO_SESSION_READBACKS_PASS",
+      "closure": "Documented terms helper passed LIVE UI and two durable session readbacks with exact cents/date and unknown payment preserved; helper did not perform its own reload. Synthetic cleanup passed."
+    },
+    {
+      "id": "QA-SOURCE-INTAKE-RELOAD-20261117",
+      "priorState": "SIGNED_PREVIEW_RELOAD_READBACK_REPLAY_PASS_LIVE_PENDING",
+      "priorClosure": "Prove causal failure, correct appropriate owner and safe diagnostic retention, then immutable exact signed reload/readback/replay/error-free proof; preserve original failure and existing successful subproofs.",
+      "currentState": "SIGNED_PREVIEW_AND_LIVE_RELOAD_READBACK_REPLAY_PASS_PRIOR_CAUSE_UNPROVEN",
+      "closure": "Exact LIVE source intake through normal UI, reload readback and idempotent replay passed with zero page/console/HTTP errors; real ledger pointer unchanged. Prior failure cause remains unproven."
+    },
+    {
+      "id": "QA-LIVE-PREDEPLOY-PHASE-20261117",
+      "priorState": "CAUSAL_FIX_NEW_EXACT_SIGNED_PREVIEW_PASS_ACTUAL_LIVE_PRECHECK_STILL_PENDING",
+      "priorClosure": "Causal regression passes; exact new Preview certification passes; existing readonly predeployment Preview check executes under full LIVE authorization; same-artifact LIVE and cleanup proofs pass.",
+      "currentState": "RESOLVED_ACTUAL_LIVE_AUTHORIZED_PREDEPLOY_CHECK_AND_EXACT_SIGNED_LIVE_PASS",
+      "closure": "The existing predeployment Preview permission check executed successfully under LIVE authorization, then three functions and same-artifact Hosting passed signed LIVE and cleanup."
+    },
+    {
+      "id": "QA-LIVE-LEGAL-SESSION-20261117",
+      "priorState": "INACTIVE_SUPPORT_EXACT_SIGNED_PREVIEW_PASS_BOUNDED_LIVE_CONSENT_NOT_GRANTED",
+      "priorClosure": "Prepare exact unchanged terms and inactive support; require explicit owner LIVE scope before deployment; verify normal UI consent, signed actor, immediate and reload readbacks with exact candidate source/build/origin and receipt.",
+      "currentState": "EXPLICIT_OWNER_LIVE_SCOPE_NORMAL_UI_IMMEDIATE_AND_RELOAD_READBACK_PASS",
+      "closure": "Explicit bounded owner authority was applied by the normal checkbox/button in both signed LIVE financial drivers; same actor, scope, source, build, origin and authorization receipt verified immediately and after reload."
+    },
+    {
+      "id": "QA-ADVISOR-RELOAD-READINESS-20261117",
+      "priorState": "CURRENT_EXACT_SIGNED_READINESS_PASS_PRIOR_TIMEOUT_CAUSE_UNPROVEN_LIVE_PENDING",
+      "priorClosure": "Current exact signed Preview readiness and restore passed. Prior fdbc timeout and HOLD restore remain historical failures; their startup cause is unproven. Passive snapshots are diagnostic only. Exact signed LIVE remains pending.",
+      "currentState": "CURRENT_EXACT_SIGNED_LIVE_READINESS_AND_RESTORE_PASS_PRIOR_TIMEOUT_CAUSE_UNPROVEN",
+      "closure": "All five existing LIVE readiness waits completed and synthetic restore passed. Prior timeout and HOLD cleanup remain historical failures with unproven cause; passive snapshots do not establish that cause."
+    },
+    {
+      "id": "QA-SCOPED-PREVIEW-NETWORK-20261117",
+      "priorState": "CURRENT_EXACT_SIGNED_PREVIEW_PASS_PRIOR_NETWORK_FAILURE_NOT_REPRODUCED_CAUSE_UNPROVEN_LIVE_PENDING",
+      "priorClosure": "The current exact four-driver signed Preview and cleanup passed. The previous scoped-reader network failure was not reproduced in this run. Observed diagnostics remain diagnostic only; historical root cause is unproven.",
+      "priorNext": "Retain the original failure and Logging403 evidence. Continue only after bounded LIVE scope with the same artifact; successful Preview and passive diagnostics do not establish a historical network cause.",
+      "currentState": "CURRENT_EXACT_SIGNED_PREVIEW_AND_LIVE_PASS_PRIOR_NETWORK_CAUSE_UNPROVEN",
+      "closure": "Current exact Preview and LIVE drivers plus cleanup passed with no unexpected browser errors. The prior Preview network failure and Logging403 evidence remain preserved; historical cause is unproven."
+    }
+  ]
+}

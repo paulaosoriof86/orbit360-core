@@ -1,22 +1,20 @@
 {
   "schema": "GI_I66_LATEST_EXACT_LIVE_RELEASE_POINTER_V3",
-  "dateGuatemala": "2026-11-13",
-  "status": "LATEST_R11_RENEWAL_DRIVE_EXACT_SIGNED_LIVE_PASS_FULL_I66_HOLD",
+  "dateGuatemala": "2026-11-17",
+  "status": "LATEST_OPERATIONAL_EXACT_SIGNED_LIVE_PASS_FULL_I66_HOLD",
   "productBrand": "Gravicentra Insurance",
   "activeGate": "I6.6",
   "historicalB4007Closed": true,
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
-  "currentLiveSourceSha": "84769378eb2014addebfefdbdd63091bddc4b817",
-  "currentLiveImmutableBuildRunId": 43503721126,
-  "currentLiveArtifactId": 14075022275,
-  "currentLiveArtifactDigest": "sha256:b0f3bacb68511cdfc91ac934602c51f55afec5c1d6428d886d13a72a706ee283",
-  "currentLiveDeployAndSignedQaRunId": 43506971214,
-  "currentLiveEvidenceArtifactId": 14076447556,
-  "currentLiveHostingVersion": "sites/ays-orbit-360-lab/versions/0766db29b338befc",
+  "currentLiveSourceSha": "1b65a790530d49fe1d1fb451f02838fd9a713c53",
+  "currentLiveImmutableBuildRunId": 44183659786,
+  "currentLiveArtifactId": 14373955326,
+  "currentLiveArtifactDigest": "sha256:fc6d8f2616141aa4388ec7df497917690fc54400d18a376f15550380334725a5",
+  "currentLiveDeployAndSignedQaRunId": 44211496307,
+  "currentLiveEvidenceArtifactId": 14385689680,
+  "currentLiveHostingVersion": "sites/ays-orbit-360-lab/versions/bf40099201b2ea51",
   "previewFirebaseLiveAndCustomLiveArtifactFiles": "223_OF_223_EACH_ORIGIN_EXACT",
-  "liveOneExistingProtectedReaderEffectiveTraffic": "100_PERCENT_NEW_REVISION",
-  "otherFunctionsPreserved": true,
   "directionLiveConciliacionesStageReadOnly": "52_OF_52_CANONICAL_HUMAN_NAMES_VISIBLE_BOTH_LIVE_ORIGINS_43498437664",
   "operativoCarlosConciliacionesNotAssigned": "SIGNED_DENY_IN_PREVIEW_AND_BOTH_LIVE_ORIGINS_PASS",
   "operativoCarlosExistingAuthorizedModulesFromPriorR7": "HISTORICAL_R7_43375687134_PRESERVED; CURRENT_R8_SIGNED_LIVE_8_OF_8_43452158412",
@@ -32,9 +30,9 @@
   "realInsurerIssuedRenewal": "HOLD_REAL_PDF_DRIVE_OAUTH_CONSENT_PENDING",
   "fullModuleRoleCountryRealWriteAcceptance": false,
   "fullI66ProductionAccepted": false,
-  "currentLiveReceipt": "artifacts/orbit360-recovery/release-control/I6_6_R11_RENEWAL_DRIVE_EXACT_LIVE_RECEIPT_20261113.json",
+  "currentLiveReceipt": "artifacts/orbit360-recovery/release-control/I6_6_OPERATIONAL_EXACT_LIVE_ACCEPTANCE_20261117.json",
   "priorR7LiveReceipt": "artifacts/orbit360-recovery/release-control/I6_6_LATEST_EXACT_LIVE_POINTER_20261112.json",
-  "previousLiveVersionForRollback": "sites/ays-orbit-360-lab/versions/23037b2a726a8def",
+  "previousLiveVersionForRollback": "sites/ays-orbit-360-lab/versions/0766db29b338befc",
   "currentR9SignedPaymentInvoicePolicyLiveAcceptance20261113": {
     "receipt": "artifacts/orbit360-recovery/release-control/I6_6_PAYMENT_INVOICE_POLICY_R9_LIVE_RECEIPT_20261113.json",
     "backendSignedLiveRunId": 43471877267,
@@ -65,7 +63,7 @@
     "afterReloadTechnicalClientLabels": 0,
     "persistentOpenTabUpdateNotification": "NOT_CERTIFIED"
   },
-  "nextAction": "A1_A7_EXACT_SOURCE_PAID_VS_PENDING_CAS_GUARDS_ZERO_BLIND_PAYMENTS; MAPFRE_SC79829_2026_2027_ANNUAL_PREMIUM_OR_ISSUED_ANNEX; REAL_CARLOS_PAYMENT_ERROR_AND_INSURER_PASSWORD_LOGO_UAT; DRIVE_ADMIN_OAUTH_CONSENT; GREENAPI_SERVER_SECRET_BRIDGE_WEBHOOK_REAL_ACK; PREEXISTING_TAB_VERSION_UPDATE_CHECK",
+  "nextAction": "I6_6_CURRENT_EXACT_OPERATIONAL_SIGNED_LIVE_ACCEPTED_PARTIAL: 1B65A7_ARTIFACT_14373955326_PUBLISHED_THREE_EXACT_FUNCTIONS_100_PERCENT_AND_223_FILES_EACH_ORIGIN; LIVE_NORMAL_UI_LEGAL_READBACK_SOURCE_INTAKE_RELOAD_REPLAY_AND_SYNTHETIC_RESTORE_PASS_44211496307. TRANSPORT_AUTHORIZATION_CONSUMED_NO_REDEPLOY_NO_NEW_ACTIVE_PRODUCT_CANDIDATE. CONTINUE_EXISTING_GENUINE_OPS_INSURER_DRIVE_WORKFLOWS_AND_AUTHORIZED_DETERMINISTIC_SOURCE_BATCHES_WITH_FRESH_PREIMAGES_IDEMPOTENCE_AUDIT_READBACK; DO_NOT_REPEAT_EXISTING_PAYMENTS. PRIOR_STARTUP_NETWORK_CAUSES_UNPROVEN. FULL_I66_AND_FULL_BLOCK2_HOLD; FROZEN_19_OF_31_AND_ONE_OF_SIX_DAILY_BLOCKS_UNCHANGED. TRANSPORT_FINANCIAL_WRITES_ZERO_SEPARATE_OPERATIONAL_RECEIPTS_REQUIRED.",
   "historicalR8ExactPublishedRoleRightsAndUat20261113": {
     "receipt": "artifacts/orbit360-recovery/release-control/I6_6_ROLE_TRANSVERSAL_R8_LIVE_RECEIPT_20261113.json",
     "qa": {
@@ -126,7 +124,7 @@
       }
     }
   },
-  "currentLiveExactReleaseTag": "R11_RENEWALS_KANBAN_DIRECT_ISSUED_DRIVE_FEEDBACK",
+  "currentLiveExactReleaseTag": "I66_OPERATIONAL_EXACT_1B65A7_THREE_FUNCTIONS_SIGNED_LIVE",
   "priorR9LiveReceipt": "artifacts/orbit360-recovery/release-control/I6_6_PAYMENT_INVOICE_POLICY_R9_LIVE_RECEIPT_20261113.json",
   "priorR9LiveSourceSha": "586401bfbe1a80cfef2820982f432743af36b108",
   "currentR10HumanClientNamesAcceptance20261113": {
@@ -148,7 +146,7 @@
     "fullI66ProductionAccepted": false,
     "status": "PREVIOUS_R10_EXACT_SIGNED_LIVE_PRESERVED"
   },
-  "currentLiveBuildId": "gi-i66-84769378eb20-57f234755dc1",
+  "currentLiveBuildId": "gi-i66-1b65a790530d-57f234755dc1",
   "currentR11RenewalsDriveAcceptance20261113": {
     "receipt": "artifacts/orbit360-recovery/release-control/I6_6_R11_RENEWAL_DRIVE_EXACT_LIVE_RECEIPT_20261113.json",
     "sourceSha": "84769378eb2014addebfefdbdd63091bddc4b817",
@@ -161,6 +159,72 @@
     "backendChanges": 0,
     "realFinancialWrites": 0,
     "realPdfUpload": "HOLD tenant OAuth",
-    "fullI66ProductionAccepted": false
+    "fullI66ProductionAccepted": false,
+    "status": "PREVIOUS_R11_RENEWAL_DRIVE_EXACT_LIVE_PRESERVED"
+  },
+  "priorR11CurrentRuntimeAliases20261117": {
+    "dateGuatemala": "2026-11-13",
+    "status": "LATEST_R11_RENEWAL_DRIVE_EXACT_SIGNED_LIVE_PASS_FULL_I66_HOLD",
+    "currentLiveExactReleaseTag": "R11_RENEWALS_KANBAN_DIRECT_ISSUED_DRIVE_FEEDBACK",
+    "liveOneExistingProtectedReaderEffectiveTraffic": "100_PERCENT_NEW_REVISION",
+    "otherFunctionsPreserved": true,
+    "directionLiveConciliacionesStageReadOnly": "52_OF_52_CANONICAL_HUMAN_NAMES_VISIBLE_BOTH_LIVE_ORIGINS_43498437664",
+    "operativoCarlosExistingAuthorizedModulesFromPriorR7": "HISTORICAL_R7_43375687134_PRESERVED; CURRENT_R8_SIGNED_LIVE_8_OF_8_43452158412",
+    "directionExistingAuthorizedModulesFromPriorR7": "HISTORICAL_R7_43375687134_PRESERVED; CURRENT_R8_SIGNED_LIVE_10_OF_10_43452158412",
+    "higherRolesRealSignedScope": "CURRENT_SIGNED_LIVE_ADMINTENANT_1_OF_2_ACTIVE_SUPERADMIN_1_OF_1_ACTIVE_10_OF_10_43452158208; ONE_ADMINTENANT_EMAIL_UNVERIFIED_HOLD"
+  },
+  "updatedAtUtc": "2026-11-18T01:09:53.344Z",
+  "currentLiveEvidenceArtifactDigest": "sha256:0f7bf749847ca03da2131e931a157f9335738ffbf0f8ad1dd8da5bc60ef0a3ea",
+  "currentLiveReceiptSha256": "6d7c84cdb4af384ae108b98605810afc5dee176c5ad9955a3ea2f1807ced0673",
+  "previousR11LiveReceipt": "artifacts/orbit360-recovery/release-control/I6_6_R11_RENEWAL_DRIVE_EXACT_LIVE_RECEIPT_20261113.json",
+  "liveThreeExistingFunctionsEffectiveTraffic": "THREE_OF_THREE_NEW_READY_REVISIONS_100_PERCENT",
+  "functionsInventoryUnchangedExceptTargets": true,
+  "currentLiveBackendRevisions": [
+    {
+      "name": "orbit360ProductOperationalCommand",
+      "region": "us-central1",
+      "service": "orbit360productoperationalcommand",
+      "previousRevision": "orbit360productoperationalcommand-00070-seq",
+      "currentRevision": "orbit360productoperationalcommand-00071-rax",
+      "trafficPercent": 100,
+      "ready": true
+    },
+    {
+      "name": "orbit360CobrosReconciliationCommand",
+      "region": "us-central1",
+      "service": "orbit360cobrosreconciliationcommand",
+      "previousRevision": "orbit360cobrosreconciliationcommand-00015-kic",
+      "currentRevision": "orbit360cobrosreconciliationcommand-00017-yum",
+      "trafficPercent": 100,
+      "ready": true
+    },
+    {
+      "name": "orbit360ScopedPolicyRead",
+      "region": "us-east1",
+      "service": "orbit360scopedpolicyread",
+      "previousRevision": "orbit360scopedpolicyread-00010-guz",
+      "currentRevision": "orbit360scopedpolicyread-00011-lij",
+      "trafficPercent": 100,
+      "ready": true
+    }
+  ],
+  "currentOperationalExactLiveAcceptance": {
+    "status": "CURRENT_OPERATIONAL_EXACT_SIGNED_LIVE_PASS_FULL_I66_HOLD",
+    "sourceSha": "1b65a790530d49fe1d1fb451f02838fd9a713c53",
+    "buildId": "gi-i66-1b65a790530d-57f234755dc1",
+    "buildRunId": 44183659786,
+    "artifactId": 14373955326,
+    "artifactDigest": "sha256:fc6d8f2616141aa4388ec7df497917690fc54400d18a376f15550380334725a5",
+    "liveRunId": 44211496307,
+    "liveEvidenceArtifactId": 14385689680,
+    "liveEvidenceArtifactDigest": "sha256:0f7bf749847ca03da2131e931a157f9335738ffbf0f8ad1dd8da5bc60ef0a3ea",
+    "hostingVersion": "sites/ays-orbit-360-lab/versions/bf40099201b2ea51",
+    "receipt": "artifacts/orbit360-recovery/release-control/I6_6_OPERATIONAL_EXACT_LIVE_ACCEPTANCE_20261117.json",
+    "receiptSha256": "6d7c84cdb4af384ae108b98605810afc5dee176c5ad9955a3ea2f1807ced0673",
+    "recordedAtUtc": "2026-11-18T01:09:53.344Z",
+    "fullI66ProductionAccepted": false,
+    "realFinancialWrites": 0,
+    "proofPath": "artifacts/orbit360-recovery/release-control/I6_6_OPERATIONAL_EXACT_LIVE_PROOF_20261117.json",
+    "proofSha256": "0a7f3862343721d9bdcee85224536adee35d4ba71dc9ccf7322af6fd2d85fbc1"
   }
 }

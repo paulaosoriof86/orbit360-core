@@ -59,11 +59,21 @@ test('proof refuses different source artifact missing driver or incomplete resto
 });
 module.exports={fixture};
 
+// These scenarios exercise the R11 epoch, not whichever LIVE successor is
+// current when the suite runs. Read its four authority snapshots from the
+// immutable pre-acceptance commit; the production validator remains current.
+const R11_FIXTURE_HEAD='bd44be5ac6c469951f56c7118b0344848c24b239';
+const r11FixtureText=new Map();
+function historicalR11Fixture(file){
+  if(!r11FixtureText.has(file))r11FixtureText.set(file,
+    require('node:child_process').execFileSync('git',['show',R11_FIXTURE_HEAD+':'+file],
+      {encoding:'utf8',maxBuffer:8*1024*1024}));
+  return JSON.parse(r11FixtureText.get(file));
+}
 function continuationFixture(phase='build'){
-  const fs=require('node:fs');
-  const control=JSON.parse(fs.readFileSync('artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json','utf8'));
-  const state=JSON.parse(fs.readFileSync('orbit360-platform/docs/recovery/orbit360-recovery-state-v1.json','utf8'));
-  const transport=JSON.parse(fs.readFileSync(g.CONTROL,'utf8'));
+  const control=historicalR11Fixture('artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json');
+  const state=historicalR11Fixture('orbit360-platform/docs/recovery/orbit360-recovery-state-v1.json');
+  const transport=historicalR11Fixture(g.CONTROL);
   const old=transport.currentExactHostingRelease;
   control.currentExecutionDecisionPointer='i66R11RenewalDriveExactLiveRelease20261113';
   control.i66OperationalContinuation20261115={status:'EXECUTING_SOURCE_QA_NOT_NEW_LIVE_ACCEPTANCE',canonicalPlan:'artifacts/orbit360-recovery/release-control/I6_6_OPERATIONAL_CONTINUATION_20261115.json',activeGate:'I6.6',closedHistoricalGate:'B4-007',latestProvenLiveSource:old.sourceSha,newFinancialWrites:0,newLiveAcceptanceClaimed:false};
@@ -82,7 +92,8 @@ function continuationFixture(phase='build'){
 function runHistoricalPreflight({control,state,transport},mutateFile){
   const fs=require('node:fs'),vm=require('node:vm');
   const source=fs.readFileSync('tools/gravicentra-governance-preflight-v1.mjs','utf8').split('const activeGuard=')[0].replace(/^import .*;\n/gm,'');
-  const replacements={'artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json':control,'orbit360-platform/docs/recovery/orbit360-recovery-state-v1.json':state,[g.CONTROL]:transport};
+  const replacements={'artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json':control,'orbit360-platform/docs/recovery/orbit360-recovery-state-v1.json':state,[g.CONTROL]:transport,
+    'artifacts/orbit360-recovery/release-control/I6_6_LATEST_EXACT_LIVE_POINTER_20261113.json':historicalR11Fixture('artifacts/orbit360-recovery/release-control/I6_6_LATEST_EXACT_LIVE_POINTER_20261113.json')};
   const readFileSync=(p,encoding)=>{
     if(Object.hasOwn(replacements,p))return JSON.stringify(replacements[p]);
     const text=fs.readFileSync(p,encoding);

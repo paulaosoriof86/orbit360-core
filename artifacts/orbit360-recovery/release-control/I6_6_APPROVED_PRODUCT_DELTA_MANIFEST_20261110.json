@@ -2713,6 +2713,17 @@
         {
           "path": "tools/gravicentra-i6-6-proposal-uat-diagnostics.test.cjs",
           "gitBlobSha": "59a558de0e9eca7caef5ad4daf805b72976e6466"
+        },
+        {
+          "path": "tools/gravicentra-i6-6-operational-release-candidate.test.cjs",
+          "gitBlobSha": "c3267b4b263c9fbc1f76b3b8c79b8abb08803f4c",
+          "replaces": {
+            "path": "tools/gravicentra-i6-6-operational-release-candidate.test.cjs",
+            "priorGitBlobSha": "ab8ff145996fd3b0fd38ca08c4e9524c0e2c971c",
+            "priorChangeId": "I6_6_DIRECTION_LEGAL_EXPLICIT_PREVIEW_ACCEPTANCE_20261116"
+          },
+          "postAcceptanceGovernanceQaOnly": true,
+          "lineageNote": "Post-LIVE historical fixture input isolation only. Existing assertions and current validators unchanged; no product source, immutable artifact, deployment authorization or acceptance proof changes."
         }
       ]
     }
@@ -2726,5 +2737,33 @@
     "existingPreviewChannelOnly": true,
     "oneBuildOneArtifact": true,
     "preflightScopeCorrection": "R10_CURRENT_LIVE_POINTER_PRESERVED_R11_PREVIEW_ONLY_AUTHORIZATION_NARROW"
+  },
+  "postAcceptanceGovernanceQa20261117": {
+    "status": "HISTORICAL_R11_FIXTURE_ISOLATION_TEST_36_OF_36_PASS",
+    "recordedAtUtc": "2026-11-18T01:20:01.715462Z",
+    "gate": "I6.6",
+    "acceptedLiveReceipt": "artifacts/orbit360-recovery/release-control/I6_6_OPERATIONAL_EXACT_LIVE_ACCEPTANCE_20261117.json",
+    "acceptedLiveReceiptSha256": "6d7c84cdb4af384ae108b98605810afc5dee176c5ad9955a3ea2f1807ced0673",
+    "affectedTestPath": "tools/gravicentra-i6-6-operational-release-candidate.test.cjs",
+    "previousTestGitBlobSha": "ab8ff145996fd3b0fd38ca08c4e9524c0e2c971c",
+    "currentTestGitBlobSha": "c3267b4b263c9fbc1f76b3b8c79b8abb08803f4c",
+    "historicalFixtureSourceHead": "bd44be5ac6c469951f56c7118b0344848c24b239",
+    "failedLocalClosureCommit": "e49d47e546e526736388c1afc8c84ca0978337c5",
+    "cause": "Historical R11 tests read mutable current CP/state/transport/latest files. Recording actual successor acceptance contaminated the historical fixtures with the new acceptance key and live identities.",
+    "correction": "Read only the four historical authority fixture snapshots from the immutable pre-closure commit; keep every assertion, mutation and production validator unchanged.",
+    "focusedTestResult": {
+      "passed": 36,
+      "failed": 0,
+      "skipped": 0
+    },
+    "productPinsUnchanged": true,
+    "existingTestPinsPreservedInHistory": true,
+    "newProductCandidate": false,
+    "rebuildRequested": false,
+    "newDeployAuthorized": false,
+    "actualLiveArtifactUnchanged": true,
+    "realFinancialWrites": 0,
+    "canonicalGuardRequiredBeforePublication": true,
+    "independentReview": "FOUR_SAME_EPOCH_SNAPSHOTS_ASSERTIONS_AND_MUTATIONS_UNCHANGED_36_OF_36_PASS"
   }
 }

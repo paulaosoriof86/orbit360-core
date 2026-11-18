@@ -1,0 +1,211 @@
+{
+  "schema": "I66_FIVE_PRIVILEGED_ROLES_IMMUTABLE_LIVE_TRANSPORT_V1",
+  "sourceSha": "1b65a790530d49fe1d1fb451f02838fd9a713c53",
+  "previewChannel": "gi-i66-rc-44009981499",
+  "artifactId": 14373955326,
+  "artifactDigest": "sha256:fc6d8f2616141aa4388ec7df497917690fc54400d18a376f15550380334725a5",
+  "previewFiles": 223,
+  "liveSiteFiles": 223,
+  "customSiteFiles": 223,
+  "previousHostingVersion": "sites/ays-orbit-360-lab/versions/0766db29b338befc",
+  "previewHostingVersion": "sites/ays-orbit-360-lab/versions/bf40099201b2ea51",
+  "liveHostingVersion": "sites/ays-orbit-360-lab/versions/bf40099201b2ea51",
+  "status": "SAME_ARTIFACT_THREE_FUNCTIONS_SIGNED_LIVE_READBACK_RELOAD_RESTORE_PASS",
+  "realCustomerWrites": 0,
+  "firestoreRuleOrAuthWrites": 0,
+  "rollback": "OUTER_FUNCTION_ROLLBACK_GUARD_ACTIVE",
+  "signedDrivers": [
+    "privileged-role-permissions",
+    "carlos-paula-ops-leads",
+    "advisor-payables",
+    "proposal-application"
+  ],
+  "syntheticRestoreComplete": true,
+  "realFinancialOrCustomerWrites": 0,
+  "focusedReports": {
+    "advisorPayables": {
+      "status": "PASS",
+      "cleanup": "PASS",
+      "checks": 16,
+      "digest": "sha256:470f0cebe052bcd244345266002828e43237d5ec042941448198fd924f3155b8",
+      "observability": {
+        "profile": "I66_SIGNED_BROWSER_OBSERVABILITY_V1",
+        "status": "PASS",
+        "unexpectedConsoleErrors": 0,
+        "unexpectedHttpErrors": 0,
+        "pageErrorCount": 0,
+        "telemetryFailures": 0
+      }
+    },
+    "proposalApplication": {
+      "status": "PASS",
+      "cleanup": "PASS",
+      "checks": 18,
+      "digest": "sha256:04e3d6104f87580907d34f011b32b81acd9e7b05e326180d994c3982a578b9c3",
+      "observability": {
+        "profile": "I66_SIGNED_BROWSER_OBSERVABILITY_V1",
+        "status": "PASS",
+        "mode": "UI_REQUEST_RELOAD_DURABLE_READBACK_EXACT"
+      }
+    }
+  },
+  "buildId": "gi-i66-1b65a790530d-57f234755dc1",
+  "buildRunId": 44183659786,
+  "previewQa": {
+    "runId": 44185021402,
+    "headSha": "1f996d3ad6a52e41a1a670dcab19fb4e3c319bf1",
+    "receiptArtifactId": 14374251840,
+    "receiptArtifactDigest": "sha256:049ad6ac46d0e604d0cc3fca882a2ef002813d52bebf355e72d5b3c790ea9270",
+    "status": "SIGNED_DRIVERS_DURABLE_READBACK_RELOAD_RESTORE_PASS"
+  },
+  "previousLive": {
+    "sourceSha": "84769378eb2014addebfefdbdd63091bddc4b817",
+    "buildId": "gi-i66-84769378eb20-57f234755dc1",
+    "artifactId": 14075022275,
+    "artifactDigest": "sha256:b0f3bacb68511cdfc91ac934602c51f55afec5c1d6428d886d13a72a706ee283",
+    "buildRunId": 43503721126,
+    "liveRunId": 43506971214,
+    "hostingVersion": "sites/ays-orbit-360-lab/versions/0766db29b338befc"
+  },
+  "targets": [
+    {
+      "name": "orbit360ProductOperationalCommand",
+      "region": "us-central1"
+    },
+    {
+      "name": "orbit360CobrosReconciliationCommand",
+      "region": "us-central1"
+    },
+    {
+      "name": "orbit360ScopedPolicyRead",
+      "region": "us-east1"
+    }
+  ],
+  "backendRevisions": [
+    {
+      "name": "orbit360ProductOperationalCommand",
+      "region": "us-central1",
+      "service": "orbit360productoperationalcommand",
+      "previousRevision": "orbit360productoperationalcommand-00070-seq",
+      "currentRevision": "orbit360productoperationalcommand-00071-rax",
+      "trafficPercent": 100,
+      "ready": true
+    },
+    {
+      "name": "orbit360CobrosReconciliationCommand",
+      "region": "us-central1",
+      "service": "orbit360cobrosreconciliationcommand",
+      "previousRevision": "orbit360cobrosreconciliationcommand-00015-kic",
+      "currentRevision": "orbit360cobrosreconciliationcommand-00017-yum",
+      "trafficPercent": 100,
+      "ready": true
+    },
+    {
+      "name": "orbit360ScopedPolicyRead",
+      "region": "us-east1",
+      "service": "orbit360scopedpolicyread",
+      "previousRevision": "orbit360scopedpolicyread-00010-guz",
+      "currentRevision": "orbit360scopedpolicyread-00011-lij",
+      "trafficPercent": 100,
+      "ready": true
+    }
+  ],
+  "sameImmutableArtifact": true,
+  "liveBackendSameArtifact": true,
+  "functionsInventoryUnchangedExceptTargets": true,
+  "rollbackSnapshotReady": true,
+  "fullI66ProductionAccepted": false,
+  "directionLiveLegalAcceptance": {
+    "advisorPayables": {
+      "status": "EXPLICIT_OWNER_DECISION_APPLIED_BY_NORMAL_UI",
+      "decisionId": "DIRECTION_I66_LIVE_SAME_LEGAL_V2_TECHNICAL_SUCCESSORS_AUTHORIZED_20261117",
+      "receiptSha256": "8fe8a9cd20c3511ed341656c18282bc809536c3b5f4a312abce15f9a6f9479a6",
+      "sourceSha": "1b65a790530d49fe1d1fb451f02838fd9a713c53",
+      "origin": "https://app.aysseguros.com",
+      "version": "2.0",
+      "clauseIds": [
+        "confidencialidad",
+        "tratamiento_datos",
+        "descargo_ia"
+      ],
+      "termsProjectionSha256": "485b07887091063cc7a5d1dc8f11a9bb547f2ef059490bb04d4acee73404f6b2",
+      "authorizationScope": "I6_6_LIVE_IDENTICAL_V2_TERMS",
+      "gate": "I6.6",
+      "buildId": "gi-i66-1b65a790530d-57f234755dc1",
+      "immediateReadback": true,
+      "reloadReadback": true,
+      "reloadActorVerified": true,
+      "actorUidSha256": "f612197b077c598edd61d757c1e2995be7a3b17300602ce4802bccefed216a72",
+      "scopeSha256": "c2736ab7324560363b1ba518a8cadcd86c31835434b1aab0a02135d505372f85",
+      "acceptedAt": "2026-11-18T00:57:54.094Z",
+      "phase": "LIVE",
+      "authorizationSourceBaseHead": "1b65a790530d49fe1d1fb451f02838fd9a713c53",
+      "advisorId": "ase-paula-osorio",
+      "actorRole": "direccion",
+      "tenantId": "alianzas-soluciones",
+      "country": "GT",
+      "acceptedForOtherActors": false,
+      "liveAcceptance": true,
+      "storageSeeded": false,
+      "gateBypassed": false
+    },
+    "proposalApplication": {
+      "status": "EXPLICIT_OWNER_DECISION_APPLIED_BY_NORMAL_UI",
+      "decisionId": "DIRECTION_I66_LIVE_SAME_LEGAL_V2_TECHNICAL_SUCCESSORS_AUTHORIZED_20261117",
+      "receiptSha256": "8fe8a9cd20c3511ed341656c18282bc809536c3b5f4a312abce15f9a6f9479a6",
+      "sourceSha": "1b65a790530d49fe1d1fb451f02838fd9a713c53",
+      "origin": "https://app.aysseguros.com",
+      "version": "2.0",
+      "clauseIds": [
+        "confidencialidad",
+        "tratamiento_datos",
+        "descargo_ia"
+      ],
+      "termsProjectionSha256": "485b07887091063cc7a5d1dc8f11a9bb547f2ef059490bb04d4acee73404f6b2",
+      "authorizationScope": "I6_6_LIVE_IDENTICAL_V2_TERMS",
+      "gate": "I6.6",
+      "buildId": "gi-i66-1b65a790530d-57f234755dc1",
+      "immediateReadback": true,
+      "reloadReadback": true,
+      "reloadActorVerified": true,
+      "actorUidSha256": "f612197b077c598edd61d757c1e2995be7a3b17300602ce4802bccefed216a72",
+      "scopeSha256": "c2736ab7324560363b1ba518a8cadcd86c31835434b1aab0a02135d505372f85",
+      "acceptedAt": "2026-11-18T00:59:15.107Z",
+      "phase": "LIVE",
+      "authorizationSourceBaseHead": "1b65a790530d49fe1d1fb451f02838fd9a713c53",
+      "advisorId": "ase-paula-osorio",
+      "actorRole": "direccion",
+      "tenantId": "alianzas-soluciones",
+      "country": "GT",
+      "acceptedForOtherActors": false,
+      "liveAcceptance": true,
+      "storageSeeded": false,
+      "gateBypassed": false
+    }
+  },
+  "sourceIntake": {
+    "status": "PASS",
+    "stage": "SOURCE_INTAKE_COMPLETE",
+    "syntheticOnly": true,
+    "sourceFileHashVerified": true,
+    "sourceMetadataDigestVerified": true,
+    "normalUiRequest": true,
+    "normalUiResponseConfirmed": true,
+    "readbackAfterReload": true,
+    "signedActorPreserved": true,
+    "realLedgerPointerUnchanged": true,
+    "countsExact": true,
+    "qaAuthorityExact": true,
+    "normalUiIdempotentReplay": true,
+    "financialWrites": 0,
+    "sourceRows": 1,
+    "proposals": 1,
+    "holds": 0,
+    "replayIntakeWrites": 0,
+    "consoleErrors": 0,
+    "pageErrors": 0,
+    "httpErrors": 0
+  },
+  "runId": 44211496307,
+  "headSha": "bd44be5ac6c469951f56c7118b0344848c24b239"
+}
