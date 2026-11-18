@@ -1,0 +1,136 @@
+{
+  "schema": "GI_I66_OWNER_REMINDERS_CADENCES_DELIVERY_FREEZE_V1",
+  "dateGuatemala": "2026-11-18",
+  "status": "OWNER_REQUIREMENTS_FROZEN_SOURCE_FINDINGS_VALIDATED_IMPLEMENTATION_AND_LIVE_DELIVERY_HOLD",
+  "project": "Gravicentra Insurance",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "gate": "I6.6",
+  "ownership": "Extend the existing Ops/Leads/Cliente360/Polizas/Cobros/Cronograma and canonical backend/notification owners; no parallel module, no second Firebase/repo/branch/methodology",
+  "liveBaseline": {
+    "sourceSha": "1b65a790530d49fe1d1fb451f02838fd9a713c53",
+    "buildId": "gi-i66-1b65a790530d-57f234755dc1",
+    "artifactId": 14373955326,
+    "artifactDigest": "sha256:fc6d8f2616141aa4388ec7df497917690fc54400d18a376f15550380334725a5",
+    "liveProofRunId": 44211496307,
+    "fullI66Accepted": false
+  },
+  "ownerDecisions": {
+    "currentClientRenewalFollowup": {
+      "useExisting": "gestiones",
+      "createAt": [
+        "Cliente360 ficha > Gestion",
+        "Cliente360 > Poliza > Solicitar gestion",
+        "Ops > + Gestion"
+      ],
+      "linkClient": true,
+      "linkExistingPolicy": true,
+      "doNotCreateLead": true,
+      "exampleBusinessDueDate": "2026-12-15",
+      "examplePolicyRenewalEnd": "2026-12-31",
+      "assignee": "selected permitted roster member",
+      "mayResolveEarly": true,
+      "onResolve": "cancel remaining scheduled notifications; preserve history",
+      "noRealRecordCreationByThisFreeze": true
+    },
+    "dueReminder": {
+      "serverOwnedSchedule": true,
+      "useManagementDueDate": true,
+      "optionalTimeWithTimezone": "America/Guatemala",
+      "channels": [
+        "campanita_internal",
+        "WhatsApp_GreenAPI_only_if_explicitly_enabled_and_provider_verified",
+        "sound_while_browser_foreground_user_activated"
+      ],
+      "notifyAssignedUserOnly": true,
+      "acknowledgeAndDismiss": true,
+      "dupeProtection": "tenant|management|dueInstant|assignedActor|channel",
+      "reassignAndEarlyResolveSafe": true,
+      "noClientContactFallback": true,
+      "externalStatus": "must readback sent/delivered/failed; not prepared=delivered",
+      "actualProviderDeliveryNotYetProven": true
+    },
+    "commercialCadence": {
+      "preserveCurrentRunningCadencesAndTemplates": true,
+      "sourceIsCanonicalNegotiations": false,
+      "existingStages": [
+        "D3",
+        "D7",
+        "D14"
+      ],
+      "allowHistoricalEntryPosition": true,
+      "chooseStartingStepOnLeadRecord": true,
+      "choices": [
+        "NONE_WAITING_FOR_PROPOSAL",
+        "D3",
+        "D7",
+        "D14_FINAL",
+        "NO_MORE_SEQUENCE"
+      ],
+      "noHistoricalBackfill": true,
+      "noReplayingCompletedSteps": true,
+      "explicitNextTouchDate": true,
+      "manualEvidenceOfPastTouch": true,
+      "doNotResetOnProposalTransitionIfAlreadyAdvanced": true,
+      "doNotAssumeAlreadySent": true,
+      "serverScopedWriteAndReload": true
+    },
+    "scope": {
+      "dirección": true,
+      "operativo": true,
+      "asesor": "own_authorized_only",
+      "otherRoles": "only_effective_backend_permissions",
+      "noCredentialsInEvidence": true
+    }
+  },
+  "sourceFindings": [
+    {
+      "id": "I66_REMINDER_DUE_ONLY_RENDER_NOT_SERVER_DISPATCH",
+      "status": "OPEN",
+      "evidence": "orbit360-platform/modules/cronograma.js renders gestiones by due date, functions/product-ops-leads-domain.js scheduled cadenceSweep reads negocios only",
+      "test": "create due management -> scheduled in_app plus eligible GreenAPI recipient -> exact receipt -> reload -> next day no duplicate"
+    },
+    {
+      "id": "I66_MANAGEMENT_NOTIFY_CONTACT_FALLBACK",
+      "status": "OPEN",
+      "evidence": "orbit360-platform/core/ciclo.js management create notify uses client tel/email even when para indicates assigned advisor; edit note fallback also client",
+      "test": "notify only authorized assignee not client; no client fallback; denial tests"
+    },
+    {
+      "id": "I66_GREENAPI_OFF_BY_DEFAULT_AND_GROUP_ROUTING",
+      "status": "OPEN_SCOPE_LIMITED",
+      "evidence": "functions/greenapi-firebase-bridge.js requires ORBIT360_GREENAPI_ENABLED and server secret; current code groups operations/payments; user confirms independent commercial usage; no receipt proves individual assignee reminder",
+      "test": "verify canonical live deployed service env without secret disclosure, deliver eligible group/direct-with-explicit-contract and inspect provider acknowledgement/delivery; preserve successful commercial cadences"
+    },
+    {
+      "id": "I66_BELL_SOUND_EXISTS_FOREGROUND_ONLY",
+      "status": "EXISTING_SOURCE_PRESERVE_LIVE_SOUND_QA_PENDING",
+      "evidence": "orbit360-platform/index.html inboxSound AudioContext requires pointer/keyboard, enabled preference and visible tab; chimes on new unread event only",
+      "test": "new owned notice -> bell badge and one audible foreground chime after interaction; muted stays silent; no claim background or closed Chrome"
+    },
+    {
+      "id": "I66_CADENCE_START_POSITION_NOT_EDITABLE",
+      "status": "OPEN",
+      "evidence": "ciclo.js new lead has no cadence step chooser, proposal transition activates cadence; functions/product-ops-leads-domain.js scheduler reads cadenciaPaso yet business writer mutable/create field allowlists omit cadenciaPaso",
+      "test": "fresh and previously followed leads D3/D7/D14 choose -> exact server readback + next due -> correct single step; no reset/double notifications"
+    }
+  ],
+  "acceptance": [
+    "No product PASS without current-source blob, immutable build, Preview signed authorized synthetic QA, same artifact to LIVE, signed roles/QA, rollback",
+    "A business management at due sends exactly one permitted in-app notification, and WhatsApp only after exact provider signed delivery; sound only with actual browser user activation",
+    "An early-resolved management has zero future due notifications and remains auditable",
+    "A reassigned management notifies the newly assigned authorized user, not the client, with country/role boundary",
+    "All configured commercial existing GreenAPI/Make working paths preserved; no template or webhook overwrite",
+    "A pre-contacted lead starts at explicit selected next step, only future cadence tasks, never invented historic sends",
+    "Existing priority I6.6 cobros/payments/renewals real writers and current release remain unmodified by this freeze"
+  ],
+  "technicalConstraints": {
+    "dataWrites": 0,
+    "externalNotifications": 0,
+    "sourceFilesChanged": 0,
+    "releaseMutation": false,
+    "newCandidate": false,
+    "doesNotCloseFullI66": true,
+    "carryForwardUntilSignedLiveProof": true
+  }
+}

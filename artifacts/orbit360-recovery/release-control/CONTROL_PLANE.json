@@ -1466,6 +1466,19 @@
       "newProductWrites": 0,
       "newFinancialWrites": 0,
       "newFormalPercentagePoints": 0
+    },
+    "remindersCadencesOwnerFreeze20261118": {
+      "status": "FROZEN_SOURCE_VERIFIED_IMPLEMENTATION_PREVIEW_LIVE_QA_REQUIRED",
+      "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_OWNER_REMINDERS_CADENCES_DELIVERY_FREEZE_20261118.json",
+      "receiptBlobSha": "2e10dccea043c6050a287af2641fd0caaf650ffc",
+      "activeGate": "I6.6",
+      "currentLiveProofRunId": 44211496307,
+      "realRecordWrites": 0,
+      "externalDeliveryClaims": 0,
+      "newProductRelease": false,
+      "openFindingCount": 4,
+      "soundExistingPreserved": true,
+      "commercialCadencePreserved": true
     }
   },
   "b4003ActiveCertificationCursor20261106": {
