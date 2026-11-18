@@ -1,0 +1,32 @@
+{
+  "schema": "GI_I66_INSURER_GROSS_TOTAL_EXACT_HOSTING_PREVIEW_V1",
+  "gate": "I6.6",
+  "dateGuatemala": "2026-11-18",
+  "status": "EXACT_HOSTING_PREVIEW_READBACK_PASS_BACKEND_PREVIEW_AND_SIGNED_UAT_HOLD",
+  "canonicalBranch": "recovery/fase-a-clean-20260831",
+  "sourceCommit": "0d76078fb5ef71c887ffaa2b10ea8d8edbbcf4d3",
+  "releaseControlCommit": "13fc8611fc7d8bd97ae165c2b2f526d07af09d2b",
+  "buildRunId": 44414675100,
+  "buildRunConclusion": "success",
+  "artifactId": 14479297045,
+  "artifactDigest": "sha256:0ca89e30d4a73e48e7ff5f387efc02ad12114a4b7ca2b988ef188a2a776f11f3",
+  "previewChannel": "gi-i66-rc-44414675100",
+  "previewUrl": "https://ays-orbit-360-lab--gi-i66-rc-44414675100-0t5eg8ef.web.app",
+  "hostingPreviewReadback": "PASS_EXACT_ARTIFACT_BYTES",
+  "localFinancialRegression": "113_113_PASS_SYNTHETIC_TRANSACTIONAL_FIRESTORE",
+  "buildFinancialRegression": "PASS",
+  "backendPreviewDeployment": "NOT_EXECUTED",
+  "signedFinancialApplicationUat": "NOT_EXECUTED",
+  "livePromotion": "NOT_EXECUTED",
+  "liveFinancialBeforeAfter": "NOT_EXECUTED",
+  "realFinancialWrites": 0,
+  "productionAccepted": false,
+  "currentAcceptedLiveArtifactUnchanged": true,
+  "liveFinancialProposalCountersObserved": {"proposals": 52, "requiresValidation": 80, "applied": 0},
+  "openGates": [
+    "Deploy exact backend function to isolated synthetic Preview and prove signed financial receipt/portfolio/cobro readback and rollback.",
+    "Authorize immutable artifact promotion only after exact Preview signed PASS; verify LIVE module and function revisions.",
+    "Re-read current insurer source rows against fresh LIVE preimages; deduplicate per source requirement and installment, execute protected high-confidence application batches, and record exact transaction IDs and before/after.",
+    "Never infer already-paid duplicates, payment dates from pending-only statements, net premium from gross premium, or customer/policy records not supported by source."
+  ]
+}
