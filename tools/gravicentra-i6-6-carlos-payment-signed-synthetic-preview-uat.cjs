@@ -157,7 +157,7 @@ async function testActor(browser,actor){
 // invoice's gross Q100.01 corrects a stale Q100.00 receipt, existing cobro and
 // portfolio. The original net premium and commissions must remain untouched.
 async function testInsurerTotalProposal(browser,actor){
-  assert.ok(!USE_LIVE_BACKEND,'INSURER_TOTAL_PROPOSAL_PREVIEW_ONLY');
+  assert.ok(!TEST_LIVE_UI,'INSURER_TOTAL_PROPOSAL_SIGNED_BACKEND_ONLY');
   assert.equal(actor.role,'direccion','INSURER_TOTAL_PROPOSAL_DIRECTION_REQUIRED');
   const runId='cobledgerqa_'+suffix;
   const prefix='b3005qa_i66_proposal_'+suffix;
@@ -223,12 +223,29 @@ async function testInsurerTotalProposal(browser,actor){
     assert.ok(signed.started&&norm(signed.role)==='direccion','INSURER_TOTAL_SIGNED_ACTOR_MISMATCH');
     assert.equal(signed.endpoint,'orbit360CobrosReconciliationCommandPreview');
     const request={proposalId:ids.proposal,sourceRunId:runId};
-    const initial=await page.evaluate(input=>window.Orbit.reconciliationDomain.previewProposalApplication(input.proposalId,input.sourceRunId),request);
+    const token=TEST_LIVE_BACKEND?await page.evaluate(async()=>{
+      const runtime=window.Orbit,p=runtime.productRuntimeBrowserProvidersP0,ctx=await p.initialize();
+      return ctx.auth.currentUser.getIdToken();
+    }):null;
+    const proposalCommand=async(operation,payload)=>{
+      if(TEST_LIVE_BACKEND){
+        const response=await fetch(LIVE_PAYMENT_URL,{method:'POST',headers:{Authorization:'Bearer '+token,'Content-Type':'application/json'},
+          body:JSON.stringify({data:{tenantId:TENANT,activeRole:actor.role,operation,
+            reason:'I6.6 ensayo sintético firmado de factura aseguradora; datos reales intactos',payload}})});
+        const body=await response.json();
+        assert.equal(response.status,200,'INSURER_TOTAL_LIVE_SIGNED_HTTP_'+response.status+':'+String(body?.error?.message||''));
+        return body.result;
+      }
+      return page.evaluate(input=>input.operation==='preview_proposal_application'?
+        window.Orbit.reconciliationDomain.previewProposalApplication(input.payload.proposalId,input.payload.sourceRunId):
+        window.Orbit.reconciliationDomain.applyProposalApplication(input.payload.proposalId,input.payload.sourceRunId,input.payload.planDigest),
+      {operation,payload});
+    };
+    const initial=await proposalCommand('preview_proposal_application',request);
     assert.equal(initial.status,'READY_TO_APPLY','INSURER_TOTAL_NOT_READY:'+String(initial.reason||initial.status));
     assert.equal(initial.eligible,true);assert.equal(initial.targets?.[0]?.amount,100.01);
     assert.equal((await cobroRef.get()).data().monto,100);
-    const applied=await page.evaluate(input=>window.Orbit.reconciliationDomain.applyProposalApplication(input.proposalId,input.sourceRunId,input.digest),
-      {...request,digest:initial.planDigest});
+    const applied=await proposalCommand('apply_proposal_application',{...request,planDigest:initial.planDigest});
     assert.equal(applied.readbackConfirmed,true,'INSURER_TOTAL_APPLY_NOT_CONFIRMED');
     assert.equal(applied.applicationId,applicationId);
     const [receipt,portfolio,cobro,application]=await Promise.all([receiptRef.get(),portfolioRef.get(),cobroRef.get(),applicationRef.get()]);
@@ -242,8 +259,7 @@ async function testInsurerTotalProposal(browser,actor){
     assert.equal(application.data().status,'APPLIED');assert.equal(application.data().beforeAfter.length,3);
     assert.equal(application.data().beforeAfter.find(x=>x.collection==='recibosEsperados')?.before?.monto,100);
     assert.equal(application.data().beforeAfter.find(x=>x.collection==='recibosEsperados')?.after?.monto,100.01);
-    const repeated=await page.evaluate(input=>window.Orbit.reconciliationDomain.applyProposalApplication(input.proposalId,input.sourceRunId,input.digest),
-      {...request,digest:initial.planDigest});
+    const repeated=await proposalCommand('apply_proposal_application',{...request,planDigest:initial.planDigest});
     assert.ok(repeated.reused&&repeated.readbackConfirmed,'INSURER_TOTAL_IDEMPOTENCE_FAILED');
     assert.equal((await col('cobros').where('reciboId','==',ids.receipt).get()).size,1);
     await page.reload({waitUntil:'commit',timeout:30000});
@@ -255,7 +271,7 @@ async function testInsurerTotalProposal(browser,actor){
     assert.equal(reloaded.uid,actor.uid);assert.equal(reloaded.started,true);
     assert.equal((await receiptRef.get()).data().monto,100.01);assert.equal((await cobroRef.get()).data().primaTotal,100.01);
     assert.deepEqual((await realPointer.get()).data(),beforeRealPointer,'INSURER_TOTAL_REAL_LEDGER_CHANGED');
-    console.log('I66_SIGNED_DIRECCION_PREVIEW_VERIFIED_INSURER_GROSS_100_01_OVER_STALE_100_00_RECEIPT_COBRO_CARTERA_NET_COMMISSION_AUDIT_IDEMPOTENCE_RELOAD_PASS');
+    console.log('I66_SIGNED_DIRECCION_'+(TEST_LIVE_BACKEND?'LIVE':'PREVIEW')+'_VERIFIED_INSURER_GROSS_100_01_OVER_STALE_100_00_RECEIPT_COBRO_CARTERA_NET_COMMISSION_AUDIT_IDEMPOTENCE_RELOAD_PASS');
   }finally{
     if(browserContext)await browserContext.close();
     const errors=[];
@@ -267,12 +283,12 @@ async function testInsurerTotalProposal(browser,actor){
     }
     if(JSON.stringify((await realPointer.get()).data())!==JSON.stringify(beforeRealPointer))errors.push('REAL_LEDGER_CHANGED');
     if(errors.length)throw Error('INSURER_TOTAL_QA_CLEANUP_HOLD:'+errors.join(','));
-    console.log('I66_SIGNED_DIRECCION_PREVIEW_VERIFIED_INSURER_TOTAL_SYNTHETIC_RESTORED_PASS real_customer_writes=0');
+    console.log('I66_SIGNED_DIRECCION_'+(TEST_LIVE_BACKEND?'LIVE':'PREVIEW')+'_VERIFIED_INSURER_TOTAL_SYNTHETIC_RESTORED_PASS real_customer_writes=0');
   }
 }
 (async()=>{const staff=await actors(),browser=await chromium.launch({headless:true,args:['--no-sandbox']});
   try{for(const actor of staff)await testActor(browser,actor);
-    if(!USE_LIVE_BACKEND)await testInsurerTotalProposal(browser,staff.find(actor=>actor.role==='direccion'));
+    if(!TEST_LIVE_UI)await testInsurerTotalProposal(browser,staff.find(actor=>actor.role==='direccion'));
     console.log('I66_SIGNED_CARLOS_PAULA_PAYMENT_'+(TEST_LIVE_UI?'LIVE_UI':TEST_LIVE_BACKEND?'LIVE_BACKEND':'PREVIEW_BACKEND')+'_TWO_ACTORS_PASS real_customer_writes=0 auth_changes=0 synthetic_restored=true');
   }finally{await browser.close();}
 })().catch(e=>{console.error('I66_CARLOS_PAYMENT_SIGNED_PREVIEW_HOLD '+String(e.code||e.message||'UNKNOWN').replace(/[^\w.:-]+/g,'_').slice(0,210));process.exitCode=1;});
