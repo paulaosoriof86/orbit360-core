@@ -60,6 +60,11 @@ assert.equal(clue.policyValidity.start,null);
 assert.equal(clue.sourceDueExactAmountMatches,null);
 const dueCase=CASES.find(x=>x.id==='A2.M1');
 assert.equal(assess(dueCase,snap({receipts:[{...receipt,numeroReciboFuente:'',monto:2497.15,fechaVencimiento:'2026-11-30'}]})).sourceDueExactAmountMatches,1,'READONLY_DUE_AMOUNT_CANDIDATE_NOT_PAYMENT_PROOF');
+const dueRead=assess(dueCase,snap({receipts:[{...receipt,numeroReciboFuente:'1/12',monto:2490.15,fechaVencimiento:'2026-11-30'}]}));
+assert.equal(dueRead.sourceDueCandidateCount,1,'INSURER_DUE_MATCH_WITH_STALE_LOCAL_GROSS_DIAGNOSTIC');
+assert.equal(dueRead.sourceDueCandidateReadback[0].grossMatchesSource,false,'REPORT_INSURER_PREVALENT_GROSS_DIFFERENCE');
+assert.equal(dueRead.sourceDueCandidateReadback[0].internalReceiptPlaceholderOnly,true,'QUOTA_IS_NOT_AN_EXTERNAL_REQUIREMENT');
+assert.equal(dueRead.currentStatus,'HOLD_EXACT_REQUIREMENT_NOT_LINKED','DUE_MATCH_DIAGNOSTIC_MUST_NOT_AUTHORIZE_PAYMENT');
 const {DOCUMENTARY_FOCAL,FOCAL_POLICY_CAP,FOCAL_LINKED_CAP,FOCAL_PROPOSAL_CAP,FOCAL_CLIENT_CAP,FOCAL_NUMBER_KEYS,
  FOCAL_CLIENT_NAME_FIELDS,FOCAL_MANAGEMENT_CLIENT_REFS,focalClientFullNames,readFocalClientManagement,
  focalNormalize,focalHash,focalRequirementHash,assessDocumentaryFocal,scanDocumentaryFocal,observationMetadata}=require('./gravicentra-i66-cartera-a1-a4-readonly.cjs');
