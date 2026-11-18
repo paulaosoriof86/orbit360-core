@@ -359,7 +359,7 @@ function assess(one,snapshot){
     amountMatches:0,exactPaid:false,linkedPaymentCount:0,clientVerified:false,
     currentStatus:'HOLD_UNVERIFIED',writes:0};
   if(policies.length!==1){out.currentStatus=policies.length?'HOLD_MULTIPLE_POLICY_EDITIONS':'HOLD_POLICY_NOT_FOUND';return out;}
-  const p=policies[0],receipts=snapshot.receipts||[],cobros=snapshot.cobros||[];
+  const p=policies[0],receipts=snapshot.receipts||[],cobros=snapshot.cobros||[],portfolio=snapshot.portfolio||[];
   out.policyValidity={start:safeIso(p.vigenciaInicio||p.vigenciaIni||p.fechaInicio),
     end:safeIso(p.vigenciaFin||p.vigenciaFinal||p.fechaFin),state:text(p.estado).slice(0,28)};
   out.clientVerified=snapshot.clientExists===true;
@@ -379,11 +379,21 @@ function assess(one,snapshot){
   out.sourceDueCandidateReadback=dueCandidates.slice(0,8).map(r=>({
     currentGrossCents:amount(r),sourceGrossCents:one.cents,
     grossMatchesSource:amount(r)===one.cents,
+    grossFieldNames:['monto','montoTotal','primaTotal','saldo','valor'].filter(k=>r[k]!=null),
     sequence:Number.isSafeInteger(+r.secuencia)?+r.secuencia:null,
     insurerRequirementAlreadyLinked:numbers(r).includes(one.requirement),
     otherExternalReference:sourceRefKeys.some(k=>text(r[k])&&text(r[k])!==one.requirement),
     internalReceiptPlaceholderOnly:!numbers(r).length||numbers(r).every(n=>/^rec_[a-f0-9]{16,64}$/i.test(n)||/^\d+\s*\/\s*\d+$/.test(n)),
-    paidEvidence:paid(r),linkedCobros:cobros.filter(c=>text(c.reciboId)===text(r.id)).length
+    paidEvidence:paid(r),linkedCobros:cobros.filter(c=>text(c.reciboId)===text(r.id)).length,
+    portfolioReadback:portfolio.filter(c=>text(c.reciboId)===text(r.id)).map(c=>({
+      active:c.carteraActiva!==false,
+      grossCents:amount(c),
+      grossFieldNames:['monto','montoTotal','primaTotal','saldo','valor'].filter(k=>c[k]!=null),
+      currencyMatches:text(c.moneda||c.currency).toUpperCase()==='GTQ',
+      policyMatches:text(c.polizaId||c.policyId)===text(p.id),
+      clientMatches:!c.clienteId||text(c.clienteId)===text(p.clienteId),
+      paidEvidence:paid(c)
+    }))
   }));
   out.sourceDueExactAmountDetails=one.due?receipts.filter(r=>amount(r)===one.cents&&due(r)===one.due).map(r=>({
     numberFieldNames:reqKeys.filter(k=>text(r[k])),
@@ -489,16 +499,18 @@ async function scan(db){
       if(snapshotReadCache[key])return snapshotReadCache[key];
       const reading=(async()=>{
       const base=name=>match.tenant.collection('data').doc(name).collection('items');
-      const [r,c,client]=await Promise.all([
+      const [r,c,pt,client]=await Promise.all([
         base('recibosEsperados').where('polizaId','==',match.id).limit(80).get(),
         base('cobros').where('polizaId','==',match.id).limit(80).get(),
+        base('carteraPrimas').where('polizaId','==',match.id).limit(80).get(),
         text(match.data.clienteId)?base('clientes').doc(text(match.data.clienteId)).get():Promise.resolve(null)
       ]);
-      if(r.size>=80||c.size>=80)throw Error('I66_A1_A4_REQUIREMENT_READ_LIMIT');
+      if(r.size>=80||c.size>=80||pt.size>=80)throw Error('I66_A1_A4_REQUIREMENT_READ_LIMIT');
       const rows=r.docs.map(d=>Object.assign({id:d.id},d.data()||{}));
       const payments=c.docs.map(d=>Object.assign({id:d.id},d.data()||{}));
-      return {policies:[match.data],receipts:rows,cobros:payments,clientExists:!!client&&client.exists,
-        fingerprint:digest({policy:match.data,receipts:rows,cobros:payments,clientExists:!!client&&client.exists})};
+      const portfolio=pt.docs.map(d=>Object.assign({id:d.id},d.data()||{}));
+      return {policies:[Object.assign({id:match.id},match.data)],receipts:rows,cobros:payments,portfolio,clientExists:!!client&&client.exists,
+        fingerprint:digest({policy:match.data,receipts:rows,cobros:payments,portfolio,clientExists:!!client&&client.exists})};
       })();
       snapshotReadCache[key]=reading;
       return reading;
