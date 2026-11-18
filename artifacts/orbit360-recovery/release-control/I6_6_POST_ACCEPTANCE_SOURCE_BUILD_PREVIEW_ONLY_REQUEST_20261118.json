@@ -1,0 +1,24 @@
+{
+  "schema": "GI_I66_POST_ACCEPTANCE_PREVIEW_BUILD_ONLY_REQUEST_V1",
+  "gate": "I6.6",
+  "dateGuatemala": "2026-11-18",
+  "status": "OWNER_APPROVED_PREVIEW_BUILD_ONLY_LIVE_ACCEPTED_LOCK_RETAINED",
+  "approvedManifestBlobSha": "b5fc5814100bd87103490d05d9ce4bb648bf790c",
+  "sourceQaRunId": 44378705804,
+  "sourceQaConclusion": "success",
+  "sourceQaHead": "e4eced4f01d3a5d5ea6565e72f168a448fe5898c",
+  "alreadyPublishedLive": {
+    "sourceSha": "1b65a790530d49fe1d1fb451f02838fd9a713c53",
+    "artifactId": 14373955326,
+    "digest": "sha256:fc6d8f2616141aa4388ec7df497917690fc54400d18a376f15550380334725a5",
+    "hostingVersion": "sites/ays-orbit-360-lab/versions/bf40099201b2ea51"
+  },
+  "buildWorkflow": ".github/workflows/gravicentra-release-delta-66-package.yml",
+  "sourceMechanismChange": "Use current immutable-package job for explicitly approved post-acceptance source successor while keeping accepted LIVE transport locked. Never redeploy accepted artifact as source changes.",
+  "requireExactNewPreview": true,
+  "backendPreview": false,
+  "live": false,
+  "realBusinessWrites": false,
+  "rollbackOnPreviewFailure": true,
+  "fullGateAccepted": false
+}

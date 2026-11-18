@@ -4130,5 +4130,27 @@
   ],
   "liveFunctionRunId": 44211496307,
   "liveFunctionScope": "THREE_EXISTING_EXACT_TARGETS_IN_ACCEPTANCE_RECEIPT",
-  "liveFunctionTraffic": "THREE_OF_THREE_NEW_READY_REVISIONS_100_PERCENT"
+  "liveFunctionTraffic": "THREE_OF_THREE_NEW_READY_REVISIONS_100_PERCENT",
+  "postAcceptanceProductSourcePreviewBuildRequest20261118": {
+    "status": "OWNER_APPROVED_SOURCE_PREVIEW_ONLY",
+    "gate": "I6.6",
+    "approvedByDirection": true,
+    "authorizedBranch": "recovery/fase-a-clean-20260831",
+    "sourceQaHead": "e4eced4f01d3a5d5ea6565e72f168a448fe5898c",
+    "sourceQaRunId": 44378705804,
+    "approvedManifestBlobSha": "b5fc5814100bd87103490d05d9ce4bb648bf790c",
+    "previousLiveSourceSha": "1b65a790530d49fe1d1fb451f02838fd9a713c53",
+    "previousLiveArtifactId": 14373955326,
+    "previousLiveArtifactDigest": "sha256:fc6d8f2616141aa4388ec7df497917690fc54400d18a376f15550380334725a5",
+    "previousLiveHostingVersion": "sites/ays-orbit-360-lab/versions/bf40099201b2ea51",
+    "strictlyNewImmutableSource": true,
+    "existingBuildJobOnly": true,
+    "previewHostingChannelOnly": true,
+    "liveDeploy": false,
+    "backendLiveDeploy": false,
+    "realOperationalDataWrites": false,
+    "legalChanges": false,
+    "newFirebase": false,
+    "rollbackMustPreserveCurrentLive": true
+  }
 }

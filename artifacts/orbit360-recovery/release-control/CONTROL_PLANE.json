@@ -1501,6 +1501,19 @@
         "shaBefore": "ac67637efc6db8399c889fef45e19246c4abd087",
         "shaAfter": "bbff5210dfc7d660e6b003d4ce78b210da37da7f",
         "status": "SOURCE_RETEST_REQUIRED_NOT_LIVE"
+      },
+      "previewBuildRequest": {
+        "status": "OWNER_APPROVED_OLD_LIVE_LOCKED_NEW_IMMUTABLE_PREVIEW_ONLY",
+        "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_POST_ACCEPTANCE_SOURCE_BUILD_PREVIEW_ONLY_REQUEST_20261118.json",
+        "receiptBlobSha": "c6d17256362022fd015b2fb258d32ccb64929e03",
+        "guardRunId": 44378705804,
+        "workflowBlob": "48c03900feef7fa04fa85fe5d0df934da9519cb6",
+        "previousLiveSource": "1b65a790530d49fe1d1fb451f02838fd9a713c53",
+        "productSourceChangedAfterOldBuild": true,
+        "requireNewBuildId": true,
+        "previewReady": false,
+        "liveReady": false,
+        "noRealWrites": true
       }
     }
   },

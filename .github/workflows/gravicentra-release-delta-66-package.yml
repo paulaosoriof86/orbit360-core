@@ -222,6 +222,34 @@ jobs:
             invoicePreview.forbidRealFinancialWrites===true&&
             invoicePreview.requireLiveFunctionRevisionBeforeAfterIdentity===true&&
             invoicePreview.requireExactBackendBlobInArtifact===true;
+          const successor=c.postAcceptanceProductSourcePreviewBuildRequest20261118||null;
+          let successorBuild=false;
+          if(successor){
+            const {execFileSync}=require('node:child_process');
+            const sha=execFileSync('git',['rev-parse','HEAD:artifacts/orbit360-recovery/release-control/I6_6_APPROVED_PRODUCT_DELTA_MANIFEST_20261110.json'],{encoding:'utf8'}).trim();
+            const live=c.currentExactHostingRelease||{};
+            const ok=successor.status==='OWNER_APPROVED_SOURCE_PREVIEW_ONLY'&&
+              successor.approvedByDirection===true&&successor.gate==='I6.6'&&
+              successor.authorizedBranch==='recovery/fase-a-clean-20260831'&&
+              successor.approvedManifestBlobSha===sha&&
+              successor.sourceQaRunId===44378705804&&
+              successor.sourceQaHead==='e4eced4f01d3a5d5ea6565e72f168a448fe5898c'&&
+              c.status==='OPERATIONAL_EXACT_LIVE_ACCEPTED_LOCKED'&&
+              c.livePromotionAuthorized===false&&c.forbidBackendLiveFunctionDeploy===true&&
+              c.forbidBackendFunctionDeploy===true&&
+              successor.previousLiveSourceSha===live.sourceSha&&
+              successor.previousLiveArtifactId===live.artifactId&&
+              successor.previousLiveArtifactDigest===live.artifactDigest&&
+              successor.previousLiveHostingVersion===live.liveHostingVersion&&
+              successor.existingBuildJobOnly===true&&
+              successor.previewHostingChannelOnly===true&&
+              successor.liveDeploy===false&&successor.backendLiveDeploy===false&&
+              successor.realOperationalDataWrites===false&&successor.legalChanges===false&&
+              successor.newFirebase===false&&successor.rollbackMustPreserveCurrentLive===true;
+            if(!ok)throw Error('I66_POST_ACCEPTANCE_PREVIEW_ONLY_REQUEST_SCOPE_DRIFT');
+            execFileSync('git',['merge-base','--is-ancestor',successor.sourceQaHead,'HEAD']);
+            successorBuild=true;
+          }
           let operationalTransport=false;
           if(['OPERATIONAL_BACKEND_PREVIEW_AUTHORIZED','OPERATIONAL_EXACT_LIVE_PROMOTION_AUTHORIZED'].includes(c.status)){
             require('./tools/gravicentra-i6-6-operational-release-candidate.cjs').candidateForPhase(c,
@@ -232,6 +260,7 @@ jobs:
           if((scopedPreview||scopedLive||scopedCarlosLive||readerPreview)&&(!/^[0-9a-f]{40}$/.test(c.approvedSourceSha||'')||!(c.sourceBuildWorkflowRunId>0)||!(c.immutableArtifactId>0)||!/^[0-9a-f]{64}$/.test(String(c.immutableArtifactZipDigest||'').replace(/^sha256:/,''))))throw Error('I66_SCOPED_RELEASE_PROOF_MISSING');
           let mode='disabled',source='',sourceRun='',artifactId='',artifactDigest='',accessSha='',readerSha='',previewChannel='';
           if(c.status==='PREVIEW_BUILD_REQUESTED'&&c.livePromotionAuthorized===false)mode='package';
+          if(successorBuild)mode='package';
           if(readerPreview){mode='reader-preview';source=reader.sourceCommit;
             sourceRun=reader.sourceWorkflowRunId;artifactId=reader.sourceArtifactId;
             artifactDigest=c.immutableArtifactZipDigest;accessSha='38fa8cee808be6b92b65150625e69b0f93639564';
