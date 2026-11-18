@@ -153,6 +153,41 @@ const checkReview=async(extraEvidence,reason)=>{
  const commission=await preview();assert.equal(commission.eligible,true);assert.equal(commission.targets[0].amount,100);
  const commissioned=await apply(commission.planDigest);assert.equal(commissioned.readbackConfirmed,true);
  const commissionCobro=documents.get(item('cobros',commissioned.results[0].cobroId));assert.equal(commissionCobro.monto,100,'commission amount cannot replace premium amount');checks++;
+ // The insurer's invoiced *total* prevails over a stale canonical receipt.
+ // Net premium, commissions and the original before-image remain separate.
+ seed({evidenceType:'INVOICE_INSTALLMENT_N',amount:100.01,invoiceNumber:'INVOICE-ORIGINAL-001',
+   paidDate:'2026-11-10',actualPaidDateEvidence:true});
+ const insurerReceipt=documents.get(item('recibosEsperados','qa_receipt'));
+ insurerReceipt.primaNeta=81.25;insurerReceipt.comAseguradora=13.5;
+ const invoiceReady=await preview();
+ assert.equal(invoiceReady.status,'READY_TO_APPLY');assert.equal(invoiceReady.targets[0].amount,100.01);
+ assert.equal(writeCount,0);checks++;
+ const invoiceApplied=await apply(invoiceReady.planDigest);
+ assert.equal(invoiceApplied.readbackConfirmed,true);
+ const updatedReceipt=documents.get(item('recibosEsperados','qa_receipt'));
+ for(const field of ['monto','montoTotal','primaTotal'])assert.equal(updatedReceipt[field],100.01);
+ assert.equal(updatedReceipt.primaNeta,81.25);assert.equal(updatedReceipt.comAseguradora,13.5);
+ assert.equal(updatedReceipt.insurerTotalBefore,100);
+ assert.equal(updatedReceipt.insurerTotalEvidenceType,'INVOICE_INSTALLMENT_N');checks++;
+ const updatedPortfolio=documents.get(item('carteraPrimas','qa_portfolio'));
+ for(const field of ['monto','montoTotal','primaTotal'])assert.equal(updatedPortfolio[field],100.01);
+ assert.equal(updatedPortfolio.carteraActiva,false);checks++;
+ const updatedCobro=documents.get(item('cobros',invoiceApplied.results[0].cobroId));
+ for(const field of ['monto','montoTotal','primaTotal'])assert.equal(updatedCobro[field],100.01);
+ const invoiceAudit=documents.get(item('reconciliationApplications',invoiceApplied.applicationId));
+ assert.equal(invoiceAudit.beforeAfter.length,3);
+ assert.equal(invoiceAudit.beforeAfter.find(x=>x.collection==='recibosEsperados').before.monto,100);
+ assert.equal(invoiceAudit.beforeAfter.find(x=>x.collection==='recibosEsperados').after.monto,100.01);checks++;
+ const invoiceWritten=writeCount;
+ assert.equal((await apply(invoiceReady.planDigest)).reused,true);
+ assert.equal(writeCount,invoiceWritten,'invoice retries cannot duplicate financial writes');checks++;
+ // A caller cannot impersonate a verified insurer source to edit a premium.
+ seed();const unauthorizedInvoice=await command.run(request('reconcile_evidence',{
+  policyId:'qa_policy',receiptId:'qa_receipt',evidenceType:'INVOICE_INSTALLMENT_N',
+  evidenceId:'unverified-invoice',currency:'GTQ',amount:100.01}));
+ assert.equal(unauthorizedInvoice.status,'REVIEW_REQUIRED');
+ assert.equal(unauthorizedInvoice.reason,'INSURER_INVOICE_TOTAL_REQUIRES_VERIFIED_SOURCE_PROPOSAL');
+ assert.equal(writeCount,0);checks++;
  seed();documents.delete(item('carteraPrimas','qa_portfolio'));const noPortfolio=await preview();
  assert.equal(noPortfolio.reason,'PROPOSAL_FINANCIAL_TARGET_NOT_UNIQUE');
  assert.equal((await apply('stale_or_missing')).reason,'PROPOSAL_FINANCIAL_TARGET_NOT_UNIQUE');assert.equal(writeCount,0);checks++;

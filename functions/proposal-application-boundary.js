@@ -22,7 +22,7 @@ const QUESTIONS = Object.freeze({
   SOURCE_BANK_PAYMENT_NOT_PROVEN:'La coincidencia bancaria no acredita todavía el pago. Falta la evidencia de pago confirmado de esa fila.',
   SOURCE_CURRENCY_REQUIRED:'La fuente no especifica la moneda; debe completarse desde el documento original.',
   SOURCE_RECEIPT_CURRENCY_MISMATCH:'La moneda de la evidencia no coincide con la del recibo y la póliza.',
-  SOURCE_RECEIPT_AMOUNT_MISMATCH:'El importe de la evidencia no coincide con el recibo. Confirma si es abono parcial o una referencia diferente.',
+  SOURCE_RECEIPT_AMOUNT_MISMATCH:'El importe no está acreditado o no corresponde al recibo. Confirma la fuente, el tipo de prima y si existe un abono parcial.',
   SOURCE_PARTIAL_PAYMENT_REQUIRES_ALLOCATION:'Es un abono parcial: debe usarse la asignación de abonos aprobada; no se liquidará todo el recibo como pagado.',
   SOURCE_LEDGER_INTEGRITY_MISMATCH:'La evidencia no supera la comprobación de integridad del libro activo. Se debe restaurar la referencia acreditada.',
   SOURCE_ACTIVE_RUN_CHANGED:'Cambió el libro activo. Actualiza la propuesta antes de aplicarla.',
@@ -80,9 +80,13 @@ function canonicalEvidence(proposal,evidence,policy,receipt,evidenceRef) {
   const sourceAmount=raw==null||raw===''?null:Number(raw);
   const receiptAmount=amount(receipt);
   if(sourceAmount!=null&&!Number.isFinite(sourceAmount))return review('SOURCE_RECEIPT_AMOUNT_MISMATCH');
+  // An insurer invoice states the authoritative *gross installment premium*.
+  // Its total may correct a stale expected receipt; commission statements
+  // state commission, not premium. Bank transfers still require exact matching.
   if(['BANK_STATEMENT_MATCH','INVOICE_INSTALLMENT_N'].includes(kind)&&
       (!Number.isFinite(sourceAmount)||sourceAmount<=0||!Number.isFinite(receiptAmount)||receiptAmount<=0||
-       Math.abs(sourceAmount*100-Math.round(sourceAmount*100))>1e-6||Math.round(sourceAmount*100)!==Math.round(receiptAmount*100)))
+       Math.abs(sourceAmount*100-Math.round(sourceAmount*100))>1e-6||
+       kind==='BANK_STATEMENT_MATCH'&&Math.round(sourceAmount*100)!==Math.round(receiptAmount*100)))
     return review('SOURCE_RECEIPT_AMOUNT_MISMATCH');
   const out={policyId:policy.id,receiptId:receipt.id,evidenceType:kind,evidenceId:evidenceRef,sourceRef:evidenceRef,
     currency,amount:kind==='COMMISSION_STATEMENT_INSTALLMENT_N'?null:sourceAmount,uniqueMatch:true,
@@ -275,7 +279,9 @@ function publicAssessment(context) {
     proposalId:context.proposalId,planDigest:context.planDigest,policyNumber:text(context.policy.numero),
     currency:context.evidencePayload.currency,evidenceType:context.plan.evidenceType,
     targets:context.plan.targets.map(t=>({receiptId:t.receiptId,installment:t.installment,mode:t.mode,
-      amount:amount(context.receipts.find(r=>r.id===t.receiptId)),paymentState:t.paymentState,applicationState:t.applicationState})),
+      amount:context.plan.evidenceType==='INVOICE_INSTALLMENT_N'&&t.mode==='DIRECT'?context.sourceAmount:
+        amount(context.receipts.find(r=>r.id===t.receiptId)),
+      paymentState:t.paymentState,applicationState:t.applicationState})),
     writes:0,serverOwned:true};
 }
 const applicationIdFor=(tenantId,runId,proposalId)=>'propapp_'+digest({tenantId,runId,proposalId}).slice(0,28);
@@ -300,7 +306,8 @@ function prepareResolution(context,payload,actor) {
   const sourceAmount=rawSource==null?null:Number(rawSource),receiptAmount=amount(receipt);
   if(['BANK_STATEMENT_MATCH','INVOICE_INSTALLMENT_N'].includes(kind)&&
       (!Number.isFinite(sourceAmount)||sourceAmount<=0||!Number.isFinite(receiptAmount)||receiptAmount<=0||
-       Math.abs(sourceAmount*100-Math.round(sourceAmount*100))>1e-6||Math.round(sourceAmount*100)!==Math.round(receiptAmount*100)))
+       Math.abs(sourceAmount*100-Math.round(sourceAmount*100))>1e-6||
+       kind==='BANK_STATEMENT_MATCH'&&Math.round(sourceAmount*100)!==Math.round(receiptAmount*100)))
     return review('SOURCE_RECEIPT_AMOUNT_MISMATCH');
   if(kind==='BANK_STATEMENT_MATCH'&&!paidDate)return review('SOURCE_BANK_PAID_DATE_REQUIRED');
   if(kind==='INSURER_STATEMENT_PENDING_FROM_N'&&paidDate)return review('SOURCE_PENDING_STATEMENT_IS_NOT_PAYMENT');

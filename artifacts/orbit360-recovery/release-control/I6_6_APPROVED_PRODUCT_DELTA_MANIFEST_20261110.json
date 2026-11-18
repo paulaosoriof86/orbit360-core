@@ -2872,6 +2872,53 @@
           }
         }
       ]
+    },
+    {
+      "id": "I6_6_INSURER_GROSS_TOTAL_AND_DISTINCT_REQUIREMENT_20261118",
+      "approvedByDirection": true,
+      "receipt": "artifacts/orbit360-recovery/release-control/I6_6_INSURER_TOTAL_RECEIPT_WRITER_QA_20261118.json",
+      "sourceStatus": "LOCAL_SYNTHETIC_QA_PASS_EXACT_SIGNED_PREVIEW_AND_LIVE_HOLD",
+      "scope": "Paula clarifies distinct insurer requirement numbers are expected for installments and an exact insurer invoice total prevails over stale gross receipt, never over net premium or commission semantics. Verified immutable proposal may correct receipt, portfolio and cobro transactionally; bank matching remains exact; no unverified financial write, no current LIVE deploy or real data write.",
+      "paths": [
+        {
+          "path": "functions/cobros-reconciliation-domain.js",
+          "gitBlobSha": "add21a5888f61fceea5ffd7aef7cf7318a31225e",
+          "replaces": {
+            "path": "functions/cobros-reconciliation-domain.js",
+            "priorGitBlobSha": "6143c52d76e803421c49c443fb1b692d85ccdf14",
+            "priorChangeId": "I6_6_AUTHENTICATED_INCREMENTAL_SOURCE_INTAKE_V2_20261117"
+          }
+        },
+        {
+          "path": "functions/proposal-application-boundary.js",
+          "gitBlobSha": "4c9cbf708a0dc353ca213c806fcedb580f7a25ec",
+          "replaces": {
+            "path": "functions/proposal-application-boundary.js",
+            "priorGitBlobSha": "ba807d0573c8a06a27ed06341d970407e2b4f521",
+            "priorChangeId": "I6_6_AUTHENTICATED_INCREMENTAL_SOURCE_INTAKE_V2_20261117"
+          }
+        }
+      ],
+      "tests": [
+        {
+          "path": "tools/gravicentra-i6-6-proposal-application-boundary.test.cjs",
+          "gitBlobSha": "74644ff9821299a45ce1d71162f48b3aba81748f",
+          "replaces": {
+            "path": "tools/gravicentra-i6-6-proposal-application-boundary.test.cjs",
+            "priorGitBlobSha": "30bd73a9d8031bef8288185adaa9dd0c2992518e",
+            "priorChangeId": "I6_6_PROPOSAL_APPLICATION_FIRESTORE_AUDIT_ARRAY_TIMESTAMP_20261116"
+          }
+        },
+        {
+          "path": "tools/gravicentra-i6-6-source-intake-v2.test.cjs",
+          "gitBlobSha": "2c1a2cf07a27ec2ebdbf427d013262233617fbfa",
+          "replaces": {
+            "path": "tools/gravicentra-i6-6-source-intake-v2.test.cjs",
+            "priorGitBlobSha": "f2e83ef77ff6f441d3eafb141c044a5a99c3df47",
+            "priorChangeId": "I6_6_AUTHENTICATED_INCREMENTAL_SOURCE_INTAKE_V2_20261117"
+          }
+        }
+      ]
     }
   ],
   "i66R11PreviewBuildRequest20261113": {

@@ -310,6 +310,23 @@ test('actual native receipt owner quota and canonical validity fields are accept
  const applied=await command.run(request('apply_proposal_application',{sourceRunId:out.sourceRunId,proposalId:out.proposalIds[0],planDigest:ready.planDigest}));assert.equal(applied.readbackConfirmed,true);
  const replay=await command.run(request('preview_proposal_application',{sourceRunId:out.sourceRunId,proposalId:out.proposalIds[0]}));assert.equal(replay.reused,true);assert.equal(table('cobros').length,1);
 });
+test('unique canonical installment accepts distinct insurer requirement and corrects total without touching net premium',async()=>{
+ const native=nativeReceiptFixture(),p=payload(),receipt=native.receipts[0],previous=clone(receipt);
+ const authoritativeTotal=Math.round((receipt.monto+0.01)*100)/100;
+ Object.assign(p.rows[0],{policyId:'',receiptId:'',receiptNumber:'INSURER-REQUIREMENT-NEW-001',
+  amount:authoritativeTotal,installment:'1/3',policyStartDate:native.policy.vigenciaInicio,policyEndDate:native.policy.vigenciaFin});
+ const out=await submit(p);assert.equal(out.counts.holds,0,JSON.stringify(out.rowResults));
+ const ready=await command.run(request('preview_proposal_application',{sourceRunId:out.sourceRunId,proposalId:out.proposalIds[0]}));
+ assert.equal(ready.eligible,true,ready.reason);assert.equal(ready.targets[0].receiptId,receipt.id);assert.equal(ready.targets[0].amount,authoritativeTotal);
+ const applied=await command.run(request('apply_proposal_application',{sourceRunId:out.sourceRunId,proposalId:out.proposalIds[0],planDigest:ready.planDigest}));
+ assert.equal(applied.readbackConfirmed,true);
+ const updated=documents.get(item('recibosEsperados',receipt.id));const portfolio=table('carteraPrimas')[0][1],payment=table('cobros')[0][1];
+ for(const record of [updated,portfolio,payment])assert.equal(record.monto,authoritativeTotal);
+ assert.equal(updated.primaNeta,previous.primaNeta);assert.equal(updated.comAseguradora,previous.comAseguradora);
+ assert.equal(updated.insurerTotalBefore,previous.monto);
+ const replay=await command.run(request('preview_proposal_application',{sourceRunId:out.sourceRunId,proposalId:out.proposalIds[0]}));
+ assert.equal(replay.reused,true);assert.equal(table('cobros').length,1);
+});
 test('native numeric quota cannot borrow a different total or conflicting sequence',async()=>{
  const native=nativeReceiptFixture(),p=payload();Object.assign(p.rows[0],{receiptId:native.receipts[0].id,receiptNumber:'',amount:native.receipts[0].monto});native.policy.cuotas=10;
  const out=await submit(p);assert.equal(out.counts.holds,1);const ready=await command.run(request('preview_proposal_application',{sourceRunId:out.sourceRunId,proposalId:out.proposalIds[0]}));assert.equal(ready.eligible,false);

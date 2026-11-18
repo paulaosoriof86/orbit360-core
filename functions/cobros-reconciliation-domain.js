@@ -906,7 +906,7 @@ async function intakeSourceRun(authz,data,payload,previewOnly){
         receipts.set(policy.id,snap.docs.map(doc=>Object.assign({id:doc.id},doc.data())));
       }
       const canonicalReceipts=receipts.get(policy.id);
-      const exact=canonicalReceipts.filter(receipt=>{
+      let exact=canonicalReceipts.filter(receipt=>{
         if(receipt.tenantId&&receipt.tenantId!==authz.tenantId||receipt.clienteId&&policy.clienteId&&receipt.clienteId!==policy.clienteId)return false;
         try{assertPaymentCountryScope(authz,policy,receipt);proposalAccess.allowRow(ctx,policy,[receipt]);}catch(_){return false;}
         if(text(receipt.moneda||receipt.currency||policy.moneda,12).toUpperCase()!==prepared.source.currency)return false;
@@ -914,13 +914,33 @@ async function intakeSourceRun(authz,data,payload,previewOnly){
         if(row.receiptNumber)return ['numeroReciboFuente','numeroRecibo','reciboNumero','numero','requerimiento'].some(k=>text(receipt[k],180)===row.receiptNumber);
         return false;
       });
+      // A different insurer requirement number on each installment is normal.
+      // When that external identifier has not yet been projected onto our
+      // receipt, a complete, unambiguous canonical installment schedule can
+      // bind the source to its *own* N/total receipt. An existing, conflicting
+      // exact identifier is never displaced by this fallback.
+      if(!exact.length&&!row.receiptId&&row.installmentIndex&&row.totalInstallments&&
+          canonicalReceipts.length===row.totalInstallments&&
+          Array.from({length:row.totalInstallments},(_,i)=>i+1).every(n=>
+            canonicalReceipts.filter(receipt=>sourceIntake.matchesCanonicalInstallment(
+              {installment:n+'/'+row.totalInstallments},policy,receipt)).length===1)){
+        exact=canonicalReceipts.filter(receipt=>{
+          if(receipt.tenantId&&receipt.tenantId!==authz.tenantId||receipt.clienteId&&policy.clienteId&&receipt.clienteId!==policy.clienteId)return false;
+          try{assertPaymentCountryScope(authz,policy,receipt);proposalAccess.allowRow(ctx,policy,[receipt]);}catch(_){return false;}
+          return text(receipt.moneda||receipt.currency||policy.moneda,12).toUpperCase()===prepared.source.currency&&
+            sourceIntake.matchesCanonicalInstallment(row,policy,receipt);
+        });
+      }
       if(qa&&(exact.length!==1||exact[0].__syntheticQa!==true||exact[0].qaRunId!==qa||!/^b3005qa_/.test(exact[0].id)))
         throw new HttpsError('permission-denied','SOURCE_QA_RECEIPT_REQUIRED');
       let hold=canonicalReceipts.length>100?'SOURCE_RECEIPT_NOT_UNIQUE':exact.length!==1?'SOURCE_RECEIPT_IDENTITY_MISSING':'';
       const receipt=exact.length===1?exact[0]:null;
       if(!qa&&receipt&&(receipt.__syntheticQa===true||/^b3005qa_/.test(receipt.id)))throw new HttpsError('permission-denied','SOURCE_REAL_INTAKE_SYNTHETIC_TARGET_DENIED');
       if(receipt&&row.installmentIndex&&!sourceIntake.matchesCanonicalInstallment(row,policy,receipt))hold='SOURCE_RECEIPT_INSTALLMENT_MISMATCH';
-      if(receipt&&['INVOICE_INSTALLMENT_N','BANK_STATEMENT_MATCH'].includes(prepared.source.evidenceType)&&
+      // Insurer invoice totals are authoritative gross premiums and may
+      // correct a stale canonical receipt during the protected Apply step.
+      // A bank transfer is not authority to alter the contractual premium.
+      if(receipt&&prepared.source.evidenceType==='BANK_STATEMENT_MATCH'&&
           (row.amount==null||receiptAmount(receipt)!==row.amount))hold='SOURCE_RECEIPT_AMOUNT_MISMATCH';
       bindings.set(row.key,{policyId:policy.id,receiptId:receipt&&receipt.id||'',reason:hold});
     }
@@ -1068,6 +1088,22 @@ async function reconcileEvidence(authz, data, payload, previewOnly, proposalRequ
     for (const receipt of receipts) assertPaymentCountryScope(authz, policy, receipt);
     const plan = trustedProposal ? trustedProposal.plan : planEvidence({ policy, receipts, evidence: evidencePayload, reconciliationConfig });
     if (!plan || plan.ok !== true) throw new HttpsError('failed-precondition', 'No fue posible evaluar la evidencia.');
+    const anchorReceipt = receipts.find(row=>row.id===plan.anchorReceiptId);
+    const insurerInvoiceTotal = plan.evidenceType==='INVOICE_INSTALLMENT_N'&&evidencePayload.amount!=null ?
+      evidencePayload.amount : null;
+    const invoiceTotalDiffers = insurerInvoiceTotal!=null&&anchorReceipt&&
+      Math.round(insurerInvoiceTotal*100)!==Math.round(receiptAmount(anchorReceipt)*100);
+    // A browser may submit evidence, but it cannot rewrite premium totals.
+    // Only an exact, immutable, server-verified insurer invoice proposal can
+    // supersede the old total on the receipt, portfolio and payment together.
+    const authorizedInvoiceTotal = !!(trustedProposal&&proposalRequest&&
+      trustedProposal.plan.evidenceType==='INVOICE_INSTALLMENT_N'&&
+      Number.isFinite(trustedProposal.sourceAmount)&&trustedProposal.sourceAmount>0&&
+      Math.round(trustedProposal.sourceAmount*100)===Math.round(insurerInvoiceTotal*100));
+    if (invoiceTotalDiffers&&!authorizedInvoiceTotal)
+      return {ok:true,operation:'reconcile_evidence',status:'REVIEW_REQUIRED',reviewRequired:true,
+        reason:'INSURER_INVOICE_TOTAL_REQUIRES_VERIFIED_SOURCE_PROPOSAL',policyId,writes:0,
+        serverOwned:true,failClosed:true};
     if (plan.autoCommit !== true || plan.status === 'REVIEW_REQUIRED') {
       return {
         ok: true,
@@ -1145,6 +1181,14 @@ async function reconcileEvidence(authz, data, payload, previewOnly, proposalRequ
       // provides the payment amount for commission-based inference.
       const amount = (!isInferred && plan.evidenceType!=='COMMISSION_STATEMENT_INSTALLMENT_N' && evidencePayload.amount != null) ? evidencePayload.amount : receiptAmount(receipt);
       if (amount == null || amount <= 0) throw new HttpsError('failed-precondition', 'El recibo no tiene monto válido.');
+      const correctSourceTotal = !isInferred&&authorizedInvoiceTotal&&
+        Math.round(amount*100)!==Math.round(receiptAmount(receipt)*100);
+      const sourceTotalPatch = correctSourceTotal ? {
+        monto:amount,montoTotal:amount,primaTotal:amount,
+        insurerTotalEvidenceRef:plan.sourceRef,
+        insurerTotalEvidenceType:'INVOICE_INSTALLMENT_N',
+        insurerTotalBefore:receiptAmount(receipt)
+      } : {};
       const paidDate = !isInferred && evidencePayload.paidDate && (plan.evidenceType === 'BANK_STATEMENT_MATCH' || evidencePayload.actualPaidDateEvidence === true) ? evidencePayload.paidDate : text(beforeCobro.paidDate || beforeCobro.fechaPago, 32);
       const applicationDate = !isInferred ? (evidencePayload.applicationDate || text(beforeCobro.applicationDate, 32)) : text(beforeCobro.applicationDate, 32);
       const inferenceProvenance = isInferred ? {
@@ -1204,6 +1248,7 @@ async function reconcileEvidence(authz, data, payload, previewOnly, proposalRequ
         monto: amount,
         estado: 'Pagado',
         conciliado: /^APPLIED_/.test(applicationState),
+        ...(correctSourceTotal?{montoTotal:amount,primaTotal:amount}:{}),
         ...shared
       });
       if (paidDate) cobro.fechaPago = paidDate;
@@ -1217,7 +1262,7 @@ async function reconcileEvidence(authz, data, payload, previewOnly, proposalRequ
         paymentOrigin: origin,
         conciliadoPago: true,
         conciliado: /^APPLIED_/.test(applicationState)
-      }, shared);
+      }, shared,sourceTotalPatch);
       if (paidDate) receiptPatch.fechaPago = paidDate;
       if (!isInferred && evidencePayload.invoiceNumber) receiptPatch.numeroFactura = evidencePayload.invoiceNumber;
       tx.set(tenantData(authz.tenantId, 'recibosEsperados').doc(receiptId), receiptPatch, { merge: true });
@@ -1244,6 +1289,7 @@ async function reconcileEvidence(authz, data, payload, previewOnly, proposalRequ
           updatedAt: technicalNow,
           updatedByUid: authz.actor.uid
         };
+        if(correctSourceTotal)Object.assign(portfolioPatch,sourceTotalPatch);
         if (isInferred) portfolioPatch.inferredEffectiveDate = target.inferredEffectiveDate;
         if (paidDate) portfolioPatch.fechaPago = paidDate;
         if (applicationDate) portfolioPatch.applicationDate = applicationDate;

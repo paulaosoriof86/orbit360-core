@@ -1,0 +1,41 @@
+{
+  "schema": "GI_I66_INSURER_GROSS_TOTAL_SOURCE_QA_V1",
+  "gate": "I6.6",
+  "recordedOn": "2026-11-18",
+  "branch": "recovery/fase-a-clean-20260831",
+  "sourceHeadBefore": "3e83561d2808003c2c3f5d54c9e83354487a7d07",
+  "ownerDecision": "Paula: distintos requerimientos para cuotas de una misma poliza son normales. El total de prima acreditado por factura de aseguradora prevalece sobre el dato historico del recibo; prima neta y comisiones son conceptos separados; aplicar lotes con pruebas, readback e idempotencia en I6.6.",
+  "scope": [
+    "Solo factura oficial de cuota inequívoca puede corregir el importe total del recibo, su cartera vinculada y su cobro en una misma transaccion.",
+    "Cada requisito de aseguradora pertenece a su propia cuota; resolver por N/total solo cuando existe un calendario canonico completo, unico y dentro del scope.",
+    "Banco debe conservar conciliacion por importe exacto; planilla de comision no sustituye la prima total.",
+    "Solo propuesta integra, inmutable y verificada en servidor puede corregir el total; llamadas financieras no verificadas quedan en revision.",
+    "No modificar prima neta ni porcentajes o montos de comisiones sin fuente que acredite esos conceptos; no inferir fecha real de pago."
+  ],
+  "changedSourceBlobs": {
+    "functions/cobros-reconciliation-domain.js": "add21a5888f61fceea5ffd7aef7cf7318a31225e",
+    "functions/proposal-application-boundary.js": "4c9cbf708a0dc353ca213c806fcedb580f7a25ec"
+  },
+  "changedTestBlobs": {
+    "tools/gravicentra-i6-6-proposal-application-boundary.test.cjs": "74644ff9821299a45ce1d71162f48b3aba81748f",
+    "tools/gravicentra-i6-6-source-intake-v2.test.cjs": "2c1a2cf07a27ec2ebdbf427d013262233617fbfa"
+  },
+  "syntheticLocalQA": {
+    "status": "PASS",
+    "testsPassed": 113,
+    "testsFailed": 0,
+    "cloudWrites": 0,
+    "coverage": ["separate external requirement per installment", "authoritative insurer gross total", "atomic receipt-portfolio-cobro", "preserve net premium and commissions", "idempotent signed apply", "unverified caller denied", "bank and commission boundaries", "preview synthetic isolation"]
+  },
+  "releaseAndDataBoundaries": {
+    "exactSignedPreview": "PENDING",
+    "exactSignedLive": "PENDING",
+    "liveFirestoreBeforeAfter": "NOT_EXECUTED",
+    "realFinancialWrites": 0,
+    "liveCustomerWrites": 0,
+    "deployed": false,
+    "currentLiveArtifactUnchanged": true,
+    "sourceDataApplyAuthorizedByThisReceipt": false,
+    "notProductionAccepted": true
+  }
+}
