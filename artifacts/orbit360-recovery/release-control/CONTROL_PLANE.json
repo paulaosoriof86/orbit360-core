@@ -1493,7 +1493,15 @@
         "functions/product-ops-leads-domain.js"
       ],
       "qaTestPath": "tools/gravicentra-i6-6-management-catalog-client-projection.test.cjs",
-      "doesNotCloseExistingFinancialAndCadenceHolds": true
+      "doesNotCloseExistingFinancialAndCadenceHolds": true,
+      "lastCausalQaRepair": {
+        "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_OPS_NOTICE_HUMAN_AUTHOR_COMPAT_SOURCE_QA_20261118.json",
+        "receiptBlobSha": "dde29953e1e90ccc4dc4a0b5d074a39d955ef54b",
+        "failedRunId": 44378210016,
+        "shaBefore": "ac67637efc6db8399c889fef45e19246c4abd087",
+        "shaAfter": "bbff5210dfc7d660e6b003d4ce78b210da37da7f",
+        "status": "SOURCE_RETEST_REQUIRED_NOT_LIVE"
+      }
     }
   },
   "b4003ActiveCertificationCursor20261106": {

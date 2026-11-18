@@ -1507,11 +1507,12 @@ Orbit.ciclo = (function () {
   function notify(o) {
     o = o || {};
     const internal=o.tipo==='gestion';
+    if(internal)o=Object.assign({},o,{tel:'',email:''});
     // Internal operational messages never use a customer's phone or email.
     const tel=internal?'':String(o.tel||'');
     const email=internal?'':String(o.email||'');
     const actor=currentUserIdentity();
-    try { S().insert('avisos', { id: 'av' + Date.now() + Math.floor(Math.random() * 99), tipo: o.tipo || 'aviso', titulo: o.titulo || 'Notificación', detalle: o.detalle || '', para: o.para || '', tel, email, actorUid:actor.uid,actorName:actor.name, fecha: today(), leida: false }); } catch (e) {}
+    try { S().insert('avisos', { id: 'av' + Date.now() + Math.floor(Math.random() * 99), tipo: o.tipo || 'aviso', titulo: o.titulo || 'Notificación', detalle: o.detalle || '', para: o.para || '', tel: o.tel || '', email: o.email || '', actorUid:actor.uid,actorName:actor.name, fecha: today(), leida: false }); } catch (e) {}
     const waNum = tel.replace(/[^0-9]/g, '');
     const msg = encodeURIComponent((o.titulo || '') + (o.detalle ? ' — ' + o.detalle : ''));
     const t = document.createElement('div'); t.className = 'ciclo-toast notif';

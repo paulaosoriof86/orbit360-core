@@ -2768,6 +2768,30 @@
           "gitBlobSha": "23d3ef170a8aa4ee0b62f19c389ada4b742e65c5"
         }
       ]
+    },
+    {
+      "id": "I6_6_OPS_INTERNAL_NOTICE_HUMAN_ACTOR_COMPAT_20261118",
+      "approvedByDirection": true,
+      "receipt": "artifacts/orbit360-recovery/release-control/I6_6_OPS_NOTICE_HUMAN_AUTHOR_COMPAT_SOURCE_QA_20261118.json",
+      "sourceStatus": "CAUSAL_COMPAT_SOURCE_PENDING_RETEST_PREVIEW_LIVE",
+      "scope": "Legacy frozen human author audit asserts literal o.email field adjacent to actorUid and actorName; previous safe internal-contact patch changed property form. Restore exact audit shape by sanitizing internal o.tel/o.email to blank first, preserving actor fields and preventing customer WhatsApp/contact leakage.",
+      "paths": [
+        {
+          "path": "orbit360-platform/core/ciclo.js",
+          "gitBlobSha": "bbff5210dfc7d660e6b003d4ce78b210da37da7f",
+          "replaces": {
+            "path": "orbit360-platform/core/ciclo.js",
+            "priorGitBlobSha": "ac67637efc6db8399c889fef45e19246c4abd087",
+            "priorChangeId": "I6_6_OPS_CLIENT_MANAGEMENT_CATALOG_NOTIFICATIONS_20261118"
+          }
+        }
+      ],
+      "tests": [
+        {
+          "path": "tools/gravicentra-i6-6-management-catalog-client-projection.test.cjs",
+          "gitBlobSha": "23d3ef170a8aa4ee0b62f19c389ada4b742e65c5"
+        }
+      ]
     }
   ],
   "i66R11PreviewBuildRequest20261113": {
