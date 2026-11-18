@@ -1,4 +1,4 @@
-# I6.6 invoice date: exact synthetic-only payment source to existing Preview callable.
+# I6.6 insurer gross-premium correction: same immutable source and artifact to isolated synthetic-only Preview callable.
 # No LIVE Hosting/Functions, real client writes, Rules/Auth or new Firebase.
 name: Gravicentra I6.6 Payment Function Exact Preview P0
 on:
@@ -19,13 +19,12 @@ jobs:
     timeout-minutes: 35
     env:
       PROJECT_ID: ays-orbit-360-lab
-      SOURCE_SHA: 586401bfbe1a80cfef2820982f432743af36b108
-      ARTIFACT_RUN: '43463160506'
-      ARTIFACT_ID: '14057935092'
-      ARTIFACT_DIGEST: sha256:1621f236b9d1b9e49ea42fc53e338a695d5872080361ada2a84183fa7d52207f
-      POLICY_UAT_RUN: '43465087494'
-      ADVISOR_CENSUS_RUN: '43465811712'
-      PREVIEW_URL: https://ays-orbit-360-lab--gi-i66-rc-42868854629-abj14q6n.web.app
+      SOURCE_SHA: 13fc8611fc7d8bd97ae165c2b2f526d07af09d2b
+      ARTIFACT_RUN: '44414675100'
+      ARTIFACT_ID: '14479297045'
+      ARTIFACT_DIGEST: sha256:0ca89e30d4a73e48e7ff5f387efc02ad12114a4b7ca2b988ef188a2a776f11f3
+      SOURCE_QA_RUN: '44413402516'
+      PREVIEW_URL: https://ays-orbit-360-lab--gi-i66-rc-44414675100-0t5eg8ef.web.app
       SA_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
       SA_ALT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
       SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
@@ -37,7 +36,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Guard current owner approval and immutable SHA, artifact, QA, no LIVE
+      - name: Guard Direction's current exact synthetic-only Preview approval, artifact, QA and LIVE lock
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -47,48 +46,49 @@ jobs:
           const assert=require('node:assert/strict'),fs=require('node:fs'),{execFileSync}=require('node:child_process');
           (async()=>{
             const c=JSON.parse(fs.readFileSync('artifacts/orbit360-recovery/release-control/I6_6_RELEASE_TRANSPORT_CONTROL_20261110.json'));
-            assert.equal(c.status,'PAYMENT_INVOICE_BACKEND_PREVIEW_AUTHORIZED');
-            assert.equal(c.backendFunctionPreviewOnly,true);
+            assert.equal(c.status,'OPERATIONAL_EXACT_LIVE_ACCEPTED_LOCKED');
+            assert.equal(c.backendFunctionPreviewOnly,false);
             assert.equal(c.forbidBackendFunctionDeploy,true);
             assert.equal(c.forbidBackendLiveFunctionDeploy,true);
             assert.equal(c.forbidFirestoreRulesDataAuthWrites,true);
             assert.equal(c.livePromotionAuthorized,false);
             assert.equal(c.previewApproved,false);
-            const gate=c.i66PaymentInvoicePreviewRelease20261113||{};
-            assert.equal(gate.status,'SIGNED_POLICY_AND_CLIENT360_PREVIEW_PASS_PAYMENT_BACKEND_PREVIEW_ONLY');
-            assert.equal(gate.singleAllowedFunction,'orbit360CobrosReconciliationCommandPreview');
-            assert.equal(gate.singleAllowedRegion,'us-central1');
+            const gate=c.i66InsurerGrossBackendPreviewRequest20261118||{};
+            assert.equal(gate.status,'DIRECTION_AUTHORIZED_EXACT_SYNTHETIC_BACKEND_PREVIEW_ONLY_AWAIT_SIGNED_UAT');
+            assert.equal(gate.allowedFunction,'orbit360CobrosReconciliationCommandPreview');
+            assert.equal(gate.allowedRegion,'us-central1');
+            assert.equal(gate.sameExistingFirebaseProject,process.env.PROJECT_ID);
             assert.equal(gate.syntheticOnly,true);
-            assert.equal(gate.forbidLiveFunctionOrHostingDeployment,true);
-            assert.equal(gate.forbidRealFinancialWrites,true);
-            assert.equal(gate.requireLiveFunctionRevisionBeforeAfterIdentity,true);
-            assert.equal(gate.requireExactBackendBlobInArtifact,true);
-            for(const [k,v] of [['approvedSourceSha',process.env.SOURCE_SHA],['immutableHostingPreviewBuildRunId',Number(process.env.ARTIFACT_RUN)],['immutableArtifactId',Number(process.env.ARTIFACT_ID)],['immutableArtifactDigest',process.env.ARTIFACT_DIGEST],['existingHostingPreviewUrl',process.env.PREVIEW_URL],['signedTwoRolesPolicyClient360UatRunId',Number(process.env.POLICY_UAT_RUN)]])assert.equal(gate[k],v,k);
+            assert.equal(gate.forbidProductionBackendAndHostingDeployment,true);
+            assert.equal(gate.forbidRealCustomerFinancialWrites,true);
+            assert.equal(gate.forbidRulesAuthIAMOrOtherFunctions,true);
+            assert.equal(gate.livePromotionAuthorizedByThisPreviewRequest,false);
+            assert.equal(gate.requireExactBackendByteMatchToArtifact,true);
+            assert.equal(gate.requireSignedApplyAndReconcileReloadAndAuditRestore,true);
+            assert.equal(gate.requireBeforeAfterLiveFunctionRevisionAndBothLiveHostHashesEqual,true);
+            for(const [k,v] of [['sourceSha',process.env.SOURCE_SHA],['immutableBuildRunId',Number(process.env.ARTIFACT_RUN)],['immutableArtifactId',Number(process.env.ARTIFACT_ID)],['immutableArtifactDigest',process.env.ARTIFACT_DIGEST],['hostingPreviewUrl',process.env.PREVIEW_URL],['approvedInsurerTotalSourceQaRunId',Number(process.env.SOURCE_QA_RUN)]])assert.equal(gate[k],v,k);
             const h={Authorization:'Bearer '+process.env.GH_TOKEN,Accept:'application/vnd.github+json','User-Agent':'GI-I66-Payment-Preview'};
             const base='https://api.github.com/repos/paulaosoriof86/orbit360-core/actions/';
-            const [q,g,b,a]=await Promise.all([
-              fetch(base+'runs/'+process.env.POLICY_UAT_RUN,{headers:h}).then(r=>r.json()),
-              fetch(base+'runs/'+process.env.ADVISOR_CENSUS_RUN,{headers:h}).then(r=>r.json()),
+            const [q,b,a]=await Promise.all([
+              fetch(base+'runs/'+process.env.SOURCE_QA_RUN,{headers:h}).then(r=>r.json()),
               fetch(base+'runs/'+process.env.ARTIFACT_RUN,{headers:h}).then(r=>r.json()),
               fetch(base+'artifacts/'+process.env.ARTIFACT_ID,{headers:h}).then(r=>r.json())
             ]);
-            for(const [kind,r] of [['POLICY_UAT',q],['ADVISOR_CENSUS',g],['BUILD',b]]){assert.equal(r.conclusion,'success',kind);}
-            for(const [kind,r] of [['POLICY_UAT',q],['ADVISOR_CENSUS',g]]){
-              assert.match(String(r.head_sha||''),/^[0-9a-f]{40}$/);
-              const drift=execFileSync('git',['diff','--name-only',process.env.SOURCE_SHA,r.head_sha,'--','functions/','orbit360-platform/'],{encoding:'utf8'}).trim();
-              assert.equal(drift,'',kind+' product source drift');
-            }
+            for(const [kind,r] of [['SOURCE_QA',q],['BUILD',b]])assert.equal(r.conclusion,'success',kind);
+            assert.equal(q.head_sha,'0d76078fb5ef71c887ffaa2b10ea8d8edbbcf4d3');
             assert.equal(b.head_sha,process.env.SOURCE_SHA,'BUILD source');
             assert.equal(a.digest,process.env.ARTIFACT_DIGEST);
             assert.equal(a.workflow_run.id,Number(process.env.ARTIFACT_RUN));
             assert.equal(a.expired,false);
-            console.log('I66_CARLOS_PAYMENT_PREVIEW_OWNER_CURRENT_ARTIFACT_AND_QA_PIN_PASS');
+            const drift=execFileSync('git',['diff','--name-only',process.env.SOURCE_SHA,'HEAD','--','functions/','orbit360-platform/'],{encoding:'utf8'}).trim();
+            assert.equal(drift,'','protected product source changed after package');
+            console.log('I66_INSURER_GROSS_BACKEND_PREVIEW_OWNER_CURRENT_ARTIFACT_AND_QA_PIN_PASS');
           })().catch(e=>{console.error(e.message);process.exitCode=1;});
           NODE
       - uses: actions/download-artifact@v4
         with:
-          artifact-ids: 14057935092
-          run-id: 43463160506
+          artifact-ids: 14479297045
+          run-id: 44414675100
           github-token: ${{ github.token }}
           path: ${{ runner.temp }}/payment-packet-download
       - name: Verify one original immutable TAR, backend source and published Hosting Preview marker
@@ -114,7 +114,10 @@ jobs:
           assert(packed.includes('invoiceDate')&&packed.includes('confirmedReceipt.invoiceDate'),'invoice date persisted/readback marker missing');
           for(const marker of ['PREVIEW_PAYMENT_SYNTHETIC_RELATION_REQUIRED','previewReconciliationRequests','previewReconciliationEvents'])assert(packed.includes(marker));
           assert(fs.existsSync(b+'backend/index.js')&&fs.existsSync(b+'backend/package-lock.json'));
-          console.log('I66_PAYMENT_PREVIEW_EXACT_BACKEND_MARKER_AND_THREE_GUARDS_PASS');
+          const proposal=fs.readFileSync(b+'backend/proposal-application-boundary.js','utf8');
+          assert(proposal.includes('An insurer invoice states the authoritative')&&proposal.includes('SOURCE_RECEIPT_AMOUNT_MISMATCH'));
+          assert(packed.includes('insurerTotalEvidenceType')&&packed.includes('carteraPrimas')&&packed.includes('sourceTotalPatch'));
+          console.log('I66_PAYMENT_PREVIEW_EXACT_BACKEND_AND_GROSS_PREMIUM_CORRECTION_MARKERS_PASS');
           NODE
           curl -fsSL --max-time 25 "$PREVIEW_URL/__recovery__/build.json" -o "$RUNNER_TEMP/payment-preview-marker.json"
           cmp "$RUNNER_TEMP/payment-packet/bundle/site/__recovery__/build.json" "$RUNNER_TEMP/payment-preview-marker.json"
