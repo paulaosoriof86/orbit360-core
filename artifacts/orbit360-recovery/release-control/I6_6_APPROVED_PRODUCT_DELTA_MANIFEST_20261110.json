@@ -2830,7 +2830,7 @@
       "id": "I6_6_CASH_30D_FORWARD_ONLY_P0_LEGACY_PRESERVATION_20261118",
       "approvedByDirection": true,
       "receipt": "artifacts/orbit360-recovery/release-control/I6_6_CASH_30D_LEGACY_GUARD_CAUSAL_REPAIR_20261118.json",
-      "sourceStatus": "CAUSAL_COMPAT_SOURCE_PENDING_RETEST_PREVIEW_LIVE",
+      "sourceStatus": "OWNER_APPROVED_CURRENT_SOURCE_GUARD_PASS_44391029675_NEW_IMMUTABLE_PREVIEW_BUILD_REQUESTED",
       "scope": "Preserve historical cash deadlines while adding explicit 30-day operational limit solely to new manual policy capture",
       "paths": [
         {
@@ -2911,5 +2911,13 @@
     "realFinancialWrites": 0,
     "canonicalGuardRequiredBeforePublication": true,
     "independentReview": "FOUR_SAME_EPOCH_SNAPSHOTS_ASSERTIONS_AND_MUTATIONS_UNCHANGED_36_OF_36_PASS"
+  },
+  "postAcceptanceSourceQaForManualPolicyCapture20261118": {
+    "status": "GUARD_PASS_PREVIEW_BUILD_REQUESTED",
+    "sourceQaRunId": 44391029675,
+    "sourceQaHead": "e5b0be43bf1a6ee4be1c644da18cdc938e051d3e",
+    "productionChange": false,
+    "previousLiveSourceSha": "1b65a790530d49fe1d1fb451f02838fd9a713c53",
+    "latestCausalFixId": "I6_6_CASH_30D_FORWARD_ONLY_P0_LEGACY_PRESERVATION_20261118"
   }
 }

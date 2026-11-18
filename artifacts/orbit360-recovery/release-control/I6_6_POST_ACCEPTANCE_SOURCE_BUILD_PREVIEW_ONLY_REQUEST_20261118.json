@@ -3,7 +3,7 @@
   "gate": "I6.6",
   "dateGuatemala": "2026-11-18",
   "status": "OWNER_APPROVED_PREVIEW_BUILD_ONLY_LIVE_ACCEPTED_LOCK_RETAINED",
-  "approvedManifestBlobSha": "4d4a8a9b493a88cb1025a2ccb59c7debbd3a6ee9",
+  "approvedManifestBlobSha": "69ec409a973bd2854e8e543979ed7e29b946a413",
   "sourceQaRunId": 44378705804,
   "sourceQaConclusion": "success",
   "sourceQaHead": "e4eced4f01d3a5d5ea6565e72f168a448fe5898c",
