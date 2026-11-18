@@ -5,6 +5,7 @@ const assert=require('node:assert/strict');
 const crypto=require('node:crypto');
 const admin=require('firebase-admin');
 const {chromium}=require('playwright');
+const {digest,applicationIdFor}=require('../functions/proposal-application-boundary');
 const PREVIEW=process.env.I66_PREVIEW_ORIGIN;
 const TEST_LIVE_BACKEND=process.env.I66_PAYMENT_LIVE_BACKEND_ONLY==='true';
 const TEST_LIVE_UI=process.env.I66_PAYMENT_LIVE_SIGNED_UI==='true';
@@ -152,8 +153,123 @@ async function testActor(browser,actor){
     console.log('I66_SIGNED_'+actor.role.toUpperCase()+'_'+(TEST_LIVE_UI?'LIVE_UI':TEST_LIVE_BACKEND?'LIVE_BACKEND':'PREVIEW_BACKEND')+'_PAYMENT_SYNTHETIC_DATA_AND_AUDIT_RESTORED_PASS');
   }
 }
+// Actual signed Preview callable, not a local transaction double. An insurer
+// invoice's gross Q100.01 corrects a stale Q100.00 receipt, existing cobro and
+// portfolio. The original net premium and commissions must remain untouched.
+async function testInsurerTotalProposal(browser,actor){
+  assert.ok(!USE_LIVE_BACKEND,'INSURER_TOTAL_PROPOSAL_PREVIEW_ONLY');
+  assert.equal(actor.role,'direccion','INSURER_TOTAL_PROPOSAL_DIRECTION_REQUIRED');
+  const runId='cobledgerqa_'+suffix;
+  const prefix='b3005qa_i66_proposal_'+suffix;
+  const ids={proposal:prefix,source:prefix+'_source',client:prefix+'_client',policy:prefix+'_policy',
+    receipt:prefix+'_receipt',portfolio:prefix+'_portfolio'};
+  const policyNumber='QA-INSURER-'+suffix.toUpperCase();
+  const cobroId='cob_'+hash(TENANT+'|receipt|'+ids.receipt).slice(0,28);
+  const applicationId=applicationIdFor(TENANT,runId,ids.proposal);
+  const eventId='payinf_'+hash(TENANT+'|'+ids.policy+'|'+applicationId).slice(0,28);
+  const qaRun=idRef('cobrosLedgerQaRuns',runId),qaPointer=idRef('cobrosLedgerQaControl',runId);
+  const stageProposal=qaRun.collection('propuestasConciliacion').doc(ids.proposal);
+  const stageEvidence=qaRun.collection('evidenciasCobro').doc(ids.source);
+  const receiptRef=idRef('recibosEsperados',ids.receipt),portfolioRef=idRef('carteraPrimas',ids.portfolio),cobroRef=idRef('cobros',cobroId);
+  const applicationRef=idRef('reconciliationApplications',applicationId);
+  const refs=[qaPointer,qaRun,stageProposal,stageEvidence,idRef('clientes',ids.client),idRef('polizas',ids.policy),
+    receiptRef,portfolioRef,cobroRef,applicationRef,
+    root.collection('reconciliationRequests').doc(applicationId),root.collection('reconciliationEvents').doc(eventId)];
+  const mark={tenantId:TENANT,__syntheticQa:true,qaRunId:runId};
+  const source={sourceRowId:prefix+'_row',sourceRowIdSha256:hash(prefix+'_row'),policyNumber,
+    receiptId:ids.receipt,currency:'GTQ',amount:100.01,evidenceType:'INVOICE_INSTALLMENT_N',
+    reportedDate:'2026-11-15',paidDate:'2026-11-12',actualPaidDateEvidence:true,
+    invoiceDate:'2026-11-13',invoiceNumber:'QA-INVOICE-'+suffix};
+  const hashes={sourceLedgerDigest:digest(source),packageLogicalSha256:digest({source,runId})};
+  const stage=(kind,docId)=>{
+    const original={...source,documentId:docId,...mark};
+    return {...original,documentClass:kind,runId,activationState:'STAGED',...hashes,payloadDigest:digest(original)};
+  };
+  const originalReceipt={id:ids.receipt,...mark,polizaId:ids.policy,clienteId:ids.client,pais:'GT',moneda:'GTQ',
+    monto:100,montoTotal:100,primaTotal:100,primaNeta:81.25,comAseguradora:13.5,
+    cuota:'1/1',vence:'2026-11-01',estado:'Pendiente'};
+  const originalPortfolio={id:ids.portfolio,...mark,polizaId:ids.policy,clienteId:ids.client,reciboId:ids.receipt,
+    pais:'GT',moneda:'GTQ',monto:100,montoTotal:100,primaTotal:100,estado:'Pendiente',carteraActiva:true};
+  const originalCobro={id:cobroId,...mark,polizaId:ids.policy,clienteId:ids.client,reciboId:ids.receipt,
+    pais:'GT',moneda:'GTQ',monto:100,montoTotal:100,primaTotal:100,estado:'Pendiente',paymentState:'PENDING'};
+  const realPointer=idRef('cobrosLedgerControl','active');
+  let browserContext=null;let cleanupArmed=false;
+  const beforeRealPointer=(await realPointer.get()).data();
+  try{
+    for(const ref of refs)assert.equal((await ref.get()).exists,false,'INSURER_TOTAL_QA_COLLISION');
+    cleanupArmed=true;
+    await qaRun.create({...mark,id:runId,runId,schemaVersion:'gi-i66-synthetic-proposal-ledger-v1',status:'ACTIVE',
+      sourceLedgerCount:1,stageDocumentCount:2,...hashes});
+    await qaPointer.create({...mark,activeRunId:runId,schemaVersion:'gi-i66-synthetic-proposal-pointer-v1',status:'ACTIVE',...hashes});
+    await stageProposal.create(stage('propuestasConciliacion',ids.proposal));
+    await stageEvidence.create(stage('evidenciasCobro',ids.source));
+    await idRef('clientes',ids.client).create({id:ids.client,...mark,pais:'GT',nombre:'I6.6 QA prima aseguradora: no cliente real'});
+    await idRef('polizas',ids.policy).create({id:ids.policy,...mark,clienteId:ids.client,numero:policyNumber,pais:'GT',moneda:'GTQ',
+      estado:'Vigente',vigenciaDesde:'2026-01-01',vigenciaHasta:'2027-01-01'});
+    await receiptRef.create(originalReceipt);await portfolioRef.create(originalPortfolio);await cobroRef.create(originalCobro);
+    browserContext=await browser.newContext({viewport:{width:1280,height:900}});
+    const page=await browserContext.newPage();await page.goto(PREVIEW+'/#/conciliaciones',{waitUntil:'commit',timeout:30000});
+    await page.waitForFunction(()=>!!window.Orbit?.productRuntimeBrowserProvidersP0&&!!window.Orbit?.productAppP0,null,{timeout:30000});
+    const signed=await page.evaluate(async token=>{
+      const provider=Orbit.productRuntimeBrowserProvidersP0,ctx=await provider.initialize();
+      await ctx.modules.auth.setPersistence(ctx.auth,ctx.modules.auth.browserSessionPersistence);
+      await ctx.modules.auth.signInWithCustomToken(ctx.auth,token);
+      const app=await Orbit.productAppP0.activate();
+      return {started:app?.started===true,role:Orbit.session?.rol?.(),
+        endpoint:Orbit.reconciliationDomain?.status?.().functionName};
+    },actor.token);
+    assert.ok(signed.started&&norm(signed.role)==='direccion','INSURER_TOTAL_SIGNED_ACTOR_MISMATCH');
+    assert.equal(signed.endpoint,'orbit360CobrosReconciliationCommandPreview');
+    const request={proposalId:ids.proposal,sourceRunId:runId};
+    const initial=await page.evaluate(input=>Orbit.reconciliationDomain.previewProposalApplication(input.proposalId,input.sourceRunId),request);
+    assert.equal(initial.status,'READY_TO_APPLY','INSURER_TOTAL_NOT_READY:'+String(initial.reason||initial.status));
+    assert.equal(initial.eligible,true);assert.equal(initial.targets?.[0]?.amount,100.01);
+    assert.equal((await cobroRef.get()).data().monto,100);
+    const applied=await page.evaluate(input=>Orbit.reconciliationDomain.applyProposalApplication(input.proposalId,input.sourceRunId,input.digest),
+      {...request,digest:initial.planDigest});
+    assert.equal(applied.readbackConfirmed,true,'INSURER_TOTAL_APPLY_NOT_CONFIRMED');
+    assert.equal(applied.applicationId,applicationId);
+    const [receipt,portfolio,cobro,application]=await Promise.all([receiptRef.get(),portfolioRef.get(),cobroRef.get(),applicationRef.get()]);
+    assert.ok(receipt.exists&&portfolio.exists&&cobro.exists&&application.exists);
+    for(const snap of [receipt,portfolio,cobro])for(const field of ['monto','montoTotal','primaTotal'])
+      assert.equal(snap.data()[field],100.01,'INSURER_TOTAL_PERSISTENCE_'+field);
+    assert.equal(receipt.data().primaNeta,81.25,'INSURER_TOTAL_NET_CHANGED');
+    assert.equal(receipt.data().comAseguradora,13.5,'INSURER_TOTAL_COMMISSION_CHANGED');
+    assert.equal(receipt.data().insurerTotalBefore,100);assert.equal(receipt.data().insurerTotalEvidenceType,'INVOICE_INSTALLMENT_N');
+    assert.equal(portfolio.data().carteraActiva,false);
+    assert.equal(application.data().status,'APPLIED');assert.equal(application.data().beforeAfter.length,3);
+    assert.equal(application.data().beforeAfter.find(x=>x.collection==='recibosEsperados')?.before?.monto,100);
+    assert.equal(application.data().beforeAfter.find(x=>x.collection==='recibosEsperados')?.after?.monto,100.01);
+    const repeated=await page.evaluate(input=>Orbit.reconciliationDomain.applyProposalApplication(input.proposalId,input.sourceRunId,input.digest),
+      {...request,digest:initial.planDigest});
+    assert.ok(repeated.reused&&repeated.readbackConfirmed,'INSURER_TOTAL_IDEMPOTENCE_FAILED');
+    assert.equal((await col('cobros').where('reciboId','==',ids.receipt).get()).size,1);
+    await page.reload({waitUntil:'commit',timeout:30000});
+    const reloaded=await page.evaluate(async()=>{
+      const provider=Orbit.productRuntimeBrowserProvidersP0;await provider.initialize();
+      const user=await provider.waitForUser();return {uid:user?.uid,started:(await Orbit.productAppP0.activate())?.started===true};
+    });
+    assert.equal(reloaded.uid,actor.uid);assert.equal(reloaded.started,true);
+    assert.equal((await receiptRef.get()).data().monto,100.01);assert.equal((await cobroRef.get()).data().primaTotal,100.01);
+    assert.deepEqual((await realPointer.get()).data(),beforeRealPointer,'INSURER_TOTAL_REAL_LEDGER_CHANGED');
+    console.log('I66_SIGNED_DIRECCION_PREVIEW_VERIFIED_INSURER_GROSS_100_01_OVER_STALE_100_00_RECEIPT_COBRO_CARTERA_NET_COMMISSION_AUDIT_IDEMPOTENCE_RELOAD_PASS');
+  }finally{
+    if(browserContext)await browserContext.close();
+    const errors=[];
+    if(cleanupArmed)for(const ref of refs.slice().reverse()){
+      const snap=await ref.get();if(!snap.exists)continue;
+      if(snap.data()?.__syntheticQa!==true||snap.data()?.qaRunId!==runId){errors.push('NOT_OWNED_'+ref.id);continue;}
+      try{await ref.delete({lastUpdateTime:snap.updateTime});assert.equal((await ref.get()).exists,false);}
+      catch(_){errors.push('DELETE_'+ref.id);}
+    }
+    if(JSON.stringify((await realPointer.get()).data())!==JSON.stringify(beforeRealPointer))errors.push('REAL_LEDGER_CHANGED');
+    if(errors.length)throw Error('INSURER_TOTAL_QA_CLEANUP_HOLD:'+errors.join(','));
+    console.log('I66_SIGNED_DIRECCION_PREVIEW_VERIFIED_INSURER_TOTAL_SYNTHETIC_RESTORED_PASS real_customer_writes=0');
+  }
+}
 (async()=>{const staff=await actors(),browser=await chromium.launch({headless:true,args:['--no-sandbox']});
   try{for(const actor of staff)await testActor(browser,actor);
+    if(!USE_LIVE_BACKEND)await testInsurerTotalProposal(browser,staff.find(actor=>actor.role==='direccion'));
     console.log('I66_SIGNED_CARLOS_PAULA_PAYMENT_'+(TEST_LIVE_UI?'LIVE_UI':TEST_LIVE_BACKEND?'LIVE_BACKEND':'PREVIEW_BACKEND')+'_TWO_ACTORS_PASS real_customer_writes=0 auth_changes=0 synthetic_restored=true');
   }finally{await browser.close();}
 })().catch(e=>{console.error('I66_CARLOS_PAYMENT_SIGNED_PREVIEW_HOLD '+String(e.code||e.message||'UNKNOWN').replace(/[^\w.:-]+/g,'_').slice(0,210));process.exitCode=1;});
