@@ -1,0 +1,57 @@
+{
+  "schema": "GI_I66_MANUAL_POLICY_CAPTURE_P0_OWNER_V1",
+  "dateGuatemala": "2026-11-18",
+  "gate": "I6.6",
+  "status": "OWNER_APPROVED_SOURCE_QA_PENDING_EXACT_PREVIEW_AND_LIVE",
+  "owner": "Dirección (user instruction current turn)",
+  "authority": "Existing single cumulative product successor, not replacement of current LIVE",
+  "issue": "manual issue capture failed UI, Sergio current client exists but server counts 0 policies/receipts/vehicle, synthetic QA required",
+  "serverReadonlyEvidence": {
+    "runId": 44388212077,
+    "job": "inspect-identities",
+    "clientExists": true,
+    "policies": 0,
+    "receipts": 0,
+    "portfolio": 0,
+    "payments": 0,
+    "vehicles": 0
+  },
+  "sourceChanges": [
+    {
+      "path": "orbit360-platform/modules/policy-receipts-v1199-bridge.js",
+      "sha": "ff1e91ebd8e59c0d334b91e066774e2e6c9c5033"
+    },
+    {
+      "path": "orbit360-platform/core/primas.js",
+      "sha": "db9524ad69b89ae20a1a260d397dd6833f12259b"
+    }
+  ],
+  "rules": {
+    "newPolicyRenewable": true,
+    "autoOneYearTermIfUserDidNotOverride": true,
+    "cashFirstContractualRequirementAtInception": true,
+    "cashOperationalLimitDays": 30,
+    "monthlyFirstAtInception": true,
+    "monthlyTwoAtNextMonth": true,
+    "semiannualTwoAtSixMonths": true,
+    "GTMapfreVehicleIssueExpenseBasis": "net_plus_assistance_5pct_owner_declared",
+    "GTColumnaIssueExpense": "zero_owner_declared",
+    "GTGeneralVehicleIssueExpense": "5pct_net_owner_declared_confirm_document",
+    "lifeMedicalIssueExpense": "no_inferred_default_without_source",
+    "visaCuotas": "single_insurer_receipt_if_contado_selected_and_zero_finance",
+    "monthlyFractional1To11": "suggest_1pct_per_month_owner_declared",
+    "twelveMonthFinanceRate": "hold_for_documented_insurer_rule",
+    "existingPolicyReceipts": "never blindly rewrite",
+    "calendarExceptional": "optional_human_data_only"
+  },
+  "newRealWrites": 0,
+  "liveDeployAuthorized": false,
+  "previewsMustPass": true,
+  "productsAffected": [
+    "policyReceipts",
+    "Cliente360",
+    "Pólizas",
+    "Recibos y cartera",
+    "Vehículos"
+  ]
+}

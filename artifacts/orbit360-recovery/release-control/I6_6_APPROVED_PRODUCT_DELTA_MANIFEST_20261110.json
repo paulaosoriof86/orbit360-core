@@ -2792,6 +2792,39 @@
           "gitBlobSha": "23d3ef170a8aa4ee0b62f19c389ada4b742e65c5"
         }
       ]
+    },
+    {
+      "id": "I6_6_MANUAL_POLICY_CAPTURE_P0_TERM_CASH_AND_VALIDATION_20261118",
+      "approvedByDirection": true,
+      "receipt": "artifacts/orbit360-recovery/release-control/I6_6_MANUAL_POLICY_CAPTURE_P0_OWNER_20261118.json",
+      "sourceStatus": "P0_CAUSAL_SOURCE_QA_PENDING_EXACT_SAME_ARTIFACT_PREVIEW_LIVE",
+      "scope": "Manual policy form source owner: renewal default, UTC expiry date, human-safe documentary date validation, 30-day single-payment grace, source-constrained expense suggestions, preserve old policies, display actual receipt preview",
+      "paths": [
+        {
+          "path": "orbit360-platform/modules/policy-receipts-v1199-bridge.js",
+          "gitBlobSha": "ff1e91ebd8e59c0d334b91e066774e2e6c9c5033",
+          "replaces": {
+            "path": "orbit360-platform/modules/policy-receipts-v1199-bridge.js",
+            "priorGitBlobSha": "0a967871c8594f776139fc797c7123ab75061d80",
+            "priorChangeId": "I6_6_DOCUMENTED_POLICY_CENT_PRECISION_AND_DIAGNOSTIC_RETENTION_20261117"
+          }
+        },
+        {
+          "path": "orbit360-platform/core/primas.js",
+          "gitBlobSha": "db9524ad69b89ae20a1a260d397dd6833f12259b",
+          "replaces": {
+            "path": "orbit360-platform/core/primas.js",
+            "priorGitBlobSha": "3619b15230d15b2224fa5408324703bdfa0cf22b",
+            "priorChangeId": "I6_6_DOCUMENTED_NON_TAXED_CHARGE_AND_CONTRACTUAL_RECEIPT_CALENDAR_20261117"
+          }
+        }
+      ],
+      "tests": [
+        {
+          "path": "tools/gravicentra-i6-6-manual-policy-capture-p0.test.cjs",
+          "gitBlobSha": "f3f32347d93da47f00bd9fad4142c0487c3be6d3"
+        }
+      ]
     }
   ],
   "i66R11PreviewBuildRequest20261113": {

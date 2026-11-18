@@ -225,7 +225,10 @@ Orbit.primas = (function () {
       if (!documentedDues.length && finCivil && venc.getTime() > finCivil.getTime()) throw new RangeError('cuotas_fuera_vigencia');
       const lim = new Date(venc);
       if (legacyCalendar) lim.setDate(lim.getDate() + 15);
-      else lim.setUTCDate(lim.getUTCDate() + 15);
+      // New canonical single-payment policies receive a 30-day operational limit;
+      // the first contractual requirement remains on the policy inception date.
+      // Historical legacy calendars keep their original 15-day semantics.
+      else lim.setUTCDate(lim.getUTCDate() + (n === 1 ? 30 : 15));
       const comAseguradora = r2(neta * comAsegPct / 100);
       const due = documentedDues[i];
       rows.push({

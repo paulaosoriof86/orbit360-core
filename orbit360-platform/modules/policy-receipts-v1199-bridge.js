@@ -16,7 +16,7 @@ Orbit.modules = Orbit.modules || {};
   function esc(v) { return U && U.esc ? U.esc(String(v == null ? '' : v)) : String(v || ''); }
   function toast(v) { try { U.toast(v); } catch (e) {} }
   function today() { return U && U.today ? U.today() : new Date().toISOString().slice(0, 10); }
-  function plusYear(date) { const d = new Date((date || today()) + 'T00:00:00'); d.setFullYear(d.getFullYear() + 1); return d.toISOString().slice(0, 10); }
+  function plusYear(date) { const parts=String(date||today()).split('-').map(Number);if(parts.length!==3||!parts.every(Number.isInteger))return '';const [year,month,day]=parts;const endYear=year+1,last=new Date(Date.UTC(endYear,month,0)).getUTCDate();return new Date(Date.UTC(endYear,month-1,Math.min(day,last))).toISOString().slice(0,10); }
   function modal(id, inner, width) {
     let b = document.getElementById(id); if (b) b.remove();
     b = document.createElement('div'); b.id = id; b.className = 'drawer-back open';
@@ -57,9 +57,10 @@ Orbit.modules = Orbit.modules || {};
     CORRECTION_SERVER_PROOF_REQUIRED: 'Falta la confirmación canónica del servidor.'
   };
   function errorText(errors) { return (errors || []).map(x => ERROR_LABELS[String(x).split(':')[0]] ||
+    (/^recargo_financiero_requiere_confirmacion/.test(x) ? 'Selecciona el recargo financiero documentado de la aseguradora para este plan, o registra explícitamente 0 si está exento.' :
     (/^cargo_no_gravado_/.test(x) ? 'Revisa el cargo no gravado: importe no negativo con dos decimales, concepto y documento de respaldo.' :
       /^calendario_documentado_/.test(x) ? 'Revisa los vencimientos del documento: una línea por recibo, secuencia desde 1, fecha válida y referencia. El límite operativo se valida como una fecha independiente.' :
-      'No fue posible confirmar esta operación.')).join(' · '); }
+      'No fue posible confirmar esta operación.'))).join(' · '); }
   function protectedPreviewRealPolicy(id){
     const host=String(location&&location.hostname||''),runtime=Orbit.productRuntimeBrowserProvidersP0;
     const releasePreview=runtime&&typeof runtime.protectedHostMode==='function'&&runtime.protectedHostMode()==='preview';
@@ -200,7 +201,7 @@ Orbit.modules = Orbit.modules || {};
           <label class="ce-l">Aseguradora *<select class="o-sel" data-insurer>${insurers.map(a => `<option value="${esc(a.id)}" ${existing && a.id === existing.aseguradoraId ? 'selected' : ''}>${esc(a.nombre)}</option>`).join('')}</select></label>
           <label class="ce-l">N.º real de póliza *<input class="o-sel" data-number value="${esc(existing && existing.numero || '')}" placeholder="No se genera un número ficticio"></label>
           <label class="ce-l">Estado *<select class="o-sel" data-status>${status.map(x => `<option ${existing && x === existing.estado ? 'selected' : (!existing && x === 'Vigente' ? 'selected' : '')}>${x}</option>`).join('')}</select></label>
-          <label class="ce-l">Renovabilidad *<select class="o-sel" data-renewable><option value="" ${renewabilityState(existing)==='UNKNOWN'?'selected':''}>Pendiente de validar</option><option value="yes" ${renewabilityState(existing)==='YES'?'selected':''}>Renovable</option><option value="no" ${renewabilityState(existing)==='NO'?'selected':''}>No renovable</option></select></label>
+          <label class="ce-l">Renovabilidad *<select class="o-sel" data-renewable><option value="" ${existing && renewabilityState(existing)==='UNKNOWN'?'selected':''}>Pendiente de validar</option><option value="yes" ${(!existing || renewabilityState(existing)==='YES')?'selected':''}>Renovable</option><option value="no" ${renewabilityState(existing)==='NO'?'selected':''}>No renovable</option></select></label>
           <label class="ce-l">Ramo *<select class="o-sel" data-ramo>${rs.map(x => `<option ${x === initialRamo ? 'selected' : ''}>${esc(x)}</option>`).join('')}</select></label>
           <label class="ce-l">Producto / subramo *<select class="o-sel" data-product>${initialSubs.map(x => `<option ${existing && (existing.producto === x || existing.subramo === x) ? 'selected' : ''}>${esc(x)}</option>`).join('')}</select></label>
         </div>
@@ -213,18 +214,18 @@ Orbit.modules = Orbit.modules || {};
           <label class="ce-l">Forma de pago<select class="o-sel" data-payment-form><option value="" ${!existing || !existing.formaPago ? 'selected' : ''}>Pendiente de validar</option>${forms.map(x => `<option ${existing && x === existing.formaPago ? 'selected' : ''}>${esc(x)}</option>`).join('')}</select></label>
           <label class="ce-l">Conducto<select class="o-sel" data-conduct><option value="" ${!existing || !existing.conducto ? 'selected' : ''}>Pendiente de validar</option>${conducts.map(x => `<option ${existing && x === existing.conducto ? 'selected' : ''}>${esc(x)}</option>`).join('')}</select></label>
         </div>
-        <label class="ce-l">Vencimientos del documento (opcional)<textarea class="o-sel" data-documented-calendar rows="3" placeholder="1 | AAAA-MM-DD | referencia del documento">${esc(Orbit.primas.formatCalendarioDocumentado(existing && existing.vencimientosDocumentados))}</textarea><small>Una línea por recibo: cuota | vencimiento contractual | referencia. Puedes añadir | fecha límite operativa si está documentada. Sin estas líneas se conserva el calendario habitual; una fecha de pago no sustituye el vencimiento.</small></label>
+        <details class="card pad" data-contractual-calendar-panel ${existing && existing.vencimientosDocumentados && existing.vencimientosDocumentados.length ? "open" : ""}><summary style="cursor:pointer;font-weight:700">Vencimientos excepcionales según documento (opcional)</summary><div class="muted" style="font-size:12px;margin:8px 0">Normalmente no necesitas escribir nada aquí: la plataforma genera todos los recibos según el inicio de vigencia y la periodicidad. Solo ábrelo si el documento trae fechas distintas.</div><label class="ce-l">Una línea por recibo, únicamente si existe calendario especial<textarea class="o-sel" data-documented-calendar rows="3" placeholder="Ejemplo: 1 | 2026-11-18 | requerimiento 123">${esc(Orbit.primas.formatCalendarioDocumentado(existing && existing.vencimientosDocumentados))}</textarea><small>Formato: cuota | AAAA-MM-DD | referencia del documento. Si no tienes esas fechas, deja el campo vacío y utiliza el calendario calculado.</small></label></details>
         <div class="gi-form-section-title"><span>💰</span><div>Prima y condiciones<small data-tax-note>IVA ${countryTaxPct(country)}% según país. Emisión, asistencia y recargo continúan editables para conservar excepciones reales.</small></div></div>
         <div class="cgrid">
           <label class="ce-l">Prima neta *<input type="number" min="0" step="0.01" class="o-sel" data-net value="${esc(existing && existing.primaNeta || 0)}"></label>
-          <label class="ce-l">Gastos de emisión<input type="number" min="0" step="0.01" class="o-sel" data-issue value="${esc(existing && existing.gastosEmision || 0)}"></label>
+          <label class="ce-l">Gastos de emisión<input type="number" min="0" step="0.01" class="o-sel" data-issue value="${esc(existing ? (existing.gastosEmision || 0) : '')}"></label>
           <label class="ce-l">Otros / asistencias<input type="number" min="0" step="0.01" class="o-sel" data-other value="${esc(existing && existing.otros || 0)}"></label>
           <label class="ce-l">Cargo documentado no gravado con IVA<input type="number" min="0" step="0.01" class="o-sel" data-nonvat value="${esc(existing && existing.cargoNoGravadoMonto || 0)}"></label>
           <label class="ce-l">Concepto del cargo no gravado<input class="o-sel" data-nonvat-concept value="${esc(existing && existing.cargoNoGravadoConcepto || '')}" placeholder="Concepto indicado por la aseguradora"></label>
           <label class="ce-l">Documento del cargo no gravado<input class="o-sel" data-nonvat-ref value="${esc(existing && existing.cargoNoGravadoDocumentRef || '')}" placeholder="Referencia verificable del documento"></label>
           <label class="ce-l">Recargo financiero %<input type="number" min="0" step="0.01" class="o-sel" data-surcharge value="${esc(existing && existing.recargoFinPct != null ? existing.recargoFinPct : '')}"></label>
           <label class="ce-l">Suma asegurada<input type="number" min="0" step="0.01" class="o-sel" data-sum value="${esc(existing && existing.sumaAsegurada || 0)}"></label>
-        </div>
+        </div><div class="muted" data-financial-rule-note style="font-size:12px">Los importes automáticos se sujetan a la aseguradora, ramo y modalidad; puedes corregirlos con respaldo.</div>
         ${!existing ? '<div class="gi-form-section-title"><span>💼</span><div>Comisiones de esta póliza<small>Confirma los porcentajes con la planilla o la configuración vigente del vendedor.</small></div></div><div class="cgrid"><label class="ce-l">Comisión aseguradora % de prima neta *<input type="number" min="0" max="100" step="0.01" class="o-sel" data-commission-insurer value="" placeholder="Porcentaje documentado"></label><label class="ce-l">Participación vendedor % de comisión *<input type="number" min="0" max="100" step="0.01" class="o-sel" data-commission-seller value="" placeholder="Porcentaje confirmado"></label></div>' : ''}
         <div class="card pad gi-policy-preview" data-preview></div>
         <div data-vehicle class="gi-vehicle-panel" style="display:none"><div class="gi-form-section-title"><span>🚘</span><div>Vehículo asegurado<small>Completa el riesgo vinculado a esta póliza.</small></div></div><div class="cgrid" style="margin-top:12px"><label class="ce-l">Marca<input class="o-sel" data-vbrand value="${esc(existingVehicle && existingVehicle.marca || '')}"></label><label class="ce-l">Línea<input class="o-sel" data-vline value="${esc(existingVehicle && existingVehicle.linea || '')}"></label><label class="ce-l">Placa<input class="o-sel" data-vplate value="${esc(existingVehicle && existingVehicle.placa || '')}"></label><label class="ce-l">Año<input type="number" class="o-sel" data-vyear value="${esc(existingVehicle && existingVehicle.anio || '')}"></label><label class="ce-l">Uso<input class="o-sel" data-vuse value="${esc(existingVehicle && existingVehicle.uso || 'Particular')}"></label><label class="ce-l">Color<input class="o-sel" data-vcolor value="${esc(existingVehicle && existingVehicle.color || '')}"></label><label class="ce-l">VIN<input class="o-sel" data-vvin value="${esc(existingVehicle && existingVehicle.vin || '')}"></label><label class="ce-l">Chasis<input class="o-sel" data-vchasis value="${esc(existingVehicle && existingVehicle.chasis || '')}"></label><label class="ce-l">Motor<input class="o-sel" data-vmotor value="${esc(existingVehicle && existingVehicle.motor || '')}"></label></div></div>
@@ -341,6 +342,7 @@ Orbit.modules = Orbit.modules || {};
     }
     function raw() {
       const c = client(), country2 = c.pais || '', currency2 = currencyEl.value;
+      if(!existing && E.installmentsForFrequency($('[data-frequency]').value,Number($('[data-installments]').value)||1)>1 && !$('[data-surcharge]').value.trim())throw new RangeError('recargo_financiero_requiere_confirmacion');
       const documented = {}, amount = $('[data-nonvat]').value, concept = $('[data-nonvat-concept]').value.trim(), ref = $('[data-nonvat-ref]').value.trim();
       if (Number(amount) !== 0 || concept || ref || existing && Object.prototype.hasOwnProperty.call(existing,'cargoNoGravadoMonto')) {
         Object.assign(documented, Orbit.primas.cargoNoGravado({ cargoNoGravadoMonto: amount, cargoNoGravadoConcepto: concept, cargoNoGravadoDocumentRef: ref }));
@@ -363,6 +365,35 @@ Orbit.modules = Orbit.modules || {};
         vehiculo: /auto|veh/i.test(ramoEl.value) ? { id: existingVehicle && existingVehicle.id || '', marca: $('[data-vbrand]').value.trim(), linea: $('[data-vline]').value.trim(), placa: $('[data-vplate]').value.trim(), anio: $('[data-vyear]').value, uso: $('[data-vuse]').value.trim(), color: $('[data-vcolor]').value.trim(), vin: $('[data-vvin]').value.trim(), chasis: $('[data-vchasis]').value.trim(), motor: $('[data-vmotor]').value.trim(), sumaAsegurada: +$('[data-sum]').value || 0 } : null
       };
     }
+    // I6.6: never overwrite a documented human premium override or an old policy.
+    // Only the owner-confirmed GT vehicle rules are eligible for automatic defaults.
+    let issueManuallyEdited=!!existing, surchargeManuallyEdited=!!existing, endManuallyEdited=!!existing;
+    function syncFinancialDefaults(){
+      if(existing)return;
+      const insurer=S().get('aseguradoras',insurerEl.value)||{};
+      const label=String(insurer.nombre||insurer.displayName||insurer.id||'')
+        .normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
+      const country2=String(client().pais||'').toUpperCase(),vehicle=/auto|veh/i.test(ramoEl.value);
+      const net=Number($('[data-net]').value)||0,assistance=Number($('[data-other]').value)||0;
+      const fee=$('[data-issue]'),pct=$('[data-surcharge]'),note=$('[data-financial-rule-note]');
+      let ruleNote='Gastos y recargos sujetos a la regla documental de aseguradora y producto.';
+      if(!issueManuallyEdited&&country2==='GT'){
+        let amount=null;
+        if(/columna/.test(label)){amount=0;ruleNote='Columna: emisión predeterminada en cero; confirma excepciones con la póliza.';}
+        else if(vehicle&&/mapfre/.test(label)){amount=Orbit.primas.r2((net+assistance)*.05);ruleNote='Mapfre vehículos: sugerencia 5% sobre neta más asistencias, según la regla de Dirección; verifica con la póliza.';}
+        else if(vehicle&&label){amount=Orbit.primas.r2(net*.05);ruleNote='Vehículos: sugerencia 5% sobre neta (excepto aseguradoras con otra base); verifica la póliza.';}
+        if(amount!==null)fee.value=String(amount);
+      }
+      const freq=$('[data-frequency]').value,installments=E.installmentsForFrequency(freq,Number($('[data-installments]').value)||1);
+      const pay=String($('[data-payment-form]').value||'');
+      if(!surchargeManuallyEdited){
+        if(installments===1||pay==='Visa Cuotas')pct.value='0';
+        else if(freq==='Mensual'&&installments<=11)pct.value=String(installments);
+        else pct.value='';
+      }
+      if(installments>1&&pct.value.trim()==='')ruleNote+=' Recargo fraccionado por confirmar con la aseguradora antes de guardar.';
+      if(note)note.textContent=ruleNote;
+    }
     function preview() {
       try {
       const preserve=!!existing&&(!nonRenewalBaseline||metadataOnlyPatch()!==null);
@@ -378,16 +409,23 @@ Orbit.modules = Orbit.modules || {};
       if(active&&recs.length)preview.insertAdjacentHTML('beforeend','<div style="margin-top:12px"><div style="font-weight:800;font-size:14px;margin-bottom:7px">🧾 '+(preserve?'Calendario existente que se conserva':'Calendario que quedará guardado')+'</div><div style="max-height:190px;overflow:auto;border:1px solid var(--line);border-radius:10px"><table class="tbl"><thead><tr><th>Recibo</th><th>Vencimiento</th><th>Límite operativo</th><th class="num">Monto</th></tr></thead><tbody>'+recs.map((r,i)=>'<tr><td>'+(i+1)+'</td><td>'+esc(r.fechaVencimientoContractual||r.vence||r.fechaVencimiento||'—')+'</td><td>'+esc(r.fechaLimite||'—')+'</td><td class="num">'+esc(money(prepared.moneda,r.montoTotal!=null?r.montoTotal:r.monto))+'</td></tr>').join('')+'</tbody></table></div></div>');
       if(preserve&&!recs.length)preview.insertAdjacentHTML('beforeend','<p class="cfg-note">No hay recibos cargados en esta vista. Esta edición conserva el plan existente: no crea, elimina ni recalcula recibos.</p>');
       } catch(error) {
-        $('[data-preview]').textContent=errorText([String(error&&error.message||'')]);
-        $('[data-save]').disabled=true;
+        const code=String(error&&error.message||''), message=errorText([code]);
+        $('[data-preview]').innerHTML='<div role="alert" class="hint error" style="display:block">No se puede calcular el calendario todavía. '+esc(message)+'</div>';
+        if(/^calendario_documentado_/.test(code))$('[data-documented-calendar]').setAttribute('aria-invalid','true');
+        // Never silently disable the button: the save handler must expose the exact validation problem.
+        $('[data-save]').disabled=!advisorRosterConfirmed||!!(assignmentMode&&assignmentMode.checked);
       }
     }
     clientEl.addEventListener('change', () => { refreshCountry(); resetNewCommissions(); }); ramoEl.addEventListener('change', () => refreshProducts('', false));
     [insurerEl, ramoEl, productEl].forEach(el => el.addEventListener('change', () => resetNewCommissions('insurer')));
     advisorEl.addEventListener('change', () => { resetNewCommissions('seller'); if(existing)preview(); });
-    $('[data-start]').addEventListener('change', () => { if (!$('[data-end]').value) $('[data-end]').value = plusYear($('[data-start]').value); preview(); });
+    $('[data-end]').addEventListener('input',()=>{endManuallyEdited=true;});
+    $('[data-start]').addEventListener('change', () => { if(!endManuallyEdited) $('[data-end]').value=plusYear($('[data-start]').value); preview(); });
+    $('[data-issue]').addEventListener('input',()=>{issueManuallyEdited=true;});
+    $('[data-surcharge]').addEventListener('input',()=>{surchargeManuallyEdited=true;});
+    [insurerEl,ramoEl,productEl,$('[data-payment-form]'),$('[data-frequency]')].forEach(el=>el.addEventListener('change',()=>{syncFinancialDefaults();preview();}));
     $('[data-frequency]').addEventListener('change', syncInstallments);
-    b.querySelectorAll('input,select').forEach(el => el.addEventListener('input', preview));
+    b.querySelectorAll('input,select').forEach(el => el.addEventListener('input',()=>{syncFinancialDefaults();preview();}));
     $('[data-documented-calendar]').addEventListener('input', preview);
     $('[data-import]').addEventListener('click', () => { b.remove(); Orbit.importa.open('polizas', { scope: { clienteId: selectedClient.id } }); });
     const deletePolicy = $('[data-delete]');
@@ -511,7 +549,7 @@ Orbit.modules = Orbit.modules || {};
     $('[data-save]').addEventListener('click', async () => {
       const save = $('[data-save]'), reason = existing ? $('[data-reason]').value.trim() : 'Alta operativa desde plataforma';
       const err = $('[data-error]'), originalText = save.textContent;
-      let payload;try{payload=raw();}catch(error){err.style.display='';err.textContent=errorText([String(error&&error.message||'')]);return;}
+      let payload;try{payload=raw();}catch(error){const code=String(error&&error.message||'');err.style.display='';err.textContent=errorText([code]);if(/^calendario_documentado_/.test(code)){const details=$('[data-contractual-calendar-panel]');if(details)details.open=true;const box=$('[data-documented-calendar]');if(box){box.setAttribute('aria-invalid','true');box.focus();}}return;}
       if (assignmentMode && assignmentMode.checked) { err.style.display = ''; err.textContent = 'Usa la previsualización y confirmación de la corrección documentada.'; return; }
       if (!advisorRosterConfirmed || !payload.asesorId ||
           (!advisors.some(a => a.id === payload.asesorId) && !(existing && payload.asesorId === initialAdvisorId))) {
@@ -562,7 +600,7 @@ Orbit.modules = Orbit.modules || {};
         save.disabled = false; save.textContent = originalText;
       }
     });
-    refreshProducts(initialProduct, true); syncInstallments(); resetNewCommissions(); preview();
+    refreshProducts(initialProduct, true); syncInstallments(); resetNewCommissions(); syncFinancialDefaults(); preview();
     refreshAdvisors(initialAdvisorId);
     // Snapshot after default normalization: classify only user-originated form changes.
     nonRenewalBaseline=existing?Array.from(b.querySelectorAll('input,select')).concat($('[data-documented-calendar]'))
