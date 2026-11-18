@@ -1,4 +1,4 @@
-# I6.6 2026-11-16: replay fresh LIVE read-only diff after V7 reconciliation config materialization; zero financial writes.
+# I6.6 2026-11-18: fresh LIVE read-only preimages for insurer source batches A1-A4/A7 before any receipt/cobro writes; zero financial writes.
 # I6.6 insurer/source batch A1-A4 + A7: same LIVE tenant-scoped read-only exact-match probe.
 # Never mutates Firestore, Auth, Hosting, Rules or payment state.
 # I6.6 2026-11-12 successor: fresh LIVE readback after certified Operativo reader traffic
