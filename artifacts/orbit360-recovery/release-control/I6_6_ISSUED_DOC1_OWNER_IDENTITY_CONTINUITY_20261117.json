@@ -1,0 +1,69 @@
+{
+  "schema": "GI_I66_OWNER_IDENTITY_DECISION_CONTINUITY_V1",
+  "dateGuatemala": "2026-11-17",
+  "recordedAtUtc": "2026-11-18T00:24:23Z",
+  "gate": "I6.6",
+  "status": "PRIOR_OWNER_BUSINESS_IDENTITY_CONFIRMATION_RECORDED_TECHNICAL_READBACK_PENDING",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "baseHeadSha": "d10a665336d0c1cb2b4179a035e35ec34643200b",
+  "caseId": "ISSUED.DOC.1",
+  "ownerDecision": {
+    "sourceType": "EXPLICIT_DIRECTION_INSTRUCTION_IN_CURRENT_PROJECT_CONTEXT",
+    "ownerStatementDateGuatemala": "2026-11-16",
+    "scope": "The owner confirmed the insured identity of the existing documentary case. Record the answered business question without duplicating private identity data in this repository.",
+    "businessIdentityConfirmed": true,
+    "doNotAskAgain": true,
+    "newBusinessDecisionRequested": false,
+    "privateIdentityDataCopied": false,
+    "financialWriteAuthorizationExpanded": false
+  },
+  "supersession": {
+    "historicalReceiptPath": "artifacts/orbit360-recovery/release-control/I6_6_SIGNED_PREVIEW_42A676_HOLD_AND_STATEMENT_INTAKE_20261117.json",
+    "historicalReceiptSha256": "3e5b5a809ab50626b0d25be8b0934cc9b7e717ed27daf321e4ab97b59dbae11e",
+    "historicalPointer": "documentaryFocalCorrection.needsCanonicalInsuredIdentityClarificationBeforePolicyConsolidation",
+    "historicalValuePreserved": true,
+    "currentBusinessQuestionRequired": false,
+    "scope": "Supersede only the pending business identity question. Preserve the historical observation and all technical and documentary checks.",
+    "historicalReceiptRewritten": false
+  },
+  "preservedTechnicalRequirements": {
+    "insuredIdentityConflictBetweenPolicyPages": true,
+    "conflictingPages": [
+      2,
+      9
+    ],
+    "originalDocumentConflictResolvedByThisReceipt": false,
+    "canonicalClientAndPolicyReadbackRequired": true,
+    "policyConsolidationTechnicalCheckRequired": true,
+    "existingClientMustNotBeDuplicated": true,
+    "netPremiumAndTaxSplitNotExplicitlyVerified": true,
+    "paymentEvidenceEstablished": false,
+    "sourceScheduleAndAmountsMustNotBeInvented": true,
+    "thisExceptionMustNotBlockOtherInsurerSources": true
+  },
+  "preservedRelease": {
+    "sourceSha": "1b65a790530d49fe1d1fb451f02838fd9a713c53",
+    "buildId": "gi-i66-1b65a790530d-57f234755dc1",
+    "buildRunId": 44183659786,
+    "artifactId": 14373955326,
+    "artifactDigest": "sha256:fc6d8f2616141aa4388ec7df497917690fc54400d18a376f15550380334725a5",
+    "newBuildRequiredByThisReceipt": false,
+    "newPreviewAcceptance": false,
+    "newLiveAcceptance": false,
+    "liveLegalConsentGranted": false,
+    "liveLegalAuthorizationStatus": "PENDING_UNCHANGED"
+  },
+  "boundaries": {
+    "productSourceChanged": false,
+    "testsChanged": false,
+    "workflowsChanged": false,
+    "historicalEvidenceChanged": false,
+    "realFinancialWrites": 0,
+    "realCustomerWrites": 0,
+    "bankMovements": 0,
+    "newFormalPercentagePoints": 0,
+    "frozenDenominatorsAndProgressUnchanged": true
+  },
+  "next": "Use the already answered owner identity decision during canonical client/policy readback and source reconciliation. Do not repeat the business question; preserve all technical checks, pending LIVE legal scope and same-artifact release boundaries."
+}
