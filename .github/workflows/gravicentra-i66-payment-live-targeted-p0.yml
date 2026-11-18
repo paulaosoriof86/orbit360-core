@@ -1,7 +1,7 @@
-# I6.6 invoice-date payment backend only: exact immutable source after signed Preview, rollback.
+# I6.6 insurer gross-premium backend only: exact immutable source after signed Preview, rollback.
 # Does NOT deploy Hosting, touch Firestore records, Rules/Auth, other Functions, or new Firebase.
-# Re-promote the same pinned artifact after I6.6 exact synthetic QA rollback
-# and its operation-ID-verified orphan cleanup (run 43471612256, PASS).
+# Retain current LIVE Hosting bytes. Real financial source batches remain gated
+# separately by preimages, owner decisions, exact receipts, idempotence and audit.
 name: Gravicentra I6.6 Payment Exact LIVE Backend Hotfix P0
 on:
   push:
@@ -21,14 +21,14 @@ jobs:
     timeout-minutes: 50
     env:
       PROJECT_ID: ays-orbit-360-lab
-      SOURCE_SHA: 586401bfbe1a80cfef2820982f432743af36b108
-      ARTIFACT_RUN: '43463160506'
-      ARTIFACT_ID: '14057935092'
-      ARTIFACT_DIGEST: sha256:1621f236b9d1b9e49ea42fc53e338a695d5872080361ada2a84183fa7d52207f
-      QA_RUN: '43465087494'
-      CONTROL_RUN: '43467912651'
-      PREVIEW_FUNCTION_RUN: '43467007164'
-      PREVIEW_URL: https://ays-orbit-360-lab--gi-i66-rc-42868854629-abj14q6n.web.app
+      SOURCE_SHA: 13fc8611fc7d8bd97ae165c2b2f526d07af09d2b
+      ARTIFACT_RUN: '44414675100'
+      ARTIFACT_ID: '14479297045'
+      ARTIFACT_DIGEST: sha256:0ca89e30d4a73e48e7ff5f387efc02ad12114a4b7ca2b988ef188a2a776f11f3
+      QA_RUN: '44413402516'
+      CONTROL_RUN: '44422246371'
+      PREVIEW_FUNCTION_RUN: '44420790350'
+      PREVIEW_URL: https://ays-orbit-360-lab--gi-i66-rc-44414675100-0t5eg8ef.web.app
       SA_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
       SA_ALT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
       SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
@@ -40,7 +40,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Gate signed Carlos/Paula payment Preview PASS and exact immutable artifact
+      - name: Gate signed Dirección gross invoice Preview PASS and exact immutable artifact
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -51,36 +51,37 @@ jobs:
           const assert=require('node:assert/strict'),fs=require('node:fs');
           (async()=>{
             const c=JSON.parse(fs.readFileSync('artifacts/orbit360-recovery/release-control/I6_6_RELEASE_TRANSPORT_CONTROL_20261110.json'));
-            assert.equal(c.status,'PAYMENT_INVOICE_BACKEND_PREVIEW_AUTHORIZED');
+            assert.equal(c.status,'OPERATIONAL_EXACT_LIVE_ACCEPTED_LOCKED');
             assert.equal(c.livePromotionAuthorized,false);
             assert.equal(c.previewApproved,false);
             assert.equal(c.forbidFirestoreRulesDataAuthWrites,true);
-            assert.equal(c.noHostingPromotion,true);
             assert.equal(c.forbidBackendLiveFunctionDeploy,true);
             assert.equal(c.forbidBackendFunctionDeploy,true);
-            const gate=c.i66PaymentInvoiceLiveTargetedAuthorization20261113||{};
-            assert.equal(gate.status,'EXACT_PREVIEW_PASSED_ONE_LIVE_PAYMENT_FUNCTION_ROLLBACK_AUTHORIZED');
-            for(const [k,v] of [['sourceSha',process.env.SOURCE_SHA],['immutableBuildRunId',Number(process.env.ARTIFACT_RUN)],['immutableArtifactId',Number(process.env.ARTIFACT_ID)],['immutableArtifactDigest',process.env.ARTIFACT_DIGEST],['signedTwoActorsPreviewFunctionRunId',Number(process.env.PREVIEW_FUNCTION_RUN)],['governanceSynchronizationPassRunId',Number(process.env.CONTROL_RUN)],['singleAllowedLiveFunction','orbit360CobrosReconciliationCommand'],['region','us-central1']])assert.equal(gate[k],v,k);
-            for(const k of ['onlyDeployExactBackendFromSamePreviewArtifact','requireSignedTwoActorSyntheticLiveBackendReadbackAndRestore','requireRevisionRollbackOnAnyFailure','noHostingPromotionInThisFunctionGate','noRulesAuthOtherFunctionsOrRealFinancialWrites','historicalR8LiveHostingMustStayUnchangedUntilHostingGate'])assert.equal(gate[k],true,k);
+            const gate=c.i66InsurerGrossLiveBackendTargetedAuthorization20261118||{};
+            assert.equal(gate.status,'DIRECTION_AUTHORIZED_CONDITIONED_ON_SIGNED_EXACT_PREVIEW_GROSS_PASS');
+            for(const [k,v] of [['sourceSha',process.env.SOURCE_SHA],['immutableBuildRunId',Number(process.env.ARTIFACT_RUN)],['immutableArtifactId',Number(process.env.ARTIFACT_ID)],['immutableArtifactDigest',process.env.ARTIFACT_DIGEST],['signedGrossPreviewFunctionRunId',Number(process.env.PREVIEW_FUNCTION_RUN)],['approvedInsurerTotalSourceQaRunId',Number(process.env.QA_RUN)],['singleAllowedLiveFunction','orbit360CobrosReconciliationCommand'],['region','us-central1'],['hostingPreviewUrl',process.env.PREVIEW_URL]])assert.equal(gate[k],v,k);
+            for(const k of ['onlyDeployExactBackendFromSamePreviewArtifact','previewGrossInvoiceSignedReadbackMustBePASS','requireSignedTwoActorSyntheticLiveBackendReadbackAndRestore','requireRevisionRollbackOnAnyFailure','noHostingPromotionInThisFunctionGate','noRulesAuthOtherFunctionsOrRealFinancialWrites','globalProductPromotionLockStillApplies'])assert.equal(gate[k],true,k);
             const h={Authorization:'Bearer '+process.env.GH_TOKEN,Accept:'application/vnd.github+json','User-Agent':'GI-I66-Payment-Live-Scoped'};
             const base='https://api.github.com/repos/paulaosoriof86/orbit360-core/actions/';
-            const names=[['EMULATOR',process.env.QA_RUN],['CONTROL',process.env.CONTROL_RUN],['BUILD',process.env.ARTIFACT_RUN],['PREVIEW_FUNCTION',process.env.PREVIEW_FUNCTION_RUN]];
+            const names=[['SOURCE_QA',process.env.QA_RUN],['CONTROL',process.env.CONTROL_RUN],['BUILD',process.env.ARTIFACT_RUN],['PREVIEW_FUNCTION',process.env.PREVIEW_FUNCTION_RUN]];
             const runs=await Promise.all(names.map(async ([name,n])=>({name,run:await fetch(base+'runs/'+n,{headers:h}).then(r=>r.json())})));
             for(const {name,run} of runs){assert.equal(run.conclusion,'success',name);}
             assert.equal(runs.find(r=>r.name==='BUILD').run.head_sha,process.env.SOURCE_SHA,'build SHA');
+            assert.equal(runs.find(r=>r.name==='SOURCE_QA').run.head_sha,'0d76078fb5ef71c887ffaa2b10ea8d8edbbcf4d3','signed source QA SHA');
+            assert.equal(runs.find(r=>r.name==='PREVIEW_FUNCTION').run.head_sha,'8a8d6abb20854f436076178f5f4e59c68980ad27','signed gross QA SHA');
             for(const {name,run} of runs.filter(r=>r.name!=='BUILD')){
               const changed=require('node:child_process').execFileSync('git',['diff','--name-only',process.env.SOURCE_SHA,run.head_sha,'--','functions/','orbit360-platform/'],{encoding:'utf8'}).trim();
               assert.equal(changed,'',name+' product drift');
             }
             const a=await fetch(base+'artifacts/'+process.env.ARTIFACT_ID,{headers:h}).then(r=>r.json());
             assert.equal(a.digest,process.env.ARTIFACT_DIGEST);assert.equal(a.workflow_run.id,Number(process.env.ARTIFACT_RUN));assert.equal(a.expired,false);
-            console.log('I66_PAYMENT_LIVE_OWNER_EXACT_ARTIFACT_CARLOS_PAULA_SIGNED_QA_PASS');
+            console.log('I66_PAYMENT_LIVE_OWNER_EXACT_ARTIFACT_SIGNED_INSURER_GROSS_PREVIEW_QA_PASS');
           })().catch(e=>{console.error(e.message);process.exitCode=1;});
           NODE
       - uses: actions/download-artifact@v4
         with:
-          artifact-ids: 14057935092
-          run-id: 43463160506
+          artifact-ids: 14479297045
+          run-id: 44414675100
           github-token: ${{ github.token }}
           path: ${{ runner.temp }}/payment-live-packet-download
       - name: Verify exact immutable TAR/backend bytes before any deployment
@@ -240,7 +241,7 @@ jobs:
           grep -q 'UNAUTHENTICATED' "$RUNNER_TEMP/payment-live-unauth.json"
           echo 'I66_PAYMENT_LIVE_AUTH_GUARD_401_PASS'
           I66_PAYMENT_LIVE_BACKEND_ONLY=true I66_PREVIEW_ORIGIN="$PREVIEW_URL" node tools/gravicentra-i6-6-carlos-payment-signed-synthetic-preview-uat.cjs
-          echo 'I66_PAYMENT_LIVE_BACKEND_SIGNED_CARLOS_PAULA_SYNTHETIC_INVOICE_DATE_PERSISTENCE_AND_RESTORE_PASS'
+          echo 'I66_PAYMENT_LIVE_BACKEND_SIGNED_CARLOS_PAULA_AND_INSURER_GROSS_SYNTHETIC_PERSISTENCE_AND_RESTORE_PASS'
           curl -fsSL --max-time 30 'https://ays-orbit-360-lab.web.app/' | sha256sum > "$RUNNER_TEMP/payment-live-host-after.sha"
           curl -fsSL --max-time 30 'https://app.aysseguros.com/' | sha256sum > "$RUNNER_TEMP/payment-live-app-after.sha"
           cmp "$RUNNER_TEMP/payment-live-host-before.sha" "$RUNNER_TEMP/payment-live-host-after.sha"
@@ -251,7 +252,7 @@ jobs:
           echo "I66_PAYMENT_LIVE_SOURCE=$SOURCE_SHA" >> "$GITHUB_STEP_SUMMARY"
           echo "I66_PAYMENT_PREVIOUS_REVISION=$OLD_REV" >> "$GITHUB_STEP_SUMMARY"
           echo "I66_PAYMENT_NEW_REVISION=$NEW_REV" >> "$GITHUB_STEP_SUMMARY"
-          echo "I66_PAYMENT_RELEASE_STATUS=BACKEND_DEPLOYED_CLIENT_AUTHENTICATED_UAT_PENDING" >> "$GITHUB_STEP_SUMMARY"
+          echo "I66_PAYMENT_RELEASE_STATUS=BACKEND_ONLY_SIGNED_SYNTHETIC_LIVE_PASS_REAL_FINANCIAL_BATCH_NOT_YET_APPLIED" >> "$GITHUB_STEP_SUMMARY"
       - name: Retain backend-only transport and rollback readback evidence
         if: always()
         uses: actions/upload-artifact@v4
