@@ -4,9 +4,14 @@ const src=fs.readFileSync('orbit360-platform/core/primas.js','utf8'),ui=fs.readF
 function primas(){const app={Orbit:{paisCfg:()=>({iva:12,recargoFinanciero:5,gastosEmision:0})}};vm.runInNewContext(src,{window:app,Orbit:app.Orbit,Date,Math,Number,RangeError});return app.Orbit.primas;}
 test('cash or Visa-funded one insurer receipt starts on inception, grace limit 30 days',()=>{
  const p=primas(),d=p.desglose(2600.02,'GT',{fraccionado:false,gastosEmision:140,otros:200,ivaPct:12,recargoFinPct:0});
- const rows=p.recibos(d,{frecuencia:'Contado',cuotas:1,vigenciaInicio:'2026-11-18',vigenciaFin:'2027-11-18'});
+ const rows=p.recibos(d,{frecuencia:'Contado',cuotas:1,vigenciaInicio:'2026-11-18',vigenciaFin:'2027-11-18',cashGraceDays:30});
  assert.equal(rows.length,1);assert.equal(rows[0].vence,'2026-11-18');assert.equal(rows[0].fechaLimite,'2026-12-18');
  assert.equal(rows[0].total,d.total);
+});
+test('historical one-payment calendar retains its original operational limit',()=>{
+ const p=primas(),d=p.desglose(1000,'GT',{fraccionado:false,gastosEmision:0,otros:0,ivaPct:12,recargoFinPct:0});
+ const rows=p.recibos(d,{frecuencia:'Contado',cuotas:1,vigenciaInicio:'2026-10-20',vigenciaFin:'2027-10-20'});
+ assert.equal(rows[0].vence,'2026-10-20');assert.equal(rows[0].fechaLimite,'2026-11-04');
 });
 test('a monthly two-payment plan begins at inception then follows month offset without drift',()=>{
  const p=primas(),d=p.desglose(1000,'GT',{fraccionado:true,gastosEmision:50,otros:0,ivaPct:12,recargoFinPct:2});

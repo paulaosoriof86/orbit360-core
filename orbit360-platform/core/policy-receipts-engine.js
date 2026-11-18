@@ -17,12 +17,12 @@ Orbit.policyReceipts = (function () {
     'numero','clienteId','asesorId','aseguradoraId','pais','moneda','ramo','subramo','producto',
     'estado','vigenciaInicio','vigenciaFin','frecuencia','formaPago','cuotas','primaNeta',
     'gastosEmision','gastosFinan','otros','ivaPct','ivaMonto','primaTotal','conducto',
-    'cargoNoGravadoMonto','cargoNoGravadoConcepto','cargoNoGravadoDocumentRef','vencimientosDocumentados'
+    'cargoNoGravadoMonto','cargoNoGravadoConcepto','cargoNoGravadoDocumentRef','vencimientosDocumentados','cashGraceDays'
   ]);
   const LOCKED_AFTER_PAYMENT = new Set([
     'numero','clienteId','asesorId','aseguradoraId','pais','moneda','vigenciaInicio','frecuencia',
     'formaPago','cuotas','primaNeta','gastosEmision','gastosFinan','otros','ivaPct','ivaMonto',
-    'primaTotal','conducto','cargoNoGravadoMonto','cargoNoGravadoConcepto','cargoNoGravadoDocumentRef','vencimientosDocumentados'
+    'primaTotal','conducto','cargoNoGravadoMonto','cargoNoGravadoConcepto','cargoNoGravadoDocumentRef','vencimientosDocumentados','cashGraceDays'
   ]);
 
   function clean(v) { return String(v == null ? '' : v).trim(); }
@@ -268,6 +268,7 @@ Orbit.policyReceipts = (function () {
       cuotas: policy.cuotas,
       vigenciaInicio: policy.vigenciaInicio,
       vigenciaFin: policy.vigenciaFin,
+      cashGraceDays: policy.cashGraceDays,
       calendarMode: policy.planCalendarVersion === PLAN_CALENDAR_UTC_VERSION ? 'utc_anchor_v1' : 'legacy_local_v0',
       emisionEn: policy.emisionEn,
       recargoEn: policy.recargoEn,

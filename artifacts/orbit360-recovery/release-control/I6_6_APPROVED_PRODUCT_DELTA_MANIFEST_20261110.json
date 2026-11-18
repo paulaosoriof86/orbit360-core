@@ -2825,6 +2825,53 @@
           "gitBlobSha": "f3f32347d93da47f00bd9fad4142c0487c3be6d3"
         }
       ]
+    },
+    {
+      "id": "I6_6_CASH_30D_FORWARD_ONLY_P0_LEGACY_PRESERVATION_20261118",
+      "approvedByDirection": true,
+      "receipt": "artifacts/orbit360-recovery/release-control/I6_6_CASH_30D_LEGACY_GUARD_CAUSAL_REPAIR_20261118.json",
+      "sourceStatus": "CAUSAL_COMPAT_SOURCE_PENDING_RETEST_PREVIEW_LIVE",
+      "scope": "Preserve historical cash deadlines while adding explicit 30-day operational limit solely to new manual policy capture",
+      "paths": [
+        {
+          "path": "orbit360-platform/modules/policy-receipts-v1199-bridge.js",
+          "gitBlobSha": "e6b5847e888c8ce6eff217faf4ea92af2796d9f0",
+          "replaces": {
+            "path": "orbit360-platform/modules/policy-receipts-v1199-bridge.js",
+            "priorGitBlobSha": "ff1e91ebd8e59c0d334b91e066774e2e6c9c5033",
+            "priorChangeId": "I6_6_MANUAL_POLICY_CAPTURE_P0_TERM_CASH_AND_VALIDATION_20261118"
+          }
+        },
+        {
+          "path": "orbit360-platform/core/primas.js",
+          "gitBlobSha": "201b82bf7ff46dcfaabf1afe34d69e465f2218c8",
+          "replaces": {
+            "path": "orbit360-platform/core/primas.js",
+            "priorGitBlobSha": "db9524ad69b89ae20a1a260d397dd6833f12259b",
+            "priorChangeId": "I6_6_MANUAL_POLICY_CAPTURE_P0_TERM_CASH_AND_VALIDATION_20261118"
+          }
+        },
+        {
+          "path": "orbit360-platform/core/policy-receipts-engine.js",
+          "gitBlobSha": "a9966cab05ae9fe2de68ec4795038de743529da7",
+          "replaces": {
+            "path": "orbit360-platform/core/policy-receipts-engine.js",
+            "priorGitBlobSha": "43b5297f8fbfaef6a3192d3fa9642113aeed2e44",
+            "priorChangeId": "I6_6_DOCUMENTED_NON_TAXED_CHARGE_AND_CONTRACTUAL_RECEIPT_CALENDAR_20261117"
+          }
+        }
+      ],
+      "tests": [
+        {
+          "path": "tools/gravicentra-i6-6-manual-policy-capture-p0.test.cjs",
+          "gitBlobSha": "90d501d4abcdd431a0e6fbb35f39f22ff15aa356",
+          "replaces": {
+            "path": "tools/gravicentra-i6-6-manual-policy-capture-p0.test.cjs",
+            "priorGitBlobSha": "f3f32347d93da47f00bd9fad4142c0487c3be6d3",
+            "priorChangeId": "I6_6_MANUAL_POLICY_CAPTURE_P0_TERM_CASH_AND_VALIDATION_20261118"
+          }
+        }
+      ]
     }
   ],
   "i66R11PreviewBuildRequest20261113": {

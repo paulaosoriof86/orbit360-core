@@ -1,0 +1,27 @@
+{
+  "schema": "GI_I66_FORWARD_ONLY_CASH_TERM_REPAIR_V1",
+  "gate": "I6.6",
+  "dateGuatemala": "2026-11-18",
+  "status": "CAUSAL_SOURCE_RETEST_REQUIRED_NOT_LIVE",
+  "incident": "Run 44389918930 rejected regression: historical synthetic receipt 2026-11-04 was changed to 2026-11-19 by global 30d default",
+  "fix": "Only manual new policy capture opts into 30-day single-payment operational limit; unspecified and historical preserve 15 days",
+  "failedWorkflowRunId": 44389918930,
+  "latestPriorLiveSource": "1b65a790530d49fe1d1fb451f02838fd9a713c53",
+  "noRealDataWrites": true,
+  "productionUnchanged": true,
+  "sourceFiles": [
+    {
+      "path": "orbit360-platform/modules/policy-receipts-v1199-bridge.js",
+      "gitBlobSha": "e6b5847e888c8ce6eff217faf4ea92af2796d9f0"
+    },
+    {
+      "path": "orbit360-platform/core/primas.js",
+      "gitBlobSha": "201b82bf7ff46dcfaabf1afe34d69e465f2218c8"
+    },
+    {
+      "path": "orbit360-platform/core/policy-receipts-engine.js",
+      "gitBlobSha": "a9966cab05ae9fe2de68ec4795038de743529da7"
+    }
+  ],
+  "newQaSha": "90d501d4abcdd431a0e6fbb35f39f22ff15aa356"
+}

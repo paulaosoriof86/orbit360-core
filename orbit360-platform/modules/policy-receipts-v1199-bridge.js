@@ -353,6 +353,7 @@ Orbit.modules = Orbit.modules || {};
       }
       return {
         ...documented,
+        ...(!existing ? { cashGraceDays: 30 } : {}),
         id: existing && existing.id, tenantId: existing && existing.tenantId || A.tenantId(), clienteId: c.id, asesorId: advisorEl && advisorEl.value || c.asesorId,
         pais: country2, moneda: currency2, aseguradoraId: insurerEl.value, numero: $('[data-number]').value.trim(), estado: $('[data-status]').value,
         ramo: ramoEl.value, subramo: productEl.value, producto: productEl.value, renovable: $('[data-renewable]').value==='yes' ? true : ($('[data-renewable]').value==='no' ? false : null), vigenciaInicio: $('[data-start]').value, vigenciaFin: $('[data-end]').value,
