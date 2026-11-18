@@ -370,6 +370,21 @@ function assess(one,snapshot){
   out.exactRequirementMatches=exact.length;
   out.amountMatches=amounts.length;
   out.sourceDueExactAmountMatches=one.due?receipts.filter(r=>amount(r)===one.cents&&due(r)===one.due).length:null;
+  // An insurer requirement number changes normally between installments.
+  // Read date-only candidates separately so a stale system gross amount does
+  // not masquerade as an identity discrepancy. These are diagnostics, NEVER
+  // authority to write or infer a paid event.
+  const dueCandidates=one.due?receipts.filter(r=>due(r)===one.due):[];
+  out.sourceDueCandidateCount=one.due?dueCandidates.length:null;
+  out.sourceDueCandidateReadback=dueCandidates.slice(0,8).map(r=>({
+    currentGrossCents:amount(r),sourceGrossCents:one.cents,
+    grossMatchesSource:amount(r)===one.cents,
+    sequence:Number.isSafeInteger(+r.secuencia)?+r.secuencia:null,
+    insurerRequirementAlreadyLinked:numbers(r).includes(one.requirement),
+    otherExternalReference:sourceRefKeys.some(k=>text(r[k])&&text(r[k])!==one.requirement),
+    internalReceiptPlaceholderOnly:!numbers(r).length||numbers(r).every(n=>/^rec_[a-f0-9]{16,64}$/i.test(n)||/^\d+\s*\/\s*\d+$/.test(n)),
+    paidEvidence:paid(r),linkedCobros:cobros.filter(c=>text(c.reciboId)===text(r.id)).length
+  }));
   out.sourceDueExactAmountDetails=one.due?receipts.filter(r=>amount(r)===one.cents&&due(r)===one.due).map(r=>({
     numberFieldNames:reqKeys.filter(k=>text(r[k])),
     sourceRefFieldNames:sourceRefKeys.filter(k=>text(r[k])),
