@@ -2726,6 +2726,48 @@
           "lineageNote": "Post-LIVE historical fixture input isolation only. Existing assertions and current validators unchanged; no product source, immutable artifact, deployment authorization or acceptance proof changes."
         }
       ]
+    },
+    {
+      "id": "I6_6_OPS_CLIENT_MANAGEMENT_CATALOG_NOTIFICATIONS_20261118",
+      "approvedByDirection": true,
+      "receipt": "artifacts/orbit360-recovery/release-control/I6_6_OPS_CLIENT_MANAGEMENT_CATALOG_NOTIFICATIONS_OWNER_P0_20261118.json",
+      "sourceStatus": "OWNER_APPROVED_SOURCE_QA_PENDING_EXACT_PREVIEW_BUILD_REQUIRED",
+      "scope": "Fix tenant-wide durable management type after Otro; client360 canonical management list and history projection; remove customer WhatsApp fallback on internal management and restrict customer outbox to portal-origin requests",
+      "paths": [
+        {
+          "path": "orbit360-platform/core/ciclo.js",
+          "gitBlobSha": "ac67637efc6db8399c889fef45e19246c4abd087",
+          "replaces": {
+            "path": "orbit360-platform/core/ciclo.js",
+            "priorGitBlobSha": "1ca57bb0c2b5eb2f8897e2ddb5f69ed48e3365ec",
+            "priorChangeId": "I6_6_OPS_PROTECTED_ENDORSEMENT_BOARD_HIDE_TRANSVERSAL_P0"
+          }
+        },
+        {
+          "path": "orbit360-platform/modules/cliente360.js",
+          "gitBlobSha": "388cd1ee015201c1bef779318fb91e18cd6b93a7",
+          "replaces": {
+            "path": "orbit360-platform/modules/cliente360.js",
+            "priorGitBlobSha": "8c4828146fc10bce10e30381e755596e9895c831",
+            "priorChangeId": "I6_6_RENEWAL_KANBAN_ISSUED_DIRECT_AND_DRIVE_FEEDBACK_R11_20261113"
+          }
+        },
+        {
+          "path": "functions/product-ops-leads-domain.js",
+          "gitBlobSha": "2628a829579e79256e9648b52f13dd9adfe62543",
+          "replaces": {
+            "path": "functions/product-ops-leads-domain.js",
+            "priorGitBlobSha": "0f7ecc4119a8e85a108bf51872771f8a7e86c241",
+            "priorChangeId": "I6_6_OPERATIVO_SUPERIORS_BUSINESS_WRITE_ROLE_PARITY_P0"
+          }
+        }
+      ],
+      "tests": [
+        {
+          "path": "tools/gravicentra-i6-6-management-catalog-client-projection.test.cjs",
+          "gitBlobSha": "23d3ef170a8aa4ee0b62f19c389ada4b742e65c5"
+        }
+      ]
     }
   ],
   "i66R11PreviewBuildRequest20261113": {

@@ -1479,6 +1479,21 @@
       "openFindingCount": 4,
       "soundExistingPreserved": true,
       "commercialCadencePreserved": true
+    },
+    "ownerImmediateP0Management20261118": {
+      "status": "OWNER_APPROVED_SOURCE_QA_PENDING_BUILD_PREVIEW_LIVE",
+      "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_OPS_CLIENT_MANAGEMENT_CATALOG_NOTIFICATIONS_OWNER_P0_20261118.json",
+      "receiptBlobSha": "723f53d3645bed75e5f61ab7a6104208170f66af",
+      "changeId": "I6_6_OPS_CLIENT_MANAGEMENT_CATALOG_NOTIFICATIONS_20261118",
+      "sourceReleaseUnchanged": true,
+      "realWrites": 0,
+      "sourcePaths": [
+        "orbit360-platform/core/ciclo.js",
+        "orbit360-platform/modules/cliente360.js",
+        "functions/product-ops-leads-domain.js"
+      ],
+      "qaTestPath": "tools/gravicentra-i6-6-management-catalog-client-projection.test.cjs",
+      "doesNotCloseExistingFinancialAndCadenceHolds": true
     }
   },
   "b4003ActiveCertificationCursor20261106": {

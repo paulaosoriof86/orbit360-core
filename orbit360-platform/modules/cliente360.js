@@ -104,7 +104,7 @@ Orbit.modules.cliente360 = (function () {
     return names.every(name => confirmed.includes(name)) ? 'ready' : 'pending';
   }
   function ensureDataCollections(names) { try { const store=S(); if(store&&typeof store._ensureCollections==='function') store._ensureCollections(names); } catch (_) {} }
-  const DETAIL_DATA_DEPS = ['clientes','polizas','recibosEsperados','carteraPrimas','cobros','comisiones','asesores'];
+  const DETAIL_DATA_DEPS = ['clientes','polizas','recibosEsperados','carteraPrimas','cobros','comisiones','asesores','gestiones'];
   function clientListDataReady() {
     const store = S();
     const projectionReady = !!(Orbit.clientProjection && typeof Orbit.clientProjection.withReadBatch === 'function');
@@ -174,7 +174,7 @@ Orbit.modules.cliente360 = (function () {
     return '<span class="badge ' + tone + '">' + e + '</span>';
   }
 
-  const TABS = ['resumen', 'polizas', 'vehiculos', 'cobros', 'recibos', 'renovaciones', 'siniestros', 'documentos', 'comisiones', 'correos', 'historial'];
+  const TABS = ['resumen', 'polizas', 'vehiculos', 'cobros', 'recibos', 'gestiones', 'renovaciones', 'siniestros', 'documentos', 'comisiones', 'correos', 'historial'];
   window.addEventListener('orbit:store:emit', event => {
     if (!listWaitingForReady) return;
     const collection = event && event.detail && event.detail.collection;
@@ -192,6 +192,19 @@ Orbit.modules.cliente360 = (function () {
       advisorListRefreshTimer = null;
       if (!shownCid && host && host.isConnected && /^#\/cliente360(?:[?\/]|$)/.test(location.hash || '')) lista();
     }, 120);
+  });
+  // Refresh the visible client panel when canonical Ops records arrive or change.
+  let managementRefreshTimer=null;
+  window.addEventListener('orbit:store:emit',event=>{
+    const collection=event&&event.detail&&event.detail.collection;
+    if(!['gestiones','actividades'].includes(collection)||!shownCid||!host||!host.isConnected||managementRefreshTimer)return;
+    if(!['resumen','gestiones','historial'].includes(tab))return;
+    managementRefreshTimer=setTimeout(()=>{
+      managementRefreshTimer=null;
+      if(shownCid&&host&&host.isConnected&&document.getElementById('c360-body')){
+        try{renderTab(shownCid,summaryForDetail(shownCid));}catch(_){}
+      }
+    },120);
   });
   window.addEventListener('orbit:lab:canonical-view-hydrated', () => scheduleClientListReadyRender(0));
 
@@ -468,7 +481,7 @@ Orbit.modules.cliente360 = (function () {
       { id: c.asesorId, nombre: verifiedClientAdvisor.asesorNombreVerificado } : null);
     const tabs = [
       ['resumen', 'Resumen', '📊'], ['polizas', 'Pólizas', '📑'], ['vehiculos', 'Vehículos', '🚗'], ['cobros', 'Cobros', '💳'],
-      ['recibos', 'Recibos y pagos', '🧾'], ['renovaciones', 'Renovaciones', '🔄'], ['siniestros', 'Siniestros', '🚨'], ['documentos', 'Documentos', '📎'], ['comisiones', 'Comisiones', '💼'], ['correos', 'Correos', '✉'], ['historial', 'Historial', '📝']
+      ['recibos', 'Recibos y pagos', '🧾'], ['gestiones', 'Gestiones', '🗂'], ['renovaciones', 'Renovaciones', '🔄'], ['siniestros', 'Siniestros', '🚨'], ['documentos', 'Documentos', '📎'], ['comisiones', 'Comisiones', '💼'], ['correos', 'Correos', '✉'], ['historial', 'Historial', '📝']
     ];
     const policyReadiness = dataReadiness(['clientes','polizas']);
     const healthReadiness = dataReadiness(['clientes','polizas','carteraPrimas']);
@@ -627,6 +640,7 @@ Orbit.modules.cliente360 = (function () {
       }
     }
     else if (tab === 'cobros') { body.innerHTML = tabCobros(cid, r); wireCobros(cid, r); }
+    else if (tab === 'gestiones') { body.innerHTML = tabGestiones(cid); wireGestiones(); }
     else if (tab === 'renovaciones') body.innerHTML = tabRenov(cid, r);
     else if (tab === 'documentos') { body.innerHTML = tabDocumentos(cid, r); wireDocumentos(cid); }
     else if (tab === 'comisiones') body.innerHTML = tabComis(cid, r);
@@ -635,9 +649,64 @@ Orbit.modules.cliente360 = (function () {
     else if (tab === 'historial') { body.innerHTML = tabHistorial(cid, r); wireHistorial(cid); }
   }
 
+  /* A single server-owned Ops management appears in Cliente360 and Historial
+     without duplicating its business record or inventing an activity write. */
+  function gestionesCliente(cid) {
+    if(dataReadiness(['gestiones'])!=='ready'||!Orbit.ciclo||typeof Orbit.ciclo.gestiones!=='function')return[];
+    return Orbit.ciclo.gestiones({surface:'ops',includeBoardHidden:true})
+      .filter(g=>g&&String(g.clienteId||'')===String(cid||''));
+  }
+  function actividadesCliente(cid) {
+    const saved=[].concat(q.actividadesDe(cid)||[]);
+    const seen=new Set(saved.map(a=>String(a&&a.gestionId||'')).filter(Boolean));
+    const managements=gestionesCliente(cid).filter(g=>!seen.has(String(g.id||'')))
+      .map(g=>({
+        icon:'🗂',tipo:'gestion',gestionId:g.id,asesorId:g.asesorId,
+        fecha:String(g.creado||g.actualizado||'').slice(0,10),
+        titulo:'Gestión · '+String(g.titulo||g.tipo||'Seguimiento'),
+        detalle:String(g.estado||'Pendiente')+' · '+String(g.proximaAccion||'Sin próxima acción')
+      }));
+    return saved.concat(managements)
+      .sort((a,b)=>String(b.fecha||'').localeCompare(String(a.fecha||'')));
+  }
+  function tabGestiones(cid) {
+    const status=dataReadiness(['gestiones']);
+    if(status!=='ready')return '<div class="card pad" data-c360-management-loading="'+U.esc(status)+'"><b>'+
+      (status==='unavailable'?'Gestiones no disponibles para este rol':'Confirmando gestiones autorizadas…')+'</b></div>';
+    const rows=gestionesCliente(cid).sort((a,b)=>
+      Number(a.estado==='Resuelta')-Number(b.estado==='Resuelta')||
+      String(a.vence||'9999').localeCompare(String(b.vence||'9999')));
+    return '<div class="card" data-c360-managements="1" style="overflow:auto">'+
+      '<div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 16px"><b>Gestiones del cliente · '+
+      rows.length+'</b><button type="button" class="btn primary sm" data-c360-management-new>+ Gestión</button></div>'+
+      '<table class="tbl"><thead><tr><th>Gestión</th><th>Póliza</th><th>Responsable</th><th>Estado</th><th>Fecha límite</th><th></th></tr></thead><tbody>'+
+      (rows.map(g=>{
+        const p=g.polizaId?S().get('polizas',g.polizaId):null,a=q.asesor(g.asesorId)||{};
+        return '<tr><td>'+U.esc(g.titulo||g.tipo||'Gestión')+
+          '</td><td>'+U.esc(p&&p.numero||'—')+
+          '</td><td>'+U.esc(a.nombre||g.asesorNombreVerificado||'Responsable por verificar')+
+          '</td><td>'+U.esc(g.estado||'Pendiente')+
+          '</td><td>'+U.esc(U.fmtDate(g.vence||''))+
+          '</td><td><button type="button" class="btn ghost sm" data-c360-management="'+U.esc(g.id)+'">Abrir</button></td></tr>';
+      }).join('')||'<tr><td colspan="6" class="muted" style="text-align:center;padding:18px">Sin gestiones en el alcance del usuario.</td></tr>')+
+      '</tbody></table></div>';
+  }
+  function wireGestiones() {
+    const body=document.getElementById('c360-body');if(!body)return;
+    body.querySelectorAll('[data-c360-management]').forEach(b=>b.addEventListener('click',()=>{
+      if(Orbit.ciclo&&typeof Orbit.ciclo.openGestion==='function')
+        Orbit.ciclo.openGestion(b.getAttribute('data-c360-management'));
+    }));
+    const add=body.querySelector('[data-c360-management-new]');
+    if(add)add.addEventListener('click',()=>{
+      if(Orbit.ciclo&&typeof Orbit.ciclo.solicitarGestion==='function')
+        Orbit.ciclo.solicitarGestion(shownCid);
+    });
+  }
+
   /* ---- Resumen (cerebro) ---- */
   function tabResumen(cid, r) {
-    const acts = q.actividadesDe(cid).slice(0, 4);
+    const acts = actividadesCliente(cid).slice(0, 4);
     const proxRenov = r.pol.filter(p => p.estado === 'Por renovar').sort((a, b) => String(a.vigenciaFin||'').localeCompare(String(b.vigenciaFin||'')))[0];
     const proxCobro = (q.carteraPendienteDe ? q.carteraPendienteDe(cid) : []).sort((a, b) => String(a.vence||a.fechaVencimiento||a.fechaLimite||'').localeCompare(String(b.vence||b.fechaVencimiento||b.fechaLimite||'')))[0];
     // distribución por ramo
@@ -1177,7 +1246,7 @@ Orbit.modules.cliente360 = (function () {
 
   /* ---- Historial + agregar nota ---- */
   function tabHistorial(cid, r) {
-    const acts = q.actividadesDe(cid);
+    const acts = actividadesCliente(cid);
     return `<div style="display:grid;grid-template-columns:1.6fr 1fr;gap:16px">
       <div class="card pad">
         <b style="font-family:var(--f-display);font-size:15px">Historial completo</b>

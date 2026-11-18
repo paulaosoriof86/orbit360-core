@@ -111,6 +111,25 @@ Orbit.ciclo = (function () {
     return { code, category, fingerprint };
   }
   function tiposGestion() { return Orbit.cat.get('tiposGestion'); }
+  // "Otro" must register a tenant-wide, server-confirmed management type.
+  // The current authorized catalog writer owns this data, not local select options.
+  async function persistGestionType(tipo, lista) {
+    const name=String(tipo||'').trim(), queue=String(lista||'Gestiones Admin').trim();
+    const key=value=>String(value||'').trim().normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
+    if(!name||name.length>160||/[<>]/.test(name)||!queue)throw Error('MANAGEMENT_TYPE_INVALID');
+    if(!Orbit.cat||typeof Orbit.cat.ensure!=='function'||typeof Orbit.cat.saveDurable!=='function')
+      throw Error('MANAGEMENT_TYPE_CANONICAL_CONFIG_UNAVAILABLE');
+    await Orbit.cat.ensure(true);
+    const current=Orbit.cat.get('tiposGestion')||[];
+    if(current.some(row=>key(row&&row.t)===key(name)))return{existing:true};
+    const next=Orbit.cat.all();
+    next.tiposGestion=current.concat([{t:name,lista:queue}]);
+    const saved=await Orbit.cat.saveDurable(next,'Registrar tipo de gestion operativa compartido');
+    if(!saved||!Array.isArray(saved.tiposGestion)||
+      !saved.tiposGestion.some(row=>key(row&&row.t)===key(name)&&row.lista===queue))
+      throw Error('MANAGEMENT_TYPE_DURABLE_READBACK_REQUIRED');
+    return{existing:false,saved:true};
+  }
 
   /* ===================== datos / filtros ===================== */
 
@@ -1014,8 +1033,8 @@ Orbit.ciclo = (function () {
           log(g, 'Estado', g.estado, 'Resuelta', 'manual');
           await S().updateDurable('gestiones', id, { estado: 'Resuelta', bitacora: g.bitacora, actualizado: today() });
           const cl = S().get('clientes', g.clienteId);
-          notify({ tipo: 'gestion', titulo: 'Gestión resuelta · ' + (g.titulo || g.tipo), detalle: cl ? cl.nombre : '', para: (ase || {}).nombre, tel: cl ? cl.telefono : '', email: cl ? cl.email : '' });
-          if (cl && Orbit.notify) Orbit.notify.pedir(cl.id, { tipo: 'Respuesta de gestión', icon: '✅', asunto: 'Actualización de tu gestión · ' + (g.tipo || ''), mensaje: 'Hola ' + cl.nombre + ', tu solicitud "' + (g.titulo || g.tipo) + '" ha sido resuelta. ' + (g.resultado ? g.resultado + ' ' : '') + 'Quedamos atentos a cualquier consulta.', onSent: () => openGestion(id) });
+          notify({ tipo: 'gestion', titulo: 'Gestión resuelta · ' + (g.titulo || g.tipo), detalle: cl ? cl.nombre : '', para: (ase || {}).nombre });
+          if (cl && Orbit.notify && /^(solicitud del cliente|portal del cliente)$/i.test(String(g.origen||'').trim())) Orbit.notify.pedir(cl.id, { tipo: 'Respuesta de gestión', icon: '✅', asunto: 'Actualización de tu gestión · ' + (g.tipo || ''), mensaje: 'Hola ' + cl.nombre + ', tu solicitud "' + (g.titulo || g.tipo) + '" ha sido resuelta. ' + (g.resultado ? g.resultado + ' ' : '') + 'Quedamos atentos a cualquier consulta.', onSent: () => openGestion(id) });
           else openGestion(id);
         } else if (a === 'reabrir') {
           await S().updateDurable('gestiones', id, { estado: 'Pendiente', actualizado: today() });
@@ -1037,6 +1056,7 @@ Orbit.ciclo = (function () {
       const cambioNota = (nuevaNota || '') !== (g.nota || g.notas || '');
       if (cambioNota) { const actor=currentUserIdentity();g.bitacora = g.bitacora || []; g.bitacora.push({ ts: stamp(), user: actor.name,actorUid:actor.uid,actorName:actor.name, campo: 'Nota', de: '', a: 'Nota actualizada', origen: 'manual' }); }
       try {
+        await persistGestionType(v('gs-tipo'), v('gs-lista'));
         await S().updateDurable('gestiones', id, {
           lista: v('gs-lista'), tipo: v('gs-tipo'), titulo: v('gs-tipo'), estado: v('gs-estado'), prioridad: v('gs-prio'),
           asesorId: nuevoAse, aseguradoraId: v('gs-asg'), vence: v('gs-vence'), proximaAccion: v('gs-prox'),
@@ -1048,7 +1068,7 @@ Orbit.ciclo = (function () {
       // notificar al responsable (cambio de asignación o nueva nota) por WA + correo
       const resp = S().get('asesores', nuevoAse); const cl = S().get('clientes', g.clienteId);
       if (resp && (cambioAse || cambioNota)) {
-        notify({ tipo: 'gestion', titulo: (cambioAse ? '👤 Gestión asignada · ' : '📝 Nota en gestión · ') + (v('gs-tipo') || g.titulo), detalle: cl ? cl.nombre : '', para: resp.nombre, tel: resp.telefono || (cl ? cl.telefono : ''), email: resp.email || (cl ? cl.email : '') });
+        notify({ tipo: 'gestion', titulo: (cambioAse ? '👤 Gestión asignada · ' : '📝 Nota en gestión · ') + (v('gs-tipo') || g.titulo), detalle: cl ? cl.nombre : '', para: resp.nombre });
       }
       back.remove(); refresh();
     });
@@ -1278,6 +1298,9 @@ Orbit.ciclo = (function () {
       const original = save.textContent;
       save.textContent = 'Guardando…';
       try {
+        save.textContent = 'Confirmando tipo de gestión…';
+        await persistGestionType(tipo, lista);
+        save.textContent = 'Guardando…';
         const noteValue = String(el('mg-nota').value || '').trim();
         const extra = Object.assign(
           {},
@@ -1349,7 +1372,7 @@ Orbit.ciclo = (function () {
           tipo: 'gestion',
           titulo: (opts.desdeCliente ? 'Solicitud de cliente · ' : 'Nueva gestión · ') + tipo,
           detalle: cli.nombre + ' → ' + lista,
-          para: ase ? ase.nombre : '', tel: cli.telefono, email: cli.email
+          para: ase ? ase.nombre : 'Equipo operativo'
         });
         back.remove();
         refresh();
@@ -1483,14 +1506,18 @@ Orbit.ciclo = (function () {
   /* ===================== notificaciones (WhatsApp / correo) ===================== */
   function notify(o) {
     o = o || {};
+    const internal=o.tipo==='gestion';
+    // Internal operational messages never use a customer's phone or email.
+    const tel=internal?'':String(o.tel||'');
+    const email=internal?'':String(o.email||'');
     const actor=currentUserIdentity();
-    try { S().insert('avisos', { id: 'av' + Date.now() + Math.floor(Math.random() * 99), tipo: o.tipo || 'aviso', titulo: o.titulo || 'Notificación', detalle: o.detalle || '', para: o.para || '', tel: o.tel || '', email: o.email || '', actorUid:actor.uid,actorName:actor.name, fecha: today(), leida: false }); } catch (e) {}
-    const waNum = (o.tel || '').replace(/[^0-9]/g, '');
+    try { S().insert('avisos', { id: 'av' + Date.now() + Math.floor(Math.random() * 99), tipo: o.tipo || 'aviso', titulo: o.titulo || 'Notificación', detalle: o.detalle || '', para: o.para || '', tel, email, actorUid:actor.uid,actorName:actor.name, fecha: today(), leida: false }); } catch (e) {}
+    const waNum = tel.replace(/[^0-9]/g, '');
     const msg = encodeURIComponent((o.titulo || '') + (o.detalle ? ' — ' + o.detalle : ''));
     const t = document.createElement('div'); t.className = 'ciclo-toast notif';
     t.innerHTML = `<span>🔔 ${U.esc(o.titulo || 'Notificación')}${o.para ? ' · ' + U.esc(o.para) : ''}</span>` +
       (waNum ? `<a href="https://wa.me/${waNum}?text=${msg}" target="_blank" rel="noopener">💬 WhatsApp</a>` : '') +
-      (o.email ? `<a style="cursor:pointer" onclick="Orbit.correoCompose({para:'${o.email}',asunto:'${(o.titulo||'').replace(/'/g,'')}'})">✉ Correo</a>` : '');
+      (email ? `<a style="cursor:pointer" onclick="Orbit.correoCompose({para:'${email}',asunto:'${(o.titulo||'').replace(/'/g,'')}'})">✉ Correo</a>` : '');
     document.body.appendChild(t); setTimeout(() => t.remove(), 5600);
     document.dispatchEvent(new CustomEvent('orbit:notify'));
   }

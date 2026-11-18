@@ -1,0 +1,59 @@
+{
+  "schema": "GI_I66_OPS_CLIENT_MANAGEMENT_CATALOG_NOTIFICATIONS_OWNER_P0_V1",
+  "dateGuatemala": "2026-11-18",
+  "gate": "I6.6",
+  "status": "OWNER_APPROVED_SOURCE_STAGED_QA_AND_EXACT_PREVIEW_PENDING_NOT_LIVE",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "scope": "Fix tenant-wide durable management type after Otro; client360 canonical management list and history projection; remove customer WhatsApp fallback on internal management and restrict customer outbox to portal-origin requests",
+  "ownerDecision": "Paula explicitly reported missing reusable custom management types, missing existing-client management listing/history, and wrong internal WhatsApp recipient. Fix source, test, certify and publish as a causal I6.6 successor.",
+  "liveUnchanged": {
+    "sourceSha": "1b65a790530d49fe1d1fb451f02838fd9a713c53",
+    "buildId": "gi-i66-1b65a790530d-57f234755dc1",
+    "artifactId": 14373955326,
+    "digest": "sha256:fc6d8f2616141aa4388ec7df497917690fc54400d18a376f15550380334725a5"
+  },
+  "files": [
+    {
+      "path": "orbit360-platform/core/ciclo.js",
+      "gitBlobSha": "ac67637efc6db8399c889fef45e19246c4abd087",
+      "priorApprovedBlob": "1ca57bb0c2b5eb2f8897e2ddb5f69ed48e3365ec",
+      "priorChangeId": "I6_6_OPS_PROTECTED_ENDORSEMENT_BOARD_HIDE_TRANSVERSAL_P0"
+    },
+    {
+      "path": "orbit360-platform/modules/cliente360.js",
+      "gitBlobSha": "388cd1ee015201c1bef779318fb91e18cd6b93a7",
+      "priorApprovedBlob": "8c4828146fc10bce10e30381e755596e9895c831",
+      "priorChangeId": "I6_6_RENEWAL_KANBAN_ISSUED_DIRECT_AND_DRIVE_FEEDBACK_R11_20261113"
+    },
+    {
+      "path": "functions/product-ops-leads-domain.js",
+      "gitBlobSha": "2628a829579e79256e9648b52f13dd9adfe62543",
+      "priorApprovedBlob": "0f7ecc4119a8e85a108bf51872771f8a7e86c241",
+      "priorChangeId": "I6_6_OPERATIVO_SUPERIORS_BUSINESS_WRITE_ROLE_PARITY_P0"
+    }
+  ],
+  "test": {
+    "path": "tools/gravicentra-i6-6-management-catalog-client-projection.test.cjs",
+    "gitBlobSha": "23d3ef170a8aa4ee0b62f19c389ada4b742e65c5"
+  },
+  "acceptance": [
+    "Source guard with new pinned test PASS",
+    "One immutable build and exact Preview certified with signed roles and no real user data writes",
+    "New tenant catalog type survives backend readback/reload and is visible to other authorized users",
+    "Existing client management visible in Client360 and Historial with state and assignee; no duplicate records",
+    "Internal management actions never include a client target or wa.me customer fallback; portal-origin customer requests preserved",
+    "Exact same artifact promoted to LIVE with signed authenticated readback, rollback and negative role tests"
+  ],
+  "financialWrites": 0,
+  "customerMutations": 0,
+  "externalMessages": 0,
+  "publicationClaimed": false,
+  "previewPassClaimed": false,
+  "fullI66Accepted": false,
+  "independentPendingInSameGate": [
+    "Due-date reminder scheduler + GreenAPI group delivery receipt",
+    "Editable commercial cadence days and lead starting step",
+    "Existing cobros/recibos/source batches and 3 priority functional flows"
+  ]
+}
