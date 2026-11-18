@@ -1514,6 +1514,17 @@
         "previewReady": false,
         "liveReady": false,
         "noRealWrites": true
+      },
+      "nextPreviewBackendProof": {
+        "status": "EXACT_SINGLE_OPS_PREVIEW_SIGNED_QA_REQUESTED",
+        "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_MANAGEMENT_EXACT_SINGLE_OPS_PREVIEW_SIGNED_UAT_REQUEST_20261118.json",
+        "receiptBlobSha": "04902259fa20ed8e565025924cb40c10f8d79ea3",
+        "buildRunId": 44380029453,
+        "artifactId": 14463416936,
+        "workflowBlob": "4f9db36736d08821bf2ec630d0b4786f7a2e893c",
+        "previewPass": false,
+        "livePass": false,
+        "noActualBusinessWrites": true
       }
     }
   },

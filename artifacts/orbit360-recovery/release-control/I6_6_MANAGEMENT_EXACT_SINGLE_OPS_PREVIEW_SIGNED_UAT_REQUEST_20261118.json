@@ -1,0 +1,40 @@
+{
+  "schema": "GI_I66_MANAGEMENT_EXACT_ONE_PREVIEW_CALLABLE_REQUEST_V1",
+  "gate": "I6.6",
+  "dateGuatemala": "2026-11-18",
+  "status": "AUTHORIZED_PREVIEW_ONLY_SIGNED_QA_PENDING",
+  "authorizedByDirection": true,
+  "repo": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "immutability": {
+    "sourceSha": "91cc211c2336b91fe06de0ce3dd21a22c18a6629",
+    "buildRun": 44380029453,
+    "buildJob": "immutable-package",
+    "artifactId": 14463416936,
+    "artifactDigest": "sha256:b1672d7cb18525a898a6eb53bae039a0fa885764e673ed83e9f33aba6a8ced4a",
+    "previewUrl": "https://ays-orbit-360-lab--gi-i66-rc-44380029453-4mghyopv.web.app"
+  },
+  "existingOwnerWorkflow": ".github/workflows/gravicentra-delta-66-ops-function-preview.yml",
+  "existingWorkflowBlobSha": "4f9db36736d08821bf2ec630d0b4786f7a2e893c",
+  "allowedBackendPreview": "orbit360OpsLeadsCommandPreview",
+  "allowedBackendRegion": "us-east1",
+  "onlyOneExistingFunction": true,
+  "sourceQaRun": 44378705804,
+  "sourceQaHead": "e4eced4f01d3a5d5ea6565e72f168a448fe5898c",
+  "priorLive": {
+    "sourceSha": "1b65a790530d49fe1d1fb451f02838fd9a713c53",
+    "artifactId": 14373955326
+  },
+  "syntheticActors": [
+    "direccion",
+    "operativo"
+  ],
+  "requireSignedFunctionalReadback": true,
+  "requireSyntheticCleanup": true,
+  "doNotDeployHostingLive": true,
+  "doNotDeployBackendLive": true,
+  "doNotModifyRulesAuthIam": true,
+  "noRealFinancialOrCustomerWrites": true,
+  "newProductCandidate": false,
+  "fullI66PassClaimed": false
+}

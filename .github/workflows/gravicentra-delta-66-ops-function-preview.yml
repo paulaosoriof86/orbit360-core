@@ -2,6 +2,10 @@
 name: Gravicentra I6.6 Carlos Transversal Function Preview
 on:
   workflow_dispatch:
+  push:
+    branches: [recovery/fase-a-clean-20260831]
+    paths:
+      - .github/workflows/gravicentra-delta-66-ops-function-preview.yml
 permissions:
   contents: read
   actions: read
@@ -23,9 +27,10 @@ jobs:
           node - <<'NODE'
           const fs=require('node:fs');
           const c=JSON.parse(fs.readFileSync('artifacts/orbit360-recovery/release-control/I6_6_RELEASE_TRANSPORT_CONTROL_20261110.json'));
-          const authorized=c.status==='CARLOS_TRANSVERSAL_FUNCTIONS_PREVIEW_AUTHORIZED'&&c.forbidBackendFunctionDeploy===false&&c.forbidBackendLiveFunctionDeploy===true;
+          const approved=c.postAcceptanceProductSourcePreviewBuildRequest20261118||{};
+          const authorized=c.status==='OPERATIONAL_EXACT_LIVE_ACCEPTED_LOCKED'&&c.forbidBackendFunctionDeploy===true&&c.forbidBackendLiveFunctionDeploy===true&&c.livePromotionAuthorized===false&&approved.status==='OWNER_APPROVED_SOURCE_PREVIEW_ONLY'&&approved.sourceQaRunId===44378705804&&approved.previousLiveSourceSha==='1b65a790530d49fe1d1fb451f02838fd9a713c53'&&approved.previewHostingChannelOnly===true&&approved.backendLiveDeploy===false;
           fs.appendFileSync(process.env.GITHUB_OUTPUT,'authorized='+String(authorized)+'\n');
-          console.log(authorized?'I66_PREVIOUS_EXACT_CARLOS_PREVIEW_FUNCTION_GATE_ACTIVE':'I66_PREVIOUS_CARLOS_PREVIEW_FUNCTION_GATE_SUPERSEDED_SAFE_SKIP');
+          console.log(authorized?'I66_CURRENT_MANAGEMENT_PREVIEW_ONLY_AUTHORIZED':'I66_CURRENT_MANAGEMENT_PREVIEW_AUTHORITY_ABSENT_SKIP');
           NODE
   stage-ops-preview:
     needs: scope
@@ -34,13 +39,14 @@ jobs:
     timeout-minutes: 35
     env:
       PROJECT_ID: ays-orbit-360-lab
-      SOURCE_SHA: b86cad550fadc050e8574678f02f3097caa8b5bd
-      ARTIFACT_ID: '13980273112'
-      ARTIFACT_DIGEST: sha256:50e0d0d51ecdc9302a40a58abb96dd6949ee66f45c2dd3bbd5e258adcdc0657a
-      ARTIFACT_RUN: '43299843267'
-      EMULATOR_QA_RUN: '43299843202'
-      PREVIEW_CHANNEL: gi-i66-rc-43299843267
-      PREVIEW_URL: https://ays-orbit-360-lab--gi-i66-rc-43299843267-qispe7e9.web.app
+      SOURCE_SHA: 91cc211c2336b91fe06de0ce3dd21a22c18a6629
+      QA_SOURCE_HEAD: e4eced4f01d3a5d5ea6565e72f168a448fe5898c
+      ARTIFACT_ID: '14463416936'
+      ARTIFACT_DIGEST: sha256:b1672d7cb18525a898a6eb53bae039a0fa885764e673ed83e9f33aba6a8ced4a
+      ARTIFACT_RUN: '44380029453'
+      EMULATOR_QA_RUN: '44378705804'
+      PREVIEW_CHANNEL: gi-i66-rc-44380029453
+      PREVIEW_URL: https://ays-orbit-360-lab--gi-i66-rc-44380029453-4mghyopv.web.app
       SA_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
       SA_ALT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
       SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
@@ -59,6 +65,8 @@ jobs:
         run: |
           set -euo pipefail
           git merge-base --is-ancestor "$SOURCE_SHA" HEAD
+          git merge-base --is-ancestor "$QA_SOURCE_HEAD" "$SOURCE_SHA"
+          node tools/gravicentra-i6-6-management-catalog-client-projection.test.cjs
           test -z "$(git diff --name-only "$SOURCE_SHA" HEAD -- orbit360-platform functions firebase.json firestore.rules storage.rules)"
           node tools/gravicentra-i6-6-carlos-ops-tasks-transversal.test.cjs
           node tools/gravicentra-i6-6-ops-crud-role-country.test.cjs
@@ -66,19 +74,22 @@ jobs:
           node - <<'NODE'
           const fs=require('node:fs'),assert=require('node:assert/strict');
           const c=JSON.parse(fs.readFileSync('artifacts/orbit360-recovery/release-control/I6_6_RELEASE_TRANSPORT_CONTROL_20261110.json'));
-          const p=c.carlosPreviewAuthorization20261112||{};
-          const targets=['orbit360OpsLeadsCommandPreview','orbit360ProductOperationalCommandPreview','orbit360ScopedPolicyReadPreview'];
-          assert.equal(c.status,'CARLOS_TRANSVERSAL_FUNCTIONS_PREVIEW_AUTHORIZED');
-          assert.equal(c.forbidBackendFunctionDeploy,false);assert.equal(c.backendFunctionPreviewOnly,true);
-          assert.equal(c.forbidBackendLiveFunctionDeploy,true);assert.equal(c.livePromotionAuthorized,false);
-          assert.equal(c.forbidFirestoreRulesDataAuthWrites,true);assert.equal(p.protectedSyntheticQaOnly,true);
-          assert.equal(p.allowRealCustomerDataWrites,false);assert.equal(p.allowHostingLivePromotion,false);
-          assert.equal(p.allowBackendLivePromotion,false);assert.equal(p.allowFirestoreRulesAuthIamChange,false);
-          assert.deepEqual(p.targetFunctions,targets);assert.equal(p.targetRegion,'us-east1');
-          assert.equal(p.sourceCommit,process.env.SOURCE_SHA);assert.equal(p.immutableBuildRunId,Number(process.env.ARTIFACT_RUN));
-          assert.equal(p.immutableArtifactId,Number(process.env.ARTIFACT_ID));assert.equal(p.immutableArtifactZipDigest,process.env.ARTIFACT_DIGEST);
-          assert.equal(p.hostingPreviewUrl,process.env.PREVIEW_URL);assert.equal(p.hostingPreviewChannel,process.env.PREVIEW_CHANNEL);
-          console.log('I66_CARLOS_EXACT_THREE_PREVIEW_CALLABLES_AUTHORIZED_NO_LIVE_WRITES');
+          const p=c.postAcceptanceProductSourcePreviewBuildRequest20261118||{};
+          assert.equal(c.status,'OPERATIONAL_EXACT_LIVE_ACCEPTED_LOCKED');
+          assert.equal(c.forbidBackendFunctionDeploy,true);
+          assert.equal(c.forbidBackendLiveFunctionDeploy,true);
+          assert.equal(c.livePromotionAuthorized,false);
+          assert.equal(c.forbidFirestoreRulesDataAuthWrites,true);
+          assert.equal(c.currentExactHostingRelease?.sourceSha,'1b65a790530d49fe1d1fb451f02838fd9a713c53');
+          assert.equal(c.currentExactHostingRelease?.artifactId,14373955326);
+          assert.equal(p.status,'OWNER_APPROVED_SOURCE_PREVIEW_ONLY');
+          assert.equal(p.sourceQaRunId,Number(process.env.EMULATOR_QA_RUN));
+          assert.equal(p.sourceQaHead,process.env.QA_SOURCE_HEAD);
+          assert.equal(p.previewHostingChannelOnly,true);
+          assert.equal(p.liveDeploy,false);
+          assert.equal(p.backendLiveDeploy,false);
+          assert.equal(p.realOperationalDataWrites,false);
+          console.log('I66_CURRENT_ONE_OPS_LEADS_PREVIEW_ONLY_LIVE_LOCKED_PASS');
           NODE
           node - <<'NODE'
           const assert=require('node:assert/strict');
@@ -91,7 +102,7 @@ jobs:
               fetch(base+'artifacts/'+process.env.ARTIFACT_ID,{headers:h}).then(r=>r.json())
             ]);
             assert.equal(q.conclusion,'success','OPS_EMULATOR_QA_HOLD');
-            assert.equal(q.head_sha,process.env.SOURCE_SHA,'OPS_EMULATOR_QA_COMMIT_DRIFT');
+            assert.equal(q.head_sha,process.env.QA_SOURCE_HEAD,'OPS_SOURCE_QA_HEAD_DRIFT');
             assert.equal(b.conclusion,'success','OPS_PACKAGE_NOT_GREEN');
             assert.equal(b.head_sha,process.env.SOURCE_SHA,'OPS_PACKAGE_SOURCE_DRIFT');
             assert.equal(a.digest,process.env.ARTIFACT_DIGEST,'OPS_ARTIFACT_DIGEST_DRIFT');
@@ -102,8 +113,8 @@ jobs:
           NODE
       - uses: actions/download-artifact@v4
         with:
-          artifact-ids: 13980273112
-          run-id: 43299843267
+          artifact-ids: 14463416936
+          run-id: 44380029453
           github-token: ${{ github.token }}
           path: ${{ runner.temp }}/ops-package-downloaded
       - name: Verify one TAR and backend bytes; use original source only
@@ -157,7 +168,7 @@ jobs:
           chmod 600 "$RUNNER_TEMP/ops-preview-auth/selected.json"
           echo "GOOGLE_APPLICATION_CREDENTIALS=$RUNNER_TEMP/ops-preview-auth/selected.json" >> "$GITHUB_ENV"
           echo "OPS_FIREBASE_CLI=$CLI" >> "$GITHUB_ENV"
-      - name: Deploy only three existing Preview callables from immutable backend, never Hosting LIVE
+      - name: Deploy only existing Ops Leads Preview callable from immutable backend, never Hosting LIVE
         run: |
           set -euo pipefail
           FROOT="$RUNNER_TEMP/ops-preview-functions";mkdir -p "$FROOT"
@@ -167,17 +178,17 @@ jobs:
           node - <<'NODE'
           const fs=require('node:fs');const x=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/ops-functions-before.json'));
           const all=Array.isArray(x.result)?x.result:Array.isArray(x)?x:[];
-          for(const name of ['orbit360OpsLeadsCommandPreview','orbit360ProductOperationalCommandPreview','orbit360ScopedPolicyReadPreview']){
+          for(const name of ['orbit360OpsLeadsCommandPreview']){
             const found=all.filter(f=>String(f.entryPoint||f.id||f.name||'').split('/').pop()===name);
             if(found.length!==1)throw Error('I66_CARLOS_EXISTING_PREVIEW_FUNCTION_NOT_UNIQUE:'+name);
             const region=String(found[0].region||found[0].location||'us-east1');
             if(region!=='us-east1')throw Error('I66_CARLOS_PREVIEW_REGION_DRIFT:'+name);
           }
-          console.log('I66_CARLOS_THREE_EXISTING_TARGETS_PRESENT_PREDEPLOY');
+          console.log('I66_CURRENT_ONE_PREVIEW_OPS_TARGET_PRESENT_PREDEPLOY');
           NODE
           curl -fsSL --max-time 30 https://ays-orbit-360-lab.web.app/ | sha256sum > "$RUNNER_TEMP/i66-carlos-live-lab-before.sha"
           curl -fsSL --max-time 30 https://app.aysseguros.com/ | sha256sum > "$RUNNER_TEMP/i66-carlos-live-staff-before.sha"
-          node "$OPS_FIREBASE_CLI" deploy --only functions:orbit360OpsLeadsCommandPreview,functions:orbit360ProductOperationalCommandPreview,functions:orbit360ScopedPolicyReadPreview --config "$FROOT/firebase.json" --project "$PROJECT_ID" --non-interactive
+          node "$OPS_FIREBASE_CLI" deploy --only functions:orbit360OpsLeadsCommandPreview --config "$FROOT/firebase.json" --project "$PROJECT_ID" --non-interactive
           for f in __recovery__/build.json core/router.js modules/ops.js modules/cronograma.js;do
             curl --fail --silent --show-error --retry 3 --max-time 30 "$PREVIEW_URL/$f" > "$RUNNER_TEMP/$(basename "$f").preview"
             cmp "$RUNNER_TEMP/ops-immutable-packet/bundle/site/$f" "$RUNNER_TEMP/$(basename "$f").preview"
@@ -196,11 +207,11 @@ jobs:
           const before=Array.isArray(prior.result)?prior.result:Array.isArray(prior)?prior:[];
           const names=x=>x.map(r=>String(r.entryPoint||r.id||r.name||'').split('/').pop()).sort();
           if(JSON.stringify(names(arr))!==JSON.stringify(names(before)))throw Error('I66_CARLOS_OTHER_FUNCTION_INVENTORY_CHANGED');
-          for(const name of ['orbit360OpsLeadsCommandPreview','orbit360ProductOperationalCommandPreview','orbit360ScopedPolicyReadPreview']){
+          for(const name of ['orbit360OpsLeadsCommandPreview']){
             const found=arr.filter(f=>String(f.entryPoint||f.id||f.name||'').split('/').pop()===name);
             if(found.length!==1)throw Error('I66_CARLOS_PREVIEW_FUNCTION_READBACK_MISSING:'+name);
           }
-          console.log('I66_CARLOS_THREE_EXACT_PREVIEW_CALLABLES_READBACK_PASS');
+          console.log('I66_CURRENT_ONE_PREVIEW_OPS_CALLABLE_READBACK_PASS');
           console.log('I66_CARLOS_LIVE_BACKEND_DEPLOYS=0; CUSTOMER_DATA_WRITES=0');
           NODE
           curl -fsSL --max-time 30 https://ays-orbit-360-lab.web.app/ | sha256sum > "$RUNNER_TEMP/i66-carlos-live-lab-after.sha"
@@ -208,4 +219,13 @@ jobs:
           cmp "$RUNNER_TEMP/i66-carlos-live-lab-before.sha" "$RUNNER_TEMP/i66-carlos-live-lab-after.sha"
           cmp "$RUNNER_TEMP/i66-carlos-live-staff-before.sha" "$RUNNER_TEMP/i66-carlos-live-staff-after.sha"
           echo 'I66_CARLOS_BOTH_LIVE_HOSTING_ORIGINS_UNCHANGED_PASS'
+      - name: Signed Carlos and Direction Preview Ops management CRUD reload and synthetic restore
+        run: |
+          set -euo pipefail
+          npm install --no-save --package-lock=false --ignore-scripts --no-audit --no-fund firebase-admin@13.4.0 playwright@1.55.0 >/dev/null
+          node node_modules/playwright/cli.js install --with-deps chromium >/dev/null
+          export I66_PREVIEW_ORIGIN="$PREVIEW_URL"
+          export I66_SIGNED_QA_CHANNEL_ID="$PREVIEW_CHANNEL"
+          node tools/gravicentra-i6-6-carlos-real-signed-synthetic-preview-uat.cjs
+          echo 'I66_MANAGEMENT_SIGNED_CARLOS_PAULA_PREVIEW_CRUD_READBACK_RELOAD_RESTORE_PASS'
 
