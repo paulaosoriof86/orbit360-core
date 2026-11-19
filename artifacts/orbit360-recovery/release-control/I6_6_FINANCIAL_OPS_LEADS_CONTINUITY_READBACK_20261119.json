@@ -1,0 +1,174 @@
+{
+  "schema": "GRAVICENTRA_I6_6_ADDITIVE_OPERATIONAL_CONTINUITY_EVIDENCE_V1",
+  "gate": "I6.6",
+  "dateGuatemala": "2026-11-19",
+  "recordType": "EVIDENCE_ONLY_SUBORDINATE_TO_CONTROL_PLANE_NOT_RELEASE_AUTHORIZATION",
+  "branch": "recovery/fase-a-clean-20260831",
+  "liveHosting": {
+    "acceptedSourceSha": "1b65a790530d49fe1d1fb451f02838fd9a713c53",
+    "newSourcePromotedLive": false,
+    "fullI66Accepted": false
+  },
+  "lastInterruptedIteration": {
+    "cendosoPaidProtectedReadback": {
+      "runId": 44569134138,
+      "sourceRows": 607,
+      "appliedCobros": 18,
+      "holds": 589,
+      "appliedAfterReadback": true,
+      "holdReasons": {
+        "ALREADY_PAID_WITH_COBRO_PRESERVE": 309,
+        "RECEIPT_PERIOD_OR_DUE_NOT_FOUND": 160,
+        "POLICY_NUMBER_NOT_FOUND": 32,
+        "POLICY_NOT_ELIGIBLE_FOR_LEGACY_PAYMENT": 32,
+        "SOURCE_CURRENCY_NOT_GTQ": 29,
+        "EXACT_POLICY_EDITION_NOT_FOUND": 12,
+        "NET_PREMIUM_CHANGED_REQUIRES_COMMISSION_RECOMPUTE": 8,
+        "CONFLICTING_SOURCE_DATES": 4,
+        "MULTIPLE_RECEIPTS_FOR_PERIOD_OR_AMOUNT": 2,
+        "MULTIPLE_POLICY_EDITIONS": 1
+      },
+      "guard": "Already-paid rows never silently repaid; unresolved distinct rows 280, each requires source-backed disposition."
+    }
+  },
+  "currentIteration": {
+    "opsPreviewBackend": {
+      "workflow": ".github/workflows/gravicentra-delta-66-ops-function-preview.yml",
+      "causalGuardCommit": "e8780beb570a320d7c2bf0241dc7f6501452e30c",
+      "deploymentAndSignedSyntheticRunId": 44586712991,
+      "status": "SIGNED_CARLOS_AND_PAULA_SYNTHETIC_PREVIEW_CRUD_RELOAD_RESTORE_PASS",
+      "liveBackendDeploys": 0,
+      "customerWrites": 0,
+      "liveHostingPromoted": false
+    },
+    "newPreviewHosting": {
+      "sourceSha": "83c4332f5921e2de331c156440d16095c7acf390",
+      "buildRunId": 44582688094,
+      "previewOnly": true,
+      "livePromotion": false
+    },
+    "sourceBulk": {
+      "sourceManifest": "artifacts/orbit360-recovery/source-batches/I6_6_SOURCE_BULK_20261118_ROBLE_238.json",
+      "reusableWorkflow": ".github/workflows/gravicentra-i66-insurer-source-bulk-protected.yml",
+      "preflightRunId": 44587206592,
+      "preflightResult": "PASS_ZERO_WRITES",
+      "inputRows": 238,
+      "unchangedRows": 174,
+      "readyRows": 1,
+      "exceptionRows": 63,
+      "exceptionCode": "POLICY_EDITION_MISSING",
+      "protectedLiveJobId": 135783683609,
+      "protectedJobLastObservedStatus": "waiting_for_environment_review",
+      "protectedEnvironment": "gravicentra-live-data-writes",
+      "readyCase": {
+        "caseId": "ROBLE_OCT23_0093",
+        "policy": "91-169567",
+        "requirement": "5485467",
+        "receiptGrossBeforeCents": 28807,
+        "receiptGrossAfterCents": 28808,
+        "portfolioGrossBeforeCents": 28807,
+        "amountOfChangeCents": 1,
+        "createsCobro": false
+      },
+      "unmatchedPolicyFamilies": {
+        "noEditionRecordedInFirestore": [
+          {
+            "policy": "91-4140843",
+            "rows": 1
+          },
+          {
+            "policy": "91-4143471",
+            "rows": 11
+          }
+        ],
+        "sourceDatesOutsideRecordedEditions": [
+          {
+            "policy": "91-8322304",
+            "rows": 1
+          },
+          {
+            "policy": "91-8322914",
+            "rows": 1
+          },
+          {
+            "policy": "91-8323091",
+            "rows": 12
+          },
+          {
+            "policy": "91-8324489",
+            "rows": 12
+          },
+          {
+            "policy": "91-8342189",
+            "rows": 12
+          },
+          {
+            "policy": "91-8343059",
+            "rows": 12
+          },
+          {
+            "policy": "91-8357452",
+            "rows": 1
+          }
+        ]
+      },
+      "insurerIssuedPdfTextConfirmedForNew2026_27": [
+        {
+          "policy": "91-4143471",
+          "from": "2026-09-21",
+          "to": "2027-09-21"
+        },
+        {
+          "policy": "91-8324489",
+          "from": "2026-11-16",
+          "to": "2027-11-16"
+        },
+        {
+          "policy": "91-8342189",
+          "from": "2026-11-12",
+          "to": "2027-11-12"
+        },
+        {
+          "policy": "91-8343059",
+          "from": "2026-11-27",
+          "to": "2027-11-27"
+        },
+        {
+          "policy": "91-8357452",
+          "from": "2026-10-27",
+          "to": "2027-10-27"
+        }
+      ],
+      "pdfBackedRowsRequiringCanonicalPolicyAndReceiptHydration": 48,
+      "rowsNotYetBackedByNewEditionPdf": 15,
+      "userBusinessDecisionAlreadyKnown": "Renew same conditions if eligible; never infer insurer issuance from pending statement alone."
+    },
+    "make": {
+      "teamId": 1975919,
+      "greenReadScenario": {
+        "id": 10196136,
+        "status": "inactive",
+        "lastReadExecutionId": "4dacaa4ed8ea4c38a3b8c83be3154549",
+        "lastReadMessageBundles": 0,
+        "writerModules": 0
+      },
+      "adWebhookScenario": {
+        "id": 10195867,
+        "status": "inactive",
+        "writerModules": 0,
+        "executions": 0
+      },
+      "existingFirestoreConnectionInMake": false,
+      "confirmedLeadWrites": 0,
+      "emailScenarioFound": false
+    }
+  },
+  "nextGates": [
+    "Protected reviewer approval for one source-backed El Roble pending receipt-and-cartera correction, followed by postimage readback; no claim until applied.",
+    "Materialize source-document-backed 2026/27 policy editions and receipt schedules using current approved owner/contracts and controls; repeat bounded financial preflight, isolate missing issuance evidence.",
+    "Repair and certify current owner-approved frontend Preview and signed role and route UAT, then exact immutable artifact promotion and LIVE readback, never allow an old-preview-only transport lock to authorize deploy.",
+    "Implement deduplicated lead creator only through an authenticated approved backend or existing authorized Firestore connection; then test Make message-to-lead and email separately.",
+    "Track 295 historical finding identities with scoped current evidence; do not silently declare resolved."
+  ],
+  "noProductionPassClaimWithoutPhysicalEvidence": true
+}
