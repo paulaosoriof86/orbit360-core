@@ -1,0 +1,159 @@
+name: Gravicentra I6.6 Cendoso Paid Cobros Protected
+on:
+  push:
+    branches: [recovery/fase-a-clean-20260831]
+    paths:
+      - .github/workflows/gravicentra-i66-cendoso-paid-protected.yml
+      - tools/gravicentra-i66-cendoso-paid-protected.cjs
+      - tools/gravicentra-i66-cendoso-paid-protected.test.cjs
+      - artifacts/orbit360-recovery/release-control/I6_6_OWNER_DECISIONS_GREENAPI_EMAIL_AND_PAYMENT_20261119.json
+      - artifacts/orbit360-recovery/source-batches/I6_6_SOURCE_CENDOSO_PAID_CANDIDATES_2026.json.gz
+permissions:
+  contents: read
+concurrency:
+  group: gravicentra-i66-cendoso-paid-${{ github.sha }}
+  cancel-in-progress: false
+env:
+  GCLOUD_PROJECT: ays-orbit-360-lab
+  SA_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+  SA_LAB_ALT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+  SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+jobs:
+  preflight:
+    if: >
+      github.repository == 'paulaosoriof86/orbit360-core' &&
+      github.ref_name == 'recovery/fase-a-clean-20260831' &&
+      contains(github.event.head_commit.message, 'I66_CENDOSO_PAID_BATCH_READY')
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    outputs:
+      ready: ${{ steps.judge.outputs.ready }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate pinned legacy source, owner decision and negative tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GCLOUD_PROJECT" = 'ays-orbit-360-lab'
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          node --check tools/gravicentra-i66-cendoso-paid-protected.cjs
+          node tools/gravicentra-i66-cendoso-paid-protected.test.cjs
+      - name: Select existing authorized Firebase identity
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm install --prefix "$RUNNER_TEMP/gi-i66-paid" --ignore-scripts --no-audit --no-fund firebase-admin@13.4.0 >/dev/null
+          echo "NODE_PATH=$RUNNER_TEMP/gi-i66-paid/node_modules" >> "$GITHUB_ENV"
+          python3 - <<'PY'
+          import json,os,pathlib
+          out=pathlib.Path(os.environ['RUNNER_TEMP'])/'gi-i66-existing-paid.json'
+          for name in ('SA_LAB','SA_LAB_ALT','SA_DEFAULT'):
+              try: value=json.loads(os.environ.get(name,''))
+              except (ValueError,TypeError): continue
+              if value.get('type')!='service_account' or value.get('project_id')!='ays-orbit-360-lab' or not value.get('private_key'): continue
+              out.write_text(json.dumps(value),encoding='utf8');out.chmod(0o600)
+              with open(os.environ['GITHUB_ENV'],'a') as env: env.write('GOOGLE_APPLICATION_CREDENTIALS='+str(out)+'\n')
+              print('I66_PAID_EXISTING_FIREBASE_IDENTITY_PASS');break
+          else: raise SystemExit('I66_PAID_NO_EXISTING_FIREBASE_IDENTITY')
+          PY
+      - name: Match legacy paid rows to canonical policies, receipts and cartera (zero writes)
+        shell: bash
+        env:
+          GI_I66_CENDOSO_MODE: preflight
+          GI_I66_CENDOSO_PLAN_OUT: ${{ runner.temp }}/gi-i66-cendoso-paid-plan.json
+          GI_I66_CENDOSO_REPORT_OUT: ${{ runner.temp }}/gi-i66-cendoso-paid-report.json
+        run: |
+          set -euo pipefail
+          node tools/gravicentra-i66-cendoso-paid-protected.cjs
+      - id: judge
+        name: Report actual eligible write count without mutating Firestore
+        shell: bash
+        env:
+          GI_I66_CENDOSO_PLAN_OUT: ${{ runner.temp }}/gi-i66-cendoso-paid-plan.json
+        run: |
+          set -euo pipefail
+          node - <<'JS'
+          const fs=require('fs');const p=JSON.parse(fs.readFileSync(process.env.GI_I66_CENDOSO_PLAN_OUT,'utf8'));
+          if(p.status!=='READONLY_PREFLIGHT_NO_WRITES'||p.writes!==0||p.inputCount!==607||
+             p.readyCount+p.holdsCount!==607)throw Error('I66_PREVIEW_NOT_EXACT');
+          fs.appendFileSync(process.env.GITHUB_OUTPUT,'ready='+(p.readyCount>0?'true':'false')+'\n');
+          console.log('I66_CENDOSO_PREFLIGHT_PASS '+p.readyCount+' eligible, '+p.holdsCount+' isolated holds');
+          JS
+      - name: Preserve plan and actionable hold counts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gi-i66-cendoso-paid-preflight-${{ github.run_id }}
+          path: |
+            ${{ runner.temp }}/gi-i66-cendoso-paid-plan.json
+            ${{ runner.temp }}/gi-i66-cendoso-paid-report.json
+          if-no-files-found: ignore
+          retention-days: 14
+  protected-paid-live:
+    needs: preflight
+    if: needs.preflight.outputs.ready == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    environment:
+      name: gravicentra-live-data-writes
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/download-artifact@v4
+        with:
+          name: gi-i66-cendoso-paid-preflight-${{ github.run_id }}
+          path: ${{ runner.temp }}/i66-paid
+      - name: Reverify owner decision, manifest and receipt/payout invariants inside reviewer gate
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF_NAME" = recovery/fase-a-clean-20260831
+          test "$GCLOUD_PROJECT" = ays-orbit-360-lab
+          node tools/gravicentra-i66-cendoso-paid-protected.test.cjs
+      - name: Select same existing Firebase identity
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm install --prefix "$RUNNER_TEMP/gi-i66-paid" --ignore-scripts --no-audit --no-fund firebase-admin@13.4.0 >/dev/null
+          echo "NODE_PATH=$RUNNER_TEMP/gi-i66-paid/node_modules" >> "$GITHUB_ENV"
+          python3 - <<'PY'
+          import json,os,pathlib
+          out=pathlib.Path(os.environ['RUNNER_TEMP'])/'gi-i66-existing-paid.json'
+          for name in ('SA_LAB','SA_LAB_ALT','SA_DEFAULT'):
+              try: value=json.loads(os.environ.get(name,''))
+              except (ValueError,TypeError): continue
+              if value.get('type')!='service_account' or value.get('project_id')!='ays-orbit-360-lab' or not value.get('private_key'): continue
+              out.write_text(json.dumps(value),encoding='utf8');out.chmod(0o600)
+              with open(os.environ['GITHUB_ENV'],'a') as env: env.write('GOOGLE_APPLICATION_CREDENTIALS='+str(out)+'\n')
+              print('I66_PAID_PROTECTED_FIREBASE_IDENTITY_PASS');break
+          else: raise SystemExit('I66_PAID_PROTECTED_IDENTITY_HOLD')
+          PY
+      - name: Commit unique owner-approved confirmed Cobros and read back every receipt and cartera
+        shell: bash
+        env:
+          GI_I66_CENDOSO_MODE: apply
+          GI_I66_PROTECTED_ENV: gravicentra-live-data-writes
+          GI_I66_CENDOSO_PLAN_IN: ${{ runner.temp }}/i66-paid/gi-i66-cendoso-paid-plan.json
+          GI_I66_CENDOSO_REPORT_OUT: ${{ runner.temp }}/gi-i66-cendoso-paid-live.json
+        run: |
+          set -euo pipefail
+          node tools/gravicentra-i66-cendoso-paid-protected.cjs
+      - name: Persist protected paid-write readback and isolated holds
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gi-i66-cendoso-paid-live-${{ github.run_id }}
+          path: ${{ runner.temp }}/gi-i66-cendoso-paid-live.json
+          if-no-files-found: ignore
+          retention-days: 90
