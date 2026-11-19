@@ -12,6 +12,10 @@ on:
     branches: [recovery/fase-a-clean-20260831]
     paths:
       - artifacts/orbit360-recovery/release-control/I6_6_APPROVED_PRODUCT_DELTA_MANIFEST_20261110.json
+      # A signed source QA run binds its exact manifest into this release
+      # transport control. The resulting CAS update must re-enter this same
+      # immutable package gate; otherwise it leaves the gate stranded on HOLD.
+      - artifacts/orbit360-recovery/release-control/I6_6_RELEASE_TRANSPORT_CONTROL_20261110.json
       - tools/gravicentra-i6-6-delta-guard.mjs
       # The same I6.6 release gate verifies the insurer-source bulk preflight.
       # No financial writes occur in this workflow.
