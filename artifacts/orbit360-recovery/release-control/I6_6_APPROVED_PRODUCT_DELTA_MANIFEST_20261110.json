@@ -3019,6 +3019,78 @@
           "replaces": {"path":"tools/gravicentra-i6-6-primas-calendar-forward-only.test.cjs","priorGitBlobSha":"e649591392d2a4d0f35b3ea7d718e5ea0ecbaa79","priorChangeId":"I6_6_FORWARD_ONLY_UTC_MONTHLY_CADENCE_WITH_TERM_GUARD"}
         }
       ]
+    },
+    {
+      "id": "I6_6_OWNER_APPROVED_SOURCE_LINEAGE_SUCCESSOR_20261119",
+      "approvedByDirection": true,
+      "receipt": "Paula 2026-11-19: autorizo continuar el plan congelado, correcciones de inicio, cadencia y Cliente360/Ops/Leads con pruebas y release sin sustituir source aprobado; evidencia I6_6_OWNER_DECISIONS_GREENAPI_EMAIL_AND_PAYMENT_20261119.json y source commits cedb1cc98/5648fcd3.",
+      "sourceStatus": "EXACT_SOURCE_BLOBS_UNIT_QA_PASS_PREVIEW_AND_LIVE_PENDING",
+      "scope": "Reconciliacion de lineage del ultimo source: auth-first, cliente-inspeccion-cadencia, rol y cartera. Esta aceptacion de source NO acepta Preview/LIVE ni autoriza datos nuevos o otra version.",
+      "paths": [
+        {
+          "path": "functions/tenant-domain-config.js",
+          "gitBlobSha": "225014974d79cf4618f59918c3b8ee7afe12b215"
+        },
+        {
+          "path": "orbit360-platform/modules/config-domain-v20260804-bridge.js",
+          "gitBlobSha": "30fa9845bb38a3dc0ff72771675fdf1e9aa25625"
+        },
+        {
+          "path": "orbit360-platform/modules/leads.js",
+          "gitBlobSha": "30096b0e8786b089d8cf3912655b439b1db0563a"
+        },
+        {
+          "path": "orbit360-platform/core/product-runtime-browser-providers-p0.js",
+          "gitBlobSha": "1c5e1dff60af7fea53a14276aeecc7273c26ad81",
+          "replaces": {"path":"orbit360-platform/core/product-runtime-browser-providers-p0.js","priorGitBlobSha":"1a43a9a297908b7131bc245320894cb92195f065","priorChangeId":"I6_6_AUTHENTICATED_INCREMENTAL_SOURCE_INTAKE_V2_20261117"}
+        },
+        {
+          "path": "orbit360-platform/core/auth-product-runtime-p0.js",
+          "gitBlobSha": "799bbd849a00e2591738d23b64795757980f1e5a",
+          "replaces": {"path":"orbit360-platform/core/auth-product-runtime-p0.js","priorGitBlobSha":"871c9661343043cdbabfa76630dd216d03c54927","priorChangeId":"I6_6_PROTECTED_PREVIEW_HOST_AND_READONLY_SELF_ACCESS"}
+        },
+        {
+          "path": "orbit360-platform/core/ciclo.js",
+          "gitBlobSha": "1e13c2021d4974ccf7d2953cd3cde62d05210876",
+          "replaces": {"path":"orbit360-platform/core/ciclo.js","priorGitBlobSha":"bbff5210dfc7d660e6b003d4ce78b210da37da7f","priorChangeId":"I6_6_OPS_INTERNAL_NOTICE_HUMAN_ACTOR_COMPAT_20261118"}
+        },
+        {
+          "path": "functions/product-ops-leads-domain.js",
+          "gitBlobSha": "cb623163b64cbed890a63713265e4bf85cbc0b4c",
+          "replaces": {"path":"functions/product-ops-leads-domain.js","priorGitBlobSha":"2628a829579e79256e9648b52f13dd9adfe62543","priorChangeId":"I6_6_OPS_CLIENT_MANAGEMENT_CATALOG_NOTIFICATIONS_20261118"}
+        },
+        {
+          "path": "orbit360-platform/modules/cliente360.js",
+          "gitBlobSha": "c3d9e3ba324d84dc989bbdebf2d0d1480a76c228",
+          "replaces": {"path":"orbit360-platform/modules/cliente360.js","priorGitBlobSha":"388cd1ee015201c1bef779318fb91e18cd6b93a7","priorChangeId":"I6_6_OPS_CLIENT_MANAGEMENT_CATALOG_NOTIFICATIONS_20261118"}
+        },
+        {
+          "path": "orbit360-platform/index.html",
+          "gitBlobSha": "6c0cfd7366c414f9d4dad2130fcf857244e548db",
+          "replaces": {"path":"orbit360-platform/index.html","priorGitBlobSha":"dd58634927d86a10f9feaf7ed8d5cefe3db420cf","priorChangeId":"I6_6_INBOX_CHIME_COUNTRY_SCOPE_P0"}
+        },
+        {
+          "path": "orbit360-platform/core/queries.js",
+          "gitBlobSha": "2ba6edc8a04e7cc6140db2bcad0ee213c17d785a",
+          "replaces": {"path":"orbit360-platform/core/queries.js","priorGitBlobSha":"8d08aa5bc96b3da6025e10d5f3018996edf7bab8","priorChangeId":"I6_6_ADVISOR_PORTFOLIO_HISTORICAL_BENEFICIARY_AND_COMPONENT_ROUNDING_20261115"}
+        }
+      ],
+      "tests": [
+        {
+          "path": "tools/gravicentra-i6-6-source-lineage-reconciliation.test.cjs",
+          "gitBlobSha": "e67279373f0d3154c382acd0cf63f8017779c43b"
+        },
+        {
+          "path": "tools/gravicentra-i6-6-roles-payment-expiry-hotfix.test.cjs",
+          "gitBlobSha": "88f3d7e2b3489a9d229e01d3ff662b3d966a5d55",
+          "replaces": {"path":"tools/gravicentra-i6-6-roles-payment-expiry-hotfix.test.cjs","priorGitBlobSha":"dc717555e60d0405ba14c38f0a4739dfb1056130","priorChangeId":"I6_6_OPERATIVE_ADVISOR_PAYMENT_INVOICE_EXPIRY_BATCH_20261113"}
+        },
+        {
+          "path": "tools/gravicentra-i6-6-protected-role-policy-hydration.test.cjs",
+          "gitBlobSha": "d28c721a333bed95316cd31a092da3d3185df6a7",
+          "replaces": {"path":"tools/gravicentra-i6-6-protected-role-policy-hydration.test.cjs","priorGitBlobSha":"ed356dd4e7bcb9cd20e0f43215f7dbc38b7dbdbd","priorChangeId":"I6_6_PROTECTED_ROLE_MATRIX_HYDRATION_ORDER_20261117"}
+        }
+      ]
     }
   ],
   "i66R11PreviewBuildRequest20261113": {
