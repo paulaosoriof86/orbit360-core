@@ -6,7 +6,21 @@ import {GoogleAuth} from 'google-auth-library';
 
 const SITE='ays-orbit-360-lab',PROJECT='ays-orbit-360-lab';
 const REQUEST=process.env.I66_APPROVED_RELEASE_REQUEST||'artifacts/orbit360-recovery/release-control/I6_6_EXACT_HOSTING_LIVE_PROMOTION_REQUEST_20261110.json';
-const request=JSON.parse(fs.readFileSync(REQUEST,'utf8'));
+const rawRequest=JSON.parse(fs.readFileSync(REQUEST,'utf8'));
+const signedClientSuccessor=rawRequest.schema==='GRAVICENTRA_I6_6_CLIENTE360_ADVISOR_EXACT_LIVE_V1';
+// The existing I6.6 rollback/clone owner consumes the signed successor directly.
+// Internal field aliases let the legacy verified byte-for-byte transport remain
+// unchanged. The actual approval is always revalidated against rawRequest.
+const request=signedClientSuccessor?Object.freeze({...rawRequest,
+  expectedOldSourceSha:rawRequest.expectedPriorLiveSourceSha,
+  expectedOldBuildId:rawRequest.expectedPriorLiveBuildId,
+  expectedOldHostingVersion:rawRequest.expectedPriorLiveHostingVersion,
+  artifactZipSha256:String(rawRequest.artifactDigest||'').replace(/^sha256:/,''),
+  qaRunId:rawRequest.buildRunId,
+  historicalGateClosed:'B4-007',activeGate:'I6.6',
+  businessDataWritesAuthorized:false,mustRollbackOnMismatch:true,
+  noBackendDeploy:true,noFirestoreAuthOrDataWrites:true
+}):rawRequest;
 const packageRoot=process.env.I66_PACKAGE_ROOT||'';
 const cli=process.env.FIREBASE_CLI_BIN||'';
 const cred=process.env.GOOGLE_APPLICATION_CREDENTIALS||'';
@@ -17,7 +31,7 @@ const pause=ms=>new Promise(r=>setTimeout(r,ms));
 const safe=v=>String(v||'').replace(/[^a-zA-Z0-9_-]/g,'').slice(0,120);
 const ver=v=>/^sites\/ays-orbit-360-lab\/versions\/[A-Za-z0-9_-]+$/.test(String(v||''));
 const evidence={schema:'I6_6_LIVE_EXACT_HOSTING_CLONE_READBACK_V1',gate:'I6.6',sourceSha:request.sourceSha,buildId:request.buildId,
-  artifactId:request.artifactId,previewChannel:request.previewChannel,status:'HOLD',liveBeforeVersion:'',previewVersion:'',liveAfterVersion:'',
+  artifactId:request.artifactId,previewChannel:request.previewChannel,requestSchema:rawRequest.schema,status:'HOLD',liveBeforeVersion:'',previewVersion:'',liveAfterVersion:'',
   firebaseLiveReadbackCount:0,appDomainReadbackCount:0,previewReadbackCount:0,dataWrites:0,backendDeployments:0,rollback:'NOT_REQUIRED'};
 let oldVersion='',promoting=false;
 async function bytes(origin,p,attempts=3){
@@ -85,6 +99,105 @@ function cloneToLive(version){
     {encoding:'utf8',stdio:['ignore','pipe','pipe'],timeout:180000,env:process.env});
 }
 function validateRequest(){
+  if(signedClientSuccessor){
+    need(rawRequest.gate==='I6.6'&&rawRequest.status==='OWNER_AUTHORIZED_TARGETED_LIVE_PENDING_PROTECTED_RUN'&&rawRequest.approvedByDirection===true,'I66_CLIENTE360_OWNER_APPROVAL_MISSING');
+    for(const k of ['sameImmutableArtifactPreviewAndLive','exactAllFilesDualOriginReadback','requireRoleSignedLiveSyntheticWriteReloadAndCleanup','requireLiveEditAndNewClientGermanPriscilaRealRoleReadback','requireExistingOpsAndPaymentLiveSyntheticUat','rollbackLiveBackendTrafficAndHostingOnAnyFailure','noFirestoreRulesAuthOrOtherBackendFunctions','noRealFinancialDataBackfillOrPaymentWrites','rollbackOnAnyDivergentRuntime'])
+      need(rawRequest[k]===true,'I66_CLIENTE360_RELEASE_GUARD_MISSING_'+k);
+    need(rawRequest.doNotClaimFullPlatformProductionAccepted===true&&rawRequest.doNotClaimFocalCaseEdsonDataUpdatedWithoutWriteReadback===true,'I66_CLIENTE360_SCOPE_OVERCLAIM');
+    need(rawRequest.signedPreviewScope?.realCarlosOperativoLogin===true&&rawRequest.signedPreviewScope?.germanAndPriscilaActualEditNewClientPolicyOps===true&&rawRequest.signedPreviewScope?.signedCarlosAndDirectionOpsLeadsSyntheticCreateUpdateResolveReloadRestore===true&&rawRequest.signedPreviewScope?.signedBothRolePaymentReceiptCobroPortfolioSyntheticWriteReloadRestore===true&&rawRequest.signedPreviewScope?.realCustomerWrites===0,'I66_CLIENTE360_SIGNED_UAT_SCOPE_INVALID');
+    need(rawRequest.sourceSha==='72d3580f3e90071b360319ce5f204d348b401663'&&rawRequest.buildRunId===44637404427&&rawRequest.artifactId===14584217893&&rawRequest.signedCarlosPaulaPreviewUatRunId===44637887342,'I66_CLIENTE360_SIGNED_PROOF_IDENTITY_DRIFT');
+    need(rawRequest.expectedPriorLiveSourceSha==='b38f877f7847c7b6e11506885e42252e84c5eeb6'&&rawRequest.expectedPriorLiveHostingVersion==='sites/ays-orbit-360-lab/versions/13944f80ba1e0bdf','I66_CLIENTE360_LIVE_ROLLBACK_BACKUP_UNPINNED');
+    need(rawRequest.previewChannel==='gi-i66-rc-'+rawRequest.buildRunId&&/^sha256:[0-9a-f]{64}$/.test(rawRequest.artifactDigest||''),'I66_CLIENTE360_ARTIFACT_OR_CHANNEL_INVALID');
+    need(new RegExp('^https://ays-orbit-360-lab--'+rawRequest.previewChannel+'-[a-z0-9]+\\.web\\.app&&request.status==='LIVE_HOSTING_CLONE_APPROVED_AFTER_TARGETED_PREVIEW_QA_PASS','I66_LIVE_PROMOTION_NOT_APPROVED');
+  need(request.approvedByDirection===true&&request.historicalGateClosed==='B4-007'&&request.noBackendDeploy===true&&request.noFirestoreAuthOrDataWrites===true,'I66_PROMOTION_SCOPE_INVALID');
+  need(request.activeGate==='I6.6'&&Number.isSafeInteger(request.qaRunId)&&request.qaRunId>0&&request.buildRunId===request.qaRunId&&Number.isSafeInteger(request.artifactId)&&request.artifactId>0,'I66_APPROVAL_PROOFS_INVALID');
+  const standardChannel='gi-i66-rc-'+request.buildRunId;
+  const controlledQuotaReuse=request.reusedPreviewChannelAfterQuota429===true&&
+    request.sourceSha==='8a0e904500cbb3c961d83f16517caab69df88a2b'&&
+    request.buildRunId===43448848169&&
+    request.previewChannel==='gi-i66-rc-42868854629'&&
+    request.expectedOldHostingVersion==='sites/ays-orbit-360-lab/versions/dae5d5235978cefe';
+  need(/^[0-9a-f]{40}$/.test(request.sourceSha||'')&&
+    (request.previewChannel===standardChannel||controlledQuotaReuse),'I66_APPROVED_SOURCE_OR_CHANNEL_DRIFT');
+  need(request.buildId==='gi-i66-'+request.sourceSha.slice(0,12)+'-57f234755dc1','I66_APPROVED_BUILD_ID_DRIFT');
+  need(new RegExp('^https://ays-orbit-360-lab--'+request.previewChannel+'-[a-z0-9]+\\.web\\.app$').test(request.previewUrl||''),'I66_PREVIEW_ORIGIN_DRIFT');
+  need(/^[0-9a-f]{64}$/.test(request.artifactZipSha256||''),'I66_ARTIFACT_DIGEST_INVALID');
+  need(/^[0-9a-f]{40}$/.test(request.expectedOldSourceSha||'')&&request.expectedOldSourceSha!==request.sourceSha&&
+    request.expectedOldBuildId==='gi-i66-'+request.expectedOldSourceSha.slice(0,12)+'-57f234755dc1','I66_HISTORICAL_LIVE_BASE_DRIFT');
+  need(request.mustRollbackOnMismatch===true&&request.businessDataWritesAuthorized===false,'I66_ROLLBACK_AND_DATA_WRITE_GUARD_MISSING');
+}
+try{
+  validateRequest();
+  need(packageRoot&&cli&&cred&&fs.existsSync(path.join(packageRoot,'bundle/site/__recovery__/build.json')),'I66_IMMUTABLE_PACKAGE_NOT_MOUNTED');
+  const pkg=JSON.parse(fs.readFileSync(path.join(packageRoot,'bundle/site/__recovery__/build.json'),'utf8'));
+  need(pkg.gate==='I6.6'&&pkg.sourceSha===request.sourceSha&&pkg.buildId===request.buildId,'I66_IMMUTABLE_PACKAGE_IDENTITY_DRIFT');
+  const rows=expectedRows();
+  evidence.previewReadbackCount=await verifyOrigin(request.previewUrl,rows);
+  authClient=await new GoogleAuth({keyFile:cred,scopes:['https://www.googleapis.com/auth/firebase.hosting']}).getClient();
+  const [firebaseBefore,customBefore,old,previewVersion]=await Promise.all([
+    marker('https://ays-orbit-360-lab.web.app'),marker('https://app.aysseguros.com'),getLatestRelease('live'),getLatestRelease(request.previewChannel)
+  ]);
+  need(firebaseBefore.sourceSha===request.expectedOldSourceSha&&customBefore.sourceSha===request.expectedOldSourceSha&&
+    firebaseBefore.buildId===request.expectedOldBuildId&&customBefore.buildId===request.expectedOldBuildId,
+    'I66_LIVE_ORIGIN_BASE_CHANGED_BEFORE_CLONE');
+  if(request.expectedOldHostingVersion)need(old===request.expectedOldHostingVersion,'I66_LIVE_HOSTING_VERSION_CHANGED_BEFORE_CLONE');
+  oldVersion=old;evidence.liveBeforeVersion=old;evidence.previewVersion=previewVersion;
+  need(old!==previewVersion,'I66_SOURCE_AND_TARGET_ALREADY_EQUAL');
+  const [beforeAgain,oldAgain]=await Promise.all([marker('https://ays-orbit-360-lab.web.app'),getLatestRelease('live')]);
+  need(oldAgain===old,'I66_LIVE_RELEASE_VERSION_CHANGED_DURING_PREFLIGHT');
+  need(beforeAgain.sourceSha===request.expectedOldSourceSha&&beforeAgain.buildId===request.expectedOldBuildId,
+    'I66_LIVE_SOURCE_CHANGED_DURING_PREFLIGHT');
+  // Clone the pre-certified, uniquely version-pinned Hosting release. Never rebuild.
+  promoting=true;
+  cloneToLive(previewVersion);
+  await Promise.all([
+    awaitMarker('https://ays-orbit-360-lab.web.app',request.sourceSha,request.buildId,15),
+    awaitMarker('https://app.aysseguros.com',request.sourceSha,request.buildId,15)
+  ]);
+  evidence.firebaseLiveReadbackCount=await verifyOrigin('https://ays-orbit-360-lab.web.app',rows);
+  evidence.appDomainReadbackCount=await verifyOrigin('https://app.aysseguros.com',rows);
+  const newest=await getLatestRelease('live');
+  need(newest===previewVersion,'I66_LIVE_HOSTING_VERSION_NOT_CLONED_EXACTLY');
+  evidence.liveAfterVersion=newest;
+  if(signedClientSuccessor){
+    // The only acceptable post-deploy smoke is the signed Carlos session against
+    // the actual LIVE selectors (not the shadowed form), with no business writes.
+    // A smoke failure is caught below and reverses the Hosting clone.
+    execFileSync(process.execPath,['tools/gravicentra-i6-6-carlos-german-assignment-roster-readonly.cjs'],
+      {cwd:process.cwd(),env:{...process.env,I66_PROVE_LIVE_NEW_CLIENT:request.sourceSha},
+       stdio:['ignore','pipe','pipe'],timeout:180000});
+    evidence.signedCarlosLiveEditNewPolicyOpsReadOnly=true;
+  }
+  evidence.status=signedClientSuccessor?'LIVE_HOSTING_AND_CARLOS_ROSTER_SAME_ARTIFACT_PASS_FULL_I66_HOLD':'LIVE_HOSTING_SAME_ARTIFACT_READBACK_PASS_NOT_FULL_UAT';
+}catch(err){
+  const code=String(err?.message||err||'');
+  evidence.blocker=/^I66_[A-Z0-9_]+$/.test(code)?code:'I66_RELEASE_EXECUTION_FAILED';
+  if(promoting&&oldVersion){
+    try{
+      cloneToLive(oldVersion);
+      await Promise.all([
+        awaitMarker('https://ays-orbit-360-lab.web.app',request.expectedOldSourceSha,request.expectedOldBuildId,15),
+        awaitMarker('https://app.aysseguros.com',request.expectedOldSourceSha,request.expectedOldBuildId,15)
+      ]);
+      evidence.rollback='CONFIRMED_OLD_EXACT_HOSTING_VERSION_RESTORED';
+    }catch{evidence.rollback='CRITICAL_UNCONFIRMED_ROLLBACK';}
+  }
+  process.exitCode=1;
+}finally{
+  fs.writeFileSync(out,JSON.stringify(evidence,null,2)+'\n',{mode:0o600});
+  console.log('I66_LIVE_HOSTING_STATUS='+evidence.status);
+  console.log('I66_LIVE_HOSTING_SOURCE='+evidence.sourceSha);
+  console.log('I66_LIVE_PREVIEW_READBACK_FILES='+evidence.previewReadbackCount);
+  console.log('I66_LIVE_FIREBASE_READBACK_FILES='+evidence.firebaseLiveReadbackCount);
+  console.log('I66_LIVE_APP_READBACK_FILES='+evidence.appDomainReadbackCount);
+  console.log('I66_LIVE_BACKEND_OR_DATA_WRITES='+evidence.backendDeployments+':'+evidence.dataWrites);
+  console.log('I66_LIVE_ROLLBACK='+evidence.rollback);
+  if(evidence.blocker)console.log('I66_LIVE_BLOCKER='+safe(evidence.blocker));
+}
+).test(rawRequest.previewUrl||''),'I66_CLIENTE360_PREVIEW_ORIGIN_NOT_EXACT');
+    need(rawRequest.buildId==='gi-i66-'+rawRequest.sourceSha.slice(0,12)+'-57f234755dc1'&&request.artifactZipSha256.length===64,'I66_CLIENTE360_BUILD_SOURCE_DRIFT');
+    return;
+  }
   need(request.schema==='I6_6_EXACT_HOSTING_LIVE_PROMOTION_V1'&&request.status==='LIVE_HOSTING_CLONE_APPROVED_AFTER_TARGETED_PREVIEW_QA_PASS','I66_LIVE_PROMOTION_NOT_APPROVED');
   need(request.approvedByDirection===true&&request.historicalGateClosed==='B4-007'&&request.noBackendDeploy===true&&request.noFirestoreAuthOrDataWrites===true,'I66_PROMOTION_SCOPE_INVALID');
   need(request.activeGate==='I6.6'&&Number.isSafeInteger(request.qaRunId)&&request.qaRunId>0&&request.buildRunId===request.qaRunId&&Number.isSafeInteger(request.artifactId)&&request.artifactId>0,'I66_APPROVAL_PROOFS_INVALID');
