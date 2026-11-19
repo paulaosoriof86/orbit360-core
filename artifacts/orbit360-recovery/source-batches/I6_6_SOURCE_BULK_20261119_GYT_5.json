@@ -4,7 +4,7 @@
   "tenantId": "alianzas-soluciones",
   "projectId": "ays-orbit-360-lab",
   "ownerRuleReference": "PAULA_EXPLICIT_2026-11-18_REQUIREMENT_PER_RECEIPT_AND_GROSS_SOURCE_PRECEDENCE; PAULA_EXPLICIT_2026-11-19_INSURER_STATEMENT_PERIOD_DUE_REQUIREMENT_AND_CURRENCY_PREVAIL_WITH_DEDUPE",
-  "technicalPreflightRevision": "2026-11-19-GYT-modified-211314Z-raw-xlsx-five-source-open-rows-hash-verified-no-Cobros",
+  "technicalPreflightRevision": "2026-11-19-issuer-numeric-AUTO-prefix-exact-identity-recheck-no-lax-match",
   "document": {
     "filename": "Balance de cuenta GyT a Noviembre 19.xlsx",
     "googleDriveFileId": "11qssA9ETh74h9kFJMYYg-2CDSGaaqFL8",
@@ -102,6 +102,39 @@
     }
   ],
   "writesPerformedByThisManifest": 0,
-  "preflightStatus": "NOT_EXECUTED",
-  "authorizationScope": "EXISTING_I6_6_INSURER_SOURCE_BULK_PROTECTED_PREFLIGHT_ONLY_FIRST_AFTER_REVIEW_OF_ACTUAL_DIFF"
+  "preflightStatus": "REQUESTED_READONLY_RECHECK_AFTER_MATCHER_FIX_NO_WRITES",
+  "authorizationScope": "EXISTING_I6_6_INSURER_SOURCE_BULK_PROTECTED_PREFLIGHT_ONLY_FIRST_AFTER_REVIEW_OF_ACTUAL_DIFF",
+  "revalidationAgainstIssuedPolicyDocuments20261119": {
+    "541608": {
+      "sourceDrivePdfId": null,
+      "editionDocumentLocatedInExactSearch": false,
+      "requiresFreshLivePolicyAliasProof": true
+    },
+    "scope": "INSURER_NUMBER_ALIAS_PREFLIGHT_ONLY_NO_UNPROVEN_PAYMENT",
+    "canonicalMatcherSourceCommit": "6de41297e58d081f3f4713ce009c344652512dd1",
+    "AUTO-492287": {
+      "sourceDrivePdfId": "1QJfbs5J4SSi4HRAePHi2VrGbQhhUxeEe",
+      "policyIssued2026": true,
+      "effectiveFrom": "2026-08-06",
+      "effectiveTo": "2027-08-06",
+      "policyNumberInDocument": "AUTO-492287",
+      "insurer": "G&T",
+      "documentaryDueForStatementFirstRow": "NOT_ESTABLISHED_BY_POLICY_COVER_PAGE",
+      "policyTermNotOverrideInsurerRequirement": true
+    },
+    "AUTO-519815": {
+      "sourceDrivePdfId": "1mZdJj9Ft7nrW87Jf7Od4bMpb-1SamjJR",
+      "policyIssued2026": true,
+      "effectiveFrom": "2026-10-28",
+      "effectiveTo": "2027-10-28",
+      "policyNumberInDocument": "AUTO-519815",
+      "verifiedDocumentaryRequirementExamples": [
+        "995653882",
+        "995653883"
+      ],
+      "insurer": "G&T",
+      "datePaymentSource": "INSURER_PENDING_STATEMENT_AND_RENEWAL_REQUIREMENTS"
+    },
+    "verificationRule": "Never create Cobros from INC balance. A G&T numeric source policy matches issued AUTO-number ONLY when insurer, effective edition, exact pending receipt/requirement, amount, active scope and current server CAS preimage all corroborate; otherwise isolate case and request document."
+  }
 }
