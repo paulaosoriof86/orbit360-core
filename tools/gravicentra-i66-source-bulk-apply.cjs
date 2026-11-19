@@ -69,7 +69,7 @@ async function applyOne(db,row,gate){
       policyReceipts.size>120)hold('IDENTITY_OR_PAYMENT');
     const monthlyIndex=monthlySequence(p,row.due);
     const monthlyMatch=row.matchMethod==='COMPLETE_MONTHLY_INSURER_DATE' &&
-      !due(r)&&monthlyIndex!=null&&
+      due(r)!==row.due&&monthlyIndex!=null&&
       internalSequence(r.numeroReciboFuente)===monthlyIndex&&
       completeMonthlySchedule({receipts:policyReceipts.docs.map(s=>s.data())})&&
       (r.numeroCuota==null||Number(r.numeroCuota)===monthlyIndex)&&

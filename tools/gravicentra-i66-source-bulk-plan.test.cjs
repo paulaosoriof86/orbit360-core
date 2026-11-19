@@ -82,6 +82,11 @@ const monthlyPlan=planSourceBatch(monthly.raw,monthly.groups);
 assert.equal(monthlyPlan.readyCount,1);
 assert.equal(monthlyPlan.chunks[0].rows[0].matchMethod,'COMPLETE_MONTHLY_INSURER_DATE');
 assert.equal(monthlyPlan.chunks[0].rows[0].receiptId,'rec_schedule_4');
+monthly.groups[0].receipts.find(r=>r.numeroReciboFuente==='4/12').fechaVencimientoContractual='2026-11-29';
+const correctedDue=planSourceBatch(monthly.raw,monthly.groups);
+assert.equal(correctedDue.readyCount,1);
+assert.equal(correctedDue.chunks[0].rows[0].oldContractualDue,'2026-11-29');
+delete monthly.groups[0].receipts.find(r=>r.numeroReciboFuente==='4/12').fechaVencimientoContractual;
 monthly.groups[0].receipts.pop();
 assert.equal(planSourceBatch(monthly.raw,monthly.groups).exceptionCount,1);
 monthly.groups[0].receipts.push({id:'rec_schedule_12',polizaId:'p0',moneda:'GTQ',

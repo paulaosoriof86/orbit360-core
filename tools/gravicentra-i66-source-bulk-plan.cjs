@@ -128,14 +128,16 @@ function planSourceBatch(rawRows, policyGroups, options = {}) {
       // contractual due, or corroborate a unique installment sequence.
       return dueOf(r) === row.due ||
         row.installment != null && Number(r.secuencia || r.numeroCuota) === row.installment ||
-        eligibleSchedule && !dueOf(r) && internalSequence(r.numeroReciboFuente) === monthlyIndex;
+        // The insurer's issued date also corrects a stale contractual date
+        // stored on the exact numbered I6 installment (never fechaLimite).
+        eligibleSchedule && internalSequence(r.numeroReciboFuente) === monthlyIndex;
     });
     if (matches.length !== 1) {
       exceptions.push({caseId: row.caseId, code: matches.length ? 'RECEIPT_AMBIGUOUS' : 'RECEIPT_NOT_IDENTIFIED'});
       continue;
     }
     const receipt = matches[0], rid = str(receipt.id);
-    const matchMethod = eligibleSchedule && !dueOf(receipt) &&
+    const matchMethod = eligibleSchedule && dueOf(receipt)!==row.due &&
       internalSequence(receipt.numeroReciboFuente) === monthlyIndex ?
       'COMPLETE_MONTHLY_INSURER_DATE' : 'EXACT_CONTRACTUAL_OR_INSTALLMENT';
     if (!rid || seenTargets.has(rid)) {

@@ -133,6 +133,8 @@ const plan=planSourceBatch(source,groups),gate={environment:'gravicentra-live-da
       const rid='rec_'+policyId+'_'+n, cid='car_'+policyId+'_'+n;
       const receipt={id:rid,polizaId:policyId,moneda:'GTQ',
         numeroReciboFuente:n+'/12',fechaLimite:'2027-12-22',
+        ...(policyId==='p-month-a'&&n===4?
+          {fechaVencimientoContractual:'2026-11-29'}:{}),
         primaTotal:gross/100-0.5,primaNeta:gross/100-20,estado:'Pendiente'};
       const port={id:cid,polizaId:policyId,reciboId:rid,moneda:'GTQ',
         primaTotal:gross/100-0.5,carteraActiva:true,clienteId:'cli1'};
@@ -171,6 +173,13 @@ const plan=planSourceBatch(source,groups),gate={environment:'gravicentra-live-da
     assert.equal(updated.primaTotal,row.grossCents/100);
     assert.equal(updated.primaNeta,row.grossCents/100-20);
   }
+  const correctedFirst=monthlyPlan.chunks[0].rows.find(row=>
+    row.policy==='91-MONTH-A'&&row.due==='2026-11-14');
+  assert.equal(correctedFirst.oldContractualDue,'2026-11-29');
+  const originalDueAudit=[...monthlyDb.docs.entries()].filter(([key,value])=>
+    key.includes('/operationalRequests/')&&value.receiptId===correctedFirst.receiptId);
+  assert.equal(originalDueAudit.length,1);
+  assert.equal(originalDueAudit[0][1].rollback.fechaVencimientoContractual,'2026-11-29');
   const monthlyReplay=await applyProtectedBatch(monthlyDb,monthlyPlan,gate);
   assert.equal(monthlyReplay.alreadyApplied,19);
   assert.equal(monthlyDb.writes,57);
