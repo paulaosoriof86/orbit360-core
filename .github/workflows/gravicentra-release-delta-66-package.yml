@@ -237,8 +237,10 @@ jobs:
           // A successor never mutates the original approved request. This
           // exact new request must attest an already successful source CI run
           // and a manifest blob pinned to this immutable source tree.
-          const financeSuccessor=!!c.postAcceptanceInsurerTotalsPreviewBuildRequest20261118;
-          const successor=c.postAcceptanceInsurerTotalsPreviewBuildRequest20261118||
+          const ownerSuccessor=!!c.postAcceptanceOwnerP0PreviewBuildRequest20261119;
+          const financeSuccessor=ownerSuccessor||!!c.postAcceptanceInsurerTotalsPreviewBuildRequest20261118;
+          const successor=c.postAcceptanceOwnerP0PreviewBuildRequest20261119||
+            c.postAcceptanceInsurerTotalsPreviewBuildRequest20261118||
             c.postAcceptanceProductSourcePreviewBuildRequest20261118||null;
           let successorBuild=false;
           if(successor){
@@ -251,10 +253,18 @@ jobs:
               const expectedWorkflow='.github/workflows/gravicentra-i66-privileged-role-parity-source-qa.yml';
               const runId=successor.sourceQaRunId;
               const sourceHead=successor.sourceQaHead;
+              const expectedScope=ownerSuccessor?
+                'EXACT_IMMUTABLE_PREVIEW_ONLY_INSURER_PRODUCT_COMMISSION_AND_ROBLE_BULK_WRITER':
+                'EXACT_IMMUTABLE_PREVIEW_ONLY_INSURER_GROSS_RECEIPT_APPLICATION';
+              const ownerProductPin=ownerSuccessor&&
+                successor.sourceQaProductCommissionTests===3&&
+                successor.productCommissionTestBlobSha===
+                  execFileSync('git',['rev-parse','HEAD:tools/gravicentra-i6-6-insurer-product-commission.test.cjs'],{encoding:'utf8'}).trim();
               if(!Number.isSafeInteger(runId)||runId<=0||!/^[0-9a-f]{40}$/.test(sourceHead)||
                   successor.sourceQaWorkflow!==expectedWorkflow||
-                  successor.releaseScope!=='EXACT_IMMUTABLE_PREVIEW_ONLY_INSURER_GROSS_RECEIPT_APPLICATION'||
-                  successor.sourceQaLocalFinancialTests!==113||successor.sourceQaLocalFinancialWrites!==0||
+                  successor.releaseScope!==expectedScope||
+                  (ownerSuccessor?!ownerProductPin:successor.sourceQaLocalFinancialTests!==113)||
+                  successor.sourceQaLocalFinancialWrites!==0||
                   successor.sourceReadyForNewImmutablePackage!==true||successor.previewOnlyNoLive!==true)
                 throw Error('I66_FINANCE_PREVIEW_SOURCE_AUTH_INVALID');
               const qa=JSON.parse(execFileSync('gh',['api',`repos/${process.env.GITHUB_REPOSITORY}/actions/runs/${runId}`],
