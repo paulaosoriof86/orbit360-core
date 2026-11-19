@@ -98,12 +98,15 @@ async function main(){
         id:g.policy.id,pais:g.policy.pais,moneda:g.policy.moneda,
         insurer:g.insurerName,clientExists:g.clientExists,
         insurerVerified:g.insurerVerified,estado:g.policy.estado,
+        frecuencia:g.policy.frecuencia,cuotas:g.policy.cuotas,
         vigenciaInicio:g.policy.vigenciaInicio,vigenciaFin:g.policy.vigenciaFin,
         receiptsCount:g.receipts.length,portfolioCount:g.portfolio.length,
         cobrosCount:g.cobros.length,
         receipts:g.receipts.slice(0,24).map(r=>({id:r.id,sourceRef:r.numeroReciboFuente,
           due:r.fechaVencimientoContractual||r.vence||r.fechaVencimiento,
-          sequence:r.secuencia||r.numeroCuota,gross:r.primaTotal}))}))
+          operationalLimit:r.fechaLimite,sequence:r.secuencia||r.numeroCuota,
+          cuota:r.cuota,gross:r.primaTotal,
+          grossAliases:{monto:r.monto,montoTotal:r.montoTotal,saldo:r.saldo}}))}))
     }));
     const bundle={...plan,sourceManifestSha256:source.bytesSha256,
       sourceManifestPath:source.relative};
