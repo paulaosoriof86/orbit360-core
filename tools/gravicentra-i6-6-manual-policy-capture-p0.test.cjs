@@ -51,3 +51,10 @@ test('owner-approved twelve-payment financial surcharge defaults to 13.5 percent
  assert.match(ui,/rule\?\.recargosPorCuotas/);
  assert.match(ui,/recargo_financiero_requiere_confirmacion/);
 });
+
+test('new policy selects a real insurer explicitly and never silently preselects QA',()=>{
+ assert.match(ui,/data-insurer><option value="">— Seleccionar aseguradora —<\/option>/);
+ assert.match(ui,/if \(!existing && !insurerEl\.value\)/);
+ assert.match(ui,/Selecciona la aseguradora real del documento/);
+ assert.match(ui,/insurerEl\.focus\(\)/);
+});
