@@ -6,8 +6,8 @@ const crypto=require('node:crypto');
 const admin=require('firebase-admin');
 const {chromium}=require('playwright');
 const LIVE=process.env.I66_NEW_POLICY_SIGNED_LIVE_ONLY==='true';
-const ORIGIN=LIVE?'https://app.aysseguros.com':'https://ays-orbit-360-lab--gi-i66-rc-44455183578-63vsza8q.web.app';
-const SOURCE='449ce7529cf46083be49fae8efa29a47ee800bb4';
+const ORIGIN=LIVE?'https://app.aysseguros.com':'https://ays-orbit-360-lab--gi-i66-rc-44521197249-7eks7v4b.web.app';
+const SOURCE='eeb68bfb0d7728939c69534dfd35c5e858f6c4a7';
 const TENANT='alianzas-soluciones';
 assert.equal(process.env.I66_PREVIEW_ORIGIN,ORIGIN,'QA_AUTHORIZED_ORIGIN_DRIFT');
 assert.equal(process.env.I66_PREVIEW_SOURCE_SHA,SOURCE,'QA_PREVIEW_SOURCE_DRIFT');
@@ -60,7 +60,8 @@ async function runOne(browser,actor){
     ['clientes',ids.client,{id:ids.client,tenantId:TENANT,pais:'GT',nombre:'I6.6 QA alta póliza nueva',tipo:'Persona',activo:true,
       asesorId:'',__syntheticQa:true}],
     ['aseguradoras',ids.insurer,{id:ids.insurer,tenantId:TENANT,pais:'GT',nombre:'I6.6 QA aseguradora',vinculada:true,activo:true,
-      moneda:'GTQ',ramos:['Autos'],__syntheticQa:true}]
+      moneda:'GTQ',ramos:['Autos'],ramosDetalle:{Autos:{productos:['Auto Individual']}},
+      comisiones:{Autos:15},comisionesProd:{'Auto Individual':18},__syntheticQa:true}]
   ];
   const context=await browser.newContext({viewport:{width:1280,height:900}});
   let page;
@@ -85,6 +86,31 @@ async function runOne(browser,actor){
     await page.evaluate(async()=>{await Orbit.store._ensureCollections(['clientes','aseguradoras','polizas','vehiculos','recibosEsperados','carteraPrimas']);});
     await page.waitForFunction(ids=>!!Orbit.store.get('clientes',ids.client)&&!!Orbit.store.get('aseguradoras',ids.insurer),ids,{timeout:30000});
     console.log('I66_NEW_POLICY_'+actor.role.toUpperCase()+'_SIGNED_FIXTURE_HYDRATED');
+    const insurerProduct=await page.evaluate(ids=>{
+      // Verify actual authenticated UI on synthetic insurer. Cancel never writes.
+      const stage=document.createElement('div');stage.id='gi-i66-insurer-commission-qa-stage';
+      document.body.appendChild(stage);
+      try{
+        Orbit.modules.aseguradoras.render(stage);
+        Orbit.modules.aseguradoras.ficha(ids.insurer,true);
+        const card=stage.querySelector('#asg-ficha');
+        const tab=card?.querySelector('[data-tab="productos"]');
+        tab?.click();
+        const rate=card?.querySelector('[data-productpct="Auto Individual"]');
+        const branch=card?.querySelector('[data-ramopct="Autos"]');
+        const before=Orbit.store.get('aseguradoras',ids.insurer)?.comisionesProd?.['Auto Individual'];
+        if(rate){rate.value='19';rate.dispatchEvent(new Event('input',{bubbles:true}));}
+        const cancel=card?.querySelector('#af-cancelar');cancel?.click();
+        const after=Orbit.store.get('aseguradoras',ids.insurer)?.comisionesProd?.['Auto Individual'];
+        return{card:!!card,rateVisible:!!rate,readRate:rate?.defaultValue,
+          ramoRate:branch?.value,cancelAvailable:!!cancel,before,after};
+      }finally{stage.remove();}
+    },ids);
+    assert.ok(insurerProduct.card&&insurerProduct.rateVisible&&insurerProduct.readRate==='18'&&
+      insurerProduct.ramoRate==='15'&&insurerProduct.cancelAvailable&&
+      insurerProduct.before===18&&insurerProduct.after===18,
+    'QA_INSURER_PRODUCT_COMMISSION_UI_OR_CANCEL_FAILED_'+actor.role+':'+JSON.stringify(insurerProduct));
+    console.log('I66_INSURER_PRODUCT_RATE_'+actor.role.toUpperCase()+'_SIGNED_PREVIEW_EDIT_CANCEL_NO_WRITE_PASS');
     const ui=await page.evaluate(async ids=>{
       Orbit.modules.cliente360.nuevaPoliza(ids.client);
       const modal=document.getElementById('policy-v1199');
