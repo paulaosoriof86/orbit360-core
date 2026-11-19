@@ -591,5 +591,210 @@
     ],
     "writesByThisReadback": 0,
     "doNotClaimFullI66Pass": true
+  },
+  "carlosOperationalIncident20261119": {
+    "recordType": "USER_REPORTED_LIVE_BLOCKERS_WITH_REPO_CAUSAL_INSPECTION_NOT_CORRECTION_NOT_PASS",
+    "reportDateGuatemala": "2026-11-19",
+    "channel": "Carlos Castro (Operativo GT) WhatsApp evidence supplied by Dirección, plus user operational report",
+    "gate": "I6.6",
+    "authority": "Subordinate evidence; CONTROL_PLANE and canonical Findings Ledger remain authoritative. Must reconcile with existing finding IDs; this object cannot close or open a formal gate.",
+    "state": "OPEN_CRITICAL_OPERATIONAL_VERIFY_CORRECT_BUILD_AND_RUNTIME",
+    "liveVsAuthority": {
+      "acceptedControlPlaneSourceSha": "1b65a790530d49fe1d1fb451f02838fd9a713c53",
+      "physicallyObservedLiveSourceShaFromPriorThreeOriginReadback": "b38f877f7847c7b6e11506885e42252e84c5eeb6",
+      "sourceHeadAtPriorInspection": "d56245a23096f8cfbcff981c0578902b44a62d17",
+      "latestGithubGuardRun": 44625178169,
+      "findingLedgerReference": "B4-003-R20-V2-17-LIVE-RELEASE-BINDING-DRIFT",
+      "gateDisposition": "HOLD_ANY_NEW_PROMOTION_UNTIL_EXACT_HOSTING_SOURCE_AND_BACKEND_RECONCILED; no assertion that a newer successful build equals approved LIVE"
+    },
+    "evidencePointers": {
+      "canonicalRostersSignedRun": 44619285215,
+      "signedExactPreviewCrossModuleRun": 44618874905,
+      "existingSourceCorrection": "03356208bed37139e4f11d0a85be53d25a35a74c",
+      "currentPreviewOnlyRun": 44609701409,
+      "currentLiveDeploySkippedRun": 44609701316,
+      "historicalCendosoPaidRuns": [
+        44569134138,
+        44593852150
+      ],
+      "historicalElRobleSourceRun": 44592619323,
+      "makeGreenScenario": 10196136,
+      "makeAdWebhookScenario": 10195867
+    },
+    "userReportedFindings": [
+      {
+        "case": "CARLOS_GERMAN_ADVISOR_NEW_POLICY",
+        "severity": "P0",
+        "reported": "Germán Reyes absent from Carlos Operativo's advisor selector while creating a policy despite previous closure claim",
+        "verified": "Signed central roster contains 8 and Germán, including one tested policy/modal. Other selectors/routing and Carlos exact browser build not exhaustively tested. Legacy Cliente360 edit UI refers to scoped S().all('asesores') but canonical policy bridge overrides this code when loaded.",
+        "ownerCandidates": [
+          "modules/policy-receipts-v1199-bridge.js",
+          "core/assignable-advisor-roster-client.js",
+          "core/ciclo.js",
+          "index.html and served effective assets"
+        ],
+        "canonicalLedger": [
+          "B4-003-R14-07-ASSIGNABLE-ADVISOR-ROSTER-PARITY",
+          "B4-003-R16-01-OPERATIVO-ASSIGNABLE-ADVISOR-ROSTER-HYDRATION",
+          "B4-003-R20-B13"
+        ],
+        "closure": "Carlos Operativo real GT create-policy selector shows canonical Germán; save synthetic policy with correct advisor; server commit/readback/reload; no duplicate advisor and no unauthorized Equipo access.",
+        "status": "OPEN_PRODUCTION_CASE_UNVERIFIED"
+      },
+      {
+        "case": "CARLOS_CLIENTE360_DIRECT_RENEWAL",
+        "severity": "P0",
+        "reported": "Clicking Renovar in Cliente360 leads to generic request without renewal details instead of issued renewal workflow",
+        "verified": "Current source layers request/management with direct path through renewals-v1200-operational-bridge and issuance-endosos; no live signed complete issued renewal readback from Carlos.",
+        "ownerCandidates": [
+          "modules/renewals-v1200-operational-bridge.js",
+          "modules/issuance-endosos-v1201-bridge.js",
+          "modules/renewals-v1201-issued-filter.js",
+          "core/policy-receipts-engine.js"
+        ],
+        "canonicalLedger": [
+          "B2-R93-RENEWAL-ISSUANCE-MODAL-CRASH-SEMANTIC-VISUAL-R21",
+          "B4-003-R20-B01"
+        ],
+        "closure": "From Cliente360 and Renovaciones, Carlos chooses direct issuance, source policy/client/insurer/premiums correctly prefilled, new issued version persists with canonical source link and receipts/cartera, predecessor removed from actionable Kanban while history preserved, reload/LIVE proof.",
+        "status": "OPEN_PRODUCTION_CASE_UNVERIFIED"
+      },
+      {
+        "case": "EDSON_KENET_MANUAL_PAYMENT_PRECONDITION",
+        "severity": "P0",
+        "reported": "Carlos sees failed-precondition and No se guardaron cambios while applying payment to Edson Kenet",
+        "verified": "Frontend modules/cobros.js maps all failed-precondition causes to generic message. Server payment engine has distinct duplicate, inactive portfolio, cross-country, already-paid and conflict guards; exact rejected receipt/request ID and server code have not been proven.",
+        "ownerCandidates": [
+          "modules/cobros.js",
+          "functions/cobros-reconciliation-domain.js",
+          "core/cobros-reconciliation-domain-client.js"
+        ],
+        "canonicalLedger": [
+          "B3-CARRY-PAYMENT-STATUS-LABEL-CONSISTENCY-20260929",
+          "B4-003-R16-05-RECEIPT-SHADOW-DUPLICATE-PROJECTION"
+        ],
+        "closure": "Isolate exact server reject without exposing secrets, reconcile receipt-policy-active portfolio single identity, run authorized real or synthetic payment, commit receipt+cartera+cobro, readback/reload both Cliente360 and Cobros; never retry uncertain writes without canonical readback.",
+        "status": "OPEN_PRODUCTION_CASE_UNVERIFIED"
+      },
+      {
+        "case": "CARLOS_THIRD_INSTALLMENT_AND_OTHERS_VENCIDO",
+        "severity": "P0",
+        "reported": "Carlos applied installment 3; screenshot shows one Pagado row and two Vencido rows, asks whether approval needed",
+        "verified": "Screenshot alone does not link exact row IDs, period, physical cobro and before/after. One manually confirmed payment does not automatically infer earlier installments; insurer invoice/commission statement or explicit approved sequential reconciliation evidence is required.",
+        "ownerCandidates": [
+          "functions/cobros-reconciliation-domain.js",
+          "modules/cliente360.js",
+          "modules/cobros.js",
+          "core/queries.js"
+        ],
+        "canonicalLedger": [
+          "B3-CARRY-PAYMENT-CONFIRMED-NOT-CONCILIATED-R6",
+          "B3-CARRY-RECEIPT-CALENDAR-LINEAGE-20260929"
+        ],
+        "closure": "Read exact receipt IDs 1/2/3 and evidence, verify third payment persists and each remaining overdue is legitimate; if source-backed inference applies, update only uniquely proven earlier installments with provenance and no duplicate Cobros.",
+        "status": "OPEN_RECONCILIATION_NOT_AUTOMATIC_PAID_ALL"
+      },
+      {
+        "case": "ASHLYN_AGUILAR_VEHICLE_SUBSTITUTION",
+        "severity": "P0",
+        "reported": "Direct issued vehicle substitution not usable in LIVE",
+        "verified": "Earlier readback: LIVE endoso modal only Crear gestión; current Preview has Registrar sustitución ya emitida requiring insurer reference/date; full E2E direct-issued post-image not passed.",
+        "ownerCandidates": [
+          "modules/issuance-endosos-v1201-bridge.js",
+          "core/endorsement-workflow-v1201.js",
+          "core/policy-receipts-engine.js"
+        ],
+        "canonicalLedger": [
+          "B4-003-R15-09-PHASEA-ENDORSEMENT-CERTIFICATE-ANNEX-CLOSURE"
+        ],
+        "closure": "With verified issued insurer endorsement, preserve old vehicle/history, link new physical vehicle to same policy edition, verify financial changes only if sourced, one server write and reload + LIVE QA. Pending insurer request remains separate path.",
+        "status": "OPEN_LIVE_UNAVAILABLE"
+      },
+      {
+        "case": "CLIENTE360_EXISTING_CLIENT_INSPECTION_OPPORTUNITY",
+        "severity": "P0",
+        "reported": "From existing client create opportunity and inspection (Carlos Corado example), with Ops/Leads synchronization",
+        "verified": "Current Preview shows Nueva inspección / oportunidad; LIVE lacks button in prior browser readback. New source calls Orbit.ciclo.nuevaOportunidadCliente and server-owned negocios writer. Existing Ops tasks for Carlos Corado do not equal Kanban inspection opportunity.",
+        "ownerCandidates": [
+          "modules/cliente360.js",
+          "core/ciclo.js",
+          "functions/product-ops-leads-domain.js"
+        ],
+        "canonicalLedger": [
+          "B4-003-R18-03-COMMERCIAL-IDENTITY-MULTIOPPORTUNITY-MODEL",
+          "B4-003-R20-B09"
+        ],
+        "closure": "LIVE Carlos and Dirección create linked opportunity for existing client; same negocio persists once and appears in Ops/Leads/Cliente360/inspection after reload, no duplicated client/gestión.",
+        "status": "OPEN_LIVE_UNAVAILABLE"
+      },
+      {
+        "case": "NEW_POLICY_AUTO_PREMIUM_AND_SERGIO_ISSUANCE",
+        "severity": "P0",
+        "reported": "Need new policy issuance with documented insurer-specific automatic premium, renewability and payment schedule; Sergio case unresolved",
+        "verified": "Prior LIVE defaulted wrong QA insurer; source corrective commit exists and tests passed, but not promoted LIVE. Actual Sergio policy save/receipts not tested.",
+        "ownerCandidates": [
+          "modules/policy-receipts-v1199-bridge.js",
+          "core/primas.js",
+          "core/policy-receipts-engine.js"
+        ],
+        "canonicalLedger": [
+          "B4-003-UAT-20261011-05",
+          "B4-003-R20-B13"
+        ],
+        "closure": "Authenticated LIVE correct insurer default empty, choose true insurer, documented premium/fees/IVA/frequency/exceptions calculate, actual or fixture policy saves, matching complete receipts/cartera and reload without QA source pollution.",
+        "status": "OPEN_LIVE_UNVERIFIED"
+      },
+      {
+        "case": "EXPIRY_SUCCESSOR_RENEWAL_KANBAN_STATES",
+        "severity": "P0",
+        "reported": "Expired policies must show Vencida; once successfully renewed must no longer be actionable in Kanban",
+        "verified": "Current renewal lifecycle uses source successor links and may isolate unlinked editions for review; no LIVE all-modules readback for Carlos reported policy. Date alone must not invent insurer renewal.",
+        "ownerCandidates": [
+          "modules/renovaciones.js",
+          "core/queries.js",
+          "modules/renewals-v1201-issued-filter.js"
+        ],
+        "canonicalLedger": [
+          "B4-003-R14-02-RENEWALS-EXPIRED-OUTCOME-CONTINUITY",
+          "B4-003-R20-B01",
+          "B4-003-R20-V2-15-RENEWAL-CUTOFF-DISPOSITION"
+        ],
+        "closure": "Crossmodule same IDs: source after end-date shows expired, valid issued successor hides predecessor from actionable Kanban; preserve historical relationships, no false deletion or disappearance of unresolved cases; reload signed role matrix.",
+        "status": "OPEN_LIVE_UNVERIFIED"
+      },
+      {
+        "case": "MAKE_WA_EMAIL_LEAD_AUTOMATION",
+        "severity": "P1",
+        "reported": "Green API working but inbound leads from WA/mail and linked Ops not yet arriving in platform",
+        "verified": "Make 10196136 inactive Green API read-only with one reader module, 10195867 inactive webhook only, no writer and email scenario not found on authorized team search.",
+        "ownerCandidates": [
+          "Make scenarios 10196136/10195867",
+          "functions/product-ops-leads-domain.js"
+        ],
+        "canonicalLedger": [
+          "B4-003-R20-B09",
+          "B4-003-R19-08-OPS-ADVISOR-HANDOFF-NOTIFICATION-GAP"
+        ],
+        "closure": "Secure authenticated write into canonical negocio with de-dup idempotency and source/consent mapping, signed test, readback in Ops/Leads, safe activation, no duplicated WhatsApp leads.",
+        "status": "OPEN_NOT_ACTIVATED"
+      }
+    ],
+    "existingFinancialMutationsPreserved": {
+      "cendosoCobrosConfirmed": 33,
+      "robleReceiptUpdatesConfirmed": 110,
+      "roblePortfolioUpdatesConfirmed": 110,
+      "gytNov19EligibleWrites": 0
+    },
+    "requiredReleasePath": [
+      "Control Plane + composition lock + physical hosting versions alignment",
+      "Find effective asset loaded and module owner for each issue and correct only proven cause",
+      "Exact cumulative candidate (one source manifest) + immutable build + signed authenticated Preview with synthetic writes/readback/cleanup",
+      "Fast human visual check on same candidate + explicit protected production authorization",
+      "Promote identical artifact/digest without source patching",
+      "LIVE Carlos Operativo + Dirección role proof for payment, issued renewal, client-linked inspection, vehicle substitution, adviser, issuer form and cross-module persistence",
+      "Rehash and audit after deploy; preserve rollback and unresolved source exceptions"
+    ],
+    "actualWritesThisCheckpoint": "EVIDENCE_JSON_ONLY_NO_CUSTOMER_DATA_NO_PRODUCT_SOURCE_NO_LIVE_DEPLOY",
+    "livePassClaimed": false
   }
 }
