@@ -111,30 +111,37 @@ function assess(row,groups){
   if(existing.length>1)return {code:'MULTIPLE_COBROS_FOR_RECEIPT'};
   if(existing.some(isPaid))return {code:'ALREADY_PAID_WITH_COBRO_PRESERVE'};
   if(existing.length)return {code:'EXISTING_UNPAID_COBRO_REVIEW'};
-  const portfolio=(g.portfolio||[]).filter(c=>str(c.reciboId)===r.id&&c.carteraActiva!==false);
-  if(portfolio.length!==1)return {code:'ACTIVE_PORTFOLIO_NOT_UNIQUE'};
-  const c=portfolio[0];
+  const portfolio=(g.portfolio||[]).filter(c=>str(c.reciboId)===r.id);
+  if(portfolio.length>1)return {code:'MULTIPLE_PORTFOLIO_ROWS_FOR_RECEIPT'};
+  const creatingPortfolio=portfolio.length===0;
+  const c=portfolio[0]||{id:'car_'+r.id,polizaId:g.policy.id,reciboId:r.id};
+  if(creatingPortfolio&&(g.portfolio||[]).some(x=>x.id===c.id||
+    (!str(x.reciboId)&&Number(x.secuencia||x.numeroCuota)===Number(r.secuencia||r.numeroCuota))))
+    return {code:'UNLINKED_PORTFOLIO_POSSIBLE_DUPLICATE'};
   const backfill=isPaid(r)||isPaid(c);
   if(backfill&&[r,c].some(x=>x.conciliado===true||/^APPLIED_/.test(str(x.applicationState))))
     return {code:'EXISTING_RECONCILIATION_WITHOUT_COBRO_REVIEW'};
   if(backfill&&[r,c].some(x=>date(x.fechaPago||x.paidDate)&&
     date(x.fechaPago||x.paidDate)!==row.paid))return {code:'LEGACY_PAID_DATE_CONFLICT'};
   if(str(c.polizaId||c.policyId)!==g.policy.id)return {code:'PORTFOLIO_POLICY_RELATION_MISMATCH'};
-  const beforeR=cents(r.primaTotal),beforeC=cents(c.primaTotal);
-  if(beforeR==null||beforeC==null)return {code:'UNDEFINED_PREVIOUS_GROSS'};
-  const amounts=comparableGrossAliases(r,c,beforeR,beforeC);
+  const beforeR=cents(r.primaTotal),beforeC=creatingPortfolio?null:cents(c.primaTotal);
+  if(beforeR==null||(!creatingPortfolio&&beforeC==null))return {code:'UNDEFINED_PREVIOUS_GROSS'};
+  const amounts=creatingPortfolio?
+    comparableGrossAliases(r,{primaTotal:r.primaTotal},beforeR,beforeR):
+    comparableGrossAliases(r,c,beforeR,beforeC);
   if(!amounts)return {code:'GROSS_ALIASES_INCONSISTENT'};
   // Net premium is a separate accounting input. Do not silently replace net or
   // recalculate commissions in a payment-state operation.
   if(cents(r.primaNeta)!=null&&row.net!=null&&cents(r.primaNeta)!==row.net)
     return {code:'NET_PREMIUM_CHANGED_REQUIRES_COMMISSION_RECOMPUTE'};
-  const before={receipt:receiptIdentity(r),portfolio:{id:c.id,polizaId:c.polizaId,
-    gross:beforeC,amount:cents(c.monto),amountTotal:cents(c.montoTotal),
-    state:str(c.estado),portfolioState:str(c.estadoCartera),paid:isPaid(c)},aliases:amounts};
+  const before={receipt:receiptIdentity(r),portfolio:creatingPortfolio?
+    {id:c.id,missing:true}:{id:c.id,polizaId:c.polizaId,
+      gross:beforeC,amount:cents(c.monto),amountTotal:cents(c.montoTotal),
+      state:str(c.estado),portfolioState:str(c.estadoCartera),paid:isPaid(c)},aliases:amounts};
   return {ready:{sourceId:row.id,policyId:g.policy.id,receiptId:r.id,portfolioId:c.id,
     policyNumber:canonicalPolicyNumber(row.policy),insurer:row.insurer,
     paidDate:row.paid,periodStart:row.periodStart,due:row.due,grossCents:row.total,
-    netCents:row.net,backfill,before,beforeHash:objhash(before),
+    netCents:row.net,backfill,creatingPortfolio,before,beforeHash:objhash(before),
     sourceRowsSha256:sha(JSON.stringify(row.sourceRows)),
     match:matchedBy+(exactAmount.length?'_GROSS_EQUAL':'_INSURER_GROSS_PREVAILS')}};
 }
@@ -210,8 +217,11 @@ async function applyOne(db,oldPlan,source){
     const [rs,cs,ps,cb,as]=await Promise.all([tx.get(rRef),tx.get(cRef),tx.get(pRef),tx.get(cobRef),tx.get(aRef)]);
     if(as.exists){const a=as.data();if(a.sourceId===oldPlan.sourceId&&a.receiptId===oldPlan.receiptId)
       return 'ALREADY_APPLIED';throw Error('AUDIT_COLLISION');}
-    if(!rs.exists||!cs.exists||!ps.exists||cb.exists)throw Error('PREIMAGE_MISSING_OR_COBRO_EXISTS');
-    const r={...rs.data(),id:rs.id},c={...cs.data(),id:cs.id},p={...ps.data(),id:ps.id};
+    if(!rs.exists||!ps.exists||cb.exists||cs.exists===oldPlan.creatingPortfolio)
+      throw Error('PREIMAGE_MISSING_OR_COBRO_EXISTS');
+    const r={...rs.data(),id:rs.id},
+      c=cs.exists?{...cs.data(),id:cs.id}:{id:cRef.id,polizaId:ps.id,reciboId:rs.id},
+      p={...ps.data(),id:ps.id};
     if(str(r.polizaId)!==p.id||str(c.polizaId||c.policyId)!==p.id||
       canonicalPolicyNumber(p.numero)!==oldPlan.policyNumber||
       date(p.vigenciaInicio)!==sourceRow(row).coverageStart||date(p.vigenciaFin)!==sourceRow(row).coverageEnd||
@@ -220,18 +230,22 @@ async function applyOne(db,oldPlan,source){
       (oldPlan.backfill&&!isPaid(r)&&!isPaid(c))||
       [r,c].some(x=>x.conciliado===true||/^APPLIED_/.test(str(x.applicationState)))||
       [r,c].some(x=>date(x.fechaPago||x.paidDate)&&date(x.fechaPago||x.paidDate)!==oldPlan.paidDate)||
-      c.carteraActiva===false||!/^[a-f0-9]{64}$/.test(oldPlan.beforeHash))throw Error('POLICY_RECEIPT_PREIMAGE_CHANGED');
-    const alias=comparableGrossAliases(r,c,cents(r.primaTotal),cents(c.primaTotal));
-    const fresh={receipt:receiptIdentity(r),portfolio:{id:c.id,polizaId:c.polizaId,
-      gross:cents(c.primaTotal),amount:cents(c.monto),amountTotal:cents(c.montoTotal),
-      state:str(c.estado),portfolioState:str(c.estadoCartera),paid:isPaid(c)},aliases:alias};
+      !/^[a-f0-9]{64}$/.test(oldPlan.beforeHash))throw Error('POLICY_RECEIPT_PREIMAGE_CHANGED');
+    const alias=oldPlan.creatingPortfolio?
+      comparableGrossAliases(r,{primaTotal:r.primaTotal},cents(r.primaTotal),cents(r.primaTotal)):
+      comparableGrossAliases(r,c,cents(r.primaTotal),cents(c.primaTotal));
+    const fresh={receipt:receiptIdentity(r),portfolio:oldPlan.creatingPortfolio?
+      {id:c.id,missing:true}:{id:c.id,polizaId:c.polizaId,
+        gross:cents(c.primaTotal),amount:cents(c.monto),amountTotal:cents(c.montoTotal),
+        state:str(c.estado),portfolioState:str(c.estadoCartera),paid:isPaid(c)},aliases:alias};
     if(objhash(fresh)!==oldPlan.beforeHash)throw Error('CAS_PREIMAGE_CHANGED');
     const [otherCobros,otherPortfolio,client,insurer]=await Promise.all([
       tx.get(item(db,'cobros').where('reciboId','==',r.id).limit(2)),
       tx.get(item(db,'carteraPrimas').where('reciboId','==',r.id).limit(3)),
       tx.get(item(db,'clientes').doc(str(p.clienteId)||'__no_client__')),
       tx.get(item(db,'aseguradoras').doc(str(p.aseguradoraId)||'__no_insurer__'))]);
-    if(!otherCobros.empty||otherPortfolio.docs.filter(d=>d.data().carteraActiva!==false).length!==1)
+    if(!otherCobros.empty||otherPortfolio.docs.length!==(oldPlan.creatingPortfolio?0:1)||
+      (!oldPlan.creatingPortfolio&&otherPortfolio.docs[0].id!==c.id))
       throw Error('NON_UNIQUE_PAYMENT_OR_PORTFOLIO');
     if(!client.exists||!insurer.exists||insurer.data()?.activo===false||
       !insurerMatches(oldPlan.insurer,insurer.data().nombre||insurer.data().razonSocial))
@@ -252,14 +266,25 @@ async function applyOne(db,oldPlan,source){
     tx.update(rRef,{...setGross(r,oldPlan.grossCents,alias.receipt),estado:'Pagado',
       estadoOperativo:'pagado',conciliado:false,conciliadoPago:true,
       cobroId:cbid,fechaPago:oldPlan.paidDate,...shared});
-    tx.update(cRef,{...setGross(c,oldPlan.grossCents,alias.cartera),estado:'Pagado',
+    const carteraPatch={...setGross(c,oldPlan.grossCents,alias.cartera),estado:'Pagado',
       estadoCartera:'Pagado',conciliado:false,conciliadoPago:true,
-      cobroId:cbid,reciboId:r.id,fechaPago:oldPlan.paidDate,...shared});
+      cobroId:cbid,reciboId:r.id,fechaPago:oldPlan.paidDate,...shared};
+    if(oldPlan.creatingPortfolio)tx.create(cRef,{id:cRef.id,tenantId:TENANT,
+      polizaId:p.id,clienteId:p.clienteId,reciboId:r.id,asesorId:str(p.asesorId),
+      aseguradoraId:p.aseguradoraId,pais:'GT',moneda:'GTQ',
+      secuencia:r.secuencia||r.numeroCuota||null,cuota:r.cuota||'',
+      monto:oldPlan.grossCents/100,montoTotal:oldPlan.grossCents/100,
+      vence:receiptDue(r),fechaLimite:operationalDue(r),
+      carteraActiva:false,carteraTipo:'historico_pagado_fuente',
+      estadoOperativo:'pagado_sin_saldo',exigibilidad:'cerrada',
+      ...carteraPatch});
+    else tx.update(cRef,carteraPatch);
     tx.create(aRef,{schema:'I6_6_PROTECTED_CENDOSO_PAID_V1',status:'COMMITTED_PENDING_READBACK',
       sourceId:oldPlan.sourceId,sourceSha256:SOURCE_SHA,policyId:p.id,receiptId:r.id,
       portfolioId:c.id,cobroId:cbid,oldPlanHash:oldPlan.beforeHash,
       newGrossCents:oldPlan.grossCents,paidDate:oldPlan.paidDate,
-      rollback:{receiptBefore:rs.data(),portfolioBefore:cs.data(),cobroWasAbsent:true},
+      rollback:{receiptBefore:rs.data(),portfolioBefore:cs.exists?cs.data():null,
+        portfolioWasAbsent:!cs.exists,cobroWasAbsent:true},
       noAutomaticInsurerBankReconciliation:true,createdAt:when});
     return 'COMMITTED';
   });

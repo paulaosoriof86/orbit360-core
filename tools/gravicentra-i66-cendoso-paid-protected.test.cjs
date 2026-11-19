@@ -37,7 +37,12 @@ assert.equal(assessCase(raw,[{...group,receipts:[{...receipt,estado:'Pagado'}],
   cobros:[{id:'oldpay',reciboId:'r1',estado:'Pagado'}]}]).code,'ALREADY_PAID_WITH_COBRO_PRESERVE');
 assert.equal(assessCase(raw,[{...group,receipts:[{...receipt,estado:'Pagado',fechaPago:'2026-05-05'}]}]).code,'LEGACY_PAID_DATE_CONFLICT');
 assert.equal(assessCase(raw,[{...group,receipts:[{...receipt,estado:'Pagado',conciliado:true}]}]).code,'EXISTING_RECONCILIATION_WITHOUT_COBRO_REVIEW');
-assert.equal(assessCase(raw,[{...group,portfolio:[cartera,{...cartera,id:'c2'}]}]).code,'ACTIVE_PORTFOLIO_NOT_UNIQUE');
+assert.equal(assessCase(raw,[{...group,portfolio:[cartera,{...cartera,id:'c2'}]}]).code,'MULTIPLE_PORTFOLIO_ROWS_FOR_RECEIPT');
+assert.equal(assessCase(raw,[{...group,portfolio:[]}]).ready.creatingPortfolio,true,
+  'missing paid historical portfolio can be created as closed audit ledger when receipt is unique');
+assert.equal(assessCase(raw,[{...group,receipts:[{...receipt,estado:'Pagado'}],portfolio:[]}]).ready.backfill,true,
+  'legacy paid receipt with no Cobro or cartera needs both historical records');
+assert.equal(assessCase(raw,[{...group,portfolio:[{...cartera,carteraActiva:false}]}]).ready.creatingPortfolio,false);
 assert.equal(assessCase(raw,[{...group,receipts:[{...receipt,primaNeta:100}]}]).code,'NET_PREMIUM_CHANGED_REQUIRES_COMMISSION_RECOMPUTE');
 assert.equal(assessCase(raw,[{...group,receipts:[{...receipt,monto:280}]}]).code,'GROSS_ALIASES_INCONSISTENT');
 assert.equal(assessCase(raw,[{...group,receipts:[{...receipt,primaTotal:280,monto:280,montoTotal:280}],
