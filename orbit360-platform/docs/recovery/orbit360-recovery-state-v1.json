@@ -10,10 +10,38 @@
   "branch": "recovery/fase-a-clean-20260831",
   "forensicOriginSha": "9c95f31461f2eabe9804625b5659bee772f5602a",
   "createdAtUtc": "2026-08-31T18:00:00Z",
-  "updatedAtUtc": "2026-11-18T01:09:53.344Z",
+  "updatedAtUtc": "2026-11-19T11:59:11Z",
   "status": "I6_6_LIVE_CONTROLLED_PORTFOLIO_UPDATE_IN_PROGRESS",
   "currentIteration": 6,
   "lastCompletedIteration": 5,
+  "ownerOperatingRule20261119": {
+    "status": "FROZEN_OWNER_INSTRUCTION_APPLIES_TO_I6_6_WITHIN_EXISTING_PLAN",
+    "ambiguity": "Ask Paula immediately one concrete question with the affected source rows and the manual-resolution alternative; do not silently classify normal policy installment/requirement changes as discrepancies.",
+    "afterAnswer": "Apply the answered and authorized rows in the same active gate, without re-asking; retain exact-source, idempotency, tenant, audit and before-after readback checks.",
+    "nonBlockingExecution": "Continue all independently verified rows while an isolated ambiguous row is answered or handled manually by Paula.",
+    "batchSize": "Use large owner-approved source batches split into safe 250-record transactional chunks, not an arbitrary six-record business limit. Report actual ready/unchanged/held counts and the precise documentary cause of each hold.",
+    "lifecycle": "Repair, test, certify and publish each reported transversal defect within the active frozen I6.6 gate; never accumulate known fixes into an indefinite backlog.",
+    "existingOwnerAnswers": "Preserve previous confirmations; distinct insurer requirement numbers on the same policy are normal; gross amount in insurer account takes precedence over stale system total; commission base is net premium; payment proof is independent of an unpaid account.",
+    "ownerSaysNineteenPolicyNumbersAlreadyResolved": true,
+    "needsFreshOperationalEvidenceForUnlinkedEditions": true
+  },
+  "latestFinancialReadback20261119": {
+    "status": "LIVE_PROTECTED_RECEIPT_AND_PORTFOLIO_WRITES_VERIFIED_PAYMENT_APPLICATION_STILL_OPEN",
+    "mapfreSixRunId": 44426236551,
+    "mapfreSixResult": "MAPFRE_SIX_LIVE_RECEIPT_PORTFOLIO_CAS_READBACK_PASS",
+    "mapfreReceiptWrites": 6,
+    "mapfrePortfolioWrites": 6,
+    "robleRunId": 44461829731,
+    "robleResult": "BULK_PROTECTED_READBACK_PASS",
+    "robleReceiptWrites": 30,
+    "roblePortfolioWrites": 30,
+    "verifiedReceiptWrites": 36,
+    "verifiedPortfolioWrites": 36,
+    "verifiedAppliedCobroWrites": 0,
+    "verifiedAppliedPaymentWrites": 0,
+    "latestOwnerApprovalRequirement": "The two cited protected jobs already received their own GitHub environment reviewer approvals. New protected jobs require their own protected workflow approval, not a repeat approval for these runs.",
+    "fullI66ProductionAccepted": false
+  },
   "i66OwnerPlanContinuation20261115": {
     "documentaryFocalOwnerIdentityConfirmation20261117": {
       "caseId": "ISSUED.DOC.1",
@@ -121,7 +149,7 @@
     "dailyExecutionPlanPointer": "artifacts/orbit360-recovery/release-control/I6_6_OPERATIONAL_CONTINUATION_20261115.json#dailyExecutionPlan20261117",
     "currentPreviewSourceSha": "1b65a790530d49fe1d1fb451f02838fd9a713c53",
     "currentPreviewBuildReceipt": "artifacts/orbit360-recovery/release-control/I6_6_NETWORK_DIAGNOSTICS_PREVIEW_BUILD_20261117.json",
-    "nextAction": "I6_6_CURRENT_EXACT_OPERATIONAL_SIGNED_LIVE_ACCEPTED_PARTIAL: 1B65A7_ARTIFACT_14373955326_PUBLISHED_THREE_EXACT_FUNCTIONS_100_PERCENT_AND_223_FILES_EACH_ORIGIN; LIVE_NORMAL_UI_LEGAL_READBACK_SOURCE_INTAKE_RELOAD_REPLAY_AND_SYNTHETIC_RESTORE_PASS_44211496307. TRANSPORT_AUTHORIZATION_CONSUMED_NO_REDEPLOY_NO_NEW_ACTIVE_PRODUCT_CANDIDATE. CONTINUE_EXISTING_GENUINE_OPS_INSURER_DRIVE_WORKFLOWS_AND_AUTHORIZED_DETERMINISTIC_SOURCE_BATCHES_WITH_FRESH_PREIMAGES_IDEMPOTENCE_AUDIT_READBACK; DO_NOT_REPEAT_EXISTING_PAYMENTS. PRIOR_STARTUP_NETWORK_CAUSES_UNPROVEN. FULL_I66_AND_FULL_BLOCK2_HOLD; FROZEN_19_OF_31_AND_ONE_OF_SIX_DAILY_BLOCKS_UNCHANGED. TRANSPORT_FINANCIAL_WRITES_ZERO_SEPARATE_OPERATIONAL_RECEIPTS_REQUIRED.",
+    "nextAction": "I6_6_20261119: TWO_OWNER_APPROVED_PROTECTED_LIVE_JOBS_APPLIED_36_RECEIPT_AND_36_PORTFOLIO_WRITES_WITH_CAS_AUDIT_EXACT_READBACK. PENDING_PAID_COBRO_WRITES_STILL_ZERO; NEXT_FIRST_INCOMPLETE_WORK_IS_SOURCE_BACKED_PAID_COBRO_PROOF_AND_PROTECTED_APPLICATION. RESOLVE_ONE_HELD_ROBLE_GROSS_ALIAS_WITH_TESTED_FIX; KEEP_63_MISSING_EDITIONS_EXPLICIT_AND_DO_NOT_REASK_OWNER_19_PRIOR_NUMBER_ANSWERS. CONTINUE_SAME_FROZEN_GATE_WITH_TRANSVERSAL_SERGIO_POLICY_ISSUANCE_OPS_INSURER_PRODUCT_COMMISSION_AND_COBROS_PERFORMANCE_QA_PREVIEW_THEN_SAME_ARTIFACT_LIVE; FULL_I66_HOLD.",
     "dailyPlanFreeze20261117": {
       "status": "FROZEN_APPROVED_BY_DIRECTION",
       "approvedAtUtc": "2026-11-17T19:14:47Z",
@@ -1366,7 +1394,7 @@
     "phaseAIterationStatuses": "HISTORICAL_FIELDS_ABOVE_PRESERVED_UNTIL_FORMAL_GATE_EVIDENCE;_NO_NEW_PASS_INFERRED",
     "labDataWriteScope": "ONLY_35_AUTHORIZED_COUNTRY_FIELDS;_NO_AUGUST_REFRESH"
   },
-  "nextAction": "I6_6_CURRENT_EXACT_OPERATIONAL_SIGNED_LIVE_ACCEPTED_PARTIAL: 1B65A7_ARTIFACT_14373955326_PUBLISHED_THREE_EXACT_FUNCTIONS_100_PERCENT_AND_223_FILES_EACH_ORIGIN; LIVE_NORMAL_UI_LEGAL_READBACK_SOURCE_INTAKE_RELOAD_REPLAY_AND_SYNTHETIC_RESTORE_PASS_44211496307. TRANSPORT_AUTHORIZATION_CONSUMED_NO_REDEPLOY_NO_NEW_ACTIVE_PRODUCT_CANDIDATE. CONTINUE_EXISTING_GENUINE_OPS_INSURER_DRIVE_WORKFLOWS_AND_AUTHORIZED_DETERMINISTIC_SOURCE_BATCHES_WITH_FRESH_PREIMAGES_IDEMPOTENCE_AUDIT_READBACK; DO_NOT_REPEAT_EXISTING_PAYMENTS. PRIOR_STARTUP_NETWORK_CAUSES_UNPROVEN. FULL_I66_AND_FULL_BLOCK2_HOLD; FROZEN_19_OF_31_AND_ONE_OF_SIX_DAILY_BLOCKS_UNCHANGED. TRANSPORT_FINANCIAL_WRITES_ZERO_SEPARATE_OPERATIONAL_RECEIPTS_REQUIRED.",
+  "nextAction": "I6_6_20261119: 36_RECEIPTS_AND_36_PORTFOLIO_ROWS_WRITTEN_LIVE_CAS_READBACK_RUNS_44426236551_44461829731. PAID_COBROS_AND_PAYMENT_WRITES_STILL_ZERO. NEXT_PAID_INFERENCE_SOURCE_MATCH_THEN_AUTHORIZED_PROTECTED_CAS_AND_READBACK; LARGE_250_CHUNKS_FOR_ELIGIBLE_ROWS; INSURER_PRODUCT_COMMISSION_UI_SOURCE_PATCH_LOCAL_TESTED_PREVIEW_AND_LIVE_NOT_YET_CERTIFIED; SERGIO_OPS_COBROS_PERF_TRANSVERSAL_QA_PENDING. DO_NOT_DECLARE_PRODUCTION_ACCEPTED.",
   "sourceOfTruth": {
     "projectBoundaryPrevalentAddendum": "orbit360-platform/docs/recovery/ADDENDUM_PREVALENTE_CHATGPT_PROJECT_BOUNDARY_20260831.md",
     "mutableState": "orbit360-platform/docs/recovery/orbit360-recovery-state-v1.json",

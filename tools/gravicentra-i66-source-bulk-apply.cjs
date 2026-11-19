@@ -4,7 +4,8 @@
 // Environment gate; one approval covers all approved chunks, not each row.
 const crypto=require('node:crypto');
 const {MAX_CHUNK,moneyCents,preimageFingerprint,paid,internal,sourceAliases,
-  monthlySequence,internalSequence,completeMonthlySchedule,canonicalPolicyNumber}
+  monthlySequence,internalSequence,completeMonthlySchedule,canonicalPolicyNumber,
+  grossAliasFields,comparableGrossAliases}
   =require('./gravicentra-i66-source-bulk-plan.cjs');
 const TENANT='alianzas-soluciones',PROJECT='ays-orbit-360-lab';
 const str=value=>String(value==null?'':value).trim();
@@ -84,26 +85,40 @@ async function applyOne(db,row,gate){
       if(policyReceipts.docs.some(s=>s.id!==row.receiptId&&
         str(s.data()[field])===row.requirement))hold('EXTERNAL_REFERENCE_NOT_UNIQUE');
     }
-    if(['monto','montoTotal','saldo','valor'].some(k=>r[k]!=null||c[k]!=null))hold('GROSS_ALIASES_NOT_SAFE');
     const beforeReceipt=moneyCents(r.primaTotal),beforeCartera=moneyCents(c.primaTotal);
+    const grossAliases=beforeReceipt==null||beforeCartera==null?null:
+      comparableGrossAliases(r,c,beforeReceipt,beforeCartera);
+    if(grossAliases==null||JSON.stringify(grossAliases)!==JSON.stringify(row.oldGrossAliases))
+      hold('GROSS_ALIAS_PREIMAGE_CHANGED');
     if(beforeReceipt!==row.oldGrossCents||beforeCartera!==row.oldCarteraGrossCents||
-      preimageFingerprint(row.receiptId,row.portfolioId,str(r.numeroReciboFuente),beforeReceipt,beforeCartera)!==row.beforeFingerprint)
+      preimageFingerprint(row.receiptId,row.portfolioId,str(r.numeroReciboFuente),beforeReceipt,
+        beforeCartera,grossAliases)!==row.beforeFingerprint)
       hold('CAS_PREIMAGE_CHANGED');
+    const updateAliases=(side,record)=>Object.fromEntries(grossAliasFields
+      .filter(field=>Object.hasOwn(grossAliases[side],field))
+      .map(field=>[field,typeof record[field]==='string'?
+        String(row.grossCents/100):row.grossCents/100]));
     tx.update(receiptRef,{numeroReciboFuente:row.requirement,primaTotal:row.grossCents/100,
       fechaVencimientoContractual:row.due,
+      ...updateAliases('receipt',r),
       ...(monthlyMatch?{referenciaCuotaInterna:str(r.numeroReciboFuente),
         numeroCuota:monthlyIndex}: {})});
-    tx.update(portfolioRef,{primaTotal:row.grossCents/100});
+    tx.update(portfolioRef,{primaTotal:row.grossCents/100,...updateAliases('cartera',c)});
     tx.create(auditRef,{status:'APPLIED_PENDING_SOURCE_GROSS',sourceManifestSha256:gate.sourceManifestSha256,
       sourceSha256:row.sourceSha256,sourceKey:row.sourceKey,caseId:row.caseId,
       policyId:row.policyId,receiptId:row.receiptId,portfolioId:row.portfolioId,
       requirement:row.requirement,oldGrossCents:row.oldGrossCents,
       oldCarteraGrossCents:row.oldCarteraGrossCents,newGrossCents:row.grossCents,
+      oldGrossAliases:row.oldGrossAliases,
       matchMethod:row.matchMethod,sourceContractualDue:row.due,
       preservedOperationalLimit:str(r.fechaLimite),
       beforeFingerprint:row.beforeFingerprint,rollback:{
         numeroReciboFuente:str(r.numeroReciboFuente),receiptGrossCents:beforeReceipt,
         portfolioGrossCents:beforeCartera,
+        receiptGrossAliases:Object.fromEntries(Object.keys(grossAliases.receipt)
+          .map(field=>[field,r[field]])),
+        carteraGrossAliases:Object.fromEntries(Object.keys(grossAliases.cartera)
+          .map(field=>[field,c[field]])),
         contractualDueWasPresent:Object.hasOwn(r,'fechaVencimientoContractual'),
         fechaVencimientoContractual:r.fechaVencimientoContractual??null,
         cuotaInternaWasPresent:Object.hasOwn(r,'referenciaCuotaInterna'),
@@ -122,6 +137,8 @@ async function applyOne(db,row,gate){
         (await policyRef.get()).data(),row.due))||
     moneyCents(postR.data().primaTotal)!==row.grossCents||
     moneyCents(postC.data().primaTotal)!==row.grossCents||
+    ['receipt','cartera'].some((side)=>Object.keys(row.oldGrossAliases?.[side]||{})
+      .some(field=>moneyCents((side==='receipt'?postR:postC).data()[field])!==row.grossCents))||
     postA.data().sourceKey!==row.sourceKey)hold('POSTIMAGE_NOT_CERTIFIED');
   return {status:applied.status==='ALREADY_APPLIED'?'ALREADY_APPLIED_READBACK_PASS':'APPLIED_READBACK_PASS',
     caseId:row.caseId,receiptId:row.receiptId,portfolioId:row.portfolioId,auditId};

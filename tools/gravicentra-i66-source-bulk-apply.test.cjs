@@ -210,7 +210,51 @@ const plan=planSourceBatch(source,groups),gate={environment:'gravicentra-live-da
   const zeroApplied=await applyProtectedBatch(zeroDb,zeroPlan,gate);
   assert.equal(zeroApplied.receiptWrites,1);
   assert.equal(zeroDb.docs.get(name('recibosEsperados')+'rec_zero').numeroReciboFuente,'5485470');
+  // A legacy receipt can hold two additional gross aliases. They must match
+  // its own previous primaTotal, be CAS-checked and move together to insurer
+  // gross; primaNeta and any operational limit are never reclassified.
+  const aliasDb=new MockDb();
+  aliasDb.docs=new Map([...zeroDb.docs].filter(([key])=>
+    !key.includes('/operationalRequests/')).map(([key,value])=>[key,{...value}]));
+  const oldAliasReceipt=aliasDb.docs.get(name('recibosEsperados')+'rec_zero');
+  delete oldAliasReceipt.numeroReciboFuente;
+  Object.assign(oldAliasReceipt,{primaTotal:288.07,monto:288.07,montoTotal:288.07,
+    primaNeta:210.17,fechaLimite:'2026-12-15'});
+  const oldAliasCartera=aliasDb.docs.get(name('carteraPrimas')+'car_zero');
+  Object.assign(oldAliasCartera,{primaTotal:288.07,montoTotal:288.07});
+  const aliasSource=[{caseId:'ROBLE-FIRST-ALIAS',insurer:'ROBLE',policy:'91-169567',
+    requirement:'5485467',due:'2026-11-05',grossCents:28808,state:'PENDING',
+    sourceSha256:'f'.repeat(64)}];
+  const aliasGroup={policy:zp,clientExists:true,insurerVerified:true,
+    insurerName:'SEGUROS EL ROBLE',
+    receipts:[{...oldAliasReceipt,id:'rec_zero'}],
+    portfolio:[{...oldAliasCartera,id:'car_zero'}],cobros:[]};
+  const aliasPlan=planSourceBatch(aliasSource,[aliasGroup]);
+  assert.equal(aliasPlan.readyCount,1);
+  assert.deepEqual(aliasPlan.chunks[0].rows[0].oldGrossAliases,
+    {receipt:{monto:28807,montoTotal:28807},cartera:{montoTotal:28807}});
+  const badAliasGroup={...aliasGroup,
+    receipts:[{...aliasGroup.receipts[0],monto:1}]};
+  assert.equal(planSourceBatch(aliasSource,[badAliasGroup]).exceptions[0].code,
+    'GROSS_PREIMAGE_NOT_COMPARABLE');
+  const aliasWritten=await applyProtectedBatch(aliasDb,aliasPlan,gate);
+  assert.equal(aliasWritten.receiptWrites,1);
+  const newAliasReceipt=aliasDb.docs.get(name('recibosEsperados')+'rec_zero');
+  const newAliasCartera=aliasDb.docs.get(name('carteraPrimas')+'car_zero');
+  for(const key of ['primaTotal','monto','montoTotal'])
+    assert.equal(newAliasReceipt[key],288.08);
+  assert.equal(newAliasCartera.primaTotal,288.08);
+  assert.equal(newAliasCartera.montoTotal,288.08);
+  assert.equal(newAliasReceipt.primaNeta,210.17);
+  assert.equal(newAliasReceipt.fechaLimite,'2026-12-15');
+  const aliasAudit=[...aliasDb.docs.entries()].find(([key])=>
+    key.includes('/operationalRequests/'))[1];
+  assert.deepEqual(aliasAudit.rollback.receiptGrossAliases,
+    {monto:288.07,montoTotal:288.07});
+  assert.deepEqual(aliasAudit.rollback.carteraGrossAliases,{montoTotal:288.07});
+  assert.equal((await applyProtectedBatch(aliasDb,aliasPlan,gate)).alreadyApplied,1);
   console.log('I66_BULK_PROTECTED_WRITER_SYNTHETIC_PASS 1 receipt 1 cartera 1 audit; retry idempotent; CAS hold');
   console.log('I66_BULK_PROTECTED_WRITER_SYNTHETIC_750_ROWS_PASS 3 chunks x 250; 1500 materialized receipt/cartera rows; 750 audit; 0 duplicate replay writes');
   console.log('I66_EL_ROBLE_MONTHLY_19_SYNTHETIC_PASS source due, aliases, CAS, exact readback, replay');
+  console.log('I66_LEGACY_GROSS_ALIASES_SYNTHETIC_PASS issuer update, preserved net/limit, audit, replay and ambiguous-alias hold');
 })().catch(error=>{console.error(error);process.exitCode=1;});

@@ -697,7 +697,7 @@ Orbit.modules.aseguradoras = (function () {
   }
 
   /* ---- diff semántico para trazabilidad antes/después ---- */
-  const CHANGE_LABELS={nombre:'Nombre comercial',logo:'Logo',logoAssetRef:'Logo',nit:'NIT / identificación fiscal',codigoIntermediario:'Código de intermediario',web:'Sitio web / app',responsable:'Responsable interno',telGeneral:'Teléfono general',emergencia:'Emergencia / asistencia',ultimaRevision:'Última revisión',observaciones:'Observaciones',drive:'Carpeta Drive',facturacion:'Datos de facturación',contactos:'Contactos',portales:'Plataformas y accesos',cuentas:'Bancos y pagos',ramos:'Ramos ofrecidos',comisiones:'Comisiones',ramosHabilitados:'Habilitación comercial',ramosDetalle:'Productos, planes y segmentación',docsRequeridos:'Requisitos de emisión',docs:'Documentos y fuentes',vinculada:'Estado de la aseguradora',cotTasas:'Tarifas y condiciones',cotTasasValidadas:'Validación de tarifas'};
+  const CHANGE_LABELS={nombre:'Nombre comercial',logo:'Logo',logoAssetRef:'Logo',nit:'NIT / identificación fiscal',codigoIntermediario:'Código de intermediario',web:'Sitio web / app',responsable:'Responsable interno',telGeneral:'Teléfono general',emergencia:'Emergencia / asistencia',ultimaRevision:'Última revisión',observaciones:'Observaciones',drive:'Carpeta Drive',facturacion:'Datos de facturación',contactos:'Contactos',portales:'Plataformas y accesos',cuentas:'Bancos y pagos',ramos:'Ramos ofrecidos',comisiones:'Comisiones por ramo',comisionesProd:'Comisiones por producto',ramosHabilitados:'Habilitación comercial',ramosDetalle:'Productos, planes y segmentación',docsRequeridos:'Requisitos de emisión',docs:'Documentos y fuentes',vinculada:'Estado de la aseguradora',cotTasas:'Tarifas y condiciones',cotTasasValidadas:'Validación de tarifas'};
   function semanticValue(value,depth){
     depth=depth||0;
     if(value==null||value==='')return undefined;
@@ -716,7 +716,7 @@ Orbit.modules.aseguradoras = (function () {
   }
   function semanticEqual(a,b){return JSON.stringify(semanticValue(a,0))===JSON.stringify(semanticValue(b,0));}
   function diffResumen(before, after) {
-    const claves = ['nombre', 'logo', 'logoAssetRef', 'nit', 'codigoIntermediario', 'web', 'responsable', 'telGeneral', 'emergencia', 'ultimaRevision', 'observaciones', 'drive', 'facturacion', 'contactos', 'portales', 'cuentas', 'ramos', 'comisiones', 'ramosHabilitados', 'ramosDetalle', 'docsRequeridos', 'docs', 'vinculada', 'cotTasas', 'cotTasasValidadas'];
+    const claves = ['nombre', 'logo', 'logoAssetRef', 'nit', 'codigoIntermediario', 'web', 'responsable', 'telGeneral', 'emergencia', 'ultimaRevision', 'observaciones', 'drive', 'facturacion', 'contactos', 'portales', 'cuentas', 'ramos', 'comisiones', 'comisionesProd', 'ramosHabilitados', 'ramosDetalle', 'docsRequeridos', 'docs', 'vinculada', 'cotTasas', 'cotTasasValidadas'];
     const cambios=[];claves.forEach(k=>{if(!semanticEqual(before&&before[k],after&&after[k]))cambios.push(k);});return cambios;
   }
   function humanChangeSummary(keys){
@@ -728,6 +728,12 @@ Orbit.modules.aseguradoras = (function () {
     const saveButton=back&&back.querySelector('#af-guardar'),originalSaveLabel=saveButton&&saveButton.textContent||'💾 Guardar cambios';
     st.saving=true;if(saveButton){saveButton.disabled=true;saveButton.textContent='Revisando cambios…';saveButton.setAttribute('aria-busy','true');}
     if (typeof st.snapshotCurrent === 'function') st.snapshotCurrent();
+    if (st.productCommissionInvalid && st.productCommissionInvalid.length) {
+      st.saving=false;
+      if(saveButton){saveButton.disabled=false;saveButton.textContent=originalSaveLabel;saveButton.removeAttribute('aria-busy');}
+      U.toast('Revisa las comisiones por producto: deben estar entre 0% y 100%, o vacías para heredar la tasa del ramo.');
+      return;
+    }
     const before = S().get('aseguradoras', id); if (!before) {st.saving=false;if(saveButton){saveButton.disabled=false;saveButton.textContent=originalSaveLabel;saveButton.removeAttribute('aria-busy');}return;}
     let logoUrl = clean(st.draft.logo);
     const pendingLogo = st.logoFile || null;
@@ -989,10 +995,32 @@ Orbit.modules.aseguradoras = (function () {
     const hab = !!(a.ramosHabilitados && a.ramosHabilitados[r] && a.ramosHabilitados[r].cotizador === true);
     const det = (a.ramosDetalle && a.ramosDetalle[r]) || {},selectedProducts=selectedCommercialList(a,r,'productos','producto'),selectedPlans=selectedCommercialList(a,r,'planes','plan');
     const products=commercialProductCatalog(a,r),plans=commercialPlanCatalog(a,r);
+    const productRates=selectedProducts.map(product=>{
+      const configured=Object.prototype.hasOwnProperty.call(a.comisionesProd||{},product);
+      const rate=configured?a.comisionesProd[product]:null;
+      const inherited=pct===''?'Sin comisión general registrada':'Hereda '+String(pct)+' % del ramo';
+      return editing
+        ? `<label style="display:flex;align-items:center;justify-content:space-between;gap:10px"><span>${U.esc(product)}</span><input class="o-sel" style="width:115px" type="number" min="0" max="100" step="0.01" data-productpct="${U.esc(product)}" aria-label="Comisión para ${U.esc(product)}" placeholder="Heredar" value="${configured?U.esc(String(rate)):''}"></label>`
+        : `<div style="display:flex;justify-content:space-between;gap:10px"><span>${U.esc(product)}</span><b>${configured?U.esc(String(rate))+' %':U.esc(inherited)}</b></div>`;
+    });
     return `<section class="insurer-offering-card" data-offering-ramo="${U.esc(r)}"><div class="insurer-offering-head"><div><b>${U.esc(r)}</b><span>${selectedProducts.length} producto(s) · ${selectedPlans.length} plan(es)</span></div><label class="insurer-cotizador-toggle"><input type="checkbox" data-ramohab="${U.esc(r)}" ${hab ? 'checked' : ''} ${editing ? '' : 'disabled'}><span>${hab?'Disponible para Cotizador':'No habilitado para Cotizador'}</span></label></div>
       <div class="insurer-offering-meta">${editing ? `<label>Comisión %<input class="o-sel" type="number" min="0" max="100" step="0.5" data-ramopct="${U.esc(r)}" value="${pct}"></label><label>Segmento<select class="o-sel" data-ramoseg="${U.esc(r)}">${selectOptions((Orbit.cat&&Orbit.cat.get?Orbit.cat.get('segmentos'):[]).filter(x=>typeof x==='string'),det.segmento||'','Seleccionar…')}</select></label>` : `<div class="insurer-offering-readfield"><span>COMISIÓN</span><b>${pct === '' ? 'No registrada' : U.esc(String(pct)) + ' %'}</b></div><div class="insurer-offering-readfield"><span>SEGMENTO</span><b>${U.esc(det.segmento || 'Sin segmento')}</b></div>`}</div>
       <div class="insurer-offering-cols"><div><b>Productos</b><small>Catálogo del país, ramo y evidencia documental; seleccionar no equivale a validar tarifas</small>${editing?multiCheckOptions(products,selectedProducts,'data-ramoprod',r):(selectedProducts.map(v=>'<span class="badge neutral">'+U.esc(v)+'</span>').join('')||'<span class="muted">Sin productos seleccionados.</span>')}</div><div><b>Planes</b><small>Planes comerciales definidos para el tenant o documentados</small>${editing?multiCheckOptions(plans,selectedPlans,'data-ramoplancheck',r):(selectedPlans.map(v=>'<span class="badge neutral">'+U.esc(v)+'</span>').join('')||'<span class="muted">Sin planes específicos.</span>')}</div></div>
+      <div style="margin-top:14px;border-top:1px solid var(--line);padding-top:11px"><b>Comisión por producto</b><small style="display:block;margin:4px 0 9px">Tasa editable en esta ficha; dejar vacío hereda el porcentaje del ramo. La comisión se calcula sobre prima neta.</small><div style="display:grid;gap:7px">${productRates.join('')||'<span class="muted">Selecciona productos para configurar una tasa particular.</span>'}</div></div>
     </section>`;
+  }
+  function reconcileProductCommissionDraft(draft, inputs) {
+    const next=Object.assign({},draft.comisionesProd||{}),invalid=[];
+    for(const input of inputs){
+      const product=clean(input.product),raw=clean(input.raw);
+      if(!product)continue;
+      if(!raw){delete next[product];continue;}
+      const pct=Number(raw);
+      if(!Number.isFinite(pct)||pct<0||pct>100){invalid.push(product);continue;}
+      next[product]=pct;
+    }
+    if(!invalid.length)draft.comisionesProd=next;
+    return invalid;
   }
   function reqRow(r, i, editing, a) {
     const ro = editing ? '' : 'disabled',ramos=a.ramos||[],ramo=r.ramo||'',products=productOptionsFor(a,ramo),plans=planOptionsFor(a,ramo,r.producto||''),status=r.estado||'Vigente',type=r.tipo||'Documento';
@@ -1312,6 +1340,8 @@ Orbit.modules.aseguradoras = (function () {
       if (t === 'productos') {
         const ramoBoxes=[...body.querySelectorAll('[data-offer-ramo]')];
         if(ramoBoxes.length)draft.ramos=ramoBoxes.filter(x=>x.checked).map(x=>x.value);
+        st.productCommissionInvalid=reconcileProductCommissionDraft(draft,
+          [...body.querySelectorAll('[data-productpct]')].map(inp=>({product:inp.dataset.productpct,raw:inp.value})));
         // Avoid implicit commission overrides when a field only displays a source-backed default.
         const sourceCommissions=S().get('aseguradoras',id)||{},explicitCommissions=sourceCommissions.comisiones||{};
         body.querySelectorAll('[data-ramopct]').forEach(inp=>{

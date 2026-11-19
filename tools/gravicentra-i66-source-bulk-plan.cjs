@@ -23,8 +23,28 @@ const moneyCents = value => value == null || value === '' || !Number.isFinite(+v
 const sourceAliases = ['numeroReciboFuente', 'numeroReciboAseguradora', 'numeroRequerimiento', 'requerimiento',
   'numeroBoleta', 'sourceNumber', 'referenciaCobro', 'receiptNumber'];
 const internal = value => !str(value) || /^rec_[a-f\d]{16,64}$/i.test(str(value)) || /^\d{1,2}\s*\/\s*\d{1,2}$/.test(str(value));
-const preimageFingerprint = (receiptId, portfolioId, requirement, receiptGrossCents, carteraGrossCents) =>
-  digest({receiptId, portfolioId, requirement, receiptGrossCents, carteraGrossCents});
+const grossAliasFields = ['monto', 'montoTotal'];
+// Legacy gross aliases are safe to move only when each existing alias agrees
+// exactly with its own side's previous primaTotal. A saldo/valor may instead
+// represent a payment balance or a different component, so it still holds.
+function comparableGrossAliases(receipt, cartera, receiptGrossCents, carteraGrossCents) {
+  if ([receipt, cartera].some(x=>x.saldo!=null||x.valor!=null)) return null;
+  const aliases={receipt:{},cartera:{}};
+  for (const [name,record,expected] of [
+    ['receipt',receipt,receiptGrossCents],['cartera',cartera,carteraGrossCents]]) {
+    for (const field of grossAliasFields) {
+      if (record[field] == null) continue;
+      const cents=moneyCents(record[field]);
+      if (cents == null || cents !== expected) return null;
+      aliases[name][field]=cents;
+    }
+  }
+  return aliases;
+}
+const preimageFingerprint = (receiptId, portfolioId, requirement, receiptGrossCents,
+  carteraGrossCents, grossAliases={receipt:{},cartera:{}}) =>
+  digest({receiptId, portfolioId, requirement, receiptGrossCents, carteraGrossCents,
+    grossAliases});
 // The operational grace deadline is not the insurer's contractual due date.
 const dueOf = row => str(row.fechaVencimientoContractual || row.vence || row.fechaVencimiento);
 // I6 installments imported as "N/12" are internal sequence labels, not
@@ -156,8 +176,9 @@ function planSourceBatch(rawRows, policyGroups, options = {}) {
       exceptions.push({caseId: row.caseId, code: 'RELATION_OR_REFERENCE_CONFLICT'}); continue;
     }
     const beforeReceipt = moneyCents(receipt.primaTotal), beforeCartera = moneyCents(cartera.primaTotal);
-    if (beforeReceipt == null || beforeCartera == null ||
-      ['monto', 'montoTotal', 'saldo', 'valor'].some(k => receipt[k] != null || cartera[k] != null)) {
+    const oldGrossAliases=beforeReceipt==null||beforeCartera==null ? null :
+      comparableGrossAliases(receipt,cartera,beforeReceipt,beforeCartera);
+    if (beforeReceipt == null || beforeCartera == null || oldGrossAliases == null) {
       exceptions.push({caseId: row.caseId, code: 'GROSS_PREIMAGE_NOT_COMPARABLE'}); continue;
     }
     const existingRef = str(receipt.numeroReciboFuente);
@@ -165,11 +186,12 @@ function planSourceBatch(rawRows, policyGroups, options = {}) {
       caseId: row.caseId, sourceKey: key, insurer: row.insurer, policy: row.policy, due: row.due,
       policyId: str(p.id), receiptId: rid, portfolioId: str(cartera.id),
       requirement: row.requirement, grossCents: row.grossCents,
-      oldGrossCents: beforeReceipt,oldCarteraGrossCents:beforeCartera,
+      oldGrossCents: beforeReceipt,oldCarteraGrossCents:beforeCartera,oldGrossAliases,
       sourceSha256: row.sourceSha256,
       matchMethod,oldContractualDue:dueOf(receipt),
       oldOperationalLimit:str(receipt.fechaLimite),
-      beforeFingerprint: preimageFingerprint(rid, cartera.id, existingRef, beforeReceipt, beforeCartera),
+      beforeFingerprint: preimageFingerprint(rid, cartera.id, existingRef, beforeReceipt,
+        beforeCartera,oldGrossAliases),
     };
     seenTargets.add(rid);
     if (existingRef === row.requirement && beforeReceipt === row.grossCents &&
@@ -181,7 +203,8 @@ function planSourceBatch(rawRows, policyGroups, options = {}) {
     const rows = ready.slice(i, i + chunkSize);
     chunks.push({sequence: chunks.length + 1, count: rows.length,
       sourcePlanSha256: digest(rows.map(r => [r.caseId, r.sourceKey, r.receiptId, r.portfolioId,
-        r.oldGrossCents, r.oldCarteraGrossCents, r.grossCents, r.beforeFingerprint])), rows});
+        r.oldGrossCents, r.oldCarteraGrossCents, r.oldGrossAliases,
+        r.grossCents, r.beforeFingerprint])), rows});
   }
   return {status: 'BULK_SOURCE_PREFLIGHT_ONLY_NO_WRITES', inputRows: rawRows.length,
     readyCount: ready.length, unchangedCount: unchanged.length, exceptionCount: exceptions.length,
@@ -190,4 +213,5 @@ function planSourceBatch(rawRows, policyGroups, options = {}) {
 
 module.exports = {MAX_CHUNK, planSourceBatch, normalizeSource, moneyCents,
   preimageFingerprint, paid, internal, sourceAliases,monthlySequence,
-  internalSequence,completeMonthlySchedule,canonicalPolicyNumber};
+  internalSequence,completeMonthlySchedule,canonicalPolicyNumber,
+  grossAliasFields,comparableGrossAliases};
