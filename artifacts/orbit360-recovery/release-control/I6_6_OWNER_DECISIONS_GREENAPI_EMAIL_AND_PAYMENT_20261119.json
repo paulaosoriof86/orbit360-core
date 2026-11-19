@@ -1,5 +1,5 @@
 {
-  "schema": "GRAVICENTRA_I6_6_FROZEN_OWNER_DECISIONS_20261119_V5",
+  "schema": "GRAVICENTRA_I6_6_FROZEN_OWNER_DECISIONS_20261119_V6",
   "dateGuatemala": "2026-11-19",
   "status": "FROZEN_DECISIONS_SOURCE_QA_CANDIDATE_PENDING_SIGNED_PREVIEW_LIVE",
   "repository": "paulaosoriof86/orbit360-core",
@@ -28,7 +28,7 @@
     "connectionHealth": "AY_S_ACTIVE_ID_14749710_OK_MAKE_SCENARIO_GET_20261119",
     "firestoreWriteConnectionNeededForCanonicalAdsScenario": true,
     "firestoreCredentialRequest": "663a0094-f827-4b73-8cfe-0f9192f7575b",
-    "firestoreCredentialState": "PENDING_OWNER_AUTHORIZATION",
+    "firestoreCredentialState": "PENDING_GOOGLE_CUSTOM_OAUTH_CREDS_MAKE_FORM_MUST_NOT_USE_GREEN_API_INSTANCE_TOKEN",
     "makeScenarioCurrentlyCreatesRealLeads": false
   },
   "roleCapabilities": {
@@ -67,7 +67,7 @@
     "secureIMAP": "correo.aysseguros.com:993 TLS",
     "secureSMTP": "correo.aysseguros.com:465 TLS",
     "makeIMAPAuthorizationRequest": "dd6d4e7b-3cc6-4fcc-9ba8-9e20ff6eb726",
-    "makeIMAPState": "PENDING_OWNER_SECURE_CREDENTIAL_ENTRY",
+    "makeIMAPState": "PENDING_OWNER_SECURE_CREDENTIAL_ENTRY_VALIDATED_FORM_VALUES_NOT_YET_SUBMITTED",
     "makeSMTPState": "UNCREATED_MAKE_CONNECTION_INVALID_ARGUMENT"
   },
   "releasedPolicyAndPremiumCandidate": {
@@ -85,7 +85,7 @@
   "financialPosting": {
     "priorLiveReceiptWritesVerified": 36,
     "priorLivePortfolioWritesVerified": 36,
-    "appliedPaidCobroWritesVerified": 0,
+    "appliedPaidCobroWritesVerified": 303,
     "currentElRobleSourceBatchRun": 44535497810,
     "currentElRobleRunStatusAtFreeze": "GITHUB_ENVIRONMENT_REVIEW_WAITING",
     "currentElRobleRows": 238,
@@ -99,7 +99,7 @@
       "distinctCandidateKeysAfterCrossFileDeduplication": 607,
       "businessMeaning": "Legacy system displays Fecha Real Pagado; not automatically equivalent to independent bank/insurer settlement proof.",
       "ownerQuestion": "RESOLVED_BY_PAULA_20261119_LEGACY_ALLOWED_FOR_CONFIRMED_UNRECONCILED_COBRO_WITH_EXACT_MATCH",
-      "status": "603_SOURCE_UNIQUE_CANDIDATES_AWAIT_CANONICAL_RECEIPT_MATCH_AND_PROTECTED_LIVE_WRITE_4_SOURCE_DATE_CONFLICTS_HELD",
+      "status": "303_CONFIRMED_UNRECONCILED_COBROS_LIVE_READBACK_PASS_304_CANDIDATES_HELD_FOR_EXACT_LINK_REVIEW",
       "sourcePacketCommit": "aed3ddb4646327e20e08213f3af0d78c69f60fd9"
     },
     "missingFive2026_2027RenewalNumbers": [],
@@ -120,7 +120,17 @@
     "protectedPaidRun": 44552961713,
     "protectedPaidReady": 303,
     "protectedPaidHolds": 304,
-    "protectedPaidStatus": "PREFLIGHT_PASS_PROTECTED_LIVE_JOB_WAITING_FOR_GITHUB_ENVIRONMENT_REVIEW_NO_VERIFIED_COBROS"
+    "protectedPaidStatus": "SIGNED_PROTECTED_FIRESTORE_LIVE_READBACK_SUCCESS_303_NEW_COBROS_0_ALREADY_0_HOLDS_0_NEW_BANK_RECONCILIATIONS",
+    "protectedPaidReadback": {
+      "run": 44552961713,
+      "jobId": 135661610660,
+      "runSourceSha": "67c033e49b6376b1a52392f5859503fae4e165eb",
+      "result": "I66_CENDOSO_LIVE_READBACK applied=303 already=0 holds=0 reconciledWrites=0",
+      "liveArtifactId": 14547260031,
+      "artifactDigest": "sha256:483ed0469f034a6440830dd79b6c483f31273965c1010186cdc08c7714b76174",
+      "completionGuatemala": "2026-11-19T09:44:55-06:00",
+      "otherCandidatesHeldInPreflight": 304
+    }
   },
   "knownOpenFronts": [
     "Paid Cobro source proof and protected write/readback/rollback route",
@@ -135,7 +145,7 @@
     "Client360-linked direct inspection opportunity without duplicate client/legacy policy linkage"
   ],
   "noInventedPass": true,
-  "revision": 5,
+  "revision": 6,
   "leadsCadenceAndTemplates": {
     "status": "SOURCE_QA_PASS_AWAIT_SIGNED_PREVIEW_MODULE_LIVE_AND_REAL_DELIVERY",
     "currentFrontend": "core/ciclo.js hardcodes D1/D3/D7/D14; automatic internal tasks activate on Propuesta, not user-selectable per newly created lead",
@@ -228,7 +238,8 @@
     "leadAdsScenario": "AY_S_GREEN_API_CONNECTION_14749710_ONLY; MUST_BUILD_FINAL_IDEMPOTENT_AD_ATTRIBUTED_WEBHOOK_TO_CANONICAL_LEAD_WRITE; EXISTING_TEST_SKELETON_NOT_PRODUCTION_COMPLETE",
     "releasePlan": "ACTIVE_I6_6_ISSUES_RESOLVED_PROVEN_IN_SAME_GATE_SOURCE_QA_PREVIEW_EXACT_LIVE_READBACK_NO_ACCUMULATION",
     "cadenceProviderReceipt": "PENDING_PROVIDER_IS_NOT_SENT_OR_DELIVERED",
-    "carlosCommercialOpportunity": "ONE_BUSINESS_ON_BOTH_BOARDS_LINKED_TO_EXISTING_CLIENT_NEW_INSPECTION_NO_DUPLICATE_CUSTOMER"
+    "carlosCommercialOpportunity": "ONE_BUSINESS_ON_BOTH_BOARDS_LINKED_TO_EXISTING_CLIENT_NEW_INSPECTION_NO_DUPLICATE_CUSTOMER",
+    "financialResult": "303_ACTUAL_CONFIRMED_UNRECONCILED_COBROS_APPLIED_SIGNED_LIVE_20261119_RECONCILIATION_0_ADDITIONAL_304_HOLDS"
   },
   "renewalFindingsRecoveredFromPriorConversation": {
     "historicalDate": "2026-10-15",
