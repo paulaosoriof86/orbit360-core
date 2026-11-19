@@ -51,6 +51,12 @@ test('contractual expiry projects Vencida without mutating stored Firestore stat
   assert.equal(view({ estado: 'Renovada', vigenciaFin: '2026-11-03' }), 'Renovada');
   assert.equal(view({ estado: 'Cancelada', vigenciaFin: '2026-11-03' }), 'Cancelada');
   assert.equal(view({ estado: 'Vigente', vigenciaFin: '2026-02-31' }), 'Vigente', 'invalid dates are not silently guessed');
+  const renewed = { id: 'prior', estado: 'Vigente', renovadaPor: 'successor', vigenciaFin: '2026-11-03' };
+  Orbit.renewalLifecycle = { evaluate: p => ({ verifiedSuccessorId: p === renewed ? 'successor' : '' }) };
+  assert.equal(view(renewed), 'Renovada', 'verified successor masks stale administrative state');
+  assert.equal(renewed.estado, 'Vigente', 'projection must never mutate Firestore');
+  assert.equal(view({ estado: 'Vigente', renovadaPor: 'missing', vigenciaFin: '2026-11-03' }), 'Vencida',
+    'unverified or broken successor cannot be silently treated as renewed');
   assert.ok(src('orbit360-platform/modules/cliente360.js').includes('U.estadoBadge(q.policyDisplayStatus(p))'));
   assert.ok(src('orbit360-platform/modules/polizas.js').includes('U.estadoBadge(displayState(p))'));
 });
