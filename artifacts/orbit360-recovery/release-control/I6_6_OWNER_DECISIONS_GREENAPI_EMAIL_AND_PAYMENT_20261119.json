@@ -1,7 +1,7 @@
 {
-  "schema": "GRAVICENTRA_I6_6_FROZEN_OWNER_DECISIONS_20261119_V3",
+  "schema": "GRAVICENTRA_I6_6_FROZEN_OWNER_DECISIONS_20261119_V4",
   "dateGuatemala": "2026-11-19",
-  "status": "FROZEN_DIRECTION_DECISIONS_AND_PENDING_LIVE_WRITE_AND_DELIVERY_CERTIFICATION",
+  "status": "FROZEN_DECISIONS_SOURCE_QA_CANDIDATE_PENDING_SIGNED_PREVIEW_LIVE",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
   "inheritsFrozenPlanRatherThanStartingAnotherIteration": true,
@@ -25,7 +25,11 @@
     "adAttributionSourceVerified": "Official Green API docs expose sourceType=ad, sourceId and ctwaClid in extended message detail and LastIncomingMessages; Make LastIncomingMessages declared output schema only lists type,idMessage,timestamp,chatId,textMessage,senderName, so exact attribution-bearing mapping still needs proof before activation.",
     "makeCurrentReadOnlyScenarioId": 10196136,
     "makeCurrentWebhookQaScenarioId": 10195867,
-    "connectionHealth": "AY_S_ACTIVE_ID_14749710_OK_MAKE_SCENARIO_GET_20261119"
+    "connectionHealth": "AY_S_ACTIVE_ID_14749710_OK_MAKE_SCENARIO_GET_20261119",
+    "firestoreWriteConnectionNeededForCanonicalAdsScenario": true,
+    "firestoreCredentialRequest": "663a0094-f827-4b73-8cfe-0f9192f7575b",
+    "firestoreCredentialState": "PENDING_OWNER_AUTHORIZATION",
+    "makeScenarioCurrentlyCreatesRealLeads": false
   },
   "roleCapabilities": {
     "policyManageRoles": [
@@ -61,7 +65,10 @@
     "integrationDesign": "Use per-user securely stored, provider-approved IMAP read and authenticated SMTP send with verified HostDime Connect Devices settings; no credentials in chat, client storage or Make scenario plaintext.",
     "ownerPilot": "finanzasyadmin@aysseguros.com",
     "secureIMAP": "correo.aysseguros.com:993 TLS",
-    "secureSMTP": "correo.aysseguros.com:465 TLS"
+    "secureSMTP": "correo.aysseguros.com:465 TLS",
+    "makeIMAPAuthorizationRequest": "dd6d4e7b-3cc6-4fcc-9ba8-9e20ff6eb726",
+    "makeIMAPState": "PENDING_OWNER_SECURE_CREDENTIAL_ENTRY",
+    "makeSMTPState": "UNCREATED_MAKE_CONNECTION_INVALID_ARGUMENT"
   },
   "releasedPolicyAndPremiumCandidate": {
     "sourceSha": "b38f877f7847c7b6e11506885e42252e84c5eeb6",
@@ -109,7 +116,11 @@
       "91-8343059",
       "91-8357452"
     ],
-    "nineDocumentaryRenewalsAvailable": true
+    "nineDocumentaryRenewalsAvailable": true,
+    "protectedPaidRun": 44552961713,
+    "protectedPaidReady": 303,
+    "protectedPaidHolds": 304,
+    "protectedPaidStatus": "PREFLIGHT_PASS_PROTECTED_LIVE_JOB_WAITING_FOR_GITHUB_ENVIRONMENT_REVIEW_NO_VERIFIED_COBROS"
   },
   "knownOpenFronts": [
     "Paid Cobro source proof and protected write/readback/rollback route",
@@ -124,19 +135,22 @@
     "Client360-linked direct inspection opportunity without duplicate client/legacy policy linkage"
   ],
   "noInventedPass": true,
-  "revision": 3,
+  "revision": 4,
   "leadsCadenceAndTemplates": {
-    "status": "OPEN_CAUSAL_PRODUCT_FINDING_NOT_CERTIFIED",
+    "status": "SOURCE_QA_PASS_AWAIT_SIGNED_PREVIEW_MODULE_LIVE_AND_REAL_DELIVERY",
     "currentFrontend": "core/ciclo.js hardcodes D1/D3/D7/D14; automatic internal tasks activate on Propuesta, not user-selectable per newly created lead",
     "currentBackend": "functions/product-ops-leads-domain.js cadence scheduler has fixed three follow-up steps D3/D7/D14 and creates gestiones/outbox pending_provider, not confirmed WhatsApp/email sends",
     "ownerRequested": "Tenant-configurable cadence and per-lead selection at intake; explicit task/channel/stop/delivery semantics, persisted and signed multi-role tested",
     "templates": "modules/plantillas.js uses six reference seed templates, production editing gated by missing server persistence owner",
     "automationUI": "modules/automatizaciones.js records configurable local prefs and prepared logs; real provider delivery not proven",
     "deliveryRule": "Never mark a reminder or prepared webhook as sent or delivered without real provider receipt",
-    "ownerDecision": "START_AT_CREATION_TENANT_ADMINISTRABLE_PER_LEAD_PERSISTED_DELIVERY"
+    "ownerDecision": "START_AT_CREATION_TENANT_ADMINISTRABLE_PER_LEAD_PERSISTED_DELIVERY",
+    "sourcePatchCommit": "cedb1cc9831644f97df860380919c5dfa474ad6f",
+    "sourceChecks": "8_NEW_CONTRACT_AND_7_OPS_PLUS_11_TRANSVERSAL_TESTS_PASS_SOURCE_ONLY_NO_PROVIDER_SEND_PROOF",
+    "sourceFunctionality": "Tenant workflow cadenceSteps day/channel/template subject/body editable, lead creation day-based scheduling, per-lead start offset or off; backend outbox remains pending_provider and does NOT indicate WhatsApp/email sent"
   },
   "inspectionWorkflow": {
-    "status": "CURRENT_LINKAGE_GAP_PROVEN_NO_CLAIM_OF_UNIFIED_ENTRY",
+    "status": "SOURCE_QA_PASS_REAL_CARLOS_360_WRITE_NOT_DONE_PREVIEW_LIVE_E2E_PENDING",
     "newProspect": "Leads opportunity / Ops Cotizaciones, transition to inspeccion -> Ops Inspecciones; no direct first-stage inspeccion UI entry",
     "existingClient": "Start from Cliente360 to preserve unique client. Current solicitarGestion creates Ops Gestiones Admin with clienteId, not automatically an Inspecciones commercial opportunity",
     "newPolicyExistingClient": "Must create distinct linked business opportunity with existing clienteId; product bridge not yet certified, never link an old policy as if the inspection is for new issuance",
@@ -145,7 +159,9 @@
       "orbit360-platform/modules/cliente360.js",
       "functions/product-ops-leads-domain.js"
     ],
-    "ownerConfirmed": "EXISTING_CLIENT_CAN_HAVE_NEW_COMMERCIAL_OPPORTUNITY_LINKED_FROM_CLIENT360_VISIBLE_IN_LEADS_WITH_OPS_INSPECTION"
+    "ownerConfirmed": "EXISTING_CLIENT_CAN_HAVE_NEW_COMMERCIAL_OPPORTUNITY_LINKED_FROM_CLIENT360_VISIBLE_IN_LEADS_WITH_OPS_INSPECTION",
+    "sourcePatchCommit": "cedb1cc9831644f97df860380919c5dfa474ad6f",
+    "sourceFunctionality": "Cliente360 button opens one new business prefilled with existing client id and direct inspection stage; backend verifies same-tenant canonical client; Leads and Ops Inspecciones project same business"
   },
   "governanceReadback20261119": {
     "latestControlPlaneGuardRunId": 44541626874,
@@ -210,7 +226,9 @@
     "sergioCase": "SAVE_REAL_POLICY_IN_CLIENT360_WITH_VEHICLE_AND_RECEIPTS_AND_ACTIVE_MODIFICATION_OPS_GESTION; NEVER_CLAIM_CREATED_UNTIL_SIGNED_READBACK",
     "opsNotification": "SEND_CONTEXT_PERMISSIONS_BASED_WHATSAPP_AND_PER_USER_EMAIL_WITH_REAL_DELIVERY_RECORDS_THREADED_TEMPLATES_AND_NO_FALSE_SENT",
     "leadAdsScenario": "AY_S_GREEN_API_CONNECTION_14749710_ONLY; MUST_BUILD_FINAL_IDEMPOTENT_AD_ATTRIBUTED_WEBHOOK_TO_CANONICAL_LEAD_WRITE; EXISTING_TEST_SKELETON_NOT_PRODUCTION_COMPLETE",
-    "releasePlan": "ACTIVE_I6_6_ISSUES_RESOLVED_PROVEN_IN_SAME_GATE_SOURCE_QA_PREVIEW_EXACT_LIVE_READBACK_NO_ACCUMULATION"
+    "releasePlan": "ACTIVE_I6_6_ISSUES_RESOLVED_PROVEN_IN_SAME_GATE_SOURCE_QA_PREVIEW_EXACT_LIVE_READBACK_NO_ACCUMULATION",
+    "cadenceProviderReceipt": "PENDING_PROVIDER_IS_NOT_SENT_OR_DELIVERED",
+    "carlosCommercialOpportunity": "ONE_BUSINESS_ON_BOTH_BOARDS_LINKED_TO_EXISTING_CLIENT_NEW_INSPECTION_NO_DUPLICATE_CUSTOMER"
   },
   "renewalFindingsRecoveredFromPriorConversation": {
     "historicalDate": "2026-10-15",
