@@ -265,13 +265,15 @@ jobs:
           // A successor never mutates the original approved request. This
           // exact new request must attest an already successful source CI run
           // and a manifest blob pinned to this immutable source tree.
-          const opsActivitySuccessor=!!c.postAcceptanceOwnerOpsActivityEndosoPreviewBuildRequest20261119;
+          const insurerSelectionSuccessor=!!c.postAcceptanceOwnerInsurerSelectionPreviewBuildRequest20261119;
+          const opsActivitySuccessor=insurerSelectionSuccessor||!!c.postAcceptanceOwnerOpsActivityEndosoPreviewBuildRequest20261119;
           const vehicleSuccessor=opsActivitySuccessor||!!c.postAcceptanceOwnerVehiclePackagePreviewBuildRequest20261119;
           const lineageSuccessor=vehicleSuccessor||!!c.postAcceptanceOwnerSourceLineagePreviewBuildRequest20261119;
           const ownerPremiumSuccessor=lineageSuccessor||!!c.postAcceptanceOwnerP0PremiumRulesPreviewBuildRequest20261119;
           const ownerSuccessor=ownerPremiumSuccessor||!!c.postAcceptanceOwnerP0PreviewBuildRequest20261119;
           const financeSuccessor=ownerSuccessor||!!c.postAcceptanceInsurerTotalsPreviewBuildRequest20261118;
-          const successor=c.postAcceptanceOwnerOpsActivityEndosoPreviewBuildRequest20261119||
+          const successor=c.postAcceptanceOwnerInsurerSelectionPreviewBuildRequest20261119||
+            c.postAcceptanceOwnerOpsActivityEndosoPreviewBuildRequest20261119||
             c.postAcceptanceOwnerVehiclePackagePreviewBuildRequest20261119||
             c.postAcceptanceOwnerSourceLineagePreviewBuildRequest20261119||
             c.postAcceptanceOwnerP0PremiumRulesPreviewBuildRequest20261119||
@@ -289,7 +291,8 @@ jobs:
               const expectedWorkflow='.github/workflows/gravicentra-i66-privileged-role-parity-source-qa.yml';
               const runId=successor.sourceQaRunId;
               const sourceHead=successor.sourceQaHead;
-              const expectedScope=opsActivitySuccessor?
+              const expectedScope=insurerSelectionSuccessor?
+                'EXACT_IMMUTABLE_PREVIEW_ONLY_POLICY_INSURER_EXPLICIT_SELECTION_AND_OPS_CLIENT360_ENDOSO':opsActivitySuccessor?
                 'EXACT_IMMUTABLE_PREVIEW_ONLY_OPS_CLIENT360_ACTIVITY_AND_DIRECT_ISSUED_VEHICLE_ENDOSO':vehicleSuccessor?
                 'EXACT_IMMUTABLE_PREVIEW_ONLY_OPERATIVO_VEHICLE_WRITE_AND_OWNER_LINEAGE':lineageSuccessor?
                 'EXACT_IMMUTABLE_PREVIEW_ONLY_OWNER_APPROVED_LOGIN_CLIENT360_OPS_LEADS_PREMIUM_COBROS_LINEAGE':ownerPremiumSuccessor?
