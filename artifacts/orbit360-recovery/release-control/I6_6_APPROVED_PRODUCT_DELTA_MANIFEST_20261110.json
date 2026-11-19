@@ -3301,6 +3301,42 @@
           }
         }
       ]
+    },
+    {
+      "id": "I6_6_CLIENTE360_EQUIPO_CANONICAL_ADVISOR_EDIT_CREATE_ROOTFIX_20261119",
+      "approvedByDirection": true,
+      "receipt": "Paula Dirección 2026-11-19: Carlos Operativo muestra físicamente en Cliente360 / Editar ficha que Germán Reyes y Priscila no figuran aunque Equipo los reconoce. Se autoriza corregir dentro del gate I6.6, preservar todas las capacidades aprobadas, certificar y publicar el mismo artefacto de manera acumulativa; no reconstruir, no editar datos operativos para reparar el selector.",
+      "sourceStatus": "SOURCE_PATCH_PENDING_CANONICAL_GUARD_SIGNED_PREVIEW_AND_SAME_ARTIFACT_LIVE_QA_NOT_PRODUCTION_ACCEPTED",
+      "capabilityOwners": [
+        "CLIENTE360_PRIMARY_RUNTIME",
+        "ROLE_SCOPE_RUNTIME",
+        "CROSS_MODULE_RELATIONSHIPS"
+      ],
+      "scope": "Unify Editar/Nuevo cliente advisor selection with authenticated minimal assignableAdvisorRoster by country/role, preserving historical ID, no default phantom advisor, no restricted Equipo collection exposure, fail closed save, preserve read/write roles and existing polizas/ops/payments. Current screenshot Edson Rene under Carlos GT; no actual customer mutation authorized by source QA.",
+      "paths": [
+        {
+          "path": "orbit360-platform/modules/cliente360.js",
+          "gitBlobSha": "696d5aa8df033f2231012d650727b05d1817c1af",
+          "replaces": {
+            "path": "orbit360-platform/modules/cliente360.js",
+            "priorGitBlobSha": "c3d9e3ba324d84dc989bbdebf2d0d1480a76c228",
+            "priorChangeId": "I6_6_OWNER_APPROVED_SOURCE_LINEAGE_SUCCESSOR_20261119"
+          }
+        }
+      ],
+      "tests": [
+        {
+          "path": "tools/gravicentra-i6-6-cliente360-advisor-source-parity.test.cjs",
+          "gitBlobSha": "fe3c553f0e3898e45019c9436f56735f17fe0531"
+        }
+      ],
+      "releaseConditions": [
+        "signed source QA passes current manifest",
+        "signed Carlos GT LIVE/Preview actual Editar+Nuevo selectors Germán and Priscila",
+        "save fixture persistence reload and no unrelated advisor or country changes",
+        "existing cumulative I6.6 source build and same artifact preview/live",
+        "readback both live origins and affected module acceptance without customer data mutation"
+      ]
     }
   ],
   "i66R11PreviewBuildRequest20261113": {
