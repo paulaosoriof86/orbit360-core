@@ -192,13 +192,19 @@ Orbit.__crmV1198GuardDiagnostics = guardDiagnostics;
     if (routeParams().c) enhanceClientDetail(host); else enhanceClientList(host);
   }
 
-  function eligibleAdvisors() {
-    const all = baseStore().all('asesores') || [];
-    const scope = A.dataScope('cliente360');
-    if (scope === 'all') return all;
-    if (scope === 'team') { const ids = new Set(A.teamAdvisorIds()); return all.filter(a => ids.has(String(a.id))); }
-    const own = A.actorAdvisorId();
-    return all.filter(a => String(a.id) === own);
+  function eligibleAdvisors(verified) {
+    // Strict intersection: server-owned Equipo identity + signed Cliente360 data scope.
+    const scope=A.dataScope('cliente360');
+    if(scope==='all')return verified;
+    if(scope==='team'){
+      const ids=new Set([].concat(A.teamAdvisorIds()||[]).map(String));
+      return verified.filter(a=>ids.has(String(a.id)));
+    }
+    if(scope==='own'){
+      const own=String(A.actorAdvisorId()||'');
+      return verified.filter(a=>own&&String(a.id)===own);
+    }
+    return [];
   }
 
   function openNewClient() {
@@ -206,7 +212,7 @@ Orbit.__crmV1198GuardDiagnostics = guardDiagnostics;
       toast('No tienes permiso para crear clientes. Solicita una gestión de corrección.');
       return;
     }
-    const advisors = eligibleAdvisors();
+    let advisors = [],advisorRosterReady=false,advisorRosterCountry='',advisorRosterSeq=0;
     const countries = (Orbit.PAISES || []).filter(p => p.id !== 'TODOS');
     let back = document.getElementById('crm-new-client-v1198'); if (back) back.remove();
     back = document.createElement('div'); back.id = 'crm-new-client-v1198'; back.className = 'drawer-back open';
@@ -234,7 +240,7 @@ Orbit.__crmV1198GuardDiagnostics = guardDiagnostics;
           <label class="ce-l">Ciudad / municipio<select id="v1198-ciu" class="o-sel"></select></label>
           <label class="ce-l">Dirección<input id="v1198-dir" class="o-sel"></label>
           <label class="ce-l">Canal<select id="v1198-canal" class="o-sel">${((Orbit.cat && Orbit.cat.get && Orbit.cat.get('canales')) || ['Referido']).map(x => `<option>${esc(x)}</option>`).join('')}</select></label>
-          <label class="ce-l">Asesor responsable *<select id="v1198-ase" class="o-sel">${advisors.map(a => `<option value="${esc(a.id)}">${esc(a.nombre)}</option>`).join('')}</select></label>
+          <label class="ce-l">Asesor responsable *<select id="v1198-ase" class="o-sel"><option value="">Consultando el equipo autorizado…</option></select></label>
         </div>
         <div style="display:flex;align-items:center;gap:9px;padding:10px 12px;border-radius:14px;background:#f5f8fb;border-left:3px solid #2a6fdb;font-family:var(--f-display);font-weight:800;font-size:14px">
           <span>📝</span><div>Contexto y seguimiento<div style="font-family:var(--f-body);font-size:11.5px;font-weight:500;color:var(--ink-3);margin-top:2px">Asigna responsable, canal y observaciones útiles para la gestión.</div></div>
@@ -267,7 +273,43 @@ Orbit.__crmV1198GuardDiagnostics = guardDiagnostics;
       dep.innerHTML = '<option value="">— Seleccionar —</option>' + rows.map(x => `<option>${esc(x)}</option>`).join(''); fillCities();
     }
     pais.addEventListener('change', fillDeps); dep.addEventListener('change', () => fillCities()); fillDeps();
+    const advisorEl=$('#v1198-ase'),advisorSave=$('#v1198-save');
+    const advisorSelectionValid=()=>advisorRosterReady&&advisorRosterCountry===pais.value&&
+      advisors.some(row=>String(row.id)===String(advisorEl.value||''));
+    const loadAdvisors=async()=>{
+      const seq=++advisorRosterSeq,country=String(pais.value||'').toUpperCase();
+      advisors=[];advisorRosterReady=false;advisorRosterCountry='';
+      advisorEl.disabled=true;advisorSave.disabled=true;advisorEl.dataset.rosterState='loading';
+      advisorEl.innerHTML='<option value="">Consultando el equipo autorizado…</option>';
+      try{
+        if(!['GT','CO'].includes(country)||typeof Orbit.assignableAdvisorRoster?.list!=='function')
+          throw Error('ASSIGNABLE_ADVISOR_ROSTER_BACKEND_REQUIRED');
+        const source=await Orbit.assignableAdvisorRoster.list(country,{force:true});
+        if(!back.isConnected||seq!==advisorRosterSeq)return;
+        const seen=new Set();
+        advisors=eligibleAdvisors(source.filter(a=>{
+          if(!a?.id||!a.nombre||a.assignable!==true||a.roleEligible!==true||
+             a.activo===false||![].concat(a.paises||[]).includes(country)||seen.has(a.id))return false;
+          seen.add(a.id);return true;
+        }));
+        advisorEl.innerHTML='<option value="">— Seleccionar asesor habilitado —</option>'+
+          advisors.map(a=>'<option value="'+esc(a.id)+'">'+esc(a.nombre)+'</option>').join('');
+        advisorRosterReady=true;advisorRosterCountry=country;advisorEl.disabled=false;
+        advisorEl.dataset.rosterState='ready';advisorEl.dataset.rosterCountry=country;
+        advisorEl.dataset.rosterCount=String(advisors.length);
+        advisorSave.disabled=true; // No phantom default seller, explicit human selection.
+      }catch(error){
+        if(!back.isConnected||seq!==advisorRosterSeq)return;
+        advisorEl.dataset.rosterState='blocked';advisorEl.disabled=true;advisorSave.disabled=true;
+        advisorEl.innerHTML='<option value="">No se pudo verificar Equipo; creación bloqueada</option>';
+        try{console.warn('[Gravicentra][CRM] ASSIGNABLE_ADVISOR_ROSTER_REQUIRED',{country});}catch(_){}
+      }
+    };
+    advisorEl.addEventListener('change',()=>{advisorSave.disabled=!advisorSelectionValid();});
+    pais.addEventListener('change',()=>{void loadAdvisors();});
+    void loadAdvisors();
     $('#v1198-save').addEventListener('click', async () => {
+      if(!advisorSelectionValid())return toast('Selecciona un asesor vigente de Equipo, confirmado para el país y rol.');
       const name = $('#v1198-nombre').value.trim();
       if (!name) { $('#v1198-nombre').focus(); toast('Ingresa el nombre o razón social'); return; }
       const raw = {
@@ -291,9 +333,12 @@ Orbit.__crmV1198GuardDiagnostics = guardDiagnostics;
       if (probable.length) {
         const ok = await U.confirm('Se detectó un posible duplicado por nombre/país. ¿Crear como Requiere validación?', { title: 'Posible duplicado', ok: 'Crear para revisión' });
         if (!ok) return;
+        if(!advisorSelectionValid())return toast('El asesor cambió durante la confirmación; vuelve a seleccionarlo.');
         raw.requiereValidacion = true;
         raw.calidad = { alertas: ['duplicado_probable'] };
       }
+      if(!advisorSelectionValid()||raw.asesorId!==advisorEl.value||raw.pais!==pais.value)
+        return toast('El país o asesor cambió; confirma nuevamente los datos.');
       const row = A.prepareManual('clientes', raw);
       row.estadoOperativo = 'pendiente_polizas'; row.estado = 'pendiente_polizas';
       const opId = 'crm_client_create_' + row.id + '_' + Date.now().toString(36);
@@ -316,7 +361,7 @@ Orbit.__crmV1198GuardDiagnostics = guardDiagnostics;
         close(); location.hash = '#/cliente360?c=' + encodeURIComponent(row.id);
         toast('✓ Cliente creado y confirmado.');
       } catch (error) {
-        save.disabled = false; save.textContent = 'Crear cliente';
+        save.disabled = !advisorSelectionValid(); save.textContent = 'Crear cliente';
         toast('No fue posible confirmar la creación; el formulario permanece abierto.');
       }
     });
