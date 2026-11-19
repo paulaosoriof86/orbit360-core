@@ -13,6 +13,10 @@ on:
     paths:
       - artifacts/orbit360-recovery/release-control/I6_6_APPROVED_PRODUCT_DELTA_MANIFEST_20261110.json
       - tools/gravicentra-i6-6-delta-guard.mjs
+      # The same I6.6 release gate verifies the insurer-source bulk preflight.
+      # No financial writes occur in this workflow.
+      - tools/gravicentra-i66-source-bulk-plan.cjs
+      - tools/gravicentra-i66-source-bulk-plan.test.cjs
       # QA owners and their transport are immutable build/proof inputs too.
       - .github/workflows/gravicentra-release-delta-66-package.yml
       - .github/workflows/gravicentra-i66-privileged-role-three-function-preview-uat.yml
@@ -94,6 +98,12 @@ jobs:
           ref: ${{ github.sha }}
           fetch-depth: 0
           persist-credentials: false
+      - name: Certify insurer-source bulk preflight with isolated exceptions
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check tools/gravicentra-i66-source-bulk-plan.cjs
+          node tools/gravicentra-i66-source-bulk-plan.test.cjs
       - id: release
         env:
           GITHUB_TOKEN: ${{ github.token }}
