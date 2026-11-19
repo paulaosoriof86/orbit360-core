@@ -3802,15 +3802,16 @@
     "status": "FROZEN_BY_PAULA_OWNER_2026_11_19",
     "scope": "EXISTING_I6_6_FROZEN_PLAN_NOT_NEW_ITERATION_OR_BRANCH",
     "authority": "Explicit owner messages on 2026-11-19 in Gravicentra Insurance project; must be backed by product tests and exact protected write readback before claimed operational",
-    "sameGreenApiInstanceForAdsAndTya": true,
     "make": {
       "newGravicentraOwnScenariosRequired": true,
       "doNotLimitToExistingMakeScenarios": true,
       "preserveExistingTyaScenarios": true,
-      "waFromMetaAdsToNewLead": "OWNER_APPROVED_SCOPE_PENDING_EXISTING_INSTANCE_INGRESS_AND_SIGNED_LEAD_WRITE_PROOF",
+      "waFromMetaAdsToNewLead": "OWNER_APPROVED_SCOPE_BACKEND_SECURE_WRITER_NOT_YET_BUILT_OR_PROVEN",
       "ownWaLeadScenarioId": 10195867,
       "ownWaLeadScenarioStatus": "INACTIVE_WEBHOOK_ONLY_NO_LEAD_WRITES",
-      "doNotRepointTyaWebhookWithoutConfirmedFanout": true
+      "doNotRepointTyaWebhookWithoutConfirmedFanout": true,
+      "aysReadOnlyPollingScenarioId": 10196136,
+      "aysReadOnlyPollingStatus": "INACTIVE_PRIVACY_GUARD_STOPPED_BROAD_100_MESSAGE_TEST_REQUIRES_EXPLICIT_SAMPLE_SCOPE"
     },
     "premiumAndCommission": {
       "replaceExistingDefaults": true,
@@ -3861,7 +3862,18 @@
       "NO_PRODUCTION_ACCEPTANCE_FOR_NEW_INSURER_FINANCIAL_RULES",
       "NEED_SIGNED_DOC_SCAN_TO_CLIENT_POLICY_VEHICLE_RECEIPT_PAYMENT_QA",
       "COBROS_LATENCY_UNRESOLVED",
-      "SERGIO_LOPEZ_UNSIGNED_POLICY_UI_NO_PROVEN_LIVE_FIX"
-    ]
+      "SERGIO_LOPEZ_UNSIGNED_POLICY_UI_NO_PROVEN_LIVE_FIX",
+      "MAKE_AYS_WA_ADS_LEAD_REAL_WRITE_NOT_PROVEN_PRIVACY_SCOPE_APPROVAL_PENDING"
+    ],
+    "greenApiInstanceAuthority": {
+      "ownerClarification": "AyS_ACTIVA_TYA_INACTIVA_SEPARATE_INSTANCES",
+      "adsWhatsappInstance": "AyS_ACTIVE",
+      "existingTyaMakeConnection": "INACTIVE_BACKING_GREENAPI_INSTANCE_DO_NOT_USE",
+      "makeTeamId": 1975919,
+      "authorizedAySOfficialConnectionId": 14749710,
+      "authorizationRequest": "0d0d7a45-bb47-4dea-8eaf-7e8de75ab2c5",
+      "authorizationState": "AUTHORIZED_2026_11_19",
+      "actualInstancePhoneIdentity": "NOT_YET_VERIFIED_BY_INSTANCE_READ_ONLY_PROOF"
+    }
   }
 }
