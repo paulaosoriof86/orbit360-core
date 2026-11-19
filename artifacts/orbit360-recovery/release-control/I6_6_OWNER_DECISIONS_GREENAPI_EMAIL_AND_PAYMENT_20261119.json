@@ -1,5 +1,5 @@
 {
-  "schema": "GRAVICENTRA_I6_6_FROZEN_OWNER_DECISIONS_20261119_V4",
+  "schema": "GRAVICENTRA_I6_6_FROZEN_OWNER_DECISIONS_20261119_V5",
   "dateGuatemala": "2026-11-19",
   "status": "FROZEN_DECISIONS_SOURCE_QA_CANDIDATE_PENDING_SIGNED_PREVIEW_LIVE",
   "repository": "paulaosoriof86/orbit360-core",
@@ -135,7 +135,7 @@
     "Client360-linked direct inspection opportunity without duplicate client/legacy policy linkage"
   ],
   "noInventedPass": true,
-  "revision": 4,
+  "revision": 5,
   "leadsCadenceAndTemplates": {
     "status": "SOURCE_QA_PASS_AWAIT_SIGNED_PREVIEW_MODULE_LIVE_AND_REAL_DELIVERY",
     "currentFrontend": "core/ciclo.js hardcodes D1/D3/D7/D14; automatic internal tasks activate on Propuesta, not user-selectable per newly created lead",
@@ -146,7 +146,7 @@
     "deliveryRule": "Never mark a reminder or prepared webhook as sent or delivered without real provider receipt",
     "ownerDecision": "START_AT_CREATION_TENANT_ADMINISTRABLE_PER_LEAD_PERSISTED_DELIVERY",
     "sourcePatchCommit": "cedb1cc9831644f97df860380919c5dfa474ad6f",
-    "sourceChecks": "8_NEW_CONTRACT_AND_7_OPS_PLUS_11_TRANSVERSAL_TESTS_PASS_SOURCE_ONLY_NO_PROVIDER_SEND_PROOF",
+    "sourceChecks": "9_NEW_CONTRACT_AND_7_OPS_PLUS_11_TRANSVERSAL_TESTS_PASS_SOURCE_ONLY_NO_PROVIDER_SEND_PROOF",
     "sourceFunctionality": "Tenant workflow cadenceSteps day/channel/template subject/body editable, lead creation day-based scheduling, per-lead start offset or off; backend outbox remains pending_provider and does NOT indicate WhatsApp/email sent"
   },
   "inspectionWorkflow": {
@@ -246,5 +246,49 @@
       "collaborative_comments_attachments_notifications_saving_and_reload"
     ],
     "previousClaim": "2026-11-14_R11_LIVE_RENOVATIONS_PREVIOUSLY_CLAIMED_TEST_25_OF_25_AND_19_FOCUSED_MUST_VERIFY_CURRENT_LINEAGE_NOT_AUTOMATIC_PASS"
+  },
+  "renewalDocumentaryDrive": {
+    "status": "FIVE_ORIGINAL_2026_2027_PDFS_UPLOADED_READBACK_VERIFIED_DOCUMENT_ONLY_NO_FIRESTORE_WRITE_NO_KANBAN_PASS",
+    "folderId": "1QkaM9HzRKaJ7GQ7B80myQ1xW5yRItOCw",
+    "folderUrl": "https://drive.google.com/drive/folders/1QkaM9HzRKaJ7GQ7B80myQ1xW5yRItOCw",
+    "files": [
+      {
+        "policy": "91-4143471",
+        "file": "914143471368727.pdf",
+        "driveId": "1DKr5Ku9-XmsIiKlJsmC3T6hsH-TLF3MM",
+        "driveUrl": "https://drive.google.com/file/d/1DKr5Ku9-XmsIiKlJsmC3T6hsH-TLF3MM/view",
+        "sha256": "b15a25530cc0cf13c46e028dd3e8657444b3e485635343835922be71cc698d42"
+      },
+      {
+        "policy": "91-8324489",
+        "file": "918324489384442.pdf",
+        "driveId": "10iVOyGWLTleozxE9ieo-d34lTSQJDV8W",
+        "driveUrl": "https://drive.google.com/file/d/10iVOyGWLTleozxE9ieo-d34lTSQJDV8W/view",
+        "sha256": "e64e6472321e53a2c68a4e88139a1423a0d1261ee75ff8f6603c47215602c8a7"
+      },
+      {
+        "policy": "91-8342189",
+        "file": "918342189384443.pdf",
+        "driveId": "1fuPpqesUkg5LmkGuz16icfarQmJ-8VXg",
+        "driveUrl": "https://drive.google.com/file/d/1fuPpqesUkg5LmkGuz16icfarQmJ-8VXg/view",
+        "sha256": "1814d67bd274ccecbb523666fc9cd52fd8928cd41b8cbec4a725804c0e41a9ad"
+      },
+      {
+        "policy": "91-8343059",
+        "file": "918343059384576.pdf",
+        "driveId": "14I4mW85MdjXQ7EZ_cI5TjFRGbBYDRY7u",
+        "driveUrl": "https://drive.google.com/file/d/14I4mW85MdjXQ7EZ_cI5TjFRGbBYDRY7u/view",
+        "sha256": "05be6fd1da736b40306f7f3f709b1e0288d0970b63813fb4376b7e2354fbab15"
+      },
+      {
+        "policy": "91-8357452",
+        "file": "918357452359402.pdf",
+        "driveId": "1V-ttJwtO21uVi1Z7t5DmpPJfhxRkxbO3",
+        "driveUrl": "https://drive.google.com/file/d/1V-ttJwtO21uVi1Z7t5DmpPJfhxRkxbO3/view",
+        "sha256": "a93e35667108acd8965430fd76dcd7d2f9e05316810672fe28ade4d227c49733"
+      }
+    ],
+    "clientOwnershipAmbiguity": "PDF 91-8343059 says RIGOBERTO SON CHAY; Drive folder says RIGOBERTO SON CHAN. Do not auto-link identities until Paula answers or authenticated identifier evidence.",
+    "nextGate": "Import/relink verified exact policy editions atomically, due/Kanban and prior-term paid renewal inference only when real renewal payment evidence independently established; then signed live before/after and readback."
   }
 }
