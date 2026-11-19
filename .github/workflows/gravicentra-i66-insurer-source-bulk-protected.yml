@@ -6,7 +6,7 @@ on:
         description: Insurer-pinned I6.6 source manifest within the existing recovery branch
         required: true
         type: string
-        default: artifacts/orbit360-recovery/source-batches/I6_6_SOURCE_BULK_20261119_ROBLE_NOV20_259.json
+        default: artifacts/orbit360-recovery/source-batches/I6_6_SOURCE_BULK_20261119_CEIBA_NOV16_1.json
   push:
     branches: [recovery/fase-a-clean-20260831]
     paths:
@@ -24,7 +24,7 @@ concurrency:
   cancel-in-progress: false
 env:
   GCLOUD_PROJECT: ays-orbit-360-lab
-  GI_I66_BULK_SOURCE_MANIFEST: ${{ inputs.source_manifest || 'artifacts/orbit360-recovery/source-batches/I6_6_SOURCE_BULK_20261119_ROBLE_NOV20_259.json' }}
+  GI_I66_BULK_SOURCE_MANIFEST: ${{ inputs.source_manifest || 'artifacts/orbit360-recovery/source-batches/I6_6_SOURCE_BULK_20261119_CEIBA_NOV16_1.json' }}
   SA_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
   SA_LAB_ALT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
   SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
