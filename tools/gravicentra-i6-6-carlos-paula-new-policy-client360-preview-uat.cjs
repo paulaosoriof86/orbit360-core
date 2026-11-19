@@ -6,8 +6,8 @@ const crypto=require('node:crypto');
 const admin=require('firebase-admin');
 const {chromium}=require('playwright');
 const LIVE=process.env.I66_NEW_POLICY_SIGNED_LIVE_ONLY==='true';
-const ORIGIN=LIVE?'https://app.aysseguros.com':'https://ays-orbit-360-lab--gi-i66-rc-44525928215-15hd22yu.web.app';
-const SOURCE='26ea9a2136d0ae027847d8668d8e82db62398945';
+const ORIGIN=LIVE?'https://app.aysseguros.com':'https://ays-orbit-360-lab--gi-i66-rc-44535644258-00es5pra.web.app';
+const SOURCE='b38f877f7847c7b6e11506885e42252e84c5eeb6';
 const TENANT='alianzas-soluciones';
 assert.equal(process.env.I66_PREVIEW_ORIGIN,ORIGIN,'QA_AUTHORIZED_ORIGIN_DRIFT');
 assert.equal(process.env.I66_PREVIEW_SOURCE_SHA,SOURCE,'QA_PREVIEW_SOURCE_DRIFT');
@@ -170,6 +170,7 @@ async function runOne(browser,actor){
       ramo:'Autos',subramo:'Auto Individual',producto:'Auto Individual',tipoPoliza:'Individual',
       estado:'Vigente',renovable:true,vigenciaInicio:'2026-11-13',vigenciaFin:'2027-11-12',
       frecuencia:'Contado',formaPago:'Transferencia',conducto:'Aseguradora',cuotas:1,
+      fechaEmision:'2026-11-13',cashRequirementMode:'ISSUE_PLUS_ONE_CALENDAR_MONTH_V1',
       primaNeta:1000,gastosEmision:50,otros:0,ivaPct:12,comAseguradoraPct:12,comVendedorPct:50,
       vehiculo:{marca:'Toyota',linea:'QA',placa:'QA-'+suffix.slice(-6),anio:'2026',uso:'Particular',chasis:'QA-'+suffix}
     };
@@ -191,6 +192,9 @@ async function runOne(browser,actor){
     assert.equal(receipts.size,1,'QA_NEW_POLICY_RECEIPT_COUNT_WRONG');
     assert.equal(portfolio.size,1,'QA_NEW_POLICY_PORTFOLIO_COUNT_WRONG');
     assert.equal(vehicles.size,1,'QA_NEW_POLICY_VEHICLE_MISSING');
+    assert.equal(policy.data()?.fechaEmision,'2026-11-13','QA_CASH_ISSUE_DATE_NOT_PERSISTED');
+    assert.equal(receipts.docs[0].data()?.vence,'2026-12-13','QA_CASH_REQUIREMENT_NOT_ISSUE_PLUS_CALENDAR_MONTH');
+    assert.equal(receipts.docs[0].data()?.fechaLimite,'2026-12-13','QA_CASH_LIMIT_NOT_EXPLICIT_DUE');
     assert.equal(receipts.docs[0].data()?.clienteId,ids.client);
     assert.equal(portfolio.docs[0].data()?.reciboId,receipts.docs[0].id);
     assert.equal(vehicles.docs[0].data()?.clienteId,ids.client);
