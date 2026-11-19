@@ -37,14 +37,17 @@ test('source UI exposes optional calendar errors rather than silently suppressin
  assert.match(ui,/Never silently disable the button/);
  assert.match(ui,/\[data-documented-calendar\].*aria-invalid/);
 });
-test('GT insurer issue defaults remain human overridable and product-gated',()=>{
+test('GT insurer issuance is editable and resolved from the insurer fiche, never from a brand name',()=>{
  assert.match(ui,/issueManuallyEdited=true/);
- assert.match(ui,/mapfre/);
- assert.match(ui,/net\+assistance/);
- assert.match(ui,/columna/);
- assert.match(ui,/veh.*mapfre/i);
+ assert.match(ui,/insurerPremiumRule\(insurerEl\.value,ramoEl\.value\)/);
+ assert.match(ui,/rule\.gastosEmisionBase==='netaMasAsistencia'/);
+ assert.match(ui,/rule\.gastosEmisionPct/);
+ assert.doesNotMatch(ui,/\/mapfre\//i);
+ assert.doesNotMatch(ui,/\/columna\//i);
 });
-test('twelve-payment financial surcharge cannot default to an unverified rate',()=>{
+test('owner-approved twelve-payment financial surcharge defaults to 13.5 percent when source does not override',()=>{
  assert.match(ui,/freq==='Mensual'&&installments<=11/);
+ assert.match(ui,/freq==='Mensual'&&installments===12\)pct\.value='13\.5'/);
+ assert.match(ui,/rule\?\.recargosPorCuotas/);
  assert.match(ui,/recargo_financiero_requiere_confirmacion/);
 });

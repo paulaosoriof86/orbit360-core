@@ -2981,6 +2981,11 @@
           "path": "tools/gravicentra-i6-6-insurer-product-commission.test.cjs",
           "gitBlobSha": "4f6a0b67d2a1a61f2832a24442d9fdf11b08ba4e",
           "replaces": {"path":"tools/gravicentra-i6-6-insurer-product-commission.test.cjs","priorGitBlobSha":"28d85abd3904a9a73fb8eee63e06a7468e22fe4b","priorChangeId":"I6_6_INSURER_EDITABLE_PRODUCT_COMMISSION_OWNER_20261119"}
+        },
+        {
+          "path": "tools/gravicentra-i6-6-manual-policy-capture-p0.test.cjs",
+          "gitBlobSha": "4ab2af161c600381d9af6023ab1242fcac235c9f",
+          "replaces": {"path":"tools/gravicentra-i6-6-manual-policy-capture-p0.test.cjs","priorGitBlobSha":"90d501d4abcdd431a0e6fbb35f39f22ff15aa356","priorChangeId":"I6_6_CASH_30D_FORWARD_ONLY_P0_LEGACY_PRESERVATION_20261118"}
         }
       ]
     }
