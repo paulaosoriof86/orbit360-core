@@ -4,7 +4,7 @@
 // Environment gate; one approval covers all approved chunks, not each row.
 const crypto=require('node:crypto');
 const {MAX_CHUNK,moneyCents,preimageFingerprint,paid,internal,sourceAliases,
-  monthlySequence,internalSequence,completeMonthlySchedule}
+  monthlySequence,internalSequence,completeMonthlySchedule,canonicalPolicyNumber}
   =require('./gravicentra-i66-source-bulk-plan.cjs');
 const TENANT='alianzas-soluciones',PROJECT='ays-orbit-360-lab';
 const str=value=>String(value==null?'':value).trim();
@@ -45,7 +45,8 @@ async function applyOne(db,row,gate){
     if(!rs.exists||!cs.exists||!ps.exists)hold('RECORD_MISSING');
     const r=rs.data(),c=cs.data(),p=ps.data();
     if(str(r.polizaId)!==row.policyId||str(c.polizaId||c.policyId)!==row.policyId||
-      str(p.numero)!==row.policy||norm(p.pais)!=='GT'||norm(p.moneda)!=='GTQ'||
+      canonicalPolicyNumber(p.numero)!==canonicalPolicyNumber(row.policy)||
+      norm(p.pais)!=='GT'||norm(p.moneda)!=='GTQ'||
       norm(r.moneda||p.moneda)!=='GTQ'||norm(c.moneda||p.moneda)!=='GTQ'||
       !str(p.clienteId)||str(c.clienteId||p.clienteId)!==str(p.clienteId)||
       [r,c,p].some(x=>x.tenantId&&x.tenantId!==TENANT)||

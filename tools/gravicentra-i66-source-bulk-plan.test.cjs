@@ -88,5 +88,11 @@ monthly.groups[0].receipts.push({id:'rec_schedule_12',polizaId:'p0',moneda:'GTQ'
   numeroReciboFuente:'12/12',primaTotal:163.01});
 monthly.raw[0].due='2026-11-15';
 assert.equal(planSourceBatch(monthly.raw,monthly.groups).exceptionCount,1);
+const padded=sample(1);
+padded.raw[0].policy='91-169567';
+padded.groups[0].policy.numero='91-0169567';
+assert.equal(planSourceBatch(padded.raw,padded.groups).readyCount,1);
+padded.raw[0].policy='91-169568';
+assert.equal(planSourceBatch(padded.raw,padded.groups).exceptions[0].code,'POLICY_EDITION_MISSING');
 assert.throws(()=>planSourceBatch(raw,groups,{chunkSize:501}),/SOURCE_BATCH_CHUNK_LIMIT/);
 console.log('I66_SOURCE_BULK_PREFLIGHT_PASS 750 rows 3 chunks; exceptions isolated; 0 writes');

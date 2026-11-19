@@ -6,7 +6,7 @@ const fs=require('node:fs');
 const path=require('node:path');
 const crypto=require('node:crypto');
 const assert=require('node:assert/strict');
-const {planSourceBatch}=require('./gravicentra-i66-source-bulk-plan.cjs');
+const {planSourceBatch,canonicalPolicyNumber}=require('./gravicentra-i66-source-bulk-plan.cjs');
 const {applyProtectedBatch}=require('./gravicentra-i66-source-bulk-apply.cjs');
 const BASE=path.resolve(__dirname,'../artifacts/orbit360-recovery/source-batches');
 const INTAKE=require('../artifacts/orbit360-recovery/release-control/I6_6_COBROS_CONCILIACION_SOURCE_INTAKE_20261110.json');
@@ -41,10 +41,13 @@ async function readGroups(db,rawRows){
   // hydration, and no materialization or mutation of source rows.
   for(let offset=0;offset<policyNumbers.length;offset+=6){
     const sets=await Promise.all(policyNumbers.slice(offset,offset+6).map(async number=>{
-      const policies=await internal('polizas',db).where('numero','==',number).limit(21).get();
-      assert.ok(policies.size<=20,'I66_POLICY_EDITION_QUERY_UNBOUNDED');
+      const names=[...new Set([number,canonicalPolicyNumber(number)])];
+      const snaps=await Promise.all(names.map(n=>
+        internal('polizas',db).where('numero','==',n).limit(21).get()));
+      const policies=new Map(snaps.flatMap(s=>s.docs).map(d=>[d.id,d]));
+      assert.ok(policies.size<=20&&snaps.every(s=>s.size<=20),'I66_POLICY_EDITION_QUERY_UNBOUNDED');
       const current=[];
-      for(const doc of policies.docs){
+      for(const doc of policies.values()){
         const p={...doc.data(),id:doc.id};
         if(str(p.pais).toUpperCase()!=='GT')continue;
         const [client,insurer,receipts,portfolio,cobros]=await Promise.all([
@@ -94,7 +97,8 @@ async function main(){
     const policyDiagnostics=[...affectedNumbers].map(number=>({
       policyNumber:number,
       sourceRows:source.data.rows.filter(r=>str(r.policy)===number).length,
-      editions:groups.filter(g=>str(g.policy.numero)===number).map(g=>({
+      editions:groups.filter(g=>canonicalPolicyNumber(g.policy.numero)===
+        canonicalPolicyNumber(number)).map(g=>({
         id:g.policy.id,pais:g.policy.pais,moneda:g.policy.moneda,
         insurer:g.insurerName,clientExists:g.clientExists,
         insurerVerified:g.insurerVerified,estado:g.policy.estado,

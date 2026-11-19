@@ -7,6 +7,15 @@ const crypto = require('node:crypto');
 const MAX_CHUNK = 250;
 const str = value => String(value == null ? '' : value).trim();
 const norm = value => str(value).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toUpperCase();
+// El Roble prints 91-169567 while older canonical policy editions preserve
+// 91-0169567. Only normalize this insurer's fixed-width numeric 91-XXXXXXX
+// policy format; never normalize a requirement number or a different policy
+// family, and never create a second edition from formatting alone.
+const canonicalPolicyNumber = value => {
+  const n = str(value).replace(/[\u2010-\u2015]/g,'-');
+  const match = /^91-(\d{1,7})$/.exec(n);
+  return match ? '91-'+match[1].padStart(7,'0') : n;
+};
 const digest = value => crypto.createHash('sha256').update(JSON.stringify(value)).digest('hex');
 const isDate = value => /^\d{4}-(0[1-9]|1[0-2])-([0-2]\d|3[01])$/.test(str(value)) &&
   new Date(str(value) + 'T00:00:00Z').toISOString().slice(0, 10) === str(value);
@@ -77,7 +86,7 @@ function planSourceBatch(rawRows, policyGroups, options = {}) {
   const ready = [], unchanged = [], exceptions = [], seenKeys = new Set(), seenTargets = new Set();
   const groupsByNumber = new Map();
   for (const group of policyGroups) {
-    const number = str(group?.policy?.numero);
+    const number = canonicalPolicyNumber(group?.policy?.numero);
     if (!number) continue;
     if (!groupsByNumber.has(number)) groupsByNumber.set(number, []);
     groupsByNumber.get(number).push(group);
@@ -92,7 +101,7 @@ function planSourceBatch(rawRows, policyGroups, options = {}) {
       exceptions.push({caseId: row.caseId, code: 'PAID_REQUIRES_COBRO_PROOF_AND_WRITER'});
       continue;
     }
-    const policyCandidates = (groupsByNumber.get(row.policy) || []).filter(g => {
+    const policyCandidates = (groupsByNumber.get(canonicalPolicyNumber(row.policy)) || []).filter(g => {
       const p = g.policy || {};
       return norm(g.insurerName || p.aseguradoraNombre).includes(row.insurer) &&
         norm(p.moneda) === 'GTQ' && norm(p.pais) === 'GT' &&
@@ -175,4 +184,4 @@ function planSourceBatch(rawRows, policyGroups, options = {}) {
 
 module.exports = {MAX_CHUNK, planSourceBatch, normalizeSource, moneyCents,
   preimageFingerprint, paid, internal, sourceAliases,monthlySequence,
-  internalSequence,completeMonthlySchedule};
+  internalSequence,completeMonthlySchedule,canonicalPolicyNumber};

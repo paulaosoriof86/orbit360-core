@@ -178,6 +178,27 @@ const plan=planSourceBatch(source,groups),gate={environment:'gravicentra-live-da
     receipts:g.receipts.map(r=>({...monthlyDb.docs.get(name('recibosEsperados')+r.id)})),
     portfolio:g.portfolio.map(c=>({...monthlyDb.docs.get(name('carteraPrimas')+c.id)}))}));
   assert.equal(planSourceBatch(monthlyRows,updatedGroups).unchangedCount,19);
+  // A source may omit the leading zero in an El Roble policy's fixed-width
+  // number; the transaction must resolve the existing exact canonical edition.
+  const zeroDb=new MockDb();
+  zeroDb.docs.set(name('clientes')+'cli1',{pais:'GT'});
+  zeroDb.docs.set(name('aseguradoras')+'asg1',{nombre:'SEGUROS EL ROBLE'});
+  const zp={id:'p-zero',numero:'91-0169567',pais:'GT',moneda:'GTQ',estado:'Vigente',
+    vigenciaInicio:'2026-08-05',vigenciaFin:'2027-08-05',clienteId:'cli1',aseguradoraId:'asg1'};
+  const zr={id:'rec_zero',polizaId:'p-zero',moneda:'GTQ',vence:'2026-11-05',primaTotal:288.06};
+  const zc={id:'car_zero',reciboId:'rec_zero',polizaId:'p-zero',moneda:'GTQ',
+    primaTotal:288.06,carteraActiva:true,clienteId:'cli1'};
+  zeroDb.docs.set(name('polizas')+'p-zero',zp);
+  zeroDb.docs.set(name('recibosEsperados')+'rec_zero',zr);
+  zeroDb.docs.set(name('carteraPrimas')+'car_zero',zc);
+  const zeroPlan=planSourceBatch([{caseId:'Z1',insurer:'ROBLE',policy:'91-169567',
+    requirement:'5485470',due:'2026-11-05',grossCents:28806,state:'PENDING',
+    sourceSha256:'f'.repeat(64)}],[{policy:zp,clientExists:true,insurerVerified:true,
+    insurerName:'SEGUROS EL ROBLE',receipts:[zr],portfolio:[zc],cobros:[]}]);
+  assert.equal(zeroPlan.readyCount,1);
+  const zeroApplied=await applyProtectedBatch(zeroDb,zeroPlan,gate);
+  assert.equal(zeroApplied.receiptWrites,1);
+  assert.equal(zeroDb.docs.get(name('recibosEsperados')+'rec_zero').numeroReciboFuente,'5485470');
   console.log('I66_BULK_PROTECTED_WRITER_SYNTHETIC_PASS 1 receipt 1 cartera 1 audit; retry idempotent; CAS hold');
   console.log('I66_BULK_PROTECTED_WRITER_SYNTHETIC_750_ROWS_PASS 3 chunks x 250; 1500 materialized receipt/cartera rows; 750 audit; 0 duplicate replay writes');
   console.log('I66_EL_ROBLE_MONTHLY_19_SYNTHETIC_PASS source due, aliases, CAS, exact readback, replay');
