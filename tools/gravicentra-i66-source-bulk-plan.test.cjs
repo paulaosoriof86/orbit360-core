@@ -57,6 +57,19 @@ confirmed.groups[0].portfolio[0].primaTotal=100.01;
 const noop=planSourceBatch(confirmed.raw,confirmed.groups);
 assert.equal(noop.unchangedCount,1);
 assert.equal(noop.readyCount,0);
+// An exact insurer requirement overrides an outdated system contractual due,
+// even if gross and requirement already match (not an unchanged/no-op row).
+const insurerDue=sample(1);
+insurerDue.groups[0].receipts[0].numeroReciboFuente=insurerDue.raw[0].requirement;
+insurerDue.groups[0].receipts[0].vence='2026-11-06';
+insurerDue.groups[0].receipts[0].fechaLimite='2026-12-30';
+insurerDue.groups[0].receipts[0].primaTotal=100.01;
+insurerDue.groups[0].portfolio[0].primaTotal=100.01;
+const insurerDuePlan=planSourceBatch(insurerDue.raw,insurerDue.groups);
+assert.equal(insurerDuePlan.readyCount,1);
+assert.equal(insurerDuePlan.unchangedCount,0);
+assert.equal(insurerDuePlan.chunks[0].rows[0].matchMethod,'EXACT_INSURER_REQUIREMENT_DUE');
+assert.equal(insurerDuePlan.chunks[0].rows[0].oldContractualDue,'2026-11-06');
 const differingPreimages=sample(1);
 differingPreimages.groups[0].portfolio[0].primaTotal=99.72;
 const correctedPortfolio=planSourceBatch(differingPreimages.raw,differingPreimages.groups);
