@@ -6,6 +6,7 @@ on:
     paths:
       - .github/workflows/gravicentra-i66-advisor-roster-identity-census-readonly.yml
       - tools/gravicentra-i6-6-advisor-roster-identity-census-readonly.cjs
+      - tools/gravicentra-i6-6-carlos-german-assignment-roster-readonly.cjs
 permissions:
   contents: read
 concurrency:
@@ -35,3 +36,11 @@ jobs:
           npm install --no-save --package-lock=false --ignore-scripts --no-audit --no-fund firebase-admin@13.4.0 >/dev/null
           node tools/gravicentra-i6-6-advisor-roster-identity-census-readonly.cjs
 # RERUN_20261119_CARLOS_GERMAN: exact LIVE roster and GT role eligibility census; no writes.
+
+      - name: Signed Carlos Operativo UI roster and German identity in LIVE and Preview (read-only)
+        run: |
+          set -euo pipefail
+          node --check tools/gravicentra-i6-6-carlos-german-assignment-roster-readonly.cjs
+          npm install --no-save --package-lock=false --ignore-scripts --no-audit --no-fund playwright@1.55.0 >/dev/null
+          node node_modules/playwright/cli.js install --with-deps chromium >/dev/null
+          node tools/gravicentra-i6-6-carlos-german-assignment-roster-readonly.cjs
