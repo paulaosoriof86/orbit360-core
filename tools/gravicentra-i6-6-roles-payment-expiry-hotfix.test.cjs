@@ -60,3 +60,28 @@ test('contractual expiry projects Vencida without mutating stored Firestore stat
   assert.ok(src('orbit360-platform/modules/cliente360.js').includes('U.estadoBadge(q.policyDisplayStatus(p))'));
   assert.ok(src('orbit360-platform/modules/polizas.js').includes('U.estadoBadge(displayState(p))'));
 });
+
+test('Cliente 360 renewal action list agrees with verified lineage without hiding truly overdue terms', () => {
+  const source = src('orbit360-platform/modules/cliente360.js');
+  const first = source.indexOf('  const esRenovable = p => {');
+  const last = source.indexOf('  const esVigente =', first);
+  assert.ok(first > 0 && last > first, 'must find Cliente 360 lifecycle predicate');
+  const Orbit = { renewalLifecycle: { evaluate: p => p.mockLifecycle } };
+  const context = vm.createContext({ Orbit });
+  vm.runInContext(source.slice(first, last) + '\nthis.eligible = esRenovable;', context);
+  const action = context.eligible;
+  assert.equal(action({ estado: 'Vigente', vigenciaFin: '2026-11-01', mockLifecycle: {
+    terminal: false, reason: 'VENCIDA_POR_GESTIONAR' } }), true,
+  'expired without a proved successor remains in renewal management');
+  assert.equal(action({ estado: 'Vigente', renovadaPor: 'next', mockLifecycle: {
+    terminal: true, reason: 'RENOVACION_VINCULADA' } }), false,
+  'previous edition must not be offered for a second renewal');
+  for (const reason of ['LINEAGE_CONFLICTO', 'SUCESORA_DE_FUENTE_PENDIENTE_ENLACE',
+    'RENOVADA_DECLARADA_SIN_SUCESORA_VERIFICADA']) {
+    assert.equal(action({ estado: 'Vigente', mockLifecycle: { terminal: false, reason } }), false,
+      'unconfirmed renewal belongs in review rather than an actionable card: ' + reason);
+  }
+  Orbit.renewalLifecycle = null;
+  assert.equal(action({ estado: 'Vigente', renovacionEstado: 'Renovada' }), false,
+    'fail-closed fallback cannot reoffer a source-declared renewal');
+});
