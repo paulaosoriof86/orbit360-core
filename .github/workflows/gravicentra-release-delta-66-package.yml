@@ -331,7 +331,10 @@ jobs:
                     successor.supplementalPackageTestBlobSha!==supplementalTest||
                     successor.sourceVehicleAndPackageFocusedTests!==5||
                     successor.sourceManifestApprovedProductPaths!==71||
-                    successor.sourceManifestPinnedTests!==(opsActivitySuccessor?87:85))
+                    successor.sourceManifestPinnedTests!==new Set(
+                      JSON.parse(fs.readFileSync('artifacts/orbit360-recovery/release-control/I6_6_APPROVED_PRODUCT_DELTA_MANIFEST_20261110.json','utf8'))
+                        .changes.flatMap(change=>(change.tests||[]).map(entry=>entry.path))
+                    ).size)
                     throw Error('I66_VEHICLE_PACKAGE_SOURCE_TESTS_NOT_PINNED');
                   if(opsActivitySuccessor){
                     const opsActivityTest=execFileSync('git',['rev-parse',
