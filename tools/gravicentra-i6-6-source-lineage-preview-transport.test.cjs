@@ -13,8 +13,23 @@ const old=transport.postAcceptanceOwnerP0PremiumRulesPreviewBuildRequest20261119
 const sha=p=>execFileSync('git',['hash-object',p],{cwd:root,encoding:'utf8'}).trim();
 assert.equal(old.approvedManifestBlobSha,'a34b9ebc0161148f938c47a057e4b451ce008689',
   'historical Preview request must remain immutable');
-assert.equal(request.approvedManifestBlobSha,
-  sha('artifacts/orbit360-recovery/release-control/I6_6_APPROVED_PRODUCT_DELTA_MANIFEST_20261110.json'));
+// Historical source requests are frozen to their own signed manifest. They
+// never have to equal the newest manifest after a subsequent approved source delta.
+assert.equal(request.approvedManifestBlobSha,'1d4e3fb8938f156b60117021813396e034bac7c8',
+  'historical source-lineage package manifest remains immutable');
+const priorVehicle=transport.postAcceptanceOwnerVehiclePackagePreviewBuildRequest20261119;
+assert.equal(priorVehicle.approvedManifestBlobSha,'fe54971b8749f5ab1d6a0947189d67f40c0f7d65',
+  'prior vehicle package manifest remains immutable');
+const next=transport.postAcceptanceOwnerOpsActivityEndosoPreviewBuildRequest20261119;
+if(next){
+  assert.equal(next.approvedManifestBlobSha,
+    sha('artifacts/orbit360-recovery/release-control/I6_6_APPROVED_PRODUCT_DELTA_MANIFEST_20261110.json'));
+  assert.equal(next.authorizedBranch,request.authorizedBranch);
+  assert.equal(next.previousLiveSourceSha,request.previousLiveSourceSha);
+  assert.equal(next.previousLiveArtifactDigest,request.previousLiveArtifactDigest);
+  assert.equal(next.sourceOpsActivityEndosoTestBlobSha,
+    sha('tools/gravicentra-i6-6-ops-activity-direct-vehicle-endorsement.test.cjs'));
+}
 assert.equal(request.sourceLineageTestBlobSha,
   sha('tools/gravicentra-i6-6-source-lineage-reconciliation.test.cjs'));
 assert.equal(request.sourceQaLineageTests,52);

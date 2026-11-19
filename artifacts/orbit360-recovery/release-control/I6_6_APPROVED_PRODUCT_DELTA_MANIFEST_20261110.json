@@ -3128,6 +3128,52 @@
           "gitBlobSha": "e40741ed257462d190e8fa7889ca943fe933471e"
         }
       ]
+    },
+    {
+      "id": "I6_6_OPS_ATOMIC_CLIENT360_ACTIVITY_DIRECT_ISSUED_VEHICLE_SUBSTITUTION_20261119",
+      "approvedByDirection": true,
+      "receipt": "Paula 2026-11-19: una gestión creada desde Cliente 360 debe dejar actividad auditable; sustitución vehicular ya emitida debe registrarse desde póliza sin navegar Ops; la gestión no emitida se resuelve por Ops al aplicar endoso aprobado. Corregir transversalmente, probar por gates y publicar sin acumular.",
+      "sourceStatus": "SOURCE_BLOBS_SYNTAX_PASS_SIGNED_PREVIEW_AND_LIVE_PENDING",
+      "scope": "Server Ops owner writes gestiones+Cliente360 actividades atomically on create_management with canonical readback, excluding separate endorsement activity; frontend removes optimistic silent activity insert and reports incomplete server linkage. UI adds documented already-issued vehicle substitution direct from policy via existing E.createRequest/E.apply with conservative reuse handling, audited previous vehicle history, and optional Ops fallback. No production write, no pending paid or receipts batch changed.",
+      "paths": [
+        {
+          "path": "functions/product-ops-leads-domain.js",
+          "gitBlobSha": "d84da411925824900b7d7d655b79b664859d079f",
+          "replaces": {
+            "path": "functions/product-ops-leads-domain.js",
+            "priorGitBlobSha": "cb623163b64cbed890a63713265e4bf85cbc0b4c",
+            "priorChangeId": "I6_6_OWNER_APPROVED_SOURCE_LINEAGE_SUCCESSOR_20261119"
+          }
+        },
+        {
+          "path": "orbit360-platform/core/ciclo.js",
+          "gitBlobSha": "4c91d7e69d9fefb7bbfbd4e0c435bc71b8ad3ec0",
+          "replaces": {
+            "path": "orbit360-platform/core/ciclo.js",
+            "priorGitBlobSha": "1e13c2021d4974ccf7d2953cd3cde62d05210876",
+            "priorChangeId": "I6_6_OWNER_APPROVED_SOURCE_LINEAGE_SUCCESSOR_20261119"
+          }
+        },
+        {
+          "path": "orbit360-platform/modules/issuance-endosos-v1201-bridge.js",
+          "gitBlobSha": "2b015cc419c8e942b517266daf82ed8d338f0fa9",
+          "replaces": {
+            "path": "orbit360-platform/modules/issuance-endosos-v1201-bridge.js",
+            "priorGitBlobSha": "27e82715e095db03aa83b44427b8e269620cc91f",
+            "priorChangeId": "I6_6_DOCUMENTED_NON_TAXED_CHARGE_AND_CONTRACTUAL_RECEIPT_CALENDAR_20261117"
+          }
+        }
+      ],
+      "tests": [
+        {
+          "path": "tools/gravicentra-i6-6-ops-activity-direct-vehicle-endorsement.test.cjs",
+          "gitBlobSha": "d39a5be75c4c0a67ba7993fc836b91957d4e9753"
+        },
+        {
+          "path": "tools/gravicentra-i6-6-source-lineage-preview-transport.test.cjs",
+          "gitBlobSha": "c8d6e597dbe1140999b15d4235241ca348337ca7"
+        }
+      ]
     }
   ],
   "i66R11PreviewBuildRequest20261113": {

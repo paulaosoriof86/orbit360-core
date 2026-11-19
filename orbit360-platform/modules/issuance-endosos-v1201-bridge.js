@@ -387,22 +387,59 @@ Orbit.modules = Orbit.modules || {};
     const policy = S().get('polizas', policyId); if (!policy) return toast('Póliza no encontrada.');
     if (!A.canView('polizas', policy, 'cliente360')) return toast('Póliza fuera de tu alcance.');
     const types = E.typeDefs();
-    const body = `<div class="cfg-note" style="margin-bottom:12px">La solicitud se crea en Ops. No cambia la póliza hasta recibir aprobación y documento de la aseguradora.</div><label class="ce-l">Tipo de endoso<select id="end-type" class="o-sel">${types.map(t => `<option value="${esc(t.id)}">${esc(t.label)}</option>`).join('')}</select></label><div id="end-dynamic" style="margin-top:12px"></div><label class="ce-l" style="margin-top:12px">Motivo / detalle<textarea id="end-note" class="o-sel" style="min-height:70px"></textarea></label><label class="ce-l" style="margin-top:10px">Documento inicial / solicitud<input id="end-doc" class="o-sel" placeholder="documentRef opcional en esta etapa"></label>`;
-    const b = modal('endorsement-request-v1201','Solicitar endoso · ' + (policy.numero || ''),body,'<button class="btn primary" data-create>Crear gestión</button>',720);
+    const body = `<div class="cfg-note" style="margin-bottom:12px">Si el endoso aún no fue emitido, crea la solicitud en Ops. Si la aseguradora ya emitió la sustitución, regístrala aquí y aplica el cambio sin tener que tramitar una gestión manual.</div><label class="ce-l">Tipo de endoso<select id="end-type" class="o-sel">${types.map(t => `<option value="${esc(t.id)}">${esc(t.label)}</option>`).join('')}</select></label><div id="end-dynamic" style="margin-top:12px"></div><label class="ce-l" style="margin-top:12px">Motivo / detalle<textarea id="end-note" class="o-sel" style="min-height:70px"></textarea></label><label class="ce-l" style="margin-top:10px">Documento inicial / endoso emitido<input id="end-doc" class="o-sel" placeholder="Referencia documental Drive; obligatoria para aplicación directa"></label><div id="end-direct-fields" style="margin-top:12px;display:none"><div class="cgrid"><label class="ce-l">Referencia del endoso emitido *<input id="end-direct-ref" class="o-sel"></label><label class="ce-l">Fecha efectiva *<input id="end-direct-date" type="date" class="o-sel" value="${esc(today())}"></label></div><small class="muted">La aplicación crea una trazabilidad interna cerrada, conserva el vehículo anterior como histórico y no obliga a navegar por Ops.</small></div>`;
+    const footer='<button class="btn ghost" data-create>Crear gestión Ops</button>'+
+      (E.canManage()?'<button class="btn primary" data-direct>Registrar sustitución ya emitida</button>':'');
+    const b = modal('endorsement-request-v1201','Endoso de póliza · ' + (policy.numero || ''),body,footer,720);
     const type = b.querySelector('#end-type'), dynamic = b.querySelector('#end-dynamic');
-    const paint = () => { dynamic.innerHTML = endFields(type.value, policy); };
-    type.onchange = paint; paint();
-    const create = b.querySelector('[data-create]');
-    create.onclick = async () => {
-      create.disabled = true;
-      try {
-        const result = await E.createRequest(policy.id, type.value, endorsementProposalFromForm(b, type.value), { documentRef: b.querySelector('#end-doc').value.trim(), nota: b.querySelector('#end-note').value.trim(), motivo: 'Solicitud de endoso desde Cliente 360' });
-        if (!result.ok) return toast('No se creó: ' + (result.errors || []).join(', '));
-        b.remove(); toast(result.reused ? 'Ya existe una gestión activa de este tipo.' : 'Endoso confirmado en Ops.');
-        location.hash = '#/ops'; window.__orbitOpenGestion = result.request.id;
-      } catch (error) { toast('No se confirmó la creación del endoso.'); }
-      finally { create.disabled = false; }
+    const direct = b.querySelector('[data-direct]'), create = b.querySelector('[data-create]');
+    const paint = () => {
+      dynamic.innerHTML = endFields(type.value, policy);
+      const allowed=type.value==='sustitucion_vehiculo'&&E.canManage();
+      if(direct)direct.style.display=allowed?'':'none';
+      b.querySelector('#end-direct-fields').style.display=allowed?'':'none';
     };
+    type.onchange = paint; paint();
+    const submit = async issued => {
+      if(issued&&!E.canManage())return toast('Tu rol activo no puede aplicar este endoso.');
+      const doc=b.querySelector('#end-doc').value.trim(),note=b.querySelector('#end-note').value.trim();
+      const ref=b.querySelector('#end-direct-ref').value.trim(),date=b.querySelector('#end-direct-date').value;
+      if(issued){
+        if(type.value!=='sustitucion_vehiculo')return toast('El registro directo está habilitado para sustituciones emitidas.');
+        if(!doc||!ref||!date||!note)return toast('Indica documento, referencia, fecha efectiva y motivo del endoso emitido.');
+        const vehicles=(S().all('vehiculos')||[]).filter(v=>v.polizaId===policy.id&&String(v.estado||'').toLowerCase()!=='histórico');
+        const selectedCurrent=b.querySelector('#end-current').value;
+        if((vehicles.length>1&&!selectedCurrent)||(!vehicles.length&&!policy.vehiculoId))
+          return toast('Identifica el vehículo anterior antes de registrar su sustitución.');
+        if(![b.querySelector('#end-placa').value,b.querySelector('#end-marca').value,b.querySelector('#end-linea').value,
+              b.querySelector('#end-chasis').value,b.querySelector('#end-motor').value].some(x=>String(x||'').trim()))
+          return toast('Ingresa la identificación del nuevo vehículo antes de crear la gestión.');
+      }
+      create.disabled=true;if(direct)direct.disabled=true;
+      try{
+        const result=await E.createRequest(policy.id,type.value,endorsementProposalFromForm(b,type.value),
+          {documentRef:doc,nota:note,motivo:issued?'Endoso de sustitución ya emitido':'Solicitud de endoso desde Cliente 360'});
+        if(!result.ok)return toast('No se creó: '+(result.errors||[]).join(', '));
+        if(issued&&result.reused){
+          b.remove();location.hash='#/ops';window.__orbitOpenGestion=result.request.id;
+          return toast('Ya existe un endoso activo: confirma que la propuesta es la misma y aplica la aprobación desde esa gestión de Ops.');
+        }
+        if(!issued){
+          b.remove();toast(result.reused?'Ya existe una gestión activa de este tipo.':'Endoso confirmado en Ops.');
+          location.hash='#/ops';window.__orbitOpenGestion=result.request.id;return;
+        }
+        const applied=await E.apply(result.request.id,{referenciaAseguradora:ref,documentRef:doc,fechaEfectiva:date,motivo:note});
+        if(!applied.ok){
+          b.remove();location.hash='#/ops';window.__orbitOpenGestion=result.request.id;
+          return toast('La sustitución no fue confirmada; conserva la gestión en Ops para completar la aplicación, sin duplicar el endoso.');
+        }
+        b.remove();toast(applied.alreadyApplied?'El endoso ya estaba aplicado.':'Sustitución emitida aplicada con historial del vehículo anterior.');
+        Orbit.modules.cliente360.verPoliza(applied.policy.id);
+      }catch(error){toast('No se confirmó la operación. Revisa la gestión y la póliza antes de repetirla.');}
+      finally{create.disabled=false;if(direct)direct.disabled=false;}
+    };
+    create.onclick=()=>submit(false);
+    if(direct)direct.onclick=()=>submit(true);
   }
 
   function openApplyEndorsement(request) {

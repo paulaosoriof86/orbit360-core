@@ -1357,14 +1357,9 @@ Orbit.ciclo = (function () {
           if (!gestion) throw new Error('OPS_MANAGEMENT_POST_DOCUMENT_READBACK_MISSING');
         }
 
-        try {
-          S().insert('actividades', {
-            id: 'act' + Date.now(), clienteId, asesorId: gestion.asesorId,
-            tipo: 'sistema', icon: '🗂', fecha: today(), titulo: 'Gestión creada: ' + tipo,
-            detalle: 'Confirmada en Ops (' + lista + ')' + ((gestion.adjuntos || []).length ? ' · ' + (gestion.adjuntos || []).length + ' documento(s)' : ''),
-            gestionId: managementId
-          });
-        } catch (e) {}
+        // La actividad nace en la transacción durable del owner de Ops.
+        // No escribirla de forma optimista ni ocultar un fallo de sincronización.
+        const actividadCliente360Confirmada = !gestion.clienteId || !!gestion.actividadCliente360Id;
         const ase = q.asesor(gestion.asesorId);
         notify({
           tipo: 'gestion',
@@ -1376,6 +1371,8 @@ Orbit.ciclo = (function () {
         refresh();
         if (failed.length) U.toast('Gestión creada. ' + failed.length + ' documento(s) no fueron confirmados por Drive; la gestión quedó marcada para completar.');
         else U.toast('Gestión creada y confirmada en Ops.');
+        if (!actividadCliente360Confirmada)
+          U.toast('La gestión está guardada en Ops, pero la actividad vinculada en Cliente 360 aún no está confirmada por el servidor.');
         if (typeof opts.onCreated === 'function') {
           try { opts.onCreated(gestion); } catch (callbackError) { U.toast('La gestión quedó guardada, pero no se pudo completar la navegación posterior.'); }
         }
