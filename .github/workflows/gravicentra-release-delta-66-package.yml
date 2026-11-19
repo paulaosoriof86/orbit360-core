@@ -330,7 +330,10 @@ jobs:
                   if(successor.vehicleWriteTestBlobSha!==vehicleTest||
                     successor.supplementalPackageTestBlobSha!==supplementalTest||
                     successor.sourceVehicleAndPackageFocusedTests!==5||
-                    successor.sourceManifestApprovedProductPaths!==71||
+                    successor.sourceManifestApprovedProductPaths!==new Set(
+                      JSON.parse(fs.readFileSync('artifacts/orbit360-recovery/release-control/I6_6_APPROVED_PRODUCT_DELTA_MANIFEST_20261110.json','utf8'))
+                        .changes.flatMap(change=>(change.paths||[]).map(entry=>entry.path))
+                    ).size||
                     successor.sourceManifestPinnedTests!==new Set(
                       JSON.parse(fs.readFileSync('artifacts/orbit360-recovery/release-control/I6_6_APPROVED_PRODUCT_DELTA_MANIFEST_20261110.json','utf8'))
                         .changes.flatMap(change=>(change.tests||[]).map(entry=>entry.path))
