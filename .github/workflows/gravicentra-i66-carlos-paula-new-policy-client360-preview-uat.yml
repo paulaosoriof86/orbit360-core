@@ -18,8 +18,8 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     env:
-      I66_PREVIEW_ORIGIN: https://ays-orbit-360-lab--gi-i66-rc-42868854629-abj14q6n.web.app
-      I66_PREVIEW_SOURCE_SHA: 586401bfbe1a80cfef2820982f432743af36b108
+      I66_PREVIEW_ORIGIN: https://ays-orbit-360-lab--gi-i66-rc-44455183578-63vsza8q.web.app
+      I66_PREVIEW_SOURCE_SHA: 449ce7529cf46083be49fae8efa29a47ee800bb4
       SA_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
       SA_ALT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
       SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
@@ -42,7 +42,7 @@ jobs:
           node - <<'NODE'
           const assert=require('node:assert/strict');
           (async()=>{
-            const r=await fetch('https://api.github.com/repos/paulaosoriof86/orbit360-core/actions/runs/43463160506',{
+            const r=await fetch('https://api.github.com/repos/paulaosoriof86/orbit360-core/actions/runs/44455183578',{
               headers:{Authorization:'Bearer '+process.env.GH_TOKEN,Accept:'application/vnd.github+json',
                 'User-Agent':'GI-I66-New-Policy-Preview-QA'}}).then(x=>x.json());
             assert.equal(r.conclusion,'success','QA_PREVIEW_BUILD_NOT_SIGNED');

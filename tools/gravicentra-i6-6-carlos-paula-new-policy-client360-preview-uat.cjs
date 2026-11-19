@@ -6,8 +6,8 @@ const crypto=require('node:crypto');
 const admin=require('firebase-admin');
 const {chromium}=require('playwright');
 const LIVE=process.env.I66_NEW_POLICY_SIGNED_LIVE_ONLY==='true';
-const ORIGIN=LIVE?'https://app.aysseguros.com':'https://ays-orbit-360-lab--gi-i66-rc-42868854629-abj14q6n.web.app';
-const SOURCE='586401bfbe1a80cfef2820982f432743af36b108';
+const ORIGIN=LIVE?'https://app.aysseguros.com':'https://ays-orbit-360-lab--gi-i66-rc-44455183578-63vsza8q.web.app';
+const SOURCE='449ce7529cf46083be49fae8efa29a47ee800bb4';
 const TENANT='alianzas-soluciones';
 assert.equal(process.env.I66_PREVIEW_ORIGIN,ORIGIN,'QA_AUTHORIZED_ORIGIN_DRIFT');
 assert.equal(process.env.I66_PREVIEW_SOURCE_SHA,SOURCE,'QA_PREVIEW_SOURCE_DRIFT');
@@ -106,6 +106,25 @@ async function runOne(browser,actor){
     });
     assert.ok(roster.unique&&roster.count>0&&roster.selectCount===roster.count+1,
       'QA_ADVISOR_ROSTER_NOT_CANONICAL_'+actor.role+':'+JSON.stringify(roster));
+    // Reproduce Sergio's malformed *optional* calendar generically for both
+    // authorized roles. The UI must expose the error and permit correction;
+    // it must never silently save a guessed contractual due date.
+    const calendarError=await page.evaluate(()=>{
+      const modal=document.getElementById('policy-v1199'),box=modal.querySelector('[data-documented-calendar]');
+      box.value='1 2026-12-17';
+      box.dispatchEvent(new Event('input',{bubbles:true}));
+      const preview=modal.querySelector('[data-preview]');
+      return {saveEnabled:!modal.querySelector('[data-save]').disabled,
+        invalid:box.getAttribute('aria-invalid')==='true',
+        explained:/vencimientos del documento/i.test(preview.textContent||'')};
+    });
+    assert.ok(calendarError.saveEnabled&&calendarError.invalid&&calendarError.explained,
+      'QA_TRANSVERSAL_CALENDAR_ERROR_BLOCKS_FORM_'+actor.role+':'+JSON.stringify(calendarError));
+    await page.evaluate(()=>{
+      const box=document.querySelector('#policy-v1199 [data-documented-calendar]');
+      box.value='';box.dispatchEvent(new Event('input',{bubbles:true}));
+    });
+    console.log('I66_NEW_POLICY_'+actor.role.toUpperCase()+'_INVALID_OPTIONAL_CALENDAR_EDITABLE_PASS');
     const advisorId=await page.evaluate(()=>{
       const select=document.querySelector('#policy-v1199 [data-advisor]');
       const id=select.options[1].value;select.remove();document.getElementById('policy-v1199').remove();
