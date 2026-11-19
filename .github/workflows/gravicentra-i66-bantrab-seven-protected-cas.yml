@@ -303,6 +303,8 @@ jobs:
       contains(github.event.head_commit.message, 'I66_SOURCE_BULK_READY')
     runs-on: ubuntu-24.04
     timeout-minutes: 30
+    outputs:
+      eligible: ${{ steps.source_preflight.outputs.eligible }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -343,11 +345,20 @@ jobs:
           else:raise SystemExit('I66_BULK_EXISTING_SERVICE_ACCOUNT_HOLD')
           PY
       - name: Preflight all real policy editions, source rows, receipts and cartera without writes
+        id: source_preflight
         env:
           GI_I66_BULK_MODE: preflight
           GI_I66_BULK_PLAN_OUT: ${{ runner.temp }}/gi-i66-bulk-plan.json
           GI_I66_BULK_REPORT_OUT: ${{ runner.temp }}/gi-i66-bulk-preflight-report.json
-        run: node tools/gravicentra-i66-source-bulk-live.cjs
+        run: |
+          set -euo pipefail
+          node tools/gravicentra-i66-source-bulk-live.cjs
+          node - <<'NODE'
+          const fs=require('fs'),r=require(process.env.GI_I66_BULK_REPORT_OUT);
+          const eligible=r.readyCount>0;
+          fs.appendFileSync(process.env.GITHUB_OUTPUT,'eligible='+(eligible?'true':'false')+'\n');
+          console.log(eligible?'I66_BULK_REAL_ELIGIBLE_PROTECTED_REVIEW_NEXT':'I66_BULK_SOURCE_MATCH_DIAGNOSTIC_HOLD_ZERO_LIVE_WRITES');
+          NODE
       - name: Retain signed private plan for single protected transaction series
         uses: actions/upload-artifact@v4
         with:
@@ -359,6 +370,7 @@ jobs:
           retention-days: 7
   insurer-source-large-batch-protected-live:
     needs: insurer-source-large-batch-preflight
+    if: needs.insurer-source-large-batch-preflight.outputs.eligible == 'true'
     runs-on: ubuntu-24.04
     timeout-minutes: 60
     environment:

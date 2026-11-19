@@ -79,18 +79,27 @@ async function main(){
   if(mode==='preflight'){
     const groups=await readGroups(db,source.data.rows);
     const plan=planSourceBatch(source.data.rows,groups,{chunkSize:250});
-    assert.ok(plan.readyCount>0,'I66_BULK_NO_ELIGIBLE_ROWS_NO_GATE_REQUESTED');
+    const exceptionCodes={};
+    for(const row of plan.exceptions)exceptionCodes[row.code]=(exceptionCodes[row.code]||0)+1;
+    const diagnostic={sourcePolicyNumbers:new Set(source.data.rows.map(r=>str(r.policy))).size,
+      livePolicyEditions:groups.length,
+      editionsWithReceipts:groups.filter(g=>g.receipts.length).length,
+      editionsWithPortfolio:groups.filter(g=>g.portfolio.length).length,
+      editionsWithCobros:groups.filter(g=>g.cobros.length).length};
     const bundle={...plan,sourceManifestSha256:source.bytesSha256,
       sourceManifestPath:source.relative};
     const planSha256=sha(Buffer.from(JSON.stringify(bundle)));
     output('GI_I66_BULK_PLAN_OUT',bundle);
-    output('GI_I66_BULK_REPORT_OUT',{status:'BULK_SOURCE_PREFLIGHT_ONLY_NO_WRITES',
+    output('GI_I66_BULK_REPORT_OUT',{status:plan.readyCount?
+        'BULK_SOURCE_PREFLIGHT_ONLY_NO_WRITES':'BULK_SOURCE_NO_ELIGIBLE_ROWS_DIAGNOSTIC_HOLD',
       sourceManifestSha256:source.bytesSha256,planSha256,inputRows:plan.inputRows,
       readyCount:plan.readyCount,unchangedCount:plan.unchangedCount,
-      exceptionCount:plan.exceptionCount,exceptionCodes:plan.exceptions.map(x=>x.code),
+      exceptionCount:plan.exceptionCount,exceptionCodes,diagnostic,
+      exceptionSamples:plan.exceptions.slice(0,35),
       chunks:plan.chunks.map(c=>({sequence:c.sequence,count:c.count,sha:c.sourcePlanSha256})),writes:0});
     console.log('I66_BULK_SOURCE_PREFLIGHT_PASS input='+plan.inputRows+' eligible='+plan.readyCount+
-      ' exceptions='+plan.exceptionCount+' chunks='+plan.chunks.length+' ZERO_WRITES');
+      ' exceptions='+plan.exceptionCount+' chunks='+plan.chunks.length+
+      ' codes='+JSON.stringify(exceptionCodes)+' diagnostic='+JSON.stringify(diagnostic)+' ZERO_WRITES');
     return;
   }
   assert.equal(process.env.GITHUB_REF,'refs/heads/recovery/fase-a-clean-20260831');
