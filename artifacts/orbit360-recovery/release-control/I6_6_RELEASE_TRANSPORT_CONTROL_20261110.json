@@ -4437,4 +4437,43 @@
     "sourceOpsActivityEndosoTestBlobSha": "d39a5be75c4c0a67ba7993fc836b91957d4e9753",
     "sourceOpsActivityEndosoFocusedTests": 4
   }
+,
+  "postAcceptanceOwnerOpsActivityEndosoBackendPreviewFunctionRequest20261119": {
+    "status": "OWNER_APPROVED_ONE_OPS_LEADS_PREVIEW_FUNCTION",
+    "gate": "I6.6",
+    "ownerInstruction": "Paula 2026-11-19: la gestión de Ops creada desde Cliente360 debe generar su actividad auditable y las sustituciones emitidas resolverse desde la póliza; certificar/publicar. Autorizar exclusivamente la versión de la callable de Preview sintética para comprobar contrato de backend, nunca LIVE, sin escribir clientes/pólizas reales.",
+    "authorizedBranch": "recovery/fase-a-clean-20260831",
+    "sourceQaHead": "7e5d2a34cbc65fff75945d0f6e812db41756ea66",
+    "sourceQaRunId": 44579894717,
+    "sourceGovernanceRunId": 44579894901,
+    "sourceGovernanceHead": "7e5d2a34cbc65fff75945d0f6e812db41756ea66",
+    "sourceArtifactCommit": "0b669a41abb0824a01ce1743e44065f6de98641d",
+    "sourceArtifactRunId": 44580723634,
+    "sourceArtifactId": 14559525324,
+    "sourceArtifactZipDigest": "sha256:b3c18af5ba9dff1a55d4dfeba3cac1c8b6ccf53d90861fe6f98381d589193713",
+    "artifactOpsBackendBlobSha": "d84da411925824900b7d7d655b79b664859d079f",
+    "sourceOpsActivityEndosoTestBlobSha": "d39a5be75c4c0a67ba7993fc836b91957d4e9753",
+    "previewHostingChannel": "gi-i66-rc-44580723634",
+    "previewHostingUrl": "https://ays-orbit-360-lab--gi-i66-rc-44580723634-m75nqdty.web.app",
+    "targetFunction": "orbit360OpsLeadsCommandPreview",
+    "targetRegion": "us-east1",
+    "sourceQaTests": 4,
+    "functionsOnly": [
+      "orbit360OpsLeadsCommandPreview"
+    ],
+    "previousLiveSourceSha": "1b65a790530d49fe1d1fb451f02838fd9a713c53",
+    "previousLiveArtifactId": 14373955326,
+    "previousLiveArtifactDigest": "sha256:fc6d8f2616141aa4388ec7df497917690fc54400d18a376f15550380334725a5",
+    "approvedByDirection": true,
+    "exactArtifactOnly": true,
+    "previewHostingChannelOnly": true,
+    "previewFunctionOnly": true,
+    "noLiveBackend": true,
+    "noLiveHosting": true,
+    "realOperationalDataWrites": false,
+    "noNewFirebase": true,
+    "explicitSyntheticOnly": true,
+    "rollbackPreserved": true,
+    "backendLiveDeploy": false
+  }
 }

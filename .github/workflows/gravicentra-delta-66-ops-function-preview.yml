@@ -1,4 +1,4 @@
-# I6.6 Carlos all-scope Preview callables, exact b86cad synthetic-only artifact; no LIVE or real customer writes.
+# I6.6 canonical Ops activity owner Preview callable, current signed synthetic-only immutable artifact; no LIVE/real customer writes.
 name: Gravicentra I6.6 Carlos Transversal Function Preview
 on:
   workflow_dispatch:
@@ -27,8 +27,8 @@ jobs:
           node - <<'NODE'
           const fs=require('node:fs');
           const c=JSON.parse(fs.readFileSync('artifacts/orbit360-recovery/release-control/I6_6_RELEASE_TRANSPORT_CONTROL_20261110.json'));
-          const approved=c.postAcceptanceProductSourcePreviewBuildRequest20261118||{};
-          const authorized=c.status==='OPERATIONAL_EXACT_LIVE_ACCEPTED_LOCKED'&&c.forbidBackendFunctionDeploy===true&&c.forbidBackendLiveFunctionDeploy===true&&c.livePromotionAuthorized===false&&approved.status==='OWNER_APPROVED_SOURCE_PREVIEW_ONLY'&&approved.sourceQaRunId===44378705804&&approved.previousLiveSourceSha==='1b65a790530d49fe1d1fb451f02838fd9a713c53'&&approved.previewHostingChannelOnly===true&&approved.backendLiveDeploy===false;
+          const approved=c.postAcceptanceOwnerOpsActivityEndosoBackendPreviewFunctionRequest20261119||{};
+          const authorized=c.status==='OPERATIONAL_EXACT_LIVE_ACCEPTED_LOCKED'&&c.forbidBackendFunctionDeploy===true&&c.forbidBackendLiveFunctionDeploy===true&&c.livePromotionAuthorized===false&&approved.status==='OWNER_APPROVED_ONE_OPS_LEADS_PREVIEW_FUNCTION'&&approved.sourceQaRunId===44579894717&&approved.previewFunctionOnly===true&&approved.targetFunction==='orbit360OpsLeadsCommandPreview'&&approved.previousLiveSourceSha==='1b65a790530d49fe1d1fb451f02838fd9a713c53'&&approved.previewHostingChannelOnly===true&&approved.backendLiveDeploy===false;
           fs.appendFileSync(process.env.GITHUB_OUTPUT,'authorized='+String(authorized)+'\n');
           console.log(authorized?'I66_CURRENT_MANAGEMENT_PREVIEW_ONLY_AUTHORIZED':'I66_CURRENT_MANAGEMENT_PREVIEW_AUTHORITY_ABSENT_SKIP');
           NODE
@@ -39,14 +39,14 @@ jobs:
     timeout-minutes: 35
     env:
       PROJECT_ID: ays-orbit-360-lab
-      SOURCE_SHA: 91cc211c2336b91fe06de0ce3dd21a22c18a6629
-      QA_SOURCE_HEAD: e4eced4f01d3a5d5ea6565e72f168a448fe5898c
-      ARTIFACT_ID: '14463416936'
-      ARTIFACT_DIGEST: sha256:b1672d7cb18525a898a6eb53bae039a0fa885764e673ed83e9f33aba6a8ced4a
-      ARTIFACT_RUN: '44380029453'
-      EMULATOR_QA_RUN: '44378705804'
-      PREVIEW_CHANNEL: gi-i66-rc-44380029453
-      PREVIEW_URL: https://ays-orbit-360-lab--gi-i66-rc-44380029453-4mghyopv.web.app
+      SOURCE_SHA: 0b669a41abb0824a01ce1743e44065f6de98641d
+      QA_SOURCE_HEAD: 7e5d2a34cbc65fff75945d0f6e812db41756ea66
+      ARTIFACT_ID: '14559525324'
+      ARTIFACT_DIGEST: sha256:b3c18af5ba9dff1a55d4dfeba3cac1c8b6ccf53d90861fe6f98381d589193713
+      ARTIFACT_RUN: '44580723634'
+      EMULATOR_QA_RUN: '44579894717'
+      PREVIEW_CHANNEL: gi-i66-rc-44580723634
+      PREVIEW_URL: https://ays-orbit-360-lab--gi-i66-rc-44580723634-m75nqdty.web.app
       SA_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
       SA_ALT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
       SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
@@ -74,7 +74,7 @@ jobs:
           node - <<'NODE'
           const fs=require('node:fs'),assert=require('node:assert/strict');
           const c=JSON.parse(fs.readFileSync('artifacts/orbit360-recovery/release-control/I6_6_RELEASE_TRANSPORT_CONTROL_20261110.json'));
-          const p=c.postAcceptanceProductSourcePreviewBuildRequest20261118||{};
+          const p=c.postAcceptanceOwnerOpsActivityEndosoBackendPreviewFunctionRequest20261119||{};
           assert.equal(c.status,'OPERATIONAL_EXACT_LIVE_ACCEPTED_LOCKED');
           assert.equal(c.forbidBackendFunctionDeploy,true);
           assert.equal(c.forbidBackendLiveFunctionDeploy,true);
@@ -82,7 +82,11 @@ jobs:
           assert.equal(c.forbidFirestoreRulesDataAuthWrites,true);
           assert.equal(c.currentExactHostingRelease?.sourceSha,'1b65a790530d49fe1d1fb451f02838fd9a713c53');
           assert.equal(c.currentExactHostingRelease?.artifactId,14373955326);
-          assert.equal(p.status,'OWNER_APPROVED_SOURCE_PREVIEW_ONLY');
+          assert.equal(p.status,'OWNER_APPROVED_ONE_OPS_LEADS_PREVIEW_FUNCTION');
+          assert.equal(p.previewFunctionOnly,true);
+          assert.equal(p.targetFunction,'orbit360OpsLeadsCommandPreview');
+          assert.equal(p.sourceArtifactId,Number(process.env.ARTIFACT_ID));
+          assert.equal(p.artifactOpsBackendBlobSha,require('node:child_process').execFileSync('git',['rev-parse',process.env.SOURCE_SHA+':functions/product-ops-leads-domain.js'],{encoding:'utf8'}).trim());
           assert.equal(p.sourceQaRunId,Number(process.env.EMULATOR_QA_RUN));
           assert.equal(p.sourceQaHead,process.env.QA_SOURCE_HEAD);
           assert.equal(p.previewHostingChannelOnly,true);
@@ -113,8 +117,8 @@ jobs:
           NODE
       - uses: actions/download-artifact@v4
         with:
-          artifact-ids: 14463416936
-          run-id: 44380029453
+          artifact-ids: 14559525324
+          run-id: 44580723634
           github-token: ${{ github.token }}
           path: ${{ runner.temp }}/ops-package-downloaded
       - name: Verify one TAR and backend bytes; use original source only
