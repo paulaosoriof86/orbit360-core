@@ -77,6 +77,40 @@ const plan=planSourceBatch(source,groups),gate={environment:'gravicentra-live-da
   const changed=await applyProtectedBatch(altered,plan,gate);
   assert.equal(changed.status,'BULK_PARTIAL_HOLD');
   assert.equal(changed.receiptWrites,0);assert.equal(altered.writes,0);
+  // Direct insurer requirement is authoritative over a stale imported due date.
+  // This is a due-only correction; it must still write and read back exactly.
+  const dueDb=new MockDb(),duePolicy={id:'due-policy',numero:'91-8282111',
+    pais:'GT',moneda:'GTQ',estado:'Vigente',clienteId:'cli1',aseguradoraId:'asg1',
+    vigenciaInicio:'2026-01-01',vigenciaFin:'2027-01-01'};
+  const dueReceipt={id:'due-receipt',polizaId:'due-policy',moneda:'GTQ',
+    numeroReciboFuente:'5254305',vence:'2026-09-06',fechaLimite:'2026-10-20',
+    primaTotal:752.16,estado:'Pendiente'};
+  const duePortfolio={id:'due-portfolio',polizaId:'due-policy',reciboId:'due-receipt',
+    moneda:'GTQ',primaTotal:752.16,clienteId:'cli1',carteraActiva:true};
+  dueDb.docs.set(name('polizas')+duePolicy.id,duePolicy);
+  dueDb.docs.set(name('recibosEsperados')+dueReceipt.id,dueReceipt);
+  dueDb.docs.set(name('carteraPrimas')+duePortfolio.id,duePortfolio);
+  dueDb.docs.set(name('clientes')+'cli1',{pais:'GT'});
+  dueDb.docs.set(name('aseguradoras')+'asg1',{nombre:'SEGUROS EL ROBLE'});
+  const dueSource=[{caseId:'ROBLE-NOV20-DUE',insurer:'ROBLE',
+    policy:'91-8282111',requirement:'5254305',due:'2026-09-17',
+    grossCents:75216,state:'PENDING',sourceSha256:'f'.repeat(64)}];
+  const dueGroup=[{policy:duePolicy,clientExists:true,insurerVerified:true,
+    insurerName:'SEGUROS EL ROBLE',receipts:[dueReceipt],portfolio:[duePortfolio],cobros:[]}];
+  const duePlan=planSourceBatch(dueSource,dueGroup);
+  assert.equal(duePlan.readyCount,1);
+  assert.equal(duePlan.unchangedCount,0);
+  assert.equal(duePlan.chunks[0].rows[0].matchMethod,'EXACT_INSURER_REQUIREMENT_DUE');
+  const dueApplied=await applyProtectedBatch(dueDb,duePlan,gate);
+  assert.equal(dueApplied.receiptWrites,1);
+  assert.equal(dueApplied.portfolioWrites,1);
+  assert.equal(dueDb.docs.get(name('recibosEsperados')+'due-receipt').fechaVencimientoContractual,
+    '2026-09-17');
+  assert.equal(dueDb.docs.get(name('recibosEsperados')+'due-receipt').fechaLimite,'2026-10-20');
+  assert.equal(dueDb.writes,3);
+  const dueReplayed=await applyProtectedBatch(dueDb,duePlan,gate);
+  assert.equal(dueReplayed.alreadyApplied,1);
+  assert.equal(dueDb.writes,3);
   // Execute, read back and replay a genuinely large *synthetic* source batch.
   // Identifiers are unique obligations, not an arbitrary per-policy cap.
   const largeDb=new MockDb();
