@@ -120,12 +120,12 @@ const ORIGINS=['https://app.aysseguros.com','https://ays-orbit-360-lab--gi-i66-r
         document.querySelectorAll('#c360-edit').forEach(n=>n.remove());
         try{
           Orbit.modules.cliente360.nuevoCliente();
-          const node=await waitRoster('#nc-ase');
-          createVisible=!!node;createReady=node?.dataset.rosterState==='ready'&&node.disabled===false;
+          const node=await waitRoster('#v1198-ase');
+          createVisible=!!node;createReady=node?.dataset.rosterState==='ready'&&node.disabled===false&&document.getElementById('crm-new-client-v1198')!==null;
           createGerman=!!node&&[...node.options].some(o=>o.value===germanId);
           createPriscila=!!node&&[...node.options].some(o=>o.value===priscilaId);
         }catch(error){createError=String(error.code||error.message||error).slice(0,160);}
-        document.querySelectorAll('#cli-nuevo').forEach(n=>n.remove());
+        document.querySelectorAll('#crm-new-client-v1198,#cli-nuevo').forEach(n=>n.remove());
       }
      return {
        started:activated?.started===true,
