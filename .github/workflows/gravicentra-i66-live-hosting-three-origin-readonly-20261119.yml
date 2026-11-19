@@ -52,6 +52,47 @@ jobs:
             throw Error('I66_LIVE_DRIFT_FROM_ACCEPTED_CONTROL_PLANE_FAIL_CLOSED');
           console.log('I66_LIVE_TWO_ORIGINS_AND_CANDIDATE_EXACT_PUBLIC_READBACK_PASS');
           NODE
+      - name: Read Hosting LIVE release version from Firebase control API (metadata only)
+        if: always()
+        env:
+          PROJECT_ID: ays-orbit-360-lab
+          SA_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+          SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/gi-i66-hosting-identity"
+          chmod 700 "$RUNNER_TEMP/gi-i66-hosting-identity"
+          python3 - <<'PY'
+          import json,os,pathlib
+          target=pathlib.Path(os.environ['RUNNER_TEMP'])/'gi-i66-hosting-identity/identity.json'
+          for key in ('SA_LAB','SA_DEFAULT'):
+              try:x=json.loads(os.environ.get(key,''))
+              except (ValueError,TypeError):continue
+              if x.get('type')=='service_account' and x.get('project_id')==os.environ['PROJECT_ID'] and x.get('private_key'):
+                  target.write_text(json.dumps(x));target.chmod(0o600);break
+          if not target.exists():raise SystemExit('I66_HOSTING_READONLY_CREDENTIAL_UNAVAILABLE')
+          PY
+          gcloud auth activate-service-account --key-file="$RUNNER_TEMP/gi-i66-hosting-identity/identity.json" --quiet >/dev/null
+          gcloud config set project "$PROJECT_ID" --quiet >/dev/null
+          TOKEN=$(gcloud auth print-access-token)
+          curl --fail --silent --show-error --max-time 35 -H "Authorization: Bearer $TOKEN" \
+            "https://firebasehosting.googleapis.com/v1beta1/sites/ays-orbit-360-lab/channels/live/releases?pageSize=5" \
+            -o "$RUNNER_TEMP/origin-diagnostic/live-releases.json"
+          unset TOKEN
+          node - <<'NODE'
+          const fs=require('node:fs'),p=process.env.RUNNER_TEMP+'/origin-diagnostic';
+          const releases=JSON.parse(fs.readFileSync(p+'/live-releases.json','utf8')).releases||[];
+          if(!releases.length)throw Error('I66_FIREBASE_CHANNEL_LIVE_RELEASE_MISSING');
+          const sanitized=releases.slice(0,5).map(r=>({releaseTime:r.releaseTime,version:r.version?.name,type:r.type}));
+          fs.writeFileSync(p+'/live-version-summary.json',JSON.stringify({
+            schema:'I66_HOSTING_LIVE_VERSION_READONLY',releases:sanitized,
+            latestVersion:sanitized[0].version,acceptedControlPlaneHostingVersion:'sites/ays-orbit-360-lab/versions/bf40099201b2ea51',
+            liveVersionMatchesAuthority:sanitized[0].version==='sites/ays-orbit-360-lab/versions/bf40099201b2ea51'
+          },null,2)+'\n');
+          console.log('I66_HOSTING_LIVE_RELEASE_VERSIONS_READONLY '+JSON.stringify(sanitized));
+          if(sanitized[0].version!=='sites/ays-orbit-360-lab/versions/bf40099201b2ea51')
+            throw Error('I66_FIREBASE_LIVE_VERSION_DRIFT_FROM_CONTROL_PLANE');
+          NODE
       - name: Retain sanitized readback even when the gate detects drift
         if: always()
         uses: actions/upload-artifact@v4
