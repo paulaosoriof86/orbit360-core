@@ -439,6 +439,15 @@
           "modifiedAtUtc": "2026-11-17T04:54:44.734Z",
           "sourceRows": 1,
           "readOnlyIntake": true
+        },
+        {
+          "filename": "Balance de cuenta GyT a Noviembre 19.xlsx",
+          "sha256": "48a9ba712c62eea5bae1258d9b7cc8d6691958f8bf8355fa61c3d8d1b446469e",
+          "hashStatus": "RAW_BYTES_SHA256_VERIFIED_2026_11_19",
+          "fileId": "11qssA9ETh74h9kFJMYYg-2CDSGaaqFL8",
+          "modifiedAtUtc": "2026-11-19T21:13:14.000Z",
+          "sourceRows": 5,
+          "readOnlyIntake": true
         }
       ],
       "count": 16,
