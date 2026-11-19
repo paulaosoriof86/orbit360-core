@@ -4,9 +4,13 @@
 const crypto=require('node:crypto');
 const fs=require('node:fs');
 const CASES=Object.freeze([
-  {id:'A1.M1',insurer:'MAPFRE',policy:'SCIN-4394',requirement:'139187477',cents:37963,paidDate:'2026-11-04'},
-  {id:'A1.M2',insurer:'MAPFRE',policy:'SC-79849',requirement:'138828141',cents:249715,paidDate:'2026-11-06'},
-  {id:'A1.M3',insurer:'MAPFRE',policy:'3002400057714',requirement:'1993561',cents:12777,paidDate:'2026-11-04'},
+  // The independent insurer account as of 2026-11-02 supplies actual due
+  // dates for these three requirements. The insurer's paid-results sheet as
+  // of 2026-11-17 independently supplies the later paid dates. Never treat
+  // the older pending account as payment evidence on its own.
+  {id:'A1.M1',insurer:'MAPFRE',policy:'SCIN-4394',requirement:'139187477',cents:37963,due:'2026-11-01',paidDate:'2026-11-04'},
+  {id:'A1.M2',insurer:'MAPFRE',policy:'SC-79849',requirement:'138828141',cents:249715,due:'2026-10-31',paidDate:'2026-11-06'},
+  {id:'A1.M3',insurer:'MAPFRE',policy:'3002400057714',requirement:'1993561',cents:12777,due:'2026-11-03',paidDate:'2026-11-04'},
   {id:'A2.M1',insurer:'MAPFRE',policy:'SC-79849',requirement:'140461192',cents:249715,due:'2026-11-30'},
   // ALL 17 unique requirements, excluding the source's two subtotal rows.
   {id:'A2.M2',insurer:'MAPFRE',policy:'SC-79829',requirement:'128419795',cents:82488,due:'2026-04-30'},
@@ -51,6 +55,7 @@ const CASES=Object.freeze([
 // Matched byte-for-byte to the frozen insurer sources in Google Drive, not a
 // copied table of totals. A newer file requires a separately reconciled gate.
 const SOURCE_SHA256=Object.freeze({
+  mapfreA1DueNov02:'9bd35651e29af40e63daf8ac456a24cec607960698d93ec547cbcce66231c462',
   mapfrePendingNov:'29a42705ae6f7b2b42693f51a27a0b1f4ced279e2259b28ce021ff7b21ccefb0',
   bantrabNov04:'b945a98c7c572909c643be4c849a7526a363eb490cdcf24ac8d0ae54ca3025b7'
 });
