@@ -14,6 +14,7 @@ on:
       - artifacts/orbit360-recovery/release-control/I6_6_EXACT_HOSTING_LIVE_PROMOTION_REQUEST_20261112_R5.json
       - artifacts/orbit360-recovery/release-control/I6_6_EXACT_HOSTING_LIVE_PROMOTION_REQUEST_20261112_R6.json
       - artifacts/orbit360-recovery/release-control/I6_6_EXACT_HOSTING_LIVE_PROMOTION_REQUEST_20261113_R8.json
+      - artifacts/orbit360-recovery/release-control/I6_6_CLIENTE360_ADVISOR_EXACT_LIVE_REQUEST_20261119.json
 
 permissions:
   contents: read
@@ -34,7 +35,7 @@ jobs:
       SA_LAB_ALT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
       SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
       I66_PACKAGE_ROOT: /tmp/gi-i66-promote-package
-      I66_APPROVED_RELEASE_REQUEST: artifacts/orbit360-recovery/release-control/I6_6_EXACT_HOSTING_LIVE_PROMOTION_REQUEST_20261113_R8.json
+      I66_APPROVED_RELEASE_REQUEST: artifacts/orbit360-recovery/release-control/I6_6_CLIENTE360_ADVISOR_EXACT_LIVE_REQUEST_20261119.json
     steps:
       - uses: actions/checkout@v4
         with:
@@ -53,7 +54,80 @@ jobs:
           node tools/gravicentra-i6-6-delta-guard.mjs
           node - <<'NODE'
           const fs=require('node:fs'),cp=require('node:child_process');
+          const assert=require('node:assert/strict');
           const j=JSON.parse(fs.readFileSync(process.env.I66_APPROVED_RELEASE_REQUEST,'utf8'));
+          if(j.schema==='GRAVICENTRA_I6_6_CLIENTE360_ADVISOR_EXACT_LIVE_V1'){
+            (async()=>{
+              assert.equal(j.gate,'I6.6');
+              assert.equal(j.status,'OWNER_AUTHORIZED_TARGETED_LIVE_PENDING_PROTECTED_RUN');
+              assert.equal(j.approvedByDirection,true);
+              assert.equal(j.sourceSha,'72d3580f3e90071b360319ce5f204d348b401663');
+              assert.equal(j.buildRunId,44637404427);
+              assert.equal(j.artifactId,14584217893);
+              assert.equal(j.signedCarlosPaulaPreviewUatRunId,44637887342);
+              assert.equal(j.sourceQaRunId,44637061466);
+              assert.equal(j.sourceGuardRunId,44637061232);
+              assert.equal(j.expectedPriorLiveSourceSha,'b38f877f7847c7b6e11506885e42252e84c5eeb6');
+              assert.equal(j.expectedPriorLiveHostingVersion,'sites/ays-orbit-360-lab/versions/13944f80ba1e0bdf');
+              assert.equal(j.buildId,'gi-i66-'+j.sourceSha.slice(0,12)+'-57f234755dc1');
+              assert.equal(j.previewChannel,'gi-i66-rc-'+j.buildRunId);
+              assert.match(j.artifactDigest,/^sha256:[0-9a-f]{64}$/);
+              assert.equal(j.signedPreviewScope?.germanAndPriscilaActualEditNewClientPolicyOps,true);
+              assert.equal(j.signedPreviewScope?.signedBothRolePaymentReceiptCobroPortfolioSyntheticWriteReloadRestore,true);
+              assert.equal(j.signedPreviewScope?.realCustomerWrites,0);
+              for(const key of ['sameImmutableArtifactPreviewAndLive','exactAllFilesDualOriginReadback',
+                  'requireLiveEditAndNewClientGermanPriscilaRealRoleReadback','rollbackLiveBackendTrafficAndHostingOnAnyFailure',
+                  'noFirestoreRulesAuthOrOtherBackendFunctions','noRealFinancialDataBackfillOrPaymentWrites',
+                  'doNotClaimFullPlatformProductionAccepted','doNotClaimFocalCaseEdsonDataUpdatedWithoutWriteReadback']){
+                assert.equal(j[key],true,'I66_CLIENTE360_NEW_RELEASE_GUARD_MISSING_'+key);
+              }
+              cp.execFileSync('git',['merge-base','--is-ancestor',j.sourceSha,'HEAD']);
+              const changed=cp.execFileSync('git',['diff','--name-only',j.sourceSha,'HEAD','--',
+                'orbit360-platform','functions','firebase.json','firestore.rules','storage.rules'],{encoding:'utf8'}).trim();
+              assert.equal(changed,'','I66_CLIENTE360_PRODUCT_CHANGED_AFTER_APPROVED_IMMUTABLE_BUILD');
+              const control=JSON.parse(fs.readFileSync('artifacts/orbit360-recovery/release-control/I6_6_RELEASE_TRANSPORT_CONTROL_20261110.json','utf8'));
+              assert.equal(control.status,'OPERATIONAL_EXACT_LIVE_ACCEPTED_LOCKED');
+              assert.equal(control.livePromotionAuthorized,false);
+              assert.equal(control.currentExactHostingRelease.sourceSha,'1b65a790530d49fe1d1fb451f02838fd9a713c53');
+              // Signed 1b history is not silently rewritten to physical b38.
+              const gh='https://api.github.com/repos/paulaosoriof86/orbit360-core/actions/';
+              const heads={Authorization:'Bearer '+process.env.GITHUB_TOKEN,Accept:'application/vnd.github+json','User-Agent':'GI-I66-Same-Artifact-Signed-Release'};
+              const runIds=[j.buildRunId,j.signedCarlosPaulaPreviewUatRunId,j.sourceQaRunId,j.sourceGuardRunId];
+              const responses=await Promise.all([...runIds.map(id=>fetch(gh+'runs/'+id,{headers:heads})),fetch(gh+'artifacts/'+j.artifactId,{headers:heads}),
+                fetch(j.previewUrl+'/__recovery__/build.json',{headers:{'Cache-Control':'no-cache'}}),
+                fetch('https://app.aysseguros.com/__recovery__/build.json',{headers:{'Cache-Control':'no-cache'}}),
+                fetch('https://ays-orbit-360-lab.web.app/__recovery__/build.json',{headers:{'Cache-Control':'no-cache'}}),
+                fetch(gh+'runs/'+j.signedCarlosPaulaPreviewUatRunId+'/jobs?per_page=100',{headers:heads})]);
+              assert.ok(responses.every(x=>x.ok),'I66_RELEASE_PROOF_OR_PUBLIC_ORIGIN_UNAVAILABLE');
+              const result=await Promise.all(responses.map(x=>x.json()));
+              for(let i=0;i<4;i++)assert.equal(result[i].conclusion,'success','I66_SIGNED_RUN_INCOMPLETE_'+runIds[i]);
+              assert.equal(result[0].head_sha,j.sourceSha);
+              assert.equal(result[0].path,'.github/workflows/gravicentra-release-delta-66-package.yml');
+              assert.equal(result[1].path,'.github/workflows/gravicentra-i66-current-exact-preview-cross-module-uat-20261119.yml');
+              assert.equal(result[2].path,'.github/workflows/gravicentra-i66-privileged-role-parity-source-qa.yml');
+              assert.equal(result[3].path,'.github/workflows/gravicentra-release-lock-sync.yml');
+              assert.equal(result[4].workflow_run?.id,j.buildRunId);
+              assert.equal(result[4].workflow_run?.head_sha,j.sourceSha);
+              assert.equal(result[4].digest,j.artifactDigest);
+              assert.equal(result[4].expired,false);
+              assert.equal(result[5].sourceSha,j.sourceSha);
+              assert.equal(result[5].buildId,j.buildId);
+              for(const n of [6,7]){
+                assert.equal(result[n].sourceSha,j.expectedPriorLiveSourceSha);
+                assert.equal(result[n].buildId,j.expectedPriorLiveBuildId);
+              }
+              const signedSteps=(result[8].jobs||[]).flatMap(z=>z.steps||[]);
+              for(const name of [
+                'Carlos Operativo signed roster in actual Editar Cliente, Nuevo Cliente, Nueva Póliza and Ops; LIVE untouched',
+                'Real-role signed Preview Ops Leads Tasks transactional writes and restoration',
+                'Real-role signed Preview direct-renewal hydration (read-only)',
+                'Real-role signed Preview payment receipt-carrier synthetic UAT and restoration']){
+                assert.ok(signedSteps.some(x=>x.name===name&&x.conclusion==='success'),'I66_SIGNED_PREVIEW_STEP_NOT_ACCEPTED_'+name);
+              }
+              fs.appendFileSync(process.env.GITHUB_OUTPUT,'artifact_id='+j.artifactId+'\nbuild_run_id='+j.buildRunId+'\n');
+              console.log('I66_LIVE_72D_EXACT_ARTIFACT_AND_CARLOS_PREVIEW_SIGNED_GATE_PASS');
+            })().catch(error=>{console.error('I66_CLIENTE360_LIVE_GATE_HOLD '+String(error.message||error).slice(0,320));process.exitCode=1;});
+          }else{
           if(j.schema!=='I6_6_EXACT_HOSTING_LIVE_PROMOTION_V1'||j.status!=='LIVE_HOSTING_CLONE_APPROVED_AFTER_TARGETED_PREVIEW_QA_PASS'||j.approvedByDirection!==true||j.noBackendDeploy!==true||j.noFirestoreAuthOrDataWrites!==true)throw Error('I66_PROMOTION_APPROVAL_INVALID');
           if(!/^[0-9a-f]{40}$/.test(j.sourceSha||'')||!Number.isSafeInteger(j.buildRunId)||j.buildRunId!==j.qaRunId||!Number.isSafeInteger(j.artifactId)||j.artifactId<=0||!/^[0-9a-f]{64}$/.test(j.artifactZipSha256||''))throw Error('I66_APPROVED_SOURCE_ID_INVALID');
           cp.execFileSync('git',['merge-base','--is-ancestor',j.sourceSha,'HEAD']);
@@ -103,6 +177,7 @@ jobs:
             fs.appendFileSync(process.env.GITHUB_OUTPUT,`artifact_id=${j.artifactId}\nbuild_run_id=${j.buildRunId}\n`);
             console.log('I66_PINNED_PREVIEW_QA_AND_PACKAGE_SUCCESS_PROOFS_PASS');
           })().catch(e=>{console.error(e.message);process.exitCode=1;});
+          }
           NODE
       - name: Download original immutable GitHub artifact only; no rebuild
         uses: actions/download-artifact@v4
@@ -162,7 +237,14 @@ jobs:
           echo "GOOGLE_APPLICATION_CREDENTIALS=$RUNNER_TEMP/gi-i66-promote-auth/selected.json" >> "$GITHUB_ENV"
           echo "FIREBASE_CLI_BIN=$CLI" >> "$GITHUB_ENV"
           npm install --no-save --package-lock=false --ignore-scripts --no-audit --no-fund firebase-admin@13.4.0 >/dev/null
-      - name: Clone exact Preview Hosting version to LIVE with rollback and two-origin 100-percent byte readback
+      - name: Install signed Carlos read-only browser for mandatory post-LIVE full selector smoke and rollback
+        run: |
+          set -euo pipefail
+          node --check tools/gravicentra-i6-6-carlos-german-assignment-roster-readonly.cjs
+          node --check tools/gravicentra-i6-6-live-exact-clone.mjs
+          npm install --no-save --package-lock=false --ignore-scripts --no-audit --no-fund firebase-admin@13.4.0 playwright@1.55.0 >/dev/null
+          node node_modules/playwright/cli.js install --with-deps chromium >/dev/null
+      - name: Clone exact signed Preview Hosting version to LIVE, readback all bytes and sign Carlos UI; rollback on any mismatch
         run: node tools/gravicentra-i6-6-live-exact-clone.mjs
       - name: Preserve release/rollback proof without user data
         if: always()
