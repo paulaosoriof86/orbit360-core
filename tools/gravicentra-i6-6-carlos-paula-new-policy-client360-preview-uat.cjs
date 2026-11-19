@@ -61,7 +61,9 @@ async function runOne(browser,actor){
       asesorId:'',__syntheticQa:true}],
     ['aseguradoras',ids.insurer,{id:ids.insurer,tenantId:TENANT,pais:'GT',nombre:'I6.6 QA aseguradora',vinculada:true,activo:true,
       moneda:'GTQ',ramos:['Autos'],ramosDetalle:{Autos:{productos:['Auto Individual']}},
-      comisiones:{Autos:15},comisionesProd:{'Auto Individual':18},__syntheticQa:true}]
+      comisiones:{Autos:15},comisionesProd:{'Auto Individual':18},
+      condicionesPrimas:{Autos:{gastosEmisionPct:5,gastosEmisionBase:'neta',recargoFinBase:'netaMasEmision',
+        maxCuotas:10,cobraRecargo:true,recargosPorCuotas:{'10':8},asistenciaAutosMonto:120}},__syntheticQa:true}]
   ];
   const context=await browser.newContext({viewport:{width:1280,height:900}});
   let page;
@@ -98,16 +100,22 @@ async function runOne(browser,actor){
         tab?.click();
         const rate=card?.querySelector('[data-productpct="Auto Individual"]');
         const branch=card?.querySelector('[data-ramopct="Autos"]');
+        const max=card?.querySelector('[data-prima-rule="maxCuotas"]');
+        const rates=card?.querySelector('[data-prima-rule="recargosPorCuotas"]');
+        const financeBase=card?.querySelector('[data-prima-rule="recargoFinBase"]');
         const before=Orbit.store.get('aseguradoras',ids.insurer)?.comisionesProd?.['Auto Individual'];
         if(rate){rate.value='19';rate.dispatchEvent(new Event('input',{bubbles:true}));}
         const cancel=card?.querySelector('#af-cancelar');cancel?.click();
         const after=Orbit.store.get('aseguradoras',ids.insurer)?.comisionesProd?.['Auto Individual'];
         return{card:!!card,rateVisible:!!rate,readRate:rate?.defaultValue,
-          ramoRate:branch?.value,cancelAvailable:!!cancel,before,after};
+          ramoRate:branch?.value,maxInstallments:max?.value,ratePlan:rates?.value,
+          financeBase:financeBase?.value,cancelAvailable:!!cancel,before,after};
       }finally{stage.remove();}
     },ids);
     assert.ok(insurerProduct.card&&insurerProduct.rateVisible&&insurerProduct.readRate==='18'&&
       insurerProduct.ramoRate==='15'&&insurerProduct.cancelAvailable&&
+      insurerProduct.maxInstallments==='10'&&insurerProduct.ratePlan==='10:8'&&
+      insurerProduct.financeBase==='netaMasEmision'&&
       insurerProduct.before===18&&insurerProduct.after===18,
     'QA_INSURER_PRODUCT_COMMISSION_UI_OR_CANCEL_FAILED_'+actor.role+':'+JSON.stringify(insurerProduct));
     console.log('I66_INSURER_PRODUCT_RATE_'+actor.role.toUpperCase()+'_SIGNED_PREVIEW_EDIT_CANCEL_NO_WRITE_PASS');

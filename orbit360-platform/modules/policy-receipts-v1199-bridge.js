@@ -39,7 +39,7 @@ Orbit.modules = Orbit.modules || {};
     producto_requerido: 'Selecciona el producto o subramo.', estado_requerido: 'Selecciona el estado.',
     vigencia_inicio_requerida: 'Ingresa el inicio de vigencia.', vigencia_fin_requerida: 'Ingresa el fin de vigencia.',
     vigencia_invalida: 'La fecha final debe ser posterior a la inicial.', prima_neta_requerida: 'La prima neta debe ser mayor que cero.',
-    cuotas_requeridas: 'La cantidad de recibos no es válida.', motivo_requerido: 'Explica el motivo del cambio.',
+    cuotas_requeridas: 'La cantidad de recibos no es válida.', cuotas_superan_maximo_aseguradora: 'El plan supera el máximo de recibos configurado en la ficha de la aseguradora para este ramo.', motivo_requerido: 'Explica el motivo del cambio.',
     renovabilidad_sin_cambios: 'La renovabilidad ya tiene ese valor. No se modificó la póliza.',
     poliza_sin_cambios: 'No se detectaron cambios para guardar. La póliza y sus recibos se conservaron.',
     permiso_poliza_denegado: 'Tu rol activo no puede modificar pólizas.', permiso_cobro_denegado: 'Tu rol activo no puede aplicar cobros.',
@@ -111,6 +111,12 @@ Orbit.modules = Orbit.modules || {};
     if (product && insurer.comisionesProd && insurer.comisionesProd[product] != null) return explicitCommission(insurer.comisionesProd[product]);
     if (branch && insurer.comisiones && insurer.comisiones[branch] != null) return explicitCommission(insurer.comisiones[branch]);
     return explicitCommission(insurer.comisionDefault);
+  }
+  function insurerPremiumRule(insurerId, branch){
+    const insurer=S().get('aseguradoras',insurerId)||{},rows=insurer.condicionesPrimas||{};
+    const key=String(branch||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim();
+    const match=Object.keys(rows).find(value=>String(value).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim()===key);
+    return match&&rows[match]&&typeof rows[match]==='object'?rows[match]:null;
   }
   function sellerCommission(advisorId) {
     const advisor = S().get('asesores', advisorId) || {};
@@ -342,7 +348,10 @@ Orbit.modules = Orbit.modules || {};
     }
     function raw() {
       const c = client(), country2 = c.pais || '', currency2 = currencyEl.value;
-      if(!existing && E.installmentsForFrequency($('[data-frequency]').value,Number($('[data-installments]').value)||1)>1 && !$('[data-surcharge]').value.trim())throw new RangeError('recargo_financiero_requiere_confirmacion');
+      const count=E.installmentsForFrequency($('[data-frequency]').value,Number($('[data-installments]').value)||1);
+      const financialRule=insurerPremiumRule(insurerEl.value,ramoEl.value);
+      if(financialRule?.maxCuotas!=null&&count>Number(financialRule.maxCuotas))throw new RangeError('cuotas_superan_maximo_aseguradora');
+      if(!existing && count>1 && !$('[data-surcharge]').value.trim())throw new RangeError('recargo_financiero_requiere_confirmacion');
       const documented = {}, amount = $('[data-nonvat]').value, concept = $('[data-nonvat-concept]').value.trim(), ref = $('[data-nonvat-ref]').value.trim();
       if (Number(amount) !== 0 || concept || ref || existing && Object.prototype.hasOwnProperty.call(existing,'cargoNoGravadoMonto')) {
         Object.assign(documented, Orbit.primas.cargoNoGravado({ cargoNoGravadoMonto: amount, cargoNoGravadoConcepto: concept, cargoNoGravadoDocumentRef: ref }));
@@ -359,7 +368,8 @@ Orbit.modules = Orbit.modules || {};
         ramo: ramoEl.value, subramo: productEl.value, producto: productEl.value, renovable: $('[data-renewable]').value==='yes' ? true : ($('[data-renewable]').value==='no' ? false : null), vigenciaInicio: $('[data-start]').value, vigenciaFin: $('[data-end]').value,
         frecuencia: $('[data-frequency]').value, formaPago: $('[data-payment-form]').value, conducto: $('[data-conduct]').value,
         cuotas: +$('[data-installments]').value || 1, ivaPct: countryTaxPct(country2), primaNeta: +$('[data-net]').value || 0, gastosEmision: +$('[data-issue]').value || 0,
-        otros: +$('[data-other]').value || 0, recargoFinPct: +$('[data-surcharge]').value || 0, sumaAsegurada: +$('[data-sum]').value || 0,
+        otros: +$('[data-other]').value || 0, recargoFinPct: +$('[data-surcharge]').value || 0,
+        recargoFinBase:financialRule?.recargoFinBase||'neta', sumaAsegurada: +$('[data-sum]').value || 0,
         comAseguradoraPct: existing ? existing.comAseguradoraPct || 0 : explicitCommission($('[data-commission-insurer]').value),
         comVendedorPct: existing ? existing.comVendedorPct || 0 : explicitCommission($('[data-commission-seller]').value),
         fuente: existing && existing.fuente || 'ingreso_manual_plataforma',
@@ -368,31 +378,38 @@ Orbit.modules = Orbit.modules || {};
     }
     // I6.6: never overwrite a documented human premium override or an old policy.
     // Only the owner-confirmed GT vehicle rules are eligible for automatic defaults.
-    let issueManuallyEdited=!!existing, surchargeManuallyEdited=!!existing, endManuallyEdited=!!existing;
+    let issueManuallyEdited=!!existing, assistanceManuallyEdited=!!existing, surchargeManuallyEdited=!!existing, endManuallyEdited=!!existing;
     function syncFinancialDefaults(){
       if(existing)return;
       const insurer=S().get('aseguradoras',insurerEl.value)||{};
-      const label=String(insurer.nombre||insurer.displayName||insurer.id||'')
-        .normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
       const country2=String(client().pais||'').toUpperCase(),vehicle=/auto|veh/i.test(ramoEl.value);
-      const net=Number($('[data-net]').value)||0,assistance=Number($('[data-other]').value)||0;
-      const fee=$('[data-issue]'),pct=$('[data-surcharge]'),note=$('[data-financial-rule-note]');
+      const rule=insurerPremiumRule(insurerEl.value,ramoEl.value),other=$('[data-other]');
+      if(vehicle&&!assistanceManuallyEdited&&rule?.asistenciaAutosMonto!=null)other.value=String(Number(rule.asistenciaAutosMonto));
+      const net=Number($('[data-net]').value)||0,assistance=Number(other.value)||0;
+      const fee=$('[data-issue]'),pct=$('[data-surcharge]'),note=$('[data-financial-rule-note]'),hint=$('[data-installments-hint]');
       let ruleNote='Gastos y recargos sujetos a la regla documental de aseguradora y producto.';
       if(!issueManuallyEdited&&country2==='GT'){
         let amount=null;
-        if(/columna/.test(label)){amount=0;ruleNote='Columna: emisión predeterminada en cero; confirma excepciones con la póliza.';}
-        else if(vehicle&&/mapfre/.test(label)){amount=Orbit.primas.r2((net+assistance)*.05);ruleNote='Mapfre vehículos: sugerencia 5% sobre neta más asistencias, según la regla de Dirección; verifica con la póliza.';}
-        else if(vehicle&&label){amount=Orbit.primas.r2(net*.05);ruleNote='Vehículos: sugerencia 5% sobre neta (excepto aseguradoras con otra base); verifica la póliza.';}
+        if(rule?.gastosEmisionPct!=null){
+          const base=rule.gastosEmisionBase==='netaMasAsistencia'?net+assistance:net;
+          amount=Orbit.primas.r2(base*Number(rule.gastosEmisionPct)/100);
+          ruleNote='Gastos de emisión calculados desde la ficha de la aseguradora ('+rule.gastosEmisionPct+' %).';
+        }else if(vehicle){amount=Orbit.primas.r2(net*.05);ruleNote='Regla general de Dirección: emisión 5 % sobre neta; registra cualquier excepción en la ficha de aseguradora.';}
         if(amount!==null)fee.value=String(amount);
       }
       const freq=$('[data-frequency]').value,installments=E.installmentsForFrequency(freq,Number($('[data-installments]').value)||1);
       const pay=String($('[data-payment-form]').value||'');
       if(!surchargeManuallyEdited){
-        if(installments===1||pay==='Visa Cuotas')pct.value='0';
+        const configured=rule?.recargosPorCuotas||{};
+        if(installments===1||pay==='Visa Cuotas'||rule?.cobraRecargo===false)pct.value='0';
+        else if(configured[String(installments)]!=null)pct.value=String(configured[String(installments)]);
         else if(freq==='Mensual'&&installments<=11)pct.value=String(installments);
+        else if(freq==='Mensual'&&installments===12)pct.value='13.5';
         else pct.value='';
       }
+      if(rule?.maxCuotas!=null&&hint)hint.textContent='Máximo configurado para '+ramoEl.value+': '+rule.maxCuotas+' recibos.';
       if(installments>1&&pct.value.trim()==='')ruleNote+=' Recargo fraccionado por confirmar con la aseguradora antes de guardar.';
+      else if(rule)ruleNote+=' Base de recargo: '+(rule.recargoFinBase==='netaMasEmision'?'neta más gastos de emisión':'prima neta')+'.';
       if(note)note.textContent=ruleNote;
     }
     function preview() {
@@ -423,6 +440,7 @@ Orbit.modules = Orbit.modules || {};
     $('[data-end]').addEventListener('input',()=>{endManuallyEdited=true;});
     $('[data-start]').addEventListener('change', () => { if(!endManuallyEdited) $('[data-end]').value=plusYear($('[data-start]').value); preview(); });
     $('[data-issue]').addEventListener('input',()=>{issueManuallyEdited=true;});
+    $('[data-other]').addEventListener('input',()=>{assistanceManuallyEdited=true;});
     $('[data-surcharge]').addEventListener('input',()=>{surchargeManuallyEdited=true;});
     [insurerEl,ramoEl,productEl,$('[data-payment-form]'),$('[data-frequency]')].forEach(el=>el.addEventListener('change',()=>{syncFinancialDefaults();preview();}));
     $('[data-frequency]').addEventListener('change', syncInstallments);

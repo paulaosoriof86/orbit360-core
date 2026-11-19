@@ -69,6 +69,8 @@ async function denied(fn,code){let e;try{await fn()}catch(err){e=err}
  const directories={
   aseguradoras:[
    {id:'insGT',tenantId,pais:'GT',nombre:'Aseguradora GT',password:'SECRET_TOP',
+    comisiones:{Autos:15},comisionesProd:{'Auto Individual':18},
+    condicionesPrimas:{Autos:{gastosEmisionPct:5,gastosEmisionBase:'neta',maxCuotas:10,recargoFinBase:'netaMasEmision',cobraRecargo:true,recargosPorCuotas:{'10':8},asistenciaAutosMonto:100}},
     actividad:[{fecha:'2026-10-30T12:00:00Z',responsable:'Actor de prueba · Operativo',cambio:'Actualización de ficha (observaciones)',motivo:'QA',camposCambiados:['observaciones'],actorUid:'DO_NOT_RETURN_UID',actorEmail:'DO_NOT_RETURN_EMAIL',before:{password:'SECRET_AUDIT_BEFORE'},after:{privateKey:'SECRET_AUDIT_AFTER'},eventId:'insact_synthetic',serverOwned:true}],
     portales:[{id:'p1',nombre:'Portal',usuario:'operador',password:'SECRET_PORTAL',credentialRef:'cred_sample'}],
     cuentas:[{banco:'Banco',tipo:'Monetaria',numero:'001122',moneda:'GTQ'}]},
@@ -104,6 +106,8 @@ async function denied(fn,code){let e;try{await fn()}catch(err){e=err}
  assert.equal(gt.rows[0].portales[0].usuario,'operador');directoryChecks++;
  assert.equal(gt.rows[0].portales[0].credentialRef,'cred_sample');directoryChecks++;
  assert.equal(gt.rows[0].cuentas[0].numero,'001122');directoryChecks++;
+ assert.equal(gt.rows[0].comisionesProd['Auto Individual'],18);directoryChecks++;
+ assert.equal(gt.rows[0].condicionesPrimas.Autos.recargosPorCuotas['10'],8);directoryChecks++;
  assert.equal(JSON.stringify(gt).includes('SECRET_'),false);directoryChecks++;
  assert.equal(gt.rows[0].actividad.length,1);assert.equal(gt.rows[0].actividad[0].fecha,'2026-10-30T12:00:00.000Z');assert.equal(gt.rows[0].actividad[0].responsable,'Actor de prueba · Operativo');assert.equal(gt.rows[0].actividadTotal,1);directoryChecks++;
  assert.equal(JSON.stringify(gt).includes('DO_NOT_RETURN'),false);assert.deepEqual(gt.rows[0].actividad[0].camposCambiados,['observaciones']);directoryChecks++;

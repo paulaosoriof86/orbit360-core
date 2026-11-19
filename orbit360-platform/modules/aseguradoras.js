@@ -568,7 +568,7 @@ Orbit.modules.aseguradoras = (function () {
     const pais = (Orbit.pais && Orbit.pais !== 'TODOS') ? Orbit.pais : 'GT';
     const id = 'asg' + Date.now().toString().slice(-6);
     const ent = {
-      id, nombre: 'Nueva aseguradora', color: '#1f3a5f', pais, ramos: [], comisionDefault: 12, comisiones: {}, comisionesProd: {}, ramosHabilitados: {}, ramosDetalle: {},
+      id, nombre: 'Nueva aseguradora', color: '#1f3a5f', pais, ramos: [], comisionDefault: 12, comisiones: {}, comisionesProd: {}, condicionesPrimas: {}, ramosHabilitados: {}, ramosDetalle: {},
       vinculada: true, contactos: [], cuentas: [], portales: [], docs: [], docsRequeridos: [], productos: [], facturacion: {}, actividad: [], creadaEnSesion: true
     };
     ent.actividad = log(ent, { cambio: 'Aseguradora creada' });
@@ -697,7 +697,7 @@ Orbit.modules.aseguradoras = (function () {
   }
 
   /* ---- diff semántico para trazabilidad antes/después ---- */
-  const CHANGE_LABELS={nombre:'Nombre comercial',logo:'Logo',logoAssetRef:'Logo',nit:'NIT / identificación fiscal',codigoIntermediario:'Código de intermediario',web:'Sitio web / app',responsable:'Responsable interno',telGeneral:'Teléfono general',emergencia:'Emergencia / asistencia',ultimaRevision:'Última revisión',observaciones:'Observaciones',drive:'Carpeta Drive',facturacion:'Datos de facturación',contactos:'Contactos',portales:'Plataformas y accesos',cuentas:'Bancos y pagos',ramos:'Ramos ofrecidos',comisiones:'Comisiones por ramo',comisionesProd:'Comisiones por producto',ramosHabilitados:'Habilitación comercial',ramosDetalle:'Productos, planes y segmentación',docsRequeridos:'Requisitos de emisión',docs:'Documentos y fuentes',vinculada:'Estado de la aseguradora',cotTasas:'Tarifas y condiciones',cotTasasValidadas:'Validación de tarifas'};
+  const CHANGE_LABELS={nombre:'Nombre comercial',logo:'Logo',logoAssetRef:'Logo',nit:'NIT / identificación fiscal',codigoIntermediario:'Código de intermediario',web:'Sitio web / app',responsable:'Responsable interno',telGeneral:'Teléfono general',emergencia:'Emergencia / asistencia',ultimaRevision:'Última revisión',observaciones:'Observaciones',drive:'Carpeta Drive',facturacion:'Datos de facturación',contactos:'Contactos',portales:'Plataformas y accesos',cuentas:'Bancos y pagos',ramos:'Ramos ofrecidos',comisiones:'Comisiones por ramo',comisionesProd:'Comisiones por producto',condicionesPrimas:'Emisión, asistencias y fraccionamiento',ramosHabilitados:'Habilitación comercial',ramosDetalle:'Productos, planes y segmentación',docsRequeridos:'Requisitos de emisión',docs:'Documentos y fuentes',vinculada:'Estado de la aseguradora',cotTasas:'Tarifas y condiciones',cotTasasValidadas:'Validación de tarifas'};
   function semanticValue(value,depth){
     depth=depth||0;
     if(value==null||value==='')return undefined;
@@ -716,7 +716,7 @@ Orbit.modules.aseguradoras = (function () {
   }
   function semanticEqual(a,b){return JSON.stringify(semanticValue(a,0))===JSON.stringify(semanticValue(b,0));}
   function diffResumen(before, after) {
-    const claves = ['nombre', 'logo', 'logoAssetRef', 'nit', 'codigoIntermediario', 'web', 'responsable', 'telGeneral', 'emergencia', 'ultimaRevision', 'observaciones', 'drive', 'facturacion', 'contactos', 'portales', 'cuentas', 'ramos', 'comisiones', 'comisionesProd', 'ramosHabilitados', 'ramosDetalle', 'docsRequeridos', 'docs', 'vinculada', 'cotTasas', 'cotTasasValidadas'];
+    const claves = ['nombre', 'logo', 'logoAssetRef', 'nit', 'codigoIntermediario', 'web', 'responsable', 'telGeneral', 'emergencia', 'ultimaRevision', 'observaciones', 'drive', 'facturacion', 'contactos', 'portales', 'cuentas', 'ramos', 'comisiones', 'comisionesProd', 'condicionesPrimas', 'ramosHabilitados', 'ramosDetalle', 'docsRequeridos', 'docs', 'vinculada', 'cotTasas', 'cotTasasValidadas'];
     const cambios=[];claves.forEach(k=>{if(!semanticEqual(before&&before[k],after&&after[k]))cambios.push(k);});return cambios;
   }
   function humanChangeSummary(keys){
@@ -732,6 +732,12 @@ Orbit.modules.aseguradoras = (function () {
       st.saving=false;
       if(saveButton){saveButton.disabled=false;saveButton.textContent=originalSaveLabel;saveButton.removeAttribute('aria-busy');}
       U.toast('Revisa las comisiones por producto: deben estar entre 0% y 100%, o vacías para heredar la tasa del ramo.');
+      return;
+    }
+    if (st.financialRulesInvalid && st.financialRulesInvalid.length) {
+      st.saving=false;
+      if(saveButton){saveButton.disabled=false;saveButton.textContent=originalSaveLabel;saveButton.removeAttribute('aria-busy');}
+      U.toast('Revisa los topes, tasas, bases y cuotas de las condiciones de prima. Ningún valor inválido fue guardado.');
       return;
     }
     const before = S().get('aseguradoras', id); if (!before) {st.saving=false;if(saveButton){saveButton.disabled=false;saveButton.textContent=originalSaveLabel;saveButton.removeAttribute('aria-busy');}return;}
@@ -994,6 +1000,9 @@ Orbit.modules.aseguradoras = (function () {
     const pct = (a.comisiones && a.comisiones[r] != null) ? a.comisiones[r] : (a.comisionDefault != null ? a.comisionDefault : '');
     const hab = !!(a.ramosHabilitados && a.ramosHabilitados[r] && a.ramosHabilitados[r].cotizador === true);
     const det = (a.ramosDetalle && a.ramosDetalle[r]) || {},selectedProducts=selectedCommercialList(a,r,'productos','producto'),selectedPlans=selectedCommercialList(a,r,'planes','plan');
+    const rule=(a.condicionesPrimas&&a.condicionesPrimas[r])||{},rates=rule.recargosPorCuotas||{};
+    const rateText=Object.keys(rates).sort((x,y)=>Number(x)-Number(y)).map(k=>k+':'+rates[k]).join('; ');
+    const ruleInput=(field,attr={})=>`data-prima-rule="${field}" ${attr.min!=null?'min="'+attr.min+'"':''} ${attr.max!=null?'max="'+attr.max+'"':''}`;
     const products=commercialProductCatalog(a,r),plans=commercialPlanCatalog(a,r);
     const productRates=selectedProducts.map(product=>{
       const configured=Object.prototype.hasOwnProperty.call(a.comisionesProd||{},product);
@@ -1007,7 +1016,49 @@ Orbit.modules.aseguradoras = (function () {
       <div class="insurer-offering-meta">${editing ? `<label>Comisión %<input class="o-sel" type="number" min="0" max="100" step="0.5" data-ramopct="${U.esc(r)}" value="${pct}"></label><label>Segmento<select class="o-sel" data-ramoseg="${U.esc(r)}">${selectOptions((Orbit.cat&&Orbit.cat.get?Orbit.cat.get('segmentos'):[]).filter(x=>typeof x==='string'),det.segmento||'','Seleccionar…')}</select></label>` : `<div class="insurer-offering-readfield"><span>COMISIÓN</span><b>${pct === '' ? 'No registrada' : U.esc(String(pct)) + ' %'}</b></div><div class="insurer-offering-readfield"><span>SEGMENTO</span><b>${U.esc(det.segmento || 'Sin segmento')}</b></div>`}</div>
       <div class="insurer-offering-cols"><div><b>Productos</b><small>Catálogo del país, ramo y evidencia documental; seleccionar no equivale a validar tarifas</small>${editing?multiCheckOptions(products,selectedProducts,'data-ramoprod',r):(selectedProducts.map(v=>'<span class="badge neutral">'+U.esc(v)+'</span>').join('')||'<span class="muted">Sin productos seleccionados.</span>')}</div><div><b>Planes</b><small>Planes comerciales definidos para el tenant o documentados</small>${editing?multiCheckOptions(plans,selectedPlans,'data-ramoplancheck',r):(selectedPlans.map(v=>'<span class="badge neutral">'+U.esc(v)+'</span>').join('')||'<span class="muted">Sin planes específicos.</span>')}</div></div>
       <div style="margin-top:14px;border-top:1px solid var(--line);padding-top:11px"><b>Comisión por producto</b><small style="display:block;margin:4px 0 9px">Tasa editable en esta ficha; dejar vacío hereda el porcentaje del ramo. La comisión se calcula sobre prima neta.</small><div style="display:grid;gap:7px">${productRates.join('')||'<span class="muted">Selecciona productos para configurar una tasa particular.</span>'}</div></div>
+      <div data-prima-ramo="${U.esc(r)}" style="margin-top:14px;border-top:1px solid var(--line);padding-top:11px"><b>Condiciones de prima y fraccionamiento</b><small style="display:block;margin:4px 0 9px">Editables por aseguradora y ramo. Los valores no documentados se pueden dejar sin configurar; conserva las excepciones reales y la fuente.</small>${editing?`
+        <div class="cgrid">
+          <label>Emisión %<input class="o-sel" type="number" min="0" max="100" step="0.01" ${ruleInput('gastosEmisionPct')} value="${U.esc(rule.gastosEmisionPct??'')}" placeholder="Sin configurar"></label>
+          <label>Base de emisión<select class="o-sel" ${ruleInput('gastosEmisionBase')}><option value="neta" ${rule.gastosEmisionBase!=='netaMasAsistencia'?'selected':''}>Prima neta</option><option value="netaMasAsistencia" ${rule.gastosEmisionBase==='netaMasAsistencia'?'selected':''}>Neta + asistencia</option></select></label>
+          <label>Máximo de recibos<input class="o-sel" type="number" min="1" max="24" step="1" ${ruleInput('maxCuotas')} value="${U.esc(rule.maxCuotas??'')}" placeholder="Sin límite validado"></label>
+          <label>Base de recargo<select class="o-sel" ${ruleInput('recargoFinBase')}><option value="neta" ${rule.recargoFinBase!=='netaMasEmision'?'selected':''}>Prima neta</option><option value="netaMasEmision" ${rule.recargoFinBase==='netaMasEmision'?'selected':''}>Neta + gastos de emisión</option></select></label>
+          <label><span><input type="checkbox" ${ruleInput('cobraRecargo')} ${rule.cobraRecargo!==false?'checked':''}> Cobra recargo por fraccionamiento</span></label>
+          <label>Asistencia autos (importe)<input class="o-sel" type="number" min="0" step="0.01" ${ruleInput('asistenciaAutosMonto')} value="${U.esc(rule.asistenciaAutosMonto??'')}" placeholder="Sin configurar"></label>
+        </div>
+        <label style="display:block;margin-top:8px">Recargo % por número de cuotas<input class="o-sel" style="width:100%" ${ruleInput('recargosPorCuotas')} value="${U.esc(rateText)}" placeholder="Ej.: 2:2; 6:6; 10:10; 12:13.5"><small>Las excepciones prevalecen sobre la regla general. Usa 0 cuando no exista recargo.</small></label>`:
+        `<div class="insurer-offering-readfield"><span>Emisión</span><b>${rule.gastosEmisionPct!=null?U.esc(String(rule.gastosEmisionPct))+' %':'Sin configurar'}</b></div><div class="insurer-offering-readfield"><span>Máximo de recibos</span><b>${rule.maxCuotas||'Sin verificar'}</b></div><div class="insurer-offering-readfield"><span>Recargo</span><b>${rule.cobraRecargo===false?'Exento':U.esc(rateText||'Según documento')}</b></div><div class="insurer-offering-readfield"><span>Base</span><b>${rule.recargoFinBase==='netaMasEmision'?'Neta + emisión':'Prima neta'}</b></div><div class="insurer-offering-readfield"><span>Asistencia de autos</span><b>${rule.asistenciaAutosMonto!=null?U.esc(String(rule.asistenciaAutosMonto))+' '+U.esc(a.moneda||''):'Sin configurar'}</b></div>`}</div>
     </section>`;
+  }
+  function reconcileInsurerFinancialRules(draft, cards){
+    const next=Object.assign({},draft.condicionesPrimas||{}),invalid=[];
+    for(const card of cards){
+      const ramo=clean(card.dataset.primaRamo);if(!ramo)continue;
+      const value=key=>clean((card.querySelector('[data-prima-rule="'+key+'"]')||{}).value);
+      const old=next[ramo]&&typeof next[ramo]==='object'?next[ramo]:{},rule=Object.assign({},old);
+      const charges=card.querySelector('[data-prima-rule="cobraRecargo"]');
+      if(!Object.keys(old).length&&['gastosEmisionPct','asistenciaAutosMonto','maxCuotas','recargosPorCuotas'].every(key=>!value(key))&&charges?.checked!==false)continue;
+      for(const field of ['gastosEmisionPct','asistenciaAutosMonto','maxCuotas']){
+        const raw=value(field);
+        if(!raw){delete rule[field];continue;}
+        const n=Number(raw),valid=Number.isFinite(n)&&n>=0&&(field==='gastosEmisionPct'?n<=100:field==='maxCuotas'?Number.isInteger(n)&&n>=1&&n<=24:n<=100000000);
+        if(!valid){invalid.push(ramo+':'+field);continue;}
+        rule[field]=n;
+      }
+      rule.gastosEmisionBase=value('gastosEmisionBase');rule.recargoFinBase=value('recargoFinBase');
+      if(!['neta','netaMasAsistencia'].includes(rule.gastosEmisionBase)||!['neta','netaMasEmision'].includes(rule.recargoFinBase))invalid.push(ramo+':base');
+      rule.cobraRecargo=!!charges?.checked;
+      const rawRates=value('recargosPorCuotas'),rates={};
+      if(rawRates)for(const part of rawRates.split(/[;,]/)){
+        const match=/^\s*(\d{1,2})\s*:\s*(\d+(?:\.\d{1,2})?)\s*$/.exec(part);
+        if(!match||Number(match[1])<1||Number(match[1])>24||Number(match[2])>100||Object.hasOwn(rates,match[1])){invalid.push(ramo+':recargos');continue;}
+        rates[String(Number(match[1]))]=Number(match[2]);
+      }
+      rule.recargosPorCuotas=rates;
+      if(!Object.keys(rates).length)delete rule.recargosPorCuotas;
+      next[ramo]=rule;
+    }
+    if(!invalid.length)draft.condicionesPrimas=next;
+    return invalid;
   }
   function reconcileProductCommissionDraft(draft, inputs) {
     const next=Object.assign({},draft.comisionesProd||{}),invalid=[];
@@ -1342,6 +1393,7 @@ Orbit.modules.aseguradoras = (function () {
         if(ramoBoxes.length)draft.ramos=ramoBoxes.filter(x=>x.checked).map(x=>x.value);
         st.productCommissionInvalid=reconcileProductCommissionDraft(draft,
           [...body.querySelectorAll('[data-productpct]')].map(inp=>({product:inp.dataset.productpct,raw:inp.value})));
+        st.financialRulesInvalid=reconcileInsurerFinancialRules(draft,[...body.querySelectorAll('[data-prima-ramo]')]);
         // Avoid implicit commission overrides when a field only displays a source-backed default.
         const sourceCommissions=S().get('aseguradoras',id)||{},explicitCommissions=sourceCommissions.comisiones||{};
         body.querySelectorAll('[data-ramopct]').forEach(inp=>{

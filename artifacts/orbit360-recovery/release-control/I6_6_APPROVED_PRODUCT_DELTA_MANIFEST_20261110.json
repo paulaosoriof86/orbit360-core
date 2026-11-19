@@ -2943,6 +2943,46 @@
           "gitBlobSha": "28d85abd3904a9a73fb8eee63e06a7468e22fe4b"
         }
       ]
+    },
+    {
+      "id": "I6_6_INSURER_SELF_ADMINISTERED_FINANCIAL_RULES_OWNER_20261119",
+      "approvedByDirection": true,
+      "receipt": "Paula owner decision 2026-11-19: replace current default commission rates with autos 15%, medical 10%, personal accidents 25%; use editable insurer-product rates, per-ramo issuance, max dues, assistance, financing percentage schedule and charge base; months up to 11 default 1 percent per month and 12 installments 13.5 percent; source-backed exceptions verified before applying.",
+      "sourceStatus": "LOCAL_90_OF_90_RELATED_PREMIUM_AND_DOCUMENTED_TERMS_TESTS_PASS_SIGNED_PREVIEW_PENDING",
+      "scope": "Server insurer directory read now returns source commission/product and non-secret premium conditions; editable per-insurer per-ramo controls persist via original durable insurer owner; new policies consume insurer rates, base and maximum, preserving old net-only financial semantics for historic policies. No unverified insurer exception written live in this source commit.",
+      "paths": [
+        {
+          "path": "orbit360-platform/modules/aseguradoras.js",
+          "gitBlobSha": "bc1a0f5b02666378e257f0d5e83064167b54fddc",
+          "replaces": {"path":"orbit360-platform/modules/aseguradoras.js","priorGitBlobSha":"94673da5f3a06d6ddeefb2d2706cc665417d4793","priorChangeId":"I6_6_INSURER_EDITABLE_PRODUCT_COMMISSION_OWNER_20261119"}
+        },
+        {
+          "path": "orbit360-platform/modules/policy-receipts-v1199-bridge.js",
+          "gitBlobSha": "fad9ae6517bc42f5531f2fcdcfa218db5be9ec86",
+          "replaces": {"path":"orbit360-platform/modules/policy-receipts-v1199-bridge.js","priorGitBlobSha":"e6b5847e888c8ce6eff217faf4ea92af2796d9f0","priorChangeId":"I6_6_CASH_30D_FORWARD_ONLY_P0_LEGACY_PRESERVATION_20261118"}
+        },
+        {
+          "path": "orbit360-platform/core/primas.js",
+          "gitBlobSha": "d74986b08eb46d34a6221198b57fec3589eb20cf",
+          "replaces": {"path":"orbit360-platform/core/primas.js","priorGitBlobSha":"201b82bf7ff46dcfaabf1afe34d69e465f2218c8","priorChangeId":"I6_6_CASH_30D_FORWARD_ONLY_P0_LEGACY_PRESERVATION_20261118"}
+        },
+        {
+          "path": "orbit360-platform/core/policy-receipts-engine.js",
+          "gitBlobSha": "699f37464ecd977a3cb489c934b31773abb5c42f",
+          "replaces": {"path":"orbit360-platform/core/policy-receipts-engine.js","priorGitBlobSha":"a9966cab05ae9fe2de68ec4795038de743529da7","priorChangeId":"I6_6_CASH_30D_FORWARD_ONLY_P0_LEGACY_PRESERVATION_20261118"}
+        },
+        {
+          "path": "functions/b4-003-scoped-bootstrap-reader.js",
+          "gitBlobSha": "eea1d0569b0a441e525ea9237ba4870fdeac14c8"
+        }
+      ],
+      "tests": [
+        {
+          "path": "tools/gravicentra-i6-6-insurer-product-commission.test.cjs",
+          "gitBlobSha": "4f6a0b67d2a1a61f2832a24442d9fdf11b08ba4e",
+          "replaces": {"path":"tools/gravicentra-i6-6-insurer-product-commission.test.cjs","priorGitBlobSha":"28d85abd3904a9a73fb8eee63e06a7468e22fe4b","priorChangeId":"I6_6_INSURER_EDITABLE_PRODUCT_COMMISSION_OWNER_20261119"}
+        }
+      ]
     }
   ],
   "i66R11PreviewBuildRequest20261113": {

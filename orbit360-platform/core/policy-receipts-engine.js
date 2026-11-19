@@ -172,6 +172,7 @@ Orbit.policyReceipts = (function () {
       gastosEmision: +raw.gastosEmision || 0,
       otros: +raw.otros || 0,
       recargoFinPct: recargoPct,
+      recargoFinBase: raw.recargoFinBase,
       ivaPct: raw.ivaPct,
       cargoNoGravadoMonto: raw.cargoNoGravadoMonto,
       cargoNoGravadoConcepto: raw.cargoNoGravadoConcepto,
@@ -235,6 +236,7 @@ Orbit.policyReceipts = (function () {
     base.primaTotal = d.total;
     base.prima = d.total;
     base.recargoFinPct = d.recargoPct;
+    base.recargoFinBase = d.recargoFinBase;
     base.policyKey = canonicalPolicyKey(base);
     base.policyVersionKey = policyVersionKey(base);
     base.fuente = clean(base.fuente || (existing ? existing.fuente : 'ingreso_manual_plataforma'));

@@ -129,14 +129,21 @@ Orbit.primas = (function () {
     const otros = +o.otros || 0;
     const recargoPct = o.recargoFinPct != null ? o.recargoFinPct : cfg.recargoFinanciero;
     const ivaPct = o.ivaPct != null ? o.ivaPct : cfg.iva;
-    const gastosFinan = o.fraccionado ? r2(neta * recargoPct / 100) : 0;
+    // The issuer decides whether financing is assessed on net premium alone
+    // or on net premium plus issuance. Preserve historical net-only behavior
+    // when older policies have no documented base.
+    if (o.recargoFinBase != null && !['neta','netaMasEmision'].includes(o.recargoFinBase))
+      throw new RangeError('recargo_financiero_base_invalida');
+    const recargoFinBase=o.recargoFinBase||'neta';
+    const financeBase=recargoFinBase==='netaMasEmision'?neta+gastosEmision:neta;
+    const gastosFinan = o.fraccionado ? r2(financeBase * recargoPct / 100) : 0;
     const baseGravable = r2(neta + gastosEmision + gastosFinan + otros);
     const iva = r2(baseGravable * ivaPct / 100);
     const documentedCharge = cargoNoGravado(o);
     const total = r2(baseGravable + iva + documentedCharge.cargoNoGravadoMonto);
     return {
       neta: r2(neta), gastosEmision: r2(gastosEmision), gastosFinan, otros: r2(otros),
-      baseGravable, iva, ivaPct, recargoPct, total, fraccionado: !!o.fraccionado,
+      baseGravable, iva, ivaPct, recargoPct, recargoFinBase, total, fraccionado: !!o.fraccionado,
       ...documentedCharge
     };
   }
