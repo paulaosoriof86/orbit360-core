@@ -26,6 +26,8 @@ const group={policy:{id:'p1',numero:'91-169567',vigenciaInicio:'2025-08-05',
 const assessCase=(row=raw,editions=[group])=>assess(sourceRow(row),editions);
 assert.ok(assessCase().ready,'exact source and receipt should match');
 assert.equal(assessCase().ready.grossCents,29684);
+assert.ok(assessCase(raw,[{...group,policy:{...group.policy,estado:'Cancelada'}}]).ready,
+  'current policy cancellation cannot block a proven historical insurer payment');
 assert.equal(assessCase({...raw,currencySource:'COP'}).code,'SOURCE_CURRENCY_NOT_GTQ');
 assert.equal(assessCase({...raw,holdReasons:['CONFLICTING_SOURCE_PAID_DATES']}).code,'CONFLICTING_SOURCE_DATES');
 assert.equal(assessCase(raw,[]).code,'POLICY_NUMBER_NOT_FOUND');
@@ -55,6 +57,11 @@ assert.equal(assessCase(raw,[{...group,policy:{...group.policy,frecuencia:'Mensu
 assert.equal(assessCase({...raw,frequencySource:'Pago Único'},[{...group,
   receipts:[{...receipt,vence:'2026-03-29',fechaLimite:'2026-03-30'}]}]).ready.match,
   'SINGLE_RECEIPT_POLICY_TERM_GROSS_EQUAL');
+assert.equal(assessCase({...raw,receiptPeriodStart:'2026-03-01'},[{...group,
+  policy:{...group.policy,frecuencia:'Mensual'},
+  receipts:[{...receipt,secuencia:8,vence:'2026-03-29',fechaLimite:'2026-04-08'}]}]).ready.match,
+  'SOURCE_PERIOD_MONTH_ORDINAL_GROSS_EQUAL',
+  'source month ordinal can identify a unique installment even with old system dates');
 assert.equal(insurerMatches('Mapfre','MAPFRE Seguros de Guatemala'),true);
 // Product labels on Cendoso policy numbers are not insurer requirement IDs.
 // Resolve safe variants only with a unique insurer + exact coverage edition.
@@ -92,5 +99,8 @@ const src=fs.readFileSync(path.join(__dirname,'gravicentra-i66-cendoso-paid-prot
 for(const mandatory of ["environment",'PENDING_APPLICATION','conciliado:false','tx.create(cobRef',
   'tx.update(rRef','tx.update(cRef','POSTIMAGE_READBACK_HOLD','sourceSha256:SOURCE_SHA'])
   assert.ok(src.includes(mandatory),'missing post-validation '+mandatory);
+assert.ok(src.includes('fechaVencimientoContractual:oldPlan.due'));
+assert.ok(src.includes('periodoInicioFuente:oldPlan.periodStart'));
+assert.ok(src.includes('receiptDue(rr.data())!==oldPlan.due'));
 assert.ok(!src.includes('forceReconciliation:true'));
 console.log('I66_CENDOSO_PROTECTED_PAID_UNIT_PASS 607_SOURCE 574_GTQ_NO_SOURCE_HOLD 12_GUARDS');
