@@ -14,6 +14,8 @@ const moneyCents = value => value == null || value === '' || !Number.isFinite(+v
 const sourceAliases = ['numeroReciboFuente', 'numeroReciboAseguradora', 'numeroRequerimiento', 'requerimiento',
   'numeroBoleta', 'sourceNumber', 'referenciaCobro', 'receiptNumber'];
 const internal = value => !str(value) || /^rec_[a-f\d]{16,64}$/i.test(str(value)) || /^\d{1,2}\s*\/\s*\d{1,2}$/.test(str(value));
+const preimageFingerprint = (receiptId, portfolioId, requirement, receiptGrossCents, carteraGrossCents) =>
+  digest({receiptId, portfolioId, requirement, receiptGrossCents, carteraGrossCents});
 // The operational grace deadline is not the insurer's contractual due date.
 const dueOf = row => str(row.fechaVencimientoContractual || row.vence || row.fechaVencimiento);
 const paid = row => !!row && (row.pagado === true || row.conciliadoPago === true || row.conciliado === true ||
@@ -113,11 +115,11 @@ function planSourceBatch(rawRows, policyGroups, options = {}) {
     }
     const existingRef = str(receipt.numeroReciboFuente);
     const record = {
-      caseId: row.caseId, sourceKey: key, policyId: str(p.id), receiptId: rid, portfolioId: str(cartera.id),
+      caseId: row.caseId, sourceKey: key, insurer: row.insurer, policy: row.policy, due: row.due,
+      policyId: str(p.id), receiptId: rid, portfolioId: str(cartera.id),
       requirement: row.requirement, grossCents: row.grossCents,
       oldGrossCents: beforeReceipt, sourceSha256: row.sourceSha256,
-      beforeFingerprint: digest({receiptId: rid, portfolioId: cartera.id, requirement: existingRef,
-        receiptGrossCents: beforeReceipt, carteraGrossCents: beforeCartera}),
+      beforeFingerprint: preimageFingerprint(rid, cartera.id, existingRef, beforeReceipt, beforeCartera),
     };
     seenTargets.add(rid);
     if (existingRef === row.requirement && beforeReceipt === row.grossCents) unchanged.push(record);
@@ -135,4 +137,5 @@ function planSourceBatch(rawRows, policyGroups, options = {}) {
     chunks, unchanged, exceptions, writes: 0};
 }
 
-module.exports = {MAX_CHUNK, planSourceBatch, normalizeSource, moneyCents};
+module.exports = {MAX_CHUNK, planSourceBatch, normalizeSource, moneyCents,
+  preimageFingerprint, paid, internal, sourceAliases};

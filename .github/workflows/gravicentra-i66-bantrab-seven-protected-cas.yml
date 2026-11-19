@@ -11,6 +11,12 @@ on:
       - tools/gravicentra-i66-bantrab-seven-protected-cas.test.cjs
       - tools/gravicentra-i66-mapfre-six-protected-cas.cjs
       - tools/gravicentra-i66-mapfre-six-protected-cas.test.cjs
+      - tools/gravicentra-i66-source-bulk-plan.cjs
+      - tools/gravicentra-i66-source-bulk-plan.test.cjs
+      - tools/gravicentra-i66-source-bulk-apply.cjs
+      - tools/gravicentra-i66-source-bulk-apply.test.cjs
+      - tools/gravicentra-i66-source-bulk-live.cjs
+      - 'artifacts/orbit360-recovery/source-batches/I6_6_SOURCE_BULK_*.json'
 permissions:
   contents: read
 concurrency:
@@ -286,5 +292,132 @@ jobs:
         with:
           name: gi-i66-mapfre-six-live-${{ github.run_id }}
           path: ${{ runner.temp }}/gi-i66-mapfre-six-report.json
+          if-no-files-found: ignore
+          retention-days: 90
+  insurer-source-large-batch-preflight:
+    if: >
+      github.repository == 'paulaosoriof86/orbit360-core' &&
+      github.ref == 'refs/heads/recovery/fase-a-clean-20260831' &&
+      contains(github.event.head_commit.message, 'I66_SOURCE_BULK_READY')
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Select one immutable insurer-source batch, run large negative tests
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF" = refs/heads/recovery/fase-a-clean-20260831
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          SOURCE_FILES=$(git diff --name-only "${{ github.event.before }}" "$GITHUB_SHA" -- artifacts/orbit360-recovery/source-batches/)
+          test "$(printf '%s\n' "$SOURCE_FILES" | sed '/^$/d' | wc -l)" -eq 1
+          case "$SOURCE_FILES" in artifacts/orbit360-recovery/source-batches/I6_6_SOURCE_BULK_*.json) ;; *) exit 1;; esac
+          echo "GI_I66_BULK_SOURCE_MANIFEST=$SOURCE_FILES" >> "$GITHUB_ENV"
+          node --check tools/gravicentra-i66-source-bulk-live.cjs
+          node tools/gravicentra-i66-source-bulk-plan.test.cjs
+          node tools/gravicentra-i66-source-bulk-apply.test.cjs
+          echo 'I66_LARGE_BATCH_750_SYNTHETIC_CAS_AND_REPLAY_PASS'
+      - name: Select existing same-project Firebase identity; no IAM or tenant changes
+        run: |
+          set -euo pipefail
+          npm install --prefix "$RUNNER_TEMP/gi-i66-source-bulk" --ignore-scripts --no-audit --no-fund firebase-admin@13.4.0 >/dev/null
+          echo "NODE_PATH=$RUNNER_TEMP/gi-i66-source-bulk/node_modules" >> "$GITHUB_ENV"
+          python3 - <<'PY'
+          import json,os,pathlib
+          target=pathlib.Path(os.environ['RUNNER_TEMP'])/'gi-i66-bulk-preflight-service.json'
+          for key in ('SA_LAB','SA_LAB_ALT','SA_DEFAULT'):
+              try:credential=json.loads(os.environ.get(key,''))
+              except (ValueError,TypeError):continue
+              if credential.get('type')=='service_account' and credential.get('project_id')=='ays-orbit-360-lab' and credential.get('private_key'):
+                  target.write_text(json.dumps(credential),encoding='utf-8');target.chmod(0o600)
+                  with open(os.environ['GITHUB_ENV'],'a') as env:env.write('GOOGLE_APPLICATION_CREDENTIALS='+str(target)+'\n')
+                  break
+          else:raise SystemExit('I66_BULK_EXISTING_SERVICE_ACCOUNT_HOLD')
+          PY
+      - name: Preflight all real policy editions, source rows, receipts and cartera without writes
+        env:
+          GI_I66_BULK_MODE: preflight
+          GI_I66_BULK_PLAN_OUT: ${{ runner.temp }}/gi-i66-bulk-plan.json
+          GI_I66_BULK_REPORT_OUT: ${{ runner.temp }}/gi-i66-bulk-preflight-report.json
+        run: node tools/gravicentra-i66-source-bulk-live.cjs
+      - name: Retain signed private plan for single protected transaction series
+        uses: actions/upload-artifact@v4
+        with:
+          name: gi-i66-source-bulk-preflight-${{ github.run_id }}
+          path: |
+            ${{ runner.temp }}/gi-i66-bulk-plan.json
+            ${{ runner.temp }}/gi-i66-bulk-preflight-report.json
+          if-no-files-found: error
+          retention-days: 7
+  insurer-source-large-batch-protected-live:
+    needs: insurer-source-large-batch-preflight
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    environment:
+      name: gravicentra-live-data-writes
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/download-artifact@v4
+        with:
+          name: gi-i66-source-bulk-preflight-${{ github.run_id }}
+          path: ${{ runner.temp }}/gi-i66-bulk-approved
+      - name: Reverify same source, exact branch and tested writer under reviewer gate
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF" = refs/heads/recovery/fase-a-clean-20260831
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          node tools/gravicentra-i66-source-bulk-plan.test.cjs
+          node tools/gravicentra-i66-source-bulk-apply.test.cjs
+          node - <<'NODE'
+          const p=require(process.env.RUNNER_TEMP+'/gi-i66-bulk-approved/gi-i66-bulk-plan.json');
+          if(p.status!=='BULK_SOURCE_PREFLIGHT_ONLY_NO_WRITES'||p.writes!==0||p.readyCount<1||
+            !/^artifacts\/orbit360-recovery\/source-batches\/I6_6_SOURCE_BULK_[0-9]{8}_[A-Za-z0-9_-]+\.json$/.test(p.sourceManifestPath))
+            throw Error('I66_BULK_PROTECTED_PREFLIGHT_DRIFT');
+          const fs=require('fs');
+          fs.appendFileSync(process.env.GITHUB_ENV,'GI_I66_BULK_SOURCE_MANIFEST='+p.sourceManifestPath+'\n');
+          NODE
+      - name: Use same previously configured Firebase project credential
+        run: |
+          set -euo pipefail
+          npm install --prefix "$RUNNER_TEMP/gi-i66-source-bulk" --ignore-scripts --no-audit --no-fund firebase-admin@13.4.0 >/dev/null
+          echo "NODE_PATH=$RUNNER_TEMP/gi-i66-source-bulk/node_modules" >> "$GITHUB_ENV"
+          python3 - <<'PY'
+          import json,os,pathlib
+          target=pathlib.Path(os.environ['RUNNER_TEMP'])/'gi-i66-bulk-protected-service.json'
+          for key in ('SA_LAB','SA_LAB_ALT','SA_DEFAULT'):
+              try:credential=json.loads(os.environ.get(key,''))
+              except (ValueError,TypeError):continue
+              if credential.get('type')=='service_account' and credential.get('project_id')=='ays-orbit-360-lab' and credential.get('private_key'):
+                  target.write_text(json.dumps(credential),encoding='utf-8');target.chmod(0o600)
+                  with open(os.environ['GITHUB_ENV'],'a') as env:env.write('GOOGLE_APPLICATION_CREDENTIALS='+str(target)+'\n')
+                  break
+          else:raise SystemExit('I66_BULK_PROTECTED_SERVICE_ACCOUNT_HOLD')
+          PY
+      - name: Materialize all eligible rows with isolated per-receipt CAS and immediate readback
+        env:
+          GI_I66_BULK_MODE: apply
+          GI_I66_BULK_PROTECTED_ENV: gravicentra-live-data-writes
+          GI_I66_BULK_PLAN_IN: ${{ runner.temp }}/gi-i66-bulk-approved/gi-i66-bulk-plan.json
+          GI_I66_BULK_REPORT_OUT: ${{ runner.temp }}/gi-i66-bulk-live-report.json
+        run: node tools/gravicentra-i66-source-bulk-live.cjs
+      - name: Retain exact real write, isolated exceptions and reversible preimages
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gi-i66-source-bulk-live-${{ github.run_id }}
+          path: ${{ runner.temp }}/gi-i66-bulk-live-report.json
           if-no-files-found: ignore
           retention-days: 90
