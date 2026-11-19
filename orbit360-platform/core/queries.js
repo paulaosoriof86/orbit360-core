@@ -73,6 +73,14 @@ Orbit.q = (function () {
     const state = String(policy && policy.estado || '').trim();
     const normalized = textNorm(state).replace(/[^a-z]/g, '');
     if (normalized !== 'vigente' && normalized !== 'porrenovar') return state;
+    // The administrative state of an older edition may remain Vigente after
+    // renewal. Only an independently verified, reciprocal successor link may
+    // project Renovada; a dangling renuevaDe/renovadaPor never proves it.
+    if (policy && policy.renovadaPor && Orbit.renewalLifecycle &&
+        typeof Orbit.renewalLifecycle.evaluate === 'function') {
+      const lifecycle = Orbit.renewalLifecycle.evaluate(policy);
+      if (lifecycle && lifecycle.verifiedSuccessorId === String(policy.renovadaPor)) return 'Renovada';
+    }
     const expiry = validBusinessDate(policy && (policy.vigenciaFin || policy.fechaFin || policy.fechaVencimiento || policy.finVigencia));
     const current = validBusinessDate(asOf || (U.today ? U.today() : new Date()));
     return expiry && current && expiry < current ? 'Vencida' : state;
