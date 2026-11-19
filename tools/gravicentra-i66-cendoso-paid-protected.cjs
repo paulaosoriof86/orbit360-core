@@ -7,7 +7,7 @@ const path=require('node:path');
 const zlib=require('node:zlib');
 const crypto=require('node:crypto');
 const assert=require('node:assert/strict');
-const {canonicalPolicyNumber,moneyCents,paid,comparableGrossAliases}=require('./gravicentra-i66-source-bulk-plan.cjs');
+const {canonicalPolicyNumber,moneyCents,paid,comparableGrossAliases,monthlySequence}=require('./gravicentra-i66-source-bulk-plan.cjs');
 const TENANT='alianzas-soluciones',PROJECT='ays-orbit-360-lab';
 const SOURCE='artifacts/orbit360-recovery/source-batches/I6_6_SOURCE_CENDOSO_PAID_CANDIDATES_2026.json.gz';
 const SOURCE_SHA='649fa315a90b176b794abf6eef3d9f893d47de64cfe558d203a099c408692aa0';
@@ -40,7 +40,7 @@ function sourceRow(raw){
   const r={id:str(raw.candidateId),insurer:str(raw.insurerSource),policy:str(raw.policyNumberSource),
     coverageStart:date(raw.coverageStart),coverageEnd:date(raw.coverageEnd),
     periodStart:date(raw.receiptPeriodStart),due:date(raw.receiptDueDate),
-    paid:date(raw.actualPaidDate),currency:norm(raw.currencySource),
+    paid:date(raw.actualPaidDate),currency:norm(raw.currencySource),frequency:norm(raw.frequencySource),
     total:cents(raw.totalPremium),net:cents(raw.netPremium),
     sourceRows:raw.sourceRows||[],hold:raw.holdReasons||[]};
   if(!/^cendoso_[a-f0-9]{24}$/.test(r.id)||!r.insurer||!r.policy||
@@ -87,19 +87,38 @@ function assess(row,groups){
   const valid=(g.receipts||[]).filter(r=>str(r.polizaId)===g.policy.id&&
     !/ANULADO|ANULADA|CANCELADA/.test(norm(r.estado))&&
     (receiptDue(r)===row.periodStart||receiptDue(r)===row.due||operationalDue(r)===row.due));
-  if(!valid.length)return {code:'RECEIPT_PERIOD_OR_DUE_NOT_FOUND'};
-  const exactAmount=valid.filter(r=>[cents(r.primaTotal),cents(r.montoTotal),cents(r.monto)].includes(row.total));
-  const targets=exactAmount.length?exactAmount:valid;
+  let candidates=valid,matchedBy='PERIOD_DATE';
+  // Legacy receipt due dates can be operationally offset. The installment
+  // ordinal inside one exact policy term, not a globally constant requirement
+  // number, is the secondary identity. No need for the dates to be identical.
+  if(!candidates.length&&norm(g.policy.frecuencia)==='MENSUAL'){
+    const ordinal=monthlySequence(g.policy,row.periodStart);
+    const seqCandidates=(g.receipts||[]).filter(r=>str(r.polizaId)===g.policy.id&&
+      !/ANULADO|ANULADA|CANCELADA/.test(norm(r.estado))&&ordinal!=null&&
+      Number(r.secuencia||r.numeroCuota)===ordinal);
+    if(ordinal!=null&&seqCandidates.length===1){candidates=seqCandidates;matchedBy='TERM_INSTALLMENT_SEQUENCE';}
+  }
+  if(!candidates.length&&(row.frequency.includes('UNICO')||row.frequency.includes('UNICA'))&&
+    (g.receipts||[]).filter(r=>!/ANULADO|ANULADA|CANCELADA/.test(norm(r.estado))).length===1){
+    candidates=g.receipts;matchedBy='SINGLE_RECEIPT_POLICY_TERM';
+  }
+  if(!candidates.length)return {code:'RECEIPT_PERIOD_OR_DUE_NOT_FOUND'};
+  const exactAmount=candidates.filter(r=>[cents(r.primaTotal),cents(r.montoTotal),cents(r.monto)].includes(row.total));
+  const targets=exactAmount.length?exactAmount:candidates;
   if(targets.length!==1)return {code:'MULTIPLE_RECEIPTS_FOR_PERIOD_OR_AMOUNT'};
   const r=targets[0];
   const existing=(g.cobros||[]).filter(c=>str(c.reciboId)===r.id);
   if(existing.length>1)return {code:'MULTIPLE_COBROS_FOR_RECEIPT'};
-  if(isPaid(r)||existing.some(isPaid))return {code:'ALREADY_PAID_PRESERVE'};
+  if(existing.some(isPaid))return {code:'ALREADY_PAID_WITH_COBRO_PRESERVE'};
   if(existing.length)return {code:'EXISTING_UNPAID_COBRO_REVIEW'};
   const portfolio=(g.portfolio||[]).filter(c=>str(c.reciboId)===r.id&&c.carteraActiva!==false);
   if(portfolio.length!==1)return {code:'ACTIVE_PORTFOLIO_NOT_UNIQUE'};
   const c=portfolio[0];
-  if(isPaid(c))return {code:'PAID_PORTFOLIO_STATE_CONFLICT'};
+  const backfill=isPaid(r)||isPaid(c);
+  if(backfill&&[r,c].some(x=>x.conciliado===true||/^APPLIED_/.test(str(x.applicationState))))
+    return {code:'EXISTING_RECONCILIATION_WITHOUT_COBRO_REVIEW'};
+  if(backfill&&[r,c].some(x=>date(x.fechaPago||x.paidDate)&&
+    date(x.fechaPago||x.paidDate)!==row.paid))return {code:'LEGACY_PAID_DATE_CONFLICT'};
   if(str(c.polizaId||c.policyId)!==g.policy.id)return {code:'PORTFOLIO_POLICY_RELATION_MISMATCH'};
   const beforeR=cents(r.primaTotal),beforeC=cents(c.primaTotal);
   if(beforeR==null||beforeC==null)return {code:'UNDEFINED_PREVIOUS_GROSS'};
@@ -115,9 +134,9 @@ function assess(row,groups){
   return {ready:{sourceId:row.id,policyId:g.policy.id,receiptId:r.id,portfolioId:c.id,
     policyNumber:canonicalPolicyNumber(row.policy),insurer:row.insurer,
     paidDate:row.paid,periodStart:row.periodStart,due:row.due,grossCents:row.total,
-    netCents:row.net,before,beforeHash:objhash(before),
+    netCents:row.net,backfill,before,beforeHash:objhash(before),
     sourceRowsSha256:sha(JSON.stringify(row.sourceRows)),
-    match:exactAmount.length?'PERIOD_AND_GROSS':'UNIQUE_POLICY_EDITION_AND_RECEIPT_PERIOD_INSURER_GROSS_PREVAILS'}};
+    match:matchedBy+(exactAmount.length?'_GROSS_EQUAL':'_INSURER_GROSS_PREVAILS')}};
 }
 async function readGroups(db,source){
   const numbers=[...new Set(source.candidates.map(r=>str(r.policyNumberSource)))];
@@ -196,7 +215,11 @@ async function applyOne(db,oldPlan,source){
     if(str(r.polizaId)!==p.id||str(c.polizaId||c.policyId)!==p.id||
       canonicalPolicyNumber(p.numero)!==oldPlan.policyNumber||
       date(p.vigenciaInicio)!==sourceRow(row).coverageStart||date(p.vigenciaFin)!==sourceRow(row).coverageEnd||
-      policyCountry(p)!=='GT'||norm(p.moneda)!=='GTQ'||isPaid(r)||isPaid(c)||
+      policyCountry(p)!=='GT'||norm(p.moneda)!=='GTQ'||
+      (!oldPlan.backfill&&(isPaid(r)||isPaid(c)))||
+      (oldPlan.backfill&&!isPaid(r)&&!isPaid(c))||
+      [r,c].some(x=>x.conciliado===true||/^APPLIED_/.test(str(x.applicationState)))||
+      [r,c].some(x=>date(x.fechaPago||x.paidDate)&&date(x.fechaPago||x.paidDate)!==oldPlan.paidDate)||
       c.carteraActiva===false||!/^[a-f0-9]{64}$/.test(oldPlan.beforeHash))throw Error('POLICY_RECEIPT_PREIMAGE_CHANGED');
     const alias=comparableGrossAliases(r,c,cents(r.primaTotal),cents(c.primaTotal));
     const fresh={receipt:receiptIdentity(r),portfolio:{id:c.id,polizaId:c.polizaId,

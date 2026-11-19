@@ -31,13 +31,24 @@ assert.equal(assessCase(raw,[]).code,'POLICY_NUMBER_NOT_FOUND');
 assert.equal(assessCase(raw,[{...group,policy:{...group.policy,vigenciaInicio:'2026-08-05'}}]).code,'EXACT_POLICY_EDITION_NOT_FOUND');
 assert.equal(assessCase(raw,[group,group]).code,'MULTIPLE_POLICY_EDITIONS');
 assert.equal(assessCase(raw,[{...group,receipts:[receipt,{...receipt,id:'r2'}]}]).code,'MULTIPLE_RECEIPTS_FOR_PERIOD_OR_AMOUNT');
-assert.equal(assessCase(raw,[{...group,receipts:[{...receipt,estado:'Pagado'}]}]).code,'ALREADY_PAID_PRESERVE');
+assert.equal(assessCase(raw,[{...group,receipts:[{...receipt,estado:'Pagado'}]}]).ready.backfill,true,
+  'paid receipt without a Cobro must be completed, not counted as a duplicate Cobro');
+assert.equal(assessCase(raw,[{...group,receipts:[{...receipt,estado:'Pagado'}],
+  cobros:[{id:'oldpay',reciboId:'r1',estado:'Pagado'}]}]).code,'ALREADY_PAID_WITH_COBRO_PRESERVE');
+assert.equal(assessCase(raw,[{...group,receipts:[{...receipt,estado:'Pagado',fechaPago:'2026-05-05'}]}]).code,'LEGACY_PAID_DATE_CONFLICT');
+assert.equal(assessCase(raw,[{...group,receipts:[{...receipt,estado:'Pagado',conciliado:true}]}]).code,'EXISTING_RECONCILIATION_WITHOUT_COBRO_REVIEW');
 assert.equal(assessCase(raw,[{...group,portfolio:[cartera,{...cartera,id:'c2'}]}]).code,'ACTIVE_PORTFOLIO_NOT_UNIQUE');
 assert.equal(assessCase(raw,[{...group,receipts:[{...receipt,primaNeta:100}]}]).code,'NET_PREMIUM_CHANGED_REQUIRES_COMMISSION_RECOMPUTE');
 assert.equal(assessCase(raw,[{...group,receipts:[{...receipt,monto:280}]}]).code,'GROSS_ALIASES_INCONSISTENT');
 assert.equal(assessCase(raw,[{...group,receipts:[{...receipt,primaTotal:280,monto:280,montoTotal:280}],
   portfolio:[{...cartera,primaTotal:280,monto:280,montoTotal:280}]}]).ready.grossCents,29684,
   'insurer/authorized source gross overrides consistent stale gross only with unique edition/period');
+assert.equal(assessCase(raw,[{...group,policy:{...group.policy,frecuencia:'Mensual'},
+  receipts:[{...receipt,secuencia:8,vence:'2026-03-29',fechaLimite:'2026-03-30'}]}]).ready.match,
+  'TERM_INSTALLMENT_SEQUENCE_GROSS_EQUAL','monthly ordinal inside exact edition resolves differing due dates');
+assert.equal(assessCase({...raw,frequencySource:'Pago Único'},[{...group,
+  receipts:[{...receipt,vence:'2026-03-29',fechaLimite:'2026-03-30'}]}]).ready.match,
+  'SINGLE_RECEIPT_POLICY_TERM_GROSS_EQUAL');
 assert.equal(insurerMatches('Mapfre','MAPFRE Seguros de Guatemala'),true);
 const mini={candidates:[raw,{...raw,candidateId:'cendoso_'+'b'.repeat(24)}]};
 const ambiguous=planBatch(mini,[group]);
