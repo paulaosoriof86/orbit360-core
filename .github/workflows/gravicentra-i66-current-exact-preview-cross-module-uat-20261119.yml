@@ -16,12 +16,12 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 48
     env:
-      I66_PREVIEW_ORIGIN: https://ays-orbit-360-lab--gi-i66-rc-44635291863-jq6kji80.web.app
-      I66_SIGNED_QA_CHANNEL_ID: gi-i66-rc-44635291863
-      I66_SOURCE_SHA: 57579ee42372ba439a354331a29ee4a2e0be0163
-      EXPECTED_BUILD_RUN: '44635291863'
-      EXPECTED_ARTIFACT_ID: '14584250356'
-      EXPECTED_ARTIFACT_DIGEST: sha256:8271f08c37efa1efa2d51f29b58d8841f763a75c921f3e9e05487e352fa4eaf5
+      I66_PREVIEW_ORIGIN: https://ays-orbit-360-lab--gi-i66-rc-44637404427-635rywxe.web.app
+      I66_SIGNED_QA_CHANNEL_ID: gi-i66-rc-44637404427
+      I66_SOURCE_SHA: 72d3580f3e90071b360319ce5f204d348b401663
+      EXPECTED_BUILD_RUN: '44637404427'
+      EXPECTED_ARTIFACT_ID: '14584217893'
+      EXPECTED_ARTIFACT_DIGEST: sha256:06decf52bfce75a1bdc7e207b96de35c17ccdfed7ff805895bedada0d80617dc
       SA_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
       SA_ALT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
       SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
@@ -72,7 +72,7 @@ jobs:
         run: |
           set -euo pipefail
           node --test tools/gravicentra-i6-6-manual-policy-capture-p0.test.cjs tools/gravicentra-i6-6-ops-activity-direct-vehicle-endorsement.test.cjs tools/gravicentra-i6-6-documented-premium-terms.test.cjs
-          node --test tools/gravicentra-i6-6-operational-renewal-entry.test.cjs tools/gravicentra-i6-6-carlos-ops-tasks-transversal.test.cjs tools/gravicentra-i6-6-cliente360-advisor-source-parity.test.cjs
+          node --test tools/gravicentra-i6-6-operational-renewal-entry.test.cjs tools/gravicentra-i6-6-carlos-ops-tasks-transversal.test.cjs tools/gravicentra-i6-6-cliente360-advisor-source-parity.test.cjs tools/gravicentra-i6-6-crm-shadow-advisor-source.test.cjs
       - name: Install signed browser dependencies without source changes
         run: |
           set -euo pipefail
