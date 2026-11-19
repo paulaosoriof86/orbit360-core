@@ -6,7 +6,7 @@ const fs=require('node:fs');
 const path=require('node:path');
 const crypto=require('node:crypto');
 const assert=require('node:assert/strict');
-const {planSourceBatch,canonicalPolicyNumber}=require('./gravicentra-i66-source-bulk-plan.cjs');
+const {planSourceBatch,canonicalPolicyNumber,policyKeys}=require('./gravicentra-i66-source-bulk-plan.cjs');
 const {applyProtectedBatch}=require('./gravicentra-i66-source-bulk-apply.cjs');
 const BASE=path.resolve(__dirname,'../artifacts/orbit360-recovery/source-batches');
 const INTAKE=require('../artifacts/orbit360-recovery/release-control/I6_6_COBROS_CONCILIACION_SOURCE_INTAKE_20261110.json');
@@ -41,7 +41,8 @@ async function readGroups(db,rawRows){
   // hydration, and no materialization or mutation of source rows.
   for(let offset=0;offset<policyNumbers.length;offset+=6){
     const sets=await Promise.all(policyNumbers.slice(offset,offset+6).map(async number=>{
-      const names=[...new Set([number,canonicalPolicyNumber(number)])];
+      const insurerRows=rawRows.filter(r=>str(r.policy)===number);
+      const names=[...new Set(insurerRows.flatMap(r=>policyKeys(number,r.insurer)))];
       const snaps=await Promise.all(names.map(n=>
         internal('polizas',db).where('numero','==',n).limit(21).get()));
       const policies=new Map(snaps.flatMap(s=>s.docs).map(d=>[d.id,d]));

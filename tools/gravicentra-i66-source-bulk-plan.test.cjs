@@ -129,5 +129,32 @@ renewalDay.groups.push({...renewalDay.groups[0],
 assert.equal(planSourceBatch(renewalDay.raw,renewalDay.groups).readyCount,1);
 padded.raw[0].policy='91-169568';
 assert.equal(planSourceBatch(padded.raw,padded.groups).exceptions[0].code,'POLICY_EDITION_MISSING');
+// G&T statement 519815 and issued AUTO-519815 must resolve within G&T
+// only, never as an unrelated insurer or ambiguous policy edition.
+const gyt=sample(1);
+gyt.raw[0]={...gyt.raw[0],insurer:'G&T',policy:'519815',
+  requirement:'E-995653883',due:'2026-11-28'};
+gyt.groups[0].insurerName='SEGUROS G&T';
+gyt.groups[0].policy={...gyt.groups[0].policy,numero:'AUTO-519815',
+  vigenciaInicio:'2026-10-28',vigenciaFin:'2027-10-28'};
+gyt.groups[0].receipts[0]={...gyt.groups[0].receipts[0],vence:'2026-11-28'};
+assert.equal(planSourceBatch(gyt.raw,gyt.groups).readyCount,1,
+  'G&T issuer numeric reference aliases its issued AUTO policy');
+const insurerMismatch=sample(1);
+insurerMismatch.raw[0]={...gyt.raw[0]};
+insurerMismatch.groups[0]={...gyt.groups[0],insurerName:'SEGUROS BANTRAB'};
+assert.equal(planSourceBatch(insurerMismatch.raw,insurerMismatch.groups).readyCount,0,
+  'same digits never bypass insurer identity');
+const noCrossInsurer=sample(1);
+noCrossInsurer.raw[0]={...gyt.raw[0],insurer:'BANTRAB'};
+noCrossInsurer.groups[0]={...gyt.groups[0],insurerName:'SEGUROS BANTRAB'};
+assert.equal(planSourceBatch(noCrossInsurer.raw,noCrossInsurer.groups).readyCount,0,
+  'AUTO prefix alias limited to G&T source');
+const editionCollision=sample(1);
+editionCollision.raw[0]={...gyt.raw[0]};
+editionCollision.groups=[...gyt.groups,{...gyt.groups[0],policy:{...gyt.groups[0].policy,id:'different-2026-edition'}}];
+assert.equal(planSourceBatch(editionCollision.raw,editionCollision.groups).exceptions[0].code,
+  'POLICY_EDITION_AMBIGUOUS','duplicate candidate editions must not auto-select');
+
 assert.throws(()=>planSourceBatch(raw,groups,{chunkSize:501}),/SOURCE_BATCH_CHUNK_LIMIT/);
 console.log('I66_SOURCE_BULK_PREFLIGHT_PASS 750 rows 3 chunks; exceptions isolated; 0 writes');

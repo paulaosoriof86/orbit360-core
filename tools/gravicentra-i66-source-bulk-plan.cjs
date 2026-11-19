@@ -17,6 +17,25 @@ const canonicalPolicyNumber = value => {
   return match ? '91-'+match[1].padStart(7,'0') : n;
 };
 const digest = value => crypto.createHash('sha256').update(JSON.stringify(value)).digest('hex');
+// Insurer-backed G&T exports may report 519815 while its issued PDF and
+// canonical policy store AUTO-519815. Alias only for this verified insurer;
+// require same tenant, insurer, effective policy edition and unique receipt.
+const gytPolicy=insurer=>/(?:G&T|GYT)/.test(norm(insurer));
+function policyKeys(number,insurer){
+  const raw=str(number), keys=new Set([canonicalPolicyNumber(raw)]);
+  if(gytPolicy(insurer)){
+    const match=/^(?:AUTO\s*[- ]\s*)?(\d{3,10})$/i.exec(raw);
+    if(match){
+      const n=match[1];
+      for(const label of [n,'AUTO-'+n,'AUTO '+n,'AUTO - '+n])keys.add(label);
+    }
+  }
+  return [...keys].filter(Boolean);
+}
+function sameInsurerPolicyNumber(left,right,insurer){
+  return policyKeys(left,insurer).some(k=>policyKeys(right,insurer).includes(k));
+}
+
 const isDate = value => /^\d{4}-(0[1-9]|1[0-2])-([0-2]\d|3[01])$/.test(str(value)) &&
   new Date(str(value) + 'T00:00:00Z').toISOString().slice(0, 10) === str(value);
 const moneyCents = value => value == null || value === '' || !Number.isFinite(+value) ? null : Math.round((+value + Number.EPSILON) * 100);
@@ -106,10 +125,12 @@ function planSourceBatch(rawRows, policyGroups, options = {}) {
   const ready = [], unchanged = [], exceptions = [], seenKeys = new Set(), seenTargets = new Set();
   const groupsByNumber = new Map();
   for (const group of policyGroups) {
-    const number = canonicalPolicyNumber(group?.policy?.numero);
-    if (!number) continue;
-    if (!groupsByNumber.has(number)) groupsByNumber.set(number, []);
-    groupsByNumber.get(number).push(group);
+    const keys=policyKeys(group?.policy?.numero,group?.insurerName||group?.policy?.aseguradoraNombre);
+    for(const number of keys){
+      if(!groupsByNumber.has(number))groupsByNumber.set(number,[]);
+      if(!groupsByNumber.get(number).some(row=>String(row?.policy?.id)===String(group?.policy?.id)))
+        groupsByNumber.get(number).push(group);
+    }
   }
   for (const raw of rawRows) {
     const row = normalizeSource(raw);
@@ -121,7 +142,8 @@ function planSourceBatch(rawRows, policyGroups, options = {}) {
       exceptions.push({caseId: row.caseId, code: 'PAID_REQUIRES_COBRO_PROOF_AND_WRITER'});
       continue;
     }
-    const policyCandidates = (groupsByNumber.get(canonicalPolicyNumber(row.policy)) || []).filter(g => {
+    const candidateDocs=new Map(policyKeys(row.policy,row.insurer).flatMap(key=>groupsByNumber.get(key)||[]).map(g=>[g?.policy?.id,g]));
+    const policyCandidates = [...candidateDocs.values()].filter(g => {
       const p = g.policy || {};
       return norm(g.insurerName || p.aseguradoraNombre).includes(row.insurer) &&
         norm(p.moneda) === 'GTQ' && norm(p.pais) === 'GT' &&
@@ -219,5 +241,5 @@ function planSourceBatch(rawRows, policyGroups, options = {}) {
 
 module.exports = {MAX_CHUNK, planSourceBatch, normalizeSource, moneyCents,
   preimageFingerprint, paid, internal, sourceAliases,monthlySequence,
-  internalSequence,completeMonthlySchedule,canonicalPolicyNumber,
+  internalSequence,completeMonthlySchedule,canonicalPolicyNumber,policyKeys,sameInsurerPolicyNumber,
   grossAliasFields,comparableGrossAliases};
