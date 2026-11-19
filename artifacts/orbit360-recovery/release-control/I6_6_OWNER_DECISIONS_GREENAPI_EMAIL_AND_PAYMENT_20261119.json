@@ -1,0 +1,85 @@
+{
+  "schema": "GRAVICENTRA_I6_6_FROZEN_OWNER_DECISIONS_20261119_V1",
+  "dateGuatemala": "2026-11-19",
+  "status": "FROZEN_DIRECTION_DECISIONS_AND_OPEN_EVIDENCE_GATES",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "inheritsFrozenPlanRatherThanStartingAnotherIteration": true,
+  "ownerInstructions": {
+    "unresolvedAmbiguities": "Ask Paula a concrete, immediately actionable question; continue independently proven rows. Do not recast normal requirement-number changes per receipt as policy discrepancies.",
+    "afterOwnerAnswer": "Apply approved evidence-backed matches in the active protected gate without re-asking or imposing an arbitrary six-row business batch limit.",
+    "invoicePriority": "Direct insurer account gross premium takes precedence over stale gross system values; preserve the distinction from net premium and calculate commissions on net premium.",
+    "delivery": "Repair, test, certify and publish within the existing frozen plan; distinguish source commit, immutable preview and signed LIVE readback.",
+    "financialIteration": "Each iteration includes receivable receipt/portfolio reconciliation and separately demonstrated paid Cobro applications where actual payment evidence supports them. Never report zero writes as completed payment application."
+  },
+  "greenApi": {
+    "ownerSaysAuthorizedAlready": true,
+    "authorizationRequestMustNotBeRepeated": true,
+    "aysActiveInstanceMakeConnectionId": 14749710,
+    "tyaSeparateInstanceLegacyMakeConnectionId": 8635810,
+    "tyaSeparateInstanceMustNotBeReusedForGravicentraAds": true,
+    "newScenarioTarget": "AyS WhatsApp Click-to-WhatsApp ad origin to Gravicentra Leads",
+    "adsOnlyEvidence": "Source attribution required; suppress or ignore unrelated private messages; idempotent phone plus ad-source evidence, tenant and actor audit.",
+    "lastThirtyDays": "Attempt only when retained Green API message history can identify ad-sourced messages without indiscriminate private-chat import.",
+    "currentScenarioStatus": "INACTIVE_NOT_CLAIMED_AS_LEAD_WRITE"
+  },
+  "roleCapabilities": {
+    "policyManageRoles": ["Dirección", "SuperAdmin", "AdminTenant", "Admin", "Operativo"],
+    "subjectToIndividualDenyOverrides": true,
+    "notHardcodedToSpecificUsers": true,
+    "twoSignedRepresentativeUsers": "Carlos (Operativo) and Paula (Dirección), not a two-user feature toggle",
+    "previewUat": 44537693575,
+    "exactLiveUat": 44539500183
+  },
+  "mail": {
+    "ownerDecision": "One personal mailbox per authenticated signed-in user. No global tenant mailbox or shared provider credentials.",
+    "linkTargets": ["Cliente", "Lead", "Cotización", "Póliza", "Gestión", "Expediente"],
+    "requiredProof": "Real delegated provider OAuth, per-user server-side credential handling, provider send/receive and Message-ID/References thread tracking, permissioned CRUD, audit and two-user isolation test.",
+    "association": "Unique customer/lead email address and durable quote/thread ID can propose a match; conflicting candidates require user confirmation before write.",
+    "existingFrontendAudit": "orbit360-platform/core/correo.js stores browser-level connection flag without provider OAuth and simulates send in Orbit.store; current state is NOT CONNECTED NOR CERTIFIED.",
+    "providerChoiceQuestion": "Microsoft 365/Outlook, Google Workspace/Gmail, or a mix?",
+    "status": "NOT_IMPLEMENTED_PENDING_PROVIDER_CHOICE_AND_VERIFIED_INTEGRATION"
+  },
+  "releasedPolicyAndPremiumCandidate": {
+    "sourceSha": "b38f877f7847c7b6e11506885e42252e84c5eeb6",
+    "artifactId": 14536161701,
+    "artifactDigest": "sha256:2fdb5e41c0fa737ac43b11254272fa944a0c9b8d615264d9f97f5a8a77cdd4e9",
+    "signedPreviewUatRunId": 44537693575,
+    "exactLiveRunId": 44539500183,
+    "liveEvidenceArtifactId": 14539170142,
+    "signedLiveStatus": "EXACT_223_OF_223_FILES_ON_BOTH_ORIGINS_TWO_ROLES_SYNTHETIC_POLICY_RECEIPT_PORTFOLIO_VEHICLE_RELOAD_AND_CLEANUP_PASS",
+    "cashRequirementRule": "Explicit actual issue date plus one calendar month, independent of coverage start, only for newly created cash policies; historical due calendars unchanged.",
+    "sergioActualPolicyCreated": false,
+    "fullPlatformProductionAccepted": false
+  },
+  "financialPosting": {
+    "priorLiveReceiptWritesVerified": 36,
+    "priorLivePortfolioWritesVerified": 36,
+    "appliedPaidCobroWritesVerified": 0,
+    "currentElRobleSourceBatchRun": 44535497810,
+    "currentElRobleRunStatusAtFreeze": "GITHUB_ENVIRONMENT_REVIEW_WAITING",
+    "currentElRobleRows": 238,
+    "preflightUnchanged": 174,
+    "preflightUniqueEligible": 1,
+    "preflightMissingPolicyEdition": 63,
+    "unlinkedEditionCause": "Nine policy numbers need exact renewal edition/document linkage; four documentary renewals have been identified but not yet atomically imported and read back.",
+    "legacyCendosoSources2026": {
+      "files": 5,
+      "dateRealPaidSourceRows": 1820,
+      "distinctCandidateKeysAfterCrossFileDeduplication": 607,
+      "businessMeaning": "Legacy system displays Fecha Real Pagado; not automatically equivalent to independent bank/insurer settlement proof.",
+      "ownerQuestion": "May exact unique receipt/policy/gross/date matches with a legacy Fecha Real Pagado be applied as Cobros, or is independent insurer/bank proof mandatory?",
+      "status": "CANDIDATE_SOURCE_REVIEW_ONLY_ZERO_NEW_PAYMENT_POSTINGS"
+    }
+  },
+  "knownOpenFronts": [
+    "Paid Cobro source proof and protected write/readback/rollback route",
+    "El Roble renewed policy edition reconstruction for 63 source exceptions",
+    "Actual Sergio López policy creation and saved record verification",
+    "Per-user email provider integration and client/lead/quote thread traceability",
+    "Ad-attributed AyS Green API to Gravicentra Leads scenario and privacy-safe historic backfill",
+    "Cobros finance hydration latency and full importer/document scanner certification",
+    "Ops operative management notifications and cross-role responsive regression"
+  ],
+  "noInventedPass": true
+}
