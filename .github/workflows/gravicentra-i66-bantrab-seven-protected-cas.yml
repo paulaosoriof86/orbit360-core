@@ -1,7 +1,7 @@
-# I6.6 A3: one existing protected financial gate, seven exact Bantrab references.
+# I6.6 A3/A2: same existing protected source-write gate, insurer-backed sparse CAS.
 # Safe source-only preflight first; native GitHub Environment reviewer required
 # before ONE atomic sparse transaction. Do not create a new environment or repo.
-name: Gravicentra I6.6 Bantrab 7 exact reference CAS
+name: Gravicentra I6.6 Protected Insurer Source CAS
 on:
   push:
     branches: [recovery/fase-a-clean-20260831]
@@ -9,6 +9,8 @@ on:
       - .github/workflows/gravicentra-i66-bantrab-seven-protected-cas.yml
       - tools/gravicentra-i66-bantrab-seven-protected-cas.cjs
       - tools/gravicentra-i66-bantrab-seven-protected-cas.test.cjs
+      - tools/gravicentra-i66-mapfre-six-protected-cas.cjs
+      - tools/gravicentra-i66-mapfre-six-protected-cas.test.cjs
 permissions:
   contents: read
 concurrency:
@@ -148,5 +150,141 @@ jobs:
         with:
           name: gi-i66-bantrab-seven-live-${{ github.run_id }}
           path: ${{ runner.temp }}/gi-i66-bantrab-7-report.json
+          if-no-files-found: ignore
+          retention-days: 90
+  mapfre-six-source-preflight:
+    if: >
+      github.repository == 'paulaosoriof86/orbit360-core' &&
+      github.ref_name == 'recovery/fase-a-clean-20260831' &&
+      contains(github.event.head_commit.message, 'I66_MAPFRE_6_SOURCE_PATCH')
+    runs-on: ubuntu-24.04
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Pin six insurer source cases and full negative tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GCLOUD_PROJECT" = 'ays-orbit-360-lab'
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          echo 'b37c72dc41f167108c79a8c91a7e2d683d2b1556a121cc332deed5f7bc826895  tools/gravicentra-i66-mapfre-six-protected-cas.cjs' | sha256sum -c -
+          echo '67c72fb4c87c2b7b555e736e0c17dbf5645f28ef400bfa8468c8463200cb0acc  tools/gravicentra-i66-mapfre-six-protected-cas.test.cjs' | sha256sum -c -
+          node --check tools/gravicentra-i66-mapfre-six-protected-cas.cjs
+          node tools/gravicentra-i66-mapfre-six-protected-cas.test.cjs
+      - name: Select existing authorized Firebase project identity
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm install --prefix "$RUNNER_TEMP/gi-i66-mapfre" --ignore-scripts --no-audit --no-fund firebase-admin@13.4.0 >/dev/null
+          echo "NODE_PATH=$RUNNER_TEMP/gi-i66-mapfre/node_modules" >> "$GITHUB_ENV"
+          python3 - <<'PY'
+          import json,os,pathlib
+          out=pathlib.Path(os.environ['RUNNER_TEMP'])/'gi-i66-mapfre-existing.json'
+          for name in ('SA_LAB','SA_LAB_ALT','SA_DEFAULT'):
+              try: value=json.loads(os.environ.get(name,''))
+              except (ValueError,TypeError):continue
+              if value.get('type')!='service_account' or value.get('project_id')!='ays-orbit-360-lab' or not value.get('private_key'):continue
+              out.write_text(json.dumps(value),encoding='utf8');out.chmod(0o600)
+              with open(os.environ['GITHUB_ENV'],'a') as env:env.write('GOOGLE_APPLICATION_CREDENTIALS='+str(out)+'\n')
+              print('I66_MAPFRE_EXISTING_PROJECT_IDENTITY_PASS');break
+          else:raise SystemExit('I66_MAPFRE_NO_AUTHORIZED_PROJECT_CREDENTIAL')
+          PY
+      - name: Inspect six unique pending receipt and active cartera preimages twice
+        shell: bash
+        env:
+          GI_I66_MAPFRE_MODE: dry-run
+          GI_I66_MAPFRE_REPORT: ${{ runner.temp }}/gi-i66-mapfre-six-report.json
+        run: |
+          set -euo pipefail
+          node tools/gravicentra-i66-mapfre-six-protected-cas.cjs
+          node - <<'JS'
+          const r=require(process.env.GI_I66_MAPFRE_REPORT);
+          if(r.status!=='MAPFRE_SIX_SOURCE_GROSS_PREFLIGHT_PASS_NO_WRITE'||
+             r.receiptWrites!==6||r.portfolioWrites!==6||r.changedGrossCount!==5||
+             r.grossDeltaCents!==10879||r.paymentWrites!==0||r.cobroWrites!==0||r.writes!==0)
+            throw Error('I66_MAPFRE_SIX_PREFLIGHT_NOT_EXACT');
+          console.log('I66_MAPFRE_SIX_GROSS_AND_REFERENCES_PREFLIGHT_PASS_NO_WRITES');
+          JS
+      - name: Preserve private preflight fingerprints and exact batch cases
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gi-i66-mapfre-six-preflight-${{ github.run_id }}
+          path: ${{ runner.temp }}/gi-i66-mapfre-six-report.json
+          if-no-files-found: ignore
+          retention-days: 7
+  protected-mapfre-six-source-gross-live:
+    needs: mapfre-six-source-preflight
+    runs-on: ubuntu-24.04
+    timeout-minutes: 18
+    environment:
+      name: gravicentra-live-data-writes
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Reverify exact source and negative tests inside existing reviewer gate
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF_NAME" = recovery/fase-a-clean-20260831
+          test "$GCLOUD_PROJECT" = ays-orbit-360-lab
+          echo 'b37c72dc41f167108c79a8c91a7e2d683d2b1556a121cc332deed5f7bc826895  tools/gravicentra-i66-mapfre-six-protected-cas.cjs' | sha256sum -c -
+          echo '67c72fb4c87c2b7b555e736e0c17dbf5645f28ef400bfa8468c8463200cb0acc  tools/gravicentra-i66-mapfre-six-protected-cas.test.cjs' | sha256sum -c -
+          node tools/gravicentra-i66-mapfre-six-protected-cas.test.cjs
+      - name: Select same existing Firebase project credential
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm install --prefix "$RUNNER_TEMP/gi-i66-mapfre" --ignore-scripts --no-audit --no-fund firebase-admin@13.4.0 >/dev/null
+          echo "NODE_PATH=$RUNNER_TEMP/gi-i66-mapfre/node_modules" >> "$GITHUB_ENV"
+          python3 - <<'PY'
+          import json,os,pathlib
+          out=pathlib.Path(os.environ['RUNNER_TEMP'])/'gi-i66-mapfre-existing.json'
+          for name in ('SA_LAB','SA_LAB_ALT','SA_DEFAULT'):
+              try: value=json.loads(os.environ.get(name,''))
+              except (ValueError,TypeError):continue
+              if value.get('type')!='service_account' or value.get('project_id')!='ays-orbit-360-lab' or not value.get('private_key'):continue
+              out.write_text(json.dumps(value),encoding='utf8');out.chmod(0o600)
+              with open(os.environ['GITHUB_ENV'],'a') as env:env.write('GOOGLE_APPLICATION_CREDENTIALS='+str(out)+'\n')
+              print('I66_MAPFRE_PROTECTED_IDENTITY_PASS');break
+          else:raise SystemExit('I66_MAPFRE_PROTECTED_AUTH_HOLD')
+          PY
+      - name: Apply six tenant-scoped insurer gross and reference CAS with immediate readback
+        shell: bash
+        env:
+          GI_I66_MAPFRE_MODE: apply
+          GI_I66_MAPFRE_REPORT: ${{ runner.temp }}/gi-i66-mapfre-six-report.json
+        run: |
+          set -euo pipefail
+          node tools/gravicentra-i66-mapfre-six-protected-cas.cjs
+          node - <<'JS'
+          const r=require(process.env.GI_I66_MAPFRE_REPORT);
+          if(r.status!=='MAPFRE_SIX_LIVE_RECEIPT_PORTFOLIO_CAS_READBACK_PASS'||
+             r.receiptWrites!==6||r.portfolioWrites!==6||r.changedGrossCount!==5||
+             r.grossDeltaCents!==10879||r.paymentWrites!==0||r.cobroWrites!==0||
+             r.rollbackRecorded!==true||r.auditRecorded!==true||
+             r.actualAfterFingerprint!==r.afterFingerprint)
+            throw Error('I66_MAPFRE_SIX_PROTECTED_LIVE_READBACK_HOLD');
+          console.log('I66_MAPFRE_SIX_REAL_RECEIPT_GROSS_AND_REFERENCE_WRITE_PASS');
+          console.log('I66_MAPFRE_SIX_REAL_CARTERA_GROSS_WRITE_PASS');
+          console.log('I66_MAPFRE_SIX_NO_UNSUPPORTED_PAYMENT_WRITE_PASS');
+          JS
+      - name: Preserve auditable exact real-data write receipt
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gi-i66-mapfre-six-live-${{ github.run_id }}
+          path: ${{ runner.temp }}/gi-i66-mapfre-six-report.json
           if-no-files-found: ignore
           retention-days: 90
