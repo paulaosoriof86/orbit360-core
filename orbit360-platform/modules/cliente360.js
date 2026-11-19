@@ -1302,10 +1302,64 @@ Orbit.modules.cliente360 = (function () {
     });
   }
 
+  /* I6.6: one server-owned, country-scoped advisor roster for Cliente 360.
+     Never use the protected/historical asesores store as an assignment selector.
+     The source remains Equipos via orbit360AssignableAdvisorRoster. */
+  function bindAssignableClientAdvisors(back, selectId, countryEl, saveId, previous) {
+    const field=back.querySelector('#'+selectId), save=back.querySelector('#'+saveId);
+    const priorId=String(previous?.id||'').trim(),priorCountry=String(previous?.country||'').toUpperCase();
+    let sequence=0,ready=false,rows=[],historical=false;
+    const allowed=()=>ready&&!!field.value&&
+      (rows.some(a=>a.id===field.value) ||
+       (historical&&field.value===priorId&&countryEl.value===priorCountry));
+    const load=async preferred=>{
+      const id=++sequence,country=String(countryEl.value||'').toUpperCase();
+      ready=false;rows=[];historical=false;field.disabled=true;save.disabled=true;
+      field.dataset.rosterState='loading';
+      field.innerHTML='<option value="">Consultando el equipo autorizado…</option>';
+      try{
+        const api=Orbit.assignableAdvisorRoster;
+        if(!api||typeof api.list!=='function'||!['GT','CO'].includes(country))
+          throw Error('CANONICAL_ASSIGNABLE_ADVISOR_REQUIRED');
+        const response=await api.list(country,{force:true});
+        if(!back.isConnected||sequence!==id)return;
+        const seen=new Set();
+        rows=response.filter(a=>{
+          if(!a?.id||!a.nombre||a.assignable!==true||a.roleEligible!==true||a.activo===false||
+             ![].concat(a.paises||[]).includes(country)||seen.has(a.id))return false;
+          seen.add(a.id);return true;
+        });
+        field.innerHTML='<option value="">— Seleccionar asesor habilitado —</option>'+
+          rows.map(a=>'<option value="'+U.esc(a.id)+'">'+U.esc(a.nombre)+'</option>').join('');
+        const wanted=String(preferred||'').trim();
+        if(wanted&&rows.some(a=>a.id===wanted))field.value=wanted;
+        else if(wanted===priorId&&priorId&&priorCountry===country){
+          // Preserve only the same historical assignment, never offer it as a new choice.
+          const label=(q.asesor(priorId,country)||{}).nombre||'Asesor histórico';
+          field.insertAdjacentHTML('beforeend','<option value="'+U.esc(priorId)+'" data-historical="1">'+
+            U.esc(label)+' · asignación histórica</option>');
+          field.value=priorId;historical=true;
+        }
+        ready=true;field.disabled=false;field.dataset.rosterState='ready';
+        field.dataset.rosterCountry=country;field.dataset.rosterCount=String(rows.length);
+        save.disabled=!allowed();
+      }catch(error){
+        if(!back.isConnected||sequence!==id)return;
+        field.dataset.rosterState='blocked';
+        field.innerHTML='<option value="">No se pudo confirmar el equipo; no se guardó ningún cambio</option>';
+        field.disabled=true;save.disabled=true;
+        try{console.warn('[Gravicentra][Cliente360] CANONICAL_ADVISOR_ROSTER_UNAVAILABLE',{country});}catch(_){}
+      }
+    };
+    field.addEventListener('change',()=>{save.disabled=!allowed();});
+    countryEl.addEventListener('change',()=>{void load(countryEl.value===priorCountry?priorId:'');});
+    void load(priorId);
+    return Object.freeze({allowed,refresh:load});
+  }
+
   /* ---- Editar ficha (modal) ---- */
   function edit(cid) {
     const c = S().get('clientes', cid); if (!c) return;
-    const asesores = S().all('asesores');
     let back = document.getElementById('c360-edit');
     if (back) back.remove();
     back = document.createElement('div');
@@ -1336,7 +1390,7 @@ Orbit.modules.cliente360 = (function () {
           <label class="ce-l">Fecha nac.<input id="ce-nac" type="date" class="o-sel" style="width:100%" value="${c.fechaNac || ''}"></label>
         </div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:11px">
-          <label class="ce-l">Asesor<select id="ce-ase" class="o-sel" style="width:100%">${asesores.map(a => `<option value="${a.id}" ${a.id === c.asesorId ? 'selected' : ''}>${U.esc(a.nombre)}</option>`).join('')}</select></label>
+          <label class="ce-l">Asesor<select id="ce-ase" class="o-sel" style="width:100%"><option value="">Consultando el equipo autorizado…</option></select></label>
           <label class="ce-l">Segmento<select id="ce-seg" class="o-sel" style="width:100%">${['Premium', 'Recurrente', 'Estándar', 'Nuevo'].map(s => `<option ${s === c.segmento ? 'selected' : ''}>${s}</option>`).join('')}</select></label>
         </div>
         ${field('Referencia histórica de carpeta Drive (opcional)', 'ce-drive', c.driveLink || '')}
@@ -1390,7 +1444,10 @@ Orbit.modules.cliente360 = (function () {
     selPais.addEventListener('change', () => fillDeptos());
     selDep.addEventListener('change', () => fillCiudades());
     fillDeptos(c.departamento, c.ciudad);
+    const advisorRoster=bindAssignableClientAdvisors(back,'ce-ase',selPais,'ce-save',
+      {id:c.asesorId,country:c.pais});
     back.querySelector('#ce-save').addEventListener('click', async () => {
+      if(!advisorRoster.allowed())return c360toast('Confirma un asesor habilitado desde Equipo antes de guardar.');
       const patch = {
         nombre: val('ce-nombre') || c.nombre,
         email: val('ce-email'), telefono: val('ce-tel'),
@@ -2016,7 +2073,6 @@ Orbit.modules.cliente360 = (function () {
 
   
   function nuevoCliente() {
-    const asesores = S().all('asesores');
     const paises = Orbit.PAISES || [{ id: 'GT', label: 'Guatemala' }, { id: 'CO', label: 'Colombia' }];
     const geo = Orbit.GEO || {};
     let back = document.getElementById('cli-nuevo'); if (back) back.remove();
@@ -2042,7 +2098,7 @@ Orbit.modules.cliente360 = (function () {
           <label class="ce-l">Fecha de nacimiento<input id="nc-nac" class="o-sel" type="date"></label>
           <label class="ce-l">Segmento<select id="nc-seg" class="o-sel">${['Nuevo','Activo','Premium','Inactivo','Prospecto'].map(s=>'<option>'+s+'</option>').join('')}</select></label>
           <label class="ce-l">Canal de ingreso<select id="nc-canal" class="o-sel">${(Orbit.cat.get('canales')||[]).map(c=>'<option>'+c+'</option>').join('')}</select></label>
-          <label class="ce-l">Asesor responsable<select id="nc-ase" class="o-sel">${asesores.map(a=>'<option value="'+a.id+'">'+a.nombre+'</option>').join('')}</select></label>
+          <label class="ce-l">Asesor responsable<select id="nc-ase" class="o-sel"><option value="">Consultando el equipo autorizado…</option></select></label>
         </div>
         <label class="ce-l">Notas<textarea id="nc-notas" class="o-sel" style="min-height:54px;resize:vertical;padding:9px 11px" placeholder="Observaciones, referencia, etc."></textarea></label>
       </div>
@@ -2064,7 +2120,9 @@ Orbit.modules.cliente360 = (function () {
     function loadGeo() { const ps = paisSel.value, deps = Object.keys(geo[ps]||{}); depSel.innerHTML = '<option value="">— Seleccionar —</option>' + deps.map(d=>'<option>'+d+'</option>').join(''); ciuSel.innerHTML = '<option value="">— Seleccionar —</option>'; }
     depSel.addEventListener('change', () => { const cids = (geo[paisSel.value]||{})[depSel.value]||[]; ciuSel.innerHTML = '<option value="">— Seleccionar —</option>' + cids.map(c=>'<option>'+c+'</option>').join(''); });
     paisSel.addEventListener('change', loadGeo); loadGeo();
+    const advisorRoster=bindAssignableClientAdvisors(back,'nc-ase',paisSel,'nc-ok',null);
     $('#nc-ok').addEventListener('click', async () => {
+      if(!advisorRoster.allowed())return c360toast('Selecciona un asesor habilitado desde Equipo antes de crear el cliente.');
       const nombre = $('#nc-nombre').value.trim(); if (!nombre) { $('#nc-nombre').focus(); return; }
       const pais = paisSel.value;
       const cli = { id: 'cli' + Date.now().toString().slice(-8), tipo: $('#nc-tipo').value, nombre, identificacion: $('#nc-id').value, pais, moneda: pais==='CO'?'COP':'GTQ', telefono: $('#nc-tel').value, email: $('#nc-email').value, departamento: depSel.value, ciudad: ciuSel.value, direccion: $('#nc-dir').value, sexo: $('#nc-sex').value, fechaNac: $('#nc-nac').value, segmento: $('#nc-seg').value, canal: $('#nc-canal').value, asesorId: $('#nc-ase').value, notas: $('#nc-notas').value, fechaAlta: new Date().toISOString().slice(0,10), etiquetas: ['Nuevo'], encuestasActivas: true };
