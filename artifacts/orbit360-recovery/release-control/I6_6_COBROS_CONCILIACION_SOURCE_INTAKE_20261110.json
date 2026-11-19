@@ -55,6 +55,8 @@
       "requiresValidationRowsDisplayedWithoutClientIdentity": 80,
       "requiresValidationRowsDisplayedWithoutAmount": 80,
       "policyNumberOccurrences": {
+        "10738": 4,
+        "223092797": 2,
         "91-8324489": 9,
         "91-8331591": 3,
         "91-8332808": 3,
@@ -65,10 +67,8 @@
         "91-8344741": 7,
         "91-8276951": 7,
         "91-8323091": 9,
-        "10738": 4,
         "91-8342189": 8,
         "91-8350081": 4,
-        "223092797": 2,
         "91-8315353": 2,
         "91-8282008": 2,
         "91-8282111": 1,
@@ -417,9 +417,22 @@
           "hashStatus": "RAW_BYTES_SHA256_VERIFIED_2026_11_10",
           "identityStatus": "DRIVE_METADATA_AND_RAW_HASH_PASS",
           "sha256": "a6d5f5242d2a40bef0f979215e9cb683875fb8efa04c2df78dad895ab59cc31d"
+        },
+        {
+          "filename": "Estado de Cuenta El Roble a noviembre 20.XLS",
+          "bytes": 55356,
+          "mimeType": "application/vnd.ms-excel",
+          "driveModifiedAt": "2026-11-19T17:10:33.300Z",
+          "googleDriveFileId": "1vk6RtUUFVjpQB_W1UMs10hvcpaEFNFjs",
+          "hashStatus": "RAW_BYTES_SHA256_VERIFIED_2026_11_19",
+          "identityStatus": "DRIVE_METADATA_AND_RAW_HASH_PASS",
+          "sha256": "7062738cdf1c008ebff85247f8b0723ab4d8f36e43bb69d386d5dfcb59d219ef",
+          "sourceAsOfDateFromFilename": "2026-11-20",
+          "latestForInsurer": "El Roble",
+          "semanticType": "PENDING_NOT_PROOF_OF_PAID"
         }
       ],
-      "count": 15,
+      "count": 16,
       "insurerFamilies": [
         "Bantrab",
         "Mapfre",
@@ -493,15 +506,17 @@
     "sha256Pinning": {
       "algorithm": "SHA-256",
       "verifiedRawSourceCounts": {
-        "novemberStatements": 15,
+        "novemberStatements": 16,
         "novemberCommissionAndInvoices": 20,
         "octoberFolderHistoricalReferences": 4,
-        "total": 39
+        "total": 40
       },
       "verifiedDateGuatemala": "2026-11-10",
       "signedUrlsStored": false,
       "rawCustomerRowsCommittedToRepository": false,
-      "normalizedWorkbookHashIsNotRawSourceHash": true
+      "normalizedWorkbookHashIsNotRawSourceHash": true,
+      "additionalSourceVerificationDateGuatemala": "2026-11-19",
+      "newestInsurerSourceMustPrecedeOlderSourceOnSameOpenRequirement": true
     }
   },
   "ownerFrozenDecisions": [
