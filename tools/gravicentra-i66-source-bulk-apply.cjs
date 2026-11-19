@@ -75,7 +75,15 @@ async function applyOne(db,row,gate){
       completeMonthlySchedule({receipts:policyReceipts.docs.map(s=>s.data())})&&
       (r.numeroCuota==null||Number(r.numeroCuota)===monthlyIndex)&&
       !str(r.referenciaCuotaInterna);
-    if(!monthlyMatch&&due(r)!==row.due)hold('CONTRACTUAL_DUE_NOT_CORROBORATED');
+    // An exact external insurer requirement on this policy edition is stronger
+    // evidence for its contractual due date than a stale imported date.
+    // Cross-receipt source-reference uniqueness is checked below.
+    const exactRequirementCorrection = row.matchMethod==='EXACT_INSURER_REQUIREMENT_DUE' &&
+      sourceAliases.some(field=>str(r[field])===row.requirement);
+    if(row.matchMethod==='EXACT_INSURER_REQUIREMENT_DUE'&&!exactRequirementCorrection)
+      hold('SOURCE_REQUIREMENT_NOT_CORROBORATED');
+    if(!monthlyMatch&&!exactRequirementCorrection&&due(r)!==row.due)
+      hold('CONTRACTUAL_DUE_NOT_CORROBORATED');
     for(const field of sourceAliases){
       if(str(r[field])&&!internal(r[field])&&str(r[field])!==row.requirement)
         hold('EXTERNAL_SOURCE_ALREADY_DIFFERENT');
