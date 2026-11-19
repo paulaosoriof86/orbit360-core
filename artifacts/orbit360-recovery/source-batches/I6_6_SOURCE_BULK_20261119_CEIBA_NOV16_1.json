@@ -34,6 +34,7 @@
   "sourceCurrency": "NOT_EXPLICIT_IN_FILE_GUATEMALA_POLICY_CURRENCY_MUST_BE_VERIFIED",
   "provenance": "RAW_INSURER_STATEMENT_UPLOAD_NOT_SIGA_OR_MANUAL_OVERRIDE",
   "writesPerformedByThisManifest": 0,
-  "preflightStatus": "NOT_EXECUTED",
-  "authorizationScope": "USE_EXISTING_I6_6_SOURCE_BULK_PROTECTED_WORKFLOW_ONLY_AFTER_REAL_LIVE_IDENTITY_DRIFT_RECONCILED"
+  "preflightStatus": "PREFLIGHT_REQUESTED_READONLY_CAS_NOT_AUTHORIZED_UNTIL_ENVIRONMENT_REVIEW",
+  "authorizationScope": "USE_EXISTING_I6_6_SOURCE_BULK_PROTECTED_WORKFLOW_ONLY_AFTER_REAL_LIVE_IDENTITY_DRIFT_RECONCILED",
+  "preflightRequestReason": "Start existing insurer-source deterministic preflight on original La Ceiba statement; keep pending status; no inferred Cobros"
 }
