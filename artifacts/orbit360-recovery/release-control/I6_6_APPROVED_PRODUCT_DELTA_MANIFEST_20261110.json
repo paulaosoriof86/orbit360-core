@@ -2954,22 +2954,38 @@
         {
           "path": "orbit360-platform/modules/aseguradoras.js",
           "gitBlobSha": "bc1a0f5b02666378e257f0d5e83064167b54fddc",
-          "replaces": {"path":"orbit360-platform/modules/aseguradoras.js","priorGitBlobSha":"94673da5f3a06d6ddeefb2d2706cc665417d4793","priorChangeId":"I6_6_INSURER_EDITABLE_PRODUCT_COMMISSION_OWNER_20261119"}
+          "replaces": {
+            "path": "orbit360-platform/modules/aseguradoras.js",
+            "priorGitBlobSha": "94673da5f3a06d6ddeefb2d2706cc665417d4793",
+            "priorChangeId": "I6_6_INSURER_EDITABLE_PRODUCT_COMMISSION_OWNER_20261119"
+          }
         },
         {
           "path": "orbit360-platform/modules/policy-receipts-v1199-bridge.js",
           "gitBlobSha": "fad9ae6517bc42f5531f2fcdcfa218db5be9ec86",
-          "replaces": {"path":"orbit360-platform/modules/policy-receipts-v1199-bridge.js","priorGitBlobSha":"e6b5847e888c8ce6eff217faf4ea92af2796d9f0","priorChangeId":"I6_6_CASH_30D_FORWARD_ONLY_P0_LEGACY_PRESERVATION_20261118"}
+          "replaces": {
+            "path": "orbit360-platform/modules/policy-receipts-v1199-bridge.js",
+            "priorGitBlobSha": "e6b5847e888c8ce6eff217faf4ea92af2796d9f0",
+            "priorChangeId": "I6_6_CASH_30D_FORWARD_ONLY_P0_LEGACY_PRESERVATION_20261118"
+          }
         },
         {
           "path": "orbit360-platform/core/primas.js",
           "gitBlobSha": "d74986b08eb46d34a6221198b57fec3589eb20cf",
-          "replaces": {"path":"orbit360-platform/core/primas.js","priorGitBlobSha":"201b82bf7ff46dcfaabf1afe34d69e465f2218c8","priorChangeId":"I6_6_CASH_30D_FORWARD_ONLY_P0_LEGACY_PRESERVATION_20261118"}
+          "replaces": {
+            "path": "orbit360-platform/core/primas.js",
+            "priorGitBlobSha": "201b82bf7ff46dcfaabf1afe34d69e465f2218c8",
+            "priorChangeId": "I6_6_CASH_30D_FORWARD_ONLY_P0_LEGACY_PRESERVATION_20261118"
+          }
         },
         {
           "path": "orbit360-platform/core/policy-receipts-engine.js",
           "gitBlobSha": "699f37464ecd977a3cb489c934b31773abb5c42f",
-          "replaces": {"path":"orbit360-platform/core/policy-receipts-engine.js","priorGitBlobSha":"a9966cab05ae9fe2de68ec4795038de743529da7","priorChangeId":"I6_6_CASH_30D_FORWARD_ONLY_P0_LEGACY_PRESERVATION_20261118"}
+          "replaces": {
+            "path": "orbit360-platform/core/policy-receipts-engine.js",
+            "priorGitBlobSha": "a9966cab05ae9fe2de68ec4795038de743529da7",
+            "priorChangeId": "I6_6_CASH_30D_FORWARD_ONLY_P0_LEGACY_PRESERVATION_20261118"
+          }
         },
         {
           "path": "functions/b4-003-scoped-bootstrap-reader.js",
@@ -2980,12 +2996,20 @@
         {
           "path": "tools/gravicentra-i6-6-insurer-product-commission.test.cjs",
           "gitBlobSha": "4f6a0b67d2a1a61f2832a24442d9fdf11b08ba4e",
-          "replaces": {"path":"tools/gravicentra-i6-6-insurer-product-commission.test.cjs","priorGitBlobSha":"28d85abd3904a9a73fb8eee63e06a7468e22fe4b","priorChangeId":"I6_6_INSURER_EDITABLE_PRODUCT_COMMISSION_OWNER_20261119"}
+          "replaces": {
+            "path": "tools/gravicentra-i6-6-insurer-product-commission.test.cjs",
+            "priorGitBlobSha": "28d85abd3904a9a73fb8eee63e06a7468e22fe4b",
+            "priorChangeId": "I6_6_INSURER_EDITABLE_PRODUCT_COMMISSION_OWNER_20261119"
+          }
         },
         {
           "path": "tools/gravicentra-i6-6-manual-policy-capture-p0.test.cjs",
           "gitBlobSha": "4ab2af161c600381d9af6023ab1242fcac235c9f",
-          "replaces": {"path":"tools/gravicentra-i6-6-manual-policy-capture-p0.test.cjs","priorGitBlobSha":"90d501d4abcdd431a0e6fbb35f39f22ff15aa356","priorChangeId":"I6_6_CASH_30D_FORWARD_ONLY_P0_LEGACY_PRESERVATION_20261118"}
+          "replaces": {
+            "path": "tools/gravicentra-i6-6-manual-policy-capture-p0.test.cjs",
+            "priorGitBlobSha": "90d501d4abcdd431a0e6fbb35f39f22ff15aa356",
+            "priorChangeId": "I6_6_CASH_30D_FORWARD_ONLY_P0_LEGACY_PRESERVATION_20261118"
+          }
         }
       ]
     },
@@ -2999,24 +3023,40 @@
         {
           "path": "orbit360-platform/core/primas.js",
           "gitBlobSha": "fbd41a84bba4a5083027689a457b427dac88f36e",
-          "replaces": {"path":"orbit360-platform/core/primas.js","priorGitBlobSha":"d74986b08eb46d34a6221198b57fec3589eb20cf","priorChangeId":"I6_6_INSURER_SELF_ADMINISTERED_FINANCIAL_RULES_OWNER_20261119"}
+          "replaces": {
+            "path": "orbit360-platform/core/primas.js",
+            "priorGitBlobSha": "d74986b08eb46d34a6221198b57fec3589eb20cf",
+            "priorChangeId": "I6_6_INSURER_SELF_ADMINISTERED_FINANCIAL_RULES_OWNER_20261119"
+          }
         },
         {
           "path": "orbit360-platform/core/policy-receipts-engine.js",
           "gitBlobSha": "84129eb3f78217b0c3cb61058ece5d2b9e91cd3d",
-          "replaces": {"path":"orbit360-platform/core/policy-receipts-engine.js","priorGitBlobSha":"699f37464ecd977a3cb489c934b31773abb5c42f","priorChangeId":"I6_6_INSURER_SELF_ADMINISTERED_FINANCIAL_RULES_OWNER_20261119"}
+          "replaces": {
+            "path": "orbit360-platform/core/policy-receipts-engine.js",
+            "priorGitBlobSha": "699f37464ecd977a3cb489c934b31773abb5c42f",
+            "priorChangeId": "I6_6_INSURER_SELF_ADMINISTERED_FINANCIAL_RULES_OWNER_20261119"
+          }
         },
         {
           "path": "orbit360-platform/modules/policy-receipts-v1199-bridge.js",
           "gitBlobSha": "d2cacdf313433ea7448a35b19f932fd3506d0076",
-          "replaces": {"path":"orbit360-platform/modules/policy-receipts-v1199-bridge.js","priorGitBlobSha":"fad9ae6517bc42f5531f2fcdcfa218db5be9ec86","priorChangeId":"I6_6_INSURER_SELF_ADMINISTERED_FINANCIAL_RULES_OWNER_20261119"}
+          "replaces": {
+            "path": "orbit360-platform/modules/policy-receipts-v1199-bridge.js",
+            "priorGitBlobSha": "fad9ae6517bc42f5531f2fcdcfa218db5be9ec86",
+            "priorChangeId": "I6_6_INSURER_SELF_ADMINISTERED_FINANCIAL_RULES_OWNER_20261119"
+          }
         }
       ],
       "tests": [
         {
           "path": "tools/gravicentra-i6-6-primas-calendar-forward-only.test.cjs",
           "gitBlobSha": "96a7c1cb871f4bccff395a203ce6b90028e85818",
-          "replaces": {"path":"tools/gravicentra-i6-6-primas-calendar-forward-only.test.cjs","priorGitBlobSha":"e649591392d2a4d0f35b3ea7d718e5ea0ecbaa79","priorChangeId":"I6_6_FORWARD_ONLY_UTC_MONTHLY_CADENCE_WITH_TERM_GUARD"}
+          "replaces": {
+            "path": "tools/gravicentra-i6-6-primas-calendar-forward-only.test.cjs",
+            "priorGitBlobSha": "e649591392d2a4d0f35b3ea7d718e5ea0ecbaa79",
+            "priorChangeId": "I6_6_FORWARD_ONLY_UTC_MONTHLY_CADENCE_WITH_TERM_GUARD"
+          }
         }
       ]
     },
@@ -3042,37 +3082,65 @@
         {
           "path": "orbit360-platform/core/product-runtime-browser-providers-p0.js",
           "gitBlobSha": "1c5e1dff60af7fea53a14276aeecc7273c26ad81",
-          "replaces": {"path":"orbit360-platform/core/product-runtime-browser-providers-p0.js","priorGitBlobSha":"1a43a9a297908b7131bc245320894cb92195f065","priorChangeId":"I6_6_AUTHENTICATED_INCREMENTAL_SOURCE_INTAKE_V2_20261117"}
+          "replaces": {
+            "path": "orbit360-platform/core/product-runtime-browser-providers-p0.js",
+            "priorGitBlobSha": "1a43a9a297908b7131bc245320894cb92195f065",
+            "priorChangeId": "I6_6_AUTHENTICATED_INCREMENTAL_SOURCE_INTAKE_V2_20261117"
+          }
         },
         {
           "path": "orbit360-platform/core/auth-product-runtime-p0.js",
           "gitBlobSha": "799bbd849a00e2591738d23b64795757980f1e5a",
-          "replaces": {"path":"orbit360-platform/core/auth-product-runtime-p0.js","priorGitBlobSha":"871c9661343043cdbabfa76630dd216d03c54927","priorChangeId":"I6_6_PROTECTED_PREVIEW_HOST_AND_READONLY_SELF_ACCESS"}
+          "replaces": {
+            "path": "orbit360-platform/core/auth-product-runtime-p0.js",
+            "priorGitBlobSha": "871c9661343043cdbabfa76630dd216d03c54927",
+            "priorChangeId": "I6_6_PROTECTED_PREVIEW_HOST_AND_READONLY_SELF_ACCESS"
+          }
         },
         {
           "path": "orbit360-platform/core/ciclo.js",
           "gitBlobSha": "1e13c2021d4974ccf7d2953cd3cde62d05210876",
-          "replaces": {"path":"orbit360-platform/core/ciclo.js","priorGitBlobSha":"bbff5210dfc7d660e6b003d4ce78b210da37da7f","priorChangeId":"I6_6_OPS_INTERNAL_NOTICE_HUMAN_ACTOR_COMPAT_20261118"}
+          "replaces": {
+            "path": "orbit360-platform/core/ciclo.js",
+            "priorGitBlobSha": "bbff5210dfc7d660e6b003d4ce78b210da37da7f",
+            "priorChangeId": "I6_6_OPS_INTERNAL_NOTICE_HUMAN_ACTOR_COMPAT_20261118"
+          }
         },
         {
           "path": "functions/product-ops-leads-domain.js",
           "gitBlobSha": "cb623163b64cbed890a63713265e4bf85cbc0b4c",
-          "replaces": {"path":"functions/product-ops-leads-domain.js","priorGitBlobSha":"2628a829579e79256e9648b52f13dd9adfe62543","priorChangeId":"I6_6_OPS_CLIENT_MANAGEMENT_CATALOG_NOTIFICATIONS_20261118"}
+          "replaces": {
+            "path": "functions/product-ops-leads-domain.js",
+            "priorGitBlobSha": "2628a829579e79256e9648b52f13dd9adfe62543",
+            "priorChangeId": "I6_6_OPS_CLIENT_MANAGEMENT_CATALOG_NOTIFICATIONS_20261118"
+          }
         },
         {
           "path": "orbit360-platform/modules/cliente360.js",
           "gitBlobSha": "c3d9e3ba324d84dc989bbdebf2d0d1480a76c228",
-          "replaces": {"path":"orbit360-platform/modules/cliente360.js","priorGitBlobSha":"388cd1ee015201c1bef779318fb91e18cd6b93a7","priorChangeId":"I6_6_OPS_CLIENT_MANAGEMENT_CATALOG_NOTIFICATIONS_20261118"}
+          "replaces": {
+            "path": "orbit360-platform/modules/cliente360.js",
+            "priorGitBlobSha": "388cd1ee015201c1bef779318fb91e18cd6b93a7",
+            "priorChangeId": "I6_6_OPS_CLIENT_MANAGEMENT_CATALOG_NOTIFICATIONS_20261118"
+          }
         },
         {
           "path": "orbit360-platform/index.html",
           "gitBlobSha": "6c0cfd7366c414f9d4dad2130fcf857244e548db",
-          "replaces": {"path":"orbit360-platform/index.html","priorGitBlobSha":"dd58634927d86a10f9feaf7ed8d5cefe3db420cf","priorChangeId":"I6_6_INBOX_CHIME_COUNTRY_SCOPE_P0"}
+          "replaces": {
+            "path": "orbit360-platform/index.html",
+            "priorGitBlobSha": "dd58634927d86a10f9feaf7ed8d5cefe3db420cf",
+            "priorChangeId": "I6_6_INBOX_CHIME_COUNTRY_SCOPE_P0"
+          }
         },
         {
           "path": "orbit360-platform/core/queries.js",
           "gitBlobSha": "2ba6edc8a04e7cc6140db2bcad0ee213c17d785a",
-          "replaces": {"path":"orbit360-platform/core/queries.js","priorGitBlobSha":"8d08aa5bc96b3da6025e10d5f3018996edf7bab8","priorChangeId":"I6_6_ADVISOR_PORTFOLIO_HISTORICAL_BENEFICIARY_AND_COMPONENT_ROUNDING_20261115"}
+          "replaces": {
+            "path": "orbit360-platform/core/queries.js",
+            "priorGitBlobSha": "8d08aa5bc96b3da6025e10d5f3018996edf7bab8",
+            "priorChangeId": "I6_6_ADVISOR_PORTFOLIO_HISTORICAL_BENEFICIARY_AND_COMPONENT_ROUNDING_20261115"
+          }
         }
       ],
       "tests": [
@@ -3083,12 +3151,20 @@
         {
           "path": "tools/gravicentra-i6-6-roles-payment-expiry-hotfix.test.cjs",
           "gitBlobSha": "88f3d7e2b3489a9d229e01d3ff662b3d966a5d55",
-          "replaces": {"path":"tools/gravicentra-i6-6-roles-payment-expiry-hotfix.test.cjs","priorGitBlobSha":"dc717555e60d0405ba14c38f0a4739dfb1056130","priorChangeId":"I6_6_OPERATIVE_ADVISOR_PAYMENT_INVOICE_EXPIRY_BATCH_20261113"}
+          "replaces": {
+            "path": "tools/gravicentra-i6-6-roles-payment-expiry-hotfix.test.cjs",
+            "priorGitBlobSha": "dc717555e60d0405ba14c38f0a4739dfb1056130",
+            "priorChangeId": "I6_6_OPERATIVE_ADVISOR_PAYMENT_INVOICE_EXPIRY_BATCH_20261113"
+          }
         },
         {
           "path": "tools/gravicentra-i6-6-protected-role-policy-hydration.test.cjs",
           "gitBlobSha": "d28c721a333bed95316cd31a092da3d3185df6a7",
-          "replaces": {"path":"tools/gravicentra-i6-6-protected-role-policy-hydration.test.cjs","priorGitBlobSha":"ed356dd4e7bcb9cd20e0f43215f7dbc38b7dbdbd","priorChangeId":"I6_6_PROTECTED_ROLE_MATRIX_HYDRATION_ORDER_20261117"}
+          "replaces": {
+            "path": "tools/gravicentra-i6-6-protected-role-policy-hydration.test.cjs",
+            "priorGitBlobSha": "ed356dd4e7bcb9cd20e0f43215f7dbc38b7dbdbd",
+            "priorChangeId": "I6_6_PROTECTED_ROLE_MATRIX_HYDRATION_ORDER_20261117"
+          }
         }
       ]
     },
@@ -3172,6 +3248,39 @@
         {
           "path": "tools/gravicentra-i6-6-source-lineage-preview-transport.test.cjs",
           "gitBlobSha": "c8d6e597dbe1140999b15d4235241ca348337ca7"
+        }
+      ]
+    },
+    {
+      "id": "I6_6_POLICY_INSURER_EXPLICIT_SELECTION_ROOTFIX_20261119",
+      "approvedByDirection": true,
+      "receipt": "Paula 2026-11-19 I6.6 same-gate no-loss immediate correction and publication request; LIVE Sergio policy form previously selected PRUEBA PREVIEW QA by default; user requires real insurer selection and cross-client safe operation. Audit checkpoint: I6_6_FINANCIAL_OPS_LEADS_CONTINUITY_READBACK_20261119.json. No production mutation authorized by this source-only commit.",
+      "sourceStatus": "ATOMIC_SOURCE_TEST_MANIFEST_ALIGNED_GUARD_AND_NEW_PREVIEW_REQUIRED_NO_LIVE_CLAIM",
+      "capabilityOwners": [
+        "POLIZAS_PRIMARY_RUNTIME",
+        "CLIENTE360_PRIMARY_RUNTIME"
+      ],
+      "scope": "New policy and client/country change must leave insurer blank until explicitly selected; preserve existing policy insurer; no payments, roles, backend, data or LIVE changes.",
+      "paths": [
+        {
+          "path": "orbit360-platform/modules/policy-receipts-v1199-bridge.js",
+          "gitBlobSha": "7c273a429fff0ec2a88bfdf9bcbe50ff631cdb33",
+          "replaces": {
+            "path": "orbit360-platform/modules/policy-receipts-v1199-bridge.js",
+            "priorGitBlobSha": "d2cacdf313433ea7448a35b19f932fd3506d0076",
+            "priorChangeId": "I6_6_CASH_ISSUANCE_MONTH_SERGIO_TRANSVERSAL_20261119"
+          }
+        }
+      ],
+      "tests": [
+        {
+          "path": "tools/gravicentra-i6-6-manual-policy-capture-p0.test.cjs",
+          "gitBlobSha": "0df0653f3e960a70596f2d8797b30edcafc58fa5",
+          "replaces": {
+            "path": "tools/gravicentra-i6-6-manual-policy-capture-p0.test.cjs",
+            "priorGitBlobSha": "4ab2af161c600381d9af6023ab1242fcac235c9f",
+            "priorChangeId": "I6_6_INSURER_SELF_ADMINISTERED_FINANCIAL_RULES_OWNER_20261119"
+          }
         }
       ]
     }

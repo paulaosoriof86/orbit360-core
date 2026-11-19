@@ -58,3 +58,9 @@ test('new policy selects a real insurer explicitly and never silently preselects
  assert.match(ui,/Selecciona la aseguradora real del documento/);
  assert.match(ui,/insurerEl\.focus\(\)/);
 });
+
+test('client change never silently selects first insurer; editing preserves real existing insurer only',()=>{
+ assert.match(ui,/const availableInsurers = linkedInsurers\(country2\)/);
+ assert.match(ui,/insurerEl\.innerHTML = '<option value="">— Seleccionar aseguradora —<\/option>' \+ availableInsurers\.map/);
+ assert.match(ui,/insurerEl\.value = existing && availableInsurers\.some\(a => a\.id === existing\.aseguradoraId\) \? existing\.aseguradoraId : '';/);
+});

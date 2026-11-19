@@ -304,7 +304,9 @@ Orbit.modules = Orbit.modules || {};
       currencyEl.value = currency2;
       $('[data-country]').value = country2;
       const taxNote = $('[data-tax-note]'); if (taxNote) taxNote.textContent = 'IVA ' + countryTaxPct(country2) + '% según país. Emisión, asistencia y recargo continúan editables para conservar excepciones reales.';
-      insurerEl.innerHTML = linkedInsurers(country2).map(a => `<option value="${esc(a.id)}">${esc(a.nombre)}</option>`).join('');
+      const availableInsurers = linkedInsurers(country2);
+      insurerEl.innerHTML = '<option value="">— Seleccionar aseguradora —</option>' + availableInsurers.map(a => `<option value="${esc(a.id)}">${esc(a.nombre)}</option>`).join('');
+      insurerEl.value = existing && availableInsurers.some(a => a.id === existing.aseguradoraId) ? existing.aseguradoraId : '';
       ramoEl.innerHTML = ramos(country2).map(x => `<option>${esc(x)}</option>`).join(''); refreshProducts('');
       refreshAdvisors(existing ? initialAdvisorId : (c.asesorId || ''));
     }
