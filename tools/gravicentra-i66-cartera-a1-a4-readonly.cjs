@@ -416,6 +416,15 @@ function assess(one,snapshot){
     status:/^(Pendiente|Vencido|Pagado|Anulado)$/i.test(text(r.estado))?text(r.estado):'OTHER',
     hasPaymentEvidence:paid(r)
   }));
+  out.paidSourceScheduleReadback=one.paidDate?receipts.slice(0,24).map(r=>({
+    due:due(r),grossCents:amount(r),
+    dueFieldNames:['fechaLimite','vence','fechaVencimiento','fechaCobro','vencimiento','fechaVencimientoPago'].filter(k=>r[k]!=null),
+    installmentNumber:Number.isSafeInteger(+r.secuencia)&&+r.secuencia>0?+r.secuencia:
+      Number.isSafeInteger(+r.numeroCuota)&&+r.numeroCuota>0?+r.numeroCuota:null,
+    sourceRefIsInternalPlaceholder:!numbers(r).length||numbers(r).every(n=>/^rec_[a-f0-9]{16,64}$/i.test(n)||/^\d+\s*\/\s*\d+$/.test(n)),
+    paidEvidence:paid(r),linkedCobros:cobros.filter(c=>text(c.reciboId)===text(r.id)).length,
+    linkedActivePortfolio:portfolio.filter(c=>text(c.reciboId)===text(r.id)&&c.carteraActiva!==false).length
+  })).sort((a,b)=>String(a.due).localeCompare(String(b.due))):[];
   if(exact.length===1){
     const r=exact[0];out.exactAmountMatch=amount(r)===one.cents;
     const linked=cobros.filter(c=>text(c.reciboId)===text(r.id));
