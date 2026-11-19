@@ -207,9 +207,12 @@ function realDomainOwnerHarness({rejectAccess=false,missingAccess=false,emptyAcc
   const needle='window.Orbit.productRuntimeBrowserProvidersP0=Object.freeze(';
   // Exercise the actual provider/owner code. Only the initialized Firebase SDK
   // context is synthetic, so neither imports nor network/auth/storage occurs.
+  // The auth-first provider has two deduplicated contexts. The synthetic
+  // fixture must seed both, just as a signed Firebase session does in LIVE.
   assert.equal(source.split(needle).length,2);
   vm.runInNewContext(source.replace(needle,
-    'window.__qaProviderContext=function(value){contextPromise=Promise.resolve(value);};'+needle),h.context);
+    'window.__qaProviderContext=function(value){contextPromise=Promise.resolve(value);'+
+    'authContextPromise=Promise.resolve({app:value.app,auth:value.auth,modules:{auth:value.modules.auth}});};'+needle),h.context);
   const currentUser={uid,email:h.member.email,emailVerified:true};
   h.sdkRequests=[];
   w.__qaProviderContext({app:{name:'qa'},auth:{currentUser},db:{},functionsByRegion:{},modules:{

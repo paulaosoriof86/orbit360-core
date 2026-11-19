@@ -8,7 +8,7 @@
 (function () {
   'use strict';
   window.Orbit = window.Orbit || {};
-  var modulesPromise=null, contextPromise=null;
+  var modulesPromise=null, contextPromise=null, authModulesPromise=null, authContextPromise=null;
   function config(){return window.__ORBIT360_PRODUCT_PUBLIC_CONFIG__||{};}
   // I6.6 Preview exposes read-only business data and permits only bounded,
   // namespaced synthetic UAT writes through existing Preview callables.
@@ -154,6 +154,17 @@
     return '';
   }
   function enabled(){var c=config();return c.enabled===true&&!!c.projectId&&!!c.authDomain&&!!c.appId&&!!c.apiKey&&!!c.tenantHint;}
+  // Auth is on the critical path to the login form and credential acceptance.
+  // Firestore and Functions are only needed after the authenticated user is
+  // known, so their downloads must never hold back the Auth SDK itself.
+  function loadAuthModules(){
+    if(authModulesPromise)return authModulesPromise;
+    authModulesPromise=Promise.all([
+      import('https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js'),
+      import('https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js')
+    ]).then(function(parts){return{app:parts[0],auth:parts[1]};});
+    return authModulesPromise;
+  }
   function loadModules(){
     if(modulesPromise)return modulesPromise;
     modulesPromise=Promise.all([
@@ -164,16 +175,30 @@
     ]).then(function(parts){return{app:parts[0],auth:parts[1],store:parts[2],functions:parts[3]};});
     return modulesPromise;
   }
+  function initializeAuth(){
+    var scopeError=protectedTransportError();
+    if(scopeError)return Promise.reject(new Error(scopeError));
+    if(!enabled())return Promise.reject(new Error('PRODUCT_RUNTIME_NOT_CONFIGURED'));
+    if(authContextPromise)return authContextPromise;
+    authContextPromise=loadAuthModules().then(function(m){
+      var c=config();
+      var app=m.app.getApps().length?m.app.getApps()[0]:m.app.initializeApp({apiKey:c.apiKey,authDomain:c.authDomain,projectId:c.projectId,appId:c.appId,storageBucket:c.storageBucket||undefined});
+      var auth=m.auth.getAuth(app);
+      // Prewarm the shared data module promise without awaiting it. The login
+      // remains usable while the non-auth SDK code downloads in parallel.
+      loadModules().catch(function(){});
+      return{modules:m,app:app,auth:auth};
+    });
+    return authContextPromise;
+  }
   function initialize(){
     var scopeError=protectedTransportError();
     if(scopeError)return Promise.reject(new Error(scopeError));
     if(!enabled())return Promise.reject(new Error('PRODUCT_RUNTIME_NOT_CONFIGURED'));
     if(contextPromise)return contextPromise;
-    contextPromise=loadModules().then(function(m){
-      var c=config();
-      var app=m.app.getApps().length?m.app.getApps()[0]:m.app.initializeApp({apiKey:c.apiKey,authDomain:c.authDomain,projectId:c.projectId,appId:c.appId,storageBucket:c.storageBucket||undefined});
-      var auth=m.auth.getAuth(app);
-      return{modules:m,app:app,auth:auth,db:m.store.getFirestore(app),functionsByRegion:{}};
+    contextPromise=initializeAuth().then(function(base){return loadModules().then(function(m){
+      return{modules:m,app:base.app,auth:base.auth,db:m.store.getFirestore(base.app),functionsByRegion:{}};
+    });
     });
     return contextPromise;
   }
@@ -181,8 +206,8 @@
     var c=config();
     return Promise.resolve({projectId:'configured',authDomain:'configured',appId:'configured',hasApiKey:true,storageBucket:c.storageBucket?'configured':'',environmentRef:c.environmentRef||'product-runtime',controlledExistingIdentity:true,existingProjectReconciled:true,identitySource:'membership_only',readOnly:true,writeAuthorized:false,serverWriteTransport:'firebase-functions'});
   }
-  function initialUser(){return initialize().then(function(ctx){if(ctx.auth&&typeof ctx.auth.authStateReady==='function')return ctx.auth.authStateReady().then(function(){return ctx.auth.currentUser||null;});return new Promise(function(resolve,reject){var off=function(){};off=ctx.modules.auth.onAuthStateChanged(ctx.auth,function(user){off();resolve(user||null);},function(error){off();reject(error);});});});}
-  function waitUser(){return initialize().then(function(ctx){if(ctx.auth.currentUser)return ctx.auth.currentUser;return new Promise(function(resolve,reject){var off=ctx.modules.auth.onAuthStateChanged(ctx.auth,function(user){if(user){off();resolve(user);}},reject);});});}
+  function initialUser(){return initializeAuth().then(function(ctx){if(ctx.auth&&typeof ctx.auth.authStateReady==='function')return ctx.auth.authStateReady().then(function(){return ctx.auth.currentUser||null;});return new Promise(function(resolve,reject){var off=function(){};off=ctx.modules.auth.onAuthStateChanged(ctx.auth,function(user){off();resolve(user||null);},function(error){off();reject(error);});});});}
+  function waitUser(){return initializeAuth().then(function(ctx){if(ctx.auth.currentUser)return ctx.auth.currentUser;return new Promise(function(resolve,reject){var off=ctx.modules.auth.onAuthStateChanged(ctx.auth,function(user){if(user){off();resolve(user);}},reject);});});}
   function protectedMode(){
     return config().scopedReadPreviewCandidate===true?protectedHostMode():'';
   }
@@ -271,7 +296,7 @@
       membershipProvider:{getByUid:membershipByUid},protectedReadPage:protectedReadPage
     };
   }
-  function signIn(email,password){return initialize().then(function(ctx){
+  function signIn(email,password){return initializeAuth().then(function(ctx){
     // Firebase's default LOCAL session is shared across every tab of this
     // origin. Switching between Dirección and Operativo in another tab used
     // to leave the first tab's productUser pointing at a different signed UID.
@@ -280,12 +305,12 @@
     return ctx.modules.auth.setPersistence(ctx.auth,ctx.modules.auth.browserSessionPersistence)
       .then(function(){return ctx.modules.auth.signInWithEmailAndPassword(ctx.auth,String(email||'').trim(),String(password||''));});
   });}
-  function signOut(){return initialize().then(function(ctx){return ctx.modules.auth.signOut(ctx.auth);});}
+  function signOut(){return initializeAuth().then(function(ctx){return ctx.modules.auth.signOut(ctx.auth);});}
   function sendVerificationEmail(user){
-    return initialize().then(function(ctx){var target=user||ctx.auth.currentUser;if(!target)throw new Error('AUTH_USER_NOT_AVAILABLE');return ctx.modules.auth.sendEmailVerification(target);});
+    return initializeAuth().then(function(ctx){var target=user||ctx.auth.currentUser;if(!target)throw new Error('AUTH_USER_NOT_AVAILABLE');return ctx.modules.auth.sendEmailVerification(target);});
   }
   function updateCurrentUserPassword(password){
-    return initialize().then(function(ctx){var target=ctx.auth.currentUser;if(!target)throw new Error('AUTH_USER_NOT_AVAILABLE');return ctx.modules.auth.updatePassword(target,String(password||''));});
+    return initializeAuth().then(function(ctx){var target=ctx.auth.currentUser;if(!target)throw new Error('AUTH_USER_NOT_AVAILABLE');return ctx.modules.auth.updatePassword(target,String(password||''));});
   }
-  window.Orbit.productRuntimeBrowserProvidersP0=Object.freeze({VERSION:'p0-b1-20261111.2-session-isolated',enabled:enabled,initialize:initialize,dependencies:dependencies,signIn:signIn,signOut:signOut,sendVerificationEmail:sendVerificationEmail,updateCurrentUserPassword:updateCurrentUserPassword,initialUser:initialUser,waitForUser:waitUser,readTenantConfig:readTenantConfig,callFunction:callFunction,protectedReadPage:protectedReadPage,configDescriptor:publicDescriptor,protectedHostMode:protectedHostMode,isI66PreviewHost:isI66PreviewHost,containsSecrets:false,tenantSource:'membership_only',browserFirestoreWriteAuthorized:false,serverWriteTransport:'firebase-functions',authoritativeFirstRead:true,authPersistence:'firebase-browser-session-on-new-login',noFallback:true});
+  window.Orbit.productRuntimeBrowserProvidersP0=Object.freeze({VERSION:'p0-i66-20261119-auth-first',enabled:enabled,initialize:initialize,initializeAuth:initializeAuth,dependencies:dependencies,signIn:signIn,signOut:signOut,sendVerificationEmail:sendVerificationEmail,updateCurrentUserPassword:updateCurrentUserPassword,initialUser:initialUser,waitForUser:waitUser,readTenantConfig:readTenantConfig,callFunction:callFunction,protectedReadPage:protectedReadPage,configDescriptor:publicDescriptor,protectedHostMode:protectedHostMode,isI66PreviewHost:isI66PreviewHost,containsSecrets:false,tenantSource:'membership_only',browserFirestoreWriteAuthorized:false,serverWriteTransport:'firebase-functions',authoritativeFirstRead:true,authPersistence:'firebase-browser-session-on-new-login',noFallback:true});
 })();

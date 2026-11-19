@@ -1,5 +1,5 @@
 {
-  "schema": "GRAVICENTRA_I6_6_FROZEN_OWNER_DECISIONS_20261119_V7",
+  "schema": "GRAVICENTRA_I6_6_FROZEN_OWNER_DECISIONS_20261119_V8",
   "dateGuatemala": "2026-11-19",
   "status": "FROZEN_DECISIONS_SOURCE_QA_CANDIDATE_PENDING_SIGNED_PREVIEW_LIVE",
   "repository": "paulaosoriof86/orbit360-core",
@@ -28,8 +28,35 @@
     "connectionHealth": "AY_S_ACTIVE_ID_14749710_OK_MAKE_SCENARIO_GET_20261119",
     "firestoreWriteConnectionNeededForCanonicalAdsScenario": true,
     "firestoreCredentialRequest": "663a0094-f827-4b73-8cfe-0f9192f7575b",
-    "firestoreCredentialState": "PENDING_GOOGLE_CUSTOM_OAUTH_CREDS_MAKE_FORM_MUST_NOT_USE_GREEN_API_INSTANCE_TOKEN",
+    "firestoreCredentialState": "INCOMPLETE_MAKE_GOOGLE_CONSENT_NOT_FINISHED_NEW_SEPARATE_OAUTH_CLIENT_CREATED",
     "makeScenarioCurrentlyCreatesRealLeads": false
+  },
+  "firestoreMakeOAuth20261119": {
+    "paulaExplicitCreationApproval": true,
+    "sourceOfApproval": "Owner message 2026-11-19: autorizo y continúa con lo que estás haciendo",
+    "googleCloudProject": "ays-orbit-360-lab",
+    "googleCloudAccount": "aysseguros2009@gmail.com",
+    "newOAuthClientName": "Gravicentra Make - Firestore (integración separada)",
+    "newOAuthClientType": "web_application",
+    "redirectUri": "https://www.integromat.com/oauth/cb/google-custom",
+    "googleCloudCreationObserved": true,
+    "firebaseBuiltInAuthClientUntouched": true,
+    "credentialsEnteredIntoMakeOwnerForm": true,
+    "clientSecretStoredInGit": false,
+    "connectionRequest": "663a0094-f827-4b73-8cfe-0f9192f7575b",
+    "makeConnectionReadback": "INCOMPLETE_NOT_AUTHORIZED_20261119",
+    "firestoreWritesThroughMakeConfirmed": 0,
+    "nextGate": "Complete Google consent through the owner's existing Make request, read back authorized connection id and scopes, then build and signed-test AyS ad-attributed lead scenario without touching T&A."
+  },
+  "loginPerformance20261119": {
+    "ownerFinding": "Login and first route appear excessively slow; preserve full data/role authorization while moving non-auth SDK waits off the login credential path.",
+    "sourceObservation": "Canonical product index references 133 external JS scripts; Firebase app/auth/firestore/functions imported as one Promise.all before form activation; protected required read remains authoritative and unavoidable.",
+    "patch": "Auth SDK first; prewarm Firestore and Functions asynchronously; full protected data bootstrap still required before app route, no new permission or write transport.",
+    "qa": "170_RELEVANT_SYNTHETIC_ASSERTIONS_PASS_20261119",
+    "previewAndLiveMeasured": false,
+    "sourceStatus": "LOCAL_CANDIDATE_PENDING_FROZEN_BRANCH_COMMIT_AND_SIGNED_RELEASE",
+    "noPerformanceClaimsWithoutSignedMeasurements": true,
+    "doNotReuseSupersededReleaseArtifact": true
   },
   "roleCapabilities": {
     "policyManageRoles": [
