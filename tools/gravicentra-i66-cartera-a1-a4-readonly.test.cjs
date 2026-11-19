@@ -39,6 +39,8 @@ const c=CASES[1],policy={id:'p',numero:c.policy,pais:'GT'},clientExists=true;
 const receipt={id:'r',polizaId:'p',numeroReciboFuente:c.requirement,monto:c.cents/100,estado:'Pendiente'};
 const snap=(over={})=>Object.assign({policies:[policy],clientExists,receipts:[receipt],cobros:[]},over);
 assert.equal(assess(c,snap()).currentStatus,'PAID_SOURCE_UNPAID_LIVE_CANDIDATE_SIGNED_CAS_REQUIRED');
+assert.equal(assess(c,snap()).paidSourceScheduleReadback.length,1,'INSURER_PAID_SOURCE_SCHEDULE_DIAGNOSTIC');
+assert.equal(assess(c,snap()).paidSourceScheduleReadback[0].grossCents,c.cents);
 assert.equal(assess(c,snap({receipts:[{...receipt,estado:'Pagado'}]})).currentStatus,'ALREADY_RECORDED_NO_WRITE');
 assert.equal(assess(c,snap({receipts:[]})).currentStatus,'HOLD_EXACT_REQUIREMENT_NOT_LINKED');
 assert.equal(assess(c,snap({receipts:[{...receipt,monto:0}]})).currentStatus,'HOLD_SOURCE_AMOUNT_DIFF');
