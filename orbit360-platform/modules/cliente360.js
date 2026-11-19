@@ -18,7 +18,17 @@ Orbit.modules.cliente360 = (function () {
     if(['juridica','juridico','persona juridica','empresa','sociedad'].includes(key))return 'Empresa';
     return raw;
   }
-  const esRenovable = p => p && (p.estado === 'Vigente' || p.estado === 'Por renovar');
+  const esRenovable = p => {
+    if (!p || !['vigente','porrenovar'].includes(String(p.estado || '').trim().toLowerCase().replace(/\s+/g,''))) return false;
+    const lifecycle = Orbit.renewalLifecycle && typeof Orbit.renewalLifecycle.evaluate === 'function'
+      ? Orbit.renewalLifecycle.evaluate(p) : null;
+    if (lifecycle) return !lifecycle.terminal && ![
+      'LINEAGE_CONFLICTO', 'SUCESORA_DE_FUENTE_PENDIENTE_ENLACE',
+      'RENOVADA_DECLARADA_SIN_SUCESORA_VERIFICADA'
+    ].includes(lifecycle.reason);
+    const outcome = String(p.renovacionEstado || '').trim().toLowerCase().replace(/[\s_-]+/g,'');
+    return !p.renovadaPor && !['renovada','norenovada','cerrada','cancelada'].includes(outcome);
+  };
   const esVigente = p => p && ['Vigente','Por renovar'].includes(q.policyDisplayStatus(p));
   const policyTotal = p => U.finiteNumber(p && p.primaTotal);
 
