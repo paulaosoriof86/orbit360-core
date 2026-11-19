@@ -157,7 +157,13 @@ function planSourceBatch(rawRows, policyGroups, options = {}) {
       continue;
     }
     const receipt = matches[0], rid = str(receipt.id);
-    const matchMethod = eligibleSchedule && dueOf(receipt)!==row.due &&
+    // The insurer requirement uniquely identifies the receipt inside this exact
+    // policy edition. When its date changes, the insurer's due date wins;
+    // an old system date is not a reason to suppress the correction.
+    const exactInsurerRequirement = sourceAliases.some(a => str(receipt[a]) === row.requirement);
+    const matchMethod = exactInsurerRequirement && dueOf(receipt)!==row.due ?
+      'EXACT_INSURER_REQUIREMENT_DUE' :
+      eligibleSchedule && dueOf(receipt)!==row.due &&
       internalSequence(receipt.numeroReciboFuente) === monthlyIndex ?
       'COMPLETE_MONTHLY_INSURER_DATE' : 'EXACT_CONTRACTUAL_OR_INSTALLMENT';
     if (!rid || seenTargets.has(rid)) {
@@ -194,8 +200,8 @@ function planSourceBatch(rawRows, policyGroups, options = {}) {
         beforeCartera,oldGrossAliases),
     };
     seenTargets.add(rid);
-    if (existingRef === row.requirement && beforeReceipt === row.grossCents &&
-      beforeCartera === row.grossCents) unchanged.push(record);
+    if (existingRef === row.requirement && dueOf(receipt) === row.due &&
+      beforeReceipt === row.grossCents && beforeCartera === row.grossCents) unchanged.push(record);
     else ready.push(record);
   }
   const chunks = [];
