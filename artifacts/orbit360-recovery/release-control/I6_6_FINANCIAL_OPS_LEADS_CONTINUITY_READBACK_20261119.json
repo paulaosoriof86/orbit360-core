@@ -796,5 +796,91 @@
     ],
     "actualWritesThisCheckpoint": "EVIDENCE_JSON_ONLY_NO_CUSTOMER_DATA_NO_PRODUCT_SOURCE_NO_LIVE_DEPLOY",
     "livePassClaimed": false
+  },
+  "carlosAdvisorRootfix20261119": {
+    "gate": "I6.6",
+    "recordType": "PHYSICALLY_VERIFIED_SOURCE_AND_AUTHENTICATED_PREVIEW_RECEIPT_NOT_LIVE_ACCEPTANCE",
+    "originalProductionReport": {
+      "actor": "Carlos Operativo GT",
+      "surface": "Cliente360 Editar ficha",
+      "missing": [
+        "Germán Reyes",
+        "Priscila"
+      ],
+      "evidence": "Screenshot Dirección 2026-11-19, real client Edson René Rodríguez López; do not reproduce client contact details in artifact"
+    },
+    "causalSourceOwners": [
+      {
+        "owner": "orbit360-platform/modules/cliente360.js",
+        "problem": "Edit client selected from legacy scoped S().all('asesores') instead of server-owned minimal signed Equipo roster",
+        "newBlob": "696d5aa8df033f2231012d650727b05d1817c1af",
+        "commit": "6f0d33eb364d8adfe499b72bf413ae17faf2d00b"
+      },
+      {
+        "owner": "orbit360-platform/modules/crm-v1198-operational-bridge.js",
+        "problem": "Actual Nuevo cliente function is shadowed by CRM v1198 override which selected from stale local advisor list",
+        "newBlob": "1ba69c71b66ddaf66001124c2a980f8f2200de4e",
+        "commit": "213c71e2ecb9c27b3262cff27084ff835851bc32"
+      }
+    ],
+    "governance": {
+      "manifestPath": "artifacts/orbit360-recovery/release-control/I6_6_APPROVED_PRODUCT_DELTA_MANIFEST_20261110.json",
+      "manifestBlob": "e7914599d90754509690e23aca477f1e3403abe3",
+      "priorApprovalsPreserved": 69,
+      "approvedTotalDeltaChanges": 71,
+      "uniqueProductPaths": 72,
+      "uniqueSourceTests": 89,
+      "signedSourceQaRunId": 44637061466,
+      "sourceQaConclusion": "success",
+      "signedControlPlaneGuardRunId": 44637061232,
+      "controlPlaneGuardConclusion": "success"
+    },
+    "cumulativeCandidate": {
+      "sourceSha": "72d3580f3e90071b360319ce5f204d348b401663",
+      "buildId": "gi-i66-72d3580f3e90-57f234755dc1",
+      "buildRunId": 44637404427,
+      "buildConclusion": "success",
+      "artifactId": 14584217893,
+      "artifactArchiveDigest": "sha256:06decf52bfce75a1bdc7e207b96de35c17ccdfed7ff805895bedada0d80617dc",
+      "previewChannel": "gi-i66-rc-44637404427",
+      "previewUrl": "https://ays-orbit-360-lab--gi-i66-rc-44637404427-635rywxe.web.app",
+      "readbackExact": true
+    },
+    "signedPreviewAcceptance": {
+      "runId": 44637887342,
+      "conclusion": "success",
+      "actor": "Carlos Operativo plus Paula Dirección synthetic tests",
+      "actualSelectorsChecked": [
+        "Cliente360 Editar cliente",
+        "CRM v1198 effective Nuevo cliente",
+        "Nueva póliza",
+        "Ops Nuevo negocio"
+      ],
+      "germanVisible": true,
+      "priscilaVisible": true,
+      "serverRosterCount": 8,
+      "opsLeadsTaskCreateUpdateResolveReload": true,
+      "directRenewalHydrationReadOnly": true,
+      "syntheticPaymentApplyReconcileInvoiceReceiptCobroPortfolioReload": true,
+      "syntheticRestorationComplete": true,
+      "realClientChanges": 0,
+      "productionChanges": 0
+    },
+    "releaseHold": {
+      "status": "LATEST_APPROVED_VERSION_PREVIEW_PASS_FOCAL_LIVE_HOLD",
+      "reason": "Actual LIVE source b38 differs from CP accepted 1b65, backend live three-function parity and full runtime persisted UI save for this new source not certified. No exact same artifact LIVE promotion receipt.",
+      "lastPhysicalLiveReadbackRunId": 44630876680,
+      "actualBothLiveOriginsSource": "b38f877f7847c7b6e11506885e42252e84c5eeb6",
+      "actualLiveHostingVersion": "sites/ays-orbit-360-lab/versions/13944f80ba1e0bdf",
+      "canonicalAcceptedLiveSource": "1b65a790530d49fe1d1fb451f02838fd9a713c53",
+      "newCandidatePromoted": false
+    },
+    "requirementsToClose": [
+      "Reconcile physical LIVE b38 and CP accepted 1b65 as separate observed vs accepted releases; preserve historical proofs, no false pointer mutation",
+      "Signed backend exact three-function preview-to-live candidate parity, before/after versions and rollback",
+      "Same immutable 72d artifact exact LIVE promotion, dual origin byte rehash",
+      "Carlos actual Editar CLIENTE save and recarga with approved identity; all affected module × role × viewport proofs; no false claim that real Edson assignment modified",
+      "Preserve prior 33 Cendoso cobros and 110 El Roble receipt+portfolio writes; no repeated apply"
+    ]
   }
 }
