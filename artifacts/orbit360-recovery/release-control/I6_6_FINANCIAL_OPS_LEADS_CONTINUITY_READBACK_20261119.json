@@ -229,9 +229,20 @@
         "CONFLICTING_SOURCE_DATES": 4
       },
       "protectedJobId": 135807230840,
-      "protectedJobLastObservedStatus": "WAITING_GITHUB_ENVIRONMENT_APPROVAL",
-      "liveWritesThisRerunConfirmed": 0,
-      "protectedRunUrl": "https://github.com/paulaosoriof86/orbit360-core/actions/runs/44593852150"
+      "protectedJobLastObservedStatus": "COMPLETED_SUCCESS_2026_11_19",
+      "liveWritesThisRerunConfirmed": 15,
+      "protectedRunUrl": "https://github.com/paulaosoriof86/orbit360-core/actions/runs/44593852150",
+      "readback": {
+        "status": "PROTECTED_REAL_PAYMENT_POSTIMAGE_PASS",
+        "appliedPayments": 15,
+        "alreadyReapplied": 0,
+        "isolatedApplyHolds": 0,
+        "reconciledWrites": 0,
+        "runId": 44593852150,
+        "jobId": 135807230840,
+        "artifactId": 14572347741,
+        "artifactDigest": "sha256:5d9779e87586c2d0d7654583f14948f77dfe5d175e890be4d3b9a91e50d814c8"
+      }
     },
     "liveBrowserUat20261119": {
       "productionUrl": "https://app.aysseguros.com/",
@@ -377,5 +388,97 @@
     "ambiguityTreatment": "Batch all independently proven rows now, isolate only individual ambiguous rows with exact policy/reference/evidence requests; ask Paula for missing issuance documents.",
     "renewalAndManualFunctions": "Manual renewal and payment UI remain operationally urgent; NEVER claim LIVE PASS on Preview-only builds.",
     "approval": "Use existing gravicentra-live-data-writes GitHub protected environment, do not bypass or self-approve."
+  },
+  "continuityAfterSecondInterruption20261119": {
+    "recordType": "EVIDENCE_ONLY_NOT_CONTROL_PLANE_NOT_LIVE_AUTHORIZATION",
+    "activeGate": "I6.6",
+    "lastCompletedWriteReceipt": {
+      "cendosoFirst": {
+        "runId": 44569134138,
+        "appliedCobros": 18
+      },
+      "cendosoSecond": {
+        "runId": 44593852150,
+        "appliedCobros": 15,
+        "protectedJobConclusion": "success"
+      },
+      "cendosoSameDayTotal": 33,
+      "robleNovLatest": {
+        "runId": 44592619323,
+        "sourceRows": 259,
+        "receiptUpdates": 110,
+        "carteraUpdates": 110,
+        "cobrosCreated": 0,
+        "exceptions": 132
+      }
+    },
+    "approvedSourceCorrection": {
+      "problem": "New-policy insurer select silently defaulted to first QA insurer; client-country switch did the same",
+      "correctiveProductCommit": "03356208bed37139e4f11d0a85be53d25a35a74c",
+      "regressionHarnessCommit": "bc32a3b1206251b2952d00708b79daf258e4be20",
+      "synchronizedManifestAndTestCommit": "bc32a3b1206251b2952d00708b79daf258e4be20",
+      "guardRun": 44609165631,
+      "guardResult": "SUCCESS",
+      "sourceRoleQaRun": 44609165607,
+      "sourceRoleQaResult": "SUCCESS",
+      "advisorNotificationsQaRun": 44609165552,
+      "advisorNotificationsQaResult": "SUCCESS"
+    },
+    "preview": {
+      "preparedSourceCommit": "598576605807109dc0139017bfa045956618d76d",
+      "runId": 44609701409,
+      "status": "SUCCESS",
+      "url": "https://ays-orbit-360-lab--gi-i66-rc-44609701409-zv8vzb9e.web.app",
+      "artifactId": 14570638996,
+      "archiveDigest": "sha256:f3cfe4e7d277edee239223ca66191a70eb92e27edefed174b8cb8c403fd5c7e7",
+      "exactPreviewReadback": true,
+      "signedCurrentPreviewWholeOperationalUiWriteMatrix": "NOT_EXECUTED",
+      "currentPreviewFrontendVsBackendEndosoVersionParity": "NOT_FULLY_VERIFIED"
+    },
+    "live": {
+      "lastCertifiedSourceSha": "1b65a790530d49fe1d1fb451f02838fd9a713c53",
+      "buildId": "gi-i66-1b65a790530d-57f234755dc1",
+      "newSourcePromoted": false,
+      "publicationWorkflowRun": 44609701316,
+      "publicationJobDisposition": "SKIPPED_NOT_DEPLOYED",
+      "missingFullLiveUat": [
+        "Direct issued vehicle substitution",
+        "Existing-client opportunity/inspection persisted to canonical Ops and Leads",
+        "Carlos Corado inspection route",
+        "Sergio policy actual saved with real insurer and verified receipts",
+        "Manual renewal full server commit and reload",
+        "Manual payment both surfaces and readback",
+        "Carlos Operativo and Direccion roles, responsive, no console/page/HTTP failures"
+      ]
+    },
+    "make": {
+      "greenApiScenario": {
+        "id": 10196136,
+        "status": "inactive",
+        "trigger": "scheduled/5min",
+        "moduleCount": 1,
+        "connectionHealth": "ok",
+        "leadWriterCount": 0
+      },
+      "adWebhookScenario": {
+        "id": 10195867,
+        "status": "inactive",
+        "moduleCount": 1,
+        "leadWriterCount": 0
+      },
+      "mailScenarioSearchResult": "NO_SCENARIO_FOUND_BY_CORREO_EMAIL_GMAIL_IN_TEAM_1975919",
+      "confirmedLeadsCreatedFromScenarios": 0,
+      "safeToActivateNow": false
+    },
+    "nextWork": [
+      "Signed current exact Preview authenticated synthetic E2E and complete cleanup per affected capability",
+      "Certify backend Preview effective revision and Ops/Leads/Cliente360 history activity flow",
+      "Authorize and implement exact same-artifact promotion to LIVE with rollback and before/after hash readback",
+      "Signed LIVE UI persistence/reload/roles/viewport for all affected operations",
+      "Resolve 132 Roble insurer edition/receipt exceptions and 265 Cendoso isolated cases via insurer source and PDFs, not blind writes",
+      "Finish Make lead writer authenticated idempotent server transport and email pipeline, test end to end before activating"
+    ],
+    "noSilentPass": true,
+    "productSourceChangedAfterPreviousLive": true
   }
 }
