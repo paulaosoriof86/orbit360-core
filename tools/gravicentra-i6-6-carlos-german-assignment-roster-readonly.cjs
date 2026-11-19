@@ -11,7 +11,7 @@ assert.ok(service,'SIGNED_ROSTER_IDENTITY_UNAVAILABLE');
 admin.initializeApp({credential:admin.credential.cert(service),projectId:'ays-orbit-360-lab'});
 const tenant=admin.firestore().collection('tenants').doc(TENANT);
 const norm=x=>String(x||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();
-const ORIGINS=['https://app.aysseguros.com','https://ays-orbit-360-lab--gi-i66-rc-44609701409-zv8vzb9e.web.app'];
+const ORIGINS=['https://app.aysseguros.com','https://ays-orbit-360-lab--gi-i66-rc-44635291863-jq6kji80.web.app'];
 (async()=>{
  const [members,advisors]=await Promise.all([
   tenant.collection('members').limit(180).get(),
@@ -34,6 +34,9 @@ const ORIGINS=['https://app.aysseguros.com','https://ays-orbit-360-lab--gi-i66-r
  });
  assert.equal(german.length,1,'GERMAN_CANONICAL_IDENTITY_NOT_UNIQUE');
  const germanId=german[0].id;
+ const priscila=advisors.docs.filter(d=>[d.data().nombre,d.data().displayName,d.data().name,d.data().nombreCompleto].some(v=>norm(v).includes('priscila')));
+ assert.equal(priscila.length,1,'PRISCILA_CANONICAL_IDENTITY_NOT_UNIQUE');
+ const priscilaId=priscila[0].id;
  const account=await admin.auth().getUser(carlos[0].id);
  assert.ok(!account.disabled&&account.emailVerified,'CARLOS_AUTH_ACCOUNT_NOT_READY');
  const token=await admin.auth().createCustomToken(carlos[0].id);
@@ -45,7 +48,7 @@ const ORIGINS=['https://app.aysseguros.com','https://ays-orbit-360-lab--gi-i66-r
     const page=await context.newPage();
     await page.goto(origin+'/#/ops',{waitUntil:'commit',timeout:30000});
     await page.waitForFunction(()=>!!window.Orbit?.productRuntimeBrowserProvidersP0&&!!window.Orbit?.productAppP0,null,{timeout:30000});
-    const result=await page.evaluate(async ({token,germanId})=>{
+    const result=await page.evaluate(async ({token,germanId,priscilaId,newPreview})=>{
      const provider=Orbit.productRuntimeBrowserProvidersP0;
      const client=await provider.initialize();
      await client.modules.auth.setPersistence(client.auth,client.modules.auth.browserSessionPersistence);
@@ -57,13 +60,14 @@ const ORIGINS=['https://app.aysseguros.com','https://ays-orbit-360-lab--gi-i66-r
      let rows=[],error='';
      try{rows=await roster.list('GT',{force:true});}
      catch(e){error=String(e.code||e.message||e).slice(0,180);}
-     let modalVisible=false,optionCount=0,optionGerman=false,selectDisabled=true,modalError='';
+     let modalVisible=false,optionCount=0,optionGerman=false,optionPriscila=false,selectDisabled=true,modalError='';
      try{
       await Orbit.ciclo.nuevoNegocio({pais:'GT'});
       const select=document.getElementById('nn-ase');
       modalVisible=!!select;
       optionCount=select?.options?.length||0;
       optionGerman=!!select&&[...select.options].some(o=>o.value===germanId);
+       optionPriscila=!!select&&[...select.options].some(o=>o.value===priscilaId);
       selectDisabled=!!select?.disabled;
      }catch(e){modalError=String(e.code||e.message||e).slice(0,180);}
      document.querySelectorAll('#ciclo-modal').forEach(n=>n.remove());
@@ -71,10 +75,11 @@ const ORIGINS=['https://app.aysseguros.com','https://ays-orbit-360-lab--gi-i66-r
      // not only a prospect from Ops. A PASS for Ops must not certify this other
      // selector. Exercise the exact effective modal without saving anything.
      let policyClientReady=false,policyModalVisible=false,policyGerman=false;
-     let policyOptionCount=0,policyDisabled=true,policyModalError='';
+     let policyOptionCount=0,policyDisabled=true,policyPriscila=false,policyModalError='';
+      let gtClient=null;
      try{
        const scoped=(Orbit.store?.all?.('clientes')||[]);
-       const gtClient=scoped.find(c=>c?.id&&String(c.pais||'').toUpperCase()==='GT'&&!c.archivado);
+       gtClient=scoped.find(c=>c?.id&&String(c.pais||'').toUpperCase()==='GT'&&!c.archivado);
        policyClientReady=!!gtClient;
        if(gtClient){
          await Orbit.modules.cliente360.nuevaPoliza(gtClient.id);
@@ -87,26 +92,60 @@ const ORIGINS=['https://app.aysseguros.com','https://ays-orbit-360-lab--gi-i66-r
          policyModalVisible=!!picker;
          policyOptionCount=picker?.options?.length||0;
          policyGerman=!!picker&&[...picker.options].some(o=>o.value===germanId);
+          policyPriscila=!!picker&&[...picker.options].some(o=>o.value===priscilaId);
          policyDisabled=picker?.disabled!==false;
        }
      }catch(e){policyModalError=String(e.code||e.message||e).slice(0,180);}
      document.querySelectorAll('#policy-v1199').forEach(n=>n.remove());
+      // Actual incident reported by Carlos: edit existing client, not only Ops/policy.
+      // No form submissions here. Verify source-backed selector state for both people.
+      let editVisible=false,editGerman=false,editPriscila=false,editReady=false,editError='';
+      let createVisible=false,createGerman=false,createPriscila=false,createReady=false,createError='';
+      if(newPreview&&gtClient){
+        const waitRoster=async selector=>{
+          for(let n=0;n<55;n++){
+            const el=document.querySelector(selector);
+            if(!el||el.dataset.rosterState==='ready'||el.dataset.rosterState==='blocked')return el;
+            await new Promise(resolve=>setTimeout(resolve,160));
+          }
+          return document.querySelector(selector);
+        };
+        try{
+          Orbit.modules.cliente360.edit(gtClient.id);
+          const node=await waitRoster('#ce-ase');
+          editVisible=!!node;editReady=node?.dataset.rosterState==='ready'&&node.disabled===false;
+          editGerman=!!node&&[...node.options].some(o=>o.value===germanId);
+          editPriscila=!!node&&[...node.options].some(o=>o.value===priscilaId);
+        }catch(error){editError=String(error.code||error.message||error).slice(0,160);}
+        document.querySelectorAll('#c360-edit').forEach(n=>n.remove());
+        try{
+          Orbit.modules.cliente360.nuevoCliente();
+          const node=await waitRoster('#nc-ase');
+          createVisible=!!node;createReady=node?.dataset.rosterState==='ready'&&node.disabled===false;
+          createGerman=!!node&&[...node.options].some(o=>o.value===germanId);
+          createPriscila=!!node&&[...node.options].some(o=>o.value===priscilaId);
+        }catch(error){createError=String(error.code||error.message||error).slice(0,160);}
+        document.querySelectorAll('#cli-nuevo').forEach(n=>n.remove());
+      }
      return {
        started:activated?.started===true,
        role,preview:provider.isI66PreviewHost(),
        callable:roster?.status?.().functionName,region:roster?.status?.().region,
        beforeCount:before.length,serverCount:rows.length,serverGerman:rows.some(r=>r.id===germanId),
-       callError:error,modalVisible,optionCount,optionGerman,selectDisabled,modalError,
-       policyClientReady,policyModalVisible,policyOptionCount,policyGerman,policyDisabled,policyModalError
+       callError:error,modalVisible,optionCount,optionGerman,optionPriscila,selectDisabled,modalError,
+       policyClientReady,policyModalVisible,policyOptionCount,policyGerman,policyPriscila,policyDisabled,policyModalError,
+       editVisible,editGerman,editPriscila,editReady,editError,createVisible,createGerman,createPriscila,createReady,createError
      };
-    },{token,germanId});
+    },{token,germanId,priscilaId,newPreview:origin.includes('--gi-i66-rc-44635291863-')});
     console.log('I66_CARLOS_GERMAN_SIGNED_ROSTER_READONLY '+JSON.stringify({origin:origin.includes('--')?'preview':'live',...result}));
     assert.equal(norm(result.role),'operativo','CARLOS_ACTIVE_ROLE_NOT_OPERATIVO');
-    if(!result.started||result.callError||!result.serverGerman||!result.optionGerman||!result.policyClientReady||!result.policyModalVisible||!result.policyGerman||result.policyDisabled||result.policyModalError)
-      throw Error('I66_CARLOS_GERMAN_REAL_OPS_AND_NEW_POLICY_SELECTOR_NOT_READY_'+(origin.includes('--')?'PREVIEW':'LIVE'));
+    if(!result.started||result.callError||!result.serverGerman||!result.optionGerman||!result.optionPriscila||!result.policyClientReady||!result.policyModalVisible||!result.policyGerman||!result.policyPriscila||result.policyDisabled||result.policyModalError)
+      throw Error('I66_CARLOS_GERMAN_PRISCILA_OPS_AND_POLICY_SELECTOR_NOT_READY_'+(origin.includes('--')?'PREVIEW':'LIVE'));
+     if(origin.includes('--gi-i66-rc-44635291863-')&&(!result.editVisible||!result.editReady||!result.editGerman||!result.editPriscila||result.editError||!result.createVisible||!result.createReady||!result.createGerman||!result.createPriscila||result.createError))
+       throw Error('I66_CARLOS_EDIT_AND_NEW_CLIENT_SIGNED_TEAM_ROSTER_NOT_READY_PREVIEW');
    }finally{await context.close();}
   }
  }finally{await browser.close();}
- console.log('I66_CARLOS_GERMAN_LIVE_AND_PREVIEW_ASSIGNABLE_UI_PASS noDataWrites=true');
+ console.log('I66_CARLOS_GERMAN_PRISCILA_OPS_POLICY_EDIT_NEW_SIGNED_PREVIEW_PASS noDataWrites=true noLiveWrite=true');
 })().catch(e=>{console.error('I66_CARLOS_GERMAN_SIGNED_HOLD '+String(e.message||e).slice(0,210));process.exitCode=1;})
  .finally(()=>admin.app().delete());
