@@ -90,7 +90,8 @@ jobs:
           assert.equal(p.sourceQaRunId,Number(process.env.EMULATOR_QA_RUN));
           assert.equal(p.sourceQaHead,process.env.QA_SOURCE_HEAD);
           assert.equal(p.previewHostingChannelOnly,true);
-          assert.equal(p.liveDeploy,false);
+          assert.equal(p.noLiveHosting,true);
+          assert.equal(p.noLiveBackend,true);
           assert.equal(p.backendLiveDeploy,false);
           assert.equal(p.realOperationalDataWrites,false);
           console.log('I66_CURRENT_ONE_OPS_LEADS_PREVIEW_ONLY_LIVE_LOCKED_PASS');
