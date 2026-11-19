@@ -2919,6 +2919,30 @@
           }
         }
       ]
+    },
+    {
+      "id": "I6_6_INSURER_EDITABLE_PRODUCT_COMMISSION_OWNER_20261119",
+      "approvedByDirection": true,
+      "receipt": "Paula owner instruction 2026-11-19: insurer fiche must hold editable product commissions, vehicle 15 percent, medical 10 percent, personal accident 25 percent defaults as insurer data and not hardcoded; preserve unresolved existing-rate replacement question.",
+      "sourceStatus": "LOCAL_3_OF_3_VM_SOURCE_TESTS_PASS_PREVIEW_LIVE_NOT_YET_CERTIFIED",
+      "scope": "Expose existing comisionesProd in insurer fiche, distinguish explicit product rate from inherited ramo rate, validate range 0-100, persist through durable auditable existing insurer patch. Does not backfill any live insurer rate before resolving existing-rate overwrite policy.",
+      "paths": [
+        {
+          "path": "orbit360-platform/modules/aseguradoras.js",
+          "gitBlobSha": "94673da5f3a06d6ddeefb2d2706cc665417d4793",
+          "replaces": {
+            "path": "orbit360-platform/modules/aseguradoras.js",
+            "priorGitBlobSha": "f224e3a4ff3b5e53be0988adbe915fcefbfafdc1",
+            "priorChangeId": "I6_6_INSURER_VAULT_REFERENCE_UI_INTEGRITY_P0"
+          }
+        }
+      ],
+      "tests": [
+        {
+          "path": "tools/gravicentra-i6-6-insurer-product-commission.test.cjs",
+          "gitBlobSha": "28d85abd3904a9a73fb8eee63e06a7468e22fe4b"
+        }
+      ]
     }
   ],
   "i66R11PreviewBuildRequest20261113": {

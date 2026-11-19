@@ -1,4 +1,5 @@
 'use strict';
+// Exact I6.6 successor test pinned by the approved product delta manifest.
 const test=require('node:test');
 const assert=require('node:assert/strict');
 const fs=require('node:fs');
