@@ -19,13 +19,13 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 25
     env:
-      I66_SOURCE_SHA: 8a0e904500cbb3c961d83f16517caab69df88a2b
-      I66_APPROVED_LIVE_SOURCE_SHA: 8a0e904500cbb3c961d83f16517caab69df88a2b
-      I66_ROLE_HOSTING_LIVE_RUN: '43451818931'
+      I66_SOURCE_SHA: 72d3580f3e90071b360319ce5f204d348b401663
+      I66_APPROVED_LIVE_SOURCE_SHA: 72d3580f3e90071b360319ce5f204d348b401663
+      I66_ROLE_HOSTING_LIVE_RUN: '44641361059'
       I66_LIVE_ORIGIN: https://app.aysseguros.com
-      I66_OPS_HOSTING_LIVE_RUN: '43309935816'
-      I66_PAYMENT_LIVE_RUN: '43307238568'
-      I66_OPS_SIGNED_LIVE_UAT_RUN: '43310610618'
+      I66_OPS_HOSTING_LIVE_RUN: '44637887342'
+      I66_PAYMENT_LIVE_RUN: '44637404427'
+      I66_OPS_SIGNED_LIVE_UAT_RUN: '44637061466'
       SA_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
       SA_ALT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
       SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
@@ -38,7 +38,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Verify unchanged exact product, prior LIVE payment, Ops, and synthetic UAT proof
+      - name: Verify exact latest LIVE artifact, Carlos Preview and reusable synthetic UAT proof
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -61,9 +61,9 @@ jobs:
               const x=await fetch(origin+'/__recovery__/build.json',{headers:{'cache-control':'no-cache'}});
               assert.ok(x.ok,'I66_LIVE_BUILD_MARKER_UNAVAILABLE');const m=await x.json();
               assert.equal(m.sourceSha,process.env.I66_SOURCE_SHA,'I66_LIVE_SOURCE_CHANGED');
-              assert.equal(m.buildId,'gi-i66-8a0e904500cb-57f234755dc1');
+              assert.equal(m.buildId,'gi-i66-72d3580f3e90-57f234755dc1');
             }
-            console.log('I66_LIVE_PAYMENT_RENEWABILITY_SIGNED_UAT_PRECONDITIONS_PASS');
+            console.log('I66_LIVE_72D_FRONTEND_EXACT_SYNTHETIC_PAYMENT_RENEWABILITY_PRECONDITIONS_PASS');
           })().catch(e=>{console.error(e.message);process.exitCode=1;});
           NODE
       - name: Install isolated browser and Firebase signed UAT dependencies
