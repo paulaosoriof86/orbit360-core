@@ -146,9 +146,16 @@ test('before-after: exact documentary schedule survives atomic policy/receipt/po
 test('before-after: blank new form does not invent credit card or CAT', async () => {
   const h = harness(), { field } = await h.newForm(); assert.equal(field('payment-form').value,''); assert.equal(field('conduct').value,''); assert.equal(h.batches.length,0);
 });
+test('new form refuses a payment or issuance write without a user-selected real insurer', async () => {
+  const h=harness(), {field}=await h.newForm();
+  await field('save').fire('click');
+  assert.equal(h.batches.length,0,'No server write before insurer selection');
+  assert.match(field('error').textContent,/Selecciona la aseguradora real del documento/);
+});
+
 test('before-after: actual new form commits documented charge and contractual date through the canonical owner', async () => {
   const h = harness(), { field } = await h.newForm();
-  for (const [key,value] of Object.entries({ number:'QA-FORM-POLICY', product:'AUTO', start:'2026-10-20', end:'2027-10-20', net:'630', issue:'41.50', other:'200', surcharge:'0', nonvat:'2.70', 'nonvat-concept':'Bomberos', 'nonvat-ref':'qa-issued-document', 'documented-calendar':'1 | 2026-11-06 | qa-issued-document', 'commission-insurer':'10', 'commission-seller':'60' })) { assert.ok(field(key),key); field(key).value=value; }
+  for (const [key,value] of Object.entries({ insurer:'qa_insurer', number:'QA-FORM-POLICY', product:'AUTO', start:'2026-10-20', end:'2027-10-20', net:'630', issue:'41.50', other:'200', surcharge:'0', nonvat:'2.70', 'nonvat-concept':'Bomberos', 'nonvat-ref':'qa-issued-document', 'documented-calendar':'1 | 2026-11-06 | qa-issued-document', 'commission-insurer':'10', 'commission-seller':'60' })) { assert.ok(field(key),key); field(key).value=value; }
   await field('documented-calendar').fire('input'); assert.match(field('preview').innerHTML,/978\.78/); assert.match(field('preview').innerHTML,/2026-11-06/);
   await field('save').fire('click'); assert.equal(h.batches.length,1,field('error').textContent); assert.equal(h.rows.polizas[0].primaTotal,978.78); assert.equal(h.rows.recibosEsperados[0].fechaVencimientoContractual,'2026-11-06');
 });

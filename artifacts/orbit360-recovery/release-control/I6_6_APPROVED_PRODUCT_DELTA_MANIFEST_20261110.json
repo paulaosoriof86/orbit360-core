@@ -3255,7 +3255,7 @@
       "id": "I6_6_POLICY_INSURER_EXPLICIT_SELECTION_ROOTFIX_20261119",
       "approvedByDirection": true,
       "receipt": "Paula 2026-11-19 I6.6 same-gate no-loss immediate correction and publication request; LIVE Sergio policy form previously selected PRUEBA PREVIEW QA by default; user requires real insurer selection and cross-client safe operation. Audit checkpoint: I6_6_FINANCIAL_OPS_LEADS_CONTINUITY_READBACK_20261119.json. No production mutation authorized by this source-only commit.",
-      "sourceStatus": "ATOMIC_SOURCE_TEST_MANIFEST_ALIGNED_GUARD_AND_NEW_PREVIEW_REQUIRED_NO_LIVE_CLAIM",
+      "sourceStatus": "SOURCE_TEST_MANIFEST_HISTORY_RECONCILED_GOVERNANCE_AND_PREVIEW_NOT_YET_PASS",
       "capabilityOwners": [
         "POLIZAS_PRIMARY_RUNTIME",
         "CLIENTE360_PRIMARY_RUNTIME"
@@ -3280,6 +3280,24 @@
             "path": "tools/gravicentra-i6-6-manual-policy-capture-p0.test.cjs",
             "priorGitBlobSha": "4ab2af161c600381d9af6023ab1242fcac235c9f",
             "priorChangeId": "I6_6_INSURER_SELF_ADMINISTERED_FINANCIAL_RULES_OWNER_20261119"
+          }
+        },
+        {
+          "path": "tools/gravicentra-i6-6-documented-premium-terms.test.cjs",
+          "gitBlobSha": "c9fb6f8e27df6a029195da3f0739655ef537b04c",
+          "replaces": {
+            "path": "tools/gravicentra-i6-6-documented-premium-terms.test.cjs",
+            "priorGitBlobSha": "b413bb380c2361f3607bcf841147c5e340393a90",
+            "priorChangeId": "I6_6_DOCUMENTED_NON_TAXED_CHARGE_AND_CONTRACTUAL_RECEIPT_CALENDAR_20261117"
+          }
+        },
+        {
+          "path": "tools/gravicentra-i6-6-source-lineage-preview-transport.test.cjs",
+          "gitBlobSha": "c0849015e58931bd23a97d9a33bbdd82c5e8b2fb",
+          "replaces": {
+            "path": "tools/gravicentra-i6-6-source-lineage-preview-transport.test.cjs",
+            "priorGitBlobSha": "c8d6e597dbe1140999b15d4235241ca348337ca7",
+            "priorChangeId": "I6_6_OPS_ATOMIC_CLIENT360_ACTIVITY_DIRECT_ISSUED_VEHICLE_SUBSTITUTION_20261119"
           }
         }
       ]

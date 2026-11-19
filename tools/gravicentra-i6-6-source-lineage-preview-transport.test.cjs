@@ -22,8 +22,8 @@ assert.equal(priorVehicle.approvedManifestBlobSha,'fe54971b8749f5ab1d6a0947189d6
   'prior vehicle package manifest remains immutable');
 const next=transport.postAcceptanceOwnerOpsActivityEndosoPreviewBuildRequest20261119;
 if(next){
-  assert.equal(next.approvedManifestBlobSha,
-    sha('artifacts/orbit360-recovery/release-control/I6_6_APPROVED_PRODUCT_DELTA_MANIFEST_20261110.json'));
+  assert.equal(next.approvedManifestBlobSha,'af500e14c012d8cf0bfc75b4d73e711ca2cf88c9',
+    'historical Ops/endoso Preview request must retain its exact approved manifest blob');
   assert.equal(next.authorizedBranch,request.authorizedBranch);
   assert.equal(next.previousLiveSourceSha,request.previousLiveSourceSha);
   assert.equal(next.previousLiveArtifactDigest,request.previousLiveArtifactDigest);
