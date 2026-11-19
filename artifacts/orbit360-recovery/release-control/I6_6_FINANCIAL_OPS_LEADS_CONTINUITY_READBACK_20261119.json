@@ -161,14 +161,83 @@
       "existingFirestoreConnectionInMake": false,
       "confirmedLeadWrites": 0,
       "emailScenarioFound": false
+    },
+    "sourceBulkOctoberReadback": {
+      "runId": 44587206592,
+      "status": "PROTECTED_LIVE_READBACK_PASS",
+      "policy": "91-169567",
+      "insurerRequirement": "5485467",
+      "sourceGrossCents": 28808,
+      "receiptWrites": 1,
+      "portfolioWrites": 1,
+      "cobroWrites": 0,
+      "applied": 1
+    },
+    "nov20InsurerSource": {
+      "manifest": "artifacts/orbit360-recovery/source-batches/I6_6_SOURCE_BULK_20261119_ROBLE_NOV20_259.json",
+      "sourceFile": "Estado de Cuenta El Roble a noviembre 20.XLS",
+      "reportFileDateLabel": "2026-11-20",
+      "note": "Source filename date exceeds current Guatemala date; actual file ingested with raw digest, no inferred payment from absence.",
+      "rawSha256": "7062738cdf1c008ebff85247f8b0723ab4d8f36e43bb69d386d5dfcb59d219ef",
+      "sourceRows": 259,
+      "preflightRunId": 44592619323,
+      "preflightStatus": "PASS_ZERO_WRITES",
+      "readyCount": 110,
+      "unchangedCount": 17,
+      "exceptionsCount": 132,
+      "exceptionCodes": {
+        "POLICY_EDITION_MISSING": 113,
+        "RECEIPT_NOT_IDENTIFIED": 19
+      },
+      "protectedJobId": 135802582833,
+      "protectedJobLastObservedStatus": "WAITING_GITHUB_ENVIRONMENT_APPROVAL",
+      "liveWritesThisBatchConfirmed": 0,
+      "sourceCorrectionsInclude": [
+        "Due date / amount by exact insurer requirement; latest insurer source prevails over stale SIGA/Firestore."
+      ],
+      "protectedRunUrl": "https://github.com/paulaosoriof86/orbit360-core/actions/runs/44592619323"
+    },
+    "cendosoPaidRerun": {
+      "codeCommit": "e74dc482d39372b308d73ac1d77504170cd0f1f2",
+      "triggerCommit": "c961832fba12cf446e26b500db7d5e4c38523ab8",
+      "preflightRunId": 44593852150,
+      "preflightResult": "PASS_ZERO_WRITES",
+      "sourceCount": 607,
+      "readyForProtectedPayment": 15,
+      "alreadyPaidPreserve": 327,
+      "otherHolds": 265,
+      "holdCounts": {
+        "SOURCE_CURRENCY_NOT_GTQ": 29,
+        "EXACT_POLICY_EDITION_NOT_FOUND": 12,
+        "ALREADY_PAID_WITH_COBRO_PRESERVE": 327,
+        "POLICY_NUMBER_NOT_FOUND": 32,
+        "NET_PREMIUM_CHANGED_REQUIRES_COMMISSION_RECOMPUTE": 8,
+        "RECEIPT_PERIOD_OR_DUE_NOT_FOUND": 177,
+        "MULTIPLE_POLICY_EDITIONS": 1,
+        "MULTIPLE_RECEIPTS_FOR_PERIOD_OR_AMOUNT": 2,
+        "CONFLICTING_SOURCE_DATES": 4
+      },
+      "protectedJobId": 135807230840,
+      "protectedJobLastObservedStatus": "WAITING_GITHUB_ENVIRONMENT_APPROVAL",
+      "liveWritesThisRerunConfirmed": 0,
+      "protectedRunUrl": "https://github.com/paulaosoriof86/orbit360-core/actions/runs/44593852150"
     }
   },
   "nextGates": [
-    "Protected reviewer approval for one source-backed El Roble pending receipt-and-cartera correction, followed by postimage readback; no claim until applied.",
-    "Materialize source-document-backed 2026/27 policy editions and receipt schedules using current approved owner/contracts and controls; repeat bounded financial preflight, isolate missing issuance evidence.",
-    "Repair and certify current owner-approved frontend Preview and signed role and route UAT, then exact immutable artifact promotion and LIVE readback, never allow an old-preview-only transport lock to authorize deploy.",
-    "Implement deduplicated lead creator only through an authenticated approved backend or existing authorized Firestore connection; then test Make message-to-lead and email separately.",
-    "Track 295 historical finding identities with scoped current evidence; do not silently declare resolved."
+    "Paula review environment approvals in the Nov20 110-ready source-bulk run and 15-ready historical paid Cobros run; then verify Firestore physical after/before receipts. NEVER call pending job applied.",
+    "Reconcile 113 pending El Roble 2026/27 missing editions from insurer PDFs with exact currency/term before creating receipts.",
+    "Resolve 177 legacy receipt identity gaps with source-backed unique policy/period/ordinal, preserve all 327 preexisting paid rows and their Cobros.",
+    "Bring current manual renewal, manual Cobros, Client360 linked opportunity and both vehicle substitution routes through per-module latest Preview PASS, same artifact LIVE promotion, and postproduction role/UI/readback; no unauthorized PASS.",
+    "Implement authenticated deduplicated Green API Make-to-Firestore lead ingestion and email only with verified writer identity, then prove real lead writes.",
+    "Checkpoint future work against CONTROL_PLANE and this subordinate additive evidence file; keep all audited source manifests and GitHub run IDs."
   ],
-  "noProductionPassClaimWithoutPhysicalEvidence": true
+  "noProductionPassClaimWithoutPhysicalEvidence": true,
+  "ownerClarifications20261119": {
+    "sourceTruthPrecedence": "Insurer statement and commission planilla supersede stale manually entered Firestore/SIGA fields for insurer requirement, receipt period, contractual due, verified paid date and amount; never infer payment from an absence or from unverified date.",
+    "historicalCoverage": "Current canceled or expired policy state alone must never suppress an insurer-proven payment for a uniquely identified historical issued edition; posting payment does not reactivate coverage.",
+    "currencyByInsurerCountry": "Insurer-country correct currency wins, validate actual insurer country and currency per policy; do not silently convert COP to GTQ or guess exchange rates.",
+    "ambiguityTreatment": "Batch all independently proven rows now, isolate only individual ambiguous rows with exact policy/reference/evidence requests; ask Paula for missing issuance documents.",
+    "renewalAndManualFunctions": "Manual renewal and payment UI remain operationally urgent; NEVER claim LIVE PASS on Preview-only builds.",
+    "approval": "Use existing gravicentra-live-data-writes GitHub protected environment, do not bypass or self-approve."
+  }
 }
