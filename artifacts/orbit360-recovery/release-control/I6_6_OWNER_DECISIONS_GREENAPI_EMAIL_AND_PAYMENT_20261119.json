@@ -1,7 +1,7 @@
 {
-  "schema": "GRAVICENTRA_I6_6_FROZEN_OWNER_DECISIONS_20261119_V1",
+  "schema": "GRAVICENTRA_I6_6_FROZEN_OWNER_DECISIONS_20261119_V3",
   "dateGuatemala": "2026-11-19",
-  "status": "FROZEN_DIRECTION_DECISIONS_AND_OPEN_EVIDENCE_GATES",
+  "status": "FROZEN_DIRECTION_DECISIONS_AND_PENDING_LIVE_WRITE_AND_DELIVERY_CERTIFICATION",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
   "inheritsFrozenPlanRatherThanStartingAnotherIteration": true,
@@ -58,7 +58,10 @@
     "status": "PROVIDER_IDENTIFIED_INTEGRATION_STILL_NOT_IMPLEMENTED_OR_CERTIFIED",
     "providerHosting": "HostDime/cPanel hosted mailboxes, one mailbox per employee",
     "outlookIsDesktopClientNotMicrosoft365": "Outlook is locally configured mail client only; do not assume native Microsoft Exchange or Microsoft 365 OAuth",
-    "integrationDesign": "Use per-user securely stored, provider-approved IMAP read and authenticated SMTP send with verified HostDime Connect Devices settings; no credentials in chat, client storage or Make scenario plaintext."
+    "integrationDesign": "Use per-user securely stored, provider-approved IMAP read and authenticated SMTP send with verified HostDime Connect Devices settings; no credentials in chat, client storage or Make scenario plaintext.",
+    "ownerPilot": "finanzasyadmin@aysseguros.com",
+    "secureIMAP": "correo.aysseguros.com:993 TLS",
+    "secureSMTP": "correo.aysseguros.com:465 TLS"
   },
   "releasedPolicyAndPremiumCandidate": {
     "sourceSha": "b38f877f7847c7b6e11506885e42252e84c5eeb6",
@@ -88,22 +91,25 @@
       "dateRealPaidSourceRows": 1820,
       "distinctCandidateKeysAfterCrossFileDeduplication": 607,
       "businessMeaning": "Legacy system displays Fecha Real Pagado; not automatically equivalent to independent bank/insurer settlement proof.",
-      "ownerQuestion": "May exact unique receipt/policy/gross/date matches with a legacy Fecha Real Pagado be applied as Cobros, or is independent insurer/bank proof mandatory?",
-      "status": "CANDIDATE_SOURCE_REVIEW_ONLY_ZERO_NEW_PAYMENT_POSTINGS"
+      "ownerQuestion": "RESOLVED_BY_PAULA_20261119_LEGACY_ALLOWED_FOR_CONFIRMED_UNRECONCILED_COBRO_WITH_EXACT_MATCH",
+      "status": "603_SOURCE_UNIQUE_CANDIDATES_AWAIT_CANONICAL_RECEIPT_MATCH_AND_PROTECTED_LIVE_WRITE_4_SOURCE_DATE_CONFLICTS_HELD",
+      "sourcePacketCommit": "aed3ddb4646327e20e08213f3af0d78c69f60fd9"
     },
-    "missingFive2026_2027RenewalNumbers": [
+    "missingFive2026_2027RenewalNumbers": [],
+    "matchedFourRenewalEvidenceNumbers": [
+      "91-4140843",
+      "91-8322304",
+      "91-8322914",
+      "91-8323091"
+    ],
+    "receivedFiveRenewalNumbers": [
       "91-4143471",
       "91-8324489",
       "91-8342189",
       "91-8343059",
       "91-8357452"
     ],
-    "matchedFourRenewalEvidenceNumbers": [
-      "91-4140843",
-      "91-8322304",
-      "91-8322914",
-      "91-8323091"
-    ]
+    "nineDocumentaryRenewalsAvailable": true
   },
   "knownOpenFronts": [
     "Paid Cobro source proof and protected write/readback/rollback route",
@@ -118,7 +124,7 @@
     "Client360-linked direct inspection opportunity without duplicate client/legacy policy linkage"
   ],
   "noInventedPass": true,
-  "revision": 2,
+  "revision": 3,
   "leadsCadenceAndTemplates": {
     "status": "OPEN_CAUSAL_PRODUCT_FINDING_NOT_CERTIFIED",
     "currentFrontend": "core/ciclo.js hardcodes D1/D3/D7/D14; automatic internal tasks activate on Propuesta, not user-selectable per newly created lead",
@@ -126,7 +132,8 @@
     "ownerRequested": "Tenant-configurable cadence and per-lead selection at intake; explicit task/channel/stop/delivery semantics, persisted and signed multi-role tested",
     "templates": "modules/plantillas.js uses six reference seed templates, production editing gated by missing server persistence owner",
     "automationUI": "modules/automatizaciones.js records configurable local prefs and prepared logs; real provider delivery not proven",
-    "deliveryRule": "Never mark a reminder or prepared webhook as sent or delivered without real provider receipt"
+    "deliveryRule": "Never mark a reminder or prepared webhook as sent or delivered without real provider receipt",
+    "ownerDecision": "START_AT_CREATION_TENANT_ADMINISTRABLE_PER_LEAD_PERSISTED_DELIVERY"
   },
   "inspectionWorkflow": {
     "status": "CURRENT_LINKAGE_GAP_PROVEN_NO_CLAIM_OF_UNIFIED_ENTRY",
@@ -137,12 +144,89 @@
       "orbit360-platform/core/ciclo.js",
       "orbit360-platform/modules/cliente360.js",
       "functions/product-ops-leads-domain.js"
-    ]
+    ],
+    "ownerConfirmed": "EXISTING_CLIENT_CAN_HAVE_NEW_COMMERCIAL_OPPORTUNITY_LINKED_FROM_CLIENT360_VISIBLE_IN_LEADS_WITH_OPS_INSPECTION"
   },
   "governanceReadback20261119": {
     "latestControlPlaneGuardRunId": 44541626874,
     "result": "PASS",
     "restoredPriorCanonicalStateBlobExact": "e62f769f59924ec75c797ba6e9de1395bc2905f0",
     "noProductOrProductionWritesForThisDecisionUpdate": true
+  },
+  "ownerDecisions20261119": {
+    "legacyRealPaidEvidence": "APPROVED_FOR_CONFIRMED_UNRECONCILED_COBRO_WHEN_UNIQUE_POLICY_EDITION_EXPECTED_RECEIPT_GROSS_AMOUNT_AND_PAID_DATE_MATCH_WITH_IDEMPOTENCY_NO_AUTOMATIC_RECONCILIATION",
+    "cadenceStart": "LEAD_CREATION",
+    "cadenceAdministration": "TENANT_EDITABLE_DEFAULTS_AND_PER_LEAD_CHOICE_PLUS_EDITABLE_TEMPLATES_REAL_PROVIDER_SEND_AND_RECEIPT_TEST_REQUIRED",
+    "perUserHostDimePilot": "finanzasyadmin@aysseguros.com",
+    "hostdimeInbound": {
+      "host": "correo.aysseguros.com",
+      "protocol": "IMAPS",
+      "port": 993,
+      "tls": true
+    },
+    "hostdimeOutbound": {
+      "host": "correo.aysseguros.com",
+      "protocol": "SMTPS",
+      "port": 465,
+      "tls": true
+    },
+    "hostdimeCredentials": "ONLY_SECURE_PROVIDER_AUTHORIZATION_NO_CHAT_NO_PUBLIC_CODE",
+    "renewalsFiveFilesReceived": true,
+    "renewalsFive": [
+      {
+        "policy": "91-4143471",
+        "file": "914143471368727.pdf",
+        "start": "2026-09-21",
+        "end": "2027-09-21"
+      },
+      {
+        "policy": "91-8324489",
+        "file": "918324489384442.pdf",
+        "start": "2026-11-16",
+        "end": "2027-11-16"
+      },
+      {
+        "policy": "91-8342189",
+        "file": "918342189384443.pdf",
+        "start": "2026-11-12",
+        "end": "2027-11-12"
+      },
+      {
+        "policy": "91-8343059",
+        "file": "918343059384576.pdf",
+        "start": "2026-11-27",
+        "end": "2027-11-27"
+      },
+      {
+        "policy": "91-8357452",
+        "file": "918357452359402.pdf",
+        "start": "2026-10-27",
+        "end": "2027-10-27"
+      }
+    ],
+    "renewalPaymentInference": "IF_RENEWAL_PAYMENT_IS_INDEPENDENTLY_ESTABLISHED_PREVIOUS_TERM_RECEIPTS_ARE_CONSIDERED_PAID_BY_OWNER_AUTHORIZED_INFERENCE_WITH_ORIGIN_AUDIT_NO_FABRICATED_SETTLEMENT_DATE_OR_BANK_RECEIPT",
+    "renewalKanbanInvariant": "COLUMNS_EXPIRED_0_15_16_45_46_90; EXPIRED_WITHOUT_SUCCESSOR_REMAINS_EXPIRED; VERIFIED_RENEWED_EDITION_LINKED_AND_PREVIOUS_NOT_EXECUTABLE; KEEP_REVIEW_TRAIL; POLICY_STATUS_EXPIRY_KPI_CONSISTENT",
+    "newClient360Opportunities": "EXISTING_CLIENT_NEW_BUSINESS_CREATES_OPPORTUNITY_LINKED_TO_EXISTING_CLIENT_VISIBLE_IN_LEADS_AND_OPS_INSPECCIONES_WITHOUT_DUPLICATE_CLIENT",
+    "sergioCase": "SAVE_REAL_POLICY_IN_CLIENT360_WITH_VEHICLE_AND_RECEIPTS_AND_ACTIVE_MODIFICATION_OPS_GESTION; NEVER_CLAIM_CREATED_UNTIL_SIGNED_READBACK",
+    "opsNotification": "SEND_CONTEXT_PERMISSIONS_BASED_WHATSAPP_AND_PER_USER_EMAIL_WITH_REAL_DELIVERY_RECORDS_THREADED_TEMPLATES_AND_NO_FALSE_SENT",
+    "leadAdsScenario": "AY_S_GREEN_API_CONNECTION_14749710_ONLY; MUST_BUILD_FINAL_IDEMPOTENT_AD_ATTRIBUTED_WEBHOOK_TO_CANONICAL_LEAD_WRITE; EXISTING_TEST_SKELETON_NOT_PRODUCTION_COMPLETE",
+    "releasePlan": "ACTIVE_I6_6_ISSUES_RESOLVED_PROVEN_IN_SAME_GATE_SOURCE_QA_PREVIEW_EXACT_LIVE_READBACK_NO_ACCUMULATION"
+  },
+  "renewalFindingsRecoveredFromPriorConversation": {
+    "historicalDate": "2026-10-15",
+    "kanbanColumns": [
+      "Vencidas",
+      "0–15",
+      "16–45",
+      "46–90"
+    ],
+    "findings": [
+      "expired_no_verified_successor_must_remain_in_expired",
+      "effective_renewals_must_link_successor_and_leave_executable_queue",
+      "policy_status_vs_end_date_vs_KPI_disagreement",
+      "renewal_and_cancellation_modes_or_filters",
+      "collaborative_comments_attachments_notifications_saving_and_reload"
+    ],
+    "previousClaim": "2026-11-14_R11_LIVE_RENOVATIONS_PREVIOUSLY_CLAIMED_TEST_25_OF_25_AND_19_FOCUSED_MUST_VERIFY_CURRENT_LINEAGE_NOT_AUTOMATIC_PASS"
   }
 }
