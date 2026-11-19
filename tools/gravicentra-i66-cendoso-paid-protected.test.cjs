@@ -2,7 +2,8 @@
 const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const path=require('node:path');
-const {sourceRow,assess,planBatch,loadSource,insurerMatches}=require('./gravicentra-i66-cendoso-paid-protected.cjs');
+const {sourceRow,assess,planBatch,loadSource,insurerMatches,policyMatches,
+  policyLookupVariants}=require('./gravicentra-i66-cendoso-paid-protected.cjs');
 const source=loadSource();
 assert.equal(source.candidates.length,607);
 assert.equal(source.candidates.filter(r=>r.currencySource==='GTQ'&&!r.holdReasons.length).length,574);
@@ -55,6 +56,30 @@ assert.equal(assessCase({...raw,frequencySource:'Pago Único'},[{...group,
   receipts:[{...receipt,vence:'2026-03-29',fechaLimite:'2026-03-30'}]}]).ready.match,
   'SINGLE_RECEIPT_POLICY_TERM_GROSS_EQUAL');
 assert.equal(insurerMatches('Mapfre','MAPFRE Seguros de Guatemala'),true);
+// Product labels on Cendoso policy numbers are not insurer requirement IDs.
+// Resolve safe variants only with a unique insurer + exact coverage edition.
+assert.ok(policyLookupVariants('AUTO - 39012').includes('39012'));
+assert.ok(policyLookupVariants('AUTO 39012').includes('AUTO-39012'));
+assert.ok(policyLookupVariants('TECD - 7001051').includes('7001051'));
+assert.equal(policyMatches('AUTO - 39012','39012'),true);
+assert.equal(policyMatches('AUTO - 39012','AUTO 39012'),true);
+assert.equal(policyMatches('AUTO - 39012','TECD - 39012'),false);
+assert.equal(policyMatches('AUTO - 39012','39013'),false);
+assert.equal(policyMatches('04 05 01 014498 - 1','04 05 01 014498'),false,
+  'renewal policy suffix is not a lookup alias');
+const labeled={...raw,insurerSource:'AseGuate',policyNumberSource:'AUTO - 39012'};
+const labeledGroup={...group,insurerName:'Aseguradora Guatemalteca',
+  policy:{...group.policy,numero:'39012'}};
+assert.equal(assess(sourceRow(labeled),[labeledGroup]).ready.policyId,'p1');
+assert.equal(assess(sourceRow(labeled),[{
+  ...labeledGroup,policy:{...labeledGroup.policy,vigenciaInicio:'2026-08-05'}
+}]).code,'EXACT_POLICY_EDITION_NOT_FOUND');
+assert.equal(assess(sourceRow(labeled),[{
+  ...labeledGroup,insurerName:'Seguros El Roble S.A.'
+}]).code,'EXACT_POLICY_EDITION_NOT_FOUND');
+assert.equal(planBatch({candidates:[labeled]},[labeledGroup]).readyCount,1);
+assert.equal(planBatch({candidates:[labeled]},[labeledGroup,{...labeledGroup,
+  policy:{...labeledGroup.policy,id:'p2'}}]).holdCounts.MULTIPLE_POLICY_EDITIONS,1);
 const mini={candidates:[raw,{...raw,candidateId:'cendoso_'+'b'.repeat(24)}]};
 const ambiguous=planBatch(mini,[group]);
 assert.equal(ambiguous.readyCount,0);

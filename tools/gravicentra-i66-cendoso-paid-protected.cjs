@@ -18,6 +18,31 @@ const norm=x=>str(x).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toUpperCase
 const cents=x=>moneyCents(x);
 const date=x=>/^\d{4}-\d{2}-\d{2}$/.test(str(x))?str(x):'';
 const objhash=x=>sha(JSON.stringify(x));
+// Some insurer exports prepend a product label ("AUTO - 39012"), while the
+// canonical policy record may store just "39012". This is a *lookup alias*,
+// not an insurer requirement number, edition, endorsement or new identity.
+// Keep the product prefix when comparing two labeled policy numbers; only
+// allow a labeled-to-bare match after exact insurer and edition checks.
+const labeledPolicy=value=>{
+  const match=/^(AUTO|TECD)\s*(?:-\s*|\s+)(\d+)$/i.exec(str(value));
+  return match?{product:match[1].toUpperCase(),number:match[2]}:null;
+};
+function policyMatches(source,live){
+  if(canonicalPolicyNumber(source)===canonicalPolicyNumber(live))return true;
+  const a=labeledPolicy(source),b=labeledPolicy(live);
+  if(!a)return false;
+  if(b)return a.product===b.product&&a.number===b.number;
+  return /^\d+$/.test(str(live))&&a.number===str(live);
+}
+function policyLookupVariants(value){
+  const input=str(value),canonical=canonicalPolicyNumber(input),labels=labeledPolicy(input);
+  const variants=new Set([input,canonical]);
+  if(labels){const {product,number}=labels;
+    for(const v of [number,`${product} ${number}`,`${product}-${number}`,`${product} - ${number}`])variants.add(v);
+  }
+  if(/^91-0+(\d+)$/.test(canonical))variants.add('91-'+canonical.split('-')[1].replace(/^0+/,''));
+  return [...variants];
+}
 const item=(db,col)=>db.collection('tenants').doc(TENANT).collection('data').doc(col).collection('items');
 const request=(db,id)=>db.collection('tenants').doc(TENANT).collection('operationalRequests').doc(id);
 const aliases=['monto','montoTotal'];
@@ -74,7 +99,7 @@ function assess(row,groups){
   if(row.hold.length)return {code:'CONFLICTING_SOURCE_DATES'};
   if(row.currency!=='GTQ')return {code:'SOURCE_CURRENCY_NOT_GTQ'};
   if(row.paid<'2026-01-01'||row.paid>'2026-12-31')return {code:'SOURCE_DATE_OUT_OF_SCOPE'};
-  const possible=(groups||[]).filter(g=>canonicalPolicyNumber(g.policy.numero)===canonicalPolicyNumber(row.policy));
+  const possible=(groups||[]).filter(g=>policyMatches(row.policy,g.policy.numero));
   if(!possible.length)return {code:'POLICY_NUMBER_NOT_FOUND'};
   const editions=possible.filter(g=>date(g.policy.vigenciaInicio)===row.coverageStart&&
     date(g.policy.vigenciaFin)===row.coverageEnd&&policyCountry(g.policy)==='GT'&&
@@ -150,8 +175,7 @@ async function readGroups(db,source){
   const groups=[];
   for(let i=0;i<numbers.length;i+=8){
     const next=await Promise.all(numbers.slice(i,i+8).map(async number=>{
-      const canonical=canonicalPolicyNumber(number),noPad=/^91-0+(\d+)$/.test(canonical)?'91-'+RegExp.$1:canonical;
-      const variants=[...new Set([number,canonical,noPad])];
+      const variants=policyLookupVariants(number);
       const found=await Promise.all(variants.map(n=>item(db,'polizas').where('numero','==',n).limit(16).get()));
       assert.ok(found.every(s=>s.size<16),'I66_PAID_UNBOUNDED_POLICY_EDITIONS');
       const policies=[...new Map(found.flatMap(s=>s.docs).map(d=>[d.id,d])).values()];
@@ -175,13 +199,24 @@ async function readGroups(db,source){
     }));
     next.forEach(a=>groups.push(...a));
   }
-  return groups;
+  // A labeled and a bare source reference can fetch the same canonical
+  // Firestore policy multiple times. Count editions by document ID, not by
+  // the number of lookup aliases that happened to find one document.
+  return [...new Map(groups.map(g=>[g.policy.id,g])).values()];
 }
 function planBatch(source,groups){
-  const by=new Map();for(const g of groups){const key=canonicalPolicyNumber(g.policy.numero);if(!by.has(key))by.set(key,[]);by.get(key).push(g);}
+  const by=new Map();for(const g of groups){
+    for(const key of policyLookupVariants(g.policy.numero)){
+      const canonical=canonicalPolicyNumber(key);
+      if(!by.has(canonical))by.set(canonical,[]);
+      by.get(canonical).push(g);
+    }
+  }
   const ready=[],holds=[],byTarget=new Map();
   for(const raw of source.candidates){
-    const row=sourceRow(raw),m=assess(row,by.get(canonicalPolicyNumber(row.policy))||[]);
+    const row=sourceRow(raw),related=[...new Set(policyLookupVariants(row.policy)
+      .flatMap(key=>by.get(canonicalPolicyNumber(key))||[]))];
+    const m=assess(row,related);
     if(m.ready){if(!byTarget.has(m.ready.receiptId))byTarget.set(m.ready.receiptId,[]);
       byTarget.get(m.ready.receiptId).push(m.ready);
     }else holds.push({sourceId:row.id,policy:row.policy,reason:m.code});
@@ -223,7 +258,7 @@ async function applyOne(db,oldPlan,source){
       c=cs.exists?{...cs.data(),id:cs.id}:{id:cRef.id,polizaId:ps.id,reciboId:rs.id},
       p={...ps.data(),id:ps.id};
     if(str(r.polizaId)!==p.id||str(c.polizaId||c.policyId)!==p.id||
-      canonicalPolicyNumber(p.numero)!==oldPlan.policyNumber||
+      !policyMatches(oldPlan.policyNumber,p.numero)||
       date(p.vigenciaInicio)!==sourceRow(row).coverageStart||date(p.vigenciaFin)!==sourceRow(row).coverageEnd||
       policyCountry(p)!=='GT'||norm(p.moneda)!=='GTQ'||
       (!oldPlan.backfill&&(isPaid(r)||isPaid(c)))||
@@ -346,4 +381,5 @@ async function main(){
   if(!applied&&!already)throw Error('I66_NO_PAYMENT_WRITES_OR_READBACK');
 }
 if(require.main===module)main().catch(e=>{console.error('I66_CENDOSO_HOLD '+e.message);process.exitCode=1;});
-module.exports={sourceRow,assess,planBatch,loadSource,receiptIdentity,insurerMatches};
+module.exports={sourceRow,assess,planBatch,loadSource,receiptIdentity,insurerMatches,
+  policyMatches,policyLookupVariants};
