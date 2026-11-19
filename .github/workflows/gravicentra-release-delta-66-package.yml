@@ -91,6 +91,7 @@ jobs:
       artifact_digest: ${{ steps.release.outputs.artifact_digest }}
       access_sha: ${{ steps.release.outputs.access_sha }}
       reader_sha: ${{ steps.release.outputs.reader_sha }}
+      directory_sha: ${{ steps.release.outputs.directory_sha }}
       preview_channel: ${{ steps.release.outputs.preview_channel }}
     steps:
       - uses: actions/checkout@v4
@@ -210,6 +211,26 @@ jobs:
             c.immutableArtifactId===stage.sourceArtifactId&&
             c.immutableArtifactZipDigest===stage.sourceArtifactDigest&&
             c.sourcePreviewChannelId===stage.hostingPreviewChannel;
+          const ownerReader=c.postAcceptanceOwnerP0PremiumReaderPreviewDeploy20261119||{};
+          const ownerReaderPreview=c.status==='OPERATIONAL_EXACT_LIVE_ACCEPTED_LOCKED'&&
+            c.forbidBackendFunctionDeploy===true&&c.forbidBackendLiveFunctionDeploy===true&&
+            c.forbidFirestoreRulesDataAuthWrites===true&&c.livePromotionAuthorized===false&&
+            ownerReader.status==='OWNER_AUTHORIZED_EXISTING_PROTECTED_READER_PREVIEW_ONLY'&&
+            ownerReader.approvedByDirection===true&&ownerReader.gate==='I6.6'&&
+            ownerReader.targetFunction==='orbit360ScopedPolicyReadPreview'&&
+            ownerReader.region==='us-east1'&&
+            ownerReader.previewFunctionOnly===true&&
+            ownerReader.noRealOperationalDataWrites===true&&
+            ownerReader.liveBackendDeploy===false&&ownerReader.liveHostingDeploy===false&&
+            ownerReader.forbidRulesAuthIamChange===true&&
+            ownerReader.sourceCommit==='26ea9a2136d0ae027847d8668d8e82db62398945'&&
+            ownerReader.sourceQaRunId===44525593351&&
+            ownerReader.sourceQaHead==='0162748ea656a1cc615ccceadd446806a6bebbeb'&&
+            Number.isSafeInteger(ownerReader.sourceWorkflowRunId)&&ownerReader.sourceWorkflowRunId>0&&
+            Number.isSafeInteger(ownerReader.sourceArtifactId)&&ownerReader.sourceArtifactId>0&&
+            /^sha256:[0-9a-f]{64}$/.test(ownerReader.sourceArtifactDigest||'')&&
+            /^gi-i66-rc-[0-9]+$/.test(ownerReader.hostingPreviewChannel||'')&&
+            ownerReader.currentLiveHostingVersion===c.currentExactHostingRelease?.liveHostingVersion;
           const exactStageLive=c.i66ConciliacionesStageExactLiveAuthorization20261113||{};
           const stageLive=c.status==='CONCILIACIONES_STAGE_EXACT_LIVE_AUTHORIZED'&&
             c.forbidBackendFunctionDeploy===false&&c.forbidBackendLiveFunctionDeploy===false&&
@@ -316,11 +337,15 @@ jobs:
             sourceRun=stage.sourceWorkflowRunId;artifactId=stage.sourceArtifactId;
             artifactDigest=stage.sourceArtifactDigest;accessSha='bc4cfabae86027657d08aaac21963fb605f5f17a';
             readerSha='34cb6c09c63fb9e45feb6c9d55c3e1c514ab17b2';previewChannel=stage.hostingPreviewChannel;}
+          if(ownerReaderPreview){mode='reader-preview';source=ownerReader.sourceCommit;
+            sourceRun=ownerReader.sourceWorkflowRunId;artifactId=ownerReader.sourceArtifactId;
+            artifactDigest=ownerReader.sourceArtifactDigest;accessSha='bc4cfabae86027657d08aaac21963fb605f5f17a';
+            readerSha='aafdbe3384506b1772c7e409d565de88bf287b21';previewChannel=ownerReader.hostingPreviewChannel;}
           if(c.status==='LIVE_PROMOTION_APPROVED'&&c.livePromotionAuthorized===true&&c.previewApproved===true){
             if(!/^[0-9a-f]{40}$/.test(c.approvedSourceSha||'')||!(c.sourceBuildWorkflowRunId>0)||!/^[0-9a-f]{64}$/.test(c.immutableTarSha256||'')||!/^gi-i66-rc-[0-9]+$/.test(c.sourcePreviewChannelId||''))throw Error('I66_LIVE_PROMOTION_PROOF_MISSING');
             throw Error('I66_LIVE_PROMOTION_REQUIRES_SEPARATE_APPROVED_EXACT_ARTIFACT_TRANSPORT');
           }
-          fs.appendFileSync(process.env.GITHUB_OUTPUT,`mode=${mode}\nsource=${source}\nsource_run=${sourceRun}\nartifact_id=${artifactId}\nartifact_digest=${artifactDigest}\naccess_sha=${accessSha}\nreader_sha=${readerSha}\npreview_channel=${previewChannel}\n`);
+          fs.appendFileSync(process.env.GITHUB_OUTPUT,`mode=${mode}\nsource=${source}\nsource_run=${sourceRun}\nartifact_id=${artifactId}\nartifact_digest=${artifactDigest}\naccess_sha=${accessSha}\nreader_sha=${readerSha}\ndirectory_sha=${ownerReaderPreview?'eea1d0569b0a441e525ea9237ba4870fdeac14c8':''}\npreview_channel=${previewChannel}\n`);
           console.log('I66_TRANSPORT_MODE='+mode);
           NODE
   immutable-package:
@@ -732,6 +757,7 @@ jobs:
       ARTIFACT_DIGEST: ${{ needs.gate.outputs.artifact_digest }}
       ACCESS_BLOB_SHA: ${{ needs.gate.outputs.access_sha }}
       READER_BLOB_SHA: ${{ needs.gate.outputs.reader_sha }}
+      DIRECTORY_BLOB_SHA: ${{ needs.gate.outputs.directory_sha }}
       PREVIEW_CHANNEL_ID: ${{ needs.gate.outputs.preview_channel }}
       TARGET_FUNCTION: orbit360ScopedPolicyReadPreview
       TARGET_REGION: us-east1
@@ -756,19 +782,30 @@ jobs:
           const fs=require('node:fs');
           const c=JSON.parse(fs.readFileSync('artifacts/orbit360-recovery/release-control/I6_6_RELEASE_TRANSPORT_CONTROL_20261110.json','utf8'));
           const stage=c.status==='CONCILIACIONES_STAGE_READER_PREVIEW_AUTHORIZED';
-          const r=stage?(c.i66ConciliacionesHumanNameReaderPreviewAuthorization20261113||{}):(c.readerPreviewAuthorization||{});
-          if(!['CONCILIACIONES_READER_PREVIEW_AUTHORIZED','CONCILIACIONES_STAGE_READER_PREVIEW_AUTHORIZED'].includes(c.status)||
+          const owner=c.postAcceptanceOwnerP0PremiumReaderPreviewDeploy20261119||{};
+          const ownerPreview=c.status==='OPERATIONAL_EXACT_LIVE_ACCEPTED_LOCKED'&&
+            owner.status==='OWNER_AUTHORIZED_EXISTING_PROTECTED_READER_PREVIEW_ONLY'&&
+            owner.approvedByDirection===true&&owner.previewFunctionOnly===true&&
+            owner.noRealOperationalDataWrites===true&&owner.liveBackendDeploy===false&&
+            owner.liveHostingDeploy===false&&owner.forbidRulesAuthIamChange===true&&
+            c.forbidBackendFunctionDeploy===true&&c.livePromotionAuthorized===false&&
+            c.forbidBackendLiveFunctionDeploy===true;
+          const r=ownerPreview?owner:stage?(c.i66ConciliacionesHumanNameReaderPreviewAuthorization20261113||{}):(c.readerPreviewAuthorization||{});
+          if((!ownerPreview&&!['CONCILIACIONES_READER_PREVIEW_AUTHORIZED','CONCILIACIONES_STAGE_READER_PREVIEW_AUTHORIZED'].includes(c.status))||
              c.forbidFirestoreRulesDataAuthWrites!==true||c.forbidBackendLiveFunctionDeploy!==true||
-             c.forbidBackendFunctionDeploy!==false||c.backendFunctionPreviewOnly!==true||
-             c.livePromotionAuthorized!==false||c.previewApproved!==false||
+             (!ownerPreview&&(c.forbidBackendFunctionDeploy!==false||c.backendFunctionPreviewOnly!==true||
+             c.previewApproved!==false))||
+             c.livePromotionAuthorized!==false||
              r.targetFunction!==process.env.TARGET_FUNCTION||r.region!==process.env.TARGET_REGION||
              r.sourceCommit!==process.env.SOURCE_SHA||r.sourceWorkflowRunId!==Number(process.env.SOURCE_RUN)||
              r.sourceArtifactId!==Number(process.env.ARTIFACT_ID)||
-             r.dataWritesPermitted!==false||r.liveBackendDeployPermitted!==false||
-             r.hostingPromotionPermitted!==false||
-             c.immutableArtifactZipDigest!==process.env.ARTIFACT_DIGEST||
-             c.approvedSourceSha!==process.env.SOURCE_SHA||
-             c.sourcePreviewChannelId!==process.env.PREVIEW_CHANNEL_ID||
+             (!ownerPreview&&(r.dataWritesPermitted!==false||r.liveBackendDeployPermitted!==false||
+             r.hostingPromotionPermitted!==false))||
+             (ownerPreview?r.sourceArtifactDigest!==process.env.ARTIFACT_DIGEST:
+             c.immutableArtifactZipDigest!==process.env.ARTIFACT_DIGEST)||
+             (!ownerPreview&&c.approvedSourceSha!==process.env.SOURCE_SHA)||
+             (ownerPreview?r.hostingPreviewChannel!==process.env.PREVIEW_CHANNEL_ID:
+             c.sourcePreviewChannelId!==process.env.PREVIEW_CHANNEL_ID)||
              (stage&&(r.previewFunctionOnly!==true||r.realSourceReadOnlyRun!==43383902368||
                r.sourceArtifactDigest!==process.env.ARTIFACT_DIGEST)))
             throw Error('I66_READER_PREVIEW_AUTHORIZATION_OR_IMMUTABLE_SOURCE_DRIFT');
@@ -826,6 +863,9 @@ jobs:
           test -f "$BACKEND/b4-003-scoped-policy-callable.js"
           test "$(git hash-object "$BACKEND/b4-003-scoped-access-boundary.js")" = "$ACCESS_BLOB_SHA"
           test "$(git hash-object "$BACKEND/b4-003-scoped-related-reader.js")" = "$READER_BLOB_SHA"
+          if test -n "$DIRECTORY_BLOB_SHA"; then
+            test "$(git hash-object "$BACKEND/b4-003-scoped-bootstrap-reader.js")" = "$DIRECTORY_BLOB_SHA"
+          fi
           node --check "$BACKEND/b4-003-scoped-policy-callable.js"
           node --check "$BACKEND/b4-003-scoped-related-reader.js"
           node --check "$BACKEND/bootstrap.js"

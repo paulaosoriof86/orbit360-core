@@ -4291,5 +4291,32 @@
     "rollbackMustPreserveCurrentLive": true,
     "sourceReadyForNewImmutablePackage": true,
     "previewOnlyNoLive": true
+  },
+  "postAcceptanceOwnerP0PremiumReaderPreviewDeploy20261119": {
+    "status": "OWNER_AUTHORIZED_EXISTING_PROTECTED_READER_PREVIEW_ONLY",
+    "gate": "I6.6",
+    "approvedByDirection": true,
+    "ownerInstruction": "Paula requested correction, test and certification of insurer source-backed commissions and premium terms, including actual signed readback in isolated Preview. Deploy only the EXISTING scoped policy reader Preview, never its LIVE counterpart.",
+    "targetFunction": "orbit360ScopedPolicyReadPreview",
+    "region": "us-east1",
+    "previewFunctionOnly": true,
+    "noRealOperationalDataWrites": true,
+    "liveBackendDeploy": false,
+    "liveHostingDeploy": false,
+    "forbidRulesAuthIamChange": true,
+    "sourceCommit": "26ea9a2136d0ae027847d8668d8e82db62398945",
+    "sourceQaRunId": 44525593351,
+    "sourceQaHead": "0162748ea656a1cc615ccceadd446806a6bebbeb",
+    "approvedManifestBlobSha": "3f7e5033ff737fff48117e82e25ec969ed43069f",
+    "sourceWorkflowRunId": 44525928215,
+    "sourceArtifactId": 14530745011,
+    "sourceArtifactDigest": "sha256:02e4c69f3a4860051317a6616c915405b9196c15da80b38a398f471f54ef16cd",
+    "hostingPreviewChannel": "gi-i66-rc-44525928215",
+    "hostingPreviewUrl": "https://ays-orbit-360-lab--gi-i66-rc-44525928215-15hd22yu.web.app",
+    "currentLiveHostingVersion": "sites/ays-orbit-360-lab/versions/bf40099201b2ea51",
+    "expectedDirectoryGitBlobSha": "eea1d0569b0a441e525ea9237ba4870fdeac14c8",
+    "verifyAllOtherFunctionsUnchanged": true,
+    "verifyBothLiveHostingOriginsUnchanged": true,
+    "signedCarlosAndDirectionUatAfterDeploy": true
   }
 }
