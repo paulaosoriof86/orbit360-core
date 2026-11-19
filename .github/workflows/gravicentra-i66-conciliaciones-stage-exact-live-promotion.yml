@@ -22,19 +22,19 @@ jobs:
     timeout-minutes: 65
     env:
       PROJECT_ID: ays-orbit-360-lab
-      SOURCE_SHA: 26ea9a2136d0ae027847d8668d8e82db62398945
-      SOURCE_RUN: '44525928215'
-      ARTIFACT_ID: '14530745011'
-      ARTIFACT_DIGEST: sha256:02e4c69f3a4860051317a6616c915405b9196c15da80b38a398f471f54ef16cd
+      SOURCE_SHA: b38f877f7847c7b6e11506885e42252e84c5eeb6
+      SOURCE_RUN: '44535644258'
+      ARTIFACT_ID: '14536161701'
+      ARTIFACT_DIGEST: sha256:2fdb5e41c0fa737ac43b11254272fa944a0c9b8d615264d9f97f5a8a77cdd4e9
       PREVIEW_READER_RUN: '44526616062'
-      SIGNED_PREVIEW_RUN: '44527223518'
-      SOURCE_QA_RUN: '44525593351'
-      I66_STAGE_PREVIEW_CHANNEL: gi-i66-rc-44525928215
-      I66_STAGE_PREVIEW_URL: https://ays-orbit-360-lab--gi-i66-rc-44525928215-15hd22yu.web.app
-      I66_STAGE_SOURCE_SHA: 26ea9a2136d0ae027847d8668d8e82db62398945
-      I66_STAGE_OLD_LIVE_SOURCE: 1b65a790530d49fe1d1fb451f02838fd9a713c53
-      I66_STAGE_OLD_LIVE_BUILD_ID: gi-i66-1b65a790530d-57f234755dc1
-      I66_STAGE_OLD_HOSTING_VERSION: sites/ays-orbit-360-lab/versions/bf40099201b2ea51
+      SIGNED_PREVIEW_RUN: '44537693575'
+      SOURCE_QA_RUN: '44534989570'
+      I66_STAGE_PREVIEW_CHANNEL: gi-i66-rc-44535644258
+      I66_STAGE_PREVIEW_URL: https://ays-orbit-360-lab--gi-i66-rc-44535644258-00es5pra.web.app
+      I66_STAGE_SOURCE_SHA: b38f877f7847c7b6e11506885e42252e84c5eeb6
+      I66_STAGE_OLD_LIVE_SOURCE: 26ea9a2136d0ae027847d8668d8e82db62398945
+      I66_STAGE_OLD_LIVE_BUILD_ID: gi-i66-26ea9a2136d0-57f234755dc1
+      I66_STAGE_OLD_HOSTING_VERSION: sites/ays-orbit-360-lab/versions/f9f974319efb262b
       I66_STAGE_OWNER_REQUEST: artifacts/orbit360-recovery/release-control/I6_6_INSURER_SELF_ADMIN_EXACT_LIVE_REQUEST_20261119.json
       GH_READ_TOKEN: ${{ github.token }}
       SA_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
@@ -98,10 +98,19 @@ jobs:
                 assert.ok(r.ok,'I66_STAGE_ARTIFACT_UNREADABLE');return r.json();})]);
             assert.ok(runs.every((r,i)=>r.id===ids[i]&&r.status==='completed'&&r.conclusion==='success')&&
               runs[0].head_sha===process.env.SOURCE_SHA&&
-              runs.slice(1,3).every(r=>{
-                execFileSync('git',['merge-base','--is-ancestor',process.env.SOURCE_SHA,r.head_sha]);
+              // Reader Preview was signed on the immediately preceding LIVE
+              // source. The newer counted-calendar fix is frontend-only: prove
+              // all backend reader owners byte-identical before reusing its
+              // already signed Preview authorization; the new signed policy
+              // UAT must still descend from this exact immutable source.
+              (()=>{
+                execFileSync('git',['merge-base','--is-ancestor',runs[1].head_sha,process.env.SOURCE_SHA]);
+                execFileSync('git',['diff','--quiet',runs[1].head_sha,process.env.SOURCE_SHA,'--',
+                  'functions/b4-003-scoped-bootstrap-reader.js','functions/b4-003-scoped-related-reader.js',
+                  'functions/b4-003-scoped-access-boundary.js','functions/i66-conciliaciones-active-ledger-projection.js']);
+                execFileSync('git',['merge-base','--is-ancestor',process.env.SOURCE_SHA,runs[2].head_sha]);
                 return true;
-              })&&
+              })()&&
               (()=>{
                 const qa=runs[3].head_sha;
                 execFileSync('git',['merge-base','--is-ancestor',qa,process.env.SOURCE_SHA]);
@@ -120,8 +129,8 @@ jobs:
       - name: Download original immutable build and verify byte-exact backend
         uses: actions/download-artifact@v4
         with:
-          run-id: 44525928215
-          artifact-ids: 14530745011
+          run-id: 44535644258
+          artifact-ids: 14536161701
           github-token: ${{ github.token }}
           path: ${{ runner.temp }}/i66-stage-exact-download
       - name: Extract certified artifact into read-only evidence and independent deploy workspace
