@@ -205,7 +205,7 @@ Orbit.modules = Orbit.modules || {};
            <label class="ce-l">Asesor / vendedor *<select class="o-sel" data-advisor disabled><option value="">Consultando asesores habilitados en Equipos…</option></select><small data-advisor-hint>El listado se actualiza desde los permisos y países vigentes, sin configurar nombres en código.</small></label>
           <label class="ce-l">País del cliente<input class="o-sel" data-country value="${esc(country)}" disabled></label>
           <label class="ce-l">Moneda de la póliza *<select class="o-sel" data-currency><option value="">— Seleccionar —</option>${E.policyCurrencies(country).map(value => '<option value="'+esc(value)+'" '+(value === cur ? 'selected' : '')+'>'+esc(value)+'</option>').join('')}</select><small>Usa la moneda del documento; los importes no se convierten.</small></label>
-          <label class="ce-l">Aseguradora *<select class="o-sel" data-insurer>${insurers.map(a => `<option value="${esc(a.id)}" ${existing && a.id === existing.aseguradoraId ? 'selected' : ''}>${esc(a.nombre)}</option>`).join('')}</select></label>
+          <label class="ce-l">Aseguradora *<select class="o-sel" data-insurer><option value="">— Seleccionar aseguradora —</option>${insurers.map(a => `<option value="${esc(a.id)}" ${existing && a.id === existing.aseguradoraId ? 'selected' : ''}>${esc(a.nombre)}</option>`).join('')}</select></label>
           <label class="ce-l">N.º real de póliza *<input class="o-sel" data-number value="${esc(existing && existing.numero || '')}" placeholder="No se genera un número ficticio"></label>
           <label class="ce-l">Estado *<select class="o-sel" data-status>${status.map(x => `<option ${existing && x === existing.estado ? 'selected' : (!existing && x === 'Vigente' ? 'selected' : '')}>${x}</option>`).join('')}</select></label>
           <label class="ce-l">Renovabilidad *<select class="o-sel" data-renewable><option value="" ${existing && renewabilityState(existing)==='UNKNOWN'?'selected':''}>Pendiente de validar</option><option value="yes" ${(!existing || renewabilityState(existing)==='YES')?'selected':''}>Renovable</option><option value="no" ${renewabilityState(existing)==='NO'?'selected':''}>No renovable</option></select></label>
@@ -571,6 +571,7 @@ Orbit.modules = Orbit.modules || {};
     $('[data-save]').addEventListener('click', async () => {
       const save = $('[data-save]'), reason = existing ? $('[data-reason]').value.trim() : 'Alta operativa desde plataforma';
       const err = $('[data-error]'), originalText = save.textContent;
+      if (!existing && !insurerEl.value) { err.style.display=''; err.textContent='Selecciona la aseguradora real del documento antes de crear la póliza.'; insurerEl.focus(); return; }
       let payload;try{payload=raw();}catch(error){const code=String(error&&error.message||'');err.style.display='';err.textContent=errorText([code]);if(/^calendario_documentado_/.test(code)){const details=$('[data-contractual-calendar-panel]');if(details)details.open=true;const box=$('[data-documented-calendar]');if(box){box.setAttribute('aria-invalid','true');box.focus();}}return;}
       if (assignmentMode && assignmentMode.checked) { err.style.display = ''; err.textContent = 'Usa la previsualización y confirmación de la corrección documentada.'; return; }
       if (!advisorRosterConfirmed || !payload.asesorId ||
