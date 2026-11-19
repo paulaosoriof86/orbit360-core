@@ -244,26 +244,35 @@
         "criticalFinding": "Aseguradora selected by default to PRUEBA PREVIEW QA instead of empty or real insurer. Persisted issuance not tested; do not assert PASS."
       },
       "renewals": {
-        "liveModule": "Pipeline por vencer",
-        "visibleAction": "Pedir renovar",
-        "directManualRenewalActionVisible": false,
-        "writeReloadPass": false
+        "liveModule": "Renovaciones · Pipeline por vencer",
+        "entry": "Pedir renovar > Registrar renovación en firme > confirmation of verifiable client approval > Continuar a la póliza emitida",
+        "directManualRenewalEntryVisibleLive": true,
+        "clientApprovalCheckboxRequired": true,
+        "actualIssuedPolicyCreateAndReloadTested": false,
+        "importantCorrection": "First main-screen observation found only Pedir renovar, subsequent nested modal confirms entry in LIVE."
       },
       "payments": {
         "liveModule": "Cobros · Cartera y conciliación",
-        "visibleActions": [
-          "Preparar lote",
-          "Conciliar"
+        "entry": "Estado: Todos > Pendiente > Aplicar pago > Cobros · registrar pago > Registrar pago",
+        "directManualPaymentEntryVisibleLive": true,
+        "fields": [
+          "fecha real pago opcional",
+          "método opcional",
+          "soporte opcional",
+          "fecha aplicación aseguradora opcional",
+          "fecha factura opcional",
+          "número factura opcional"
         ],
-        "manualApplyPaymentActionVisible": false,
-        "writeReloadPass": false
+        "realCustomerApplyAndReloadTested": false,
+        "importantCorrection": "Initial main-screen observation found no global button; subsequent pending filter confirms per-row manual payment UI in LIVE."
       },
       "vehicleSubstitution": {
         "livePolicyModal": "Solicitar endoso, Crear gestión Ops only",
         "previewPolicyModal": "Endoso de póliza, Crear gestión Ops plus Registrar sustitución ya emitida with insurer reference and effective date",
         "directLiveSubstitutionAvailable": false,
         "historyReadbackPass": false,
-        "secondRouteVerifiedLive": false
+        "secondRouteVerifiedLive": false,
+        "exactLivePreviewComparison": "LIVE modal only Crear gestión (request; no immediate policy modification); Preview modal has Crear gestión Ops and Registrar sustitución ya emitida with insurer doc reference and effective date."
       },
       "client360Opportunity": {
         "existingClientLiveButtonVisible": false,
@@ -277,8 +286,9 @@
           "Carlos corado 19/11/2026, completed"
         ],
         "inspectionKanbanCardsCount": 0,
-        "opsInspectionIngressOpens": "generic Nuevo prospecto form with no existing-client selector; would risk duplicate if saved",
-        "liveInspectionCreationPass": false
+        "opsInspectionIngressOpens": "Generic Nuevo prospecto in Inspecciones lane; no existing-client lookup, so avoid duplicate; Carlos 2026-11-11 task incomplete, 2026-11-19 task complete, 0 inspection cards",
+        "liveInspectionCreationPass": false,
+        "liveOpsInspectionCreationPass": false
       },
       "previewStartup": {
         "homeHasBanner": "No fue posible confirmar todas las fuentes de información autorizadas.",
@@ -286,6 +296,68 @@
         "livePromotionStillUnproven": true
       },
       "crossRoleCoverage": "Direction only in this read; no role matrix complete"
+    },
+    "nov20ExceptionsPolicyCohorts": {
+      "source": "verified pinned 259-row latest insurer statement + workflow preflight artifact 14564416077",
+      "policyEditionMissing": {
+        "totalRows": 113,
+        "distinctPolicyNumbers": 14,
+        "policyRows": {
+          "91-8276951": 12,
+          "91-8323091": 12,
+          "91-8324489": 12,
+          "91-8342189": 12,
+          "91-8343059": 12,
+          "91-9119234": 11,
+          "91-8322914": 11,
+          "91-9118884": 11,
+          "91-4143471": 10,
+          "91-0234395": 6,
+          "91-4140843": 1,
+          "91-0227949": 1,
+          "91-8357452": 1,
+          "91-9119548": 1
+        }
+      },
+      "receiptNotIdentified": {
+        "totalRows": 19,
+        "policyRows": {
+          "91-9119548": 11,
+          "91-8334771": 7,
+          "91-9105495": 1
+        }
+      },
+      "newlyVerifiedInsurerIssuedDocs": [
+        {
+          "policy": "91-8322914",
+          "exactEdition": "2026-10-05 to 2027-10-05",
+          "insurerEndorsement": "353920",
+          "documentId": "1IsvnNfbahXoY5RD6r8qRbxooPm5gWLpa"
+        },
+        {
+          "policy": "91-0234395",
+          "exactEdition": "2026-05-02 to 2027-05-02",
+          "insurerEndorsement": "199410",
+          "documentId": "1bDZF50cAMHW522wb8ZBWXQS_y6SvpOvO"
+        },
+        {
+          "policy": "91-4140843",
+          "exactEdition": "2026-09-10 to 2027-09-10",
+          "insurerEndorsement": "322984",
+          "documentId": "1R6HMlHHv09_87BALnvLpa-E_cWiKlr9m"
+        }
+      ],
+      "note": "Doc existence supports issuance, but policy+receipt source writer needs exact version/owner/dedup approval; never create from pending statement alone."
+    },
+    "releaseTransportDiagnosis": {
+      "workflowRunId": 44582688330,
+      "phaseJobId": 135767253834,
+      "phaseLog": "I66_OPERATIONAL_LIVE_PHASE_NOOP",
+      "backendGuardFile": "artifacts/orbit360-recovery/release-control/I6_6_RELEASE_TRANSPORT_CONTROL_20261110.json",
+      "currentStatus": "OPERATIONAL_EXACT_LIVE_ACCEPTED_LOCKED",
+      "requiredGateStatus": "OPERATIONAL_EXACT_LIVE_PROMOTION_AUTHORIZED",
+      "livePromotionJob": "skipped",
+      "interpretation": "Not a failed GitHub deploy and not permission error; no authorized build/digest promotion request met strict gate. Source Preview only, must certify then authorize same artifact under canonical control."
     }
   },
   "nextGates": [
