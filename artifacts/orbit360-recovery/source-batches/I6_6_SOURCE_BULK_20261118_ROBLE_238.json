@@ -4,7 +4,7 @@
   "tenantId": "alianzas-soluciones",
   "projectId": "ays-orbit-360-lab",
   "ownerRuleReference": "PAULA_EXPLICIT_2026-11-18_REQUIREMENT_PER_RECEIPT_AND_GROSS_SOURCE_PRECEDENCE",
-  "technicalPreflightRevision": "2026-11-18-identity-and-relation-exception-census-v2",
+  "technicalPreflightRevision": "2026-11-18-source-backed-missing-receipts-diagnostic-v3",
   "document": {
     "filename": "Estado de Cuenta El Roble a Octubre 23.XLS",
     "googleDriveFileId": "1itHxF7QXeBc7ZK4AOI8HaZPl3oNpSFXD",

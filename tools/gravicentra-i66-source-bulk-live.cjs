@@ -86,6 +86,25 @@ async function main(){
       editionsWithReceipts:groups.filter(g=>g.receipts.length).length,
       editionsWithPortfolio:groups.filter(g=>g.portfolio.length).length,
       editionsWithCobros:groups.filter(g=>g.cobros.length).length};
+    // Private, bounded per-policy evidence: distinguish an absent policy from
+    // a valid policy whose source-backed receipts have not been materialized.
+    const exceptionsByCase=new Set(plan.exceptions.map(e=>e.caseId));
+    const affectedNumbers=new Set(source.data.rows.filter(r=>exceptionsByCase.has(r.caseId))
+      .map(r=>str(r.policy)));
+    const policyDiagnostics=[...affectedNumbers].map(number=>({
+      policyNumber:number,
+      sourceRows:source.data.rows.filter(r=>str(r.policy)===number).length,
+      editions:groups.filter(g=>str(g.policy.numero)===number).map(g=>({
+        id:g.policy.id,pais:g.policy.pais,moneda:g.policy.moneda,
+        insurer:g.insurerName,clientExists:g.clientExists,
+        insurerVerified:g.insurerVerified,estado:g.policy.estado,
+        vigenciaInicio:g.policy.vigenciaInicio,vigenciaFin:g.policy.vigenciaFin,
+        receiptsCount:g.receipts.length,portfolioCount:g.portfolio.length,
+        cobrosCount:g.cobros.length,
+        receipts:g.receipts.slice(0,24).map(r=>({id:r.id,sourceRef:r.numeroReciboFuente,
+          due:r.fechaVencimientoContractual||r.vence||r.fechaVencimiento,
+          sequence:r.secuencia||r.numeroCuota,gross:r.primaTotal}))}))
+    }));
     const bundle={...plan,sourceManifestSha256:source.bytesSha256,
       sourceManifestPath:source.relative};
     const planSha256=sha(Buffer.from(JSON.stringify(bundle)));
@@ -95,6 +114,7 @@ async function main(){
       sourceManifestSha256:source.bytesSha256,planSha256,inputRows:plan.inputRows,
       readyCount:plan.readyCount,unchangedCount:plan.unchangedCount,
       exceptionCount:plan.exceptionCount,exceptionCodes,diagnostic,
+      privatePolicyDiagnostics:policyDiagnostics,
       exceptionSamples:plan.exceptions.slice(0,35),
       chunks:plan.chunks.map(c=>({sequence:c.sequence,count:c.count,sha:c.sourcePlanSha256})),writes:0});
     console.log('I66_BULK_SOURCE_PREFLIGHT_PASS input='+plan.inputRows+' eligible='+plan.readyCount+
