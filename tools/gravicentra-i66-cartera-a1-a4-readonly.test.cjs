@@ -3,10 +3,14 @@ const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const {CASES,SOURCE_SHA256,BANTRAB_PREVIOUSLY_WRITTEN,assess,resolveEditions,policyVariants}=require('./gravicentra-i66-cartera-a1-a4-readonly.cjs');
 assert.equal(SOURCE_SHA256.mapfrePendingNov,'29a42705ae6f7b2b42693f51a27a0b1f4ced279e2259b28ce021ff7b21ccefb0');
+assert.equal(SOURCE_SHA256.mapfreA1DueNov02,'9bd35651e29af40e63daf8ac456a24cec607960698d93ec547cbcce66231c462');
 assert.equal(SOURCE_SHA256.bantrabNov04,'b945a98c7c572909c643be4c849a7526a363eb490cdcf24ac8d0ae54ca3025b7');
 assert.equal(CASES.length,37,'A1_PAID_THREE_A2_SEVENTEEN_A3_FOURTEEN_A4_TWO_A7_ONE');
 assert.equal(new Set(CASES.map(x=>x.id)).size,CASES.length,'UNIQUE_SOURCE_CASE_IDS');
 assert.equal(CASES.filter(x=>x.id.startsWith('A1.')).length,3);
+assert.deepEqual(CASES.filter(x=>x.id.startsWith('A1.')).map(x=>[x.due,x.paidDate]),
+ [['2026-11-01','2026-11-04'],['2026-10-31','2026-11-06'],['2026-11-03','2026-11-04']],
+ 'INDEPENDENT_INSURER_DUE_AND_PAID_SOURCES_NOT_INTERCHANGED');
 assert.equal(CASES.filter(x=>x.id.startsWith('A2.')).length,17);
 assert.equal(CASES.filter(x=>x.id.startsWith('A3.')).length,14);
 assert.equal(BANTRAB_PREVIOUSLY_WRITTEN.length,7);
@@ -57,7 +61,7 @@ assert.equal(clue.amountCandidateReadback[0].due,'2026-11-03');
 assert.equal(clue.amountCandidateReadback[0].sourceNumberMatched,false);
 assert.equal(clue.amountCandidateReadback[0].hasExternalNumber,false);
 assert.equal(clue.policyValidity.start,null);
-assert.equal(clue.sourceDueExactAmountMatches,null);
+assert.equal(clue.sourceDueExactAmountMatches,0);
 const dueCase=CASES.find(x=>x.id==='A2.M1');
 assert.equal(assess(dueCase,snap({receipts:[{...receipt,numeroReciboFuente:'',monto:2497.15,fechaVencimiento:'2026-11-30'}]})).sourceDueExactAmountMatches,1,'READONLY_DUE_AMOUNT_CANDIDATE_NOT_PAYMENT_PROOF');
 const dueRead=assess(dueCase,snap({receipts:[{...receipt,numeroReciboFuente:'1/12',monto:2490.15,fechaVencimiento:'2026-11-30'}]}));
