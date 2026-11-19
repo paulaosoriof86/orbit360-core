@@ -193,11 +193,19 @@ async function run(){
         const targetHash='#/'+route,host=document.getElementById('host');
         const begin=performance.now();
         let routeMs=null,contentMs=null,readyMs=null,complete=false,denied=false;
+        let cobrosCoreReadyMs=null,cobrosFinancialReadyMs=null;
         const check=()=>{
           if(Orbit.route?.key!==route)return;
           const text=(host?.innerText||'').slice(0,700);
           if(routeMs===null&&Orbit.route?.key===route)routeMs=Math.round(performance.now()-begin);
           if(contentMs===null&&host?.querySelector('.page'))contentMs=Math.round(performance.now()-begin);
+          if(route==='cobros'){
+            const financial=host?.querySelector('[data-cobros-core-ready="1"]');
+            if(cobrosCoreReadyMs===null&&financial)
+              cobrosCoreReadyMs=Math.round(performance.now()-begin);
+            if(cobrosFinancialReadyMs===null&&financial?.getAttribute('data-cobros-financial-readiness')==='ready')
+              cobrosFinancialReadyMs=Math.round(performance.now()-begin);
+          }
           denied=/No tienes acceso con el rol activo/.test(text);
           if(!denied&&readyMs===null&&host?.querySelector(readySelector)){
             if(route!=='cliente360'||!!host?.querySelector('[data-c360-list-ready="1"]'))
@@ -218,12 +226,26 @@ async function run(){
             if(complete||performance.now()-startPoll>10000){clearInterval(timer);resolve();}
           },100);
         });
+        // Cold Cobros financial KPIs can remain unavailable after its table
+        // first paints. Measure that separate, user-visible latency explicitly
+        // without treating an early shell/list render as a complete PASS.
+        if(route==='cobros'&&!denied&&cobrosFinancialReadyMs===null){
+          await new Promise(resolve=>{
+            const since=performance.now();
+            const poll=setInterval(()=>{
+              check();
+              if(cobrosFinancialReadyMs!==null||performance.now()-since>55000){clearInterval(poll);resolve();}
+            },150);
+          });
+        }
         observer.disconnect();document.removeEventListener('orbit:route-ready',handler);
         const status=Orbit.store?._productStatus?.()||{};
         const renderStats=window.__GI_I66_RENDER_STATS__?.[route]||null;
         const readStats=Object.fromEntries(Object.entries(window.__GI_I66_STORE_READ_STATS__||{}).map(([name,r])=>[name,{...r}]));
         for(const r of Object.values(window.__GI_I66_STORE_READ_STATS__||{})){r.calls=0;r.totalMs=0;r.maxMs=0;}
-        return {route,routeMs,contentMs,readyMs,denied,complete,visibleRows:host?.querySelectorAll('tbody tr').length||0,
+        return {route,routeMs,contentMs,readyMs,cobrosCoreReadyMs,cobrosFinancialReadyMs,
+          cobrosFinancialReady:route==='cobros'?!!host?.querySelector('[data-cobros-financial-readiness="ready"]'):null,
+          denied,complete,visibleRows:host?.querySelectorAll('tbody tr').length||0,
           hostChars:host?.innerHTML.length||0,
           loadedSources:[].concat(status.serverConfirmedCollections||[]).length,
           pendingSources:[].concat(status.optionalMissing||[]).length,
