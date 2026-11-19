@@ -9,6 +9,8 @@ on:
       - functions/product-ops-leads-domain.js
       - orbit360-platform/core/access-scope.js
       - orbit360-platform/modules/equipo.js
+      - orbit360-platform/modules/cliente360.js
+      - tools/gravicentra-i6-6-cliente360-advisor-source-parity.test.cjs
       - tools/gravicentra-i6-6-privileged-role-portfolio-parity.test.cjs
       - tools/gravicentra-i6-6-privileged-role-writer-transaction.test.cjs
       - tools/gravicentra-i6-6-equipo-protected-role-defaults.test.cjs
@@ -40,6 +42,8 @@ jobs:
           node --check functions/product-ops-leads-domain.js
           node --check orbit360-platform/core/access-scope.js
           node --check orbit360-platform/modules/equipo.js
+          node --check orbit360-platform/modules/cliente360.js
+          node --test tools/gravicentra-i6-6-cliente360-advisor-source-parity.test.cjs
           node --test tools/gravicentra-i6-6-privileged-role-portfolio-parity.test.cjs \
             tools/gravicentra-i6-6-privileged-role-writer-transaction.test.cjs \
             tools/gravicentra-i6-6-equipo-protected-role-defaults.test.cjs
