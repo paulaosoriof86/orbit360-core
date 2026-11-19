@@ -341,7 +341,10 @@ jobs:
             sourceRun=stage.sourceWorkflowRunId;artifactId=stage.sourceArtifactId;
             artifactDigest=stage.sourceArtifactDigest;accessSha='bc4cfabae86027657d08aaac21963fb605f5f17a';
             readerSha='34cb6c09c63fb9e45feb6c9d55c3e1c514ab17b2';previewChannel=stage.hostingPreviewChannel;}
-          if(ownerReaderPreview){mode='reader-preview';source=ownerReader.sourceCommit;
+          // A newer owner-signed source QA/manifest request must produce its
+          // own new immutable artifact. The older reader-only authorization
+          // cannot override this with a stale Preview Function redeploy.
+          if(ownerReaderPreview&&!successorBuild){mode='reader-preview';source=ownerReader.sourceCommit;
             sourceRun=ownerReader.sourceWorkflowRunId;artifactId=ownerReader.sourceArtifactId;
             artifactDigest=ownerReader.sourceArtifactDigest;accessSha='bc4cfabae86027657d08aaac21963fb605f5f17a';
             readerSha='aafdbe3384506b1772c7e409d565de88bf287b21';previewChannel=ownerReader.hostingPreviewChannel;}
