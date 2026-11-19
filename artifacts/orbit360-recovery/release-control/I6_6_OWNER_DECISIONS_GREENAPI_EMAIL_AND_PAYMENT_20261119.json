@@ -1,5 +1,5 @@
 {
-  "schema": "GRAVICENTRA_I6_6_FROZEN_OWNER_DECISIONS_20261119_V6",
+  "schema": "GRAVICENTRA_I6_6_FROZEN_OWNER_DECISIONS_20261119_V7",
   "dateGuatemala": "2026-11-19",
   "status": "FROZEN_DECISIONS_SOURCE_QA_CANDIDATE_PENDING_SIGNED_PREVIEW_LIVE",
   "repository": "paulaosoriof86/orbit360-core",
@@ -129,7 +129,10 @@
       "liveArtifactId": 14547260031,
       "artifactDigest": "sha256:483ed0469f034a6440830dd79b6c483f31273965c1010186cdc08c7714b76174",
       "completionGuatemala": "2026-11-19T09:44:55-06:00",
-      "otherCandidatesHeldInPreflight": 304
+      "otherCandidatesHeldInPreflight": 304,
+      "receiptPaidWrites": 303,
+      "portfolioPaidWrites": 303,
+      "cobroWrites": 303
     }
   },
   "knownOpenFronts": [
@@ -142,10 +145,11 @@
     "Ops operative management notifications and cross-role responsive regression",
     "Per-lead follow-up cadence selector and signed scheduler delivery contract",
     "Editable server-persisted notification templates and true provider delivery proof",
-    "Client360-linked direct inspection opportunity without duplicate client/legacy policy linkage"
+    "Client360-linked direct inspection opportunity without duplicate client/legacy policy linkage",
+    "Five El Roble PDF source import: 49 documented receipts; source says four renewals and one new policy; 4 cent-level rounding differences; identity link needs verification"
   ],
   "noInventedPass": true,
-  "revision": 6,
+  "revision": 7,
   "leadsCadenceAndTemplates": {
     "status": "SOURCE_QA_PASS_AWAIT_SIGNED_PREVIEW_MODULE_LIVE_AND_REAL_DELIVERY",
     "currentFrontend": "core/ciclo.js hardcodes D1/D3/D7/D14; automatic internal tasks activate on Propuesta, not user-selectable per newly created lead",
@@ -259,7 +263,7 @@
     "previousClaim": "2026-11-14_R11_LIVE_RENOVATIONS_PREVIOUSLY_CLAIMED_TEST_25_OF_25_AND_19_FOCUSED_MUST_VERIFY_CURRENT_LINEAGE_NOT_AUTOMATIC_PASS"
   },
   "renewalDocumentaryDrive": {
-    "status": "FIVE_ORIGINAL_2026_2027_PDFS_UPLOADED_READBACK_VERIFIED_DOCUMENT_ONLY_NO_FIRESTORE_WRITE_NO_KANBAN_PASS",
+    "status": "FIVE_DOCS_UPLOADED_AND_SOURCE_49_PAYMENT_REQUIREMENTS_EXTRACTED_DOCUMENTARY_ONLY_4_RENEWALS_1_NEW_POLICY_UNPOSTED",
     "folderId": "1QkaM9HzRKaJ7GQ7B80myQ1xW5yRItOCw",
     "folderUrl": "https://drive.google.com/drive/folders/1QkaM9HzRKaJ7GQ7B80myQ1xW5yRItOCw",
     "files": [
@@ -268,38 +272,412 @@
         "file": "914143471368727.pdf",
         "driveId": "1DKr5Ku9-XmsIiKlJsmC3T6hsH-TLF3MM",
         "driveUrl": "https://drive.google.com/file/d/1DKr5Ku9-XmsIiKlJsmC3T6hsH-TLF3MM/view",
-        "sha256": "b15a25530cc0cf13c46e028dd3e8657444b3e485635343835922be71cc698d42"
+        "sha256": "b15a25530cc0cf13c46e028dd3e8657444b3e485635343835922be71cc698d42",
+        "sourceClass": "NUEVA",
+        "sourceEndorsement": "368727",
+        "sourceGrossPremiumCents": 401230,
+        "sourcePremiumBreakdownCents": {
+          "net": 266515,
+          "issueExpenses": 13326,
+          "installmentSurcharge": 35900,
+          "assistance": 42500,
+          "iva": 42989
+        },
+        "sourcePaymentRequirements": [
+          {
+            "sequence": 1,
+            "sourceRequirement": "5693795",
+            "contractualDueDate": "2026-09-21",
+            "sourceAmountCents": 33418
+          },
+          {
+            "sequence": 2,
+            "sourceRequirement": "5693796",
+            "contractualDueDate": "2026-10-21",
+            "sourceAmountCents": 33437
+          },
+          {
+            "sequence": 3,
+            "sourceRequirement": "5693797",
+            "contractualDueDate": "2026-11-21",
+            "sourceAmountCents": 33437
+          },
+          {
+            "sequence": 4,
+            "sourceRequirement": "5693798",
+            "contractualDueDate": "2026-12-21",
+            "sourceAmountCents": 33437
+          },
+          {
+            "sequence": 5,
+            "sourceRequirement": "5693799",
+            "contractualDueDate": "2027-01-21",
+            "sourceAmountCents": 33437
+          },
+          {
+            "sequence": 6,
+            "sourceRequirement": "5693800",
+            "contractualDueDate": "2027-02-21",
+            "sourceAmountCents": 33437
+          },
+          {
+            "sequence": 7,
+            "sourceRequirement": "5693801",
+            "contractualDueDate": "2027-03-21",
+            "sourceAmountCents": 33437
+          },
+          {
+            "sequence": 8,
+            "sourceRequirement": "5693802",
+            "contractualDueDate": "2027-04-21",
+            "sourceAmountCents": 33437
+          },
+          {
+            "sequence": 9,
+            "sourceRequirement": "5693803",
+            "contractualDueDate": "2027-05-21",
+            "sourceAmountCents": 33437
+          },
+          {
+            "sequence": 10,
+            "sourceRequirement": "5693804",
+            "contractualDueDate": "2027-06-21",
+            "sourceAmountCents": 33437
+          },
+          {
+            "sequence": 11,
+            "sourceRequirement": "5693805",
+            "contractualDueDate": "2027-07-21",
+            "sourceAmountCents": 33437
+          },
+          {
+            "sequence": 12,
+            "sourceRequirement": "5693806",
+            "contractualDueDate": "2027-08-21",
+            "sourceAmountCents": 33437
+          }
+        ],
+        "sourceRequirementSumCents": 401225,
+        "sourceDocumentVsRequirementsRoundingCents": 5,
+        "documentNameCorrectedInDrive": "Póliza nueva El Roble - 91-4143471 - 2026-09-21 a 2027-09-21.pdf"
       },
       {
         "policy": "91-8324489",
         "file": "918324489384442.pdf",
         "driveId": "10iVOyGWLTleozxE9ieo-d34lTSQJDV8W",
         "driveUrl": "https://drive.google.com/file/d/10iVOyGWLTleozxE9ieo-d34lTSQJDV8W/view",
-        "sha256": "e64e6472321e53a2c68a4e88139a1423a0d1261ee75ff8f6603c47215602c8a7"
+        "sha256": "e64e6472321e53a2c68a4e88139a1423a0d1261ee75ff8f6603c47215602c8a7",
+        "sourceClass": "RENOVACION",
+        "sourceEndorsement": "384442",
+        "sourceGrossPremiumCents": 336710,
+        "sourcePremiumBreakdownCents": {
+          "net": 220000,
+          "issueExpenses": 11000,
+          "installmentSurcharge": 29634,
+          "assistance": 40000,
+          "iva": 36076
+        },
+        "sourcePaymentRequirements": [
+          {
+            "sequence": 1,
+            "sourceRequirement": "5747312",
+            "contractualDueDate": "2026-11-16",
+            "sourceAmountCents": 28057
+          },
+          {
+            "sequence": 2,
+            "sourceRequirement": "5747313",
+            "contractualDueDate": "2026-12-16",
+            "sourceAmountCents": 28059
+          },
+          {
+            "sequence": 3,
+            "sourceRequirement": "5747314",
+            "contractualDueDate": "2027-01-16",
+            "sourceAmountCents": 28059
+          },
+          {
+            "sequence": 4,
+            "sourceRequirement": "5747315",
+            "contractualDueDate": "2027-02-16",
+            "sourceAmountCents": 28059
+          },
+          {
+            "sequence": 5,
+            "sourceRequirement": "5747316",
+            "contractualDueDate": "2027-03-16",
+            "sourceAmountCents": 28059
+          },
+          {
+            "sequence": 6,
+            "sourceRequirement": "5747317",
+            "contractualDueDate": "2027-04-16",
+            "sourceAmountCents": 28059
+          },
+          {
+            "sequence": 7,
+            "sourceRequirement": "5747318",
+            "contractualDueDate": "2027-05-16",
+            "sourceAmountCents": 28059
+          },
+          {
+            "sequence": 8,
+            "sourceRequirement": "5747319",
+            "contractualDueDate": "2027-06-16",
+            "sourceAmountCents": 28059
+          },
+          {
+            "sequence": 9,
+            "sourceRequirement": "5747320",
+            "contractualDueDate": "2027-07-16",
+            "sourceAmountCents": 28059
+          },
+          {
+            "sequence": 10,
+            "sourceRequirement": "5747321",
+            "contractualDueDate": "2027-08-16",
+            "sourceAmountCents": 28059
+          },
+          {
+            "sequence": 11,
+            "sourceRequirement": "5747322",
+            "contractualDueDate": "2027-09-16",
+            "sourceAmountCents": 28059
+          },
+          {
+            "sequence": 12,
+            "sourceRequirement": "5747323",
+            "contractualDueDate": "2027-10-16",
+            "sourceAmountCents": 28059
+          }
+        ],
+        "sourceRequirementSumCents": 336706,
+        "sourceDocumentVsRequirementsRoundingCents": 4
       },
       {
         "policy": "91-8342189",
         "file": "918342189384443.pdf",
         "driveId": "1fuPpqesUkg5LmkGuz16icfarQmJ-8VXg",
         "driveUrl": "https://drive.google.com/file/d/1fuPpqesUkg5LmkGuz16icfarQmJ-8VXg/view",
-        "sha256": "1814d67bd274ccecbb523666fc9cd52fd8928cd41b8cbec4a725804c0e41a9ad"
+        "sha256": "1814d67bd274ccecbb523666fc9cd52fd8928cd41b8cbec4a725804c0e41a9ad",
+        "sourceClass": "RENOVACION",
+        "sourceEndorsement": "384443",
+        "sourceGrossPremiumCents": 336710,
+        "sourcePremiumBreakdownCents": {
+          "net": 220000,
+          "issueExpenses": 11000,
+          "installmentSurcharge": 29634,
+          "assistance": 40000,
+          "iva": 36076
+        },
+        "sourcePaymentRequirements": [
+          {
+            "sequence": 1,
+            "sourceRequirement": "5747324",
+            "contractualDueDate": "2026-11-12",
+            "sourceAmountCents": 28057
+          },
+          {
+            "sequence": 2,
+            "sourceRequirement": "5747325",
+            "contractualDueDate": "2026-12-12",
+            "sourceAmountCents": 28059
+          },
+          {
+            "sequence": 3,
+            "sourceRequirement": "5747326",
+            "contractualDueDate": "2027-01-12",
+            "sourceAmountCents": 28059
+          },
+          {
+            "sequence": 4,
+            "sourceRequirement": "5747327",
+            "contractualDueDate": "2027-02-12",
+            "sourceAmountCents": 28059
+          },
+          {
+            "sequence": 5,
+            "sourceRequirement": "5747328",
+            "contractualDueDate": "2027-03-12",
+            "sourceAmountCents": 28059
+          },
+          {
+            "sequence": 6,
+            "sourceRequirement": "5747329",
+            "contractualDueDate": "2027-04-12",
+            "sourceAmountCents": 28059
+          },
+          {
+            "sequence": 7,
+            "sourceRequirement": "5747330",
+            "contractualDueDate": "2027-05-12",
+            "sourceAmountCents": 28059
+          },
+          {
+            "sequence": 8,
+            "sourceRequirement": "5747331",
+            "contractualDueDate": "2027-06-12",
+            "sourceAmountCents": 28059
+          },
+          {
+            "sequence": 9,
+            "sourceRequirement": "5747332",
+            "contractualDueDate": "2027-07-12",
+            "sourceAmountCents": 28059
+          },
+          {
+            "sequence": 10,
+            "sourceRequirement": "5747333",
+            "contractualDueDate": "2027-08-12",
+            "sourceAmountCents": 28059
+          },
+          {
+            "sequence": 11,
+            "sourceRequirement": "5747334",
+            "contractualDueDate": "2027-09-12",
+            "sourceAmountCents": 28059
+          },
+          {
+            "sequence": 12,
+            "sourceRequirement": "5747335",
+            "contractualDueDate": "2027-10-12",
+            "sourceAmountCents": 28059
+          }
+        ],
+        "sourceRequirementSumCents": 336706,
+        "sourceDocumentVsRequirementsRoundingCents": 4
       },
       {
         "policy": "91-8343059",
         "file": "918343059384576.pdf",
         "driveId": "14I4mW85MdjXQ7EZ_cI5TjFRGbBYDRY7u",
         "driveUrl": "https://drive.google.com/file/d/14I4mW85MdjXQ7EZ_cI5TjFRGbBYDRY7u/view",
-        "sha256": "05be6fd1da736b40306f7f3f709b1e0288d0970b63813fb4376b7e2354fbab15"
+        "sha256": "05be6fd1da736b40306f7f3f709b1e0288d0970b63813fb4376b7e2354fbab15",
+        "sourceClass": "RENOVACION",
+        "sourceEndorsement": "384576",
+        "sourceGrossPremiumCents": 504087,
+        "sourcePremiumBreakdownCents": {
+          "net": 346145,
+          "issueExpenses": 17307,
+          "installmentSurcharge": 46626,
+          "assistance": 40000,
+          "iva": 54009
+        },
+        "sourcePaymentRequirements": [
+          {
+            "sequence": 1,
+            "sourceRequirement": "5747887",
+            "contractualDueDate": "2026-11-27",
+            "sourceAmountCents": 42013
+          },
+          {
+            "sequence": 2,
+            "sourceRequirement": "5747888",
+            "contractualDueDate": "2026-12-27",
+            "sourceAmountCents": 42006
+          },
+          {
+            "sequence": 3,
+            "sourceRequirement": "5747889",
+            "contractualDueDate": "2027-01-27",
+            "sourceAmountCents": 42006
+          },
+          {
+            "sequence": 4,
+            "sourceRequirement": "5747890",
+            "contractualDueDate": "2027-02-27",
+            "sourceAmountCents": 42006
+          },
+          {
+            "sequence": 5,
+            "sourceRequirement": "5747891",
+            "contractualDueDate": "2027-03-27",
+            "sourceAmountCents": 42006
+          },
+          {
+            "sequence": 6,
+            "sourceRequirement": "5747892",
+            "contractualDueDate": "2027-04-27",
+            "sourceAmountCents": 42006
+          },
+          {
+            "sequence": 7,
+            "sourceRequirement": "5747893",
+            "contractualDueDate": "2027-05-27",
+            "sourceAmountCents": 42006
+          },
+          {
+            "sequence": 8,
+            "sourceRequirement": "5747894",
+            "contractualDueDate": "2027-06-27",
+            "sourceAmountCents": 42006
+          },
+          {
+            "sequence": 9,
+            "sourceRequirement": "5747895",
+            "contractualDueDate": "2027-07-27",
+            "sourceAmountCents": 42006
+          },
+          {
+            "sequence": 10,
+            "sourceRequirement": "5747896",
+            "contractualDueDate": "2027-08-27",
+            "sourceAmountCents": 42006
+          },
+          {
+            "sequence": 11,
+            "sourceRequirement": "5747897",
+            "contractualDueDate": "2027-09-27",
+            "sourceAmountCents": 42006
+          },
+          {
+            "sequence": 12,
+            "sourceRequirement": "5747898",
+            "contractualDueDate": "2027-10-27",
+            "sourceAmountCents": 42006
+          }
+        ],
+        "sourceRequirementSumCents": 504079,
+        "sourceDocumentVsRequirementsRoundingCents": 8
       },
       {
         "policy": "91-8357452",
         "file": "918357452359402.pdf",
         "driveId": "1V-ttJwtO21uVi1Z7t5DmpPJfhxRkxbO3",
         "driveUrl": "https://drive.google.com/file/d/1V-ttJwtO21uVi1Z7t5DmpPJfhxRkxbO3/view",
-        "sha256": "a93e35667108acd8965430fd76dcd7d2f9e05316810672fe28ade4d227c49733"
+        "sha256": "a93e35667108acd8965430fd76dcd7d2f9e05316810672fe28ade4d227c49733",
+        "sourceClass": "RENOVACION",
+        "sourceEndorsement": "359402",
+        "sourceGrossPremiumCents": 306320,
+        "sourcePremiumBreakdownCents": {
+          "net": 220000,
+          "issueExpenses": 11000,
+          "installmentSurcharge": 0,
+          "assistance": 42500,
+          "iva": 32820
+        },
+        "sourcePaymentRequirements": [
+          {
+            "sequence": 1,
+            "sourceRequirement": "5676444",
+            "contractualDueDate": "2026-11-27",
+            "sourceAmountCents": 306320
+          }
+        ],
+        "sourceRequirementSumCents": 306320,
+        "sourceDocumentVsRequirementsRoundingCents": 0
       }
     ],
     "clientOwnershipAmbiguity": "PDF 91-8343059 says RIGOBERTO SON CHAY; Drive folder says RIGOBERTO SON CHAN. Do not auto-link identities until Paula answers or authenticated identifier evidence.",
-    "nextGate": "Import/relink verified exact policy editions atomically, due/Kanban and prior-term paid renewal inference only when real renewal payment evidence independently established; then signed live before/after and readback."
+    "nextGate": "Import/relink verified exact policy editions atomically, due/Kanban and prior-term paid renewal inference only when real renewal payment evidence independently established; then signed live before/after and readback.",
+    "sourceClassification": "91-4143471 source letter explicitly states ORIGINAL Y COPIA DE POLIZA NUEVA, not renewal; four other PDFs explicitly state ORIGINAL Y COPIA DE RENOVACION. Ask Paula to confirm before creating predecessor link or prior-term inference.",
+    "sourceRequirementCounts": {
+      "newPolicySource": 1,
+      "renewalSources": 4,
+      "totalExpectedReceipts": 49,
+      "from12Installment": 48,
+      "fromSingleCash": 1
+    },
+    "roundingDifference": "Insurer source gross totals exceed the sum of literal requirement amounts by GTQ 0.05, 0.04, 0.04, 0.08 for respective 12-installment documents; 91-8357452 exact. Do not rewrite source requirement amounts to force a match; ask Paula for handling of cents."
   }
 }
