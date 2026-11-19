@@ -18,6 +18,33 @@ const preimageFingerprint = (receiptId, portfolioId, requirement, receiptGrossCe
   digest({receiptId, portfolioId, requirement, receiptGrossCents, carteraGrossCents});
 // The operational grace deadline is not the insurer's contractual due date.
 const dueOf = row => str(row.fechaVencimientoContractual || row.vence || row.fechaVencimiento);
+// I6 installments imported as "N/12" are internal sequence labels, not
+// insurer requirement numbers. The insurer's contractual date establishes
+// the installment only when it exactly follows a complete annual schedule.
+const internalSequence = value => {
+  const m = /^(\d{1,2})\s*\/\s*12$/.exec(str(value));
+  return m && +m[1] >= 1 && +m[1] <= 12 ? +m[1] : null;
+};
+function monthlySequence(policy, due) {
+  if (norm(policy?.frecuencia) !== 'MENSUAL' || !isDate(policy?.vigenciaInicio) ||
+    !isDate(policy?.vigenciaFin) || !isDate(due)) return null;
+  const start = policy.vigenciaInicio;
+  if (policy.vigenciaFin !== String(+start.slice(0,4)+1)+start.slice(4)) return null;
+  const month = (+due.slice(0,4)-+start.slice(0,4))*12 +
+    (+due.slice(5,7)-+start.slice(5,7));
+  if (month < 0 || month >= 12) return null;
+  const y = +start.slice(0,4)+Math.floor((+start.slice(5,7)-1+month)/12);
+  const mo = ((+start.slice(5,7)-1+month)%12)+1;
+  const day = Math.min(+start.slice(8,10),new Date(Date.UTC(y,mo,0)).getUTCDate());
+  const expected = String(y).padStart(4,'0')+'-'+String(mo).padStart(2,'0')+
+    '-'+String(day).padStart(2,'0');
+  return expected === due ? month+1 : null;
+}
+const completeMonthlySchedule = group => {
+  if ((group.receipts || []).length !== 12) return false;
+  const seqs = group.receipts.map(r => internalSequence(r.referenciaCuotaInterna || r.numeroReciboFuente));
+  return seqs.every(Boolean) && new Set(seqs).size === 12;
+};
 const paid = row => !!row && (row.pagado === true || row.conciliadoPago === true || row.conciliado === true ||
   !!str(row.fechaPago || row.fechaPagoReportada || row.paidDate) || /^(PAGADO|PAID|CONCILIADO)$/i.test(str(row.estado)) ||
   /^PAID_/i.test(str(row.paymentState)) || /^APPLIED_/i.test(str(row.applicationState)));
@@ -79,6 +106,8 @@ function planSourceBatch(rawRows, policyGroups, options = {}) {
       continue;
     }
     const group = policyCandidates[0], p = group.policy;
+    const monthlyIndex = monthlySequence(p,row.due);
+    const eligibleSchedule = monthlyIndex != null && completeMonthlySchedule(group);
     const matches = (group.receipts || []).filter(r => {
       if (str(r.polizaId) !== str(p.id) || norm(r.moneda || p.moneda) !== 'GTQ') return false;
       const refs = sourceAliases.map(a => str(r[a])).filter(a => a && !internal(a));
@@ -86,13 +115,18 @@ function planSourceBatch(rawRows, policyGroups, options = {}) {
       if (refs.includes(row.requirement)) return true;
       // A different requirement on the same policy is normal; select a unique
       // contractual due, or corroborate a unique installment sequence.
-      return dueOf(r) === row.due || row.installment != null && Number(r.secuencia || r.numeroCuota) === row.installment;
+      return dueOf(r) === row.due ||
+        row.installment != null && Number(r.secuencia || r.numeroCuota) === row.installment ||
+        eligibleSchedule && !dueOf(r) && internalSequence(r.numeroReciboFuente) === monthlyIndex;
     });
     if (matches.length !== 1) {
       exceptions.push({caseId: row.caseId, code: matches.length ? 'RECEIPT_AMBIGUOUS' : 'RECEIPT_NOT_IDENTIFIED'});
       continue;
     }
     const receipt = matches[0], rid = str(receipt.id);
+    const matchMethod = eligibleSchedule && !dueOf(receipt) &&
+      internalSequence(receipt.numeroReciboFuente) === monthlyIndex ?
+      'COMPLETE_MONTHLY_INSURER_DATE' : 'EXACT_CONTRACTUAL_OR_INSTALLMENT';
     if (!rid || seenTargets.has(rid)) {
       exceptions.push({caseId: row.caseId, code: 'RECEIPT_ASSIGNED_TWICE'}); continue;
     }
@@ -119,6 +153,8 @@ function planSourceBatch(rawRows, policyGroups, options = {}) {
       policyId: str(p.id), receiptId: rid, portfolioId: str(cartera.id),
       requirement: row.requirement, grossCents: row.grossCents,
       oldGrossCents: beforeReceipt, sourceSha256: row.sourceSha256,
+      matchMethod,oldContractualDue:dueOf(receipt),
+      oldOperationalLimit:str(receipt.fechaLimite),
       beforeFingerprint: preimageFingerprint(rid, cartera.id, existingRef, beforeReceipt, beforeCartera),
     };
     seenTargets.add(rid);
@@ -138,4 +174,5 @@ function planSourceBatch(rawRows, policyGroups, options = {}) {
 }
 
 module.exports = {MAX_CHUNK, planSourceBatch, normalizeSource, moneyCents,
-  preimageFingerprint, paid, internal, sourceAliases};
+  preimageFingerprint, paid, internal, sourceAliases,monthlySequence,
+  internalSequence,completeMonthlySchedule};

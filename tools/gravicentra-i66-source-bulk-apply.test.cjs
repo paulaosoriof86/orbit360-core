@@ -113,6 +113,72 @@ const plan=planSourceBatch(source,groups),gate={environment:'gravicentra-live-da
   assert.equal(replay.alreadyApplied,750);
   assert.equal(replay.applied,0);
   assert.equal(largeDb.writes,2250);
+  // El Roble-style monthly importer: 19 distinct insurer requirements map
+  // to 19 existing installments across two complete 12-receipt policies.
+  // The operational cutoff is intentionally unrelated to contractual due.
+  const monthlyDb=new MockDb(),monthlyRows=[],monthlyGroups=[];
+  monthlyDb.docs.set(name('clientes')+'cli1',{pais:'GT'});
+  monthlyDb.docs.set(name('aseguradoras')+'asg1',{nombre:'SEGUROS EL ROBLE'});
+  for(const [policyId,number,startMonth,startDay,firstIncluded,gross] of [
+    ['p-month-a','91-MONTH-A',8,14,4,16302],
+    ['p-month-b','91-MONTH-B',9,8,3,28246]]){
+    const start='2026-'+String(startMonth).padStart(2,'0')+'-'+String(startDay).padStart(2,'0');
+    const end='2027-'+String(startMonth).padStart(2,'0')+'-'+String(startDay).padStart(2,'0');
+    const policy={id:policyId,numero:number,pais:'GT',moneda:'GTQ',estado:'Vigente',
+      vigenciaInicio:start,vigenciaFin:end,frecuencia:'Mensual',
+      clienteId:'cli1',aseguradoraId:'asg1'};
+    monthlyDb.docs.set(name('polizas')+policyId,policy);
+    const recs=[],cartera=[];
+    for(let n=1;n<=12;n++){
+      const rid='rec_'+policyId+'_'+n, cid='car_'+policyId+'_'+n;
+      const receipt={id:rid,polizaId:policyId,moneda:'GTQ',
+        numeroReciboFuente:n+'/12',fechaLimite:'2027-12-22',
+        primaTotal:gross/100-0.5,primaNeta:gross/100-20,estado:'Pendiente'};
+      const port={id:cid,polizaId:policyId,reciboId:rid,moneda:'GTQ',
+        primaTotal:gross/100-0.5,carteraActiva:true,clienteId:'cli1'};
+      monthlyDb.docs.set(name('recibosEsperados')+rid,receipt);
+      monthlyDb.docs.set(name('carteraPrimas')+cid,port);
+      recs.push(receipt);cartera.push(port);
+      if(n>=firstIncluded){
+        const month=startMonth-1+n-1, year=2026+Math.floor(month/12);
+        const monthOfYear=month%12+1;
+        const due=year+'-'+String(monthOfYear).padStart(2,'0')+
+          '-'+String(startDay).padStart(2,'0');
+        monthlyRows.push({caseId:'ROBLE-'+policyId+'-'+n,insurer:'ROBLE',policy:number,
+          requirement:'REQ-'+policyId+'-'+n,due,grossCents:gross,
+          state:'PENDING',sourceSha256:'e'.repeat(64)});
+      }
+    }
+    monthlyGroups.push({policy,clientExists:true,insurerVerified:true,
+      insurerName:'SEGUROS EL ROBLE',receipts:recs,portfolio:cartera,cobros:[]});
+  }
+  const monthlyPlan=planSourceBatch(monthlyRows,monthlyGroups);
+  assert.equal(monthlyPlan.readyCount,19);
+  assert.equal(monthlyPlan.exceptionCount,0);
+  assert.ok(monthlyPlan.chunks[0].rows.every(x=>
+    x.matchMethod==='COMPLETE_MONTHLY_INSURER_DATE'));
+  const monthlyApplied=await applyProtectedBatch(monthlyDb,monthlyPlan,gate);
+  assert.equal(monthlyApplied.status,'BULK_PROTECTED_READBACK_PASS');
+  assert.equal(monthlyApplied.receiptWrites,19);
+  assert.equal(monthlyApplied.portfolioWrites,19);
+  assert.equal(monthlyDb.writes,57);
+  for(const row of monthlyPlan.chunks[0].rows){
+    const updated=monthlyDb.docs.get(name('recibosEsperados')+row.receiptId);
+    assert.equal(updated.numeroReciboFuente,row.requirement);
+    assert.equal(updated.fechaVencimientoContractual,row.due);
+    assert.equal(updated.fechaLimite,'2027-12-22');
+    assert.match(updated.referenciaCuotaInterna,/^\d+\/12$/);
+    assert.equal(updated.primaTotal,row.grossCents/100);
+    assert.equal(updated.primaNeta,row.grossCents/100-20);
+  }
+  const monthlyReplay=await applyProtectedBatch(monthlyDb,monthlyPlan,gate);
+  assert.equal(monthlyReplay.alreadyApplied,19);
+  assert.equal(monthlyDb.writes,57);
+  const updatedGroups=monthlyGroups.map(g=>({...g,
+    receipts:g.receipts.map(r=>({...monthlyDb.docs.get(name('recibosEsperados')+r.id)})),
+    portfolio:g.portfolio.map(c=>({...monthlyDb.docs.get(name('carteraPrimas')+c.id)}))}));
+  assert.equal(planSourceBatch(monthlyRows,updatedGroups).unchangedCount,19);
   console.log('I66_BULK_PROTECTED_WRITER_SYNTHETIC_PASS 1 receipt 1 cartera 1 audit; retry idempotent; CAS hold');
   console.log('I66_BULK_PROTECTED_WRITER_SYNTHETIC_750_ROWS_PASS 3 chunks x 250; 1500 materialized receipt/cartera rows; 750 audit; 0 duplicate replay writes');
+  console.log('I66_EL_ROBLE_MONTHLY_19_SYNTHETIC_PASS source due, aliases, CAS, exact readback, replay');
 })().catch(error=>{console.error(error);process.exitCode=1;});

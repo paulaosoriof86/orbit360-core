@@ -60,5 +60,33 @@ assert.equal(noop.readyCount,0);
 const paid=sample(2);
 paid.raw[0].state='PAID';
 assert.equal(planSourceBatch(paid.raw,paid.groups).exceptions[0].code,'PAID_REQUIRES_COBRO_PROOF_AND_WRITER');
+// An insurer's distinct requirement number can match an I6 internal N/12
+// only when the policy has a complete, unique 12-month schedule and insurer
+// due date is the precise monthly anniversary of the current policy edition.
+const monthly=sample(1);
+monthly.groups[0].policy={...monthly.groups[0].policy,
+  vigenciaInicio:'2026-08-14',vigenciaFin:'2027-08-14',frecuencia:'Mensual'};
+monthly.groups[0].receipts=[];
+monthly.groups[0].portfolio=[];
+for(let n=1;n<=12;n++){
+  const rid='rec_schedule_'+n;
+  monthly.groups[0].receipts.push({id:rid,polizaId:'p0',moneda:'GTQ',
+    numeroReciboFuente:n+'/12',fechaLimite:'2027-12-22',primaTotal:163.01});
+  monthly.groups[0].portfolio.push({id:'c_schedule_'+n,polizaId:'p0',
+    reciboId:rid,moneda:'GTQ',primaTotal:163.01,carteraActiva:true});
+}
+monthly.raw[0]={caseId:'R.1',insurer:'BANTRAB',policy:'AUTO-000000',
+  requirement:'INSURER-5581772',due:'2026-11-14',grossCents:16302,
+  state:'PENDING',sourceSha256:sha};
+const monthlyPlan=planSourceBatch(monthly.raw,monthly.groups);
+assert.equal(monthlyPlan.readyCount,1);
+assert.equal(monthlyPlan.chunks[0].rows[0].matchMethod,'COMPLETE_MONTHLY_INSURER_DATE');
+assert.equal(monthlyPlan.chunks[0].rows[0].receiptId,'rec_schedule_4');
+monthly.groups[0].receipts.pop();
+assert.equal(planSourceBatch(monthly.raw,monthly.groups).exceptionCount,1);
+monthly.groups[0].receipts.push({id:'rec_schedule_12',polizaId:'p0',moneda:'GTQ',
+  numeroReciboFuente:'12/12',primaTotal:163.01});
+monthly.raw[0].due='2026-11-15';
+assert.equal(planSourceBatch(monthly.raw,monthly.groups).exceptionCount,1);
 assert.throws(()=>planSourceBatch(raw,groups,{chunkSize:501}),/SOURCE_BATCH_CHUNK_LIMIT/);
 console.log('I66_SOURCE_BULK_PREFLIGHT_PASS 750 rows 3 chunks; exceptions isolated; 0 writes');

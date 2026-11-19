@@ -3,7 +3,8 @@
 // cartera corrections. The caller must be the existing protected GitHub
 // Environment gate; one approval covers all approved chunks, not each row.
 const crypto=require('node:crypto');
-const {MAX_CHUNK,moneyCents,preimageFingerprint,paid,internal,sourceAliases}
+const {MAX_CHUNK,moneyCents,preimageFingerprint,paid,internal,sourceAliases,
+  monthlySequence,internalSequence,completeMonthlySchedule}
   =require('./gravicentra-i66-source-bulk-plan.cjs');
 const TENANT='alianzas-soluciones',PROJECT='ays-orbit-360-lab';
 const str=value=>String(value==null?'':value).trim();
@@ -51,7 +52,9 @@ async function applyOne(db,row,gate){
       /ANULADA|CANCELADA|SUSPENDIDA|DELETED/.test(norm(p.estado))||
       !str(p.vigenciaInicio)||!str(p.vigenciaFin)||
       row.due<p.vigenciaInicio||row.due>p.vigenciaFin||
-      due(r)!==row.due||c.carteraActiva===false)hold('IDENTITY_TERM_OR_DUE');
+      c.carteraActiva===false||due(r)!==str(row.oldContractualDue)||
+      str(r.fechaLimite)!==str(row.oldOperationalLimit))
+      hold('IDENTITY_TERM_OR_DUE');
     const [client,insurer,cobros,policyReceipts]=await Promise.all([
       tx.get(items(db,'clientes').doc(str(p.clienteId))),
       tx.get(items(db,'aseguradoras').doc(str(p.aseguradoraId))),
@@ -63,6 +66,14 @@ async function applyOne(db,row,gate){
       !norm(insurer.data().nombre||insurer.data().razonSocial).includes(row.insurer)||
       cobros.size>0||paid(r)||paid(c)||str(r.estadoOperativo).toUpperCase().includes('PAG')||
       policyReceipts.size>120)hold('IDENTITY_OR_PAYMENT');
+    const monthlyIndex=monthlySequence(p,row.due);
+    const monthlyMatch=row.matchMethod==='COMPLETE_MONTHLY_INSURER_DATE' &&
+      !due(r)&&monthlyIndex!=null&&
+      internalSequence(r.numeroReciboFuente)===monthlyIndex&&
+      completeMonthlySchedule({receipts:policyReceipts.docs.map(s=>s.data())})&&
+      (r.numeroCuota==null||Number(r.numeroCuota)===monthlyIndex)&&
+      !str(r.referenciaCuotaInterna);
+    if(!monthlyMatch&&due(r)!==row.due)hold('CONTRACTUAL_DUE_NOT_CORROBORATED');
     for(const field of sourceAliases){
       if(str(r[field])&&!internal(r[field])&&str(r[field])!==row.requirement)
         hold('EXTERNAL_SOURCE_ALREADY_DIFFERENT');
@@ -77,21 +88,36 @@ async function applyOne(db,row,gate){
     if(beforeReceipt!==row.oldGrossCents||beforeCartera!==row.oldGrossCents||
       preimageFingerprint(row.receiptId,row.portfolioId,str(r.numeroReciboFuente),beforeReceipt,beforeCartera)!==row.beforeFingerprint)
       hold('CAS_PREIMAGE_CHANGED');
-    tx.update(receiptRef,{numeroReciboFuente:row.requirement,primaTotal:row.grossCents/100});
+    tx.update(receiptRef,{numeroReciboFuente:row.requirement,primaTotal:row.grossCents/100,
+      fechaVencimientoContractual:row.due,
+      ...(monthlyMatch?{referenciaCuotaInterna:str(r.numeroReciboFuente),
+        numeroCuota:monthlyIndex}: {})});
     tx.update(portfolioRef,{primaTotal:row.grossCents/100});
     tx.create(auditRef,{status:'APPLIED_PENDING_SOURCE_GROSS',sourceManifestSha256:gate.sourceManifestSha256,
       sourceSha256:row.sourceSha256,sourceKey:row.sourceKey,caseId:row.caseId,
       policyId:row.policyId,receiptId:row.receiptId,portfolioId:row.portfolioId,
       requirement:row.requirement,oldGrossCents:row.oldGrossCents,newGrossCents:row.grossCents,
+      matchMethod:row.matchMethod,sourceContractualDue:row.due,
+      preservedOperationalLimit:str(r.fechaLimite),
       beforeFingerprint:row.beforeFingerprint,rollback:{
         numeroReciboFuente:str(r.numeroReciboFuente),receiptGrossCents:beforeReceipt,
-        portfolioGrossCents:beforeCartera},paymentWrites:0,cobroWrites:0,
+        portfolioGrossCents:beforeCartera,
+        contractualDueWasPresent:Object.hasOwn(r,'fechaVencimientoContractual'),
+        fechaVencimientoContractual:r.fechaVencimientoContractual??null,
+        cuotaInternaWasPresent:Object.hasOwn(r,'referenciaCuotaInterna'),
+        numeroCuotaWasPresent:Object.hasOwn(r,'numeroCuota'),
+        numeroCuota:r.numeroCuota??null},paymentWrites:0,cobroWrites:0,
       committedAt:new Date().toISOString()});
     return {status:'COMMITTED_PENDING_READBACK',auditId};
   });
   const [postR,postC,postA]=await Promise.all([receiptRef.get(),portfolioRef.get(),auditRef.get()]);
   if(!postR.exists||!postC.exists||!postA.exists||
     str(postR.data().numeroReciboFuente)!==row.requirement||
+    due(postR.data())!==row.due||
+    str(postR.data().fechaLimite)!==str(row.oldOperationalLimit)||
+    (row.matchMethod==='COMPLETE_MONTHLY_INSURER_DATE'&&
+      internalSequence(postR.data().referenciaCuotaInterna)!==monthlySequence(
+        (await policyRef.get()).data(),row.due))||
     moneyCents(postR.data().primaTotal)!==row.grossCents||
     moneyCents(postC.data().primaTotal)!==row.grossCents||
     postA.data().sourceKey!==row.sourceKey)hold('POSTIMAGE_NOT_CERTIFIED');
