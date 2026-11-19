@@ -265,11 +265,13 @@ jobs:
           // A successor never mutates the original approved request. This
           // exact new request must attest an already successful source CI run
           // and a manifest blob pinned to this immutable source tree.
-          const lineageSuccessor=!!c.postAcceptanceOwnerSourceLineagePreviewBuildRequest20261119;
+          const vehicleSuccessor=!!c.postAcceptanceOwnerVehiclePackagePreviewBuildRequest20261119;
+          const lineageSuccessor=vehicleSuccessor||!!c.postAcceptanceOwnerSourceLineagePreviewBuildRequest20261119;
           const ownerPremiumSuccessor=lineageSuccessor||!!c.postAcceptanceOwnerP0PremiumRulesPreviewBuildRequest20261119;
           const ownerSuccessor=ownerPremiumSuccessor||!!c.postAcceptanceOwnerP0PreviewBuildRequest20261119;
           const financeSuccessor=ownerSuccessor||!!c.postAcceptanceInsurerTotalsPreviewBuildRequest20261118;
-          const successor=c.postAcceptanceOwnerSourceLineagePreviewBuildRequest20261119||
+          const successor=c.postAcceptanceOwnerVehiclePackagePreviewBuildRequest20261119||
+            c.postAcceptanceOwnerSourceLineagePreviewBuildRequest20261119||
             c.postAcceptanceOwnerP0PremiumRulesPreviewBuildRequest20261119||
             c.postAcceptanceOwnerP0PreviewBuildRequest20261119||
             c.postAcceptanceInsurerTotalsPreviewBuildRequest20261118||
@@ -285,7 +287,8 @@ jobs:
               const expectedWorkflow='.github/workflows/gravicentra-i66-privileged-role-parity-source-qa.yml';
               const runId=successor.sourceQaRunId;
               const sourceHead=successor.sourceQaHead;
-              const expectedScope=lineageSuccessor?
+              const expectedScope=vehicleSuccessor?
+                'EXACT_IMMUTABLE_PREVIEW_ONLY_OPERATIVO_VEHICLE_WRITE_AND_OWNER_LINEAGE':lineageSuccessor?
                 'EXACT_IMMUTABLE_PREVIEW_ONLY_OWNER_APPROVED_LOGIN_CLIENT360_OPS_LEADS_PREMIUM_COBROS_LINEAGE':ownerPremiumSuccessor?
                 'EXACT_IMMUTABLE_PREVIEW_ONLY_SELF_ADMIN_PREMIUM_TERMS_AND_PROTECTED_INSURER_DIRECTORY':ownerSuccessor?
                 'EXACT_IMMUTABLE_PREVIEW_ONLY_INSURER_PRODUCT_COMMISSION_AND_ROBLE_BULK_WRITER':
@@ -313,6 +316,18 @@ jobs:
                   !Number.isSafeInteger(successor.sourceGovernanceRunId)||
                   successor.sourceGovernanceRunId<=0)
                   throw Error('I66_LINEAGE_PREVIEW_SOURCE_QA_PIN_MISSING');
+                if(vehicleSuccessor){
+                  const vehicleTest=execFileSync('git',['rev-parse',
+                    'HEAD:tools/gravicentra-i6-6-vehicle-only-durable-write.test.cjs'],{encoding:'utf8'}).trim();
+                  const supplementalTest=execFileSync('git',['rev-parse',
+                    'HEAD:tools/gravicentra-i6-6-signed-supplemental-package.test.cjs'],{encoding:'utf8'}).trim();
+                  if(successor.vehicleWriteTestBlobSha!==vehicleTest||
+                    successor.supplementalPackageTestBlobSha!==supplementalTest||
+                    successor.sourceVehicleAndPackageFocusedTests!==5||
+                    successor.sourceManifestApprovedProductPaths!==71||
+                    successor.sourceManifestPinnedTests!==85)
+                    throw Error('I66_VEHICLE_PACKAGE_SOURCE_TESTS_NOT_PINNED');
+                }
                 const governance=JSON.parse(execFileSync('gh',['api',
                   `repos/${process.env.GITHUB_REPOSITORY}/actions/runs/${successor.sourceGovernanceRunId}`],
                   {encoding:'utf8',env:{...process.env,GH_TOKEN:process.env.GITHUB_TOKEN}}));
