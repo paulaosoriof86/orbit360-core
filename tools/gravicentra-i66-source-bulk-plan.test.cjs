@@ -92,6 +92,17 @@ const padded=sample(1);
 padded.raw[0].policy='91-169567';
 padded.groups[0].policy.numero='91-0169567';
 assert.equal(planSourceBatch(padded.raw,padded.groups).readyCount,1);
+const renewalDay=sample(1);
+renewalDay.raw[0].policy='91-169567';
+renewalDay.raw[0].due='2026-08-05';
+renewalDay.groups[0].policy={...renewalDay.groups[0].policy,
+  numero:'91-0169567',vigenciaInicio:'2026-08-05',vigenciaFin:'2027-08-05'};
+renewalDay.groups[0].receipts[0].vence='2026-08-05';
+renewalDay.groups.push({...renewalDay.groups[0],
+  policy:{...renewalDay.groups[0].policy,id:'old-edition',
+    vigenciaInicio:'2025-08-05',vigenciaFin:'2026-08-05',estado:'Renovada'},
+  receipts:[],portfolio:[]});
+assert.equal(planSourceBatch(renewalDay.raw,renewalDay.groups).readyCount,1);
 padded.raw[0].policy='91-169568';
 assert.equal(planSourceBatch(padded.raw,padded.groups).exceptions[0].code,'POLICY_EDITION_MISSING');
 assert.throws(()=>planSourceBatch(raw,groups,{chunkSize:501}),/SOURCE_BATCH_CHUNK_LIMIT/);

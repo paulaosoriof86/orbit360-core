@@ -106,7 +106,9 @@ function planSourceBatch(rawRows, policyGroups, options = {}) {
       return norm(g.insurerName || p.aseguradoraNombre).includes(row.insurer) &&
         norm(p.moneda) === 'GTQ' && norm(p.pais) === 'GT' &&
         isDate(p.vigenciaInicio) && isDate(p.vigenciaFin) &&
-        p.vigenciaInicio <= row.due && p.vigenciaFin >= row.due &&
+        // Renewal at the exact anniversary owns that day's new installment;
+        // the preceding edition ends at its vigenciaFin (exclusive).
+        p.vigenciaInicio <= row.due && p.vigenciaFin > row.due &&
         !/ANULADA|CANCELADA|SUSPENDIDA|DELETED/.test(norm(p.estado)) &&
         g.clientExists === true && g.insurerVerified === true;
     });

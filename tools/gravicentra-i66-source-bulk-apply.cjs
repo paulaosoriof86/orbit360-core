@@ -52,7 +52,7 @@ async function applyOne(db,row,gate){
       [r,c,p].some(x=>x.tenantId&&x.tenantId!==TENANT)||
       /ANULADA|CANCELADA|SUSPENDIDA|DELETED/.test(norm(p.estado))||
       !str(p.vigenciaInicio)||!str(p.vigenciaFin)||
-      row.due<p.vigenciaInicio||row.due>p.vigenciaFin||
+      row.due<p.vigenciaInicio||row.due>=p.vigenciaFin||
       c.carteraActiva===false||due(r)!==str(row.oldContractualDue)||
       str(r.fechaLimite)!==str(row.oldOperationalLimit))
       hold('IDENTITY_TERM_OR_DUE');
