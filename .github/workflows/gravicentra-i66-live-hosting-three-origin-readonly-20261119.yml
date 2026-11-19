@@ -1,0 +1,62 @@
+name: Gravicentra I6.6 LIVE vs Preview Three-Origin Readback READONLY
+on:
+  push:
+    branches: [recovery/fase-a-clean-20260831]
+    paths:
+      - .github/workflows/gravicentra-i66-live-hosting-three-origin-readonly-20261119.yml
+permissions:
+  contents: read
+jobs:
+  three-origin-readback:
+    if: github.repository == 'paulaosoriof86/orbit360-core' && github.ref == 'refs/heads/recovery/fase-a-clean-20260831'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - name: Compare three immutable build markers with cache bypass; no Firebase writes
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/origin-diagnostic"
+          for pair in "custom https://app.aysseguros.com" "firebase https://ays-orbit-360-lab.web.app" "candidate https://ays-orbit-360-lab--gi-i66-rc-44609701409-zv8vzb9e.web.app"; do
+            read -r label origin <<< "$pair"
+            curl --fail --silent --show-error --location --max-time 30 --retry 2 \
+              -H 'Cache-Control: no-cache, no-store, must-revalidate' \
+              -H 'Pragma: no-cache' \
+              -D "$RUNNER_TEMP/origin-diagnostic/$label.headers" \
+              "$origin/__recovery__/build.json?readback=$GITHUB_RUN_ID-$label" \
+              -o "$RUNNER_TEMP/origin-diagnostic/$label.json"
+          done
+          node - <<'NODE'
+          const fs=require('fs'),root=process.env.RUNNER_TEMP+'/origin-diagnostic';
+          const names=['custom','firebase','candidate'];
+          const markers=Object.fromEntries(names.map(n=>[n,JSON.parse(fs.readFileSync(root+'/'+n+'.json','utf8'))]));
+          for(const name of names){
+            const m=markers[name];
+            console.log('I66_ORIGIN_MARKER_'+name.toUpperCase()+'='+JSON.stringify({sourceSha:m.sourceSha,buildId:m.buildId,gate:m.gate}));
+          }
+          fs.writeFileSync(root+'/result.json',JSON.stringify({
+            schema:'I66_THREE_ORIGIN_PUBLIC_READBACK_NO_MUTATIONS',
+            checkedAtUtc:new Date().toISOString(),runId:process.env.GITHUB_RUN_ID,
+            sources:Object.fromEntries(names.map(n=>[n,{sourceSha:markers[n].sourceSha,buildId:markers[n].buildId}])),
+            liveOriginsEqual:markers.custom.sourceSha===markers.firebase.sourceSha&&markers.custom.buildId===markers.firebase.buildId,
+            candidateMatchesCertified:markers.candidate.sourceSha==='598576605807109dc0139017bfa045956618d76d',
+            controlPlaneLastAcceptedSha:'1b65a790530d49fe1d1fb451f02838fd9a713c53',
+            liveMatchesControlPlane:markers.custom.sourceSha==='1b65a790530d49fe1d1fb451f02838fd9a713c53'&&
+              markers.firebase.sourceSha==='1b65a790530d49fe1d1fb451f02838fd9a713c53'
+          },null,2)+'\n');
+          if(markers.custom.sourceSha!==markers.firebase.sourceSha||markers.custom.buildId!==markers.firebase.buildId)
+            throw Error('I66_BOTH_LIVE_ORIGINS_DIVERGED_FAIL_CLOSED');
+          if(markers.candidate.sourceSha!=='598576605807109dc0139017bfa045956618d76d')
+            throw Error('I66_CANDIDATE_PREVIEW_SOURCE_DRIFT');
+          if(markers.custom.sourceSha!=='1b65a790530d49fe1d1fb451f02838fd9a713c53')
+            throw Error('I66_LIVE_DRIFT_FROM_ACCEPTED_CONTROL_PLANE_FAIL_CLOSED');
+          console.log('I66_LIVE_TWO_ORIGINS_AND_CANDIDATE_EXACT_PUBLIC_READBACK_PASS');
+          NODE
+      - name: Retain sanitized readback even when the gate detects drift
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gi-i66-three-origin-readonly-${{ github.run_id }}
+          path: ${{ runner.temp }}/origin-diagnostic/
+          if-no-files-found: warn
+          retention-days: 30
