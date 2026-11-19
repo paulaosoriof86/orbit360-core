@@ -15,6 +15,7 @@ on:
       - artifacts/orbit360-recovery/release-control/I6_6_EXACT_HOSTING_LIVE_PROMOTION_REQUEST_20261112_R6.json
       - artifacts/orbit360-recovery/release-control/I6_6_EXACT_HOSTING_LIVE_PROMOTION_REQUEST_20261113_R8.json
       - artifacts/orbit360-recovery/release-control/I6_6_CLIENTE360_ADVISOR_EXACT_LIVE_REQUEST_20261119.json
+      - tools/gravicentra-i6-6-live-exact-clone.mjs
 
 permissions:
   contents: read
@@ -52,6 +53,8 @@ jobs:
         run: |
           set -euo pipefail
           node tools/gravicentra-i6-6-delta-guard.mjs
+          node --check tools/gravicentra-i6-6-live-exact-clone.mjs
+          node --check tools/gravicentra-i6-6-carlos-german-assignment-roster-readonly.cjs
           node - <<'NODE'
           const fs=require('node:fs'),cp=require('node:child_process');
           const assert=require('node:assert/strict');
