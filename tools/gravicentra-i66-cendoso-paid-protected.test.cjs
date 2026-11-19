@@ -1,4 +1,5 @@
 'use strict';
+// 2026-11-19: insurer source prevails for historical due/period; paid Cobro never auto-reconciled.
 const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const path=require('node:path');
