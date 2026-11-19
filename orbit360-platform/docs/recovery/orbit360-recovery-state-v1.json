@@ -10,7 +10,7 @@
   "branch": "recovery/fase-a-clean-20260831",
   "forensicOriginSha": "9c95f31461f2eabe9804625b5659bee772f5602a",
   "createdAtUtc": "2026-08-31T18:00:00Z",
-  "updatedAtUtc": "2026-11-19T11:59:11Z",
+  "updatedAtUtc": "2026-11-19T12:52:38.648Z",
   "status": "I6_6_LIVE_CONTROLLED_PORTFOLIO_UPDATE_IN_PROGRESS",
   "currentIteration": 6,
   "lastCompletedIteration": 5,
@@ -3797,5 +3797,71 @@
     },
     "currentR11RenewalDriveSignedLiveReceipt": "artifacts/orbit360-recovery/release-control/I6_6_R11_RENEWAL_DRIVE_EXACT_LIVE_RECEIPT_20261113.json",
     "realIssuedRenewalWithPdf": "HOLD tenant Drive OAuth consent"
+  },
+  "ownerDecisionsFrozen20261119MakeAndPremiums": {
+    "status": "FROZEN_BY_PAULA_OWNER_2026_11_19",
+    "scope": "EXISTING_I6_6_FROZEN_PLAN_NOT_NEW_ITERATION_OR_BRANCH",
+    "authority": "Explicit owner messages on 2026-11-19 in Gravicentra Insurance project; must be backed by product tests and exact protected write readback before claimed operational",
+    "sameGreenApiInstanceForAdsAndTya": true,
+    "make": {
+      "newGravicentraOwnScenariosRequired": true,
+      "doNotLimitToExistingMakeScenarios": true,
+      "preserveExistingTyaScenarios": true,
+      "waFromMetaAdsToNewLead": "OWNER_APPROVED_SCOPE_PENDING_EXISTING_INSTANCE_INGRESS_AND_SIGNED_LEAD_WRITE_PROOF",
+      "ownWaLeadScenarioId": 10195867,
+      "ownWaLeadScenarioStatus": "INACTIVE_WEBHOOK_ONLY_NO_LEAD_WRITES",
+      "doNotRepointTyaWebhookWithoutConfirmedFanout": true
+    },
+    "premiumAndCommission": {
+      "replaceExistingDefaults": true,
+      "persistInEditableInsurerFicha": true,
+      "applyToPolicies": "RECALCULATE_AFFECTED_ACTIVE_POLICIES_WITH_SOURCE_CAS_AND_AUDIT_DO_NOT_REWRITE_CONFIRMED_PAID_HISTORY",
+      "defaultCommissionPercentByBranch": {
+        "Autos": 15,
+        "GastosMedicos": 10,
+        "AccidentesPersonales": 25
+      },
+      "commissionBase": "PRIMA_NETA_NEVER_GROSS_PREMIUM",
+      "accountAmount": "PRIMA_TOTAL_AS_INSURER_SOURCE",
+      "financing": {
+        "months1Through11": "MONTHS_X_1_PERCENT_SUBJECT_TO_INSURER_CONFIGURATION",
+        "months12": "13_5_PERCENT_TOTAL_IF_INSURER_ALLOWS_TWELVE",
+        "insurerMaxInstallments": "CONFIGURE_PER_INSURER_AND_PRODUCT",
+        "insurerFees": "CONFIGURE_ISSUE_FEE_PERCENT_AND_BASE_NET_OR_NET_PLUS_SPECIFIED_COMPONENTS",
+        "insurerFinancingBase": "CONFIGURE_NET_OR_NET_PLUS_ISSUE",
+        "insurerAutoAssistance": "CONFIGURE_COST_IN_INSURER_FICHA",
+        "insurerMayDisableIssueOrFinancingFees": true,
+        "insurerOverridesNeedSourceReview": [
+          {
+            "insurer": "Aseguradora Guatemalteca",
+            "ownerExample": "8% para fraccionamiento a 10 meses",
+            "status": "VERIFY_FROM_INSURER_POLICY_BEFORE_ASSERTING_OR_BACKFILLING"
+          },
+          {
+            "insurer": "Columna",
+            "ownerExample": "sin recargo de fraccionamiento ni gastos de emisión",
+            "status": "VERIFY_FROM_INSURER_POLICY_BEFORE_ASSERTING_OR_BACKFILLING"
+          }
+        ]
+      }
+    },
+    "operatingRules": {
+      "askImmediatelyOnRealAmbiguity": true,
+      "onceOwnerAnswersApplyWithoutRepeat": true,
+      "distinctRequirementNumberIsNormal": true,
+      "insurerDirectSourceGrossPrevalent": true,
+      "doNotBlockIndependentSourceRows": true,
+      "sourceBatches": "LARGE_IDEMPOTENT_PROTECTED_CAS_CHUNKS_UP_TO_250",
+      "eachIteration": "READ_SOURCE_RECONCILE_APPLY_AUTHORIZED_RECEIPT_PORTFOLIO_AND_PAYMENT_IF_PROVEN_WITH_BEFORE_AFTER_READBACK",
+      "release": "CORRECT_TEST_CERTIFY_PUBLISH_IN_EACH_ACTIVE_GATE_NO_ACCUMULATING_UNVERIFIED_DELTAS",
+      "noPassWithoutSignedEvidence": true
+    },
+    "openMustNotClaimSolved": [
+      "NO_PAID_COBROS_WRITES_PROVEN_FOR_THIS_ITERATION",
+      "NO_PRODUCTION_ACCEPTANCE_FOR_NEW_INSURER_FINANCIAL_RULES",
+      "NEED_SIGNED_DOC_SCAN_TO_CLIENT_POLICY_VEHICLE_RECEIPT_PAYMENT_QA",
+      "COBROS_LATENCY_UNRESOLVED",
+      "SERGIO_LOPEZ_UNSIGNED_POLICY_UI_NO_PROVEN_LIVE_FIX"
+    ]
   }
 }
