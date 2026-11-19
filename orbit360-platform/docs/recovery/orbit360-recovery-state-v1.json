@@ -3875,5 +3875,20 @@
       "authorizationState": "AUTHORIZED_2026_11_19",
       "actualInstancePhoneIdentity": "NOT_YET_VERIFIED_BY_INSTANCE_READ_ONLY_PROOF"
     }
+  },
+  "i66InsurerSelfAdminLivePromotionRequested20261119": {
+    "gate": "I6.6",
+    "status": "OWNER_APPROVED_TARGETED_EXACT_LIVE_PENDING_RUN_NOT_PUBLISHED",
+    "sourceSha": "26ea9a2136d0ae027847d8668d8e82db62398945",
+    "buildRunId": 44525928215,
+    "immutableArtifactId": 14530745011,
+    "signedPreviewRunId": 44527223518,
+    "protectedPreviewReaderRunId": 44526616062,
+    "expectedPriorLiveVersion": "sites/ays-orbit-360-lab/versions/bf40099201b2ea51",
+    "existingLiveReaderTarget": "orbit360ScopedPolicyRead",
+    "newWriterScope": "NONE_EXCEPT_REVERSIBLE_SYNTHETIC_SIGNED_LIVE_UAT",
+    "financialBackfillStillPending": true,
+    "rollbackRequired": true,
+    "qaReceipt": "artifacts/orbit360-recovery/release-control/I6_6_INSURER_SELF_ADMIN_EXACT_LIVE_REQUEST_20261119.json"
   }
 }

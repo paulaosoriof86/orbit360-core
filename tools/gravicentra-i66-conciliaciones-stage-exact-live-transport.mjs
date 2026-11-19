@@ -1,4 +1,4 @@
-// I6.6: same immutable 223-file Preview site -> LIVE, with exact readback.
+// I6.6: same immutable Preview Hosting version -> LIVE, with exact readback.
 // The enclosing job owns automatic backend+Hosting rollback on any failure.
 import fs from 'node:fs';
 import path from 'node:path';
@@ -7,7 +7,9 @@ import {execFileSync} from 'node:child_process';
 import {GoogleAuth} from 'google-auth-library';
 
 const assert=(truth,code)=>{if(!truth)throw Error(code);};
-const SITE='ays-orbit-360-lab',OLD='0153f5cbbe00c3732e11ebae59b32bd357e38bfd';
+const SITE='ays-orbit-360-lab',OLD=String(process.env.I66_STAGE_OLD_LIVE_SOURCE||'');
+const OLD_VERSION=String(process.env.I66_STAGE_OLD_HOSTING_VERSION||'');
+const OLD_BUILD=String(process.env.I66_STAGE_OLD_LIVE_BUILD_ID||'');
 const PREVIEW=String(process.env.I66_STAGE_PREVIEW_URL||'');
 const SOURCE=String(process.env.I66_STAGE_SOURCE_SHA||'');
 const CHANNEL=String(process.env.I66_STAGE_PREVIEW_CHANNEL||'');
@@ -23,6 +25,10 @@ const pause=ms=>new Promise(resolve=>setTimeout(resolve,ms));
 
 assert(['pre','promote','post'].includes(MODE),'I66_STAGE_RELEASE_MODE_INVALID');
 assert(/^[0-9a-f]{40}$/.test(SOURCE)&&SOURCE!==OLD,'I66_STAGE_SOURCE_INVALID');
+assert(/^[0-9a-f]{40}$/.test(OLD)&&/^gi-i66-[0-9a-f]{12}-[0-9a-f]{12}$/.test(OLD_BUILD),
+  'I66_STAGE_PREVIOUS_LIVE_SOURCE_OR_BUILD_UNPINNED');
+assert(/^sites\/ays-orbit-360-lab\/versions\/[A-Za-z0-9_-]+$/.test(OLD_VERSION),
+  'I66_STAGE_PREVIOUS_LIVE_VERSION_UNPINNED');
 assert(/^gi-i66-rc-\d+$/.test(CHANNEL),'I66_STAGE_CHANNEL_INVALID');
 assert(PREVIEW.startsWith('https://ays-orbit-360-lab--'+CHANNEL+'-')&&
   PREVIEW.endsWith('.web.app'),'I66_STAGE_PREVIEW_ORIGIN_INVALID');
@@ -56,7 +62,7 @@ function manifest(){
     'I66_STAGE_LOCAL_ARTIFACT_CHANGED');
   return{sha:m[1],rel:m[2]};
  });
- assert(rows.length===223&&new Set(rows.map(x=>x.rel)).size===223,
+ assert(rows.length>=200&&rows.length<=800&&new Set(rows.map(x=>x.rel)).size===rows.length,
    'I66_STAGE_SITE_FILE_COUNT_CHANGED');
  return rows;
 }
@@ -69,7 +75,7 @@ async function verify(origin,rows){
    verified++;
   }
  }));
- assert(verified===223,'I66_STAGE_SITE_READBACK_INCOMPLETE');
+ assert(verified===rows.length,'I66_STAGE_SITE_READBACK_INCOMPLETE');
  return verified;
 }
 async function waitForBuild(origin,source,buildId){
@@ -105,20 +111,22 @@ try{
   const [beforeLive,staff,liveVersion,previewVersion,previewBuild]=await Promise.all([
    marker(HOSTS[0]),marker(HOSTS[1]),version('live'),version(CHANNEL),marker(PREVIEW)]);
   assert(beforeLive.sourceSha===OLD&&staff.sourceSha===OLD&&
-    liveVersion==='sites/'+SITE+'/versions/9cedc5ecda75bb2a',
-    'I66_STAGE_R7_LIVE_POINTER_CHANGED_HOLD');
+    beforeLive.buildId===OLD_BUILD&&staff.buildId===OLD_BUILD&&
+    liveVersion===OLD_VERSION,
+    'I66_STAGE_LIVE_POINTER_CHANGED_HOLD');
   assert(previewVersion!==liveVersion&&previewBuild.sourceSha===SOURCE&&
     previewBuild.buildId===build.buildId,'I66_STAGE_PREVIEW_EXACT_SOURCE_NOT_SEALED');
   const checked=await verify(PREVIEW,rows);
-  fs.writeFileSync(PROOF,JSON.stringify({schema:'I66_STAGE_EXACT_LIVE_V1',
+  fs.writeFileSync(PROOF,JSON.stringify({schema:'I66_STAGE_EXACT_LIVE_V2',
     sourceSha:SOURCE,previousLiveVersion:liveVersion,previewHostingVersion:previewVersion,
+    expectedFileCount:rows.length,
     previewFiles:checked,liveSiteFiles:0,customSiteFiles:0,realBusinessWrites:0,
-    status:'PREVIEW_BYTES_PASS_LIVE_R7_OLD_VERSION_PINNED'},null,2)+'\n');
-  console.log('I66_STAGE_EXACT_PREVIEW_223_OF_223_AND_R7_LIVE_PRECONDITIONS_PASS');
+    status:'PREVIEW_BYTES_PASS_LIVE_PRIOR_VERSION_PINNED'},null,2)+'\n');
+  console.log('I66_STAGE_EXACT_PREVIEW_'+rows.length+'_OF_'+rows.length+'_AND_PRIOR_LIVE_PRECONDITIONS_PASS');
  }
  if(MODE==='promote'){
   const proof=JSON.parse(fs.readFileSync(PROOF,'utf8'));
-  assert(proof.sourceSha===SOURCE&&proof.previewFiles===223&&
+  assert(proof.sourceSha===SOURCE&&proof.expectedFileCount===rows.length&&proof.previewFiles===rows.length&&
     (await version('live'))===proof.previousLiveVersion&&
     (await version(CHANNEL))===proof.previewHostingVersion,
     'I66_STAGE_PREPROMOTION_VERSION_RACE_STOP');
@@ -129,13 +137,13 @@ try{
   [proof.liveSiteFiles,proof.customSiteFiles]=await Promise.all(HOSTS.map(o=>verify(o,rows)));
   assert((await version('live'))===proof.previewHostingVersion,
     'I66_STAGE_LIVE_VERSION_DIFFERS_FROM_CERTIFIED_PREVIEW');
-  proof.status='EXACT_PREVIEW_VERSION_PUBLISHED_223_OF_223_BOTH_LIVE_ORIGINS_SIGNED_QA_PENDING';
+  proof.status='EXACT_PREVIEW_VERSION_PUBLISHED_ALL_FILES_BOTH_LIVE_ORIGINS_SIGNED_QA_PENDING';
   fs.writeFileSync(PROOF,JSON.stringify(proof,null,2)+'\n');
-  console.log('I66_STAGE_EXACT_SAME_ARTIFACT_LIVE_223_OF_223_EACH_ORIGIN_PASS');
+  console.log('I66_STAGE_EXACT_SAME_ARTIFACT_LIVE_'+rows.length+'_OF_'+rows.length+'_EACH_ORIGIN_PASS');
  }
  if(MODE==='post'){
   const proof=JSON.parse(fs.readFileSync(PROOF,'utf8'));
-  assert(proof.sourceSha===SOURCE&&proof.liveSiteFiles===223&&proof.customSiteFiles===223&&
+  assert(proof.sourceSha===SOURCE&&proof.liveSiteFiles===rows.length&&proof.customSiteFiles===rows.length&&
     (await version('live'))===proof.previewHostingVersion,
     'I66_STAGE_POST_SIGNED_LIVE_VERSION_DRIFT');
   const [a,b]=await Promise.all(HOSTS.map(marker));

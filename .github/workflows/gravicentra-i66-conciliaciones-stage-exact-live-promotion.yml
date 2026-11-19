@@ -1,14 +1,19 @@
-# Existing I6.6 gate. The single certified Preview artifact is cloned to
-# LIVE, and only the existing live scoped reader is deployed from its backend.
-# One-time executed gate 43388747480. Retained for audit only; no push re-deploy.
-name: Gravicentra I6.6 Conciliaciones Stage Exact LIVE and Rollback
+# Existing I6.6 exact backend+Hosting transport reused for the owner's
+# 2026-11-19 signed insurer financial self-admin successor. The historical
+# successful 43388747480 run remains sealed at its original commit.
+name: Gravicentra I6.6 Signed Exact LIVE Insurer Rules and Rollback
 on:
   workflow_dispatch:
+  push:
+    branches: [recovery/fase-a-clean-20260831]
+    paths:
+      - .github/workflows/gravicentra-i66-conciliaciones-stage-exact-live-promotion.yml
+      - artifacts/orbit360-recovery/release-control/I6_6_INSURER_SELF_ADMIN_EXACT_LIVE_REQUEST_20261119.json
 permissions:
   contents: read
   actions: read
 concurrency:
-  group: gi-i66-conciliaciones-stage-exact-live
+  group: gi-i66-insurer-self-admin-exact-live
   cancel-in-progress: false
 jobs:
   exact-stage-live:
@@ -17,15 +22,20 @@ jobs:
     timeout-minutes: 65
     env:
       PROJECT_ID: ays-orbit-360-lab
-      SOURCE_SHA: e6183a9f1da68243cc935e222d98b2d21b5f17b8
-      SOURCE_RUN: '43385953587'
-      ARTIFACT_ID: '14018512857'
-      ARTIFACT_DIGEST: sha256:64ccf09525abf48d8c707deb366ca1cf0122c6cd7765a7ae98c5ea5380dcec31
-      PREVIEW_READER_RUN: '43386427260'
-      SIGNED_PREVIEW_RUN: '43387403110'
-      I66_STAGE_PREVIEW_CHANNEL: gi-i66-rc-42868854629
-      I66_STAGE_PREVIEW_URL: https://ays-orbit-360-lab--gi-i66-rc-42868854629-abj14q6n.web.app
-      I66_STAGE_SOURCE_SHA: e6183a9f1da68243cc935e222d98b2d21b5f17b8
+      SOURCE_SHA: 26ea9a2136d0ae027847d8668d8e82db62398945
+      SOURCE_RUN: '44525928215'
+      ARTIFACT_ID: '14530745011'
+      ARTIFACT_DIGEST: sha256:02e4c69f3a4860051317a6616c915405b9196c15da80b38a398f471f54ef16cd
+      PREVIEW_READER_RUN: '44526616062'
+      SIGNED_PREVIEW_RUN: '44527223518'
+      SOURCE_QA_RUN: '44525593351'
+      I66_STAGE_PREVIEW_CHANNEL: gi-i66-rc-44525928215
+      I66_STAGE_PREVIEW_URL: https://ays-orbit-360-lab--gi-i66-rc-44525928215-15hd22yu.web.app
+      I66_STAGE_SOURCE_SHA: 26ea9a2136d0ae027847d8668d8e82db62398945
+      I66_STAGE_OLD_LIVE_SOURCE: 1b65a790530d49fe1d1fb451f02838fd9a713c53
+      I66_STAGE_OLD_LIVE_BUILD_ID: gi-i66-1b65a790530d-57f234755dc1
+      I66_STAGE_OLD_HOSTING_VERSION: sites/ays-orbit-360-lab/versions/bf40099201b2ea51
+      I66_STAGE_OWNER_REQUEST: artifacts/orbit360-recovery/release-control/I6_6_INSURER_SELF_ADMIN_EXACT_LIVE_REQUEST_20261119.json
       GH_READ_TOKEN: ${{ github.token }}
       SA_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
       SA_ALT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
@@ -38,47 +48,49 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Fail closed unless exact signed Preview and one-function LIVE are authorized
+      - name: Fail closed unless this exact immutable signed Preview and one-function LIVE are authorized
         run: |
           set -euo pipefail
           node tools/gravicentra-i6-6-delta-guard.mjs
           git cat-file -e "$SOURCE_SHA^{commit}"
           git merge-base --is-ancestor "$SOURCE_SHA" HEAD
-          test -z "$(git diff --name-only "$SOURCE_SHA" HEAD -- orbit360-platform functions firebase.json firestore.rules storage.rules)"
+          test -z "$(git diff --name-only "$SOURCE_SHA" HEAD -- orbit360-platform ':(exclude)orbit360-platform/docs/**' functions firebase.json firestore.rules storage.rules)"
           node --check tools/gravicentra-i66-conciliaciones-stage-exact-live-transport.mjs
-          node --check tools/gravicentra-i66-conciliaciones-stage-signed-preview-ui-readonly.cjs
+          node --check tools/gravicentra-i6-6-carlos-paula-new-policy-client360-preview-uat.cjs
           node - <<'NODE'
-          const assert=require('node:assert/strict'),fs=require('node:fs');
+          const assert=require('node:assert/strict'),fs=require('node:fs'),{execFileSync}=require('node:child_process');
           const c=JSON.parse(fs.readFileSync('artifacts/orbit360-recovery/release-control/I6_6_RELEASE_TRANSPORT_CONTROL_20261110.json','utf8'));
-          const a=c.i66ConciliacionesStageExactLiveAuthorization20261113||{};
-          assert.equal(c.status,'CONCILIACIONES_STAGE_EXACT_LIVE_AUTHORIZED');
+          const a=JSON.parse(fs.readFileSync(process.env.I66_STAGE_OWNER_REQUEST,'utf8'));
+          assert.equal(c.status,'OPERATIONAL_EXACT_LIVE_ACCEPTED_LOCKED');
           assert.equal(c.gate,'I6.6');assert.equal(c.historicalClosedGate,'B4-007');
-          assert.ok(c.livePromotionAuthorized===true&&c.previewApproved===true&&
-            c.forbidBackendFunctionDeploy===false&&c.forbidBackendLiveFunctionDeploy===false&&
-            c.backendFunctionPreviewOnly===false&&c.noHostingPromotion===false&&
-            c.forbidFirestoreRulesDataAuthWrites===true,'I66_STAGE_LIVE_GLOBAL_SCOPE_DENIED');
-          assert.ok(a.status==='SIGNED_PREVIEW_ACCEPTED_EXACT_SOURCE_ARTIFACT_ONE_LIVE_READER_DUAL_HOSTING'&&
-            a.approvedByDirection===true&&a.sameImmutableArtifact===true&&
-            a.oneExistingLiveFunctionOnly===true&&a.noBusinessFinancialWrites===true&&
-            a.rollbackBackendAndHostingOnAnyFailure===true&&
-            a.targetFunction==='orbit360ScopedPolicyRead'&&a.region==='us-east1'&&
-            a.expectedPriorLiveHostingVersion==='9cedc5ecda75bb2a'&&
-            a.expectedPriorLiveSource==='0153f5cbbe00c3732e11ebae59b32bd357e38bfd'&&
-            a.sourceSha===process.env.SOURCE_SHA&&a.sourceRun===Number(process.env.SOURCE_RUN)&&
+          assert.ok(c.forbidFirestoreRulesDataAuthWrites===true&&c.forbidBackendLiveFunctionDeploy===true&&
+            c.livePromotionAuthorized===false,'I66_STAGE_LOCKED_GLOBAL_CONTROL_DRIFT');
+          assert.ok(a.schema==='GRAVICENTRA_I6_6_INSURER_PREMIUM_EXACT_LIVE_V1'&&
+            a.gate==='I6.6'&&a.status==='OWNER_AUTHORIZED_TARGETED_LIVE_PENDING_PROTECTED_RUN'&&
+            a.approvedByDirection===true&&a.sameImmutableArtifactPreviewAndLive===true&&
+            a.exactAllFilesDualOriginReadback===true&&a.noRealFinancialDataBackfillOrPaymentWrites===true&&
+            a.requireRoleSignedLiveSyntheticWriteReloadAndCleanup===true&&
+            a.rollbackLiveBackendTrafficAndHostingOnAnyFailure===true&&
+            a.noFirestoreRulesAuthOrOtherBackendFunctions===true&&
+            a.doNotClaimFullPlatformProductionAccepted===true&&
+            a.targetExistingLiveBackendFunction==='orbit360ScopedPolicyRead'&&a.backendRegion==='us-east1'&&
+            a.expectedPriorLiveHostingVersion===process.env.I66_STAGE_OLD_HOSTING_VERSION&&
+            a.expectedPriorLiveSourceSha===process.env.I66_STAGE_OLD_LIVE_SOURCE&&
+            a.expectedPriorLiveBuildId===process.env.I66_STAGE_OLD_LIVE_BUILD_ID&&
+            a.sourceSha===process.env.SOURCE_SHA&&a.buildRunId===Number(process.env.SOURCE_RUN)&&
             a.artifactId===Number(process.env.ARTIFACT_ID)&&a.artifactDigest===process.env.ARTIFACT_DIGEST&&
-            a.previewReaderDeployRun===Number(process.env.PREVIEW_READER_RUN)&&
-            a.signedPreviewUatRun===Number(process.env.SIGNED_PREVIEW_RUN)&&
+            a.scopedReaderPreviewDeployRunId===Number(process.env.PREVIEW_READER_RUN)&&
+            a.signedCarlosPaulaPreviewUatRunId===Number(process.env.SIGNED_PREVIEW_RUN)&&
+            a.sourceQaRunId===Number(process.env.SOURCE_QA_RUN)&&a.sourceQaTests===90&&
             a.previewChannel===process.env.I66_STAGE_PREVIEW_CHANNEL&&
-            a.previewUrl===process.env.I66_STAGE_PREVIEW_URL&&
-            c.approvedSourceSha===a.sourceSha&&c.immutableArtifactId===a.artifactId&&
-            c.sourcePreviewChannelId===a.previewChannel,
+            a.previewUrl===process.env.I66_STAGE_PREVIEW_URL,
             'I66_STAGE_LIVE_EXACT_OWNER_ACCEPTANCE_NOT_PROVEN');
           (async()=>{
             const headers={Authorization:'Bearer '+process.env.GH_READ_TOKEN,
-              Accept:'application/vnd.github+json','User-Agent':'I66-Exact-Stage-LIVE'};
+              Accept:'application/vnd.github+json','User-Agent':'I66-Insurer-Exact-LIVE'};
             const uri='https://api.github.com/repos/paulaosoriof86/orbit360-core/actions/';
             const ids=[Number(process.env.SOURCE_RUN),Number(process.env.PREVIEW_READER_RUN),
-              Number(process.env.SIGNED_PREVIEW_RUN),43383902368];
+              Number(process.env.SIGNED_PREVIEW_RUN),Number(process.env.SOURCE_QA_RUN)];
             const [runs,artifact]=await Promise.all([
               Promise.all(ids.map(id=>fetch(uri+'runs/'+id,{headers}).then(r=>{
                 assert.ok(r.ok,'I66_STAGE_REQUIRED_RUN_UNREADABLE');return r.json();}))),
@@ -86,19 +98,30 @@ jobs:
                 assert.ok(r.ok,'I66_STAGE_ARTIFACT_UNREADABLE');return r.json();})]);
             assert.ok(runs.every((r,i)=>r.id===ids[i]&&r.status==='completed'&&r.conclusion==='success')&&
               runs[0].head_sha===process.env.SOURCE_SHA&&
+              runs.slice(1,3).every(r=>{
+                execFileSync('git',['merge-base','--is-ancestor',process.env.SOURCE_SHA,r.head_sha]);
+                return true;
+              })&&
+              (()=>{
+                const qa=runs[3].head_sha;
+                execFileSync('git',['merge-base','--is-ancestor',qa,process.env.SOURCE_SHA]);
+                execFileSync('git',['diff','--quiet',qa,process.env.SOURCE_SHA,'--',
+                  'orbit360-platform','functions','firebase.json','firestore.rules','storage.rules']);
+                return true;
+              })()&&
               artifact.id===Number(process.env.ARTIFACT_ID)&&artifact.expired===false&&
               artifact.digest===process.env.ARTIFACT_DIGEST&&
               artifact.workflow_run?.id===Number(process.env.SOURCE_RUN)&&
               artifact.workflow_run?.head_sha===process.env.SOURCE_SHA,
               'I66_STAGE_SIGNED_PROVENANCE_FAILED');
-            console.log('I66_STAGE_FOUR_REQUIRED_GATES_AND_ORIGINAL_ARTIFACT_PASS');
+            console.log('I66_INSURER_LIVE_FOUR_SUCCESS_GATES_AND_EXACT_ORIGINAL_ARTIFACT_PASS');
           })().catch(e=>{console.error(String(e.message||e).slice(0,140));process.exitCode=1;});
           NODE
       - name: Download original immutable build and verify byte-exact backend
         uses: actions/download-artifact@v4
         with:
-          run-id: 43385953587
-          artifact-ids: 14018512857
+          run-id: 44525928215
+          artifact-ids: 14530745011
           github-token: ${{ github.token }}
           path: ${{ runner.temp }}/i66-stage-exact-download
       - name: Extract certified artifact into read-only evidence and independent deploy workspace
@@ -115,15 +138,14 @@ jobs:
           tar -xzf "${TARS[0]}" -C "$PACKAGE" --no-same-owner
           test -f "$PACKAGE/bundle/site/__recovery__/build.json"
           test -f "$PACKAGE/bundle/backend/bootstrap.js"
-          test "$(git hash-object "$PACKAGE/bundle/backend/b4-003-scoped-access-boundary.js")" = bc4cfabae86027657d08aaac21963fb605f5f17a
-          test "$(git hash-object "$PACKAGE/bundle/backend/b4-003-scoped-related-reader.js")" = 34cb6c09c63fb9e45feb6c9d55c3e1c514ab17b2
           node - <<'NODE'
           const assert=require('node:assert/strict'),fs=require('node:fs'),{execFileSync}=require('node:child_process');
           const root=process.env.RUNNER_TEMP+'/i66-stage-exact-package/bundle';
           const build=JSON.parse(fs.readFileSync(root+'/site/__recovery__/build.json'));
           assert.equal(build.sourceSha,process.env.SOURCE_SHA);
           for(const p of ['functions/i66-conciliaciones-active-ledger-projection.js',
-              'functions/b4-003-scoped-related-reader.js','functions/b4-003-scoped-access-boundary.js']){
+              'functions/b4-003-scoped-related-reader.js','functions/b4-003-scoped-access-boundary.js',
+              'functions/b4-003-scoped-bootstrap-reader.js']){
             const certified=fs.readFileSync(root+'/backend/'+p.split('/').at(-1));
             assert.ok(certified.equals(execFileSync('git',['show',process.env.SOURCE_SHA+':'+p])),
               'I66_STAGE_BACKEND_SOURCE_IS_NOT_CERTIFIED_'+p);
@@ -140,7 +162,7 @@ jobs:
       - uses: google-github-actions/setup-gcloud@v2
         with:
           version: '>= 483.0.0'
-      - name: Use only existing same-project credentials and snapshot R7 live function revision
+      - name: Use only existing same-project credentials and snapshot prior LIVE function revision
         run: |
           set -euo pipefail
           mkdir -p "$RUNNER_TEMP/i66-stage-auth"
@@ -201,7 +223,7 @@ jobs:
           echo "I66_STAGE_OLD_LIVE_REVISION=$OLD_REV" >> "$GITHUB_ENV"
           npm install --no-save --package-lock=false --ignore-scripts --no-audit --no-fund google-auth-library@10.9.1 firebase-admin@13.4.0 playwright@1.55.0 >/dev/null
           node node_modules/playwright/cli.js install --with-deps chromium >/dev/null
-      - name: Confirm immutable Preview and R7 rollback version before any live changes
+      - name: Confirm immutable Preview and pinned rollback version before any LIVE changes
         run: node tools/gravicentra-i66-conciliaciones-stage-exact-live-transport.mjs pre
       - name: Publish one LIVE reader plus exact Preview Hosting version, rollback on any failure
         run: |
@@ -214,8 +236,8 @@ jobs:
               gcloud run services update-traffic "$I66_STAGE_LIVE_SERVICE" --region us-east1 --project "$PROJECT_ID" --to-revisions="$I66_STAGE_OLD_LIVE_REVISION=100" --quiet || failed=1
               # Never overwrite a concurrent independent production release.
               LIVE_SHA=$(curl -fsSL --max-time 20 https://ays-orbit-360-lab.web.app/__recovery__/build.json | node -e 'let s="";process.stdin.on("data",x=>s+=x).on("end",()=>{try{process.stdout.write(JSON.parse(s).sourceSha||"")}catch{}})')
-              if test "$LIVE_SHA" = '0153f5cbbe00c3732e11ebae59b32bd357e38bfd' || test "$LIVE_SHA" = "$SOURCE_SHA";then
-                node "$FIREBASE_CLI_BIN" hosting:clone "ays-orbit-360-lab@9cedc5ecda75bb2a" 'ays-orbit-360-lab:live' --project "$PROJECT_ID" --non-interactive || failed=1
+              if test "$LIVE_SHA" = "$I66_STAGE_OLD_LIVE_SOURCE" || test "$LIVE_SHA" = "$SOURCE_SHA";then
+                node "$FIREBASE_CLI_BIN" hosting:clone "ays-orbit-360-lab@${I66_STAGE_OLD_HOSTING_VERSION##*/}" 'ays-orbit-360-lab:live' --project "$PROJECT_ID" --non-interactive || failed=1
               else
                 echo 'I66_STAGE_HOSTING_ROLLBACK_CONCURRENT_SOURCE_CHANGED_STOP';failed=1
               fi
@@ -242,7 +264,7 @@ jobs:
           console.log('I66_STAGE_LIVE_READER_NEW_REVISION_100_PERCENT_PASS');
           NODE
           node tools/gravicentra-i66-conciliaciones-stage-exact-live-transport.mjs promote
-          I66_STAGE_MODE=LIVE node tools/gravicentra-i66-conciliaciones-stage-signed-preview-ui-readonly.cjs
+          I66_NEW_POLICY_SIGNED_LIVE_ONLY=true I66_PREVIEW_ORIGIN=https://app.aysseguros.com I66_PREVIEW_SOURCE_SHA="$SOURCE_SHA" node tools/gravicentra-i6-6-carlos-paula-new-policy-client360-preview-uat.cjs
           node tools/gravicentra-i66-conciliaciones-stage-exact-live-transport.mjs post
           node "$FIREBASE_CLI_BIN" functions:list --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/i66-stage-fns-after.json"
           node - <<'NODE'
@@ -257,12 +279,12 @@ jobs:
           NODE
           completed=1
           trap - EXIT
-          echo 'I66_STAGE_EXACT_ARTIFACT_SIGNED_LIVE_ACCEPTANCE_PASS_ZERO_BUSINESS_WRITES'
+          echo 'I66_INSURER_EXACT_ARTIFACT_TWO_ROLES_SIGNED_LIVE_SYNTHETIC_RESTORED_NO_REAL_FINANCIAL_BACKFILL_PASS'
       - name: Preserve PII-free LIVE release evidence and rollback pointer
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: gi-i66-conciliaciones-exact-live-evidence-${{ github.run_id }}
+          name: gi-i66-insurer-self-admin-exact-live-evidence-${{ github.run_id }}
           path: ${{ runner.temp }}/i66-stage-live-exact-proof.json
           retention-days: 30
           if-no-files-found: warn
