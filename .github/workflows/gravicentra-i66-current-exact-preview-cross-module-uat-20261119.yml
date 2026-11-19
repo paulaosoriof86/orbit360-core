@@ -1,0 +1,82 @@
+name: Gravicentra I6.6 Current Exact Preview Signed Cross-Module UAT
+on:
+  push:
+    branches: [recovery/fase-a-clean-20260831]
+    paths:
+      - .github/workflows/gravicentra-i66-current-exact-preview-cross-module-uat-20261119.yml
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: gi-i66-current-exact-preview-crossmodule-qa
+  cancel-in-progress: false
+jobs:
+  signed-preview:
+    if: github.repository == 'paulaosoriof86/orbit360-core' && github.ref == 'refs/heads/recovery/fase-a-clean-20260831'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 48
+    env:
+      I66_PREVIEW_ORIGIN: https://ays-orbit-360-lab--gi-i66-rc-44609701409-zv8vzb9e.web.app
+      I66_SIGNED_QA_CHANNEL_ID: gi-i66-rc-44609701409
+      I66_SOURCE_SHA: 598576605807109dc0139017bfa045956618d76d
+      EXPECTED_BUILD_RUN: '44609701409'
+      EXPECTED_ARTIFACT_ID: '14570638996'
+      EXPECTED_ARTIFACT_DIGEST: sha256:f3cfe4e7d277edee239223ca66191a70eb92e27edefed174b8cb8c403fd5c7e7
+      SA_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_ALT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Pin previously certified immutable artifact and existing LIVE
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor "$I66_SOURCE_SHA" HEAD
+          test -z "$(git diff --name-only "$I66_SOURCE_SHA" HEAD -- orbit360-platform functions firebase.json firestore.rules storage.rules)"
+          node --check tools/gravicentra-i6-6-carlos-real-signed-synthetic-preview-uat.cjs
+          node --check tools/gravicentra-i66-carlos-paula-signed-direct-renewal-preview-hydration-readonly.cjs
+          node --check tools/gravicentra-i6-6-carlos-payment-signed-synthetic-preview-uat.cjs
+          node - <<'NODE'
+          const assert=require('node:assert/strict');
+          (async()=>{
+            const h={Authorization:'Bearer '+process.env.GH_TOKEN,Accept:'application/vnd.github+json','User-Agent':'GI-I66-Current-Operational-QA'};
+            const base='https://api.github.com/repos/paulaosoriof86/orbit360-core/actions/';
+            const [run,artifact,preview,live]=await Promise.all([
+              fetch(base+'runs/'+process.env.EXPECTED_BUILD_RUN,{headers:h}).then(x=>x.json()),
+              fetch(base+'artifacts/'+process.env.EXPECTED_ARTIFACT_ID,{headers:h}).then(x=>x.json()),
+              fetch(process.env.I66_PREVIEW_ORIGIN+'/__recovery__/build.json',{headers:{'cache-control':'no-cache'}}).then(x=>x.json()),
+              fetch('https://app.aysseguros.com/__recovery__/build.json',{headers:{'cache-control':'no-cache'}}).then(x=>x.json())
+            ]);
+            assert.equal(run.conclusion,'success','IMMUTABLE_BUILD_NOT_ACCEPTED');
+            assert.equal(run.head_sha,process.env.I66_SOURCE_SHA,'BUILD_SOURCE_MISMATCH');
+            assert.equal(artifact.workflow_run?.id,run.id,'ARTIFACT_WRONG_RUN');
+            assert.equal(artifact.digest,process.env.EXPECTED_ARTIFACT_DIGEST,'ARTIFACT_DIGEST_DRIFT');
+            assert.equal(artifact.expired,false,'ARTIFACT_EXPIRED');
+            assert.equal(preview.sourceSha,process.env.I66_SOURCE_SHA,'PREVIEW_SOURCE_DRIFT');
+            assert.equal(live.sourceSha,'1b65a790530d49fe1d1fb451f02838fd9a713c53','LIVE_UNEXPECTEDLY_CHANGED');
+            console.log('I66_EXACT_PREVIEW_PACKAGE_AND_LIVE_BACKUP_PASS');
+          })().catch(e=>{console.error(e.stack||e);process.exitCode=1;});
+          NODE
+      - name: Owner contract and anti-regression source tests
+        run: |
+          set -euo pipefail
+          node --test tools/gravicentra-i6-6-manual-policy-capture-p0.test.cjs tools/gravicentra-i6-6-ops-activity-direct-vehicle-endorsement.test.cjs tools/gravicentra-i6-6-documented-premium-terms.test.cjs
+          node --test tools/gravicentra-i6-6-operational-renewal-entry.test.cjs tools/gravicentra-i6-6-carlos-ops-tasks-transversal.test.cjs
+      - name: Install signed browser dependencies without source changes
+        run: |
+          set -euo pipefail
+          npm install --no-save --package-lock=false --ignore-scripts --no-audit --no-fund firebase-admin@13.4.0 playwright@1.55.0 >/dev/null
+          node node_modules/playwright/cli.js install --with-deps chromium >/dev/null
+      - name: Real-role signed Preview Ops Leads Tasks transactional writes and restoration
+        run: node tools/gravicentra-i6-6-carlos-real-signed-synthetic-preview-uat.cjs
+      - name: Real-role signed Preview direct-renewal hydration (read-only)
+        run: node tools/gravicentra-i66-carlos-paula-signed-direct-renewal-preview-hydration-readonly.cjs
+      - name: Real-role signed Preview payment receipt-carrier synthetic UAT and restoration
+        run: node tools/gravicentra-i6-6-carlos-payment-signed-synthetic-preview-uat.cjs
