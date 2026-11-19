@@ -190,12 +190,23 @@
         "RECEIPT_NOT_IDENTIFIED": 19
       },
       "protectedJobId": 135802582833,
-      "protectedJobLastObservedStatus": "WAITING_GITHUB_ENVIRONMENT_APPROVAL",
-      "liveWritesThisBatchConfirmed": 0,
+      "protectedJobLastObservedStatus": "COMPLETED_SUCCESS_2026_11_19",
+      "liveWritesThisBatchConfirmed": 110,
       "sourceCorrectionsInclude": [
         "Due date / amount by exact insurer requirement; latest insurer source prevails over stale SIGA/Firestore."
       ],
-      "protectedRunUrl": "https://github.com/paulaosoriof86/orbit360-core/actions/runs/44592619323"
+      "protectedRunUrl": "https://github.com/paulaosoriof86/orbit360-core/actions/runs/44592619323",
+      "readback": {
+        "status": "PROTECTED_REAL_POSTIMAGE_PASS",
+        "appliedRows": 110,
+        "receiptWrites": 110,
+        "carteraWrites": 110,
+        "cobroWrites": 0,
+        "isolatedHolds": 0,
+        "isolatedExceptionsUnapplied": 132,
+        "jobId": 135802582833,
+        "artifactId": 14563109294
+      }
     },
     "cendosoPaidRerun": {
       "codeCommit": "e74dc482d39372b308d73ac1d77504170cd0f1f2",
@@ -221,9 +232,64 @@
       "protectedJobLastObservedStatus": "WAITING_GITHUB_ENVIRONMENT_APPROVAL",
       "liveWritesThisRerunConfirmed": 0,
       "protectedRunUrl": "https://github.com/paulaosoriof86/orbit360-core/actions/runs/44593852150"
+    },
+    "liveBrowserUat20261119": {
+      "productionUrl": "https://app.aysseguros.com/",
+      "signedInRole": "Dirección",
+      "browser": "Paula-connected Chrome",
+      "visualEvidence": "DOM/UI of actual LIVE vs current Preview; read-only, no live form submissions",
+      "policyIssuanceForSergio": {
+        "liveFormOpens": true,
+        "clientPreselected": true,
+        "criticalFinding": "Aseguradora selected by default to PRUEBA PREVIEW QA instead of empty or real insurer. Persisted issuance not tested; do not assert PASS."
+      },
+      "renewals": {
+        "liveModule": "Pipeline por vencer",
+        "visibleAction": "Pedir renovar",
+        "directManualRenewalActionVisible": false,
+        "writeReloadPass": false
+      },
+      "payments": {
+        "liveModule": "Cobros · Cartera y conciliación",
+        "visibleActions": [
+          "Preparar lote",
+          "Conciliar"
+        ],
+        "manualApplyPaymentActionVisible": false,
+        "writeReloadPass": false
+      },
+      "vehicleSubstitution": {
+        "livePolicyModal": "Solicitar endoso, Crear gestión Ops only",
+        "previewPolicyModal": "Endoso de póliza, Crear gestión Ops plus Registrar sustitución ya emitida with insurer reference and effective date",
+        "directLiveSubstitutionAvailable": false,
+        "historyReadbackPass": false,
+        "secondRouteVerifiedLive": false
+      },
+      "client360Opportunity": {
+        "existingClientLiveButtonVisible": false,
+        "existingClientPreviewButtonVisible": true,
+        "previewButtonText": "Nueva inspección / oportunidad",
+        "linkAndSaveLivePass": false
+      },
+      "carlosCoradoInspection": {
+        "liveOpsTasksSeen": [
+          "Carlos corado inspección (11/11/2026), incomplete",
+          "Carlos corado 19/11/2026, completed"
+        ],
+        "inspectionKanbanCardsCount": 0,
+        "opsInspectionIngressOpens": "generic Nuevo prospecto form with no existing-client selector; would risk duplicate if saved",
+        "liveInspectionCreationPass": false
+      },
+      "previewStartup": {
+        "homeHasBanner": "No fue posible confirmar todas las fuentes de información autorizadas.",
+        "confirmedSourceFraction": "4/5",
+        "livePromotionStillUnproven": true
+      },
+      "crossRoleCoverage": "Direction only in this read; no role matrix complete"
     }
   },
   "nextGates": [
+    "Fix and recertify missing live UI behavior: direct issued-vehicle substitution, Cliente360-linked existing-client opportunity/inspection, manual renewal/payment, insurer QA dropdown default; verify same approved artifact is promoted with role×viewport and write/reload evidence.",
     "Paula review environment approvals in the Nov20 110-ready source-bulk run and 15-ready historical paid Cobros run; then verify Firestore physical after/before receipts. NEVER call pending job applied.",
     "Reconcile 113 pending El Roble 2026/27 missing editions from insurer PDFs with exact currency/term before creating receipts.",
     "Resolve 177 legacy receipt identity gaps with source-backed unique policy/period/ordinal, preserve all 327 preexisting paid rows and their Cobros.",
