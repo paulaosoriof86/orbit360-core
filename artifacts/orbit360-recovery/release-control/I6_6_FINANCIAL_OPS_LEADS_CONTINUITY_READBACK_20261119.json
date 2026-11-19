@@ -480,5 +480,116 @@
     ],
     "noSilentPass": true,
     "productSourceChangedAfterPreviousLive": true
+  },
+  "freshReadbackAfterColumnaGyTReplacement20261119": {
+    "recordType": "READONLY_EVIDENCE_NO_LIVE_ACCEPTANCE_NO_PAYMENT_POSTING",
+    "sourceDriveFolder": "Cartera - Estados de Cuenta Aseguradoras/Por aseguradora",
+    "columnGyT": {
+      "gytSourceDriveId": "11qssA9ETh74h9kFJMYYg-2CDSGaaqFL8",
+      "gytSourceSha256": "48a9ba712c62eea5bae1258d9b7cc8d6691958f8bf8355fa61c3d8d1b446469e",
+      "gyt5Rows": [
+        {
+          "policy": "492287",
+          "case": "GYT_NOV19_0001",
+          "hold": "RECEIPT_NOT_IDENTIFIED"
+        },
+        {
+          "policy": "541608",
+          "case": "GYT_NOV19_0002",
+          "hold": "POLICY_EDITION_MISSING"
+        },
+        {
+          "policy": "519815",
+          "case": "GYT_NOV19_0003",
+          "hold": "POLICY_EDITION_MISSING"
+        },
+        {
+          "policy": "541608",
+          "case": "GYT_NOV19_0004",
+          "hold": "POLICY_EDITION_MISSING"
+        },
+        {
+          "policy": "519815",
+          "case": "GYT_NOV19_0005",
+          "hold": "POLICY_EDITION_MISSING"
+        }
+      ],
+      "protectedRunId": 44624680162,
+      "preflightStatus": "SUCCESS_ZERO_ELIGIBLE_ZERO_WRITES",
+      "previousPreflightMissedAll5": true,
+      "aliasesCorrectedCommit": "6de41297e58d081f3f4713ce009c344652512dd1",
+      "insurer2026PolicyDocsFound": {
+        "AUTO-492287": "1QJfbs5J4SSi4HRAePHi2VrGbQhhUxeEe",
+        "AUTO-519815": "1mZdJj9Ft7nrW87Jf7Od4bMpb-1SamjJR"
+      },
+      "unlocatedIssuedDocumentFor": "541608",
+      "noAutomaticRenewalWritesUntilExistingEditionVsSourceReconciled": true
+    },
+    "columna": {
+      "currentFolderDriveId": "1RUtvdj078FUoL8B03h7CTTNhMrzHm7Mw",
+      "receivedNewerFile": "Estado de cuenta Columna a noviembre 16.xlsb",
+      "fileId": "1OzMu3VZaaf4lB3wdNQVDjgRQJtmnJdVA",
+      "rawSha256": "d688b05c677fd27e6466e0dfd65b1002fda9a52f23b94b819a0f6d2d69888f4a",
+      "rawSizeBytes": 12079902,
+      "sheetsPresent": 6,
+      "parsedOperationalRows": false,
+      "olderNov19XlsxStillDuplicatesGyTRows": true,
+      "noColumnaWritesFromAmbiguousOldXlsx": true
+    },
+    "german": {
+      "screenshotReporter": "Carlos Operativo",
+      "dataCensusRunId": 44619285215,
+      "recognizedAdvisorProfile": true,
+      "role": "Asesor",
+      "country": "GT",
+      "active": true,
+      "signedTestRunId": 44619285215,
+      "live": {
+        "callable": "orbit360AssignableAdvisorRoster",
+        "serverCount": 8,
+        "serverGerman": true,
+        "modalCountWithPlaceholder": 9,
+        "modalGerman": true
+      },
+      "preview": {
+        "callable": "orbit360AssignableAdvisorRosterPreview",
+        "serverCount": 8,
+        "serverGerman": true,
+        "modalCountWithPlaceholder": 9,
+        "modalGerman": true
+      },
+      "unresolvedOtherSelectorsMayUseScopedLocalAdvisors": true,
+      "noDuplicateAdvisorCreated": true
+    },
+    "signedPreview": {
+      "workflowRunId": 44618874905,
+      "status": "SUCCESS",
+      "opsLeadsTasksBothActorsWriteReloadRollback": true,
+      "renewalHydrationBothActorsReadOnlyPass": true,
+      "paymentsBothActorsSyntheticWriteReloadRollback": true,
+      "realEndosoSubstitutionFullPass": false,
+      "realClientInspectionFullPass": false,
+      "newSourcePromotedToLive": false
+    },
+    "liveReleaseDiscrepancy": {
+      "actualOnBothLiveOrigins": "b38f877f7847c7b6e11506885e42252e84c5eeb6",
+      "acceptedControlPlane": "1b65a790530d49fe1d1fb451f02838fd9a713c53",
+      "firebaseLiveHostingVersion": "sites/ays-orbit-360-lab/versions/13944f80ba1e0bdf",
+      "priorAcceptedHostingVersion": "sites/ays-orbit-360-lab/versions/bf40099201b2ea51",
+      "firebaseLiveDeploymentsAfterControlPlane": [
+        "2026-11-19T13:16:04.393Z",
+        "2026-11-19T14:05:33.335Z"
+      ],
+      "mustReconcilePriorToSameArtifactLivePromotion": true
+    },
+    "nextSafeActions": [
+      "Resolve G&T source 492287 receipt reference and locate real 2026 editions for 519815/541608 without duplicating policy",
+      "Read Columna current XLSB safely via supported spreadsheet conversion/reader before any batch",
+      "Find precise UI surface from Carlos screenshot that uses outdated local advisor directory, preserve canonical server roster and verify operative save",
+      "Finish signed end-to-end direct issued vehicle substitution and existing-client inspection routes in Preview",
+      "Reconcile two newer LIVE Hosting releases against control plane and certify backend source before same-artifact promotion"
+    ],
+    "writesByThisReadback": 0,
+    "doNotClaimFullI66Pass": true
   }
 }
