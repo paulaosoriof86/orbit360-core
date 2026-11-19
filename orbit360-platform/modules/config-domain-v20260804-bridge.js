@@ -27,15 +27,46 @@
     return `<div class="cfg-row"><div class="cfg-lab">${esc(label)}${hint ? `<small>${esc(hint)}</small>` : ''}</div><div class="cfg-ctrl">${control}</div></div>`;
   }
 
+  const DEFAULT_CADENCE_STEPS = [
+    {day:1,channel:'whatsapp',label:'Bienvenida y primer contacto',templateId:'lead_wa_d1',subject:'',body:'Hola {nombre}, gracias por contactarnos. ¿En qué podemos ayudarte?'},
+    {day:3,channel:'whatsapp',label:'Seguimiento comercial',templateId:'lead_wa_d3',subject:'',body:'Hola {nombre}, seguimos atentos a tu solicitud de {producto}.'},
+    {day:7,channel:'email',label:'Seguimiento por correo',templateId:'lead_email_d7',subject:'Seguimiento a tu solicitud',body:'Hola {nombre}, te damos seguimiento a tu solicitud de {producto}.'},
+    {day:14,channel:'whatsapp',label:'Último seguimiento',templateId:'lead_wa_d14',subject:'',body:'Hola {nombre}, seguimos disponibles cuando quieras retomar tu seguro.'}
+  ];
+  const DEFAULT_WORKFLOW_STAGES = {
+    nuevo:{label:'Nuevo',leads:true,ops:false,next:['contactado','cotizando','perdido']},
+    contactado:{label:'Contactado',leads:true,ops:false,next:['cotizando','perdido']},
+    cotizando:{label:'Cotizando',leads:true,ops:true,opsList:'Cotizaciones',next:['propuesta','perdido']},
+    propuesta:{label:'Propuesta',leads:true,ops:false,next:['negociacion','inspeccion','emision','perdido']},
+    negociacion:{label:'Negociación',leads:true,ops:false,next:['inspeccion','emision','perdido']},
+    inspeccion:{label:'Inspección',leads:true,ops:true,opsList:'Inspecciones',next:['emision','perdido']},
+    emision:{label:'Emisión',leads:true,ops:true,opsList:'Emisiones',next:['emitido','perdido']},
+    emitido:{label:'Emitido',leads:true,ops:false,terminal:true,next:[]},
+    perdido:{label:'Perdido',leads:true,ops:false,terminal:true,next:['contactado']}
+  };
+  function cadenceRow(step) {
+    return `<tr data-wf-cadence-row="1">
+      <td><input class="o-sel" type="number" min="0" max="365" step="1" data-cad="day" value="${Number(step.day||0)}" style="width:66px"></td>
+      <td><select class="o-sel" data-cad="channel">${[['whatsapp','WhatsApp'],['email','Correo'],['internal','Tarea interna']].map(([id,name])=>`<option value="${id}" ${step.channel===id?'selected':''}>${name}</option>`).join('')}</select></td>
+      <td><input class="o-sel" data-cad="label" maxlength="160" value="${esc(step.label||'')}" style="min-width:160px"></td>
+      <td><input class="o-sel" data-cad="templateId" maxlength="100" value="${esc(step.templateId||'')}" style="min-width:110px"></td>
+      <td><input class="o-sel" data-cad="subject" maxlength="240" value="${esc(step.subject||'')}" placeholder="Asunto (correo)" style="min-width:145px"></td>
+      <td><textarea class="o-sel" data-cad="body" maxlength="1500" rows="2" style="min-width:240px">${esc(step.body||'')}</textarea></td>
+      <td><button type="button" class="btn ghost sm" data-cad-remove="1" title="Quitar paso">✕</button></td>
+    </tr>`;
+  }
+
   async function workflow(body) {
     const response = await Orbit.domainConfig.get('workflow');
     const cfg = response.config || Orbit.domainConfig.defaults('workflow');
-    const stages = Object.entries(cfg.stages || {});
+    const stageConfig=cfg.stages&&Object.keys(cfg.stages).length?cfg.stages:DEFAULT_WORKFLOW_STAGES;
+    const stages = Object.entries(stageConfig);
+    const cadenceSteps = Array.isArray(cfg.cadenceSteps)&&cfg.cadenceSteps.length?cfg.cadenceSteps:DEFAULT_CADENCE_STEPS;
     body.innerHTML = `<div class="cfg-h"><b>Flujos de trabajo</b><span>Etapas, sincronización, SLA y automatizaciones sin código</span></div>
       <div class="cfg-note">Una oportunidad se conserva como un solo registro y se muestra en Leads, Ops o ambos según la etapa configurada.</div>
       ${toggle('wf-advisor', cfg.advisorManagementProjection !== false, 'Gestiones visibles al asesor', 'Muestra en Leads las gestiones operativas asignadas.')}
       ${toggle('wf-portal', cfg.portalResponseEnabled !== false, 'Respuesta en Portal', 'Conserva la respuesta de cada gestión para que el cliente pueda consultarla.')}
-      ${toggle('wf-cadence', cfg.cadenceEnabled !== false, 'Cadencias comerciales', 'Activa seguimientos configurados al enviar una propuesta.')}
+      ${toggle('wf-cadence', cfg.cadenceEnabled !== false, 'Cadencias comerciales', 'El calendario comienza con la creación del lead. Cada oportunidad puede desactivarlo o desplazar su inicio.')}
       ${toggle('wf-escalation', cfg.escalationEnabled !== false, 'Escalamientos', 'Eleva gestiones vencidas o sin actividad según SLA.')}
       ${toggle('wf-duplicates', cfg.duplicateDetectionEnabled !== false, 'Detección de duplicados', 'Evita crear solicitudes repetidas para el mismo cliente y asunto.')}
       ${field('SLA predeterminado', `<input id="wf-sla" type="number" min="0" class="o-sel" value="${Number(cfg.defaultManagementSlaHours || 72)}" style="width:130px"> horas`, 'Puede ajustarse posteriormente por tipo de gestión.')}
@@ -43,13 +74,31 @@
       <div class="card" style="overflow:auto"><table class="tbl"><thead><tr><th>Etapa</th><th>Leads</th><th>Ops</th><th>Lista Ops</th><th>SLA horas</th><th>Siguientes</th></tr></thead><tbody>
         ${stages.map(([id, stage]) => `<tr data-wf-stage="${esc(id)}"><td><b>${esc(stage.label || id)}</b><div class="muted mono" style="font-size:10px">${esc(id)}</div></td><td><input type="checkbox" data-field="leads" ${stage.leads !== false ? 'checked' : ''}></td><td><input type="checkbox" data-field="ops" ${stage.ops ? 'checked' : ''}></td><td><input class="o-sel" data-field="opsList" value="${esc(stage.opsList || '')}" style="min-width:140px"></td><td><input class="o-sel" type="number" min="0" data-field="slaHours" value="${Number(stage.slaHours || 0)}" style="width:90px"></td><td><input class="o-sel" data-field="next" value="${esc((stage.next || []).join(', '))}" style="min-width:190px"></td></tr>`).join('')}
       </tbody></table></div>
+      <div class="cfg-h" style="margin-top:20px"><b>Cadencias y plantillas por paso</b><span>Autoadministrables por tenant · días contados desde la creación</span></div>
+      <div class="cfg-note">Configura días, canal, asunto y texto. Variables: {nombre}, {producto}. Guardar un paso no acredita que el proveedor haya enviado el mensaje; la entrega se confirma por separado.</div>
+      <div class="card" style="overflow:auto"><table class="tbl"><thead><tr><th>Día</th><th>Canal</th><th>Acción</th><th>ID plantilla</th><th>Asunto</th><th>Mensaje</th><th></th></tr></thead><tbody id="wf-cadence-rows">${cadenceSteps.map(cadenceRow).join('')}</tbody></table></div>
+      <button type="button" class="btn ghost sm" id="wf-cadence-add" style="margin-top:8px">+ Añadir paso</button>
       <div style="display:flex;justify-content:flex-end;margin-top:14px"><button class="btn primary" id="wf-save">Guardar flujos</button></div>`;
+
+    body.querySelector('#wf-cadence-add').addEventListener('click',()=>{
+      const rows=body.querySelector('#wf-cadence-rows');
+      if(rows.querySelectorAll('[data-wf-cadence-row]').length>=12){toast('Máximo 12 pasos por cadencia.');return;}
+      const prior=[...rows.querySelectorAll('[data-wf-cadence-row]')].slice(-1)[0];
+      const lastDay=Number(prior&&prior.querySelector('[data-cad="day"]').value||0);
+      rows.insertAdjacentHTML('beforeend',cadenceRow({day:lastDay+1,channel:'internal',label:'Nuevo seguimiento',templateId:'lead_followup_'+(lastDay+1),subject:'',body:'Seguimiento de {nombre}.'}));
+    });
+    body.querySelector('#wf-cadence-rows').addEventListener('click',event=>{
+      const button=event.target.closest('[data-cad-remove]');if(!button)return;
+      const rows=body.querySelectorAll('[data-wf-cadence-row]');
+      if(rows.length<=1){toast('Debe conservarse al menos un paso.');return;}
+      button.closest('[data-wf-cadence-row]').remove();
+    });
 
     body.querySelector('#wf-save').addEventListener('click', async () => {
       const stagesOut = {};
       body.querySelectorAll('[data-wf-stage]').forEach(row => {
         const stageId = row.dataset.wfStage;
-        const previous = cfg.stages[stageId] || {};
+        const previous = stageConfig[stageId] || {};
         const get = name => row.querySelector('[data-field="' + name + '"]');
         stagesOut[stageId] = {
           label: previous.label || stageId,
@@ -62,18 +111,27 @@
           next: text(get('next').value).split(',').map(v => text(v)).filter(Boolean)
         };
       });
+      const stepsOut=[...body.querySelectorAll('[data-wf-cadence-row]')].map(row=>{
+        const val=key=>text(row.querySelector('[data-cad="'+key+'"]').value);
+        return{day:Number(val('day')),channel:val('channel'),label:val('label'),templateId:val('templateId'),subject:val('subject'),body:val('body')};
+      });
+      const validSteps=stepsOut.length>=1&&stepsOut.length<=12&&stepsOut.every((step,index)=>Number.isInteger(step.day)&&step.day>=0&&step.day<=365&&
+        (index===0||step.day>stepsOut[index-1].day)&&step.label&&step.templateId&&step.body&&
+        (step.channel!=='email'||step.subject));
+      if(!validSteps){toast('Revisa los días crecientes, las plantillas y los asuntos de correo.');return;}
       const next = Object.assign({}, cfg, {
         stages: stagesOut,
         advisorManagementProjection: bool(body, 'wf-advisor'),
         portalResponseEnabled: bool(body, 'wf-portal'),
-        cadenceEnabled: bool(body, 'wf-cadence'),
+        cadenceEnabled: bool(body, 'wf-cadence'),cadenceStart:'creation',cadenceSteps:stepsOut,
         escalationEnabled: bool(body, 'wf-escalation'),
         duplicateDetectionEnabled: bool(body, 'wf-duplicates'),
         defaultManagementSlaHours: num(body, 'wf-sla', 72)
       });
       try {
         const result = await Orbit.domainConfig.save('workflow', next, 'Configuración de flujos actualizada por el administrador del tenant');
-        toast(result.syncPending ? '✓ Flujos guardados; la sincronización se completará al activar el servicio.' : '✓ Flujos guardados');
+        if(result.syncPending||result.source!=='protected')throw Error('WORKFLOW_CONFIG_CANONICAL_READBACK_REQUIRED');
+        toast('Cadencia y plantillas guardadas en configuración del tenant. La entrega externa todavía requiere prueba del proveedor.');
       } catch (error) { toast('No fue posible guardar los flujos. Revisa las transiciones.'); }
     });
   }

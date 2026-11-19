@@ -2,7 +2,7 @@
 
 const crypto = require('node:crypto');
 const { getApps, initializeApp } = require('firebase-admin/app');
-const { getFirestore, FieldValue } = require('firebase-admin/firestore');
+const { getFirestore, FieldValue, FieldPath } = require('firebase-admin/firestore');
 const { HttpsError, onCall } = require('firebase-functions/v2/https');
 const { onSchedule } = require('firebase-functions/v2/scheduler');
 const { resolveProductActiveRole } = require('./product-active-role-contract');
@@ -10,6 +10,12 @@ const { resolveProductActiveRole } = require('./product-active-role-contract');
 const REGION = process.env.ORBIT360_FUNCTIONS_REGION || 'us-central1';
 const PREVIEW_REGION = 'us-east1';
 const VERSION = 'orbit360-ops-leads-product-domain-v13-management-collaboration';
+const DEFAULT_CADENCE_STEPS=Object.freeze([
+ {day:1,channel:'whatsapp',label:'Bienvenida y primer contacto',templateId:'lead_wa_d1',subject:'',body:'Hola {nombre}, gracias por contactarnos. ¿En qué podemos ayudarte?'},
+ {day:3,channel:'whatsapp',label:'Seguimiento comercial',templateId:'lead_wa_d3',subject:'',body:'Hola {nombre}, seguimos atentos a tu solicitud de {producto}.'},
+ {day:7,channel:'email',label:'Seguimiento por correo',templateId:'lead_email_d7',subject:'Seguimiento a tu solicitud',body:'Hola {nombre}, te damos seguimiento a tu solicitud de {producto}.'},
+ {day:14,channel:'whatsapp',label:'Último seguimiento',templateId:'lead_wa_d14',subject:'',body:'Hola {nombre}, seguimos disponibles cuando quieras retomar tu seguro.'}
+]);
 const app = getApps()[0] || initializeApp();
 const db = getFirestore(app);
 const DEFAULT_STAGES = Object.freeze({
@@ -37,7 +43,7 @@ const MANAGEMENT_MUTABLE_FIELDS = Object.freeze([
   'proximaAccion','checklist','nota','notas','origen','bitacora','comentarios','creado','actualizado','resultado',
   'adjuntos','documentoCargaPendiente','documentoCargaFallida'
 ]);
-const BUSINESS_CREATE_EXTRA_FIELDS = Object.freeze(['plan','segmento','aseguradoraIds','puntoIngreso','commercialIdentityId','sourceOpportunityId','polizaId','cancelacionId','prob','proximoToque','descripcion','cadenciaActiva','cadencia','nroCotizacion','decision','bitacora','motivoPerdido','checklist','colLeads','notas','comentarios','vence','creado','actualizado','ultimoContacto']);
+const BUSINESS_CREATE_EXTRA_FIELDS = Object.freeze(['plan','segmento','aseguradoraIds','puntoIngreso','commercialIdentityId','sourceOpportunityId','polizaId','cancelacionId','prob','proximoToque','descripcion','cadenciaActiva','cadencia','cadenciaRetrasoDias','nroCotizacion','decision','bitacora','motivoPerdido','checklist','colLeads','notas','comentarios','vence','creado','actualizado','ultimoContacto']);
 const MANAGEMENT_CREATE_EXTRA_FIELDS = Object.freeze(['cancelacionId','ramo','pais','moneda','producto','vence','proximaAccion','checklist','notas','bitacora','comentarios','creado','actualizado','resultado','adjuntos','documentoCargaPendiente','documentoCargaFallida']);
 const ISSUANCE_MANAGEMENT_FIELDS = Object.freeze(['workflowType','requestKey','operationId','issuanceMode','sourcePolicyId','renewalManagementId','pais','moneda','producto','acceptedOffer','acceptedConfirmed','emissionStage','requiereInspeccion','documentosCompletos','requiereValidacion','validacionAlertas','policyCreatedId','policyNumber','documentRef','resueltaAt','nuevaPolizaId','emisionGestionId']);
 const RENEWAL_MANAGEMENT_FIELDS = Object.freeze(['workflowType','renewalAction','sourcePolicyId','acceptedConfirmed','clientApprovalAt','clientApprovalNote','quoteContext','directRenewalPolicyId','issuanceRequestId','nuevaPolizaId','emisionGestionId']);
@@ -200,7 +206,7 @@ async function authorize(request,operation){
    email:text(member.email||request.auth.token&&request.auth.token.email,320),
    name:actorName,advisorId,activeRole:roleState.activeRole,roles:roleState.assignedRoles}};
 }
-function workflowConfig(raw){raw=raw||{};const stages={};const source=raw.stages&&typeof raw.stages==='object'?raw.stages:DEFAULT_STAGES;Object.entries(source).forEach(([key,s])=>{const k=norm(key);stages[k]={leads:s.leads!==false,ops:s.ops===true,opsList:text(s.opsList||s.listaOps,100),terminal:s.terminal===true,next:unique(s.next||s.siguientes||[]).map(norm)};});return{version:text(raw.version||VERSION,120),stages,notificationChannels:unique(raw.notificationChannels||['portal','in_app']),portalResponseEnabled:raw.portalResponseEnabled!==false,cadenceEnabled:raw.cadenceEnabled!==false};}
+function workflowConfig(raw){raw=raw||{};const stages={};const source=raw.stages&&typeof raw.stages==='object'?raw.stages:DEFAULT_STAGES;Object.entries(source).forEach(([key,s])=>{const k=norm(key);stages[k]={leads:s.leads!==false,ops:s.ops===true,opsList:text(s.opsList||s.listaOps,100),terminal:s.terminal===true,next:unique(s.next||s.siguientes||[]).map(norm)};});const cadenceSteps=Array.isArray(raw.cadenceSteps)&&raw.cadenceSteps.length?raw.cadenceSteps:DEFAULT_CADENCE_STEPS;return{version:text(raw.version||VERSION,120),stages,notificationChannels:unique(raw.notificationChannels||['portal','in_app']),portalResponseEnabled:raw.portalResponseEnabled!==false,cadenceEnabled:raw.cadenceEnabled!==false,cadenceStart:'creation',cadenceSteps};}
 async function config(t){const s=await configRef(t).get();return workflowConfig(s.exists?s.data():{});}
 function copyAllowed(target,input,fields){fields.forEach(k=>{if(input&&input[k]!==undefined)target[k]=stable(input[k]);});return target;}
 function copyWorkflowManagementFields(target,input,before){
@@ -319,9 +325,30 @@ if(operation==='create_business')prepared=canonicalizeCreationAudit(sanitizeBusi
 const committed=await db.runTransaction(async tx=>{const priorReq=await tx.get(req);if(priorReq.exists&&priorReq.data().status==='committed')return Object.assign({reused:true},priorReq.data().result||{});const snap=await tx.get(entity),before=snap.exists?snap.data():null;if(prepared&&before)throw new HttpsError('already-exists','El registro ya existe.');if(!prepared&&!before)throw new HttpsError('not-found','El registro no existe.');let after=prepared?Object.assign({},prepared):Object.assign({},before);if(operation==='update_business'||operation==='update_management')payload=canonicalizeCollaborationPayload(before,payload,authz.actor);const authorizationDomain=workflowAuthorizationDomain(authz,operation,entityType,before,payload,cfg);assertRecordCountryScope(authz.member,before,after);
 if(!workflowRoleModuleAllowed(authz,authorizationDomain,after))throw new HttpsError('permission-denied','El rol activo no puede escribir en este módulo o país.');
 if(!advisorAllowed(authz.member,after.asesorId||payload.asesorId||payload.advisorId,authorizationDomain,authz.actor.activeRole,authz.accessConfig))throw new HttpsError('permission-denied','El asesor está fuera de su alcance activo.');
+if(operation==='create_business'){
+  const stage=cfg.stages[after.etapa];
+  if(!stage||stage.leads!==true)throw new HttpsError('failed-precondition','BUSINESS_ENTRY_STAGE_NOT_CONFIGURED');
+  after.opsVisible=stage.ops===true;after.opsList=stage.opsList||'';
+  if(after.clienteId){
+    // A customer from Cliente 360 is a canonical identity, not a new lead
+    // identity to be silently created when this business is later issued.
+    const cs=await tx.get(dataRef(authz.tenantId,'clientes',id(after.clienteId,'clientId'))),cli=cs.exists?cs.data()||{}:null;
+    if(!cli||cli.archivado===true||cli.eliminado===true||cli.tenantId&&cli.tenantId!==authz.tenantId||
+       text(cli.pais,8).toUpperCase()&&text(cli.pais,8).toUpperCase()!==after.pais)
+      throw new HttpsError('failed-precondition','BUSINESS_EXISTING_CLIENT_SCOPE_MISMATCH');
+  }
+  const delay=Number(after.cadenciaRetrasoDias||0);
+  if(!Number.isInteger(delay)||delay<0||delay>30)throw new HttpsError('invalid-argument','CADENCE_DELAY_OUT_OF_RANGE');
+  after.cadenciaRetrasoDias=delay;
+  after.cadenciaActiva=previewOnly!==true&&cfg.cadenceEnabled&&payload.cadenciaActiva!==false;
+  after.cadenciaPaso=1;
+  after.cadenciaInicio=localDate();
+  after.cadencia=(cfg.cadenceSteps||DEFAULT_CADENCE_STEPS).map(s=>`Día ${s.day} · ${s.label}`);
+  after.proximoToque=after.cadenciaActiva?plusDays(after.cadenciaInicio,delay+Number(cfg.cadenceSteps[0].day)):'';
+}
 if(entityType==='gestiones'&&after.workflowType==='endorsement_request'&&prepared)
   await validateEndorsementMutation(tx,{tenantId:authz.tenantId,authz,operation,entityId,payload,before,after,previewOnly});
-if(operation==='transition_business'){const from=norm(before.etapa),to=norm(payload.to||payload.etapa||payload.stage),stage=cfg.stages[from];if(!cfg.stages[to])throw new HttpsError('failed-precondition','La etapa destino no está configurada.');if(!stage||!stage.next.includes(to))throw new HttpsError('failed-precondition','Transición no permitida.');copyAllowed(after,payload,BUSINESS_MUTABLE_FIELDS.filter(k=>!['etapa','archivado'].includes(k)));after.etapa=to;after.prob=Number(payload.prob!=null?payload.prob:after.prob||0);after.opsVisible=cfg.stages[to].ops===true;after.opsList=cfg.stages[to].opsList||'';if(to==='propuesta'&&cfg.cadenceEnabled){after.cadenciaActiva=true;after.cadenciaPaso=Math.max(1,Number(after.cadenciaPaso)||1);if(!text(after.proximoToque,40))after.proximoToque=new Date(Date.now()+3*86400000).toISOString().slice(0,10);}
+if(operation==='transition_business'){const from=norm(before.etapa),to=norm(payload.to||payload.etapa||payload.stage),stage=cfg.stages[from];if(!cfg.stages[to])throw new HttpsError('failed-precondition','La etapa destino no está configurada.');if(!stage||!stage.next.includes(to))throw new HttpsError('failed-precondition','Transición no permitida.');copyAllowed(after,payload,BUSINESS_MUTABLE_FIELDS.filter(k=>!['etapa','archivado'].includes(k)));after.etapa=to;after.prob=Number(payload.prob!=null?payload.prob:after.prob||0);after.opsVisible=cfg.stages[to].ops===true;after.opsList=cfg.stages[to].opsList||'';
 if(to==='emitido'){
   const emission=after.emissionContract&&typeof after.emissionContract==='object'?after.emissionContract:{},policyDraft=emission.policy&&typeof emission.policy==='object'?emission.policy:{},vehicleDraft=emission.vehicle&&typeof emission.vehicle==='object'?emission.vehicle:null;
   const identity=clientIdentity(after),explicitClientId=text(after.clienteId||after.clienteIdCreado,180),candidateIds=new Set();
@@ -412,34 +439,49 @@ if(entityType==='gestiones'&&confirmedRow.workflowType==='endorsement_request'){
 }
 return Object.assign({},committed,response);}
 
-const CADENCE_STEPS=Object.freeze([
- {label:'Día 3 · WhatsApp de seguimiento',nextDays:4},
- {label:'Día 7 · correo con propuesta si no responde WhatsApp',nextDays:7},
- {label:'Día 14 · WhatsApp de cierre',nextDays:null}
-]);
 function localDate(){return new Intl.DateTimeFormat('en-CA',{timeZone:'America/Guatemala',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());}
 function plusDays(dateText,days){const d=new Date(String(dateText||localDate())+'T12:00:00Z');return new Date(d.getTime()+Number(days||0)*86400000).toISOString().slice(0,10);}
 async function runCadenceBusiness(tenantId,businessId,preview){
- const bRef=dataRef(tenantId,'negocios',businessId),today=localDate();
+ const bRef=dataRef(tenantId,'negocios',businessId),today=localDate(),cfg=await config(tenantId);
+ if(!cfg.cadenceEnabled)return{ok:true,due:false,reason:'TENANT_CADENCE_DISABLED'};
  return db.runTransaction(async tx=>{
   const snap=await tx.get(bRef);if(!snap.exists)return{ok:false,missing:true};
   const before=snap.data()||{};if(preview&&before.previewWrite!==true)throw new Error('R20_CADENCE_PREVIEW_SYNTHETIC_ONLY');
+  if(!preview&&before.previewWrite===true)return{ok:true,due:false,reason:'PREVIEW_NEVER_SCHEDULED_IN_LIVE'};
   if(before.archivado===true||before.cadenciaActiva!==true||!text(before.proximoToque,40)||text(before.proximoToque,40)>today)return{ok:true,due:false};
-  const step=Math.max(1,Math.min(CADENCE_STEPS.length,Number(before.cadenciaPaso)||1)),def=CADENCE_STEPS[step-1];
+  const steps=cfg.cadenceSteps||DEFAULT_CADENCE_STEPS;
+  const step=Math.max(1,Math.min(steps.length,Number(before.cadenciaPaso)||1)),def=steps[step-1];
+  if(!def)return{ok:true,due:false,reason:'TENANT_CADENCE_EMPTY'};
+  const label=`Día ${def.day} · ${def.label}`;
   const taskId=(preview?'b4003qa_cad_':'cad_')+sha(tenantId+'|'+businessId+'|'+step).slice(0,24),taskRef=dataRef(tenantId,'gestiones',taskId);
   const eventId='evt_'+sha(tenantId+'|cadence|'+businessId+'|'+step).slice(0,28),eRef=eventRef(tenantId,eventId,preview),oRef=outboxRef(tenantId,eventId,preview);
-  const taskSnap=await tx.get(taskRef);if(!taskSnap.exists)tx.set(taskRef,{id:taskId,tenantId,tipo:'Seguimiento de cadencia',titulo:def.label,negocioId:businessId,clienteId:text(before.clienteId,180),asesorId:text(before.asesorId,180),pais:text(before.pais,8),producto:text(before.producto,180),ramo:text(before.ramo,140),estado:'Pendiente',prioridad:'Media',vence:today,proximaAccion:def.label,origen:'Cadencia automática',previewWrite:preview===true,createdAt:now(),updatedAt:now()},{merge:false});
-  const nextStep=step+1,next=nextStep<=CADENCE_STEPS.length?plusDays(today,def.nextDays):'';
-  const bit=[].concat(before.bitacora||[]).concat([{ts:new Date().toISOString(),user:'Sistema',campo:'Cadencia',de:text(before.proximoToque,40),a:def.label,origen:'auto'}]).slice(-100);
+  const taskSnap=await tx.get(taskRef);if(!taskSnap.exists)tx.set(taskRef,{id:taskId,tenantId,tipo:'Seguimiento de cadencia',titulo:label,negocioId:businessId,clienteId:text(before.clienteId,180),asesorId:text(before.asesorId,180),pais:text(before.pais,8),producto:text(before.producto,180),ramo:text(before.ramo,140),estado:'Pendiente',prioridad:'Media',vence:today,proximaAccion:label,origen:'Cadencia automática',previewWrite:preview===true,createdAt:now(),updatedAt:now()},{merge:false});
+  const nextStep=step+1,created=validDate(before.cadenciaInicio)?before.cadenciaInicio:(validDate(before.creado)?before.creado:today),delay=Math.max(0,Math.min(30,Number(before.cadenciaRetrasoDias)||0)),next=nextStep<=steps.length?plusDays(created,Number(steps[nextStep-1].day)+delay):'';
+  const bit=[].concat(before.bitacora||[]).concat([{ts:new Date().toISOString(),user:'Sistema',campo:'Cadencia',de:text(before.proximoToque,40),a:label,origen:'auto'}]).slice(-100);
   tx.set(bRef,{cadenciaPaso:nextStep,cadenciaUltimaAccionAt:now(),cadenciaUltimaAccion:def.label,proximoToque:next,cadenciaActiva:!!next,bitacora:bit,updatedAt:now()},{merge:true});
-  tx.set(eRef,{schemaVersion:VERSION,tenantId,operation:'cadence_due',entityType:'negocios',entityId:businessId,requestId:'cadence_'+taskId,actor:{uid:'system',advisorId:text(before.asesorId,180),activeRole:'system'},reason:def.label,previewWrite:preview===true,createdAt:now()},{merge:false});
-  tx.set(oRef,{schemaVersion:VERSION,tenantId,eventId,operation:'cadence_due',entityType:'negocios',entityId:businessId,targets:before.asesorId?[{type:'advisor',id:text(before.asesorId,180)}]:[{type:'role',id:'operations'}],channels:['in_app','topbar','tarea'],status:'pending_provider',previewWrite:preview===true,payload:{title:'Seguimiento de cadencia pendiente',message:def.label},createdAt:now()},{merge:false});
+  tx.set(eRef,{schemaVersion:VERSION,tenantId,operation:'cadence_due',entityType:'negocios',entityId:businessId,requestId:'cadence_'+taskId,actor:{uid:'system',advisorId:text(before.asesorId,180),activeRole:'system'},reason:label,previewWrite:preview===true,createdAt:now()},{merge:false});
+  tx.set(oRef,{schemaVersion:VERSION,tenantId,eventId,operation:'cadence_due',entityType:'negocios',entityId:businessId,targets:before.asesorId?[{type:'advisor',id:text(before.asesorId,180)}]:[{type:'role',id:'operations'}],channels:['in_app','topbar','tarea',def.channel],status:'pending_provider',previewWrite:preview===true,providerConfirmed:false,templateId:def.templateId,templateSnapshot:{channel:def.channel,subject:text(def.subject,240),body:text(def.body,1500)},payload:{title:'Seguimiento de cadencia pendiente',message:label},createdAt:now()},{merge:false});
   return{ok:true,due:true,businessId,taskId,eventId,step,nextStep,nextDate:next,previewWrite:preview===true};
  });
 }
 async function cadenceSweep(){
  const tenants=await db.collection('tenants').get(),summary={tenants:0,due:0,errors:[]};
- for(const td of tenants.docs){summary.tenants++;try{const snap=await dataRef(td.id,'negocios','_').parent.where('cadenciaActiva','==',true).limit(500).get();for(const doc of snap.docs){const row=doc.data()||{};if(row.archivado===true||!text(row.proximoToque,40)||text(row.proximoToque,40)>localDate())continue;const out=await runCadenceBusiness(td.id,doc.id,false);if(out&&out.due)summary.due++;}}catch(error){summary.errors.push({tenantId:td.id,error:text(error&&error.message||error,500)});}}
+ for(const td of tenants.docs){summary.tenants++;try{
+   const collection=dataRef(td.id,'negocios','_').parent;
+   let last=null;
+   for(let page=0;page<40;page++){
+     let query=collection.where('cadenciaActiva','==',true).orderBy(FieldPath.documentId()).limit(250);
+     if(last)query=query.startAfter(last);
+     const snap=await query.get();
+     for(const doc of snap.docs){const row=doc.data()||{};
+       if(row.previewWrite===true||row.archivado===true||!text(row.proximoToque,40)||text(row.proximoToque,40)>localDate())continue;
+       const out=await runCadenceBusiness(td.id,doc.id,false);if(out&&out.due)summary.due++;
+     }
+     if(snap.docs.length<250){last=null;break;}
+     last=snap.docs[snap.docs.length-1];
+     if(page===39)summary.errors.push({tenantId:td.id,error:'CADENCE_PAGINATION_LIMIT_REACHED'});
+   }
+  }catch(error){summary.errors.push({tenantId:td.id,error:text(error&&error.message||error,500)});}}
  return summary;
 }
 async function cadencePreview(request){

@@ -42,7 +42,7 @@ Orbit.modules.leads = (function () {
         { label: 'Ganados (emitidos)', val: m.ganados, color: 'var(--warn)', foot: 'cierre del mes', onclick: 'location.hash=\'#/cliente360\'' }
       ])}
       <div class="ops-legend">
-        <span class="muted">🎯 Pipeline con <b>cadencias automáticas</b> al enviar propuesta · <span class="kmirror" style="position:static">🔗 en Ops</span> = el equipo lo está gestionando</span>
+        <span class="muted">🎯 Cadencia configurable desde la creación del lead · la entrega WA/correo requiere confirmación del proveedor · <span class="kmirror" style="position:static">🔗 en Ops</span> = el equipo lo está gestionando</span>
         <span class="ops-sync">🔁 Sincronizado con Orbit Ops</span>
       </div>
       <div class="kanban">

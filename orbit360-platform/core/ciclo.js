@@ -69,9 +69,10 @@ Orbit.ciclo = (function () {
   }
   function cadencePanelHtml(n){
     const hasHistory=Number(n&&n.cadenciaPaso||0)>1||!!(n&&n.cadenciaUltimaAccion),active=!!(n&&n.cadenciaActiva);
-    if(!active&&!hasHistory)return '<div class="muted" style="font-size:12.5px">Se activa al registrar la propuesta. Cada paso mostrará el estado interno real; no se marcará como enviado sin confirmación del proveedor.</div>';
+    if(!active&&!hasHistory)return '<div class="muted" style="font-size:12.5px">Cadencia inactiva para esta oportunidad. Se puede elegir desde su creación; ningún paso se marcará como enviado sin confirmación del proveedor.</div>';
     const terminal=/atendid|resuelt|cerrad|complet/i;
-    const steps=CADENCIA.map((label,index)=>{
+    const configured=Array.isArray(n&&n.cadencia)&&n.cadencia.length?n.cadencia:CADENCIA;
+    const steps=configured.map((label,index)=>{
       const task=cadenceTask(n,label),state=String(task&&task.estado||''),recorded=index<Math.max(0,Number(n.cadenciaPaso||1)-1);
       let code='scheduled',icon='○',caption='Programado';
       if(task){code=terminal.test(state)?'task_attended':'task_created';icon='▣';caption=terminal.test(state)?'Tarea atendida · entrega externa no acreditada':'Tarea creada · pendiente de atención';}
@@ -292,11 +293,8 @@ Orbit.ciclo = (function () {
       if(!emission)return n;
       Object.assign(patch,emission);
     }
-    if (etapaId === 'propuesta') {
-      patch.cadenciaActiva = true;
-      patch.cadencia = CADENCIA.slice();
-      patch.proximoToque = inDays(3);
-    }
+    // La cadencia se elige al CREAR el lead; moverlo a Propuesta no reanuda
+    // unilateralmente una cadencia que el usuario dejó desactivada.
     log(n, 'Etapa', de, etapaId, 'manual');
     patch.bitacora = n.bitacora;
     await S().updateDurable('negocios', id, patch);
@@ -1413,19 +1411,39 @@ Orbit.ciclo = (function () {
     }, ctx));
   }
 
+  /* Una inspección de un cliente existente es una oportunidad comercial nueva.
+     La misma entidad negocios se proyecta en Leads y en Ops / Inspecciones;
+     no se crea un segundo cliente ni una gestión administrativa duplicada. */
+  function nuevaOportunidadCliente(clienteId, inspeccion) {
+    const cli = S().get('clientes', clienteId);
+    if (!cli || !cli.id || cli.archivado || cli.eliminado) {
+      U.toast('Primero confirma la ficha del cliente actual. No se creó una oportunidad.');
+      return;
+    }
+    return nuevoNegocio({clienteId:cli.id, commercialIdentityId:cli.id,
+      nombre:cli.nombre, tipo:cli.tipo, telefono:cli.telefono, email:cli.email,
+      pais:cli.pais, canal:'Cliente actual', asesorId:cli.asesorId,
+      segmento:cli.segmento, prioridad:'Alta', inspeccion:inspeccion===true,
+      ramo:inspeccion===true?'Automóviles':''});
+  }
+
   /* ===================== nuevo negocio / nueva gestión ===================== */
   async function nuevoNegocio(prefill) {
     try{await Orbit.cat.ensure();}catch(error){U.toast('No fue posible confirmar los catálogos del tenant. La operación queda bloqueada.');return;}
     prefill=prefill&&typeof prefill==='object'?prefill:{};
     const metaQaPreview=/^ays-orbit-360-lab--gi-i65-b4-[a-z0-9-]+\.web\.app$/i.test(String(location.hostname||''))&&String(Orbit.auth?.productUser?.tenantId||'')==='alianzas-soluciones';
     const initialCountry = prefill.pais || (Orbit.pais && Orbit.pais !== 'TODOS' ? Orbit.pais : 'GT');
-    const initialRamo=(Orbit.cat.ramosDe(initialCountry)||[])[0]||'';
+    const ramosIniciales=Orbit.cat.ramosDe(initialCountry)||[];
+    const initialRamo=prefill.ramo&&ramosIniciales.includes(prefill.ramo)?prefill.ramo:
+      (prefill.inspeccion?ramosIniciales.find(x=>/auto|veh[ií]cul/i.test(x)):null)||ramosIniciales[0]||'';
     let asesores = await assignableAdvisors(initialCountry),asgs=insurersForCountry(initialCountry);
-    const entryOptions=Orbit.cat.get('puntosIngreso'),defaultEntry=(entryOptions.find(p=>p&&p.etapa==='nuevo')||entryOptions[0]||{}).id||'';
+    const entryOptions=Orbit.cat.get('puntosIngreso');
+    if(prefill.clienteId&&prefill.inspeccion===true)entryOptions.push({id:'CLIENTE_INSPECCION',label:'Inspección solicitada · Ops y Leads',etapa:'inspeccion',origen:'Leads',probability:85});
+    const defaultEntry=(prefill.clienteId&&prefill.inspeccion===true?'CLIENTE_INSPECCION':(entryOptions.find(p=>p&&p.etapa==='nuevo')||entryOptions[0]||{}).id)||'';
     const html = `
       <div class="ciclo-h" style="background:linear-gradient(120deg,#C5162E,#8f1020)">
         <div><div class="ciclo-eyebrow">${prefill.commercialIdentityId?'Nueva oportunidad · misma identidad comercial':'Nuevo ingreso · ciclo comercial'}</div><h2>🌱 ${prefill.commercialIdentityId?'Nueva oportunidad':'Nuevo prospecto'}</h2>
-        <div class="ciclo-sub">${prefill.commercialIdentityId?'Conserva la misma persona/empresa y crea un negocio independiente.':'Por defecto inicia en <b>Nuevo</b>. Solo usa ingreso directo a Cotización cuando el caso ya esté listo para cotizar.'}</div></div>
+        <div class="ciclo-sub">${prefill.clienteId&&prefill.inspeccion?'Cliente existente vinculado. La inspección del nuevo vehículo se seguirá como una sola oportunidad en Leads y Ops, sin duplicar el cliente.':prefill.commercialIdentityId?'Conserva la misma persona/empresa y crea un negocio independiente.':'Por defecto inicia en <b>Nuevo</b>. Solo usa ingreso directo a Cotización cuando el caso ya esté listo para cotizar.'}</div></div>
         <div class="ciclo-h-act"><button class="imp-x" data-close>✕</button></div>
       </div>
       <div class="ciclo-create-body" style="padding:20px 22px;display:grid;gap:13px">
@@ -1445,6 +1463,16 @@ Orbit.ciclo = (function () {
           ${fInput('Prima estimada', 'nn-prima', 0, 'number')}
           ${fSelectOpt('Asesor', 'nn-ase', [['','Selecciona un asesor responsable']].concat(asesores.map(a => [a.id, a.nombre])), prefill.asesorId||(Orbit.session&&Orbit.session.asesorId?Orbit.session.asesorId()||'':''))}
         </div>
+        <label class="ce-l">Inicio de la cadencia automática (a partir de la creación)
+          <select id="nn-cadence" class="o-sel">
+            <option value="0" selected>Activar · calendario del tenant desde hoy</option>
+            <option value="1">Activar · desplazar 1 día</option>
+            <option value="3">Activar · desplazar 3 días</option>
+            <option value="7">Activar · desplazar 7 días</option>
+            <option value="off">No activar para este negocio</option>
+          </select>
+          <small class="muted">Los días, canales y textos de cada paso se administran en Configuración → Flujos. Crear la tarea no acredita envío por WhatsApp o correo.</small>
+        </label>
         <div class="ce-l"><span>Aseguradoras de interés</span><div id="nn-asg" class="insurer-multicheck" data-country-scope="${U.esc(initialCountry)}">${insurerChecklistHtml(asgs,[])}</div><small class="muted" style="display:block;margin-top:4px">Marca una o varias aseguradoras. Solo se muestran las habilitadas para el país seleccionado.</small></div>
         ${fSelectOpt('Punto de ingreso', 'nn-ingreso', entryOptions.map(p=>[p.id,p.label]), defaultEntry)}
         ${metaQaPreview?'<label class="ce-l" data-meta-qa-preview style="border:1px solid #c5162e;padding:9px 11px;border-radius:8px"><span><input type="checkbox" id="nn-meta-qa" /> Caso sintético Meta TR-01…TR-07, ID fijo <code>b4003qa_meta_tr_v27_20261025_01</code>, pieza <code>F02-V27-QA</code>. No utiliza datos personales ni comunicaciones externas.</span></label>':''}
@@ -1473,19 +1501,20 @@ Orbit.ciclo = (function () {
     back.querySelector('#nn-ok').addEventListener('click', async () => {
       const save = back.querySelector('#nn-ok');if(save.disabled)return;
       const v=sid=>(back.querySelector('#'+sid)||{}).value;
-      const ingreso=Orbit.cat.puntoIngreso(v('nn-ingreso'));if(!ingreso)return U.toast('Selecciona un punto de ingreso válido.');
+      const ingreso=entryOptions.find(p=>p&&p.id===v('nn-ingreso'));
+      if(!ingreso||ingreso.id==='CLIENTE_INSPECCION'&&!prefill.clienteId)return U.toast('Selecciona un punto de ingreso válido.');
       const ingresoOps=ingreso.origen==='Ops',pais=v('nn-pais'),asesorId=v('nn-ase'),insurerIds=checkedInsurerIds(insurerSelect);
       if(!asesorId||!asesores.some(a=>String(a.id)===String(asesorId)))return U.toast('Selecciona un asesor responsable confirmado para este país y rol.');
       const metaQa=metaQaPreview&&back.querySelector('#nn-meta-qa')?.checked===true;
       if(metaQa&&(pais!=='GT'||ingresoOps||ingreso.etapa!=='nuevo'))return U.toast('La prueba Meta requiere Guatemala y el punto de ingreso Leads / Nuevo.');
       const id=metaQa?'b4003qa_meta_tr_v27_20261025_01':(attemptedBusinessId || (attemptedBusinessId = 'neg_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 10))),identityId=prefill.commercialIdentityId||id;
       const creator=currentUserIdentity();
-      const n={id,commercialIdentityId:identityId,sourceOpportunityId:prefill.sourceOpportunityId||'',nombre:metaQa?'QA Meta · Caso sintético sin datos personales':(v('nn-nombre')||'Prospecto'),tipo:metaQa?'Persona':v('nn-tipo'),
+      const n={id,commercialIdentityId:identityId,sourceOpportunityId:prefill.sourceOpportunityId||'',clienteId:prefill.clienteId||'',nombre:metaQa?'QA Meta · Caso sintético sin datos personales':(v('nn-nombre')||'Prospecto'),tipo:metaQa?'Persona':v('nn-tipo'),
         etapa:ingreso.etapa,prob:Number(ingreso.probability??ingreso.prob??0),puntoIngreso:ingreso.id,asesorId,canal:metaQa?'Facebook':v('nn-canal'),pais,moneda:pais==='CO'?'COP':'GTQ',
         piezaOrigen:metaQa?'F02-V27-QA':v('nn-pieza'),
         producto:v('nn-prod')||'',plan:v('nn-plan')||'',ramo:v('nn-ramo')||'',segmento:v('nn-segmento')||'',aseguradoraIds:insurerIds,aseguradoraId:insurerIds[0]||'',
-        telefono:metaQa?'':v('nn-tel'),email:metaQa?'':v('nn-email'),primaEst:metaQa?0:(+v('nn-prima')||0),descripcion:metaQa?'QA interna: trazabilidad de pieza a necesidad, responsable, seguimiento y resultado.':v('nn-desc'),notas:'',cadencia:'',cadenciaActiva:false,
-        proximoToque:inDays(2),vence:inDays(7),prioridad:v('nn-prioridad')||'',decision:'',nroCotizacion:'',nroPoliza:'',
+        telefono:metaQa?'':v('nn-tel'),email:metaQa?'':v('nn-email'),primaEst:metaQa?0:(+v('nn-prima')||0),descripcion:metaQa?'QA interna: trazabilidad de pieza a necesidad, responsable, seguimiento y resultado.':v('nn-desc'),notas:'',cadencia:CADENCIA.slice(),cadenciaActiva:v('nn-cadence')!=='off',cadenciaRetrasoDias:v('nn-cadence')==='off'?0:Number(v('nn-cadence')||0),
+        proximoToque:v('nn-cadence')==='off'?'':inDays(1+Number(v('nn-cadence')||0)),vence:inDays(7),prioridad:v('nn-prioridad')||'',decision:'',nroCotizacion:'',nroPoliza:'',
         checklist:[{t:'Datos completos para cotizar',done:ingresoOps},{t:'Cotización enviada al cliente',done:false},{t:'Documentos del riesgo recibidos',done:false},{t:'Inspección / avalúo realizado',done:false}],
         clienteIdCreado:'',archivado:false,etiquetas:[],bitacora:[{ts:stamp(),user:creator.name,actorUid:creator.uid,actorName:creator.name,campo:'Creación',de:'',a:'Ingreso ('+(ingresoOps?'Ops':'Leads')+')',origen:'manual'}],
         comentarios:[],origen:ingresoOps?'Ops':'Leads',creado:today(),actualizado:today()};
@@ -1629,7 +1658,7 @@ Orbit.ciclo = (function () {
     negocios, gestiones, opsBoard, leadsBoard, metricasLeads,
     cardNegocio, cardGestion, actionQueueRanks, collaborationState, wireCards, notify, gestionarListas,
     setEtapa, decidirCierre, perder, archivar, emitir, crearGestion, crearGestionDurable,
-    openNegocio, openGestion, managementCreateModal, solicitarGestion, nuevoNegocio, nuevaGestion, assignableAdvisors
+    openNegocio, openGestion, managementCreateModal, solicitarGestion, nuevaOportunidadCliente, nuevoNegocio, nuevaGestion, assignableAdvisors
   };
 })();
 

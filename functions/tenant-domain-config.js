@@ -101,6 +101,30 @@ function validateWorkflow(input) {
     if (!stages[next]) throw new HttpsError('invalid-argument', `La etapa ${stageId} apunta a ${next}, que no existe.`);
     if (next === stageId) throw new HttpsError('invalid-argument', `La etapa ${stageId} no puede apuntarse a sí misma.`);
   }));
+  // Admin del tenant: calendarios y contenido de cada paso, sin valores
+  // enterrados en el código ni cambios automáticos a otros tenants.
+  const defaultCadenceSteps=[
+    {day:1,channel:'whatsapp',label:'Bienvenida y primer contacto',templateId:'lead_wa_d1',subject:'',body:'Hola {nombre}, gracias por contactarnos. ¿En qué podemos ayudarte?'},
+    {day:3,channel:'whatsapp',label:'Seguimiento comercial',templateId:'lead_wa_d3',subject:'',body:'Hola {nombre}, seguimos atentos a tu solicitud de {producto}.'},
+    {day:7,channel:'email',label:'Seguimiento por correo',templateId:'lead_email_d7',subject:'Seguimiento a tu solicitud',body:'Hola {nombre}, te damos seguimiento a tu solicitud de {producto}.'},
+    {day:14,channel:'whatsapp',label:'Último seguimiento',templateId:'lead_wa_d14',subject:'',body:'Hola {nombre}, seguimos disponibles cuando quieras retomar tu seguro.'}
+  ];
+  const incomingSteps=input.cadenceSteps===undefined?defaultCadenceSteps:input.cadenceSteps;
+  if(!Array.isArray(incomingSteps)||incomingSteps.length<1||incomingSteps.length>12)
+    throw new HttpsError('invalid-argument','La cadencia requiere de 1 a 12 pasos.');
+  let previousDay=-1;
+  const cadenceSteps=incomingSteps.map((raw,index)=>{
+    raw=raw||{};
+    const day=Number(raw.day);
+    const channel=norm(raw.channel);
+    const step={day,channel,label:text(raw.label,160),templateId:norm(raw.templateId),subject:text(raw.subject,240),body:text(raw.body,1500)};
+    if(!Number.isInteger(day)||day<0||day>365||day<=previousDay||!['whatsapp','email','internal'].includes(channel)||
+      !step.label||!step.templateId||!step.body)
+      throw new HttpsError('invalid-argument',`Paso ${index+1} de la cadencia inválido. Los días deben ser crecientes y las plantillas completas.`);
+    if(channel==='email'&&!step.subject)throw new HttpsError('invalid-argument','El correo de cadencia requiere asunto.');
+    previousDay=day;
+    return step;
+  });
   return {
     schemaVersion: VERSION,
     storageMode: input.storageMode === 'canonicalV2' ? 'canonicalV2' : 'legacyCompatible',
@@ -109,6 +133,8 @@ function validateWorkflow(input) {
     advisorManagementProjection: input.advisorManagementProjection !== false,
     portalResponseEnabled: input.portalResponseEnabled !== false,
     cadenceEnabled: input.cadenceEnabled !== false,
+    cadenceStart: 'creation',
+    cadenceSteps,
     escalationEnabled: input.escalationEnabled !== false,
     duplicateDetectionEnabled: input.duplicateDetectionEnabled !== false,
     defaultManagementSlaHours: Math.max(0, Number(input.defaultManagementSlaHours || 72)),
