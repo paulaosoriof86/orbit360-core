@@ -17,9 +17,16 @@ const ORIGINS=['https://app.aysseguros.com','https://ays-orbit-360-lab--gi-i66-r
   tenant.collection('members').limit(180).get(),
   tenant.collection('data').doc('asesores').collection('items').limit(450).get()]);
  assert.ok(members.size<180&&advisors.size<450,'SIGNED_ROSTER_SCAN_UNBOUNDED');
+ const advisorCarlos=advisors.docs.filter(d=>{
+   const a=d.data()||{};return [a.nombre,a.nombreCompleto,a.displayName,a.name].some(v=>norm(v).startsWith('carlos castro'));
+ });
+ const ids=new Set(advisorCarlos.map(d=>d.id)),uids=new Set();
+ for(const d of advisorCarlos){const a=d.data()||{};for(const value of [a.authUid,a.uid,a.userId])if(value)uids.add(String(value));}
  const carlos=members.docs.filter(d=>{
-   const r=d.data()||{};return [r.nombre,r.displayName,r.name,r.nombreCompleto,r.fullName].some(v=>norm(v).startsWith('carlos castro'))&&
-   norm(r.activeRole)==='operativo'&&r.active!==false&&r.activo!==false;
+   const r=d.data()||{};
+   const linked=[r.nombre,r.displayName,r.name,r.nombreCompleto,r.fullName].some(v=>norm(v).startsWith('carlos castro'))||
+     ids.has(String(r.advisorId||r.asesorId||''))||uids.has(d.id);
+   return linked&&norm(r.activeRole)==='operativo'&&r.active!==false&&r.activo!==false;
  });
  assert.equal(carlos.length,1,'CARLOS_OPERATIVO_MEMBERSHIP_NOT_UNIQUE');
  const german=advisors.docs.filter(d=>{
