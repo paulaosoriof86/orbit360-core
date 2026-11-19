@@ -2988,6 +2988,37 @@
           "replaces": {"path":"tools/gravicentra-i6-6-manual-policy-capture-p0.test.cjs","priorGitBlobSha":"90d501d4abcdd431a0e6fbb35f39f22ff15aa356","priorChangeId":"I6_6_CASH_30D_FORWARD_ONLY_P0_LEGACY_PRESERVATION_20261118"}
         }
       ]
+    },
+    {
+      "id": "I6_6_CASH_ISSUANCE_MONTH_SERGIO_TRANSVERSAL_20261119",
+      "approvedByDirection": true,
+      "receipt": "Paula 2026-11-19: para pago contado el requerimiento del recibo vence un mes calendario después de la fecha real de emisión; la fecha de emisión se consulta al documento, no se deduce de la vigencia. Aplicar de forma transversal sin modificar calendarios históricos ni requerimientos documentados.",
+      "sourceStatus": "LOCAL_12_OF_12_CASH_CALENDAR_TESTS_PASS_PREVIEW_LIVE_PENDING",
+      "scope": "Captura explícita de fecha de emisión; vencimiento contractual de contado al mes calendario, con conservación de fechas documentadas y compatibilidad retroactiva. Certificación firmada Preview/LIVE pendiente; cero escrituras de asegurados reales.",
+      "paths": [
+        {
+          "path": "orbit360-platform/core/primas.js",
+          "gitBlobSha": "fbd41a84bba4a5083027689a457b427dac88f36e",
+          "replaces": {"path":"orbit360-platform/core/primas.js","priorGitBlobSha":"d74986b08eb46d34a6221198b57fec3589eb20cf","priorChangeId":"I6_6_INSURER_SELF_ADMINISTERED_FINANCIAL_RULES_OWNER_20261119"}
+        },
+        {
+          "path": "orbit360-platform/core/policy-receipts-engine.js",
+          "gitBlobSha": "84129eb3f78217b0c3cb61058ece5d2b9e91cd3d",
+          "replaces": {"path":"orbit360-platform/core/policy-receipts-engine.js","priorGitBlobSha":"699f37464ecd977a3cb489c934b31773abb5c42f","priorChangeId":"I6_6_INSURER_SELF_ADMINISTERED_FINANCIAL_RULES_OWNER_20261119"}
+        },
+        {
+          "path": "orbit360-platform/modules/policy-receipts-v1199-bridge.js",
+          "gitBlobSha": "d2cacdf313433ea7448a35b19f932fd3506d0076",
+          "replaces": {"path":"orbit360-platform/modules/policy-receipts-v1199-bridge.js","priorGitBlobSha":"fad9ae6517bc42f5531f2fcdcfa218db5be9ec86","priorChangeId":"I6_6_INSURER_SELF_ADMINISTERED_FINANCIAL_RULES_OWNER_20261119"}
+        }
+      ],
+      "tests": [
+        {
+          "path": "tools/gravicentra-i6-6-primas-calendar-forward-only.test.cjs",
+          "gitBlobSha": "96a7c1cb871f4bccff395a203ce6b90028e85818",
+          "replaces": {"path":"tools/gravicentra-i6-6-primas-calendar-forward-only.test.cjs","priorGitBlobSha":"e649591392d2a4d0f35b3ea7d718e5ea0ecbaa79","priorChangeId":"I6_6_FORWARD_ONLY_UTC_MONTHLY_CADENCE_WITH_TERM_GUARD"}
+        }
+      ]
     }
   ],
   "i66R11PreviewBuildRequest20261113": {

@@ -38,6 +38,7 @@ Orbit.modules = Orbit.modules || {};
     numero_poliza_requerido: 'Ingresa el número real de póliza.', ramo_requerido: 'Selecciona el ramo.',
     producto_requerido: 'Selecciona el producto o subramo.', estado_requerido: 'Selecciona el estado.',
     vigencia_inicio_requerida: 'Ingresa el inicio de vigencia.', vigencia_fin_requerida: 'Ingresa el fin de vigencia.',
+    fecha_emision_requerida_contado: 'Para contado, ingresa la fecha real de emisión que aparece en el documento. El requerimiento se calculará un mes calendario después.',
     vigencia_invalida: 'La fecha final debe ser posterior a la inicial.', prima_neta_requerida: 'La prima neta debe ser mayor que cero.',
     cuotas_requeridas: 'La cantidad de recibos no es válida.', cuotas_superan_maximo_aseguradora: 'El plan supera el máximo de recibos configurado en la ficha de la aseguradora para este ramo.', motivo_requerido: 'Explica el motivo del cambio.',
     renovabilidad_sin_cambios: 'La renovabilidad ya tiene ese valor. No se modificó la póliza.',
@@ -56,7 +57,7 @@ Orbit.modules = Orbit.modules || {};
     CORRECTION_READBACK_MISMATCH: 'La verificación posterior necesita revisión; no se declara aplicada la corrección.',
     CORRECTION_SERVER_PROOF_REQUIRED: 'Falta la confirmación canónica del servidor.'
   };
-  function errorText(errors) { return (errors || []).map(x => ERROR_LABELS[String(x).split(':')[0]] ||
+  function errorText(errors) { return (errors || []).map(x => (/fecha_emision_requerida_contado/.test(String(x)) ? ERROR_LABELS.fecha_emision_requerida_contado : null) || ERROR_LABELS[String(x).split(':')[0]] ||
     (/^recargo_financiero_requiere_confirmacion/.test(x) ? 'Selecciona el recargo financiero documentado de la aseguradora para este plan, o registra explícitamente 0 si está exento.' :
     (/^cargo_no_gravado_/.test(x) ? 'Revisa el cargo no gravado: importe no negativo con dos decimales, concepto y documento de respaldo.' :
       /^calendario_documentado_/.test(x) ? 'Revisa los vencimientos del documento: una línea por recibo, secuencia desde 1, fecha válida y referencia. El límite operativo se valida como una fecha independiente.' :
@@ -215,6 +216,7 @@ Orbit.modules = Orbit.modules || {};
         <div class="cgrid">
           <label class="ce-l">Inicio vigencia *<input type="date" class="o-sel" data-start value="${esc(start)}"></label>
           <label class="ce-l">Fin vigencia *<input type="date" class="o-sel" data-end value="${esc(end)}"></label>
+          <label class="ce-l">Fecha de emisión según póliza<input type="date" class="o-sel" data-issue-date value="${esc(existing && existing.fechaEmision || '')}"><small>En contado, confirma esta fecha del documento: el requerimiento vence un mes calendario después. No se infiere desde la vigencia.</small></label>
           <label class="ce-l">Frecuencia<select class="o-sel" data-frequency>${frequencies.map(x => `<option ${existing && x === existing.frecuencia ? 'selected' : ''}>${esc(x)}</option>`).join('')}</select></label>
           <label class="ce-l">Cantidad de recibos<input type="number" min="1" max="24" class="o-sel" data-installments value="${esc(existing && existing.cuotas || Orbit.primas.cuotasDe(existing && existing.frecuencia || 'Contado'))}"><small data-installments-hint></small></label>
           <label class="ce-l">Forma de pago<select class="o-sel" data-payment-form><option value="" ${!existing || !existing.formaPago ? 'selected' : ''}>Pendiente de validar</option>${forms.map(x => `<option ${existing && x === existing.formaPago ? 'selected' : ''}>${esc(x)}</option>`).join('')}</select></label>
@@ -362,10 +364,11 @@ Orbit.modules = Orbit.modules || {};
       }
       return {
         ...documented,
-        ...(!existing ? { cashGraceDays: 30 } : {}),
+        ...(!existing ? ($('[data-frequency]').value==='Contado' ? { cashRequirementMode: 'ISSUE_PLUS_ONE_CALENDAR_MONTH_V1' } : { cashGraceDays: 30 }) : {}),
         id: existing && existing.id, tenantId: existing && existing.tenantId || A.tenantId(), clienteId: c.id, asesorId: advisorEl && advisorEl.value || c.asesorId,
         pais: country2, moneda: currency2, aseguradoraId: insurerEl.value, numero: $('[data-number]').value.trim(), estado: $('[data-status]').value,
         ramo: ramoEl.value, subramo: productEl.value, producto: productEl.value, renovable: $('[data-renewable]').value==='yes' ? true : ($('[data-renewable]').value==='no' ? false : null), vigenciaInicio: $('[data-start]').value, vigenciaFin: $('[data-end]').value,
+        fechaEmision: $('[data-issue-date]').value,
         frecuencia: $('[data-frequency]').value, formaPago: $('[data-payment-form]').value, conducto: $('[data-conduct]').value,
         cuotas: +$('[data-installments]').value || 1, ivaPct: countryTaxPct(country2), primaNeta: +$('[data-net]').value || 0, gastosEmision: +$('[data-issue]').value || 0,
         otros: +$('[data-other]').value || 0, recargoFinPct: +$('[data-surcharge]').value || 0,

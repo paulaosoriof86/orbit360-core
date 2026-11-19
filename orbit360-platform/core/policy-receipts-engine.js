@@ -17,12 +17,14 @@ Orbit.policyReceipts = (function () {
     'numero','clienteId','asesorId','aseguradoraId','pais','moneda','ramo','subramo','producto',
     'estado','vigenciaInicio','vigenciaFin','frecuencia','formaPago','cuotas','primaNeta',
     'gastosEmision','gastosFinan','otros','ivaPct','ivaMonto','primaTotal','conducto',
-    'cargoNoGravadoMonto','cargoNoGravadoConcepto','cargoNoGravadoDocumentRef','vencimientosDocumentados','cashGraceDays'
+    'cargoNoGravadoMonto','cargoNoGravadoConcepto','cargoNoGravadoDocumentRef','vencimientosDocumentados','cashGraceDays',
+    'fechaEmision','cashRequirementMode'
   ]);
   const LOCKED_AFTER_PAYMENT = new Set([
     'numero','clienteId','asesorId','aseguradoraId','pais','moneda','vigenciaInicio','frecuencia',
     'formaPago','cuotas','primaNeta','gastosEmision','gastosFinan','otros','ivaPct','ivaMonto',
-    'primaTotal','conducto','cargoNoGravadoMonto','cargoNoGravadoConcepto','cargoNoGravadoDocumentRef','vencimientosDocumentados','cashGraceDays'
+    'primaTotal','conducto','cargoNoGravadoMonto','cargoNoGravadoConcepto','cargoNoGravadoDocumentRef','vencimientosDocumentados','cashGraceDays',
+    'fechaEmision','cashRequirementMode'
   ]);
 
   function clean(v) { return String(v == null ? '' : v).trim(); }
@@ -114,7 +116,8 @@ Orbit.policyReceipts = (function () {
       try {
         Orbit.primas.recibos({ neta: 0, gastosEmision: 0, gastosFinan: 0, otros: 0, iva: 0, ivaPct: 0, total: 0 }, {
           frecuencia: p.frecuencia, cuotas: p.cuotas, vigenciaInicio: p.vigenciaInicio, vigenciaFin: p.vigenciaFin,
-          calendarMode: 'utc_anchor_v1', vencimientosDocumentados: p.vencimientosDocumentados
+          calendarMode: 'utc_anchor_v1', vencimientosDocumentados: p.vencimientosDocumentados,
+          fechaEmision: p.fechaEmision, cashRequirementMode: p.cashRequirementMode
         });
       } catch (error) {
         errors.push('plan_cuotas_invalido:' + clean(error && error.message || 'calendario'));
@@ -270,6 +273,8 @@ Orbit.policyReceipts = (function () {
       cuotas: policy.cuotas,
       vigenciaInicio: policy.vigenciaInicio,
       vigenciaFin: policy.vigenciaFin,
+      fechaEmision: policy.fechaEmision,
+      cashRequirementMode: policy.cashRequirementMode,
       cashGraceDays: policy.cashGraceDays,
       calendarMode: policy.planCalendarVersion === PLAN_CALENDAR_UTC_VERSION ? 'utc_anchor_v1' : 'legacy_local_v0',
       emisionEn: policy.emisionEn,

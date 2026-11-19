@@ -194,6 +194,16 @@ Orbit.primas = (function () {
     const documentedDues = calendarioDocumentado(opts.vencimientosDocumentados, n);
     const documentedCharge = cargoNoGravado(d);
     const legacyCalendar = opts.calendarMode === 'legacy_local_v0';
+    // Forward-only contract: a newly issued cash policy has an insurer
+    // requirement one *calendar month* after the actual issue date, never a
+    // guessed 30 days after the start of coverage. Older calendars retain
+    // their persisted dates and prior calculation semantics.
+    const issueBasedCash = !legacyCalendar && n === 1 &&
+      String(opts.frecuencia || '').trim().toLowerCase() === 'contado' &&
+      opts.cashRequirementMode === 'ISSUE_PLUS_ONE_CALENDAR_MONTH_V1' &&
+      documentedDues.length === 0;
+    if (issueBasedCash && !opts.fechaEmision) throw new RangeError('fecha_emision_requerida_contado');
+    const issuedOn = issueBasedCash ? asCivilUtcDate(opts.fechaEmision) : null;
     const inicio = legacyCalendar
       ? (opts.vigenciaInicio ? new Date(opts.vigenciaInicio) : new Date())
       : asCivilUtcDate(opts.vigenciaInicio);
@@ -227,7 +237,8 @@ Orbit.primas = (function () {
       const iva = i === n - 1 ? r2(d.iva - rows.reduce((s, r) => s + r.iva, 0)) : r2(baseGrav * (d.ivaPct || 0) / 100);
       const total = r2(baseGrav + iva + cargoNoGravadoMonto);
       const months = Math.round(i * pasoMeses);
-      const venc = legacyCalendar ? new Date(inicio) : dueAtCalendarMonthUtc(inicio, months);
+      const venc = issuedOn ? dueAtCalendarMonthUtc(issuedOn, 1) :
+        (legacyCalendar ? new Date(inicio) : dueAtCalendarMonthUtc(inicio, months));
       if (legacyCalendar) venc.setMonth(venc.getMonth() + months);
       if (!documentedDues.length && finCivil && venc.getTime() > finCivil.getTime()) throw new RangeError('cuotas_fuera_vigencia');
       const lim = new Date(venc);
@@ -235,7 +246,9 @@ Orbit.primas = (function () {
       // New canonical single-payment policies receive a 30-day operational limit;
       // the first contractual requirement remains on the policy inception date.
       // Historical legacy calendars keep their original 15-day semantics.
-      else lim.setUTCDate(lim.getUTCDate() + (n === 1 && Number(opts.cashGraceDays) === 30 ? 30 : 15));
+      // Do not invent an additional collection grace beyond the contractual
+      // due date when its issue-date basis was explicitly confirmed.
+      else if (!issuedOn) lim.setUTCDate(lim.getUTCDate() + (n === 1 && Number(opts.cashGraceDays) === 30 ? 30 : 15));
       const comAseguradora = r2(neta * comAsegPct / 100);
       const due = documentedDues[i];
       rows.push({

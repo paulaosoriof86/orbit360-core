@@ -69,6 +69,44 @@ test('Cadencias originales intactas: contado, bimestral, trimestral, cuatrimestr
   assert.deepEqual(due(p,'2026-08-31','Semestral',2),['2026-08-31','2027-02-28']);
   assert.deepEqual(due(p,'2026-02-28','Anual',1),['2026-02-28']);
 });
+test('Contado nuevo: el requerimiento es un mes calendario después de la emisión explícita, nunca 30 días desde vigencia',async()=>{
+  const e=makeRuntime('GT'),p=e.Orbit.primas;
+  const d=p.desglose(1000,'GT',{fraccionado:false,gastosEmision:50,recargoFinPct:0,ivaPct:12});
+  const cash={vigenciaInicio:'2026-11-15',vigenciaFin:'2027-11-15',fechaEmision:'2026-11-17',
+    frecuencia:'Contado',cuotas:1,calendarMode:'utc_anchor_v1',cashRequirementMode:'ISSUE_PLUS_ONE_CALENDAR_MONTH_V1'};
+  const recs=p.recibos(d,cash);
+  assert.equal(recs.length,1);
+  assert.equal(recs[0].vence,'2026-12-17');
+  assert.equal(recs[0].fechaLimite,'2026-12-17','No inventar gracia adicional tras requerimiento');
+  assert.equal(recs[0].total,d.total);
+  const policy=e.policy('p_cash_issue','POL-CASH-ISSUE');
+  Object.assign(policy,cash,{planCalendarVersion:'UTC_ANCHOR_V1',primaNeta:1000,gastosEmision:50,recargoFinPct:0,formaPago:'Transferencia'});
+  const created=await e.Orbit.policyReceipts.createPolicy(policy,{operationId:'op_cash_issue'});
+  assert.equal(created.ok,true,JSON.stringify(created.errors||[]));
+  assert.equal(e.rows.polizas[0].fechaEmision,'2026-11-17');
+  assert.equal(e.rows.recibosEsperados[0].vence,'2026-12-17');
+  assert.equal(e.rows.carteraPrimas.length,1);
+});
+test('Contado desde emisión: día 31 y bisiesto se ajustan sin deriva, calendario documentado prevalece',()=>{
+  const p=makeRuntime().Orbit.primas,d=p.desglose(100,'GT',{fraccionado:false,gastosEmision:0,recargoFinPct:0,ivaPct:12});
+  const base={frecuencia:'Contado',cuotas:1,vigenciaInicio:'2026-01-01',vigenciaFin:'2027-01-01',
+    calendarMode:'utc_anchor_v1',cashRequirementMode:'ISSUE_PLUS_ONE_CALENDAR_MONTH_V1'};
+  assert.equal(p.recibos(d,{...base,fechaEmision:'2024-01-31'})[0].vence,'2024-02-29');
+  assert.equal(p.recibos(d,{...base,fechaEmision:'2025-01-31'})[0].vence,'2025-02-28');
+  assert.equal(p.recibos(d,{...base,fechaEmision:'2026-11-17',vencimientosDocumentados:[
+    {secuencia:1,fechaVencimiento:'2026-12-20',documentRef:'Requerimiento real aseguradora 42'}
+  ]})[0].vence,'2026-12-20');
+});
+test('Sin fecha de emisión en contado nuevo, no se guarda ni se infiere a partir de vigencia',async()=>{
+  const e=makeRuntime('GT'),policy=e.policy('p_cash_no_date','POL-CASH-NO-DATE');
+  Object.assign(policy,{frecuencia:'Contado',cuotas:1,fechaEmision:'',cashRequirementMode:'ISSUE_PLUS_ONE_CALENDAR_MONTH_V1'});
+  const result=await e.Orbit.policyReceipts.createPolicy(policy,{operationId:'op_cash_no_date'});
+  assert.equal(result.ok,false);
+  assert.ok(result.errors.some(x=>x.includes('fecha_emision_requerida_contado')),JSON.stringify(result.errors||[]));
+  assert.equal(e.rows.polizas.length,0);
+  assert.equal(e.rows.recibosEsperados.length,0);
+  assert.equal(e.rows.carteraPrimas.length,0);
+});
 test('Date-time ISO no cambia fecha civil y fecha inválida falla cerrada',()=>{
   const p=makeRuntime().Orbit.primas;
   assert.equal(due(p,'2026-10-01T00:00:00-06:00','Mensual',12)[0],'2026-10-01');
