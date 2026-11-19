@@ -18,8 +18,8 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     env:
-      I66_PREVIEW_ORIGIN: https://ays-orbit-360-lab--gi-i66-rc-44525928215-15hd22yu.web.app
-      I66_PREVIEW_SOURCE_SHA: 26ea9a2136d0ae027847d8668d8e82db62398945
+      I66_PREVIEW_ORIGIN: https://ays-orbit-360-lab--gi-i66-rc-44535644258-00es5pra.web.app
+      I66_PREVIEW_SOURCE_SHA: b38f877f7847c7b6e11506885e42252e84c5eeb6
       SA_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
       SA_ALT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
       SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
@@ -40,10 +40,11 @@ jobs:
           test -z "$(git diff --name-only "$I66_PREVIEW_SOURCE_SHA" HEAD -- orbit360-platform functions firebase.json firestore.rules storage.rules)"
           node --check tools/gravicentra-i6-6-carlos-paula-new-policy-client360-preview-uat.cjs
           node --test tools/gravicentra-i6-6-insurer-product-commission.test.cjs
+          node tools/gravicentra-i6-6-primas-calendar-forward-only.test.cjs
           node - <<'NODE'
           const assert=require('node:assert/strict');
           (async()=>{
-            const r=await fetch('https://api.github.com/repos/paulaosoriof86/orbit360-core/actions/runs/44525928215',{
+            const r=await fetch('https://api.github.com/repos/paulaosoriof86/orbit360-core/actions/runs/44535644258',{
               headers:{Authorization:'Bearer '+process.env.GH_TOKEN,Accept:'application/vnd.github+json',
                 'User-Agent':'GI-I66-New-Policy-Preview-QA'}}).then(x=>x.json());
             assert.equal(r.conclusion,'success','QA_PREVIEW_BUILD_NOT_SIGNED');
