@@ -86,7 +86,7 @@ async function applyOne(db,row,gate){
     }
     if(['monto','montoTotal','saldo','valor'].some(k=>r[k]!=null||c[k]!=null))hold('GROSS_ALIASES_NOT_SAFE');
     const beforeReceipt=moneyCents(r.primaTotal),beforeCartera=moneyCents(c.primaTotal);
-    if(beforeReceipt!==row.oldGrossCents||beforeCartera!==row.oldGrossCents||
+    if(beforeReceipt!==row.oldGrossCents||beforeCartera!==row.oldCarteraGrossCents||
       preimageFingerprint(row.receiptId,row.portfolioId,str(r.numeroReciboFuente),beforeReceipt,beforeCartera)!==row.beforeFingerprint)
       hold('CAS_PREIMAGE_CHANGED');
     tx.update(receiptRef,{numeroReciboFuente:row.requirement,primaTotal:row.grossCents/100,
@@ -97,7 +97,8 @@ async function applyOne(db,row,gate){
     tx.create(auditRef,{status:'APPLIED_PENDING_SOURCE_GROSS',sourceManifestSha256:gate.sourceManifestSha256,
       sourceSha256:row.sourceSha256,sourceKey:row.sourceKey,caseId:row.caseId,
       policyId:row.policyId,receiptId:row.receiptId,portfolioId:row.portfolioId,
-      requirement:row.requirement,oldGrossCents:row.oldGrossCents,newGrossCents:row.grossCents,
+      requirement:row.requirement,oldGrossCents:row.oldGrossCents,
+      oldCarteraGrossCents:row.oldCarteraGrossCents,newGrossCents:row.grossCents,
       matchMethod:row.matchMethod,sourceContractualDue:row.due,
       preservedOperationalLimit:str(r.fechaLimite),
       beforeFingerprint:row.beforeFingerprint,rollback:{

@@ -137,7 +137,8 @@ const plan=planSourceBatch(source,groups),gate={environment:'gravicentra-live-da
           {fechaVencimientoContractual:'2026-11-29'}:{}),
         primaTotal:gross/100-0.5,primaNeta:gross/100-20,estado:'Pendiente'};
       const port={id:cid,polizaId:policyId,reciboId:rid,moneda:'GTQ',
-        primaTotal:gross/100-0.5,carteraActiva:true,clienteId:'cli1'};
+        primaTotal:gross/100-(policyId==='p-month-a'&&n===4?0.75:0.5),
+        carteraActiva:true,clienteId:'cli1'};
       monthlyDb.docs.set(name('recibosEsperados')+rid,receipt);
       monthlyDb.docs.set(name('carteraPrimas')+cid,port);
       recs.push(receipt);cartera.push(port);
@@ -176,6 +177,7 @@ const plan=planSourceBatch(source,groups),gate={environment:'gravicentra-live-da
   const correctedFirst=monthlyPlan.chunks[0].rows.find(row=>
     row.policy==='91-MONTH-A'&&row.due==='2026-11-14');
   assert.equal(correctedFirst.oldContractualDue,'2026-11-29');
+  assert.notEqual(correctedFirst.oldCarteraGrossCents,correctedFirst.oldGrossCents);
   const originalDueAudit=[...monthlyDb.docs.entries()].filter(([key,value])=>
     key.includes('/operationalRequests/')&&value.receiptId===correctedFirst.receiptId);
   assert.equal(originalDueAudit.length,1);

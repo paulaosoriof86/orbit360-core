@@ -156,7 +156,7 @@ function planSourceBatch(rawRows, policyGroups, options = {}) {
       exceptions.push({caseId: row.caseId, code: 'RELATION_OR_REFERENCE_CONFLICT'}); continue;
     }
     const beforeReceipt = moneyCents(receipt.primaTotal), beforeCartera = moneyCents(cartera.primaTotal);
-    if (beforeReceipt == null || beforeCartera == null || beforeReceipt !== beforeCartera ||
+    if (beforeReceipt == null || beforeCartera == null ||
       ['monto', 'montoTotal', 'saldo', 'valor'].some(k => receipt[k] != null || cartera[k] != null)) {
       exceptions.push({caseId: row.caseId, code: 'GROSS_PREIMAGE_NOT_COMPARABLE'}); continue;
     }
@@ -165,13 +165,15 @@ function planSourceBatch(rawRows, policyGroups, options = {}) {
       caseId: row.caseId, sourceKey: key, insurer: row.insurer, policy: row.policy, due: row.due,
       policyId: str(p.id), receiptId: rid, portfolioId: str(cartera.id),
       requirement: row.requirement, grossCents: row.grossCents,
-      oldGrossCents: beforeReceipt, sourceSha256: row.sourceSha256,
+      oldGrossCents: beforeReceipt,oldCarteraGrossCents:beforeCartera,
+      sourceSha256: row.sourceSha256,
       matchMethod,oldContractualDue:dueOf(receipt),
       oldOperationalLimit:str(receipt.fechaLimite),
       beforeFingerprint: preimageFingerprint(rid, cartera.id, existingRef, beforeReceipt, beforeCartera),
     };
     seenTargets.add(rid);
-    if (existingRef === row.requirement && beforeReceipt === row.grossCents) unchanged.push(record);
+    if (existingRef === row.requirement && beforeReceipt === row.grossCents &&
+      beforeCartera === row.grossCents) unchanged.push(record);
     else ready.push(record);
   }
   const chunks = [];
@@ -179,7 +181,7 @@ function planSourceBatch(rawRows, policyGroups, options = {}) {
     const rows = ready.slice(i, i + chunkSize);
     chunks.push({sequence: chunks.length + 1, count: rows.length,
       sourcePlanSha256: digest(rows.map(r => [r.caseId, r.sourceKey, r.receiptId, r.portfolioId,
-        r.oldGrossCents, r.grossCents, r.beforeFingerprint])), rows});
+        r.oldGrossCents, r.oldCarteraGrossCents, r.grossCents, r.beforeFingerprint])), rows});
   }
   return {status: 'BULK_SOURCE_PREFLIGHT_ONLY_NO_WRITES', inputRows: rawRows.length,
     readyCount: ready.length, unchangedCount: unchanged.length, exceptionCount: exceptions.length,
