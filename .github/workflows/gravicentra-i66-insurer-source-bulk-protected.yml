@@ -20,14 +20,14 @@ on:
 permissions:
   contents: read
 concurrency:
-  group: gravicentra-i66-source-bulk-${{ github.ref }-${{ github.sha }
+  group: gravicentra-i66-source-bulk-${{ github.ref }}-${{ github.sha }}
   cancel-in-progress: false
 env:
   GCLOUD_PROJECT: ays-orbit-360-lab
-  GI_I66_BULK_SOURCE_MANIFEST: ${{ inputs.source_manifest || 'artifacts/orbit360-recovery/source-batches/I6_6_SOURCE_BULK_20261118_ROBLE_238.json' }
-  SA_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }
-  SA_LAB_ALT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }
-  SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }
+  GI_I66_BULK_SOURCE_MANIFEST: ${{ inputs.source_manifest || 'artifacts/orbit360-recovery/source-batches/I6_6_SOURCE_BULK_20261118_ROBLE_238.json' }}
+  SA_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+  SA_LAB_ALT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+  SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
 jobs:
   preflight:
     if: >
@@ -38,11 +38,11 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     outputs:
-      ready: ${{ steps.judge.outputs.ready }
+      ready: ${{ steps.judge.outputs.ready }}
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ github.sha }
+          ref: ${{ github.sha }}
           persist-credentials: false
       - uses: actions/setup-node@v4
         with:
@@ -80,8 +80,8 @@ jobs:
         shell: bash
         env:
           GI_I66_BULK_MODE: preflight
-          GI_I66_BULK_PLAN_OUT: ${{ runner.temp }/gi-i66-bulk-plan.json
-          GI_I66_BULK_REPORT_OUT: ${{ runner.temp }/gi-i66-bulk-preflight.json
+          GI_I66_BULK_PLAN_OUT: ${{ runner.temp }}/gi-i66-bulk-plan.json
+          GI_I66_BULK_REPORT_OUT: ${{ runner.temp }}/gi-i66-bulk-preflight.json
         run: |
           set -euo pipefail
           node tools/gravicentra-i66-source-bulk-live.cjs
@@ -89,7 +89,7 @@ jobs:
         name: Verify exact counts before protected financial writes
         shell: bash
         env:
-          GI_I66_BULK_PLAN_OUT: ${{ runner.temp }/gi-i66-bulk-plan.json
+          GI_I66_BULK_PLAN_OUT: ${{ runner.temp }}/gi-i66-bulk-plan.json
         run: |
           set -euo pipefail
           node - <<'JS'
@@ -108,10 +108,10 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: gi-i66-source-bulk-preflight-${{ github.run_id }
+          name: gi-i66-source-bulk-preflight-${{ github.run_id }}
           path: |
-            ${{ runner.temp }/gi-i66-bulk-plan.json
-            ${{ runner.temp }/gi-i66-bulk-preflight.json
+            ${{ runner.temp }}/gi-i66-bulk-plan.json
+            ${{ runner.temp }}/gi-i66-bulk-preflight.json
           if-no-files-found: ignore
           retention-days: 14
   protected-source-bulk-live:
@@ -124,15 +124,15 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ github.sha }
+          ref: ${{ github.sha }}
           persist-credentials: false
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
       - uses: actions/download-artifact@v4
         with:
-          name: gi-i66-source-bulk-preflight-${{ github.run_id }
-          path: ${{ runner.temp }/i66-source-bulk-plan
+          name: gi-i66-source-bulk-preflight-${{ github.run_id }}
+          path: ${{ runner.temp }}/i66-source-bulk-plan
       - name: Recheck source and negative tests inside protected review gate
         shell: bash
         run: |
@@ -165,8 +165,8 @@ jobs:
         env:
           GI_I66_BULK_MODE: apply
           GI_I66_BULK_PROTECTED_ENV: gravicentra-live-data-writes
-          GI_I66_BULK_PLAN_IN: ${{ runner.temp }/i66-source-bulk-plan/gi-i66-bulk-plan.json
-          GI_I66_BULK_REPORT_OUT: ${{ runner.temp }/gi-i66-bulk-live.json
+          GI_I66_BULK_PLAN_IN: ${{ runner.temp }}/i66-source-bulk-plan/gi-i66-bulk-plan.json
+          GI_I66_BULK_REPORT_OUT: ${{ runner.temp }}/gi-i66-bulk-live.json
         run: |
           set -euo pipefail
           node tools/gravicentra-i66-source-bulk-live.cjs
@@ -174,7 +174,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: gi-i66-source-bulk-live-${{ github.run_id }
-          path: ${{ runner.temp }/gi-i66-bulk-live.json
+          name: gi-i66-source-bulk-live-${{ github.run_id }}
+          path: ${{ runner.temp }}/gi-i66-bulk-live.json
           if-no-files-found: ignore
           retention-days: 90
