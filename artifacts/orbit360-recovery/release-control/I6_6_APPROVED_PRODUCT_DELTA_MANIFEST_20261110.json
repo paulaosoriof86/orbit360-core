@@ -3091,6 +3091,43 @@
           "replaces": {"path":"tools/gravicentra-i6-6-protected-role-policy-hydration.test.cjs","priorGitBlobSha":"ed356dd4e7bcb9cd20e0f43215f7dbc38b7dbdbd","priorChangeId":"I6_6_PROTECTED_ROLE_MATRIX_HYDRATION_ORDER_20261117"}
         }
       ]
+    },
+    {
+      "id": "I6_6_OWNER_VEHICLE_EDIT_ROLE_WRITE_AND_IMMUTABLE_PACKAGE_20261119",
+      "approvedByDirection": true,
+      "receipt": "Paula 2026-11-19: corregir transversalmente permission-denied al editar el vehiculo de Ashlyn Aguilar desde rol Operativo, conservar derechos por rol para Carlos y publicar cada correccion tras certificacion; completar tambien empaquetador canónico que omitio modulo aprobado en I6.6.",
+      "sourceStatus": "LOCAL_5_OF_5_TARGETED_TESTS_PASS_SIGNED_PREVIEW_AND_LIVE_PENDING",
+      "scope": "La edicion puntual de un vehiculo ligado a poliza escribe solo vehiculos y auditoria en transaccion durable, sin regenerar recibos/cartera/pagos. La composicion I6.6 incluye un bridge aprobado SHA-pinned como fuente dormida, sin cargar LAB ni modificar el unico entrypoint. No reconfigura por suposicion permisos, pertenencia, paises ni Firestore Rules y no afirma LIVE.",
+      "paths": [
+        {
+          "path": "orbit360-platform/core/policy-receipts-engine.js",
+          "gitBlobSha": "1a42767f5d1b7fc455e4a332b4d0e6eda2f87014",
+          "replaces": {
+            "path": "orbit360-platform/core/policy-receipts-engine.js",
+            "priorGitBlobSha": "84129eb3f78217b0c3cb61058ece5d2b9e91cd3d",
+            "priorChangeId": "I6_6_CASH_ISSUANCE_MONTH_SERGIO_TRANSVERSAL_20261119"
+          }
+        },
+        {
+          "path": "tools/gravicentra-i6-1-preview-package.mjs",
+          "gitBlobSha": "c774bbcec55878fa7136f906443e605be43334d4",
+          "replaces": {
+            "path": "tools/gravicentra-i6-1-preview-package.mjs",
+            "priorGitBlobSha": "0d1b4044784d8d46dfb2a3c482b933ec2d16a078",
+            "priorChangeId": "I6_6_TENANT_BRANDED_PWA_ICON_FROM_CANONICAL_BRANDING_20261110"
+          }
+        }
+      ],
+      "tests": [
+        {
+          "path": "tools/gravicentra-i6-6-vehicle-only-durable-write.test.cjs",
+          "gitBlobSha": "af9ca14a5b4121ac42b7bdbedd82901d70a41916"
+        },
+        {
+          "path": "tools/gravicentra-i6-6-signed-supplemental-package.test.cjs",
+          "gitBlobSha": "e40741ed257462d190e8fa7889ca943fe933471e"
+        }
+      ]
     }
   ],
   "i66R11PreviewBuildRequest20261113": {

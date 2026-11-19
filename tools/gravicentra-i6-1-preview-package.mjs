@@ -82,6 +82,41 @@ for(const p of requiredSite) if(!seen.has(p))throw new Error('REACHABILITY_CLOSU
 for(const p of seen) if(/^(tools|docs|reports|functions|\.github)\//.test(p))throw new Error('NON_PRODUCT_TREE_REACHED:'+p);
 fs.writeFileSync(path.join(EVIDENCE,'reachable-files.txt'),[...seen].sort().join('\n')+'\n');
 
+// I6.6 preserves the distinction between an executed entrypoint dependency
+// and an approved, SHA-pinned product source. The latter must be present in
+// the exact artifact when the release verifier requires byte parity; it must
+// NOT silently become a new <script> in the canonical index. The currently
+// approved configuration-domain bridge is intentionally dormant: its only
+// historical loader belongs to excluded backend-LAB initialization.
+if(RELEASE_GATE==='I6.6'){
+  if(BUILD_PREFIX!=='gi-i66')throw new Error('I66_SIGNED_SUPPLEMENTAL_GATE_DRIFT');
+  const manifestPath=path.resolve(sourceRoot,'artifacts/orbit360-recovery/release-control/I6_6_APPROVED_PRODUCT_DELTA_MANIFEST_20261110.json');
+  const approved=JSON.parse(read(manifestPath));
+  if(approved.schema!=='GRAVICENTRA_I6_6_APPROVED_PRODUCT_DELTAS_V1'||approved.activeGate!=='I6.6'||approved.dataMutationAuthorized!==false)
+    throw new Error('I66_SIGNED_SUPPLEMENTAL_MANIFEST_INVALID');
+  const terminalPins=new Map();
+  for(const change of approved.changes||[])for(const pin of change.paths||[])terminalPins.set(pin.path,pin.gitBlobSha);
+  const supplementalAllowlist=new Set(['modules/config-domain-v20260804-bridge.js']);
+  const supplemental=[];
+  for(const [sourcePath,expectedBlob] of terminalPins){
+    if(!sourcePath.startsWith('orbit360-platform/'))continue;
+    const rel=sourcePath.slice('orbit360-platform/'.length);
+    if(seen.has(rel)||rel.startsWith('assets/tenant/'))continue; // tenant assets enter via the approved branding copy below
+    if(!supplementalAllowlist.has(rel))throw new Error('I66_APPROVED_PRODUCT_NOT_REACHABLE_OR_SUPPLEMENTAL:'+rel);
+    const source=path.resolve(SRC,rel),destination=path.resolve(SITE,rel);
+    if(!source.startsWith(SRC+path.sep)||!destination.startsWith(SITE+path.sep)||!fs.existsSync(source)||fs.lstatSync(source).isSymbolicLink())
+      throw new Error('I66_SIGNED_SUPPLEMENTAL_SOURCE_UNSAFE:'+rel);
+    const bytes=fs.readFileSync(source);
+    const actualBlob=crypto.createHash('sha1').update('blob '+bytes.length+'\0').update(bytes).digest('hex');
+    if(actualBlob!==expectedBlob)throw new Error('I66_SIGNED_SUPPLEMENTAL_BLOB_DRIFT:'+rel);
+    fs.mkdirSync(path.dirname(destination),{recursive:true});fs.copyFileSync(source,destination);
+    supplemental.push({path:rel,gitBlobSha:actualBlob,executedFromCanonicalEntrypoint:false});
+  }
+  if(supplemental.length!==supplementalAllowlist.size||supplemental.some(row=>!supplementalAllowlist.has(row.path)))
+    throw new Error('I66_SIGNED_SUPPLEMENTAL_CLOSURE_DRIFT');
+  fs.writeFileSync(path.join(EVIDENCE,'approved-dormant-source.json'),JSON.stringify({gate:'I6.6',supplemental},null,2)+'\n');
+}
+
 function copyTree(src,dst){for(const e of fs.readdirSync(src,{withFileTypes:true})){if(e.name==='node_modules'||e.name==='.git'||e.name.endsWith('.local'))continue;const a=path.join(src,e.name),b=path.join(dst,e.name);if(e.isDirectory()){fs.mkdirSync(b,{recursive:true});copyTree(a,b);}else if(e.isFile()){fs.mkdirSync(path.dirname(b),{recursive:true});fs.copyFileSync(a,b);}}}
 copyTree(FUNCTIONS_SRC,BACKEND);
 // B4-003/B4-004/B4-005: stage scoped callable names in ONE immutable Preview package without deploying the backend.

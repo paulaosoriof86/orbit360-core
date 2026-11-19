@@ -579,6 +579,39 @@ Orbit.policyReceipts = (function () {
     options=options||{};if(!canManagePolicies())return{ok:false,errors:['permiso_poliza_denegado']};if(!S()||typeof S().batchDurable!=='function')return{ok:false,errors:['contrato_atomico_no_disponible']};
     const current=S().get('polizas',id);if(!current)return{ok:false,errors:['poliza_no_encontrada']};
     const before=clone(current),opId=options.operationId||operationId('polupd');
+    // A vehicle-data correction is NOT a policy premium/receipt renewal.
+    // Keep its existing canonical vehicle identity and relationship; write only
+    // the vehicle and one audit activity through the same durable server path.
+    // This avoids requiring Cobros permission merely to correct a car field,
+    // and prevents any incidental receipt/portfolio regeneration.
+    if(patch&&Object.keys(patch).length===1&&patch.vehiculo&&typeof patch.vehiculo==='object'&&!Array.isArray(patch.vehiculo)){
+      if(!clean(options.motivo))return{ok:false,errors:['motivo_requerido'],operationId:opId};
+      const input=patch.vehiculo,vehicleId=clean(input.id);
+      const prior=vehicleId&&S().get('vehiculos',vehicleId);
+      if(!prior||clean(prior.polizaId)!==clean(id)||
+         (prior.tenantId&&clean(prior.tenantId)!==clean(before.tenantId))||
+         (prior.clienteId&&clean(prior.clienteId)!==clean(before.clienteId))||
+         (prior.pais&&clean(prior.pais)!==clean(before.pais)))
+        return{ok:false,errors:['vehiculo_vinculo_canonico_invalido'],operationId:opId};
+      const editable=new Set(['marca','linea','anio','placa','uso','color','chasis','vin','motor','inciso','sumaAsegurada','concepto','descripcion']);
+      if(Object.keys(input).some(key=>key!=='id'&&!editable.has(key)))
+        return{ok:false,errors:['vehiculo_campos_no_autorizados'],operationId:opId};
+      const changed={};
+      for(const key of editable)if(Object.prototype.hasOwnProperty.call(input,key)&&
+         JSON.stringify(input[key])!==JSON.stringify(prior[key]))changed[key]=input[key];
+      if(!Object.keys(changed).length)return{ok:false,errors:['poliza_sin_cambios'],operationId:opId};
+      const activity=activityRow(before,'Datos de vehículo actualizados: '+(before.numero||id),options.motivo,opId);
+      const mutations=[
+        {action:'update',collection:'vehiculos',id:vehicleId,payload:Object.assign(changed,{operationId:opId,actualizado:now()})},
+        {action:'insert',collection:'actividades',id:activity.id,payload:activity}
+      ];
+      try{
+        await S().batchDurable(mutations,{requestId:opId,timeoutMs:25000});
+        return{ok:true,policy:before,vehicle:Object.assign({},prior,changed),operationId:opId,
+          receipts:{preserved:true},portfolio:{preserved:true},vehicleOnly:true,atomicServerCommit:true};
+      }catch(error){return{ok:false,errors:['operacion_atomica_no_confirmada'],
+        error:String(error&&(error.code||error.message||error)),operationId:opId};}
+    }
     if (isRenewabilityOnlyPatch(patch)) {
       if (!clean(options.motivo)) return {ok:false,errors:['motivo_requerido'],operationId:opId};
       if (before.renovable === patch.renovable) return {ok:false,errors:['renovabilidad_sin_cambios'],operationId:opId};
