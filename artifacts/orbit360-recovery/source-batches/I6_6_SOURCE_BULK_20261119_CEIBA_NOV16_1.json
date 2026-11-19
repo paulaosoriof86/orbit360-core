@@ -1,0 +1,39 @@
+{
+  "schema": "GRAVICENTRA_I6_6_INSURER_SOURCE_BULK_V1",
+  "status": "OWNER_RULES_FROZEN_SOURCE_ROWS_VERIFIED",
+  "tenantId": "alianzas-soluciones",
+  "projectId": "ays-orbit-360-lab",
+  "ownerRuleReference": "PAULA_EXPLICIT_2026-11-18_REQUIREMENT_PER_RECEIPT_AND_GROSS_SOURCE_PRECEDENCE; PAULA_EXPLICIT_2026-11-19_INSURER_STATEMENT_PERIOD_DUE_REQUIREMENT_AND_CURRENCY_PREVAIL_WITH_DEDUPE",
+  "technicalPreflightRevision": "2026-11-19-raw-insurer-excel-sha256-one-pending-requirement-no-payment-inference",
+  "document": {
+    "filename": "Estado de cuenta La Ceiba al 16 de noviembre.xlsx",
+    "googleDriveFileId": "1tfPHUciiKtI0mqdwInhhL5ZAb_OIMNak",
+    "rawSha256": "f40c1ab97bdcdf5809f9e6bc897bb1e30f0196caea278a02205897b427fd358a",
+    "rawBytes": 3646,
+    "driveModifiedAtUtc": "2026-11-17T04:54:44.734Z",
+    "sourceAsOfDateFromFilename": "2026-11-16",
+    "evidenceType": "INSURER_STATEMENT_PENDING",
+    "semanticLimit": "Source column FECHA_COBRO and MOROSIDAD 30 indicate a charge shown on insurer account; not proof of payment. Do not create Cobro. Requirement 02505903 and issuer gross Q138.97 prevail only after unique insured-policy-edition-receipt match and protected before/after."
+  },
+  "verifiedSourceRowCount": 1,
+  "verifiedDistinctPolicyCount": 1,
+  "verifiedGrossCents": 13897,
+  "rows": [
+    {
+      "caseId": "CEIBA_NOV16_0001",
+      "insurer": "CEIBA",
+      "policy": "0226130804",
+      "requirement": "02505903",
+      "due": "2026-10-31",
+      "grossCents": 13897,
+      "state": "PENDING",
+      "sourceSha256": "f40c1ab97bdcdf5809f9e6bc897bb1e30f0196caea278a02205897b427fd358a",
+      "sourceRowNumber": 2
+    }
+  ],
+  "sourceCurrency": "NOT_EXPLICIT_IN_FILE_GUATEMALA_POLICY_CURRENCY_MUST_BE_VERIFIED",
+  "provenance": "RAW_INSURER_STATEMENT_UPLOAD_NOT_SIGA_OR_MANUAL_OVERRIDE",
+  "writesPerformedByThisManifest": 0,
+  "preflightStatus": "NOT_EXECUTED",
+  "authorizationScope": "USE_EXISTING_I6_6_SOURCE_BULK_PROTECTED_WORKFLOW_ONLY_AFTER_REAL_LIVE_IDENTITY_DRIFT_RECONCILED"
+}

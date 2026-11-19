@@ -430,6 +430,15 @@
           "sourceAsOfDateFromFilename": "2026-11-20",
           "latestForInsurer": "El Roble",
           "semanticType": "PENDING_NOT_PROOF_OF_PAID"
+        },
+        {
+          "filename": "Estado de cuenta La Ceiba al 16 de noviembre.xlsx",
+          "sha256": "f40c1ab97bdcdf5809f9e6bc897bb1e30f0196caea278a02205897b427fd358a",
+          "hashStatus": "RAW_BYTES_SHA256_VERIFIED_2026_11_19",
+          "fileId": "1tfPHUciiKtI0mqdwInhhL5ZAb_OIMNak",
+          "modifiedAtUtc": "2026-11-17T04:54:44.734Z",
+          "sourceRows": 1,
+          "readOnlyIntake": true
         }
       ],
       "count": 16,
