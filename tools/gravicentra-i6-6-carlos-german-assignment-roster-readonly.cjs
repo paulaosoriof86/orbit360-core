@@ -67,18 +67,43 @@ const ORIGINS=['https://app.aysseguros.com','https://ays-orbit-360-lab--gi-i66-r
       selectDisabled=!!select?.disabled;
      }catch(e){modalError=String(e.code||e.message||e).slice(0,180);}
      document.querySelectorAll('#ciclo-modal').forEach(n=>n.remove());
+     // Production incident: Carlos creates policies from Cliente 360 / Pólizas,
+     // not only a prospect from Ops. A PASS for Ops must not certify this other
+     // selector. Exercise the exact effective modal without saving anything.
+     let policyClientReady=false,policyModalVisible=false,policyGerman=false;
+     let policyOptionCount=0,policyDisabled=true,policyModalError='';
+     try{
+       const scoped=(Orbit.store?.all?.('clientes')||[]);
+       const gtClient=scoped.find(c=>c?.id&&String(c.pais||'').toUpperCase()==='GT'&&!c.archivado);
+       policyClientReady=!!gtClient;
+       if(gtClient){
+         await Orbit.modules.cliente360.nuevaPoliza(gtClient.id);
+         const cutoff=Date.now()+12000;
+         let picker=document.querySelector('#policy-v1199 [data-advisor]');
+         while(picker&&picker.disabled&&Date.now()<cutoff){
+           await new Promise(resolve=>setTimeout(resolve,120));
+           picker=document.querySelector('#policy-v1199 [data-advisor]');
+         }
+         policyModalVisible=!!picker;
+         policyOptionCount=picker?.options?.length||0;
+         policyGerman=!!picker&&[...picker.options].some(o=>o.value===germanId);
+         policyDisabled=picker?.disabled!==false;
+       }
+     }catch(e){policyModalError=String(e.code||e.message||e).slice(0,180);}
+     document.querySelectorAll('#policy-v1199').forEach(n=>n.remove());
      return {
        started:activated?.started===true,
        role,preview:provider.isI66PreviewHost(),
        callable:roster?.status?.().functionName,region:roster?.status?.().region,
        beforeCount:before.length,serverCount:rows.length,serverGerman:rows.some(r=>r.id===germanId),
-       callError:error,modalVisible,optionCount,optionGerman,selectDisabled,modalError
+       callError:error,modalVisible,optionCount,optionGerman,selectDisabled,modalError,
+       policyClientReady,policyModalVisible,policyOptionCount,policyGerman,policyDisabled,policyModalError
      };
     },{token,germanId});
     console.log('I66_CARLOS_GERMAN_SIGNED_ROSTER_READONLY '+JSON.stringify({origin:origin.includes('--')?'preview':'live',...result}));
     assert.equal(norm(result.role),'operativo','CARLOS_ACTIVE_ROLE_NOT_OPERATIVO');
-    if(!result.started||result.callError||!result.serverGerman||!result.optionGerman)
-      throw Error('I66_CARLOS_GERMAN_ASSIGNMENT_ROSTER_NOT_READY_'+(origin.includes('--')?'PREVIEW':'LIVE'));
+    if(!result.started||result.callError||!result.serverGerman||!result.optionGerman||!result.policyClientReady||!result.policyModalVisible||!result.policyGerman||result.policyDisabled||result.policyModalError)
+      throw Error('I66_CARLOS_GERMAN_REAL_OPS_AND_NEW_POLICY_SELECTOR_NOT_READY_'+(origin.includes('--')?'PREVIEW':'LIVE'));
    }finally{await context.close();}
   }
  }finally{await browser.close();}
