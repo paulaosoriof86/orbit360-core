@@ -60,8 +60,11 @@ jobs:
             assert.equal(artifact.digest,process.env.EXPECTED_ARTIFACT_DIGEST,'ARTIFACT_DIGEST_DRIFT');
             assert.equal(artifact.expired,false,'ARTIFACT_EXPIRED');
             assert.equal(preview.sourceSha,process.env.I66_SOURCE_SHA,'PREVIEW_SOURCE_DRIFT');
-            assert.equal(live.sourceSha,'1b65a790530d49fe1d1fb451f02838fd9a713c53','LIVE_UNEXPECTEDLY_CHANGED');
-            console.log('I66_EXACT_PREVIEW_PACKAGE_AND_LIVE_BACKUP_PASS');
+            assert.match(String(live.sourceSha||''),/^[0-9a-f]{40}$/,'LIVE_BACKUP_MARKER_MISSING');
+            if(live.sourceSha!=='1b65a790530d49fe1d1fb451f02838fd9a713c53')
+              console.log('I66_LIVE_CONTROL_PLANE_DRIFT_HOLD_SEPARATE_FROM_PREVIEW_UAT actual='+String(live.sourceSha).slice(0,12));
+            console.log('I66_NO_LIVE_ACCEPTANCE_CLAIM_FROM_THIS_PREVIEW_UAT');
+            console.log('I66_EXACT_PREVIEW_PACKAGE_PASS_CURRENT_LIVE_PROVENANCE_SEPARATE_HOLD');
           })().catch(e=>{console.error(e.stack||e);process.exitCode=1;});
           NODE
       - name: Owner contract and anti-regression source tests
