@@ -108,7 +108,11 @@ function validateRequest(){
     need(rawRequest.sourceSha==='72d3580f3e90071b360319ce5f204d348b401663'&&rawRequest.buildRunId===44637404427&&rawRequest.artifactId===14584217893&&rawRequest.signedCarlosPaulaPreviewUatRunId===44637887342,'I66_CLIENTE360_SIGNED_PROOF_IDENTITY_DRIFT');
     need(rawRequest.expectedPriorLiveSourceSha==='b38f877f7847c7b6e11506885e42252e84c5eeb6'&&rawRequest.expectedPriorLiveHostingVersion==='sites/ays-orbit-360-lab/versions/13944f80ba1e0bdf','I66_CLIENTE360_LIVE_ROLLBACK_BACKUP_UNPINNED');
     need(rawRequest.previewChannel==='gi-i66-rc-'+rawRequest.buildRunId&&/^sha256:[0-9a-f]{64}$/.test(rawRequest.artifactDigest||''),'I66_CLIENTE360_ARTIFACT_OR_CHANNEL_INVALID');
-    need(new RegExp('^https://ays-orbit-360-lab--'+rawRequest.previewChannel+'-[a-z0-9]+\\.web\\.app&&request.status==='LIVE_HOSTING_CLONE_APPROVED_AFTER_TARGETED_PREVIEW_QA_PASS','I66_LIVE_PROMOTION_NOT_APPROVED');
+    need(new RegExp('^https://ays-orbit-360-lab--'+rawRequest.previewChannel+'-[a-z0-9]+\\.web\\.app$').test(rawRequest.previewUrl||''),'I66_CLIENTE360_PREVIEW_ORIGIN_NOT_EXACT');
+    need(rawRequest.buildId==='gi-i66-'+rawRequest.sourceSha.slice(0,12)+'-57f234755dc1'&&request.artifactZipSha256.length===64,'I66_CLIENTE360_BUILD_SOURCE_DRIFT');
+    return;
+  }
+  need(request.schema==='I6_6_EXACT_HOSTING_LIVE_PROMOTION_V1'&&request.status==='LIVE_HOSTING_CLONE_APPROVED_AFTER_TARGETED_PREVIEW_QA_PASS','I66_LIVE_PROMOTION_NOT_APPROVED');
   need(request.approvedByDirection===true&&request.historicalGateClosed==='B4-007'&&request.noBackendDeploy===true&&request.noFirestoreAuthOrDataWrites===true,'I66_PROMOTION_SCOPE_INVALID');
   need(request.activeGate==='I6.6'&&Number.isSafeInteger(request.qaRunId)&&request.qaRunId>0&&request.buildRunId===request.qaRunId&&Number.isSafeInteger(request.artifactId)&&request.artifactId>0,'I66_APPROVAL_PROOFS_INVALID');
   const standardChannel='gi-i66-rc-'+request.buildRunId;
