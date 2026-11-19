@@ -3337,6 +3337,30 @@
         "existing cumulative I6.6 source build and same artifact preview/live",
         "readback both live origins and affected module acceptance without customer data mutation"
       ]
+    },
+    {
+      "id": "I6_6_CRM_EFFECTIVE_NEW_CLIENT_SHADOW_ADVISOR_ROSTER_ROOTFIX_20261119",
+      "approvedByDirection": true,
+      "receipt": "Paula Dirección, 19-nov-2026, exige cerrar la raíz de los selectores incoherentes en todas las rutas efectivas y publicar. Signed current Preview discovered Nuevo Cliente uses legacy CRM v1198 override despite a Cliente360 base form fix. This addendum binds the actual owner to signed Equipos roster, no new identity, no other modules removed.",
+      "sourceStatus": "SOURCE_SIGNED_QA_AND_NEW_IMMUTABLE_PREVIEW_REQUIRED_NO_LIVE_ACCEPTANCE",
+      "capabilityOwners": [
+        "CLIENTE360_PRIMARY_RUNTIME",
+        "ROLE_SCOPE_RUNTIME",
+        "CROSS_MODULE_RELATIONSHIPS"
+      ],
+      "scope": "Existing override openNewClient must no longer read local asesores. Use server-owned active country/role scoped roster, explicit selection and no save until confirmed; unchanged CRM feature/validation/dedup/persistence and read-only signed QA proof before Live; preserve previous 70 approvals.",
+      "paths": [
+        {
+          "path": "orbit360-platform/modules/crm-v1198-operational-bridge.js",
+          "gitBlobSha": "1ba69c71b66ddaf66001124c2a980f8f2200de4e"
+        }
+      ],
+      "tests": [
+        {
+          "path": "tools/gravicentra-i6-6-crm-shadow-advisor-source.test.cjs",
+          "gitBlobSha": "f0e0ce18ccf3e698622b0d137115c9379c5883f6"
+        }
+      ]
     }
   ],
   "i66R11PreviewBuildRequest20261113": {
