@@ -108,7 +108,8 @@ function assess(row,groups){
   if(editions.length!==1)return {code:'MULTIPLE_POLICY_EDITIONS'};
   const g=editions[0];
   if(!g.clientExists||!g.insurerVerified||!str(g.policy.clienteId))return {code:'CLIENT_OR_INSURER_REFERENCE_MISSING'};
-  if(/CANCELADA|ANULADA|DELETED|SUSPENDIDA/.test(norm(g.policy.estado)))return {code:'POLICY_NOT_ELIGIBLE_FOR_LEGACY_PAYMENT'};
+  // Current policy status does not erase insurer-proven payments in this exact
+  // historical edition. Never reactivate coverage as a payment side effect.
   const valid=(g.receipts||[]).filter(r=>str(r.polizaId)===g.policy.id&&
     !/ANULADO|ANULADA|CANCELADA/.test(norm(r.estado))&&
     (receiptDue(r)===row.periodStart||receiptDue(r)===row.due||operationalDue(r)===row.due));
@@ -122,6 +123,16 @@ function assess(row,groups){
       !/ANULADO|ANULADA|CANCELADA/.test(norm(r.estado))&&ordinal!=null&&
       Number(r.secuencia||r.numeroCuota)===ordinal);
     if(ordinal!=null&&seqCandidates.length===1){candidates=seqCandidates;matchedBy='TERM_INSTALLMENT_SEQUENCE';}
+    // Source period can start on day 1 while the policy anniversary does not.
+    // Use only a unique installment ordinal within the exact edition.
+    if(!candidates.length&&row.periodStart>=row.coverageStart&&row.periodStart<row.coverageEnd){
+      const monthIndex=(+row.periodStart.slice(0,4)-+row.coverageStart.slice(0,4))*12+
+        (+row.periodStart.slice(5,7)-+row.coverageStart.slice(5,7));
+      const byOrdinal=(g.receipts||[]).filter(r=>str(r.polizaId)===g.policy.id&&
+        !/ANULADO|ANULADA|CANCELADA/.test(norm(r.estado))&&
+        monthIndex>=0&&monthIndex<12&&Number(r.secuencia||r.numeroCuota)===monthIndex+1);
+      if(byOrdinal.length===1){candidates=byOrdinal;matchedBy='SOURCE_PERIOD_MONTH_ORDINAL';}
+    }
   }
   if(!candidates.length&&(row.frequency.includes('UNICO')||row.frequency.includes('UNICA'))&&
     (g.receipts||[]).filter(r=>!/ANULADO|ANULADA|CANCELADA/.test(norm(r.estado))).length===1){
@@ -266,6 +277,12 @@ async function applyOne(db,oldPlan,source){
       [r,c].some(x=>x.conciliado===true||/^APPLIED_/.test(str(x.applicationState)))||
       [r,c].some(x=>date(x.fechaPago||x.paidDate)&&date(x.fechaPago||x.paidDate)!==oldPlan.paidDate)||
       !/^[a-f0-9]{64}$/.test(oldPlan.beforeHash))throw Error('POLICY_RECEIPT_PREIMAGE_CHANGED');
+    if(oldPlan.match.startsWith('SOURCE_PERIOD_MONTH_ORDINAL')){
+      const delta=(+oldPlan.periodStart.slice(0,4)-+p.vigenciaInicio.slice(0,4))*12+
+        (+oldPlan.periodStart.slice(5,7)-+p.vigenciaInicio.slice(5,7));
+      if(delta<0||delta>=12||Number(r.secuencia||r.numeroCuota)!==delta+1)
+        throw Error('INSURER_PERIOD_SEQUENCE_CHANGED');
+    }
     const alias=oldPlan.creatingPortfolio?
       comparableGrossAliases(r,{primaTotal:r.primaTotal},cents(r.primaTotal),cents(r.primaTotal)):
       comparableGrossAliases(r,c,cents(r.primaTotal),cents(c.primaTotal));
@@ -296,12 +313,17 @@ async function applyOne(db,oldPlan,source){
       reconciledAt:null,updatedAt:when,updatedByUid:'I6_6_PROTECTED_SOURCE_RUNNER'};
     tx.create(cobRef,{id:cbid,tenantId:TENANT,clienteId:p.clienteId,polizaId:p.id,reciboId:r.id,
       asesorId:str(r.asesorId||p.asesorId),pais:'GT',moneda:'GTQ',cuota:r.cuota||r.numeroCuota||'',
-      vence:receiptDue(r),monto:oldPlan.grossCents/100,fechaPago:oldPlan.paidDate,
+      vence:oldPlan.due,periodoInicioFuente:oldPlan.periodStart,
+      monto:oldPlan.grossCents/100,fechaPago:oldPlan.paidDate,
       estado:'Pagado',conciliado:false,...shared});
-    tx.update(rRef,{...setGross(r,oldPlan.grossCents,alias.receipt),estado:'Pagado',
+    tx.update(rRef,{...setGross(r,oldPlan.grossCents,alias.receipt),
+      fechaVencimientoContractual:oldPlan.due,periodoInicioFuente:oldPlan.periodStart,
+      estado:'Pagado',
       estadoOperativo:'pagado',conciliado:false,conciliadoPago:true,
       cobroId:cbid,fechaPago:oldPlan.paidDate,...shared});
-    const carteraPatch={...setGross(c,oldPlan.grossCents,alias.cartera),estado:'Pagado',
+    const carteraPatch={...setGross(c,oldPlan.grossCents,alias.cartera),
+      vence:oldPlan.due,fechaVencimientoContractual:oldPlan.due,
+      periodoInicioFuente:oldPlan.periodStart,estado:'Pagado',
       estadoCartera:'Pagado',conciliado:false,conciliadoPago:true,
       cobroId:cbid,reciboId:r.id,fechaPago:oldPlan.paidDate,...shared};
     if(oldPlan.creatingPortfolio)tx.create(cRef,{id:cRef.id,tenantId:TENANT,
@@ -309,7 +331,7 @@ async function applyOne(db,oldPlan,source){
       aseguradoraId:p.aseguradoraId,pais:'GT',moneda:'GTQ',
       secuencia:r.secuencia||r.numeroCuota||null,cuota:r.cuota||'',
       monto:oldPlan.grossCents/100,montoTotal:oldPlan.grossCents/100,
-      vence:receiptDue(r),fechaLimite:operationalDue(r),
+      vence:oldPlan.due,fechaLimite:operationalDue(r),
       carteraActiva:false,carteraTipo:'historico_pagado_fuente',
       estadoOperativo:'pagado_sin_saldo',exigibilidad:'cerrada',
       ...carteraPatch});
@@ -318,6 +340,7 @@ async function applyOne(db,oldPlan,source){
       sourceId:oldPlan.sourceId,sourceSha256:SOURCE_SHA,policyId:p.id,receiptId:r.id,
       portfolioId:c.id,cobroId:cbid,oldPlanHash:oldPlan.beforeHash,
       newGrossCents:oldPlan.grossCents,paidDate:oldPlan.paidDate,
+      insurerDueDate:oldPlan.due,insurerPeriodStart:oldPlan.periodStart,
       rollback:{receiptBefore:rs.data(),portfolioBefore:cs.exists?cs.data():null,
         portfolioWasAbsent:!cs.exists,cobroWasAbsent:true},
       noAutomaticInsurerBankReconciliation:true,createdAt:when});
@@ -328,6 +351,9 @@ async function applyOne(db,oldPlan,source){
     ![rr,cc,cb].every(s=>s.data().paymentState==='PAID_DIRECT'&&
       s.data().applicationState==='PENDING_APPLICATION'&&s.data().conciliado===false&&
       s.data().fechaPago===oldPlan.paidDate)||
+    receiptDue(rr.data())!==oldPlan.due||
+    date(cc.data().fechaVencimientoContractual)!==oldPlan.due||
+    date(cb.data().vence)!==oldPlan.due||
     cents(rr.data().primaTotal)!==oldPlan.grossCents||
     cents(cc.data().primaTotal)!==oldPlan.grossCents||
     cents(cb.data().monto)!==oldPlan.grossCents||
