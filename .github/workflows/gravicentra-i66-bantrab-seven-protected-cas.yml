@@ -20,7 +20,9 @@ on:
 permissions:
   contents: read
 concurrency:
-  group: gravicentra-live-data-writes-i66
+  # Keep independent source batches from queueing behind an older approval;
+  # every protected job still requires the SAME environment reviewer and CAS.
+  group: gravicentra-live-data-writes-i66-${{ github.sha }}
   cancel-in-progress: false
 env:
   GCLOUD_PROJECT: ays-orbit-360-lab
