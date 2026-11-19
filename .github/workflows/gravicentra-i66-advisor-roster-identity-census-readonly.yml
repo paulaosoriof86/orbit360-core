@@ -34,3 +34,4 @@ jobs:
           node --check tools/gravicentra-i6-6-advisor-roster-identity-census-readonly.cjs
           npm install --no-save --package-lock=false --ignore-scripts --no-audit --no-fund firebase-admin@13.4.0 >/dev/null
           node tools/gravicentra-i6-6-advisor-roster-identity-census-readonly.cjs
+# RERUN_20261119_CARLOS_GERMAN: exact LIVE roster and GT role eligibility census; no writes.
