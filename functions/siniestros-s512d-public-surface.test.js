@@ -52,6 +52,7 @@ test('S5.12D endpoint allows exact LAB and A&S HTTPS origins without wildcard',(
     'https://ays-orbit-360-lab.web.app',
     'https://ays-orbit-360-lab.firebaseapp.com',
     'https://ays-web-publica.web.app',
+    'https://ays-alys-gt-v1--alys-q46-1113-9n5qjflr.web.app',
     'https://aysseguros.com'
   ].sort());
   for(const denied of [
@@ -59,6 +60,7 @@ test('S5.12D endpoint allows exact LAB and A&S HTTPS origins without wildcard',(
     'https://www.aysseguros.com',
     'https://aysseguros.com.evil.invalid',
     'https://ays-web-publica.web.app.evil.invalid',
+    'https://ays-alys-gt-v1--alys-q46-1113-9n5qjflr.web.app.evil.invalid',
     'https://aysseguros.com:443',
     'https://example.com',
     '*',
@@ -70,5 +72,8 @@ test('S5.12D endpoint allows exact LAB and A&S HTTPS origins without wildcard',(
   assert.equal(headers['Access-Control-Allow-Origin'],'https://aysseguros.com');
   assert.equal(headers.Vary,'Origin');
   assert.equal(headers['Access-Control-Allow-Methods'],'GET, OPTIONS');
+  assert.equal(r.allowOrigin({get:()=> 'https://ays-alys-gt-v1--alys-q46-1113-9n5qjflr.web.app'},response),true);
+  assert.equal(headers['Access-Control-Allow-Origin'],'https://ays-alys-gt-v1--alys-q46-1113-9n5qjflr.web.app');
+  assert.equal(r.allowOrigin({get:()=> 'https://ays-alys-gt-v1--alys-q46-1113-9n5qjflr.web.app.evil.invalid'},response),false);
   assert.equal(r.allowOrigin({get:()=> 'https://example.com'},response),false);
 });
