@@ -4538,6 +4538,12 @@
     "readbackEachOrigin": 224,
     "receipt": "artifacts/orbit360-recovery/release-control/I6_6_FINANCIAL_OPS_LEADS_CONTINUITY_READBACK_20261119.json#latestPhysicalLiveAndFinancialAcceptance20261119",
     "backendFunctionsChanged": 0,
-    "fullI66ProductionAccepted": false
+    "fullI66ProductionAccepted": false,
+    "governanceReadback": {
+      "commit": "13eea7e60bc9b3d4d65dd7a25b1c7388f5da999c",
+      "run": 44672112472,
+      "result": "success",
+      "supersedesFailedBuildAttempt": 44671988162
+    }
   }
 }
