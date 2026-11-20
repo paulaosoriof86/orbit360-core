@@ -365,6 +365,54 @@ jobs:
                 qa.event==='push'&&qa.status==='completed'&&qa.conclusion==='success'&&
                 qa.path===expectedWorkflow;
             }
+            // A signed request already transported to LIVE cannot authorize another build.
+            // Compare the request with the one stored in the published source, then verify
+            // the promotion receipt and the unchanged runtime before returning a no-op.
+            if (qaTrusted && insurerSelectionSuccessor && c.currentPhysicalHostingRelease &&
+                c.status === 'OPERATIONAL_EXACT_LIVE_ACCEPTED_LOCKED' &&
+                c.livePromotionAuthorized === false && c.forbidBackendFunctionDeploy === true &&
+                c.forbidBackendLiveFunctionDeploy === true && successor.approvedManifestBlobSha === sha &&
+                successor.previousLiveSourceSha !== live.sourceSha) {
+              const assert = require('node:assert/strict');
+              const git = (...args) => execFileSync('git', args, {encoding: 'utf8'}).trim();
+              const controlDir = 'artifacts/orbit360-recovery/release-control/';
+              assert.match(live.sourceSha, /^[a-f0-9]{40}$/);
+              git('merge-base', '--is-ancestor', live.sourceSha, 'HEAD');
+              const published = JSON.parse(git('show', live.sourceSha + ':' + controlDir +
+                'I6_6_RELEASE_TRANSPORT_CONTROL_20261110.json'));
+              if (require('node:util').isDeepStrictEqual(successor,
+                  published.postAcceptanceOwnerInsurerSelectionPreviewBuildRequest20261119)) {
+                const previous = published.currentPhysicalHostingRelease;
+                assert.deepEqual(
+                  [successor.previousLiveSourceSha, successor.previousLiveArtifactId,
+                   successor.previousLiveArtifactDigest, successor.previousLiveHostingVersion],
+                  [previous.sourceSha, previous.artifactId, previous.artifactDigest, previous.liveHostingVersion]);
+                assert.equal(git('rev-parse', live.sourceSha + ':' + controlDir +
+                  'I6_6_APPROVED_PRODUCT_DELTA_MANIFEST_20261110.json'), sha);
+                const receipt = JSON.parse(fs.readFileSync(controlDir +
+                  'I6_6_FINANCIAL_OPS_LEADS_CONTINUITY_READBACK_20261119.json', 'utf8')).opsHandbackSignedLive;
+                assert.deepEqual(
+                  [receipt.sourceSha, receipt.buildId, receipt.artifactId, receipt.build,
+                   receipt.liveRun, receipt.liveBeforeVersion, receipt.previewVersion, receipt.liveAfterVersion],
+                  [live.sourceSha, live.buildId, live.artifactId, live.previewRunId,
+                   live.liveCloneRunId, previous.liveHostingVersion, live.liveHostingVersion, live.liveHostingVersion]);
+                assert.ok(receipt.signedPreview > 0 &&
+                  receipt.firebaseLiveReadbackCount > 0 &&
+                  receipt.firebaseLiveReadbackCount === receipt.appDomainReadbackCount &&
+                  receipt.appDomainReadbackCount === receipt.previewReadbackCount);
+                const artifact = JSON.parse(execFileSync('gh', ['api',
+                  'repos/' + process.env.GITHUB_REPOSITORY + '/actions/artifacts/' + live.artifactId],
+                  {encoding: 'utf8', env: {...process.env, GH_TOKEN: process.env.GITHUB_TOKEN}}));
+                assert.equal(artifact.workflow_run.head_sha, live.sourceSha);
+                assert.equal(artifact.workflow_run.id, live.previewRunId);
+                assert.equal(artifact.digest, live.artifactDigest);
+                git('diff', '--quiet', live.sourceSha, 'HEAD', '--', 'orbit360-platform', 'functions',
+                  'firebase.json', 'firestore.rules', 'storage.rules');
+                fs.appendFileSync(process.env.GITHUB_OUTPUT, 'mode=disabled\n');
+                console.log('I66_PREVIEW_REQUEST_ALREADY_PROMOTED mode=disabled source=' + live.sourceSha);
+                process.exit(0);
+              }
+            }
             const ok=successor.status==='OWNER_APPROVED_SOURCE_PREVIEW_ONLY'&&
               successor.approvedByDirection===true&&successor.gate==='I6.6'&&
               successor.authorizedBranch==='recovery/fase-a-clean-20260831'&&
