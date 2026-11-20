@@ -16,12 +16,12 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 48
     env:
-      I66_PREVIEW_ORIGIN: https://ays-orbit-360-lab--gi-i66-rc-44637404427-635rywxe.web.app
-      I66_SIGNED_QA_CHANNEL_ID: gi-i66-rc-44637404427
-      I66_SOURCE_SHA: 72d3580f3e90071b360319ce5f204d348b401663
-      EXPECTED_BUILD_RUN: '44637404427'
-      EXPECTED_ARTIFACT_ID: '14584217893'
-      EXPECTED_ARTIFACT_DIGEST: sha256:06decf52bfce75a1bdc7e207b96de35c17ccdfed7ff805895bedada0d80617dc
+      I66_PREVIEW_ORIGIN: https://ays-orbit-360-lab--gi-i66-rc-44653024431-9osqd6fl.web.app
+      I66_SIGNED_QA_CHANNEL_ID: gi-i66-rc-44653024431
+      I66_SOURCE_SHA: f4e28f9fdaa01b9360494136e5860861748deb3c
+      EXPECTED_BUILD_RUN: '44653024431'
+      EXPECTED_ARTIFACT_ID: '14592150834'
+      EXPECTED_ARTIFACT_DIGEST: sha256:3c6ff48d1ac4377cc6f4647abd24e42f3722065964e0f1c9f7ef39ad22bc6e8e
       SA_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
       SA_ALT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
       SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
@@ -44,6 +44,7 @@ jobs:
           node --check tools/gravicentra-i66-carlos-paula-signed-direct-renewal-preview-hydration-readonly.cjs
           node --check tools/gravicentra-i6-6-carlos-payment-signed-synthetic-preview-uat.cjs
           node --check tools/gravicentra-i6-6-carlos-german-assignment-roster-readonly.cjs
+          node --check tools/gravicentra-i6-6-carlos-client-edit-signed-synthetic-uat.cjs
           node - <<'NODE'
           const assert=require('node:assert/strict');
           (async()=>{
@@ -72,14 +73,17 @@ jobs:
         run: |
           set -euo pipefail
           node --test tools/gravicentra-i6-6-manual-policy-capture-p0.test.cjs tools/gravicentra-i6-6-ops-activity-direct-vehicle-endorsement.test.cjs tools/gravicentra-i6-6-documented-premium-terms.test.cjs
-          node --test tools/gravicentra-i6-6-operational-renewal-entry.test.cjs tools/gravicentra-i6-6-carlos-ops-tasks-transversal.test.cjs tools/gravicentra-i6-6-cliente360-advisor-source-parity.test.cjs tools/gravicentra-i6-6-crm-shadow-advisor-source.test.cjs
+          node --test tools/gravicentra-i6-6-operational-renewal-entry.test.cjs tools/gravicentra-i6-6-carlos-ops-tasks-transversal.test.cjs tools/gravicentra-i6-6-cliente360-advisor-source-parity.test.cjs tools/gravicentra-i6-6-crm-shadow-advisor-source.test.cjs tools/gravicentra-i6-6-client-edit-activity-country-persistence.test.cjs
       - name: Install signed browser dependencies without source changes
         run: |
           set -euo pipefail
           npm install --no-save --package-lock=false --ignore-scripts --no-audit --no-fund firebase-admin@13.4.0 playwright@1.55.0 >/dev/null
           node node_modules/playwright/cli.js install --with-deps chromium >/dev/null
-      - name: Carlos Operativo signed roster in actual Editar Cliente, Nuevo Cliente, Nueva Póliza and Ops; LIVE untouched
-        run: node tools/gravicentra-i6-6-carlos-german-assignment-roster-readonly.cjs
+      - name: Carlos and Dirección signed actual Editar Cliente phone/advisor/atomic country activity durable write reload and cleanup
+        env:
+          I66_SIGNED_CLIENT_EDIT_ORIGIN: https://ays-orbit-360-lab--gi-i66-rc-44653024431-9osqd6fl.web.app
+          I66_SIGNED_CLIENT_EDIT_SOURCE: f4e28f9fdaa01b9360494136e5860861748deb3c
+        run: node tools/gravicentra-i6-6-carlos-client-edit-signed-synthetic-uat.cjs
       - name: Real-role signed Preview Ops Leads Tasks transactional writes and restoration
         run: node tools/gravicentra-i6-6-carlos-real-signed-synthetic-preview-uat.cjs
       - name: Real-role signed Preview direct-renewal hydration (read-only)
