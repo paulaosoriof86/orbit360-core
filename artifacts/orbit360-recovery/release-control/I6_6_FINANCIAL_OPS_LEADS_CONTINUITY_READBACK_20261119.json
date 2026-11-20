@@ -641,7 +641,13 @@
         "closure": "Carlos Operativo real GT create-policy selector shows canonical Germán; save synthetic policy with correct advisor; server commit/readback/reload; no duplicate advisor and no unauthorized Equipo access.",
         "status": "LIVE_CARLOS_SIGNED_ADVISOR_SELECTOR_PASS_POLICY_COMMIT_UNVERIFIED",
         "liveReadbackRunId": 44641361059,
-        "actualClientEditNewSelectorSourceSha": "72d3580f3e90071b360319ce5f204d348b401663"
+        "actualClientEditNewSelectorSourceSha": "72d3580f3e90071b360319ce5f204d348b401663",
+        "readback20261120": {
+          "result": "Live advisor selectors confirmed; complete issuance with the selected advisor still open.",
+          "runs": [
+            44806394054
+          ]
+        }
       },
       {
         "case": "CARLOS_CLIENTE360_DIRECT_RENEWAL",
@@ -659,7 +665,14 @@
           "B4-003-R20-B01"
         ],
         "closure": "From Cliente360 and Renovaciones, Carlos chooses direct issuance, source policy/client/insurer/premiums correctly prefilled, new issued version persists with canonical source link and receipts/cartera, predecessor removed from actionable Kanban while history preserved, reload/LIVE proof.",
-        "status": "OPEN_PRODUCTION_CASE_UNVERIFIED"
+        "status": "OPEN_PRODUCTION_CASE_UNVERIFIED",
+        "readback20261120": {
+          "result": "Operativo and Dirección signed rendered prior number, actual insurer, recalculated term and preserved override. The form test submitted zero policies. Actual signed issuance and indexed successor remain open.",
+          "runs": [
+            44805919722,
+            44806394054
+          ]
+        }
       },
       {
         "case": "EDSON_KENET_MANUAL_PAYMENT_PRECONDITION",
@@ -676,7 +689,14 @@
           "B4-003-R16-05-RECEIPT-SHADOW-DUPLICATE-PROJECTION"
         ],
         "closure": "Isolate exact server reject without exposing secrets, reconcile receipt-policy-active portfolio single identity, run authorized real or synthetic payment, commit receipt+cartera+cobro, readback/reload both Cliente360 and Cobros; never retry uncertain writes without canonical readback.",
-        "status": "LIVE_GENERIC_SYNTHETIC_PAYMENT_PASS_EXACT_EDSON_PRECONDITION_STILL_OPEN"
+        "status": "LIVE_GENERIC_SYNTHETIC_PAYMENT_PASS_EXACT_EDSON_PRECONDITION_STILL_OPEN",
+        "readback20261120": {
+          "result": "Hosted payment feedback corrected; six specified installments across two policies paid, with one linked payment each. Original rejected request ID unresolved.",
+          "runs": [
+            44798516716,
+            44806394054
+          ]
+        }
       },
       {
         "case": "CARLOS_THIRD_INSTALLMENT_AND_OTHERS_VENCIDO",
@@ -694,7 +714,13 @@
           "B3-CARRY-RECEIPT-CALENDAR-LINEAGE-20260929"
         ],
         "closure": "Read exact receipt IDs 1/2/3 and evidence, verify third payment persists and each remaining overdue is legitimate; if source-backed inference applies, update only uniquely proven earlier installments with provenance and no duplicate Cobros.",
-        "status": "OPEN_RECONCILIATION_NOT_AUTOMATIC_PAID_ALL"
+        "status": "OPEN_RECONCILIATION_NOT_AUTOMATIC_PAID_ALL",
+        "readback20261120": {
+          "result": "The six identified installment records are paid in server readback. No additional collection posted.",
+          "runs": [
+            44798516716
+          ]
+        }
       },
       {
         "case": "ASHLYN_AGUILAR_VEHICLE_SUBSTITUTION",
@@ -710,7 +736,13 @@
           "B4-003-R15-09-PHASEA-ENDORSEMENT-CERTIFICATE-ANNEX-CLOSURE"
         ],
         "closure": "With verified issued insurer endorsement, preserve old vehicle/history, link new physical vehicle to same policy edition, verify financial changes only if sourced, one server write and reload + LIVE QA. Pending insurer request remains separate path.",
-        "status": "OPEN_LIVE_UNAVAILABLE"
+        "status": "OPEN_LIVE_UNAVAILABLE",
+        "readback20261120": {
+          "result": "Existing applied request is linked to policy history and a document. The available insurer endorsement reference and effective date differ from the applied request. Preserve its history; no second substitution created.",
+          "runs": [
+            44807917797
+          ]
+        }
       },
       {
         "case": "CLIENTE360_EXISTING_CLIENT_INSPECTION_OPPORTUNITY",
@@ -727,7 +759,14 @@
           "B4-003-R20-B09"
         ],
         "closure": "LIVE Carlos and Dirección create linked opportunity for existing client; same negocio persists once and appears in Ops/Leads/Cliente360/inspection after reload, no duplicated client/gestión.",
-        "status": "OPEN_LIVE_UNAVAILABLE"
+        "status": "OPEN_LIVE_UNAVAILABLE",
+        "readback20261120": {
+          "result": "Corado source queue still has zero Ops and one Leads. Signed synthetic directed return and resubmission preserved the same business. Advisor attachment, notification and each remaining scenario require separate certification.",
+          "runs": [
+            44805919722,
+            44806394054
+          ]
+        }
       },
       {
         "case": "NEW_POLICY_AUTO_PREMIUM_AND_SERGIO_ISSUANCE",
@@ -744,7 +783,13 @@
           "B4-003-R20-B13"
         ],
         "closure": "Authenticated LIVE correct insurer default empty, choose true insurer, documented premium/fees/IVA/frequency/exceptions calculate, actual or fixture policy saves, matching complete receipts/cartera and reload without QA source pollution.",
-        "status": "OPEN_LIVE_UNVERIFIED"
+        "status": "OPEN_LIVE_UNVERIFIED",
+        "readback20261120": {
+          "result": "Two scoped clients matched the supplied name; the current insured and issued policy number remain unresolved. No new business write.",
+          "runs": [
+            44807917797
+          ]
+        }
       },
       {
         "case": "EXPIRY_SUCCESSOR_RENEWAL_KANBAN_STATES",
@@ -762,7 +807,13 @@
           "B4-003-R20-V2-15-RENEWAL-CUTOFF-DISPOSITION"
         ],
         "closure": "Crossmodule same IDs: source after end-date shows expired, valid issued successor hides predecessor from actionable Kanban; preserve historical relationships, no false deletion or disappearance of unresolved cases; reload signed role matrix.",
-        "status": "OPEN_LIVE_UNVERIFIED"
+        "status": "OPEN_LIVE_UNVERIFIED",
+        "readback20261120": {
+          "result": "Renewability persisted in controlled LIVE tests. Final issued-successor and expired-predecessor Kanban behavior remains unverified for these cases.",
+          "runs": [
+            44806394054
+          ]
+        }
       },
       {
         "case": "MAKE_WA_EMAIL_LEAD_AUTOMATION",
@@ -778,7 +829,11 @@
           "B4-003-R19-08-OPS-ADVISOR-HANDOFF-NOTIFICATION-GAP"
         ],
         "closure": "Secure authenticated write into canonical negocio with de-dup idempotency and source/consent mapping, signed test, readback in Ops/Leads, safe activation, no duplicated WhatsApp leads.",
-        "status": "OPEN_NOT_ACTIVATED"
+        "status": "OPEN_NOT_ACTIVATED",
+        "readback20261120": {
+          "result": "Two inactive scenarios; no real canonical lead verified. Three campaign ad sets have WhatsApp destination; no native forms selectable on the two authorized pages.",
+          "runs": []
+        }
       }
     ],
     "existingFinancialMutationsPreserved": {
@@ -1155,10 +1210,15 @@
     "issuedFive": {
       "sourceDocuments": 5,
       "documentedInstallments": 49,
-      "serverPreflight": 44672465397,
+      "serverPreflight": 44808034579,
       "exactTermsFoundAtPreflight": 0,
       "newPoliciesApplied": 0,
-      "distinctPolicyholderAndVehicleOwner": 2
+      "distinctPolicyholderAndVehicleOwner": 2,
+      "previousReadback": 44672465397,
+      "policyRoleSourceManifest": "artifacts/orbit360-recovery/source-batches/I6_6_ROBLE_ISSUED_FIVE_20261119.json",
+      "newTermsFound": 0,
+      "matchingInstallmentsForExactTerms": 0,
+      "policyCreates": 0
     },
     "integrations": {
       "imap": "PRIVATE_INPUT_AND_CONNECTION_TEST_PENDING",
@@ -1219,6 +1279,41 @@
       "canonical inbound writer, Make auth and website production form",
       "first documented advisor/receipt mismatch and remaining financial exceptions",
       "all 295 historical findings preserved; only a scoped Hosting receipt is accepted"
-    ]
+    ],
+    "additionalIssuanceReadback": {
+      "run": 44807917797,
+      "vehicleChange": {
+        "currentPolicies": 1,
+        "activeTermVehicleDocuments": 2,
+        "linkedAppliedSubstitutionsWithPolicyHistory": 1,
+        "linkedSubstitutionsWithDocument": 1,
+        "priorVehicleMarkedHistorical": 1,
+        "comparisonWithAvailableCarrierEndorsement": {
+          "referenceEqual": false,
+          "effectiveDateEqual": false,
+          "carrierRequirementFound": false
+        },
+        "duplicateCreated": false,
+        "newEndorsementsIssued": 0
+      },
+      "newPolicyCapture": {
+        "matchingClientNamesInGT": 2,
+        "uniqueInsuredOrPolicyNumberEstablished": false,
+        "policyCreated": false
+      },
+      "mapfre": {
+        "priorTermDocumentRecovered": true,
+        "nonpaymentCancellationNoticeRecovered": true,
+        "laterReceivableStatementRecovered": true,
+        "newIssuedTermEstablished": false
+      }
+    },
+    "findingsReconciliation": {
+      "historicalFindings": 295,
+      "historicalEntriesReopened": 0,
+      "linkedIncidentRegister": "carlosOperationalIncident20261119.userReportedFindings",
+      "totalComplaintGroups": 9
+    },
+    "latestBusinessReadbackCommit": "2da666a14cfa0c922ef4c14f4a07033d7be7511c"
   }
 }
