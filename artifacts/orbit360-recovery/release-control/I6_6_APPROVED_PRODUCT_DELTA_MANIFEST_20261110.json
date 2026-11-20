@@ -3361,6 +3361,44 @@
           "gitBlobSha": "f0e0ce18ccf3e698622b0d137115c9379c5883f6"
         }
       ]
+    },
+    {
+      "id": "I6_6_OPERATIVO_CLIENT_EDIT_ACTIVITY_COUNTRY_PERSISTENCE_20261119",
+      "approvedByDirection": true,
+      "receipt": "Paula Dirección 2026-11-19: Carlos Operativo no puede guardar teléfono ni reasignación de asesor en ficha de cliente; corregir inmediatamente, probar, certificar y publicar con misma fuente sin ampliar el rol a administrador. La actividad de su lote durable carecía de país y el servidor exige país para toda escritura. A&S conserva motivo auditable, sin audit optimista previo al commit.",
+      "sourceStatus": "SOURCE_PATCH_PENDING_SIGNED_RUNTIME_WRITE_AND_LIVE_RELEASE",
+      "capabilityOwners": [
+        "CLIENTE360_PRIMARY_RUNTIME",
+        "ROLE_SCOPE_RUNTIME",
+        "ACTIVITY_AUDIT_CONTRACT"
+      ],
+      "scope": "Insert activity with validated country and advisor in same client edit durable write; retain mandatory reason and suppress optimistic phantom audit; report bounded errors, no real data changed by source QA.",
+      "paths": [
+        {
+          "path": "orbit360-platform/modules/cliente360.js",
+          "gitBlobSha": "52b94b71eab0665dfb26201af49ed71c1579fb63",
+          "replaces": {
+            "path": "orbit360-platform/modules/cliente360.js",
+            "priorGitBlobSha": "696d5aa8df033f2231012d650727b05d1817c1af",
+            "priorChangeId": "I6_6_CLIENTE360_EQUIPO_CANONICAL_ADVISOR_EDIT_CREATE_ROOTFIX_20261119"
+          }
+        },
+        {
+          "path": "orbit360-platform/modules/crm-v1198-operational-bridge.js",
+          "gitBlobSha": "ba62bb97544c57400cf9c7bbf0a46853b8a451a4",
+          "replaces": {
+            "path": "orbit360-platform/modules/crm-v1198-operational-bridge.js",
+            "priorGitBlobSha": "1ba69c71b66ddaf66001124c2a980f8f2200de4e",
+            "priorChangeId": "I6_6_CRM_EFFECTIVE_NEW_CLIENT_SHADOW_ADVISOR_ROSTER_ROOTFIX_20261119"
+          }
+        }
+      ],
+      "tests": [
+        {
+          "path": "tools/gravicentra-i6-6-client-edit-activity-country-persistence.test.cjs",
+          "gitBlobSha": "0aea5278a3fd1cacb78ffcc2f02b69c4b7bc266d"
+        }
+      ]
     }
   ],
   "i66R11PreviewBuildRequest20261113": {
