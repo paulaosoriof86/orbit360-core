@@ -1,0 +1,501 @@
+{
+  "state": "ISSUER_DOCUMENT_EVIDENCE_NOT_PAYMENT",
+  "editions": [
+    {
+      "policy": "91-4143471",
+      "sha256": "b15a25530cc0cf13c46e028dd3e8657444b3e485635343835922be71cc698d42",
+      "installments": [
+        {
+          "requirement": "5693795",
+          "due": "2026-09-21",
+          "netCents": 22205,
+          "expensesCents": 4643,
+          "surchargeCents": 2988,
+          "taxCents": 3582,
+          "grossCents": 33418
+        },
+        {
+          "requirement": "5693796",
+          "due": "2026-10-21",
+          "netCents": 22210,
+          "expensesCents": 4653,
+          "surchargeCents": 2992,
+          "taxCents": 3582,
+          "grossCents": 33437
+        },
+        {
+          "requirement": "5693797",
+          "due": "2026-11-21",
+          "netCents": 22210,
+          "expensesCents": 4653,
+          "surchargeCents": 2992,
+          "taxCents": 3582,
+          "grossCents": 33437
+        },
+        {
+          "requirement": "5693798",
+          "due": "2026-12-21",
+          "netCents": 22210,
+          "expensesCents": 4653,
+          "surchargeCents": 2992,
+          "taxCents": 3582,
+          "grossCents": 33437
+        },
+        {
+          "requirement": "5693799",
+          "due": "2027-01-21",
+          "netCents": 22210,
+          "expensesCents": 4653,
+          "surchargeCents": 2992,
+          "taxCents": 3582,
+          "grossCents": 33437
+        },
+        {
+          "requirement": "5693800",
+          "due": "2027-02-21",
+          "netCents": 22210,
+          "expensesCents": 4653,
+          "surchargeCents": 2992,
+          "taxCents": 3582,
+          "grossCents": 33437
+        },
+        {
+          "requirement": "5693801",
+          "due": "2027-03-21",
+          "netCents": 22210,
+          "expensesCents": 4653,
+          "surchargeCents": 2992,
+          "taxCents": 3582,
+          "grossCents": 33437
+        },
+        {
+          "requirement": "5693802",
+          "due": "2027-04-21",
+          "netCents": 22210,
+          "expensesCents": 4653,
+          "surchargeCents": 2992,
+          "taxCents": 3582,
+          "grossCents": 33437
+        },
+        {
+          "requirement": "5693803",
+          "due": "2027-05-21",
+          "netCents": 22210,
+          "expensesCents": 4653,
+          "surchargeCents": 2992,
+          "taxCents": 3582,
+          "grossCents": 33437
+        },
+        {
+          "requirement": "5693804",
+          "due": "2027-06-21",
+          "netCents": 22210,
+          "expensesCents": 4653,
+          "surchargeCents": 2992,
+          "taxCents": 3582,
+          "grossCents": 33437
+        },
+        {
+          "requirement": "5693805",
+          "due": "2027-07-21",
+          "netCents": 22210,
+          "expensesCents": 4653,
+          "surchargeCents": 2992,
+          "taxCents": 3582,
+          "grossCents": 33437
+        },
+        {
+          "requirement": "5693806",
+          "due": "2027-08-21",
+          "netCents": 22210,
+          "expensesCents": 4653,
+          "surchargeCents": 2992,
+          "taxCents": 3582,
+          "grossCents": 33437
+        }
+      ],
+      "driveFileId": "1DKr5Ku9-XmsIiKlJsmC3T6hsH-TLF3MM",
+      "title": "Póliza nueva El Roble - 91-4143471 - 2026-09-21 a 2027-09-21.pdf",
+      "start": "2026-09-21",
+      "end": "2027-09-21",
+      "kind": "ISSUED_NEW"
+    },
+    {
+      "policy": "91-8324489",
+      "sha256": "e64e6472321e53a2c68a4e88139a1423a0d1261ee75ff8f6603c47215602c8a7",
+      "installments": [
+        {
+          "requirement": "5747312",
+          "due": "2026-11-16",
+          "netCents": 18337,
+          "expensesCents": 4250,
+          "surchargeCents": 2464,
+          "taxCents": 3006,
+          "grossCents": 28057
+        },
+        {
+          "requirement": "5747313",
+          "due": "2026-12-16",
+          "netCents": 18333,
+          "expensesCents": 4250,
+          "surchargeCents": 2470,
+          "taxCents": 3006,
+          "grossCents": 28059
+        },
+        {
+          "requirement": "5747314",
+          "due": "2027-01-16",
+          "netCents": 18333,
+          "expensesCents": 4250,
+          "surchargeCents": 2470,
+          "taxCents": 3006,
+          "grossCents": 28059
+        },
+        {
+          "requirement": "5747315",
+          "due": "2027-02-16",
+          "netCents": 18333,
+          "expensesCents": 4250,
+          "surchargeCents": 2470,
+          "taxCents": 3006,
+          "grossCents": 28059
+        },
+        {
+          "requirement": "5747316",
+          "due": "2027-03-16",
+          "netCents": 18333,
+          "expensesCents": 4250,
+          "surchargeCents": 2470,
+          "taxCents": 3006,
+          "grossCents": 28059
+        },
+        {
+          "requirement": "5747317",
+          "due": "2027-04-16",
+          "netCents": 18333,
+          "expensesCents": 4250,
+          "surchargeCents": 2470,
+          "taxCents": 3006,
+          "grossCents": 28059
+        },
+        {
+          "requirement": "5747318",
+          "due": "2027-05-16",
+          "netCents": 18333,
+          "expensesCents": 4250,
+          "surchargeCents": 2470,
+          "taxCents": 3006,
+          "grossCents": 28059
+        },
+        {
+          "requirement": "5747319",
+          "due": "2027-06-16",
+          "netCents": 18333,
+          "expensesCents": 4250,
+          "surchargeCents": 2470,
+          "taxCents": 3006,
+          "grossCents": 28059
+        },
+        {
+          "requirement": "5747320",
+          "due": "2027-07-16",
+          "netCents": 18333,
+          "expensesCents": 4250,
+          "surchargeCents": 2470,
+          "taxCents": 3006,
+          "grossCents": 28059
+        },
+        {
+          "requirement": "5747321",
+          "due": "2027-08-16",
+          "netCents": 18333,
+          "expensesCents": 4250,
+          "surchargeCents": 2470,
+          "taxCents": 3006,
+          "grossCents": 28059
+        },
+        {
+          "requirement": "5747322",
+          "due": "2027-09-16",
+          "netCents": 18333,
+          "expensesCents": 4250,
+          "surchargeCents": 2470,
+          "taxCents": 3006,
+          "grossCents": 28059
+        },
+        {
+          "requirement": "5747323",
+          "due": "2027-10-16",
+          "netCents": 18333,
+          "expensesCents": 4250,
+          "surchargeCents": 2470,
+          "taxCents": 3006,
+          "grossCents": 28059
+        }
+      ],
+      "driveFileId": "10iVOyGWLTleozxE9ieo-d34lTSQJDV8W",
+      "title": "Renovación El Roble - 91-8324489 - 2026-11-16 a 2027-11-16.pdf",
+      "start": "2026-11-16",
+      "end": "2027-11-16",
+      "kind": "ISSUED_RENEWAL"
+    },
+    {
+      "policy": "91-8342189",
+      "sha256": "1814d67bd274ccecbb523666fc9cd52fd8928cd41b8cbec4a725804c0e41a9ad",
+      "installments": [
+        {
+          "requirement": "5747324",
+          "due": "2026-11-12",
+          "netCents": 18337,
+          "expensesCents": 4250,
+          "surchargeCents": 2464,
+          "taxCents": 3006,
+          "grossCents": 28057
+        },
+        {
+          "requirement": "5747325",
+          "due": "2026-12-12",
+          "netCents": 18333,
+          "expensesCents": 4250,
+          "surchargeCents": 2470,
+          "taxCents": 3006,
+          "grossCents": 28059
+        },
+        {
+          "requirement": "5747326",
+          "due": "2027-01-12",
+          "netCents": 18333,
+          "expensesCents": 4250,
+          "surchargeCents": 2470,
+          "taxCents": 3006,
+          "grossCents": 28059
+        },
+        {
+          "requirement": "5747327",
+          "due": "2027-02-12",
+          "netCents": 18333,
+          "expensesCents": 4250,
+          "surchargeCents": 2470,
+          "taxCents": 3006,
+          "grossCents": 28059
+        },
+        {
+          "requirement": "5747328",
+          "due": "2027-03-12",
+          "netCents": 18333,
+          "expensesCents": 4250,
+          "surchargeCents": 2470,
+          "taxCents": 3006,
+          "grossCents": 28059
+        },
+        {
+          "requirement": "5747329",
+          "due": "2027-04-12",
+          "netCents": 18333,
+          "expensesCents": 4250,
+          "surchargeCents": 2470,
+          "taxCents": 3006,
+          "grossCents": 28059
+        },
+        {
+          "requirement": "5747330",
+          "due": "2027-05-12",
+          "netCents": 18333,
+          "expensesCents": 4250,
+          "surchargeCents": 2470,
+          "taxCents": 3006,
+          "grossCents": 28059
+        },
+        {
+          "requirement": "5747331",
+          "due": "2027-06-12",
+          "netCents": 18333,
+          "expensesCents": 4250,
+          "surchargeCents": 2470,
+          "taxCents": 3006,
+          "grossCents": 28059
+        },
+        {
+          "requirement": "5747332",
+          "due": "2027-07-12",
+          "netCents": 18333,
+          "expensesCents": 4250,
+          "surchargeCents": 2470,
+          "taxCents": 3006,
+          "grossCents": 28059
+        },
+        {
+          "requirement": "5747333",
+          "due": "2027-08-12",
+          "netCents": 18333,
+          "expensesCents": 4250,
+          "surchargeCents": 2470,
+          "taxCents": 3006,
+          "grossCents": 28059
+        },
+        {
+          "requirement": "5747334",
+          "due": "2027-09-12",
+          "netCents": 18333,
+          "expensesCents": 4250,
+          "surchargeCents": 2470,
+          "taxCents": 3006,
+          "grossCents": 28059
+        },
+        {
+          "requirement": "5747335",
+          "due": "2027-10-12",
+          "netCents": 18333,
+          "expensesCents": 4250,
+          "surchargeCents": 2470,
+          "taxCents": 3006,
+          "grossCents": 28059
+        }
+      ],
+      "driveFileId": "1fuPpqesUkg5LmkGuz16icfarQmJ-8VXg",
+      "title": "Renovación El Roble - 91-8342189 - 2026-11-12 a 2027-11-12.pdf",
+      "start": "2026-11-12",
+      "end": "2027-11-12",
+      "kind": "ISSUED_RENEWAL"
+    },
+    {
+      "policy": "91-8343059",
+      "sha256": "05be6fd1da736b40306f7f3f709b1e0288d0970b63813fb4376b7e2354fbab15",
+      "installments": [
+        {
+          "requirement": "5747887",
+          "due": "2026-11-27",
+          "netCents": 28850,
+          "expensesCents": 4782,
+          "surchargeCents": 3880,
+          "taxCents": 4501,
+          "grossCents": 42013
+        },
+        {
+          "requirement": "5747888",
+          "due": "2026-12-27",
+          "netCents": 28845,
+          "expensesCents": 4775,
+          "surchargeCents": 3886,
+          "taxCents": 4500,
+          "grossCents": 42006
+        },
+        {
+          "requirement": "5747889",
+          "due": "2027-01-27",
+          "netCents": 28845,
+          "expensesCents": 4775,
+          "surchargeCents": 3886,
+          "taxCents": 4500,
+          "grossCents": 42006
+        },
+        {
+          "requirement": "5747890",
+          "due": "2027-02-27",
+          "netCents": 28845,
+          "expensesCents": 4775,
+          "surchargeCents": 3886,
+          "taxCents": 4500,
+          "grossCents": 42006
+        },
+        {
+          "requirement": "5747891",
+          "due": "2027-03-27",
+          "netCents": 28845,
+          "expensesCents": 4775,
+          "surchargeCents": 3886,
+          "taxCents": 4500,
+          "grossCents": 42006
+        },
+        {
+          "requirement": "5747892",
+          "due": "2027-04-27",
+          "netCents": 28845,
+          "expensesCents": 4775,
+          "surchargeCents": 3886,
+          "taxCents": 4500,
+          "grossCents": 42006
+        },
+        {
+          "requirement": "5747893",
+          "due": "2027-05-27",
+          "netCents": 28845,
+          "expensesCents": 4775,
+          "surchargeCents": 3886,
+          "taxCents": 4500,
+          "grossCents": 42006
+        },
+        {
+          "requirement": "5747894",
+          "due": "2027-06-27",
+          "netCents": 28845,
+          "expensesCents": 4775,
+          "surchargeCents": 3886,
+          "taxCents": 4500,
+          "grossCents": 42006
+        },
+        {
+          "requirement": "5747895",
+          "due": "2027-07-27",
+          "netCents": 28845,
+          "expensesCents": 4775,
+          "surchargeCents": 3886,
+          "taxCents": 4500,
+          "grossCents": 42006
+        },
+        {
+          "requirement": "5747896",
+          "due": "2027-08-27",
+          "netCents": 28845,
+          "expensesCents": 4775,
+          "surchargeCents": 3886,
+          "taxCents": 4500,
+          "grossCents": 42006
+        },
+        {
+          "requirement": "5747897",
+          "due": "2027-09-27",
+          "netCents": 28845,
+          "expensesCents": 4775,
+          "surchargeCents": 3886,
+          "taxCents": 4500,
+          "grossCents": 42006
+        },
+        {
+          "requirement": "5747898",
+          "due": "2027-10-27",
+          "netCents": 28845,
+          "expensesCents": 4775,
+          "surchargeCents": 3886,
+          "taxCents": 4500,
+          "grossCents": 42006
+        }
+      ],
+      "driveFileId": "14I4mW85MdjXQ7EZ_cI5TjFRGbBYDRY7u",
+      "title": "Renovación El Roble - 91-8343059 - 2026-11-27 a 2027-11-27.pdf",
+      "start": "2026-11-27",
+      "end": "2027-11-27",
+      "kind": "ISSUED_RENEWAL"
+    },
+    {
+      "policy": "91-8357452",
+      "sha256": "a93e35667108acd8965430fd76dcd7d2f9e05316810672fe28ade4d227c49733",
+      "installments": [
+        {
+          "requirement": "5676444",
+          "due": "2026-11-27",
+          "netCents": 220000,
+          "expensesCents": 53500,
+          "surchargeCents": 0,
+          "taxCents": 32820,
+          "grossCents": 306320
+        }
+      ],
+      "driveFileId": "1V-ttJwtO21uVi1Z7t5DmpPJfhxRkxbO3",
+      "title": "Renovación El Roble - 91-8357452 - 2026-10-27 a 2027-10-27.pdf",
+      "start": "2026-10-27",
+      "end": "2027-10-27",
+      "kind": "ISSUED_RENEWAL"
+    }
+  ]
+}

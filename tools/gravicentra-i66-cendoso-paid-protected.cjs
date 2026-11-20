@@ -362,12 +362,27 @@ async function applyOne(db,oldPlan,source){
 }
 async function main(){
   const mode=str(process.env.GI_I66_CENDOSO_MODE);
-  assert.ok(['preflight','apply','columna-readback'].includes(mode),'I66_PAID_MODE_REQUIRED');
+  assert.ok(['preflight','apply','columna-readback','issued-readback'].includes(mode),'I66_PAID_MODE_REQUIRED');
   assert.equal(process.env.GCLOUD_PROJECT,PROJECT,'I66_PAID_FIREBASE_PROJECT_DRIFT');
   const source=loadSource();
   const admin=require('firebase-admin');
   admin.initializeApp({credential:admin.credential.applicationDefault(),projectId:PROJECT});
   const db=admin.firestore();
+  if(mode==='issued-readback'){
+    const editions=require('../artifacts/orbit360-recovery/source-batches/I6_6_ROBLE_ISSUED_FIVE_20261119.json').editions;
+    const groups=await readGroups(db,{candidates:editions.map(p=>({policyNumberSource:p.policy}))});
+    for(const p of editions){
+      const versions=groups.filter(g=>policyMatches(p.policy,g.policy.numero)&&insurerMatches('ELROBLE',g.insurerName)&&policyCountry(g.policy)==='GT');
+      const same=versions.filter(g=>date(g.policy.vigenciaInicio)===p.start&&date(g.policy.vigenciaFin)===p.end);
+      const expected=new Set(p.installments.map(r=>r.requirement));
+      const receipts=same.flatMap(g=>g.receipts);
+      console.log('I66_ISSUED_READBACK '+JSON.stringify({policy:p.policy,canonicalEditions:versions.length,
+        exactIssuedTerm:same.length,expected:expected.size,receipts:receipts.length,
+        matchingRequirements:receipts.filter(r=>expected.has(str(r.numeroReciboFuente||r.numeroRequerimiento))).length,
+        cartera:same.reduce((n,g)=>n+g.portfolio.length,0),writes:0}));
+    }
+    return;
+  }
   if(mode==='columna-readback'){
     const evidence=require('../artifacts/orbit360-recovery/source-batches/I6_6_COLUMNA_20261116_PAYMENT_EVIDENCE.json');
     const candidates=evidence.payments.flatMap(p=>[p.policy,'VA-'+p.policy,'VA '+p.policy].map(policyNumberSource=>({policyNumberSource})));
