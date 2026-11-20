@@ -3593,6 +3593,15 @@
         {
           "path": "tools/gravicentra-i6-6-payment-optional-evidence.test.cjs",
           "gitBlobSha": "519a0a7089336f33c279fb7ba113f8863e0509f4"
+        },
+        {
+          "path": "tools/gravicentra-i6-6-roles-payment-expiry-hotfix.test.cjs",
+          "gitBlobSha": "85250107f3f591e34f20da11f6a96a5ee0da6783",
+          "replaces": {
+            "path": "tools/gravicentra-i6-6-roles-payment-expiry-hotfix.test.cjs",
+            "priorGitBlobSha": "88f3d7e2b3489a9d229e01d3ff662b3d966a5d55",
+            "priorChangeId": "I6_6_OWNER_APPROVED_SOURCE_LINEAGE_SUCCESSOR_20261119"
+          }
         }
       ]
     }

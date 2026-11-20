@@ -31,7 +31,9 @@ test('invoice date is explicit, validated, persisted and read back with reconcil
   assert.match(backend, /if \(finalInvoiceDate\) shared\.invoiceDate = finalInvoiceDate/);
   assert.match(backend, /confirmedReceipt\.invoiceDate !== result\.invoiceDate/);
   assert.match(backend, /confirmedCobro\.applicationState !== result\.applicationState/);
-  assert.match(ui, /Pago aplicado y conciliado con la aseguradora/);
+  assert.match(ui, /Pago registrado y conciliado con la aseguradora/);
+  assert.match(ui, /Pago del cliente registrado/);
+  assert.match(ui, /La aplicación por la aseguradora puede conciliarse después/);
   assert.match(ui, /La fecha de factura sola no acredita aplicación/);
   assert.ok(!/invoiceDate\s*\|\|\s*applicationDate/.test(backend), 'invoice issue date must not be inferred as insurer application date');
 });
