@@ -468,6 +468,16 @@
           "hashStatus": "RAW_BYTES_SHA256_VERIFIED_2026_11_19",
           "sourceRows": 4,
           "uniqueRequirements": 3
+        },
+        {
+          "filename": "Universales - Balance de antigüedad - Corte 2026-11-16.pdf",
+          "bytes": 428497,
+          "fileId": "1DJnElCTzrOlR1LvePDqWZ2BjD_WZwo2X",
+          "driveModifiedAt": "2026-11-17T04:57:06.625Z",
+          "sha256": "74ea0b692469420e0822269d036fdb761d0daddb7988abb5c04a5af894c114ff",
+          "hashStatus": "RAW_BYTES_SHA256_VERIFIED_2026_11_19",
+          "sourceRows": 35,
+          "uniqueRequirements": 35
         }
       ],
       "count": 16,
