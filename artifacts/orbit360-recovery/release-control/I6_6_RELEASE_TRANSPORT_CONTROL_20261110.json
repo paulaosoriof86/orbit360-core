@@ -4643,5 +4643,21 @@
     "receipt": "artifacts/orbit360-recovery/release-control/I6_6_FINANCIAL_OPS_LEADS_CONTINUITY_READBACK_20261119.json#opsHandbackSignedLive",
     "backendFunctionsChanged": 0,
     "fullI66ProductionAccepted": false
+  },
+  "importSourceReviewPreviewRequest20261120": {
+    "scope": "I6.6_PREVIEW_ONLY_IMPORT_SOURCE_REVIEW",
+    "branch": "recovery/fase-a-clean-20260831",
+    "approvedByDirection": true,
+    "directionReference": "20/11/2026 I6.6, correcciones individuales de importación y publicación después de Preview",
+    "sourceQaHead": "af7a2e8de2c5abd8aee1992396c91953ca4a7793",
+    "sourceQaRunId": 44817663332,
+    "governanceRunId": 44817663357,
+    "previousLiveSourceSha": "ab99e4474cea1ef7d08d2359966e6aa8d81e061b",
+    "previousLiveArtifactId": 14661315988,
+    "previousLiveArtifactDigest": "sha256:fe63c6ea2bb77761ce7cd8e31a8171b3637e8bc6c0f40e22c1f55237e6ff8054",
+    "previousLiveHostingVersion": "sites/ays-orbit-360-lab/versions/889f966a323c1017",
+    "backendDeploy": false,
+    "liveDeploy": false,
+    "businessWrites": false
   }
 }
