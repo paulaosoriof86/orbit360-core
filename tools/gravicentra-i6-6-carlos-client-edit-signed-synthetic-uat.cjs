@@ -51,9 +51,11 @@ const suffix=Date.now().toString(36)+'_'+crypto.randomBytes(4).toString('hex');
    await client.create({id,tenantId:TENANT,pais:'GT',nombre:'QA I6.6 Cliente edit no real',tipo:'Persona',telefono:beforePhone,
      asesorId:paula[0].id,segmento:'Nuevo',canal:'Referido',__syntheticQa:true});
    const ctx=await browser.newContext({viewport:{width:1280,height:900}});
-   let matching=[],qaStage='create-browser-page',page=null;
+   let matching=[],qaStage='create-browser-page',page=null,saveWarnings=[];
    try{
-    page=await ctx.newPage();page.on('dialog',async d=>{if(d.type()==='prompt')await d.accept('QA I6.6 cambio operativo verificado');else await d.dismiss();});
+    page=await ctx.newPage();
+    page.on('console',m=>{const s=m.text();if(s.includes('DURABLE_CLIENT_EDIT_HOLD'))saveWarnings.push(s.slice(0,420));});
+    page.on('dialog',async d=>{if(d.type()==='prompt')await d.accept('QA I6.6 cambio operativo verificado');else await d.dismiss();});
     qaStage='navigate-cliente360';
     await page.goto(ORIGIN+'/#/cliente360',{waitUntil:'commit',timeout:30000});
     qaStage='await-runtime-exports';
@@ -102,8 +104,9 @@ const suffix=Date.now().toString(36)+'_'+crypto.randomBytes(4).toString('hex');
     console.log('I66_'+a.role.toUpperCase()+'_SIGNED_CLIENT_EDIT_PHONE_ADVISOR_ACTIVITY_COUNTRY_ATOMIC_LIVE_OR_PREVIEW_PASS source='+SOURCE.slice(0,12));
    }catch(e){
     let diagnostic={};
-    try{diagnostic=await page?.evaluate(()=>({readyState:document.readyState,hasOrbit:!!window.Orbit,hasProviders:!!window.Orbit?.productRuntimeBrowserProvidersP0,hasProductApp:!!window.Orbit?.productAppP0,hasStore:!!window.Orbit?.store,editorOpen:!!document.querySelector('#c360-edit'),rosterState:document.querySelector('#ce-ase')?.dataset.rosterState||null}));}catch{}
-    console.error('I66_SIGNED_CLIENT_EDIT_STAGE_HOLD '+JSON.stringify({role:a.role,stage:qaStage,diagnostic}).slice(0,750));
+    try{diagnostic=await page?.evaluate(()=>({readyState:document.readyState,hasOrbit:!!window.Orbit,hasProviders:!!window.Orbit?.productRuntimeBrowserProvidersP0,hasProductApp:!!window.Orbit?.productAppP0,hasStore:!!window.Orbit?.store,editorOpen:!!document.querySelector('#c360-edit'),rosterState:document.querySelector('#ce-ase')?.dataset.rosterState||null,saveDisabled:!!document.querySelector('#ce-save')?.disabled,saveLabel:document.querySelector('#ce-save')?.textContent?.slice(0,64)||'',visibleToasts:[...document.querySelectorAll('.ciclo-toast')].map(e=>e.textContent.slice(0,180))}));}catch{}
+    try{const persisted=await client.get();diagnostic.syntheticPresent=persisted.exists;diagnostic.phoneChanged=!!persisted.exists&&persisted.data()?.telefono===afterPhone;diagnostic.advisorChanged=!!persisted.exists&&persisted.data()?.asesorId===german[0].id;diagnostic.activityCount=(await col('actividades').where('clienteId','==',id).limit(6).get()).size;}catch{}
+    console.error('I66_SIGNED_CLIENT_EDIT_STAGE_HOLD '+JSON.stringify({role:a.role,stage:qaStage,diagnostic,saveWarnings}).slice(0,1350));
     throw e;
    }finally{
     const found=await col('actividades').where('clienteId','==',id).limit(10).get();
