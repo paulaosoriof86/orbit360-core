@@ -4,6 +4,7 @@ on:
     branches: [recovery/fase-a-clean-20260831]
     paths:
       - .github/workflows/gravicentra-i66-live-hosting-three-origin-readonly-20261119.yml
+      - artifacts/orbit360-recovery/release-control/I6_6_CLIENTE360_ADVISOR_EXACT_LIVE_RECEIPT_20261119.json
 permissions:
   contents: read
 jobs:
@@ -20,7 +21,7 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p "$RUNNER_TEMP/origin-diagnostic"
-          for pair in "custom https://app.aysseguros.com" "firebase https://ays-orbit-360-lab.web.app" "candidate https://ays-orbit-360-lab--gi-i66-rc-44609701409-zv8vzb9e.web.app"; do
+          for pair in "custom https://app.aysseguros.com" "firebase https://ays-orbit-360-lab.web.app" "candidate https://ays-orbit-360-lab--gi-i66-rc-44637404427-635rywxe.web.app"; do
             read -r label origin <<< "$pair"
             curl --fail --silent --show-error --location --max-time 30 --retry 2 \
               -H 'Cache-Control: no-cache, no-store, must-revalidate' \
@@ -32,13 +33,17 @@ jobs:
           node - <<'NODE'
           const fs=require('fs'),root=process.env.RUNNER_TEMP+'/origin-diagnostic';
           const cp=JSON.parse(fs.readFileSync('artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json','utf8'));
-          const evidence=JSON.parse(fs.readFileSync('artifacts/orbit360-recovery/release-control/I6_6_FINANCIAL_OPS_LEADS_CONTINUITY_READBACK_20261119.json','utf8'));
-          const accepted=cp.i66OperationalContinuation20261115?.latestSignedQaOutcome||{};
-          const currentCandidate=evidence.continuityAfterSecondInterruption20261119?.preview||{};
-          if(!/^[a-f0-9]{40}$/.test(accepted.sourceSha||'') ||
-             !/^[a-f0-9]{40}$/.test(currentCandidate.preparedSourceCommit||'') ||
-             !accepted.buildId || !accepted.hostingVersion || currentCandidate.status!=='SUCCESS')
-            throw Error('I66_CANONICAL_CONTROL_PLANE_OR_PREVIEW_RECEIPT_MISSING');
+          const latest=JSON.parse(fs.readFileSync('artifacts/orbit360-recovery/release-control/I6_6_CLIENTE360_ADVISOR_EXACT_LIVE_RECEIPT_20261119.json','utf8'));
+          const historical=cp.i66OperationalContinuation20261115?.latestSignedQaOutcome||{};
+          if(latest.schema!=='GI_I66_CLIENTE360_ADVISOR_SAME_ARTIFACT_LIVE_RECEIPT_V1'||
+             latest.status!=='LIVE_HOSTING_AND_CARLOS_ROSTER_SAME_ARTIFACT_PASS_FULL_I66_HOLD'||
+             latest.sourceSha!=='72d3580f3e90071b360319ce5f204d348b401663'||
+             latest.liveCloneRunId!==44641361059||latest.artifactId!==14584217893||
+             latest.liveAfter?.hostingVersion!=='sites/ays-orbit-360-lab/versions/63eb68dfe649db40'||
+             latest.previewVersion!==latest.liveAfter.hostingVersion||
+             latest.fullI66ProductionAccepted!==false||
+             historical.sourceSha!=='1b65a790530d49fe1d1fb451f02838fd9a713c53')
+            throw Error('I66_PHYSICAL_LIVE_RECEIPT_OR_HISTORICAL_CONTROL_AUTHORITY_DRIFT');
           const names=['custom','firebase','candidate'];
           const markers=Object.fromEntries(names.map(n=>[n,JSON.parse(fs.readFileSync(root+'/'+n+'.json','utf8'))]));
           for(const name of names){
@@ -50,21 +55,21 @@ jobs:
             checkedAtUtc:new Date().toISOString(),runId:process.env.GITHUB_RUN_ID,
             sources:Object.fromEntries(names.map(n=>[n,{sourceSha:markers[n].sourceSha,buildId:markers[n].buildId}])),
             liveOriginsEqual:markers.custom.sourceSha===markers.firebase.sourceSha&&markers.custom.buildId===markers.firebase.buildId,
-            candidateMatchesCertified:markers.candidate.sourceSha===currentCandidate.preparedSourceCommit,
-            controlPlaneLastAcceptedSha:accepted.sourceSha, controlPlaneLastAcceptedBuildId:accepted.buildId,
-            liveMatchesControlPlane:markers.custom.sourceSha===accepted.sourceSha&&markers.firebase.sourceSha===accepted.sourceSha&&
-              markers.custom.buildId===accepted.buildId&&markers.firebase.buildId===accepted.buildId,
-            candidateExactSource:currentCandidate.preparedSourceCommit,
-            candidatePreviewRunId:currentCandidate.runId,
-            authorityPath:'CONTROL_PLANE.json',
-            partialI66Accepted:accepted.fullI66ProductionAccepted===true
+            candidateMatchesCertified:markers.candidate.sourceSha===latest.sourceSha&&markers.candidate.buildId===latest.buildId,
+            historicalControlPlaneSourceSha:historical.sourceSha, historicalControlPlaneBuildId:historical.buildId,
+            liveMatchesLatestPublishedReceipt:markers.custom.sourceSha===latest.liveAfter.sourceSha&&markers.firebase.sourceSha===latest.liveAfter.sourceSha&&
+              markers.custom.buildId===latest.buildId&&markers.firebase.buildId===latest.buildId,
+            candidateExactSource:latest.sourceSha,
+            candidatePreviewBuildRunId:latest.buildRunId,
+            authorityPath:'I6_6_CLIENTE360_ADVISOR_EXACT_LIVE_RECEIPT_20261119.json',
+            fullI66ProductionAccepted:false
           },null,2)+'\n');
           if(markers.custom.sourceSha!==markers.firebase.sourceSha||markers.custom.buildId!==markers.firebase.buildId)
             throw Error('I66_BOTH_LIVE_ORIGINS_DIVERGED_FAIL_CLOSED');
-          if(markers.candidate.sourceSha!==currentCandidate.preparedSourceCommit)
+          if(markers.candidate.sourceSha!==latest.sourceSha||markers.candidate.buildId!==latest.buildId)
             throw Error('I66_CANDIDATE_PREVIEW_SOURCE_DRIFT');
-          if(markers.custom.sourceSha!==accepted.sourceSha||markers.custom.buildId!==accepted.buildId)
-            throw Error('I66_LIVE_DRIFT_FROM_ACCEPTED_CONTROL_PLANE_FAIL_CLOSED');
+          if(markers.custom.sourceSha!==latest.liveAfter.sourceSha||markers.custom.buildId!==latest.buildId)
+            throw Error('I66_LIVE_DRIFT_FROM_SIGNED_PHYSICAL_RECEIPT_FAIL_CLOSED');
           console.log('I66_LIVE_TWO_ORIGINS_AND_CANDIDATE_EXACT_PUBLIC_READBACK_PASS');
           NODE
       - name: Read Hosting LIVE release version from Firebase control API (metadata only)
@@ -96,21 +101,20 @@ jobs:
           unset TOKEN
           node - <<'NODE'
           const fs=require('node:fs'),p=process.env.RUNNER_TEMP+'/origin-diagnostic';
-          const cp=JSON.parse(fs.readFileSync('artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json','utf8'));
-          const accepted=cp.i66OperationalContinuation20261115?.latestSignedQaOutcome||{};
-          if(!String(accepted.hostingVersion||'').startsWith('sites/ays-orbit-360-lab/versions/'))
-            throw Error('I66_CANONICAL_ACCEPTED_HOSTING_VERSION_MISSING');
+          const accepted=JSON.parse(fs.readFileSync('artifacts/orbit360-recovery/release-control/I6_6_CLIENTE360_ADVISOR_EXACT_LIVE_RECEIPT_20261119.json','utf8'));
+          if(!String(accepted.liveAfter?.hostingVersion||'').startsWith('sites/ays-orbit-360-lab/versions/'))
+            throw Error('I66_SIGNED_CURRENT_PHYSICAL_HOSTING_VERSION_MISSING');
           const releases=JSON.parse(fs.readFileSync(p+'/live-releases.json','utf8')).releases||[];
           if(!releases.length)throw Error('I66_FIREBASE_CHANNEL_LIVE_RELEASE_MISSING');
           const sanitized=releases.slice(0,5).map(r=>({releaseTime:r.releaseTime,version:r.version?.name,type:r.type}));
           fs.writeFileSync(p+'/live-version-summary.json',JSON.stringify({
             schema:'I66_HOSTING_LIVE_VERSION_READONLY',releases:sanitized,
-            latestVersion:sanitized[0].version,acceptedControlPlaneHostingVersion:accepted.hostingVersion,
-            liveVersionMatchesAuthority:sanitized[0].version===accepted.hostingVersion
+            latestVersion:sanitized[0].version,latestSignedPhysicalHostingVersion:accepted.liveAfter.hostingVersion,
+            liveVersionMatchesAuthority:sanitized[0].version===accepted.liveAfter.hostingVersion
           },null,2)+'\n');
           console.log('I66_HOSTING_LIVE_RELEASE_VERSIONS_READONLY '+JSON.stringify(sanitized));
-          if(sanitized[0].version!==accepted.hostingVersion)
-            throw Error('I66_FIREBASE_LIVE_VERSION_DRIFT_FROM_CONTROL_PLANE');
+          if(sanitized[0].version!==accepted.liveAfter.hostingVersion)
+            throw Error('I66_FIREBASE_LIVE_VERSION_DRIFT_FROM_SIGNED_PHYSICAL_RECEIPT');
           NODE
       - name: Retain sanitized readback even when the gate detects drift
         if: always()
