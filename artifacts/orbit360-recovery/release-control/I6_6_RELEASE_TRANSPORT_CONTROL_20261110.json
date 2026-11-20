@@ -4611,5 +4611,22 @@
     "livePromotionAuthorizedByThisRequest": false,
     "latestClientEditActivitySourceFix": "I6_6_PREVIEW_CLIENT_ACTIVITY_MARKER_20261119",
     "consumedByVerifiedLiveRun": 44673416497
+  },
+  "issuedRenewalPaymentPreviewRequest20261120": {
+    "scope": "I6.6_PREVIEW_ONLY_RENEWAL_FIELDS_AND_PAYMENT_FEEDBACK",
+    "branch": "recovery/fase-a-clean-20260831",
+    "approvedByDirection": true,
+    "directionReference": "20/11/2026 · I6.6 · apartados 4, 6 y 10",
+    "sourceQaHead": "9c99948f522cc6739024c7104b7182a6641df9d5",
+    "sourceQaRunId": 44799521002,
+    "governanceRunId": 44799521006,
+    "approvedManifestBlobSha": "fcea8fea7a04f7514e40aeb780ff2ce5d92a5962",
+    "previousLiveSourceSha": "7791f34cf2574d1915701ee22cf3993e8de79249",
+    "previousLiveArtifactId": 14601447337,
+    "previousLiveArtifactDigest": "sha256:f89a57e5972150cacbe6ad21f1e591ea32f879fb85945b4cd18d4da0a773d3a7",
+    "previousLiveHostingVersion": "sites/ays-orbit-360-lab/versions/d1ffe4c44b4d9330",
+    "backendDeploy": false,
+    "liveDeploy": false,
+    "businessWrites": false
   }
 }

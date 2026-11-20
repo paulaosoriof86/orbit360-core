@@ -281,7 +281,61 @@ jobs:
             c.postAcceptanceInsurerTotalsPreviewBuildRequest20261118||
             c.postAcceptanceProductSourcePreviewBuildRequest20261118||null;
           let successorBuild=false;
-          if(successor){
+          const uiRequest = c.issuedRenewalPaymentPreviewRequest20261120;
+          if (uiRequest && uiRequest.approvedManifestBlobSha === require('node:child_process').execFileSync(
+              'git', ['rev-parse','HEAD:artifacts/orbit360-recovery/release-control/I6_6_APPROVED_PRODUCT_DELTA_MANIFEST_20261110.json'],
+              {encoding:'utf8'}).trim()) {
+            const assert = require('node:assert/strict');
+            const exec = require('node:child_process').execFileSync;
+            const git = (...args) => exec('git', args, {encoding:'utf8'}).trim();
+            const api = path => JSON.parse(exec('gh',['api','repos/' + process.env.GITHUB_REPOSITORY + '/actions/' + path],
+              {encoding:'utf8',env:{...process.env,GH_TOKEN:process.env.GITHUB_TOKEN}}));
+            const r = uiRequest, live = c.currentPhysicalHostingRelease;
+            assert.equal(c.status,'OPERATIONAL_EXACT_LIVE_ACCEPTED_LOCKED');
+            assert.ok(c.livePromotionAuthorized === false && c.forbidBackendFunctionDeploy === true &&
+              c.forbidBackendLiveFunctionDeploy === true && c.forbidFirestoreRulesDataAuthWrites === true);
+            assert.equal(r.scope,'I6.6_PREVIEW_ONLY_RENEWAL_FIELDS_AND_PAYMENT_FEEDBACK');
+            assert.equal(r.branch,'recovery/fase-a-clean-20260831');
+            assert.equal(r.approvedByDirection,true);
+            assert.equal(r.backendDeploy,false);
+            assert.equal(r.liveDeploy,false);
+            assert.equal(r.businessWrites,false);
+            assert.match(r.sourceQaHead,/^[0-9a-f]{40}$/);
+            git('merge-base','--is-ancestor',r.sourceQaHead,'HEAD');
+            const manifestPath = 'artifacts/orbit360-recovery/release-control/I6_6_APPROVED_PRODUCT_DELTA_MANIFEST_20261110.json';
+            assert.equal(git('rev-parse',r.sourceQaHead + ':' + manifestPath),r.approvedManifestBlobSha);
+            for (const [runId, workflow] of [
+              [r.sourceQaRunId,'gravicentra-i66-privileged-role-parity-source-qa.yml'],
+              [r.governanceRunId,'gravicentra-release-lock-sync.yml']]) {
+              assert.ok(Number.isSafeInteger(runId) && runId > 0);
+              const run = api('runs/' + runId);
+              assert.deepEqual([run.head_sha,run.head_branch,run.path,run.event,run.status,run.conclusion],
+                [r.sourceQaHead,r.branch,'.github/workflows/'+workflow,'push','completed','success']);
+            }
+            const marker = JSON.parse(exec('curl',['--fail','--silent','--show-error','--max-time','20',
+              '-H','Cache-Control: no-cache','https://app.aysseguros.com/__recovery__/build.json'],{encoding:'utf8'}));
+            assert.deepEqual([marker.sourceSha,marker.buildId],[live.sourceSha,live.buildId]);
+            const artifact = api('artifacts/' + live.artifactId);
+            assert.equal(artifact.digest,live.artifactDigest);
+            assert.equal(artifact.workflow_run.head_sha,live.sourceSha);
+            const roots = ['orbit360-platform','functions','firebase.json','firestore.rules','storage.rules'];
+            git('diff','--quiet',r.sourceQaHead,'HEAD','--',...roots,
+              'tools/gravicentra-i6-6-cobros-payment-failure-category.test.cjs',
+              'tools/gravicentra-i6-6-operational-renewal-entry.test.cjs');
+            if (r.consumedByVerifiedLiveRun) {
+              assert.equal(r.consumedByVerifiedLiveRun,live.liveCloneRunId);
+              assert.equal(git('rev-parse',live.sourceSha+':'+manifestPath),r.approvedManifestBlobSha);
+              git('diff','--quiet',live.sourceSha,'HEAD','--',...roots);
+              fs.appendFileSync(process.env.GITHUB_OUTPUT,'mode=disabled\n');
+              console.log('I66_UI_PREVIEW_REQUEST_ALREADY_PROMOTED');
+              process.exit(0);
+            }
+            assert.deepEqual([live.sourceSha,live.artifactId,live.artifactDigest,live.liveHostingVersion],
+              [r.previousLiveSourceSha,r.previousLiveArtifactId,r.previousLiveArtifactDigest,r.previousLiveHostingVersion]);
+            assert.deepEqual(git('diff','--name-only',live.sourceSha,r.sourceQaHead,'--',...roots).split('\n').sort(),
+              ['orbit360-platform/modules/cobros.js','orbit360-platform/modules/issuance-endosos-v1201-bridge.js']);
+            successorBuild = true;
+          } else if(successor){
             const {execFileSync}=require('node:child_process');
             const sha=execFileSync('git',['rev-parse','HEAD:artifacts/orbit360-recovery/release-control/I6_6_APPROVED_PRODUCT_DELTA_MANIFEST_20261110.json'],{encoding:'utf8'}).trim();
             const live=c.currentPhysicalHostingRelease||c.currentExactHostingRelease||{};
