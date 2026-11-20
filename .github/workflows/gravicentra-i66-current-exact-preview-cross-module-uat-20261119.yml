@@ -81,7 +81,7 @@ jobs:
           set -euo pipefail
           proof="$RUNNER_TEMP/gi-i66-hosted-check"
           mkdir -p "$proof/tools" "$proof/orbit360-platform/modules"
-          for module in cobros.js issuance-endosos-v1201-bridge.js renewals-v1200-operational-bridge.js; do
+          for module in cobros.js issuance-endosos-v1201-bridge.js renewals-v1200-operational-bridge.js cliente360.js; do
             curl --fail --silent --show-error --max-time 30 "$I66_PREVIEW_ORIGIN/modules/$module" -o "$proof/orbit360-platform/modules/$module"
             cmp "$proof/orbit360-platform/modules/$module" "orbit360-platform/modules/$module"
           done
