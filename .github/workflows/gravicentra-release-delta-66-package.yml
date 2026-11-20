@@ -380,8 +380,10 @@ jobs:
               git('merge-base', '--is-ancestor', live.sourceSha, 'HEAD');
               const published = JSON.parse(git('show', live.sourceSha + ':' + controlDir +
                 'I6_6_RELEASE_TRANSPORT_CONTROL_20261110.json'));
-              if (require('node:util').isDeepStrictEqual(successor,
-                  published.postAcceptanceOwnerInsurerSelectionPreviewBuildRequest20261119)) {
+              const {consumedByVerifiedLiveRun, ...originalRequest} = successor;
+              if (consumedByVerifiedLiveRun === live.liveCloneRunId &&
+                  require('node:util').isDeepStrictEqual(originalRequest,
+                    published.postAcceptanceOwnerInsurerSelectionPreviewBuildRequest20261119)) {
                 const previous = published.currentPhysicalHostingRelease;
                 assert.deepEqual(
                   [successor.previousLiveSourceSha, successor.previousLiveArtifactId,
