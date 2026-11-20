@@ -1,0 +1,73 @@
+{
+  "schema": "GI_I66_CLIENTE360_ADVISOR_SAME_ARTIFACT_LIVE_RECEIPT_V1",
+  "gate": "I6.6",
+  "brand": "Gravicentra Insurance",
+  "releaseType": "SIGNED_TARGETED_HOSTING_ONLY",
+  "status": "LIVE_HOSTING_AND_CARLOS_ROSTER_SAME_ARTIFACT_PASS_FULL_I66_HOLD",
+  "sourceSha": "72d3580f3e90071b360319ce5f204d348b401663",
+  "buildId": "gi-i66-72d3580f3e90-57f234755dc1",
+  "buildRunId": 44637404427,
+  "artifactId": 14584217893,
+  "artifactDigest": "sha256:06decf52bfce75a1bdc7e207b96de35c17ccdfed7ff805895bedada0d80617dc",
+  "signedPreviewUatRunId": 44637887342,
+  "sourceQaRunId": 44637061466,
+  "sourceGuardRunId": 44637061232,
+  "liveCloneRunId": 44641361059,
+  "liveCloneConclusion": "success",
+  "liveCloneHeadSha": "6115fdead7b3c11e1bb8d40a73db4f8c8d097459",
+  "liveEvidenceArtifactId": 14587420057,
+  "liveEvidenceArtifactDigest": "sha256:0551117abd2c8ff1b4a1a12967f1bfb6906fc7a5582822840927144fc1fe0971",
+  "liveBefore": {
+    "sourceSha": "b38f877f7847c7b6e11506885e42252e84c5eeb6",
+    "hostingVersion": "sites/ays-orbit-360-lab/versions/13944f80ba1e0bdf"
+  },
+  "liveAfter": {
+    "sourceSha": "72d3580f3e90071b360319ce5f204d348b401663",
+    "hostingVersion": "sites/ays-orbit-360-lab/versions/63eb68dfe649db40"
+  },
+  "previewVersion": "sites/ays-orbit-360-lab/versions/63eb68dfe649db40",
+  "immutableReadback": {
+    "previewFiles": 224,
+    "firebaseLiveFiles": 224,
+    "customDomainLiveFiles": 224,
+    "bothLiveOriginSourceEqual": true,
+    "sameExactPreviewHostingVersion": true
+  },
+  "liveSignedCarlosReadOnly": {
+    "role": "Operativo",
+    "verified": true,
+    "surfaces": [
+      "Ops advisor selector",
+      "New policy advisor selector",
+      "Cliente360 Editar ficha advisor selector",
+      "effective CRM v1198 Nuevo Cliente advisor selector"
+    ],
+    "germanReyes": true,
+    "priscila": true,
+    "realCustomerWrites": 0
+  },
+  "changes": {
+    "hostingClonedExactly": true,
+    "backendFunctionsDeployed": 0,
+    "businessDataWrites": 0,
+    "financialDataWrites": 0,
+    "firestoreRulesOrAuthWrites": 0,
+    "rollback": "NOT_REQUIRED"
+  },
+  "historicalAcceptancePreserved": {
+    "controlPlaneHistoricalAcceptedSource": "1b65a790530d49fe1d1fb451f02838fd9a713c53",
+    "doNotPromoteHistoricalEvidenceToCurrentArtifact": true
+  },
+  "stillOpen": [
+    "LIVE synthetic financial write/reload suite (separate job 44642178389)",
+    "Real Edson Kenet payment failed-precondition diagnosis before any retry",
+    "Customer 360 end-to-end policy save with German advisor",
+    "Direct issued renewal successor/portfolio/live complete acceptance",
+    "Issued vehicle substitution Ashley/Ashlyn Aguilar signed real workflow",
+    "Client360 inspection to linked Ops/Leads Carlos Corado",
+    "Make Green API and Meta leads write pipeline not yet activated",
+    "Full I6.6 module×role×action LIVE acceptance and signed backend function lineage"
+  ],
+  "fullI66ProductionAccepted": false,
+  "latestApprovedFrontendPublishedToLive": true
+}
