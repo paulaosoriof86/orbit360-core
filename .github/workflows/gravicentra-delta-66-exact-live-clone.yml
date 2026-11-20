@@ -19,6 +19,7 @@ on:
       - artifacts/orbit360-recovery/release-control/I6_6_OPS_LEADS_RETURN_EXACT_LIVE_REQUEST_20261119.json
       - artifacts/orbit360-recovery/release-control/I6_6_ISSUED_RENEWAL_PAYMENT_EXACT_LIVE_REQUEST_20261120.json
       - artifacts/orbit360-recovery/release-control/I6_6_DOCUMENT_IMPORT_SOURCE_EXACT_LIVE_REQUEST_20261120.json
+      - artifacts/orbit360-recovery/release-control/I6_6_DIRECT_PAYMENT_OPTIONAL_DOCUMENT_EXACT_LIVE_REQUEST_20261120.json
       - tools/gravicentra-i6-6-live-exact-clone.mjs
 
 permissions:
@@ -40,7 +41,7 @@ jobs:
       SA_LAB_ALT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
       SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
       I66_PACKAGE_ROOT: /tmp/gi-i66-promote-package
-      I66_APPROVED_RELEASE_REQUEST: artifacts/orbit360-recovery/release-control/I6_6_DOCUMENT_IMPORT_SOURCE_EXACT_LIVE_REQUEST_20261120.json
+      I66_APPROVED_RELEASE_REQUEST: artifacts/orbit360-recovery/release-control/I6_6_DIRECT_PAYMENT_OPTIONAL_DOCUMENT_EXACT_LIVE_REQUEST_20261120.json
     steps:
       - uses: actions/checkout@v4
         with:
@@ -64,7 +65,8 @@ jobs:
           const assert=require('node:assert/strict');
           const j=JSON.parse(fs.readFileSync(process.env.I66_APPROVED_RELEASE_REQUEST,'utf8'));
           const importReview=j.schema==='GRAVICENTRA_I6_6_DOCUMENT_IMPORT_SOURCE_EXACT_LIVE_V1';
-          const issuedRenewal=importReview||j.schema==='GRAVICENTRA_I6_6_ISSUED_RENEWAL_PAYMENT_EXACT_LIVE_V1';
+          const paymentDirect=j.schema==='GRAVICENTRA_I6_6_DIRECT_PAYMENT_OPTIONAL_DOCUMENT_EXACT_LIVE_V1';
+          const issuedRenewal=importReview||paymentDirect||j.schema==='GRAVICENTRA_I6_6_ISSUED_RENEWAL_PAYMENT_EXACT_LIVE_V1';
           if(issuedRenewal||j.schema==='GRAVICENTRA_I6_6_CLIENTE360_ADVISOR_EXACT_LIVE_V1'){
             (async()=>{
               assert.equal(j.requireSignedLiveCoradoQueueReadback,true);
@@ -72,7 +74,7 @@ jobs:
               assert.equal(j.status,'OWNER_AUTHORIZED_TARGETED_LIVE_PENDING_PROTECTED_RUN');
               assert.equal(j.approvedByDirection,true);
               if(issuedRenewal){
-                assert.equal(cp.execFileSync('git',['hash-object',process.env.I66_APPROVED_RELEASE_REQUEST],{encoding:'utf8'}).trim(),importReview?'56e868fb4ccff56ed1f72a6605107190635b5c0f':'4956a5cc5d2109b60adb4e02e6602bf737dba23c','EXACT_UI_APPROVAL_RECORD_DRIFT');
+                assert.equal(cp.execFileSync('git',['hash-object',process.env.I66_APPROVED_RELEASE_REQUEST],{encoding:'utf8'}).trim(),paymentDirect?'d9cb65965825f88757332b090d471e6819390023':importReview?'56e868fb4ccff56ed1f72a6605107190635b5c0f':'4956a5cc5d2109b60adb4e02e6602bf737dba23c','EXACT_UI_APPROVAL_RECORD_DRIFT');
                 assert.equal(j.signedPreviewScope.renewalNumberInsurerSuggestedTermAndManualOverride,true);
                 assert.equal(j.requireHostedPaymentFeedbackTests,true);
                 assert.equal(j.backendDeploy,false);
@@ -102,6 +104,11 @@ jobs:
               const changed=cp.execFileSync('git',['diff','--name-only',j.sourceSha,'HEAD','--',
                 'orbit360-platform','functions','firebase.json','firestore.rules','storage.rules'],{encoding:'utf8'}).trim();
               assert.equal(changed,'','I66_CLIENTE360_PRODUCT_CHANGED_AFTER_APPROVED_IMMUTABLE_BUILD');
+              if(paymentDirect){
+                const delta=cp.execFileSync('git',['diff','--name-only',j.expectedPriorLiveSourceSha,j.sourceSha,'--',
+                  'orbit360-platform','functions','firebase.json','firestore.rules','storage.rules'],{encoding:'utf8'}).trim();
+                assert.equal(delta,'orbit360-platform/modules/cobros.js','I66_PAYMENT_DIRECT_ONLY_APPROVED_FRONTEND_DIFF');
+              }
               const control=JSON.parse(fs.readFileSync('artifacts/orbit360-recovery/release-control/I6_6_RELEASE_TRANSPORT_CONTROL_20261110.json','utf8'));
               assert.equal(control.status,'OPERATIONAL_EXACT_LIVE_ACCEPTED_LOCKED');
               assert.equal(control.livePromotionAuthorized,false);
@@ -136,10 +143,19 @@ jobs:
               const signedSteps=(result[8].jobs||[]).flatMap(z=>z.steps||[]);
               assert.equal(control.currentPhysicalHostingRelease.sourceSha,j.expectedPriorLiveSourceSha);
               assert.equal(control.currentPhysicalHostingRelease.liveHostingVersion,j.expectedPriorLiveHostingVersion);
-              const authority=importReview?control.importSourceReviewPreviewRequest20261120:issuedRenewal?control.issuedRenewalPaymentPreviewRequest20261120:control.postAcceptanceOwnerInsurerSelectionPreviewBuildRequest20261119;
+              const authority=paymentDirect?control.paymentDirectOptionalDocumentPreviewRequest20261120:importReview?control.importSourceReviewPreviewRequest20261120:issuedRenewal?control.issuedRenewalPaymentPreviewRequest20261120:control.postAcceptanceOwnerInsurerSelectionPreviewBuildRequest20261119;
               assert.equal(result[2].head_sha,authority.sourceQaHead);
               if(issuedRenewal){
                 assert.equal(result[1].head_sha,j.signedPreviewQaCommit);
+                if(paymentDirect){
+                  assert.equal(j.signedPreviewScope.hostedOptionalDocumentFailureDoesNotBlockPayment,true);
+                  assert.equal(j.signedPreviewScope.hostedInvoiceOneStepFieldsVerified,true);
+                  assert.equal(j.requireRestoredLivePreflight,true);
+                  assert.ok(signedSteps.some(s=>s.name==='Check renewal and payment behavior against the bytes served by this Preview'&&s.conclusion==='success'));
+                  assert.ok(signedSteps.some(s=>s.name==='Real-role signed Preview payment receipt-carrier synthetic UAT and restoration'&&s.conclusion==='success'));
+                  const qaLog=await fetch(gh+'jobs/'+(result[8].jobs||[]).find(z=>z.name==='signed-preview')?.id+'/logs',{headers:heads,redirect:'follow'});
+                  assert.ok(qaLog.ok,'I66_HOSTED_PAYMENT_OPTIONAL_QA_LOG_NOT_AVAILABLE');
+                }
                 if(importReview){
                   assert.equal(j.requireHostedImportTests,true);
                   assert.equal(j.requireSignedImportRealSourceReview,true);
