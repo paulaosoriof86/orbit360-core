@@ -3399,6 +3399,40 @@
           "gitBlobSha": "0aea5278a3fd1cacb78ffcc2f02b69c4b7bc266d"
         }
       ]
+    },
+    {
+      "id": "I6_6_PREVIEW_CLIENT_ACTIVITY_MARKER_20261119",
+      "approvedByDirection": true,
+      "receipt": "Dirección I6.6 19/11: corregir el contrato de la actividad sintética sin relajar Preview ni producción. Rechazo real I66_PREVIEW_MUTATION_CALLABLE_DENIED en QA 44671336690.",
+      "sourceStatus": "SOURCE_PENDING_IMMUTABLE_PREVIEW_AND_SIGNED_UAT",
+      "capabilityOwners": [
+        "CLIENTE360_PRIMARY_RUNTIME",
+        "ROLE_SCOPE_RUNTIME",
+        "ACTIVITY_AUDIT_CONTRACT"
+      ],
+      "scope": "Propagate fixture metadata only to the same client's linked activity on I6.6 Preview. Preserve server and provider checks.",
+      "paths": [
+        {
+          "path": "orbit360-platform/modules/cliente360.js",
+          "gitBlobSha": "7acb2990c020a92080db8f17875343edd200386c",
+          "replaces": {
+            "path": "orbit360-platform/modules/cliente360.js",
+            "priorGitBlobSha": "52b94b71eab0665dfb26201af49ed71c1579fb63",
+            "priorChangeId": "I6_6_OPERATIVO_CLIENT_EDIT_ACTIVITY_COUNTRY_PERSISTENCE_20261119"
+          }
+        }
+      ],
+      "tests": [
+        {
+          "path": "tools/gravicentra-i6-6-client-edit-activity-country-persistence.test.cjs",
+          "gitBlobSha": "bbb22da34683c8713d36da34c99c89217eea8cfc",
+          "replaces": {
+            "path": "tools/gravicentra-i6-6-client-edit-activity-country-persistence.test.cjs",
+            "priorGitBlobSha": "0aea5278a3fd1cacb78ffcc2f02b69c4b7bc266d",
+            "priorChangeId": "I6_6_OPERATIVO_CLIENT_EDIT_ACTIVITY_COUNTRY_PERSISTENCE_20261119"
+          }
+        }
+      ]
     }
   ],
   "i66R11PreviewBuildRequest20261113": {

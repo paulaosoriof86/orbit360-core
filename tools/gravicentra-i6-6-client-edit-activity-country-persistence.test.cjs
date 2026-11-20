@@ -25,3 +25,20 @@ test('Both components parse and preserve direct signed country advisor roster',(
  new vm.Script(ui);new vm.Script(crm);
  assert.match(ui,/bindAssignableClientAdvisors\(back,'ce-ase',selPais,'ce-save'/);
 });
+
+test('Only the linked activity of a marked client fixture on I6.6 Preview inherits its marker',()=>{
+ const start=ui.indexOf('  function markPreviewClientActivity(');
+ const mark=vm.runInNewContext('('+ui.slice(start,ui.indexOf('  function edit(cid)',start)).trim()+')');
+ const preview='ays-orbit-360-lab--gi-i66-rc-123-abc.web.app';
+ for(const [host,id,flag,link,expected] of [
+  [preview,'b4003qa_x',true,'b4003qa_x',true],
+  [preview,'b4003qa_x',false,'b4003qa_x',undefined],
+  [preview,'real',true,'real',undefined],
+  [preview,'b4003qa_x',true,'another',undefined],
+  ['app.aysseguros.com','b4003qa_x',true,'b4003qa_x',undefined]
+ ]){
+  const activity={id:'act_cli_edit_'+id+'_1',clienteId:link};
+  mark({id,__syntheticQa:flag},activity,host);
+  assert.equal(activity.__syntheticQa,expected);
+ }
+});

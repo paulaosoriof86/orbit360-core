@@ -1358,6 +1358,13 @@ Orbit.modules.cliente360 = (function () {
   }
 
   /* ---- Editar ficha (modal) ---- */
+  function markPreviewClientActivity(client, activity, hostname) {
+    if (!/^ays-orbit-360-lab--gi-i66-rc-[a-z0-9-]+\.web\.app$/i.test(hostname)) return;
+    if (client.__syntheticQa !== true || !/^b4003qa_[A-Za-z0-9._:-]+$/.test(client.id)) return;
+    if (activity.clienteId === client.id && activity.id.startsWith('act_cli_edit_' + client.id + '_')) {
+      activity.__syntheticQa = true;
+    }
+  }
   function edit(cid) {
     const c = S().get('clientes', cid); if (!c) return;
     let back = document.getElementById('c360-edit');
@@ -1461,13 +1468,14 @@ Orbit.modules.cliente360 = (function () {
       };
       const opId = 'cli_edit_' + cid + '_' + Date.now().toString(36), save = back.querySelector('#ce-save');
       const activity = { id: 'act_' + opId, clienteId: cid, pais: patch.pais, tenantId: c.tenantId || '', asesorId: patch.asesorId, tipo: 'sistema', icon: '✏', fecha: Orbit.ui.today(), titulo: 'Cliente actualizado', detalle: 'Actualización confirmada desde Cliente 360. Motivo: '+String(back.dataset.pendingAuditReason || 'Corrección operativa'), operacionId: opId };
+      markPreviewClientActivity(c, activity, window.location.hostname);
       if (!S().batchDurable) return c360toast('Guardado server-owned no disponible; no se aplicaron cambios.');
       save.disabled = true; save.textContent = 'Guardando…';
       try {
         await S().batchDurable([{ action: 'update', collection: 'clientes', id: cid, payload: patch }, { action: 'insert', collection: 'actividades', id: activity.id, payload: activity }], { requestId: opId, timeoutMs: 20000 });
         closeM(); detalle(cid); c360toast('✓ Cliente actualizado y confirmado.');
       } catch (error) {
-        save.disabled = false; save.textContent = 'Guardar cambios'; const code=String(error&&error.code||'unavailable').replace(/[^a-zA-Z0-9/_-]/g,'').slice(0,64); console.warn('[Gravicentra][Cliente360] DURABLE_CLIENT_EDIT_HOLD',{code,collection:'clientes+actividades'}); c360toast('No se confirmó el cambio ('+code+'). El formulario permanece abierto; no se aplicó una actualización parcial.');
+        save.disabled = false; save.textContent = 'Guardar cambios'; const localReason=String(error&&error.message||''); const code=String(error&&error.code||(/^[A-Z][A-Z0-9_]{3,95}$/.test(localReason)?localReason:'unavailable')).replace(/[^a-zA-Z0-9/_-]/g,'').slice(0,64); console.warn('[Gravicentra][Cliente360] DURABLE_CLIENT_EDIT_HOLD',{code,collection:'clientes+actividades'}); c360toast('No se confirmó el cambio ('+code+'). El formulario permanece abierto; no se aplicó una actualización parcial.');
       }
     });
   }
