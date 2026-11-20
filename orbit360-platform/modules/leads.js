@@ -31,6 +31,9 @@ Orbit.modules.leads = (function () {
   function draw() {
     const board = C().leadsBoard();
     const actionRanks=C().actionQueueRanks?C().actionQueueRanks('leads'):{};
+    const assignedManagement = C().gestiones({surface:'leads'}).filter(g =>
+      C().collaborationOwner(g) === 'advisor' && g.estado !== 'Resuelta' &&
+      Orbit.access && Orbit.access.canView && Orbit.access.canView('gestiones',g,'leads'));
     const m = C().metricasLeads();
     const esAse = Orbit.session && Orbit.session.esAsesor && Orbit.session.esAsesor();
     host.innerHTML = `<div class="page">
@@ -41,6 +44,7 @@ Orbit.modules.leads = (function () {
         { label: 'Pronóstico ponderado', val: U.moneyShort(m.pond, Orbit.q.monedaPais()), color: 'var(--ok)', foot: 'por probabilidad', footTone: 'up', onclick: 'location.hash=\'#/leads\'' },
         { label: 'Ganados (emitidos)', val: m.ganados, color: 'var(--warn)', foot: 'cierre del mes', onclick: 'location.hash=\'#/cliente360\'' }
       ])}
+      ${assignedManagement.length ? `<section class="card pad" aria-label="Gestiones devueltas al asesor"><b>Gestiones devueltas al asesor · ${assignedManagement.length}</b><div class="kcol-body">${assignedManagement.map(g=>C().cardGestion(g)).join('')}</div></section>` : ''}
       <div class="ops-legend">
         <span class="muted">🎯 Cadencia configurable desde la creación del lead · la entrega WA/correo requiere confirmación del proveedor · <span class="kmirror" style="position:static">🔗 en Ops</span> = el equipo lo está gestionando</span>
         <span class="ops-sync">🔁 Sincronizado con Orbit Ops</span>

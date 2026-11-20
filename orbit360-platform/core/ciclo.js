@@ -362,11 +362,11 @@ Orbit.ciclo = (function () {
 
   /* ===================== tableros ===================== */
   function opsBoard() {
-    const ng = negocios({surface:'ops'});
+    const ng = negocios({surface:'ops'}).filter(n => collaborationOwner(n) !== 'advisor');
     return opsListas().map(L => {
       let items;
       if (L.kind === 'negocio') items = ng.filter(n => n.etapa === L.etapa).map(n => ({ kind: 'negocio', rec: n }));
-      else items = gestiones({surface:'ops'}).filter(g => g.lista === L.nombre).map(g => ({ kind: 'gestion', rec: g }));
+      else items = gestiones({surface:'ops'}).filter(g => g.lista === L.nombre && collaborationOwner(g) !== 'advisor').map(g => ({ kind: 'gestion', rec: g }));
       return { def: L, items };
     });
   }
@@ -390,8 +390,18 @@ Orbit.ciclo = (function () {
   }
 
   /* ===================== tarjetas ===================== */
+  function collaborationOwner(record) {
+    const comments = Array.isArray(record && record.comentarios) ? record.comentarios : [];
+    for (let index = comments.length - 1; index >= 0; index--) {
+      const comment = comments[index];
+      if (!comment) continue;
+      const direction = comment.direction || collaborationDirection(comment.tipo);
+      if (direction === 'advisor' || direction === 'operations') return direction;
+    }
+    return '';
+  }
   function collaborationState(n,board){
-    const comments=[].concat(n&&n.comentarios||[]),last=comments.length?comments[comments.length-1]:null,direction=last&&last.direction||'';
+    const comments=[].concat(n&&n.comentarios||[]),last=comments.length?comments[comments.length-1]:null,direction=collaborationOwner(n);
     const needed=board==='ops'?'operations':board==='leads'?'advisor':'';
     const latestOther=comments.reduce((i,c,j)=>c&&c.direction&&c.direction!==needed?j:i,-1);
     const directed=needed?comments.filter((c,i)=>i>latestOther&&c&&c.direction===needed):[];
@@ -420,7 +430,7 @@ Orbit.ciclo = (function () {
     const d = U.daysFromNow(n.proximoToque), prob = U.finiteNumber(n.prob);
     const done = (n.checklist || []).filter(c => c.done).length, tot = (n.checklist || []).length;
     const pr = { Alta: 'danger', Media: 'warn', Baja: 'neutral' }[n.prioridad] || 'neutral';
-    const espejo = opts.espejo,comments=[].concat(n.comentarios||[]),lastCollab=comments.length?comments[comments.length-1]:null;
+    const espejo = opts.espejo && collaborationOwner(n) !== 'advisor';
     const collab=collaborationState(n,opts.board),collabDirection=collab.direction,collabNeedsAction=collab.needsAction;
     const queueRank=Number(opts.actionRank)||0;
     const collabLabel=!collabDirection?'':collabNeedsAction?('Acción requerida · #'+(queueRank||1)):(collabDirection==='advisor'?'Enviado al asesor':'Enviado a Operaciones');
@@ -1653,7 +1663,7 @@ Orbit.ciclo = (function () {
   return {
     ETAPAS, E, FLUJO, opsListas, leadsListas, etapaInfo, flag,
     negocios, gestiones, opsBoard, leadsBoard, metricasLeads,
-    cardNegocio, cardGestion, actionQueueRanks, collaborationState, wireCards, notify, gestionarListas,
+    cardNegocio, cardGestion, actionQueueRanks, collaborationOwner, collaborationState, wireCards, notify, gestionarListas,
     setEtapa, decidirCierre, perder, archivar, emitir, crearGestion, crearGestionDurable,
     openNegocio, openGestion, managementCreateModal, solicitarGestion, nuevaOportunidadCliente, nuevoNegocio, nuevaGestion, assignableAdvisors
   };

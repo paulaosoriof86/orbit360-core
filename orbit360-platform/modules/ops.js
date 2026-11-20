@@ -43,7 +43,7 @@ Orbit.modules.ops = (function () {
     // second gestion or moving the opportunity to an incorrect pipeline stage.
     const onBoard=new Set(board.flatMap(col=>(col.items||[]).filter(it=>it.kind==='negocio').map(it=>String(it.rec.id))));
     let incoming=C().negocios({surface:'ops'}).filter(n=>{
-      if(onBoard.has(String(n.id)))return false;
+      if(onBoard.has(String(n.id)) || C().collaborationOwner(n)==='advisor')return false;
       const state=C().collaborationState(n,'ops');
       // Do not show unconfirmed or previously resolved inbox notifications as
       // current tasks. The signed inbox projection owns resolution state.

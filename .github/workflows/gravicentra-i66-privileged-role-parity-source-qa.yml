@@ -39,6 +39,7 @@ jobs:
       - name: Source test with 5 roles, 12 domain writers and explicit negative boundaries
         run: |
           set -euo pipefail
+          node --test tools/gravicentra-i6-6-ops-collaboration-owner.test.cjs
           node --check functions/b4-003-scoped-access-boundary.js
           node --check functions/product-operational-domain.js
           node --check functions/product-ops-leads-domain.js

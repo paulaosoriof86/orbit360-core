@@ -3433,6 +3433,52 @@
           }
         }
       ]
+    },
+    {
+      "id": "I6_6_OPS_LEADS_DIRECTED_COLLABORATION_QUEUE_20261119",
+      "approvedByDirection": true,
+      "receipt": "Dirección 19/11: devolución al asesor y reenvío a Operaciones con el mismo ID y registro. Reproducido en la tarjeta LIVE de Juan Carlos Corado García.",
+      "sourceStatus": "SOURCE_PENDING_SIGNED_UI_READBACK_AND_SAME_ARTIFACT_RELEASE",
+      "capabilityOwners": [
+        "CLIENTE360_PRIMARY_RUNTIME",
+        "OPS_LEADS_RUNTIME"
+      ],
+      "scope": "Use the latest directed collaboration in persisted history to project the active queue. Preserve ordinary notes, canonical IDs, stage and scope.",
+      "paths": [
+        {
+          "path": "orbit360-platform/core/ciclo.js",
+          "gitBlobSha": "1964c481f5cf1ba126d3af95b3c3f87c17428b5a",
+          "replaces": {
+            "path": "orbit360-platform/core/ciclo.js",
+            "priorGitBlobSha": "4c91d7e69d9fefb7bbfbd4e0c435bc71b8ad3ec0",
+            "priorChangeId": "I6_6_OPS_ATOMIC_CLIENT360_ACTIVITY_DIRECT_ISSUED_VEHICLE_SUBSTITUTION_20261119"
+          }
+        },
+        {
+          "path": "orbit360-platform/modules/leads.js",
+          "gitBlobSha": "95b66e0215f0cecbc40a903202ba08fa41358e8c",
+          "replaces": {
+            "path": "orbit360-platform/modules/leads.js",
+            "priorGitBlobSha": "30096b0e8786b089d8cf3912655b439b1db0563a",
+            "priorChangeId": "I6_6_OWNER_APPROVED_SOURCE_LINEAGE_SUCCESSOR_20261119"
+          }
+        },
+        {
+          "path": "orbit360-platform/modules/ops.js",
+          "gitBlobSha": "f5c9d5b1029538999070a23c16fdc46000f64df9",
+          "replaces": {
+            "path": "orbit360-platform/modules/ops.js",
+            "priorGitBlobSha": "eb5b54b8edb1f1df4b120cac73c42af18b2d2608",
+            "priorChangeId": "I6_6_CARLOS_TRANSVERSAL_OPS_TASKS_ROLE_WRITE_PARITY_P0"
+          }
+        }
+      ],
+      "tests": [
+        {
+          "path": "tools/gravicentra-i6-6-ops-collaboration-owner.test.cjs",
+          "gitBlobSha": "9defd98552b65498b0352b99b7575458bf19e3b8"
+        }
+      ]
     }
   ],
   "i66R11PreviewBuildRequest20261113": {
