@@ -1528,6 +1528,35 @@
       }
     },
     "currentPhysicalHostingRelease": {
+      "sourceSha": "ab99e4474cea1ef7d08d2359966e6aa8d81e061b",
+      "buildId": "gi-i66-ab99e4474cea-57f234755dc1",
+      "artifactId": 14661315988,
+      "artifactDigest": "sha256:fe63c6ea2bb77761ce7cd8e31a8171b3637e8bc6c0f40e22c1f55237e6ff8054",
+      "previewRunId": 44799887193,
+      "signedPreviewRunId": 44805919722,
+      "liveCloneRunId": 44806394054,
+      "liveHostingVersion": "sites/ays-orbit-360-lab/versions/889f966a323c1017",
+      "readbackEachOrigin": 224,
+      "receipt": "artifacts/orbit360-recovery/release-control/I6_6_FINANCIAL_OPS_LEADS_CONTINUITY_READBACK_20261119.json#operationalReconciliation20261120",
+      "backendFunctionsChanged": 0,
+      "fullI66ProductionAccepted": false
+    },
+    "latestHistoricallyAcceptedOperationalSource": "1b65a790530d49fe1d1fb451f02838fd9a713c53",
+    "latestProvenLiveSourceScope": "currentPhysicalHostingRelease identifies the signed 20 November frontend. Historical full-stack acceptance stays separately recorded. Current gate I6.6 requires outstanding real-business and integration readbacks.",
+    "priorPhysicalHostingRelease20261119": {
+      "sourceSha": "72d3580f3e90071b360319ce5f204d348b401663",
+      "buildId": "gi-i66-72d3580f3e90-57f234755dc1",
+      "artifactId": 14584217893,
+      "artifactDigest": "sha256:06decf52bfce75a1bdc7e207b96de35c17ccdfed7ff805895bedada0d80617dc",
+      "previewRunId": 44637404427,
+      "liveCloneRunId": 44641361059,
+      "liveHostingVersion": "sites/ays-orbit-360-lab/versions/63eb68dfe649db40",
+      "readbackEachOrigin": 224,
+      "receipt": "artifacts/orbit360-recovery/release-control/I6_6_FINANCIAL_OPS_LEADS_CONTINUITY_READBACK_20261119.json#latestPhysicalLiveAndFinancialAcceptance20261119",
+      "backendFunctionsChanged": 0,
+      "fullI66ProductionAccepted": false
+    },
+    "priorPhysicalHostingReleaseBeforeIssuedRenewal20261120": {
       "sourceSha": "7791f34cf2574d1915701ee22cf3993e8de79249",
       "buildId": "gi-i66-7791f34cf257-57f234755dc1",
       "artifactId": 14601447337,
@@ -1540,19 +1569,11 @@
       "backendFunctionsChanged": 0,
       "fullI66ProductionAccepted": false
     },
-    "latestHistoricallyAcceptedOperationalSource": "1b65a790530d49fe1d1fb451f02838fd9a713c53",
-    "latestProvenLiveSourceScope": "Historical signed operational acceptance including backend. currentPhysicalHostingRelease is authoritative for the current frontend and rollback.",
-    "priorPhysicalHostingRelease20261119": {
-      "sourceSha": "72d3580f3e90071b360319ce5f204d348b401663",
-      "buildId": "gi-i66-72d3580f3e90-57f234755dc1",
-      "artifactId": 14584217893,
-      "artifactDigest": "sha256:06decf52bfce75a1bdc7e207b96de35c17ccdfed7ff805895bedada0d80617dc",
-      "previewRunId": 44637404427,
-      "liveCloneRunId": 44641361059,
-      "liveHostingVersion": "sites/ays-orbit-360-lab/versions/63eb68dfe649db40",
-      "readbackEachOrigin": 224,
-      "receipt": "artifacts/orbit360-recovery/release-control/I6_6_FINANCIAL_OPS_LEADS_CONTINUITY_READBACK_20261119.json#latestPhysicalLiveAndFinancialAcceptance20261119",
-      "backendFunctionsChanged": 0,
+    "currentOperationalEvidence20261120": {
+      "receipt": "artifacts/orbit360-recovery/release-control/I6_6_FINANCIAL_OPS_LEADS_CONTINUITY_READBACK_20261119.json#operationalReconciliation20261120",
+      "independentHostingReadback": 44807075886,
+      "businessFinancialPreflight": 44797201457,
+      "settlementReceiptReadback": 44806656832,
       "fullI66ProductionAccepted": false
     }
   },

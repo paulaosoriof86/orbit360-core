@@ -4530,15 +4530,16 @@
     "consumedByVerifiedLiveRun": 44675481227
   },
   "currentPhysicalHostingRelease": {
-    "sourceSha": "7791f34cf2574d1915701ee22cf3993e8de79249",
-    "buildId": "gi-i66-7791f34cf257-57f234755dc1",
-    "artifactId": 14601447337,
-    "artifactDigest": "sha256:f89a57e5972150cacbe6ad21f1e591ea32f879fb85945b4cd18d4da0a773d3a7",
-    "previewRunId": 44674734296,
-    "liveCloneRunId": 44675481227,
-    "liveHostingVersion": "sites/ays-orbit-360-lab/versions/d1ffe4c44b4d9330",
+    "sourceSha": "ab99e4474cea1ef7d08d2359966e6aa8d81e061b",
+    "buildId": "gi-i66-ab99e4474cea-57f234755dc1",
+    "artifactId": 14661315988,
+    "artifactDigest": "sha256:fe63c6ea2bb77761ce7cd8e31a8171b3637e8bc6c0f40e22c1f55237e6ff8054",
+    "previewRunId": 44799887193,
+    "signedPreviewRunId": 44805919722,
+    "liveCloneRunId": 44806394054,
+    "liveHostingVersion": "sites/ays-orbit-360-lab/versions/889f966a323c1017",
     "readbackEachOrigin": 224,
-    "receipt": "artifacts/orbit360-recovery/release-control/I6_6_FINANCIAL_OPS_LEADS_CONTINUITY_READBACK_20261119.json#opsHandbackSignedLive",
+    "receipt": "artifacts/orbit360-recovery/release-control/I6_6_FINANCIAL_OPS_LEADS_CONTINUITY_READBACK_20261119.json#operationalReconciliation20261120",
     "backendFunctionsChanged": 0,
     "fullI66ProductionAccepted": false
   },
@@ -4627,6 +4628,20 @@
     "previousLiveHostingVersion": "sites/ays-orbit-360-lab/versions/d1ffe4c44b4d9330",
     "backendDeploy": false,
     "liveDeploy": false,
-    "businessWrites": false
+    "businessWrites": false,
+    "consumedByVerifiedLiveRun": 44806394054
+  },
+  "priorPhysicalHostingReleaseBeforeIssuedRenewal20261120": {
+    "sourceSha": "7791f34cf2574d1915701ee22cf3993e8de79249",
+    "buildId": "gi-i66-7791f34cf257-57f234755dc1",
+    "artifactId": 14601447337,
+    "artifactDigest": "sha256:f89a57e5972150cacbe6ad21f1e591ea32f879fb85945b4cd18d4da0a773d3a7",
+    "previewRunId": 44674734296,
+    "liveCloneRunId": 44675481227,
+    "liveHostingVersion": "sites/ays-orbit-360-lab/versions/d1ffe4c44b4d9330",
+    "readbackEachOrigin": 224,
+    "receipt": "artifacts/orbit360-recovery/release-control/I6_6_FINANCIAL_OPS_LEADS_CONTINUITY_READBACK_20261119.json#opsHandbackSignedLive",
+    "backendFunctionsChanged": 0,
+    "fullI66ProductionAccepted": false
   }
 }

@@ -1135,9 +1135,22 @@
       "artifact": 14661315988,
       "artifactDigest": "sha256:fe63c6ea2bb77761ce7cd8e31a8171b3637e8bc6c0f40e22c1f55237e6ff8054",
       "previewChannel": "gi-i66-rc-44799887193",
-      "stage": "EXACT_HOSTING_PREVIEW_READBACK_CONFIRMED_SIGNED_QA_IN_PROGRESS",
+      "stage": "EXACT_FRONTEND_LIVE_SIGNED_UAT_PASS_FULL_I66_HOLD",
       "priorAcceptedLiveSource": "7791f34cf2574d1915701ee22cf3993e8de79249",
-      "priorAcceptedLiveRun": 44675481227
+      "priorAcceptedLiveRun": 44675481227,
+      "buildId": "gi-i66-ab99e4474cea-57f234755dc1",
+      "liveHostingVersion": "sites/ays-orbit-360-lab/versions/889f966a323c1017",
+      "rollbackVersion": "sites/ays-orbit-360-lab/versions/d1ffe4c44b4d9330",
+      "rollbackInvoked": false,
+      "signedPreviewRun": 44805919722,
+      "liveCloneRun": 44806394054,
+      "independentThreeOriginReadback": 44807075886,
+      "filesPerOrigin": 224,
+      "receiptArtifact": 14662413998,
+      "receiptArtifactDigest": "sha256:f8f294d6e9faf437bafc6f6552714899f9a7d548b2f7c18a472914e3b3de2865",
+      "syntheticCustomerDataRestored": true,
+      "backendDeployments": 0,
+      "liveRealCustomerWrites": 0
     },
     "issuedFive": {
       "sourceDocuments": 5,
@@ -1157,8 +1170,55 @@
       "scenariosActivated": 0,
       "newCanonicalOpportunitiesVerified": 0,
       "metaCampaignDestination": "WHATSAPP",
-      "selectableNativeFormsOnTwoAuthorizedPages": 0
+      "selectableNativeFormsOnTwoAuthorizedPages": 0,
+      "webCorporatePilot": "Historical one-time LAB submission already consumed. Current LIVE web lead not certified.",
+      "facebookAdDestinationSets": [
+        "PF-01",
+        "LIV-01",
+        "PES-01"
+      ]
     },
-    "fullGateAccepted": false
+    "fullGateAccepted": false,
+    "roleEvidence": {
+      "roles": [
+        "Operativo",
+        "Dirección"
+      ],
+      "renderedIssuedRenewalFields": {
+        "priorNumber": true,
+        "realInsurer": true,
+        "termRecalculation": true,
+        "manualEndPreserved": true,
+        "submissions": 0
+      },
+      "hostedPaymentFeedbackTests": true,
+      "syntheticClientPhoneAdvisorActivity": true,
+      "syntheticOpsLeadsTasks": true,
+      "syntheticPaymentAndRenewability": true,
+      "fullRoleAndCountryMatrixComplete": false,
+      "completeRealRenewals": 0
+    },
+    "commissionAssignment": {
+      "accountsPayableCreated": 0,
+      "readOnlyRuns": [
+        44806100462,
+        44806656832
+      ],
+      "canonicalCurrentPolicyAssignmentsCorrect": 2,
+      "checkedSettlementReceipts": 2,
+      "receiptAssignmentsCorrect": 1,
+      "receiptAssignmentsDifferent": 1,
+      "newSettlementsPosted": 0,
+      "appliedPayments": 0,
+      "remainingAction": "Align the documented first source receipt through the existing signed operational writer. Neither source receipt was marked paid or had a linked cobro at readback. A commission settlement is not proof of insured payment."
+    },
+    "openScope": [
+      "live business issuance and Drive evidence attachment",
+      "remaining directed handoffs and actual advisor attachment response",
+      "full privileged directory edit and negative-role/country matrix",
+      "canonical inbound writer, Make auth and website production form",
+      "first documented advisor/receipt mismatch and remaining financial exceptions",
+      "all 295 historical findings preserved; only a scoped Hosting receipt is accepted"
+    ]
   }
 }
