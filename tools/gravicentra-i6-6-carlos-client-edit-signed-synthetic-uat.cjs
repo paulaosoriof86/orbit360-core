@@ -80,20 +80,26 @@ const suffix=Date.now().toString(36)+'_'+crypto.randomBytes(4).toString('hex');
     assert.ok(authState.started&&norm(authState.role)===a.role,'QA_ACTOR_ROLE_NOT_SIGNED');
     if (SOURCE === 'ab99e4474cea1ef7d08d2359966e6aa8d81e061b') {
       qaStage='issued-renewal-display';
-      const result=await page.evaluate(async ()=>{
+      const result=await page.evaluate(async fixtureClientId=>{
         const store=Orbit.store;
         await store._ensureCollections(['polizas','clientes','aseguradoras']);
-        const policy=store.all('polizas').find(row=>{
-          const prior=row.vigenciaInicio, next=row.vigenciaFin;
-          return /^\d{4}-\d{2}-\d{2}$/.test(prior) && /^\d{4}-\d{2}-\d{2}$/.test(next)
-            && next.slice(4)===prior.slice(4) && Number(next.slice(0,4))===Number(prior.slice(0,4))+1
-            && next.slice(5)!=='02-29' && row.numero && row.pais==='GT'
-            && store.get('clientes',row.clienteId) && store.get('aseguradoras',row.aseguradoraId)?.vinculada!==false
-            && store.get('aseguradoras',row.aseguradoraId)?.nombre;
-        });
-        if (!policy) throw Error('RENEWAL_NO_AUTHORIZED_ANNUAL_POLICY_FOR_DISPLAY');
-        // A transient view model exercises only the form. It is never submitted or stored.
-        Orbit.renewalDirect.open({workflowType:'renewal_accepted',acceptedConfirmed:true,sourcePolicyId:policy.id});
+        const insurers=store.all('aseguradoras');
+        const insurer=insurers.find(row=>row?.id && row.vinculada!==false &&
+          (!row.pais || row.pais==='GT' || [].concat(row.paises||[]).includes('GT')) &&
+          /roble|mapfre|bantrab|ficohsa|universales|columna|guatemalteca|ceiba|banrural|aseguradora general/i.test(row.nombre||''));
+        if (!insurer) throw Error('RENEWAL_REAL_SCOPED_INSURER_MISSING_count_'+insurers.length);
+        // This view-only fixture is resolved only in this page, never persisted. The
+        // insurer must come from the signed directory and the client from this test.
+        const policy={id:'i66-form-only',numero:'I66-FORM-ONLY',pais:'GT',moneda:'GTQ',clienteId:fixtureClientId,
+          aseguradoraId:insurer.id,vigenciaInicio:'2025-08-31',vigenciaFin:'2026-08-31'};
+        const getRecord=store.get;
+        try {
+          store.get=function(collection,key){
+            if(collection==='polizas' && key===policy.id) return policy;
+            return getRecord.call(this,collection,key);
+          };
+          Orbit.renewalDirect.open({workflowType:'renewal_accepted',acceptedConfirmed:true,sourcePolicyId:policy.id});
+        } finally { store.get=getRecord; }
         const modal=document.getElementById('ops-direct-renewal-v1201');
         if (!modal) throw Error('RENEWAL_ISSUED_EDITOR_NOT_OPEN');
         try {
@@ -107,7 +113,7 @@ const suffix=Date.now().toString(36)+'_'+crypto.randomBytes(4).toString('hex');
           changeStart('2028-03-08');
           return {prefilled,insurer,calculated,manualEndPreserved:field('end').value==='2029-03-12'};
         } finally { modal.remove(); }
-      });
+      },id);
       assert.deepEqual(result,{prefilled:true,insurer:true,calculated:true,manualEndPreserved:true},'RENEWAL_ISSUED_FORM_READONLY');
       console.log('I66_SIGNED_RENEWAL_FORM_'+a.role.toUpperCase()+'_PREFILL_TERM_MANUAL_END_PASS formSubmissions=0');
     }
