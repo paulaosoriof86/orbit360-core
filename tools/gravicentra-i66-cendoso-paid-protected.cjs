@@ -378,10 +378,13 @@ async function main(){
       const terms=groups.filter(g=>numbers.includes(str(g.policy.numero))&&insurerMatches(evidence.insurer,g.insurerName)&&
         policyCountry(g.policy)==='GT'&&norm(g.policy.moneda)==='GTQ'&&date(g.policy.vigenciaInicio)<=evidence.due&&date(g.policy.vigenciaFin)>evidence.due);
       const receipts=terms.flatMap(g=>g.receipts.filter(r=>[r.numeroReciboFuente,r.numeroRequerimiento].map(str).includes(p.requirement)));
-      const ids=new Set(receipts.map(r=>r.id));
+      const ordinalCandidates=terms.flatMap(g=>g.receipts.filter(r=>
+        Number(r.secuencia||r.numeroCuota)===p.installment&&[r.primaTotal,r.montoTotal,r.monto].some(v=>cents(v)===p.grossCents)));
+      const exactOrOrdinal=receipts.length?receipts:ordinalCandidates;
+      const ids=new Set(exactOrOrdinal.map(r=>r.id));
       const cobros=terms.flatMap(g=>g.cobros.filter(c=>ids.has(c.reciboId)));
       console.log('I66_STATEMENT_PAYMENT_READBACK '+JSON.stringify({requirement:p.requirement,terms:terms.length,
-        receipts:receipts.length,receiptPaid:receipts.filter(isPaid).length,linkedCobros:cobros.length,
+        receipts:receipts.length,ordinalAndAmount:ordinalCandidates.length,receiptPaid:exactOrOrdinal.filter(isPaid).length,linkedCobros:cobros.length,
         samePayment:cobros.filter(c=>isPaid(c)&&date(c.fechaPago||c.paidDate)===p.paidDate&&cents(c.monto)===p.grossCents).length,writes:0}));
     }
     return;
