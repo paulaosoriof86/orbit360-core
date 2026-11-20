@@ -94,3 +94,6 @@ jobs:
       - name: Real-role signed Preview payment receipt-carrier synthetic UAT and restoration
         if: ${{ !cancelled() && steps.browser_setup.outcome == 'success' }}
         run: node tools/gravicentra-i6-6-carlos-payment-signed-synthetic-preview-uat.cjs
+      - name: Carlos Operativo signed roster in actual Editar Cliente, Nuevo Cliente, Nueva Póliza and Ops; LIVE untouched
+        if: ${{ !cancelled() && steps.browser_setup.outcome == 'success' }}
+        run: node tools/gravicentra-i6-6-carlos-german-assignment-roster-readonly.cjs

@@ -11,7 +11,9 @@ assert.ok(service,'SIGNED_ROSTER_IDENTITY_UNAVAILABLE');
 admin.initializeApp({credential:admin.credential.cert(service),projectId:'ays-orbit-360-lab'});
 const tenant=admin.firestore().collection('tenants').doc(TENANT);
 const norm=x=>String(x||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();
-const ORIGINS=['https://app.aysseguros.com','https://ays-orbit-360-lab--gi-i66-rc-44637404427-635rywxe.web.app'];
+const LIVE='https://app.aysseguros.com';
+const PREVIEW='https://ays-orbit-360-lab--gi-i66-rc-44672291118-doo7rxfc.web.app';
+const ORIGINS=process.env.I66_PROVE_LIVE_NEW_CLIENT?[LIVE]:[PREVIEW];
 (async()=>{
  const [members,advisors]=await Promise.all([
   tenant.collection('members').limit(180).get(),
@@ -136,12 +138,12 @@ const ORIGINS=['https://app.aysseguros.com','https://ays-orbit-360-lab--gi-i66-r
        policyClientReady,policyModalVisible,policyOptionCount,policyGerman,policyPriscila,policyDisabled,policyModalError,
        editVisible,editGerman,editPriscila,editReady,editError,createVisible,createGerman,createPriscila,createReady,createError
      };
-    },{token,germanId,priscilaId,newPreview:origin.includes('--gi-i66-rc-44637404427-')||(origin==='https://app.aysseguros.com'&&process.env.I66_PROVE_LIVE_NEW_CLIENT==='72d3580f3e90071b360319ce5f204d348b401663')});
+    },{token,germanId,priscilaId,newPreview:true});
     console.log('I66_CARLOS_GERMAN_SIGNED_ROSTER_READONLY '+JSON.stringify({origin:origin.includes('--')?'preview':'live',...result}));
     assert.equal(norm(result.role),'operativo','CARLOS_ACTIVE_ROLE_NOT_OPERATIVO');
     if(!result.started||result.callError||!result.serverGerman||!result.optionGerman||!result.optionPriscila||!result.policyClientReady||!result.policyModalVisible||!result.policyGerman||!result.policyPriscila||result.policyDisabled||result.policyModalError)
       throw Error('I66_CARLOS_GERMAN_PRISCILA_OPS_AND_POLICY_SELECTOR_NOT_READY_'+(origin.includes('--')?'PREVIEW':'LIVE'));
-     if((origin.includes('--gi-i66-rc-44637404427-')||(origin==='https://app.aysseguros.com'&&process.env.I66_PROVE_LIVE_NEW_CLIENT==='72d3580f3e90071b360319ce5f204d348b401663'))&&(!result.editVisible||!result.editReady||!result.editGerman||!result.editPriscila||result.editError||!result.createVisible||!result.createReady||!result.createGerman||!result.createPriscila||result.createError))
+     if((!result.editVisible||!result.editReady||!result.editGerman||!result.editPriscila||result.editError||!result.createVisible||!result.createReady||!result.createGerman||!result.createPriscila||result.createError))
        throw Error('I66_CARLOS_EDIT_AND_NEW_CLIENT_SIGNED_TEAM_ROSTER_NOT_READY_PREVIEW');
    }finally{await context.close();}
   }
