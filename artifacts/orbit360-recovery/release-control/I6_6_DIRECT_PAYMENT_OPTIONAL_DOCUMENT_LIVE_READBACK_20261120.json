@@ -1,0 +1,66 @@
+{
+  "schema": "GRAVICENTRA_I6_6_DIRECT_PAYMENT_OPTIONAL_DOCUMENT_LIVE_RECEIPT_V1",
+  "dateGuatemala": "2026-11-20",
+  "gate": "I6.6",
+  "recordType": "ADDITIVE_PHYSICAL_EVIDENCE_NOT_FORMAL_GATE_ACCEPTANCE",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "sourceSha": "f1eb5bc6397f0b159079be516a521dd7b1e5d9ba",
+  "buildId": "gi-i66-f1eb5bc6397f-57f234755dc1",
+  "buildRunId": 44826594717,
+  "artifactId": 14674736714,
+  "artifactDigest": "sha256:e55fcc674a6cc493cdedff27672d082222db3dd7134354559788364b6ae23713",
+  "previewUrl": "https://ays-orbit-360-lab--gi-i66-rc-44826594717-x8drvh8s.web.app",
+  "previewChannel": "gi-i66-rc-44826594717",
+  "signedPreviewUatRunId": 44827281351,
+  "signedPreviewUatResult": "SUCCESS",
+  "sourceQaRunId": 44826145927,
+  "sourceQaResult": "SUCCESS",
+  "releaseGuardRunId": 44826146077,
+  "releaseGuardResult": "SUCCESS",
+  "liveCloneRunId": 44827928263,
+  "liveCloneRunResult": "SUCCESS",
+  "liveReadbackArtifactId": 14674414002,
+  "liveReadbackArtifactDigest": "sha256:057f1f001d8378e354000cd7c1d340585f591e47b69a7fe250ef75a93744b320",
+  "previousHostingVersion": "sites/ays-orbit-360-lab/versions/95771c3acafb17b1",
+  "previewHostingVersion": "sites/ays-orbit-360-lab/versions/7a0d829d3504c9f8",
+  "physicalLiveHostingVersion": "sites/ays-orbit-360-lab/versions/7a0d829d3504c9f8",
+  "exactFiles": {
+    "preview": 224,
+    "firebaseLive": 224,
+    "customDomainLive": 224
+  },
+  "postLiveSyntheticQa": {
+    "carlosOperativoPaymentApplyReconcileNoDuplicateReload": "PASS",
+    "direccionPaymentApplyReconcileNoDuplicateReload": "PASS",
+    "carlosOperativoOpsLeadsTasksReadonlyAndSynthetic": "PASS",
+    "direccionOpsLeadsTasksReadonlyAndSynthetic": "PASS",
+    "syntheticTestRecordsRestored": true
+  },
+  "frontendPatch": {
+    "file": "orbit360-platform/modules/cobros.js",
+    "gitBlobSha": "f410e0f0f23c399a0d9f574fa9d1279801d3542c",
+    "description": "Optional Drive upload rejection no longer prevents applying client's direct payment; display truthful document hold; distinguish paid and insurer reconciliation, retain one-step fields for invoice/date."
+  },
+  "tests": {
+    "rejectedOptionalDocumentOnActualHostedPreview": "SOURCE_DYNAMIC_QA_PASS",
+    "directReceiptCobroCarteraSignedWithInvoiceEnrichment": "SIGNED_SYNTHETIC_TWO_STEP_PASS",
+    "oneStepInvoiceFields": "HOSTED_SOURCE_ASSERTION_PASS",
+    "oneStepActualCustomerWithAttachedInvoice": "NOT_CERTIFIED",
+    "liveRealCustomerPaymentAttempt": "NOT_REPRODUCED"
+  },
+  "dataWrites": 0,
+  "backendDeployments": 0,
+  "rollback": "NOT_REQUIRED",
+  "openGates": [
+    "Drive tenant OAuth: account chooser reached and origin saved, but Google app-unverified consent and upload/readback remain pending",
+    "Original live Carlos rejected receipt request ID and business-payment before/after not yet verified",
+    "One-step real customer invoice attachment upload and confirmed reconciliation not signed end-to-end",
+    "Renewals missing case-level disposition and El Roble five issued terms not applied",
+    "Payment origin report vs confirmed classification, and reconciledAt technical semantics remain independent P0 findings"
+  ],
+  "fullI66ProductionAccepted": false,
+  "noBusinessDataReimport": true,
+  "antiReplay": true,
+  "canonicalAuthority": "CONTROL_PLANE.json; evidence additive, not an override of gate, financial authorization, or historic I5."
+}
