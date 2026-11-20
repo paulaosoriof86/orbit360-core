@@ -106,5 +106,49 @@ async function read() {
     }
     console.log('I66_ADVISOR_ASSIGNMENT_READBACK '+JSON.stringify(result));
   }
+
+  // Restrict the read to GT clients in the two outstanding issuance cases.
+  // Log only aggregate relationships; names, document IDs and vehicle data stay in Firestore.
+  for(const [label,prefixes,surnames] of [
+    ['policy_capture',['Sergio','SERGIO'],['LOPEZ']],
+    ['vehicle_change',['Ashlyn','ASHLYN','Ashley','ASHLEY'],['AGUILAR']]
+  ]){
+    const candidates=new Map();
+    for(const prefix of prefixes){
+      const docs=await items('clientes').where('nombre','>=',prefix).where('nombre','<=',prefix+'\uf8ff').limit(41).get();
+      assert.ok(docs.size<41,'CLIENT_PREFIX_SCAN_AMBIGUOUS');
+      for(const doc of docs.docs){
+        const client=doc.data(),words=norm(client.nombre).split(/\s+/);
+        if(norm(client.pais)==='GT' && surnames.every(s=>words.includes(s))) candidates.set(doc.id,doc);
+      }
+    }
+    const caseResult={label,matchedScopedClients:candidates.size,writes:0};
+    if(candidates.size===1){
+      const client=[...candidates.values()][0];
+      const policies=await items('polizas').where('clienteId','==',client.id).limit(41).get();
+      assert.ok(policies.size<41,'CLIENT_POLICY_SCAN_BOUND');
+      caseResult.linkedPolicies=policies.size;
+      const current=policies.docs.filter(doc=>{
+        const p=doc.data(),start=p.vigenciaInicio||p.vigenciaIni;
+        return norm(p.pais)==='GT' && start && start<='2026-11-20' && p.vigenciaFin>'2026-11-20';
+      });
+      caseResult.currentTerms=current.length;caseResult.currentRelations=[];
+      for(const doc of current){
+        const counts={};
+        for(const key of ['vehiculos','endosos','recibosEsperados','carteraPrimas']){
+          const linked=await items(key).where('polizaId','==',doc.id).limit(121).get();
+          assert.ok(linked.size<121,'POLICY_RELATION_BOUND');
+          counts[key]=linked.size;
+          if(key==='endosos')counts.markedIssuedSubstitutions=linked.docs.filter(item=>{
+            const row=item.data();
+            return /SUSTITUCION|SUSTITUCION_VEHICULAR/.test(norm([row.tipo,row.tipoEndoso,row.subtipo].join(' '))) &&
+              /EMITID|APLICAD/.test(norm([row.estado,row.estadoEmision].join(' ')));
+          }).length;
+        }
+        caseResult.currentRelations.push(counts);
+      }
+    }
+    console.log('I66_OUTSTANDING_ISSUANCE_READBACK '+JSON.stringify(caseResult));
+  }
 }
 read().catch(e=>{console.error(e.message); process.exitCode=1;});
