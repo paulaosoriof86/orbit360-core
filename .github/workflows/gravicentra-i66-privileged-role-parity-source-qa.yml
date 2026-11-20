@@ -4,6 +4,12 @@ on:
     branches: [recovery/fase-a-clean-20260831]
     paths:
       - .github/workflows/gravicentra-i66-privileged-role-parity-source-qa.yml
+      - orbit360-platform/core/ciclo.js
+      - orbit360-platform/modules/ops.js
+      - orbit360-platform/modules/leads.js
+      - tools/gravicentra-i6-6-ops-collaboration-owner.test.cjs
+      - tools/gravicentra-i6-6-ops-leads-inbox-projection.test.cjs
+      - tools/gravicentra-b4-003-ops-leads-role-scopes.test.cjs
       - functions/b4-003-scoped-access-boundary.js
       - functions/product-operational-domain.js
       - functions/product-ops-leads-domain.js
@@ -40,6 +46,7 @@ jobs:
         run: |
           set -euo pipefail
           node --test tools/gravicentra-i6-6-ops-collaboration-owner.test.cjs
+          node --test tools/gravicentra-i6-6-ops-leads-inbox-projection.test.cjs
           node --check functions/b4-003-scoped-access-boundary.js
           node --check functions/product-operational-domain.js
           node --check functions/product-ops-leads-domain.js
