@@ -17,6 +17,7 @@ function harness(records){
   ];
   const ciclo={opsBoard:()=>opsColumns,negocios:()=>records,
     actionQueueRanks:()=>({actionable:1,alreadyOnBoard:2}),
+    collaborationOwner:n=>n.owner||'',
     collaborationState:n=>({needsAction:!!n.pending,noticeKnown:!!n.confirmed}),
     cardNegocio:n=>`<article data-neg="${n.id}">NEGOCIO_${n.id}</article>`,cardGestion:()=>'',wireCards(){}};
   const host={innerHTML:'',querySelector:sel=>sel==='#op-shared-inbox'?{addEventListener(_type,fn){host.openInbox=fn;}}:null,querySelectorAll:()=>[]};
@@ -33,6 +34,7 @@ function harness(records){
 test('Ops shows only signed unresolved Leads handoffs outside its current stage without duplicate cards or writes',()=>{
   const h=harness([
     {id:'actionable',pais:'GT',pending:true,confirmed:true,authorized:true},
+    {id:'returned',pais:'GT',pending:true,confirmed:true,authorized:true,owner:'advisor'},
     {id:'unconfirmed',pais:'GT',pending:true,confirmed:false,authorized:true},
     {id:'resolved',pais:'GT',pending:false,confirmed:true,authorized:true},
     {id:'forbidden',pais:'CO',pending:true,confirmed:true,authorized:false},
@@ -40,7 +42,7 @@ test('Ops shows only signed unresolved Leads handoffs outside its current stage 
   ]);
   assert.match(h.rendered,/Solicitudes de Leads pendientes · 1/);
   assert.match(h.rendered,/NEGOCIO_actionable/);
-  assert.doesNotMatch(h.rendered,/NEGOCIO_(unconfirmed|resolved|forbidden)/);
+  assert.doesNotMatch(h.rendered,/NEGOCIO_(unconfirmed|resolved|forbidden|returned)/);
   assert.equal((h.rendered.match(/NEGOCIO_alreadyOnBoard/g)||[]).length,1);
   assert.equal(h.clickInbox(),1);
   assert.equal(h.writes,0);
