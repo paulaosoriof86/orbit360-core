@@ -7,7 +7,8 @@ import {GoogleAuth} from 'google-auth-library';
 const SITE='ays-orbit-360-lab',PROJECT='ays-orbit-360-lab';
 const REQUEST=process.env.I66_APPROVED_RELEASE_REQUEST||'artifacts/orbit360-recovery/release-control/I6_6_EXACT_HOSTING_LIVE_PROMOTION_REQUEST_20261110.json';
 const rawRequest=JSON.parse(fs.readFileSync(REQUEST,'utf8'));
-const signedClientSuccessor=rawRequest.schema==='GRAVICENTRA_I6_6_CLIENTE360_ADVISOR_EXACT_LIVE_V1';
+const issuedRenewal=rawRequest.schema==='GRAVICENTRA_I6_6_ISSUED_RENEWAL_PAYMENT_EXACT_LIVE_V1';
+const signedClientSuccessor=issuedRenewal||rawRequest.schema==='GRAVICENTRA_I6_6_CLIENTE360_ADVISOR_EXACT_LIVE_V1';
 // The existing I6.6 rollback/clone owner consumes the signed successor directly.
 // Internal field aliases let the legacy verified byte-for-byte transport remain
 // unchanged. The actual approval is always revalidated against rawRequest.
@@ -105,8 +106,14 @@ function validateRequest(){
       need(rawRequest[k]===true,'I66_CLIENTE360_RELEASE_GUARD_MISSING_'+k);
     need(rawRequest.doNotClaimFullPlatformProductionAccepted===true&&rawRequest.doNotClaimFocalCaseEdsonDataUpdatedWithoutWriteReadback===true,'I66_CLIENTE360_SCOPE_OVERCLAIM');
     need(rawRequest.signedPreviewScope?.realCarlosOperativoLogin===true&&rawRequest.signedPreviewScope?.germanAndPriscilaActualEditNewClientPolicyOps===true&&rawRequest.signedPreviewScope?.signedCarlosAndDirectionOpsLeadsSyntheticCreateUpdateResolveReloadRestore===true&&rawRequest.signedPreviewScope?.signedBothRolePaymentReceiptCobroPortfolioSyntheticWriteReloadRestore===true&&rawRequest.signedPreviewScope?.realCustomerWrites===0,'I66_CLIENTE360_SIGNED_UAT_SCOPE_INVALID');
-    need(rawRequest.sourceSha==='7791f34cf2574d1915701ee22cf3993e8de79249'&&rawRequest.buildRunId===44674734296&&rawRequest.artifactId===14601447337&&rawRequest.signedCarlosPaulaPreviewUatRunId===44675079983,'I66_CLIENTE360_SIGNED_PROOF_IDENTITY_DRIFT');
-    need(rawRequest.expectedPriorLiveSourceSha==='9c689bd283793a635f6a94197351b3fe0ecf2da9'&&rawRequest.expectedPriorLiveHostingVersion==='sites/ays-orbit-360-lab/versions/29889fb4208832e6','I66_CLIENTE360_LIVE_ROLLBACK_BACKUP_UNPINNED');
+    if(issuedRenewal){
+      const approvedBlob=execFileSync('git',['hash-object',REQUEST],{encoding:'utf8'}).trim();
+      need(approvedBlob==='4956a5cc5d2109b60adb4e02e6602bf737dba23c'&&rawRequest.backendDeploy===false,'I66_ISSUED_RENEWAL_APPROVAL_RECORD_DRIFT');
+      need(rawRequest.signedPreviewScope.renewalNumberInsurerSuggestedTermAndManualOverride===true&&rawRequest.requireHostedPaymentFeedbackTests===true,'I66_ISSUED_RENEWAL_SIGNED_QA_MISSING');
+    }else{
+      need(rawRequest.sourceSha==='7791f34cf2574d1915701ee22cf3993e8de79249'&&rawRequest.buildRunId===44674734296&&rawRequest.artifactId===14601447337&&rawRequest.signedCarlosPaulaPreviewUatRunId===44675079983,'I66_CLIENTE360_SIGNED_PROOF_IDENTITY_DRIFT');
+      need(rawRequest.expectedPriorLiveSourceSha==='9c689bd283793a635f6a94197351b3fe0ecf2da9'&&rawRequest.expectedPriorLiveHostingVersion==='sites/ays-orbit-360-lab/versions/29889fb4208832e6','I66_CLIENTE360_LIVE_ROLLBACK_BACKUP_UNPINNED');
+    }
     need(rawRequest.previewChannel==='gi-i66-rc-'+rawRequest.buildRunId&&/^sha256:[0-9a-f]{64}$/.test(rawRequest.artifactDigest||''),'I66_CLIENTE360_ARTIFACT_OR_CHANNEL_INVALID');
     need(new RegExp('^https://ays-orbit-360-lab--'+rawRequest.previewChannel+'-[a-z0-9]+\\.web\\.app$').test(rawRequest.previewUrl||''),'I66_CLIENTE360_PREVIEW_ORIGIN_NOT_EXACT');
     need(rawRequest.buildId==='gi-i66-'+rawRequest.sourceSha.slice(0,12)+'-57f234755dc1'&&request.artifactZipSha256.length===64,'I66_CLIENTE360_BUILD_SOURCE_DRIFT');
