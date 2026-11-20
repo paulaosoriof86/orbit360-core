@@ -1221,8 +1221,8 @@
       "policyCreates": 0
     },
     "integrations": {
-      "imap": "PRIVATE_INPUT_AND_CONNECTION_TEST_PENDING",
-      "drive": "TENANT_SETUP_REQUIRED_LAST_SIGNED_READBACK",
+      "imap": "HOSTDIME_NON_SECRET_SETTINGS_FILLED_PASSWORD_FOCUSED_AWAITING_PRIVATE_SUBMIT_AND_TEST",
+      "drive": "LIVE_DIRECTION_PROVIDER_OPENED_GOOGLE_400_ORIGIN_MISMATCH",
       "greenApiScenarios": [
         10196136,
         10195867
@@ -1236,7 +1236,37 @@
         "PF-01",
         "LIV-01",
         "PES-01"
-      ]
+      ],
+      "browserReadback20261120": {
+        "authenticatedLiveRole": "Dirección",
+        "drive": {
+          "entryPoint": "Cliente 360 > Documentos del cliente > Configurar Drive",
+          "googleCode": "400 origin_mismatch",
+          "exactGoogleOAuthClientComparedWithCloudConsole": true,
+          "liveOriginAbsentInSavedCloudConfiguration": true,
+          "productionOrigin": "https://app.aysseguros.com",
+          "originStagedInCloudConsole": true,
+          "originSaveVerified": false,
+          "consentVerified": false,
+          "documentRoundTripVerified": false
+        },
+        "imap": {
+          "requestId": "1d49bea1-0d2c-48c1-8f0e-2516c5662d32",
+          "type": "Others (IMAP)",
+          "provider": "Other",
+          "host": "mail.aysseguros.com",
+          "port": 993,
+          "tls": true,
+          "connectionTestVerified": false
+        },
+        "firestore": {
+          "priorRequest": "109d757e-6a3f-492f-b822-997d0774563a",
+          "googleCode": "401 invalid_client",
+          "requestClientMatchedExistingScopedOAuthClient": false,
+          "correctSeparateClientFilledInCombinedRequest": true,
+          "verifiedConnection": false
+        }
+      }
     },
     "fullGateAccepted": false,
     "roleEvidence": {

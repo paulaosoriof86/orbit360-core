@@ -372,11 +372,11 @@ test('Cliente 360 Operativo uses only verified policy advisor labels without rea
   const diagnostics={};
   const host={innerHTML:'',isConnected:true,querySelectorAll:()=>[],querySelector:()=>null};
   const Orbit={store,ui,kit:{bannerFor:()=>''},modules:{},pais:'CO',route:{params:{}},
-    session:{rol:()=> 'Operativo'},clientProjection:{withReadBatch:fn=>fn?fn():null},
-    q:{isSyntheticQaRecord:row=>!!row&&row.__syntheticQa===true}};
+    session:{rol:()=> 'Operativo'},clientProjection:{withReadBatch:fn=>fn?fn():null}};
   const browserWindow={Orbit,OrbitRuntimeDiagnostics:diagnostics,addEventListener(){}};
   const document={addEventListener(){},getElementById:id=>id==='c360-client-name-case-style'?{}:null};
   const ctx=vm.createContext({Orbit,OrbitRuntimeDiagnostics:diagnostics,window:browserWindow,document,location:{hash:'#/cliente360'},Date,Map,Set,console,setTimeout,clearTimeout});
+  vm.runInContext(queries,ctx,{filename:'queries.js'});
   vm.runInContext(cliente360,ctx,{filename:'cliente360.js'});
   Orbit.modules.cliente360.render(host);
   assert.match(host.innerHTML,/data-c360-list-ready="1"/);
