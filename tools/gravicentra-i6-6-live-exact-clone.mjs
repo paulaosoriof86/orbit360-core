@@ -109,7 +109,7 @@ function validateRequest(){
     need(rawRequest.signedPreviewScope?.realCarlosOperativoLogin===true&&rawRequest.signedPreviewScope?.germanAndPriscilaActualEditNewClientPolicyOps===true&&rawRequest.signedPreviewScope?.signedCarlosAndDirectionOpsLeadsSyntheticCreateUpdateResolveReloadRestore===true&&rawRequest.signedPreviewScope?.signedBothRolePaymentReceiptCobroPortfolioSyntheticWriteReloadRestore===true&&rawRequest.signedPreviewScope?.realCustomerWrites===0,'I66_CLIENTE360_SIGNED_UAT_SCOPE_INVALID');
     if(issuedRenewal){
       const approvedBlob=execFileSync('git',['hash-object',REQUEST],{encoding:'utf8'}).trim();
-      need(approvedBlob===(importReview?'616109f0a5611c833ece9789b8317af65060fdb9':'4956a5cc5d2109b60adb4e02e6602bf737dba23c')&&rawRequest.backendDeploy===false,'I66_ISSUED_RENEWAL_APPROVAL_RECORD_DRIFT');
+      need(approvedBlob===(importReview?'56e868fb4ccff56ed1f72a6605107190635b5c0f':'4956a5cc5d2109b60adb4e02e6602bf737dba23c')&&rawRequest.backendDeploy===false,'I66_ISSUED_RENEWAL_APPROVAL_RECORD_DRIFT');
       need(rawRequest.signedPreviewScope.renewalNumberInsurerSuggestedTermAndManualOverride===true&&rawRequest.requireHostedPaymentFeedbackTests===true,'I66_ISSUED_RENEWAL_SIGNED_QA_MISSING');
     }else{
       need(rawRequest.sourceSha==='7791f34cf2574d1915701ee22cf3993e8de79249'&&rawRequest.buildRunId===44674734296&&rawRequest.artifactId===14601447337&&rawRequest.signedCarlosPaulaPreviewUatRunId===44675079983,'I66_CLIENTE360_SIGNED_PROOF_IDENTITY_DRIFT');
@@ -175,9 +175,15 @@ try{
     // The only acceptable post-deploy smoke is the signed Carlos session against
     // the actual LIVE selectors (not the shadowed form), with no business writes.
     // A smoke failure is caught below and reverses the Hosting clone.
-    execFileSync(process.execPath,['tools/gravicentra-i6-6-carlos-german-assignment-roster-readonly.cjs'],
-      {cwd:process.cwd(),env:{...process.env,I66_VERIFY_CORADO_QUEUE:'1',I66_PROVE_LIVE_NEW_CLIENT:request.sourceSha},
-       stdio:['ignore','pipe','pipe'],timeout:180000});
+    try {
+      execFileSync(process.execPath,['tools/gravicentra-i6-6-carlos-german-assignment-roster-readonly.cjs'],
+        {cwd:process.cwd(),env:{...process.env,I66_VERIFY_CORADO_QUEUE:'1',I66_PROVE_LIVE_NEW_CLIENT:request.sourceSha},
+         stdio:['ignore','pipe','pipe'],timeout:180000});
+    } catch (error) {
+      // Publish the assertion code only. Role data and browser output remain private.
+      const reason=String(error.stderr||'').match(/I66_CARLOS_GERMAN_SIGNED_HOLD ([A-Z][A-Z0-9_]{3,140})(?:\s|$)/);
+      throw Error('I66_LIVE_ROSTER_'+(reason?reason[1]:'DEPENDENCY_OR_BROWSER_FAILED'));
+    }
     evidence.signedCarlosLiveEditNewPolicyOpsReadOnly=true;
     evidence.signedCarlosLiveCoradoOpsZeroLeadsOne=true;
     need(rawRequest.requireClientEditLiveSyntheticWriteReloadCleanup===true,'I66_CLIENT_EDIT_LIVE_QA_REQUIRED');
