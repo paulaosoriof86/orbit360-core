@@ -282,6 +282,8 @@ jobs:
             c.postAcceptanceProductSourcePreviewBuildRequest20261118||null;
           let successorBuild=false;
           const importRequest = c.importSourceReviewPreviewRequest20261120;
+          const paymentDirectRequest = c.paymentDirectOptionalDocumentPreviewRequest20261120;
+          const paymentDirectBuild = Boolean(paymentDirectRequest);
           const manifestName = 'artifacts/orbit360-recovery/release-control/I6_6_APPROVED_PRODUCT_DELTA_MANIFEST_20261110.json';
           const importDelta = JSON.parse(fs.readFileSync(manifestName)).changes.some(change => change.id === 'I6_6_IMPORT_REVIEW_SOURCE_ROWS_ONLY_20261120');
           if (importDelta && !importRequest) {
@@ -289,7 +291,7 @@ jobs:
             console.log('I66_IMPORT_REVIEW_AWAITING_BOUND_SOURCE_QA');
             process.exit(0);
           }
-          const uiRequest = importDelta ? importRequest : c.issuedRenewalPaymentPreviewRequest20261120;
+          const uiRequest = paymentDirectBuild ? paymentDirectRequest : importDelta ? importRequest : c.issuedRenewalPaymentPreviewRequest20261120;
           if (importDelta && uiRequest.approvedManifestBlobSha !== require('node:child_process').execFileSync(
               'git',['rev-parse','HEAD:'+manifestName],{encoding:'utf8'}).trim()) throw Error('I66_IMPORT_SOURCE_MANIFEST_NOT_PINNED');
           if (uiRequest && uiRequest.approvedManifestBlobSha === require('node:child_process').execFileSync(
@@ -304,7 +306,7 @@ jobs:
             assert.equal(c.status,'OPERATIONAL_EXACT_LIVE_ACCEPTED_LOCKED');
             assert.ok(c.livePromotionAuthorized === false && c.forbidBackendFunctionDeploy === true &&
               c.forbidBackendLiveFunctionDeploy === true && c.forbidFirestoreRulesDataAuthWrites === true);
-            assert.equal(r.scope,importDelta ? 'I6.6_PREVIEW_ONLY_IMPORT_SOURCE_REVIEW' : 'I6.6_PREVIEW_ONLY_RENEWAL_FIELDS_AND_PAYMENT_FEEDBACK');
+            assert.equal(r.scope,paymentDirectBuild ? 'I6.6_PREVIEW_ONLY_DIRECT_PAYMENT_OPTIONAL_DOCUMENT_RECOVERY' : importDelta ? 'I6.6_PREVIEW_ONLY_IMPORT_SOURCE_REVIEW' : 'I6.6_PREVIEW_ONLY_RENEWAL_FIELDS_AND_PAYMENT_FEEDBACK');
             assert.equal(r.branch,'recovery/fase-a-clean-20260831');
             assert.equal(r.approvedByDirection,true);
             assert.equal(r.backendDeploy,false);
@@ -344,7 +346,7 @@ jobs:
             assert.deepEqual([live.sourceSha,live.artifactId,live.artifactDigest,live.liveHostingVersion],
               [r.previousLiveSourceSha,r.previousLiveArtifactId,r.previousLiveArtifactDigest,r.previousLiveHostingVersion]);
             assert.deepEqual(git('diff','--name-only',live.sourceSha,r.sourceQaHead,'--',...roots).split('\n').sort(),
-              importDelta ? ['orbit360-platform/core/importa.js'] : ['orbit360-platform/modules/cobros.js','orbit360-platform/modules/issuance-endosos-v1201-bridge.js']);
+              paymentDirectBuild ? ['orbit360-platform/modules/cobros.js'] : importDelta ? ['orbit360-platform/core/importa.js'] : ['orbit360-platform/modules/cobros.js','orbit360-platform/modules/issuance-endosos-v1201-bridge.js']);
             successorBuild = true;
           } else if(successor){
             const {execFileSync}=require('node:child_process');
