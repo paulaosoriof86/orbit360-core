@@ -139,11 +139,27 @@ async function read() {
           const linked=await items(key).where('polizaId','==',doc.id).limit(121).get();
           assert.ok(linked.size<121,'POLICY_RELATION_BOUND');
           counts[key]=linked.size;
+          const pinned=(value,expected)=>require('node:crypto').createHash('sha256')
+            .update(String(value||'').trim()).digest('hex')===expected;
+          if(label==='vehicle_change' && key==='vehiculos'){
+            const correctSuccessor=linked.docs.filter(item=>item.id===doc.data().vehiculoId && norm(item.data().estado)==='ACTIVO' &&
+              norm(item.data().marca).includes('MAZDA'));
+            counts.policyPointsToActiveSuccessor=correctSuccessor.length===1;
+            counts.previousVehicleHistorical=linked.docs.filter(item=>norm(item.data().estado)==='HISTORICO' &&
+              Boolean(item.data().sustituidoPorGestionId)).length;
+          }
+          if(label==='vehicle_change' && key==='recibosEsperados'){
+            counts.carrierRequirementMatches=linked.docs.filter(item=>
+              [item.data().numeroReciboFuente,item.data().numeroRequerimiento].some(v=>pinned(v,'609db246c97cea18aea3ccc46b4fa499cf4ecde06335ea0867e35e813c91f471'))).length;
+          }
           if(key==='gestiones'){
             const substitutions=linked.docs.filter(item=>item.data().workflowType==='endorsement_request' &&
               item.data().endorsementType==='sustitucion_vehiculo');
             const history=[].concat(doc.data().historial||[]);
             counts.substitutionRequests=substitutions.length;
+            counts.sourceReferenceMatches=substitutions.filter(item=>
+              String(item.data().referenciaAseguradora||'').match(/\d+/g)?.some(digits=>pinned(String(Number(digits)),'366e031159861b8f2be6ecce7fe76d05fd2880a7a3dcbf7543a744ccdeddff1b'))).length;
+            counts.sourceEffectiveDateMatches=substitutions.filter(item=>pinned(item.data().fechaEfectiva,'d67425239ed6643d14af63ec25f4bf3bfd60e882769882f0cdfaec1d7d69cd6b')).length;
             counts.appliedSubstitutionsWithHistory=substitutions.filter(item=>item.data().endorsementStage==='APLICADO' &&
               history.some(event=>event?.gestionId===item.id)).length;
             counts.substitutionRequestsWithDocument=substitutions.filter(item=>Boolean(item.data().documentRef)).length;
