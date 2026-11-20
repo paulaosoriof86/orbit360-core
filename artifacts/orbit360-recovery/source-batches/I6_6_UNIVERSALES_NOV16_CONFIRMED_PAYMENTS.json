@@ -1,0 +1,32 @@
+{
+  "fileId": "1_9oKfTx5XGKQeeEXF41u1UMj4xzZRGAW",
+  "sourceFile": "Universales - Recaudos Noviembre 2026.PDF",
+  "sha256": "59a99a7d26dc69bc2632dc8b6b29b4c2a9a232a372c3024632c0cd8823aa2759",
+  "currency": "GTQ",
+  "grossCents": 319631,
+  "insurer": "UNIVERSALES",
+  "due": "2026-11-01",
+  "payments": [
+    {
+      "policy": "04-15-01-603-0",
+      "requirement": "39460327",
+      "installment": 2,
+      "grossCents": 95256,
+      "paidDate": "2026-11-05"
+    },
+    {
+      "policy": "04-05-01-10738-6",
+      "requirement": "37260364",
+      "installment": 9,
+      "grossCents": 147935,
+      "paidDate": "2026-11-13"
+    },
+    {
+      "policy": "04-05-01-15590-0",
+      "requirement": "39470707",
+      "installment": 2,
+      "grossCents": 76440,
+      "paidDate": "2026-11-05"
+    }
+  ]
+}

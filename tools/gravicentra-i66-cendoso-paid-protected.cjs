@@ -362,12 +362,30 @@ async function applyOne(db,oldPlan,source){
 }
 async function main(){
   const mode=str(process.env.GI_I66_CENDOSO_MODE);
-  assert.ok(['preflight','apply','columna-readback','issued-readback'].includes(mode),'I66_PAID_MODE_REQUIRED');
+  assert.ok(['preflight','apply','columna-readback','issued-readback','statement-payment-readback'].includes(mode),'I66_PAID_MODE_REQUIRED');
   assert.equal(process.env.GCLOUD_PROJECT,PROJECT,'I66_PAID_FIREBASE_PROJECT_DRIFT');
   const source=loadSource();
   const admin=require('firebase-admin');
   admin.initializeApp({credential:admin.credential.applicationDefault(),projectId:PROJECT});
   const db=admin.firestore();
+  if(mode==='statement-payment-readback'){
+    const evidence=require('../artifacts/orbit360-recovery/source-batches/I6_6_UNIVERSALES_NOV16_CONFIRMED_PAYMENTS.json');
+    const {policyKeys}=require('./gravicentra-i66-source-bulk-plan.cjs');
+    const candidates=evidence.payments.flatMap(p=>policyKeys(p.policy,evidence.insurer).map(policyNumberSource=>({policyNumberSource})));
+    const groups=await readGroups(db,{candidates});
+    for(const p of evidence.payments){
+      const numbers=policyKeys(p.policy,evidence.insurer);
+      const terms=groups.filter(g=>numbers.includes(str(g.policy.numero))&&insurerMatches(evidence.insurer,g.insurerName)&&
+        policyCountry(g.policy)==='GT'&&norm(g.policy.moneda)==='GTQ'&&date(g.policy.vigenciaInicio)<=evidence.due&&date(g.policy.vigenciaFin)>evidence.due);
+      const receipts=terms.flatMap(g=>g.receipts.filter(r=>[r.numeroReciboFuente,r.numeroRequerimiento].map(str).includes(p.requirement)));
+      const ids=new Set(receipts.map(r=>r.id));
+      const cobros=terms.flatMap(g=>g.cobros.filter(c=>ids.has(c.reciboId)));
+      console.log('I66_STATEMENT_PAYMENT_READBACK '+JSON.stringify({requirement:p.requirement,terms:terms.length,
+        receipts:receipts.length,receiptPaid:receipts.filter(isPaid).length,linkedCobros:cobros.length,
+        samePayment:cobros.filter(c=>isPaid(c)&&date(c.fechaPago||c.paidDate)===p.paidDate&&cents(c.monto)===p.grossCents).length,writes:0}));
+    }
+    return;
+  }
   if(mode==='issued-readback'){
     const editions=require('../artifacts/orbit360-recovery/source-batches/I6_6_ROBLE_ISSUED_FIVE_20261119.json').editions;
     const groups=await readGroups(db,{candidates:editions.map(p=>({policyNumberSource:p.policy}))});

@@ -25,7 +25,7 @@ jobs:
     if: >
       github.repository == 'paulaosoriof86/orbit360-core' &&
       github.ref_name == 'recovery/fase-a-clean-20260831' &&
-      (contains(github.event.head_commit.message, 'I66_CENDOSO_PAID_BATCH_READY') || contains(github.event.head_commit.message, 'I66_COLUMNA_READBACK') || contains(github.event.head_commit.message, 'I66_ISSUED_READBACK'))
+      (contains(github.event.head_commit.message, 'I66_CENDOSO_PAID_BATCH_READY') || contains(github.event.head_commit.message, 'I66_COLUMNA_READBACK') || contains(github.event.head_commit.message, 'I66_ISSUED_READBACK') || contains(github.event.head_commit.message, 'I66_STATEMENT_PAYMENT_READBACK'))
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     outputs:
@@ -64,6 +64,11 @@ jobs:
               print('I66_PAID_EXISTING_FIREBASE_IDENTITY_PASS');break
           else: raise SystemExit('I66_PAID_NO_EXISTING_FIREBASE_IDENTITY')
           PY
+      - name: Read exact insurer-confirmed payments and existing linked collections
+        if: contains(github.event.head_commit.message, 'I66_STATEMENT_PAYMENT_READBACK')
+        run: node tools/gravicentra-i66-cendoso-paid-protected.cjs
+        env:
+          GI_I66_CENDOSO_MODE: statement-payment-readback
       - name: Verify five issued El Roble terms and 49 requirements against current policy editions
         if: contains(github.event.head_commit.message, 'I66_ISSUED_READBACK')
         run: node tools/gravicentra-i66-cendoso-paid-protected.cjs
