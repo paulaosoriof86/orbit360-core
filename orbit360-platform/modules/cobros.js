@@ -955,11 +955,25 @@ Orbit.modules.cobros = (function () {
       btn.disabled=true;btn.textContent='Guardando…';pm.setAttribute('aria-busy','true');if(state)state.textContent='Guardando documentos…';
       try{
         const domain=Orbit.reconciliationDomain;if(!domain||typeof domain.applyPayment!=='function')throw new Error('PAYMENT_DOMAIN_UNAVAILABLE');
-        const [supportRef,invoiceRef]=await Promise.all([
+        // Payment is the primary, server-owned transaction. An optional Drive
+        // upload must not prevent confirming the client's payment if OAuth,
+        // permissions or the document provider are temporarily unavailable.
+        // Do not claim any failed document was uploaded or reconciled.
+        const [supportUpload,invoiceUpload]=await Promise.allSettled([
           uploadPaymentDocument(supportFile,'payment_support',c,receipt.id),
           uploadPaymentDocument(invoiceFile,'insurer_invoice',c,receipt.id)
         ]);
-        if(state)state.textContent='Registrando pago y confirmando persistencia…';
+        const supportRef=supportUpload.status==='fulfilled'?supportUpload.value:'';
+        const invoiceRef=invoiceUpload.status==='fulfilled'?invoiceUpload.value:'';
+        const pendingEvidence=[];
+        if(supportFile&&supportUpload.status==='rejected')pendingEvidence.push('comprobante del cliente');
+        if(invoiceFile&&invoiceUpload.status==='rejected')pendingEvidence.push('factura de la aseguradora');
+        if(pendingEvidence.length) {
+          console.warn('[Gravicentra][Cobros] PAYMENT_OPTIONAL_DOCUMENT_UPLOAD_HOLD',{
+            receiptId:String(receipt.id||''),documentKinds:pendingEvidence
+          });
+          if(state)state.textContent='El adjunto no se pudo guardar. Se registrará el pago sin ese archivo; conserva el original para completar evidencia.';
+        } else if(state)state.textContent='Registrando pago y confirmando persistencia…';
         const applied=await domain.applyPayment(receipt.id,{payload:{
           sourceType:'manual',
           paidDate:pm.querySelector('#pm-paid').value||'',
@@ -973,9 +987,18 @@ Orbit.modules.cobros = (function () {
         }});
         const avisar=pm.querySelector('#pm-avisar')&&pm.querySelector('#pm-avisar').checked;
         const docsOk=!(applied&&applied.documentLifecycleOk===false);
-         const reconciled=!!(applied&&/^APPLIED_/.test(String(applied.applicationState||'')));
-         close();U.toast(docsOk ? (reconciled ? '✓ Pago aplicado y conciliado con la aseguradora' : '✓ Pago aplicado; pendiente de conciliación') : '✓ Pago registrado. Un documento quedó en recuperación controlada.');baseCache=null;
-        if(docsOk&&avisar&&Orbit.notify&&cli&&cli.id){Orbit.notify.pedir(cli.id,{tipo:'Aviso de pago confirmado',icon:'💳',asunto:'Confirmación de pago · póliza '+(p.numero||''),mensaje:'Hola '+(cli.nombre||'')+', registramos tu pago de '+U.money(c.monto,c.moneda)+' (cuota '+(c.cuota||'')+') de la póliza '+(p.numero||'')+'. ¡Gracias por tu confianza!'});}
+        const reconciled=!!(applied&&/^APPLIED_/.test(String(applied.applicationState||'')));
+        const cartera=applied&&applied.portfolioUpdated===true
+          ? ' La obligación quedó pagada y descargada de cartera.'
+          : ' Verifica el reflejo de cartera de este requerimiento.';
+        const paymentResult=reconciled
+          ? '✓ Pago registrado y conciliado con la aseguradora.'
+          : '✓ Pago del cliente registrado. La aplicación por la aseguradora puede conciliarse después; no es un pago pendiente.';
+        const documentaryHold=pendingEvidence.length
+          ? ' No se guardó: '+pendingEvidence.join(' y ')+'. Conserva el archivo y completa el adjunto cuando Drive esté disponible.'
+          : docsOk?'':' Un documento requiere recuperación controlada.';
+        close();U.toast(paymentResult+cartera+documentaryHold);baseCache=null;
+        if(avisar&&Orbit.notify&&cli&&cli.id){Orbit.notify.pedir(cli.id,{tipo:'Aviso de pago confirmado',icon:'💳',asunto:'Confirmación de pago · póliza '+(p.numero||''),mensaje:'Hola '+(cli.nombre||'')+', registramos tu pago de '+U.money(c.monto,c.moneda)+' (cuota '+(c.cuota||'')+') de la póliza '+(p.numero||'')+'. ¡Gracias por tu confianza!'});}
         /* B3-004 R14: router/store reactive owner preserves the active payment context. */
       } catch (error) {
         const feedback = paymentFailureFeedback(error);

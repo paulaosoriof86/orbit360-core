@@ -3566,6 +3566,35 @@
           "gitBlobSha": "7aa643d8d6d8170044e11ef7adc0f4a5c23fd8b8"
         }
       ]
+    },
+    {
+      "id": "I6_6_CLIENT_PAYMENT_CANONICAL_PAID_WITH_OPTIONAL_DOCUMENT_RECOVERY_20261120",
+      "approvedByDirection": true,
+      "receipt": "Paula Dirección, 20-nov-2026: aplicar pago del cliente directamente al requerimiento, descargar cartera incluso cuando falte conciliación aseguradora; adjuntos opcionales no deben paralizar la transacción; cuando ya exista factura y fecha, pagar y conciliar en una única operación, conservar evidencia, sin repetir pagos. Solo modifica la interfaz de Cobros y mantiene los contratos de seguridad y servidor, con signed Preview/LIVE obligatorios.",
+      "sourceStatus": "SOURCE_PATCH_NEEDS_SIGNED_PREVIEW_REAL_ROLE_AND_SAME_ARTIFACT_LIVE",
+      "capabilityOwners": [
+        "COBROS_PRIMARY_RUNTIME",
+        "RECIBOS_CARTERA_PRIMARY_RUNTIME",
+        "DOCUMENT_DRIVE_TENANT_STATE_ERRORS"
+      ],
+      "scope": "Optional file upload failures must not prevent a server-authorized direct payment. Show explicit truthful document failure, do not invent attachment, and preserve submitted paidDate/applicationDate/invoice fields. After confirmed operation, display direct paid state separately from insurer reconciliation; guard original receipt, no second writer, no backend/permissions change. Persist and reload on signed actors before LIVE promotion.",
+      "paths": [
+        {
+          "path": "orbit360-platform/modules/cobros.js",
+          "gitBlobSha": "f410e0f0f23c399a0d9f574fa9d1279801d3542c",
+          "replaces": {
+            "path": "orbit360-platform/modules/cobros.js",
+            "priorGitBlobSha": "fd769c5a3fc684f00eb25dfb0ea36294d1914b38",
+            "priorChangeId": "I6_6_ISSUED_RENEWAL_TERMS_AND_EXISTING_PAYMENT_MESSAGE_20261120"
+          }
+        }
+      ],
+      "tests": [
+        {
+          "path": "tools/gravicentra-i6-6-payment-optional-evidence.test.cjs",
+          "gitBlobSha": "519a0a7089336f33c279fb7ba113f8863e0509f4"
+        }
+      ]
     }
   ],
   "i66R11PreviewBuildRequest20261113": {
