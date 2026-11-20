@@ -14,7 +14,7 @@ const srcFs=require('node:fs');
 const domain=srcFs.readFileSync('functions/product-ops-leads-domain.js','utf8');
 assert.match(domain,/collabDirection=entityType==='negocios'\?collaborationWriteDirection\(before,after\):''/,'NO_STALE_COLLABORATION_DIRECTION_ON_UNRELATED_SAVE');
 assert.match(domain,/eventId:collabDirection&&collab&&collab.eventId\?text\(collab.eventId,180\):eventId/,'SAME_CANONICAL_EVENT_INBOX_AND_COMMENT');
-const cyc=grab('orbit360-platform/core/ciclo.js','function collaborationState(n,board){','function actionQueueRanks(board){','collaborationState',{Orbit:{sharedInboxState:{lookup:()=>({known:true,globalResolved:false})}}});
+const cyc=grab('orbit360-platform/core/ciclo.js','function collaborationOwner(record) {','function actionQueueRanks(board){','collaborationState',{Orbit:{sharedInboxState:{lookup:()=>({known:true,globalResolved:false})}}});
 const thread=[{direction:'operations',eventId:'operations-request'},{direction:'advisor',eventId:'advisor-return'}];
 assert.equal(cyc.collaborationState({comentarios:thread},'ops').needsAction,false,'OLD_OPERATIONS_TURN_NOT_CURRENT');
 assert.equal(cyc.collaborationState({comentarios:thread},'leads').needsAction,true,'LATEST_ADVISOR_TURN_CURRENT');
