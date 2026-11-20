@@ -11,6 +11,7 @@ const ALLOWED_ORIGINS=new Set([
   'https://ays-orbit-360-lab.web.app',
   'https://ays-orbit-360-lab.firebaseapp.com',
   'https://ays-web-publica.web.app',
+  'https://ays-alys-gt-v1--alys-q46-1113-9n5qjflr.web.app',
   'https://aysseguros.com'
 ]);
 
