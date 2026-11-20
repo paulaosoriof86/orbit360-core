@@ -19,12 +19,12 @@ jobs:
     env:
       I66_VERIFY_CORADO_QUEUE: '1'
       I66_VERIFY_COLLABORATION_ROUNDTRIP: '1'
-      I66_PREVIEW_ORIGIN: https://ays-orbit-360-lab--gi-i66-rc-44674734296-49x74zh3.web.app
-      I66_SIGNED_QA_CHANNEL_ID: gi-i66-rc-44674734296
-      I66_SOURCE_SHA: 7791f34cf2574d1915701ee22cf3993e8de79249
-      EXPECTED_BUILD_RUN: '44674734296'
-      EXPECTED_ARTIFACT_ID: '14601447337'
-      EXPECTED_ARTIFACT_DIGEST: sha256:f89a57e5972150cacbe6ad21f1e591ea32f879fb85945b4cd18d4da0a773d3a7
+      I66_PREVIEW_ORIGIN: https://ays-orbit-360-lab--gi-i66-rc-44799887193-3x3mt2y8.web.app
+      I66_SIGNED_QA_CHANNEL_ID: gi-i66-rc-44799887193
+      I66_SOURCE_SHA: ab99e4474cea1ef7d08d2359966e6aa8d81e061b
+      EXPECTED_BUILD_RUN: '44799887193'
+      EXPECTED_ARTIFACT_ID: '14661315988'
+      EXPECTED_ARTIFACT_DIGEST: sha256:fe63c6ea2bb77761ce7cd8e31a8171b3637e8bc6c0f40e22c1f55237e6ff8054
       SA_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
       SA_ALT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
       SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
@@ -66,7 +66,7 @@ jobs:
             assert.equal(artifact.expired,false,'ARTIFACT_EXPIRED');
             assert.equal(preview.sourceSha,process.env.I66_SOURCE_SHA,'PREVIEW_SOURCE_DRIFT');
             assert.match(String(live.sourceSha||''),/^[0-9a-f]{40}$/,'LIVE_BACKUP_MARKER_MISSING');
-            assert.equal(live.sourceSha,'9c689bd283793a635f6a94197351b3fe0ecf2da9','LIVE_BACKUP_CHANGED');
+            assert.equal(live.sourceSha,'7791f34cf2574d1915701ee22cf3993e8de79249','LIVE_BACKUP_CHANGED');
             console.log('I66_NO_LIVE_ACCEPTANCE_CLAIM_FROM_THIS_PREVIEW_UAT');
             console.log('I66_EXACT_PREVIEW_PACKAGE_PASS_CURRENT_LIVE_PROVENANCE_SEPARATE_HOLD');
           })().catch(e=>{console.error(e.stack||e);process.exitCode=1;});
@@ -76,6 +76,17 @@ jobs:
           set -euo pipefail
           node --test tools/gravicentra-i6-6-manual-policy-capture-p0.test.cjs tools/gravicentra-i6-6-ops-activity-direct-vehicle-endorsement.test.cjs tools/gravicentra-i6-6-documented-premium-terms.test.cjs
           node --test tools/gravicentra-i6-6-operational-renewal-entry.test.cjs tools/gravicentra-i6-6-carlos-ops-tasks-transversal.test.cjs tools/gravicentra-i6-6-cliente360-advisor-source-parity.test.cjs tools/gravicentra-i6-6-crm-shadow-advisor-source.test.cjs tools/gravicentra-i6-6-client-edit-activity-country-persistence.test.cjs
+      - name: Check renewal and payment behavior against the bytes served by this Preview
+        run: |
+          set -euo pipefail
+          proof="$RUNNER_TEMP/gi-i66-hosted-check"
+          mkdir -p "$proof/tools" "$proof/orbit360-platform/modules"
+          for module in cobros.js issuance-endosos-v1201-bridge.js renewals-v1200-operational-bridge.js; do
+            curl --fail --silent --show-error --max-time 30 "$I66_PREVIEW_ORIGIN/modules/$module" -o "$proof/orbit360-platform/modules/$module"
+            cmp "$proof/orbit360-platform/modules/$module" "orbit360-platform/modules/$module"
+          done
+          cp tools/gravicentra-i6-6-operational-renewal-entry.test.cjs tools/gravicentra-i6-6-cobros-payment-failure-category.test.cjs "$proof/tools/"
+          node --test "$proof"/tools/*.test.cjs
       - name: Install signed browser dependencies without source changes
         id: browser_setup
         run: |
@@ -84,8 +95,8 @@ jobs:
           node node_modules/playwright/cli.js install --with-deps chromium >/dev/null
       - name: Carlos and Dirección signed actual Editar Cliente phone/advisor/atomic country activity durable write reload and cleanup
         env:
-          I66_SIGNED_CLIENT_EDIT_ORIGIN: https://ays-orbit-360-lab--gi-i66-rc-44674734296-49x74zh3.web.app
-          I66_SIGNED_CLIENT_EDIT_SOURCE: 7791f34cf2574d1915701ee22cf3993e8de79249
+          I66_SIGNED_CLIENT_EDIT_ORIGIN: https://ays-orbit-360-lab--gi-i66-rc-44799887193-3x3mt2y8.web.app
+          I66_SIGNED_CLIENT_EDIT_SOURCE: ab99e4474cea1ef7d08d2359966e6aa8d81e061b
         run: node tools/gravicentra-i6-6-carlos-client-edit-signed-synthetic-uat.cjs
       - name: Real-role signed Preview Ops Leads Tasks transactional writes and restoration
         if: ${{ !cancelled() && steps.browser_setup.outcome == 'success' }}
