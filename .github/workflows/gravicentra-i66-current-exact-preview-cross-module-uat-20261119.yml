@@ -4,6 +4,7 @@ on:
     branches: [recovery/fase-a-clean-20260831]
     paths:
       - .github/workflows/gravicentra-i66-current-exact-preview-cross-module-uat-20261119.yml
+      - tools/gravicentra-i6-6-carlos-client-edit-signed-synthetic-uat.cjs
 permissions:
   contents: read
   actions: read
