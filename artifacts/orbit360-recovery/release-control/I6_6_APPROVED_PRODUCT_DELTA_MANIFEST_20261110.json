@@ -3542,6 +3542,30 @@
           }
         }
       ]
+    },
+    {
+      "id": "I6_6_IMPORT_REVIEW_SOURCE_ROWS_ONLY_20261120",
+      "approvedByDirection": true,
+      "receipt": "Dirección, I6.6 20/11/2026, apartados 4, 9 y 10. Reproducción desde la ficha Cliente 360 con PDF original y sin confirmar el mapeo.",
+      "sourceStatus": "SOURCE_PENDING_SIGNED_PREVIEW_AND_EXACT_LIVE",
+      "scope": "Require rows read from the selected source before confirming a structured import. Retain document-only Drive and existing canonical source-intake owners. No contractual values or financial writes in source QA.",
+      "paths": [
+        {
+          "path": "orbit360-platform/core/importa.js",
+          "gitBlobSha": "888aa5030af37b18f914aeb91c54a7a2f84ee1a2",
+          "replaces": {
+            "path": "orbit360-platform/core/importa.js",
+            "priorGitBlobSha": "3009c50f83806666a2a75d543e03936d52ac9ae1",
+            "priorChangeId": "I6_6_AUTHENTICATED_INCREMENTAL_SOURCE_INTAKE_V2_20261117"
+          }
+        }
+      ],
+      "tests": [
+        {
+          "path": "tools/gravicentra-i6-6-import-source-preview.test.cjs",
+          "gitBlobSha": "7aa643d8d6d8170044e11ef7adc0f4a5c23fd8b8"
+        }
+      ]
     }
   ],
   "i66R11PreviewBuildRequest20261113": {

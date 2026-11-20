@@ -1344,6 +1344,18 @@
       "linkedIncidentRegister": "carlosOperationalIncident20261119.userReportedFindings",
       "totalComplaintGroups": 9
     },
-    "latestBusinessReadbackCommit": "2da666a14cfa0c922ef4c14f4a07033d7be7511c"
+    "latestBusinessReadbackCommit": "2da666a14cfa0c922ef4c14f4a07033d7be7511c",
+    "importerLiveIncident": {
+      "role": "Dirección",
+      "entryPoint": "Cliente 360 > Crear póliza > Importar documento",
+      "sourceReference": "I6_6_ROBLE_ISSUED_FIVE_20261119.json#editions[0]",
+      "sourceDigestVerified": true,
+      "expectedDocumentRequirements": 12,
+      "rowsFromExampleCatalogShown": 3,
+      "mappingConfirmationClicked": false,
+      "customerWrites": 0,
+      "originatedFromStaticSampleFallback": true,
+      "hostedCorrectionAccepted": false
+    }
   }
 }

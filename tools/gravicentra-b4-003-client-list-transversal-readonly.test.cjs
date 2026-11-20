@@ -153,8 +153,10 @@ const denied=async(fn,code)=>assert.rejects(fn,e=>e instanceof Denied&&e.code===
    'Operativo vehicle portfolio matches the approved policy scope');checks++;
   assert.equal(scopeFor('opLegacyOwn','recibosEsperados').scope,'all',
    'Confirmed financial portfolio: Operativo reads authorized-country expected receipts');checks++;
-  assert.equal(scopeFor('opModuleOwn','reclamos').scope,'own',
-   'Another collection sharing module cliente360 must not widen');checks++;
+  assert.equal(scopeFor('opModuleOwn','reclamos').scope,'all',
+   'I6.6 privileged claims portfolio follows the authorized country and role ceiling');checks++;
+  assert.throws(()=>scopeFor('opModuleNone','reclamos'), e=>e instanceof Denied,
+   'Explicit module denial also blocks claims');checks++;
   assert.equal(scopeFor('opLegacyOwn','clientes',{roleScopes:{operativo:'team'}}).scope,'own',
    'Explicit central role ceiling not silently overridden');checks++;
   assert.equal(allowRow(scopeFor('opLegacyOwn'),{tenantId,pais:'CO',asesorId:'aOther'}),true);checks++;

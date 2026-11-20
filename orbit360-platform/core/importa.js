@@ -89,7 +89,7 @@ Orbit.importa = (function () {
   function loadLib(url, globalName) {
     if (window[globalName]) return Promise.resolve(window[globalName]);
     if (_libs[url]) return _libs[url];
-    _libs[url] = new Promise((res, rej) => { const s = document.createElement('script'); s.src = url; s.onload = () => res(window[globalName]); s.onerror = () => rej(new Error('load ' + url)); document.head.appendChild(s); });
+    _libs[url] = new Promise((res, rej) => { const s = document.createElement('script'); s.src = url; s.onload = () => window[globalName] ? res(window[globalName]) : rej(new Error('load ' + globalName)); s.onerror = () => rej(new Error('load ' + url)); document.head.appendChild(s); }).catch(error => { delete _libs[url]; throw error; });
     return _libs[url];
   }
   /* matriz (Excel) -> {headers, rows} */
@@ -1003,6 +1003,14 @@ Orbit.importa = (function () {
       </div>
       <div class="imp-note">${state.modo === 'documental' ? '📁 Modo documental: el archivo se guardará en <b>Drive únicamente después de confirmar</b> y de recibir readback del proveedor documental. Si Drive no está conectado, la operación se bloquea sin falso éxito.' : '🧠 Modo inteligente: reconoce el formato, <b>extrae los datos y los mapea</b> a Orbit 360 (cruza y complementa sin duplicar). Para documentos de expediente, el archivo original también debe quedar confirmado en Drive.'}</div>`;
   }
+  function canConfirmImport() {
+    if (!(state.filesReal && state.filesReal.length)) return false;
+    if (state.modo === 'documental' || state.kind === 'docs-aseguradora') return true;
+    const parsed = state.parsed;
+    return Boolean(IMPORT_MAP[state.kind] && parsed && parsed.rows.length &&
+      Object.keys(mapHeaders(state.kind, parsed.headers)).length);
+  }
+
   function step2(m) {
     if (isSourceIntake()) return '<div data-source-intake-host role="status">Cargando revisión documental de conciliación…</div>';
     if (state.kind === 'docs-aseguradora') {
@@ -1024,6 +1032,9 @@ Orbit.importa = (function () {
           <div class="cfg-note" style="margin-top:12px"><b>${state.modo==='documental'?'Archivo listo para guardar':'Análisis completado'}:</b> ${state.modo==='documental'?'se conservará en Drive sin interpretar su contenido.':'se leyó el contenido y se propuso la clasificación mostrada arriba. '+(state.insurerAnalysis&&state.insurerAnalysis.needsReview?'Ramo o producto todavía necesitan confirmación.':'La propuesta tiene dimensiones reconocidas para revisión.')} Al confirmar, el archivo quedará en Drive como <b>Documento recibido · requiere validación</b>. Ninguna tarifa se aplicará ni se habilitará automáticamente.</div>
         </div>`;
     }
+    if (state.modo === 'documental') {
+      return scopeBanner(state.kind) + '<div class="imp-note">Archivo listo para revisar y guardar en Drive.</div>';
+    }
     // Base de datos inicial: si aún no se resolvió a una entidad real, hacerlo aquí (nunca mostrar la tabla de ejemplo)
     if (state.kind === 'base-inicial' && state.parsed && state.parsed.headers && state.parsed.headers.length) {
       let best = 'clientes', score = -1;['clientes', 'polizas', 'vehiculos', 'movimientos-finanzas', 'estados-cuenta'].forEach(k => { const n = Object.keys(mapHeaders(k, state.parsed.headers)).length; if (n > score) { score = n; best = k; } });
@@ -1038,12 +1049,15 @@ Orbit.importa = (function () {
         <label class="ce-l">Póliza de auto<select class="o-sel" style="width:100%">${Orbit.store.where('polizas', p => p.ramo === 'Auto').slice(0, 8).map(p => `<option>${p.numero}</option>`).join('') || '<option>—</option>'}</select></label>
       </div></div>` : '';
     const real = (state.parsed && IMPORT_MAP[state.kind]) ? realPreview(state.kind) : null;
-    const cols = real ? real.cols : m.cols;
-    const sample = real ? real.rows : m.sample;
-    const nReg = real ? real.total : (m.sample.length + '+');
+    if (!real || !real.total) {
+      return scopeB + scopeNote + '<div class="imp-note" role="alert">No se extrajeron registros del archivo. Puedes volver a seleccionar el documento o usar «Solo guardar» para conservarlo en Drive.</div>';
+    }
+    const cols = real.cols;
+    const previewRows = real.rows;
+    const nReg = real.total;
     // Conciliación: computar desde datos REALES si hay archivo; si no, mostrar ejemplo
     const det = (m.conciliacion || state.kind === 'estados-banco') ? (state.parsed ? conciliarRows(state.kind) : null) : null;
-    const detData = det ? { noCreados: det.noCreados.map(r => [r.numeroRecibo || r.concepto || '—', r.polizaNumero || (r.polizaId ? (Orbit.store.get('polizas', r.polizaId) || {}).numero : '') || '—', r._motivo || '', U.money ? U.money(r.monto || 0, r.moneda || 'GTQ') : (r.monto || 0)]), noAplicados: det.noAplicados.map(r => [r.numeroRecibo || '—', (Orbit.store.get('polizas', r.polizaId) || {}).numero || '—', r._motivo || '', U.money ? U.money(r.monto || 0, r.moneda || 'GTQ') : (r.monto || 0)]) } : (m.detect || null);
+    const detData = det ? { noCreados: det.noCreados.map(r => [r.numeroRecibo || r.concepto || '—', r.polizaNumero || (r.polizaId ? (Orbit.store.get('polizas', r.polizaId) || {}).numero : '') || '—', r._motivo || '', U.money ? U.money(r.monto || 0, r.moneda || 'GTQ') : (r.monto || 0)]), noAplicados: det.noAplicados.map(r => [r.numeroRecibo || '—', (Orbit.store.get('polizas', r.polizaId) || {}).numero || '—', r._motivo || '', U.money ? U.money(r.monto || 0, r.moneda || 'GTQ') : (r.monto || 0)]) } : null;
     const isAI = state.parsed && state.parsed.ai;
     const mapNote = real ? ('<div class="imp-note" style="margin-top:0;margin-bottom:10px">' + (isAI
       ? ('🧠 <b>Extracción inteligente (IA):</b> leí el documento y estructuré <b>' + real.total + ' registros</b> de <b>' + U.esc(state.files[0] || 'tu archivo') + '</b> detectando los campos automáticamente.')
@@ -1061,11 +1075,11 @@ Orbit.importa = (function () {
       ${dr.errores.length ? `<div style="padding:9px 13px;border-top:1px solid var(--line);background:rgba(197,22,46,.05)"><b style="font-size:12px;color:var(--danger,#C5162E)">⚠ ${dr.errores.length} fila(s) con avisos:</b><div style="max-height:120px;overflow:auto;margin-top:5px">${dr.errores.slice(0, 12).map(e => `<div style="font-size:11.5px;color:var(--ink-2)">Fila ${e.fila}: ${U.esc(e.motivo)}</div>`).join('')}${dr.errores.length > 12 ? `<div class="muted" style="font-size:11px">…y ${dr.errores.length - 12} más</div>` : ''}</div></div>` : '<div style="padding:8px 13px;border-top:1px solid var(--line);font-size:12px;color:var(--ok,#1F8A5B)">✓ Sin errores de formato. La dedup evita duplicados (actualiza en vez de duplicar).</div>'}
     </div>` : '';
     return `${scopeB}${scopeNote}${mapNote}<p class="imp-desc">Detectamos y mapeamos estos registros. Revisa antes de confirmar.</p>
-      <div class="imp-scan"><span class="imp-spark">🧠</span> Extracción ${state.iterado ? 'refinada (' + state.iterado + 'ª pasada)' : 'completada'} · <b>${nReg} registros</b> reconocidos · 0 errores de formato.<button class="btn ghost sm" id="imp-reporte" style="margin-left:auto">⬇ Reporte</button><button class="btn ghost sm" id="imp-iterar">🔄 Iterar / mejorar</button></div>
+      <div class="imp-scan"><span class="imp-spark">🧠</span> Extracción ${state.iterado ? 'refinada (' + state.iterado + 'ª pasada)' : 'completada'} · <b>${nReg} registros</b> leídos del archivo.<button class="btn ghost sm" id="imp-reporte" style="margin-left:auto">⬇ Reporte</button><button class="btn ghost sm" id="imp-iterar">🔄 Iterar / mejorar</button></div>
       ${state.hojas ? `<div class="cfg-note" style="margin-top:10px">📑 <b>${(state.hojas.procesadas || []).length}</b> hoja(s) procesada(s)${(state.hojas.procesadas || []).length ? ' · ' + state.hojas.procesadas.map(h => U.esc(h.hoja) + ' (' + h.filas + ' filas' + (h.pais !== '—' ? ', ' + h.pais + '/' + h.moneda : '') + (h.periodo !== '—' ? ', ' + h.periodo : '') + ')').join(' · ') : ''}${(state.hojas.excluidas || []).length ? `<br>🚫 <b>${state.hojas.excluidas.length}</b> hoja(s) excluida(s): ` + state.hojas.excluidas.map(h => U.esc(h.hoja) + ' — ' + U.esc(h.motivo)).join(' · ') : ''}</div>` : ''}
       ${drCard}
       <div class="card" style="overflow:hidden;margin-top:12px"><div style="overflow-x:auto"><table class="tbl" style="min-width:max-content"><thead><tr>${cols.map(c => `<th style="white-space:nowrap">${U.esc(c)}</th>`).join('')}</tr></thead>
-        <tbody>${sample.map(row => `<tr>${row.map((cell, i) => `<td${i === 0 ? ' style="font-weight:600"' : ''}>${U.esc(cell)}</td>`).join('')}</tr>`).join('')}</tbody></table></div></div>
+        <tbody>${previewRows.map(row => `<tr>${row.map((cell, i) => `<td${i === 0 ? ' style="font-weight:600"' : ''}>${U.esc(cell)}</td>`).join('')}</tr>`).join('')}</tbody></table></div></div>
       ${assoc}
       ${detData ? `
         <div class="imp-detect">
@@ -1327,10 +1341,11 @@ Orbit.importa = (function () {
     if(insurerVersion) insurerVersion.addEventListener('input',e=>state.insurerDocVersion=e.target.value);
     if(insurerVigencia) insurerVigencia.addEventListener('input',e=>state.insurerDocVigencia=e.target.value);
     const fileInput = dr.querySelector('#imp-file');
-    if (fileInput) fileInput.addEventListener('change', e => {
-      const files = [...e.target.files];
+    function readFiles(fileList) {
+      const files = Array.from(fileList || []);
       state.files = files.map(f => f.name);
       state.filesReal = files; state.parsed = null; state.processing = null;
+      state.manualMap = null; state.detectedRates = null; state.aplicarTarifas = false;
       const fl = dr.querySelector('#imp-files');
       if (fl) fl.innerHTML = state.files.map(n => `<span class="mail-chip">📎 ${U.esc(n)}</span>`).join('');
       if (!files.length) return;
@@ -1439,9 +1454,9 @@ Orbit.importa = (function () {
           try { const out = await Tesseract.recognize(f0, 'spa+eng'); if(state.kind==='docs-aseguradora')await procesarTexto(out.data.text);else{state.parsed = textToParsed(out.data.text, state.kind);goPreview();} } catch (err) { fail('No se pudo procesar la imagen'); }
         }).catch(() => fail('No se pudo cargar el OCR')); return;
       }
-      // otro formato: vista de ejemplo
-      setTimeout(() => { state.step = 2; paint(); }, 300);
-    });
+      fail('Formato sin extracción disponible.');
+    }
+    if (fileInput) fileInput.addEventListener('change', e => readFiles(e.target.files));
     if (drop) {
       // clic en el área (no en el botón-label) abre el selector de archivo real
       drop.addEventListener('click', e => { if (e.target.closest('label')) return; if (fileInput) fileInput.click(); });
@@ -1449,17 +1464,7 @@ Orbit.importa = (function () {
       drop.addEventListener('dragleave', () => drop.classList.remove('over'));
       drop.addEventListener('drop', e => {
         e.preventDefault(); drop.classList.remove('over');
-        const files = Array.from(e.dataTransfer && e.dataTransfer.files || []);
-        state.files = files.map(f => f.name);
-        state.filesReal = files;
-        state.parsed = null;
-        if (!files.length) return;
-        if (state.modo === 'documental') { state.step = 2; paint(); return; }
-        const synthetic = document.createElement('input');
-        synthetic.type = 'file';
-        const fl = dr.querySelector('#imp-files');
-        if (fl) fl.innerHTML = state.files.map(n => `<span class="mail-chip">📎 ${U.esc(n)}</span>`).join('');
-        state.step = 2; paint();
+        readFiles(e.dataTransfer && e.dataTransfer.files);
       });
     }
     if (isSourceIntake()) {
@@ -1486,13 +1491,14 @@ Orbit.importa = (function () {
       // botón continuar al pie
       const body = dr.querySelector('.imp-body');
       const bar = document.createElement('div'); bar.style.cssText = 'display:flex;gap:8px;justify-content:flex-end;margin-top:16px';
-      bar.innerHTML = `<button class="btn ghost" id="imp-back2">Atrás</button><button class="btn primary" id="imp-next2">${state.kind === 'docs-aseguradora' ? 'Revisar y guardar →' : 'Confirmar mapeo →'}</button>`;
+      const canContinue = canConfirmImport();
+      bar.innerHTML = `<button class="btn ghost" id="imp-back2">Atrás</button><button class="btn primary" id="imp-next2" ${canContinue ? '' : 'disabled'}>${state.kind === 'docs-aseguradora' ? 'Revisar y guardar →' : 'Confirmar mapeo →'}</button>`;
       body.appendChild(bar);
       bar.querySelector('#imp-back2').addEventListener('click', () => { state.step = 1; paint(); });
-      bar.querySelector('#imp-next2').addEventListener('click', () => { state.step = 3; paint(); });
+      bar.querySelector('#imp-next2').addEventListener('click', () => { if (canConfirmImport()) { state.step = 3; paint(); } });
     }
     const fin = dr.querySelector('#imp-finish'); if (fin) fin.addEventListener('click', async () => {
-      if (fin.disabled) return;
+      if (fin.disabled || !canConfirmImport()) return;
       let msg = '';
       const kind = state.kind;
       const cfgFin = IMPORT_MAP[kind];
