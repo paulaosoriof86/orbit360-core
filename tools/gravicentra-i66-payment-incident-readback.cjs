@@ -81,6 +81,24 @@ async function read() {
       for (const collection of ['recibosEsperados','comisiones','finmovs']) {
         const linked = await items(collection).where('polizaId','==',policy.id).limit(121).get();
         assert.ok(linked.size < 121,'LINKED_COLLECTION_BOUND');
+        if(collection==='recibosEsperados'){
+          const expectedSource = caseId==='ROBLE_NOV20_0001' ? '0f31141ac773f188328e5b8ff052e3e4f965da6d9199b0931ef083121bc753b6' : '078593a923e602118f7075ab712979f517561c9711b6bb13f691dde1d52c795c';
+          const referenceMatches = linked.docs.filter(doc => {
+            const receipt=doc.data();
+            return [receipt.numeroReciboFuente,receipt.numeroRequerimiento,receipt.requerimiento,receipt.referenciaAseguradora]
+              .filter(Boolean).some(value => require('node:crypto').createHash('sha256')
+                .update('ROBLE|'+row.policy+'|'+String(value).trim()).digest('hex') === expectedSource);
+          });
+          result.settledSourceReceiptMatches=referenceMatches.length;
+          if(referenceMatches.length===1){
+            const target=referenceMatches[0], receipt=target.data();
+            result.sourceReceiptAssignedToExpected=expected.has(receipt.asesorId);
+            result.sourceReceiptPaid=paid(receipt);
+            const issued=await items('cobros').where('reciboId','==',target.id).limit(6).get();
+            assert.ok(issued.size<6,'SOURCE_RECEIPT_PAYMENTS_BOUND');
+            result.linkedPayments=issued.size;
+          }
+        }
         result[collection] = {count:linked.size,
           rowsWithAdvisor:linked.docs.filter(doc=>Boolean(doc.data().asesorId)).length,
           expectedAdvisor:linked.docs.filter(doc=>expected.has(doc.data().asesorId)).length};
