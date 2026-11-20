@@ -118,7 +118,13 @@
       "title": "Póliza nueva El Roble - 91-4143471 - 2026-09-21 a 2027-09-21.pdf",
       "start": "2026-09-21",
       "end": "2027-09-21",
-      "kind": "ISSUED_NEW"
+      "kind": "ISSUED_NEW",
+      "documentPartyReadback": {
+        "policyholderAndRegisteredVehicleOwner": "SAME",
+        "policyholderSource": "issued certificate or endorsement",
+        "vehicleOwnerSource": "vehicle registration or individual vehicle certificate",
+        "creatingPolicyOrReceiptFromFilenameAuthorized": false
+      }
     },
     {
       "policy": "91-8324489",
@@ -237,7 +243,13 @@
       "title": "Renovación El Roble - 91-8324489 - 2026-11-16 a 2027-11-16.pdf",
       "start": "2026-11-16",
       "end": "2027-11-16",
-      "kind": "ISSUED_RENEWAL"
+      "kind": "ISSUED_RENEWAL",
+      "documentPartyReadback": {
+        "policyholderAndRegisteredVehicleOwner": "SAME",
+        "policyholderSource": "issued certificate or endorsement",
+        "vehicleOwnerSource": "vehicle registration or individual vehicle certificate",
+        "creatingPolicyOrReceiptFromFilenameAuthorized": false
+      }
     },
     {
       "policy": "91-8342189",
@@ -356,7 +368,13 @@
       "title": "Renovación El Roble - 91-8342189 - 2026-11-12 a 2027-11-12.pdf",
       "start": "2026-11-12",
       "end": "2027-11-12",
-      "kind": "ISSUED_RENEWAL"
+      "kind": "ISSUED_RENEWAL",
+      "documentPartyReadback": {
+        "policyholderAndRegisteredVehicleOwner": "DISTINCT",
+        "policyholderSource": "issued certificate or endorsement",
+        "vehicleOwnerSource": "vehicle registration or individual vehicle certificate",
+        "creatingPolicyOrReceiptFromFilenameAuthorized": false
+      }
     },
     {
       "policy": "91-8343059",
@@ -475,7 +493,13 @@
       "title": "Renovación El Roble - 91-8343059 - 2026-11-27 a 2027-11-27.pdf",
       "start": "2026-11-27",
       "end": "2027-11-27",
-      "kind": "ISSUED_RENEWAL"
+      "kind": "ISSUED_RENEWAL",
+      "documentPartyReadback": {
+        "policyholderAndRegisteredVehicleOwner": "SAME",
+        "policyholderSource": "issued certificate or endorsement",
+        "vehicleOwnerSource": "vehicle registration or individual vehicle certificate",
+        "creatingPolicyOrReceiptFromFilenameAuthorized": false
+      }
     },
     {
       "policy": "91-8357452",
@@ -495,7 +519,13 @@
       "title": "Renovación El Roble - 91-8357452 - 2026-10-27 a 2027-10-27.pdf",
       "start": "2026-10-27",
       "end": "2027-10-27",
-      "kind": "ISSUED_RENEWAL"
+      "kind": "ISSUED_RENEWAL",
+      "documentPartyReadback": {
+        "policyholderAndRegisteredVehicleOwner": "DISTINCT",
+        "policyholderSource": "issued certificate or endorsement",
+        "vehicleOwnerSource": "vehicle registration or individual vehicle certificate",
+        "creatingPolicyOrReceiptFromFilenameAuthorized": false
+      }
     }
   ]
 }
