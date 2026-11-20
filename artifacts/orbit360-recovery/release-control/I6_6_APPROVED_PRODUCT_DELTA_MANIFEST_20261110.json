@@ -3477,6 +3477,15 @@
         {
           "path": "tools/gravicentra-i6-6-ops-collaboration-owner.test.cjs",
           "gitBlobSha": "9defd98552b65498b0352b99b7575458bf19e3b8"
+        },
+        {
+          "path": "tools/gravicentra-i6-6-ops-leads-inbox-projection.test.cjs",
+          "gitBlobSha": "99d49217e172a35d73e259b060f64f62dcd685ed",
+          "replaces": {
+            "path": "tools/gravicentra-i6-6-ops-leads-inbox-projection.test.cjs",
+            "priorGitBlobSha": "b036fbbf7827305d9a998ec645406c98d4496b3a",
+            "priorChangeId": "I6_6_OPS_INBOX_PENDING_LEADS_PROJECTION"
+          }
         }
       ]
     }
