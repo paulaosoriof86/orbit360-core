@@ -406,7 +406,6 @@ Orbit.__crmV1198GuardDiagnostics = guardDiagnostics;
         const c = baseStore().get('clientes', cid);
         if (!c || !A.canView('clientes', c, 'cliente360')) return toast('Cliente fuera de tu alcance');
         if (!A.can('cliente360', 'edit')) return completeMissingClient(cid);
-        const before = JSON.parse(JSON.stringify(c));
         original(cid);
         const back = document.getElementById('c360-edit'), save = back && back.querySelector('#ce-save');
         if (!save) return;
@@ -414,10 +413,9 @@ Orbit.__crmV1198GuardDiagnostics = guardDiagnostics;
         save.addEventListener('click', function gate(e) {
           const motivo = (window.prompt('Motivo del cambio (obligatorio):', '') || '').trim();
           if (!motivo) { e.preventDefault(); e.stopImmediatePropagation(); toast('Se requiere motivo para guardar'); return; }
-          setTimeout(() => {
-            const after = baseStore().get('clientes', cid);
-            A.audit('editar', 'clientes', cid, before, after, motivo);
-          }, 0);
+          // The canonical client+activity transaction owns audit only after commit.
+          // Never publish an optimistic activity based on a failed write.
+          back.dataset.pendingAuditReason = motivo;
         }, true);
       };
     }
