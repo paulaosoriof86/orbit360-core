@@ -1,0 +1,242 @@
+{
+  "schema": "GRAVICENTRA_I6_6_INSURER_SOURCE_BULK_V1",
+  "status": "OWNER_RULES_FROZEN_SOURCE_ROWS_VERIFIED",
+  "tenantId": "alianzas-soluciones",
+  "projectId": "ays-orbit-360-lab",
+  "ownerRuleReference": "PAULA_EXPLICIT_2026-11-18_REQUIREMENT_PER_RECEIPT_AND_GROSS_SOURCE_PRECEDENCE; PAULA_EXPLICIT_2026-11-19_INSURER_STATEMENT_PERIOD_DUE_REQUIREMENT_AND_CURRENCY_PREVAIL_WITH_DEDUPE",
+  "documents": [
+    {
+      "filename": "Mapfre - Recaudos pendientes - Noviembre 2026.xls",
+      "bytes": 9199,
+      "fileId": "1tililHqGhdlifR9dDpLK5bgOls5b7DRh",
+      "driveModifiedAt": "2026-11-17T04:59:25.874Z",
+      "sha256": "2c155b914cd380be92dbf43965d4b092c160274799dd2cb3bc38981072a3035c",
+      "hashStatus": "RAW_BYTES_SHA256_VERIFIED_2026_11_19",
+      "sourceRows": 17,
+      "uniqueRequirements": 17
+    },
+    {
+      "filename": "Estado de cuenta La Ceiba al 09 de noviembre.xlsx",
+      "bytes": 3788,
+      "mimeType": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      "driveModifiedAt": "2026-11-09T19:50:51.866Z",
+      "hashStatus": "RAW_BYTES_SHA256_VERIFIED_2026_11_10",
+      "identityStatus": "DRIVE_METADATA_AND_RAW_HASH_PASS",
+      "sha256": "0396615a394859ce39a0694567747e4dec3cc0e34a415222d5cf4d009cda5ac0",
+      "driveFileId": "1B5XupnxyFOGlXNJxy9-4cIZCQX2mjs7m",
+      "source": "LA CEIBA"
+    }
+  ],
+  "verifiedSourceRowCount": 19,
+  "verifiedDistinctPolicyCount": 7,
+  "verifiedGrossCents": 1191691,
+  "rows": [
+    {
+      "caseId": "MAPFRE_NOV17_0010",
+      "insurer": "MAPFRE",
+      "policy": "SC-79849",
+      "requirement": "140461192",
+      "due": "2026-11-30",
+      "grossCents": 249715,
+      "state": "PENDING",
+      "sourceSha256": "2c155b914cd380be92dbf43965d4b092c160274799dd2cb3bc38981072a3035c",
+      "sourceRowNumber": 11
+    },
+    {
+      "caseId": "MAPFRE_NOV17_0011",
+      "insurer": "MAPFRE",
+      "policy": "SC-79829",
+      "requirement": "128419795",
+      "due": "2026-04-30",
+      "grossCents": 82488,
+      "state": "PENDING",
+      "sourceSha256": "2c155b914cd380be92dbf43965d4b092c160274799dd2cb3bc38981072a3035c",
+      "sourceRowNumber": 12
+    },
+    {
+      "caseId": "MAPFRE_NOV17_0012",
+      "insurer": "MAPFRE",
+      "policy": "SC-79829",
+      "requirement": "130326306",
+      "due": "2026-05-31",
+      "grossCents": 82488,
+      "state": "PENDING",
+      "sourceSha256": "2c155b914cd380be92dbf43965d4b092c160274799dd2cb3bc38981072a3035c",
+      "sourceRowNumber": 13
+    },
+    {
+      "caseId": "MAPFRE_NOV17_0013",
+      "insurer": "MAPFRE",
+      "policy": "SC-79829",
+      "requirement": "132044877",
+      "due": "2026-07-31",
+      "grossCents": 88486,
+      "state": "PENDING",
+      "sourceSha256": "2c155b914cd380be92dbf43965d4b092c160274799dd2cb3bc38981072a3035c",
+      "sourceRowNumber": 14
+    },
+    {
+      "caseId": "MAPFRE_NOV17_0014",
+      "insurer": "MAPFRE",
+      "policy": "SC-79829",
+      "requirement": "135226671",
+      "due": "2026-08-31",
+      "grossCents": 88486,
+      "state": "PENDING",
+      "sourceSha256": "2c155b914cd380be92dbf43965d4b092c160274799dd2cb3bc38981072a3035c",
+      "sourceRowNumber": 15
+    },
+    {
+      "caseId": "MAPFRE_NOV17_0015",
+      "insurer": "MAPFRE",
+      "policy": "SC-79829",
+      "requirement": "137345069",
+      "due": "2026-09-30",
+      "grossCents": 88486,
+      "state": "PENDING",
+      "sourceSha256": "2c155b914cd380be92dbf43965d4b092c160274799dd2cb3bc38981072a3035c",
+      "sourceRowNumber": 16
+    },
+    {
+      "caseId": "MAPFRE_NOV17_0016",
+      "insurer": "MAPFRE",
+      "policy": "SC-79829",
+      "requirement": "138847044",
+      "due": "2026-10-31",
+      "grossCents": 88486,
+      "state": "PENDING",
+      "sourceSha256": "2c155b914cd380be92dbf43965d4b092c160274799dd2cb3bc38981072a3035c",
+      "sourceRowNumber": 17
+    },
+    {
+      "caseId": "MAPFRE_NOV17_0017",
+      "insurer": "MAPFRE",
+      "policy": "SC-79829",
+      "requirement": "140557498",
+      "due": "2026-11-30",
+      "grossCents": 88486,
+      "state": "PENDING",
+      "sourceSha256": "2c155b914cd380be92dbf43965d4b092c160274799dd2cb3bc38981072a3035c",
+      "sourceRowNumber": 18
+    },
+    {
+      "caseId": "MAPFRE_NOV17_0018",
+      "insurer": "MAPFRE",
+      "policy": "3002100014247",
+      "requirement": "3053326",
+      "due": "2026-11-21",
+      "grossCents": 10457,
+      "state": "PENDING",
+      "sourceSha256": "2c155b914cd380be92dbf43965d4b092c160274799dd2cb3bc38981072a3035c",
+      "sourceRowNumber": 19
+    },
+    {
+      "caseId": "MAPFRE_NOV17_0019",
+      "insurer": "MAPFRE",
+      "policy": "3002600004525",
+      "requirement": "3072645",
+      "due": "2026-10-18",
+      "grossCents": 35237,
+      "state": "PENDING",
+      "sourceSha256": "2c155b914cd380be92dbf43965d4b092c160274799dd2cb3bc38981072a3035c",
+      "sourceRowNumber": 20
+    },
+    {
+      "caseId": "MAPFRE_NOV17_0020",
+      "insurer": "MAPFRE",
+      "policy": "3002100014247",
+      "requirement": "3053325",
+      "due": "2026-10-21",
+      "grossCents": 10457,
+      "state": "PENDING",
+      "sourceSha256": "2c155b914cd380be92dbf43965d4b092c160274799dd2cb3bc38981072a3035c",
+      "sourceRowNumber": 21
+    },
+    {
+      "caseId": "MAPFRE_NOV17_0021",
+      "insurer": "MAPFRE",
+      "policy": "3002600004525",
+      "requirement": "3072646",
+      "due": "2026-11-18",
+      "grossCents": 35237,
+      "state": "PENDING",
+      "sourceSha256": "2c155b914cd380be92dbf43965d4b092c160274799dd2cb3bc38981072a3035c",
+      "sourceRowNumber": 22
+    },
+    {
+      "caseId": "MAPFRE_NOV17_0022",
+      "insurer": "MAPFRE",
+      "policy": "3002100014117",
+      "requirement": "3057111",
+      "due": "2026-11-03",
+      "grossCents": 28285,
+      "state": "PENDING",
+      "sourceSha256": "2c155b914cd380be92dbf43965d4b092c160274799dd2cb3bc38981072a3035c",
+      "sourceRowNumber": 23
+    },
+    {
+      "caseId": "MAPFRE_NOV17_0023",
+      "insurer": "MAPFRE",
+      "policy": "3002600004525",
+      "requirement": "3072644",
+      "due": "2026-09-18",
+      "grossCents": 35237,
+      "state": "PENDING",
+      "sourceSha256": "2c155b914cd380be92dbf43965d4b092c160274799dd2cb3bc38981072a3035c",
+      "sourceRowNumber": 24
+    },
+    {
+      "caseId": "MAPFRE_NOV17_0024",
+      "insurer": "MAPFRE",
+      "policy": "3002100014247",
+      "requirement": "3053324",
+      "due": "2026-09-21",
+      "grossCents": 10457,
+      "state": "PENDING",
+      "sourceSha256": "2c155b914cd380be92dbf43965d4b092c160274799dd2cb3bc38981072a3035c",
+      "sourceRowNumber": 25
+    },
+    {
+      "caseId": "MAPFRE_NOV17_0025",
+      "insurer": "MAPFRE",
+      "policy": "3002100014117",
+      "requirement": "3057110",
+      "due": "2026-10-03",
+      "grossCents": 28285,
+      "state": "PENDING",
+      "sourceSha256": "2c155b914cd380be92dbf43965d4b092c160274799dd2cb3bc38981072a3035c",
+      "sourceRowNumber": 26
+    },
+    {
+      "caseId": "MAPFRE_NOV17_0026",
+      "insurer": "MAPFRE",
+      "policy": "3002100014247",
+      "requirement": "3053323",
+      "due": "2026-08-21",
+      "grossCents": 10457,
+      "state": "PENDING",
+      "sourceSha256": "2c155b914cd380be92dbf43965d4b092c160274799dd2cb3bc38981072a3035c",
+      "sourceRowNumber": 27
+    },
+    {
+      "caseId": "A4.C1",
+      "insurer": "LA CEIBA",
+      "policy": "0226130804",
+      "requirement": "02505903",
+      "grossCents": 13897,
+      "due": "2026-10-31",
+      "state": "PENDING",
+      "sourceSha256": "0396615a394859ce39a0694567747e4dec3cc0e34a415222d5cf4d009cda5ac0"
+    },
+    {
+      "caseId": "A4.C2",
+      "insurer": "LA CEIBA",
+      "policy": "0225118528",
+      "requirement": "02492371",
+      "grossCents": 116564,
+      "due": "2026-11-16",
+      "state": "PENDING",
+      "sourceSha256": "0396615a394859ce39a0694567747e4dec3cc0e34a415222d5cf4d009cda5ac0"
+    }
+  ]
+}

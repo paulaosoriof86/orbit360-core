@@ -448,6 +448,26 @@
           "modifiedAtUtc": "2026-11-19T21:13:14.000Z",
           "sourceRows": 5,
           "readOnlyIntake": true
+        },
+        {
+          "filename": "Mapfre - Recaudos pendientes - Noviembre 2026.xls",
+          "bytes": 9199,
+          "fileId": "1tililHqGhdlifR9dDpLK5bgOls5b7DRh",
+          "driveModifiedAt": "2026-11-17T04:59:25.874Z",
+          "sha256": "2c155b914cd380be92dbf43965d4b092c160274799dd2cb3bc38981072a3035c",
+          "hashStatus": "RAW_BYTES_SHA256_VERIFIED_2026_11_19",
+          "sourceRows": 17,
+          "uniqueRequirements": 17
+        },
+        {
+          "filename": "Mapfre - Cobros realizados - Noviembre 2026.xls",
+          "bytes": 4111,
+          "fileId": "1KReCocFl7z7vQdNRUq4Cpd3zt92-JBCC",
+          "driveModifiedAt": "2026-11-17T04:59:06.439Z",
+          "sha256": "75fd8de1cd233d93dcc191dc9569e786b3ca498258d79d28204ef8c496675602",
+          "hashStatus": "RAW_BYTES_SHA256_VERIFIED_2026_11_19",
+          "sourceRows": 4,
+          "uniqueRequirements": 3
         }
       ],
       "count": 16,
