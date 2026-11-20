@@ -92,7 +92,9 @@ const suffix=Date.now().toString(36)+'_'+crypto.randomBytes(4).toString('hex');
       await drawer.locator('input[type=file]').setInputFiles({name:'qa-review.csv',mimeType:'text/csv',buffer:Buffer.from('poliza,ramo\nSOURCE-REVIEW-318,Autos')});
       await drawer.getByText('SOURCE-REVIEW-318',{exact:true}).waitFor({timeout:20000});
       assert.equal(await drawer.locator('#imp-next2').isEnabled(),true,'REAL_SOURCE_REVIEW_NOT_AVAILABLE');
-      await drawer.locator('#imp-close').click();
+      await page.reload({waitUntil:'domcontentloaded'});
+      await page.waitForFunction(() => !!window.Orbit?.store && !!window.Orbit?.session?.rol?.(),null,{timeout:30000});
+      assert.equal(await page.locator('#imp-drawer.open').count(),0,'IMPORT_REVIEW_PERSISTED_AFTER_RELOAD');
       console.log('I66_SIGNED_IMPORT_ACTUAL_SOURCE_REVIEW_'+a.role.toUpperCase()+'_PASS policySubmissions=0');
     }
     if (SOURCE === 'ab99e4474cea1ef7d08d2359966e6aa8d81e061b' || SOURCE === '431892dcfefaa7eaad6faec3ab281dca25d6b2b1') {
