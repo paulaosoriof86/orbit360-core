@@ -76,6 +76,7 @@ jobs:
           node --test tools/gravicentra-i6-6-manual-policy-capture-p0.test.cjs tools/gravicentra-i6-6-ops-activity-direct-vehicle-endorsement.test.cjs tools/gravicentra-i6-6-documented-premium-terms.test.cjs
           node --test tools/gravicentra-i6-6-operational-renewal-entry.test.cjs tools/gravicentra-i6-6-carlos-ops-tasks-transversal.test.cjs tools/gravicentra-i6-6-cliente360-advisor-source-parity.test.cjs tools/gravicentra-i6-6-crm-shadow-advisor-source.test.cjs tools/gravicentra-i6-6-client-edit-activity-country-persistence.test.cjs
       - name: Install signed browser dependencies without source changes
+        id: browser_setup
         run: |
           set -euo pipefail
           npm install --no-save --package-lock=false --ignore-scripts --no-audit --no-fund firebase-admin@13.4.0 playwright@1.55.0 >/dev/null
@@ -86,8 +87,11 @@ jobs:
           I66_SIGNED_CLIENT_EDIT_SOURCE: f4e28f9fdaa01b9360494136e5860861748deb3c
         run: node tools/gravicentra-i6-6-carlos-client-edit-signed-synthetic-uat.cjs
       - name: Real-role signed Preview Ops Leads Tasks transactional writes and restoration
+        if: ${{ !cancelled() && steps.browser_setup.outcome == 'success' }}
         run: node tools/gravicentra-i6-6-carlos-real-signed-synthetic-preview-uat.cjs
       - name: Real-role signed Preview direct-renewal hydration (read-only)
+        if: ${{ !cancelled() && steps.browser_setup.outcome == 'success' }}
         run: node tools/gravicentra-i66-carlos-paula-signed-direct-renewal-preview-hydration-readonly.cjs
       - name: Real-role signed Preview payment receipt-carrier synthetic UAT and restoration
+        if: ${{ !cancelled() && steps.browser_setup.outcome == 'success' }}
         run: node tools/gravicentra-i6-6-carlos-payment-signed-synthetic-preview-uat.cjs

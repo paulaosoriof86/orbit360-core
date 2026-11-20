@@ -54,6 +54,15 @@ const suffix=Date.now().toString(36)+'_'+crypto.randomBytes(4).toString('hex');
    let matching=[],qaStage='create-browser-page',page=null,saveWarnings=[];
    try{
     page=await ctx.newPage();
+    page.on('response',async response=>{
+      const url=new URL(response.url());
+      if(!url.hostname.endsWith('.cloudfunctions.net')||!url.pathname.includes('ProductOperationalCommand')||response.request().method()!=='POST')return;
+      const body=await response.json().catch(()=>null);
+      const message=body?.error?.message;
+      const reason=message==='Preview operativo requiere marca sintética explícita.'?'MISSING_SYNTHETIC_MARKER':
+        message==='Preview operativo solo admite fixtures sintéticos autorizados B3-004/B4-003.'?'INVALID_SYNTHETIC_ID':'OTHER';
+      console.log('I66_CLIENT_EDIT_CALLABLE http='+response.status()+' reason='+reason);
+    });
     page.on('console',m=>{const s=m.text();if(s.includes('DURABLE_CLIENT_EDIT_HOLD'))saveWarnings.push(s.slice(0,420));});
     page.on('dialog',async d=>{if(d.type()==='prompt')await d.accept('QA I6.6 cambio operativo verificado');else await d.dismiss();});
     qaStage='navigate-cliente360';
