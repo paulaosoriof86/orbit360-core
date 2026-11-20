@@ -80,9 +80,18 @@ const suffix=Date.now().toString(36)+'_'+crypto.randomBytes(4).toString('hex');
     assert.ok(authState.started&&norm(authState.role)===a.role,'QA_ACTOR_ROLE_NOT_SIGNED');
     if (SOURCE === 'ab99e4474cea1ef7d08d2359966e6aa8d81e061b') {
       qaStage='issued-renewal-display';
+      await page.evaluate(()=>Orbit.store._ensureCollections(['polizas','clientes','aseguradoras']));
+      await page.waitForFunction(()=>{
+        const state=Orbit.store._productStatus();
+        const keys=['polizas','clientes','aseguradoras'];
+        return keys.every(key=>(state.serverConfirmedCollections||[]).includes(key)) ||
+          keys.some(key=>(state.deniedCollections||[]).includes(key) || state.snapshotErrors?.[key]);
+      },null,{timeout:30000});
       const result=await page.evaluate(async fixtureClientId=>{
-        const store=Orbit.store;
-        await store._ensureCollections(['polizas','clientes','aseguradoras']);
+        const store=Orbit.store, state=store._productStatus();
+        if(!['polizas','clientes','aseguradoras'].every(key=>state.serverConfirmedCollections.includes(key))) {
+          throw Error('RENEWAL_DIRECTORY_HYDRATION_NOT_CONFIRMED');
+        }
         const insurers=store.all('aseguradoras');
         const insurer=insurers.find(row=>row?.id && row.vinculada!==false &&
           (!row.pais || row.pais==='GT' || [].concat(row.paises||[]).includes('GT')) &&
