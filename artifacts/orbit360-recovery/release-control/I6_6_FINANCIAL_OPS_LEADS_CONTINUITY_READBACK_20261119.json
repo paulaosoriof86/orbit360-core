@@ -1008,12 +1008,44 @@
       "uploadAndDownloadCertified": false
     },
     "universalesCurrentStatement": {
+      "sourceDate": "2026-11-16",
       "input": 35,
-      "readbackRun": 44676192914,
+      "sourceGrossCents": 2526743,
+      "firstReadbackRun": 44676192914,
+      "correctedReadbackRun": 44676392119,
+      "unmodified": 10,
+      "policyEditionLookupExceptions": 25,
       "eligible": 0,
-      "lookupExceptions": 35,
       "writes": 0,
-      "exactPolicyVariantNeedsReview": true
+      "correctedLookup": "preserved source number and tested insurer-specific six-digit policy segment"
+    },
+    "universalesPaidEvidence": {
+      "run": 44676535938,
+      "sourceGrossCents": 319631,
+      "sourcePaid": 3,
+      "matchingExistingCobros": 1,
+      "existingPaidAmountCents": 95256,
+      "sourcePaymentsMissingEdition": 2,
+      "newPayments": 0
+    },
+    "guatemaltecaStatement": {
+      "driveFileId": "1H_kNDw2v2HI6oGqEwx06Cmvp0dolluap",
+      "sha256": "574e090ef80e63155b149eae274bee7f4539340199c820f3a281def20f87b049",
+      "reportDate": "2026-11-19",
+      "reportTitle": "RELACION DE PRIMAS NETAS POR COBRAR POR ANTIGUEDAD Y TIPO DE SEGURO",
+      "reportedBalanceCents": 3090684,
+      "writes": 0,
+      "reason": "A net-premium aging report cannot by itself set gross premiums, cobros or actual payment date."
+    },
+    "makeReadback": {
+      "request": "1d49bea1-0d2c-48c1-8f0e-2516c5662d32",
+      "email": "pending_private_input",
+      "firestore": "pending",
+      "imap": "mail.aysseguros.com",
+      "port": 993,
+      "tls": true,
+      "whatsappScenariosActive": 0,
+      "verifiedNewLeads": 0
     }
   }
 }
