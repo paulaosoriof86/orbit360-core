@@ -1222,7 +1222,7 @@
     },
     "integrations": {
       "imap": "HOSTDIME_NON_SECRET_SETTINGS_FILLED_PASSWORD_FOCUSED_AWAITING_PRIVATE_SUBMIT_AND_TEST",
-      "drive": "LIVE_DIRECTION_PROVIDER_OPENED_GOOGLE_400_ORIGIN_MISMATCH",
+      "drive": "LIVE_ORIGIN_SAVED_AND_REOPENED_GOOGLE_ACCOUNT_CHOOSER_REACHED_UNVERIFIED_APP_REVIEW_PENDING",
       "greenApiScenarios": [
         10196136,
         10195867
@@ -1265,6 +1265,21 @@
           "requestClientMatchedExistingScopedOAuthClient": false,
           "correctSeparateClientFilledInCombinedRequest": true,
           "verifiedConnection": false
+        },
+        "driveAfterOwnerConfirmation": {
+          "productionOrigin": "https://app.aysseguros.com",
+          "authorizationScope": "Owner confirmed saving this origin",
+          "googleConsoleSaveConfirmed": true,
+          "originReopenedFromSavedClient": true,
+          "productEntryPoint": "Cliente 360 > Documentos > Configurar Drive",
+          "liveProductRole": "Dirección",
+          "accountChooserReached": true,
+          "corporateAccountSelected": true,
+          "nextGoogleScreen": "Google no verificó esta app",
+          "providerRequestedScope": "https://www.googleapis.com/auth/drive",
+          "tenantConsentCompleted": false,
+          "documentRoundTripVerified": false,
+          "noDocumentUploads": true
         }
       }
     },
