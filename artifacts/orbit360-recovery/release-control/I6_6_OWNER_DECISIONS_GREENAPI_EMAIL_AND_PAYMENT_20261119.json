@@ -706,5 +706,32 @@
       "fromSingleCash": 1
     },
     "roundingDifference": "Insurer source gross totals exceed the sum of literal requirement amounts by GTQ 0.05, 0.04, 0.04, 0.08 for respective 12-installment documents; 91-8357452 exact. Do not rewrite source requirement amounts to force a match; ask Paula for handling of cents."
+  },
+  "parallelCendosoPreflight20261120": {
+    "recordType": "ADDITIVE_READONLY_PREFLIGHT_REQUEST_NOT_POLICY_OVERRIDE",
+    "gate": "I6.6",
+    "source": "artifacts/orbit360-recovery/source-batches/I6_6_SOURCE_CENDOSO_PAID_CANDIDATES_2026.json.gz",
+    "sourceCandidateCount": 607,
+    "purpose": "During Work's UI/renewal recovery, recompute pending confirmed-unreconciled paid Cobro deltas against current signed Firestore; isolate already-paid, missing editions, double count and date/amount conflicts.",
+    "priorLivePaidRuns": [
+      44552961713,
+      44569134138,
+      44593852150
+    ],
+    "priorAppliedCobrosReported": [
+      303,
+      18,
+      15
+    ],
+    "preservePreviouslyApplied": true,
+    "noBlindReplay": true,
+    "noBankReconciliations": true,
+    "noProductionAcceptanceClaim": true,
+    "protectedEnvironment": "gravicentra-live-data-writes",
+    "workflow": ".github/workflows/gravicentra-i66-cendoso-paid-protected.yml",
+    "userInstruction": "2026-11-20: prepare payment lots in parallel for Direction review; do not collide with Work's product source, release or Make changes",
+    "expectedNext": "Read-only preflight first; protected Firestore writes ONLY if eligible > 0 and Direction approves the exact job; verify canonical postimage, audit, dedupe and rollback.",
+    "runId": null,
+    "applicationResult": "NOT_EXECUTED"
   }
 }
