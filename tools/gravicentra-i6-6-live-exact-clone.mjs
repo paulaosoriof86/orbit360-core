@@ -105,8 +105,8 @@ function validateRequest(){
       need(rawRequest[k]===true,'I66_CLIENTE360_RELEASE_GUARD_MISSING_'+k);
     need(rawRequest.doNotClaimFullPlatformProductionAccepted===true&&rawRequest.doNotClaimFocalCaseEdsonDataUpdatedWithoutWriteReadback===true,'I66_CLIENTE360_SCOPE_OVERCLAIM');
     need(rawRequest.signedPreviewScope?.realCarlosOperativoLogin===true&&rawRequest.signedPreviewScope?.germanAndPriscilaActualEditNewClientPolicyOps===true&&rawRequest.signedPreviewScope?.signedCarlosAndDirectionOpsLeadsSyntheticCreateUpdateResolveReloadRestore===true&&rawRequest.signedPreviewScope?.signedBothRolePaymentReceiptCobroPortfolioSyntheticWriteReloadRestore===true&&rawRequest.signedPreviewScope?.realCustomerWrites===0,'I66_CLIENTE360_SIGNED_UAT_SCOPE_INVALID');
-    need(rawRequest.sourceSha==='72d3580f3e90071b360319ce5f204d348b401663'&&rawRequest.buildRunId===44637404427&&rawRequest.artifactId===14584217893&&rawRequest.signedCarlosPaulaPreviewUatRunId===44637887342,'I66_CLIENTE360_SIGNED_PROOF_IDENTITY_DRIFT');
-    need(rawRequest.expectedPriorLiveSourceSha==='b38f877f7847c7b6e11506885e42252e84c5eeb6'&&rawRequest.expectedPriorLiveHostingVersion==='sites/ays-orbit-360-lab/versions/13944f80ba1e0bdf','I66_CLIENTE360_LIVE_ROLLBACK_BACKUP_UNPINNED');
+    need(rawRequest.sourceSha==='9c689bd283793a635f6a94197351b3fe0ecf2da9'&&rawRequest.buildRunId===44672291118&&rawRequest.artifactId===14600542823&&rawRequest.signedCarlosPaulaPreviewUatRunId===44672924385,'I66_CLIENTE360_SIGNED_PROOF_IDENTITY_DRIFT');
+    need(rawRequest.expectedPriorLiveSourceSha==='72d3580f3e90071b360319ce5f204d348b401663'&&rawRequest.expectedPriorLiveHostingVersion==='sites/ays-orbit-360-lab/versions/63eb68dfe649db40','I66_CLIENTE360_LIVE_ROLLBACK_BACKUP_UNPINNED');
     need(rawRequest.previewChannel==='gi-i66-rc-'+rawRequest.buildRunId&&/^sha256:[0-9a-f]{64}$/.test(rawRequest.artifactDigest||''),'I66_CLIENTE360_ARTIFACT_OR_CHANNEL_INVALID');
     need(new RegExp('^https://ays-orbit-360-lab--'+rawRequest.previewChannel+'-[a-z0-9]+\\.web\\.app$').test(rawRequest.previewUrl||''),'I66_CLIENTE360_PREVIEW_ORIGIN_NOT_EXACT');
     need(rawRequest.buildId==='gi-i66-'+rawRequest.sourceSha.slice(0,12)+'-57f234755dc1'&&request.artifactZipSha256.length===64,'I66_CLIENTE360_BUILD_SOURCE_DRIFT');
@@ -171,6 +171,18 @@ try{
       {cwd:process.cwd(),env:{...process.env,I66_PROVE_LIVE_NEW_CLIENT:request.sourceSha},
        stdio:['ignore','pipe','pipe'],timeout:180000});
     evidence.signedCarlosLiveEditNewPolicyOpsReadOnly=true;
+    need(rawRequest.requireClientEditLiveSyntheticWriteReloadCleanup===true,'I66_CLIENT_EDIT_LIVE_QA_REQUIRED');
+    const env={...process.env,I66_SIGNED_CLIENT_EDIT_ORIGIN:'https://app.aysseguros.com',
+      I66_SIGNED_CLIENT_EDIT_SOURCE:request.sourceSha,I66_LIVE_ORIGIN:'https://app.aysseguros.com',
+      I66_APPROVED_LIVE_SOURCE_SHA:request.sourceSha};
+    for(const [key,script] of [
+      ['clientEdit','gravicentra-i6-6-carlos-client-edit-signed-synthetic-uat.cjs'],
+      ['opsLeads','gravicentra-i6-6-carlos-paula-live-synthetic-ops-leads-uat.cjs'],
+      ['payments','gravicentra-i6-6-carlos-paula-live-synthetic-payment-renewability-uat.cjs']
+    ]){
+      execFileSync(process.execPath,['tools/'+script],{cwd:process.cwd(),env,stdio:'inherit',timeout:300000});
+      evidence[key+'SignedLiveSyntheticPass']=true;
+    }
   }
   evidence.status=signedClientSuccessor?'LIVE_HOSTING_AND_CARLOS_ROSTER_SAME_ARTIFACT_PASS_FULL_I66_HOLD':'LIVE_HOSTING_SAME_ARTIFACT_READBACK_PASS_NOT_FULL_UAT';
 }catch(err){

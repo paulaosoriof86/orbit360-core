@@ -15,6 +15,7 @@ on:
       - artifacts/orbit360-recovery/release-control/I6_6_EXACT_HOSTING_LIVE_PROMOTION_REQUEST_20261112_R6.json
       - artifacts/orbit360-recovery/release-control/I6_6_EXACT_HOSTING_LIVE_PROMOTION_REQUEST_20261113_R8.json
       - artifacts/orbit360-recovery/release-control/I6_6_CLIENTE360_ADVISOR_EXACT_LIVE_REQUEST_20261119.json
+      - artifacts/orbit360-recovery/release-control/I6_6_CLIENTE360_EDIT_ACTIVITY_EXACT_LIVE_REQUEST_20261119.json
       - tools/gravicentra-i6-6-live-exact-clone.mjs
 
 permissions:
@@ -36,7 +37,7 @@ jobs:
       SA_LAB_ALT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
       SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
       I66_PACKAGE_ROOT: /tmp/gi-i66-promote-package
-      I66_APPROVED_RELEASE_REQUEST: artifacts/orbit360-recovery/release-control/I6_6_CLIENTE360_ADVISOR_EXACT_LIVE_REQUEST_20261119.json
+      I66_APPROVED_RELEASE_REQUEST: artifacts/orbit360-recovery/release-control/I6_6_CLIENTE360_EDIT_ACTIVITY_EXACT_LIVE_REQUEST_20261119.json
     steps:
       - uses: actions/checkout@v4
         with:
@@ -64,14 +65,14 @@ jobs:
               assert.equal(j.gate,'I6.6');
               assert.equal(j.status,'OWNER_AUTHORIZED_TARGETED_LIVE_PENDING_PROTECTED_RUN');
               assert.equal(j.approvedByDirection,true);
-              assert.equal(j.sourceSha,'72d3580f3e90071b360319ce5f204d348b401663');
-              assert.equal(j.buildRunId,44637404427);
-              assert.equal(j.artifactId,14584217893);
-              assert.equal(j.signedCarlosPaulaPreviewUatRunId,44637887342);
-              assert.equal(j.sourceQaRunId,44637061466);
-              assert.equal(j.sourceGuardRunId,44637061232);
-              assert.equal(j.expectedPriorLiveSourceSha,'b38f877f7847c7b6e11506885e42252e84c5eeb6');
-              assert.equal(j.expectedPriorLiveHostingVersion,'sites/ays-orbit-360-lab/versions/13944f80ba1e0bdf');
+              assert.equal(j.sourceSha,'9c689bd283793a635f6a94197351b3fe0ecf2da9');
+              assert.equal(j.buildRunId,44672291118);
+              assert.equal(j.artifactId,14600542823);
+              assert.equal(j.signedCarlosPaulaPreviewUatRunId,44672924385);
+              assert.equal(j.sourceQaRunId,44671795215);
+              assert.equal(j.sourceGuardRunId,44671795277);
+              assert.equal(j.expectedPriorLiveSourceSha,'72d3580f3e90071b360319ce5f204d348b401663');
+              assert.equal(j.expectedPriorLiveHostingVersion,'sites/ays-orbit-360-lab/versions/63eb68dfe649db40');
               assert.equal(j.buildId,'gi-i66-'+j.sourceSha.slice(0,12)+'-57f234755dc1');
               assert.equal(j.previewChannel,'gi-i66-rc-'+j.buildRunId);
               assert.match(j.artifactDigest,/^sha256:[0-9a-f]{64}$/);
@@ -120,7 +121,13 @@ jobs:
                 assert.equal(result[n].buildId,j.expectedPriorLiveBuildId);
               }
               const signedSteps=(result[8].jobs||[]).flatMap(z=>z.steps||[]);
+              assert.equal(control.currentPhysicalHostingRelease.sourceSha,j.expectedPriorLiveSourceSha);
+              assert.equal(control.currentPhysicalHostingRelease.liveHostingVersion,j.expectedPriorLiveHostingVersion);
+              assert.equal(result[2].head_sha,control.postAcceptanceOwnerInsurerSelectionPreviewBuildRequest20261119.sourceQaHead);
+              assert.equal(result[3].head_sha,result[2].head_sha);
+              assert.equal(j.requireClientEditLiveSyntheticWriteReloadCleanup,true);
               for(const name of [
+                'Carlos and Dirección signed actual Editar Cliente phone/advisor/atomic country activity durable write reload and cleanup',
                 'Carlos Operativo signed roster in actual Editar Cliente, Nuevo Cliente, Nueva Póliza and Ops; LIVE untouched',
                 'Real-role signed Preview Ops Leads Tasks transactional writes and restoration',
                 'Real-role signed Preview direct-renewal hydration (read-only)',
