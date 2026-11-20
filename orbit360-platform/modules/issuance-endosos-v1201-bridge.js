@@ -536,6 +536,23 @@ Orbit.modules = Orbit.modules || {};
       }catch(e){btn.disabled=false;btn.textContent=original;toast('Verifica la gestión en Ops antes de reintentar. No se confirmó toda la operación.');}
     };
   }
+  function renewalTermEnd(previousStart, previousEnd, nextStart) {
+    function dateOf(value) {
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(value || '')) return null;
+      const date = new Date(value + 'T00:00:00Z');
+      return Number.isFinite(date.getTime()) && date.toISOString().slice(0, 10) === value ? date : null;
+    }
+    function addMonths(date, months) {
+      const last = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth() + months + 1, 0));
+      last.setUTCDate(Math.min(date.getUTCDate(), last.getUTCDate()));
+      return last.toISOString().slice(0, 10);
+    }
+    const start = dateOf(previousStart), end = dateOf(previousEnd), next = dateOf(nextStart);
+    if (!start || !end || !next || end <= start) return '';
+    const months = (end.getUTCFullYear() - start.getUTCFullYear()) * 12 + end.getUTCMonth() - start.getUTCMonth();
+    if (months > 0 && addMonths(start, months) === previousEnd) return addMonths(next, months);
+    return '';
+  }
   function openDirectRenewal(g) {
     const role=String(Orbit.session&&Orbit.session.rol&&Orbit.session.rol()||'');
     if(!['Dirección','SuperAdmin','AdminTenant','Admin','Operativo'].includes(role)||!I.canManage()||
@@ -544,11 +561,12 @@ Orbit.modules = Orbit.modules || {};
       return toast('Primero confirma la aceptación del cliente en la gestión canónica.');
     const source=renewalSource(g);if(!source)return toast('No se encontró la póliza origen.');
     const insurers=renewalInsurers(source),start=source.vigenciaFin||today(),payments=renewalDefaultPayments(source);
-    const body=`<div class="cfg-note" style="margin-bottom:12px">Usa esta opción cuando la aseguradora ya envió la <b>renovación en firme</b>. Al confirmar se crea una nueva póliza vinculada a la anterior, con sus recibos/cartera; la póliza origen se conserva.</div><div class="cgrid">
-      <label class="ce-l">Aseguradora *<select id="rend-asg" class="o-sel">${insurers.map(a=>`<option value="${esc(a.id)}" ${a.id===source.aseguradoraId?'selected':''}>${esc(a.nombre)}</option>`).join('')}</select></label>
-      <label class="ce-l">Número real de nueva póliza *<input id="rend-num" class="o-sel"></label>
+    const client=S().get('clientes',source.clienteId)||{};
+    const body=`<div class="cfg-note" style="margin-bottom:12px"><b>Póliza anterior ${esc(source.numero || '')}</b> · ${esc(client.nombre || client.nombreCompleto || '')}</div><div class="cfg-note" style="margin-bottom:12px">Usa esta opción cuando la aseguradora ya envió la <b>renovación en firme</b>. Al confirmar se crea una nueva póliza vinculada a la anterior, con sus recibos/cartera; la póliza origen se conserva.</div><div class="cgrid">
+      <label class="ce-l">Aseguradora *<select id="rend-asg" class="o-sel"><option value="">Selecciona la aseguradora del documento</option>${insurers.map(a=>`<option value="${esc(a.id)}" ${a.id===source.aseguradoraId?'selected':''}>${esc(a.nombre)}</option>`).join('')}</select></label>
+      <label class="ce-l">Número de póliza en el documento de renovación *<input id="rend-num" class="o-sel" value="${esc(source.numero || '')}"></label>
       <label class="ce-l">Vigencia inicio *<input id="rend-start" type="date" class="o-sel" value="${esc(start)}"></label>
-      <label class="ce-l">Vigencia fin *<input id="rend-end" type="date" class="o-sel" value="${esc(plusYear(start))}"></label>
+      <label class="ce-l">Vigencia fin *<input id="rend-end" type="date" class="o-sel" value="${esc(renewalTermEnd(source.vigenciaInicio, source.vigenciaFin, start))}"></label>
       <label class="ce-l">Producto / subramo<input id="rend-prod" class="o-sel" value="${esc(source.producto||source.subramo||'')}"></label>
       <label class="ce-l">Frecuencia<select id="rend-freq" class="o-sel">${['Contado','Semestral','Cuatrimestral','Trimestral','Bimestral','Mensual'].map(x=>`<option ${x===source.frecuencia?'selected':''}>${x}</option>`).join('')}</select></label>
       <label class="ce-l">Cantidad de pagos<input id="rend-payments" type="number" min="1" class="o-sel" value="${payments}"></label>
@@ -576,7 +594,13 @@ Orbit.modules = Orbit.modules || {};
     </div>`;
     const b=modal('ops-direct-renewal-v1201','Registrar renovación en el sistema',body,'<button class="btn primary" data-create>Crear nueva póliza de renovación</button>',780);
     const $=x=>b.querySelector(x),btn=b.querySelector('[data-create]');
-    const client=S().get('clientes',source.clienteId)||{};
+    const endField = $('#rend-end');
+    let suggestedEnd = endField.value;
+    $('#rend-start').addEventListener('change', () => {
+      const keepDocumentedEnd = endField.value && endField.value !== suggestedEnd;
+      suggestedEnd = renewalTermEnd(source.vigenciaInicio, source.vigenciaFin, $('#rend-start').value);
+      if (!keepDocumentedEnd) endField.value = suggestedEnd;
+    });
     const docs=clientDocumentOptions(client),docSelect=$('#rend-doc-existing'),docFile=$('#rend-doc-file'),docInput=$('#rend-doc'),docNote=$('#rend-doc-note'),tariffNote=$('#rend-tariff-note');
     docs.forEach(doc=>{const opt=document.createElement('option');opt.value=doc.ref;opt.textContent=doc.name;docSelect.appendChild(opt);});
     docSelect.addEventListener('change',()=>{if(docSelect.value)docInput.value=docSelect.value;});

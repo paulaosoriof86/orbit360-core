@@ -98,3 +98,16 @@ test('Cliente360 routes renewal to shared role decision and issued-document fail
   assert.match(issuance,/No fue posible confirmar el soporte en Drive/);
   assert.match(issuance,/No fue posible confirmar la renovación\. Consulta la póliza antes de reintentar/);
 });
+
+test('issued renewal carries the prior number and suggests only a verified calendar term', ()=>{
+  const start=issuance.indexOf('  function renewalTermEnd(');
+  const end=issuance.indexOf('  function openDirectRenewal(', start);
+  assert.ok(start>=0 && end>start);
+  const calculate=new Function(issuance.slice(start,end)+'\nreturn renewalTermEnd;')();
+  assert.equal(calculate('2025-11-16','2026-11-16','2026-11-20'),'2027-11-20');
+  assert.equal(calculate('2025-08-31','2026-02-28','2026-08-31'),'2027-02-28');
+  assert.equal(calculate('2024-02-29','2025-02-28','2028-02-29'),'2029-02-28');
+  assert.equal(calculate('2026-01-01','2026-02-14','2026-02-14'),'');
+  assert.equal(calculate('', '2026-11-16','2026-11-20'),'');
+  assert.match(issuance,/id="rend-num"[^>]*value="\$\{esc\(source\.numero/);
+});

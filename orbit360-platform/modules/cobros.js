@@ -904,10 +904,18 @@ Orbit.modules.cobros = (function () {
       'unavailable': 'El servicio de cobros no respondió; hay que verificar el estado.',
       'internal': 'El servicio de cobros no pudo confirmar el resultado.'
     };
-    const message = descriptions[code] || 'El servicio de cobros no confirmó el resultado.';
+    const reason = code === 'failed-precondition' ? localCode.split(':', 1)[0] : '';
+    const messagesByReason = {
+      PAYMENT_ALREADY_APPLIED: 'Este recibo ya figura como pagado. Consulta el cobro existente en el historial.',
+      PAYMENT_ACTIVE_PORTFOLIO_REQUIRED: 'Falta la obligación activa de cartera vinculada al recibo. Revisa la cartera de esta póliza.',
+      PAYMENT_RECEIPT_COBRO_STATE_CONFLICT: 'El estado del recibo difiere del cobro vinculado. Revisa ambos en conciliación.',
+      PAYMENT_DETERMINISTIC_COBRO_ID_CONFLICT: 'Existe una referencia de cobro con otra vinculación. Revisa la relación con el recibo.'
+    };
+    const knownReason = Object.prototype.hasOwnProperty.call(messagesByReason, reason) ? reason : '';
+    const message = messagesByReason[knownReason] || descriptions[code] || 'El servicio de cobros no confirmó el resultado.';
     const requestId = String(error && error.gravicentraPayment && error.gravicentraPayment.requestId || '')
       .replace(/[^A-Za-z0-9_-]/g, '').slice(0, 45);
-    return { code, uncertain, message, requestId };
+    return { code, uncertain, message, requestId, alreadyApplied: knownReason === 'PAYMENT_ALREADY_APPLIED' };
   }
 
   /* ---- Registrar pago por el owner canónico: pago y aplicación son hechos distintos ---- */
@@ -980,7 +988,7 @@ Orbit.modules.cobros = (function () {
         btn.disabled = false; btn.textContent = 'Registrar pago'; pm.removeAttribute('aria-busy');
         const status = feedback.uncertain
           ? 'Resultado no confirmado. Recarga y comprueba si ya quedó aplicado antes de reintentar.'
-          : 'No se guardaron cambios.';
+          : feedback.alreadyApplied ? 'No se creó un segundo cobro.' : 'No se guardaron cambios.';
         const reference = feedback.requestId ? ' · Ref. ' + feedback.requestId : '';
         if (state) state.textContent = status + ' Código: ' + feedback.code + reference;
         U.toast((isPreviewHost() ? 'Preview: ' : '') + feedback.message + ' Código: ' + feedback.code + reference + '. ' + status);

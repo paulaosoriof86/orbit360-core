@@ -71,3 +71,15 @@ test('catch displays status with category, request reference, and no unqualified
   assert.match(source, /feedback\.requestId \? ' · Ref\. '/);
   assert.doesNotMatch(source, /No fue posible registrar el pago\. No se guardaron cambios\./);
 });
+
+test('a server-confirmed previous payment is distinct from a missing active portfolio and an uncertain request', () => {
+  const previous = helper({code:'functions/failed-precondition',message:'PAYMENT_ALREADY_APPLIED: private detail'});
+  assert.equal(previous.alreadyApplied, true);
+  assert.match(previous.message, /ya figura como pagado/);
+  assert.doesNotMatch(previous.message, /private detail/);
+  const portfolio = helper({code:'functions/failed-precondition',message:'PAYMENT_ACTIVE_PORTFOLIO_REQUIRED: private detail'});
+  assert.equal(portfolio.alreadyApplied, false);
+  assert.match(portfolio.message, /obligación activa/);
+  assert.equal(helper({code:'functions/unavailable',message:'PAYMENT_ALREADY_APPLIED'}).alreadyApplied, false);
+  assert.equal(helper({code:'functions/failed-precondition',message:'constructor'}).alreadyApplied, false);
+});

@@ -4,6 +4,10 @@ on:
     branches: [recovery/fase-a-clean-20260831]
     paths:
       - .github/workflows/gravicentra-i66-privileged-role-parity-source-qa.yml
+      - orbit360-platform/modules/cobros.js
+      - orbit360-platform/modules/issuance-endosos-v1201-bridge.js
+      - tools/gravicentra-i6-6-cobros-payment-failure-category.test.cjs
+      - tools/gravicentra-i6-6-operational-renewal-entry.test.cjs
       - orbit360-platform/core/ciclo.js
       - orbit360-platform/modules/ops.js
       - orbit360-platform/modules/leads.js
@@ -45,6 +49,7 @@ jobs:
       - name: Source test with 5 roles, 12 domain writers and explicit negative boundaries
         run: |
           set -euo pipefail
+          node --test tools/gravicentra-i6-6-cobros-payment-failure-category.test.cjs tools/gravicentra-i6-6-operational-renewal-entry.test.cjs
           node --test tools/gravicentra-i6-6-ops-collaboration-owner.test.cjs
           node --test tools/gravicentra-i6-6-ops-leads-inbox-projection.test.cjs
           node --check functions/b4-003-scoped-access-boundary.js

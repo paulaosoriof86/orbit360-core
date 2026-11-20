@@ -3488,6 +3488,60 @@
           }
         }
       ]
+    },
+    {
+      "id": "I6_6_ISSUED_RENEWAL_TERMS_AND_EXISTING_PAYMENT_MESSAGE_20261120",
+      "approvedByDirection": true,
+      "receipt": "Dirección 20/11/2026, I6.6 apartados 4, 6 y 10; lectura de cuotas 44798516716.",
+      "sourceStatus": "SOURCE_PENDING_SIGNED_PREVIEW_AND_EXACT_LIVE",
+      "capabilityOwners": [
+        "COBROS_RECONCILIATION",
+        "RENOVACIONES_ACTIONABLE_WORKLIST",
+        "CLIENTE360_DIRECT_RENEWAL",
+        "OPS_DURABLE_AUDIT",
+        "DOCUMENT_DRIVE_TENANT_STATE_ERRORS"
+      ],
+      "scope": "Issued renewal form prefill and documented calendar term; safe server rejection categories for duplicate payments; existing server write contracts and receipts are preserved.",
+      "paths": [
+        {
+          "path": "orbit360-platform/modules/cobros.js",
+          "gitBlobSha": "fd769c5a3fc684f00eb25dfb0ea36294d1914b38",
+          "replaces": {
+            "path": "orbit360-platform/modules/cobros.js",
+            "priorGitBlobSha": "cbd1d20bea67dd7f7f0f8b1fb43e902576f95aac",
+            "priorChangeId": "I6_6_OPERATIVE_ADVISOR_PAYMENT_INVOICE_EXPIRY_BATCH_20261113"
+          }
+        },
+        {
+          "path": "orbit360-platform/modules/issuance-endosos-v1201-bridge.js",
+          "gitBlobSha": "496d6975f31f3aa092f3a629d02c3f5fca6961e7",
+          "replaces": {
+            "path": "orbit360-platform/modules/issuance-endosos-v1201-bridge.js",
+            "priorGitBlobSha": "2b015cc419c8e942b517266daf82ed8d338f0fa9",
+            "priorChangeId": "I6_6_OPS_ATOMIC_CLIENT360_ACTIVITY_DIRECT_ISSUED_VEHICLE_SUBSTITUTION_20261119"
+          }
+        }
+      ],
+      "tests": [
+        {
+          "path": "tools/gravicentra-i6-6-cobros-payment-failure-category.test.cjs",
+          "gitBlobSha": "491e11bda5c7b021478771e87f0b7ec682561cab",
+          "replaces": {
+            "path": "tools/gravicentra-i6-6-cobros-payment-failure-category.test.cjs",
+            "priorGitBlobSha": "dca70538b5534d5054983289374097220b4e6a93",
+            "priorChangeId": "I6_6_OPS_COBROS_SAFE_FAILURE_DIAGNOSTICS_P0"
+          }
+        },
+        {
+          "path": "tools/gravicentra-i6-6-operational-renewal-entry.test.cjs",
+          "gitBlobSha": "dedccf127ca2542eb0c083509f52573105599d7f",
+          "replaces": {
+            "path": "tools/gravicentra-i6-6-operational-renewal-entry.test.cjs",
+            "priorGitBlobSha": "dc5cba86fd8db6c4439c46e676c5ebbf6077da6e",
+            "priorChangeId": "I6_6_RENEWAL_KANBAN_ISSUED_DIRECT_AND_DRIVE_FEEDBACK_R11_20261113"
+          }
+        }
+      ]
     }
   ],
   "i66R11PreviewBuildRequest20261113": {
