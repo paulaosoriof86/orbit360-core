@@ -78,7 +78,24 @@ const suffix=Date.now().toString(36)+'_'+crypto.randomBytes(4).toString('hex');
      return{started:result?.started,role:Orbit.session?.rol?.()};
     },token);
     assert.ok(authState.started&&norm(authState.role)===a.role,'QA_ACTOR_ROLE_NOT_SIGNED');
-    if (SOURCE === 'ab99e4474cea1ef7d08d2359966e6aa8d81e061b') {
+    if (SOURCE === '431892dcfefaa7eaad6faec3ab281dca25d6b2b1') {
+      qaStage='import-source-review';
+      await page.evaluate(fixtureId => {
+        Orbit.importa.open('polizas',{scope:{cid:fixtureId,nombre:'Auditoría I6.6'}});
+      },id);
+      const drawer=page.locator('#imp-drawer');
+      await drawer.locator('input[type=file]').setInputFiles({name:'qa-source.unknown',mimeType:'application/octet-stream',buffer:Buffer.from('I6.6 source without mapped rows')});
+      await drawer.getByRole('alert').filter({hasText:'No se extrajeron registros'}).waitFor({timeout:20000});
+      assert.equal(await drawer.locator('#imp-next2').isDisabled(),true,'UNMAPPED_IMPORT_ADVANCED');
+      assert.equal(await drawer.getByText('GT-AT-48210',{exact:true}).count(),0,'SAMPLE_POLICY_RENDERED');
+      await drawer.locator('#imp-back2').click();
+      await drawer.locator('input[type=file]').setInputFiles({name:'qa-review.csv',mimeType:'text/csv',buffer:Buffer.from('poliza,ramo\nSOURCE-REVIEW-318,Autos')});
+      await drawer.getByText('SOURCE-REVIEW-318',{exact:true}).waitFor({timeout:20000});
+      assert.equal(await drawer.locator('#imp-next2').isEnabled(),true,'REAL_SOURCE_REVIEW_NOT_AVAILABLE');
+      await drawer.locator('#imp-close').click();
+      console.log('I66_SIGNED_IMPORT_ACTUAL_SOURCE_REVIEW_'+a.role.toUpperCase()+'_PASS policySubmissions=0');
+    }
+    if (SOURCE === 'ab99e4474cea1ef7d08d2359966e6aa8d81e061b' || SOURCE === '431892dcfefaa7eaad6faec3ab281dca25d6b2b1') {
       qaStage='issued-renewal-display';
       await page.evaluate(()=>Orbit.store._ensureCollections(['polizas','clientes','aseguradoras']));
       await page.waitForFunction(()=>{
