@@ -23,6 +23,13 @@ const digest = value => crypto.createHash('sha256').update(JSON.stringify(value)
 const gytPolicy=insurer=>/(?:G&T|GYT)/.test(norm(insurer));
 function policyKeys(number,insurer){
   const raw=str(number), keys=new Set([canonicalPolicyNumber(raw)]);
+  if (/^(?:SEGUROS )?UNIVERSALES$/.test(norm(insurer))) {
+    const parts = /^(\d{2}-\d{2}-\d{2}-)(\d{1,6})(-\d)$/.exec(raw);
+    if (parts) {
+      keys.add(parts[1] + parts[2].padStart(6, '0') + parts[3]);
+      keys.add(parts[1] + String(Number(parts[2])) + parts[3]);
+    }
+  }
   if(gytPolicy(insurer)){
     const match=/^(?:AUTO\s*[- ]\s*)?(\d{3,10})$/i.exec(raw);
     if(match){

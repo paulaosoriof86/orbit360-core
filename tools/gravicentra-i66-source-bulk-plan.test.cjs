@@ -158,3 +158,10 @@ assert.equal(planSourceBatch(editionCollision.raw,editionCollision.groups).excep
 
 assert.throws(()=>planSourceBatch(raw,groups,{chunkSize:501}),/SOURCE_BATCH_CHUNK_LIMIT/);
 console.log('I66_SOURCE_BULK_PREFLIGHT_PASS 750 rows 3 chunks; exceptions isolated; 0 writes');
+
+{
+  const {policyKeys}=require('./gravicentra-i66-source-bulk-plan.cjs');
+  assert.ok(policyKeys('04-15-01-603-0','UNIVERSALES').includes('04-15-01-000603-0'));
+  assert.ok(policyKeys('04-15-01-000603-0','Seguros Universales').includes('04-15-01-603-0'));
+  assert.ok(!policyKeys('04-15-01-603-0','MAPFRE').includes('04-15-01-000603-0'));
+}

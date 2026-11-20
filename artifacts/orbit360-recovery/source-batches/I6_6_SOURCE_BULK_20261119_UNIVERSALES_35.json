@@ -412,5 +412,6 @@
     "reportTotalCents": 2526743,
     "extractedCents": 2526743,
     "unpaidRequirements": 35
-  }
+  },
+  "policyFormatEvidence": "I6_6_UNIVERSALES_MARIA_EXACT_CURRENT_CAS_PREVIEW_NOT_APPLIED_20261110.json: segment 603 is stored as 000603; check both forms and require a unique edition."
 }
