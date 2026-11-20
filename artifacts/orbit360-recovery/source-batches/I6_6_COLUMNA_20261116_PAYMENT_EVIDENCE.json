@@ -1,0 +1,91 @@
+{
+  "insurer": "Columna",
+  "driveFileId": "1OzMu3VZaaf4lB3wdNQVDjgRQJtmnJdVA",
+  "sha256": "d688b05c677fd27e6466e0dfd65b1002fda9a52f23b94b819a0f6d2d69888f4a",
+  "sheet": 1,
+  "intermediaryCode": 346,
+  "paidSourceRows": 21,
+  "payments": [
+    {
+      "paymentId": "6160810",
+      "invoiceId": "7122449",
+      "policy": "58028",
+      "installment": 7,
+      "paidDate": "2026-10-15",
+      "grossCents": 22493,
+      "sourceRows": [
+        651
+      ]
+    },
+    {
+      "paymentId": "6174759",
+      "invoiceId": "7167583",
+      "policy": "41977",
+      "installment": 5,
+      "paidDate": "2026-10-26",
+      "grossCents": 33320,
+      "sourceRows": [
+        35069
+      ]
+    },
+    {
+      "paymentId": "6181060",
+      "invoiceId": "7586104",
+      "policy": "50952",
+      "installment": 3,
+      "paidDate": "2026-10-29",
+      "grossCents": 31640,
+      "sourceRows": [
+        91619
+      ]
+    },
+    {
+      "paymentId": "6200925",
+      "invoiceId": "7043053",
+      "policy": "57280",
+      "installment": 9,
+      "paidDate": "2026-11-09",
+      "grossCents": 14803,
+      "sourceRows": [
+        223473,
+        240616,
+        258174,
+        276345,
+        294820,
+        313295,
+        331770,
+        350245
+      ]
+    },
+    {
+      "paymentId": "6202751",
+      "invoiceId": "7172685",
+      "policy": "52068",
+      "installment": 6,
+      "paidDate": "2026-11-10",
+      "grossCents": 45500,
+      "sourceRows": [
+        351198,
+        351809,
+        352785,
+        354013,
+        355241,
+        356469,
+        357697
+      ]
+    },
+    {
+      "paymentId": "6207494",
+      "invoiceId": "7122450",
+      "policy": "58028",
+      "installment": 8,
+      "paidDate": "2026-11-13",
+      "grossCents": 22493,
+      "sourceRows": [
+        368864,
+        370008,
+        371152
+      ]
+    }
+  ]
+}

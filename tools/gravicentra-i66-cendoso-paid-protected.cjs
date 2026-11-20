@@ -362,12 +362,27 @@ async function applyOne(db,oldPlan,source){
 }
 async function main(){
   const mode=str(process.env.GI_I66_CENDOSO_MODE);
-  assert.ok(['preflight','apply'].includes(mode),'I66_PAID_MODE_REQUIRED');
+  assert.ok(['preflight','apply','columna-readback'].includes(mode),'I66_PAID_MODE_REQUIRED');
   assert.equal(process.env.GCLOUD_PROJECT,PROJECT,'I66_PAID_FIREBASE_PROJECT_DRIFT');
   const source=loadSource();
   const admin=require('firebase-admin');
   admin.initializeApp({credential:admin.credential.applicationDefault(),projectId:PROJECT});
   const db=admin.firestore();
+  if(mode==='columna-readback'){
+    const evidence=require('../artifacts/orbit360-recovery/source-batches/I6_6_COLUMNA_20261116_PAYMENT_EVIDENCE.json');
+    const candidates=evidence.payments.flatMap(p=>[p.policy,'VA-'+p.policy,'VA '+p.policy].map(policyNumberSource=>({policyNumberSource})));
+    const groups=await readGroups(db,{candidates});
+    for(const p of evidence.payments){
+      const editions=groups.filter(g=>[p.policy,'VA-'+p.policy,'VA '+p.policy].includes(str(g.policy.numero))&&
+        policyCountry(g.policy)==='GT'&&insurerMatches('COLUMNA',g.insurerName));
+      const receiptMatches=editions.flatMap(g=>g.receipts.filter(r=>Number(r.secuencia||r.numeroCuota)===p.installment&&
+        [r.primaTotal,r.montoTotal,r.monto].some(v=>cents(v)===p.grossCents)));
+      console.log('I66_COLUMNA_READBACK '+JSON.stringify({policy:p.policy,installment:p.installment,
+        editions:editions.length,matchingReceipts:receiptMatches.length,alreadyPaid:receiptMatches.filter(isPaid).length,
+        linkedCobros:editions.reduce((n,g)=>n+g.cobros.filter(c=>date(c.fechaPago)===p.paidDate&&cents(c.monto)===p.grossCents).length,0),writes:0}));
+    }
+    return;
+  }
   if(mode==='preflight'){
     const groups=await readGroups(db,source);const p=planBatch(source,groups);
     report('GI_I66_CENDOSO_PLAN_OUT',p);
