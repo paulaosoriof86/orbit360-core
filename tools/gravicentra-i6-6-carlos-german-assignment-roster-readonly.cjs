@@ -12,7 +12,7 @@ admin.initializeApp({credential:admin.credential.cert(service),projectId:'ays-or
 const tenant=admin.firestore().collection('tenants').doc(TENANT);
 const norm=x=>String(x||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();
 const LIVE='https://app.aysseguros.com';
-const PREVIEW='https://ays-orbit-360-lab--gi-i66-rc-44674734296-49x74zh3.web.app';
+const PREVIEW='https://ays-orbit-360-lab--gi-i66-rc-44799887193-3x3mt2y8.web.app';
 const ORIGINS=process.env.I66_PROVE_LIVE_NEW_CLIENT?[LIVE]:[PREVIEW];
 (async()=>{
  const [members,advisors]=await Promise.all([
@@ -45,6 +45,8 @@ const ORIGINS=process.env.I66_PROVE_LIVE_NEW_CLIENT?[LIVE]:[PREVIEW];
  const browser=await chromium.launch({headless:true,args:['--no-sandbox']});
  try{
   for(const origin of ORIGINS){
+   const marker=await fetch(origin+'/__recovery__/build.json',{headers:{'cache-control':'no-cache'}}).then(r=>r.json());
+   assert.equal(marker.sourceSha,origin===LIVE?process.env.I66_PROVE_LIVE_NEW_CLIENT:'ab99e4474cea1ef7d08d2359966e6aa8d81e061b','ROSTER_HOSTED_ARTIFACT_DRIFT');
    const context=await browser.newContext({viewport:{width:1280,height:850}});
    try{
     const page=await context.newPage();

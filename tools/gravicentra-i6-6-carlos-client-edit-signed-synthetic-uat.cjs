@@ -78,6 +78,39 @@ const suffix=Date.now().toString(36)+'_'+crypto.randomBytes(4).toString('hex');
      return{started:result?.started,role:Orbit.session?.rol?.()};
     },token);
     assert.ok(authState.started&&norm(authState.role)===a.role,'QA_ACTOR_ROLE_NOT_SIGNED');
+    if (SOURCE === 'ab99e4474cea1ef7d08d2359966e6aa8d81e061b') {
+      qaStage='issued-renewal-display';
+      const result=await page.evaluate(async ()=>{
+        const store=Orbit.store;
+        await store._ensureCollections(['polizas','clientes','aseguradoras']);
+        const policy=store.all('polizas').find(row=>{
+          const prior=row.vigenciaInicio, next=row.vigenciaFin;
+          return /^\d{4}-\d{2}-\d{2}$/.test(prior) && /^\d{4}-\d{2}-\d{2}$/.test(next)
+            && next.slice(4)===prior.slice(4) && Number(next.slice(0,4))===Number(prior.slice(0,4))+1
+            && next.slice(5)!=='02-29' && row.numero && row.pais==='GT'
+            && store.get('clientes',row.clienteId) && store.get('aseguradoras',row.aseguradoraId)?.vinculada!==false
+            && store.get('aseguradoras',row.aseguradoraId)?.nombre;
+        });
+        if (!policy) throw Error('RENEWAL_NO_AUTHORIZED_ANNUAL_POLICY_FOR_DISPLAY');
+        // A transient view model exercises only the form. It is never submitted or stored.
+        Orbit.renewalDirect.open({workflowType:'renewal_accepted',acceptedConfirmed:true,sourcePolicyId:policy.id});
+        const modal=document.getElementById('ops-direct-renewal-v1201');
+        if (!modal) throw Error('RENEWAL_ISSUED_EDITOR_NOT_OPEN');
+        try {
+          const field=id=>modal.querySelector('#rend-'+id);
+          const changeStart=value=>{field('start').value=value;field('start').dispatchEvent(new Event('change',{bubbles:true}));};
+          const prefilled=field('num').value===String(policy.numero) && field('start').value===policy.vigenciaFin;
+          const insurer=field('asg').value===String(policy.aseguradoraId);
+          changeStart('2028-03-07');
+          const calculated=field('end').value==='2029-03-07';
+          field('end').value='2029-03-12';
+          changeStart('2028-03-08');
+          return {prefilled,insurer,calculated,manualEndPreserved:field('end').value==='2029-03-12'};
+        } finally { modal.remove(); }
+      });
+      assert.deepEqual(result,{prefilled:true,insurer:true,calculated:true,manualEndPreserved:true},'RENEWAL_ISSUED_FORM_READONLY');
+      console.log('I66_SIGNED_RENEWAL_FORM_'+a.role.toUpperCase()+'_PREFILL_TERM_MANUAL_END_PASS formSubmissions=0');
+    }
     await page.evaluate(async()=>{await Orbit.store._ensureCollections(['clientes','actividades']);});
     qaStage='await-synthetic-client-hydration';
     await page.waitForFunction(id=>!!Orbit.store?.get?.('clientes',id),id,{timeout:30000});
