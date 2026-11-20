@@ -405,5 +405,12 @@
       "sourceSha256": "74ea0b692469420e0822269d036fdb761d0daddb7988abb5c04a5af894c114ff",
       "sourceRowNumber": 59
     }
-  ]
+  ],
+  "statementCutoff": "2026-11-16",
+  "sourceTotalTieOut": {
+    "agent": "2625-0",
+    "reportTotalCents": 2526743,
+    "extractedCents": 2526743,
+    "unpaidRequirements": 35
+  }
 }
