@@ -18,6 +18,7 @@ on:
       - artifacts/orbit360-recovery/release-control/I6_6_CLIENTE360_EDIT_ACTIVITY_EXACT_LIVE_REQUEST_20261119.json
       - artifacts/orbit360-recovery/release-control/I6_6_OPS_LEADS_RETURN_EXACT_LIVE_REQUEST_20261119.json
       - artifacts/orbit360-recovery/release-control/I6_6_ISSUED_RENEWAL_PAYMENT_EXACT_LIVE_REQUEST_20261120.json
+      - artifacts/orbit360-recovery/release-control/I6_6_DOCUMENT_IMPORT_SOURCE_EXACT_LIVE_REQUEST_20261120.json
       - tools/gravicentra-i6-6-live-exact-clone.mjs
 
 permissions:
@@ -39,7 +40,7 @@ jobs:
       SA_LAB_ALT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
       SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
       I66_PACKAGE_ROOT: /tmp/gi-i66-promote-package
-      I66_APPROVED_RELEASE_REQUEST: artifacts/orbit360-recovery/release-control/I6_6_ISSUED_RENEWAL_PAYMENT_EXACT_LIVE_REQUEST_20261120.json
+      I66_APPROVED_RELEASE_REQUEST: artifacts/orbit360-recovery/release-control/I6_6_DOCUMENT_IMPORT_SOURCE_EXACT_LIVE_REQUEST_20261120.json
     steps:
       - uses: actions/checkout@v4
         with:
@@ -62,7 +63,8 @@ jobs:
           const fs=require('node:fs'),cp=require('node:child_process');
           const assert=require('node:assert/strict');
           const j=JSON.parse(fs.readFileSync(process.env.I66_APPROVED_RELEASE_REQUEST,'utf8'));
-          const issuedRenewal=j.schema==='GRAVICENTRA_I6_6_ISSUED_RENEWAL_PAYMENT_EXACT_LIVE_V1';
+          const importReview=j.schema==='GRAVICENTRA_I6_6_DOCUMENT_IMPORT_SOURCE_EXACT_LIVE_V1';
+          const issuedRenewal=importReview||j.schema==='GRAVICENTRA_I6_6_ISSUED_RENEWAL_PAYMENT_EXACT_LIVE_V1';
           if(issuedRenewal||j.schema==='GRAVICENTRA_I6_6_CLIENTE360_ADVISOR_EXACT_LIVE_V1'){
             (async()=>{
               assert.equal(j.requireSignedLiveCoradoQueueReadback,true);
@@ -70,7 +72,7 @@ jobs:
               assert.equal(j.status,'OWNER_AUTHORIZED_TARGETED_LIVE_PENDING_PROTECTED_RUN');
               assert.equal(j.approvedByDirection,true);
               if(issuedRenewal){
-                assert.equal(cp.execFileSync('git',['hash-object',process.env.I66_APPROVED_RELEASE_REQUEST],{encoding:'utf8'}).trim(),'4956a5cc5d2109b60adb4e02e6602bf737dba23c','RENEWAL_PAYMENT_APPROVAL_RECORD_DRIFT');
+                assert.equal(cp.execFileSync('git',['hash-object',process.env.I66_APPROVED_RELEASE_REQUEST],{encoding:'utf8'}).trim(),importReview?'616109f0a5611c833ece9789b8317af65060fdb9':'4956a5cc5d2109b60adb4e02e6602bf737dba23c','EXACT_UI_APPROVAL_RECORD_DRIFT');
                 assert.equal(j.signedPreviewScope.renewalNumberInsurerSuggestedTermAndManualOverride,true);
                 assert.equal(j.requireHostedPaymentFeedbackTests,true);
                 assert.equal(j.backendDeploy,false);
@@ -134,10 +136,18 @@ jobs:
               const signedSteps=(result[8].jobs||[]).flatMap(z=>z.steps||[]);
               assert.equal(control.currentPhysicalHostingRelease.sourceSha,j.expectedPriorLiveSourceSha);
               assert.equal(control.currentPhysicalHostingRelease.liveHostingVersion,j.expectedPriorLiveHostingVersion);
-              const authority=issuedRenewal?control.issuedRenewalPaymentPreviewRequest20261120:control.postAcceptanceOwnerInsurerSelectionPreviewBuildRequest20261119;
+              const authority=importReview?control.importSourceReviewPreviewRequest20261120:issuedRenewal?control.issuedRenewalPaymentPreviewRequest20261120:control.postAcceptanceOwnerInsurerSelectionPreviewBuildRequest20261119;
               assert.equal(result[2].head_sha,authority.sourceQaHead);
               if(issuedRenewal){
                 assert.equal(result[1].head_sha,j.signedPreviewQaCommit);
+                if(importReview){
+                  assert.equal(j.requireHostedImportTests,true);
+                  assert.equal(j.requireSignedImportRealSourceReview,true);
+                  assert.equal(j.signedPreviewScope.importSourceReviewBothRoles,true);
+                  assert.ok(signedSteps.some(s=>s.name==='Check import source review against the exact bytes served by Preview'&&s.conclusion==='success'));
+                  const harness='tools/gravicentra-i6-6-carlos-client-edit-signed-synthetic-uat.cjs';
+                  cp.execFileSync('git',['diff','--quiet',j.signedPreviewQaCommit,'HEAD','--',harness]);
+                }
                 assert.equal(result[1].head_branch,'recovery/fase-a-clean-20260831');
                 assert.equal(authority.previousLiveArtifactDigest,j.signedPriorLiveReleaseEvidence.artifactDigest);
                 assert.equal(authority.previousLiveArtifactId,j.signedPriorLiveReleaseEvidence.artifactId);

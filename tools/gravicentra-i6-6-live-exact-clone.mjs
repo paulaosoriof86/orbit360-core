@@ -7,7 +7,8 @@ import {GoogleAuth} from 'google-auth-library';
 const SITE='ays-orbit-360-lab',PROJECT='ays-orbit-360-lab';
 const REQUEST=process.env.I66_APPROVED_RELEASE_REQUEST||'artifacts/orbit360-recovery/release-control/I6_6_EXACT_HOSTING_LIVE_PROMOTION_REQUEST_20261110.json';
 const rawRequest=JSON.parse(fs.readFileSync(REQUEST,'utf8'));
-const issuedRenewal=rawRequest.schema==='GRAVICENTRA_I6_6_ISSUED_RENEWAL_PAYMENT_EXACT_LIVE_V1';
+const importReview=rawRequest.schema==='GRAVICENTRA_I6_6_DOCUMENT_IMPORT_SOURCE_EXACT_LIVE_V1';
+const issuedRenewal=importReview||rawRequest.schema==='GRAVICENTRA_I6_6_ISSUED_RENEWAL_PAYMENT_EXACT_LIVE_V1';
 const signedClientSuccessor=issuedRenewal||rawRequest.schema==='GRAVICENTRA_I6_6_CLIENTE360_ADVISOR_EXACT_LIVE_V1';
 // The existing I6.6 rollback/clone owner consumes the signed successor directly.
 // Internal field aliases let the legacy verified byte-for-byte transport remain
@@ -108,7 +109,7 @@ function validateRequest(){
     need(rawRequest.signedPreviewScope?.realCarlosOperativoLogin===true&&rawRequest.signedPreviewScope?.germanAndPriscilaActualEditNewClientPolicyOps===true&&rawRequest.signedPreviewScope?.signedCarlosAndDirectionOpsLeadsSyntheticCreateUpdateResolveReloadRestore===true&&rawRequest.signedPreviewScope?.signedBothRolePaymentReceiptCobroPortfolioSyntheticWriteReloadRestore===true&&rawRequest.signedPreviewScope?.realCustomerWrites===0,'I66_CLIENTE360_SIGNED_UAT_SCOPE_INVALID');
     if(issuedRenewal){
       const approvedBlob=execFileSync('git',['hash-object',REQUEST],{encoding:'utf8'}).trim();
-      need(approvedBlob==='4956a5cc5d2109b60adb4e02e6602bf737dba23c'&&rawRequest.backendDeploy===false,'I66_ISSUED_RENEWAL_APPROVAL_RECORD_DRIFT');
+      need(approvedBlob===(importReview?'616109f0a5611c833ece9789b8317af65060fdb9':'4956a5cc5d2109b60adb4e02e6602bf737dba23c')&&rawRequest.backendDeploy===false,'I66_ISSUED_RENEWAL_APPROVAL_RECORD_DRIFT');
       need(rawRequest.signedPreviewScope.renewalNumberInsurerSuggestedTermAndManualOverride===true&&rawRequest.requireHostedPaymentFeedbackTests===true,'I66_ISSUED_RENEWAL_SIGNED_QA_MISSING');
     }else{
       need(rawRequest.sourceSha==='7791f34cf2574d1915701ee22cf3993e8de79249'&&rawRequest.buildRunId===44674734296&&rawRequest.artifactId===14601447337&&rawRequest.signedCarlosPaulaPreviewUatRunId===44675079983,'I66_CLIENTE360_SIGNED_PROOF_IDENTITY_DRIFT');
@@ -190,6 +191,7 @@ try{
     ]){
       execFileSync(process.execPath,['tools/'+script],{cwd:process.cwd(),env,stdio:'inherit',timeout:300000});
       evidence[key+'SignedLiveSyntheticPass']=true;
+      if(key==='clientEdit'&&importReview)evidence.importSourceReviewBothSignedRolesLive=true;
     }
   }
   evidence.status=signedClientSuccessor?'LIVE_HOSTING_AND_CARLOS_ROSTER_SAME_ARTIFACT_PASS_FULL_I66_HOLD':'LIVE_HOSTING_SAME_ARTIFACT_READBACK_PASS_NOT_FULL_UAT';
