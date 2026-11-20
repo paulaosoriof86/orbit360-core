@@ -53,5 +53,40 @@ async function read() {
       receiptCount:receipts.size,quotas:quotas.sort((a,b)=>a.index-b.index),writes:0}));
   }
   assert.ok(matches > 0,'NO_VERIFIED_CURRENT_CLIENT_POLICY_MATCH');
+  const batch = require('../artifacts/orbit360-recovery/source-batches/I6_6_SOURCE_BULK_20261119_ROBLE_NOV20_259.json');
+  const roster = await items('asesores').limit(401).get();
+  assert.ok(roster.size < 401, 'ADVISOR_ROSTER_BOUND');
+  const named = roster.docs.filter(doc => {
+    const row = doc.data();
+    return [row.nombre, row.nombreCompleto, row.displayName, row.name].some(value => {
+      const words = norm(value).split(/\s+/);
+      return words.includes('FERNANDO') && words.includes('ARIAS');
+    }) && row.activo !== false && row.active !== false;
+  });
+  const expected = new Set(named.flatMap(doc => [doc.id, doc.data().id, doc.data().asesorId].filter(Boolean)));
+  for (const caseId of ['ROBLE_NOV20_0001', 'ROBLE_NOV20_0006']) {
+    const row = batch.rows.find(source => source.caseId === caseId && source.insurer === 'ROBLE');
+    assert.ok(row, 'APPROVED_SOURCE_ROW_MISSING');
+    const found = await items('polizas').where('numero', '==', row.policy).limit(12).get();
+    assert.ok(found.size < 12, 'POLICY_EDITION_BOUND');
+    const terms = found.docs.filter(doc => {
+      const p = doc.data(), start = p.vigenciaInicio || p.vigenciaIni;
+      return norm(p.pais)==='GT' && start && start <= caseDate && p.vigenciaFin > caseDate;
+    });
+    const result = {caseId, currentTerms:terms.length, matchingAdvisorProfiles:named.length, writes:0};
+    if (terms.length === 1 && named.length === 1) {
+      const policy = terms[0];
+      result.policyAssignedToExpected = expected.has(policy.data().asesorId);
+      result.policyHasAdvisor = Boolean(policy.data().asesorId);
+      for (const collection of ['recibosEsperados','comisiones','finmovs']) {
+        const linked = await items(collection).where('polizaId','==',policy.id).limit(121).get();
+        assert.ok(linked.size < 121,'LINKED_COLLECTION_BOUND');
+        result[collection] = {count:linked.size,
+          rowsWithAdvisor:linked.docs.filter(doc=>Boolean(doc.data().asesorId)).length,
+          expectedAdvisor:linked.docs.filter(doc=>expected.has(doc.data().asesorId)).length};
+      }
+    }
+    console.log('I66_ADVISOR_ASSIGNMENT_READBACK '+JSON.stringify(result));
+  }
 }
 read().catch(e=>{console.error(e.message); process.exitCode=1;});
