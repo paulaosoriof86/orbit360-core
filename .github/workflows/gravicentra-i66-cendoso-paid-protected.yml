@@ -6,6 +6,7 @@ on:
       - .github/workflows/gravicentra-i66-cendoso-paid-protected.yml
       - tools/gravicentra-i66-cendoso-paid-protected.cjs
       - tools/gravicentra-i66-cendoso-paid-protected.test.cjs
+      - tools/gravicentra-i66-payment-incident-readback.cjs
       - artifacts/orbit360-recovery/release-control/I6_6_OWNER_DECISIONS_GREENAPI_EMAIL_AND_PAYMENT_20261119.json
       - artifacts/orbit360-recovery/source-batches/I6_6_SOURCE_CENDOSO_PAID_CANDIDATES_2026.json.gz
       - artifacts/orbit360-recovery/source-batches/I6_6_COLUMNA_20261116_PAYMENT_EVIDENCE.json
@@ -25,7 +26,7 @@ jobs:
     if: >
       github.repository == 'paulaosoriof86/orbit360-core' &&
       github.ref_name == 'recovery/fase-a-clean-20260831' &&
-      (contains(github.event.head_commit.message, 'I66_CENDOSO_PAID_BATCH_READY') || contains(github.event.head_commit.message, 'I66_COLUMNA_READBACK') || contains(github.event.head_commit.message, 'I66_ISSUED_READBACK') || contains(github.event.head_commit.message, 'I66_STATEMENT_PAYMENT_READBACK'))
+      (contains(github.event.head_commit.message, 'I66_CENDOSO_PAID_BATCH_READY') || contains(github.event.head_commit.message, 'I66_COLUMNA_READBACK') || contains(github.event.head_commit.message, 'I66_ISSUED_READBACK') || contains(github.event.head_commit.message, 'I66_STATEMENT_PAYMENT_READBACK') || contains(github.event.head_commit.message, 'I66_PAYMENT_INCIDENT_READBACK'))
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     outputs:
@@ -64,6 +65,9 @@ jobs:
               print('I66_PAID_EXISTING_FIREBASE_IDENTITY_PASS');break
           else: raise SystemExit('I66_PAID_NO_EXISTING_FIREBASE_IDENTITY')
           PY
+      - name: Read the reported first three installments and linked payments without writes
+        if: contains(github.event.head_commit.message, 'I66_PAYMENT_INCIDENT_READBACK')
+        run: node tools/gravicentra-i66-payment-incident-readback.cjs
       - name: Read exact insurer-confirmed payments and existing linked collections
         if: contains(github.event.head_commit.message, 'I66_STATEMENT_PAYMENT_READBACK')
         run: node tools/gravicentra-i66-cendoso-paid-protected.cjs
