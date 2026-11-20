@@ -34,11 +34,18 @@ jobs:
           node --check tools/gravicentra-i66-drive-signed-status-readonly.cjs
           node - <<'NODE'
           const assert=require('node:assert/strict');
-          const p=require('./artifacts/orbit360-recovery/release-control/I6_6_LATEST_EXACT_LIVE_POINTER_20261113.json');
-          assert.equal(p.currentLiveSourceSha,'586401bfbe1a80cfef2820982f432743af36b108');
-          assert.equal(p.currentLiveHostingVersion,'sites/ays-orbit-360-lab/versions/1dd873081501d7fb');
-          assert.equal(p.fullI66ProductionAccepted,false);
-          console.log('DRIVE_SIGNED_STATUS_TEST_EXACT_R9_LIVE_READONLY');
+          (async()=>{
+            const origins=['https://app.aysseguros.com','https://ays-orbit-360-lab.web.app'];
+            const markers=await Promise.all(origins.map(async origin=>{
+              const response=await fetch(origin+'/__recovery__/build.json',{cache:'no-store'});
+              assert.equal(response.ok,true);
+              return response.json();
+            }));
+            assert.equal(markers[0].sourceSha,markers[1].sourceSha);
+            assert.equal(markers[0].buildId,markers[1].buildId);
+            assert.match(markers[0].sourceSha,/^[0-9a-f]{40}$/);
+            console.log('DRIVE_SIGNED_STATUS_READONLY_CURRENT_LIVE',markers[0].sourceSha,markers[0].buildId);
+          })().catch(error=>{console.error(error.message);process.exitCode=1;});
           NODE
       - name: Select same-project existing service account and public web configuration
         run: |
