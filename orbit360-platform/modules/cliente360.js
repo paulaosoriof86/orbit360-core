@@ -1460,14 +1460,14 @@ Orbit.modules.cliente360 = (function () {
         contactoAlt: chk.checked ? val('ce-cont') : ''
       };
       const opId = 'cli_edit_' + cid + '_' + Date.now().toString(36), save = back.querySelector('#ce-save');
-      const activity = { id: 'act_' + opId, clienteId: cid, asesorId: patch.asesorId, tipo: 'sistema', icon: '✏', fecha: Orbit.ui.today(), titulo: 'Cliente actualizado', detalle: 'Actualización confirmada desde Cliente 360.', operacionId: opId };
+      const activity = { id: 'act_' + opId, clienteId: cid, pais: patch.pais, tenantId: c.tenantId || '', asesorId: patch.asesorId, tipo: 'sistema', icon: '✏', fecha: Orbit.ui.today(), titulo: 'Cliente actualizado', detalle: 'Actualización confirmada desde Cliente 360. Motivo: '+String(back.dataset.pendingAuditReason || 'Corrección operativa'), operacionId: opId };
       if (!S().batchDurable) return c360toast('Guardado server-owned no disponible; no se aplicaron cambios.');
       save.disabled = true; save.textContent = 'Guardando…';
       try {
         await S().batchDurable([{ action: 'update', collection: 'clientes', id: cid, payload: patch }, { action: 'insert', collection: 'actividades', id: activity.id, payload: activity }], { requestId: opId, timeoutMs: 20000 });
         closeM(); detalle(cid); c360toast('✓ Cliente actualizado y confirmado.');
       } catch (error) {
-        save.disabled = false; save.textContent = 'Guardar cambios'; c360toast('No fue posible confirmar el guardado; revisa y reintenta.');
+        save.disabled = false; save.textContent = 'Guardar cambios'; const code=String(error&&error.code||'unavailable').replace(/[^a-zA-Z0-9/_-]/g,'').slice(0,64); console.warn('[Gravicentra][Cliente360] DURABLE_CLIENT_EDIT_HOLD',{code,collection:'clientes+actividades'}); c360toast('No se confirmó el cambio ('+code+'). El formulario permanece abierto; no se aplicó una actualización parcial.');
       }
     });
   }
