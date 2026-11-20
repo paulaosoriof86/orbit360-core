@@ -1,0 +1,221 @@
+name: AYS S5.12D F040 Q97 Exact Preview-Origin LAB Publish
+on:
+  push:
+    branches:
+      - ays/s512d-f040-q97-origin-qa-20261119
+    paths:
+      - .github/workflows/siniestros-s512d-q97-f040-preview-origin-lab-20261119.yml
+permissions:
+  contents: read
+concurrency:
+  group: ays-s512d-function-only-lab
+  cancel-in-progress: false
+env:
+  PROJECT_ID: ays-orbit-360-lab
+  FUNCTION_NAME: siniestrosPublicResolverS512D
+  EXPECTED_PARENT: 120d914b08077a9158d6f6636dfe19f027cb1c37
+  SOURCE_BASE: a1529716fdfc55018a48278eb58e35b2fb244e0c
+  WORKFLOW_PATH: .github/workflows/siniestros-s512d-q97-f040-preview-origin-lab-20261119.yml
+jobs:
+  publish:
+    if: github.repository == 'paulaosoriof86/orbit360-core' && github.ref == 'refs/heads/ays/s512d-f040-q97-origin-qa-20261119'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      FIREBASE_SERVICE_ACCOUNT_FALLBACK: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+    steps:
+      - name: Checkout exact source
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 4
+          persist-credentials: false
+      - name: Fail closed if parent or change scope differs
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD^)" = "$EXPECTED_PARENT"
+          test "$(git diff --name-only "$EXPECTED_PARENT" HEAD)" = "$WORKFLOW_PATH"
+          test "$PROJECT_ID" = 'ays-orbit-360-lab'
+          test "$FUNCTION_NAME" = 'siniestrosPublicResolverS512D'
+          test "$(git diff --name-only "$SOURCE_BASE" "$EXPECTED_PARENT")" = "$(printf '%s\n' 'functions/siniestros-public-resolver-s512d.js' 'functions/siniestros-s512d-public-surface.test.js')"
+          git diff --check "$SOURCE_BASE" HEAD
+          grep -Fq "'https://ays-alys-gt-v1--alys-q46-1113-9n5qjflr.web.app'" functions/siniestros-public-resolver-s512d.js
+          grep -Fq "'https://ays-alys-gt-v1--alys-q46-1113-9n5qjflr.web.app.evil.invalid'" functions/siniestros-s512d-public-surface.test.js
+          grep -Fq "'https://aysseguros.com'" functions/siniestros-public-resolver-s512d.js
+          grep -Fq "'https://ays-web-publica.web.app'" functions/siniestros-public-resolver-s512d.js
+          grep -Fq "'https://ays-web-publica.web.app.evil.invalid'" functions/siniestros-s512d-public-surface.test.js
+          grep -Fq "'mapfre_guatemala':'mapfre_seguros'" functions/siniestros-public-contract-s512.js
+          grep -Fq "require('./siniestros-public-resolver-s512d')" functions/bootstrap.js
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install locked functions dependencies
+        working-directory: functions
+        run: npm ci
+      - name: Execute resolver tests and syntax check
+        working-directory: functions
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check siniestros-public-resolver-s512d.js
+          node --test siniestros-s512d-public-surface.test.js
+      - name: Verify existing LAB service-account identity
+        shell: bash
+        run: |
+          set -euo pipefail
+          SA="$FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB"
+          if [ -z "$SA" ]; then SA="$FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB"; fi
+          if [ -z "$SA" ]; then SA="$FIREBASE_SERVICE_ACCOUNT_FALLBACK"; fi
+          test -n "$SA"
+          mkdir -p "$RUNNER_TEMP/s512d"
+          CREDS="$RUNNER_TEMP/s512d/credentials.json"
+          printf '%s' "$SA" > "$CREDS"
+          chmod 600 "$CREDS"
+          ACTUAL="$(node -e "const fs=require('fs');process.stdout.write(JSON.parse(fs.readFileSync(process.argv[1],'utf8')).project_id||'')" "$CREDS")"
+          test "$ACTUAL" = "$PROJECT_ID"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$CREDS" >> "$GITHUB_ENV"
+      - name: Install pinned Firebase CLI
+        run: npm install --global firebase-tools@15.32.0
+      - name: Deploy only S5.12D resolver to LAB
+        id: labdeploy
+        shell: bash
+        run: |
+          set -euo pipefail
+          firebase deploy --only "functions:siniestrosPublicResolverS512D" --project "ays-orbit-360-lab" --non-interactive --force
+      - name: Probe exact origin, insurer resolution and negative gates
+        shell: bash
+        run: |
+          set -euo pipefail
+          URL='https://us-central1-ays-orbit-360-lab.cloudfunctions.net/siniestrosPublicResolverS512D'
+          mkdir -p "$RUNNER_TEMP/s512d/probes"
+          for i in 1 2 3 4 5; do
+            CODE="$(curl -sS --max-time 20 -D "$RUNNER_TEMP/s512d/probes/headers" -o "$RUNNER_TEMP/s512d/probes/list" -w '%{http_code}' -G "$URL" --data-urlencode country=GT --data-urlencode action=list -H 'Origin: https://aysseguros.com')"
+            if [ "$CODE" = 200 ]; then break; fi
+            sleep 5
+          done
+          test "$CODE" = 200
+          grep -iq '^access-control-allow-origin: https://aysseguros.com' "$RUNNER_TEMP/s512d/probes/headers"
+          node - "$RUNNER_TEMP/s512d/probes/list" <<'NODE'
+          const fs=require('fs'),assert=require('node:assert/strict');
+          const x=JSON.parse(fs.readFileSync(process.argv[2],'utf8'));
+          assert.equal(x.ok,true);assert.equal(x.country,'GT');
+          assert.equal(x.schemaVersion,'ays-siniestros-s512d-public-resolver-v1');
+          assert.equal(x.count,8);assert.equal(x.insurerNames.length,8);
+          assert.equal(x.truth.coverageConfirmed,false);assert.equal(x.truth.eligibilityConfirmed,false);
+          NODE
+          CODE="$(curl -sS --max-time 20 -o "$RUNNER_TEMP/s512d/probes/roble" -w '%{http_code}' -G "$URL" --data-urlencode country=GT --data-urlencode 'insurer=SEGUROS EL ROBLE' -H 'Origin: https://aysseguros.com')"
+          test "$CODE" = 200
+          node - "$RUNNER_TEMP/s512d/probes/roble" <<'NODE'
+          const fs=require('fs'),assert=require('node:assert/strict');
+          const x=JSON.parse(fs.readFileSync(process.argv[2],'utf8'));
+          assert.equal(x.insurerChannel.value,'1797');assert.equal(x.insurerChannel.validated,true);
+          assert.equal(x.truth.coverageConfirmed,false);
+          NODE
+          # D1.8 original Firebase staging origin must remain allowed without altering the public resolver contract.
+          CODE="$(curl -sS --max-time 20 -D "$RUNNER_TEMP/s512d/probes/firebase-headers" -o "$RUNNER_TEMP/s512d/probes/firebase-general" -w '%{http_code}' -G "$URL" --data-urlencode country=GT --data-urlencode 'insurer=ASEGURADORA GENERAL' -H 'Origin: https://ays-web-publica.web.app')"
+          test "$CODE" = 200
+          grep -iq '^access-control-allow-origin: https://ays-web-publica.web.app' "$RUNNER_TEMP/s512d/probes/firebase-headers"
+          node - "$RUNNER_TEMP/s512d/probes/firebase-general" <<'NODE'
+          const fs=require('node:fs'),assert=require('node:assert/strict');
+          const x=JSON.parse(fs.readFileSync(process.argv[2],'utf8'));
+          assert.equal(x.ok,true);
+          assert.equal(x.insurerChannel.value,'1757');
+          assert.equal(x.insurerChannel.validated,true);
+          assert.equal(x.truth.coverageConfirmed,false);
+          NODE
+          CODE="$(curl -sS --max-time 20 -o /dev/null -w '%{http_code}' -X OPTIONS "$URL" -H 'Origin: https://ays-web-publica.web.app' -H 'Access-Control-Request-Method: GET')"
+          test "$CODE" = 204
+          # F040 Q96: authorize only the EXACT isolated Firebase preview host.
+          QA_ORIGIN='https://ays-alys-gt-v1--alys-q46-1113-9n5qjflr.web.app'
+          CODE="$(curl -sS --max-time 20 -D "$RUNNER_TEMP/s512d/probes/q96-headers" -o "$RUNNER_TEMP/s512d/probes/q96-general" -w '%{http_code}' -G "$URL" --data-urlencode country=GT --data-urlencode 'insurer=ASEGURADORA GENERAL' -H "Origin: $QA_ORIGIN")"
+          test "$CODE" = 200
+          grep -iq "^access-control-allow-origin: $QA_ORIGIN" "$RUNNER_TEMP/s512d/probes/q96-headers"
+          node - "$RUNNER_TEMP/s512d/probes/q96-general" <<'NODE'
+          const fs=require('node:fs'),assert=require('node:assert/strict');
+          const x=JSON.parse(fs.readFileSync(process.argv[2],'utf8'));
+          assert.equal(x.ok,true);
+          assert.equal(x.country,'GT');
+          assert.equal(x.insurerChannel?.value,'1757');
+          assert.equal(x.insurerChannel?.validated,true);
+          assert.equal(x.truth.coverageConfirmed,false);
+          NODE
+          CODE="$(curl -sS --max-time 20 -D "$RUNNER_TEMP/s512d/probes/q96-options-h" -o /dev/null -w '%{http_code}' -X OPTIONS "$URL" -H "Origin: $QA_ORIGIN" -H 'Access-Control-Request-Method: GET')"
+          test "$CODE" = 204
+          grep -iq "^access-control-allow-origin: $QA_ORIGIN" "$RUNNER_TEMP/s512d/probes/q96-options-h"
+          CODE="$(curl -sS --max-time 20 -o /dev/null -w '%{http_code}' -G "$URL" --data-urlencode country=GT --data-urlencode action=list -H "Origin: $QA_ORIGIN.evil.invalid")"
+          test "$CODE" = 403
+          echo 'S512D_Q96_EXACT_PREVIEW_ORIGIN_GET_OPTIONS_POSITIVE_SPOOFED_NEGATIVE_PASS'
+          CODE="$(curl -sS --max-time 20 -o /dev/null -w '%{http_code}' -G "$URL" --data-urlencode country=GT --data-urlencode action=list -H 'Origin: https://ays-web-publica.web.app.evil.invalid')"
+          test "$CODE" = 403
+          CODE="$(curl -sS --max-time 20 -o "$RUNNER_TEMP/s512d/probes/deny" -w '%{http_code}' -G "$URL" --data-urlencode country=GT --data-urlencode action=list -H 'Origin: https://untrusted.example')"
+          test "$CODE" = 403
+          CODE="$(curl -sS --max-time 20 -o "$RUNNER_TEMP/s512d/probes/co" -w '%{http_code}' -G "$URL" --data-urlencode country=CO --data-urlencode action=list -H 'Origin: https://aysseguros.com')"
+          test "$CODE" = 400
+          CODE="$(curl -sS --max-time 20 -o "$RUNNER_TEMP/s512d/probes/post" -w '%{http_code}' -X POST "$URL" -H 'Origin: https://aysseguros.com')"
+          test "$CODE" = 405
+          node --input-type=module <<'NODE'
+          import assert from 'node:assert/strict';
+          const base='https://us-central1-ays-orbit-360-lab.cloudfunctions.net/siniestrosPublicResolverS512D';
+          const origin='https://ays-alys-gt-v1--alys-q46-1113-9n5qjflr.web.app';
+          const validated=[
+            ['Aseguradora General','1757'],
+            ['Aseguradora Guatemalteca','2388-6868 Ext. 1'],
+            ['Aseguradora La Ceiba','2379-1818 / 2311-1223'],
+            ['Aseguradora Rural','2294-8811'],
+            ['G&T Seguros','1778'],
+            ['MAPFRE Guatemala','2328-5060 / 2375-5060'],
+            ['Seguros El Roble','1797'],
+            ['Seguros Bantrab','2410-2696']
+          ];
+          const unvalidated=[
+            'Ficohsa Seguros','Seguros Columna · MICOOP',
+            'Seguros Privanza','Seguros Agromercantil · BAM',
+            'Seguros Universales','Pan American Life'
+          ];
+          async function query(insurer){
+            const url=new URL(base);
+            url.searchParams.set('country','GT');
+            url.searchParams.set('insurer',insurer);
+            const response=await fetch(url,{headers:{Origin:origin,Accept:'application/json'}});
+            assert.equal(response.status,200,insurer+' HTTP');
+            assert.equal(response.headers.get('access-control-allow-origin'),origin,insurer+' CORS');
+            const payload=await response.json();
+            assert.equal(payload.ok,true,insurer+' payload');
+            assert.equal(payload.country,'GT',insurer+' country');
+            assert.equal(payload.truth.coverageConfirmed,false,insurer+' truth');
+            return payload;
+          }
+          for(const [name,expected] of validated){
+            const payload=await query(name);
+            assert.equal(payload.insurerChannelStatus,'CURRENT_CHANNEL_VALIDATED',name);
+            assert.equal(payload.insurerChannel?.value,expected,name);
+            assert.equal(payload.insurerChannel?.validated,true,name);
+          }
+          for(const name of unvalidated){
+            const payload=await query(name);
+            assert.equal(payload.insurerChannelStatus,'NO_VALIDATED_INSURER_CHANNEL',name);
+            assert.equal(payload.insurerChannel,null,name);
+          }
+          console.log('S512D_FIREBASE_ORIGIN_8_VALIDATED_6_SAFE_FALLBACK_PASS');
+          NODE
+          echo 'S512D_LAB_RUNTIME_SECURITY_PASS'
+      - name: Restore last known-good single LAB function after post-deploy failure
+        if: failure() && (steps.labdeploy.outcome == 'success' || steps.labdeploy.outcome == 'failure')
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$PROJECT_ID" = 'ays-orbit-360-lab'
+          test "$FUNCTION_NAME" = 'siniestrosPublicResolverS512D'
+          git show "$SOURCE_BASE:functions/siniestros-public-resolver-s512d.js" > functions/siniestros-public-resolver-s512d.js
+          node --check functions/siniestros-public-resolver-s512d.js
+          firebase deploy --only "functions:$FUNCTION_NAME" --project "$PROJECT_ID" --non-interactive --force
+          echo 'S512D F040 Q97 HOLD: restored last verified LAB resolver; QA origin remains unapproved pending retest.' >> "$GITHUB_STEP_SUMMARY"
+      - name: Delete temporary credential
+        if: always()
+        shell: bash
+        run: |
+          if [ -f "$RUNNER_TEMP/s512d/credentials.json" ]; then
+            shred -u "$RUNNER_TEMP/s512d/credentials.json" || rm -f "$RUNNER_TEMP/s512d/credentials.json"
+          fi
