@@ -81,7 +81,21 @@ const suffix=Date.now().toString(36)+'_'+crypto.randomBytes(4).toString('hex');
     await page.evaluate(async()=>{await Orbit.store._ensureCollections(['clientes','actividades']);});
     qaStage='await-synthetic-client-hydration';
     await page.waitForFunction(id=>!!Orbit.store?.get?.('clientes',id),id,{timeout:30000});
-    await page.evaluate(id=>Orbit.modules.cliente360.edit(id),id);
+    await page.evaluate(id=>{
+      const store=Orbit.store, batch=store.batchDurable;
+      store.batchDurable=async function(...args){
+        try{return await batch.apply(this,args);}
+        catch(error){
+          const message=String(error?.message||'');
+          const safe=/^[A-Z][A-Z0-9_]{3,95}$/.test(message)?message:
+            message==='Preview operativo requiere marca sintética explícita.'?'MISSING_SYNTHETIC_MARKER':
+            error instanceof TypeError?'TYPE_ERROR':error instanceof ReferenceError?'REFERENCE_ERROR':'OTHER';
+          console.warn('DURABLE_CLIENT_EDIT_HOLD diagnostic='+safe+' frame='+String(error?.stack||'').split('\n').slice(1,3).map(line=>line.match(/(?:[\w.-]+\.js):\d+:\d+/)?.[0]||'unknown').join(','));
+          throw error;
+        }
+      };
+      Orbit.modules.cliente360.edit(id);
+    },id);
     qaStage='await-current-country-advisor-roster';
     await page.waitForFunction(()=>{const s=document.querySelector('#ce-ase');return s&&s.dataset.rosterState==='ready'&&!s.disabled;},null,{timeout:30000});
     const ready=await page.evaluate(({advisorId,phone})=>{
