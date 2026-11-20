@@ -300,7 +300,7 @@ jobs:
     if: >
       github.repository == 'paulaosoriof86/orbit360-core' &&
       github.ref == 'refs/heads/recovery/fase-a-clean-20260831' &&
-      contains(github.event.head_commit.message, 'I66_SOURCE_BULK_READY')
+      (contains(github.event.head_commit.message, 'I66_SOURCE_BULK_READY') || contains(github.event.head_commit.message, 'I66_SOURCE_SINGLE_MANIFEST'))
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     outputs:
