@@ -155,6 +155,26 @@ try{
   if(request.expectedOldHostingVersion)need(old===request.expectedOldHostingVersion,'I66_LIVE_HOSTING_VERSION_CHANGED_BEFORE_CLONE');
   oldVersion=old;evidence.liveBeforeVersion=old;evidence.previewVersion=previewVersion;
   need(old!==previewVersion,'I66_SOURCE_AND_TARGET_ALREADY_EQUAL');
+  if (importReview && rawRequest.requireRestoredLivePreflight === true) {
+    // The last promotion stopped during financial startup. Exercise the restored
+    // release first, while both domains still serve the verified previous version.
+    const paymentTest = 'tools/gravicentra-i6-6-carlos-paula-live-synthetic-payment-renewability-uat.cjs';
+    try {
+      execFileSync(process.execPath, [paymentTest], {
+        cwd: process.cwd(),
+        env: {
+          ...process.env,
+          I66_LIVE_ORIGIN: 'https://app.aysseguros.com',
+          I66_APPROVED_LIVE_SOURCE_SHA: request.expectedOldSourceSha
+        },
+        stdio: 'inherit',
+        timeout: 300000
+      });
+    } catch {
+      throw Error('I66_RESTORED_LIVE_FINANCIAL_PREFLIGHT_FAILED');
+    }
+    evidence.restoredLiveFinancialPreflightPassed = true;
+  }
   const [beforeAgain,oldAgain]=await Promise.all([marker('https://ays-orbit-360-lab.web.app'),getLatestRelease('live')]);
   need(oldAgain===old,'I66_LIVE_RELEASE_VERSION_CHANGED_DURING_PREFLIGHT');
   need(beforeAgain.sourceSha===request.expectedOldSourceSha&&beforeAgain.buildId===request.expectedOldBuildId,
