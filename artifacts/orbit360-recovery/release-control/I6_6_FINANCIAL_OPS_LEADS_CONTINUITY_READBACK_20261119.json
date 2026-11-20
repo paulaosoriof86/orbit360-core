@@ -972,5 +972,48 @@
     ],
     "columnaReadback": 44671646547,
     "issuedPolicyReadback": 44672465397
+  },
+  "opsHandbackSignedLive": {
+    "schema": "I6_6_LIVE_EXACT_HOSTING_CLONE_READBACK_V1",
+    "gate": "I6.6",
+    "sourceSha": "7791f34cf2574d1915701ee22cf3993e8de79249",
+    "buildId": "gi-i66-7791f34cf257-57f234755dc1",
+    "artifactId": 14601447337,
+    "previewChannel": "gi-i66-rc-44674734296",
+    "requestSchema": "GRAVICENTRA_I6_6_CLIENTE360_ADVISOR_EXACT_LIVE_V1",
+    "status": "LIVE_HOSTING_AND_CARLOS_ROSTER_SAME_ARTIFACT_PASS_FULL_I66_HOLD",
+    "liveBeforeVersion": "sites/ays-orbit-360-lab/versions/29889fb4208832e6",
+    "previewVersion": "sites/ays-orbit-360-lab/versions/d1ffe4c44b4d9330",
+    "liveAfterVersion": "sites/ays-orbit-360-lab/versions/d1ffe4c44b4d9330",
+    "firebaseLiveReadbackCount": 224,
+    "appDomainReadbackCount": 224,
+    "previewReadbackCount": 224,
+    "dataWrites": 0,
+    "backendDeployments": 0,
+    "rollback": "NOT_REQUIRED",
+    "signedCarlosLiveEditNewPolicyOpsReadOnly": true,
+    "signedCarlosLiveCoradoOpsZeroLeadsOne": true,
+    "clientEditSignedLiveSyntheticPass": true,
+    "opsLeadsSignedLiveSyntheticPass": true,
+    "paymentsSignedLiveSyntheticPass": true,
+    "proofArtifactId": 14601399457,
+    "proofDigest": "sha256:7abfe30727409b1d40222bd76303d9cd099dc765831ea102023e75c3ae8cc1d2",
+    "build": 44674734296,
+    "signedPreview": 44675079983,
+    "liveRun": 44675481227,
+    "driveSignedReadback": {
+      "run": 44675593278,
+      "direccion": "tenant_setup_required",
+      "carlos": "tenant_setup_required",
+      "uploadAndDownloadCertified": false
+    },
+    "universalesCurrentStatement": {
+      "input": 35,
+      "readbackRun": 44676192914,
+      "eligible": 0,
+      "lookupExceptions": 35,
+      "writes": 0,
+      "exactPolicyVariantNeedsReview": true
+    }
   }
 }
