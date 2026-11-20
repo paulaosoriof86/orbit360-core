@@ -119,3 +119,8 @@ jobs:
       - name: Carlos Operativo signed roster in actual Editar Cliente, Nuevo Cliente, Nueva Póliza and Ops; LIVE untouched
         if: ${{ !cancelled() && steps.browser_setup.outcome == 'success' }}
         run: node tools/gravicentra-i6-6-carlos-german-assignment-roster-readonly.cjs
+      - name: Read the restored LIVE roster and Corado handback before considering promotion
+        if: ${{ !cancelled() && steps.browser_setup.outcome == 'success' }}
+        env:
+          I66_PROVE_LIVE_NEW_CLIENT: ab99e4474cea1ef7d08d2359966e6aa8d81e061b
+        run: node tools/gravicentra-i6-6-carlos-german-assignment-roster-readonly.cjs

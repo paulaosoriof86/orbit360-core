@@ -12,7 +12,11 @@ admin.initializeApp({credential:admin.credential.cert(service),projectId:'ays-or
 const tenant=admin.firestore().collection('tenants').doc(TENANT);
 const norm=x=>String(x||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();
 const LIVE='https://app.aysseguros.com';
-const PREVIEW='https://ays-orbit-360-lab--gi-i66-rc-44799887193-3x3mt2y8.web.app';
+const PREVIEW=process.env.I66_PREVIEW_ORIGIN||'https://ays-orbit-360-lab--gi-i66-rc-44799887193-3x3mt2y8.web.app';
+const previewSource=process.env.I66_SOURCE_SHA||'ab99e4474cea1ef7d08d2359966e6aa8d81e061b';
+assert.match(PREVIEW,/^https:\/\/ays-orbit-360-lab--gi-i66-rc-\d+-[a-z0-9]+\.web\.app$/,'PREVIEW_ORIGIN_MISMATCH');
+const expectedSource=process.env.I66_PROVE_LIVE_NEW_CLIENT||previewSource;
+assert.match(expectedSource,/^[a-f0-9]{40}$/,'INVALID_HOSTED_SOURCE');
 const ORIGINS=process.env.I66_PROVE_LIVE_NEW_CLIENT?[LIVE]:[PREVIEW];
 (async()=>{
  const [members,advisors]=await Promise.all([
@@ -45,8 +49,8 @@ const ORIGINS=process.env.I66_PROVE_LIVE_NEW_CLIENT?[LIVE]:[PREVIEW];
  const browser=await chromium.launch({headless:true,args:['--no-sandbox']});
  try{
   for(const origin of ORIGINS){
-   const marker=await fetch(origin+'/__recovery__/build.json',{headers:{'cache-control':'no-cache'}}).then(r=>r.json());
-   assert.equal(marker.sourceSha,origin===LIVE?process.env.I66_PROVE_LIVE_NEW_CLIENT:'ab99e4474cea1ef7d08d2359966e6aa8d81e061b','ROSTER_HOSTED_ARTIFACT_DRIFT');
+   const marker=await fetch(origin+'/__recovery__/build.json?qa='+expectedSource+'-'+Date.now(),{headers:{'cache-control':'no-cache'},redirect:'error'}).then(r=>r.json());
+   assert.equal(marker.sourceSha,expectedSource,'ROSTER_HOSTED_ARTIFACT_DRIFT');
    const context=await browser.newContext({viewport:{width:1280,height:850}});
    try{
     const page=await context.newPage();
