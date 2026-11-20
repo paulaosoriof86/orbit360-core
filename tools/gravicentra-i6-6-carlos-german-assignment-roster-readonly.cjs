@@ -12,7 +12,7 @@ admin.initializeApp({credential:admin.credential.cert(service),projectId:'ays-or
 const tenant=admin.firestore().collection('tenants').doc(TENANT);
 const norm=x=>String(x||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();
 const LIVE='https://app.aysseguros.com';
-const PREVIEW='https://ays-orbit-360-lab--gi-i66-rc-44672291118-doo7rxfc.web.app';
+const PREVIEW='https://ays-orbit-360-lab--gi-i66-rc-44674734296-49x74zh3.web.app';
 const ORIGINS=process.env.I66_PROVE_LIVE_NEW_CLIENT?[LIVE]:[PREVIEW];
 (async()=>{
  const [members,advisors]=await Promise.all([
@@ -139,6 +139,27 @@ const ORIGINS=process.env.I66_PROVE_LIVE_NEW_CLIENT?[LIVE]:[PREVIEW];
        editVisible,editGerman,editPriscila,editReady,editError,createVisible,createGerman,createPriscila,createReady,createError
      };
     },{token,germanId,priscilaId,newPreview:true});
+    if (process.env.I66_VERIFY_CORADO_QUEUE === '1') {
+      const route = await page.evaluate(() => {
+        const normalize = value => String(value || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+        const target = 'juan carlos corado garcia';
+        const clients = Orbit.store.all('clientes').filter(client =>
+          [client.nombre, client.nombreCompleto, client.razonSocial].some(value => normalize(value) === target));
+        const linked = new Set(clients.map(client => client.id));
+        const candidates = Orbit.ciclo.negocios({surface:'leads'}).filter(record =>
+          record.etapa === 'inspeccion' && (linked.has(record.clienteId) ||
+            [record.nombre, record.clienteNombre, record.nombreCliente, record.titulo].some(value => normalize(value).includes(target))));
+        if (candidates.length !== 1) return {matches:candidates.length};
+        const record = candidates[0];
+        const occurrences = columns => columns.flatMap(column => column.items).filter(item => item.kind === 'negocio' && item.rec.id === record.id).length;
+        return {matches:1, direction:Orbit.ciclo.collaborationOwner(record), ops:occurrences(Orbit.ciclo.opsBoard()), leads:occurrences(Orbit.ciclo.leadsBoard())};
+      });
+      assert.equal(route.matches,1,'CORADO_CANONICAL_SCOPED_INSPECTION_NOT_UNIQUE');
+      assert.equal(route.direction,'advisor','CORADO_CURRENT_RESPONSIBILITY_CHANGED_OR_MISSING');
+      assert.equal(route.ops,0,'CORADO_REMAINS_IN_OPS');
+      assert.equal(route.leads,1,'CORADO_NOT_UNIQUE_IN_LEADS');
+      console.log('I66_CORADO_SIGNED_QUEUE_READBACK_PASS ops=0 leads=1 customerWrites=0');
+    }
     console.log('I66_CARLOS_GERMAN_SIGNED_ROSTER_READONLY '+JSON.stringify({origin:origin.includes('--')?'preview':'live',...result}));
     assert.equal(norm(result.role),'operativo','CARLOS_ACTIVE_ROLE_NOT_OPERATIVO');
     if(!result.started||result.callError||!result.serverGerman||!result.optionGerman||!result.optionPriscila||!result.policyClientReady||!result.policyModalVisible||!result.policyGerman||!result.policyPriscila||result.policyDisabled||result.policyModalError)

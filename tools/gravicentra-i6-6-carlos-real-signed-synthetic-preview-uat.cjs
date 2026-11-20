@@ -113,6 +113,27 @@ async function runActor(browser,actor){
     assert.ok(bu.ok&&bu.canonicalReadback,'I66_SIGNED_LEAD_UPDATE_NO_READBACK_'+role);
     lead=(await ref('negocios',ids.business).get()).data()||{};
     assert.equal(lead.nombre,AUDIT_NAME+' actualizada','I66_LEAD_UPDATE_NOT_PERSISTED_'+role);
+    if (process.env.I66_VERIFY_COLLABORATION_ROUNDTRIP === '1') {
+      for (const direction of ['advisor','operations']) {
+        const previous = lead.comentarios || [];
+        const marker = 'evt_i66_' + role + '_' + suffix + '_' + direction;
+        const update = await workflow('update_business',ids.business,{
+          id:ids.business,pais:'GT',comentarios:previous.concat([{
+            eventId:marker,direction,tipo:direction==='advisor'?'Devuelto a asesor':'Reenviado a Operaciones',texto:'Prueba reversible de bandeja'
+          }])
+        });
+        assert.ok(update.ok && update.canonicalReadback,'I66_DIRECTED_UPDATE_NOT_COMMITTED');
+        lead = (await ref('negocios',ids.business).get()).data() || {};
+        assert.equal(lead.id,ids.business);
+        assert.equal(lead.etapa,'nuevo');
+        assert.equal(lead.comentarios.length,previous.length+1);
+        assert.deepEqual(lead.comentarios.slice(0,-1),previous);
+        assert.equal(lead.comentarios.at(-1).eventId,marker);
+        assert.equal(lead.comentarios.at(-1).actorUid,actor.uid);
+        const projected = await page.evaluate(record=>Orbit.ciclo.collaborationOwner(record),{comentarios:lead.comentarios.map(c=>({direction:c.direction,tipo:c.tipo}))});
+        assert.equal(projected,direction,'I66_PERSISTED_QUEUE_DIRECTION_DRIFT');
+      }
+    }
     created.push(['tareas',ids.task]);
     const task=await page.evaluate(async p=>Orbit.store.insertDurable('tareas',p),{id:ids.task,t:'I6.6 tarea sintética transversal',pais:'GT',fecha:'2026-11-12',done:false,__syntheticQa:true});
     assert.equal(task?.id,ids.task,'I66_SIGNED_TASK_CREATE_NOT_CONFIRMED_'+role);
