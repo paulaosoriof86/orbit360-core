@@ -135,15 +135,20 @@ async function read() {
       caseResult.currentTerms=current.length;caseResult.currentRelations=[];
       for(const doc of current){
         const counts={};
-        for(const key of ['vehiculos','endosos','recibosEsperados','carteraPrimas']){
+        for(const key of ['vehiculos','gestiones','recibosEsperados','carteraPrimas']){
           const linked=await items(key).where('polizaId','==',doc.id).limit(121).get();
           assert.ok(linked.size<121,'POLICY_RELATION_BOUND');
           counts[key]=linked.size;
-          if(key==='endosos')counts.markedIssuedSubstitutions=linked.docs.filter(item=>{
-            const row=item.data();
-            return /SUSTITUCION|SUSTITUCION_VEHICULAR/.test(norm([row.tipo,row.tipoEndoso,row.subtipo].join(' '))) &&
-              /EMITID|APLICAD/.test(norm([row.estado,row.estadoEmision].join(' ')));
-          }).length;
+          if(key==='gestiones'){
+            const substitutions=linked.docs.filter(item=>item.data().workflowType==='endorsement_request' &&
+              item.data().endorsementType==='sustitucion_vehiculo');
+            const history=[].concat(doc.data().historial||[]);
+            counts.substitutionRequests=substitutions.length;
+            counts.appliedSubstitutionsWithHistory=substitutions.filter(item=>item.data().endorsementStage==='APLICADO' &&
+              history.some(event=>event?.gestionId===item.id)).length;
+            counts.substitutionRequestsWithDocument=substitutions.filter(item=>Boolean(item.data().documentRef)).length;
+          }
+
         }
         caseResult.currentRelations.push(counts);
       }
