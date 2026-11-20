@@ -26,7 +26,7 @@
     "canonicalPlan": "artifacts/orbit360-recovery/release-control/I6_6_OPERATIONAL_CONTINUATION_20261115.json",
     "activeGate": "I6.6",
     "closedHistoricalGate": "B4-007",
-    "latestProvenLiveSource": "72d3580f3e90071b360319ce5f204d348b401663",
+    "latestProvenLiveSource": "1b65a790530d49fe1d1fb451f02838fd9a713c53",
     "currentWork": "I6.6 HOLD. Physical LIVE hosting is 72d3580f, with separate historical operational acceptance for 1b65a790. Client edit signed Preview rejected by I66_PREVIEW_MUTATION_CALLABLE_DENIED. Signed Ops/Leads, read-only renewal hydration and synthetic payments completed separately in 44670796836. Build patched client activity from its approved cumulative manifest. No promotion until signed persistence passes.",
     "latestHostingPreviewEvidence": "artifacts/orbit360-recovery/release-control/I6_6_NETWORK_DIAGNOSTICS_PREVIEW_BUILD_20261117.json",
     "latestHostingPreviewSource": "1b65a790530d49fe1d1fb451f02838fd9a713c53",
@@ -1540,7 +1540,8 @@
       "backendFunctionsChanged": 0,
       "fullI66ProductionAccepted": false
     },
-    "latestHistoricallyAcceptedOperationalSource": "1b65a790530d49fe1d1fb451f02838fd9a713c53"
+    "latestHistoricallyAcceptedOperationalSource": "1b65a790530d49fe1d1fb451f02838fd9a713c53",
+    "latestProvenLiveSourceScope": "Historical signed operational acceptance including backend. currentPhysicalHostingRelease is authoritative for the current frontend and rollback."
   },
   "b4003ActiveCertificationCursor20261106": {
     "schema": "GRAVICENTRA_B4_003_SINGLE_ACTIVE_CERTIFICATION_CURSOR_V1",
