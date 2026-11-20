@@ -1047,5 +1047,118 @@
       "whatsappScenariosActive": 0,
       "verifiedNewLeads": 0
     }
+  },
+  "operationalReconciliation20261120": {
+    "gate": "I6.6",
+    "asOfDateGT": "2026-11-20",
+    "businessWritesInNewPreflight": 0,
+    "sourceBatch": {
+      "manifest": "I6_6_SOURCE_BULK_20261120_MULTI_302.json",
+      "run": 44797201457,
+      "artifact": 14659131845,
+      "sha256": "c3006bb4978cab108baa80760ef90a05b06ca331ac8928b1a300691b64b0edfe",
+      "bySource": [
+        {
+          "insurer": "El Roble",
+          "rows": 259,
+          "correct": 127,
+          "policyEditionUnresolved": 113,
+          "receiptUnresolved": 19
+        },
+        {
+          "insurer": "Universales",
+          "rows": 35,
+          "correct": 10,
+          "policyEditionUnresolved": 25,
+          "receiptUnresolved": 0
+        },
+        {
+          "insurer": "G&T",
+          "rows": 5,
+          "correct": 0,
+          "policyEditionUnresolved": 4,
+          "receiptUnresolved": 1
+        },
+        {
+          "insurer": "Ficohsa",
+          "rows": 3,
+          "correct": 0,
+          "policyEditionUnresolved": 3,
+          "receiptUnresolved": 0
+        }
+      ],
+      "rows": 302,
+      "correct": 137,
+      "holds": 165,
+      "eligibleUpdates": 0,
+      "confirmedNew": 0,
+      "applied": 0,
+      "excludedFromApply": 165,
+      "duplicatePaymentInference": false,
+      "protectedApplicationsNotReplayed": [
+        44672845293,
+        44673383533
+      ],
+      "otherIndependentPreflights": [
+        {
+          "run": 44796710450,
+          "source": "Cendoso",
+          "rows": 607,
+          "alreadyPaidWithCobro": 342
+        },
+        {
+          "run": 44797174565,
+          "rows": 327,
+          "correct": 146,
+          "holds": 181,
+          "overlapPossible": true
+        }
+      ]
+    },
+    "paymentIncident": {
+      "readOnlyServerRun": 44798516716,
+      "policies": 2,
+      "installmentsChecked": 6,
+      "paidWithExactlyOneLinkedPayment": 6,
+      "applicationsRepeated": 0,
+      "originalRejectedRequestIdVerified": false
+    },
+    "release": {
+      "oldRequestRun": 44676392228,
+      "consumedPriorRequestVerifiedRun": 44797928412,
+      "consumedPriorRequestGuard": 44797928287,
+      "qaSource": "9c99948f522cc6739024c7104b7182a6641df9d5",
+      "sourceQa": 44799521002,
+      "sourceGuard": 44799521006,
+      "immutableSource": "ab99e4474cea1ef7d08d2359966e6aa8d81e061b",
+      "buildRun": 44799887193,
+      "artifact": 14661315988,
+      "artifactDigest": "sha256:fe63c6ea2bb77761ce7cd8e31a8171b3637e8bc6c0f40e22c1f55237e6ff8054",
+      "previewChannel": "gi-i66-rc-44799887193",
+      "stage": "EXACT_HOSTING_PREVIEW_READBACK_CONFIRMED_SIGNED_QA_IN_PROGRESS",
+      "priorAcceptedLiveSource": "7791f34cf2574d1915701ee22cf3993e8de79249",
+      "priorAcceptedLiveRun": 44675481227
+    },
+    "issuedFive": {
+      "sourceDocuments": 5,
+      "documentedInstallments": 49,
+      "serverPreflight": 44672465397,
+      "exactTermsFoundAtPreflight": 0,
+      "newPoliciesApplied": 0,
+      "distinctPolicyholderAndVehicleOwner": 2
+    },
+    "integrations": {
+      "imap": "PRIVATE_INPUT_AND_CONNECTION_TEST_PENDING",
+      "drive": "TENANT_SETUP_REQUIRED_LAST_SIGNED_READBACK",
+      "greenApiScenarios": [
+        10196136,
+        10195867
+      ],
+      "scenariosActivated": 0,
+      "newCanonicalOpportunitiesVerified": 0,
+      "metaCampaignDestination": "WHATSAPP",
+      "selectableNativeFormsOnTwoAuthorizedPages": 0
+    },
+    "fullGateAccepted": false
   }
 }
