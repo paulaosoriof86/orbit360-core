@@ -4,9 +4,10 @@ on:
     branches: [recovery/fase-a-clean-20260831]
     paths:
       - .github/workflows/gravicentra-i66-live-hosting-three-origin-readonly-20261119.yml
-      - artifacts/orbit360-recovery/release-control/I6_6_CLIENTE360_ADVISOR_EXACT_LIVE_RECEIPT_20261119.json
+      - artifacts/orbit360-recovery/release-control/I6_6_ISSUED_RENEWAL_PAYMENT_EXACT_LIVE_REQUEST_20261120.json
 permissions:
   contents: read
+  actions: read
 jobs:
   three-origin-readback:
     if: github.repository == 'paulaosoriof86/orbit360-core' && github.ref == 'refs/heads/recovery/fase-a-clean-20260831'
@@ -16,12 +17,34 @@ jobs:
       - uses: actions/checkout@v4
         with:
           persist-credentials: false
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 44806394054
+          name: gi-i66-live-exact-clone-evidence-44806394054
+          github-token: ${{ github.token }}
+          path: ${{ runner.temp }}/signed-clone-receipt
+      - name: Verify signed run and audit artifact metadata
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          node - <<'NODE'
+          const assert=require('node:assert/strict');
+          (async()=>{
+            const base='https://api.github.com/repos/paulaosoriof86/orbit360-core/actions/';
+            const options={headers:{Authorization:'Bearer '+process.env.GH_TOKEN,'User-Agent':'GI-I66-Independent-Readback'}};
+            const run=await fetch(base+'runs/44806394054',options).then(r=>r.json());
+            const artifact=await fetch(base+'artifacts/14662413998',options).then(r=>r.json());
+            assert.equal(run.conclusion,'success');assert.equal(run.head_sha,'047e56c413f37cda69d75d7bf44cfe4409e85242');
+            assert.equal(artifact.digest,'sha256:f8f294d6e9faf437bafc6f6552714899f9a7d548b2f7c18a472914e3b3de2865'); assert.equal(artifact.workflow_run.id,run.id);
+          })().catch(e=>{console.error(e.message);process.exitCode=1;});
+          NODE
       - name: Compare three immutable build markers with cache bypass; no Firebase writes
         shell: bash
         run: |
           set -euo pipefail
           mkdir -p "$RUNNER_TEMP/origin-diagnostic"
-          for pair in "custom https://app.aysseguros.com" "firebase https://ays-orbit-360-lab.web.app" "candidate https://ays-orbit-360-lab--gi-i66-rc-44637404427-635rywxe.web.app"; do
+          for pair in "custom https://app.aysseguros.com" "firebase https://ays-orbit-360-lab.web.app" "candidate https://ays-orbit-360-lab--gi-i66-rc-44799887193-3x3mt2y8.web.app"; do
             read -r label origin <<< "$pair"
             curl --fail --silent --show-error --location --max-time 30 --retry 2 \
               -H 'Cache-Control: no-cache, no-store, must-revalidate' \
@@ -33,17 +56,17 @@ jobs:
           node - <<'NODE'
           const fs=require('fs'),root=process.env.RUNNER_TEMP+'/origin-diagnostic';
           const cp=JSON.parse(fs.readFileSync('artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json','utf8'));
-          const latest=JSON.parse(fs.readFileSync('artifacts/orbit360-recovery/release-control/I6_6_CLIENTE360_ADVISOR_EXACT_LIVE_RECEIPT_20261119.json','utf8'));
+          const request=JSON.parse(fs.readFileSync('artifacts/orbit360-recovery/release-control/I6_6_ISSUED_RENEWAL_PAYMENT_EXACT_LIVE_REQUEST_20261120.json','utf8'));
+          const receipt=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/signed-clone-receipt/i66-live-exact-clone-readback.json','utf8'));
           const historical=cp.i66OperationalContinuation20261115?.latestSignedQaOutcome||{};
-          if(latest.schema!=='GI_I66_CLIENTE360_ADVISOR_SAME_ARTIFACT_LIVE_RECEIPT_V1'||
-             latest.status!=='LIVE_HOSTING_AND_CARLOS_ROSTER_SAME_ARTIFACT_PASS_FULL_I66_HOLD'||
-             latest.sourceSha!=='72d3580f3e90071b360319ce5f204d348b401663'||
-             latest.liveCloneRunId!==44641361059||latest.artifactId!==14584217893||
-             latest.liveAfter?.hostingVersion!=='sites/ays-orbit-360-lab/versions/63eb68dfe649db40'||
-             latest.previewVersion!==latest.liveAfter.hostingVersion||
-             latest.fullI66ProductionAccepted!==false||
+          if(receipt.sourceSha!==request.sourceSha || receipt.buildId!==request.buildId ||
+             receipt.artifactId!==request.artifactId || receipt.liveBeforeVersion!==request.expectedPriorLiveHostingVersion ||
+             receipt.liveAfterVersion!==receipt.previewVersion || receipt.rollback!=='NOT_REQUIRED' ||
+             ![receipt.firebaseLiveReadbackCount,receipt.appDomainReadbackCount,receipt.previewReadbackCount].every(n=>n===224) ||
+             ![receipt.clientEditSignedLiveSyntheticPass,receipt.opsLeadsSignedLiveSyntheticPass,receipt.paymentsSignedLiveSyntheticPass].every(x=>x===true) ||
              historical.sourceSha!=='1b65a790530d49fe1d1fb451f02838fd9a713c53')
             throw Error('I66_PHYSICAL_LIVE_RECEIPT_OR_HISTORICAL_CONTROL_AUTHORITY_DRIFT');
+          const latest={...request,liveAfter:{sourceSha:receipt.sourceSha,hostingVersion:receipt.liveAfterVersion}};
           const names=['custom','firebase','candidate'];
           const markers=Object.fromEntries(names.map(n=>[n,JSON.parse(fs.readFileSync(root+'/'+n+'.json','utf8'))]));
           for(const name of names){
@@ -61,7 +84,7 @@ jobs:
               markers.custom.buildId===latest.buildId&&markers.firebase.buildId===latest.buildId,
             candidateExactSource:latest.sourceSha,
             candidatePreviewBuildRunId:latest.buildRunId,
-            authorityPath:'I6_6_CLIENTE360_ADVISOR_EXACT_LIVE_RECEIPT_20261119.json',
+            authorityPath:'I6_6_ISSUED_RENEWAL_PAYMENT_EXACT_LIVE_REQUEST_20261120.json',
             fullI66ProductionAccepted:false
           },null,2)+'\n');
           if(markers.custom.sourceSha!==markers.firebase.sourceSha||markers.custom.buildId!==markers.firebase.buildId)
@@ -101,19 +124,19 @@ jobs:
           unset TOKEN
           node - <<'NODE'
           const fs=require('node:fs'),p=process.env.RUNNER_TEMP+'/origin-diagnostic';
-          const accepted=JSON.parse(fs.readFileSync('artifacts/orbit360-recovery/release-control/I6_6_CLIENTE360_ADVISOR_EXACT_LIVE_RECEIPT_20261119.json','utf8'));
-          if(!String(accepted.liveAfter?.hostingVersion||'').startsWith('sites/ays-orbit-360-lab/versions/'))
+          const accepted=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/signed-clone-receipt/i66-live-exact-clone-readback.json','utf8'));
+          if(!String(accepted.liveAfterVersion||'').startsWith('sites/ays-orbit-360-lab/versions/'))
             throw Error('I66_SIGNED_CURRENT_PHYSICAL_HOSTING_VERSION_MISSING');
           const releases=JSON.parse(fs.readFileSync(p+'/live-releases.json','utf8')).releases||[];
           if(!releases.length)throw Error('I66_FIREBASE_CHANNEL_LIVE_RELEASE_MISSING');
           const sanitized=releases.slice(0,5).map(r=>({releaseTime:r.releaseTime,version:r.version?.name,type:r.type}));
           fs.writeFileSync(p+'/live-version-summary.json',JSON.stringify({
             schema:'I66_HOSTING_LIVE_VERSION_READONLY',releases:sanitized,
-            latestVersion:sanitized[0].version,latestSignedPhysicalHostingVersion:accepted.liveAfter.hostingVersion,
-            liveVersionMatchesAuthority:sanitized[0].version===accepted.liveAfter.hostingVersion
+            latestVersion:sanitized[0].version,latestSignedPhysicalHostingVersion:accepted.liveAfterVersion,
+            liveVersionMatchesAuthority:sanitized[0].version===accepted.liveAfterVersion
           },null,2)+'\n');
           console.log('I66_HOSTING_LIVE_RELEASE_VERSIONS_READONLY '+JSON.stringify(sanitized));
-          if(sanitized[0].version!==accepted.liveAfter.hostingVersion)
+          if(sanitized[0].version!==accepted.liveAfterVersion)
             throw Error('I66_FIREBASE_LIVE_VERSION_DRIFT_FROM_SIGNED_PHYSICAL_RECEIPT');
           NODE
       - name: Retain sanitized readback even when the gate detects drift
