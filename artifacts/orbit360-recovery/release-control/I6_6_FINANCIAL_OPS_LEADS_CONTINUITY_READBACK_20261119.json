@@ -626,7 +626,7 @@
         "case": "CARLOS_GERMAN_ADVISOR_NEW_POLICY",
         "severity": "P0",
         "reported": "Germán Reyes absent from Carlos Operativo's advisor selector while creating a policy despite previous closure claim",
-        "verified": "Signed central roster contains 8 and Germán, including one tested policy/modal. Other selectors/routing and Carlos exact browser build not exhaustively tested. Legacy Cliente360 edit UI refers to scoped S().all('asesores') but canonical policy bridge overrides this code when loaded.",
+        "verified": "Real Carlos GT Operativo selectors in Ops, Nueva póliza, Editar cliente and actual CRM Nuevo cliente now include Germán and Priscila on the new LIVE hosting 72d; no real new-policy save certified for this case",
         "ownerCandidates": [
           "modules/policy-receipts-v1199-bridge.js",
           "core/assignable-advisor-roster-client.js",
@@ -639,7 +639,9 @@
           "B4-003-R20-B13"
         ],
         "closure": "Carlos Operativo real GT create-policy selector shows canonical Germán; save synthetic policy with correct advisor; server commit/readback/reload; no duplicate advisor and no unauthorized Equipo access.",
-        "status": "OPEN_PRODUCTION_CASE_UNVERIFIED"
+        "status": "LIVE_CARLOS_SIGNED_ADVISOR_SELECTOR_PASS_POLICY_COMMIT_UNVERIFIED",
+        "liveReadbackRunId": 44641361059,
+        "actualClientEditNewSelectorSourceSha": "72d3580f3e90071b360319ce5f204d348b401663"
       },
       {
         "case": "CARLOS_CLIENTE360_DIRECT_RENEWAL",
@@ -674,7 +676,7 @@
           "B4-003-R16-05-RECEIPT-SHADOW-DUPLICATE-PROJECTION"
         ],
         "closure": "Isolate exact server reject without exposing secrets, reconcile receipt-policy-active portfolio single identity, run authorized real or synthetic payment, commit receipt+cartera+cobro, readback/reload both Cliente360 and Cobros; never retry uncertain writes without canonical readback.",
-        "status": "OPEN_PRODUCTION_CASE_UNVERIFIED"
+        "status": "LIVE_GENERIC_SYNTHETIC_PAYMENT_PASS_EXACT_EDSON_PRECONDITION_STILL_OPEN"
       },
       {
         "case": "CARLOS_THIRD_INSTALLMENT_AND_OTHERS_VENCIDO",
@@ -882,5 +884,53 @@
       "Carlos actual Editar CLIENTE save and recarga with approved identity; all affected module × role × viewport proofs; no false claim that real Edson assignment modified",
       "Preserve prior 33 Cendoso cobros and 110 El Roble receipt+portfolio writes; no repeated apply"
     ]
+  },
+  "latestPhysicalLiveAndFinancialAcceptance20261119": {
+    "status": "LATEST_FRONTEND_LIVE_AND_SIGNED_SYNTHETIC_FINANCIAL_PASS_FULL_I66_HOLD",
+    "parentGate": "I6.6",
+    "sourceSha": "72d3580f3e90071b360319ce5f204d348b401663",
+    "buildId": "gi-i66-72d3580f3e90-57f234755dc1",
+    "immutableBuildRunId": 44637404427,
+    "immutableArtifactId": 14584217893,
+    "immutableArtifactDigest": "sha256:06decf52bfce75a1bdc7e207b96de35c17ccdfed7ff805895bedada0d80617dc",
+    "liveHostingExactCloneRunId": 44641361059,
+    "liveHostingVersion": "sites/ays-orbit-360-lab/versions/63eb68dfe649db40",
+    "priorPhysicalLiveSourceSha": "b38f877f7847c7b6e11506885e42252e84c5eeb6",
+    "priorPhysicalHostingVersion": "sites/ays-orbit-360-lab/versions/13944f80ba1e0bdf",
+    "sourceHistoricalAcceptedInControlPlane": "1b65a790530d49fe1d1fb451f02838fd9a713c53",
+    "exactPreviewLiveBothOriginsReadbackFiles": 224,
+    "exactLiveEvidenceArtifactId": 14587420057,
+    "liveCarlosActualAdvisorSelectorsReadOnlyPass": true,
+    "liveCarlosPaulaFinancialSyntheticRunId": 44642178389,
+    "liveCarlosPaulaFinancialSyntheticResult": "SUCCESS",
+    "liveFinancialScope": [
+      "renewability CAS",
+      "payment apply receipt+cartera+cobro",
+      "invoice reconciliation no duplicate",
+      "reload persisted",
+      "QA cleanup and audit restore"
+    ],
+    "liveReadbackIndependentRunId": 44642769082,
+    "liveReadbackIndependentResult": "SUCCESS",
+    "backendDeploymentInHostingPromotion": 0,
+    "realCustomerFinancialWritesInQa": 0,
+    "makeGreenApiConnectionState": "ok",
+    "makeScenarioGreenApi": 10196136,
+    "makeScenarioGreenApiStatus": "inactive-trigger-only-no-signed-writer",
+    "makeScenarioAds": 10195867,
+    "makeScenarioAdsStatus": "inactive-webhook-only-no-signed-writer",
+    "makeFirestoreConnectionRequest": "109d757e-6a3f-492f-b822-997d0774563a",
+    "makeFirestoreConnectionState": "pending-user-authorization",
+    "explicitUnresolvedCases": [
+      "Edson Kenet exact failed-precondition cause and payment preimage",
+      "Ashley/Ashlyn Aguilar issued substitution persisted LIVE",
+      "Carlos Corado existing-client inspection linked Ops/Leads",
+      "Sergio new policy full issuance and receipts LIVE",
+      "renewal issued successor and Kanban expiry statuses LIVE",
+      "insurer-specific financial invoice inference remaining statement lots",
+      "Make Green API, Meta Lead Ads and Email to canonical Leads writer"
+    ],
+    "fullI66ProductionAccepted": false,
+    "doNotRebuildArtifactOrReplayExistingFinancialWrites": true
   }
 }
