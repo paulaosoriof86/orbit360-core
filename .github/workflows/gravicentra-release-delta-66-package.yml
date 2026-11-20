@@ -290,6 +290,8 @@ jobs:
             process.exit(0);
           }
           const uiRequest = importDelta ? importRequest : c.issuedRenewalPaymentPreviewRequest20261120;
+          if (importDelta && uiRequest.approvedManifestBlobSha !== require('node:child_process').execFileSync(
+              'git',['rev-parse','HEAD:'+manifestName],{encoding:'utf8'}).trim()) throw Error('I66_IMPORT_SOURCE_MANIFEST_NOT_PINNED');
           if (uiRequest && uiRequest.approvedManifestBlobSha === require('node:child_process').execFileSync(
               'git', ['rev-parse','HEAD:artifacts/orbit360-recovery/release-control/I6_6_APPROVED_PRODUCT_DELTA_MANIFEST_20261110.json'],
               {encoding:'utf8'}).trim()) {
