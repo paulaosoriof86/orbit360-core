@@ -86,7 +86,7 @@ concurrency:
 
 jobs:
   gate:
-    if: github.repository == 'paulaosoriof86/orbit360-core' && github.ref == 'refs/heads/recovery/fase-a-clean-20260831'
+    if: github.repository == 'paulaosoriof86/orbit360-core' && github.ref == 'refs/heads/recovery/fase-a-clean-20260831' && !startsWith(github.event.head_commit.message, 'evidence(i66-live-readback):')
     runs-on: ubuntu-24.04
     outputs:
       mode: ${{ steps.release.outputs.mode }}

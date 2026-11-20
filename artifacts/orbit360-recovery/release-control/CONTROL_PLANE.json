@@ -27,7 +27,7 @@
     "activeGate": "I6.6",
     "closedHistoricalGate": "B4-007",
     "latestProvenLiveSource": "1b65a790530d49fe1d1fb451f02838fd9a713c53",
-    "currentWork": "I6.6 HOLD. Physical LIVE hosting is 72d3580f, with separate historical operational acceptance for 1b65a790. Client edit signed Preview rejected by I66_PREVIEW_MUTATION_CALLABLE_DENIED. Signed Ops/Leads, read-only renewal hydration and synthetic payments completed separately in 44670796836. Build patched client activity from its approved cumulative manifest. No promotion until signed persistence passes.",
+    "currentWork": "I6.6 HOLD. Client 360 phone and advisor durable atomic edit, activity and reload passed on LIVE for Operativo and Dirección on scoped synthetic records. Ops/Leads and payments signed LIVE passed. Current physical Hosting and rollback documented in clientEditSignedLive. Corado responsibility, durable insurer editions, attachments, integrations and financial exceptions remain open.",
     "latestHostingPreviewEvidence": "artifacts/orbit360-recovery/release-control/I6_6_NETWORK_DIAGNOSTICS_PREVIEW_BUILD_20261117.json",
     "latestHostingPreviewSource": "1b65a790530d49fe1d1fb451f02838fd9a713c53",
     "operationsEvidenceReview": "artifacts/orbit360-recovery/release-control/I6_6_OPS_EVIDENCE_AND_PREVIEW_BINDING_REVIEW_20261116.json",
@@ -1528,6 +1528,21 @@
       }
     },
     "currentPhysicalHostingRelease": {
+      "sourceSha": "9c689bd283793a635f6a94197351b3fe0ecf2da9",
+      "buildId": "gi-i66-9c689bd28379-57f234755dc1",
+      "artifactId": 14600542823,
+      "artifactDigest": "sha256:cd154cc848ee3ab3ddd736c6863f07f98e90b098e303916aca98a6a78a0e5c9e",
+      "previewRunId": 44672291118,
+      "liveCloneRunId": 44673416497,
+      "liveHostingVersion": "sites/ays-orbit-360-lab/versions/29889fb4208832e6",
+      "readbackEachOrigin": 224,
+      "receipt": "artifacts/orbit360-recovery/release-control/I6_6_FINANCIAL_OPS_LEADS_CONTINUITY_READBACK_20261119.json#clientEditSignedLive",
+      "backendFunctionsChanged": 0,
+      "fullI66ProductionAccepted": false
+    },
+    "latestHistoricallyAcceptedOperationalSource": "1b65a790530d49fe1d1fb451f02838fd9a713c53",
+    "latestProvenLiveSourceScope": "Historical signed operational acceptance including backend. currentPhysicalHostingRelease is authoritative for the current frontend and rollback.",
+    "priorPhysicalHostingRelease20261119": {
       "sourceSha": "72d3580f3e90071b360319ce5f204d348b401663",
       "buildId": "gi-i66-72d3580f3e90-57f234755dc1",
       "artifactId": 14584217893,
@@ -1539,9 +1554,7 @@
       "receipt": "artifacts/orbit360-recovery/release-control/I6_6_FINANCIAL_OPS_LEADS_CONTINUITY_READBACK_20261119.json#latestPhysicalLiveAndFinancialAcceptance20261119",
       "backendFunctionsChanged": 0,
       "fullI66ProductionAccepted": false
-    },
-    "latestHistoricallyAcceptedOperationalSource": "1b65a790530d49fe1d1fb451f02838fd9a713c53",
-    "latestProvenLiveSourceScope": "Historical signed operational acceptance including backend. currentPhysicalHostingRelease is authoritative for the current frontend and rollback."
+    }
   },
   "b4003ActiveCertificationCursor20261106": {
     "schema": "GRAVICENTRA_B4_003_SINGLE_ACTIVE_CERTIFICATION_CURSOR_V1",

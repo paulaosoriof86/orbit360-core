@@ -4525,9 +4525,23 @@
     "actualNewClientOwner": "orbit360-platform/modules/crm-v1198-operational-bridge.js",
     "latestApprovedCrmSourceBlobSha": "1ba69c71b66ddaf66001124c2a980f8f2200de4e",
     "livePromotionAuthorizedByThisRequest": false,
-    "latestClientEditActivitySourceFix": "I6_6_PREVIEW_CLIENT_ACTIVITY_MARKER_20261119"
+    "latestClientEditActivitySourceFix": "I6_6_PREVIEW_CLIENT_ACTIVITY_MARKER_20261119",
+    "consumedByVerifiedLiveRun": 44673416497
   },
   "currentPhysicalHostingRelease": {
+    "sourceSha": "9c689bd283793a635f6a94197351b3fe0ecf2da9",
+    "buildId": "gi-i66-9c689bd28379-57f234755dc1",
+    "artifactId": 14600542823,
+    "artifactDigest": "sha256:cd154cc848ee3ab3ddd736c6863f07f98e90b098e303916aca98a6a78a0e5c9e",
+    "previewRunId": 44672291118,
+    "liveCloneRunId": 44673416497,
+    "liveHostingVersion": "sites/ays-orbit-360-lab/versions/29889fb4208832e6",
+    "readbackEachOrigin": 224,
+    "receipt": "artifacts/orbit360-recovery/release-control/I6_6_FINANCIAL_OPS_LEADS_CONTINUITY_READBACK_20261119.json#clientEditSignedLive",
+    "backendFunctionsChanged": 0,
+    "fullI66ProductionAccepted": false
+  },
+  "priorPhysicalHostingRelease20261119": {
     "sourceSha": "72d3580f3e90071b360319ce5f204d348b401663",
     "buildId": "gi-i66-72d3580f3e90-57f234755dc1",
     "artifactId": 14584217893,
