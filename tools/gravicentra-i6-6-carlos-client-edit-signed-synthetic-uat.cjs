@@ -23,14 +23,26 @@ const suffix=Date.now().toString(36)+'_'+crypto.randomBytes(4).toString('hex');
  assert.equal(german.length,1,'QA_GERMAN_CANONICAL_IDENTITY_AMBIGUOUS');
  assert.equal(paula.length,1,'QA_PAULA_CANONICAL_ADVISOR_AMBIGUOUS');
  const actors=[{role:'operativo',name:'carlos castro'},{role:'direccion',name:'paula osorio'}];
+ const matchesStaff=(row,part)=>{
+   return [row.nombre,row.nombreCompleto,row.displayName,row.name,row.fullName].some(x=>norm(x).startsWith(part));
+ };
+ const membersForActor=a=>{
+   const linkedAdvisors=advisors.docs.filter(d=>matchesStaff(d.data()||{},a.name));
+   const advisorIds=new Set(linkedAdvisors.map(d=>d.id));
+   const actorUids=new Set(linkedAdvisors.flatMap(d=>[d.data()?.authUid,d.data()?.uid,d.data()?.userId].filter(Boolean).map(String)));
+   return members.docs.filter(d=>{
+      const row=d.data()||{};
+      const matches=matchesStaff(row,a.name)||
+        advisorIds.has(String(row.advisorId||row.asesorId||''))||actorUids.has(d.id);
+      const active=norm(row.activeRole)===a.role&&row.active!==false&&row.activo!==false&&
+        [].concat(row.countries||[]).map(String).includes('GT');
+      return matches&&active;
+   });
+ };
  const browser=await chromium.launch({headless:true,args:['--no-sandbox']});
  try{
   for(const a of actors){
-   const member=members.docs.filter(d=>{const row=d.data()||{};
-     return [row.nombre,row.displayName,row.name,row.nombreCompleto,row.fullName].some(x=>norm(x).includes(a.name))&&
-      norm(row.activeRole)===a.role&&row.active!==false&&row.activo!==false&&
-      [].concat(row.countries||[]).map(String).includes('GT');
-   });
+   const member=membersForActor(a);
    assert.equal(member.length,1,'QA_SIGNED_MEMBER_AMBIGUOUS_'+a.role);
    const user=await admin.auth().getUser(member[0].id);assert.ok(!user.disabled&&user.emailVerified);
    const token=await admin.auth().createCustomToken(member[0].id);
