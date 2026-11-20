@@ -17,12 +17,12 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 48
     env:
-      I66_PREVIEW_ORIGIN: https://ays-orbit-360-lab--gi-i66-rc-44653024431-9osqd6fl.web.app
-      I66_SIGNED_QA_CHANNEL_ID: gi-i66-rc-44653024431
-      I66_SOURCE_SHA: f4e28f9fdaa01b9360494136e5860861748deb3c
-      EXPECTED_BUILD_RUN: '44653024431'
-      EXPECTED_ARTIFACT_ID: '14592150834'
-      EXPECTED_ARTIFACT_DIGEST: sha256:3c6ff48d1ac4377cc6f4647abd24e42f3722065964e0f1c9f7ef39ad22bc6e8e
+      I66_PREVIEW_ORIGIN: https://ays-orbit-360-lab--gi-i66-rc-44672291118-doo7rxfc.web.app
+      I66_SIGNED_QA_CHANNEL_ID: gi-i66-rc-44672291118
+      I66_SOURCE_SHA: 9c689bd283793a635f6a94197351b3fe0ecf2da9
+      EXPECTED_BUILD_RUN: '44672291118'
+      EXPECTED_ARTIFACT_ID: '14600542823'
+      EXPECTED_ARTIFACT_DIGEST: sha256:cd154cc848ee3ab3ddd736c6863f07f98e90b098e303916aca98a6a78a0e5c9e
       SA_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
       SA_ALT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
       SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
@@ -64,8 +64,7 @@ jobs:
             assert.equal(artifact.expired,false,'ARTIFACT_EXPIRED');
             assert.equal(preview.sourceSha,process.env.I66_SOURCE_SHA,'PREVIEW_SOURCE_DRIFT');
             assert.match(String(live.sourceSha||''),/^[0-9a-f]{40}$/,'LIVE_BACKUP_MARKER_MISSING');
-            if(live.sourceSha!=='1b65a790530d49fe1d1fb451f02838fd9a713c53')
-              console.log('I66_LIVE_CONTROL_PLANE_DRIFT_HOLD_SEPARATE_FROM_PREVIEW_UAT actual='+String(live.sourceSha).slice(0,12));
+            assert.equal(live.sourceSha,'72d3580f3e90071b360319ce5f204d348b401663','LIVE_BACKUP_CHANGED');
             console.log('I66_NO_LIVE_ACCEPTANCE_CLAIM_FROM_THIS_PREVIEW_UAT');
             console.log('I66_EXACT_PREVIEW_PACKAGE_PASS_CURRENT_LIVE_PROVENANCE_SEPARATE_HOLD');
           })().catch(e=>{console.error(e.stack||e);process.exitCode=1;});
@@ -83,8 +82,8 @@ jobs:
           node node_modules/playwright/cli.js install --with-deps chromium >/dev/null
       - name: Carlos and Dirección signed actual Editar Cliente phone/advisor/atomic country activity durable write reload and cleanup
         env:
-          I66_SIGNED_CLIENT_EDIT_ORIGIN: https://ays-orbit-360-lab--gi-i66-rc-44653024431-9osqd6fl.web.app
-          I66_SIGNED_CLIENT_EDIT_SOURCE: f4e28f9fdaa01b9360494136e5860861748deb3c
+          I66_SIGNED_CLIENT_EDIT_ORIGIN: https://ays-orbit-360-lab--gi-i66-rc-44672291118-doo7rxfc.web.app
+          I66_SIGNED_CLIENT_EDIT_SOURCE: 9c689bd283793a635f6a94197351b3fe0ecf2da9
         run: node tools/gravicentra-i6-6-carlos-client-edit-signed-synthetic-uat.cjs
       - name: Real-role signed Preview Ops Leads Tasks transactional writes and restoration
         if: ${{ !cancelled() && steps.browser_setup.outcome == 'success' }}
