@@ -105,8 +105,8 @@ function validateRequest(){
       need(rawRequest[k]===true,'I66_CLIENTE360_RELEASE_GUARD_MISSING_'+k);
     need(rawRequest.doNotClaimFullPlatformProductionAccepted===true&&rawRequest.doNotClaimFocalCaseEdsonDataUpdatedWithoutWriteReadback===true,'I66_CLIENTE360_SCOPE_OVERCLAIM');
     need(rawRequest.signedPreviewScope?.realCarlosOperativoLogin===true&&rawRequest.signedPreviewScope?.germanAndPriscilaActualEditNewClientPolicyOps===true&&rawRequest.signedPreviewScope?.signedCarlosAndDirectionOpsLeadsSyntheticCreateUpdateResolveReloadRestore===true&&rawRequest.signedPreviewScope?.signedBothRolePaymentReceiptCobroPortfolioSyntheticWriteReloadRestore===true&&rawRequest.signedPreviewScope?.realCustomerWrites===0,'I66_CLIENTE360_SIGNED_UAT_SCOPE_INVALID');
-    need(rawRequest.sourceSha==='9c689bd283793a635f6a94197351b3fe0ecf2da9'&&rawRequest.buildRunId===44672291118&&rawRequest.artifactId===14600542823&&rawRequest.signedCarlosPaulaPreviewUatRunId===44672924385,'I66_CLIENTE360_SIGNED_PROOF_IDENTITY_DRIFT');
-    need(rawRequest.expectedPriorLiveSourceSha==='72d3580f3e90071b360319ce5f204d348b401663'&&rawRequest.expectedPriorLiveHostingVersion==='sites/ays-orbit-360-lab/versions/63eb68dfe649db40','I66_CLIENTE360_LIVE_ROLLBACK_BACKUP_UNPINNED');
+    need(rawRequest.sourceSha==='7791f34cf2574d1915701ee22cf3993e8de79249'&&rawRequest.buildRunId===44674734296&&rawRequest.artifactId===14601447337&&rawRequest.signedCarlosPaulaPreviewUatRunId===44675079983,'I66_CLIENTE360_SIGNED_PROOF_IDENTITY_DRIFT');
+    need(rawRequest.expectedPriorLiveSourceSha==='9c689bd283793a635f6a94197351b3fe0ecf2da9'&&rawRequest.expectedPriorLiveHostingVersion==='sites/ays-orbit-360-lab/versions/29889fb4208832e6','I66_CLIENTE360_LIVE_ROLLBACK_BACKUP_UNPINNED');
     need(rawRequest.previewChannel==='gi-i66-rc-'+rawRequest.buildRunId&&/^sha256:[0-9a-f]{64}$/.test(rawRequest.artifactDigest||''),'I66_CLIENTE360_ARTIFACT_OR_CHANNEL_INVALID');
     need(new RegExp('^https://ays-orbit-360-lab--'+rawRequest.previewChannel+'-[a-z0-9]+\\.web\\.app$').test(rawRequest.previewUrl||''),'I66_CLIENTE360_PREVIEW_ORIGIN_NOT_EXACT');
     need(rawRequest.buildId==='gi-i66-'+rawRequest.sourceSha.slice(0,12)+'-57f234755dc1'&&request.artifactZipSha256.length===64,'I66_CLIENTE360_BUILD_SOURCE_DRIFT');
@@ -168,9 +168,10 @@ try{
     // the actual LIVE selectors (not the shadowed form), with no business writes.
     // A smoke failure is caught below and reverses the Hosting clone.
     execFileSync(process.execPath,['tools/gravicentra-i6-6-carlos-german-assignment-roster-readonly.cjs'],
-      {cwd:process.cwd(),env:{...process.env,I66_PROVE_LIVE_NEW_CLIENT:request.sourceSha},
+      {cwd:process.cwd(),env:{...process.env,I66_VERIFY_CORADO_QUEUE:'1',I66_PROVE_LIVE_NEW_CLIENT:request.sourceSha},
        stdio:['ignore','pipe','pipe'],timeout:180000});
     evidence.signedCarlosLiveEditNewPolicyOpsReadOnly=true;
+    evidence.signedCarlosLiveCoradoOpsZeroLeadsOne=true;
     need(rawRequest.requireClientEditLiveSyntheticWriteReloadCleanup===true,'I66_CLIENT_EDIT_LIVE_QA_REQUIRED');
     const env={...process.env,I66_SIGNED_CLIENT_EDIT_ORIGIN:'https://app.aysseguros.com',
       I66_SIGNED_CLIENT_EDIT_SOURCE:request.sourceSha,I66_LIVE_ORIGIN:'https://app.aysseguros.com',
