@@ -1,0 +1,158 @@
+{
+  "schema": "GRAVICENTRA_I6_6_NEXT_LARGE_DELTA_SOURCE_ONLY_INTAKE_V1",
+  "recordType": "ADDITIVE_EVIDENCE_NOT_CONTROL_PLANE_NOT_DATA_APPLY_NOT_GATE_PASS",
+  "dateGuatemala": "2026-11-20",
+  "gate": "I6.6",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "canonicalControlPlane": "artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json",
+  "preservePreviouslyAcceptedRelease": true,
+  "doNotChangeProductSource": true,
+  "doNotBuildForDataOnly": true,
+  "attachedProjectSourceFingerprints": [
+    {
+      "filename": "CobranzaCendoso (24).xlsx",
+      "sha256": "36de3d35055716af4ca85d48719d4ef58154286a3136f41fac35287e740c03db",
+      "identifiableRows": 1559,
+      "location": "USER_PROJECT_ATTACHMENT_NOT_REUPLOADED_TO_REPOSITORY"
+    },
+    {
+      "filename": "CobranzaCendoso (25).xlsx",
+      "sha256": "0cb6af82ebeccc75c9fcf54b2e4e98db28be0b6c64e1cedb69b2b99d0f20cd90",
+      "identifiableRows": 1441,
+      "location": "USER_PROJECT_ATTACHMENT_NOT_REUPLOADED_TO_REPOSITORY"
+    },
+    {
+      "filename": "CobranzaCendoso (26).xlsx",
+      "sha256": "8400b6fb3e74b78361870d2eec65822e4dc544511bef90391abb10f0f862ff25",
+      "identifiableRows": 1559,
+      "location": "USER_PROJECT_ATTACHMENT_NOT_REUPLOADED_TO_REPOSITORY"
+    },
+    {
+      "filename": "CobranzaCendoso (27).xlsx",
+      "sha256": "f17774ef0f8730a0d35f7300510f5eebc73c4d567ccf3b03bc8917421937f834",
+      "identifiableRows": 312,
+      "location": "USER_PROJECT_ATTACHMENT_NOT_REUPLOADED_TO_REPOSITORY"
+    },
+    {
+      "filename": "CobranzaCendoso (28).xlsx",
+      "sha256": "1dd905a5ff483a905e3f2298efbd8ebb20d9146357e0c5732fd89fdd88ebc8c7",
+      "identifiableRows": 1745,
+      "location": "USER_PROJECT_ATTACHMENT_NOT_REUPLOADED_TO_REPOSITORY"
+    },
+    {
+      "filename": "Contratantes Datos de Contacto 2026-09-17-220726(1).xlsx",
+      "sha256": "4f0a1307605ad5dcc947355dbbc98a50b510358e5f6a9835b75d02e45f5a8c7c",
+      "location": "USER_PROJECT_ATTACHMENT_NOT_REUPLOADED_TO_REPOSITORY"
+    },
+    {
+      "filename": "Directorio Aseguradoras Guatemala 2026 (2)(1).xlsx",
+      "sha256": "f2e57fa72ff1b94b110b5037038c6c47fbc727c513f9eebd2348d7f4f2244083",
+      "location": "USER_PROJECT_ATTACHMENT_NOT_REUPLOADED_TO_REPOSITORY"
+    },
+    {
+      "filename": "Polizas (16).xlsx",
+      "sha256": "e68bfd576b28b01d2839d8c3a22e547d8905f1eaeb84d1d7ffc3a0082960c2a7",
+      "location": "USER_PROJECT_ATTACHMENT_NOT_REUPLOADED_TO_REPOSITORY"
+    },
+    {
+      "filename": "Polizas (17).xlsx",
+      "sha256": "fc00546ca8231f0fafd7f54d5415f152ee58ace21b6c1216e15932ceaf3fdbef",
+      "location": "USER_PROJECT_ATTACHMENT_NOT_REUPLOADED_TO_REPOSITORY"
+    },
+    {
+      "filename": "Renovaciones (13).xlsx",
+      "sha256": "1505902788fb6e71d56cb751d64cd721f6d1930d0c90bcfd890c1a129b5041f3",
+      "location": "USER_PROJECT_ATTACHMENT_NOT_REUPLOADED_TO_REPOSITORY"
+    },
+    {
+      "filename": "Reporte-2026-09-18-061143.xlsx",
+      "sha256": "714407074727167bef52eec34572ea84ee1f6d91da7655572437f03bad7887cd",
+      "location": "USER_PROJECT_ATTACHMENT_NOT_REUPLOADED_TO_REPOSITORY"
+    },
+    {
+      "filename": "Reporte-2026-09-18-061226.xlsx",
+      "sha256": "5681c8d92c94ddd9aa904cede6157004726d70d6da86e179aca6e933f05a000a",
+      "location": "USER_PROJECT_ATTACHMENT_NOT_REUPLOADED_TO_REPOSITORY"
+    }
+  ],
+  "crossFileCendosoSourceOnlyAudit": {
+    "examinedFiles": 5,
+    "tableRowsWithPolicyAndInsurer": 6616,
+    "distinctProvisionalCompositeKeys": 3706,
+    "possibleRepeatedRowsByProvisionalComposite": 2910,
+    "keysSeenInMoreThanOneSnapshot": 1466,
+    "keysMissingCompleteProvisionalComposite": 2,
+    "sourceFolioReciboValuesPresent": 0,
+    "provisionalKeyDefinition": "Insurer + normalized policy + series/cuota + due date + gross + policy term; NO canonical receipt ID/tenant or Firestore match at this stage",
+    "warning": "Counts describe source overlap only, not Firestore duplicates, actual payments or an eligible mutation set. All source rows require current scoped Firestore preimages and approved canonical IDs."
+  },
+  "currentGithubSourceBatch": {
+    "path": "artifacts/orbit360-recovery/source-batches/I6_6_SOURCE_BULK_20261120_MULTI_302.json",
+    "blobSha": "ab64e111319e3447733a3af05bf378250698ccdb",
+    "uniqueSourceCaseIds": 302,
+    "byInsurer": {
+      "ROBLE": 259,
+      "UNIVERSALES": 35,
+      "G&T": 5,
+      "FICOHSA": 3
+    },
+    "sourceMatchesInExistingReadOnlyPreflight": 137,
+    "identityAndEditionHolds": 165,
+    "safeDeterministicUpdatesInExistingPreflight": 0,
+    "scope": "Unpaid statement requirement rows are not proof of paid claims or collections."
+  },
+  "independentNotAdditivePreflights": [
+    {
+      "source": "Cendoso",
+      "rows": 607,
+      "alreadyPaidWithLinkedCobro": 342,
+      "warning": "Do not replay or count 607 as added to 302."
+    },
+    {
+      "source": "Other insurer evidence",
+      "rows": 327,
+      "matched": 146,
+      "holds": 181,
+      "warning": "Overlaps with other sources not reconciled; do not sum."
+    },
+    {
+      "source": "Conciliaciones stage",
+      "proposals": 132,
+      "policyLinks": 52,
+      "policyEditionHolds": 80,
+      "warning": "Stage proposals are not confirmed payment writes."
+    },
+    {
+      "source": "Five El Roble issued terms",
+      "sourceDocuments": 5,
+      "documentedInstallments": 49,
+      "applied": 0,
+      "warning": "Issuer term identity and renewal must be established before creation."
+    }
+  ],
+  "alreadyProcessedInputFingerprints": {
+    "directory": "f2e57fa72ff1b94b110b5037038c6c47fbc727c513f9eebd2348d7f4f2244083",
+    "clients": "4f0a1307605ad5dcc947355dbbc98a50b510358e5f6a9835b75d02e45f5a8c7c",
+    "rule": "These match the authoritative historical I6.2/I6.3 source fingerprints. They are not new sources for reapply."
+  },
+  "requiredNextPhysicalCycle": [
+    "Re-read CONTROL_PLANE and canonical writer/permissions; preserve I6.6 active; do not modify certified artifact.",
+    "Fetch fresh scoped Firestore preimages for each source-case canonical key and exact policy edition.",
+    "Generate verified source-to-server diff categories SIN_CAMBIO, ACTUALIZAR, AGREGAR, REVISAR_AMBIGÜEDAD; isolate contradictions.",
+    "Exclude previously applied rows and protect against any collection from a pending statement row alone.",
+    "Apply only deterministic authorized delta via existing server-owned writer with CAS/idempotency, per field before/after.",
+    "Perform server readback, reload, relationship/financial invariants, audit, rollback receipt, then mini-freeze under existing gate."
+  ],
+  "preparedWorkbookSha256": "5eb0ed4c27f42f47d00ec04434b12d029c9ef984032beae07694d6c7bc91c092",
+  "preparedWorkbookName": "Gravicentra_I66_Lote_Grande_Preparacion_Delta_20261120.xlsx",
+  "workbookScope": "ChatGPT conversation attachment available to Direction; not asserted to exist in GitHub/Drive",
+  "notAuthorized": {
+    "firestoreWrites": 0,
+    "productionDeployments": 0,
+    "makeScenarioActivations": 0,
+    "financialInferenceCorrectionsApplied": 0,
+    "anyNewGateClosed": false,
+    "reason": "Source-only analysis cannot substitute current server identity/diff, signed execution receipt or LIVE readback."
+  }
+}
