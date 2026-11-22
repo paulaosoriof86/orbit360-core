@@ -12,6 +12,7 @@ on:
     paths:
       - .github/workflows/gravicentra-i66-insurer-source-bulk-protected.yml
       - tools/gravicentra-i66-issued-renewal*.cjs
+      - tools/gravicentra-i66-roble-five-issuer-crosswalk*.cjs
       - tools/gravicentra-i66-issued-original-access.cjs
       - tools/gravicentra-i66-issued-source-schedule*.cjs
       - tools/gravicentra-i66-source-bulk-plan.cjs
