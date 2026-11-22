@@ -4660,7 +4660,9 @@
     "backendDeploy": false,
     "liveDeploy": false,
     "businessWrites": false,
-    "approvedManifestBlobSha": "b9a3748c987d3ba045e03252b1647dcd8afc1df5"
+    "approvedManifestBlobSha": "b9a3748c987d3ba045e03252b1647dcd8afc1df5",
+    "consumedBySignedLiveRunId": 44823500637,
+    "consumedAs": "EXACT_HOSTING_IMPORT_REVIEW_PUBLISHED_224_FILES"
   },
   "previousPhysicalHostingReleaseBeforePaymentDirect20261120": {
     "sourceSha": "431892dcfefaa7eaad6faec3ab281dca25d6b2b1",
@@ -4709,7 +4711,9 @@
     "liveDeploy": false,
     "businessWrites": false,
     "approvedManifestBlobSha": "6ba434a8ab59925b32899143f55e80215b358e9c",
-    "consentedScope": "Same existing I6.6 immutable Preview only. Synthetic QA and role readback before any same-artifact LIVE promotion. No Firestore data migration, no password/OAuth bypass, no frontend baseline overlay."
+    "consentedScope": "Same existing I6.6 immutable Preview only. Synthetic QA and role readback before any same-artifact LIVE promotion. No Firestore data migration, no password/OAuth bypass, no frontend baseline overlay.",
+    "consumedBySignedLiveRunId": 44827928263,
+    "consumedAs": "EXACT_HOSTING_OPTIONAL_DOCUMENT_PAYMENT_PUBLISHED_224_FILES"
   },
   "latestSignedPhysicalFrontendLivePointer20261122": {
     "sourceSha": "f1eb5bc6397f0b159079be516a521dd7b1e5d9ba",
