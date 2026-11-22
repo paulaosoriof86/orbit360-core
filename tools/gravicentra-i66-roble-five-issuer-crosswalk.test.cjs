@@ -30,6 +30,8 @@ test('four single-risk issuances qualify for source-only crosswalk, fleet certif
  assert.equal(r.reduce((n,x)=>n+x.mutations,0),0);
  assert.equal(r.reduce((n,x)=>n+x.firestoreWrites,0),0);
  assert.equal(r.filter(x=>x.partialRiskMatchesOnPredecessor===1).length,5);
+ assert.equal(r.filter(x=>x.sameHolderDocumentaryRiskCandidates===1).length,5);
+ assert.equal(r.filter(x=>x.otherHolderRiskCandidates===0).length,5);
  assert.equal(r.filter(x=>x.plateMatchesOnPredecessor===1&&x.vinMatchesOnPredecessor===1).length,5);
 });
 test('already issued 2026-2027 edition never becomes another create',()=>{
