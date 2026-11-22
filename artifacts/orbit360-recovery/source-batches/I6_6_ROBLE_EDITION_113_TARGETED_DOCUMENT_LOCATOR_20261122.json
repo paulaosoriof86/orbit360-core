@@ -1,0 +1,303 @@
+{
+  "schema": "GRAVICENTRA_I66_ROBLE_113_EDITION_TARGETED_DOC_LOCATOR_V1",
+  "gate": "I6.6",
+  "status": "SOURCE_ONLY_TARGETED_EVIDENCE_NO_CANONICAL_FIRESORE_DIFF_OR_WRITES",
+  "dateGuatemala": "2026-11-22",
+  "source": "I6_6_FINANCIAL_OPS_LEADS_CONTINUITY_READBACK_20261119.json#currentIteration.nov20ExceptionsPolicyCohorts",
+  "activeSourceBatch": "artifacts/orbit360-recovery/source-batches/I6_6_SOURCE_BULK_20261120_MULTI_302.json",
+  "sourceBatchBlobSha": "ab64e111319e3447733a3af05bf378250698ccdb",
+  "affectedPendingSourceRows": 113,
+  "policyNumbers": 14,
+  "documentMetadataReadMethod": "Google Drive connector search filename with 25-result cap and file metadata readback; empty match is NOT proof of missing file.",
+  "allRows": [
+    {
+      "policy": "91-8276951",
+      "affectedSourcePendingRows": 12,
+      "documentSearchCategory": "ONLY_OLD_TERMS_FOUND_IN_CURRENT_FILENAME_SEARCH",
+      "availableDriveDocumentIds": [],
+      "historicalTermDocumentIds": [
+        "19QvmSf4Kw42DMO-VR8SszwC5FyG-Wr5C"
+      ],
+      "priorAuditedIssueTerm": [],
+      "firestoreCanonicalEditionId": null,
+      "receiptCanonicalIdsVerified": 0,
+      "safeDeterministicWritesFromThisPass": 0,
+      "nextAction": "Use all existing issuer provenance and source dossier, then request original issued terms only if absent after exact search; no policy creation from pending statement alone."
+    },
+    {
+      "policy": "91-8323091",
+      "affectedSourcePendingRows": 12,
+      "documentSearchCategory": "ONLY_OLD_TERMS_FOUND_IN_CURRENT_FILENAME_SEARCH",
+      "availableDriveDocumentIds": [],
+      "historicalTermDocumentIds": [
+        "1N4KeYnhs0Tn0J6nMmxCLRgPPxFese_0u",
+        "1O9F-A_8Dz7uVqWbTsgba33gl3xXJIkH-"
+      ],
+      "priorAuditedIssueTerm": [],
+      "firestoreCanonicalEditionId": null,
+      "receiptCanonicalIdsVerified": 0,
+      "safeDeterministicWritesFromThisPass": 0,
+      "nextAction": "Use all existing issuer provenance and source dossier, then request original issued terms only if absent after exact search; no policy creation from pending statement alone."
+    },
+    {
+      "policy": "91-8324489",
+      "affectedSourcePendingRows": 12,
+      "documentSearchCategory": "PRIOR_DOCUMENT_TERM_FOUND_CURRENT_METADATA_NOT_PINNED",
+      "availableDriveDocumentIds": [],
+      "historicalTermDocumentIds": [
+        "1jGaudPEJxmZie_k86ASMLinyM6f63Isd",
+        "1hgyR4QQOPxWvx4RSRN7KG2F_JnlRNbEW"
+      ],
+      "priorAuditedIssueTerm": [
+        "2026-11-16 to 2027-11-16"
+      ],
+      "firestoreCanonicalEditionId": null,
+      "receiptCanonicalIdsVerified": 0,
+      "safeDeterministicWritesFromThisPass": 0,
+      "nextAction": "Read actual issued PDF terms/insured/endorsement, compare current Firestore policy edition and receipt before-after, dedupe identical source; CASE-SCOPED HOLD until match."
+    },
+    {
+      "policy": "91-8342189",
+      "affectedSourcePendingRows": 12,
+      "documentSearchCategory": "PRIOR_DOCUMENT_TERM_FOUND_CURRENT_METADATA_NOT_PINNED",
+      "availableDriveDocumentIds": [],
+      "historicalTermDocumentIds": [],
+      "priorAuditedIssueTerm": [
+        "2026-11-12 to 2027-11-12"
+      ],
+      "firestoreCanonicalEditionId": null,
+      "receiptCanonicalIdsVerified": 0,
+      "safeDeterministicWritesFromThisPass": 0,
+      "nextAction": "Read actual issued PDF terms/insured/endorsement, compare current Firestore policy edition and receipt before-after, dedupe identical source; CASE-SCOPED HOLD until match."
+    },
+    {
+      "policy": "91-8343059",
+      "affectedSourcePendingRows": 12,
+      "documentSearchCategory": "PRIOR_DOCUMENT_TERM_FOUND_CURRENT_METADATA_NOT_PINNED",
+      "availableDriveDocumentIds": [],
+      "historicalTermDocumentIds": [],
+      "priorAuditedIssueTerm": [
+        "2026-11-27 to 2027-11-27"
+      ],
+      "firestoreCanonicalEditionId": null,
+      "receiptCanonicalIdsVerified": 0,
+      "safeDeterministicWritesFromThisPass": 0,
+      "nextAction": "Read actual issued PDF terms/insured/endorsement, compare current Firestore policy edition and receipt before-after, dedupe identical source; CASE-SCOPED HOLD until match."
+    },
+    {
+      "policy": "91-9119234",
+      "affectedSourcePendingRows": 11,
+      "documentSearchCategory": "NO_EXACT_FILENAME_MATCH_FOUND_NOT_ABSENCE_PROOF",
+      "availableDriveDocumentIds": [],
+      "historicalTermDocumentIds": [],
+      "priorAuditedIssueTerm": [],
+      "firestoreCanonicalEditionId": null,
+      "receiptCanonicalIdsVerified": 0,
+      "safeDeterministicWritesFromThisPass": 0,
+      "nextAction": "Use all existing issuer provenance and source dossier, then request original issued terms only if absent after exact search; no policy creation from pending statement alone."
+    },
+    {
+      "policy": "91-8322914",
+      "affectedSourcePendingRows": 11,
+      "documentSearchCategory": "DOCUMENT_METADATA_LOCATED_UNMATCHED_EDITION",
+      "availableDriveDocumentIds": [
+        "1IsvnNfbahXoY5RD6r8qRbxooPm5gWLpa"
+      ],
+      "historicalTermDocumentIds": [],
+      "priorAuditedIssueTerm": [],
+      "firestoreCanonicalEditionId": null,
+      "receiptCanonicalIdsVerified": 0,
+      "safeDeterministicWritesFromThisPass": 0,
+      "nextAction": "Read actual issued PDF terms/insured/endorsement, compare current Firestore policy edition and receipt before-after, dedupe identical source; CASE-SCOPED HOLD until match."
+    },
+    {
+      "policy": "91-9118884",
+      "affectedSourcePendingRows": 11,
+      "documentSearchCategory": "NO_EXACT_FILENAME_MATCH_FOUND_NOT_ABSENCE_PROOF",
+      "availableDriveDocumentIds": [],
+      "historicalTermDocumentIds": [],
+      "priorAuditedIssueTerm": [],
+      "firestoreCanonicalEditionId": null,
+      "receiptCanonicalIdsVerified": 0,
+      "safeDeterministicWritesFromThisPass": 0,
+      "nextAction": "Use all existing issuer provenance and source dossier, then request original issued terms only if absent after exact search; no policy creation from pending statement alone."
+    },
+    {
+      "policy": "91-4143471",
+      "affectedSourcePendingRows": 10,
+      "documentSearchCategory": "DOCUMENT_METADATA_LOCATED_UNMATCHED_EDITION",
+      "availableDriveDocumentIds": [
+        "1uTZ_Y4jX1uT7Pum9Ob3nPPyYGVsPzoCQ",
+        "1DKr5Ku9-XmsIiKlJsmC3T6hsH-TLF3MM"
+      ],
+      "historicalTermDocumentIds": [],
+      "priorAuditedIssueTerm": [],
+      "firestoreCanonicalEditionId": null,
+      "receiptCanonicalIdsVerified": 0,
+      "safeDeterministicWritesFromThisPass": 0,
+      "nextAction": "Read actual issued PDF terms/insured/endorsement, compare current Firestore policy edition and receipt before-after, dedupe identical source; CASE-SCOPED HOLD until match."
+    },
+    {
+      "policy": "91-0234395",
+      "affectedSourcePendingRows": 6,
+      "documentSearchCategory": "DOCUMENT_METADATA_LOCATED_UNMATCHED_EDITION",
+      "availableDriveDocumentIds": [
+        "1bDZF50cAMHW522wb8ZBWXQS_y6SvpOvO"
+      ],
+      "historicalTermDocumentIds": [],
+      "priorAuditedIssueTerm": [],
+      "firestoreCanonicalEditionId": null,
+      "receiptCanonicalIdsVerified": 0,
+      "safeDeterministicWritesFromThisPass": 0,
+      "nextAction": "Read actual issued PDF terms/insured/endorsement, compare current Firestore policy edition and receipt before-after, dedupe identical source; CASE-SCOPED HOLD until match."
+    },
+    {
+      "policy": "91-4140843",
+      "affectedSourcePendingRows": 1,
+      "documentSearchCategory": "DOCUMENT_METADATA_LOCATED_UNMATCHED_EDITION",
+      "availableDriveDocumentIds": [
+        "1R6HMlHHv09_87BALnvLpa-E_cWiKlr9m"
+      ],
+      "historicalTermDocumentIds": [],
+      "priorAuditedIssueTerm": [],
+      "firestoreCanonicalEditionId": null,
+      "receiptCanonicalIdsVerified": 0,
+      "safeDeterministicWritesFromThisPass": 0,
+      "nextAction": "Read actual issued PDF terms/insured/endorsement, compare current Firestore policy edition and receipt before-after, dedupe identical source; CASE-SCOPED HOLD until match."
+    },
+    {
+      "policy": "91-0227949",
+      "affectedSourcePendingRows": 1,
+      "documentSearchCategory": "NO_EXACT_FILENAME_MATCH_FOUND_NOT_ABSENCE_PROOF",
+      "availableDriveDocumentIds": [],
+      "historicalTermDocumentIds": [],
+      "priorAuditedIssueTerm": [],
+      "firestoreCanonicalEditionId": null,
+      "receiptCanonicalIdsVerified": 0,
+      "safeDeterministicWritesFromThisPass": 0,
+      "nextAction": "Use all existing issuer provenance and source dossier, then request original issued terms only if absent after exact search; no policy creation from pending statement alone."
+    },
+    {
+      "policy": "91-8357452",
+      "affectedSourcePendingRows": 1,
+      "documentSearchCategory": "DOCUMENT_METADATA_LOCATED_UNMATCHED_EDITION",
+      "availableDriveDocumentIds": [
+        "1V-ttJwtO21uVi1Z7t5DmpPJfhxRkxbO3"
+      ],
+      "historicalTermDocumentIds": [],
+      "priorAuditedIssueTerm": [],
+      "firestoreCanonicalEditionId": null,
+      "receiptCanonicalIdsVerified": 0,
+      "safeDeterministicWritesFromThisPass": 0,
+      "nextAction": "Read actual issued PDF terms/insured/endorsement, compare current Firestore policy edition and receipt before-after, dedupe identical source; CASE-SCOPED HOLD until match."
+    },
+    {
+      "policy": "91-9119548",
+      "affectedSourcePendingRows": 1,
+      "documentSearchCategory": "NO_EXACT_FILENAME_MATCH_FOUND_NOT_ABSENCE_PROOF",
+      "availableDriveDocumentIds": [],
+      "historicalTermDocumentIds": [],
+      "priorAuditedIssueTerm": [],
+      "firestoreCanonicalEditionId": null,
+      "receiptCanonicalIdsVerified": 0,
+      "safeDeterministicWritesFromThisPass": 0,
+      "nextAction": "Use all existing issuer provenance and source dossier, then request original issued terms only if absent after exact search; no policy creation from pending statement alone."
+    }
+  ],
+  "metadataDocuments": [
+    {
+      "policy": "91-4143471",
+      "driveId": "1uTZ_Y4jX1uT7Pum9Ob3nPPyYGVsPzoCQ",
+      "title": "Póliza nueva El Roble - 91-4143471 - 2026-09-21 a 2027-09-21.pdf",
+      "sizeBytes": 1221464,
+      "modified": "2026-11-20T21:01:42.056Z",
+      "otherSameTitleId": "1DKr5Ku9-XmsIiKlJsmC3T6hsH-TLF3MM",
+      "otherSameTitleSizeBytes": 1221464,
+      "otherModified": "2026-11-19T16:01:51.541Z",
+      "meaning": "TWO_SAME_SIZE_SAME_TITLE_DRIVE_COPIES_NOT_PROVEN_IDENTICAL_BYTES"
+    },
+    {
+      "policy": "91-8357452",
+      "driveId": "1V-ttJwtO21uVi1Z7t5DmpPJfhxRkxbO3",
+      "title": "Renovación El Roble - 91-8357452 - 2026-10-27 a 2027-10-27.pdf",
+      "sizeBytes": 1052688,
+      "modified": "2026-11-19T15:43:37.728Z",
+      "meaning": "FILE_METADATA_FOUND_NOT_FIRESTORE_EDITION"
+    },
+    {
+      "policy": "91-8322914",
+      "driveId": "1IsvnNfbahXoY5RD6r8qRbxooPm5gWLpa",
+      "title": "918322914353920.pdf",
+      "sizeBytes": 1053140,
+      "modified": "2026-09-10T16:06:24.000Z",
+      "meaning": "ORIGINAL_PREVIOUSLY_AUDITED_AS_2026_10_05_TO_2027_10_05;_METADATA_NAME_NOT_TERM_PROOF"
+    },
+    {
+      "policy": "91-0234395",
+      "driveId": "1bDZF50cAMHW522wb8ZBWXQS_y6SvpOvO",
+      "title": "91234395199410.pdf",
+      "sizeBytes": 153949,
+      "modified": "2026-04-14T17:19:39.000Z",
+      "meaning": "ORIGINAL_PREVIOUSLY_AUDITED_AS_2026_05_02_TO_2027_05_02;_METADATA_NAME_NOT_TERM_PROOF"
+    },
+    {
+      "policy": "91-4140843",
+      "driveId": "1R6HMlHHv09_87BALnvLpa-E_cWiKlr9m",
+      "title": "914140843322984.pdf",
+      "sizeBytes": 1048133,
+      "modified": "2026-08-11T15:23:17.000Z",
+      "meaning": "ORIGINAL_PREVIOUSLY_AUDITED_AS_2026_09_10_TO_2027_09_10;_METADATA_NAME_NOT_TERM_PROOF"
+    }
+  ],
+  "onlyOldTermDocumentIds": {
+    "91-8276951": [
+      {
+        "id": "19QvmSf4Kw42DMO-VR8SszwC5FyG-Wr5C",
+        "term": "2025–2026"
+      }
+    ],
+    "91-8323091": [
+      {
+        "id": "1N4KeYnhs0Tn0J6nMmxCLRgPPxFese_0u",
+        "term": "2025–2026"
+      },
+      {
+        "id": "1O9F-A_8Dz7uVqWbTsgba33gl3xXJIkH-",
+        "term": "2024–2025"
+      }
+    ],
+    "91-8324489": [
+      {
+        "id": "1jGaudPEJxmZie_k86ASMLinyM6f63Isd",
+        "term": "2025–2026"
+      },
+      {
+        "id": "1hgyR4QQOPxWvx4RSRN7KG2F_JnlRNbEW",
+        "term": "2024–2025"
+      }
+    ]
+  },
+  "previouslyAuditedExactCurrentTerms": [
+    {
+      "policy": "91-8324489",
+      "term": "2026-11-16 to 2027-11-16",
+      "authority": "I6_6_FINANCIAL_OPS_LEADS_CONTINUITY_READBACK_20261119.json#currentIteration.sourceBulk.insurerIssuedPdfTextConfirmedForNew2026_27"
+    },
+    {
+      "policy": "91-8342189",
+      "term": "2026-11-12 to 2027-11-12",
+      "authority": "same"
+    },
+    {
+      "policy": "91-8343059",
+      "term": "2026-11-27 to 2027-11-27",
+      "authority": "same"
+    }
+  ],
+  "eligibleForProtectedWrites": 0,
+  "realFirestoreReadbackThisPass": false,
+  "actualWrites": 0,
+  "duplicatePolicyCreation": 0,
+  "scope": "Metadata lookups for 113 policy-edition holds only; existing I6.4/I6.5 data and previously paid Cendoso preserved; no policy/receipt/portfolio data changes.",
+  "next": "Resolve 14 policy editions with documentary/source proof and current Firestore before/after in protected preflight. Apply only deterministic deltas, then readback and mini-freeze; hold only ambiguous records."
+}
