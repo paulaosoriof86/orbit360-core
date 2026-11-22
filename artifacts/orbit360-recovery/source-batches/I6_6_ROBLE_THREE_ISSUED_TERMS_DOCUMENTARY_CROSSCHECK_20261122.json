@@ -1,0 +1,94 @@
+{
+  "schema": "GI_I66_ISSUED_TERMS_3_POLICIES_CROSSCHECK_V1",
+  "recordType": "SOURCE_DOCUMENT_TEXT_EXTRACT_VERIFIED_NO_FIRESTORE_MAPPING_NO_BUSINESS_MUTATION",
+  "dateGuatemala": "2026-11-22",
+  "activeGate": "I6.6",
+  "sourceOnly": true,
+  "readFrom": "Authenticated Google Drive original insurer PDFs, parsed text (not screenshots or assumed titles)",
+  "immutableSourceBatch": "artifacts/orbit360-recovery/source-batches/I6_6_SOURCE_BULK_20261120_MULTI_302.json",
+  "immutableSourceBatchBlobSha": "ab64e111319e3447733a3af05bf378250698ccdb",
+  "insuredIdentitiesOmittedForPrivacy": true,
+  "issuedExamples": [
+    {
+      "policy": "91-4143471",
+      "issuerDocumentId": "1uTZ_Y4jX1uT7Pum9Ob3nPPyYGVsPzoCQ",
+      "otherSameTitleCopyId": "1DKr5Ku9-XmsIiKlJsmC3T6hsH-TLF3MM",
+      "operation": "NUEVA",
+      "endoso": "368727",
+      "vigenciaInicio": "2026-09-21",
+      "vigenciaFin": "2027-09-21",
+      "issuerCoverGrossCents": 401230,
+      "issuerScheduleGrossCents": 401225,
+      "issuerCoverScheduleCentsDifference": 5,
+      "issuedScheduleRequirements": {
+        "first": "5693795",
+        "firstGrossCents": 33418,
+        "second": "5693796",
+        "remainingFrom": "5693797",
+        "remainingTo": "5693806",
+        "remainingCount": 10,
+        "remainingGrossEachCents": 33437
+      },
+      "sourceRowsPending": 10,
+      "sourceMatchesExactRequirementNumbers": true,
+      "qualification": "12 DOCUMENTED REQUIREMENTS, only last 10 reported PENDING; first two absent from current pending statement, NOT proof of paid. Difference Q0.05 HOLD until agreed issuer amount; never overwrite insurer cover or schedule silently."
+    },
+    {
+      "policy": "91-8357452",
+      "issuerDocumentId": "1V-ttJwtO21uVi1Z7t5DmpPJfhxRkxbO3",
+      "operation": "RENOVACION",
+      "endoso": "359402",
+      "vigenciaInicio": "2026-10-27",
+      "vigenciaFin": "2027-10-27",
+      "issuerCoverGrossCents": 306320,
+      "issuerScheduleGrossCents": 306320,
+      "issuedRequirement": "5676444",
+      "issuedDue": "2026-11-27",
+      "issuerInstallments": 1,
+      "sourceRowsPending": 1,
+      "sourceMatchesRequirementDueAndGross": true,
+      "qualification": "Exactly matches one statement requirement, due and gross. This DOES NOT resolve canonical client/policy edition or existing Firestore receipt identity."
+    },
+    {
+      "policy": "91-8322914",
+      "issuerDocumentId": "1IsvnNfbahXoY5RD6r8qRbxooPm5gWLpa",
+      "operation": "RENOVACION",
+      "endoso": "353920",
+      "vigenciaInicio": "2026-10-05",
+      "vigenciaFin": "2027-10-05",
+      "issuerCoverGrossCents": 550236,
+      "issuerScheduleGrossCents": 550236,
+      "issuedRequirement": "5654713",
+      "issuedInstallments": 1,
+      "issuedDue": "2026-11-05",
+      "statementRequirementsFrom": "5773297",
+      "statementRequirementsTo": "5773307",
+      "statementSourceRows": 11,
+      "statementGrossEachCents": 51228,
+      "statementPendingAggregateCents": 563508,
+      "sourceAndIssuerGrossDifferenceCents": 13272,
+      "sourceNumbersMismatchIssuedRequirement": true,
+      "qualification": "The original PDF documents one payment requirement 5654713 totaling Q5,502.36, but later pending statement reports eleven other requirements 5773297–5773307 of Q512.28 each, totaling Q5,635.08. This is not a rounding discrepancy. Likely another payment-plan/endorsement or altered source edition; NOT proven. Obtain newer insurer-issued endorsement/payment plan and current Firestore identity before any financial update."
+    }
+  ],
+  "counts": {
+    "sourcePolicies": 3,
+    "statementRowsAffected": 22,
+    "safelyWritableAgainstCurrentFirestore": 0,
+    "sourceOriginDocumentsRead": 3
+  },
+  "separation": {
+    "paidClient": false,
+    "appliedByInsurer": false,
+    "receiptScheduleMatchedIssuerOnly": "FIRST_TWO_CASES_ONLY",
+    "actualFirestorePolicyEditionMatched": false
+  },
+  "next": [
+    "Use exact issuer endoso/requirement and contract due date to resolve canonical edition+receipt; keep first 2 absent pending rows unaltered",
+    "For 91-8322914 find insurer amendment or current 11-payment schedule before any write",
+    "For 91-4143471 isolate Q0.05 difference and source of truth; require approval only if genuine contradiction persists",
+    "Execute protected source CAS and readback for newly uniquely matched rows; never create real Cobros based on pending statement"
+  ],
+  "realBusinessWrites": 0,
+  "newRelease": false
+}
