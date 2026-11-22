@@ -65,8 +65,9 @@ jobs:
             assert.equal(artifact.digest,process.env.EXPECTED_ARTIFACT_DIGEST,'ARTIFACT_DIGEST_DRIFT');
             assert.equal(artifact.expired,false,'ARTIFACT_EXPIRED');
             assert.equal(preview.sourceSha,process.env.I66_SOURCE_SHA,'PREVIEW_SOURCE_DRIFT');
-            assert.match(String(live.sourceSha||''),/^[0-9a-f]{40}$/,'LIVE_BACKUP_MARKER_MISSING');
-            assert.equal(live.sourceSha,'431892dcfefaa7eaad6faec3ab281dca25d6b2b1','LIVE_BACKUP_CHANGED');
+            assert.match(String(live.sourceSha||''),/^[0-9a-f]{40}$/,'LIVE_BUILD_MARKER_MISSING');
+            // The approved source is now the current LIVE; a retired importer marker is not authority.
+            assert.equal(live.sourceSha,process.env.I66_SOURCE_SHA,'LIVE_CERTIFIED_SOURCE_DRIFT');
             console.log('I66_NO_LIVE_ACCEPTANCE_CLAIM_FROM_THIS_PREVIEW_UAT');
             console.log('I66_EXACT_PREVIEW_PACKAGE_PASS_CURRENT_LIVE_PROVENANCE_SEPARATE_HOLD');
           })().catch(e=>{console.error(e.stack||e);process.exitCode=1;});
@@ -152,5 +153,5 @@ jobs:
       - name: Read the restored LIVE roster and Corado handback before considering promotion
         if: ${{ !cancelled() && steps.browser_setup.outcome == 'success' }}
         env:
-          I66_PROVE_LIVE_NEW_CLIENT: 431892dcfefaa7eaad6faec3ab281dca25d6b2b1
+          I66_PROVE_LIVE_NEW_CLIENT: ${{ env.I66_SOURCE_SHA }}
         run: node tools/gravicentra-i6-6-carlos-german-assignment-roster-readonly.cjs
