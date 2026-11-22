@@ -13,6 +13,10 @@ const ORIGIN=process.env.GI_I66_PERF_ORIGIN||'https://app.aysseguros.com';
 // It is the sole approved candidate for this scoped comparison.
 const APPROVED_PREVIEW='https://ays-orbit-360-lab--gi-i66-rc-43123134271-5vsqe8fh.web.app';
 const OUTPUT=process.env.GI_I66_PERF_REPORT;
+const CURRENT_LIVE_SOURCE=process.env.I66_APPROVED_LIVE_SOURCE_SHA||'';
+if(ORIGIN==='https://app.aysseguros.com')
+  needSource(CURRENT_LIVE_SOURCE);
+function needSource(x){if(!/^[a-f0-9]{40}$/.test(x))throw Error('I66_PERF_LIVE_SOURCE_PIN_REQUIRED');}
 const norm=x=>String(x??'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();
 const need=(ok,code)=>{if(!ok)throw Error(code);};
 need(process.env.GI_I66_PERF_PROJECT===PROJECT&&process.env.GI_I66_PERF_TENANT===TENANT,'I66_PERF_PROJECT_TENANT_HOLD');
@@ -23,7 +27,9 @@ const app=getApps()[0]||initializeApp({credential:applicationDefault(),projectId
 const db=getFirestore(app),auth=getAuth(app);
 const report={
   schema:'GI_I66_BROWSER_PERFORMANCE_READONLY_V2',project:PROJECT,tenant:TENANT,
-  origin:ORIGIN,gate:'I6.6',sourceSha:process.env.GITHUB_SHA||'',
+  origin:ORIGIN,gate:'I6.6',
+  sourceSha:ORIGIN==='https://app.aysseguros.com'?CURRENT_LIVE_SOURCE:process.env.GITHUB_SHA||'',
+  workflowHeadSha:process.env.GITHUB_SHA||'',
   readOnly:true,firestoreWrites:0,businessActions:0,paymentActions:0,
   syntheticFixtures:0,pushNotifications:0,roleChanged:false,
   auth:{},routes:[],mobile:{},errors:[],notes:[]
@@ -58,6 +64,19 @@ async function findCarlos(){
   return {uid:who.uid,allowedRole:'operativo'};
 }
 async function run(){
+  if(ORIGIN==='https://app.aysseguros.com'){
+    const response=await fetch(ORIGIN+'/__recovery__/build.json',{headers:{'cache-control':'no-cache'}});
+    need(response.status===200,'I66_PERF_LIVE_BUILD_MARKER_HTTP_HOLD');
+    const marker=await response.json();
+    const cp=JSON.parse(fs.readFileSync('artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json','utf8'));
+    const t=JSON.parse(fs.readFileSync('artifacts/orbit360-recovery/release-control/I6_6_RELEASE_TRANSPORT_CONTROL_20261110.json','utf8'));
+    const approved=cp.i66LatestPhysicalFrontendLive20261120||{};
+    need(marker.sourceSha===CURRENT_LIVE_SOURCE&&approved.sourceSha===CURRENT_LIVE_SOURCE&&
+      t.currentPhysicalHostingRelease?.sourceSha===CURRENT_LIVE_SOURCE&&
+      marker.buildId===approved.buildId,'I66_PERF_LIVE_SERVED_OR_CONTROL_DRIFT_HOLD');
+    report.liveBuildId=marker.buildId;
+    report.liveReleaseArtifactId=approved.artifactId;
+  }
   const actor=await findCarlos();
   const token=await auth.createCustomToken(actor.uid);
   let browser;
