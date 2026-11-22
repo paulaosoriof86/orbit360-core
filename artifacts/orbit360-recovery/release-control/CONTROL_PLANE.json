@@ -24596,5 +24596,27 @@
     "oldThreeFunctionLiveAcceptancePreserved": "i66OperationalExactLiveAcceptance20261117",
     "previousFrontendLiveVersion": "sites/ays-orbit-360-lab/versions/95771c3acafb17b1",
     "currentOperationalFullProof": "HOLD_GENUINE_CUSTOMER_ISSUANCE_RENEWAL_DRIVE_INVOICE_AUTOMATION_AND_FINANCIAL_DELTAS"
+  },
+  "i66ActiveRecoveryCursor": {
+    "status": "FROZEN_I66_SHOCK_EXECUTION_CONTINUES_NO_GATE_REPLACEMENT",
+    "currentEvidencePath": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_EXECUTION_PROGRESS_20261122.json",
+    "currentEvidenceBlobSha": "0dda5c7b70b54f15dc33b98811798e13462bb180",
+    "frozenPlanPath": "artifacts/orbit360-recovery/release-control/I6_6_PLAN_CHOQUE_FUNCIONAL_FINANCIERO_20261122.md",
+    "frozenPlanBlobSha": "fbfd54d229a13101fbfb0dfc6e92a5fa524999b6",
+    "fullInventoryPath": "artifacts/orbit360-recovery/release-control/I6_6_INVENTARIO_INTEGRAL_295_20261122.md",
+    "fullInventoryBlobSha": "6d5a15d6d05c1145a2ff536b085eaa6629722273",
+    "lastPhysicalLiveSourceSha": "f1eb5bc6397f0b159079be516a521dd7b1e5d9ba",
+    "lastPhysicalLiveRunId": 44827928263,
+    "lastPublicAvailabilityRunId": 45068427094,
+    "formalI6GatePercent": 60,
+    "shockObjectivesPassed": 2,
+    "shockObjectivesTotal": 14,
+    "shockObjectivesPct": 14.3,
+    "moduleReleasedThisIteration": [],
+    "financialDeltaCasesPrepared": 113,
+    "financialRowsAppliedThisIteration": 0,
+    "lastEvidenceDateLocal": "2026-11-22",
+    "noNormativeProjectSourceChange": true,
+    "next": "LOCAL_CHROME_ACCESS_RECHECK; PER_ROLE_GENUINE_LIVE_OPERATIONS; I66_DETERMINISTIC_FINANCIAL_BATCH_AND_DOCUMENTS; NO_DATA_REPLAY"
   }
 }
