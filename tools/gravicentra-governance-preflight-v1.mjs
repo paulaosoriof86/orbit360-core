@@ -1,5 +1,6 @@
 import fs from 'node:fs';
 import {spawnSync} from 'node:child_process';
+import crypto from 'node:crypto';
 import operationalRelease from './gravicentra-i6-6-operational-release-candidate.cjs';
 
 const allowedModes=new Set(['governance','i2','i3','i4a','i4b','i5','i6','certified']);
@@ -31,6 +32,50 @@ const postI5Guard='tools/gravicentra-post-i5-control-plane-guard-v1.mjs';
 const i6Guard='tools/gravicentra-i6-control-plane-guard-v1.mjs';
 const i66Guard='tools/gravicentra-i6-6-delta-guard.mjs';
 const i66Active=i6Active&&control.gateState?.gates?.I6?.activeSubgate==='I6.6';
+
+// I6.6 continuity and no-loss invariant: all workstreams are derived from CP.
+// The receipt can advance per iteration, but cannot silently detach from its
+// frozen plan/inventory, LIVE identity, or its documented progress denominator.
+if(i66Active&&control.i66ActiveRecoveryCursor){
+  const c=control.i66ActiveRecoveryCursor;
+  const digest=(path)=>{
+    if(!/^artifacts\/orbit360-recovery\/(release-control|source-batches)\/[A-Za-z0-9_.-]+\.(json|md)$/.test(path))
+      throw Error('I66_PROGRESS_UNSAFE_OR_UNKNOWN_EVIDENCE_PATH:'+String(path));
+    const bytes=fs.readFileSync(path);
+    return crypto.createHash('sha1').update('blob '+bytes.length+'\0').update(bytes).digest('hex');
+  };
+  for(const [path,sha] of [[c.currentEvidencePath,c.currentEvidenceBlobSha],
+                            [c.frozenPlanPath,c.frozenPlanBlobSha],
+                            [c.fullInventoryPath,c.fullInventoryBlobSha]]){
+    if(!/^[0-9a-f]{40}$/.test(String(sha||''))||digest(path)!==sha)
+      throw Error('I66_PROGRESS_CURSOR_BLOB_DRIFT:'+String(path));
+  }
+  const p=JSON.parse(fs.readFileSync(c.currentEvidencePath,'utf8'));
+  if(p.recordType!=='SUBORDINATE_APPEND_ONLY_EXECUTION_RECEIPT_NOT_RELEASE_GATE_AUTHORITY'||
+      p.activeGate!=='I6.6'||p.frozenPlan.path!==c.frozenPlanPath||
+      p.fullFindings.path!==c.fullInventoryPath||
+      p.frozenPlan.gitBlobSha!==c.frozenPlanBlobSha||
+      p.fullFindings.gitBlobSha!==c.fullInventoryBlobSha||
+      p.fullFindings.count<295||p.fullFindings.originalLedgerUnmodified!==true)
+    throw Error('I66_PROGRESS_FROZEN_NOLOSS_CONTRACT_DRIFT');
+  const x=p.shockObjectives||{},passed=(x.items||[]).filter(t=>t.passForShock===true).length;
+  if(!Number.isSafeInteger(x.total)||x.total<1||x.items.length!==x.total||
+     passed!==x.physicallyPassed||passed!==c.shockObjectivesPassed||
+     x.total!==c.shockObjectivesTotal||
+     Math.round(x.physicallyPassed*1000/x.total)/10!==x.percent||
+     x.percent!==c.shockObjectivesPct)
+    throw Error('I66_PROGRESS_DENOMINATOR_OR_PASS_EVIDENCE_DRIFT');
+  if(c.formalI6GatePercent!==control.postproductionExitProgress?.formalPercent||
+     p.officialProgress.postproductionI6.percent!==c.formalI6GatePercent||
+     p.releasedFrontend.sourceSha!==control.i66LatestPhysicalFrontendLive20261120?.sourceSha||
+     c.lastPhysicalLiveSourceSha!==control.i66LatestPhysicalFrontendLive20261120?.sourceSha||
+     p.releasedFrontend.digest!==control.i66LatestPhysicalFrontendLive20261120?.artifactDigest||
+     c.financialRowsAppliedThisIteration!==p.financialWork.currentIterationRealCustomerFinancialWrites||
+     p.notTouched.firestoreRealWrites!==true||p.notTouched.hostingProduction!==true)
+    throw Error('I66_PROGRESS_UNPROVEN_RELEASE_GATE_OR_FINANCIAL_WRITE');
+  console.log('I66_ACTIVE_RECOVERY_CURSOR_NOLOSS_AND_PERCENT_GUARD=PASS');
+}
+
 // An immutable Hosting promotion and a separately authorized Preview-only
 // backend reader are different operations. Keep their permission flags scoped,
 // and fail closed if mutable release summaries disagree on actual LIVE bytes.
