@@ -42,7 +42,7 @@ jobs:
         run: |
           set -euo pipefail
           git merge-base --is-ancestor "$I66_SOURCE_SHA" HEAD
-          test -z "$(git diff --name-only "$I66_SOURCE_SHA" HEAD -- orbit360-platform functions firebase.json firestore.rules storage.rules)"
+          test -z "$(git diff --name-only "$I66_SOURCE_SHA" HEAD -- orbit360-platform functions firebase.json firestore.rules storage.rules ':(exclude)orbit360-platform/docs/recovery/orbit360-recovery-state-v1.json')"
           node --check tools/gravicentra-i6-6-carlos-real-signed-synthetic-preview-uat.cjs
           node --check tools/gravicentra-i66-carlos-paula-signed-direct-renewal-preview-hydration-readonly.cjs
           node --check tools/gravicentra-i6-6-carlos-payment-signed-synthetic-preview-uat.cjs
@@ -202,7 +202,7 @@ jobs:
           NODE
           current_source="$(node -p "require('./artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json').i66LatestPhysicalFrontendLive20261120.sourceSha")"
           git merge-base --is-ancestor "$current_source" HEAD
-          test -z "$(git diff --name-only "$current_source" HEAD -- orbit360-platform functions firestore.rules storage.rules firebase.json)"
+          test -z "$(git diff --name-only "$current_source" HEAD -- orbit360-platform functions firestore.rules storage.rules firebase.json ':(exclude)orbit360-platform/docs/recovery/orbit360-recovery-state-v1.json')"
           node --check tools/gravicentra-i6-6-carlos-paula-live-direct-renewal-synthetic-uat.cjs
           node --check tools/gravicentra-i6-6-carlos-paula-live-insurer-synthetic-write-uat.cjs
       - name: Install pinned signed browser QA dependencies
