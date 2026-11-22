@@ -155,3 +155,66 @@ jobs:
         env:
           I66_PROVE_LIVE_NEW_CLIENT: ${{ env.I66_SOURCE_SHA }}
         run: node tools/gravicentra-i6-6-carlos-german-assignment-roster-readonly.cjs
+
+  signed-live-functional-regression:
+    # Scoped controlled QA only: no new deployment, changes to actual business
+    # policy/insurer/payments, service account permissions or legal consent.
+    needs: signed-preview
+    if: ${{ github.repository == 'paulaosoriof86/orbit360-core' && github.ref == 'refs/heads/recovery/fase-a-clean-20260831' && needs.signed-preview.result == 'success' }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    env:
+      I66_LIVE_ORIGIN: https://app.aysseguros.com
+      SA_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_ALT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Exact current I6.6 LIVE source, transport, readback, scope and rollback boundary
+        run: |
+          set -euo pipefail
+          node - <<'NODE'
+          const fs=require('node:fs'),assert=require('node:assert/strict');
+          const cp=JSON.parse(fs.readFileSync('artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json'));
+          const tr=JSON.parse(fs.readFileSync('artifacts/orbit360-recovery/release-control/I6_6_RELEASE_TRANSPORT_CONTROL_20261110.json'));
+          const r=JSON.parse(fs.readFileSync('artifacts/orbit360-recovery/release-control/I6_6_DIRECT_PAYMENT_OPTIONAL_DOCUMENT_LIVE_READBACK_20261120.json'));
+          const c=cp.i66LatestPhysicalFrontendLive20261120||{};
+          assert.equal(cp.currentExecutionDecisionPointer,'i66LatestPhysicalFrontendLive20261120');
+          assert.equal(c.sourceSha,r.sourceSha);
+          assert.equal(c.sourceSha,tr.currentPhysicalHostingRelease.sourceSha);
+          assert.equal(c.buildId,r.buildId);
+          assert.equal(c.artifactDigest,r.artifactDigest);
+          assert.equal(c.hostedFilesEachOrigin,224);
+          assert.equal(r.liveCloneRunResult,'SUCCESS');
+          assert.equal(r.fullI66ProductionAccepted,false);
+          assert.equal(r.dataWrites,0);
+          assert.equal(tr.paymentDirectOptionalDocumentPreviewRequest20261120.consumedBySignedLiveRunId,r.liveCloneRunId);
+          assert.ok(cp.i66OperationalExactLiveAcceptance20261117?.fullI66ProductionAccepted===false);
+          fs.appendFileSync(process.env.GITHUB_ENV,'I66_APPROVED_LIVE_SOURCE_SHA='+c.sourceSha+'\n');
+          console.log('I66_LIVE_REGRESSION_GUARD_SOURCE_AND_BACKEND_HISTORICAL_BOUNDARY=PASS');
+          NODE
+          git merge-base --is-ancestor "$I66_APPROVED_LIVE_SOURCE_SHA" HEAD
+          test -z "$(git diff --name-only "$I66_APPROVED_LIVE_SOURCE_SHA" HEAD -- orbit360-platform functions firestore.rules storage.rules firebase.json)"
+          node --check tools/gravicentra-i6-6-carlos-paula-live-direct-renewal-synthetic-uat.cjs
+          node --check tools/gravicentra-i6-6-carlos-paula-live-insurer-synthetic-write-uat.cjs
+      - name: Install pinned signed browser QA dependencies
+        run: |
+          set -euo pipefail
+          npm install --no-save --package-lock=false --ignore-scripts --no-audit --no-fund firebase-admin@13.4.0 playwright@1.55.0 >/dev/null
+          node node_modules/playwright/cli.js install --with-deps chromium >/dev/null
+      - name: Operativo and Dirección LIVE issued-renewal synthetic write/readback/reload/replay/restore
+        run: node tools/gravicentra-i6-6-carlos-paula-live-direct-renewal-synthetic-uat.cjs
+      - name: Operativo and Dirección LIVE insurer directory account CRUD permission/reload/restore
+        run: node tools/gravicentra-i6-6-carlos-paula-live-insurer-synthetic-write-uat.cjs
+      - name: Explicit scoped QA disposition
+        if: success()
+        run: |
+          echo 'I66_CURRENT_EXACT_LIVE_SYNTHETIC_RENEWAL_AND_INSURER_PASS_REAL_BUSINESS_ISSUANCE_AND_DRIVE_DOCUMENTS_STILL_HOLD' >> "$GITHUB_STEP_SUMMARY"
+          echo 'I66_LIVE_SYNTHETIC_RECORDS_FULLY_RESTORED_BY_EACH_DRIVER; NO_NEW_LIVE_BUILD_OR_DEPLOY' >> "$GITHUB_STEP_SUMMARY"
