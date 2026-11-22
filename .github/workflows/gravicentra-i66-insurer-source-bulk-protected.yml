@@ -13,6 +13,7 @@ on:
       - .github/workflows/gravicentra-i66-insurer-source-bulk-protected.yml
       - tools/gravicentra-i66-issued-renewal*.cjs
       - tools/gravicentra-i66-issued-original-access.cjs
+      - tools/gravicentra-i66-issued-source-schedule*.cjs
       - tools/gravicentra-i66-source-bulk-plan.cjs
       - tools/gravicentra-i66-source-bulk-apply.cjs
       - tools/gravicentra-i66-source-bulk-live.cjs
@@ -42,6 +43,10 @@ jobs:
     timeout-minutes: 30
     outputs:
       ready: ${{ steps.judge.outputs.ready }}
+      d01_ready: ${{ steps.d01.outputs.eligible }}
+      d01_before: ${{ steps.d01.outputs.before }}
+      d03_ready: ${{ steps.d03.outputs.eligible }}
+      d03_before: ${{ steps.d03.outputs.before }}
       issued_ready: ${{ steps.issued.outputs.eligible }}
       issued_before: ${{ steps.issued.outputs.before }}
     steps:
@@ -93,6 +98,20 @@ jobs:
       - name: Check existing Drive access to exact issuer originals without publishing contents
         if: contains(github.event.head_commit.message, 'I66_VERIFY_ISSUED_ORIGINALS')
         run: node tools/gravicentra-i66-issued-original-access.cjs
+      - name: Compute issuer-backed D03 obligations and independent source identities
+        id: d03
+        if: contains(github.event.head_commit.message, 'I66_DOCUMENTARY_SCHEDULES')
+        run: |
+          if ! command -v pdftotext >/dev/null; then sudo apt-get -qq update && sudo apt-get -qq install -y poppler-utils; fi
+          node --test tools/gravicentra-i66-issued-source-schedules.test.cjs
+          node tools/gravicentra-i66-issued-source-schedule-protected.cjs preflight D03
+      - name: Compute issuer-backed D01 obligations and independent source identities
+        id: d01
+        if: contains(github.event.head_commit.message, 'I66_DOCUMENTARY_SCHEDULES')
+        run: |
+          if ! command -v pdftotext >/dev/null; then sudo apt-get -qq update && sudo apt-get -qq install -y poppler-utils; fi
+          node --test tools/gravicentra-i66-issued-source-schedules.test.cjs
+          node tools/gravicentra-i66-issued-source-schedule-protected.cjs preflight D01
       - name: Verify documentary successor without writes on the frozen D02 authority
         id: issued
         if: contains(github.event.head_commit.message, 'I66_D02_ISSUED_CAS')
@@ -235,3 +254,91 @@ jobs:
         run: |
           node --test tools/gravicentra-i66-issued-renewal-cas.test.cjs
           node tools/gravicentra-i66-issued-renewal-protected.cjs apply
+
+  protected-issued-d01-source-schedule:
+    needs: preflight
+    if: needs.preflight.outputs.d01_ready == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    concurrency:
+      group: gravicentra-i66-d01-issued-source-schedule
+      cancel-in-progress: false
+    environment: gravicentra-live-data-writes
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Select the same authorized Firebase project for protected CAS writes
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm install --prefix "$RUNNER_TEMP/gi-i66-source-bulk" --ignore-scripts --no-audit --no-fund firebase-admin@13.4.0 >/dev/null
+          echo "NODE_PATH=$RUNNER_TEMP/gi-i66-source-bulk/node_modules" >> "$GITHUB_ENV"
+          python3 - <<'PY'
+          import json,os,pathlib
+          out=pathlib.Path(os.environ['RUNNER_TEMP'])/'gi-i66-bulk-existing.json'
+          for key in ('SA_LAB','SA_LAB_ALT','SA_DEFAULT'):
+              try: value=json.loads(os.environ.get(key,''))
+              except (TypeError,ValueError): continue
+              if value.get('type')!='service_account' or value.get('project_id')!='ays-orbit-360-lab' or not value.get('private_key'): continue
+              out.write_text(json.dumps(value),encoding='utf8');out.chmod(0o600)
+              with open(os.environ['GITHUB_ENV'],'a',encoding='utf8') as env: env.write('GOOGLE_APPLICATION_CREDENTIALS='+str(out)+'\n')
+              print('I66_BULK_PROTECTED_EXISTING_FIREBASE_IDENTITY_PASS');break
+          else: raise SystemExit('I66_BULK_PROTECTED_FIREBASE_IDENTITY_MISSING')
+          PY
+      - name: Commit the exact D01 issuer schedule and read back the full set of records
+        env:
+          GI_I66_BULK_PROTECTED_ENV: gravicentra-live-data-writes
+          I66_EXPECTED_BEFORE: ${{ needs.preflight.outputs.d01_before }}
+        run: |
+          if ! command -v pdftotext >/dev/null; then sudo apt-get -qq update && sudo apt-get -qq install -y poppler-utils; fi
+          node --test tools/gravicentra-i66-issued-source-schedules.test.cjs
+          node tools/gravicentra-i66-issued-source-schedule-protected.cjs apply D01
+
+  protected-issued-d03-source-schedule:
+    needs: preflight
+    if: needs.preflight.outputs.d03_ready == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    concurrency:
+      group: gravicentra-i66-d03-issued-source-schedule
+      cancel-in-progress: false
+    environment: gravicentra-live-data-writes
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Select the same authorized Firebase project for protected CAS writes
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm install --prefix "$RUNNER_TEMP/gi-i66-source-bulk" --ignore-scripts --no-audit --no-fund firebase-admin@13.4.0 >/dev/null
+          echo "NODE_PATH=$RUNNER_TEMP/gi-i66-source-bulk/node_modules" >> "$GITHUB_ENV"
+          python3 - <<'PY'
+          import json,os,pathlib
+          out=pathlib.Path(os.environ['RUNNER_TEMP'])/'gi-i66-bulk-existing.json'
+          for key in ('SA_LAB','SA_LAB_ALT','SA_DEFAULT'):
+              try: value=json.loads(os.environ.get(key,''))
+              except (TypeError,ValueError): continue
+              if value.get('type')!='service_account' or value.get('project_id')!='ays-orbit-360-lab' or not value.get('private_key'): continue
+              out.write_text(json.dumps(value),encoding='utf8');out.chmod(0o600)
+              with open(os.environ['GITHUB_ENV'],'a',encoding='utf8') as env: env.write('GOOGLE_APPLICATION_CREDENTIALS='+str(out)+'\n')
+              print('I66_BULK_PROTECTED_EXISTING_FIREBASE_IDENTITY_PASS');break
+          else: raise SystemExit('I66_BULK_PROTECTED_FIREBASE_IDENTITY_MISSING')
+          PY
+      - name: Commit the exact D03 issuer schedule and read back the full set of records
+        env:
+          GI_I66_BULK_PROTECTED_ENV: gravicentra-live-data-writes
+          I66_EXPECTED_BEFORE: ${{ needs.preflight.outputs.d03_before }}
+        run: |
+          if ! command -v pdftotext >/dev/null; then sudo apt-get -qq update && sudo apt-get -qq install -y poppler-utils; fi
+          node --test tools/gravicentra-i66-issued-source-schedules.test.cjs
+          node tools/gravicentra-i66-issued-source-schedule-protected.cjs apply D03

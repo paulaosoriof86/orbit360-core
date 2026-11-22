@@ -1,6 +1,5 @@
 'use strict';
 const crypto = require('node:crypto');
-const {GoogleAuth}=require('google-auth-library');
 const terms=require('../artifacts/orbit360-recovery/source-batches/I6_6_ROBLE_THREE_ISSUED_TERMS_DOCUMENTARY_CROSSCHECK_20261122.json').issuedExamples;
 const witnesses=require('../artifacts/orbit360-recovery/source-batches/I6_6_ROBLE_ISSUED_TERM_WITNESSES_20261122.json');
 async function readOriginal(term,index,headers){
@@ -12,6 +11,7 @@ async function readOriginal(term,index,headers){
   return {status:'ISSUER_ORIGINAL_BYTES_VERIFIED',data};
 }
 async function inspect(){
+  const {GoogleAuth}=require('google-auth-library');
   const auth=new GoogleAuth({scopes:['https://www.googleapis.com/auth/drive.readonly']});
   const headers=await (await auth.getClient()).getRequestHeaders();
   const result=await Promise.all(terms.map((t,i)=>readOriginal(t,i,headers)));
