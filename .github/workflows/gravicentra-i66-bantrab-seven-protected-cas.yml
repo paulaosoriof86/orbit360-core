@@ -314,20 +314,32 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Select one immutable insurer-source batch, run large negative tests
+      # A code-only source adapter/QA update may still carry the bulk-ready title.
+      # Do not interpret it as a new immutable insurer statement or a reason to
+      # re-use an old authorized live-data-writes plan. Exact one-file changes
+      # remain mandatory when a real new manifest was committed.
+      - name: Select changed immutable source manifest (no stale replay on QA-only changes)
+        id: manifest
         run: |
           set -euo pipefail
           test "$GITHUB_REF" = refs/heads/recovery/fase-a-clean-20260831
           test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
           SOURCE_FILES=$(git diff --name-only "${{ github.event.before }}" "$GITHUB_SHA" -- artifacts/orbit360-recovery/source-batches/)
+          if [ -z "$SOURCE_FILES" ]; then
+            echo 'changed=false' >> "$GITHUB_OUTPUT"
+            echo 'I66_BULK_NO_NEW_SOURCE_MANIFEST_PASS_ZERO_WRITES'
+            exit 0
+          fi
           test "$(printf '%s\n' "$SOURCE_FILES" | sed '/^$/d' | wc -l)" -eq 1
           case "$SOURCE_FILES" in artifacts/orbit360-recovery/source-batches/I6_6_SOURCE_BULK_*.json) ;; *) exit 1;; esac
           echo "GI_I66_BULK_SOURCE_MANIFEST=$SOURCE_FILES" >> "$GITHUB_ENV"
           node --check tools/gravicentra-i66-source-bulk-live.cjs
           node tools/gravicentra-i66-source-bulk-plan.test.cjs
           node tools/gravicentra-i66-source-bulk-apply.test.cjs
+          echo 'changed=true' >> "$GITHUB_OUTPUT"
           echo 'I66_LARGE_BATCH_750_SYNTHETIC_CAS_AND_REPLAY_PASS'
       - name: Select existing same-project Firebase identity; no IAM or tenant changes
+        if: steps.manifest.outputs.changed == 'true'
         run: |
           set -euo pipefail
           npm install --prefix "$RUNNER_TEMP/gi-i66-source-bulk" --ignore-scripts --no-audit --no-fund firebase-admin@13.4.0 >/dev/null
@@ -345,6 +357,7 @@ jobs:
           else:raise SystemExit('I66_BULK_EXISTING_SERVICE_ACCOUNT_HOLD')
           PY
       - name: Preflight all real policy editions, source rows, receipts and cartera without writes
+        if: steps.manifest.outputs.changed == 'true'
         id: source_preflight
         env:
           GI_I66_BULK_MODE: preflight
@@ -360,6 +373,7 @@ jobs:
           console.log(eligible?'I66_BULK_REAL_ELIGIBLE_PROTECTED_REVIEW_NEXT':'I66_BULK_SOURCE_MATCH_DIAGNOSTIC_HOLD_ZERO_LIVE_WRITES');
           NODE
       - name: Retain signed private plan for single protected transaction series
+        if: steps.manifest.outputs.changed == 'true'
         uses: actions/upload-artifact@v4
         with:
           name: gi-i66-source-bulk-preflight-${{ github.run_id }}
