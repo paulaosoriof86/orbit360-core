@@ -1,0 +1,301 @@
+{
+  "schema": "GRAVICENTRA_I66_OPERATIONAL_SHOCK_PROGRESS_DERIVED_V2",
+  "recordType": "SUBORDINATE_APPEND_ONLY_EXECUTION_RECEIPT_NOT_RELEASE_GATE_AUTHORITY",
+  "product": "Gravicentra Insurance",
+  "repo": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "createdDateLocal": "2026-11-22",
+  "activeGate": "I6.6",
+  "frozenPlan": {
+    "path": "artifacts/orbit360-recovery/release-control/I6_6_PLAN_CHOQUE_FUNCIONAL_FINANCIERO_20261122.md",
+    "gitBlobSha": "fbfd54d229a13101fbfb0dfc6e92a5fa524999b6"
+  },
+  "fullFindings": {
+    "path": "artifacts/orbit360-recovery/release-control/I6_6_INVENTARIO_INTEGRAL_295_20261122.md",
+    "gitBlobSha": "6d5a15d6d05c1145a2ff536b085eaa6629722273",
+    "count": 295,
+    "originalLedgerUnmodified": true
+  },
+  "frozenBusinessDecision": "No reconstruir ni reimportar; un solo artifact por deploy, actualizar solo deltas probados, publicar cada corrección que supere su gate, no declarar PASS por fuente o UI aislada, permisos Operativo escritos en módulos asignados.",
+  "officialProgress": {
+    "phaseAHistoricalGates": {
+      "closed": 7,
+      "total": 7,
+      "percent": 100
+    },
+    "postproductionI6": {
+      "closed": 6,
+      "total": 10,
+      "percent": 60
+    },
+    "currentSubgate": "I6.6",
+    "fullI66Accepted": false
+  },
+  "shockObjectives": {
+    "total": 14,
+    "physicallyPassed": 2,
+    "percent": 14.3,
+    "meaning": "Solo puntos discretos del plan de choque, no progreso funcional total de la plataforma",
+    "items": [
+      {
+        "id": "A01",
+        "title": "DNS/HTTPS público + mismo build en ambos LIVE",
+        "status": "AVAILABILITY_EXTERNAL_SIGNED_PASS",
+        "evidence": "45068427094",
+        "next": "HTTP 200 en 4 rutas, SHA exacta, DNS público",
+        "passForShock": true
+      },
+      {
+        "id": "A02",
+        "title": "Control Plane ↔ transporte ↔ puntero LIVE y guard",
+        "status": "AUTHORITY_SIGNED_PASS",
+        "evidence": "45065093595",
+        "next": "Puntero f1eb 224/224; requests consumidos, guard y packager PASS",
+        "passForShock": true
+      },
+      {
+        "id": "A03",
+        "title": "Acceso desde Chrome de Dirección",
+        "status": "HOLD_LOCAL_BROWSER_ERR_FAILED",
+        "evidence": "user-screenshot-20261122-1441",
+        "next": "HTTP externo PASS no prueba red/browser local",
+        "passForShock": false
+      },
+      {
+        "id": "A04",
+        "title": "Matriz completa de permisos reales Operativo/Admin/SuperAdmin/Dirección/Asesor",
+        "status": "PARTIAL_OPERATIVO_DIRECCION_LIVE_INSURER_CRUD_PASS_OTHER_ROLE_MATRIX_HOLD",
+        "evidence": "45069138814 signed-live-functional-regression",
+        "next": "AdminTenant, SuperAdmin and Asesor negative/positive role real LIVE matrix; no credential leak.",
+        "passForShock": false
+      },
+      {
+        "id": "A05",
+        "title": "Cliente360 edición, gestiones, actividad, notas y adjuntos",
+        "status": "HOLD_COMPLETE_GENUINE_RUNTIME",
+        "evidence": "45064138268",
+        "next": "Edición sintética PASS; documentos y gestiones reales sin prueba total",
+        "passForShock": false
+      },
+      {
+        "id": "A06",
+        "title": "Ops/Leads y oportunidad/inspección desde cliente existente",
+        "status": "HOLD_CORADO_OPS_ZERO_LEADS_ONE",
+        "evidence": "45064138268",
+        "next": "Prueba sintética PASS; caso real e ingreso requieren E2E",
+        "passForShock": false
+      },
+      {
+        "id": "A07",
+        "title": "Emisión de póliza nueva, asesor y primas de Sergio",
+        "status": "HOLD_REAL_ISSUANCE",
+        "evidence": "I6_6_FINANCIAL_OPS_LEADS_CONTINUITY_READBACK_20261119.json",
+        "next": "Sin nueva póliza real certificada",
+        "passForShock": false
+      },
+      {
+        "id": "A08",
+        "title": "Renovación en firme, hija, calendarios y Kanban",
+        "status": "PARTIAL_SIGNED_LIVE_SYNTHETIC_RENEWAL_PASS_REAL_ISSUED_PDF_HOLD",
+        "evidence": "45069138814 signed-live-functional-regression",
+        "next": "Complete first genuine issued PDF renewal, readback and full role matrix.",
+        "passForShock": false
+      },
+      {
+        "id": "A09",
+        "title": "Sustitución de vehículo con endoso emitido exacto",
+        "status": "HOLD_ISSUER_ENDORSEMENT_CONFLICT",
+        "evidence": "I6_6_FINANCIAL_OPS_LEADS_CONTINUITY_READBACK_20261119.json",
+        "next": "Fecha/referencia previa difiere",
+        "passForShock": false
+      },
+      {
+        "id": "A10",
+        "title": "Cobros reales sin documentos y con factura en una operación",
+        "status": "HOLD_EDSON_AND_ONE_STEP_REAL_INVOICE",
+        "evidence": "I6_6_DIRECT_PAYMENT_OPTIONAL_DOCUMENT_LIVE_READBACK_20261120.json",
+        "next": "Código/hosting y pago sintético PASS, caso real no",
+        "passForShock": false
+      },
+      {
+        "id": "A11",
+        "title": "Drive OAuth y subida/lectura de documentos real",
+        "status": "HOLD_GOOGLE_CONSENT_AND_UPLOAD_READBACK",
+        "evidence": "I6_6_DIRECT_PAYMENT_OPTIONAL_DOCUMENT_LIVE_READBACK_20261120.json",
+        "next": "No exigir documento para pago; no éxito falso",
+        "passForShock": false
+      },
+      {
+        "id": "A12",
+        "title": "Lote incremental real aplicado y probado",
+        "status": "HOLD_NEW_DELTA_0_WRITES",
+        "evidence": "I6_6_ROBLE_113_EDITION_DOC_READINESS_20261122.json",
+        "next": "113 filas/14 pólizas preparados; 302 source preflight, cero nuevas elegibles",
+        "passForShock": false
+      },
+      {
+        "id": "A13",
+        "title": "Leads WhatsApp/form/correo mediante Make escritor autorizado",
+        "status": "HOLD_INACTIVE_MAKE_SCENARIOS",
+        "evidence": "10196136;10195867",
+        "next": "Solo lector/webhook, no writer certificado",
+        "passForShock": false
+      },
+      {
+        "id": "A14",
+        "title": "QA transversal módulos, viewport, rendimiento y reinicio",
+        "status": "HOLD_FULL_MATRIX",
+        "evidence": "I6_FINDINGS_LEDGER_20260924.json",
+        "next": "Los PASS históricos son preservados, no equivalen a nuevo full E2E",
+        "passForShock": false
+      }
+    ]
+  },
+  "releasedFrontend": {
+    "sourceSha": "f1eb5bc6397f0b159079be516a521dd7b1e5d9ba",
+    "buildId": "gi-i66-f1eb5bc6397f-57f234755dc1",
+    "artifactId": 14674736714,
+    "digest": "sha256:e55fcc674a6cc493cdedff27672d082222db3dd7134354559788364b6ae23713",
+    "hostingVersion": "sites/ays-orbit-360-lab/versions/7a0d829d3504c9f8",
+    "fileCount": 224,
+    "liveReceipt": "artifacts/orbit360-recovery/release-control/I6_6_DIRECT_PAYMENT_OPTIONAL_DOCUMENT_LIVE_READBACK_20261120.json"
+  },
+  "externalAvailability": {
+    "status": "PASS_PUBLIC_ANONYMOUS_EXACT_BUILD_ONLY",
+    "runId": 45068427094,
+    "checkedAtUtc": "2026-11-22T20:47:40.419439+00:00",
+    "customHttp": 200,
+    "firebaseHttp": 200,
+    "bothMarkersExact": true,
+    "localChromeStatus": "REPORTED_ERR_FAILED_NOT_RETESTED_ON_LOCAL"
+  },
+  "technicalRootFixes": {
+    "cpTransportDrift": "FIXED_IN_5a486_and_guard",
+    "staleUat": "FIXED_47ef35b_run45064138268_PASS",
+    "consumedBuildAuthorization": "FIXED_4c4c72_run45064931462_PASS",
+    "dualOriginMonitor": "PRESENT_d273ac_job137349710564_PASS"
+  },
+  "financialWork": {
+    "previousAppliedCobrosCendoso": 33,
+    "previousInsurerReceiptAndCarteraCorrections": 110,
+    "readySourceBatch": {
+      "path": "artifacts/orbit360-recovery/source-batches/I6_6_ROBLE_113_EDITION_DOC_READINESS_20261122.json",
+      "blobSha": "fbe3be3bb09d1965653b1049b50b6141ede4acf9",
+      "rows": 113,
+      "policies": 14,
+      "appliedNow": 0
+    },
+    "otherSourceRows302": {
+      "matched": 137,
+      "held": 165,
+      "deterministicNewWrites": 0
+    },
+    "currentIterationRealCustomerFinancialWrites": 0,
+    "doNotRepeatPaid": true
+  },
+  "parallelLanes": [
+    {
+      "id": "L1",
+      "name": "Site/DNS/HTTPS/Chrome",
+      "status": "PUBLIC_PASS_LOCAL_HOLD",
+      "owner": "I6.6"
+    },
+    {
+      "id": "L2",
+      "name": "CP/transport/release provenance",
+      "status": "SIGNATURE_AND_GUARD_PASS",
+      "owner": "I6.6"
+    },
+    {
+      "id": "L3",
+      "name": "Functional LIVE Operativo/roles/CRUD",
+      "status": "OPERATIVO_DIRECCION_LIVE_RENEWAL_INSURER_SYNTHETIC_PASS_OTHER_GENUINE_FLOW_HOLD",
+      "owner": "I6.6"
+    },
+    {
+      "id": "L4",
+      "name": "Financial source-delta/inferences",
+      "status": "NEXT_SOURCE_BATCH_PREPARED_NO_WRITES",
+      "owner": "I6.6"
+    },
+    {
+      "id": "L5",
+      "name": "Drive/Make/notifications",
+      "status": "HOLD",
+      "owner": "I6.6"
+    }
+  ],
+  "updateDiscipline": {
+    "oneSourceBatchMinimumPerCycle": "Build OR process a deterministic source batch; record zero-write blockers rather than falsely claim data applied.",
+    "onEveryIteration": [
+      "Record last successful gate/run and source SHA",
+      "Report per-lane state and binary shock objective count/14",
+      "Report official I6 frozen fraction 6/10 until a formal seal",
+      "Report source batches built/applied/held and exact real writes",
+      "Specify modules newly LIVE accepted and safe for business data refresh",
+      "Report blockers, next one causal action per lane"
+    ],
+    "whenModuleAvailable": "Announce only after exact LIVE proof of module create/update readback reload roles; do not announce from Preview or green skipped jobs.",
+    "crossChatResume": "Read Control Plane i66ActiveRecoveryCursor, its progress receipt, original 295 ledger, frozen plan, latest physical LIVE receipt; do not use transcript as authority.",
+    "lastIteration": "22-NOV-2026-I6.6-FUNCTIONAL-LIVE-SYNTHETIC",
+    "completedSincePrior": [
+      "Live direct renewal synthetic: policy, receipt, cartera, Ops link, edit, reload, idempotency PASS and cleanup for Operativo and Dirección",
+      "Live insurer account CRUD synthetic including scope negatives and audit/reload PASS and cleanup",
+      "All probes source SHA exact, no production artifact change"
+    ],
+    "nextIncomplete": [
+      "Edson original request/apply against exact receipt",
+      "First real issued renewal and successor receipt/cartera proof",
+      "Sustitución endoso insurer effective date matching",
+      "Drive real OAuth/attachments",
+      "Make authenticated lead writer",
+      "Financial deterministic batch after current Firestore preimages",
+      "Admin/SuperAdmin real matrix",
+      "Paula browser direct access/incognito discrimination"
+    ]
+  },
+  "notTouched": {
+    "productSource": true,
+    "firestoreRealWrites": true,
+    "hostingProduction": true,
+    "backendDeploy": true
+  },
+  "next": "Run authenticated real-role flow as soon as Chrome/direct session restored; then complete first incomplete I6.6 real CRUD proof. In parallel prepare exact insurer-document matching and deterministic deltas under protected writer.",
+  "previousEvidencePath": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_EXECUTION_PROGRESS_20261122.json",
+  "previousEvidenceBlobSha": "0dda5c7b70b54f15dc33b98811798e13462bb180",
+  "version": 2,
+  "lastFunctionalQaRunId": 45069138814,
+  "lastFunctionalQaJobId": 137352857627,
+  "recentSignedFunctionalProof": {
+    "runId": 45069138814,
+    "runStatus": "SUCCESS",
+    "sourceSha": "f1eb5bc6397f0b159079be516a521dd7b1e5d9ba",
+    "preview": {
+      "jobId": 137351934479,
+      "status": "PASS",
+      "focus": [
+        "Cliente360 edit/advisor activity reload",
+        "Ops/Leads synthetic tasks",
+        "renewal hydration readonly",
+        "payment application/synthetic receipt/cobro/portfolio",
+        "Germán and Priscila roster",
+        "Corado readback ops=0 leads=1"
+      ]
+    },
+    "live": {
+      "jobId": 137352857627,
+      "status": "SCOPED_SYNTHETIC_PASS",
+      "roles": [
+        "Operativo GT",
+        "Dirección GT"
+      ],
+      "directRenewal": "CREATE_ISSUED_POLICY_WITH_SYNTHETIC_DOCUMENT_FIXTURE_READBACK_RELOAD_IDEMPOTENCE_OPS_RECEIPTS_CARTERA_PASS",
+      "insurerDirectory": "SYNTHETIC_CREATE_EDIT_ACCOUNT_AUDIT_RELOAD_NEGATIVE_SCOPE_AND_CLEANUP_PASS",
+      "syntheticRestored": true,
+      "realClientPoliciesPaymentsWritten": 0,
+      "realInsurerRowsModified": 0,
+      "genuineInsurerIssuedPdfCertified": false
+    },
+    "mustNotPromote": "No real insured issued-renewal acceptance or AdminTenant/SuperAdmin complete role matrix is inferred from this 2-actor QA."
+  }
+}

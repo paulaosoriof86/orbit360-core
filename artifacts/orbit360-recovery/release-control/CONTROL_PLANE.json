@@ -24599,8 +24599,8 @@
   },
   "i66ActiveRecoveryCursor": {
     "status": "FROZEN_I66_SHOCK_EXECUTION_CONTINUES_NO_GATE_REPLACEMENT",
-    "currentEvidencePath": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_EXECUTION_PROGRESS_20261122.json",
-    "currentEvidenceBlobSha": "0dda5c7b70b54f15dc33b98811798e13462bb180",
+    "currentEvidencePath": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_EXECUTION_PROGRESS_20261122_R2.json",
+    "currentEvidenceBlobSha": "8906c2378719b2992f5ca8f136956d17f68714be",
     "frozenPlanPath": "artifacts/orbit360-recovery/release-control/I6_6_PLAN_CHOQUE_FUNCIONAL_FINANCIERO_20261122.md",
     "frozenPlanBlobSha": "fbfd54d229a13101fbfb0dfc6e92a5fa524999b6",
     "fullInventoryPath": "artifacts/orbit360-recovery/release-control/I6_6_INVENTARIO_INTEGRAL_295_20261122.md",
@@ -24617,6 +24617,9 @@
     "financialRowsAppliedThisIteration": 0,
     "lastEvidenceDateLocal": "2026-11-22",
     "noNormativeProjectSourceChange": true,
-    "next": "LOCAL_CHROME_ACCESS_RECHECK; PER_ROLE_GENUINE_LIVE_OPERATIONS; I66_DETERMINISTIC_FINANCIAL_BATCH_AND_DOCUMENTS; NO_DATA_REPLAY"
+    "next": "P0: FIRST_REAL_ISSUED_RENEWAL_PDF_AND_CARLOS_EDSON_ORIGINAL_PAYMENT_RECEIPT; P0: OPERATIVO_ADMIN_SUPERADMIN_ROLE_MATRIX; P0: DRIVE; P0: DETERMINISTIC_FINANCIAL_APPLY; NO_REPLAY.",
+    "lastFunctionalLiveUatRunId": 45069138814,
+    "lastFunctionalLiveUatJobId": 137352857627,
+    "lastFunctionalLiveScope": "TWO_ROLE_RENEWAL_INSURER_SYNTHETIC_PASS_REAL_ISSUANCE_AND_DOCUMENT_HOLD"
   }
 }
