@@ -1,0 +1,101 @@
+{
+  "schema": "GI_I66_ROBLE_8322914_HISTORICAL_CHAIN_AND_STATEMENT_WITNESS_V1",
+  "recordType": "SOURCE_ONLY_FORENSIC_EVIDENCE_NO_BUSINESS_WRITES_NO_RELEASE",
+  "gate": "I6.6",
+  "dateGuatemala": "2026-11-22",
+  "origin": "Directly read authenticated Google Drive insurer policy PDFs and exact 302-row GitHub source manifest; no source content rewritten",
+  "policy": "91-8322914",
+  "sources": [
+    {
+      "sourceType": "ISSUER_PDF_PREDECESSOR",
+      "driveFileId": "1AWaHEwOVByEUQY34-YZv1xy8QtuMBBU2",
+      "documentName": "918322914591278.pdf",
+      "endorsement": "591278",
+      "termStart": "2024-10-05",
+      "termEnd": "2025-10-05",
+      "sourceUse": "historic policy identity only; not 2026 paid/due authority"
+    },
+    {
+      "sourceType": "ISSUER_PDF_IMMEDIATE_PREDECESSOR",
+      "driveFileId": "1cMQjotVpDXgwmuXHMFgtgk8LVciN-enM",
+      "documentName": "918322914957406.pdf",
+      "endorsement": "957406",
+      "termStart": "2025-10-05",
+      "termEnd": "2026-10-05",
+      "sourceUse": "historic policy lineage; verify matches canonical holder/risk/version, no automatic merge of certificates"
+    },
+    {
+      "sourceType": "ISSUER_PDF_CURRENT_ISSUANCE",
+      "driveFileId": "1IsvnNfbahXoY5RD6r8qRbxooPm5gWLpa",
+      "documentName": "918322914353920.pdf",
+      "endorsement": "353920",
+      "termStart": "2026-10-05",
+      "termEnd": "2027-10-05",
+      "issuedGrossCents": 550236,
+      "issuedRequirement": "5654713",
+      "issuedDue": "2026-11-05",
+      "sourceUse": "original issued renewal terms and premium; original document includes multiple certificate/vehicle references so do not infer 1:1 risk from policy number"
+    },
+    {
+      "sourceType": "INSURER_PENDING_STATEMENT",
+      "driveFileId": "1vk6RtUUFVjpQB_W1UMs10hvcpaEFNFjs",
+      "documentName": "Estado de Cuenta El Roble a noviembre 20.XLS",
+      "manifestPath": "artifacts/orbit360-recovery/source-batches/I6_6_SOURCE_BULK_20261120_MULTI_302.json",
+      "manifestBlobSha": "ab64e111319e3447733a3af05bf378250698ccdb",
+      "fileSha256": "7062738cdf1c008ebff85247f8b0723ab4d8f36e43bb69d386d5dfcb59d219ef",
+      "sourceUse": "pending requirements and balances as of this statement; not payment confirmation"
+    }
+  ],
+  "verifiedPendingSchedule": {
+    "requirements": [
+      "5773297",
+      "5773298",
+      "5773299",
+      "5773300",
+      "5773301",
+      "5773302",
+      "5773303",
+      "5773304",
+      "5773305",
+      "5773306",
+      "5773307"
+    ],
+    "dueDates": [
+      "2026-11-05",
+      "2026-12-05",
+      "2027-01-05",
+      "2027-02-05",
+      "2027-03-05",
+      "2027-04-05",
+      "2027-05-05",
+      "2027-06-05",
+      "2027-07-05",
+      "2027-08-05",
+      "2027-09-05"
+    ],
+    "grossEachCents": 51228,
+    "pendingRows": 11,
+    "pendingTotalCents": 563508,
+    "issuerOriginalTotalCents": 550236,
+    "deltaCents": 13272,
+    "firstDueSameAsOriginalIssuedRequirement": true,
+    "requirementNumbersDifferent": true
+  },
+  "identitySemantics": {
+    "samePolicyNumberAcrossThreeYears": true,
+    "continuityOfTermDates": true,
+    "riskCertificatesMayDifferAcrossYears": true,
+    "insurerDocumentMultipleCertificates": true,
+    "policyNumberAloneInsufficientToMergeVehiclesOrClients": true,
+    "notNewerEndorsementsTheTwoAdditionalPdfsAreHistorical": true,
+    "currentFirestoreExact2026EditionProven": false,
+    "directPaymentEvidenceFromTheseSources": false
+  },
+  "directionFrozenDecision": "D03 — issued PDF owns original issuance terms; later insurer statement owns current pending requirements and due dates. Keep source provenance and update only uniquely linked canonical edition/receipts; no duplicate Cobros.",
+  "nextMechanic": "Crosswalk 2025-2026 canonical predecessor by issued history/endoso and legal holder, verify vehicle certificate links independently; reuse or create only certified 2026-2027 successor; apply 11 source statement requirements per current date and amount with CAS and exact server readback; do not invent a new endorsement to explain Q132.72",
+  "paymentsWritten": 0,
+  "policiesWritten": 0,
+  "receiptsWritten": 0,
+  "gatePassed": false,
+  "productSourceChanged": false
+}
