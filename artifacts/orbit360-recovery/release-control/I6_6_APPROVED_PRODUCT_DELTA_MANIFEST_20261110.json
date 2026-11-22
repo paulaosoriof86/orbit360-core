@@ -3604,6 +3604,35 @@
           }
         }
       ]
+    },
+    {
+      "id": "I6_6_CLIENT_LINKED_DEAL_TIMELINE_20261122",
+      "approvedByDirection": true,
+      "receipt": "Dirección, 22/11/2026: mostrar la actividad y las inspecciones del cliente sin duplicar la gestión, respetar ID canónico, rol y país y certificar antes de promover.",
+      "sourceStatus": "SOURCE_REQUIRES_EXACT_PREVIEW_AND_LIVE_UI_PROOF",
+      "capabilityOwners": [
+        "CLIENTE360",
+        "OPS",
+        "LEADS"
+      ],
+      "scope": "Read existing scoped business history and comments by exact clientId in the client detail. No new business or activity writes.",
+      "paths": [
+        {
+          "path": "orbit360-platform/modules/cliente360.js",
+          "gitBlobSha": "1b3666172cbcfdaecd9b9ce7b35dbf26a4a0beec",
+          "replaces": {
+            "path": "orbit360-platform/modules/cliente360.js",
+            "priorGitBlobSha": "7acb2990c020a92080db8f17875343edd200386c",
+            "priorChangeId": "I6_6_PREVIEW_CLIENT_ACTIVITY_MARKER_20261119"
+          }
+        }
+      ],
+      "tests": [
+        {
+          "path": "tools/gravicentra-i6-6-client-linked-deal-timeline.test.cjs",
+          "gitBlobSha": "d52e6799d8fbbb31ef90849ddc2a7f23c26958b3"
+        }
+      ]
     }
   ],
   "i66R11PreviewBuildRequest20261113": {

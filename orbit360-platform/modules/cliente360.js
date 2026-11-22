@@ -207,7 +207,7 @@ Orbit.modules.cliente360 = (function () {
   let managementRefreshTimer=null;
   window.addEventListener('orbit:store:emit',event=>{
     const collection=event&&event.detail&&event.detail.collection;
-    if(!['gestiones','actividades'].includes(collection)||!shownCid||!host||!host.isConnected||managementRefreshTimer)return;
+    if(!['gestiones','actividades','negocios'].includes(collection)||!shownCid||!host||!host.isConnected||managementRefreshTimer)return;
     if(!['resumen','gestiones','historial'].includes(tab))return;
     managementRefreshTimer=setTimeout(()=>{
       managementRefreshTimer=null;
@@ -480,6 +480,8 @@ Orbit.modules.cliente360 = (function () {
      DETALLE — el cerebro 360
      ========================================================= */
   function detalle(cid) {
+    if (commercialHistorySurfaces().length) ensureDataCollections(['negocios']);
+    ensureDataCollections(['actividades']);
     const r = summaryForDetail(cid);
     const rawClient = r.cli;
     const c = Orbit.clientProjection && typeof Orbit.clientProjection.project === 'function'
@@ -658,6 +660,9 @@ Orbit.modules.cliente360 = (function () {
     else if (tab === 'correos') { body.innerHTML = tabCorreos(cid, r); }
     else if (tab === 'siniestros') { body.innerHTML = tabSiniestros(cid, r); }
     else if (tab === 'historial') { body.innerHTML = tabHistorial(cid, r); wireHistorial(cid); }
+    for (const button of body.querySelectorAll('[data-c360-negocio]')) {
+      button.onclick = () => Orbit.ciclo.openNegocio(button.dataset.c360Negocio);
+    }
   }
 
   /* A single server-owned Ops management appears in Cliente360 and Historial
@@ -667,6 +672,57 @@ Orbit.modules.cliente360 = (function () {
     return Orbit.ciclo.gestiones({surface:'ops',includeBoardHidden:true})
       .filter(g=>g&&String(g.clienteId||'')===String(cid||''));
   }
+  function commercialHistorySurfaces() {
+    return ['leads','ops'].filter(surface => Orbit.access?.can?.(surface,'view') === true);
+  }
+
+  function commercialHistory(cid, saved) {
+    if (!cid || dataReadiness(['negocios']) !== 'ready' || !Orbit.ciclo?.negocios) return [];
+    const deals = new Map();
+    for (const surface of commercialHistorySurfaces()) {
+      for (const deal of Orbit.ciclo.negocios({surface, incArchivado:true})) {
+        if (deal.id && deal.clienteId === cid) deals.set(deal.id, deal);
+      }
+    }
+    const events = [];
+    for (const deal of deals.values()) {
+      const seen = new Set(saved.filter(a => a.negocioId === deal.id && a.eventId).map(a => a.eventId));
+      const comments = Array.isArray(deal.comentarios) ? deal.comentarios : [];
+      const history = Array.isArray(deal.bitacora) ? deal.bitacora : [];
+      const add = (entry, title, detail) => {
+        if (!entry || (entry.eventId && seen.has(entry.eventId))) return;
+        if (entry.eventId) seen.add(entry.eventId);
+        events.push({icon:'🎯', tipo:'negocio', negocioId:deal.id, eventId:entry.eventId,
+          fecha:entry.ts || '', actor:entry.actorName || entry.user || '',
+          titulo:title || 'Oportunidad', detalle:detail || ''});
+      };
+      for (const c of comments) {
+        if (c) add(c, c.tipo || 'Comentario', c.texto);
+      }
+      for (const h of history) {
+        if (h) add(h, h.campo || 'Oportunidad', h.a);
+      }
+      if (!history.length && !comments.length && deal.creado) {
+        add({ts:deal.creado}, 'Oportunidad creada', deal.etapa);
+      }
+    }
+    return events;
+  }
+
+  function commercialEventLink(a) {
+    if (!a.negocioId) return '';
+    return '<button type="button" class="btn ghost sm" data-c360-negocio="'+U.esc(a.negocioId)+'">Abrir oportunidad</button>';
+  }
+
+  function commercialHistoryNotice() {
+    if (!commercialHistorySurfaces().length) return '';
+    const status = dataReadiness(['negocios']);
+    if (status === 'ready') return '';
+    return '<p class="muted" role="status">'+(status === 'unavailable'
+      ? 'No fue posible consultar el historial de oportunidades.'
+      : 'Consultando el historial de oportunidades…')+'</p>';
+  }
+
   function actividadesCliente(cid) {
     const saved=[].concat(q.actividadesDe(cid)||[]);
     const seen=new Set(saved.map(a=>String(a&&a.gestionId||'')).filter(Boolean));
@@ -677,7 +733,7 @@ Orbit.modules.cliente360 = (function () {
         titulo:'Gestión · '+String(g.titulo||g.tipo||'Seguimiento'),
         detalle:String(g.estado||'Pendiente')+' · '+String(g.proximaAccion||'Sin próxima acción')
       }));
-    return saved.concat(managements)
+    return saved.concat(managements, commercialHistory(cid, saved))
       .sort((a,b)=>String(b.fecha||'').localeCompare(String(a.fecha||'')));
   }
   function tabGestiones(cid) {
@@ -754,11 +810,12 @@ Orbit.modules.cliente360 = (function () {
           <span class="tab" style="cursor:pointer;font-size:12px" onclick="document.querySelector('.ftab[data-tab=&quot;historial&quot;]').click()">Ver todo →</span>
         </div>
         <div style="margin-top:14px;position:relative;padding-left:6px">
+          ${commercialHistoryNotice()}
           ${acts.map(a => `<div style="display:flex;gap:12px;padding-bottom:14px;position:relative">
             <div style="width:30px;height:30px;border-radius:50%;background:var(--surface);border:1px solid var(--line);display:grid;place-items:center;flex-shrink:0">${a.icon}</div>
             <div style="flex:1"><div style="font-size:13.5px;font-weight:600">${U.esc(a.titulo)}</div>
             <div class="muted" style="font-size:12px;margin-top:2px">${U.esc(a.detalle)}</div>
-            <div class="muted mono" style="font-size:11px;margin-top:3px">${U.fmtDate(a.fecha)} · ${U.ago(a.fecha)}</div></div>
+            <div class="muted mono" style="font-size:11px;margin-top:3px">${U.fmtDate(a.fecha)} · ${U.ago(a.fecha)}${a.actor ? ' · '+U.esc(a.actor) : ''}</div>${commercialEventLink(a)}</div>
           </div>`).join('') || '<span class="muted">Sin actividad registrada.</span>'}
         </div>
       </div>
@@ -1262,11 +1319,13 @@ Orbit.modules.cliente360 = (function () {
       <div class="card pad">
         <b style="font-family:var(--f-display);font-size:15px">Historial completo</b>
         <div style="margin-top:16px;border-left:2px solid var(--line);padding-left:18px;display:grid;gap:16px">
+          ${commercialHistoryNotice()}
           ${acts.map(a => `<div style="position:relative">
             <span style="position:absolute;left:-26px;top:0;width:24px;height:24px;border-radius:50%;background:#fff;border:1px solid var(--line);display:grid;place-items:center;font-size:12px">${a.icon}</span>
             <div style="font-size:13.5px;font-weight:600">${U.esc(a.titulo)}</div>
             <div class="muted" style="font-size:12.5px;margin-top:2px">${U.esc(a.detalle)}</div>
-            <div class="muted mono" style="font-size:11px;margin-top:3px">${U.fmtDate(a.fecha)} · ${U.ago(a.fecha)} · ${U.esc((q.asesor(a.asesorId) || {}).nombre || '')}</div>
+            <div class="muted mono" style="font-size:11px;margin-top:3px">${U.fmtDate(a.fecha)} · ${U.ago(a.fecha)} · ${U.esc(a.actor || (q.asesor(a.asesorId) || {}).nombre || '')}</div>
+            ${commercialEventLink(a)}
           </div>`).join('') || '<span class="muted">Sin actividad.</span>'}
         </div>
       </div>
