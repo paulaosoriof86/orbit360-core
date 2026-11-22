@@ -3,6 +3,7 @@
 // Direction. No user IDs, email, phone, credentials or secret values printed.
 const assert=require('node:assert/strict');
 const admin=require('firebase-admin');
+const {explicitAssignedRoles, resolveProductActiveRole} = require('../functions/product-active-role-contract');
 const key=['SA_LAB','SA_ALT','SA_DEFAULT'].map(x=>process.env[x]).filter(Boolean)
   .map(x=>{try{return JSON.parse(x);}catch{return null;}})
   .find(x=>x?.type==='service_account'&&x.project_id==='ays-orbit-360-lab'&&x.private_key);
@@ -25,6 +26,41 @@ const targets=[
   {label:'Priscila',match:n=>n.includes('priscila')},
   {label:'Asesor asignado',match:n=>n==='asesor asignado'}
 ];
+
+// Compare the currently selected role with explicit grants. Selecting a permitted
+// secondary role in the UI is legitimate, but is not proof of a dedicated account.
+async function advisorLoginCensus(members) {
+  const byCountry = {};
+  for (const country of ['GT', 'CO']) {
+    byCountry[country] = {assigned: 0, currentVerified: 0, switchableVerified: 0,
+      disabled: 0, emailUnverified: 0, missingAuth: 0};
+  }
+  for (const {id, row} of members) {
+    const states = [row.status, row.estado].map(canon).filter(Boolean);
+    if (row.tenantId !== tenant.id || !active(row) || !states.length ||
+        !states.every(s => s === 'active' || s === 'activo')) continue;
+    const assigned = explicitAssignedRoles(row);
+    if (!assigned.some(role => role === 'asesor' || role === 'comercial')) continue;
+    const scoped = unique(row.countries ?? row.paises ?? row.paisesAutorizados)
+      .map(c => String(c).toUpperCase()).filter(c => Object.hasOwn(byCountry, c));
+    if (!scoped.length) continue;
+    let user;
+    try { user = await admin.auth().getUser(id); }
+    catch (error) { if (error.code !== 'auth/user-not-found') throw error; }
+    let currentRole;
+    try { currentRole = resolveProductActiveRole(row).activeRole; }
+    catch (error) { if (error.code !== 'PRODUCT_ACTIVE_ROLE_NOT_ASSIGNED') throw error; }
+    const result = !user ? 'missingAuth' : user.disabled ? 'disabled' :
+      !user.emailVerified ? 'emailUnverified' :
+      ['asesor','comercial'].includes(currentRole) ? 'currentVerified' : 'switchableVerified';
+    for (const country of new Set(scoped)) {
+      byCountry[country].assigned++;
+      byCountry[country][result]++;
+    }
+  }
+  return byCountry;
+}
+
 (async()=>{
   const [a,m,access]=await Promise.all([
     tenant.collection('data').doc('asesores').collection('items').limit(450).get(),
@@ -36,6 +72,7 @@ const targets=[
   const members=m.docs.map(doc=>({id:doc.id,row:doc.data()||{}}));
   const summary={at:new Date().toISOString(),tenant:'alianzas-soluciones',
     totals:{advisorRecords:advisors.length,memberRecords:members.length},
+    advisorLoginEligibility:await advisorLoginCensus(members),
     teamRoleConfigPresent:!!access.data()?.rolePermissions,
     targets:[]};
   for(const target of targets){
