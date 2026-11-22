@@ -485,10 +485,12 @@ function acceptedForPreflight(control,state,transport,latest,io=fs){
     assert.equal(summary[key],value,'I66_OPERATIONAL_ACCEPTANCE_CP_'+key);
     assert.equal(state.currentLiveSuccessorAcceptance?.[key],value,'I66_OPERATIONAL_ACCEPTANCE_STATE_'+key);
   }
-  assert.equal(control.currentExecutionDecisionPointer,ACCEPTANCE_KEY);
-  assert.equal(state.currentExecutionDecisionPointer,'artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json#'+ACCEPTANCE_KEY);
+  const currentPayment=control.i66LatestPhysicalFrontendLive20261120||null;
+  const currentKey=currentPayment?'i66LatestPhysicalFrontendLive20261120':ACCEPTANCE_KEY;
+  assert.equal(control.currentExecutionDecisionPointer,currentKey,'I66_CURRENT_PHYSICAL_LIVE_POINTER_DRIFT');
+  assert.equal(state.currentExecutionDecisionPointer,'artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json#'+currentKey,'I66_CURRENT_PHYSICAL_STATE_POINTER_DRIFT');
   const work=control.i66OperationalContinuation20261115;
-  assert.equal(work?.activeGate,'I6.6');assert.equal(work.closedHistoricalGate,'B4-007');assert.equal(work.latestProvenLiveSource,p.sourceSha);assert.equal(work.newLiveAcceptanceClaimed,true);
+  assert.equal(work?.activeGate,'I6.6');assert.equal(work.closedHistoricalGate,'B4-007');assert.equal(work.latestProvenLiveSource,currentPayment?.sourceSha||p.sourceSha,'I66_CURRENT_PHYSICAL_LIVE_WORK_SOURCE_DRIFT');assert.equal(work.newLiveAcceptanceClaimed,true);
   assert.equal(transport.status,'OPERATIONAL_EXACT_LIVE_ACCEPTED_LOCKED');
   for(const [key,value] of Object.entries({livePromotionAuthorized:false,previewApproved:false,forbidBackendFunctionDeploy:true,backendFunctionPreviewOnly:false,forbidBackendLiveFunctionDeploy:true,noHostingPromotion:true,forbidFirestoreRulesDataAuthWrites:true}))assert.equal(transport[key],value,'I66_OPERATIONAL_ACCEPTANCE_LOCK_'+key);
   assert.equal(transport.operationalReleaseCandidate,undefined,'I66_OPERATIONAL_ACCEPTANCE_UNCONSUMED_AUTHORIZATION');
@@ -496,6 +498,44 @@ function acceptedForPreflight(control,state,transport,latest,io=fs){
   assert.equal(live?.status,'PUBLISHED_EXACT_OPERATIONAL_223_FILES_THREE_FUNCTIONS_SIGNED_LIVE_PARTIAL');
   for(const [key,target] of Object.entries({sourceSha:'sourceSha',buildId:'buildId',buildRunId:'previewRunId',artifactId:'artifactId',artifactDigest:'artifactDigest',liveRunId:'liveCloneRunId',hostingVersion:'liveHostingVersion',receipt:'receipt'}))assert.equal(live[target],facts[key],'I66_OPERATIONAL_ACCEPTANCE_TRANSPORT_'+key);
   assert.equal(live.readbackEachOrigin,223);
+  // The old 17-Nov three-function LIVE acceptance remains independently sealed.
+  // The 20-Nov Hosting-only successor is separately pinned to physical bytes,
+  // current LIVE marker UAT and transport, never flattened into that older proof.
+  if(currentPayment){
+    const path='artifacts/orbit360-recovery/release-control/I6_6_DIRECT_PAYMENT_OPTIONAL_DOCUMENT_LIVE_READBACK_20261120.json';
+    const raw=io.readFileSync(path,'utf8');
+    const blob=crypto.createHash('sha1').update('blob '+Buffer.byteLength(raw)+'\\0').update(raw).digest('hex');
+    assert.equal(currentPayment.receiptPath,path,'I66_PAYMENT_FRONTEND_RECEIPT_PATH');
+    assert.equal(currentPayment.receiptGitBlobSha,blob,'I66_PAYMENT_FRONTEND_RECEIPT_SHA_DRIFT');
+    const r=JSON.parse(raw);
+    assert.equal(r.schema,'GRAVICENTRA_I6_6_DIRECT_PAYMENT_OPTIONAL_DOCUMENT_LIVE_RECEIPT_V1');
+    assert.equal(currentPayment.status,'CURRENT_SIGNED_PHYSICAL_FRONTEND_LIVE_224_FILES_FULL_I66_HOLD');
+    assert.equal(currentPayment.gate,'I6.6');
+    for(const [key,value] of Object.entries({sourceSha:r.sourceSha,buildId:r.buildId,buildRunId:r.buildRunId,artifactId:r.artifactId,artifactDigest:r.artifactDigest,previewUrl:r.previewUrl,signedPreviewUatRunId:r.signedPreviewUatRunId,liveCloneRunId:r.liveCloneRunId,hostingVersion:r.physicalLiveHostingVersion,liveReadbackArtifactId:r.liveReadbackArtifactId,liveReadbackArtifactDigest:r.liveReadbackArtifactDigest}))
+      assert.equal(currentPayment[key],value,'I66_CURRENT_LIVE_FRONTEND_FIELD_'+key);
+    for(const key of ['preview','firebaseLive','customDomainLive'])assert.equal(r.exactFiles[key],224,'I66_PAYMENT_LIVE_224_FILES_'+key);
+    assert.equal(currentPayment.hostedFilesEachOrigin,224);
+    assert.equal(currentPayment.currentMarkerRealRoleUatRunId,45064138268,'I66_CURRENT_LIVE_MARKER_TEST_ID');
+    assert.equal(currentPayment.currentMarkerGovernanceRunId,45064138325,'I66_CURRENT_LIVE_MARKER_GUARD_ID');
+    assert.equal(r.signedPreviewUatResult,'SUCCESS');assert.equal(r.liveCloneRunResult,'SUCCESS');
+    assert.equal(r.tests.oneStepActualCustomerWithAttachedInvoice,'NOT_CERTIFIED','I66_DO_NOT_FAKE_REAL_INVOICE_ACCEPTANCE');
+    assert.equal(r.tests.liveRealCustomerPaymentAttempt,'NOT_REPRODUCED');
+    assert.equal(r.dataWrites,0);assert.equal(r.backendDeployments,0);assert.equal(r.fullI66ProductionAccepted,false);
+    for(const key of ['fullI66ProductionAccepted','realFinancialWrites','backendDeployments'])
+      assert.equal(currentPayment[key],key==='fullI66ProductionAccepted'?false:0,'I66_PAYMENT_SCOPE_'+key);
+    assert.equal(currentPayment.oldThreeFunctionLiveAcceptancePreserved,ACCEPTANCE_KEY);
+    assert.deepEqual(state.currentPhysicalFrontendLive20261120,currentPayment,'I66_CURRENT_FRONTEND_STATE_MISMATCH');
+    const h=transport.currentPhysicalHostingRelease||{};
+    for(const [key,value] of Object.entries({sourceSha:r.sourceSha,buildId:r.buildId,artifactId:r.artifactId,artifactDigest:r.artifactDigest,previewRunId:r.buildRunId,signedPreviewRunId:r.signedPreviewUatRunId,liveCloneRunId:r.liveCloneRunId,liveHostingVersion:r.physicalLiveHostingVersion,readbackEachOrigin:224,receipt:path,backendFunctionsChanged:0,fullI66ProductionAccepted:false}))
+      assert.equal(h[key],value,'I66_PAYMENT_LATEST_TRANSPORT_'+key);
+    assert.equal(h.status,'PUBLISHED_SIGNED_224_FRONTEND_HOSTING_ONLY_FULL_I66_HOLD');
+    const prev=transport.previousPhysicalHostingReleaseBeforePaymentDirect20261120||{};
+    assert.equal(prev.sourceSha,r.sourceSha==='f1eb5bc6397f0b159079be516a521dd7b1e5d9ba'?'431892dcfefaa7eaad6faec3ab281dca25d6b2b1':'INVALID','I66_PAYMENT_PREVIOUS_HOSTING_ID');
+    assert.equal(prev.liveHostingVersion,r.previousHostingVersion,'I66_PAYMENT_ROLLBACK_HOSTING');
+    assert.equal(transport.latestSignedPhysicalFrontendLivePointer20261122?.receiptGitBlobSha,blob,'I66_PAYMENT_TRANSPORT_RECEIPT_BLOB');
+    assert.equal(work.latestPhysicalFrontendLiveReceipt,path,'I66_PAYMENT_CONTINUATION_RECEIPT');
+    assert.ok(String(control.nextAction||'').includes(r.buildId),'I66_PAYMENT_NEXT_ACTION_STALE');
+  }
   assert.equal(latest.status,'LATEST_OPERATIONAL_EXACT_SIGNED_LIVE_PASS_FULL_I66_HOLD');assert.equal(latest.fullI66ProductionAccepted,false);
   for(const [key,target] of Object.entries({sourceSha:'currentLiveSourceSha',buildId:'currentLiveBuildId',buildRunId:'currentLiveImmutableBuildRunId',artifactId:'currentLiveArtifactId',artifactDigest:'currentLiveArtifactDigest',liveRunId:'currentLiveDeployAndSignedQaRunId',liveEvidenceArtifactId:'currentLiveEvidenceArtifactId',liveEvidenceArtifactDigest:'currentLiveEvidenceArtifactDigest',hostingVersion:'currentLiveHostingVersion',receipt:'currentLiveReceipt'}))assert.equal(latest[target],facts[key],'I66_OPERATIONAL_ACCEPTANCE_LATEST_'+key);
   assert.equal(latest.previousLiveVersionForRollback,r11.hostingVersion);

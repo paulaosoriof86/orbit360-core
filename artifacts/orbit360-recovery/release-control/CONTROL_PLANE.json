@@ -26,8 +26,8 @@
     "canonicalPlan": "artifacts/orbit360-recovery/release-control/I6_6_OPERATIONAL_CONTINUATION_20261115.json",
     "activeGate": "I6.6",
     "closedHistoricalGate": "B4-007",
-    "latestProvenLiveSource": "1b65a790530d49fe1d1fb451f02838fd9a713c53",
-    "currentWork": "I6.6 HOLD. Signed document-import source review passed on the published Hosting artifact for Operativo and Dirección. Cliente 360, Corado handback, synthetic task and financial flows have scoped LIVE evidence. Five original El Roble PDFs and 49 installments verified; durable policy issuance, remaining role/scenario coverage, financial exceptions and production inbound/Drive integrations remain open.",
+    "latestProvenLiveSource": "f1eb5bc6397f0b159079be516a521dd7b1e5d9ba",
+    "currentWork": "I6.6 HOLD. Current physical frontend Hosting is f1eb5bc, same artifact 224/224 Preview/Firebase/custom LIVE, signed Carlos and Dirección synthetic tests repeated 22-Nov. 17-Nov three backend functions remain separately certified and unchanged by this Hosting-only successor. Real issuance/renewal/Drive invoice, Edson original error, Make inbound and financial delta payments still unproven. Preserve historical acceptance.",
     "latestHostingPreviewEvidence": "artifacts/orbit360-recovery/release-control/I6_6_NETWORK_DIAGNOSTICS_PREVIEW_BUILD_20261117.json",
     "latestHostingPreviewSource": "1b65a790530d49fe1d1fb451f02838fd9a713c53",
     "operationsEvidenceReview": "artifacts/orbit360-recovery/release-control/I6_6_OPS_EVIDENCE_AND_PREVIEW_BINDING_REVIEW_20261116.json",
@@ -1591,7 +1591,9 @@
       "receipt": "artifacts/orbit360-recovery/release-control/I6_6_FINANCIAL_OPS_LEADS_CONTINUITY_READBACK_20261119.json#operationalReconciliation20261120",
       "backendFunctionsChanged": 0,
       "fullI66ProductionAccepted": false
-    }
+    },
+    "latestPhysicalFrontendLiveReceipt": "artifacts/orbit360-recovery/release-control/I6_6_DIRECT_PAYMENT_OPTIONAL_DOCUMENT_LIVE_READBACK_20261120.json",
+    "latestPhysicalFrontendLiveRunId": 44827928263
   },
   "b4003ActiveCertificationCursor20261106": {
     "schema": "GRAVICENTRA_B4_003_SINGLE_ACTIVE_CERTIFICATION_CURSOR_V1",
@@ -4924,7 +4926,7 @@
     "i63LiveReadbackPass": true,
     "i63DeterministicDiffReady": true
   },
-  "nextAction": "I6_6_CURRENT_SIGNED_LIVE_DEPLOY_PASS_FULL_I66_HOLD: CERTIFIED_1B65A79053_BUILD_gi-i66-1b65a790530d-57f234755dc1_ARTIFACT_14373955326_PUBLISHED_EXACTLY_223_OF_223_EACH_ORIGIN_AND_THREE_BACKEND_FUNCTIONS_LIVE_RUN_44211496307; NORMAL_UI_DIRECTION_V2_LEGAL_ACCEPTANCE_IMMEDIATE_RELOAD_PASS; FOCAL_SYNTHETIC_CARLOS_DIRECTION_OPS_LEADS_PERMISSION_CXP_AND_CONCILIACION_UAT_PASS_WITH_CLEANUP; OPS_PLUS_TAREA_NORMAL_UI_LEGAL_OVERLAY_HOLD_FOR_UNACCEPTED_SESSIONS; REAL_COBROS_AND_INFERENCE_APPLIES_ZERO_IN_THIS_TRANSPORT. NEXT_FIRST_INCOMPLETE_GATE: GENUINE_AFFECTED_LIVE_WORKFLOWS_AND_SOURCE_PINNED_DETERMINISTIC_FINANCIAL_BATCHES_WITH_FRESH_SERVER_PREIMAGES_DIFF_IDEMPOTENT_WRITES_BEFORE_AFTER_READBACK_RELOAD_AND_AUDIT; AMBIGUOUS_ITEMS_ISOLATED_NOT_GLOBAL_HOLD; PRESERVE_SAME_ACCEPTED_LIVE_ARTIFACT_AND_NO_REBUILD_FOR_DATA_ONLY; FULL_I66_NOT_ACCEPTED.",
+  "nextAction": "I6_6_CURRENT_PHYSICAL_FRONTEND_SIGNED_224_FILES_LIVE_gi-i66-f1eb5bc6397f-57f234755dc1_WITH_TESTED_NO_BLOCK_PAYMENT_AND_SYNTHETIC_ROLES; HISTORICAL_17NOV_THREE_BACKEND_FUNCTIONS_ACCEPTANCE_PRESERVED; FULL_I66_HOLD; FIRST_INCOMPLETE_WORK: CORRECT_GENUINE_RENEWAL_SUBSTITUTION_PAYMENT_CASE_DOCUMENT_DRIVE_AND_AUTHENTICATED_BROWSER_UI, PLUS_FRESH_FIRESORE_READBACK_SOURCE_PINNED_DETERMINISTIC_FINANCIAL_DELTAS_WITH_NO_REPLAY. NO_NEW_RELEASE_OR_DATA_MUTATION_AUTHORIZED_BY_THIS_POINTER.",
   "postproductionExitProgress": {
     "formalPercent": 60,
     "frozenMiniGates": 6,
@@ -23238,7 +23240,7 @@
     "noNewIterationsOrParallelReleaseMethod": true,
     "noGlobalSynchronizationClaim": true
   },
-  "currentExecutionDecisionPointer": "i66OperationalExactLiveAcceptance20261117",
+  "currentExecutionDecisionPointer": "i66LatestPhysicalFrontendLive20261120",
   "i66PaymentInvoicePolicyR9ExactLiveRelease20261113": {
     "schema": "GI_I66_R9_EXACT_LIVE_OPERATIVE_SUCCESSOR_V1",
     "status": "PREVIOUS_R9_PAYMENT_INVOICE_POLICY_SIGNED_LIVE_PRESERVED",
@@ -24567,5 +24569,32 @@
     "realFinancialWrites": 0,
     "proofPath": "artifacts/orbit360-recovery/release-control/I6_6_OPERATIONAL_EXACT_LIVE_PROOF_20261117.json",
     "proofSha256": "0a7f3862343721d9bdcee85224536adee35d4ba71dc9ccf7322af6fd2d85fbc1"
+  },
+  "i66LatestPhysicalFrontendLive20261120": {
+    "status": "CURRENT_SIGNED_PHYSICAL_FRONTEND_LIVE_224_FILES_FULL_I66_HOLD",
+    "gate": "I6.6",
+    "sourceSha": "f1eb5bc6397f0b159079be516a521dd7b1e5d9ba",
+    "buildId": "gi-i66-f1eb5bc6397f-57f234755dc1",
+    "buildRunId": 44826594717,
+    "artifactId": 14674736714,
+    "artifactDigest": "sha256:e55fcc674a6cc493cdedff27672d082222db3dd7134354559788364b6ae23713",
+    "signedPreviewUatRunId": 44827281351,
+    "liveCloneRunId": 44827928263,
+    "hostingVersion": "sites/ays-orbit-360-lab/versions/7a0d829d3504c9f8",
+    "hostedFilesEachOrigin": 224,
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_DIRECT_PAYMENT_OPTIONAL_DOCUMENT_LIVE_READBACK_20261120.json",
+    "receiptGitBlobSha": "3e44c28449070b78de5a71522167cbd65ead7666",
+    "previewUrl": "https://ays-orbit-360-lab--gi-i66-rc-44826594717-x8drvh8s.web.app",
+    "liveReadbackArtifactId": 14674414002,
+    "liveReadbackArtifactDigest": "sha256:057f1f001d8378e354000cd7c1d340585f591e47b69a7fe250ef75a93744b320",
+    "currentMarkerRealRoleUatRunId": 45064138268,
+    "currentMarkerGovernanceRunId": 45064138325,
+    "backendDeployments": 0,
+    "realFinancialWrites": 0,
+    "fullI66ProductionAccepted": false,
+    "currentScope": "FRONTEND_HOSTING_AND_SIGNED_SYNTHETIC_REGRESSION_ONLY",
+    "oldThreeFunctionLiveAcceptancePreserved": "i66OperationalExactLiveAcceptance20261117",
+    "previousFrontendLiveVersion": "sites/ays-orbit-360-lab/versions/95771c3acafb17b1",
+    "currentOperationalFullProof": "HOLD_GENUINE_CUSTOMER_ISSUANCE_RENEWAL_DRIVE_INVOICE_AUTOMATION_AND_FINANCIAL_DELTAS"
   }
 }
