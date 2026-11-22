@@ -68,6 +68,7 @@ jobs:
           node --check tools/gravicentra-i66-source-bulk-live.cjs
           node tools/gravicentra-i66-source-bulk-plan.test.cjs
           node tools/gravicentra-i66-source-bulk-apply.test.cjs
+          node --test tools/gravicentra-i66-roble-five-issuer-crosswalk.test.cjs
       - name: Select configured Firebase service account for bounded read-only preflight
         shell: bash
         run: |
