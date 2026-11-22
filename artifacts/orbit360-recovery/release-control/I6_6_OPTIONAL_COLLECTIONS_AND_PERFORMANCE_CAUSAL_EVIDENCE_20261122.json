@@ -1,0 +1,114 @@
+{
+  "schema": "GI_I66_OPTIONAL_READ_AND_PERFORMANCE_PHYSICAL_EVIDENCE_V1",
+  "type": "SUBORDINATE_CAUSAL_EVIDENCE_READ_ONLY_NOT_FUNCTIONAL_PASS",
+  "dateGuatemala": "2026-11-22",
+  "source": {
+    "runId": 45074429319,
+    "artifactId": 14775062360,
+    "artifactFile": "gi-i66-live-carlos-performance.json",
+    "liveSourceSha": "f1eb5bc6397f0b159079be516a521dd7b1e5d9ba",
+    "workflowHeadSha": "b6d27447786779e5b2b678261ef50c3568f7a19d",
+    "exactBrowserOrigin": "https://app.aysseguros.com",
+    "actorRole": "Operativo",
+    "httpErrors": 0,
+    "consoleErrors": 0,
+    "pageErrors": 0
+  },
+  "testedMetrics": {
+    "cobros": {
+      "firstContentMs": 1647,
+      "financialReadyMs": 13791,
+      "renderCalls": 3,
+      "renderTotalMs": 6893.1,
+      "storeGetCalls": 12402,
+      "storeGetTotalMs": 1724,
+      "storeAllCalls": 241,
+      "storeAllTotalMs": 3491
+    },
+    "polizas": {
+      "readyMs": 5501,
+      "renderCalls": 6,
+      "renderTotalMs": 148.8,
+      "storeGetCalls": 597,
+      "cpuIdleSampleMs": 4828
+    },
+    "cronograma": {
+      "readyMs": 1009,
+      "storeGetCalls": 11197,
+      "storeGetTotalMs": 630
+    },
+    "calidad": {
+      "readyMs": 1088,
+      "storeGetCalls": 14448,
+      "storeGetTotalMs": 762
+    },
+    "cliente360": {
+      "firstVisibleMs": 52,
+      "detailMs": 2430,
+      "detailReadinessReady": 5,
+      "detailReadinessUnavailable": 1
+    },
+    "startup": {
+      "activateMs": 2385
+    }
+  },
+  "protectedReadContracts": {
+    "frontendProvider": {
+      "path": "orbit360-platform/core/product-runtime-browser-providers-p0.js",
+      "blobSha": "1c5e1dff60af7fea53a14276aeecc7273c26ad81",
+      "line": 269,
+      "noSupport": [
+        "estadosCuentaAseguradora",
+        "recibosAseguradora"
+      ],
+      "supports": [
+        "reclamos"
+      ]
+    },
+    "productStore": {
+      "path": "orbit360-platform/data/store-firestore-product-readonly-p0.js",
+      "blobSha": "062e5633e97ba830a4149fcf4d4ef49cd9f7f8cb",
+      "lines": [
+        244,
+        328
+      ],
+      "noSupport": [
+        "estadosCuentaAseguradora",
+        "recibosAseguradora"
+      ],
+      "supports": [
+        "reclamos"
+      ]
+    },
+    "backendRelatedReader": {
+      "path": "functions/b4-003-scoped-related-reader.js",
+      "blobSha": "aafdbe3384506b1772c7e409d565de88bf287b21",
+      "line": 8,
+      "noSupport": [
+        "estadosCuentaAseguradora",
+        "recibosAseguradora"
+      ],
+      "supports": [
+        "reclamos"
+      ]
+    },
+    "observedSnapshotErrorSources": [
+      "estadosCuentaAseguradora",
+      "recibosAseguradora",
+      "reclamos"
+    ],
+    "assessment": "The first two requested source names are unsupported by the current protected reader contract on both client and server; not proof of lost records. reclamos IS supported by all three allowlists; actual error code and parent/country validation must be captured separately before causal fix."
+  },
+  "discriminantQA": [
+    "For the two unsupported insurer statement/receipt collections: inventory last approved contract and whether this role/surface should consume them. Do not blindly add names to frontend allowlist without matching backend authorization, schema, country, tenant, projection and tests. If optional by design, gate request at correct readiness source; do not mask required data.",
+    "For reclamos: instrument and retain the exact sanitized snapshotErrors['reclamos'] code, callable request collection/country/role and authorized backend response; differentiate missing country/parent relation, reader/role denial, pagination/integrity, transient function response; no reimport.",
+    "For Cobros: measure phase boundaries (core vs financial ready), repeated store.get/all per render, clone costs, reactively re-rendered modules and source fetches. Optimize indexed projection/memoization and bounded snapshots after direct causal profile; preserve currency, scope and transformations.",
+    "For Polizas: 5501ms readiness with only ~149ms render and 4828ms idle samples suggests waiting/hydration dominates that sample, not just rendering. Verify exact query/backend events before selecting optimization.",
+    "For Cliente360: identify the one unavailable section and ensure it is not falsely interpreted as an empty dossier; require server readback and role safety."
+  ],
+  "noWrites": true,
+  "noNewRelease": true,
+  "newGatePass": false,
+  "activeGate": "I6.6",
+  "next": "Use current exact browser and native diagnostics in the existing I6.6 signed test battery. Work can remedy only causal root identified, then source change must pass new Preview and identical LIVE artifact."
+}
