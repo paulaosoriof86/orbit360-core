@@ -41,7 +41,7 @@ function verifySource() {
 }
 function verdict(data,identityMatch=match) {
   verifySource();
-  const {clients=[],vehicles=[],policies=[],insurers=[],advisors=[]}=data||{};
+  const {clientes:clients=[],vehiculos:vehicles=[],polizas:policies=[],aseguradoras:insurers=[],asesores:advisors=[]}=data||{};
   return source.cases.map(c=>{
     const w=evidence.witnesses.find(x=>x.policy===c.policy);
     const holder=clients.filter(x=>String(x.pais||'').toUpperCase()==='GT'&&
