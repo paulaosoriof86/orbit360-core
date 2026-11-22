@@ -1,0 +1,62 @@
+{
+  "schema": "GI_I66_ROBLE_FIVE_ISSUED_IDENTITY_SHA256_WITNESSES_V1",
+  "recordType": "ISSUER_PDF_NATIVE_BYTES_SHA256_AND_SALTED_IDENTITY_WITNESSES_NON_AUTHORITATIVE",
+  "dateGuatemala": "2026-11-22",
+  "scope": "I6.6",
+  "sourcePath": "artifacts/orbit360-recovery/source-batches/I6_6_ROBLE_FIVE_ISSUED_49_REQUIREMENTS_20261122.json",
+  "method": "Native PDF SHA256, identity hashes SHA256(pdfRawSha256 + '|' + uppercase NFD letters+digits). Holder from insurer REF POLIZA/ASEGURADO contractual cover letter, risk from first certificate only; test identical based on country/tenant, insurer and exact predecessor.",
+  "witnesses": [
+    {
+      "policy": "91-8323091",
+      "sourcePdfRawSha256": "e75ed257defa5ee055168fc196f8ae7b92d3888c5013f3463e239253b7af6319",
+      "holderWitness": "7cf7f764c5c4681a1f3fdf5f6c69839a6beb3eaa22b2eb9856ebe18eee0d4892",
+      "initialCertificatePlateWitness": "bc30413c057caf16f6914915ce985013fc1e92c8711332842e6142e1f7bfb072",
+      "initialCertificateVinWitness": "ec4564b135c2950fe69db383524788c80707c026698610c5280fa5f0a61bbcf6",
+      "initialCertificateHolderMatchesContractHolder": true,
+      "riskUse": "CANDIDATE_REQUIRES_EXACT_PREDECESSOR_LINK_READBACK",
+      "privacy": "NO_PLAINTEXT_HOLDER_OR_VEHICLE_IDENTIFIERS"
+    },
+    {
+      "policy": "91-8324489",
+      "sourcePdfRawSha256": "e64e6472321e53a2c68a4e88139a1423a0d1261ee75ff8f6603c47215602c8a7",
+      "holderWitness": "34b242946d607d110e858f7ac3f9d47f90132d3866f6505573ce8812afa38921",
+      "initialCertificatePlateWitness": "31c96b8b0a2e7cfafc1c0987a4831ce64782da7e227d04b097895d41d9429d10",
+      "initialCertificateVinWitness": "52df9c0bc6c4c6129455a7b7284ef4793c17a69bec69f9dcc02730c7f6b1ff46",
+      "initialCertificateHolderMatchesContractHolder": true,
+      "riskUse": "CANDIDATE_REQUIRES_EXACT_PREDECESSOR_LINK_READBACK",
+      "privacy": "NO_PLAINTEXT_HOLDER_OR_VEHICLE_IDENTIFIERS"
+    },
+    {
+      "policy": "91-8342189",
+      "sourcePdfRawSha256": "1814d67bd274ccecbb523666fc9cd52fd8928cd41b8cbec4a725804c0e41a9ad",
+      "holderWitness": "3882a8e26296e13fe3e9b103ab73bb8f36f5668e2b5c069fa5fa96b3edbba08d",
+      "initialCertificatePlateWitness": "5f080cc79a764a377d3912a1fa3733a5e5ff7c269a74f1f6b6025ae54e9bc108",
+      "initialCertificateVinWitness": "b7d4db99449109b5c65e34ed3ac88d6cca8cb99546c7ec277b7b22326b6448b6",
+      "initialCertificateHolderMatchesContractHolder": false,
+      "riskUse": "DO_NOT_ASSUME_SINGLE_RISK_FLEET_DIFF_FIRST_CERTIFICATE",
+      "privacy": "NO_PLAINTEXT_HOLDER_OR_VEHICLE_IDENTIFIERS"
+    },
+    {
+      "policy": "91-8343059",
+      "sourcePdfRawSha256": "05be6fd1da736b40306f7f3f709b1e0288d0970b63813fb4376b7e2354fbab15",
+      "holderWitness": "89edd3559e9bf486a65fe151e4bbf2b39c523c673606628fe2fb4acb30bd2524",
+      "initialCertificatePlateWitness": "f6ed90c08f8a95c78334827ecad59419c4555e602b584d0b2aa689f2447d4f18",
+      "initialCertificateVinWitness": "d1d6f4544ba846e6b8a3f6aa8e08c716867563190b07f83b346775317fa397aa",
+      "initialCertificateHolderMatchesContractHolder": true,
+      "riskUse": "CANDIDATE_REQUIRES_EXACT_PREDECESSOR_LINK_READBACK",
+      "privacy": "NO_PLAINTEXT_HOLDER_OR_VEHICLE_IDENTIFIERS"
+    },
+    {
+      "policy": "91-4140843",
+      "sourcePdfRawSha256": "a8b0b7cf358630ebcdf934a9dcfdcb5939b2192d55acf50cb8cea2f5a1c2fe44",
+      "holderWitness": "17fd3de149a7733e85ba3019d72dfe20aec7875a4fa0b8daf929ddec708d4a3e",
+      "initialCertificatePlateWitness": "44d4158f6aa6288b7b24bf039ae953c84e392bc6557f241876cdb345aceebcd3",
+      "initialCertificateVinWitness": "87741e34c7d8de426107022a03cc1cfd9617c67e24295c64fa0cd5f592012e05",
+      "initialCertificateHolderMatchesContractHolder": true,
+      "riskUse": "CANDIDATE_REQUIRES_EXACT_PREDECESSOR_LINK_READBACK",
+      "privacy": "NO_PLAINTEXT_HOLDER_OR_VEHICLE_IDENTIFIERS"
+    }
+  ],
+  "noBusinessWrites": true,
+  "noProductBuild": true
+}
