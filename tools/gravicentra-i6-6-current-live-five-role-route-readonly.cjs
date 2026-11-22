@@ -62,7 +62,7 @@ async function getActors(){
       countries(m).includes('ALL')));
     if(wanted.matchName){
       candidates=candidates.filter(m=>[m.nombre,m.displayName,m.name,m.nombreCompleto,m.fullName]
-        .some(v=>norm(v).includes(wanted.matchName)));
+        .some(v=>wanted.matchName.split(' ').every(part=>norm(v).includes(part))));
     }
     const valid=[];
     for(const m of candidates){
@@ -110,7 +110,8 @@ async function visit(browser,actor,width){
         canInsurerEdit:Orbit.access?.can?.('aseguradoras','edit')===true,
         canPay:Orbit.access?.can?.('cobros','edit')===true};
     },actor.token);
-    actorReport.ready=state.started&&!state.preview&&norm(state.role)===actor.role;
+    actorReport.ready=state.started&&!state.preview&&(norm(state.role)===actor.role||
+      (actor.role==='admintenant'&&['admin','administrador'].includes(norm(state.role))));
     actorReport.sessionRole=norm(state.role);
     actorReport.viewPermissions=state.accessibleModules;
     actorReport.canInsurerEdit=state.canInsurerEdit;
