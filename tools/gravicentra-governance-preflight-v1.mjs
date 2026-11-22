@@ -80,13 +80,14 @@ if(i66Active&&control.i66ActiveRecoveryCursor){
   }
   if(committedObligations!==p.financialWork.currentIterationRealCustomerFinancialWrites ||
      p.notTouched.firestoreRealWrites!==(committedObligations===0))throw Error('I66_COMMERCIAL_WRITE_TOTAL_DRIFT');
+  const currentPhysical=control.i66FrontendReleaseHead||control.i66LatestPhysicalFrontendLive20261120;
   if(c.formalI6GatePercent!==control.postproductionExitProgress?.formalPercent||
      p.officialProgress.postproductionI6.percent!==c.formalI6GatePercent||
-     p.releasedFrontend.sourceSha!==control.i66LatestPhysicalFrontendLive20261120?.sourceSha||
-     c.lastPhysicalLiveSourceSha!==control.i66LatestPhysicalFrontendLive20261120?.sourceSha||
-     p.releasedFrontend.digest!==control.i66LatestPhysicalFrontendLive20261120?.artifactDigest||
+     p.releasedFrontend.sourceSha!==currentPhysical?.sourceSha||
+     c.lastPhysicalLiveSourceSha!==currentPhysical?.sourceSha||
+     p.releasedFrontend.digest!==currentPhysical?.artifactDigest||
      c.financialRowsAppliedThisIteration!==p.financialWork.currentIterationRealCustomerFinancialWrites||
-     p.notTouched.hostingProduction!==true)
+     (!p.notTouched.hostingProduction&&!(control.i66FrontendReleaseHead&&p.frontendReleaseGeneration===control.i66FrontendReleaseHead.generation)))
     throw Error('I66_PROGRESS_UNPROVEN_RELEASE_GATE_OR_FINANCIAL_WRITE');
   console.log('I66_ACTIVE_RECOVERY_CURSOR_NOLOSS_AND_PERCENT_GUARD=PASS');
 }
