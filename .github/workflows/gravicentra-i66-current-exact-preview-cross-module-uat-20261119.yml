@@ -214,8 +214,62 @@ jobs:
         run: node tools/gravicentra-i6-6-carlos-paula-live-direct-renewal-synthetic-uat.cjs
       - name: Operativo and Dirección LIVE insurer directory account CRUD permission/reload/restore
         run: node tools/gravicentra-i6-6-carlos-paula-live-insurer-synthetic-write-uat.cjs
-      - name: Explicit scoped QA disposition
-        if: success()
+      - name: Carlos and Dirección LIVE Cliente360 canonical edit, advisor and activity write/reload/restore
+        id: live_client360
+        continue-on-error: true
+        env:
+          I66_SIGNED_CLIENT_EDIT_ORIGIN: https://app.aysseguros.com
+          I66_SIGNED_CLIENT_EDIT_SOURCE: ${{ env.I66_APPROVED_LIVE_SOURCE_SHA }}
+        run: node tools/gravicentra-i6-6-carlos-client-edit-signed-synthetic-uat.cjs
+      - name: Carlos and Dirección LIVE Ops Leads workflow create/update/resolution task readback/reload/restore
+        id: live_ops_leads
+        continue-on-error: true
+        run: node tools/gravicentra-i6-6-carlos-paula-live-synthetic-ops-leads-uat.cjs
+      - name: Carlos and Dirección LIVE payment receipt portfolio reconciliation idempotence reload and restore
+        id: live_cobros
+        continue-on-error: true
+        run: node tools/gravicentra-i6-6-carlos-paula-live-synthetic-payment-renewability-uat.cjs
+      - name: Carlos LIVE physical route and startup performance readonly across thirteen modules and mobile
+        id: live_performance
+        continue-on-error: true
+        env:
+          GI_I66_PERF_PROJECT: ays-orbit-360-lab
+          GI_I66_PERF_TENANT: alianzas-soluciones
+          GI_I66_PERF_ORIGIN: https://app.aysseguros.com
+          GI_I66_PERF_REPORT: ${{ runner.temp }}/gi-i66-live-carlos-performance.json
+          GOOGLE_APPLICATION_CREDENTIALS: ${{ runner.temp }}/gi-i66-admin-cert.json
         run: |
-          echo 'I66_CURRENT_EXACT_LIVE_SYNTHETIC_RENEWAL_AND_INSURER_PASS_REAL_BUSINESS_ISSUANCE_AND_DRIVE_DOCUMENTS_STILL_HOLD' >> "$GITHUB_STEP_SUMMARY"
-          echo 'I66_LIVE_SYNTHETIC_RECORDS_FULLY_RESTORED_BY_EACH_DRIVER; NO_NEW_LIVE_BUILD_OR_DEPLOY' >> "$GITHUB_STEP_SUMMARY"
+          set -euo pipefail
+          node - <<'NODE'
+          const fs=require('node:fs'),assert=require('node:assert/strict');
+          const c=['SA_LAB','SA_ALT','SA_DEFAULT'].map(k=>{try{return JSON.parse(process.env[k]||'');}catch{return null;}})
+            .find(x=>x?.type==='service_account'&&x.project_id==='ays-orbit-360-lab'&&x.private_key);
+          assert.ok(c,'I66_PERF_PROJECT_CREDENTIAL_NOT_AVAILABLE');
+          fs.writeFileSync(process.env.GOOGLE_APPLICATION_CREDENTIALS,JSON.stringify(c),{mode:0o600,flag:'wx'});
+          NODE
+          node tools/gravicentra-i66-live-performance-readonly.mjs
+      - name: Preserve diagnostic performance JSON on all outcomes
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gi-i66-live-carlos-performance-${{ github.run_id }}
+          path: ${{ runner.temp }}/gi-i66-live-carlos-performance.json
+          if-no-files-found: warn
+      - name: Functional proof disposition - preserve old PASS, fail closed on new discriminants
+        if: always()
+        run: |
+          set -euo pipefail
+          echo '### Current exact LIVE role and route forensic QA' >> "$GITHUB_STEP_SUMMARY"
+          echo '- Previous signed renewal/insurer PASS only when individual steps succeeded; data synthetic and restored' >> "$GITHUB_STEP_SUMMARY"
+          echo '| New domain | Outcome | Scope |' >> "$GITHUB_STEP_SUMMARY"
+          echo '|---|---|---|' >> "$GITHUB_STEP_SUMMARY"
+          echo '| Cliente 360 | ${{ steps.live_client360.outcome }} | Carlos/Dirección synthetic LIVE edit/reload/cleanup |' >> "$GITHUB_STEP_SUMMARY"
+          echo '| Ops / Leads | ${{ steps.live_ops_leads.outcome }} | Carlos/Dirección synthetic LIVE CRUD/tasks/readback/cleanup |' >> "$GITHUB_STEP_SUMMARY"
+          echo '| Cobros | ${{ steps.live_cobros.outcome }} | Carlos/Dirección synthetic LIVE payment/portfolio/reload/cleanup |' >> "$GITHUB_STEP_SUMMARY"
+          echo '| Startup / 13 routes / mobile | ${{ steps.live_performance.outcome }} | Carlos real signed LIVE read-only |' >> "$GITHUB_STEP_SUMMARY"
+          echo '- No genuine customer payment or issuance claimed, Drive real upload and full role matrix remain HOLD' >> "$GITHUB_STEP_SUMMARY"
+          test "${{ steps.live_client360.outcome }}" = success
+          test "${{ steps.live_ops_leads.outcome }}" = success
+          test "${{ steps.live_cobros.outcome }}" = success
+          test "${{ steps.live_performance.outcome }}" = success
+          echo 'I66_LIVE_FOUR_NEW_FUNCTIONAL_DOMAINS_PASS_SYNTHETIC_OR_READONLY_DO_NOT_CLAIM_REAL_BUSINESS_ACCEPTANCE' >> "$GITHUB_STEP_SUMMARY"
