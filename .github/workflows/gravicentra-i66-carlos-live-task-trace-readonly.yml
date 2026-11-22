@@ -45,7 +45,13 @@ jobs:
             assert.ok(s.includes("GI_I66_CARLOS_TRACE_MODE,'readonly'"));
             const r=await fetch('https://app.aysseguros.com/__recovery__/build.json',{headers:{'cache-control':'no-cache'}});
             assert.ok(r.ok);const b=await r.json();
-            assert.equal(b.sourceSha,'1dd675ed59ac51fd122915ca8056f85f82fa12d6');
+            const c=JSON.parse(fs.readFileSync('artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json'));
+            const t=JSON.parse(fs.readFileSync('artifacts/orbit360-recovery/release-control/I6_6_RELEASE_TRANSPORT_CONTROL_20261110.json'));
+            const current=c[c.currentExecutionDecisionPointer];
+            assert.ok(current && current.sourceSha && current.buildId);
+            assert.equal(t.currentPhysicalHostingRelease.sourceSha,current.sourceSha);
+            assert.equal(b.sourceSha,current.sourceSha);
+            assert.equal(b.buildId,current.buildId);
             console.log('I66_CARLOS_TASK_SIGNED_LIVE_FRONTEND_SOURCE_AND_READONLY_GUARD_PASS');
           })().catch(e=>{console.error(e.message);process.exitCode=1;});
           NODE

@@ -34,6 +34,35 @@ function identity(members,advisors){
   assert.ok(countries.length>=1,'I66_CARLOS_TASK_COUNTRY_SCOPE_MISSING');
   return{uid:matches[0].id,advisorIds,countries:Array.from(new Set(countries))};
 }
+// The browser supplied one canonical client ID. Compare digests in the
+// runner so public evidence contains neither a customer ID nor a note.
+async function incidentReadback(root) {
+  const digest = value => crypto.createHash('sha256').update(text(value)).digest('hex');
+  const ids = await col(root,'clientes').select().limit(800).get();
+  assert.ok(ids.size < 800, 'I66_CARLOS_CLIENT_ID_SCAN_LIMIT');
+  const client = ids.docs.filter(doc => digest(doc.id) ===
+    '81fc08e4af440dc08586b546692423b1d97621874d91d1cf60e7e1e50ee55e20');
+  assert.equal(client.length, 1, 'I66_CARLOS_CLIENT_KEY_NOT_UNIQUE');
+  const cid = client[0].id;
+  const linked = name => col(root,name).where('clienteId','==',cid).limit(150).get();
+  const [managements, activities, deals, leadIndex] = await Promise.all([
+    linked('gestiones'), linked('actividades'), linked('negocios'),
+    col(root,'negocios').select('nombre','clienteId','etapa').limit(650).get()
+  ]);
+  assert.ok([managements,activities,deals].every(s => s.size < 150) && leadIndex.size < 650,
+    'I66_CARLOS_LINKED_RECORD_LIMIT');
+  const saved = managements.docs.filter(doc => digest(doc.get('proximaAccion')) ===
+    '1e613148cf9c51c2737121dc1d7b7a23b9bbb0b0c0ca05a67a3fc3b40d166c8f');
+  const matching = leadIndex.docs.filter(doc => doc.get('etapa') === 'inspeccion' &&
+    digest(norm(doc.get('nombre'))) === '841b8f60bbe1ffbc0078370253d3973020d5fdee29c8a94abe1f4054c21ea21d');
+  return {linkedManagements:managements.size, linkedActivities:activities.size,
+    linkedDeals:deals.size, attemptedManagementMatches:saved.length,
+    attemptedManagementAudit:saved.map(d=>({record:masked(d.id),
+      originFromClient:d.get('origen')==='Ficha cliente',hasCreator:!!d.get('createdByUid'),
+      activityLinked:activities.docs.some(a=>a.get('gestionId')===d.id)})),
+    inspectionNameMatches:matching.length, inspectionExactClient:matching.filter(d=>d.get('clienteId')===cid).length,
+    inspectionMissingClient:matching.filter(d=>!d.get('clienteId')).length};
+}
 async function main(){
   assert.equal(process.env.GCLOUD_PROJECT,PROJECT);
   assert.equal(process.env.GI_I66_CARLOS_TRACE_MODE,'readonly');
@@ -84,7 +113,9 @@ async function main(){
       missingCountry:snapshot.docs.filter(d=>!text((d.data()||{}).pais)).length};
   };
   const [gestiones,negocios]=await Promise.all([listCreated('gestiones'),listCreated('negocios')]);
-  const report={schema:'gi.i66.carlos.actual-task-trace.readonly.v1',dateGuatemala:'2026-11-12',
+  const linkedCase=await incidentReadback(root);
+  console.log('I66_EXISTING_CLIENT_UI_SERVER_READBACK='+JSON.stringify(linkedCase));
+  const report={linkedCase,schema:'gi.i66.carlos.actual-task-trace.readonly.v1',observedAt:new Date().toISOString(),
     tenant:'A_S_GT_CO_CANONICAL',actor:'CARLOS_OPERATIVO_SOURCE_MATCHED',
     allowedCountries:actor.countries,countryTaskCounts:byCountry,
     allTenantTaskCount:tasks.length,carloRelatedTaskCount:related.length,
