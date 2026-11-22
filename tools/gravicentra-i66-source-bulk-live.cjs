@@ -108,6 +108,8 @@ async function main(){
   if(mode==='preflight'){
     const groups=await readGroups(db,source.data.rows);
     console.log('I66_ISSUED_TERM_READBACK='+JSON.stringify(issuedTermReadback(groups)));
+    const crosswalk=await require('./gravicentra-i66-issued-term-identities.cjs').crosswalk(name=>internal(name,db));
+    console.log('I66_ISSUED_IDENTITY_WITNESSES='+JSON.stringify(crosswalk));
     const plan=planSourceBatch(source.data.rows,groups,{chunkSize:250});
     const exceptionCodes={};
     for(const row of plan.exceptions)exceptionCodes[row.code]=(exceptionCodes[row.code]||0)+1;

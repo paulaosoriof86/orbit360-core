@@ -34,7 +34,8 @@ jobs:
       github.repository == 'paulaosoriof86/orbit360-core' &&
       github.ref == 'refs/heads/recovery/fase-a-clean-20260831' &&
       (github.event_name == 'workflow_dispatch' ||
-      contains(github.event.head_commit.message, 'I66_SOURCE_BULK_READY'))
+      contains(github.event.head_commit.message, 'I66_SOURCE_BULK_READY') ||
+      contains(github.event.head_commit.message, 'I66_REFRESH_PINNED_SOURCE'))
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     outputs:

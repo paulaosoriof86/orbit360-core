@@ -1,0 +1,204 @@
+[
+  {
+    "decision": "D01",
+    "pdfSha256": "b15a25530cc0cf13c46e028dd3e8657444b3e485635343835922be71cc698d42",
+    "holderWitness": "aff24830f393f2c72da4e2160c0815e5b3ad15f2578ab964822b91483f243896",
+    "plateWitness": "520fe5795e3e947c4963fc8d71b01a61a92ad8b5963f013e3557ac9f4b8264d8",
+    "vinWitness": "75ae578af34e22fc1a00f11a2a1f3965081a77334f2dc4a3d1f506da61fbafe9",
+    "grossScheduleColumns": [
+      "net",
+      "expensesAndOther",
+      "financing",
+      "tax",
+      "gross"
+    ],
+    "schedule": [
+      {
+        "requirement": "5693795",
+        "due": "2026-09-21",
+        "cents": [
+          22205,
+          4643,
+          2988,
+          3582,
+          33418
+        ]
+      },
+      {
+        "requirement": "5693796",
+        "due": "2026-10-21",
+        "cents": [
+          22210,
+          4653,
+          2992,
+          3582,
+          33437
+        ]
+      },
+      {
+        "requirement": "5693797",
+        "due": "2026-11-21",
+        "cents": [
+          22210,
+          4653,
+          2992,
+          3582,
+          33437
+        ]
+      },
+      {
+        "requirement": "5693798",
+        "due": "2026-12-21",
+        "cents": [
+          22210,
+          4653,
+          2992,
+          3582,
+          33437
+        ]
+      },
+      {
+        "requirement": "5693799",
+        "due": "2027-01-21",
+        "cents": [
+          22210,
+          4653,
+          2992,
+          3582,
+          33437
+        ]
+      },
+      {
+        "requirement": "5693800",
+        "due": "2027-02-21",
+        "cents": [
+          22210,
+          4653,
+          2992,
+          3582,
+          33437
+        ]
+      },
+      {
+        "requirement": "5693801",
+        "due": "2027-03-21",
+        "cents": [
+          22210,
+          4653,
+          2992,
+          3582,
+          33437
+        ]
+      },
+      {
+        "requirement": "5693802",
+        "due": "2027-04-21",
+        "cents": [
+          22210,
+          4653,
+          2992,
+          3582,
+          33437
+        ]
+      },
+      {
+        "requirement": "5693803",
+        "due": "2027-05-21",
+        "cents": [
+          22210,
+          4653,
+          2992,
+          3582,
+          33437
+        ]
+      },
+      {
+        "requirement": "5693804",
+        "due": "2027-06-21",
+        "cents": [
+          22210,
+          4653,
+          2992,
+          3582,
+          33437
+        ]
+      },
+      {
+        "requirement": "5693805",
+        "due": "2027-07-21",
+        "cents": [
+          22210,
+          4653,
+          2992,
+          3582,
+          33437
+        ]
+      },
+      {
+        "requirement": "5693806",
+        "due": "2027-08-21",
+        "cents": [
+          22210,
+          4653,
+          2992,
+          3582,
+          33437
+        ]
+      }
+    ]
+  },
+  {
+    "decision": "D02",
+    "pdfSha256": "a93e35667108acd8965430fd76dcd7d2f9e05316810672fe28ade4d227c49733",
+    "holderWitness": "04ee6a8024437fc2631e1bcd708ed9ed590ad48b146a4b59c559481a3b91f829",
+    "plateWitness": "b96fcbbc98b7c4fc6d3f04bd05e2b365228caae61315b5193b59f38c8ea341e6",
+    "vinWitness": "d3fa55b233a085ebb1dc267c3504f14222d41d90139cc541797cadd6ed3aacea",
+    "grossScheduleColumns": [
+      "net",
+      "expensesAndOther",
+      "financing",
+      "tax",
+      "gross"
+    ],
+    "schedule": [
+      {
+        "requirement": "5676444",
+        "due": "2026-11-27",
+        "cents": [
+          220000,
+          53500,
+          0,
+          32820,
+          306320
+        ]
+      }
+    ]
+  },
+  {
+    "decision": "D03",
+    "pdfSha256": "fe12fb2c278ab06932f56b3362416a7d32aa3b71619aa9aeb7e3fccf8f1ffde7",
+    "holderWitness": "b0a3f31275f9e947ac534322f58e4760937fefba819c351827565a6a8760323f",
+    "plateWitness": "6ff8a2200d7a577a91c0ac54a8ebda0be2c3f562fecb15d4aebc0f79f72b690b",
+    "vinWitness": "df76bcb813634be0f7a06ed1aae0e41306e38523f1ed0210c67069cc75af6617",
+    "grossScheduleColumns": [
+      "net",
+      "expensesAndOther",
+      "financing",
+      "tax",
+      "gross"
+    ],
+    "schedule": [
+      {
+        "requirement": "5654713",
+        "due": "2026-11-05",
+        "cents": [
+          427411,
+          63871,
+          0,
+          58954,
+          550236
+        ]
+      }
+    ]
+  }
+]
