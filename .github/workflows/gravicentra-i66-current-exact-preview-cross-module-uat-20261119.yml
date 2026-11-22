@@ -219,8 +219,7 @@ jobs:
         continue-on-error: true
         env:
           I66_SIGNED_CLIENT_EDIT_ORIGIN: https://app.aysseguros.com
-          I66_SIGNED_CLIENT_EDIT_SOURCE: ${{ env.I66_APPROVED_LIVE_SOURCE_SHA }}
-        run: node tools/gravicentra-i6-6-carlos-client-edit-signed-synthetic-uat.cjs
+        run: I66_SIGNED_CLIENT_EDIT_SOURCE="$I66_APPROVED_LIVE_SOURCE_SHA" node tools/gravicentra-i6-6-carlos-client-edit-signed-synthetic-uat.cjs
       - name: Carlos and Dirección LIVE Ops Leads workflow create/update/resolution task readback/reload/restore
         id: live_ops_leads
         continue-on-error: true
