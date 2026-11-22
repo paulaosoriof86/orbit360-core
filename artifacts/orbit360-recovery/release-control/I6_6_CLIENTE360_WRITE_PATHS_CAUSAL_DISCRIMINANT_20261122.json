@@ -1,0 +1,121 @@
+{
+  "schema": "GI_I66_CLIENTE360_WRITE_PATHS_CAUSAL_DISCRIMINANT_V1",
+  "recordType": "READ_ONLY_SOURCE_EVIDENCE_NOT_LIVE_FUNCTIONAL_PASS_NOT_GATE_AUTHORITY",
+  "dateGuatemala": "2026-11-22",
+  "gate": "I6.6",
+  "authority": "artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json",
+  "linkedDirectionFreeze": "artifacts/orbit360-recovery/release-control/I6_6_DIRECCION_DECISIONES_FINANCIERAS_Y_PLAN_INTEGRAL_20261122.md",
+  "findingLedger": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
+  "liveSourceSha": "f1eb5bc6397f0b159079be516a521dd7b1e5d9ba",
+  "productOwner": {
+    "path": "orbit360-platform/modules/cliente360.js",
+    "liveBlobSha": "7acb2990c020a92080db8f17875343edd200386c",
+    "branchBlobShaAtRead": "1b3666172cbcfdaecd9b9ce7b35dbf26a4a0beec"
+  },
+  "transportOwner": {
+    "path": "orbit360-platform/data/store-firestore-product-operational-p0.js",
+    "liveAndBranchBlobSha": "0138ba3d11b767d38a664db76e8a4d4b2c948919"
+  },
+  "newProductWrites": 0,
+  "liveCustomerWrites": 0,
+  "deployments": 0,
+  "findings": [
+    {
+      "id": "I66-C360-FE-01",
+      "surface": "Cliente360→Historial→Registrar interacción",
+      "verifiedSource": {
+        "liveLine": 1297,
+        "branchLine": 1356
+      },
+      "codeFact": "wireHistorial invokes S().insert('actividades',...) then detalle(cid) without awaiting a server commit; operational facade insert uses callDurable(...).catch(function(){}) and returns an optimistic row",
+      "effect": "UI may render activity before durable commit and may silently omit backend errors",
+      "status": "SOURCE_RISK_PROVEN_RUNTIME_REPRODUCTION_PENDING",
+      "closeProof": "Press Agregar al historial in authenticated LIVE and in Preview where changes exist; capture network request, backend event/readback, reload and deliberate error case. Replace fire-and-forget with durable server-owned UI mutation only after causal confirmation."
+    },
+    {
+      "id": "I66-C360-FE-02",
+      "surface": "Cliente360→Detalle póliza→Historial y endosos→Registrar endoso",
+      "verifiedSource": {
+        "liveLines": [
+          1802,
+          1803
+        ],
+        "branchLines": [
+          1861,
+          1862
+        ]
+      },
+      "codeFact": "Legacy endoso button directly calls cliente360.endoso. Handler makes separate S().update('polizas') and S().insert('actividades') then closes drawer; neither write is awaited; source also offers vehicle substitution via same handler.",
+      "effect": "Potential non-atomic policy/event consistency and implied success even when one write fails; prior written status may not represent an issued insurer endorsement.",
+      "status": "SOURCE_RISK_PROVEN_RUNTIME_REPRODUCTION_PENDING",
+      "closeProof": "Distinguish management request from issued endorsement; click actual button and verify single server-owned transaction/issued provenance, policy and activity IDs, rollback/idempotence, refresh; preserve approved endoso owner."
+    },
+    {
+      "id": "I66-C360-FE-03",
+      "surface": "Cliente360→Detalle póliza→Editar→cambio de frecuencia/forma de pago",
+      "verifiedSource": {
+        "liveLines": [
+          1913,
+          1934,
+          1942,
+          1945
+        ],
+        "branchLines": [
+          1972,
+          1993,
+          2001,
+          2004
+        ]
+      },
+      "codeFact": "Legacy editarPoliza writes policy via non-awaited S().update; on changing payment terms, regenerarRecibosPendientes removes existing non-Pagado 'cobros' and inserts new 'cobros' with estado:'Pendiente'. The UI contains a visible Editar button wired to this method.",
+      "effect": "Contradicts canonical financial separation: contractual expected installments belong in recibosEsperados/carteraPrimas; cobros are evidence of confirmed payments. Unsafe to create placeholder cobros. Existence of live source path is proven; effective runtime interception and successful mutation not yet proven.",
+      "status": "HIGH_PRIORITY_SOURCE_SEMANTIC_CONTRADICTION_RUNTIME_DISCRIMINANT_PENDING",
+      "closeProof": "Click actual Editar, change a synthetic policy's payment frequency/forma, verify backend refuses fictional cobros and protects paid receipts, then use canonical writer for expected receipts/cartera and readback/reload; do not test by changing real commercial policy."
+    },
+    {
+      "id": "I66-C360-FE-04",
+      "surface": "Cliente360→Siniestros→Bitácora",
+      "verifiedSource": {
+        "branchLines": [
+          2265,
+          2267
+        ]
+      },
+      "codeFact": "addBitacora uses Orbit.store.update('reclamos',...) then immediately displays 'Bitácora actualizada'; nearby nuevoReclamo already correctly awaits Orbit.store.insertDurable('reclamos',rec).",
+      "effect": "Potential false success and lost update after reload when update callable fails",
+      "status": "SOURCE_RISK_PROVEN_RUNTIME_REPRODUCTION_PENDING",
+      "closeProof": "Click Anotar movimiento under real assigned role using reversible synthetic claim, confirm request and server before/after, reload; use durable write with rollback/error state if source defect proven."
+    }
+  ],
+  "alreadyDurableExamples": [
+    {
+      "source": "Cliente360 edit + activity",
+      "branchLine": 1534,
+      "method": "batchDurable client update + actividades insert"
+    },
+    {
+      "source": "Reclamo new",
+      "branchLine": 2255,
+      "method": "await insertDurable('reclamos',rec)"
+    },
+    {
+      "source": "Backend Ops create management",
+      "path": "functions/product-ops-leads-domain.js",
+      "branchLines": [
+        423,
+        427,
+        437,
+        443
+      ],
+      "method": "same Firestore transaction: gestiones+actividades with managementActivityReadback"
+    }
+  ],
+  "constraints": [
+    "No need to reopen historical PASS without proven causal regression; bind all proof to exact live source and UI action.",
+    "This receipt is not a new findings ledger, nor closure, nor a source/product change; Work should link causal evidence to the existing finding IDs or append them to the canonical ledger if newly discovered.",
+    "No consumer payment/renewal/endorsement write was executed by this source inspection.",
+    "Do not fix write failure via data re-import, background optimistic success, pending cobros or overlays; preserve single product owner and canonical engine.",
+    "Do not patch certified artifact; source change requires new build/digest, Preview, same bytes promotion, functional UAT and post-LIVE readback."
+  ],
+  "next": "Work/QA reproduce actual click paths and adjudicate whether newer bridges intercept legacy handlers; then apply causal source fix only for confirmed effective owners, certifying per-flow write/readback/reload and no fictional Cobros."
+}
