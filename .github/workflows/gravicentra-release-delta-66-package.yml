@@ -331,21 +331,23 @@ jobs:
             assert.equal(artifact.digest,live.artifactDigest);
             assert.equal(artifact.workflow_run.head_sha,live.sourceSha);
             const roots = ['orbit360-platform','functions','firebase.json','firestore.rules','storage.rules'];
+            // The recovery state JSON is mutable governance metadata, not served product source.
+            const excludeState=':(exclude)orbit360-platform/docs/recovery/orbit360-recovery-state-v1.json';
             git('diff','--quiet',r.sourceQaHead,'HEAD','--',...roots,
               'tools/gravicentra-i6-6-cobros-payment-failure-category.test.cjs',
               'tools/gravicentra-i6-6-operational-renewal-entry.test.cjs',
-              'tools/gravicentra-i6-6-import-source-preview.test.cjs');
+              'tools/gravicentra-i6-6-import-source-preview.test.cjs',excludeState);
             if (r.consumedByVerifiedLiveRun) {
               assert.equal(r.consumedByVerifiedLiveRun,live.liveCloneRunId);
               assert.equal(git('rev-parse',live.sourceSha+':'+manifestPath),r.approvedManifestBlobSha);
-              git('diff','--quiet',live.sourceSha,'HEAD','--',...roots);
+              git('diff','--quiet',live.sourceSha,'HEAD','--',...roots,excludeState);
               fs.appendFileSync(process.env.GITHUB_OUTPUT,'mode=disabled\n');
               console.log('I66_UI_PREVIEW_REQUEST_ALREADY_PROMOTED');
               process.exit(0);
             }
             assert.deepEqual([live.sourceSha,live.artifactId,live.artifactDigest,live.liveHostingVersion],
               [r.previousLiveSourceSha,r.previousLiveArtifactId,r.previousLiveArtifactDigest,r.previousLiveHostingVersion]);
-            assert.deepEqual(git('diff','--name-only',live.sourceSha,r.sourceQaHead,'--',...roots).split('\n').sort(),
+            assert.deepEqual(git('diff','--name-only',live.sourceSha,r.sourceQaHead,'--',...roots,excludeState).split('\n').sort(),
               paymentDirectBuild ? ['orbit360-platform/modules/cobros.js'] : importDelta ? ['orbit360-platform/core/importa.js'] : ['orbit360-platform/modules/cobros.js','orbit360-platform/modules/issuance-endosos-v1201-bridge.js']);
             successorBuild = true;
           } else if(successor){
@@ -476,7 +478,8 @@ jobs:
                 assert.equal(artifact.workflow_run.id, live.previewRunId);
                 assert.equal(artifact.digest, live.artifactDigest);
                 git('diff', '--quiet', live.sourceSha, 'HEAD', '--', 'orbit360-platform', 'functions',
-                  'firebase.json', 'firestore.rules', 'storage.rules');
+                  'firebase.json', 'firestore.rules', 'storage.rules',
+                   ':(exclude)orbit360-platform/docs/recovery/orbit360-recovery-state-v1.json');
                 fs.appendFileSync(process.env.GITHUB_OUTPUT, 'mode=disabled\n');
                 console.log('I66_PREVIEW_REQUEST_ALREADY_PROMOTED mode=disabled source=' + live.sourceSha);
                 process.exit(0);
