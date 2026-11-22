@@ -72,6 +72,31 @@ async function readGroups(db,rawRows){
   }
   return groups;
 }
+// Compare the issued term to the current Firestore editions without treating a
+// similarly numbered, expired policy as the successor. Publish counts only.
+function issuedTermReadback(groups) {
+  const evidencePath=path.join(BASE,'I6_6_ROBLE_THREE_ISSUED_TERMS_DOCUMENTARY_CROSSCHECK_20261122.json');
+  const terms=JSON.parse(fs.readFileSync(evidencePath,'utf8')).issuedExamples;
+  return terms.map((term,index)=>{
+    const matches=groups.filter(g=>canonicalPolicyNumber(g.policy.numero)===term.policy &&
+      g.insurerVerified && /roble/i.test(g.insurerName) && g.clientExists);
+    const exact=matches.filter(g=>g.policy.vigenciaInicio===term.vigenciaInicio &&
+      g.policy.vigenciaFin===term.vigenciaFin);
+    const references=new Set([term.issuedRequirement,term.issuedScheduleRequirements?.first,
+      term.issuedScheduleRequirements?.second].filter(Boolean));
+    if(term.issuedScheduleRequirements)
+      for(let n=Number(term.issuedScheduleRequirements.remainingFrom);n<=Number(term.issuedScheduleRequirements.remainingTo);n++)references.add(String(n));
+    const receiptMatches=exact.flatMap(g=>g.receipts.filter(r=>[
+      r.numeroReciboFuente,r.numeroReciboAseguradora,r.numeroRequerimiento,r.requerimiento,
+      r.numeroBoleta,r.sourceNumber,r.referenciaCobro,r.receiptNumber
+    ].some(v=>references.has(str(v)))).map(r=>({r,g})));
+    return {sourceOrdinal:index+1,verifiedEditions:matches.length,exactTerms:exact.length,
+      priorTerms:matches.filter(g=>str(g.policy.vigenciaFin) && g.policy.vigenciaFin<=term.vigenciaInicio).length,
+      exactTermReceiptCount:exact.reduce((n,g)=>n+g.receipts.length,0),
+      exactTermIssuedReceiptRefMatches:receiptMatches.length,
+      matchesWithOnePortfolio:receiptMatches.filter(({g,r})=>g.portfolio.filter(c=>c.reciboId===r.id&&c.carteraActiva!==false).length===1).length};
+  });
+}
 async function main(){
   const mode=str(process.env.GI_I66_BULK_MODE);
   assert.ok(['preflight','apply'].includes(mode),'I66_BULK_MODE_MUST_BE_EXPLICIT');
@@ -82,6 +107,7 @@ async function main(){
   const db=admin.firestore();
   if(mode==='preflight'){
     const groups=await readGroups(db,source.data.rows);
+    console.log('I66_ISSUED_TERM_READBACK='+JSON.stringify(issuedTermReadback(groups)));
     const plan=planSourceBatch(source.data.rows,groups,{chunkSize:250});
     const exceptionCodes={};
     for(const row of plan.exceptions)exceptionCodes[row.code]=(exceptionCodes[row.code]||0)+1;

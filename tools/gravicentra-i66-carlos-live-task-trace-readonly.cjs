@@ -56,7 +56,8 @@ async function incidentReadback(root) {
   const matching = leadIndex.docs.filter(doc => doc.get('etapa') === 'inspeccion' &&
     digest(norm(doc.get('nombre'))) === '841b8f60bbe1ffbc0078370253d3973020d5fdee29c8a94abe1f4054c21ea21d');
   return {linkedManagements:managements.size, linkedActivities:activities.size,
-    linkedDeals:deals.size, attemptedManagementMatches:saved.length,
+    linkedDeals:deals.size, linkedDealHistory:deals.docs.reduce((n,d)=>n+(Array.isArray(d.get('bitacora'))?d.get('bitacora').length:0),0),
+    attemptedManagementMatches:saved.length,
     attemptedManagementAudit:saved.map(d=>({record:masked(d.id),
       originFromClient:d.get('origen')==='Ficha cliente',hasCreator:!!d.get('createdByUid'),
       activityLinked:activities.docs.some(a=>a.get('gestionId')===d.id)})),
