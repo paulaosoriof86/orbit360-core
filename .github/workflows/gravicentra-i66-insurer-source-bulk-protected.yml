@@ -12,6 +12,7 @@ on:
     paths:
       - .github/workflows/gravicentra-i66-insurer-source-bulk-protected.yml
       - tools/gravicentra-i66-issued-renewal*.cjs
+      - tools/gravicentra-i66-issued-original-access.cjs
       - tools/gravicentra-i66-source-bulk-plan.cjs
       - tools/gravicentra-i66-source-bulk-apply.cjs
       - tools/gravicentra-i66-source-bulk-live.cjs
@@ -89,6 +90,9 @@ jobs:
         run: |
           set -euo pipefail
           node tools/gravicentra-i66-source-bulk-live.cjs
+      - name: Check existing Drive access to exact issuer originals without publishing contents
+        if: contains(github.event.head_commit.message, 'I66_VERIFY_ISSUED_ORIGINALS')
+        run: node tools/gravicentra-i66-issued-original-access.cjs
       - name: Verify documentary successor without writes on the frozen D02 authority
         id: issued
         if: contains(github.event.head_commit.message, 'I66_D02_ISSUED_CAS')
