@@ -1,0 +1,185 @@
+{
+  "schema": "GI_I66_ROBLE_113_ISSUED_EDITION_SOURCE_READINESS_V1",
+  "gate": "I6.6",
+  "dateGuatemala": "2026-11-22",
+  "sourceBatch": "artifacts/orbit360-recovery/source-batches/I6_6_SOURCE_BULK_20261120_MULTI_302.json",
+  "sourceBatchBlob": "ab64e111319e3447733a3af05bf378250698ccdb",
+  "status": "FRESH_DRIVE_METADATA_SOURCE_ONLY_NO_LIVE_APPLY",
+  "heldRows": 113,
+  "heldPolicies": 14,
+  "policies": [
+    {
+      "policy": "91-8276951",
+      "heldStatementRows": 12,
+      "driveDocumentMetadataIds": [],
+      "previouslyAuditedIssuedTerm": null,
+      "oldTermOnlyLocated": "2025-2026",
+      "exactFileNameSearchNotProofOfAbsence": true,
+      "needsSourceIssuedEditionCrosswalk": true,
+      "needsFirestoreReadback": true,
+      "eligibleWritesInThisIntake": 0
+    },
+    {
+      "policy": "91-8323091",
+      "heldStatementRows": 12,
+      "driveDocumentMetadataIds": [],
+      "previouslyAuditedIssuedTerm": null,
+      "oldTermOnlyLocated": "2024-2025, 2025-2026",
+      "exactFileNameSearchNotProofOfAbsence": true,
+      "needsSourceIssuedEditionCrosswalk": true,
+      "needsFirestoreReadback": true,
+      "eligibleWritesInThisIntake": 0
+    },
+    {
+      "policy": "91-8324489",
+      "heldStatementRows": 12,
+      "driveDocumentMetadataIds": [],
+      "previouslyAuditedIssuedTerm": "2026-11-16 to 2027-11-16",
+      "oldTermOnlyLocated": null,
+      "exactFileNameSearchNotProofOfAbsence": true,
+      "needsSourceIssuedEditionCrosswalk": true,
+      "needsFirestoreReadback": true,
+      "eligibleWritesInThisIntake": 0
+    },
+    {
+      "policy": "91-8342189",
+      "heldStatementRows": 12,
+      "driveDocumentMetadataIds": [],
+      "previouslyAuditedIssuedTerm": "2026-11-12 to 2027-11-12",
+      "oldTermOnlyLocated": null,
+      "exactFileNameSearchNotProofOfAbsence": true,
+      "needsSourceIssuedEditionCrosswalk": true,
+      "needsFirestoreReadback": true,
+      "eligibleWritesInThisIntake": 0
+    },
+    {
+      "policy": "91-8343059",
+      "heldStatementRows": 12,
+      "driveDocumentMetadataIds": [],
+      "previouslyAuditedIssuedTerm": "2026-11-27 to 2027-11-27",
+      "oldTermOnlyLocated": null,
+      "exactFileNameSearchNotProofOfAbsence": true,
+      "needsSourceIssuedEditionCrosswalk": true,
+      "needsFirestoreReadback": true,
+      "eligibleWritesInThisIntake": 0
+    },
+    {
+      "policy": "91-9119234",
+      "heldStatementRows": 11,
+      "driveDocumentMetadataIds": [],
+      "previouslyAuditedIssuedTerm": null,
+      "oldTermOnlyLocated": null,
+      "exactFileNameSearchNotProofOfAbsence": true,
+      "needsSourceIssuedEditionCrosswalk": true,
+      "needsFirestoreReadback": true,
+      "eligibleWritesInThisIntake": 0
+    },
+    {
+      "policy": "91-8322914",
+      "heldStatementRows": 11,
+      "driveDocumentMetadataIds": [
+        "1IsvnNfbahXoY5RD6r8qRbxooPm5gWLpa"
+      ],
+      "previouslyAuditedIssuedTerm": "2026-10-05 to 2027-10-05",
+      "oldTermOnlyLocated": null,
+      "exactFileNameSearchNotProofOfAbsence": true,
+      "needsSourceIssuedEditionCrosswalk": true,
+      "needsFirestoreReadback": true,
+      "eligibleWritesInThisIntake": 0
+    },
+    {
+      "policy": "91-9118884",
+      "heldStatementRows": 11,
+      "driveDocumentMetadataIds": [],
+      "previouslyAuditedIssuedTerm": null,
+      "oldTermOnlyLocated": null,
+      "exactFileNameSearchNotProofOfAbsence": true,
+      "needsSourceIssuedEditionCrosswalk": true,
+      "needsFirestoreReadback": true,
+      "eligibleWritesInThisIntake": 0
+    },
+    {
+      "policy": "91-4143471",
+      "heldStatementRows": 10,
+      "driveDocumentMetadataIds": [
+        "1uTZ_Y4jX1uT7Pum9Ob3nPPyYGVsPzoCQ",
+        "1DKr5Ku9-XmsIiKlJsmC3T6hsH-TLF3MM"
+      ],
+      "previouslyAuditedIssuedTerm": null,
+      "oldTermOnlyLocated": null,
+      "exactFileNameSearchNotProofOfAbsence": true,
+      "needsSourceIssuedEditionCrosswalk": true,
+      "needsFirestoreReadback": true,
+      "eligibleWritesInThisIntake": 0
+    },
+    {
+      "policy": "91-0234395",
+      "heldStatementRows": 6,
+      "driveDocumentMetadataIds": [
+        "1bDZF50cAMHW522wb8ZBWXQS_y6SvpOvO"
+      ],
+      "previouslyAuditedIssuedTerm": "2026-05-02 to 2027-05-02",
+      "oldTermOnlyLocated": null,
+      "exactFileNameSearchNotProofOfAbsence": true,
+      "needsSourceIssuedEditionCrosswalk": true,
+      "needsFirestoreReadback": true,
+      "eligibleWritesInThisIntake": 0
+    },
+    {
+      "policy": "91-4140843",
+      "heldStatementRows": 1,
+      "driveDocumentMetadataIds": [
+        "1R6HMlHHv09_87BALnvLpa-E_cWiKlr9m"
+      ],
+      "previouslyAuditedIssuedTerm": "2026-09-10 to 2027-09-10",
+      "oldTermOnlyLocated": null,
+      "exactFileNameSearchNotProofOfAbsence": true,
+      "needsSourceIssuedEditionCrosswalk": true,
+      "needsFirestoreReadback": true,
+      "eligibleWritesInThisIntake": 0
+    },
+    {
+      "policy": "91-0227949",
+      "heldStatementRows": 1,
+      "driveDocumentMetadataIds": [],
+      "previouslyAuditedIssuedTerm": null,
+      "oldTermOnlyLocated": null,
+      "exactFileNameSearchNotProofOfAbsence": true,
+      "needsSourceIssuedEditionCrosswalk": true,
+      "needsFirestoreReadback": true,
+      "eligibleWritesInThisIntake": 0
+    },
+    {
+      "policy": "91-8357452",
+      "heldStatementRows": 1,
+      "driveDocumentMetadataIds": [
+        "1V-ttJwtO21uVi1Z7t5DmpPJfhxRkxbO3"
+      ],
+      "previouslyAuditedIssuedTerm": null,
+      "oldTermOnlyLocated": null,
+      "exactFileNameSearchNotProofOfAbsence": true,
+      "needsSourceIssuedEditionCrosswalk": true,
+      "needsFirestoreReadback": true,
+      "eligibleWritesInThisIntake": 0
+    },
+    {
+      "policy": "91-9119548",
+      "heldStatementRows": 1,
+      "driveDocumentMetadataIds": [],
+      "previouslyAuditedIssuedTerm": null,
+      "oldTermOnlyLocated": null,
+      "exactFileNameSearchNotProofOfAbsence": true,
+      "needsSourceIssuedEditionCrosswalk": true,
+      "needsFirestoreReadback": true,
+      "eligibleWritesInThisIntake": 0
+    }
+  ],
+  "sourceDocsMetadataLocated": 6,
+  "frozenEvidence": "El Roble previous five original PDF proofs and 49 installments remain preserved; do not infer new issuance or payment from pending statement.",
+  "next": "Get insurer issued-term proof and exact Firestore policy-edition + receipt readback for these 113 held rows. Use existing source-owned protected preflight, isolate ambiguous rows, then apply only deterministic delta with CAS and readback.",
+  "businessWrites": 0,
+  "duplicatePayments": 0,
+  "frontEndChanges": 0,
+  "newBuild": false,
+  "fullI66Accepted": false
+}
