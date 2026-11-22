@@ -24599,8 +24599,8 @@
   },
   "i66ActiveRecoveryCursor": {
     "status": "FROZEN_I66_SHOCK_EXECUTION_CONTINUES_NO_GATE_REPLACEMENT",
-    "currentEvidencePath": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_EXECUTION_PROGRESS_20261122_R2.json",
-    "currentEvidenceBlobSha": "8906c2378719b2992f5ca8f136956d17f68714be",
+    "currentEvidencePath": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_EXECUTION_PROGRESS_20261122_R3.json",
+    "currentEvidenceBlobSha": "33314b573a40ff106e1a945513b0b9f017d1e312",
     "frozenPlanPath": "artifacts/orbit360-recovery/release-control/I6_6_PLAN_CHOQUE_FUNCIONAL_FINANCIERO_20261122.md",
     "frozenPlanBlobSha": "fbfd54d229a13101fbfb0dfc6e92a5fa524999b6",
     "fullInventoryPath": "artifacts/orbit360-recovery/release-control/I6_6_INVENTARIO_INTEGRAL_295_20261122.md",
@@ -24617,9 +24617,19 @@
     "financialRowsAppliedThisIteration": 0,
     "lastEvidenceDateLocal": "2026-11-22",
     "noNormativeProjectSourceChange": true,
-    "next": "P0: FIRST_REAL_ISSUED_RENEWAL_PDF_AND_CARLOS_EDSON_ORIGINAL_PAYMENT_RECEIPT; P0: OPERATIVO_ADMIN_SUPERADMIN_ROLE_MATRIX; P0: DRIVE; P0: DETERMINISTIC_FINANCIAL_APPLY; NO_REPLAY.",
-    "lastFunctionalLiveUatRunId": 45069138814,
+    "next": "Five-role exact LIVE rerun 45074429319, explicit Carlos/Dir and adviser roles; reconcile issuer editions for 165 holds, actual Edson, Drive, inspection Corado; never reimport for UI.",
+    "lastFunctionalLiveUatRunId": 45072928898,
     "lastFunctionalLiveUatJobId": 137352857627,
-    "lastFunctionalLiveScope": "TWO_ROLE_RENEWAL_INSURER_SYNTHETIC_PASS_REAL_ISSUANCE_AND_DOCUMENT_HOLD"
+    "lastFunctionalLiveScope": "TWO_ROLE_RENEWAL_INSURER_SYNTHETIC_PASS_REAL_ISSUANCE_AND_DOCUMENT_HOLD",
+    "previousEvidencePath": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_EXECUTION_PROGRESS_20261122_R2.json",
+    "previousEvidenceBlobSha": "8906c2378719b2992f5ca8f136956d17f68714be",
+    "lastFunctionalLiveUatStatus": "SIGNED_5_DOMAIN_SYNTHETIC_PASS_REAL_CUSTOMER_HOLD",
+    "lastFinancialProtectedPreflightRunId": 45073268445,
+    "lastFinancialSourceStatus": "302_PRECHECK_137_MATCH_165_HOLD_0_NEW_WRITES",
+    "lastFiveRoleMatrixRunId": 45073437828,
+    "lastFiveRoleMatrixStatus": "PARTIAL_ADMIN_SUPER_SIGNED_PASS_OPERATIVO_DIRECCION_ASESOR_HOLD",
+    "nextRoleMatrixRerunId": 45074429319,
+    "lastPerformanceEvidenceArtifactId": 14773364439,
+    "latestSourceDocCrosscheckBlobSha": "9e2aae3fdfa758480a46088890be6337bf7d8a74"
   }
 }
