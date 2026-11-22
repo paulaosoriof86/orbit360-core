@@ -15,11 +15,11 @@ const matches=(w,x,field)=>{
 };
 function fixtures(){
   return {
-    clients:M.cases.map(c=>({id:'client-'+c.policy,pais:'GT',nombre:'holder-'+c.policy})),
-    insurers:[{id:'el-roble',nombre:'Seguros El Roble',pais:'GT',activo:true}],
-    advisors:[{id:'advisor',activo:true}],
-    policies:M.cases.map(c=>({id:'prior-'+c.policy,pais:'GT',numero:c.policy,vigenciaInicio:c.termStart.replace(/^2026/,'2025'),vigenciaFin:c.termStart,clienteId:'client-'+c.policy,aseguradoraId:'el-roble',asesorId:'advisor'})),
-    vehicles:M.cases.map(c=>({id:'risk-'+c.policy,pais:'GT',placa:'plate-'+c.policy,vin:'vin-'+c.policy,polizaId:'prior-'+c.policy,clienteId:'client-'+c.policy}))
+    clientes:M.cases.map(c=>({id:'client-'+c.policy,pais:'GT',nombre:'holder-'+c.policy})),
+    aseguradoras:[{id:'el-roble',nombre:'Seguros El Roble',pais:'GT',activo:true}],
+    asesores:[{id:'advisor',activo:true}],
+    polizas:M.cases.map(c=>({id:'prior-'+c.policy,pais:'GT',numero:c.policy,vigenciaInicio:c.termStart.replace(/^2026/,'2025'),vigenciaFin:c.termStart,clienteId:'client-'+c.policy,aseguradoraId:'el-roble',asesorId:'advisor'})),
+    vehiculos:M.cases.map(c=>({id:'risk-'+c.policy,pais:'GT',placa:'plate-'+c.policy,vin:'vin-'+c.policy,polizaId:'prior-'+c.policy,clienteId:'client-'+c.policy}))
   };
 }
 test('four single-risk issuances qualify for source-only crosswalk, fleet certificate stays held',()=>{
@@ -32,17 +32,17 @@ test('four single-risk issuances qualify for source-only crosswalk, fleet certif
 });
 test('already issued 2026-2027 edition never becomes another create',()=>{
  let f=fixtures(),c=M.cases[0];
- f.policies.push({id:'already',numero:c.policy,pais:'GT',clienteId:'client-'+c.policy,aseguradoraId:'el-roble',vigenciaInicio:c.termStart,vigenciaFin:c.termEnd});
+ f.polizas.push({id:'already',numero:c.policy,pais:'GT',clienteId:'client-'+c.policy,aseguradoraId:'el-roble',vigenciaInicio:c.termStart,vigenciaFin:c.termEnd});
  assert.equal(F.verdict(f,matches).find(x=>x.policy===c.policy).status,'EDITION_ALREADY_PRESENT_DO_NOT_DUPLICATE');
 });
 test('source identity collision, predecessor missing, risk and advisor ambiguity remain local',()=>{
- let f=fixtures(),c=M.cases[0];f.clients.push({...f.clients[0],id:'other'});
+ let f=fixtures(),c=M.cases[0];f.clientes.push({...f.clientes[0],id:'other'});
  assert.equal(F.verdict(f,matches).find(x=>x.policy===c.policy).status,'HOLDER_IDENTITY_NOT_UNIQUE');
- f=fixtures();f.policies=f.policies.filter(x=>x.numero!==c.policy);
+ f=fixtures();f.polizas=f.polizas.filter(x=>x.numero!==c.policy);
  assert.equal(F.verdict(f,matches).find(x=>x.policy===c.policy).status,'PREDECESSOR_EDITION_NOT_UNIQUE');
- f=fixtures();f.vehicles=f.vehicles.filter(x=>x.polizaId!=='prior-'+c.policy);
+ f=fixtures();f.vehiculos=f.vehiculos.filter(x=>x.polizaId!=='prior-'+c.policy);
  assert.equal(F.verdict(f,matches).find(x=>x.policy===c.policy).status,'POLICY_VEHICLE_CERTIFICATE_IDENTITY_NOT_UNIQUE');
- f=fixtures();f.advisors=[];
+ f=fixtures();f.asesores=[];
  assert.equal(F.verdict(f,matches).find(x=>x.policy===c.policy).status,'PRIOR_ADVISOR_UNVERIFIED');
 });
 test('fake mismatched source identifier never becomes an authorized client',()=>{
