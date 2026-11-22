@@ -24,7 +24,7 @@ function verifySource() {
   assert.equal(source.cases.length,5);
   assert.equal(evidence.witnesses.length,5);
   assert.equal(source.commercialWrites,0);
-  assert.equal(source.sourceBatchBlobSha,'ab64e111319e3447733aaf05bf378250698ccdb');
+  assert.equal(source.sourceBatchBlobSha,'ab64e111319e3447733a3af05bf378250698ccdb');
   assert.equal(new Set(source.cases.map(c=>c.policy)).size,5);
   for (const c of source.cases) {
     const w=evidence.witnesses.find(x=>x.policy===c.policy);
