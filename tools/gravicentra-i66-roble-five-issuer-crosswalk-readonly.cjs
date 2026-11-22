@@ -39,24 +39,24 @@ function verifySource() {
   assert.equal(source.cases.reduce((n,c)=>n+c.schedule.length,0),49);
   return true;
 }
-function verdict(data) {
+function verdict(data,identityMatch=match) {
   verifySource();
   const {clients=[],vehicles=[],policies=[],insurers=[],advisors=[]}=data||{};
   return source.cases.map(c=>{
     const w=evidence.witnesses.find(x=>x.policy===c.policy);
     const holder=clients.filter(x=>String(x.pais||'').toUpperCase()==='GT'&&
-      [x.nombre,x.nombreCompleto,x.razonSocial].some(v=>match(w,v,'holderWitness')));
+      [x.nombre,x.nombreCompleto,x.razonSocial].some(v=>identityMatch(w,v,'holderWitness')));
     const insurer=insurers.filter(x=>String(x.pais||'').toUpperCase()==='GT'&&x.activo!==false&&/roble/i.test(String(x.nombre||'')));
     const sameNumber=policies.filter(x=>String(x.pais||'').toUpperCase()==='GT'&&
       [x.numero,x.numeroPoliza,x.polizaNumero].some(v=>v&&canonicalPolicyNumber(v)===canonicalPolicyNumber(c.policy)));
     const exact=sameNumber.filter(p=>p.vigenciaInicio===c.termStart&&p.vigenciaFin===c.termEnd);
     const prior=sameNumber.filter(p=>p.vigenciaFin===c.termStart&&holder.some(h=>h.id===p.clienteId)&&insurer.some(a=>a.id===p.aseguradoraId));
     const candidateVehicles=vehicles.filter(v=>String(v.pais||'GT').toUpperCase()==='GT'&&
-      ([v.placa,v.placaFuente].some(z=>match(w,z,'initialCertificatePlateWitness')) ||
-       [v.vin,v.chasis,v.chasisFuente].some(z=>match(w,z,'initialCertificateVinWitness'))));
+      ([v.placa,v.placaFuente].some(z=>identityMatch(w,z,'initialCertificatePlateWitness')) ||
+       [v.vin,v.chasis,v.chasisFuente].some(z=>identityMatch(w,z,'initialCertificateVinWitness'))));
     const strong=candidateVehicles.filter(v=>
-      [v.placa,v.placaFuente].some(z=>match(w,z,'initialCertificatePlateWitness'))&&
-      [v.vin,v.chasis,v.chasisFuente].some(z=>match(w,z,'initialCertificateVinWitness')));
+      [v.placa,v.placaFuente].some(z=>identityMatch(w,z,'initialCertificatePlateWitness'))&&
+      [v.vin,v.chasis,v.chasisFuente].some(z=>identityMatch(w,z,'initialCertificateVinWitness')));
     const linked=strong.filter(v=>prior.some(p=>p.id===v.polizaId)&&holder.some(h=>h.id===v.clienteId));
     const advisorLinked=prior.filter(p=>advisors.some(a=>a.id===p.asesorId&&a.activo!==false));
     let status='CANDIDATE_RISK_AND_EDITION_READY_SOURCE_ONLY';
