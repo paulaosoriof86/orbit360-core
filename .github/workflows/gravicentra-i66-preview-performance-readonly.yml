@@ -1,12 +1,10 @@
 # I6.6: measure the existing immutable Preview artifact with real Chrome and Carlos's existing Operativo role.
 # Read-only QA. Never applies payments, updates portfolio, or sends notifications.
 name: Gravicentra I6.6 PREVIEW Performance READ ONLY
+# Historical Preview 867b TTL comparison is kept for forensics, not the current release.
+# Current I6.6 execution uses signed exact-LIVE UAT and the canonical public availability guard.
+# Avoid re-running historical hard-coded source checks on unrelated QA/source commits.
 on:
-  push:
-    branches: [recovery/fase-a-clean-20260831]
-    paths:
-      - .github/workflows/gravicentra-i66-preview-performance-readonly.yml
-      - tools/gravicentra-i66-live-performance-readonly.mjs
   workflow_dispatch:
 
 permissions:
