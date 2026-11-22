@@ -504,7 +504,7 @@ function acceptedForPreflight(control,state,transport,latest,io=fs){
   if(currentPayment){
     const path='artifacts/orbit360-recovery/release-control/I6_6_DIRECT_PAYMENT_OPTIONAL_DOCUMENT_LIVE_READBACK_20261120.json';
     const raw=io.readFileSync(path,'utf8');
-    const blob=crypto.createHash('sha1').update('blob '+Buffer.byteLength(raw)+'\\0').update(raw).digest('hex');
+    const blob=crypto.createHash('sha1').update('blob '+Buffer.byteLength(raw)+'\0').update(raw).digest('hex');
     assert.equal(currentPayment.receiptPath,path,'I66_PAYMENT_FRONTEND_RECEIPT_PATH');
     assert.equal(currentPayment.receiptGitBlobSha,blob,'I66_PAYMENT_FRONTEND_RECEIPT_SHA_DRIFT');
     const r=JSON.parse(raw);
