@@ -58,6 +58,10 @@ function verdict(data,identityMatch=match) {
       [v.placa,v.placaFuente].some(z=>identityMatch(w,z,'initialCertificatePlateWitness'))&&
       [v.vin,v.chasis,v.chasisFuente].some(z=>identityMatch(w,z,'initialCertificateVinWitness')));
     const linked=strong.filter(v=>prior.some(p=>p.id===v.polizaId)&&holder.some(h=>h.id===v.clienteId));
+    const onPrior=candidateVehicles.filter(v=>prior.some(p=>p.id===v.polizaId)&&holder.some(h=>h.id===v.clienteId));
+    const priorAllVehicles=vehicles.filter(v=>prior.some(p=>p.id===v.polizaId)&&holder.some(h=>h.id===v.clienteId));
+    const plateOnPrior=onPrior.filter(v=>[v.placa,v.placaFuente].some(z=>identityMatch(w,z,'initialCertificatePlateWitness')));
+    const vinOnPrior=onPrior.filter(v=>[v.vin,v.chasis,v.chasisFuente].some(z=>identityMatch(w,z,'initialCertificateVinWitness')));
     const advisorLinked=prior.filter(p=>advisors.some(a=>a.id===p.asesorId&&a.activo!==false));
     let status='CANDIDATE_RISK_AND_EDITION_READY_SOURCE_ONLY';
     if(exact.length)status='EDITION_ALREADY_PRESENT_DO_NOT_DUPLICATE';
@@ -73,6 +77,8 @@ function verdict(data,identityMatch=match) {
       exactEditionCount:exact.length,predecessorCount:prior.length,predecessorAlreadyRenewed:prior.filter(p=>!!p.renovadaPor).length,
       activePriorAdvisorCount:advisorLinked.length,firstCertificateCandidates:candidateVehicles.length,
       strongCertificateMatches:strong.length,linkedOldRiskMatches:linked.length,
+      priorAllVehicleCount:priorAllVehicles.length,partialRiskMatchesOnPredecessor:onPrior.length,
+      plateMatchesOnPredecessor:plateOnPrior.length,vinMatchesOnPredecessor:vinOnPrior.length,
       sourceRiskMismatch:w.initialCertificateHolderMatchesContractHolder!==true,
       mutations:0,firestoreWrites:0};
   });
