@@ -1,0 +1,596 @@
+{
+  "schema": "GI_I66_ROBLE_FIVE_ISSUED_SCHEDULE_CROSSWALK_V1",
+  "recordType": "SOURCE_ONLY_VERIFIED_ISSUER_PDF_VS_PINNED_STATEMENT_NOT_WRITE_AUTHORITY",
+  "dateGuatemala": "2026-11-22",
+  "tenantId": "alianzas-soluciones",
+  "gate": "I6.6",
+  "sourceBatchPath": "artifacts/orbit360-recovery/source-batches/I6_6_SOURCE_BULK_20261120_MULTI_302.json",
+  "sourceBatchBlobSha": "ab64e111319e3447733a3af05bf378250698ccdb",
+  "directionFrozen": "artifacts/orbit360-recovery/release-control/I6_6_DIRECCION_DECISIONES_FINANCIERAS_Y_PLAN_INTEGRAL_20261122.md",
+  "insurerOriginalsVerified": 5,
+  "matchedPendingRequirements": 49,
+  "matchedTotalCents": 1883337,
+  "extraStatementRowsOutsideTheseIssuedTerms": 3,
+  "cases": [
+    {
+      "policy": "91-8323091",
+      "insurer": "ROBLE",
+      "country": "GT",
+      "currency": "GTQ",
+      "sourcePdfId": "1qmUypnZBwW4xyeKlINpk6U42vltZKk-W",
+      "sourcePdfFilename": "918323091353922.pdf",
+      "sourcePdfRawSha256": "e75ed257defa5ee055168fc196f8ae7b92d3888c5013f3463e239253b7af6319",
+      "termStart": "2026-10-11",
+      "termEnd": "2027-10-11",
+      "issuerEndorsement": "353922",
+      "issuedGrossCents": 331110,
+      "pdfInstallments": 12,
+      "matchedSourcePendingCount": 12,
+      "matchedSourcePendingCents": 331106,
+      "sourceStatementAdditionalRows": [
+        {
+          "sourceCaseId": "ROBLE_NOV20_0150",
+          "requirement": "4992325",
+          "due": "2026-09-11",
+          "grossCents": 27359,
+          "meaning": "OTHER_TERM_OR_DIFFERENT_REQUIREMENT_UNRESOLVED_NO_REWRITE"
+        }
+      ],
+      "schedule": [
+        {
+          "requirement": "5654715",
+          "sequence": 1,
+          "installments": 12,
+          "due": "2026-10-11",
+          "grossCents": 27583,
+          "sourceCaseId": "ROBLE_NOV20_0151",
+          "sourceRowNumber": 152
+        },
+        {
+          "requirement": "5654716",
+          "sequence": 2,
+          "installments": 12,
+          "due": "2026-11-11",
+          "grossCents": 27593,
+          "sourceCaseId": "ROBLE_NOV20_0152",
+          "sourceRowNumber": 153
+        },
+        {
+          "requirement": "5654717",
+          "sequence": 3,
+          "installments": 12,
+          "due": "2026-12-11",
+          "grossCents": 27593,
+          "sourceCaseId": "ROBLE_NOV20_0153",
+          "sourceRowNumber": 154
+        },
+        {
+          "requirement": "5654718",
+          "sequence": 4,
+          "installments": 12,
+          "due": "2027-01-11",
+          "grossCents": 27593,
+          "sourceCaseId": "ROBLE_NOV20_0154",
+          "sourceRowNumber": 155
+        },
+        {
+          "requirement": "5654719",
+          "sequence": 5,
+          "installments": 12,
+          "due": "2027-02-11",
+          "grossCents": 27593,
+          "sourceCaseId": "ROBLE_NOV20_0155",
+          "sourceRowNumber": 156
+        },
+        {
+          "requirement": "5654720",
+          "sequence": 6,
+          "installments": 12,
+          "due": "2027-03-11",
+          "grossCents": 27593,
+          "sourceCaseId": "ROBLE_NOV20_0156",
+          "sourceRowNumber": 157
+        },
+        {
+          "requirement": "5654721",
+          "sequence": 7,
+          "installments": 12,
+          "due": "2027-04-11",
+          "grossCents": 27593,
+          "sourceCaseId": "ROBLE_NOV20_0157",
+          "sourceRowNumber": 158
+        },
+        {
+          "requirement": "5654722",
+          "sequence": 8,
+          "installments": 12,
+          "due": "2027-05-11",
+          "grossCents": 27593,
+          "sourceCaseId": "ROBLE_NOV20_0158",
+          "sourceRowNumber": 159
+        },
+        {
+          "requirement": "5654723",
+          "sequence": 9,
+          "installments": 12,
+          "due": "2027-06-11",
+          "grossCents": 27593,
+          "sourceCaseId": "ROBLE_NOV20_0159",
+          "sourceRowNumber": 160
+        },
+        {
+          "requirement": "5654724",
+          "sequence": 10,
+          "installments": 12,
+          "due": "2027-07-11",
+          "grossCents": 27593,
+          "sourceCaseId": "ROBLE_NOV20_0160",
+          "sourceRowNumber": 161
+        },
+        {
+          "requirement": "5654725",
+          "sequence": 11,
+          "installments": 12,
+          "due": "2027-08-11",
+          "grossCents": 27593,
+          "sourceCaseId": "ROBLE_NOV20_0161",
+          "sourceRowNumber": 162
+        },
+        {
+          "requirement": "5654726",
+          "sequence": 12,
+          "installments": 12,
+          "due": "2027-09-11",
+          "grossCents": 27593,
+          "sourceCaseId": "ROBLE_NOV20_0162",
+          "sourceRowNumber": 163
+        }
+      ],
+      "sourceValidation": "ISSUER_PDF_REQUIREMENT_DUE_AMOUNT_100PCT_MATCH_CURRENT_INSURER_STATEMENT",
+      "backendEditionValidation": "REQUIRES_FRESH_UNIQUE_CLIENT_INSURER_POLICY_RISK_CROSSWALK",
+      "safeToApplyNow": false
+    },
+    {
+      "policy": "91-8324489",
+      "insurer": "ROBLE",
+      "country": "GT",
+      "currency": "GTQ",
+      "sourcePdfId": "10iVOyGWLTleozxE9ieo-d34lTSQJDV8W",
+      "sourcePdfFilename": "Renovación El Roble - 91-8324489 - 2026-11-16 a 2027-11-16.pdf",
+      "sourcePdfRawSha256": "e64e6472321e53a2c68a4e88139a1423a0d1261ee75ff8f6603c47215602c8a7",
+      "termStart": "2026-11-16",
+      "termEnd": "2027-11-16",
+      "issuerEndorsement": "384442",
+      "issuedGrossCents": 336710,
+      "pdfInstallments": 12,
+      "matchedSourcePendingCount": 12,
+      "matchedSourcePendingCents": 336706,
+      "sourceStatementAdditionalRows": [
+        {
+          "sourceCaseId": "ROBLE_NOV20_0149",
+          "requirement": "4710737",
+          "due": "2026-10-16",
+          "grossCents": 27593,
+          "meaning": "OTHER_TERM_OR_DIFFERENT_REQUIREMENT_UNRESOLVED_NO_REWRITE"
+        }
+      ],
+      "schedule": [
+        {
+          "requirement": "5747312",
+          "sequence": 1,
+          "installments": 12,
+          "due": "2026-11-16",
+          "grossCents": 28057,
+          "sourceCaseId": "ROBLE_NOV20_0163",
+          "sourceRowNumber": 164
+        },
+        {
+          "requirement": "5747313",
+          "sequence": 2,
+          "installments": 12,
+          "due": "2026-12-16",
+          "grossCents": 28059,
+          "sourceCaseId": "ROBLE_NOV20_0164",
+          "sourceRowNumber": 165
+        },
+        {
+          "requirement": "5747314",
+          "sequence": 3,
+          "installments": 12,
+          "due": "2027-01-16",
+          "grossCents": 28059,
+          "sourceCaseId": "ROBLE_NOV20_0165",
+          "sourceRowNumber": 166
+        },
+        {
+          "requirement": "5747315",
+          "sequence": 4,
+          "installments": 12,
+          "due": "2027-02-16",
+          "grossCents": 28059,
+          "sourceCaseId": "ROBLE_NOV20_0166",
+          "sourceRowNumber": 167
+        },
+        {
+          "requirement": "5747316",
+          "sequence": 5,
+          "installments": 12,
+          "due": "2027-03-16",
+          "grossCents": 28059,
+          "sourceCaseId": "ROBLE_NOV20_0167",
+          "sourceRowNumber": 168
+        },
+        {
+          "requirement": "5747317",
+          "sequence": 6,
+          "installments": 12,
+          "due": "2027-04-16",
+          "grossCents": 28059,
+          "sourceCaseId": "ROBLE_NOV20_0168",
+          "sourceRowNumber": 169
+        },
+        {
+          "requirement": "5747318",
+          "sequence": 7,
+          "installments": 12,
+          "due": "2027-05-16",
+          "grossCents": 28059,
+          "sourceCaseId": "ROBLE_NOV20_0169",
+          "sourceRowNumber": 170
+        },
+        {
+          "requirement": "5747319",
+          "sequence": 8,
+          "installments": 12,
+          "due": "2027-06-16",
+          "grossCents": 28059,
+          "sourceCaseId": "ROBLE_NOV20_0170",
+          "sourceRowNumber": 171
+        },
+        {
+          "requirement": "5747320",
+          "sequence": 9,
+          "installments": 12,
+          "due": "2027-07-16",
+          "grossCents": 28059,
+          "sourceCaseId": "ROBLE_NOV20_0171",
+          "sourceRowNumber": 172
+        },
+        {
+          "requirement": "5747321",
+          "sequence": 10,
+          "installments": 12,
+          "due": "2027-08-16",
+          "grossCents": 28059,
+          "sourceCaseId": "ROBLE_NOV20_0172",
+          "sourceRowNumber": 173
+        },
+        {
+          "requirement": "5747322",
+          "sequence": 11,
+          "installments": 12,
+          "due": "2027-09-16",
+          "grossCents": 28059,
+          "sourceCaseId": "ROBLE_NOV20_0173",
+          "sourceRowNumber": 174
+        },
+        {
+          "requirement": "5747323",
+          "sequence": 12,
+          "installments": 12,
+          "due": "2027-10-16",
+          "grossCents": 28059,
+          "sourceCaseId": "ROBLE_NOV20_0174",
+          "sourceRowNumber": 175
+        }
+      ],
+      "sourceValidation": "ISSUER_PDF_REQUIREMENT_DUE_AMOUNT_100PCT_MATCH_CURRENT_INSURER_STATEMENT",
+      "backendEditionValidation": "REQUIRES_FRESH_UNIQUE_CLIENT_INSURER_POLICY_RISK_CROSSWALK",
+      "safeToApplyNow": false
+    },
+    {
+      "policy": "91-8342189",
+      "insurer": "ROBLE",
+      "country": "GT",
+      "currency": "GTQ",
+      "sourcePdfId": "1fuPpqesUkg5LmkGuz16icfarQmJ-8VXg",
+      "sourcePdfFilename": "Renovación El Roble - 91-8342189 - 2026-11-12 a 2027-11-12.pdf",
+      "sourcePdfRawSha256": "1814d67bd274ccecbb523666fc9cd52fd8928cd41b8cbec4a725804c0e41a9ad",
+      "termStart": "2026-11-12",
+      "termEnd": "2027-11-12",
+      "issuerEndorsement": "384443",
+      "issuedGrossCents": 336710,
+      "pdfInstallments": 12,
+      "matchedSourcePendingCount": 12,
+      "matchedSourcePendingCents": 336706,
+      "sourceStatementAdditionalRows": [
+        {
+          "sourceCaseId": "ROBLE_NOV20_0187",
+          "requirement": "5482367",
+          "due": "2026-10-12",
+          "grossCents": 27593,
+          "meaning": "OTHER_TERM_OR_DIFFERENT_REQUIREMENT_UNRESOLVED_NO_REWRITE"
+        }
+      ],
+      "schedule": [
+        {
+          "requirement": "5747324",
+          "sequence": 1,
+          "installments": 12,
+          "due": "2026-11-12",
+          "grossCents": 28057,
+          "sourceCaseId": "ROBLE_NOV20_0188",
+          "sourceRowNumber": 189
+        },
+        {
+          "requirement": "5747325",
+          "sequence": 2,
+          "installments": 12,
+          "due": "2026-12-12",
+          "grossCents": 28059,
+          "sourceCaseId": "ROBLE_NOV20_0189",
+          "sourceRowNumber": 190
+        },
+        {
+          "requirement": "5747326",
+          "sequence": 3,
+          "installments": 12,
+          "due": "2027-01-12",
+          "grossCents": 28059,
+          "sourceCaseId": "ROBLE_NOV20_0190",
+          "sourceRowNumber": 191
+        },
+        {
+          "requirement": "5747327",
+          "sequence": 4,
+          "installments": 12,
+          "due": "2027-02-12",
+          "grossCents": 28059,
+          "sourceCaseId": "ROBLE_NOV20_0191",
+          "sourceRowNumber": 192
+        },
+        {
+          "requirement": "5747328",
+          "sequence": 5,
+          "installments": 12,
+          "due": "2027-03-12",
+          "grossCents": 28059,
+          "sourceCaseId": "ROBLE_NOV20_0192",
+          "sourceRowNumber": 193
+        },
+        {
+          "requirement": "5747329",
+          "sequence": 6,
+          "installments": 12,
+          "due": "2027-04-12",
+          "grossCents": 28059,
+          "sourceCaseId": "ROBLE_NOV20_0193",
+          "sourceRowNumber": 194
+        },
+        {
+          "requirement": "5747330",
+          "sequence": 7,
+          "installments": 12,
+          "due": "2027-05-12",
+          "grossCents": 28059,
+          "sourceCaseId": "ROBLE_NOV20_0194",
+          "sourceRowNumber": 195
+        },
+        {
+          "requirement": "5747331",
+          "sequence": 8,
+          "installments": 12,
+          "due": "2027-06-12",
+          "grossCents": 28059,
+          "sourceCaseId": "ROBLE_NOV20_0195",
+          "sourceRowNumber": 196
+        },
+        {
+          "requirement": "5747332",
+          "sequence": 9,
+          "installments": 12,
+          "due": "2027-07-12",
+          "grossCents": 28059,
+          "sourceCaseId": "ROBLE_NOV20_0196",
+          "sourceRowNumber": 197
+        },
+        {
+          "requirement": "5747333",
+          "sequence": 10,
+          "installments": 12,
+          "due": "2027-08-12",
+          "grossCents": 28059,
+          "sourceCaseId": "ROBLE_NOV20_0197",
+          "sourceRowNumber": 198
+        },
+        {
+          "requirement": "5747334",
+          "sequence": 11,
+          "installments": 12,
+          "due": "2027-09-12",
+          "grossCents": 28059,
+          "sourceCaseId": "ROBLE_NOV20_0198",
+          "sourceRowNumber": 199
+        },
+        {
+          "requirement": "5747335",
+          "sequence": 12,
+          "installments": 12,
+          "due": "2027-10-12",
+          "grossCents": 28059,
+          "sourceCaseId": "ROBLE_NOV20_0199",
+          "sourceRowNumber": 200
+        }
+      ],
+      "sourceValidation": "ISSUER_PDF_REQUIREMENT_DUE_AMOUNT_100PCT_MATCH_CURRENT_INSURER_STATEMENT",
+      "backendEditionValidation": "REQUIRES_FRESH_UNIQUE_CLIENT_INSURER_POLICY_RISK_CROSSWALK",
+      "safeToApplyNow": false
+    },
+    {
+      "policy": "91-8343059",
+      "insurer": "ROBLE",
+      "country": "GT",
+      "currency": "GTQ",
+      "sourcePdfId": "14I4mW85MdjXQ7EZ_cI5TjFRGbBYDRY7u",
+      "sourcePdfFilename": "Renovación El Roble - 91-8343059 - 2026-11-27 a 2027-11-27.pdf",
+      "sourcePdfRawSha256": "05be6fd1da736b40306f7f3f709b1e0288d0970b63813fb4376b7e2354fbab15",
+      "termStart": "2026-11-27",
+      "termEnd": "2027-11-27",
+      "issuerEndorsement": "384576",
+      "issuedGrossCents": 504087,
+      "pdfInstallments": 12,
+      "matchedSourcePendingCount": 12,
+      "matchedSourcePendingCents": 504079,
+      "sourceStatementAdditionalRows": [],
+      "schedule": [
+        {
+          "requirement": "5747887",
+          "sequence": 1,
+          "installments": 12,
+          "due": "2026-11-27",
+          "grossCents": 42013,
+          "sourceCaseId": "ROBLE_NOV20_0200",
+          "sourceRowNumber": 201
+        },
+        {
+          "requirement": "5747888",
+          "sequence": 2,
+          "installments": 12,
+          "due": "2026-12-27",
+          "grossCents": 42006,
+          "sourceCaseId": "ROBLE_NOV20_0201",
+          "sourceRowNumber": 202
+        },
+        {
+          "requirement": "5747889",
+          "sequence": 3,
+          "installments": 12,
+          "due": "2027-01-27",
+          "grossCents": 42006,
+          "sourceCaseId": "ROBLE_NOV20_0202",
+          "sourceRowNumber": 203
+        },
+        {
+          "requirement": "5747890",
+          "sequence": 4,
+          "installments": 12,
+          "due": "2027-02-27",
+          "grossCents": 42006,
+          "sourceCaseId": "ROBLE_NOV20_0203",
+          "sourceRowNumber": 204
+        },
+        {
+          "requirement": "5747891",
+          "sequence": 5,
+          "installments": 12,
+          "due": "2027-03-27",
+          "grossCents": 42006,
+          "sourceCaseId": "ROBLE_NOV20_0204",
+          "sourceRowNumber": 205
+        },
+        {
+          "requirement": "5747892",
+          "sequence": 6,
+          "installments": 12,
+          "due": "2027-04-27",
+          "grossCents": 42006,
+          "sourceCaseId": "ROBLE_NOV20_0205",
+          "sourceRowNumber": 206
+        },
+        {
+          "requirement": "5747893",
+          "sequence": 7,
+          "installments": 12,
+          "due": "2027-05-27",
+          "grossCents": 42006,
+          "sourceCaseId": "ROBLE_NOV20_0206",
+          "sourceRowNumber": 207
+        },
+        {
+          "requirement": "5747894",
+          "sequence": 8,
+          "installments": 12,
+          "due": "2027-06-27",
+          "grossCents": 42006,
+          "sourceCaseId": "ROBLE_NOV20_0207",
+          "sourceRowNumber": 208
+        },
+        {
+          "requirement": "5747895",
+          "sequence": 9,
+          "installments": 12,
+          "due": "2027-07-27",
+          "grossCents": 42006,
+          "sourceCaseId": "ROBLE_NOV20_0208",
+          "sourceRowNumber": 209
+        },
+        {
+          "requirement": "5747896",
+          "sequence": 10,
+          "installments": 12,
+          "due": "2027-08-27",
+          "grossCents": 42006,
+          "sourceCaseId": "ROBLE_NOV20_0209",
+          "sourceRowNumber": 210
+        },
+        {
+          "requirement": "5747897",
+          "sequence": 11,
+          "installments": 12,
+          "due": "2027-09-27",
+          "grossCents": 42006,
+          "sourceCaseId": "ROBLE_NOV20_0210",
+          "sourceRowNumber": 211
+        },
+        {
+          "requirement": "5747898",
+          "sequence": 12,
+          "installments": 12,
+          "due": "2027-10-27",
+          "grossCents": 42006,
+          "sourceCaseId": "ROBLE_NOV20_0211",
+          "sourceRowNumber": 212
+        }
+      ],
+      "sourceValidation": "ISSUER_PDF_REQUIREMENT_DUE_AMOUNT_100PCT_MATCH_CURRENT_INSURER_STATEMENT",
+      "backendEditionValidation": "REQUIRES_FRESH_UNIQUE_CLIENT_INSURER_POLICY_RISK_CROSSWALK",
+      "safeToApplyNow": false
+    },
+    {
+      "policy": "91-4140843",
+      "insurer": "ROBLE",
+      "country": "GT",
+      "currency": "GTQ",
+      "sourcePdfId": "1R6HMlHHv09_87BALnvLpa-E_cWiKlr9m",
+      "sourcePdfFilename": "914140843322984.pdf",
+      "sourcePdfRawSha256": "a8b0b7cf358630ebcdf934a9dcfdcb5939b2192d55acf50cb8cea2f5a1c2fe44",
+      "termStart": "2026-09-10",
+      "termEnd": "2027-09-10",
+      "issuerEndorsement": "322984",
+      "issuedGrossCents": 374740,
+      "pdfInstallments": 1,
+      "matchedSourcePendingCount": 1,
+      "matchedSourcePendingCents": 374740,
+      "sourceStatementAdditionalRows": [],
+      "schedule": [
+        {
+          "requirement": "5574011",
+          "sequence": 1,
+          "installments": 1,
+          "due": "2026-10-10",
+          "grossCents": 374740,
+          "sourceCaseId": "ROBLE_NOV20_0040",
+          "sourceRowNumber": 41
+        }
+      ],
+      "sourceValidation": "ISSUER_PDF_REQUIREMENT_DUE_AMOUNT_100PCT_MATCH_CURRENT_INSURER_STATEMENT",
+      "backendEditionValidation": "REQUIRES_FRESH_UNIQUE_CLIENT_INSURER_POLICY_RISK_CROSSWALK",
+      "safeToApplyNow": false
+    }
+  ],
+  "authoritativeInterpretation": "Issued PDFs own contractual original; later insurer statement owns current pending requirements and due amounts; no inferred direct payment, invoice or claim from pending obligations.",
+  "next": "Execute a single bounded server preflight for five editions, unique client+insurer+predecessor+vehicle under current Firestore; create the 49 contractual pending obligations only after canonical issuer-backed issuance and CAS, and preserve extra statement rows. Keep failures case-local; never join by policy alone, never create Cobros.",
+  "commercialWrites": 0,
+  "sourceFilesChanged": 0,
+  "approvalOfRelease": false
+}
