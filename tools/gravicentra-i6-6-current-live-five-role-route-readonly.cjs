@@ -61,8 +61,24 @@ async function getActors(){
       (countries(m).includes(wanted.country)||countries(m).includes('TODOS')||
       countries(m).includes('ALL')));
     if(wanted.matchName){
-      candidates=candidates.filter(m=>[m.nombre,m.displayName,m.name,m.nombreCompleto,m.fullName]
-        .some(v=>wanted.matchName.split(' ').every(part=>norm(v).includes(part))));
+      // Reuse the same canonical advisor/UID linkage proven by the signed
+      // LIVE Carlos/Dirección renewal, insurer and Client 360 UAT owners.
+      // Names alone are not a unique operational identity.
+      const verifiedName= wanted.role==='operativo'
+        ? v=>norm(v).startsWith('carlos castro')
+        : v=>norm(v).includes('paula')&&norm(v).includes('osorio');
+      const linked=advisorSnap.docs.filter(d=>{
+        const row=d.data()||{};
+        return [row.nombre,row.nombreCompleto,row.displayName,row.name].some(verifiedName);
+      });
+      const advisorIds=new Set(linked.map(d=>d.id));
+      const linkedUids=new Set(linked.flatMap(d=>{
+        const row=d.data()||{};
+        return [row.authUid,row.uid,row.userId].filter(Boolean).map(String);
+      }));
+      candidates=candidates.filter(m=>
+        [m.nombre,m.displayName,m.name,m.nombreCompleto,m.fullName].some(verifiedName)||
+        advisorIds.has(String(m.advisorId||m.asesorId||''))||linkedUids.has(m.uid));
     }
     const valid=[];
     for(const m of candidates){
@@ -71,7 +87,7 @@ async function getActors(){
         if(!u.disabled&&u.emailVerified===true)valid.push({uid:m.uid,activeRole:m.activeRole});
       }catch(e){}
     }
-    if(wanted.matchName&&valid.length!==1){report.holds.push('SIGNED_ACTOR_NOT_UNIQUE_'+wanted.role);continue;}
+    if(wanted.matchName&&valid.length!==1){report.holds.push('SIGNED_ACTOR_NOT_UNIQUE_'+wanted.role+'_COUNT_'+valid.length);continue;}
     if(!valid.length){report.holds.push('NO_VERIFIED_ACTIVE_GT_ROLE_'+wanted.role);continue;}
     valid.sort((a,b)=>a.uid.localeCompare(b.uid));
     out.push({...wanted,uid:valid[0].uid,uidHash:hash(valid[0].uid).slice(0,12),token:await auth.createCustomToken(valid[0].uid)});
