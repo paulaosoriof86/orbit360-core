@@ -4722,5 +4722,17 @@
     "runId": 44827928263,
     "currentMarkerRealRoleUatRunId": 45064138268,
     "governanceRunId": 45064138325
+  },
+  "frontendPreviewRequest": {
+    "version": 1,
+    "mode": "PREVIEW_HOSTING_ONLY",
+    "sourceQaHead": "c1ae680ea5160f0f6b1412d5a7d09f6358614801",
+    "manifestBlob": "098c127eb1c08a8d5fc3575c0ec38c6cb59f3858",
+    "sourceQaRunId": 45081385141,
+    "guardRunId": 45081385136,
+    "previousReceiptBlob": "3e44c28449070b78de5a71522167cbd65ead7666",
+    "productPaths": [
+      "orbit360-platform/modules/cliente360.js"
+    ]
   }
 }

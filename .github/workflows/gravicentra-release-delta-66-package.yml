@@ -119,6 +119,7 @@ jobs:
           set -euo pipefail
           node - <<'NODE'
           const fs=require('node:fs');
+          (function releaseGate(){
           const c=JSON.parse(fs.readFileSync('artifacts/orbit360-recovery/release-control/I6_6_RELEASE_TRANSPORT_CONTROL_20261110.json','utf8'));
           const scopedPreview=c.status==='PAYMENT_FUNCTION_PREVIEW_AUTHORIZED'&&c.backendFunctionPreviewOnly===true&&c.forbidBackendLiveFunctionDeploy===true&&c.livePromotionAuthorized===false&&c.previewApproved===false;
           const scopedLive=c.status==='PAYMENT_LIVE_FUNCTION_PROMOTION_AUTHORIZED'&&c.liveFunctionScope==='orbit360CobrosReconciliationCommand'&&c.noHostingPromotion===true&&c.forbidBackendLiveFunctionDeploy===false&&c.livePromotionAuthorized===true&&c.previewApproved===true&&c.previewFunctionRunId===43306217923&&c.carlosPaymentPreviewNextSource20261112?.signedCarlosPaulaPaymentUat==='PASS_43306217923';
@@ -281,6 +282,20 @@ jobs:
             c.postAcceptanceInsurerTotalsPreviewBuildRequest20261118||
             c.postAcceptanceProductSourcePreviewBuildRequest20261118||null;
           let successorBuild=false;
+          if (c.frontendPreviewRequest) {
+            const api = async suffix => JSON.parse(require('node:child_process').execFileSync('gh',
+              ['api','repos/'+process.env.GITHUB_REPOSITORY+'/actions/'+suffix],
+              {encoding:'utf8',env:{...process.env,GH_TOKEN:process.env.GITHUB_TOKEN}}));
+            const marker = async origin => {
+              const response = await fetch(origin+'/__recovery__/build.json',{cache:'no-store',signal:AbortSignal.timeout(15000)});
+              if (!response.ok) throw Error('I66_PREVIEW_PRIOR_MARKER_UNAVAILABLE');
+              return response.json();
+            };
+            require('./tools/gravicentra-i6-6-frontend-preview-authority.cjs').admitPreview(c,api,marker)
+              .then(eligible=>fs.appendFileSync(process.env.GITHUB_OUTPUT,'mode='+(eligible?'package':'disabled')+'\n'))
+              .catch(error=>{console.error(error.message);process.exitCode=1;});
+            return;
+          }
           const importRequest = c.importSourceReviewPreviewRequest20261120;
           const paymentDirectRequest = c.paymentDirectOptionalDocumentPreviewRequest20261120;
           const paymentDirectBuild = Boolean(paymentDirectRequest && !paymentDirectRequest.consumedBySignedLiveRunId);
@@ -538,6 +553,7 @@ jobs:
           }
           fs.appendFileSync(process.env.GITHUB_OUTPUT,`mode=${mode}\nsource=${source}\nsource_run=${sourceRun}\nartifact_id=${artifactId}\nartifact_digest=${artifactDigest}\naccess_sha=${accessSha}\nreader_sha=${readerSha}\ndirectory_sha=${ownerReaderPreview?'eea1d0569b0a441e525ea9237ba4870fdeac14c8':''}\npreview_channel=${previewChannel}\n`);
           console.log('I66_TRANSPORT_MODE='+mode);
+          })();
           NODE
   immutable-package:
     needs: gate
