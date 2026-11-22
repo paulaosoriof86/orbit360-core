@@ -1,0 +1,57 @@
+{
+  "schema": "GI_I66_ROBLE_8357452_PREDECESSOR_RENEWAL_SOURCE_WITNESS_V1",
+  "recordType": "SOURCE_DOCUMENT_EVIDENCE_NO_LIVE_MUTATION",
+  "activeGate": "I6.6",
+  "dateGuatemala": "2026-11-22",
+  "policyNumber": "91-8357452",
+  "sources": [
+    {
+      "id": "18Sg89JCqdvcfz3ZN-2eRyhCdDsvNaLwq",
+      "name": "9183574525743.pdf",
+      "operation": "POLIZA_NUEVA",
+      "endorsement": "005743",
+      "termStart": "2025-10-27",
+      "termEnd": "2026-10-27",
+      "issuerDocumentDate": "2025-10-27",
+      "source": "Original insurer PDF read via authenticated Google Drive"
+    },
+    {
+      "id": "1V-ttJwtO21uVi1Z7t5DmpPJfhxRkxbO3",
+      "name": "Renovación El Roble - 91-8357452 - 2026-10-27 a 2027-10-27.pdf",
+      "operation": "RENOVACION",
+      "endorsement": "359402",
+      "termStart": "2026-10-27",
+      "termEnd": "2027-10-27",
+      "issuerDocumentDate": "2026-09-18",
+      "grossTotalCents": 306320,
+      "statementRequirement": "5676444",
+      "firstDue": "2026-11-27",
+      "source": "Original insurer PDF read via authenticated Google Drive"
+    }
+  ],
+  "verifiedSourceCrosswalk": {
+    "samePolicyNumber": true,
+    "termContinuous": true,
+    "oldDocumentNewPolicyCurrentDocumentRenewal": true,
+    "sameInsurer": true,
+    "sameContractingHolderInCoverLetter": true,
+    "firstInsuredRiskPlateSame": true,
+    "firstInsuredRiskChassisOrVinSame": true,
+    "vehicleDescriptionMayDifferInInsurerPDF": true,
+    "linkedExistingEditionInFirestore": "SOURCE_PREFLIGHT_PAST_TERM_EXISTS_LIVE_SUCCESSOR_NOT_YET_PROVEN",
+    "clientIdUniqueFromActualFirestore": "TO_READ",
+    "oldPolicyIdUniqueFromActualFirestore": "TO_READ",
+    "newPolicyId": "TO_READ_OR_CREATE_THROUGH_CANONICAL_WRITER",
+    "noNewOwnerBusinessDecisionRequired": true
+  },
+  "authorizedAction": "Resolve the exact existing 2025-2026 canonical Firestore edition by policy number plus insured/contractor/risk/tenant/country and its stable ID; verify succession and client ownership. Reuse 2026-2027 edition if already exists, else register successor only through approved signed writer, then connect one issued 5676444 receipt Q3063.20 due 2026-11-27. Validate Cliente360/Pólizas/Recibos/cartera/Kanban reload. Do not create Cobros because obligation exists.",
+  "preservation": [
+    "No reimport for UI errors",
+    "No duplicate policy or receipt",
+    "Keep prior term and audit history",
+    "Do not infer an historical direct payment date"
+  ],
+  "dataWrites": 0,
+  "liveReleaseChanged": false,
+  "officialPassClaimed": false
+}
