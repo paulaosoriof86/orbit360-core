@@ -84,6 +84,9 @@ async function crosswalk(collection) {
     assert.ok(snap.size<limit,'ISSUED_FIVE_CROSSWALK_TRUNCATED_'+name);
     return snap.docs.map(d=>({...d.data(),id:d.id}));
   }));
+  const counts=Object.fromEntries(spec.map((s,i)=>[s[0],selections[i].length]));
+  console.log('I66_FIVE_READER_COUNTS='+JSON.stringify(counts));
+  assert.ok(counts.clientes>0&&counts.aseguradoras>0,'ISSUED_FIVE_READ_SOURCES_EMPTY_HOLD');
   return verdict(Object.fromEntries(spec.map((s,i)=>[s[0],selections[i]])));
 }
 module.exports={crosswalk,verdict,verifySource,match};
