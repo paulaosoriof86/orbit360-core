@@ -1,6 +1,6 @@
 {
   "schema": "GRAVICENTRA_I66_OPERATIONAL_SHOCK_PROGRESS_DERIVED_V2",
-  "recordType": "DERIVED_ACCUMULATIVE_I66_EXECUTION_PROGRESS_NO_GATE_OR_RELEASE_AUTHORITY",
+  "recordType": "SUBORDINATE_APPEND_ONLY_EXECUTION_RECEIPT_NOT_RELEASE_GATE_AUTHORITY",
   "product": "Gravicentra Insurance",
   "repo": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
