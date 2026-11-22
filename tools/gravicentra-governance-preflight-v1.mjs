@@ -65,13 +65,28 @@ if(i66Active&&control.i66ActiveRecoveryCursor){
      Math.round(x.physicallyPassed*1000/x.total)/10!==x.percent||
      x.percent!==c.shockObjectivesPct)
     throw Error('I66_PROGRESS_DENOMINATOR_OR_PASS_EVIDENCE_DRIFT');
+  const commercial=p.financialWork.commercialReceipts||[];
+  let committedObligations=0;
+  const usedAudits=new Set();
+  for(const entry of commercial){
+    if(digest(entry.path)!==entry.blobSha)throw Error('I66_COMMERCIAL_RECEIPT_BLOB_DRIFT');
+    const receipt=JSON.parse(fs.readFileSync(entry.path,'utf8')),after=receipt.after||{};
+    if(receipt.schema!=='GI_I66_COMMERCIAL_SOURCE_RECEIPT_V1'||receipt.commitStatus!=='COMMITTED_AND_SERVER_READ_BACK'||
+       receipt.protectedEnvironment!=='gravicentra-live-data-writes'||!Number.isSafeInteger(receipt.runId)||
+       !Number.isSafeInteger(receipt.jobId)||!Number.isInteger(after.newObligations)||after.newObligations<1||
+       !/^[0-9a-f]{64}$/.test(after.auditIdDigest)||usedAudits.has(after.auditIdDigest))
+      throw Error('I66_COMMERCIAL_RECEIPT_MISSING_OR_DUPLICATED');
+    usedAudits.add(after.auditIdDigest);committedObligations+=after.newObligations;
+  }
+  if(committedObligations!==p.financialWork.currentIterationRealCustomerFinancialWrites ||
+     p.notTouched.firestoreRealWrites!==(committedObligations===0))throw Error('I66_COMMERCIAL_WRITE_TOTAL_DRIFT');
   if(c.formalI6GatePercent!==control.postproductionExitProgress?.formalPercent||
      p.officialProgress.postproductionI6.percent!==c.formalI6GatePercent||
      p.releasedFrontend.sourceSha!==control.i66LatestPhysicalFrontendLive20261120?.sourceSha||
      c.lastPhysicalLiveSourceSha!==control.i66LatestPhysicalFrontendLive20261120?.sourceSha||
      p.releasedFrontend.digest!==control.i66LatestPhysicalFrontendLive20261120?.artifactDigest||
      c.financialRowsAppliedThisIteration!==p.financialWork.currentIterationRealCustomerFinancialWrites||
-     p.notTouched.firestoreRealWrites!==true||p.notTouched.hostingProduction!==true)
+     p.notTouched.hostingProduction!==true)
     throw Error('I66_PROGRESS_UNPROVEN_RELEASE_GATE_OR_FINANCIAL_WRITE');
   console.log('I66_ACTIVE_RECOVERY_CURSOR_NOLOSS_AND_PERCENT_GUARD=PASS');
 }

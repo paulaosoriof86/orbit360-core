@@ -1,0 +1,46 @@
+{
+  "schema": "GI_I66_COMMERCIAL_SOURCE_RECEIPT_V1",
+  "activeGate": "I6.6",
+  "decision": "D02",
+  "kind": "issued_policy_renewal",
+  "commitStatus": "COMMITTED_AND_SERVER_READ_BACK",
+  "tenantCountry": "GT",
+  "sourceSha": "b20a15b8967b2182481b206d468a10f9cad11c38",
+  "runId": 45083747526,
+  "jobId": 137397677176,
+  "preflightJobId": 137397522262,
+  "protectedEnvironment": "gravicentra-live-data-writes",
+  "serverReadbackUtc": "2026-11-22T23:34:57Z",
+  "beforeDigest": "0e172013d2d1b8153091d136dfdabcffeef8524acffb60b4ef91edb7f5aabdd6",
+  "after": {
+    "newObligations": 1,
+    "editionsCreated": 1,
+    "predecessorsUpdated": 1,
+    "vehiclesLinked": 1,
+    "portfolioRowsCreated": 1,
+    "activitiesCreated": 1,
+    "auditsCreated": 1,
+    "physicalDocumentWrites": 7,
+    "paymentsCreated": 0,
+    "currency": "GTQ",
+    "pendingGrossCents": 306320,
+    "receiptIdDigest": "536be33f7c619b53fc918fbc9023ea2d2eac70183b02cf9c94147e9e49d0a1d5",
+    "successorIdDigest": "376b98ed49d7256b2bb797d5ecd5066be83d37f1b13d18d0cd470aad81ab8405",
+    "auditIdDigest": "cdf115663016c7bf5cdaa6cde853feed684b4c41115dc01859c76c742f33c12f"
+  },
+  "uiAfterReload": {
+    "actorRole": "Operativo",
+    "origin": "https://app.aysseguros.com",
+    "interactions": [
+      "Buscar por número",
+      "abrir resultado de póliza",
+      "Pólizas en Cliente 360"
+    ],
+    "predecessor": "Renovada",
+    "successor": "Vigente",
+    "successorEnd": "2027-10-27",
+    "receiptDue": "2026-11-27",
+    "clientHistory": "Renovación emitida registrada"
+  },
+  "latestBatchRun": 45084256011
+}
