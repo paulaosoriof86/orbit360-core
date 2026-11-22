@@ -5,6 +5,7 @@ on:
     paths:
       - .github/workflows/gravicentra-i66-current-exact-preview-cross-module-uat-20261119.yml
       - tools/gravicentra-i6-6-carlos-client-edit-signed-synthetic-uat.cjs
+      - tools/gravicentra-i6-6-current-live-five-role-route-readonly.cjs
 permissions:
   contents: read
   actions: read
@@ -247,6 +248,19 @@ jobs:
           fs.writeFileSync(process.env.GOOGLE_APPLICATION_CREDENTIALS,JSON.stringify(c),{mode:0o600,flag:'wx'});
           NODE
           node tools/gravicentra-i66-live-performance-readonly.mjs
+      - name: Read-only five real active roles in LIVE across core routes, desktop and mobile
+        id: live_five_roles
+        continue-on-error: true
+        env:
+          I66_FIVE_ROLE_REPORT: ${{ runner.temp }}/gi-i66-five-role-live-matrix.json
+        run: node tools/gravicentra-i6-6-current-live-five-role-route-readonly.cjs
+      - name: Preserve bounded five-role matrix even when role or route is held
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gi-i66-five-role-route-matrix-${{ github.run_id }}
+          path: ${{ runner.temp }}/gi-i66-five-role-live-matrix.json
+          if-no-files-found: warn
       - name: Preserve diagnostic performance JSON on all outcomes
         if: always()
         uses: actions/upload-artifact@v4
@@ -266,9 +280,11 @@ jobs:
           echo '| Ops / Leads | ${{ steps.live_ops_leads.outcome }} | Carlos/Dirección synthetic LIVE CRUD/tasks/readback/cleanup |' >> "$GITHUB_STEP_SUMMARY"
           echo '| Cobros | ${{ steps.live_cobros.outcome }} | Carlos/Dirección synthetic LIVE payment/portfolio/reload/cleanup |' >> "$GITHUB_STEP_SUMMARY"
           echo '| Startup / 13 routes / mobile | ${{ steps.live_performance.outcome }} | Carlos real signed LIVE read-only |' >> "$GITHUB_STEP_SUMMARY"
+          echo '| Roles / 14 routes / desktop-mobile | ${{ steps.live_five_roles.outcome }} | 5 real members, 2 viewports, no business writes |' >> "$GITHUB_STEP_SUMMARY"
           echo '- No genuine customer payment or issuance claimed, Drive real upload and full role matrix remain HOLD' >> "$GITHUB_STEP_SUMMARY"
           test "${{ steps.live_client360.outcome }}" = success
           test "${{ steps.live_ops_leads.outcome }}" = success
           test "${{ steps.live_cobros.outcome }}" = success
           test "${{ steps.live_performance.outcome }}" = success
+          test "${{ steps.live_five_roles.outcome }}" = success
           echo 'I66_LIVE_FOUR_NEW_FUNCTIONAL_DOMAINS_PASS_SYNTHETIC_OR_READONLY_DO_NOT_CLAIM_REAL_BUSINESS_ACCEPTANCE' >> "$GITHUB_STEP_SUMMARY"
