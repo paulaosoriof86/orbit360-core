@@ -1,0 +1,64 @@
+{
+  "schema": "GI_I66_MAKE_30_DAY_INBOUND_DIAGNOSTIC_V1",
+  "dateGuatemala": "2026-11-23",
+  "type": "READ_ONLY_MAKE_EXECUTION_RECEIPT_NOT_ERP_WRITE_NOT_RELEASE",
+  "teamId": 1975919,
+  "scenarioId": 10196136,
+  "statusAtRead": "ACTIVE",
+  "connectionId": 14749710,
+  "connectionHealth": "ok",
+  "modules": [
+    {
+      "id": 1,
+      "module": "green-api:LastIncomingMessages",
+      "minutesRestored": 15,
+      "limitRestored": 100
+    },
+    {
+      "id": 2,
+      "module": "green-api:getMessage",
+      "filter": "Only 1.chatId @c.us and 1.idMessage exists"
+    }
+  ],
+  "oneTimeQuery": {
+    "minutes": 43200,
+    "limit": 100,
+    "runId": "3777bb5e0a7e4627afb042261993ac31",
+    "conclusion": "success",
+    "moduleId": 1,
+    "operations": 1,
+    "rawResultShapeKeys": [
+      "__IMTLENGTH__"
+    ],
+    "reportedMessageCount": 0,
+    "sourceDetailModuleInvocations": 0,
+    "sourceAdAttributedRecords": 0
+  },
+  "proofSemantics": "GREEN API connection success / empty list only. Does not prove WhatsApp has no messages; could be wrong/empty instance, source retention, WhatsApp session, instance receiving configuration or integration credential. Requires instance/receiver verification or a real new ad-sourced message. No private content copied.",
+  "firebaseConnection": {
+    "app": "google-cloud-firestore",
+    "requestId": "e0e9cb34-79e0-4488-8b0a-85f4352c30c5",
+    "status": "PENDING_AUTHORIZATION",
+    "existingConnections": 0
+  },
+  "writer": {
+    "scenarioId": 10195867,
+    "scenarioStatus": "INACTIVE_TRIGGER_ONLY",
+    "realLeadWrites": 0,
+    "noPersonalChatsImported": true,
+    "canonicalAuthenticatedWriterAvailable": false
+  },
+  "guardrails": {
+    "tenant": "alianzas-soluciones",
+    "AysOnly": true,
+    "otherTYAInstanceForbidden": true,
+    "sourceTypeAdAndSourceIdRequired": true,
+    "ctwaClidOptional": true,
+    "idempotencyByMessageSourcePhone": true,
+    "rawPrivateMessagesNotCopied": true,
+    "noDirectFirestoreBypass": true
+  },
+  "ownerPreviouslyAuthorized": true,
+  "newOwnerBusinessDecisionRequired": false,
+  "next": "Inspect original AyS GreenAPI instance receive settings in Make without writing; produce one genuine click-to-WhatsApp ad message with attribution, confirm greenapi metadata, authorize Firestore Make connector and server-authenticated canonical lead creation, signed first write and replay before activating end-to-end."
+}
