@@ -6,7 +6,7 @@ const admin=require('firebase-admin');
 const C=require('./gravicentra-i66-roble-two-issued-plan.cjs');
 const {sourceAliases}=require('./gravicentra-i66-source-bulk-plan.cjs');
 const mode=process.argv[2];
-assert.ok(['preflight','apply'].includes(mode),'TWO_MODE_EXPLICIT_REQUIRED');
+assert.ok(['preflight','apply','readback'].includes(mode),'TWO_MODE_EXPLICIT_REQUIRED');
 assert.equal(process.env.GITHUB_REPOSITORY,'paulaosoriof86/orbit360-core');
 assert.equal(process.env.GITHUB_REF,'refs/heads/recovery/fase-a-clean-20260831');
 assert.equal(process.env.GCLOUD_PROJECT,C.project);
@@ -115,10 +115,21 @@ async function verify(c,operation){
   const gross=loaded[1].docs.reduce((sum,d)=>sum+Math.round(Number(d.get('primaTotal'))*100),0);
   assert.equal(gross,c.issuedScheduleGrossCents);
   return {case:c.policy,policySuccessor:1,receipts:12,portfolio:12,payments:0,
-   vehicle:1,activity:1,pendingGrossCents:gross,sourceDigest:C.sha(c.policy+'|'+policy.renuevaDe)};
+   vehicle:1,activity:1,auditIdDigest:C.sha(a.id),policyIdDigest:C.sha(policy.id),originalRunId:a.get('runId'),beforeDigest:a.get('beforeDigest'),pendingGrossCents:gross,sourceDigest:C.sha(c.policy+'|'+policy.renuevaDe)};
  },{readOnly:true});
 }
 (async()=>{
+ if(mode==='readback'){
+  const checks=[];
+  for(const c of C.source.cases){
+   const snap=await tenant.collection('operationalRequests').where('policy','==',c.policy).get();
+   const found=snap.docs.filter(d=>d.id.startsWith('gi_i66_roble_two_')&&d.get('status')==='COMMITTED'&&d.get('operation')===d.id);
+   assert.equal(found.length,1,'TWO_EXACT_SIGNED_AUDIT_REQUIRED');
+   checks.push(await verify(c,found[0].id));
+  }
+  console.log('I66_TWO_RENEWALS_INDEPENDENT_READBACK='+JSON.stringify({checks,writes:0}));
+  return;
+ }
  const results=[],preimages={};
  for(const c of C.source.cases){
   const out=await db.runTransaction(tx=>scoped(tx,c),mode==='preflight'?{readOnly:true}:undefined);

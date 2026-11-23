@@ -11,6 +11,7 @@ on:
       - tools/gravicentra-i6-6-cobros-payment-failure-category.test.cjs
       - tools/gravicentra-i6-6-operational-renewal-entry.test.cjs
       - orbit360-platform/core/ciclo.js
+      - tools/gravicentra-i6-6-management-default-and-client-country.test.cjs
       - orbit360-platform/modules/ops.js
       - orbit360-platform/modules/leads.js
       - tools/gravicentra-i6-6-ops-collaboration-owner.test.cjs
