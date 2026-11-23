@@ -1,0 +1,122 @@
+{
+  "schema": "GI_I66_MAKE_OAUTH_IMAP_GREENAPI_OPS_LIVE_R14_V1",
+  "recordedAtGuatemala": "2026-11-23T12:56:00-06:00",
+  "gate": "I6.6",
+  "branch": "recovery/fase-a-clean-20260831",
+  "recordType": "APPEND_ONLY_READBACK_AND_USER_GUIDANCE_NOT_RELEASE_AUTHORITY",
+  "firestoreMakeOAuth": {
+    "requestId": "e0e9cb34-79e0-4488-8b0a-85f4352c30c5",
+    "status": "authorized",
+    "connectionId": 14756714,
+    "grantedScopes": [
+      "https://www.googleapis.com/auth/datastore",
+      "https://www.googleapis.com/auth/devstorage.read_write",
+      "https://www.googleapis.com/auth/firebase.readonly"
+    ],
+    "realReadOnlyQa": {
+      "temporaryScenarioId": 10220425,
+      "deleted": true,
+      "runId": "0a3150a9f5234817886c64a0cf3218ea",
+      "status": "success",
+      "projectId": "ays-orbit-360-lab",
+      "canonicalTenantDocument": "tenants/alianzas-soluciones/config/reconciliation",
+      "firestoreWrites": 0
+    },
+    "doesNotAuthorizeRawBypassOfCanonicalLeadWriter": true
+  },
+  "emailHostDime": {
+    "mailbox": "finanzasyadmin@aysseguros.com",
+    "incomingHost": "mail.aysseguros.com",
+    "imapPort": 993,
+    "tls": true,
+    "explicitTls": false,
+    "usernameMustBeFullMailbox": true,
+    "passwordMustBeActualMailboxPassword": true,
+    "screenshotEnteredGreenApiInstanceNumberAsUsername": true,
+    "screenshotPasswordNotInterpretedOrRetained": true,
+    "emailOauthRequest": "1d49bea1-0d2c-48c1-8f0e-2516c5662d32",
+    "emailConnectionStatus": "pending",
+    "actualPasswordNeededInProviderPrivateMakeForm": true,
+    "notUserGmailPasswordOrGreenApiToken": true
+  },
+  "greenApi": {
+    "scenarioId": 10196136,
+    "scenarioStatus": "active",
+    "moduleIds": [
+      1,
+      2
+    ],
+    "connectionId": 14749710,
+    "connectionStatus": "ok",
+    "exactLiveReadback": {
+      "temporaryScenarioId": 10220436,
+      "deleted": true,
+      "runId": "ba15ca8044b4406ba6162c04b629623c",
+      "status": "success",
+      "incomingWebhook": "no",
+      "webhookUrlConfigured": false
+    },
+    "screenshotShowsWhatsAppInstanceAuthorized": true,
+    "unblock": "In existing AyS Green API instance, Webhooks > Change > Receive webhooks on incoming messages and files: Yes > Save Changes. Keep webhookUrl blank while polling. No logout or delete.",
+    "sourceAdMetadata": [
+      "extendedTextMessage.sourceType=ad",
+      "extendedTextMessage.sourceId",
+      "extendedTextMessage.ctwaClid if present"
+    ],
+    "personalChatImportForbidden": true,
+    "latestRealAdAttributionObserved": false,
+    "realLeadsWritten": 0,
+    "mailNumberIsNotMailUsername": true
+  },
+  "operationalRelease": {
+    "liveOrigins": [
+      "https://app.aysseguros.com",
+      "https://ays-orbit-360-lab.web.app"
+    ],
+    "sameLiveBuildMarkerBoth": true,
+    "sourceSha": "15e849bd606bd8c93e4c0471da1193e85004aecd",
+    "buildId": "gi-i66-15e849bd606b-57f234755dc1",
+    "newPreviewUrl": "https://ays-orbit-360-lab--gi-i66-rc-45189363251-ml6nr9i9.web.app",
+    "newPreviewSource": "82af5ca6466db2955b29d61218d11c1b34674a58",
+    "newPreviewArtifactId": 14824703889,
+    "newPreviewBuildRun": 45189363251,
+    "backendPreviewUatRun": 45189362912,
+    "backendPreviewUatActualJob": "skipped",
+    "notAPass": true,
+    "livePromotionActualJob": "skipped",
+    "notDeployed": true,
+    "carlosOpsSourceCorrection": "196e3cdbae5a02792f19acc3cacd37621836c02f",
+    "carlosOpsRealNewLiveSaveAndReload": "HOLD_NOT_CERTIFIED",
+    "exactArtifactMustPassSignedBackendPreview": true,
+    "liveChangedInThisRound": false
+  },
+  "finance": {
+    "latestFreshProtectedPreflightRun": 45192733898,
+    "results": {
+      "examined": 302,
+      "unchanged": 185,
+      "missingPolicyEdition": 97,
+      "missingReceiptIdentity": 20,
+      "eligible": 0,
+      "writes": 0
+    },
+    "ownerDecisionsAlreadyReceived": true,
+    "authorizedOrdinaryCarlosOperationalReconciliationScope": true,
+    "signedSyntheticLiveApplyReconcilePriorPass": true,
+    "oneStepActualInvoiceAndDocumentUpload": "NOT_CERTIFIED"
+  },
+  "continuity": {
+    "activeGate": "I6.6",
+    "lastFrozenGate": "I6.5",
+    "i6Closed": 6,
+    "i6Total": 10,
+    "shockClosed": 2,
+    "shockTotal": 14,
+    "noNewRepo": true,
+    "noNewFirebase": true,
+    "noBranchChange": true,
+    "noRawCredentialDisclosure": true,
+    "carryForwardPriorR13": "artifacts/orbit360-recovery/release-control/I6_6_20261123_CRITICAL_CONTINUITY_PAYMENT_MAKE_RELEASE_R13.json",
+    "next": "Complete private HostDime IMAP credential login; enable GreenAPI incoming webhook notifications on existing AyS instance; signed backend Preview ops/drive/readback and same-artifact LIVE; then canonical ad source lead writer and financial identity CAS."
+  }
+}
