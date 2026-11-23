@@ -27,6 +27,8 @@ on:
       - tools/gravicentra-i66-universales-25-source-crosswalk.test.cjs
       - artifacts/orbit360-recovery/source-batches/I6_6_UNIVERSALES_25_PENDING_2_PAID_9_INFERRED_20261122.json
       - artifacts/orbit360-recovery/source-batches/I6_6_SOURCE_BULK_*.json
+      # The owner-authorized source refresh is still the existing CAS gate.
+      - artifacts/orbit360-recovery/release-control/I6_6_20261123_PROTECTED_SOURCE_BULK_REFRESH_REQUEST.json
 permissions:
   contents: read
 concurrency:
