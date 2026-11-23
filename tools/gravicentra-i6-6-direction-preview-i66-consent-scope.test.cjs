@@ -253,3 +253,15 @@ test('no storage seeding bypass or forced UI action was added; protected CI has 
   for(const code of ['DIRECTION_LEGAL_SCOPE_SOURCE_NOT_DESCENDANT','DIRECTION_LEGAL_RELOAD_ACTOR_MISMATCH',
     'DIRECTION_LEGAL_RELOAD_PROOF_REQUIRED','DIRECTION_LEGAL_SCOPE_RECEIPT_MISMATCH'])assert.ok(g.LEGAL_FAILURE_CHECKS.includes(code));
 });
+
+test('scoped Preview legal authority uses the signed four-function candidate and preserves normal UI consent',()=>{
+  const start=helperSource.indexOf('async function acceptDirectionPreviewLegal(');
+  const end=helperSource.indexOf('async function ',start+10);
+  const block=helperSource.slice(start,end<0?undefined:end);
+  assert.ok(block.includes("control.scopedBackendPreviewI66?.status==='APPROVED_FOUR_FUNCTION_PREVIEW_SYNTHETIC_ONLY'"));
+  assert.ok(block.includes("candidateForPhase(control,'preview')"));
+  assert.ok(block.includes("assert.equal(control.status,'OPERATIONAL_BACKEND_PREVIEW_AUTHORIZED'"));
+  assert.ok(block.includes('validateDecision({receipt,receiptSha256,candidate,cfg,sourceParent,actor,technicalRetryBytes,control})'));
+  assert.ok(block.includes('applyDirectionLegalUi({page,actor,cfg,candidate,receipt,receiptSha256,scoped,technicalRetryBytes,technicalRetry,phase:'));
+  assert.ok(!block.includes('storage.setItem('));
+});

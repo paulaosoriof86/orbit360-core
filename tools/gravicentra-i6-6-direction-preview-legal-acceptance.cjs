@@ -424,8 +424,18 @@ async function acceptDirectionPreviewLegal({page,actor,cfg}){
   let legalSubstage='AUTHORITY_VALIDATION';
   try{
   const control=JSON.parse(fs.readFileSync(CONTROL,'utf8'));
-  assert.equal(control.status,'OPERATIONAL_BACKEND_PREVIEW_AUTHORIZED','DIRECTION_LEGAL_PREVIEW_GATE_NOT_ACTIVE');
-  const candidate=control.operationalReleaseCandidate,scoped=usesI66Scope(candidate);
+  // The scoped four-function Preview leaves the production lock intact.
+  // Validate that exact owner-approved synthetic-only authority rather than
+  // requiring the former global Preview status. Never grant consent or skip UI.
+  const scopedPreview=control.status==='OPERATIONAL_EXACT_LIVE_ACCEPTED_LOCKED' &&
+    control.scopedBackendPreviewI66?.status==='APPROVED_FOUR_FUNCTION_PREVIEW_SYNTHETIC_ONLY';
+  if(!scopedPreview){
+    assert.equal(control.status,'OPERATIONAL_BACKEND_PREVIEW_AUTHORIZED','DIRECTION_LEGAL_PREVIEW_GATE_NOT_ACTIVE');
+  }
+  const candidate=scopedPreview
+    ? require('./gravicentra-i6-6-operational-release-candidate.cjs').candidateForPhase(control,'preview')
+    : control.operationalReleaseCandidate;
+  const scoped=usesI66Scope(candidate);
   const receiptPath=scoped?I66_SCOPE.receiptPath:RECEIPT;
   const receiptBytes=fs.readFileSync(receiptPath),receipt=JSON.parse(receiptBytes),receiptSha256=hash(receiptBytes);
   const sourceParent=scoped?undefined:execFileSync('git',['rev-parse',cfg.source+'^'],{encoding:'utf8'}).trim();
