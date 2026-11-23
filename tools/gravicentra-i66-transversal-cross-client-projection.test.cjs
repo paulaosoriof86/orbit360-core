@@ -115,7 +115,7 @@ test('All canonical Ops create_management records create one server-owned Client
  assert.ok(creator>0&&stored>creator&&save>stored&&readback>save,
    'confirmed Ops management activity must be persisted and verified by one server owner');
  assert.match(server,/OPS_CLIENT360_ACTIVITY_READBACK_MISSING/);
- assert.match(server,/gestionId:entityId,origen:'ops'/);
+ assert.match(server,/gestionId:entityId,reclamoId:text\\(after\\.reclamoId,180\\),origen:'ops'/);
 });
 test('portal_request shares the same durable activity and readback contract for all clients',()=>{
  const portal=source('orbit360-platform/modules/portal.js');

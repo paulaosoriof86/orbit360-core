@@ -3830,6 +3830,15 @@
             "priorGitBlobSha": "f353820d428b417c84d147fd8727f6f54b507349",
             "priorChangeId": "I6_6_PORTAL_SHARED_CLIENT360_ACTIVITY_ATOMIC_20261122"
           }
+        },
+        {
+          "path": "tools/gravicentra-i6-6-ops-activity-direct-vehicle-endorsement.test.cjs",
+          "gitBlobSha": "87a2db05e7aaee0ab85a1e78d14e7eba2061e870",
+          "replaces": {
+            "path": "tools/gravicentra-i6-6-ops-activity-direct-vehicle-endorsement.test.cjs",
+            "priorGitBlobSha": "26d6b5f31312dee488eb6c6127dbfaa98a60a3b0",
+            "priorChangeId": "I6_6_PORTAL_SHARED_CLIENT360_ACTIVITY_ATOMIC_20261122"
+          }
         }
       ]
     }

@@ -20,7 +20,7 @@ test('Ops management and Client 360 activity are atomically persisted by the bac
   assert.match(block,/gestionId:entityId/);
   assert.match(block,/after\.actividadCliente360Id=activityId/);
   assert.match(server,/OPS_CLIENT360_ACTIVITY_READBACK_MISSING/);
-  assert.match(server,/managementActivityReadback=\{activityId,clienteId:confirmedRow\.clienteId,gestionId:entityId,exists:true,transactional:true\}/);
+  assert.match(server,/managementActivityReadback=\{activityId,clienteId:confirmedRow\.clienteId,gestionId:entityId,reclamoId:text\(confirmedRow\.reclamoId,180\),exists:true,transactional:true\}/);
 });
 test('Client never claims success for optimistic activity nor swallows permission errors',()=>{
   assert.doesNotMatch(client,/S\(\)\.insert\('actividades'/);
