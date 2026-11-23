@@ -23,6 +23,14 @@ const digest = value => crypto.createHash('sha256').update(JSON.stringify(value)
 const gytPolicy=insurer=>/(?:G&T|GYT)/.test(norm(insurer));
 function policyKeys(number,insurer){
   const raw=str(number), keys=new Set([canonicalPolicyNumber(raw)]);
+  // Firestore preserves both historical El Roble display forms. A lookup of
+  // only the padded form can report an existing edition as missing (for
+  // example 91-0234395 versus 91-234395). These are lookup aliases only;
+  // insurer, country, exact edition, unique receipt and CAS still decide.
+  if (/^(?:SEGUROS )?(?:EL )?ROBLE$/.test(norm(insurer))) {
+    const roble = /^91-(\d{1,7})$/.exec(raw);
+    if (roble) keys.add('91-' + String(Number(roble[1])));
+  }
   if (/^(?:SEGUROS )?UNIVERSALES$/.test(norm(insurer))) {
     const parts = /^(\d{2}-\d{2}-\d{2}-)(\d{1,6})(-\d)$/.exec(raw);
     if (parts) {

@@ -165,3 +165,103 @@ console.log('I66_SOURCE_BULK_PREFLIGHT_PASS 750 rows 3 chunks; exceptions isolat
   assert.ok(policyKeys('04-15-01-000603-0','Seguros Universales').includes('04-15-01-603-0'));
   assert.ok(!policyKeys('04-15-01-603-0','MAPFRE').includes('04-15-01-000603-0'));
 }
+
+// Exercise the actual Firestore read adapter. Prior tests provided already
+// hydrated groups and could not detect an incomplete query that hid a policy.
+const test = require('node:test');
+const {readGroups} = require('./gravicentra-i66-source-bulk-live.cjs');
+function readonlyFirestore(tables) {
+  const queries=[];
+  const snapshot = row => ({id:row.id,exists:true,data:()=>({...row}),get:key=>row[key]});
+  function ref(parts=[]) {
+    return {
+      collection:name=>ref([...parts,name]),
+      doc:id=>ref([...parts,id]),
+      async get(){
+        const row=(tables[parts[3]]||[]).find(r=>r.id===parts[5]);
+        return row?snapshot(row):{exists:false};
+      },
+      where(field,operator,value){
+        assert.equal(operator,'==');
+        return {limit(limit){
+          assert.ok(limit>0&&limit<=121);
+          queries.push({collection:parts[3],field,value,limit});
+          return {async get(){
+            const docs=(tables[parts[3]]||[]).filter(r=>r[field]===value)
+              .slice(0,limit).map(snapshot);
+            return {docs,size:docs.length};
+          }};
+        }};
+      }
+    };
+  }
+  return {db:ref(),queries};
+}
+function lookupFixture() {
+  const f=sample(1),g=f.groups[0];
+  f.raw[0]={...f.raw[0],insurer:'ROBLE',policy:'91-0234395'};
+  g.policy={...g.policy,numero:'91-234395',aseguradoraId:'roble'};
+  const tables={
+    polizas:[g.policy],
+    clientes:[{id:g.policy.clienteId,nombre:'Synthetic holder',pais:'GT'}],
+    aseguradoras:[{id:'roble',nombre:'SEGUROS EL ROBLE',pais:'GT',activo:true}],
+    recibosEsperados:g.receipts,carteraPrimas:g.portfolio,cobros:[]
+  };
+  return {raw:f.raw,tables};
+}
+test('padded Roble source finds the existing unpadded policy before planning',async()=>{
+  const f=lookupFixture(),mock=readonlyFirestore(f.tables);
+  const groups=await readGroups(mock.db,f.raw);
+  assert.equal(groups.length,1);
+  assert.equal(groups[0].policy.numero,'91-234395','do not rewrite persisted identity');
+  assert.ok(mock.queries.some(q=>q.collection==='polizas'&&q.field==='numero'&&q.value==='91-234395'));
+  assert.equal(planSourceBatch(f.raw,groups).readyCount,1);
+  assert.equal(planSourceBatch(f.raw,groups).writes,0);
+});
+test('historical numeroPoliza field is read but cannot invent canonical write identity',async()=>{
+  const f=lookupFixture();
+  f.tables.polizas[0].numeroPoliza=f.tables.polizas[0].numero;
+  delete f.tables.polizas[0].numero;
+  const groups=await readGroups(readonlyFirestore(f.tables).db,f.raw);
+  assert.equal(groups.length,1,'alias field must be observable for source adjudication');
+  assert.equal(groups[0].policy.numero,undefined);
+  assert.equal(groups[0].policy.numeroPoliza,'91-234395');
+  const plan=planSourceBatch(f.raw,groups);
+  assert.equal(plan.readyCount,0,'unchanged canonical writer requires numero');
+  assert.equal(plan.exceptionCount,1);
+});
+test('several matching number fields and source aliases count the same document once',async()=>{
+  const f=lookupFixture();
+  Object.assign(f.tables.polizas[0],{numeroPoliza:'91-0234395',polizaNumero:'91-234395'});
+  f.raw.push({...f.raw[0],caseId:'lookup-only-alias',policy:'91-234395'});
+  const groups=await readGroups(readonlyFirestore(f.tables).db,f.raw);
+  assert.equal(groups.length,1);
+  assert.equal(groups[0].policy.id,'p0');
+});
+test('two physical policy editions remain ambiguous after alias lookup',async()=>{
+  const f=lookupFixture();
+  f.tables.polizas.push({...f.tables.polizas[0],id:'different-edition'});
+  const groups=await readGroups(readonlyFirestore(f.tables).db,f.raw);
+  assert.equal(groups.length,2);
+  const plan=planSourceBatch(f.raw,groups);
+  assert.equal(plan.readyCount,0);
+  assert.equal(plan.exceptions[0].code,'POLICY_EDITION_AMBIGUOUS');
+});
+test('number aliases do not bypass insurer, country or paid receipt protections',async()=>{
+  const f=lookupFixture();
+  f.tables.aseguradoras[0].nombre='SEGUROS MAPFRE';
+  assert.equal(planSourceBatch(f.raw,await readGroups(readonlyFirestore(f.tables).db,f.raw)).readyCount,0);
+  f.tables.aseguradoras[0].nombre='SEGUROS EL ROBLE';
+  f.tables.polizas[0].pais='CO';
+  assert.equal((await readGroups(readonlyFirestore(f.tables).db,f.raw)).length,0);
+  f.tables.polizas[0].pais='GT';
+  f.tables.recibosEsperados[0].pagado=true;
+  const plan=planSourceBatch(f.raw,await readGroups(readonlyFirestore(f.tables).db,f.raw));
+  assert.equal(plan.readyCount,0);
+  assert.equal(plan.exceptions[0].code,'PAYMENT_OR_PORTFOLIO_EXCEPTION');
+});
+test('lookup fails closed when policy edition query reaches its bound',async()=>{
+  const f=lookupFixture();
+  f.tables.polizas=Array.from({length:21},(_,i)=>({...f.tables.polizas[0],id:'p'+i}));
+  await assert.rejects(()=>readGroups(readonlyFirestore(f.tables).db,f.raw),/I66_POLICY_EDITION_QUERY_UNBOUNDED/);
+});

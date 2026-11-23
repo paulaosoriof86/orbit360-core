@@ -43,8 +43,13 @@ async function readGroups(db,rawRows){
     const sets=await Promise.all(policyNumbers.slice(offset,offset+6).map(async number=>{
       const insurerRows=rawRows.filter(r=>str(r.policy)===number);
       const names=[...new Set(insurerRows.flatMap(r=>policyKeys(number,r.insurer)))];
-      const snaps=await Promise.all(names.map(n=>
-        internal('polizas',db).where('numero','==',n).limit(21).get()));
+      // The issued-term crosswalk reads these same persisted policy-number
+      // fields. Do not mistake an older field name for an absent edition.
+      // Keep the original document unchanged: alias-only identities can be
+      // diagnosed here, but the planner/writer still require canonical numero.
+      const snaps=await Promise.all(names.flatMap(n=>
+        ['numero','numeroPoliza','polizaNumero'].map(field=>
+          internal('polizas',db).where(field,'==',n).limit(21).get())));
       const policies=new Map(snaps.flatMap(s=>s.docs).map(d=>[d.id,d]));
       assert.ok(policies.size<=20&&snaps.every(s=>s.size<=20),'I66_POLICY_EDITION_QUERY_UNBOUNDED');
       const current=[];
@@ -52,8 +57,8 @@ async function readGroups(db,rawRows){
         const p={...doc.data(),id:doc.id};
         if(str(p.pais).toUpperCase()!=='GT')continue;
         const [client,insurer,receipts,portfolio,cobros]=await Promise.all([
-          internal('clientes',db).doc(str(p.clienteId)).get(),
-          internal('aseguradoras',db).doc(str(p.aseguradoraId)).get(),
+          p.clienteId?internal('clientes',db).doc(str(p.clienteId)).get():Promise.resolve({exists:false}),
+          p.aseguradoraId?internal('aseguradoras',db).doc(str(p.aseguradoraId)).get():Promise.resolve({exists:false}),
           internal('recibosEsperados',db).where('polizaId','==',p.id).limit(121).get(),
           internal('carteraPrimas',db).where('polizaId','==',p.id).limit(121).get(),
           internal('cobros',db).where('polizaId','==',p.id).limit(121).get()]);
@@ -71,7 +76,9 @@ async function readGroups(db,rawRows){
     }));
     sets.forEach(group=>groups.push(...group));
   }
-  return groups;
+  // The same policy can be returned by several source aliases and fields.
+  // Count physical editions by document ID; distinct editions remain distinct.
+  return [...new Map(groups.map(g=>[g.policy.id,g])).values()];
 }
 // Compare the issued term to the current Firestore editions without treating a
 // similarly numbered, expired policy as the successor. Publish counts only.
@@ -324,4 +331,5 @@ async function main(){
     ' receiptWrites='+result.receiptWrites+' carteraWrites='+result.portfolioWrites+
     ' cobroWrites='+result.cobroWrites);
 }
-main().catch(error=>{console.error('I66_BULK_EXECUTION_HOLD '+str(error.message));process.exitCode=1;});
+module.exports={readGroups};
+if(require.main===module)main().catch(error=>{console.error('I66_BULK_EXECUTION_HOLD '+str(error.message));process.exitCode=1;});
