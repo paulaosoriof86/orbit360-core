@@ -157,10 +157,17 @@ jobs:
           from urllib.parse import urlsplit
           cp=json.loads(Path('artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json').read_text())
           tr=json.loads(Path('artifacts/orbit360-recovery/release-control/I6_6_RELEASE_TRANSPORT_CONTROL_20261110.json').read_text())
-          latest=cp.get('i66LatestPhysicalFrontendLive20261120') or {}
+          # The mutable Control Plane pointer, not an archived release alias,
+          # determines exactly which immutable frontend LIVE should serve.
+          latest_key=cp.get('currentExecutionDecisionPointer')
+          if not isinstance(latest_key,str) or not latest_key.startswith('i66') or latest_key not in cp:
+            raise SystemExit('I66_LIVE_ACTIVE_POINTER_MISSING_OR_INVALID')
+          latest=cp[latest_key]
+          if not isinstance(latest,dict) or not latest.get('sourceSha') or not latest.get('buildId'):
+            raise SystemExit('I66_LIVE_ACTIVE_RELEASE_MISSING')
           expected=latest.get('sourceSha')
           expected_build=latest.get('buildId')
-          report={'checkedAtUtc':datetime.now(timezone.utc).isoformat(),'gate':cp['gateState']['gates']['I6'].get('activeSubgate'),'expectedSource':expected,'expectedBuild':expected_build,'checks':[],'readOnly':True}
+          report={'checkedAtUtc':datetime.now(timezone.utc).isoformat(),'gate':cp['gateState']['gates']['I6'].get('activeSubgate'),'activeReleasePointer':latest_key,'activeGeneration':latest.get('generation'),'expectedSource':expected,'expectedBuild':expected_build,'checks':[],'readOnly':True}
           urls=[('CUSTOM','https://app.aysseguros.com/'),('CUSTOM_MARKER','https://app.aysseguros.com/__recovery__/build.json'),('FIREBASE','https://ays-orbit-360-lab.web.app/'),('FIREBASE_MARKER','https://ays-orbit-360-lab.web.app/__recovery__/build.json')]
           for label,url in urls:
             data={'label':label,'url':url,'status':None,'dns':[],'error':None,'sourceSha':None,'buildId':None,'elapsedMs':None}
@@ -188,7 +195,9 @@ jobs:
                 data['error']=type(exc).__name__+':'+str(exc)[:180]
             report['checks'].append(data)
           by={r['label']:r for r in report['checks']}
-          control_ok=(bool(expected) and latest.get('hostedFilesEachOrigin')==224 and tr.get('currentPhysicalHostingRelease',{}).get('sourceSha')==expected and tr.get('currentPhysicalHostingRelease',{}).get('buildId')==expected_build)
+          signed=tr.get('latestSignedPhysicalFrontendLivePointer20261122',{})
+          signed_matches=(not latest.get('generation') or (isinstance(signed,dict) and signed.get('generation')==latest.get('generation') and signed.get('sourceSha')==expected and signed.get('artifactDigest')==latest.get('artifactDigest')))
+          control_ok=(bool(expected) and latest.get('hostedFilesEachOrigin')==224 and signed_matches and tr.get('currentPhysicalHostingRelease',{}).get('sourceSha')==expected and tr.get('currentPhysicalHostingRelease',{}).get('buildId')==expected_build)
           root_ok=all(by[n]['status']==200 for n in ('CUSTOM','FIREBASE'))
           markers_ok=all(by[n]['status']==200 and by[n]['sourceSha']==expected and by[n]['buildId']==expected_build for n in ('CUSTOM_MARKER','FIREBASE_MARKER'))
           report['result']='PASS' if control_ok and root_ok and markers_ok else 'HOLD'
