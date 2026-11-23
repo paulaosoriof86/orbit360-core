@@ -8,7 +8,16 @@ const P={cp:dir+'CONTROL_PLANE.json',transport:dir+'I6_6_RELEASE_TRANSPORT_CONTR
   legacy:dir+'I6_6_FRONTEND_PREVERSIONED_CONTROL_VIEW.json'};
 const serial=v=>JSON.stringify(v,null,2)+'\n';
 const blob=body=>crypto.createHash('sha1').update('blob '+Buffer.byteLength(body)+'\0').update(body).digest('hex');
+const hash=body=>crypto.createHash('sha256').update(body).digest('hex');
 const genName=(n,suffix)=>{assert.ok(Number.isSafeInteger(n)&&n>0);return dir+'I6_6_FRONTEND_E'+String(n).padStart(5,'0')+'_'+suffix+'.json';};
+function executionSnapshot(transport){
+  const r=transport.frontendPreviewRequest,s=transport.scopedBackendPreviewI66,p=transport.operationalReleaseCandidate;
+  return {transportStatus:transport.status,previewRequest:r?{version:r.version,sourceQaHead:r.sourceQaHead,
+    sourceQaRunId:r.sourceQaRunId,guardRunId:r.guardRunId}:null,
+    scopedPreview:s?{sourceSha:s.sourceSha,artifactDigest:s.artifactDigest}:null,
+    operationalCandidate:p?{status:p.status,sourceSha:p.sourceSha,artifactDigest:p.artifactDigest,
+      previewQaRunId:p.previewQa?.runId||null}:null};
+}
 function physicalGuard(control,state,transport,io){
   const head=control.i66FrontendReleaseHead;
   assert.ok(head&&Number.isSafeInteger(head.generation)&&head.generation>0,'I66_VERSIONED_FRONTEND_HEAD_MISSING');
@@ -44,6 +53,40 @@ function physicalGuard(control,state,transport,io){
   assert.deepEqual(JSON.parse(read(P.ledger)).frontendReleaseHead,head);
   assert.equal(control.i66OperationalContinuation20261115.latestProvenLiveSource,head.sourceSha);
   assert.equal(control.i66ActiveRecoveryCursor.lastPhysicalLiveSourceSha,head.sourceSha);
+  if(receipt.scope==='COMPOSITE'||head.scope==='COMPOSITE'||journal.request.scope==='COMPOSITE'){
+    assert.equal(receipt.scope,'COMPOSITE','COMPOSITE_RECEIPT_SCOPE_REMOVED');
+    assert.equal(receipt.schema,'GI_I66_SIGNED_COMPOSITE_RECEIPT_V1');
+    assert.equal(journal.operation,'ACCEPT_EXECUTED_COMPOSITE_LIVE');
+    assert.equal(journal.request.scope,'COMPOSITE');
+    const proofPath=genName(head.generation,'LIVE_PROOF'),proofText=read(proofPath),proof=JSON.parse(proofText);
+    assert.deepEqual(receipt.liveProof,{path:proofPath,sha256:hash(proofText),gitBlobSha:blob(proofText)});
+    assert.deepEqual(journal.liveProof,proof,'COMPOSITE_JOURNAL_PROOF_DRIFT');
+    require('./gravicentra-i66-frontend-promotion-transaction.cjs').validateCompositeProof(journal.request,proof);
+    assert.deepEqual(receipt,compositeReceipt(journal,proof.runId),'COMPOSITE_SIGNED_RECEIPT_CONTENT_DRIFT');
+    assert.equal(head.scope,'COMPOSITE');assert.equal(head.backendFunctionsChanged,4);
+    assert.equal(physical.scope,'COMPOSITE');assert.equal(physical.backendFunctionsChanged,4);
+    assert.deepEqual(receipt.backendRevisions,proof.backendRevisions,'COMPOSITE_RECEIPT_REVISIONS_DRIFT');
+    assert.deepEqual(head.backendRevisions,proof.backendRevisions,'COMPOSITE_HEAD_REVISIONS_DRIFT');
+    assert.deepEqual(physical.backendRevisions,proof.backendRevisions,'COMPOSITE_TRANSPORT_REVISIONS_DRIFT');
+    assert.equal(head.liveProofPath,proofPath);assert.equal(head.liveProofSha256,hash(proofText));
+    for(const current of [control.i66CurrentPhysicalBackendRelease,state.currentPhysicalBackend,
+      transport.currentPhysicalBackendRelease,JSON.parse(read(P.ledger)).backendReleaseHead])
+      assert.deepEqual(current,receipt.backend,'COMPOSITE_BACKEND_POINTER_DRIFT');
+    assert.equal(receipt.backend.sourceSha,target.sourceSha);assert.equal(receipt.backend.artifactDigest,target.artifactDigest);
+    assert.equal(receipt.backend.functionsChanged,4);assert.deepEqual(receipt.backend.revisions,proof.backendRevisions);
+    assert.deepEqual(transport.lastConsumedOperationalCandidate,journal.request.candidate,'COMPOSITE_CONSUMED_AUTHORITY_DRIFT');
+    const pending=transport.scopedBackendPreviewI66?.candidate||transport.operationalReleaseCandidate;
+    if(pending){
+      assert.notEqual(pending.sourceSha,head.sourceSha,'COMPOSITE_ACCEPTED_AUTHORITY_REUSED');
+      require('./gravicentra-i6-6-operational-release-candidate.cjs').candidateForPhase(transport,
+        transport.status==='OPERATIONAL_EXACT_LIVE_PROMOTION_AUTHORIZED'?'live':'preview');
+    }else{
+      assert.equal(transport.status,'OPERATIONAL_EXACT_LIVE_ACCEPTED_LOCKED');
+      for(const [key,value] of Object.entries({forbidBackendFunctionDeploy:true,backendFunctionPreviewOnly:false,
+        forbidBackendLiveFunctionDeploy:true,forbidFirestoreRulesDataAuthWrites:true,livePromotionAuthorized:false,
+        previewApproved:false,noHostingPromotion:true}))assert.equal(transport[key],value,'COMPOSITE_TERMINAL_LOCK_'+key);
+    }
+  }
   return head;
 }
 function closeFiles(read,j,body){
@@ -70,6 +113,8 @@ function closeFiles(read,j,body){
   transport.currentPhysicalHostingRelease={sourceSha:t.sourceSha,buildId:t.buildId,artifactId:t.artifactId,artifactDigest:t.artifactDigest,
     previewRunId:t.buildRunId,signedPreviewRunId:t.previewUiRunId||null,liveCloneRunId:body.receipt.runId,liveHostingVersion:t.hostingVersion,
     readbackEachOrigin:t.files,receipt:receiptPath,backendFunctionsChanged:0,fullI66ProductionAccepted:false,status:head.status};
+  cp.i66OperationalContinuation20261115.currentPhysicalHostingRelease=transport.currentPhysicalHostingRelease;
+  cp.i66OperationalContinuation20261115.latestPhysicalFrontendLiveRunId=body.receipt.runId;
   transport.latestSignedPhysicalFrontendLivePointer20261122=head;
   transport.frontendReleaseSequence=n;transport.consumedFrontendAuthorities=[...new Set([...(transport.consumedFrontendAuthorities||[]),j.request.approvalBlob])];
   ledger.frontendReleaseHead=head;
@@ -81,6 +126,64 @@ function closeFiles(read,j,body){
   c.previousEvidencePath=oldEvidence;c.previousEvidenceBlobSha=c.currentEvidenceBlobSha;c.currentEvidencePath=progressPath;
   c.currentEvidenceBlobSha=blob(serial(progress));c.lastPhysicalLiveRunId=head.liveCloneRunId;c.lastPhysicalLiveSourceSha=t.sourceSha;
   c.moduleReleasedThisIteration=true;
+  if(c.executionSynchronizationVersion===1)progress.executionSynchronization=executionSnapshot(transport);
+  c.currentEvidenceBlobSha=blob(serial(progress));
   return {...changes,[P.cp]:cp,[P.state]:state,[P.transport]:transport,[P.ledger]:ledger,[progressPath]:progress,[genName(n,'JOURNAL')]:body};
 }
-module.exports={P,genName,serial,blob,physicalGuard,closeFiles};
+function compositeReceipt(j,runId){
+  const {validateCompositeProof}=require('./gravicentra-i66-frontend-promotion-transaction.cjs');
+  const proof=validateCompositeProof(j.request,j.liveProof),p=j.request.candidate;
+  assert.equal(runId,proof.runId,'COMPOSITE_RECEIPT_RUN_DRIFT');
+  const proofPath=genName(j.generation,'LIVE_PROOF'),proofText=serial(proof);
+  const backend={generation:j.generation,gate:'I6.6',scope:'COMPOSITE',status:'SIGNED_LIVE_VERIFIED',
+    sourceSha:p.sourceSha,artifactId:p.artifactId,artifactDigest:p.artifactDigest,buildId:p.buildId,
+    functionsChanged:4,revisions:proof.backendRevisions,liveRunId:proof.runId,
+    proofPath,proofSha256:hash(proofText),rollbackHostingVersion:proof.previousHostingVersion,
+    fullI66ProductionAccepted:false};
+  return {schema:'GI_I66_SIGNED_COMPOSITE_RECEIPT_V1',scope:'COMPOSITE',generation:j.generation,
+    target:j.request.target,previous:j.request.previous,authorization:j.request.approvalBlob,
+    scopeId:'I66_COMPOSITE_FOUR_FUNCTIONS_SIGNED',preview:j.preview,physical:j.physical,
+    ui:{result:'PASS',buildId:p.buildId,receiptBlob:blob(proofText),source:'VALIDATED_SIGNED_COMPOSITE_LIVE_PROOF'},
+    backendFunctionsChanged:4,backendRevisions:proof.backendRevisions,backend,
+    liveProof:{path:proofPath,sha256:hash(proofText),gitBlobSha:blob(proofText)},runId};
+}
+function closeCompositeFiles(read,j,body){
+  const receipt=compositeReceipt(j,j.liveProof.runId);
+  assert.equal(body.phase,'COMMITTED');assert.equal(body.receipt.blob,blob(serial(receipt)),'COMPOSITE_SIGNED_RECEIPT_DRIFT');
+  const changes=closeFiles(read,j,body),cp=changes[P.cp],transport=changes[P.transport],state=changes[P.state],ledger=changes[P.ledger];
+  const head=cp.i66FrontendReleaseHead,physical=transport.currentPhysicalHostingRelease;
+  Object.assign(head,{scope:'COMPOSITE',status:'COMPOSITE_LIVE_SIGNED_UI_VERIFIED',backendFunctionsChanged:4,
+    backendRevisions:receipt.backendRevisions,liveProofPath:receipt.liveProof.path,liveProofSha256:receipt.liveProof.sha256});
+  Object.assign(physical,{scope:'COMPOSITE',status:head.status,backendFunctionsChanged:4,backendRevisions:receipt.backendRevisions,
+    liveProofPath:receipt.liveProof.path,liveProofSha256:receipt.liveProof.sha256});
+  const previousBackend=transport.currentPhysicalBackendRelease||null;
+  if(previousBackend)transport.previousPhysicalBackendRelease=previousBackend;
+  cp.i66CurrentPhysicalBackendRelease=state.currentPhysicalBackend=transport.currentPhysicalBackendRelease=ledger.backendReleaseHead=receipt.backend;
+  transport.lastConsumedOperationalCandidate=j.request.candidate;
+  if(transport.scopedBackendPreviewI66)transport.lastConsumedScopedBackendPreviewI66=transport.scopedBackendPreviewI66;
+  delete transport.operationalReleaseCandidate;delete transport.scopedBackendPreviewI66;
+  Object.assign(transport,{status:'OPERATIONAL_EXACT_LIVE_ACCEPTED_LOCKED',forbidBackendFunctionDeploy:true,
+    backendFunctionPreviewOnly:false,forbidBackendLiveFunctionDeploy:true,forbidFirestoreRulesDataAuthWrites:true,
+    livePromotionAuthorized:false,previewApproved:false,noHostingPromotion:true});
+  const progress=changes[genName(j.generation,'FOCAL_PROGRESS')],c=cp.i66ActiveRecoveryCursor;
+  progress.releasedBackend=receipt.backend;progress.releaseScope='COMPOSITE';progress.notTouched.backendDeploy=false;
+  c.lastCompositeLiveUatRunId=receipt.runId;c.lastCompositeLiveUatStatus=j.liveProof.status;
+  const continuation=cp.i66OperationalContinuation20261115;
+  continuation.latestCompositeLiveReceipt=genName(j.generation,'RECEIPT');continuation.latestCompositeLiveRunId=receipt.runId;
+  continuation.currentWork='I6.6: composite '+head.buildId+' verified with the same immutable frontend and four backend functions; remaining genuine business workflows, Make and financial deltas stay individually gated.';
+  continuation.latestProvenLiveSourceScope='COMPOSITE_FRONTEND_AND_FOUR_BACKEND_FUNCTIONS_SAME_IMMUTABLE_SIGNED_PROOF';
+  continuation.legalSuccessorAcceptance='COMPOSITE_PREVIEW_AND_LIVE_IDENTICAL_V2_NORMAL_UI_RELOAD_VERIFIED';
+  if(state.currentLiveSuccessorAcceptance)state.previousLiveSuccessorAcceptance=state.currentLiveSuccessorAcceptance;
+  state.currentLiveSuccessorAcceptance={status:'CURRENT_COMPOSITE_EXACT_SIGNED_LIVE_PASS_FULL_I66_HOLD',
+    gate:'I6.6',scope:'COMPOSITE',generation:j.generation,sourceSha:head.sourceSha,buildId:head.buildId,
+    buildRunId:head.buildRunId,artifactId:head.artifactId,artifactDigest:head.artifactDigest,hostingVersion:head.hostingVersion,
+    liveRunId:receipt.runId,receipt:head.receiptPath,receiptGitBlobSha:head.receiptGitBlobSha,
+    proofPath:receipt.liveProof.path,proofSha256:receipt.liveProof.sha256,backendFunctionsChanged:4,
+    backendRevisions:receipt.backendRevisions,previousLiveVersionForRollback:j.request.previous.hostingVersion,
+    fullI66ProductionAccepted:false,realFinancialWrites:0};
+  state.nextAction=cp.nextAction='I6.6: publicación compuesta '+head.buildId+' verificada. Continuar las capacidades reales y lotes pendientes desde '+genName(j.generation,'FOCAL_PROGRESS')+'.';
+  progress.executionSynchronization=executionSnapshot(transport);c.executionSynchronizationVersion=1;
+  c.currentEvidenceBlobSha=blob(serial(progress));
+  return {...changes,[genName(j.generation,'RECEIPT')]:receipt,[receipt.liveProof.path]:j.liveProof};
+}
+module.exports={P,genName,serial,blob,physicalGuard,closeFiles,executionSnapshot,compositeReceipt,closeCompositeFiles};

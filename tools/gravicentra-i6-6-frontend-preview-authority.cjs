@@ -8,11 +8,18 @@ const manifest = dir+'I6_6_APPROVED_PRODUCT_DELTA_MANIFEST_20261110.json';
 const branch = 'recovery/fase-a-clean-20260831';
 const git = (...args) => execFileSync('git',args,{encoding:'utf8'}).trim();
 
+function previewRequestTransition(request, previousRequest) {
+  if (JSON.stringify(request) === JSON.stringify(previousRequest)) return false;
+  assert.ok(Number.isSafeInteger(request?.version) && request.version > 0,
+    'PREVIEW_REQUEST_VERSION_INVALID');
+  assert.equal(request.version,(previousRequest?.version || 0)+1,'PREVIEW_REQUEST_VERSION_DRIFT');
+  return true;
+}
+
 async function admitPreview(transport,api,readMarker) {
   const request = transport.frontendPreviewRequest;
   const previous = JSON.parse(git('show','HEAD^:'+transportPath));
-  if (JSON.stringify(request) === JSON.stringify(previous.frontendPreviewRequest)) return false;
-  assert.equal(request.version,(previous.frontendPreviewRequest?.version || 0)+1,'PREVIEW_REQUEST_VERSION_DRIFT');
+  if (!previewRequestTransition(request,previous.frontendPreviewRequest)) return false;
   const composite=request.mode==='COMPOSITE_ARTIFACT_HOSTING_PREVIEW_ONLY';
   assert.ok(request.mode==='PREVIEW_HOSTING_ONLY'||composite,'PREVIEW_REQUEST_MODE_INVALID');
   if(composite){
@@ -74,4 +81,4 @@ async function admitPreview(transport,api,readMarker) {
   }
   return true;
 }
-module.exports={admitPreview};
+module.exports={admitPreview,previewRequestTransition};

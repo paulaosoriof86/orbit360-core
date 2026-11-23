@@ -1,8 +1,8 @@
 'use strict';
 const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),os=require('node:os');
 const {execFileSync}=require('node:child_process');
-const {P,genName,serial,blob,closeFiles,physicalGuard}=require('./gravicentra-i66-frontend-control.cjs');
-const {promote}=require('./gravicentra-i66-frontend-promotion-transaction.cjs');
+const {P,genName,serial,blob,closeFiles,physicalGuard,closeCompositeFiles,compositeReceipt}=require('./gravicentra-i66-frontend-control.cjs');
+const {promote,acceptComposite}=require('./gravicentra-i66-frontend-promotion-transaction.cjs');
 const {hosting}=require('./gravicentra-i66-frontend-hosting-io.cjs');
 const repository='paulaosoriof86/orbit360-core',branch='recovery/fase-a-clean-20260831';
 const repoUrl='https://api.github.com/repos/'+repository+'/';
@@ -32,6 +32,70 @@ const pins=[P.guard,'tools/gravicentra-i66-frontend-control.cjs','tools/gravicen
   'tools/gravicentra-i66-frontend-hosting-io.cjs','tools/gravicentra-i66-frontend-promotion-transaction.cjs',
   'tools/gravicentra-i6-6-operational-release-candidate.cjs','.github/workflows/gravicentra-delta-66-exact-live-clone.yml'];
 function pinSet(head){return Object.fromEntries(pins.map(p=>[p,blobAt(head,p)]));}
+function nextCompositeGeneration(sequence,readJournal){
+  assert.ok(Number.isSafeInteger(sequence)&&sequence>0);
+  for(let n=sequence+1;n<=sequence+100;n++){
+    const j=readJournal(n);if(!j||j.phase==='VERIFIED')return n;
+    assert.equal(j.phase,'ROLLED_BACK','COMPOSITE_PREVIOUS_ATTEMPT_NOT_TERMINAL');
+  }
+  throw Error('COMPOSITE_GENERATION_HISTORY_BOUND');
+}
+function assertCompositeRollbackAllowed(attempt,journal,context){
+  // The caller must obtain these values from a successful fresh remote read.
+  // `null` means proven absence; an unavailable/indeterminate read must throw.
+  assert.notEqual(journal,undefined,'COMPOSITE_ROLLBACK_JOURNAL_READ_INDETERMINATE');
+  const {runId:expectedRunId,sourceSha,previous,transport}=context;
+  assert.ok(Number.isSafeInteger(expectedRunId)&&expectedRunId>0);
+  assert.match(sourceSha,/^[0-9a-f]{40}$/);
+  if(attempt){
+    assert.ok(Number.isSafeInteger(attempt.generation)&&attempt.generation>0);
+    assert.match(attempt.key,/^[0-9a-f]{64}$/);
+    assert.equal(attempt.runId,expectedRunId,'COMPOSITE_ROLLBACK_ATTEMPT_RUN_DRIFT');
+    assert.equal(attempt.sourceSha,sourceSha,'COMPOSITE_ROLLBACK_ATTEMPT_SOURCE_DRIFT');
+    if(journal){
+      assert.equal(journal.key,attempt.key,'COMPOSITE_ROLLBACK_ATTEMPT_KEY_DRIFT');
+      assert.equal(journal.generation,attempt.generation,'COMPOSITE_ROLLBACK_GENERATION_DRIFT');
+      assert.equal(journal.operation,'ACCEPT_EXECUTED_COMPOSITE_LIVE');
+      assert.equal(journal.request.scope,'COMPOSITE');
+      assert.equal(journal.liveProof.runId,expectedRunId);assert.equal(journal.liveProof.sourceSha,sourceSha);
+      assert.notEqual(journal.phase,'COMMITTED','COMPOSITE_ROLLBACK_BLOCKED_COMMITTED');
+      assert.equal(journal.phase,'VERIFIED','COMPOSITE_ROLLBACK_PHASE_NOT_COMPENSABLE');
+    }
+  }else assert.equal(journal,null,'COMPOSITE_ROLLBACK_ATTEMPT_MISSING');
+  assert.ok(previous?.sourceSha&&previous.buildId&&previous.hostingVersion,'COMPOSITE_ROLLBACK_PREDECESSOR_MISSING');
+  const physical=transport.currentPhysicalHostingRelease;
+  assert.equal(physical.sourceSha,previous.sourceSha,'COMPOSITE_ROLLBACK_CONTROL_ALREADY_ADVANCED');
+  assert.equal(physical.buildId,previous.buildId,'COMPOSITE_ROLLBACK_PREDECESSOR_BUILD_DRIFT');
+  assert.equal(physical.liveHostingVersion,previous.hostingVersion,'COMPOSITE_ROLLBACK_PREDECESSOR_VERSION_DRIFT');
+}
+async function authorizeCompositeRollback(){
+  assert.equal(process.env.GITHUB_REPOSITORY,repository);assert.equal(process.env.GITHUB_REF_NAME,branch);
+  const file=path.join(process.env.RUNNER_TEMP,'gi-i66-composite-acceptance-attempt.json');
+  const attempt=fs.existsSync(file)?JSON.parse(fs.readFileSync(file,'utf8')):null,h=remote();
+  let journal=null;
+  if(attempt){
+    const jp=genName(attempt.generation,'JOURNAL'),listed=git('ls-tree','--name-only',h,'--',jp);
+    assert.ok(listed===''||listed===jp,'COMPOSITE_ROLLBACK_JOURNAL_LOOKUP_INVALID');
+    if(listed)journal=jsonAt(h,jp);
+  }
+  assertCompositeRollbackAllowed(attempt,journal,{runId,sourceSha:process.env.I66_ROLE_SOURCE_SHA,
+    previous:{sourceSha:process.env.I66_PREVIOUS_SOURCE_SHA,buildId:process.env.I66_PREVIOUS_BUILD_ID,
+      hostingVersion:process.env.I66_PREVIOUS_HOSTING_VERSION},transport:jsonAt(h,P.transport)});
+  console.log('I66_COMPOSITE_PHYSICAL_ROLLBACK_AUTHORIZED_BEFORE_COMMIT');
+}
+function verifyProspectiveChanges(h,changes){
+  const scratch=fs.mkdtempSync(path.join(os.tmpdir(),'gi-i66-guard-')),wt=path.join(scratch,'tree');
+  try{
+    git('worktree','add','--quiet','--detach',wt,h);
+    for(const [file,obj] of Object.entries(changes))fs.writeFileSync(path.join(wt,file),serial(obj));
+    git('-C',wt,'add','--',...Object.keys(changes));
+    git('-C',wt,'-c','user.name=Gravicentra release preflight','-c','user.email=release@localhost',
+      '-c','commit.gpgSign=false','commit','--quiet','-m','Verify prospective control transaction');
+    const tree=git('-C',wt,'rev-parse','HEAD^{tree}');
+    for(const [file,obj] of Object.entries(changes))assert.equal(git('-C',wt,'rev-parse',tree+':'+file),blob(serial(obj)),'PROSPECTIVE_TREE_DRIFT');
+    execFileSync(process.execPath,[P.guard],{cwd:wt,stdio:'inherit',timeout:420000});
+  }finally{if(fs.existsSync(wt))git('worktree','remove','--force',wt);fs.rmSync(scratch,{recursive:true,force:true});}
+}
 async function run(){
   assert.equal(process.env.GITHUB_REPOSITORY,repository);assert.equal(process.env.GITHUB_REF_NAME,branch);
   assert.ok(Number.isSafeInteger(runId)&&runId>0);
@@ -143,22 +207,7 @@ async function run(){
       const changes=closeFiles(p=>jsonAt(h,p),j,next);
       const read={readFileSync:p=>Object.hasOwn(changes,p)?serial(changes[p]):git('show',h+':'+p)+'\n'};
       physicalGuard(changes[P.cp],changes[P.state],changes[P.transport],read);
-      const scratch=fs.mkdtempSync(path.join(os.tmpdir(),'gi-i66-guard-')),wt=path.join(scratch,'tree');
-      try{
-        git('worktree','add','--quiet','--detach',wt,h);
-        for(const [file,obj] of Object.entries(changes))fs.writeFileSync(path.join(wt,file),serial(obj));
-        // The central guard also checks for a clean tree. Represent the exact
-        // proposed control transaction as a detached local commit before QA.
-        // This does not move the recovery branch or publish its contents.
-        git('-C',wt,'add','--',...Object.keys(changes));
-        git('-C',wt,'-c','user.name=Gravicentra release preflight','-c','user.email=release@localhost',
-          '-c','commit.gpgSign=false','commit','--quiet','-m','Verify prospective control transaction');
-        const tree=git('-C',wt,'rev-parse','HEAD^{tree}');
-        for(const [file,obj] of Object.entries(changes)){
-          assert.equal(git('-C',wt,'rev-parse',tree+':'+file),blob(serial(obj)),'PROSPECTIVE_TREE_DRIFT');
-        }
-        execFileSync(process.execPath,[P.guard],{cwd:wt,stdio:'inherit',timeout:420000});
-      }finally{if(fs.existsSync(wt))git('worktree','remove','--force',wt);fs.rmSync(scratch,{recursive:true,force:true});}
+      verifyProspectiveChanges(h,changes);
       assert.equal(await provider.current('live'),request.target.hostingVersion,'PHYSICAL_DRIFT_DURING_METADATA_GUARD');
       await casCommit(h,'release(i66): COMMITTED exact frontend, transport, status ledger, rollback and cursor',changes);return next;
     },
@@ -172,4 +221,157 @@ async function run(){
   const result=await promote(io,request);await io.verifyCommitted(result);
   console.log('I66_FRONTEND_FINAL_PHASE='+result.phase+' GENERATION='+raw.generation);
 }
-run().catch(e=>{console.error('I66_FRONTEND_PROMOTION_HOLD '+String(e.message).split('\n')[0].slice(0,150));process.exitCode=1;});
+async function runCompositeAcceptance(){
+  assert.equal(process.env.GITHUB_REPOSITORY,repository);assert.equal(process.env.GITHUB_REF_NAME,branch);
+  assert.ok(Number.isSafeInteger(runId)&&runId>0);
+  const g=require('./gravicentra-i6-6-operational-release-candidate.cjs');
+  const proof=JSON.parse(fs.readFileSync(path.join(process.env.RUNNER_TEMP,'i66-role-live-exact-proof.json'),'utf8'));
+  assert.equal(proof.runId,runId,'COMPOSITE_CURRENT_RUN_PROOF_REQUIRED');
+  assert.equal(proof.headSha,process.env.GITHUB_SHA,'COMPOSITE_CURRENT_RUN_HEAD_REQUIRED');
+  const {GoogleAuth}=require('google-auth-library');
+  const auth=await new GoogleAuth({scopes:['https://www.googleapis.com/auth/firebase.hosting']}).getClient();
+  const provider=hosting(auth,github),boot=remote(),initial=jsonAt(boot,P.transport),cp=jsonAt(boot,P.cp);
+  const already=initial.currentPhysicalHostingRelease.sourceSha===proof.sourceSha&&cp.i66FrontendReleaseHead?.scope==='COMPOSITE';
+  const generation=already?cp.i66FrontendReleaseHead.generation:
+    nextCompositeGeneration(initial.frontendReleaseSequence,n=>optional(boot,genName(n,'JOURNAL')));
+  const jp=genName(generation,'JOURNAL'),rp=genName(generation,'RECEIPT'),proofPath=genName(generation,'LIVE_PROOF');
+  const existing=optional(boot,jp);
+  const candidate=already?existing?.request?.candidate:g.candidateForPhase(initial,'live');
+  g.validateLiveProof(candidate,proof);
+  const approvalBlob=existing?.request?.approvalBlob||blobAt(boot,P.transport),ownerPins=pinSet(boot);
+  const previous=cp.i66FrontendReleaseHead;
+  const request=existing?.request||{schema:'GI_I66_FRONTEND_PROMOTION_V1',gate:'I6.6',scope:'COMPOSITE',generation,
+    approvalBlob,guardBlob:blobAt(boot,P.guard),previousReceiptBlob:previous.receiptGitBlobSha,candidate,
+    previous:{sourceSha:previous.sourceSha,sourceTree:previous.sourceTree,manifestBlob:previous.manifestBlob,
+      compositionBlob:previous.compositionBlob,artifactId:previous.artifactId,artifactDigest:previous.artifactDigest,
+      buildId:previous.buildId,buildRunId:previous.buildRunId,previewUrl:previous.previewUrl,
+      hostingVersion:previous.hostingVersion,files:previous.hostedFilesEachOrigin},
+    target:{sourceSha:candidate.sourceSha,sourceTree:git('rev-parse',candidate.sourceSha+'^{tree}'),
+      manifestBlob:blobAt(candidate.sourceSha,P.manifest),compositionBlob:blobAt(candidate.sourceSha,P.composition),
+      artifactId:candidate.artifactId,artifactDigest:candidate.artifactDigest,buildId:candidate.buildId,
+      buildRunId:candidate.buildRunId,previewUrl:candidate.previewUrl,previewChannel:candidate.previewChannelId,
+      hostingVersion:proof.liveHostingVersion,files:candidate.expectedSiteFileCount}};
+  function validateCurrent(h){
+    assert.equal(blobAt(h,P.transport),approvalBlob,'COMPOSITE_LIVE_AUTHORITY_REPLACED');
+    assert.deepEqual(pinSet(h),ownerPins,'RELEASE_OWNER_DRIFT');
+    assert.equal(git('diff','--name-only',candidate.sourceSha,h,'--',...g.PINNED_OWNER_PATHS),'','COMPOSITE_SOURCE_OR_QA_OWNER_DRIFT');
+    const tr=jsonAt(h,P.transport),control=jsonAt(h,P.cp),head=control.i66FrontendReleaseHead;
+    assert.deepEqual(g.candidateForPhase(tr,'live'),candidate,'COMPOSITE_LIVE_AUTHORIZATION_DRIFT');
+    assert.equal(head.generation,initial.frontendReleaseSequence,'RELEASE_GENERATION_CAS');
+    assert.equal(head.receiptGitBlobSha,request.previousReceiptBlob,'RELEASE_PREDECESSOR_RECEIPT_DRIFT');
+    assert.equal(blobAt(h,head.receiptPath),request.previousReceiptBlob);
+    assert.equal(tr.currentPhysicalHostingRelease.liveHostingVersion,request.previous.hostingVersion);
+    return tr;
+  }
+  function verifyBackend(){
+    for(const row of proof.backendRevisions){
+      const f=JSON.parse(execFileSync('gcloud',['functions','describe',row.name,'--gen2','--region',row.region,
+        '--project',g.SITE,'--format=json'],{encoding:'utf8',stdio:['ignore','pipe','pipe'],timeout:60000}));
+      const s=JSON.parse(execFileSync('gcloud',['run','services','describe',row.service,'--region',row.region,
+        '--project',g.SITE,'--format=json'],{encoding:'utf8',stdio:['ignore','pipe','pipe'],timeout:60000}));
+      const active=(s.status?.traffic||s.traffic||[]).filter(x=>Number(x.percent)>0);
+      assert.equal(f.serviceConfig?.revision,row.currentRevision,'COMPOSITE_EFFECTIVE_FUNCTION_REVISION_DRIFT');
+      assert.equal(String(f.serviceConfig?.service||'').split('/').at(-1),row.service,'COMPOSITE_BACKEND_SERVICE_DRIFT');
+      assert.ok(['ACTIVE','READY'].includes(String(f.state||'').toUpperCase()),'COMPOSITE_BACKEND_NOT_READY');
+      assert.equal(active.length,1);assert.equal(Number(active[0].percent),100);
+      assert.equal(String(active[0].revisionName||active[0].revision),row.currentRevision,'COMPOSITE_EFFECTIVE_TRAFFIC_DRIFT');
+    }
+  }
+  async function verifyCommitted(j){
+    const h=remote(),read={readFileSync:p=>git('show',h+':'+p)+'\n'};
+    assert.equal(j.phase,'COMMITTED');assert.deepEqual(j.liveProof,proof);
+    physicalGuard(jsonAt(h,P.cp),jsonAt(h,P.state),jsonAt(h,P.transport),read);
+    await signed(j.receipt.commit);assert.equal(await provider.current('live'),request.target.hostingVersion);
+    verifyBackend();
+  }
+  fs.writeFileSync(path.join(process.env.RUNNER_TEMP,'gi-i66-composite-acceptance-attempt.json'),serial({generation,
+    key:require('./gravicentra-i66-frontend-promotion-transaction.cjs').digest(request),runId,sourceSha:candidate.sourceSha}));
+  if(already){assert.ok(existing,'COMPOSITE_COMMITTED_JOURNAL_MISSING');await verifyCommitted(existing);return;}
+  const io={
+    readJournal:async()=>optional(remote(),jp),
+    readControl:async()=>{const h=remote(),tr=validateCurrent(h);
+      assert.equal(nextCompositeGeneration(tr.frontendReleaseSequence,n=>optional(h,genName(n,'JOURNAL'))),generation,'COMPOSITE_GENERATION_CAS');
+      return {generation:generation-1,
+      physical:request.previous,receiptBlob:request.previousReceiptBlob,guardBlob:blobAt(h,P.guard),
+      consumed:tr.consumedFrontendAuthorities||[],authorization:tr};},
+    validateProofs:async()=>{
+      validateCurrent(remote());
+      const [build,artifact,qa,qaArtifact,current]=await Promise.all([
+        github('actions/runs/'+candidate.buildRunId),github('actions/artifacts/'+candidate.artifactId),
+        github('actions/runs/'+candidate.previewQa.runId),github('actions/artifacts/'+candidate.previewQa.receiptArtifactId),
+        github('actions/runs/'+runId)]);
+      g.validateArtifact(candidate,build,artifact);g.validatePreviewQa(candidate,qa,qaArtifact);
+      assert.equal(current.head_sha,proof.headSha);assert.equal(current.head_branch,branch);
+      assert.equal(current.path,'.github/workflows/gravicentra-i66-privileged-role-exact-live-promotion.yml');
+      assert.ok(current.status==='in_progress'||(current.status==='completed'&&current.conclusion==='success'),'COMPOSITE_LIVE_RUN_NOT_EXECUTING');
+      verifyBackend();
+    },
+    verifyLive:provider.live,verifyPreview:provider.preview,currentVersion:()=>provider.current('live'),
+    cas:async(old,next)=>{for(let attempt=0;attempt<3;attempt++){
+      const h=remote();validateCurrent(h);const stored=optional(h,jp);
+      if(stored&&JSON.stringify(stored)===JSON.stringify(next))return stored;
+      assert.deepEqual(stored,old,'RELEASE_PHASE_CAS');
+      try{await casCommit(h,'release(i66): VERIFIED executed composite generation '+generation,{[jp]:next});return next;}
+      catch(e){if(attempt===2||!String(e.message).includes('HEAD_CAS_FAILED'))throw e;}
+    }},
+    assertOwnership:async j=>{const h=remote();validateCurrent(h);assert.deepEqual(optional(h,jp),j,'RELEASE_OWNER_LOST');},
+    signedReceipt:async j=>{
+      const proposed=compositeReceipt(j,runId),h=remote();validateCurrent(h);
+      const stored=optional(h,rp);let commit;
+      if(stored){assert.deepEqual(stored,proposed,'COMPOSITE_EXISTING_RECEIPT_DRIFT');commit=git('log','-1','--format=%H',h,'--',rp);}
+      else{assert.deepEqual(optional(h,jp),j);commit=await casCommit(h,'release(i66): sign four-function composite LIVE receipt '+generation,
+        {[rp]:proposed,[proofPath]:proof});}
+      await signed(commit);const fresh=remote();assert.equal(blobAt(fresh,rp),blob(serial(proposed)));
+      assert.equal(blobAt(fresh,proofPath),blob(serial(proof)));
+      return {blob:blobAt(fresh,rp),commit,verified:true,runId};
+    },
+    commitAll:async(j,next)=>{for(let attempt=0;attempt<3;attempt++){
+      const h=remote();validateCurrent(h);assert.deepEqual(optional(h,jp),j);
+      const changes=closeCompositeFiles(p=>jsonAt(h,p),j,next);
+      const read={readFileSync:p=>Object.hasOwn(changes,p)?serial(changes[p]):git('show',h+':'+p)+'\n'};
+      physicalGuard(changes[P.cp],changes[P.state],changes[P.transport],read);
+      verifyProspectiveChanges(h,changes);
+      assert.equal(await provider.current('live'),request.target.hostingVersion,'PHYSICAL_DRIFT_DURING_METADATA_GUARD');
+      verifyBackend();
+      try{await casCommit(h,'release(i66): COMMITTED same-artifact composite, backend rollback and synchronized execution',changes);return next;}
+      catch(e){if(attempt===2||!String(e.message).includes('HEAD_CAS_FAILED'))throw e;}
+    }},verifyCommitted
+  };
+  const result=await acceptComposite(io,request,proof);await verifyCommitted(result);
+  console.log('I66_COMPOSITE_FINAL_PHASE='+result.phase+' GENERATION='+generation+' BACKEND_FUNCTIONS=4');
+}
+async function recordCompositeRollback(){
+  assert.equal(process.env.GITHUB_REPOSITORY,repository);assert.equal(process.env.GITHUB_REF_NAME,branch);
+  const file=path.join(process.env.RUNNER_TEMP,'gi-i66-composite-acceptance-attempt.json');
+  if(!fs.existsSync(file))return;
+  const attempt=JSON.parse(fs.readFileSync(file,'utf8')),jp=genName(attempt.generation,'JOURNAL'),h=remote(),j=optional(h,jp);
+  if(!j)return;
+  assert.equal(attempt.runId,runId);assert.equal(j.key,attempt.key);assert.equal(j.phase,'VERIFIED','COMPOSITE_ROLLBACK_CANNOT_REWRITE_ACCEPTANCE');
+  assert.equal(j.liveProof.sourceSha,attempt.sourceSha);assert.equal(j.liveProof.runId,runId);
+  const {GoogleAuth}=require('google-auth-library');
+  const auth=await new GoogleAuth({scopes:['https://www.googleapis.com/auth/firebase.hosting']}).getClient();
+  const provider=hosting(auth,github),physical=await provider.live(j.request.previous);
+  require('./gravicentra-i66-frontend-promotion-transaction.cjs').verifyBytes(j.request.previous,physical);
+  const backend=[];
+  for(const row of j.liveProof.backendRevisions){
+    const s=JSON.parse(execFileSync('gcloud',['run','services','describe',row.service,'--region',row.region,
+      '--project','ays-orbit-360-lab','--format=json'],{encoding:'utf8',stdio:['ignore','pipe','pipe'],timeout:60000}));
+    const active=(s.status?.traffic||s.traffic||[]).filter(x=>Number(x.percent)>0);
+    assert.equal(active.length,1);assert.equal(Number(active[0].percent),100);
+    assert.equal(String(active[0].revisionName||active[0].revision),row.previousRevision,'COMPOSITE_ROLLBACK_REVISION_NOT_RESTORED');
+    backend.push({name:row.name,region:row.region,revision:row.previousRevision,trafficPercent:100});
+  }
+  const fresh=remote();assert.deepEqual(optional(fresh,jp),j,'COMPOSITE_ROLLBACK_JOURNAL_CAS');
+  assert.equal(jsonAt(fresh,P.transport).currentPhysicalHostingRelease.sourceSha,j.request.previous.sourceSha);
+  await casCommit(fresh,'release(i66): record verified composite compensation without advancing physical control',
+    {[jp]:{...j,phase:'ROLLED_BACK',rollback:{physical,backend,verified:true,runId}}});
+  console.log('I66_COMPOSITE_COMPENSATION_RECORDED_GENERATION='+attempt.generation);
+}
+if(require.main===module){
+  const action=process.argv[2];
+  const execution=action==='--accept-composite-live'?runCompositeAcceptance():
+    action==='--authorize-composite-rollback'?authorizeCompositeRollback():action==='--record-composite-rollback'?recordCompositeRollback():
+    action===undefined?run():Promise.reject(Error('RELEASE_OWNER_UNKNOWN_OPERATION'));
+  execution.catch(e=>{console.error('I66_FRONTEND_PROMOTION_HOLD '+String(e.message).split('\n')[0].slice(0,150));process.exitCode=1;});
+}
+module.exports={nextCompositeGeneration,assertCompositeRollbackAllowed};

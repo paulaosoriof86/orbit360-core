@@ -1,0 +1,46 @@
+{
+  "schema": "GI_I66_EXECUTION_SYNCHRONIZATION_CAUSAL_CORRECTION_V1",
+  "recordType": "APPEND_ONLY_CAUSAL_EVIDENCE_NOT_LIVE_ACCEPTANCE",
+  "dateLocal": "2026-11-23",
+  "gate": "I6.6",
+  "observedHead": "584875267070e909da571b7e257b6d0a3653896e",
+  "historicalEvidencePreserved": true,
+  "oldCursor": {
+    "path": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_EXECUTION_PROGRESS_20261122_R9.json",
+    "blobSha": "9fed80a8ccd107e6c89444e3dbe4aa5c18a3d334"
+  },
+  "correctedClaims": [
+    {
+      "historicalReceipt": "I6_6_20261123_OPS_FOUR_FUNCTION_PREVIEW_CARLOS_QA_AND_MAKE_R15.json",
+      "claim": "FOUR_FUNCTION_PREVIEW_DEPLOY_AND_INVENTORY_PASS",
+      "actualRun": 45259132272,
+      "actualJob": 137988910717,
+      "actualDeployedFunctionCount": 3,
+      "signedUiFailure": "DIRECTION_LEGAL_PREVIEW_GATE_NOT_ACTIVE",
+      "correction": "Three observed targets and a failed signed gate do not certify the required four-function candidate; historical receipt remains unmodified."
+    },
+    {
+      "run": 45266197734,
+      "failure": "VERSION_ASSERTION_11_NE_10",
+      "correction": "Monotonic request transition, not a fixed request number, is the invariant."
+    },
+    {
+      "run": 45266197849,
+      "failure": "I66_OPERATIONAL_SOURCE_OR_QA_OWNER_DRIFT",
+      "correction": "Freeze all product, legal and release QA owners before the next immutable build."
+    },
+    {
+      "run": 45266198021,
+      "status": "EXACT_LIVE_JOB_SKIPPED",
+      "correction": "Green phase/noop is not publication."
+    }
+  ],
+  "implementation": [
+    "Use candidateForPhase for the same scoped four-function candidate in deploy, inventory and QA.",
+    "Require exact four target names and correct regions; no fallback when authority is absent.",
+    "Atomically close the already-executed composite release through existing promotion owner and update CP/state/ledger/transport/cursor.",
+    "Require cursor execution snapshot to equal actual transport request/candidate; stale execution summaries fail the guard."
+  ],
+  "liveReleaseChangedByThisReceipt": false,
+  "fullI66ProductionAccepted": false
+}

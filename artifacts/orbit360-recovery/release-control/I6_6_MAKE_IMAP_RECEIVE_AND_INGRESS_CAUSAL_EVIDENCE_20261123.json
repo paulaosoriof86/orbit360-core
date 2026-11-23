@@ -1,0 +1,197 @@
+{
+  "schema": "GRAVICENTRA_I66_MAKE_IMAP_RECEIVE_AND_INGRESS_CAUSAL_EVIDENCE_V1",
+  "recordType": "APPEND_ONLY_EXECUTION_EVIDENCE_NOT_PRODUCT_OR_RELEASE_ACCEPTANCE",
+  "gate": "I6.6",
+  "dateGuatemala": "2026-11-23",
+  "recordedAtUtc": "2026-11-23T21:38:06Z",
+  "repo": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "inspectedSourceSha": "8a98274064f5c442cf28130847f49e347a568d82",
+  "authority": {
+    "ownerDecisionPath": "artifacts/orbit360-recovery/release-control/I6_6_OWNER_DECISIONS_GREENAPI_EMAIL_AND_PAYMENT_20261119.json",
+    "currentPlanPath": "artifacts/orbit360-recovery/release-control/I6_6_PLAN_CHOQUE_FUNCIONAL_FINANCIERO_20261122.md",
+    "previousEvidencePath": "artifacts/orbit360-recovery/release-control/I6_6_20261123_OPS_FOUR_FUNCTION_PREVIEW_CARLOS_QA_AND_MAKE_R15.json"
+  },
+  "imap": {
+    "status": "REAL_PROVIDER_RECEIVE_METADATA_PASS_NO_ERP_EMAIL_INGEST",
+    "scenarioId": 10221181,
+    "scenarioUrl": "https://eu2.make.com/1975919/scenarios/10221181",
+    "scenarioName": "Gravicentra Insurance · correo HostDime piloto · recepción bajo demanda",
+    "teamId": 1975919,
+    "lastEdit": "2026-11-23T21:46:19.933Z",
+    "isActive": true,
+    "triggerKind": "on-demand",
+    "recurringSchedule": false,
+    "connectionId": 14756803,
+    "mailbox": "finanzasyadmin@aysseguros.com",
+    "mailboxScope": "OWNER_AUTHORIZED_PER_USER_PILOT_ONLY_NOT_GLOBAL_TENANT_MAILBOX",
+    "folderDiscovery": "SUCCESS_INBOX_AND_SEVEN_SUBFOLDERS",
+    "config": {
+      "folder": "INBOX",
+      "markSeen": false,
+      "searchType": "simple",
+      "criteria": "ALL",
+      "since": "2026-11-23",
+      "before": "2026-11-24",
+      "maxResults": 1,
+      "continueWhenNoRes": true
+    },
+    "execution": {
+      "id": "3cde1527cb824947a38123ddee794674",
+      "status": "success",
+      "startedAt": "2026-11-23T21:38:02.454Z",
+      "durationMs": 3298,
+      "operations": 1,
+      "credits": 1,
+      "modules": [
+        {
+          "id": 1,
+          "name": "scenario-service: StartSubscenario",
+          "invocations": 1,
+          "errors": 0
+        },
+        {
+          "id": 2,
+          "name": "email: ActionGetEmails",
+          "invocations": 1,
+          "errors": 0
+        },
+        {
+          "id": 3,
+          "name": "scenario-service: ReturnData",
+          "invocations": 1,
+          "errors": 0
+        }
+      ]
+    },
+    "readback": {
+      "messageCount": 1,
+      "messageUid": 333332,
+      "messageIdPresent": true,
+      "messageDate": "2026-11-23T09:50:43.000Z",
+      "firstReferencePresent": false,
+      "inReplyToPresent": false,
+      "attachmentCountLowerBound": 1,
+      "firstAttachmentContentType": "text/csv",
+      "firstAttachmentBytes": 19408
+    },
+    "evidenceContainsMailBody": false,
+    "evidenceContainsAttachmentBinary": false,
+    "sendOperations": 0,
+    "erpWrites": 0,
+    "providerReadFlagWrites": 0,
+    "smtpPilotConnectionAvailable": false,
+    "smtpReadbackBasis": "email:ActionSendEmail module_spec only listed Google Restricted connection13018098; no HostDime SMTP. Other mailbox was not substituted.",
+    "fullEmailModuleCertified": false,
+    "controlledAttachmentRecovery": {
+      "executionId": "80f85ce3960c467e8d1252bd14c0df82",
+      "status": "SUCCESS_EXACT_UID_AND_FILENAME_FILTERED_RECEIVE_ONLY",
+      "messageUid": 333332,
+      "sameMessageIdAsOriginalReceive": true,
+      "sameMessageDateAsOriginalReceive": true,
+      "filename": "Pendientesconbitacora003288.csv",
+      "fetchedBytes": 19404,
+      "sha256": "cbb28553d601c16e5f206ca92e0c8e1ba04696479f97d1b9867faafd27416a11",
+      "initialMetadataBytes": 19408,
+      "secondReadMetadataAndDecodedBytes": 19404,
+      "fourByteMetadataDifferenceReason": "UNDETERMINED_NOT_CLAIMED_IDENTICAL_TO_UNREAD_ORIGINAL_MIME",
+      "bodyExported": false,
+      "readFlagChanged": false,
+      "readerMetadataOnlyConfigurationRestored": true,
+      "restoredAtUtc": "2026-11-23T21:46:19.933Z",
+      "headerIndicates": "CLAIMS_AND_CLAIM_ACTIVITY_FIELDS_NOT_AUTOMATICALLY_PAYMENT_SOURCE",
+      "financialOrOperationalWrites": 0,
+      "sourceHeaders": {
+        "senderDomain": "elroble.com.gt",
+        "subject": "Reporte de Siniestros Pendientesconbitacora Agente 003288"
+      },
+      "verificationReread": {
+        "executionId": "e5a0baa517b447f2928cbbe02881adf0",
+        "status": "success",
+        "sameUid": true,
+        "sameMessageId": true,
+        "sameDate": true,
+        "sameFilename": true,
+        "bytes": 19406,
+        "sha256": "ab5a5af77b73154aa5c2d39c1aaa0f961a8183653a057095f8167153ecd34972",
+        "byteDifference": "two-byte insertion at offset11765 compared with19404-byte first recovered file",
+        "sourceByteStability": "NOT_ESTABLISHED_DO_NOT_APPLY_FROM_THIS_RECEIPT",
+        "semanticComparisonByFinanceLane": {
+          "all77RowsEqualAfterWhitespaceNormalization": true,
+          "difference": "two spaces appended to RESERV field in data row47",
+          "semanticSha256": "3a65c5600fb7a4535a08aa97a342e6fb3ea2627905ed9817e395d910a78216ca",
+          "physicalRows": 77,
+          "exactUniqueRows": 66,
+          "duplicateRows": 11,
+          "distinctClaims": 4,
+          "financialObligations": 0,
+          "rawMimeByteExactnessNotClaimed": true
+        }
+      }
+    }
+  },
+  "whatsApp": {
+    "readerScenarioId": 10196136,
+    "readerState": "ACTIVE_READ_ONLY",
+    "readerLastEdit": "2026-11-23T19:54:17.962Z",
+    "connectionId": 14749710,
+    "connectionHealth": "ok",
+    "inspectedHistory": {
+      "from": "2026-11-23T19:54:18Z",
+      "toLastRun": "2026-11-23T21:29:53.962Z",
+      "runs": 20,
+      "successfulRuns": 20
+    },
+    "detailSample": {
+      "executionId": "f290087c67b8400b9b14febe42fc696b",
+      "moduleId": 2,
+      "invocations": 6,
+      "errors": 0,
+      "fullyDecodedPackets": 5,
+      "truncatedPackets": 1,
+      "nonTruncatedAdAttributedPackets": 0
+    },
+    "sampleAbsenceNotProofOfNoHistoricalAds": true,
+    "qaWebhookScenarioId": 10195867,
+    "qaWebhookState": "INACTIVE_TRIGGER_ONLY",
+    "writerImplemented": false,
+    "realLeadWrites": 0,
+    "privateChatsImported": 0,
+    "sourceAttributionRequired": [
+      "sourceType=ad",
+      "sourceId"
+    ],
+    "ctwaClidOptional": true
+  },
+  "rootCauses": [
+    {
+      "id": "MAKE_CANONICAL_INGRESS_ABSENT",
+      "proof": "Current Make reader has only LastIncomingMessages and getMessage; isolated webhook only CustomWebHook. Current product owner accepts signed Firebase member only; no ingress auth adapter is implemented.",
+      "owner": "functions/product-ops-leads-domain.js",
+      "ownerBlobSha": "b7921ca88343ced65bdad4cd9de26fa120647083",
+      "notFixedBy": "repeating OAuth or activating reader"
+    },
+    {
+      "id": "MAKE_FIRESTORE_OAUTH_NOT_PRODUCT_MEMBER",
+      "proof": "Existing authorized connection14756714 grants datastore/devstorage/firebase readonly scopes, not a Firebase Auth member token for orbit360OpsLeadsCommand. Raw canonical negocio writes would bypass domain validation and are forbidden."
+    },
+    {
+      "id": "MAIL_SERVER_OWNER_ABSENT",
+      "proof": "core/correo.js currently persists a browser configuration flag and uses Orbit.store('correos'); no provider backend owner, tenant/user mailbox isolation or SMTP receipt path is implemented."
+    },
+    {
+      "id": "EXECUTION_CURSOR_STALE",
+      "proof": "CONTROL_PLANE.i66ActiveRecoveryCursor points to22NovR9 while23NovR13/R14/R15 exist. R9 Make state says inactive although current reader active. Actual writes/tests must replace stale next-action guidance through audited canonical update, without falsely closing objective."
+    }
+  ],
+  "nextExecution": [
+    "Preserve current six-path publication candidate; do not append an untested ingress to its certified artifact.",
+    "Implement bounded inbound normalization and authentication inside the canonical Ops/Leads owner, reuse its transaction, workflow request idempotency and post-commit notification outbox; add exact tenant/country/integration membership mapping and provenance source proof.",
+    "Configure Make to invoke that authenticated owner with sourceType=ad,sourceId,provider message ID and phone dedupe only after signed Preview synthetic reject/replay/readback tests. Never use direct canonical Firestore writes.",
+    "For email, implement a per-user provider adapter and server owner for correos/thread associations; require Message-ID/References dedupe, effective role/country permissions and two-user isolation. Reuse the now-proven IMAP pilot rather than requesting the same credential again.",
+    "Provider SMTP credential remains absent for pilot; no outgoing mail is authorized or sent by this evidence."
+  ],
+  "sourceCodeChanged": false,
+  "liveDeployment": false,
+  "fullI66ProductionAccepted": false
+}

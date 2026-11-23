@@ -1,6 +1,8 @@
 import fs from 'node:fs';
 import {spawnSync} from 'node:child_process';
 import crypto from 'node:crypto';
+import assert from 'node:assert/strict';
+import frontendControl from './gravicentra-i66-frontend-control.cjs';
 import operationalRelease from './gravicentra-i6-6-operational-release-candidate.cjs';
 
 const allowedModes=new Set(['governance','i2','i3','i4a','i4b','i5','i6','certified']);
@@ -51,6 +53,11 @@ if(i66Active&&control.i66ActiveRecoveryCursor){
       throw Error('I66_PROGRESS_CURSOR_BLOB_DRIFT:'+String(path));
   }
   const p=JSON.parse(fs.readFileSync(c.currentEvidencePath,'utf8'));
+  if(c.executionSynchronizationVersion===1){
+    const executionTransport=JSON.parse(fs.readFileSync(frontendControl.P.transport,'utf8'));
+    assert.deepEqual(p.executionSynchronization,frontendControl.executionSnapshot(executionTransport),
+      'I66_PROGRESS_EXECUTION_SYNCHRONIZATION_DRIFT');
+  }
   if(p.recordType!=='SUBORDINATE_APPEND_ONLY_EXECUTION_RECEIPT_NOT_RELEASE_GATE_AUTHORITY'||
       p.activeGate!=='I6.6'||p.frozenPlan.path!==c.frozenPlanPath||
       p.fullFindings.path!==c.fullInventoryPath||

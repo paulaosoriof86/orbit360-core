@@ -8,6 +8,28 @@ const {P,genName,physicalGuard,blob}=owner;
 const read=p=>JSON.parse(fs.readFileSync(p,'utf8'));
 const serial=value=>JSON.stringify(value,null,2)+'\n';
 
+test('execution snapshot tracks request, scoped Preview and operational candidate without mutable aliases',()=>{
+  const transport={status:'PREVIEW_AUTHORIZED',frontendPreviewRequest:{version:12,sourceQaHead:'source-a',sourceQaRunId:101,guardRunId:102},
+    scopedBackendPreviewI66:{sourceSha:'source-a',artifactDigest:'digest-a'},
+    operationalReleaseCandidate:{status:'LIVE_AUTHORIZED',sourceSha:'source-a',artifactDigest:'digest-a',previewQa:{runId:103}}};
+  const snapshot=owner.executionSnapshot(transport);
+  assert.deepEqual(snapshot,{transportStatus:'PREVIEW_AUTHORIZED',previewRequest:{version:12,sourceQaHead:'source-a',sourceQaRunId:101,guardRunId:102},
+    scopedPreview:{sourceSha:'source-a',artifactDigest:'digest-a'},
+    operationalCandidate:{status:'LIVE_AUTHORIZED',sourceSha:'source-a',artifactDigest:'digest-a',previewQaRunId:103}});
+  for(const mutate of [t=>t.status='LOCKED',t=>t.frontendPreviewRequest.version++,t=>t.frontendPreviewRequest.sourceQaHead='source-b',
+    t=>t.frontendPreviewRequest.sourceQaRunId++,t=>t.frontendPreviewRequest.guardRunId++,t=>t.scopedBackendPreviewI66.sourceSha='source-b',
+    t=>t.scopedBackendPreviewI66.artifactDigest='digest-b',t=>t.operationalReleaseCandidate.status='CONSUMED',
+    t=>t.operationalReleaseCandidate.sourceSha='source-b',t=>t.operationalReleaseCandidate.artifactDigest='digest-b',
+    t=>t.operationalReleaseCandidate.previewQa.runId++]){
+    const changed=structuredClone(transport);mutate(changed);assert.notDeepEqual(owner.executionSnapshot(changed),snapshot);
+  }
+  transport.frontendPreviewRequest.version++;transport.scopedBackendPreviewI66.sourceSha='later';
+  transport.operationalReleaseCandidate.previewQa.runId++;
+  assert.equal(snapshot.previewRequest.version,12);assert.equal(snapshot.scopedPreview.sourceSha,'source-a');
+  assert.equal(snapshot.operationalCandidate.previewQaRunId,103);
+  assert.deepEqual(owner.executionSnapshot({status:'LOCKED'}),{transportStatus:'LOCKED',previewRequest:null,scopedPreview:null,operationalCandidate:null});
+});
+
 function model(){
   const cp=read(P.cp),state=read(P.state),transport=read(P.transport);
   const head=cp.i66FrontendReleaseHead,receipt=read(head.receiptPath);
@@ -26,12 +48,13 @@ function model(){
 test('the checked-out physical receipt agrees with the active control, ledger and transport',()=>{
   physicalGuard(read(P.cp),read(P.state),read(P.transport),fs);
 });
-test('a successor can change the file count without a historical acceptance key',()=>{
+test('frontend file counts remain versioned and composite counts remain tied to their signed proof',()=>{
   const f=model(),count=f.receipt.target.files+1;
   f.receipt.target.files=f.journal.request.target.files=f.receipt.preview.files=count;
   f.receipt.physical.custom=f.receipt.physical.firebase=f.head.hostedFilesEachOrigin=f.transport.currentPhysicalHostingRelease.readbackEachOrigin=count;
   delete f.cp[candidate.ACCEPTANCE_KEY];
-  assert.equal(f.verify().sourceSha,f.head.sourceSha);
+  if(f.receipt.scope==='COMPOSITE')assert.throws(f.verify,/COMPOSITE_FILE_COUNT/);
+  else assert.equal(f.verify().sourceSha,f.head.sourceSha);
 });
 for(const [field,mutate] of [
   ['control count',f=>f.head.hostedFilesEachOrigin++],

@@ -13,7 +13,7 @@ function releaseBinding(release) {
 }
 function validateRequest(request,control) {
   assert.equal(request.schema,'GI_I66_FRONTEND_PROMOTION_V1');
-  assert.equal(request.gate,'I6.6');assert.equal(request.scope,'FRONTEND_ONLY');
+  assert.equal(request.gate,'I6.6');assert.ok(['FRONTEND_ONLY','COMPOSITE'].includes(request.scope),'RELEASE_SCOPE_UNKNOWN');
   assert.equal(request.generation,(control.generation||0)+1,'RELEASE_GENERATION_CAS');
   assert.ok(gitSha(request.approvalBlob)&&gitSha(request.guardBlob),'RELEASE_AUTHORITY_MISSING');
   assert.equal(request.guardBlob,control.guardBlob,'RELEASE_STALE_GUARD');
@@ -34,6 +34,7 @@ function verifyBytes(binding,proof) {
   assert.ok(artDigest(proof.manifestDigest),'RELEASE_READBACK_MANIFEST');
 }
 async function promote(io,request) {
+  assert.equal(request.scope,'FRONTEND_ONLY','COMPOSITE_MUST_CONSUME_EXECUTED_LIVE_PROOF');
   const key=digest(request);let j=await io.readJournal(request.generation);
   if(j){
     assert.equal(j.key,key,'RELEASE_DIFFERENT_AUTHORITY_AT_GENERATION');
@@ -96,4 +97,59 @@ async function promote(io,request) {
     throw error;
   }
 }
-module.exports={promote,validateRequest,verifyBytes,releaseBinding,digest};
+function validateCompositeProof(request,proof){
+  assert.equal(request.scope,'COMPOSITE','COMPOSITE_SCOPE_REQUIRED');
+  const g=require('./gravicentra-i6-6-operational-release-candidate.cjs'),p=request.candidate;
+  assert.equal(p?.opsLeadsComposite,true,'COMPOSITE_FOUR_FUNCTION_CANDIDATE_REQUIRED');
+  g.validateLiveProof(p,proof);
+  assert.equal(proof.backendRevisions.length,4,'COMPOSITE_FOUR_EFFECTIVE_REVISIONS_REQUIRED');
+  for(const key of ['sourceSha','artifactId','artifactDigest','buildId','buildRunId'])
+    assert.equal(request.target[key],p[key],'COMPOSITE_TARGET_IDENTITY_'+key);
+  assert.equal(request.target.previewUrl,p.previewUrl,'COMPOSITE_PREVIEW_ORIGIN');
+  assert.equal(request.target.previewChannel,p.previewChannelId,'COMPOSITE_PREVIEW_CHANNEL');
+  assert.equal(request.target.hostingVersion,proof.liveHostingVersion,'COMPOSITE_PHYSICAL_VERSION');
+  assert.equal(request.target.files,p.expectedSiteFileCount,'COMPOSITE_FILE_COUNT');
+  for(const key of ['sourceSha','artifactId','artifactDigest','buildId','buildRunId','hostingVersion'])
+    assert.equal(request.previous[key],p.currentLive[key],'COMPOSITE_PREDECESSOR_'+key);
+  return proof;
+}
+// Acceptance of an already executed, signed composite release. Deployment and
+// compensation remain owned by the exact LIVE workflow; this path never clones
+// Hosting or fabricates a frontend-only promotion history.
+async function acceptComposite(io,request,proof){
+  validateCompositeProof(request,proof);
+  const key=digest(request);let j=await io.readJournal(request.generation);
+  if(j){
+    assert.equal(j.key,key,'RELEASE_DIFFERENT_AUTHORITY_AT_GENERATION');
+    if(j.phase==='COMMITTED'){await io.verifyCommitted(j);return j;}
+    assert.equal(j.phase,'VERIFIED','COMPOSITE_ACCEPTANCE_NOT_RESUMABLE');
+    assert.equal(j.operation,'ACCEPT_EXECUTED_COMPOSITE_LIVE');
+    assert.deepEqual(j.liveProof,proof,'COMPOSITE_RESUME_PROOF_DRIFT');
+  }
+  try{
+    const control=await io.readControl();validateRequest(request,control);
+    const g=require('./gravicentra-i6-6-operational-release-candidate.cjs');
+    assert.deepEqual(g.candidateForPhase(control.authorization,'live'),request.candidate,'COMPOSITE_LIVE_AUTHORIZATION_DRIFT');
+    await io.validateProofs(request,proof);
+    const [preview,physical]=await Promise.all([io.verifyPreview(request.target),io.verifyLive(request.target)]);
+    verifyBytes(request.target,physical);
+    assert.equal(preview.files,request.target.files,'RELEASE_PREVIEW_FILE_COUNT');
+    assert.equal(preview.artifactDigest,request.target.artifactDigest,'RELEASE_PREVIEW_DIGEST');
+    assert.equal(preview.hostingVersion,request.target.hostingVersion,'RELEASE_PREVIEW_VERSION');
+    assert.equal(await io.currentVersion(),request.target.hostingVersion,'COMPOSITE_LIVE_CHANGED_BEFORE_ACCEPTANCE');
+    if(!j)j=await io.cas(null,{phase:'VERIFIED',operation:'ACCEPT_EXECUTED_COMPOSITE_LIVE',key,
+      generation:request.generation,request,preview,physical,liveProof:proof});
+    await io.assertOwnership(j);
+    const receipt=await io.signedReceipt(j);
+    assert.ok(receipt.verified&&gitSha(receipt.blob)&&gitSha(receipt.commit),'RELEASE_SIGNED_RECEIPT_ABSENT');
+    assert.equal(await io.currentVersion(),request.target.hostingVersion,'COMPOSITE_LIVE_CHANGED_BEFORE_COMMIT');
+    return await io.commitAll(j,{...j,phase:'COMMITTED',receipt});
+  }catch(error){
+    // A lost acknowledgement after the atomic commit must never ask the outer
+    // workflow to roll back an already accepted physical release.
+    const actual=await io.readJournal(request.generation);
+    if(actual?.phase==='COMMITTED'&&actual.key===key){await io.verifyCommitted(actual);return actual;}
+    throw error;
+  }
+}
+module.exports={promote,acceptComposite,validateCompositeProof,validateRequest,verifyBytes,releaseBinding,digest};
