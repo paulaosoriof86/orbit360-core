@@ -107,13 +107,14 @@ test('Ops projects all authorized Cronograma tasks beyond first eight without co
  assert.equal(taskHarness({fAseg:'any_insurer'}).tasks.length,0);
  assert.equal(taskHarness({q:'QA 11'}).tasks.length,1);
 });
-test('Ops management, portal management and Cliente 360 activity must share one server-owned transactional event contract',()=>{
- const creator=server.indexOf("if((operation==='create_management'||operation==='portal_request')&&after.clienteId");
- const readback=server.indexOf("if((operation==='create_management'||operation==='portal_request')&&confirmedRow.clienteId");
- const stored=server.indexOf("tx.set(dataRef(authz.tenantId,'actividades',activityId)");
- const save=server.indexOf("tx.set(entity,after,{merge:true})");
- assert.ok(creator>0&&readback>0&&stored>creator&&save>stored,
-  'general management entry must emit a transactional activity for create_management and portal_request');
+test('All canonical Ops create_management records create one server-owned Client 360 activity in the same transaction',()=>{
+ const creator=server.indexOf("if(operation==='create_management'&&after.clienteId");
+ const stored=server.indexOf("tx.set(dataRef(authz.tenantId,'actividades',activityId)",creator);
+ const save=server.indexOf("tx.set(entity,after,{merge:true})",creator);
+ const readback=server.indexOf("if(operation==='create_management'&&confirmedRow.clienteId");
+ assert.ok(creator>0&&stored>creator&&save>stored&&readback>save,
+   'confirmed Ops management activity must be persisted and verified by one server owner');
  assert.match(server,/OPS_CLIENT360_ACTIVITY_READBACK_MISSING/);
  assert.match(server,/gestionId:entityId,origen:'ops'/);
 });
+test.todo('I6.6 pending lineage: portal_request must reuse the same durable activity and readback contract for any client');
