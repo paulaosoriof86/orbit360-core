@@ -63,3 +63,33 @@ test('preview and live transport require fourth callable and exact 224-byte-set 
  assert.match(transport,/operational\?\.expectedSiteFileCount\|\|223/);
  assert.match(live,/candidate.expectedSiteFileCount/);
 });
+test('scoped four-function Preview authority leaves production closed even during synthetic QA',()=>{
+ const {control,p}=candidate();
+ const old={...control,
+  status:'OPERATIONAL_EXACT_LIVE_ACCEPTED_LOCKED',
+  forbidBackendFunctionDeploy:true,backendFunctionPreviewOnly:false,
+  forbidBackendLiveFunctionDeploy:true,livePromotionAuthorized:false,
+  previewApproved:false,noHostingPromotion:true,operationalReleaseCandidate:undefined,
+  scopedBackendPreviewI66:{
+    schema:'GI_I66_SCOPED_BACKEND_PREVIEW_AUTHORIZATION_V1',
+    status:'APPROVED_FOUR_FUNCTION_PREVIEW_SYNTHETIC_ONLY',
+    approvedByDirection:true,noLiveOrFinancialWrites:true,noRulesAuthIamWrites:true,
+    sameImmutableArtifactOnly:true,sourceSha:p.sourceSha,artifactDigest:p.artifactDigest,
+    currentPhysicalLiveSourceSha:control.currentPhysicalHostingRelease.sourceSha,
+    currentPhysicalLiveArtifactDigest:control.currentPhysicalHostingRelease.artifactDigest,
+    candidate:p
+  }
+ };
+ assert.equal(g.candidateForPhase(old,'preview'),p);
+ assert.equal(old.status,'OPERATIONAL_EXACT_LIVE_ACCEPTED_LOCKED');
+ assert.equal(old.forbidBackendFunctionDeploy,true);
+ assert.equal(old.operationalReleaseCandidate,undefined);
+ assert.throws(()=>g.candidateForPhase(old,'live'),/I66_SCOPED_AUTHORIZATION_CANNOT_DEPLOY_LIVE/);
+ for(const change of [
+  v=>v.scopedBackendPreviewI66.approvedByDirection=false,
+  v=>v.scopedBackendPreviewI66.noLiveOrFinancialWrites=false,
+  v=>v.scopedBackendPreviewI66.artifactDigest='sha256:'+'0'.repeat(64),
+  v=>v.forbidBackendFunctionDeploy=false,
+  v=>v.livePromotionAuthorized=true
+ ]){const copy=clone(old);change(copy);assert.throws(()=>g.candidateForPhase(copy,'preview'))}
+});

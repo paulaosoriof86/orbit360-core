@@ -32,7 +32,15 @@ jobs:
           node - <<'NODE'
           const fs=require('node:fs');
           const c=JSON.parse(fs.readFileSync('artifacts/orbit360-recovery/release-control/I6_6_RELEASE_TRANSPORT_CONTROL_20261110.json','utf8'));
-          const authorized=c.status==='OPERATIONAL_BACKEND_PREVIEW_AUTHORIZED';
+          // Only the phase runner may consume this scoped Preview authority;
+          // global status, backend lock and LIVE permissions remain closed.
+          const g=require('./tools/gravicentra-i6-6-operational-release-candidate.cjs');
+          const authorized=c.status==='OPERATIONAL_BACKEND_PREVIEW_AUTHORIZED' ||
+            (c.scopedBackendPreviewI66 &&
+             c.status==='OPERATIONAL_EXACT_LIVE_ACCEPTED_LOCKED' &&
+             c.forbidBackendFunctionDeploy===true &&
+             c.livePromotionAuthorized===false &&
+             !!g.candidateForPhase(c,'preview'));
           fs.appendFileSync(process.env.GITHUB_OUTPUT,'authorized='+String(authorized)+'\n');
           console.log(authorized?'I66_OPERATIONAL_PREVIEW_PHASE_READY_FOR_STRICT_GATES':'I66_OPERATIONAL_PREVIEW_PHASE_NOOP');
           NODE

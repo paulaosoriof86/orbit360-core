@@ -185,6 +185,36 @@ function signedMatrixBinding(env,control) {
 }
 function candidateForPhase(control,phase) {
   assert.ok(['preview','live'].includes(phase),'I66_OPERATIONAL_PHASE_INVALID');
+  // Preview-only exception inside the existing I6.6 gate. The canonical
+  // production lock remains immutable while the scoped four-function QA
+  // validates this one exact signed, synthetic-only artifact. The temporary
+  // effective view never writes or replaces the physical control plane.
+  const scoped=control.scopedBackendPreviewI66;
+  if(scoped){
+    assert.equal(phase,'preview','I66_SCOPED_AUTHORIZATION_CANNOT_DEPLOY_LIVE');
+    assert.equal(control.status,'OPERATIONAL_EXACT_LIVE_ACCEPTED_LOCKED','I66_SCOPED_CANONICAL_PRODUCTION_LOCK_DRIFT');
+    for(const [key,value] of Object.entries({
+      forbidBackendFunctionDeploy:true,backendFunctionPreviewOnly:false,
+      forbidBackendLiveFunctionDeploy:true,forbidFirestoreRulesDataAuthWrites:true,
+      livePromotionAuthorized:false,previewApproved:false,noHostingPromotion:true
+    }))assert.equal(control[key],value,'I66_SCOPED_LOCK_'+key);
+    assert.equal(control.operationalReleaseCandidate,undefined,'I66_SCOPED_MUST_NOT_REOPEN_OLD_RELEASE');
+    assert.equal(scoped.schema,'GI_I66_SCOPED_BACKEND_PREVIEW_AUTHORIZATION_V1');
+    assert.equal(scoped.status,'APPROVED_FOUR_FUNCTION_PREVIEW_SYNTHETIC_ONLY');
+    assert.equal(scoped.approvedByDirection,true);
+    assert.equal(scoped.noLiveOrFinancialWrites,true);
+    assert.equal(scoped.noRulesAuthIamWrites,true);
+    assert.equal(scoped.sameImmutableArtifactOnly,true);
+    assert.equal(scoped.currentPhysicalLiveSourceSha,control.currentPhysicalHostingRelease?.sourceSha);
+    assert.equal(scoped.currentPhysicalLiveArtifactDigest,control.currentPhysicalHostingRelease?.artifactDigest);
+    assert.equal(scoped.candidate?.sourceSha,scoped.sourceSha);
+    assert.equal(scoped.candidate?.artifactDigest,scoped.artifactDigest);
+    assert.equal(scoped.candidate?.opsLeadsComposite,true);
+    control={...control,status:'OPERATIONAL_BACKEND_PREVIEW_AUTHORIZED',
+      forbidBackendFunctionDeploy:false,backendFunctionPreviewOnly:true,
+      forbidBackendLiveFunctionDeploy:true,livePromotionAuthorized:false,
+      previewApproved:false,noHostingPromotion:true,operationalReleaseCandidate:scoped.candidate};
+  }
   assert.equal(control.gate,'I6.6');
   assert.equal(control.historicalClosedGate,'B4-007');
   assert.equal(control.status,phase==='preview'?'OPERATIONAL_BACKEND_PREVIEW_AUTHORIZED':'OPERATIONAL_EXACT_LIVE_PROMOTION_AUTHORIZED');
