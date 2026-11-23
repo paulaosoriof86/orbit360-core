@@ -5,7 +5,7 @@ const file=fs.readFileSync('tools/gravicentra-i6-6-frontend-preview-authority.cj
 const control=JSON.parse(fs.readFileSync('artifacts/orbit360-recovery/release-control/I6_6_RELEASE_TRANSPORT_CONTROL_20261110.json','utf8'));
 const req=control.frontendPreviewRequest,sha=p=>execFileSync('git',['rev-parse','HEAD:'+p],{encoding:'utf8'}).trim();
 test('composite signed Preview requires exact backend owner and prohibits LIVE',()=>{
- assert.equal(req.version,9);
+ assert.equal(req.version,10);
  assert.equal(req.mode,'COMPOSITE_ARTIFACT_HOSTING_PREVIEW_ONLY');
  assert.equal(req.fourFunctionExactPreviewRequired,true);
  assert.deepEqual(req.backendPaths,['functions/product-ops-leads-domain.js']);

@@ -169,7 +169,10 @@ function signedMatrixBinding(env,control) {
     // Validate the complete canonical authorization independently of which of
     // those two exact origins this read-only invocation observes.
     const authorizationPhase=control?.status==='OPERATIONAL_EXACT_LIVE_PROMOTION_AUTHORIZED'?'live':
-      control?.status==='OPERATIONAL_BACKEND_PREVIEW_AUTHORIZED'?'preview':null;
+      control?.status==='OPERATIONAL_BACKEND_PREVIEW_AUTHORIZED'||
+      (control?.status==='OPERATIONAL_EXACT_LIVE_ACCEPTED_LOCKED'&&
+       control?.scopedBackendPreviewI66?.status==='APPROVED_FOUR_FUNCTION_PREVIEW_SYNTHETIC_ONLY')
+        ?'preview':null;
     assert.ok(authorizationPhase,'I66_SIGNED_MATRIX_CONTROL_PHASE_UNAUTHORIZED');
     const p=candidateForPhase(control,authorizationPhase),phase=origin===LIVE?'live':'preview';
     if(phase==='live')assert.equal(authorizationPhase,'live','I66_SIGNED_MATRIX_LIVE_ORIGIN_NOT_AUTHORIZED');
