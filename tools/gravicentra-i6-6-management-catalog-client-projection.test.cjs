@@ -43,7 +43,7 @@ test('catalog denial or missing readback never advertises success',async()=>{
 });
 test('new type must be saved before management insert; no silent session-only type',()=>{
   const save=ciclo.indexOf('await persistGestionType(tipo, lista);');
-  const insert=ciclo.indexOf('gestion = await crearGestionDurable');
+  const insert=ciclo.indexOf('let gestion = await crearGestionDurable');
   assert.ok(save>0&&save<insert);
   assert.match(ciclo,/await persistGestionType\(v\('gs-tipo'\), v\('gs-lista'\)\);/);
   assert.match(ciclo,/const saved=await Orbit\.cat\.saveDurable\(next,/);

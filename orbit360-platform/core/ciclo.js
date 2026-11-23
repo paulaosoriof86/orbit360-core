@@ -1309,7 +1309,7 @@ Orbit.ciclo = (function () {
       if (invalidLink) return U.toast('Los enlaces documentales deben iniciar con https://');
 
       const managementId = 'ges' + Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
-      let managementCommitted = false, gestion = null;
+      let managementCommitted = false, confirmedGestion = null;
       const linkedDocs = linkLines.map((url, i) => ({
         nombre: 'Documento Drive ' + (i + 1),
         driveUrl: url, externalUrl: url, origen: 'Drive/enlace',
@@ -1334,7 +1334,7 @@ Orbit.ciclo = (function () {
           opts.extraFields && typeof opts.extraFields === 'object' ? opts.extraFields : {},
           typeof opts.dynamicFields === 'function' ? (opts.dynamicFields({ clienteId, polizaId, tipo, lista, nota: noteValue }) || {}) : {}
         );
-        gestion = await crearGestionDurable(Object.assign({}, extra, {
+        let gestion = await crearGestionDurable(Object.assign({}, extra, {
           id: managementId,
           lista, tipo, titulo: opts.titulo || tipo, clienteId, polizaId,
           asesorId: el('mg-ase').value || cli.asesorId || '',
@@ -1350,6 +1350,7 @@ Orbit.ciclo = (function () {
           checklist
         }));
         // A successful durable create is not undone by optional Drive failure.
+        confirmedGestion = gestion;
         managementCommitted = true;
 
         const uploaded = [];
@@ -1423,7 +1424,7 @@ Orbit.ciclo = (function () {
           back.remove(); refresh();
           U.toast('Gestión creada y confirmada. Una operación posterior no se confirmó. No repitas la gestión; verifica los documentos en su ficha.');
           if (typeof opts.onCreated === 'function') {
-            try { opts.onCreated(savedGestion || gestion); } catch (callbackError) {}
+            try { opts.onCreated(savedGestion || confirmedGestion); } catch (callbackError) {}
           }
           if (opts.openAfterCreate !== false) openGestion(managementId);
           return;

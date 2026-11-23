@@ -2765,12 +2765,7 @@
       "tests": [
         {
           "path": "tools/gravicentra-i6-6-management-catalog-client-projection.test.cjs",
-          "gitBlobSha": "169ac84a0bc51ce6b8612370b120eebcf876c1a1",
-          "replaces": {
-            "path": "tools/gravicentra-i6-6-management-catalog-client-projection.test.cjs",
-            "priorGitBlobSha": "23d3ef170a8aa4ee0b62f19c389ada4b742e65c5",
-            "priorChangeId": "I6_6_OPS_CLIENT_MANAGEMENT_CATALOG_NOTIFICATIONS_20261118"
-          }
+          "gitBlobSha": "23d3ef170a8aa4ee0b62f19c389ada4b742e65c5"
         }
       ]
     },
@@ -2794,12 +2789,7 @@
       "tests": [
         {
           "path": "tools/gravicentra-i6-6-management-catalog-client-projection.test.cjs",
-          "gitBlobSha": "169ac84a0bc51ce6b8612370b120eebcf876c1a1",
-          "replaces": {
-            "path": "tools/gravicentra-i6-6-management-catalog-client-projection.test.cjs",
-            "priorGitBlobSha": "23d3ef170a8aa4ee0b62f19c389ada4b742e65c5",
-            "priorChangeId": "I6_6_OPS_INTERNAL_NOTICE_HUMAN_ACTOR_COMPAT_20261118"
-          }
+          "gitBlobSha": "23d3ef170a8aa4ee0b62f19c389ada4b742e65c5"
         }
       ]
     },
@@ -3897,11 +3887,11 @@
         "CLIENTE360_PRIMARY_RUNTIME",
         "CROSS_MODULE_RELATIONSHIPS"
       ],
-      "scope": "Catalog read errors no longer block built-in operational types; custom tenant type creation remains server-authorized. Ops management commits once with linked activity before optional Drive upload; failed attachments become pending, and post-commit errors cannot masquerade as failed creation. No shared rules, financial data, role grant or LIVE mutation. Postcommit failure callback reuses lexically bound management, preventing new ReferenceError during confirmed-write recovery.",
+      "scope": "Catalog read errors no longer block built-in operational types; custom tenant type creation remains server-authorized. Ops management commits once with linked activity before optional Drive upload; failed attachments become pending, and post-commit errors cannot masquerade as failed creation. No shared rules, financial data, role grant or LIVE mutation. Postcommit failure callback reuses lexically bound management, preventing new ReferenceError during confirmed-write recovery. Historical assertion for catalog-before-insert stays byte-identical; confirmed management reference remains in outer callback scope.",
       "paths": [
         {
           "path": "orbit360-platform/core/ciclo.js",
-          "gitBlobSha": "8943761126ff66a878405ca5dd9f560f7be1aa49",
+          "gitBlobSha": "ab4b5c0c35abcc2d815d50296f741bf319b0e42d",
           "replaces": {
             "path": "orbit360-platform/core/ciclo.js",
             "priorGitBlobSha": "acc82d42a4c01accf0d0a553eb6e20a54ea2d8ed",
@@ -3912,7 +3902,7 @@
       "tests": [
         {
           "path": "tools/gravicentra-i6-6-management-default-and-client-country.test.cjs",
-          "gitBlobSha": "efb08ea6128933b413c8bde38802bdaea87d4a66",
+          "gitBlobSha": "7e12f6fc64e90089f3d068583d44a1fadd45d969",
           "replaces": {
             "path": "tools/gravicentra-i6-6-management-default-and-client-country.test.cjs",
             "priorGitBlobSha": "97f722249010c79c07c103fa429ee317db0e5a04",
