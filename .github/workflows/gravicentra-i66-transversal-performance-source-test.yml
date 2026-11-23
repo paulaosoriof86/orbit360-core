@@ -4,6 +4,7 @@ on:
   push:
     branches: [recovery/fase-a-clean-20260831]
     paths:
+      - .github/workflows/gravicentra-i66-transversal-performance-source-test.yml
       - orbit360-platform/core/tenant-domain-config-client.js
       - orbit360-platform/core/access-scope.js
       - orbit360-platform/data/store-firestore-product-readonly-p0.js
