@@ -148,6 +148,8 @@ jobs:
         with:
           ref: ${{ github.sha }}
           persist-credentials: false
+      - name: Verify active generation against its physical receipt and file counts
+        run: node --test tools/gravicentra-i66-frontend-control.test.cjs
       - name: Probe DNS TLS HTTPS both LIVE origins and exact build, fail closed
         run: |
           python3 - <<'PY'
@@ -196,8 +198,11 @@ jobs:
             report['checks'].append(data)
           by={r['label']:r for r in report['checks']}
           signed=tr.get('latestSignedPhysicalFrontendLivePointer20261122',{})
-          signed_matches=(not latest.get('generation') or (isinstance(signed,dict) and signed.get('generation')==latest.get('generation') and signed.get('sourceSha')==expected and signed.get('artifactDigest')==latest.get('artifactDigest')))
-          control_ok=(bool(expected) and latest.get('hostedFilesEachOrigin')==224 and signed_matches and tr.get('currentPhysicalHostingRelease',{}).get('sourceSha')==expected and tr.get('currentPhysicalHostingRelease',{}).get('buildId')==expected_build)
+          physical=tr.get('currentPhysicalHostingRelease',{})
+          files=latest.get('hostedFilesEachOrigin')
+          signed_matches=(not latest.get('generation') or (signed==latest and tr.get('frontendReleaseSequence')==latest['generation']))
+          control_ok=(bool(expected) and type(files) is int and files>0 and physical.get('readbackEachOrigin')==files and signed_matches and physical.get('sourceSha')==expected and physical.get('buildId')==expected_build and physical.get('artifactDigest')==latest.get('artifactDigest'))
+          report['signedFilesEachOrigin']=files
           root_ok=all(by[n]['status']==200 for n in ('CUSTOM','FIREBASE'))
           markers_ok=all(by[n]['status']==200 and by[n]['sourceSha']==expected and by[n]['buildId']==expected_build for n in ('CUSTOM_MARKER','FIREBASE_MARKER'))
           report['result']='PASS' if control_ok and root_ok and markers_ok else 'HOLD'

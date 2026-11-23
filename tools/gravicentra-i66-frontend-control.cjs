@@ -11,6 +11,8 @@ const blob=body=>crypto.createHash('sha1').update('blob '+Buffer.byteLength(body
 const genName=(n,suffix)=>{assert.ok(Number.isSafeInteger(n)&&n>0);return dir+'I6_6_FRONTEND_E'+String(n).padStart(5,'0')+'_'+suffix+'.json';};
 function physicalGuard(control,state,transport,io){
   const head=control.i66FrontendReleaseHead;
+  assert.ok(head&&Number.isSafeInteger(head.generation)&&head.generation>0,'I66_VERSIONED_FRONTEND_HEAD_MISSING');
+  assert.equal(transport.frontendReleaseSequence,head.generation,'I66_TRANSPORT_GENERATION_DRIFT');
   assert.equal(control.currentExecutionDecisionPointer,'i66FrontendReleaseHead');
   assert.equal(state.currentExecutionDecisionPointer,P.cp+'#i66FrontendReleaseHead');
   assert.deepEqual(state.currentPhysicalFrontend,head);
@@ -24,11 +26,20 @@ function physicalGuard(control,state,transport,io){
   assert.deepEqual(receipt.target,journal.request.target);assert.deepEqual(receipt.previous,journal.request.previous);
   assert.equal(receipt.preview.artifactDigest,receipt.target.artifactDigest);assert.equal(receipt.ui.result,'PASS');
   require('./gravicentra-i66-frontend-promotion-transaction.cjs').verifyBytes(receipt.target,receipt.physical);
-  assert.equal(head.sourceSha,receipt.target.sourceSha);assert.equal(head.hostingVersion,receipt.target.hostingVersion);
-  assert.equal(head.artifactDigest,receipt.target.artifactDigest);assert.equal(head.buildId,receipt.target.buildId);
-  assert.equal(transport.currentPhysicalHostingRelease.liveHostingVersion,head.hostingVersion);
-  assert.equal(transport.currentPhysicalHostingRelease.sourceSha,head.sourceSha);
-  assert.equal(transport.currentPhysicalHostingRelease.artifactDigest,head.artifactDigest);
+  const target=receipt.target,physical=transport.currentPhysicalHostingRelease;
+  assert.equal(receipt.generation,head.generation,'I66_RECEIPT_GENERATION');
+  assert.ok(Number.isSafeInteger(target.files)&&target.files>0,'I66_SIGNED_FILE_COUNT_REQUIRED');
+  assert.equal(head.hostedFilesEachOrigin,target.files,'I66_HEAD_FILE_COUNT_DRIFT');
+  assert.equal(receipt.preview.files,target.files,'I66_PREVIEW_FILE_COUNT_DRIFT');
+  assert.equal(receipt.preview.hostingVersion,target.hostingVersion,'I66_PREVIEW_VERSION_DRIFT');
+  for(const key of ['sourceSha','sourceTree','manifestBlob','compositionBlob','artifactId','artifactDigest','buildId','buildRunId','previewUrl','hostingVersion']){
+    assert.equal(head[key],target[key],'I66_HEAD_TARGET_DRIFT_'+key);
+  }
+  for(const key of ['sourceSha','buildId','artifactId','artifactDigest'])assert.equal(physical[key],target[key],'I66_TRANSPORT_TARGET_DRIFT_'+key);
+  assert.equal(physical.liveHostingVersion,target.hostingVersion);
+  assert.equal(physical.previewRunId,target.buildRunId);
+  assert.equal(physical.readbackEachOrigin,target.files,'I66_TRANSPORT_FILE_COUNT_DRIFT');
+  assert.equal(physical.receipt,head.receiptPath,'I66_TRANSPORT_RECEIPT_DRIFT');
   assert.deepEqual(transport.latestSignedPhysicalFrontendLivePointer20261122,head);
   assert.deepEqual(JSON.parse(read(P.ledger)).frontendReleaseHead,head);
   assert.equal(control.i66OperationalContinuation20261115.latestProvenLiveSource,head.sourceSha);

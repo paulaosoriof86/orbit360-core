@@ -110,7 +110,8 @@ if(i66Active){
   const r10Current=r10Release?.status==='CURRENT_R10_CONCILIACIONES_HUMAN_NAMES_EXACT_LIVE_PASS_FULL_I66_HOLD';
   const r11Release=control.i66R11RenewalDriveExactLiveRelease20261113;
   const r11Current=r11Release?.status==='CURRENT_R11_RENEWAL_DRIVE_EXACT_LIVE_SIGNED_PASS_FULL_I66_HOLD';
-  const operationalCurrent=control[operationalRelease.ACCEPTANCE_KEY]!==undefined;
+  const operationalCurrent=Boolean(control.i66FrontendReleaseHead||transport.frontendReleaseSequence||
+    control.currentExecutionDecisionPointer==='i66FrontendReleaseHead'||control[operationalRelease.ACCEPTANCE_KEY]);
   const pointer=(operationalCurrent||r11Current||r10Current||r9Current||roleCurrent||stageCurrent)
     ?'artifacts/orbit360-recovery/release-control/I6_6_LATEST_EXACT_LIVE_POINTER_20261113.json'
     :'artifacts/orbit360-recovery/release-control/I6_6_LATEST_EXACT_LIVE_POINTER_20261112.json';

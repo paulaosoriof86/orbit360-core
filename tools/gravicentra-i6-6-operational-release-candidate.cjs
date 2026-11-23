@@ -446,20 +446,14 @@ function validateLiveProof(p,proof){
   return proof;
 }
 function acceptedForPreflight(control,state,transport,latest,io=fs){
-  if(control.i66FrontendReleaseHead){
+  if(control.i66FrontendReleaseHead || transport.frontendReleaseSequence || control.currentExecutionDecisionPointer==='i66FrontendReleaseHead'){
     const owner=require('./gravicentra-i66-frontend-control.cjs');
     const head=owner.physicalGuard(control,state,transport,io);
-    const raw=io.readFileSync(owner.P.legacy,'utf8');
-    assert.equal(owner.blob(raw),control.i66PreversionedControlViewBlob,'I66_LEGACY_CONTROL_SNAPSHOT_DRIFT');
-    const archived=JSON.parse(raw);
-    const legacyControl={...control,currentExecutionDecisionPointer:archived.decision,
-      i66OperationalContinuation20261115:archived.work,nextAction:archived.nextAction};
-    delete legacyControl.i66FrontendReleaseHead;
-    acceptedForPreflight(legacyControl,{...state,currentExecutionDecisionPointer:archived.stateDecision},
-      {...transport,currentPhysicalHostingRelease:archived.hosting,latestSignedPhysicalFrontendLivePointer20261122:archived.signed},latest,io);
+    const archive=io.readFileSync(owner.P.legacy,'utf8');
+    assert.equal(owner.blob(archive),control.i66PreversionedControlViewBlob,'I66_LEGACY_CONTROL_SNAPSHOT_DRIFT');
     return {status:head.status,sourceSha:head.sourceSha,receipt:head.receiptPath};
   }
-
+  // Replaying pre-versioned acceptance remains available on its own original controls.
   const summary=control[ACCEPTANCE_KEY];assert.ok(summary,'I66_OPERATIONAL_ACCEPTANCE_SUMMARY_MISSING');
   assert.equal(summary.status,ACCEPTED_STATUS);assert.equal(summary.receipt,ACCEPTANCE_RECEIPT);
   const text=io.readFileSync(ACCEPTANCE_RECEIPT,'utf8');
