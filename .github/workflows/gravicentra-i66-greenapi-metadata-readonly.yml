@@ -298,6 +298,96 @@ jobs:
             'permission':'secretmanager.versions.access','secretPayloadRead':False,'iamWrites':0,'secretWrites':0,'messagesSent':0}
           print('I66_GREENAPI_EXACT_RUNTIME_SECRET_ACCESS='+json.dumps(report,sort_keys=True,separators=(',',':')))
           PYACCESS
+      - name: Troubleshoot exact GreenAPI runtime access without reading payload or granting IAM
+        shell: bash
+        run: |
+          set -euo pipefail
+          set +x
+          python3 - <<'PYEXACT'
+          import datetime,json,re,subprocess,urllib.request,urllib.error
+          project='ays-orbit-360-lab'
+          secret='orbit360-greenapi-gt-alianzas-soluciones'
+          principal='orbit360-secrets-lab@ays-orbit-360-lab.iam.gserviceaccount.com'
+          permission='secretmanager.versions.access'
+          def command(args):
+              try:
+                  p=subprocess.run(args,capture_output=True,text=True,timeout=45)
+                  return json.loads(p.stdout) if p.returncode==0 else None
+              except (ValueError,subprocess.TimeoutExpired):return None
+          def roles(policy):
+              if not isinstance(policy,dict):return {'readable':False,'exactPrincipalRoles':[]}
+              rows=[]
+              for b in policy.get('bindings',[]):
+                  if not isinstance(b,dict) or 'serviceAccount:'+principal not in b.get('members',[]):continue
+                  role=b.get('role','')
+                  if re.fullmatch(r'roles/[A-Za-z0-9_.]+|projects/ays-orbit-360-lab/roles/[A-Za-z0-9_.]+',role):
+                      rows.append({'role':role,'conditional':bool(b.get('condition'))})
+              return {'readable':True,'exactPrincipalRoles':rows}
+          direct=roles(command(['gcloud','secrets','get-iam-policy',secret,'--project',project,'--format=json']))
+          inherited=roles(command(['gcloud','projects','get-iam-policy',project,'--format=json']))
+          metadata=command(['gcloud','projects','describe',project,'--format=json'])
+          project_number=str((metadata or {}).get('projectNumber',''))
+          project_ok=isinstance(metadata,dict) and metadata.get('projectId')==project and bool(re.fullmatch(r'[0-9]+',project_number))
+          version_rows=command(['gcloud','secrets','versions','list',secret,'--project',project,'--limit=100','--format=json'])
+          versions=[]
+          if isinstance(version_rows,list) and len(version_rows)<100 and project_ok:
+              for row in version_rows:
+                  name=row.get('name','')
+                  match=re.fullmatch(r'projects/('+re.escape(project)+'|'+re.escape(project_number)+')/secrets/'+re.escape(secret)+r'/versions/([1-9][0-9]*)',name)
+                  if not match:versions=[];break
+                  versions.append({'version':int(match.group(2)),'state':row.get('state') if row.get('state') in ('ENABLED','DISABLED','DESTROYED') else 'UNKNOWN'})
+          inventory_complete=bool(versions) and len({v['version'] for v in versions})==len(versions)
+          next_version=max(v['version'] for v in versions)+1 if inventory_complete else None
+          token_result=subprocess.run(['gcloud','auth','print-access-token'],capture_output=True,text=True,timeout=30)
+          token=token_result.stdout.strip() if token_result.returncode==0 else ''
+          states={'CAN_ACCESS','CANNOT_ACCESS','UNKNOWN_INFO','UNKNOWN_CONDITIONAL','OVERALL_ACCESS_STATE_UNSPECIFIED'}
+          def troubleshoot(suffix):
+              safe_resource='projects/'+project+'/secrets/'+secret+suffix
+              result={'resource':safe_resource,'state':'UNPROVEN','httpStatus':None,'tupleVerified':False}
+              if not project_ok or not token:return result
+              full='//secretmanager.googleapis.com/projects/'+project_number+'/secrets/'+secret+suffix
+              query={'accessTuple':{'principal':principal,'fullResourceName':full,'permission':permission,
+                'conditionContext':{'request':{'receiveTime':datetime.datetime.now(datetime.timezone.utc).isoformat().replace('+00:00','Z')}}}}
+              req=urllib.request.Request('https://policytroubleshooter.googleapis.com/v3/iam:troubleshoot',
+                data=json.dumps(query).encode(),headers={'Authorization':'Bearer '+token,'Content-Type':'application/json'},method='POST')
+              try:
+                  with urllib.request.urlopen(req,timeout=30) as response:
+                      result['httpStatus']=response.status;answer=json.load(response)
+                  t=answer.get('accessTuple',{})
+                  result['tupleVerified']=t.get('principal')==principal and t.get('fullResourceName')==full and t.get('permission')==permission
+                  if result['tupleVerified'] and answer.get('overallAccessState') in states:result['state']=answer['overallAccessState']
+              except urllib.error.HTTPError as error:result['httpStatus']=error.code
+              except (ValueError,TimeoutError,urllib.error.URLError):pass
+              return result
+          queries=[troubleshoot(''),troubleshoot('/versions/1')]
+          if next_version:queries.append(troubleshoot('/versions/'+str(next_version)))
+          def inbox_endpoint(name,region):
+              row={'function':name,'expectedRegion':region,'exists':None,'httpStatus':None,'exactResourceAndRegion':False,'active':False}
+              if not token:return row
+              url='https://cloudfunctions.googleapis.com/v2/projects/'+project+'/locations/'+region+'/functions/'+name
+              req=urllib.request.Request(url,headers={'Authorization':'Bearer '+token},method='GET')
+              try:
+                  with urllib.request.urlopen(req,timeout=30) as response:
+                      row['httpStatus']=response.status;function=json.load(response)
+                  allowed_names={'projects/'+project+'/locations/'+region+'/functions/'+name,
+                    'projects/'+project_number+'/locations/'+region+'/functions/'+name}
+                  row['exists']=True;row['exactResourceAndRegion']=function.get('name') in allowed_names
+                  row['active']=function.get('state')=='ACTIVE'
+              except urllib.error.HTTPError as error:
+                  row['httpStatus']=error.code
+                  if error.code==404:row['exists']=False
+              except (ValueError,TimeoutError,urllib.error.URLError):pass
+              return row
+          inbox_inventory=[inbox_endpoint(name,region) for name,region in [
+            ('orbit360GetAdvisorOpsInboxPreview','us-east1'),('orbit360UpdateAdvisorOpsInboxStatePreview','us-east1'),
+            ('orbit360GetAdvisorOpsInbox','us-central1'),('orbit360UpdateAdvisorOpsInboxState','us-central1')]]
+          report={'schema':'GI_I66_GREENAPI_RUNTIME_EFFECTIVE_ACCESS_READONLY_V1','runtimeServiceAccount':principal,
+            'permission':permission,'secretPolicy':direct,'projectPolicy':inherited,'projectIdentityVerified':project_ok,
+            'versions':versions,'versionInventoryComplete':inventory_complete,'nextVersionReference':
+              'projects/'+project+'/secrets/'+secret+'/versions/'+str(next_version) if next_version else None,
+            'troubleshooter':queries,'existingInboxEndpoints':inbox_inventory,'secretPayloadRead':False,'secretWrites':0,'iamWrites':0,'messagesSent':0}
+          print('I66_GREENAPI_RUNTIME_EFFECTIVE_ACCESS='+json.dumps(report,sort_keys=True,separators=(',',':')))
+          PYEXACT
       - name: Publish approved non-secret resource references only
         shell: bash
         run: |
