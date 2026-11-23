@@ -13,6 +13,7 @@ on:
       - .github/workflows/gravicentra-i66-insurer-source-bulk-protected.yml
       - tools/gravicentra-i66-issued-renewal*.cjs
       - tools/gravicentra-i66-roble-five-issuer-crosswalk*.cjs
+      - tools/gravicentra-i66-roble-two-issued-plan*.cjs
       - tools/gravicentra-i66-issued-original-access.cjs
       - tools/gravicentra-i66-issued-source-schedule*.cjs
       - tools/gravicentra-i66-source-bulk-plan.cjs
@@ -72,6 +73,8 @@ jobs:
           node --check tools/gravicentra-i66-roble-five-issuer-crosswalk-readonly.cjs
           node --check tools/gravicentra-i66-roble-five-issuer-crosswalk.test.cjs
           node --test tools/gravicentra-i66-roble-five-issuer-crosswalk.test.cjs
+          node --check tools/gravicentra-i66-roble-two-issued-plan.cjs
+          node --test tools/gravicentra-i66-roble-two-issued-plan.test.cjs
       - name: Select configured Firebase service account for bounded read-only preflight
         shell: bash
         run: |
