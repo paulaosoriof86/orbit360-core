@@ -5440,5 +5440,146 @@
       }
     },
     "receipt": "artifacts/orbit360-recovery/release-control/I6_6_V13_LIVE_PREMUTATION_PHASE_GUARD_HOLD_20261123.json"
+  },
+  "scopedBackendPreviewI66": {
+    "schema": "GI_I66_SCOPED_BACKEND_PREVIEW_AUTHORIZATION_V1",
+    "status": "APPROVED_FOUR_FUNCTION_PREVIEW_SYNTHETIC_ONLY",
+    "approvedByDirection": true,
+    "noLiveOrFinancialWrites": true,
+    "noRulesAuthIamWrites": true,
+    "sameImmutableArtifactOnly": true,
+    "sourceSha": "65c825b2808a615ca4195bdde6689dbdbe3193b2",
+    "artifactDigest": "sha256:7cb782848a45083047c4899bc30c13bf5be46429607e42597d09342becfc9acc",
+    "currentPhysicalLiveSourceSha": "15e849bd606bd8c93e4c0471da1193e85004aecd",
+    "currentPhysicalLiveArtifactDigest": "sha256:78a409a419e21648f2e074b49767d1dd55731140f8a83f6064b3ae1c8073b453",
+    "candidate": {
+      "schema": "I6_6_OPERATIONAL_EXACT_RELEASE_V1",
+      "approvedByDirection": true,
+      "status": "EXACT_BACKEND_PREVIEW_SIGNED_QA_AUTHORIZED",
+      "opsLeadsComposite": true,
+      "compositeVersion": 1,
+      "sourceSha": "65c825b2808a615ca4195bdde6689dbdbe3193b2",
+      "buildRunId": 45287432665,
+      "artifactId": 14873426438,
+      "artifactDigest": "sha256:7cb782848a45083047c4899bc30c13bf5be46429607e42597d09342becfc9acc",
+      "buildId": "gi-i66-65c825b2808a-57f234755dc1",
+      "previewUrl": "https://ays-orbit-360-lab--gi-i66-rc-45287432665-qxusovq3.web.app",
+      "previewChannelId": "gi-i66-rc-45287432665",
+      "targets": {
+        "preview": [
+          {
+            "name": "orbit360ProductOperationalCommandPreview",
+            "region": "us-east1"
+          },
+          {
+            "name": "orbit360CobrosReconciliationCommandPreview",
+            "region": "us-central1"
+          },
+          {
+            "name": "orbit360ScopedPolicyReadPreview",
+            "region": "us-east1"
+          },
+          {
+            "name": "orbit360OpsLeadsCommandPreview",
+            "region": "us-east1"
+          }
+        ],
+        "live": [
+          {
+            "name": "orbit360ProductOperationalCommand",
+            "region": "us-central1"
+          },
+          {
+            "name": "orbit360CobrosReconciliationCommand",
+            "region": "us-central1"
+          },
+          {
+            "name": "orbit360ScopedPolicyRead",
+            "region": "us-east1"
+          },
+          {
+            "name": "orbit360OpsLeadsCommand",
+            "region": "us-central1"
+          }
+        ]
+      },
+      "requiredPreviewDrivers": [
+        "tools/gravicentra-i66-privileged-role-signed-ui-permissions-readonly.cjs",
+        "tools/gravicentra-i6-6-carlos-real-signed-synthetic-preview-uat.cjs",
+        "tools/gravicentra-i6-6-advisor-payables-signed-uat.cjs",
+        "tools/gravicentra-i6-6-proposal-application-signed-uat.cjs"
+      ],
+      "syntheticQaIsolation": {
+        "tenantId": "alianzas-soluciones",
+        "runIdPrefix": "cobledgerqa_",
+        "entityIdPrefix": "b3005qa_",
+        "runCollection": "cobrosLedgerQaRuns",
+        "controlCollection": "cobrosLedgerQaControl",
+        "requireSameQaRunId": true,
+        "requireSyntheticMarker": true,
+        "allowRealControlPointerMutation": false,
+        "restoreAllSyntheticRecords": true
+      },
+      "advisorPayableQaIsolation": {
+        "tenantId": "alianzas-soluciones",
+        "runIdPrefix": "b4003qa_i66_cxp_",
+        "payableIdPrefix": "b4003qa_cxpase_",
+        "commissionIdPrefix": "b4003qa_comsrc_",
+        "requireSameQaRunId": true,
+        "requireSyntheticMarker": true,
+        "restoreAllSyntheticRecords": true,
+        "financialPayments": 0,
+        "bankMovements": 0,
+        "authOrMembershipMutations": 0
+      },
+      "sameImmutableArtifactOnly": true,
+      "syntheticRecordsOnly": true,
+      "noRealFinancialOrCustomerWrites": true,
+      "noRulesAuthIamWrites": true,
+      "rollbackThreeBackendRevisionsAndHosting": true,
+      "rollbackFourBackendRevisionsAndHosting": true,
+      "expectedSiteFileCount": 224,
+      "opsLeadsBackendPath": "functions/product-ops-leads-domain.js",
+      "opsLeadsBackendBlobSha": "b7921ca88343ced65bdad4cd9de26fa120647083",
+      "currentPhysicalLive": {
+        "sourceSha": "15e849bd606bd8c93e4c0471da1193e85004aecd",
+        "buildId": "gi-i66-15e849bd606b-57f234755dc1",
+        "artifactId": 14777966155,
+        "artifactDigest": "sha256:78a409a419e21648f2e074b49767d1dd55731140f8a83f6064b3ae1c8073b453",
+        "previewRunId": 45081926149,
+        "signedPreviewRunId": null,
+        "liveCloneRunId": 45088457923,
+        "liveHostingVersion": "sites/ays-orbit-360-lab/versions/e4e8f31b02ba2aef",
+        "readbackEachOrigin": 224,
+        "receipt": "artifacts/orbit360-recovery/release-control/I6_6_FRONTEND_E00002_RECEIPT.json",
+        "backendFunctionsChanged": 0,
+        "fullI66ProductionAccepted": false,
+        "status": "FOCAL_FRONTEND_LIVE_UI_VERIFIED"
+      },
+      "currentLive": {
+        "sourceSha": "15e849bd606bd8c93e4c0471da1193e85004aecd",
+        "buildId": "gi-i66-15e849bd606b-57f234755dc1",
+        "artifactId": 14777966155,
+        "artifactDigest": "sha256:78a409a419e21648f2e074b49767d1dd55731140f8a83f6064b3ae1c8073b453",
+        "buildRunId": 45081926149,
+        "liveRunId": 45088457923,
+        "hostingVersion": "sites/ays-orbit-360-lab/versions/e4e8f31b02ba2aef"
+      },
+      "signedObservabilityProfile": "I66_SIGNED_BROWSER_OBSERVABILITY_V1",
+      "legalAcceptance": {
+        "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_DIRECTION_PREVIEW_V2_SCOPE_AUTHORIZATION_20261116.json",
+        "receiptSha256": "d3309675c753bd1b31f9163d506aba2e29ac70583a7b8d54cb5b8503b5c50a44",
+        "decisionId": "DIRECTION_I66_PREVIEW_SAME_LEGAL_V2_TECHNICAL_SUCCESSORS_AUTHORIZED_20261116",
+        "authorizationScope": "I6_6_PREVIEW_IDENTICAL_V2_TERMS",
+        "gate": "I6.6",
+        "phase": "PREVIEW",
+        "origin": "https://ays-orbit-360-lab--gi-i66-rc-45287432665-qxusovq3.web.app",
+        "sourceSha": "65c825b2808a615ca4195bdde6689dbdbe3193b2",
+        "actorRole": "direccion",
+        "termsProjectionSha256": "485b07887091063cc7a5d1dc8f11a9bb547f2ef059490bb04d4acee73404f6b2",
+        "buildId": "gi-i66-65c825b2808a-57f234755dc1"
+      }
+    },
+    "ownerInstruction": "23-Nov: complete and publish approved cumulative work; this bounded step authorizes only four exact Preview functions and restored synthetic signed QA. LIVE remains separately gated by the same artifact proof."
   }
 }

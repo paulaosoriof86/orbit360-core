@@ -1,0 +1,60 @@
+{
+  "schema": "GI_I66_V14_IMMUTABLE_RETRY_BINDING_RECEIPT_V1",
+  "gate": "I6.6",
+  "recordedAtUtc": "2026-11-23T23:40:43.932Z",
+  "sourceSha": "65c825b2808a615ca4195bdde6689dbdbe3193b2",
+  "buildRunId": 45287432665,
+  "firstAttempt": {
+    "attempt": 1,
+    "jobId": 138087462114,
+    "status": "FAILED_PREVIEW_MARKER_READINESS",
+    "artifactId": 14873290082,
+    "artifactDigest": "sha256:679bb31ae58b963eb69cfd00175d69e48a84fa93fb913ce0003d09872fd8a615",
+    "tarSha256": "8e80579557a5bb0da4b48a91ad1809b8a3a64c963020e4103dd10eb3907d23cb",
+    "artifactRetained": true,
+    "readinessWindowSeconds": 101,
+    "actualHttpOrNetworkCause": "UNPROVEN_ORIGINAL_LOG_DID_NOT_RETAIN_HTTP_STATUS_OR_STDERR"
+  },
+  "independentCurrentReadback": {
+    "reportSha256": "a89327abe1a1d242cadb15fb1bdcfdbbb61bfa299ff478c9131c3d8f8181f9fc",
+    "files": 224,
+    "allHttp200AndSha256Exact": true,
+    "bothLiveSourceSha": "15e849bd606bd8c93e4c0471da1193e85004aecd",
+    "doesNotOverrideFailedCi": true
+  },
+  "successfulAttempt": {
+    "attempt": 2,
+    "jobId": 138093495625,
+    "conclusion": "success",
+    "artifactId": 14873426438,
+    "artifactDigest": "sha256:7cb782848a45083047c4899bc30c13bf5be46429607e42597d09342becfc9acc",
+    "tarSha256": "cb7b5d3cadd9f8e34684770fbbee20bf08f28a9fd6830e98027fdd7b3d1dfcd2",
+    "package": {
+      "buildId": "gi-i66-65c825b2808a-57f234755dc1",
+      "buildBoundAssetCount": 138,
+      "hostedFileCount": 224,
+      "hostedPayloadDigest": "da40e7ad3f453107a44fdc868a58ff469f91139252c0204f9fc298a8d9f02905",
+      "backendFileCount": 45,
+      "backendSourceDigest": "7bfe883d48c3cd354ae210c1a54c37563ecfefd4e88a94b73f6255d90e0f167a",
+      "bundleFileCount": 271,
+      "bundleDigest": "6f58f0bbbaccf98f8ec940d045aa6cebd5c4c60e5e34747c78d7a865024a4c58",
+      "reachableProductFiles": 217
+    },
+    "previewUrl": "https://ays-orbit-360-lab--gi-i66-rc-45287432665-qxusovq3.web.app",
+    "previewChannelId": "gi-i66-rc-45287432665",
+    "sourceUnchanged": true,
+    "backendPayloadUnchanged": true,
+    "previousArtifactBytesNotReused": true,
+    "selection": "EXACT_ARTIFACT_ID_NOT_NAME",
+    "onlyPayloadChangeFromFirstAttempt": {
+      "path": "site/data/tenant-public-branding-snapshot.generated.js",
+      "field": "generatedAt",
+      "before": "2026-11-23T23:19:16.003Z",
+      "after": "2026-11-23T23:31:21.297Z"
+    },
+    "signedQaRequiredForThisExactNewDigest": true
+  },
+  "previewSignedPass": false,
+  "livePromoted": false,
+  "fullI66ProductionAccepted": false
+}
