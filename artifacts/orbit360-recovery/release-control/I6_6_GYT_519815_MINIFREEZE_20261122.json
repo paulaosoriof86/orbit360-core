@@ -1,0 +1,119 @@
+{
+  "schema": "GI_I66_COMMERCIAL_SOURCE_RECEIPT_V1",
+  "recordType": "DERIVED_COMMERCIAL_RECEIPT_CLOSURE",
+  "commitStatus": "COMMITTED_AND_SERVER_READ_BACK",
+  "protectedEnvironment": "gravicentra-live-data-writes",
+  "runId": 45095076205,
+  "jobId": 137433172256,
+  "source": {
+    "gitCommit": "5e44a0e7063286a3927f353e64f2e64d19d5ba17",
+    "manifest": "../source-batches/I6_6_MULTICARRIER_ISSUED_IDENTITY_20261122.json",
+    "issueDate": "2026-09-14",
+    "termStart": "2026-10-28",
+    "termEnd": "2027-10-28",
+    "certificate": "1",
+    "pdfSha256": "3c64e84f1893313bf30fa64dbb2c3f1960637678089f8bfbdd5e878a7606faa9",
+    "issuerRequirements": [
+      "995653882",
+      "995653883",
+      "995653884",
+      "995653885",
+      "995653886",
+      "995653887",
+      "995653888",
+      "995653889",
+      "995653890",
+      "995653891"
+    ]
+  },
+  "physicalReceipt": {
+    "path": "artifacts/orbit360-recovery/release-control/I6_6_GYT_519815_COMMERCIAL_SERVER_READBACK_20261122.json",
+    "gitBlobSha": "f5188d816cd2749259525789d728e33e87b24c7f"
+  },
+  "before": {
+    "readOnlyJob": 137432983884,
+    "preimageDigest": "babe7f0c2fb1ffa754d975d2eda4df1ac86938e716b46b43d3b3530154cc8eb7",
+    "exactPredecessors": 1,
+    "knownSuccessors": 0,
+    "existingTargetRecords": 0,
+    "existingRequirementsWithIssuerNumbers": 0,
+    "writes": 0,
+    "statementRowsInOriginalUniverse": 2
+  },
+  "after": {
+    "newObligations": 10,
+    "auditIdDigest": "7970d44bcc599f36b57f5764ef5382a01d9533a3ece7e4381cd0fce98f3c5f56",
+    "documentOperations": 25,
+    "successor": 1,
+    "receiptRows": 10,
+    "portfolioRows": 10,
+    "directPayments": 0,
+    "contractGrossCents": 664737,
+    "insurerStatementRows": 2,
+    "insurerStatementCents": 132948,
+    "otherFutureContractualRows": 8,
+    "otherFutureContractualCents": 531789
+  },
+  "independentServerReadback": {
+    "run": 45095576694,
+    "job": 137434517660,
+    "readbackAtUtc": "2026-11-23T01:37:43Z",
+    "sameBeforeDigest": "babe7f0c2fb1ffa754d975d2eda4df1ac86938e716b46b43d3b3530154cc8eb7",
+    "sameAuditIdDigest": "7970d44bcc599f36b57f5764ef5382a01d9533a3ece7e4381cd0fce98f3c5f56",
+    "duplicateWrites": 0
+  },
+  "liveUi": {
+    "userRole": "Operativo",
+    "origin": "https://app.aysseguros.com/",
+    "steps": [
+      "Buscar AUTO-519815",
+      "Abrir resultado de póliza",
+      "Recargar expediente del titular",
+      "Pulsar Recibos y pagos"
+    ],
+    "observedAfterReload": [
+      {
+        "number": "995653882",
+        "grossCents": 66474
+      },
+      {
+        "number": "995653883",
+        "grossCents": 66474
+      },
+      {
+        "number": "995653884",
+        "grossCents": 66474
+      },
+      {
+        "number": "995653885",
+        "grossCents": 66474
+      },
+      {
+        "number": "995653886",
+        "grossCents": 66474
+      },
+      {
+        "number": "995653887",
+        "grossCents": 66474
+      },
+      {
+        "number": "995653888",
+        "grossCents": 66474
+      },
+      {
+        "number": "995653889",
+        "grossCents": 66474
+      },
+      {
+        "number": "995653890",
+        "grossCents": 66474
+      },
+      {
+        "number": "995653891",
+        "grossCents": 66471
+      }
+    ],
+    "issuedRenewalButtonUsed": false,
+    "cashActionUsed": false
+  }
+}
