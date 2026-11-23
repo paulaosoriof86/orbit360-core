@@ -427,7 +427,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: \${{ github.sha }}
+          ref: ${{ github.sha }}
           persist-credentials: false
       - uses: actions/setup-node@v4
         with:
@@ -456,7 +456,7 @@ jobs:
         shell: bash
         env:
           GI_I66_BULK_PROTECTED_ENV: gravicentra-live-data-writes
-          GI_I66_TWO_EXPECTED_B64: \${{ needs.preflight.outputs.two_preimagesB64 }}
+          GI_I66_TWO_EXPECTED_B64: ${{ needs.preflight.outputs.two_preimagesB64 }}
         run: |
           set -euo pipefail
           test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
