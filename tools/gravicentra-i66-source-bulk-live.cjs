@@ -80,6 +80,53 @@ async function readGroups(db,rawRows){
   // Count physical editions by document ID; distinct editions remain distinct.
   return [...new Map(groups.map(g=>[g.policy.id,g])).values()];
 }
+// Explain the exact existing payment/portfolio hold from the bounded snapshot.
+// This is private read-only evidence, not a second matcher or a write plan.
+function paymentPortfolioHoldDiagnostics(rows,groups,exceptions,requestedCaseIds=[]){
+  const {paid,moneyCents}=require('./gravicentra-i66-source-bulk-plan.cjs');
+  const codes=new Map(exceptions.filter(e=>e.code==='PAYMENT_OR_PORTFOLIO_EXCEPTION').map(e=>[e.caseId,e.code]));
+  requestedCaseIds.forEach(id=>{if(!codes.has(id))codes.set(id,'REQUESTED_CASE_READBACK');});
+  const status=r=>({paidByCanonicalPredicate:paid(r),estado:str(r.estado),
+    paymentState:str(r.paymentState),applicationState:str(r.applicationState),
+    pagado:r.pagado===true,conciliado:r.conciliado===true,conciliadoPago:r.conciliadoPago===true,
+    paidDates:Object.fromEntries(['fechaPago','fechaPagoReportada','paidDate'].filter(k=>str(r[k])).map(k=>[k,str(r[k])]))});
+  const money=r=>Object.fromEntries(['primaTotal','monto','montoTotal','importe','montoPagado']
+    .filter(k=>r[k]!=null).map(k=>[k,moneyCents(r[k])]));
+  const refs=r=>Object.fromEntries([...sourceAliases,'numeroRecibo','referenciaAseguradora']
+    .filter(k=>str(r[k])).map(k=>[k,str(r[k])]));
+  return rows.filter(r=>codes.has(r.caseId)).map(row=>({caseId:row.caseId,code:codes.get(row.caseId),
+    sourceRequirement:row.requirement,sourceDue:row.due,sourceGrossCents:row.grossCents,
+    editions:groups.filter(g=>sameInsurerPolicyNumber(g.policy.numero,row.policy,row.insurer)&&
+      str(g.policy.vigenciaInicio)<=row.due&&str(g.policy.vigenciaFin)>row.due).map(g=>({
+      policyId:g.policy.id,receipts:g.receipts.filter(r=>sourceAliases.some(k=>str(r[k])===row.requirement)||
+        str(r.fechaVencimientoContractual||r.vence||r.fechaVencimiento)===row.due).map(r=>{
+        const portfolio=g.portfolio.filter(c=>str(c.reciboId)===str(r.id));
+        const cobros=g.cobros.filter(c=>[str(c.reciboId),str(c.reciboEsperadoId)].includes(str(r.id)));
+        return {receiptId:r.id,status:status(r),amountsCents:money(r),sourceReferences:refs(r),
+          activePortfolioCount:portfolio.filter(c=>c.carteraActiva!==false).length,
+          portfolio:portfolio.map(c=>({id:c.id,carteraActiva:c.carteraActiva!==false,
+            status:status(c),amountsCents:money(c)})),
+          cobroLinksCountedByPlanner:cobros.filter(c=>str(c.reciboId)===str(r.id)).length,
+          cobros:cobros.map(c=>({id:c.id,reciboId:str(c.reciboId),reciboEsperadoId:str(c.reciboEsperadoId),
+            status:status(c),amountsCents:money(c),sourceReferences:refs(c),
+            inferredPaid:c.inferredPaid===true,confirmado:c.confirmado===true,
+            sourceType:str(c.sourceType||c.evidenceType),
+            auditReferences:Object.fromEntries(['requestId','operationalRequestId','sourceCandidateId','sourceId','auditId']
+              .filter(k=>str(c[k])).map(k=>[k,str(c[k])]))}))};
+      })})),diagnosticOnly:true,writes:0}));
+}
+
+function selectReadbackCase(rows,caseId){
+  assert.equal(caseId,'ROBLE_NOV20_0043','I66_CASE_READBACK_NOT_AUTHORIZED');
+  const selected=rows.filter(row=>row.caseId===caseId);
+  assert.equal(selected.length,1,'I66_CASE_READBACK_SOURCE_NOT_UNIQUE');
+  const row=selected[0];
+  assert.equal(row.insurer,'ROBLE');assert.equal(row.policy,'91-4143471');
+  assert.equal(row.requirement,'5693797');assert.equal(row.due,'2026-11-21');
+  assert.equal(row.grossCents,33437);assert.equal(row.state,'PENDING');
+  return selected;
+}
+
 // Compare the issued term to the current Firestore editions without treating a
 // similarly numbered, expired policy as the successor. Publish counts only.
 function issuedTermReadback(groups) {
@@ -239,12 +286,28 @@ async function locateAttestedPayments(db,groups,rows){
 
 async function main(){
   const mode=str(process.env.GI_I66_BULK_MODE);
-  assert.ok(['preflight','apply'].includes(mode),'I66_BULK_MODE_MUST_BE_EXPLICIT');
+  assert.ok(['preflight','case-readback','apply'].includes(mode),'I66_BULK_MODE_MUST_BE_EXPLICIT');
   assert.equal(process.env.GCLOUD_PROJECT,PROJECT,'I66_PROJECT_NOT_EXISTING_FIREBASE');
   const source=sealedSource();
   const admin=require('firebase-admin');
   admin.initializeApp({credential:admin.credential.applicationDefault(),projectId:PROJECT});
   const db=admin.firestore();
+  if(mode==='case-readback'){
+    const rows=selectReadbackCase(source.data.rows,str(process.env.GI_I66_BULK_READBACK_CASE));
+    const groups=await readGroups(db,rows),plan=planSourceBatch(rows,groups,{chunkSize:250});
+    // This receipt deliberately cannot enter the protected writer: it has a
+    // separate status, zero chunks, and a readOnly flag even if a delta exists.
+    const receipt={status:'BULK_SOURCE_CASE_READBACK_ONLY_NO_WRITES',readOnly:true,
+      caseId:rows[0].caseId,sourceManifestPath:source.relative,sourceManifestSha256:source.bytesSha256,
+      sourceSha256:rows[0].sourceSha256,inputRows:1,readyCount:plan.readyCount,
+      unchangedCount:plan.unchangedCount,exceptionCount:plan.exceptionCount,
+      exceptions:plan.exceptions,chunks:[],writes:0,
+      privatePaymentPortfolioHolds:paymentPortfolioHoldDiagnostics(rows,groups,plan.exceptions,[rows[0].caseId])};
+    output('GI_I66_BULK_PLAN_OUT',receipt);output('GI_I66_BULK_REPORT_OUT',receipt);
+    console.log('I66_SCOPED_CASE_READBACK case='+rows[0].caseId+' input=1 ready='+plan.readyCount+
+      ' unchanged='+plan.unchangedCount+' exceptions='+plan.exceptionCount+' ZERO_WRITES NO_APPLY_PLAN');
+    return;
+  }
   if(mode==='preflight'){
     const groups=await readGroups(db,source.data.rows);
     console.log('I66_ISSUED_TERM_READBACK='+JSON.stringify(issuedTermReadback(groups)));
@@ -296,6 +359,7 @@ async function main(){
       readyCount:plan.readyCount,unchangedCount:plan.unchangedCount,
       exceptionCount:plan.exceptionCount,exceptionCodes,diagnostic,
       privatePolicyDiagnostics:policyDiagnostics,
+      privatePaymentPortfolioHolds:paymentPortfolioHoldDiagnostics(source.data.rows,groups,plan.exceptions),
       exceptionSamples:plan.exceptions.slice(0,35),
       chunks:plan.chunks.map(c=>({sequence:c.sequence,count:c.count,sha:c.sourcePlanSha256})),writes:0});
     console.log('I66_BULK_SOURCE_PREFLIGHT_PASS input='+plan.inputRows+' eligible='+plan.readyCount+
@@ -331,5 +395,5 @@ async function main(){
     ' receiptWrites='+result.receiptWrites+' carteraWrites='+result.portfolioWrites+
     ' cobroWrites='+result.cobroWrites);
 }
-module.exports={readGroups};
+module.exports={readGroups,paymentPortfolioHoldDiagnostics,selectReadbackCase};
 if(require.main===module)main().catch(error=>{console.error('I66_BULK_EXECUTION_HOLD '+str(error.message));process.exitCode=1;});

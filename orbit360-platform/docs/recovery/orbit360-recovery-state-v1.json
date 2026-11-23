@@ -1396,7 +1396,7 @@
     "phaseAIterationStatuses": "HISTORICAL_FIELDS_ABOVE_PRESERVED_UNTIL_FORMAL_GATE_EVIDENCE;_NO_NEW_PASS_INFERRED",
     "labDataWriteScope": "ONLY_35_AUTHORIZED_COUNTRY_FIELDS;_NO_AUGUST_REFRESH"
   },
-  "nextAction": "I6.6: promover las cuatro funciones y Hosting del mismo artifact 14869651976, verificar 224 archivos por origen, ejecutar pruebas LIVE firmadas y cerrar CP/state/ledger/transporte/cursor en un solo commit. Después continuar Make, Asesor, rendimiento y las capacidades reales pendientes.",
+  "nextAction": "I6.6: corregir la contradicción de fases en las pruebas históricas y verificar LIVE autorizado/cierre antes del próximo build inmutable; integrar correcciones ya preparadas de Make y Asesor. Ejecutar lectura financiera acotada del caso ROBLE_NOV20_0043 sin aplicar pagos ni reintentar lotes.",
   "sourceOfTruth": {
     "projectBoundaryPrevalentAddendum": "orbit360-platform/docs/recovery/ADDENDUM_PREVALENTE_CHATGPT_PROJECT_BOUNDARY_20260831.md",
     "mutableState": "orbit360-platform/docs/recovery/orbit360-recovery-state-v1.json",
