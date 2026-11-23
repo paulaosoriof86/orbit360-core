@@ -289,6 +289,20 @@
     }
     if (message.indexOf('membership_invalid:') === 0) return 'MEMBERSHIP_INVALID';
     if (message === 'PROTECTED_READ_PROVIDER_MISSING') return 'PROVIDER_MISSING';
+    // Bootstrap membership can fail before a Firestore snapshot exists.
+    // Expose only stable SDK categories. Never log the identity or response.
+    var functionErrors = {
+      'functions/unauthenticated': 'FUNCTION_UNAUTHENTICATED',
+      'functions/permission-denied': 'FUNCTION_PERMISSION_DENIED',
+      'functions/unavailable': 'FUNCTION_UNAVAILABLE',
+      'functions/deadline-exceeded': 'FUNCTION_DEADLINE_EXCEEDED',
+      'functions/internal': 'FUNCTION_INTERNAL'
+    };
+    var directCode = text(error && error.code);
+    if (Object.prototype.hasOwnProperty.call(functionErrors, directCode)) return functionErrors[directCode];
+    if (message === 'PROTECTED_BOOTSTRAP_MEMBERSHIP_INVALID') return 'MEMBERSHIP_INVALID';
+    if (message === 'PROTECTED_BOOTSTRAP_RESPONSE_INVALID') return 'SERVER_RESPONSE_INVALID';
+
     var snapshot = {};
     try { snapshot = store && typeof store._productStatus === 'function' ? store._productStatus() : {}; }
     catch (_) {}

@@ -12,6 +12,7 @@ on:
       - tools/gravicentra-i6-6-operational-renewal-entry.test.cjs
       - orbit360-platform/core/ciclo.js
       - tools/gravicentra-i6-6-management-default-and-client-country.test.cjs
+      - tools/gravicentra-i6-6-active-session-recovery.test.cjs
       - orbit360-platform/modules/ops.js
       - orbit360-platform/modules/leads.js
       - tools/gravicentra-i6-6-ops-collaboration-owner.test.cjs
@@ -65,6 +66,7 @@ jobs:
           node --check orbit360-platform/modules/crm-v1198-operational-bridge.js
           node --test tools/gravicentra-i6-6-crm-shadow-advisor-source.test.cjs
           node --test tools/gravicentra-i6-6-cliente360-advisor-source-parity.test.cjs
+          node --test tools/gravicentra-i6-6-active-session-recovery.test.cjs tools/gravicentra-i66-auth-first-startup.test.cjs
           node --test tools/gravicentra-i6-6-management-default-and-client-country.test.cjs tools/gravicentra-i6-6-client-linked-deal-timeline.test.cjs tools/gravicentra-i6-6-management-catalog-client-projection.test.cjs
           node --test tools/gravicentra-i6-6-privileged-role-portfolio-parity.test.cjs \
             tools/gravicentra-i6-6-privileged-role-writer-transaction.test.cjs \

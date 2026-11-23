@@ -3671,6 +3671,43 @@
           "gitBlobSha": "626013900e9d0035ef1cda10abbe7742a66bd3db"
         }
       ]
+    },
+    {
+      "id": "I6_6_RESTORE_SIGNED_SESSION_MEMBERSHIP_20261122",
+      "approvedByDirection": true,
+      "receipt": "Mandato I6.6, secciones 4, 10 y 11. Alcance autorizado para corrección y Preview. La aceptación visual y LIVE de esta candidata siguen pendientes.",
+      "sourceStatus": "SOURCE_REQUIRES_EXACT_PREVIEW_AND_LIVE_UI_PROOF",
+      "capabilityOwners": [
+        "LOGIN",
+        "PWA"
+      ],
+      "scope": "Verified existing Firebase session recovery through normal membership bootstrap and limited diagnostic codes before the first data snapshot.",
+      "paths": [
+        {
+          "path": "orbit360-platform/core/auth-product-runtime-p0.js",
+          "gitBlobSha": "506ac0a0bd6319ca2136591dc3fdd81c1547242c",
+          "replaces": {
+            "path": "orbit360-platform/core/auth-product-runtime-p0.js",
+            "priorGitBlobSha": "799bbd849a00e2591738d23b64795757980f1e5a",
+            "priorChangeId": "I6_6_OWNER_APPROVED_SOURCE_LINEAGE_SUCCESSOR_20261119"
+          }
+        },
+        {
+          "path": "orbit360-platform/core/backend-product-readonly-bootstrap-p0.js",
+          "gitBlobSha": "8efd4f51ac273e44c4377282d39da6d26bdb561d",
+          "replaces": {
+            "path": "orbit360-platform/core/backend-product-readonly-bootstrap-p0.js",
+            "priorGitBlobSha": "e2ea6e0a3464b84ce3ebb291cc643dce93644568",
+            "priorChangeId": "I6_6_PROTECTED_ROLE_MATRIX_HYDRATION_ORDER_20261117"
+          }
+        }
+      ],
+      "tests": [
+        {
+          "path": "tools/gravicentra-i6-6-active-session-recovery.test.cjs",
+          "gitBlobSha": "fff275d234a19cf8f6c244a70040f65e279ef61d"
+        }
+      ]
     }
   ],
   "i66R11PreviewBuildRequest20261113": {
