@@ -363,6 +363,36 @@
     "globalAcceptanceBoundary": "Business-direction acceptance of evidence and small-difference tolerance does not itself certify that the correct production document was mutated; avoid PAID_LIVE_PASS until before/after Firestore readback.",
     "allowedNext": "Continue I6.6 protected financial batches and module QA, without repeating these three questions.",
     "documentSourceManifestUnchanged": true,
-    "branchNoNewIteration": true
+    "branchNoNewIteration": true,
+    "transversalTechnicalAcceptanceCriteria": [
+      {
+        "id": "I66_OWNER_CONFIRMED_PAID",
+        "scope": "Any authorized customer/policy/insurer/country",
+        "sourceType": "OWNER_ATTESTED_PAYMENT",
+        "require": "authorized Dirección identity, exact tenant+client+policy+effective term+requirement, owner attestation date separate from unknown actual paid date; before/after CAS and dedupe of receipt+cobro",
+        "mustNot": "Depend on a particular policy/person, invent a payment date or reject valid owner attestation solely because a past insurer document was stale",
+        "validate": "Paula's Ficohsa 7317082 positive; nonowner/foreign tenant/wrong edition/duplicate negative; direct reload persistence"
+      },
+      {
+        "id": "I66_TINY_VARIANCE_NOT_BLOCKING",
+        "scope": "Exact owner-approved substitution adjustment and generalized conditional tiny-difference tolerance without broad monetary writeoffs",
+        "require": "match issuer requirement+endorsement+risk+transfer amount and verify existing related Cobros; document 4 cents variance as tolerated, preserving both originals",
+        "mustNot": "create Q0.04 synthetic payment, offset or overwrite source amount, ignore mismatched endorsement and unrelated bank source",
+        "validate": "Q176.40 paid vs Q176.44 requirement accept, >=material mismatch or wrong risk fail closed; idempotent replay and reload"
+      },
+      {
+        "id": "I66_PROTECTED_WRITER_ROLE_SEPARATOR",
+        "scope": "Financial batch and release",
+        "require": "protected environment review, durable server readback, exact release pointer, no parallel second writer",
+        "mustNot": "Treat GREEN preflight or source QA as live applied payment",
+        "validate": "fresh real Firestore readback after each explicit protected write"
+      }
+    ],
+    "causalSourceTestObservation": {
+      "source": "GitHub Actions 45092731780 source QA logs",
+      "test": "BANK proof without an actual paid date is admitted HOLD and never READY",
+      "interpretation": "Existing BANK-only test remains valid for uncorroborated bank proof; OWNER_ATTESTED_PAYMENT needs independent governed path not rewriting a BANK rule to ignore chronology.",
+      "status": "TECHNICAL_IMPLEMENTATION_PENDING_NOT_PERFORMANCE_PASS"
+    }
   }
 }
