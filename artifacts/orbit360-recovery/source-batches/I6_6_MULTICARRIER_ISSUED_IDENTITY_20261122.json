@@ -29,52 +29,92 @@
         {
           "number": "995653882",
           "due": "2026-10-28",
-          "grossCents": 66474
+          "grossCents": 66474,
+          "netCents": 51610,
+          "expenseCents": 2581,
+          "financingCents": 5161,
+          "vatCents": 7122
         },
         {
           "number": "995653883",
           "due": "2026-11-28",
-          "grossCents": 66474
+          "grossCents": 66474,
+          "netCents": 51610,
+          "expenseCents": 2581,
+          "financingCents": 5161,
+          "vatCents": 7122
         },
         {
           "number": "995653884",
           "due": "2026-12-28",
-          "grossCents": 66474
+          "grossCents": 66474,
+          "netCents": 51610,
+          "expenseCents": 2581,
+          "financingCents": 5161,
+          "vatCents": 7122
         },
         {
           "number": "995653885",
           "due": "2027-01-28",
-          "grossCents": 66474
+          "grossCents": 66474,
+          "netCents": 51610,
+          "expenseCents": 2581,
+          "financingCents": 5161,
+          "vatCents": 7122
         },
         {
           "number": "995653886",
           "due": "2027-02-28",
-          "grossCents": 66474
+          "grossCents": 66474,
+          "netCents": 51610,
+          "expenseCents": 2581,
+          "financingCents": 5161,
+          "vatCents": 7122
         },
         {
           "number": "995653887",
           "due": "2027-03-31",
-          "grossCents": 66474
+          "grossCents": 66474,
+          "netCents": 51610,
+          "expenseCents": 2581,
+          "financingCents": 5161,
+          "vatCents": 7122
         },
         {
           "number": "995653888",
           "due": "2027-04-30",
-          "grossCents": 66474
+          "grossCents": 66474,
+          "netCents": 51610,
+          "expenseCents": 2581,
+          "financingCents": 5161,
+          "vatCents": 7122
         },
         {
           "number": "995653889",
           "due": "2027-05-31",
-          "grossCents": 66474
+          "grossCents": 66474,
+          "netCents": 51610,
+          "expenseCents": 2581,
+          "financingCents": 5161,
+          "vatCents": 7122
         },
         {
           "number": "995653890",
           "due": "2027-06-30",
-          "grossCents": 66474
+          "grossCents": 66474,
+          "netCents": 51610,
+          "expenseCents": 2581,
+          "financingCents": 5161,
+          "vatCents": 7122
         },
         {
           "number": "995653891",
           "due": "2027-07-31",
-          "grossCents": 66471
+          "grossCents": 66471,
+          "netCents": 51610,
+          "expenseCents": 2576,
+          "financingCents": 5161,
+          "vatCents": 7124
         }
       ],
       "plateWitness": "541bd40d413588c60d3744795d24fb2eb93ba5ba26bd04f26897be2a30c7b2e9",
@@ -86,7 +126,25 @@
       },
       "plateWithoutClassWitness": "6c3f61cb08d4d55ce8172078025f23b1fcd86fd03b50ff7ffa280e5b127cdd76",
       "issuerChassisLength": 8,
-      "engineWitness": "dd323aa2d194658395f8ccd53d52c74387ef5a72b53d2bed48753c7371ef784d"
+      "engineWitness": "dd323aa2d194658395f8ccd53d52c74387ef5a72b53d2bed48753c7371ef784d",
+      "premiumBreakdown": {
+        "netCents": 516100,
+        "expenseCents": 25805,
+        "financingCents": 51610,
+        "vatCents": 71222
+      },
+      "issueDate": "2026-09-14",
+      "certificate": "1",
+      "liabilityLimitCents": 75000000,
+      "ownDamageIncluded": false,
+      "totalTheftIncluded": false,
+      "vehicleDescription": {
+        "classLetter": "C",
+        "marca": "INTERNATIONAL",
+        "linea": "4700 4X2",
+        "anio": 1992,
+        "tipo": "CAMION"
+      }
     },
     {
       "insurer": "G&T",

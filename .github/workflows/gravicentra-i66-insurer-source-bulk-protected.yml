@@ -11,6 +11,7 @@ on:
     branches: [recovery/fase-a-clean-20260831]
     paths:
       - .github/workflows/gravicentra-i66-insurer-source-bulk-protected.yml
+      - artifacts/orbit360-recovery/release-control/I6_6_GYT_519815_COMMERCIAL_SERVER_READBACK_20261122.json
       - tools/gravicentra-i66-issued-renewal*.cjs
       - tools/gravicentra-i66-roble-five-issuer-crosswalk*.cjs
       - tools/gravicentra-i66-roble-two-issued-plan*.cjs
@@ -55,6 +56,8 @@ jobs:
       d03_before: ${{ steps.d03.outputs.before }}
       issued_ready: ${{ steps.issued.outputs.eligible }}
       issued_before: ${{ steps.issued.outputs.before }}
+      gyt_ready: ${{ steps.gyt.outputs.eligible }}
+      gyt_before: ${{ steps.gyt.outputs.before }}
       two_ready: ${{ steps.two.outputs.eligible }}
       two_preimagesB64: ${{ steps.two.outputs.preimagesB64 }}
     steps:
@@ -149,6 +152,15 @@ jobs:
           set -euo pipefail
           node --test tools/gravicentra-i66-roble-two-issued-plan.test.cjs
           node tools/gravicentra-i66-roble-two-issued-protected.cjs preflight
+      - name: Check the issued G&T schedule and exact predecessor in Firestore
+        id: gyt
+        if: contains(github.event.head_commit.message, 'I66_GYT_519815')
+        run: |
+          node --test tools/gravicentra-i66-issued-renewal-gyt.test.cjs
+          node tools/gravicentra-i66-issued-renewal-gyt-protected.cjs preflight
+      - name: Independently read back the full G&T issued schedule and links
+        if: contains(github.event.head_commit.message, 'I66_GYT_POSTIMAGE')
+        run: node tools/gravicentra-i66-issued-renewal-gyt-protected.cjs readback
       - id: judge
         name: Verify exact counts before protected financial writes
         shell: bash
@@ -180,7 +192,10 @@ jobs:
           retention-days: 14
   protected-source-bulk-live:
     needs: preflight
-    if: needs.preflight.outputs.ready == 'true'
+    if: needs.preflight.outputs.ready == 'true' || needs.preflight.outputs.gyt_ready == 'true'
+    concurrency:
+      group: gravicentra-i66-protected-source-bulk-live
+      cancel-in-progress: false
     runs-on: ubuntu-24.04
     timeout-minutes: 50
     environment:
@@ -225,6 +240,7 @@ jobs:
           else: raise SystemExit('I66_BULK_PROTECTED_FIREBASE_IDENTITY_MISSING')
           PY
       - name: Apply only exact preimage-pinned pending source corrections, audit and read back
+        if: needs.preflight.outputs.ready == 'true'
         shell: bash
         env:
           GI_I66_BULK_MODE: apply
@@ -234,12 +250,24 @@ jobs:
         run: |
           set -euo pipefail
           node tools/gravicentra-i66-source-bulk-live.cjs
+      - name: Register the issued G&T renewal with its protected preimage and read back each item
+        if: needs.preflight.outputs.gyt_ready == 'true'
+        shell: bash
+        env:
+          GI_I66_BULK_PROTECTED_ENV: gravicentra-live-data-writes
+          GI_I66_GYT_BEFORE: ${{ needs.preflight.outputs.gyt_before }}
+        run: |
+          set -euo pipefail
+          node --test tools/gravicentra-i66-issued-renewal-gyt.test.cjs
+          node tools/gravicentra-i66-issued-renewal-gyt-protected.cjs apply | tee "$RUNNER_TEMP/gi-i66-gyt-issuer-readback.jsonl"
       - name: Preserve receipt and cartera before-after readback
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: gi-i66-source-bulk-live-${{ github.run_id }}
-          path: ${{ runner.temp }}/gi-i66-bulk-live.json
+          path: |
+            ${{ runner.temp }}/gi-i66-bulk-live.json
+            ${{ runner.temp }}/gi-i66-gyt-issuer-readback.jsonl
           if-no-files-found: ignore
           retention-days: 90
 
