@@ -26,7 +26,7 @@
     "canonicalPlan": "artifacts/orbit360-recovery/release-control/I6_6_OPERATIONAL_CONTINUATION_20261115.json",
     "activeGate": "I6.6",
     "closedHistoricalGate": "B4-007",
-    "latestProvenLiveSource": "f1eb5bc6397f0b159079be516a521dd7b1e5d9ba",
+    "latestProvenLiveSource": "15e849bd606bd8c93e4c0471da1193e85004aecd",
     "currentWork": "I6.6 HOLD. Current physical frontend Hosting is f1eb5bc, same artifact 224/224 Preview/Firebase/custom LIVE, signed Carlos and Dirección synthetic tests repeated 22-Nov. 17-Nov three backend functions remain separately certified and unchanged by this Hosting-only successor. Real issuance/renewal/Drive invoice, Edson original error, Make inbound and financial delta payments still unproven. Preserve historical acceptance.",
     "latestHostingPreviewEvidence": "artifacts/orbit360-recovery/release-control/I6_6_NETWORK_DIAGNOSTICS_PREVIEW_BUILD_20261117.json",
     "latestHostingPreviewSource": "1b65a790530d49fe1d1fb451f02838fd9a713c53",
@@ -1592,7 +1592,7 @@
       "backendFunctionsChanged": 0,
       "fullI66ProductionAccepted": false
     },
-    "latestPhysicalFrontendLiveReceipt": "artifacts/orbit360-recovery/release-control/I6_6_DIRECT_PAYMENT_OPTIONAL_DOCUMENT_LIVE_READBACK_20261120.json",
+    "latestPhysicalFrontendLiveReceipt": "artifacts/orbit360-recovery/release-control/I6_6_FRONTEND_E00002_RECEIPT.json",
     "latestPhysicalFrontendLiveRunId": 44827928263
   },
   "b4003ActiveCertificationCursor20261106": {
@@ -4926,7 +4926,7 @@
     "i63LiveReadbackPass": true,
     "i63DeterministicDiffReady": true
   },
-  "nextAction": "I6_6_CURRENT_PHYSICAL_FRONTEND_SIGNED_224_FILES_LIVE_gi-i66-f1eb5bc6397f-57f234755dc1_WITH_TESTED_NO_BLOCK_PAYMENT_AND_SYNTHETIC_ROLES; HISTORICAL_17NOV_THREE_BACKEND_FUNCTIONS_ACCEPTANCE_PRESERVED; FULL_I66_HOLD; FIRST_INCOMPLETE_WORK: CORRECT_GENUINE_RENEWAL_SUBSTITUTION_PAYMENT_CASE_DOCUMENT_DRIVE_AND_AUTHENTICATED_BROWSER_UI, PLUS_FRESH_FIRESORE_READBACK_SOURCE_PINNED_DETERMINISTIC_FINANCIAL_DELTAS_WITH_NO_REPLAY. NO_NEW_RELEASE_OR_DATA_MUTATION_AUTHORIZED_BY_THIS_POINTER.",
+  "nextAction": "I6.6 continúa después de la publicación focal gi-i66-15e849bd606b-57f234755dc1. Continue I6.6 on the versioned exact frontend promotion, remaining 143 source exceptions, signed advisor scope, management save, Drive, integrations and remaining open findings.",
   "postproductionExitProgress": {
     "formalPercent": 60,
     "frozenMiniGates": 6,
@@ -23240,7 +23240,7 @@
     "noNewIterationsOrParallelReleaseMethod": true,
     "noGlobalSynchronizationClaim": true
   },
-  "currentExecutionDecisionPointer": "i66LatestPhysicalFrontendLive20261120",
+  "currentExecutionDecisionPointer": "i66FrontendReleaseHead",
   "i66PaymentInvoicePolicyR9ExactLiveRelease20261113": {
     "schema": "GI_I66_R9_EXACT_LIVE_OPERATIVE_SUCCESSOR_V1",
     "status": "PREVIOUS_R9_PAYMENT_INVOICE_POLICY_SIGNED_LIVE_PRESERVED",
@@ -24599,20 +24599,20 @@
   },
   "i66ActiveRecoveryCursor": {
     "status": "FROZEN_I66_SHOCK_EXECUTION_CONTINUES_NO_GATE_REPLACEMENT",
-    "currentEvidencePath": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_EXECUTION_PROGRESS_20261122_R6.json",
-    "currentEvidenceBlobSha": "1a2a64c6f7d4fef4394b255d68e421747fe2629d",
+    "currentEvidencePath": "artifacts/orbit360-recovery/release-control/I6_6_FRONTEND_E00002_FOCAL_PROGRESS.json",
+    "currentEvidenceBlobSha": "a3e6921135089e41d4c5fce912378d41dceee998",
     "frozenPlanPath": "artifacts/orbit360-recovery/release-control/I6_6_PLAN_CHOQUE_FUNCIONAL_FINANCIERO_20261122.md",
     "frozenPlanBlobSha": "fbfd54d229a13101fbfb0dfc6e92a5fa524999b6",
     "fullInventoryPath": "artifacts/orbit360-recovery/release-control/I6_6_INVENTARIO_INTEGRAL_295_20261122.md",
     "fullInventoryBlobSha": "6d5a15d6d05c1145a2ff536b085eaa6629722273",
-    "lastPhysicalLiveSourceSha": "f1eb5bc6397f0b159079be516a521dd7b1e5d9ba",
-    "lastPhysicalLiveRunId": 44827928263,
+    "lastPhysicalLiveSourceSha": "15e849bd606bd8c93e4c0471da1193e85004aecd",
+    "lastPhysicalLiveRunId": 45088457923,
     "lastPublicAvailabilityRunId": 45068427094,
     "formalI6GatePercent": 60,
     "shockObjectivesPassed": 2,
     "shockObjectivesTotal": 14,
     "shockObjectivesPct": 14.3,
-    "moduleReleasedThisIteration": [],
+    "moduleReleasedThisIteration": true,
     "financialDeltaCasesPrepared": 113,
     "financialRowsAppliedThisIteration": 24,
     "lastEvidenceDateLocal": "2026-11-22",
@@ -24621,8 +24621,8 @@
     "lastFunctionalLiveUatRunId": 45074429319,
     "lastFunctionalLiveUatJobId": 137352857627,
     "lastFunctionalLiveScope": "TWO_ROLE_RENEWAL_INSURER_SYNTHETIC_PASS_REAL_ISSUANCE_AND_DOCUMENT_HOLD",
-    "previousEvidencePath": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_EXECUTION_PROGRESS_20261122_R5.json",
-    "previousEvidenceBlobSha": "f5806fbe29fb27fa0b58f1edcd10385fe6dc417d",
+    "previousEvidencePath": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_EXECUTION_PROGRESS_20261122_R6.json",
+    "previousEvidenceBlobSha": "1a2a64c6f7d4fef4394b255d68e421747fe2629d",
     "lastFunctionalLiveUatStatus": "LIVE_PHYSICAL_STEPS_PASS_FIVE_ROLE_FINAL_COVERAGE_FAIL_CLOSED",
     "lastFinancialProtectedPreflightRunId": 45084256011,
     "lastFinancialSourceStatus": "D01_D02_D03_COMMITTED_AND_SERVER_READ_BACK_159_UNCHANGED_143_INDIVIDUAL_HOLDS",
@@ -24631,5 +24631,28 @@
     "nextRoleMatrixRerunId": 45074429319,
     "lastPerformanceEvidenceArtifactId": 14775062360,
     "latestSourceDocCrosscheckBlobSha": "9e2aae3fdfa758480a46088890be6337bf7d8a74"
+  },
+  "i66PreversionedControlViewBlob": "de401082f688ce1c59f025f6f39e3c947dceaa35",
+  "i66FrontendReleaseHead": {
+    "generation": 2,
+    "gate": "I6.6",
+    "status": "FOCAL_FRONTEND_LIVE_UI_VERIFIED",
+    "sourceSha": "15e849bd606bd8c93e4c0471da1193e85004aecd",
+    "sourceTree": "4567343f7e438f550a5deda200098124f330ccd2",
+    "compositionBlob": "33bf80768cb6cb311f2975d282a5f50935f680aa",
+    "manifestBlob": "098c127eb1c08a8d5fc3575c0ec38c6cb59f3858",
+    "artifactId": 14777966155,
+    "artifactDigest": "sha256:78a409a419e21648f2e074b49767d1dd55731140f8a83f6064b3ae1c8073b453",
+    "hostingVersion": "sites/ays-orbit-360-lab/versions/e4e8f31b02ba2aef",
+    "buildId": "gi-i66-15e849bd606b-57f234755dc1",
+    "hostedFilesEachOrigin": 224,
+    "previewUrl": "https://ays-orbit-360-lab--gi-i66-rc-45081926149-b9hkley0.web.app",
+    "buildRunId": 45081926149,
+    "rollback": "sites/ays-orbit-360-lab/versions/7a0d829d3504c9f8",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_FRONTEND_E00002_RECEIPT.json",
+    "receiptGitBlobSha": "d39f216defb2959b47087da84cc87b32b97faa94",
+    "receiptCommit": "5c5adeb6f9bdb25e40f01c1ca386c4455197b6ef",
+    "fullI66ProductionAccepted": false,
+    "liveCloneRunId": 45088457923
   }
 }

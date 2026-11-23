@@ -763,5 +763,27 @@
     "acceptanceScope": "Current immutable candidate42 B4-003 only. Earlier accepted module evidence is preserved monotonically; no new global-IAM/security certification or other gate acceptance.",
     "subsequentGateAuthorized": false,
     "augustDataRefreshAuthorized": false
+  },
+  "frontendReleaseHead": {
+    "generation": 2,
+    "gate": "I6.6",
+    "status": "FOCAL_FRONTEND_LIVE_UI_VERIFIED",
+    "sourceSha": "15e849bd606bd8c93e4c0471da1193e85004aecd",
+    "sourceTree": "4567343f7e438f550a5deda200098124f330ccd2",
+    "compositionBlob": "33bf80768cb6cb311f2975d282a5f50935f680aa",
+    "manifestBlob": "098c127eb1c08a8d5fc3575c0ec38c6cb59f3858",
+    "artifactId": 14777966155,
+    "artifactDigest": "sha256:78a409a419e21648f2e074b49767d1dd55731140f8a83f6064b3ae1c8073b453",
+    "hostingVersion": "sites/ays-orbit-360-lab/versions/e4e8f31b02ba2aef",
+    "buildId": "gi-i66-15e849bd606b-57f234755dc1",
+    "hostedFilesEachOrigin": 224,
+    "previewUrl": "https://ays-orbit-360-lab--gi-i66-rc-45081926149-b9hkley0.web.app",
+    "buildRunId": 45081926149,
+    "rollback": "sites/ays-orbit-360-lab/versions/7a0d829d3504c9f8",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_FRONTEND_E00002_RECEIPT.json",
+    "receiptGitBlobSha": "d39f216defb2959b47087da84cc87b32b97faa94",
+    "receiptCommit": "5c5adeb6f9bdb25e40f01c1ca386c4455197b6ef",
+    "fullI66ProductionAccepted": false,
+    "liveCloneRunId": 45088457923
   }
 }

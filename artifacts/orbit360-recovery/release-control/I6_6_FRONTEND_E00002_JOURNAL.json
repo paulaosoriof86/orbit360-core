@@ -1,5 +1,5 @@
 {
-  "phase": "VERIFIED",
+  "phase": "COMMITTED",
   "key": "c507e75d01533d1fbdff973da23123c480fef9f542a09f9a2d3765345f5f8091",
   "generation": 2,
   "request": {
@@ -61,5 +61,16 @@
     "artifactDigest": "sha256:78a409a419e21648f2e074b49767d1dd55731140f8a83f6064b3ae1c8073b453",
     "hostingVersion": "sites/ays-orbit-360-lab/versions/e4e8f31b02ba2aef",
     "manifestDigest": "sha256:0882c7191e68ce09ff496637a57e9f37bbe8efee1774da6a33be53e04f6522b4"
+  },
+  "receipt": {
+    "blob": "d39f216defb2959b47087da84cc87b32b97faa94",
+    "commit": "5c5adeb6f9bdb25e40f01c1ca386c4455197b6ef",
+    "verified": true,
+    "runId": 45088457923
+  },
+  "liveUi": {
+    "result": "PASS",
+    "buildId": "gi-i66-15e849bd606b-57f234755dc1",
+    "receiptBlob": "dde134471c94ad6a167c7dfb07d070efb58ce83e"
   }
 }
