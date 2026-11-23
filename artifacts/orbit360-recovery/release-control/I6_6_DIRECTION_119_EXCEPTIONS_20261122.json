@@ -1,0 +1,114 @@
+{
+  "schema": "GI_I66_DIRECTION_119_SOURCE_EXCEPTIONS_CLARIFICATIONS_V1",
+  "recordType": "BUSINESS_OWNER_DECISION_EVIDENCE_NOT_RELEASE_AUTHORITY",
+  "project": "Gravicentra Insurance",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "gate": "I6.6",
+  "dateGuatemala": "2026-11-22",
+  "authority": "PAULA_DIRECCION_EXPLICIT_CURRENT_CONVERSATION_2026_11_22",
+  "noChangeTo": "CONTROL_PLANE/LINEAGE_LOCK/CAPABILITY_LEDGER/PRODUCT_SOURCE",
+  "operationalSource": "Firestore",
+  "documentSource": "Drive",
+  "sourceManifest": {
+    "path": "artifacts/orbit360-recovery/source-batches/I6_6_SOURCE_BULK_20261120_MULTI_302.json",
+    "gitBlobSha": "ab64e111319e3447733a3af05bf378250698ccdb",
+    "preflightRunId": 45089542945,
+    "sourceRows": 302,
+    "unchanged": 183,
+    "exceptions": 119,
+    "policyEditionMissing": 99,
+    "receiptNotIdentified": 20,
+    "readyToWriteAtPreflight": 0
+  },
+  "decisionScope": {
+    "affectedPolicyCount": 5,
+    "affectedSourceRows": 22,
+    "remainingOtherExceptionsNotWaived": 97
+  },
+  "rules": [
+    "Identidad/corte/numero/vencimiento/importe documentales de aseguradora prevalecen sobre proyeccion desactualizada, siempre con match unico de contrato y vigencia; no sobreescribir pagos historicos acreditados por un estado anterior.",
+    "Inferencia secuencial: cuando fuente autoritativa muestra cuotas pendientes desde N dentro de un calendario completo, las 1..N-1 se consideran pagadas por inferencia sin contradiccion; preservar fecha efectiva contractual marcada inferida, asOf, regla, ancla, evidencia y no duplicar cobros.",
+    "No transformar pendiente de aseguradora en cobro real. Cobro confirmado necesita confirmacion autorizada o evidencia directa/permitida. Pago no conciliado confirmado permanece en Cobros.",
+    "Crear una renovacion faltante solo con documentacion contractual emitida, identidad canonica unica, predecessor exacto, riesgos/asesor correctos y readback; calendario de recibos+cartera se crea idempotentemente, sin pago ficticio.",
+    "Cargo de sustitucion se vincula al endoso/riesgo/vehiculo/cobro real; no tratarlo como mensualidad de prima ni aplicarlo dos veces.",
+    "No reimportar los 183 NO-OP ni reprocesar las dos renovaciones de El Roble 91-8324489/91-8343059 previamente comprometidas. Conflictos aislados, no HOLD global."
+  ],
+  "cases": [
+    {
+      "insurer": "ROBLE",
+      "policy": "91-9119548",
+      "sourceRows": 12,
+      "sourceRequirementRange": [
+        "5833555",
+        "5833566"
+      ],
+      "sourceDueRange": [
+        "2026-11-11",
+        "2027-10-11"
+      ],
+      "ownerDecision": "Usar requerimientos y fechas del estado de cuenta/poliza. Si existen doce cuotas contractuales y solo once figuran pendientes en un estado de cuenta posterior, inferir la primera como pagada; crear renovacion faltante si hay respaldo emitido y no existe sucesora.",
+      "verifiedSnapshot": "Fuente pinned 2026-11-20 contiene DOCE pendientes, no once. No inferir automaticamente la primera con esa misma fuente.",
+      "next": "Verificar documento emitido, edicion exacta, calendario de doce y si existe estado de cuenta posterior que retire primero; re-ejecutar readback CAS."
+    },
+    {
+      "insurer": "ROBLE",
+      "policy": "91-8334771",
+      "sourceRows": 7,
+      "sourceRequirementRange": [
+        "5776448",
+        "5776454"
+      ],
+      "sourceDueRange": [
+        "2026-11-10",
+        "2027-05-10"
+      ],
+      "ownerDecision": "Las siete cuotas de estado de cuenta son las pendientes. Si el plan contractual completo tiene doce y corresponden las cinco primeras contiguas faltantes, considerarlas pagadas por inferencia; fechas y requerimientos los originales de aseguradora.",
+      "verifiedSnapshot": "Siete requerimientos pendientes en fuente 2026-11-20; no prueba aislada de plan de doce ni de vigencia nueva exacta.",
+      "next": "Probar edicion emitida, secuencia 1..12, cancelaciones/ajustes contradictorios y no duplicidad antes de eventuales cobros inferidos."
+    },
+    {
+      "insurer": "FICOHSA",
+      "policy": "AUTO-1000002937",
+      "sourceRows": 1,
+      "sourceRequirement": "7301819",
+      "sourceAmountCents": 17640,
+      "ownerDecision": "Saldo originado por cancelacion. NO generar recibos nuevos para polizas canceladas. Solo registrar/actualizar cobros historicos de vigencia acreditables directamente o por inferencia permitida.",
+      "verifiedSnapshot": "Estado de cuenta Ficohsa 2026-10-22 muestra saldo pendiente por cancelacion. Un saldo pendiente NO prueba un cobro.",
+      "next": "Conservar caso de saldo cancelacion por separado y verificar documentos de pago/reverso; no crear recibo ni cobro por solo saldo."
+    },
+    {
+      "insurer": "FICOHSA",
+      "policy": "AUTO-1000000334",
+      "sourceRows": 1,
+      "sourceRequirement": "7317082",
+      "sourceAmountCents": 388080,
+      "ownerDecision": "Corresponde a una renovacion; Direccion afirma pago realizado y pide cotejar planilla de comisiones.",
+      "verifiedSnapshot": "Estado Ficohsa 2026-10-22 la muestra pendiente; planilla octubre 2026 localizada en Drive NO contiene este numero ni requerimiento. La unica fila de comision octubre es otra poliza. Documento 2025-2026 confirma edicion previa, no sustituye renovacion 2026-2027.",
+      "next": "Buscar comprobante/planilla posterior y poliza emitida 2026-2027. Si pago corroborado, relacionar a edicion+recibo exactos, registrar el mismo cobro sin duplicar y actualizar proyecciones."
+    },
+    {
+      "insurer": "ROBLE",
+      "policy": "91-9105495",
+      "sourceRows": 1,
+      "sourceRequirement": "5838167",
+      "sourceAmountCents": 17644,
+      "ownerDecision": "Cargo/cobro por sustitucion de vehiculo ya ingresada; existe hallazgo transversal de endosos y relaciones en solucion.",
+      "verifiedSnapshot": "Estado El Roble 2026-11-20 muestra saldo pendiente Q176.44; no determina por si solo si el cliente ya pago.",
+      "next": "Cotejar endoso, documentacion del cambio de riesgo, cargo, pago, recibo asociado si corresponde y persistencia en Cliente360/Póliza/Vehículos/Cobros."
+    }
+  ],
+  "sourceRefs": {
+    "ficohsaOctoberCommissionDriveFileId": "1_yH82M7deJ6og98wTI663s3urK2i3Au7",
+    "ficohsaPendingStatementDriveFileId": "1qnOMyFHKnZlAgLNnACmsmgky3avOHsl4",
+    "ficohsaPriorPolicyPdfDriveFileId": "1g7H_QF4__a1riCRBBw--ZEr6zqwYCUpb"
+  },
+  "executionPolicy": {
+    "productionFinancialWritesPerformedByThisRecord": 0,
+    "productSourceChanges": 0,
+    "newReleaseAuthorized": false,
+    "financialApplyAuthorizedByThisRecordAlone": false,
+    "status": "DECISIONS_CAPTURED_PENDING_PROTECTED_CAS_AND_DOCUMENTARY_EVIDENCE"
+  },
+  "questionForOwner": "Existe una planilla posterior a octubre de Ficohsa o comprobante de pago para AUTO-1000000334 requerimiento 7317082? En octubre no consta y al 22-Oct seguia pendiente. Si ademas hay estado El Roble posterior a 20-Nov con solo once pendientes para 91-9119548, identificar corte documental."
+}
