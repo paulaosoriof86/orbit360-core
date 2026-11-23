@@ -84,7 +84,7 @@ async function issuedSubstitutionReadback(root) {
       holderMatchesIssuer:!!holder?.exists && match(holder.data(),['nombre','nombreCompleto','razonSocial'],source.holder),
       status:row.estado, linkedRisks:risks.size, linkedManagements:requests.size,
       risks:risks.docs.map(v=>({entityDigest:masked(v.id),pointer:row.vehiculoId===v.id,previousPlate:match(v.data(),['placa','placaFuente'],source.oldPlate),issuedPlate:match(v.data(),['placa','placaFuente'],source.newPlate),previousVin:match(v.data(),['vin','chasis','chasisFuente'],source.oldVin),issuedVin:match(v.data(),['vin','chasis','chasisFuente'],source.newVin),estado:text(v.get('estado')).slice(0,32),activo:v.get('activo')??null})),
-      endorsements:requests.docs.filter(q=>q.get('workflowType')==='endorsement_request').map(q=>({entityDigest:masked(q.id),stage:text(q.get('endorsementStage')).slice(0,40),date:date(q.get('createdAt')),matchingIssuedNumber:clean(q.get('endorsementNumber')||q.get('numeroEndoso'))==='199154'}))});
+      endorsements:requests.docs.filter(q=>q.get('workflowType')==='endorsement_request').map(q=>({entityDigest:masked(q.id),stage:text(q.get('endorsementStage')).slice(0,40),date:date(q.get('createdAt')),effectiveDate:text(q.get('fechaEfectiva')).slice(0,10),hasInsurerReference:!!q.get('referenciaAseguradora'),hasDocumentReference:!!q.get('documentRef'),matchingIssuedNumber:[q.get('referenciaAseguradora'),q.get('documentRef'),q.get('endorsementNumber'),q.get('numeroEndoso')].some(value=>/(^|[^0-9])199154([^0-9]|$)/.test(text(value)))}))});
   }
   return {sourcePdfSha256:'14c5a6209463713fea26a6ca35316276211382ee3b93a63a2d017d3285d7e031',issuerEndorsement:'199154',editions:reports, writes:0};
 }
