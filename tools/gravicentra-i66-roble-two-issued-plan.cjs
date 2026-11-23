@@ -29,6 +29,7 @@ function check(){
   assert.equal(issued.issuerEndorsement,c.endorsement);
   assert.equal(issued.issuedGrossCents,c.issuerHeader.grossCents);
   assert.equal(issued.matchedSourcePendingCount,12);
+  assert.ok(Number.isSafeInteger(c.issuedInsuredValueCents)&&c.issuedInsuredValueCents>0,'SIGNED_ISSUER_INSURED_VALUE_REQUIRED');
   assert.equal(c.schedule.length,12);assert.equal(c.schedule[0].sequence,1);
   for(const r of c.schedule){
    const x=issued.schedule.find(y=>y.requirement===r.requirement);
@@ -85,18 +86,18 @@ function mutation(c,identity,at){
    nombre:'Renovación emitida '+c.endorsement,sha256:w.sourcePdfRawSha256,clienteId:holder.id,polizaId:pid};
  const asMoney=x=>Number((x/100).toFixed(2));
  const today=at.slice(0,10);
- const common={...canonical,createdAt:at,updatedAt:at,source:'El Roble original emitido + estado de cuenta 20/11/2026',
+ const common={...canonical,createdAt:at,updatedAt:at,creado:at,actualizado:at,fuente:'Documento emitido por El Roble + estado de cuenta 20/11/2026',source:'El Roble original emitido + estado de cuenta 20/11/2026',
    sourceDocumentRef:fiveCase.sourcePdfId,issuerDocumentSha256:w.sourcePdfRawSha256};
  const hdr=c.issuerHeader;
  const policy={...common,id:pid,numero:c.policy,estado:c.termStart<=today?'Vigente':'Emitida',
-   policyVersionKey:basis,ramo:prior.ramo||'Vehículos',subramo:prior.subramo||'',producto:prior.producto||'',
+   policyKey:[tenant,'GT',insurer.id,c.policy,holder.id].join('|'),policyVersionKey:basis,ramo:prior.ramo||'Vehículos',subramo:prior.subramo||'',producto:prior.producto||'',divisa:'GTQ',
    vigenciaInicio:c.termStart,vigenciaFin:c.termEnd,fechaEmision:'2026-10-13',renuevaDe:prior.id,
    frecuencia:'Mensual',cuotas:12,endoso:c.endorsement,primaNeta:asMoney(hdr.netCents),
    gastosEmision:asMoney(hdr.expensesCents),otros:asMoney(hdr.assistCents),gastosFinan:asMoney(hdr.financeCents),
    iva:asMoney(hdr.ivaCents),ivaMonto:asMoney(hdr.ivaCents),prima:asMoney(hdr.grossCents),primaTotal:asMoney(hdr.grossCents),
    primaTotalDocumentalOriginal:asMoney(hdr.grossCents),primaCalendarioEmitido:asMoney(c.issuedScheduleGrossCents),
    diferenciaDocumentalCentavos:c.coverScheduleDeltaCents,
-   sumaAsegurada:prior.sumaAsegurada??null,documentRef:fiveCase.sourcePdfId,documentos:[doc],adjuntos:[doc],
+   sumaAsegurada:asMoney(c.issuedInsuredValueCents),documentRef:fiveCase.sourcePdfId,documentos:[doc],adjuntos:[doc],
    vehiculoId:vid,sourcePolicyId:prior.id,
    historial:[{fecha:today,icon:'🔄',t:'Renovación emitida registrada',d:'Endoso '+c.endorsement,operationId:operation}]};
  const creates=[['polizas',policy]];
@@ -107,7 +108,7 @@ function mutation(c,identity,at){
    secuencia:r.sequence,numeroCuota:r.sequence,cuota:r.sequence+'/12',
    numeroReciboFuente:r.requirement,fechaVencimientoContractual:due,fechaVencimiento:due,vence:due,fechaLimite:due,
    primaNeta:asMoney(r.netCents),neta:asMoney(r.netCents),
-   gastosEmisionYOtros:asMoney(r.expensesAndOtherCents),componenteGastosSinSeparar:true,
+   gastosEmisionYOtrosDocumentados:asMoney(r.expensesAndOtherCents),componenteGastosSinSeparar:true,
    gastosFinan:asMoney(r.financingCents),iva:asMoney(r.ivaCents),ivaMonto:asMoney(r.ivaCents),
    monto:asMoney(r.grossCents),primaTotal:asMoney(r.grossCents),montoTotal:asMoney(r.grossCents),
    estado:due<today?'Vencido':'Pendiente',carteraActiva:true,conciliado:false,fechaPago:null,
@@ -119,7 +120,7 @@ function mutation(c,identity,at){
     carteraTipo:'cartera_activa',estadoConciliacionSaldo:'pendiente_conciliacion',saldoConciliado:false}]);
  }
  const nextVehicle={...Object.fromEntries(['placa','placaFuente','vin','chasis','chasisFuente','marca','linea','anio','motor','uso','tipo','inciso'].filter(k=>vehicle[k]!=null).map(k=>[k,vehicle[k]])),
-   ...common,id:vid,polizaId:pid,estado:'Vigente',sourcePolicyId:prior.id,sourceVehicleId:vehicle.id,
+   ...common,id:vid,polizaId:pid,estado:'Vigente',sumaAsegurada:asMoney(c.issuedInsuredValueCents),sourcePolicyId:prior.id,sourceVehicleId:vehicle.id,
    versionOfVehicleId:vehicle.id,documentRef:fiveCase.sourcePdfId,creado:at};
  const activity={...common,id:'act_'+operation,polizaId:pid,sourcePolicyId:prior.id,
    fecha:today,tipo:'renovacion',icon:'🔄',titulo:'Renovación emitida registrada',
