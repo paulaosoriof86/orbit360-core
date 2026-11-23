@@ -4738,14 +4738,16 @@
     "liveCloneRunId": 45088457923
   },
   "frontendPreviewRequest": {
-    "version": 2,
+    "version": 3,
     "mode": "PREVIEW_HOSTING_ONLY",
-    "sourceQaHead": "53c11835c6e012417b9044a0d955704f1ec6aa72",
-    "manifestBlob": "3226b4e313eefc2a2eba81b3f717ffd46dc186f3",
-    "sourceQaRunId": 45090025052,
-    "guardRunId": 45090024989,
+    "sourceQaHead": "bd4e643852fd9b5974a1b7de36052d599de18a2f",
+    "manifestBlob": "638342618594a1bfe89f675956a32a73b47b342c",
+    "sourceQaRunId": 45092731929,
+    "guardRunId": 45092731772,
     "previousReceiptBlob": "d39f216defb2959b47087da84cc87b32b97faa94",
     "productPaths": [
+      "orbit360-platform/core/auth-product-runtime-p0.js",
+      "orbit360-platform/core/backend-product-readonly-bootstrap-p0.js",
       "orbit360-platform/core/ciclo.js",
       "orbit360-platform/modules/cliente360.js"
     ]
