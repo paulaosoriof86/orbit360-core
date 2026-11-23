@@ -1,0 +1,93 @@
+{
+  "schema": "GI_I66_V14_SIGNED_PREVIEW_VALIDATED_RECEIPT_V1",
+  "gate": "I6.6",
+  "recordedAtUtc": "2026-11-23T23:49:29.056Z",
+  "run": {
+    "id": 45290957490,
+    "headSha": "68b18de6a285eedd0dd678ff7f89fe18f7b6a882",
+    "conclusion": "success",
+    "path": ".github/workflows/gravicentra-i66-privileged-role-three-function-preview-uat.yml"
+  },
+  "artifact": {
+    "id": 14874980702,
+    "digest": "sha256:3a9a6aed22139310a94d0f050b4ef86f394506495ce9d773a530f64b9b1dfddd",
+    "name": "gi-i66-operational-preview-proof-45290957490",
+    "expired": false
+  },
+  "proof": {
+    "schema": "I6_6_OPERATIONAL_SIGNED_PREVIEW_PROOF_V1",
+    "status": "SIGNED_DRIVERS_DURABLE_READBACK_RELOAD_RESTORE_PASS",
+    "sourceSha": "65c825b2808a615ca4195bdde6689dbdbe3193b2",
+    "buildRunId": 45287432665,
+    "artifactId": 14873426438,
+    "artifactDigest": "sha256:7cb782848a45083047c4899bc30c13bf5be46429607e42597d09342becfc9acc",
+    "previewUrl": "https://ays-orbit-360-lab--gi-i66-rc-45287432665-qxusovq3.web.app",
+    "previewChannelId": "gi-i66-rc-45287432665",
+    "buildId": "gi-i66-65c825b2808a-57f234755dc1",
+    "targets": [
+      {
+        "name": "orbit360ProductOperationalCommandPreview",
+        "region": "us-east1"
+      },
+      {
+        "name": "orbit360CobrosReconciliationCommandPreview",
+        "region": "us-central1"
+      },
+      {
+        "name": "orbit360ScopedPolicyReadPreview",
+        "region": "us-east1"
+      },
+      {
+        "name": "orbit360OpsLeadsCommandPreview",
+        "region": "us-east1"
+      }
+    ],
+    "signedDrivers": [
+      "tools/gravicentra-i66-privileged-role-signed-ui-permissions-readonly.cjs",
+      "tools/gravicentra-i6-6-carlos-real-signed-synthetic-preview-uat.cjs",
+      "tools/gravicentra-i6-6-advisor-payables-signed-uat.cjs",
+      "tools/gravicentra-i6-6-proposal-application-signed-uat.cjs"
+    ],
+    "realFinancialOrCustomerWrites": 0,
+    "syntheticRestoreComplete": true,
+    "liveHostingUnchanged": true,
+    "liveBackendUnchanged": true,
+    "focusedReports": {
+      "advisorPayables": {
+        "status": "PASS",
+        "cleanup": "PASS",
+        "checks": 16,
+        "digest": "sha256:9091708f1429a3d446658164335aa9d71aab850b0b32fa251bc8f7dcd3b60897",
+        "observability": {
+          "profile": "I66_SIGNED_BROWSER_OBSERVABILITY_V1",
+          "status": "PASS",
+          "unexpectedConsoleErrors": 0,
+          "unexpectedHttpErrors": 0,
+          "pageErrorCount": 0,
+          "telemetryFailures": 0
+        }
+      },
+      "proposalApplication": {
+        "status": "PASS",
+        "cleanup": "PASS",
+        "checks": 18,
+        "digest": "sha256:075b79a5e320ff63655d38212917e6accd3c471e04cc1b80fb1de08fe791f1be",
+        "observability": {
+          "profile": "I66_SIGNED_BROWSER_OBSERVABILITY_V1",
+          "status": "PASS",
+          "mode": "UI_REQUEST_RELOAD_DURABLE_READBACK_EXACT"
+        }
+      }
+    },
+    "runId": 45290957490,
+    "headSha": "68b18de6a285eedd0dd678ff7f89fe18f7b6a882"
+  },
+  "focusedDetailedReportsChecked": true,
+  "detailedReportChecks": {
+    "advisorPayables": 16,
+    "proposalApplication": 18
+  },
+  "sameArtifactLiveAuthorized": true,
+  "livePromoted": false,
+  "fullI66ProductionAccepted": false
+}
