@@ -108,7 +108,109 @@
     "productSourceChanges": 0,
     "newReleaseAuthorized": false,
     "financialApplyAuthorizedByThisRecordAlone": false,
-    "status": "DECISIONS_CAPTURED_PENDING_PROTECTED_CAS_AND_DOCUMENTARY_EVIDENCE"
+    "status": "DIRECTION_DECISIONS_CAPTURED_WITH_SOURCE_AND_EXISTING_FIRESTORE_SNAPSHOT_FIVE_CASES_PROTECTED_APPLY_PENDING"
   },
-  "questionForOwner": "Existe una planilla posterior a octubre de Ficohsa o comprobante de pago para AUTO-1000000334 requerimiento 7317082? En octubre no consta y al 22-Oct seguia pendiente. Si ademas hay estado El Roble posterior a 20-Nov con solo once pendientes para 91-9119548, identificar corte documental."
+  "questionForOwner": "Existe una planilla posterior a octubre de Ficohsa o comprobante de pago para AUTO-1000000334 requerimiento 7317082? En octubre no consta y al 22-Oct seguia pendiente. Si ademas hay estado El Roble posterior a 20-Nov con solo once pendientes para 91-9119548, identificar corte documental.",
+  "readonlyFirestoreSnapshot": {
+    "sourceRunId": 45089542945,
+    "reportArtifactId": 14780905698,
+    "readonly": true,
+    "snapshotNotAnAuthorizationForWrites": true,
+    "observations": [
+      {
+        "policy": "91-9119548",
+        "verifiedOnRun": 45089542945,
+        "editions": [
+          {
+            "term": "2026-11-12..2027-11-11",
+            "status": "Vigente",
+            "receipts": 12,
+            "cartera": 12,
+            "cobros": 1
+          }
+        ],
+        "existingGross": "11 x Q892.81 plus 1 x Q892.82",
+        "sourceGross": "Q287.81 monthly except first Q287.82",
+        "criticalNote": "AN EXISTING CURRENT EDITION EXISTS; DO NOT CREATE RENEWAL. Insurer report has 12 pending and due one day earlier. Verify same covered risk/contract before gross overwrite. Preserve existing confirmed cobro without double-application."
+      },
+      {
+        "policy": "91-8334771",
+        "verifiedOnRun": 45089542945,
+        "editions": [
+          {
+            "term": "2026-06-25..2027-06-25",
+            "status": "Vigente",
+            "receipts": 23,
+            "cartera": 22,
+            "cobros": 1
+          },
+          {
+            "term": "2025-06-10..2026-06-10",
+            "status": "Cancelada",
+            "receipts": 0
+          },
+          {
+            "term": "2024-06-10..2025-06-10",
+            "status": "Renovada",
+            "receipts": 0
+          },
+          {
+            "term": "2025-06-25..2026-06-25",
+            "status": "Renovada",
+            "receipts": 0
+          }
+        ],
+        "criticalNote": "Current 23 receipts vs 12 expected monthly means deduplication/legacy projection first. Seven insurer-pending are due day 10 vs current term day 25. Five inferred past payments only when exact 12-month issuer schedule, distinct receipts and no contradicting evidence are established."
+      },
+      {
+        "policy": "AUTO-1000002937",
+        "verifiedOnRun": 45089542945,
+        "editions": [
+          {
+            "term": "2026-02-13..2027-02-13",
+            "status": "Cancelada",
+            "receipts": 0,
+            "cartera": 0,
+            "cobros": 0
+          }
+        ],
+        "criticalNote": "Cancelation debt Q176.40 is not a paid event; do not create receipts or cobros without evidence. Historical term collections only when provable."
+      },
+      {
+        "policy": "AUTO-1000000334",
+        "verifiedOnRun": 45089542945,
+        "editions": [
+          {
+            "term": "2025-10-07..2026-10-07",
+            "status": "Vigente",
+            "receipts": 1,
+            "cartera": 0,
+            "cobros": 0
+          }
+        ],
+        "existingReceiptGrossCents": 446292,
+        "insurerReportPendingGrossCents": 388080,
+        "criticalNote": "No 2026-27 successor identified on this snapshot; issued 2025-26 original has 2025-10-02..2026-10-02, but system dates 2025-10-07..2026-10-07. October Ficohsa commission sheet DOES NOT list 1000000334 or 7317082. Seek later paid evidence plus issued renewal, preserve historical term."
+      },
+      {
+        "policy": "91-9105495",
+        "verifiedOnRun": 45089542945,
+        "editions": [
+          {
+            "term": "2026-02-18..2027-02-18",
+            "status": "Vigente",
+            "receipts": 2,
+            "cartera": 2,
+            "cobros": 2
+          }
+        ],
+        "existingReceiptGrossCents": [
+          42702,
+          337456
+        ],
+        "statementSubstitutionChargeCents": 17644,
+        "criticalNote": "Existing policy receipts/cobros do not directly identify insurer substitution requirement 5838167. Do not turn pending additional endoso into another premium installment or paid event. Match exact endorsement, vehicle lineage, charge and actual paid evidence."
+      }
+    ]
+  }
 }
