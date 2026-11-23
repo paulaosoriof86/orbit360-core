@@ -1,0 +1,164 @@
+{
+  "schema": "GI_I66_ROBLE_0234395_ISSUED_12_INFERRED_6_PENDING_V1",
+  "recordType": "SOURCE_ONLY_DOCUMENTARY_INFERENCE_AND_HOLDER_CHANGE_HOLD_NO_WRITES",
+  "gate": "I6.6",
+  "sourceStatementGitBlobSha": "ab64e111319e3447733a3af05bf378250698ccdb",
+  "sourceStatementAsOf": "2026-11-20",
+  "country": "GT",
+  "insurer": "ROBLE",
+  "currency": "GTQ",
+  "policy": "91-0234395",
+  "issuedTerm": {
+    "start": "2026-05-02",
+    "end": "2027-05-02",
+    "endorsement": "199410",
+    "pdfId": "1bDZF50cAMHW522wb8ZBWXQS_y6SvpOvO",
+    "pdfRawSha256": "76f8d03e9250006a66fa06c12d92d926dfe676dc38aefd64f97167ba26bf9244",
+    "holderWitness": "daf456945bcb0dcebc66f78c614fc16cd91374ac96519acde5252df785302dbb",
+    "plateWitness": "9710a79977123aaed50dad9221d7716dedc1c58a5716d809eb6b52543bb9bd22",
+    "vinWitness": "8f3e34ea88c34f5b738807caae3c74a09ecb6935d5d32cd866cb823c074c73f5",
+    "grossOriginalCents": 333910
+  },
+  "predecessorTerm": {
+    "start": "2025-05-02",
+    "end": "2026-05-02",
+    "endorsement": "833867",
+    "pdfId": "1Q3RYB4PYApUREfOxJlVXzjJ6-08VpZrq",
+    "pdfRawSha256": "7fac5f248584733328b7dc3747297b81ffc4b0f2dd675f61b51ddf82f26cb771",
+    "holderWitness": "fa35e1afa250f885d23fce89963489bd7598932cd18f8ce854017d8e953c5fd7",
+    "plateWitness": "1b365847f59272eb4ab45e8ba712ff76ee8de78f961f32a255fdfc5a73645796",
+    "vinWitness": "8b9f964d310c139785f094270391869f16a619d227b879524b49d05fc894170a"
+  },
+  "sourceFindings": {
+    "samePolicyNumber": true,
+    "termContinuous": true,
+    "issuerInsuredDifferentAcrossTerms": true,
+    "issuerVehiclePlateAndVinSame": true,
+    "statementSixOnlyPending": true,
+    "priorSixAbsentFromCompletePendingStatement": true,
+    "notDirectPaymentEvidence": true
+  },
+  "paymentInferenceRule": "D01/V7 sequential inferredPaid for absent earlier installments when statement is complete and no payment reversal exists; do not invent bank reference, direct payment or reconciliation",
+  "schedule": [
+    {
+      "requirement": "5228527",
+      "sequence": 1,
+      "totalInstallments": 12,
+      "due": "2026-05-02",
+      "grossCents": 27820,
+      "disposition": "INFERRED_PAID_CONDITIONAL_ON_CANONICAL_SERVER_CROSSWALK",
+      "sourceCaseId": null
+    },
+    {
+      "requirement": "5228528",
+      "sequence": 2,
+      "totalInstallments": 12,
+      "due": "2026-06-02",
+      "grossCents": 27826,
+      "disposition": "INFERRED_PAID_CONDITIONAL_ON_CANONICAL_SERVER_CROSSWALK",
+      "sourceCaseId": null
+    },
+    {
+      "requirement": "5228529",
+      "sequence": 3,
+      "totalInstallments": 12,
+      "due": "2026-07-02",
+      "grossCents": 27826,
+      "disposition": "INFERRED_PAID_CONDITIONAL_ON_CANONICAL_SERVER_CROSSWALK",
+      "sourceCaseId": null
+    },
+    {
+      "requirement": "5228530",
+      "sequence": 4,
+      "totalInstallments": 12,
+      "due": "2026-08-02",
+      "grossCents": 27826,
+      "disposition": "INFERRED_PAID_CONDITIONAL_ON_CANONICAL_SERVER_CROSSWALK",
+      "sourceCaseId": null
+    },
+    {
+      "requirement": "5228531",
+      "sequence": 5,
+      "totalInstallments": 12,
+      "due": "2026-09-02",
+      "grossCents": 27826,
+      "disposition": "INFERRED_PAID_CONDITIONAL_ON_CANONICAL_SERVER_CROSSWALK",
+      "sourceCaseId": null
+    },
+    {
+      "requirement": "5228532",
+      "sequence": 6,
+      "totalInstallments": 12,
+      "due": "2026-10-02",
+      "grossCents": 27826,
+      "disposition": "INFERRED_PAID_CONDITIONAL_ON_CANONICAL_SERVER_CROSSWALK",
+      "sourceCaseId": null
+    },
+    {
+      "requirement": "5228533",
+      "sequence": 7,
+      "totalInstallments": 12,
+      "due": "2026-11-02",
+      "grossCents": 27826,
+      "disposition": "PENDING_MATCHED_CURRENT_STATEMENT",
+      "sourceCaseId": "ROBLE_NOV20_0223"
+    },
+    {
+      "requirement": "5228534",
+      "sequence": 8,
+      "totalInstallments": 12,
+      "due": "2026-12-02",
+      "grossCents": 27826,
+      "disposition": "PENDING_MATCHED_CURRENT_STATEMENT",
+      "sourceCaseId": "ROBLE_NOV20_0224"
+    },
+    {
+      "requirement": "5228535",
+      "sequence": 9,
+      "totalInstallments": 12,
+      "due": "2027-01-02",
+      "grossCents": 27826,
+      "disposition": "PENDING_MATCHED_CURRENT_STATEMENT",
+      "sourceCaseId": "ROBLE_NOV20_0225"
+    },
+    {
+      "requirement": "5228536",
+      "sequence": 10,
+      "totalInstallments": 12,
+      "due": "2027-02-02",
+      "grossCents": 27826,
+      "disposition": "PENDING_MATCHED_CURRENT_STATEMENT",
+      "sourceCaseId": "ROBLE_NOV20_0226"
+    },
+    {
+      "requirement": "5228537",
+      "sequence": 11,
+      "totalInstallments": 12,
+      "due": "2027-03-02",
+      "grossCents": 27826,
+      "disposition": "PENDING_MATCHED_CURRENT_STATEMENT",
+      "sourceCaseId": "ROBLE_NOV20_0227"
+    },
+    {
+      "requirement": "5228538",
+      "sequence": 12,
+      "totalInstallments": 12,
+      "due": "2027-04-02",
+      "grossCents": 27826,
+      "disposition": "PENDING_MATCHED_CURRENT_STATEMENT",
+      "sourceCaseId": "ROBLE_NOV20_0228"
+    }
+  ],
+  "totals": {
+    "rows": 12,
+    "pendingRows": 6,
+    "inferredRows": 6,
+    "issuedScheduleCents": 333906,
+    "pendingCents": 166956,
+    "inferredCents": 166950,
+    "minorRoundingDifferenceCents": 4
+  },
+  "specificHOLD": "ISSUER_HOLDER_DIFFERS_FROM_PRIOR_TERM: resolve legal insured/client ownership and policy linkage without conflating accounts. This HOLD must be per policy only, not entire source batch.",
+  "newWrites": 0,
+  "pass": false
+}
