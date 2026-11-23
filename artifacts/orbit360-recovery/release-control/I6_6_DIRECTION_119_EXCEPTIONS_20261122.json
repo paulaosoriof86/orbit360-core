@@ -110,7 +110,7 @@
     "financialApplyAuthorizedByThisRecordAlone": false,
     "status": "DIRECTION_DECISIONS_CAPTURED_WITH_SOURCE_AND_EXISTING_FIRESTORE_SNAPSHOT_FIVE_CASES_PROTECTED_APPLY_PENDING"
   },
-  "questionForOwner": "Existe una planilla posterior a octubre de Ficohsa o comprobante de pago para AUTO-1000000334 requerimiento 7317082? En octubre no consta y al 22-Oct seguia pendiente. Si ademas hay estado El Roble posterior a 20-Nov con solo once pendientes para 91-9119548, identificar corte documental.",
+  "questionForOwner": "No repeat questions on the three explained cases. Continue primary source/commission invoice search for 2026 paid proof of AUTO-1000000334. Resolve four-cent El Roble bank-vs-statement discrepancy through exact issuer/endoso readback; request only genuinely unresolved business decision after source exhaustion.",
   "readonlyFirestoreSnapshot": {
     "sourceRunId": 45089542945,
     "reportArtifactId": 14780905698,
@@ -212,5 +212,84 @@
         "criticalNote": "Existing policy receipts/cobros do not directly identify insurer substitution requirement 5838167. Do not turn pending additional endoso into another premium installment or paid event. Match exact endorsement, vehicle lineage, charge and actual paid evidence."
       }
     ]
+  },
+  "ownerEvidenceReadback20261122": {
+    "status": "SOURCE_DOCUMENTS_VERIFIED_WITH_PRIVACY_HOLD_AND_NO_OPERATIONAL_WRITES",
+    "caseRecords": [
+      {
+        "policy": "91-9119548",
+        "insurer": "ROBLE",
+        "statementCut": "2026-11-20",
+        "sourceDriveFolderId": "1cgPmzxTmIBi06xOn3wKoKYmMXUTicEb_",
+        "sourceDriveFileId": "1vk6RtUUFVjpQB_W1UMs10hvcpaEFNFjs",
+        "sourceRawSha256": "7062738cdf1c008ebff85247f8b0723ab4d8f36e43bb69d386d5dfcb59d219ef",
+        "matchesPinnedManifest": true,
+        "sourcePendingRequirements": 12,
+        "firstPendingRequirement": "5833555",
+        "lastPendingRequirement": "5833566",
+        "inferenceOnFirstReceiptFromThisSourceAllowed": false,
+        "reason": "First installment is included in current insurer pending list. Missing 11th vs 12th hypothetical must not override actual current file."
+      },
+      {
+        "policy": "AUTO-1000000334",
+        "insurer": "FICOHSA",
+        "priorTermInvoicePdfSha256": "270162563f53691c29ac1a81fc840480c25274692bedc294e5ff7ef690e159d9",
+        "invoiceDate": "2025-10-21",
+        "priorTermInvoiceRequirement": "7250974",
+        "priorTermInvoiceGrossCents": 446292,
+        "distinct2026PendingStatementRequirement": "7317082",
+        "distinct2026PendingGrossCents": 388080,
+        "pendingStatementCut": "2026-10-22",
+        "october2026CommissionSheetDriveFileId": "1_yH82M7deJ6og98wTI663s3urK2i3Au7",
+        "october2026CommissionRawSha256": "3c43dc11ce04a4e5ecba9fc17fdd7641cb894faa6da9bd6c8e6d2fb7d175262f",
+        "verifiedOctoberCommissionSheet": "Reporte Q has one business row for a DIFFERENT policy, Reporte US has zero; exact 1000000334/7317082 not present in this particular workbook",
+        "ownerAssertionPaymentRemainsPreserved": true,
+        "interpretation": "Neither a prior-year invoice nor a different-policy commission sheet proves 2026 paid transaction. Continue source lookup, do not fabricate evidence or erase the owner's assertion."
+      },
+      {
+        "policy": "91-9105495",
+        "insurer": "ROBLE",
+        "sourceEvidenceType": "BANK_TRANSFER_TO_INSURER_SCREENSHOT_AND_OWNER_ATTESTATION",
+        "bankScreenshotSha256": "45632d6d4e00420a941d69095a5d9113e524b6b3ba2f16da19ae61d99b36a9b6",
+        "bankDate": "2026-11-12",
+        "bankTimeLocal": "07:00:30",
+        "transferAmountCents": 17640,
+        "bankBeneficiary": "Seguros El Roble",
+        "bankNarrative": "Pago sustitucion de poliza",
+        "ownerStatement": "Client has paid this substitution",
+        "statementSourceRequirement": "5838167",
+        "statementSourceGrossCents": 17644,
+        "deltaCents": 4,
+        "clientOriginalPolicyDriveFolderId": "1YDBJmkUxbapcdPwM7yN7jRPBMpHhyPR7",
+        "originalPolicyPdfDriveId": "1JAtiYeLMx6jSWImM2l_HrRQx27mlgy-s",
+        "originalPolicyEndorsement": "199154",
+        "originalPolicyDocumentDate": "2026-04-10",
+        "care": "Original endorsement number is NOT proof that later vehicle substitution used that same endorsement. Exact payable adjustment and preexisting two cobros must be read back before reconciliation.",
+        "operationalState": "BANK_TRANSFER_DOCUMENT_CONFIRMS_EXTERNAL_PAYMENT_AMOUNT_ONLY_PENDING_UNIQUE_ENDORSEMENT_RECEIPT_RECONCILIATION",
+        "noNewCobrosByThisEvidenceReadback": true
+      }
+    ],
+    "securityFinding": {
+      "code": "I66_DRIVE_CLIENT_SOURCE_FOLDER_PUBLIC_EDITOR_PERMISSION",
+      "evidence": "Google Drive get_file_metadata returned permissions anyone:writer on canonical client folders and insurer subfolders during focused read-only checks.",
+      "affectedFolderIds": [
+        "1YDBJmkUxbapcdPwM7yN7jRPBMpHhyPR7",
+        "1W2VejPlSL2yGfGIz3eGM9_yEAiXaDanA",
+        "1dpXmagxLzvcN8qutrsV0cIXNrYfV167m",
+        "1cgPmzxTmIBi06xOn3wKoKYmMXUTicEb_",
+        "1l3CIh3ORCdVDhGwCu_IRxGYoOdPneor8"
+      ],
+      "privacyHandling": "Do not upload raw bank screenshot, identity documents or insurer confidential receipts into those folders until ownership/sharing/permissions reviewed. Do not silently rewrite sharing due possible authorized external dependencies.",
+      "state": "OPEN_SECURITY_REVIEW_REQUIRED",
+      "securityPermissionsChanged": false,
+      "rawSensitiveFilesUploadedToPublicFolder": false
+    },
+    "execution": {
+      "dataWrites": 0,
+      "productWrites": 0,
+      "artifactUploadedToPublicFolder": false,
+      "newBusinessRelease": false,
+      "guide": "Continue I6.6 protected CAS with before/after exact matching; do not treat a green preflight with skipped apply as data PASS."
+    }
   }
 }
