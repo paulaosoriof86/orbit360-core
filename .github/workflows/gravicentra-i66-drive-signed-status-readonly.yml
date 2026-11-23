@@ -1,4 +1,6 @@
 name: Gravicentra I6.6 Drive Signed Status Read-Only LIVE
+# 2026-11-23 continuation: re-read the current tenant connection with both
+# existing actors while V13 Preview runs; no OAuth consent or document write.
 on:
   push:
     branches: [recovery/fase-a-clean-20260831]
