@@ -103,6 +103,9 @@ async function verify(c,operation){
   const old=await tx.get(col('polizas').doc(a.get('oldPolicyId')));
   assert.equal(old.get('renovadaPor'),policy.id);
   assert.equal(policy.renuevaDe,old.id);
+  assert.equal(Math.round(Number(policy.sumaAsegurada)*100),c.issuedInsuredValueCents,'ISSUED_RISK_COVER_READBACK');
+  assert.equal(Math.round(Number(policy.primaTotal)*100),c.issuerHeader.grossCents,'ISSUED_GROSS_COVER_READBACK');
+  assert.equal(policy.endoso,c.endorsement,'ISSUED_ENDORSEMENT_READBACK');
   const loaded=await Promise.all(['recibosEsperados','carteraPrimas','cobros','vehiculos','actividades'].map(k=>
    tx.get(col(k).where('polizaId','==',policy.id).limit(40))));
   const counts=loaded.map(x=>x.size);
