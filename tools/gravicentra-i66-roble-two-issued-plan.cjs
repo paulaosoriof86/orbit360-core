@@ -19,6 +19,9 @@ function check(){
  assert.equal(gitBlob,'53b08239aa8807378ec95a4b4704c5d97622bc84','DIRECTION_AUTHORITY_DRIFT');
  assert.equal(source.schema,'GI_I66_ROBLE_TWO_ISSUED_24_REQUIREMENTS_BREAKDOWN_V1');
  assert.equal(source.cases.length,2);assert.equal(source.totals.installments,24);
+ assert.equal(source.totals.statementGrossCents,840785,'TWO_ISSUER_STATEMENT_24_SUM_DRIFT');
+ assert.equal(source.totals.headerGrossCents,840797,'TWO_ISSUER_COVER_TOTAL_DRIFT');
+ assert.equal(source.totals.differenceCents,12,'TWO_ISSUER_MINOR_ROUNDING_DRIFT');
  assert.equal(source.parentManifestBlobSha,'ab64e111319e3447733a3af05bf378250698ccdb');
  assert.equal(source.writing.firestoreWrites,0);
  for(const c of source.cases){
