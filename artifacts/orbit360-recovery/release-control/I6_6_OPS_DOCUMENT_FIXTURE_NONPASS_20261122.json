@@ -1,0 +1,38 @@
+{
+  "schema": "GI_I66_FOCAL_OPS_DOCUMENT_UI_HOLD_RECEIPT_V1",
+  "recordType": "FORENSIC_NONPASS_NEVER_AUTO_ACCEPT_GREEN_RUN",
+  "project": "Gravicentra Insurance",
+  "gate": "I6.6",
+  "dateGuatemala": "2026-11-22",
+  "sourceRunId": 45098835994,
+  "sourceRunConclusion": "success",
+  "sourceHead": "b7a385f4e87c36d0b69c6a3945f2f67bdbecac78",
+  "exactPreviewSource": "0e7dcdb04cf66f427f160b1642715a6382d05aba",
+  "previewOrigin": "https://ays-orbit-360-lab--gi-i66-rc-45093054745-631rjml6.web.app",
+  "evidenceArtifactId": 14784268713,
+  "evidenceArtifactName": "gi-i66-existing-ops-document-45098835994",
+  "workflowJob": "existing-preview-document-fixture",
+  "workflowJobConclusion": "success",
+  "actualBrowserResult": {
+    "savedClick": false,
+    "uiHold": "locator.click: Timeout 30000ms exceeded.",
+    "operationalWrites": 0,
+    "networkCalls": 0,
+    "finalDocumentRefs": 0,
+    "cleanupRemovedSyntheticFixture": true,
+    "restoreAudit": true,
+    "role": "Operativo",
+    "creatorVerified": true
+  },
+  "functionalDecision": "HOLD_NO_SAVE_CLICK_NO_DOCUMENT_WRITE_NO_RELOAD_PROOF",
+  "interpretation": "GH Actions SUCCESS was cleanup/test-wrapper success, NOT document-save functional PASS.",
+  "nextWithinActiveGate": [
+    "Inspect and correct the existing form button selector using #ng-com-add and DOM/visibility/disabled evidence. Never bypass an inaccessible UI control via forced click.",
+    "Make existing single fixture QA job fail-closed when savedClick=false, uiHold exists, required upload response missing or confirmed Firestore document link absent.",
+    "Create/reuse only owner-authorized isolated synthetic fixture, execute real click, upload, backend postimage, reload/readback and cleanup, preserve all identifiers and source digest.",
+    "Do not promote an unchanged source release or mark full I6.6 production accepted on workflow exit code alone."
+  ],
+  "noRealDataMutation": true,
+  "noHostingOrBackendDeployment": true,
+  "coordination": "Separate independent evidence only. Do not move source, rebuild a different product, reimport business data or interfere with Work's release gate."
+}
