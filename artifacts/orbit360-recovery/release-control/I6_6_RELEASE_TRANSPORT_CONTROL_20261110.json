@@ -4790,5 +4790,140 @@
   "frontendReleaseSequence": 2,
   "consumedFrontendAuthorities": [
     "2d0b28e6c2a30995118520cdf66a32bb5bf4afcb"
-  ]
+  ],
+  "scopedBackendPreviewI66": {
+    "schema": "GI_I66_SCOPED_BACKEND_PREVIEW_AUTHORIZATION_V1",
+    "status": "APPROVED_FOUR_FUNCTION_PREVIEW_SYNTHETIC_ONLY",
+    "approvedByDirection": true,
+    "gate": "I6.6",
+    "sourceSha": "9d34f6981e6d82d8503e3d99b91b265f8b499d3c",
+    "artifactDigest": "sha256:fb4d6907e0ea18ba366441a29f269e928166fc1dc25b9aa86daf6bb734b01209",
+    "currentPhysicalLiveSourceSha": "15e849bd606bd8c93e4c0471da1193e85004aecd",
+    "currentPhysicalLiveArtifactDigest": "sha256:78a409a419e21648f2e074b49767d1dd55731140f8a83f6064b3ae1c8073b453",
+    "noLiveOrFinancialWrites": true,
+    "noRulesAuthIamWrites": true,
+    "sameImmutableArtifactOnly": true,
+    "signedCandidateProof": {
+      "sourceBuildRun": 45258374230,
+      "artifactId": 14859991026,
+      "buildId": "gi-i66-9d34f6981e6d-57f234755dc1",
+      "previewUrl": "https://ays-orbit-360-lab--gi-i66-rc-45258374230-dh8ru1do.web.app",
+      "backendPaths": [
+        "functions/product-ops-leads-domain.js"
+      ],
+      "fourOnly": true
+    },
+    "candidate": {
+      "schema": "I6_6_OPERATIONAL_EXACT_RELEASE_V1",
+      "approvedByDirection": true,
+      "status": "EXACT_BACKEND_PREVIEW_SIGNED_QA_AUTHORIZED",
+      "opsLeadsComposite": true,
+      "compositeVersion": 1,
+      "sourceSha": "9d34f6981e6d82d8503e3d99b91b265f8b499d3c",
+      "buildRunId": 45258374230,
+      "artifactId": 14859991026,
+      "artifactDigest": "sha256:fb4d6907e0ea18ba366441a29f269e928166fc1dc25b9aa86daf6bb734b01209",
+      "buildId": "gi-i66-9d34f6981e6d-57f234755dc1",
+      "previewUrl": "https://ays-orbit-360-lab--gi-i66-rc-45258374230-dh8ru1do.web.app",
+      "previewChannelId": "gi-i66-rc-45258374230",
+      "targets": {
+        "preview": [
+          {
+            "name": "orbit360ProductOperationalCommandPreview",
+            "region": "us-east1"
+          },
+          {
+            "name": "orbit360CobrosReconciliationCommandPreview",
+            "region": "us-central1"
+          },
+          {
+            "name": "orbit360ScopedPolicyReadPreview",
+            "region": "us-east1"
+          },
+          {
+            "name": "orbit360OpsLeadsCommandPreview",
+            "region": "us-east1"
+          }
+        ],
+        "live": [
+          {
+            "name": "orbit360ProductOperationalCommand",
+            "region": "us-central1"
+          },
+          {
+            "name": "orbit360CobrosReconciliationCommand",
+            "region": "us-central1"
+          },
+          {
+            "name": "orbit360ScopedPolicyRead",
+            "region": "us-east1"
+          },
+          {
+            "name": "orbit360OpsLeadsCommand",
+            "region": "us-central1"
+          }
+        ]
+      },
+      "requiredPreviewDrivers": [
+        "tools/gravicentra-i66-privileged-role-signed-ui-permissions-readonly.cjs",
+        "tools/gravicentra-i6-6-carlos-real-signed-synthetic-preview-uat.cjs",
+        "tools/gravicentra-i6-6-advisor-payables-signed-uat.cjs",
+        "tools/gravicentra-i6-6-proposal-application-signed-uat.cjs"
+      ],
+      "syntheticQaIsolation": {
+        "tenantId": "alianzas-soluciones",
+        "runIdPrefix": "cobledgerqa_",
+        "entityIdPrefix": "b3005qa_",
+        "runCollection": "cobrosLedgerQaRuns",
+        "controlCollection": "cobrosLedgerQaControl",
+        "requireSameQaRunId": true,
+        "requireSyntheticMarker": true,
+        "allowRealControlPointerMutation": false,
+        "restoreAllSyntheticRecords": true
+      },
+      "advisorPayableQaIsolation": {
+        "tenantId": "alianzas-soluciones",
+        "runIdPrefix": "b4003qa_i66_cxp_",
+        "payableIdPrefix": "b4003qa_cxpase_",
+        "commissionIdPrefix": "b4003qa_comsrc_",
+        "requireSameQaRunId": true,
+        "requireSyntheticMarker": true,
+        "restoreAllSyntheticRecords": true,
+        "financialPayments": 0,
+        "bankMovements": 0,
+        "authOrMembershipMutations": 0
+      },
+      "sameImmutableArtifactOnly": true,
+      "syntheticRecordsOnly": true,
+      "noRealFinancialOrCustomerWrites": true,
+      "noRulesAuthIamWrites": true,
+      "rollbackThreeBackendRevisionsAndHosting": true,
+      "rollbackFourBackendRevisionsAndHosting": true,
+      "expectedSiteFileCount": 224,
+      "opsLeadsBackendPath": "functions/product-ops-leads-domain.js",
+      "opsLeadsBackendBlobSha": "b7921ca88343ced65bdad4cd9de26fa120647083",
+      "currentPhysicalLive": {
+        "sourceSha": "15e849bd606bd8c93e4c0471da1193e85004aecd",
+        "buildId": "gi-i66-15e849bd606b-57f234755dc1",
+        "artifactId": 14777966155,
+        "artifactDigest": "sha256:78a409a419e21648f2e074b49767d1dd55731140f8a83f6064b3ae1c8073b453",
+        "buildRunId": 45081926149,
+        "liveRunId": 45088457923,
+        "hostingVersion": "sites/ays-orbit-360-lab/versions/e4e8f31b02ba2aef"
+      },
+      "currentLive": {
+        "sourceSha": "15e849bd606bd8c93e4c0471da1193e85004aecd",
+        "buildId": "gi-i66-15e849bd606b-57f234755dc1",
+        "artifactId": 14777966155,
+        "artifactDigest": "sha256:78a409a419e21648f2e074b49767d1dd55731140f8a83f6064b3ae1c8073b453",
+        "buildRunId": 45081926149,
+        "liveRunId": 45088457923,
+        "hostingVersion": "sites/ays-orbit-360-lab/versions/e4e8f31b02ba2aef"
+      },
+      "signedObservabilityProfile": "I66_SIGNED_BROWSER_OBSERVABILITY_V1"
+    },
+    "noNewFirebase": true,
+    "noRulesDeploy": true,
+    "noMainBranch": true
+  }
 }
