@@ -3777,6 +3777,15 @@
         {
           "path": "tools/gravicentra-i6-6-portal-canonical-activity.test.cjs",
           "gitBlobSha": "f353820d428b417c84d147fd8727f6f54b507349"
+        },
+        {
+          "path": "tools/gravicentra-i6-6-source-lineage-preview-transport.test.cjs",
+          "gitBlobSha": "34678b42ddce14298b7576673972b34eb4598227",
+          "replaces": {
+            "path": "tools/gravicentra-i6-6-source-lineage-preview-transport.test.cjs",
+            "priorGitBlobSha": "c0849015e58931bd23a97d9a33bbdd82c5e8b2fb",
+            "priorChangeId": "I6_6_POLICY_INSURER_EXPLICIT_SELECTION_ROOTFIX_20261119"
+          }
         }
       ]
     }

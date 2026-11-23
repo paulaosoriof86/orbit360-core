@@ -27,8 +27,22 @@ if(next){
   assert.equal(next.authorizedBranch,request.authorizedBranch);
   assert.equal(next.previousLiveSourceSha,request.previousLiveSourceSha);
   assert.equal(next.previousLiveArtifactDigest,request.previousLiveArtifactDigest);
-  assert.equal(next.sourceOpsActivityEndosoTestBlobSha,
-    sha('tools/gravicentra-i6-6-ops-activity-direct-vehicle-endorsement.test.cjs'));
+  // A later I6.6-approved test supersession does not rewrite the signed
+  // November 19 Preview source request. Keep that historical blob frozen,
+  // and compare the active test to the final approved manifest successor.
+  const delta=JSON.parse(file('artifacts/orbit360-recovery/release-control/I6_6_APPROVED_PRODUCT_DELTA_MANIFEST_20261110.json'));
+  const testPath='tools/gravicentra-i6-6-ops-activity-direct-vehicle-endorsement.test.cjs';
+  const legacy=delta.changes.find(change=>change.id==='I6_6_OPS_ATOMIC_CLIENT360_ACTIVITY_DIRECT_ISSUED_VEHICLE_SUBSTITUTION_20261119');
+  const predecessor=(legacy&&legacy.tests||[]).find(test=>test.path===testPath);
+  const revisions=delta.changes.map(change=>({change,entry:(change.tests||[]).find(test=>test.path===testPath)})).filter(row=>row.entry);
+  assert.ok(predecessor&&revisions.length>=1,'OPS_TEST_HISTORICAL_MANIFEST_MISSING');
+  assert.equal(next.sourceOpsActivityEndosoTestBlobSha,predecessor.gitBlobSha,
+    'historical Ops source acceptance remains bound to its original test');
+  const currentTest=revisions[revisions.length-1].entry;
+  assert.equal(currentTest.gitBlobSha,sha(testPath),'OPS_TEST_LATEST_APPROVED_SUCCESSOR_DRIFT');
+  if(currentTest.gitBlobSha!==predecessor.gitBlobSha)
+    assert.ok(revisions.some(row=>row.entry.replaces&&row.entry.replaces.priorGitBlobSha===predecessor.gitBlobSha),
+      'OPS_TEST_SUPERSESSION_NOT_PROVEN');
 }
 assert.equal(request.sourceLineageTestBlobSha,
   sha('tools/gravicentra-i6-6-source-lineage-reconciliation.test.cjs'));
