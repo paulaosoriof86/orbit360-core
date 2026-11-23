@@ -1,0 +1,65 @@
+{
+  "schema": "GI_I66_GREENAPI_AYS_SETTINGS_CAUSAL_DIAGNOSTIC_V1",
+  "dateLocal": "2026-11-23",
+  "gate": "I6.6",
+  "recordType": "SOURCE_CAUSAL_FACTS_NOT_LEAD_PASS",
+  "makeTeamId": 1975919,
+  "existingScenarioId": 10196136,
+  "greenApiConnectionId": 14749710,
+  "readOnlySettings": {
+    "scenarioId": 10218416,
+    "runId": "ffc7570737be4c17a14bf340195a0914",
+    "status": "success",
+    "output": {
+      "incomingWebhook": "no",
+      "stateWebhook": "no"
+    },
+    "webhookUrlPresent": false,
+    "webhookTokenPresent": false,
+    "instanceIdentifierNotExposed": true
+  },
+  "historySearch": {
+    "runId": "b259036efb2e46e996d41e8765da2f26",
+    "fromDate": "2026-10-01",
+    "minutes": 77760,
+    "limit": 500,
+    "returnCount": 0,
+    "outputShape": "__IMTLENGTH__",
+    "sourceDetailExecutions": 0,
+    "returnedToPollingMinutes": 15
+  },
+  "attemptedMinimalRemediation": {
+    "scenarioId": 10218433,
+    "attempts": [
+      {
+        "id": "0293a92b09724d43b239caeac9e1bbf8",
+        "mapper": {
+          "incomingWebhook": true
+        },
+        "status": "error",
+        "category": "MAKE_GREENAPI_DATAERROR_INVALID_JSON_RESPONSE"
+      },
+      {
+        "id": "a419eb417b964c16bccdefdf8e9dcf8d",
+        "mapper": {
+          "incomingWebhook": true,
+          "webhookUrl": ""
+        },
+        "status": "error",
+        "category": "MAKE_GREENAPI_DATAERROR_INVALID_JSON_RESPONSE"
+      }
+    ],
+    "afterFailureReadback": {
+      "id": "a5e8ad85c7d04847984d0dad1ba47e63",
+      "incomingWebhook": "no"
+    },
+    "successfulSettingWriteClaim": false,
+    "providerTokenOrRawChatsCopied": false
+  },
+  "diagnosis": "GREENAPI_CONFIG_DISABLED_INCOMING=true; connected credentials and Make schedule cannot read incoming history while incomingWebhook='no'. Minimal SetSettings via Make module failed twice due to non-JSON provider response and returned no acknowledged write. No more retry without provider-side correction; do not fake ad messages or import personal chats.",
+  "authorizedSafeNext": "In Green API instance console enable only incoming messages notifications (incomingWebhook yes); account setting may reboot instance and takes up to 5 minutes. Keep webhookUrl blank for HTTP polling; then verify getSettings=yes and new ad-sourced real message metadata. Owner OAuth for Make Firestore is independent pending.",
+  "makeFirestoreConnectionRequest": "e0e9cb34-79e0-4488-8b0a-85f4352c30c5",
+  "oauthStatus": "pending",
+  "privacy": "No raw customer messages, phone numbers, credentials or URLs in this receipt.",
+  "productionLeadsCreated": 0
+}
