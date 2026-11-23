@@ -1,0 +1,56 @@
+{
+  "phase": "PREPARED",
+  "key": "c507e75d01533d1fbdff973da23123c480fef9f542a09f9a2d3765345f5f8091",
+  "generation": 2,
+  "request": {
+    "schema": "GI_I66_FRONTEND_PROMOTION_V1",
+    "gate": "I6.6",
+    "scope": "FRONTEND_ONLY",
+    "generation": 2,
+    "approvalBlob": "2d0b28e6c2a30995118520cdf66a32bb5bf4afcb",
+    "guardBlob": "d3b3fa459ed23f539b1855c7ac01151cfae29fac",
+    "previousReceiptBlob": "3e44c28449070b78de5a71522167cbd65ead7666",
+    "previous": {
+      "sourceSha": "f1eb5bc6397f0b159079be516a521dd7b1e5d9ba",
+      "sourceTree": "c91d2d494893df1cd704ea76448a88e47ca0a0a4",
+      "manifestBlob": "6ba434a8ab59925b32899143f55e80215b358e9c",
+      "compositionBlob": "33bf80768cb6cb311f2975d282a5f50935f680aa",
+      "artifactId": 14674736714,
+      "artifactDigest": "sha256:e55fcc674a6cc493cdedff27672d082222db3dd7134354559788364b6ae23713",
+      "buildId": "gi-i66-f1eb5bc6397f-57f234755dc1",
+      "buildRunId": 44826594717,
+      "previewUrl": "",
+      "previewChannel": "",
+      "hostingVersion": "sites/ays-orbit-360-lab/versions/7a0d829d3504c9f8",
+      "files": 224
+    },
+    "target": {
+      "sourceSha": "15e849bd606bd8c93e4c0471da1193e85004aecd",
+      "sourceTree": "4567343f7e438f550a5deda200098124f330ccd2",
+      "manifestBlob": "098c127eb1c08a8d5fc3575c0ec38c6cb59f3858",
+      "compositionBlob": "33bf80768cb6cb311f2975d282a5f50935f680aa",
+      "artifactId": 14777966155,
+      "artifactDigest": "sha256:78a409a419e21648f2e074b49767d1dd55731140f8a83f6064b3ae1c8073b453",
+      "buildId": "gi-i66-15e849bd606b-57f234755dc1",
+      "buildRunId": 45081926149,
+      "previewUrl": "https://ays-orbit-360-lab--gi-i66-rc-45081926149-b9hkley0.web.app",
+      "previewChannel": "gi-i66-rc-45081926149",
+      "hostingVersion": "sites/ays-orbit-360-lab/versions/e4e8f31b02ba2aef",
+      "files": 224
+    }
+  },
+  "backup": {
+    "firebase": 224,
+    "custom": 224,
+    "sourceSha": "f1eb5bc6397f0b159079be516a521dd7b1e5d9ba",
+    "buildId": "gi-i66-f1eb5bc6397f-57f234755dc1",
+    "artifactDigest": "sha256:e55fcc674a6cc493cdedff27672d082222db3dd7134354559788364b6ae23713",
+    "hostingVersion": "sites/ays-orbit-360-lab/versions/7a0d829d3504c9f8",
+    "manifestDigest": "sha256:ee2dfddad8c2b1e2553be7f1a108e2094cc5f65c68104d6fd1ef2c0ee5338b98"
+  },
+  "preview": {
+    "files": 224,
+    "hostingVersion": "sites/ays-orbit-360-lab/versions/e4e8f31b02ba2aef",
+    "artifactDigest": "sha256:78a409a419e21648f2e074b49767d1dd55731140f8a83f6064b3ae1c8073b453"
+  }
+}
