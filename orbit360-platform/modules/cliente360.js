@@ -224,9 +224,15 @@ Orbit.modules.cliente360 = (function () {
     ensureClientNameCaseStyle();
     const p = (Orbit.route && Orbit.route.params) || {};
     const cid = p.c || null;
+    const requested = cid && S().get('clientes', cid);
+    if (requested && !clientInCurrentCountry(requested)) {
+      shownCid = null;
+      tab = 'resumen';
+      host.innerHTML = '<div class="page"><div class="card pad">El expediente está fuera del país seleccionado. <a href="#/cliente360">Volver a Clientes 360</a></div></div>';
+      return;
+    }
     if (cid) ensureDataCollections(DETAIL_DATA_DEPS);
-    if (cid && S().get('clientes', cid)) {
-      const requested = S().get('clientes', cid);
+    if (requested) {
       if (requested && String(requested.mergedIntoClientId || '').trim()) {
         const canonicalId = String(requested.mergedIntoClientId || '').trim();
         if (S().get('clientes', canonicalId)) {
@@ -252,6 +258,10 @@ Orbit.modules.cliente360 = (function () {
   /* =========================================================
      LISTA (cartera de clientes)
      ========================================================= */
+  function clientInCurrentCountry(client) {
+    const selected = String(Orbit.pais || 'TODOS').trim().toUpperCase();
+    return selected === 'TODOS' || String(client && client.pais || '').trim().toUpperCase() === selected;
+  }
   function lista() {
     const f = filtros;
     ensureDataCollections(['clientes','polizas','asesores','carteraPrimas']);
@@ -268,8 +278,8 @@ Orbit.modules.cliente360 = (function () {
     // Projection helpers may enrich summaries but may not replace it with an empty/stale snapshot.
     const clientesRaw = S().all('clientes');
     const clientesAll = (clientesRaw || []).filter(c => !(c && (c.fusionado === true || String(c.mergedIntoClientId || '').trim())));
-    const globalCountry = String(Orbit.pais || 'TODOS').toUpperCase();
-    const clientes = clientesAll.filter(c => globalCountry === 'TODOS' || String(c && c.pais || '').toUpperCase() === globalCountry);
+    const globalCountry = String(Orbit.pais || 'TODOS').trim().toUpperCase();
+    const clientes = clientesAll.filter(clientInCurrentCountry);
     const policyReadiness = dataReadiness(['polizas']);
     if (policyReadiness === 'pending') ensureDataCollections(['polizas']);
     const policiesRaw = policyReadiness === 'ready' ? S().all('polizas') : [];

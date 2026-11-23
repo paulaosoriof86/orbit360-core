@@ -3633,6 +3633,44 @@
           "gitBlobSha": "d52e6799d8fbbb31ef90849ddc2a7f23c26958b3"
         }
       ]
+    },
+    {
+      "id": "I6_6_STANDARD_MANAGEMENT_AND_CLIENT_COUNTRY_SCOPE_20261122",
+      "approvedByDirection": true,
+      "receipt": "Dirección I6.6 D05 y D08: escritura operativa, expediente canónico y separación GT/CO. Se requiere nueva prueba UI antes de promover.",
+      "sourceStatus": "SOURCE_REQUIRES_EXACT_PREVIEW_AND_LIVE_UI_PROOF",
+      "capabilityOwners": [
+        "CLIENTE360",
+        "OPS",
+        "LEADS"
+      ],
+      "scope": "Standard policy management requires only the normal operational writer. Explicit custom types still require the catalog writer. Switching country hides an open out-of-country client dossier.",
+      "paths": [
+        {
+          "path": "orbit360-platform/core/ciclo.js",
+          "gitBlobSha": "9307296ab6c23d7c22e1d7a4e6b89ab53414c113",
+          "replaces": {
+            "path": "orbit360-platform/core/ciclo.js",
+            "priorGitBlobSha": "1964c481f5cf1ba126d3af95b3c3f87c17428b5a",
+            "priorChangeId": "I6_6_OPS_LEADS_DIRECTED_COLLABORATION_QUEUE_20261119"
+          }
+        },
+        {
+          "path": "orbit360-platform/modules/cliente360.js",
+          "gitBlobSha": "c1039b2d5b7bbcc2f05d0b8de8c440b37786db9a",
+          "replaces": {
+            "path": "orbit360-platform/modules/cliente360.js",
+            "priorGitBlobSha": "1b3666172cbcfdaecd9b9ce7b35dbf26a4a0beec",
+            "priorChangeId": "I6_6_CLIENT_LINKED_DEAL_TIMELINE_20261122"
+          }
+        }
+      ],
+      "tests": [
+        {
+          "path": "tools/gravicentra-i6-6-management-default-and-client-country.test.cjs",
+          "gitBlobSha": "626013900e9d0035ef1cda10abbe7742a66bd3db"
+        }
+      ]
     }
   ],
   "i66R11PreviewBuildRequest20261113": {

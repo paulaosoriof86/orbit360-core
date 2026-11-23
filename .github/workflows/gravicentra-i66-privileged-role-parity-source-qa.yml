@@ -64,6 +64,7 @@ jobs:
           node --check orbit360-platform/modules/crm-v1198-operational-bridge.js
           node --test tools/gravicentra-i6-6-crm-shadow-advisor-source.test.cjs
           node --test tools/gravicentra-i6-6-cliente360-advisor-source-parity.test.cjs
+          node --test tools/gravicentra-i6-6-management-default-and-client-country.test.cjs
           node --test tools/gravicentra-i6-6-privileged-role-portfolio-parity.test.cjs \
             tools/gravicentra-i6-6-privileged-role-writer-transaction.test.cjs \
             tools/gravicentra-i6-6-equipo-protected-role-defaults.test.cjs

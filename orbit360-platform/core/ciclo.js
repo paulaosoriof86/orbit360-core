@@ -118,6 +118,9 @@ Orbit.ciclo = (function () {
     const name=String(tipo||'').trim(), queue=String(lista||'Gestiones Admin').trim();
     const key=value=>String(value||'').trim().normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
     if(!name||name.length>160||/[<>]/.test(name)||!queue)throw Error('MANAGEMENT_TYPE_INVALID');
+    // The standard Ficha cliente / Póliza / Portal intake is an operational
+    // action even when the tenant has never customized its catalog.
+    if(key(name)==='gestion de poliza'&&key(queue)==='gestiones admin')return{existing:true};
     if(!Orbit.cat||typeof Orbit.cat.ensure!=='function'||typeof Orbit.cat.saveDurable!=='function')
       throw Error('MANAGEMENT_TYPE_CANONICAL_CONFIG_UNAVAILABLE');
     await Orbit.cat.ensure(true);
