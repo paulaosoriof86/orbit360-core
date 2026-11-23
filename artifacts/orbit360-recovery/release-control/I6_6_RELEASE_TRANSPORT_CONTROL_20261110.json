@@ -4738,7 +4738,7 @@
     "liveCloneRunId": 45088457923
   },
   "frontendPreviewRequest": {
-    "version": 10,
+    "version": 11,
     "mode": "COMPOSITE_ARTIFACT_HOSTING_PREVIEW_ONLY",
     "sourceQaHead": "196e3cdbae5a02792f19acc3cacd37621836c02f",
     "manifestBlob": "5fce7ef65c7d418815cbe0abea67aef8cbce6e30",
@@ -4765,12 +4765,15 @@
     "immutableArtifactMustCoverBothFrontendAndBackend": true,
     "ownerInstruction": "23-Nov Dirección: publish only current approved cumulative source after signed Preview and exact SAME digest; never deploy backend LIVE or production writes from this request.",
     "scope": "I6.6 only: build one exact frontend+backend artifact; publish Hosting Preview only, then separately authorize scoped backend Preview tests. No LIVE.",
-    "reason": "V10: immutable four-function Preview under separately signed scoped authority, preserving historical phase-only status validator unchanged. Source and backend changes remain exactly frozen.",
+    "reason": "V11 same cumulative source with scoped legal acceptance authority adapter fix. Existing signed I6.6 approval and identical legal V2.0 terms only; build new immutable artifact for isolated Preview, no LIVE or real data writes.",
     "opsLeadsPreviewFunction": "orbit360OpsLeadsCommandPreview",
     "opsLeadsLiveFunction": "orbit360OpsLeadsCommand",
     "fourFunctionExactPreviewRequired": true,
     "realCustomerWritesAllowed": false,
-    "liveDeployAuthorized": false
+    "liveDeployAuthorized": false,
+    "previousPreviewFailureRun": 45259132272,
+    "previousPreviewFailureCheck": "DIRECTION_LEGAL_PREVIEW_GATE_NOT_ACTIVE",
+    "releaseAfterPreviewAllowed": false
   },
   "previousPhysicalHostingRelease": {
     "sourceSha": "f1eb5bc6397f0b159079be516a521dd7b1e5d9ba",
