@@ -201,3 +201,41 @@ jobs:
           if not all(type(v) is bool for v in report.values()):raise RuntimeError('NON_BOOLEAN_REPORT_BLOCKED')
           print('I66_GREENAPI_READONLY_METADATA='+json.dumps(report,sort_keys=True,separators=(',',':')))
           PY
+      - name: Publish approved non-secret resource references only
+        shell: bash
+        run: |
+          set -euo pipefail
+          set +x
+          python3 - <<'PYMETA'
+          import json,os,pathlib,re
+          root=pathlib.Path(os.environ['RUNNER_TEMP'])/'i66-greenapi-meta'
+          project='ays-orbit-360-lab'
+          names=['orbit360GreenApiOutboxUpdated','orbit360GreenApiDeliveryStatus']
+          def obj(path):
+              try:return json.loads(path.read_text())
+              except (OSError,ValueError):return None
+          safe_ref=re.compile(r'projects/ays-orbit-360-lab/secrets/[A-Za-z0-9_-]{4,100}/versions/(?:latest|[0-9]+)')
+          safe_sa=re.compile(r'(?:[a-z][a-z0-9._-]{1,100}@ays-orbit-360-lab\.iam\.gserviceaccount\.com|[0-9]{6,30}-compute@developer\.gserviceaccount\.com|ays-orbit-360-lab@appspot\.gserviceaccount\.com)')
+          resources={'projectId':project,'functions':[],'candidateSecrets':[]}
+          for name in names:
+              item=obj(root/'functions'/f'{name}.json')
+              config=item.get('serviceConfig') or {} if isinstance(item,dict) else {}
+              account=str(config.get('serviceAccountEmail') or '')
+              ref=str((config.get('environmentVariables') or {}).get('ORBIT360_GREENAPI_GT_SECRET_VERSION') or '')
+              resources['functions'].append({'functionName':name,
+                'serviceAccount':account if safe_sa.fullmatch(account) else '',
+                'secretVersionReference':ref if safe_ref.fullmatch(ref) else ''})
+          candidate_file=root/'candidate-secrets'
+          candidates=candidate_file.read_text().splitlines() if candidate_file.exists() else []
+          for name in candidates[:5]:
+              if not re.fullmatch(r'[A-Za-z0-9_-]{4,100}',name):continue
+              versions=obj(root/'versions'/f'{name}.json')
+              enabled=[]
+              for version in versions if isinstance(versions,list) else []:
+                  if not isinstance(version,dict) or version.get('state')!='ENABLED':continue
+                  match=re.search(r'/versions/([0-9]+)$',str(version.get('name') or ''))
+                  if match:enabled.append(f'projects/{project}/secrets/{name}/versions/{match.group(1)}')
+              resources['candidateSecrets'].append({'secretResource':f'projects/{project}/secrets/{name}',
+                'enabledVersionReferences':sorted(set(enabled))[:20]})
+          print('I66_GREENAPI_READONLY_RESOURCE_REFERENCES='+json.dumps(resources,sort_keys=True,separators=(',',':')))
+          PYMETA

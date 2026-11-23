@@ -4738,6 +4738,66 @@
     "liveCloneRunId": 45088457923
   },
   "frontendPreviewRequest": {
+    "version": 12,
+    "mode": "COMPOSITE_ARTIFACT_HOSTING_PREVIEW_ONLY",
+    "sourceQaHead": "810f6ab11f04614ab0955645341c93728c0b8a73",
+    "manifestBlob": "5fce7ef65c7d418815cbe0abea67aef8cbce6e30",
+    "sourceQaRunId": 45275937536,
+    "guardRunId": 45275937358,
+    "previousReceiptBlob": "d39f216defb2959b47087da84cc87b32b97faa94",
+    "productPaths": [
+      "functions/product-ops-leads-domain.js",
+      "orbit360-platform/core/auth-product-runtime-p0.js",
+      "orbit360-platform/core/backend-product-readonly-bootstrap-p0.js",
+      "orbit360-platform/core/ciclo.js",
+      "orbit360-platform/modules/cliente360.js",
+      "orbit360-platform/modules/portal.js"
+    ],
+    "backendPaths": [
+      "functions/product-ops-leads-domain.js"
+    ],
+    "backendPathBlobs": {
+      "functions/product-ops-leads-domain.js": "b7921ca88343ced65bdad4cd9de26fa120647083"
+    },
+    "backendPreviewRequired": true,
+    "backendLiveDeployAllowed": false,
+    "realDataWritesAllowed": false,
+    "immutableArtifactMustCoverBothFrontendAndBackend": true,
+    "ownerInstruction": "23-Nov Dirección: publish only current approved cumulative source after signed Preview and exact SAME digest; never deploy backend LIVE or production writes from this request.",
+    "scope": "I6.6 only: build one exact frontend+backend artifact; publish Hosting Preview only, then separately authorize scoped backend Preview tests. No LIVE.",
+    "reason": "Rebuild after causal release-owner synchronization fix: monotonic admission, exact four targets, existing legal scope pin, atomic composite close and commit-aware rollback. Product scope remains the approved six paths.",
+    "opsLeadsPreviewFunction": "orbit360OpsLeadsCommandPreview",
+    "opsLeadsLiveFunction": "orbit360OpsLeadsCommand",
+    "fourFunctionExactPreviewRequired": true,
+    "realCustomerWritesAllowed": false,
+    "liveDeployAuthorized": false,
+    "previousPreviewFailureRun": 45266197849,
+    "previousPreviewFailureCheck": "I66_OPERATIONAL_SOURCE_OR_QA_OWNER_DRIFT",
+    "releaseAfterPreviewAllowed": false,
+    "releaseMechanismSourceSha": "810f6ab11f04614ab0955645341c93728c0b8a73",
+    "previousBuildFailureRun": 45266197734,
+    "previousBuildFailureCheck": "FIXED_REQUEST_VERSION_ASSERTION"
+  },
+  "previousPhysicalHostingRelease": {
+    "sourceSha": "f1eb5bc6397f0b159079be516a521dd7b1e5d9ba",
+    "buildId": "gi-i66-f1eb5bc6397f-57f234755dc1",
+    "artifactId": 14674736714,
+    "artifactDigest": "sha256:e55fcc674a6cc493cdedff27672d082222db3dd7134354559788364b6ae23713",
+    "previewRunId": 44826594717,
+    "signedPreviewRunId": 44827281351,
+    "liveCloneRunId": 44827928263,
+    "liveHostingVersion": "sites/ays-orbit-360-lab/versions/7a0d829d3504c9f8",
+    "readbackEachOrigin": 224,
+    "receipt": "artifacts/orbit360-recovery/release-control/I6_6_DIRECT_PAYMENT_OPTIONAL_DOCUMENT_LIVE_READBACK_20261120.json",
+    "backendFunctionsChanged": 0,
+    "fullI66ProductionAccepted": false,
+    "status": "PUBLISHED_SIGNED_224_FRONTEND_HOSTING_ONLY_FULL_I66_HOLD"
+  },
+  "frontendReleaseSequence": 2,
+  "consumedFrontendAuthorities": [
+    "2d0b28e6c2a30995118520cdf66a32bb5bf4afcb"
+  ],
+  "previousFrontendPreviewRequest": {
     "version": 11,
     "mode": "COMPOSITE_ARTIFACT_HOSTING_PREVIEW_ONLY",
     "sourceQaHead": "196e3cdbae5a02792f19acc3cacd37621836c02f",
@@ -4775,26 +4835,7 @@
     "previousPreviewFailureCheck": "DIRECTION_LEGAL_PREVIEW_GATE_NOT_ACTIVE",
     "releaseAfterPreviewAllowed": false
   },
-  "previousPhysicalHostingRelease": {
-    "sourceSha": "f1eb5bc6397f0b159079be516a521dd7b1e5d9ba",
-    "buildId": "gi-i66-f1eb5bc6397f-57f234755dc1",
-    "artifactId": 14674736714,
-    "artifactDigest": "sha256:e55fcc674a6cc493cdedff27672d082222db3dd7134354559788364b6ae23713",
-    "previewRunId": 44826594717,
-    "signedPreviewRunId": 44827281351,
-    "liveCloneRunId": 44827928263,
-    "liveHostingVersion": "sites/ays-orbit-360-lab/versions/7a0d829d3504c9f8",
-    "readbackEachOrigin": 224,
-    "receipt": "artifacts/orbit360-recovery/release-control/I6_6_DIRECT_PAYMENT_OPTIONAL_DOCUMENT_LIVE_READBACK_20261120.json",
-    "backendFunctionsChanged": 0,
-    "fullI66ProductionAccepted": false,
-    "status": "PUBLISHED_SIGNED_224_FRONTEND_HOSTING_ONLY_FULL_I66_HOLD"
-  },
-  "frontendReleaseSequence": 2,
-  "consumedFrontendAuthorities": [
-    "2d0b28e6c2a30995118520cdf66a32bb5bf4afcb"
-  ],
-  "scopedBackendPreviewI66": {
+  "supersededScopedBackendPreviewI66": {
     "schema": "GI_I66_SCOPED_BACKEND_PREVIEW_AUTHORIZATION_V1",
     "status": "APPROVED_FOUR_FUNCTION_PREVIEW_SYNTHETIC_ONLY",
     "approvedByDirection": true,
@@ -4927,6 +4968,8 @@
     },
     "noNewFirebase": true,
     "noRulesDeploy": true,
-    "noMainBranch": true
+    "noMainBranch": true,
+    "supersededReason": "Source and release owners changed before V12; never reuse old artifact for the repaired execution.",
+    "supersededByPreviewRequestVersion": 12
   }
 }
