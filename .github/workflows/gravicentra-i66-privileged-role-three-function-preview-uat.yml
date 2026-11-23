@@ -168,18 +168,38 @@ jobs:
             const found=rows.filter(r=>id(r)===n);assert.equal(found.length,1,'I66_PREVIEW_EXISTING_FUNCTION_NOT_UNIQUE_'+n);
             assert.equal(String(found[0].region||found[0].location||''),region);
           }
-          console.log('I66_ONLY_THREE_PREEXISTING_EXACT_REGION_PREVIEW_CALLABLES_ALLOWED_PASS');
+          const scope=JSON.parse(fs.readFileSync('artifacts/orbit360-recovery/release-control/I6_6_RELEASE_TRANSPORT_CONTROL_20261110.json','utf8')).operationalReleaseCandidate;
+          if(scope?.opsLeadsComposite===true){
+            const ops=rows.filter(r=>id(r)==='orbit360OpsLeadsCommandPreview');
+            assert.ok(ops.length<=1,'I66_OPS_PREVIEW_DUPLICATE_OR_UNKNOWN');
+            if(ops.length)assert.equal(String(ops[0].region||ops[0].location||''),'us-east1','I66_OPS_PREVIEW_REGION_DRIFT');
+          }
+          console.log('I66_HISTORICAL_THREE_PLUS_PINNED_OPS_PREVIEW_SCOPE_PASS');
           NODE
-          node "$I66_ROLE_FIREBASE_CLI" deploy \
+          if node -e "const c=require('./artifacts/orbit360-recovery/release-control/I6_6_RELEASE_TRANSPORT_CONTROL_20261110.json');process.exit(c.operationalReleaseCandidate?.opsLeadsComposite===true?0:1)";then
+            node "$I66_ROLE_FIREBASE_CLI" deploy \
+            --only functions:orbit360ProductOperationalCommandPreview,functions:orbit360CobrosReconciliationCommandPreview,functions:orbit360ScopedPolicyReadPreview,functions:orbit360OpsLeadsCommandPreview \
+            --config "$I66_ROLE_PREVIEW_FIREBASE_CONFIG" --project "$PROJECT_ID" --non-interactive
+          else
+            node "$I66_ROLE_FIREBASE_CLI" deploy \
             --only functions:orbit360ProductOperationalCommandPreview,functions:orbit360CobrosReconciliationCommandPreview,functions:orbit360ScopedPolicyReadPreview \
             --config "$I66_ROLE_PREVIEW_FIREBASE_CONFIG" --project "$PROJECT_ID" --non-interactive
+          fi
           node "$I66_ROLE_FIREBASE_CLI" functions:list --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/gi-role-functions-after.json"
           node - <<'NODE'
           const assert=require('node:assert/strict'),a=require(process.env.RUNNER_TEMP+'/gi-role-functions-before.json'),b=require(process.env.RUNNER_TEMP+'/gi-role-functions-after.json');
           const rows=x=>Array.isArray(x.result)?x.result:Array.isArray(x)?x:[];
           const id=x=>String(x.entryPoint||x.id||x.name||'').split('/').pop();
-          assert.deepEqual(rows(a).map(id).sort(),rows(b).map(id).sort(),'I66_PREVIEW_OTHER_FUNCTION_INVENTORY_CHANGED');
-          const targets=new Set(require('./tools/gravicentra-i6-6-operational-release-candidate.cjs').TARGETS.preview.map(x=>x.name));
+          const g=require('./tools/gravicentra-i6-6-operational-release-candidate.cjs');
+          const candidate=JSON.parse(require('node:fs').readFileSync(g.CONTROL,'utf8')).operationalReleaseCandidate;
+          const beforeIds=rows(a).map(id).sort(),afterIds=rows(b).map(id).sort();
+          if(candidate?.opsLeadsComposite===true){
+            const added=afterIds.filter(v=>!beforeIds.includes(v));
+            assert.ok(added.length<=1&&added.every(v=>v==='orbit360OpsLeadsCommandPreview'),'I66_OPS_PREVIEW_INVENTORY_UNEXPECTED_NEW_FUNCTION');
+            assert.deepEqual(beforeIds.filter(v=>v!=='orbit360OpsLeadsCommandPreview'),
+              afterIds.filter(v=>v!=='orbit360OpsLeadsCommandPreview'),'I66_PREVIEW_UNRELATED_FUNCTION_CHANGED');
+          }else assert.deepEqual(beforeIds,afterIds,'I66_PREVIEW_OTHER_FUNCTION_INVENTORY_CHANGED');
+          const targets=new Set(g.targetsForCandidate(candidate,'preview').map(x=>x.name));
           const untouched=x=>rows(x).filter(r=>!targets.has(id(r))).sort((l,r)=>id(l).localeCompare(id(r)));
           assert.deepEqual(untouched(a),untouched(b),'I66_PREVIEW_NON_TARGET_BACKEND_CHANGED');
           console.log('I66_EXACT_THREE_BACKEND_PREVIEW_FUNCTIONS_DEPLOYED_INVENTORY_READBACK_PASS');
@@ -210,7 +230,7 @@ jobs:
             status:'SIGNED_DRIVERS_DURABLE_READBACK_RELOAD_RESTORE_PASS',
             ...Object.fromEntries(['sourceSha','buildRunId','artifactId','artifactDigest','previewUrl','previewChannelId'].map(k=>[k,p[k]])),
             ...(p.buildId===undefined?{}:{buildId:p.buildId}),
-            targets:g.TARGETS.preview,signedDrivers:g.DRIVERS,realFinancialOrCustomerWrites:0,
+            targets:g.targetsForCandidate(p,'preview'),signedDrivers:g.DRIVERS,realFinancialOrCustomerWrites:0,
             syntheticRestoreComplete:true,liveHostingUnchanged:true,liveBackendUnchanged:true,
             focusedReports:g.focusedReportsFromDisk(p,'PREVIEW'),
             runId:Number(process.env.GITHUB_RUN_ID),headSha:process.env.GITHUB_SHA};

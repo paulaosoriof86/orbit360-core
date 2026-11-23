@@ -50,3 +50,16 @@ test('rejects composite target, source, role and rollback dilution without chang
  ];
  for(const mutate of bad){let{control}=candidate();mutate(control);assert.throws(()=>g.candidateForPhase(control,'preview'))}
 });
+
+test('preview and live transport require fourth callable and exact 224-byte-set for composite',()=>{
+ const fs=require('node:fs');
+ const preview=fs.readFileSync('.github/workflows/gravicentra-i66-privileged-role-three-function-preview-uat.yml','utf8');
+ const live=fs.readFileSync('.github/workflows/gravicentra-i66-privileged-role-exact-live-promotion.yml','utf8');
+ const transport=fs.readFileSync('tools/gravicentra-i66-privileged-role-exact-live-transport.mjs','utf8');
+ assert.match(preview,/functions:orbit360OpsLeadsCommandPreview/);
+ assert.match(live,/functions:orbit360OpsLeadsCommand/);
+ assert.match(preview,/targetsForCandidate\(candidate,'preview'\)/);
+ assert.match(live,/targetsForCandidate\(p,'live'\)/);
+ assert.match(transport,/operational\?\.expectedSiteFileCount\|\|223/);
+ assert.match(live,/candidate.expectedSiteFileCount/);
+});

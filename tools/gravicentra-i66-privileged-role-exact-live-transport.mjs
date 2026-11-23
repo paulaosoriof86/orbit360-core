@@ -60,7 +60,8 @@ function manifestRows(){
       'I66_ROLE_SITE_MANIFEST_UNSAFE');
     return{hash:m[1],path:m[2]};
   });
-  need(rows.length===223&&new Set(rows.map(r=>r.path)).size===223,'I66_ROLE_SITE_FILE_COUNT_DRIFT');
+  const expected=operational?.expectedSiteFileCount||223;
+  need(rows.length===expected&&new Set(rows.map(r=>r.path)).size===expected,'I66_ROLE_SITE_FILE_COUNT_DRIFT');
   for(const r of rows){
     const file=path.join(root,'bundle/site',r.path);
     need(fs.existsSync(file)&&digest(fs.readFileSync(file))===r.hash,'I66_ROLE_SOURCE_ARTIFACT_LOCAL_DRIFT');
@@ -120,8 +121,9 @@ try{
   [evidence.liveSiteFiles,evidence.customSiteFiles]=await Promise.all(LIVE.map(origin=>verify(origin,rows)));
   need((await getVersion('live'))===preview,'I66_ROLE_LIVE_VERSION_DIFFERS_FROM_PREVIEW');
   evidence.liveHostingVersion=preview;
-  evidence.status='EXACT_223_OF_223_EACH_ORIGIN_SAME_PREVIEW_VERSION_PASS_SIGNED_LIVE_QA_REQUIRED';
-  console.log('I66_ROLE_EXACT_HOSTING_TWO_LIVE_ORIGINS_223_OF_223_PASS');
+  const verified=operational?.expectedSiteFileCount||223;
+  evidence.status='EXACT_'+verified+'_OF_'+verified+'_EACH_ORIGIN_SAME_PREVIEW_VERSION_PASS_SIGNED_LIVE_QA_REQUIRED';
+  console.log('I66_ROLE_EXACT_HOSTING_TWO_LIVE_ORIGINS_'+verified+'_OF_'+verified+'_PASS');
   console.log('I66_ROLE_PREVIEW_VERSION_EQUALS_LIVE_VERSION_PASS');
 }catch(error){
   evidence.blocker=String(error.message||error).replace(/[^A-Za-z0-9_:-]/g,'_').slice(0,140);

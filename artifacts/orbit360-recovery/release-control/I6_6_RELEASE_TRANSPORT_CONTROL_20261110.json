@@ -4738,7 +4738,7 @@
     "liveCloneRunId": 45088457923
   },
   "frontendPreviewRequest": {
-    "version": 4,
+    "version": 5,
     "mode": "COMPOSITE_ARTIFACT_HOSTING_PREVIEW_ONLY",
     "sourceQaHead": "196e3cdbae5a02792f19acc3cacd37621836c02f",
     "manifestBlob": "5fce7ef65c7d418815cbe0abea67aef8cbce6e30",
@@ -4764,7 +4764,13 @@
     "realDataWritesAllowed": false,
     "immutableArtifactMustCoverBothFrontendAndBackend": true,
     "ownerInstruction": "23-Nov Dirección: publish only current approved cumulative source after signed Preview and exact SAME digest; never deploy backend LIVE or production writes from this request.",
-    "scope": "I6.6 only: build one exact frontend+backend artifact; publish Hosting Preview only, then separately authorize scoped backend Preview tests. No LIVE."
+    "scope": "I6.6 only: build one exact frontend+backend artifact; publish Hosting Preview only, then separately authorize scoped backend Preview tests. No LIVE.",
+    "reason": "Source governance updated to include four exact Ops/Leads/operational/payment/policy targets in same immutable Preview; original three-function historical seals remain unchanged.",
+    "opsLeadsPreviewFunction": "orbit360OpsLeadsCommandPreview",
+    "opsLeadsLiveFunction": "orbit360OpsLeadsCommand",
+    "fourFunctionExactPreviewRequired": true,
+    "realCustomerWritesAllowed": false,
+    "liveDeployAuthorized": false
   },
   "previousPhysicalHostingRelease": {
     "sourceSha": "f1eb5bc6397f0b159079be516a521dd7b1e5d9ba",
