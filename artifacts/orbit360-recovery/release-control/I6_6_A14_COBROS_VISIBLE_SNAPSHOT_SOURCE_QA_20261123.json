@@ -1,0 +1,98 @@
+{
+  "schema": "GI_I66_A14_COBROS_VISIBLE_SNAPSHOT_SYNTHETIC_QA_V1",
+  "createdAt": "2026-11-23T22:29:28.977833+00:00",
+  "base": {
+    "baseHead": "d0369a0f332744beb54e59a299c4ef2320a9532a",
+    "baseBlob": "f410e0f0f23c399a0d9f574fa9d1279801d3542c",
+    "baseSha256": "a412f1d86669fda4fe27d2784e9654d1e6ae97889a4781f96e96ac3a1e037dd0",
+    "sourcePath": "orbit360-platform/modules/cobros.js",
+    "checkoutUnmodified": true
+  },
+  "files": {
+    "orbit360-platform/modules/cobros.js": "98b26afb9fa9bc9eb62bf3445f8f848a8122ce4a3aad1b1b4d0fe4e411e7f499",
+    "tools/gravicentra-i6-6-cobros-visible-snapshot-performance.test.cjs": "e71b50f21a5a3d2c7e5fdf56d250991c5cc53673a263dd86fad9f7c0eae0d7dd",
+    "cobros-visible-snapshot.patch": "4e79c1706fd8a24a0c82ce4dc76b8ae6f1508456fce42a4aaeb1421bfbc67482"
+  },
+  "applyCheck": {
+    "exitCode": 0,
+    "output": ""
+  },
+  "scope": "read/render only; no financial calculation, writer, service or root-checkout changes",
+  "causalFixture": {
+    "rowsPerTenant": 1200,
+    "actualOwnersLoaded": [
+      "core/ui.js",
+      "core/queries.js",
+      "core/access-scope.js",
+      "modules/cobros.js",
+      "modules/cobros-cartera-i65-closure-bridge.js"
+    ],
+    "store": "synthetic already-tenant-bounded clone-on-read fixture, not Firestore service",
+    "beforeGetCalls": 10028,
+    "afterGetCalls": 3998,
+    "reductionPct": 60.1316,
+    "beforeReceiptGetCalls": 1205,
+    "afterReceiptGetCalls": 0,
+    "beforeAdvisorGetCalls": 8763,
+    "afterAdvisorGetCalls": 3938,
+    "beforeCobrosAllCalls": 6,
+    "afterCobrosAllCalls": 4,
+    "sourceMutations": 0,
+    "businessWrites": 0,
+    "fullHtmlAndReportParity": true
+  },
+  "causalTests": {
+    "passed": 7,
+    "failed": 0,
+    "command": "GI_I66_COBROS_QA_REPO_ROOT=/workspace/scratch/2ea890c39c51/orbit360-core node --test tools/gravicentra-i6-6-cobros-visible-snapshot-performance.test.cjs"
+  },
+  "regressions": [
+    {
+      "file": "tools/gravicentra-b4-003-cobros-scope-cache.test.cjs",
+      "exitCode": 0
+    },
+    {
+      "file": "tools/gravicentra-b4-003-cobros-q683-filter-parity.test.cjs",
+      "exitCode": 0,
+      "checks": 33
+    },
+    {
+      "file": "tools/gravicentra-b4-003-cobros-role-hydration-successor.test.cjs",
+      "exitCode": 0,
+      "testsPassed": 16
+    },
+    {
+      "file": "tools/gravicentra-i6-6-cobros-application-and-temporal-search.test.cjs",
+      "exitCode": 0
+    }
+  ],
+  "regressionMethod": "original files run from repo with only fs.readFileSync of modules/cobros.js redirected to candidate outside checkout",
+  "notClaimed": [
+    "live latency reduction",
+    "A14 PASS",
+    "full I6.6 PASS",
+    "new financial writes"
+  ],
+  "nextGate": "build new immutable artifact, run pinned preview/live performance and role/hydration/readback gates",
+  "finalSourceRevision": {
+    "recordedAtUtc": "2026-11-23T22:35:02.941813+00:00",
+    "causalTestsPassed": 8,
+    "causalTestsFailed": 0,
+    "additionalContract": "Real operational store trims get() reference arguments; noncanonical spaced references delegate to the same prior get owner. Normal identifiers keep the scoped per-render index.",
+    "beforeCorrectionObservedAmount": 280.26,
+    "expectedAndCorrectedAmount": 913.47,
+    "paidReceiptRemainsExcludedFromDebt": true,
+    "files": [
+      {
+        "path": "orbit360-platform/modules/cobros.js",
+        "sha256": "2b44a4208810b616e79678cedf3865e8890cf141bf2baea8728c7c9069a35f07",
+        "gitBlobSha": "b7813be360a778cd199579cc3898a0179f2e3c2a"
+      },
+      {
+        "path": "tools/gravicentra-i6-6-cobros-visible-snapshot-performance.test.cjs",
+        "sha256": "6be2abdd15885dac373934a9fac32a3b997ab5630c436aa46d4bc00c2945a776",
+        "gitBlobSha": "5f7efc67df5551368fe396beb26a5e7ea13ec5dc"
+      }
+    ]
+  }
+}

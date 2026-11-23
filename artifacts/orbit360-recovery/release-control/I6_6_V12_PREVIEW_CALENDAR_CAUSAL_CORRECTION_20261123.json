@@ -1,0 +1,63 @@
+{
+  "schema": "GI_I66_V12_PREVIEW_HOLD_CAUSAL_CORRECTION_V1",
+  "activeGate": "I6.6",
+  "priorSourceSha": "97fdeb96af2c6194764584a00f860f8bb752d85b",
+  "previewRunId": 45277851717,
+  "previewJobId": 138054382041,
+  "artifactId": 14868486169,
+  "artifactDigest": "sha256:fefc688860f4469f6a3ec5c60f46d3dd859953855ebc7031b52cfd00a2c321f0",
+  "diagnosticArtifactId": 14869205450,
+  "diagnosticArtifactDigest": "sha256:a27a1b5349514fbbc68cc7c068aab277a2fc6360f9b3163e7c74fce286f3eb44",
+  "observed": {
+    "fourExactPreviewFunctionsDeployed": true,
+    "signedStatus": "HOLD",
+    "stage": "DOCUMENTED_PREMIUM_TERMS",
+    "helperStep": "FORM_FIELDS",
+    "helperWriteAttempted": false,
+    "helperCleanup": "PASS",
+    "helperRemaining": 0,
+    "driverCleanup": "PASS",
+    "driverRemaining": 0,
+    "livePromotion": false
+  },
+  "rootCause": {
+    "sourceDemonstrated": "New policy places documented-calendar textarea under closed details; old signed helper filled without opening summary.",
+    "causalPreimageTests": {
+      "checks": 4,
+      "pass": 1,
+      "fail": 3,
+      "exitCode": 1
+    },
+    "correctedHelperAndActualFormTests": {
+      "checks": 120,
+      "pass": 120,
+      "fail": 0
+    },
+    "sourceCorrection": "Normal summary click, visible calendar wait, fill; exact UI/durable/audit/cleanup checks preserved.",
+    "liveCausalityStillRequires": "New immutable artifact signed Preview and LIVE results."
+  },
+  "owners": [
+    {
+      "path": "tools/gravicentra-i6-6-documented-terms-signed-check.cjs",
+      "gitBlobSha": "35a026b8a439efb4c5557e04a13880da4cd6475f"
+    },
+    {
+      "path": "tools/gravicentra-i6-6-documented-terms-signed-check.test.cjs",
+      "gitBlobSha": "a27fda43f87dd4d411f9844a159ce62d8504f8b2"
+    },
+    {
+      "path": "tools/gravicentra-i6-6-documented-premium-terms.test.cjs",
+      "gitBlobSha": "e85efa5ce3b403b8840f522c7ded137362ce3f4f"
+    },
+    {
+      "path": "orbit360-platform/modules/cobros.js",
+      "gitBlobSha": "b7813be360a778cd199579cc3898a0179f2e3c2a"
+    },
+    {
+      "path": "tools/gravicentra-i6-6-cobros-visible-snapshot-performance.test.cjs",
+      "gitBlobSha": "5f7efc67df5551368fe396beb26a5e7ea13ec5dc"
+    }
+  ],
+  "fullI66ProductionAccepted": false,
+  "realCustomerWritesByThisCorrection": 0
+}

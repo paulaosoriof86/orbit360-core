@@ -1,6 +1,9 @@
 #!/usr/bin/env node
 // I6.6 LIVE/PREVIEW P0. Browser-origin timings only; never write business data.
 import fs from 'node:fs';
+import {createRequire} from 'node:module';
+import {execFileSync} from 'node:child_process';
+const require=createRequire(import.meta.url);
 import {chromium} from 'playwright';
 import {initializeApp,applicationDefault,getApps} from 'firebase-admin/app';
 import {getFirestore} from 'firebase-admin/firestore';
@@ -8,27 +11,41 @@ import {getAuth} from 'firebase-admin/auth';
 
 const PROJECT='ays-orbit-360-lab';
 const TENANT='alianzas-soluciones';
-const ORIGIN=process.env.GI_I66_PERF_ORIGIN||'https://app.aysseguros.com';
-// Exact 867b0b0d75cf source passed immutable-build and Preview byte readback.
-// It is the sole approved candidate for this scoped comparison.
-const APPROVED_PREVIEW='https://ays-orbit-360-lab--gi-i66-rc-43123134271-5vsqe8fh.web.app';
+const LIVE='https://app.aysseguros.com';
 const OUTPUT=process.env.GI_I66_PERF_REPORT;
-const CURRENT_LIVE_SOURCE=process.env.I66_APPROVED_LIVE_SOURCE_SHA||'';
-if(ORIGIN==='https://app.aysseguros.com')
-  needSource(CURRENT_LIVE_SOURCE);
-function needSource(x){if(!/^[a-f0-9]{40}$/.test(x))throw Error('I66_PERF_LIVE_SOURCE_PIN_REQUIRED');}
 const norm=x=>String(x??'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();
 const need=(ok,code)=>{if(!ok)throw Error(code);};
 need(process.env.GI_I66_PERF_PROJECT===PROJECT&&process.env.GI_I66_PERF_TENANT===TENANT,'I66_PERF_PROJECT_TENANT_HOLD');
-need(ORIGIN==='https://app.aysseguros.com'||ORIGIN===APPROVED_PREVIEW,'I66_PERF_ORIGIN_NOT_APPROVED');
 need(!process.env.FIRESTORE_EMULATOR_HOST,'I66_PERF_EMULATOR_HOLD');
 need(OUTPUT&&OUTPUT.startsWith(process.env.RUNNER_TEMP+'/'),'I66_PERF_OUTPUT_SCOPE_HOLD');
+// Reuse the canonical candidate/physical-head owners. Never admit a historical
+// pointer, arbitrary preview URL, or a driver edited after its source build.
+const phase=process.env.GI_I66_PERF_PHASE||'live';
+need(['preview','live'].includes(phase),'I66_PERF_PHASE_HOLD');
+const release=require('./gravicentra-i6-6-operational-release-candidate.cjs');
+const controlOwner=require('./gravicentra-i66-frontend-control.cjs');
+const readJson=file=>JSON.parse(fs.readFileSync(file,'utf8'));
+const transport=readJson(release.CONTROL);
+const pending=transport.scopedBackendPreviewI66?.candidate||transport.operationalReleaseCandidate;
+const pin=phase==='preview'&&pending
+  ?release.candidateForPhase(transport,transport.status==='OPERATIONAL_EXACT_LIVE_PROMOTION_AUTHORIZED'?'live':'preview')
+  :controlOwner.physicalGuard(readJson(controlOwner.P.cp),readJson(controlOwner.P.state),transport,fs);
+const APPROVED_PREVIEW=pin.previewUrl;
+const CURRENT_LIVE_SOURCE=pin.sourceSha;
+const ORIGIN=process.env.GI_I66_PERF_ORIGIN||(phase==='preview'?APPROVED_PREVIEW:LIVE);
+need(ORIGIN===(phase==='preview'?APPROVED_PREVIEW:LIVE),'I66_PERF_ORIGIN_NOT_APPROVED');
+if(process.env.I66_APPROVED_LIVE_SOURCE_SHA)
+  need(process.env.I66_APPROVED_LIVE_SOURCE_SHA===pin.sourceSha,'I66_PERF_SOURCE_ENV_DRIFT');
+const DRIVER='tools/gravicentra-i66-live-performance-readonly.mjs';
+need(fs.readFileSync(DRIVER).equals(execFileSync('git',['show',pin.sourceSha+':'+DRIVER])),
+  'I66_PERF_DRIVER_SOURCE_BYTES_DRIFT');
 const app=getApps()[0]||initializeApp({credential:applicationDefault(),projectId:PROJECT});
 const db=getFirestore(app),auth=getAuth(app);
 const report={
   schema:'GI_I66_BROWSER_PERFORMANCE_READONLY_V2',project:PROJECT,tenant:TENANT,
   origin:ORIGIN,gate:'I6.6',
-  sourceSha:ORIGIN==='https://app.aysseguros.com'?CURRENT_LIVE_SOURCE:process.env.GITHUB_SHA||'',
+  sourceSha:pin.sourceSha,buildId:pin.buildId,releaseArtifactId:pin.artifactId,
+  releaseArtifactDigest:pin.artifactDigest,releaseBuildRunId:pin.buildRunId,phase,
   workflowHeadSha:process.env.GITHUB_SHA||'',
   readOnly:true,firestoreWrites:0,businessActions:0,paymentActions:0,
   syntheticFixtures:0,pushNotifications:0,roleChanged:false,
@@ -64,19 +81,13 @@ async function findCarlos(){
   return {uid:who.uid,allowedRole:'operativo'};
 }
 async function run(){
-  if(ORIGIN==='https://app.aysseguros.com'){
-    const response=await fetch(ORIGIN+'/__recovery__/build.json',{headers:{'cache-control':'no-cache'}});
-    need(response.status===200,'I66_PERF_LIVE_BUILD_MARKER_HTTP_HOLD');
-    const marker=await response.json();
-    const cp=JSON.parse(fs.readFileSync('artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json','utf8'));
-    const t=JSON.parse(fs.readFileSync('artifacts/orbit360-recovery/release-control/I6_6_RELEASE_TRANSPORT_CONTROL_20261110.json','utf8'));
-    const approved=cp.i66LatestPhysicalFrontendLive20261120||{};
-    need(marker.sourceSha===CURRENT_LIVE_SOURCE&&approved.sourceSha===CURRENT_LIVE_SOURCE&&
-      t.currentPhysicalHostingRelease?.sourceSha===CURRENT_LIVE_SOURCE&&
-      marker.buildId===approved.buildId,'I66_PERF_LIVE_SERVED_OR_CONTROL_DRIFT_HOLD');
-    report.liveBuildId=marker.buildId;
-    report.liveReleaseArtifactId=approved.artifactId;
-  }
+  const response=await fetch(ORIGIN+'/__recovery__/build.json',{headers:{'cache-control':'no-cache'}});
+  need(response.status===200,'I66_PERF_BUILD_MARKER_HTTP_HOLD');
+  const marker=await response.json();
+  need(marker.sourceSha===pin.sourceSha&&marker.buildId===pin.buildId&&marker.gate==='I6.6'&&
+    marker.product==='Gravicentra Insurance','I66_PERF_SERVED_OR_CONTROL_DRIFT_HOLD');
+  report.liveBuildId=phase==='live'?marker.buildId:null;
+  report.liveReleaseArtifactId=phase==='live'?pin.artifactId:null;
   const actor=await findCarlos();
   const token=await auth.createCustomToken(actor.uid);
   let browser;
@@ -406,7 +417,9 @@ async function run(){
     report.auth.pageErrors=pageErrors;report.auth.consoleErrors=consoleErrors;
     report.auth.consoleErrorClasses=consoleClasses;report.auth.httpErrorClasses=httpClasses;
     await context.close();
-    report.status=ORIGIN===APPROVED_PREVIEW?'PREVIEW_READONLY_MEASURED':'LIVE_READONLY_MEASURED';
+    const finalMarker=await fetch(ORIGIN+'/__recovery__/build.json',{headers:{'cache-control':'no-cache'}}).then(r=>r.json());
+    need(finalMarker.sourceSha===pin.sourceSha&&finalMarker.buildId===pin.buildId,'I66_PERF_BUILD_CHANGED_DURING_RUN');
+    report.status=phase==='preview'?'PREVIEW_READONLY_MEASURED':'LIVE_READONLY_MEASURED';
   }finally{if(browser)await browser.close();}
 }
 try{

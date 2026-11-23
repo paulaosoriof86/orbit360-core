@@ -26,6 +26,7 @@ function fixture(){
   p.liveLegalAcceptance=legal.liveScopeCandidatePin(p,p.liveLegalAcceptance.receiptSha256,read(legal.LIVE_SCOPE.authorizationPath));
   for(const key of ['sourceSha','buildId','buildRunId','artifactId','artifactDigest','previewQa'])proof[key]=clone(p[key]);
   Object.assign(proof,{runId:236,headSha:'8'.repeat(40),previewChannel:p.previewChannelId,
+    recordedAtUtc:'2026-11-23T23:30:00.000Z',
     status:'SAME_ARTIFACT_FOUR_FUNCTIONS_SIGNED_LIVE_READBACK_RELOAD_RESTORE_PASS',previousLive:clone(p.currentLive),
     previousHostingVersion:previous.hostingVersion,previewHostingVersion:'sites/ays-orbit-360-lab/versions/fixture-composite',
     liveHostingVersion:'sites/ays-orbit-360-lab/versions/fixture-composite',previewFiles:224,liveSiteFiles:224,customSiteFiles:224,
@@ -85,6 +86,20 @@ test('composite acceptance synchronizes one generation and four revisions withou
   const progress=f.readFile(cp.i66ActiveRecoveryCursor.currentEvidencePath);
   assert.deepEqual(progress.executionSynchronization,owner.executionSnapshot(tr));
   assert.equal(progress.notTouched.backendDeploy,false);
+  assert.equal(progress.releaseExecution.status,'COMPOSITE_FOUR_FUNCTIONS_SIGNED_LIVE_ACCEPTED');
+  for(const key of ['artifactBuilt','previewSignedPass','livePromoted'])assert.equal(progress.releaseExecution[key],true);
+  assert.equal(progress.releaseExecution.liveRunId,f.proof.runId);
+  assert.equal(progress.releaseExecution.artifactDigest,f.p.artifactDigest);
+  assert.equal(progress.releaseExecution.recordedAtUtc,f.proof.recordedAtUtc);
+  assert.equal(progress.recordedAtUtc,f.proof.recordedAtUtc);
+  assert.deepEqual(progress.previousReleaseExecution,f.readFile(progress.previousEvidencePath).releaseExecution);
+  assert.deepEqual(progress.consumedPreviewRequest,tr.lastConsumedFrontendPreviewRequest);
+  for(const next of [cp.nextAction,state.nextAction,cp.i66ActiveRecoveryCursor.next,cp.i66OperationalContinuation20261115.currentWork])
+    assert.equal(next,progress.next);
+  assert.ok(!progress.next.includes('construir y leer el artifact nuevo de V12'));
+  assert.ok(progress.remainingExecutionLanes.length>0);
+  assert.deepEqual(progress.shockObjectives,f.readFile(progress.previousEvidencePath).shockObjectives);
+  assert.deepEqual(progress.officialProgress,f.readFile(progress.previousEvidencePath).officialProgress);
   assert.equal(cp.i66ActiveRecoveryCursor.currentEvidenceBlobSha,blob(serial(progress)));
   assert.equal(progress.financialWork.currentIterationRealCustomerFinancialWrites,
     f.readFile(progress.previousEvidencePath).financialWork.currentIterationRealCustomerFinancialWrites);
@@ -113,6 +128,11 @@ test('metadata CAS failure never records COMMITTED and leaves rollback to the LI
   const f=fixture();f.io.commitAll=async()=>{throw Error('HEAD_CAS_FAILED');};
   await assert.rejects(tx.acceptComposite(f.io,f.request,f.proof),/HEAD_CAS_FAILED/);
   assert.equal(f.files.get(f.jp).phase,'VERIFIED');assert.equal(f.model.clones,0);assert.equal(f.model.commits,0);
+});
+test('semantic close refuses a proof without its real sealing timestamp and preserves all control pointers',async()=>{
+  const f=fixture(),before=serial(f.readFile(P.cp));delete f.proof.recordedAtUtc;
+  await assert.rejects(tx.acceptComposite(f.io,f.request,f.proof),/COMPOSITE_ACCEPTANCE_TIMESTAMP_REQUIRED/);
+  assert.equal(f.model.commits,0);assert.equal(serial(f.readFile(P.cp)),before);
 });
 test('lost acknowledgement after the atomic close returns COMMITTED without rollback',async()=>{
   const f=fixture(),commit=f.io.commitAll;f.io.commitAll=async(...args)=>{await commit(...args);throw Error('LOST_ACK');};

@@ -146,6 +146,13 @@ test('before-after: exact documentary schedule survives atomic policy/receipt/po
 test('before-after: blank new form does not invent credit card or CAT', async () => {
   const h = harness(), { field } = await h.newForm(); assert.equal(field('payment-form').value,''); assert.equal(field('conduct').value,''); assert.equal(h.batches.length,0);
 });
+test('actual new-policy form keeps optional documentary calendar in a closed details section',async()=>{
+  const h=harness(),{form}=await h.newForm();
+  const panel=form.innerHTML.match(/<details\b([^>]*data-contractual-calendar-panel[^>]*)>([\s\S]*?)<\/details>/);
+  assert.ok(panel);assert.equal(Object.hasOwn(attrs(panel[1]),'open'),false);
+  assert.match(panel[2],/<summary\b[^>]*>Vencimientos excepcionales según documento/);
+  assert.match(panel[2],/<textarea\b[^>]*data-documented-calendar/);assert.equal(h.batches.length,0);
+});
 test('new form refuses a payment or issuance write without a user-selected real insurer', async () => {
   const h=harness(), {field}=await h.newForm();
   await field('save').fire('click');

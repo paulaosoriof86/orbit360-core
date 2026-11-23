@@ -19,7 +19,7 @@ test('nonce and generated request/audit identities remain exact and bounded',()=
   for(const value of ['a'.repeat(24)+'\n','a'.repeat(25),'real',''])assert.throws(()=>H.fixtureIdentity(value),/NONCE/);
 });
 function setup(options={}){
-  const rows=new Map(),deletes=[],calls=[],fields={'payment-form':'',conduct:''};let modal=false,time=0;
+  const rows=new Map(),deletes=[],calls=[],uiActions=[],fields={'payment-form':'',conduct:''};let modal=false,time=0,calendarOpen=!!options.calendarInitiallyOpen;
   const client={id:clientId,tenantId,pais:'GT',moneda:'GTQ',nombre:'QA synthetic',__syntheticQa:true,__qaRunId:clientId.slice(0,-7),asesorId:'b4003qa_i66_cxp_synthetic_test_advisor',...options.clientPatch};
   const basePath='tenants/'+tenantId,clientPath=basePath+'/data/clientes/items/'+clientId;rows.set(clientPath,clone(client));
   function ref(p){return{path:p,collection(n){return ref(p+'/'+n);},doc(n){return ref(p+'/'+n);},async get(){const row=rows.get(p);return{exists:!!row,data:()=>row?clone(row):undefined,updateTime:'t-'+time};},async delete(precondition){assert.equal(precondition.lastUpdateTime,'t-'+time);if(options.deleteFailure)throw Error('synthetic failure');deletes.push(p);rows.delete(p);}};}
@@ -46,11 +46,18 @@ function setup(options={}){
   };
   const context=vm.createContext({Orbit,document,Date,console,fetch:async()=>({ok:true,json:async()=>({sourceSha:source,buildId,gate:'I6.6',product:'Gravicentra Insurance',...options.markerPatch})})});context.window=context;
   for(const p of ['core/primas.js','core/policy-receipts-engine.js'])vm.runInContext(fs.readFileSync(path.join(__dirname,'../orbit360-platform',p),'utf8'),context);
-  const form={async waitFor({state}){assert.equal(modal,state==='visible');},locator(selector){const m=selector.match(/^\[data-([^\]]+)\]$/);assert.ok(m);const key=m[1];return{async inputValue(){return key==='client'?clientId:(fields[key]||'');},async fill(value){fields[key]=value;},async selectOption(value){fields[key]=value;}};},
+  const form={async waitFor({state}){assert.equal(modal,state==='visible');},locator(selector){
+      if(selector==='[data-contractual-calendar-panel] > summary')return{async click(){uiActions.push('calendar-summary-click');if(!options.calendarCannotOpen)calendarOpen=!calendarOpen;}};
+      const m=selector.match(/^\[data-([^\]]+)\]$/);assert.ok(m);const key=m[1];return{
+        async inputValue(){return key==='client'?clientId:(fields[key]||'');},
+        async isVisible(){assert.equal(key,'documented-calendar');return calendarOpen;},
+        async waitFor({state}){assert.equal(key,'documented-calendar');assert.equal(state,'visible');assert.ok(calendarOpen,'calendar is hidden inside closed details');},
+        async fill(value){if(key==='documented-calendar'){assert.ok(calendarOpen,'calendar is hidden inside closed details');uiActions.push('calendar-fill');}fields[key]=value;},
+        async selectOption(value){fields[key]=value;}};},
     getByRole(role,spec){assert.equal(role,'button');assert.equal(spec.name,'Cancelar');assert.equal(spec.exact,true);return{async click(){modal=false;}};},
     async evaluate(fn){const node={querySelector(selector){if(selector==='[data-preview]')return{textContent:options.badUi?'976.08':'978.78 2026-11-06'};const key=selector.match(/^\[data-([^\]]+)\]$/)[1];return{value:fields[key]||''};}};return fn(node);}};
   const page={url:()=> (options.live?'https://app.aysseguros.com':origin)+'/#/inicio',locator(selector){assert.equal(selector,'#policy-v1199');return form;},async evaluate(fn,arg){context.__arg=arg;return vm.runInContext('('+fn.toString()+')(__arg)',context);},async waitForFunction(fn,arg){assert.equal(await this.evaluate(fn,arg),true);}};
-  return{page,db,rows,calls,deletes,clientPath,client,context,fields};
+  return{page,db,rows,calls,deletes,clientPath,client,context,fields,uiActions};
 }
 async function run(options={}){
   const env={I66_PREVIEW_ORIGIN:process.env.I66_PREVIEW_ORIGIN,I66_SOURCE_SHA:process.env.I66_SOURCE_SHA,I66_EXPECTED_BUILD_ID:process.env.I66_EXPECTED_BUILD_ID};
@@ -60,6 +67,16 @@ async function run(options={}){
 }
 for(const live of [false,true])test('same helper uses signed '+(live?'LIVE':'Preview')+' writer and restores exactly two records plus request/event',async()=>{
   const h=await run({live});assert.equal(h.error,undefined);assert.equal(h.proof.status,'PASS');assert.equal(h.proof.ui,'PASS');assert.equal(h.proof.durableReadbackCount,2);assert.equal(h.proof.reloadPerformed,false);assert.equal(h.proof.sessionPreserved,true);assert.equal(h.proof.modalCancelled,true);assert.deepEqual(h.proof.cleanup,{status:'PASS',remaining:0});assert.equal(h.calls.length,1);assert.equal(h.deletes.length,4);assert.equal(h.rows.size,1);assert.deepEqual(h.rows.get(h.clientPath),h.client);
+});
+test('new closed calendar is opened through its summary before fill and durable write',async()=>{
+  const h=await run();assert.equal(h.error,undefined);assert.deepEqual(h.uiActions,['calendar-summary-click','calendar-fill']);assert.equal(h.calls.length,1);
+});
+test('already visible calendar is not toggled closed',async()=>{
+  const h=await run({calendarInitiallyOpen:true});assert.equal(h.error,undefined);assert.deepEqual(h.uiActions,['calendar-fill']);
+});
+test('a calendar that does not open remains HOLD and cannot be replaced by direct DOM or server writes',async()=>{
+  const h=await run({calendarCannotOpen:true});assert.ok(h.error);assert.equal(h.proof.step,'FORM_CALENDAR_OPEN');assert.equal(h.proof.writeAttempted,false);
+  assert.equal(h.calls.length,0);assert.deepEqual(h.uiActions,['calendar-summary-click']);assert.equal(h.proof.modalCancelled,true);assert.deepEqual(h.proof.cleanup,{status:'PASS',remaining:0});
 });
 for(const options of [{gate:true},{uid:'wrong_actor'},{markerPatch:{sourceSha:'2'.repeat(40)}},{markerPatch:{buildId:buildId+'\n'}},{markerPatch:{gate:'I6.5'}},{clientPatch:{__syntheticQa:false}}])test('no writes on scope/session/legal/source failure '+JSON.stringify(options),async()=>{
   const h=await run(options);assert.ok(h.error);assert.equal(h.calls.length,0);assert.equal(h.deletes.length,0);assert.equal(h.rows.size,1);

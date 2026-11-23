@@ -394,6 +394,7 @@ jobs:
           p.directionLiveLegalAcceptance={advisorPayables:advisor.directionLiveLegalAcceptance,proposalApplication:proposal.directionLiveLegalAcceptance};
           p.sourceIntake=require('./tools/gravicentra-i6-6-proposal-uat-diagnostics.cjs').safeSourceIntakeEvidence(proposal.sourceIntake);
           p.runId=Number(process.env.GITHUB_RUN_ID);p.headSha=process.env.GITHUB_SHA;
+          p.recordedAtUtc=new Date().toISOString();
           g.validateLiveProof(candidate,p);
           fs.writeFileSync(path,JSON.stringify(p,null,2)+'\n');
           NODE

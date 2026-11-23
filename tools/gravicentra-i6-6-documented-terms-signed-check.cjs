@@ -3,7 +3,7 @@
 // applicable legal acceptance. No login, consent, transport override or seed API.
 const crypto=require('node:crypto');
 const TENANT='alianzas-soluciones',SCHEMA='GI_I66_DOCUMENTED_TERMS_SIGNED_CHECK_V1';
-const STEPS=Object.freeze(['CONTEXT','SIGNED_SOURCE','TARGET_ABSENCE','CLIENT_HYDRATION','FORM_OPEN','FORM_DEFAULTS','FORM_FIELDS','FORM_PREVIEW','FORM_CANCEL','CALCULATION','CANONICAL_WRITE','DURABLE_READBACK','SESSION_READBACK']);
+const STEPS=Object.freeze(['CONTEXT','SIGNED_SOURCE','TARGET_ABSENCE','CLIENT_HYDRATION','FORM_OPEN','FORM_DEFAULTS','FORM_FIELDS','FORM_CALENDAR_OPEN','FORM_CALENDAR_FILL','FORM_PREVIEW','FORM_CANCEL','CALCULATION','CANONICAL_WRITE','DURABLE_READBACK','SESSION_READBACK']);
 const FAILURE_CODES=Object.freeze(['ACTOR_REQUIRED','SCOPE_REQUIRED','EXACT_SYNTHETIC_CLIENT_REQUIRED','SOURCE_REQUIRED','ORIGIN_REQUIRED','CLIENT_NOT_OWNED_QA','NONCE_INVALID','CALCULATION_MISSING','AMOUNT_MISMATCH','PROVENANCE_MISMATCH','FIXTURE_SCOPE_MISMATCH','UNKNOWN_PAYMENT_MISMATCH','IDENTITY_OR_IVA_MISMATCH','CALENDAR_MISMATCH','COMMISSION_OR_PAYMENT_MISMATCH','PERSISTED_OWNER_MISMATCH','PERSISTED_PAYLOAD_MISMATCH','PERSISTED_UNEXPECTED_FIELD','REQUEST_PROOF_MISMATCH','EVENT_PROOF_MISMATCH','AUDIT_COLLECTION_MISMATCH','UI_FIELD_MISMATCH','UI_PREVIEW_MISMATCH','PAGE_ORIGIN_DRIFT','SIGNED_SESSION_DRIFT','LEGAL_GATE_BLOCKED','EXISTING_MODAL_BLOCKED','SERVED_SOURCE_DRIFT','TARGET_COLLISION','UI_CLIENT_DRIFT','UI_UNKNOWN_DEFAULT_MISMATCH','SERVER_READBACK_MISSING','CLIENT_CHANGED','SESSION_OR_ROUTE_CHANGED','UNEXPECTED_RECORD','UNEXPECTED_AUDIT','RUNTIME_HOLD','SIGNED_HOLD'].map(code=>'I66_DOCUMENTED_TERMS_'+code));
 function safeDocumentedTermsProof(value){
   const row=value&&typeof value==='object'&&!Array.isArray(value)?value:{},pick=(v,values,fallback)=>values.includes(v)?v:fallback;
@@ -105,7 +105,13 @@ async function runDocumentedTermsCheck({page,role,actorUid,tenantId,live,db,clie
     proof.step='FORM_DEFAULTS';check(await form.locator('[data-client]').inputValue()===clientId,'UI_CLIENT_DRIFT');
     check(await form.locator('[data-payment-form]').inputValue()===''&&await form.locator('[data-conduct]').inputValue()==='','UI_UNKNOWN_DEFAULT_MISMATCH');
     proof.step='FORM_FIELDS';await form.locator('[data-frequency]').selectOption('Contado');
-    for(const [field,value]of Object.entries({start:'2026-10-20',end:'2027-10-20',net:'630',issue:'41.50',other:'200',surcharge:'0',nonvat:'2.70','nonvat-concept':'Bomberos','nonvat-ref':'QA-DOCUMENTED-TERMS','documented-calendar':'1 | 2026-11-06 | QA-DOCUMENTED-TERMS'}))await form.locator('[data-'+field+']').fill(value);
+    for(const [field,value]of Object.entries({start:'2026-10-20',end:'2027-10-20',net:'630',issue:'41.50',other:'200',surcharge:'0',nonvat:'2.70','nonvat-concept':'Bomberos','nonvat-ref':'QA-DOCUMENTED-TERMS'}))await form.locator('[data-'+field+']').fill(value);
+    // A new policy intentionally keeps the optional documentary calendar closed.
+    // Exercise the visible control before filling it, exactly as a user does.
+    proof.step='FORM_CALENDAR_OPEN';const calendar=form.locator('[data-documented-calendar]');
+    if(!await calendar.isVisible())await form.locator('[data-contractual-calendar-panel] > summary').click({timeout:10000});
+    await calendar.waitFor({state:'visible',timeout:10000});
+    proof.step='FORM_CALENDAR_FILL';await calendar.fill('1 | 2026-11-06 | QA-DOCUMENTED-TERMS',{timeout:10000});
     proof.step='FORM_PREVIEW';
     const values=await form.evaluate(node=>{const value=name=>node.querySelector('[data-'+name+']').value,text=node.querySelector('[data-preview]').textContent;return{payment:value('payment-form'),conduct:value('conduct'),charge:value('nonvat'),concept:value('nonvat-concept'),reference:value('nonvat-ref'),calendar:value('documented-calendar'),totalVisible:/978[.,]78/.test(text),dateVisible:text.includes('2026-11-06')};});
     proof.uiChecks={unknownPaymentPreserved:values.payment===''&&values.conduct==='',totalExact:values.totalVisible===true,dateExact:values.dateVisible===true};validateUi(values);

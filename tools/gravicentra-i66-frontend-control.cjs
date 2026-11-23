@@ -182,6 +182,28 @@ function closeCompositeFiles(read,j,body){
     backendRevisions:receipt.backendRevisions,previousLiveVersionForRollback:j.request.previous.hostingVersion,
     fullI66ProductionAccepted:false,realFinancialWrites:0};
   state.nextAction=cp.nextAction='I6.6: publicación compuesta '+head.buildId+' verificada. Continuar las capacidades reales y lotes pendientes desde '+genName(j.generation,'FOCAL_PROGRESS')+'.';
+  assert.ok(Number.isFinite(Date.parse(j.liveProof.recordedAtUtc)),'COMPOSITE_ACCEPTANCE_TIMESTAMP_REQUIRED');
+  progress.previousReleaseExecution=progress.releaseExecution||null;
+  progress.consumedPreviewRequest=transport.frontendPreviewRequest;
+  transport.lastConsumedFrontendPreviewRequest=transport.frontendPreviewRequest;
+  progress.releaseExecution={status:'COMPOSITE_FOUR_FUNCTIONS_SIGNED_LIVE_ACCEPTED',
+    sourceSha:head.sourceSha,buildId:head.buildId,buildRunId:head.buildRunId,
+    artifactId:head.artifactId,artifactDigest:head.artifactDigest,artifactBuilt:true,
+    previewSignedPass:true,livePromoted:true,signedPreviewRunId:j.request.candidate.previewQa.runId,
+    liveRunId:receipt.runId,receiptPath:head.receiptPath,proofPath:receipt.liveProof.path,
+    proofSha256:receipt.liveProof.sha256,backendFunctionsChanged:4,
+    sourceQaHead:transport.frontendPreviewRequest?.sourceQaHead,
+    sourceQaRunId:transport.frontendPreviewRequest?.sourceQaRunId,
+    guardRunId:transport.frontendPreviewRequest?.guardRunId,
+    frontendPreviewRequestVersion:transport.frontendPreviewRequest?.version,
+    recordedAtUtc:j.liveProof.recordedAtUtc,fullI66ProductionAccepted:false};
+  progress.recordedAtUtc=j.liveProof.recordedAtUtc;
+  progress.remainingExecutionLanes=(progress.shockObjectives?.items||[]).filter(row=>row.passForShock!==true)
+    .map(({id,title,status,next})=>({id,title,status,next}));
+  const next='I6.6: continuar las capacidades pendientes del plan congelado: '+
+    progress.remainingExecutionLanes.map(row=>row.id+' '+row.title).join('; ')+
+    '. El artifact '+head.artifactDigest+' ya está aceptado; retomar sus pruebas pendientes y la operación autorizada, sin repetir su build ni promoción.';
+  c.next=progress.next=continuation.currentWork=state.nextAction=cp.nextAction=next;
   progress.executionSynchronization=executionSnapshot(transport);c.executionSynchronizationVersion=1;
   c.currentEvidenceBlobSha=blob(serial(progress));
   return {...changes,[genName(j.generation,'RECEIPT')]:receipt,[receipt.liveProof.path]:j.liveProof};

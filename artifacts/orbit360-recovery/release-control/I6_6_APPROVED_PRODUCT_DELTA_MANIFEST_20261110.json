@@ -3910,6 +3910,53 @@
           }
         }
       ]
+    },
+    {
+      "id": "I6_6_COBROS_VISIBLE_SNAPSHOT_AND_DOCUMENTED_CALENDAR_QA_20261123",
+      "approvedByDirection": true,
+      "receipt": "Dirección 2026-11-23: completar y publicar lo pendiente, corregir de raíz la sincronización de ejecución, escrituras financieras y operación. Corrección causal de lecturas repetidas de Cobros y del helper que llenaba calendario documental cerrado; no nueva regla de negocio.",
+      "sourceStatus": "SOURCE_QA_PENDING_NEW_IMMUTABLE_ARTIFACT_PREVIEW_AND_LIVE_NOT_CLAIMED",
+      "capabilityOwners": [
+        "COBROS_PRIMARY_RUNTIME",
+        "ROLE_SCOPE_RUNTIME",
+        "CROSS_MODULE_RELATIONSHIPS"
+      ],
+      "scope": "Cobros reutiliza sólo un snapshot visible por render/Reportes, con IDs exactos, sin persistir cache ni cambiar importes, fechas, permisos o writers. El helper firmado abre por clic la sección documental opcional, conserva todos los asserts de UI, writer, readback y cleanup. Artifact anterior permanece fallido, sin parchearlo ni promoverlo.",
+      "paths": [
+        {
+          "path": "orbit360-platform/modules/cobros.js",
+          "gitBlobSha": "b7813be360a778cd199579cc3898a0179f2e3c2a",
+          "replaces": {
+            "path": "orbit360-platform/modules/cobros.js",
+            "priorGitBlobSha": "f410e0f0f23c399a0d9f574fa9d1279801d3542c",
+            "priorChangeId": "I6_6_CLIENT_PAYMENT_CANONICAL_PAID_WITH_OPTIONAL_DOCUMENT_RECOVERY_20261120"
+          }
+        }
+      ],
+      "tests": [
+        {
+          "path": "tools/gravicentra-i6-6-cobros-visible-snapshot-performance.test.cjs",
+          "gitBlobSha": "5f7efc67df5551368fe396beb26a5e7ea13ec5dc"
+        },
+        {
+          "path": "tools/gravicentra-i6-6-documented-terms-signed-check.test.cjs",
+          "gitBlobSha": "a27fda43f87dd4d411f9844a159ce62d8504f8b2",
+          "replaces": {
+            "path": "tools/gravicentra-i6-6-documented-terms-signed-check.test.cjs",
+            "priorGitBlobSha": "b0d09f44af919bba4b10797a65417d9bd9b3fde8",
+            "priorChangeId": "I6_6_DOCUMENTED_POLICY_CENT_PRECISION_AND_DIAGNOSTIC_RETENTION_20261117"
+          }
+        },
+        {
+          "path": "tools/gravicentra-i6-6-documented-premium-terms.test.cjs",
+          "gitBlobSha": "e85efa5ce3b403b8840f522c7ded137362ce3f4f",
+          "replaces": {
+            "path": "tools/gravicentra-i6-6-documented-premium-terms.test.cjs",
+            "priorGitBlobSha": "c9fb6f8e27df6a029195da3f0739655ef537b04c",
+            "priorChangeId": "I6_6_POLICY_INSURER_EXPLICIT_SELECTION_ROOTFIX_20261119"
+          }
+        }
+      ]
     }
   ],
   "i66R11PreviewBuildRequest20261113": {

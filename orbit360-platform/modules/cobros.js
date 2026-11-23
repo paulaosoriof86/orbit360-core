@@ -178,9 +178,25 @@ Orbit.modules.cobros = (function () {
     return state==='pagado'||state==='conciliado'||paymentState==='PAID_DIRECT'||paymentState==='PAID_CONFIRMED'||
       applicationState==='APPLIED_DIRECT'||!!(r&&r.conciliado===true);
   }
-  function receiptPaymentEvidence(idx) {
-    const linked = new Set((S().all('cobros') || []).map(c => String(c && (c.reciboId || c.receiptId) || '')).filter(Boolean));
-    return (S().all('recibosEsperados') || [])
+  // A14: one authorized, synchronous read snapshot per render/report. Never
+  // retain it in baseCache: role, tenant, hydration and payment updates must
+  // be observed even when a local filter reuses only the aggregate model.
+  function visibleFinancialRows(includeReceipts) {
+    const cobros = S().all('cobros') || [];
+    const receipts = includeReceipts ? (S().all('recibosEsperados') || []) : [];
+    const receiptsById = new Map();
+    receipts.forEach(r => {
+      // Match the store's exact key and first-record lookup contract. Do not
+      // coerce IDs, infer receipt links or read through an unscoped store.
+      const id = r && (r.id || r.uid || r.codigo || r.numero || r.key);
+      if (id != null && !receiptsById.has(id)) receiptsById.set(id, r);
+    });
+    const linked = new Set(cobros.map(c => String(c && (c.reciboId || c.receiptId) || '')).filter(Boolean));
+    return { cobros, receipts, receiptsById, linked };
+  }
+  function receiptPaymentEvidence(idx, readRows) {
+    const linked = readRows.linked;
+    return readRows.receipts
       .filter(r => {
         if(!r||linked.has(String(r.id||''))) return false;
         const op=String(r.estadoOperativo||'').toLowerCase().replace(/\s+/g,'_');
@@ -217,8 +233,8 @@ Orbit.modules.cobros = (function () {
         };
       });
   }
-  function reportedRows(idx) {
-    return receiptPaymentEvidence(idx).filter(c => {
+  function reportedRows(idx, readRows) {
+    return receiptPaymentEvidence(idx, readRows).filter(c => {
       if (!matchTxt(c, idx)) return false;
       // E4/B4-003: a cancelled expected receipt must never masquerade as an
       // active payment projection in the default list. Keep it inspectable
@@ -238,8 +254,8 @@ Orbit.modules.cobros = (function () {
     });
   }
 
-  function portfolioPaymentRows(idx) {
-    const linked = new Set((S().all('cobros') || []).map(c => String(c && (c.reciboId || c.receiptId) || '')).filter(Boolean));
+  function portfolioPaymentRows(idx, readRows) {
+    const linked = readRows.linked;
     const adapter = Orbit.cobrosCarteraProjectionAdapter;
     const qaReceipt = qaReceiptId();
     const source = qaReceipt
@@ -250,7 +266,11 @@ Orbit.modules.cobros = (function () {
     return source.map(r => {
       const receiptId = String(r && (r.reciboId || r.receiptId) || '');
       if (!receiptId || linked.has(receiptId)) return null;
-      const receipt = S().get('recibosEsperados', receiptId) || r;
+      // The operational facade trims lookup arguments; legacy stores need
+      // not. Delegate noncanonical references to their existing read owner.
+      const receipt = (receiptId !== receiptId.trim()
+        ? S().get('recibosEsperados', receiptId)
+        : readRows.receiptsById.get(receiptId)) || r;
       // Do not collapse contradictory origin/expected-receipt evidence.
       const originCountry=rowCountry(r,idx),receiptCountry=rowCountry(receipt,idx);
       if (!['GT','CO'].includes(originCountry) || !['GT','CO'].includes(receiptCountry) || originCountry !== receiptCountry) return null;
@@ -307,8 +327,8 @@ Orbit.modules.cobros = (function () {
     return ![c, policy, client, policyClient].some(isQa);
   }
 
-  function rows(idx) {
-    return (S().all('cobros') || []).filter(c => {
+  function rows(idx, readRows) {
+    return readRows.cobros.filter(c => {
       if (!countryMatches(c, idx)) return false;
       if (c.estado === 'Anulado' && st.fest !== 'Anulado') return false;
       const estV = estadoValidacion(c);
@@ -432,9 +452,10 @@ Orbit.modules.cobros = (function () {
     const unassignedConfirmedBreakdown = hyd.financialReady ? Object.entries(cart.unassignedConfirmedByCurrency || {})
       .map(([currency, value]) => U.esc(safeMoney(value, currency, false))).join(' · ') : '';
     const qaSurfaceRow = qaReceipt ? qaReceiptSurfaceRow(qaReceipt) : null;
-    const authoritative = qaReceipt ? [] : rows(idx).filter(row => commercialCobrosRow(row, idx));
-    const portfolioOnly = qaReceipt || !hyd.financialReady ? [] : portfolioPaymentRows(idx).filter(row => commercialCobrosRow(row, idx));
-    const reported = qaReceipt || !hyd.financialReady ? [] : reportedRows(idx).filter(row => commercialCobrosRow(row, idx));
+    const readRows = qaReceipt ? null : visibleFinancialRows(hyd.financialReady);
+    const authoritative = qaReceipt ? [] : rows(idx, readRows).filter(row => commercialCobrosRow(row, idx));
+    const portfolioOnly = qaReceipt || !hyd.financialReady ? [] : portfolioPaymentRows(idx, readRows).filter(row => commercialCobrosRow(row, idx));
+    const reported = qaReceipt || !hyd.financialReady ? [] : reportedRows(idx, readRows).filter(row => commercialCobrosRow(row, idx));
     const crmDirect = reported.filter(x => x.__crmDirectEvidence), paidReceiptFallback = reported.filter(x => x.__paidReceiptEvidence), advisorReported = reported.filter(x => x.__advisorReportedEvidence), clientReported = reported.filter(x => x.__clientReportedEvidence);
     const allRowsUnfiltered = qaReceipt ? (qaSurfaceRow ? [qaSurfaceRow] : []) : authoritative.concat(portfolioOnly, reported).sort((a, b) => String(a.vence || '').localeCompare(String(b.vence || '')));
     const allRows = qaReceipt ? allRowsUnfiltered.filter(row => receiptIdOf(row) === qaReceipt) : allRowsUnfiltered;
@@ -1094,7 +1115,8 @@ Orbit.modules.cobros = (function () {
     try {
       st = { fq: '', fest: '', fase: '', sort: 'vence', page: 1 };
       const idx = buildIndex();
-      return rows(idx).concat(portfolioPaymentRows(idx), reportedRows(idx))
+      const readRows = visibleFinancialRows(true);
+      return rows(idx, readRows).concat(portfolioPaymentRows(idx, readRows), reportedRows(idx, readRows))
         .filter(row => row && row.estado !== 'Anulado');
     } finally {
       st = originalFilters;

@@ -20,6 +20,10 @@ on:
       - tools/gravicentra-governance-preflight-v1.mjs
       - tools/gravicentra-i6-6-direction-preview-legal-acceptance.cjs
       - tools/gravicentra-i6-6-direction-preview-i66-consent-scope.test.cjs
+      - tools/gravicentra-i6-6-documented-terms-signed-check.cjs
+      - tools/gravicentra-i6-6-documented-terms-signed-check.test.cjs
+      - tools/gravicentra-i6-6-documented-premium-terms.test.cjs
+      - tools/gravicentra-i6-6-cobros-visible-snapshot-performance.test.cjs
       - orbit360-platform/modules/cobros.js
       - orbit360-platform/core/importa.js
       - tools/gravicentra-i6-6-import-source-preview.test.cjs
@@ -74,6 +78,7 @@ jobs:
           node --test tools/gravicentra-i6-6-composite-preview-admission.test.cjs tools/gravicentra-i6-6-workflow-candidate-resolution.test.cjs
           node --test tools/gravicentra-i66-composite-acceptance.test.cjs tools/gravicentra-i66-frontend-control.test.cjs tools/gravicentra-i66-frontend-promotion-transaction.test.cjs
           node --test tools/gravicentra-i6-6-direction-preview-i66-consent-scope.test.cjs tools/gravicentra-i6-6-direction-live-legal-acceptance.test.cjs
+          node --test tools/gravicentra-i6-6-documented-terms-signed-check.test.cjs tools/gravicentra-i6-6-documented-premium-terms.test.cjs tools/gravicentra-i6-6-cobros-visible-snapshot-performance.test.cjs
           node --test tools/gravicentra-i6-6-import-source-preview.test.cjs
           node --test tools/gravicentra-i6-6-cobros-payment-failure-category.test.cjs tools/gravicentra-i6-6-operational-renewal-entry.test.cjs
           node --test tools/gravicentra-i6-6-ops-collaboration-owner.test.cjs
