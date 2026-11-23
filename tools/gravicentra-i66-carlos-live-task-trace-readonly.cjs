@@ -102,6 +102,17 @@ async function readDocumentaryFixture(root){
       recoverableAttachmentRefs:comments.filter(x=>x&&x.attachment&&typeof x.attachment.documentRef==='string'&&x.attachment.documentRef).length};
   });
 }
+// A service-side existence check can distinguish an empty canonical collection
+// from a missing consumer projection. It does not certify any user's role.
+async function optionalCollectionPresence(root){
+  const result={};
+  for(const name of ['estadosCuentaAseguradora','recibosAseguradora','reclamos']){
+    const ref=root.collection('data').doc(name).collection('items');
+    const [any,gt,co]=await Promise.all([ref,ref.where('pais','==','GT'),ref.where('pais','==','CO')].map(q=>q.select().limit(1).get()));
+    result[name]={anyDocument:!any.empty,withGT:!gt.empty,withCO:!co.empty};
+  }
+  return result;
+}
 async function main(){
   assert.equal(process.env.GCLOUD_PROJECT,PROJECT);
   assert.equal(process.env.GI_I66_CARLOS_TRACE_MODE,'readonly');
@@ -112,6 +123,7 @@ async function main(){
   assert.ok(service,'I66_CARLOS_TASK_SERVICE_IDENTITY_HOLD');
   admin.initializeApp({credential:admin.credential.cert(service),projectId:PROJECT});
   const root=admin.firestore().collection('tenants').doc(TENANT);
+  console.log('I66_OPTIONAL_SERVER_PRESENCE='+JSON.stringify(await optionalCollectionPresence(root)));
   console.log('I66_OPS_DOCUMENTARY_FIXTURE_READBACK='+JSON.stringify(await readDocumentaryFixture(root)));
   const [members,advisors,allTasks]=await Promise.all([
     root.collection('members').limit(150).get(),col(root,'asesores').limit(400).get(),
