@@ -282,7 +282,32 @@
       "privacyHandling": "Do not upload raw bank screenshot, identity documents or insurer confidential receipts into those folders until ownership/sharing/permissions reviewed. Do not silently rewrite sharing due possible authorized external dependencies.",
       "state": "OPEN_SECURITY_REVIEW_REQUIRED",
       "securityPermissionsChanged": false,
-      "rawSensitiveFilesUploadedToPublicFolder": false
+      "rawSensitiveFilesUploadedToPublicFolder": false,
+      "affectedParentFolderStructure": [
+        {
+          "name": "AyS Guatemala",
+          "id": "1kHcziA5HPnodcudFAsO8V9M7v_XrPzEr",
+          "permission": "anyone:writer"
+        },
+        {
+          "name": "Clientes",
+          "id": "13H7zMGwFC9f1UnHyfNqzzSfFex1jJRHE",
+          "permission": "anyone:writer"
+        },
+        {
+          "name": "Cartera - Estados de Cuenta Aseguradoras",
+          "id": "1q96yoKokCvL7LKD5mOf0kaKIcIa0iNBv",
+          "permission": "anyone:writer"
+        },
+        {
+          "name": "Por aseguradora",
+          "id": "14bmI4KtawLDDj7QM0k9aTEFnOKpfNNuZ",
+          "permission": "anyone:writer"
+        }
+      ],
+      "scope": "TRANSVERSAL_PARENT_AND_CHILD_FOLDER_PUBLIC_WRITER_PERMISSIONS_PHYSICALLY_OBSERVED",
+      "blockerForRawSensitiveAttachmentUploads": true,
+      "requiredBeforePermissionMutation": "Confirm owners, legitimate integration/sharing usage, affected inheritance and permission rollback. Obtain explicit Dirección approval before changing shared permissions."
     },
     "execution": {
       "dataWrites": 0,
