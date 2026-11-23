@@ -27,6 +27,13 @@ const TARGETS = Object.freeze({
     {name:'orbit360ScopedPolicyRead',region:'us-east1'}
   ]
 });
+// The historical 3-function contract stays sealed. The current Ops/Leads
+// successor additionally deploys its own canonical Preview/LIVE callable.
+const COMPOSITE_TARGETS = Object.freeze({
+  preview: Object.freeze([...TARGETS.preview, {name:'orbit360OpsLeadsCommandPreview',region:'us-east1'}]),
+  live: Object.freeze([...TARGETS.live, {name:'orbit360OpsLeadsCommand',region:'us-central1'}])
+});
+const targetsForCandidate=(p,phase)=>p&&p.opsLeadsComposite===true?COMPOSITE_TARGETS[phase]:TARGETS[phase];
 const DRIVERS = Object.freeze([
   'tools/gravicentra-i66-privileged-role-signed-ui-permissions-readonly.cjs',
   'tools/gravicentra-i6-6-carlos-real-signed-synthetic-preview-uat.cjs',
@@ -202,19 +209,29 @@ function candidateForPhase(control,phase) {
     assert.equal(p.signedObservabilityProfile,SIGNED_OBSERVABILITY_PROFILE,'I66_OPERATIONAL_SIGNED_OBSERVABILITY_PROFILE_REQUIRED');
   if(p.signedObservabilityProfile!==undefined)
     assert.equal(p.signedObservabilityProfile,SIGNED_OBSERVABILITY_PROFILE,'I66_OPERATIONAL_SIGNED_OBSERVABILITY_PROFILE_UNKNOWN');
-  assert.deepEqual(p.targets,TARGETS,'I66_OPERATIONAL_TARGET_SCOPE_DRIFT');
+  const composite=p.opsLeadsComposite===true;
+  assert.deepEqual(p.targets,composite?COMPOSITE_TARGETS:TARGETS,'I66_OPERATIONAL_TARGET_SCOPE_DRIFT');
+  if(composite){
+    assert.equal(p.compositeVersion,1,'I66_OPS_COMPOSITE_VERSION');
+    assert.equal(p.opsLeadsBackendPath,'functions/product-ops-leads-domain.js','I66_OPS_BACKEND_OWNER');
+    assert.equal(p.opsLeadsBackendBlobSha,'b7921ca88343ced65bdad4cd9de26fa120647083','I66_OPS_BACKEND_BLOB');
+    assert.equal(p.rollbackFourBackendRevisionsAndHosting,true,'I66_OPS_FOUR_FUNCTION_ROLLBACK');
+    assert.equal(p.currentPhysicalLive?.sourceSha,control.currentPhysicalHostingRelease?.sourceSha,'I66_OPS_PHYSICAL_LIVE_SOURCE_DRIFT');
+    assert.equal(p.currentPhysicalLive?.artifactDigest,control.currentPhysicalHostingRelease?.artifactDigest,'I66_OPS_PHYSICAL_LIVE_ARTIFACT_DRIFT');
+    assert.notEqual(p.sourceSha,p.currentPhysicalLive.sourceSha,'I66_OPS_ALREADY_LIVE');
+  }
   assert.deepEqual(p.requiredPreviewDrivers,DRIVERS,'I66_OPERATIONAL_QA_DRIVER_SCOPE_DRIFT');
   assert.equal(p.sameImmutableArtifactOnly,true);
   assert.equal(p.syntheticRecordsOnly,true);
   assert.equal(p.noRealFinancialOrCustomerWrites,true);
   assert.equal(p.noRulesAuthIamWrites,true);
   assert.equal(p.rollbackThreeBackendRevisionsAndHosting,true);
-  assert.equal(p.expectedSiteFileCount,223);
+  assert.equal(p.expectedSiteFileCount,p.opsLeadsComposite===true?224:223,'I66_OPERATIONAL_SITE_FILE_COUNT_PIN');
   // Existing staff/tenant only, with an isolated synthetic namespace. No new
   // membership, IAM, rules or mutation of the operational control/active pointer.
   assert.deepEqual(p.syntheticQaIsolation,PROPOSAL_QA_ISOLATION,'I66_OPERATIONAL_QA_NAMESPACE_ISOLATION_DRIFT');
   assert.deepEqual(p.advisorPayableQaIsolation,ADVISOR_QA_ISOLATION,'I66_OPERATIONAL_ADVISOR_QA_NAMESPACE_ISOLATION_DRIFT');
-  const current=control.currentExactHostingRelease||{},backup=p.currentLive||{};
+  const current=(p.opsLeadsComposite===true?control.currentPhysicalHostingRelease:control.currentExactHostingRelease)||{},backup=p.currentLive||{};
   for(const [field,source] of Object.entries({sourceSha:'sourceSha',buildId:'buildId',artifactId:'artifactId',artifactDigest:'artifactDigest',buildRunId:'previewRunId',liveRunId:'liveCloneRunId',hostingVersion:'liveHostingVersion'}))
     assert.equal(backup[field],current[source],'I66_OPERATIONAL_LIVE_BACKUP_DRIFT_'+field);
   checkSha(backup.sourceSha,'I66_OPERATIONAL_BACKUP_SOURCE');
@@ -282,7 +299,7 @@ function validateProof(p,proof) {
   assert.equal(proof.status,'SIGNED_DRIVERS_DURABLE_READBACK_RELOAD_RESTORE_PASS');
   for(const key of ['sourceSha','buildRunId','artifactId','artifactDigest','previewUrl','previewChannelId'])assert.equal(proof[key],p[key]);
   if(p.buildId!==undefined)assert.equal(proof.buildId,p.buildId,'I66_OPERATIONAL_PROOF_BUILD_ID_DRIFT');
-  assert.deepEqual(proof.targets,TARGETS.preview);assert.deepEqual(proof.signedDrivers,DRIVERS);
+  assert.deepEqual(proof.targets,targetsForCandidate(p,'preview'));assert.deepEqual(proof.signedDrivers,DRIVERS);
   assert.equal(proof.realFinancialOrCustomerWrites,0);assert.equal(proof.syntheticRestoreComplete,true);
   assert.equal(proof.liveHostingUnchanged,true);assert.equal(proof.liveBackendUnchanged,true);
   assert.deepEqual(Object.keys(proof.focusedReports||{}).sort(),['advisorPayables','proposalApplication']);
@@ -398,7 +415,7 @@ const ACCEPTED_STATUS='CURRENT_OPERATIONAL_EXACT_SIGNED_LIVE_PASS_FULL_I66_HOLD'
 const sha256=value=>crypto.createHash('sha256').update(value).digest('hex');
 function validateLiveProof(p,proof){
   assert.equal(proof.schema,'I66_FIVE_PRIVILEGED_ROLES_IMMUTABLE_LIVE_TRANSPORT_V1');
-  assert.equal(proof.status,LIVE_SIGNED_STATUS,'I66_OPERATIONAL_LIVE_NOT_ACCEPTED');
+  assert.equal(proof.status,p.opsLeadsComposite===true?'SAME_ARTIFACT_FOUR_FUNCTIONS_SIGNED_LIVE_READBACK_RELOAD_RESTORE_PASS':LIVE_SIGNED_STATUS,'I66_OPERATIONAL_LIVE_NOT_ACCEPTED');
   for(const key of ['sourceSha','buildId','buildRunId','artifactId','artifactDigest'])assert.equal(proof[key],p[key],'I66_OPERATIONAL_LIVE_IDENTITY_'+key);
   checkBuildId(proof.buildId,p.sourceSha,'I66_OPERATIONAL_LIVE_BUILD_ID');
   checkId(proof.runId,'I66_OPERATIONAL_LIVE_RUN_ID');checkSha(proof.headSha,'I66_OPERATIONAL_LIVE_RUN_HEAD');
@@ -409,15 +426,15 @@ function validateLiveProof(p,proof){
   assert.match(String(proof.liveHostingVersion||''),/^sites\/ays-orbit-360-lab\/versions\/[A-Za-z0-9_-]+$/);
   assert.equal(proof.liveHostingVersion,proof.previewHostingVersion);
   assert.notEqual(proof.liveHostingVersion,proof.previousHostingVersion);
-  for(const key of ['previewFiles','liveSiteFiles','customSiteFiles'])assert.equal(proof[key],223,'I66_OPERATIONAL_LIVE_READBACK_'+key);
-  assert.deepEqual(proof.targets,TARGETS.live,'I66_OPERATIONAL_LIVE_TARGETS');
+  for(const key of ['previewFiles','liveSiteFiles','customSiteFiles'])assert.equal(proof[key],p.expectedSiteFileCount,'I66_OPERATIONAL_LIVE_READBACK_'+key);
+  assert.deepEqual(proof.targets,targetsForCandidate(p,'live'),'I66_OPERATIONAL_LIVE_TARGETS');
   assert.deepEqual(proof.signedDrivers,['privileged-role-permissions','carlos-paula-ops-leads','advisor-payables','proposal-application']);
   for(const key of ['syntheticRestoreComplete','sameImmutableArtifact','liveBackendSameArtifact','functionsInventoryUnchangedExceptTargets','rollbackSnapshotReady'])assert.equal(proof[key],true,'I66_OPERATIONAL_LIVE_REQUIRED_'+key);
   for(const key of ['realCustomerWrites','realFinancialOrCustomerWrites','firestoreRuleOrAuthWrites'])assert.equal(proof[key],0,'I66_OPERATIONAL_LIVE_FORBIDDEN_'+key);
   assert.equal(proof.fullI66ProductionAccepted,false,'I66_OPERATIONAL_LIVE_SCOPE_OVERCLAIM');
   assert.equal(proof.rollback,'OUTER_FUNCTION_ROLLBACK_GUARD_ACTIVE');
-  assert.ok(Array.isArray(proof.backendRevisions));assert.equal(proof.backendRevisions.length,3);
-  assert.deepEqual(proof.backendRevisions.map(({name,region})=>({name,region})),TARGETS.live);
+  assert.ok(Array.isArray(proof.backendRevisions));assert.equal(proof.backendRevisions.length,targetsForCandidate(p,'live').length);
+  assert.deepEqual(proof.backendRevisions.map(({name,region})=>({name,region})),targetsForCandidate(p,'live'));
   for(const row of proof.backendRevisions){
     assert.match(row.service,/^[a-z][a-z0-9-]+$/);
     for(const key of ['previousRevision','currentRevision'])assert.ok(typeof row[key]==='string'&&row[key].startsWith(row.service+'-'),'I66_OPERATIONAL_LIVE_REVISION_MISSING');
@@ -549,5 +566,5 @@ function acceptedForPreflight(control,state,transport,latest,io=fs){
   assert.equal(latest.previousLiveVersionForRollback,r11.hostingVersion);
   return {status:ACCEPTED_STATUS,sourceSha:p.sourceSha,receipt:ACCEPTANCE_RECEIPT};
 }
-module.exports={CONTROL,SITE,PREVIEW,CHANNEL,LIVE,TARGETS,DRIVERS,PROPOSAL_QA_ISOLATION,ADVISOR_QA_ISOLATION,PINNED_OWNER_PATHS,SIGNED_OBSERVABILITY_PROFILE,previewIdentity,validateBuildMarker,signedMatrixBinding,candidateForPhase,continuationForPreflight,validateArtifact,validatePreviewQa,validateProof,validateFocusedReports,signedObservabilityReports,focusedReportsFromDisk,envFor,ACCEPTANCE_KEY,ACCEPTANCE_RECEIPT,ACCEPTANCE_PROOF,ACCEPTED_STATUS,LIVE_SIGNED_STATUS,validateLiveProof,acceptedForPreflight};
+module.exports={CONTROL,SITE,PREVIEW,CHANNEL,LIVE,TARGETS,COMPOSITE_TARGETS,targetsForCandidate,DRIVERS,PROPOSAL_QA_ISOLATION,ADVISOR_QA_ISOLATION,PINNED_OWNER_PATHS,SIGNED_OBSERVABILITY_PROFILE,previewIdentity,validateBuildMarker,signedMatrixBinding,candidateForPhase,continuationForPreflight,validateArtifact,validatePreviewQa,validateProof,validateFocusedReports,signedObservabilityReports,focusedReportsFromDisk,envFor,ACCEPTANCE_KEY,ACCEPTANCE_RECEIPT,ACCEPTANCE_PROOF,ACCEPTED_STATUS,LIVE_SIGNED_STATUS,validateLiveProof,acceptedForPreflight};
 if(require.main===module)main().catch(error=>{console.error(String(error.message||error));process.exitCode=1;});
