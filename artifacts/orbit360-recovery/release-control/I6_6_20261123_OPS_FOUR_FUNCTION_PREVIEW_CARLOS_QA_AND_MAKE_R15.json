@@ -1,0 +1,121 @@
+{
+  "schema": "GRAVICENTRA_I66_FOUR_FUNCTION_PREVIEW_QA_AND_MAKE_R15",
+  "recordType": "APPEND_ONLY_PHYSICAL_EVIDENCE_NOT_RELEASE_AUTHORITY",
+  "localDateGuatemala": "2026-11-23",
+  "activeGate": "I6.6",
+  "lastFrozenGate": "I6.5",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "latestPreviousAcceptedLive": {
+    "site": "https://app.aysseguros.com",
+    "sourceSha": "15e849bd606bd8c93e4c0471da1193e85004aecd",
+    "buildId": "gi-i66-15e849bd606b-57f234755dc1",
+    "artifactId": 14777966155,
+    "changedByThisTurn": false
+  },
+  "signedImmutablePreview": {
+    "sourceSha": "9d34f6981e6d82d8503e3d99b91b265f8b499d3c",
+    "buildRun": 45258374230,
+    "buildConclusion": "success",
+    "artifactId": 14859991026,
+    "artifactDigest": "sha256:fb4d6907e0ea18ba366441a29f269e928166fc1dc25b9aa86daf6bb734b01209",
+    "buildId": "gi-i66-9d34f6981e6d-57f234755dc1",
+    "previewOrigin": "https://ays-orbit-360-lab--gi-i66-rc-45258374230-dh8ru1do.web.app",
+    "readback": "PASS",
+    "liveOriginsUnchanged": true
+  },
+  "backendPreview": {
+    "scopedAuthorizationCommit": "81136992a30678939f16fbe39fbffe1ed9e99161",
+    "fourFunctionOnly": true,
+    "targets": [
+      "orbit360ProductOperationalCommandPreview",
+      "orbit360CobrosReconciliationCommandPreview",
+      "orbit360ScopedPolicyReadPreview",
+      "orbit360OpsLeadsCommandPreview"
+    ],
+    "qaRun": 45259132272,
+    "qaJob": 137988910717,
+    "sourceAndArtifactValidation": "PASS",
+    "previewBackendDeployAndInventoryReadback": "PASS",
+    "carlosAndPaulaSignedSyntheticCrudReloadRestore": "IN_PROGRESS_NOT_ACCEPTED",
+    "realCustomerWrites": 0,
+    "backendLiveFunctionDeploy": false,
+    "globalControlStillLocked": true,
+    "legacyThreeFunctionHistoricalSealsPreserved": true,
+    "productionAcceptance": "HOLD"
+  },
+  "make": {
+    "firestoreOAuth": "AUTHORIZED",
+    "firestoreConnectionId": 14756714,
+    "firestoreReadback": "PASS",
+    "emailOAuth": "AUTHORIZED",
+    "imapConnectionId": 14756803,
+    "imapFolderDiscovery": "PASS",
+    "noEmailContentsCopied": true,
+    "greenApiConnectionId": 14749710,
+    "greenApiIncomingWebhook": "yes",
+    "greenApiReceiveConfiguration": "PASS",
+    "mainWhatsAppScenarioId": 10196136,
+    "status": "ACTIVE",
+    "moduleGetMessageChatIdMapped": true,
+    "detailQaAfterFix": "SUCCESS",
+    "readWindow": "2026-10-01 .. 2026-11-23",
+    "messagesReturnedForQuery": 1,
+    "adAttributedMessages": 0,
+    "privateMessagesImported": 0,
+    "realLeadsCreated": 0,
+    "canonicalLeadIngestWriter": "NOT_CERTIFIED",
+    "webhookQaScenarioId": 10195867,
+    "webhookQaIsActive": false
+  },
+  "finance": {
+    "freshProtectedPreflightRun": 45192733898,
+    "reviewed": 302,
+    "unchanged": 185,
+    "missingPolicyEdition": 97,
+    "missingReceiptId": 20,
+    "ready": 0,
+    "newWrites": 0,
+    "ownerBusinessDecisionsFrozen": true,
+    "caseRoble8323091": {
+      "issued2026Source": "https://drive.google.com/file/d/1qmUypnZBwW4xyeKlINpk6U42vltZKk-W/view?usp=drivesdk",
+      "predecessor2025Source": "https://drive.google.com/file/d/1N4KeYnhs0Tn0J6nMmxCLRgPPxFese_0u/view?usp=drivesdk",
+      "currentFirestoreEdits": [
+        "2023-10-11..2024-10-11",
+        "2024-10-11..2025-10-11",
+        "2025-10-11..2026-10-11"
+      ],
+      "issued2026SuccessorIdentified": true,
+      "uniqueVehicleCertificateLink": false,
+      "sourceWrites": 0
+    },
+    "otherIssuedDocs": [
+      {
+        "policy": "91-8342189",
+        "term": "2026-11-12..2027-11-12",
+        "fileId": "1fuPpqesUkg5LmkGuz16icfarQmJ-8VXg",
+        "riskJoinHeld": true
+      },
+      {
+        "policy": "91-0234395",
+        "term": "2026-05-02..2027-05-02",
+        "fileId": "1bDZF50cAMHW522wb8ZBWXQS_y6SvpOvO",
+        "sourceOnly": true
+      },
+      {
+        "policy": "91-4140843",
+        "term": "2026-09-10..2027-09-10",
+        "fileId": "1R6HMlHHv09_87BALnvLpa-E_cWiKlr9m",
+        "sourceOnly": true
+      }
+    ]
+  },
+  "hardStop": [
+    "No unconfirmed LIVE deployment",
+    "No manual payment replay",
+    "No personal WhatsApp chat as ad lead",
+    "No Firestore direct Make lead write bypass",
+    "No PASS without role+country+server readback+reload"
+  ],
+  "nextControl": "Wait for current signed Carlos/Paula QA run 45259132272 to finish; on PASS retain receipt and perform exact same artifact LIVE promotion via separately approved owner-controlled release; on HOLD investigate failing step in active gate."
+}
