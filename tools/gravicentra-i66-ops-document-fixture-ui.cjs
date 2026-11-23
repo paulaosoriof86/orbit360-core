@@ -62,6 +62,7 @@ async function run(){
       responses.push((async()=>{let data={};try{data=await res.json();}catch{}
         const out=data.result||data.data||{},err=data.error||{};
         if(/upload/i.test(h.pathname)&&out.ok===true)confirmedUpload=true;
+        if(h.pathname.endsWith('/orbit360DocumentDriveCleanupPreview')&&out.ok===true&&out.deleted===true)report.driveFileDeleted=true;
         report.network.push({endpoint:h.pathname.slice(1),status:res.status(),ok:out.ok===true,error:String(err.status||''),
           reason:String(err.message||'').replace(/[\w.+-]+@[\w.-]+/g,'[redacted]').slice(0,170),requestId:out.requestId||null});})());
     });
@@ -76,16 +77,28 @@ async function run(){
       await page.locator('#ng-com-new').fill('I6.6 · Verificación documental controlada de Ops.');
       await page.locator('#ng-com-file').setInputFiles({name:fileName,mimeType:'text/plain',buffer:bytes});
       await page.getByText('Adjunto seleccionado:',{exact:false}).waitFor();
-      await page.getByRole('button',{name:'Registrar ahora'}).click();report.savedClick=true;
+      const submit=page.locator('#ng-com-add');
+      report.beforeSubmit={count:await submit.count(),visible:await submit.isVisible(),enabled:await submit.count()===1&&await submit.isEnabled()};
+      await submit.click();
+      report.savedClick=true;
       await page.waitForFunction(()=>!document.querySelector('#ng-com-add[aria-busy="true"]'),null,{timeout:35000});
       await Promise.all(responses);
     }
     const post=match(await ref.get());report.afterClick={comments:comments(post).length,documentRefs:linkedFiles(post).length};
+    report.operationalWrites=report.savedClick&&comments(post).length===comments(row).length+1?1:0;
     if(linkedFiles(post).length===1){
       await page.reload();await reopen(page);
-      const attach=page.locator('[data-collab-open-ref], [data-collab-doc-open], .com-row button').filter({hasText:/adjunto|respaldo|abrir/i});
-      if(await attach.count()===1){await attach.click();report.openClick=true;await page.waitForTimeout(900);await Promise.all(responses);}
-      report.reloadAttachmentVisible=await page.locator('.com-row').filter({hasText:fileName}).count()===1;
+      const attachment=page.locator('#ng-coms [data-collab-doc]').filter({hasText:fileName});
+      report.reloadAttachmentVisible=await attachment.count()===1&&await attachment.isVisible();
+      if(report.reloadAttachmentVisible){
+        assert.equal(await attachment.getAttribute('data-collab-doc'),linkedFiles(post)[0].attachment.documentRef);
+        const [download]=await Promise.all([page.waitForEvent('download',{timeout:12000}),attachment.click()]);
+        report.openClick=true;
+        assert.equal(download.suggestedFilename(),fileName);
+        const localFile=await download.path();
+        report.downloadSha256=sha(fs.readFileSync(localFile));
+        await Promise.all(responses);
+      }
     }
     page.once('dialog',async dlg=>{
       if(dlg.type()==='confirm'&&/archivar este negocio sintético/.test(dlg.message()))await dlg.accept();else await dlg.dismiss();
@@ -115,5 +128,13 @@ async function run(){
   }
 }
 run().catch(e=>{report.error=String(e.message||e).split('\n')[0].slice(0,170);process.exitCode=1;}).finally(()=>{
+  const success=name=>report.network.some(r=>r.endpoint===name&&r.status===200&&r.ok);
+  const accepted=!report.error&&!report.uiHold&&report.savedClick&&report.afterClick?.documentRefs===1&&
+    report.afterClick.comments===1&&report.operationalWrites===1&&success('orbit360DocumentDriveUploadPreview')&&
+    success('orbit360DocumentDriveFinalizePreview')&&report.reloadAttachmentVisible&&report.openClick&&
+    success('orbit360DocumentDriveDownloadPreview')&&report.downloadSha256===report.sha256&&
+    report.cleanupClick&&report.driveFileDeleted&&success('orbit360DocumentDriveCleanupPreview')&&(report.archived||report.removed);
+  report.functionalStatus=accepted?'PASS':'HOLD';
+  if(!accepted)process.exitCode=1;
   console.log('I66_FOCAL_OPS_DOCUMENT_FORM='+JSON.stringify(report));fs.writeFileSync(process.env.RUNNER_TEMP+'/i66-ops-document-form.json',JSON.stringify(report,null,2));
 });
