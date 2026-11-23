@@ -145,7 +145,9 @@
       "issuedScheduleGrossCents": 336706,
       "coverScheduleDeltaCents": 4,
       "sourceBasis": "INSURER_PDF_ORIGINAL_12_INSTALLMENT_BREAKDOWN_VERIFIED_NATIVE",
-      "riskCaveat": "CANONICAL_LEGACY_PLATE_PRESENT_BUT_LEGACY_VIN_ABSENT; require unique prior risk plate and no conflicting relationship before issuing"
+      "riskCaveat": "CANONICAL_LEGACY_PLATE_PRESENT_BUT_LEGACY_VIN_ABSENT; require unique prior risk plate and no conflicting relationship before issuing",
+      "issuedInsuredValueCents": 3989050,
+      "insuredVehicleLabel": "NISSAN TIIDA C11 2011"
     },
     {
       "policy": "91-8343059",
@@ -285,7 +287,9 @@
       "issuedScheduleGrossCents": 504079,
       "coverScheduleDeltaCents": 8,
       "sourceBasis": "INSURER_PDF_ORIGINAL_12_INSTALLMENT_BREAKDOWN_VERIFIED_NATIVE",
-      "riskCaveat": "CANONICAL_LEGACY_PLATE_PRESENT_BUT_LEGACY_VIN_ABSENT; require unique prior risk plate and no conflicting relationship before issuing"
+      "riskCaveat": "CANONICAL_LEGACY_PLATE_PRESENT_BUT_LEGACY_VIN_ABSENT; require unique prior risk plate and no conflicting relationship before issuing",
+      "issuedInsuredValueCents": 11732500,
+      "insuredVehicleLabel": "TOYOTA RAV 4 2016"
     }
   ],
   "totals": {
@@ -299,5 +303,6 @@
     "eligibleBeforeFreshServerReadback": false,
     "protectedCasRequired": true,
     "firestoreWrites": 0
-  }
+  },
+  "sourceRiskValuesReadFrom": "native insurer signed PDF initial endorsement 2026, not predecessor Firestore"
 }
