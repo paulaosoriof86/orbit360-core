@@ -1,0 +1,41 @@
+{
+  "generation": 2,
+  "scopeId": "C360_LINKED_OPPORTUNITY_HISTORY",
+  "artifactDigest": "sha256:78a409a419e21648f2e074b49767d1dd55731140f8a83f6064b3ae1c8073b453",
+  "sourceSha": "15e849bd606bd8c93e4c0471da1193e85004aecd",
+  "physicalPhaseKey": "c507e75d01533d1fbdff973da23123c480fef9f542a09f9a2d3765345f5f8091",
+  "buildId": "gi-i66-15e849bd606b-57f234755dc1",
+  "result": "PASS",
+  "authenticated": true,
+  "buttonClicked": true,
+  "serverReadback": true,
+  "reload": true,
+  "linkedDestination": true,
+  "roleScope": true,
+  "noDuplicate": true,
+  "actorContext": "Existing authenticated Operativo; authorized GT customer",
+  "steps": [
+    "Reload new LIVE release in authenticated Operativo context, reopen customer history",
+    "Observe 3 events and click Abrir oportunidad",
+    "Inspect original inspection marked Devuelto a asesor and denial",
+    "Cerrar, reload, verify Operativo, reopen Historial: original three entries and three linked buttons."
+  ],
+  "matchingServerEvidence": {
+    "run": 45088171338,
+    "job": 137411415955,
+    "canonicalRecords": 1,
+    "embeddedEvents": 3
+  },
+  "originFileReadbacks": {
+    "firebase": 224,
+    "custom": 224,
+    "sourceSha": "15e849bd606bd8c93e4c0471da1193e85004aecd",
+    "buildId": "gi-i66-15e849bd606b-57f234755dc1",
+    "artifactDigest": "sha256:78a409a419e21648f2e074b49767d1dd55731140f8a83f6064b3ae1c8073b453",
+    "hostingVersion": "sites/ays-orbit-360-lab/versions/e4e8f31b02ba2aef",
+    "manifestDigest": "sha256:0882c7191e68ce09ff496637a57e9f37bbe8efee1774da6a33be53e04f6522b4"
+  },
+  "commercialWrites": 0,
+  "assertionScope": "Existing event projection and opening the authorized linked record. Other write flows and Asesor authorization negatives remain separate.",
+  "observedAgain": true
+}
