@@ -202,6 +202,75 @@ jobs:
           if not all(type(v) is bool for v in report.values()):raise RuntimeError('NON_BOOLEAN_REPORT_BLOCKED')
           print('I66_GREENAPI_READONLY_METADATA='+json.dumps(report,sort_keys=True,separators=(',',':')))
           PY
+      - name: Inspect exact webhook invocation policy and Preview existence without IAM writes
+        shell: bash
+        run: |
+          set -euo pipefail
+          set +x
+          python3 - <<'PYIAM'
+          import json,subprocess,urllib.request,urllib.error,re
+          project='ays-orbit-360-lab'
+          targets=[('orbit360GreenApiDeliveryStatus','us-central1'),('orbit360GreenApiDeliveryStatusPreview','us-east1')]
+          allowed_accounts={'orbit360-secrets-lab@ays-orbit-360-lab.iam.gserviceaccount.com'}
+          token_result=subprocess.run(['gcloud','auth','print-access-token'],capture_output=True,text=True,timeout=30)
+          if token_result.returncode or not token_result.stdout.strip():raise SystemExit('I66_GREENAPI_IAM_READONLY_EXISTING_CREDENTIAL_UNAVAILABLE')
+          token=token_result.stdout.strip()
+          rows=[]
+          for name,region in targets:
+              resource=f'projects/{project}/locations/{region}/functions/{name}'
+              request=urllib.request.Request('https://cloudfunctions.googleapis.com/v2/'+resource,
+                headers={'Authorization':'Bearer '+token})
+              try:
+                  with urllib.request.urlopen(request,timeout=30) as response:
+                      status=response.status
+                      payload=response.read(1048577)
+                  if len(payload)>1048576:raise SystemExit('I66_GREENAPI_IAM_READONLY_METADATA_BOUND')
+                  item=json.loads(payload)
+              except urllib.error.HTTPError as error:
+                  status=error.code;item=None
+              except (urllib.error.URLError,TimeoutError,ValueError):
+                  status=None;item=None
+              row={'functionName':name,'region':region,'functionHttpStatus':status,
+                'functionExists':status==200,'exactNotFound':status==404,'functionReadIndeterminate':status not in (200,404),
+                'serviceAccount':'','serviceAccountAllowed':False,'exactServiceReferenceVerified':False,
+                'iamPolicyReadable':False,'iamReadErrorClass':'NOT_ATTEMPTED',
+                'publicRunInvoker':False,'allowedInvocationBindings':[],'unlistedPrincipalCount':0,'conditionalInvokerBindings':False}
+              if status==200 and isinstance(item,dict):
+                  if item.get('name')!=resource:raise SystemExit('I66_GREENAPI_IAM_READONLY_RESOURCE_IDENTITY_DRIFT')
+                  config=item.get('serviceConfig') or {};account=str(config.get('serviceAccountEmail') or '')
+                  row['serviceAccountAllowed']=account in allowed_accounts
+                  row['serviceAccount']=account if account in allowed_accounts else ''
+                  reference=str(config.get('service') or '');prefix=f'projects/{project}/locations/{region}/services/'
+                  service=reference[len(prefix):] if reference.startswith(prefix) else ''
+                  if re.fullmatch(r'[a-z][a-z0-9-]{1,62}',service):
+                      row['exactServiceReferenceVerified']=True
+                      result=subprocess.run(['gcloud','run','services','get-iam-policy',service,'--region',region,
+                        '--project',project,'--format=json'],capture_output=True,text=True,timeout=45)
+                      if result.returncode:
+                          row['iamReadErrorClass']='PERMISSION_DENIED' if re.search(r'PERMISSION_DENIED|permission|forbidden',result.stderr,re.I) else 'UNREADABLE'
+                      else:
+                          try:policy=json.loads(result.stdout)
+                          except ValueError:policy=None
+                          if isinstance(policy,dict) and isinstance(policy.get('bindings',[]),list):
+                              row['iamPolicyReadable']=True;row['iamReadErrorClass']='NONE'
+                              for binding in policy.get('bindings',[]):
+                                  if not isinstance(binding,dict) or binding.get('role')!='roles/run.invoker':continue
+                                  condition=bool(binding.get('condition'));row['conditionalInvokerBindings']|=condition
+                                  safe=[]
+                                  for member in binding.get('members',[]):
+                                      if member=='allUsers' or member in {'serviceAccount:'+a for a in allowed_accounts}:safe.append(member)
+                                      else:row['unlistedPrincipalCount']+=1
+                                  if 'allUsers' in safe and not condition:row['publicRunInvoker']=True
+                                  if safe:row['allowedInvocationBindings'].append({'role':'roles/run.invoker','members':sorted(set(safe)),'conditional':condition})
+                          else:row['iamReadErrorClass']='INVALID_RESPONSE'
+              rows.append(row)
+          report={'schema':'GI_I66_GREENAPI_EXACT_IAM_READONLY_V1','functions':rows,
+            'requiredPreviewCreationPolicy':{'functionName':'orbit360GreenApiDeliveryStatusPreview','region':'us-east1',
+              'role':'roles/run.invoker','member':'allUsers','resourceScope':'EXACT_NEW_HTTP_SERVICE_ONLY',
+              'applicationAuthentication':['providerBearer','verifiedFirebaseIdToken','exactImmutableReleaseAuthority']},
+            'secretPayloadRead':False,'iamWrites':0,'cloudResourcesMutated':False,'messagesSent':0}
+          print('I66_GREENAPI_EXACT_IAM_READONLY='+json.dumps(report,sort_keys=True,separators=(',',':')))
+          PYIAM
       - name: Publish approved non-secret resource references only
         shell: bash
         run: |
