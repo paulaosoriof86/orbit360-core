@@ -4004,5 +4004,26 @@
     "productionChange": false,
     "previousLiveSourceSha": "1b65a790530d49fe1d1fb451f02838fd9a713c53",
     "latestCausalFixId": "I6_6_CASH_30D_FORWARD_ONLY_P0_LEGACY_PRESERVATION_20261118"
-  }
+  },
+  "testRevisions": [
+    {
+      "id": "I6_6_HISTORICAL_PREVIEW_QA_PHASE_CORRECTION_20261123",
+      "approvedByDirection": true,
+      "scope": "EXISTING_DECLARED_TESTS_ONLY",
+      "paths": [],
+      "receipt": "artifacts/orbit360-recovery/release-control/I6_6_HISTORICAL_PREVIEW_PHASE_QA_CORRECTION_20261123.json",
+      "receiptGitBlobSha": "7d37f75582e92d8e11d74191bc9ed30a11aab893",
+      "tests": [
+        {
+          "path": "tools/gravicentra-i6-6-source-lineage-preview-transport.test.cjs",
+          "gitBlobSha": "508d5021a281b4b9e6296ffe2ae341cb35cb480f",
+          "replaces": {
+            "path": "tools/gravicentra-i6-6-source-lineage-preview-transport.test.cjs",
+            "priorGitBlobSha": "34678b42ddce14298b7576673972b34eb4598227",
+            "priorChangeId": "I6_6_PORTAL_SHARED_CLIENT360_ACTIVITY_ATOMIC_20261122"
+          }
+        }
+      ]
+    }
+  ]
 }

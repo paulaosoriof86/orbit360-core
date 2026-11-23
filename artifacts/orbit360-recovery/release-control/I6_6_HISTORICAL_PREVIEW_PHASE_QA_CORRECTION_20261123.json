@@ -1,0 +1,45 @@
+{
+  "schema": "GI_I66_EXISTING_TEST_REVISION_AUTHORITY_V1",
+  "gate": "I6.6",
+  "revisionId": "I6_6_HISTORICAL_PREVIEW_QA_PHASE_CORRECTION_20261123",
+  "scope": "EXISTING_DECLARED_TESTS_ONLY",
+  "productSourceChanges": 0,
+  "productionAcceptanceClaimed": false,
+  "approvedByDirection": true,
+  "ownerInstruction": "23-Nov: continuar completando y publicando; corregir de raíz el mecanismo de ejecución y preservar aprobaciones previas.",
+  "causeEvidence": "artifacts/orbit360-recovery/release-control/I6_6_V13_LIVE_PREMUTATION_PHASE_GUARD_HOLD_20261123.json",
+  "failureRunId": 45284653398,
+  "failureJobId": 138077834389,
+  "tests": [
+    {
+      "path": "tools/gravicentra-i6-6-source-lineage-preview-transport.test.cjs",
+      "gitBlobSha": "508d5021a281b4b9e6296ffe2ae341cb35cb480f",
+      "replaces": {
+        "path": "tools/gravicentra-i6-6-source-lineage-preview-transport.test.cjs",
+        "priorGitBlobSha": "34678b42ddce14298b7576673972b34eb4598227",
+        "priorChangeId": "I6_6_PORTAL_SHARED_CLIENT360_ACTIVITY_ATOMIC_20261122"
+      }
+    }
+  ],
+  "preservation": [
+    "Historical requests and approved product blobs unchanged.",
+    "Historical predecessor and flags checked at their own source-QA epoch.",
+    "Current LIVE/Preview authority validated by the existing candidate owner; locked state requires exact flags and physicalGuard.",
+    "Only an already-declared QA test can receive an exact linked testRevision; no new product path or release acceptance is granted.",
+    "New artifact required after this QA and release-owner source change; V13 artifact remains immutable."
+  ],
+  "discriminants": [
+    "exact authorized LIVE accepted",
+    "missing candidate rejected",
+    "wrong LIVE flags rejected",
+    "Preview candidate cannot authorize LIVE",
+    "unsigned Preview proof rejected",
+    "already-LIVE source rejected",
+    "scoped Preview cannot acquire LIVE permission",
+    "locked state with open flags rejected",
+    "missing physical proof rejected",
+    "test revision cannot add product paths/new tests or broken predecessor",
+    "receipt blob and receipt test list must match"
+  ],
+  "localScope": "source-only validation; no deployment or business writes"
+}

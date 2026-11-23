@@ -7,6 +7,9 @@ on:
       - .github/workflows/gravicentra-i66-privileged-role-three-function-preview-uat.yml
       - .github/workflows/gravicentra-i66-privileged-role-exact-live-promotion.yml
       - tools/gravicentra-i6-6-operational-release-candidate.cjs
+      - tools/gravicentra-i6-6-delta-guard.mjs
+      - tools/gravicentra-i6-6-delta-test-revisions.cjs
+      - tools/gravicentra-i6-6-source-lineage-preview-transport.test.cjs
       - tools/gravicentra-i6-6-frontend-preview-authority.cjs
       - tools/gravicentra-i6-6-composite-preview-admission.test.cjs
       - tools/gravicentra-i6-6-workflow-candidate-resolution.test.cjs
@@ -75,6 +78,8 @@ jobs:
       - name: Source test with 5 roles, 12 domain writers and explicit negative boundaries
         run: |
           set -euo pipefail
+          node --check tools/gravicentra-i6-6-delta-test-revisions.cjs
+          node tools/gravicentra-i6-6-source-lineage-preview-transport.test.cjs
           node --test tools/gravicentra-i6-6-composite-preview-admission.test.cjs tools/gravicentra-i6-6-workflow-candidate-resolution.test.cjs
           node --test tools/gravicentra-i66-composite-acceptance.test.cjs tools/gravicentra-i66-frontend-control.test.cjs tools/gravicentra-i66-frontend-promotion-transaction.test.cjs
           node --test tools/gravicentra-i6-6-direction-preview-i66-consent-scope.test.cjs tools/gravicentra-i6-6-direction-live-legal-acceptance.test.cjs

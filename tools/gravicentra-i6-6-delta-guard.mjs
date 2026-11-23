@@ -1,5 +1,6 @@
 import fs from 'node:fs';
 import {execFileSync, spawnSync} from 'node:child_process';
+import testRevisions from './gravicentra-i6-6-delta-test-revisions.cjs';
 
 // The B4-003/004/005/006/007 guards govern their own sealed release epoch.
 // I6.6 may not reinterpret their historic HEAD-diff checks against new source.
@@ -92,6 +93,12 @@ for(const change of manifest.changes){
     approveTestOrSupersede(entry,change.id);
   }
 }
+// QA-only corrections preserve every historical product path/blob. They may
+// supersede an existing declared test only, through its exact receipt/chain.
+testRevisions.applyTestRevisions(manifest,tests,seenChangeIds,{
+  readBlob:p=>git('rev-parse','HEAD:'+p),
+  readJson:p=>JSON.parse(fs.readFileSync(p,'utf8'))
+});
 const expectedPaths=[...approved.keys()].sort();
 const diff=git('diff','--name-only',BASE,'HEAD','--','orbit360-platform','functions','tools/gravicentra-i6-1-preview-package.mjs','firestore.rules','storage.rules','database.rules.json','firebase.json',':(exclude)orbit360-platform/docs/recovery/orbit360-recovery-state-v1.json').split('\n').filter(Boolean).sort();
 need(JSON.stringify(diff)===JSON.stringify(expectedPaths),'UNDECLARED_PRODUCT_SOURCE_DELTA:'+diff.join(','));

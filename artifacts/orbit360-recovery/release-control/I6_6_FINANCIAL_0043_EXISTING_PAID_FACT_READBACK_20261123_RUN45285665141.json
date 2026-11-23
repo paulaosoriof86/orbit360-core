@@ -1,0 +1,71 @@
+{
+  "schema": "I66_FINANCIAL_EXISTING_PAID_FACT_CASE_RESOLUTION_V1",
+  "gate": "I6.6",
+  "caseId": "ROBLE_NOV20_0043",
+  "status": "SOURCE_PENDING_SUPERSEDED_BY_CURRENT_PAID_FACT_PRESERVE_NO_WRITES",
+  "evidence": {
+    "runId": 45285665141,
+    "jobId": 138081223060,
+    "runUrl": "https://github.com/paulaosoriof86/orbit360-core/actions/runs/45285665141",
+    "artifactId": 14871851091,
+    "artifactDigest": "sha256:85059f5f2bc83fa5a74f7f6f6b168c9b0d3acf185070f3e64a42e137f4687c34",
+    "privateReportName": "gi-i66-bulk-preflight.json",
+    "privateReportSha256": "39dd8eb6e41b712562bbd2e6b7c8a247a8a7df4d9c00b859b7e8c1c57fd6cd5b",
+    "protectedJobs": "ALL_SKIPPED",
+    "reportStatus": "BULK_SOURCE_CASE_READBACK_ONLY_NO_WRITES"
+  },
+  "source": {
+    "manifest": "artifacts/orbit360-recovery/source-batches/I6_6_SOURCE_BULK_20261120_MULTI_302.json",
+    "manifestSha256": "35b548913253c836e63db6cb3cac79bda541a6ceda776494969d23393504e225",
+    "documentSha256": "7062738cdf1c008ebff85247f8b0723ab4d8f36e43bb69d386d5dfcb59d219ef",
+    "requirement": "5693797",
+    "sourceDue": "2026-11-21",
+    "state": "PENDING",
+    "grossCents": 33437
+  },
+  "currentCanonicalFact": {
+    "policyId": "pol_gi_i66_d01_dcc21d00486c5ed39653bdcc",
+    "receiptId": "cob_pol_gi_i66_d01_dcc21d00486c5ed39653bdcc_003",
+    "portfolioId": "car_cob_pol_gi_i66_d01_dcc21d00486c5ed39653bdcc_003",
+    "cashId": "cob_63ddce7e7eddba05ef06e7f665f9",
+    "currency": "GTQ",
+    "grossCents": 33437,
+    "state": "Pagado",
+    "paymentState": "PAID_DIRECT",
+    "applicationState": "APPLIED_DIRECT",
+    "paymentDate": "2026-11-23",
+    "receiptPaidByCanonicalPredicate": true,
+    "portfolioPaidByCanonicalPredicate": true,
+    "activePortfolioCount": 1,
+    "exactReciboIdCashLinks": 1,
+    "inferredPaid": false
+  },
+  "decision": {
+    "preserveReceipt": true,
+    "preservePortfolio": true,
+    "preserveCash": true,
+    "reapplyPendingSource": false,
+    "newWriteDelta": 0,
+    "reason": "The exact currently paid receipt, portfolio and linked cash supersede the older pending-source row; the existing writer correctly holds rather than reversing payment."
+  },
+  "evidenceLimits": {
+    "paymentOriginOrAuditRequestNotCertified": true,
+    "auditReferencesInReadback": {},
+    "newPaymentCreatedInThisReadback": false,
+    "businessUiReloadNotPerformed": true,
+    "batchWide112ExceptionCountNotRecomputed": true
+  },
+  "counts": {
+    "examinedSourceCases": 1,
+    "materialHoldReasonResolved": 1,
+    "sourceCasesReadyForApply": 0,
+    "financialDocumentWrites": 0,
+    "paymentWrites": 0,
+    "newObligations": 0,
+    "previousSixExistingReceiptUpdatesRemainSeparatelyAccredited": true
+  },
+  "containsPersonalNames": false,
+  "containsSecrets": false,
+  "authWrites": 0,
+  "membershipWrites": 0
+}
