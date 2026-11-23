@@ -1,0 +1,26 @@
+{
+  "schema": "GI_I66_PROTECTED_SOURCE_BULK_REFRESH_REQUEST_V1",
+  "dateGuatemala": "2026-11-23",
+  "gate": "I6.6",
+  "authority": "Dirección confirms apply identity-proven financial delta urgently, without reasking D01-D06 or owner-attested decisions",
+  "requestedExecution": "EXISTING_PROTECTED_BULK_WORKFLOW_PREFLIGHT_THEN_CAS_ONLY_IF_READY",
+  "workflow": ".github/workflows/gravicentra-i66-insurer-source-bulk-protected.yml",
+  "sourceManifest": "artifacts/orbit360-recovery/source-batches/I6_6_SOURCE_BULK_20261120_MULTI_302.json",
+  "branch": "recovery/fase-a-clean-20260831",
+  "priorIndependentReadback": {
+    "runId": 45095576694,
+    "matched": 185,
+    "held": 117,
+    "missingEdition": 97,
+    "receiptIdentityHolds": 20,
+    "eligible": 0
+  },
+  "businessOwnerApprovals": "artifacts/orbit360-recovery/release-control/I6_6_DIRECCION_DECISIONES_FINANCIERAS_Y_PLAN_INTEGRAL_20261122.md and I6_6_DIRECTION_119_EXCEPTIONS_20261122.json",
+  "requires": "fresh actual Firestore preimages; unique tenant country insurer policy edition and receipt; write only rows with CAS deterministic proof; no duplicate applications; postimage readback and rollback receipts; HOLD uncertain cases",
+  "mustNot": "Never infer pending as paid; no fabricated payment dates, no fabricated endorsement, no duplicate write of prior 58 obligations, 33 Cendoso payments or 110 El Roble adjustments",
+  "workflowMayApplyReadyRows": true,
+  "writingAuthorizedOnlyAfterExistingProtectedGate": true,
+  "customerWritesClaimedByThisReceipt": 0,
+  "sourceQaNotLiveProof": true,
+  "scope": "No new iteration, repo, Firebase, branch, rules, Auth, or general ledger reimport"
+}
