@@ -7,7 +7,7 @@ function candidate(){
    artifactDigest:'sha256:'+'a'.repeat(64),previewRunId:149,liveCloneRunId:150,liveHostingVersion:'sites/ays-orbit-360-lab/versions/physical'};
  const p={schema:'I6_6_OPERATIONAL_EXACT_RELEASE_V1',approvedByDirection:true,
   status:'EXACT_BACKEND_PREVIEW_SIGNED_QA_AUTHORIZED',opsLeadsComposite:true,compositeVersion:1,
-  sourceSha:'2'.repeat(40),buildRunId:151,artifactId:152,artifactDigest:'sha256:'+'b'.repeat(64),
+  sourceSha:'2'.repeat(40),buildId:'gi-i66-'+ '2'.repeat(12)+'-57f234755dc1',buildRunId:151,artifactId:152,artifactDigest:'sha256:'+'b'.repeat(64),
   previewUrl:'https://ays-orbit-360-lab--gi-i66-rc-151-ab12cd34.web.app',previewChannelId:'gi-i66-rc-151',
   targets:clone(g.COMPOSITE_TARGETS),requiredPreviewDrivers:[...g.DRIVERS],expectedSiteFileCount:224,
   opsLeadsBackendPath:'functions/product-ops-leads-domain.js',
