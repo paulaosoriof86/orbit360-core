@@ -1,0 +1,85 @@
+{
+  "schema": "GI_I66_OPS_STANDARD_TYPE_SOURCE_QA_HANDOFF_V1",
+  "product": "Gravicentra Insurance",
+  "recordType": "APPEND_ONLY_SOURCE_CERTIFICATION_FOR_NEXT_INCOMPLETE_GATE_NOT_DEPLOYMENT",
+  "asOfLocalGuatemala": "2026-11-22 21:05",
+  "ownerInstruction": "Continue I6.6 from R9, preserve signed prior LIVE history, fix Carlos Operativo management write transversally and certify per role; do not reopen historical B4.",
+  "repo": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "activeGate": "I6.6",
+  "historicalLastPass": "I6.5",
+  "currentLive": {
+    "sourceSha": "15e849bd606bd8c93e4c0471da1193e85004aecd",
+    "buildId": "gi-i66-15e849bd606b-57f234755dc1",
+    "immutableArtifactId": 14777966155,
+    "digest": "sha256:78a409a419e21648f2e074b49767d1dd55731140f8a83f6064b3ae1c8073b453",
+    "hostingVersion": "sites/ays-orbit-360-lab/versions/e4e8f31b02ba2aef",
+    "fileCount": 224,
+    "liveStatus": "FOCAL_FRONTEND_LIVE_UI_VERIFIED",
+    "fullI66Acceptance": false
+  },
+  "sourceFix": {
+    "commit": "71a11a82550477c897a20beeeb2f786d052c1d6c",
+    "issue": "I66-OPS-MGMT-SAVE-02",
+    "evidence": "R9 report observed an attempted tenant catalog admin write before canonical management insert; direct LIVE error cause not yet identified by requestId.",
+    "design": "Recognize standard built-in types from Orbit.cat.DEF.tiposGestion with exact approved queue and skip admin config mutation. Keep custom tenant types gated by canonical saveDurable and readback.",
+    "sourceFile": "orbit360-platform/core/ciclo.js",
+    "sourceBlobSha": "acc82d42a4c01accf0d0a553eb6e20a54ea2d8ed",
+    "testFile": "tools/gravicentra-i6-6-management-default-and-client-country.test.cjs",
+    "testBlobSha": "97f722249010c79c07c103fa429ee317db0e5a04",
+    "manifestBlobSha": "6279a1f7e040b48beaa6e74fcb344e137f8660be",
+    "testMatrix": "Four approved examples x two countries GT/CO x four administrative/Operativo role contexts; no catalog writes for built-ins; cross-list/custom type still gated"
+  },
+  "sourceQa": {
+    "statuses": [
+      {
+        "runId": 45103795852,
+        "workflow": "I6.6 Transversal Performance Source QA",
+        "conclusion": "SUCCESS"
+      },
+      {
+        "runId": 45103795847,
+        "workflow": "I6.6 Privileged Operational Role Parity Source QA",
+        "conclusion": "SUCCESS",
+        "evidence": "I6_6_DELTA_GUARD PASS; 97 declared delta tests; 0 failures for new builtin type test"
+      },
+      {
+        "runId": 45103795880,
+        "workflow": "I6.6 Advisor Payment Ops Notification Emulator QA",
+        "conclusion": "SUCCESS"
+      },
+      {
+        "runId": 45103795811,
+        "workflow": "I6.6 Build Immutable Release Package gate",
+        "conclusion": "SUCCESS_GATE_ONLY",
+        "immutablePackagePublished": false
+      },
+      {
+        "runId": 45103795813,
+        "workflow": "Control Plane Guard v5",
+        "conclusion": "SUCCESS"
+      }
+    ],
+    "separateHistorical": {
+      "workflow": "B4-005 Exact Immutable Preview",
+      "runId": 45103795818,
+      "conclusion": "FAIL_HISTORICAL_SOURCE_EPOCH_COMPARISON",
+      "reopenHistoricalGate": false
+    }
+  },
+  "nextCertification": {
+    "status": "SOURCE_QA_PASS_PREVIEW_AND_LIVE_WRITE_HOLD",
+    "required": [
+      "Use the existing I6.6 authorized exact-source path to build ONE immutable artifact from the approved frontend/backend composite (backend has not been promoted with this source delta). Do not use historical B4-005 workflow as release authority.",
+      "In isolated Preview with a genuinely authorized Operativo account, create an approved synthetic management using a built-in type. Confirm transaction response, management and Client360 activity readback by exact tenant+country+client+ID; reload and ensure no duplicate; capture requestId/error code.",
+      "Verify custom new type remains denied without catalog permission and advisor or cross-country unauthorized writes are denied server-side.",
+      "Promote the SAME artifact only after signed Preview acceptance and owner-approved release protocol, then perform controlled real Carlos Operativo management write and reload in LIVE; ensure Client360 and Ops both show the exact same management and activity without duplicate.",
+      "Preserve the existing LIVE build and rollback until readback; no data reimport, direct Firebase Rules change or unrelated source resets."
+    ],
+    "markedPreviewPass": false,
+    "markedLivePass": false,
+    "financialWritesByThisBlock": 0,
+    "clientWritesByThisBlock": 0,
+    "backendDeploysByThisBlock": 0
+  }
+}
