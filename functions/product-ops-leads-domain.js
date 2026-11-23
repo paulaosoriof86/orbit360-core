@@ -44,7 +44,7 @@ const MANAGEMENT_MUTABLE_FIELDS = Object.freeze([
   'adjuntos','documentoCargaPendiente','documentoCargaFallida'
 ]);
 const BUSINESS_CREATE_EXTRA_FIELDS = Object.freeze(['plan','segmento','aseguradoraIds','puntoIngreso','commercialIdentityId','sourceOpportunityId','polizaId','cancelacionId','prob','proximoToque','descripcion','cadenciaActiva','cadencia','cadenciaRetrasoDias','nroCotizacion','decision','bitacora','motivoPerdido','checklist','colLeads','notas','comentarios','vence','creado','actualizado','ultimoContacto']);
-const MANAGEMENT_CREATE_EXTRA_FIELDS = Object.freeze(['cancelacionId','ramo','pais','moneda','producto','vence','proximaAccion','checklist','notas','bitacora','comentarios','creado','actualizado','resultado','adjuntos','documentoCargaPendiente','documentoCargaFallida']);
+const MANAGEMENT_CREATE_EXTRA_FIELDS = Object.freeze(['cancelacionId','ramo','pais','moneda','producto','vence','proximaAccion','checklist','notas','bitacora','comentarios','creado','actualizado','resultado','adjuntos','documentoCargaPendiente','documentoCargaFallida','reclamoId']);
 const ISSUANCE_MANAGEMENT_FIELDS = Object.freeze(['workflowType','requestKey','operationId','issuanceMode','sourcePolicyId','renewalManagementId','pais','moneda','producto','acceptedOffer','acceptedConfirmed','emissionStage','requiereInspeccion','documentosCompletos','requiereValidacion','validacionAlertas','policyCreatedId','policyNumber','documentRef','resueltaAt','nuevaPolizaId','emisionGestionId']);
 const RENEWAL_MANAGEMENT_FIELDS = Object.freeze(['workflowType','renewalAction','sourcePolicyId','acceptedConfirmed','clientApprovalAt','clientApprovalNote','quoteContext','directRenewalPolicyId','issuanceRequestId','nuevaPolizaId','emisionGestionId']);
 // Endosos are owned by Ops, never by the general product-operational writer.
@@ -325,6 +325,29 @@ if(operation==='create_business')prepared=canonicalizeCreationAudit(sanitizeBusi
 const committed=await db.runTransaction(async tx=>{const priorReq=await tx.get(req);if(priorReq.exists&&priorReq.data().status==='committed')return Object.assign({reused:true},priorReq.data().result||{});const snap=await tx.get(entity),before=snap.exists?snap.data():null;if(prepared&&before)throw new HttpsError('already-exists','El registro ya existe.');if(!prepared&&!before)throw new HttpsError('not-found','El registro no existe.');let after=prepared?Object.assign({},prepared):Object.assign({},before);if(operation==='update_business'||operation==='update_management')payload=canonicalizeCollaborationPayload(before,payload,authz.actor);const authorizationDomain=workflowAuthorizationDomain(authz,operation,entityType,before,payload,cfg);assertRecordCountryScope(authz.member,before,after);
 if(!workflowRoleModuleAllowed(authz,authorizationDomain,after))throw new HttpsError('permission-denied','El rol activo no puede escribir en este módulo o país.');
 if(!advisorAllowed(authz.member,after.asesorId||payload.asesorId||payload.advisorId,authorizationDomain,authz.actor.activeRole,authz.accessConfig))throw new HttpsError('permission-denied','El asesor está fuera de su alcance activo.');
+if(prepared&&entityType==='gestiones'&&text(after.reclamoId,180)){
+  // Claims are created by the portal writer. Bind the existing claim to Ops
+  // only after its tenant, client, country and policy identity agree.
+  const claimId=id(after.reclamoId,'reclamoId');
+  const cs=await tx.get(dataRef(authz.tenantId,'reclamos',claimId));
+  const claim=cs.exists?cs.data()||{}:null;
+  if(!claim||(claim.tenantId&&claim.tenantId!==authz.tenantId)||
+     text(claim.clienteId,180)!==text(after.clienteId,180)||
+     (text(claim.pais,8)&&text(claim.pais,8).toUpperCase()!==text(after.pais,8).toUpperCase()))
+    throw new HttpsError('failed-precondition','PORTAL_CLAIM_CLIENT_SCOPE_MISMATCH');
+  const policyId=text(claim.polizaId,180);
+  if(policyId){
+    if(after.polizaId&&text(after.polizaId,180)!==policyId)
+      throw new HttpsError('failed-precondition','PORTAL_CLAIM_POLICY_RELATION_MISMATCH');
+    const ps=await tx.get(dataRef(authz.tenantId,'polizas',id(policyId,'policyId')));
+    const insured=ps.exists?ps.data()||{}:null;
+    if(!insured||(insured.tenantId&&insured.tenantId!==authz.tenantId)||
+       text(insured.clienteId,180)!==text(after.clienteId,180)||
+       text(insured.pais,8).toUpperCase()!==text(after.pais,8).toUpperCase())
+      throw new HttpsError('failed-precondition','PORTAL_CLAIM_POLICY_CLIENT_COUNTRY_MISMATCH');
+    after.polizaId=policyId;
+  }
+}
 if(operation==='create_business'){
   const stage=cfg.stages[after.etapa];
   if(!stage||stage.leads!==true)throw new HttpsError('failed-precondition','BUSINESS_ENTRY_STAGE_NOT_CONFIGURED');
@@ -426,7 +449,7 @@ if(['create_management','portal_request'].includes(operation)&&after.clienteId&&
   tx.set(dataRef(authz.tenantId,'actividades',activityId),{
     id:activityId,tenantId:authz.tenantId,clienteId:after.clienteId,
     polizaId:text(after.polizaId,180),asesorId:text(after.asesorId,180),
-    pais:text(after.pais,8),gestionId:entityId,origen:'ops',
+    pais:text(after.pais,8),gestionId:entityId,reclamoId:text(after.reclamoId,180),origen:'ops',
     tipo:'sistema',icon:'🗂',fecha:localDate(),
     titulo:'Gestión creada: '+text(after.tipo,180),
     detalle:'Confirmada en Ops ('+text(after.lista,120)+')',
@@ -441,9 +464,10 @@ tx.set(entity,after,{merge:true});tx.set(eventRef(authz.tenantId,eventId,preview
 if(['create_management','portal_request'].includes(operation)&&confirmedRow.clienteId&&confirmedRow.workflowType!=='endorsement_request'){
   const activityId=text(confirmedRow.actividadCliente360Id,180);
   const activitySnap=activityId?await dataRef(authz.tenantId,'actividades',activityId).get():null;
-  if(!activitySnap||!activitySnap.exists||text((activitySnap.data()||{}).gestionId,180)!==entityId)
+  if(!activitySnap||!activitySnap.exists||text((activitySnap.data()||{}).gestionId,180)!==entityId||
+     text((activitySnap.data()||{}).reclamoId,180)!==text(confirmedRow.reclamoId,180))
     throw new HttpsError('internal','OPS_CLIENT360_ACTIVITY_READBACK_MISSING');
-  response.managementActivityReadback={activityId,clienteId:confirmedRow.clienteId,gestionId:entityId,exists:true,transactional:true};
+  response.managementActivityReadback={activityId,clienteId:confirmedRow.clienteId,gestionId:entityId,reclamoId:text(confirmedRow.reclamoId,180),exists:true,transactional:true};
 }
 if(entityType==='gestiones'){const docKey=x=>{if(!x||typeof x!=='object')return text(x,1000);return text(x.documentRef||x.fileId||x.archivoRef||x.driveUrl||x.externalUrl||x.url,1000);};response.managementDocumentReadback={documentRefs:[].concat(confirmedRow.adjuntos||[]).map(docKey).filter(Boolean).sort(),documentoCargaPendiente:confirmedRow.documentoCargaPendiente===true,documentoCargaFallidaCount:[].concat(confirmedRow.documentoCargaFallida||[]).filter(Boolean).length};}if(operation==='hide_management_card')response.opsBoardHideReadback={opsBoardHidden:confirmedRow.opsBoardHidden===true,opsBoardHiddenReason:text(confirmedRow.opsBoardHiddenReason,600),opsBoardHiddenByRole:text(confirmedRow.opsBoardHiddenByRole,120),opsBoardHiddenAtPresent:!!confirmedRow.opsBoardHiddenAt,deletedPreserved:confirmedRow.deleted!==true,archivedPreserved:confirmedRow.archivado!==true,policyId:text(confirmedRow.polizaId,180)};if(operation==='transition_business'&&norm(confirmedRow.etapa)==='emitido'){
   const clientId=text(confirmedRow.clienteId,180),policyId=text(confirmedRow.polizaId,180),vehicleId=text(confirmedRow.vehiculoId,180);

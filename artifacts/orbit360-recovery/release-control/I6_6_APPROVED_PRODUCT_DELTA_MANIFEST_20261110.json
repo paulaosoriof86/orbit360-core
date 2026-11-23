@@ -3788,6 +3788,50 @@
           }
         }
       ]
+    },
+    {
+      "id": "I6_6_PORTAL_CLAIM_OPS_CANONICAL_RELATION_AND_RETRY_20261122",
+      "approvedByDirection": true,
+      "receipt": "Dirección 2026-11-22/23: continuidad I6.6 de solicitudes y siniestros desde Portal, Ops y Cliente360 con relaciones persistentes y no duplicar al reintentar; preserva la corrección transaccional aprobada.",
+      "sourceStatus": "SOURCE_QA_PENDING_IMMUTABLE_BACKEND_PREVIEW_SIGNED_UAT_AND_LIVE_HOLD",
+      "capabilityOwners": [
+        "OPS_PRIMARY_RUNTIME",
+        "CLIENTE360_PRIMARY_RUNTIME",
+        "CROSS_MODULE_RELATIONSHIPS",
+        "ROLE_SCOPE_RUNTIME"
+      ],
+      "scope": "Persist portal claim linkage on canonical management, require same tenant+client+country+policy before write, mirror claimId in server Client360 activity and readback, stable UI retry ID and no second claim on partial errors. Exact same gate, no live writes.",
+      "paths": [
+        {
+          "path": "functions/product-ops-leads-domain.js",
+          "gitBlobSha": "b7921ca88343ced65bdad4cd9de26fa120647083",
+          "replaces": {
+            "path": "functions/product-ops-leads-domain.js",
+            "priorGitBlobSha": "41a53549c3e8712d143a513e2073fd8e88673a42",
+            "priorChangeId": "I6_6_PORTAL_SHARED_CLIENT360_ACTIVITY_ATOMIC_20261122"
+          }
+        },
+        {
+          "path": "orbit360-platform/modules/portal.js",
+          "gitBlobSha": "a8de030469a5eb9bf808c8da5dedcfe7ecb5c9ac",
+          "replaces": {
+            "path": "orbit360-platform/modules/portal.js",
+            "priorGitBlobSha": "96300278e3b6cc0cbd2274c82be34c82f45b5bd3",
+            "priorChangeId": "I6_6_PORTAL_SHARED_CLIENT360_ACTIVITY_ATOMIC_20261122"
+          }
+        }
+      ],
+      "tests": [
+        {
+          "path": "tools/gravicentra-i6-6-portal-canonical-activity.test.cjs",
+          "gitBlobSha": "e140c7b7a4117e8c47840219277f5f4b7e75b736",
+          "replaces": {
+            "path": "tools/gravicentra-i6-6-portal-canonical-activity.test.cjs",
+            "priorGitBlobSha": "f353820d428b417c84d147fd8727f6f54b507349",
+            "priorChangeId": "I6_6_PORTAL_SHARED_CLIENT360_ACTIVITY_ATOMIC_20261122"
+          }
+        }
+      ]
     }
   ],
   "i66R11PreviewBuildRequest20261113": {

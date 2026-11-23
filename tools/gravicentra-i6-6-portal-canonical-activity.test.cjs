@@ -10,8 +10,9 @@ const start=portal.indexOf('  function solicitar(tipoPre) {');
 const end=portal.indexOf('  function detPoliza(polId) {',start);
 assert.ok(start>=0&&end>start,'canonical portal request owner');
 const crear=new Function('S','Orbit','q','clienteId','drawer','toast','render','host','esPolizaActivaPortal',portal.slice(start,end)+'\nreturn solicitar;');
-async function submit(clientId,{country='GT',activityLinked=true,claim=false}={}){
+async function submit(clientId,{country='GT',activityLinked=true,claim=false,failFirst=false}={}){
  const writes=[],notices=[];
+ let failedOnce=false;
  const client={id:clientId,nombre:'QA '+clientId,asesorId:'qa_advisor',pais:country};
  const store={get:(c,id)=>c==='clientes'&&id===clientId?client:null,all:()=>[],
   async insertDurable(collection,row){writes.push({collection,row});if(collection==='actividades')throw Error('DUPLICATE_ACTIVITY_FORBIDDEN');return row;}};
@@ -23,12 +24,14 @@ async function submit(clientId,{country='GT',activityLinked=true,claim=false}={}
  const drawer=(title,html,handler)=>{onOk=handler;return back;};
  const Orbit={ui:{today:()=> '2026-11-22'},ciclo:{async crearGestionDurable(row){
   writes.push({collection:'gestiones',row});
-  return {...row,id:'qa_gestion_'+clientId,actividadCliente360Id:activityLinked?'act_qa_'+clientId:''};
+  if(failFirst&&!failedOnce){failedOnce=true;throw Error('SYNTHETIC_MANAGEMENT_HOLD');}
+  return {...row,id:row.id,actividadCliente360Id:activityLinked?'act_qa_'+clientId:''};
  }}};
  const open=crear(()=>store,Orbit,{polizasDe:()=>[]},clientId,drawer,m=>notices.push(m),()=>{rendered++;},{},()=>false);
  open();
  assert.equal(typeof onOk,'function');
  await onOk();
+ if(failFirst)await onOk();
  return {writes,notices,removed,rendered};
 }
 test('Twelve distinct clients create one durable management and no duplicate activity',async()=>{
@@ -50,6 +53,8 @@ test('Siniestro portal does not create a duplicate activity after the management
  const r=await submit('qa_claim',{claim:true});
  assert.deepEqual(r.writes.map(x=>x.collection),['reclamos','gestiones']);
  assert.equal(r.writes[1].row.clienteId,'qa_claim');
+ assert.equal(r.writes[1].row.reclamoId,r.writes[0].row.id);
+ assert.ok(r.writes[1].row.id.startsWith('ges_portal_'));
 });
 test('Both canonical operation types use one transactional server activity and postcommit readback',()=>{
  const condition="['create_management','portal_request'].includes(operation)&&after.clienteId&&after.workflowType!=='endorsement_request'";
@@ -61,4 +66,21 @@ test('Both canonical operation types use one transactional server activity and p
  assert.ok(backend.includes('OPS_CLIENT360_ACTIVITY_READBACK_MISSING'));
  assert.ok(backend.includes('after.actividadCliente360Id=activityId'));
  assert.ok(!portal.includes("S().insertDurable('actividades'"));
+});
+
+test('Partial claim success retries the exact management without another claim',async()=>{
+ const r=await submit('qa_retry_claim',{claim:true,failFirst:true});
+ assert.deepEqual(r.writes.map(x=>x.collection),['reclamos','gestiones','gestiones']);
+ assert.equal(r.writes[1].row.id,r.writes[2].row.id);
+ assert.equal(r.writes[1].row.reclamoId,r.writes[2].row.reclamoId);
+ assert.match(r.notices.join(' '),/Reintenta sin crear otro reclamo/);
+ assert.equal(r.removed,true);
+});
+test('Server validates claim link against tenant, client, country and policy',()=>{
+ for(const marker of ['PORTAL_CLAIM_CLIENT_SCOPE_MISMATCH',
+  'PORTAL_CLAIM_POLICY_RELATION_MISMATCH','PORTAL_CLAIM_POLICY_CLIENT_COUNTRY_MISMATCH'])
+  assert.ok(backend.includes(marker),'missing '+marker);
+ assert.ok(backend.includes("reclamoId:text(after.reclamoId,180),origen:'ops'"));
+ assert.ok(backend.includes("'documentoCargaFallida','reclamoId'"));
+ assert.ok(backend.includes("text((activitySnap.data()||{}).reclamoId,180)!==text(confirmedRow.reclamoId,180)"));
 });
