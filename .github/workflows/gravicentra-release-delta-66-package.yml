@@ -591,6 +591,7 @@ jobs:
           test "$(git rev-parse HEAD)" = "$SOURCE_SHA"
           node --check tools/gravicentra-governance-preflight-v1.mjs
           node --check tools/gravicentra-i6-6-delta-guard.mjs
+          node --test tools/gravicentra-i6-6-composite-preview-admission.test.cjs
           node --check tools/gravicentra-i6-1-preview-package.mjs
           node --check tools/gravicentra-i6-6-preview-current-live-restore.cjs
           node --test tools/gravicentra-i6-6-preview-current-live-restore.test.cjs

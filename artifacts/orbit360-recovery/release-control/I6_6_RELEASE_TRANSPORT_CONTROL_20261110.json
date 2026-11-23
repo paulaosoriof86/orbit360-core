@@ -4738,19 +4738,33 @@
     "liveCloneRunId": 45088457923
   },
   "frontendPreviewRequest": {
-    "version": 3,
-    "mode": "PREVIEW_HOSTING_ONLY",
-    "sourceQaHead": "bd4e643852fd9b5974a1b7de36052d599de18a2f",
-    "manifestBlob": "638342618594a1bfe89f675956a32a73b47b342c",
-    "sourceQaRunId": 45092731929,
-    "guardRunId": 45092731772,
+    "version": 4,
+    "mode": "COMPOSITE_ARTIFACT_HOSTING_PREVIEW_ONLY",
+    "sourceQaHead": "196e3cdbae5a02792f19acc3cacd37621836c02f",
+    "manifestBlob": "5fce7ef65c7d418815cbe0abea67aef8cbce6e30",
+    "sourceQaRunId": 45183267436,
+    "guardRunId": 45183267325,
     "previousReceiptBlob": "d39f216defb2959b47087da84cc87b32b97faa94",
     "productPaths": [
+      "functions/product-ops-leads-domain.js",
       "orbit360-platform/core/auth-product-runtime-p0.js",
       "orbit360-platform/core/backend-product-readonly-bootstrap-p0.js",
       "orbit360-platform/core/ciclo.js",
-      "orbit360-platform/modules/cliente360.js"
-    ]
+      "orbit360-platform/modules/cliente360.js",
+      "orbit360-platform/modules/portal.js"
+    ],
+    "backendPaths": [
+      "functions/product-ops-leads-domain.js"
+    ],
+    "backendPathBlobs": {
+      "functions/product-ops-leads-domain.js": "b7921ca88343ced65bdad4cd9de26fa120647083"
+    },
+    "backendPreviewRequired": true,
+    "backendLiveDeployAllowed": false,
+    "realDataWritesAllowed": false,
+    "immutableArtifactMustCoverBothFrontendAndBackend": true,
+    "ownerInstruction": "23-Nov Dirección: publish only current approved cumulative source after signed Preview and exact SAME digest; never deploy backend LIVE or production writes from this request.",
+    "scope": "I6.6 only: build one exact frontend+backend artifact; publish Hosting Preview only, then separately authorize scoped backend Preview tests. No LIVE."
   },
   "previousPhysicalHostingRelease": {
     "sourceSha": "f1eb5bc6397f0b159079be516a521dd7b1e5d9ba",

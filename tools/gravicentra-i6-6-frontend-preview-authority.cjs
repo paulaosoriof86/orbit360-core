@@ -13,7 +13,16 @@ async function admitPreview(transport,api,readMarker) {
   const previous = JSON.parse(git('show','HEAD^:'+transportPath));
   if (JSON.stringify(request) === JSON.stringify(previous.frontendPreviewRequest)) return false;
   assert.equal(request.version,(previous.frontendPreviewRequest?.version || 0)+1,'PREVIEW_REQUEST_VERSION_DRIFT');
-  assert.equal(request.mode,'PREVIEW_HOSTING_ONLY');
+  const composite=request.mode==='COMPOSITE_ARTIFACT_HOSTING_PREVIEW_ONLY';
+  assert.ok(request.mode==='PREVIEW_HOSTING_ONLY'||composite,'PREVIEW_REQUEST_MODE_INVALID');
+  if(composite){
+    assert.equal(request.backendPreviewRequired,true,'BACKEND_PREVIEW_ACCEPTANCE_REQUIRED');
+    assert.equal(request.backendLiveDeployAllowed,false,'NO_UNCERTIFIED_BACKEND_LIVE');
+    assert.equal(request.realDataWritesAllowed,false,'NO_REAL_WRITES_IN_PREVIEW');
+    assert.deepEqual(request.backendPaths,['functions/product-ops-leads-domain.js'],'BACKEND_OWNER_SCOPE_DRIFT');
+    assert.equal(request.backendPathBlobs?.[request.backendPaths[0]],
+      git('rev-parse',request.sourceQaHead+':'+request.backendPaths[0]),'BACKEND_SOURCE_BLOB_DRIFT');
+  }
   assert.equal(transport.livePromotionAuthorized,false);
   assert.equal(transport.noHostingPromotion,true);
   assert.equal(transport.forbidBackendFunctionDeploy,true);
@@ -38,7 +47,13 @@ async function admitPreview(transport,api,readMarker) {
     'database.rules.json','tools/gravicentra-i6-1-preview-package.mjs',':(exclude)orbit360-platform/docs/recovery/orbit360-recovery-state-v1.json'];
   git('diff','--quiet',request.sourceQaHead,'HEAD','--',...roots);
   const paths=git('diff','--name-only',current.sourceSha,request.sourceQaHead,'--',...roots).split('\n');
-  assert.ok(paths.length && paths.every(p => /^orbit360-platform\/(modules|core)\/[\w.-]+\.js$/.test(p)),'PREVIEW_SCOPE_DRIFT');
+  const frontendPath=p=>/^orbit360-platform\/(modules|core)\/[\w.-]+\.js$/.test(p);
+  if(composite){
+    assert.ok(paths.some(frontendPath),'COMPOSITE_FRONTEND_MISSING');
+    assert.deepEqual(paths.filter(p=>!frontendPath(p)),request.backendPaths,'COMPOSITE_BACKEND_EXACT_SCOPE_REQUIRED');
+  }else{
+    assert.ok(paths.length && paths.every(frontendPath),'PREVIEW_SCOPE_DRIFT');
+  }
   assert.deepEqual(request.productPaths,paths);
   const runs = [[request.sourceQaRunId,'gravicentra-i66-privileged-role-parity-source-qa.yml'],
     [request.guardRunId,'gravicentra-release-lock-sync.yml']];
