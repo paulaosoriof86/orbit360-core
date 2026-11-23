@@ -108,16 +108,24 @@ test('Ops projects all authorized Cronograma tasks beyond first eight without co
  assert.equal(taskHarness({q:'QA 11'}).tasks.length,1);
 });
 test('All canonical Ops create_management records create one server-owned Client 360 activity in the same transaction',()=>{
- const creator=server.indexOf("if(operation==='create_management'&&after.clienteId");
+ const creator=server.indexOf("if(['create_management','portal_request'].includes(operation)&&after.clienteId");
  const stored=server.indexOf("tx.set(dataRef(authz.tenantId,'actividades',activityId)",creator);
  const save=server.indexOf("tx.set(entity,after,{merge:true})",creator);
- const readback=server.indexOf("if(operation==='create_management'&&confirmedRow.clienteId");
+ const readback=server.indexOf("if(['create_management','portal_request'].includes(operation)&&confirmedRow.clienteId");
  assert.ok(creator>0&&stored>creator&&save>stored&&readback>save,
    'confirmed Ops management activity must be persisted and verified by one server owner');
  assert.match(server,/OPS_CLIENT360_ACTIVITY_READBACK_MISSING/);
  assert.match(server,/gestionId:entityId,origen:'ops'/);
 });
-test.todo('I6.6 pending lineage: portal_request must reuse the same durable activity and readback contract for any client');
+test('portal_request shares the same durable activity and readback contract for all clients',()=>{
+ const portal=source('orbit360-platform/modules/portal.js');
+ const first=server.indexOf("if(['create_management','portal_request'].includes(operation)&&after.clienteId&&after.workflowType!=='endorsement_request'")
+ const readback=server.indexOf("if(['create_management','portal_request'].includes(operation)&&confirmedRow.clienteId&&confirmedRow.workflowType!=='endorsement_request'")
+ assert.ok(first>0&&readback>first);
+ assert.ok(server.indexOf("tx.set(dataRef(authz.tenantId,'actividades',activityId)",first)>first);
+ assert.ok(!portal.includes("S().insertDurable('actividades'"),'Portal cannot create duplicate activity');
+ assert.ok(portal.includes('gestion.actividadCliente360Id'));
+});
 
 test('LIVE availability guard follows the current release pointer and exact signed digest, never a historical alias',()=>{
  const guard=source('.github/workflows/gravicentra-release-lock-sync.yml');

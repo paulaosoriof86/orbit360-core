@@ -11,8 +11,8 @@ const issued=src('orbit360-platform/modules/issuance-endosos-v1201-bridge.js');
 const engine=src('orbit360-platform/core/endorsement-workflow-v1201.js');
 
 test('Ops management and Client 360 activity are atomically persisted by the backend owner',()=>{
-  assert.match(server,/if\(operation==='create_management'&&after\.clienteId&&after\.workflowType!=='endorsement_request'\)/);
-  const i=server.indexOf("if(operation==='create_management'&&after.clienteId&&after.workflowType!=='endorsement_request')");
+  assert.ok(server.includes("if(['create_management','portal_request'].includes(operation)&&after.clienteId&&after.workflowType!=='endorsement_request')"));
+  const i=server.indexOf("if(['create_management','portal_request'].includes(operation)&&after.clienteId&&after.workflowType!=='endorsement_request')");
   const j=server.indexOf('tx.set(entity,after,{merge:true});',i);
   assert.ok(i>0&&j>i);
   const block=server.slice(i,j);

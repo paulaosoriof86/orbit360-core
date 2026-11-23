@@ -15,6 +15,8 @@ on:
       - orbit360-platform/modules/ops.js
       - orbit360-platform/modules/cliente360.js
       - functions/product-ops-leads-domain.js
+      - orbit360-platform/modules/portal.js
+      - tools/gravicentra-i6-6-portal-canonical-activity.test.cjs
       - functions/b4-003-scoped-access-boundary.js
       - artifacts/orbit360-recovery/release-control/I6_6_APPROVED_PRODUCT_DELTA_MANIFEST_20261110.json
   workflow_dispatch:
@@ -43,7 +45,9 @@ jobs:
           node --check tools/gravicentra-i6-6-transversal-access-index-mobile.test.cjs
           node --check tools/gravicentra-i66-transversal-cross-client-projection.test.cjs
           node --check functions/product-ops-leads-domain.js
+          node --check orbit360-platform/modules/portal.js
+          node --check tools/gravicentra-i6-6-portal-canonical-activity.test.cjs
       - name: Functional cache and role policy unit QA, no operational mutations
         run: |
           set -euo pipefail
-          node --test tools/gravicentra-i6-6-protected-read-clone-performance.test.cjs tools/gravicentra-i6-6-transversal-access-index-mobile.test.cjs tools/gravicentra-i66-transversal-cross-client-projection.test.cjs
+          node --test tools/gravicentra-i6-6-protected-read-clone-performance.test.cjs tools/gravicentra-i6-6-transversal-access-index-mobile.test.cjs tools/gravicentra-i66-transversal-cross-client-projection.test.cjs tools/gravicentra-i6-6-portal-canonical-activity.test.cjs

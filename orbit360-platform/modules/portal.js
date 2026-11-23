@@ -333,15 +333,15 @@ Orbit.modules.portal = (function () {
           checklist: [{ t: 'Solicitud recibida', done: true }, { t: 'En gestión', done: false }]
         });
         if (!gestion || !gestion.id) throw new Error('PORTAL_MANAGEMENT_CANONICAL_READBACK_REQUIRED');
-        await S().insertDurable('actividades', {
-          id: 'act' + Date.now(), clienteId, asesorId: cli.asesorId,
-          tipo: esSiniestro ? 'siniestro' : 'sistema', icon: esSiniestro ? '🚨' : '🙋',
-          fecha: Orbit.ui.today(), titulo: esSiniestro ? 'Siniestro reportado por el cliente' : ('Solicitud del cliente: ' + tipo),
-          detalle: det + ' · Portal → Ops' + (reclamoId ? ' + Siniestros' : ''),
-          reclamoId, gestionId: gestion.id
-        });
+        // Ops owns one client activity in the same committed transaction.
+        // Never create a duplicate or report false failure after commit.
+        const actividadCliente360Confirmada = !!gestion.actividadCliente360Id;
         back.remove();
-        toast(esSiniestro ? '✓ Siniestro y gestión confirmados para seguimiento' : '✓ Solicitud confirmada para el equipo');
+        if (!actividadCliente360Confirmada) {
+          toast('Solicitud guardada en Ops. La actividad vinculada en Cliente 360 aún no está confirmada.');
+        } else {
+          toast(esSiniestro ? '✓ Siniestro y gestión confirmados para seguimiento' : '✓ Solicitud confirmada para el equipo');
+        }
         render(host);
       } catch (error) {
         if (submit) { submit.disabled = false; submit.textContent = 'Enviar solicitud'; }

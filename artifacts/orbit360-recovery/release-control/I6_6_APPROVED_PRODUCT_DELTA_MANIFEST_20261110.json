@@ -3736,6 +3736,49 @@
           "gitBlobSha": "fff275d234a19cf8f6c244a70040f65e279ef61d"
         }
       ]
+    },
+    {
+      "id": "I6_6_PORTAL_SHARED_CLIENT360_ACTIVITY_ATOMIC_20261122",
+      "approvedByDirection": true,
+      "receipt": "Dirección 2026-11-22/23: reparar gestiones de Cliente 360 y portal transversalmente, preservar historial y no duplicar; I6_6_OPS_ATOMIC_CLIENT360_ACTIVITY_DIRECT_ISSUED_VEHICLE_SUBSTITUTION_20261119; fuente y pruebas autorizadas en el mismo gate.",
+      "sourceStatus": "SOURCE_QA_PENDING_EXACT_PREVIEW_SIGNED_MULTIROLE_LIVE_HOLD",
+      "capabilityOwners": [
+        "OPS_PRIMARY_RUNTIME",
+        "CLIENTE360_PRIMARY_RUNTIME",
+        "CROSS_MODULE_RELATIONSHIPS",
+        "ROLE_SCOPE_RUNTIME"
+      ],
+      "scope": "Shared canonical Ops management create / portal_request save one deterministic client activity in the same Firestore transaction, with readback. Remove client portal's second activity write and false failure after commit. No business writes in this source change.",
+      "paths": [
+        {
+          "path": "functions/product-ops-leads-domain.js",
+          "gitBlobSha": "41a53549c3e8712d143a513e2073fd8e88673a42",
+          "replaces": {
+            "path": "functions/product-ops-leads-domain.js",
+            "priorGitBlobSha": "d84da411925824900b7d7d655b79b664859d079f",
+            "priorChangeId": "I6_6_OPS_ATOMIC_CLIENT360_ACTIVITY_DIRECT_ISSUED_VEHICLE_SUBSTITUTION_20261119"
+          }
+        },
+        {
+          "path": "orbit360-platform/modules/portal.js",
+          "gitBlobSha": "96300278e3b6cc0cbd2274c82be34c82f45b5bd3"
+        }
+      ],
+      "tests": [
+        {
+          "path": "tools/gravicentra-i6-6-ops-activity-direct-vehicle-endorsement.test.cjs",
+          "gitBlobSha": "26d6b5f31312dee488eb6c6127dbfaa98a60a3b0",
+          "replaces": {
+            "path": "tools/gravicentra-i6-6-ops-activity-direct-vehicle-endorsement.test.cjs",
+            "priorGitBlobSha": "d39a5be75c4c0a67ba7993fc836b91957d4e9753",
+            "priorChangeId": "I6_6_OPS_ATOMIC_CLIENT360_ACTIVITY_DIRECT_ISSUED_VEHICLE_SUBSTITUTION_20261119"
+          }
+        },
+        {
+          "path": "tools/gravicentra-i6-6-portal-canonical-activity.test.cjs",
+          "gitBlobSha": "f353820d428b417c84d147fd8727f6f54b507349"
+        }
+      ]
     }
   ],
   "i66R11PreviewBuildRequest20261113": {
