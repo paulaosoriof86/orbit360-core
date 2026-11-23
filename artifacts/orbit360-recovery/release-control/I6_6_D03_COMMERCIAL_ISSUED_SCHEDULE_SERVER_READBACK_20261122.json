@@ -1,0 +1,36 @@
+{
+  "schema": "GI_I66_COMMERCIAL_SOURCE_RECEIPT_V1",
+  "activeGate": "I6.6",
+  "decision": "D03",
+  "commitStatus": "COMMITTED_AND_SERVER_READ_BACK",
+  "sourceSha": "55bdf81866573d65ad2898f3e730390c754315df",
+  "runId": 45085268849,
+  "jobId": 137402631352,
+  "preflightJobId": 137402331303,
+  "protectedEnvironment": "gravicentra-live-data-writes",
+  "serverReadbackUtc": "2026-11-22T23:53:05Z",
+  "beforeDigest": "98216c3fc93d16d75647b6d9a759fa326f4fa575e06d70fb87a10d7944db3615",
+  "after": {
+    "newObligations": 11,
+    "editionsCreated": 1,
+    "predecessorsUpdated": 1,
+    "vehiclesLinked": 1,
+    "portfolioRowsCreated": 11,
+    "activitiesCreated": 1,
+    "auditsCreated": 1,
+    "physicalDocumentWrites": 27,
+    "directPayments": 0,
+    "inferredPayments": 0,
+    "inferredGrossCents": 0,
+    "contractGrossCents": 550236,
+    "pendingGrossCents": 563508,
+    "currency": "GTQ",
+    "policyIdDigest": "ba983e72b46fc4533de110367700944e4b546a3c1d205ac713ad03e16777f76f",
+    "auditIdDigest": "49ba7f0238625926da676f9d3566c8de47a7600e6961d580e30c362372312605"
+  },
+  "postAllBatchReadback": {
+    "runId": 45084256011,
+    "attempt": 2,
+    "jobId": 137403665709
+  }
+}
