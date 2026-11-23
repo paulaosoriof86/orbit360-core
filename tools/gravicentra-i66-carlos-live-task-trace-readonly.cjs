@@ -64,6 +64,30 @@ async function incidentReadback(root) {
     inspectionNameMatches:matching.length, inspectionExactClient:matching.filter(d=>d.get('clienteId')===cid).length,
     inspectionMissingClient:matching.filter(d=>!d.get('clienteId')).length};
 }
+async function issuedSubstitutionReadback(root) {
+  const clean = value => String(value || '').normalize('NFKD').replace(/[^a-z0-9]/gi,'').toUpperCase();
+  const fp = v => crypto.createHash('sha256').update(clean(v)).digest('hex');
+  const match = (row,fields,hash) => fields.some(f=>row[f] && fp(row[f])===hash);
+  const source = {
+    policy:'919105495', oldPlate:'c1e529dc5bdf7131fa018615f726e01a577b27403728bf2a6f42b46c1d889d74', newPlate:'1339915f8fe46d74c8cfaf992f83d0956f9263ddebd3a587ce4c0297b7fc7c95',
+    oldVin:'36923d7cca30bcbf8232ee1e1c1add2460bde9b8b01f5855aa84e865e61f89dd', newVin:'e6e5656ec531df9d8c73b6befb7f8758e27ce94f1f3dabfd0582842ba53d65cb', holder:'0176782161a20d4fe15dd665302d98bf23614013ecf54a163427ca7ec9fdb0bf'
+  };
+  const policies=await col(root,'polizas').where('pais','==','GT').select('numero','numeroPoliza','polizaNumero','clienteId','estado','vigenciaInicio','vigenciaFin','vehiculoId','ultimoEndosoId','endoso').limit(2500).get();
+  assert.ok(policies.size<2500,'I66_SUBSTITUTION_POLICY_SCAN_LIMIT');
+  const fits=policies.docs.filter(d=>['numero','numeroPoliza','polizaNumero'].some(k=>clean(d.get(k))===source.policy));
+  const reports=[];
+  for(const d of fits){
+    const row=d.data(),holder=row.clienteId?await col(root,'clientes').doc(row.clienteId).get():null;
+    const [risks,requests]=await Promise.all(['vehiculos','gestiones'].map(k=>col(root,k).where('polizaId','==',d.id).limit(100).get()));
+    assert.ok(risks.size<100&&requests.size<100,'I66_SUBSTITUTION_RELATED_SCAN_LIMIT');
+    reports.push({policyDigest:masked(d.id),termStart:row.vigenciaInicio,termEnd:row.vigenciaFin,
+      holderMatchesIssuer:!!holder?.exists && match(holder.data(),['nombre','nombreCompleto','razonSocial'],source.holder),
+      status:row.estado, linkedRisks:risks.size, linkedManagements:requests.size,
+      risks:risks.docs.map(v=>({entityDigest:masked(v.id),pointer:row.vehiculoId===v.id,previousPlate:match(v.data(),['placa','placaFuente'],source.oldPlate),issuedPlate:match(v.data(),['placa','placaFuente'],source.newPlate),previousVin:match(v.data(),['vin','chasis','chasisFuente'],source.oldVin),issuedVin:match(v.data(),['vin','chasis','chasisFuente'],source.newVin),estado:text(v.get('estado')).slice(0,32),activo:v.get('activo')??null})),
+      endorsements:requests.docs.filter(q=>q.get('workflowType')==='endorsement_request').map(q=>({entityDigest:masked(q.id),stage:text(q.get('endorsementStage')).slice(0,40),date:date(q.get('createdAt')),matchingIssuedNumber:clean(q.get('endorsementNumber')||q.get('numeroEndoso'))==='199154'}))});
+  }
+  return {sourcePdfSha256:'14c5a6209463713fea26a6ca35316276211382ee3b93a63a2d017d3285d7e031',issuerEndorsement:'199154',editions:reports, writes:0};
+}
 async function main(){
   assert.equal(process.env.GCLOUD_PROJECT,PROJECT);
   assert.equal(process.env.GI_I66_CARLOS_TRACE_MODE,'readonly');
@@ -80,6 +104,7 @@ async function main(){
   ]);
   assert.ok(members.size<150&&advisors.size<400&&allTasks.size<750,'I66_CARLOS_TASK_SCAN_LIMIT');
   const actor=identity(members,advisors);
+  console.log('I66_ISSUED_SUBSTITUTION_SERVER_READBACK='+JSON.stringify(await issuedSubstitutionReadback(root)));
   const catalog = await root.collection('config').doc('catalogs').get();
   const member = members.docs.find(doc => doc.id === actor.uid).data();
   const catalogRows = catalog.exists ? catalog.get('tiposGestion') : null;
