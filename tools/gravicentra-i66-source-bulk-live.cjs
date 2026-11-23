@@ -184,6 +184,52 @@ async function readIssuedSuccessorLinks(db,groups){
   return rows;
 }
 
+// Read only. An owner's payment attestation settles the business fact. These
+// checks locate its canonical destination without rewriting an older receipt.
+async function locateAttestedPayments(db,groups,rows){
+  const disposition=require('../artifacts/orbit360-recovery/release-control/I6_6_DIRECTION_119_EXCEPTIONS_20261122.json').ownerFinalDisposition20261122;
+  const results=[];
+  for(const decision of disposition.cases.filter(c=>c.requirement)){
+    const row=rows.find(r=>r.requirement===decision.requirement && r.policy===decision.policy);
+    assert.ok(row,'ATTESTED_REQUIREMENT_MISSING_FROM_SOURCE');
+    const editions=groups.filter(g=>sameInsurerPolicyNumber(g.policy.numero,row.policy,row.insurer)&&g.clientExists&&g.insurerVerified);
+    const names=['recibosEsperados','carteraPrimas','cobros'];
+    const lookup=await Promise.all(names.map(async k=>{
+      const refs=[decision.requirement,Number(decision.requirement)];
+      const snapshots=await Promise.all([...new Set(sourceAliases.concat('numeroRecibo','referenciaAseguradora'))]
+        .map(f=>internal(k,db).where(f,'in',refs).select('polizaId','clienteId').limit(11).get()));
+      assert.ok(snapshots.every(q=>q.size<11),'ATTESTED_ALIAS_RESULT_BOUNDS');
+      return new Set(snapshots.flatMap(q=>q.docs.map(d=>d.id))).size;
+    }));
+    for(const g of editions){
+      const p=g.policy, policies=internal('polizas',db);
+      const [linked,holder,mgmt,pointer]=await Promise.all([policies.where('renuevaDe','==',p.id).limit(31).get(),
+        policies.where('clienteId','==',p.clienteId).limit(161).get(),
+        internal('gestiones',db).where('polizaId','==',p.id).limit(81).get(),
+        p.renovadaPor?policies.doc(str(p.renovadaPor)).get():Promise.resolve(null)]);
+      assert.ok(linked.size<31&&holder.size<161&&mgmt.size<81,'ATTESTED_RELATION_RESULT_BOUNDS');
+      const refs=mgmt.docs.map(d=>({id:d.id,ref:str(d.get('referenciaAseguradora')),docRef:str(d.get('documentRef')),date:str(d.get('fechaEfectiva'))}))
+        .filter(m=>m.ref||m.docRef);
+      const cents=values=>values.filter(x=>x!=null&&x!==''&&Number.isFinite(+x)).map(v=>Math.round(+v*100));
+      const cash=g.cobros.map(c=>({linkedReceipt:g.receipts.some(r=>[c.reciboId,c.reciboEsperadoId].includes(r.id)),
+        documentedAmount:cents([c.monto,c.importe,c.primaTotal,c.montoPagado,c.total]).includes(row.grossCents),
+        ownerAmount:decision.bankAmountCents!=null&&cents([c.monto,c.importe,c.primaTotal,c.montoPagado,c.total]).includes(decision.bankAmountCents),
+        linkedEndorsement:refs.some(m=>[c.gestionId,c.endosoId,c.gestionEndosoId].includes(m.id)),
+        matchingRef:[...sourceAliases,'numeroRecibo','referenciaAseguradora'].some(f=>str(c[f])===decision.requirement)}));
+      const laterSameHolder=holder.docs.filter(d=>d.id!==p.id&&d.get('aseguradoraId')===p.aseguradoraId&&
+        d.get('pais')==='GT'&&str(d.get('vigenciaInicio'))>=str(p.vigenciaInicio)&&str(d.get('vigenciaFin'))>str(p.vigenciaFin));
+      results.push({policy:row.policy,requirement:row.requirement,canonicalTerm:[p.vigenciaInicio,p.vigenciaFin],existingReceipts:g.receipts.length,
+        existingCobros:g.cobros.length,existingPortfolio:g.portfolio.length,numberMatchesByCollection:Object.fromEntries(names.map((k,i)=>[k,lookup[i]])),
+        directSuccessors:linked.size,successorPointerExists:Boolean(pointer?.exists),laterSameHolderInsurer:laterSameHolder.length,
+        laterTerms:laterSameHolder.map(d=>[d.get('vigenciaInicio'),d.get('vigenciaFin')]),
+        otherSourceReceiptNumbers:g.receipts.map(r=>sourceAliases.map(f=>str(r[f])).filter(v=>/^\d{5,12}$/.test(v))[0]).filter(Boolean),
+        observedCash:cash,endorsements:refs.map(m=>({date:m.date,referencesRequirement:m.ref===row.requirement,sourceRefIsDriveUrl:/^https:\/\/(?:drive|docs)\.google\.com\//.test(m.docRef),sourceRefIsDriveFileId:/^[A-Za-z0-9_-]{20,}$/.test(m.docRef)})),writes:0});
+    }
+    if(!editions.length)results.push({policy:row.policy,requirement:row.requirement,editions:0,numberMatchesByCollection:Object.fromEntries(names.map((k,i)=>[k,lookup[i]])),writes:0});
+  }
+  return results;
+}
+
 async function main(){
   const mode=str(process.env.GI_I66_BULK_MODE);
   assert.ok(['preflight','apply'].includes(mode),'I66_BULK_MODE_MUST_BE_EXPLICIT');
@@ -195,6 +241,7 @@ async function main(){
   if(mode==='preflight'){
     const groups=await readGroups(db,source.data.rows);
     console.log('I66_ISSUED_TERM_READBACK='+JSON.stringify(issuedTermReadback(groups)));
+    if(process.env.GI_I66_ATTESTED_TARGETS==='true')console.log('I66_ATTESTED_PAYMENT_TARGET_READBACK='+JSON.stringify(await locateAttestedPayments(db,groups,source.data.rows)));
     const crosswalk=await require('./gravicentra-i66-issued-term-identities.cjs').crosswalk(name=>internal(name,db));
     console.log('I66_ISSUED_IDENTITY_WITNESSES='+JSON.stringify(crosswalk));
     const five=await require('./gravicentra-i66-roble-five-issuer-crosswalk-readonly.cjs').crosswalk(name=>internal(name,db));

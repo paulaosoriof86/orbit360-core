@@ -106,6 +106,7 @@ jobs:
       - name: Compute unique pending receipt and cartera source differences with zero writes
         shell: bash
         env:
+          GI_I66_ATTESTED_TARGETS: ${{ contains(github.event.head_commit.message, 'I66_ATTESTED_READBACK') }}
           GI_I66_BULK_MODE: preflight
           GI_I66_BULK_PLAN_OUT: ${{ runner.temp }}/gi-i66-bulk-plan.json
           GI_I66_BULK_REPORT_OUT: ${{ runner.temp }}/gi-i66-bulk-preflight.json
