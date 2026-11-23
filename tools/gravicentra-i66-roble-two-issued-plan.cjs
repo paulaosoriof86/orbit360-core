@@ -107,7 +107,7 @@ function mutation(c,identity,at){
    secuencia:r.sequence,numeroCuota:r.sequence,cuota:r.sequence+'/12',
    numeroReciboFuente:r.requirement,fechaVencimientoContractual:due,fechaVencimiento:due,vence:due,fechaLimite:due,
    primaNeta:asMoney(r.netCents),neta:asMoney(r.netCents),
-   gastosEmision:asMoney(r.expensesAndOtherCents),otrosGastosIncluidos:true,
+   gastosEmisionYOtros:asMoney(r.expensesAndOtherCents),componenteGastosSinSeparar:true,
    gastosFinan:asMoney(r.financingCents),iva:asMoney(r.ivaCents),ivaMonto:asMoney(r.ivaCents),
    monto:asMoney(r.grossCents),primaTotal:asMoney(r.grossCents),montoTotal:asMoney(r.grossCents),
    estado:due<today?'Vencido':'Pendiente',carteraActiva:true,conciliado:false,fechaPago:null,
