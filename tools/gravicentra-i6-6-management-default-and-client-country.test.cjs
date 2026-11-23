@@ -36,3 +36,36 @@ test('detail country changes close the previous client before any detail reads',
   assert.ok(render.indexOf('!clientInCurrentCountry(requested)')<render.indexOf('ensureDataCollections(DETAIL_DATA_DEPS)'));
 });
 
+
+test('all approved built-in types are operational for GT/CO without catalog write access',async()=>{
+  const catalogSource=fs.readFileSync('orbit360-platform/core/config.js','utf8');
+  assert.ok(catalogSource.includes('"t":"Actualizar datos de cliente","lista":"Gestiones Admin"'));
+  assert.ok(catalogSource.includes('"t":"Renovación de póliza","lista":"Renovaciones / Modif."'));
+  const builtins=[
+    {t:'Actualizar datos de cliente',lista:'Gestiones Admin'},
+    {t:'Renovación de póliza',lista:'Renovaciones / Modif.'},
+    {t:'Reclamo / Siniestro',lista:'Gestiones Admin'},
+    {t:'Solicitud de cancelación',lista:'Gestiones Admin'}
+  ];
+  for(const role of ['Operativo','Direccion','AdminTenant','SuperAdmin']){
+    let catalogWrites=0, catalogReads=0;
+    const cat={
+      DEF:{tiposGestion:builtins},
+      ensure:async()=>{catalogReads++;throw Error('catalog-read-unavailable');},
+      get:()=>[],all:()=>({}),
+      saveDurable:async()=>{catalogWrites++;throw Error('permission-denied');}
+    };
+    const fn=cycle.match(/  async function persistGestionType\(tipo, lista\) \{[\s\S]*?\n  \}/);
+    assert.ok(fn,'same shared catalog helper');
+    const write=new Function('Orbit',fn[0]+'\nreturn persistGestionType;')({cat});
+    for(const country of ['GT','CO']){
+      for(const item of builtins)
+        assert.deepEqual(await write(item.t,item.lista),{existing:true},role+' '+country+' '+item.t);
+    }
+    assert.equal(catalogWrites,0,role+' must not edit tenant config');
+    assert.equal(catalogReads,0,role+' must not need an admin catalog lookup for a built-in');
+    await assert.rejects(write('Actualizar datos de cliente','Otra cola'),/catalog-read-unavailable/);
+    await assert.rejects(write('Seguimiento de renovación no registrado','Gestiones Admin'),/catalog-read-unavailable/);
+    assert.equal(catalogWrites,0);
+  }
+});

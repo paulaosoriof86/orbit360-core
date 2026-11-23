@@ -121,6 +121,14 @@ Orbit.ciclo = (function () {
     // The standard Ficha cliente / Póliza / Portal intake is an operational
     // action even when the tenant has never customized its catalog.
     if(key(name)==='gestion de poliza'&&key(queue)==='gestiones admin')return{existing:true};
+    // Built-in management types are operational contracts, not tenant
+    // configuration edits. Operativo may create a management using the
+    // approved default catalogue even when its saved tenant catalogue
+    // was not migrated or the user lacks catalogue-administration grants.
+    const standard=Orbit.cat&&Orbit.cat.DEF&&Array.isArray(Orbit.cat.DEF.tiposGestion)
+      ?Orbit.cat.DEF.tiposGestion:[];
+    if(standard.some(item=>key(item&&item.t)===key(name)&&key(item&&item.lista)===key(queue)))
+      return{existing:true};
     if(!Orbit.cat||typeof Orbit.cat.ensure!=='function'||typeof Orbit.cat.saveDurable!=='function')
       throw Error('MANAGEMENT_TYPE_CANONICAL_CONFIG_UNAVAILABLE');
     await Orbit.cat.ensure(true);

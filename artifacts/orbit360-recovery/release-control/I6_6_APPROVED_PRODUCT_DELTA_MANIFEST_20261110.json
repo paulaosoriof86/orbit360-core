@@ -3841,6 +3841,41 @@
           }
         }
       ]
+    },
+    {
+      "id": "I6_6_STANDARD_OPS_MANAGEMENT_NO_ADMIN_CATALOG_WRITE_20261122",
+      "approvedByDirection": true,
+      "receipt": "Dirección I6.6 2026-11-22 R9: Carlos Operativo debe poder crear cualquier gestión estándar en Ops y Cliente360; eliminar bloqueo de catálogo administrativo en acción operativa sin conceder permisos de configuración ni forzar casos por cliente.",
+      "sourceStatus": "FOCAL_SOURCE_CHANGE_QA_PENDING_PREVIEW_AND_LIVE_UAT_NOT_CLAIMED",
+      "capabilityOwners": [
+        "OPS_PRIMARY_RUNTIME",
+        "CLIENTE360_PRIMARY_RUNTIME",
+        "ROLE_SCOPE_RUNTIME",
+        "CROSS_MODULE_RELATIONSHIPS"
+      ],
+      "scope": "For standard built-in management types in their approved queue, reuse DEF without tenant catalog administration/read side effects. Keep custom tenant type creation and unique server readback governed by existing persistent catalog writer. Preserve nonstandard queues, tenant/country/role scope, management+activity atomic backend and no financial writes.",
+      "paths": [
+        {
+          "path": "orbit360-platform/core/ciclo.js",
+          "gitBlobSha": "acc82d42a4c01accf0d0a553eb6e20a54ea2d8ed",
+          "replaces": {
+            "path": "orbit360-platform/core/ciclo.js",
+            "priorGitBlobSha": "9307296ab6c23d7c22e1d7a4e6b89ab53414c113",
+            "priorChangeId": "I6_6_STANDARD_MANAGEMENT_AND_CLIENT_COUNTRY_SCOPE_20261122"
+          }
+        }
+      ],
+      "tests": [
+        {
+          "path": "tools/gravicentra-i6-6-management-default-and-client-country.test.cjs",
+          "gitBlobSha": "97f722249010c79c07c103fa429ee317db0e5a04",
+          "replaces": {
+            "path": "tools/gravicentra-i6-6-management-default-and-client-country.test.cjs",
+            "priorGitBlobSha": "626013900e9d0035ef1cda10abbe7742a66bd3db",
+            "priorChangeId": "I6_6_STANDARD_MANAGEMENT_AND_CLIENT_COUNTRY_SCOPE_20261122"
+          }
+        }
+      ]
     }
   ],
   "i66R11PreviewBuildRequest20261113": {
