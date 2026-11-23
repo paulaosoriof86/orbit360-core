@@ -1,0 +1,43 @@
+{
+  "schema": "GI_I66_SUBSTITUTION_SOURCE_AND_LIVE_READBACK_V1",
+  "gate": "I6.6",
+  "findingId": "I66-VEH-ENDORSEMENT-09",
+  "policy": "91-9105495",
+  "issuer": "El Roble",
+  "country": "GT",
+  "issuerEvidence": {
+    "sha256": "14c5a6209463713fea26a6ca35316276211382ee3b93a63a2d017d3285d7e031",
+    "pdfPages": 46,
+    "issuedEndorsement": "199154",
+    "concept": "SUSTITUCION CERT 1 X 2",
+    "priorCertificate": 1,
+    "issuedCertificate": 2,
+    "issuedDate": "2026-04-10",
+    "effectiveFrom": "2026-04-09",
+    "coverageEnds": "2027-02-16"
+  },
+  "freshReadback": {
+    "run": 45090672854,
+    "job": 137419245853,
+    "policyEditionsFound": 1,
+    "holderMatchesIssuer": true,
+    "currentStatus": "Vigente",
+    "canonicalTerm": [
+      "2026-02-18",
+      "2027-02-18"
+    ],
+    "risks": 2,
+    "historicalRiskMatchesAprilIssuedPlate": true,
+    "currentRiskMatchesAprilIssuedPlate": false,
+    "riskPointer": true,
+    "laterManagementCount": 1,
+    "laterManagementStage": "APLICADO",
+    "laterManagementRecorded": "2026-11-20",
+    "laterEffectiveDate": "2026-11-16",
+    "laterInsurerReferencePresent": true,
+    "laterDocumentReferencePresent": true,
+    "laterReferenceIdentifiesApril199154": false,
+    "writesInThisCase": 0
+  },
+  "disposition": "April issuance and November application are separate. Verify original underlying the November reference, compare both terms, then decide whether any corrective write is warranted."
+}
