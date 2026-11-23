@@ -3881,17 +3881,17 @@
       "id": "I6_6_MANAGEMENT_CATALOG_FALLBACK_OPTIONAL_DRIVE_POSTCOMMIT_20261122",
       "approvedByDirection": true,
       "receipt": "Dirección I6.6 2026-11-22 exige escritura real de gestiones con Operativo sin permiso de configuración; documentos opcionales no deben convertir el commit ya confirmado en falso error ni inducir duplicados.",
-      "sourceStatus": "FOCAL_SOURCE_CHANGE_QA_PENDING_EXACT_PREVIEW_AND_LIVE_AUTHENTICATED_WRITE_RELOAD_NOT_CLAIMED",
+      "sourceStatus": "SOURCE_QA_REVALIDATION_PENDING_PREVIEW_AND_LIVE",
       "capabilityOwners": [
         "OPS_PRIMARY_RUNTIME",
         "CLIENTE360_PRIMARY_RUNTIME",
         "CROSS_MODULE_RELATIONSHIPS"
       ],
-      "scope": "Catalog read errors no longer block built-in operational types; custom tenant type creation remains server-authorized. Ops management commits once with linked activity before optional Drive upload; failed attachments become pending, and post-commit errors cannot masquerade as failed creation. No shared rules, financial data, role grant or LIVE mutation.",
+      "scope": "Catalog read errors no longer block built-in operational types; custom tenant type creation remains server-authorized. Ops management commits once with linked activity before optional Drive upload; failed attachments become pending, and post-commit errors cannot masquerade as failed creation. No shared rules, financial data, role grant or LIVE mutation. Postcommit failure callback reuses lexically bound management, preventing new ReferenceError during confirmed-write recovery.",
       "paths": [
         {
           "path": "orbit360-platform/core/ciclo.js",
-          "gitBlobSha": "dd6550160005b777db8a805f060000dd06577d9a",
+          "gitBlobSha": "8943761126ff66a878405ca5dd9f560f7be1aa49",
           "replaces": {
             "path": "orbit360-platform/core/ciclo.js",
             "priorGitBlobSha": "acc82d42a4c01accf0d0a553eb6e20a54ea2d8ed",
@@ -3902,7 +3902,7 @@
       "tests": [
         {
           "path": "tools/gravicentra-i6-6-management-default-and-client-country.test.cjs",
-          "gitBlobSha": "585c341816ceba357d6147eebfda7009568bb4a3",
+          "gitBlobSha": "efb08ea6128933b413c8bde38802bdaea87d4a66",
           "replaces": {
             "path": "tools/gravicentra-i6-6-management-default-and-client-country.test.cjs",
             "priorGitBlobSha": "97f722249010c79c07c103fa429ee317db0e5a04",

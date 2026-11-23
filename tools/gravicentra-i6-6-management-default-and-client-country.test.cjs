@@ -100,3 +100,13 @@ test('Management persists once before optional Drive and distinguishes postcommi
   assert.match(block,/actividadCliente360Confirmada/);
   assert.equal((block.match(/await crearGestionDurable\(/g)||[]).length,1,'no duplicate create transport');
 });
+ 
+test('postcommit failure path retains the same committed management variable',()=>{
+  const start=cycle.indexOf("    el('mg-save').addEventListener('click', async () => {");
+  const end=cycle.indexOf('    return back;',start);
+  const block=cycle.slice(start,end);
+  assert.ok(block.includes('let managementCommitted = false, gestion = null;'));
+  assert.ok(block.includes('gestion = await crearGestionDurable('));
+  assert.ok(!block.includes('let gestion = await crearGestionDurable('));
+  assert.ok(block.includes('opts.onCreated(savedGestion || gestion)'));
+});

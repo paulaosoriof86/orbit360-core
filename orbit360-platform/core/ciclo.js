@@ -1309,7 +1309,7 @@ Orbit.ciclo = (function () {
       if (invalidLink) return U.toast('Los enlaces documentales deben iniciar con https://');
 
       const managementId = 'ges' + Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
-      let managementCommitted = false;
+      let managementCommitted = false, gestion = null;
       const linkedDocs = linkLines.map((url, i) => ({
         nombre: 'Documento Drive ' + (i + 1),
         driveUrl: url, externalUrl: url, origen: 'Drive/enlace',
@@ -1334,7 +1334,7 @@ Orbit.ciclo = (function () {
           opts.extraFields && typeof opts.extraFields === 'object' ? opts.extraFields : {},
           typeof opts.dynamicFields === 'function' ? (opts.dynamicFields({ clienteId, polizaId, tipo, lista, nota: noteValue }) || {}) : {}
         );
-        let gestion = await crearGestionDurable(Object.assign({}, extra, {
+        gestion = await crearGestionDurable(Object.assign({}, extra, {
           id: managementId,
           lista, tipo, titulo: opts.titulo || tipo, clienteId, polizaId,
           asesorId: el('mg-ase').value || cli.asesorId || '',
