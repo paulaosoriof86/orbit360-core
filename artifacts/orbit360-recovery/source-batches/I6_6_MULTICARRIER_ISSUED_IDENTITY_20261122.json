@@ -24,7 +24,61 @@
           "grossCents": 66474
         }
       ],
-      "contractualGrossCents": 664737
+      "contractualGrossCents": 664737,
+      "issuedSchedule": [
+        {
+          "number": "995653882",
+          "due": "2026-10-28",
+          "grossCents": 66474
+        },
+        {
+          "number": "995653883",
+          "due": "2026-11-28",
+          "grossCents": 66474
+        },
+        {
+          "number": "995653884",
+          "due": "2026-12-28",
+          "grossCents": 66474
+        },
+        {
+          "number": "995653885",
+          "due": "2027-01-28",
+          "grossCents": 66474
+        },
+        {
+          "number": "995653886",
+          "due": "2027-02-28",
+          "grossCents": 66474
+        },
+        {
+          "number": "995653887",
+          "due": "2027-03-31",
+          "grossCents": 66474
+        },
+        {
+          "number": "995653888",
+          "due": "2027-04-30",
+          "grossCents": 66474
+        },
+        {
+          "number": "995653889",
+          "due": "2027-05-31",
+          "grossCents": 66474
+        },
+        {
+          "number": "995653890",
+          "due": "2027-06-30",
+          "grossCents": 66474
+        },
+        {
+          "number": "995653891",
+          "due": "2027-07-31",
+          "grossCents": 66471
+        }
+      ],
+      "plateWitness": "541bd40d413588c60d3744795d24fb2eb93ba5ba26bd04f26897be2a30c7b2e9",
+      "chassisWitness": "8033286efc251bcd7ed3dfa6fba5ab27d66f855a4221678a9bee914fec20a87c"
     },
     {
       "insurer": "G&T",

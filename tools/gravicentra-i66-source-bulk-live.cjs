@@ -131,6 +131,51 @@ function issuedMulticarrierReadback(groups, rows, outcome){
   });
 }
 
+// An edition may have been renewed to a different policy number. Follow both
+// directions of the relationship and compare the insurer's risk before any CAS.
+async function readIssuedSuccessorLinks(db,groups){
+  const issued=require('../artifacts/orbit360-recovery/source-batches/I6_6_MULTICARRIER_ISSUED_IDENTITY_20261122.json').documents.filter(c=>c.issuedSchedule);
+  const normalize=v=>str(v).normalize('NFD').toUpperCase().replace(/[^A-Z0-9]/g,'');
+  const rows=[];
+  for(const c of issued){
+    const matches=(v,expected)=>Boolean(v)&&sha(c.pdfSha256+'|'+normalize(v))===expected;
+    const candidates=groups.filter(g=>g.clientExists&&g.insurerVerified&&/G\s*(?:&|Y)\s*T/i.test(g.insurerName)&&
+      sameInsurerPolicyNumber(g.policy.numero,c.policy,c.insurer)&&g.policy.vigenciaFin===c.termStart&&
+      g.holderNames.some(n=>matches(n,c.holderWitness)));
+    if(candidates.length!==1){rows.push({policy:c.policy,verifiedPriorCount:candidates.length});continue;}
+    const p=candidates[0].policy,policies=internal('polizas',db);
+    const [byLink,byClient,risks,pointer]=await Promise.all([
+      policies.where('renuevaDe','==',p.id).limit(31).get(),
+      policies.where('clienteId','==',p.clienteId).limit(161).get(),
+      internal('vehiculos',db).where('polizaId','==',p.id).limit(51).get(),
+      p.renovadaPor?policies.doc(str(p.renovadaPor)).get():Promise.resolve(null)]);
+    if(byLink.size>30||byClient.size>160||risks.size>50){
+      rows.push({policy:c.policy,hold:'SUCCESSOR_QUERY_BOUNDS'});continue;
+    }
+    const sameTerm=byClient.docs.filter(d=>d.get('aseguradoraId')===p.aseguradoraId&&
+      d.get('vigenciaInicio')===c.termStart&&d.get('vigenciaFin')===c.termEnd);
+    const insurerRefs=c.issuedSchedule.map(r=>r.number), alternate=new Set();
+    for(const collection of ['recibosEsperados','carteraPrimas','cobros']){
+      for(const field of [...new Set(sourceAliases.concat('numeroRecibo'))]){
+        const refs=insurerRefs.flatMap(n=>[n,Number(n)]);
+        const found=await internal(collection,db).where(field,'in',refs).select('polizaId').limit(45).get();
+        for(const d of found.docs)alternate.add(collection+'/'+d.id);
+        if(found.size===45)alternate.add('READ_BOUNDARY');
+      }
+    }
+    const fields=(d,keys)=>keys.map(k=>d.get(k)).filter(Boolean);
+    rows.push({policy:c.policy,verifiedPriorCount:1,priorState:str(p.estado),priorPointsToSuccessor:Boolean(p.renovadaPor),
+      pointerTargetExists:pointer?pointer.exists:false,pointerTargetSameHolder:pointer?.exists&&pointer.get('clienteId')===p.clienteId||false,
+      pointerTargetSameTerm:pointer?.exists&&pointer.get('vigenciaInicio')===c.termStart&&pointer.get('vigenciaFin')===c.termEnd||false,
+      policiesWithPreviousLink:byLink.size,otherSameHolderInsurerExactTerm:sameTerm.length,
+      advisorOnPrior:Boolean(p.asesorId),earlierLinkedRisks:risks.size,
+      earlierVerifiedPlate:risks.docs.filter(d=>fields(d,['placa','placaFuente']).some(v=>matches(v,c.plateWitness))).length,
+      earlierVerifiedChassis:risks.docs.filter(d=>fields(d,['vin','chasis','chasisFuente']).some(v=>matches(v,c.chassisWitness))).length,
+      existingDocsUsingIssuedNumbers:alternate.size,anyDuplicateQueryTruncated:alternate.has('READ_BOUNDARY'),writes:0});
+  }
+  return rows;
+}
+
 async function main(){
   const mode=str(process.env.GI_I66_BULK_MODE);
   assert.ok(['preflight','apply'].includes(mode),'I66_BULK_MODE_MUST_BE_EXPLICIT');
@@ -148,6 +193,7 @@ async function main(){
     console.log('I66_ROBLE_FIVE_49_ISSUED_EDITION_CROSSWALK='+JSON.stringify(five));
     const plan=planSourceBatch(source.data.rows,groups,{chunkSize:250});
     console.log('I66_MULTICARRIER_ISSUED_FIRESTORE_READBACK='+JSON.stringify(issuedMulticarrierReadback(groups,source.data.rows,plan)));
+    console.log('I66_ISSUED_PREDECESSOR_SUCCESSOR_LINKS='+JSON.stringify(await readIssuedSuccessorLinks(db,groups)));
     const exceptionCodes={};
     for(const row of plan.exceptions)exceptionCodes[row.code]=(exceptionCodes[row.code]||0)+1;
     const diagnostic={sourcePolicyNumbers:new Set(source.data.rows.map(r=>str(r.policy))).size,
