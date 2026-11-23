@@ -1,0 +1,94 @@
+{
+  "schema": "GRAVICENTRA_I66_MONDAY_PREVIEW_MAKE_CONTINUITY_RECEIPT_V1",
+  "recordType": "APPEND_ONLY_OPERATIONAL_EVIDENCE_NOT_CONTROL_PLANE_OR_LIVE_ACCEPTANCE",
+  "dateLocalGuatemala": "2026-11-23",
+  "gate": "I6.6",
+  "authority": {
+    "controlPlane": "artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json",
+    "branch": "recovery/fase-a-clean-20260831",
+    "previousR11": "artifacts/orbit360-recovery/release-control/I6_6_MONDAY_WORK_CONTINUITY_20261123_R11.json"
+  },
+  "immutablePreview": {
+    "sourceSha": "82af5ca6466db2955b29d61218d11c1b34674a58",
+    "buildId": "gi-i66-82af5ca6466d-57f234755dc1",
+    "buildRunId": 45189363251,
+    "buildConclusion": "success",
+    "artifactId": 14824703889,
+    "artifactArchiveDigest": "sha256:ab8bbe279be670e12bc700d88a1c67794cc2e787bde4530ca4bde867c0fac66b",
+    "previewOrigin": "https://ays-orbit-360-lab--gi-i66-rc-45189363251-ml6nr9i9.web.app",
+    "previewChannel": "gi-i66-rc-45189363251",
+    "immutablePackageJob": "SUCCESS",
+    "hostingDeploy": "SUCCESS",
+    "hostedReadback": "SUCCESS",
+    "markerReadback": "gi-i66-82af5ca6466d-57f234755dc1",
+    "frontendAndBackendIncluded": true,
+    "backendDeployment": false,
+    "signedBackendPreviewTest": "NOT_RUN",
+    "carlosManagementCreateDurableActivityReload": "HOLD_NOT_CERTIFIED",
+    "optionalDriveDocumentRoundtrip": "HOLD_NOT_CERTIFIED",
+    "sameArtifactLIVEPromotion": false,
+    "productionWrites": 0
+  },
+  "livePreserved": {
+    "origins": [
+      "https://app.aysseguros.com",
+      "https://ays-orbit-360-lab.web.app"
+    ],
+    "sourceSha": "15e849bd606bd8c93e4c0471da1193e85004aecd",
+    "buildId": "gi-i66-15e849bd606b-57f234755dc1",
+    "sourceArtifactId": 14777966155,
+    "markerRecheckedBothOrigins": true,
+    "changedByThisWork": false
+  },
+  "make": {
+    "teamId": 1975919,
+    "scenarioId": 10196136,
+    "scenarioLink": "https://eu2.make.com/1975919/scenarios/10196136",
+    "status": "ACTIVE_READ_ONLY",
+    "greenApiConnectionId": 14749710,
+    "messagesQuery": "green-api:LastIncomingMessages module 1",
+    "sourceDetailQuery": "green-api:getMessage module 2",
+    "filter": "personal @c.us + nonempty idMessage",
+    "groupChatsNotPassed": true,
+    "latestTriggeredReadRunId": "abb143b252654495881860de9b341fe4",
+    "latestTriggeredReadConclusion": "success",
+    "last24HourSample": "no incoming messages returned by module; no advertisement-attributed messages observed",
+    "pollingMinutesRestored": 15,
+    "inboundAdLeadCanonicalWriter": "NOT_IMPLEMENTED",
+    "realLeadsCreated": 0,
+    "personalChatsImported": 0,
+    "qaWebhookScenarioId": 10195867,
+    "qaWebhookStatus": "INACTIVE_NO_WRITER",
+    "cloudFirestoreConnectionRequestId": "e0e9cb34-79e0-4488-8b0a-85f4352c30c5",
+    "cloudFirestoreConnectionState": "PENDING_OWNER_OAUTH",
+    "mustNotUseSeparateTyAInstance": true,
+    "requiresBeforeRealWrites": [
+      "actual sourceType=ad and sourceId or ctwaClid",
+      "canonical authenticated server-owned business writer",
+      "tenant GT member and actor audit",
+      "idempotent message+source+phone identity",
+      "private-chat suppression",
+      "replay duplicate negative tests",
+      "readback as single linked lead"
+    ]
+  },
+  "finance": {
+    "previouslyRecordedSummary": "185 matched out of 302, 117 held, including 97 policy editions and 20 receipt identities",
+    "ownerDecisionsRerequestForbidden": [
+      "Ficohsa 7317082 payment attested",
+      "Roble 5838167 Q0.04 tolerance",
+      "Roble D01-D03 issued source precedence and inference",
+      "Drive intentional shared workflow"
+    ],
+    "paymentsByCarlosRole": "SIGNED_LIVE_SYNTHETIC_APPLY_AND_RECONCILE_DEDUPE_PASS_ONLY",
+    "realOneStepInvoiceAndSupportUpload": "NOT_CERTIFIED",
+    "role": "OPERATIVO_CAN_MANAGE_WITH_EFFECTIVE_COUNTRY_AND_INDIVIDUAL_GRANTS_NO_ROUTINE_DIRECTION_APPROVAL",
+    "newFinancialWritesThisReceipt": 0
+  },
+  "releaseNext": "Existing I6.6 backend Preview controlled candidate with exact immutable backend bytes; signed Carlos Operativo UI management from Ops and Cliente360, atomic activity/readback/reload, country+role negatives, real Drive fixture upload/download and cleanup; only then same artifact LIVE promotion and module-by-module post-deploy verification.",
+  "noNewIteration": true,
+  "noBranchChange": true,
+  "noRealtimeLiveAcceptance": false,
+  "canClaimFullI66PASS": false,
+  "warning": "GitHub SUCCESS of immutable-package does not imply authenticated backend Preview or LIVE write acceptance."
+}
