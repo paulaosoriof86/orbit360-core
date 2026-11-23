@@ -333,6 +333,10 @@ jobs:
           const p=JSON.parse(fs.readFileSync(path,'utf8'));
           const g=require('./tools/gravicentra-i6-6-operational-release-candidate.cjs');
           const candidate=g.candidateForPhase(require('./'+g.CONTROL),'live');
+          // Preserve the sealed legacy three-function/223-file assertion, plus
+          // the current composite four-function/224-file bounded acceptance.
+          if(candidate.opsLeadsComposite!==true&&(p.previewFiles!==223||p.liveSiteFiles!==223||p.customSiteFiles!==223))
+            throw Error('I66_HISTORICAL_THREE_FUNCTION_223_FILE_COUNT_DRIFT');
           if(p.liveSiteFiles!==candidate.expectedSiteFileCount||p.customSiteFiles!==candidate.expectedSiteFileCount||
              p.previewFiles!==candidate.expectedSiteFileCount||p.liveHostingVersion!==p.previewHostingVersion)
             throw Error('I66_OPERATIONAL_LIVE_PROOF_INCOMPLETE');

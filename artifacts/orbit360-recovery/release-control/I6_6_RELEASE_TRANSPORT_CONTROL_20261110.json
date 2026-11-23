@@ -4738,7 +4738,7 @@
     "liveCloneRunId": 45088457923
   },
   "frontendPreviewRequest": {
-    "version": 7,
+    "version": 8,
     "mode": "COMPOSITE_ARTIFACT_HOSTING_PREVIEW_ONLY",
     "sourceQaHead": "196e3cdbae5a02792f19acc3cacd37621836c02f",
     "manifestBlob": "5fce7ef65c7d418815cbe0abea67aef8cbce6e30",
@@ -4765,7 +4765,7 @@
     "immutableArtifactMustCoverBothFrontendAndBackend": true,
     "ownerInstruction": "23-Nov Dirección: publish only current approved cumulative source after signed Preview and exact SAME digest; never deploy backend LIVE or production writes from this request.",
     "scope": "I6.6 only: build one exact frontend+backend artifact; publish Hosting Preview only, then separately authorize scoped backend Preview tests. No LIVE.",
-    "reason": "V7 corrects composite QA fixture buildId before immutable build; prior V5/V6 rejected pre-deploy, no LIVE change, exact backend and four functions unchanged",
+    "reason": "V8: retain historical 223-byte readback invariant in addition to new composite 224-byte gate, no deployment or financial writes in V5–V7.",
     "opsLeadsPreviewFunction": "orbit360OpsLeadsCommandPreview",
     "opsLeadsLiveFunction": "orbit360OpsLeadsCommand",
     "fourFunctionExactPreviewRequired": true,
