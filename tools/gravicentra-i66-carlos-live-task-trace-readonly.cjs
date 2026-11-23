@@ -88,6 +88,20 @@ async function issuedSubstitutionReadback(root) {
   }
   return {sourcePdfSha256:'14c5a6209463713fea26a6ca35316276211382ee3b93a63a2d017d3285d7e031',issuerEndorsement:'199154',editions:reports, writes:0};
 }
+async function readDocumentaryFixture(root){
+  const items=root.collection('data').doc('negocios').collection('items');
+  const matches=await items.where('nombre','==','Prueba documental Ops/Leads (no operativa)').limit(81).get();
+  assert.ok(matches.size<81,'I66_CARLOS_DOCUMENTARY_FIXTURE_BOUND');
+  const found=matches.docs.filter(d=>/^b4003qa_user_[a-z0-9_]+$/.test(d.id)&&
+    d.createTime.toMillis()>=Date.parse('2026-11-23T01:49:00Z')&&d.createTime.toMillis()<Date.parse('2026-11-23T02:20:00Z'));
+  return found.map(d=>{
+    const row=d.data(),comments=Array.isArray(row.comentarios)?row.comentarios:[];
+    return {fixtureId:d.id,createdUtc:d.createTime.toDate().toISOString(),lastUpdatedUtc:d.updateTime.toDate().toISOString(),
+      tenantScoped:true,previewWrite:row.previewWrite===true,country:row.pais,archived:row.archivado===true||row.eliminado===true,
+      linkedToCustomer:Boolean(row.clienteId||row.polizaId),commentCount:comments.length,
+      recoverableAttachmentRefs:comments.filter(x=>x&&x.attachment&&typeof x.attachment.documentRef==='string'&&x.attachment.documentRef).length};
+  });
+}
 async function main(){
   assert.equal(process.env.GCLOUD_PROJECT,PROJECT);
   assert.equal(process.env.GI_I66_CARLOS_TRACE_MODE,'readonly');
@@ -98,6 +112,7 @@ async function main(){
   assert.ok(service,'I66_CARLOS_TASK_SERVICE_IDENTITY_HOLD');
   admin.initializeApp({credential:admin.credential.cert(service),projectId:PROJECT});
   const root=admin.firestore().collection('tenants').doc(TENANT);
+  console.log('I66_OPS_DOCUMENTARY_FIXTURE_READBACK='+JSON.stringify(await readDocumentaryFixture(root)));
   const [members,advisors,allTasks]=await Promise.all([
     root.collection('members').limit(150).get(),col(root,'asesores').limit(400).get(),
     col(root,'tareas').limit(750).get()
