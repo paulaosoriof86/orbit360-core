@@ -1,0 +1,104 @@
+{
+  "schema": "GRAVICENTRA_I66_OPS_SOURCE_QA_HANDOFF_R10",
+  "recordType": "SUBORDINATE_EVIDENCE_NOT_CONTROL_PLANE_NOT_PREVIEW_PASS_NOT_LIVE_PASS",
+  "dateGuatemala": "2026-11-22",
+  "activeGate": "I6.6",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "predecessorR9": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_EXECUTION_PROGRESS_20261122_R9.json",
+  "sourceCorrection": {
+    "commit": "03064eadfa9ea021d26ba12013e36843429abb90",
+    "parentCommittedHead": "4bf1cc432efe9844cf6251593a42f55c30662fe4",
+    "owner": "orbit360-platform/core/ciclo.js",
+    "ownerBlobSha": "dd6550160005b777db8a805f060000dd06577d9a",
+    "test": "tools/gravicentra-i6-6-management-default-and-client-country.test.cjs",
+    "testBlobSha": "585c341816ceba357d6147eebfda7009568bb4a3",
+    "approvedDeltaManifest": "artifacts/orbit360-recovery/release-control/I6_6_APPROVED_PRODUCT_DELTA_MANIFEST_20261110.json",
+    "approvedDeltaManifestBlobSha": "2d120a23c4ef4bff18dd5a4c03d788dad9e1c807",
+    "behavior": [
+      "Standard operational management creation no longer requires privileged catalog read when built-in defaults are available; custom types still require canonical durable configuration writer.",
+      "Server-confirmed management plus linked client activity is committed before optional document uploads.",
+      "Per-file Drive upload exceptions are captured as nonconfirmed optional documents; postcommit faults cannot misreport an already-created management as not created or encourage duplicate submission."
+    ],
+    "productionChange": false,
+    "previewArtifactBuilt": false,
+    "realDataWrites": 0
+  },
+  "sourceQa": {
+    "status": "PASS_SOURCE_ONLY",
+    "runs": [
+      {
+        "id": 45105612333,
+        "name": "Gravicentra I6.6 Transversal Performance Source QA",
+        "conclusion": "success"
+      },
+      {
+        "id": 45105612287,
+        "name": "Gravicentra I6.6 Privileged Operational Role Parity Source QA",
+        "conclusion": "success"
+      },
+      {
+        "id": 45105612255,
+        "name": "Gravicentra I6.6 Advisor Payment Ops Notification Emulator QA",
+        "conclusion": "success"
+      },
+      {
+        "id": 45105612258,
+        "name": "Gravicentra I6.6 Build Immutable Release Package",
+        "conclusion": "success",
+        "interpretation": "Gate job success only; immutable-package job skipped. No release artifact produced."
+      },
+      {
+        "id": 45105612275,
+        "name": "Gravicentra Control Plane Guard v5",
+        "conclusion": "success"
+      }
+    ],
+    "historicalB4005": {
+      "run": 45105612269,
+      "conclusion": "failure",
+      "interpretation": "Legacy historical B4-005 validation of different frozen source; not current I6.6 gate."
+    }
+  },
+  "attachmentFixture": {
+    "nonpassReceipt": "artifacts/orbit360-recovery/release-control/I6_6_OPS_DOCUMENT_FIXTURE_NONPASS_20261122.json",
+    "greenWrapperRun": 45098835994,
+    "realOutcome": "savedClick false; no network, no documentRef",
+    "failClosedRun": 45099404657,
+    "failClosedOutcome": "failure correctly because original synthetic fixture had been cleaned (alreadyAbsent true)",
+    "next": "Create brand-new isolated authorized synthetic fixture via real UI, click #ng-com-add, verify upload/finalize, documentRef, reload/open/download checksum and cleanup; never force click, never reuse removed record."
+  },
+  "businessContinuity": {
+    "gyt": "I6_6_GYT_519815_MINIFREEZE_20261122.json",
+    "gytIssuedRenewal": "10/10 requirements and 10 receipts, 0 cash; does not certify Renovar en firme UI",
+    "financialSnapshot": {
+      "rows": 302,
+      "unchanged": 185,
+      "held": 117,
+      "missingExactEdition": 97,
+      "receiptIdentityHolds": 20,
+      "eligibleFurtherWrites": 0
+    },
+    "reportedExistingCustomerWritesThisR10": 0
+  },
+  "releaseBoundary": {
+    "currentFormalGate": "I6.6",
+    "latestFrozenMiniGate": "I6.5",
+    "i6FormalClosed": 6,
+    "i6FormalTotal": 10,
+    "sourceStatus": "SOURCE_PASS_PENDING_EXACT_IMMUTABLE_PREVIEW_SIGNED_ROLE_COUNTRY_UAT",
+    "previewStatus": "HOLD_NOT_TESTED_FOR_NEW_SOURCE",
+    "liveStatus": "HOLD_NOT_PUBLISHED",
+    "noProductionDeploy": true,
+    "noRoleGrants": true,
+    "noReimport": true
+  },
+  "nextControls": [
+    "Build exact candidate from current approved source and verify composition and signed isolated Preview.",
+    "Carlos Operativo create standard management from Ops and Cliente360 GT/CO; Firestore canonical commit, exactly one linked activity, same IDs after reload, role/country visibility.",
+    "Synthetic document upload/save/reload/download/hash/cleanup; must fail workflow on any missing step.",
+    "Acceptance by Dirección of exact Preview; promote same artifact/digest only after required gates; LIVE role/viewport/write readback and audit.",
+    "Keep 117 financial cases local HOLD until documented edition/receipt identity resolution; do not replay paid rows or stage next gate."
+  ],
+  "note": "Preserve R9 and prior accepted LIVE release identity; no PASS inferred from a green CI or a source fix."
+}
