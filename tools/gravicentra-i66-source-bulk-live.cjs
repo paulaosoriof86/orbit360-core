@@ -6,7 +6,7 @@ const fs=require('node:fs');
 const path=require('node:path');
 const crypto=require('node:crypto');
 const assert=require('node:assert/strict');
-const {planSourceBatch,canonicalPolicyNumber,policyKeys}=require('./gravicentra-i66-source-bulk-plan.cjs');
+const {planSourceBatch,canonicalPolicyNumber,policyKeys,sameInsurerPolicyNumber,sourceAliases}=require('./gravicentra-i66-source-bulk-plan.cjs');
 const {applyProtectedBatch}=require('./gravicentra-i66-source-bulk-apply.cjs');
 const BASE=path.resolve(__dirname,'../artifacts/orbit360-recovery/source-batches');
 const INTAKE=require('../artifacts/orbit360-recovery/release-control/I6_6_COBROS_CONCILIACION_SOURCE_INTAKE_20261110.json');
@@ -59,6 +59,7 @@ async function readGroups(db,rawRows){
           internal('cobros',db).where('polizaId','==',p.id).limit(121).get()]);
         if([receipts,portfolio,cobros].some(x=>x.size>120))throw Error('I66_POLICY_FINANCIAL_QUERY_UNBOUNDED');
         current.push({policy:p,clientExists:client.exists,
+          holderNames:client.exists?[client.get('nombre'),client.get('nombreCompleto'),client.get('razonSocial')].filter(Boolean):[],
           insurerVerified:insurer.exists&&String(p.aseguradoraId||'')!==''&&
             insurer.data()?.activo!==false,
           insurerName:insurer.exists?str(insurer.data().nombre||insurer.data().razonSocial):'',
@@ -97,6 +98,39 @@ function issuedTermReadback(groups) {
       matchesWithOnePortfolio:receiptMatches.filter(({g,r})=>g.portfolio.filter(c=>c.reciboId===r.id&&c.carteraActiva!==false).length===1).length};
   });
 }
+// Cross-check separately issued terms on the same bounded snapshot used by the
+// bulk planner. No private names or unapproved mutations leave this function.
+function issuedMulticarrierReadback(groups, rows, outcome){
+  const docs=require('../artifacts/orbit360-recovery/source-batches/I6_6_MULTICARRIER_ISSUED_IDENTITY_20261122.json').documents;
+  const norm=v=>str(v).normalize('NFD').toUpperCase().replace(/[^A-Z0-9]/g,'');
+  return docs.filter(d=>rows.some(r=>r.insurer===d.insurer&&r.policy===d.policy)).map(d=>{
+    const aliases=groups.filter(g=>sameInsurerPolicyNumber(g.policy.numero,d.policy,d.insurer)&&
+      g.clientExists&&g.insurerVerified&&(d.insurer==='G&T'?/G\s*(?:&|Y)\s*T/i.test(g.insurerName):norm(g.insurerName).includes(norm(d.insurer))));
+    const holderMatches=g=>g.holderNames.some(n=>sha(d.pdfSha256+'|'+norm(n))===d.holderWitness);
+    const exact=aliases.filter(g=>g.policy.vigenciaInicio===d.termStart&&g.policy.vigenciaFin===d.termEnd);
+    const prior=aliases.filter(g=>g.policy.vigenciaFin===d.termStart&&holderMatches(g));
+    const obligations=d.matchingStatementRequirements.map(req=>{
+      const source=rows.filter(r=>r.insurer===d.insurer&&r.policy===d.policy&&
+        r.requirement===req.number&&r.due===req.due&&r.grossCents===req.grossCents);
+      assert.equal(source.length,1,'ISSUED_REQUIREMENT_STATEMENT_DRIFT');
+      const matching=exact.filter(holderMatches).flatMap(g=>g.receipts.filter(r=>
+        sourceAliases.concat('numeroRecibo').some(f=>str(r[f])===req.number)).map(r=>({
+          sameDate:str(r.fechaVencimientoContractual||r.vence||r.fechaVencimiento)===req.due,
+          sameGross:Math.round(Number(r.primaTotal)*100)===req.grossCents,
+          portfolio:g.portfolio.filter(c=>c.reciboId===r.id&&c.carteraActiva!==false).length
+        })));
+      return {number:req.number,matchedReceiptCount:matching.length,matches:matching,
+        bulkOutcome:outcome.exceptions.find(e=>e.caseId===source[0].caseId)?.code||
+          (outcome.unchanged.some(e=>e.caseId===source[0].caseId)?'UNCHANGED':'CHECK_ELIGIBLE_PLAN')};
+    });
+    return {insurer:d.insurer,policy:d.policy,termStart:d.termStart,termEnd:d.termEnd,
+      matchingNumberEditions:aliases.length,exactTermEditions:exact.length,
+      exactTermVerifiedHolder:exact.filter(holderMatches).length,priorTermVerifiedHolder:prior.length,
+      exactTermState:exact.map(g=>String(g.policy.estado||'').slice(0,32)),
+      receiptsOnExactTerm:exact.map(g=>g.receipts.length),obligations,writes:0};
+  });
+}
+
 async function main(){
   const mode=str(process.env.GI_I66_BULK_MODE);
   assert.ok(['preflight','apply'].includes(mode),'I66_BULK_MODE_MUST_BE_EXPLICIT');
@@ -113,6 +147,7 @@ async function main(){
     const five=await require('./gravicentra-i66-roble-five-issuer-crosswalk-readonly.cjs').crosswalk(name=>internal(name,db));
     console.log('I66_ROBLE_FIVE_49_ISSUED_EDITION_CROSSWALK='+JSON.stringify(five));
     const plan=planSourceBatch(source.data.rows,groups,{chunkSize:250});
+    console.log('I66_MULTICARRIER_ISSUED_FIRESTORE_READBACK='+JSON.stringify(issuedMulticarrierReadback(groups,source.data.rows,plan)));
     const exceptionCodes={};
     for(const row of plan.exceptions)exceptionCodes[row.code]=(exceptionCodes[row.code]||0)+1;
     const diagnostic={sourcePolicyNumbers:new Set(source.data.rows.map(r=>str(r.policy))).size,
@@ -128,8 +163,8 @@ async function main(){
     const policyDiagnostics=[...affectedNumbers].map(number=>({
       policyNumber:number,
       sourceRows:source.data.rows.filter(r=>str(r.policy)===number).length,
-      editions:groups.filter(g=>canonicalPolicyNumber(g.policy.numero)===
-        canonicalPolicyNumber(number)).map(g=>({
+      editions:groups.filter(g=>source.data.rows.some(r=>str(r.policy)===number&&
+        sameInsurerPolicyNumber(g.policy.numero,number,r.insurer))).map(g=>({
         id:g.policy.id,pais:g.policy.pais,moneda:g.policy.moneda,
         insurer:g.insurerName,clientExists:g.clientExists,
         insurerVerified:g.insurerVerified,estado:g.policy.estado,

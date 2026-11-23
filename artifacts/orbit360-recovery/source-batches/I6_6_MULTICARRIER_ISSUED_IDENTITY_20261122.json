@@ -1,0 +1,98 @@
+{
+  "schema": "GI_I66_MULTICARRIER_SOURCE_IDENTITY_V1",
+  "parentManifestBlob": "ab64e111319e3447733a3af05bf378250698ccdb",
+  "documents": [
+    {
+      "insurer": "G&T",
+      "policy": "519815",
+      "termStart": "2026-10-28",
+      "termEnd": "2027-10-28",
+      "driveFileId": "1mZdJj9Ft7nrW87Jf7Od4bMpb-1SamjJR",
+      "pdfSha256": "3c64e84f1893313bf30fa64dbb2c3f1960637678089f8bfbdd5e878a7606faa9",
+      "bytes": 1151910,
+      "identityLabel": "asegurado",
+      "holderWitness": "1f32c8637d6966e193c70fafbdd71e5da75052bf1fdc3ce8cf6ae84839a5bd0d",
+      "matchingStatementRequirements": [
+        {
+          "number": "995653882",
+          "due": "2026-10-28",
+          "grossCents": 66474
+        },
+        {
+          "number": "995653883",
+          "due": "2026-11-28",
+          "grossCents": 66474
+        }
+      ],
+      "contractualGrossCents": 664737
+    },
+    {
+      "insurer": "G&T",
+      "policy": "519815",
+      "termStart": "2025-10-28",
+      "termEnd": "2026-10-28",
+      "driveFileId": "1nv9XLadaH3EzetU2JUUW9BwZYSnaC9KA",
+      "pdfSha256": "1201cee7edce1736df7c2173a3c32dc7386ce9473b2abb0ceef0ecdf19f0f1ab",
+      "bytes": 609952,
+      "identityLabel": "asegurado",
+      "holderWitness": "bb1127741719773c91150187cd49415223bcdacef6bb969030a6c7fc0ba23025",
+      "matchingStatementRequirements": []
+    },
+    {
+      "insurer": "G&T",
+      "policy": "492287",
+      "termStart": "2026-08-06",
+      "termEnd": "2027-08-06",
+      "driveFileId": "1QJfbs5J4SSi4HRAePHi2VrGbQhhUxeEe",
+      "pdfSha256": "78e51476ce0f25ce311aaec06d0b8e21ce326cee3a1ba51975f7e60d507ef606",
+      "bytes": 1145323,
+      "identityLabel": "asegurado",
+      "holderWitness": "4e25afa8ee92793b4c03c83d9d8bc4c411972e6b755b0c2b30fec74d9bd8f577",
+      "matchingStatementRequirements": []
+    },
+    {
+      "insurer": "FICOHSA",
+      "policy": "AUTO-1000000181",
+      "termStart": "2026-09-22",
+      "termEnd": "2027-09-22",
+      "driveFileId": "1F0ttLoucLCRVD4flwKTrl62koQxRcm7r",
+      "pdfSha256": "40fde72b122f0d58c21618558258eeaf600eaf409d26127843ec208ece3b89c2",
+      "bytes": 306036,
+      "identityLabel": "contratante",
+      "holderWitness": "120afb63347a335ea4c1833483d171b1ca36646026a3a1dfde9ab9c68a0ebeb7",
+      "matchingStatementRequirements": []
+    },
+    {
+      "insurer": "FICOHSA",
+      "policy": "AUTO-1000000334",
+      "termStart": "2025-10-02",
+      "termEnd": "2026-10-02",
+      "driveFileId": "1g7H_QF4__a1riCRBBw--ZEr6zqwYCUpb",
+      "pdfSha256": "a8078412c5bebf5f55184ff8c95b2a2f5ca773702eb14450f9c5d7ca457bd97d",
+      "bytes": 315508,
+      "identityLabel": "contratante",
+      "holderWitness": "7b6af8552f301863921fbd647cbd69ed452d14fdaff96b96644919c38c46a310",
+      "matchingStatementRequirements": []
+    },
+    {
+      "insurer": "FICOHSA",
+      "policy": "AUTO-1000002937",
+      "termStart": "2026-02-13",
+      "termEnd": "2027-02-13",
+      "driveFileId": "1URQOdQrnZZmeDgR8b6_g3jMfQ1akvugG",
+      "pdfSha256": "d5e806b91f2aaaf8f10e9b282eabfc0d9afa15ea1f5ac77b5902b8a47de960fb",
+      "bytes": 227672,
+      "identityLabel": "contratante",
+      "holderWitness": "a357f6490f25a0297e6b09e329600edf4a2c48764f4009ff64423611bf074af3",
+      "matchingStatementRequirements": []
+    }
+  ],
+  "additionalEvidence": [
+    {
+      "role": "Ficohsa fraccionamiento y requerimientos, sin referencia exacta 7301819",
+      "sha256": "d7aafd5ec883603beec6a7c04eb1336850a4f1fa9da67b6a5cbae418b691323d",
+      "driveFileId": "1X6dRjSVpbJaBnu5rVVlNpxqx6T2j_S_H"
+    }
+  ],
+  "authority": "Read-only documentary crosswalk. A matching policy document alone does not authorize a payment or a successor."
+}
