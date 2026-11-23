@@ -1,5 +1,5 @@
 {
-  "phase": "VERIFIED",
+  "phase": "ROLLED_BACK",
   "key": "170b7b9df2fb743d29e6d3e96c797b73de769919ec311b9c3834f6dbbb83e521",
   "generation": 1,
   "request": {
@@ -61,5 +61,15 @@
     "artifactDigest": "sha256:78a409a419e21648f2e074b49767d1dd55731140f8a83f6064b3ae1c8073b453",
     "hostingVersion": "sites/ays-orbit-360-lab/versions/e4e8f31b02ba2aef",
     "manifestDigest": "sha256:0882c7191e68ce09ff496637a57e9f37bbe8efee1774da6a33be53e04f6522b4"
-  }
+  },
+  "rollback": {
+    "firebase": 224,
+    "custom": 224,
+    "sourceSha": "f1eb5bc6397f0b159079be516a521dd7b1e5d9ba",
+    "buildId": "gi-i66-f1eb5bc6397f-57f234755dc1",
+    "artifactDigest": "sha256:e55fcc674a6cc493cdedff27672d082222db3dd7134354559788364b6ae23713",
+    "hostingVersion": "sites/ays-orbit-360-lab/versions/7a0d829d3504c9f8",
+    "manifestDigest": "sha256:ee2dfddad8c2b1e2553be7f1a108e2094cc5f65c68104d6fd1ef2c0ee5338b98"
+  },
+  "reason": "Command failed: /opt/hostedtoolcache/node/22.23.5/x64/bin/node tools/gravicentra-governance-prefligh"
 }
