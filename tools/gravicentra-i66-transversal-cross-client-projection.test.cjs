@@ -118,3 +118,18 @@ test('All canonical Ops create_management records create one server-owned Client
  assert.match(server,/gestionId:entityId,origen:'ops'/);
 });
 test.todo('I6.6 pending lineage: portal_request must reuse the same durable activity and readback contract for any client');
+
+test('LIVE availability guard follows the current release pointer and exact signed digest, never a historical alias',()=>{
+ const guard=source('.github/workflows/gravicentra-release-lock-sync.yml');
+ const cp=JSON.parse(source('artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json'));
+ const tr=JSON.parse(source('artifacts/orbit360-recovery/release-control/I6_6_RELEASE_TRANSPORT_CONTROL_20261110.json'));
+ const key=cp.currentExecutionDecisionPointer,live=cp[key],transport=tr.currentPhysicalHostingRelease;
+ assert.ok(key&&key.startsWith('i66')&&live,'active Control Plane pointer is mandatory');
+ assert.match(guard,/latest_key=cp.get\('currentExecutionDecisionPointer'\)/);
+ assert.match(guard,/signed_matches=/);
+ assert.doesNotMatch(guard,/latest=cp.get\('i66LatestPhysicalFrontendLive20261120'\)/);
+ assert.equal(live.sourceSha,transport.sourceSha);
+ assert.equal(live.buildId,transport.buildId);
+ assert.equal(live.artifactDigest,transport.artifactDigest);
+ assert.equal(live.hostedFilesEachOrigin,224);
+});
