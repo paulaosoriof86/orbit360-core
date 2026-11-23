@@ -1,0 +1,49 @@
+{
+  "schema": "GI_I66_ROBLE_91_8323091_SOURCE_LOCATION_DATES_V1",
+  "dateGuatemala": "2026-11-23",
+  "gate": "I6.6",
+  "recordType": "DOCUMENT_LOCATION_FINDING_NO_PAYMENT_WRITE",
+  "policy": "91-8323091",
+  "insurer": "EL ROBLE",
+  "recentOriginal": {
+    "fileId": "1qmUypnZBwW4xyeKlINpk6U42vltZKk-W",
+    "title": "918323091353922.pdf",
+    "mimeType": "application/pdf",
+    "modifiedTime": "2026-09-14T19:49:57.000Z",
+    "term": {
+      "start": "2026-10-11",
+      "end": "2027-10-11"
+    },
+    "driveUrl": "https://drive.google.com/file/d/1qmUypnZBwW4xyeKlINpk6U42vltZKk-W/view?usp=drivesdk",
+    "issuerDocumentTextParsed": true,
+    "rawFileShaNotVerifiedHere": true
+  },
+  "predecessor": {
+    "fileId": "1N4KeYnhs0Tn0J6nMmxCLRgPPxFese_0u",
+    "title": "Póliza automóvil - El Roble - 91-8323091 - 2025-10-11 a 2026-10-11.pdf",
+    "term": {
+      "start": "2025-10-11",
+      "end": "2026-10-11"
+    },
+    "driveUrl": "https://drive.google.com/file/d/1N4KeYnhs0Tn0J6nMmxCLRgPPxFese_0u/view?usp=drivesdk"
+  },
+  "latestProtectedFirestoreCrosswalk": {
+    "runId": 45192733898,
+    "sourceRows": 12,
+    "sourceTotalCents": 331106,
+    "policyEditions": 3,
+    "exactEditionCount": 0,
+    "predecessorCount": 1,
+    "priorAdvisorCount": 1,
+    "vehicleCandidates": 2,
+    "strongCertificateMatches": 0,
+    "linkedOldRiskMatches": 0,
+    "oldRiskVinPresent": false,
+    "status": "POLICY_VEHICLE_CERTIFICATE_IDENTITY_NOT_UNIQUE"
+  },
+  "claimBoundary": "The located 2026-27 PDF is not a new server-confirmed edition and does not override the existing 20261122 source-witness raw SHA without an exact binary check; two risk candidates remain unresolved. No fake PASS or extra financial writes.",
+  "next": "Compare original PDF binary hash to pinned source witness, reconcile certified issuer certificate/plate/VIN against exact predecessor client and vehicle IDs and canonical 2026-27 holder; if unique, run existing protected CAS once with receipts+cartera and server readback; otherwise isolated HOLD.",
+  "financialWrites": 0,
+  "productWrites": 0,
+  "authChanges": 0
+}
