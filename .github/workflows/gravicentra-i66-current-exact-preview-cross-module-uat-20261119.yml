@@ -4,6 +4,7 @@ on:
     branches: [recovery/fase-a-clean-20260831]
     paths:
       - .github/workflows/gravicentra-i66-current-exact-preview-cross-module-uat-20261119.yml
+      - tools/gravicentra-i66-ops-document-fixture-ui.cjs
       - tools/gravicentra-i6-6-carlos-client-edit-signed-synthetic-uat.cjs
       - tools/gravicentra-i6-6-current-live-five-role-route-readonly.cjs
 permissions:
@@ -13,8 +14,39 @@ concurrency:
   group: gi-i66-current-exact-preview-crossmodule-qa
   cancel-in-progress: false
 jobs:
+  existing-preview-document-fixture:
+    if: github.repository == 'paulaosoriof86/orbit360-core' && github.ref == 'refs/heads/recovery/fase-a-clean-20260831' && contains(github.event.head_commit.message, 'I66_EXISTING_DOC_FIXTURE')
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    env:
+      SA_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_ALT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Test only the existing isolated Preview document form and restore its fixture
+        run: |
+          set -euo pipefail
+          npm install --prefix "$RUNNER_TEMP/i66-doc-fixture" --ignore-scripts --no-audit --no-fund firebase-admin@13.4.0 playwright@1.55.0 >/dev/null
+          export NODE_PATH="$RUNNER_TEMP/i66-doc-fixture/node_modules"
+          node "$NODE_PATH/playwright/cli.js" install --with-deps chromium >/dev/null
+          node tools/gravicentra-i66-ops-document-fixture-ui.cjs
+      - name: Save the redacted result of the form, readback and cleanup
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gi-i66-existing-ops-document-${{ github.run_id }}
+          path: ${{ runner.temp }}/i66-ops-document-form.json
+          if-no-files-found: ignore
+          retention-days: 90
   signed-preview:
-    if: github.repository == 'paulaosoriof86/orbit360-core' && github.ref == 'refs/heads/recovery/fase-a-clean-20260831'
+    if: github.repository == 'paulaosoriof86/orbit360-core' && github.ref == 'refs/heads/recovery/fase-a-clean-20260831' && !contains(github.event.head_commit.message, 'I66_EXISTING_DOC_FIXTURE')
     runs-on: ubuntu-24.04
     timeout-minutes: 48
     env:
