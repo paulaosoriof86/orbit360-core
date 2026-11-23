@@ -1,0 +1,32 @@
+{
+  "schema": "GI_I66_COMMERCIAL_SOURCE_RECEIPT_V1",
+  "commitStatus": "COMMITTED_AND_SERVER_READ_BACK",
+  "protectedEnvironment": "gravicentra-live-data-writes",
+  "policy": "91-8324489",
+  "runId": 45088103756,
+  "jobId": 137411381999,
+  "preflightJobId": 137411206602,
+  "beforeDigest": "b0d649e5d8ca092537a042848fe99ccd27f9040fee66c4752c6086991ce7a570",
+  "after": {
+    "newObligations": 12,
+    "predecessorsUpdated": 1,
+    "successorsCreated": 1,
+    "vehiclesLinked": 1,
+    "activitiesCreated": 1,
+    "auditsCreated": 1,
+    "portfolioRowsCreated": 12,
+    "physicalDocumentWrites": 29,
+    "directPayments": 0,
+    "inferredPayments": 0,
+    "pendingGrossCents": 336706,
+    "currency": "GTQ",
+    "policyIdDigest": "ba0dc9167d52fb30e4aacffc3d1b09a5c0a4fe1764514d5b0448dbfff782853a",
+    "auditIdDigest": "8b422163ac505eedd5142b764c2759e9531ebeefa854a7a1e1ec9797ad02563d"
+  },
+  "independentAuditReadback": {
+    "runId": 45089542945,
+    "jobId": 137415734790,
+    "writes": 0
+  },
+  "sourceReceipt": "artifacts/orbit360-recovery/release-control/I6_6_ROBLE_TWO_24_COMMERCIAL_SERVER_READBACK_20261122.json"
+}
