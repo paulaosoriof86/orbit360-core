@@ -13,6 +13,8 @@ on:
       - orbit360-platform/core/ciclo.js
       - tools/gravicentra-i6-6-management-default-and-client-country.test.cjs
       - tools/gravicentra-i6-6-active-session-recovery.test.cjs
+      - orbit360-platform/core/backend-product-readonly-bootstrap-p0.js
+      - orbit360-platform/core/auth-product-runtime-p0.js
       - orbit360-platform/modules/ops.js
       - orbit360-platform/modules/leads.js
       - tools/gravicentra-i6-6-ops-collaboration-owner.test.cjs

@@ -3708,6 +3708,34 @@
           "gitBlobSha": "fff275d234a19cf8f6c244a70040f65e279ef61d"
         }
       ]
+    },
+    {
+      "id": "I6_6_RESTORE_RETRY_EXISTING_MESSAGE_20261122",
+      "approvedByDirection": true,
+      "receipt": "Mandato I6.6, secciones 4, 10 y 11. Alcance autorizado para corrección y Preview. La aceptación visual y LIVE de esta candidata siguen pendientes.",
+      "scope": "Retain the previously accepted recovery message next to the new authenticated retry control, per central regression 45092586518.",
+      "sourceStatus": "SOURCE_REQUIRES_EXACT_PREVIEW_AND_LIVE_UI_PROOF",
+      "capabilityOwners": [
+        "LOGIN",
+        "PWA"
+      ],
+      "paths": [
+        {
+          "path": "orbit360-platform/core/auth-product-runtime-p0.js",
+          "gitBlobSha": "d44482c7ba9952e269f6c38249a561aefcf0eb37",
+          "replaces": {
+            "path": "orbit360-platform/core/auth-product-runtime-p0.js",
+            "priorGitBlobSha": "506ac0a0bd6319ca2136591dc3fdd81c1547242c",
+            "priorChangeId": "I6_6_RESTORE_SIGNED_SESSION_MEMBERSHIP_20261122"
+          }
+        }
+      ],
+      "tests": [
+        {
+          "path": "tools/gravicentra-i6-6-active-session-recovery.test.cjs",
+          "gitBlobSha": "fff275d234a19cf8f6c244a70040f65e279ef61d"
+        }
+      ]
     }
   ],
   "i66R11PreviewBuildRequest20261113": {
