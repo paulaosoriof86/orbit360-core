@@ -2765,7 +2765,12 @@
       "tests": [
         {
           "path": "tools/gravicentra-i6-6-management-catalog-client-projection.test.cjs",
-          "gitBlobSha": "23d3ef170a8aa4ee0b62f19c389ada4b742e65c5"
+          "gitBlobSha": "169ac84a0bc51ce6b8612370b120eebcf876c1a1",
+          "replaces": {
+            "path": "tools/gravicentra-i6-6-management-catalog-client-projection.test.cjs",
+            "priorGitBlobSha": "23d3ef170a8aa4ee0b62f19c389ada4b742e65c5",
+            "priorChangeId": "I6_6_OPS_CLIENT_MANAGEMENT_CATALOG_NOTIFICATIONS_20261118"
+          }
         }
       ]
     },
@@ -2789,7 +2794,12 @@
       "tests": [
         {
           "path": "tools/gravicentra-i6-6-management-catalog-client-projection.test.cjs",
-          "gitBlobSha": "23d3ef170a8aa4ee0b62f19c389ada4b742e65c5"
+          "gitBlobSha": "169ac84a0bc51ce6b8612370b120eebcf876c1a1",
+          "replaces": {
+            "path": "tools/gravicentra-i6-6-management-catalog-client-projection.test.cjs",
+            "priorGitBlobSha": "23d3ef170a8aa4ee0b62f19c389ada4b742e65c5",
+            "priorChangeId": "I6_6_OPS_INTERNAL_NOTICE_HUMAN_ACTOR_COMPAT_20261118"
+          }
         }
       ]
     },
