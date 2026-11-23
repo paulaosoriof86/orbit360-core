@@ -1,0 +1,138 @@
+{
+  "schema": "GI_I66_MONDAY_OPERATIONAL_CONTINUITY_R11_V1",
+  "dateGuatemala": "2026-11-23",
+  "recordType": "SUBORDINATE_APPEND_ONLY_EVIDENCE_NOT_CONTROL_PLANE_OR_RELEASE_AUTHORITY",
+  "owner": "Gravicentra Insurance",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "governingGate": "I6.6",
+  "sourceReferences": {
+    "controlPlane": "artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json",
+    "priorR9": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_EXECUTION_PROGRESS_20261122_R9.json",
+    "priorR10": "artifacts/orbit360-recovery/release-control/I6_6_OPS_SOURCE_QA_HANDOFF_R10_20261122.json",
+    "findingsLedger": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json"
+  },
+  "formalProgress": {
+    "i6": {
+      "closed": 6,
+      "total": 10,
+      "active": "I6.6",
+      "lastFrozen": "I6.5"
+    },
+    "shock": {
+      "closed": 2,
+      "total": 14,
+      "percent": 14.3
+    },
+    "unaffectedHistoricalPassPreserved": true
+  },
+  "latestVerifiedLive": {
+    "sourceSha": "15e849bd606bd8c93e4c0471da1193e85004aecd",
+    "buildId": "gi-i66-15e849bd606b-57f234755dc1",
+    "artifactId": 14777966155,
+    "files": 224,
+    "hostingVersion": "sites/ays-orbit-360-lab/versions/e4e8f31b02ba2aef",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_FRONTEND_E00002_RECEIPT.json",
+    "noProductPromotionInThisWork": true
+  },
+  "mondaySourceWork": {
+    "currentCommit": "196e3cdbae5a02792f19acc3cacd37621836c02f",
+    "source": "orbit360-platform/core/ciclo.js",
+    "sourceBlob": "ab4b5c0c35abcc2d815d50296f741bf319b0e42d",
+    "approvedDeltaManifest": "artifacts/orbit360-recovery/release-control/I6_6_APPROVED_PRODUCT_DELTA_MANIFEST_20261110.json",
+    "sourceChangeDescription": "Fix postcommit management callback lexical scope while preserving original historical test for admin catalog save order; no duplicate management after optional Drive failure.",
+    "qa": [
+      {
+        "run": 45183267231,
+        "kind": "transversal_source",
+        "conclusion": "success"
+      },
+      {
+        "run": 45183267436,
+        "kind": "privileged_roles_source",
+        "conclusion": "success"
+      },
+      {
+        "run": 45183267489,
+        "kind": "advisor_payment_ops_notification_emulator",
+        "conclusion": "success"
+      },
+      {
+        "run": 45183267571,
+        "kind": "immutable_package_GATE_ONLY",
+        "conclusion": "success",
+        "packageJobSkipped": true
+      },
+      {
+        "run": 45183267325,
+        "kind": "control_plane_guard",
+        "conclusion": "success"
+      }
+    ],
+    "historicalB4005": "Not governing I6.6 and not reopened",
+    "newPreviewBuild": false,
+    "newLiveDeployment": false,
+    "realBusinessWritesByThisWork": 0
+  },
+  "releaseBlocker": {
+    "classification": "EXACT_PACKAGE_CANDIDATE_FRONTEND_BACKEND_SCOPE_MISMATCH",
+    "sourceQaButNotRuntimePass": true,
+    "frontendOnlyAdmitter": "tools/gravicentra-i6-6-frontend-preview-authority.cjs",
+    "reason": "Diff from current LIVE source to current QA source includes functions/product-ops-leads-domain.js as well as frontend; frontend-only admitPreview() requires all product diffs to be orbit360-platform/core or modules, so current approved cumulative source cannot be safely packaged by this frontend-only mode.",
+    "required": "Use the existing I6.6 combined backend/source exact artifact and isolated Preview protocol with signed Carlos operation; no forcing frontend-only guard, no old artifact overlay, no live deploy until acceptance."
+  },
+  "makeDirectReadOnly": {
+    "team": 1975919,
+    "scenarios": [
+      {
+        "id": 10196136,
+        "mode": "scheduled reader only",
+        "status": "inactive",
+        "connection": "green-api ok",
+        "lastExecutionUtc": "2026-11-19T13:05:17.911Z",
+        "writerPresent": false
+      },
+      {
+        "id": 10195867,
+        "mode": "webhook only",
+        "status": "inactive",
+        "queued": 0,
+        "executionCount": 0,
+        "writerPresent": false
+      }
+    ],
+    "reactivated": false,
+    "realLeadsCreated": 0
+  },
+  "financialUnchangedFromR9": {
+    "rows": 302,
+    "matched": 185,
+    "held": 117,
+    "missingUniqueEdition": 97,
+    "receiptIdentityHolds": 20,
+    "newEligibleWrites": 0,
+    "sourceWritesInMondayReview": 0,
+    "previousRealObligationsUpdated": 58,
+    "gytAuto519815": {
+      "source": "artifacts/orbit360-recovery/release-control/I6_6_GYT_519815_MINIFREEZE_20261122.json",
+      "successor": 1,
+      "receipts": 10,
+      "cartera": 10,
+      "totalCents": 664737,
+      "createdPayments": 0
+    }
+  },
+  "unfinishedAndNext": [
+    "Isolated complete exact I6.6 frontend plus backend Preview.",
+    "Carlos authenticated standard management Ops/Cliente360: canonical single record and activity, role/country security and reload.",
+    "New synthetic Drive document form: click/upload/finalize/download/hash/reload/cleanup fail-closed.",
+    "Review existing renewal manual UI and verify finance, policy, adviser/risk links and Kanban without duplicate creation.",
+    "Continue approved deterministic financial deltas once unique identities proven; do not replay held 117 or previous paid records.",
+    "Make inbound lead canonical writer with idempotency and permission before activation; no existing workflows changed."
+  ],
+  "noRealClientsChanged": true,
+  "noSecretsExported": true,
+  "noAuthOrRulesChanges": true,
+  "fullI66Accepted": false,
+  "receiptInterpretation": "This receipt records current evidence for continuity and does not replace Control Plane, prove Preview, authorize automatic production promotion or close I6.6."
+}
