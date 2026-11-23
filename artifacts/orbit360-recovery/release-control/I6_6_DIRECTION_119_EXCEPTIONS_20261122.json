@@ -108,9 +108,9 @@
     "productSourceChanges": 0,
     "newReleaseAuthorized": false,
     "financialApplyAuthorizedByThisRecordAlone": false,
-    "status": "DIRECTION_DECISIONS_CAPTURED_WITH_SOURCE_AND_EXISTING_FIRESTORE_SNAPSHOT_FIVE_CASES_PROTECTED_APPLY_PENDING"
+    "status": "OWNER_FINAL_BUSINESS_DISPOSITION_CAPTURED_NO_AUTOMATIC_LEDGER_WRITE"
   },
-  "questionForOwner": "No repeat questions on the three explained cases. Continue primary source/commission invoice search for 2026 paid proof of AUTO-1000000334. Resolve four-cent El Roble bank-vs-statement discrepancy through exact issuer/endoso readback; request only genuinely unresolved business decision after source exhaustion.",
+  "questionForOwner": "No further evidence requests for Ficohsa payment 7317082, Roble Q0.04 variance, or existing Drive sharing. Only escalate a materially new ambiguous business decision after source inspection.",
   "readonlyFirestoreSnapshot": {
     "sourceRunId": 45089542945,
     "reportArtifactId": 14780905698,
@@ -316,5 +316,53 @@
       "newBusinessRelease": false,
       "guide": "Continue I6.6 protected CAS with before/after exact matching; do not treat a green preflight with skipped apply as data PASS."
     }
+  },
+  "ownerFinalDisposition20261122": {
+    "recordType": "DIRECTION_LATEST_EXPLICIT_SUPERSESSION_FOR_I66_FIVE_CASES",
+    "owner": "Paula Osorio / Dirección",
+    "dateGuatemala": "2026-11-22",
+    "supersedesOnly": "Earlier prompts asking for more evidence, proof, or consent for these exact items; preserves preexisting receipts and the history of observations without allowing fabricated writes.",
+    "cases": [
+      {
+        "policy": "AUTO-1000000334",
+        "insurer": "FICOHSA",
+        "requirement": "7317082",
+        "ownerConfirmed": "PAYMENT_FOR_RENEWAL_ALREADY_MADE",
+        "businessDecision": "OWNER_ATTESTATION_ACCEPTED_AS_SUFFICIENT_PROOF_OF_PAID_STATUS_NO_OTHER_PAYMENT_PROOF_REQUEST",
+        "verificationStillNeededOnlyFor": "find actual canonical successor edition and unique receipt/cobro ID, detect duplicate before applying business status and read back",
+        "actualPaymentDate": "UNKNOWN_DO_NOT_FABRICATE",
+        "attestationDate": "2026-11-22",
+        "preexisting2025InvoiceDistinctRequirement": "7250974",
+        "sourceDiscrepancyStatus": "not a blocker to owner-attested payment; preserve documentary history",
+        "financialWritesByThisReceipt": 0
+      },
+      {
+        "policy": "91-9105495",
+        "insurer": "ROBLE",
+        "requirement": "5838167",
+        "ownerConfirmed": "SUBSTITUTION_PAYMENT_EXECUTED",
+        "bankAmountCents": 17640,
+        "statementAmountCents": 17644,
+        "varianceCents": 4,
+        "decision": "ROUNDING_OR_SMALL_VARIANCE_TOLERANCE_OWNER_APPROVED_PASS_FINANCIAL_VARIANCE_GATE",
+        "noFurtherProofRequested": true,
+        "retainBothOriginalAmounts": true,
+        "notAnAdditionalPayment": true,
+        "appliedToLive": "PENDING_UNIQUE_ENDORSEMENT_AND_EXISTING_COBRO_READBACK",
+        "financialWritesByThisReceipt": 0
+      },
+      {
+        "scope": "DRIVE_FOLDER_SHARING",
+        "ownerConfirmed": "INTENTIONAL_TEAM_SHARING",
+        "decision": "DO_NOT_TREAT_AS_CURRENT_I66_BLOCKER_OR_REPEAT_RISK_ALERTS",
+        "changePermissions": false,
+        "operationalImpact": "NONE",
+        "historicalMetadataRetainedForTraceability": true
+      }
+    ],
+    "globalAcceptanceBoundary": "Business-direction acceptance of evidence and small-difference tolerance does not itself certify that the correct production document was mutated; avoid PAID_LIVE_PASS until before/after Firestore readback.",
+    "allowedNext": "Continue I6.6 protected financial batches and module QA, without repeating these three questions.",
+    "documentSourceManifestUnchanged": true,
+    "branchNoNewIteration": true
   }
 }
