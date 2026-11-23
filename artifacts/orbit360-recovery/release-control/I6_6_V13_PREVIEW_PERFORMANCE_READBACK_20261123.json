@@ -1,0 +1,145 @@
+{
+  "schema": "GI_I66_PREVIEW_PERFORMANCE_EXACT_ARTIFACT_READBACK_V1",
+  "status": "READONLY_MEASURED_A14_REMAINS_OPEN",
+  "runId": 45282695200,
+  "artifactId": 14869693021,
+  "artifactDigest": "sha256:ed5f0e82c47460983569a2a3525a125a23a3d3c3c2438a34508d439766c79b51",
+  "rawReportSha256": "f5bde1444b4ce5ecfc2c21eb24759cc9d442f8790b40e6a2656145dcb931c4e1",
+  "sourceSha": "5a76e86141e0e1586ff5f2673f89e34f8f051141",
+  "releaseArtifactId": 14869651976,
+  "releaseArtifactDigest": "sha256:42eb1bcf36977cf455c406edd00f577c53c0c8d2ee74972dd653dfa11834d73a",
+  "buildId": "gi-i66-5a76e86141e0-57f234755dc1",
+  "phase": "preview",
+  "readOnly": true,
+  "firestoreWrites": 0,
+  "errors": [],
+  "auth": {
+    "documentReadyWallMs": 532,
+    "navigation": {
+      "domContentLoadedMs": 529,
+      "loadMs": 0,
+      "transferBytes": 11012,
+      "resourceCount": 168
+    },
+    "activation": {
+      "ok": true,
+      "signedInMs": 231,
+      "activateMs": 14374,
+      "role": "Operativo",
+      "storeStatus": "ready-read-only",
+      "readyCollection": "clientes",
+      "hasRouter": false
+    },
+    "storeReadContext": {
+      "protectedCandidate": true,
+      "nativeStructuredClone": true,
+      "readAccessors": [
+        "all",
+        "get",
+        "where",
+        "find",
+        "_productStatus",
+        "raw",
+        "pref"
+      ]
+    },
+    "pageErrors": 0,
+    "consoleErrors": 0,
+    "consoleErrorClasses": {},
+    "httpErrorClasses": {}
+  },
+  "cobros": {
+    "route": "cobros",
+    "routeMs": 14685,
+    "contentMs": 5,
+    "readyMs": 5535,
+    "cobrosCoreReadyMs": 5535,
+    "cobrosFinancialReadyMs": 14699,
+    "cobrosFinancialReady": true,
+    "denied": false,
+    "complete": true,
+    "visibleRows": 60,
+    "hostChars": 107545,
+    "loadedSources": 12,
+    "pendingSources": 0,
+    "snapshotErrorCount": 3,
+    "snapshotErrorSources": [
+      "estadosCuentaAseguradora",
+      "recibosAseguradora",
+      "reclamos"
+    ],
+    "renderStats": {
+      "calls": 4,
+      "totalMs": 3814.4,
+      "maxMs": 1568.1
+    },
+    "readStats": {
+      "all": {
+        "calls": 258,
+        "totalMs": 2413.5,
+        "maxMs": 22.4
+      },
+      "get": {
+        "calls": 5989,
+        "totalMs": 356.4,
+        "maxMs": 43.7
+      },
+      "where": {
+        "calls": 0,
+        "totalMs": 0,
+        "maxMs": 0
+      },
+      "find": {
+        "calls": 0,
+        "totalMs": 0,
+        "maxMs": 0
+      },
+      "_productStatus": {
+        "calls": 75,
+        "totalMs": 3.5,
+        "maxMs": 0.2
+      },
+      "raw": {
+        "calls": 0,
+        "totalMs": 0,
+        "maxMs": 0
+      },
+      "pref": {
+        "calls": 0,
+        "totalMs": 0,
+        "maxMs": 0
+      }
+    },
+    "client360RenderMs": null
+  },
+  "cliente360Detail": {
+    "available": true,
+    "detailMs": 1443,
+    "ready": true,
+    "detailChars": 10904,
+    "policyCountForSelected": 65,
+    "readinessCounts": {
+      "ready": 5,
+      "unavailable": 1
+    },
+    "renderStats": {
+      "calls": 3,
+      "totalMs": 1388.4,
+      "maxMs": 1352.2
+    }
+  },
+  "mobile": {
+    "viewportWidth": 390,
+    "eventMs": 0.6,
+    "twoFramesMs": 12.5,
+    "menuOpen": true,
+    "navItems": 17
+  },
+  "baseline": {
+    "sourceRunId": 45074429319,
+    "cobrosFinancialReadyMs": 13791,
+    "renderTotalMs": 6893.1,
+    "getCalls": 12402
+  },
+  "observation": "Menor trabajo local de render y lecturas get; preparación financiera total 14699ms, por lo que no se acredita mejora total de latencia ni A14. Persisten tres fuentes opcionales con error."
+}

@@ -1396,7 +1396,7 @@
     "phaseAIterationStatuses": "HISTORICAL_FIELDS_ABOVE_PRESERVED_UNTIL_FORMAL_GATE_EVIDENCE;_NO_NEW_PASS_INFERRED",
     "labDataWriteScope": "ONLY_35_AUTHORIZED_COUNTRY_FIELDS;_NO_AUGUST_REFRESH"
   },
-  "nextAction": "I6_6_20261119: 36_RECEIPTS_AND_36_PORTFOLIO_ROWS_WRITTEN_LIVE_CAS_READBACK_RUNS_44426236551_44461829731. PAID_COBROS_AND_PAYMENT_WRITES_STILL_ZERO. NEXT_PAID_INFERENCE_SOURCE_MATCH_THEN_AUTHORIZED_PROTECTED_CAS_AND_READBACK; LARGE_250_CHUNKS_FOR_ELIGIBLE_ROWS; INSURER_PRODUCT_COMMISSION_UI_SOURCE_PATCH_LOCAL_TESTED_PREVIEW_AND_LIVE_NOT_YET_CERTIFIED; SERGIO_OPS_COBROS_PERF_TRANSVERSAL_QA_PENDING. DO_NOT_DECLARE_PRODUCTION_ACCEPTED.",
+  "nextAction": "I6.6: promover las cuatro funciones y Hosting del mismo artifact 14869651976, verificar 224 archivos por origen, ejecutar pruebas LIVE firmadas y cerrar CP/state/ledger/transporte/cursor en un solo commit. Después continuar Make, Asesor, rendimiento y las capacidades reales pendientes.",
   "sourceOfTruth": {
     "projectBoundaryPrevalentAddendum": "orbit360-platform/docs/recovery/ADDENDUM_PREVALENTE_CHATGPT_PROJECT_BOUNDARY_20260831.md",
     "mutableState": "orbit360-platform/docs/recovery/orbit360-recovery-state-v1.json",
