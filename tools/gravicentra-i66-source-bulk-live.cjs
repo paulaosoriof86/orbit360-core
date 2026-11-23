@@ -171,6 +171,14 @@ async function readIssuedSuccessorLinks(db,groups){
       advisorOnPrior:Boolean(p.asesorId),earlierLinkedRisks:risks.size,
       earlierVerifiedPlate:risks.docs.filter(d=>fields(d,['placa','placaFuente']).some(v=>matches(v,c.plateWitness))).length,
       earlierVerifiedChassis:risks.docs.filter(d=>fields(d,['vin','chasis','chasisFuente']).some(v=>matches(v,c.chassisWitness))).length,
+      priorPlatePopulated:risks.docs.some(d=>fields(d,['placa','placaFuente']).length),
+      priorChassisPopulated:risks.docs.some(d=>fields(d,['vin','chasis','chasisFuente']).length),
+      priorEnginePopulated:risks.docs.some(d=>fields(d,['motor','numeroMotor','motorFuente']).length),
+      priorEngineMatch:risks.docs.filter(d=>fields(d,['motor','numeroMotor','motorFuente']).some(v=>matches(v,c.engineWitness))).length,
+      priorPlateWithoutClassMatch:risks.docs.filter(d=>fields(d,['placa','placaFuente']).some(v=>
+        normalize(v).length===6&&matches(v,c.plateWithoutClassWitness))).length,
+      priorChassisSuffixMatch:risks.docs.filter(d=>fields(d,['vin','chasis','chasisFuente']).some(v=>
+        normalize(v).length>=c.issuerChassisLength&&matches(normalize(v).slice(-c.issuerChassisLength),c.chassisWitness))).length,
       existingDocsUsingIssuedNumbers:alternate.size,anyDuplicateQueryTruncated:alternate.has('READ_BOUNDARY'),writes:0});
   }
   return rows;

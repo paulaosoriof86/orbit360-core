@@ -78,7 +78,15 @@
         }
       ],
       "plateWitness": "541bd40d413588c60d3744795d24fb2eb93ba5ba26bd04f26897be2a30c7b2e9",
-      "chassisWitness": "8033286efc251bcd7ed3dfa6fba5ab27d66f855a4221678a9bee914fec20a87c"
+      "chassisWitness": "8033286efc251bcd7ed3dfa6fba5ab27d66f855a4221678a9bee914fec20a87c",
+      "sameRiskAsPriorIssuedDocument": {
+        "Placa": true,
+        "Chasis": true,
+        "Motor": true
+      },
+      "plateWithoutClassWitness": "6c3f61cb08d4d55ce8172078025f23b1fcd86fd03b50ff7ffa280e5b127cdd76",
+      "issuerChassisLength": 8,
+      "engineWitness": "dd323aa2d194658395f8ccd53d52c74387ef5a72b53d2bed48753c7371ef784d"
     },
     {
       "insurer": "G&T",
