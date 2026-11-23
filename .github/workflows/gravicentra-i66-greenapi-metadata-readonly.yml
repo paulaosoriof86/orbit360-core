@@ -1,7 +1,8 @@
 # I6.6 GREENAPI METADATA PROBE -- read-only evidence, no delivery.
 # Manual read-only inventory of existing GCP Secret Manager/Functions/Cloud Run.
-# No GreenAPI HTTP, no Secret Manager payload read, no Firestore, no deployment.
-name: Gravicentra I6.6 GreenAPI Secure Metadata ONLY
+# Metadata job: no payload access. Config job: exact existing secret validation in memory,
+# plus at most one configured advisor read. Neither job sends, writes or deploys.
+name: Gravicentra I6.6 GreenAPI Secure Readiness
 
 on:
   push:
@@ -10,10 +11,10 @@ on:
   workflow_dispatch:
     inputs:
       scope_confirmation:
-        description: "Inventory metadata only; never access token payload or send messages"
+        description: "Read metadata, or validate existing inbound configuration server-side without exposing payload"
         required: true
         type: choice
-        options: [READ_ONLY_NO_SEND]
+        options: [READ_ONLY_NO_SEND, READ_ONLY_VALIDATE_EXISTING_INBOUND_CONFIG]
 
 permissions:
   contents: read
@@ -239,3 +240,49 @@ jobs:
                 'enabledVersionReferences':sorted(set(enabled))[:20]})
           print('I66_GREENAPI_READONLY_RESOURCE_REFERENCES='+json.dumps(resources,sort_keys=True,separators=(',',':')))
           PYMETA
+  existing_inbound_config:
+    if: >-
+      github.repository == 'paulaosoriof86/orbit360-core' &&
+      github.ref == 'refs/heads/recovery/fase-a-clean-20260831' &&
+      ((github.event_name == 'workflow_dispatch' && inputs.scope_confirmation == 'READ_ONLY_VALIDATE_EXISTING_INBOUND_CONFIG') ||
+       (github.event_name == 'push' && contains(github.event.head_commit.message, 'I66_GREENAPI_INGRESS_CONFIG_READONLY')))
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    env:
+      SA_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_ALT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install existing server dependencies without lifecycle scripts
+        working-directory: functions
+        run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Select existing same-project credential without printing it
+        shell: bash
+        run: |
+          set -euo pipefail
+          set +x
+          python3 - <<'PYCONFIG'
+          import json,os,pathlib
+          target=pathlib.Path(os.environ['RUNNER_TEMP'])/'i66-inbound-config-adc.json'
+          selected=None
+          for key in ('SA_LAB','SA_ALT','SA_DEFAULT'):
+              try:item=json.loads(os.environ.get(key) or '{}')
+              except (TypeError,ValueError):continue
+              if item.get('type')=='service_account' and item.get('project_id')=='ays-orbit-360-lab' and item.get('private_key'):
+                  selected=item
+                  break
+          if selected is None:raise SystemExit('I66_INBOUND_CONFIG_SAME_PROJECT_CREDENTIAL_UNAVAILABLE')
+          target.write_text(json.dumps(selected))
+          target.chmod(0o600)
+          with open(os.environ['GITHUB_ENV'],'a') as env:env.write('GOOGLE_APPLICATION_CREDENTIALS='+str(target)+'\n')
+          PYCONFIG
+      - name: Validate exact existing inbound configuration without payload or credential output
+        shell: bash
+        run: node tools/gravicentra-i66-greenapi-existing-config-readonly.cjs
