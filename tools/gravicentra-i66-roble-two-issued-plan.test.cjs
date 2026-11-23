@@ -38,6 +38,9 @@ test('all 24 emitted invoices and cartera, not a synthetic cobro',()=>{
   assert.equal(policy.renuevaDe,'old-'+c.policy);
   assert.equal(policy.primaTotal,c.issuerHeader.grossCents/100);
   assert.equal(policy.diferenciaDocumentalCentavos,c.coverScheduleDeltaCents);
+  assert.equal(Math.round(policy.sumaAsegurada*100),c.issuedInsuredValueCents);
+  assert.equal(Math.round(m.creates.find(x=>x[0]==='vehiculos')[1].sumaAsegurada*100),c.issuedInsuredValueCents);
+  assert.ok(m.creates.filter(x=>x[0]==='recibosEsperados').every(x=>Number.isFinite(x[1].gastosEmisionYOtrosDocumentados)));
   assert.equal(m.previous.renovadaPor,policy.id);
  }
 });
