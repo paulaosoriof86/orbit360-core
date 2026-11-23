@@ -271,6 +271,33 @@ jobs:
             'secretPayloadRead':False,'iamWrites':0,'cloudResourcesMutated':False,'messagesSent':0}
           print('I66_GREENAPI_EXACT_IAM_READONLY='+json.dumps(report,sort_keys=True,separators=(',',':')))
           PYIAM
+      - name: Verify exact GreenAPI runtime secret accessor binding without payload
+        shell: bash
+        run: |
+          set -euo pipefail
+          set +x
+          python3 - <<'PYACCESS'
+          import json,subprocess
+          project='ays-orbit-360-lab'
+          secret='orbit360-greenapi-gt-alianzas-soluciones'
+          principal='serviceAccount:orbit360-secrets-lab@ays-orbit-360-lab.iam.gserviceaccount.com'
+          def read(args):
+              p=subprocess.run(args,capture_output=True,text=True,timeout=45)
+              try:value=json.loads(p.stdout) if p.returncode==0 else None
+              except ValueError:value=None
+              return value if isinstance(value,dict) else None
+          def binding(policy):
+              rows=[b for b in (policy or {}).get('bindings',[]) if b.get('role')=='roles/secretmanager.secretAccessor' and principal in b.get('members',[])]
+              return {'readable':policy is not None,'unconditionalAccessor':any(not b.get('condition') for b in rows),'conditionalAccessor':any(bool(b.get('condition')) for b in rows)}
+          direct=binding(read(['gcloud','secrets','get-iam-policy',secret,'--project',project,'--format=json']))
+          inherited=binding(read(['gcloud','projects','get-iam-policy',project,'--format=json'])) if not direct['unconditionalAccessor'] else {'readable':False,'notRequired':True,'unconditionalAccessor':False,'conditionalAccessor':False}
+          granted=direct['unconditionalAccessor'] or inherited['unconditionalAccessor']
+          report={'schema':'GI_I66_GREENAPI_EXACT_RUNTIME_SECRET_ACCESS_V1','secretResource':'projects/'+project+'/secrets/'+secret,
+            'runtimeServiceAccount':principal.removeprefix('serviceAccount:'),'secretPolicy':direct,'projectPolicy':inherited,
+            'access':'GRANTED_BY_EXACT_UNCONDITIONAL_ACCESSOR_BINDING' if granted else 'UNPROVEN_NOT_A_DENIAL',
+            'permission':'secretmanager.versions.access','secretPayloadRead':False,'iamWrites':0,'secretWrites':0,'messagesSent':0}
+          print('I66_GREENAPI_EXACT_RUNTIME_SECRET_ACCESS='+json.dumps(report,sort_keys=True,separators=(',',':')))
+          PYACCESS
       - name: Publish approved non-secret resource references only
         shell: bash
         run: |
