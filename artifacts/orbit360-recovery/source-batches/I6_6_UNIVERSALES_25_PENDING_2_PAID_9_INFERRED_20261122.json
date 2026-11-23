@@ -1,0 +1,320 @@
+{
+  "schema": "GRAVICENTRA_I66_UNIVERSALES_PAID_PENDING_CONTRACTUAL_CROSSWALK_V1",
+  "recordType": "SOURCE_PINNED_READONLY_ACCOUNT_STATEMENT_AND_PAID_EVENT_WITNESS",
+  "dateGuatemala": "2026-11-22",
+  "gate": "I6.6",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "projectId": "ays-orbit-360-lab",
+  "tenantId": "alianzas-soluciones",
+  "frozenSource": {
+    "path": "artifacts/orbit360-recovery/source-batches/I6_6_SOURCE_BULK_20261120_MULTI_302.json",
+    "blobSha": "ab64e111319e3447733a3af05bf378250698ccdb",
+    "rowsTotal": 302,
+    "sourceAsOf": "2026-11-16"
+  },
+  "documentarySources": {
+    "insurerPending": {
+      "driveFileId": "1DJnElCTzrOlR1LvePDqWZ2BjD_WZwo2X",
+      "filename": "Universales - Balance de antigüedad - Corte 2026-11-16.pdf",
+      "rawSha256": "74ea0b692469420e0822269d036fdb761d0daddb7988abb5c04a5af894c114ff",
+      "date": "2026-11-16",
+      "page": 1
+    },
+    "insurerPayments": {
+      "driveFileId": "1_9oKfTx5XGKQeeEXF41u1UMj4xzZRGAW",
+      "filename": "Universales - Recaudos Noviembre 2026.PDF",
+      "rawSha256": "59a99a7d26dc69bc2632dc8b6b29b4c2a9a232a372c3024632c0cd8823aa2759",
+      "date": "2026-11-16",
+      "page": 1
+    },
+    "historical12289": {
+      "driveFileId": "1LwPaa6mGojSdxA9KrFSu0iQUPxIThy7v",
+      "filename": "Renovación - Universales - Gastos Médicos - 2025-2026.pdf",
+      "rawSha256": "adcb83cfa9d19d51f6e6a3a58c1c6c91352f821f60cef29f1a20adb0f10610db",
+      "termStart": "2025-10-01",
+      "termEnd": "2026-10-01"
+    }
+  },
+  "exactPolicies": [
+    {
+      "policy": "04-05-01-10738-6",
+      "pendingCount": 3,
+      "firstRequirement": "37260365",
+      "lastRequirement": "37260367",
+      "firstPaymentSequence": 10,
+      "lastPaymentSequence": 12,
+      "paidAnchor": {
+        "requirement": "37260364",
+        "paymentNumber": 9,
+        "grossCents": 147935,
+        "status": "PAGADO",
+        "statusTimestampLocal": "2026-11-13T08:11:51",
+        "dueDate": "2026-11-01"
+      },
+      "priorInferred": {
+        "first": 1,
+        "last": 8,
+        "count": 8
+      },
+      "pendingRows": [
+        {
+          "caseId": "UNIVERSALES_NOV16_37260365",
+          "requirement": "37260365",
+          "due": "2026-12-01",
+          "grossCents": 150399,
+          "sourceRowNumber": 16
+        },
+        {
+          "caseId": "UNIVERSALES_NOV16_37260366",
+          "requirement": "37260366",
+          "due": "2027-01-01",
+          "grossCents": 150399,
+          "sourceRowNumber": 17
+        },
+        {
+          "caseId": "UNIVERSALES_NOV16_37260367",
+          "requirement": "37260367",
+          "due": "2027-02-01",
+          "grossCents": 150391,
+          "sourceRowNumber": 18
+        }
+      ],
+      "pendingGrossCents": 451189
+    },
+    {
+      "policy": "04-05-01-15590-0",
+      "pendingCount": 10,
+      "firstRequirement": "39470708",
+      "lastRequirement": "39470717",
+      "firstPaymentSequence": 3,
+      "lastPaymentSequence": 12,
+      "paidAnchor": {
+        "requirement": "39470707",
+        "paymentNumber": 2,
+        "grossCents": 76440,
+        "status": "PAGADO",
+        "statusTimestampLocal": "2026-11-05T10:39:23",
+        "dueDate": "2026-11-01"
+      },
+      "priorInferred": {
+        "first": 1,
+        "last": 1,
+        "count": 1
+      },
+      "pendingRows": [
+        {
+          "caseId": "UNIVERSALES_NOV16_39470708",
+          "requirement": "39470708",
+          "due": "2026-12-01",
+          "grossCents": 78904,
+          "sourceRowNumber": 37
+        },
+        {
+          "caseId": "UNIVERSALES_NOV16_39470709",
+          "requirement": "39470709",
+          "due": "2027-01-01",
+          "grossCents": 78904,
+          "sourceRowNumber": 38
+        },
+        {
+          "caseId": "UNIVERSALES_NOV16_39470710",
+          "requirement": "39470710",
+          "due": "2027-02-01",
+          "grossCents": 78904,
+          "sourceRowNumber": 39
+        },
+        {
+          "caseId": "UNIVERSALES_NOV16_39470711",
+          "requirement": "39470711",
+          "due": "2027-03-01",
+          "grossCents": 78904,
+          "sourceRowNumber": 40
+        },
+        {
+          "caseId": "UNIVERSALES_NOV16_39470712",
+          "requirement": "39470712",
+          "due": "2027-04-01",
+          "grossCents": 78904,
+          "sourceRowNumber": 41
+        },
+        {
+          "caseId": "UNIVERSALES_NOV16_39470713",
+          "requirement": "39470713",
+          "due": "2027-05-01",
+          "grossCents": 78904,
+          "sourceRowNumber": 42
+        },
+        {
+          "caseId": "UNIVERSALES_NOV16_39470714",
+          "requirement": "39470714",
+          "due": "2027-06-01",
+          "grossCents": 78904,
+          "sourceRowNumber": 43
+        },
+        {
+          "caseId": "UNIVERSALES_NOV16_39470715",
+          "requirement": "39470715",
+          "due": "2027-07-01",
+          "grossCents": 78904,
+          "sourceRowNumber": 44
+        },
+        {
+          "caseId": "UNIVERSALES_NOV16_39470716",
+          "requirement": "39470716",
+          "due": "2027-08-01",
+          "grossCents": 78904,
+          "sourceRowNumber": 45
+        },
+        {
+          "caseId": "UNIVERSALES_NOV16_39470717",
+          "requirement": "39470717",
+          "due": "2027-09-01",
+          "grossCents": 78904,
+          "sourceRowNumber": 46
+        }
+      ],
+      "pendingGrossCents": 789040
+    },
+    {
+      "policy": "04-05-01-12289-4",
+      "pendingCount": 12,
+      "firstRequirement": "39196269",
+      "lastRequirement": "39196280",
+      "firstPaymentSequence": 1,
+      "lastPaymentSequence": 12,
+      "paidAnchor": null,
+      "priorInferred": null,
+      "knownPriorIssued": {
+        "number": "04-05-01-12289-3",
+        "termStart": "2025-10-01",
+        "termEnd": "2026-10-01",
+        "exactEdition2026IssuedVerified": false,
+        "warning": "Older issued -3 is not the 2026 -4 successor by itself."
+      },
+      "pendingRows": [
+        {
+          "caseId": "UNIVERSALES_NOV16_39196269",
+          "requirement": "39196269",
+          "due": "2026-10-01",
+          "grossCents": 27829,
+          "sourceRowNumber": 22
+        },
+        {
+          "caseId": "UNIVERSALES_NOV16_39196270",
+          "requirement": "39196270",
+          "due": "2026-11-01",
+          "grossCents": 27829,
+          "sourceRowNumber": 23
+        },
+        {
+          "caseId": "UNIVERSALES_NOV16_39196271",
+          "requirement": "39196271",
+          "due": "2026-12-01",
+          "grossCents": 27829,
+          "sourceRowNumber": 24
+        },
+        {
+          "caseId": "UNIVERSALES_NOV16_39196272",
+          "requirement": "39196272",
+          "due": "2027-01-01",
+          "grossCents": 27829,
+          "sourceRowNumber": 25
+        },
+        {
+          "caseId": "UNIVERSALES_NOV16_39196273",
+          "requirement": "39196273",
+          "due": "2027-02-01",
+          "grossCents": 27829,
+          "sourceRowNumber": 26
+        },
+        {
+          "caseId": "UNIVERSALES_NOV16_39196274",
+          "requirement": "39196274",
+          "due": "2027-03-01",
+          "grossCents": 27829,
+          "sourceRowNumber": 27
+        },
+        {
+          "caseId": "UNIVERSALES_NOV16_39196275",
+          "requirement": "39196275",
+          "due": "2027-04-01",
+          "grossCents": 27829,
+          "sourceRowNumber": 28
+        },
+        {
+          "caseId": "UNIVERSALES_NOV16_39196276",
+          "requirement": "39196276",
+          "due": "2027-05-01",
+          "grossCents": 27829,
+          "sourceRowNumber": 29
+        },
+        {
+          "caseId": "UNIVERSALES_NOV16_39196277",
+          "requirement": "39196277",
+          "due": "2027-06-01",
+          "grossCents": 27829,
+          "sourceRowNumber": 30
+        },
+        {
+          "caseId": "UNIVERSALES_NOV16_39196278",
+          "requirement": "39196278",
+          "due": "2027-07-01",
+          "grossCents": 27829,
+          "sourceRowNumber": 31
+        },
+        {
+          "caseId": "UNIVERSALES_NOV16_39196279",
+          "requirement": "39196279",
+          "due": "2027-08-01",
+          "grossCents": 27829,
+          "sourceRowNumber": 32
+        },
+        {
+          "caseId": "UNIVERSALES_NOV16_39196280",
+          "requirement": "39196280",
+          "due": "2027-09-01",
+          "grossCents": 27835,
+          "sourceRowNumber": 33
+        }
+      ],
+      "pendingGrossCents": 333954
+    }
+  ],
+  "counts": {
+    "blockedPolicyCount": 3,
+    "pendingRows": 25,
+    "pendingGrossCents": 1574183,
+    "directDocumentedPaid": 2,
+    "earlierInferredPaidCandidates": 9,
+    "priorCoveredInstallments": 11,
+    "operationalLiveWrites": 0
+  },
+  "unchangedFourthPolicyControl": {
+    "policy": "04-15-01-603-0",
+    "pendingRows": 10,
+    "doNotReimport": true,
+    "paidAnchorRequirement": "39460327",
+    "paidAnchorGrossCents": 95256,
+    "sequence": 2
+  },
+  "priceSemantics": {
+    "policy10738": {
+      "paidAnchorGrossCents": 147935,
+      "nextPendingGrossCents": 150399,
+      "differenceCents": 2464
+    },
+    "policy15590": {
+      "paidAnchorGrossCents": 76440,
+      "nextPendingGrossCents": 78904,
+      "differenceCents": 2464
+    },
+    "rule": "Real paid-event amount and future insurer pending requirement amount are separate, a Q24.64 difference is NOT four-cent tolerance; preserve both without assuming common gross or fabricating credits."
+  },
+  "inferenceRule": "Earlier contiguous installments absent from an authoritative pending list can be classed INFERRED_PAID only after current edition/source anchor+client+policy+country+role verified, no contrary paid/debt/endorsement evidence, no duplicated Cobro; distinguish direct payment fact from inferred status and never invent paid timestamp.",
+  "technicalGate": "Current preflight marked these 25 rows POLICY_EDITION_MISSING. No apply until exact 2026 term, insured client, advisor, policy, source receipt identities and CAS before/after are uniquely proven. Do not infer from 2025-26 -3 policy as a direct substitute.",
+  "operationalWrites": 0,
+  "paymentWrites": 0,
+  "liveDeploy": false,
+  "securityChanges": false
+}

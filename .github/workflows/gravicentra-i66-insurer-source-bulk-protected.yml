@@ -24,6 +24,8 @@ on:
       - tools/gravicentra-i66-source-bulk-live.cjs
       - tools/gravicentra-i66-source-bulk-plan.test.cjs
       - tools/gravicentra-i66-source-bulk-apply.test.cjs
+      - tools/gravicentra-i66-universales-25-source-crosswalk.test.cjs
+      - artifacts/orbit360-recovery/source-batches/I6_6_UNIVERSALES_25_PENDING_2_PAID_9_INFERRED_20261122.json
       - artifacts/orbit360-recovery/source-batches/I6_6_SOURCE_BULK_*.json
 permissions:
   contents: read
@@ -79,6 +81,7 @@ jobs:
           node --check tools/gravicentra-i66-source-bulk-live.cjs
           node tools/gravicentra-i66-source-bulk-plan.test.cjs
           node tools/gravicentra-i66-source-bulk-apply.test.cjs
+          node --test tools/gravicentra-i66-universales-25-source-crosswalk.test.cjs
           node --check tools/gravicentra-i66-roble-five-issuer-crosswalk-readonly.cjs
           node --check tools/gravicentra-i66-roble-five-issuer-crosswalk.test.cjs
           node --test tools/gravicentra-i66-roble-five-issuer-crosswalk.test.cjs
