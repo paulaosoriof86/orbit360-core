@@ -25,18 +25,24 @@
     "endorsement": "833867",
     "pdfId": "1Q3RYB4PYApUREfOxJlVXzjJ6-08VpZrq",
     "pdfRawSha256": "7fac5f248584733328b7dc3747297b81ffc4b0f2dd675f61b51ddf82f26cb771",
-    "holderWitness": "fa35e1afa250f885d23fce89963489bd7598932cd18f8ce854017d8e953c5fd7",
+    "holderWitness": "153e059069f427b7f0db6d3c0de833b865260e66b69475fd66b5c6f3f377e3b4",
     "plateWitness": "1b365847f59272eb4ab45e8ba712ff76ee8de78f961f32a255fdfc5a73645796",
-    "vinWitness": "8b9f964d310c139785f094270391869f16a619d227b879524b49d05fc894170a"
+    "vinWitness": "8b9f964d310c139785f094270391869f16a619d227b879524b49d05fc894170a",
+    "vehicleCertificateOwnerWitness": "fa35e1afa250f885d23fce89963489bd7598932cd18f8ce854017d8e953c5fd7"
   },
   "sourceFindings": {
     "samePolicyNumber": true,
     "termContinuous": true,
-    "issuerInsuredDifferentAcrossTerms": true,
+    "issuerInsuredDifferentAcrossTerms": false,
     "issuerVehiclePlateAndVinSame": true,
     "statementSixOnlyPending": true,
     "priorSixAbsentFromCompletePendingStatement": true,
-    "notDirectPaymentEvidence": true
+    "notDirectPaymentEvidence": true,
+    "issuerContractualInsuredSameAcrossTerms": true,
+    "priorCertificateVehicleOwnerDiffersFromContractualInsured": true,
+    "ownerAndInsuredAreDifferentRelationships": true,
+    "oldCertificateFirstPageWasNotContractualInsuredSource": true,
+    "correctedGenericResolution": "SIGNED_POLICY_COVER_INSURED_PREVAILS_OVER_CERTIFICATE_OWNER"
   },
   "paymentInferenceRule": "D01/V7 sequential inferredPaid for absent earlier installments when statement is complete and no payment reversal exists; do not invent bank reference, direct payment or reconciliation",
   "schedule": [
@@ -158,7 +164,18 @@
     "inferredCents": 166950,
     "minorRoundingDifferenceCents": 4
   },
-  "specificHOLD": "ISSUER_HOLDER_DIFFERS_FROM_PRIOR_TERM: resolve legal insured/client ownership and policy linkage without conflating accounts. This HOLD must be per policy only, not entire source batch.",
+  "specificHOLD": "CANONICAL_CLIENT_EDITION_VEHICLE_PREDECESSOR_CAS_REQUIRED: no contractual insured change between terms. Resolve unique Firestore client, old edition, risk relation, payment duplications before six inferred plus six pending obligations. Do not hold for minor Q0.04 document rounding or certificate-owner difference. Isolate any ambiguous record only.",
   "newWrites": 0,
-  "pass": false
+  "pass": false,
+  "documentComparisonCorrection": {
+    "version": "GI_I66_GENERIC_INSURED_VS_RISK_OWNER_V1",
+    "classification": "CONTRACTUAL_INSURED_SAME_ISSUED_TERMS",
+    "precedence": "Issuer signed cover/letter REF POLIZA ASEGURADO and policy body above identity-card holder and vehicle PROPIETARIO; never compare different party roles",
+    "previousCoverPdfId": "1Q3RYB4PYApUREfOxJlVXzjJ6-08VpZrq",
+    "currentCoverPdfId": "1bDZF50cAMHW522wb8ZBWXQS_y6SvpOvO",
+    "insurerContractualInsuredSha256WithDocumentSaltPrevious": "153e059069f427b7f0db6d3c0de833b865260e66b69475fd66b5c6f3f377e3b4",
+    "insurerContractualInsuredSha256WithDocumentSaltCurrent": "daf456945bcb0dcebc66f78c614fc16cd91374ac96519acde5252df785302dbb",
+    "previousVehicleCertificateOwnerWitness": "fa35e1afa250f885d23fce89963489bd7598932cd18f8ce854017d8e953c5fd7",
+    "effects": "Removes false holder-change HOLD only. No auto-join, payment confirmation or mutation."
+  }
 }
