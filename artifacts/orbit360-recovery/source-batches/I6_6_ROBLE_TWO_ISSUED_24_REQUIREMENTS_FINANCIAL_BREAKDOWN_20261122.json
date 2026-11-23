@@ -1,0 +1,303 @@
+{
+  "schema": "GI_I66_ROBLE_TWO_ISSUED_24_REQUIREMENTS_BREAKDOWN_V1",
+  "recordType": "PINNED_SOURCE_ONLY_NOT_APPLIED",
+  "gate": "I6.6",
+  "dateGuatemala": "2026-11-22",
+  "parentSource": "artifacts/orbit360-recovery/source-batches/I6_6_ROBLE_FIVE_ISSUED_49_REQUIREMENTS_20261122.json",
+  "parentManifestBlobSha": "ab64e111319e3447733a3af05bf378250698ccdb",
+  "authorizedScope": "PROPOSE 2 UNIQUE PRIOR-RISK OWNERS FOR PROTECTED CONDITIONAL RENEWAL; NO DIRECT PAYMENT OR DRYRUN BYPASS",
+  "cases": [
+    {
+      "policy": "91-8324489",
+      "endorsement": "384442",
+      "termStart": "2026-11-16",
+      "termEnd": "2027-11-16",
+      "issuerHeader": {
+        "netCents": 220000,
+        "expensesCents": 11000,
+        "assistCents": 40000,
+        "financeCents": 29634,
+        "ivaCents": 36076,
+        "grossCents": 336710
+      },
+      "schedule": [
+        {
+          "requirement": "5747312",
+          "sequence": 1,
+          "due": "2026-11-16",
+          "netCents": 18337,
+          "expensesAndOtherCents": 4250,
+          "financingCents": 2464,
+          "ivaCents": 3006,
+          "grossCents": 28057
+        },
+        {
+          "requirement": "5747313",
+          "sequence": 2,
+          "due": "2026-12-16",
+          "netCents": 18333,
+          "expensesAndOtherCents": 4250,
+          "financingCents": 2470,
+          "ivaCents": 3006,
+          "grossCents": 28059
+        },
+        {
+          "requirement": "5747314",
+          "sequence": 3,
+          "due": "2027-01-16",
+          "netCents": 18333,
+          "expensesAndOtherCents": 4250,
+          "financingCents": 2470,
+          "ivaCents": 3006,
+          "grossCents": 28059
+        },
+        {
+          "requirement": "5747315",
+          "sequence": 4,
+          "due": "2027-02-16",
+          "netCents": 18333,
+          "expensesAndOtherCents": 4250,
+          "financingCents": 2470,
+          "ivaCents": 3006,
+          "grossCents": 28059
+        },
+        {
+          "requirement": "5747316",
+          "sequence": 5,
+          "due": "2027-03-16",
+          "netCents": 18333,
+          "expensesAndOtherCents": 4250,
+          "financingCents": 2470,
+          "ivaCents": 3006,
+          "grossCents": 28059
+        },
+        {
+          "requirement": "5747317",
+          "sequence": 6,
+          "due": "2027-04-16",
+          "netCents": 18333,
+          "expensesAndOtherCents": 4250,
+          "financingCents": 2470,
+          "ivaCents": 3006,
+          "grossCents": 28059
+        },
+        {
+          "requirement": "5747318",
+          "sequence": 7,
+          "due": "2027-05-16",
+          "netCents": 18333,
+          "expensesAndOtherCents": 4250,
+          "financingCents": 2470,
+          "ivaCents": 3006,
+          "grossCents": 28059
+        },
+        {
+          "requirement": "5747319",
+          "sequence": 8,
+          "due": "2027-06-16",
+          "netCents": 18333,
+          "expensesAndOtherCents": 4250,
+          "financingCents": 2470,
+          "ivaCents": 3006,
+          "grossCents": 28059
+        },
+        {
+          "requirement": "5747320",
+          "sequence": 9,
+          "due": "2027-07-16",
+          "netCents": 18333,
+          "expensesAndOtherCents": 4250,
+          "financingCents": 2470,
+          "ivaCents": 3006,
+          "grossCents": 28059
+        },
+        {
+          "requirement": "5747321",
+          "sequence": 10,
+          "due": "2027-08-16",
+          "netCents": 18333,
+          "expensesAndOtherCents": 4250,
+          "financingCents": 2470,
+          "ivaCents": 3006,
+          "grossCents": 28059
+        },
+        {
+          "requirement": "5747322",
+          "sequence": 11,
+          "due": "2027-09-16",
+          "netCents": 18333,
+          "expensesAndOtherCents": 4250,
+          "financingCents": 2470,
+          "ivaCents": 3006,
+          "grossCents": 28059
+        },
+        {
+          "requirement": "5747323",
+          "sequence": 12,
+          "due": "2027-10-16",
+          "netCents": 18333,
+          "expensesAndOtherCents": 4250,
+          "financingCents": 2470,
+          "ivaCents": 3006,
+          "grossCents": 28059
+        }
+      ],
+      "issuedScheduleGrossCents": 336706,
+      "coverScheduleDeltaCents": 4,
+      "sourceBasis": "INSURER_PDF_ORIGINAL_12_INSTALLMENT_BREAKDOWN_VERIFIED_NATIVE",
+      "riskCaveat": "CANONICAL_LEGACY_PLATE_PRESENT_BUT_LEGACY_VIN_ABSENT; require unique prior risk plate and no conflicting relationship before issuing"
+    },
+    {
+      "policy": "91-8343059",
+      "endorsement": "384576",
+      "termStart": "2026-11-27",
+      "termEnd": "2027-11-27",
+      "issuerHeader": {
+        "netCents": 346145,
+        "expensesCents": 17307,
+        "assistCents": 40000,
+        "financeCents": 46626,
+        "ivaCents": 54009,
+        "grossCents": 504087
+      },
+      "schedule": [
+        {
+          "requirement": "5747887",
+          "sequence": 1,
+          "due": "2026-11-27",
+          "netCents": 28850,
+          "expensesAndOtherCents": 4782,
+          "financingCents": 3880,
+          "ivaCents": 4501,
+          "grossCents": 42013
+        },
+        {
+          "requirement": "5747888",
+          "sequence": 2,
+          "due": "2026-12-27",
+          "netCents": 28845,
+          "expensesAndOtherCents": 4775,
+          "financingCents": 3886,
+          "ivaCents": 4500,
+          "grossCents": 42006
+        },
+        {
+          "requirement": "5747889",
+          "sequence": 3,
+          "due": "2027-01-27",
+          "netCents": 28845,
+          "expensesAndOtherCents": 4775,
+          "financingCents": 3886,
+          "ivaCents": 4500,
+          "grossCents": 42006
+        },
+        {
+          "requirement": "5747890",
+          "sequence": 4,
+          "due": "2027-02-27",
+          "netCents": 28845,
+          "expensesAndOtherCents": 4775,
+          "financingCents": 3886,
+          "ivaCents": 4500,
+          "grossCents": 42006
+        },
+        {
+          "requirement": "5747891",
+          "sequence": 5,
+          "due": "2027-03-27",
+          "netCents": 28845,
+          "expensesAndOtherCents": 4775,
+          "financingCents": 3886,
+          "ivaCents": 4500,
+          "grossCents": 42006
+        },
+        {
+          "requirement": "5747892",
+          "sequence": 6,
+          "due": "2027-04-27",
+          "netCents": 28845,
+          "expensesAndOtherCents": 4775,
+          "financingCents": 3886,
+          "ivaCents": 4500,
+          "grossCents": 42006
+        },
+        {
+          "requirement": "5747893",
+          "sequence": 7,
+          "due": "2027-05-27",
+          "netCents": 28845,
+          "expensesAndOtherCents": 4775,
+          "financingCents": 3886,
+          "ivaCents": 4500,
+          "grossCents": 42006
+        },
+        {
+          "requirement": "5747894",
+          "sequence": 8,
+          "due": "2027-06-27",
+          "netCents": 28845,
+          "expensesAndOtherCents": 4775,
+          "financingCents": 3886,
+          "ivaCents": 4500,
+          "grossCents": 42006
+        },
+        {
+          "requirement": "5747895",
+          "sequence": 9,
+          "due": "2027-07-27",
+          "netCents": 28845,
+          "expensesAndOtherCents": 4775,
+          "financingCents": 3886,
+          "ivaCents": 4500,
+          "grossCents": 42006
+        },
+        {
+          "requirement": "5747896",
+          "sequence": 10,
+          "due": "2027-08-27",
+          "netCents": 28845,
+          "expensesAndOtherCents": 4775,
+          "financingCents": 3886,
+          "ivaCents": 4500,
+          "grossCents": 42006
+        },
+        {
+          "requirement": "5747897",
+          "sequence": 11,
+          "due": "2027-09-27",
+          "netCents": 28845,
+          "expensesAndOtherCents": 4775,
+          "financingCents": 3886,
+          "ivaCents": 4500,
+          "grossCents": 42006
+        },
+        {
+          "requirement": "5747898",
+          "sequence": 12,
+          "due": "2027-10-27",
+          "netCents": 28845,
+          "expensesAndOtherCents": 4775,
+          "financingCents": 3886,
+          "ivaCents": 4500,
+          "grossCents": 42006
+        }
+      ],
+      "issuedScheduleGrossCents": 504079,
+      "coverScheduleDeltaCents": 8,
+      "sourceBasis": "INSURER_PDF_ORIGINAL_12_INSTALLMENT_BREAKDOWN_VERIFIED_NATIVE",
+      "riskCaveat": "CANONICAL_LEGACY_PLATE_PRESENT_BUT_LEGACY_VIN_ABSENT; require unique prior risk plate and no conflicting relationship before issuing"
+    }
+  ],
+  "totals": {
+    "policies": 2,
+    "installments": 24,
+    "statementGrossCents": 840785,
+    "headerGrossCents": 840797,
+    "differenceCents": 12
+  },
+  "writing": {
+    "eligibleBeforeFreshServerReadback": false,
+    "protectedCasRequired": true,
+    "firestoreWrites": 0
+  }
+}
