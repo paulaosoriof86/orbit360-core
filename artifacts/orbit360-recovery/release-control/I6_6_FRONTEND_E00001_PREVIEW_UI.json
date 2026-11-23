@@ -1,0 +1,37 @@
+{
+  "scopeId": "C360_LINKED_OPPORTUNITY_HISTORY",
+  "sourceSha": "15e849bd606bd8c93e4c0471da1193e85004aecd",
+  "buildId": "gi-i66-15e849bd606b-57f234755dc1",
+  "artifactDigest": "sha256:78a409a419e21648f2e074b49767d1dd55731140f8a83f6064b3ae1c8073b453",
+  "result": "PASS",
+  "authenticated": true,
+  "buttonClicked": true,
+  "serverReadback": true,
+  "reload": true,
+  "linkedDestination": true,
+  "roleScope": true,
+  "noDuplicate": true,
+  "desktop": true,
+  "mobile390": true,
+  "visualDecision": "APPROVED_BY_DIRECTION",
+  "testClass": "UI_INTERACTION_AND_EXISTING_RECORD_READBACK",
+  "desktopWidth": 1536,
+  "mobileWidth": 390,
+  "serverEvidence": {
+    "run": 45082105369,
+    "job": 137392337185,
+    "linkedDeals": 1,
+    "canonicalTimelineEntries": 3,
+    "standaloneActivities": 0
+  },
+  "observations": [
+    "Authenticated Dirección opened the assigned customer file, Historial and Abrir oportunidad on desktop and at 390 CSS pixels. Both opened the already existing inspection.",
+    "The three entries Creación, Observación operativa and Devuelto a asesor persisted upon reload. The screen showed the recorded denial and outstanding customer decision.",
+    "Existing assigned Asesor view GT displayed the same linked history. Server authorization denial for an exclusively Asesor identity remains outside this focal acceptance."
+  ],
+  "commercialWrites": 0,
+  "requestCorrelation": "Existing linked-record server readback, backed by the signed source reader run. No new write request expected for opening history.",
+  "otherObservedIssues": [
+    "Separate startup Inbox internal error and partial first-load hydration remain open."
+  ]
+}

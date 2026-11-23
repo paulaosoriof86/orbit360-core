@@ -1,0 +1,33 @@
+{
+  "schema": "GI_I66_FRONTEND_AUTHORITY_V1",
+  "status": "DIRECTION_APPROVED_EXACT_PREVIEW",
+  "approvedByDirection": true,
+  "gate": "I6.6",
+  "scopeId": "C360_LINKED_OPPORTUNITY_HISTORY",
+  "generation": 1,
+  "target": {
+    "sourceSha": "15e849bd606bd8c93e4c0471da1193e85004aecd",
+    "buildId": "gi-i66-15e849bd606b-57f234755dc1",
+    "artifactId": 14777966155,
+    "artifactDigest": "sha256:78a409a419e21648f2e074b49767d1dd55731140f8a83f6064b3ae1c8073b453",
+    "buildRunId": 45081926149,
+    "previewChannel": "gi-i66-rc-45081926149",
+    "previewUrl": "https://ays-orbit-360-lab--gi-i66-rc-45081926149-b9hkley0.web.app"
+  },
+  "previousHostingVersion": "sites/ays-orbit-360-lab/versions/7a0d829d3504c9f8",
+  "previousArtifactDigest": "sha256:e55fcc674a6cc493cdedff27672d082222db3dd7134354559788364b6ae23713",
+  "previousReceiptBlob": "3e44c28449070b78de5a71522167cbd65ead7666",
+  "previewReceiptPath": "artifacts/orbit360-recovery/release-control/I6_6_FRONTEND_E00001_PREVIEW_UI.json",
+  "previewReceiptBlob": "8905bb7f2f633057aa6d8750a9d83d3836a04292",
+  "guardRun": 45086661415,
+  "guardHead": "6406321c94a425a1a54c250cda5afec863cc5feb",
+  "ownerPins": {
+    "tools/gravicentra-governance-preflight-v1.mjs": "d3b3fa459ed23f539b1855c7ac01151cfae29fac",
+    "tools/gravicentra-i66-frontend-control.cjs": "f9d91fe70546169e8ca3181d7d6cd2c9c3becb67",
+    "tools/gravicentra-i66-frontend-promotion-owner.cjs": "96a0633d792010a468ad4ad5a215cfa3467af98a",
+    "tools/gravicentra-i66-frontend-hosting-io.cjs": "936e8aaa8681cd9c655611a17fa98b5647474c9f",
+    "tools/gravicentra-i66-frontend-promotion-transaction.cjs": "7ae0903d2a2df3835d42427986613c3e07a88628",
+    "tools/gravicentra-i6-6-operational-release-candidate.cjs": "7efc0dba145fa2fb1e1121333b3febe67a846a3b",
+    ".github/workflows/gravicentra-delta-66-exact-live-clone.yml": "aa6cfd7253d6fe288c29db4894d32a381105b0f9"
+  }
+}
