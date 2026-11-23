@@ -69,3 +69,34 @@ test('all approved built-in types are operational for GT/CO without catalog writ
     assert.equal(catalogWrites,0);
   }
 });
+
+test('Ops management modal may open built-in flows when protected catalog fetch is unavailable',async()=>{
+  const start=cycle.indexOf('  async function managementCreateModal(opts) {');
+  const end=cycle.indexOf('    opts = Object.assign(',start);
+  assert.ok(start>=0&&end>start);
+  const preamble=cycle.slice(start,end);
+  const compile=new Function('Orbit','U',preamble+'    return "OPEN";\n  }\nreturn managementCreateModal;');
+  const toasts=[];
+  const allowed=compile({cat:{DEF:{tiposGestion:[{t:'Actualizar datos de cliente',lista:'Gestiones Admin'}]},get:()=>[],ensure:async()=>{throw Error('permission-denied');}}},{toast:message=>toasts.push(message)});
+  assert.equal(await allowed({}), 'OPEN');
+  assert.equal(toasts.length,0);
+  const blocked=compile({cat:{DEF:{tiposGestion:[]},get:()=>[],ensure:async()=>{throw Error('catalog-missing');}}},{toast:message=>toasts.push(message)});
+  assert.equal(await blocked({}),undefined);
+  assert.match(toasts.at(-1),/catálogos/);
+});
+
+test('Management persists once before optional Drive and distinguishes postcommit failures from create failures',()=>{
+  const start=cycle.indexOf("    el('mg-save').addEventListener('click', async () => {");
+  const end=cycle.indexOf('    return back;',start);
+  assert.ok(start>=0&&end>start);
+  const block=cycle.slice(start,end);
+  const create=block.indexOf('await crearGestionDurable(');
+  const ack=block.indexOf('managementCommitted = true;');
+  const upload=block.indexOf('await Orbit.secureResources.uploadDocument(');
+  assert.ok(create>=0&&ack>create&&upload>ack,'canonical create must precede optional upload');
+  assert.match(block,/catch \(uploadError\) \{[\s\S]*?failed\.push\(\{ nombre: file\.name, status: 'carga_no_confirmada' \}\);[\s\S]*?continue;/);
+  assert.match(block,/if \(managementCommitted\) \{[\s\S]*?No repitas la gestión; verifica los documentos en su ficha/);
+  assert.match(block,/documentoCargaPendiente: failed\.length > 0/);
+  assert.match(block,/actividadCliente360Confirmada/);
+  assert.equal((block.match(/await crearGestionDurable\(/g)||[]).length,1,'no duplicate create transport');
+});

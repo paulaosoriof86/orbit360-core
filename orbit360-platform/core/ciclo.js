@@ -1115,7 +1115,14 @@ Orbit.ciclo = (function () {
   }
 
   async function managementCreateModal(opts) {
-    try{await Orbit.cat.ensure();}catch(error){U.toast('No fue posible confirmar los catálogos del tenant. La operación queda bloqueada.');return;}
+    try{await Orbit.cat.ensure();}catch(error){
+      // Product built-ins are operational defaults, not tenant config writes.
+      // Custom catalog types remain fail-closed at the canonical writer.
+      const defaults=Orbit.cat&&Orbit.cat.DEF&&Orbit.cat.DEF.tiposGestion;
+      if(!Array.isArray(defaults)||!defaults.length||typeof Orbit.cat.get!=='function'){
+        U.toast('No fue posible confirmar los catálogos del tenant. La operación queda bloqueada.');return;
+      }
+    }
     opts = Object.assign({
       clienteId: '', polizaId: '', tipo: '', titulo: '', lista: '', prioridad: 'Media', estado: 'Pendiente',
       asesorId: '', aseguradoraId: '', vence: inDays(7), proximaAccion: 'Pendiente de definir',
@@ -1302,6 +1309,7 @@ Orbit.ciclo = (function () {
       if (invalidLink) return U.toast('Los enlaces documentales deben iniciar con https://');
 
       const managementId = 'ges' + Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+      let managementCommitted = false;
       const linkedDocs = linkLines.map((url, i) => ({
         nombre: 'Documento Drive ' + (i + 1),
         driveUrl: url, externalUrl: url, origen: 'Drive/enlace',
@@ -1341,16 +1349,25 @@ Orbit.ciclo = (function () {
           adjuntos: linkedDocs.slice(),
           checklist
         }));
+        // A successful durable create is not undone by optional Drive failure.
+        managementCommitted = true;
 
         const uploaded = [];
         const failed = [];
         if (pendingFiles.length) {
           save.textContent = 'Guardando documentos…';
           for (const file of pendingFiles) {
-            const out = await Orbit.secureResources.uploadDocument(file, {
-              entidad: 'gestion', entidadId: managementId, clienteId, polizaId,
-              categoria: 'soporte_gestion', nombre: file.name
-            });
+            let out = null;
+            try {
+              out = await Orbit.secureResources.uploadDocument(file, {
+                entidad: 'gestion', entidadId: managementId, clienteId, polizaId,
+                categoria: 'soporte_gestion', nombre: file.name
+              });
+            } catch (uploadError) {
+              // Optional attachment failed; preserve the canonical management.
+              failed.push({ nombre: file.name, status: 'carga_no_confirmada' });
+              continue;
+            }
             if (out && out.ok) {
               uploaded.push({
                 nombre: out.nombre || file.name,
@@ -1399,6 +1416,18 @@ Orbit.ciclo = (function () {
         }
         if (opts.openAfterCreate !== false) openGestion(managementId);
       } catch (error) {
+        if (managementCommitted) {
+          // Never invite a duplicate create after canonical server readback,
+          // even if an optional document or later notification failed.
+          const savedGestion = S().get('gestiones', managementId);
+          back.remove(); refresh();
+          U.toast('Gestión creada y confirmada. Una operación posterior no se confirmó. No repitas la gestión; verifica los documentos en su ficha.');
+          if (typeof opts.onCreated === 'function') {
+            try { opts.onCreated(savedGestion || gestion); } catch (callbackError) {}
+          }
+          if (opts.openAfterCreate !== false) openGestion(managementId);
+          return;
+        }
         const code = String(error && (error.code || error.message) || '');
         U.toast(/PREVIEW_SYNTHETIC_ONLY|preview.*synthetic|synthetic.*only/i.test(code)
           ? 'Preview protege los datos reales: no se creó ninguna gestión en Ops.'
