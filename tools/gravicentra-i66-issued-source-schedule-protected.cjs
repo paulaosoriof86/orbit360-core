@@ -75,7 +75,15 @@ async function verify(){
   return db.runTransaction(async tx=>{
     const receipt=await tx.get(audit);assert.equal(receipt.get('operation'),s.op);
     const records=receipt.get('records'),refs=records.map(x=>col(x.collection).doc(x.row.id)),actual=await tx.getAll(...refs);
-    actual.forEach((d,i)=>assert.deepEqual(d.data(),records[i].row));
+    const amendment=code==='D03'?await tx.get(tenant.collection('operationalRequests').doc(s.op+'_source_series_v2')):null;
+    actual.forEach((d,i)=>{
+      const expected={...records[i].row};
+      if(amendment?.exists&&['recibosEsperados','carteraPrimas'].includes(records[i].collection)){
+        assert.equal(amendment.get('priorOperation'),s.op);expected.cuota='';delete expected.numeroCuota;
+        Object.assign(expected,{posicionEstadoCuenta:expected.secuencia,numeroCuotaFuente:'NO_INFORMADO',cantidadPendientesEstadoCuenta:11});
+      }
+      assert.deepEqual(d.data(),expected);
+    });
     const policy=records.find(x=>x.collection==='polizas').row;
     const quantities={};
     for(const k of ['recibosEsperados','carteraPrimas','cobros','vehiculos','actividades']){

@@ -15,7 +15,7 @@ for(const code of ['D01','D03'])test(code+' conservation, deterministic relation
   assert.ok(payments.every(r=>r.fechaPago===r.vence && r.metodo===null && !r.confirmado && !r.conciliado));
   assert.equal(policy.primaTotal,code==='D01'?4012.30:5502.36);
   assert.equal(p.pending,code==='D01'?334370:563508);assert.equal(p.inferred,code==='D01'?66855:0);
-  if(code==='D03'){assert.equal(policy.cuotas,1);assert.equal(policy.cronogramaOriginalAseguradora[0].requirement,'5654713');assert.ok(receipts.every(r=>r.importeNeto==null));}
+  if(code==='D03'){assert.equal(policy.cuotas,1);assert.equal(policy.cronogramaOriginalAseguradora[0].requirement,'5654713');assert.ok(receipts.every(r=>r.importeNeto==null&&r.cuota===''&&r.numeroCuota==null&&r.posicionEstadoCuenta===r.secuencia));}
   assert.deepEqual(p,C.plan(s,links,original,'2026-11-22T18:00:00Z'));
 });
 test('unknown financial authority or unavailable original stops the plan',()=>{

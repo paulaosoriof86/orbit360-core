@@ -79,6 +79,7 @@ function plan(s,relations,original,iso){
       numeroReciboFuente:r.req,vence:r.due,fechaVencimientoContractual:r.due,fechaLimite:r.due,
       vencimientoDocumentRef:s.code==='D03'?statementRef:ref,primaTotal:r.total/100,monto:r.total/100,montoTotal:r.total/100,
       conciliado:false,carteraActiva:!inferredPaid,fuente:'Estado de cuenta de aseguradora',documentaryEvidence:facts,creado:iso,actualizado:iso};
+    if(s.code==='D03'){base.cuota='';delete base.numeroCuota;base.posicionEstadoCuenta=seq;base.numeroCuotaFuente='NO_INFORMADO';base.cantidadPendientesEstadoCuenta=obligations.length;}
     if(r.parts)Object.assign(base,{primaNeta:r.parts[0]/100,neta:r.parts[0]/100,gastosEmisionYOtrosDocumentados:r.parts[1]/100,gastosFinan:r.parts[2]/100,iva:r.parts[3]/100});
     if(inferredPaid){inferred+=r.total;Object.assign(base,{estado:'Pago inferido',estadoOperativo:'pago_inferido',paymentState:'PAID_INFERRED',
       inferredPaid:true,paymentDateOrigin:'INFERRED',fechaPagoInferida:true,fechaPago:r.due,periodoInferido:r.due.slice(0,7),anchorSequence:3,
