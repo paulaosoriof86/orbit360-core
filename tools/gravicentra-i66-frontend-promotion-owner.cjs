@@ -147,6 +147,16 @@ async function run(){
       try{
         git('worktree','add','--quiet','--detach',wt,h);
         for(const [file,obj] of Object.entries(changes))fs.writeFileSync(path.join(wt,file),serial(obj));
+        // The central guard also checks for a clean tree. Represent the exact
+        // proposed control transaction as a detached local commit before QA.
+        // This does not move the recovery branch or publish its contents.
+        git('-C',wt,'add','--',...Object.keys(changes));
+        git('-C',wt,'-c','user.name=Gravicentra release preflight','-c','user.email=release@localhost',
+          '-c','commit.gpgSign=false','commit','--quiet','-m','Verify prospective control transaction');
+        const tree=git('-C',wt,'rev-parse','HEAD^{tree}');
+        for(const [file,obj] of Object.entries(changes)){
+          assert.equal(git('-C',wt,'rev-parse',tree+':'+file),blob(serial(obj)),'PROSPECTIVE_TREE_DRIFT');
+        }
         execFileSync(process.execPath,[P.guard],{cwd:wt,stdio:'inherit',timeout:420000});
       }finally{if(fs.existsSync(wt))git('worktree','remove','--force',wt);fs.rmSync(scratch,{recursive:true,force:true});}
       assert.equal(await provider.current('live'),request.target.hostingVersion,'PHYSICAL_DRIFT_DURING_METADATA_GUARD');

@@ -80,6 +80,17 @@ async function main(){
   ]);
   assert.ok(members.size<150&&advisors.size<400&&allTasks.size<750,'I66_CARLOS_TASK_SCAN_LIMIT');
   const actor=identity(members,advisors);
+  const catalog = await root.collection('config').doc('catalogs').get();
+  const member = members.docs.find(doc => doc.id === actor.uid).data();
+  const catalogRows = catalog.exists ? catalog.get('tiposGestion') : null;
+  const grants = [...(member.permissions || []), ...(member.permisosExtra || []), ...(member.extras || [])];
+  const known = Array.isArray(catalogRows) && catalogRows.some(row => norm(row.t) === norm('Gestión de póliza'));
+  console.log('I66_MANAGEMENT_CATALOG_EVIDENCE=' + JSON.stringify({
+    canonicalCatalogExists:catalog.exists, typeCount:Array.isArray(catalogRows)?catalogRows.length:null,
+    existingStandardTypeInTenantDocument:known, activeRole:member.activeRole,
+    explicitCatalogGrant:grants.some(g=>['config manage','catalog config manage'].includes(norm(g))),
+    writes:0
+  }));
   const tasks=allTasks.docs.map(d=>({id:d.id,row:d.data()||{}}));
   const owns=r=>r.ownerUid===actor.uid||r.createdByUid===actor.uid||r.updatedByUid===actor.uid||
     actor.advisorIds.has(text(r.asesorId||r.advisorId));
