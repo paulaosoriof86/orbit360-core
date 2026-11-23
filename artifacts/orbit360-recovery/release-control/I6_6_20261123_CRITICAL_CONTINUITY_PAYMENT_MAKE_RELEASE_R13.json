@@ -1,0 +1,90 @@
+{
+  "schema": "GI_I66_CRITICAL_CONTINUITY_PAYMENT_MAKE_RELEASE_R13_V1",
+  "recordedDateGuatemala": "2026-11-23",
+  "recordType": "SUBORDINATE_APPEND_ONLY_EXECUTION_EVIDENCE_NOT_CONTROL_PLANE",
+  "gate": "I6.6",
+  "branch": "recovery/fase-a-clean-20260831",
+  "repo": "paulaosoriof86/orbit360-core",
+  "production": {
+    "currentBuildId": "gi-i66-15e849bd606b-57f234755dc1",
+    "currentSourceSha": "15e849bd606bd8c93e4c0471da1193e85004aecd",
+    "siteArtifactId": 14777966155,
+    "lastKnownPreviewArtifactId": 14824703889,
+    "newDeployment": false,
+    "certifiedBackEndOfNewPreview": false,
+    "fullI66Accepted": false
+  },
+  "newIsolatedPreview": {
+    "sourceSha": "82af5ca6466db2955b29d61218d11c1b34674a58",
+    "buildId": "gi-i66-82af5ca6466d-57f234755dc1",
+    "url": "https://ays-orbit-360-lab--gi-i66-rc-45189363251-ml6nr9i9.web.app",
+    "buildRun": 45189363251,
+    "artifactId": 14824703889,
+    "artifactDigest": "sha256:ab8bbe279be670e12bc700d88a1c67794cc2e787bde4530ca4bde867c0fac66b",
+    "hostingPreviewMarkerVerified": true,
+    "backendFunctionPreviewAndAuthenticatedWrite": "PENDING",
+    "sameArtifactLivePromotion": false
+  },
+  "finance": {
+    "freshRunId": 45192733898,
+    "result": "PREFLIGHT_PASS_ONLY",
+    "reviewed": 302,
+    "unchanged": 185,
+    "held": 117,
+    "missingExactPolicyEdition": 97,
+    "missingUniqueReceipt": 20,
+    "newEligibleWrites": 0,
+    "newFinancialWritesThisRound": 0,
+    "authorizedOwnerBusinessDecisions": "D01-D06 and owner confirmed 7317082 PAID and 5838167 Q0.04 tolerated; no new business answer required",
+    "noBlindReplays": true,
+    "sourceReceipt": "artifacts/orbit360-recovery/release-control/I6_6_20261123_PROTECTED_SOURCE_BULK_REFRESH_REQUEST.json"
+  },
+  "specificNewDriveLead": {
+    "policy": "91-8323091",
+    "sourcePdfId": "1qmUypnZBwW4xyeKlINpk6U42vltZKk-W",
+    "sourceTerm": "2026-10-11..2027-10-11",
+    "predecessorPdfId": "1N4KeYnhs0Tn0J6nMmxCLRgPPxFese_0u",
+    "previousTerm": "2025-10-11..2026-10-11",
+    "presentDuplicatePolicyEditionCount": 0,
+    "oldRiskLinkageCandidateCount": 2,
+    "uniqueRiskVerified": false,
+    "write": false,
+    "receipt": "artifacts/orbit360-recovery/release-control/I6_6_EL_ROBLE_91_8323091_DOCUMENT_IDENTIFICATION_20261123.json"
+  },
+  "make": {
+    "existingWhatsAppReaderId": 10196136,
+    "status": "ACTIVE_READER_ONLY",
+    "GreenApiConnectionId": 14749710,
+    "lastHistorySearch": "2026-10-01..2026-11-23",
+    "historyMessagesReturned": 0,
+    "incomingWebhookReadback": "no",
+    "webhookUrlSet": false,
+    "attemptedSetSettingsRuns": [
+      "0293a92b09724d43b239caeac9e1bbf8",
+      "a419eb417b964c16bccdefdf8e9dcf8d"
+    ],
+    "bothFailed": "GREEN_API_SETSETTINGS_NON_JSON_DATAERROR",
+    "settingsChangedVerified": false,
+    "qaTempScenariosDeleted": [
+      10218416,
+      10218433
+    ],
+    "canonicalRealLeadWrites": 0,
+    "adRefRequired": true,
+    "metaAIToolCannotSubstituteAdSource": true,
+    "sourceReceipt": "artifacts/orbit360-recovery/release-control/I6_6_GREENAPI_AyS_SETTINGS_CAUSAL_DIAGNOSTIC_20261123.json",
+    "qaWebhookScenarioId": 10195867,
+    "qaWebhookIsInactive": true
+  },
+  "oauth": {
+    "newMakeFirestoreRequestId": "e0e9cb34-79e0-4488-8b0a-85f4352c30c5",
+    "status": "pending",
+    "connectionOwnerPrivateAction": "Copy OAuth Client ID and Client Secret from Google Auth Platform Clients existing app and complete Google sign-in; no Gmail password in Make Client ID/Secret fields",
+    "requiresExistingProjectOnly": "ays-orbit-360-lab",
+    "oldOauthClient": "Gravicentra Make - Firestore (integración separada)",
+    "oauthRedirect": "https://www.integromat.com/oauth/cb/google-custom"
+  },
+  "requiredExternalPrivateStep": "GreenAPI console existing AyS instance > Change > Receive notifications about incoming messages/files ON > Save; use HTTP API with webhookUrl blank; do not touch T&A instance. Setting changes reboot provider instance; readback before claiming pass.",
+  "releaseHardBoundary": "Do not publish frontend-only package with missing backend acceptance. Require same immutable artifact/digest and authenticated Carlos Ops write readback + Drive and payment checks in isolated Preview before any LIVE promotion.",
+  "sourceIntegrity": "No new repo, branch, Firebase, reimport, permissions grants, or false PASS. Preserve I6.5 last frozen and I6.6 one active gate; existing signed 58 obligations and G&T 10 requirements remain."
+}
