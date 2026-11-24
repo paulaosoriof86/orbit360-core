@@ -539,32 +539,40 @@ test('real Chromium DOM reproduces canonical detail detachment and preserves str
           serverBalanceProof:f.h.probe.sixServerBalanceProof(f.r,[f.p],f.policy,[],queries)};
         const original=JSON.stringify(data);
         const detachingPage=remaining=>{
-          const trace=[];
-          return {trace,locator(css){
-            assert.equal(css,selector);const locator=page.locator(css),withElement=locator._withElement.bind(locator);
-            // Timing seam only: the real locator resolves the real DOM handle,
-            // then the unchanged product renderer replaces it. The original
-            // Playwright scroll must produce its own error; no result is faked.
-            locator._withElement=(task,...options)=>withElement(async(handle,...args)=>{
-              if(remaining>0){remaining--;assert.equal(await handle.evaluate(node=>node.isConnected),true);
-                await render();assert.equal(await handle.evaluate(node=>node.isConnected),false);trace.push('CANONICAL_DETAIL_REPLACED');}
-              return task(handle,...args);
-            },...options);
-            return locator;
-          }};
+          const trace=[],frame=page.mainFrame(),channel=frame._channel;
+          // Timing seam only, inside the already active public scroll API zone:
+          // return the real resolved handle after the unchanged product renderer
+          // replaces its DOM. Do not wrap _withElement or rewrite any error.
+          frame._channel=new Proxy(channel,{get(target,key){
+            const value=Reflect.get(target,key);
+            if(key!=='waitForSelector')return value;
+            return async params=>{
+              const result=await value(params);
+              if(params.selector===selector&&params.strict===true&&params.state==='attached'&&remaining>0){
+                remaining--;const handle=result.element?._object;assert.ok(handle);
+                assert.equal(await handle.evaluate(node=>node.isConnected),true);
+                await render();assert.equal(await handle.evaluate(node=>node.isConnected),false);
+                trace.push('CANONICAL_DETAIL_REPLACED');
+              }
+              return result;
+            };
+          }});
+          return {trace,restore:()=>{frame._channel=channel;},locator(css){assert.equal(css,selector);return page.locator(css);}};
         };
         const old=detachingPage(1);
-        await assert.rejects(old.locator(selector).scrollIntoViewIfNeeded({timeout:1500}),
-          /^Error: locator\.scrollIntoViewIfNeeded: Element is not attached to the DOM/);
+        try{await assert.rejects(old.locator(selector).scrollIntoViewIfNeeded({timeout:1500}),
+          /^Error: locator\.scrollIntoViewIfNeeded: Element is not attached to the DOM/);}finally{old.restore();}
         assert.equal(old.trace.length,1,'The old one-shot interaction reproduces the observed Preview failure');
-        const transient=detachingPage(1),recovered=await f.h.probe.showSixReceiptBalance(transient,f.e,width,'BEFORE_RELOAD');
+        const transient=detachingPage(1);let recovered;
+        try{recovered=await f.h.probe.showSixReceiptBalance(transient,f.e,width,'BEFORE_RELOAD');}finally{transient.restore();}
         assert.deepEqual(plain(recovered),{attempts:2,detachments:1});assert.equal(transient.trace.length,1);
         const observed=await page.evaluate(f.h.probe.inspectSixReceiptBrowser,input);
         f.h.probe.certifySixReceiptUi(f.e,server,observed,'BEFORE_RELOAD','direccion',width);
         assert.equal(observed.displayedGrossCents,27826);assert.equal(observed.displayedBalanceCents,27826);
         assert.equal(observed.viewport.horizontalOverflowPx,0);assert.equal(observed.viewport.balanceVisible,true);
         await render();const persistent=detachingPage(Infinity);
-        await assert.rejects(f.h.probe.showSixReceiptBalance(persistent,f.e,width,'AFTER_RELOAD'),/SCROLL_DETACH_PERSISTENT_HOLD/);
+        try{await assert.rejects(f.h.probe.showSixReceiptBalance(persistent,f.e,width,'AFTER_RELOAD'),/SCROLL_DETACH_PERSISTENT_HOLD/);}
+        finally{persistent.restore();}
         assert.equal(persistent.trace.length,3,'Persistent real DOM replacement remains HOLD after exactly three attempts');
         for(const kind of ['missing','hidden','duplicate','wrong-identity','overflow']){
           await render();
