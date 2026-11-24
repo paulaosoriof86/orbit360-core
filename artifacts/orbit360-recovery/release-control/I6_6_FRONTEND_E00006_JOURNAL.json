@@ -1,0 +1,59 @@
+{
+  "phase": "PREPARED",
+  "key": "32bf0a31259398a252be0a38cbdcdd2e4a6ab7ef3634390b93fbff357980c5e1",
+  "generation": 6,
+  "request": {
+    "schema": "GI_I66_FRONTEND_PROMOTION_V1",
+    "gate": "I6.6",
+    "scope": "FRONTEND_ONLY",
+    "scopeId": "SIX_RECEIPT_CURRENT_BALANCE_READONLY",
+    "generation": 6,
+    "approvalBlob": "7ae4c1b58afd9ec318364ab83d40a3737397b79e",
+    "guardBlob": "edce16bffa474aae01eb34cdbc5bec5b0b63017f",
+    "previousReceiptBlob": "11fdb3bee494541513482666d6215f45cbad0567",
+    "previous": {
+      "sourceSha": "65c825b2808a615ca4195bdde6689dbdbe3193b2",
+      "sourceTree": "e7f197675e7124caee45460fc131b526cd43dae1",
+      "manifestBlob": "7f693bd0e1a7faaa6cbc95794ef5123c91c5efa4",
+      "compositionBlob": "33bf80768cb6cb311f2975d282a5f50935f680aa",
+      "artifactId": 14873426438,
+      "artifactDigest": "sha256:7cb782848a45083047c4899bc30c13bf5be46429607e42597d09342becfc9acc",
+      "buildId": "gi-i66-65c825b2808a-57f234755dc1",
+      "buildRunId": 45287432665,
+      "previewUrl": "",
+      "previewChannel": "",
+      "previewUiRunId": null,
+      "hostingVersion": "sites/ays-orbit-360-lab/versions/332999a55b189108",
+      "files": 224
+    },
+    "target": {
+      "sourceSha": "48a7a6d4379759b6f32c7f2435e8e37c724989cc",
+      "sourceTree": "31bd6f8d420bfa8c5c296d9561d7de0ff4442f74",
+      "manifestBlob": "677354250c84ef0a5af0b562e29586dfe1559553",
+      "compositionBlob": "33bf80768cb6cb311f2975d282a5f50935f680aa",
+      "artifactId": 14913484604,
+      "artifactDigest": "sha256:531fddd76a010377bd9aa6c652d737dc584a99edc573c2aca313b56fd7efa405",
+      "buildId": "gi-i66-48a7a6d43797-57f234755dc1",
+      "buildRunId": 45382606064,
+      "previewUrl": "https://ays-orbit-360-lab--gi-i66-rc-45382606064-6302t2f6.web.app",
+      "previewChannel": "gi-i66-rc-45382606064",
+      "previewUiRunId": 45389300598,
+      "hostingVersion": "sites/ays-orbit-360-lab/versions/fdbec659ed0f3b71",
+      "files": 224
+    }
+  },
+  "backup": {
+    "firebase": 224,
+    "custom": 224,
+    "sourceSha": "65c825b2808a615ca4195bdde6689dbdbe3193b2",
+    "buildId": "gi-i66-65c825b2808a-57f234755dc1",
+    "artifactDigest": "sha256:7cb782848a45083047c4899bc30c13bf5be46429607e42597d09342becfc9acc",
+    "hostingVersion": "sites/ays-orbit-360-lab/versions/332999a55b189108",
+    "manifestDigest": "sha256:da40e7ad3f453107a44fdc868a58ff469f91139252c0204f9fc298a8d9f02905"
+  },
+  "preview": {
+    "files": 224,
+    "hostingVersion": "sites/ays-orbit-360-lab/versions/fdbec659ed0f3b71",
+    "artifactDigest": "sha256:531fddd76a010377bd9aa6c652d737dc584a99edc573c2aca313b56fd7efa405"
+  }
+}
