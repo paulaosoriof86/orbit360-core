@@ -7,6 +7,8 @@ on:
       - tools/gravicentra-i66-cendoso-paid-protected.cjs
       - tools/gravicentra-i66-cendoso-paid-protected.test.cjs
       - tools/gravicentra-i66-payment-incident-readback.cjs
+      - artifacts/orbit360-recovery/release-control/I6_6_DIRECTION_URGENT_COMPLETION_TOLERANCE_AND_DIRECT_RENEWAL_20261124.json
+      - artifacts/orbit360-recovery/source-batches/I6_6_CENDOSO_155_EXISTING_DIRECT_APPLICATION_TARGETS_20261124.json
       - artifacts/orbit360-recovery/release-control/I6_6_OWNER_DECISIONS_GREENAPI_EMAIL_AND_PAYMENT_20261119.json
       - artifacts/orbit360-recovery/source-batches/I6_6_SOURCE_CENDOSO_PAID_CANDIDATES_2026.json.gz
       - artifacts/orbit360-recovery/source-batches/I6_6_COLUMNA_20261116_PAYMENT_EVIDENCE.json
@@ -14,7 +16,7 @@ on:
 permissions:
   contents: read
 concurrency:
-  group: gravicentra-i66-cendoso-paid-${{ github.sha }}
+  group: gravicentra-i66-cendoso-paid
   cancel-in-progress: false
 env:
   GCLOUD_PROJECT: ays-orbit-360-lab
@@ -26,11 +28,12 @@ jobs:
     if: >
       github.repository == 'paulaosoriof86/orbit360-core' &&
       github.ref_name == 'recovery/fase-a-clean-20260831' &&
-      (contains(github.event.head_commit.message, 'I66_CENDOSO_PAID_BATCH_READY') || contains(github.event.head_commit.message, 'I66_COLUMNA_READBACK') || contains(github.event.head_commit.message, 'I66_ISSUED_READBACK') || contains(github.event.head_commit.message, 'I66_STATEMENT_PAYMENT_READBACK') || contains(github.event.head_commit.message, 'I66_PAYMENT_INCIDENT_READBACK'))
+      (contains(github.event.head_commit.message, 'I66_CENDOSO_APPLICATION_READY') || contains(github.event.head_commit.message, 'I66_CENDOSO_PAID_BATCH_READY') || contains(github.event.head_commit.message, 'I66_COLUMNA_READBACK') || contains(github.event.head_commit.message, 'I66_ISSUED_READBACK') || contains(github.event.head_commit.message, 'I66_STATEMENT_PAYMENT_READBACK') || contains(github.event.head_commit.message, 'I66_PAYMENT_INCIDENT_READBACK'))
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     outputs:
       ready: ${{ steps.judge.outputs.ready }}
+      apply_mode: ${{ steps.judge.outputs.apply_mode }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -83,18 +86,18 @@ jobs:
         run: node tools/gravicentra-i66-cendoso-paid-protected.cjs
         env:
           GI_I66_CENDOSO_MODE: columna-readback
-      - name: Match legacy paid rows to canonical policies, receipts and cartera (zero writes)
-        if: contains(github.event.head_commit.message, 'I66_CENDOSO_PAID_BATCH_READY')
+      - name: Check exact registration or existing-payment application targets (zero writes)
+        if: contains(github.event.head_commit.message, 'I66_CENDOSO_PAID_BATCH_READY') || contains(github.event.head_commit.message, 'I66_CENDOSO_APPLICATION_READY')
         shell: bash
         env:
-          GI_I66_CENDOSO_MODE: preflight
+          GI_I66_CENDOSO_MODE: ${{ contains(github.event.head_commit.message, 'I66_CENDOSO_APPLICATION_READY') && 'application-preflight' || 'preflight' }}
           GI_I66_CENDOSO_PLAN_OUT: ${{ runner.temp }}/gi-i66-cendoso-paid-plan.json
           GI_I66_CENDOSO_REPORT_OUT: ${{ runner.temp }}/gi-i66-cendoso-paid-report.json
         run: |
           set -euo pipefail
           node tools/gravicentra-i66-cendoso-paid-protected.cjs
       - id: judge
-        if: contains(github.event.head_commit.message, 'I66_CENDOSO_PAID_BATCH_READY')
+        if: contains(github.event.head_commit.message, 'I66_CENDOSO_PAID_BATCH_READY') || contains(github.event.head_commit.message, 'I66_CENDOSO_APPLICATION_READY')
         name: Report actual eligible write count without mutating Firestore
         shell: bash
         env:
@@ -103,8 +106,13 @@ jobs:
           set -euo pipefail
           node - <<'JS'
           const fs=require('fs');const p=JSON.parse(fs.readFileSync(process.env.GI_I66_CENDOSO_PLAN_OUT,'utf8'));
-          if(p.status!=='READONLY_PREFLIGHT_NO_WRITES'||p.writes!==0||p.inputCount!==607||
-             p.readyCount+p.holdsCount!==607)throw Error('I66_PREVIEW_NOT_EXACT');
+          const application=p.schema==='GI_I66_EXISTING_DIRECT_APPLICATION_PLAN_V1';
+          if(p.writes!==0||!Number.isInteger(p.readyCount)||p.readyCount!==p.ready.length||
+             (application ? p.status!=='READONLY_APPLICATION_PREFLIGHT_NO_WRITES'||p.inputCount!==155||
+               p.readyCount+p.unchangedCount+p.holdsCount!==155||p.newPayments!==0||p.bankMovements!==0 :
+               p.status!=='READONLY_PREFLIGHT_NO_WRITES'||p.inputCount!==607||p.readyCount+p.holdsCount!==607))
+            throw Error('I66_PREVIEW_NOT_EXACT');
+          fs.appendFileSync(process.env.GITHUB_OUTPUT,'apply_mode='+(application?'application-apply':'apply')+'\n');
           fs.appendFileSync(process.env.GITHUB_OUTPUT,'ready='+(p.readyCount>0?'true':'false')+'\n');
           console.log('I66_CENDOSO_PREFLIGHT_PASS '+p.readyCount+' eligible, '+p.holdsCount+' isolated holds');
           JS
@@ -162,10 +170,10 @@ jobs:
               print('I66_PAID_PROTECTED_FIREBASE_IDENTITY_PASS');break
           else: raise SystemExit('I66_PAID_PROTECTED_IDENTITY_HOLD')
           PY
-      - name: Commit unique owner-approved confirmed Cobros and read back every receipt and cartera
+      - name: Execute the approved exact mode and verify every receipt, cartera and cobro
         shell: bash
         env:
-          GI_I66_CENDOSO_MODE: apply
+          GI_I66_CENDOSO_MODE: ${{ needs.preflight.outputs.apply_mode }}
           GI_I66_PROTECTED_ENV: gravicentra-live-data-writes
           GI_I66_CENDOSO_PLAN_IN: ${{ runner.temp }}/i66-paid/gi-i66-cendoso-paid-plan.json
           GI_I66_CENDOSO_REPORT_OUT: ${{ runner.temp }}/gi-i66-cendoso-paid-live.json

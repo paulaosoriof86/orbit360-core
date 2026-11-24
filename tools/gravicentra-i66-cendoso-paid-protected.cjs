@@ -784,14 +784,246 @@ async function applyHistoricalChunk(db,plans,source){
   return {accepted,holds,committedCount,physicalDocumentCreates:committedCount*4,
     committedUnverified:holds.filter(r=>r.commitOutcome==='COMMITTED_PENDING_READBACK').map(r=>r.sourceId)};
 }
+// Existing protected Cendoso executor: explicit manual application of already
+// registered DIRECT payments. This path never creates a payment or represents
+// Direction's instruction as insurer/bank/invoice evidence.
+const APPLICATION_DECISION='DIRECTION_I66_COMPLETE_APPLICATION_GLOBAL_TOLERANCE_DIRECT_RENEWAL_20261124';
+const APPLICATION_AUTHORITY='artifacts/orbit360-recovery/release-control/I6_6_DIRECTION_URGENT_COMPLETION_TOLERANCE_AND_DIRECT_RENEWAL_20261124.json';
+const APPLICATION_AUTHORITY_SHA='cda5d408666e6e959248ea0a08ffa13f9e05a695fe41b3dedee20ba3d93f7c3d';
+const APPLICATION_TARGETS='artifacts/orbit360-recovery/source-batches/I6_6_CENDOSO_155_EXISTING_DIRECT_APPLICATION_TARGETS_20261124.json';
+const APPLICATION_TARGETS_SHA='8619d7953c05b7a82eeb0c837796064bc8e46fe5bc12c051345f3e5152a2ec66';
+const applicationAuditId=sourceId=>'gi_i66_direct_application_'+sha(`${TENANT}|${APPLICATION_DECISION}|${sourceId}`).slice(0,30);
+const applicationKey=(collection,id)=>collection+'/'+id;
+function loadApplicationBinding(source){
+  const aBytes=fs.readFileSync(path.join(__dirname,'..',APPLICATION_AUTHORITY));
+  const mBytes=fs.readFileSync(path.join(__dirname,'..',APPLICATION_TARGETS));
+  assert.equal(sha(aBytes),APPLICATION_AUTHORITY_SHA,'APPLICATION_AUTHORITY_BYTES_CHANGED');
+  assert.equal(sha(mBytes),APPLICATION_TARGETS_SHA,'APPLICATION_TARGET_BYTES_CHANGED');
+  const decision=JSON.parse(aBytes),manifest=JSON.parse(mBytes);
+  assert.equal(decision.schema,'GI_I66_DIRECTION_URGENT_COMPLETION_DECISION_V1');
+  assert.equal(decision.decisionId,APPLICATION_DECISION);assert.equal(decision.gate,'I6.6');
+  assert.equal(decision.authority,'DIRECT_USER_INSTRUCTION_IN_CURRENT_CONVERSATION');
+  assert.equal(decision.decisions.completePendingApplicationThroughCanonicalWriter,true);
+  assert.equal(decision.preservedBoundaries.noInventedPaymentsOrBankTransfers,true);
+  assert.equal(decision.preservedBoundaries.exactPaymentAndObligationIdentityRequired,true);
+  assert.equal(manifest.schema,'GI_I66_EXISTING_DIRECT_APPLICATION_TARGETS_V1');
+  assert.equal(manifest.decisionId,APPLICATION_DECISION);assert.equal(manifest.authoritySha256,APPLICATION_AUTHORITY_SHA);
+  assert.equal(manifest.authorityPath,APPLICATION_AUTHORITY);assert.equal(manifest.sourcePath,SOURCE);
+  assert.equal(manifest.sourceSha256,SOURCE_SHA);assert.equal(manifest.projectId,PROJECT);assert.equal(manifest.tenantId,TENANT);
+  assert.equal(manifest.country,'GT');assert.equal(manifest.currency,'GTQ');assert.equal(manifest.targetCount,155);
+  assert.equal(manifest.targets.length,155);assert.equal(manifest.registeredGrossCents,7880643);
+  for(const field of ['sourceId','receiptId','portfolioId','cobroId'])assert.equal(new Set(manifest.targets.map(t=>t[field])).size,155,'APPLICATION_DUPLICATE_TARGET_'+field);
+  assert.equal(manifest.targets.reduce((sum,t)=>sum+t.grossCents,0),7880643);
+  for(const target of manifest.targets){
+    const raw=source.candidates.find(r=>r.candidateId===target.sourceId),row=raw&&sourceRow(raw);
+    assert.ok(row&&!row.error,'APPLICATION_SOURCE_MISSING');
+    assert.equal(row.total,target.grossCents);assert.equal(row.paid,target.paidDate);
+    assert.equal(row.periodStart,target.periodStart);assert.equal(row.due,target.due);
+    assert.equal(objhash(row.sourceRows),target.sourceRowsSha256);assert.equal(target.cobroId,cobroId(target.receiptId));
+    assert.equal(target.originalPostingAuditId,auditId(target.sourceId));
+  }
+  return {manifest,authoritySha256:APPLICATION_AUTHORITY_SHA,manifestSha256:APPLICATION_TARGETS_SHA};
+}
+async function readApplicationSnapshot(db,source,binding,tx){
+  const snapshot=await readHistoricalSnapshot(db,source,tx),getAll=(...refs)=>tx?tx.getAll(...refs):db.getAll(...refs);
+  snapshot.rawByPath={};snapshot.updateTimes={};snapshot.applicationAudits=[];snapshot.clients=[];
+  const refs=binding.manifest.targets.flatMap(t=>[
+    ['recibosEsperados',t.receiptId],['carteraPrimas',t.portfolioId],['cobros',t.cobroId]
+  ]);
+  for(let i=0;i<refs.length;i+=100){
+    const group=refs.slice(i,i+100),found=await getAll(...group.map(([col,id])=>item(db,col).doc(id)));
+    found.forEach((s,n)=>{if(s.exists){const key=applicationKey(...group[n]);snapshot.rawByPath[key]=s.data();
+      assert.ok(s.updateTime,'APPLICATION_UPDATE_TIME_REQUIRED');snapshot.updateTimes[key]=stableValue(s.updateTime);}});
+  }
+  const audits=binding.manifest.targets.map(t=>request(db,applicationAuditId(t.sourceId)));
+  for(let i=0;i<audits.length;i+=100){const rows=await getAll(...audits.slice(i,i+100));
+    snapshot.applicationAudits.push(...rows.filter(s=>s.exists).map(s=>({...s.data(),id:s.id})));}
+  const policyIds=new Set(binding.manifest.targets.map(t=>t.policyId));
+  const clientIds=[...new Set(snapshot.policies.filter(p=>policyIds.has(p.id)).map(p=>str(p.clienteId)).filter(Boolean))];
+  for(let i=0;i<clientIds.length;i+=100){const rows=await getAll(...clientIds.slice(i,i+100).map(id=>item(db,'clientes').doc(id)));
+    snapshot.clients.push(...rows.filter(s=>s.exists).map(s=>({...s.data(),id:s.id})));}
+  return snapshot;
+}
+function assessApplication(target,source,snapshot,binding){
+  const hold=code=>({hold:{sourceId:target.sourceId,receiptId:target.receiptId,code}});
+  if(snapshot.complete!==true||snapshot.sourceSha256!==SOURCE_SHA)return hold('APPLICATION_INCOMPLETE_SNAPSHOT');
+  const canonical=binding.manifest.targets.find(t=>t.sourceId===target.sourceId);
+  if(!canonical||stableHash(canonical)!==stableHash(target))return hold('APPLICATION_TARGET_SCOPE_CHANGED');
+  const raw=source.candidates.find(r=>r.candidateId===target.sourceId),row=raw&&sourceRow(raw);
+  if(!row||row.error||row.hold.length||row.currency!=='GTQ'||row.total!==target.grossCents||row.paid!==target.paidDate||
+    row.periodStart!==target.periodStart||row.due!==target.due||objhash(row.sourceRows)!==target.sourceRowsSha256)return hold('APPLICATION_SOURCE_CHANGED');
+  const policy=snapshot.policies.find(p=>p.id===target.policyId),client=policy&&snapshot.clients.find(c=>c.id===policy.clienteId),
+    insurer=policy&&snapshot.insurers.find(i=>i.id===policy.aseguradoraId);
+  if(!policy||!client||!insurer||policyCountry(policy)!=='GT'||norm(policy.moneda)!=='GTQ'||
+    (client.tenantId&&client.tenantId!==TENANT)||(client.pais&&!['GT','GUATEMALA'].includes(norm(client.pais)))||
+    !policyMatches(row.policy,policyIdentityNumber(policy))||date(policy.vigenciaInicio)!==row.coverageStart||date(policy.vigenciaFin)!==row.coverageEnd||
+    !insurerMatches(row.insurer,insurer.nombre||insurer.razonSocial)||
+    (target.clientId&&target.clientId!==client.id)||(target.insurerId&&target.insurerId!==insurer.id))return hold('APPLICATION_PARENT_IDENTITY_CHANGED');
+  const insurers=new Map(snapshot.insurers.map(i=>[i.id,i]));
+  const peers=snapshot.policies.filter(p=>policyCountry(p)==='GT'&&norm(p.moneda)==='GTQ'&&
+    policyNumberFields.some(field=>policyMatches(row.policy,p[field]))&&date(p.vigenciaInicio)===row.coverageStart&&date(p.vigenciaFin)===row.coverageEnd&&
+    (p.aseguradoraId===policy.aseguradoraId||!insurers.has(p.aseguradoraId)||
+      insurerMatches(row.insurer,insurers.get(p.aseguradoraId).nombre||insurers.get(p.aseguradoraId).razonSocial)));
+  if(peers.length!==1)return hold('APPLICATION_POLICY_EDITION_NOT_UNIQUE');
+  const roots=[['recibosEsperados',target.receiptId],['carteraPrimas',target.portfolioId],['cobros',target.cobroId]],records={};
+  for(const [collection,id] of roots){
+    const key=applicationKey(collection,id),record=snapshot.rawByPath[key];
+    if(!record||!snapshot.updateTimes[key])return hold('APPLICATION_EXISTING_RECORD_REQUIRED');
+    const related=snapshot.records.filter(r=>r.collection===collection&&(r.id===id||
+      ['reciboId','receiptId','expectedReceiptId'].some(k=>str(r[k])===target.receiptId)||
+      ['sourceId','evidenceId','sourceRef'].some(k=>str(r[k])===target.sourceId)));
+    if(related.length!==1||related[0].id!==id)return hold('APPLICATION_DUPLICATE_LINK_OR_SOURCE');
+    if((record.tenantId&&record.tenantId!==TENANT)||str(record.polizaId)!==policy.id||(collection!=='recibosEsperados'&&str(record.reciboId)!==target.receiptId)||
+      ['policyId'].some(k=>record[k]&&str(record[k])!==policy.id)||
+      ['clienteId','clientId'].some(k=>record[k]&&str(record[k])!==client.id)||
+      ['aseguradoraId','insurerId'].some(k=>record[k]&&str(record[k])!==insurer.id)||
+      (record.moneda&&norm(record.moneda)!=='GTQ')||(record.pais&&!['GT','GUATEMALA'].includes(norm(record.pais))))return hold('APPLICATION_FINANCIAL_IDENTITY_CHANGED');
+    if(record.paymentState!=='PAID_DIRECT'||record.directOrInferred!=='DIRECT'||record.paymentOrigin!=='CRM_MIGRATED_DIRECT_PAYMENT'||
+      record.paymentEvidenceType!=='LEGACY_CENDOSO_FECHA_REAL_PAGADO'||record.inferredPaid===true)return hold('APPLICATION_NOT_ORIGINAL_DIRECT_PAYMENT');
+    if(!['PENDING_APPLICATION','APPLIED_DIRECT'].includes(record.applicationState)||
+      record.conciliado!==(record.applicationState==='APPLIED_DIRECT'))return hold('APPLICATION_STATE_CONFLICT');
+    if(['reversal','reversed','paymentReversed','partialPayment'].some(k=>record[k]===true)||
+      ['reversedAt','reversalId','paymentReversalId'].some(k=>str(record[k]))||
+      ['estado','estadoOperativo','paymentState'].some(k=>/REVERS|ANULAD|PARCIAL|PARTIAL/i.test(str(record[k]))))return hold('APPLICATION_REVERSAL_OR_PARTIAL_HOLD');
+    const moneyFields=['primaTotal','monto','montoTotal'].filter(k=>record[k]!==undefined&&record[k]!==null&&record[k]!=='');
+    if(!moneyFields.length||moneyFields.some(k=>cents(record[k])!==target.grossCents))return hold('APPLICATION_AMOUNT_CHANGED');
+    const dates=['paidDate','fechaPago'].map(k=>str(record[k])).filter(Boolean);
+    if(!dates.length||dates.some(v=>v!==target.paidDate))return hold('APPLICATION_PAID_DATE_CHANGED');
+    if(str(record.evidenceId)!==target.sourceId||str(record.sourceRef)!==target.sourceId)return hold('APPLICATION_ORIGINAL_SOURCE_CHANGED');
+    records[key]=record;
+  }
+  const original=snapshot.audits.find(a=>a.id===target.originalPostingAuditId);
+  if(!original||original.schema!=='I6_6_PROTECTED_CENDOSO_PAID_V1'||original.sourceId!==target.sourceId||original.sourceSha256!==SOURCE_SHA||
+    original.policyId!==policy.id||original.receiptId!==target.receiptId||original.portfolioId!==target.portfolioId||original.cobroId!==target.cobroId||
+    original.newGrossCents!==target.grossCents||original.paidDate!==target.paidDate)return hold('APPLICATION_ORIGINAL_POSTING_AUDIT_REQUIRED');
+  const hashes=Object.fromEntries(Object.entries(records).map(([key,value])=>[key,stableHash(value)]));
+  const audit=snapshot.applicationAudits.find(a=>a.id===applicationAuditId(target.sourceId));
+  if(audit){
+    if(audit.schema!=='GI_I66_MANUAL_EXISTING_DIRECT_APPLICATION_V1'||audit.decisionId!==APPLICATION_DECISION||
+      audit.authoritySha256!==binding.authoritySha256||audit.manifestSha256!==binding.manifestSha256||
+      audit.sourceId!==target.sourceId||audit.receiptId!==target.receiptId||audit.portfolioId!==target.portfolioId||audit.cobroId!==target.cobroId)
+      return hold('APPLICATION_AUDIT_COLLISION');
+    if(stableHash(audit.afterHashes)!==stableHash(hashes)||!Object.values(records).every(r=>r.applicationState==='APPLIED_DIRECT'))
+      return hold('APPLICATION_REPLAY_POSTIMAGE_CHANGED');
+    return {unchanged:{sourceId:target.sourceId,status:'ALREADY_APPLIED_READBACK_PASS',newPayments:0}};
+  }
+  if(Object.values(records).every(r=>r.applicationState==='APPLIED_DIRECT'))return {unchanged:{sourceId:target.sourceId,status:'ALREADY_APPLIED_PRESERVED',newPayments:0}};
+  const updateTimes=Object.fromEntries(roots.map(([col,id])=>{const key=applicationKey(col,id);return [key,snapshot.updateTimes[key]];}));
+  const before={records,updateTimes,policyHash:stableHash(policy),clientHash:stableHash(client),insurerHash:stableHash(insurer),originalAuditHash:stableHash(original)};
+  return {ready:{...target,before,beforeHash:stableHash(before),applicationAuditId:applicationAuditId(target.sourceId),
+    collectionsToUpdate:roots.filter(([col,id])=>records[applicationKey(col,id)].applicationState==='PENDING_APPLICATION').map(([col])=>col)}};
+}
+function planApplications(source,snapshot,binding){
+  const ready=[],unchanged=[],holds=[];
+  for(const target of binding.manifest.targets){const result=assessApplication(target,source,snapshot,binding);
+    if(result.ready)ready.push(result.ready);else if(result.unchanged)unchanged.push(result.unchanged);else holds.push(result.hold);}
+  return {schema:'GI_I66_EXISTING_DIRECT_APPLICATION_PLAN_V1',status:'READONLY_APPLICATION_PREFLIGHT_NO_WRITES',writes:0,
+    sourceSha256:SOURCE_SHA,authoritySha256:binding.authoritySha256,manifestSha256:binding.manifestSha256,
+    inputCount:binding.manifest.targets.length,readyCount:ready.length,unchangedCount:unchanged.length,holdsCount:holds.length,
+    readyGrossCents:ready.reduce((n,r)=>n+r.grossCents,0),ready,unchanged,holds,newPayments:0,bankMovements:0,createdAt:new Date().toISOString()};
+}
+function applicationPatch(when,binding){return {applicationState:'APPLIED_DIRECT',conciliado:true,
+  applicationEvidenceType:'MANUAL_RECONCILIATION',applicationAuthorityDecisionId:APPLICATION_DECISION,
+  applicationAuthorityPath:APPLICATION_AUTHORITY,applicationAuthoritySha256:binding.authoritySha256,
+  manualApplicationAt:when,reconciledAt:when,updatedAt:when,updatedByUid:'I6_6_PROTECTED_SOURCE_RUNNER'};}
+async function applyApplicationChunk(db,plans,source,binding){
+  assert.ok(plans.length>0&&plans.length<=HISTORICAL_CHUNK,'APPLICATION_CHUNK_LIMIT');
+  assert.equal(new Set(plans.map(p=>p.sourceId)).size,plans.length,'APPLICATION_DUPLICATE_PLAN');
+  const result=await db.runTransaction(async tx=>{
+    const snapshot=await readApplicationSnapshot(db,source,binding,tx),accepted=[],holds=[],pending=[];
+    for(const oldPlan of plans){
+      const target=binding.manifest.targets.find(t=>t.sourceId===oldPlan.sourceId);
+      if(!target){holds.push({sourceId:oldPlan.sourceId,code:'APPLICATION_TARGET_OUT_OF_SCOPE'});continue;}
+      const fresh=assessApplication(target,source,snapshot,binding);
+      if(fresh.unchanged){accepted.push(fresh.unchanged);continue;}
+      if(fresh.hold){holds.push(fresh.hold);continue;}
+      if(fresh.ready.beforeHash!==oldPlan.beforeHash||stableHash(fresh.ready)!==stableHash(oldPlan)){
+        holds.push({sourceId:oldPlan.sourceId,code:'APPLICATION_CAS_PREIMAGE_CHANGED'});continue;}
+      const when=new Date().toISOString(),patch=applicationPatch(when,binding),before=fresh.ready.before.records;
+      const after=Object.fromEntries(Object.entries(before).map(([key,value])=>[key,
+        fresh.ready.collectionsToUpdate.includes(key.split('/')[0])?{...value,...patch}:value]));
+      pending.push({plan:fresh.ready,when,before,after,patch});
+    }
+    // All reads and every rollback image are complete before the first write.
+    for(const itemToApply of pending){const {plan,when,before,after,patch}=itemToApply;
+      tx.create(request(db,plan.applicationAuditId),{schema:'GI_I66_MANUAL_EXISTING_DIRECT_APPLICATION_V1',status:'COMMITTED_PENDING_READBACK',
+        decisionId:APPLICATION_DECISION,authorityPath:APPLICATION_AUTHORITY,authoritySha256:binding.authoritySha256,manifestSha256:binding.manifestSha256,
+        sourceId:plan.sourceId,sourceSha256:SOURCE_SHA,originalPostingAuditId:plan.originalPostingAuditId,
+        policyId:plan.policyId,receiptId:plan.receiptId,portfolioId:plan.portfolioId,cobroId:plan.cobroId,
+        beforeHash:plan.beforeHash,beforeUpdateTimes:plan.before.updateTimes,rollback:{records:before,onlyIfCurrentAfterHashesMatch:true},
+        beforeHashes:Object.fromEntries(Object.entries(before).map(([key,value])=>[key,stableHash(value)])),
+        afterHashes:Object.fromEntries(Object.entries(after).map(([key,value])=>[key,stableHash(value)])),
+        collectionsUpdated:plan.collectionsToUpdate,preservedGrossCents:plan.grossCents,preservedPaidDate:plan.paidDate,
+        newPayments:0,newObligations:0,bankMovements:0,insurerReconciliationProven:false,noAutomaticInsurerBankReconciliation:true,
+        applicationEvidenceType:'MANUAL_RECONCILIATION',createdAt:when});
+      for(const collection of plan.collectionsToUpdate){const id=collection==='recibosEsperados'?plan.receiptId:collection==='carteraPrimas'?plan.portfolioId:plan.cobroId;
+        tx.update(item(db,collection).doc(id),patch);}
+    }
+    return {accepted,holds,committed:pending.map(x=>x.plan)};
+  });
+  let fresh;const committedUnverified=[];
+  try{fresh=await readApplicationSnapshot(db,source,binding);}catch(error){
+    return {accepted:result.accepted,holds:[...result.holds,...result.committed.map(p=>({sourceId:p.sourceId,code:'APPLICATION_POSTCOMMIT_READBACK_UNAVAILABLE',commitOutcome:'COMMITTED_REQUIRES_REVIEW_BEFORE_RETRY'}))],
+      knownCommittedApplications:result.committed.length,knownFinancialDocumentUpdates:result.committed.reduce((n,p)=>n+p.collectionsToUpdate.length,0),
+      committedUnverified:result.committed.map(p=>p.sourceId),newPayments:0,bankMovements:0};
+  }
+  for(const plan of result.committed){const target=binding.manifest.targets.find(t=>t.sourceId===plan.sourceId),verified=assessApplication(target,source,fresh,binding);
+    if(verified.unchanged?.status==='ALREADY_APPLIED_READBACK_PASS')result.accepted.push({sourceId:plan.sourceId,
+      status:'APPLICATION_APPLIED_READBACK_PASS',receiptId:plan.receiptId,portfolioId:plan.portfolioId,cobroId:plan.cobroId,
+      applicationAuditId:plan.applicationAuditId,grossCents:plan.grossCents,collectionsUpdated:plan.collectionsToUpdate,newPayments:0});
+    else{committedUnverified.push(plan.sourceId);result.holds.push({sourceId:plan.sourceId,code:verified.hold?.code||'APPLICATION_POSTIMAGE_READBACK_HOLD',commitOutcome:'COMMITTED_REQUIRES_REVIEW_BEFORE_RETRY'});}}
+  return {accepted:result.accepted,holds:result.holds,knownCommittedApplications:result.committed.length,committedUnverified,
+    knownFinancialDocumentUpdates:result.committed.reduce((n,p)=>n+p.collectionsToUpdate.length,0),newPayments:0,bankMovements:0};
+}
+async function applicationMain(db,source,mode){
+  const binding=loadApplicationBinding(source);
+  if(mode==='application-preflight'){
+    const plan=planApplications(source,await readApplicationSnapshot(db,source,binding),binding);
+    report('GI_I66_CENDOSO_PLAN_OUT',plan);
+    report('GI_I66_CENDOSO_REPORT_OUT',{...plan,ready:plan.ready.map(({before,...rest})=>rest)});
+    console.log('I66_APPLICATION_PREFLIGHT targets='+plan.inputCount+' ready='+plan.readyCount+' unchanged='+plan.unchangedCount+' holds='+plan.holdsCount+' ZERO_WRITES');return;
+  }
+  assert.equal(mode,'application-apply');assert.equal(process.env.GITHUB_REF,'refs/heads/recovery/fase-a-clean-20260831');
+  assert.equal(process.env.GITHUB_REPOSITORY,'paulaosoriof86/orbit360-core');assert.equal(process.env.GI_I66_PROTECTED_ENV,'gravicentra-live-data-writes');
+  const plan=JSON.parse(fs.readFileSync(process.env.GI_I66_CENDOSO_PLAN_IN,'utf8'));
+  assert.equal(plan.schema,'GI_I66_EXISTING_DIRECT_APPLICATION_PLAN_V1');assert.equal(plan.status,'READONLY_APPLICATION_PREFLIGHT_NO_WRITES');assert.equal(plan.writes,0);
+  assert.equal(plan.sourceSha256,SOURCE_SHA);assert.equal(plan.authoritySha256,binding.authoritySha256);assert.equal(plan.manifestSha256,binding.manifestSha256);
+  assert.equal(plan.inputCount,binding.manifest.targets.length);assert.equal(plan.readyCount,plan.ready.length);
+  assert.equal(plan.holdsCount,plan.holds.length);assert.equal(plan.unchangedCount,plan.unchanged.length);
+  assert.equal(plan.readyCount+plan.holdsCount+plan.unchangedCount,plan.inputCount);
+  assert.equal(plan.newPayments,0);assert.equal(plan.bankMovements,0);
+  assert.equal(new Set(plan.ready.map(p=>p.sourceId)).size,plan.ready.length);assert.ok(plan.ready.length>0&&plan.ready.length<=binding.manifest.targets.length);
+  const accepted=[],holds=[],committedUnverified=[],attempted=new Set();let knownCommittedApplications=0,knownFinancialDocumentUpdates=0,writeOutcomeIndeterminate=false;
+  for(let i=0;i<plan.ready.length;i+=HISTORICAL_CHUNK){
+    const chunk=plan.ready.slice(i,i+HISTORICAL_CHUNK);chunk.forEach(p=>attempted.add(p.sourceId));
+    try{const result=await applyApplicationChunk(db,plan.ready.slice(i,i+HISTORICAL_CHUNK),source,binding);
+      accepted.push(...result.accepted);holds.push(...result.holds);committedUnverified.push(...result.committedUnverified);
+      knownCommittedApplications+=result.knownCommittedApplications;knownFinancialDocumentUpdates+=result.knownFinancialDocumentUpdates;
+      if(result.committedUnverified.length)break;
+    }catch(error){writeOutcomeIndeterminate=true;holds.push({code:/^[A-Z0-9_]+$/.test(error.message)?error.message:'APPLICATION_PRIVATE_RUNTIME_ERROR',
+      sourceIds:chunk.map(p=>p.sourceId),commitOutcome:'UNKNOWN_INSPECT_APPLICATION_AUDITS_BEFORE_RETRY'});break;}
+  }
+  const notAttempted=plan.ready.filter(r=>!attempted.has(r.sourceId)).map(r=>r.sourceId);
+  const body={schema:'GI_I66_EXISTING_DIRECT_APPLICATION_RESULT_V1',status:holds.length?'PROTECTED_APPLICATION_PARTIAL_OR_HOLD':(plan.holdsCount?'PROTECTED_ELIGIBLE_APPLICATION_READBACK_PASS_WITH_ISOLATED_HOLDS':'PROTECTED_APPLICATION_READBACK_PASS'),
+    decisionId:APPLICATION_DECISION,authoritySha256:binding.authoritySha256,manifestSha256:binding.manifestSha256,sourceSha256:SOURCE_SHA,
+    preflightReady:plan.ready.length,preflightHeld:plan.holdsCount,preflightUnchanged:plan.unchangedCount,
+    preflightHolds:plan.holds,preflightUnchangedRows:plan.unchanged,knownCommittedApplications,knownFinancialDocumentUpdates,
+    verifiedApplied:accepted.filter(r=>r.status==='APPLICATION_APPLIED_READBACK_PASS').length,writeOutcomeIndeterminate,committedUnverified,
+    accepted,holds,notAttempted,newPayments:0,newObligations:0,bankMovements:0,amountChangesCents:0,paidDateChanges:0,insurerReconciliationProven:false};
+  report('GI_I66_CENDOSO_REPORT_OUT',body);
+  console.log('I66_APPLICATION_LIVE_READBACK applied='+body.verifiedApplied+' holds='+holds.length+' newPayments=0');
+  if(writeOutcomeIndeterminate||committedUnverified.length||!accepted.length)throw Error('I66_APPLICATION_READBACK_HOLD');
+}
+
 async function main(){
   const mode=str(process.env.GI_I66_CENDOSO_MODE);
-  assert.ok(['preflight','apply','columna-readback','issued-readback','statement-payment-readback'].includes(mode),'I66_PAID_MODE_REQUIRED');
+  assert.ok(['preflight','apply','columna-readback','issued-readback','statement-payment-readback','application-preflight','application-apply'].includes(mode),'I66_PAID_MODE_REQUIRED');
   assert.equal(process.env.GCLOUD_PROJECT,PROJECT,'I66_PAID_FIREBASE_PROJECT_DRIFT');
   const source=loadSource();
   const admin=require('firebase-admin');
   admin.initializeApp({credential:admin.credential.applicationDefault(),projectId:PROJECT});
   const db=admin.firestore();
+  if(mode==='application-preflight'||mode==='application-apply')return applicationMain(db,source,mode);
   if(mode==='statement-payment-readback'){
     const evidence=require('../artifacts/orbit360-recovery/source-batches/I6_6_UNIVERSALES_NOV16_CONFIRMED_PAYMENTS.json');
     const {policyKeys}=require('./gravicentra-i66-source-bulk-plan.cjs');
@@ -913,4 +1145,5 @@ if(require.main===module)main().catch(e=>{console.error('I66_CENDOSO_HOLD '+e.me
 module.exports={sourceRow,assess,planBatch,loadSource,receiptIdentity,insurerMatches,
   policyMatches,policyLookupVariants,policyIdentityNumber,readGroups,heldPolicyDiagnostics,
   historicalSourceProved,historicalIdentity,historicalDocuments,historicalAbsence,assessHistorical,
-  readHistoricalSnapshot,applyHistoricalChunk,stableHash,auditId,cobroId,legacyDistinctSeriesProof};
+  readHistoricalSnapshot,applyHistoricalChunk,stableHash,auditId,cobroId,legacyDistinctSeriesProof,
+  loadApplicationBinding,readApplicationSnapshot,assessApplication,planApplications,applicationPatch,applyApplicationChunk,applicationAuditId};

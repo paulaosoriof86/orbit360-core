@@ -268,10 +268,10 @@ assert.equal(assessHistorical(emptyHistorical(),{candidates:[...historicalSource
   'HISTORICAL_SOURCE_PERIOD_NOT_UNIQUE','a different paid amount/date cannot create a second period receipt');
 
 function memoryFirestore(){
-  const records=new Map(),stats={creates:0,collections:[]},clone=v=>JSON.parse(JSON.stringify(v));
+  const records=new Map(),revisions=new Map();let clock=0;const stats={creates:0,updates:0,collections:[]},clone=v=>JSON.parse(JSON.stringify(v));
   const key=(col,id)=>['tenants','alianzas-soluciones','data',col,'items',id].join('/');
   const auditKey=id=>['tenants','alianzas-soluciones','operationalRequests',id].join('/');
-  const snap=(p,fields)=>({id:p.split('/').at(-1),exists:records.has(p),data:()=>{
+  const snap=(p,fields)=>({id:p.split('/').at(-1),exists:records.has(p),updateTime:{seconds:revisions.get(p)||1,nanoseconds:0},data:()=>{
     const v=records.get(p);if(v===undefined)return undefined;
     if(!fields)return clone(v);
     return Object.fromEntries(fields.filter(k=>v[k]!==undefined).map(k=>[k,clone(v[k])]));
@@ -294,17 +294,19 @@ function memoryFirestore(){
     const pending=[];let writing=false;
     const tx={get:async ref=>{assert.equal(writing,false,'Firestore reads must precede writes');return ref.get();},
       getAll:async(...refs)=>{assert.equal(writing,false);return Promise.all(refs.map(r=>r.get()));},
-      create(ref,value){writing=true;pending.push([ref.path,clone(value)]);}};
+      create(ref,value){writing=true;pending.push([ref.path,clone(value),'create']);},
+      update(ref,value){writing=true;assert.ok(records.has(ref.path));pending.push([ref.path,{...clone(records.get(ref.path)),...clone(value)},'update']);}};
     const out=await fn(tx);
     assert.equal(new Set(pending.map(([p])=>p)).size,pending.length,'no repeated target in one atomic commit');
-    for(const [p]of pending)assert.equal(records.has(p),false,'create must not overwrite');
-    for(const [p,v]of pending){records.set(p,v);stats.creates++;stats.collections.push(p.split('/')[3]);}
+    for(const [p,,kind]of pending)assert.equal(records.has(p),kind==='update','write precondition required');
+    for(const [p,v,kind]of pending){records.set(p,v);revisions.set(p,++clock);if(kind==='create')stats.creates++;else stats.updates++;stats.collections.push(p.split('/')[3]);}
     if(db.afterCommit){const f=db.afterCommit;db.afterCommit=null;f();}
     return out;
   };
-  db.seed=(col,id,value)=>records.set(key(col,id),clone(value));
+  db.seed=(col,id,value)=>{records.set(key(col,id),clone(value));revisions.set(key(col,id),++clock);};
+  db.touch=(col,id)=>revisions.set(key(col,id),++clock);
   db.remove=(col,id)=>records.delete(key(col,id));
-  db.seedAudit=(id,value)=>records.set(auditKey(id),clone(value));
+  db.seedAudit=(id,value)=>{records.set(auditKey(id),clone(value));revisions.set(auditKey(id),++clock);};
   db.read=(col,id)=>clone(records.get(key(col,id)));
   db.readAudit=id=>clone(records.get(auditKey(id)));
   db.stats=stats;
@@ -493,4 +495,126 @@ function distinctFixture(){
   assert.equal(out.accepted.length,0,race);assert.equal(out.holds.length,1,race);assert.equal(f.db.stats.creates,0,race);
  }
  console.log('I66_CENDOSO_DISTINCT_LEGACY_7_PAYMENTS_Q2167_96_28_CREATES_CAS_READBACK_REPLAY_PASS');
+})().catch(error=>{console.error(error);process.exitCode=1;});
+
+// Explicit Direction application supplements the old registration authority.
+// Execute the same transaction owner against real-shaped existing DIRECT rows;
+// no Firebase credentials, network, customer write or new payment occurs here.
+const applicationBinding=H.loadApplicationBinding(source);
+assert.equal(applicationBinding.manifest.targets.length,155);
+assert.equal(applicationBinding.manifest.targets.reduce((n,t)=>n+t.grossCents,0),7880643);
+function applicationFixture(){
+ const db=memoryFirestore(),chosen=['cendoso_923114254eae488f66c70cf5',applicationBinding.manifest.targets[0].sourceId,'cendoso_d5eb7e075150b2c3989782dd'];
+ const targets=chosen.map(id=>applicationBinding.manifest.targets.find(t=>t.sourceId===id));
+ const packet={candidates:source.candidates.filter(r=>chosen.includes(r.candidateId))};
+ const binding={...applicationBinding,manifest:{...applicationBinding.manifest,targets,targetCount:targets.length}};
+ for(const target of targets){
+  const raw=packet.candidates.find(r=>r.candidateId===target.sourceId),row=H.sourceRow(raw);
+  const p={id:target.policyId,numero:target.policyNumber,vigenciaInicio:row.coverageStart,vigenciaFin:row.coverageEnd,
+   clienteId:target.clientId||'test-client-'+target.sourceId,aseguradoraId:target.insurerId||'test-insurer-'+target.insurer,
+   pais:'GT',moneda:'GTQ'};
+  db.seed('polizas',p.id,p);db.seed('clientes',p.clienteId,{id:p.clienteId,pais:'GT',nombre:'OFFLINE_PRIVATE_TEST'});
+  db.seed('aseguradoras',p.aseguradoraId,{id:p.aseguradoraId,nombre:target.insurer,activo:true});
+  for(const [collection,generated] of H.historicalDocuments(raw,p,'2026-11-24T00:00:00.000Z').records){
+   const id=collection==='recibosEsperados'?target.receiptId:collection==='carteraPrimas'?target.portfolioId:target.cobroId;
+   const data={...generated,id,cobroId:target.cobroId,invoiceDate:'',invoiceNumber:'',paymentMethod:'',privateExistingNote:'preserve'};
+   if(collection!=='recibosEsperados')data.reciboId=target.receiptId;
+   db.seed(collection,id,data);
+  }
+  db.seedAudit(target.originalPostingAuditId,{schema:'I6_6_PROTECTED_CENDOSO_PAID_V1',status:'COMMITTED_PENDING_READBACK',
+   sourceId:target.sourceId,sourceSha256:sourceDigest,policyId:p.id,receiptId:target.receiptId,portfolioId:target.portfolioId,
+   cobroId:target.cobroId,newGrossCents:target.grossCents,paidDate:target.paidDate});
+ }
+ return {db,binding,packet,targets};
+}
+const applicationIds=t=>[['recibosEsperados',t.receiptId],['carteraPrimas',t.portfolioId],['cobros',t.cobroId]];
+async function applicationPlan(f){return H.planApplications(f.packet,await H.readApplicationSnapshot(f.db,f.packet,f.binding),f.binding);}
+(async()=>{
+ let checks=0;
+ const f=applicationFixture(),plan=await applicationPlan(f),before=new Map();
+ assert.equal(plan.readyCount,3);assert.equal(plan.holdsCount,0);assert.equal(plan.writes,0);checks++;
+ for(const t of f.targets)for(const [col,id] of applicationIds(t))before.set(col+'/'+id,f.db.read(col,id));
+ const done=await H.applyApplicationChunk(f.db,plan.ready,f.packet,f.binding);
+ assert.equal(done.knownCommittedApplications,3);assert.equal(done.accepted.length,3);assert.equal(done.holds.length,0);
+ assert.equal(f.db.stats.updates,9);assert.equal(f.db.stats.creates,3,'creates are application audits only');checks++;
+ const allowed=new Set(Object.keys(H.applicationPatch('technical-time',f.binding)));
+ for(const t of f.targets){
+  const audit=f.db.readAudit(H.applicationAuditId(t.sourceId));assert.equal(audit.newPayments,0);assert.equal(audit.bankMovements,0);
+  assert.equal(audit.insurerReconciliationProven,false);assert.equal(audit.applicationEvidenceType,'MANUAL_RECONCILIATION');
+  for(const [col,id] of applicationIds(t)){
+   const key=col+'/'+id,after=f.db.read(col,id),prior=before.get(key);
+   assert.equal(after.applicationState,'APPLIED_DIRECT');assert.equal(after.conciliado,true);
+   for(const [field,value] of Object.entries(prior))if(!allowed.has(field))assert.deepEqual(after[field],value,'preserve '+field);
+   assert.deepEqual(audit.rollback.records[key],prior);assert.equal(audit.afterHashes[key],H.stableHash(after));
+   assert.equal(after.paymentState,'PAID_DIRECT');assert.equal(after.sourceRef,t.sourceId);
+   assert.equal(after.fechaPago,t.paidDate);assert.equal(after.monto,t.grossCents/100);assert.equal(after.applicationDate,undefined);
+  }
+ }
+ checks++;
+ const replay=await H.applyApplicationChunk(f.db,plan.ready,f.packet,f.binding);
+ assert.equal(replay.knownCommittedApplications,0);assert.equal(replay.accepted.length,3);assert.equal(replay.holds.length,0);
+ assert.equal(f.db.stats.updates,9);assert.equal(f.db.stats.creates,3);checks++;
+ const afterPlan=await applicationPlan(f);assert.equal(afterPlan.readyCount,0);assert.equal(afterPlan.unchangedCount,3);checks++;
+
+ const negative=[
+  ['amount',x=>{const t=x.targets[0],r=x.db.read('cobros',t.cobroId);r.monto+=0.01;x.db.seed('cobros',t.cobroId,r);},'APPLICATION_AMOUNT_CHANGED'],
+  ['receipt amount',x=>{const t=x.targets[0],r=x.db.read('recibosEsperados',t.receiptId);r.primaTotal+=0.01;x.db.seed('recibosEsperados',t.receiptId,r);},'APPLICATION_AMOUNT_CHANGED'],
+  ['paid date',x=>{const t=x.targets[0],r=x.db.read('cobros',t.cobroId);r.paidDate='2026-11-24';x.db.seed('cobros',t.cobroId,r);},'APPLICATION_PAID_DATE_CHANGED'],
+  ['source',x=>{const t=x.targets[0],r=x.db.read('cobros',t.cobroId);r.sourceRef='another';x.db.seed('cobros',t.cobroId,r);},'APPLICATION_ORIGINAL_SOURCE_CHANGED'],
+  ['inferred',x=>{const t=x.targets[0],r=x.db.read('cobros',t.cobroId);r.directOrInferred='INFERRED';x.db.seed('cobros',t.cobroId,r);},'APPLICATION_NOT_ORIGINAL_DIRECT_PAYMENT'],
+  ['reversal',x=>{const t=x.targets[0],r=x.db.read('cobros',t.cobroId);r.reversal=true;x.db.seed('cobros',t.cobroId,r);},'APPLICATION_REVERSAL_OR_PARTIAL_HOLD'],
+  ['partial payment',x=>{const t=x.targets[0],r=x.db.read('cobros',t.cobroId);r.partialPayment=true;x.db.seed('cobros',t.cobroId,r);},'APPLICATION_REVERSAL_OR_PARTIAL_HOLD'],
+  ['missing portfolio',x=>x.db.remove('carteraPrimas',x.targets[0].portfolioId),'APPLICATION_EXISTING_RECORD_REQUIRED'],
+  ['other client',x=>{const t=x.targets[0],r=x.db.read('cobros',t.cobroId);r.clienteId='other';x.db.seed('cobros',t.cobroId,r);},'APPLICATION_FINANCIAL_IDENTITY_CHANGED'],
+  ['tenant',x=>{const t=x.targets[0],r=x.db.read('cobros',t.cobroId);r.tenantId='other-tenant';x.db.seed('cobros',t.cobroId,r);},'APPLICATION_FINANCIAL_IDENTITY_CHANGED'],
+  ['client tenant',x=>{const p=x.db.read('polizas',x.targets[0].policyId),c=x.db.read('clientes',p.clienteId);c.tenantId='other-tenant';x.db.seed('clientes',p.clienteId,c);},'APPLICATION_PARENT_IDENTITY_CHANGED'],
+  ['client country',x=>{const p=x.db.read('polizas',x.targets[0].policyId),c=x.db.read('clientes',p.clienteId);c.pais='CO';x.db.seed('clientes',p.clienteId,c);},'APPLICATION_PARENT_IDENTITY_CHANGED'],
+  ['country',x=>{const t=x.targets[0],p=x.db.read('polizas',t.policyId);p.pais='CO';x.db.seed('polizas',t.policyId,p);},'APPLICATION_PARENT_IDENTITY_CHANGED'],
+  ['currency',x=>{const t=x.targets[0],r=x.db.read('cobros',t.cobroId);r.moneda='USD';x.db.seed('cobros',t.cobroId,r);},'APPLICATION_FINANCIAL_IDENTITY_CHANGED'],
+  ['original audit',x=>x.db.seedAudit(x.targets[0].originalPostingAuditId,{sourceId:'other'}),'APPLICATION_ORIGINAL_POSTING_AUDIT_REQUIRED'],
+  ['duplicate receipt link',x=>{const t=x.targets[0];x.db.seed('cobros','duplicate',{...x.db.read('cobros',t.cobroId),id:'duplicate'});},'APPLICATION_DUPLICATE_LINK_OR_SOURCE'],
+  ['duplicate orphan source',x=>{x.db.seed('cobros','orphan',{id:'orphan',sourceId:x.targets[0].sourceId});},'APPLICATION_DUPLICATE_LINK_OR_SOURCE'],
+  ['duplicate edition',x=>{const p=x.db.read('polizas',x.targets[0].policyId);x.db.seed('polizas','duplicate-edition',{...p,id:'duplicate-edition'});},'APPLICATION_POLICY_EDITION_NOT_UNIQUE'],
+  ['duplicate edition insurer alias',x=>{const p=x.db.read('polizas',x.targets[0].policyId),i=x.db.read('aseguradoras',p.aseguradoraId);x.db.seed('aseguradoras','insurer-alias',{...i,id:'insurer-alias'});x.db.seed('polizas','alias-edition',{...p,id:'alias-edition',aseguradoraId:'insurer-alias'});},'APPLICATION_POLICY_EDITION_NOT_UNIQUE'],
+  ['duplicate edition unknown insurer',x=>{const p=x.db.read('polizas',x.targets[0].policyId);x.db.seed('polizas','unknown-insurer-edition',{...p,id:'unknown-insurer-edition',aseguradoraId:'missing-insurer'});},'APPLICATION_POLICY_EDITION_NOT_UNIQUE'],
+  ['duplicate edition conflicting number aliases',x=>{const p=x.db.read('polizas',x.targets[0].policyId);x.db.seed('polizas','conflicting-edition',{...p,id:'conflicting-edition',numeroPoliza:'OTHER-POLICY'});},'APPLICATION_POLICY_EDITION_NOT_UNIQUE'],
+  ['application status',x=>{const t=x.targets[0],r=x.db.read('cobros',t.cobroId);r.applicationState='UNKNOWN';x.db.seed('cobros',t.cobroId,r);},'APPLICATION_STATE_CONFLICT'],
+  ['application audit collision',x=>x.db.seedAudit(H.applicationAuditId(x.targets[0].sourceId),{sourceId:'other'}),'APPLICATION_AUDIT_COLLISION']
+ ];
+ for(const [label,mutate,code] of negative){
+  const x=applicationFixture();mutate(x);const p=await applicationPlan(x);
+  assert.equal(p.readyCount,2,label+' must not block independent rows');assert.equal(p.holds[0].code,code,label);
+  assert.equal(x.db.stats.creates,0);assert.equal(x.db.stats.updates,0);checks++;
+ }
+ for(const [col,key] of [['recibosEsperados','receiptId'],['carteraPrimas','portfolioId'],['cobros','cobroId']]){
+  for(const sameBytes of [false,true]){
+   const x=applicationFixture(),p=await applicationPlan(x),t=x.targets[0];
+   x.db.beforeTransaction=()=>{if(sameBytes)x.db.touch(col,t[key]);else x.db.seed(col,t[key],{...x.db.read(col,t[key]),afterPreflight:'changed'});};
+   const result=await H.applyApplicationChunk(x.db,[p.ready.find(r=>r.sourceId===t.sourceId)],x.packet,x.binding);
+   assert.equal(result.knownCommittedApplications,0);assert.equal(result.holds[0].code,'APPLICATION_CAS_PREIMAGE_CHANGED');
+   assert.equal(x.db.stats.updates,0);assert.equal(x.db.stats.creates,0);checks++;
+  }
+ }
+ const partial=applicationFixture(),pt=partial.targets[0],oldApplied={...partial.db.read('cobros',pt.cobroId),
+  applicationState:'APPLIED_DIRECT',conciliado:true,applicationEvidenceType:'EXISTING_VALID_APPLICATION',existingApplicationNote:'preserve'};
+ partial.db.seed('cobros',pt.cobroId,oldApplied);const pp=await applicationPlan(partial),one=pp.ready.find(r=>r.sourceId===pt.sourceId);
+ assert.deepEqual(one.collectionsToUpdate,['recibosEsperados','carteraPrimas']);
+ const completed=await H.applyApplicationChunk(partial.db,[one],partial.packet,partial.binding);
+ assert.equal(completed.knownFinancialDocumentUpdates,2);assert.deepEqual(partial.db.read('cobros',pt.cobroId),oldApplied);checks++;
+
+ const drift=applicationFixture(),dp=await applicationPlan(drift),dt=drift.targets[0];
+ drift.db.afterCommit=()=>drift.db.seed('cobros',dt.cobroId,{...drift.db.read('cobros',dt.cobroId),afterCommit:'drift'});
+ const dr=await H.applyApplicationChunk(drift.db,[dp.ready.find(r=>r.sourceId===dt.sourceId)],drift.packet,drift.binding);
+ assert.equal(dr.knownCommittedApplications,1);assert.deepEqual(dr.committedUnverified,[dt.sourceId]);assert.equal(dr.accepted.length,0);
+ assert.equal(dr.holds[0].code,'APPLICATION_REPLAY_POSTIMAGE_CHANGED');checks++;
+ const unavailable=applicationFixture(),up=await applicationPlan(unavailable),ut=unavailable.targets[0];
+ unavailable.db.afterCommit=()=>{unavailable.db.getAll=async()=>{throw Error('PRIVATE_SIMULATED_TRANSPORT_FAILURE');};};
+ const ur=await H.applyApplicationChunk(unavailable.db,[up.ready.find(r=>r.sourceId===ut.sourceId)],unavailable.packet,unavailable.binding);
+ assert.equal(ur.knownCommittedApplications,1);assert.equal(ur.knownFinancialDocumentUpdates,3);
+ assert.deepEqual(ur.committedUnverified,[ut.sourceId]);assert.equal(ur.accepted.length,0);
+ assert.equal(ur.holds[0].code,'APPLICATION_POSTCOMMIT_READBACK_UNAVAILABLE');checks++;
+ const duplicate=applicationFixture(),du=await applicationPlan(duplicate);
+ await assert.rejects(H.applyApplicationChunk(duplicate.db,[du.ready[0],du.ready[0]],duplicate.packet,duplicate.binding),/APPLICATION_DUPLICATE_PLAN/);checks++;
+ assert.equal(duplicate.db.stats.creates,0);assert.equal(duplicate.db.stats.updates,0);
+ console.log('I66_EXISTING_DIRECT_MANUAL_APPLICATION_PASS '+checks+' meaningful_cases 155_PINNED_TARGETS 0_NEW_PAYMENTS 0_BANK_MOVEMENTS');
 })().catch(error=>{console.error(error);process.exitCode=1;});
