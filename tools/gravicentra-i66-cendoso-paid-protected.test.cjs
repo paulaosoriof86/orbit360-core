@@ -207,6 +207,8 @@ function fakeReader(records){
   console.log('I66_CENDOSO_ALIAS_READER_CAUSAL_PASS OLD_ZERO_NEW_ONE_CONFLICT_HOLD_NO_WRITES');
 })().catch(error=>{console.error(error);process.exitCode=1;});
 
+
+
 // Source-backed historical delta: execute the production transaction code
 // against a complete in-memory Firestore surface, including fresh census,
 // parent CAS, exact postimages and zero-write replay.
@@ -387,4 +389,108 @@ function memoryFirestore(){
   assert.equal(isolatedResult.accepted[0].sourceId,historicalSource[1].candidateId);
   assert.equal(isolatedResult.committedCount,1);
   console.log('I66_CENDOSO_HISTORICAL_PAIRED_SOURCE_CENSUS_CAS_POSTIMAGE_REPLAY_ZERO_PASS');
+})().catch(error=>{console.error(error);process.exitCode=1;});
+
+// The probe found one later AUTO installment and four later VA installments.
+// The pinned paired source proves seven earlier payments; these exact existing
+// rows must survive while seven different closed historical rows are created.
+const distinctSources=source.candidates.filter(r=>['AUTO-45580','VA-53105'].includes(r.policyNumberSource));
+assert.equal(distinctSources.length,7);
+assert.equal(distinctSources.reduce((n,r)=>n+Math.round(Number(r.totalPremium)*100),0),216796);
+function distinctFixture(){
+ const configs=[
+  {id:'pol_6537ecb219275945f57fc567610c',number:'AUTO-45580',start:'2025-07-21',end:'2026-07-21',insurer:'Bantrab',gross:299.94,net:200,total:10,
+   rows:[['rec_hist_16212cd7ce44fe9d916493a6',10,'2026-04-21','car_hist_f08197b9ffd468b4e631bf57']]},
+  {id:'pol_c0001022fe28c0fa04d405d4a5b8',number:'VA-53105',start:'2025-07-10',end:'2026-07-10',insurer:'Columna',gross:334.13,net:298.33,total:12,
+   rows:[['rec_hist_c8094f5c5d957ebb92394280',9,'2026-03-20','car_hist_81df5e9d13fb048cc5a7c7ee'],
+    ['rec_hist_97584e6447b4d77693e3b2bb',10,'2026-04-20','car_hist_b71098f7943809fc28e538fd'],
+    ['rec_hist_b20e2186b389ed6a2176c09e',11,'2026-05-20','car_hist_2a9bbbf32c3a2b9f3c32323a'],
+    ['rec_hist_746bbd6d8c6722088a24d50f',12,'2026-06-20','car_hist_0d88f3b85f39cd4262946a7f']]}
+ ];
+ const db=memoryFirestore(),groups=[],preserved=[];
+ for(const c of configs){
+  const policy={id:c.id,numero:c.number,clienteId:'client-'+c.number,aseguradoraId:'insurer-'+c.number,
+   asesorId:'preserved-advisor',vigenciaInicio:c.start,vigenciaFin:c.end,pais:'GT',moneda:'GTQ',frecuencia:'Mensual',estado:'Renovada'},
+   client={id:policy.clienteId,pais:'GT',nombre:'PRIVATE_TEST_'+c.number},insurer={id:policy.aseguradoraId,pais:'GT',nombre:c.insurer,activo:true};
+  const g={policy,insurerName:c.insurer,clientExists:true,insurerVerified:true,clientSnapshotHash:H.stableHash(client),
+   insurerSnapshotHash:H.stableHash(insurer),receipts:[],portfolio:[],cobros:[]};
+  for(const [rid,ordinal,due,pid] of c.rows){
+   const shared={polizaId:policy.id,clienteId:policy.clienteId,aseguradoraId:policy.aseguradoraId,moneda:'GTQ',
+    numeroReciboFuente:'',serie:ordinal+'/'+c.total,polizaNumero:c.number,fechaLimite:due,primaTotal:c.gross,
+    historicalExigible:true,sourceBundleSha256:'f445e2f4a20b9eb7a526bda8896472dab9e7ac4617b3c5d8124a939a0dee0e6a'};
+   const receipt={...shared,id:rid,primaNeta:c.net},portfolio={...shared,id:pid,reciboId:rid};
+   g.receipts.push(receipt);g.portfolio.push(portfolio);
+   for(const [collection,row] of [['recibosEsperados',receipt],['carteraPrimas',portfolio]]){
+    db.seed(collection,row.id,row);preserved.push({collection,id:row.id,before:JSON.stringify(row)});
+   }
+  }
+  for(const [collection,row] of [['polizas',policy],['clientes',client],['aseguradoras',insurer]]){
+   db.seed(collection,row.id,row);preserved.push({collection,id:row.id,before:JSON.stringify(row)});
+  }
+  groups.push(g);
+ }
+ return {db,groups,preserved,packet:{candidates:distinctSources}};
+}
+(async()=>{
+ const fixture=distinctFixture(),{db,groups,packet,preserved}=fixture,snapshot=await H.readHistoricalSnapshot(db,packet);
+ for(const raw of distinctSources){
+  const g=groups.find(g=>g.policy.numero===raw.policyNumberSource);
+  assert.equal(H.assess(H.sourceRow(raw),[g]).code,'RECEIPT_PERIOD_OR_DUE_NOT_FOUND','causal old path cannot match a later installment');
+  assert.ok(H.assessHistorical(raw,[g],packet,snapshot).ready,'positive identity proof permits the missing exact period');
+ }
+ const plan=H.planBatch(packet,groups,snapshot);assert.equal(plan.readyCount,7);assert.equal(plan.holdsCount,0);
+ assert.equal(plan.ready.reduce((n,r)=>n+r.grossCents,0),216796);
+ assert.ok(plan.ready.every(r=>r.creatingReceipt&&r.creatingPortfolio&&r.before.existingDistinctInstallments.length>=2));
+ assert.equal(db.stats.creates,0,'planning cannot write');
+ const applied=await H.applyHistoricalChunk(db,plan.ready,packet);
+ assert.equal(applied.accepted.length,7,JSON.stringify(applied));assert.equal(applied.committedCount,7);assert.equal(applied.holds.length,0);
+ assert.equal(db.stats.creates,28);assert.equal(applied.physicalDocumentCreates,28);
+ for(const item of preserved)assert.equal(JSON.stringify(db.read(item.collection,item.id)),item.before,'every existing record and parent is preserved');
+ for(const raw of distinctSources){
+  const g=groups.find(g=>g.policy.numero===raw.policyNumberSource),ids=H.historicalIdentity(raw,g.policy);
+  for(const [collection,id] of [['recibosEsperados',ids.receiptId],['carteraPrimas',ids.portfolioId],['cobros',ids.cobroId]]){
+   const r=db.read(collection,id);assert.equal(r.paymentState,'PAID_DIRECT');assert.equal(r.conciliado,false);
+   assert.equal(r.applicationState,'PENDING_APPLICATION');assert.equal(r.saldo,0);assert.equal(r.carteraActiva,false);
+   assert.equal(r.fechaPago,raw.actualPaidDate);assert.equal(r.primaTotal,Number(raw.totalPremium));
+  }
+ }
+ const replay=await H.applyHistoricalChunk(db,plan.ready,packet);
+ assert.equal(replay.accepted.length,7,JSON.stringify(replay));assert.equal(replay.holds.length,0);
+ assert.ok(replay.accepted.every(r=>r.status==='ALREADY_APPLIED_READBACK_PASS'));assert.equal(db.stats.creates,28);
+ const fresh=H.planBatch(packet,groups.map(g=>({...g,
+  receipts:[...g.receipts,...distinctSources.filter(r=>r.policyNumberSource===g.policy.numero).map(r=>db.read('recibosEsperados',H.historicalIdentity(r,g.policy).receiptId))],
+  portfolio:[...g.portfolio,...distinctSources.filter(r=>r.policyNumberSource===g.policy.numero).map(r=>db.read('carteraPrimas',H.historicalIdentity(r,g.policy).portfolioId))],
+  cobros:distinctSources.filter(r=>r.policyNumberSource===g.policy.numero).map(r=>db.read('cobros',H.historicalIdentity(r,g.policy).cobroId))
+ })),await H.readHistoricalSnapshot(db,packet));
+ assert.equal(fresh.readyCount,0);assert.equal(fresh.holdCounts.ALREADY_PAID_WITH_COBRO_PRESERVE,7);
+
+ const mutations=[
+  r=>{r.serie='5/10';},r=>{r.serie='';},r=>{r.numeroCuota=5;},r=>{r.cuota='5/10';},
+  r=>{r.fechaLimite='2025-11-21';},r=>{r.fechaVencimientoContractual='2025-11-21';},
+  r=>{r.periodoInicioFuente='2025-11-21';},r=>{r.sourceBundleSha256='x'.repeat(64);},
+  r=>{r.polizaNumero='AUTO-99999';},r=>{r.policyId='another';},r=>{r.clienteId='another';},
+  r=>{r.numeroPolizaFuente='AUTO-99999';},
+  r=>{r.moneda='USD';},r=>{r.primaTotal=299.95;},r=>{r.primaNeta=200.01;},
+  r=>{r.monto=299.95;},r=>{r.numeroReciboFuente='9912345';},r=>{r.paymentState='PAID_REPORTED';},
+  r=>{r.sourceId=distinctSources[0].candidateId;}
+ ];
+ for(const mutate of mutations){
+  const f=distinctFixture(),g=f.groups[0],r={...g.receipts[0]};mutate(r);f.db.seed('recibosEsperados',r.id,r);
+  const s=await H.readHistoricalSnapshot(f.db,f.packet),out=H.assessHistorical(distinctSources[0],[g],f.packet,s);
+  assert.ok(!out.ready,'contradictory later-installment witness stays held: '+mutate.toString());assert.equal(f.db.stats.creates,0);
+ }
+ for(const race of ['legacy-body','orphan','source-evidence','portfolio-link','new-receipt','policy-country']){
+  const f=distinctFixture(),s=await H.readHistoricalSnapshot(f.db,f.packet),p=H.planBatch(f.packet,f.groups,s),g=f.groups[0];
+  f.db.beforeTransaction=()=>{
+   if(race==='legacy-body')f.db.seed('recibosEsperados',g.receipts[0].id,{...g.receipts[0],freshNote:'changed-after-preflight'});
+   if(race==='orphan')f.db.seed('cobros','orphan',{monto:299.94,fechaPago:distinctSources[0].actualPaidDate});
+   if(race==='source-evidence')f.db.seed('cobros','source-evidence',{sourceId:distinctSources[0].candidateId});
+   if(race==='portfolio-link')f.db.seed('carteraPrimas',g.portfolio[0].id,{...g.portfolio[0],reciboId:'unknown'});
+   if(race==='new-receipt')f.db.seed('recibosEsperados','new-receipt',{polizaId:g.policy.id,serie:'5/10',primaTotal:299.94});
+   if(race==='policy-country')f.db.seed('polizas',g.policy.id,{...g.policy,pais:'CO'});
+  };
+  const out=await H.applyHistoricalChunk(f.db,[p.ready.find(r=>r.sourceId===distinctSources[0].candidateId)],f.packet);
+  assert.equal(out.accepted.length,0,race);assert.equal(out.holds.length,1,race);assert.equal(f.db.stats.creates,0,race);
+ }
+ console.log('I66_CENDOSO_DISTINCT_LEGACY_7_PAYMENTS_Q2167_96_28_CREATES_CAS_READBACK_REPLAY_PASS');
 })().catch(error=>{console.error(error);process.exitCode=1;});

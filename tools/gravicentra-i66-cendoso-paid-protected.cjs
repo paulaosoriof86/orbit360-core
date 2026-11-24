@@ -370,6 +370,65 @@ function historicalSiblingValid(record,policy,source,snapshot){
     return stableHash(actual)===stableHash(value);
   });
 }
+// Probe 45346736089 (artifact 14897739308, report SHA256
+// 2b2ac19e777b1b072a33332527c3bf3fdec843fcdb0cef88c0285d32c7177ebe)
+// positively identifies these pre-existing I6.5 installments. They are later
+// obligations of the same edition, not the source-paid missing periods below.
+// Never treat an arbitrary different fechaLimite as proof of absence.
+const LEGACY_SERIES_BUNDLE='f445e2f4a20b9eb7a526bda8896472dab9e7ac4617b3c5d8124a939a0dee0e6a';
+const legacyDistinctCases=Object.freeze([
+ {policyId:'pol_6537ecb219275945f57fc567610c',number:'AUTO-45580',start:'2025-07-21',end:'2026-07-21',
+  total:10,gross:29994,net:20000,dueOffsetDays:0,
+  sourceIds:['cendoso_d5eb7e075150b2c3989782dd','cendoso_27154b0c4a2e943cf75ca38e','cendoso_07519621c141a2b7df48fddc',
+   'cendoso_bdbb576b75d88b998e65263c','cendoso_8ee03ffc90c04de52d710327'],
+  receipts:[['rec_hist_16212cd7ce44fe9d916493a6',10,'2026-04-21','car_hist_f08197b9ffd468b4e631bf57']]},
+ {policyId:'pol_c0001022fe28c0fa04d405d4a5b8',number:'VA-53105',start:'2025-07-10',end:'2026-07-10',
+  total:12,gross:33413,net:29833,dueOffsetDays:10,
+  sourceIds:['cendoso_15d21b2ff0177f2c070f77fa','cendoso_b5b2c51d8a6d55a5a2ee76c7'],
+  receipts:[['rec_hist_c8094f5c5d957ebb92394280',9,'2026-03-20','car_hist_81df5e9d13fb048cc5a7c7ee'],
+   ['rec_hist_97584e6447b4d77693e3b2bb',10,'2026-04-20','car_hist_b71098f7943809fc28e538fd'],
+   ['rec_hist_b20e2186b389ed6a2176c09e',11,'2026-05-20','car_hist_2a9bbbf32c3a2b9f3c32323a'],
+   ['rec_hist_746bbd6d8c6722088a24d50f',12,'2026-06-20','car_hist_0d88f3b85f39cd4262946a7f']]}
+]);
+const legacyCase=(raw,policy)=>legacyDistinctCases.find(c=>c.policyId===policy.id&&c.sourceIds.includes(raw.candidateId));
+function legacyDistinctSeriesProof(raw,record,policy,snapshot){
+ const c=legacyCase(raw,policy),row=sourceRow(raw);
+ if(!c||row.error||norm(policy.frecuencia)!=='MENSUAL'||!policyMatches(c.number,policyIdentityNumber(policy))||
+  date(policy.vigenciaInicio)!==c.start||date(policy.vigenciaFin)!==c.end||row.coverageStart!==c.start||row.coverageEnd!==c.end||
+  row.total!==c.gross||row.net!==c.net||norm(row.frequency)!=='MENSUAL')return false;
+ const sourceOrdinal=monthlySequence(policy,row.periodStart);
+ if(!Number.isInteger(sourceOrdinal)||sourceOrdinal<1||sourceOrdinal>c.total||
+  (Date.parse(row.due+'T00:00:00Z')-Date.parse(row.periodStart+'T00:00:00Z'))/86400000!==c.dueOffsetDays)return false;
+ const specified=c.receipts.find(([id,,,portfolio])=>record.collection==='recibosEsperados'?record.id===id:
+  record.collection==='carteraPrimas'&&record.id===portfolio);
+ if(!specified)return false;
+ const [receiptId,ordinal,legacyDue,portfolioId]=specified;
+ if(sourceOrdinal>=ordinal)return false;
+ const receiptRows=snapshot.records.filter(r=>r.collection==='recibosEsperados'&&r.id===receiptId);
+ const portfolioRows=snapshot.records.filter(r=>r.collection==='carteraPrimas'&&r.id===portfolioId);
+ if(receiptRows.length!==1||portfolioRows.length!==1)return false;
+ const expectedPeriod=new Date(c.start+'T00:00:00Z');expectedPeriod.setUTCMonth(expectedPeriod.getUTCMonth()+ordinal-1);
+ const period=expectedPeriod.toISOString().slice(0,10),due=new Date(expectedPeriod.getTime()+c.dueOffsetDays*86400000).toISOString().slice(0,10);
+ if(due!==legacyDue||[row.periodStart,row.due].includes(legacyDue)||row.periodStart===period)return false;
+ for(const r of [...receiptRows,...portfolioRows]){
+  if(r.sourceBundleSha256!==LEGACY_SERIES_BUNDLE||r.polizaId!==policy.id||str(r.policyId)&&r.policyId!==policy.id||
+   r.clienteId!==policy.clienteId||str(r.clientId)&&r.clientId!==policy.clienteId||r.aseguradoraId!==policy.aseguradoraId||
+   norm(r.moneda)!=='GTQ'||!policyMatches(c.number,r.polizaNumero)||
+   ['numeroPoliza','policyNumber','policyNumberSource','numeroPolizaFuente'].some(k=>str(r[k])&&!policyMatches(c.number,r[k]))||
+   r.serie!==ordinal+'/'+c.total||str(r.numeroReciboFuente)||date(r.fechaLimite)!==legacyDue||
+   ['secuencia','numeroCuota'].some(k=>r[k]!=null&&Number(r[k])!==ordinal)||
+   str(r.cuota)&&r.cuota!==ordinal+'/'+c.total||
+   ['periodoInicioFuente','periodStart','receiptPeriodStart'].some(k=>str(r[k])&&date(r[k])!==period)||
+   ['fechaVencimientoContractual','fechaVencimiento','vence'].some(k=>str(r[k])&&date(r[k])!==legacyDue)||
+   cents(r.primaTotal)!==c.gross||['monto','montoTotal','grossAmount','amount'].some(k=>r[k]!=null&&cents(r[k])!==c.gross)||
+   ['primaNeta','neta'].some(k=>r[k]!=null&&cents(r[k])!==c.net))return false;
+  if(isPaid(r)||['fechaPago','paidDate','actualPaidDate','cobroId','paymentState','applicationState','directOrInferred']
+   .some(k=>str(r[k]))||['conciliado','conciliadoPago','inferredPaid','reportedPaid','confirmado'].some(k=>str(r[k])&&r[k]!==false))return false;
+  if(r.collection==='carteraPrimas'&&(r.reciboId!==receiptId||['receiptId','reciboEsperadoId'].some(k=>str(r[k])&&r[k]!==receiptId)))return false;
+  if(r.collection==='recibosEsperados'&&['reciboId','receiptId','reciboEsperadoId'].some(k=>str(r[k])&&r[k]!==receiptId))return false;
+ }
+ return true;
+}
 function historicalAbsence(raw,policy,source,snapshot){
   if(!snapshot?.complete||snapshot.sourceSha256!==SOURCE_SHA||!Array.isArray(snapshot.policies)||!Array.isArray(snapshot.insurers))
     return 'HISTORICAL_COMPLETE_CENSUS_REQUIRED';
@@ -412,6 +471,8 @@ function historicalAbsence(raw,policy,source,snapshot){
     if(own&&parents.every(id=>id===policy.id)&&inherited.every(id=>id===policy.id)&&
       r.sourceId!==row.id&&date(r.periodoInicioFuente)!==row.periodStart&&
       historicalSiblingValid(r,policy,source,snapshot))continue;
+    if(own&&parents.every(id=>id===policy.id)&&inherited.every(id=>id===policy.id)&&
+      legacyDistinctSeriesProof(raw,r,policy,snapshot))continue;
     return own?'HISTORICAL_EXISTING_POLICY_FINANCIAL_RECORD':'HISTORICAL_ORPHAN_OR_ALIAS_AMBIGUITY';
   }
   return '';
@@ -445,6 +506,9 @@ function assessHistorical(raw,groups,source,snapshot){
   const ids=historicalIdentity(raw,p),before={policyHash:stableHash(p),
     clientHash:g.clientSnapshotHash,insurerHash:g.insurerSnapshotHash,sourceHash:stableHash(raw),
     historicalAuthoritySha256:HISTORICAL_AUTHORITY_SHA,absence:'COMPLETE_FINANCIAL_CENSUS_NO_TARGET_OR_ORPHAN'};
+  const distinct=snapshot.records.filter(r=>legacyDistinctSeriesProof(raw,r,p,snapshot));
+  if(distinct.length)before.existingDistinctInstallments=distinct.map(r=>({collection:r.collection,id:r.id,
+    documentSha256:stableHash({...r,collection:undefined})})).sort((a,b)=>(a.collection+'|'+a.id).localeCompare(b.collection+'|'+b.id));
   return {ready:{sourceId:row.id,policyId:p.id,clientId:p.clienteId,insurerId:p.aseguradoraId,
     receiptId:ids.receiptId,portfolioId:ids.portfolioId,cobroId:ids.cobroId,naturalKey:ids.naturalKey,
     policyNumber:canonicalPolicyNumber(row.policy),insurer:row.insurer,
@@ -468,7 +532,7 @@ function planBatch(source,groups,historicalSnapshot){
       .flatMap(key=>by.get(canonicalPolicyNumber(key))||[]))];
     let m=assess(row,related);
     if(m.code==='RECEIPT_PERIOD_OR_DUE_NOT_FOUND'&&historicalSnapshot&&
-      related.some(g=>!g.receipts.length&&!g.portfolio.length&&!g.cobros.length))
+      related.some(g=>!g.receipts.length&&!g.portfolio.length&&!g.cobros.length||legacyCase(raw,g.policy)))
       m=assessHistorical(raw,related,source,historicalSnapshot);
     if(m.ready){if(!byTarget.has(m.ready.receiptId))byTarget.set(m.ready.receiptId,[]);
       byTarget.get(m.ready.receiptId).push(m.ready);
@@ -849,4 +913,4 @@ if(require.main===module)main().catch(e=>{console.error('I66_CENDOSO_HOLD '+e.me
 module.exports={sourceRow,assess,planBatch,loadSource,receiptIdentity,insurerMatches,
   policyMatches,policyLookupVariants,policyIdentityNumber,readGroups,heldPolicyDiagnostics,
   historicalSourceProved,historicalIdentity,historicalDocuments,historicalAbsence,assessHistorical,
-  readHistoricalSnapshot,applyHistoricalChunk,stableHash,auditId,cobroId};
+  readHistoricalSnapshot,applyHistoricalChunk,stableHash,auditId,cobroId,legacyDistinctSeriesProof};
