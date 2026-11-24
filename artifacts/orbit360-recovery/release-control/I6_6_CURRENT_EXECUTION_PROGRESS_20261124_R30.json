@@ -1,6 +1,6 @@
 {
   "schema": "GRAVICENTRA_I66_OPERATIONAL_SHOCK_PROGRESS_DERIVED_V2",
-  "recordType": "CURRENT_EXECUTION_PROGRESS_NOT_RELEASE_COMPLETION",
+  "recordType": "SUBORDINATE_APPEND_ONLY_EXECUTION_RECEIPT_NOT_RELEASE_GATE_AUTHORITY",
   "product": "Gravicentra Insurance",
   "repo": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
@@ -206,7 +206,7 @@
       "newObligationsThisExecution": 24,
       "runId": 45332501697
     },
-    "currentIterationRealCustomerFinancialWrites": 82,
+    "currentIterationRealCustomerFinancialWrites": 94,
     "doNotRepeatPaid": true,
     "fresh302SourcePreflight": {
       "sourceRows": 302,
@@ -274,6 +274,10 @@
       {
         "path": "artifacts/orbit360-recovery/release-control/I6_6_EL_ROBLE_91_8342189_CANONICAL_RECEIPT_20261124.json",
         "blobSha": "3a9b1147b28ac83474526cc9a518a1d8ae8c6b2f"
+      },
+      {
+        "path": "artifacts/orbit360-recovery/release-control/I6_6_UNIVERSALES_12289_CANONICAL_RECEIPT_20261124.json",
+        "blobSha": "a060313e673fe40e7708dd0dc5b6f5d62b8e50db"
       }
     ],
     "previous302Snapshot": {
@@ -3733,5 +3737,19 @@
     "newMessagesSent": 0,
     "newLiveAcceptance": false,
     "newFormalPercentagePoints": 0
+  },
+  "recordPurpose": "CURRENT_EXECUTION_PROGRESS_NOT_RELEASE_COMPLETION",
+  "checkpointMetadataAlignment": {
+    "priorCheckpointBlob": "fbf2c4ad048d207985f5358a98ab21d2b7640137",
+    "observedGuardRunId": 45366332171,
+    "observedGuardJobId": 138348888711,
+    "corrections": [
+      "Preserve the frozen subordinate recordType; purpose is separate metadata.",
+      "Add the already committed Universales12 proof in the existing canonical commercial receipt schema so cursor94 and receipt sum94 agree."
+    ],
+    "priorBusinessWritesReplayed": 0,
+    "newBusinessWrites": 0,
+    "guardSourceChanged": false,
+    "productionAcceptanceChanged": false
   }
 }

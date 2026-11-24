@@ -1,0 +1,43 @@
+{
+  "schema": "GI_I66_COMMERCIAL_SOURCE_RECEIPT_V1",
+  "commitStatus": "COMMITTED_AND_SERVER_READ_BACK",
+  "protectedEnvironment": "gravicentra-live-data-writes",
+  "policy": "04-05-01-12289-4",
+  "runId": 45357085685,
+  "jobId": 138317804770,
+  "preflightJobId": 138317474508,
+  "beforeDigest": "8b786663beb735962c0faf7ac0c0dfb75836bfd5d2897e042f5453f235f813f7",
+  "after": {
+    "newObligations": 12,
+    "predecessorsUpdated": 1,
+    "successorsCreated": 1,
+    "vehiclesLinked": 0,
+    "activitiesCreated": 1,
+    "auditsCreated": 1,
+    "portfolioRowsCreated": 12,
+    "physicalDocumentWrites": 28,
+    "directPayments": 0,
+    "inferredPayments": 0,
+    "pendingGrossCents": 333954,
+    "currency": "GTQ",
+    "policyIdDigest": "8b03d05aabc4e37739b99dfb1b3d362f31946b424967d9aa804b839843452d24",
+    "auditIdDigest": "493fa07043d6827094a2a072ac4187604fbd731714cb88be5efd1cdf188e2289"
+  },
+  "protectedServerReadback": {
+    "runId": 45357085685,
+    "jobId": 138317804770,
+    "exactAfterTransaction": true,
+    "sourceReportSha256": "dc8c88d6dbbfaec7f804b906f1d53ca62ef643330c80cdee74931c6fa2a6781d",
+    "sourceArtifactId": 14903765484,
+    "sourceArtifactSha256": "312d919a9202c40786cf503882598e17a08045362c1a07a94152a6e7ef956d8f",
+    "proofOperationSha256": "493fa07043d6827094a2a072ac4187604fbd731714cb88be5efd1cdf188e2289"
+  },
+  "sourceReceipt": "artifacts/orbit360-recovery/release-control/I6_6_UNIVERSALES_12289_TWELVE_LIVE_READBACK_20261124.json",
+  "sourceReceiptBlobSha": "cf63b1a77c3a8e997a11144e6713e76177e57d28",
+  "sourcePdfSha256": "6c360b74ef73c971f856a66eb4f4aa906ea8c303faafcfe972e027b16620fc7e",
+  "sourceCommit": "7026f0b9efe72742ed67189c1848f19ea369a857",
+  "policyStatePreserved": "SIN COBERTURA",
+  "statementOriginalDifferenceCentsPreserved": 4,
+  "noNewWritesByReceiptPublication": true,
+  "uiAcceptanceClaimed": false
+}
