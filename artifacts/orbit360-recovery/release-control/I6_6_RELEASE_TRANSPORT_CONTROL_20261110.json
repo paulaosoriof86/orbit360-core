@@ -7504,14 +7504,29 @@
     "artifactDigest": "sha256:7770d117745170604bcdd860d7c44beea97027c869c674c6ac162d3a9160e7f4",
     "approvedByDirection": true,
     "externalMessagesSent": 0,
-    "action": "CAPTURE_AFTER_CREATE",
-    "version": 4,
+    "action": "VERIFY_PREVIEW",
+    "version": 5,
     "expectedConfigDigest": "28bfe94f2481ab404ea60a6530d0f61f925a8a9a215d738bc2ca6b3cec6f894a",
-    "expiresAt": "2026-11-24T17:24:19.973Z",
+    "expiresAt": "2026-11-24T17:27:21.211Z",
     "createExecutionReceipt": {
       "path": "artifacts/orbit360-recovery/release-control/I6_6_MAKE_V23_PREVIEW_CREATE_EXECUTION_20261124.json",
       "gitBlobSha": "c2583ca2efe4d3e6cac751a538f1cd2882f96b0e",
       "sha256": "5bab58224d4aabb6148464c11d1aea4eabbb40031a2373014047f66f7e33f3a4"
+    },
+    "replayExecutionReceipt": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_6_MAKE_V23_PREVIEW_REPLAY_EXECUTION_20261124.json",
+      "gitBlobSha": "21f2aad0ef14ce164ede5ab805708e8974351ce7",
+      "sha256": "da9b62223455fe10c1188aef4a1244e47e60e2bb58c14f23f5cf255ccb3e0750"
+    },
+    "rejectExecutionReceipt": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_6_MAKE_V23_PREVIEW_REJECT_EXECUTION_20261124.json",
+      "gitBlobSha": "5bac56989ff3e4182dcec9608a650aac26e2d02c",
+      "sha256": "dde648c180ff687e2a53bc197deae6db639adf8dc506036c0a2ac98dd45d37d6"
+    },
+    "closedTriggerProof": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_6_MAKE_V23_PREVIEW_CLOSED_TRIGGER_PROOF_20261124.json",
+      "gitBlobSha": "3736e37b7161613318b504f7951e0535286a7c35",
+      "sha256": "3104d7f26e681b8e2fee9fe4a038bd67d59060963518cd517bed11e0643be5c5"
     }
   }
 }

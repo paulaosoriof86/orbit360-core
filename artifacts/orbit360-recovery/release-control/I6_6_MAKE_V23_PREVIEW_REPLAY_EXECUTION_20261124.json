@@ -1,0 +1,113 @@
+{
+  "schema": "GI_I66_MAKE_QUEUE_EXECUTION_RECEIPT_V1",
+  "status": "success",
+  "scenarioId": 10196136,
+  "connectionId": 14756714,
+  "module": "google-cloud-firestore:createDocument",
+  "moduleId": 3,
+  "executionId": "749dfcf486c043cab40431326a7f54bc",
+  "documentName": "projects/ays-orbit-360-lab/databases/(default)/documents/tenants/alianzas-soluciones/previewLeadIngressRequests/Ni56raqbsn5zhsDvqha7",
+  "documentCreateTime": "2026-11-24T17:12:07.903Z",
+  "externalMessagesSent": 0,
+  "stage": "REPLAY",
+  "phase": "preview",
+  "sourceSha": "31741e5150c5a2879dafd96351f6cce70ed05d78",
+  "artifactId": 14940808746,
+  "artifactDigest": "sha256:7770d117745170604bcdd860d7c44beea97027c869c674c6ac162d3a9160e7f4",
+  "backendPreviewRunId": 45442224026,
+  "activeConfigurationDigest": "28bfe94f2481ab404ea60a6530d0f61f925a8a9a215d738bc2ca6b3cec6f894a",
+  "activeProtectedReportBlob": "ae00a3edf333dc3e2f4c6124896a9dfe1199f69d",
+  "activeProtectedReportSha256": "04a5c40aa80e72977e45e9c19158268ca44884a62af8cd4631a7caa021e11db5",
+  "finalizedPayloadFileSha256": "ea4fe4561dad2296001c3397ab3b050c84673349881d9ab304351783a9a1c8f2",
+  "providerPacketSha256": "04a2d99a00f0d4bd8475c65b44d7050caf580409d8fcd34f8663ba5632185a47",
+  "packetTimestamp": 1795540146,
+  "queueEnvelopeDigest": "cf1836440384bc1ca511a643a9b02d75bbacc92d101008deadf7d6ca170e569f",
+  "qaNonceSha256": "0ead5f471ababf49b24ade8bfe1e37a09fba41c2e9105f6d5f8585046d10ca8e",
+  "inputOutputMatchFinalEnvelope": true,
+  "startedAt": "2026-11-24T17:12:07.064Z",
+  "durationMs": 1376,
+  "queueModuleFinishedAt": "2026-11-24T17:12:07.981Z",
+  "queueOnly": true,
+  "providerFixtureIsSynthetic": true,
+  "canonicalLeadAcceptanceClaim": false,
+  "protectedCanonicalCreateReadbackPending": false,
+  "readback": {
+    "topology": [
+      3,
+      1,
+      2
+    ],
+    "scheduling": {
+      "type": "on-demand"
+    },
+    "scenarioStatus": "active",
+    "writerDisabled": true,
+    "lastEdit": "2026-11-24T17:12:11.292Z",
+    "queueModuleInvocations": 1,
+    "queueModuleErrors": 0,
+    "explicitScenarioRunRequested": true,
+    "explicitScenarioRunCallCount": 1,
+    "stageMapperRetainedWhileDisabled": true,
+    "replayRunCalls": 1,
+    "rejectRunCalls": 0,
+    "windowExecutions": [
+      {
+        "id": "b86ae61ccf24495482bd1d1a3be2a10e",
+        "startedAt": "2026-11-24T17:12:46.383Z",
+        "status": "success",
+        "startedBy": "auto",
+        "duration": 1399,
+        "operations": 2,
+        "credits": 2,
+        "dataTransfer": 26280,
+        "isReplayable": true
+      },
+      {
+        "id": "749dfcf486c043cab40431326a7f54bc",
+        "startedAt": "2026-11-24T17:12:07.064Z",
+        "status": "success",
+        "startedBy": "auto",
+        "duration": 1376,
+        "operations": 2,
+        "credits": 2,
+        "dataTransfer": 26280,
+        "isReplayable": true
+      },
+      {
+        "id": "f7ef8a67786b4820874d787fe582fcd1",
+        "startedAt": "2026-11-24T17:09:44.228Z",
+        "status": "success",
+        "startedBy": "auto",
+        "duration": 1432,
+        "operations": 2,
+        "credits": 2,
+        "dataTransfer": 31439,
+        "isReplayable": true
+      },
+      {
+        "id": "f8a737420603407a910d9872500baa79",
+        "startedAt": "2026-11-24T16:58:47.265Z",
+        "status": "success",
+        "startedBy": "auto",
+        "duration": 4239,
+        "operations": 10,
+        "credits": 10,
+        "dataTransfer": 22821,
+        "isReplayable": true
+      }
+    ]
+  },
+  "evidence": {
+    "moduleReadCycle": 1,
+    "cycleSelectionBasis": "Provider inspect explicitly instructed cycle1; output matches exact executionId and final envelope.",
+    "payloadTruncated": false,
+    "onlyModule3PayloadRead": true,
+    "privateGreenApiMessageBodiesRead": false
+  },
+  "protectedCanonicalFinalVerificationPending": true,
+  "afterCreateSnapshotId": "d467df2fececda70c9be23793deedd6b5c6d82266d46b455bc572e41d585cc1d",
+  "afterCreateSnapshotReportBlob": "6b189996a2f8691a9c15451e9831b54babd24733",
+  "afterCreateSnapshotReportSha256": "5c9bc84039351c073bf00e2ebf9c91a8b495bfcc488120e06d76ab8431bb5e37",
+  "identicalCreateEnvelope": true,
+  "onlyChangedField": null
+}
