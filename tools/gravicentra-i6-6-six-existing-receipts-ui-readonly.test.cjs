@@ -10,7 +10,7 @@ function harness(extra={}){
   assert.ok(start>0&&end>start);
   const context={require,URL,URLSearchParams,setTimeout,clearTimeout,need:(ok,code)=>{if(!ok)throw Error(code);},norm:x=>String(x||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase(),
     fs:{readFileSync:()=>bytes},execFileSync:()=>bytes,pin:{sourceSha:'qa-source'},...extra};
-  vm.runInNewContext(source.slice(start,end)+'\nthis.probe={validateSixSourceRow,certifySixReceiptUi,inspectSixReceiptBrowser,installBootstrapObservation,sixReceiptAuthority,sixServerSnapshot,sixServerBalanceProof,focalHash,sixFinancialInputs,sixExpectedBrowserInputs,sixFinancialInputMetadata,sixFinancialInputDifferences,SIX_FINANCIAL_FIELDS,isSixReceiptBusinessWrite,visibleCivilDate,sixVisibleValueChecks,sixVisibleValueDiagnostic,collectSixVisibleResult,sixUiReloadValues,showSixReceiptBalance,inspectSixReadinessHold,sixDiagnosticErrorCounts,sixPartialStageCounts,sixBoundedDiagnosticRead,waitSixReceiptReady,runSixReceiptUi,findFinancialActors,runFrontendFinancialMatrix};',context);
+  vm.runInNewContext(source.slice(start,end)+'\nthis.probe={validateSixSourceRow,certifySixReceiptUi,inspectSixReceiptBrowser,sixStartupTaxonomy,installBootstrapObservation,observeSixStartupFailures,sanitizeSixStartupFailures,sixReceiptAuthority,sixServerSnapshot,sixServerBalanceProof,focalHash,sixFinancialInputs,sixExpectedBrowserInputs,sixFinancialInputMetadata,sixFinancialInputDifferences,SIX_FINANCIAL_FIELDS,isSixReceiptBusinessWrite,visibleCivilDate,sixVisibleValueChecks,sixVisibleValueDiagnostic,collectSixVisibleResult,sixUiReloadValues,showSixReceiptBalance,inspectSixReadinessHold,sixDiagnosticErrorCounts,sixPartialStageCounts,sixBoundedDiagnosticRead,captureSixStartupHold,waitSixReceiptReady,runSixReceiptUi,findFinancialActors,runFrontendFinancialMatrix};',context);
   return context;
 }
 function sourceRow(e=authority.rows[0]){
@@ -302,12 +302,114 @@ test('read-only firewall blocks REST mutations and callable writers while allowi
 });
 test('bootstrap timing observes only existing events, bounds output, drops identity, and preserves source timestamps',()=>{
   const listeners={},window={addEventListener:(name,fn)=>{listeners[name]=fn;}},document={addEventListener:(name,fn)=>{listeners[name]=fn;}};
-  let now=14;const h=harness({window,document,performance:{now:()=>now}});h.probe.installBootstrapObservation();
+  let now=14;const h=harness({window,document,performance:{now:()=>now}});h.probe.installBootstrapObservation(h.probe.sixStartupTaxonomy());
   listeners['orbit:product-readonly-bootstrap']({detail:{phase:'membership',tenantId:'private-tenant',uid:'private-user',ready:false}});
   now=14374;listeners['orbit:product-app']({detail:{started:true,routerStarted:true,displayName:'Private Name'}});
   const events=window.__GI_I66_BOOTSTRAP_TIMELINE__;assert.equal(events[0].timeMs,14);assert.equal(events[1].timeMs,14374);
   assert.equal(events[1].started,true);assert.doesNotMatch(JSON.stringify(events),/private|Private/);
   for(let i=0;i<100;i++)listeners['orbit:product-app']({detail:{}});assert.equal(events.length,80);
+});
+test('startup timeline retains exact failure phase/detail but rejects even short alphanumeric private values',()=>{
+  const listeners={},window={addEventListener:(n,f)=>{listeners[n]=f;}},document={addEventListener:(n,f)=>{listeners[n]=f;}};
+  const h=harness({window,document,performance:{now:()=>25}}),t=h.probe.sixStartupTaxonomy();h.probe.installBootstrapObservation(t);
+  listeners['orbit:product-readonly-bootstrap']({detail:{phase:'blocked',failurePhase:'membership',failureCode:'MEMBERSHIP_FAILED',
+    failureDetailCode:'FUNCTION_UNAVAILABLE',uid:'UIDabc12',tenantId:'privateTenant',activeRole:'privateRole'}});
+  listeners['orbit:product-app']({detail:{phase:'UIDabc12',failurePhase:'TokenABC',failureCode:'Secret123',failureDetailCode:'OtherSecret',lastError:'UIDabc12'}});
+  const events=plain(window.__GI_I66_BOOTSTRAP_TIMELINE__);
+  assert.equal(events[0].failurePhase,'membership');assert.equal(events[0].failureCode,'MEMBERSHIP_FAILED');
+  assert.equal(events[0].failureDetailCode,'FUNCTION_UNAVAILABLE');
+  for(const key of ['phase','failurePhase','failureCode','failureDetailCode','appErrorCode'])assert.equal(events[1][key],'UNKNOWN');
+  assert.doesNotMatch(JSON.stringify(events),/UIDabc12|TokenABC|Secret123|OtherSecret|privateTenant|privateRole/);
+});
+function startupFlagsFixture(){
+  const privateValue='UIDabc12',listeners={},window={},host={querySelector:()=>null};
+  const Orbit={store:{__productPrebootstrapP0:true,get:()=>null},auth:{productUser:null},session:{rol:()=>''},
+    productRuntimeBrowserProvidersP0:{},productAppP0:{status:()=>({initialized:true,started:false,activating:false,routerStarted:false,
+      lastError:privateValue,tenantId:privateValue,uid:privateValue})}};
+  window.Orbit=Orbit;window.__ORBIT360_PRODUCT_PUBLIC_CONFIG__={enabled:true,scopedReadPreviewCandidate:true,apiKey:privateValue};
+  window.addEventListener=(n,f)=>{listeners[n]=f;};
+  const document={readyState:'complete',addEventListener:(n,f)=>{listeners[n]=f;},documentElement:{hasAttribute:()=>true},
+    body:{classList:{contains:()=>true}},getElementById:()=>host,querySelector:()=>null,querySelectorAll:()=>[]};
+  const h=harness({window,Orbit,document,location:{hash:'#/cliente360?t=recibos'},CSS:{escape:x=>x},innerWidth:1365,innerHeight:900,
+    performance:{now:()=>12}});
+  h.probe.installBootstrapObservation(h.probe.sixStartupTaxonomy());
+  listeners['orbit:product-readonly-bootstrap']({detail:{phase:'blocked',failurePhase:'waiting-snapshots',
+    failureCode:'STORE_READINESS_TIMEOUT',failureDetailCode:'STORE_TIMEOUT_UNCLASSIFIED',uid:privateValue}});
+  return {h,window,Orbit,input:{expected:{receiptId:'privateReceipt'},clientId:'privateClient',actorUid:'privateActor',policyId:'privatePolicy',
+    expectedRole:'operativo',startupTaxonomy:h.probe.sixStartupTaxonomy()}};
+}
+test('HOLD browser read distinguishes protected config from prebootstrap store and exports current app state safely',()=>{
+  const f=startupFlagsFixture(),d=plain(f.h.probe.inspectSixReadinessHold(f.input));
+  assert.equal(d.protectedCandidate,false);assert.equal(d.statusReaderPresent,false);
+  assert.equal(d.startup.configProtectedCandidate,true);assert.equal(d.startup.prebootstrapStore,true);
+  assert.equal(d.startup.app.initialized,true);assert.equal(d.startup.app.lastError,'UNKNOWN');
+  assert.equal(d.startup.latestBootstrap.failurePhase,'waiting-snapshots');
+  assert.equal(d.startup.latestBootstrap.failureCode,'STORE_READINESS_TIMEOUT');
+  assert.equal(d.startup.latestBootstrap.failureDetailCode,'STORE_TIMEOUT_UNCLASSIFIED');
+  assert.doesNotMatch(JSON.stringify(d),/UIDabc12|privateReceipt|privateClient|privateActor|privatePolicy|apiKey/);
+  f.Orbit.productAppP0.status=()=>{throw Error('private@example.test token_SECRET');};
+  const unavailable=f.h.probe.inspectSixReadinessHold(f.input);assert.equal(unavailable.startup.appStatusReadFailed,true);
+  assert.equal(unavailable.startup.appStatusAvailable,false);assert.doesNotMatch(JSON.stringify(unavailable),/private@example|token_SECRET/);
+});
+test('error observation uses closed classes without URLs/messages and keeps cumulative counts through reload windows',()=>{
+  const handlers={},main={},page={on:(name,fn)=>{handlers[name]=fn;},mainFrame:()=>main};let now=100;
+  const h=harness({ORIGIN:'https://app.aysseguros.com',Date:{now:()=>now}}),observed=h.probe.observeSixStartupFailures(page);
+  const consoleEvent=(type,text)=>handlers.console({type:()=>type,text:()=>text});
+  handlers.framenavigated(main);consoleEvent('error','Failed to fetch dynamically imported module: https://secret.test/?token=TokenABC');
+  now=120;handlers.framenavigated(main);consoleEvent('error','net::ERR_CONNECTION_CLOSED private@example.test');
+  consoleEvent('warning','[Orbit Product] READONLY_BOOTSTRAP_BLOCKED phase=membership code=MEMBERSHIP_FAILED detail=FUNCTION_UNAVAILABLE');
+  consoleEvent('warning','[Orbit Product] READONLY_BOOTSTRAP_BLOCKED phase=UIDabc12 code=TokenABC detail=Secret123');
+  consoleEvent('warning','[Orbit Auth] RESTORE_ACTIVATION_FAILED private@example.test token_SECRET');
+  handlers.requestfailed({url:()=> 'https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js?token=TokenABC',resourceType:()=> 'script',
+    failure:()=>({errorText:'net::ERR_CONNECTION_CLOSED'})});
+  handlers.requestfailed({url:()=> 'https://secret.test/private/UIDabc12?token=TokenABC',resourceType:()=> 'fetch',
+    failure:()=>({errorText:'https://secret.test token_SECRET'})});
+  const d=plain(h.probe.sanitizeSixStartupFailures(observed.snapshot()));
+  assert.equal(d.documentSequence,2);assert.equal(d.counts.console.SDK_MODULE_LOAD,1);assert.equal(d.counts.console.NETWORK,1);
+  assert.equal(d.events[0].observedDocumentSequence,1);assert.equal(d.events[1].observedDocumentSequence,2);
+  assert.equal(d.counts.warning.AUTH_RESTORE_ACTIVATION,1);assert.equal(d.counts.request.NETWORK_CONNECTION,1);
+  assert.equal(d.events[2].phase,'membership');assert.equal(d.events[2].detailCode,'FUNCTION_UNAVAILABLE');
+  assert.equal(d.events[3].phase,'UNKNOWN');assert.equal(d.events[3].code,'UNKNOWN');assert.equal(d.events[3].detailCode,'UNKNOWN');
+  assert.equal(d.events[5].resourceClass,'FIREBASE_SDK_AUTH');assert.equal(d.events[6].category,'NETWORK_OTHER');
+  assert.doesNotMatch(JSON.stringify(d),/secret\.test|private@example|UIDabc12|TokenABC|Secret123|token_SECRET|firebase-auth\.js/);
+  for(let i=0;i<100;i++)consoleEvent('warning','private message');assert.equal(observed.snapshot().events.length,80);
+  assert.equal(observed.snapshot().counts.warning.OTHER,100);
+});
+test('counter sanitization keeps generic HTTP classes and drops arbitrary keys or event payloads',()=>{
+  const h=harness(),v={schema:'GI_I66_STARTUP_FAILURE_OBSERVATION_V1',counts:{console:{NETWORK:2,TokenABC:3}},events:[
+    {kind:'request',category:'TokenABC',resourceClass:'UIDabc12',elapsedMs:1,observedDocumentSequence:2,url:'https://secret.test'},
+    {kind:'TokenABC',category:'NETWORK',payload:'private'}]};
+  const d=plain(h.probe.sixDiagnosticErrorCounts(()=>({pageErrors:0,consoleErrors:2,blockedWrites:0,startupFailureObservation:v,
+    httpClasses:{FUNCTION_403:1,GOOGLE_API_503:2,OTHER_404:1,HTTP_500:3,UIDabc12:10,HTTP_200:99}})));
+  assert.deepEqual(d.httpClasses,{FUNCTION_403:1,GOOGLE_API_503:2,OTHER_404:1,HTTP_500:3});
+  assert.deepEqual(d.startupFailureObservation.counts.console,{NETWORK:2});assert.equal(d.startupFailureObservation.events.length,1);
+  assert.equal(d.startupFailureObservation.events[0].category,'UNKNOWN');assert.equal(d.startupFailureObservation.events[0].resourceClass,'UNKNOWN');
+  assert.doesNotMatch(JSON.stringify(d),/UIDabc12|TokenABC|secret\.test|private|payload/);
+});
+test('a failed reload retains bootstrap phase/code under the same single60s wait and2s capture without turning HOLD into PASS',async()=>{
+  const f=startupFlagsFixture(),h=f.h,original=Object.assign(Error('private timeout TokenABC'),{name:'TimeoutError'});
+  let waits=0,browserReads=0,serverReads=0;
+  h.report={roles:[],financialFocalProgress:{observations:[{beforeCheck:{pass:true},afterCheck:{pass:true}},{beforeCheck:{pass:true}}]}};
+  h.phase='live';h.pin={sourceSha:'a'.repeat(40),buildId:'gi-i66-aaaaaaaaaaaa-bbbbbbbbbbbb'};
+  const before={rows:[{server:'same'}]};h.sixServerSnapshot=async()=>{serverReads++;return before;};
+  const page={waitForFunction:async(_fn,_id,config)=>{waits++;assert.equal(config.timeout,60000);throw original;},
+    evaluate:async(fn,input)=>{browserReads++;assert.equal(fn.name,'inspectSixReadinessHold');return h.probe.inspectSixReadinessHold(input);}};
+  let caught;try{await h.probe.waitSixReceiptReady(page,{input:f.input,actor:{allowedRole:'operativo',viewportWidth:1365},stage:'AFTER_RELOAD',
+    index:1,authority:{scope:{policyId:'privatePolicy'}},before,errors:()=>({pageErrors:0,consoleErrors:3,blockedWrites:0,httpClasses:{}})});}catch(e){caught=e;}
+  assert.equal(caught,original);assert.equal(h.report.status,'HOLD');assert.equal(h.report.stageCount,3);
+  const d=caught.sixReadinessHold;assert.equal(d.waitAttempts,1);assert.equal(d.waitTimeoutMs,60000);assert.equal(d.diagnosticBudgetMs,2000);
+  assert.equal(d.retryPerformed,false);assert.equal(d.uiAccepted,false);assert.equal(waits,1);assert.equal(browserReads,1);assert.equal(serverReads,1);
+  assert.equal(d.browser.flags.startup.latestBootstrap.failurePhase,'waiting-snapshots');
+  assert.equal(d.browser.flags.startup.latestBootstrap.failureCode,'STORE_READINESS_TIMEOUT');
+  assert.equal(d.serverFinancialReadback.serverUnchanged,true);assert.doesNotMatch(JSON.stringify(d),/TokenABC|privatePolicy/);
+});
+test('pre-receipt activation HOLD gets one passive bounded startup capture and preserves the thrown error',async()=>{
+  const f=startupFlagsFixture();let reads=0;
+  const d=await f.h.probe.captureSixStartupHold({evaluate:async(fn,input)=>{reads++;return f.h.probe.inspectSixReadinessHold(input);}},
+    ()=>({pageErrors:0,consoleErrors:1,blockedWrites:0,httpClasses:{FUNCTION_503:1}}));
+  assert.equal(reads,1);assert.equal(d.status,'HOLD');assert.equal(d.diagnosticBudgetMs,2000);
+  assert.equal(d.retryPerformed,false);assert.equal(d.uiAccepted,false);assert.equal(d.additionalWrites,0);
+  assert.equal(d.browser.startup.latestBootstrap.failureCode,'STORE_READINESS_TIMEOUT');
 });
 test('focal mode preserves artifact identity, exact observer authority, writer blocking and separate performance acceptance',()=>{
   assert.match(source,/fs\.readFileSync\(DRIVER\)\.equals\(execFileSync\('git',\['show',pin\.sourceSha\+':\'\+DRIVER\]\)\)/);
@@ -385,7 +487,7 @@ async function frontendMatrixFlow(options={}){
   const actors=['operativo','direccion'].map(role=>({uid:'qa-'+role,allowedRole:role,requestedRole:role,actorSha256:crypto.hash('sha256',role)}));
   const fixtures=authority.rows.map(e=>uiFixture(e)),snapshot={clientId:'qa-client',policyFingerprint:'same',rows:fixtures.map(f=>({...f.server,
     serverBalanceProof:{sourceSha:target.sourceSha,ownerBlob:'a'.repeat(40),open:true,balanceCents:27826,source:'CARTERA_EXPLICIT'}}))};
-  let serverReads=0,authorityAfter=0,visited=0,closed=0,readingScrolls=0,diagnosticReads=0;const viewports=[],readinessWaits=[];
+  let serverReads=0,authorityAfter=0,visited=0,closed=0,readingScrolls=0,diagnosticReads=0;const viewports=[],readinessWaits=[],initObservers=[];
   const h=harness({phase,readMode:'six-frontend-release',frontendQa:before,report,pin:target,ORIGIN:report.origin,
     auth:{createCustomToken:async uid=>uid},financialOwner:{...owner,
       resolveFinancialQa:async()=>{authorityAfter++;if(options.authorityDrift)throw Error('FINANCIAL_QA_FINAL_AUTHORITY_DRIFT');return {...before,stage:'after'};},
@@ -397,7 +499,10 @@ async function frontendMatrixFlow(options={}){
       {...snapshot,policyFingerprint:'changed'}:snapshot;};
   h.chromium={launch:async()=>({close:async()=>{},newContext:async({viewport})=>{
     viewports.push(viewport.width);let role='operativo',index=0,stage='BEFORE_RELOAD',route='receipt',firewall,balanceInView=false;
-    const context={close:async()=>{closed++;},route:async(pattern,fn)=>{firewall=fn;},newPage:async()=>page};
+    let observerInstalled=false;
+    const context={close:async()=>{closed++;},route:async(pattern,fn)=>{firewall=fn;},
+      addInitScript:async(fn,argument)=>{assert.equal(fn.name,'installBootstrapObservation');assert.ok(argument.codes.includes('MEMBERSHIP_FAILED'));
+        observerInstalled=true;initObservers.push(viewport.width);},newPage:async()=>{assert.equal(observerInstalled,true);return page;}};
     const page={on:()=>{},goto:async()=>{},waitForFunction:async(fn,arg,config)=>{
       if(!String(fn).includes('data-rp-receipt-detail-id'))return;
       readinessWaits.push({role,width:viewport.width,index,stage,timeout:config.timeout});
@@ -429,7 +534,7 @@ async function frontendMatrixFlow(options={}){
       }};return context;
   }})};
   let error;try{await h.probe.runFrontendFinancialMatrix();}catch(e){error=e;}
-  return {h,report:plain(report),error,visited,serverReads,authorityAfter,viewports,closed,readingScrolls,owner,target,diagnosticReads,readinessWaits};
+  return {h,report:plain(report),error,visited,serverReads,authorityAfter,viewports,closed,readingScrolls,owner,target,diagnosticReads,readinessWaits,initObservers};
 }
 test('the observed third-mobile-receipt after-reload timeout keeps 17 partial stages, bounded diagnostics and HOLD without retry',async()=>{
   const r=await frontendMatrixFlow({readinessTimeout:true}),d=r.error.sixReadinessHold;
@@ -442,6 +547,8 @@ test('the observed third-mobile-receipt after-reload timeout keeps 17 partial st
   assert.equal(r.diagnosticReads,1);assert.equal(r.serverReads,5);assert.equal(r.authorityAfter,0);
   assert.equal(d.stage,'AFTER_RELOAD');assert.equal(d.role,'operativo');assert.equal(d.viewportWidth,390);assert.equal(d.receiptOrdinal,3);
   assert.equal(d.waitAttempts,1);assert.equal(d.retryPerformed,false);assert.equal(d.uiAccepted,false);
+  assert.deepEqual(r.initObservers,[1365,390]);
+  assert.equal(d.errors.startupFailureObservation.schema,'GI_I66_STARTUP_FAILURE_OBSERVATION_V1');
   assert.equal(d.browser.flags.expectedDetailCount,0);assert.equal(d.browser.flags.allRequiredSourcesConfirmed,true);
   assert.equal(d.serverFinancialReadback.serverUnchanged,true);assert.equal(d.serverFinancialReadback.rowCount,6);
   assert.equal(r.report.roles[1].progress.sourceSnapshotAfter.length,6);

@@ -56,11 +56,11 @@
       "artifactDigest": "sha256:7cb782848a45083047c4899bc30c13bf5be46429607e42597d09342becfc9acc",
       "hostingVersion": "sites/ays-orbit-360-lab/versions/332999a55b189108"
     },
-    "evidencePath": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_EXECUTION_PROGRESS_20261124_R41.json",
-    "evidenceGitBlobSha": "bbe47c1b5412da78124b0f5edca26b0961eafa2c",
+    "evidencePath": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_EXECUTION_PROGRESS_20261124_R42.json",
+    "evidenceGitBlobSha": "42af1a03893c3ad65bf27fbba63d029a67ff26ca",
     "activeGate": "I6.6",
-    "currentWork": "I6.6: publicar el MISMO artifact v20 por el owner FRONTEND_ONLY, rehash dual-origin y LIVE48 real antes de aceptar E6. Conservar E3 backend de cuatro funciones y los rollbacks E4/E5. A13 Make y la mejora backend A14 permanecen HOLD; no nuevas escrituras financieras.",
-    "nextAction": "I6.6: publicar el MISMO artifact v20 por el owner FRONTEND_ONLY, rehash dual-origin y LIVE48 real antes de aceptar E6. Conservar E3 backend de cuatro funciones y los rollbacks E4/E5. A13 Make y la mejora backend A14 permanecen HOLD; no nuevas escrituras financieras.",
+    "currentWork": "I6.6: E6 quedó ROLLED_BACK tras HOLD de arranque/restauración al segundo recibo AFTER_RELOAD; E3 fue restaurado y verificado en224 archivos por ambos orígenes. Primer gate incompleto: observar fase/código de bootstrap y clases de errores con el owner readonlyObserver performance sobre E3 aceptado, después de source QA y guard exactos de la revisión diagnóstica. Ejecutar solo six-existing-receipts, sin pagos, retry de promoción, aceptación E6 ni A05. Preservar v20 inmutable; ningún nuevo artifact antes de causa y corrección demostradas.",
+    "nextAction": "I6.6: E6 quedó ROLLED_BACK tras HOLD de arranque/restauración al segundo recibo AFTER_RELOAD; E3 fue restaurado y verificado en224 archivos por ambos orígenes. Primer gate incompleto: observar fase/código de bootstrap y clases de errores con el owner readonlyObserver performance sobre E3 aceptado, después de source QA y guard exactos de la revisión diagnóstica. Ejecutar solo six-existing-receipts, sin pagos, retry de promoción, aceptación E6 ni A05. Preservar v20 inmutable; ningún nuevo artifact antes de causa y corrección demostradas.",
     "frontendPreviewRequest": {
       "version": 20,
       "sourceQaHead": "b4f90d00c0468a54fc9b542d48212919e1a14144",
@@ -564,7 +564,7 @@
     "phaseAIterationStatuses": "HISTORICAL_FIELDS_ABOVE_PRESERVED_UNTIL_FORMAL_GATE_EVIDENCE;_NO_NEW_PASS_INFERRED",
     "labDataWriteScope": "ONLY_35_AUTHORIZED_COUNTRY_FIELDS;_NO_AUGUST_REFRESH"
   },
-  "nextAction": "I6.6: publicar el MISMO artifact v20 por el owner FRONTEND_ONLY, rehash dual-origin y LIVE48 real antes de aceptar E6. Conservar E3 backend de cuatro funciones y los rollbacks E4/E5. A13 Make y la mejora backend A14 permanecen HOLD; no nuevas escrituras financieras.",
+  "nextAction": "I6.6: E6 quedó ROLLED_BACK tras HOLD de arranque/restauración al segundo recibo AFTER_RELOAD; E3 fue restaurado y verificado en224 archivos por ambos orígenes. Primer gate incompleto: observar fase/código de bootstrap y clases de errores con el owner readonlyObserver performance sobre E3 aceptado, después de source QA y guard exactos de la revisión diagnóstica. Ejecutar solo six-existing-receipts, sin pagos, retry de promoción, aceptación E6 ni A05. Preservar v20 inmutable; ningún nuevo artifact antes de causa y corrección demostradas.",
   "sourceOfTruth": {
     "projectBoundaryPrevalentAddendum": "orbit360-platform/docs/recovery/ADDENDUM_PREVALENTE_CHATGPT_PROJECT_BOUNDARY_20260831.md",
     "mutableState": "orbit360-platform/docs/recovery/orbit360-recovery-state-v1.json",
@@ -4655,6 +4655,50 @@
           "guardRunId": 45382071816
         }
       }
+    },
+    {
+      "reason": "ACTIVE_OWNER_PLAN_SUMMARY_SUPERSEDED",
+      "priorGitBlobSha": "ec5049b264df2e9a71982b15265ef6dbe7cbe8e1",
+      "supersededByGeneration": 3,
+      "prior": {
+        "schema": "GI_I66_ACTIVE_OWNER_PLAN_CONTINUATION_V1",
+        "authorityPointer": "artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json#i66OperationalContinuation20261115",
+        "generation": 3,
+        "latestProvenLiveSource": "65c825b2808a615ca4195bdde6689dbdbe3193b2",
+        "latestPhysicalFrontendLiveReceipt": "artifacts/orbit360-recovery/release-control/I6_6_FRONTEND_E00003_RECEIPT.json",
+        "currentPhysicalFrontend": {
+          "generation": 3,
+          "sourceSha": "65c825b2808a615ca4195bdde6689dbdbe3193b2",
+          "buildId": "gi-i66-65c825b2808a-57f234755dc1",
+          "artifactId": 14873426438,
+          "artifactDigest": "sha256:7cb782848a45083047c4899bc30c13bf5be46429607e42597d09342becfc9acc",
+          "hostingVersion": "sites/ays-orbit-360-lab/versions/332999a55b189108"
+        },
+        "evidencePath": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_EXECUTION_PROGRESS_20261124_R41.json",
+        "evidenceGitBlobSha": "bbe47c1b5412da78124b0f5edca26b0961eafa2c",
+        "activeGate": "I6.6",
+        "currentWork": "I6.6: publicar el MISMO artifact v20 por el owner FRONTEND_ONLY, rehash dual-origin y LIVE48 real antes de aceptar E6. Conservar E3 backend de cuatro funciones y los rollbacks E4/E5. A13 Make y la mejora backend A14 permanecen HOLD; no nuevas escrituras financieras.",
+        "nextAction": "I6.6: publicar el MISMO artifact v20 por el owner FRONTEND_ONLY, rehash dual-origin y LIVE48 real antes de aceptar E6. Conservar E3 backend de cuatro funciones y los rollbacks E4/E5. A13 Make y la mejora backend A14 permanecen HOLD; no nuevas escrituras financieras.",
+        "frontendPreviewRequest": {
+          "version": 20,
+          "sourceQaHead": "b4f90d00c0468a54fc9b542d48212919e1a14144",
+          "sourceQaRunId": 45382071947,
+          "guardRunId": 45382071816
+        }
+      }
     }
-  ]
+  ],
+  "i66E6RollbackStartupDiagnostic20261124": {
+    "path": "artifacts/orbit360-recovery/release-control/I6_6_V20_E6_ROLLBACK_STARTUP_DIAGNOSTIC_CHECKPOINT_20261124_R42.json",
+    "gitBlobSha": "fab0116024f0cf279014fbaa2b4c4d9cfeb20f6c",
+    "status": "E6_ROLLED_BACK_E3_EXACT_READBACK_VERIFIED_ACTIVE_RELEASE_AUTHORITY_WITHDRAWN",
+    "runId": 45391827840,
+    "journalPath": "artifacts/orbit360-recovery/release-control/I6_6_FRONTEND_E00006_JOURNAL.json",
+    "journalGitBlobSha": "779fcefb7fa73835dc52065404f09fbe80a00394",
+    "currentAcceptedGeneration": 3,
+    "live48Passed": false,
+    "preview48Passed": true,
+    "newReleaseAuthorized": false,
+    "a05Authorized": false
+  }
 }

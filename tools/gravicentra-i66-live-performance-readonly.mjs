@@ -88,18 +88,110 @@ async function findCarlos(){
   return {uid:who.uid,allowedRole:'operativo'};
 }
 // Existing bootstrap events only: no request, polling or altered timing mark.
-function installBootstrapObservation(){
+function sixStartupTaxonomy(){
+  return {
+    phases:['created','preflight','environment','authentication','membership','planning','attaching','waiting-snapshots','installing','ready-read-only','blocked'],
+    codes:['BOOTSTRAP_PREFLIGHT_REJECTED','STORE_READINESS_TIMEOUT','STORE_SNAPSHOT_ERROR','STORE_ATTACH_ERROR','STORE_BLOCKED',
+      'MEMBERSHIP_REJECTED','READINESS_CONTRACT_REJECTED','PROTECTED_PROVIDER_MISSING','SNAPSHOTS_NOT_ATTACHED','ENVIRONMENT_FAILED',
+      'AUTHENTICATION_FAILED','MEMBERSHIP_FAILED','PLANNING_FAILED','ATTACHING_FAILED','SNAPSHOT_READ_FAILED','INSTALLING_FAILED','BOOTSTRAP_FAILED'],
+    details:['NONE','READINESS_EMAIL_UNVERIFIED','READINESS_MEMBERSHIP_INVALID','READINESS_STORE_INVALID','READINESS_OTHER','MEMBERSHIP_INVALID',
+      'PROVIDER_MISSING','STORE_TIMEOUT_UNCLASSIFIED','COUNTRY_MISMATCH','TENANT_MISMATCH','DUPLICATE_OR_MISSING_ID','RESPONSE_INVALID',
+      'SERVER_RESPONSE_INVALID','ROLE_NOT_ASSIGNED','PLAN_DENIED','COUNTRY_DENIED','PAGE_LIMIT','CURSOR_INVALID','FUNCTION_UNAUTHENTICATED',
+      'FUNCTION_PERMISSION_DENIED','FUNCTION_DEADLINE_EXCEEDED','FUNCTION_UNAVAILABLE','FUNCTION_INTERNAL','STORE_SNAPSHOT_OTHER'],
+    appCodes:['PRODUCT_APP_ACTIVATION_FAILED','PRODUCT_AUTH_OWNER_MISSING','PRODUCT_RUNTIME_NOT_CONFIGURED','PROTECTED_READ_CANDIDATE_DISABLED',
+      'PROTECTED_READ_HOST_DENIED','PRODUCT_RUNTIME_PROVIDERS_MISSING','PRODUCT_READONLY_BOOTSTRAP_MISSING','PRODUCT_HYDRATION_CONTRACT_MISSING',
+      'PRODUCT_HYDRATION_CONTRACT_EMPTY','PRODUCT_READONLY_BOOTSTRAP_NOT_READY','PRODUCT_STORE_NOT_READY','PRODUCT_AUTHORIZED_COUNTRY_CONTEXT_MISSING',
+      'PRODUCT_TENANT_CONTEXT_BRIDGE_MISSING','PRODUCT_TENANT_CONTEXT_NOT_READY','PRODUCT_OPERATIONAL_WRITE_OWNER_MISSING',
+      'PRODUCT_OPERATIONAL_WRITE_NOT_READY','ACADEMIA_PRODUCT_CATALOG_OWNER_MISSING','ACADEMIA_PRODUCT_CATALOG_NOT_READY','PRODUCT_ROUTER_MISSING'],
+    errorClasses:['PERMISSION','FUNCTION_INTERNAL','NOT_FOUND','NETWORK','CSP','SDK_MODULE_LOAD','OTHER'],
+    warningClasses:['BOOTSTRAP_BLOCKED','AUTH_RESTORE_ACTIVATION','AUTH_POST_AUTH_ACTIVATION','AUTH_SELF_ACCESS_SYNC','OTHER'],
+    requestClasses:['NETWORK_TIMEOUT','NETWORK_DNS','NETWORK_CONNECTION','NETWORK_ABORTED','NETWORK_BLOCKED','NETWORK_TLS','NETWORK_OTHER'],
+    resourceClasses:['FIREBASE_SDK_APP','FIREBASE_SDK_AUTH','FIREBASE_SDK_FIRESTORE','FIREBASE_SDK_FUNCTIONS','FIREBASE_SDK_OTHER',
+      'FIREBASE_AUTH_TOKEN','FIREBASE_AUTH_API','SCOPED_READER','DOMAIN_CONFIG','ADVISOR_ROSTER','AUTH_SELF_ACCESS_SYNC',
+      'CALLABLE_OTHER','FIRESTORE_TRANSPORT','HOSTING_SCRIPT','HOSTING_DOCUMENT','HOSTING_OTHER','OTHER_RESOURCE']
+  };
+}
+function installBootstrapObservation(taxonomy){
   const timeline=[];window.__GI_I66_BOOTSTRAP_TIMELINE__=timeline;
-  const text=value=>/^[A-Z0-9_.:-]{0,80}$/i.test(String(value||''))?String(value||''):'';
+  const pick=(key,value)=>!value?'':(taxonomy?.[key]||[]).includes(value)?value:'UNKNOWN';
   const record=(name,detail)=>{
     if(timeline.length>=80)return;
     const d=detail||{};
-    timeline.push({event:name,timeMs:Math.round(performance.now()),phase:text(d.phase),ready:d.ready===true,
+    timeline.push({event:name,timeMs:Math.round(performance.now()),phase:pick('phases',d.phase),ready:d.ready===true,
       initialized:d.initialized===true,activating:d.activating===true,started:d.started===true,routerStarted:d.routerStarted===true,
-      tenantContextReady:d.tenantContextReady===true,failurePhase:text(d.failurePhase),failureCode:text(d.failureCode)});
+      tenantContextReady:d.tenantContextReady===true,failurePhase:pick('phases',d.failurePhase),failureCode:pick('codes',d.failureCode),
+      failureDetailCode:pick('details',d.failureDetailCode),appErrorCode:pick('appCodes',d.lastError)});
   };
   window.addEventListener('orbit:product-readonly-bootstrap',event=>record('bootstrap',event.detail));
   document.addEventListener('orbit:product-app',event=>record('application',event.detail));
+}
+// Passive Node-side listeners. Lifelong gate counters below remain untouched.
+// Navigation windows show when an event was observed, not which document caused it.
+function observeSixStartupFailures(page){
+  const taxonomy=sixStartupTaxonomy(),events=[],counts={console:{},warning:{},page:{},request:{}};
+  const started=Date.now();let documentSequence=0;
+  const errorClass=value=>{const s=String(value||'').toLowerCase();
+    if(/csp|content security policy/.test(s))return 'CSP';
+    if(/dynamically imported module|importing a module script failed|module script.*load/.test(s))return 'SDK_MODULE_LOAD';
+    if(/permission.denied|missing or insufficient permissions|\b403\b|unauthorized/.test(s))return 'PERMISSION';
+    if(/functions\/internal|internal error|\binternal\b/.test(s))return 'FUNCTION_INTERNAL';
+    if(/\b404\b|not found/.test(s))return 'NOT_FOUND';
+    if(/network|failed to fetch|net::/.test(s))return 'NETWORK';return 'OTHER';};
+  const requestClass=value=>{const s=String(value||'');
+    if(/^net::ERR_(?:TIMED_OUT|CONNECTION_TIMED_OUT)$/.test(s))return 'NETWORK_TIMEOUT';
+    if(/^net::ERR_(?:NAME_NOT_RESOLVED|DNS_TIMED_OUT|DNS_SERVER_FAILED)$/.test(s))return 'NETWORK_DNS';
+    if(/^net::ERR_(?:CONNECTION_CLOSED|CONNECTION_RESET|CONNECTION_REFUSED|CONNECTION_ABORTED|INTERNET_DISCONNECTED|NETWORK_CHANGED)$/.test(s))return 'NETWORK_CONNECTION';
+    if(s==='net::ERR_ABORTED')return 'NETWORK_ABORTED';
+    if(/^net::ERR_BLOCKED_BY_(?:CLIENT|RESPONSE|CSP)$/.test(s))return 'NETWORK_BLOCKED';
+    if(/^net::ERR_(?:CERT_[A-Z_]+|SSL_[A-Z_]+)$/.test(s))return 'NETWORK_TLS';return 'NETWORK_OTHER';};
+  const resourceClass=request=>{try{const u=new URL(request.url()),name=u.pathname.split('/').pop();
+    if(u.hostname==='www.gstatic.com'&&u.pathname.startsWith('/firebasejs/')){
+      const sdk={'firebase-app.js':'APP','firebase-auth.js':'AUTH','firebase-firestore.js':'FIRESTORE','firebase-functions.js':'FUNCTIONS'};
+      return 'FIREBASE_SDK_'+(sdk[name]||'OTHER');}
+    if(u.hostname==='securetoken.googleapis.com')return 'FIREBASE_AUTH_TOKEN';
+    if(u.hostname==='identitytoolkit.googleapis.com')return 'FIREBASE_AUTH_API';
+    if(u.hostname.endsWith('.cloudfunctions.net'))return ({orbit360ScopedPolicyRead:'SCOPED_READER',orbit360ScopedPolicyReadPreview:'SCOPED_READER',
+      orbit360TenantDomainConfig:'DOMAIN_CONFIG',orbit360TenantDomainConfigPreview:'DOMAIN_CONFIG',orbit360AssignableAdvisorRoster:'ADVISOR_ROSTER',
+      orbit360AssignableAdvisorRosterPreview:'ADVISOR_ROSTER',orbit360ProvisionTeamAccess:'AUTH_SELF_ACCESS_SYNC'})[name]||'CALLABLE_OTHER';
+    if(/^firestore(?:\.[a-z0-9-]+)*\.googleapis\.com$/.test(u.hostname))return 'FIRESTORE_TRANSPORT';
+    if(u.origin===ORIGIN)return request.resourceType()==='script'?'HOSTING_SCRIPT':request.resourceType()==='document'?'HOSTING_DOCUMENT':'HOSTING_OTHER';
+    return 'OTHER_RESOURCE';}catch{return 'OTHER_RESOURCE';}};
+  const pick=(key,value)=>(taxonomy[key]||[]).includes(value)?value:'UNKNOWN';
+  const add=(kind,category,extra={})=>{
+    counts[kind][category]=Math.min(1000000,(counts[kind][category]||0)+1);
+    if(events.length<80)events.push({kind,category,observedDocumentSequence:documentSequence,
+      elapsedMs:Math.min(1000000000,Math.max(0,Date.now()-started)),...extra});
+  };
+  page.on('framenavigated',frame=>{if(frame===page.mainFrame())documentSequence=Math.min(1000000,documentSequence+1);});
+  page.on('pageerror',error=>add('page',errorClass(error?.message)));
+  page.on('console',message=>{
+    if(message.type()==='error'){add('console',errorClass(message.text()));return;}
+    if(message.type()!=='warning')return;
+    const text=String(message.text()||'');let category='OTHER',detail={};
+    if(text.startsWith('[Orbit Product] READONLY_BOOTSTRAP_BLOCKED ')){
+      category='BOOTSTRAP_BLOCKED';const found=text.match(/phase=([^ ]+) code=([^ ]+) detail=([^ ]+)$/);
+      detail={phase:pick('phases',found?.[1]),code:pick('codes',found?.[2]),detailCode:pick('details',found?.[3])};
+    }else if(text.startsWith('[Orbit Auth] RESTORE_ACTIVATION_FAILED'))category='AUTH_RESTORE_ACTIVATION';
+    else if(text.startsWith('[Orbit Auth] POST_AUTH_ACTIVATION_FAILED'))category='AUTH_POST_AUTH_ACTIVATION';
+    else if(text.startsWith('[Orbit Auth] SELF_ACCESS_SYNC_FAILED'))category='AUTH_SELF_ACCESS_SYNC';
+    add('warning',category,detail);
+  });
+  page.on('requestfailed',request=>add('request',requestClass(request.failure()?.errorText),{resourceClass:resourceClass(request)}));
+  return {snapshot:()=>({schema:'GI_I66_STARTUP_FAILURE_OBSERVATION_V1',scope:'VIEW_LIFETIME_OBSERVATION_WINDOWS_NOT_CAUSAL_DOCUMENT_ATTRIBUTION',
+    documentSequence,counts:JSON.parse(JSON.stringify(counts)),events:events.map(e=>({...e})),eventLimit:80})};
+}
+function sanitizeSixStartupFailures(value){
+  if(!value||value.schema!=='GI_I66_STARTUP_FAILURE_OBSERVATION_V1')return undefined;
+  const t=sixStartupTaxonomy(),count=x=>Number.isSafeInteger(x)&&x>=0?Math.min(x,1000000000):0;
+  const kinds={console:t.errorClasses,warning:t.warningClasses,page:t.errorClasses,request:t.requestClasses};
+  const pick=(list,value)=>list.includes(value)?value:'UNKNOWN';
+  return {schema:value.schema,scope:'VIEW_LIFETIME_OBSERVATION_WINDOWS_NOT_CAUSAL_DOCUMENT_ATTRIBUTION',documentSequence:count(value.documentSequence),
+    counts:Object.fromEntries(Object.entries(kinds).map(([kind,allowed])=>[kind,Object.fromEntries(Object.entries(value.counts?.[kind]||{})
+      .filter(([key])=>allowed.includes(key)).map(([key,n])=>[key,count(n)]))])),eventLimit:80,
+    events:(Array.isArray(value.events)?value.events:[]).slice(0,80).filter(e=>e&&Object.hasOwn(kinds,e.kind)).map(e=>({
+      kind:e.kind,category:pick(kinds[e.kind],e.category),observedDocumentSequence:count(e.observedDocumentSequence),elapsedMs:count(e.elapsedMs),
+      ...(e.kind==='request'?{resourceClass:pick(t.resourceClasses,e.resourceClass)}:{}),
+      ...(e.kind==='warning'&&e.category==='BOOTSTRAP_BLOCKED'?{phase:pick(t.phases,e.phase),code:pick(t.codes,e.code),detailCode:pick(t.details,e.detailCode)}:{})}))};
 }
 // A12 is a bounded readback of six existing obligations, not a payment/reapply.
 const SIX_RECEIPT_AUTHORITY='artifacts/orbit360-recovery/release-control/I6_6_FINANCIAL_SIX_EXISTING_RECEIPTS_READBACK_20261123_RUN45272554046.json';
@@ -461,6 +553,26 @@ function inspectSixReadinessHold(input){
   }));
   const available=(collection,id)=>{try{return typeof store?.get==='function'?!!store.get(collection,id):null;}catch{return null;}};
   const detailCount=count(document.querySelectorAll(selector).length);
+  const taxonomy=input.startupTaxonomy||{},pick=(key,value)=>!value?'':(taxonomy[key]||[]).includes(value)?value:'UNKNOWN';
+  let appStatus={},appStatusReadFailed=false;
+  try{appStatus=o?.productAppP0?.status?.()||{};}catch{appStatusReadFailed=true;}
+  const observedTimeline=window.__GI_I66_BOOTSTRAP_TIMELINE__;
+  const bootstrapTimeline=list(observedTimeline).slice(0,80).filter(e=>['bootstrap','application'].includes(e?.event)).map(e=>({
+    event:e.event,timeMs:count(e.timeMs),phase:pick('phases',e.phase),ready:e.ready===true,initialized:e.initialized===true,
+    activating:e.activating===true,started:e.started===true,routerStarted:e.routerStarted===true,tenantContextReady:e.tenantContextReady===true,
+    failurePhase:pick('phases',e.failurePhase),failureCode:pick('codes',e.failureCode),failureDetailCode:pick('details',e.failureDetailCode),
+    appErrorCode:pick('appCodes',e.appErrorCode)}));
+  const config=window.__ORBIT360_PRODUCT_PUBLIC_CONFIG__;
+  const startup={schema:'GI_I66_STARTUP_HOLD_FLAGS_V1',scope:'CURRENT_DOCUMENT_EXISTING_EVENTS_ONLY',
+    observerInstalled:Array.isArray(observedTimeline),prebootstrapStore:store?.__productPrebootstrapP0===true,
+    configPresent:!!config,configEnabled:config?.enabled===true,configProtectedCandidate:config?.scopedReadPreviewCandidate===true,
+    authRestoring:document.documentElement?.hasAttribute?.('data-auth-restoring')===true,
+    preAuthBody:document.body?.classList?.contains?.('pre-auth')===true,loginPresent:!!document.getElementById('login'),
+    appStatusAvailable:typeof o?.productAppP0?.status==='function'&&!appStatusReadFailed,appStatusReadFailed,
+    app:{initialized:appStatus.initialized===true,activating:appStatus.activating===true,started:appStatus.started===true,
+      routerStarted:appStatus.routerStarted===true,tenantContextReady:appStatus.tenantContextReady===true,
+      operationalWriteReady:appStatus.operationalWriteReady===true,lastError:pick('appCodes',appStatus.lastError)},
+    bootstrapTimeline,latestBootstrap:bootstrapTimeline.filter(e=>e.event==='bootstrap').slice(-1)[0]||null};
   return {schema:'GI_I66_SIX_READINESS_DOM_FLAGS_V1',valueDisclosure:'NONE_STRUCTURAL_FLAGS_ONLY',
     documentState:['loading','interactive','complete'].includes(document.readyState)?document.readyState:'OTHER',
     orbitPresent:!!o,storePresent:!!store,statusReaderPresent:typeof store?._productStatus==='function',statusReadFailed,
@@ -479,14 +591,15 @@ function inspectSixReadinessHold(input){
     route:{hashRoute:knownRoute(parts[0]),runtimeRoute:knownRoute(o?.route?.key),clientParamPresent:query.has('c'),
       receiptParamPresent:query.has('r'),tabIsReceipts:query.get('t')==='recibos',clientMatches:query.get('c')===input.clientId,
       receiptMatches:query.get('r')===input.expected.receiptId,otherParamCount:[...query.keys()].filter(k=>!['c','r','t'].includes(k)).length},
-    scriptShape:{total:count(document.querySelectorAll('script[src]').length),modules:count(document.querySelectorAll('script[type="module"][src]').length)}};
+    scriptShape:{total:count(document.querySelectorAll('script[src]').length),modules:count(document.querySelectorAll('script[type="module"][src]').length)},startup};
 }
 function sixDiagnosticErrorCounts(read){
   try{
     const e=read(),count=x=>Number.isSafeInteger(x)&&x>=0?Math.min(x,1000000):0;
+    const startupFailureObservation=sanitizeSixStartupFailures(e.startupFailureObservation);
     return {available:true,pageErrors:count(e.pageErrors),consoleErrors:count(e.consoleErrors),blockedWrites:count(e.blockedWrites),
-      httpClasses:Object.fromEntries(Object.entries(e.httpClasses||{}).filter(([key])=>/^HTTP_[45]\d{2}$/.test(key))
-        .slice(0,200).map(([key,value])=>[key,count(value)]))};
+      httpClasses:Object.fromEntries(Object.entries(e.httpClasses||{}).filter(([key])=>/^(?:HTTP|FUNCTION|GOOGLE_API|OTHER)_[45]\d{2}$/.test(key))
+        .slice(0,200).map(([key,value])=>[key,count(value)])),...(startupFailureObservation?{startupFailureObservation}:{})};
   }catch{return {available:false,reason:'COUNTERS_UNAVAILABLE'};}
 }
 function sixPartialStageCounts(value){
@@ -501,6 +614,15 @@ async function sixBoundedDiagnosticRead(work,budgetMs){
     Promise.resolve().then(work).then(value=>({status:'CAPTURED',value}),()=>({status:'UNAVAILABLE',reason:'READ_FAILED'})),
     new Promise(resolve=>{timer=setTimeout(()=>resolve({status:'UNAVAILABLE',reason:'DIAGNOSTIC_DEADLINE'}),budgetMs);})
   ]);}finally{clearTimeout(timer);}
+}
+async function captureSixStartupHold(page,errors){
+  // Initial activation can fail before a receipt wait exists. Observe the same
+  // structural reader once, without initializing/restarting an auth provider.
+  const browser=await sixBoundedDiagnosticRead(()=>page.evaluate(inspectSixReadinessHold,{
+    expected:{receiptId:''},clientId:'',policyId:'',actorUid:'',expectedRole:'OTHER',startupTaxonomy:sixStartupTaxonomy()
+  }),2000);
+  return {schema:'GI_I66_STARTUP_WAIT_HOLD_V1',status:'HOLD',diagnosticBudgetMs:2000,uiAccepted:false,additionalWrites:0,retryPerformed:false,
+    errors:sixDiagnosticErrorCounts(errors),browser:browser.status==='CAPTURED'?{status:'CAPTURED',startup:browser.value?.startup}:browser};
 }
 async function waitSixReceiptReady(page,{input,actor,stage,index,authority,before,errors}){
   try{return await page.waitForFunction(id=>!!document.querySelector('[data-rp-receipt-detail-id="'+CSS.escape(id)+'"]')&&
@@ -523,7 +645,7 @@ async function waitSixReceiptReady(page,{input,actor,stage,index,authority,befor
     // reruns navigation, supplies missing UI values or reclassifies the failure.
     const [dom,server]=await Promise.all([
       sixBoundedDiagnosticRead(()=>page.evaluate(inspectSixReadinessHold,{...input,policyId:authority.scope.policyId,
-        expectedRole:diagnostic.role}),budgetMs),
+        expectedRole:diagnostic.role,startupTaxonomy:sixStartupTaxonomy()}),budgetMs),
       sixBoundedDiagnosticRead(()=>sixServerSnapshot(authority),budgetMs)
     ]);
     diagnostic.browser=dom.status==='CAPTURED'?{status:'CAPTURED',flags:dom.value}:dom;
@@ -661,14 +783,17 @@ async function runFrontendFinancialMatrix(){
   try{
     for(const actor of actors)for(const width of [1365,390]){
       const context=await browser.newContext({viewport:{width,height:width===390?844:900},ignoreHTTPSErrors:false});
+      await context.addInitScript(installBootstrapObservation,sixStartupTaxonomy());
       let pageErrors=0,consoleErrors=0,blockedWrites=0;const httpClasses={};
       await context.route('**/*',route=>{
         const r=route.request();if(isSixReceiptBusinessWrite(r.method(),r.url())){blockedWrites++;return route.abort('blockedbyclient');}
         return route.continue();
       });
       const page=await context.newPage();page.on('pageerror',()=>{pageErrors++;});
+      const startupFailures=observeSixStartupFailures(page);
       page.on('console',m=>{if(m.type()==='error')consoleErrors++;});
       page.on('response',r=>{if(r.status()>=400){const key='HTTP_'+r.status();httpClasses[key]=(httpClasses[key]||0)+1;}});
+      const readErrors=()=>({pageErrors,consoleErrors,httpClasses,blockedWrites,startupFailureObservation:startupFailures.snapshot()});
       const row={role:actor.allowedRole,actorSha256:actor.actorSha256,country:'GT',width,authenticated:false,
         assignedRoleVerified:false,viewportVerified:false};report.roles.push(row);
       try{
@@ -693,13 +818,14 @@ async function runFrontendFinancialMatrix(){
             n(Orbit.session?.rol?.())===role&&Orbit.pais==='GT';
         },{uid:actor.uid,role:actor.allowedRole},{timeout:30000});
         row.authenticated=true;row.assignedRoleVerified=true;
-        await runSixReceiptUi(page,{...actor,viewportWidth:width},()=>({pageErrors,consoleErrors,httpClasses,blockedWrites}));
+        await runSixReceiptUi(page,{...actor,viewportWidth:width},readErrors);
         row.financialFocal=report.financialFocal;delete report.financialFocal;
         row.viewportVerified=row.financialFocal.observations.every(x=>[x.beforeReload,x.afterReload].every(u=>u.viewport?.width===width&&u.viewport.detailVisible&&u.viewport.balanceVisible&&u.viewport.horizontalOverflowPx===0));
       }catch(error){
         if(error?.sixReadinessHold){row.readinessHold=error.sixReadinessHold;row.progress=report.financialFocalProgress;
           report.stageCount=sixPartialStageCounts(report).completed;throw error;}
-        if(error?.message!=='I66_SIX_VISIBLE_VALUES_OR_BALANCE_HOLD'||!error.sixVisibleComparisons)throw error;
+        if(error?.message!=='I66_SIX_VISIBLE_VALUES_OR_BALANCE_HOLD'||!error.sixVisibleComparisons){
+          row.startupHold=await captureSixStartupHold(page,readErrors);error.sixStartupHold=row.startupHold;throw error;}
         row.visibleHold=error.sixVisibleComparisons;row.progress=report.financialFocalProgress;delete report.financialFocalProgress;
       }finally{await context.close();}
     }
@@ -730,20 +856,22 @@ async function run(){
   report.liveReleaseArtifactId=phase==='live'?pin.artifactId:null;
   const actor=await findCarlos();
   const token=await auth.createCustomToken(actor.uid);
-  let browser;
+  let browser,page,startupErrors;
   try{
     browser=await chromium.launch({headless:true,args:['--no-sandbox']});
     const context=await browser.newContext({viewport:{width:1365,height:900},ignoreHTTPSErrors:false});
-    await context.addInitScript(installBootstrapObservation);
+    await context.addInitScript(installBootstrapObservation,sixStartupTaxonomy());
     let blockedWrites=0;
     if(readMode==='six-existing-receipts')await context.route('**/*',route=>{
       const request=route.request();
       if(isSixReceiptBusinessWrite(request.method(),request.url())){blockedWrites++;return route.abort('blockedbyclient');}
       return route.continue();
     });
-    const page=await context.newPage();
+    page=await context.newPage();
+    const startupFailures=readMode==='six-existing-receipts'?observeSixStartupFailures(page):null;
     let pageErrors=0,consoleErrors=0;
     const consoleClasses={},httpClasses={};
+    startupErrors=()=>({pageErrors,consoleErrors,httpClasses,blockedWrites,startupFailureObservation:startupFailures?.snapshot()});
     const classifyError=message=>{
       const s=String(message||'').toLowerCase();
       if(/permission.denied|missing or insufficient permissions|403|unauthorized/.test(s))return 'PERMISSION';
@@ -796,7 +924,7 @@ async function run(){
     report.auth.bootstrapTimeline=await page.evaluate(()=>window.__GI_I66_BOOTSTRAP_TIMELINE__||[]);
     report.auth.bootstrapTimelineScope='Existing events only; bounded80; no extra request or polling';
     if(readMode==='six-existing-receipts'){
-      await runSixReceiptUi(page,actor,()=>({pageErrors,consoleErrors,httpClasses,blockedWrites}));
+      await runSixReceiptUi(page,actor,startupErrors);
       const final=await fetch(ORIGIN+'/__recovery__/build.json',{headers:{'cache-control':'no-cache'}}).then(r=>r.json());
       need(final.sourceSha===pin.sourceSha&&final.buildId===pin.buildId,'I66_PERF_BUILD_CHANGED_DURING_RUN');
       report.status='LIVE_SIX_EXISTING_RECEIPTS_SIGNED_UI_RELOAD_CALCULATION_PASS';
@@ -1126,6 +1254,10 @@ async function run(){
     const finalMarker=await fetch(ORIGIN+'/__recovery__/build.json',{headers:{'cache-control':'no-cache'}}).then(r=>r.json());
     need(finalMarker.sourceSha===pin.sourceSha&&finalMarker.buildId===pin.buildId,'I66_PERF_BUILD_CHANGED_DURING_RUN');
     report.status=phase==='preview'?'PREVIEW_READONLY_MEASURED':'LIVE_READONLY_MEASURED';
+  }catch(error){
+    if(readMode==='six-existing-receipts'&&page&&!error?.sixReadinessHold)
+      error.sixStartupHold=await captureSixStartupHold(page,startupErrors||(()=>({})));
+    throw error;
   }finally{if(browser)await browser.close();}
 }
 try{
@@ -1143,6 +1275,7 @@ try{
     report.financialFocalHold=error.sixVisibleComparisons||error.sixVisibleComparison;
   if(error?.sixScrollComparison)report.financialFocalScrollHold=error.sixScrollComparison;
   if(error?.sixReadinessHold)report.financialFocalReadinessHold=error.sixReadinessHold;
+  if(error?.sixStartupHold)report.financialStartupHold=error.sixStartupHold;
   report.errors.push(error?.sixReadinessHold?'I66_SIX_RECEIPT_READINESS_WAIT_HOLD':
     String(error?.message||'PERF_UNKNOWN').replace(/[^A-Z0-9_:-]/gi,'').slice(0,100));
   console.error('I66_PERF_HOLD:'+report.errors[0]);

@@ -1,12 +1,12 @@
 {
   "schema": "GI_I66_FRONTEND_AUTHORITY_V1",
-  "status": "DIRECTION_APPROVED_EXACT_PREVIEW",
+  "status": "HOLD",
   "gate": "I6.6",
-  "approvedByDirection": true,
+  "approvedByDirection": false,
   "scopeId": "SIX_RECEIPT_CURRENT_BALANCE_READONLY",
   "releaseScope": "FRONTEND_ONLY",
   "generation": 6,
-  "readOnlyQa": true,
+  "readOnlyQa": false,
   "backendDeployAllowed": false,
   "businessWritesAllowed": false,
   "target": {
@@ -48,5 +48,25 @@
     "tools/gravicentra-i66-live-performance-readonly.mjs": "983095bdf1a96a6b30c2e6337f5e21555a807f34"
   },
   "previewReceiptPath": "artifacts/orbit360-recovery/release-control/I6_6_FRONTEND_E00006_PREVIEW_UI.json",
-  "previewReceiptBlob": "3aa2a801c056d98610b81dec3201c59080029837"
+  "previewReceiptBlob": "3aa2a801c056d98610b81dec3201c59080029837",
+  "withdrawnAtUtc": "2026-11-24T12:32:48.208Z",
+  "withdrawalReason": "E6_ROLLED_BACK_I66_SIX_RECEIPT_READINESS_WAIT_HOLD",
+  "historicalAuthorityBlob": "7ae4c1b58afd9ec318364ab83d40a3737397b79e",
+  "historicalAuthorityPreservedIn": "artifacts/orbit360-recovery/release-control/I6_6_V20_E6_ROLLBACK_STARTUP_DIAGNOSTIC_CHECKPOINT_20261124_R42.json",
+  "withdrawalReceiptBlob": "fab0116024f0cf279014fbaa2b4c4d9cfeb20f6c",
+  "activePromotionAuthorized": false,
+  "activeQaAuthorized": false,
+  "noReleaseTransitions": true,
+  "nextDiagnosticTarget": {
+    "generation": 3,
+    "sourceSha": "65c825b2808a615ca4195bdde6689dbdbe3193b2",
+    "buildId": "gi-i66-65c825b2808a-57f234755dc1",
+    "buildRunId": 45287432665,
+    "artifactId": 14873426438,
+    "artifactDigest": "sha256:7cb782848a45083047c4899bc30c13bf5be46429607e42597d09342becfc9acc",
+    "hostingVersion": "sites/ays-orbit-360-lab/versions/332999a55b189108",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_FRONTEND_E00003_RECEIPT.json",
+    "receiptGitBlobSha": "11fdb3bee494541513482666d6215f45cbad0567",
+    "receiptCommit": "f80c37e174406ccb489569b3bc7dd6073c2c4273"
+  }
 }
