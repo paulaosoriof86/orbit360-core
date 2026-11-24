@@ -56,11 +56,11 @@
       "artifactDigest": "sha256:7cb782848a45083047c4899bc30c13bf5be46429607e42597d09342becfc9acc",
       "hostingVersion": "sites/ays-orbit-360-lab/versions/332999a55b189108"
     },
-    "evidencePath": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_EXECUTION_PROGRESS_20261124_R42.json",
-    "evidenceGitBlobSha": "42af1a03893c3ad65bf27fbba63d029a67ff26ca",
+    "evidencePath": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_EXECUTION_PROGRESS_20261124_R43.json",
+    "evidenceGitBlobSha": "dddf692452a4fd8abf480ef4d3b0daeaba37cbee",
     "activeGate": "I6.6",
-    "currentWork": "I6.6: E6 quedó ROLLED_BACK tras HOLD de arranque/restauración al segundo recibo AFTER_RELOAD; E3 fue restaurado y verificado en224 archivos por ambos orígenes. Primer gate incompleto: observar fase/código de bootstrap y clases de errores con el owner readonlyObserver performance sobre E3 aceptado, después de source QA y guard exactos de la revisión diagnóstica. Ejecutar solo six-existing-receipts, sin pagos, retry de promoción, aceptación E6 ni A05. Preservar v20 inmutable; ningún nuevo artifact antes de causa y corrección demostradas.",
-    "nextAction": "I6.6: E6 quedó ROLLED_BACK tras HOLD de arranque/restauración al segundo recibo AFTER_RELOAD; E3 fue restaurado y verificado en224 archivos por ambos orígenes. Primer gate incompleto: observar fase/código de bootstrap y clases de errores con el owner readonlyObserver performance sobre E3 aceptado, después de source QA y guard exactos de la revisión diagnóstica. Ejecutar solo six-existing-receipts, sin pagos, retry de promoción, aceptación E6 ni A05. Preservar v20 inmutable; ningún nuevo artifact antes de causa y corrección demostradas.",
+    "currentWork": "I6.6: ejecutar el owner readonlyObserver performance sobre E3 aceptado en modo six-existing-receipts. Capturar fase/código de bootstrap y clases de errores durante recargas de los mismos seis recibos; conservar HOLD de saldo si corresponde. Esta observación no acepta v20/E6, no promueve Hosting, no ejecuta pagos ni habilita A05. Resolver la causa demostrada dentro del gate activo antes de un nuevo artifact o intento de release.",
+    "nextAction": "I6.6: ejecutar el owner readonlyObserver performance sobre E3 aceptado en modo six-existing-receipts. Capturar fase/código de bootstrap y clases de errores durante recargas de los mismos seis recibos; conservar HOLD de saldo si corresponde. Esta observación no acepta v20/E6, no promueve Hosting, no ejecuta pagos ni habilita A05. Resolver la causa demostrada dentro del gate activo antes de un nuevo artifact o intento de release.",
     "frontendPreviewRequest": {
       "version": 20,
       "sourceQaHead": "b4f90d00c0468a54fc9b542d48212919e1a14144",
@@ -564,7 +564,7 @@
     "phaseAIterationStatuses": "HISTORICAL_FIELDS_ABOVE_PRESERVED_UNTIL_FORMAL_GATE_EVIDENCE;_NO_NEW_PASS_INFERRED",
     "labDataWriteScope": "ONLY_35_AUTHORIZED_COUNTRY_FIELDS;_NO_AUGUST_REFRESH"
   },
-  "nextAction": "I6.6: E6 quedó ROLLED_BACK tras HOLD de arranque/restauración al segundo recibo AFTER_RELOAD; E3 fue restaurado y verificado en224 archivos por ambos orígenes. Primer gate incompleto: observar fase/código de bootstrap y clases de errores con el owner readonlyObserver performance sobre E3 aceptado, después de source QA y guard exactos de la revisión diagnóstica. Ejecutar solo six-existing-receipts, sin pagos, retry de promoción, aceptación E6 ni A05. Preservar v20 inmutable; ningún nuevo artifact antes de causa y corrección demostradas.",
+  "nextAction": "I6.6: ejecutar el owner readonlyObserver performance sobre E3 aceptado en modo six-existing-receipts. Capturar fase/código de bootstrap y clases de errores durante recargas de los mismos seis recibos; conservar HOLD de saldo si corresponde. Esta observación no acepta v20/E6, no promueve Hosting, no ejecuta pagos ni habilita A05. Resolver la causa demostrada dentro del gate activo antes de un nuevo artifact o intento de release.",
   "sourceOfTruth": {
     "projectBoundaryPrevalentAddendum": "orbit360-platform/docs/recovery/ADDENDUM_PREVALENTE_CHATGPT_PROJECT_BOUNDARY_20260831.md",
     "mutableState": "orbit360-platform/docs/recovery/orbit360-recovery-state-v1.json",
@@ -4686,6 +4686,37 @@
           "guardRunId": 45382071816
         }
       }
+    },
+    {
+      "reason": "ACTIVE_OWNER_PLAN_SUMMARY_SUPERSEDED",
+      "priorGitBlobSha": "26c0912e0d3a5dbdd6fa98ee90567bdc4031f902",
+      "supersededByGeneration": 3,
+      "prior": {
+        "schema": "GI_I66_ACTIVE_OWNER_PLAN_CONTINUATION_V1",
+        "authorityPointer": "artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json#i66OperationalContinuation20261115",
+        "generation": 3,
+        "latestProvenLiveSource": "65c825b2808a615ca4195bdde6689dbdbe3193b2",
+        "latestPhysicalFrontendLiveReceipt": "artifacts/orbit360-recovery/release-control/I6_6_FRONTEND_E00003_RECEIPT.json",
+        "currentPhysicalFrontend": {
+          "generation": 3,
+          "sourceSha": "65c825b2808a615ca4195bdde6689dbdbe3193b2",
+          "buildId": "gi-i66-65c825b2808a-57f234755dc1",
+          "artifactId": 14873426438,
+          "artifactDigest": "sha256:7cb782848a45083047c4899bc30c13bf5be46429607e42597d09342becfc9acc",
+          "hostingVersion": "sites/ays-orbit-360-lab/versions/332999a55b189108"
+        },
+        "evidencePath": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_EXECUTION_PROGRESS_20261124_R42.json",
+        "evidenceGitBlobSha": "42af1a03893c3ad65bf27fbba63d029a67ff26ca",
+        "activeGate": "I6.6",
+        "currentWork": "I6.6: E6 quedó ROLLED_BACK tras HOLD de arranque/restauración al segundo recibo AFTER_RELOAD; E3 fue restaurado y verificado en224 archivos por ambos orígenes. Primer gate incompleto: observar fase/código de bootstrap y clases de errores con el owner readonlyObserver performance sobre E3 aceptado, después de source QA y guard exactos de la revisión diagnóstica. Ejecutar solo six-existing-receipts, sin pagos, retry de promoción, aceptación E6 ni A05. Preservar v20 inmutable; ningún nuevo artifact antes de causa y corrección demostradas.",
+        "nextAction": "I6.6: E6 quedó ROLLED_BACK tras HOLD de arranque/restauración al segundo recibo AFTER_RELOAD; E3 fue restaurado y verificado en224 archivos por ambos orígenes. Primer gate incompleto: observar fase/código de bootstrap y clases de errores con el owner readonlyObserver performance sobre E3 aceptado, después de source QA y guard exactos de la revisión diagnóstica. Ejecutar solo six-existing-receipts, sin pagos, retry de promoción, aceptación E6 ni A05. Preservar v20 inmutable; ningún nuevo artifact antes de causa y corrección demostradas.",
+        "frontendPreviewRequest": {
+          "version": 20,
+          "sourceQaHead": "b4f90d00c0468a54fc9b542d48212919e1a14144",
+          "sourceQaRunId": 45382071947,
+          "guardRunId": 45382071816
+        }
+      }
     }
   ],
   "i66E6RollbackStartupDiagnostic20261124": {
@@ -4700,5 +4731,22 @@
     "preview48Passed": true,
     "newReleaseAuthorized": false,
     "a05Authorized": false
+  },
+  "i66E3ReadonlyStartupDiagnostic20261124": {
+    "status": "EXACT_SOURCE_TESTED_E3_READONLY_OBSERVER_AUTHORIZED",
+    "authorityReceiptPath": "artifacts/orbit360-recovery/release-control/I6_6_E3_RELOAD_STARTUP_READONLY_OBSERVER_AUTHORITY_20261124_R43.json",
+    "authorityReceiptBlob": "307c3f7a871381aba8ebd09aed29a0d32e4278d2",
+    "target": {
+      "generation": 3,
+      "sourceSha": "65c825b2808a615ca4195bdde6689dbdbe3193b2",
+      "buildId": "gi-i66-65c825b2808a-57f234755dc1",
+      "buildRunId": 45287432665,
+      "artifactId": 14873426438,
+      "artifactDigest": "sha256:7cb782848a45083047c4899bc30c13bf5be46429607e42597d09342becfc9acc",
+      "hostingVersion": "sites/ays-orbit-360-lab/versions/332999a55b189108",
+      "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_FRONTEND_E00003_RECEIPT.json",
+      "receiptGitBlobSha": "11fdb3bee494541513482666d6215f45cbad0567",
+      "receiptCommit": "f80c37e174406ccb489569b3bc7dd6073c2c4273"
+    }
   }
 }

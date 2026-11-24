@@ -1,0 +1,148 @@
+{
+  "schema": "GI_I66_E3_RELOAD_STARTUP_READONLY_OBSERVER_AUTHORITY_RECEIPT_V1",
+  "recordType": "SUBORDINATE_DIAGNOSTIC_AUTHORITY_NOT_RELEASE_ACCEPTANCE",
+  "recordedAtUtc": "2026-11-24T12:40:53.449Z",
+  "status": "EXACT_SOURCE_TESTED_READONLY_E3_OBSERVER_AUTHORIZED",
+  "reviewedHead": "3314632a4be63a14897d7f68299fb669faa5303f",
+  "authorityPointer": "artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json#i66OperationalContinuation20261115.postAcceptanceGovernanceQa.observers.performance",
+  "authority": {
+    "schema": "GI_I66_READONLY_OBSERVER_AUTHORITY_V1",
+    "status": "APPROVED_EXACT_QA_ON_ACCEPTED_LIVE",
+    "profile": "performance",
+    "approvedByDirection": true,
+    "readOnly": true,
+    "noProductWrites": true,
+    "noReleaseTransitions": true,
+    "noSyntheticWrites": true,
+    "target": {
+      "generation": 3,
+      "sourceSha": "65c825b2808a615ca4195bdde6689dbdbe3193b2",
+      "buildId": "gi-i66-65c825b2808a-57f234755dc1",
+      "buildRunId": 45287432665,
+      "artifactId": 14873426438,
+      "artifactDigest": "sha256:7cb782848a45083047c4899bc30c13bf5be46429607e42597d09342becfc9acc",
+      "hostingVersion": "sites/ays-orbit-360-lab/versions/332999a55b189108",
+      "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_FRONTEND_E00003_RECEIPT.json",
+      "receiptGitBlobSha": "11fdb3bee494541513482666d6215f45cbad0567",
+      "receiptCommit": "f80c37e174406ccb489569b3bc7dd6073c2c4273"
+    },
+    "qaSourceSha": "3314632a4be63a14897d7f68299fb669faa5303f",
+    "qaPins": {
+      ".github/workflows/gravicentra-i66-live-performance-readonly.yml": "12225700cec41aafabc477d60fe7f525ba957e12",
+      ".github/workflows/gravicentra-i66-privileged-role-parity-source-qa.yml": "37d150c7bcfb884152409ebefe512bdab26e5df9",
+      ".github/workflows/gravicentra-release-lock-sync.yml": "379f7d4fef9daedfa0c060cadc7646ce788f7b6e",
+      "tools/gravicentra-governance-preflight-v1.mjs": "edce16bffa474aae01eb34cdbc5bec5b0b63017f",
+      "tools/gravicentra-i6-6-delta-guard.mjs": "576eda7cd5767c8a7e3bd033f36a8805f06890e8",
+      "tools/gravicentra-i6-6-delta-test-revisions.cjs": "b99b4e8ac0def995efbc4f1fdb00b67efdc31a49",
+      "tools/gravicentra-i6-6-direction-preview-legal-acceptance.cjs": "b3a6539596fb9ed706f7a6e21aa982bf97129780",
+      "tools/gravicentra-i6-6-operational-release-candidate.cjs": "badcc35dc58ce606371437d8b4e0fd086bbcd7dc",
+      "tools/gravicentra-i6-6-performance-first-route-source-timeline.test.cjs": "5a9b7fccbbce89b85669bc6a8bbd82cc30481563",
+      "tools/gravicentra-i6-6-readonly-observer-authority.test.cjs": "4d03114cddcdd59f4af3e9e916bead8548351619",
+      "tools/gravicentra-i6-6-six-existing-receipts-ui-readonly.test.cjs": "43a924c1812cb3eb8c6debc4d353ac4681b21c47",
+      "tools/gravicentra-i66-frontend-control.cjs": "588f7ae7bef517d6efb678cca54c64d180e071ee",
+      "tools/gravicentra-i66-frontend-promotion-transaction.cjs": "9a9449f04ac77b2f88c187df46bed85ff8a15b4f",
+      "tools/gravicentra-i66-live-performance-readonly.mjs": "ae25d4088eec88e172dc6b4fcfb09f2a7dffea25"
+    },
+    "sourceQaRunId": 45395337884,
+    "guardRunId": 45395337947,
+    "purpose": "Observe startup/restoration after reload on accepted E3 with the existing six-receipt driver; no v20 or E6 acceptance.",
+    "requestedReadMode": "six-existing-receipts",
+    "expectedReceiptStages": 12,
+    "financialReleaseAcceptance": false,
+    "noPaymentApplications": true,
+    "noPromotionRetry": true,
+    "priorFailedE6RunId": 45391827840
+  },
+  "authorityBlob": "1e01b5f5a498ba9bf173ee8abe9e8e2dfe479945",
+  "sourceQa": {
+    "runId": 45395337884,
+    "headSha": "3314632a4be63a14897d7f68299fb669faa5303f",
+    "workflow": ".github/workflows/gravicentra-i66-privileged-role-parity-source-qa.yml",
+    "status": "completed",
+    "conclusion": "success",
+    "jobId": 138449477558,
+    "jobName": "signed-source-gate-no-production-writes",
+    "verifiedSteps": [
+      {
+        "name": "Source test with 5 roles, 12 domain writers and explicit negative boundaries",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Canonical source blob and historic release guard without re-opening B4",
+        "status": "completed",
+        "conclusion": "success"
+      }
+    ]
+  },
+  "guard": {
+    "runId": 45395337947,
+    "headSha": "3314632a4be63a14897d7f68299fb669faa5303f",
+    "workflow": ".github/workflows/gravicentra-release-lock-sync.yml",
+    "status": "completed",
+    "conclusion": "success",
+    "jobId": 138449478022,
+    "jobName": "verify-control-plane",
+    "verifiedSteps": [
+      {
+        "name": "Fail closed through canonical shared governance preflight",
+        "status": "completed",
+        "conclusion": "success"
+      }
+    ]
+  },
+  "previousCheckpointPath": "artifacts/orbit360-recovery/release-control/I6_6_V20_E6_ROLLBACK_STARTUP_DIAGNOSTIC_CHECKPOINT_20261124_R42.json",
+  "previousCheckpointBlob": "fab0116024f0cf279014fbaa2b4c4d9cfeb20f6c",
+  "failedE6JournalBlob": "779fcefb7fa73835dc52065404f09fbe80a00394",
+  "unchangedReleaseAuthorityBlob": "3e51fb0e9b686e250072535d4069fd63925610a9",
+  "acceptedFrontend": {
+    "generation": 3,
+    "sourceSha": "65c825b2808a615ca4195bdde6689dbdbe3193b2",
+    "buildId": "gi-i66-65c825b2808a-57f234755dc1",
+    "buildRunId": 45287432665,
+    "artifactId": 14873426438,
+    "artifactDigest": "sha256:7cb782848a45083047c4899bc30c13bf5be46429607e42597d09342becfc9acc",
+    "hostingVersion": "sites/ays-orbit-360-lab/versions/332999a55b189108",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_FRONTEND_E00003_RECEIPT.json",
+    "receiptGitBlobSha": "11fdb3bee494541513482666d6215f45cbad0567",
+    "receiptCommit": "f80c37e174406ccb489569b3bc7dd6073c2c4273"
+  },
+  "requestedMode": "six-existing-receipts",
+  "receiptStages": 12,
+  "limits": {
+    "scope": "DIAGNOSTIC_ONLY_ON_ACCEPTED_E3_NOT_V20_RELEASE_ACCEPTANCE",
+    "mode": "six-existing-receipts",
+    "profile": "performance",
+    "actor": "existing_Carlos_Operativo",
+    "viewportWidth": 1365,
+    "receiptCount": 6,
+    "maximumReceiptStages": 12,
+    "canCollectUnverifiedBalanceAndReachReload": true,
+    "serverBalanceProofRequiredOnlyInSixFrontendRelease": true,
+    "visibleHoldDoesNotAbortBeforeAllSixReloads": true,
+    "identityScopeInputsStillFailClosed": true,
+    "canonicalTests": {
+      "passed": 2,
+      "failed": 0,
+      "names": [
+        "visible collector cannot swallow scope, identity, state or source financial-input failures",
+        "six-case UI flow collects twelve visible failures and still verifies unchanged final server before HOLD"
+      ]
+    },
+    "persistenceDifference": "Generic six-existing-receipts inherits Firebase default persistence; financial48 explicitly selects browserSessionPersistence. This diagnostic is not the identical48-stage matrix.",
+    "e3PassDoesNotProveE6FailureResolved": true,
+    "amountAcceptanceUnchanged": true,
+    "financialWrites": 0,
+    "releaseTransitions": 0
+  },
+  "runtimeSourceChanged": false,
+  "artifactChanged": false,
+  "backendChanged": false,
+  "noPromotionRetry": true,
+  "readOnly": true,
+  "businessWrites": 0,
+  "paymentApplications": 0,
+  "newLiveAcceptance": false,
+  "a05Authorized": false,
+  "fullI66ProductionAccepted": false
+}

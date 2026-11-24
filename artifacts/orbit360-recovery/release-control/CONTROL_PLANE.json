@@ -27,7 +27,7 @@
     "activeGate": "I6.6",
     "closedHistoricalGate": "B4-007",
     "latestProvenLiveSource": "65c825b2808a615ca4195bdde6689dbdbe3193b2",
-    "currentWork": "I6.6: E6 quedó ROLLED_BACK tras HOLD de arranque/restauración al segundo recibo AFTER_RELOAD; E3 fue restaurado y verificado en224 archivos por ambos orígenes. Primer gate incompleto: observar fase/código de bootstrap y clases de errores con el owner readonlyObserver performance sobre E3 aceptado, después de source QA y guard exactos de la revisión diagnóstica. Ejecutar solo six-existing-receipts, sin pagos, retry de promoción, aceptación E6 ni A05. Preservar v20 inmutable; ningún nuevo artifact antes de causa y corrección demostradas.",
+    "currentWork": "I6.6: ejecutar el owner readonlyObserver performance sobre E3 aceptado en modo six-existing-receipts. Capturar fase/código de bootstrap y clases de errores durante recargas de los mismos seis recibos; conservar HOLD de saldo si corresponde. Esta observación no acepta v20/E6, no promueve Hosting, no ejecuta pagos ni habilita A05. Resolver la causa demostrada dentro del gate activo antes de un nuevo artifact o intento de release.",
     "latestHostingPreviewEvidence": "artifacts/orbit360-recovery/release-control/I6_6_NETWORK_DIAGNOSTICS_PREVIEW_BUILD_20261117.json",
     "latestHostingPreviewSource": "1b65a790530d49fe1d1fb451f02838fd9a713c53",
     "operationsEvidenceReview": "artifacts/orbit360-recovery/release-control/I6_6_OPS_EVIDENCE_AND_PREVIEW_BINDING_REVIEW_20261116.json",
@@ -1696,6 +1696,54 @@
             "tools/gravicentra-i66-frontend-control.cjs": "81b2f844856d188dd6cf915f10ee29b8daf08f98",
             "tools/gravicentra-i66-frontend-promotion-transaction.cjs": "7e99182ff7854be39c8c5e90056ec6ee69d09994"
           }
+        },
+        "performance": {
+          "schema": "GI_I66_READONLY_OBSERVER_AUTHORITY_V1",
+          "status": "APPROVED_EXACT_QA_ON_ACCEPTED_LIVE",
+          "profile": "performance",
+          "approvedByDirection": true,
+          "readOnly": true,
+          "noProductWrites": true,
+          "noReleaseTransitions": true,
+          "noSyntheticWrites": true,
+          "target": {
+            "generation": 3,
+            "sourceSha": "65c825b2808a615ca4195bdde6689dbdbe3193b2",
+            "buildId": "gi-i66-65c825b2808a-57f234755dc1",
+            "buildRunId": 45287432665,
+            "artifactId": 14873426438,
+            "artifactDigest": "sha256:7cb782848a45083047c4899bc30c13bf5be46429607e42597d09342becfc9acc",
+            "hostingVersion": "sites/ays-orbit-360-lab/versions/332999a55b189108",
+            "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_FRONTEND_E00003_RECEIPT.json",
+            "receiptGitBlobSha": "11fdb3bee494541513482666d6215f45cbad0567",
+            "receiptCommit": "f80c37e174406ccb489569b3bc7dd6073c2c4273"
+          },
+          "qaSourceSha": "3314632a4be63a14897d7f68299fb669faa5303f",
+          "qaPins": {
+            ".github/workflows/gravicentra-i66-live-performance-readonly.yml": "12225700cec41aafabc477d60fe7f525ba957e12",
+            ".github/workflows/gravicentra-i66-privileged-role-parity-source-qa.yml": "37d150c7bcfb884152409ebefe512bdab26e5df9",
+            ".github/workflows/gravicentra-release-lock-sync.yml": "379f7d4fef9daedfa0c060cadc7646ce788f7b6e",
+            "tools/gravicentra-governance-preflight-v1.mjs": "edce16bffa474aae01eb34cdbc5bec5b0b63017f",
+            "tools/gravicentra-i6-6-delta-guard.mjs": "576eda7cd5767c8a7e3bd033f36a8805f06890e8",
+            "tools/gravicentra-i6-6-delta-test-revisions.cjs": "b99b4e8ac0def995efbc4f1fdb00b67efdc31a49",
+            "tools/gravicentra-i6-6-direction-preview-legal-acceptance.cjs": "b3a6539596fb9ed706f7a6e21aa982bf97129780",
+            "tools/gravicentra-i6-6-operational-release-candidate.cjs": "badcc35dc58ce606371437d8b4e0fd086bbcd7dc",
+            "tools/gravicentra-i6-6-performance-first-route-source-timeline.test.cjs": "5a9b7fccbbce89b85669bc6a8bbd82cc30481563",
+            "tools/gravicentra-i6-6-readonly-observer-authority.test.cjs": "4d03114cddcdd59f4af3e9e916bead8548351619",
+            "tools/gravicentra-i6-6-six-existing-receipts-ui-readonly.test.cjs": "43a924c1812cb3eb8c6debc4d353ac4681b21c47",
+            "tools/gravicentra-i66-frontend-control.cjs": "588f7ae7bef517d6efb678cca54c64d180e071ee",
+            "tools/gravicentra-i66-frontend-promotion-transaction.cjs": "9a9449f04ac77b2f88c187df46bed85ff8a15b4f",
+            "tools/gravicentra-i66-live-performance-readonly.mjs": "ae25d4088eec88e172dc6b4fcfb09f2a7dffea25"
+          },
+          "sourceQaRunId": 45395337884,
+          "guardRunId": 45395337947,
+          "purpose": "Observe startup/restoration after reload on accepted E3 with the existing six-receipt driver; no v20 or E6 acceptance.",
+          "requestedReadMode": "six-existing-receipts",
+          "expectedReceiptStages": 12,
+          "financialReleaseAcceptance": false,
+          "noPaymentApplications": true,
+          "noPromotionRetry": true,
+          "priorFailedE6RunId": 45391827840
         }
       }
     },
@@ -3093,7 +3141,7 @@
       "a05Authorized": false
     },
     "pendingReadonlyStartupDiagnostic20261124": {
-      "status": "WAITING_FOR_EXACT_DIAGNOSTIC_SOURCE_QA_AND_GUARD",
+      "status": "EXACT_SOURCE_TESTED_E3_READONLY_OBSERVER_AUTHORIZED",
       "target": {
         "generation": 3,
         "sourceSha": "65c825b2808a615ca4195bdde6689dbdbe3193b2",
@@ -3110,7 +3158,7 @@
       "mode": "six-existing-receipts",
       "workflow": ".github/workflows/gravicentra-i66-live-performance-readonly.yml",
       "markerAfterAuthorityOnly": "I66_SIX_RECEIPTS_UI_READONLY",
-      "authorityGenerated": false,
+      "authorityGenerated": true,
       "readinessSemanticsUnchanged": true,
       "noPromotionRetry": true,
       "noBusinessWrites": true,
@@ -3143,7 +3191,16 @@
         "releaseTransitions": 0
       },
       "checkpointPath": "artifacts/orbit360-recovery/release-control/I6_6_V20_E6_ROLLBACK_STARTUP_DIAGNOSTIC_CHECKPOINT_20261124_R42.json",
-      "checkpointBlob": "fab0116024f0cf279014fbaa2b4c4d9cfeb20f6c"
+      "checkpointBlob": "fab0116024f0cf279014fbaa2b4c4d9cfeb20f6c",
+      "authorityPointer": "artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json#i66OperationalContinuation20261115.postAcceptanceGovernanceQa.observers.performance",
+      "authorityBlob": "1e01b5f5a498ba9bf173ee8abe9e8e2dfe479945",
+      "qaSourceSha": "3314632a4be63a14897d7f68299fb669faa5303f",
+      "sourceQaRunId": 45395337884,
+      "guardRunId": 45395337947,
+      "authorityReceiptPath": "artifacts/orbit360-recovery/release-control/I6_6_E3_RELOAD_STARTUP_READONLY_OBSERVER_AUTHORITY_20261124_R43.json",
+      "authorityReceiptBlob": "307c3f7a871381aba8ebd09aed29a0d32e4278d2",
+      "executionPending": true,
+      "observedOutcome": null
     }
   },
   "b4003ActiveCertificationCursor20261106": {
@@ -6477,7 +6534,7 @@
     "i63LiveReadbackPass": true,
     "i63DeterministicDiffReady": true
   },
-  "nextAction": "I6.6: E6 quedó ROLLED_BACK tras HOLD de arranque/restauración al segundo recibo AFTER_RELOAD; E3 fue restaurado y verificado en224 archivos por ambos orígenes. Primer gate incompleto: observar fase/código de bootstrap y clases de errores con el owner readonlyObserver performance sobre E3 aceptado, después de source QA y guard exactos de la revisión diagnóstica. Ejecutar solo six-existing-receipts, sin pagos, retry de promoción, aceptación E6 ni A05. Preservar v20 inmutable; ningún nuevo artifact antes de causa y corrección demostradas.",
+  "nextAction": "I6.6: ejecutar el owner readonlyObserver performance sobre E3 aceptado en modo six-existing-receipts. Capturar fase/código de bootstrap y clases de errores durante recargas de los mismos seis recibos; conservar HOLD de saldo si corresponde. Esta observación no acepta v20/E6, no promueve Hosting, no ejecuta pagos ni habilita A05. Resolver la causa demostrada dentro del gate activo antes de un nuevo artifact o intento de release.",
   "postproductionExitProgress": {
     "formalPercent": 60,
     "frozenMiniGates": 6,
@@ -26150,8 +26207,8 @@
   },
   "i66ActiveRecoveryCursor": {
     "status": "FROZEN_I66_SHOCK_EXECUTION_CONTINUES_NO_GATE_REPLACEMENT",
-    "currentEvidencePath": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_EXECUTION_PROGRESS_20261124_R42.json",
-    "currentEvidenceBlobSha": "42af1a03893c3ad65bf27fbba63d029a67ff26ca",
+    "currentEvidencePath": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_EXECUTION_PROGRESS_20261124_R43.json",
+    "currentEvidenceBlobSha": "dddf692452a4fd8abf480ef4d3b0daeaba37cbee",
     "frozenPlanPath": "artifacts/orbit360-recovery/release-control/I6_6_PLAN_CHOQUE_FUNCIONAL_FINANCIERO_20261122.md",
     "frozenPlanBlobSha": "fbfd54d229a13101fbfb0dfc6e92a5fa524999b6",
     "fullInventoryPath": "artifacts/orbit360-recovery/release-control/I6_6_INVENTARIO_INTEGRAL_295_20261122.md",
@@ -26168,12 +26225,12 @@
     "financialRowsAppliedThisIteration": 104,
     "lastEvidenceDateLocal": "2026-11-24",
     "noNormativeProjectSourceChange": true,
-    "next": "I6.6: E6 quedó ROLLED_BACK tras HOLD de arranque/restauración al segundo recibo AFTER_RELOAD; E3 fue restaurado y verificado en224 archivos por ambos orígenes. Primer gate incompleto: observar fase/código de bootstrap y clases de errores con el owner readonlyObserver performance sobre E3 aceptado, después de source QA y guard exactos de la revisión diagnóstica. Ejecutar solo six-existing-receipts, sin pagos, retry de promoción, aceptación E6 ni A05. Preservar v20 inmutable; ningún nuevo artifact antes de causa y corrección demostradas.",
+    "next": "I6.6: ejecutar el owner readonlyObserver performance sobre E3 aceptado en modo six-existing-receipts. Capturar fase/código de bootstrap y clases de errores durante recargas de los mismos seis recibos; conservar HOLD de saldo si corresponde. Esta observación no acepta v20/E6, no promueve Hosting, no ejecuta pagos ni habilita A05. Resolver la causa demostrada dentro del gate activo antes de un nuevo artifact o intento de release.",
     "lastFunctionalLiveUatRunId": 45074429319,
     "lastFunctionalLiveUatJobId": 137352857627,
     "lastFunctionalLiveScope": "TWO_ROLE_RENEWAL_INSURER_SYNTHETIC_PASS_REAL_ISSUANCE_AND_DOCUMENT_HOLD",
-    "previousEvidencePath": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_EXECUTION_PROGRESS_20261124_R41.json",
-    "previousEvidenceBlobSha": "bbe47c1b5412da78124b0f5edca26b0961eafa2c",
+    "previousEvidencePath": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_EXECUTION_PROGRESS_20261124_R42.json",
+    "previousEvidenceBlobSha": "42af1a03893c3ad65bf27fbba63d029a67ff26ca",
     "lastFunctionalLiveUatStatus": "LIVE_PHYSICAL_STEPS_PASS_FIVE_ROLE_FINAL_COVERAGE_FAIL_CLOSED",
     "lastFinancialProtectedPreflightRunId": 45332501697,
     "lastFinancialSourceStatus": "155_DIRECT_HISTORICAL_PAYMENTS_46_NEW_OBLIGATIONS_READBACK_VERIFIED_607_AND_302_NOT_FULLY_CLOSED",
@@ -26201,7 +26258,7 @@
     "financialHistoricalPaymentsAppliedThisContinuation": 155,
     "financialHistoricalPaidReceiptsMaterializedThisContinuation": 153,
     "financialNewPendingObligationsThisContinuation": 46,
-    "moduleReleasedThisIterationScope": "Metadata reconciliation only: E6 rolled back, E3 restored, active promotion HOLD, startup diagnostic pending exact QA authority.",
+    "moduleReleasedThisIterationScope": "Read-only startup diagnostic authority on unchanged accepted E3; no product publication or financial application.",
     "lastLivePromotionAttemptRunId": 45391827840,
     "lastLivePromotionAttemptStatus": "ROLLED_BACK"
   },
