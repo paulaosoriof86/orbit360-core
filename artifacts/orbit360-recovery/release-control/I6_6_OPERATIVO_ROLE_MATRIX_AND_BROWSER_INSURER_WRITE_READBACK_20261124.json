@@ -1,0 +1,94 @@
+{
+  "schema": "GI_I66_OPERATIVO_ROLE_MATRIX_AND_BROWSER_INSURER_WRITE_READBACK_V1",
+  "status": "LIVE_SCOPED_ROLE_CONFIGURATION_AND_SYNTHETIC_OBSERVATION_WRITE_VERIFIED_FULL_A04_OPEN",
+  "dateLocal": "2026-11-24",
+  "timezone": "America/Guatemala",
+  "activeGate": "I6.6",
+  "origin": "https://app.aysseguros.com",
+  "productionGeneration": "E3",
+  "hostingDeploymentPerformed": false,
+  "roleConfiguration": {
+    "method": "Normal signed Dirección session in Equipo y permisos; Guardar matriz with reason; full page reload",
+    "role": "Operativo",
+    "beforeAfter": [
+      {
+        "module": "cancelaciones",
+        "capability": "ver",
+        "before": false,
+        "after": true
+      },
+      {
+        "module": "cancelaciones",
+        "capability": "editar",
+        "before": false,
+        "after": true
+      },
+      {
+        "module": "comisiones",
+        "capability": "ver",
+        "before": false,
+        "after": true
+      },
+      {
+        "module": "comisiones",
+        "capability": "editar",
+        "before": false,
+        "after": true
+      }
+    ],
+    "allOtherVisiblePermissionCheckboxesUnchanged": true,
+    "visiblePermissionCheckboxesCompared": 580,
+    "scopeBefore": "all",
+    "scopeAfter": "all",
+    "memberAssignmentsUnchanged": true,
+    "independentReadback": {
+      "workflow": ".github/workflows/gravicentra-i66-privileged-role-live-authz-readonly.yml",
+      "runId": 43374139073,
+      "runAttempt": 3,
+      "jobId": 138780806007,
+      "conclusion": "success",
+      "observedAtUtc": "2026-11-24T21:12:40.1414429Z",
+      "configuredScope": "all",
+      "activeAssignedMembers": 5,
+      "approvedModulesChecked": [
+        "cliente360",
+        "polizas",
+        "renovaciones",
+        "cobros",
+        "ops",
+        "leads",
+        "aseguradoras",
+        "cancelaciones",
+        "siniestros",
+        "comisiones"
+      ],
+      "explicitRestrictions": [],
+      "readbackWrites": 0
+    },
+    "visibleOperativoNavigationAfterRefresh": [
+      "Cancelaciones",
+      "Comisiones"
+    ]
+  },
+  "insurerUiProof": {
+    "actor": "Existing signed owner session selecting legitimately assigned Operativo through normal role selector",
+    "fixtureType": "Existing synthetic insurer; zero linked policies",
+    "field": "observaciones",
+    "originalValue": "empty",
+    "changedValue": "Synthetic reversible test note without customer data",
+    "normalUiSaveToast": "Cambios guardados correctamente.",
+    "fullReloadReadback": "MATCH",
+    "restoreMethod": "Normal edit and save returning field to empty; audit retained",
+    "restoreUiReadback": "Sin registrar",
+    "saveOperations": 2,
+    "customerOrPolicyOrPaymentWrites": 0,
+    "credentialWrites": 0,
+    "logoUploads": 0
+  },
+  "limitations": [
+    "The basic observation write does not attribute or resolve the specific save failure reported for another user.",
+    "This receipt does not certify logo, contact or secure credential writes.",
+    "No full transversal A04 acceptance or new Hosting release is asserted.",
+    "Drive administrative bootstrap remains unconfirmed and was not completed by this receipt."
+  ]
+}

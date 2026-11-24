@@ -1,0 +1,52 @@
+{
+  "schema": "GI_I66_EXISTING_FINANCIAL_AND_ADMISSION_TEST_REVISION_V1",
+  "revisionId": "I6_6_R51_ASSIGNED_ROLES_INSURER_COMPOSED_ADMISSION_QA_20261124",
+  "scope": "EXISTING_DECLARED_TESTS_ONLY",
+  "productSourceChanges": 0,
+  "productionAcceptanceClaimed": false,
+  "status": "SOURCE_QA_PASS_SIGNED_PREVIEW_LIVE_PENDING",
+  "tests": [
+    {
+      "path": "tools/gravicentra-i6-6-composite-preview-admission.test.cjs",
+      "gitBlobSha": "e1dd83a9dc1cc63f04f68a1d10afeedfca758afa",
+      "replaces": {
+        "path": "tools/gravicentra-i6-6-composite-preview-admission.test.cjs",
+        "priorGitBlobSha": "abd35d228b8c92c409e7ac09ce1abd002b73d5c6",
+        "priorChangeId": "I6_6_R51_DOCUMENTARY_PAYMENT_AND_ADMISSION_QA_20261124"
+      }
+    },
+    {
+      "path": "tools/gravicentra-i6-6-proposal-application-signed-uat.test.cjs",
+      "gitBlobSha": "cbb8ae140a8fa88b53d3fac603625ca201403aea",
+      "replaces": {
+        "path": "tools/gravicentra-i6-6-proposal-application-signed-uat.test.cjs",
+        "priorGitBlobSha": "e209eb5a3a3f5bdd88ae944672c344ea1ed2fa99",
+        "priorChangeId": "I6_6_R51_DOCUMENTARY_PAYMENT_AND_ADMISSION_QA_20261124"
+      }
+    }
+  ],
+  "causalSource": {
+    "path": "artifacts/orbit360-recovery/release-control/I6_6_R51_ASSIGNED_ROLES_INSURER_FINANCIAL_RECOVERY_SOURCE_20261124.json",
+    "gitBlobSha": "1d89b80f46afc83bc5cfda1c0147548fe5319347"
+  },
+  "verification": {
+    "documentary": {
+      "passed": 16,
+      "failed": 0,
+      "skipped": 0,
+      "reportSha256": "d224fe0be8ff303b2883e9ea4f72d5cd9fe4d41405e2084e9fed94281cfb1965"
+    },
+    "admission": {
+      "passed": 85,
+      "failed": 0,
+      "skipped": 0,
+      "reportSha256": "d6018440207282f2868cd86353d1c57c3d83dd424b558e94ea5bb0dbe0c51bc7"
+    },
+    "common": {
+      "passed": 169,
+      "failed": 0,
+      "skipped": 0,
+      "reportSha256": "faf37d8d69b9bf83d270a788da52a1a8ec19edf61357e816cc21d214f6dbec1b"
+    }
+  }
+}

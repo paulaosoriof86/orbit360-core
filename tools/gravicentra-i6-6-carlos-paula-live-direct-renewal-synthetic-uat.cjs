@@ -3,6 +3,8 @@
 // inherited editable fields without business submissions; the canonical Preview
 // writer continues to reject relations. LIVE exercises the same UI against only
 // unique synthetic fixtures, then verifies durable writes/reload/replay/restore.
+// The explicit assigned-role profile uses Paula's existing Direction authority
+// and normal role selector; the historical Carlos profile keeps its own grant.
 const assert=require('node:assert/strict'),crypto=require('node:crypto'),fs=require('node:fs'),path=require('node:path');
 const TENANT='alianzas-soluciones',LIVE_ORIGIN='https://app.aysseguros.com';
 const norm=x=>String(x||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();
@@ -15,7 +17,12 @@ function configuration(env=process.env){
   assert.match(source||'',/^[a-f0-9]{40}$/,'I66_RENEWAL_SOURCE_PIN_REQUIRED');
   assert.ok(env.I66_PACKAGE_ROOT&&path.isAbsolute(env.I66_PACKAGE_ROOT),'I66_RENEWAL_EXACT_PACKAGE_REQUIRED');
   assert.ok(env.I66_CANCELLATION_QA===undefined||['0','1'].includes(env.I66_CANCELLATION_QA),'I66_CANCELLATION_PROFILE_INVALID');
-  return {phase,live,origin,source,packageRoot:env.I66_PACKAGE_ROOT,...(env.I66_CANCELLATION_QA==='1'?{cancellationQa:true}:{})};
+  const qaProfile=env.I66_DIRECT_FORMS_QA_PROFILE||undefined;
+  if(qaProfile!==undefined){
+    assert.equal(qaProfile,PAULA_ROLE_PROFILE,'I66_DIRECT_FORMS_ROLE_PROFILE_UNKNOWN');
+    assert.equal(env.I66_CANCELLATION_QA,'1','I66_DIRECT_FORMS_ROLE_CANCELLATION_PROFILE_REQUIRED');
+  }
+  return {phase,live,origin,source,packageRoot:env.I66_PACKAGE_ROOT,...(env.I66_CANCELLATION_QA==='1'?{cancellationQa:true}:{}),...(qaProfile?{qaProfile}:{})};
 }
 function fixtures(role,suffix){
   assert.ok(['operativo','direccion'].includes(role));assert.match(suffix,/^[a-z0-9_]{8,80}$/);
@@ -448,9 +455,137 @@ async function applyPersonalLegalUi({page,actor,cfg,authority},io={}){
   validatePersonalLegalProof(proof,atClick);return proof;
 }
 
+const PAULA_ROLE_PROFILE='PAULA_ASSIGNED_ROLES_EFFECTIVE_FORMS_V1';
+const paulaRoleAuthorities=new WeakSet();
+function directFormsProfile(candidate){
+  if(candidate?.directFormsQaProfile===undefined)return null;
+  assert.equal(candidate.directFormsQa,true,'I66_DIRECT_FORMS_ROLE_PROFILE_WITHOUT_QA');
+  assert.equal(candidate.cancellationQa,true,'I66_DIRECT_FORMS_ROLE_CANCELLATION_PROFILE_REQUIRED');
+  assert.equal(candidate.directFormsQaProfile,PAULA_ROLE_PROFILE,'I66_DIRECT_FORMS_ROLE_PROFILE_UNKNOWN');
+  assert.equal(candidate.directFormsPersonalLegal,undefined,'I66_DIRECT_FORMS_ROLE_MIXED_PERSONAL_GRANTS');
+  return PAULA_ROLE_PROFILE;
+}
+function validatePaulaRoleAuthority({cfg,controlBytes,candidate:expected,previewReceiptBytes,liveReceiptBytes,proposalBytes,controlHeadSha}){
+  assert.ok(['PREVIEW','LIVE'].includes(cfg?.phase),'I66_DIRECT_FORMS_ROLE_PHASE');
+  assert.match(controlHeadSha||'',/^[a-f0-9]{40}$/,'I66_DIRECT_FORMS_ROLE_CURRENT_HEAD');
+  const guard=require('./gravicentra-i6-6-operational-release-candidate.cjs');
+  const legal=require('./gravicentra-i6-6-direction-preview-legal-acceptance.cjs');
+  const control=JSON.parse(controlBytes),candidate=guard.candidateForPhase(control,cfg.phase.toLowerCase());
+  assert.equal(directFormsProfile(candidate),PAULA_ROLE_PROFILE,'I66_DIRECT_FORMS_ROLE_PROFILE_REQUIRED');
+  if(expected)assert.deepEqual(candidate,expected,'I66_DIRECT_FORMS_ROLE_CURRENT_CANDIDATE_DRIFT');
+  assert.equal(candidate.sourceSha,cfg.source,'I66_DIRECT_FORMS_ROLE_SOURCE_DRIFT');
+  assert.equal(cfg.origin,cfg.phase==='LIVE'?LIVE_ORIGIN:candidate.previewUrl,'I66_DIRECT_FORMS_ROLE_ORIGIN_DRIFT');
+  assert.equal(personalHash(previewReceiptBytes),legal.I66_SCOPE.receiptSha256,'I66_DIRECT_FORMS_ROLE_DIRECTION_AUTHORITY_DRIFT');
+  if(cfg.phase==='LIVE')legal.validateLiveScopeDecision({receipt:JSON.parse(liveReceiptBytes),receiptSha256:personalHash(liveReceiptBytes),candidate,proposalBytes,control});
+  else legal.validateI66ScopeCandidate(candidate);
+  const authority=freezePersonal({profile:PAULA_ROLE_PROFILE,phase:cfg.phase,origin:cfg.origin,candidate,controlHeadSha,
+    actorUidSha256:cfg.phase==='LIVE'?candidate.liveLegalAcceptance.actorUidSha256:null,
+    legalAuthoritySha256:cfg.phase==='LIVE'?personalHash(liveReceiptBytes):personalHash(previewReceiptBytes)});
+  paulaRoleAuthorities.add(authority);return authority;
+}
+function readCurrentPaulaRoleAuthority({cfg,candidate},io={}){
+  const exec=io.execFileSync||require('node:child_process').execFileSync;
+  const git=(...args)=>exec('git',args,{encoding:'utf8',stdio:['ignore','pipe','pipe'],maxBuffer:4*1024*1024});
+  try{
+    const guard=require('./gravicentra-i6-6-operational-release-candidate.cjs'),legal=require('./gravicentra-i6-6-direction-preview-legal-acceptance.cjs');
+    git('fetch','--no-tags','--quiet','origin','refs/heads/'+PERSONAL_LEGAL.branch);
+    const head=git('rev-parse','FETCH_HEAD').trim();assert.match(head,/^[a-f0-9]{40}$/,'I66_DIRECT_FORMS_ROLE_CURRENT_HEAD');
+    git('merge-base','--is-ancestor',cfg.source,head);
+    assert.equal(git('diff','--name-only',cfg.source,head,'--',...guard.PINNED_OWNER_PATHS).trim(),'','I66_DIRECT_FORMS_ROLE_SOURCE_OR_OWNER_DRIFT');
+    const sourceBytes=p=>git('show',cfg.source+':'+p),currentBytes=p=>git('show',head+':'+p);
+    const previewReceiptBytes=currentBytes(legal.I66_SCOPE.receiptPath);
+    assert.equal(previewReceiptBytes,sourceBytes(legal.I66_SCOPE.receiptPath),'I66_DIRECT_FORMS_ROLE_DIRECTION_AUTHORITY_DRIFT');
+    assert.equal(personalHash(sourceBytes(PERSONAL_LEGAL.legalOwnerPath)),PERSONAL_LEGAL.legalOwnerSha256,'I66_DIRECT_FORMS_ROLE_TERMS_DRIFT');
+    let liveReceiptBytes,proposalBytes;
+    if(cfg.phase==='LIVE'){
+      liveReceiptBytes=currentBytes(legal.LIVE_SCOPE.authorizationPath);proposalBytes=currentBytes(legal.LIVE_SCOPE.proposalPath);
+      assert.equal(liveReceiptBytes,sourceBytes(legal.LIVE_SCOPE.authorizationPath),'I66_DIRECT_FORMS_ROLE_DIRECTION_AUTHORITY_DRIFT');
+      assert.equal(proposalBytes,sourceBytes(legal.LIVE_SCOPE.proposalPath),'I66_DIRECT_FORMS_ROLE_DIRECTION_AUTHORITY_DRIFT');
+    }
+    return validatePaulaRoleAuthority({cfg,candidate,controlHeadSha:head,controlBytes:currentBytes(guard.CONTROL),previewReceiptBytes,liveReceiptBytes,proposalBytes});
+  }catch(error){
+    if(/^I66_DIRECT_FORMS_ROLE_[A-Z0-9_]+$/.test(error?.message||''))throw error;
+    throw Error('I66_DIRECT_FORMS_ROLE_CURRENT_AUTHORITY_UNAVAILABLE');
+  }
+}
+function resolvePaulaAssignedActors(members,authority){
+  assert.ok(paulaRoleAuthorities.has(authority),'I66_DIRECT_FORMS_ROLE_CURRENT_AUTHORITY_REQUIRED');
+  const matches=members.filter(row=>String(row.data?.advisorId||row.data?.asesorId||'')==='ase-paula-osorio');
+  assert.equal(matches.length,1,'I66_DIRECT_FORMS_ROLE_PAULA_MEMBERSHIP_AMBIGUOUS');
+  const {uid,data}=matches[0],roles=[].concat(data.roles||[]).map(norm),countries=[].concat(data.countries||data.paises||[]).map(v=>String(v).toUpperCase());
+  assert.ok(typeof uid==='string'&&uid,'I66_DIRECT_FORMS_ROLE_UID_REQUIRED');
+  assert.ok(data.active!==false&&data.activo!==false&&['active','activo'].includes(norm(data.status||data.estado)),'I66_DIRECT_FORMS_ROLE_MEMBERSHIP_INACTIVE');
+  assert.ok(roles.includes('direccion')&&roles.includes('operativo'),'I66_DIRECT_FORMS_ROLE_NOT_ASSIGNED');
+  assert.equal(norm(data.activeRole),'direccion','I66_DIRECT_FORMS_ROLE_INITIAL_DIRECTION_REQUIRED');
+  assert.ok(countries.includes('GT'),'I66_DIRECT_FORMS_ROLE_COUNTRY_DENIED');
+  if(data.tenantId!==undefined)assert.equal(data.tenantId,TENANT,'I66_DIRECT_FORMS_ROLE_TENANT_DRIFT');
+  if(authority.actorUidSha256)assert.equal(personalHash(uid),authority.actorUidSha256,'I66_DIRECT_FORMS_ROLE_UID_DRIFT');
+  const base={uid,advisorId:'ase-paula-osorio',membershipSha256:personalDigest(data),assignedRolesSha256:personalDigest([...new Set(roles)].sort())};
+  return ['operativo','direccion'].map(role=>({...base,role}));
+}
+function validatePaulaRuntime(snapshot,actor,role){
+  assert.equal(snapshot.actorUidSha256,personalHash(actor.uid),'I66_DIRECT_FORMS_ROLE_RUNTIME_UID_DRIFT');
+  assert.equal(snapshot.signedActorUidSha256,snapshot.actorUidSha256,'I66_DIRECT_FORMS_ROLE_AUTH_UID_DRIFT');
+  assert.equal(snapshot.advisorId,'ase-paula-osorio','I66_DIRECT_FORMS_ROLE_ADVISOR_DRIFT');
+  assert.equal(snapshot.tenantId,TENANT,'I66_DIRECT_FORMS_ROLE_TENANT_DRIFT');
+  assert.equal(snapshot.country,'GT','I66_DIRECT_FORMS_ROLE_COUNTRY_DRIFT');
+  assert.equal(norm(snapshot.role),role,'I66_DIRECT_FORMS_ROLE_EFFECTIVE_ROLE_DRIFT');
+  assert.ok(snapshot.assignedRoles.includes('direccion')&&snapshot.assignedRoles.includes('operativo'),'I66_DIRECT_FORMS_ROLE_NOT_ASSIGNED');
+  assert.equal(personalDigest([...new Set(snapshot.assignedRoles)].sort()),actor.assignedRolesSha256,'I66_DIRECT_FORMS_ROLE_ASSIGNMENTS_DRIFT');
+  assert.equal(snapshot.appStarted,true,'I66_DIRECT_FORMS_ROLE_APP_NOT_STARTED');
+  for(const key of ['canRenew','canIssue','canCancel'])assert.equal(snapshot[key],true,'I66_DIRECT_FORMS_ROLE_CAPABILITY_DENIED_'+key);
+  return {actorUidSha256:snapshot.actorUidSha256,advisorId:snapshot.advisorId,tenantId:snapshot.tenantId,country:snapshot.country};
+}
+async function readPaulaRuntimeSnapshot(page){
+    const data=await page.evaluate(async function directFormsPaulaRoleSnapshot(){
+      const o=Orbit,u=o.auth.user(),signed=await o.productRuntimeBrowserProvidersP0.initialUser();
+      return {uid:u.uid,signedUid:signed?.uid||'',advisorId:u.advisorId,tenantId:u.tenantId,role:o.session.rol(),
+        country:document.getElementById('pais-sel')?.value||'',assignedRoles:o.session.allowedRoles(),appStarted:o.productAppP0.isStarted()===true,
+        canRenew:o.access.can('renovaciones','edit')===true,canIssue:o.issuance.canManage()===true,canCancel:o.policyReceipts.canRegisterEffectiveCancellation()===true};
+    });
+    return {...data,actorUidSha256:personalHash(data.uid),signedActorUidSha256:personalHash(data.signedUid),assignedRoles:data.assignedRoles.map(norm)};
+}
+async function selectPaulaAssignedRole({page,actor,authority,directionLegalAcceptance},io={}){
+  assert.ok(paulaRoleAuthorities.has(authority),'I66_DIRECT_FORMS_ROLE_CURRENT_AUTHORITY_REQUIRED');
+  const legal=io.legal||require('./gravicentra-i6-6-direction-preview-legal-acceptance.cjs');
+  if(authority.phase==='LIVE')legal.validateLiveAcceptanceProof(directionLegalAcceptance,authority.candidate);
+  else legal.validateAcceptanceProof(directionLegalAcceptance,authority.candidate);
+  assert.equal(directionLegalAcceptance.actorUidSha256,personalHash(actor.uid),'I66_DIRECT_FORMS_ROLE_LEGAL_ACTOR_DRIFT');
+  // Only normal selectors. The canonical owner refuses unassigned roles and
+  // invalidates scope before rehydration; no membership or storage injection.
+  const country=page.locator('#pais-sel');if(await country.inputValue()!=='GT')await country.selectOption('GT');
+  const before=validatePaulaRuntime(await readPaulaRuntimeSnapshot(page),actor,'direccion');
+  await page.locator('#rol-sel').selectOption(actor.role==='operativo'?'Operativo':'Dirección');
+  await page.waitForFunction(role=>window.Orbit?.session?.rol?.()===role,actor.role==='operativo'?'Operativo':'Dirección',{timeout:10000});
+  await page.evaluate(async()=>{await Orbit.store._ensureCollections(['clientes','polizas','gestiones','aseguradoras']);});
+  await page.waitForFunction(()=>['clientes','polizas','gestiones','aseguradoras'].every(c=>Orbit.store._productStatus().serverConfirmedCollections.includes(c)),null,{timeout:30000});
+  const after=validatePaulaRuntime(await readPaulaRuntimeSnapshot(page),actor,actor.role);
+  assert.deepEqual(after,before,'I66_DIRECT_FORMS_ROLE_IDENTITY_CHANGED_ON_SELECTION');
+  await (io.readiness||requireExistingLegalReadiness)(page);
+  return {profile:PAULA_ROLE_PROFILE,actorUidSha256:after.actorUidSha256,advisorId:after.advisorId,tenantId:after.tenantId,country:'GT',
+    initialRole:'direccion',activeRole:actor.role,normalSelector:true,rehydrated:true,sameIdentity:true,
+    assignedRolesSha256:actor.assignedRolesSha256,membershipBeforeSha256:actor.membershipSha256,membershipAfterSha256:null,
+    identityScopeSha256:personalDigest(after),legalAcceptedAsRole:'direccion',reloadIdentityChecks:0};
+}
+function validatePaulaRoleProof(actor,authority){
+  assert.ok(paulaRoleAuthorities.has(authority),'I66_DIRECT_FORMS_ROLE_CURRENT_AUTHORITY_REQUIRED');
+  const legal=require('./gravicentra-i6-6-direction-preview-legal-acceptance.cjs'),proof=actor.roleSelection;
+  const acceptance=actor.directionLegalAcceptance;
+  if(authority.phase==='LIVE')legal.validateLiveAcceptanceProof(acceptance,authority.candidate);else legal.validateAcceptanceProof(acceptance,authority.candidate);
+  for(const [k,v] of Object.entries({profile:PAULA_ROLE_PROFILE,advisorId:'ase-paula-osorio',tenantId:TENANT,country:'GT',initialRole:'direccion',activeRole:actor.role,
+    normalSelector:true,rehydrated:true,sameIdentity:true,legalAcceptedAsRole:'direccion'}))assert.deepEqual(proof?.[k],v,'I66_DIRECT_FORMS_ROLE_PROOF_'+k);
+  for(const k of ['actorUidSha256','assignedRolesSha256','membershipBeforeSha256','membershipAfterSha256','identityScopeSha256'])assert.match(proof[k]||'',/^[a-f0-9]{64}$/,'I66_DIRECT_FORMS_ROLE_PROOF_DIGEST');
+  assert.equal(proof.actorUidSha256,acceptance.actorUidSha256,'I66_DIRECT_FORMS_ROLE_PROOF_LEGAL_ACTOR_DRIFT');
+  if(authority.actorUidSha256)assert.equal(proof.actorUidSha256,authority.actorUidSha256,'I66_DIRECT_FORMS_ROLE_PROOF_UID_DRIFT');
+  assert.equal(proof.membershipBeforeSha256,proof.membershipAfterSha256,'I66_DIRECT_FORMS_ROLE_MEMBERSHIP_CHANGED');
+  assert.equal(proof.identityScopeSha256,personalDigest({actorUidSha256:proof.actorUidSha256,advisorId:'ase-paula-osorio',tenantId:TENANT,country:'GT'}),'I66_DIRECT_FORMS_ROLE_PROOF_IDENTITY_DRIFT');
+  assert.equal(proof.reloadIdentityChecks,authority.phase==='LIVE'?2:0,'I66_DIRECT_FORMS_ROLE_RELOAD_IDENTITY_REQUIRED');
+  assert.equal(actor.personalLegalAcceptance,undefined,'I66_DIRECT_FORMS_ROLE_OTHER_PERSONAL_ACCEPTANCE_FORBIDDEN');
+}
+
 function safeDirectFormsDiagnosticReport(report){
   const knownStage=['SEED','SIGNED_SESSION','DIRECTION_EXISTING_LEGAL_SCOPE','EXISTING_LEGAL_READINESS','PROTECTED_HYDRATION',
-    'PERSONAL_LEGAL_AUTHORITY','PERSONAL_LEGAL_NORMAL_UI','BOTH_PUBLIC_RENEWAL_ENTRIES','ISSUED_BENEFICIARY_ENDORSEMENT_DRAFT','ISSUED_ENDORSEMENT_SAVE','DIRECT_RENEWAL_SAVE','RELOAD_READBACK',
+    'PERSONAL_LEGAL_AUTHORITY','PERSONAL_LEGAL_NORMAL_UI','PAULA_ASSIGNED_ROLE_SELECTION','BOTH_PUBLIC_RENEWAL_ENTRIES','ISSUED_BENEFICIARY_ENDORSEMENT_DRAFT','ISSUED_ENDORSEMENT_SAVE','DIRECT_RENEWAL_SAVE','RELOAD_READBACK',
     'EFFECTIVE_CANCELLATION_DRAFT','EFFECTIVE_CANCELLATION_SAVE','EFFECTIVE_CANCELLATION_RELOAD_REPLAY'];
   const cleanClick=raw=>{
     if(!raw||typeof raw!=='object')return null;
@@ -470,11 +605,19 @@ function safeDirectFormsDiagnosticReport(report){
       clickDiagnostic:cleanClick(actor?.clickDiagnostic),failureUi:actor?.failureUi?safeDirectFormsSnapshot(actor.failureUi):null
     })):[]};
 }
-function validateSignedReport(report,{phase,sourceSha,buildId,personalAuthority,cancellationQa=false}){
+function validateSignedReport(report,{phase,sourceSha,buildId,personalAuthority,roleAuthority,cancellationQa=false}){
   assert.ok(['PREVIEW','LIVE'].includes(phase),'I66_DIRECT_FORMS_REPORT_PHASE');
   assert.match(sourceSha||'',/^[a-f0-9]{40}$/,'I66_DIRECT_FORMS_REPORT_SOURCE_REQUIRED');
   assert.ok(typeof buildId==='string'&&buildId.length>0,'I66_DIRECT_FORMS_REPORT_BUILD_REQUIRED');
-  const live=phase==='LIVE';let checks=0;
+  const live=phase==='LIVE',paula=roleAuthority?.profile===PAULA_ROLE_PROFILE;let checks=0;
+  if(paula){
+    assert.ok(paulaRoleAuthorities.has(roleAuthority),'I66_DIRECT_FORMS_ROLE_CURRENT_AUTHORITY_REQUIRED');
+    assert.equal(roleAuthority.phase,phase,'I66_DIRECT_FORMS_ROLE_PHASE_DRIFT');
+    assert.equal(roleAuthority.candidate.sourceSha,sourceSha,'I66_DIRECT_FORMS_ROLE_SOURCE_DRIFT');
+    assert.equal(roleAuthority.candidate.buildId,buildId,'I66_DIRECT_FORMS_ROLE_BUILD_DRIFT');
+    assert.equal(report.profile,PAULA_ROLE_PROFILE,'I66_DIRECT_FORMS_ROLE_REPORT_PROFILE_REQUIRED');
+    assert.equal(cancellationQa,roleAuthority.candidate.cancellationQa===true,'I66_DIRECT_FORMS_REPORT_CANCELLATION_CANDIDATE_DRIFT');
+  }else assert.equal(report?.profile,undefined,'I66_DIRECT_FORMS_ROLE_UNBOUND_PROFILE');
   const equal=(actual,expected,code)=>{assert.deepEqual(actual,expected,'I66_DIRECT_FORMS_REPORT_'+code);checks++;};
   equal(report?.schema,'I66_DIRECT_RENEWAL_ISSUED_ENDORSEMENT_SIGNED_UI_V1','SCHEMA');
   equal(report.phase,phase,'PHASE');equal(report.sourceSha,sourceSha,'SOURCE');equal(report.buildId,buildId,'BUILD');
@@ -517,13 +660,20 @@ function validateSignedReport(report,{phase,sourceSha,buildId,personalAuthority,
       assert.equal(actor.cancellationWrite,undefined,'I66_DIRECT_FORMS_REPORT_UNAUTHORIZED_CANCELLATION_WRITE');
     }
   }
-  // Authorization validation is separate from the preserved 44/66 functional checks.
-  personalAssert(personalAuthorities.has(personalAuthority),'VALIDATED_CURRENT_AUTHORITY_REQUIRED');
-  assert.equal(cancellationQa,personalAuthority.candidate.cancellationQa===true,'I66_DIRECT_FORMS_REPORT_CANCELLATION_CANDIDATE_DRIFT');
-  personalAssert(personalAuthority.phase===phase&&personalAuthority.reviewContext.target.sourceSha===sourceSha&&personalAuthority.reviewContext.target.buildId===buildId,'SIGNED_REPORT_CONTEXT_DRIFT');
-  validatePersonalLegalProof(report.actors.find(a=>a.role==='operativo').personalLegalAcceptance,personalAuthority);
-  personalAssert(report.actors.find(a=>a.role==='direccion').personalLegalAcceptance===undefined,'OTHER_ACTOR_PROOF_FORBIDDEN');
-  return {status:'PASS',cleanup:'PASS',checks,phase,coverage:cancellationQa?(live?'NORMAL_UI_RENEWAL_ENDORSEMENT_CANCELLATION_READBACK_RELOAD_REPLAY':'PUBLIC_ENTRIES_AND_CANCELLATION_READONLY'):(live?'NORMAL_UI_SAVE_READBACK_RELOAD_REPLAY':'PUBLIC_ENTRIES_READONLY')};
+  // Actor authorization is separate from the existing 44/66 base and 63/113
+  // conditional cancellation checks. The cancellation exercise is unchanged.
+  if(paula){
+    for(const actor of report.actors)validatePaulaRoleProof(actor,roleAuthority);
+    for(const key of ['actorUidSha256','advisorId','tenantId','country','assignedRolesSha256','membershipBeforeSha256','membershipAfterSha256','identityScopeSha256'])
+      assert.equal(report.actors[0].roleSelection[key],report.actors[1].roleSelection[key],'I66_DIRECT_FORMS_ROLE_BETWEEN_RUNS_DRIFT');
+  }else{
+    personalAssert(personalAuthorities.has(personalAuthority),'VALIDATED_CURRENT_AUTHORITY_REQUIRED');
+    assert.equal(cancellationQa,personalAuthority.candidate.cancellationQa===true,'I66_DIRECT_FORMS_REPORT_CANCELLATION_CANDIDATE_DRIFT');
+    personalAssert(personalAuthority.phase===phase&&personalAuthority.reviewContext.target.sourceSha===sourceSha&&personalAuthority.reviewContext.target.buildId===buildId,'SIGNED_REPORT_CONTEXT_DRIFT');
+    validatePersonalLegalProof(report.actors.find(a=>a.role==='operativo').personalLegalAcceptance,personalAuthority);
+    personalAssert(report.actors.find(a=>a.role==='direccion').personalLegalAcceptance===undefined,'OTHER_ACTOR_PROOF_FORBIDDEN');
+  }
+  return {status:'PASS',cleanup:'PASS',checks,phase,...(paula?{profile:PAULA_ROLE_PROFILE}:{}),coverage:cancellationQa?(live?'NORMAL_UI_RENEWAL_ENDORSEMENT_CANCELLATION_READBACK_RELOAD_REPLAY':'PUBLIC_ENTRIES_AND_CANCELLATION_READONLY'):(live?'NORMAL_UI_SAVE_READBACK_RELOAD_REPLAY':'PUBLIC_ENTRIES_READONLY')};
 }
 async function openDraft(page,entry,source,diagnostic={}){
   assert.ok(['Renovaciones','Cliente360'].includes(entry),'I66_RENEWAL_UNKNOWN_PUBLIC_ENTRY');
@@ -682,7 +832,7 @@ async function main(){
   const collection=c=>tenant.collection('data').doc(c).collection('items'),item=(c,id)=>collection(c).doc(id);
   const suffix=Date.now().toString(36)+'_'+crypto.randomBytes(4).toString('hex');
   const report={schema:'I66_DIRECT_RENEWAL_ISSUED_ENDORSEMENT_SIGNED_UI_V1',phase:cfg.phase,sourceSha:cfg.source,
-    status:'RUNNING',realCustomerWrites:0,externalMessages:0,actors:[],restoreComplete:false,...(cfg.cancellationQa?{cancellationQa:true}:{})};
+    status:'RUNNING',realCustomerWrites:0,externalMessages:0,actors:[],restoreComplete:false,...(cfg.cancellationQa?{cancellationQa:true}:{}),...(cfg.qaProfile?{profile:cfg.qaProfile}:{})};
   let browser;
   try{
     const marker=await fetch(cfg.origin+'/__recovery__/build.json',{headers:{'cache-control':'no-cache'}}).then(r=>r.json());
@@ -702,10 +852,13 @@ async function main(){
       assert.equal(matches.length,1,'I66_RENEWAL_STAFF_AMBIGUOUS_'+role);
       const row=matches[0].data()||{};return {uid:matches[0].id,advisorId:row.advisorId||row.asesorId||'',role};
     };
-    const actors=[resolve(x=>x.startsWith('carlos castro'),'operativo'),resolve(x=>x.includes('paula')&&x.includes('osorio'),'direccion')];
-    // Read/validate personal delegation before fixtures, sessions or any legal action.
-    const personalAuthority=readCurrentPersonalLegalAuthority({cfg,actor:actors[0]});
-    assert.equal(cfg.cancellationQa===true,personalAuthority.candidate.cancellationQa===true,'I66_CANCELLATION_CANDIDATE_PROFILE_DRIFT');
+    const roleAuthority=cfg.qaProfile===PAULA_ROLE_PROFILE?readCurrentPaulaRoleAuthority({cfg}):null;
+    const actors=roleAuthority?resolvePaulaAssignedActors(members.docs.map(d=>({uid:d.id,data:d.data()})),roleAuthority):
+      [resolve(x=>x.startsWith('carlos castro'),'operativo'),resolve(x=>x.includes('paula')&&x.includes('osorio'),'direccion')];
+    // Validate the exact current authority before fixtures or sessions. Paula's
+    // assigned-role profile never reads or substitutes Carlos's personal grant.
+    const personalAuthority=roleAuthority?null:readCurrentPersonalLegalAuthority({cfg,actor:actors[0]});
+    assert.equal(cfg.cancellationQa===true,(roleAuthority||personalAuthority).candidate.cancellationQa===true,'I66_CANCELLATION_CANDIDATE_PROFILE_DRIFT');
     browser=await chromium.launch({headless:true,args:['--no-sandbox']});
     for(const actor of actors){
       const fx=fixtures(actor.role,suffix),{ids}=fx,seeds=[],context=await browser.newContext({viewport:{width:1280,height:900}});
@@ -731,16 +884,20 @@ async function main(){
         const session=await page.evaluate(async token=>{const p=Orbit.productRuntimeBrowserProvidersP0,c=await p.initialize();
           await c.modules.auth.setPersistence(c.auth,c.modules.auth.browserSessionPersistence);await c.modules.auth.signInWithCustomToken(c.auth,token);
           const result=await Orbit.productAppP0.activate();return {started:result?.started===true,role:Orbit.session?.rol?.(),preview:p.isI66PreviewHost(),canRenew:Orbit.access?.can('renovaciones','edit'),canIssue:Orbit.issuance?.canManage?.()};},token);
-        assert.ok(session.started&&session.preview===!cfg.live&&norm(session.role)===actor.role&&session.canRenew&&session.canIssue,'I66_RENEWAL_SIGNED_ROLE_DENIED');
+        assert.ok(session.started&&session.preview===!cfg.live&&norm(session.role)===(roleAuthority?'direccion':actor.role)&&session.canRenew&&session.canIssue,'I66_RENEWAL_SIGNED_ROLE_DENIED');
         adapterReady=true;
-        if(actor.role==='operativo'){
+        if(!roleAuthority&&actor.role==='operativo'){
           stage='PERSONAL_LEGAL_NORMAL_UI';
           result.personalLegalAcceptance=await applyPersonalLegalUi({page,actor,cfg,authority:personalAuthority});
         }
-        if(actor.role==='direccion'){
+        if(roleAuthority||actor.role==='direccion'){
           stage='DIRECTION_EXISTING_LEGAL_SCOPE';
-          const legal=require('./gravicentra-i6-6-direction-preview-legal-acceptance.cjs');
-          if(cfg.live)await legal.acceptDirectionLiveLegal({page,actor,cfg});else await legal.acceptDirectionPreviewLegal({page,actor,cfg});
+          const legal=require('./gravicentra-i6-6-direction-preview-legal-acceptance.cjs'),legalActor=roleAuthority?{...actor,role:'direccion'}:actor;
+          const proof=cfg.live?await legal.acceptDirectionLiveLegal({page,actor:legalActor,cfg}):await legal.acceptDirectionPreviewLegal({page,actor:legalActor,cfg});
+          if(roleAuthority){
+            result.directionLegalAcceptance=proof;stage='PAULA_ASSIGNED_ROLE_SELECTION';
+            result.roleSelection=await selectPaulaAssignedRole({page,actor,authority:roleAuthority,directionLegalAcceptance:proof});
+          }
         }
         stage='EXISTING_LEGAL_READINESS';
         result.legalReadiness=await requireExistingLegalReadiness(page);
@@ -834,6 +991,10 @@ async function main(){
           Orbit.store.get('gestiones',x.renewal)?.directRenewalPolicyId===x.policy&&Orbit.store.get('gestiones',x.endorsement)?.endorsementStage==='APLICADO',
           {policy:outcome,source:ids.source,renewal:renewalManagement,endorsement:endorsementManagement,note},{timeout:30000});
         assert.deepEqual(errors,[],'I66_RENEWAL_PAGE_ERRORS');
+        if(roleAuthority){
+          validatePaulaRuntime(await readPaulaRuntimeSnapshot(page),actor,actor.role);
+          result.roleSelection.reloadIdentityChecks++;
+        }
         result.pageErrorCount=0;Object.assign(result.endorsementWrite,{reload:true,idempotentReplay:true});
         result.writes={normalUi:true,entry,successors:1,receipts:1,portfolio:1,linkedManagement:true,reload:true,idempotentReplay:true};
         if(cfg.cancellationQa){
@@ -865,6 +1026,10 @@ async function main(){
           await page.evaluate(async()=>{const p=Orbit.productRuntimeBrowserProvidersP0;await p.initialize();await p.waitForUser();await Orbit.productAppP0.activate();
             await Orbit.store._ensureCollections(['polizas','clientes','aseguradoras','gestiones','recibosEsperados','carteraPrimas','cobros']);});
           await requireExistingLegalReadiness(page);
+          if(roleAuthority){
+            validatePaulaRuntime(await readPaulaRuntimeSnapshot(page),actor,actor.role);
+            result.roleSelection.reloadIdentityChecks++;
+          }
           await page.waitForFunction(x=>{const p=Orbit.store.get('polizas',x.id);return p?.estado==='Cancelada'&&Object.keys(x.payload).every(k=>p[k]===x.payload[k]);},
             {id:outcome,payload},{timeout:30000});
           const replayForm=await openCancellationDraft(page,policyAfter.data,{checkOps:false});
@@ -918,6 +1083,12 @@ async function main(){
           const snap=await item(c,id).get();if(snap.exists)await deleteSnapshotAfterCheck(snap,current=>assertSeedRestore(c,current,row,{live:cfg.live,uid:actor.uid}));
           assert.equal((await item(c,id).get()).exists,false);
         }catch(e){cleanupErrors.push(String(e.message||e).slice(0,100));}
+        if(roleAuthority)try{
+          const membership=await tenant.collection('members').doc(actor.uid).get();
+          assert.equal(membership.exists,true,'I66_DIRECT_FORMS_ROLE_MEMBERSHIP_MISSING');
+          assert.equal(personalDigest(membership.data()),actor.membershipSha256,'I66_DIRECT_FORMS_ROLE_MEMBERSHIP_CHANGED');
+          if(result.roleSelection)result.roleSelection.membershipAfterSha256=actor.membershipSha256;
+        }catch(e){cleanupErrors.push('I66_DIRECT_FORMS_ROLE_MEMBERSHIP_CHANGED');}
         result.restored=cleanupErrors.length===0;
         if(cleanupErrors.length)throw Error('I66_RENEWAL_SYNTHETIC_RESTORE_HOLD:'+cleanupErrors.join(','));
         console.log('I66_'+cfg.phase+'_'+actor.role.toUpperCase()+'_DIRECT_FORMS_SYNTHETIC_RESTORED');
@@ -927,7 +1098,7 @@ async function main(){
     assert.equal(report.actors.length,2);assert.ok(report.restoreComplete);
     report.status=cfg.live?'SIGNED_LIVE_DIRECT_FORMS_NORMAL_UI_PASS':'SIGNED_PREVIEW_DIRECT_FORMS_READONLY_PASS';
     validateSignedReport(report,{phase:cfg.phase,sourceSha:cfg.source,buildId:report.buildId,
-      personalAuthority:readCurrentPersonalLegalAuthority({cfg,actor:actors[0]}),cancellationQa:cfg.cancellationQa===true});
+      ...(roleAuthority?{roleAuthority:readCurrentPaulaRoleAuthority({cfg})}:{personalAuthority:readCurrentPersonalLegalAuthority({cfg,actor:actors[0]})}),cancellationQa:cfg.cancellationQa===true});
     console.log(report.status+' real_customer_writes=0 external_messages=0 genuine_insurer_document_gate_NOT_CERTIFIED');
   }catch(error){report.status='HOLD';report.failureCode=safeDirectFormsFailureCode(error);throw error;}
   finally{
@@ -937,6 +1108,7 @@ async function main(){
   }
 }
 module.exports={configuration,fixtures,assertNoOutboundChannels,assertGeneratedRow,assertSeedRestore,deleteSnapshotAfterCheck,waitForBusinessIdle,settleAndClose,validateSignedReport,openDraft,
+  PAULA_ROLE_PROFILE,directFormsProfile,validatePaulaRoleAuthority,readCurrentPaulaRoleAuthority,resolvePaulaAssignedActors,validatePaulaRuntime,selectPaulaAssignedRole,validatePaulaRoleProof,
   CANCELLATION_FINANCE_COLLECTIONS,cancellationPayload,openCancellationDraft,fillCancellationDraft,exerciseCancellationDraft,cancellationSnapshot,cancellationPreservationSnapshot,
   cancellationCommandIdentity,assertCancellationAudit,assertCancellationActivity,assertCancellationPolicy,cancellationAuditSnapshots,validateCancellationAuditSnapshots,restoreCancellationAudit,
   PERSONAL_LEGAL,PERSONAL_LIMITS,personalHash,personalBlob,personalDigest,personalReviewContext,validatePersonalLegalAuthority,readCurrentPersonalLegalAuthority,

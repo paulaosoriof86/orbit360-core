@@ -47,10 +47,12 @@ function intakeUiRequest(request,fixture,cfg){
 }
 const DOCUMENTARY_PAYMENT_QA_PROFILE='I66_R51_DOCUMENTARY_PAYMENT_UI_SIGNED_QA_V1';
 const DOCUMENTARY_PAYMENT_QA_RECEIPT='artifacts/orbit360-recovery/release-control/I6_6_R51_DOCUMENTARY_PAYMENT_FINANCIAL_RECOVERY_SOURCE_20261124.json';
+const DOCUMENTARY_PAYMENT_QA_SUCCESSOR_RECEIPT='artifacts/orbit360-recovery/release-control/I6_6_R51_ASSIGNED_ROLES_INSURER_FINANCIAL_RECOVERY_SOURCE_20261124.json';
 const DOCUMENTARY_PAYMENT_SOURCES=Object.freeze(['commission_statement','insurer_statement']);
 function validateDocumentaryPaymentQaBinding(binding){
  assert.deepEqual(Object.keys(binding||{}).sort(),['profile','receiptBlob','receiptPath'],'I66_DOCUMENTARY_QA_BINDING_REQUIRED');
- assert.equal(binding.profile,DOCUMENTARY_PAYMENT_QA_PROFILE);assert.equal(binding.receiptPath,DOCUMENTARY_PAYMENT_QA_RECEIPT);
+ assert.equal(binding.profile,DOCUMENTARY_PAYMENT_QA_PROFILE);
+ assert.ok([DOCUMENTARY_PAYMENT_QA_RECEIPT,DOCUMENTARY_PAYMENT_QA_SUCCESSOR_RECEIPT].includes(binding.receiptPath),'I66_DOCUMENTARY_QA_EXACT_RECEIPT_REQUIRED');
  assert.match(binding.receiptBlob||'',/^[a-f0-9]{40}$/,'I66_DOCUMENTARY_QA_RECEIPT_PIN_REQUIRED');return binding;
 }
 function documentaryPaymentFixture(nonce,sourceType){
@@ -616,6 +618,6 @@ async function main(){
  console.log(JSON.stringify({sourceSha:report.sourceSha,phase:report.phase,status:report.status,checks:report.checks.length,cleanup:report.cleanup,realControlUnchanged:report.realControlUnchanged}));
  if(report.status!=='PASS')throw failure||Error('I66_PROPOSAL_SIGNED_UAT_HOLD');
 }
-module.exports={validateEnvironment,owned,makeStage,sourceIntakeFixture,intakeUiRequest,DOCUMENTARY_PAYMENT_QA_PROFILE,DOCUMENTARY_PAYMENT_QA_RECEIPT,DOCUMENTARY_PAYMENT_SOURCES,
+module.exports={validateEnvironment,owned,makeStage,sourceIntakeFixture,intakeUiRequest,DOCUMENTARY_PAYMENT_QA_PROFILE,DOCUMENTARY_PAYMENT_QA_RECEIPT,DOCUMENTARY_PAYMENT_QA_SUCCESSOR_RECEIPT,DOCUMENTARY_PAYMENT_SOURCES,
  validateDocumentaryPaymentQaBinding,documentaryPaymentFixture,documentaryPaymentRequest,assertDocumentaryPaymentOwned,assertDocumentaryPaymentReadback,validateDocumentaryPaymentUiEvidence,exerciseDocumentaryPayments};
 if(require.main===module)main().catch(error=>{const safe=failureDetails(error,'BOOT');console.error('I66_PROPOSAL_SIGNED_UAT_HOLD '+safe.failureCode+' '+safe.failureCheck);process.exitCode=1;});

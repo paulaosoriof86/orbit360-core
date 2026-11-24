@@ -45,6 +45,12 @@ const releaseOwner=require('./gravicentra-i6-6-operational-release-candidate.cjs
 const clone=x=>x==null?x:structuredClone(x);
 const binding={profile:documentOwner.DOCUMENTARY_PAYMENT_QA_PROFILE,receiptPath:documentOwner.DOCUMENTARY_PAYMENT_QA_RECEIPT,receiptBlob:'a'.repeat(40)};
 const nonce='synthetic_offline_0123456789';
+const successorBinding={...binding,receiptPath:documentOwner.DOCUMENTARY_PAYMENT_QA_SUCCESSOR_RECEIPT};
+test('documentary binding admits only the historical receipt or its closed published successor',()=>{
+ for(const b of [binding,successorBinding])assert.deepEqual(documentOwner.validateDocumentaryPaymentQaBinding(b),b);
+ for(const receiptPath of [binding.receiptPath+'.extra',successorBinding.receiptPath.replace('20261124','20261125'),'artifacts/orbit360-recovery/release-control/OTHER_FINANCIAL_SOURCE.json'])
+  assert.throws(()=>documentOwner.validateDocumentaryPaymentQaBinding({...binding,receiptPath}),/EXACT_RECEIPT_REQUIRED/);
+});
 test('build markers keep their independent historical and financial binding without reading an out-of-scope control',()=>{
  const p={sourceSha:'b'.repeat(40),buildId:'gi-i66-'+('b'.repeat(12))+'-0123456789ab',buildRunId:123,
   previewChannelId:'gi-i66-rc-123',previewUrl:'https://ays-orbit-360-lab--gi-i66-rc-123-abc.web.app'};
@@ -83,6 +89,7 @@ for(const mutation of [x=>delete x.receiptBlob,x=>{x.receiptPath='private/raw.js
 // in-memory transactional store. No Firebase SDK, auth session, network or real
 // account is used; the signed browser acceptance still must run on the artifact.
 function documentaryHarness(phase,options={}){
+ const executionBinding=options.binding||binding;
  const tenantId='alianzas-soluciones',base='tenants/'+tenantId,actor={uid:'synthetic_direction_documentary',role:'direccion'};
  const documents=new Map(),versions=new Map(),calls=[],deleted=[];let sequence=0,closed=false,active=null,formGone=false,pending=null,backendWrites=0;
  const put=(key,row)=>{documents.set(key,clone(row));versions.set(key,{seconds:100000,nanoseconds:++sequence});};
@@ -155,20 +162,22 @@ function documentaryHarness(phase,options={}){
   locator:selector=>{assert.equal(selector,'#cob-pay');return{locator,waitFor:async({state})=>assert.equal(formGone,state==='detached')};},
   waitForResponse:match=>new Promise((resolve,reject)=>{pending={match,resolve,reject};}),close:async()=>{closed=true;calls.push('close');}};
  const io={readFileSync:()=>moduleBytes,fetch:async()=>({status:200,arrayBuffer:async()=>moduleBytes}),requireExistingLegalReadiness:async()=>{calls.push('existing-direction-legal-readiness');}};
- return{run:()=>documentOwner.exerciseDocumentaryPayments({page,actor,cfg,tenant,item,nonce,binding,buildId:'synthetic-build'},io),documents,calls,deleted,
+ return{run:()=>documentOwner.exerciseDocumentaryPayments({page,actor,cfg,tenant,item,nonce,binding:executionBinding,buildId:'synthetic-build'},io),documents,calls,deleted,
   cfg,item,actor,get backendWrites(){return backendWrites;}};
 }
-for(const phase of ['PREVIEW','LIVE'])test('documentary UI orchestration '+phase+' executes actual command builder and callable, then reload/replay/CAS restore',async()=>{
- const h=documentaryHarness(phase),proof=await h.run();
- const summary=documentOwner.validateDocumentaryPaymentUiEvidence(proof,{...h.cfg,buildId:'synthetic-build',binding});
- releaseOwner.validateFinancialRecoverySummary({sourceSha:h.cfg.sourceSha,buildId:'synthetic-build',financialRecoveryQa:binding},phase,summary);
+for(const phase of ['PREVIEW','LIVE'])for(const executionBinding of [binding,successorBinding])test('documentary UI orchestration '+phase+' '+(executionBinding===binding?'historical':'successor')+' executes actual command builder and callable, then reload/replay/CAS restore',async()=>{
+ const h=documentaryHarness(phase,{binding:executionBinding}),proof=await h.run();
+ const summary=documentOwner.validateDocumentaryPaymentUiEvidence(proof,{...h.cfg,buildId:'synthetic-build',binding:executionBinding});
+ assert.deepEqual(proof.binding,executionBinding);
+ assert.throws(()=>documentOwner.validateDocumentaryPaymentUiEvidence(proof,{...h.cfg,buildId:'synthetic-build',binding:executionBinding===binding?successorBinding:binding}));
+ releaseOwner.validateFinancialRecoverySummary({sourceSha:h.cfg.sourceSha,buildId:'synthetic-build',financialRecoveryQa:executionBinding},phase,summary);
  assert.equal(h.calls.filter(x=>x==='normal-button').length,2);assert.equal(h.calls.filter(x=>x==='canonical-replay').length,2);
  assert.equal(h.deleted.length,14);assert.equal([...h.documents.keys()].filter(k=>k.includes('/data/')).length,0);assert.equal(h.backendWrites,10);
  assert.ok(h.calls.indexOf('existing-direction-legal-readiness')<h.calls.indexOf('normal-button'));
  for(const change of [p=>delete p.cases[0].readbackAfterReload,p=>{p.cases[0].replayAdditionalPayments=1;},p=>{p.cleanup.remaining=1;},p=>{p.realFinancialWrites=1;},p=>{p.phase='OTHER';},p=>p.cases.pop(),p=>{p.cases[0].normalUiRequest=false;}]){
-  const bad=clone(proof);change(bad);assert.throws(()=>documentOwner.validateDocumentaryPaymentUiEvidence(bad,{...h.cfg,buildId:'synthetic-build',binding}));
+  const bad=clone(proof);change(bad);assert.throws(()=>documentOwner.validateDocumentaryPaymentUiEvidence(bad,{...h.cfg,buildId:'synthetic-build',binding:executionBinding}));
  }
- assert.throws(()=>releaseOwner.validateFinancialRecoverySummary({sourceSha:h.cfg.sourceSha,buildId:'synthetic-build',financialRecoveryQa:binding},phase,undefined));
+ assert.throws(()=>releaseOwner.validateFinancialRecoverySummary({sourceSha:h.cfg.sourceSha,buildId:'synthetic-build',financialRecoveryQa:executionBinding},phase,undefined));
 });
 test('uncertain UI response cannot clean while a server writer may still commit or claim PASS',async()=>{
  const h=documentaryHarness('PREVIEW',{uncertainUiResponse:true});let failure;

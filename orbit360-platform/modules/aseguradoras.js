@@ -658,7 +658,23 @@ Orbit.modules.aseguradoras = (function () {
   }
 
   function credentialChanges(st, draft) {
-    return Object.keys(st && st.credentialDrafts || {}).map(key => st.credentialDrafts[key]).filter(item => item && item.password);
+    const portals=Array.isArray(draft&&draft.portales)?draft.portales:[];
+    return Object.keys(st && st.credentialDrafts || {}).map(key => st.credentialDrafts[key]).filter(item => item && item.password &&
+      portals.some((portal,index)=>clean(portal.id||String(index))===clean(item.portalId)));
+  }
+  function discardRemovedPortalCredential(st, removedIndex) {
+    // Legacy portals may use their array index as the resource identity. Drop
+    // the removed portal's draft and keep surviving drafts attached to the
+    // same row after the array shifts; never replay an orphaned password.
+    const retained={};
+    (st.draft.portales||[]).forEach((portal,index)=>{
+      if(index===removedIndex)return;
+      const priorKey=clean(portal.id||String(index)),item=(st.credentialDrafts||{})[priorKey];
+      if(!item||clean(item.portalId)!==priorKey)return;
+      const nextKey=clean(portal.id||String(index>removedIndex?index-1:index));
+      retained[nextKey]=Object.assign({},item,{portalId:nextKey});
+    });
+    st.credentialDrafts=retained;
   }
   async function secureSourceHash(value) {
     if (!window.crypto || !window.crypto.subtle || typeof TextEncoder === 'undefined') throw new Error('SECURE_HASH_UNAVAILABLE');
@@ -769,7 +785,7 @@ Orbit.modules.aseguradoras = (function () {
       if (!uploaded || uploaded.ok !== true || !uploaded.url || !uploaded.assetRef) throw new Error('INSURER_LOGO_UPLOAD_NOT_CONFIRMED');
       st.draft.logo = uploaded.url; st.draft.logoAssetRef = uploaded.assetRef; st.logoFile = null; logoUrl = uploaded.url; confirmedSideEffects.push('logo');
     }
-    if (logoUrl && !/^https:\/\//i.test(logoUrl)) throw new Error('INSURER_LOGO_HTTPS_REQUIRED');
+    if (logoUrl && (pendingLogo || !semanticEqual(before.logo,st.draft.logo)) && !/^https:\/\//i.test(logoUrl)) throw new Error('INSURER_LOGO_HTTPS_REQUIRED');
     if (saveButton) saveButton.textContent = secureCount ? 'Guardando accesos…' : 'Guardando…';
       if (secureCount) { await persistSecureCredentialChanges(id, st); confirmedSideEffects.push('credenciales'); }
       cambios = diffResumen(before, st.draft);
@@ -1347,6 +1363,8 @@ Orbit.modules.aseguradoras = (function () {
 
     body.querySelectorAll('[data-del]').forEach(b => b.addEventListener('click', () => {
       const [key, idx] = b.dataset.del.split(':');
+      snapshotTab();
+      if(key==='portales')discardRemovedPortalCredential(st,+idx);
       draft[key] = (draft[key] || []).slice(); draft[key].splice(+idx, 1);
       selectTab(t);
     }));
@@ -1367,7 +1385,8 @@ Orbit.modules.aseguradoras = (function () {
         draft.facturacion = Object.assign({}, draft.facturacion, { razonSocial: g('#af-rs'), dirFiscal: g('#af-dir') });
       }
       if (t === 'contactos') {
-        draft.contactos = [...body.querySelectorAll('[data-cont]')].map(r => ({ nombre: r.querySelector('[data-cn]').value, area: r.querySelector('[data-ca]').value, email: r.querySelector('[data-ce]').value, tel: r.querySelector('[data-cl]').value, ext: r.querySelector('[data-cext]').value, cargo: r.querySelector('[data-cargo]').value, pais: r.querySelector('[data-cpais]').value, canal: r.querySelector('[data-cchan]').value, vigencia: r.querySelector('[data-cvig]').value, gestionPreferida: r.querySelector('[data-cgest]').value, principal: r.querySelector('[data-cppal]').checked }));
+        const previous=draft.contactos||[];
+        draft.contactos = [...body.querySelectorAll('[data-cont]')].map((r,index) => Object.assign({},previous[Number(r.dataset.cont)]||previous[index]||{}, { nombre: r.querySelector('[data-cn]').value, area: r.querySelector('[data-ca]').value, email: r.querySelector('[data-ce]').value, tel: r.querySelector('[data-cl]').value, ext: r.querySelector('[data-cext]').value, cargo: r.querySelector('[data-cargo]').value, pais: r.querySelector('[data-cpais]').value, canal: r.querySelector('[data-cchan]').value, vigencia: r.querySelector('[data-cvig]').value, gestionPreferida: r.querySelector('[data-cgest]').value, principal: r.querySelector('[data-cppal]').checked }));
       }
       if (t === 'plataformas') {
         const previous = draft.portales || [];
@@ -1380,6 +1399,8 @@ Orbit.modules.aseguradoras = (function () {
           const portal = Object.assign({}, prior, { id: prior.id || (resourceId.indexOf('portal_') === 0 ? resourceId : undefined), nombre: r.querySelector('[data-pn]').value, tipo: r.querySelector('[data-ptipo]').value, url: r.querySelector('[data-pu]').value, usuario: r.querySelector('[data-puser]').value, pais: r.querySelector('[data-ppais]').value, estadoAcceso: r.querySelector('[data-pest]').value, responsable: r.querySelector('[data-presp]').value, ultimaVerificacion: r.querySelector('[data-pver]').value });
           const password = r.querySelector('[data-ppass]');
           if (password && password.value) st.credentialDrafts[resourceId] = { portalId: resourceId, credentialRef: portal.credentialRef, username: portal.usuario, password: password.value };
+          else if(password&&password.dataset.credentialEdited==='1')delete st.credentialDrafts[resourceId];
+          else if(st.credentialDrafts[resourceId])Object.assign(st.credentialDrafts[resourceId],{username:portal.usuario,credentialRef:portal.credentialRef});
           return portal;
         });
         draft.drive = (body.querySelector('#af-drive') || {}).value || draft.drive || '';
@@ -1467,8 +1488,15 @@ Orbit.modules.aseguradoras = (function () {
     }
     st.snapshotCurrent = snapshotTab;
 
-    // cualquier cambio de input actualiza el draft; Guardar fuerza además el snapshot de la pestaña visible.
-    body.querySelectorAll('input,select,textarea').forEach(el => { el.addEventListener('change', snapshotTab); el.addEventListener('input', snapshotTab); });
+    // Mark an actual password edit separately from a tab repaint. Clearing
+    // the field cancels that pending credential; an untouched empty input in
+    // a repainted tab does not erase a credential already staged by the user.
+    function snapshotChangedField(event) {
+      const input=event&&event.currentTarget;
+      if(input&&input.matches&&input.matches('[data-ppass]'))input.dataset.credentialEdited='1';
+      snapshotTab();
+    }
+    body.querySelectorAll('input,select,textarea').forEach(el => { el.addEventListener('change', snapshotChangedField); el.addEventListener('input', snapshotChangedField); });
 
     if (t === 'contactos') { const add = body.querySelector('#af-add-cont'); if (add) add.addEventListener('click', () => { snapshotTab(); draft.contactos = (draft.contactos || []).concat([{ id: 'contact_' + Date.now().toString(36), nombre: '', area: 'Comercial', email: '', tel: '', cargo: '', canal: 'Correo', principal: false }]); selectTab('contactos'); }); }
     if (t === 'plataformas') { const add = body.querySelector('#af-add-portal'); if (add) add.addEventListener('click', () => { snapshotTab(); draft.portales = (draft.portales || []).concat([{ id: 'portal_' + Date.now().toString(36), nombre: '', url: '', usuario: '', estadoAcceso: 'Sin verificar' }]); selectTab('plataformas'); }); }

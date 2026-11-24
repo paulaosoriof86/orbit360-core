@@ -1,0 +1,177 @@
+{
+  "schema": "GI_I66_DIRECT_FORMS_LEGAL_READINESS_AND_PERSONAL_AUTHORITY_CAUSAL_QA_V1",
+  "status": "SOURCE_CAUSAL_QA_PASS_NO_PERSONAL_CONSENT_SIGNED_PREVIEW_LIVE_PENDING",
+  "gate": "I6.6",
+  "classification": "PRODUCT_AND_QA",
+  "supersedes": {
+    "repositoryHead": "32229710311b6fc8fdb01d1e00c95ced32d2ebf8",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_DIRECT_FORMS_LEGAL_READINESS_AND_PERSONAL_AUTHORITY_CAUSAL_SOURCE_20261124.json",
+    "receiptBlob": "70207f0c0dce31b1412744a9f679ae6734e513a4",
+    "scope": "ASSIGNED_ROLES_QA_AND_INSURER_EDITOR_PRODUCT_ORIGINAL_DIRECT_FORMS_PRESERVED"
+  },
+  "qaSourceBase": "32229710311b6fc8fdb01d1e00c95ced32d2ebf8",
+  "productBytesUnchanged": false,
+  "noBackendChanges": true,
+  "noPermissionChanges": true,
+  "realDataWrites": 0,
+  "liveDeploys": 0,
+  "legalAcceptanceExecutions": 0,
+  "personalDecisionPresent": false,
+  "causalEvidence": {
+    "sourceSchedulingRaceReproduced": true,
+    "actualRunInterceptorObserved": false,
+    "actualRunHitTestRetained": false,
+    "signedPreviewRunId": 45465410675,
+    "readinessWaitsForCanonicalGate": true,
+    "normalClickOnly": true,
+    "personalAuthorityRequiredBeforeBackendMutation": true
+  },
+  "driverContract": {
+    "previewChecks": 44,
+    "liveChecks": 66,
+    "personalAuthorizationSeparateFromFunctionalChecks": true,
+    "directionScopeUnchanged": true,
+    "profile": "PAULA_ASSIGNED_ROLES_EFFECTIVE_FORMS_V1",
+    "assignedRoles": [
+      "direccion",
+      "operativo"
+    ],
+    "sameActorUidRequired": true,
+    "directionAcceptanceOwnerUnchanged": true,
+    "cancellationRecoveryPreserved": true,
+    "legacyCarlosProfilePreserved": true
+  },
+  "tests": {
+    "signedDriverContracts": {
+      "pass": 169,
+      "fail": 0,
+      "skip": 0,
+      "reportSha256": "faf37d8d69b9bf83d270a788da52a1a8ec19edf61357e816cc21d214f6dbec1b"
+    },
+    "failureDiagnosticRetention": {
+      "pass": 62,
+      "fail": 0,
+      "skip": 0,
+      "reportSha256": "6aa7ec00f2a833908713cbe074f805a36b2811d143650672693c16b3c762b3e8"
+    },
+    "signedUi": "PENDING",
+    "published": false
+  },
+  "files": [
+    {
+      "path": "orbit360-platform/modules/renewals-v1200-operational-bridge.js",
+      "gitBlobSha": "8395b86246cf9bd77523da0059a6e5318e0cfc80",
+      "sha256": "7c981939230024d2ce3d31a2d504ecb38a151f73baeb1cd036da79a56d9e7c05"
+    },
+    {
+      "path": "orbit360-platform/modules/issuance-endosos-v1201-bridge.js",
+      "gitBlobSha": "6dabc32d0a012566eb7840ef8774aee3beb17817",
+      "sha256": "668040348d92085d0948375ce8f72a7c0748cfa88b72aa3382b4783bbc30d89b"
+    },
+    {
+      "path": ".github/workflows/gravicentra-i66-privileged-role-three-function-preview-uat.yml",
+      "gitBlobSha": "65a1783cb52f8c7bccd9aefc84cb46ec10081de1",
+      "sha256": "05fa28c669a3bb0147b903210ad4ccfbd6e469b2706a483b8a02dbabcdb45002"
+    },
+    {
+      "path": "tools/gravicentra-i6-6-carlos-paula-live-direct-renewal-synthetic-uat.cjs",
+      "gitBlobSha": "49b5da17f6046deb52aebb2baf030d877f43b895",
+      "sha256": "5377ae18a7f32f71f65738f1b2d7a8db9474ca62c2ce6d080bac942149f23211"
+    },
+    {
+      "path": "tools/gravicentra-i6-6-direct-forms-signed-driver.test.cjs",
+      "gitBlobSha": "c1e0af172d9d7fd535d22f6c45e8092c46ffeb24",
+      "sha256": "4596cc871bcdff22ef2f77657c053c2c81a623cc7e87bd6c8d2497b0fc439257"
+    },
+    {
+      "path": "tools/gravicentra-i6-6-issued-endorsement-direct-entry.test.cjs",
+      "gitBlobSha": "ed25c788bb6c314ac48ec0b32a89cad48016967c",
+      "sha256": "e5d72fd823c3e816274ea714f1cfdfebd4429829d3f02116da0cbd25d3f9653c"
+    },
+    {
+      "path": "tools/gravicentra-i6-6-operational-release-candidate.cjs",
+      "gitBlobSha": "9e91c35bed88b98bc4a3805abb826d632e51b7bf",
+      "sha256": "e96df4186c9ceb73f7f148d3f99a5222f12d794fbd96a9591b507bfdac5e12d3"
+    },
+    {
+      "path": "tools/gravicentra-i6-6-operational-renewal-entry.test.cjs",
+      "gitBlobSha": "f82cac81a2e21e038ea972e0b4aa12bc754e668b",
+      "sha256": "a6a9feb1b6e7e5d15fc028ff1cd3af084279f6427683ea26b47d8760f91909a6"
+    },
+    {
+      "path": "tools/gravicentra-i6-6-ops-activity-direct-vehicle-endorsement.test.cjs",
+      "gitBlobSha": "2332077977cd81f8b829796e7952515b933c68f6",
+      "sha256": "339c88423d49a25e726b939c4dfc9efc402a3a1744dbad484ded1a065c5aa8f4"
+    },
+    {
+      "path": "tools/gravicentra-i6-6-preview-failure-diagnostics-retention.test.cjs",
+      "gitBlobSha": "b28d361e07bdaf3eb32ad42c019e47b739808658",
+      "sha256": "afd7675523bdca825aceb890a219e07d79e88b7ee7e1cdf1a89d558971dd8cc6"
+    },
+    {
+      "path": "tools/gravicentra-i6-6-renewal-direct-form-entry.test.cjs",
+      "gitBlobSha": "ffc053cbca92d73e2d07e8b806144e4e6e7c5327",
+      "sha256": "0dec6075413989a19f0720a1e052f47e9944bffd1caccf3df358de2cbb07db6d"
+    }
+  ],
+  "previousQaFiles": [
+    {
+      "path": ".github/workflows/gravicentra-i66-privileged-role-three-function-preview-uat.yml",
+      "gitBlobSha": "65a1783cb52f8c7bccd9aefc84cb46ec10081de1",
+      "sha256": "05fa28c669a3bb0147b903210ad4ccfbd6e469b2706a483b8a02dbabcdb45002"
+    },
+    {
+      "path": "tools/gravicentra-i6-6-carlos-paula-live-direct-renewal-synthetic-uat.cjs",
+      "gitBlobSha": "12b5922679e429f5412409565db0bb587596f67c",
+      "sha256": "05dad31676d79168d98631e386c744f5d14baed866f668cb0fa6fb7c7cebfacf"
+    },
+    {
+      "path": "tools/gravicentra-i6-6-direct-forms-signed-driver.test.cjs",
+      "gitBlobSha": "cb8509355f43247ffe3f9ac1b6431f004dc7c4d1",
+      "sha256": "61e194f84bf7b375846ee79a8484c2f52bea39599221babf922d54af8bc01a98"
+    },
+    {
+      "path": "tools/gravicentra-i6-6-issued-endorsement-direct-entry.test.cjs",
+      "gitBlobSha": "ed25c788bb6c314ac48ec0b32a89cad48016967c",
+      "sha256": "e5d72fd823c3e816274ea714f1cfdfebd4429829d3f02116da0cbd25d3f9653c"
+    },
+    {
+      "path": "tools/gravicentra-i6-6-operational-release-candidate.cjs",
+      "gitBlobSha": "3478791880385c72c6c6bba99d1e7619cc596ed4",
+      "sha256": "36487c6bffd70d7e51ea324dfecc1840e2303179f65724b992264e6e71ab25eb"
+    },
+    {
+      "path": "tools/gravicentra-i6-6-operational-renewal-entry.test.cjs",
+      "gitBlobSha": "f82cac81a2e21e038ea972e0b4aa12bc754e668b",
+      "sha256": "a6a9feb1b6e7e5d15fc028ff1cd3af084279f6427683ea26b47d8760f91909a6"
+    },
+    {
+      "path": "tools/gravicentra-i6-6-ops-activity-direct-vehicle-endorsement.test.cjs",
+      "gitBlobSha": "2332077977cd81f8b829796e7952515b933c68f6",
+      "sha256": "339c88423d49a25e726b939c4dfc9efc402a3a1744dbad484ded1a065c5aa8f4"
+    },
+    {
+      "path": "tools/gravicentra-i6-6-preview-failure-diagnostics-retention.test.cjs",
+      "gitBlobSha": "b28d361e07bdaf3eb32ad42c019e47b739808658",
+      "sha256": "afd7675523bdca825aceb890a219e07d79e88b7ee7e1cdf1a89d558971dd8cc6"
+    },
+    {
+      "path": "tools/gravicentra-i6-6-renewal-direct-form-entry.test.cjs",
+      "gitBlobSha": "ffc053cbca92d73e2d07e8b806144e4e6e7c5327",
+      "sha256": "0dec6075413989a19f0720a1e052f47e9944bffd1caccf3df358de2cbb07db6d"
+    }
+  ],
+  "conditionalCancellationProfile": {
+    "profile": "I66_EFFECTIVE_CANCELLATION_UI_SIGNED_QA_V1",
+    "previewChecks": 63,
+    "liveChecks": 113,
+    "historicalCountsPreserved": true,
+    "signedPreview": "PENDING",
+    "signedLive": "PENDING"
+  },
+  "originalDirectFormsProductBytesUnchanged": true,
+  "insurerEditorRecovery": {
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_INSURER_EDITOR_STATE_PRESERVATION_CAUSAL_SOURCE_20261124.json",
+    "receiptBlob": "9f2b2e79e8ee8564bd2999689396680fd7f3ba0a"
+  }
+}

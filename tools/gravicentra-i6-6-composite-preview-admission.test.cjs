@@ -432,20 +432,20 @@ const {DIRECT_FORMS_QA_REVISION_RECEIPT_PATH:NEXT_RECEIPT,DIRECT_FORMS_QA_REVISI
 const qaHash=b=>require('node:crypto').createHash('sha1').update(Buffer.from('blob '+b.length+'\0')).update(b).digest('hex');
 function revisedDirectFormsFixture(){
  const f=directFormsFixture(),originalRead=f.readBlob,originalJson=f.readJson;
- f.receipt=JSON.parse(fs.readFileSync(NEXT_RECEIPT));
+ f.receipt=JSON.parse(git('show',qaRevision.COMPOSED_PUBLISHED_SOURCE+':'+NEXT_RECEIPT));
  f.request.sourceQaHead='d'.repeat(40);
  f.request.directFormsRecovery.receiptPath=NEXT_RECEIPT;f.request.directFormsRecovery.receiptBlob=NEXT_BLOB;
  f.readBlob=(ref,p)=>{
   if([f.request.sourceQaHead,'HEAD'].includes(ref)){
-   if(p===NEXT_RECEIPT||NEXT_QA_PATHS.includes(p)||DIRECT_FORMS_PATHS.includes(p)||p===DIRECT_FORMS_RECEIPT_PATH)return qaHash(fs.readFileSync(p));
+   if(p===NEXT_RECEIPT||NEXT_QA_PATHS.includes(p)||DIRECT_FORMS_PATHS.includes(p)||p===DIRECT_FORMS_RECEIPT_PATH)return git('rev-parse',qaRevision.COMPOSED_PUBLISHED_SOURCE+':'+p);
    return originalRead(QA_BASE,p);
   }
   return originalRead(ref,p);
  };
- f.readJson=(ref,p)=>[f.request.sourceQaHead,'HEAD'].includes(ref)&&[NEXT_RECEIPT,DIRECT_FORMS_RECEIPT_PATH].includes(p)?JSON.parse(fs.readFileSync(p)):originalJson(ref,p);
+ f.readJson=(ref,p)=>[f.request.sourceQaHead,'HEAD'].includes(ref)&&[NEXT_RECEIPT,DIRECT_FORMS_RECEIPT_PATH].includes(p)?JSON.parse(git('show',qaRevision.COMPOSED_PUBLISHED_SOURCE+':'+p)):originalJson(ref,p);
  return f;
 }
-test('the second closed causal receipt admits current QA bytes while preserving the exact two original product owners and backend/startup pins',()=>{
+test('the published second causal receipt admits its source322 QA epoch while preserving the exact two original product owners and backend/startup pins',()=>{
  const f=revisedDirectFormsFixture(),calls=[];
  assert.deepEqual(validateDirectFixture(f,{readBlob:(ref,p)=>{calls.push([ref,p]);return f.readBlob(ref,p);}}),DIRECT_FORMS_PATHS);
  for(const p of [DIRECT_FORMS_RECEIPT_PATH,NEXT_RECEIPT,...DIRECT_FORMS_PATHS,...NEXT_QA_PATHS])
@@ -500,4 +500,150 @@ test('revised QA receipt preserves the same pending backend and startup invarian
   f=>{delete f.request.startupRecovery;},f=>{f.request.directFormsRecovery.productPathBlobs['orbit360-platform/core/unrelated.js']='f'.repeat(40);}]){
   const f=revisedDirectFormsFixture();change(f);assert.throws(()=>validateDirectFixture(f));
  }
+});
+
+
+// Source322 successor requests below are offline fixtures. Actual historical
+// receipt bytes are read by immutable commit; prospective QA hashes are mapped
+// to scratch source only to test admission, never to claim provider acceptance.
+function assignedInsurerFixture(){
+ const f=directFormsFixture(),o=qaRevision,head='c'.repeat(40),base=o.COMPOSED_PUBLISHED_SOURCE;
+ const h=x=>require('node:crypto').createHash('sha1').update(String(x)).digest('hex');
+ const historical=p=>JSON.parse(git('show',base+':'+p));
+ f.request.sourceQaHead=head;f.receipt=JSON.parse(fs.readFileSync(o.DIRECT_FORMS_ASSIGNED_ROLES_RECEIPT_PATH));
+ f.insurerReceipt=JSON.parse(fs.readFileSync(o.DIRECT_FORMS_INSURER_EDITOR_RECEIPT_PATH));
+ f.oldDirectReceipt=historical(o.DIRECT_FORMS_QA_REVISION_RECEIPT_PATH);
+ f.oldFinancialReceipt=historical(o.FINANCIAL_RECEIPT_PATH);
+ f.oldCancellationReceipt=historical(o.CANCELLATION_RECEIPT_PATH);
+ f.financialReceipt=clone(f.oldFinancialReceipt);f.financialReceipt.supersedes=clone(o.FINANCIAL_SUCCESSOR_PREDECESSOR);
+ f.cancellationReceipt=clone(f.oldCancellationReceipt);f.cancellationReceipt.supersedes=clone(o.CANCELLATION_SUCCESSOR_PREDECESSOR);
+ for(const receipt of [f.financialReceipt,f.cancellationReceipt])for(const row of receipt.qaPaths)row.gitBlobSha=qaHash(fs.readFileSync(row.path));
+ f.request.directFormsRecovery={schema:'GI_I66_DIRECT_FORMS_RECOVERY_PREVIEW_EXTENSION_V1',receiptPath:o.DIRECT_FORMS_ASSIGNED_ROLES_RECEIPT_PATH,
+   receiptBlob:o.DIRECT_FORMS_ASSIGNED_ROLES_RECEIPT_BLOB,productPathBlobs:{...f.previous.directFormsRecovery.productPathBlobs,[o.DIRECT_FORMS_INSURER_EDITOR_PATH]:f.insurerReceipt.productPaths[0].gitBlobSha}};
+ f.request.directFormsQaProfile=o.DIRECT_FORMS_ASSIGNED_ROLES_PROFILE;
+ f.request.financialRecovery={schema:'GI_I66_R51_FINANCIAL_RECOVERY_PREVIEW_EXTENSION_V1',receiptPath:o.FINANCIAL_SUCCESSOR_RECEIPT_PATH,
+   receiptBlob:h('offline financial successor'),productPathBlobs:Object.fromEntries(f.financialReceipt.productPaths.map(x=>[x.path,x.gitBlobSha]))};
+ f.request.financialRecoveryQa={profile:o.FINANCIAL_QA_PROFILE,receiptPath:f.request.financialRecovery.receiptPath,receiptBlob:f.request.financialRecovery.receiptBlob};
+ f.request.cancellationRecovery={schema:'GI_I66_EFFECTIVE_CANCELLATION_PREVIEW_EXTENSION_V1',receiptPath:o.CANCELLATION_SUCCESSOR_RECEIPT_PATH,
+   receiptBlob:h('offline cancellation successor'),productPathBlobs:Object.fromEntries(f.cancellationReceipt.productPaths.map(x=>[x.path,x.gitBlobSha]))};
+ f.request.cancellationRecoveryQa={profile:o.CANCELLATION_QA_PROFILE,receiptPath:f.request.cancellationRecovery.receiptPath,receiptBlob:f.request.cancellationRecovery.receiptBlob};
+ f.request.productPaths=o.exactPathUnion(f.previous.productPaths,o.FINANCIAL_PATHS,o.CANCELLATION_PATHS,[o.DIRECT_FORMS_INSURER_EDITOR_PATH]);
+ f.readBlob=(ref,p)=>{
+  if(![head,'HEAD'].includes(ref))return git('rev-parse',ref+':'+p);
+  if(p===o.DIRECT_FORMS_ASSIGNED_ROLES_RECEIPT_PATH)return o.DIRECT_FORMS_ASSIGNED_ROLES_RECEIPT_BLOB;
+  if(p===o.FINANCIAL_SUCCESSOR_RECEIPT_PATH)return f.request.financialRecovery.receiptBlob;
+  if(p===o.CANCELLATION_SUCCESSOR_RECEIPT_PATH)return f.request.cancellationRecovery.receiptBlob;
+  const insurer=[...f.insurerReceipt.productPaths,...f.insurerReceipt.testPaths].find(row=>row.path===p);
+  if(insurer)return insurer.gitBlobSha;
+  if(o.FINANCIAL_PATHS.includes(p)||o.CANCELLATION_PATHS.includes(p))return git('rev-parse',base+':'+p);
+  if(p===o.DIRECT_FORMS_INSURER_EDITOR_RECEIPT_PATH||NEXT_QA_PATHS.includes(p)||o.FINANCIAL_QA_PATHS.includes(p)||o.CANCELLATION_QA_PATHS.includes(p))return qaHash(fs.readFileSync(p));
+  return git('rev-parse',base+':'+p);
+ };
+ f.readJson=(ref,p)=>{
+  if(![head,'HEAD'].includes(ref)){
+   if(ref===base&&p===o.DIRECT_FORMS_QA_REVISION_RECEIPT_PATH)return f.oldDirectReceipt;
+   if(ref===base&&p===o.FINANCIAL_RECEIPT_PATH)return f.oldFinancialReceipt;
+   if(ref===base&&p===o.CANCELLATION_RECEIPT_PATH)return f.oldCancellationReceipt;
+   return JSON.parse(git('show',ref+':'+p));
+  }
+  if(p===o.DIRECT_FORMS_ASSIGNED_ROLES_RECEIPT_PATH)return f.receipt;
+  if(p===o.DIRECT_FORMS_INSURER_EDITOR_RECEIPT_PATH)return f.insurerReceipt;
+  if(p===o.FINANCIAL_SUCCESSOR_RECEIPT_PATH)return f.financialReceipt;
+  if(p===o.CANCELLATION_SUCCESSOR_RECEIPT_PATH)return f.cancellationReceipt;
+  return historical(p);
+ };
+ f.readText=(ref,p)=>{assert.equal(ref,head);return fs.readFileSync(p,'utf8');};
+ return f;
+}
+function validateAssignedComposition(f,deps={}){
+ const io={readBlob:f.readBlob,readJson:f.readJson,readText:f.readText,...deps};
+ const direct=qaRevision.validateDirectFormsRecovery(f.request,f.currentSource,f.previous,io);
+ const financial=qaRevision.validateFinancialRecovery(f.request,f.currentSource,f.previous,io);
+ const cancellation=qaRevision.validateCancellationRecovery(f.request,f.currentSource,f.previous,io);
+ assertRequestMode(f.request,p=>io.readBlob(f.request.sourceQaHead,p),Object.keys(f.request.startupRecovery.productPathBlobs).sort(),direct,financial,cancellation);
+ return {direct,financial,cancellation};
+}
+test('published source322 successors admit Paula QA and the one insurer owner while retaining the existing cancellation proof and twenty-one-owner union',()=>{
+ const f=assignedInsurerFixture(),result=validateAssignedComposition(f);
+ assert.equal(result.direct.length,3);assert.equal(result.financial.length,6);assert.equal(result.cancellation.length,4);assert.equal(f.request.productPaths.length,21);
+ assert.deepEqual(result.direct,qaRevision.exactPathUnion(DIRECT_FORMS_PATHS,[qaRevision.DIRECT_FORMS_INSURER_EDITOR_PATH]));
+ assert.equal(f.request.productPaths.filter(p=>p==='orbit360-platform/modules/policy-receipts-v1199-detail-guard.js').length,1);
+ assert.deepEqual(f.request.backendPaths,makeScope.SOURCE_PATHS);
+ assert.deepEqual(f.cancellationReceipt.runtimeRequirement,f.oldCancellationReceipt.runtimeRequirement);
+ assert.equal(f.receipt.conditionalCancellationProfile.previewChecks,63);assert.equal(f.receipt.conditionalCancellationProfile.liveChecks,113);
+});
+test('candidate binding selectors accept only the historical or one named successor path and preserve exact three-field profiles',()=>{
+ const o=qaRevision;
+ for(const [validate,profile,paths] of [[o.validateFinancialQaBinding,o.FINANCIAL_QA_PROFILE,[o.FINANCIAL_RECEIPT_PATH,o.FINANCIAL_SUCCESSOR_RECEIPT_PATH]],
+  [o.validateCancellationQaBinding,o.CANCELLATION_QA_PROFILE,[o.CANCELLATION_RECEIPT_PATH,o.CANCELLATION_SUCCESSOR_RECEIPT_PATH]]]){
+  for(const receiptPath of paths){const binding={profile,receiptPath,receiptBlob:'a'.repeat(40)};assert.equal(validate(binding),binding);
+   for(const mutate of [b=>{b.profile='OTHER';},b=>{b.receiptPath='arbitrary.json';},b=>{b.receiptBlob='';},b=>{delete b.profile;},b=>{b.additionalAuthority=true;}]){
+    const bad=clone(binding);mutate(bad);assert.throws(()=>validate(bad));
+   }
+  }
+ }
+});
+test('the new assigned profile cannot silently select either old direct-forms receipt or legacy Carlos QA',()=>{
+ for(const mutate of [f=>{delete f.request.directFormsQaProfile;},f=>{f.request.directFormsQaProfile='CARLOS';},
+  f=>{f.request.directFormsRecovery.receiptPath=NEXT_RECEIPT;f.request.directFormsRecovery.receiptBlob=NEXT_BLOB;delete f.request.directFormsRecovery.productPathBlobs[qaRevision.DIRECT_FORMS_INSURER_EDITOR_PATH];},
+  f=>{f.receipt.driverContract.sameActorUidRequired=false;},f=>{f.receipt.driverContract.directionAcceptanceOwnerUnchanged=false;},
+  f=>{f.receipt.driverContract.legacyCarlosProfilePreserved=false;},f=>{f.receipt.driverContract.assignedRoles=['admin','operativo'];}]){
+  const f=assignedInsurerFixture();mutate(f);assert.throws(()=>validateAssignedComposition(f));
+ }
+});
+test('successor admission preserves exact source322 receipts and does not rewrite or retarget their published evidence',()=>{
+ const o=qaRevision;
+ for(const [key,pred] of [['receipt',o.DIRECT_FORMS_ASSIGNED_ROLES_PREDECESSOR],['financialReceipt',o.FINANCIAL_SUCCESSOR_PREDECESSOR],['cancellationReceipt',o.CANCELLATION_SUCCESSOR_PREDECESSOR]]){
+  for(const mutate of [r=>{r.supersedes.receiptBlob='f'.repeat(40);},r=>{r.supersedes.repositoryHead='e'.repeat(40);},r=>{r.supersedes.receiptPath='arbitrary.json';},r=>{r.supersedes.scope='UNRESTRICTED';},r=>{r.supersedes.extra=true;}]){
+   const f=assignedInsurerFixture();mutate(f[key]);assert.throws(()=>validateAssignedComposition(f));
+  }
+  for(const ref of [o.COMPOSED_PUBLISHED_SOURCE,'c'.repeat(40),'HEAD']){
+   const f=assignedInsurerFixture();assert.throws(()=>validateAssignedComposition(f,{readBlob:(r,p)=>r===ref&&p===pred.receiptPath?'f'.repeat(40):f.readBlob(r,p)}),/PREDECESSOR_RECEIPT_DRIFT/);
+  }
+ }
+ for(const ref of [o.COMPOSED_PUBLISHED_SOURCE,'c'.repeat(40),'HEAD']){const f=assignedInsurerFixture();assert.throws(()=>validateAssignedComposition(f,{readBlob:(r,p)=>r===ref&&p===o.FINANCIAL_SUCCESSOR_PREDECESSOR.qaReceiptPath?'f'.repeat(40):f.readBlob(r,p)}),/PREDECESSOR_QA_RECEIPT_DRIFT/);}
+});
+test('source322 successor receipts cannot change any existing financial or cancellation product postimage or semantics',()=>{
+ for(const key of ['financialReceipt','cancellationReceipt'])for(const mutate of [r=>{r.productPaths[0].gitBlobSha='f'.repeat(40);},r=>{r.productPaths[0].sha256='e'.repeat(64);},
+  r=>{r.boundaries.backendTargets=6;},r=>{r.semantics.noAutomaticCustomerNotice=false;},r=>{r.boundaries.realDataWrites=1;}]){
+  const f=assignedInsurerFixture();mutate(f[key]);assert.throws(()=>validateAssignedComposition(f),/PRESERVED_FIELD/);
+ }
+ const f=assignedInsurerFixture();f.cancellationReceipt.runtimeRequirement.preview='CANONICAL_WRITE';assert.throws(()=>validateAssignedComposition(f),/PRESERVED_FIELD_runtimeRequirement/);
+});
+test('the assigned profile preserves the old two direct-form products and exact three changed QA owners',()=>{
+ for(const p of DIRECT_FORMS_PATHS){const f=assignedInsurerFixture();f.request.directFormsRecovery.productPathBlobs[p]='f'.repeat(40);assert.throws(()=>validateAssignedComposition(f));}
+ for(const p of NEXT_QA_PATHS){const f=assignedInsurerFixture(),row=f.receipt.files.find(x=>x.path===p);
+  row.gitBlobSha=qaRevision.DIRECT_FORMS_ASSIGNED_ROLES_CHANGED_QA.includes(p)?f.receipt.previousQaFiles.find(x=>x.path===p).gitBlobSha:'f'.repeat(40);
+  assert.throws(()=>validateAssignedComposition(f));
+ }
+ for(const mutate of [f=>{f.receipt.previousQaFiles.pop();},f=>{f.receipt.qaSourceBase=QA_BASE;},f=>{f.receipt.originalDirectFormsProductBytesUnchanged=false;},f=>{f.receipt.tests.signedDriverContracts.skip=1;},f=>{f.receipt.personalDecisionPresent=true;}]){
+  const f=assignedInsurerFixture();mutate(f);assert.throws(()=>validateAssignedComposition(f));
+ }
+});
+test('insurer admission rejects unlisted paths, arbitrary receipt, missing test, changed findings and broadened effects',()=>{
+ for(const mutate of [f=>{f.receipt.insurerEditorRecovery.receiptPath='other.json';},f=>{f.receipt.insurerEditorRecovery.extra=true;},
+  f=>{f.insurerReceipt.productPaths.push({...f.insurerReceipt.productPaths[0],path:'orbit360-platform/core/unrelated.js'});},
+  f=>{f.insurerReceipt.testPaths=[];},f=>{f.insurerReceipt.causalFindingIds.pop();},f=>{f.insurerReceipt.runtimeAcceptance=true;},
+  f=>{f.insurerReceipt.sourceOnly=false;},f=>{f.insurerReceipt.boundaries.functionTargetsAdded=1;},f=>{f.insurerReceipt.boundaries.incidentAttributedToReportedActor=true;},
+  f=>{f.insurerReceipt.evidence.freshShapeReadback.doesNotMeasureExposure=false;},f=>{f.request.directFormsRecovery.productPathBlobs['orbit360-platform/core/unrelated.js']='f'.repeat(40);},
+  f=>{delete f.request.cancellationRecovery;},f=>{delete f.request.financialRecovery;}]){
+  const f=assignedInsurerFixture();mutate(f);assert.throws(()=>validateAssignedComposition(f));
+ }
+});
+test('insurer source evidence requires a failed historical baseline, complete passing candidate and no skips or real operations',()=>{
+ for(const mutate of [r=>{r.tests.baselineFailed=0;r.tests.baselinePassed=r.tests.baselineCases;},r=>{r.tests.candidatePassed--;},r=>{r.tests.candidateFailed=1;},
+  r=>{r.tests.skipped=1;},r=>{r.tests.cancelled=1;},r=>{r.tests.networkRequests=1;},r=>{r.tests.realWrites=1;},r=>{r.tests.realCredentialsUsed=true;},
+  r=>{r.evidence.candidate.sha256='';},r=>{r.preimages.sameProductAndTestBlobsAtBothSources=false;}]){
+  const f=assignedInsurerFixture();mutate(f.insurerReceipt);assert.throws(()=>validateAssignedComposition(f));
+ }
+});
+test('insurer source and both predecessor identities plus new QA pins are checked at exact source and HEAD',()=>{
+ const f=assignedInsurerFixture(),o=qaRevision;
+ for(const p of [o.DIRECT_FORMS_INSURER_EDITOR_PATH,o.DIRECT_FORMS_INSURER_EDITOR_TEST_PATH])for(const ref of [f.currentSource,QA_BASE,f.request.sourceQaHead,'HEAD'])
+  assert.throws(()=>validateAssignedComposition(f,{readBlob:(r,q)=>r===ref&&q===p?'f'.repeat(40):f.readBlob(r,q)}),/DRIFT/);
+ for(const p of [o.DIRECT_FORMS_INSURER_EDITOR_RECEIPT_PATH,...NEXT_QA_PATHS])for(const ref of [f.request.sourceQaHead,'HEAD'])
+  assert.throws(()=>validateAssignedComposition(f,{readBlob:(r,q)=>r===ref&&q===p?'f'.repeat(40):f.readBlob(r,q)}),/DRIFT/);
+});
+test('the historical source322 direct-forms receipt cannot approve the newer assigned-role driver bytes',()=>{
+ const f=revisedDirectFormsFixture();assert.throws(()=>validateDirectFixture(f,{readBlob:(ref,p)=>[f.request.sourceQaHead,'HEAD'].includes(ref)&&qaRevision.DIRECT_FORMS_ASSIGNED_ROLES_CHANGED_QA.includes(p)?qaHash(fs.readFileSync(p)):f.readBlob(ref,p)}),/PRODUCT_OR_QA_SOURCE_DRIFT/);
 });

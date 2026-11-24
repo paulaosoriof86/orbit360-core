@@ -57,8 +57,13 @@ const ADVISOR_QA_ISOLATION = Object.freeze({
   financialPayments:0,bankMovements:0,authOrMembershipMutations:0
 });
 const PINNED_OWNER_PATHS = Object.freeze([
+  'artifacts/orbit360-recovery/release-control/I6_6_DIRECT_FORMS_ASSIGNED_ROLES_AND_INSURER_EDITOR_CAUSAL_SOURCE_20261124.json',
+  'artifacts/orbit360-recovery/release-control/I6_6_EFFECTIVE_CANCELLATION_ASSIGNED_ROLES_CAUSAL_SOURCE_20261124.json',
+  'artifacts/orbit360-recovery/release-control/I6_6_R51_ASSIGNED_ROLES_INSURER_FINANCIAL_RECOVERY_SOURCE_20261124.json',
   'artifacts/orbit360-recovery/release-control/I6_6_EFFECTIVE_CANCELLATION_DIRECT_OR_OPS_CAUSAL_SOURCE_20261124.json',
   'tools/gravicentra-i6-6-effective-cancellation-direct-form.test.cjs',
+  'tools/gravicentra-i6-6-payment-optional-evidence.test.cjs',
+  'tools/gravicentra-i6-6-insurer-credential-placeholder-integrity.test.cjs',
   'artifacts/orbit360-recovery/release-control/I6_6_R51_DOCUMENTARY_PAYMENT_FINANCIAL_RECOVERY_SOURCE_20261124.json',
   'tools/gravicentra-i6-6-frontend-preview-authority.cjs',
   'tools/gravicentra-i6-6-composite-preview-admission.test.cjs',
@@ -312,10 +317,7 @@ function candidateForPhase(control,phase) {
     assert.equal(p.cancellationQa,true,'I66_CANCELLATION_QA_PROFILE_INVALID');
     assert.equal(p.directFormsQa,true,'I66_CANCELLATION_DIRECT_FORMS_QA_REQUIRED');
     const authority=require('./gravicentra-i6-6-frontend-preview-authority.cjs');
-    assert.deepEqual(Object.keys(p.cancellationRecoveryQa||{}).sort(),['profile','receiptBlob','receiptPath'],'I66_CANCELLATION_EXACT_QA_BINDING_REQUIRED');
-    assert.equal(p.cancellationRecoveryQa.profile,authority.CANCELLATION_QA_PROFILE,'I66_CANCELLATION_QA_PROFILE_DRIFT');
-    assert.equal(p.cancellationRecoveryQa.receiptPath,authority.CANCELLATION_RECEIPT_PATH,'I66_CANCELLATION_QA_RECEIPT_DRIFT');
-    checkSha(p.cancellationRecoveryQa.receiptBlob,'I66_CANCELLATION_QA_RECEIPT_BLOB');
+    authority.validateCancellationQaBinding(p.cancellationRecoveryQa);
   }else assert.equal(p.cancellationRecoveryQa,undefined,'I66_CANCELLATION_QA_FLAG_REQUIRED');
   assert.equal(p.schema,'I6_6_OPERATIONAL_EXACT_RELEASE_V1');
   assert.equal(p.approvedByDirection,true);
@@ -348,6 +350,12 @@ function candidateForPhase(control,phase) {
   }
   assert.deepEqual(p.requiredPreviewDrivers,DRIVERS,'I66_OPERATIONAL_QA_DRIVER_SCOPE_DRIFT');
   if(p.directFormsQa!==undefined)assert.equal(p.directFormsQa,true,'I66_DIRECT_FORMS_QA_PROFILE_INVALID');
+  const directFormsDriver=require('./gravicentra-i6-6-carlos-paula-live-direct-renewal-synthetic-uat.cjs');
+  if(control.frontendPreviewRequest?.directFormsQaProfile!==undefined){
+    assert.equal(p.directFormsQa,true,'I66_DIRECT_FORMS_REQUIRED_UI_QA_REMOVED');
+    assert.equal(p.directFormsQaProfile,control.frontendPreviewRequest.directFormsQaProfile,'I66_DIRECT_FORMS_REQUIRED_ROLE_PROFILE_REMOVED');
+  }
+  directFormsDriver.directFormsProfile(p);
   assert.equal(p.sameImmutableArtifactOnly,true);
   assert.equal(p.syntheticRecordsOnly,true);
   assert.equal(p.noRealFinancialOrCustomerWrites,true);
@@ -439,6 +447,7 @@ function validateProof(p,proof) {
   }
   if(p.directFormsQa===true){
     assert.equal(proof.focusedReports.directForms.phase,'PREVIEW');
+    assert.equal(proof.focusedReports.directForms.profile,p.directFormsQaProfile,'I66_DIRECT_FORMS_PREVIEW_ROLE_PROFILE_DRIFT');
     assert.equal(proof.focusedReports.directForms.coverage,p.cancellationQa===true?'SIGNED_PUBLIC_ENTRIES_AND_CANCELLATION_READONLY':'SIGNED_PUBLIC_ENTRIES_READONLY');
     if(p.cancellationQa===true)assert.equal(proof.focusedReports.directForms.checks,63,'I66_CANCELLATION_PREVIEW_CHECKS_REQUIRED');
   }
@@ -505,8 +514,9 @@ function assertDirectFormsPersonalAuthority(p,phase,readCurrent){
   assert.ok(['PREVIEW','LIVE'].includes(phase));
   if(p.directFormsQa!==true)return null;
   const driver=require('./gravicentra-i6-6-carlos-paula-live-direct-renewal-synthetic-uat.cjs');
-  const read=readCurrent||driver.readCurrentPersonalLegalAuthority;
-  return read({cfg:{phase,source:p.sourceSha,origin:phase==='LIVE'?LIVE:p.previewUrl},candidate:p});
+  const roleProfile=driver.directFormsProfile(p);
+  const read=readCurrent||(roleProfile===driver.PAULA_ROLE_PROFILE?driver.readCurrentPaulaRoleAuthority:driver.readCurrentPersonalLegalAuthority);
+  return read({cfg:{phase,source:p.sourceSha,origin:phase==='LIVE'?LIVE:p.previewUrl,...(roleProfile?{qaProfile:roleProfile}:{})},candidate:p});
 }
 function focusedReportsFromDisk(p,phase,env=process.env){
   const personalAuthority=assertDirectFormsPersonalAuthority(p,phase);
@@ -524,9 +534,11 @@ function focusedReportsFromDisk(p,phase,env=process.env){
   if(p.directFormsQa===true){
     const raw=fs.readFileSync(path.join(env.RUNNER_TEMP,'gi-i66-direct-forms-'+phase.toLowerCase()+'.json'));
     const direct=JSON.parse(raw);
-    const verified=require('./gravicentra-i6-6-carlos-paula-live-direct-renewal-synthetic-uat.cjs').validateSignedReport(direct,{phase,sourceSha:p.sourceSha,buildId:p.buildId,personalAuthority,cancellationQa:p.cancellationQa===true});
+    const driver=require('./gravicentra-i6-6-carlos-paula-live-direct-renewal-synthetic-uat.cjs'),roleProfile=driver.directFormsProfile(p);
+    const verified=driver.validateSignedReport(direct,{phase,sourceSha:p.sourceSha,buildId:p.buildId,
+      ...(roleProfile===driver.PAULA_ROLE_PROFILE?{roleAuthority:personalAuthority}:{personalAuthority}),cancellationQa:p.cancellationQa===true});
     focused.directForms={status:'PASS',cleanup:'PASS',checks:verified.checks,
-      digest:'sha256:'+crypto.createHash('sha256').update(raw).digest('hex'),phase,
+      digest:'sha256:'+crypto.createHash('sha256').update(raw).digest('hex'),phase,...(roleProfile?{profile:verified.profile}:{}),
       coverage:p.cancellationQa===true?'SIGNED_'+verified.coverage:phase==='PREVIEW'?'SIGNED_PUBLIC_ENTRIES_READONLY':'SIGNED_NORMAL_UI_SAVE_READBACK_RELOAD_REPLAY_RESTORE'};
   }
   return focused;
@@ -553,7 +565,7 @@ async function fetchJson(url){
   assert.ok(r.ok,'I66_OPERATIONAL_PROOF_API_UNAVAILABLE');return r.json();
 }
 function envFor(p){return {
-  I66_DIRECT_FORMS_QA:String(p.directFormsQa===true),I66_CANCELLATION_QA:p.cancellationQa===true?'1':'0',I66_LIVE_ORIGIN:LIVE,
+  I66_DIRECT_FORMS_QA:String(p.directFormsQa===true),I66_DIRECT_FORMS_QA_PROFILE:p.directFormsQaProfile||'',I66_CANCELLATION_QA:p.cancellationQa===true?'1':'0',I66_LIVE_ORIGIN:LIVE,
   I66_MAKE_INGRESS:String(makeScope.isMake(p)),I66_MAKE_TRIGGER_PREVIOUS_STATE:makeScope.isMake(p)?p.makeIngress.targetBefore.live.state:'',
   I66_OPERATIONAL_CANDIDATE:'true',SOURCE_SHA:p.sourceSha,I66_SOURCE_SHA:p.sourceSha,
   SOURCE_PACKAGE_RUN:p.buildRunId,SOURCE_ARTIFACT_ID:p.artifactId,SOURCE_ARTIFACT_DIGEST:p.artifactDigest,
@@ -629,6 +641,7 @@ function validateLiveProof(p,proof){
   }
   if(p.directFormsQa===true){
     assert.equal(focus.directForms.phase,'LIVE');
+    assert.equal(focus.directForms.profile,p.directFormsQaProfile,'I66_DIRECT_FORMS_LIVE_ROLE_PROFILE_DRIFT');
     assert.equal(focus.directForms.coverage,p.cancellationQa===true?'SIGNED_NORMAL_UI_RENEWAL_ENDORSEMENT_CANCELLATION_READBACK_RELOAD_REPLAY':'SIGNED_NORMAL_UI_SAVE_READBACK_RELOAD_REPLAY_RESTORE');
     if(p.cancellationQa===true)assert.equal(focus.directForms.checks,113,'I66_CANCELLATION_LIVE_CHECKS_REQUIRED');
   }

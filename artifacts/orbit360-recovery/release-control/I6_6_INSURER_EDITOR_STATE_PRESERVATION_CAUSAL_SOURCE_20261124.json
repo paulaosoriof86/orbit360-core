@@ -1,0 +1,96 @@
+{
+  "schema": "GI_I66_INSURER_EDITOR_STATE_PRESERVATION_CAUSAL_SOURCE_V1",
+  "id": "I6_6_INSURER_EDITOR_STATE_PRESERVATION_20261124",
+  "status": "SOURCE_VERIFIED_NOT_SIGNED_PREVIEW_OR_LIVE",
+  "sourceOnly": true,
+  "runtimeAcceptance": false,
+  "causalFindingIds": [
+    "UNCHANGED_LEGACY_LOGO_BLOCKS_OTHER_FIELD",
+    "CONTACT_UNEDITED_SOURCE_METADATA_REMOVED",
+    "EXPLICITLY_CLEARED_PASSWORD_REMAINS_PENDING",
+    "DELETED_PORTAL_PENDING_CREDENTIAL_STILL_IMPORTED"
+  ],
+  "productPaths": [
+    {
+      "path": "orbit360-platform/modules/aseguradoras.js",
+      "beforeGitBlobSha": "bc1a0f5b02666378e257f0d5e83064167b54fddc",
+      "gitBlobSha": "0ce40050387f68b2e3efaddc7717ace7cf3ae3ff",
+      "sha256": "2d436eb5ccac4f6c6691d8c58a89d25f256857bde2c0490f7f314706e05b0de5",
+      "bytes": 152011
+    }
+  ],
+  "testPaths": [
+    {
+      "path": "tools/gravicentra-i6-6-insurer-credential-placeholder-integrity.test.cjs",
+      "beforeGitBlobSha": "1318806a77c34a3b8dd017db1eec09d7a10c6aa7",
+      "gitBlobSha": "981065de889bf0bc03e148709ac476876242d10d",
+      "sha256": "a4a155855329278156796ca6eb3a9fb475efb3ff0702e01e8212538069725fc2",
+      "bytes": 16826
+    }
+  ],
+  "preimages": {
+    "physicalE3SourceSha": "65c825b2808a615ca4195bdde6689dbdbe3193b2",
+    "priorSource28Sha": "74ae28c6e6e6b40f845567c9b00738a58307b3cb",
+    "sameProductAndTestBlobsAtBothSources": true
+  },
+  "tests": {
+    "candidateCases": 23,
+    "candidatePassed": 23,
+    "candidateFailed": 0,
+    "baselineCases": 23,
+    "baselinePassed": 10,
+    "baselineFailed": 13,
+    "existingStaticGuardsPassed": 11,
+    "skipped": 0,
+    "cancelled": 0,
+    "networkRequests": 0,
+    "realWrites": 0,
+    "realCredentialsUsed": false
+  },
+  "evidence": {
+    "candidate": {
+      "fileName": "editor-regression-attempt1.tap",
+      "gitBlobSha": "6e3406c5065d0a32413132292247a91a0b938f2d",
+      "sha256": "08d2dc38ad34264589a0b0c4f90be3f76a847b4e79433a5ddbe89b25a2156f0d",
+      "bytes": 5810
+    },
+    "baseline": {
+      "fileName": "editor-baseline-negative.tap",
+      "gitBlobSha": "8bf6fe0c3385866b3804b8cbc27aa047bb7bc919",
+      "sha256": "29d17454ac690d27494dccbbd64e54b832eacc561245b7d5d67cafe655f579db",
+      "bytes": 19183
+    },
+    "originalRepro": {
+      "fileName": "source-review.json",
+      "gitBlobSha": "5c4b0a7ad5adfdf5b4ad76743e9b34a26f87858c",
+      "sha256": "123db9bf7c847804e00daa329491e2161f421a03fedf937b209557223d00efd3",
+      "bytes": 2234
+    },
+    "freshShapeReadback": {
+      "fileName": "insurer-server-shape-fresh-20261124.log",
+      "gitBlobSha": "dfc53bf3903eb3e517d8ecdd8640699b046cc7ce",
+      "sha256": "f4436c9ddac838051ac77587a166b78bde3629cdd93dec5a1b1914e170ee72b8",
+      "bytes": 16791,
+      "containsOnlyShapeEvidence": true,
+      "doesNotMeasureExposure": true
+    }
+  },
+  "boundaries": {
+    "productOwners": 1,
+    "backendOwnersAdded": 0,
+    "functionTargetsAdded": 0,
+    "fiveExistingReleaseTargetsPreserved": true,
+    "authOrRoleChanges": 0,
+    "realFinancialWrites": 0,
+    "sameArtifactPreviewLiveStillRequired": true,
+    "incidentAttributedToReportedActor": false,
+    "realExposureCountKnown": false
+  },
+  "notes": [
+    "Candidate tests execute extracted canonical save/snapshot/deletion handlers, with synthetic in-memory transports only.",
+    "The existing secure credential provider and ordinary durable batch remain authoritative.",
+    "Legacy portal pending-draft keys are shifted only as the corresponding visible row is removed; no operational portal ID is manufactured.",
+    "Root reported a successful normal Operativo UI observation save/reload/restore on a synthetic insurer; that test does not certify these other scenarios.",
+    "The fresh 32-insurer diagnostic exposes shapes only and does not establish legacy-logo/contact incidence."
+  ]
+}

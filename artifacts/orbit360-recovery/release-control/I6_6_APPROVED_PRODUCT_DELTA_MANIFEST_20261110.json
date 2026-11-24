@@ -4353,6 +4353,38 @@
           }
         }
       ]
+    },
+    {
+      "id": "I6_6_INSURER_EDITOR_STATE_PRESERVATION_20261124",
+      "approvedByDirection": true,
+      "receipt": "artifacts/orbit360-recovery/release-control/I6_6_INSURER_EDITOR_STATE_PRESERVATION_CAUSAL_SOURCE_20261124.json",
+      "sourceStatus": "SOURCE_PATCH_NEEDS_SIGNED_PREVIEW_REAL_ROLE_AND_SAME_ARTIFACT_LIVE",
+      "capabilityOwners": [
+        "ASEGURADORAS_PRIMARY_RUNTIME"
+      ],
+      "scope": "Four reproduced editor regressions in the existing insurer owner: preserve unchanged legacy logo while continuing to reject a newly unsafe logo; preserve contact identity/source metadata; cancel a credential on explicit password clear while preserving a pending edit across tab repaint; discard a removed portal credential and retain surviving legacy-index associations. No role, authorization, backend, financial mutation, OAuth or callable-target changes. Source cases do not identify the unresolved reported user incident.",
+      "paths": [
+        {
+          "path": "orbit360-platform/modules/aseguradoras.js",
+          "gitBlobSha": "0ce40050387f68b2e3efaddc7717ace7cf3ae3ff",
+          "replaces": {
+            "path": "orbit360-platform/modules/aseguradoras.js",
+            "priorGitBlobSha": "bc1a0f5b02666378e257f0d5e83064167b54fddc",
+            "priorChangeId": "I6_6_INSURER_SELF_ADMINISTERED_FINANCIAL_RULES_OWNER_20261119"
+          }
+        }
+      ],
+      "tests": [
+        {
+          "path": "tools/gravicentra-i6-6-insurer-credential-placeholder-integrity.test.cjs",
+          "gitBlobSha": "981065de889bf0bc03e148709ac476876242d10d",
+          "replaces": {
+            "path": "tools/gravicentra-i6-6-insurer-credential-placeholder-integrity.test.cjs",
+            "priorGitBlobSha": "1318806a77c34a3b8dd017db1eec09d7a10c6aa7",
+            "priorChangeId": "I6_6_INSURER_VAULT_REFERENCE_UI_INTEGRITY_P0"
+          }
+        }
+      ]
     }
   ],
   "i66R11PreviewBuildRequest20261113": {
@@ -4540,6 +4572,53 @@
             "path": "tools/gravicentra-i6-6-preview-failure-diagnostics-retention.test.cjs",
             "priorGitBlobSha": "1377a2f1f6924a901cdd12b4ba3b05c4bc5ea3d9",
             "priorChangeId": "I6_6_DOCUMENTED_POLICY_CENT_PRECISION_AND_DIAGNOSTIC_RETENTION_20261117"
+          }
+        }
+      ]
+    },
+    {
+      "id": "I6_6_DIRECT_FORMS_ASSIGNED_ROLES_QA_SUCCESSOR_20261124",
+      "approvedByDirection": true,
+      "scope": "EXISTING_DECLARED_TESTS_ONLY",
+      "paths": [],
+      "receipt": "artifacts/orbit360-recovery/release-control/I6_6_DIRECT_FORMS_ASSIGNED_ROLES_QA_SUCCESSOR_20261124.json",
+      "receiptGitBlobSha": "e9451d03ccd69709b6bd7ba9fdfae764ea9dbb4b",
+      "tests": [
+        {
+          "path": "tools/gravicentra-i6-6-direct-forms-signed-driver.test.cjs",
+          "gitBlobSha": "c1e0af172d9d7fd535d22f6c45e8092c46ffeb24",
+          "replaces": {
+            "path": "tools/gravicentra-i6-6-direct-forms-signed-driver.test.cjs",
+            "priorGitBlobSha": "cb8509355f43247ffe3f9ac1b6431f004dc7c4d1",
+            "priorChangeId": "I6_6_EFFECTIVE_CANCELLATION_DIRECT_OR_OPS_20261124"
+          }
+        }
+      ]
+    },
+    {
+      "id": "I6_6_R51_ASSIGNED_ROLES_INSURER_COMPOSED_ADMISSION_QA_20261124",
+      "approvedByDirection": true,
+      "scope": "EXISTING_DECLARED_TESTS_ONLY",
+      "paths": [],
+      "receipt": "artifacts/orbit360-recovery/release-control/I6_6_R51_ASSIGNED_ROLES_INSURER_COMPOSED_ADMISSION_QA_20261124.json",
+      "receiptGitBlobSha": "b4c9c1a35e795436c2fee7b2134dcd56cac6ce93",
+      "tests": [
+        {
+          "path": "tools/gravicentra-i6-6-composite-preview-admission.test.cjs",
+          "gitBlobSha": "e1dd83a9dc1cc63f04f68a1d10afeedfca758afa",
+          "replaces": {
+            "path": "tools/gravicentra-i6-6-composite-preview-admission.test.cjs",
+            "priorGitBlobSha": "abd35d228b8c92c409e7ac09ce1abd002b73d5c6",
+            "priorChangeId": "I6_6_R51_DOCUMENTARY_PAYMENT_AND_ADMISSION_QA_20261124"
+          }
+        },
+        {
+          "path": "tools/gravicentra-i6-6-proposal-application-signed-uat.test.cjs",
+          "gitBlobSha": "cbb8ae140a8fa88b53d3fac603625ca201403aea",
+          "replaces": {
+            "path": "tools/gravicentra-i6-6-proposal-application-signed-uat.test.cjs",
+            "priorGitBlobSha": "e209eb5a3a3f5bdd88ae944672c344ea1ed2fa99",
+            "priorChangeId": "I6_6_R51_DOCUMENTARY_PAYMENT_AND_ADMISSION_QA_20261124"
           }
         }
       ]

@@ -50,6 +50,8 @@ on:
       - orbit360-platform/modules/issuance-endosos-v1201-bridge.js
       - tools/gravicentra-i6-6-cobros-payment-failure-category.test.cjs
       - tools/gravicentra-i6-6-payment-optional-evidence.test.cjs
+      - orbit360-platform/modules/aseguradoras.js
+      - tools/gravicentra-i6-6-insurer-credential-placeholder-integrity.test.cjs
       - tools/gravicentra-i6-6-operational-renewal-entry.test.cjs
       - tools/gravicentra-i6-6-renewal-direct-form-entry.test.cjs
       - tools/gravicentra-i6-6-issued-endorsement-direct-entry.test.cjs
@@ -123,6 +125,7 @@ jobs:
           node --test tools/gravicentra-i6-6-proposal-application-signed-uat.test.cjs
           node --test tools/gravicentra-i6-6-import-source-preview.test.cjs
           node --test tools/gravicentra-i6-6-cobros-payment-failure-category.test.cjs tools/gravicentra-i6-6-operational-renewal-entry.test.cjs tools/gravicentra-i6-6-payment-optional-evidence.test.cjs
+          node --test tools/gravicentra-i6-6-insurer-credential-placeholder-integrity.test.cjs
           node --test tools/gravicentra-i6-6-renewal-direct-form-entry.test.cjs tools/gravicentra-i6-6-issued-endorsement-direct-entry.test.cjs
           node --test tools/gravicentra-i6-6-direct-forms-signed-driver.test.cjs
           node --test tools/gravicentra-i6-6-effective-cancellation-direct-form.test.cjs

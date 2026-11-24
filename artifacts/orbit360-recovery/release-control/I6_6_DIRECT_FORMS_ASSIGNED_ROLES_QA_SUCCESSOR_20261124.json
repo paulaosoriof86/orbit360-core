@@ -1,0 +1,31 @@
+{
+  "schema": "GI_I66_EXISTING_DIRECT_FORMS_ASSIGNED_ROLES_TEST_REVISION_V1",
+  "revisionId": "I6_6_DIRECT_FORMS_ASSIGNED_ROLES_QA_SUCCESSOR_20261124",
+  "scope": "EXISTING_DECLARED_TESTS_ONLY",
+  "productSourceChanges": 0,
+  "productionAcceptanceClaimed": false,
+  "status": "SOURCE_QA_PASS_SIGNED_PREVIEW_LIVE_PENDING",
+  "tests": [
+    {
+      "path": "tools/gravicentra-i6-6-direct-forms-signed-driver.test.cjs",
+      "gitBlobSha": "c1e0af172d9d7fd535d22f6c45e8092c46ffeb24",
+      "replaces": {
+        "path": "tools/gravicentra-i6-6-direct-forms-signed-driver.test.cjs",
+        "priorGitBlobSha": "cb8509355f43247ffe3f9ac1b6431f004dc7c4d1",
+        "priorChangeId": "I6_6_EFFECTIVE_CANCELLATION_DIRECT_OR_OPS_20261124"
+      }
+    }
+  ],
+  "causalSource": {
+    "path": "artifacts/orbit360-recovery/release-control/I6_6_DIRECT_FORMS_ASSIGNED_ROLES_AND_INSURER_EDITOR_CAUSAL_SOURCE_20261124.json",
+    "gitBlobSha": "539a1c4be0635588f5c7ec187320a78ce4b91927"
+  },
+  "publishedPredecessorHead": "32229710311b6fc8fdb01d1e00c95ced32d2ebf8",
+  "preservedHistoricalRetentionTestBlob": "b28d361e07bdaf3eb32ad42c019e47b739808658",
+  "verification": {
+    "passed": 169,
+    "failed": 0,
+    "skipped": 0,
+    "reportSha256": "faf37d8d69b9bf83d270a788da52a1a8ec19edf61357e816cc21d214f6dbec1b"
+  }
+}
