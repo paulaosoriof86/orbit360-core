@@ -333,18 +333,19 @@ async function mapfreOriginals(binding,fetcher=fetch,headers){
   }catch{return {...result,status:'ORIGINAL_TRANSPORT_HOLD'};}
  }));
 }
-async function mapfreSnapshot(db,binding){
+async function mapfreSnapshot(db,binding,transaction){
  const tenant=db.collection('tenants').doc(binding.preflight.scope.tenantId);
  const at=col=>tenant.collection('data').doc(col).collection('items');
+ const get=ref=>transaction?transaction.get(ref):ref.get();
  const raw=s=>({id:s.id,exists:s.exists===true,updateTime:s.updateTime?.toJSON?s.updateTime.toJSON():s.updateTime||null,
   data:s.exists?s.data():null});
  const collections={};
  await Promise.all(['polizas','recibosEsperados','carteraPrimas','cobros','aseguradoras'].map(async col=>{
-  const snap=await at(col).limit(15001).get();assert.ok(snap.size<=15000,'MAPFRE_CENSUS_BOUNDARY_'+col);
+  const snap=await get(at(col).limit(15001));assert.ok(snap.size<=15000,'MAPFRE_CENSUS_BOUNDARY_'+col);
   collections[col]=snap.docs.map(raw);
  }));
- const s=binding.preflight.scope,client=raw(await at('clientes').doc(s.clientId).get());
- const requests=await db.getAll(...binding.preflight.twoCases.map(t=>tenant.collection('reconciliationRequests').doc(t.pendingConditionalCanonicalCall.requestId)));
+ const s=binding.preflight.scope,client=raw(await get(at('clientes').doc(s.clientId)));
+ const requests=await Promise.all(binding.preflight.twoCases.map(t=>get(tenant.collection('reconciliationRequests').doc(t.pendingConditionalCanonicalCall.requestId))));
  return {collections,client,requests:requests.map(raw),complete:true,observedAtUtc:new Date().toISOString()};
 }
 function mapfreReview(binding,snapshot,originals){
@@ -357,7 +358,7 @@ function mapfreReview(binding,snapshot,originals){
  const holderEvidence=Object.fromEntries(['nombre','nombreCompleto','razonSocial'].map(k=>[k,{present:!!str(client.data?.[k]),
   matchesPinnedOriginal:!!str(client.data?.[k])&&knownHolderHashes.has(sha(norm(client.data[k])))}]));
  if(!snapshot.complete||originals.length!==3||originals.some(o=>o.status!=='ORIGINAL_BYTES_VERIFIED'))holds.push('MAPFRE_ORIGINAL_ACCESS_UNVERIFIED');
- if(!policy||policy.clienteId!==s.clientId||policy.aseguradoraId!==s.insurerId||policy.pais!=='GT'||policy.moneda!=='GTQ'||
+ if(!policy||/ANULADA|CANCELADA|SUSPENDIDA|DELETED/.test(str(policy.estado).toUpperCase())||policy.clienteId!==s.clientId||policy.aseguradoraId!==s.insurerId||policy.pais!=='GT'||policy.moneda!=='GTQ'||
   policy.vigenciaInicio!==s.issuedTerm[0]||policy.vigenciaFin!==s.issuedTerm[1]||
   !fields.some(k=>norm(policy[k])===norm(s.policyNumber))||fields.some(k=>str(policy[k])&&norm(policy[k])!==norm(s.policyNumber))||
   (policy.tenantId&&policy.tenantId!==s.tenantId)||!insurer?.exists||!/mapfre/i.test(str(insurer.data.nombre||insurer.data.razonSocial)))holds.push('MAPFRE_POLICY_IDENTITY_HOLD');
@@ -376,7 +377,7 @@ function mapfreReview(binding,snapshot,originals){
    if(str(d.polizaId)!==s.policyId||(col==='carteraPrimas'&&str(d.reciboId)!==t.receiptId)||
     (d.policyId&&d.policyId!==s.policyId)||(d.clienteId&&d.clienteId!==s.clientId)||
     (d.aseguradoraId&&d.aseguradoraId!==s.insurerId)||(d.moneda&&d.moneda!=='GTQ')||
-    (d.pais&&!['GT','GUATEMALA'].includes(str(d.pais).toUpperCase()))||(d.tenantId&&d.tenantId!==s.tenantId)||
+    (col==='carteraPrimas'&&d.carteraActiva===false)||(d.pais&&!['GT','GUATEMALA'].includes(str(d.pais).toUpperCase()))||(d.tenantId&&d.tenantId!==s.tenantId)||
     str(d.serie)!==t.installment+'/12')local.push('MAPFRE_TARGET_IDENTITY_HOLD');
    const amounts=['primaTotal','monto','montoTotal'].filter(k=>d[k]!==undefined&&d[k]!==null&&d[k]!=='').map(k=>moneyCents(d[k]));
    if(!amounts.length||amounts.some(v=>!Number.isSafeInteger(v)||v!==amounts[0])||

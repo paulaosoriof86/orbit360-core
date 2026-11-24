@@ -286,14 +286,48 @@ async function locateAttestedPayments(db,groups,rows){
 
 async function main(){
   const mode=str(process.env.GI_I66_BULK_MODE);
-  assert.ok(['preflight','case-readback','mapfre-readback','apply'].includes(mode),'I66_BULK_MODE_MUST_BE_EXPLICIT');
+  assert.ok(['preflight','case-readback','mapfre-readback','mapfre-cas-preflight','mapfre-cas-apply','apply'].includes(mode),'I66_BULK_MODE_MUST_BE_EXPLICIT');
   assert.equal(process.env.GCLOUD_PROJECT,PROJECT,'I66_PROJECT_NOT_EXISTING_FIREBASE');
   const admin=require('firebase-admin');
   admin.initializeApp({credential:admin.credential.applicationDefault(),projectId:PROJECT});
   const db=admin.firestore();
-  if(mode==='mapfre-readback'){
+  if(mode==='mapfre-cas-apply'){
+    assert.equal(process.env.GI_I66_BULK_PROTECTED_ENV,'gravicentra-live-data-writes');
+    assert.equal(process.env.GITHUB_REPOSITORY,'paulaosoriof86/orbit360-core');
+    assert.equal(process.env.GITHUB_REF,'refs/heads/recovery/fase-a-clean-20260831');
+    const filename=str(process.env.GI_I66_BULK_PLAN_IN);
+    assert.ok(path.isAbsolute(filename),'MAPFRE_CAS_PLAN_FILE_REQUIRED');
+    const plan=JSON.parse(fs.readFileSync(filename));
+    const writer=require('./gravicentra-i66-source-bulk-apply.cjs');
+    const gate={environment:process.env.GI_I66_BULK_PROTECTED_ENV,reviewerEvidence:true,
+      repository:process.env.GITHUB_REPOSITORY,ref:process.env.GITHUB_REF,project:PROJECT,
+      sourceManifestSha256:plan.sourceManifestSha256,authoritySha256:plan.authoritySha256};
+    const result=await writer.applyMapfreObligations(db,plan,gate);
+    output('GI_I66_BULK_REPORT_OUT',result);
+    assert.ok(['MAPFRE_OBLIGATION_APPLIED_READBACK_PASS','MAPFRE_OBLIGATION_ALREADY_APPLIED_READBACK_PASS'].includes(result.status),
+      'MAPFRE_CAS_READBACK_NOT_ACCEPTED');
+    const replay=await writer.applyMapfreObligations(db,plan,gate);
+    output('GI_I66_BULK_REPORT_OUT',{...result,replay});
+    assert.equal(replay.status,'MAPFRE_OBLIGATION_ALREADY_APPLIED_READBACK_PASS');
+    assert.equal(replay.technicalWrites,0);
+    console.log('I66_MAPFRE_EXISTING_OBLIGATION_READBACK_PASS receipts=2 portfolios=2 payments=0 replayWrites=0');
+    return;
+  }
+  if(['mapfre-readback','mapfre-cas-preflight'].includes(mode)){
     const review=await require('./gravicentra-i66-financial-identity-readback.cjs').mapfreFreshPreflight(db);
     output('GI_I66_BULK_REPORT_OUT',review);
+    if(mode==='mapfre-cas-preflight'){
+      let plan;
+      try{
+        const binding=require('./gravicentra-i66-financial-identity-readback.cjs').mapfreBinding();
+        plan=require('./gravicentra-i66-source-bulk-apply.cjs').mapfreCorrectionPlan(review,binding);
+      }catch(error){plan={schema:'GI_I66_MAPFRE_EXISTING_OBLIGATION_CAS_V1',status:'MAPFRE_OBLIGATION_PREFLIGHT_HOLD',
+        writes:0,paymentWrites:0,inputRows:2,readyCount:0,
+        reason:/^I66_BULK_HOLD_[A-Z_]+$/.test(error.message)?error.message:'MAPFRE_PRIVATE_PREFLIGHT_HOLD'};}
+      output('GI_I66_BULK_PLAN_OUT',plan);
+      console.log('I66_MAPFRE_OBLIGATION_CAS_PREFLIGHT ready='+plan.readyCount+' paymentWrites=0');
+      return;
+    }
     output('GI_I66_BULK_PLAN_OUT',{status:'BULK_MAPFRE_READONLY_PREFLIGHT_NO_WRITES',readOnly:true,
       writes:0,paymentWriteEligibleCount:0,inputRows:2,chunks:[],privateReportRequired:true,
       correctionEligibleCount:review.correctionEligibleCount,beforeHash:review.beforeHash});

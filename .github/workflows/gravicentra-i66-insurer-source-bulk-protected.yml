@@ -26,6 +26,7 @@ on:
       - tools/gravicentra-i66-financial-identity-readback.cjs
       - tools/gravicentra-i66-source-bulk-plan.test.cjs
       - tools/gravicentra-i66-source-bulk-apply.test.cjs
+      - tools/gravicentra-i66-mapfre-obligation-cas.test.cjs
       - tools/gravicentra-i66-source-bulk-readback.test.cjs
       - tools/gravicentra-i66-universales-25-source-crosswalk.test.cjs
       - artifacts/orbit360-recovery/source-batches/I6_6_UNIVERSALES_25_PENDING_2_PAID_9_INFERRED_20261122.json
@@ -49,6 +50,7 @@ jobs:
       github.repository == 'paulaosoriof86/orbit360-core' &&
       github.ref == 'refs/heads/recovery/fase-a-clean-20260831' &&
       (github.event_name == 'workflow_dispatch' ||
+      contains(github.event.head_commit.message, 'I66_MAPFRE_OBLIGATION_CAS') ||
       contains(github.event.head_commit.message, 'I66_MAPFRE_PAYMENT_PREFLIGHT') ||
       contains(github.event.head_commit.message, 'I66_SOURCE_BULK_READY') ||
       contains(github.event.head_commit.message, 'I66_REFRESH_PINNED_SOURCE') ||
@@ -89,6 +91,7 @@ jobs:
           node --check tools/gravicentra-i66-source-bulk-live.cjs
           node tools/gravicentra-i66-source-bulk-plan.test.cjs
           node tools/gravicentra-i66-source-bulk-apply.test.cjs
+          node --test tools/gravicentra-i66-mapfre-obligation-cas.test.cjs
           node --test tools/gravicentra-i66-source-bulk-readback.test.cjs
           node --test tools/gravicentra-i66-universales-25-source-crosswalk.test.cjs
           node --check tools/gravicentra-i66-roble-five-issuer-crosswalk-readonly.cjs
@@ -119,7 +122,7 @@ jobs:
         shell: bash
         env:
           GI_I66_ATTESTED_TARGETS: ${{ contains(github.event.head_commit.message, 'I66_ATTESTED_READBACK') }}
-          GI_I66_BULK_MODE: ${{ contains(github.event.head_commit.message, 'I66_MAPFRE_PAYMENT_PREFLIGHT') && 'mapfre-readback' || (contains(github.event.head_commit.message, 'I66_ROBLE_0043_READBACK') && 'case-readback' || 'preflight') }}
+          GI_I66_BULK_MODE: ${{ contains(github.event.head_commit.message, 'I66_MAPFRE_OBLIGATION_CAS') && 'mapfre-cas-preflight' || (contains(github.event.head_commit.message, 'I66_MAPFRE_PAYMENT_PREFLIGHT') && 'mapfre-readback' || (contains(github.event.head_commit.message, 'I66_ROBLE_0043_READBACK') && 'case-readback' || 'preflight')) }}
           GI_I66_BULK_READBACK_CASE: ${{ contains(github.event.head_commit.message, 'I66_ROBLE_0043_READBACK') && 'ROBLE_NOV20_0043' || '' }}
           GI_I66_BULK_PLAN_OUT: ${{ runner.temp }}/gi-i66-bulk-plan.json
           GI_I66_BULK_REPORT_OUT: ${{ runner.temp }}/gi-i66-bulk-preflight.json
@@ -186,6 +189,15 @@ jobs:
           node - <<'JS'
           const fs=require('node:fs'),assert=require('node:assert/strict');
           const p=JSON.parse(fs.readFileSync(process.env.GI_I66_BULK_PLAN_OUT,'utf8'));
+          if(p.schema==='GI_I66_MAPFRE_EXISTING_OBLIGATION_CAS_V1'){
+            assert.equal(p.writes,0);assert.equal(p.paymentWrites,0);assert.equal(p.inputRows,2);
+            const ready=p.status==='MAPFRE_OBLIGATION_PREFLIGHT_ONLY_NO_PAYMENT_WRITES'&&p.readyCount===2;
+            assert.ok(ready||p.status==='MAPFRE_OBLIGATION_PREFLIGHT_HOLD');
+            if(ready)assert.equal(p.patches.length,4);
+            fs.appendFileSync(process.env.GITHUB_OUTPUT,'ready='+ready+'\nreadonly=false\n');
+            console.log('I66_MAPFRE_CORRECTION_ONLY_PREFLIGHT ready='+ready+' payments=0');
+            process.exit(0);
+          }
           if(p.status==='BULK_MAPFRE_READONLY_PREFLIGHT_NO_WRITES'){
             assert.equal(p.readOnly,true);assert.equal(p.writes,0);assert.equal(p.paymentWriteEligibleCount,0);
             assert.equal(p.inputRows,2);assert.deepEqual(p.chunks,[]);
@@ -250,6 +262,7 @@ jobs:
           test "$GCLOUD_PROJECT" = ays-orbit-360-lab
           node tools/gravicentra-i66-source-bulk-plan.test.cjs
           node tools/gravicentra-i66-source-bulk-apply.test.cjs
+          node --test tools/gravicentra-i66-mapfre-obligation-cas.test.cjs
       - name: Select the same authorized Firebase project for protected CAS writes
         shell: bash
         run: |
@@ -272,7 +285,7 @@ jobs:
         if: needs.preflight.outputs.ready == 'true'
         shell: bash
         env:
-          GI_I66_BULK_MODE: apply
+          GI_I66_BULK_MODE: ${{ contains(github.event.head_commit.message, 'I66_MAPFRE_OBLIGATION_CAS') && 'mapfre-cas-apply' || 'apply' }}
           GI_I66_BULK_PROTECTED_ENV: gravicentra-live-data-writes
           GI_I66_BULK_PLAN_IN: ${{ runner.temp }}/i66-source-bulk-plan/gi-i66-bulk-plan.json
           GI_I66_BULK_REPORT_OUT: ${{ runner.temp }}/gi-i66-bulk-live.json

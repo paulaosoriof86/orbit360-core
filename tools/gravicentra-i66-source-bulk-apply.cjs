@@ -211,4 +211,140 @@ async function applyProtectedBatch(db,plan,gate){
     writeOutcomeIndeterminate:documentaryResults.some(r=>r.writeOutcomeIndeterminate),
     documentaryResults,cobroWrites:0,paymentWrites:0,failed,accepted};
 }
-module.exports={gateValid,applyOne,applyProtectedBatch};
+// The two MAPFRE installments are existing unpaid obligations backed by paid
+// insurer evidence. This adapter corrects their gross/due/source references;
+// it never turns a paid source into PENDING and never creates a payment.
+const mapfreStable=x=>Array.isArray(x)?x.map(mapfreStable):x&&typeof x==='object'?
+  Object.fromEntries(Object.keys(x).sort().map(k=>[k,mapfreStable(x[k])])):x;
+const mapfreHash=x=>sha(JSON.stringify(mapfreStable(x)));
+const mapfreRecordKey=e=>e.collection+'/'+e.id;
+const mapfreDataView=entries=>entries.map(e=>({collection:e.collection,id:e.id,data:e.data}))
+  .sort((a,b)=>mapfreRecordKey(a).localeCompare(mapfreRecordKey(b)));
+function mapfreCorrectionPlan(review,binding){
+  if(review.schema!=='GI_I66_MAPFRE_FRESH_CONTROLLED_PREFLIGHT_V1'||review.writes!==0||
+    review.paymentWriteEligibleCount!==0||review.correctionEligibleCount!==2||review.globalHolds.length||
+    !/^[a-f\d]{64}$/.test(review.beforeHash)||review.targets.length!==2||
+    review.targets.some(t=>!t.correctionEligible||t.localHolds.length)||
+    review.originals.length!==3||review.originals.some(o=>o.status!=='ORIGINAL_BYTES_VERIFIED'))
+    hold('MAPFRE_EXACT_FRESH_PLAN_REQUIRED');
+  const patches=[];
+  for(const target of binding.preflight.twoCases){
+    const approved=review.targets.find(t=>t.sourceFactId===target.sourceFactId);
+    if(!approved||approved.requirement!==target.requirement||approved.sourceGrossCents!==12777)
+      hold('MAPFRE_TARGET_PIN_CHANGED');
+    for(const [collection,id] of [['recibosEsperados',target.receiptId],['carteraPrimas',target.portfolioId]]){
+      const before=review.privatePreimages.find(e=>e.collection===collection&&e.id===id);
+      if(!before?.exists||!before.updateTime)hold('MAPFRE_FULL_PREIMAGE_REQUIRED');
+      const fields=['primaTotal',...grossAliasFields].filter(k=>Object.hasOwn(before.data,k));
+      if(!fields.length||fields.some(k=>moneyCents(before.data[k])!==12776&&moneyCents(before.data[k])!==12777))
+        hold('MAPFRE_EXPECTED_ONE_CENT_CORRECTION_REQUIRED');
+      const patch=Object.fromEntries(fields.map(k=>[k,typeof before.data[k]==='string'?'127.77':127.77]));
+      if(collection==='recibosEsperados')Object.assign(patch,{numeroReciboFuente:target.requirement,
+        fechaVencimientoContractual:target.documentedTarget.contractualDue});
+      patches.push({collection,id,sourceFactId:target.sourceFactId,patch,
+        beforeHash:mapfreHash(before.data),beforeUpdateTime:before.updateTime});
+    }
+  }
+  const afterEntries=review.privatePreimages.map(e=>{
+    const patch=patches.find(p=>mapfreRecordKey(p)===mapfreRecordKey(e));
+    return patch?{...e,data:{...e.data,...patch.patch}}:e;
+  });
+  const body={schema:'GI_I66_MAPFRE_EXISTING_OBLIGATION_CAS_V1',
+    status:'MAPFRE_OBLIGATION_PREFLIGHT_ONLY_NO_PAYMENT_WRITES',writes:0,paymentWrites:0,
+    inputRows:2,readyCount:2,policyId:binding.preflight.scope.policyId,
+    sourcePins:review.sourcePins,sourceManifestSha256:review.sourcePins.source[1],
+    authoritySha256:review.sourcePins.authority[1],beforeHash:review.beforeHash,
+    originals:review.originals,patches,beforeDataHash:mapfreHash(mapfreDataView(review.privatePreimages)),
+    expectedAfterDataHash:mapfreHash(mapfreDataView(afterEntries)),
+    priorPayments:9,annualVariancePreserved:true,installment12Excluded:true};
+  return JSON.parse(JSON.stringify({...body,planHash:mapfreHash(body)}));
+}
+function mapfreAuditId(plan){return 'gi_i66_mapfre_obligation_'+sha(plan.sourceManifestSha256+'|'+
+  plan.authoritySha256+'|'+plan.policyId).slice(0,28);}
+function mapfreGate(gate,plan){
+  return gate?.environment==='gravicentra-live-data-writes'&&gate.reviewerEvidence===true&&
+    gate.repository==='paulaosoriof86/orbit360-core'&&gate.ref==='refs/heads/recovery/fase-a-clean-20260831'&&
+    gate.project===PROJECT&&gate.sourceManifestSha256===plan.sourceManifestSha256&&
+    gate.authoritySha256===plan.authoritySha256&&plan.schema==='GI_I66_MAPFRE_EXISTING_OBLIGATION_CAS_V1'&&
+    plan.status==='MAPFRE_OBLIGATION_PREFLIGHT_ONLY_NO_PAYMENT_WRITES'&&plan.writes===0&&
+    plan.paymentWrites===0&&plan.inputRows===2&&plan.readyCount===2&&plan.patches?.length===4;
+}
+async function applyMapfreObligations(db,plan,gate,binding,originals){
+  const reader=require('./gravicentra-i66-financial-identity-readback.cjs');
+  if(!mapfreGate(gate,plan))hold('MAPFRE_PROTECTED_ENVIRONMENT_REQUIRED');
+  binding=binding||reader.mapfreBinding();originals=originals||await reader.mapfreOriginals(binding);
+  if(originals.length!==3||originals.some(o=>o.status!=='ORIGINAL_BYTES_VERIFIED')||
+    originals.some(o=>!binding.preflight.originalDocumentPins.some(p=>p.driveFileId===o.fileId&&p.sha256===o.sha256))||
+    mapfreHash(originals)!==mapfreHash(plan.originals))hold('MAPFRE_ORIGINAL_BYTES_CHANGED');
+  const auditId=mapfreAuditId(plan),auditRef=audit(db,auditId),before=[],after=[];
+  let attempted=false,committed=false,replayed=false,uncertain=false,transactionError='';
+  const certify=(record,review)=>record?.schema==='GI_I66_MAPFRE_EXISTING_OBLIGATION_CORRECTION_V1'&&
+    record.planHash===plan.planHash&&record.authoritySha256===plan.authoritySha256&&
+    record.sourceManifestSha256===plan.sourceManifestSha256&&record.policyId===plan.policyId&&
+    record.paymentWrites===0&&record.cobroWrites===0&&
+    record.afterDataHash===plan.expectedAfterDataHash&&
+    mapfreHash(mapfreDataView(review.privatePreimages))===plan.expectedAfterDataHash&&
+    review.globalHolds.length===0&&review.correctionEligibleCount===2;
+  try{
+    const outcome=await db.runTransaction(async tx=>{
+      const [snapshot,existing]=await Promise.all([reader.mapfreSnapshot(db,binding,tx),tx.get(auditRef)]);
+      const review=reader.mapfreReview(binding,snapshot,originals);
+      if(existing.exists){
+        if(!certify(existing.data(),review))hold('MAPFRE_EXISTING_CORRECTION_POSTIMAGE_CHANGED');
+        return {replayed:true};
+      }
+      const fresh=mapfreCorrectionPlan(review,binding);
+      if(mapfreHash(fresh)!==mapfreHash(plan))hold('MAPFRE_FULL_PREIMAGE_CAS_CHANGED');
+      before.splice(0,before.length,...review.privatePreimages);
+      after.splice(0,after.length,...review.privatePreimages.map(e=>{
+        const patch=plan.patches.find(p=>mapfreRecordKey(p)===mapfreRecordKey(e));
+        return patch?{...e,data:{...e.data,...patch.patch}}:e;
+      }));
+      // Every transaction read finishes before any write. Firestore also
+      // protects the bounded queries from newly inserted competing links.
+      attempted=true;
+      for(const patch of plan.patches)tx.update(items(db,patch.collection).doc(patch.id),patch.patch);
+      tx.create(auditRef,{schema:'GI_I66_MAPFRE_EXISTING_OBLIGATION_CORRECTION_V1',
+        status:'EXISTING_OBLIGATIONS_CORRECTED_NO_PAYMENTS',planHash:plan.planHash,
+        authoritySha256:plan.authoritySha256,sourceManifestSha256:plan.sourceManifestSha256,
+        sourcePins:plan.sourcePins,originals,policyId:plan.policyId,patches:plan.patches,
+        beforeHash:plan.beforeHash,beforeDataHash:plan.beforeDataHash,afterDataHash:plan.expectedAfterDataHash,
+        rollback:{records:before.filter(e=>plan.patches.some(p=>mapfreRecordKey(p)===mapfreRecordKey(e))),
+          onlyIfWholeCurrentAfterDataHashMatches:true},
+        preservedRecordHashes:before.filter(e=>!plan.patches.some(p=>mapfreRecordKey(p)===mapfreRecordKey(e)))
+          .map(e=>({collection:e.collection,id:e.id,sha256:mapfreHash(e.data),updateTime:e.updateTime})),
+        originalSourceStates:binding.preflight.twoCases.map(t=>({sourceFactId:t.sourceFactId,
+          state:binding.source.facts.find(f=>f.sourceFactId===t.sourceFactId).state,
+          sourceDocumentSha256:t.source.sha256,sourceRowSha256:t.source.sourceRowSha256})),
+        receiptWrites:2,portfolioWrites:2,auditWrites:1,paymentWrites:0,cobroWrites:0,
+        previousPaymentsPreserved:9,annualVariancePreserved:true,installment12Excluded:true,
+        committedAt:new Date().toISOString()});
+      return {replayed:false};
+    });
+    replayed=outcome.replayed;committed=!replayed;
+  }catch(error){
+    transactionError=/^I66_BULK_HOLD_[A-Z_]+$/.test(error.message)?error.message:'MAPFRE_PRIVATE_TRANSACTION_ERROR';
+    uncertain=attempted;
+    if(!attempted)return {status:'MAPFRE_OBLIGATION_CAS_HOLD',reason:transactionError,
+      technicalWrites:0,paymentWrites:0,cobroWrites:0,newPayments:0,writeOutcomeIndeterminate:false};
+  }
+  let post,postAudit;
+  try{
+    const [snapshot,stored]=await Promise.all([reader.mapfreSnapshot(db,binding),auditRef.get()]);
+    post=reader.mapfreReview(binding,snapshot,originals);postAudit=stored.exists?stored.data():null;
+  }catch{return {status:committed?'MAPFRE_OBLIGATION_COMMITTED_READBACK_HOLD':'MAPFRE_OBLIGATION_READBACK_HOLD',
+    auditId,knownCommitted:committed,writeOutcomeIndeterminate:uncertain,
+    technicalWrites:committed?5:replayed?0:null,paymentWrites:0,cobroWrites:0,newPayments:0,
+    reason:'MAPFRE_POSTCOMMIT_READ_UNAVAILABLE'};}
+  if(!certify(postAudit,post))return {status:committed?'MAPFRE_OBLIGATION_COMMITTED_READBACK_HOLD':'MAPFRE_OBLIGATION_READBACK_HOLD',
+    auditId,knownCommitted:committed,writeOutcomeIndeterminate:uncertain,
+    technicalWrites:committed?5:replayed?0:null,paymentWrites:0,cobroWrites:0,newPayments:0,
+    reason:'MAPFRE_POSTIMAGE_CHANGED_OR_AUDIT_ABSENT',privateAfter:post};
+  return {status:replayed?'MAPFRE_OBLIGATION_ALREADY_APPLIED_READBACK_PASS':'MAPFRE_OBLIGATION_APPLIED_READBACK_PASS',
+    auditId,planHash:plan.planHash,knownCommitted:!replayed,writeOutcomeIndeterminate:false,
+    recoveredAmbiguousCommit:uncertain,technicalWrites:replayed?0:5,receiptWrites:replayed?0:2,
+    portfolioWrites:replayed?0:2,auditWrites:replayed?0:1,paymentWrites:0,cobroWrites:0,newPayments:0,
+    privateBefore:before,privateAfter:post,afterDataHash:plan.expectedAfterDataHash,
+    next:'Authenticate the real authorized user and submit each exact pinned canonical payment request.'};
+}
+module.exports={gateValid,applyOne,applyProtectedBatch,mapfreCorrectionPlan,mapfreAuditId,applyMapfreObligations};
