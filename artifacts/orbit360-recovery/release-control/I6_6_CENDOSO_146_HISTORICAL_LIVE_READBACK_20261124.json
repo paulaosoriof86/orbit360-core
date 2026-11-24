@@ -1,0 +1,1163 @@
+{
+  "schema": "GI_I66_CENDOSO_LONG_HISTORICAL_BATCH_LIVE_RECEIPT_V1",
+  "status": "PROTECTED_PAID_READBACK_PASS",
+  "dateGuatemala": "2026-11-23",
+  "gate": "I6.6",
+  "runId": 45330498452,
+  "preflightJobId": 138230282452,
+  "liveJobId": 138230596854,
+  "sourceSha": "38e19499431a67b6826ed3adec53bf3ddc682766",
+  "writerGitBlobSha": "a7f02baf56364779cd5e11853bc7412acdaf5110",
+  "inputSourceSha256": "649fa315a90b176b794abf6eef3d9f893d47de64cfe558d203a099c408692aa0",
+  "preflightArtifact": {
+    "id": 14891144028,
+    "digest": "sha256:2b077744b1680a09fbdad84a816dc2323bed2abf855ca5f8208a28c26a6ad161"
+  },
+  "liveArtifact": {
+    "id": 14892335961,
+    "digest": "sha256:1963da51aeb9d25491c414460933815c6700d2a6305df3bfdf471773804ce439"
+  },
+  "preflightPlanSha256": "3e84a82c4fe68409f3f9b68658b7b402def08add516510d4cb3e5278ff441d60",
+  "liveReportSha256": "f68ada535e160f274e155bffa34e21ec6915a194c4ab33cbe0ed85284e6bfa4b",
+  "reconciledCounts": {
+    "input": 607,
+    "existingPaymentsPreserved": 344,
+    "historicalPaymentsApplied": 146,
+    "isolatedSourceExceptions": 117,
+    "policyEditions": 47,
+    "grossCents": 7609129,
+    "netCents": 5952572,
+    "currency": "GTQ",
+    "chunkObligations": [
+      100,
+      46
+    ],
+    "technicalDocumentCreates": 584
+  },
+  "byInsurer": {
+    "BAM": {
+      "payments": 2,
+      "policyEditions": 1,
+      "grossCents": 51520
+    },
+    "Bantrab": {
+      "payments": 15,
+      "policyEditions": 3,
+      "grossCents": 629456
+    },
+    "Columna": {
+      "payments": 12,
+      "policyEditions": 4,
+      "grossCents": 459528
+    },
+    "El Roble": {
+      "payments": 54,
+      "policyEditions": 14,
+      "grossCents": 1547796
+    },
+    "Ficohsa": {
+      "payments": 3,
+      "policyEditions": 1,
+      "grossCents": 44100
+    },
+    "G&T": {
+      "payments": 19,
+      "policyEditions": 15,
+      "grossCents": 2043559
+    },
+    "La Ceiba": {
+      "payments": 20,
+      "policyEditions": 4,
+      "grossCents": 870191
+    },
+    "La General": {
+      "payments": 5,
+      "policyEditions": 1,
+      "grossCents": 235845
+    },
+    "Mapfre": {
+      "payments": 12,
+      "policyEditions": 2,
+      "grossCents": 1394588
+    },
+    "Universales": {
+      "payments": 4,
+      "policyEditions": 2,
+      "grossCents": 332546
+    }
+  },
+  "isolatedExceptions": {
+    "SOURCE_CURRENCY_NOT_GTQ": 29,
+    "EXACT_POLICY_EDITION_NOT_FOUND": 12,
+    "POLICY_NUMBER_NOT_FOUND": 32,
+    "NET_PREMIUM_CHANGED_REQUIRES_COMMISSION_RECOMPUTE": 8,
+    "MULTIPLE_POLICY_EDITIONS": 1,
+    "RECEIPT_PERIOD_OR_DUE_NOT_FOUND": 23,
+    "MULTIPLE_RECEIPTS_FOR_PERIOD_OR_AMOUNT": 2,
+    "HISTORICAL_EXISTING_POLICY_FINANCIAL_RECORD": 6,
+    "CONFLICTING_SOURCE_DATES": 4
+  },
+  "liveReadback": {
+    "status": "PROTECTED_PAID_READBACK_PASS",
+    "sourceSha256": "649fa315a90b176b794abf6eef3d9f893d47de64cfe558d203a099c408692aa0",
+    "inputCount": 607,
+    "preflightReady": 146,
+    "cobroWrites": 146,
+    "receiptPaidWrites": 146,
+    "portfolioPaidWrites": 146,
+    "knownCommittedPaymentWrites": 146,
+    "verifiedApplied": 146,
+    "writeOutcomeIndeterminate": false,
+    "historicalReceiptCreates": 146,
+    "knownHistoricalReceiptCreates": 146,
+    "historicalDocumentCreatesKnown": 584,
+    "historicalCommitsUnverified": [],
+    "currentDebtCreated": 0,
+    "reconciledWrites": 0,
+    "alreadyApplied": 0,
+    "holds": [],
+    "accepted": [
+      {
+        "sourceId": "cendoso_3c577af2dc9808dcbc458f6c",
+        "status": "APPLIED_READBACK_PASS",
+        "receiptCreated": true,
+        "historicalPaidOnly": true,
+        "currentDebtCreated": 0
+      },
+      {
+        "sourceId": "cendoso_7b2dcbd881e497bc2eb886e2",
+        "status": "APPLIED_READBACK_PASS",
+        "receiptCreated": true,
+        "historicalPaidOnly": true,
+        "currentDebtCreated": 0
+      },
+      {
+        "sourceId": "cendoso_b84bf8e5658787912f320c5e",
+        "status": "APPLIED_READBACK_PASS",
+        "receiptCreated": true,
+        "historicalPaidOnly": true,
+        "currentDebtCreated": 0
+      },
+      {
+        "sourceId": "cendoso_2bc1d402450cfe1a3d01b63e",
+        "status": "APPLIED_READBACK_PASS",
+        "receiptCreated": true,
+        "historicalPaidOnly": true,
+        "currentDebtCreated": 0
+      },
+      {
+        "sourceId": "cendoso_374741a385749b4625381dbe",
+        "status": "APPLIED_READBACK_PASS",
+        "receiptCreated": true,
+        "historicalPaidOnly": true,
+        "currentDebtCreated": 0
+      },
+      {
+        "sourceId": "cendoso_c11faa2a06028bde40d1e66d",
+        "status": "APPLIED_READBACK_PASS",
+        "receiptCreated": true,
+        "historicalPaidOnly": true,
+        "currentDebtCreated": 0
+      },
+      {
+        "sourceId": "cendoso_b018af21e897df01c0618d07",
+        "status": "APPLIED_READBACK_PASS",
+        "receiptCreated": true,
+        "historicalPaidOnly": true,
+        "currentDebtCreated": 0
+      },
+      {
+        "sourceId": "cendoso_64a0406b90543688a3a463b9",
+        "status": "APPLIED_READBACK_PASS",
+        "receiptCreated": true,
+        "historicalPaidOnly": true,
+        "currentDebtCreated": 0
+      },
+      {
+        "sourceId": "cendoso_2f5b3c7f471d803ea5eee0b1",
+        "status": "APPLIED_READBACK_PASS",
+        "receiptCreated": true,
+        "historicalPaidOnly": true,
+        "currentDebtCreated": 0
+      },
+      {
+        "sourceId": "cendoso_54c46d460952c6a137910d04",
+        "status": "APPLIED_READBACK_PASS",
+        "receiptCreated": true,
+        "historicalPaidOnly": true,
+        "currentDebtCreated": 0
+      },
+      {
+        "sourceId": "cendoso_52e271d92fc1ebf325b5737e",
+        "status": "APPLIED_READBACK_PASS",
+        "receiptCreated": true,
+        "historicalPaidOnly": true,
+        "currentDebtCreated": 0
+      },
+      {
+        "sourceId": "cendoso_665b829cd334b994bd548073",
+        "status": "APPLIED_READBACK_PASS",
+        "receiptCreated": true,
+        "historicalPaidOnly": true,
+        "currentDebtCreated": 0
+      },
+      {
+        "sourceId": "cendoso_d58fe865f54f07055b17e3cf",
+        "status": "APPLIED_READBACK_PASS",
+        "receiptCreated": true,
+        "historicalPaidOnly": true,
+        "currentDebtCreated": 0
+      },
+      {
+        "sourceId": "cendoso_deb47020a9fc6d3c19d25350",
+        "status": "APPLIED_READBACK_PASS",
+        "receiptCreated": true,
+        "historicalPaidOnly": true,
+        "currentDebtCreated": 0
+      },
+      {
+        "sourceId": "cendoso_f3db52450202a7c6a206ecb6",
+        "status": "APPLIED_READBACK_PASS",
+        "receiptCreated": true,
+        "historicalPaidOnly": true,
+        "currentDebtCreated": 0
+      },
+      {
+        "sourceId": "cendoso_ff44cd1a9a35a7f36fa55794",
+        "status": "APPLIED_READBACK_PASS",
+        "receiptCreated": true,
+        "historicalPaidOnly": true,
+        "currentDebtCreated": 0
+      },
+      {
+        "sourceId": "cendoso_2d714fb4e179fb67f137e9f7",
+        "status": "APPLIED_READBACK_PASS",
+        "receiptCreated": true,
+        "historicalPaidOnly": true,
+        "currentDebtCreated": 0
+      },
+      {
+        "sourceId": "cendoso_ac56addcc6eb7a65215fc938",
+        "status": "APPLIED_READBACK_PASS",
+        "receiptCreated": true,
+        "historicalPaidOnly": true,
+        "currentDebtCreated": 0
+      },
+      {
+        "sourceId": "cendoso_961779ae73f2ecb352f1dddb",
+        "status": "APPLIED_READBACK_PASS",
+        "receiptCreated": true,
+        "historicalPaidOnly": true,
+        "currentDebtCreated": 0
+      },
+      {
+        "sourceId": "cendoso_9b96af84113b5de08873b381",
+        "status": "APPLIED_READBACK_PASS",
+        "receiptCreated": true,
+        "historicalPaidOnly": true,
+        "currentDebtCreated": 0
+      },
+      {
+        "sourceId": "cendoso_ee08b4303f0659cc5de7631d",
+        "status": "APPLIED_READBACK_PASS",
+        "receiptCreated": true,
+        "historicalPaidOnly": true,
+        "currentDebtCreated": 0
+      },
+      {
+        "sourceId": "cendoso_fc918f9d1634714a1a4d9bee",
+        "status": "APPLIED_READBACK_PASS",
+        "receiptCreated": true,
+        "historicalPaidOnly": true,
+        "currentDebtCreated": 0
+      },
+      {
+        "sourceId": "cendoso_8229c4aa9605e28935c5519d",
+        "status": "APPLIED_READBACK_PASS",
+        "receiptCreated": true,
+        "historicalPaidOnly": true,
+        "currentDebtCreated": 0
+      },
+      {
+        "sourceId": "cendoso_2c5b933582e561dfe9cc9d6a",
+        "status": "APPLIED_READBACK_PASS",
+        "receiptCreated": true,
+        "historicalPaidOnly": true,
+        "currentDebtCreated": 0
+      },
+      {
+        "sourceId": "cendoso_fbb51e3520d83baf5ab4d8fd",
+        "status": "APPLIED_READBACK_PASS",
+        "receiptCreated": true,
+        "historicalPaidOnly": true,
+        "currentDebtCreated": 0
+      },
+      {
+        "sourceId": "cendoso_0feb9e3c3276eaf5c6e12696",
+        "status": "APPLIED_READBACK_PASS",
+        "receiptCreated": true,
+        "historicalPaidOnly": true,
+        "currentDebtCreated": 0
+      },
+      {
+        "sourceId": "cendoso_1df2f6ee2500b2541e926c34",
+        "status": "APPLIED_READBACK_PASS",
+        "receiptCreated": true,
+        "historicalPaidOnly": true,
+        "currentDebtCreated": 0
+      },
+      {
+        "sourceId": "cendoso_38514bfe177008ec126733cd",
+        "status": "APPLIED_READBACK_PASS",
+        "receiptCreated": true,
+        "historicalPaidOnly": true,
+        "currentDebtCreated": 0
+      },
+      {
+        "sourceId": "cendoso_4fa55a9617c3588dc1b3ed79",
+        "status": "APPLIED_READBACK_PASS",
+        "receiptCreated": true,
+        "historicalPaidOnly": true,
+        "currentDebtCreated": 0
+      },
+      {
+        "sourceId": "cendoso_4d9bf10c5f9ec3b707bd567d",
+        "status": "APPLIED_READBACK_PASS",
+        "receiptCreated": true,
+        "historicalPaidOnly": true,
+        "currentDebtCreated": 0
+      },
+      {
+        "sourceId": "cendoso_9d317ce9cb8aaa26052a3dca",
+        "status": "APPLIED_READBACK_PASS",
+        "receiptCreated": true,
+        "historicalPaidOnly": true,
+        "currentDebtCreated": 0
+      },
+      {
+        "sourceId": "cendoso_3487fc9f03036bfc7de62887",
+        "status": "APPLIED_READBACK_PASS",
+        "receiptCreated": true,
+        "historicalPaidOnly": true,
+        "currentDebtCreated": 0
+      },
+      {
+        "sourceId": "cendoso_2de7b21a44912ba200b4fc05",
+        "status": "APPLIED_READBACK_PASS",
+        "receiptCreated": true,
+        "historicalPaidOnly": true,
+        "currentDebtCreated": 0
+      },
+      {
+        "sourceId": "cendoso_ea9e50a949aee18873e83a02",
+        "status": "APPLIED_READBACK_PASS",
+        "receiptCreated": true,
+        "historicalPaidOnly": true,
+        "currentDebtCreated": 0
+      },
+      {
+        "sourceId": "cendoso_d1e3b7086f3809677a037c0c",
+        "status": "APPLIED_READBACK_PASS",
+        "receiptCreated": true,
+        "historicalPaidOnly": true,
+        "currentDebtCreated": 0
+      },
+      {
+        "sourceId": "cendoso_d6a363f5f0ecdf5152979854",
+        "status": "APPLIED_READBACK_PASS",
+        "receiptCreated": true,
+        "historicalPaidOnly": true,
+        "currentDebtCreated": 0
+      },
+      {
+        "sourceId": "cendoso_ce9fd8bfc6f3020196fd2253",
+        "status": "APPLIED_READBACK_PASS",
+        "receiptCreated": true,
+        "historicalPaidOnly": true,
+        "currentDebtCreated": 0
+      },
+      {
+        "sourceId": "cendoso_792701faddad343048016fa0",
+        "status": "APPLIED_READBACK_PASS",
+        "receiptCreated": true,
+        "historicalPaidOnly": true,
+        "currentDebtCreated": 0
+      },
+      {
+        "sourceId": "cendoso_c4f1f5290b7556a2673f1f67",
+        "status": "APPLIED_READBACK_PASS",
+        "receiptCreated": true,
+        "historicalPaidOnly": true,
+        "currentDebtCreated": 0
+      },
+      {
+        "sourceId": "cendoso_423ab829a16b6c138c3f2319",
+        "status": "APPLIED_READBACK_PASS",
+        "receiptCreated": true,
+        "historicalPaidOnly": true,
+        "currentDebtCreated": 0
+      },
+      {
+        "sourceId": "cendoso_4dd1d2a96c8b97c734b85223",
+        "status": "APPLIED_READBACK_PASS",
+        "receiptCreated": true,
+        "historicalPaidOnly": true,
+        "currentDebtCreated": 0
+      },
+      {
+        "sourceId": "cendoso_ec6c0854a32c4bd0cb6a7e3b",
+        "status": "APPLIED_READBACK_PASS",
+        "receiptCreated": true,
+        "historicalPaidOnly": true,
+        "currentDebtCreated": 0
+      },
+      {
+        "sourceId": "cendoso_4ba4dbd4e475840c5e4700a1",
+        "status": "APPLIED_READBACK_PASS",
+        "receiptCreated": true,
+        "historicalPaidOnly": true,
+        "currentDebtCreated": 0
+      },
+      {
+        "sourceId": "cendoso_f3ee4282be93c96a571212f3",
+        "status": "APPLIED_READBACK_PASS",
+        "receiptCreated": true,
+        "historicalPaidOnly": true,
+        "currentDebtCreated": 0
+      },
+      {
+        "sourceId": "cendoso_414e78d05a5e3e1030152897",
+        "status": "APPLIED_READBACK_PASS",
+        "receiptCreated": true,
+        "historicalPaidOnly": true,
+        "currentDebtCreated": 0
+      },
+      {
+        "sourceId": "cendoso_1a45330efe3c662f114f4b2d",
+        "status": "APPLIED_READBACK_PASS",
+        "receiptCreated": true,
+        "historicalPaidOnly": true,
+        "currentDebtCreated": 0
+      },
+      {
+        "sourceId": "cendoso_bc2817eb8c4a91f72bc5281f",
+        "status": "APPLIED_READBACK_PASS",
+        "receiptCreated": true,
+        "historicalPaidOnly": true,
+        "currentDebtCreated": 0
+      },
+      {
+        "sourceId": "cendoso_02b34e6085da2ba5eaefd0f4",
+        "status": "APPLIED_READBACK_PASS",
+        "receiptCreated": true,
+        "historicalPaidOnly": true,
+        "currentDebtCreated": 0
+      },
+      {
+        "sourceId": "cendoso_5df937a4a20f094f31291bf9",
+        "status": "APPLIED_READBACK_PASS",
+        "receiptCreated": true,
+        "historicalPaidOnly": true,
+        "currentDebtCreated": 0
+      },
+      {
+        "sourceId": "cendoso_9a16fc755e42ff8f0baf5296",
+        "status": "APPLIED_READBACK_PASS",
+        "receiptCreated": true,
+        "historicalPaidOnly": true,
+        "currentDebtCreated": 0
+      },
+      {
+        "sourceId": "cendoso_e1106375137d1f0f089ed2f0",
+        "status": "APPLIED_READBACK_PASS",
+        "receiptCreated": true,
+        "historicalPaidOnly": true,
+        "currentDebtCreated": 0
+      },
+      {
+        "sourceId": "cendoso_9d643f24657570d8633b35db",
+        "status": "APPLIED_READBACK_PASS",
+        "receiptCreated": true,
+        "historicalPaidOnly": true,
+        "currentDebtCreated": 0
+      },
+      {
+        "sourceId": "cendoso_612991bbee6bc42355be6f6a",
+        "status": "APPLIED_READBACK_PASS",
+        "receiptCreated": true,
+        "historicalPaidOnly": true,
+        "currentDebtCreated": 0
+      },
+      {
+        "sourceId": "cendoso_a74dbbc5f44976be505bf7f9",
+        "status": "APPLIED_READBACK_PASS",
+        "receiptCreated": true,
+        "historicalPaidOnly": true,
+        "currentDebtCreated": 0
+      },
+      {
+        "sourceId": "cendoso_5065c4ae63d1ccc26d65101e",
+        "status": "APPLIED_READBACK_PASS",
+        "receiptCreated": true,
+        "historicalPaidOnly": true,
+        "currentDebtCreated": 0
+      },
+      {
+        "sourceId": "cendoso_273c11a3877d861866f771b3",
+        "status": "APPLIED_READBACK_PASS",
+        "receiptCreated": true,
+        "historicalPaidOnly": true,
+        "currentDebtCreated": 0
+      },
+      {
+        "sourceId": "cendoso_47360150b194ce6d0cf3976e",
+        "status": "APPLIED_READBACK_PASS",
+        "receiptCreated": true,
+        "historicalPaidOnly": true,
+        "currentDebtCreated": 0
+      },
+      {
+        "sourceId": "cendoso_2ecc3ec6100b6e3e26f5fc8e",
+        "status": "APPLIED_READBACK_PASS",
+        "receiptCreated": true,
+        "historicalPaidOnly": true,
+        "currentDebtCreated": 0
+      },
+      {
+        "sourceId": "cendoso_10bce3671f0cb599ac91687d",
+        "status": "APPLIED_READBACK_PASS",
+        "receiptCreated": true,
+        "historicalPaidOnly": true,
+        "currentDebtCreated": 0
+      },
+      {
+        "sourceId": "cendoso_23fd957520750bb007fb84e3",
+        "status": "APPLIED_READBACK_PASS",
+        "receiptCreated": true,
+        "historicalPaidOnly": true,
+        "currentDebtCreated": 0
+      },
+      {
+        "sourceId": "cendoso_d8d3600c8c0a68c81df6d153",
+        "status": "APPLIED_READBACK_PASS",
+        "receiptCreated": true,
+        "historicalPaidOnly": true,
+        "currentDebtCreated": 0
+      },
+      {
+        "sourceId": "cendoso_4c00fbf8301eb6b4253df80e",
+        "status": "APPLIED_READBACK_PASS",
+        "receiptCreated": true,
+        "historicalPaidOnly": true,
+        "currentDebtCreated": 0
+      },
+      {
+        "sourceId": "cendoso_0a741320078678950db613c9",
+        "status": "APPLIED_READBACK_PASS",
+        "receiptCreated": true,
+        "historicalPaidOnly": true,
+        "currentDebtCreated": 0
+      },
+      {
+        "sourceId": "cendoso_83018dae3d6e4d4736fee05a",
+        "status": "APPLIED_READBACK_PASS",
+        "receiptCreated": true,
+        "historicalPaidOnly": true,
+        "currentDebtCreated": 0
+      },
+      {
+        "sourceId": "cendoso_1febf53312bcf42697b83d9b",
+        "status": "APPLIED_READBACK_PASS",
+        "receiptCreated": true,
+        "historicalPaidOnly": true,
+        "currentDebtCreated": 0
+      },
+      {
+        "sourceId": "cendoso_b0271727762df42d3c494948",
+        "status": "APPLIED_READBACK_PASS",
+        "receiptCreated": true,
+        "historicalPaidOnly": true,
+        "currentDebtCreated": 0
+      },
+      {
+        "sourceId": "cendoso_5dbe86a0990a8a835fd0e16d",
+        "status": "APPLIED_READBACK_PASS",
+        "receiptCreated": true,
+        "historicalPaidOnly": true,
+        "currentDebtCreated": 0
+      },
+      {
+        "sourceId": "cendoso_31a15f5ec9fc0eac3d38046f",
+        "status": "APPLIED_READBACK_PASS",
+        "receiptCreated": true,
+        "historicalPaidOnly": true,
+        "currentDebtCreated": 0
+      },
+      {
+        "sourceId": "cendoso_67d0f48e76ba2196e14e980a",
+        "status": "APPLIED_READBACK_PASS",
+        "receiptCreated": true,
+        "historicalPaidOnly": true,
+        "currentDebtCreated": 0
+      },
+      {
+        "sourceId": "cendoso_6bea850d78aa3742d44b54b7",
+        "status": "APPLIED_READBACK_PASS",
+        "receiptCreated": true,
+        "historicalPaidOnly": true,
+        "currentDebtCreated": 0
+      },
+      {
+        "sourceId": "cendoso_12b455eaf4ca9eaad3e2c3a0",
+        "status": "APPLIED_READBACK_PASS",
+        "receiptCreated": true,
+        "historicalPaidOnly": true,
+        "currentDebtCreated": 0
+      },
+      {
+        "sourceId": "cendoso_4487d5a68a670090962fc281",
+        "status": "APPLIED_READBACK_PASS",
+        "receiptCreated": true,
+        "historicalPaidOnly": true,
+        "currentDebtCreated": 0
+      },
+      {
+        "sourceId": "cendoso_dada4f5432677c5dfd659da1",
+        "status": "APPLIED_READBACK_PASS",
+        "receiptCreated": true,
+        "historicalPaidOnly": true,
+        "currentDebtCreated": 0
+      },
+      {
+        "sourceId": "cendoso_be8f007de30c5bd5cc06d631",
+        "status": "APPLIED_READBACK_PASS",
+        "receiptCreated": true,
+        "historicalPaidOnly": true,
+        "currentDebtCreated": 0
+      },
+      {
+        "sourceId": "cendoso_38aa1140b83a5f574a8b75c0",
+        "status": "APPLIED_READBACK_PASS",
+        "receiptCreated": true,
+        "historicalPaidOnly": true,
+        "currentDebtCreated": 0
+      },
+      {
+        "sourceId": "cendoso_5e12883a805abc6761191676",
+        "status": "APPLIED_READBACK_PASS",
+        "receiptCreated": true,
+        "historicalPaidOnly": true,
+        "currentDebtCreated": 0
+      },
+      {
+        "sourceId": "cendoso_ef193a264fb826b7bd5a2bad",
+        "status": "APPLIED_READBACK_PASS",
+        "receiptCreated": true,
+        "historicalPaidOnly": true,
+        "currentDebtCreated": 0
+      },
+      {
+        "sourceId": "cendoso_16d8cb5b41756710fc668d88",
+        "status": "APPLIED_READBACK_PASS",
+        "receiptCreated": true,
+        "historicalPaidOnly": true,
+        "currentDebtCreated": 0
+      },
+      {
+        "sourceId": "cendoso_d3383148e735cb342a49ed5d",
+        "status": "APPLIED_READBACK_PASS",
+        "receiptCreated": true,
+        "historicalPaidOnly": true,
+        "currentDebtCreated": 0
+      },
+      {
+        "sourceId": "cendoso_ac88eb02b18e2b5c25a68b47",
+        "status": "APPLIED_READBACK_PASS",
+        "receiptCreated": true,
+        "historicalPaidOnly": true,
+        "currentDebtCreated": 0
+      },
+      {
+        "sourceId": "cendoso_a52c72a43527ef9bb5f14dc6",
+        "status": "APPLIED_READBACK_PASS",
+        "receiptCreated": true,
+        "historicalPaidOnly": true,
+        "currentDebtCreated": 0
+      },
+      {
+        "sourceId": "cendoso_0c19da404d0d3fcb91b97852",
+        "status": "APPLIED_READBACK_PASS",
+        "receiptCreated": true,
+        "historicalPaidOnly": true,
+        "currentDebtCreated": 0
+      },
+      {
+        "sourceId": "cendoso_d16cd443c099743b893ce221",
+        "status": "APPLIED_READBACK_PASS",
+        "receiptCreated": true,
+        "historicalPaidOnly": true,
+        "currentDebtCreated": 0
+      },
+      {
+        "sourceId": "cendoso_d880a8a6588432b27db1fa3c",
+        "status": "APPLIED_READBACK_PASS",
+        "receiptCreated": true,
+        "historicalPaidOnly": true,
+        "currentDebtCreated": 0
+      },
+      {
+        "sourceId": "cendoso_e6bb390828a317582bb6d471",
+        "status": "APPLIED_READBACK_PASS",
+        "receiptCreated": true,
+        "historicalPaidOnly": true,
+        "currentDebtCreated": 0
+      },
+      {
+        "sourceId": "cendoso_ab41118cb33599505470f3aa",
+        "status": "APPLIED_READBACK_PASS",
+        "receiptCreated": true,
+        "historicalPaidOnly": true,
+        "currentDebtCreated": 0
+      },
+      {
+        "sourceId": "cendoso_5b5cc5e7b58f7b8f599dd0b4",
+        "status": "APPLIED_READBACK_PASS",
+        "receiptCreated": true,
+        "historicalPaidOnly": true,
+        "currentDebtCreated": 0
+      },
+      {
+        "sourceId": "cendoso_ecc8e3b6e52196188ede1d46",
+        "status": "APPLIED_READBACK_PASS",
+        "receiptCreated": true,
+        "historicalPaidOnly": true,
+        "currentDebtCreated": 0
+      },
+      {
+        "sourceId": "cendoso_4daf7eb95f0ea0c01179cefa",
+        "status": "APPLIED_READBACK_PASS",
+        "receiptCreated": true,
+        "historicalPaidOnly": true,
+        "currentDebtCreated": 0
+      },
+      {
+        "sourceId": "cendoso_5cfa59ac0d45a3351b3f0a7e",
+        "status": "APPLIED_READBACK_PASS",
+        "receiptCreated": true,
+        "historicalPaidOnly": true,
+        "currentDebtCreated": 0
+      },
+      {
+        "sourceId": "cendoso_8b481b31268a4da47487dc13",
+        "status": "APPLIED_READBACK_PASS",
+        "receiptCreated": true,
+        "historicalPaidOnly": true,
+        "currentDebtCreated": 0
+      },
+      {
+        "sourceId": "cendoso_88d55f4dbba6ce728fccf495",
+        "status": "APPLIED_READBACK_PASS",
+        "receiptCreated": true,
+        "historicalPaidOnly": true,
+        "currentDebtCreated": 0
+      },
+      {
+        "sourceId": "cendoso_278815e9405c5a9147dcc06a",
+        "status": "APPLIED_READBACK_PASS",
+        "receiptCreated": true,
+        "historicalPaidOnly": true,
+        "currentDebtCreated": 0
+      },
+      {
+        "sourceId": "cendoso_3ace17ecfc8abb9aa3b68997",
+        "status": "APPLIED_READBACK_PASS",
+        "receiptCreated": true,
+        "historicalPaidOnly": true,
+        "currentDebtCreated": 0
+      },
+      {
+        "sourceId": "cendoso_655b16a8c5b0c73fe35df2f4",
+        "status": "APPLIED_READBACK_PASS",
+        "receiptCreated": true,
+        "historicalPaidOnly": true,
+        "currentDebtCreated": 0
+      },
+      {
+        "sourceId": "cendoso_0fc4525b15b634117a6aad77",
+        "status": "APPLIED_READBACK_PASS",
+        "receiptCreated": true,
+        "historicalPaidOnly": true,
+        "currentDebtCreated": 0
+      },
+      {
+        "sourceId": "cendoso_0f4145391e4f243bb48b2657",
+        "status": "APPLIED_READBACK_PASS",
+        "receiptCreated": true,
+        "historicalPaidOnly": true,
+        "currentDebtCreated": 0
+      },
+      {
+        "sourceId": "cendoso_522c430a6d2c6800906aa763",
+        "status": "APPLIED_READBACK_PASS",
+        "receiptCreated": true,
+        "historicalPaidOnly": true,
+        "currentDebtCreated": 0
+      },
+      {
+        "sourceId": "cendoso_2fd9c0a78dd03906d7f89767",
+        "status": "APPLIED_READBACK_PASS",
+        "receiptCreated": true,
+        "historicalPaidOnly": true,
+        "currentDebtCreated": 0
+      },
+      {
+        "sourceId": "cendoso_068a3fc570c4328cc2caf3e6",
+        "status": "APPLIED_READBACK_PASS",
+        "receiptCreated": true,
+        "historicalPaidOnly": true,
+        "currentDebtCreated": 0
+      },
+      {
+        "sourceId": "cendoso_dc40724a0a5e60a4da6276c5",
+        "status": "APPLIED_READBACK_PASS",
+        "receiptCreated": true,
+        "historicalPaidOnly": true,
+        "currentDebtCreated": 0
+      },
+      {
+        "sourceId": "cendoso_2abd7d427d11d3aef620fb75",
+        "status": "APPLIED_READBACK_PASS",
+        "receiptCreated": true,
+        "historicalPaidOnly": true,
+        "currentDebtCreated": 0
+      },
+      {
+        "sourceId": "cendoso_677e06080e7e2934417ec816",
+        "status": "APPLIED_READBACK_PASS",
+        "receiptCreated": true,
+        "historicalPaidOnly": true,
+        "currentDebtCreated": 0
+      },
+      {
+        "sourceId": "cendoso_7dadf641ff5b1da65393aa82",
+        "status": "APPLIED_READBACK_PASS",
+        "receiptCreated": true,
+        "historicalPaidOnly": true,
+        "currentDebtCreated": 0
+      },
+      {
+        "sourceId": "cendoso_baad2a06309576deab30c6f9",
+        "status": "APPLIED_READBACK_PASS",
+        "receiptCreated": true,
+        "historicalPaidOnly": true,
+        "currentDebtCreated": 0
+      },
+      {
+        "sourceId": "cendoso_c23fe704291834cd1f3124d8",
+        "status": "APPLIED_READBACK_PASS",
+        "receiptCreated": true,
+        "historicalPaidOnly": true,
+        "currentDebtCreated": 0
+      },
+      {
+        "sourceId": "cendoso_44c94a0d98c8c9a5644a020b",
+        "status": "APPLIED_READBACK_PASS",
+        "receiptCreated": true,
+        "historicalPaidOnly": true,
+        "currentDebtCreated": 0
+      },
+      {
+        "sourceId": "cendoso_1f0bcd2d59a2a534278fbd9a",
+        "status": "APPLIED_READBACK_PASS",
+        "receiptCreated": true,
+        "historicalPaidOnly": true,
+        "currentDebtCreated": 0
+      },
+      {
+        "sourceId": "cendoso_a076e85518304a2d783040a9",
+        "status": "APPLIED_READBACK_PASS",
+        "receiptCreated": true,
+        "historicalPaidOnly": true,
+        "currentDebtCreated": 0
+      },
+      {
+        "sourceId": "cendoso_1e977ce12318349505fce702",
+        "status": "APPLIED_READBACK_PASS",
+        "receiptCreated": true,
+        "historicalPaidOnly": true,
+        "currentDebtCreated": 0
+      },
+      {
+        "sourceId": "cendoso_10cba4544a811812104f5690",
+        "status": "APPLIED_READBACK_PASS",
+        "receiptCreated": true,
+        "historicalPaidOnly": true,
+        "currentDebtCreated": 0
+      },
+      {
+        "sourceId": "cendoso_a06bd6fdb49db92bc3669d9e",
+        "status": "APPLIED_READBACK_PASS",
+        "receiptCreated": true,
+        "historicalPaidOnly": true,
+        "currentDebtCreated": 0
+      },
+      {
+        "sourceId": "cendoso_713e90722d7cf0a815c2af27",
+        "status": "APPLIED_READBACK_PASS",
+        "receiptCreated": true,
+        "historicalPaidOnly": true,
+        "currentDebtCreated": 0
+      },
+      {
+        "sourceId": "cendoso_222ccf620a2271c33368232f",
+        "status": "APPLIED_READBACK_PASS",
+        "receiptCreated": true,
+        "historicalPaidOnly": true,
+        "currentDebtCreated": 0
+      },
+      {
+        "sourceId": "cendoso_66809f1b55130cca37f5989b",
+        "status": "APPLIED_READBACK_PASS",
+        "receiptCreated": true,
+        "historicalPaidOnly": true,
+        "currentDebtCreated": 0
+      },
+      {
+        "sourceId": "cendoso_9762c0fa902f83895e5725c1",
+        "status": "APPLIED_READBACK_PASS",
+        "receiptCreated": true,
+        "historicalPaidOnly": true,
+        "currentDebtCreated": 0
+      },
+      {
+        "sourceId": "cendoso_e42ac544e1ae327af37dc745",
+        "status": "APPLIED_READBACK_PASS",
+        "receiptCreated": true,
+        "historicalPaidOnly": true,
+        "currentDebtCreated": 0
+      },
+      {
+        "sourceId": "cendoso_0ff44838aac9d24f648d06b5",
+        "status": "APPLIED_READBACK_PASS",
+        "receiptCreated": true,
+        "historicalPaidOnly": true,
+        "currentDebtCreated": 0
+      },
+      {
+        "sourceId": "cendoso_97d7f53a8927eed57c28ae50",
+        "status": "APPLIED_READBACK_PASS",
+        "receiptCreated": true,
+        "historicalPaidOnly": true,
+        "currentDebtCreated": 0
+      },
+      {
+        "sourceId": "cendoso_ea84a1808fddb6ddb40929de",
+        "status": "APPLIED_READBACK_PASS",
+        "receiptCreated": true,
+        "historicalPaidOnly": true,
+        "currentDebtCreated": 0
+      },
+      {
+        "sourceId": "cendoso_c564fbc9f90dce3b37302252",
+        "status": "APPLIED_READBACK_PASS",
+        "receiptCreated": true,
+        "historicalPaidOnly": true,
+        "currentDebtCreated": 0
+      },
+      {
+        "sourceId": "cendoso_971dd9bd34dd18dd7ba71bfc",
+        "status": "APPLIED_READBACK_PASS",
+        "receiptCreated": true,
+        "historicalPaidOnly": true,
+        "currentDebtCreated": 0
+      },
+      {
+        "sourceId": "cendoso_632ac3567e7fba9d134ad69b",
+        "status": "APPLIED_READBACK_PASS",
+        "receiptCreated": true,
+        "historicalPaidOnly": true,
+        "currentDebtCreated": 0
+      },
+      {
+        "sourceId": "cendoso_92fd4564c7499d99c7c821fd",
+        "status": "APPLIED_READBACK_PASS",
+        "receiptCreated": true,
+        "historicalPaidOnly": true,
+        "currentDebtCreated": 0
+      },
+      {
+        "sourceId": "cendoso_24cbe8b0b091c52776df9bf7",
+        "status": "APPLIED_READBACK_PASS",
+        "receiptCreated": true,
+        "historicalPaidOnly": true,
+        "currentDebtCreated": 0
+      },
+      {
+        "sourceId": "cendoso_46fb92f46b3001a9155dc39c",
+        "status": "APPLIED_READBACK_PASS",
+        "receiptCreated": true,
+        "historicalPaidOnly": true,
+        "currentDebtCreated": 0
+      },
+      {
+        "sourceId": "cendoso_19191b64b221b5a2b7ef0718",
+        "status": "APPLIED_READBACK_PASS",
+        "receiptCreated": true,
+        "historicalPaidOnly": true,
+        "currentDebtCreated": 0
+      },
+      {
+        "sourceId": "cendoso_17aeee9ac9d211ce5d918fc6",
+        "status": "APPLIED_READBACK_PASS",
+        "receiptCreated": true,
+        "historicalPaidOnly": true,
+        "currentDebtCreated": 0
+      },
+      {
+        "sourceId": "cendoso_fc9f0f397be83a96a9bc5a34",
+        "status": "APPLIED_READBACK_PASS",
+        "receiptCreated": true,
+        "historicalPaidOnly": true,
+        "currentDebtCreated": 0
+      },
+      {
+        "sourceId": "cendoso_59e6638d6744e7e73591c955",
+        "status": "APPLIED_READBACK_PASS",
+        "receiptCreated": true,
+        "historicalPaidOnly": true,
+        "currentDebtCreated": 0
+      },
+      {
+        "sourceId": "cendoso_ffbbfe17031ab9436ca7834d",
+        "status": "APPLIED_READBACK_PASS",
+        "receiptCreated": true,
+        "historicalPaidOnly": true,
+        "currentDebtCreated": 0
+      },
+      {
+        "sourceId": "cendoso_16c35446ccfc65d0883f5a49",
+        "status": "APPLIED_READBACK_PASS",
+        "receiptCreated": true,
+        "historicalPaidOnly": true,
+        "currentDebtCreated": 0
+      },
+      {
+        "sourceId": "cendoso_32b30d5c3363a59a6083c234",
+        "status": "APPLIED_READBACK_PASS",
+        "receiptCreated": true,
+        "historicalPaidOnly": true,
+        "currentDebtCreated": 0
+      },
+      {
+        "sourceId": "cendoso_4227b036896ade6031e4f29e",
+        "status": "APPLIED_READBACK_PASS",
+        "receiptCreated": true,
+        "historicalPaidOnly": true,
+        "currentDebtCreated": 0
+      },
+      {
+        "sourceId": "cendoso_a4b4d8185348b8b3f656f42d",
+        "status": "APPLIED_READBACK_PASS",
+        "receiptCreated": true,
+        "historicalPaidOnly": true,
+        "currentDebtCreated": 0
+      },
+      {
+        "sourceId": "cendoso_7c25c237e66120bebf079a67",
+        "status": "APPLIED_READBACK_PASS",
+        "receiptCreated": true,
+        "historicalPaidOnly": true,
+        "currentDebtCreated": 0
+      },
+      {
+        "sourceId": "cendoso_e18fbca967f47033ca0b77a0",
+        "status": "APPLIED_READBACK_PASS",
+        "receiptCreated": true,
+        "historicalPaidOnly": true,
+        "currentDebtCreated": 0
+      },
+      {
+        "sourceId": "cendoso_370feddee752c1bf822cabb1",
+        "status": "APPLIED_READBACK_PASS",
+        "receiptCreated": true,
+        "historicalPaidOnly": true,
+        "currentDebtCreated": 0
+      },
+      {
+        "sourceId": "cendoso_ef828b67e882959a3af15475",
+        "status": "APPLIED_READBACK_PASS",
+        "receiptCreated": true,
+        "historicalPaidOnly": true,
+        "currentDebtCreated": 0
+      },
+      {
+        "sourceId": "cendoso_83799bf191b4435c5ba6e6f5",
+        "status": "APPLIED_READBACK_PASS",
+        "receiptCreated": true,
+        "historicalPaidOnly": true,
+        "currentDebtCreated": 0
+      },
+      {
+        "sourceId": "cendoso_69ecde86b2e21e1279e02dca",
+        "status": "APPLIED_READBACK_PASS",
+        "receiptCreated": true,
+        "historicalPaidOnly": true,
+        "currentDebtCreated": 0
+      },
+      {
+        "sourceId": "cendoso_6bb24fff74c5e28e82070ee9",
+        "status": "APPLIED_READBACK_PASS",
+        "receiptCreated": true,
+        "historicalPaidOnly": true,
+        "currentDebtCreated": 0
+      },
+      {
+        "sourceId": "cendoso_2e30164bbd1fd037a29f7e98",
+        "status": "APPLIED_READBACK_PASS",
+        "receiptCreated": true,
+        "historicalPaidOnly": true,
+        "currentDebtCreated": 0
+      },
+      {
+        "sourceId": "cendoso_a8ce8624a56a1d09483261a1",
+        "status": "APPLIED_READBACK_PASS",
+        "receiptCreated": true,
+        "historicalPaidOnly": true,
+        "currentDebtCreated": 0
+      },
+      {
+        "sourceId": "cendoso_01d3790493d31edb51a5571c",
+        "status": "APPLIED_READBACK_PASS",
+        "receiptCreated": true,
+        "historicalPaidOnly": true,
+        "currentDebtCreated": 0
+      },
+      {
+        "sourceId": "cendoso_942cf0b0709e6097d40500cb",
+        "status": "APPLIED_READBACK_PASS",
+        "receiptCreated": true,
+        "historicalPaidOnly": true,
+        "currentDebtCreated": 0
+      }
+    ]
+  },
+  "financialSemantics": {
+    "sourceHistoricalPayments": true,
+    "newCurrentDebt": 0,
+    "automaticBankInsurerReconciliations": 0,
+    "newPolicies": 0,
+    "policyStatusChanges": 0,
+    "futureCalendarsCreated": 0
+  },
+  "priorWritesPreserved": {
+    "twoExactPaymentsRun": 45328403470,
+    "sixDueDateCorrectionsRun": 45272554046,
+    "sourceIdOverlapWithThoseTwo": 0
+  },
+  "limits": {
+    "full607Closed": false,
+    "fullI66ProductionAccepted": false,
+    "uiAcceptanceForNewHistoricalRowsClaimed": false
+  },
+  "next": "Preserve this completed batch and its operational audits. Resolve the 117 isolated source exceptions by their concrete causes; never replay accepted facts to fix UI."
+}

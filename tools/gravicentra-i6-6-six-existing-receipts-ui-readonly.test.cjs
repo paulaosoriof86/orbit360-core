@@ -10,7 +10,7 @@ function harness(extra={}){
   assert.ok(start>0&&end>start);
   const context={require,URL,need:(ok,code)=>{if(!ok)throw Error(code);},norm:x=>String(x||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase(),
     fs:{readFileSync:()=>bytes},execFileSync:()=>bytes,pin:{sourceSha:'qa-source'},...extra};
-  vm.runInNewContext(source.slice(start,end)+'\nthis.probe={validateSixSourceRow,certifySixReceiptUi,inspectSixReceiptBrowser,installBootstrapObservation,sixReceiptAuthority,sixServerSnapshot,focalHash,sixFinancialInputs,sixExpectedBrowserInputs,sixFinancialInputMetadata,sixFinancialInputDifferences,SIX_FINANCIAL_FIELDS,isSixReceiptBusinessWrite,visibleCivilDate};',context);
+  vm.runInNewContext(source.slice(start,end)+'\nthis.probe={validateSixSourceRow,certifySixReceiptUi,inspectSixReceiptBrowser,installBootstrapObservation,sixReceiptAuthority,sixServerSnapshot,focalHash,sixFinancialInputs,sixExpectedBrowserInputs,sixFinancialInputMetadata,sixFinancialInputDifferences,SIX_FINANCIAL_FIELDS,isSixReceiptBusinessWrite,visibleCivilDate,sixVisibleValueChecks,sixVisibleValueDiagnostic,collectSixVisibleResult,sixUiReloadValues,runSixReceiptUi};',context);
   return context;
 }
 function sourceRow(e=authority.rows[0]){
@@ -19,14 +19,14 @@ function sourceRow(e=authority.rows[0]){
     operationalLimit:e.operationalLimitBeforeAndAfter,currency:'GTQ',portfolioCurrency:'GTQ',grossCents:27826,portfolioGrossCents:27826,
     receiptState:{estado:'Pendiente'},portfolioState:{estado:'Pendiente',carteraActiva:true},portfolioMatches:1,cobrosTruncated:false,rollbackPresent:true,auditIdentity:true};
 }
-function uiFixture(){
-  const e=authority.rows[0],r={id:e.receiptId,polizaId:authority.scope.policyId,clienteId:'qa-client',moneda:'GTQ',primaTotal:278.26,
+function uiFixture(e=authority.rows[0]){
+  const r={id:e.receiptId,polizaId:authority.scope.policyId,clienteId:'qa-client',moneda:'GTQ',primaTotal:278.26,
     numeroReciboFuente:e.sourceRequirement,fechaVencimientoContractual:e.contractualDueAfter,fechaLimite:e.operationalLimitBeforeAndAfter,estado:'Pendiente'};
   const p={id:e.portfolioId,reciboId:e.receiptId,polizaId:authority.scope.policyId,clienteId:'qa-client',moneda:'GTQ',primaTotal:278.26,monto:278.26,estado:'Pendiente',carteraActiva:true};
   const policy={id:authority.scope.policyId,clienteId:'qa-client',pais:'GT',moneda:'GTQ',estado:'Vigente'};
-  const cells={
-    'Prima total':'Q 278.26','Vencimiento contractual documentado':'02 nov 2026','Fecha límite operativa':'02 nov 2026'
-  };
+  const dateLabel=iso=>{const [year,month,day]=iso.split('-');return day+' '+['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'][Number(month)-1]+' '+year;};
+  const cells={'Prima total':'Q 278.26','Vencimiento contractual documentado':dateLabel(e.contractualDueAfter),
+    'Fecha límite operativa':dateLabel(e.operationalLimitBeforeAndAfter)};
   const root={getAttribute:()=>e.receiptId,querySelector(selector){
     if(selector==='[data-rp-detail-values]')return {children:Object.entries(cells).map(([k,v])=>({children:[{textContent:k},{textContent:v}]}))};
     if(selector==='[data-rp-hero-status]')return {textContent:'Pendiente'};
@@ -175,6 +175,112 @@ test('mismatch diagnostics retain only bounded fields, types and salted digests,
     other.probe.sixFinancialInputMetadata(raw).receipt.monto.digest,'separate runs cannot expose enumerable low-entropy hashes');
   assert.equal(h.probe.sixFinancialInputDifferences(before,h.probe.sixFinancialInputMetadata(raw)).differingFieldCount,0);
   assert.match(source,/report\.financialFocalHold=error\.sixFinancialComparison/);
+});
+test('visible HOLD identifies the exact failing fields and stage without certifying an unknown balance',()=>{
+  const {h,e,input,server}=uiFixture(),observed=h.probe.inspectSixReceiptBrowser(input);
+  observed.displayedGrossCents=27827;observed.displayedContractualDue='03 nov 2026';
+  observed.balanceCents=null;observed.displayedBalanceCents=null;observed.balanceState='unverified';
+  observed.displayedStatus='private unexpected status';
+  let error;try{h.probe.certifySixReceiptUi(e,server,observed,'AFTER_RELOAD');}catch(value){error=value;}
+  assert.equal(error.message,'I66_SIX_VISIBLE_VALUES_OR_BALANCE_HOLD');
+  const d=error.sixVisibleComparison;
+  assert.equal(d.stage,'AFTER_RELOAD');assert.equal(d.sourceRequirement,e.sourceRequirement);assert.equal(d.receiptId,e.receiptId);
+  assert.deepEqual(plain(d.failedChecks),['gross','contractualDue','status','balanceVerified','balanceState']);
+  assert.equal(d.checks.balanceValue,true,'matching null text and owner value does not prove the balance');
+  assert.equal(d.observed.balanceCents,null);assert.equal(d.acceptanceChanged,false);
+  assert.doesNotMatch(JSON.stringify(d),/private unexpected status|qa-client|qa-actor|financialInputs":/);
+});
+test('real proof owner exposes missing amount aliases and operational state as bounded context',()=>{
+  const {h,input,p,r,policy}=uiFixture();
+  delete p.monto;p.estadoOperativo='pendiente_futuro';r.estadoOperativo='pendiente_futuro';
+  const observed=h.probe.inspectSixReceiptBrowser(input);
+  assert.equal(observed.balanceCents,null);assert.equal(observed.ownerDecision.proofSource,'UNVERIFIED');
+  assert.equal(observed.ownerDecision.portfolioAmount.present,false);assert.equal(observed.ownerDecision.portfolioBalance.present,false);
+  assert.equal(observed.ownerDecision.receiptOperationalState.value,'pendiente_futuro');
+  assert.equal(observed.ownerDecision.portfolioOperationalState.value,'pendiente_futuro');
+  assert.equal(observed.ownerDecision.portfoliosForReceipt,1);assert.equal(observed.ownerDecision.linkedPaymentInContext,false);
+  policy.estado='Private Person';r.estadoOperativo='another private string';
+  assert.doesNotMatch(JSON.stringify(h.probe.inspectSixReceiptBrowser(input).ownerDecision),/Private Person|another private string/);
+});
+test('visible collector cannot swallow scope, identity, state or source financial-input failures',()=>{
+  for(const mutate of [o=>{o.actorMatches=false;},o=>{o.source.receiptId='foreign';},
+    o=>{o.source.receiptState.estado='Pagado';},o=>{o.financialInputs.portfolio.monto=100;}]){
+    const {h,e,input,server}=uiFixture(),observed=h.probe.inspectSixReceiptBrowser(input),failures=[];
+    mutate(observed);
+    assert.throws(()=>h.probe.collectSixVisibleResult(e,server,observed,'BEFORE_RELOAD',failures),/I66_SIX_(?:SIGNED_UI|SOURCE_|UI_STATE|UI_FINANCIAL)/);
+    assert.equal(failures.length,0);
+  }
+});
+async function sixFlow(mutate=()=>{},options={}){
+  const fixtures=authority.rows.map(e=>uiFixture(e)),report={},visited=[];
+  const h=harness({phase:'live',report});let serverReads=0,reloads=0,cobrosReads=0,index=0,stage='BEFORE_RELOAD',route='receipt';
+  const snapshot={clientId:'qa-client',policyFingerprint:'unchanged',rows:fixtures.map(f=>f.server)};
+  h.sixReceiptAuthority=()=>authority;
+  h.sixServerSnapshot=async()=>{serverReads++;return options.serverDrift&&serverReads>1?{...snapshot,policyFingerprint:'changed'}:snapshot;};
+  const page={locator:()=>({count:async()=>1,inputValue:async()=> 'GT'}),waitForFunction:async()=>{},
+    reload:async()=>{reloads++;stage='AFTER_RELOAD';},
+    evaluate:async(fn,arg)=>{
+      if(arg===undefined){assert.match(String(fn),/#\/cobros/);route='cobros';return;}
+      if(typeof arg==='string'){
+        if(arg==='#/cobros'){route='cobros';return;}
+        route='receipt';index=authority.rows.findIndex(r=>arg.includes(encodeURIComponent(r.receiptId)));stage='BEFORE_RELOAD';return;
+      }
+      if(route==='cobros'){
+        cobrosReads++;return {ready:true,totalGrossCents:166956,rows:authority.rows.map(e=>({receiptId:e.receiptId,count:1,
+          rows:[{policyId:authority.scope.policyId,currency:'GTQ',grossCents:27826,due:e.operationalLimitBeforeAndAfter,state:'Pendiente'}]}))};
+      }
+      const f=fixtures[index],observed=f.h.probe.inspectSixReceiptBrowser(f.input);visited.push({index,stage});
+      mutate(observed,index,stage);return observed;
+    }};
+  let error;try{await h.probe.runSixReceiptUi(page,{uid:'qa-actor'},()=>({pageErrors:0,consoleErrors:0,httpClasses:{},blockedWrites:options.blockedWrites||0}));}
+  catch(value){error=value;}
+  return {h,report,error,visited,serverReads,reloads,cobrosReads};
+}
+test('six-case UI flow collects twelve visible failures and still verifies unchanged final server before HOLD',async()=>{
+  const r=await sixFlow(o=>{o.balanceCents=null;o.displayedBalanceCents=null;o.balanceState='unverified';o.amountProofSource='UNVERIFIED';});
+  assert.equal(r.error.message,'I66_SIX_VISIBLE_VALUES_OR_BALANCE_HOLD');
+  const d=r.error.sixVisibleComparisons;
+  assert.equal(d.rowCount,6);assert.equal(d.stageCount,12);assert.equal(d.failedStages,12);assert.equal(d.uiAccepted,false);
+  assert.equal(d.failureCount,12);assert.equal(d.reloadComparisonsFailed,0);
+  assert.equal(d.firstFailure.sourceRequirement,authority.rows[0].sourceRequirement);assert.equal(d.firstFailure.stage,'BEFORE_RELOAD');
+  assert.equal(new Set(d.failures.map(x=>x.receiptId)).size,6);assert.equal(d.serverUnchanged,true);
+  assert.equal(r.visited.length,12);assert.equal(r.reloads,6);assert.equal(r.serverReads,2);assert.equal(r.cobrosReads,0);
+  assert.equal(r.report.financialFocalProgress.observations.length,6);
+  assert.equal(r.report.financialFocalProgress.status,'VISIBLE_VALUES_HOLD_ALL_SIX_COLLECTED_SERVER_UNCHANGED');
+  assert.equal(r.report.financialFocal,undefined);
+});
+test('visible failure before reload remains a failure when reload repairs the text, and later rows are still checked',async()=>{
+  const r=await sixFlow((o,index,stage)=>{if(index===0&&stage==='BEFORE_RELOAD')o.displayedGrossCents=27827;});
+  assert.equal(r.error.message,'I66_SIX_VISIBLE_VALUES_OR_BALANCE_HOLD');assert.equal(r.visited.length,12);
+  const d=r.error.sixVisibleComparisons;
+  assert.equal(d.firstFailure.stage,'BEFORE_RELOAD');assert.equal(d.failedStages,1);
+  assert.equal(d.reloadComparisonsFailed,1);assert.equal(d.failureCount,2);
+  assert.deepEqual(plain(d.failures[1].changedVisibleFields),['displayedGrossCents']);
+  assert.equal(r.report.financialFocalProgress.observations[0].reloadPass,false);
+  assert.equal(r.report.financialFocalProgress.observations[0].afterCheck.pass,true);
+  assert.equal(r.report.financialFocal,undefined);
+});
+test('six-case collector remains fail-fast for authentication and nonvisual reload drift',async()=>{
+  const auth=await sixFlow(o=>{o.actorMatches=false;});
+  assert.match(auth.error.message,/SIGNED_UI_SCOPE/);assert.equal(auth.visited.length,1);assert.equal(auth.reloads,0);assert.equal(auth.serverReads,1);
+  const drift=await sixFlow((o,index,stage)=>{if(stage==='AFTER_RELOAD')o.amountProofSource='OTHER_OWNER';});
+  assert.equal(drift.error.message,'I66_SIX_UI_RELOAD_CHANGED_VALUES');assert.equal(drift.visited.length,2);
+  assert.equal(drift.report.financialFocal,undefined);
+});
+test('server drift or a blocked write overrides a collected visible HOLD and cannot report an unchanged readback',async()=>{
+  for(const [options,code]of [[{serverDrift:true},'I66_SIX_SERVER_CHANGED_DURING_READONLY_UI'],
+    [{blockedWrites:1},'I66_SIX_UI_HTTP_CONSOLE_OR_WRITE_ATTEMPT_HOLD']]){
+    const r=await sixFlow(o=>{o.displayedGrossCents=27827;},options);
+    assert.equal(r.error.message,code);assert.equal(r.visited.length,12);assert.equal(r.serverReads,2);
+    assert.equal(r.report.financialFocal,undefined);assert.equal(r.error.sixVisibleComparisons,undefined);
+  }
+});
+test('unchanged acceptance still requires all six valid views, reload, Cobros calculation and final server equality',async()=>{
+  const r=await sixFlow((o,index,stage)=>{if(stage==='AFTER_RELOAD')o.ownerDecision.extraDiagnostic='ignored by acceptance';});
+  assert.equal(r.error,undefined);assert.equal(r.visited.length,12);assert.equal(r.serverReads,2);assert.equal(r.cobrosReads,2);
+  assert.equal(r.report.financialFocal.distinctObligationCount,6);assert.equal(r.report.financialFocal.sourceGrossCents,166956);
+  assert.equal(r.report.financialFocal.observations.every(x=>x.beforeCheck.pass&&x.afterCheck.pass&&x.reloadPass),true);
+  assert.equal(r.report.financialFocalProgress,undefined);
 });
 test('read-only firewall blocks REST mutations and callable writers while allowing the actual read transports',()=>{
   const check=harness().probe.isSixReceiptBusinessWrite,base='https://firestore.googleapis.com/v1/projects/p/databases/(default)/documents';

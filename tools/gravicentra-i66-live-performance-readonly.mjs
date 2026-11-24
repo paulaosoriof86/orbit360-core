@@ -257,6 +257,7 @@ function inspectSixReceiptBrowser(input){
   const moneyCents=text=>{const value=String(text||'').trim().replace(/^Saldo pendiente:\s*/,'').replace(/\u00a0/g,' ');
     const m=/^Q\s+(-?(?:\d{1,3}(?:,\d{3})*|\d+)\.\d{2})$/.exec(value);if(!m)return null;
     const amount=Number(m[1].replace(/,/g,''));return Number.isFinite(amount)?Math.round(amount*100):null;};
+  const textShape=value=>String(value||'').slice(0,80).replace(/[0-9]/g,'9').replace(/[a-z\u00c0-\u024f]/gi,'a');
   const state=row=>Object.fromEntries(['estado','estadoOperativo','estadoCartera','paymentState','applicationState','pagado','conciliado','carteraActiva','inferredPaid','archivado','fechaPago','paidDate'].filter(k=>row[k]!==undefined).map(k=>[k,row[k]]));
   const status=store._productStatus(),member=Orbit.auth?.productUser;
   const payment=(store.all('cobros')||[]).find(r=>String(r.reciboId||r.receiptId||'')===expected.receiptId)||{};
@@ -267,6 +268,25 @@ function inspectSixReceiptBrowser(input){
   const context=Orbit.q.portfolioAmountContext(),proof=Orbit.q.portfolioAmountProof(portfolio,context),open=Orbit.q.portfolioOpen(portfolio);
   const balanceCents=open?(proof.value==null?null:Math.round(Number(proof.value)*100)):0;
   const canonicalState=Orbit.receiptsPortfolioProjection.stateLabel(receipt,payment)?.t||'';
+  // Bounded owner context is diagnostic only. It cannot supply a missing value
+  // or substitute for the independently checked server inputs and visible UI.
+  const policy=store.get('polizas',receipt.polizaId)||{},key=String(portfolio.reciboId||portfolio.receiptId||'').trim();
+  const knownStates=['vigente','por renovar','renovada','cancelada','anulada','terminada','vencida','suspendida',
+    'pendiente','pendiente_vencido','pendiente_futuro','pendiente_por_vencer','futuro','por_vencer',
+    'pagado','pago_inferido','pago_reportado','pago_reportado_asesor','no_pendiente_segun_aseguradora',
+    'requiere_validacion_estado','cerrado','gt','co','gtq','cop','usd','eur'];
+  const field=(value,numeric=false)=>({present:value!==undefined&&value!==null&&String(value).trim()!=='',
+    type:value===null?'null':typeof value,value:numeric?(value!==undefined&&value!==null&&String(value).trim()!==''&&Number.isFinite(Number(value))?Number(value):null):
+      knownStates.includes(String(value||'').trim().toLowerCase())?String(value).trim().toLowerCase():value==null||String(value).trim()===''?null:'OTHER'});
+  const diagnosticDate=value=>/^\d{4}-\d{2}-\d{2}$/.test(String(value||'').slice(0,10))?String(value).slice(0,10):'';
+  const ownerDecision={open,proofSource:proof.source||'',proofValueCents:proof.value==null?null:Math.round(Number(proof.value)*100),
+    currentBalanceCents:balanceCents,portfolioAmount:field(portfolio.monto,true),portfolioBalance:field(portfolio.saldo,true),
+    receiptOperationalState:field(receipt.estadoOperativo),portfolioOperationalState:field(portfolio.estadoOperativo),
+    policyState:field(policy.estado),policyCountry:field(policy.pais||policy.country),policyCurrency:field(policy.moneda||policy.divisa),
+    duplicateReceipt:context.duplicates.has(key),portfoliosForReceipt:context.portfoliosPerReceipt.get(key)||0,
+    linkedPaymentInContext:context.paymentReceiptIds.has(key),policyPresent:context.policiesById.has(String(portfolio.polizaId||portfolio.policyId||'').trim()),
+    portfolioDue:diagnosticDate(Orbit.q.portfolioDue(portfolio)),
+    receiptDue:diagnosticDate(receipt.fechaLimite||receipt.vence||receipt.fechaVencimiento)};
   return {ready:true,receiptId:root.getAttribute('data-rp-receipt-detail-id'),detailCount:document.querySelectorAll('[data-rp-receipt-detail-id="'+CSS.escape(expected.receiptId)+'"]').length,
     actorMatches:member?.uid===actorUid&&member?.tenantId==='alianzas-soluciones',role:String(Orbit.session.rol()),country:Orbit.pais,
     protectedCandidate:store._protectedCandidate===true,
@@ -283,7 +303,47 @@ function inspectSixReceiptBrowser(input){
     displayedOperationalLimit:value('Fecha límite operativa'),
     displayedStatus:root.querySelector('[data-rp-hero-status]')?.textContent?.trim()||'',canonicalStatus:canonicalState,
     displayedBalanceCents:moneyCents(root.querySelector('[data-rp-current-balance]')?.textContent),balanceCents,
-    balanceState:root.querySelector('[data-rp-current-balance]')?.getAttribute('data-rp-current-balance'),open,amountProofSource:proof.source||''};
+    balanceState:root.querySelector('[data-rp-current-balance]')?.getAttribute('data-rp-current-balance'),open,amountProofSource:proof.source||'',ownerDecision,
+    visibleFormats:{grossShape:textShape(value('Prima total')),balanceShape:textShape(root.querySelector('[data-rp-current-balance]')?.textContent)}};
+}
+function sixUiReloadValues(observed){
+  const {ownerDecision,visibleFormats,...values}=observed;
+  return values; // Diagnostic context adds no acceptance requirement.
+}
+function sixVisibleValueChecks(expected,observed){
+  return {gross:observed.displayedGrossCents===27826,
+    contractualDue:visibleCivilDate(observed.displayedContractualDue)===expected.contractualDueAfter,
+    operationalLimit:visibleCivilDate(observed.displayedOperationalLimit)===expected.operationalLimitBeforeAndAfter,
+    status:!!observed.displayedStatus&&observed.displayedStatus===observed.canonicalStatus,
+    balanceVerified:observed.balanceCents!==null,
+    balanceValue:observed.displayedBalanceCents===observed.balanceCents,
+    balanceState:observed.balanceState===(observed.open?'open':'closed')};
+}
+function sixVisibleValueDiagnostic(expected,observed,stage,checks){
+  const textShape=value=>String(value||'').slice(0,80).replace(/[0-9]/g,'9').replace(/[a-z\u00c0-\u024f]/gi,'a');
+  const status=value=>({present:!!value,type:typeof value,digest:focalHash([SIX_DIAGNOSTIC_SALT,value||''])});
+  return {schema:'GI_I66_SIX_VISIBLE_VALUE_DIAGNOSTIC_V1',stage,sourceRequirement:expected.sourceRequirement,
+    receiptId:expected.receiptId,checks,failedChecks:Object.keys(checks).filter(key=>!checks[key]),
+    expected:{grossCents:27826,contractualDue:expected.contractualDueAfter,operationalLimit:expected.operationalLimitBeforeAndAfter},
+    observed:{displayedGrossCents:observed.displayedGrossCents,
+      contractualDue:visibleCivilDate(observed.displayedContractualDue),contractualDateShape:textShape(observed.displayedContractualDue),
+      operationalLimit:visibleCivilDate(observed.displayedOperationalLimit),operationalDateShape:textShape(observed.displayedOperationalLimit),
+      displayedStatus:status(observed.displayedStatus),canonicalStatus:status(observed.canonicalStatus),
+      displayedBalanceCents:observed.displayedBalanceCents,balanceCents:observed.balanceCents,
+      balanceState:observed.balanceState,open:observed.open,amountProofSource:observed.amountProofSource,
+      ownerDecision:observed.ownerDecision||null,visibleFormats:observed.visibleFormats||null},
+    financialInputsFingerprint:observed.financialInputsFingerprint,
+    acceptanceChanged:false,valueDisclosure:'BOUNDED_FINANCIAL_VALUES_AND_OWNER_CONTEXT_NO_PERSONAL_IDENTITY'};
+}
+function collectSixVisibleResult(expected,source,observed,stage,failures){
+  try{certifySixReceiptUi(expected,source,observed,stage);return {pass:true,stage,checks:sixVisibleValueChecks(expected,observed)};}
+  catch(error){
+    // Only the final visible-value check is collectable. Authentication, scope,
+    // identity, source relation/state and financial input failures still abort.
+    if(error?.message!=='I66_SIX_VISIBLE_VALUES_OR_BALANCE_HOLD'||!error.sixVisibleComparison)throw error;
+    failures.push(error.sixVisibleComparison);
+    return {pass:false,stage,checks:error.sixVisibleComparison.checks};
+  }
 }
 function certifySixReceiptUi(expected,source,observed,stage='UNSPECIFIED'){
   need(observed.ready&&observed.detailCount===1&&observed.receiptId===expected.receiptId&&observed.actorMatches&&
@@ -302,10 +362,11 @@ function certifySixReceiptUi(expected,source,observed,stage='UNSPECIFIED'){
       mismatch:sixFinancialInputDifferences(source._financialInputsMetadata,metadata)};
     throw error;
   }
-  need(observed.displayedGrossCents===27826&&visibleCivilDate(observed.displayedContractualDue)===expected.contractualDueAfter&&
-    visibleCivilDate(observed.displayedOperationalLimit)===expected.operationalLimitBeforeAndAfter&&observed.displayedStatus&&observed.displayedStatus===observed.canonicalStatus&&
-    observed.balanceCents!==null&&observed.displayedBalanceCents===observed.balanceCents&&
-    observed.balanceState===(observed.open?'open':'closed'),'I66_SIX_VISIBLE_VALUES_OR_BALANCE_HOLD');
+  const checks=sixVisibleValueChecks(expected,observed);
+  if(!Object.values(checks).every(Boolean)){
+    const error=Error('I66_SIX_VISIBLE_VALUES_OR_BALANCE_HOLD');
+    error.sixVisibleComparison=sixVisibleValueDiagnostic(expected,observed,stage,checks);throw error;
+  }
 }
 async function runSixReceiptUi(page,actor,errors){
   need(phase==='live','I66_SIX_REAL_DATA_LIVE_ONLY');
@@ -313,17 +374,49 @@ async function runSixReceiptUi(page,actor,errors){
   const country=page.locator('#pais-sel');
   need(await country.count()===1,'I66_SIX_COUNTRY_SELECTOR_MISSING');
   if(await country.inputValue()!=='GT')await country.selectOption('GT');
-  const observations=[];
+  const observations=[],visibleFailures=[];
+  // Preserve every completed stage even if a later identity or transport check
+  // aborts. A diagnostic HOLD never grants UI acceptance or a write capability.
+  report.financialFocalProgress={status:'READONLY_CHECKS_IN_PROGRESS',observations,visibleFailures,
+    sourceSnapshotBefore:before.rows,additionalWrites:0};
   for(let i=0;i<authority.rows.length;i++){
     const expected=authority.rows[i],source=before.rows[i],input={expected,clientId:before.clientId,actorUid:actor.uid,financialFields:SIX_FINANCIAL_FIELDS};
     await page.evaluate(hash=>{location.hash=hash;},'#/cliente360?c='+encodeURIComponent(before.clientId)+'&t=recibos&r='+encodeURIComponent(expected.receiptId));
     const wait=()=>page.waitForFunction(id=>!!document.querySelector('[data-rp-receipt-detail-id="'+CSS.escape(id)+'"]')&&
       ['clientes','polizas','recibosEsperados','carteraPrimas','cobros'].every(k=>(Orbit.store?._productStatus?.().serverConfirmedCollections||[]).includes(k)),expected.receiptId,{timeout:60000});
-    await wait();const first=await page.evaluate(inspectSixReceiptBrowser,input);certifySixReceiptUi(expected,source,first,'BEFORE_RELOAD');
+    await wait();const first=await page.evaluate(inspectSixReceiptBrowser,input);
+    const beforeCheck=collectSixVisibleResult(expected,source,first,'BEFORE_RELOAD',visibleFailures);
+    const observation={sourceRequirement:expected.sourceRequirement,receiptId:expected.receiptId,portfolioId:expected.portfolioId,
+      beforeReload:first,beforeCheck,reloadPass:false};observations.push(observation);
     await page.reload({waitUntil:'domcontentloaded',timeout:60000});await wait();
-    const reloaded=await page.evaluate(inspectSixReceiptBrowser,input);certifySixReceiptUi(expected,source,reloaded,'AFTER_RELOAD');
-    need(focalHash(first)===focalHash(reloaded),'I66_SIX_UI_RELOAD_CHANGED_VALUES');
-    observations.push({sourceRequirement:expected.sourceRequirement,receiptId:expected.receiptId,portfolioId:expected.portfolioId,beforeReload:first,afterReload:reloaded,reloadPass:true});
+    const reloaded=await page.evaluate(inspectSixReceiptBrowser,input);
+    const afterCheck=collectSixVisibleResult(expected,source,reloaded,'AFTER_RELOAD',visibleFailures);
+    observation.afterReload=reloaded;observation.afterCheck=afterCheck;
+    const beforeValues=sixUiReloadValues(first),afterValues=sixUiReloadValues(reloaded);
+    const changed=Object.keys({...beforeValues,...afterValues}).filter(key=>focalHash(beforeValues[key]??null)!==focalHash(afterValues[key]??null));
+    if(focalHash(beforeValues)!==focalHash(afterValues)){
+      const visibleKeys=['displayedGrossCents','displayedContractualDue','displayedOperationalLimit','displayedStatus','displayedBalanceCents','balanceState'];
+      need(changed.length>0&&changed.every(key=>visibleKeys.includes(key)),'I66_SIX_UI_RELOAD_CHANGED_VALUES');
+      visibleFailures.push({...sixVisibleValueDiagnostic(expected,reloaded,'RELOAD_COMPARISON',{reloadEquality:false}),
+        changedVisibleFields:changed,beforeVisible:sixVisibleValueDiagnostic(expected,first,'BEFORE_RELOAD',beforeCheck.checks).observed});
+      observation.changedVisibleFields=changed;
+    }else observation.reloadPass=true;
+  }
+  if(visibleFailures.length){
+    const after=await sixServerSnapshot(authority),errorCounts=errors();
+    report.financialFocalProgress.sourceSnapshotAfter=after.rows;
+    report.financialFocalProgress.errors=errorCounts;
+    need(focalHash(before)===focalHash(after),'I66_SIX_SERVER_CHANGED_DURING_READONLY_UI');
+    need(errorCounts.pageErrors===0&&errorCounts.consoleErrors===0&&Object.keys(errorCounts.httpClasses).length===0&&errorCounts.blockedWrites===0,
+      'I66_SIX_UI_HTTP_CONSOLE_OR_WRITE_ATTEMPT_HOLD');
+    report.financialFocalProgress.status='VISIBLE_VALUES_HOLD_ALL_SIX_COLLECTED_SERVER_UNCHANGED';
+    const error=Error('I66_SIX_VISIBLE_VALUES_OR_BALANCE_HOLD');
+    error.sixVisibleComparisons={schema:'GI_I66_SIX_VISIBLE_VALUES_HOLD_V1',
+      rowCount:observations.length,stageCount:observations.reduce((n,row)=>n+Number(!!row.beforeCheck)+Number(!!row.afterCheck),0),
+      failedStages:visibleFailures.filter(row=>row.stage==='BEFORE_RELOAD'||row.stage==='AFTER_RELOAD').length,
+      reloadComparisonsFailed:visibleFailures.filter(row=>row.stage==='RELOAD_COMPARISON').length,
+      failureCount:visibleFailures.length,firstFailure:visibleFailures[0],failures:visibleFailures,
+      serverUnchanged:true,additionalWrites:0,uiAccepted:false};throw error;
   }
   const cobrosRead=async()=>{
     await page.evaluate(()=>{location.hash='#/cobros';});
@@ -349,6 +442,7 @@ async function runSixReceiptUi(page,actor,errors){
     cobrosEvidenceScope:'Canonical reportableRows calculation after real Cobros readiness and reload; individual Cobros DOM rows are not certified',
     currentOutstandingCents:observations.reduce((sum,x)=>sum+x.afterReload.balanceCents,0),sourceGrossCents:166956,distinctObligationCount:6,
     errors:errorCounts,scope:'Exact six-row UI/reload/calculation only;112 exceptions and other source universes remain separate; mini-freeze adjudication external'};
+  delete report.financialFocalProgress;
 }
 
 async function run(){
@@ -771,6 +865,8 @@ try{
   report.status='HOLD';
   if(error?.message==='I66_SIX_UI_FINANCIAL_INPUTS_DIFFER_FROM_SERVER'&&error.sixFinancialComparison)
     report.financialFocalHold=error.sixFinancialComparison;
+  if(error?.message==='I66_SIX_VISIBLE_VALUES_OR_BALANCE_HOLD')
+    report.financialFocalHold=error.sixVisibleComparisons||error.sixVisibleComparison;
   report.errors.push(String(error?.message||'PERF_UNKNOWN').replace(/[^A-Z0-9_:-]/gi,'').slice(0,100));
   console.error('I66_PERF_HOLD:'+report.errors[0]);
   process.exitCode=1;
