@@ -4,7 +4,7 @@
   "gate": "I6.6",
   "approvedByDirection": true,
   "scopeId": "SIX_RECEIPT_CURRENT_BALANCE_READONLY",
-  "generation": 4,
+  "generation": 5,
   "readOnlyQa": true,
   "backendDeployAllowed": false,
   "businessWritesAllowed": false,

@@ -1,0 +1,82 @@
+{
+  "schema": "GI_I66_EMAIL_OPERATIONAL_SOURCE_PRECEDENCE_OWNER_DECISION_V1",
+  "recordType": "ADDITIVE_PREVALENT_OWNER_CLARIFICATION_NOT_LIVE_ACCEPTANCE",
+  "dateGuatemala": "2026-11-24",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "gate": "I6.6",
+  "objective": "A13",
+  "status": "OWNER_AUTHORIZED_IMPLEMENTATION_AND_SOURCE_PROOF_PENDING",
+  "chronology": {
+    "previousDecisionPath": "artifacts/orbit360-recovery/release-control/I6_6_EMAIL_AUTOMATIC_CLASSIFICATION_OWNER_DECISION_20261124.json",
+    "previousDecisionBlobSha": "04bc1ccbb1f640368e89cf3c53b3090c7438140b",
+    "previousDecisionPreserved": true,
+    "currentClarificationPrevailsOnSourceAndEntityClassification": true,
+    "doesNotCancelRareUnambiguousNewQuoteAutoLead": true
+  },
+  "ownerClarification": {
+    "source": "DIRECCION_DIRECT_MESSAGE_ACTIVE_PROJECT_CONVERSATION_AFTER_EMAIL_INGESTION_CLASSIFICATION",
+    "messageSha256": "102c2d3021b94c730c4037375523e9d649d32f306b2df71a73ccc2ada580dd71",
+    "summary": "WhatsApp remains the primary commercial opportunity channel. Quote correspondence can update exact existing Leads. A designated supplier sends prospect data; verify that supplier against actual correspondence. New account statements must enter the existing Conciliations inbox and use the canonical inference and reconciliation pipeline. Continue the active work."
+  },
+  "sourcePrecedence": {
+    "primaryCommercialOpportunityChannel": "WHATSAPP_EXISTING_GREENAPI_MAKE_INGRESS",
+    "ordinaryQuoteEmail": "ASSOCIATE_OR_UPDATE_EXACT_EXISTING_LEAD_WITH_VERIFIED_REQUEST_OR_THREAD",
+    "namedProspectSupplier": {
+      "identityStatus": "VERIFY_AGAINST_ACTUAL_CORRESPONDENCE_NOT_DISPLAY_NAME",
+      "behaviorWhenSourceIdentityAndRowsAreVerified": "CREATE_DEDUPLICATED_PROSPECT_LEADS_PENDING_OPERATIONS",
+      "supplierRole": "DIRECTION_DESIGNATED_EXTERNAL_PROSPECT_SUPPLIER",
+      "designationNameSha256": "9b4d4ff02d95df9af7ccbf8b2f5732a587854751ceb0519a14081512b761d0d6",
+      "verifiedSenderAddressSha256": null
+    },
+    "rareDirectNewQuoteRequest": "CREATE_LEAD_PENDING_OPERATIONS_ONLY_WHEN_NEW_INTENT_AND_IDENTITY_ARE_UNAMBIGUOUS",
+    "operationalEmail": "LINK_TO_EXACT_UNIQUE_AUTHORIZED_CASE",
+    "accountStatementAttachment": "INTAKE_IN_EXISTING_CONCILIATIONS_INBOX_THEN_USE_CANONICAL_INFERENCE_AND_RECONCILIATION_RULES",
+    "ambiguousIntentSourceIdentityPolicyReceiptAmountsDatesOrRelationships": "HOLD_FOR_REVIEW_WITHOUT_AUTOMATIC_FINANCIAL_OR_COMMERCIAL_WRITE"
+  },
+  "financialOwnerReuse": {
+    "endpoint": "orbit360CobrosReconciliationCommand",
+    "intakeOperation": "intake_source_run",
+    "intakeSchema": "gi-cobros-source-intake-v2",
+    "sourceOwnerPath": "functions/cobros-source-intake-v2.js",
+    "inferenceOwnerPath": "functions/payment-inference-engine.js",
+    "proposalPreviewOperation": "preview_proposal_application",
+    "proposalApplyOperation": "apply_proposal_application",
+    "intakeCreatesPayments": false,
+    "sourceRequirements": [
+      "original_document_sha256",
+      "durable_Drive_documentRef",
+      "actual_content_cut_date",
+      "exact_insurer_country_currency",
+      "complete_policy_group_when_required",
+      "source_row_provenance",
+      "existing_canonical_identity_and_dedupe"
+    ],
+    "mailMessageIdentityStoredInOuterAuthorityNotUnapprovedSourceFields": true,
+    "automaticApplicationRequiresCanonicalUniqueMatchAndCAS": true,
+    "newParallelInferenceEngineAllowed": false,
+    "known607302AndAlreadyAppliedPaymentsMustNotBeReimported": true
+  },
+  "boundaries": {
+    "existingEmailScenarioId": 10221181,
+    "existingEmailConnectionId": 14756803,
+    "existingWhatsAppScenarioId": 10196136,
+    "newScenarios": false,
+    "newConnections": false,
+    "outboundMessages": false,
+    "fullPersonalMailboxPhaseBIncluded": false,
+    "mailboxOwnerAssumedFromConnectionLabel": false,
+    "humanIdentityImpersonation": false,
+    "historicalBulkBackfillByThisDecision": false
+  },
+  "currentEvidence": {
+    "imapProviderReadPreviouslySucceeded": true,
+    "canonicalEmailWriterCertified": false,
+    "namedSupplierIdentityVerified": false,
+    "mailboxOwnerBindingVerified": false,
+    "automaticStatementProcessingLiveAccepted": false
+  },
+  "canonicalWritesByThisReceipt": 0,
+  "messagesSent": 0,
+  "liveAccepted": false
+}

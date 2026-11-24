@@ -1,7 +1,7 @@
 # I6.6 GREENAPI METADATA PROBE -- read-only evidence, no delivery.
 # Manual read-only inventory of existing GCP Secret Manager/Functions/Cloud Run.
 # Metadata job: no payload access. Config job: exact existing secret validation in memory,
-# plus at most one configured advisor read and two provider metadata GETs. Neither job sends, writes or deploys.
+# plus bounded projected mailbox-owner identity reads and provider metadata GETs. No job sends, writes or deploys.
 name: Gravicentra I6.6 GreenAPI Secure Readiness
 
 on:
@@ -476,6 +476,10 @@ jobs:
       - name: Validate exact existing inbound configuration without payload or credential output
         shell: bash
         run: node tools/gravicentra-i66-greenapi-existing-config-readonly.cjs
+      - name: Verify exact mailbox-owner census isolation without writes
+        run: node --test tools/gravicentra-i66-mailbox-owner-readonly.test.cjs
+      - name: Inspect the existing pilot mailbox identity candidates without binding an owner
+        run: node tools/gravicentra-i66-mailbox-owner-readonly.cjs
       - name: Read canonical Ops runtime and exact required capabilities without granting access
         run: node tools/gravicentra-i66-make-lead-runtime-access.cjs preflight
 # I6.6 continuation 2026-11-24: distinguish exact runtime Secret RPC, parsing and scope outcomes with allowlisted booleans; no messages or writes.

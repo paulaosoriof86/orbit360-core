@@ -1,0 +1,62 @@
+{
+  "schema": "GI_I66_EMAIL_AUTOMATIC_CLASSIFICATION_OWNER_DECISION_V1",
+  "recordType": "ADDITIVE_OWNER_SCOPE_DECISION_NOT_LIVE_ACCEPTANCE",
+  "dateGuatemala": "2026-11-24",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "gate": "I6.6",
+  "objective": "A13",
+  "status": "OWNER_AUTHORIZED_IMPLEMENTATION_AND_PROOF_PENDING",
+  "authority": {
+    "source": "DIRECCION_EXPLICIT_REQUEST_USER_INPUT_ACTIVE_PROJECT_CONVERSATION",
+    "questionId": "email_ingestion_classification",
+    "questionScope": "Nuevas solicitudes de cotización cuando la identidad y el tipo son inequívocos",
+    "selectedLabel": "Crear Lead automáticamente (Recommended)",
+    "selectedDescription": "Crear un Lead pendiente de Operaciones; vincular los correos operativos a su expediente y enviar las ambigüedades a revisión",
+    "alternativeNotSelected": "Revisar antes de crear",
+    "scopeContractPath": "artifacts/orbit360-recovery/release-control/I6_6_A13_CHANNEL_SCOPE_AND_EXISTING_EXECUTORS_20261124.json",
+    "scopeContractBlobSha": "7ce546736ac8d08b8ac922d19f3e6e4c2bac0021",
+    "perUserDecisionPath": "artifacts/orbit360-recovery/release-control/I6_6_OWNER_DECISIONS_GREENAPI_EMAIL_AND_PAYMENT_20261119.json"
+  },
+  "approvedBehavior": {
+    "unambiguousNewQuoteRequest": "CREATE_CANONICAL_LEAD_PENDING_OPERATIONS",
+    "operationalEmailWithExactUniquePermittedCase": "LINK_EMAIL_TO_EXISTING_CASE",
+    "ambiguousIntentIdentityOrRelationship": "REVIEW_WITHOUT_AUTOMATIC_BUSINESS_WRITE",
+    "duplicateMessageOrReplay": "VERIFY_EXISTING_RESULT_WITHOUT_DUPLICATE_CANONICAL_ENTITY",
+    "actor": "AUTHENTICATED_INTEGRATION_ACTOR_NOT_IMPERSONATED_HUMAN",
+    "mailboxIsolation": "EXPLICIT_VERIFIED_USER_MAILBOX_BINDING",
+    "outboundAllowed": false,
+    "automaticFinancialPostingAllowed": false,
+    "automaticClaimStateChangeAllowed": false,
+    "newScenariosOrConnectionsAuthorizedByThisReceipt": false,
+    "historicalBackfillAuthorizedByThisReceipt": false,
+    "fullPersonalMailboxUiMovedFromPhaseB": false
+  },
+  "existingExecutor": {
+    "scenarioId": 10221181,
+    "connectionId": 14756803,
+    "authorizationRequestStatusObserved": "authorized",
+    "authorizationRequestId": "dd6d4e7b-3cc6-4fcc-9ba8-9e20ff6eb726",
+    "authorizationReadbackContainsLoginIdentity": false,
+    "currentModules": [
+      "scenario-service:StartSubscenario",
+      "email:ActionGetEmails",
+      "scenario-service:ReturnData"
+    ],
+    "erpWriterCurrentlyConfigured": false,
+    "providerMailboxOwnerVerified": false,
+    "existingScenarioChangedByThisReceipt": false
+  },
+  "requiredImplementationEvidence": [
+    "Verify actual connection login/mailbox identity independently of its label and match an explicit active GT user binding",
+    "Verify authenticated IMAP source evidence and complete Message-ID/References before any automatic classification writes",
+    "Use the existing canonical Ops/Leads transaction through a separately validated email internal capability, never sourceType=ad",
+    "Preserve a cursor with a bounded overlap and detectable result limit; the current module does not expose UIDVALIDITY or an authenticated exact delivery timestamp",
+    "Reject or review conflicting sender/reply/identity/intent, competing entities, source changes and ambiguous thread references",
+    "Execute signed Preview and exact LIVE readback, replay and two-user mailbox isolation before declaring inbound integration accepted"
+  ],
+  "realProviderReadsByThisDecision": 0,
+  "canonicalWrites": 0,
+  "messagesSent": 0,
+  "liveAccepted": false
+}

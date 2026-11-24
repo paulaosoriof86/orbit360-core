@@ -1,0 +1,65 @@
+{
+  "schema": "GI_I66_FRONTEND_POST_UI_NETWORK_ROLLBACK_V1",
+  "gate": "I6.6",
+  "generation": 4,
+  "status": "EXACT_LIVE_UI_PASS_RELEASE_METADATA_FAILED_PREVIOUS_VERSION_RESTORED",
+  "sourceSha": "658246bb953c0c1b7aa6f54e98cd5c4e39c5b85d",
+  "buildId": "gi-i66-658246bb953c-57f234755dc1",
+  "artifactId": 14900297283,
+  "artifactDigest": "sha256:58a2286811ba8b5ce891d07a24bddabddd1700ca61cb6daccd71ef3fe248b0a7",
+  "execution": {
+    "runId": 45355676984,
+    "jobId": 138312762792,
+    "conclusion": "failure"
+  },
+  "liveUi": {
+    "status": "FRONTEND_SIX_RECEIPTS_TWO_ROLE_TWO_VIEW_READONLY_PASS",
+    "stageCount": 48,
+    "reportArtifactId": 14903760100,
+    "artifactDigest": "sha256:3d6459d254af71eebb65ce4f0105f36760073292f1482af25e4c3447e29dd8a4",
+    "reportSha256": "eb61d774ec669d1b70b23b88af1fb81495832c81c821a0acb94645dcdb87efde",
+    "authorityBlob": "a4958991350f76571faf571d9202d8911488d2b7",
+    "physicalPhaseKey": "2edbdb07d990fbf87593601d18b431456ae3a9d98ac547d244a396fc0bcf0a9e",
+    "sourceAndServerSnapshotsUnchanged": true,
+    "firestoreWrites": 0,
+    "businessActions": 0,
+    "paymentActions": 0
+  },
+  "failure": {
+    "classification": "RELEASE_COMPOSITION_PROVIDER_NETWORK",
+    "observedReason": "fetch failed",
+    "operation": "SAVE_SIGNED_LIVE_UI_RECEIPT",
+    "liveUiReceiptPersisted": false,
+    "releaseAccepted": false
+  },
+  "rollback": {
+    "journalPath": "artifacts/orbit360-recovery/release-control/I6_6_FRONTEND_E00004_JOURNAL.json",
+    "journalBlob": "393cfc09bb456690bc52d3f42f9472a278800da8",
+    "journalCommit": "e72d14cfac6ea3be17d81d36e8861b73bf0ab758",
+    "phase": "ROLLED_BACK",
+    "physical": {
+      "firebase": 224,
+      "custom": 224,
+      "sourceSha": "65c825b2808a615ca4195bdde6689dbdbe3193b2",
+      "buildId": "gi-i66-65c825b2808a-57f234755dc1",
+      "artifactDigest": "sha256:7cb782848a45083047c4899bc30c13bf5be46429607e42597d09342becfc9acc",
+      "hostingVersion": "sites/ays-orbit-360-lab/versions/332999a55b189108",
+      "manifestDigest": "sha256:da40e7ad3f453107a44fdc868a58ff469f91139252c0204f9fc298a8d9f02905"
+    }
+  },
+  "successor": {
+    "generation": 5,
+    "targetUnchanged": true,
+    "artifactRebuilt": false,
+    "ownerCodeChanged": false,
+    "previewReceiptReusedExact": true,
+    "previewReceiptPath": "artifacts/orbit360-recovery/release-control/I6_6_FRONTEND_E00004_PREVIEW_UI.json",
+    "previewReceiptBlob": "956e2676d2f9d6cfe18ed0af92784574862ae232",
+    "previewRunId": 45351824251,
+    "existingOwnerAttemptHistoryValidationPassed": true,
+    "liveReadbackRequiredAgain": true
+  },
+  "fullA04Accepted": false,
+  "fullA12Passed": false,
+  "globalGateAccepted": false
+}
