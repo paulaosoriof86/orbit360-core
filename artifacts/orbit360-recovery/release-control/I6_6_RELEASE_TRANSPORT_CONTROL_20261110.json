@@ -7504,10 +7504,10 @@
     "artifactDigest": "sha256:7770d117745170604bcdd860d7c44beea97027c869c674c6ac162d3a9160e7f4",
     "approvedByDirection": true,
     "externalMessagesSent": 0,
-    "action": "VERIFY_PROBE",
-    "version": 1,
+    "action": "BIND_PRINCIPAL",
+    "version": 2,
     "expectedConfigDigest": "ed2ec7177ce54a4ae52b32f6fd3a51fe9594d98df51f079ea2712debaa23206f",
-    "expiresAt": "2026-11-24T17:14:07Z",
+    "expiresAt": "2026-11-24T17:14:30Z",
     "probeRequestId": "ttrxWV1VJ2d2jaM9WUO2",
     "makeExecutionReceipt": {
       "path": "artifacts/orbit360-recovery/release-control/I6_6_MAKE_V23_PREVIEW_PROBE_EXECUTION_20261124.json",
