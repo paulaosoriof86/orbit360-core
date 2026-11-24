@@ -9,6 +9,7 @@ const source=require('../artifacts/orbit360-recovery/source-batches/I6_6_ROBLE_T
 const five=require('../artifacts/orbit360-recovery/source-batches/I6_6_ROBLE_FIVE_ISSUED_49_REQUIREMENTS_20261122.json');
 const witness=require('../artifacts/orbit360-recovery/source-batches/I6_6_ROBLE_FIVE_ISSUED_IDENTITY_WITNESSES_20261122.json');
 const originals=require('./gravicentra-i66-roble-issued-original.cjs');
+const {sourceAliases}=require('./gravicentra-i66-source-bulk-plan.cjs');
 const sha=v=>crypto.createHash('sha256').update(String(v)).digest('hex');
 const norm=v=>String(v==null?'':v).normalize('NFD').toUpperCase().replace(/[^A-Z0-9]/g,'');
 const cents=n=>Math.round(Number(n)*100);
@@ -201,4 +202,121 @@ function mutation(c,identity,at){
     sourceCalendarGrossCents:c.issuedScheduleGrossCents,originalGrossCents:hdr.grossCents,documentedMinorDeltaCents:c.coverScheduleDeltaCents},
    counts:{creates:creates.length,updates:prior?1:0,audit:1,receipts:installments,portfolio:installments,directPayments:0}};
 }
-module.exports={tenant,project,source,five,witness,policies,cases,check,resolve,resolveIssued,operationFor,mutation,match,sha,originals};
+// The original issued policy is already present under one truncated number.
+// This case corrects those exact existing identities; it never creates a
+// successor, risk, receipt, payment, or another current obligation.
+const existingIdentityTarget=Object.freeze({policy:'91-4140843',storedNumber:'91-414084',
+ policyId:'pol_7ab15779e3626402f1cb4349fa69',vehicleId:'veh_89b8d29c9ed558c356dc0f75',
+ receiptId:'rec_i65_59e37e009188644b34059e4a',portfolioId:'car_i65_ed31ae1fb408d4a4e95d2ca3',
+ requirement:'5574011',operationalDate:'2026-09-25',contractualDate:'2026-10-10'});
+const stable=x=>x&&typeof x==='object'?(typeof x.toJSON==='function'?stable(x.toJSON()):
+ Array.isArray(x)?x.map(stable):Object.fromEntries(Object.keys(x).sort().filter(k=>x[k]!==undefined).map(k=>[k,stable(x[k])]))):x;
+const stableHash=x=>sha(JSON.stringify(stable(x)));
+const text=x=>String(x??'').trim();
+function existingOperation(c){
+ assert.equal(c.policy,existingIdentityTarget.policy);
+ return 'gi_i66_roble_identity_'+sha([tenant,existingIdentityTarget.policyId,c.sourcePdfRawSha256,
+  existingIdentityTarget.requirement].join('|')).slice(0,24);
+}
+function resolveExisting(c,arrays,matcher=match,corrected=false){
+ const t=existingIdentityTarget,w=witness.witnesses.find(x=>x.policy===c.policy),bad=reason=>({status:reason});
+ if(c.policy!==t.policy||!c.originalVerified||!c.originalProof?.contractHolderVerified||
+  !c.originalProof?.sourceScheduleVerified||c.originalProof?.certificateCount!==1||c.schedule.length!==1||
+  c.schedule[0].requirement!==t.requirement||c.schedule[0].due!==t.contractualDate||
+  c.schedule[0].grossCents!==374740||c.issuerHeader.netCents!==278180)return bad('EXISTING_ISSUER_PROOF_REQUIRED');
+ const holders=arrays.clientes.filter(x=>x.pais==='GT'&&[x.nombre,x.nombreCompleto,x.razonSocial].some(n=>matcher(w,n,'holderWitness')));
+ const insurers=arrays.aseguradoras.filter(x=>x.pais==='GT'&&x.activo!==false&&/roble/i.test(x.nombre||''));
+ const p=arrays.polizas.find(x=>x.id===t.policyId);
+ if(holders.length!==1||insurers.length!==1||!p)return bad('EXISTING_POLICY_HOLDER_INSURER_NOT_UNIQUE');
+ if(p.pais!=='GT'||p.clienteId!==holders[0].id||p.aseguradoraId!==insurers[0].id||
+  p.vigenciaInicio!==c.termStart||p.vigenciaFin!==c.termEnd||/cancelad|anulad|renovada/i.test(p.estado||''))
+  return bad('EXISTING_POLICY_EDITION_CONFLICT');
+ const fields=['numero','numeroPoliza','polizaNumero'];
+ const allowed=corrected?norm(c.policy):norm(t.storedNumber);
+ if(!text(p.numero)||fields.some(k=>text(p[k])&&norm(p[k])!==allowed))return bad('EXISTING_POLICY_NUMBER_CONFLICT');
+ const compatible=arrays.polizas.filter(x=>fields.some(k=>[norm(c.policy),norm(t.storedNumber)].includes(norm(x[k]))));
+ if(compatible.some(x=>!['GT','CO'].includes(x.pais)))return bad('EXISTING_COMPATIBLE_COUNTRY_UNVERIFIED');
+ if(compatible.some(x=>x.id!==p.id&&x.pais==='GT'&&(!/^\d{4}-\d{2}-\d{2}$/.test(x.vigenciaFin||'')||
+  x.vigenciaFin>c.termStart)))return bad('EXISTING_COMPETING_POLICY_EDITION');
+ const advisors=arrays.asesores.filter(a=>a.id===p.asesorId&&a.id===holders[0].asesorId&&a.activo!==false&&
+  (!a.pais||a.pais==='GT'||Array.isArray(a.paises)&&a.paises.includes('GT')));
+ if(advisors.length!==1)return bad('EXISTING_ADVISOR_UNVERIFIED');
+ const owned=arrays.vehiculos.filter(v=>v.polizaId===p.id),vehicle=owned.find(v=>v.id===t.vehicleId);
+ if(owned.length!==1||!vehicle||vehicle.clienteId!==p.clienteId||vehicle.pais!=='GT'||
+  ![vehicle.placa,vehicle.placaFuente].some(v=>matcher(w,v,'initialCertificatePlateWitness'))||
+  [vehicle.placa,vehicle.placaFuente].filter(v=>text(v)).some(v=>!matcher(w,v,'initialCertificatePlateWitness'))||
+  [vehicle.vin,vehicle.chasis,vehicle.chasisFuente].filter(v=>text(v)).some(v=>!matcher(w,v,'initialCertificateVinWitness')))
+  return bad('EXISTING_CURRENT_RISK_NOT_UNIQUE');
+ const risks=arrays.vehiculos.filter(v=>[v.placa,v.placaFuente].some(n=>matcher(w,n,'initialCertificatePlateWitness'))||
+  [v.vin,v.chasis,v.chasisFuente].some(n=>matcher(w,n,'initialCertificateVinWitness')));
+ const parents=new Map(arrays.polizas.map(p=>[p.id,p]));
+ if(risks.some(v=>{if(v.id===vehicle.id)return false;const parent=parents.get(v.polizaId);
+  return v.clienteId!==p.clienteId||v.pais!=='GT'||!parent||parent.pais!=='GT'||parent.clienteId!==p.clienteId||
+   !/^\d{4}-\d{2}-\d{2}$/.test(parent.vigenciaFin||'')||parent.vigenciaFin>c.termStart;}))
+  return bad('EXISTING_CURRENT_RISK_COMPETITOR');
+ return {status:'ELIGIBLE_EXISTING_IDENTITY_CORRECTION',policy:p,holder:holders[0],insurer:insurers[0],advisor:advisors[0],vehicle,
+  preservedVehicleIds:risks.map(v=>v.id),preservedPolicyIds:[...new Set(risks.map(v=>v.polizaId).filter(id=>id!==p.id))]};
+}
+function existingFinancial(c,identity,snapshot){
+ const t=existingIdentityTarget,p=identity.policy,bad=reason=>({status:reason});
+ if(identity.status!=='ELIGIBLE_EXISTING_IDENTITY_CORRECTION'||!snapshot?.complete||!Array.isArray(snapshot.records)||!Array.isArray(snapshot.policies))
+  return bad('EXISTING_COMPLETE_FINANCIAL_CENSUS_REQUIRED');
+ if(p.moneda!=='GTQ'||cents(p.primaTotal)!==374740||cents(p.primaNeta)!==278180||p.frecuencia!=='Pago Único'||
+  text(p.renuevaDe)||text(p.renovadaPor)||text(p.vehiculoId)&&p.vehiculoId!==t.vehicleId||
+  text(p.documentRef)&&p.documentRef!==c.sourcePdfId||text(p.issuerDocumentSha256)&&p.issuerDocumentSha256!==c.sourcePdfRawSha256)
+  return bad('EXISTING_POLICY_FULL_PREIMAGE_CONFLICT');
+ const rows=snapshot.records,receipts=new Map(rows.filter(r=>r.collection==='recibosEsperados').map(r=>[r.id,r]));
+ const policies=new Map(snapshot.policies.map(p=>[p.id,p]));
+ const referenceFields=[...sourceAliases,'numeroRecibo','sourceRef','sourceId','evidenceId','sourceCaseId'];
+ const related=rows.filter(r=>{
+  const parents=[r.polizaId,r.policyId].map(text).filter(Boolean),links=[r.reciboId,r.receiptId,r.reciboEsperadoId].map(text).filter(Boolean);
+  const inherited=links.flatMap(id=>{const x=receipts.get(id);return x?[x.polizaId,x.policyId].map(text).filter(Boolean):[];});
+  if([...parents,...inherited].includes(p.id)||links.includes(t.receiptId)||[t.receiptId,t.portfolioId].includes(r.id))return true;
+  if(referenceFields.some(k=>text(r[k])===t.requirement))return true;
+  const orphan=![...parents,...inherited].length||[...parents,...inherited].some(id=>!policies.has(id));
+  const number=['polizaNumero','numeroPoliza','policyNumber','policyNumberSource'].some(k=>[norm(c.policy),norm(t.storedNumber)].includes(norm(r[k])));
+  const dated=['fechaLimite','fechaVencimientoContractual','fechaVencimiento','vence','periodoInicioFuente']
+   .some(k=>[c.termStart,t.operationalDate,t.contractualDate].includes(text(r[k])));
+  const gross=['primaTotal','monto','montoTotal'].some(k=>r[k]!=null&&cents(r[k])===374740);
+  return orphan&&(number||dated&&gross);
+ });
+ if(related.length!==2||!related.some(r=>r.collection==='recibosEsperados'&&r.id===t.receiptId)||
+  !related.some(r=>r.collection==='carteraPrimas'&&r.id===t.portfolioId))return bad('EXISTING_FINANCIAL_IDENTITY_NOT_UNIQUE');
+ for(const r of related){
+  if(r.polizaId!==p.id||text(r.policyId)&&r.policyId!==p.id||r.clienteId!==p.clienteId||
+   text(r.clientId)&&r.clientId!==p.clienteId||r.aseguradoraId!==p.aseguradoraId||r.asesorId!==p.asesorId||
+   r.moneda!=='GTQ'||r.collection==='carteraPrimas'&&r.reciboId!==t.receiptId||
+   ['reciboId','receiptId','reciboEsperadoId'].some(k=>text(r[k])&&r[k]!==t.receiptId))
+   return bad('EXISTING_FINANCIAL_RELATION_CONFLICT');
+  if(cents(r.primaTotal)!==374740||['monto','montoTotal','grossAmount','amount'].some(k=>r[k]!=null&&cents(r[k])!==374740)||
+   ['primaNeta','neta'].some(k=>r[k]!=null&&cents(r[k])!==278180))return bad('EXISTING_FINANCIAL_AMOUNT_CONFLICT');
+  if(r.numeroReciboFuente!=='1/1'||r.serie!=='1/1'||norm(r.polizaNumero)!==norm(t.storedNumber)||
+   sourceAliases.filter(k=>k!=='numeroReciboFuente').some(k=>text(r[k])&&text(r[k])!==t.requirement)||
+   ['numeroPoliza','policyNumber','policyNumberSource'].some(k=>text(r[k])&&norm(r[k])!==norm(t.storedNumber))||
+   text(r.fechaLimite)!==t.operationalDate||['fechaVencimientoContractual','fechaVencimiento','vence']
+    .some(k=>text(r[k])&&text(r[k])!==t.contractualDate))return bad('EXISTING_FINANCIAL_SOURCE_PREIMAGE_CONFLICT');
+  if(['pagado','pagada','conciliado','conciliadoPago','inferredPaid','reportedPaid','confirmado'].some(k=>text(r[k])&&r[k]!==false)||
+   ['fechaPago','paidDate','fechaPagoReportada','actualPaidDate','cobroId','paymentState','applicationState','directOrInferred','reportado']
+    .some(k=>text(r[k])&&r[k]!==false)||[r.estado,r.estadoCartera,r.estadoOperativo].some(v=>/pagad|paid|applied|conciliad|cancelad|anulad/i.test(text(v))))
+   return bad('EXISTING_PAYMENT_OR_TERMINAL_EVIDENCE');
+ }
+ return {status:'ELIGIBLE_EXISTING_IDENTITY_CORRECTION',records:related};
+}
+function existingMutation(c,identity,financial,at){
+ assert.equal(identity.status,'ELIGIBLE_EXISTING_IDENTITY_CORRECTION');assert.equal(financial.status,identity.status);
+ const t=existingIdentityTarget,operation=existingOperation(c),r=c.schedule[0];
+ const proof={operation,sourcePdfId:c.sourcePdfId,sourcePdfSha256:c.sourcePdfRawSha256,
+  sourceRequirement:r.requirement,previousPolicyNumber:t.storedNumber,recordedAt:at};
+ const policyPatch={numero:c.policy,numeroPoliza:c.policy,polizaNumero:c.policy,vehiculoId:t.vehicleId,
+  documentRef:c.sourcePdfId,issuerDocumentSha256:c.sourcePdfRawSha256,issuedIdentityCorrection:proof};
+ const financialPatch={polizaNumero:c.policy,numeroReciboFuente:r.requirement,
+  fechaVencimientoContractual:r.due,fechaVencimiento:r.due,vence:r.due,
+  sourceDocumentRef:c.sourcePdfId,issuerDocumentSha256:c.sourcePdfRawSha256,
+  issuedIdentityCorrection:{...proof,previousReceiptReference:'1/1',preservedOperationalDate:t.operationalDate}};
+ const updates=[['polizas',identity.policy,policyPatch],...financial.records.map(row=>[row.collection,row,
+  {...financialPatch,...Object.fromEntries(['numeroPoliza','policyNumber','policyNumberSource'].filter(k=>text(row[k])).map(k=>[k,c.policy]))}])];
+ return {operation,updates,counts:{updates:3,audit:1,receiptsCreated:0,portfolioCreated:0,paymentsCreated:0,
+  existingReceiptsCorrected:1,preservedGrossCents:r.grossCents}};
+}
+module.exports={tenant,project,source,five,witness,policies,cases,check,resolve,resolveIssued,operationFor,mutation,match,sha,originals,
+ existingIdentityTarget,existingOperation,resolveExisting,existingFinancial,existingMutation,stableHash};

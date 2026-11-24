@@ -64,6 +64,7 @@ async function scoped(tx,c){
     reason:/^[A-Z0-9_]+$/.test(error.message)?error.message:'PRIVATE_IDENTITY_DIAGNOSTIC_FAILED'});
   }
  }
+ if(c.policy===C.existingIdentityTarget.policy)return scopedExisting(tx,c,arrays);
  // A replay must prove the exact existing operation, not classify its own
  // successor as a new ambiguity. Competing editions/risk references still hold.
  if(check.evidence.holderCount===1&&check.evidence.insurerCount===1&&check.holder&&check.insurer&&
@@ -154,7 +155,115 @@ async function scoped(tx,c){
  return{result:{case:c.policy,status:'COMMITTED',writes:muts.creates.length+(old?2:1),
    operation:muts.operation,pendingGrossCents:c.issuedScheduleGrossCents}};
 }
+async function scopedExisting(tx,c,arrays){
+ const t=C.existingIdentityTarget,operation=C.existingOperation(c),audit=tenant.collection('operationalRequests').doc(operation);
+ const recorded=await tx.get(audit);
+ if(recorded.exists){
+  assert.equal(recorded.get('schema'),'GI_I66_ROBLE_EXISTING_IDENTITY_CORRECTION_V1');
+  assert.equal(recorded.get('operation'),operation);assert.equal(recorded.get('policy'),c.policy);
+  assert.equal(recorded.get('status'),'COMMITTED');
+  return {result:{case:c.policy,status:'ALREADY_APPLIED_READBACK_REQUIRED',operation,writes:0}};
+ }
+ if(mode==='readback')return {result:fail('EXISTING_EXACT_SIGNED_AUDIT_REQUIRED',c.policy)};
+ if(mode==='apply'&&!Object.hasOwn(expectedPreimages,c.policy))return {result:fail('NOT_ELIGIBLE_IN_SIGNED_PREFLIGHT',c.policy)};
+ let identity=C.resolveExisting(c,arrays);
+ if(identity.status!=='ELIGIBLE_EXISTING_IDENTITY_CORRECTION')return {result:fail(identity.status,c.policy)};
+ const keys=[['polizas',t.policyId],['recibosEsperados',t.receiptId],['carteraPrimas',t.portfolioId],
+  ['clientes',identity.holder.id],['aseguradoras',identity.insurer.id],['asesores',identity.advisor.id],
+  ...identity.preservedVehicleIds.map(id=>['vehiculos',id]),...identity.preservedPolicyIds.map(id=>['polizas',id])];
+ const snapshots=await tx.getAll(...keys.map(([collection,id])=>col(collection).doc(id)));
+ if(snapshots.some(s=>!s.exists))return {result:fail('EXISTING_PARENT_OR_FINANCIAL_PREIMAGE_MISSING',c.policy)};
+ const full={...arrays};
+ for(const collection of ['polizas','clientes','aseguradoras','asesores','vehiculos'])
+  full[collection]=arrays[collection].map(p=>{const index=keys.findIndex(([k,id])=>k===collection&&id===p.id);
+   return index<0?p:row(snapshots[index]);});
+ identity=C.resolveExisting(c,full);
+ if(identity.status!=='ELIGIBLE_EXISTING_IDENTITY_CORRECTION')return {result:fail(identity.status,c.policy)};
+ const paid=require('./gravicentra-i66-cendoso-paid-protected.cjs'),source=paid.loadSource();
+ const financialSnapshot=await paid.readHistoricalSnapshot(db,source,tx);
+ const financial=C.existingFinancial(c,identity,financialSnapshot);
+ if(financial.status!=='ELIGIBLE_EXISTING_IDENTITY_CORRECTION')return {result:fail(financial.status,c.policy)};
+ const digest=beforeDigest(snapshots),at=new Date().toISOString(),mutation=C.existingMutation(c,identity,financial,at);
+ if(mode==='preflight')return {result:{case:c.policy,status:'ELIGIBLE',beforeDigest:digest,
+  additions:0,updates:3,auditCreates:1,expectedReceiptsCreated:0,expectedPortfolioCreated:0,
+  existingReceiptsCorrected:1,existingPortfolioCorrected:1,preservedGrossCents:374740,
+  contractualDate:c.schedule[0].due,preservedOperationalDate:t.operationalDate,
+  sourceRequirement:t.requirement,realFinancialWrites:0,original:c.originalProof,
+  financialCensusCounts:Object.fromEntries(['recibosEsperados','carteraPrimas','cobros']
+   .map(k=>[k,financialSnapshot.records.filter(r=>r.collection===k).length]))}};
+ assert.equal(expectedPreimages[c.policy],digest,'EXISTING_IDENTITY_CAS_PREIMAGE_CHANGED');
+ const records=mutation.updates.map(([collection,record,patch])=>{
+  const index=keys.findIndex(([k,id])=>k===collection&&id===record.id);assert.ok(index>=0);
+  return {collection,id:record.id,before:snapshots[index].data(),patch,after:{...snapshots[index].data(),...patch}};
+ });
+ const preserved=keys.map(([collection,id],i)=>({collection,id,before:snapshots[i].data()}))
+  .filter(p=>!records.some(r=>r.collection===p.collection&&r.id===p.id));
+ for(const r of records)tx.update(col(r.collection).doc(r.id),r.patch);
+ tx.create(audit,{schema:'GI_I66_ROBLE_EXISTING_IDENTITY_CORRECTION_V1',status:'COMMITTED',operation,
+  policy:c.policy,policyId:t.policyId,sourcePdfId:c.sourcePdfId,sourcePdfSha256:c.sourcePdfRawSha256,
+  sourceRequirement:t.requirement,sourceOriginalProof:c.originalProof,beforeDigest:digest,
+  records,preserved,counts:mutation.counts,createdAt:at,runId:process.env.GITHUB_RUN_ID});
+ return {result:{case:c.policy,status:'COMMITTED',operation,writes:4,existingReceiptsCorrected:1,
+  existingPortfolioCorrected:1,receiptsCreated:0,portfolioCreated:0,preservedGrossCents:374740}};
+}
+async function verifyExisting(c,operation){
+ return db.runTransaction(async tx=>{
+  const t=C.existingIdentityTarget,a=await tx.get(tenant.collection('operationalRequests').doc(operation));
+  assert.ok(a.exists,'EXISTING_AUDIT_REQUIRED');const data=a.data();
+  assert.equal(operation,C.existingOperation(c));assert.equal(data.schema,'GI_I66_ROBLE_EXISTING_IDENTITY_CORRECTION_V1');
+  assert.equal(data.operation,operation);assert.equal(data.status,'COMMITTED');assert.equal(data.policy,c.policy);
+  assert.equal(data.policyId,t.policyId);assert.equal(data.sourcePdfId,c.sourcePdfId);
+  assert.equal(data.sourcePdfSha256,c.sourcePdfRawSha256);assert.equal(data.sourceRequirement,t.requirement);
+  assert.deepEqual(data.sourceOriginalProof,c.originalProof);
+  assert.match(data.createdAt,/^\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d\.\d{3}Z$/);
+  const records=data.records||[],preserved=data.preserved||[];
+  assert.equal(records.map(r=>r.collection+'|'+r.id).sort().join('\n'),
+   ['polizas|'+t.policyId,'recibosEsperados|'+t.receiptId,'carteraPrimas|'+t.portfolioId].sort().join('\n'));
+  assert.ok(preserved.length>=4&&preserved.length<=50,'EXISTING_PRESERVED_PARENT_SCOPE');
+  const arrays={polizas:[],clientes:[],aseguradoras:[],asesores:[],vehiculos:[]};
+  for(const r of [...records,...preserved])if(arrays[r.collection])arrays[r.collection].push({...r.before,id:r.id});
+  const identity=C.resolveExisting(c,arrays);assert.equal(identity.status,'ELIGIBLE_EXISTING_IDENTITY_CORRECTION');
+  const financial={complete:true,policies:arrays.polizas,records:records.filter(r=>r.collection!=='polizas')
+   .map(r=>({...r.before,id:r.id,collection:r.collection}))};
+  const match=C.existingFinancial(c,identity,financial);assert.equal(match.status,'ELIGIBLE_EXISTING_IDENTITY_CORRECTION');
+  const expected=C.existingMutation(c,identity,match,data.createdAt);assert.deepEqual(data.counts,expected.counts);
+  for(const [collection,row,patch] of expected.updates){
+   const r=records.find(r=>r.collection===collection&&r.id===row.id);assert.deepEqual(r.patch,patch);
+   assert.equal(C.stableHash(r.after),C.stableHash({...r.before,...patch}));
+  }
+  const fresh=await tx.getAll(...[...records,...preserved].map(r=>col(r.collection).doc(r.id)));
+  for(let i=0;i<fresh.length;i++){
+   assert.ok(fresh[i].exists,'EXISTING_READBACK_DOCUMENT_MISSING');
+   assert.deepEqual(fresh[i].data(),i<records.length?records[i].after:preserved[i-records.length].before,
+    'EXISTING_READBACK_POSTIMAGE_OR_PRESERVED_PARENT_DRIFT');
+  }
+  // Repeat the global identity census during independent readback, including
+  // orphan aliases and new competing editions inserted after the first plan.
+  const [policies,vehicles,clients,insurers,advisors]=await Promise.all([
+   tx.get(col('polizas').limit(2500)),tx.get(col('vehiculos').limit(2000)),
+   tx.get(col('clientes').where('pais','==','GT').limit(1000)),
+   tx.get(col('aseguradoras').where('pais','==','GT').limit(100)),tx.get(col('asesores').limit(400))]);
+  assert.ok(policies.size<2500&&vehicles.size<2000&&clients.size<1000&&insurers.size<100&&advisors.size<400);
+  const current={polizas:policies.docs.map(row),vehiculos:vehicles.docs.map(row),clientes:clients.docs.map(row),
+   aseguradoras:insurers.docs.map(row),asesores:advisors.docs.map(row)};
+  assert.equal(C.resolveExisting(c,current,C.match,true).status,'ELIGIBLE_EXISTING_IDENTITY_CORRECTION',
+   'EXISTING_READBACK_COMPETING_IDENTITY');
+  const paid=require('./gravicentra-i66-cendoso-paid-protected.cjs');
+  const census=await paid.readHistoricalSnapshot(db,paid.loadSource(),tx);
+  // Re-evaluate absence using the exact stored preimages for the three changed
+  // documents. All other current records and aliases remain in the census.
+  const restored={...census,records:census.records.map(r=>{const old=records.find(x=>x.collection===r.collection&&x.id===r.id);
+   return old?{...old.before,id:old.id,collection:old.collection}:r;})};
+  assert.equal(C.existingFinancial(c,identity,restored).status,'ELIGIBLE_EXISTING_IDENTITY_CORRECTION',
+   'EXISTING_READBACK_COMPETING_FINANCIAL_RECORD');
+  return {case:c.policy,existingPolicyCorrected:1,receipts:1,portfolio:1,payments:0,
+   receiptsCreated:0,portfolioCreated:0,vehiclePreserved:1,priorPoliciesPreserved:preserved.filter(r=>r.collection==='polizas').length,
+   preservedGrossCents:374740,contractualDate:t.contractualDate,preservedOperationalDate:t.operationalDate,
+   originalRunId:data.runId,beforeDigest:data.beforeDigest,auditIdDigest:C.sha(operation),policyIdDigest:C.sha(t.policyId)};
+ },{readOnly:true});
+}
 async function verify(c,operation){
+ if(c.policy===C.existingIdentityTarget.policy&&operation===C.existingOperation(c))return verifyExisting(c,operation);
  return db.runTransaction(async tx=>{
   const audit=tenant.collection('operationalRequests').doc(operation),a=await tx.get(audit);
   assert.ok(a.exists,'TWO_AUDIT_REQUIRED');

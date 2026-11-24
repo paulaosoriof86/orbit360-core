@@ -196,7 +196,9 @@ async function executeProtected(c,state,mode,expected={},identityMatcher=origina
  const modules={
   'firebase-admin':{initializeApp:()=>{},credential:{applicationDefault:()=>({})},firestore},
   'google-auth-library':{GoogleAuth:class{async getClient(){return {getRequestHeaders:async()=>({})};}}},
-  './gravicentra-i66-roble-two-issued-plan.cjs':{...C,cases:[c],resolve:(c,a)=>C.resolve(c,a,identityMatcher),originals:{load:async()=>c}},
+  './gravicentra-i66-roble-two-issued-plan.cjs':{...C,cases:[c],match:identityMatcher,
+   resolve:(c,a)=>C.resolve(c,a,identityMatcher),
+   resolveExisting:(c,a,m=identityMatcher,corrected=false)=>C.resolveExisting(c,a,m,corrected),originals:{load:async()=>c}},
   '../artifacts/orbit360-recovery/release-control/I6_6_20261123_PROTECTED_SOURCE_BULK_REFRESH_REQUEST.json':{readonlyIdentityReadback:identityRequest},
   'node:fs':{appendFileSync:(p,text)=>outputs.push(text)}
  };
@@ -364,13 +366,10 @@ test('protected writer rejects a changed parent after preflight and a source req
  const duplicate=await executeProtected(c,duplicateState,'preflight');
  assert.equal(duplicate.report.results[0].reason,'ISSUER_REQUIREMENT_ALREADY_USED');assert.equal(duplicate.report.totals.writes,0);
 });
-test('external issued renewal uses one obligation and the canonical holder advisor without inventing a predecessor',async()=>{
+test('4140843 cannot create a replacement when its observed existing edition is missing',async()=>{
  const c=newCases()[2],state=isolatedStore(newFixture(c)),preflight=await executeProtected(c,state,'preflight');
- assert.equal(preflight.report.results[0].expectedReceipts,1);assert.equal(preflight.report.results[0].updates,0);
- const applied=await executeProtected(c,state,'apply',{[c.policy]:preflight.report.results[0].beforeDigest});
- assert.equal(applied.exitCode,0,applied.errors.join('\n'));
- assert.equal(applied.report.results[0].readback.externalRenewal,1);assert.equal(applied.report.totals.writes,6);
- assert.equal(applied.report.results[0].readback.receipts,1);assert.equal(applied.report.results[0].readback.payments,0);
+ assert.equal(preflight.report.results[0].reason,'EXISTING_POLICY_HOLDER_INSURER_NOT_UNIQUE');
+ assert.equal(preflight.report.totals.eligible,0);assert.equal(preflight.report.totals.writes,0);
 });
 test('new compatible policy with missing country after preflight cannot become a hidden duplicate',async()=>{
  const c=newCases()[0],state=isolatedStore(newFixture(c)),preflight=await executeProtected(c,state,'preflight');
@@ -409,4 +408,95 @@ test('a committed transaction followed by failed readback retains its actual wri
  assert.equal(applied.report.totals.writes,29);assert.equal(applied.report.totals.committed,0);
  assert.equal(applied.report.totals.committedWithReadbackHold,1);
  assert.ok(applied.errors.some(x=>x.includes('I66_TWO_COMMITTED_READBACK_INCOMPLETE')));
+});
+
+function existingFixture(){
+ const c=newCases()[2],t=C.existingIdentityTarget,f=newFixture(c);
+ f.polizas.push({id:t.policyId,numero:t.storedNumber,pais:'GT',moneda:'GTQ',clienteId:'holder',
+  aseguradoraId:'rob',asesorId:'adv',vigenciaInicio:c.termStart,vigenciaFin:c.termEnd,estado:'Vigente',
+  frecuencia:'Pago Único',primaTotal:3747.40,primaNeta:2781.80,originalPrivateField:'PRESERVE_PRIVATE'});
+ f.polizas.push({id:'prior-truncated',numero:t.storedNumber,pais:'GT',clienteId:'holder',aseguradoraId:'rob',
+  asesorId:'adv',vigenciaInicio:'2025-09-10',vigenciaFin:c.termStart,estado:'Renovada'});
+ f.vehiculos.push({id:t.vehicleId,polizaId:t.policyId,clienteId:'holder',pais:'GT',placa:originalPlate(c)});
+ f.vehiculos.push({id:'prior-risk',polizaId:'prior-truncated',clienteId:'holder',pais:'GT',placa:originalPlate(c)});
+ const common={polizaId:t.policyId,clienteId:'holder',aseguradoraId:'rob',asesorId:'adv',moneda:'GTQ',
+  primaTotal:3747.40,numeroReciboFuente:'1/1',serie:'1/1',polizaNumero:t.storedNumber,
+  fechaLimite:t.operationalDate,estadoOperativo:'futuro_pendiente',exigibilidad:'futura',sourceRef:null,
+  sourceRefsI65:[{unmodifiedSource:'ORIGINAL_SOURCE_REFERENCE'}]};
+ f.recibosEsperados=[{...common,id:t.receiptId,primaNeta:2781.80,fechaPagoReportada:''}];
+ f.carteraPrimas=[{...common,id:t.portfolioId,reciboId:t.receiptId}];
+ return {c,t,f};
+}
+test('4140843 corrects exactly three existing records, preserves operational date and 1/1, no new risk/obligation/payment',async()=>{
+ const {c,t,f}=existingFixture(),state=isolatedStore(f),before=JSON.stringify([...state.entries]);
+ const pre=await executeProtected(c,state,'preflight');assert.equal(pre.exitCode,0,pre.errors.join('\n'));
+ assert.equal(pre.report.totals.eligible,1,JSON.stringify(pre.report));assert.equal(JSON.stringify([...state.entries]),before);
+ assert.equal(pre.report.results[0].updates,3);assert.equal(pre.report.results[0].additions,0);
+ const oldParents=new Map([...state.entries].filter(([key])=>!key.includes('/recibosEsperados/')&&!key.includes('/carteraPrimas/')&&
+  !key.endsWith('/polizas/items/'+t.policyId)).map(([key,value])=>[key,state.clone(value.data)]));
+ const applied=await executeProtected(c,state,'apply',{[c.policy]:pre.report.results[0].beforeDigest});
+ assert.equal(applied.exitCode,0,JSON.stringify({report:applied.report,errors:applied.errors}));
+ assert.equal(applied.report.totals.committed,1);assert.equal(applied.report.totals.writes,4);
+ const read=applied.report.results[0].readback;assert.equal(read.receiptsCreated,0);assert.equal(read.payments,0);
+ assert.equal(read.preservedGrossCents,374740);assert.equal(read.priorPoliciesPreserved,1);
+ for(const [key,data] of oldParents)assert.deepEqual(state.entries.get(key).data,data);
+ const policy=state.entries.get(state.base+'/data/polizas/items/'+t.policyId).data;
+ assert.equal(policy.numero,c.policy);assert.equal(policy.vehiculoId,t.vehicleId);
+ assert.equal(policy.originalPrivateField,'PRESERVE_PRIVATE');assert.equal(policy.renuevaDe,undefined);
+ for(const [collection,id] of [['recibosEsperados',t.receiptId],['carteraPrimas',t.portfolioId]]){
+  const r=state.entries.get(state.base+'/data/'+collection+'/items/'+id).data;
+  assert.equal(r.numeroReciboFuente,'5574011');assert.equal(r.serie,'1/1');assert.equal(r.fechaLimite,'2026-09-25');
+  assert.equal(r.fechaVencimientoContractual,'2026-10-10');assert.equal(r.primaTotal,3747.40);
+  assert.deepEqual(r.sourceRefsI65,[{unmodifiedSource:'ORIGINAL_SOURCE_REFERENCE'}]);
+  assert.equal(r.issuedIdentityCorrection.previousReceiptReference,'1/1');
+ }
+ const committed=JSON.stringify([...state.entries]),replay=await executeProtected(c,state,'apply',{}),readback=await executeProtected(c,state,'readback');
+ assert.equal(replay.exitCode,0,replay.errors.join('\n'));assert.equal(readback.exitCode,0,readback.errors.join('\n'));
+ assert.equal(replay.report.totals.alreadyApplied,1);assert.equal(replay.report.totals.writes,0);
+ assert.equal(JSON.stringify([...state.entries]),committed);assert.equal([...state.entries.keys()].filter(k=>k.includes('/cobros/items/')).length,0);
+});
+test('4140843 rejects mismatched identity, source, financial aliases and every payment signal',async()=>{
+ const changes=[
+  f=>{f.polizas[0].numeroPoliza='91-9999999';},f=>{f.polizas[0].moneda='USD';},
+  f=>{f.polizas[0].vigenciaFin='2028-09-10';},f=>{f.polizas[0].clienteId='other';},
+  f=>{f.polizas[0].asesorId='other';},f=>{f.polizas[0].primaNeta=2781.81;},
+  f=>{f.polizas[0].vehiculoId='other';},f=>{f.vehiculos[0].vin='CONTRADICTS_ORIGINAL';},
+  f=>{f.vehiculos[0].placaFuente='OTHER';},f=>{f.recibosEsperados[0].montoTotal=3747.41;},
+  f=>{f.recibosEsperados[0].numeroReciboFuente='5574012';},f=>{f.recibosEsperados[0].serie='2/2';},
+  f=>{f.recibosEsperados[0].numeroReciboAseguradora='5574012';},f=>{f.carteraPrimas[0].conciliado='true';},
+  f=>{f.recibosEsperados[0].fechaVencimientoContractual='2026-09-25';},
+  f=>{f.carteraPrimas[0].reciboId='another';},f=>{f.carteraPrimas[0].policyId='another';},
+  ...['fechaPago','fechaPagoReportada','cobroId','paymentState','applicationState','directOrInferred','reportado']
+   .flatMap(key=>['recibosEsperados','carteraPrimas'].map(collection=>f=>{f[collection][0][key]='CONTRADICTORY';})),
+  ...['conciliado','conciliadoPago','inferredPaid','reportedPaid','confirmado']
+   .flatMap(key=>['recibosEsperados','carteraPrimas'].map(collection=>f=>{f[collection][0][key]=true;}))
+ ];
+ for(const change of changes){const {c,f}=existingFixture();change(f);const state=isolatedStore(f),before=JSON.stringify([...state.entries]);
+  const pre=await executeProtected(c,state,'preflight');assert.equal(pre.report.totals.eligible,0,change.toString());
+  assert.equal(pre.report.totals.writes,0);assert.equal(JSON.stringify([...state.entries]),before);}
+});
+test('4140843 CAS rechecks all parents, orphans, requirements and payment links before any update',async()=>{
+ const changes=[
+  ({state,t})=>{const r=state.entries.get(state.base+'/data/recibosEsperados/items/'+t.receiptId);r.data.comment='changed';r.version++;},
+  ({state})=>state.entries.set(state.base+'/data/polizas/items/country-missing',{data:{numero:'91-4140843',vigenciaInicio:'2026-09-10',vigenciaFin:'2027-09-10'},version:1}),
+  ({state,t})=>state.entries.set(state.base+'/data/cobros/items/new-payment',{data:{reciboId:t.receiptId,polizaId:t.policyId,monto:3747.40},version:1}),
+  ({state})=>state.entries.set(state.base+'/data/recibosEsperados/items/used-requirement',{data:{numeroReciboFuente:'5574011',polizaId:'other'},version:1}),
+  ({state})=>state.entries.set(state.base+'/data/cobros/items/used-payment-reference',{data:{referenciaCobro:'5574011'},version:1}),
+  ({state})=>state.entries.set(state.base+'/data/recibosEsperados/items/orphan',{data:{fechaLimite:'2026-10-10',primaTotal:3747.40},version:1})
+ ];
+ for(const change of changes){const {c,t,f}=existingFixture(),state=isolatedStore(f),pre=await executeProtected(c,state,'preflight');
+  assert.equal(pre.report.totals.eligible,1);change({state,t});const before=JSON.stringify([...state.entries]);
+  const apply=await executeProtected(c,state,'apply',{[c.policy]:pre.report.results[0].beforeDigest});
+  assert.equal(apply.exitCode,1);assert.equal(apply.report.totals.writes,0);assert.equal(JSON.stringify([...state.entries]),before);}
+});
+test('4140843 independent readback rejects tampering or a newly competing requirement',async()=>{
+ for(const change of ['postimage','audit','duplicate']){
+  const {c,t,f}=existingFixture(),state=isolatedStore(f),pre=await executeProtected(c,state,'preflight');
+  const apply=await executeProtected(c,state,'apply',{[c.policy]:pre.report.results[0].beforeDigest});assert.equal(apply.exitCode,0);
+  if(change==='postimage')state.entries.get(state.base+'/data/carteraPrimas/items/'+t.portfolioId).data.primaTotal+=1;
+  if(change==='audit')state.entries.get(state.base+'/operationalRequests/'+C.existingOperation(c)).data.sourcePdfSha256='0'.repeat(64);
+  if(change==='duplicate')state.entries.set(state.base+'/data/recibosEsperados/items/duplicate',{data:{numeroReciboFuente:'5574011'},version:1});
+  const before=JSON.stringify([...state.entries]),readback=await executeProtected(c,state,'readback');
+  assert.equal(readback.exitCode,1);assert.equal(readback.report.totals.writes,0);assert.equal(JSON.stringify([...state.entries]),before);
+ }
 });

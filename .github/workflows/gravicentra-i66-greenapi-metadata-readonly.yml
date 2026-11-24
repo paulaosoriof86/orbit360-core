@@ -1,7 +1,7 @@
 # I6.6 GREENAPI METADATA PROBE -- read-only evidence, no delivery.
 # Manual read-only inventory of existing GCP Secret Manager/Functions/Cloud Run.
 # Metadata job: no payload access. Config job: exact existing secret validation in memory,
-# plus at most one configured advisor read. Neither job sends, writes or deploys.
+# plus at most one configured advisor read and two provider metadata GETs. Neither job sends, writes or deploys.
 name: Gravicentra I6.6 GreenAPI Secure Readiness
 
 on:
@@ -449,6 +449,8 @@ jobs:
       - name: Install existing server dependencies without lifecycle scripts
         working-directory: functions
         run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Verify provider-readiness scope, secret isolation and bounded metadata reads
+        run: node --test tools/gravicentra-i66-greenapi-provider-readiness.test.cjs
       - name: Select existing same-project credential without printing it
         shell: bash
         run: |
@@ -472,4 +474,4 @@ jobs:
       - name: Validate exact existing inbound configuration without payload or credential output
         shell: bash
         run: node tools/gravicentra-i66-greenapi-existing-config-readonly.cjs
-# I6.6 continuation 2026-11-24: inspect only the exact existing inbound configuration; no provider calls or writes.
+# I6.6 continuation 2026-11-24: verify existing runtime secret access and provider identity using bounded metadata GETs; no messages or writes.
