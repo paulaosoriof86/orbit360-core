@@ -1,5 +1,5 @@
 {
-  "phase": "VERIFIED",
+  "phase": "COMMITTED",
   "operation": "ACCEPT_EXECUTED_COMPOSITE_LIVE",
   "key": "203c058c1c6dea5140cc2371a02971383048e020901d212357e1233216bd1278",
   "generation": 3,
@@ -442,5 +442,11 @@
     "runId": 45292163934,
     "headSha": "f509fe1a58c8067aeafe7d655e0244a99328c5ce",
     "recordedAtUtc": "2026-11-24T00:01:11.706Z"
+  },
+  "receipt": {
+    "blob": "11fdb3bee494541513482666d6215f45cbad0567",
+    "commit": "f80c37e174406ccb489569b3bc7dd6073c2c4273",
+    "verified": true,
+    "runId": 45292163934
   }
 }

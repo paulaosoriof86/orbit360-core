@@ -4,7 +4,7 @@
   "productBrand": "Gravicentra Insurance",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
-  "status": "OPERATIONAL_EXACT_LIVE_PROMOTION_AUTHORIZED",
+  "status": "OPERATIONAL_EXACT_LIVE_ACCEPTED_LOCKED",
   "i66InsurerGrossLiveBackendTargetedAuthorization20261118": {
     "status": "DIRECTION_AUTHORIZED_CONDITIONED_ON_SIGNED_EXACT_PREVIEW_GROSS_PASS",
     "authority": "Paula Dirección 2026-11-18 exige actualizar recibos y cobros por inferencias en I6.6, certificar y publicar sin diferir. Excepción mínima: promover exclusivamente el mismo backend ya probado en Preview, con reversión automática y ensayos sintéticos firmados antes de cualquier escritura real.",
@@ -462,8 +462,8 @@
   "historicalClosedGate": "B4-007",
   "approvedProductDeltaManifest": "artifacts/orbit360-recovery/release-control/I6_6_APPROVED_PRODUCT_DELTA_MANIFEST_20261110.json",
   "ownerAuthority": "Paula Osorio Dirección 2026-11-12: Operativo tiene escritura integral en cada módulo autorizado, con paridad funcional para roles superiores según sus permisos, país, tenant y auditoría; cada arreglo probado pasa inmediatamente a LIVE desde un artefacto exacto. Alcance R7 autorizado, Preview firmado PASS 43375403003 y LIVE exacto publicado con tres funciones y hosting 223/223 en ambas URL, actores reales Carlos y Dirección y escrituras sintéticas reversibles PASS 43375687134. Mantener el resto de UAT real por país/rol, documentación real de aseguradora, UI legal y escrituras financieras en HOLD hasta prueba específica, sin tocar Firestore Rules, Auth ni IAM. Histórico R5/R6 se conserva como linaje, no como estado actual.",
-  "livePromotionAuthorized": true,
-  "previewApproved": true,
+  "livePromotionAuthorized": false,
+  "previewApproved": false,
   "carlosOpsLiveAuthorization20261112": {
     "status": "EXACT_TWO_WRITERS_AND_HOSTING_AUTHORIZED_AFTER_SIGNED_PREVIEW",
     "sourceSha": "1dd675ed59ac51fd122915ca8056f85f82fa12d6",
@@ -648,7 +648,7 @@
   "requiredCanonicalOrigin": "https://ays-orbit-360-lab.web.app",
   "requiredStaffOrigin": "https://app.aysseguros.com",
   "originReadbackRequirement": "BOTH_HOSTS_IDENTICAL_TO_SAME_ARTIFACT_OR_ROLLBACK",
-  "forbidBackendFunctionDeploy": false,
+  "forbidBackendFunctionDeploy": true,
   "forbidFirestoreRulesDataAuthWrites": true,
   "rollback": "FRONTEND_TOPBAR_PREVIEW_FIRST; KEEP BOTH LIVE HOSTING ORIGINS AND COBROS FUNCTION UNCHANGED UNTIL EXACT_ARTIFACT_PREVIEW_PASS; THEN BACKUP_AND_ATOMIC_EXACT_ARTIFACT_LIVE_PROMOTION_WITH_REHASH_AND_ROLLBACK",
   "sourcePreviewUrl": "https://ays-orbit-360-lab--gi-i66-rc-44009981499-d08psr2y.web.app",
@@ -700,7 +700,7 @@
     "syntheticLedgerRequestEventRestored": true,
     "livePromotionAccepted": false
   },
-  "forbidBackendLiveFunctionDeploy": false,
+  "forbidBackendLiveFunctionDeploy": true,
   "readerPreviewAuthorization": {
     "authorizedBy": "Paula Andrea Osorio Franco, Direccion",
     "authorizedAtGuatemala": "2026-11-11",
@@ -817,7 +817,7 @@
   "controlPlaneGuardRunId": 44185021399,
   "previewFunctionRunId": 44185021402,
   "previewFunctionStatus": "EXACT_CURRENT_PREVIEW_CERTIFICATION_CONSUMED_BY_SAME_ARTIFACT_SIGNED_LIVE_ACCEPTANCE",
-  "noHostingPromotion": false,
+  "noHostingPromotion": true,
   "hostingOriginsUntouched": false,
   "liveCustomerDataWrites": 0,
   "releaseStatus": "CURRENT_OPERATIONAL_EXACT_SIGNED_LIVE_PASS_FULL_I66_HOLD",
@@ -4530,19 +4530,60 @@
     "consumedByVerifiedLiveRun": 44675481227
   },
   "currentPhysicalHostingRelease": {
-    "sourceSha": "15e849bd606bd8c93e4c0471da1193e85004aecd",
-    "buildId": "gi-i66-15e849bd606b-57f234755dc1",
-    "artifactId": 14777966155,
-    "artifactDigest": "sha256:78a409a419e21648f2e074b49767d1dd55731140f8a83f6064b3ae1c8073b453",
-    "previewRunId": 45081926149,
+    "sourceSha": "65c825b2808a615ca4195bdde6689dbdbe3193b2",
+    "buildId": "gi-i66-65c825b2808a-57f234755dc1",
+    "artifactId": 14873426438,
+    "artifactDigest": "sha256:7cb782848a45083047c4899bc30c13bf5be46429607e42597d09342becfc9acc",
+    "previewRunId": 45287432665,
     "signedPreviewRunId": null,
-    "liveCloneRunId": 45088457923,
-    "liveHostingVersion": "sites/ays-orbit-360-lab/versions/e4e8f31b02ba2aef",
+    "liveCloneRunId": 45292163934,
+    "liveHostingVersion": "sites/ays-orbit-360-lab/versions/332999a55b189108",
     "readbackEachOrigin": 224,
-    "receipt": "artifacts/orbit360-recovery/release-control/I6_6_FRONTEND_E00002_RECEIPT.json",
-    "backendFunctionsChanged": 0,
+    "receipt": "artifacts/orbit360-recovery/release-control/I6_6_FRONTEND_E00003_RECEIPT.json",
+    "backendFunctionsChanged": 4,
     "fullI66ProductionAccepted": false,
-    "status": "FOCAL_FRONTEND_LIVE_UI_VERIFIED"
+    "status": "COMPOSITE_LIVE_SIGNED_UI_VERIFIED",
+    "scope": "COMPOSITE",
+    "backendRevisions": [
+      {
+        "name": "orbit360ProductOperationalCommand",
+        "region": "us-central1",
+        "service": "orbit360productoperationalcommand",
+        "previousRevision": "orbit360productoperationalcommand-00071-rax",
+        "currentRevision": "orbit360productoperationalcommand-00072-mab",
+        "trafficPercent": 100,
+        "ready": true
+      },
+      {
+        "name": "orbit360CobrosReconciliationCommand",
+        "region": "us-central1",
+        "service": "orbit360cobrosreconciliationcommand",
+        "previousRevision": "orbit360cobrosreconciliationcommand-00019-cux",
+        "currentRevision": "orbit360cobrosreconciliationcommand-00021-zex",
+        "trafficPercent": 100,
+        "ready": true
+      },
+      {
+        "name": "orbit360ScopedPolicyRead",
+        "region": "us-east1",
+        "service": "orbit360scopedpolicyread",
+        "previousRevision": "orbit360scopedpolicyread-00013-gen",
+        "currentRevision": "orbit360scopedpolicyread-00014-nec",
+        "trafficPercent": 100,
+        "ready": true
+      },
+      {
+        "name": "orbit360OpsLeadsCommand",
+        "region": "us-central1",
+        "service": "orbit360opsleadscommand",
+        "previousRevision": "orbit360opsleadscommand-00013-fad",
+        "currentRevision": "orbit360opsleadscommand-00014-vep",
+        "trafficPercent": 100,
+        "ready": true
+      }
+    ],
+    "liveProofPath": "artifacts/orbit360-recovery/release-control/I6_6_FRONTEND_E00003_LIVE_PROOF.json",
+    "liveProofSha256": "4013a99719ba5f8bb3087a5e5f43c189a22daf55aabfcea37e8df5030bb5653c"
   },
   "priorPhysicalHostingRelease20261119": {
     "sourceSha": "72d3580f3e90071b360319ce5f204d348b401663",
@@ -4716,26 +4757,68 @@
     "consumedAs": "EXACT_HOSTING_OPTIONAL_DOCUMENT_PAYMENT_PUBLISHED_224_FILES"
   },
   "latestSignedPhysicalFrontendLivePointer20261122": {
-    "generation": 2,
+    "generation": 3,
     "gate": "I6.6",
-    "status": "FOCAL_FRONTEND_LIVE_UI_VERIFIED",
-    "sourceSha": "15e849bd606bd8c93e4c0471da1193e85004aecd",
-    "sourceTree": "4567343f7e438f550a5deda200098124f330ccd2",
+    "status": "COMPOSITE_LIVE_SIGNED_UI_VERIFIED",
+    "sourceSha": "65c825b2808a615ca4195bdde6689dbdbe3193b2",
+    "sourceTree": "e7f197675e7124caee45460fc131b526cd43dae1",
     "compositionBlob": "33bf80768cb6cb311f2975d282a5f50935f680aa",
-    "manifestBlob": "098c127eb1c08a8d5fc3575c0ec38c6cb59f3858",
-    "artifactId": 14777966155,
-    "artifactDigest": "sha256:78a409a419e21648f2e074b49767d1dd55731140f8a83f6064b3ae1c8073b453",
-    "hostingVersion": "sites/ays-orbit-360-lab/versions/e4e8f31b02ba2aef",
-    "buildId": "gi-i66-15e849bd606b-57f234755dc1",
+    "manifestBlob": "7f693bd0e1a7faaa6cbc95794ef5123c91c5efa4",
+    "artifactId": 14873426438,
+    "artifactDigest": "sha256:7cb782848a45083047c4899bc30c13bf5be46429607e42597d09342becfc9acc",
+    "hostingVersion": "sites/ays-orbit-360-lab/versions/332999a55b189108",
+    "buildId": "gi-i66-65c825b2808a-57f234755dc1",
     "hostedFilesEachOrigin": 224,
-    "previewUrl": "https://ays-orbit-360-lab--gi-i66-rc-45081926149-b9hkley0.web.app",
-    "buildRunId": 45081926149,
-    "rollback": "sites/ays-orbit-360-lab/versions/7a0d829d3504c9f8",
-    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_FRONTEND_E00002_RECEIPT.json",
-    "receiptGitBlobSha": "d39f216defb2959b47087da84cc87b32b97faa94",
-    "receiptCommit": "5c5adeb6f9bdb25e40f01c1ca386c4455197b6ef",
+    "previewUrl": "https://ays-orbit-360-lab--gi-i66-rc-45287432665-qxusovq3.web.app",
+    "buildRunId": 45287432665,
+    "rollback": "sites/ays-orbit-360-lab/versions/e4e8f31b02ba2aef",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_FRONTEND_E00003_RECEIPT.json",
+    "receiptGitBlobSha": "11fdb3bee494541513482666d6215f45cbad0567",
+    "receiptCommit": "f80c37e174406ccb489569b3bc7dd6073c2c4273",
     "fullI66ProductionAccepted": false,
-    "liveCloneRunId": 45088457923
+    "liveCloneRunId": 45292163934,
+    "scope": "COMPOSITE",
+    "backendFunctionsChanged": 4,
+    "backendRevisions": [
+      {
+        "name": "orbit360ProductOperationalCommand",
+        "region": "us-central1",
+        "service": "orbit360productoperationalcommand",
+        "previousRevision": "orbit360productoperationalcommand-00071-rax",
+        "currentRevision": "orbit360productoperationalcommand-00072-mab",
+        "trafficPercent": 100,
+        "ready": true
+      },
+      {
+        "name": "orbit360CobrosReconciliationCommand",
+        "region": "us-central1",
+        "service": "orbit360cobrosreconciliationcommand",
+        "previousRevision": "orbit360cobrosreconciliationcommand-00019-cux",
+        "currentRevision": "orbit360cobrosreconciliationcommand-00021-zex",
+        "trafficPercent": 100,
+        "ready": true
+      },
+      {
+        "name": "orbit360ScopedPolicyRead",
+        "region": "us-east1",
+        "service": "orbit360scopedpolicyread",
+        "previousRevision": "orbit360scopedpolicyread-00013-gen",
+        "currentRevision": "orbit360scopedpolicyread-00014-nec",
+        "trafficPercent": 100,
+        "ready": true
+      },
+      {
+        "name": "orbit360OpsLeadsCommand",
+        "region": "us-central1",
+        "service": "orbit360opsleadscommand",
+        "previousRevision": "orbit360opsleadscommand-00013-fad",
+        "currentRevision": "orbit360opsleadscommand-00014-vep",
+        "trafficPercent": 100,
+        "ready": true
+      }
+    ],
+    "liveProofPath": "artifacts/orbit360-recovery/release-control/I6_6_FRONTEND_E00003_LIVE_PROOF.json",
+    "liveProofSha256": "4013a99719ba5f8bb3087a5e5f43c189a22daf55aabfcea37e8df5030bb5653c"
   },
   "frontendPreviewRequest": {
     "version": 14,
@@ -4783,23 +4866,24 @@
     "previousLivePromotionFailureCheck": "HISTORICAL_PREVIEW_FLAGS_APPLIED_TO_CURRENT_AUTHORIZED_LIVE"
   },
   "previousPhysicalHostingRelease": {
-    "sourceSha": "f1eb5bc6397f0b159079be516a521dd7b1e5d9ba",
-    "buildId": "gi-i66-f1eb5bc6397f-57f234755dc1",
-    "artifactId": 14674736714,
-    "artifactDigest": "sha256:e55fcc674a6cc493cdedff27672d082222db3dd7134354559788364b6ae23713",
-    "previewRunId": 44826594717,
-    "signedPreviewRunId": 44827281351,
-    "liveCloneRunId": 44827928263,
-    "liveHostingVersion": "sites/ays-orbit-360-lab/versions/7a0d829d3504c9f8",
+    "sourceSha": "15e849bd606bd8c93e4c0471da1193e85004aecd",
+    "buildId": "gi-i66-15e849bd606b-57f234755dc1",
+    "artifactId": 14777966155,
+    "artifactDigest": "sha256:78a409a419e21648f2e074b49767d1dd55731140f8a83f6064b3ae1c8073b453",
+    "previewRunId": 45081926149,
+    "signedPreviewRunId": null,
+    "liveCloneRunId": 45088457923,
+    "liveHostingVersion": "sites/ays-orbit-360-lab/versions/e4e8f31b02ba2aef",
     "readbackEachOrigin": 224,
-    "receipt": "artifacts/orbit360-recovery/release-control/I6_6_DIRECT_PAYMENT_OPTIONAL_DOCUMENT_LIVE_READBACK_20261120.json",
+    "receipt": "artifacts/orbit360-recovery/release-control/I6_6_FRONTEND_E00002_RECEIPT.json",
     "backendFunctionsChanged": 0,
     "fullI66ProductionAccepted": false,
-    "status": "PUBLISHED_SIGNED_224_FRONTEND_HOSTING_ONLY_FULL_I66_HOLD"
+    "status": "FOCAL_FRONTEND_LIVE_UI_VERIFIED"
   },
-  "frontendReleaseSequence": 2,
+  "frontendReleaseSequence": 3,
   "consumedFrontendAuthorities": [
-    "2d0b28e6c2a30995118520cdf66a32bb5bf4afcb"
+    "2d0b28e6c2a30995118520cdf66a32bb5bf4afcb",
+    "caef66ef2f20eb8ce71f1815985288bdcfd4a3d8"
   ],
   "previousFrontendPreviewRequest": {
     "version": 13,
@@ -5582,7 +5666,61 @@
     },
     "ownerInstruction": "23-Nov: complete and publish approved cumulative work; this bounded step authorizes only four exact Preview functions and restored synthetic signed QA. LIVE remains separately gated by the same artifact proof."
   },
-  "operationalReleaseCandidate": {
+  "currentPhysicalBackendRelease": {
+    "generation": 3,
+    "gate": "I6.6",
+    "scope": "COMPOSITE",
+    "status": "SIGNED_LIVE_VERIFIED",
+    "sourceSha": "65c825b2808a615ca4195bdde6689dbdbe3193b2",
+    "artifactId": 14873426438,
+    "artifactDigest": "sha256:7cb782848a45083047c4899bc30c13bf5be46429607e42597d09342becfc9acc",
+    "buildId": "gi-i66-65c825b2808a-57f234755dc1",
+    "functionsChanged": 4,
+    "revisions": [
+      {
+        "name": "orbit360ProductOperationalCommand",
+        "region": "us-central1",
+        "service": "orbit360productoperationalcommand",
+        "previousRevision": "orbit360productoperationalcommand-00071-rax",
+        "currentRevision": "orbit360productoperationalcommand-00072-mab",
+        "trafficPercent": 100,
+        "ready": true
+      },
+      {
+        "name": "orbit360CobrosReconciliationCommand",
+        "region": "us-central1",
+        "service": "orbit360cobrosreconciliationcommand",
+        "previousRevision": "orbit360cobrosreconciliationcommand-00019-cux",
+        "currentRevision": "orbit360cobrosreconciliationcommand-00021-zex",
+        "trafficPercent": 100,
+        "ready": true
+      },
+      {
+        "name": "orbit360ScopedPolicyRead",
+        "region": "us-east1",
+        "service": "orbit360scopedpolicyread",
+        "previousRevision": "orbit360scopedpolicyread-00013-gen",
+        "currentRevision": "orbit360scopedpolicyread-00014-nec",
+        "trafficPercent": 100,
+        "ready": true
+      },
+      {
+        "name": "orbit360OpsLeadsCommand",
+        "region": "us-central1",
+        "service": "orbit360opsleadscommand",
+        "previousRevision": "orbit360opsleadscommand-00013-fad",
+        "currentRevision": "orbit360opsleadscommand-00014-vep",
+        "trafficPercent": 100,
+        "ready": true
+      }
+    ],
+    "liveRunId": 45292163934,
+    "proofPath": "artifacts/orbit360-recovery/release-control/I6_6_FRONTEND_E00003_LIVE_PROOF.json",
+    "proofSha256": "4013a99719ba5f8bb3087a5e5f43c189a22daf55aabfcea37e8df5030bb5653c",
+    "rollbackHostingVersion": "sites/ays-orbit-360-lab/versions/e4e8f31b02ba2aef",
+    "fullI66ProductionAccepted": false
+  },
+  "lastConsumedOperationalCandidate": {
     "schema": "I6_6_OPERATIONAL_EXACT_RELEASE_V1",
     "approvedByDirection": true,
     "status": "EXACT_PREVIEW_SIGNED_LIVE_AUTHORIZED",
@@ -5746,5 +5884,50 @@
       "proposalSha256": "e9e1b369d166242cfff2145b08fd36ca8ad3288b302ce6980e00a36e3165e04a",
       "reviewDocumentSha256": "f8fd153e864892c8c4720003f1b72d4ade64fc3c866266c3719729c5a0369d4f"
     }
+  },
+  "lastConsumedFrontendPreviewRequest": {
+    "version": 14,
+    "mode": "COMPOSITE_ARTIFACT_HOSTING_PREVIEW_ONLY",
+    "sourceQaHead": "976a3705126b764d2fcd8d3eb5d368082dd75082",
+    "manifestBlob": "7f693bd0e1a7faaa6cbc95794ef5123c91c5efa4",
+    "sourceQaRunId": 45287058338,
+    "guardRunId": 45287058194,
+    "previousReceiptBlob": "d39f216defb2959b47087da84cc87b32b97faa94",
+    "productPaths": [
+      "functions/product-ops-leads-domain.js",
+      "orbit360-platform/core/auth-product-runtime-p0.js",
+      "orbit360-platform/core/backend-product-readonly-bootstrap-p0.js",
+      "orbit360-platform/core/ciclo.js",
+      "orbit360-platform/modules/cliente360.js",
+      "orbit360-platform/modules/cobros.js",
+      "orbit360-platform/modules/portal.js"
+    ],
+    "backendPaths": [
+      "functions/product-ops-leads-domain.js"
+    ],
+    "backendPathBlobs": {
+      "functions/product-ops-leads-domain.js": "b7921ca88343ced65bdad4cd9de26fa120647083"
+    },
+    "backendPreviewRequired": true,
+    "backendLiveDeployAllowed": false,
+    "realDataWritesAllowed": false,
+    "immutableArtifactMustCoverBothFrontendAndBackend": true,
+    "ownerInstruction": "23-Nov Dirección: publish only current approved cumulative source after signed Preview and exact SAME digest; never deploy backend LIVE or production writes from this request.",
+    "scope": "I6.6 only: build one exact frontend+backend artifact; publish Hosting Preview only, then separately authorize scoped backend Preview tests. No LIVE.",
+    "reason": "V13 signed Preview passed; LIVE failed before mutation because a historical Preview test required current LIVE authorization to remain false. V14 preserves all product bytes and historical facts, fixes phase-scoped QA and linked test-only manifest revisions, freezes those release owners before a NEW immutable build.",
+    "opsLeadsPreviewFunction": "orbit360OpsLeadsCommandPreview",
+    "opsLeadsLiveFunction": "orbit360OpsLeadsCommand",
+    "fourFunctionExactPreviewRequired": true,
+    "realCustomerWritesAllowed": false,
+    "liveDeployAuthorized": false,
+    "previousPreviewFailureRun": 45277851717,
+    "previousPreviewFailureCheck": "I66_DOCUMENTED_TERMS_SIGNED_HOLD",
+    "releaseAfterPreviewAllowed": false,
+    "releaseMechanismSourceSha": "976a3705126b764d2fcd8d3eb5d368082dd75082",
+    "previousBuildFailureRun": 45266197734,
+    "previousBuildFailureCheck": "FIXED_REQUEST_VERSION_ASSERTION",
+    "previousPreviewFailureStage": "FORM_FIELDS",
+    "previousLivePromotionFailureRun": 45284653398,
+    "previousLivePromotionFailureCheck": "HISTORICAL_PREVIEW_FLAGS_APPLIED_TO_CURRENT_AUTHORIZED_LIVE"
   }
 }
