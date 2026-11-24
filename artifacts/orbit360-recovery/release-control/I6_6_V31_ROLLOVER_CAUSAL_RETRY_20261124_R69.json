@@ -1,0 +1,56 @@
+{
+  "schema": "GI_I66_ROLLOVER_CAUSAL_RETRY_V1",
+  "status": "SOURCE_QA_PASS_IMMUTABLE_BUILD_REQUESTED_ONLY",
+  "requestVersion": 31,
+  "sourceQaHead": "9c60332a9ccb3a9bab9fd55e289551e02ad33c22",
+  "repositoryHead": "9c60332a9ccb3a9bab9fd55e289551e02ad33c22",
+  "failedRequest": {
+    "version": 30,
+    "sourceSha": "96bc5388c5c22c1df9256bd11cdb4209681779dc",
+    "runId": 45510996597,
+    "attempt": 1,
+    "status": "FAILED_BEFORE_PREVIEW_OVERWRITE",
+    "artifactCreated": true,
+    "receipt": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_6_V30_ROLLOVER_PREOVERWRITE_FAILURE_20261124_R66.json",
+      "gitBlobSha": "1931aa51b12cfc23c1d2f3327f63d55b853d0050",
+      "sha256": "7c1d29c8eaaad4785720c25c940da35911250e443fb4f374f147e40756ca7dff"
+    }
+  },
+  "sourceQa": {
+    "path": "artifacts/orbit360-recovery/release-control/I6_6_V31_SIGNED_SOURCE_QA_AND_GOVERNANCE_20261124.json",
+    "gitBlobSha": "84882d15563176f99c7a817556f58d7d99abf0f6",
+    "sha256": "dafde8d8956ce3e9f4a6f69d801a8324e2b59bd4e5dc392728432761822b53e7"
+  },
+  "productPaths": [
+    "functions/b4-003-scoped-related-reader.js",
+    "functions/bootstrap.js",
+    "functions/cobros-reconciliation-domain.js",
+    "functions/make-lead-ingress-bridge.js",
+    "functions/payment-inference-engine.js",
+    "functions/product-lead-ingress-contract.js",
+    "functions/product-lead-ingress-owner-support.js",
+    "functions/product-ops-leads-domain.js",
+    "orbit360-platform/core/policy-receipts-engine.js",
+    "orbit360-platform/core/primas.js",
+    "orbit360-platform/core/product-hydration-required-optional-p0.js",
+    "orbit360-platform/core/queries.js",
+    "orbit360-platform/data/store-firestore-product-operational-p0.js",
+    "orbit360-platform/data/store-firestore-product-readonly-p0.js",
+    "orbit360-platform/modules/aseguradoras.js",
+    "orbit360-platform/modules/cobros.js",
+    "orbit360-platform/modules/config-domain-v20260804-bridge.js",
+    "orbit360-platform/modules/issuance-endosos-v1201-bridge.js",
+    "orbit360-platform/modules/policy-receipts-v1199-bridge.js",
+    "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js",
+    "orbit360-platform/modules/renewals-v1200-operational-bridge.js"
+  ],
+  "allProductBytesPreserved": true,
+  "backendTargets": 5,
+  "releaseOwnerChangedRequiresNewArtifact": true,
+  "priorArtifactNeverPatched": true,
+  "backendPreviewAuthority": false,
+  "liveAuthority": false,
+  "realDataWrites": 0,
+  "deployments": 0
+}

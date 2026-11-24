@@ -1,0 +1,39 @@
+{
+  "schema": "GI_I66_V31_SOURCE_QA_AND_GOVERNANCE_VERIFICATION_V1",
+  "status": "SIGNED_SOURCE_QA_AND_GOVERNANCE_PASS",
+  "branch": "recovery/fase-a-clean-20260831",
+  "sourceHead": "9c60332a9ccb3a9bab9fd55e289551e02ad33c22",
+  "verifiedAt": "2026-11-24T23:56:08.040Z",
+  "sourceQa": {
+    "workflow": ".github/workflows/gravicentra-i66-privileged-role-parity-source-qa.yml",
+    "headSha": "9c60332a9ccb3a9bab9fd55e289551e02ad33c22",
+    "status": "completed",
+    "conclusion": "success",
+    "runId": 45513689665,
+    "jobId": 138867558296,
+    "sourceSuiteStep": 4,
+    "lineageGuardStep": 5,
+    "providerUrl": "https://github.com/paulaosoriof86/orbit360-core/actions/runs/45513689665"
+  },
+  "governance": {
+    "workflow": ".github/workflows/gravicentra-release-lock-sync.yml",
+    "headSha": "9c60332a9ccb3a9bab9fd55e289551e02ad33c22",
+    "status": "completed",
+    "conclusion": "success",
+    "runId": 45513689710,
+    "preflightJobId": 138867558579,
+    "availabilityJobId": 138867559049,
+    "preflightStep": 4,
+    "canonicalPreflight": "PROVIDER_STEP_SUCCESS_VERIFIED",
+    "providerUrl": "https://github.com/paulaosoriof86/orbit360-core/actions/runs/45513689710"
+  },
+  "priorFailedSourceQa": {
+    "sourceHead": "bf6bce909ad143d59fb2cbb414cdbbe7972c4ee2",
+    "runId": 45505421061,
+    "jobId": 138839252861,
+    "status": "completed",
+    "conclusion": "failure",
+    "cause": "Historical composite fixtures inherited the newer financial and effective-operation requirements; the successor restores their sealed E3 request without changing production owners."
+  },
+  "noRuntimeAcceptanceClaim": true
+}
