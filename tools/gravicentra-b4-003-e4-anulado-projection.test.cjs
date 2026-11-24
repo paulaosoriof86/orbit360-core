@@ -67,7 +67,7 @@ function make(country) {
   const original = read('modules/cobros.js');
   assert.equal(original.split(marker).length, 2, 'Cobros API contract changed');
   const instrumented = original.replace(marker,
-    '  return { __e4Test: { buildIndex, reportedRows, reportableRows, filter: value => { st.fest = value; } }, render, detalle, reportarPago,');
+    '  return { __e4Test: { buildIndex, reportedRows: idx => reportedRows(idx, visibleFinancialRows(true)), reportableRows, filter: value => { st.fest = value; } }, render, detalle, reportarPago,');
   vm.runInContext(instrumented, context);
   const owner = Orbit.modules.cobros.__e4Test;
   return { owner, writes: () => writes };

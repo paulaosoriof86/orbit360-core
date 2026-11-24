@@ -1,0 +1,394 @@
+{
+  "schema": "GI_I66_V29_BUILD_HOLD_CAUSAL_FIXTURE_PREPARATION_V1",
+  "id": "I6_6_V29_BUILD_HOLD_CAUSAL_FIXTURE_PREPARATION_20261124",
+  "gate": "I6.6",
+  "classification": "QA_PREPARATION_AND_CONTINUITY_EVIDENCE",
+  "status": "PREPARED_NOT_APPLIED_PINNED_QA_AND_SUCCESSOR_TRANSITION_PENDING",
+  "recordedAtUtc": "2026-11-24T22:44:48.721523Z",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "intendedRepositoryPath": "artifacts/orbit360-recovery/release-control/I6_6_V29_BUILD_HOLD_CAUSAL_FIXTURE_PREPARATION_20261124.json",
+  "sourceIdentity": {
+    "requestHead": "6efd4d494cd56b6be87d2fee3cbfc0ba55e9f6a8",
+    "sourceQaHead": "9da06674caf080e10f510d8a13a1d122d449dff2",
+    "releaseMechanismSourceSha": "9da06674caf080e10f510d8a13a1d122d449dff2",
+    "requestVersion": 29,
+    "sourceQaRunId": 45501592776,
+    "governanceRunId": 45501592707,
+    "manifestBlob": "d65388fe60b6ef2489c2699f551907d0cac97b37",
+    "testPath": "tools/gravicentra-i6-6-composite-preview-admission.test.cjs",
+    "validatorPath": "tools/gravicentra-i6-6-frontend-preview-authority.cjs",
+    "validatorBlobAtRequestHead": "c6d557968818a10164211b03092aa604743cbc9c",
+    "historicalFixtureRequestSource": "32229710311b6fc8fdb01d1e00c95ced32d2ebf8",
+    "historicalDirectFormsCpSource": "74ae28c6e6e6b40f845567c9b00738a58307b3cb"
+  },
+  "signedBuildFailure": {
+    "runId": 45502038971,
+    "runUrl": "https://github.com/paulaosoriof86/orbit360-core/actions/runs/45502038971",
+    "headSha": "6efd4d494cd56b6be87d2fee3cbfc0ba55e9f6a8",
+    "gateJobId": 138827539047,
+    "gateConclusion": "success",
+    "failedJobId": 138828118868,
+    "failedJobName": "immutable-package",
+    "failedStep": "Verify latest I6.6 source and historical B4 seals without reopening B4",
+    "failedCommand": "node --test tools/gravicentra-i6-6-composite-preview-admission.test.cjs",
+    "nodeVersion": "v22.23.5",
+    "tests": 85,
+    "passed": 72,
+    "failed": 13,
+    "cancelled": 0,
+    "skipped": 0,
+    "failureSummaryLoggedAtUtc": "2026-11-24T22:35:32.9612254Z",
+    "artifactCountObserved": 0,
+    "productArtifactCreated": false,
+    "buildStep": "SKIPPED",
+    "uploadArtifactStep": "SKIPPED",
+    "hostingPreviewDeployStep": "SKIPPED",
+    "previewArtifactReadbackStep": "SKIPPED",
+    "noV29DeployOccurred": true,
+    "failedTests": [
+      {
+        "testNumber": 8,
+        "name": "financial extension admits exactly six owners atop eleven unaccepted E3 deltas, with five existing backend targets",
+        "sourcePath": "tools/gravicentra-i6-6-composite-preview-admission.test.cjs",
+        "lineAtBase": 225,
+        "actualFailureCode": "I66_EXISTING_TWO_DIRECT_FORM_PREIMAGES_REQUIRED",
+        "expectedCaseReachesIntendedAssertionAfterPatch": true
+      },
+      {
+        "testNumber": 33,
+        "name": "cancellation adds exactly three owners to the seventeen financial composition, with one identical shared blob and no additional backend target",
+        "sourcePath": "tools/gravicentra-i6-6-composite-preview-admission.test.cjs",
+        "lineAtBase": 302,
+        "actualFailureCode": "I66_EXISTING_TWO_DIRECT_FORM_PREIMAGES_REQUIRED",
+        "expectedCaseReachesIntendedAssertionAfterPatch": true
+      },
+      {
+        "testNumber": 62,
+        "name": "cancellation admission verifies every source, shared owner, QA and receipt pin at source QA and HEAD",
+        "sourcePath": "tools/gravicentra-i6-6-composite-preview-admission.test.cjs",
+        "lineAtBase": 340,
+        "actualFailureCode": "I66_EXISTING_TWO_DIRECT_FORM_PREIMAGES_REQUIRED",
+        "expectedCaseReachesIntendedAssertionAfterPatch": true
+      },
+      {
+        "testNumber": 63,
+        "name": "the exact product union rejects any unauthorized path even when it resembles an admitted data owner",
+        "sourcePath": "tools/gravicentra-i6-6-composite-preview-admission.test.cjs",
+        "lineAtBase": 354,
+        "actualFailureCode": "I66_EXISTING_TWO_DIRECT_FORM_PREIMAGES_REQUIRED",
+        "expectedCaseReachesIntendedAssertionAfterPatch": true
+      },
+      {
+        "testNumber": 65,
+        "name": "closed direct forms extension admits exactly the two reported owners with source-QA and HEAD evidence",
+        "sourcePath": "tools/gravicentra-i6-6-composite-preview-admission.test.cjs",
+        "lineAtBase": 384,
+        "actualFailureCode": "I66_ASSIGNED_ROLES_PROFILE_REQUIRES_EXACT_SUCCESSOR",
+        "expectedCaseReachesIntendedAssertionAfterPatch": true
+      },
+      {
+        "testNumber": 67,
+        "name": "direct forms extension rejects product, QA, receipt and accepted predecessor drift at either sealed source",
+        "sourcePath": "tools/gravicentra-i6-6-composite-preview-admission.test.cjs",
+        "lineAtBase": 408,
+        "actualFailureCode": "I66_ASSIGNED_ROLES_PROFILE_REQUIRES_EXACT_SUCCESSOR",
+        "expectedCaseReachesIntendedAssertionAfterPatch": true
+      },
+      {
+        "testNumber": 69,
+        "name": "the published second causal receipt admits its source322 QA epoch while preserving the exact two original product owners and backend/startup pins",
+        "sourcePath": "tools/gravicentra-i6-6-composite-preview-admission.test.cjs",
+        "lineAtBase": 448,
+        "actualFailureCode": "I66_ASSIGNED_ROLES_PROFILE_REQUIRES_EXACT_SUCCESSOR",
+        "expectedCaseReachesIntendedAssertionAfterPatch": true
+      },
+      {
+        "testNumber": 70,
+        "name": "the original immutable receipt still works only with original QA and cannot approve the new driver bytes",
+        "sourcePath": "tools/gravicentra-i6-6-composite-preview-admission.test.cjs",
+        "lineAtBase": 457,
+        "actualFailureCode": "I66_ASSIGNED_ROLES_PROFILE_REQUIRES_EXACT_SUCCESSOR",
+        "expectedCaseReachesIntendedAssertionAfterPatch": true
+      },
+      {
+        "testNumber": 72,
+        "name": "the revised profile rejects drift in either receipt or any current product/QA owner at source QA or HEAD",
+        "sourcePath": "tools/gravicentra-i6-6-composite-preview-admission.test.cjs",
+        "lineAtBase": 468,
+        "actualFailureCode": "I66_ASSIGNED_ROLES_PROFILE_REQUIRES_EXACT_SUCCESSOR",
+        "expectedCaseReachesIntendedAssertionAfterPatch": true
+      },
+      {
+        "testNumber": 76,
+        "name": "published source322 successors admit Paula QA and the one insurer owner while retaining the existing cancellation proof and twenty-one-owner union",
+        "sourcePath": "tools/gravicentra-i6-6-composite-preview-admission.test.cjs",
+        "lineAtBase": 566,
+        "actualFailureCode": "I66_EXISTING_TWO_DIRECT_FORM_PREIMAGES_REQUIRED",
+        "expectedCaseReachesIntendedAssertionAfterPatch": true
+      },
+      {
+        "testNumber": 79,
+        "name": "successor admission preserves exact source322 receipts and does not rewrite or retarget their published evidence",
+        "sourcePath": "tools/gravicentra-i6-6-composite-preview-admission.test.cjs",
+        "lineAtBase": 594,
+        "actualFailureCode": "I66_EXISTING_TWO_DIRECT_FORM_PREIMAGES_REQUIRED",
+        "expectedCaseReachesIntendedAssertionAfterPatch": true
+      },
+      {
+        "testNumber": 80,
+        "name": "source322 successor receipts cannot change any existing financial or cancellation product postimage or semantics",
+        "sourcePath": "tools/gravicentra-i6-6-composite-preview-admission.test.cjs",
+        "lineAtBase": 606,
+        "actualFailureCode": "I66_EXISTING_TWO_DIRECT_FORM_PREIMAGES_REQUIRED",
+        "expectedCaseReachesIntendedAssertionAfterPatch": true
+      },
+      {
+        "testNumber": 85,
+        "name": "the historical source322 direct-forms receipt cannot approve the newer assigned-role driver bytes",
+        "sourcePath": "tools/gravicentra-i6-6-composite-preview-admission.test.cjs",
+        "lineAtBase": 647,
+        "actualFailureCode": "I66_ASSIGNED_ROLES_PROFILE_REQUIRES_EXACT_SUCCESSOR",
+        "expectedCaseReachesIntendedAssertionAfterPatch": true
+      }
+    ]
+  },
+  "causalDiagnosis": {
+    "cause": "Historical synthetic financial/direct-forms fixtures cloned mutable control.frontendPreviewRequest. Publishing V29 added the assigned-role profile and a third direct-forms owner to fixtures still exercising historical two-owner receipts. Existing validators correctly rejected the mixed epochs.",
+    "requestAtHistoricalSourceAndSourceQaEqual": true,
+    "historicalRequest": {
+      "version": 28,
+      "productPathCount": 11,
+      "directFormsProductPathCount": 2,
+      "directFormsQaProfilePresent": false
+    },
+    "requestAtFailure": {
+      "version": 29,
+      "productPathCount": 21,
+      "directFormsProductPathCount": 3,
+      "directFormsQaProfile": "PAULA_ASSIGNED_ROLES_EFFECTIVE_FORMS_V1"
+    },
+    "originalProductPreimagesPreserved": {
+      "orbit360-platform/modules/issuance-endosos-v1201-bridge.js": "6dabc32d0a012566eb7840ef8774aee3beb17817",
+      "orbit360-platform/modules/renewals-v1200-operational-bridge.js": "8395b86246cf9bd77523da0059a6e5318e0cfc80"
+    },
+    "additionalDirectFormsOwner": "orbit360-platform/modules/aseguradoras.js",
+    "failureWasNotEvidenceOfProductRegression": true,
+    "liveAcceptanceClaimed": false
+  },
+  "preparedPatch": {
+    "appliedToRepository": false,
+    "appliedOnlyToIsolatedLocalCandidate": true,
+    "paths": [
+      "tools/gravicentra-i6-6-composite-preview-admission.test.cjs"
+    ],
+    "beforeGitBlobSha": "e1dd83a9dc1cc63f04f68a1d10afeedfca758afa",
+    "afterGitBlobSha": "09d129c82158d5af06b3a2aaec5d2c1a20333539",
+    "beforeSha256": "4df611f4fa745b81d404c8c9cbd1811e679016a05cbaa33a020ed703c50f7961",
+    "afterSha256": "ea04ee0587ef478c566619df3a25d41b43caf9d825ec8e9a83b7b9cc63ca6727",
+    "encoding": "utf-8",
+    "patchFormat": "git unified diff",
+    "patchBytes": 2736,
+    "patchSha256": "65e6f18b679b1890490204b5b9b06abc12c10cd07014395f9ca7df0d8f6ff25b",
+    "patchText": "diff --git a/tools/gravicentra-i6-6-composite-preview-admission.test.cjs b/tools/gravicentra-i6-6-composite-preview-admission.test.cjs\nindex e1dd83a9d..09d129c82 100644\n--- a/tools/gravicentra-i6-6-composite-preview-admission.test.cjs\n+++ b/tools/gravicentra-i6-6-composite-preview-admission.test.cjs\n@@ -187,9 +187,13 @@ test('composite fixture retains all exact backend assertions and rejection cases\n const clone=x=>JSON.parse(JSON.stringify(x));\n // These metadata/identity fixtures are synthetic offline contracts, never grants.\n const financialOwner=require('./gravicentra-i6-6-frontend-preview-authority.cjs');\n+// Historical synthetic fixtures keep the published source322 request epoch.\n+// The retained-request tests above continue to validate the actual control.\n+const historicalFixtureControl=JSON.parse(git('show',financialOwner.COMPOSED_PUBLISHED_SOURCE+':artifacts/orbit360-recovery/release-control/I6_6_RELEASE_TRANSPORT_CONTROL_20261110.json'));\n+const historicalFixtureRequest=historicalFixtureControl.frontendPreviewRequest;\n function financialFixture(){\n  const crypto=require('node:crypto'),h=x=>crypto.createHash('sha1').update(String(x)).digest('hex');\n- const previous=clone(req),currentSource=h('synthetic accepted E3'),sourceQaHead=h('synthetic financial source');\n+ const previous=clone(historicalFixtureRequest),currentSource=h('synthetic accepted E3'),sourceQaHead=h('synthetic financial source');\n  const paths=financialOwner.FINANCIAL_PATHS,authority=JSON.parse(fs.readFileSync(financialOwner.FINANCIAL_AUTHORITY_PATH));\n  const receipt={schema:'GI_I66_R51_DOCUMENTARY_PAYMENT_FINANCIAL_RECOVERY_SOURCE_V1',status:'SOURCE_FOCAL_REGRESSION_PASS_SIGNED_PREVIEW_LIVE_PENDING',gate:'I6.6',classification:'PRODUCT',\n   authority:{path:financialOwner.FINANCIAL_AUTHORITY_PATH,gitBlobSha:h('synthetic authority')},priorToleranceAuthority:clone(authority.decisions.priorToleranceAuthority),\n@@ -359,8 +363,8 @@ test('the exact product union rejects any unauthorized path even when it resembl\n  }\n });\n function directFormsFixture(){\n- const previous=clone(req),head='74ae28c6e6e6b40f845567c9b00738a58307b3cb';\n- const cp=JSON.parse(fs.readFileSync('artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json'));\n+ const previous=clone(historicalFixtureRequest),head='74ae28c6e6e6b40f845567c9b00738a58307b3cb';\n+ const cp=JSON.parse(git('show',head+':artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json'));\n  const currentSource=cp[cp.currentExecutionDecisionPointer].sourceSha;\n  const receipt=JSON.parse(fs.readFileSync(DIRECT_FORMS_RECEIPT_PATH));\n  const productPathBlobs=Object.fromEntries(receipt.files.filter(row=>DIRECT_FORMS_PATHS.includes(row.path)).map(row=>[row.path,row.gitBlobSha]));\n",
+    "changes": [
+      "Use immutable COMPOSED_PUBLISHED_SOURCE request only in historical synthetic fixtures.",
+      "Use the original direct-form source CP for its historical physical predecessor.",
+      "Preserve the two retained-request tests that validate the current V29 request."
+    ],
+    "validatorsChanged": false,
+    "workflowChanged": false,
+    "productSourceChanged": false,
+    "gatesChanged": false,
+    "historicalReceiptsChanged": false,
+    "testCasesRemoved": 0,
+    "testAssertionsRelaxed": false
+  },
+  "localReproduction": {
+    "baseSha": "6efd4d494cd56b6be87d2fee3cbfc0ba55e9f6a8",
+    "nodeVersion": "v24.22.3",
+    "baseline": {
+      "command": "node --test tools/gravicentra-i6-6-composite-preview-admission.test.cjs",
+      "exitCode": 1,
+      "tests": 85,
+      "passed": 72,
+      "failed": 13,
+      "cancelled": 0,
+      "skipped": 0,
+      "reportSha256": "885547a1bae393a64db679265120fb4558dd1678b1fa94e8c714040c31068eee",
+      "reportFormat": "node:test spec"
+    },
+    "candidate": {
+      "command": "node --test --test-reporter=tap tools/gravicentra-i6-6-composite-preview-admission.test.cjs",
+      "exitCode": 0,
+      "tests": 85,
+      "passed": 85,
+      "failed": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "reportSha256": "63936314e3b08070a4fbcdabcfcdeb8535b3320ce2afefd4e904bca2fa084f80",
+      "reportFormat": "TAP"
+    },
+    "signedCiAfterPatch": "NOT_EXECUTED",
+    "ciNode22RerunRequiredBeforeSuccessorBuild": true,
+    "networkOrProductionWritesPerformedByTheseTests": false
+  },
+  "pinnedQaGraph": {
+    "productRuntimeGraphMember": false,
+    "buildVerificationDependency": true,
+    "buildWorkflowPath": ".github/workflows/gravicentra-release-delta-66-package.yml",
+    "phase": "immutable-package pre-build verification",
+    "affectedReceiptBindings": [
+      {
+        "requestField": "financialRecovery",
+        "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_R51_ASSIGNED_ROLES_INSURER_FINANCIAL_RECOVERY_SOURCE_20261124.json",
+        "receiptBlob": "1d89b80f46afc83bc5cfda1c0147548fe5319347",
+        "receiptBlobVerifiedAtSourceQaAndRequestHead": true,
+        "qaPaths": [
+          ".github/workflows/gravicentra-i66-privileged-role-parity-source-qa.yml",
+          "tools/gravicentra-i6-6-cobros-payment-failure-category.test.cjs",
+          "tools/gravicentra-i6-6-composite-preview-admission.test.cjs",
+          "tools/gravicentra-i6-6-documentary-payment-ui.test.cjs",
+          "tools/gravicentra-i6-6-frontend-preview-authority.cjs",
+          "tools/gravicentra-i6-6-operational-release-candidate.cjs",
+          "tools/gravicentra-i6-6-proposal-application-signed-uat.cjs",
+          "tools/gravicentra-i6-6-proposal-application-signed-uat.test.cjs",
+          "tools/gravicentra-i6-6-r51-documentary-variance.test.cjs",
+          "tools/gravicentra-i6-6-r51-payment-application-preservation.test.cjs"
+        ],
+        "affectedPin": {
+          "path": "tools/gravicentra-i6-6-composite-preview-admission.test.cjs",
+          "gitBlobSha": "e1dd83a9dc1cc63f04f68a1d10afeedfca758afa",
+          "sha256": "4df611f4fa745b81d404c8c9cbd1811e679016a05cbaa33a020ed703c50f7961"
+        },
+        "comparisonRefs": [
+          "request.sourceQaHead",
+          "HEAD"
+        ],
+        "guardFailureIfPinDrifts": "I66_FINANCIAL_QA_SOURCE_DRIFT"
+      },
+      {
+        "requestField": "cancellationRecovery",
+        "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_EFFECTIVE_CANCELLATION_ASSIGNED_ROLES_CAUSAL_SOURCE_20261124.json",
+        "receiptBlob": "966b69dacfc6b3f80c8b97e8f0507f98ae4466a5",
+        "receiptBlobVerifiedAtSourceQaAndRequestHead": true,
+        "qaPaths": [
+          ".github/workflows/gravicentra-i66-privileged-role-exact-live-promotion.yml",
+          ".github/workflows/gravicentra-i66-privileged-role-parity-source-qa.yml",
+          ".github/workflows/gravicentra-i66-privileged-role-three-function-preview-uat.yml",
+          "tools/gravicentra-i6-6-carlos-paula-live-direct-renewal-synthetic-uat.cjs",
+          "tools/gravicentra-i6-6-composite-preview-admission.test.cjs",
+          "tools/gravicentra-i6-6-direct-forms-signed-driver.test.cjs",
+          "tools/gravicentra-i6-6-effective-cancellation-direct-form.test.cjs",
+          "tools/gravicentra-i6-6-frontend-preview-authority.cjs",
+          "tools/gravicentra-i6-6-operational-release-candidate.cjs"
+        ],
+        "affectedPin": {
+          "path": "tools/gravicentra-i6-6-composite-preview-admission.test.cjs",
+          "gitBlobSha": "e1dd83a9dc1cc63f04f68a1d10afeedfca758afa",
+          "sha256": "4df611f4fa745b81d404c8c9cbd1811e679016a05cbaa33a020ed703c50f7961"
+        },
+        "comparisonRefs": [
+          "request.sourceQaHead",
+          "HEAD"
+        ],
+        "guardFailureIfPinDrifts": "I66_CANCELLATION_QA_SOURCE_DRIFT"
+      }
+    ],
+    "existingSourceQaDoesNotCertifyNewFixtureBlob": true,
+    "historicalReceiptsMustRemainImmutable": true,
+    "newExactQaReceiptCompositionRequiredForSuccessor": true
+  },
+  "additionalSuccessorBlock": {
+    "status": "IDENTIFIED_NOT_FIXED",
+    "kind": "STATIC_VALIDATOR_CONTRACT_MISMATCH_FOR_NEXT_REQUEST",
+    "function": "validatePreservedDirectFormsProducts",
+    "validatorPath": "tools/gravicentra-i6-6-frontend-preview-authority.cjs",
+    "lineAtBase": 105,
+    "failureCode": "I66_EXISTING_TWO_DIRECT_FORM_PREIMAGES_REQUIRED",
+    "expectedPreviousProductPaths": [
+      "orbit360-platform/modules/issuance-endosos-v1201-bridge.js",
+      "orbit360-platform/modules/renewals-v1200-operational-bridge.js"
+    ],
+    "actualPreviousProductPathsForNextRequest": [
+      "orbit360-platform/modules/aseguradoras.js",
+      "orbit360-platform/modules/issuance-endosos-v1201-bridge.js",
+      "orbit360-platform/modules/renewals-v1200-operational-bridge.js"
+    ],
+    "actualPreviousProductPathBlobs": {
+      "orbit360-platform/modules/renewals-v1200-operational-bridge.js": "8395b86246cf9bd77523da0059a6e5318e0cfc80",
+      "orbit360-platform/modules/issuance-endosos-v1201-bridge.js": "6dabc32d0a012566eb7840ef8774aee3beb17817",
+      "orbit360-platform/modules/aseguradoras.js": "0ce40050387f68b2e3efaddc7717ace7cf3ae3ff"
+    },
+    "calledBy": [
+      "validateFinancialRecovery",
+      "validateCancellationRecovery"
+    ],
+    "explanation": "A successor following V29 inherits a three-owner previousRequest. The unconditional equality against the two original paths rejects it even if all three approved product blobs are preserved. This is distinct from the historical-fixture contamination repaired in staging.",
+    "newSuccessorRequestExecuted": false,
+    "requiredRepair": "Recognize the exact admitted predecessor shape and receipt lineage; preserve every approved predecessor owner and blob, including the insurer owner. Keep historical two-owner coverage and negative checks for missing/extra owners, arbitrary receipts and changed blobs. Do not replace the closed assertion with a generic owner count or ignore the insurer."
+  },
+  "continuityAndPublicationBoundary": {
+    "retainR61": true,
+    "retainFailedV29RequestAndRun": true,
+    "r62MayLinkThisEvidenceWithoutApplyingPinnedHarness": true,
+    "request29MustRemainUnchangedInContinuityRepair": true,
+    "sameRequestDoesNotTriggerAnotherPackage": "admitPreview returns false when frontendPreviewRequest equals the parent request.",
+    "rerunningFailedRunWouldStillUseUnpatched6efd": true,
+    "newBuildDispatched": false,
+    "newArtifactCreated": false,
+    "newDeployPerformed": false,
+    "productOrValidatorPatchPublished": false,
+    "allExistingNoWriteAndLivePromotionGatesPreserved": true
+  },
+  "successorStepsWithinSameGate": [
+    {
+      "step": 1,
+      "action": "Preserve R61, the unchanged failed V29 request, this receipt and the embedded patch in R62. Do not apply the pinned admission test as an unbound governance edit.",
+      "completionRequired": "Exact receipt blob/hash linked from the current continuity authority."
+    },
+    {
+      "step": 2,
+      "action": "Apply the prepared fixture patch in the same I6.6 causal successor workspace, then implement the separately identified predecessor transition repair with exact receipt/owner/blob preservation.",
+      "completionRequired": "Original 85 cases pass and focused transition tests prove the approved three-owner predecessor succeeds while unauthorized owner, receipt and blob drift still fail."
+    },
+    {
+      "step": 3,
+      "action": "Create explicit new QA composition evidence that preserves the already published receipts as predecessors and binds the changed fixture and any causal validator bytes. Update only the closed successor selectors/receipts required to admit those exact bytes.",
+      "completionRequired": "Financial and cancellation QA paths are pinned to the new source; historical 322/9da receipts remain unchanged; product deltas stay the approved 21-owner composition unless separately evidenced."
+    },
+    {
+      "step": 4,
+      "action": "Run the active source QA, governance guards and complete pre-build verification on the exact successor SHA, including CI Node 22. Verify executed jobs and receipts rather than workflow-level green alone.",
+      "completionRequired": "All applicable checks pass with zero skips used as acceptance; record exact source SHA, blob pins and signed run IDs."
+    },
+    {
+      "step": 5,
+      "action": "Only after the causal and QA bindings pass, issue one next monotonic request within I6.6, preserving V29 as failed evidence and binding the new signed source. Do not dispatch competing builds or rerun the immutable failed 6efd source expecting the patch.",
+      "completionRequired": "Preview admission validates the actual previous V29 three-owner request and the new exact QA pins before a single new artifact is built."
+    },
+    {
+      "step": 6,
+      "action": "Use the resulting immutable artifact through the existing Preview, module/role/viewport, exact backend and authorized LIVE acceptance sequence. Preserve digest identity and rollback evidence.",
+      "completionRequired": "Product acceptance remains pending until the existing gates have actual signed runtime evidence; this receipt grants no deploy, financial write or personal consent."
+    }
+  ],
+  "authorizationBoundary": {
+    "additionalPaulaAuthorizationRequiredForAlreadyAuthorizedCausalRepair": false,
+    "basis": "Existing instruction to correct causal failures and continue inside the active I6.6 gate; this record preserves preparation only.",
+    "newBusinessAuthorityCreated": false,
+    "financialWritesAuthorizedByThisReceipt": false,
+    "hostingOrBackendDeployAuthorizedByThisReceipt": false,
+    "personalConsentOrLiveAcceptanceProvided": false,
+    "noNewMethodologyOrIteration": true
+  },
+  "sanitization": {
+    "containsCredentials": false,
+    "containsTokens": false,
+    "containsOperationalCustomerData": false,
+    "rawCiLogsEmbedded": false,
+    "onlyRepositoryPathsCommitBlobsTestNamesAndPreparedPatchEmbedded": true,
+    "containsAccountUidsEmailsOrCustomerIdentifiers": false,
+    "existingTestTitlesAndAuthorizationOwnerNamePreserved": true
+  }
+}

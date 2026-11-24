@@ -57,6 +57,7 @@ if(i66Active&&control.i66ActiveRecoveryCursor){
   // successor archives the previous observers; historical snapshots stay sealed.
   if(control.i66FrontendReleaseHead)
     frontendControl.assertExecutionProgress(control,p,fs);
+  frontendControl.assertActiveFinancialAndPlanProjections(control,p,fs);
   frontendControl.assertActiveReleaseProgress(control,p,JSON.parse(fs.readFileSync(frontendControl.P.transport,'utf8')));
   if(c.executionSynchronizationVersion===1){
     const executionTransport=JSON.parse(fs.readFileSync(frontendControl.P.transport,'utf8'));

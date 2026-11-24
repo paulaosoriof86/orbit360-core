@@ -3071,7 +3071,7 @@
       "realFinancialWrites": 0
     }
   },
-  "nextAction": "I6_6_CURRENT_EXACT_OPERATIONAL_SIGNED_LIVE_ACCEPTED_PARTIAL: 1B65A7_ARTIFACT_14373955326_PUBLISHED_THREE_EXACT_FUNCTIONS_100_PERCENT_AND_223_FILES_EACH_ORIGIN; LIVE_NORMAL_UI_LEGAL_READBACK_SOURCE_INTAKE_RELOAD_REPLAY_AND_SYNTHETIC_RESTORE_PASS_44211496307. TRANSPORT_AUTHORIZATION_CONSUMED_NO_REDEPLOY_NO_NEW_ACTIVE_PRODUCT_CANDIDATE. CONTINUE_EXISTING_GENUINE_OPS_INSURER_DRIVE_WORKFLOWS_AND_AUTHORIZED_DETERMINISTIC_SOURCE_BATCHES_WITH_FRESH_PREIMAGES_IDEMPOTENCE_AUDIT_READBACK; DO_NOT_REPEAT_EXISTING_PAYMENTS. PRIOR_STARTUP_NETWORK_CAUSES_UNPROVEN. FULL_I66_AND_FULL_BLOCK2_HOLD; FROZEN_19_OF_31_AND_ONE_OF_SIX_DAILY_BLOCKS_UNCHANGED. TRANSPORT_FINANCIAL_WRITES_ZERO_SEPARATE_OPERATIONAL_RECEIPTS_REQUIRED.",
+  "nextAction": "artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json#nextAction",
   "sourceIntakePrecisionPreviewBuild20261117": {
     "receipt": "artifacts/orbit360-recovery/release-control/I6_6_SOURCE_INTAKE_PRECISION_PREVIEW_BUILD_20261117.json",
     "status": "IMMUTABLE_PREVIEW_EXACT_READBACK_PASS_SIGNED_FUNCTIONAL_QA_PENDING",
@@ -3693,5 +3693,20 @@
     "hostingVersion": "sites/ays-orbit-360-lab/versions/0766db29b338befc",
     "filesPerOrigin": 223,
     "fullI66Accepted": false
-  }
+  },
+  "nextActionBeforeExecutionRedirect20261124": {
+    "status": "HISTORICAL_SUPERSEDED_EXECUTION_INSTRUCTION",
+    "sourceCommit": "32229710311b6fc8fdb01d1e00c95ced32d2ebf8",
+    "sourceFileGitBlobSha": "20d1a9c169b2230158f13a60e7f291771b05859f",
+    "value": "I6_6_CURRENT_EXACT_OPERATIONAL_SIGNED_LIVE_ACCEPTED_PARTIAL: 1B65A7_ARTIFACT_14373955326_PUBLISHED_THREE_EXACT_FUNCTIONS_100_PERCENT_AND_223_FILES_EACH_ORIGIN; LIVE_NORMAL_UI_LEGAL_READBACK_SOURCE_INTAKE_RELOAD_REPLAY_AND_SYNTHETIC_RESTORE_PASS_44211496307. TRANSPORT_AUTHORIZATION_CONSUMED_NO_REDEPLOY_NO_NEW_ACTIVE_PRODUCT_CANDIDATE. CONTINUE_EXISTING_GENUINE_OPS_INSURER_DRIVE_WORKFLOWS_AND_AUTHORIZED_DETERMINISTIC_SOURCE_BATCHES_WITH_FRESH_PREIMAGES_IDEMPOTENCE_AUDIT_READBACK; DO_NOT_REPEAT_EXISTING_PAYMENTS. PRIOR_STARTUP_NETWORK_CAUSES_UNPROVEN. FULL_I66_AND_FULL_BLOCK2_HOLD; FROZEN_19_OF_31_AND_ONE_OF_SIX_DAILY_BLOCKS_UNCHANGED. TRANSPORT_FINANCIAL_WRITES_ZERO_SEPARATE_OPERATIONAL_RECEIPTS_REQUIRED."
+  },
+  "recordScope": "FROZEN_BUSINESS_DECISIONS_AND_HISTORICAL_EVIDENCE",
+  "currentExecutionAuthority": {
+    "schema": "GI_I66_CANONICAL_PLAN_EXECUTION_REDIRECT_V1",
+    "controlPlanePath": "artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json",
+    "cursorPointer": "artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json#i66ActiveRecoveryCursor",
+    "nextActionPointer": "artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json#nextAction",
+    "financialExecutionPointer": "artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json#i66OperationalContinuation20261115.currentFinancialDataExecution20261124"
+  },
+  "historicalSnapshotRule": "Frozen business decisions remain binding within their recorded scope. The dated evidence, lastProvenLive, currentAuthorization, currentEvidenceBoundaries and dailyExecutionPlan20261117 in this file retain their historical scope and do not govern the current release, payments or next execution. Resolve currentExecutionAuthority through the active Control Plane; do not repeat already applied financial facts from an older snapshot."
 }

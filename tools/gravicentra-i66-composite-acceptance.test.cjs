@@ -14,6 +14,10 @@ const read=p=>JSON.parse(fs.readFileSync(p,'utf8'));
 function fixture(){
   const cp=read(P.cp),state=read(P.state),transport=read(P.transport),ledger=read(P.ledger),previous=cp.i66FrontendReleaseHead;
   const p=clone(read(g.ACCEPTANCE_RECEIPT).candidate),proof=read(g.ACCEPTANCE_PROOF);
+  // This fixture exercises the four-function acceptance epoch. The active
+  // request can later require additional financial or cancellation proof;
+  // borrowing that request would mix two scopes before reaching these tests.
+  transport.frontendPreviewRequest=clone(read(genName(3,'FOCAL_PROGRESS')).consumedPreviewRequest);
   delete p.previewRollover;
   Object.assign(p,{sourceSha:'9'.repeat(40),buildId:'gi-i66-'+ '9'.repeat(12)+'-57f234755dc1',
     buildRunId:232,artifactId:233,artifactDigest:'sha256:'+'b'.repeat(64),previewChannelId:'gi-i66-rc-232',

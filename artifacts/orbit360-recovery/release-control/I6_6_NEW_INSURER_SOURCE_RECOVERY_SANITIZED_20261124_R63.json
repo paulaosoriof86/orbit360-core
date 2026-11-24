@@ -1,0 +1,137 @@
+{
+  "schema": "GI_I66_NEW_INSURER_SOURCE_RECOVERY_SANITIZED_R63_V1",
+  "recordType": "SANITIZED_SOURCE_RECOVERY_NOT_PAYMENT_APPLICATION_OR_WRITE_AUTHORIZATION",
+  "recordedAtUtc": "2026-11-24T22:57:21.917Z",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "gate": "I6.6",
+  "status": "SOURCE_EXTRACTED_BASE28_READBACK_ONLY_EXTENDED27_QUERY_PENDING_ZERO_NEW_APPLIES",
+  "privateEvidence": {
+    "summaryPath": "/workspace/scratch/959ac47e87b3/financiero/nov24-source-review-summary.json",
+    "summarySha256": "59f9ce9af9dfd434dc20d6fa7bcea93da75410601aebfdd84f3aadb6b452a318",
+    "readmePath": "/workspace/scratch/959ac47e87b3/financiero/README_CONTINUIDAD_FINANCIERA.md",
+    "readmeSha256": "4a49e54163cfcebc58d86fbe27226757d9fb6f906485e5b613bb60aec2654f29",
+    "originalsAndOperationalIdentitiesRemainPrivate": true,
+    "rawSourceRowsInThisReceipt": false,
+    "privateDecryptionKeyInRepository": false
+  },
+  "sourceInventory": {
+    "insurerFolders": 11,
+    "currentInsurerOriginals": 24,
+    "novemberOriginals": 15,
+    "originalsUsedForThisExtraction": 13,
+    "latestDriveRecheck": {
+      "dateGuatemala": "2026-11-24",
+      "timeGuatemala": "16:21",
+      "evidenceOrigin": "SOURCE_OWNER_DRIVE_RECHECK_REPORTED_BY_ROOT_IN_THIS_SESSION",
+      "newFiles": 0,
+      "modifiedFiles": 0,
+      "countsMatchPriorInventory": true
+    }
+  },
+  "sourceFacts": {
+    "observations": 114,
+    "documentedColumnaPayments": 7,
+    "documentedColumnaGrossCents": 201889,
+    "pendingObservations": 107,
+    "guatemaltecaPendingNetRows": 90,
+    "guatemaltecaNetTotalCents": 3425249,
+    "guatemaltecaAmountSemantic": "NET_NOT_GROSS",
+    "inferencePredecessorCandidates": 83,
+    "inferencePredecessorsWithExistingPaidWitness": 7,
+    "remainingUnexcludedCandidates": 76,
+    "remainingCandidatesAreWriteEligible": false,
+    "newColumnaFactRelativeToPreviouslyDocumentedSources": 1,
+    "newColumnaSourceGrossCents": 31640,
+    "currency": "GTQ",
+    "freshApplyEligible": null,
+    "sourceFactsAreNotIncrementalPayments": true,
+    "sourceTotalsMustNotBeAddedToAppliedPaymentCounters": true
+  },
+  "duplicatesPreservedOrExcluded": {
+    "gyt": "5 business-identical rows",
+    "ceiba": "1 business-identical obligation repeated PDF/ZIP; embedded workbook contains only header",
+    "general16nov": "1 paid and9 pending rows superseded by23nov; no new payment",
+    "universalesEffectiveness": "aggregate only; not payment-level evidence"
+  },
+  "existingApplicationProtection": {
+    "existingCendosoApplications": 155,
+    "grossCents": 7880643,
+    "currency": "GTQ",
+    "applicationState": "APPLIED_DIRECT",
+    "repeatExistingPayments": false,
+    "earlier56FactLaneRemainsSeparate": {
+      "preparedMapfrePayments": 2,
+      "otherDocumentaryHolds": 7,
+      "countsNotAddedToThisSourceUniverse": true
+    }
+  },
+  "baseReadback": {
+    "runId": 45497509828,
+    "runAttempt": 1,
+    "jobId": 138811792888,
+    "artifactId": 14970530267,
+    "artifactZipSha256": "785f796276e7d7b24a622d3ddecb50b2d43be3679227a0227c0e3926086a6fa6",
+    "reportSha256": "4ce24a0ccdaf4e555d6e5647b1c63340933359b4281f94cf7ce982c33d8e2286",
+    "sourceSha": "32229710311b6fc8fdb01d1e00c95ced32d2ebf8",
+    "event": "push",
+    "runCreatedAtUtc": "2026-11-24T22:05:19Z",
+    "runCompletedAtUtc": "2026-11-24T22:06:24Z",
+    "artifactCreatedAtUtc": "2026-11-24T22:06:20Z",
+    "status": "SUCCESS",
+    "readonlyReferenceQuerySupplied": false,
+    "extended27TargetsExecuted": false,
+    "baseSourceCaseCount": 28,
+    "twoScansComparedEqualByOwner": true,
+    "dateCaveat": "dateGuatemala=2026-11-12 is a hardcoded documentary source date; freshness comes from the run timestamps.",
+    "reportPath": "a5a6-fresh-45497509828/gi-i66-a5-a6-live-readonly.json",
+    "writes": 0,
+    "certifiedApplied": 0,
+    "statusCounts": {
+      "HOLD_REQUIREMENT_NOT_LINKED": 21,
+      "HOLD_EXACT_INSURER_POLICY_NOT_FOUND": 6,
+      "PENDING_SOURCE_EXACT_RECEIPT_ELIGIBILITY_REVIEW_NOT_WRITE": 1
+    },
+    "newWriteEligibility": 0,
+    "baseArtifactDoesNotProvideCompleteCanonicalIdsAndUpdateTime": true,
+    "baseArtifactIsInsufficientForFreshCas": true,
+    "validatesLatestColumnaGuatemaltecaRuralSources": false
+  },
+  "preparedExtendedReadback": {
+    "workflow": ".github/workflows/gravicentra-i66-cartera-a5-a6-readonly.yml",
+    "input": "readonly_reference_query",
+    "queryFile": "readonly-reference-query.json",
+    "querySha256": "46013562cc92dd4c8aa735745f91643ce3b4bd36f2c8280732ef657f43d684ee",
+    "queryBytes": 21219,
+    "policySelectors": 27,
+    "references": 108,
+    "ownerExtensionCommittedAtSha": "32229710311b6fc8fdb01d1e00c95ced32d2ebf8",
+    "extendedQueryExecuted": false,
+    "baseRun45497509828IsNotExtendedQuery": true,
+    "localContractChecks": 14,
+    "localContractStatus": "PASS",
+    "outputEncryption": "RSA-OAEP-SHA256+AES-256-GCM; private key remains in private working evidence",
+    "inputTransport": "GITHUB_EVENT_PATH; no shell interpolation or raw input environment variable",
+    "inputPrivacy": "Minimal policy/reference selectors, source hashes and public key; no names, amounts, dates, accounts or Drive IDs",
+    "authorizationBoundary": "Existing read-only workflow only; do not send this source package to an apply gate.",
+    "transportStatus": "NO_COMPATIBLE_DISPATCH_TRANSPORT_PROVEN",
+    "doNotChangeMainOrBroadenMakeScopeToForceDispatch": true
+  },
+  "nextRequiredExecution": {
+    "first": "Use a compatible authorized dispatch for readonly_reference_query on the existing cartera-a5-a6-readonly workflow and recovery branch.",
+    "then": "Obtain and privately decrypt the extended artifact; validate canonical identities, document updateTimes, existing payments, amounts, periods and references.",
+    "afterReadback": "Prepare one largest eligible deduplicated batch through the existing canonical writer with fresh preimages, CAS, audit, after-readback and isolated holds.",
+    "applicationMayBeClaimedOnlyAfterActualCanonicalWriteAndIndependentReadback": true
+  },
+  "effects": {
+    "newPaymentsApplied": 0,
+    "newObligationsApplied": 0,
+    "financialWrites": 0,
+    "bankMovements": 0,
+    "formalPassCountChanged": false,
+    "newLiveAcceptance": false
+  },
+  "nextActionAuthority": "artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json#nextAction",
+  "recoveryCheckpointBase": "bf6bce909ad143d59fb2cbb414cdbbe7972c4ee2",
+  "priorLocalPreparationWasUnpublished": true
+}

@@ -42,8 +42,10 @@ const expectDenied=async(fn,code='permission-denied')=>{
   await assert.rejects(fn,e=>String(e.code||'').includes(code)||String(e.message||'').includes(code));checks++;
 };
 const seed=async(id,country,advisorId,monto)=>{
-  await data('polizas','pol_'+id).set({id:'pol_'+id,pais:country,asesorId:advisorId,clienteId:'cli_'+id});
-  await data('recibosEsperados','rec_'+id).set({id:'rec_'+id,polizaId:'pol_'+id,asesorId:advisorId,clienteId:'cli_'+id,pais:country,monto,estado:'Pendiente'});
+  const moneda={GT:'GTQ',CO:'COP'}[country];
+  assert(moneda,'QA fixture requires an explicit supported country currency');
+  await data('polizas','pol_'+id).set({id:'pol_'+id,pais:country,moneda,asesorId:advisorId,clienteId:'cli_'+id});
+  await data('recibosEsperados','rec_'+id).set({id:'rec_'+id,polizaId:'pol_'+id,asesorId:advisorId,clienteId:'cli_'+id,pais:country,moneda,monto,estado:'Pendiente'});
 };
 (async()=>{
   await Promise.all([

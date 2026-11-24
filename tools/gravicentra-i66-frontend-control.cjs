@@ -219,6 +219,57 @@ function assertOwnerPlanContinuation(control,state,transport){
   assert.equal(state.currentOperationalWorkPointer,mirror.authorityPointer,'I66_OWNER_PLAN_POINTER_DRIFT');
   assert.equal(state.nextAction,control.nextAction,'I66_OWNER_PLAN_NEXT_ACTION_DRIFT');
 }
+function assertActiveFinancialAndPlanProjections(control,progress,io){
+  const continuation=control.i66OperationalContinuation20261115;
+  assert.ok(continuation,'I66_ACTIVE_CONTINUATION_MISSING');
+  const planPath=continuation.canonicalPlan;
+  assert.ok(/^artifacts\/orbit360-recovery\/release-control\/[A-Za-z0-9_.-]+\.json$/.test(planPath||''),
+    'I66_CANONICAL_PLAN_PATH_INVALID');
+  const plan=JSON.parse(io.readFileSync(planPath,'utf8'));
+  // This file retains the frozen decisions and dated evidence. Its old prose
+  // must never become a second mutable execution cursor after a new release.
+  assert.equal(plan.recordScope,'FROZEN_BUSINESS_DECISIONS_AND_HISTORICAL_EVIDENCE',
+    'I66_CANONICAL_PLAN_SCOPE_MISSING');
+  assert.equal(plan.nextAction,P.cp+'#nextAction','I66_CANONICAL_PLAN_NEXT_ACTION_DRIFT');
+  assert.deepEqual(plan.currentExecutionAuthority,{
+    schema:'GI_I66_CANONICAL_PLAN_EXECUTION_REDIRECT_V1',controlPlanePath:P.cp,
+    cursorPointer:P.cp+'#i66ActiveRecoveryCursor',nextActionPointer:P.cp+'#nextAction',
+    financialExecutionPointer:P.cp+'#i66OperationalContinuation20261115.currentFinancialDataExecution20261124'
+  },'I66_CANONICAL_PLAN_EXECUTION_POINTER_DRIFT');
+
+  const current=progress.financialWork?.currentExecution20261124;
+  assert.equal(current?.schema,'GI_I66_CURRENT_FINANCIAL_EXECUTION_V1','I66_CURRENT_FINANCIAL_EXECUTION_MISSING');
+  assert.deepEqual(continuation.currentFinancialDataExecution20261124,current,
+    'I66_CURRENT_FINANCIAL_EXECUTION_PROJECTION_DRIFT');
+  // Compare the duplicated summary to the active receipt, and independently
+  // to its sealed application proof. Updating both summaries to PENDING cannot
+  // erase a completed application or authorize the same payments a second time.
+  const payments=current.historicalPayments,completion=payments?.applicationCompletion,pin=completion?.receipt;
+  assert.ok(completion&&pin,'I66_APPLIED_PAYMENT_COMPLETION_MISSING');
+  assert.ok(/^artifacts\/orbit360-recovery\/release-control\/[A-Za-z0-9_.-]+\.json$/.test(pin.path||''),
+    'I66_APPLIED_PAYMENT_RECEIPT_PATH_INVALID');
+  const bytes=io.readFileSync(pin.path,'utf8'),receipt=JSON.parse(bytes),proven=receipt.cendoso;
+  assert.equal(blob(bytes),pin.gitBlobSha,'I66_APPLIED_PAYMENT_RECEIPT_BLOB_DRIFT');
+  assert.equal(hash(bytes),pin.sha256,'I66_APPLIED_PAYMENT_RECEIPT_HASH_DRIFT');
+  assert.ok(proven&&proven.exactManifestIdentitySetCovered===true&&proven.committedUnverified===0&&
+    proven.writeOutcomeIndeterminate===false,'I66_APPLIED_PAYMENT_READBACK_UNPROVEN');
+  assert.equal(proven.applicationState,'APPLIED_DIRECT','I66_APPLIED_PAYMENT_PROOF_NOT_APPLIED');
+  assert.equal(payments.applicationState,proven.applicationState,'I66_APPLIED_PAYMENT_STATE_REGRESSION');
+  assert.equal(completion.applicationState,proven.applicationState,'I66_APPLIED_PAYMENT_COMPLETION_STATE_DRIFT');
+  assert.equal(completion.status,proven.status,'I66_APPLIED_PAYMENT_COMPLETION_STATUS_DRIFT');
+  assert.equal(payments.applied,proven.verifiedApplied,'I66_APPLIED_PAYMENT_COUNT_DRIFT');
+  assert.equal(payments.grossCents,proven.registeredPaymentGrossCents,'I66_APPLIED_PAYMENT_GROSS_DRIFT');
+  assert.equal(payments.currency,proven.currency,'I66_APPLIED_PAYMENT_CURRENCY_DRIFT');
+  assert.equal(completion.verifiedExistingPayments,proven.verifiedApplied,'I66_APPLIED_PAYMENT_COMPLETION_COUNT_DRIFT');
+  assert.equal(completion.registeredPaymentGrossCents,proven.registeredPaymentGrossCents,'I66_APPLIED_PAYMENT_COMPLETION_GROSS_DRIFT');
+  assert.equal(completion.currency,proven.currency,'I66_APPLIED_PAYMENT_COMPLETION_CURRENCY_DRIFT');
+  assert.equal(completion.insurerReconciliationProven,proven.insurerReconciliationProven,'I66_APPLIED_PAYMENT_INSURER_RECONCILIATION_DRIFT');
+  assert.equal(completion.all155SinglePostCompletionCensusClaimed,proven.noWriteReplayEvidence.all155SinglePostCompletionCensusClaimed,
+    'I66_APPLIED_PAYMENT_SINGLE_POST_COMPLETION_CENSUS_DRIFT');
+  assert.deepEqual(completion.applicationRunIds,proven.runs.map(run=>run.runId),'I66_APPLIED_PAYMENT_RUN_DRIFT');
+  for(const key of ['newPayments','newObligations','bankMovements','amountChangesCents','paidDateChanges'])
+    assert.equal(completion[key],proven[key],'I66_APPLIED_PAYMENT_COMPLETION_EFFECT_DRIFT_'+key);
+}
 function assertActiveReleaseProgress(control,progress,transport){
   const head=control.i66FrontendReleaseHead;if(!head||head.generation<4)return;
   const execution=progress.releaseExecution;
@@ -730,5 +781,5 @@ async function verifyReadonlyObserver(resolution,{env=process.env,api,readMarker
     productWrites:0,syntheticWrites:0,releaseTransitions:0,hostedMarkersVerified:origins};
 }
 module.exports={P,genName,serial,blob,physicalGuard,closeFiles,executionSnapshot,executionProgressProjection,synchronizeExecutionProgress,archiveExecutionObservers,assertExecutionProgress,assertRetiredReleaseContinuation,
-  ownerPlanContinuationProjection,synchronizeOwnerPlanContinuation,assertOwnerPlanContinuation,assertActiveReleaseProgress,
+  ownerPlanContinuationProjection,synchronizeOwnerPlanContinuation,assertOwnerPlanContinuation,assertActiveFinancialAndPlanProjections,assertActiveReleaseProgress,
   compositeReceipt,closeCompositeFiles,READONLY_PROFILES,readonlyObserverPaths,readonlyObserverTarget,resolveReadonlyObserver,verifyReadonlyObserver};

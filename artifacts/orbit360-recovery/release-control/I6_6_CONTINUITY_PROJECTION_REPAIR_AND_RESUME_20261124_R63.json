@@ -1,0 +1,750 @@
+{
+  "schema": "GI_I66_CONTINUITY_PROJECTION_REPAIR_AND_RESUME_R63_V1",
+  "recordType": "SANITIZED_ADDITIVE_GOVERNANCE_EVIDENCE_NOT_RELEASE_OR_FINANCIAL_ACCEPTANCE",
+  "recordedAtUtc": "2026-11-24T22:57:21.917Z",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "gate": "I6.6",
+  "recoveredSource": {
+    "commit": "bf6bce909ad143d59fb2cbb414cdbbe7972c4ee2",
+    "remoteHeadVerified": true,
+    "priorProgress": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_EXECUTION_PROGRESS_20261124_R62.json",
+      "gitBlobSha": "7fa3e45839ca92b72a9b59efa5158ef07250c382",
+      "sha256": "bc4806589114af573e851fce47b045c4f5e0a3dd752d3d7979dbeca41933b94a"
+    },
+    "initialRecoveredCommit": "32229710311b6fc8fdb01d1e00c95ced32d2ebf8",
+    "concurrentProductIntegrationCommit": "9da06674caf080e10f510d8a13a1d122d449dff2",
+    "sharedWorkPreserved": true,
+    "originalSharedCheckoutModifiedByThisRepair": false,
+    "insurerAndAssignedRoleSource": {
+      "status": "COMMITTED_SOURCE_PRESERVED_SIGNED_SUCCESSOR_RUNTIME_PENDING",
+      "insurerOwner": "orbit360-platform/modules/aseguradoras.js",
+      "insurerOwnerGitBlobSha": "0ce40050387f68b2e3efaddc7717ace7cf3ae3ff",
+      "insurerReceipt": {
+        "path": "artifacts/orbit360-recovery/release-control/I6_6_INSURER_EDITOR_STATE_PRESERVATION_CAUSAL_SOURCE_20261124.json",
+        "gitBlobSha": "9f2b2e79e8ee8564bd2999689396680fd7f3ba0a",
+        "sha256": "68325d206e40f1484989e84c21d080105c4303d0f9813cbc4c9c41fe0f86597c"
+      },
+      "assignedRoleReceipt": {
+        "path": "artifacts/orbit360-recovery/release-control/I6_6_DIRECT_FORMS_ASSIGNED_ROLES_AND_INSURER_EDITOR_CAUSAL_SOURCE_20261124.json",
+        "gitBlobSha": "539a1c4be0635588f5c7ec187320a78ce4b91927",
+        "sha256": "dd8e93ad71b236544b4f936418d005e24da9385fd981eba4c5a267f662fca7c6"
+      },
+      "roleWriteReceipt": {
+        "path": "artifacts/orbit360-recovery/release-control/I6_6_OPERATIVO_ROLE_MATRIX_AND_BROWSER_INSURER_WRITE_READBACK_20261124.json",
+        "gitBlobSha": "76754d8c1acb4c9fa5d393bf1bd27913e4971e43",
+        "sha256": "5c25263888b3cfb8c684c2883d8b72af4d2c5c07bb689b00b49807e1364758b1"
+      },
+      "financeReceipt": {
+        "path": "artifacts/orbit360-recovery/release-control/I6_6_R51_ASSIGNED_ROLES_INSURER_FINANCIAL_RECOVERY_SOURCE_20261124.json",
+        "gitBlobSha": "4d989f8bb8705974209fe79d65a72d4f11e4a1f1",
+        "sha256": "f807d9d16c7b3750dde7f0a14bc316d757b9f550fede24469a302770d225abf4"
+      },
+      "cancellationReceipt": {
+        "path": "artifacts/orbit360-recovery/release-control/I6_6_EFFECTIVE_CANCELLATION_ASSIGNED_ROLES_CAUSAL_SOURCE_20261124.json",
+        "gitBlobSha": "c095cdf1cc648a009dde51a641062f3941ee4da1",
+        "sha256": "cb3d7183efc5ee634668cf4f2f0379ba8ecdcd12edd73722d6be6c54d4d45269"
+      },
+      "productModuleCompletionClaimed": false,
+      "newRuntimeAcceptanceTransferred": false
+    }
+  },
+  "signedSourceEvidence": {
+    "sourceSha": "9da06674caf080e10f510d8a13a1d122d449dff2",
+    "sourceQa": {
+      "runId": 45501592776,
+      "conclusion": "success",
+      "scope": "PRIVILEGED_OPERATIONAL_ROLE_PARITY_SOURCE_QA"
+    },
+    "governance": {
+      "runId": 45501592707,
+      "conclusion": "success",
+      "scope": "CANONICAL_GUARD_AND_PUBLIC_LIVE_AVAILABILITY"
+    },
+    "receipt": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_6_V29_SIGNED_SOURCE_QA_AND_GOVERNANCE_20261124.json",
+      "gitBlobSha": "82a3eef6b71b8183d9c1199ffb2cb59d0fb3649d",
+      "sha256": "1672bd64324c18e8bf301f9c06f3093404898aae307f3eea63fe0739c1b77b55"
+    },
+    "successorStillRequiresExactComposedSourceQa": true,
+    "successorStillRequiresExactCanonicalGuard": true,
+    "fullBuildAdmissionPassed": false,
+    "noRuntimeAcceptanceClaim": true
+  },
+  "historicalRecoveredSourceEvidence": {
+    "sourceSha": "32229710311b6fc8fdb01d1e00c95ced32d2ebf8",
+    "sourceQaRunId": 45497509833,
+    "guardRunId": 45497509884,
+    "conclusion": "success",
+    "gateOnlyRun": {
+      "runId": 45497510367,
+      "conclusion": "success",
+      "executedJobs": [
+        "gate"
+      ],
+      "skippedJobs": [
+        "immutable-package",
+        "protected-conciliaciones-reader-preview"
+      ],
+      "newArtifactBuilt": false,
+      "build29Proven": false,
+      "artifactId": null,
+      "artifactDigest": null
+    },
+    "notV29ArtifactEvidence": true
+  },
+  "failedBuild29": {
+    "status": "V29_SOURCE_ADMISSION_TEST_FAILURE_BEFORE_PACKAGE_NO_ARTIFACT_NOT_RELEASE_ELIGIBLE",
+    "requestVersion": 29,
+    "runId": 45502038971,
+    "runAttempt": 1,
+    "headSha": "6efd4d494cd56b6be87d2fee3cbfc0ba55e9f6a8",
+    "workflow": ".github/workflows/gravicentra-release-delta-66-package.yml",
+    "providerUrl": "https://github.com/paulaosoriof86/orbit360-core/actions/runs/45502038971",
+    "conclusion": "failure",
+    "completedAtUtc": "2026-11-24T22:35:36Z",
+    "gate": {
+      "jobId": 138827539047,
+      "conclusion": "success"
+    },
+    "immutablePackage": {
+      "jobId": 138828118868,
+      "conclusion": "failure",
+      "failedStep": 4,
+      "failedStepName": "Verify latest I6.6 source and historical B4 seals without reopening B4",
+      "sourceAdmissionTests": 85,
+      "sourceAdmissionPassed": 72,
+      "sourceAdmissionFailed": 13,
+      "testCountsVerifiedFromProviderJobLog": true
+    },
+    "skippedSteps": [
+      "Build a single immutable package from the exact I6.6 source and config snapshot",
+      "Preserve byte-exact package, digest and source identity for Preview then LIVE",
+      "Run actions/upload-artifact@v4",
+      "Publish exact immutable site only to isolated Hosting Preview",
+      "Preview readback all artifact files and confirm both LIVE origins are untouched"
+    ],
+    "protectedReaderPreview": "skipped",
+    "providerArtifactCount": 0,
+    "artifactId": null,
+    "artifactDigest": null,
+    "productPackageBuilt": false,
+    "hostingDeployExecuted": false,
+    "scopedBackendDeployed": false,
+    "livePromoted": false,
+    "sourceQaPassDoesNotCertifyBuildAdmissionOrRuntime": true,
+    "blindRerunAuthorized": false,
+    "next": "The published causal admission and three-owner correction is integrated. Verify exact integrated R63 source QA and guard, then use the existing monotonic successor request procedure."
+  },
+  "browserObservation": {
+    "status": "SCOPED_AUTHENTICATED_DIRECTION_INSURER_READ_OBSERVED_NOT_MODULE_ACCEPTANCE",
+    "evidenceOrigin": "CONNECTED_CHROME_OBSERVATION_REPORTED_BY_ROOT_IN_THIS_SESSION",
+    "dateGuatemala": "2026-11-24",
+    "role": "Dirección",
+    "insurer": "MAPFRE",
+    "observedBuildId": "gi-i66-65c825b2808a-57f234755dc1",
+    "observedSourceSha": "65c825b2808a615ca4195bdde6689dbdbe3193b2",
+    "readOnly": true,
+    "writeActions": 0,
+    "errorsCaptured": 0,
+    "errorScope": "No error captured in this bounded browser observation; not proof that the whole module or every request is error-free.",
+    "startupReloadCycleCertified": false,
+    "insurerWritesCertified": false,
+    "fullA03Passed": false,
+    "fullA04Passed": false,
+    "fullI66Accepted": false
+  },
+  "causalFindings": [
+    {
+      "id": "I66-CONTINUITY-CANONICAL-PLAN-NEXT-DRIFT",
+      "path": "artifacts/orbit360-recovery/release-control/I6_6_OPERATIONAL_CONTINUATION_20261115.json",
+      "field": "nextAction",
+      "before": "Obsolete active-looking instruction referencing 1b65a7/artifact14373955326/223files/three functions.",
+      "cause": "The canonical business plan retained a second mutable nextAction, while active Control Plane and state projections advanced.",
+      "correction": "Preserve the exact former text as historical; redirect nextAction to CONTROL_PLANE#nextAction and label dated evidence as historical.",
+      "discriminant": "Restoring the former nextAction or changing the execution pointer is rejected by the canonical preflight helper."
+    },
+    {
+      "id": "I66-CONTINUITY-APPLIED-PAYMENT-PROJECTION-DRIFT",
+      "path": "artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json",
+      "field": "i66OperationalContinuation20261115.currentFinancialDataExecution20261124.historicalPayments.applicationState",
+      "before": "PENDING_APPLICATION",
+      "after": "APPLIED_DIRECT",
+      "cause": "The financial summary embedded in Control Plane was not checked against active progress and the sealed R52 application evidence.",
+      "correction": "Derive the financial projection from active progress and validate it independently against the immutable R52 receipt.",
+      "discriminant": "A stale CP copy, two synchronized PENDING copies, doubled count, missing completion, modified receipt bytes, currency drift, invented insurer reconciliation or an unproved single post-completion census are rejected."
+    }
+  ],
+  "newerR61Assessment": {
+    "bothOriginalProjectionDefectsStillPresent": true,
+    "preservesCommittedInsurerAndRoleSource": true,
+    "selectsAssignedPaulaRoles": true,
+    "preservesR60BusinessInstructionsAndR52Payments": true,
+    "requestedV29": true,
+    "correctedHistoricalMakeRevision": "orbit360makeleadingresspreview-00001-cuy",
+    "newCloudTrafficObservationClaimed": false
+  },
+  "qaHarnessCorrectionsIncludedInThisCheckpoint": {
+    "status": "INTEGRATED_BY_ROOT_IN_DETACHED_SUCCESSOR_PENDING_COMMIT_AND_SIGNED_CI",
+    "paths": [
+      "tools/gravicentra-b4-003-e4-anulado-projection.test.cjs",
+      "tools/gravicentra-delta66-advisor-payment-emulator-functional.test.cjs"
+    ],
+    "gitBlobShas": {
+      "tools/gravicentra-b4-003-e4-anulado-projection.test.cjs": "ca30835b82a7d2c329770062991d2c6e0362e396",
+      "tools/gravicentra-delta66-advisor-payment-emulator-functional.test.cjs": "6459586a5b1847e4167dade8e595eb78f66cb670"
+    },
+    "productSourceMutation": false,
+    "signedCiPending": true
+  },
+  "exactSourceCompatibility": {
+    "productSourceChangedByThisRepair": false,
+    "transportRequest29Changed": false,
+    "acceptedArtifactPatched": false,
+    "newBuildRequestedByThisRepair": false,
+    "previewRequestAuthority": "tools/gravicentra-i6-6-frontend-preview-authority.cjs",
+    "productSourceEqualityExcludesOnlyRecoveryStateMetadata": true,
+    "futureSignedCandidatePinnedOwnersInclude": [
+      "tools/gravicentra-i66-frontend-control.cjs",
+      "tools/gravicentra-i66-frontend-control.test.cjs",
+      "tools/gravicentra-governance-preflight-v1.mjs",
+      "tools/gravicentra-i66-composite-acceptance.test.cjs"
+    ],
+    "risk": "The source admission and predecessor transition corrections are committed and their source-only QA receipts are resealed. The bf6 source-QA run failed on the separately corrected historical composite fixture. Obtain actual source QA and canonical guard evidence for the exact integrated R63 successor before requesting its immutable package; preserve the current request29 failure and all artifact gates.",
+    "qaHarnessesDoNotClaimEarlierSourcePass": true
+  },
+  "localValidation": {
+    "status": "CURRENT_BASE_INTEGRATED_100_PASS_FINAL_DESCRIPTIVE_CURSOR_INVARIANTS_PASS_SIGNED_CI_PENDING",
+    "previousBase99": {
+      "sourceBase": "32229710311b6fc8fdb01d1e00c95ced32d2ebf8",
+      "tests": 99,
+      "passed": 99,
+      "failed": 0,
+      "additionalExistingTestMutations": [
+        "completion currency",
+        "insurer reconciliation claim",
+        "single post-completion census claim"
+      ],
+      "passDoesNotTransferToCurrentBase": true
+    },
+    "priorRoot100": {
+      "tests": 100,
+      "passed": 100,
+      "failed": 0,
+      "scope": "Before the three final completion assertions and before source6efd; historical only."
+    },
+    "currentBaseRootBeforeR63": {
+      "sourceBase": "6efd4d494cd56b6be87d2fee3cbfc0ba55e9f6a8",
+      "historicalOnly": true,
+      "tests": 100,
+      "passed": 87,
+      "failed": 13,
+      "failureScope": "Eleven composite fixtures read the mutable v29 transport; two continuity tests see the still-stale financial projection.",
+      "evidenceOrigin": "ROOT_REPORTED_LOG",
+      "log": "/workspace/scratch/866014daf534/continuity-exact-tests-after-base-r61.log"
+    },
+    "currencyDiscriminant": {
+      "tests": 7,
+      "passed": 7,
+      "failed": 0,
+      "evidenceOrigin": "ROOT_REPORTED_LOCAL_DISCRIMINANT",
+      "fullEmulatorPassed": false
+    },
+    "fullEmulatorPendingCI": true,
+    "signedCiOnRepairedSuccessor": false,
+    "exactIntegratedPreflightPending": true,
+    "twoQaHarnessCorrectionsIntegrated": true,
+    "signedCiPending": true,
+    "currentBaseIntegrated": {
+      "sourceBase": "bf6bce909ad143d59fb2cbb414cdbbe7972c4ee2",
+      "nodeVersion": "v24.22.3",
+      "tests": 100,
+      "passed": 100,
+      "failed": 0,
+      "skipped": 0,
+      "testFiles": [
+        "tools/gravicentra-i66-frontend-control.test.cjs",
+        "tools/gravicentra-i66-composite-acceptance.test.cjs",
+        "tools/gravicentra-b4-003-e4-anulado-projection.test.cjs"
+      ],
+      "testPins": {
+        "tools/gravicentra-i66-frontend-control.test.cjs": "53ca073f7c6d5db36513caccb010bece47a42919",
+        "tools/gravicentra-i66-composite-acceptance.test.cjs": "3bab3e94cdd575b40efda54eb8d6d7ba72f87a39",
+        "tools/gravicentra-b4-003-e4-anulado-projection.test.cjs": "ca30835b82a7d2c329770062991d2c6e0362e396"
+      },
+      "logSha256": "0bc85b10c1062872a7dd5aa8ebbe40ac0c7a15d9ab811fef03db2bb75eea121c",
+      "logPath": "/workspace/scratch/866014daf534/continuity-repair-staging/r63-bf6-integrated-100-tests.tap",
+      "includesThreeCompletionProofEqualities": true,
+      "includesE4HarnessCorrection": true,
+      "includesRootCompositeFixtureCorrection": true,
+      "productRuntimeAcceptance": false
+    },
+    "cursorProjectionInvariants": "PASS",
+    "syntaxPassed": true,
+    "finalCanonicalPreflightPendingOnIntegratedCommit": true,
+    "compositeFixtureCorrection": {
+      "path": "tools/gravicentra-i66-composite-acceptance.test.cjs",
+      "gitBlobSha": "3bab3e94cdd575b40efda54eb8d6d7ba72f87a39",
+      "scope": "Historical four-function fixture uses the sealed E00003 consumed request, retaining current production validators.",
+      "discriminant": {
+        "priorFailing": 11,
+        "afterTests": 56,
+        "afterPassed": 56,
+        "afterFailed": 0,
+        "afterSkipped": 0,
+        "evidenceOrigin": "ROOT_REPORTED_SEPARATE_SUITE_AND_INDEPENDENT_INTEGRATED_100_RERUN"
+      }
+    },
+    "predecessorSignedCi": {
+      "sourceSha": "bf6bce909ad143d59fb2cbb414cdbbe7972c4ee2",
+      "sourceQa": {
+        "runId": 45505421061,
+        "jobId": 138839252861,
+        "conclusion": "failure",
+        "tests": 125,
+        "passed": 114,
+        "failed": 11,
+        "skipped": 0,
+        "failure": "I66_FINANCIAL_REQUIRED_UI_QA_REMOVED",
+        "scope": "Historical composite-acceptance fixture read mutable request29; the included root correction binds the sealed E3 request.",
+        "testCountsEvidenceOrigin": "INDEPENDENT_REVIEWER_PROVIDER_JOB_LOG",
+        "runConclusionVerifiedByThisSession": true,
+        "sourceGuardStep": "skipped",
+        "sourceQaReceiptProduced": false
+      },
+      "governance": {
+        "runId": 45505421194,
+        "jobId": 138839253821,
+        "conclusion": "success",
+        "canonicalPreflightStep": "success",
+        "publicReadOnlyJobId": 138839253531,
+        "b4003Emulator": "skipped",
+        "providerJobsVerifiedByThisSession": true
+      },
+      "build": {
+        "runId": 45505420878,
+        "workflowConclusion": "success",
+        "gateJobId": 138839252490,
+        "gate": "success",
+        "immutablePackage": "skipped",
+        "protectedReader": "skipped",
+        "artifactCount": 0,
+        "providerJobsAndArtifactCountVerifiedByThisSession": true,
+        "notAnImmutableProductBuild": true
+      },
+      "signedQaForRepairedR63Commit": "PENDING_NEW_COMMIT_AND_ACTIONS_EVIDENCE"
+    }
+  },
+  "financialSourceRecovery": {
+    "path": "artifacts/orbit360-recovery/release-control/I6_6_NEW_INSURER_SOURCE_RECOVERY_SANITIZED_20261124_R63.json",
+    "gitBlobSha": "43c9918d2da47cb4753aaa392b581573d0b98173",
+    "sha256": "12906baf0481894c67015f748c972ec952e6d895863daa3e8496ff7346b8d3a7"
+  },
+  "preservedBoundaries": {
+    "shockPassed": 2,
+    "shockTotal": 14,
+    "postproductionMiniGatesPassed": 6,
+    "postproductionMiniGatesTotal": 10,
+    "acceptedLiveGeneration": 3,
+    "acceptedLiveSource": "65c825b2808a615ca4195bdde6689dbdbe3193b2",
+    "acceptedLiveArtifactId": 14873426438,
+    "acceptedLiveArtifactDigest": "sha256:7cb782848a45083047c4899bc30c13bf5be46429607e42597d09342becfc9acc",
+    "historicalPaymentsApplied": 155,
+    "historicalPaymentGrossCents": 7880643,
+    "currency": "GTQ",
+    "mapfreCanonicalPaymentsPending": 2,
+    "otherDocumentaryPaymentHolds": 7,
+    "failedPreview28Retired": true,
+    "makeRealIngressAccepted": false,
+    "externalMessagesSent": 0
+  },
+  "effects": {
+    "productionMutation": false,
+    "businessWrites": 0,
+    "financialWrites": 0,
+    "productSourceCertifiedByThisReceipt": false,
+    "newLiveAcceptance": false,
+    "formalPassCountChanged": false,
+    "request29OrTransportMutation": false,
+    "noConcurrentProductOrQaRevisionDiscarded": true
+  },
+  "nextActionAuthority": "artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json#nextAction",
+  "unresolvedPublicationMechanism": {
+    "status": "CAUSAL_FIX_INTEGRATED_R63_COMPOSITE_FIX_INCLUDED_EXACT_SIGNED_SUCCESSOR_QA_PENDING",
+    "currentCausalSourceRevision": {
+      "status": "COMMITTED_CAUSAL_ADMISSION_AND_THREE_OWNER_FIX_WITH_LOCAL_89_PASS_RUNTIME_PENDING",
+      "sourceSha": "bf6bce909ad143d59fb2cbb414cdbbe7972c4ee2",
+      "sourceTree": "c68ec1f8b401cda37babeee5262a8f9a49cebf5c",
+      "receipt": {
+        "path": "artifacts/orbit360-recovery/release-control/I6_6_COMPOSITE_ADMISSION_HISTORICAL_FIXTURES_AND_REQUEST_CONTINUITY_QA_20261124.json",
+        "gitBlobSha": "39b1dfec26caa279f3ebb79d44740165d637fac1",
+        "sha256": "c79a3d521178c2dcdf07ed432ca4d7b0f0f87f6ce1e1521a1cfebe9b1d46af22"
+      },
+      "testOwner": {
+        "path": "tools/gravicentra-i6-6-composite-preview-admission.test.cjs",
+        "gitBlobSha": "c6485d21daa40ea5a0521521163b67a375d6fd6d",
+        "replaces": {
+          "path": "tools/gravicentra-i6-6-composite-preview-admission.test.cjs",
+          "priorGitBlobSha": "e1dd83a9dc1cc63f04f68a1d10afeedfca758afa",
+          "priorChangeId": "I6_6_R51_ASSIGNED_ROLES_INSURER_COMPOSED_ADMISSION_QA_20261124"
+        }
+      },
+      "admissionOwner": {
+        "path": "tools/gravicentra-i6-6-frontend-preview-authority.cjs",
+        "previousGitBlobSha": "c6d557968818a10164211b03092aa604743cbc9c",
+        "gitBlobSha": "c1b38fcccdf4fae3bc23cfc6c5cf0a1e9dbd1230",
+        "sha256": "9e0c85ce1f3a809ff514e1e5e2bc5cf60bef118144d076a4838a23b953c125f9",
+        "scope": "EXACT_PREVIOUS_THREE_OWNER_EXTENSION_IDENTITY_WITH_FULL_RECEIPT_SOURCE_QA_HEAD_REVALIDATION"
+      },
+      "localVerification": {
+        "tests": 89,
+        "passed": 89,
+        "failed": 0,
+        "skipped": 0,
+        "reportSha256": "04cb424dffbee6ecab53d2e95d40d2e948ca85e6b8ddd0eee2c14138dcb34e24",
+        "evidenceOrigin": "COMMITTED_CAUSAL_RECEIPT_FROM_CONCURRENT_SOURCE_OWNER",
+        "independentLocalRerunByThisContinuitySession": false
+      },
+      "sourceOnlyFinancialQaReseal": {
+        "path": "artifacts/orbit360-recovery/release-control/I6_6_R51_ASSIGNED_ROLES_INSURER_FINANCIAL_RECOVERY_SOURCE_20261124.json",
+        "gitBlobSha": "4d989f8bb8705974209fe79d65a72d4f11e4a1f1",
+        "sha256": "f807d9d16c7b3750dde7f0a14bc316d757b9f550fede24469a302770d225abf4"
+      },
+      "sourceOnlyCancellationQaReseal": {
+        "path": "artifacts/orbit360-recovery/release-control/I6_6_EFFECTIVE_CANCELLATION_ASSIGNED_ROLES_CAUSAL_SOURCE_20261124.json",
+        "gitBlobSha": "c095cdf1cc648a009dde51a641062f3941ee4da1",
+        "sha256": "cb3d7183efc5ee634668cf4f2f0379ba8ecdcd12edd73722d6be6c54d4d45269"
+      },
+      "historicalReceiptArchives": [
+        {
+          "sourcePath": "artifacts/orbit360-recovery/release-control/I6_6_R51_ASSIGNED_ROLES_INSURER_FINANCIAL_RECOVERY_SOURCE_20261124.json",
+          "archivePath": "artifacts/orbit360-recovery/release-control/I6_6_R51_ASSIGNED_ROLES_INSURER_FINANCIAL_RECOVERY_SOURCE_20261124_PRE_BUILD29_QA.json",
+          "gitBlobSha": "1d89b80f46afc83bc5cfda1c0147548fe5319347",
+          "sha256": "50e7c9e86862d40665cf413703105cba96fcd08fa47516bc7d709a4c4ee4e955",
+          "publishedSourceHead": "9da06674caf080e10f510d8a13a1d122d449dff2",
+          "failedBuildControlHead": "6efd4d494cd56b6be87d2fee3cbfc0ba55e9f6a8",
+          "sourceOnly": true,
+          "signedPreviewAccepted": false,
+          "signedLiveAccepted": false
+        },
+        {
+          "sourcePath": "artifacts/orbit360-recovery/release-control/I6_6_EFFECTIVE_CANCELLATION_ASSIGNED_ROLES_CAUSAL_SOURCE_20261124.json",
+          "archivePath": "artifacts/orbit360-recovery/release-control/I6_6_EFFECTIVE_CANCELLATION_ASSIGNED_ROLES_CAUSAL_SOURCE_20261124_PRE_BUILD29_QA.json",
+          "gitBlobSha": "966b69dacfc6b3f80c8b97e8f0507f98ae4466a5",
+          "sha256": "e25249b94b345f408022202d640d3f97c3d821d6014827015d4f76811461c904",
+          "publishedSourceHead": "9da06674caf080e10f510d8a13a1d122d449dff2",
+          "failedBuildControlHead": "6efd4d494cd56b6be87d2fee3cbfc0ba55e9f6a8",
+          "sourceOnly": true,
+          "signedPreviewAccepted": false,
+          "signedLiveAccepted": false
+        }
+      ],
+      "historicalProductOwnersPreserved": true,
+      "backendTargetsPreserved": true,
+      "request29Preserved": true,
+      "newProductArtifactCreated": false,
+      "signedPreviewAccepted": false,
+      "signedLiveAccepted": false
+    },
+    "predecessorSignedCi": {
+      "sourceSha": "bf6bce909ad143d59fb2cbb414cdbbe7972c4ee2",
+      "sourceQa": {
+        "runId": 45505421061,
+        "jobId": 138839252861,
+        "conclusion": "failure",
+        "tests": 125,
+        "passed": 114,
+        "failed": 11,
+        "skipped": 0,
+        "failure": "I66_FINANCIAL_REQUIRED_UI_QA_REMOVED",
+        "scope": "Historical composite-acceptance fixture read mutable request29; the included root correction binds the sealed E3 request.",
+        "testCountsEvidenceOrigin": "INDEPENDENT_REVIEWER_PROVIDER_JOB_LOG",
+        "runConclusionVerifiedByThisSession": true,
+        "sourceGuardStep": "skipped",
+        "sourceQaReceiptProduced": false
+      },
+      "governance": {
+        "runId": 45505421194,
+        "jobId": 138839253821,
+        "conclusion": "success",
+        "canonicalPreflightStep": "success",
+        "publicReadOnlyJobId": 138839253531,
+        "b4003Emulator": "skipped",
+        "providerJobsVerifiedByThisSession": true
+      },
+      "build": {
+        "runId": 45505420878,
+        "workflowConclusion": "success",
+        "gateJobId": 138839252490,
+        "gate": "success",
+        "immutablePackage": "skipped",
+        "protectedReader": "skipped",
+        "artifactCount": 0,
+        "providerJobsAndArtifactCountVerifiedByThisSession": true,
+        "notAnImmutableProductBuild": true
+      },
+      "signedQaForRepairedR63Commit": "PENDING_NEW_COMMIT_AND_ACTIONS_EVIDENCE"
+    },
+    "historicalPreparationReceipt": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_6_V29_BUILD_HOLD_CAUSAL_FIXTURE_PREPARATION_20261124.json",
+      "gitBlobSha": "66b982f0c97730fe9c202af0b5bbbc539998532a",
+      "sha256": "b528c551be5f6ff6e85b8f412f7ceb0b48d84f10e22e6bd68d3552c370204f57"
+    },
+    "admissionFixtureCorrectionIntegratedAt": "bf6bce909ad143d59fb2cbb414cdbbe7972c4ee2",
+    "threeOwnerTransitionCorrectionIntegratedAt": "bf6bce909ad143d59fb2cbb414cdbbe7972c4ee2",
+    "financialAndCancellationQaReceiptsResealedAt": "bf6bce909ad143d59fb2cbb414cdbbe7972c4ee2",
+    "sourceQaFailureCorrectionIncludedInR63": true,
+    "sourceQaCorrectionOwner": "tools/gravicentra-i66-composite-acceptance.test.cjs",
+    "sourceQaCorrectionBlob": "3bab3e94cdd575b40efda54eb8d6d7ba72f87a39",
+    "exactRepairedCommitSignedSourceQaPending": true,
+    "exactRepairedCommitCanonicalGuardPending": true,
+    "nextRequestVersion": 30,
+    "nextRequestIssuedByThisCheckpoint": false,
+    "v29RequestPreservedUnchanged": true,
+    "blindV29RerunAuthorized": false,
+    "newArtifactClaimed": false
+  },
+  "currentAuthorityIntegration": {
+    "status": "REMOTE_PUBLISHED_R62_PRESERVED_AND_USED_AS_PREVIOUS_EVIDENCE",
+    "sourceCommit": "bf6bce909ad143d59fb2cbb414cdbbe7972c4ee2",
+    "previousProgress": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_EXECUTION_PROGRESS_20261124_R62.json",
+      "gitBlobSha": "7fa3e45839ca92b72a9b59efa5158ef07250c382",
+      "sha256": "bc4806589114af573e851fce47b045c4f5e0a3dd752d3d7979dbeca41933b94a"
+    },
+    "remoteHeadVerified": true,
+    "additionalGreenapiWorkflowPreserved": {
+      "path": ".github/workflows/gravicentra-i66-greenapi-metadata-readonly.yml",
+      "gitBlobSha": "0c0c30c2423fce38bd0c051a8e2c8bc577aa35d3",
+      "sha256": "c33f1039026fe27ab5207b207113c00399e849e6ef0513e766075535623e0676"
+    },
+    "greenapiDifferenceFromLocal95ceaaOnlyThisWorkflow": true,
+    "newCloudObservationClaimedByThisRepair": false
+  },
+  "currentCausalSourceRevision": {
+    "status": "COMMITTED_CAUSAL_ADMISSION_AND_THREE_OWNER_FIX_WITH_LOCAL_89_PASS_RUNTIME_PENDING",
+    "sourceSha": "bf6bce909ad143d59fb2cbb414cdbbe7972c4ee2",
+    "sourceTree": "c68ec1f8b401cda37babeee5262a8f9a49cebf5c",
+    "receipt": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_6_COMPOSITE_ADMISSION_HISTORICAL_FIXTURES_AND_REQUEST_CONTINUITY_QA_20261124.json",
+      "gitBlobSha": "39b1dfec26caa279f3ebb79d44740165d637fac1",
+      "sha256": "c79a3d521178c2dcdf07ed432ca4d7b0f0f87f6ce1e1521a1cfebe9b1d46af22"
+    },
+    "testOwner": {
+      "path": "tools/gravicentra-i6-6-composite-preview-admission.test.cjs",
+      "gitBlobSha": "c6485d21daa40ea5a0521521163b67a375d6fd6d",
+      "replaces": {
+        "path": "tools/gravicentra-i6-6-composite-preview-admission.test.cjs",
+        "priorGitBlobSha": "e1dd83a9dc1cc63f04f68a1d10afeedfca758afa",
+        "priorChangeId": "I6_6_R51_ASSIGNED_ROLES_INSURER_COMPOSED_ADMISSION_QA_20261124"
+      }
+    },
+    "admissionOwner": {
+      "path": "tools/gravicentra-i6-6-frontend-preview-authority.cjs",
+      "previousGitBlobSha": "c6d557968818a10164211b03092aa604743cbc9c",
+      "gitBlobSha": "c1b38fcccdf4fae3bc23cfc6c5cf0a1e9dbd1230",
+      "sha256": "9e0c85ce1f3a809ff514e1e5e2bc5cf60bef118144d076a4838a23b953c125f9",
+      "scope": "EXACT_PREVIOUS_THREE_OWNER_EXTENSION_IDENTITY_WITH_FULL_RECEIPT_SOURCE_QA_HEAD_REVALIDATION"
+    },
+    "localVerification": {
+      "tests": 89,
+      "passed": 89,
+      "failed": 0,
+      "skipped": 0,
+      "reportSha256": "04cb424dffbee6ecab53d2e95d40d2e948ca85e6b8ddd0eee2c14138dcb34e24",
+      "evidenceOrigin": "COMMITTED_CAUSAL_RECEIPT_FROM_CONCURRENT_SOURCE_OWNER",
+      "independentLocalRerunByThisContinuitySession": false
+    },
+    "sourceOnlyFinancialQaReseal": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_6_R51_ASSIGNED_ROLES_INSURER_FINANCIAL_RECOVERY_SOURCE_20261124.json",
+      "gitBlobSha": "4d989f8bb8705974209fe79d65a72d4f11e4a1f1",
+      "sha256": "f807d9d16c7b3750dde7f0a14bc316d757b9f550fede24469a302770d225abf4"
+    },
+    "sourceOnlyCancellationQaReseal": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_6_EFFECTIVE_CANCELLATION_ASSIGNED_ROLES_CAUSAL_SOURCE_20261124.json",
+      "gitBlobSha": "c095cdf1cc648a009dde51a641062f3941ee4da1",
+      "sha256": "cb3d7183efc5ee634668cf4f2f0379ba8ecdcd12edd73722d6be6c54d4d45269"
+    },
+    "historicalReceiptArchives": [
+      {
+        "sourcePath": "artifacts/orbit360-recovery/release-control/I6_6_R51_ASSIGNED_ROLES_INSURER_FINANCIAL_RECOVERY_SOURCE_20261124.json",
+        "archivePath": "artifacts/orbit360-recovery/release-control/I6_6_R51_ASSIGNED_ROLES_INSURER_FINANCIAL_RECOVERY_SOURCE_20261124_PRE_BUILD29_QA.json",
+        "gitBlobSha": "1d89b80f46afc83bc5cfda1c0147548fe5319347",
+        "sha256": "50e7c9e86862d40665cf413703105cba96fcd08fa47516bc7d709a4c4ee4e955",
+        "publishedSourceHead": "9da06674caf080e10f510d8a13a1d122d449dff2",
+        "failedBuildControlHead": "6efd4d494cd56b6be87d2fee3cbfc0ba55e9f6a8",
+        "sourceOnly": true,
+        "signedPreviewAccepted": false,
+        "signedLiveAccepted": false
+      },
+      {
+        "sourcePath": "artifacts/orbit360-recovery/release-control/I6_6_EFFECTIVE_CANCELLATION_ASSIGNED_ROLES_CAUSAL_SOURCE_20261124.json",
+        "archivePath": "artifacts/orbit360-recovery/release-control/I6_6_EFFECTIVE_CANCELLATION_ASSIGNED_ROLES_CAUSAL_SOURCE_20261124_PRE_BUILD29_QA.json",
+        "gitBlobSha": "966b69dacfc6b3f80c8b97e8f0507f98ae4466a5",
+        "sha256": "e25249b94b345f408022202d640d3f97c3d821d6014827015d4f76811461c904",
+        "publishedSourceHead": "9da06674caf080e10f510d8a13a1d122d449dff2",
+        "failedBuildControlHead": "6efd4d494cd56b6be87d2fee3cbfc0ba55e9f6a8",
+        "sourceOnly": true,
+        "signedPreviewAccepted": false,
+        "signedLiveAccepted": false
+      }
+    ],
+    "historicalProductOwnersPreserved": true,
+    "backendTargetsPreserved": true,
+    "request29Preserved": true,
+    "newProductArtifactCreated": false,
+    "signedPreviewAccepted": false,
+    "signedLiveAccepted": false
+  },
+  "predecessorSignedCi": {
+    "sourceSha": "bf6bce909ad143d59fb2cbb414cdbbe7972c4ee2",
+    "sourceQa": {
+      "runId": 45505421061,
+      "jobId": 138839252861,
+      "conclusion": "failure",
+      "tests": 125,
+      "passed": 114,
+      "failed": 11,
+      "skipped": 0,
+      "failure": "I66_FINANCIAL_REQUIRED_UI_QA_REMOVED",
+      "scope": "Historical composite-acceptance fixture read mutable request29; the included root correction binds the sealed E3 request.",
+      "testCountsEvidenceOrigin": "INDEPENDENT_REVIEWER_PROVIDER_JOB_LOG",
+      "runConclusionVerifiedByThisSession": true,
+      "sourceGuardStep": "skipped",
+      "sourceQaReceiptProduced": false
+    },
+    "governance": {
+      "runId": 45505421194,
+      "jobId": 138839253821,
+      "conclusion": "success",
+      "canonicalPreflightStep": "success",
+      "publicReadOnlyJobId": 138839253531,
+      "b4003Emulator": "skipped",
+      "providerJobsVerifiedByThisSession": true
+    },
+    "build": {
+      "runId": 45505420878,
+      "workflowConclusion": "success",
+      "gateJobId": 138839252490,
+      "gate": "success",
+      "immutablePackage": "skipped",
+      "protectedReader": "skipped",
+      "artifactCount": 0,
+      "providerJobsAndArtifactCountVerifiedByThisSession": true,
+      "notAnImmutableProductBuild": true
+    },
+    "signedQaForRepairedR63Commit": "PENDING_NEW_COMMIT_AND_ACTIONS_EVIDENCE"
+  },
+  "previousPublicationDiagnosisPreparation": {
+    "status": "HISTORICAL_PREPARATION_SUPERSEDED_BY_COMMITTED_CAUSAL_REVISION",
+    "evidence": {
+      "status": "NOT_RESOLVED_BY_CONTINUITY_REPAIR",
+      "failedAttempt": {
+        "status": "V29_SOURCE_ADMISSION_TEST_FAILURE_BEFORE_PACKAGE_NO_ARTIFACT_NOT_RELEASE_ELIGIBLE",
+        "requestVersion": 29,
+        "runId": 45502038971,
+        "runAttempt": 1,
+        "headSha": "6efd4d494cd56b6be87d2fee3cbfc0ba55e9f6a8",
+        "workflow": ".github/workflows/gravicentra-release-delta-66-package.yml",
+        "providerUrl": "https://github.com/paulaosoriof86/orbit360-core/actions/runs/45502038971",
+        "conclusion": "failure",
+        "completedAtUtc": "2026-11-24T22:35:36Z",
+        "gate": {
+          "jobId": 138827539047,
+          "conclusion": "success"
+        },
+        "immutablePackage": {
+          "jobId": 138828118868,
+          "conclusion": "failure",
+          "failedStep": 4,
+          "failedStepName": "Verify latest I6.6 source and historical B4 seals without reopening B4",
+          "sourceAdmissionTests": 85,
+          "sourceAdmissionPassed": 72,
+          "sourceAdmissionFailed": 13,
+          "testCountsVerifiedFromProviderJobLog": true
+        },
+        "skippedSteps": [
+          "Build a single immutable package from the exact I6.6 source and config snapshot",
+          "Preserve byte-exact package, digest and source identity for Preview then LIVE",
+          "Run actions/upload-artifact@v4",
+          "Publish exact immutable site only to isolated Hosting Preview",
+          "Preview readback all artifact files and confirm both LIVE origins are untouched"
+        ],
+        "protectedReaderPreview": "skipped",
+        "providerArtifactCount": 0,
+        "artifactId": null,
+        "artifactDigest": null,
+        "productPackageBuilt": false,
+        "hostingDeployExecuted": false,
+        "scopedBackendDeployed": false,
+        "livePromoted": false,
+        "sourceQaPassDoesNotCertifyBuildAdmissionOrRuntime": true,
+        "blindRerunAuthorized": false,
+        "next": "Resolve the reproduced admission/profile test cause inside I6.6, validate the exact composed source and request its immutable successor using the existing procedure."
+      },
+      "admissionFixture": {
+        "path": "tools/gravicentra-i6-6-composite-preview-admission.test.cjs",
+        "originalGitBlobSha": "e1dd83a9dc1cc63f04f68a1d10afeedfca758afa",
+        "preparedGitBlobSha": "09d129c82158d5af06b3a2aaec5d2c1a20333539",
+        "patchSha256": "65e6f18b679b1890490204b5b9b06abc12c10cd07014395f9ca7df0d8f6ff25b",
+        "causalTestBaseline": {
+          "tests": 85,
+          "passed": 72,
+          "failed": 13
+        },
+        "preparedCorrection": {
+          "tests": 85,
+          "passed": 85,
+          "failed": 0,
+          "skipped": 0
+        },
+        "evidenceOrigin": "INDEPENDENT_REVIEWER_EXACT_SOURCE_REPRODUCTION",
+        "integratedByThisCheckpoint": false,
+        "reason": "The harness is pinned by financial/cancellation source receipts; renew exact source evidence before publishing its changed bytes."
+      },
+      "successorAdmission": {
+        "owner": "tools/gravicentra-i6-6-frontend-preview-authority.cjs",
+        "function": "validatePreservedDirectFormsProducts",
+        "rejection": "I66_EXISTING_TWO_DIRECT_FORM_PREIMAGES_REQUIRED",
+        "priorRequest29Owners": 3,
+        "legacyRequiredOwners": 2,
+        "cause": "The existing validator unconditionally expects two previous direct-form owners although request29 already has the reviewed insurer owner as its third.",
+        "needed": "Preserve and verify all three previous product preimages through a causal successor check, renew the affected exact QA receipts and signed source validation, then use one successor immutable build.",
+        "ownerChangedByThisCheckpoint": false,
+        "newUserPermissionRequired": false
+      },
+      "v29RequestPreservedUnchanged": true,
+      "blindV29RerunAuthorized": false,
+      "newArtifactClaimed": false,
+      "newProductReleaseRequestByThisCheckpoint": false,
+      "diagnosticReceipt": {
+        "path": "artifacts/orbit360-recovery/release-control/I6_6_V29_BUILD_HOLD_CAUSAL_FIXTURE_PREPARATION_20261124.json",
+        "gitBlobSha": "66b982f0c97730fe9c202af0b5bbbc539998532a",
+        "sha256": "b528c551be5f6ff6e85b8f412f7ceb0b48d84f10e22e6bd68d3552c370204f57"
+      },
+      "diagnosticSchema": "GI_I66_V29_BUILD_HOLD_CAUSAL_FIXTURE_PREPARATION_V1"
+    },
+    "scope": "Prepared85 patch and two-versus-three-owner diagnosis were valid before the concurrent correction; neither remains an unimplemented task.",
+    "supersedingReceipt": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_6_COMPOSITE_ADMISSION_HISTORICAL_FIXTURES_AND_REQUEST_CONTINUITY_QA_20261124.json",
+      "gitBlobSha": "39b1dfec26caa279f3ebb79d44740165d637fac1",
+      "sha256": "c79a3d521178c2dcdf07ed432ca4d7b0f0f87f6ce1e1521a1cfebe9b1d46af22"
+    }
+  },
+  "newerR62Assessment": {
+    "recordsFailedV29BeforePackage": true,
+    "sourceAdmissionHistoricalFixtureCorrected": true,
+    "exactThreeOwnerPredecessorContinuityCorrected": true,
+    "manifestTestRevisionRecorded": true,
+    "financialAndCancellationQaResealsRecorded": true,
+    "local89PassReceipt": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_6_COMPOSITE_ADMISSION_HISTORICAL_FIXTURES_AND_REQUEST_CONTINUITY_QA_20261124.json",
+      "gitBlobSha": "39b1dfec26caa279f3ebb79d44740165d637fac1",
+      "sha256": "c79a3d521178c2dcdf07ed432ca4d7b0f0f87f6ce1e1521a1cfebe9b1d46af22"
+    },
+    "appliedPaymentProjectionStillRequiredRepair": true,
+    "canonicalPlanNextAliasStillRequiredRepair": true,
+    "noRuntimeAcceptanceTransferred": true
+  }
+}

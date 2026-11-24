@@ -293,6 +293,49 @@ test('active progress accepts only the checked-out objective and observer projec
   if(control.i66FrontendReleaseHead)
     owner.assertExecutionProgress(control,read(control.i66ActiveRecoveryCursor.currentEvidencePath),fs);
 });
+function currentFinancialProjectionFixture(){
+  const cp=read(P.cp),progress=read(cp.i66ActiveRecoveryCursor.currentEvidencePath);
+  const planPath=cp.i66OperationalContinuation20261115.canonicalPlan,plan=read(planPath);
+  const io={readFileSync:(p,encoding)=>p===planPath?serial(plan):fs.readFileSync(p,encoding)};
+  return {cp,progress,plan,io,verify:()=>owner.assertActiveFinancialAndPlanProjections(cp,progress,io)};
+}
+test('current financial completion and canonical plan redirect agree without rewriting historical evidence',()=>{
+  const f=currentFinancialProjectionFixture(),before=serial({cp:f.cp,progress:f.progress,plan:f.plan});
+  assert.doesNotThrow(f.verify);assert.equal(serial({cp:f.cp,progress:f.progress,plan:f.plan}),before);
+  assert.match(f.plan.nextActionBeforeExecutionRedirect20261124.value,/1B65A7_ARTIFACT_14373955326/);
+  assert.notEqual(f.plan.lastProvenLive.sourceSha,f.cp.i66FrontendReleaseHead.sourceSha);
+});
+test('the stale Control Plane PENDING_APPLICATION copy is rejected against the applied receipt',()=>{
+  const f=currentFinancialProjectionFixture();
+  f.cp.i66OperationalContinuation20261115.currentFinancialDataExecution20261124.historicalPayments.applicationState='PENDING_APPLICATION';
+  assert.throws(f.verify,/I66_CURRENT_FINANCIAL_EXECUTION_PROJECTION_DRIFT/);
+});
+test('synchronizing two stale financial summaries cannot undo sealed payment application',()=>{
+  for(const mutate of [
+    x=>x.historicalPayments.applicationState='PENDING_APPLICATION',
+    x=>x.historicalPayments.applied*=2,
+    x=>delete x.historicalPayments.applicationCompletion,
+    x=>x.historicalPayments.applicationCompletion.currency='USD',
+    x=>x.historicalPayments.applicationCompletion.insurerReconciliationProven=true,
+    x=>x.historicalPayments.applicationCompletion.all155SinglePostCompletionCensusClaimed=true
+  ]){
+    const f=currentFinancialProjectionFixture();mutate(f.progress.financialWork.currentExecution20261124);
+    f.cp.i66OperationalContinuation20261115.currentFinancialDataExecution20261124=structuredClone(f.progress.financialWork.currentExecution20261124);
+    assert.throws(f.verify,/I66_APPLIED_PAYMENT_(STATE_REGRESSION|COUNT_DRIFT|COMPLETION_MISSING|COMPLETION_CURRENCY_DRIFT|INSURER_RECONCILIATION_DRIFT|SINGLE_POST_COMPLETION_CENSUS_DRIFT)/);
+  }
+});
+test('canonical plan cannot resume the old release or point outside the active cursor',()=>{
+  for(const mutate of [
+    p=>p.nextAction=p.nextActionBeforeExecutionRedirect20261124.value,
+    p=>p.currentExecutionAuthority.cursorPointer='historical/old-cursor',
+    p=>delete p.recordScope
+  ]){const f=currentFinancialProjectionFixture();mutate(f.plan);assert.throws(f.verify,/I66_CANONICAL_PLAN_/);}
+});
+test('payment application proof must retain its pinned bytes',()=>{
+  const f=currentFinancialProjectionFixture(),pin=f.progress.financialWork.currentExecution20261124.historicalPayments.applicationCompletion.receipt;
+  const old=f.io.readFileSync;f.io.readFileSync=(p,encoding)=>p===pin.path?old(p,encoding)+' ':old(p,encoding);
+  assert.throws(f.verify,/I66_APPLIED_PAYMENT_RECEIPT_BLOB_DRIFT/);
+});
 test('the active state mirror archives the entire former mixed summary and rejects stale source evidence or next action',()=>{
   const control=read(P.cp),transport=read(P.transport),state=read(P.state),prior=structuredClone(state.i66OwnerPlanContinuation20261115);
   const before=serial(prior);owner.synchronizeOwnerPlanContinuation(control,state,transport);
