@@ -472,3 +472,4 @@ jobs:
       - name: Validate exact existing inbound configuration without payload or credential output
         shell: bash
         run: node tools/gravicentra-i66-greenapi-existing-config-readonly.cjs
+# I6.6 continuation 2026-11-24: inspect only the exact existing inbound configuration; no provider calls or writes.
