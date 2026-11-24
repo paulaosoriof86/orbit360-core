@@ -1637,7 +1637,23 @@
     "latestPhysicalFrontendLiveReceipt": "artifacts/orbit360-recovery/release-control/I6_6_FRONTEND_E00003_RECEIPT.json",
     "latestPhysicalFrontendLiveRunId": 45292163934,
     "latestCompositeLiveReceipt": "artifacts/orbit360-recovery/release-control/I6_6_FRONTEND_E00003_RECEIPT.json",
-    "latestCompositeLiveRunId": 45292163934
+    "latestCompositeLiveRunId": 45292163934,
+    "acceptedLivePerformanceRequest20261124": {
+      "schema": "GI_I66_ACCEPTED_LIVE_READONLY_PERFORMANCE_REQUEST_V1",
+      "requestedAtUtc": "2026-11-24T00:05:06.011Z",
+      "gate": "I6.6",
+      "generation": 3,
+      "sourceSha": "65c825b2808a615ca4195bdde6689dbdbe3193b2",
+      "artifactId": 14873426438,
+      "artifactDigest": "sha256:7cb782848a45083047c4899bc30c13bf5be46429607e42597d09342becfc9acc",
+      "buildId": "gi-i66-65c825b2808a-57f234755dc1",
+      "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_FRONTEND_E00003_RECEIPT.json",
+      "receiptGitBlobSha": "11fdb3bee494541513482666d6215f45cbad0567",
+      "mode": "EXISTING_LIVE_READONLY_DRIVER",
+      "businessWrites": 0,
+      "releaseAcceptanceAlreadyCommitted": true,
+      "fullI66ProductionAcceptanceClaimed": false
+    }
   },
   "b4003ActiveCertificationCursor20261106": {
     "schema": "GRAVICENTRA_B4_003_SINGLE_ACTIVE_CERTIFICATION_CURSOR_V1",
