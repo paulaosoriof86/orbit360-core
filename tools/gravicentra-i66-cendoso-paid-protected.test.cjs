@@ -206,3 +206,185 @@ function fakeReader(records){
     planBatch({candidates:[raw]},[paidGroup]).holds),[],'already-paid history is not reopened');
   console.log('I66_CENDOSO_ALIAS_READER_CAUSAL_PASS OLD_ZERO_NEW_ONE_CONFLICT_HOLD_NO_WRITES');
 })().catch(error=>{console.error(error);process.exitCode=1;});
+
+// Source-backed historical delta: execute the production transaction code
+// against a complete in-memory Firestore surface, including fresh census,
+// parent CAS, exact postimages and zero-write replay.
+const H=require('./gravicentra-i66-cendoso-paid-protected.cjs');
+const historicalSource=source.candidates.filter(r=>r.policyNumberSource==='AUTO-20251544');
+assert.equal(historicalSource.length,2);
+const historicalPacket={candidates:historicalSource};
+const historicalPolicy={id:'hist-policy',numero:'AUTO-20251544',clienteId:'hist-client',
+  aseguradoraId:'hist-insurer',asesorId:'hist-advisor',pais:'GT',moneda:'GTQ',
+  vigenciaInicio:historicalSource[0].coverageStart,vigenciaFin:historicalSource[0].coverageEnd,
+  frecuencia:'Mensual',estado:'Renovada',renovadaPor:'existing-successor'};
+const historicalClient={id:'hist-client',nombre:'PRIVATE_TEST_CLIENT',pais:'GT'};
+const historicalInsurer={id:'hist-insurer',nombre:'BAM',activo:true,pais:'GT'};
+const historicalGroup={policy:historicalPolicy,clientExists:true,insurerVerified:true,
+  clientSnapshotHash:H.stableHash(historicalClient),insurerSnapshotHash:H.stableHash(historicalInsurer),
+  insurerName:'BAM',receipts:[],portfolio:[],cobros:[]};
+const sourceDigest='649fa315a90b176b794abf6eef3d9f893d47de64cfe558d203a099c408692aa0';
+const emptyHistorical=()=>({complete:true,sourceSha256:sourceDigest,records:[],audits:[],
+  policies:[historicalPolicy],insurers:[historicalInsurer]});
+const assessHistorical=(snapshot=emptyHistorical(),packet=historicalPacket,raw=historicalSource[0])=>
+  H.assessHistorical(raw,[historicalGroup],packet,snapshot);
+assert.ok(assessHistorical().ready);
+assert.equal(H.historicalSourceProved({...historicalSource[0],sourceRows:historicalSource[0].sourceRows
+  .filter(r=>!r.file.includes('-24-'))}),false,'a schedule alone does not prove payment');
+assert.equal(H.historicalSourceProved({...historicalSource[0],sourceRows:historicalSource[0].sourceRows
+  .filter(r=>r.file.includes('-24-'))}),false,'a paid row alone does not authorize a missing schedule');
+assert.equal(H.historicalSourceProved({...historicalSource[0],materialSourceVariation:true}),false);
+assert.equal(H.historicalSourceProved({...historicalSource[0],actualPaidDate:'2026-02-31'}),false);
+assert.equal(assessHistorical({...emptyHistorical(),complete:false}).code,'HISTORICAL_COMPLETE_CENSUS_REQUIRED');
+const addRecord=record=>({...emptyHistorical(),records:[record]});
+assert.equal(assessHistorical(addRecord({collection:'recibosEsperados',id:'alias-receipt',
+  policyId:historicalPolicy.id})).code,'HISTORICAL_EXISTING_POLICY_FINANCIAL_RECORD');
+assert.equal(assessHistorical(addRecord({collection:'cobros',id:'alias-conflict',
+  polizaId:historicalPolicy.id,policyId:'another-policy'})).code,'HISTORICAL_EXISTING_POLICY_FINANCIAL_RECORD');
+assert.equal(assessHistorical(addRecord({collection:'cobros',id:'orphan-payment',
+  evidenceId:historicalSource[0].candidateId})).code,'HISTORICAL_EXISTING_NATURAL_KEY_OR_EVIDENCE');
+assert.equal(assessHistorical(addRecord({collection:'carteraPrimas',id:'natural-orphan',
+  historicalNaturalKey:H.historicalIdentity(historicalSource[0],historicalPolicy).naturalKey})).code,
+  'HISTORICAL_EXISTING_NATURAL_KEY_OR_EVIDENCE');
+assert.equal(assessHistorical(addRecord({collection:'cobros',id:'unanchored-paid',
+  fechaLimite:historicalSource[0].receiptDueDate,monto:Number(historicalSource[0].totalPremium)})).code,
+  'HISTORICAL_ORPHAN_OR_ALIAS_AMBIGUITY');
+assert.equal(assessHistorical(addRecord({collection:'cobros',id:'broken-parent',policyId:'missing-parent',
+  fechaLimite:historicalSource[0].receiptDueDate,monto:Number(historicalSource[0].totalPremium)})).code,
+  'HISTORICAL_ORPHAN_OR_ALIAS_AMBIGUITY');
+for(const field of ['fechaPago','paidDate','actualPaidDate'])assert.equal(assessHistorical(addRecord({
+  collection:'cobros',id:'paid-date-orphan',
+  [field]:historicalSource[0].actualPaidDate,monto:Number(historicalSource[0].totalPremium)})).code,
+  'HISTORICAL_ORPHAN_OR_ALIAS_AMBIGUITY','a date-only orphan payment cannot become a duplicate');
+assert.equal(assessHistorical(addRecord({collection:'cobros',id:'unparsed-date-orphan',
+  paidDate:{seconds:123456789},monto:Number(historicalSource[0].totalPremium)})).code,
+  'HISTORICAL_ORPHAN_OR_ALIAS_AMBIGUITY','an unparsed payment date does not prove absence');
+assert.equal(assessHistorical({...emptyHistorical(),policies:[historicalPolicy,
+  {...historicalPolicy,id:'rival-edition'}]}).code,'HISTORICAL_GLOBAL_POLICY_EDITION_NOT_UNIQUE');
+assert.equal(assessHistorical(emptyHistorical(),{candidates:[...historicalSource,
+  {...historicalSource[0],candidateId:'cendoso_'+'f'.repeat(24),totalPremium:'999.00',actualPaidDate:'2026-02-10'}]}).code,
+  'HISTORICAL_SOURCE_PERIOD_NOT_UNIQUE','a different paid amount/date cannot create a second period receipt');
+
+function memoryFirestore(){
+  const records=new Map(),stats={creates:0,collections:[]},clone=v=>JSON.parse(JSON.stringify(v));
+  const key=(col,id)=>['tenants','alianzas-soluciones','data',col,'items',id].join('/');
+  const auditKey=id=>['tenants','alianzas-soluciones','operationalRequests',id].join('/');
+  const snap=(p,fields)=>({id:p.split('/').at(-1),exists:records.has(p),data:()=>{
+    const v=records.get(p);if(v===undefined)return undefined;
+    if(!fields)return clone(v);
+    return Object.fromEntries(fields.filter(k=>v[k]!==undefined).map(k=>[k,clone(v[k])]));
+  }});
+  const at=(parts,cap=Infinity,fields=null)=>({
+    path:parts.join('/'),collection(name){return at([...parts,name]);},doc(id){assert.ok(id);return at([...parts,id]);},
+    limit(n){return at(parts,n,fields);},select(...names){return at(parts,cap,names);},
+    async get(){
+      if(parts.length%2===0)return snap(parts.join('/'),fields);
+      const prefix=parts.join('/')+'/';
+      const docs=[...records.keys()].filter(k=>k.startsWith(prefix)&&!k.slice(prefix.length).includes('/'))
+        .slice(0,cap).map(k=>snap(k,fields));
+      return {docs,size:docs.length,empty:docs.length===0};
+    }
+  });
+  const db=at([]);
+  db.getAll=async(...refs)=>Promise.all(refs.map(r=>r.get()));
+  db.runTransaction=async fn=>{
+    if(db.beforeTransaction){const f=db.beforeTransaction;db.beforeTransaction=null;f();}
+    const pending=[];let writing=false;
+    const tx={get:async ref=>{assert.equal(writing,false,'Firestore reads must precede writes');return ref.get();},
+      getAll:async(...refs)=>{assert.equal(writing,false);return Promise.all(refs.map(r=>r.get()));},
+      create(ref,value){writing=true;pending.push([ref.path,clone(value)]);}};
+    const out=await fn(tx);
+    assert.equal(new Set(pending.map(([p])=>p)).size,pending.length,'no repeated target in one atomic commit');
+    for(const [p]of pending)assert.equal(records.has(p),false,'create must not overwrite');
+    for(const [p,v]of pending){records.set(p,v);stats.creates++;stats.collections.push(p.split('/')[3]);}
+    if(db.afterCommit){const f=db.afterCommit;db.afterCommit=null;f();}
+    return out;
+  };
+  db.seed=(col,id,value)=>records.set(key(col,id),clone(value));
+  db.remove=(col,id)=>records.delete(key(col,id));
+  db.seedAudit=(id,value)=>records.set(auditKey(id),clone(value));
+  db.read=(col,id)=>clone(records.get(key(col,id)));
+  db.readAudit=id=>clone(records.get(auditKey(id)));
+  db.stats=stats;
+  db.seed('polizas',historicalPolicy.id,historicalPolicy);
+  db.seed('clientes',historicalClient.id,historicalClient);
+  db.seed('aseguradoras',historicalInsurer.id,historicalInsurer);
+  return db;
+}
+(async()=>{
+  const db=memoryFirestore(),snapshot=await H.readHistoricalSnapshot(db,historicalPacket);
+  const plan=H.planBatch(historicalPacket,[historicalGroup],snapshot);
+  assert.equal(plan.readyCount,2);assert.ok(plan.ready.every(r=>r.creatingReceipt));
+  const beforePolicy=JSON.stringify(db.read('polizas',historicalPolicy.id));
+  const first=await H.applyHistoricalChunk(db,[plan.ready[0]],historicalPacket);
+  assert.equal(first.holds.length,0);assert.equal(first.accepted.length,1);assert.equal(db.stats.creates,4);
+  const ids=H.historicalIdentity(historicalSource[0],historicalPolicy);
+  const receipt=db.read('recibosEsperados',ids.receiptId),portfolio=db.read('carteraPrimas',ids.portfolioId),
+    payment=db.read('cobros',ids.cobroId);
+  assert.equal(receipt.numeroReciboFuente,null,'do not invent an insurer requirement from the candidate hash');
+  for(const r of [receipt,portfolio,payment]){
+    assert.equal(r.paymentState,'PAID_DIRECT');assert.equal(r.applicationState,'PENDING_APPLICATION');
+    assert.equal(r.conciliado,false);assert.equal(r.carteraActiva,false);assert.equal(r.saldo,0);
+    assert.equal(r.fechaPago,historicalSource[0].actualPaidDate);
+    assert.equal(r.primaNeta,Number(historicalSource[0].netPremium));
+  }
+  assert.equal(portfolio.carteraTipo,'historico_pagado_fuente');
+  assert.equal(JSON.stringify(db.read('polizas',historicalPolicy.id)),beforePolicy,'coverage/lifecycle must remain exact');
+  assert.ok(db.stats.collections.every(c=>['recibosEsperados','carteraPrimas','cobros'].includes(c)||c.startsWith('gi_i66_cendoso_paid_')));
+  const second=await H.applyHistoricalChunk(db,[plan.ready[1]],historicalPacket);
+  assert.equal(second.holds.length,0,'verified prior-chunk sibling must not block a distinct paid period');
+  assert.equal(second.accepted.length,1);assert.equal(db.stats.creates,8);
+  const replay=await H.applyHistoricalChunk(db,plan.ready,historicalPacket);
+  assert.equal(replay.holds.length,0);assert.equal(replay.accepted.length,2);
+  assert.ok(replay.accepted.every(r=>r.status==='ALREADY_APPLIED_READBACK_PASS'));
+  assert.equal(db.stats.creates,8,'replay creates zero records');
+  const originalAudit=db.readAudit(H.auditId(historicalSource[0].candidateId));
+  db.seedAudit(H.auditId(historicalSource[0].candidateId),{...originalAudit,newGrossCents:originalAudit.newGrossCents+1});
+  const badAuditReplay=await H.applyHistoricalChunk(db,[plan.ready[0]],historicalPacket);
+  assert.equal(badAuditReplay.accepted.length,0);assert.equal(badAuditReplay.committedCount,0);
+  assert.equal(badAuditReplay.holds[0].reason,'HISTORICAL_REPLAY_POSTIMAGE_HOLD');
+  db.seedAudit(H.auditId(historicalSource[0].candidateId),originalAudit);
+  db.seed('recibosEsperados','natural-duplicate-after-commit',{...receipt,id:'natural-duplicate-after-commit'});
+  const duplicateReplay=await H.applyHistoricalChunk(db,[plan.ready[0]],historicalPacket);
+  assert.equal(duplicateReplay.accepted.length,0);assert.equal(duplicateReplay.committedCount,0);
+  assert.equal(duplicateReplay.holds[0].reason,'HISTORICAL_REPLAY_POSTIMAGE_HOLD');
+  db.remove('recibosEsperados','natural-duplicate-after-commit');
+  db.seed('cobros',ids.cobroId,{...payment,monto:payment.monto+1});
+  const badReplay=await H.applyHistoricalChunk(db,[plan.ready[0]],historicalPacket);
+  assert.equal(badReplay.accepted.length,0);assert.equal(badReplay.holds[0].reason,'HISTORICAL_REPLAY_POSTIMAGE_HOLD');
+  assert.equal(db.stats.creates,8,'a corrupted replay never repairs or duplicates silently');
+
+  for(const mutation of [
+    d=>d.seed('clientes',historicalClient.id,{...historicalClient,nombre:'changed-concurrently'}),
+    d=>d.seed('polizas','competing-edition',{...historicalPolicy,id:'competing-edition'}),
+    d=>{d.seed('aseguradoras','equivalent-insurer',{id:'equivalent-insurer',nombre:'BAM Guatemala',activo:true});
+      d.seed('polizas','competing-insurer-alias',{...historicalPolicy,id:'competing-insurer-alias',aseguradoraId:'equivalent-insurer'});},
+    d=>d.seed('recibosEsperados','alias-arrived',{policyId:historicalPolicy.id}),
+    d=>d.seed('cobros','orphan-arrived',{evidenceId:historicalSource[0].candidateId})
+  ]){
+    const raced=memoryFirestore();raced.beforeTransaction=()=>mutation(raced);
+    const out=await H.applyHistoricalChunk(raced,[plan.ready[0]],historicalPacket);
+    assert.equal(out.accepted.length,0);assert.equal(out.holds.length,1);assert.equal(raced.stats.creates,0);
+  }
+  const changedPostimage=memoryFirestore();changedPostimage.afterCommit=()=>{
+    const p=changedPostimage.read('cobros',ids.cobroId);changedPostimage.seed('cobros',ids.cobroId,{...p,conciliado:true});
+  };
+  const badReadback=await H.applyHistoricalChunk(changedPostimage,[plan.ready[0]],historicalPacket);
+  assert.equal(badReadback.accepted.length,0);assert.equal(badReadback.holds[0].reason,'HISTORICAL_POSTIMAGE_READBACK_HOLD');
+  assert.equal(badReadback.committedCount,1);assert.equal(badReadback.physicalDocumentCreates,4);
+  assert.equal(badReadback.holds[0].commitOutcome,'COMMITTED_PENDING_READBACK',
+    'a committed but unverified row must never be reported as zero writes');
+  assert.deepEqual(badReadback.committedUnverified,[historicalSource[0].candidateId]);
+  const unavailableReadback=memoryFirestore();unavailableReadback.afterCommit=()=>{
+    unavailableReadback.getAll=async()=>{throw Error('simulated transport failure');};
+  };
+  const transportHold=await H.applyHistoricalChunk(unavailableReadback,[plan.ready[0]],historicalPacket);
+  assert.equal(transportHold.accepted.length,0);assert.equal(transportHold.committedCount,1);
+  assert.equal(transportHold.holds[0].reason,'HISTORICAL_POSTIMAGE_READBACK_UNAVAILABLE');
+  const isolated=memoryFirestore();isolated.seed('cobros','orphan-first-only',{evidenceId:historicalSource[0].candidateId});
+  const isolatedResult=await H.applyHistoricalChunk(isolated,plan.ready,historicalPacket);
+  assert.equal(isolatedResult.holds.length,1);assert.equal(isolatedResult.accepted.length,1);
+  assert.equal(isolatedResult.accepted[0].sourceId,historicalSource[1].candidateId);
+  assert.equal(isolatedResult.committedCount,1);
+  console.log('I66_CENDOSO_HISTORICAL_PAIRED_SOURCE_CENSUS_CAS_POSTIMAGE_REPLAY_ZERO_PASS');
+})().catch(error=>{console.error(error);process.exitCode=1;});

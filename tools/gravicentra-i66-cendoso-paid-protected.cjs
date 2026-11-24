@@ -12,12 +12,19 @@ const TENANT='alianzas-soluciones',PROJECT='ays-orbit-360-lab';
 const SOURCE='artifacts/orbit360-recovery/source-batches/I6_6_SOURCE_CENDOSO_PAID_CANDIDATES_2026.json.gz';
 const SOURCE_SHA='649fa315a90b176b794abf6eef3d9f893d47de64cfe558d203a099c408692aa0';
 const MAX_CHUNK=250;
+const HISTORICAL_AUTHORITY='artifacts/orbit360-recovery/release-control/I6_6_CENDOSO_MISSING_HISTORICAL_RECEIPTS_CAUSAL_AUTHORITY_20261124.json';
+const HISTORICAL_AUTHORITY_SHA='95d0610ac778af0a021bcb780a6bdcbc2ff1a83b8af9de1eb9fdaaa797579672';
+const HISTORICAL_CHUNK=100,MAX_FINANCIAL_CENSUS=15000;
 const sha=x=>crypto.createHash('sha256').update(x).digest('hex');
 const str=x=>String(x==null?'':x).trim();
 const norm=x=>str(x).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toUpperCase();
 const cents=x=>moneyCents(x);
 const date=x=>/^\d{4}-\d{2}-\d{2}$/.test(str(x))?str(x):'';
 const objhash=x=>sha(JSON.stringify(x));
+const stableValue=x=>x&&typeof x==='object'?
+  (typeof x.toJSON==='function'?stableValue(x.toJSON()):Array.isArray(x)?x.map(stableValue):
+    Object.fromEntries(Object.keys(x).sort().filter(k=>x[k]!==undefined).map(k=>[k,stableValue(x[k])]))):x;
+const stableHash=x=>objhash(stableValue(x));
 // Some insurer exports prepend a product label ("AUTO - 39012"), while the
 // canonical policy record may store just "39012". This is a *lookup alias*,
 // not an insurer requirement number, edition, endorsement or new identity.
@@ -236,6 +243,8 @@ async function readGroups(db,source){
           item(db,'cobros').where('polizaId','==',p.id).limit(101).get()]);
         assert.ok([receipts,portfolio,cobros].every(s=>s.size<101),'I66_PAID_UNBOUNDED_FINANCIAL_RELATIONS');
         out.push({policy:p,clientExists:client.exists,insurerVerified:insurer.exists&&insurer.data()?.activo!==false,
+          clientSnapshotHash:client.exists?stableHash({...client.data(),id:client.id}):'',
+          insurerSnapshotHash:insurer.exists?stableHash({...insurer.data(),id:insurer.id}):'',
           insurerName:insurer.exists?str(insurer.data().nombre||insurer.data().razonSocial):'',
           receipts:receipts.docs.map(d=>({...d.data(),id:d.id})),
           portfolio:portfolio.docs.map(d=>({...d.data(),id:d.id})),
@@ -250,7 +259,200 @@ async function readGroups(db,source){
   // the number of lookup aliases that happened to find one document.
   return [...new Map(groups.map(g=>[g.policy.id,g])).values()];
 }
-function planBatch(source,groups){
+function historicalAuthority(){
+  const bytes=fs.readFileSync(path.join(__dirname,'..',HISTORICAL_AUTHORITY));
+  assert.equal(sha(bytes),HISTORICAL_AUTHORITY_SHA,'HISTORICAL_AUTHORITY_DIGEST_DRIFT');
+  const a=JSON.parse(bytes);
+  assert.equal(a.sourceSha256,SOURCE_SHA);assert.equal(a.protectedEnvironment,'gravicentra-live-data-writes');
+  return a;
+}
+function historicalSourceProved(raw){
+  const row=sourceRow(raw);if(row.error||row.hold.length||raw.materialSourceVariation!==false)return false;
+  const a=historicalAuthority(),hashes=new Set(row.sourceRows.map(r=>r.sha256));
+  const realDate=v=>date(v)&&!Number.isNaN(Date.parse(v+'T00:00:00Z'))&&
+    new Date(v+'T00:00:00Z').toISOString().slice(0,10)===v;
+  return hashes.has(a.actualPaidSourceSha256)&&a.scheduleSourceSha256.some(h=>hashes.has(h))&&
+    row.currency==='GTQ'&&Number.isSafeInteger(row.net)&&row.net>=0&&row.net<=row.total&&
+    [row.coverageStart,row.coverageEnd,row.periodStart,row.due,row.paid].every(realDate)&&
+    row.coverageStart<=row.periodStart&&row.periodStart<row.coverageEnd&&row.due>=row.periodStart&&
+    row.paid>='2026-01-01'&&row.paid<='2026-09-17'&&
+    ['MENSUAL','PAGO UNICO'].includes(row.frequency)&&!str(raw.receiptFolio)&&!str(raw.endorsementSource);
+}
+const financialCollections=['recibosEsperados','carteraPrimas','cobros'];
+// Read complete bounded collections, rather than guessing absence from one
+// indexed foreign-key alias. This includes missing/contradictory parent aliases
+// and orphan payments. The same census is read inside every creation CAS.
+async function readHistoricalSnapshot(db,source,tx){
+  const get=ref=>tx?tx.get(ref):ref.get();
+  const sets=await Promise.all(financialCollections.map(async collection=>{
+    const snap=await get(item(db,collection).limit(MAX_FINANCIAL_CENSUS+1));
+    assert.ok(snap.size<=MAX_FINANCIAL_CENSUS,'HISTORICAL_FINANCIAL_CENSUS_TRUNCATED');
+    return snap.docs.map(d=>({...d.data(),id:d.id,collection}));
+  }));
+  const refs=source.candidates.map(r=>request(db,auditId(r.candidateId)));
+  const audits=[];for(let i=0;i<refs.length;i+=100){
+    const found=await (tx?tx.getAll(...refs.slice(i,i+100)):db.getAll(...refs.slice(i,i+100)));
+    audits.push(...found.filter(s=>s.exists).map(s=>({...s.data(),id:s.id})));
+  }
+  const policySnap=await get(item(db,'polizas').select('numero','numeroPoliza','polizaNumero',
+    'vigenciaInicio','vigenciaFin','clienteId','aseguradoraId','pais','moneda').limit(5001));
+  assert.ok(policySnap.size<=5000,'HISTORICAL_POLICY_CENSUS_TRUNCATED');
+  const insurerSnap=await get(item(db,'aseguradoras').select('nombre','razonSocial','activo').limit(1001));
+  assert.ok(insurerSnap.size<=1000,'HISTORICAL_INSURER_CENSUS_TRUNCATED');
+  return {complete:true,sourceSha256:SOURCE_SHA,records:sets.flat(),audits,
+    policies:policySnap.docs.map(d=>({...d.data(),id:d.id})),
+    insurers:insurerSnap.docs.map(d=>({...d.data(),id:d.id}))};
+}
+function historicalIdentity(raw,policy){
+  const row=sourceRow(raw),naturalKey=stableHash({tenant:TENANT,country:'GT',currency:row.currency,
+    policyId:policy.id,periodStart:row.periodStart,due:row.due,grossCents:row.total,netCents:row.net});
+  const receiptId='rec_i66_paid_'+naturalKey.slice(0,30);
+  return {naturalKey,receiptId,portfolioId:'car_'+receiptId,cobroId:cobroId(receiptId)};
+}
+function historicalDocuments(raw,policy,when){
+  const row=sourceRow(raw),ids=historicalIdentity(raw,policy);
+  const common={tenantId:TENANT,pais:'GT',moneda:'GTQ',clienteId:policy.clienteId,
+    polizaId:policy.id,asesorId:str(policy.asesorId),aseguradoraId:policy.aseguradoraId,
+    historicalNaturalKey:ids.naturalKey,historicalCreationAuthoritySha256:HISTORICAL_AUTHORITY_SHA,
+    sourceManifestSha256:SOURCE_SHA,sourceRef:row.id,evidenceId:row.id,sourceId:row.id,
+    periodoInicioFuente:row.periodStart,fechaVencimientoContractual:row.due,vence:row.due,fechaLimite:row.due,
+    primaTotal:row.total/100,monto:row.total/100,montoTotal:row.total/100,
+    primaNeta:row.net/100,neta:row.net/100,fechaPago:row.paid,paidDate:row.paid,
+    paymentState:'PAID_DIRECT',estado:'Pagado',estadoOperativo:'pagado_sin_saldo',
+    paymentOrigin:'CRM_MIGRATED_DIRECT_PAYMENT',paymentEvidenceType:'LEGACY_CENDOSO_FECHA_REAL_PAGADO',
+    directOrInferred:'DIRECT',inferredPaid:false,applicationState:'PENDING_APPLICATION',
+    conciliado:false,conciliadoPago:true,reconciledAt:null,
+    carteraActiva:false,historicalExigible:false,exigibilidad:'cerrada',saldo:0,saldoPendiente:0,
+    sourceMonetaryBreakdown:{netPremium:raw.netPremium,totalPremium:raw.totalPremium,
+      issuanceExpense:raw.issuanceExpense,financingSurcharge:raw.financingSurcharge,
+      discount:raw.discount,tax:raw.tax},
+    sourceRows:row.sourceRows,actualPaidDateSource:'CENDOSO_FECHA_REAL_PAGADO',
+    createdAt:when,updatedAt:when,updatedByUid:'I6_6_PROTECTED_SOURCE_RUNNER'};
+  const receipt={...common,id:ids.receiptId,receiptKey:ids.naturalKey,cobroId:ids.cobroId,
+    numeroReciboFuente:null,fuente:'Cronograma y pago histórico Cendoso documentados'};
+  const cartera={...common,id:ids.portfolioId,reciboId:ids.receiptId,cobroId:ids.cobroId,
+    carteraTipo:'historico_pagado_fuente',estadoCartera:'Pagado'};
+  const cobro={...common,id:ids.cobroId,reciboId:ids.receiptId,confirmado:true};
+  return {ids,records:[['recibosEsperados',receipt],['carteraPrimas',cartera],['cobros',cobro]]};
+}
+function historicalAudit(raw,policy,oldPlan,documents,when){
+  return {schema:'I6_6_PROTECTED_CENDOSO_PAID_V1',status:'COMMITTED_PENDING_READBACK',
+    sourceId:oldPlan.sourceId,sourceSha256:SOURCE_SHA,sourceHash:stableHash(raw),
+    historicalReceiptCreated:true,historicalCreationAuthoritySha256:HISTORICAL_AUTHORITY_SHA,
+    policyId:policy.id,receiptId:documents.ids.receiptId,portfolioId:documents.ids.portfolioId,
+    cobroId:documents.ids.cobroId,historicalNaturalKey:documents.ids.naturalKey,
+    oldPlanHash:oldPlan.beforeHash,policyBeforeHash:oldPlan.before.policyHash,
+    parentPreimage:oldPlan.before,newGrossCents:oldPlan.grossCents,newNetCents:oldPlan.netCents,
+    paidDate:oldPlan.paidDate,insurerDueDate:oldPlan.due,insurerPeriodStart:oldPlan.periodStart,
+    postimageSha256:Object.fromEntries(documents.records.map(([col,row])=>[col,stableHash(row)])),
+    rollback:{receiptBefore:null,portfolioBefore:null,receiptWasAbsent:true,
+      portfolioWasAbsent:true,cobroWasAbsent:true},currentDebtCreated:0,
+    noAutomaticInsurerBankReconciliation:true,createdAt:when};
+}
+function historicalSiblingValid(record,policy,source,snapshot){
+  if(record.historicalCreationAuthoritySha256!==HISTORICAL_AUTHORITY_SHA||record.sourceManifestSha256!==SOURCE_SHA)return false;
+  const raw=source.candidates.find(r=>r.candidateId===record.sourceId);
+  if(!raw||!historicalSourceProved(raw))return false;
+  const a=snapshot.audits.find(a=>a.id===auditId(raw.candidateId));
+  if(!a||a.historicalReceiptCreated!==true||a.sourceSha256!==SOURCE_SHA||a.policyId!==policy.id||
+    a.sourceId!==raw.candidateId||a.policyBeforeHash!==stableHash(policy)||
+    a.historicalCreationAuthoritySha256!==HISTORICAL_AUTHORITY_SHA||!a.parentPreimage||
+    typeof a.createdAt!=='string'||!/^\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d\.\d{3}Z$/.test(a.createdAt))return false;
+  const expected=historicalDocuments(raw,policy,a.createdAt);
+  const row=sourceRow(raw),oldPlan={sourceId:row.id,before:a.parentPreimage,beforeHash:stableHash(a.parentPreimage),
+    grossCents:row.total,netCents:row.net,paidDate:row.paid,due:row.due,periodStart:row.periodStart};
+  if(a.parentPreimage?.sourceHash!==stableHash(raw)||a.parentPreimage?.policyHash!==stableHash(policy)||
+    stableHash({...a,id:undefined})!==stableHash(historicalAudit(raw,policy,oldPlan,expected,a.createdAt)))return false;
+  return expected.records.every(([collection,value])=>{
+    const matches=snapshot.records.filter(r=>r.collection===collection&&r.id===value.id);
+    if(matches.length!==1)return false;
+    const actual={...matches[0]};delete actual.collection;
+    return stableHash(actual)===stableHash(value);
+  });
+}
+function historicalAbsence(raw,policy,source,snapshot){
+  if(!snapshot?.complete||snapshot.sourceSha256!==SOURCE_SHA||!Array.isArray(snapshot.policies)||!Array.isArray(snapshot.insurers))
+    return 'HISTORICAL_COMPLETE_CENSUS_REQUIRED';
+  const row=sourceRow(raw),ids=historicalIdentity(raw,policy);
+  const dateFields=['periodoInicioFuente','periodStart','receiptPeriodStart','fechaVencimientoContractual',
+    'vence','fechaVencimiento','fechaLimite'];
+  const amountFields=['primaTotal','monto','montoTotal','grossAmount','amount'];
+  const paymentDateFields=['fechaPago','paidDate','actualPaidDate'];
+  const numberFields=['polizaNumero','numeroPoliza','policyNumber','policyNumberSource','numeroPolizaFuente'];
+  const evidenceFields=['sourceId','sourceRef','evidenceId','sourceCandidateId'];
+  const receipts=new Map(snapshot.records.filter(r=>r.collection==='recibosEsperados').map(r=>[r.id,r]));
+  const policies=new Map(snapshot.policies.map(p=>[p.id,p]));
+  for(const r of snapshot.records){
+    const parents=[r.polizaId,r.policyId].map(str).filter(Boolean);
+    const linked=[r.reciboId,r.receiptId].map(str).filter(Boolean);
+    const inherited=linked.flatMap(id=>{const p=receipts.get(id);return p?[p.polizaId,p.policyId].map(str).filter(Boolean):[];});
+    const client=[r.clienteId,r.clientId].map(str).filter(Boolean);
+    const own=parents.includes(policy.id)||inherited.includes(policy.id);
+    const identityHit=evidenceFields.some(k=>str(r[k])===row.id)||
+      str(r.historicalNaturalKey)===ids.naturalKey||str(r.receiptKey)===ids.naturalKey||
+      [r.id,...linked].some(id=>[ids.receiptId,ids.portfolioId,ids.cobroId].includes(id));
+    const parentless=(!parents.length&&!inherited.length)||[...parents,...inherited].some(id=>!policies.has(id));
+    const numberHit=numberFields.some(k=>str(r[k])&&policyMatches(row.policy,r[k]));
+    const dateHit=dateFields.some(k=>[row.periodStart,row.due].includes(date(r[k])));
+    const paymentDateHit=paymentDateFields.some(k=>date(r[k])===row.paid);
+    const unknownPaymentDate=paymentDateFields.some(k=>r[k]!=null&&str(r[k])&&!date(r[k]));
+    const amountHit=amountFields.some(k=>cents(r[k])===row.total);
+    // Unanchored rows with the same dated gross remain ambiguous even without
+    // client/name fields. A client reference alone never establishes absence.
+    const otherEdition=parents.length&&parents.every(id=>{
+      const p=policies.get(id);return p&&p.id!==policy.id&&date(p.vigenciaInicio)&&date(p.vigenciaFin)&&
+        (row.periodStart<date(p.vigenciaInicio)||row.periodStart>=date(p.vigenciaFin));
+    });
+    const incompleteClientOrphan=client.includes(str(policy.clienteId))&&
+      (!dateFields.some(k=>str(r[k]))||!amountFields.some(k=>r[k]!=null));
+    const orphan=(numberHit&&!otherEdition)||(parentless&&
+      (((dateHit||paymentDateHit||unknownPaymentDate)&&amountHit)||incompleteClientOrphan));
+    if(!own&&!identityHit&&!orphan)continue;
+    if(identityHit)return 'HISTORICAL_EXISTING_NATURAL_KEY_OR_EVIDENCE';
+    if(own&&parents.every(id=>id===policy.id)&&inherited.every(id=>id===policy.id)&&
+      r.sourceId!==row.id&&date(r.periodoInicioFuente)!==row.periodStart&&
+      historicalSiblingValid(r,policy,source,snapshot))continue;
+    return own?'HISTORICAL_EXISTING_POLICY_FINANCIAL_RECORD':'HISTORICAL_ORPHAN_OR_ALIAS_AMBIGUITY';
+  }
+  return '';
+}
+function assessHistorical(raw,groups,source,snapshot){
+  if(!historicalSourceProved(raw))return {code:'HISTORICAL_PAIRED_SCHEDULE_AND_PAID_PROOF_REQUIRED'};
+  if(!snapshot?.complete||snapshot.sourceSha256!==SOURCE_SHA||!Array.isArray(snapshot.policies)||!Array.isArray(snapshot.insurers))
+    return {code:'HISTORICAL_COMPLETE_CENSUS_REQUIRED'};
+  const row=sourceRow(raw),matches=(groups||[]).filter(g=>policyMatches(row.policy,policyIdentityNumber(g.policy))&&
+    date(g.policy.vigenciaInicio)===row.coverageStart&&date(g.policy.vigenciaFin)===row.coverageEnd&&
+    policyCountry(g.policy)==='GT'&&norm(g.policy.moneda)==='GTQ'&&insurerMatches(row.insurer,g.insurerName));
+  if(matches.length!==1)return {code:'HISTORICAL_EXACT_EDITION_NOT_UNIQUE'};
+  const g=matches[0],p=g.policy;
+  const insurers=new Map(snapshot.insurers.map(a=>[a.id,a]));
+  const globalEditions=snapshot.policies.filter(candidate=>
+    policyNumberFields.some(field=>policyMatches(row.policy,candidate[field]))&&
+    date(candidate.vigenciaInicio)===row.coverageStart&&date(candidate.vigenciaFin)===row.coverageEnd&&
+    policyCountry(candidate)==='GT'&&norm(candidate.moneda)==='GTQ'&&
+    (candidate.aseguradoraId===p.aseguradoraId||!insurers.has(candidate.aseguradoraId)||
+      insurerMatches(row.insurer,insurers.get(candidate.aseguradoraId).nombre||insurers.get(candidate.aseguradoraId).razonSocial)));
+  if(globalEditions.length!==1||globalEditions[0].id!==p.id||!policyIdentityNumber(globalEditions[0]))
+    return {code:'HISTORICAL_GLOBAL_POLICY_EDITION_NOT_UNIQUE'};
+  if(!g.clientExists||!g.insurerVerified||!str(p.clienteId)||!str(p.aseguradoraId)||
+    !/^[a-f0-9]{64}$/.test(g.clientSnapshotHash||'')||!/^[a-f0-9]{64}$/.test(g.insurerSnapshotHash||''))
+    return {code:'HISTORICAL_PARENT_PREIMAGE_UNVERIFIED'};
+  const collision=source.candidates.filter(other=>{const x=sourceRow(other);return !x.error&&
+    policyMatches(x.policy,policyIdentityNumber(p))&&insurerMatches(x.insurer,g.insurerName)&&
+    x.coverageStart===row.coverageStart&&x.coverageEnd===row.coverageEnd&&x.periodStart===row.periodStart;});
+  if(collision.length!==1)return {code:'HISTORICAL_SOURCE_PERIOD_NOT_UNIQUE'};
+  const reason=historicalAbsence(raw,p,source,snapshot);if(reason)return {code:reason};
+  const ids=historicalIdentity(raw,p),before={policyHash:stableHash(p),
+    clientHash:g.clientSnapshotHash,insurerHash:g.insurerSnapshotHash,sourceHash:stableHash(raw),
+    historicalAuthoritySha256:HISTORICAL_AUTHORITY_SHA,absence:'COMPLETE_FINANCIAL_CENSUS_NO_TARGET_OR_ORPHAN'};
+  return {ready:{sourceId:row.id,policyId:p.id,clientId:p.clienteId,insurerId:p.aseguradoraId,
+    receiptId:ids.receiptId,portfolioId:ids.portfolioId,cobroId:ids.cobroId,naturalKey:ids.naturalKey,
+    policyNumber:canonicalPolicyNumber(row.policy),insurer:row.insurer,
+    paidDate:row.paid,periodStart:row.periodStart,due:row.due,grossCents:row.total,netCents:row.net,
+    creatingReceipt:true,creatingPortfolio:true,backfill:false,before,beforeHash:stableHash(before),
+    sourceRowsSha256:sha(JSON.stringify(row.sourceRows)),match:'PAIRED_SCHEDULE_AND_ACTUAL_PAID_MISSING_HISTORICAL_RECEIPT'}};
+}
+function planBatch(source,groups,historicalSnapshot){
   const by=new Map();for(const g of groups){
     // Conflicting aliases remain discoverable so assess can isolate the row
     // explicitly; they never become an eligible payment through a first match.
@@ -264,7 +466,10 @@ function planBatch(source,groups){
   for(const raw of source.candidates){
     const row=sourceRow(raw),related=[...new Set(policyLookupVariants(row.policy)
       .flatMap(key=>by.get(canonicalPolicyNumber(key))||[]))];
-    const m=assess(row,related);
+    let m=assess(row,related);
+    if(m.code==='RECEIPT_PERIOD_OR_DUE_NOT_FOUND'&&historicalSnapshot&&
+      related.some(g=>!g.receipts.length&&!g.portfolio.length&&!g.cobros.length))
+      m=assessHistorical(raw,related,source,historicalSnapshot);
     if(m.ready){if(!byTarget.has(m.ready.receiptId))byTarget.set(m.ready.receiptId,[]);
       byTarget.get(m.ready.receiptId).push(m.ready);
     }else holds.push({sourceId:row.id,policy:row.policy,reason:m.code});
@@ -432,6 +637,89 @@ async function applyOne(db,oldPlan,source){
     aa.data().sourceId!==oldPlan.sourceId)throw Error('POSTIMAGE_READBACK_HOLD');
   return {sourceId:oldPlan.sourceId,status:status==='ALREADY_APPLIED'?'ALREADY_APPLIED_READBACK_PASS':'APPLIED_READBACK_PASS'};
 }
+// Four creates per historical obligation. Keep the complete-census CAS atomic
+// in subchunks below Firestore's write ceiling; all reads precede all writes.
+// A held row is isolated before writes and cannot authorize another row.
+async function applyHistoricalChunk(db,plans,source){
+  assert.ok(plans.length>0&&plans.length<=HISTORICAL_CHUNK,'HISTORICAL_CHUNK_LIMIT');
+  const bySource=new Map(source.candidates.map(r=>[r.candidateId,r]));
+  const result=await db.runTransaction(async tx=>{
+    const snapshot=await readHistoricalSnapshot(db,source,tx),accepted=[],holds=[],writes=[];
+    const parentRefs=new Map();for(const p of plans){
+      for(const [col,id]of [['polizas',p.policyId],['clientes',p.clientId],['aseguradoras',p.insurerId]])
+        parentRefs.set(col+'|'+id,item(db,col).doc(id));
+    }
+    const parentEntries=[...parentRefs],parentSnaps=new Map();
+    for(let i=0;i<parentEntries.length;i+=100){
+      const found=await tx.getAll(...parentEntries.slice(i,i+100).map(([,ref])=>ref));
+      found.forEach((s,j)=>parentSnaps.set(parentEntries[i+j][0],s));
+    }
+    for(const oldPlan of plans){
+      const raw=bySource.get(oldPlan.sourceId);
+      const ps=parentSnaps.get('polizas|'+oldPlan.policyId),cs=parentSnaps.get('clientes|'+oldPlan.clientId),
+        ins=parentSnaps.get('aseguradoras|'+oldPlan.insurerId);
+      if(!raw||!historicalSourceProved(raw)||![ps,cs,ins].every(s=>s?.exists)){
+        holds.push({sourceId:oldPlan.sourceId,reason:'HISTORICAL_SOURCE_OR_PARENT_CHANGED'});continue;
+      }
+      const p={...ps.data(),id:ps.id},client={...cs.data(),id:cs.id},insurer={...ins.data(),id:ins.id};
+      const sameParents=p.clienteId===oldPlan.clientId&&p.aseguradoraId===oldPlan.insurerId&&
+        stableHash(p)===oldPlan.before?.policyHash&&stableHash(client)===oldPlan.before?.clientHash&&
+        stableHash(insurer)===oldPlan.before?.insurerHash;
+      if(!sameParents){holds.push({sourceId:oldPlan.sourceId,reason:'HISTORICAL_PARENT_CAS_CHANGED'});continue;}
+      const g={policy:p,clientExists:true,insurerVerified:insurer.activo!==false,
+        clientSnapshotHash:stableHash(client),insurerSnapshotHash:stableHash(insurer),
+        insurerName:str(insurer.nombre||insurer.razonSocial),receipts:[],portfolio:[],cobros:[]};
+      const previous=snapshot.audits.find(a=>a.id===auditId(oldPlan.sourceId));
+      if(previous){
+        const documents=historicalDocuments(raw,p,previous.createdAt);
+        const ownKeys=new Set(documents.records.map(([col,row])=>col+'|'+row.id));
+        const withoutOwn={...snapshot,records:snapshot.records.filter(r=>!ownKeys.has(r.collection+'|'+r.id))};
+        const replayPlan=assessHistorical(raw,[g],source,withoutOwn);
+        const receipt=snapshot.records.find(r=>r.collection==='recibosEsperados'&&r.id===oldPlan.receiptId);
+        if(previous.sourceId!==oldPlan.sourceId||previous.policyId!==oldPlan.policyId||
+          previous.oldPlanHash!==oldPlan.beforeHash||!receipt||!historicalSiblingValid(receipt,p,source,snapshot)||
+          !replayPlan.ready||stableHash(replayPlan.ready)!==stableHash(oldPlan)||
+          stableHash({...previous,id:undefined})!==stableHash(historicalAudit(raw,p,oldPlan,documents,previous.createdAt))){
+          holds.push({sourceId:oldPlan.sourceId,reason:'HISTORICAL_REPLAY_POSTIMAGE_HOLD'});continue;
+        }
+        accepted.push({oldPlan,policy:p,documents,audit:previous,replay:true});continue;
+      }
+      const fresh=assessHistorical(raw,[g],source,snapshot);
+      if(!fresh.ready||stableHash(fresh.ready)!==stableHash(oldPlan)){
+        holds.push({sourceId:oldPlan.sourceId,reason:fresh.code||'HISTORICAL_PLAN_CAS_CHANGED'});continue;
+      }
+      // Unique period is checked over the entire source, independently of chunk
+      // ordering. No same-period candidate can escape through another ID.
+      const when=new Date().toISOString(),documents=historicalDocuments(raw,p,when);
+      const audit=historicalAudit(raw,p,oldPlan,documents,when);
+      for(const [col,row]of documents.records)writes.push([item(db,col).doc(row.id),row]);
+      writes.push([request(db,auditId(oldPlan.sourceId)),audit]);
+      accepted.push({oldPlan,policy:p,documents,audit,replay:false});
+    }
+    assert.ok(writes.length<=HISTORICAL_CHUNK*4,'HISTORICAL_WRITE_LIMIT');
+    for(const [ref,value]of writes)tx.create(ref,value);
+    return {accepted,holds};
+  });
+  const accepted=[],holds=[...result.holds];
+  for(const outcome of result.accepted){
+    const {oldPlan,documents,audit}=outcome;
+    const refs=documents.records.map(([col,row])=>item(db,col).doc(row.id));
+    let actual;
+    try{actual=await db.getAll(...refs,request(db,auditId(oldPlan.sourceId)),item(db,'polizas').doc(oldPlan.policyId));}
+    catch(e){holds.push({sourceId:oldPlan.sourceId,reason:'HISTORICAL_POSTIMAGE_READBACK_UNAVAILABLE',
+      commitOutcome:outcome.replay?'PREVIOUSLY_COMMITTED':'COMMITTED_PENDING_READBACK'});continue;}
+    const exact=actual.every(s=>s.exists)&&documents.records.every(([,row],i)=>stableHash(actual[i].data())===stableHash(row))&&
+      stableHash({...actual[3].data(),id:undefined})===stableHash({...audit,id:undefined})&&
+      stableHash({...actual[4].data(),id:actual[4].id})===oldPlan.before.policyHash;
+    if(!exact){holds.push({sourceId:oldPlan.sourceId,reason:'HISTORICAL_POSTIMAGE_READBACK_HOLD',
+      commitOutcome:outcome.replay?'PREVIOUSLY_COMMITTED':'COMMITTED_PENDING_READBACK'});continue;}
+    accepted.push({sourceId:oldPlan.sourceId,status:outcome.replay?'ALREADY_APPLIED_READBACK_PASS':'APPLIED_READBACK_PASS',
+      receiptCreated:!outcome.replay,historicalPaidOnly:true,currentDebtCreated:0});
+  }
+  const committedCount=result.accepted.filter(r=>!r.replay).length;
+  return {accepted,holds,committedCount,physicalDocumentCreates:committedCount*4,
+    committedUnverified:holds.filter(r=>r.commitOutcome==='COMMITTED_PENDING_READBACK').map(r=>r.sourceId)};
+}
 async function main(){
   const mode=str(process.env.GI_I66_CENDOSO_MODE);
   assert.ok(['preflight','apply','columna-readback','issued-readback','statement-payment-readback'].includes(mode),'I66_PAID_MODE_REQUIRED');
@@ -492,11 +780,14 @@ async function main(){
     return;
   }
   if(mode==='preflight'){
-    const groups=await readGroups(db,source);const p=planBatch(source,groups);
+    const groups=await readGroups(db,source),snapshot=await readHistoricalSnapshot(db,source);
+    const p=planBatch(source,groups,snapshot);
     report('GI_I66_CENDOSO_PLAN_OUT',p);
     report('GI_I66_CENDOSO_REPORT_OUT',{status:'READONLY_PREFLIGHT_NO_WRITES',
       sourceSha256:SOURCE_SHA,inputCount:p.inputCount,readyCount:p.readyCount,
       holdsCount:p.holdsCount,holdCounts:p.holdCounts,
+      historicalReceiptCreates:p.ready.filter(r=>r.creatingReceipt).length,
+      financialCensusCounts:Object.fromEntries(financialCollections.map(c=>[c,snapshot.records.filter(r=>r.collection===c).length])),
       privatePolicyDiagnostics:heldPolicyDiagnostics(source,groups,p.holds),
       holdExamples:p.holds.slice(0,55),writes:0});
     console.log('I66_CENDOSO_PREFLIGHT input='+p.inputCount+' ready='+p.readyCount+
@@ -512,24 +803,50 @@ async function main(){
   assert.ok(plan.ready.every(r=>sourceIds.has(r.sourceId)&&
     /^[a-f0-9]{64}$/.test(r.beforeHash)));
   const accepted=[],holds=[];
-  for(let i=0;i<plan.ready.length;i+=MAX_CHUNK){const chunk=plan.ready.slice(i,i+MAX_CHUNK);
+  let knownHistoricalCommits=0,writeOutcomeIndeterminate=false;
+  const historicalCommitsUnverified=[];
+  const existingPlans=plan.ready.filter(r=>!r.creatingReceipt),historicalPlans=plan.ready.filter(r=>r.creatingReceipt);
+  for(let i=0;i<existingPlans.length;i+=MAX_CHUNK){const chunk=existingPlans.slice(i,i+MAX_CHUNK);
     for(let k=0;k<chunk.length;k+=8){
       const done=await Promise.all(chunk.slice(k,k+8).map(async r=>{
         try{return {ok:true,result:await applyOne(db,r,source)};}
-        catch(e){return {ok:false,sourceId:r.sourceId,reason:/^[A-Z_]+$/.test(e.message)?e.message:'PRIVATE_RUNTIME_ERROR'};}}));
-      done.forEach(x=>(x.ok?accepted:holds).push(x.ok?x.result:{sourceId:x.sourceId,reason:x.reason}));
+        catch(e){const reason=/^[A-Z_]+$/.test(e.message)?e.message:'PRIVATE_RUNTIME_ERROR';
+          const knownBeforeWrite=new Set(['SOURCE_CHANGED','AUDIT_COLLISION','PREIMAGE_MISSING_OR_COBRO_EXISTS',
+            'POLICY_RECEIPT_PREIMAGE_CHANGED','LEGACY_INSURER_LIMIT_PREIMAGE_CHANGED','INSURER_PERIOD_SEQUENCE_CHANGED',
+            'CAS_PREIMAGE_CHANGED','NON_UNIQUE_PAYMENT_OR_PORTFOLIO','CLIENT_OR_INSURER_CHANGED']);
+          return {ok:false,sourceId:r.sourceId,reason,indeterminate:!knownBeforeWrite.has(reason)};}}));
+      done.forEach(x=>{if(x.ok)accepted.push(x.result);else{
+        writeOutcomeIndeterminate||=x.indeterminate;
+        holds.push({sourceId:x.sourceId,reason:x.reason,commitOutcome:x.indeterminate?'UNKNOWN_VERIFY_AUDIT_BEFORE_RETRY':'NO_WRITES'});
+      }});
     }
+  }
+  for(let i=0;i<historicalPlans.length;i+=HISTORICAL_CHUNK){
+    const chunk=historicalPlans.slice(i,i+HISTORICAL_CHUNK);
+    try{const out=await applyHistoricalChunk(db,chunk,source);accepted.push(...out.accepted);holds.push(...out.holds);
+      knownHistoricalCommits+=out.committedCount;historicalCommitsUnverified.push(...out.committedUnverified);}
+    catch(e){writeOutcomeIndeterminate=true;holds.push(...chunk.map(r=>({sourceId:r.sourceId,
+      reason:/^[A-Z_]+$/.test(e.message)?e.message:'HISTORICAL_PRIVATE_RUNTIME_ERROR',
+      commitOutcome:'UNKNOWN_VERIFY_AUDIT_BEFORE_RETRY'})));}
   }
   const applied=accepted.filter(x=>x.status==='APPLIED_READBACK_PASS').length;
   const already=accepted.length-applied;
+  const knownWrites=accepted.filter(x=>x.status==='APPLIED_READBACK_PASS'&&!x.historicalPaidOnly).length+knownHistoricalCommits;
   const body={status:holds.length?'PROTECTED_PARTIAL_READBACK_WITH_ISOLATED_HOLDS':'PROTECTED_PAID_READBACK_PASS',
     sourceSha256:SOURCE_SHA,inputCount:plan.inputCount,preflightReady:plan.readyCount,
-    cobroWrites:applied,receiptPaidWrites:applied,portfolioPaidWrites:applied,
+    cobroWrites:writeOutcomeIndeterminate?null:knownWrites,receiptPaidWrites:writeOutcomeIndeterminate?null:knownWrites,
+    portfolioPaidWrites:writeOutcomeIndeterminate?null:knownWrites,knownCommittedPaymentWrites:knownWrites,
+    verifiedApplied:applied,writeOutcomeIndeterminate,
+    historicalReceiptCreates:writeOutcomeIndeterminate?null:knownHistoricalCommits,
+    knownHistoricalReceiptCreates:knownHistoricalCommits,historicalDocumentCreatesKnown:knownHistoricalCommits*4,
+    historicalCommitsUnverified,currentDebtCreated:0,
     reconciledWrites:0,alreadyApplied:already,holds,accepted};
   report('GI_I66_CENDOSO_REPORT_OUT',body);
   console.log('I66_CENDOSO_LIVE_READBACK applied='+applied+' already='+already+' holds='+holds.length+' reconciledWrites=0');
-  if(!applied&&!already)throw Error('I66_NO_PAYMENT_WRITES_OR_READBACK');
+  if(!applied&&!already)throw Error('I66_NO_VERIFIED_PAYMENT_READBACK');
 }
 if(require.main===module)main().catch(e=>{console.error('I66_CENDOSO_HOLD '+e.message);process.exitCode=1;});
 module.exports={sourceRow,assess,planBatch,loadSource,receiptIdentity,insurerMatches,
-  policyMatches,policyLookupVariants,policyIdentityNumber,readGroups,heldPolicyDiagnostics};
+  policyMatches,policyLookupVariants,policyIdentityNumber,readGroups,heldPolicyDiagnostics,
+  historicalSourceProved,historicalIdentity,historicalDocuments,historicalAbsence,assessHistorical,
+  readHistoricalSnapshot,applyHistoricalChunk,stableHash,auditId,cobroId};

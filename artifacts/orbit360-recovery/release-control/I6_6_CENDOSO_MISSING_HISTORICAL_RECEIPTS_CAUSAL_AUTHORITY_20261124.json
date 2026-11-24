@@ -1,0 +1,53 @@
+{
+  "schema": "GRAVICENTRA_I6_6_CENDOSO_MISSING_HISTORICAL_RECEIPTS_AUTHORITY_V1",
+  "recordType": "APPEND_ONLY_CAUSAL_IMPLEMENTATION_SCOPE_NOT_EXECUTION_RECEIPT",
+  "dateUtc": "2026-11-24",
+  "gate": "I6.6",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "authority": [
+    {
+      "path": "artifacts/orbit360-recovery/release-control/I6_5_RECIBOS_CARTERA_SOURCE_INTAKE_20260918.json",
+      "rule": "sourcePrecedence: Cendoso28/26/27 are scheduled-receipt evidence; Cendoso24 is actual-paid evidence. invariants.paidHistoricalRule: historical/non-current policies may retain evidenced paid receipt history but must not create current cartera."
+    },
+    {
+      "path": "artifacts/orbit360-recovery/release-control/I6_6_OWNER_DECISIONS_GREENAPI_EMAIL_AND_PAYMENT_20261119.json",
+      "rule": "ownerDecisions20261119.legacyRealPaidEvidence authorizes confirmed unreconciled Cobro for exact unique policy edition, expected receipt reality, gross and actual paid date; protected environment and idempotency remain required."
+    },
+    {
+      "path": "artifacts/orbit360-recovery/release-control/I6_6_DIRECCION_DECISIONES_FINANCIERAS_Y_PLAN_INTEGRAL_20261122.md",
+      "rule": "D06: source-pinned deterministic AGREGAR delta through the existing protected writer, CAS, audit, rollback and readback, without repeating applied facts."
+    },
+    {
+      "kind": "CURRENT_OWNER_REQUEST_20261124",
+      "text": "Paula requests continuity and long financial writing batches, preserving prior preparations and decisions and avoiding duplicate reprocessing."
+    }
+  ],
+  "sourceManifest": "artifacts/orbit360-recovery/source-batches/I6_6_SOURCE_CENDOSO_PAID_CANDIDATES_2026.json.gz",
+  "sourceSha256": "649fa315a90b176b794abf6eef3d9f893d47de64cfe558d203a099c408692aa0",
+  "scheduleSourceSha256": [
+    "1dd905a5ff483a905e3f2298efbd8ebb20d9146357e0c5732fd89fdd88ebc8c7",
+    "8400b6fb3e74b78361870d2eec65822e4dc544511bef90391abb10f0f862ff25",
+    "f17774ef0f8730a0d35f7300510f5eebc73c4d567ccf3b03bc8917421937f834"
+  ],
+  "actualPaidSourceSha256": "36de3d35055716af4ca85d48719d4ef58154286a3136f41fac35287e740c03db",
+  "existingWriter": "tools/gravicentra-i66-cendoso-paid-protected.cjs",
+  "protectedEnvironment": "gravicentra-live-data-writes",
+  "allowedDelta": "Create one absent canonical historical expected receipt, one closed zero-debt portfolio ledger, one confirmed unreconciled Cobro and one audit for each uniquely proven paired-source paid obligation.",
+  "requiredConditions": [
+    "Exactly one existing tenant/GT/GTQ/insurer/client/policy edition; preserve policy and coverage status byte-for-byte.",
+    "Pinned scheduled-receipt source and primary actual-payment source both attest the same candidate; all dates and net/gross values exact and no material source variation.",
+    "Complete bounded census of receipt, cartera and Cobro collections; examine relation aliases, orphan records, evidence aliases and natural obligation identity; any plausible competing record holds that row.",
+    "No preexisting receipt may be replaced or bypassed. Existing-receipt flows retain their own identity and financial gates.",
+    "Each record has a deterministic natural key, exact preimage CAS and immutable postimage comparison; replay creates zero.",
+    "Only the approved exact protected job may apply its freshly generated eligible plan; metadata or local tests are not write authorization or proof."
+  ],
+  "prohibited": [
+    "No new policy, renewal, coverage activation, policy status change, invented insurer requirement or installment total.",
+    "No active/overdue debt, future calendar, automatic insurer/bank reconciliation, invoice, commission or payment-date inference.",
+    "No broad reimport, second writer, manual-gate bypass or claim that 146 observations guarantee 146 eligible writes."
+  ],
+  "executionStatus": "SOURCE_IMPLEMENTATION_ONLY_NO_WRITES",
+  "writes": 0
+}
+

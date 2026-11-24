@@ -1,5 +1,6 @@
 'use strict';
-// I6.6 two-policy protected source-to-receipt plan, NOT an independent importer.
+// Existing I6.6 protected source-to-receipt plan. The original two cases retain
+// their identities; the remaining three use the risk in the pinned issuer PDF.
 // This pure module grants no writes. Only the existing reviewed GitHub environment can apply it.
 const assert=require('node:assert/strict');
 const fs=require('node:fs');
@@ -7,11 +8,13 @@ const crypto=require('node:crypto');
 const source=require('../artifacts/orbit360-recovery/source-batches/I6_6_ROBLE_TWO_ISSUED_24_REQUIREMENTS_FINANCIAL_BREAKDOWN_20261122.json');
 const five=require('../artifacts/orbit360-recovery/source-batches/I6_6_ROBLE_FIVE_ISSUED_49_REQUIREMENTS_20261122.json');
 const witness=require('../artifacts/orbit360-recovery/source-batches/I6_6_ROBLE_FIVE_ISSUED_IDENTITY_WITNESSES_20261122.json');
+const originals=require('./gravicentra-i66-roble-issued-original.cjs');
 const sha=v=>crypto.createHash('sha256').update(String(v)).digest('hex');
 const norm=v=>String(v==null?'':v).normalize('NFD').toUpperCase().replace(/[^A-Z0-9]/g,'');
 const cents=n=>Math.round(Number(n)*100);
 const tenant='alianzas-soluciones',project='ays-orbit-360-lab';
 const policies=new Set(['91-8324489','91-8343059']);
+const cases=[...source.cases,...originals.remainingCases()];
 const OWNER_PATH='artifacts/orbit360-recovery/release-control/I6_6_DIRECCION_DECISIONES_FINANCIERAS_Y_PLAN_INTEGRAL_20261122.md';
 const authority=fs.readFileSync(OWNER_PATH);
 const gitBlob=crypto.createHash('sha1').update('blob '+authority.length+'\0').update(authority).digest('hex');
@@ -48,8 +51,57 @@ function check(){
  return true;
 }
 function match(w,v,k){return !!v&&sha(w.sourcePdfRawSha256+'|'+norm(v))===w[k];}
+function operationFor(c,holder,insurer){
+ return 'gi_i66_roble_two_'+sha([tenant,'GT',insurer.id,c.policy,holder.id,c.termStart,c.endorsement].join('|')).slice(0,24);
+}
+function resolveIssued(c,arrays,matcher=match){
+ const w=witness.witnesses.find(x=>x.policy===c.policy);
+ const {clientes=[],aseguradoras=[],polizas=[],vehiculos=[],asesores=[]}=arrays;
+ const holder=clientes.filter(x=>x.pais==='GT'&&[x.nombre,x.nombreCompleto,x.razonSocial].some(n=>matcher(w,n,'holderWitness')));
+ const insurers=aseguradoras.filter(x=>x.pais==='GT'&&x.activo!==false&&/roble/i.test(x.nombre||''));
+ const compatible=polizas.filter(x=>[x.numero,x.numeroPoliza,x.polizaNumero].some(n=>norm(n)===norm(c.policy)));
+ const unverifiedCountry=compatible.filter(x=>!['GT','CO'].includes(x.pais));
+ const siblings=compatible.filter(x=>x.pais==='GT');
+ const current=siblings.filter(p=>p.vigenciaInicio===c.termStart||p.vigenciaFin===c.termEnd);
+ const prior=siblings.filter(p=>p.vigenciaFin===c.termStart&&holder.some(h=>h.id===p.clienteId)&&insurers.some(i=>i.id===p.aseguradoraId));
+ const advisorId=prior[0]?.asesorId||holder[0]?.asesorId;
+ const advisors=asesores.filter(a=>a.id===advisorId&&a.activo!==false&&
+  (!a.pais||a.pais==='GT'||(Array.isArray(a.paises)&&a.paises.includes('GT'))));
+ const riskMatches=vehiculos.filter(v=>[v.placa,v.placaFuente].some(n=>matcher(w,n,'initialCertificatePlateWitness'))||
+  [v.vin,v.chasis,v.chasisFuente].some(n=>matcher(w,n,'initialCertificateVinWitness')));
+ const byPolicy=new Map(polizas.map(p=>[p.id,p]));
+ const riskConflicts=riskMatches.filter(v=>{
+  const p=byPolicy.get(v.polizaId);
+  return v.clienteId!==holder[0]?.id||(v.pais&&v.pais!=='GT')||!p||p.pais!=='GT'||
+   p.clienteId!==holder[0]?.id||!/^\d{4}-\d{2}-\d{2}$/.test(p.vigenciaFin||'')||p.vigenciaFin>c.termStart;
+ });
+ const priorRisk=vehiculos.filter(v=>prior.some(p=>p.id===v.polizaId));
+ let status='ELIGIBLE_SOURCE_IDENTITY_ONLY';
+ if(!c.originalVerified||!c.originalProof?.contractHolderVerified||c.originalProof?.certificateCount!==1)status='ISSUED_ORIGINAL_NOT_VERIFIED';
+ else if(holder.length!==1)status='CLIENT_HOLDER_NOT_UNIQUE';
+ else if(insurers.length!==1)status='INSURER_NOT_UNIQUE';
+ else if(unverifiedCountry.length)status='COMPATIBLE_POLICY_COUNTRY_UNVERIFIED';
+ else if(siblings.some(p=>[p.numero,p.numeroPoliza,p.polizaNumero].filter(Boolean).some(n=>norm(n)!==norm(c.policy))))status='POLICY_NUMBER_FIELDS_CONFLICT';
+ else if(current.length)status='ISSUED_EDITION_ALREADY_EXISTS';
+ else if(prior.length!==1&&!(c.allowAbsentPredecessor&&siblings.length===0))status='PREDECESSOR_NOT_UNIQUE';
+ else if(siblings.some(p=>!p.vigenciaFin||p.vigenciaFin>c.termStart))status='COMPETING_POLICY_EDITION';
+ else if(prior.some(p=>p.renovadaPor||/cancelad|anulad/i.test(p.estado||''))||polizas.some(p=>prior.some(old=>p.renuevaDe===old.id)))status='ALREADY_RENEWED_OR_CANCELLED';
+ else if(advisors.length!==1)status='DOCUMENTARY_ADVISOR_UNVERIFIED';
+ else if(riskConflicts.length)status='ISSUED_RISK_CURRENT_POLICY_OR_HOLDER_CONFLICT';
+ return {status,holder:holder[0],insurer:insurers[0],prior:prior[0],advisor:advisors[0],
+  vehicle:c.originalRisk,preservedVehicleIds:[...new Set([...priorRisk,...riskMatches].map(v=>v.id))],
+  riskConflictIds:riskConflicts.map(v=>v.id),
+  evidence:{holderCount:holder.length,insurerCount:insurers.length,currentCount:current.length,
+   unverifiedCountryCount:unverifiedCountry.length,
+   priorCount:prior.length,priorVehicleCount:priorRisk.length,advisorCount:advisors.length,
+   documentaryRiskMatches:riskMatches.length,currentRiskConflicts:riskConflicts.length,
+   sourceRows:c.schedule.length,sourceRiskFromOriginal:true,
+   ownerDistinctFromContractHolder:c.originalProof?.contractOwnerDistinct===true,
+   externalRenewalWithoutCanonicalPredecessor:prior.length===0}};
+}
 function resolve(c,arrays,matcher=match){
  check();
+ if(c.riskFromIssuedOriginal)return resolveIssued(c,arrays,matcher);
  const w=witness.witnesses.find(x=>x.policy===c.policy);
  const {clientes=[],aseguradoras=[],polizas=[],vehiculos=[],asesores=[]}=arrays;
  const holder=clientes.filter(x=>x.pais==='GT'&&[x.nombre,x.nombreCompleto,x.razonSocial].some(n=>matcher(w,n,'holderWitness')));
@@ -81,8 +133,8 @@ function mutation(c,identity,at){
  assert.equal(identity.status,'ELIGIBLE_SOURCE_IDENTITY_ONLY');
  const {holder,insurer,prior,vehicle,advisor}=identity;
  const basis=[tenant,'GT',insurer.id,c.policy,holder.id,c.termStart,c.endorsement].join('|');
- const operation='gi_i66_roble_two_'+sha(basis).slice(0,24),pid='pol_'+operation,vid='veh_'+operation;
- const canonical={tenantId:tenant,pais:'GT',moneda:'GTQ',clienteId:holder.id,asesorId:prior.asesorId,aseguradoraId:insurer.id,operationId:operation};
+ const operation=operationFor(c,holder,insurer),pid='pol_'+operation,vid='veh_'+operation;
+ const canonical={tenantId:tenant,pais:'GT',moneda:'GTQ',clienteId:holder.id,asesorId:advisor.id,aseguradoraId:insurer.id,operationId:operation};
  const fiveCase=five.cases.find(x=>x.policy===c.policy),w=witness.witnesses.find(x=>x.policy===c.policy);
  const url='https://drive.google.com/open?id='+fiveCase.sourcePdfId;
  const doc={fileId:fiveCase.sourcePdfId,documentRef:fiveCase.sourcePdfId,driveUrl:url,externalUrl:url,
@@ -92,23 +144,26 @@ function mutation(c,identity,at){
  const common={...canonical,createdAt:at,updatedAt:at,creado:at,actualizado:at,fuente:'Documento emitido por El Roble + estado de cuenta 20/11/2026',source:'El Roble original emitido + estado de cuenta 20/11/2026',
    sourceDocumentRef:fiveCase.sourcePdfId,issuerDocumentSha256:w.sourcePdfRawSha256};
  const hdr=c.issuerHeader;
+ const installments=c.schedule.length;
  const policy={...common,id:pid,numero:c.policy,estado:c.termStart<=today?'Vigente':'Emitida',
-   policyKey:[tenant,'GT',insurer.id,c.policy,holder.id].join('|'),policyVersionKey:basis,ramo:prior.ramo||'Vehículos',subramo:prior.subramo||'',producto:prior.producto||'',divisa:'GTQ',
-   vigenciaInicio:c.termStart,vigenciaFin:c.termEnd,fechaEmision:'2026-10-13',renuevaDe:prior.id,
-   frecuencia:'Mensual',cuotas:12,endoso:c.endorsement,primaNeta:asMoney(hdr.netCents),
+   policyKey:[tenant,'GT',insurer.id,c.policy,holder.id].join('|'),policyVersionKey:basis,ramo:prior?.ramo||'Vehículos',subramo:prior?.subramo||'',producto:prior?.producto||'',divisa:'GTQ',
+   vigenciaInicio:c.termStart,vigenciaFin:c.termEnd,fechaEmision:c.issuedDate||'2026-10-13',...(prior?{renuevaDe:prior.id}:{}),
+   frecuencia:installments===1?'Contado':'Mensual',cuotas:installments,endoso:c.endorsement,primaNeta:asMoney(hdr.netCents),
    gastosEmision:asMoney(hdr.expensesCents),otros:asMoney(hdr.assistCents),gastosFinan:asMoney(hdr.financeCents),
    iva:asMoney(hdr.ivaCents),ivaMonto:asMoney(hdr.ivaCents),prima:asMoney(hdr.grossCents),primaTotal:asMoney(hdr.grossCents),
    primaTotalDocumentalOriginal:asMoney(hdr.grossCents),primaCalendarioEmitido:asMoney(c.issuedScheduleGrossCents),
    diferenciaDocumentalCentavos:c.coverScheduleDeltaCents,
    sumaAsegurada:asMoney(c.issuedInsuredValueCents),documentRef:fiveCase.sourcePdfId,documentos:[doc],adjuntos:[doc],
-   vehiculoId:vid,sourcePolicyId:prior.id,
+   vehiculoId:vid,...(prior?{sourcePolicyId:prior.id}:{}),
    historial:[{fecha:today,icon:'🔄',t:'Renovación emitida registrada',d:'Endoso '+c.endorsement,operationId:operation}]};
+ if(c.riskFromIssuedOriginal)Object.assign(policy,{issuerOperation:'RENOVACION',
+   externalRenewalWithoutCanonicalPredecessor:!prior,documentaryRiskProof:c.originalProof});
  const creates=[['polizas',policy]];
  for(const r of c.schedule){
   const rid='cob_'+pid+'_'+String(r.sequence).padStart(2,'0');
   const due=r.due;
   const record={...common,id:rid,polizaId:pid,reciboKey:[tenant,pid,r.sequence].join('|'),
-   secuencia:r.sequence,numeroCuota:r.sequence,cuota:r.sequence+'/12',
+   secuencia:r.sequence,numeroCuota:r.sequence,cuota:r.sequence+'/'+installments,
    numeroReciboFuente:r.requirement,fechaVencimientoContractual:due,fechaVencimiento:due,vence:due,fechaLimite:due,
    primaNeta:asMoney(r.netCents),neta:asMoney(r.netCents),
    gastosEmisionYOtrosDocumentados:asMoney(r.expensesAndOtherCents),componenteGastosSinSeparar:true,
@@ -122,24 +177,28 @@ function mutation(c,identity,at){
     estadoOperativo:due<today?'pendiente_vencido':'futuro_pendiente',exigibilidad:due<today?'exigible':'futura',
     carteraTipo:'cartera_activa',estadoConciliacionSaldo:'pendiente_conciliacion',saldoConciliado:false}]);
  }
- const nextVehicle={...Object.fromEntries(['placa','placaFuente','vin','chasis','chasisFuente','marca','linea','anio','motor','uso','tipo','inciso'].filter(k=>vehicle[k]!=null).map(k=>[k,vehicle[k]])),
-   ...common,id:vid,polizaId:pid,estado:'Vigente',sumaAsegurada:asMoney(c.issuedInsuredValueCents),sourcePolicyId:prior.id,sourceVehicleId:vehicle.id,
-   versionOfVehicleId:vehicle.id,documentRef:fiveCase.sourcePdfId,creado:at};
- const activity={...common,id:'act_'+operation,polizaId:pid,sourcePolicyId:prior.id,
+ const riskFields=['placa','placaFuente','vin','chasis','chasisFuente','marca','linea','anio','motor','uso','tipo','inciso'];
+ if(c.riskFromIssuedOriginal)riskFields.push('propietario');
+ const nextVehicle={...Object.fromEntries(riskFields.filter(k=>vehicle[k]!=null).map(k=>[k,vehicle[k]])),
+   ...common,id:vid,polizaId:pid,estado:'Vigente',sumaAsegurada:asMoney(c.issuedInsuredValueCents),
+   ...(prior?{sourcePolicyId:prior.id}:{}),
+   ...(!c.riskFromIssuedOriginal?{sourceVehicleId:vehicle.id,versionOfVehicleId:vehicle.id}:{}),
+   documentRef:fiveCase.sourcePdfId,creado:at};
+ const activity={...common,id:'act_'+operation,polizaId:pid,...(prior?{sourcePolicyId:prior.id}:{}),
    fecha:today,tipo:'renovacion',icon:'🔄',titulo:'Renovación emitida registrada',
-   detalle:'Endoso '+c.endorsement+' · 12 obligaciones emitidas',origen:'Documento original El Roble',documentRef:fiveCase.sourcePdfId};
+   detalle:'Endoso '+c.endorsement+' · '+installments+' obligaciones emitidas',origen:'Documento original El Roble',documentRef:fiveCase.sourcePdfId};
  creates.push(['vehiculos',nextVehicle],['actividades',activity]);
- const prevPatch={renovadaPor:pid,renovacionEstado:'Renovada',renovacionFechaEfectiva:c.termStart,
+ const prevPatch=prior?{renovadaPor:pid,renovacionEstado:'Renovada',renovacionFechaEfectiva:c.termStart,
    historial:[...(prior.historial||[]),{icon:'🔄',fecha:today,t:'Renovación registrada',d:'Póliza sucesora '+pid,operationId:operation}],
-   actualizado:at};
- assert.equal(creates.length,27);
- assert.equal(creates.filter(x=>x[0]==='recibosEsperados').length,12);
- assert.equal(creates.filter(x=>x[0]==='carteraPrimas').length,12);
+   actualizado:at}:null;
+ assert.equal(creates.length,installments*2+3);
+ assert.equal(creates.filter(x=>x[0]==='recibosEsperados').length,installments);
+ assert.equal(creates.filter(x=>x[0]==='carteraPrimas').length,installments);
  assert.equal(creates.filter(x=>x[0]==='cobros').length,0);
  assert.equal(creates.filter(x=>x[0]==='carteraPrimas').reduce((n,x)=>n+cents(x[1].primaTotal),0),c.issuedScheduleGrossCents);
- return{operation,policyId:pid,creates,previous:prevPatch,priorId:prior.id,
+ return{operation,policyId:pid,creates,previous:prevPatch,priorId:prior?.id||null,
    evidence:{issuedTerm:c.termStart+'..'+c.termEnd,pdfSha256:w.sourcePdfRawSha256,
     sourceCalendarGrossCents:c.issuedScheduleGrossCents,originalGrossCents:hdr.grossCents,documentedMinorDeltaCents:c.coverScheduleDeltaCents},
-   counts:{creates:27,updates:1,audit:1,receipts:12,portfolio:12,directPayments:0}};
+   counts:{creates:creates.length,updates:prior?1:0,audit:1,receipts:installments,portfolio:installments,directPayments:0}};
 }
-module.exports={tenant,project,source,five,witness,policies,check,resolve,mutation,match,sha};
+module.exports={tenant,project,source,five,witness,policies,cases,check,resolve,resolveIssued,operationFor,mutation,match,sha,originals};

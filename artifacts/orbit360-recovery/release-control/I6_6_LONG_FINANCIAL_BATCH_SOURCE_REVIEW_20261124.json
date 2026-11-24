@@ -1,0 +1,57 @@
+{
+  "schema": "GI_I66_LONG_FINANCIAL_BATCH_SOURCE_REVIEW_V1",
+  "status": "INDEPENDENT_SOURCE_REVIEW_AND_LOCAL_CAUSAL_TESTS_PASS_LIVE_PREFLIGHT_PENDING",
+  "dateGuatemala": "2026-11-23",
+  "parentCanonicalHead": "64245538850cacbc30f216cb8f39a456157fe19b",
+  "scope": {
+    "cendoso": "Same existing protected writer: paired schedule and actual-paid source can materialize uniquely absent historical receipt, closed zero-debt portfolio, confirmed unreconciled Cobro and audit.",
+    "roble": "Same existing protected issuer writer: preserve the original two applied renewals and admit only the remaining three exact original PDFs and their 25 source requirements."
+  },
+  "potentialSourceCounts": {
+    "cendosoHistoricalRows": 146,
+    "cendosoPolicyEditions": 47,
+    "cendosoGrossCents": 7609129,
+    "robleRequirements": 25,
+    "robleGrossCents": 1042552,
+    "currency": "GTQ",
+    "eligibleOrAppliedCountsClaimed": false
+  },
+  "reviewedCorrections": [
+    "Global edition and orphan detection within CAS",
+    "Deterministic source identity and exact existing-source bytes",
+    "Replay validates postimages, audit identity and competing records",
+    "Committed-but-unverified writes remain counted and held",
+    "Roble independent readback covers all five cases and preserves original operation IDs",
+    "No future debt from paid history; no direct Cobro from pending obligations"
+  ],
+  "localVerification": {
+    "robleTests": 15,
+    "robleFailures": 0,
+    "robleOriginalPdfParse": 3,
+    "robleExactRequirementLines": 25,
+    "cendosoExistingAndAdversarialSuite": "PASS",
+    "cendosoVolume": {
+      "rows": 146,
+      "subchunks": [
+        100,
+        46
+      ],
+      "documentCreates": 584,
+      "verifiedReadbacks": 146,
+      "replayCreates": 0,
+      "unchangedPolicies": 47,
+      "openPortfolioBalanceCents": 0,
+      "environment": "ISOLATED_DOUBLE_NOT_LIVE"
+    }
+  },
+  "runtimeGates": [
+    "Fresh canonical Firestore preflight",
+    "Existing protected environment review",
+    "Only exact eligible plans with current CAS",
+    "Every committed record read back",
+    "Isolate unresolved source or identity rows"
+  ],
+  "productBuildChanged": false,
+  "fullI66ProductionAccepted": false,
+  "liveWritesByThisReceipt": 0
+}

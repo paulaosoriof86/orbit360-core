@@ -16,6 +16,7 @@ on:
       - tools/gravicentra-i66-roble-five-issuer-crosswalk*.cjs
       - tools/gravicentra-i66-roble-two-issued-plan*.cjs
       - tools/gravicentra-i66-roble-two-issued-protected.cjs
+      - tools/gravicentra-i66-roble-issued-original.cjs
       - tools/gravicentra-i66-issued-original-access.cjs
       - tools/gravicentra-i66-d03-statement-series.cjs
       - tools/gravicentra-i66-issued-source-schedule*.cjs
@@ -155,12 +156,13 @@ jobs:
       - name: Read back already committed issuer renewals and their unique audit identities
         if: contains(github.event.head_commit.message, 'I66_TWO_POST_COMMIT_READBACK')
         run: node tools/gravicentra-i66-roble-two-issued-protected.cjs readback
-      - name: Check two exact issuer-backed successor editions with current Firestore and zero writes
+      - name: Check five issuer-backed editions and remaining obligations with current Firestore and zero writes
         id: two
         if: contains(github.event.head_commit.message, 'I66_ROBLE_TWO_24_CAS')
         shell: bash
         run: |
           set -euo pipefail
+          if ! command -v pdftotext >/dev/null; then sudo apt-get -qq update && sudo apt-get -qq install -y poppler-utils; fi
           node --test tools/gravicentra-i66-roble-two-issued-plan.test.cjs
           node tools/gravicentra-i66-roble-two-issued-protected.cjs preflight
       - name: Check the issued G&T schedule and exact predecessor in Firestore
@@ -501,7 +503,7 @@ jobs:
               print('I66_ROBLE_TWO_SAME_FIREBASE_IDENTITY_PASS');break
           else: raise SystemExit('I66_ROBLE_TWO_FIREBASE_IDENTITY_MISSING')
           PY
-      - name: Certify and apply only two original El Roble renewals with pinned CAS and exact server readback
+      - name: Apply only eligible original El Roble renewals with pinned CAS and exact server readback
         shell: bash
         env:
           GI_I66_BULK_PROTECTED_ENV: gravicentra-live-data-writes
@@ -509,6 +511,7 @@ jobs:
         run: |
           set -euo pipefail
           test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          if ! command -v pdftotext >/dev/null; then sudo apt-get -qq update && sudo apt-get -qq install -y poppler-utils; fi
           node --check tools/gravicentra-i66-roble-two-issued-protected.cjs
           node --test tools/gravicentra-i66-roble-two-issued-plan.test.cjs
           node tools/gravicentra-i66-roble-two-issued-protected.cjs apply
