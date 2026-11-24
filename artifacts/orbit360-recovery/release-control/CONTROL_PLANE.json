@@ -1653,6 +1653,92 @@
       "businessWrites": 0,
       "releaseAcceptanceAlreadyCommitted": true,
       "fullI66ProductionAcceptanceClaimed": false
+    },
+    "postAcceptanceGovernanceQa": {
+      "observers": {
+        "fiveRoles": {
+          "schema": "GI_I66_READONLY_OBSERVER_AUTHORITY_V1",
+          "status": "APPROVED_EXACT_QA_ON_ACCEPTED_LIVE",
+          "profile": "fiveRoles",
+          "approvedByDirection": true,
+          "readOnly": true,
+          "noProductWrites": true,
+          "noReleaseTransitions": true,
+          "noSyntheticWrites": true,
+          "target": {
+            "generation": 3,
+            "sourceSha": "65c825b2808a615ca4195bdde6689dbdbe3193b2",
+            "buildId": "gi-i66-65c825b2808a-57f234755dc1",
+            "buildRunId": 45287432665,
+            "artifactId": 14873426438,
+            "artifactDigest": "sha256:7cb782848a45083047c4899bc30c13bf5be46429607e42597d09342becfc9acc",
+            "hostingVersion": "sites/ays-orbit-360-lab/versions/332999a55b189108",
+            "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_FRONTEND_E00003_RECEIPT.json",
+            "receiptGitBlobSha": "11fdb3bee494541513482666d6215f45cbad0567",
+            "receiptCommit": "f80c37e174406ccb489569b3bc7dd6073c2c4273"
+          },
+          "qaSourceSha": "2309ddd27cba10725f7cce5a778afed505dbd1c4",
+          "sourceQaRunId": 45297461362,
+          "guardRunId": 45297461235,
+          "qaPins": {
+            ".github/workflows/gravicentra-i66-current-exact-preview-cross-module-uat-20261119.yml": "1af12aaeef8178c0ff9e172f958e02991386601c",
+            ".github/workflows/gravicentra-i66-privileged-role-parity-source-qa.yml": "6a30bbd84977abb4ebd82c681b0a63f8f02821f3",
+            ".github/workflows/gravicentra-release-lock-sync.yml": "379f7d4fef9daedfa0c060cadc7646ce788f7b6e",
+            "functions/product-active-role-contract.js": "09681f536c5cbbd36bcba6514d4829d2494b9387",
+            "tools/gravicentra-governance-preflight-v1.mjs": "ae2eaeb12c7bc035f07ddabd00ce9693b2dde844",
+            "tools/gravicentra-i6-6-current-live-five-role-route-readonly.cjs": "cb151d10e047f823d925d536f04a4bc8084ea7d9",
+            "tools/gravicentra-i6-6-delta-guard.mjs": "576eda7cd5767c8a7e3bd033f36a8805f06890e8",
+            "tools/gravicentra-i6-6-delta-test-revisions.cjs": "b99b4e8ac0def995efbc4f1fdb00b67efdc31a49",
+            "tools/gravicentra-i6-6-direction-preview-legal-acceptance.cjs": "b3a6539596fb9ed706f7a6e21aa982bf97129780",
+            "tools/gravicentra-i6-6-five-role-assigned-selection.test.cjs": "6605e3a61adab866d5d9a20b60a3b0182335d99b",
+            "tools/gravicentra-i6-6-operational-release-candidate.cjs": "95d1221eeab7b5cc818dde314d5c8c0528823911",
+            "tools/gravicentra-i6-6-readonly-observer-authority.test.cjs": "4d03114cddcdd59f4af3e9e916bead8548351619",
+            "tools/gravicentra-i66-frontend-control.cjs": "f8cda031f5b0d4458c0afa75a7fd7f6f6e9dd91f",
+            "tools/gravicentra-i66-frontend-promotion-transaction.cjs": "7e99182ff7854be39c8c5e90056ec6ee69d09994"
+          }
+        },
+        "performance": {
+          "schema": "GI_I66_READONLY_OBSERVER_AUTHORITY_V1",
+          "status": "APPROVED_EXACT_QA_ON_ACCEPTED_LIVE",
+          "profile": "performance",
+          "approvedByDirection": true,
+          "readOnly": true,
+          "noProductWrites": true,
+          "noReleaseTransitions": true,
+          "noSyntheticWrites": true,
+          "target": {
+            "generation": 3,
+            "sourceSha": "65c825b2808a615ca4195bdde6689dbdbe3193b2",
+            "buildId": "gi-i66-65c825b2808a-57f234755dc1",
+            "buildRunId": 45287432665,
+            "artifactId": 14873426438,
+            "artifactDigest": "sha256:7cb782848a45083047c4899bc30c13bf5be46429607e42597d09342becfc9acc",
+            "hostingVersion": "sites/ays-orbit-360-lab/versions/332999a55b189108",
+            "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_FRONTEND_E00003_RECEIPT.json",
+            "receiptGitBlobSha": "11fdb3bee494541513482666d6215f45cbad0567",
+            "receiptCommit": "f80c37e174406ccb489569b3bc7dd6073c2c4273"
+          },
+          "qaSourceSha": "2309ddd27cba10725f7cce5a778afed505dbd1c4",
+          "sourceQaRunId": 45297461362,
+          "guardRunId": 45297461235,
+          "qaPins": {
+            ".github/workflows/gravicentra-i66-live-performance-readonly.yml": "12225700cec41aafabc477d60fe7f525ba957e12",
+            ".github/workflows/gravicentra-i66-privileged-role-parity-source-qa.yml": "6a30bbd84977abb4ebd82c681b0a63f8f02821f3",
+            ".github/workflows/gravicentra-release-lock-sync.yml": "379f7d4fef9daedfa0c060cadc7646ce788f7b6e",
+            "tools/gravicentra-governance-preflight-v1.mjs": "ae2eaeb12c7bc035f07ddabd00ce9693b2dde844",
+            "tools/gravicentra-i6-6-delta-guard.mjs": "576eda7cd5767c8a7e3bd033f36a8805f06890e8",
+            "tools/gravicentra-i6-6-delta-test-revisions.cjs": "b99b4e8ac0def995efbc4f1fdb00b67efdc31a49",
+            "tools/gravicentra-i6-6-direction-preview-legal-acceptance.cjs": "b3a6539596fb9ed706f7a6e21aa982bf97129780",
+            "tools/gravicentra-i6-6-operational-release-candidate.cjs": "95d1221eeab7b5cc818dde314d5c8c0528823911",
+            "tools/gravicentra-i6-6-performance-first-route-source-timeline.test.cjs": "5a9b7fccbbce89b85669bc6a8bbd82cc30481563",
+            "tools/gravicentra-i6-6-readonly-observer-authority.test.cjs": "4d03114cddcdd59f4af3e9e916bead8548351619",
+            "tools/gravicentra-i6-6-six-existing-receipts-ui-readonly.test.cjs": "a29326af3341cba8ae08bbcc7125436adc7d901c",
+            "tools/gravicentra-i66-frontend-control.cjs": "f8cda031f5b0d4458c0afa75a7fd7f6f6e9dd91f",
+            "tools/gravicentra-i66-frontend-promotion-transaction.cjs": "7e99182ff7854be39c8c5e90056ec6ee69d09994",
+            "tools/gravicentra-i66-live-performance-readonly.mjs": "7ae8ed33d8bf8fb0ecd72d5da17ac3a808e7abee"
+          }
+        }
+      }
     }
   },
   "b4003ActiveCertificationCursor20261106": {
