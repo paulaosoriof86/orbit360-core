@@ -1,0 +1,190 @@
+{
+  "schema": "GI_I66_CENDOSO_155_APPLICATION_MAPFRE_OBLIGATION_EXECUTION_R52_V1",
+  "recordType": "SANITIZED_ADDITIVE_PROTECTED_EXECUTION_EVIDENCE_NOT_RELEASE_GATE_CLOSURE",
+  "observedAtUtc": "2026-11-24T17:24:44+00:00",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "gate": "I6.6",
+  "authority": {
+    "path": "artifacts/orbit360-recovery/release-control/I6_6_DIRECTION_URGENT_COMPLETION_TOLERANCE_AND_DIRECT_RENEWAL_20261124.json",
+    "sha256": "cda5d408666e6e959248ea0a08ffa13f9e05a695fe41b3dedee20ba3d93f7c3d",
+    "decisionId": "DIRECTION_I66_COMPLETE_APPLICATION_GLOBAL_TOLERANCE_DIRECT_RENEWAL_20261124",
+    "owner": "DIRECT_USER_INSTRUCTION_IN_CURRENT_CONVERSATION"
+  },
+  "cendoso": {
+    "status": "ALL_155_EXISTING_DIRECT_PAYMENTS_APPLICATION_READBACK_PASS",
+    "targetManifestPath": "artifacts/orbit360-recovery/source-batches/I6_6_CENDOSO_155_EXISTING_DIRECT_APPLICATION_TARGETS_20261124.json",
+    "targetManifestSha256": "8619d7953c05b7a82eeb0c837796064bc8e46fe5bc12c051345f3e5152a2ec66",
+    "sourceSha256": "649fa315a90b176b794abf6eef3d9f893d47de64cfe558d203a099c408692aa0",
+    "targetCount": 155,
+    "verifiedApplied": 155,
+    "uniqueAcceptedTargetIds": 155,
+    "exactManifestIdentitySetCovered": true,
+    "registeredPaymentGrossCents": 7880643,
+    "currency": "GTQ",
+    "financialDocumentUpdates": 465,
+    "applicationAuditCreates": 155,
+    "totalTechnicalWrites": 620,
+    "newPayments": 0,
+    "newObligations": 0,
+    "bankMovements": 0,
+    "amountChangesCents": 0,
+    "paidDateChanges": 0,
+    "masterClientOrPolicyChanges": 0,
+    "remainingTargetHolds": 0,
+    "committedUnverified": 0,
+    "writeOutcomeIndeterminate": false,
+    "applicationState": "APPLIED_DIRECT",
+    "paymentStatePreserved": "PAID_DIRECT",
+    "paymentOriginPreserved": "CRM_MIGRATED_DIRECT_PAYMENT",
+    "applicationEvidenceType": "MANUAL_RECONCILIATION",
+    "insurerReconciliationProven": false,
+    "applicationDateInvented": false,
+    "control": "Existing protected Cendoso application owner; complete census, exact identity, full preimage and updateTime CAS, transaction audit with rollback images, independent post-read.",
+    "runs": [
+      {
+        "runId": 45443954812,
+        "url": "https://github.com/paulaosoriof86/orbit360-core/actions/runs/45443954812",
+        "commit": "e8db3c5cd372bd986ee62093af8b7c4cb9588cf1",
+        "protectedJobId": 138622819510,
+        "conclusion": "success",
+        "applied": 153,
+        "grossCents": 7816621,
+        "financialDocumentUpdates": 459,
+        "applicationAuditCreates": 153,
+        "preflightIsolatedHolds": 2,
+        "runtimeHolds": 0,
+        "artifact": {
+          "artifactId": 14945322937,
+          "name": "gi-i66-cendoso-paid-live-45443954812",
+          "archiveSha256": "377b4a44e9dcb5bee3142fac637014e2f9e53e372c4328e86f11a3fc2e1d5307",
+          "digestIndependentlyVerified": true
+        }
+      },
+      {
+        "runId": 45447045899,
+        "url": "https://github.com/paulaosoriof86/orbit360-core/actions/runs/45447045899",
+        "commit": "cd417c18cbdcb22b07f4044a34eeded750d6f676",
+        "protectedJobId": 138634299882,
+        "conclusion": "success",
+        "applied": 2,
+        "grossCents": 64022,
+        "financialDocumentUpdates": 6,
+        "applicationAuditCreates": 2,
+        "preflightAlreadyAppliedReadback": 153,
+        "preflightHolds": 0,
+        "runtimeHolds": 0,
+        "artifact": {
+          "artifactId": 14947160409,
+          "name": "gi-i66-cendoso-paid-live-45447045899",
+          "archiveSha256": "69a943f8c786585ba0de346f1ddb5973d4ca6ced33bfa74fb0686456b68fb247",
+          "digestIndependentlyVerified": true
+        }
+      }
+    ],
+    "noWriteReplayEvidence": {
+      "runId": 45445519833,
+      "url": "https://github.com/paulaosoriof86/orbit360-core/actions/runs/45445519833",
+      "alreadyApplied": 153,
+      "ready": 0,
+      "writes": 0,
+      "artifact": {
+        "artifactId": 14945532944,
+        "name": "gi-i66-cendoso-paid-preflight-45445519833",
+        "archiveSha256": "e0ed110fb9cbf3e9afdf50d59e37b6fa553676a28d33d4be6e7ae5cd604ca065",
+        "digestIndependentlyVerified": true
+      },
+      "additionalLastTwoPostCommitAuditsAndAfterHashesVerified": true,
+      "all155SinglePostCompletionCensusClaimed": false
+    },
+    "lastTwoCauseAndResolution": {
+      "cause": "Client country was used as if it were the jurisdiction of every linked policy. The exact relationship was already documented as cross-border.",
+      "preservedPolicyCountry": "GT",
+      "preservedClientCountry": "CO",
+      "scopeCount": 2,
+      "broadCountryExceptionIntroduced": false,
+      "monetaryToleranceUsedForCountry": false,
+      "evidencePath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_CARLOS_FINANCE_TRANSVERSAL_SIGNED_UAT_20261103.json",
+      "evidenceSha256": "f6559d44962f5823ee69aa6eb4f0bb9e689b9c3e90d234766c4ac11ed404b836",
+      "liveGuard": "Exact sealed manifest source, policy and client identities; exact GT policy/CO client relation; original posting audit and all other source/amount/date/dedup/CAS guards remain required."
+    }
+  },
+  "mapfre": {
+    "status": "TWO_EXISTING_OBLIGATIONS_CORRECTED_LIVE_CANONICAL_PAYMENTS_NOT_YET_EXECUTED",
+    "sourcePreflightReference": "artifacts/orbit360-recovery/release-control/I6_6_MAPFRE_NEXT_CONTROLLED_PREFLIGHT_20261124_R46.json",
+    "runId": 45446816038,
+    "url": "https://github.com/paulaosoriof86/orbit360-core/actions/runs/45446816038",
+    "commit": "bf5f2077b06344b2fd85009e817012f2d3a044f9",
+    "protectedJobId": 138633518905,
+    "conclusion": "success",
+    "artifact": {
+      "artifactId": 14944719665,
+      "name": "gi-i66-source-bulk-live-45446816038",
+      "archiveSha256": "b5150bfa43402e967d38a093b1e7329a4c74fdca438df978139aab8d9d0388d4",
+      "digestIndependentlyVerified": true
+    },
+    "protectedOwner": "Existing insurer-source bulk obligation CAS",
+    "auditId": "gi_i66_mapfre_obligation_3193bd7e155147a639bf0d6b7e1d",
+    "planHash": "26b913e29d51c7e1ce12d1af647ee0dc473fe05260f67d2352fd3e500e877438",
+    "beforeHash": "b46adb84785384bbd460111717cc40028c4a4cfbcd537b154cf30ebb0171008f",
+    "afterDataHash": "1a72a6e2a6caf1f0e0f4fdd9fc8299e1056a7a4e85606d9883d97763336c4c94",
+    "freshOriginalDocumentsVerifiedByBytes": 3,
+    "privateBeforeRecordCount": 35,
+    "privateAfterRecordCount": 35,
+    "existingReceiptUpdates": 2,
+    "existingPortfolioUpdates": 2,
+    "auditCreates": 1,
+    "totalTechnicalWrites": 5,
+    "grossBeforeEachCents": 12776,
+    "grossAfterEachCents": 12777,
+    "grossCorrectionPerObligationCents": 1,
+    "obligationGrossCorrectionTotalCents": 2,
+    "currency": "GTQ",
+    "targetInstallments": [
+      10,
+      11
+    ],
+    "sourceRequirementAndContractualDuePersisted": true,
+    "operationalDeadlinePreserved": true,
+    "netTaxesExpensesAndCommissionsPreserved": true,
+    "previousPaymentsPreserved": 9,
+    "previousPaymentGrossCents": 114984,
+    "installment12PreservedAndExcluded": true,
+    "annualDifferenceCentsPreserved": 3,
+    "approvedToleranceCents": 5,
+    "sourceStatesPreserved": [
+      "COMMISSION_ANCHOR",
+      "PAID"
+    ],
+    "sourceWasNotReclassifiedAsPending": true,
+    "newObligations": 0,
+    "newPayments": 0,
+    "cobroWrites": 0,
+    "writeOutcomeIndeterminate": false,
+    "replayStatus": "MAPFRE_OBLIGATION_ALREADY_APPLIED_READBACK_PASS",
+    "replayWrites": 0,
+    "canonicalPaymentFollowThrough": {
+      "status": "READY_AFTER_OBLIGATION_CAS_NOT_EXECUTED",
+      "paymentCount": 2,
+      "totalGrossCents": 25554,
+      "canonicalFunction": "orbit360CobrosReconciliationCommand",
+      "operation": "apply_payment",
+      "usePinnedRequestIdsAndPayloadsFromR46": true,
+      "realAuthenticatedAuthorizedUserRequired": true,
+      "newPaymentsMayOnlyBeClaimedAfterCanonicalResponsesAndIndependentReadback": true,
+      "signedReloadRequired": true
+    }
+  },
+  "privacy": {
+    "privatePreimagesIncludedInRepositoryReceipt": false,
+    "customerNamesOrIdentifiersIncluded": false,
+    "privateEvidenceLocation": "Access-controlled workflow artifacts and canonical transaction audits; no operational documents copied into this receipt."
+  },
+  "releaseBoundary": {
+    "hostingDeploymentPerformedByTheseRuns": false,
+    "productionAcceptanceClaimed": false,
+    "modulePassCountChangedByThisReceipt": false,
+    "doesNotReplaceCurrentRecoveryAuthority": true
+  },
+  "next": "Complete the two MAPFRE canonical requests through the actual authorized session, verify both server requests/events and exact after-images, then record the separate signed UI reload. Continue the active product release gate independently."
+}

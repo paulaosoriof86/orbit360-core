@@ -1,0 +1,54 @@
+{
+  "schema": "GI_I66_V24_SOURCE_QA_AND_GOVERNANCE_VERIFICATION_V1",
+  "status": "SIGNED_SOURCE_QA_AND_GOVERNANCE_PASS",
+  "sourceHead": "a26e2bffd87d2c700e102c7e989eda20aa562772",
+  "branch": "recovery/fase-a-clean-20260831",
+  "sourceQa": {
+    "runId": 45447374799,
+    "workflow": ".github/workflows/gravicentra-i66-privileged-role-parity-source-qa.yml",
+    "headSha": "a26e2bffd87d2c700e102c7e989eda20aa562772",
+    "status": "completed",
+    "conclusion": "success",
+    "jobId": 138634747942,
+    "sourceSuiteStep": 4,
+    "lineageGuardStep": 5,
+    "checks": {
+      "renewalDirectEntry": 18,
+      "issuedEndorsementDirectEntry": 12,
+      "signedDriverContracts": 13,
+      "closedCompositeAdmission": 11,
+      "failures": 0
+    }
+  },
+  "governance": {
+    "runId": 45447374897,
+    "workflow": ".github/workflows/gravicentra-release-lock-sync.yml",
+    "headSha": "a26e2bffd87d2c700e102c7e989eda20aa562772",
+    "status": "completed",
+    "conclusion": "success",
+    "preflightJobId": 138634927679,
+    "preflightStep": 4,
+    "availabilityJobId": 138634927173,
+    "canonicalPreflight": "GRAVICENTRA_GOVERNANCE_PREFLIGHT=PASS"
+  },
+  "signedV23": {
+    "runId": 45442224026,
+    "jobId": 138616409174,
+    "conclusion": "success",
+    "signedDriversStep": 15,
+    "sealStep": 16,
+    "proofArtifactId": 14944284710,
+    "proofArtifactDigest": "sha256:db435003eb52a0b2d9463b91d830ede21b37ec3ff4117691d44812c9f9db503d",
+    "successorProductNotCovered": true
+  },
+  "actionsByReviewer": {
+    "productChanges": 0,
+    "backendChanges": 0,
+    "customerDataWrites": 0,
+    "productionDeploys": 0
+  },
+  "limitations": [
+    "These runs certify source and governance; they do not certify new direct-form UI in Preview or LIVE.",
+    "The completed v23 signed proof covers its immutable artifact only and does not accept v24."
+  ]
+}
