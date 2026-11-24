@@ -139,3 +139,55 @@ test('MAPFRE retains committed-but-unverified status after a postcommit outage a
   assert.equal(recovered.status,'MAPFRE_OBLIGATION_APPLIED_READBACK_PASS');assert.equal(recovered.recoveredAmbiguousCommit,true);
   assert.equal(recovered.writeOutcomeIndeterminate,false);assert.equal(a.db.writes,5);
 });
+const stable=x=>Array.isArray(x)?x.map(stable):x&&typeof x==='object'?
+  Object.fromEntries(Object.keys(x).sort().map(k=>[k,stable(x[k])])):x;
+const objectHash=x=>hash(JSON.stringify(stable(x)));
+async function canonicalPaymentFixture(){
+  const f=fixture(),p=await plan(f),corrected=await apply(f,p),s=f.binding.preflight.scope;
+  for(const t of f.binding.preflight.twoCases){
+    const request=t.pendingConditionalCanonicalCall,body=request.payload;
+    const shared={paymentState:'PAID_DIRECT',applicationState:'APPLIED_DIRECT',directOrInferred:'DIRECT',
+      estado:'Pagado',paidDate:body.paidDate,fechaPago:body.paidDate,conciliado:true,
+      evidenceId:body.evidenceId,sourceRef:body.sourceRef,evidenceType:body.evidenceType,
+      invoiceNumber:body.invoiceNumber,paymentSupportDocumentRef:body.paymentSupportDocumentRef,
+      evidenceAsOfDate:body.evidenceAsOfDate};
+    f.db.put(at('recibosEsperados',t.receiptId),{...f.db.docs.get(at('recibosEsperados',t.receiptId)),...shared});
+    f.db.put(at('carteraPrimas',t.portfolioId),{...f.db.docs.get(at('carteraPrimas',t.portfolioId)),
+      estado:'Pagado',estadoCartera:'Pagado',fechaPago:body.paidDate,paymentState:'PAID_DIRECT',applicationState:'APPLIED_DIRECT'});
+    f.db.put(at('cobros',request.expectedNewCobroIdIfAbsent),{polizaId:s.policyId,clienteId:s.clientId,
+      reciboId:t.receiptId,moneda:'GTQ',monto:127.77,...shared});
+    const result={ok:true,receiptId:t.receiptId,cobroId:request.expectedNewCobroIdIfAbsent,
+      policyId:s.policyId,clientId:s.clientId,paymentState:'PAID_DIRECT',applicationState:'APPLIED_DIRECT',
+      paidDate:body.paidDate,invoiceNumber:body.invoiceNumber,portfolioUpdated:true,serverOwned:true,idempotent:true};
+    const eventId='payevt_'+hash(s.tenantId+'|'+t.receiptId+'|'+request.requestId).slice(0,28);
+    const payloadDigest=reader.mapfreCanonicalPayloadDigest(t);
+    f.db.put(root+'/reconciliationRequests/'+request.requestId,{status:'committed',operation:'apply_payment',eventId,payloadDigest,result});
+    f.db.put(root+'/reconciliationEvents/'+eventId,{operation:'apply_payment',requestId:request.requestId,
+      receiptId:t.receiptId,cobroId:request.expectedNewCobroIdIfAbsent,payloadDigest,resultDigest:objectHash(result),actor:{uid:'synthetic-authorized-actor'}});
+  }
+  f.auditId=corrected.auditId;return f;
+}
+async function paymentReview(f){
+  const snapshot=await reader.mapfreSnapshot(f.db,f.binding);
+  const raw=path=>{const s=f.db.snap(path);return {id:s.id,exists:s.exists,data:s.exists?s.data():null,updateTime:s.updateTime};};
+  const events=f.binding.preflight.twoCases.map(t=>raw(root+'/reconciliationEvents/payevt_'+
+    hash(f.binding.preflight.scope.tenantId+'|'+t.receiptId+'|'+t.pendingConditionalCanonicalCall.requestId).slice(0,28)));
+  return reader.mapfrePaymentReview(f.binding,snapshot,f.originals,{correctionAudit:raw(root+'/operationalRequests/'+f.auditId),events});
+}
+test('MAPFRE final observer requires both canonical requests, exact sources and nine unchanged prior payments with zero writes',async()=>{
+  const f=await canonicalPaymentFixture(),before=clone([...f.db.docs]),writes=f.db.writes,r=await paymentReview(f);
+  assert.equal(r.status,'MAPFRE_TWO_CANONICAL_PAYMENTS_READBACK_PASS');assert.equal(r.verifiedPayments,2);
+  assert.equal(r.verifiedGrossCents,25554);assert.equal(r.previousPaymentsPreserved,9);assert.equal(r.writes,0);
+  assert.deepEqual([...f.db.docs],before);assert.equal(f.db.writes,writes);
+});
+test('MAPFRE final observer rejects wrong invoice, invented dates, duplicate payments, changed prior records and actor audit defects',async()=>{
+  for(const mutate of [f=>f.db.docs.get(at('cobros',f.binding.preflight.twoCases[0].pendingConditionalCanonicalCall.expectedNewCobroIdIfAbsent)).invoiceNumber='wrong',
+    f=>f.db.docs.get(at('recibosEsperados',f.binding.preflight.twoCases[0].receiptId)).applicationDate='2026-11-24',
+    f=>f.db.put(at('cobros','duplicate'),{reciboId:f.binding.preflight.twoCases[0].receiptId}),
+    f=>f.db.docs.get(at('cobros',f.binding.preflight.preservedPayments[0].cobroId)).monto+=0.01,
+    f=>{const k=[...f.db.docs.keys()].find(k=>k.includes('/reconciliationEvents/'));f.db.docs.get(k).actor.uid='';},
+    f=>{const k=[...f.db.docs.keys()].find(k=>k.includes('/reconciliationRequests/'));f.db.docs.get(k).payloadDigest='changed';}]){
+    const f=await canonicalPaymentFixture();mutate(f);const count=f.db.writes,r=await paymentReview(f);
+    assert.equal(r.status,'MAPFRE_PAYMENT_READBACK_HOLD');assert.ok(r.verifiedPayments<2);assert.equal(f.db.writes,count);
+  }
+});

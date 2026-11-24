@@ -286,11 +286,20 @@ async function locateAttestedPayments(db,groups,rows){
 
 async function main(){
   const mode=str(process.env.GI_I66_BULK_MODE);
-  assert.ok(['preflight','case-readback','mapfre-readback','mapfre-cas-preflight','mapfre-cas-apply','apply'].includes(mode),'I66_BULK_MODE_MUST_BE_EXPLICIT');
+  assert.ok(['preflight','case-readback','mapfre-readback','mapfre-payment-readback','mapfre-cas-preflight','mapfre-cas-apply','apply'].includes(mode),'I66_BULK_MODE_MUST_BE_EXPLICIT');
   assert.equal(process.env.GCLOUD_PROJECT,PROJECT,'I66_PROJECT_NOT_EXISTING_FIREBASE');
   const admin=require('firebase-admin');
   admin.initializeApp({credential:admin.credential.applicationDefault(),projectId:PROJECT});
   const db=admin.firestore();
+  if(mode==='mapfre-payment-readback'){
+    const report=await require('./gravicentra-i66-financial-identity-readback.cjs').mapfrePaymentReadback(db);
+    output('GI_I66_BULK_REPORT_OUT',report);
+    output('GI_I66_BULK_PLAN_OUT',{status:'BULK_MAPFRE_READONLY_PREFLIGHT_NO_WRITES',readOnly:true,
+      writes:0,paymentWriteEligibleCount:0,inputRows:2,chunks:[],privateReportRequired:true,
+      verifiedPayments:report.verifiedPayments,paymentReadbackStatus:report.status});
+    console.log('I66_MAPFRE_CANONICAL_PAYMENT_READBACK verified='+report.verifiedPayments+' status='+report.status+' ZERO_WRITES');
+    return;
+  }
   if(mode==='mapfre-cas-apply'){
     assert.equal(process.env.GI_I66_BULK_PROTECTED_ENV,'gravicentra-live-data-writes');
     assert.equal(process.env.GITHUB_REPOSITORY,'paulaosoriof86/orbit360-core');

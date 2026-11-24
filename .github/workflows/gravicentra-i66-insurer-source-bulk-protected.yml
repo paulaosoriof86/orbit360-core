@@ -50,6 +50,7 @@ jobs:
       github.repository == 'paulaosoriof86/orbit360-core' &&
       github.ref == 'refs/heads/recovery/fase-a-clean-20260831' &&
       (github.event_name == 'workflow_dispatch' ||
+      contains(github.event.head_commit.message, 'I66_MAPFRE_PAYMENT_READBACK') ||
       contains(github.event.head_commit.message, 'I66_MAPFRE_OBLIGATION_CAS') ||
       contains(github.event.head_commit.message, 'I66_MAPFRE_PAYMENT_PREFLIGHT') ||
       contains(github.event.head_commit.message, 'I66_SOURCE_BULK_READY') ||
@@ -122,7 +123,7 @@ jobs:
         shell: bash
         env:
           GI_I66_ATTESTED_TARGETS: ${{ contains(github.event.head_commit.message, 'I66_ATTESTED_READBACK') }}
-          GI_I66_BULK_MODE: ${{ contains(github.event.head_commit.message, 'I66_MAPFRE_OBLIGATION_CAS') && 'mapfre-cas-preflight' || (contains(github.event.head_commit.message, 'I66_MAPFRE_PAYMENT_PREFLIGHT') && 'mapfre-readback' || (contains(github.event.head_commit.message, 'I66_ROBLE_0043_READBACK') && 'case-readback' || 'preflight')) }}
+          GI_I66_BULK_MODE: ${{ contains(github.event.head_commit.message, 'I66_MAPFRE_PAYMENT_READBACK') && 'mapfre-payment-readback' || (contains(github.event.head_commit.message, 'I66_MAPFRE_OBLIGATION_CAS') && 'mapfre-cas-preflight' || (contains(github.event.head_commit.message, 'I66_MAPFRE_PAYMENT_PREFLIGHT') && 'mapfre-readback' || (contains(github.event.head_commit.message, 'I66_ROBLE_0043_READBACK') && 'case-readback' || 'preflight'))) }}
           GI_I66_BULK_READBACK_CASE: ${{ contains(github.event.head_commit.message, 'I66_ROBLE_0043_READBACK') && 'ROBLE_NOV20_0043' || '' }}
           GI_I66_BULK_PLAN_OUT: ${{ runner.temp }}/gi-i66-bulk-plan.json
           GI_I66_BULK_REPORT_OUT: ${{ runner.temp }}/gi-i66-bulk-preflight.json
