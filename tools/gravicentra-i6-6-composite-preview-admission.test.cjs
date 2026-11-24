@@ -3,6 +3,7 @@ const test=require('node:test'),assert=require('node:assert/strict'),fs=require(
 const {execFileSync}=require('node:child_process');
 const {previewRequestTransition}=require('./gravicentra-i6-6-frontend-preview-authority.cjs');
 const {candidateForPhase}=require('./gravicentra-i6-6-operational-release-candidate.cjs');
+const makeScope=require('./gravicentra-i66-make-release-scope.cjs');
 const file=fs.readFileSync('tools/gravicentra-i6-6-frontend-preview-authority.cjs','utf8');
 const control=JSON.parse(fs.readFileSync('artifacts/orbit360-recovery/release-control/I6_6_RELEASE_TRANSPORT_CONTROL_20261110.json','utf8'));
 const req=control.frontendPreviewRequest;
@@ -11,11 +12,19 @@ const sha=p=>git('rev-parse',req.sourceQaHead+':'+p);
 const frontendPath=p=>/^orbit360-platform\/(modules|core)\/[\w.-]+\.js$/.test(p);
 function assertRequestMode(request,blobFor){
  assert.ok(Number.isSafeInteger(request.version)&&request.version>0,'REQUEST_VERSION_REQUIRED');
- const composite=request.mode==='COMPOSITE_ARTIFACT_HOSTING_PREVIEW_ONLY';
- assert.ok(composite||request.mode==='PREVIEW_HOSTING_ONLY','REQUEST_MODE_REQUIRED');
+ const composite=request.mode==='COMPOSITE_ARTIFACT_HOSTING_PREVIEW_ONLY',makeIngress=request.mode===makeScope.REQUEST_MODE;
+ assert.ok(composite||makeIngress||request.mode==='PREVIEW_HOSTING_ONLY','REQUEST_MODE_REQUIRED');
  assert.ok(Array.isArray(request.productPaths)&&request.productPaths.length>0,'PRODUCT_PATHS_REQUIRED');
- assert.ok(request.productPaths.some(frontendPath),'FRONTEND_PATH_REQUIRED');
- if(composite){
+ if(!makeIngress)assert.ok(request.productPaths.some(frontendPath),'FRONTEND_PATH_REQUIRED');
+ if(makeIngress){
+  assert.equal(request.fiveFunctionExactPreviewRequired,true);assert.equal(request.scopeContractBlob,makeScope.CONTRACT_BLOB);
+  assert.equal(request.backendPreviewRequired,true);assert.deepEqual(request.productPaths,makeScope.PRODUCT_PATHS);
+  assert.deepEqual(request.balanceCorrection,makeScope.BALANCE_CORRECTION);
+  assert.equal(blobFor(makeScope.FRONTEND_PATH),makeScope.FRONTEND_BLOB);
+  assert.equal(blobFor(makeScope.BALANCE_RECEIPT_PATH),makeScope.BALANCE_RECEIPT_BLOB);
+  assert.deepEqual(request.backendPaths,makeScope.SOURCE_PATHS);assert.deepEqual(Object.keys(request.backendPathBlobs).sort(),makeScope.SOURCE_PATHS);
+  for(const p of makeScope.SOURCE_PATHS)assert.equal(request.backendPathBlobs[p],blobFor(p));
+ }else if(composite){
   assert.equal(request.fourFunctionExactPreviewRequired,true);
   assert.deepEqual(request.backendPaths,['functions/product-ops-leads-domain.js']);
   assert.equal(request.backendPathBlobs[request.backendPaths[0]],blobFor(request.backendPaths[0]));
@@ -63,8 +72,8 @@ test('signed request binds exact product paths and predecessor receipt at its so
    'tools/gravicentra-i6-1-preview-package.mjs',':(exclude)orbit360-platform/docs/recovery/orbit360-recovery-state-v1.json')
    .split('\n').filter(Boolean);
  assert.deepEqual(req.productPaths,paths);
- assert.ok(paths.some(p=>/^orbit360-platform\/(modules|core)\/[\w.-]+\.js$/.test(p)));
- assert.deepEqual(paths.filter(p=>!frontendPath(p)),req.mode==='COMPOSITE_ARTIFACT_HOSTING_PREVIEW_ONLY'?req.backendPaths:[]);
+ if(req.mode!==makeScope.REQUEST_MODE)assert.ok(paths.some(p=>/^orbit360-platform\/(modules|core)\/[\w.-]+\.js$/.test(p)));
+ assert.deepEqual(paths.filter(p=>!frontendPath(p)),req.mode==='COMPOSITE_ARTIFACT_HOSTING_PREVIEW_ONLY'||req.mode===makeScope.REQUEST_MODE?req.backendPaths:[]);
  assert.equal(req.manifestBlob,sha('artifacts/orbit360-recovery/release-control/I6_6_APPROVED_PRODUCT_DELTA_MANIFEST_20261110.json'));
  for(const id of [req.sourceQaRunId,req.guardRunId])assert.ok(Number.isSafeInteger(id)&&id>0);
  assert.notEqual(req.sourceQaRunId,req.guardRunId);

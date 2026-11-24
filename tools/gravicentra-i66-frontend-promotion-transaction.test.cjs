@@ -154,3 +154,70 @@ test('remote authority, executing workflow, built QA bytes, artifact digest and 
   f.raw.approvedByDirection=false;f.responseFiles.set(require('./gravicentra-i66-frontend-control.cjs').P.authority,JSON.stringify(f.raw));
   await assert.rejects(frontendOwner.resolveFinancialQa('preview',{...f,stage:'after',expected:before}));
 });
+
+// Transport recovery: no new product writes, no weakened release evidence.
+const recoveryOwner=require('./gravicentra-i66-frontend-promotion-owner.cjs');
+const lostTransport=()=>Object.assign(new TypeError('fetch failed'),{cause:{code:'ECONNRESET'}});
+async function withLocalCasFailure(mode,check){
+  const http=require('node:http');let posts=0,commits=0,current='expected';
+  const server=http.createServer((req,res)=>{
+    if(req.method==='POST'){
+      posts++;req.resume();
+      req.once('end',()=>{
+        if(mode==='BEFORE_COMMIT'&&posts===1){req.socket.destroy();return;}
+        if(current!=='expected'){res.writeHead(409);res.end('{}');return;}
+        current='exact';commits++;
+        if(mode==='AFTER_COMMIT'&&posts===1){req.socket.destroy();return;}
+        res.setHeader('Content-Type','application/json');res.end(JSON.stringify({sha:'exact'}));
+      });
+    }else{res.setHeader('Content-Type','application/json');res.end(JSON.stringify(current==='exact'?{status:'EXACT_COMMIT',sha:'exact'}:{status:'UNCHANGED'}));}
+  });
+  await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));
+  const origin='http://127.0.0.1:'+server.address().port;
+  try{await check({
+    write:async()=>{const r=await fetch(origin,{method:'POST',headers:{Connection:'close'},body:'synthetic-cas'});assert.equal(r.status,200);return (await r.json()).sha;},
+    readback:async()=>{const r=await fetch(origin,{headers:{Connection:'close'}});return r.json();},
+    verifySignature:async sha=>assert.equal(sha,'exact'),pause:async()=>{}
+  },()=>({posts,commits}));}finally{await new Promise(resolve=>server.close(resolve));}
+}
+test('real lost HTTP response after CAS adopts the one exact commit without a second POST',async()=>{
+  await withLocalCasFailure('AFTER_COMMIT',async(io,count)=>{assert.equal(await recoveryOwner.commitWithReadback(io),'exact');assert.deepEqual(count(),{posts:1,commits:1});});
+});
+test('real HTTP failure before CAS retries only after unchanged readback and still commits once',async()=>{
+  await withLocalCasFailure('BEFORE_COMMIT',async(io,count)=>{assert.equal(await recoveryOwner.commitWithReadback(io),'exact');assert.deepEqual(count(),{posts:2,commits:1});});
+});
+test('an unreadable acknowledgement state never permits a second write',async()=>{
+  let writes=0,reads=0;
+  await assert.rejects(recoveryOwner.commitWithReadback({write:async()=>{writes++;throw lostTransport();},
+    readback:async()=>{reads++;throw lostTransport();},verifySignature:async()=>{},pause:async()=>{}}),/fetch failed/);
+  assert.equal(writes,1);assert.equal(reads,3);
+});
+test('a foreign concurrent commit is never adopted or overwritten after a transport failure',async()=>{
+  let writes=0;await assert.rejects(recoveryOwner.commitWithReadback({write:async()=>{writes++;throw lostTransport();},
+    readback:async()=>({status:'FOREIGN_COMMIT'}),verifySignature:async()=>{},pause:async()=>{}}),/RELEASE_HEAD_CAS_FAILED/);assert.equal(writes,1);
+});
+test('a signature network failure rechecks and verifies the exact commit without replaying its write',async()=>{
+  let writes=0,signatures=0,reads=0;const sha=await recoveryOwner.commitWithReadback({write:async()=>{writes++;return 'exact';},
+    readback:async()=>{reads++;return {status:'EXACT_COMMIT',sha:'exact'};},
+    verifySignature:async()=>{if(++signatures===1)throw lostTransport();},pause:async()=>{}});
+  assert.equal(sha,'exact');assert.deepEqual({writes,signatures,reads},{writes:1,signatures:2,reads:1});
+});
+test('an invalid signature and an HTTP permission denial do not become transport retries',async()=>{
+  for(const reason of ['GITHUB_SIGNATURE_UNVERIFIED','GITHUB_PROVIDER_HTTP_403']){
+    let writes=0,reads=0;await assert.rejects(recoveryOwner.commitWithReadback({write:async()=>{writes++;return 'exact';},
+      readback:async()=>{reads++;return {status:'EXACT_COMMIT',sha:'exact'};},verifySignature:async()=>{throw Error(reason);},pause:async()=>{}}),new RegExp(reason));
+    assert.equal(writes,1);assert.equal(reads,0);
+  }
+});
+test('transport recovery has a three-CAS ceiling and diagnostics contain codes only',async()=>{
+  let writes=0;const events=[];await assert.rejects(recoveryOwner.commitWithReadback({write:async()=>{writes++;throw lostTransport();},
+    readback:async()=>({status:'UNCHANGED'}),verifySignature:async()=>{},pause:async()=>{},diagnostic:x=>events.push(x)}),/fetch failed/);
+  assert.equal(writes,3);assert.equal(events.length,3);assert.ok(events.every(e=>Object.keys(e).sort().join(',')==='attempt,code,operation'&&e.code==='ECONNRESET'));
+  assert.equal(recoveryOwner.transportCode({message:'sensitive-body',cause:{code:'Bearer private'}}),null);
+});
+test('long child supervision leaves the parent event loop running and propagates failure',async()=>{
+  let heartbeat=false;const timer=setTimeout(()=>{heartbeat=true;},20);
+  await recoveryOwner.runReleaseChild(process.execPath,['-e','setTimeout(()=>{},100)'],{stdio:'ignore',timeout:1000});
+  clearTimeout(timer);assert.equal(heartbeat,true);
+  await assert.rejects(recoveryOwner.runReleaseChild(process.execPath,['-e','process.exit(7)'],{stdio:'ignore',timeout:1000}),/RELEASE_SUBPROCESS_FAILED_7/);
+});

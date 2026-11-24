@@ -1,6 +1,6 @@
 'use strict';
 const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),os=require('node:os'),crypto=require('node:crypto');
-const {execFileSync}=require('node:child_process');
+const {execFileSync,spawn}=require('node:child_process');
 const {P,genName,serial,blob,closeFiles,physicalGuard,closeCompositeFiles,compositeReceipt}=require('./gravicentra-i66-frontend-control.cjs');
 const {promote,acceptComposite}=require('./gravicentra-i66-frontend-promotion-transaction.cjs');
 const {hosting}=require('./gravicentra-i66-frontend-hosting-io.cjs');
@@ -15,18 +15,83 @@ const optional=(sha,p)=>{try{return jsonAt(sha,p);}catch(e){if(!existsAt(sha,p))
 function existsAt(sha,p){try{execFileSync('git',['cat-file','-e',sha+':'+p],{stdio:'ignore'});return true;}catch{return false;}}
 function remote(){git('fetch','--quiet','origin','refs/heads/'+branch);return git('rev-parse','FETCH_HEAD');}
 async function api(url,options={}){
+  // Long browser/guard subprocesses must not leave a reused GitHub connection
+  // as the only route to recording an otherwise proven release.
   const r=await fetch(url,{...options,headers:{Authorization:'Bearer '+process.env.GITHUB_TOKEN,'User-Agent':'Gravicentra-Release-Owner',
-    Accept:'application/vnd.github+json',...options.headers},signal:AbortSignal.timeout(60000)});assert.ok(r.ok,'GITHUB_PROVIDER_HTTP_'+r.status);return r;
+    Accept:'application/vnd.github+json',...options.headers,Connection:'close'},signal:AbortSignal.timeout(60000)});assert.ok(r.ok,'GITHUB_PROVIDER_HTTP_'+r.status);return r;
 }
 const github=async(p,raw=false)=>{const r=await api(repoUrl+p);return raw?r:r.json();};
 async function signed(sha){const c=await github('commits/'+sha);assert.equal(c.commit.verification.verified,true,'GITHUB_SIGNATURE_UNVERIFIED');return sha;}
+function transportCode(error){
+  const allowed=new Set(['ECONNRESET','ETIMEDOUT','EPIPE','ENOTFOUND','EAI_AGAIN','UND_ERR_SOCKET',
+    'UND_ERR_CONNECT_TIMEOUT','UND_ERR_HEADERS_TIMEOUT','UND_ERR_BODY_TIMEOUT','ABORT_ERR']);
+  for(const item of [error,error?.cause])if(allowed.has(item?.code))return item.code;
+  if(error?.name==='TimeoutError'||error?.name==='AbortError')return error.name;
+  if(error?.message==='fetch failed')return 'FETCH_FAILED';
+  return null;
+}
+function runReleaseChild(file,args,options){
+  return new Promise((resolve,reject)=>{
+    const child=spawn(file,args,{...options,windowsHide:true});
+    child.once('error',reject);
+    child.once('close',(code,signal)=>code===0?resolve():reject(Error('RELEASE_SUBPROCESS_FAILED_'+String(code)+'_'+String(signal))));
+  });
+}
+// A retry may repeat only the same expected-head CAS after an independent
+// read proves it has not committed. Lost acknowledgements adopt only the exact
+// one-parent, exact-file-set, exact-blob commit, followed by signature proof.
+async function commitWithReadback({write,readback,verifySignature,pause=sleep,diagnostic=()=>{}},{maxAttempts=3}={}){
+  assert.equal(maxAttempts,3,'RELEASE_CAS_RECOVERY_BOUND');
+  let state={status:'UNCHANGED'},last;
+  for(let attempt=0;attempt<maxAttempts;attempt++){
+    try{
+      const sha=state.status==='EXACT_COMMIT'?state.sha:await write();
+      state={status:'EXACT_COMMIT',sha};
+      await verifySignature(sha);return sha;
+    }catch(error){
+      last=error;const code=transportCode(error);
+      if(!code&&error.message!=='RELEASE_HEAD_CAS_FAILED')throw error;
+      diagnostic({operation:'SIGNED_EXPECTED_HEAD_COMMIT',attempt:attempt+1,code:code||'HEAD_CAS_FAILED'});
+      let observed;
+      for(let readAttempt=0;readAttempt<3;readAttempt++){
+        try{observed=await readback();break;}catch(readError){
+          if(!transportCode(readError)||readAttempt===2)throw readError;
+          await pause(200*(readAttempt+1));
+        }
+      }
+      assert.ok(observed&&['UNCHANGED','EXACT_COMMIT'].includes(observed.status),'RELEASE_HEAD_CAS_FAILED');
+      state=observed;
+      if(!code&&state.status==='UNCHANGED')throw error;
+      if(attempt+1<maxAttempts)await pause(200*(attempt+1));
+    }
+  }
+  // The final failed response can still describe a successful single CAS.
+  // Signature verification remains mandatory and is never inferred from bytes.
+  if(state.status==='EXACT_COMMIT'){await verifySignature(state.sha);return state.sha;}
+  throw last;
+}
 async function casCommit(head,headline,entries){
   const mutation='mutation($input:CreateCommitOnBranchInput!){createCommitOnBranch(input:$input){commit{oid}}}';
   const input={branch:{repositoryNameWithOwner:repository,branchName:branch},expectedHeadOid:head,message:{headline},
     fileChanges:{additions:Object.entries(entries).map(([p,obj])=>({path:p,contents:Buffer.from(serial(obj)).toString('base64')}))}};
-  const r=await (await api('https://api.github.com/graphql',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({query:mutation,variables:{input}})})).json();
-  assert.ok(!r.errors?.length&&r.data?.createCommitOnBranch?.commit?.oid,'RELEASE_HEAD_CAS_FAILED');
-  return signed(r.data.createCommitOnBranch.commit.oid);
+  return commitWithReadback({
+    write:async()=>{
+      const r=await (await api('https://api.github.com/graphql',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({query:mutation,variables:{input}})})).json();
+      assert.ok(!r.errors?.length&&r.data?.createCommitOnBranch?.commit?.oid,'RELEASE_HEAD_CAS_FAILED');
+      return r.data.createCommitOnBranch.commit.oid;
+    },
+    readback:async()=>{
+      const fresh=remote();if(fresh===head)return {status:'UNCHANGED'};
+      assert.equal(git('show','-s','--format=%P',fresh),head,'RELEASE_HEAD_CAS_FAILED');
+      assert.equal(git('show','-s','--format=%s',fresh),headline,'RELEASE_HEAD_CAS_FAILED');
+      const changed=Object.entries(entries).filter(([file,obj])=>!existsAt(head,file)||blobAt(head,file)!==blob(serial(obj))).map(([file])=>file).sort();
+      assert.deepEqual(git('diff-tree','--no-commit-id','--name-only','-r',fresh).split('\n').filter(Boolean).sort(),changed,'RELEASE_HEAD_CAS_FAILED');
+      for(const [file,obj] of Object.entries(entries))assert.equal(blobAt(fresh,file),blob(serial(obj)),'RELEASE_HEAD_CAS_FAILED');
+      return {status:'EXACT_COMMIT',sha:fresh};
+    },
+    verifySignature:signed,
+    diagnostic:detail=>console.error('I66_RELEASE_TRANSPORT_RECOVERY '+JSON.stringify(detail))
+  });
 }
 const pins=[P.guard,'tools/gravicentra-i66-frontend-control.cjs','tools/gravicentra-i66-frontend-promotion-owner.cjs',
   'tools/gravicentra-i66-frontend-hosting-io.cjs','tools/gravicentra-i66-frontend-promotion-transaction.cjs',
@@ -280,7 +345,7 @@ async function authorizeCompositeRollback(){
       hostingVersion:process.env.I66_PREVIOUS_HOSTING_VERSION},transport:jsonAt(h,P.transport)});
   console.log('I66_COMPOSITE_PHYSICAL_ROLLBACK_AUTHORIZED_BEFORE_COMMIT');
 }
-function verifyProspectiveChanges(h,changes){
+async function verifyProspectiveChanges(h,changes){
   const scratch=fs.mkdtempSync(path.join(os.tmpdir(),'gi-i66-guard-')),wt=path.join(scratch,'tree');
   try{
     git('worktree','add','--quiet','--detach',wt,h);
@@ -290,7 +355,7 @@ function verifyProspectiveChanges(h,changes){
       '-c','commit.gpgSign=false','commit','--quiet','-m','Verify prospective control transaction');
     const tree=git('-C',wt,'rev-parse','HEAD^{tree}');
     for(const [file,obj] of Object.entries(changes))assert.equal(git('-C',wt,'rev-parse',tree+':'+file),blob(serial(obj)),'PROSPECTIVE_TREE_DRIFT');
-    execFileSync(process.execPath,[P.guard],{cwd:wt,stdio:'inherit',timeout:420000});
+    await runReleaseChild(process.execPath,[P.guard],{cwd:wt,stdio:'inherit',timeout:420000});
   }finally{if(fs.existsSync(wt))git('worktree','remove','--force',wt);fs.rmSync(scratch,{recursive:true,force:true});}
 }
 async function run(){
@@ -393,7 +458,7 @@ async function run(){
           return {result:'PASS',buildId:request.target.buildId,receiptBlob:blobAt(h,uiPath)};
         }
         const output=path.join(process.env.RUNNER_TEMP,'gi-i66-frontend-live-financial-'+runId+'.json');
-        execFileSync(process.execPath,[FINANCIAL_DRIVER],{stdio:'inherit',timeout:18*60*1000,
+        await runReleaseChild(process.execPath,[FINANCIAL_DRIVER],{stdio:'inherit',timeout:18*60*1000,
           env:{...process.env,GI_I66_PERF_PROJECT:'ays-orbit-360-lab',GI_I66_PERF_TENANT:'alianzas-soluciones',
             GI_I66_PERF_PHASE:'live',GI_I66_READONLY_MODE:'six-frontend-release',GI_I66_PERF_REPORT:output}});
         const report=JSON.parse(fs.readFileSync(output,'utf8'));
@@ -433,7 +498,7 @@ async function run(){
       const changes=closeFiles(p=>jsonAt(h,p),j,next);
       const read={readFileSync:p=>Object.hasOwn(changes,p)?serial(changes[p]):git('show',h+':'+p)+'\n'};
       physicalGuard(changes[P.cp],changes[P.state],changes[P.transport],read);
-      verifyProspectiveChanges(h,changes);
+      await verifyProspectiveChanges(h,changes);
       assert.equal(await provider.current('live'),request.target.hostingVersion,'PHYSICAL_DRIFT_DURING_METADATA_GUARD');
       await casCommit(h,'release(i66): COMMITTED exact frontend, transport, status ledger, rollback and cursor',changes);return next;
     },
@@ -501,6 +566,11 @@ async function runCompositeAcceptance(){
       assert.ok(['ACTIVE','READY'].includes(String(f.state||'').toUpperCase()),'COMPOSITE_BACKEND_NOT_READY');
       assert.equal(active.length,1);assert.equal(Number(active[0].percent),100);
       assert.equal(String(active[0].revisionName||active[0].revision),row.currentRevision,'COMPOSITE_EFFECTIVE_TRAFFIC_DRIFT');
+      if(candidate.makeIngressComposite===true&&row.name==='orbit360MakeLeadIngress'){
+        const actual=require('./gravicentra-i66-make-lead-protected-executor.cjs').fnProjection(f,candidate,'live');
+        assert.equal(actual.configurationDigest,proof.makeIngress.closedTrigger.configurationDigest,'COMPOSITE_AUTH_CONTEXT_TRIGGER_DRIFT');
+        assert.equal(actual.revision,proof.makeIngress.closedTrigger.revision,'COMPOSITE_AUTH_CONTEXT_REVISION_DRIFT');
+      }
     }
   }
   async function verifyCommitted(j){
@@ -545,7 +615,7 @@ async function runCompositeAcceptance(){
       const proposed=compositeReceipt(j,runId),h=remote();validateCurrent(h);
       const stored=optional(h,rp);let commit;
       if(stored){assert.deepEqual(stored,proposed,'COMPOSITE_EXISTING_RECEIPT_DRIFT');commit=git('log','-1','--format=%H',h,'--',rp);}
-      else{assert.deepEqual(optional(h,jp),j);commit=await casCommit(h,'release(i66): sign four-function composite LIVE receipt '+generation,
+      else{assert.deepEqual(optional(h,jp),j);commit=await casCommit(h,'release(i66): sign '+g.targetsForCandidate(candidate,'live').length+'-function composite LIVE receipt '+generation,
         {[rp]:proposed,[proofPath]:proof});}
       await signed(commit);const fresh=remote();assert.equal(blobAt(fresh,rp),blob(serial(proposed)));
       assert.equal(blobAt(fresh,proofPath),blob(serial(proof)));
@@ -556,7 +626,7 @@ async function runCompositeAcceptance(){
       const changes=closeCompositeFiles(p=>jsonAt(h,p),j,next);
       const read={readFileSync:p=>Object.hasOwn(changes,p)?serial(changes[p]):git('show',h+':'+p)+'\n'};
       physicalGuard(changes[P.cp],changes[P.state],changes[P.transport],read);
-      verifyProspectiveChanges(h,changes);
+      await verifyProspectiveChanges(h,changes);
       assert.equal(await provider.current('live'),request.target.hostingVersion,'PHYSICAL_DRIFT_DURING_METADATA_GUARD');
       verifyBackend();
       try{await casCommit(h,'release(i66): COMMITTED same-artifact composite, backend rollback and synchronized execution',changes);return next;}
@@ -564,7 +634,7 @@ async function runCompositeAcceptance(){
     }},verifyCommitted
   };
   const result=await acceptComposite(io,request,proof);await verifyCommitted(result);
-  console.log('I66_COMPOSITE_FINAL_PHASE='+result.phase+' GENERATION='+generation+' BACKEND_FUNCTIONS=4');
+  console.log('I66_COMPOSITE_FINAL_PHASE='+result.phase+' GENERATION='+generation+' BACKEND_FUNCTIONS='+g.targetsForCandidate(candidate,'live').length);
 }
 async function recordCompositeRollback(){
   assert.equal(process.env.GITHUB_REPOSITORY,repository);assert.equal(process.env.GITHUB_REF_NAME,branch);
@@ -580,6 +650,12 @@ async function recordCompositeRollback(){
   require('./gravicentra-i66-frontend-promotion-transaction.cjs').verifyBytes(j.request.previous,physical);
   const backend=[];
   for(const row of j.liveProof.backendRevisions){
+    if(j.request.candidate?.makeIngressComposite===true&&row.previousState==='ABSENT'){
+      const scope=require('./gravicentra-i66-make-release-scope.cjs');assert.equal(row.name,scope.ADDED.live.name);assert.equal(row.region,scope.ADDED.live.region);
+      const rows=JSON.parse(execFileSync('gcloud',['functions','list','--gen2','--regions',row.region,'--project','ays-orbit-360-lab','--format=json'],{encoding:'utf8',stdio:['ignore','pipe','pipe'],timeout:60000}));
+      assert.ok(Array.isArray(rows)&&!rows.some(f=>String(f.name||'').split('/').at(-1)===row.name),'COMPOSITE_CREATED_TRIGGER_NOT_REMOVED');
+      backend.push({name:row.name,region:row.region,state:'ABSENT',rollbackAction:'DELETE_EXACT_CREATED_FUNCTION'});continue;
+    }
     const s=JSON.parse(execFileSync('gcloud',['run','services','describe',row.service,'--region',row.region,
       '--project','ays-orbit-360-lab','--format=json'],{encoding:'utf8',stdio:['ignore','pipe','pipe'],timeout:60000}));
     const active=(s.status?.traffic||s.traffic||[]).filter(x=>Number(x.percent)>0);
@@ -589,8 +665,15 @@ async function recordCompositeRollback(){
   }
   const fresh=remote();assert.deepEqual(optional(fresh,jp),j,'COMPOSITE_ROLLBACK_JOURNAL_CAS');
   assert.equal(jsonAt(fresh,P.transport).currentPhysicalHostingRelease.sourceSha,j.request.previous.sourceSha);
+  let makeIngress;
+  if(j.request.candidate?.makeIngressComposite===true){
+    makeIngress=JSON.parse(fs.readFileSync(path.join(process.env.RUNNER_TEMP,'gi-make-live-rollback.json')));
+    assert.equal(makeIngress.status,'COMPENSATION_READBACK_VERIFIED');assert.equal(makeIngress.phase,'live');
+    assert.equal(makeIngress.sourceSha,j.request.candidate.sourceSha);assert.equal(makeIngress.artifactDigest,j.request.candidate.artifactDigest);
+    assert.deepEqual(makeIngress.failures,[]);assert.equal(makeIngress.canonicalLeadWrites,0);assert.equal(makeIngress.externalMessagesSent,0);
+  }
   await casCommit(fresh,'release(i66): record verified composite compensation without advancing physical control',
-    {[jp]:{...j,phase:'ROLLED_BACK',rollback:{physical,backend,verified:true,runId}}});
+    {[jp]:{...j,phase:'ROLLED_BACK',rollback:{physical,backend,verified:true,runId,...(makeIngress?{makeIngress}:{})}}});
   console.log('I66_COMPOSITE_COMPENSATION_RECORDED_GENERATION='+attempt.generation);
 }
 if(require.main===module){
@@ -598,7 +681,7 @@ if(require.main===module){
   const execution=action==='--accept-composite-live'?runCompositeAcceptance():
     action==='--authorize-composite-rollback'?authorizeCompositeRollback():action==='--record-composite-rollback'?recordCompositeRollback():
     action===undefined?run():Promise.reject(Error('RELEASE_OWNER_UNKNOWN_OPERATION'));
-  execution.catch(e=>{console.error('I66_FRONTEND_PROMOTION_HOLD '+String(e.message).split('\n')[0].slice(0,150));process.exitCode=1;});
+  execution.catch(e=>{console.error('I66_FRONTEND_PROMOTION_HOLD '+String(e.message).split('\n')[0].slice(0,150)+(transportCode(e)?' TRANSPORT_CODE='+transportCode(e):''));process.exitCode=1;});
 }
 module.exports={nextCompositeGeneration,assertCompositeRollbackAllowed,FINANCIAL_SCOPE,financialQaPaths,financialTarget,
-  validateFinancialAuthority,resolveFinancialQa,validateFinancialReport};
+  validateFinancialAuthority,resolveFinancialQa,validateFinancialReport,transportCode,runReleaseChild,commitWithReadback};

@@ -20,10 +20,11 @@ jobs:
     timeout-minutes: 5
     outputs:
       authorized: ${{ steps.scoped.outputs.authorized == 'true' || steps.phase.outputs.authorized == 'true' }}
+      make_ingress: ${{ steps.scoped.outputs.make_ingress }}
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 1
+          fetch-depth: 2
           persist-credentials: false
       - name: Read canonical Preview phase without credentials or mutations
         id: phase
@@ -32,7 +33,11 @@ jobs:
           node - <<'NODE'
           const fs=require('node:fs');
           const c=JSON.parse(fs.readFileSync('artifacts/orbit360-recovery/release-control/I6_6_RELEASE_TRANSPORT_CONTROL_20261110.json','utf8'));
-          const authorized=c.status==='OPERATIONAL_BACKEND_PREVIEW_AUTHORIZED';
+          let authorized=c.status==='OPERATIONAL_BACKEND_PREVIEW_AUTHORIZED';
+          if(authorized&&c.operationalReleaseCandidate?.makeIngressComposite===true&&process.env.GITHUB_EVENT_NAME==='push'){
+            const before=JSON.parse(require('node:child_process').execFileSync('git',['show','HEAD^:artifacts/orbit360-recovery/release-control/I6_6_RELEASE_TRANSPORT_CONTROL_20261110.json'],{encoding:'utf8'}));
+            authorized=JSON.stringify(before.operationalReleaseCandidate)!==JSON.stringify(c.operationalReleaseCandidate);
+          }
           fs.appendFileSync(process.env.GITHUB_OUTPUT,'authorized='+String(authorized)+'\n');
           console.log(authorized?'I66_OPERATIONAL_PREVIEW_PHASE_READY_FOR_STRICT_GATES':'I66_OPERATIONAL_PREVIEW_PHASE_NOOP');
           NODE
@@ -44,7 +49,14 @@ jobs:
           const fs=require('node:fs');
           const g=require('./tools/gravicentra-i6-6-operational-release-candidate.cjs');
           const c=JSON.parse(fs.readFileSync(g.CONTROL,'utf8'));
-          const approved=Boolean(c.scopedBackendPreviewI66 && g.candidateForPhase(c,'preview'));
+          let approved=Boolean(c.scopedBackendPreviewI66 && g.candidateForPhase(c,'preview'));
+          const p=c.scopedBackendPreviewI66?.candidate||c.operationalReleaseCandidate;
+          const makeIngress=p?.makeIngressComposite===true;
+          if(approved&&makeIngress&&process.env.GITHUB_EVENT_NAME==='push'){
+            const before=JSON.parse(require('node:child_process').execFileSync('git',['show','HEAD^:'+g.CONTROL],{encoding:'utf8'}));
+            approved=JSON.stringify(before.scopedBackendPreviewI66?.candidate)!==JSON.stringify(p);
+          }
+          fs.appendFileSync(process.env.GITHUB_OUTPUT,'make_ingress='+String(makeIngress)+'\n');
           fs.appendFileSync(process.env.GITHUB_OUTPUT,'authorized='+String(approved)+'\n');
           console.log(approved?'I66_SCOPED_FOUR_FUNCTION_PREVIEW_AUTHORIZATION_PASS':'I66_SCOPED_PREVIEW_NOOP');
           SCOPED
@@ -52,8 +64,9 @@ jobs:
     needs: phase
     if: github.repository == 'paulaosoriof86/orbit360-core' && github.ref == 'refs/heads/recovery/fase-a-clean-20260831' && needs.phase.outputs.authorized == 'true'
     runs-on: ubuntu-24.04
-    timeout-minutes: 55
+    timeout-minutes: ${{ needs.phase.outputs.make_ingress == 'true' && 85 || 55 }}
     env:
+      I66_MAKE_INGRESS: ${{ needs.phase.outputs.make_ingress }}
       PROJECT_ID: ays-orbit-360-lab
       GH_TOKEN: ${{ github.token }}
       SA_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
@@ -73,6 +86,7 @@ jobs:
           node --test tools/gravicentra-i6-6-workflow-candidate-resolution.test.cjs
           node --test tools/gravicentra-i66-composite-acceptance.test.cjs tools/gravicentra-i66-frontend-control.test.cjs tools/gravicentra-i66-frontend-promotion-transaction.test.cjs
           node --test tools/gravicentra-i6-6-operational-release-candidate.test.cjs
+          if test "$I66_MAKE_INGRESS" = true;then node --test tools/gravicentra-i6-6-make-lead-ingress-release.test.cjs tools/gravicentra-i6-6-financial-page-read-efficiency.test.cjs;fi
           node --test tools/gravicentra-i6-6-preview-candidate-binding.test.cjs
           node --test tools/gravicentra-i6-6-direction-preview-i66-consent-scope.test.cjs
           node --test tools/gravicentra-i6-6-direction-live-legal-acceptance.test.cjs
@@ -133,6 +147,12 @@ jobs:
             git show "$SOURCE_SHA:functions/$p" > "$RUNNER_TEMP/i66-source-$p"
             cmp "$RUNNER_TEMP/i66-source-$p" "$BACKEND/$p"
           done
+          if test "$I66_MAKE_INGRESS" = true;then
+            for p in bootstrap.js make-lead-ingress-bridge.js product-lead-ingress-contract.js product-lead-ingress-owner-support.js;do
+              git show "$SOURCE_SHA:functions/$p" > "$RUNNER_TEMP/i66-source-$p"
+              cmp "$RUNNER_TEMP/i66-source-$p" "$BACKEND/$p"
+            done
+          fi
           test -f "$BACKEND/index.js"
           node --check "$BACKEND/index.js"
           test -f "$BACKEND/package-lock.json"
@@ -170,6 +190,10 @@ jobs:
           for o in https://ays-orbit-360-lab.web.app https://app.aysseguros.com;do
             curl -fsSL --max-time 30 "$o/" | sha256sum
           done > "$RUNNER_TEMP/gi-role-live-before.sha"
+      - uses: google-github-actions/setup-gcloud@v2
+        if: env.I66_MAKE_INGRESS == 'true'
+        with:
+          version: '>= 483.0.0'
       - name: Verify exact authorized Preview callables then deploy only those
         run: |
           set -euo pipefail
@@ -189,6 +213,7 @@ jobs:
             assert.ok(ops.length<=1,'I66_OPS_PREVIEW_DUPLICATE_OR_UNKNOWN');
             if(ops.length)assert.equal(String(ops[0].region||ops[0].location||''),'us-east1','I66_OPS_PREVIEW_REGION_DRIFT');
           }
+          if(scope?.makeIngressComposite===true)require('./tools/gravicentra-i66-make-release-scope.cjs').validateInventoryBefore(scope,'preview',a,g.targetsForCandidate(scope,'preview'));
           console.log('I66_HISTORICAL_THREE_PLUS_PINNED_OPS_PREVIEW_SCOPE_PASS');
           NODE
           PREVIEW_TARGET_COUNT="$(node - <<'PREVIEW_TARGETS'
@@ -197,7 +222,14 @@ jobs:
           process.stdout.write(String(g.targetsForCandidate(candidate,'preview').length));
           PREVIEW_TARGETS
           )"
-          if test "$PREVIEW_TARGET_COUNT" -eq 4;then
+          if test "$PREVIEW_TARGET_COUNT" -eq 5;then
+            gcloud auth activate-service-account --key-file="$GOOGLE_APPLICATION_CREDENTIALS" --quiet >/dev/null
+            node tools/gravicentra-i66-make-lead-protected-executor.cjs snapshot-trigger preview
+            node tools/gravicentra-i66-make-lead-protected-executor.cjs before-deploy preview
+            node tools/gravicentra-i66-make-firebase-project-iam-guard.cjs "$I66_ROLE_FIREBASE_CLI" preview deploy \
+            --only functions:orbit360ProductOperationalCommandPreview,functions:orbit360CobrosReconciliationCommandPreview,functions:orbit360ScopedPolicyReadPreview,functions:orbit360OpsLeadsCommandPreview,functions:orbit360MakeLeadIngressPreview \
+            --config "$I66_ROLE_PREVIEW_FIREBASE_CONFIG" --project "$PROJECT_ID" --non-interactive
+          elif test "$PREVIEW_TARGET_COUNT" -eq 4;then
             node "$I66_ROLE_FIREBASE_CLI" deploy \
             --only functions:orbit360ProductOperationalCommandPreview,functions:orbit360CobrosReconciliationCommandPreview,functions:orbit360ScopedPolicyReadPreview,functions:orbit360OpsLeadsCommandPreview \
             --config "$I66_ROLE_PREVIEW_FIREBASE_CONFIG" --project "$PROJECT_ID" --non-interactive
@@ -217,7 +249,9 @@ jobs:
           const g=require('./tools/gravicentra-i6-6-operational-release-candidate.cjs');
           const candidate=g.candidateForPhase(JSON.parse(require('node:fs').readFileSync(g.CONTROL,'utf8')),'preview');
           const beforeIds=rows(a).map(id).sort(),afterIds=rows(b).map(id).sort();
-          if(candidate?.opsLeadsComposite===true){
+          if(candidate?.makeIngressComposite===true){
+            require('./tools/gravicentra-i66-make-release-scope.cjs').validateInventoryAfter(candidate,'preview',a,b,g.targetsForCandidate(candidate,'preview'));
+          }else if(candidate?.opsLeadsComposite===true){
             const added=afterIds.filter(v=>!beforeIds.includes(v));
             assert.ok(added.length<=1&&added.every(v=>v==='orbit360OpsLeadsCommandPreview'),'I66_OPS_PREVIEW_INVENTORY_UNEXPECTED_NEW_FUNCTION');
             assert.deepEqual(beforeIds.filter(v=>v!=='orbit360OpsLeadsCommandPreview'),
@@ -239,6 +273,32 @@ jobs:
           done > "$RUNNER_TEMP/gi-role-live-after.sha"
           cmp "$RUNNER_TEMP/gi-role-live-before.sha" "$RUNNER_TEMP/gi-role-live-after.sha"
           echo 'I66_PREVIEW_BACKEND_ONLY_ZERO_LIVE_HOSTING_CHANGES_PASS'
+          if test "$PREVIEW_TARGET_COUNT" -eq 5;then
+            node tools/gravicentra-i66-make-lead-protected-executor.cjs capture-trigger preview
+            node tools/gravicentra-i66-make-lead-protected-executor.cjs initialize-closed preview
+          fi
+      - name: Preserve CLOSED deployment before the real Make connection probe
+        if: env.I66_MAKE_INGRESS == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: gi-i66-make-preview-closed-${{ github.run_id }}
+          path: ${{ runner.temp }}/gi-make-preview-initialize-closed.json
+          retention-days: 30
+          if-no-files-found: error
+      - name: Observe the existing Make Firestore connection through the closed trigger
+        if: env.I66_MAKE_INGRESS == 'true'
+        run: node tools/gravicentra-i66-make-lead-protected-executor.cjs wait-probe preview
+      - name: Preserve the actual AuthContext proof for the protected binding
+        if: env.I66_MAKE_INGRESS == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: gi-i66-make-preview-principal-${{ github.run_id }}
+          path: ${{ runner.temp }}/gi-make-preview-closed-trigger.json
+          retention-days: 30
+          if-no-files-found: error
+      - name: Complete protected binding and canonical synthetic create readback replay reject restore
+        if: env.I66_MAKE_INGRESS == 'true'
+        run: node tools/gravicentra-i66-make-lead-protected-executor.cjs wait-config preview
       - name: Signed Carlos and Paula real-auth synthetic CRUD, durable readback, reload and restore
         run: |
           set -euo pipefail
@@ -264,6 +324,7 @@ jobs:
             syntheticRestoreComplete:true,liveHostingUnchanged:true,liveBackendUnchanged:true,
             focusedReports:g.focusedReportsFromDisk(p,'PREVIEW'),
             runId:Number(process.env.GITHUB_RUN_ID),headSha:process.env.GITHUB_SHA};
+          if(p.makeIngressComposite===true)receipt.makeIngress=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/gi-make-preview-proof.json'));
           g.validateProof(p,receipt);
           fs.writeFileSync(process.env.RUNNER_TEMP+'/i66-operational-preview-proof.json',JSON.stringify(receipt,null,2)+'\n');
           NODE
@@ -273,10 +334,28 @@ jobs:
           name: gi-i66-operational-preview-proof-${{ github.run_id }}
           path: |
             ${{ runner.temp }}/i66-operational-preview-proof.json
+            ${{ runner.temp }}/gi-make-preview-proof.json
+            ${{ runner.temp }}/gi-make-preview-operation-*.json
             ${{ runner.temp }}/gravicentra-i66-advisor-payables-signed-uat-preview.json
             ${{ env.I66_PACKAGE_ROOT }}/evidence/i66-proposal-application-signed-uat-preview.json
           retention-days: 30
           if-no-files-found: error
+      - name: Close machine ingress and compensate its exact Preview trigger on failure
+        if: failure() && env.I66_MAKE_INGRESS == 'true'
+        run: |
+          set -euo pipefail
+          if test -f "$RUNNER_TEMP/gi-make-preview-snapshot-trigger.json";then
+            node tools/gravicentra-i66-make-lead-protected-executor.cjs rollback preview
+          fi
+      - name: Preserve machine ingress diagnostics and compensation without private IAM plans
+        if: always() && env.I66_MAKE_INGRESS == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: gi-i66-make-preview-diagnostics-${{ github.run_id }}
+          path: |
+            ${{ runner.temp }}/gi-make-preview-*.json
+          retention-days: 30
+          if-no-files-found: warn
       - name: Preserve sanitized failure diagnostics without an acceptance proof
         if: failure()
         run: |

@@ -189,6 +189,13 @@ function assertActiveReleaseProgress(control,progress,transport){
     assert.equal(progress.currentExecutionMutations?.scope,'THIS_FRONTEND_PROMOTION_ONLY');
     assert.equal(progress.currentExecutionMutations.productSourceChanged,true);assert.equal(progress.currentExecutionMutations.hostingDeploy,true);
     assert.equal(progress.currentExecutionMutations.backendDeploy,false);assert.equal(progress.currentExecutionMutations.businessWrites,false);
+  }else if(transport.lastConsumedOperationalCandidate?.makeIngressComposite===true){
+    assert.equal(control.i66OperationalContinuation20261115.latestProvenLiveSourceScope,'COMPOSITE_FRONTEND_AND_FIVE_BACKEND_FUNCTIONS_CLOSED_INGRESS_SIGNED_PROOF');
+    assert.equal(execution.backendFunctionsChanged,5);assert.equal(progress.notTouched.productSource,false);
+    assert.equal(progress.currentExecutionMutations?.scope,'THIS_COMPOSITE_PROMOTION_ONLY');
+    assert.equal(progress.currentExecutionMutations.backendFunctionsChanged,5);assert.equal(progress.currentExecutionMutations.businessWrites,false);
+    assert.equal(progress.makeIngressDeploymentAcceptance?.acceptanceScope,'RELEASE_TIME_ONLY');
+    assert.equal(progress.makeIngressDeploymentAcceptance?.a13RealLeadAccepted,false);assert.equal(progress.makeIngressDeploymentAcceptance?.fullA13Accepted,false);
   }
 }
 function assertExecutionProgress(control,progress,io){
@@ -289,8 +296,9 @@ function physicalGuard(control,state,transport,io){
     assert.deepEqual(journal.liveProof,proof,'COMPOSITE_JOURNAL_PROOF_DRIFT');
     require('./gravicentra-i66-frontend-promotion-transaction.cjs').validateCompositeProof(journal.request,proof);
     assert.deepEqual(receipt,compositeReceipt(journal,proof.runId),'COMPOSITE_SIGNED_RECEIPT_CONTENT_DRIFT');
-    assert.equal(head.scope,'COMPOSITE');assert.equal(head.backendFunctionsChanged,4);
-    assert.equal(physical.scope,'COMPOSITE');assert.equal(physical.backendFunctionsChanged,4);
+    const backendCount=require('./gravicentra-i6-6-operational-release-candidate.cjs').targetsForCandidate(journal.request.candidate,'live').length;
+    assert.equal(head.scope,'COMPOSITE');assert.equal(head.backendFunctionsChanged,backendCount);
+    assert.equal(physical.scope,'COMPOSITE');assert.equal(physical.backendFunctionsChanged,backendCount);
     assert.deepEqual(receipt.backendRevisions,proof.backendRevisions,'COMPOSITE_RECEIPT_REVISIONS_DRIFT');
     assert.deepEqual(head.backendRevisions,proof.backendRevisions,'COMPOSITE_HEAD_REVISIONS_DRIFT');
     assert.deepEqual(physical.backendRevisions,proof.backendRevisions,'COMPOSITE_TRANSPORT_REVISIONS_DRIFT');
@@ -299,7 +307,7 @@ function physicalGuard(control,state,transport,io){
       transport.currentPhysicalBackendRelease,JSON.parse(read(P.ledger)).backendReleaseHead])
       assert.deepEqual(current,receipt.backend,'COMPOSITE_BACKEND_POINTER_DRIFT');
     assert.equal(receipt.backend.sourceSha,target.sourceSha);assert.equal(receipt.backend.artifactDigest,target.artifactDigest);
-    assert.equal(receipt.backend.functionsChanged,4);assert.deepEqual(receipt.backend.revisions,proof.backendRevisions);
+    assert.equal(receipt.backend.functionsChanged,backendCount);assert.deepEqual(receipt.backend.revisions,proof.backendRevisions);
     assert.deepEqual(transport.lastConsumedOperationalCandidate,journal.request.candidate,'COMPOSITE_CONSUMED_AUTHORITY_DRIFT');
     const pending=transport.scopedBackendPreviewI66?.candidate||transport.operationalReleaseCandidate;
     if(pending){
@@ -407,16 +415,20 @@ function compositeReceipt(j,runId){
   const proof=validateCompositeProof(j.request,j.liveProof),p=j.request.candidate;
   assert.equal(runId,proof.runId,'COMPOSITE_RECEIPT_RUN_DRIFT');
   const proofPath=genName(j.generation,'LIVE_PROOF'),proofText=serial(proof);
+  const makeIngress=require('./gravicentra-i66-make-release-scope.cjs').isMake(p);
+  const backendCount=require('./gravicentra-i6-6-operational-release-candidate.cjs').targetsForCandidate(p,'live').length;
   const backend={generation:j.generation,gate:'I6.6',scope:'COMPOSITE',status:'SIGNED_LIVE_VERIFIED',
     sourceSha:p.sourceSha,artifactId:p.artifactId,artifactDigest:p.artifactDigest,buildId:p.buildId,
-    functionsChanged:4,revisions:proof.backendRevisions,liveRunId:proof.runId,
+    functionsChanged:backendCount,revisions:proof.backendRevisions,liveRunId:proof.runId,
     proofPath,proofSha256:hash(proofText),rollbackHostingVersion:proof.previousHostingVersion,
     fullI66ProductionAccepted:false};
   return {schema:'GI_I66_SIGNED_COMPOSITE_RECEIPT_V1',scope:'COMPOSITE',generation:j.generation,
     target:j.request.target,previous:j.request.previous,authorization:j.request.approvalBlob,
-    scopeId:'I66_COMPOSITE_FOUR_FUNCTIONS_SIGNED',preview:j.preview,physical:j.physical,
+    scopeId:makeIngress?'I66_COMPOSITE_FIVE_FUNCTIONS_CLOSED_MAKE_SIGNED':'I66_COMPOSITE_FOUR_FUNCTIONS_SIGNED',preview:j.preview,physical:j.physical,
     ui:{result:'PASS',buildId:p.buildId,receiptBlob:blob(proofText),source:'VALIDATED_SIGNED_COMPOSITE_LIVE_PROOF'},
-    backendFunctionsChanged:4,backendRevisions:proof.backendRevisions,backend,
+    backendFunctionsChanged:backendCount,backendRevisions:proof.backendRevisions,backend,
+    ...(makeIngress?{makeIngress:{status:'CLOSED_DEPLOYMENT_AUTH_CONTEXT_VERIFIED',active:false,a13RealLeadAccepted:false,
+      scopeContractBlob:p.makeIngress.scopeContractBlob,closedTrigger:proof.makeIngress.closedTrigger}}:{}),
     liveProof:{path:proofPath,sha256:hash(proofText),gitBlobSha:blob(proofText)},runId};
 }
 function closeCompositeFiles(read,j,body){
@@ -424,9 +436,10 @@ function closeCompositeFiles(read,j,body){
   assert.equal(body.phase,'COMMITTED');assert.equal(body.receipt.blob,blob(serial(receipt)),'COMPOSITE_SIGNED_RECEIPT_DRIFT');
   const changes=closeFiles(read,j,body),cp=changes[P.cp],transport=changes[P.transport],state=changes[P.state],ledger=changes[P.ledger];
   const head=cp.i66FrontendReleaseHead,physical=transport.currentPhysicalHostingRelease;
-  Object.assign(head,{scope:'COMPOSITE',status:'COMPOSITE_LIVE_SIGNED_UI_VERIFIED',backendFunctionsChanged:4,
+  const makeIngress=require('./gravicentra-i66-make-release-scope.cjs').isMake(j.request.candidate),backendCount=receipt.backend.functionsChanged;
+  Object.assign(head,{scope:'COMPOSITE',status:'COMPOSITE_LIVE_SIGNED_UI_VERIFIED',backendFunctionsChanged:backendCount,
     backendRevisions:receipt.backendRevisions,liveProofPath:receipt.liveProof.path,liveProofSha256:receipt.liveProof.sha256});
-  Object.assign(physical,{scope:'COMPOSITE',status:head.status,backendFunctionsChanged:4,backendRevisions:receipt.backendRevisions,
+  Object.assign(physical,{scope:'COMPOSITE',status:head.status,backendFunctionsChanged:backendCount,backendRevisions:receipt.backendRevisions,
     liveProofPath:receipt.liveProof.path,liveProofSha256:receipt.liveProof.sha256});
   const previousBackend=transport.currentPhysicalBackendRelease||null;
   if(previousBackend)transport.previousPhysicalBackendRelease=previousBackend;
@@ -442,15 +455,17 @@ function closeCompositeFiles(read,j,body){
   c.lastCompositeLiveUatRunId=receipt.runId;c.lastCompositeLiveUatStatus=j.liveProof.status;
   const continuation=cp.i66OperationalContinuation20261115;
   continuation.latestCompositeLiveReceipt=genName(j.generation,'RECEIPT');continuation.latestCompositeLiveRunId=receipt.runId;
-  continuation.currentWork='I6.6: composite '+head.buildId+' verified with the same immutable frontend and four backend functions; remaining genuine business workflows, Make and financial deltas stay individually gated.';
-  continuation.latestProvenLiveSourceScope='COMPOSITE_FRONTEND_AND_FOUR_BACKEND_FUNCTIONS_SAME_IMMUTABLE_SIGNED_PROOF';
+  continuation.currentWork=makeIngress?'I6.6: composite '+head.buildId+' verified with the same immutable frontend and five backend functions; the machine ingress is CLOSED and real Make activation remains independently gated.':
+    'I6.6: composite '+head.buildId+' verified with the same immutable frontend and four backend functions; remaining genuine business workflows, Make and financial deltas stay individually gated.';
+  continuation.latestProvenLiveSourceScope=makeIngress?'COMPOSITE_FRONTEND_AND_FIVE_BACKEND_FUNCTIONS_CLOSED_INGRESS_SIGNED_PROOF':
+    'COMPOSITE_FRONTEND_AND_FOUR_BACKEND_FUNCTIONS_SAME_IMMUTABLE_SIGNED_PROOF';
   continuation.legalSuccessorAcceptance='COMPOSITE_PREVIEW_AND_LIVE_IDENTICAL_V2_NORMAL_UI_RELOAD_VERIFIED';
   if(state.currentLiveSuccessorAcceptance)state.previousLiveSuccessorAcceptance=state.currentLiveSuccessorAcceptance;
   state.currentLiveSuccessorAcceptance={status:'CURRENT_COMPOSITE_EXACT_SIGNED_LIVE_PASS_FULL_I66_HOLD',
     gate:'I6.6',scope:'COMPOSITE',generation:j.generation,sourceSha:head.sourceSha,buildId:head.buildId,
     buildRunId:head.buildRunId,artifactId:head.artifactId,artifactDigest:head.artifactDigest,hostingVersion:head.hostingVersion,
     liveRunId:receipt.runId,receipt:head.receiptPath,receiptGitBlobSha:head.receiptGitBlobSha,
-    proofPath:receipt.liveProof.path,proofSha256:receipt.liveProof.sha256,backendFunctionsChanged:4,
+    proofPath:receipt.liveProof.path,proofSha256:receipt.liveProof.sha256,backendFunctionsChanged:backendCount,
     backendRevisions:receipt.backendRevisions,previousLiveVersionForRollback:j.request.previous.hostingVersion,
     fullI66ProductionAccepted:false,realFinancialWrites:0};
   state.nextAction=cp.nextAction='I6.6: publicación compuesta '+head.buildId+' verificada. Continuar las capacidades reales y lotes pendientes desde '+genName(j.generation,'FOCAL_PROGRESS')+'.';
@@ -458,17 +473,26 @@ function closeCompositeFiles(read,j,body){
   progress.previousReleaseExecution=progress.releaseExecution||null;
   progress.consumedPreviewRequest=transport.frontendPreviewRequest;
   transport.lastConsumedFrontendPreviewRequest=transport.frontendPreviewRequest;
-  progress.releaseExecution={status:'COMPOSITE_FOUR_FUNCTIONS_SIGNED_LIVE_ACCEPTED',
+  progress.releaseExecution={status:makeIngress?'COMPOSITE_FIVE_FUNCTIONS_CLOSED_INGRESS_SIGNED_LIVE_ACCEPTED':'COMPOSITE_FOUR_FUNCTIONS_SIGNED_LIVE_ACCEPTED',
     sourceSha:head.sourceSha,buildId:head.buildId,buildRunId:head.buildRunId,
     artifactId:head.artifactId,artifactDigest:head.artifactDigest,artifactBuilt:true,
     previewSignedPass:true,livePromoted:true,signedPreviewRunId:j.request.candidate.previewQa.runId,
     liveRunId:receipt.runId,receiptPath:head.receiptPath,proofPath:receipt.liveProof.path,
-    proofSha256:receipt.liveProof.sha256,backendFunctionsChanged:4,
+    proofSha256:receipt.liveProof.sha256,backendFunctionsChanged:backendCount,
     sourceQaHead:transport.frontendPreviewRequest?.sourceQaHead,
     sourceQaRunId:transport.frontendPreviewRequest?.sourceQaRunId,
     guardRunId:transport.frontendPreviewRequest?.guardRunId,
     frontendPreviewRequestVersion:transport.frontendPreviewRequest?.version,
     recordedAtUtc:j.liveProof.recordedAtUtc,fullI66ProductionAccepted:false};
+  if(makeIngress){
+    progress.notTouched.productSource=false;
+    progress.currentExecutionMutations={scope:'THIS_COMPOSITE_PROMOTION_ONLY',productSourceChanged:true,hostingDeploy:true,
+      backendDeploy:true,backendFunctionsChanged:backendCount,businessWrites:false,financialWrites:false,
+      integrationConfigurationOutsideDataOnly:true,exactSecretIamWrites:j.liveProof.makeIngress.secretIamWrites};
+    progress.makeIngressDeploymentAcceptance={...receipt.makeIngress,sourceSha:head.sourceSha,artifactDigest:head.artifactDigest,
+      receiptPath:head.receiptPath,acceptanceScope:'RELEASE_TIME_ONLY',realLeadAcceptanceNotIncluded:true,fullA13Accepted:false};
+    delete transport.frontendPreviewRequest;
+  }
   progress.recordedAtUtc=j.liveProof.recordedAtUtc;
   synchronizeExecutionProgress(progress);
   const next='I6.6: continuar las capacidades pendientes del plan congelado: '+

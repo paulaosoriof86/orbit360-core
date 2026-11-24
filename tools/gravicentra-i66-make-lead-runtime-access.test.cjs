@@ -234,7 +234,9 @@ function eventarcDeps({existingEvent=true,bindings=true,permissions=true,unreach
     if(op.url.endsWith('/rulesets/observed-ruleset'))return{data:{source:{files:[{content:'DO_NOT_PUBLISH_RULES'}]}}};
     const target=a.OPS.find(t=>op.url.endsWith('/locations/'+t.region+'/functions/'+t.name));
     if(target)return{data:{name:`projects/${a.PROJECT}/locations/${target.region}/functions/${target.name}`,state:'ACTIVE',
-      serviceConfig:{serviceAccountEmail:runtimeChanged?'unverified@example.invalid':a.CANONICAL_RUNTIME,environmentVariables:{PRIVATE:'DO_NOT_PUBLISH'}}}};
+      serviceConfig:{serviceAccountEmail:runtimeChanged?'unverified@example.invalid':a.CANONICAL_RUNTIME,
+        service:`projects/${a.PROJECT}/locations/${target.region}/services/${target.name.toLowerCase()}`,
+        environmentVariables:{PRIVATE:'DO_NOT_PUBLISH'}}}};
     if(op.url.includes('/locations/-/functions'))return{data:{functions:existingEvent&&op.url.includes('/v2/')?
       [{name:'projects/'+a.PROJECT+'/locations/us-central1/functions/existing',eventTrigger:{eventType:'google.cloud.firestore.document.v1.created'},
         serviceConfig:{environmentVariables:{PRIVATE:'DO_NOT_PUBLISH'}}}]:[],...(unreachable?{unreachable:['us-central1']}:{})}};
@@ -246,9 +248,15 @@ function eventarcDeps({existingEvent=true,bindings=true,permissions=true,unreach
   }},runtimeClientFor:async who=>{
     assert.equal(who,a.CANONICAL_RUNTIME);
     return{getAccessToken:async()=>({token:'DO_NOT_PUBLISH'}),request:async op=>{
-      calls.push(clone(op));assert.equal(op.url,`https://cloudresourcemanager.googleapis.com/v1/projects/${a.PROJECT}:testIamPermissions`);
-      assert.deepEqual(op.data.permissions,[...a.REQUIRED_EVENTARC_PERMISSIONS]);
-      return{data:{permissions:permissions?[...a.REQUIRED_EVENTARC_PERMISSIONS]:[]}};
+      calls.push(clone(op));assert.equal(op.method,'POST');
+      if(op.url.startsWith('https://cloudresourcemanager.googleapis.com/')){
+        assert.equal(op.url,`https://cloudresourcemanager.googleapis.com/v1/projects/${a.PROJECT}:testIamPermissions`);
+        assert.deepEqual(op.data.permissions,['eventarc.events.receiveEvent']);
+      }else{
+        assert.ok(a.OPS.some(t=>op.url===`https://run.googleapis.com/v2/projects/${a.PROJECT}/locations/${t.region}/services/${t.name.toLowerCase()}:testIamPermissions`));
+        assert.deepEqual(op.data.permissions,['run.routes.invoke']);
+      }
+      return{data:{permissions:permissions?[...op.data.permissions]:[]}};
     }};
   }};
 }
@@ -257,6 +265,7 @@ test('Eventarc readonly probe verifies current runtime and existing event servic
   assert.equal(r.status,'EVENTARC_RUNTIME_AND_PROJECT_IAM_READY');assert.equal(r.cliWouldAddProjectBindings,false);
   assert.deepEqual(r.existingRecognizedEventServices,['firestore']);assert.equal(r.projectIamWrites,0);assert.equal(r.secretIamWrites,0);
   assert.equal(r.firestoreWrites,0);assert.equal(r.privatePolicyPublished,false);assert.match(r.projectPolicyDigest,/^[a-f0-9]{64}$/);
+  assert.equal(r.permissionChecks.length,3);assert.ok(r.permissionChecks.every(p=>p.granted));
   assert.equal(JSON.stringify(r).includes('DO_NOT_PUBLISH'),false);assert.equal(JSON.stringify(r).includes('private-policy-etag'),false);
   assert.ok(d.calls.every(c=>c.method==='GET'||c.url.endsWith(':getIamPolicy')||c.url.endsWith(':testIamPermissions')));
 });
@@ -295,4 +304,72 @@ test('ruleset readback outputs only exact canonical path/blob and refuses missin
   await assert.rejects(a.queueRulesReadback(d.sourceClient,()=>[{sourcePath:'firestore.rules',bytes:Buffer.from('different')}]),/SOURCE_NOT_UNIQUE/);
   await assert.rejects(a.queueRulesReadback(d.sourceClient,()=>[...d.readRulesSources(),{sourcePath:'firestore.rules',bytes:Buffer.from('DO_NOT_PUBLISH_RULES')}]),/SOURCE_NOT_UNIQUE/);
   await assert.rejects(a.queueRulesReadback({request:async()=>({data:{rulesetName:'projects/other/rulesets/other'}})},d.readRulesSources),/IDENTITY_UNVERIFIED/);
+});
+test('invalid provider permission arguments remain a diagnostic HOLD and never masquerade as an access denial or grant requirement',async()=>{
+  const d=eventarcDeps();d.runtimeClientFor=async()=>({getAccessToken:async()=>({token:'private'}),
+    request:async()=>{throw{code:'ERR_BAD_REQUEST',response:{status:400,data:{error:{status:'INVALID_ARGUMENT',message:'private provider payload'}}},
+      message:'private provider payload'};}});
+  const r=await a.eventarcPreflight(d);assert.equal(r.failureStage,'RUNTIME_EVENTARC_PERMISSIONS');assert.equal(r.failureStatus,'INVALID_ARGUMENT');
+  assert.equal(r.failureHttpStatus,400);assert.equal(r.failureProviderStatus,'INVALID_ARGUMENT');assert.equal(r.permissionChecks.length,3);
+  assert.equal(r.status,'EVENTARC_PREREQUISITES_UNVERIFIED_HOLD');assert.equal(r.cliWouldAddProjectBindings,false);
+  assert.equal(r.projectIamWrites,0);assert.equal(JSON.stringify(r).includes('private provider payload'),false);
+});
+test('Run permission is required on both observed regional services and one denial keeps the entire preflight closed',async()=>{
+  const d=eventarcDeps(),original=d.runtimeClientFor;
+  d.runtimeClientFor=async who=>{const client=await original(who),request=client.request;
+    client.request=async op=>op.url.includes('/locations/us-east1/services/')?{data:{permissions:[]}}:request(op);return client;};
+  const r=await a.eventarcPreflight(d);assert.equal(r.status,'EVENTARC_RUNTIME_PERMISSION_MISSING_HOLD');
+  assert.equal(r.runtimeEventarcPermissionsVerified,false);assert.deepEqual(r.grantedRequiredPermissions,['eventarc.events.receiveEvent']);
+  assert.equal(r.permissionChecks.filter(p=>p.granted).length,2);assert.equal(r.projectIamWrites,0);
+});
+test('unverified Run service identities are refused before any runtime permission request',async()=>{
+  for(const service of [undefined,'projects/other/locations/us-central1/services/target',
+    'projects/ays-orbit-360-lab/locations/us-east1/services/target','https://private.invalid/']){
+    const d=eventarcDeps(),original=d.sourceClient.request;let runtimeRequests=0;
+    d.sourceClient.request=async op=>{const r=await original(op);if(op.url.includes('/functions/orbit360OpsLeadsCommand'))r.data.serviceConfig.service=service;return r;};
+    d.runtimeClientFor=async()=>{runtimeRequests++;throw Error('should not reach runtime');};
+    const r=await a.eventarcPreflight(d);assert.equal(r.status,'EVENTARC_PREREQUISITES_UNVERIFIED_HOLD');
+    assert.equal(r.failureStage,'CANONICAL_RUNTIME');assert.equal(runtimeRequests,0);assert.equal(r.projectIamWrites,0);
+  }
+});
+function preimageDeps({configExists=false,configError=null,functionError=404,functionExists=false}={}){
+  const calls=[];return{calls,readConfiguration:async path=>{
+    calls.push({kind:'configuration',path});if(configError)throw configError;
+    const phase=path.endsWith('Preview')?'preview':'live';
+    return{path,exists:configExists,data:configExists?{schema:'GI_I66_MAKE_LEAD_INGRESS_GRANT_V1',
+      tenantId:a.SCOPE.TENANT,country:a.SCOPE.COUNTRY,instanceId:a.SCOPE.INSTANCE,scenarioId:10196136,
+      phase,provider:'greenapi',externalSendAllowed:false,enabled:false,state:'CLOSED',private:'DO_NOT_PUBLISH'}:null};
+  },sourceClient:{request:async op=>{
+    calls.push({kind:'function',...op});assert.equal(op.method,'GET');
+    const target=Object.values(a.INGRESS_TARGETS).find(t=>op.url===`https://cloudfunctions.googleapis.com/v2/projects/${a.PROJECT}/locations/${t.region}/functions/${t.name}`);
+    assert.ok(target);
+    if(!functionExists)throw{response:{status:functionError},message:'DO_NOT_PUBLISH'};
+    return{data:{name:op.url.replace('https://cloudfunctions.googleapis.com/v2/',''),state:'ACTIVE',
+      serviceConfig:{revision:target.name.toLowerCase()+'-00001-test',serviceAccountEmail:a.CANONICAL_RUNTIME,environmentVariables:{PRIVATE:'DO_NOT_PUBLISH'}}}};
+  }}};
+}
+test('ingress preimages prove exact absence with only two configuration reads and two authenticated function GETs',async()=>{
+  const d=preimageDeps(),r=await a.ingressPreimages(d);
+  assert.equal(r.status,'PREIMAGES_CONFIRMED_FOR_CLOSED_INITIALIZATION');assert.equal(r.firestoreReads,2);assert.equal(r.functionReads,2);
+  assert.equal(d.calls.length,4);assert.ok(Object.values(r.closedConfiguration).every(x=>x.readVerified&&x.expectedDigest==='ABSENT'));
+  assert.ok(Object.values(r.targetBefore).every(x=>x.readVerified&&x.state==='ABSENT'&&x.httpStatus===404&&x.revision===null));
+  assert.equal(r.firestoreWrites,0);assert.equal(r.functionWrites,0);assert.equal(r.privateBodiesPublished,false);
+});
+test('existing ingress state is hashed without exposing bodies and never treated as an absent or approved function',async()=>{
+  const d=preimageDeps({configExists:true,functionExists:true}),r=await a.ingressPreimages(d);
+  assert.equal(r.status,'PREIMAGES_OBSERVED_REVIEW_REQUIRED');assert.ok(Object.values(r.closedConfiguration).every(x=>x.status==='CLOSED_EXISTING'));
+  for(const row of Object.values(r.closedConfiguration))assert.match(row.expectedDigest,/^[a-f0-9]{64}$/);
+  assert.ok(Object.values(r.targetBefore).every(x=>x.state==='EXISTING_REQUIRES_APPROVED_LINEAGE'&&x.revision&&x.runtimeIdentityVerified));
+  assert.equal(JSON.stringify(r).includes('DO_NOT_PUBLISH'),false);
+});
+test('denied, failed or wrong-resource ingress reads never manufacture an ABSENT preimage',async()=>{
+  for(const options of [{functionError:403},{functionError:500},{configError:{code:7,message:'DO_NOT_PUBLISH'}}]){
+    const r=await a.ingressPreimages(preimageDeps(options));assert.equal(r.status,'PREIMAGES_UNVERIFIED_HOLD');
+    if(options.functionError)assert.ok(Object.values(r.targetBefore).every(x=>x.state==='UNVERIFIED'&&!x.readVerified));
+    if(options.configError)assert.ok(Object.values(r.closedConfiguration).every(x=>x.expectedDigest===null&&!x.readVerified));
+    assert.equal(JSON.stringify(r).includes('DO_NOT_PUBLISH'),false);assert.equal(r.firestoreWrites,0);
+  }
+  const d=preimageDeps();d.readConfiguration=async()=>({path:'tenants/other/config/private',exists:false});
+  const r=await a.ingressPreimages(d);assert.equal(r.status,'PREIMAGES_UNVERIFIED_HOLD');
+  assert.ok(Object.values(r.closedConfiguration).every(x=>!x.readVerified&&x.expectedDigest===null));
 });

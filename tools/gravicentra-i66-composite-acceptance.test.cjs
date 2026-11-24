@@ -6,6 +6,9 @@ const legal=require('./gravicentra-i6-6-direction-preview-legal-acceptance.cjs')
 const owner=require('./gravicentra-i66-frontend-control.cjs');
 const tx=require('./gravicentra-i66-frontend-promotion-transaction.cjs');
 const {assertCompositeRollbackAllowed}=require('./gravicentra-i66-frontend-promotion-owner.cjs');
+// Load reusable sample definitions at module scope so their node:test cases
+// remain top-level and cannot be cancelled as nested tests of makeFixture.
+const makeExamples=require('./gravicentra-i66-make-release-scope.test.cjs');
 const {P,genName,serial,blob}=owner,clone=v=>JSON.parse(JSON.stringify(v));
 const read=p=>JSON.parse(fs.readFileSync(p,'utf8'));
 function fixture(){
@@ -208,6 +211,61 @@ test('a verified rollback preserves its immutable receipt and permits the next g
 function rollbackContext(f){
   return {runId:f.proof.runId,sourceSha:f.request.target.sourceSha,previous:f.request.previous,transport:f.readFile(P.transport)};
 }
+function makeFixture(){
+  const f=fixture(),scope=require('./gravicentra-i66-make-release-scope.cjs');
+  const examples=makeExamples,sample=examples.fixture().p;
+  Object.assign(f.p,{makeIngressComposite:true,compositeVersion:2,makeIngress:clone(sample.makeIngress),targets:clone(g.MAKE_TARGETS),
+    financialPreviewQa:clone(sample.financialPreviewQa),
+    rollbackFiveBackendRevisionsAndHosting:true,noRulesAuthIamWrites:false,noRulesAuthMembershipWrites:true,onlyExactSecretIamDeltaAllowed:true,
+    opsLeadsBackendBlobSha:sample.opsLeadsBackendBlobSha});f.p.makeIngress.sourceSha=f.p.sourceSha;
+  const liveTrigger=examples.trigger(f.p,'live'),previewTrigger=examples.trigger(f.p,'preview');
+  f.proof.status=scope.LIVE_STATUS;f.proof.targets=clone(g.MAKE_TARGETS.live);
+  f.proof.backendRevisions.push({...scope.ADDED.live,service:scope.ADDED.live.name.toLowerCase(),previousState:'ABSENT',
+    previousRevision:null,currentRevision:liveTrigger.revision,trafficPercent:100,ready:true,rollbackAction:'DELETE_EXACT_CREATED_FUNCTION'});
+  f.proof.makeIngress={status:'CLOSED_DEPLOYMENT_AUTH_CONTEXT_VERIFIED',active:false,a13RealLeadAccepted:false,
+    closedTrigger:liveTrigger,configurationWritesOutsideDataOnly:true,externalMessagesSent:0,secretIamWrites:1,
+    secretIamReadback:{status:'SECRET_RUNTIME_ACCESS_VERIFIED',secretResource:scope.SECRET,principal:scope.RUNTIME,
+      role:'roles/secretmanager.secretAccessor',secretReadback:true,iamWrites:1,projectIamWrites:0,secretValueWrites:0,
+      firestoreWrites:0,membershipWrites:0,externalMessagesSent:0},
+    preview:{schema:'GI_I66_MAKE_LEAD_INGRESS_PREVIEW_PROOF_V1',status:'PASS',sourceSha:f.p.sourceSha,artifactDigest:f.p.artifactDigest,
+      closedTrigger:previewTrigger,authenticatedMakeQueue:true,providerFixtureIsSynthetic:true,pendingOperationsCanonicalLead:true,
+      canonicalReadback:true,sameImmutableArtifact:true,noOtherOperationalMutations:true,syntheticRestoreComplete:true,
+      createdCanonicalLeads:1,replayCanonicalWrites:0,rejectCanonicalWrites:0,externalMessagesSent:0,realLeadAccepted:false,
+      reportSha256:'e'.repeat(64),reportBlobSha:'f'.repeat(40)}};
+  return f;
+}
+test('five-target successor closes the same artifact with a CLOSED machine ingress and preserves all financial evidence',async()=>{
+  const f=makeFixture(),beforeProgress=f.readFile(f.cp.i66ActiveRecoveryCursor.currentEvidencePath),beforeFinance=clone(beforeProgress.financialWork);
+  const j=await tx.acceptComposite(f.io,f.request,f.proof);await f.io.verifyCommitted(j);
+  const cp=f.readFile(P.cp),tr=f.readFile(P.transport),state=f.readFile(P.state),progress=f.readFile(cp.i66ActiveRecoveryCursor.currentEvidencePath);
+  assert.equal(j.phase,'COMMITTED');assert.equal(f.model.clones,0);assert.equal(f.model.commits,1);
+  assert.equal(tr.currentPhysicalBackendRelease.functionsChanged,5);assert.equal(tr.currentPhysicalHostingRelease.backendFunctionsChanged,5);
+  assert.equal(cp.i66OperationalContinuation20261115.latestProvenLiveSourceScope,'COMPOSITE_FRONTEND_AND_FIVE_BACKEND_FUNCTIONS_CLOSED_INGRESS_SIGNED_PROOF');
+  assert.equal(progress.releaseExecution.status,'COMPOSITE_FIVE_FUNCTIONS_CLOSED_INGRESS_SIGNED_LIVE_ACCEPTED');
+  assert.equal(progress.notTouched.productSource,false);assert.equal(progress.currentExecutionMutations.businessWrites,false);
+  assert.equal(progress.currentExecutionMutations.financialWrites,false);
+  const {currentSignedUiReadback:priorUi,...priorFinance}=beforeFinance;
+  const {currentSignedUiReadback:nextUi,...afterFinance}=progress.financialWork;
+  assert.deepEqual(afterFinance,priorFinance);
+  if(priorUi){assert.equal(nextUi,undefined);assert.deepEqual(f.readFile(progress.previousEvidencePath).financialWork.currentSignedUiReadback,priorUi);}
+  assert.equal(progress.makeIngressDeploymentAcceptance.acceptanceScope,'RELEASE_TIME_ONLY');
+  assert.equal(progress.makeIngressDeploymentAcceptance.active,false);assert.equal(progress.makeIngressDeploymentAcceptance.a13RealLeadAccepted,false);
+  assert.equal(f.readFile(f.rp).makeIngress.active,false);assert.equal(tr.frontendPreviewRequest,undefined);
+  assert.deepEqual(state.currentPhysicalBackend,tr.currentPhysicalBackendRelease);
+  assert.equal(j.liveProof.fullI66ProductionAccepted,false);
+  await tx.acceptComposite(f.io,f.request,f.proof);assert.equal(f.model.commits,1);
+});
+test('five-target close refuses fake previous revision, active ingress, missing AuthContext or widened IAM',async()=>{
+  for(const mutate of [f=>f.proof.backendRevisions[4].previousRevision='invented-prior',
+    f=>f.proof.backendRevisions[4].rollbackAction='RESTORE_EXACT_PREVIOUS_REVISION',
+    f=>f.proof.makeIngress.active=true,f=>f.proof.makeIngress.a13RealLeadAccepted=true,
+    f=>f.proof.makeIngress.closedTrigger.realAuthContextObserved=false,
+    f=>f.proof.makeIngress.secretIamReadback.projectIamWrites=1,
+    f=>f.proof.makeIngress.preview.artifactDigest='sha256:'+'0'.repeat(64)]){
+    const f=makeFixture(),before=serial(f.readFile(P.cp));mutate(f);await assert.rejects(tx.acceptComposite(f.io,f.request,f.proof));
+    assert.equal(f.model.commits,0);assert.equal(f.model.clones,0);assert.equal(serial(f.readFile(P.cp)),before);
+  }
+});
 function rollbackAttempt(f){
   return {generation:f.request.generation,key:tx.digest(f.request),runId:f.proof.runId,sourceSha:f.request.target.sourceSha};
 }
@@ -238,7 +296,7 @@ false
 `;
     const r=spawnSync('bash',['-s'],{input:script,encoding:'utf8',env:{...process.env,RUNNER_TEMP:tmp,
       TRACE:path.join(tmp,'trace'),GUARD_STATUS:String(guardStatus),PROJECT_ID:'fixture-project',SITE:'fixture-site',
-      FIREBASE_CLI_BIN:'fixture-cli',I66_ROLE_ROLLBACK_HOSTING_VERSION:'old-version'},timeout:10000});
+      FIREBASE_CLI_BIN:'fixture-cli',I66_ROLE_ROLLBACK_HOSTING_VERSION:'old-version',I66_MAKE_INGRESS:'false'},timeout:10000});
     assert.equal(r.error,undefined);assert.equal(r.status,1,'ROLLBACK_TRAP_MUST_PRESERVE_ORIGINAL_FAILURE');
     const calls=fs.existsSync(path.join(tmp,'trace'))?fs.readFileSync(path.join(tmp,'trace'),'utf8').trim().split('\n'):[];
     assert.equal(calls[0],'guard','JOURNAL_GUARD_MUST_PRECEDE_ALL_PHYSICAL_ROLLBACK');

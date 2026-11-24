@@ -1,0 +1,278 @@
+{
+  "schema": "GI_I66_UNIVERSALES_15590_TEN_LIVE_READBACK_V1",
+  "status": "PROTECTED_TEN_DOCUMENTARY_OBLIGATIONS_SERVER_READBACK_PASS",
+  "gate": "I6.6",
+  "observedAtUtc": "2026-11-24T09:50:18.982361+00:00",
+  "executedAtUtc": "2026-11-24T09:49:10.0274037Z",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "sourceSha": "b7f2cb110235b0ce87625582008956ed723e82dd",
+  "runId": 45366332425,
+  "preflightJobId": 138348888705,
+  "protectedJobId": 138349205751,
+  "runUrl": "https://github.com/paulaosoriof86/orbit360-core/actions/runs/45366332425",
+  "existingWorkflow": ".github/workflows/gravicentra-i66-insurer-source-bulk-protected.yml",
+  "protectedEnvironment": "gravicentra-live-data-writes",
+  "protectedJobConclusion": "success",
+  "source302ManifestPath": "artifacts/orbit360-recovery/source-batches/I6_6_SOURCE_BULK_20261120_MULTI_302.json",
+  "source302ManifestSha256": "35b548913253c836e63db6cb3cac79bda541a6ceda776494969d23393504e225",
+  "documentaryManifestPath": "artifacts/orbit360-recovery/source-batches/I6_6_UNIVERSALES_TWO_ISSUED_MEDICAL_22_20261124.json",
+  "documentaryManifestBlobSha": "d9b54304ec05f2eef6ec22894059a247cb680bfa",
+  "documentaryOriginal": {
+    "policy": "04-05-01-15590-0",
+    "fileId": "1nHigtnI2GJlKePaeyVyXlB_giCyIH2ss",
+    "sha256": "78d78df726fa54c8ef2af5d728a50265db6956208b4a593eab433457f24b4e62",
+    "bytes": 437717,
+    "serviceIdentityMetadataHttp": 200,
+    "serviceIdentityMediaHttp": 200,
+    "originalBytesVerifiedBeforeEligibility": true,
+    "originalBytesReverifiedInsideProtectedExecution": true
+  },
+  "preflight": {
+    "sourceRows": 302,
+    "ready": 10,
+    "unchanged": 227,
+    "exceptions": 65,
+    "chunks": 1,
+    "writes": 0,
+    "exceptionCodes": {
+      "PAYMENT_OR_PORTFOLIO_EXCEPTION": 1,
+      "POLICY_EDITION_MISSING": 44,
+      "RECEIPT_NOT_IDENTIFIED": 20
+    },
+    "beforeHash": "24c267bab26529adae7a76a1a03af40d11c41eb941aff5b2a2aa42741c0398fc",
+    "sourcePlanSha256": "a78522e35a1456e6b31e048a0d9f49fe8fa0e7f84bb5e3c6f127a2f0281a160d"
+  },
+  "application": {
+    "status": "BULK_PROTECTED_READBACK_PASS",
+    "applied": 10,
+    "alreadyApplied": 0,
+    "receiptWrites": 10,
+    "portfolioWrites": 10,
+    "policyCreates": 1,
+    "activityCreates": 1,
+    "priorPolicyUpdates": 0,
+    "auditCreates": 1,
+    "technicalDocumentWrites": 23,
+    "writeOutcomeIndeterminate": false,
+    "cobroWrites": 0,
+    "paymentWrites": 0,
+    "failed": []
+  },
+  "proof": {
+    "policy": "04-05-01-15590-0",
+    "operation": "gi_i66_medical_58cf66007f126a05355b1f4fc231",
+    "receipts": 10,
+    "portfolio": 10,
+    "policyCreates": 1,
+    "activityCreates": 1,
+    "priorUpdates": 0,
+    "payments": 0,
+    "vehicles": 0,
+    "pendingGrossCents": 789040,
+    "originalGrossCents": 917280,
+    "policyState": "Emitida",
+    "beforeHash": "24c267bab26529adae7a76a1a03af40d11c41eb941aff5b2a2aa42741c0398fc",
+    "sourceManifestSha256": "84265751defc79ce50523da0e43205d1f773f2533c748ff9a1c6a3fba308ccec",
+    "originalRunId": "45366332425"
+  },
+  "acceptedRows": [
+    {
+      "status": "APPLIED_READBACK_PASS",
+      "caseId": "UNIVERSALES_NOV16_39470708",
+      "operationKind": "ISSUED_MEDICAL_EDITION_CREATE",
+      "policy": "04-05-01-15590-0",
+      "operation": "gi_i66_medical_58cf66007f126a05355b1f4fc231",
+      "receiptId": "rec_gi_i66_medical_58cf66007f126a05355b1f4fc231_39470708",
+      "portfolioId": "car_rec_gi_i66_medical_58cf66007f126a05355b1f4fc231_39470708",
+      "requirement": "39470708",
+      "due": "2026-12-01",
+      "grossCents": 78904
+    },
+    {
+      "status": "APPLIED_READBACK_PASS",
+      "caseId": "UNIVERSALES_NOV16_39470709",
+      "operationKind": "ISSUED_MEDICAL_EDITION_CREATE",
+      "policy": "04-05-01-15590-0",
+      "operation": "gi_i66_medical_58cf66007f126a05355b1f4fc231",
+      "receiptId": "rec_gi_i66_medical_58cf66007f126a05355b1f4fc231_39470709",
+      "portfolioId": "car_rec_gi_i66_medical_58cf66007f126a05355b1f4fc231_39470709",
+      "requirement": "39470709",
+      "due": "2027-01-01",
+      "grossCents": 78904
+    },
+    {
+      "status": "APPLIED_READBACK_PASS",
+      "caseId": "UNIVERSALES_NOV16_39470710",
+      "operationKind": "ISSUED_MEDICAL_EDITION_CREATE",
+      "policy": "04-05-01-15590-0",
+      "operation": "gi_i66_medical_58cf66007f126a05355b1f4fc231",
+      "receiptId": "rec_gi_i66_medical_58cf66007f126a05355b1f4fc231_39470710",
+      "portfolioId": "car_rec_gi_i66_medical_58cf66007f126a05355b1f4fc231_39470710",
+      "requirement": "39470710",
+      "due": "2027-02-01",
+      "grossCents": 78904
+    },
+    {
+      "status": "APPLIED_READBACK_PASS",
+      "caseId": "UNIVERSALES_NOV16_39470711",
+      "operationKind": "ISSUED_MEDICAL_EDITION_CREATE",
+      "policy": "04-05-01-15590-0",
+      "operation": "gi_i66_medical_58cf66007f126a05355b1f4fc231",
+      "receiptId": "rec_gi_i66_medical_58cf66007f126a05355b1f4fc231_39470711",
+      "portfolioId": "car_rec_gi_i66_medical_58cf66007f126a05355b1f4fc231_39470711",
+      "requirement": "39470711",
+      "due": "2027-03-01",
+      "grossCents": 78904
+    },
+    {
+      "status": "APPLIED_READBACK_PASS",
+      "caseId": "UNIVERSALES_NOV16_39470712",
+      "operationKind": "ISSUED_MEDICAL_EDITION_CREATE",
+      "policy": "04-05-01-15590-0",
+      "operation": "gi_i66_medical_58cf66007f126a05355b1f4fc231",
+      "receiptId": "rec_gi_i66_medical_58cf66007f126a05355b1f4fc231_39470712",
+      "portfolioId": "car_rec_gi_i66_medical_58cf66007f126a05355b1f4fc231_39470712",
+      "requirement": "39470712",
+      "due": "2027-04-01",
+      "grossCents": 78904
+    },
+    {
+      "status": "APPLIED_READBACK_PASS",
+      "caseId": "UNIVERSALES_NOV16_39470713",
+      "operationKind": "ISSUED_MEDICAL_EDITION_CREATE",
+      "policy": "04-05-01-15590-0",
+      "operation": "gi_i66_medical_58cf66007f126a05355b1f4fc231",
+      "receiptId": "rec_gi_i66_medical_58cf66007f126a05355b1f4fc231_39470713",
+      "portfolioId": "car_rec_gi_i66_medical_58cf66007f126a05355b1f4fc231_39470713",
+      "requirement": "39470713",
+      "due": "2027-05-01",
+      "grossCents": 78904
+    },
+    {
+      "status": "APPLIED_READBACK_PASS",
+      "caseId": "UNIVERSALES_NOV16_39470714",
+      "operationKind": "ISSUED_MEDICAL_EDITION_CREATE",
+      "policy": "04-05-01-15590-0",
+      "operation": "gi_i66_medical_58cf66007f126a05355b1f4fc231",
+      "receiptId": "rec_gi_i66_medical_58cf66007f126a05355b1f4fc231_39470714",
+      "portfolioId": "car_rec_gi_i66_medical_58cf66007f126a05355b1f4fc231_39470714",
+      "requirement": "39470714",
+      "due": "2027-06-01",
+      "grossCents": 78904
+    },
+    {
+      "status": "APPLIED_READBACK_PASS",
+      "caseId": "UNIVERSALES_NOV16_39470715",
+      "operationKind": "ISSUED_MEDICAL_EDITION_CREATE",
+      "policy": "04-05-01-15590-0",
+      "operation": "gi_i66_medical_58cf66007f126a05355b1f4fc231",
+      "receiptId": "rec_gi_i66_medical_58cf66007f126a05355b1f4fc231_39470715",
+      "portfolioId": "car_rec_gi_i66_medical_58cf66007f126a05355b1f4fc231_39470715",
+      "requirement": "39470715",
+      "due": "2027-07-01",
+      "grossCents": 78904
+    },
+    {
+      "status": "APPLIED_READBACK_PASS",
+      "caseId": "UNIVERSALES_NOV16_39470716",
+      "operationKind": "ISSUED_MEDICAL_EDITION_CREATE",
+      "policy": "04-05-01-15590-0",
+      "operation": "gi_i66_medical_58cf66007f126a05355b1f4fc231",
+      "receiptId": "rec_gi_i66_medical_58cf66007f126a05355b1f4fc231_39470716",
+      "portfolioId": "car_rec_gi_i66_medical_58cf66007f126a05355b1f4fc231_39470716",
+      "requirement": "39470716",
+      "due": "2027-08-01",
+      "grossCents": 78904
+    },
+    {
+      "status": "APPLIED_READBACK_PASS",
+      "caseId": "UNIVERSALES_NOV16_39470717",
+      "operationKind": "ISSUED_MEDICAL_EDITION_CREATE",
+      "policy": "04-05-01-15590-0",
+      "operation": "gi_i66_medical_58cf66007f126a05355b1f4fc231",
+      "receiptId": "rec_gi_i66_medical_58cf66007f126a05355b1f4fc231_39470717",
+      "portfolioId": "car_rec_gi_i66_medical_58cf66007f126a05355b1f4fc231_39470717",
+      "requirement": "39470717",
+      "due": "2027-09-01",
+      "grossCents": 78904
+    }
+  ],
+  "evidence": {
+    "preflightArtifactId": 14905854912,
+    "preflightArtifactSha256": "1d4b99d6685016a7abfc793b059ead7ae825a8ab5a57dea7089a7251833ad3ff",
+    "liveArtifactId": 14908341768,
+    "liveArtifactSha256": "20036d866228796ae6dddc82d2a7e5d2364fc233327f8d1193c97eb4ed76500f",
+    "liveArtifactBytes": 996,
+    "artifactDigestsVerified": true,
+    "files": [
+      {
+        "path": "gi-i66-bulk-plan.json",
+        "sha256": "171e377cb83c38b67662ad69ffd230cfa7d57d1eb3f7c44d59ea53b764ac1862",
+        "bytes": 230714
+      },
+      {
+        "path": "gi-i66-bulk-preflight.json",
+        "sha256": "d7094f2f6fcc9114fcea587e29ff67f27541a5079147ea89a302d8fb7a60a5cd",
+        "bytes": 42397
+      },
+      {
+        "path": "preflight.log",
+        "sha256": "cd02c8254180360e41ed34c63a631046c047b2345397dc85c95e5ffda1a54724",
+        "bytes": 61139
+      },
+      {
+        "path": "live/gi-i66-bulk-live.json",
+        "sha256": "69c89d1fe8d047de94969c3512f7789c21ba4d09d7b31c90902cdc04af257222",
+        "bytes": 5623
+      },
+      {
+        "path": "live/protected.log",
+        "sha256": "75543d7d3615249da7dd64352a7621654c1f8ee0f0c335cbd74a48f1438445cc",
+        "bytes": 29081
+      }
+    ]
+  },
+  "beforeAfterTotals": {
+    "scope": "Current disjoint issued pending-obligation executions only; not complete database totals or payment totals.",
+    "previousNewPendingObligations": 36,
+    "previousNewPendingGrossCents": 1001766,
+    "additionalNewPendingObligations": 10,
+    "additionalNewPendingGrossCents": 789040,
+    "currentNewPendingObligations": 46,
+    "currentNewPendingGrossCents": 1790806,
+    "currentNewPendingTechnicalWrites": 109,
+    "knownPriorIssuedScheduleObligations": 58,
+    "knownIssuedScheduleObligationsBefore": 94,
+    "knownIssuedScheduleObligationsAfter": 104,
+    "currency": "GTQ"
+  },
+  "preservation": {
+    "existing155DirectHistoricalPaymentsReapplied": false,
+    "existing155DirectHistoricalPaymentsState": "PENDING_APPLICATION",
+    "existing155DirectHistoricalPaymentGrossCents": 7880643,
+    "automaticInsurerReconciliations": 0,
+    "previous12289PendingRowsSeenUnchangedInPreflight": 12,
+    "previous12289LiteralStatusChanged": false,
+    "previousRobleRowsReapplied": false,
+    "legacy302And607SourcesModified": false,
+    "source56PaymentsApplied": 0,
+    "newVehicles": 0,
+    "coverageOrCancellationDecisionChanged": false
+  },
+  "source302DispositionAfterApply": {
+    "basis": "Full302 preflight plus ten protected transaction readbacks; not a new full302 post-application census.",
+    "sourceRows": 302,
+    "unchangedBeforeApply": 227,
+    "newlyApplied": 10,
+    "coveredRows": 237,
+    "isolatedExceptions": 65,
+    "fullPostApplicationCensusPerformed": false,
+    "full302Closed": false
+  },
+  "signedUiReadbackPerformed": false,
+  "liveReplayPerformed": false,
+  "fullA12Passed": false,
+  "fullI66ProductionAccepted": false,
+  "claimBoundary": "Certifies one protected real financial application and exact server readback of ten pending obligations, one issued policy, related activity and audit. No payment, inferred payment, insurer reconciliation, vehicle write, new release, full UI acceptance or full I6.6 closure is claimed."
+}

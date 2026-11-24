@@ -1,0 +1,148 @@
+{
+  "schema": "GI_I66_UNIVERSALES_15590_TEN_PREFLIGHT_READBACK_V1",
+  "status": "SOURCE_VERIFIED_TEN_READY_EXISTING_PROTECTED_ENVIRONMENT_PENDING",
+  "observedAtUtc": "2026-11-24T09:47:50.561982+00:00",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "gate": "I6.6",
+  "sourceSha": "b7f2cb110235b0ce87625582008956ed723e82dd",
+  "runId": 45366332425,
+  "preflightJobId": 138348888705,
+  "protectedJobId": 138349205751,
+  "runUrl": "https://github.com/paulaosoriof86/orbit360-core/actions/runs/45366332425",
+  "source302": {
+    "inputRows": 302,
+    "unchanged": 227,
+    "ready": 10,
+    "exceptions": 65,
+    "writes": 0,
+    "exceptionCodes": {
+      "PAYMENT_OR_PORTFOLIO_EXCEPTION": 1,
+      "POLICY_EDITION_MISSING": 44,
+      "RECEIPT_NOT_IDENTIFIED": 20
+    },
+    "sha256": "35b548913253c836e63db6cb3cac79bda541a6ceda776494969d23393504e225",
+    "path": "artifacts/orbit360-recovery/source-batches/I6_6_SOURCE_BULK_20261120_MULTI_302.json"
+  },
+  "documentaryPlan": {
+    "policy": "04-05-01-15590-0",
+    "operationKind": "ISSUED_MEDICAL_EDITION_CREATE",
+    "operation": "gi_i66_medical_58cf66007f126a05355b1f4fc231",
+    "beforeHash": "24c267bab26529adae7a76a1a03af40d11c41eb941aff5b2a2aa42741c0398fc",
+    "sourcePlanSha256": "a78522e35a1456e6b31e048a0d9f49fe8fa0e7f84bb5e3c6f127a2f0281a160d",
+    "documentaryManifestSha256": "84265751defc79ce50523da0e43205d1f773f2533c748ff9a1c6a3fba308ccec",
+    "newPendingObligations": 10,
+    "newReceiptCreates": 10,
+    "newPortfolioCreates": 10,
+    "newPolicyCreates": 1,
+    "activityCreates": 1,
+    "auditCreates": 1,
+    "totalProspectiveWrites": 23,
+    "currency": "GTQ",
+    "pendingGrossCents": 789040,
+    "originalPremiumGrossCents": 917280,
+    "policyState": "Emitida",
+    "priorUpdates": 0,
+    "paymentsOrCobros": 0,
+    "vehicles": 0,
+    "rows": [
+      {
+        "caseId": "UNIVERSALES_NOV16_39470708",
+        "requirement": "39470708",
+        "due": "2026-12-01",
+        "grossCents": 78904
+      },
+      {
+        "caseId": "UNIVERSALES_NOV16_39470709",
+        "requirement": "39470709",
+        "due": "2027-01-01",
+        "grossCents": 78904
+      },
+      {
+        "caseId": "UNIVERSALES_NOV16_39470710",
+        "requirement": "39470710",
+        "due": "2027-02-01",
+        "grossCents": 78904
+      },
+      {
+        "caseId": "UNIVERSALES_NOV16_39470711",
+        "requirement": "39470711",
+        "due": "2027-03-01",
+        "grossCents": 78904
+      },
+      {
+        "caseId": "UNIVERSALES_NOV16_39470712",
+        "requirement": "39470712",
+        "due": "2027-04-01",
+        "grossCents": 78904
+      },
+      {
+        "caseId": "UNIVERSALES_NOV16_39470713",
+        "requirement": "39470713",
+        "due": "2027-05-01",
+        "grossCents": 78904
+      },
+      {
+        "caseId": "UNIVERSALES_NOV16_39470714",
+        "requirement": "39470714",
+        "due": "2027-06-01",
+        "grossCents": 78904
+      },
+      {
+        "caseId": "UNIVERSALES_NOV16_39470715",
+        "requirement": "39470715",
+        "due": "2027-07-01",
+        "grossCents": 78904
+      },
+      {
+        "caseId": "UNIVERSALES_NOV16_39470716",
+        "requirement": "39470716",
+        "due": "2027-08-01",
+        "grossCents": 78904
+      },
+      {
+        "caseId": "UNIVERSALES_NOV16_39470717",
+        "requirement": "39470717",
+        "due": "2027-09-01",
+        "grossCents": 78904
+      }
+    ]
+  },
+  "originalServiceIdentityRead": {
+    "principal": "firebase-adminsdk-fbsvc@ays-orbit-360-lab.iam.gserviceaccount.com",
+    "scope": "drive.readonly",
+    "policy15590": {
+      "fileId": "1nHigtnI2GJlKePaeyVyXlB_giCyIH2ss",
+      "metadataHttp": 200,
+      "mediaHttp": 200,
+      "bytes": 437717,
+      "sha256": "78d78df726fa54c8ef2af5d728a50265db6956208b4a593eab433457f24b4e62",
+      "status": "ISSUER_ORIGINAL_BYTES_VERIFIED"
+    },
+    "policy12289OriginalVerified": true,
+    "sourceLogRedactionPreserved": true
+  },
+  "preservation": {
+    "previous12289PendingRowsUnchanged": 12,
+    "previous12289PendingCents": 333954,
+    "previous12289LiteralStatusChangeRequested": false,
+    "prior155DirectPaymentsReapplied": false,
+    "source56ApplicationRequested": false,
+    "newInferredPaymentRequested": false,
+    "previousRobleAndDateCorrectionsRepeated": false
+  },
+  "artifact": {
+    "id": 14905854912,
+    "name": "gi-i66-source-bulk-preflight-45366332425",
+    "digest": "sha256:1d4b99d6685016a7abfc793b059ead7ae825a8ab5a57dea7089a7251833ad3ff",
+    "bytes": 30150,
+    "digestVerified": true,
+    "planSha256": "171e377cb83c38b67662ad69ffd230cfa7d57d1eb3f7c44d59ea53b764ac1862",
+    "reportSha256": "d7094f2f6fcc9114fcea587e29ff67f27541a5079147ea89a302d8fb7a60a5cd",
+    "decodedLogSha256": "cd02c8254180360e41ed34c63a631046c047b2345397dc85c95e5ffda1a54724"
+  },
+  "newFinancialWrites": 0,
+  "newProductionAcceptance": false,
+  "fullI66Accepted": false,
+  "claimBoundary": "The immutable preflight proves ten documentary pending obligations eligible and original bytes readable under the existing service identity. The already-running protected job is waiting; no new live financial application, payment or insurer reconciliation is certified by this receipt."
+}

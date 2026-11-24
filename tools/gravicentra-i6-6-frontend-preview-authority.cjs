@@ -2,6 +2,7 @@
 const assert = require('node:assert/strict');
 const {execFileSync} = require('node:child_process');
 const fs = require('node:fs');
+const makeScope=require('./gravicentra-i66-make-release-scope.cjs');
 const dir = 'artifacts/orbit360-recovery/release-control/';
 const transportPath = dir+'I6_6_RELEASE_TRANSPORT_CONTROL_20261110.json';
 const manifest = dir+'I6_6_APPROVED_PRODUCT_DELTA_MANIFEST_20261110.json';
@@ -20,8 +21,21 @@ async function admitPreview(transport,api,readMarker) {
   const request = transport.frontendPreviewRequest;
   const previous = JSON.parse(git('show','HEAD^:'+transportPath));
   if (!previewRequestTransition(request,previous.frontendPreviewRequest)) return false;
-  const composite=request.mode==='COMPOSITE_ARTIFACT_HOSTING_PREVIEW_ONLY';
-  assert.ok(request.mode==='PREVIEW_HOSTING_ONLY'||composite,'PREVIEW_REQUEST_MODE_INVALID');
+  const composite=request.mode==='COMPOSITE_ARTIFACT_HOSTING_PREVIEW_ONLY',makeIngress=request.mode===makeScope.REQUEST_MODE;
+  assert.ok(request.mode==='PREVIEW_HOSTING_ONLY'||composite||makeIngress,'PREVIEW_REQUEST_MODE_INVALID');
+  if(makeIngress){
+    assert.equal(request.backendPreviewRequired,true,'BACKEND_PREVIEW_ACCEPTANCE_REQUIRED');
+    assert.equal(request.backendLiveDeployAllowed,false,'NO_UNCERTIFIED_BACKEND_LIVE');
+    assert.equal(request.realDataWritesAllowed,false,'NO_REAL_WRITES_IN_PREVIEW');
+    assert.equal(request.fiveFunctionExactPreviewRequired,true);
+    assert.equal(request.scopeContractBlob,makeScope.CONTRACT_BLOB);
+    assert.deepEqual(request.balanceCorrection,makeScope.BALANCE_CORRECTION,'I66_MAKE_BALANCE_FOCAL_REQUIRED');
+    assert.equal(git('rev-parse',request.sourceQaHead+':'+makeScope.FRONTEND_PATH),makeScope.FRONTEND_BLOB,'I66_MAKE_BALANCE_SOURCE_BLOB_DRIFT');
+    assert.equal(git('rev-parse',request.sourceQaHead+':'+makeScope.BALANCE_RECEIPT_PATH),makeScope.BALANCE_RECEIPT_BLOB,'I66_MAKE_BALANCE_AUTHORITY_BLOB_DRIFT');
+    assert.deepEqual(request.backendPaths,makeScope.SOURCE_PATHS,'I66_MAKE_BACKEND_EXACT_SCOPE_REQUIRED');
+    assert.deepEqual(Object.keys(request.backendPathBlobs||{}).sort(),makeScope.SOURCE_PATHS);
+    for(const p of request.backendPaths)assert.equal(request.backendPathBlobs[p],git('rev-parse',request.sourceQaHead+':'+p),'BACKEND_SOURCE_BLOB_DRIFT');
+  }
   if(composite){
     assert.equal(request.backendPreviewRequired,true,'BACKEND_PREVIEW_ACCEPTANCE_REQUIRED');
     assert.equal(request.backendLiveDeployAllowed,false,'NO_UNCERTIFIED_BACKEND_LIVE');
@@ -55,7 +69,10 @@ async function admitPreview(transport,api,readMarker) {
   git('diff','--quiet',request.sourceQaHead,'HEAD','--',...roots);
   const paths=git('diff','--name-only',current.sourceSha,request.sourceQaHead,'--',...roots).split('\n');
   const frontendPath=p=>/^orbit360-platform\/(modules|core)\/[\w.-]+\.js$/.test(p);
-  if(composite){
+  if(makeIngress){
+    assert.deepEqual(paths,makeScope.PRODUCT_PATHS,'I66_MAKE_BALANCE_AND_BACKEND_EXACT_PRODUCT_DELTA_REQUIRED');
+    assert.deepEqual(paths.filter(frontendPath),[makeScope.FRONTEND_PATH],'I66_MAKE_NO_UNRELATED_FRONTEND_DELTA');
+  }else if(composite){
     assert.ok(paths.some(frontendPath),'COMPOSITE_FRONTEND_MISSING');
     assert.deepEqual(paths.filter(p=>!frontendPath(p)),request.backendPaths,'COMPOSITE_BACKEND_EXACT_SCOPE_REQUIRED');
   }else{

@@ -1,0 +1,262 @@
+{
+  "schema": "GI_I66_COMPOSED_SOURCE_REPAIR_RECEIPT_V1",
+  "recordType": "SUBORDINATE_SOURCE_EVIDENCE_NOT_RELEASE_ACCEPTANCE",
+  "createdAt": "2026-11-24T09:58:11+00:00",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "preparedAgainstHead": "3a2d075975245e2bd12a60d560eb2b24bed133fa",
+  "status": "LOCAL_INTEGRATED_SOURCE_TESTS_PASS_SIGNED_SOURCE_QA_AND_NEW_IMMUTABLE_RELEASE_REQUIRED",
+  "authority": {
+    "userInstruction": "Resume all authorized parallel work and publish the latest approved capabilities without losing prior decisions, duplicating financial operations, or inventing release acceptance.",
+    "scopeContractPath": "artifacts/orbit360-recovery/release-control/I6_6_A13_CHANNEL_SCOPE_AND_EXISTING_EXECUTORS_20261124.json",
+    "scopeContractBlob": "7ce546736ac8d08b8ac922d19f3e6e4c2bac0021",
+    "communicationDecisionPath": "artifacts/orbit360-recovery/release-control/I6_6_COMMUNICATION_TRACEABILITY_AND_DOCUMENT_INGRESS_OWNER_DECISION_20261124.json",
+    "communicationDecisionBlob": "3bbfe4a19b9bb2db446bbfbb8f8be60da6ef8a18"
+  },
+  "lastAcceptedRelease": {
+    "generation": 3,
+    "sourceSha": "65c825b2808a615ca4195bdde6689dbdbe3193b2",
+    "buildId": "gi-i66-65c825b2808a-57f234755dc1",
+    "artifactId": 14873426438,
+    "artifactDigest": "sha256:7cb782848a45083047c4899bc30c13bf5be46429607e42597d09342becfc9acc",
+    "hostingVersion": "sites/ays-orbit-360-lab/versions/332999a55b189108"
+  },
+  "observedFailure": {
+    "runs": [
+      45355676984,
+      45359645078
+    ],
+    "uiStagesPassedPerAttempt": 48,
+    "failureStage": "signed LIVE_UI receipt publication",
+    "message": "I66_FRONTEND_PROMOTION_HOLD fetch failed",
+    "rollbackToLastAcceptedVerified": true,
+    "specificStaleSocketCauseProven": false,
+    "priorFaultInjectionReceipt": "artifacts/orbit360-recovery/release-control/I6_6_RELEASE_TRANSPORT_FAULT_INJECTION_REPAIR_20261124.json"
+  },
+  "repairs": [
+    "Preserve transport cause codes; supervise long release children asynchronously; close individual GitHub request connections.",
+    "Read Eventarc project capability separately from Run invocation capability on the existing serviceConfig.service resource, preserving HTTP status without response bodies and stopping for any unverified permission. Read two exact configuration documents and two exact function identities for candidate preimages; only HTTP404 proves absence.",
+    "On a lost mutation response, independently read the exact branch/commit/tree/signature. Adopt only the intended signed commit; repeat CAS only after proving the branch is unchanged; stop for unknown or foreign state. Maximum three CAS attempts.",
+    "Compose existing A13 machine-ingress source with closed default admission, same tenant and existing Make scenario, dedicated five-function Preview/LIVE contracts, exact-secret-only IAM allowance, and no outbound messaging or backfill.",
+    "Preserve human actor boundaries, email per-user and cross-mailbox traceability contract, and future-pending balance projection already approved.",
+    "A14 batches related reads while preserving exact 442-row payload in three pages; no persistence or writer change."
+  ],
+  "productSourcePins": [
+    {
+      "path": "functions/b4-003-scoped-related-reader.js",
+      "gitBlobSha": "439bea6d90ef9a6a03ca2539096cb626cc43695d"
+    },
+    {
+      "path": "functions/bootstrap.js",
+      "gitBlobSha": "bd0837a9d5296a456e0575aec555b2971fdedcd7"
+    },
+    {
+      "path": "functions/make-lead-ingress-bridge.js",
+      "gitBlobSha": "8b519ad21da032ffeeee7f9f9cc3e9c3fe6c1317"
+    },
+    {
+      "path": "functions/product-lead-ingress-contract.js",
+      "gitBlobSha": "ee29ee1fb12b1a30bf24b7c2c2a8180a2f2ef937"
+    },
+    {
+      "path": "functions/product-lead-ingress-owner-support.js",
+      "gitBlobSha": "0f07f1620e3968cacf684a88c895faa64eb8a1a1"
+    },
+    {
+      "path": "functions/product-ops-leads-domain.js",
+      "gitBlobSha": "affde2677b4c997b89abdabf3af2cb920128935d"
+    }
+  ],
+  "changedSourceToolWorkflowPins": [
+    {
+      "path": ".github/workflows/gravicentra-i66-greenapi-metadata-readonly.yml",
+      "gitBlobSha": "0bfa5d1f4910c677a75aff08269b7bb058735520"
+    },
+    {
+      "path": ".github/workflows/gravicentra-i66-privileged-role-exact-live-promotion.yml",
+      "gitBlobSha": "9cab0eae6b4c6107f18c9cf36663f32279367d1c"
+    },
+    {
+      "path": ".github/workflows/gravicentra-i66-privileged-role-parity-source-qa.yml",
+      "gitBlobSha": "37d150c7bcfb884152409ebefe512bdab26e5df9"
+    },
+    {
+      "path": ".github/workflows/gravicentra-i66-privileged-role-three-function-preview-uat.yml",
+      "gitBlobSha": "9cbfac18fc0e473878d83a7f9bb901e8e660c179"
+    },
+    {
+      "path": ".github/workflows/gravicentra-release-delta-66-package.yml",
+      "gitBlobSha": "19540c5c5cab3384ec9fa819ba1685e6b55129e7"
+    },
+    {
+      "path": "functions/b4-003-scoped-related-reader.js",
+      "gitBlobSha": "439bea6d90ef9a6a03ca2539096cb626cc43695d"
+    },
+    {
+      "path": "functions/bootstrap.js",
+      "gitBlobSha": "bd0837a9d5296a456e0575aec555b2971fdedcd7"
+    },
+    {
+      "path": "functions/make-lead-ingress-bridge.js",
+      "gitBlobSha": "8b519ad21da032ffeeee7f9f9cc3e9c3fe6c1317"
+    },
+    {
+      "path": "functions/product-lead-ingress-contract.js",
+      "gitBlobSha": "ee29ee1fb12b1a30bf24b7c2c2a8180a2f2ef937"
+    },
+    {
+      "path": "functions/product-lead-ingress-owner-support.js",
+      "gitBlobSha": "0f07f1620e3968cacf684a88c895faa64eb8a1a1"
+    },
+    {
+      "path": "functions/product-ops-leads-domain.js",
+      "gitBlobSha": "affde2677b4c997b89abdabf3af2cb920128935d"
+    },
+    {
+      "path": "tools/gravicentra-b4-003-ops-leads-human-actor.test.cjs",
+      "gitBlobSha": "3beccab588d66f0ba6ed9f67a6b52657b3de6e47"
+    },
+    {
+      "path": "tools/gravicentra-i6-6-composite-preview-admission.test.cjs",
+      "gitBlobSha": "e9814a87fe871c825d63eebd1f8a24d92270db13"
+    },
+    {
+      "path": "tools/gravicentra-i6-6-financial-page-read-efficiency.test.cjs",
+      "gitBlobSha": "b090a37debd6e397d597410efe237083a8fff84f"
+    },
+    {
+      "path": "tools/gravicentra-i6-6-frontend-preview-authority.cjs",
+      "gitBlobSha": "b4e1e1fe26db3d69c6d3f40cd2405279cd642baf"
+    },
+    {
+      "path": "tools/gravicentra-i6-6-make-lead-ingress-release.test.cjs",
+      "gitBlobSha": "eb800c9b5ac086609c03ff7a619dd364c3132ac6"
+    },
+    {
+      "path": "tools/gravicentra-i6-6-operational-release-candidate.cjs",
+      "gitBlobSha": "badcc35dc58ce606371437d8b4e0fd086bbcd7dc"
+    },
+    {
+      "path": "tools/gravicentra-i66-composite-acceptance.test.cjs",
+      "gitBlobSha": "3e80d7414b33d4c7748c7cff69bfca8d52dbc698"
+    },
+    {
+      "path": "tools/gravicentra-i66-frontend-control.cjs",
+      "gitBlobSha": "c26da24150cd69f866d84d1ac631634111575112"
+    },
+    {
+      "path": "tools/gravicentra-i66-frontend-promotion-owner.cjs",
+      "gitBlobSha": "a061cdd62c0b4f77069a1c5c4358cb5fd4d417aa"
+    },
+    {
+      "path": "tools/gravicentra-i66-frontend-promotion-transaction.cjs",
+      "gitBlobSha": "b3c9e1d5bcc6ad2b95e53c6a2cff22b760f91fc7"
+    },
+    {
+      "path": "tools/gravicentra-i66-frontend-promotion-transaction.test.cjs",
+      "gitBlobSha": "b80b1559b63d5f41606a0fdddd14087f1f4e5eee"
+    },
+    {
+      "path": "tools/gravicentra-i66-make-firebase-project-iam-guard.cjs",
+      "gitBlobSha": "2cf83098a20e85b0879d0f4b341f8dd65de32345"
+    },
+    {
+      "path": "tools/gravicentra-i66-make-lead-ingress-config.cjs",
+      "gitBlobSha": "cc3c46b4d5097da8172711d6ad5daa00c5027155"
+    },
+    {
+      "path": "tools/gravicentra-i66-make-lead-ingress-scenario.cjs",
+      "gitBlobSha": "438a3e514a10a3876afb565c18c3ba6d4e75f221"
+    },
+    {
+      "path": "tools/gravicentra-i66-make-lead-ingress-scenario.test.cjs",
+      "gitBlobSha": "0f252df8d21786d51761f21059897f1e7bdbfb1e"
+    },
+    {
+      "path": "tools/gravicentra-i66-make-lead-ingress.test.cjs",
+      "gitBlobSha": "1570bdc7ce039a6cb49750fabc409fda6dc4fe8c"
+    },
+    {
+      "path": "tools/gravicentra-i66-make-lead-protected-executor.cjs",
+      "gitBlobSha": "64ebca22b1ae8b91e4e5ede7e69f6cfad363bd5b"
+    },
+    {
+      "path": "tools/gravicentra-i66-make-lead-protected-executor.test.cjs",
+      "gitBlobSha": "3f30c2e0ecb1d61f8a77f1dfeec9101d6a7d6dd4"
+    },
+    {
+      "path": "tools/gravicentra-i66-make-lead-runtime-access.cjs",
+      "gitBlobSha": "2accbcf79d810a35718400a2a9ced9ab43bd7256"
+    },
+    {
+      "path": "tools/gravicentra-i66-make-lead-runtime-access.test.cjs",
+      "gitBlobSha": "ba645829af998e0ec04dfe6097cb2b27c6c8b64c"
+    },
+    {
+      "path": "tools/gravicentra-i66-make-release-scope.cjs",
+      "gitBlobSha": "bfdadef022b3b70b4628968f2622ab5be9cd94c6"
+    },
+    {
+      "path": "tools/gravicentra-i66-make-release-scope.test.cjs",
+      "gitBlobSha": "cfa0fd7628acb087983ab0df4dee0bd39d1753ac"
+    }
+  ],
+  "retainedGreenapiWorkflow": {
+    "path": ".github/workflows/gravicentra-i66-greenapi-metadata-readonly.yml",
+    "baselineGitBlobSha": "e27c00fc4e66c4d7ede3a20596288762f47f03a3",
+    "gitBlobSha": "0bfa5d1f4910c677a75aff08269b7bb058735520",
+    "existingRuntimeMailboxEventarcProbesPreserved": true,
+    "onlyNewWorkflowDelta": "Comment describing the bounded preimage reads; invokes the existing path-filtered readonly probe on push."
+  },
+  "preservedUnchanged": {
+    "balanceQuery": {
+      "path": "orbit360-platform/core/queries.js",
+      "gitBlobSha": "b77b65f86ef6ac2ab6dc157fdbc9ad5e34dbcdcc"
+    }
+  },
+  "localValidation": {
+    "command": [
+      "node",
+      "--test",
+      "tools/gravicentra-i66-frontend-promotion-transaction.test.cjs",
+      "tools/gravicentra-i66-frontend-control.test.cjs",
+      "tools/gravicentra-i66-composite-acceptance.test.cjs",
+      "tools/gravicentra-i6-6-financial-page-read-efficiency.test.cjs",
+      "tools/gravicentra-i6-6-make-lead-ingress-release.test.cjs"
+    ],
+    "tests": 245,
+    "passed": 245,
+    "failed": 0,
+    "cancelled": 0,
+    "skipped": 0,
+    "logSha256": "244db21e8ce64c5e602b5847ba494a2f8f610090f5fefabc9c282f44f44c7fd1",
+    "a14Fixture": {
+      "rows": 442,
+      "pages": 3,
+      "rawQueriesBefore": 7,
+      "rawQueriesAfter": 3,
+      "parentBatchesBefore": 14,
+      "parentBatchesAfter": 6,
+      "actualProductionLatencyClaimed": false
+    }
+  },
+  "remoteValidation": {
+    "signedSourceQa": "PENDING",
+    "guardForNewSource": "PENDING",
+    "newFrozenPreviewRequest": "PENDING",
+    "newImmutableBuild": "PENDING",
+    "previewModuleAndRoleQa": "PENDING",
+    "liveModuleAndRoleQa": "PENDING",
+    "sameArtifactAcceptance": "PENDING"
+  },
+  "boundaries": {
+    "newReleaseAccepted": false,
+    "deploymentPerformed": false,
+    "liveDataWritesPerformed": 0,
+    "fullI66ProductionAccepted": false,
+    "mailboxAutoProcessingAccepted": false,
+    "makeIngressActivated": false,
+    "augustDataRefreshAuthorizedByThisReceipt": false
+  },
+  "nextAction": "Publish these exact source pins under existing recovery authority; require signed source QA and central guard on the same source head; freeze request v18; build once, verify Preview, then promote and verify the same artifact with the approved composite backend contracts."
+}

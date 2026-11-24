@@ -3992,6 +3992,71 @@
           }
         }
       ]
+    },
+    {
+      "id": "I6_6_A13_A14_CANONICAL_MACHINE_INGRESS_AND_PAGED_READ_20261124",
+      "approvedByDirection": true,
+      "receipt": "artifacts/orbit360-recovery/release-control/I6_6_A13_A14_TRANSPORT_COMPOSED_SOURCE_20261124.json",
+      "receiptGitBlobSha": "09f858e4f33c8fd238df4e04460c9d97fb2a2e98",
+      "sourceStatus": "LOCAL_INTEGRATED_SOURCE_QA_PASS_NEW_IMMUTABLE_PREVIEW_AND_LIVE_REQUIRED",
+      "capabilityOwners": [
+        "OPS_LEADS_PRIMARY_RUNTIME",
+        "ROLE_SCOPE_RUNTIME",
+        "CROSS_MODULE_RELATIONSHIPS",
+        "RECEIPTS_READ_MODEL"
+      ],
+      "scope": "Existing A13 canonical machine ingress with closed admission, tenant scope and canonical deduplication; preserve human actor ownership and five-function exact preview/live contracts. A14 related-read batch efficiency preserves payload, role semantics and writers. No outbound messaging, backfill, mailbox activation or financial import by this source change. Transport recovery remains in the same release owner and verifies the exact signed commit before any bounded replay.",
+      "paths": [
+        {
+          "path": "functions/b4-003-scoped-related-reader.js",
+          "gitBlobSha": "439bea6d90ef9a6a03ca2539096cb626cc43695d",
+          "replaces": {
+            "path": "functions/b4-003-scoped-related-reader.js",
+            "priorGitBlobSha": "aafdbe3384506b1772c7e409d565de88bf287b21",
+            "priorChangeId": "I6_6_ADVISOR_PORTFOLIO_HISTORICAL_BENEFICIARY_AND_COMPONENT_ROUNDING_20261115"
+          }
+        },
+        {
+          "path": "functions/bootstrap.js",
+          "gitBlobSha": "bd0837a9d5296a456e0575aec555b2971fdedcd7",
+          "replaces": {
+            "path": "functions/bootstrap.js",
+            "priorGitBlobSha": "160f943dd993bb4dfa88e24fd00ede422e3d5a7b",
+            "priorChangeId": "I6_6_GREENAPI_DIRECT_WHATSAPP_GROUP_QA_DISABLED_P0"
+          }
+        },
+        {
+          "path": "functions/make-lead-ingress-bridge.js",
+          "gitBlobSha": "8b519ad21da032ffeeee7f9f9cc3e9c3fe6c1317"
+        },
+        {
+          "path": "functions/product-lead-ingress-contract.js",
+          "gitBlobSha": "ee29ee1fb12b1a30bf24b7c2c2a8180a2f2ef937"
+        },
+        {
+          "path": "functions/product-lead-ingress-owner-support.js",
+          "gitBlobSha": "0f07f1620e3968cacf684a88c895faa64eb8a1a1"
+        },
+        {
+          "path": "functions/product-ops-leads-domain.js",
+          "gitBlobSha": "affde2677b4c997b89abdabf3af2cb920128935d",
+          "replaces": {
+            "path": "functions/product-ops-leads-domain.js",
+            "priorGitBlobSha": "b7921ca88343ced65bdad4cd9de26fa120647083",
+            "priorChangeId": "I6_6_PORTAL_CLAIM_OPS_CANONICAL_RELATION_AND_RETRY_20261122"
+          }
+        }
+      ],
+      "tests": [
+        {
+          "path": "tools/gravicentra-i6-6-make-lead-ingress-release.test.cjs",
+          "gitBlobSha": "eb800c9b5ac086609c03ff7a619dd364c3132ac6"
+        },
+        {
+          "path": "tools/gravicentra-i6-6-financial-page-read-efficiency.test.cjs",
+          "gitBlobSha": "b090a37debd6e397d597410efe237083a8fff84f"
+        }
+      ]
     }
   ],
   "i66R11PreviewBuildRequest20261113": {

@@ -102,7 +102,8 @@ function validateCompositeProof(request,proof){
   const g=require('./gravicentra-i6-6-operational-release-candidate.cjs'),p=request.candidate;
   assert.equal(p?.opsLeadsComposite,true,'COMPOSITE_FOUR_FUNCTION_CANDIDATE_REQUIRED');
   g.validateLiveProof(p,proof);
-  assert.equal(proof.backendRevisions.length,4,'COMPOSITE_FOUR_EFFECTIVE_REVISIONS_REQUIRED');
+  const count=g.targetsForCandidate(p,'live').length;
+  assert.equal(proof.backendRevisions.length,count,p.makeIngressComposite===true?'COMPOSITE_FIVE_EFFECTIVE_REVISIONS_REQUIRED':'COMPOSITE_FOUR_EFFECTIVE_REVISIONS_REQUIRED');
   for(const key of ['sourceSha','artifactId','artifactDigest','buildId','buildRunId'])
     assert.equal(request.target[key],p[key],'COMPOSITE_TARGET_IDENTITY_'+key);
   assert.equal(request.target.previewUrl,p.previewUrl,'COMPOSITE_PREVIEW_ORIGIN');

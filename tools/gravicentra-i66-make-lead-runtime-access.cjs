@@ -17,7 +17,11 @@ const PROJECT='ays-orbit-360-lab';
 const SECRET=`projects/${PROJECT}/secrets/orbit360-greenapi-gt-alianzas-soluciones`;
 const ROLE='roles/secretmanager.secretAccessor';
 const PROJECT_NUMBER='646761409743',CANONICAL_RUNTIME=PROJECT_NUMBER+'-compute@developer.gserviceaccount.com';
-const REQUIRED_EVENTARC_PERMISSIONS=Object.freeze(['eventarc.events.receive','run.routes.invoke']);
+// Exact permission names from the provider's Eventarc Event Receiver and Cloud
+// Run Invoker contracts; role names alone are not an effective-access probe.
+// https://docs.cloud.google.com/eventarc/standard/docs/access-control
+// https://docs.cloud.google.com/run/docs/reference/iam/roles
+const REQUIRED_EVENTARC_PERMISSIONS=Object.freeze(['eventarc.events.receiveEvent','run.routes.invoke']);
 // firebase-tools@14.10.1 checkIam.ensureServiceAgentRoles requests these only
 // for the first recognized event service. This probe predicts that branch; it
 // never grants these project roles. The protected CLI also forbids the setter.
@@ -42,6 +46,8 @@ const REQUIRED_FIRESTORE_PERMISSIONS=Object.freeze(['datastore.databases.get','d
   'datastore.entities.list','datastore.entities.create','datastore.entities.update']);
 const OPS=Object.freeze([{name:'orbit360OpsLeadsCommand',region:'us-central1'},
   {name:'orbit360OpsLeadsCommandPreview',region:'us-east1'}]);
+const INGRESS_TARGETS=Object.freeze({preview:{name:'orbit360MakeLeadIngressPreview',region:'us-east1'},
+  live:{name:'orbit360MakeLeadIngress',region:'us-central1'}});
 const isRuntime=v=>typeof v==='string'&&(/^[a-z][a-z0-9-]{4,61}@ays-orbit-360-lab\.iam\.gserviceaccount\.com$/.test(v)||
   /^[0-9]{6,20}-compute@developer\.gserviceaccount\.com$/.test(v)||v==='ays-orbit-360-lab@appspot.gserviceaccount.com');
 const etagString=p=>Buffer.isBuffer(p?.etag)||p?.etag instanceof Uint8Array?Buffer.from(p.etag).toString('base64'):String(p?.etag||'');
@@ -138,9 +144,17 @@ async function rollbackExact({client,plan,receipt}){
   }catch(error){error.ingressIamOutcome={commitState:committed?'COMMITTED_UNVERIFIED':'UNKNOWN',knownIamWrites:committed?1:0,
     action:'ROLLBACK',resource:SECRET,principal:plan.principal};throw error;}
 }
-function safeStatus(error){const code=Number(error?.code||error?.response?.status);
+function safeStatus(error){const code=[error?.response?.status,error?.response?.data?.error?.code,error?.code]
+  .map(Number).find(n=>Number.isInteger(n)&&n>0);
   return code===7||code===403?'PERMISSION_DENIED':code===16||code===401?'UNAUTHENTICATED':code===5||code===404?'NOT_FOUND':
-    [4,13,14,429,500,502,503,504].includes(code)?'TRANSIENT_FAILURE':'UNCONFIRMED';}
+    code===3||code===400?'INVALID_ARGUMENT':[4,13,14,429,500,502,503,504].includes(code)?'TRANSIENT_FAILURE':'UNCONFIRMED';}
+function safeFailureFacts(error){
+  const http=Number(error?.response?.status),provider=error?.response?.data?.error?.status;
+  return{status:safeStatus(error),httpStatus:Number.isInteger(http)&&http>=100&&http<=599?http:null,
+    providerStatus:['INVALID_ARGUMENT','UNAUTHENTICATED','PERMISSION_DENIED','NOT_FOUND','RESOURCE_EXHAUSTED',
+      'FAILED_PRECONDITION','ABORTED','OUT_OF_RANGE','UNIMPLEMENTED','INTERNAL','UNAVAILABLE','DATA_LOSS',
+      'DEADLINE_EXCEEDED','CANCELLED','UNKNOWN'].includes(provider)?provider:null};
+}
 async function listEventInventory(sourceClient,version){
   const rows=[],tokens=new Set();let pageToken='';
   for(let page=0;page<20;page++){
@@ -178,15 +192,22 @@ async function eventarcPreflight({sourceClient,runtimeClientFor,readRulesSources
     projectId:PROJECT,cliVersion:'14.10.1',canonicalRuntime:CANONICAL_RUNTIME,canonicalRuntimeObserved:false,
     inventoryComplete:false,existingRecognizedEventServices:[],projectPolicyRead:false,projectPolicyDigest:null,
     firstEventBindings:[],cliWouldAddProjectBindings:null,queueRules:null,runtimeImpersonationVerified:false,
-    runtimeEventarcPermissionsVerified:false,grantedRequiredPermissions:[],failureStage:null,failureStatus:null,
+    runtimeEventarcPermissionsVerified:false,grantedRequiredPermissions:[],permissionChecks:[],failureStage:null,failureStatus:null,
+    failureHttpStatus:null,failureProviderStatus:null,
     projectIamWrites:0,secretIamWrites:0,firestoreWrites:0,providerRequests:0,externalMessagesSent:0,privatePolicyPublished:false};
   let stage='CANONICAL_RUNTIME';
   try{
+    const runResources=[];
     for(const target of OPS){
       const resource=`projects/${PROJECT}/locations/${target.region}/functions/${target.name}`;
       const r=await sourceClient.request({url:'https://cloudfunctions.googleapis.com/v2/'+resource,method:'GET'});
       c.need(r.data?.name===resource&&r.data.state==='ACTIVE'&&r.data.serviceConfig?.serviceAccountEmail===CANONICAL_RUNTIME,
         'INGRESS_EVENTARC_CANONICAL_RUNTIME_CHANGED');
+      const service=r.data.serviceConfig.service,parts=typeof service==='string'?service.split('/'):[];
+      c.need(parts.length===6&&parts[0]==='projects'&&[PROJECT,PROJECT_NUMBER].includes(parts[1])&&
+        parts[2]==='locations'&&parts[3]===target.region&&parts[4]==='services'&&/^[a-z][a-z0-9-]{0,62}$/.test(parts[5]),
+        'INGRESS_EVENTARC_RUN_SERVICE_IDENTITY_UNVERIFIED');
+      runResources.push(service);
     }
     report.canonicalRuntimeObserved=true;stage='FUNCTION_INVENTORY';
     const rows=[...await listEventInventory(sourceClient,'v1'),...await listEventInventory(sourceClient,'v2')];
@@ -204,13 +225,86 @@ async function eventarcPreflight({sourceClient,runtimeClientFor,readRulesSources
     stage='QUEUE_RULES_READBACK';report.queueRules=await queueRulesReadback(sourceClient,readRulesSources);
     stage='RUNTIME_EVENTARC_PERMISSIONS';
     const runtime=await runtimeClientFor(CANONICAL_RUNTIME);await runtime.getAccessToken();report.runtimeImpersonationVerified=true;
-    const granted=await runtime.request({url:`https://cloudresourcemanager.googleapis.com/v1/projects/${PROJECT}:testIamPermissions`,
-      method:'POST',data:{permissions:[...REQUIRED_EVENTARC_PERMISSIONS]}});
-    report.grantedRequiredPermissions=REQUIRED_EVENTARC_PERMISSIONS.filter(p=>granted.data?.permissions?.includes(p));
-    report.runtimeEventarcPermissionsVerified=report.grantedRequiredPermissions.length===REQUIRED_EVENTARC_PERMISSIONS.length;
-    report.status=report.cliWouldAddProjectBindings?'UNAUTHORIZED_PROJECT_IAM_DELTA_WOULD_BE_REQUIRED_HOLD':
-      report.runtimeEventarcPermissionsVerified?'EVENTARC_RUNTIME_AND_PROJECT_IAM_READY':'EVENTARC_RUNTIME_PERMISSION_MISSING_HOLD';
-  }catch(error){report.failureStage=stage;report.failureStatus=safeStatus(error);}
+    // Event Receiver is project-scoped. Run Invoker is tested through the Run
+    // resource API using service identities returned by the two canonical
+    // functions, never a fabricated service or another account. A successful
+    // UI-oriented permission probe does not replace the protected real-event QA.
+    // https://docs.cloud.google.com/iam/docs/roles-permissions/eventarc
+    // https://docs.cloud.google.com/run/docs/reference/rest/v2/projects.locations.services/testIamPermissions
+    const probes=[{permission:'eventarc.events.receiveEvent',resource:`projects/${PROJECT}`,
+      url:`https://cloudresourcemanager.googleapis.com/v1/projects/${PROJECT}:testIamPermissions`},
+      ...runResources.map(resource=>({permission:'run.routes.invoke',resource,
+        url:`https://run.googleapis.com/v2/${resource}:testIamPermissions`}))];
+    for(const probe of probes){
+      const row={permission:probe.permission,resource:probe.resource,granted:false,status:'UNVERIFIED',httpStatus:null,providerStatus:null};
+      try{
+        const response=await runtime.request({url:probe.url,method:'POST',data:{permissions:[probe.permission]}});
+        row.granted=Array.isArray(response.data?.permissions)&&response.data.permissions.includes(probe.permission);
+        row.status=row.granted?'GRANTED':'NOT_GRANTED';
+      }catch(error){Object.assign(row,safeFailureFacts(error));
+        if(!report.failureStage){report.failureStage=stage;report.failureStatus=row.status;
+          report.failureHttpStatus=row.httpStatus;report.failureProviderStatus=row.providerStatus;}}
+      report.permissionChecks.push(row);
+    }
+    report.grantedRequiredPermissions=REQUIRED_EVENTARC_PERMISSIONS.filter(permission=>
+      report.permissionChecks.filter(row=>row.permission===permission).every(row=>row.granted));
+    report.runtimeEventarcPermissionsVerified=report.permissionChecks.length===3&&report.permissionChecks.every(row=>row.granted);
+    report.status=report.failureStage?'EVENTARC_PREREQUISITES_UNVERIFIED_HOLD':
+      report.cliWouldAddProjectBindings?'UNAUTHORIZED_PROJECT_IAM_DELTA_WOULD_BE_REQUIRED_HOLD':
+        report.runtimeEventarcPermissionsVerified?'EVENTARC_RUNTIME_AND_PROJECT_IAM_READY':'EVENTARC_RUNTIME_PERMISSION_MISSING_HOLD';
+  }catch(error){const facts=safeFailureFacts(error);report.failureStage=stage;report.failureStatus=facts.status;
+    report.failureHttpStatus=facts.httpStatus;report.failureProviderStatus=facts.providerStatus;}
+  return{...report,reportDigest:c.digest(report)};
+}
+// Exact reads needed before freezing the first ingress candidate. Neither an
+// absent source file nor a failed read proves the absence of deployed state.
+// No configuration body, nonce, principal binding or environment is published.
+async function ingressPreimages({sourceClient,readConfiguration}){
+  const report={schema:'GI_I66_MAKE_INGRESS_PREIMAGES_READONLY_V1',status:'PREIMAGES_UNVERIFIED_HOLD',
+    projectId:PROJECT,tenantId:SCOPE.TENANT,closedConfiguration:{},targetBefore:{},
+    firestoreReads:0,functionReads:0,firestoreWrites:0,functionWrites:0,projectIamWrites:0,
+    secretIamWrites:0,externalMessagesSent:0,privateBodiesPublished:false};
+  for(const phase of ['preview','live']){
+    const path=`tenants/${SCOPE.TENANT}/config/${phase==='preview'?'makeLeadIngressPreview':'makeLeadIngress'}`;
+    const config={path,readVerified:false,exists:null,expectedDigest:null,state:null,scopeVerified:false,status:'UNVERIFIED',httpStatus:null,providerStatus:null};
+    try{
+      report.firestoreReads++;const snap=await readConfiguration(path);
+      c.need(snap?.path===path&&typeof snap.exists==='boolean','INGRESS_CONFIG_READ_IDENTITY_REQUIRED');
+      config.exists=snap.exists;
+      if(!snap.exists){config.expectedDigest='ABSENT';config.scopeVerified=true;config.status='ABSENT';}
+      else{
+        const value=snap.data;c.need(value&&typeof value==='object'&&!Array.isArray(value)&&
+          Buffer.byteLength(JSON.stringify(value),'utf8')<=100000,'INGRESS_CONFIG_READ_BOUNDED_OBJECT_REQUIRED');
+        config.expectedDigest=c.digest(value);
+        config.state=['CLOSED','BOUND','ACTIVE'].includes(value.state)?value.state:'UNRECOGNIZED';
+        config.scopeVerified=value.schema==='GI_I66_MAKE_LEAD_INGRESS_GRANT_V1'&&value.tenantId===SCOPE.TENANT&&
+          value.country===SCOPE.COUNTRY&&value.instanceId===SCOPE.INSTANCE&&value.scenarioId===10196136&&
+          value.phase===phase&&value.provider==='greenapi'&&value.externalSendAllowed===false;
+        config.status=config.scopeVerified&&value.enabled===false&&value.state==='CLOSED'?'CLOSED_EXISTING':'EXISTING_REQUIRES_REVIEW';
+      }
+      config.readVerified=true;
+    }catch(error){Object.assign(config,safeFailureFacts(error));}
+    report.closedConfiguration[phase]=config;
+    const target=INGRESS_TARGETS[phase],resource=`projects/${PROJECT}/locations/${target.region}/functions/${target.name}`;
+    const before={...target,resource,readVerified:false,state:'UNVERIFIED',revision:null,httpStatus:null,providerStatus:null,status:'UNVERIFIED'};
+    try{
+      report.functionReads++;const response=await sourceClient.request({url:'https://cloudfunctions.googleapis.com/v2/'+resource,method:'GET'}),fn=response.data;
+      c.need(fn?.name===resource,'INGRESS_FUNCTION_READ_IDENTITY_REQUIRED');
+      before.readVerified=true;before.state='EXISTING_REQUIRES_APPROVED_LINEAGE';before.status=before.state;
+      before.revision=/^[a-z][a-z0-9-]+$/.test(fn.serviceConfig?.revision||'')?fn.serviceConfig.revision:null;
+      before.runtimeIdentityVerified=fn.serviceConfig?.serviceAccountEmail===CANONICAL_RUNTIME;
+      before.active=fn.state==='ACTIVE';
+    }catch(error){
+      // Only the authenticated exact resource HTTP 404 is absence evidence.
+      if(Number(error?.response?.status)===404){before.readVerified=true;before.state='ABSENT';before.status='ABSENT';before.httpStatus=404;}
+      else Object.assign(before,safeFailureFacts(error));
+    }
+    report.targetBefore[phase]=before;
+  }
+  const configs=Object.values(report.closedConfiguration),targets=Object.values(report.targetBefore);
+  if(configs.every(row=>row.readVerified)&&targets.every(row=>row.readVerified))report.status=
+    configs.every(row=>['ABSENT','CLOSED_EXISTING'].includes(row.status))&&targets.every(row=>row.state==='ABSENT')?
+      'PREIMAGES_CONFIRMED_FOR_CLOSED_INITIALIZATION':'PREIMAGES_OBSERVED_REVIEW_REQUIRED';
   return{...report,reportDigest:c.digest(report)};
 }
 async function preflight({sourceClient,runtimeClientFor,secretClientFor}){
@@ -272,7 +366,18 @@ async function main(){
     secretClientFor:async runtime=>new SecretManagerServiceClient({projectId:PROJECT,auth:new GoogleAuth({authClient:runtime,projectId:PROJECT})})};
   const eventarc=process.argv[2]==='eventarc-preflight',report=await (eventarc?eventarcPreflight(options):preflight(options));
   console.log((eventarc?'I66_MAKE_EVENTARC_PROJECT_IAM_READONLY=':'I66_MAKE_RUNTIME_ACCESS_PREFLIGHT=')+JSON.stringify(report));
+  if(eventarc){
+    const {initializeApp,applicationDefault,deleteApp}=functionsRequire('firebase-admin/app'),{getFirestore}=functionsRequire('firebase-admin/firestore');
+    let app=null,db=null;
+    try{
+      const preimages=await ingressPreimages({sourceClient,readConfiguration:async path=>{
+        if(!app){app=initializeApp({projectId:PROJECT,credential:applicationDefault()},'i66-make-preimages-readonly');db=getFirestore(app);}
+        const snap=await db.doc(path).get();return{path:snap.ref.path,exists:snap.exists,data:snap.exists?snap.data():null};
+      }});
+      console.log('I66_MAKE_INGRESS_PREIMAGES_READONLY='+JSON.stringify(preimages));
+    }finally{if(app)await deleteApp(app);}
+  }
 }
 if(require.main===module)main().catch(()=>{console.error('I66_MAKE_RUNTIME_PREFLIGHT_UNCONFIRMED');process.exitCode=1;});
-module.exports={SCOPE,PROJECT,SECRET,ROLE,PRIOR_RUNTIME,OPS,CANONICAL_RUNTIME,REQUIRED_FIRESTORE_PERMISSIONS,REQUIRED_EVENTARC_PERMISSIONS,FIRST_EVENT_BINDINGS,
-  isRuntime,policyDigest,exactGrantPlan,grantExact,rollbackExact,preflight,eventarcPreflight,listEventInventory,inventoryService,queueRulesReadback};
+module.exports={SCOPE,PROJECT,SECRET,ROLE,PRIOR_RUNTIME,OPS,INGRESS_TARGETS,CANONICAL_RUNTIME,REQUIRED_FIRESTORE_PERMISSIONS,REQUIRED_EVENTARC_PERMISSIONS,FIRST_EVENT_BINDINGS,
+  isRuntime,policyDigest,exactGrantPlan,grantExact,rollbackExact,preflight,eventarcPreflight,ingressPreimages,listEventInventory,inventoryService,queueRulesReadback};

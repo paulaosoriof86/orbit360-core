@@ -437,7 +437,10 @@ async function readScopedRelatedList({db,auth,request}){
  // Parents and scopes are verified server-side for every returned record.
  // Unlike the earlier Cobros fast path, client-only real receipts are retained.
  if(['vehiculos','recibosEsperados','carteraPrimas','cobros','conciliaciones','conciliacionesPrimas'].includes(coll)&&!policyId&&!hasBatch){
-   const MAX_SCANNED=3000,RAW_PAGE=100,PARENT_CONCURRENCY=10;
+   const MAX_SCANNED=3000,RAW_PAGE=Math.max(100,pageSize+1),PARENT_CONCURRENCY=10;
+   // The approved HTTP page is up to 200 rows. Fetch its lookahead in one
+   // raw batch when possible; every row still receives the same fresh parent
+   // and scope verification. Keep small-page/scoped scans at least 100 rows.
    const parents=new Map();
    async function verifiedParent(kind,id){
      const key=kind+':'+id;
@@ -506,7 +509,11 @@ async function readScopedRelatedList({db,auth,request}){
    }
    const filtered=[];
    while(filtered.length<=pageSize){
-     const ss=await ordered.limit(RAW_PAGE).get(),docs=Array.isArray(ss.docs)?ss.docs:[];
+     // At the exact scan boundary, probe one row only to distinguish EOF
+     // from overflow. Do not reject a valid page merely because a larger
+     // raw batch would include documents beyond the existing 3000-row cap.
+     const scanLimit=Math.min(RAW_PAGE,MAX_SCANNED-scanned||1);
+     const ss=await ordered.limit(scanLimit).get(),docs=Array.isArray(ss.docs)?ss.docs:[];
      if(!docs.length)break;
      scanned+=docs.length;
      if(scanned>MAX_SCANNED)throw new Denied('FINANCIAL_SCAN_BOUND_EXCEEDED');
@@ -516,7 +523,7 @@ async function readScopedRelatedList({db,auth,request}){
        filtered.push(...batch.filter(Boolean));
        if(filtered.length>pageSize)break;
      }
-     if(filtered.length>pageSize||docs.length<RAW_PAGE)break;
+     if(filtered.length>pageSize||docs.length<scanLimit)break;
      ordered=target.orderBy('__name__').startAfter(docs[docs.length-1]);
    }
    const rows=filtered.slice(0,pageSize);

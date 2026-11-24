@@ -137,3 +137,4 @@ const denied=async(fn,code)=>{let x;try{await fn()}catch(e){x=e}assert.equal(x&&
  }
  console.log('B4_003_OPS_LEADS_CANONICAL_HUMAN_ACTOR_SOURCE_QA_PASS checks='+checks+' synthetic_only_no_writes');
 })().catch(e=>{console.error(e);process.exitCode=1;});
+

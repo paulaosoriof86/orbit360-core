@@ -2,6 +2,7 @@
 # Manual read-only inventory of existing GCP Secret Manager/Functions/Cloud Run.
 # Metadata job: no payload access. Config job: exact existing secret validation in memory,
 # plus bounded projected mailbox-owner identity reads and provider metadata GETs. No job sends, writes or deploys.
+# Runtime refresh also reads exact ingress configuration and function preimages without writes.
 name: Gravicentra I6.6 GreenAPI Secure Readiness
 
 on:

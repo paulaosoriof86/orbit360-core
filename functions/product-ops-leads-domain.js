@@ -7,6 +7,7 @@ const { HttpsError, onCall } = require('firebase-functions/v2/https');
 const { onSchedule } = require('firebase-functions/v2/scheduler');
 const { resolveProductActiveRole } = require('./product-active-role-contract');
 
+const INGRESS_CAPABILITY = Symbol('canonical-lead-ingress');
 const REGION = process.env.ORBIT360_FUNCTIONS_REGION || 'us-central1';
 const PREVIEW_REGION = 'us-east1';
 const VERSION = 'orbit360-ops-leads-product-domain-v13-management-collaboration';
@@ -101,6 +102,7 @@ function scope(m,domain,activeRole,accessConfig){
  return'all'; // Legacy unspecified operational scope; preserve existing contract.
 }
 function advisorAllowed(m,target,domain,activeRole,accessConfig){
+ if(m&&m[INGRESS_CAPABILITY]===true)return domain==='leads'&&activeRole==='integration'&&!text(target,180);
  const sc=scope(m,domain,activeRole,accessConfig),own=text(m.advisorId||m.asesorId,180),t=text(target,180);
  if(sc==='none')return false;
  if(sc==='own')return!!own&&own===t;
@@ -216,7 +218,7 @@ function copyWorkflowManagementFields(target,input,before){
   if(wt==='endorsement_request')copyAllowed(target,input,ENDORSEMENT_MUTABLE_FIELDS);
   return target;
 }
-function sanitizeBusiness(input,actor){const out={id:id(input.id||`neg_${Date.now().toString(36)}`,'businessId'),nombre:text(input.nombre||input.name,220),tipo:text(input.tipo||input.type,80),email:text(input.email||input.correo,320),telefono:text(input.telefono||input.phone,100),etapa:norm(input.etapa||input.stage||'nuevo'),asesorId:id(input.asesorId||input.advisorId||actor.advisorId,'advisorId'),clienteId:text(input.clienteId||input.clientId,180),pais:text(input.pais||input.country,8).toUpperCase(),moneda:text(input.moneda||input.currency,8).toUpperCase(),canal:text(input.canal||input.channel,100),piezaOrigen:text(input.piezaOrigen,120),producto:text(input.producto||input.product,180),ramo:text(input.ramo||input.line,140),aseguradoraId:text(input.aseguradoraId||input.insurerId,180),primaEst:Number(input.primaEst||input.estimatedPremium||0),prioridad:text(input.prioridad||input.priority||'Media',40),origen:text(input.origen||input.origin||'Plataforma',100),archivado:false};copyAllowed(out,input,BUSINESS_CREATE_EXTRA_FIELDS);return out;}
+function sanitizeBusiness(input,actor,capability){const out={id:id(input.id||`neg_${Date.now().toString(36)}`,'businessId'),nombre:text(input.nombre||input.name,220),tipo:text(input.tipo||input.type,80),email:text(input.email||input.correo,320),telefono:text(input.telefono||input.phone,100),etapa:norm(input.etapa||input.stage||'nuevo'),asesorId:capability===INGRESS_CAPABILITY?'':id(input.asesorId||input.advisorId||actor.advisorId,'advisorId'),clienteId:text(input.clienteId||input.clientId,180),pais:text(input.pais||input.country,8).toUpperCase(),moneda:text(input.moneda||input.currency,8).toUpperCase(),canal:text(input.canal||input.channel,100),piezaOrigen:text(input.piezaOrigen,120),producto:text(input.producto||input.product,180),ramo:text(input.ramo||input.line,140),aseguradoraId:text(input.aseguradoraId||input.insurerId,180),primaEst:Number(input.primaEst||input.estimatedPremium||0),prioridad:text(input.prioridad||input.priority||'Media',40),origen:text(input.origen||input.origin||'Plataforma',100),archivado:false};copyAllowed(out,input,BUSINESS_CREATE_EXTRA_FIELDS);return out;}
 function canonicalizeCreationAudit(business,actor){
  const name=humanActorName(actor&&actor.name)||'Usuario del equipo';
  business.bitacora=[{ts:new Date().toISOString(),user:name,actorUid:text(actor&&actor.uid,180),actorName:name,campo:'Creación',de:'',a:'Ingreso ('+(norm(business.origen)==='ops'?'Ops':'Leads')+')',origen:'manual'}];
@@ -303,7 +305,7 @@ async function validateEndorsementMutation(tx,{tenantId,authz,operation,entityId
     throw new HttpsError('failed-precondition','ENDOSO_CANNOT_RESOLVE_BEFORE_APPLICATION');
 }
 
-async function execute(request,previewOnly=false){const d=request.data||{},operation=norm(d.operation);if(!OPERATIONS.has(operation))throw new HttpsError('invalid-argument','Operación no soportada.');const authz=await authorize(request,operation),cfg=await config(authz.tenantId),motivo=reason(d);let payload=d.payload&&typeof d.payload==='object'?d.payload:{};const isBusiness=operation.includes('business'),entityType=isBusiness?'negocios':'gestiones';let entityId=text(d.entityId||payload.id,180),prepared=null;
+async function execute(request,previewOnly=false,ingressContext=null){const d=request.data||{},operation=norm(d.operation);if(!OPERATIONS.has(operation))throw new HttpsError('invalid-argument','Operación no soportada.');const authz=ingressContext?ingressContext.authz:await authorize(request,operation),cfg=await config(authz.tenantId),motivo=reason(d);let payload=d.payload&&typeof d.payload==='object'?d.payload:{};const isBusiness=operation.includes('business'),entityType=isBusiness?'negocios':'gestiones';let entityId=text(d.entityId||payload.id,180),prepared=null;
 // The Preview endpoint shares the Firebase tenant but must never create a
 // business-looking record, link a real client/policy, or emit a real policy.
 // In LIVE this entire guard is inactive: signed operators retain normal CRUD.
@@ -321,8 +323,28 @@ if(entityId===metaQaId||text(payload.id,180)===metaQaId){
  if(previewOnly!==true||authz.tenantId!=='alianzas-soluciones'||entityId!==metaQaId||(payload.id&&text(payload.id,180)!==metaQaId))throw new HttpsError('permission-denied','META_TR_QA_PREVIEW_ONLY: ID y tenant deben coincidir en la función Preview.');
  if(operation==='create_business'&&(text(payload.piezaOrigen,120)!=='F02-V27-QA'||text(payload.canal,100)!=='Facebook'||text(payload.origen,100)!=='Leads'||norm(payload.etapa)!=='nuevo'||text(payload.pais,8).toUpperCase()!=='GT'||text(payload.email||payload.correo,320)||text(payload.telefono||payload.phone,100)))throw new HttpsError('permission-denied','META_TR_QA_PREVIEW_ONLY: se requiere el caso sintético exacto sin datos reales.');
 }
-if(operation==='create_business')prepared=canonicalizeCreationAudit(sanitizeBusiness(payload,authz.actor),authz.actor);if(operation==='create_management'||operation==='portal_request')prepared=sanitizeManagement(payload,authz.actor);if(prepared&&entityType==='gestiones')prepared=await enrichManagementContext(authz.tenantId,prepared);if(prepared)entityId=prepared.id;entityId=id(entityId,isBusiness?'businessId':'managementId');const entity=dataRef(authz.tenantId,entityType,entityId);if(previewOnly===true&&!['create_management','create_business','portal_request'].includes(operation)){const ps=await entity.get(),pr=ps.exists?ps.data():null;if(!pr||pr.previewWrite!==true)throw new HttpsError('permission-denied','PREVIEW_TEST_RECORD_ONLY: en Preview solo se modifican gestiones/negocios creados durante la prueba.');}const rid=requestId(authz.tenantId,operation,entityId,payload,d.requestId),req=requestRef(authz.tenantId,rid,previewOnly),eventId=`evt_${sha(`${authz.tenantId}|${rid}`).slice(0,28)}`;
-const committed=await db.runTransaction(async tx=>{const priorReq=await tx.get(req);if(priorReq.exists&&priorReq.data().status==='committed')return Object.assign({reused:true},priorReq.data().result||{});const snap=await tx.get(entity),before=snap.exists?snap.data():null;if(prepared&&before)throw new HttpsError('already-exists','El registro ya existe.');if(!prepared&&!before)throw new HttpsError('not-found','El registro no existe.');let after=prepared?Object.assign({},prepared):Object.assign({},before);if(operation==='update_business'||operation==='update_management')payload=canonicalizeCollaborationPayload(before,payload,authz.actor);const authorizationDomain=workflowAuthorizationDomain(authz,operation,entityType,before,payload,cfg);assertRecordCountryScope(authz.member,before,after);
+if(operation==='create_business')prepared=canonicalizeCreationAudit(sanitizeBusiness(payload,authz.actor,ingressContext&&ingressContext.capability),authz.actor);if(operation==='create_management'||operation==='portal_request')prepared=sanitizeManagement(payload,authz.actor);if(prepared&&entityType==='gestiones')prepared=await enrichManagementContext(authz.tenantId,prepared);if(prepared&&ingressContext){prepared.ingressProvenance=ingressContext.provenance;prepared.assignmentState='pending_operations';prepared.__syntheticQa=previewOnly===true;prepared.bitacora[0].origen='make_ad_ingress';}
+if(prepared)entityId=prepared.id;entityId=id(entityId,isBusiness?'businessId':'managementId');const entity=dataRef(authz.tenantId,entityType,entityId);if(previewOnly===true&&!['create_management','create_business','portal_request'].includes(operation)){const ps=await entity.get(),pr=ps.exists?ps.data():null;if(!pr||pr.previewWrite!==true)throw new HttpsError('permission-denied','PREVIEW_TEST_RECORD_ONLY: en Preview solo se modifican gestiones/negocios creados durante la prueba.');}const rid=requestId(authz.tenantId,operation,entityId,payload,d.requestId),req=requestRef(authz.tenantId,rid,previewOnly),eventId=`evt_${sha(`${authz.tenantId}|${rid}`).slice(0,28)}`;
+const ingressSupport=ingressContext?require('./product-lead-ingress-owner-support'):null;
+const committed=await db.runTransaction(async tx=>{
+const ingressFresh=ingressContext?await ingressSupport.fresh(tx,{db,dataRef,ctx:ingressContext}):null;
+const priorReq=await tx.get(req);
+if(priorReq.exists&&priorReq.data().status==='committed'){
+ if(ingressContext){const current=await tx.get(entity);return ingressSupport.replayExisting(priorReq.data(),current.exists?current.data():null,ingressFresh,ingressContext);}
+ return Object.assign({reused:true},priorReq.data().result||{});
+}
+const snap=await tx.get(entity),before=snap.exists?snap.data():null;
+if(prepared&&before){
+ if(ingressContext){
+  const result={ok:true,operation,entityType,entityId,requestId:rid,eventId,previewWrite:previewOnly===true,
+   storageMode:'productCanonicalDataV1',writePath:'tenants/{tenant}/data/{collection}/items',
+   ingressIdentityKey:ingressContext.identityKey,ingressMessageKey:ingressContext.messageKey};
+  return ingressSupport.attachMessage(tx,{db,ctx:ingressContext,before,freshState:ingressFresh,req,
+   event:eventRef(authz.tenantId,eventId,previewOnly),result,now});
+ }
+ throw new HttpsError('already-exists','El registro ya existe.');
+}
+if(ingressContext&&ingressFresh.message)throw new HttpsError('failed-precondition','INGRESS_MESSAGE_WITHOUT_CANONICAL_LEAD');if(!prepared&&!before)throw new HttpsError('not-found','El registro no existe.');let after=prepared?Object.assign({},prepared):Object.assign({},before);if(operation==='update_business'||operation==='update_management')payload=canonicalizeCollaborationPayload(before,payload,authz.actor);const authorizationDomain=workflowAuthorizationDomain(authz,operation,entityType,before,payload,cfg);assertRecordCountryScope(authz.member,before,after);
 if(!workflowRoleModuleAllowed(authz,authorizationDomain,after))throw new HttpsError('permission-denied','El rol activo no puede escribir en este módulo o país.');
 if(!advisorAllowed(authz.member,after.asesorId||payload.asesorId||payload.advisorId,authorizationDomain,authz.actor.activeRole,authz.accessConfig))throw new HttpsError('permission-denied','El asesor está fuera de su alcance activo.');
 if(prepared&&entityType==='gestiones'&&text(after.reclamoId,180)){
@@ -457,10 +479,13 @@ if(['create_management','portal_request'].includes(operation)&&after.clienteId&&
     operationId:rid
   },{merge:false});
 }
-tx.set(entity,after,{merge:true});tx.set(eventRef(authz.tenantId,eventId,previewOnly),{schemaVersion:VERSION,tenantId:authz.tenantId,operation,entityType,entityId:entityId,requestId:rid,actor:authz.actor,reason:motivo,beforeDigest:before?digest(before):'',afterDigest:digest(after),previewWrite:previewOnly===true,createdAt:now()},{merge:false});const comments=[].concat(after.comentarios||[]),collab=comments.length?comments[comments.length-1]:null;let collabDirection=entityType==='negocios'?collaborationWriteDirection(before,after):'';if(entityType==='gestiones'&&operation==='update_management')collabDirection=collaborationWriteDirection(before,after);const targets=[];
+tx.set(entity,after,{merge:true});tx.set(eventRef(authz.tenantId,eventId,previewOnly),{schemaVersion:VERSION,tenantId:authz.tenantId,operation,entityType,entityId:entityId,requestId:rid,actor:authz.actor,reason:motivo,beforeDigest:before?digest(before):'',afterDigest:digest(after),previewWrite:previewOnly===true,createdAt:now()},{merge:false});const comments=[].concat(after.comentarios||[]),collab=comments.length?comments[comments.length-1]:null;let collabDirection=entityType==='negocios'?collaborationWriteDirection(before,after):'';if(entityType==='gestiones'&&operation==='update_management')collabDirection=collaborationWriteDirection(before,after);const targets=[];if(ingressContext)targets.push({type:'role',id:'operations'});
     if(collabDirection==='advisor'&&after.asesorId)targets.push({type:'advisor',id:after.asesorId});
     else if(collabDirection==='operations')targets.push({type:'role',id:'operations'});
-    else if(after.asesorId&&operation!=='hide_management_card')targets.push({type:'advisor',id:after.asesorId});const portalManagement=entityType==='gestiones'&&(operation==='portal_request'||['solicitud_del_cliente','portal_del_cliente'].includes(norm(after.origen)));if(entityType==='gestiones'&&!portalManagement&&operation!=='hide_management_card'&&!targets.some(t=>t.type==='role'&&t.id==='operations'))targets.push({type:'role',id:'operations'});if(cfg.portalResponseEnabled&&portalManagement&&after.clienteId&&['resolve_management','create_management','portal_request','assign_management'].includes(operation))targets.push({type:'client',id:after.clienteId});if(targets.length)tx.set(outboxRef(authz.tenantId,eventId,previewOnly),{schemaVersion:VERSION,tenantId:authz.tenantId,eventId:collabDirection&&collab&&collab.eventId?text(collab.eventId,180):eventId,operation,entityType,entityId,targets,channels:cfg.notificationChannels,status:'pending_provider',previewWrite:previewOnly===true,actorUid:authz.actor.uid,actorName:authz.actor.name,direction:collabDirection,targetSurface:collabDirection==='advisor'?'leads':collabDirection==='operations'?'ops':'',payload:{title:text(payload.notificationTitle||(collabDirection?(text(collab&&collab.tipo,160)||'Colaboración comercial-operativa'):(after.titulo||after.nombre||'Actualización')),220),message:text(payload.notificationMessage||(collabDirection?(text(collab&&collab.texto,1200)||text(collab&&collab.txt,1200)||motivo):motivo),1200)},createdAt:now()},{merge:false});const result={ok:true,operation,entityType,entityId,requestId:rid,eventId,previewWrite:previewOnly===true,notificationSuppressed:operation==='hide_management_card',notificationPreview:previewOnly===true,storageMode:'productCanonicalDataV1',writePath:'tenants/{tenant}/data/{collection}/items',projection:{leadsVisible:entityType==='negocios'?!!(cfg.stages[after.etapa]&&cfg.stages[after.etapa].leads):false,opsVisible:entityType==='gestiones'?!after.archivado&&!after.opsBoardHidden:!!(cfg.stages[after.etapa]&&cfg.stages[after.etapa].ops),advisorVisible:!!after.asesorId,clientId:text(after.clienteIdCreado||after.clienteId),policyId:text(after.polizaId),vehicleId:text(after.vehiculoId)}};tx.set(req,{status:'committed',operation,entityType,entityId,eventId,result,committedAt:now()},{merge:true});return result;});const confirmed=await entity.get();if(!confirmed.exists)throw new HttpsError('internal','Canonical workflow readback missing.');const confirmedRow=confirmed.data()||{};const readAction=(operation==='create_management'||operation==='create_business'||operation==='portal_request')?'insert':'update';const response={canonicalReadback:true,canonicalReadbackCount:1,readback:[{collection:entityType,id:entityId,action:readAction,exists:true}],collaborationReadback:[].concat(confirmedRow.comentarios||[]).slice(-1)[0]||null};
+    else if(after.asesorId&&operation!=='hide_management_card')targets.push({type:'advisor',id:after.asesorId});const portalManagement=entityType==='gestiones'&&(operation==='portal_request'||['solicitud_del_cliente','portal_del_cliente'].includes(norm(after.origen)));if(entityType==='gestiones'&&!portalManagement&&operation!=='hide_management_card'&&!targets.some(t=>t.type==='role'&&t.id==='operations'))targets.push({type:'role',id:'operations'});if(cfg.portalResponseEnabled&&portalManagement&&after.clienteId&&['resolve_management','create_management','portal_request','assign_management'].includes(operation))targets.push({type:'client',id:after.clienteId});if(targets.length)tx.set(outboxRef(authz.tenantId,eventId,previewOnly),{schemaVersion:VERSION,tenantId:authz.tenantId,eventId:collabDirection&&collab&&collab.eventId?text(collab.eventId,180):eventId,operation,entityType,entityId,targets,channels:ingressContext?['in_app','topbar']:cfg.notificationChannels,status:'pending_provider',previewWrite:previewOnly===true,actorUid:authz.actor.uid,actorName:authz.actor.name,direction:collabDirection,targetSurface:collabDirection==='advisor'?'leads':collabDirection==='operations'?'ops':'',payload:{title:text(payload.notificationTitle||(collabDirection?(text(collab&&collab.tipo,160)||'Colaboración comercial-operativa'):(after.titulo||after.nombre||'Actualización')),220),message:text(payload.notificationMessage||(collabDirection?(text(collab&&collab.texto,1200)||text(collab&&collab.txt,1200)||motivo):motivo),1200)},createdAt:now()},{merge:false});const result={ok:true,operation,entityType,entityId,requestId:rid,eventId,previewWrite:previewOnly===true,notificationSuppressed:operation==='hide_management_card',notificationPreview:previewOnly===true,storageMode:'productCanonicalDataV1',writePath:'tenants/{tenant}/data/{collection}/items',projection:{leadsVisible:entityType==='negocios'?!!(cfg.stages[after.etapa]&&cfg.stages[after.etapa].leads):false,opsVisible:entityType==='gestiones'?!after.archivado&&!after.opsBoardHidden:!!(cfg.stages[after.etapa]&&cfg.stages[after.etapa].ops),advisorVisible:!!after.asesorId,clientId:text(after.clienteIdCreado||after.clienteId),policyId:text(after.polizaId),vehicleId:text(after.vehiculoId)}};if(ingressContext){Object.assign(result,{ingressIdentityKey:ingressContext.identityKey,ingressMessageKey:ingressContext.messageKey,canonicalLeadWrites:1,canonicalAuditWrites:4});ingressSupport.recordNew(tx,{db,ctx:ingressContext,result,now});}
+tx.set(req,{status:'committed',operation,entityType,entityId,eventId,result,committedAt:now()},{merge:true});return result;});
+if(ingressContext)ingressContext.commitOutcome=committed;
+const confirmed=await entity.get();if(!confirmed.exists)throw new HttpsError('internal','Canonical workflow readback missing.');const confirmedRow=confirmed.data()||{};const readAction=(operation==='create_management'||operation==='create_business'||operation==='portal_request')?'insert':'update';const response={canonicalReadback:true,canonicalReadbackCount:1,readback:[{collection:entityType,id:entityId,action:readAction,exists:true}],collaborationReadback:[].concat(confirmedRow.comentarios||[]).slice(-1)[0]||null};
 if(['create_management','portal_request'].includes(operation)&&confirmedRow.clienteId&&confirmedRow.workflowType!=='endorsement_request'){
   const activityId=text(confirmedRow.actividadCliente360Id,180);
   const activitySnap=activityId?await dataRef(authz.tenantId,'actividades',activityId).get():null;
@@ -487,7 +512,28 @@ if(entityType==='gestiones'&&confirmedRow.workflowType==='endorsement_request'){
     referenciaAseguradora:confirmedRow.referenciaAseguradora||'',fechaEfectiva:confirmedRow.fechaEfectiva||'',
     policyUpdatedId:confirmedRow.policyUpdatedId||'',proposalDigest:digest(confirmedRow.propuestaCambios)};
 }
+if(ingressContext)response.ingressReadback=await ingressSupport.readback({db,dataRef,requestRef,eventRef,outboxRef,ctx:ingressContext,result:committed});
 return Object.assign({},committed,response);}
+
+
+// Internal entry only. Firebase callable data can never manufacture the local
+// Symbol capability or impersonate an assigned human. Provider verification and
+// the server-owned grant are mandatory before using this shared transaction.
+async function ingestVerifiedLead({event,packet,previewOnly=false,nowMs=Date.now()}){
+ const support=require('./product-lead-ingress-owner-support');
+ const ctx=await support.prepare({db,event,packet,previewOnly,nowMs});
+ ctx.capability=INGRESS_CAPABILITY;ctx.authz.member[INGRESS_CAPABILITY]=true;
+ try{
+  return await execute({data:{tenantId:ctx.authz.tenantId,operation:'create_business',entityId:ctx.businessId,
+   requestId:ctx.workflowRequestId,reason:'Ingreso autenticado de anuncio AyS; asignación pendiente de Operaciones',payload:ctx.payload}},previewOnly,ctx);
+ }catch(error){
+  // A failed post-commit read must never be represented as zero writes. The
+  // deterministic message ledger lets an eventual retry prove the result.
+  if(ctx.commitOutcome)error.ingressCommitOutcome={committed:true,entityId:ctx.businessId,
+   canonicalLeadWrites:ctx.commitOutcome.canonicalLeadWrites,canonicalAuditWrites:ctx.commitOutcome.canonicalAuditWrites};
+  throw error;
+ }
+}
 
 function localDate(){return new Intl.DateTimeFormat('en-CA',{timeZone:'America/Guatemala',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());}
 function plusDays(dateText,days){const d=new Date(String(dateText||localDate())+'T12:00:00Z');return new Date(d.getTime()+Number(days||0)*86400000).toISOString().slice(0,10);}
@@ -545,4 +591,4 @@ exports.orbit360OpsLeadsCommand=onCall({region:REGION,cors:true,timeoutSeconds:6
 exports.orbit360OpsLeadsCommandPreview=onCall({region:PREVIEW_REGION,cors:true,timeoutSeconds:60,memory:'256MiB'},request=>execute(request,true));
 exports.orbit360RunOpsLeadsCadencePreview=onCall({region:PREVIEW_REGION,cors:true,timeoutSeconds:60,memory:'256MiB'},cadencePreview);
 exports.orbit360OpsLeadsCadenceScheduler=onSchedule({region:REGION,schedule:'every 60 minutes',timeZone:'America/Guatemala',timeoutSeconds:300,memory:'256MiB'},cadenceSweep);
-exports.__opsLeadsProductDomain=Object.freeze({VERSION,DEFAULT_STAGES,OPERATIONS,storageMode:'productCanonicalDataV1',authorize,advisorAllowed,dataRef,text,runCadenceBusiness,cadenceSweep});
+exports.__opsLeadsProductDomain=Object.freeze({VERSION,DEFAULT_STAGES,OPERATIONS,storageMode:'productCanonicalDataV1',authorize,advisorAllowed,dataRef,text,runCadenceBusiness,cadenceSweep,ingestVerifiedLead});

@@ -21,10 +21,12 @@ jobs:
     timeout-minutes: 5
     outputs:
       authorized: ${{ steps.phase.outputs.authorized }}
+      make_ingress: ${{ steps.phase.outputs.make_ingress }}
+      configuration_operation: ${{ steps.phase.outputs.configuration_operation }}
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 1
+          fetch-depth: 2
           persist-credentials: false
       - name: Read canonical LIVE phase without credentials or mutations
         id: phase
@@ -33,19 +35,31 @@ jobs:
           node - <<'NODE'
           const fs=require('node:fs');
           const c=JSON.parse(fs.readFileSync('artifacts/orbit360-recovery/release-control/I6_6_RELEASE_TRANSPORT_CONTROL_20261110.json','utf8'));
-          const authorized=c.status==='OPERATIONAL_EXACT_LIVE_PROMOTION_AUTHORIZED';
+          let authorized=c.status==='OPERATIONAL_EXACT_LIVE_PROMOTION_AUTHORIZED';
+          const p=c.operationalReleaseCandidate||c.lastConsumedOperationalCandidate,makeIngress=p?.makeIngressComposite===true;
+          const before=process.env.GITHUB_EVENT_NAME==='push'?JSON.parse(require('node:child_process').execFileSync('git',['show',
+            'HEAD^:artifacts/orbit360-recovery/release-control/I6_6_RELEASE_TRANSPORT_CONTROL_20261110.json'],{encoding:'utf8'})):null;
+          if(authorized&&makeIngress&&before)authorized=JSON.stringify(before.operationalReleaseCandidate)!==JSON.stringify(p);
+          const op=c.makeIngressProtectedOperation;
+          const configurationOperation=Boolean(makeIngress&&c.status==='OPERATIONAL_EXACT_LIVE_ACCEPTED_LOCKED'&&
+            !c.operationalReleaseCandidate&&!c.scopedBackendPreviewI66&&op?.phase==='live'&&op.sourceSha===p.sourceSha&&
+            (!before||JSON.stringify(before.makeIngressProtectedOperation)!==JSON.stringify(op)));
+          if(configurationOperation)require('./tools/gravicentra-i66-make-lead-protected-executor.cjs').requireOperation(op,p,'live');
           fs.appendFileSync(process.env.GITHUB_OUTPUT,'authorized='+String(authorized)+'\n');
+          fs.appendFileSync(process.env.GITHUB_OUTPUT,'make_ingress='+String(makeIngress)+'\n');
+          fs.appendFileSync(process.env.GITHUB_OUTPUT,'configuration_operation='+String(configurationOperation)+'\n');
           console.log(authorized?'I66_OPERATIONAL_LIVE_PHASE_READY_FOR_STRICT_GATES':'I66_OPERATIONAL_LIVE_PHASE_NOOP');
           NODE
   exact-role-live:
     needs: phase
     if: github.repository == 'paulaosoriof86/orbit360-core' && github.ref == 'refs/heads/recovery/fase-a-clean-20260831' && needs.phase.outputs.authorized == 'true'
     runs-on: ubuntu-24.04
-    timeout-minutes: 65
+    timeout-minutes: ${{ needs.phase.outputs.make_ingress == 'true' && 85 || 65 }}
     permissions:
       contents: write
       actions: read
     env:
+      I66_MAKE_INGRESS: ${{ needs.phase.outputs.make_ingress }}
       PROJECT_ID: ays-orbit-360-lab
       SITE: ays-orbit-360-lab
       GH_TOKEN: ${{ github.token }}
@@ -68,6 +82,7 @@ jobs:
           node --test tools/gravicentra-i66-composite-acceptance.test.cjs tools/gravicentra-i66-frontend-control.test.cjs tools/gravicentra-i66-frontend-promotion-transaction.test.cjs
           node tools/gravicentra-i6-6-direction-preview-legal-acceptance.cjs --preflight-live-authority
           node --test tools/gravicentra-i6-6-operational-release-candidate.test.cjs
+          if test "$I66_MAKE_INGRESS" = true;then node --test tools/gravicentra-i6-6-make-lead-ingress-release.test.cjs tools/gravicentra-i6-6-financial-page-read-efficiency.test.cjs;fi
           node --test tools/gravicentra-i6-6-preview-candidate-binding.test.cjs
           node --test tools/gravicentra-i6-6-direction-preview-i66-consent-scope.test.cjs
           node --test tools/gravicentra-i6-6-direction-live-legal-acceptance.test.cjs
@@ -140,6 +155,9 @@ jobs:
             ['backend/i66-conciliaciones-active-ledger-projection.js','functions/i66-conciliaciones-active-ledger-projection.js'],
             ['site/core/access-scope.js','orbit360-platform/core/access-scope.js']
           ])assert.ok(fs.readFileSync(p+'/'+target).equals(execFileSync('git',['show',process.env.I66_ROLE_SOURCE_SHA+':'+source])),'I66_ROLE_PRODUCT_OWNER_BYTES_DIFFER:'+source);
+          if(process.env.I66_MAKE_INGRESS==='true')for(const file of require('./tools/gravicentra-i66-make-release-scope.cjs').SOURCE_PATHS)
+            assert.ok(fs.readFileSync(p+'/backend/'+file.slice(10)).equals(execFileSync('git',['show',process.env.I66_ROLE_SOURCE_SHA+':'+file])),
+              'I66_MAKE_PRODUCT_OWNER_BYTES_DIFFER:'+file);
           assert.ok(fs.existsSync(p+'/backend/bootstrap.js')&&fs.existsSync(p+'/backend/package-lock.json'));
           console.log('I66_ROLE_ORIGINAL_PREVIEW_ARTIFACT_EXACT_BACKEND_AND_FRONTEND_BYTES_PASS');
           NODE
@@ -179,6 +197,9 @@ jobs:
       - uses: google-github-actions/setup-gcloud@v2
         with:
           version: '>= 483.0.0'
+      - name: Verify exact financial Preview report and read-only authority before five-target LIVE deployment
+        if: env.I66_MAKE_INGRESS == 'true'
+        run: node tools/gravicentra-i66-frontend-promotion-owner.cjs --verify-composite-financial-preview
       - name: Test signed existing Carlos and Direction Preview eight-module permissions before touching LIVE
         run: |
           set -euo pipefail
@@ -195,7 +216,9 @@ jobs:
           const id=x=>String(x.entryPoint||x.id||x.name||'').split('/').pop();
           const g=require('./tools/gravicentra-i6-6-operational-release-candidate.cjs');
           const p=g.candidateForPhase(JSON.parse(require('node:fs').readFileSync(g.CONTROL,'utf8')),'live');
+          if(p.makeIngressComposite===true)require('./tools/gravicentra-i66-make-release-scope.cjs').validateInventoryBefore(p,'live',a,g.targetsForCandidate(p,'live'));
           for(const {name,region} of g.targetsForCandidate(p,'live')){
+            if(p.makeIngressComposite===true&&name==='orbit360MakeLeadIngress'&&p.makeIngress.targetBefore.live.state==='ABSENT')continue;
             const match=rows.filter(x=>id(x)===name);assert.equal(match.length,1,'I66_ROLE_EXISTING_LIVE_TARGET_NOT_UNIQUE_'+name);
             assert.equal(String(match[0].region||match[0].location||''),region,'I66_ROLE_LIVE_TARGET_REGION_DRIFT');
           }
@@ -209,7 +232,10 @@ jobs:
           LIVE_TARGETS
           )"
           PAIRS='orbit360ProductOperationalCommand:us-central1 orbit360CobrosReconciliationCommand:us-central1 orbit360ScopedPolicyRead:us-east1'
-          if test "$LIVE_TARGET_COUNT" -eq 4;then
+          if test "$LIVE_TARGET_COUNT" -eq 5;then
+            PAIRS="$PAIRS orbit360OpsLeadsCommand:us-central1 orbit360MakeLeadIngress:us-central1"
+            node tools/gravicentra-i66-make-lead-protected-executor.cjs snapshot-trigger live
+          elif test "$LIVE_TARGET_COUNT" -eq 4;then
             PAIRS="$PAIRS orbit360OpsLeadsCommand:us-central1"
           elif test "$LIVE_TARGET_COUNT" -ne 3;then
             echo 'I66_LIVE_AUTHORIZED_TARGET_COUNT_INVALID' >&2
@@ -217,6 +243,10 @@ jobs:
           fi
           for PAIR in $PAIRS;do
             FN="${PAIR%:*}";REGION="${PAIR#*:}";export FN REGION
+            if test "$FN" = orbit360MakeLeadIngress && test "$I66_MAKE_TRIGGER_PREVIOUS_STATE" = ABSENT;then
+              printf '%s|%s|-|ABSENT\n' "$FN" "$REGION" >> "$RUNNER_TEMP/gi-role-live-old-revisions.tsv"
+              continue
+            fi
             gcloud functions describe "$FN" --gen2 --region "$REGION" --project "$PROJECT_ID" --format=json > "$RUNNER_TEMP/gi-role-before-fn.json"
             SERVICE=$(node - <<'NODE'
           const f=require(process.env.RUNNER_TEMP+'/gi-role-before-fn.json');
@@ -270,7 +300,11 @@ jobs:
                 if test "$code" = 0;then code=1;fi
                 exit "$code"
               fi
+              if test "$I66_MAKE_INGRESS" = true;then
+                node tools/gravicentra-i66-make-lead-protected-executor.cjs rollback live || failed=1
+              fi
               while IFS='|' read -r FN REGION SERVICE OLD_REV;do
+                if test "$OLD_REV" = ABSENT;then continue;fi
                 gcloud run services update-traffic "$SERVICE" --region "$REGION" --project "$PROJECT_ID" --to-revisions="$OLD_REV=100" --quiet || failed=1
                 export OLD_REV
                 gcloud run services describe "$SERVICE" --region "$REGION" --project "$PROJECT_ID" --format=json > "$RUNNER_TEMP/gi-role-rollback-service.json" || failed=1
@@ -307,7 +341,15 @@ jobs:
           LIVE_DEPLOY_TARGETS
           )"
           started=1
-          if test "$LIVE_TARGET_COUNT" -eq 4;then
+          if test "$LIVE_TARGET_COUNT" -eq 5;then
+            node tools/gravicentra-i66-make-lead-protected-executor.cjs before-deploy live
+            node tools/gravicentra-i66-make-firebase-project-iam-guard.cjs "$FIREBASE_CLI_BIN" live deploy \
+            --only functions:orbit360ProductOperationalCommand,functions:orbit360CobrosReconciliationCommand,functions:orbit360ScopedPolicyRead,functions:orbit360OpsLeadsCommand,functions:orbit360MakeLeadIngress \
+            --config "$I66_LIVE_FIREBASE_CONFIG" --project "$PROJECT_ID" --non-interactive
+            node tools/gravicentra-i66-make-lead-protected-executor.cjs capture-trigger live
+            node tools/gravicentra-i66-make-lead-protected-executor.cjs initialize-closed live
+            node tools/gravicentra-i66-make-lead-protected-executor.cjs wait-probe live
+          elif test "$LIVE_TARGET_COUNT" -eq 4;then
             node "$FIREBASE_CLI_BIN" deploy \
             --only functions:orbit360ProductOperationalCommand,functions:orbit360CobrosReconciliationCommand,functions:orbit360ScopedPolicyRead,functions:orbit360OpsLeadsCommand \
             --config "$I66_LIVE_FIREBASE_CONFIG" --project "$PROJECT_ID" --non-interactive
@@ -320,6 +362,16 @@ jobs:
             exit 1
           fi
           while IFS='|' read -r FN REGION SERVICE OLD_REV;do
+            if test "$OLD_REV" = ABSENT;then
+              test "$FN" = orbit360MakeLeadIngress
+              SERVICE="$(node - <<'NEW_TRIGGER'
+          const r=require(process.env.RUNNER_TEMP+'/gi-make-live-capture-trigger.json');
+          const service=String(r.function.service||'').split('/').at(-1);
+          if(!/^[a-z][a-z0-9-]+$/.test(service))throw Error('I66_NEW_TRIGGER_SERVICE_REQUIRED');
+          process.stdout.write(service);
+          NEW_TRIGGER
+              )"
+            fi
             gcloud run services update-traffic "$SERVICE" --region "$REGION" --project "$PROJECT_ID" --to-latest --quiet
             export FN REGION SERVICE OLD_REV
             gcloud functions describe "$FN" --gen2 --region "$REGION" --project "$PROJECT_ID" --format=json > "$RUNNER_TEMP/gi-role-after-fn.json"
@@ -335,7 +387,9 @@ jobs:
           const revisions=JSON.parse(fs.readFileSync(file,'utf8'));
           if(revisions.some(row=>row.name===process.env.FN))throw Error('I66_ROLE_DUPLICATE_REVISION_RECEIPT');
           revisions.push({name:process.env.FN,region:process.env.REGION,service:process.env.SERVICE,
-            previousRevision:process.env.OLD_REV,currentRevision:newRev,trafficPercent:100,ready:true});
+            previousRevision:process.env.OLD_REV==='ABSENT'?null:process.env.OLD_REV,currentRevision:newRev,trafficPercent:100,ready:true,
+            ...(process.env.FN==='orbit360MakeLeadIngress'?{previousState:process.env.OLD_REV==='ABSENT'?'ABSENT':'EXISTING_APPROVED',
+              rollbackAction:process.env.OLD_REV==='ABSENT'?'DELETE_EXACT_CREATED_FUNCTION':'RESTORE_EXACT_PREVIOUS_REVISION'}:{})});
           fs.writeFileSync(file,JSON.stringify(revisions,null,2)+'\n');
           console.log('I66_ROLE_NEW_LIVE_FUNCTION_EFFECTIVE_100_PERCENT_PASS '+process.env.FN);
           NODE
@@ -352,10 +406,11 @@ jobs:
           const after=require(process.env.RUNNER_TEMP+'/gi-role-live-functions-after.json');
           const rows=x=>Array.isArray(x.result)?x.result:Array.isArray(x)?x:[];
           const id=x=>String(x.entryPoint||x.id||x.name||'').split('/').pop();
-          assert.deepEqual(rows(before).map(id).sort(),rows(after).map(id).sort(),'I66_ROLE_NON_TARGET_FUNCTION_INVENTORY_CHANGED');
           const g=require('./tools/gravicentra-i6-6-operational-release-candidate.cjs');
           const p=g.candidateForPhase(JSON.parse(require('node:fs').readFileSync(g.CONTROL,'utf8')),'live');
           const expected=g.targetsForCandidate(p,'live');
+          if(p.makeIngressComposite===true)require('./tools/gravicentra-i66-make-release-scope.cjs').validateInventoryAfter(p,'live',before,after,expected);
+          else assert.deepEqual(rows(before).map(id).sort(),rows(after).map(id).sort(),'I66_ROLE_NON_TARGET_FUNCTION_INVENTORY_CHANGED');
           for(const {name,region} of expected){
             const found=rows(after).filter(r=>id(r)===name);
             assert.equal(found.length,1,'I66_LIVE_DEPLOYED_TARGET_NOT_UNIQUE_'+name);
@@ -378,7 +433,8 @@ jobs:
           if(p.liveSiteFiles!==candidate.expectedSiteFileCount||p.customSiteFiles!==candidate.expectedSiteFileCount||
              p.previewFiles!==candidate.expectedSiteFileCount||p.liveHostingVersion!==p.previewHostingVersion)
             throw Error('I66_OPERATIONAL_LIVE_PROOF_INCOMPLETE');
-          p.status=candidate.opsLeadsComposite===true?'SAME_ARTIFACT_FOUR_FUNCTIONS_SIGNED_LIVE_READBACK_RELOAD_RESTORE_PASS':
+          p.status=candidate.makeIngressComposite===true?require('./tools/gravicentra-i66-make-release-scope.cjs').LIVE_STATUS:
+            candidate.opsLeadsComposite===true?'SAME_ARTIFACT_FOUR_FUNCTIONS_SIGNED_LIVE_READBACK_RELOAD_RESTORE_PASS':
             'SAME_ARTIFACT_THREE_FUNCTIONS_SIGNED_LIVE_READBACK_RELOAD_RESTORE_PASS';
           p.signedDrivers=['privileged-role-permissions','carlos-paula-ops-leads','advisor-payables','proposal-application'];
           p.syntheticRestoreComplete=true;p.realFinancialOrCustomerWrites=0;
@@ -386,6 +442,13 @@ jobs:
           p.buildId=candidate.buildId;p.buildRunId=candidate.buildRunId;p.previewQa=candidate.previewQa;
           p.previousLive=candidate.currentLive;p.targets=g.targetsForCandidate(candidate,'live');
           p.backendRevisions=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/gi-role-effective-revisions.json','utf8'));
+          if(candidate.makeIngressComposite===true){
+            const secretIamReadback=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/gi-make-live-before-deploy.json'));
+            const preview=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/gi-i66-operational-preview-proof/i66-operational-preview-proof.json')).makeIngress;
+            p.makeIngress={status:'CLOSED_DEPLOYMENT_AUTH_CONTEXT_VERIFIED',active:false,a13RealLeadAccepted:false,
+              closedTrigger:JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/gi-make-live-closed-trigger.json')).closedTrigger,
+              preview,secretIamReadback,secretIamWrites:secretIamReadback.iamWrites,configurationWritesOutsideDataOnly:true,externalMessagesSent:0};
+          }
           p.sameImmutableArtifact=true;p.liveBackendSameArtifact=true;
           p.functionsInventoryUnchangedExceptTargets=true;p.rollbackSnapshotReady=true;
           p.fullI66ProductionAccepted=false;
@@ -398,7 +461,7 @@ jobs:
           g.validateLiveProof(candidate,p);
           fs.writeFileSync(path,JSON.stringify(p,null,2)+'\n');
           NODE
-          if test "$LIVE_TARGET_COUNT" -eq 4;then
+          if test "$LIVE_TARGET_COUNT" -ge 4;then
             node tools/gravicentra-i66-frontend-promotion-owner.cjs --accept-composite-live
           fi
           completed=1
@@ -413,5 +476,102 @@ jobs:
             ${{ runner.temp }}/i66-role-live-exact-proof.json
             ${{ runner.temp }}/gravicentra-i66-advisor-payables-signed-uat-live.json
             ${{ env.I66_PACKAGE_ROOT }}/evidence/i66-proposal-application-signed-uat-live.json
+            ${{ runner.temp }}/gi-make-live-*.json
+          retention-days: 30
+          if-no-files-found: warn
+  protected-make-configuration:
+    needs: phase
+    if: needs.phase.outputs.configuration_operation == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      PROJECT_ID: ays-orbit-360-lab
+      GH_TOKEN: ${{ github.token }}
+      SA_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_ALT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Require a COMMITTED exact artifact before any real ingress configuration
+        run: |
+          set -euo pipefail
+          node - <<'NODE'
+          const fs=require('node:fs'),assert=require('node:assert/strict'),{execFileSync}=require('node:child_process');
+          const g=require('./tools/gravicentra-i6-6-operational-release-candidate.cjs'),e=require('./tools/gravicentra-i66-make-lead-protected-executor.cjs');
+          const c=JSON.parse(fs.readFileSync(g.CONTROL)),p=e.resolveCandidate(c,'live',true);
+          e.requireOperation(c.makeIngressProtectedOperation,p,'live');
+          require('./tools/gravicentra-i66-make-release-scope.cjs').verifySourcePins(p);
+          assert.equal(execFileSync('git',['diff','--name-only',p.sourceSha,'HEAD','--',...g.PINNED_OWNER_PATHS],{encoding:'utf8'}).trim(),'');
+          const base='artifacts/orbit360-recovery/release-control/';
+          require('./tools/gravicentra-i66-frontend-control.cjs').physicalGuard(JSON.parse(fs.readFileSync(base+'CONTROL_PLANE.json')),
+            JSON.parse(fs.readFileSync('orbit360-platform/docs/recovery/orbit360-recovery-state-v1.json')),c,fs);
+          const api=async suffix=>{const r=await fetch('https://api.github.com/repos/paulaosoriof86/orbit360-core/actions/'+suffix,
+            {headers:{Authorization:'Bearer '+process.env.GH_TOKEN,Accept:'application/vnd.github+json'},signal:AbortSignal.timeout(30000)});
+            assert.ok(r.ok);return r.json();};
+          (async()=>{const[run,artifact]=await Promise.all([api('runs/'+p.buildRunId),api('artifacts/'+p.artifactId)]);
+            g.validateArtifact(p,run,artifact);
+            for(const[k,v]of Object.entries(g.envFor(p)))fs.appendFileSync(process.env.GITHUB_ENV,k+'='+v+'\n');
+            console.log('I66_MAKE_COMMITTED_ARTIFACT_CONFIGURATION_AUTHORITY_PASS');
+          })().catch(()=>{console.error('I66_MAKE_COMMITTED_CONFIGURATION_AUTHORITY_HOLD');process.exitCode=1;});
+          NODE
+      - uses: actions/download-artifact@v4
+        with:
+          artifact-ids: ${{ env.I66_ROLE_ARTIFACT_ID }}
+          run-id: ${{ env.I66_ROLE_BUILD_RUN }}
+          github-token: ${{ github.token }}
+          path: ${{ runner.temp }}/gi-i66-make-operation-artifact
+      - name: Reuse immutable backend SDK and verify every ingress source byte
+        run: |
+          set -euo pipefail
+          mapfile -t TARS < <(find "$RUNNER_TEMP/gi-i66-make-operation-artifact" -maxdepth 3 -type f -name gi-i66-exact-package.tar.gz)
+          mapfile -t SUMS < <(find "$RUNNER_TEMP/gi-i66-make-operation-artifact" -maxdepth 3 -type f -name gi-i66-exact-package.sha256)
+          test "${#TARS[@]}" -eq 1 && test "${#SUMS[@]}" -eq 1
+          test "$(dirname "${TARS[0]}")" = "$(dirname "${SUMS[0]}")"
+          test "$(sha256sum "${TARS[0]}" | awk '{print $1}')" = "$(awk '{print $1}' "${SUMS[0]}")"
+          export I66_PACKAGE_ROOT="$RUNNER_TEMP/gi-i66-make-operation-package"
+          mkdir -p "$I66_PACKAGE_ROOT"
+          tar -xzf "${TARS[0]}" -C "$I66_PACKAGE_ROOT" --no-same-owner
+          (cd "$I66_PACKAGE_ROOT/bundle/backend" && sha256sum --check --quiet "$I66_PACKAGE_ROOT/evidence/backend-manifest.sha256")
+          node - <<'NODE'
+          const fs=require('node:fs'),assert=require('node:assert/strict'),{execFileSync}=require('node:child_process');
+          const s=require('./tools/gravicentra-i66-make-release-scope.cjs');
+          for(const file of s.SOURCE_PATHS)assert.ok(fs.readFileSync(process.env.I66_PACKAGE_ROOT+'/bundle/backend/'+file.slice(10))
+            .equals(execFileSync('git',['show',process.env.I66_ROLE_SOURCE_SHA+':'+file])));
+          NODE
+          (cd "$I66_PACKAGE_ROOT/bundle/backend" && npm ci --ignore-scripts --no-audit --no-fund >/dev/null)
+          echo "I66_PACKAGE_ROOT=$I66_PACKAGE_ROOT" >> "$GITHUB_ENV"
+      - name: Select an existing authorized same-project credential without exposing it
+        run: |
+          set -euo pipefail
+          node - <<'NODE'
+          const fs=require('node:fs'),path=require('node:path'),{createRequire}=require('node:module');
+          const requireFrom=createRequire(path.join(process.env.I66_PACKAGE_ROOT,'bundle/backend/package.json'));
+          const {GoogleAuth}=requireFrom('google-auth-library');
+          const root=path.join(process.env.RUNNER_TEMP,'gi-make-operation-auth');fs.mkdirSync(root,{recursive:true,mode:0o700});
+          (async()=>{for(const [i,key]of ['SA_LAB','SA_ALT','SA_DEFAULT'].entries()){
+            let v;try{v=JSON.parse(process.env[key]||'');}catch{continue;}
+            if(v.type!=='service_account'||v.project_id!=='ays-orbit-360-lab'||!v.private_key)continue;
+            const file=path.join(root,i+'.json');fs.writeFileSync(file,JSON.stringify(v),{mode:0o600});
+            try{const auth=await new GoogleAuth({keyFilename:file,scopes:['https://www.googleapis.com/auth/cloud-platform']}).getClient();
+              await auth.request({url:'https://cloudfunctions.googleapis.com/v2/projects/ays-orbit-360-lab/locations/us-central1/functions/orbit360MakeLeadIngress',method:'GET'});
+              fs.appendFileSync(process.env.GITHUB_ENV,'GOOGLE_APPLICATION_CREDENTIALS='+file+'\n');
+              console.log('I66_MAKE_EXISTING_PROJECT_CREDENTIAL_SELECTED');return;
+            }catch{/* Try only the configured same-project credentials; never log provider errors. */}
+          }throw Error();})().catch(()=>{console.error('I66_MAKE_EXISTING_PROJECT_CREDENTIAL_UNAVAILABLE');process.exitCode=1;});
+          NODE
+      - name: Execute only the exact authorized CAS or canonical readback operation
+        run: node tools/gravicentra-i66-make-lead-protected-executor.cjs operate live
+      - name: Preserve safe configuration and real ingress readback
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gi-i66-make-live-configuration-${{ github.run_id }}
+          path: ${{ runner.temp }}/gi-make-live-operate.json
           retention-days: 30
           if-no-files-found: warn

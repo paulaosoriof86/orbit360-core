@@ -17,5 +17,6 @@ module.exports = Object.assign(
   require('./index'),
   require('./bank-accounts'),
   require('./document-drive-domain'),
-  require('./greenapi-firebase-bridge')
+  require('./greenapi-firebase-bridge'),
+  require('./make-lead-ingress-bridge')
 );
