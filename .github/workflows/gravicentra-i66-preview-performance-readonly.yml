@@ -8,9 +8,11 @@ on:
     branches: [recovery/fase-a-clean-20260831]
     paths:
       - artifacts/orbit360-recovery/release-control/I6_6_RELEASE_TRANSPORT_CONTROL_20261110.json
+      - artifacts/orbit360-recovery/release-control/I6_6_FRONTEND_PROMOTION_AUTHORITY.json
 
 permissions:
   contents: read
+  actions: read
 
 concurrency:
   group: gi-i66-preview-performance-readonly
@@ -18,13 +20,15 @@ concurrency:
 
 jobs:
   exact-preview-chrome-perf:
-    if: github.repository == 'paulaosoriof86/orbit360-core' && github.ref_name == 'recovery/fase-a-clean-20260831' && (github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, 'I66_PREVIEW_PERFORMANCE'))
+    if: github.repository == 'paulaosoriof86/orbit360-core' && github.ref_name == 'recovery/fase-a-clean-20260831' && (github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, 'I66_PREVIEW_PERFORMANCE') || contains(github.event.head_commit.message, 'I66_PREVIEW_FINANCIAL_SIX'))
     runs-on: ubuntu-24.04
-    timeout-minutes: 20
+    timeout-minutes: 35
     env:
       GI_I66_PERF_PROJECT: ays-orbit-360-lab
       GI_I66_PERF_TENANT: alianzas-soluciones
       GI_I66_PERF_PHASE: preview
+      GI_I66_READONLY_MODE: ${{ contains(github.event.head_commit.message, 'I66_PREVIEW_FINANCIAL_SIX') && 'six-frontend-release' || 'performance' }}
+      GITHUB_TOKEN: ${{ github.token }}
       SA_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
       SA_LAB_ALT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
       SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
@@ -38,10 +42,24 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
+      - name: Resolve manual read-only scope from the current exact authority
+        run: |
+          node - <<'NODE'
+          const fs=require('node:fs'),assert=require('node:assert/strict');
+          if(process.env.GITHUB_EVENT_NAME==='workflow_dispatch'){
+            const {P}=require('./tools/gravicentra-i66-frontend-control.cjs');
+            const {FINANCIAL_SCOPE}=require('./tools/gravicentra-i66-frontend-promotion-owner.cjs');
+            const a=JSON.parse(fs.readFileSync(P.authority)),cp=JSON.parse(fs.readFileSync(P.cp));
+            const pending=a.scopeId===FINANCIAL_SCOPE&&a.generation>cp.i66FrontendReleaseHead.generation;
+            if(pending)assert.equal(a.status,'DIRECTION_AUTHORIZED_EXACT_PREVIEW_READONLY','FINANCIAL_PREVIEW_AUTHORITY_NOT_ACTIVE');
+            fs.appendFileSync(process.env.GITHUB_ENV,'GI_I66_READONLY_MODE='+(pending?'six-frontend-release':'performance')+'\n');
+          }
+          NODE
       - name: Guard immutable PREVIEW build and zero business writes
         run: |
           set -euo pipefail
           node --check tools/gravicentra-i66-live-performance-readonly.mjs
+          node --test tools/gravicentra-i6-6-six-existing-receipts-ui-readonly.test.cjs tools/gravicentra-i66-frontend-promotion-transaction.test.cjs
           node - <<'NODE'
           const fs=require('node:fs');
           const s=fs.readFileSync('tools/gravicentra-i66-live-performance-readonly.mjs','utf8');

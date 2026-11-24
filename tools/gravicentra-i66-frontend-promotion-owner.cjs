@@ -1,5 +1,5 @@
 'use strict';
-const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),os=require('node:os');
+const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),os=require('node:os'),crypto=require('node:crypto');
 const {execFileSync}=require('node:child_process');
 const {P,genName,serial,blob,closeFiles,physicalGuard,closeCompositeFiles,compositeReceipt}=require('./gravicentra-i66-frontend-control.cjs');
 const {promote,acceptComposite}=require('./gravicentra-i66-frontend-promotion-transaction.cjs');
@@ -31,7 +31,204 @@ async function casCommit(head,headline,entries){
 const pins=[P.guard,'tools/gravicentra-i66-frontend-control.cjs','tools/gravicentra-i66-frontend-promotion-owner.cjs',
   'tools/gravicentra-i66-frontend-hosting-io.cjs','tools/gravicentra-i66-frontend-promotion-transaction.cjs',
   'tools/gravicentra-i6-6-operational-release-candidate.cjs','.github/workflows/gravicentra-delta-66-exact-live-clone.yml'];
-function pinSet(head){return Object.fromEntries(pins.map(p=>[p,blobAt(head,p)]));}
+const FINANCIAL_SCOPE='SIX_RECEIPT_CURRENT_BALANCE_READONLY';
+const FINANCIAL_DRIVER='tools/gravicentra-i66-live-performance-readonly.mjs';
+const FINANCIAL_PREVIEW_WORKFLOW='.github/workflows/gravicentra-i66-preview-performance-readonly.yml';
+const FINANCIAL_LIVE_WORKFLOW='.github/workflows/gravicentra-delta-66-exact-live-clone.yml';
+const financialPins=[FINANCIAL_DRIVER,FINANCIAL_PREVIEW_WORKFLOW,
+  'tools/gravicentra-i6-6-six-existing-receipts-ui-readonly.test.cjs',
+  'tools/gravicentra-i66-frontend-promotion-transaction.test.cjs','tools/gravicentra-i66-frontend-control.test.cjs',
+  'functions/product-active-role-contract.js'];
+const financialTargetKeys=['sourceSha','artifactId','artifactDigest','buildId','buildRunId','previewUrl','previewChannel'];
+const financialTarget=t=>Object.fromEntries(financialTargetKeys.map(k=>[k,t[k]]));
+const financialQaPaths=()=>[...new Set([...pins,...financialPins,
+  ...require('./gravicentra-i66-frontend-control.cjs').readonlyObserverPaths('performance')])].sort();
+function pinSet(head,scope){return Object.fromEntries((scope===FINANCIAL_SCOPE?financialQaPaths():pins).map(p=>[p,blobAt(head,p)]));}
+// Read-only verification has no button/write requirement. Its evidence remains
+// tied to the exact artifact, two existing assigned roles and four real views.
+function validateFinancialReport(report,target,phase,{authorityBlob,physicalPhaseKey}={}){
+  assert.equal(report.schema,'GI_I66_BROWSER_PERFORMANCE_READONLY_V2');
+  assert.equal(report.status,'FRONTEND_SIX_RECEIPTS_TWO_ROLE_TWO_VIEW_READONLY_PASS');
+  assert.equal(report.phase,phase);assert.equal(report.scopeId,FINANCIAL_SCOPE);
+  assert.deepEqual([report.sourceSha,report.buildId,report.releaseArtifactId,report.releaseArtifactDigest,report.releaseBuildRunId],
+    [target.sourceSha,target.buildId,target.artifactId,target.artifactDigest,target.buildRunId],'FINANCIAL_QA_TARGET_DRIFT');
+  assert.equal(report.origin,phase==='preview'?target.previewUrl:'https://app.aysseguros.com');
+  for(const key of ['firestoreWrites','businessActions','paymentActions','syntheticFixtures','pushNotifications'])
+    assert.equal(report[key],0,'FINANCIAL_QA_WRITE_BOUNDARY_'+key);
+  assert.equal(report.readOnly,true);assert.equal(report.roleChanged,false);
+  assert.equal(report.assignedRoleSelectionOnly,true);assert.equal(report.fullA04Accepted,false);assert.equal(report.fullA12Passed,false);
+  assert.deepEqual(report.errors,[]);assert.equal(report.roles?.length,4,'FINANCIAL_QA_FOUR_REAL_VIEWS_REQUIRED');
+  assert.deepEqual(report.roles.map(r=>r.role+':'+r.width).sort(),['direccion:1365','direccion:390','operativo:1365','operativo:390']);
+  assert.equal(new Set(report.roles.filter(r=>r.role==='operativo').map(r=>r.actorSha256)).size,1);
+  assert.equal(new Set(report.roles.filter(r=>r.role==='direccion').map(r=>r.actorSha256)).size,1);
+  assert.equal(new Set(report.roles.map(r=>r.actorSha256)).size,2,'FINANCIAL_QA_TWO_ACTORS_REQUIRED');
+  assert.equal(report.matrixServerSnapshotBefore?.length,6);
+  assert.deepEqual(report.matrixServerSnapshotAfter,report.matrixServerSnapshotBefore,'FINANCIAL_QA_MATRIX_SERVER_CHANGED');
+  for(const row of report.roles){
+    assert.equal(row.authenticated,true);assert.equal(row.assignedRoleVerified,true);assert.equal(row.country,'GT');
+    assert.match(row.actorSha256||'',/^[a-f0-9]{64}$/);assert.equal(row.viewportVerified,true);
+    const f=row.financialFocal;assert.equal(f?.sixExistingObligations,true);
+    assert.equal(f.distinctObligationCount,6);assert.equal(f.newObligations,0);assert.equal(f.additionalWrites,0);
+    assert.equal(f.sourceGrossCents,166956);assert.equal(f.currentOutstandingCents,166956);assert.equal(f.policyUnchanged,true);
+    assert.deepEqual(f.sourceSnapshotAfter,f.sourceSnapshotBefore,'FINANCIAL_QA_SERVER_CHANGED');
+    assert.deepEqual(f.sourceSnapshotBefore,report.matrixServerSnapshotBefore,'FINANCIAL_QA_VIEW_SERVER_CHANGED');
+    for(const s of f.sourceSnapshotBefore){assert.equal(s.serverBalanceProof?.sourceSha,target.sourceSha);
+      assert.match(s.serverBalanceProof.ownerBlob||'',/^[a-f0-9]{40}$/);assert.equal(s.serverBalanceProof.open,true);
+      assert.equal(s.serverBalanceProof.balanceCents,27826);}
+    assert.equal(f.observations?.length,6);assert.equal(new Set(f.observations.map(x=>x.receiptId)).size,6);
+    for(const observation of f.observations){
+      assert.equal(observation.reloadPass,true,'FINANCIAL_QA_RELOAD_HOLD');
+      for(const [stage,check] of [['beforeReload','beforeCheck'],['afterReload','afterCheck']]){
+        assert.equal(observation[check]?.pass,true,'FINANCIAL_QA_VISIBLE_STAGE_HOLD');
+        assert.deepEqual(Object.keys(observation[check].checks).sort(),
+          ['balanceState','balanceValue','balanceVerified','contractualDue','gross','operationalLimit','status']);
+        assert.ok(Object.values(observation[check].checks).every(x=>x===true));
+        const u=observation[stage];assert.equal(u?.actorMatches,true);assert.equal(u.role.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,''),row.role);
+        assert.equal(u.country,'GT');assert.equal(u.protectedCandidate,true);assert.equal(u.confirmed,true);
+        assert.deepEqual(u.relevantErrors,[]);assert.equal(u.detailCount,1);assert.equal(u.balanceCents,27826);
+        assert.equal(u.displayedBalanceCents,27826);assert.equal(u.balanceState,'open');assert.equal(u.open,true);
+        assert.equal(u.amountProofSource,f.sourceSnapshotBefore.find(s=>s.receiptId===observation.receiptId)?.serverBalanceProof.source,
+          'FINANCIAL_QA_BROWSER_SERVER_OWNER_DRIFT');
+        assert.equal(u.viewport?.width,row.width);assert.equal(u.viewport?.detailVisible,true);assert.equal(u.viewport?.balanceVisible,true);
+        assert.equal(u.viewport?.horizontalOverflowPx,0,'FINANCIAL_QA_HORIZONTAL_OVERFLOW');
+      }
+    }
+    assert.deepEqual(f.cobrosEngineBeforeReload,f.cobrosEngineAfterReload);assert.equal(f.cobrosEngineAfterReload?.totalGrossCents,166956);
+    for(const key of ['pageErrors','consoleErrors','blockedWrites'])assert.equal(f.errors[key],0,'FINANCIAL_QA_RUNTIME_'+key);
+    assert.deepEqual(f.errors.httpClasses,{});
+  }
+  const before=report.frontendQaBefore,after=report.frontendQaAfter;
+  assert.equal(before?.stage,'before');assert.equal(after?.stage,'after');
+  for(const proof of [before,after]){
+    assert.equal(proof.phase,phase);assert.equal(proof.scopeId,FINANCIAL_SCOPE);assert.equal(proof.readOnly,true);
+    assert.deepEqual(proof.target,financialTarget(target),'FINANCIAL_QA_AUTHORITY_TARGET_DRIFT');
+    assert.equal(proof.authorityBlob,authorityBlob||before.authorityBlob,'FINANCIAL_QA_AUTHORITY_CHANGED');
+    assert.match(proof.authorityBlob||'',/^[a-f0-9]{40}$/);
+    assert.equal(proof.physicalPhaseKey,physicalPhaseKey||null,'FINANCIAL_QA_JOURNAL_CHANGED');
+    assert.equal(proof.runId,before.runId);assert.equal(proof.workflowHeadSha,report.workflowHeadSha);
+  }
+  assert.equal(report.stageCount,48,'FINANCIAL_QA_48_STAGES_REQUIRED');
+  return report;
+}
+function validateFinancialAuthority({raw,authorityBlob,physical,journal,phase,attemptHistory=[]}){
+  assert.ok(['preview','live'].includes(phase));assert.equal(raw.scopeId,FINANCIAL_SCOPE);assert.equal(raw.gate,'I6.6');
+  assert.equal(raw.approvedByDirection,true);assert.equal(raw.readOnlyQa,true);
+  assert.equal(raw.backendDeployAllowed,false);assert.equal(raw.businessWritesAllowed,false);
+  assert.equal(raw.status,phase==='preview'?'DIRECTION_AUTHORIZED_EXACT_PREVIEW_READONLY':'DIRECTION_APPROVED_EXACT_PREVIEW');
+  assert.ok(Number.isSafeInteger(raw.generation)&&raw.generation>physical.generation&&raw.generation<=physical.generation+100,
+    'FINANCIAL_QA_GENERATION_DRIFT');
+  assert.equal(attemptHistory.length,raw.generation-physical.generation-1,'FINANCIAL_QA_ATTEMPT_HISTORY_REQUIRED');
+  for(let i=0;i<attemptHistory.length;i++){
+    const prior=attemptHistory[i];assert.equal(prior.generation,physical.generation+i+1);
+    assert.equal(prior.phase,'ROLLED_BACK','FINANCIAL_QA_PREVIOUS_ATTEMPT_NOT_ROLLED_BACK');
+    assert.equal(prior.key,require('./gravicentra-i66-frontend-promotion-transaction.cjs').digest(prior.request));
+    assert.equal(prior.request.previousReceiptBlob,physical.receiptGitBlobSha);
+    for(const k of ['sourceSha','artifactDigest','hostingVersion'])assert.equal(prior.request.previous[k],physical[k]);
+    require('./gravicentra-i66-frontend-promotion-transaction.cjs').verifyBytes(prior.request.previous,prior.rollback);
+  }
+  assert.equal(raw.previousReceiptBlob,physical.receiptGitBlobSha);assert.equal(raw.previousHostingVersion,physical.hostingVersion);
+  assert.equal(raw.previousArtifactDigest,physical.artifactDigest);
+  const t=raw.target;assert.match(t.sourceSha||'',/^[a-f0-9]{40}$/);assert.notEqual(t.sourceSha,physical.sourceSha);
+  assert.match(t.artifactDigest||'',/^sha256:[a-f0-9]{64}$/);assert.notEqual(t.artifactDigest,physical.artifactDigest);
+  for(const k of ['artifactId','buildRunId'])assert.ok(Number.isSafeInteger(t[k])&&t[k]>0);
+  assert.match(t.buildId||'',/^gi-i66-[a-z0-9-]+$/);
+  assert.match(t.previewUrl||'',/^https:\/\/ays-orbit-360-lab--gi-i66-[a-z0-9-]+\.web\.app$/);
+  assert.match(t.previewChannel||'',/^gi-i66-[a-z0-9-]+$/);
+  assert.deepEqual(Object.keys(raw.ownerPins||{}).sort(),financialQaPaths(),'FINANCIAL_QA_EXACT_OWNER_PINS_REQUIRED');
+  if(phase==='live'){
+    assert.equal(journal?.phase,'VERIFIED','FINANCIAL_QA_LIVE_VERIFIED_JOURNAL_REQUIRED');
+    assert.equal(journal.generation,raw.generation);assert.equal(journal.request.scope,'FRONTEND_ONLY');
+    assert.equal(journal.request.approvalBlob,authorityBlob,'FINANCIAL_QA_JOURNAL_AUTHORITY_DRIFT');
+    assert.deepEqual(financialTarget(journal.request.target),financialTarget(t));
+    assert.equal(journal.request.previousReceiptBlob,physical.receiptGitBlobSha);
+    assert.equal(journal.key,require('./gravicentra-i66-frontend-promotion-transaction.cjs').digest(journal.request));
+    require('./gravicentra-i66-frontend-promotion-transaction.cjs').verifyBytes(journal.request.target,journal.physical);
+  }else assert.equal(journal,null,'FINANCIAL_QA_PREVIEW_GENERATION_ALREADY_USED');
+  return financialTarget(t);
+}
+async function resolveFinancialQa(phase,{env=process.env,api:readApi=github,io=fs,gitRead=(...a)=>execFileSync('git',a),readMarker,stage='before',expected}={}){
+  assert.equal(env.GITHUB_REPOSITORY,repository);assert.equal(env.GITHUB_REF_NAME,branch);
+  assert.ok(['before','after'].includes(stage));assert.match(env.GITHUB_SHA||'',/^[a-f0-9]{40}$/);
+  const executionRun=Number(env.GITHUB_RUN_ID);assert.ok(Number.isSafeInteger(executionRun)&&executionRun>0);
+  const remoteRef=await readApi('git/ref/heads/'+branch),head=remoteRef.object?.sha;assert.match(head||'',/^[a-f0-9]{40}$/);
+  const files=new Map();
+  async function file(relative){
+    const entry=await readApi('contents/'+relative.split('/').map(encodeURIComponent).join('/')+'?ref='+head);
+    assert.equal(entry.path,relative);assert.ok(entry.size>0&&entry.size<=4*1024*1024);
+    const data=entry.encoding==='base64'?entry:await readApi('git/blobs/'+entry.sha);assert.equal(data.encoding,'base64');
+    const bytes=Buffer.from(data.content,'base64');assert.equal(blob(bytes),entry.sha,'FINANCIAL_QA_REMOTE_BLOB_DRIFT');
+    files.set(relative,bytes);return JSON.parse(bytes);
+  }
+  const [cp,state,tr,raw]=await Promise.all([file(P.cp),file(P.state),file(P.transport),file(P.authority),file(P.ledger)]);
+  const current=cp.i66FrontendReleaseHead;assert.ok(current);
+  await Promise.all([file(genName(current.generation,'RECEIPT')),file(genName(current.generation,'JOURNAL')),
+    ...(current.scope==='COMPOSITE'?[file(genName(current.generation,'LIVE_PROOF'))]:[])]);
+  const physical=physicalGuard(cp,state,tr,{readFileSync:p=>{assert.ok(files.has(p));return files.get(p);}});
+  assert.ok(Number.isSafeInteger(raw.generation)&&raw.generation>physical.generation&&raw.generation<=physical.generation+100,
+    'FINANCIAL_QA_GENERATION_DRIFT');
+  const attemptHistory=await Promise.all(Array.from({length:raw.generation-physical.generation-1},(_,i)=>file(genName(physical.generation+i+1,'JOURNAL'))));
+  let journal=null;
+  if(phase==='live')journal=await file(genName(raw.generation,'JOURNAL'));
+  else try{journal=await file(genName(raw.generation,'JOURNAL'));}catch(error){
+    if(error?.message!=='GITHUB_PROVIDER_HTTP_404')throw error;
+  }
+  const authorityBlob=blob(files.get(P.authority)),target=validateFinancialAuthority({raw,authorityBlob,physical,journal,phase,attemptHistory});
+  for(const p of financialQaPaths()){
+    const bytes=io.readFileSync(p);assert.equal(blob(bytes),raw.ownerPins[p],'FINANCIAL_QA_EXECUTING_OWNER_DRIFT_'+p);
+    assert.ok(Buffer.from(bytes).equals(Buffer.from(gitRead('show',target.sourceSha+':'+p))),'FINANCIAL_QA_BUILD_OWNER_DRIFT_'+p);
+  }
+  gitRead('merge-base','--is-ancestor',physical.sourceSha,target.sourceSha);
+  gitRead('merge-base','--is-ancestor',target.sourceSha,env.GITHUB_SHA);
+  const [execution,build,artifact]=await Promise.all([readApi('actions/runs/'+executionRun),readApi('actions/runs/'+target.buildRunId),readApi('actions/artifacts/'+target.artifactId)]);
+  assert.deepEqual([execution.id,execution.path,execution.head_sha,execution.head_branch,execution.status],
+    [executionRun,phase==='preview'?FINANCIAL_PREVIEW_WORKFLOW:FINANCIAL_LIVE_WORKFLOW,env.GITHUB_SHA,branch,'in_progress']);
+  assert.deepEqual([build.id,build.path,build.head_sha,build.head_branch,build.status,build.conclusion],
+    [target.buildRunId,'.github/workflows/gravicentra-release-delta-66-package.yml',target.sourceSha,branch,'completed','success']);
+  assert.deepEqual([artifact.id,artifact.digest,artifact.workflow_run?.id,artifact.workflow_run?.head_sha,artifact.expired],
+    [target.artifactId,target.artifactDigest,target.buildRunId,target.sourceSha,false]);
+  if(!readMarker)readMarker=async origin=>{
+    const r=await fetch(origin+'/__recovery__/build.json',{headers:{'cache-control':'no-cache'},redirect:'error',signal:AbortSignal.timeout(30000)});
+    assert.equal(r.status,200);return r.json();
+  };
+  const hosted=phase==='preview'?[[target.previewUrl,target],['https://app.aysseguros.com',physical],['https://ays-orbit-360-lab.web.app',physical]]:
+    [['https://app.aysseguros.com',target],['https://ays-orbit-360-lab.web.app',target]];
+  for(const [origin,pin] of hosted){const m=await readMarker(origin);
+    assert.deepEqual([m.sourceSha,m.buildId,m.gate,m.product],[pin.sourceSha,pin.buildId,'I6.6','Gravicentra Insurance'],'FINANCIAL_QA_HOSTED_MARKER_DRIFT');}
+  const proof={schema:'GI_I66_FRONTEND_FINANCIAL_QA_AUTHORITY_V1',stage,phase,scopeId:FINANCIAL_SCOPE,
+    generation:raw.generation,target,authorityBlob,physicalPhaseKey:journal?.key||null,
+    runId:executionRun,workflowHeadSha:env.GITHUB_SHA,remoteControlHead:head,readOnly:true};
+  if(expected)for(const key of ['phase','scopeId','generation','target','authorityBlob','physicalPhaseKey','runId','workflowHeadSha'])
+    assert.deepEqual(proof[key],expected[key],'FINANCIAL_QA_FINAL_AUTHORITY_DRIFT_'+key);
+  return proof;
+}
+async function readFinancialPreviewReport(qa,target){
+  for(const k of ['qaRunId','qaArtifactId'])assert.ok(Number.isSafeInteger(qa[k])&&qa[k]>0);
+  assert.match(qa.qaArtifactDigest||'',/^sha256:[a-f0-9]{64}$/);assert.match(qa.qaReportSha256||'',/^[a-f0-9]{64}$/);
+  const [run,artifact,jobs]=await Promise.all([github('actions/runs/'+qa.qaRunId),github('actions/artifacts/'+qa.qaArtifactId),
+    github('actions/runs/'+qa.qaRunId+'/jobs?per_page=100')]);
+  assert.deepEqual([run.path,run.head_branch,run.status,run.conclusion],
+    [FINANCIAL_PREVIEW_WORKFLOW,branch,'completed','success'],'FINANCIAL_PREVIEW_WORKFLOW_NOT_PASSED');
+  const job=jobs.jobs.filter(j=>j.name==='exact-preview-chrome-perf');assert.equal(job.length,1);
+  assert.equal(job[0].conclusion,'success');
+  const step=job[0].steps.filter(s=>s.name==='Measure every authorized module in exact PREVIEW');
+  assert.equal(step.length,1);assert.equal(step[0].conclusion,'success','FINANCIAL_PREVIEW_UI_NOT_EXECUTED');
+  assert.deepEqual([artifact.digest,artifact.workflow_run?.id,artifact.workflow_run?.head_sha,artifact.expired],
+    [qa.qaArtifactDigest,qa.qaRunId,run.head_sha,false]);
+  const zip=Buffer.from(await (await github('actions/artifacts/'+qa.qaArtifactId+'/zip',true)).arrayBuffer());
+  assert.equal('sha256:'+crypto.createHash('sha256').update(zip).digest('hex'),qa.qaArtifactDigest);
+  const tmp=fs.mkdtempSync(path.join(process.env.RUNNER_TEMP||os.tmpdir(),'i66-financial-qa-'));
+  try{
+    const file=path.join(tmp,'qa.zip');fs.writeFileSync(file,zip,{mode:0o600});
+    const members=execFileSync('unzip',['-Z1',file],{encoding:'utf8',maxBuffer:65536}).trim().split('\n');
+    const reports=members.filter(m=>m.split('/').at(-1)==='gi-i66-preview-perf-summary.json');assert.equal(reports.length,1);
+    assert.ok(reports[0].split('/').every(x=>x&&x!=='.'&&x!=='..')&&!reports[0].startsWith('/'));
+    const bytes=execFileSync('unzip',['-p',file,reports[0]],{maxBuffer:8*1024*1024});
+    assert.equal(crypto.createHash('sha256').update(bytes).digest('hex'),qa.qaReportSha256);
+    const report=JSON.parse(bytes);assert.equal(report.workflowHeadSha,run.head_sha);assert.equal(report.frontendQaBefore?.runId,qa.qaRunId);
+    validateFinancialReport(report,target,'preview',{authorityBlob:qa.previewReadOnlyAuthorityBlob});
+    return report;
+  }finally{fs.rmSync(tmp,{recursive:true,force:true});}
+}
 function nextCompositeGeneration(sequence,readJournal){
   assert.ok(Number.isSafeInteger(sequence)&&sequence>0);
   for(let n=sequence+1;n<=sequence+100;n++){
@@ -110,7 +307,7 @@ async function run(){
   const targetBase=raw.target;
   const digestPaths=head=>{
     assert.equal(blobAt(head,P.authority),approvalBlob,'RELEASE_AUTHORITY_REPLACED');
-    assert.deepEqual(pinSet(head),raw.ownerPins,'RELEASE_OWNER_DRIFT');
+    assert.deepEqual(pinSet(head,approvedScope),raw.ownerPins,'RELEASE_OWNER_DRIFT');
     assert.equal(blobAt(head,P.manifest),blobAt(targetBase.sourceSha,P.manifest),'RELEASE_COMPOSITION_MANIFEST_DRIFT');
     assert.equal(blobAt(head,P.composition),blobAt(targetBase.sourceSha,P.composition),'RELEASE_COMPOSITION_LOCK_DRIFT');
     git('diff','--quiet',targetBase.sourceSha,head,'--','orbit360-platform','functions','firebase.json','firestore.rules','storage.rules',
@@ -121,11 +318,11 @@ async function run(){
   async function makeBinding(base,prior){
     const v={sourceSha:base.sourceSha,sourceTree:git('rev-parse',base.sourceSha+'^{tree}'),manifestBlob:blobAt(base.sourceSha,P.manifest),
       compositionBlob:blobAt(base.sourceSha,P.composition),artifactId:base.artifactId,artifactDigest:base.artifactDigest,buildId:base.buildId,
-      buildRunId:base.buildRunId||base.previewRunId,previewUrl:base.previewUrl||'',previewChannel:base.previewChannel||'',
+      buildRunId:base.buildRunId||base.previewRunId,previewUrl:base.previewUrl||'',previewChannel:base.previewChannel||'',previewUiRunId:base.previewUiRunId||null,
       hostingVersion:prior?base.liveHostingVersion:await provider.current(base.previewChannel)};
     const pkg=await provider.packageData(v);v.files=pkg.rows.length;return v;
   }
-  const request=existing?.request||{schema:'GI_I66_FRONTEND_PROMOTION_V1',gate:'I6.6',scope:'FRONTEND_ONLY',generation:raw.generation,approvalBlob,
+  const request=existing?.request||{schema:'GI_I66_FRONTEND_PROMOTION_V1',gate:'I6.6',scope:'FRONTEND_ONLY',scopeId:approvedScope,generation:raw.generation,approvalBlob,
     guardBlob:raw.ownerPins[P.guard],previousReceiptBlob:raw.previousReceiptBlob,
     previous:await makeBinding(currentRaw,true),target:await makeBinding(targetBase,false)};
   assert.equal(request.approvalBlob,approvalBlob);
@@ -171,15 +368,44 @@ async function run(){
       }
       assert.deepEqual([qa.scopeId,qa.sourceSha,qa.buildId,qa.artifactDigest,qa.result],
         [approvedScope,targetBase.sourceSha,targetBase.buildId,targetBase.artifactDigest,'PASS']);
-      for(const k of ['authenticated','buttonClicked','serverReadback','reload','linkedDestination','roleScope','noDuplicate','desktop','mobile390'])
-        assert.equal(qa[k],true,'PREVIEW_FUNCTIONAL_PROOF_MISSING_'+k);
-      assert.equal(qa.visualDecision,'APPROVED_BY_DIRECTION');
-      const branchGuardSig=pinSet(raw.guardHead);assert.deepEqual(branchGuardSig,raw.ownerPins,'STALE_GUARD_RUN');
+      if(approvedScope===FINANCIAL_SCOPE){
+        assert.equal(raw.readOnlyQa,true);assert.equal(raw.backendDeployAllowed,false);assert.equal(raw.businessWritesAllowed,false);
+        assert.equal(qa.readOnly,true);assert.equal(qa.fullA04Accepted,false);assert.equal(qa.fullA12Passed,false);
+        await readFinancialPreviewReport(qa,targetBase);
+      }else{
+        for(const k of ['authenticated','buttonClicked','serverReadback','reload','linkedDestination','roleScope','noDuplicate','desktop','mobile390'])
+          assert.equal(qa[k],true,'PREVIEW_FUNCTIONAL_PROOF_MISSING_'+k);
+        assert.equal(qa.visualDecision,'APPROVED_BY_DIRECTION');
+      }
+      const branchGuardSig=pinSet(raw.guardHead,approvedScope);assert.deepEqual(branchGuardSig,raw.ownerPins,'STALE_GUARD_RUN');
     },
     verifyLive:provider.live,verifyPreview:provider.preview,currentVersion:()=>provider.current('live'),clone:provider.clone,cas:writePhase,
     assertOwnership:async j=>{const h=remote();validateCurrent(h);assert.deepEqual(optional(h,jp),j,'RELEASE_OWNER_LOST');},
     assertCompensationOwnership:async j=>{const h=remote();assert.deepEqual(optional(h,jp),j);const tr=ctl(h);assert.equal(tr.currentPhysicalHostingRelease.liveHostingVersion,request.previous.hostingVersion);},
     liveUiProof:async j=>{
+      if(approvedScope===FINANCIAL_SCOPE){
+        const h=remote();validateCurrent(h);assert.deepEqual(optional(h,jp),j,'RELEASE_OWNER_LOST');
+        const prior=optional(h,uiPath);
+        if(prior){
+          assert.equal(prior.generation,j.generation);assert.equal(prior.physicalPhaseKey,j.key);assert.equal(prior.scopeId,approvedScope);
+          validateFinancialReport(prior.financialQa,request.target,'live',{authorityBlob:approvalBlob,physicalPhaseKey:j.key});
+          await signed(git('log','-1','--format=%H',h,'--',uiPath));
+          return {result:'PASS',buildId:request.target.buildId,receiptBlob:blobAt(h,uiPath)};
+        }
+        const output=path.join(process.env.RUNNER_TEMP,'gi-i66-frontend-live-financial-'+runId+'.json');
+        execFileSync(process.execPath,[FINANCIAL_DRIVER],{stdio:'inherit',timeout:18*60*1000,
+          env:{...process.env,GI_I66_PERF_PROJECT:'ays-orbit-360-lab',GI_I66_PERF_TENANT:'alianzas-soluciones',
+            GI_I66_PERF_PHASE:'live',GI_I66_READONLY_MODE:'six-frontend-release',GI_I66_PERF_REPORT:output}});
+        const report=JSON.parse(fs.readFileSync(output,'utf8'));
+        validateFinancialReport(report,request.target,'live',{authorityBlob:approvalBlob,physicalPhaseKey:j.key});
+        const fresh=remote();validateCurrent(fresh);assert.deepEqual(optional(fresh,jp),j,'RELEASE_OWNER_LOST_AFTER_FINANCIAL_QA');
+        const ui={schema:'GI_I66_FRONTEND_FINANCIAL_READONLY_UI_RECEIPT_V1',generation:j.generation,scopeId:approvedScope,
+          sourceSha:request.target.sourceSha,artifactDigest:request.target.artifactDigest,buildId:request.target.buildId,
+          physicalPhaseKey:j.key,result:'PASS',readOnly:true,fullA04Accepted:false,fullA12Passed:false,
+          reportSha256:crypto.createHash('sha256').update(fs.readFileSync(output)).digest('hex'),financialQa:report};
+        await casCommit(fresh,'release(i66): signed exact financial read-only UI for '+j.generation,{[uiPath]:ui});
+        return {result:'PASS',buildId:request.target.buildId,receiptBlob:blob(serial(ui))};
+      }
       console.log('I66_PHYSICAL_VERIFIED_AWAITING_LIVE_UI '+request.target.buildId+' '+uiPath);
       for(let i=0;i<36;i++){
         const h=remote(),u=optional(h,uiPath);
@@ -374,4 +600,5 @@ if(require.main===module){
     action===undefined?run():Promise.reject(Error('RELEASE_OWNER_UNKNOWN_OPERATION'));
   execution.catch(e=>{console.error('I66_FRONTEND_PROMOTION_HOLD '+String(e.message).split('\n')[0].slice(0,150));process.exitCode=1;});
 }
-module.exports={nextCompositeGeneration,assertCompositeRollbackAllowed};
+module.exports={nextCompositeGeneration,assertCompositeRollbackAllowed,FINANCIAL_SCOPE,financialQaPaths,financialTarget,
+  validateFinancialAuthority,resolveFinancialQa,validateFinancialReport};

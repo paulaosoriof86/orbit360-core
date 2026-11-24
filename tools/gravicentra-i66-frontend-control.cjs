@@ -14,6 +14,9 @@ function executionSnapshot(transport){
   const r=transport.frontendPreviewRequest,s=transport.scopedBackendPreviewI66,p=transport.operationalReleaseCandidate;
   return {transportStatus:transport.status,previewRequest:r?{version:r.version,sourceQaHead:r.sourceQaHead,
     sourceQaRunId:r.sourceQaRunId,guardRunId:r.guardRunId}:null,
+    ...(transport.lastConsumedFrontendRelease?{previewRequestDisposition:{version:r?.version||null,
+      status:r?.version===transport.lastConsumedFrontendRelease.previewRequestVersion?'CONSUMED_EXACT_LIVE':'PENDING_NEW_PREVIEW_REQUEST',
+      lastConsumedRelease:transport.lastConsumedFrontendRelease}}:{}),
     scopedPreview:s?{sourceSha:s.sourceSha,artifactDigest:s.artifactDigest}:null,
     operationalCandidate:p?{status:p.status,sourceSha:p.sourceSha,artifactDigest:p.artifactDigest,
       previewQaRunId:p.previewQa?.runId||null}:null};
@@ -136,6 +139,58 @@ function archiveExecutionObservers(control,progress,head,read){
   synchronizeExecutionProgress(progress);
   return archived;
 }
+function ownerPlanContinuationProjection(control,transport){
+  const head=control.i66FrontendReleaseHead,c=control.i66ActiveRecoveryCursor,continuation=control.i66OperationalContinuation20261115;
+  assert.ok(head&&c&&continuation,'I66_OWNER_PLAN_ACTIVE_AUTHORITY_MISSING');
+  return {schema:'GI_I66_ACTIVE_OWNER_PLAN_CONTINUATION_V1',authorityPointer:P.cp+'#i66OperationalContinuation20261115',
+    generation:head.generation,latestProvenLiveSource:head.sourceSha,latestPhysicalFrontendLiveReceipt:head.receiptPath,
+    currentPhysicalFrontend:observerTarget(head),evidencePath:c.currentEvidencePath,evidenceGitBlobSha:c.currentEvidenceBlobSha,
+    activeGate:'I6.6',currentWork:continuation.currentWork,nextAction:control.nextAction,
+    frontendPreviewRequest:executionSnapshot(transport).previewRequest};
+}
+function synchronizeOwnerPlanContinuation(control,state,transport,{archivePrior=true}={}){
+  const prior=state.i66OwnerPlanContinuation20261115,next=ownerPlanContinuationProjection(control,transport);
+  if(prior&&serial(prior)!==serial(next)&&archivePrior){
+    state.priorI66OwnerPlanContinuations=[...(state.priorI66OwnerPlanContinuations||[]),{
+      reason:'ACTIVE_OWNER_PLAN_SUMMARY_SUPERSEDED',priorGitBlobSha:blob(serial(prior)),
+      supersededByGeneration:next.generation,prior:structuredClone(prior)}];
+  }
+  state.i66OwnerPlanContinuation20261115=next;
+  state.currentOperationalWorkPointer=next.authorityPointer;
+  state.nextAction=control.nextAction;
+  return next;
+}
+function assertOwnerPlanContinuation(control,state,transport){
+  const mirror=state.i66OwnerPlanContinuation20261115;
+  // The historical mixed acceptance/summary object is archived on explicit
+  // adoption. Every successor from E4 must carry the current small projection.
+  if(control.i66FrontendReleaseHead.generation<4&&mirror?.schema!=='GI_I66_ACTIVE_OWNER_PLAN_CONTINUATION_V1')return;
+  assert.deepEqual(mirror,ownerPlanContinuationProjection(control,transport),'I66_OWNER_PLAN_ACTIVE_SUMMARY_DRIFT');
+  assert.equal(state.currentOperationalWorkPointer,mirror.authorityPointer,'I66_OWNER_PLAN_POINTER_DRIFT');
+  assert.equal(state.nextAction,control.nextAction,'I66_OWNER_PLAN_NEXT_ACTION_DRIFT');
+}
+function assertActiveReleaseProgress(control,progress,transport){
+  const head=control.i66FrontendReleaseHead;if(!head||head.generation<4)return;
+  const execution=progress.releaseExecution;
+  assert.equal(progress.frontendReleaseGeneration,head.generation,'I66_ACTIVE_RELEASE_PROGRESS_GENERATION_DRIFT');
+  assert.equal(progress.releaseScope,head.scope||'FRONTEND_ONLY','I66_ACTIVE_RELEASE_PROGRESS_SCOPE_DRIFT');
+  for(const k of ['sourceSha','buildId','buildRunId','artifactId','artifactDigest'])
+    assert.equal(execution?.[k],head[k],'I66_ACTIVE_RELEASE_EXECUTION_DRIFT_'+k);
+  assert.equal(execution.receiptPath,head.receiptPath);assert.equal(execution.liveRunId,head.liveCloneRunId||head.liveRunId);
+  assert.equal(execution.fullI66ProductionAccepted,false);
+  const consumed=transport.lastConsumedFrontendRelease;assert.ok(consumed,'I66_ACTIVE_RELEASE_CONSUMPTION_MISSING');
+  assert.equal(consumed.generation,head.generation);assert.equal(consumed.sourceSha,head.sourceSha);
+  assert.equal(consumed.artifactDigest,head.artifactDigest);assert.equal(consumed.receiptPath,head.receiptPath);
+  assert.deepEqual(progress.consumedPreviewRequest,transport.lastConsumedFrontendPreviewRequest,'I66_ACTIVE_CONSUMED_PREVIEW_DRIFT');
+  if(progress.releaseScope==='FRONTEND_ONLY'){
+    assert.equal(control.i66OperationalContinuation20261115.latestProvenLiveSourceScope,'FRONTEND_ONLY_EXACT_ARTIFACT_SIGNED_UI_PROOF',
+      'I66_ACTIVE_FRONTEND_SOURCE_SCOPE_DRIFT');
+    assert.equal(execution.backendFunctionsChanged,0);assert.equal(progress.notTouched.productSource,false);
+    assert.equal(progress.currentExecutionMutations?.scope,'THIS_FRONTEND_PROMOTION_ONLY');
+    assert.equal(progress.currentExecutionMutations.productSourceChanged,true);assert.equal(progress.currentExecutionMutations.hostingDeploy,true);
+    assert.equal(progress.currentExecutionMutations.backendDeploy,false);assert.equal(progress.currentExecutionMutations.businessWrites,false);
+  }
+}
 function assertExecutionProgress(control,progress,io){
   const projection=executionProgressProjection(progress),cursor=control.i66ActiveRecoveryCursor||{};
   assert.deepEqual(progress.remainingExecutionLanes,projection.remainingExecutionLanes,'I66_PROGRESS_REMAINING_LANES_DRIFT');
@@ -196,6 +251,7 @@ function physicalGuard(control,state,transport,io){
   assert.equal(state.currentExecutionDecisionPointer,P.cp+'#i66FrontendReleaseHead');
   assert.deepEqual(state.currentPhysicalFrontend,head);
   assert.equal(head.gate,'I6.6');assert.equal(head.fullI66ProductionAccepted,false);
+  assertOwnerPlanContinuation(control,state,transport);
   const read=p=>io.readFileSync(p,'utf8');
   assert.equal(head.receiptPath,genName(head.generation,'RECEIPT'));
   assert.equal(blob(read(head.receiptPath)),head.receiptGitBlobSha);
@@ -262,6 +318,8 @@ function physicalGuard(control,state,transport,io){
 function closeFiles(read,j,body){
   const cp=read(P.cp),transport=read(P.transport),ledger=read(P.ledger),state=read(P.state);
   const c=cp.i66ActiveRecoveryCursor,t=j.request.target,n=j.generation;
+  const priorLiveSourceScope={sourceSha:cp.i66OperationalContinuation20261115?.latestProvenLiveSource,
+    scope:cp.i66OperationalContinuation20261115?.latestProvenLiveSourceScope};
   assert.equal(transport.currentPhysicalHostingRelease.liveHostingVersion,j.request.previous.hostingVersion);
   const changes={};
   if(!cp.i66FrontendReleaseHead){
@@ -270,13 +328,14 @@ function closeFiles(read,j,body){
     changes[P.legacy]=legacy;cp.i66PreversionedControlViewBlob=blob(serial(legacy));
   }
   const receiptPath=genName(n,'RECEIPT');
-  const head={generation:n,gate:'I6.6',status:'FOCAL_FRONTEND_LIVE_UI_VERIFIED',sourceSha:t.sourceSha,sourceTree:t.sourceTree,
+  const head={generation:n,gate:'I6.6',scope:'FRONTEND_ONLY',status:'FOCAL_FRONTEND_LIVE_UI_VERIFIED',sourceSha:t.sourceSha,sourceTree:t.sourceTree,
     compositionBlob:t.compositionBlob,manifestBlob:t.manifestBlob,artifactId:t.artifactId,artifactDigest:t.artifactDigest,
     hostingVersion:t.hostingVersion,buildId:t.buildId,hostedFilesEachOrigin:t.files,previewUrl:t.previewUrl,buildRunId:t.buildRunId,
     rollback:j.request.previous.hostingVersion,receiptPath,receiptGitBlobSha:body.receipt.blob,receiptCommit:body.receipt.commit,
     fullI66ProductionAccepted:false,liveCloneRunId:body.receipt.runId};
   cp.i66FrontendReleaseHead=head;cp.currentExecutionDecisionPointer='i66FrontendReleaseHead';
-  cp.i66OperationalContinuation20261115={...cp.i66OperationalContinuation20261115,latestProvenLiveSource:t.sourceSha,latestPhysicalFrontendLiveReceipt:receiptPath};
+  cp.i66OperationalContinuation20261115={...cp.i66OperationalContinuation20261115,latestProvenLiveSource:t.sourceSha,
+    latestProvenLiveSourceScope:'FRONTEND_ONLY_EXACT_ARTIFACT_SIGNED_UI_PROOF',latestPhysicalFrontendLiveReceipt:receiptPath};
   cp.nextAction='I6.6 continúa después de la publicación focal '+t.buildId+'. '+c.next;
   state.currentExecutionDecisionPointer=P.cp+'#i66FrontendReleaseHead';state.currentPhysicalFrontend=head;
   transport.previousPhysicalHostingRelease=transport.currentPhysicalHostingRelease;
@@ -289,11 +348,46 @@ function closeFiles(read,j,body){
   transport.frontendReleaseSequence=n;transport.consumedFrontendAuthorities=[...new Set([...(transport.consumedFrontendAuthorities||[]),j.request.approvalBlob])];
   ledger.frontendReleaseHead=head;
   const oldEvidence=c.currentEvidencePath,progress=read(oldEvidence),progressPath=genName(n,'FOCAL_PROGRESS');
+  const priorReleaseView=Object.fromEntries(['releaseScope','releaseExecution','consumedPreviewRequest','currentExecutionMutations','immediateExecution','notTouched']
+    .filter(k=>progress[k]!==undefined).map(k=>[k,structuredClone(progress[k])]));
   const archivedObservers=archiveExecutionObservers(cp,progress,head,read);
   progress.previousEvidencePath=oldEvidence;progress.previousEvidenceBlobSha=c.currentEvidenceBlobSha;
   progress.releasedFrontend={sourceSha:t.sourceSha,buildId:t.buildId,artifactId:t.artifactId,digest:t.artifactDigest,fileCount:t.files,
     hostingVersion:t.hostingVersion,liveReceipt:receiptPath};
   progress.notTouched.hostingProduction=false;progress.frontendReleaseGeneration=n;progress.frontendPromotionBusinessWrites=0;
+  transport.lastConsumedFrontendPreviewRequest=structuredClone(transport.frontendPreviewRequest);
+  transport.lastConsumedFrontendRelease={generation:n,previewRequestVersion:transport.frontendPreviewRequest?.version||null,
+    sourceSha:t.sourceSha,artifactDigest:t.artifactDigest,receiptPath};
+  if(j.request.scope!=='COMPOSITE'){
+    progress.priorReleaseExecutionViews=[...(progress.priorReleaseExecutionViews||[]),{
+      priorEvidencePath:oldEvidence,priorEvidenceGitBlobSha:c.currentEvidenceBlobSha,priorLiveSourceScope,view:priorReleaseView}];
+    progress.releaseScope='FRONTEND_ONLY';progress.consumedPreviewRequest=structuredClone(transport.frontendPreviewRequest);
+    progress.releaseExecution={status:'FRONTEND_FOCAL_SIGNED_LIVE_ACCEPTED',scope:'FRONTEND_ONLY',scopeId:j.request.scopeId||null,
+      sourceSha:t.sourceSha,buildId:t.buildId,buildRunId:t.buildRunId,artifactId:t.artifactId,artifactDigest:t.artifactDigest,
+      artifactBuilt:true,previewSignedPass:true,livePromoted:true,signedPreviewRunId:t.previewUiRunId||null,
+      liveRunId:body.receipt.runId,receiptPath,uiReceiptPath:genName(n,'LIVE_UI'),uiReceiptGitBlobSha:body.liveUi?.receiptBlob||null,
+      backendFunctionsChanged:0,businessWrites:0,sourceQaHead:transport.frontendPreviewRequest?.sourceQaHead||null,
+      sourceQaRunId:transport.frontendPreviewRequest?.sourceQaRunId||null,guardRunId:transport.frontendPreviewRequest?.guardRunId||null,
+      frontendPreviewRequestVersion:transport.frontendPreviewRequest?.version||null,fullI66ProductionAccepted:false};
+    progress.currentExecutionMutations={scope:'THIS_FRONTEND_PROMOTION_ONLY',sourceQaAndProtectedWriterCodePublished:true,
+      productSourceChanged:true,hostingDeploy:true,backendDeploy:false,businessWrites:false,
+      priorFinancialWritesRetainedAt:oldEvidence};
+    progress.notTouched.productSource=false;
+    progress.immediateExecution={...progress.immediateExecution,status:'EXACT_FRONTEND_FOCAL_RELEASE_ACCEPTED_REMAINING_I66_WORK_OPEN',
+      frontendSourceSha:t.sourceSha,frontendArtifactDigest:t.artifactDigest,frontendReceiptPath:receiptPath,
+      financialFocal:j.request.scopeId==='SIX_RECEIPT_CURRENT_BALANCE_READONLY'
+        ?'Exact six-receipt balance, source, reload and viewport readback passed in Preview and LIVE for the two assigned roles; no business writes. Full A04/A12 and other financial scopes retain their gates.'
+        :'The exact focal frontend release passed its approved Preview and LIVE UI scope; continue the remaining capabilities.',
+      alreadyPublishedArtifactMustNotBeRebuilt:true,fullA04Passed:false,fullA12Passed:false,fullA14Passed:false,fullI66ProductionAccepted:false};
+    delete progress.immediateExecution.sourceScopeReceipt;
+    if(j.request.scopeId==='SIX_RECEIPT_CURRENT_BALANCE_READONLY'){
+      const a12=progress.shockObjectives.items.find(row=>row.id==='A12');assert.ok(a12);
+      a12.status='SIX_RECEIPT_PREVIEW_LIVE_SCOPED_UI_PASS_FULL_A12_OPEN';a12.passForShock=false;
+      a12.evidence='Current E'+n+': exact six receipts, two assigned roles, desktop/mobile390, 48 read/reload stages per phase, zero business writes; signed proof '+receiptPath+'. Prior artifact evidence remains archived.';
+      a12.next='Preserve the accepted six-receipt UI proof and completed financial writes. Continue remaining A12 source universes and exceptions against the frozen plan; do not reimport the six records or repeat this accepted release.';
+      synchronizeExecutionProgress(progress);
+    }
+  }
   c.previousEvidencePath=oldEvidence;c.previousEvidenceBlobSha=c.currentEvidenceBlobSha;c.currentEvidencePath=progressPath;
   c.currentEvidenceBlobSha=blob(serial(progress));c.lastPhysicalLiveRunId=head.liveCloneRunId;c.lastPhysicalLiveSourceSha=t.sourceSha;
   c.moduleReleasedThisIteration=true;
@@ -304,6 +398,8 @@ function closeFiles(read,j,body){
   }
   if(c.executionSynchronizationVersion===1)progress.executionSynchronization=executionSnapshot(transport);
   c.currentEvidenceBlobSha=blob(serial(progress));
+  synchronizeOwnerPlanContinuation(cp,state,transport);
+  if(j.request.scope!=='COMPOSITE')assertActiveReleaseProgress(cp,progress,transport);
   return {...changes,[P.cp]:cp,[P.state]:state,[P.transport]:transport,[P.ledger]:ledger,[progressPath]:progress,[genName(n,'JOURNAL')]:body};
 }
 function compositeReceipt(j,runId){
@@ -381,6 +477,8 @@ function closeCompositeFiles(read,j,body){
   c.next=progress.next=continuation.currentWork=state.nextAction=cp.nextAction=next;
   progress.executionSynchronization=executionSnapshot(transport);c.executionSynchronizationVersion=1;
   c.currentEvidenceBlobSha=blob(serial(progress));
+  synchronizeOwnerPlanContinuation(cp,state,transport,{archivePrior:false});
+  assertActiveReleaseProgress(cp,progress,transport);
   return {...changes,[genName(j.generation,'RECEIPT')]:receipt,[receipt.liveProof.path]:j.liveProof};
 }
 // Observation code has its own exact source authority. It cannot change the
@@ -517,4 +615,6 @@ async function verifyReadonlyObserver(resolution,{env=process.env,api,readMarker
     sourceQaVerified,remoteControlHead:remoteHead,target:resolution.target,readOnly:true,
     productWrites:0,syntheticWrites:0,releaseTransitions:0,hostedMarkersVerified:origins};
 }
-module.exports={P,genName,serial,blob,physicalGuard,closeFiles,executionSnapshot,executionProgressProjection,synchronizeExecutionProgress,archiveExecutionObservers,assertExecutionProgress,compositeReceipt,closeCompositeFiles,READONLY_PROFILES,readonlyObserverPaths,readonlyObserverTarget,resolveReadonlyObserver,verifyReadonlyObserver};
+module.exports={P,genName,serial,blob,physicalGuard,closeFiles,executionSnapshot,executionProgressProjection,synchronizeExecutionProgress,archiveExecutionObservers,assertExecutionProgress,
+  ownerPlanContinuationProjection,synchronizeOwnerPlanContinuation,assertOwnerPlanContinuation,assertActiveReleaseProgress,
+  compositeReceipt,closeCompositeFiles,READONLY_PROFILES,readonlyObserverPaths,readonlyObserverTarget,resolveReadonlyObserver,verifyReadonlyObserver};

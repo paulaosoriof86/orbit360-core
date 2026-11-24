@@ -227,14 +227,67 @@ test('progress incorporating a matching observed result retires the prior pendin
   f.cp.i66FrontendReleaseHead.generation++;
   assert.throws(f.verify,/I66_PROGRESS_OBSERVER_TARGET_DRIFT_generation/);
 });
-test('progress validation is wired to the current composite cursor in the canonical preflight',()=>{
+test('canonical preflight keeps the active progress check after composite E3 becomes frontend E4',()=>{
   const preflight=fs.readFileSync(P.guard,'utf8');
-  assert.match(preflight,/if\(control\.i66FrontendReleaseHead\?\.scope==='COMPOSITE'\)\s*frontendControl\.assertExecutionProgress\(control,p,fs\)/);
+  const gate=preflight.match(/if\(control\.i66FrontendReleaseHead\)\s*frontendControl\.assertExecutionProgress\(control,p,fs\);/);
+  assert.ok(gate,'ACTIVE_VERSIONED_CURSOR_REQUIRED');
+  const f=successorModel(),changes=f.close(),control=changes[P.cp],p=changes[genName(f.target.generation,'FOCAL_PROGRESS')];
+  assert.notEqual(control.i66FrontendReleaseHead.scope,'COMPOSITE');
+  const run=()=>require('node:vm').runInNewContext(gate[0],{control,p,frontendControl:owner,fs});
+  assert.doesNotThrow(run);p.remainingExecutionLanes[0].evidence='obsolete E3 summary';
+  assert.throws(run,/I66_PROGRESS_REMAINING_LANES_DRIFT/);
 });
 test('active progress accepts only the checked-out objective and observer projections',()=>{
   const control=read(P.cp);
-  if(control.i66FrontendReleaseHead?.scope==='COMPOSITE')
+  if(control.i66FrontendReleaseHead)
     owner.assertExecutionProgress(control,read(control.i66ActiveRecoveryCursor.currentEvidencePath),fs);
+});
+test('the active state mirror archives the entire former mixed summary and rejects stale source evidence or next action',()=>{
+  const control=read(P.cp),transport=read(P.transport),state=read(P.state),prior=structuredClone(state.i66OwnerPlanContinuation20261115);
+  const before=serial(prior);owner.synchronizeOwnerPlanContinuation(control,state,transport);
+  assert.doesNotThrow(()=>owner.assertOwnerPlanContinuation(control,state,transport));
+  if(prior?.schema!=='GI_I66_ACTIVE_OWNER_PLAN_CONTINUATION_V1'){
+    assert.equal(serial(state.priorI66OwnerPlanContinuations.at(-1).prior),before);
+    assert.equal(state.priorI66OwnerPlanContinuations.at(-1).priorGitBlobSha,blob(before));
+  }
+  const history=serial(state.priorI66OwnerPlanContinuations);owner.synchronizeOwnerPlanContinuation(control,state,transport);
+  assert.equal(serial(state.priorI66OwnerPlanContinuations),history);
+  for(const mutate of [s=>s.i66OwnerPlanContinuation20261115.latestProvenLiveSource='1'.repeat(40),
+    s=>s.i66OwnerPlanContinuation20261115.evidenceGitBlobSha='2'.repeat(40),s=>s.i66OwnerPlanContinuation20261115.nextAction='36 old writes',
+    s=>s.nextAction='old work',s=>s.currentOperationalWorkPointer='old pointer']){
+    const changed=structuredClone(state);mutate(changed);assert.throws(()=>owner.assertOwnerPlanContinuation(control,changed,transport),/I66_OWNER_PLAN_/);
+  }
+});
+test('frontend E4 closure always installs the active mirror and cannot keep or delete the old resume summary',()=>{
+  const f=successorModel(),changes=f.close(),control=changes[P.cp],state=changes[P.state],transport=changes[P.transport];
+  assert.doesNotThrow(()=>owner.assertOwnerPlanContinuation(control,state,transport));
+  assert.equal(state.i66OwnerPlanContinuation20261115.evidenceGitBlobSha,control.i66ActiveRecoveryCursor.currentEvidenceBlobSha);
+  delete state.i66OwnerPlanContinuation20261115;
+  assert.throws(()=>owner.assertOwnerPlanContinuation(control,state,transport),/I66_OWNER_PLAN_ACTIVE_SUMMARY_DRIFT/);
+});
+test('E4 consumes its request and advances only current frontend views while retaining financial and backend proofs',()=>{
+  const f=successorModel();f.journal.request.scope='FRONTEND_ONLY';f.journal.request.scopeId='SIX_RECEIPT_CURRENT_BALANCE_READONLY';
+  f.cp.i66OperationalContinuation20261115.latestProvenLiveSource=f.oldTarget.sourceSha;
+  f.cp.i66OperationalContinuation20261115.latestProvenLiveSourceScope='COMPOSITE_FRONTEND_AND_FOUR_BACKEND_FUNCTIONS_SAME_IMMUTABLE_SIGNED_PROOF';
+  f.progress.financialWork.currentExecution20261124={paid:148,source:'independent financial proof'};
+  f.progress.releasedBackend={generation:3,scope:'COMPOSITE',sourceSha:f.oldTarget.sourceSha};
+  const before=structuredClone(f.progress),changes=f.close(),cp=changes[P.cp],p=changes[genName(f.target.generation,'FOCAL_PROGRESS')],tr=changes[P.transport];
+  assert.equal(p.releaseScope,'FRONTEND_ONLY');assert.equal(p.notTouched.productSource,false);
+  assert.equal(p.currentExecutionMutations.businessWrites,false);assert.equal(p.currentExecutionMutations.hostingDeploy,true);
+  assert.deepEqual(p.financialWork.currentExecution20261124,before.financialWork.currentExecution20261124);
+  assert.deepEqual(p.releasedBackend,before.releasedBackend);
+  assert.deepEqual(p.priorReleaseExecutionViews.at(-1).view.releaseExecution,before.releaseExecution);
+  assert.equal(p.priorReleaseExecutionViews.at(-1).priorLiveSourceScope.sourceSha,f.oldTarget.sourceSha);
+  assert.equal(p.priorReleaseExecutionViews.at(-1).priorLiveSourceScope.scope,'COMPOSITE_FRONTEND_AND_FOUR_BACKEND_FUNCTIONS_SAME_IMMUTABLE_SIGNED_PROOF');
+  assert.equal(p.shockObjectives.items.find(r=>r.id==='A12').passForShock,false);
+  assert.equal(p.shockObjectives.items.find(r=>r.id==='A12').status,'SIX_RECEIPT_PREVIEW_LIVE_SCOPED_UI_PASS_FULL_A12_OPEN');
+  assert.doesNotThrow(()=>owner.assertActiveReleaseProgress(cp,p,tr));assert.doesNotThrow(()=>owner.assertExecutionProgress(cp,p,fs));
+  const wrongScope=structuredClone(cp);wrongScope.i66OperationalContinuation20261115.latestProvenLiveSourceScope='COMPOSITE_FRONTEND_AND_FOUR_BACKEND_FUNCTIONS_SAME_IMMUTABLE_SIGNED_PROOF';
+  assert.throws(()=>owner.assertActiveReleaseProgress(wrongScope,p,tr),/I66_ACTIVE_FRONTEND_SOURCE_SCOPE_DRIFT/);
+  for(const mutate of [x=>x.releaseScope='COMPOSITE',x=>x.releaseExecution.sourceSha=f.oldTarget.sourceSha,
+    x=>x.notTouched.productSource=true,x=>x.currentExecutionMutations.businessWrites=true]){
+    const wrong=structuredClone(p);mutate(wrong);assert.throws(()=>owner.assertActiveReleaseProgress(cp,wrong,tr));
+  }
 });
 
 function model(){

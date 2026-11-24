@@ -8,15 +8,33 @@ const control=JSON.parse(fs.readFileSync('artifacts/orbit360-recovery/release-co
 const req=control.frontendPreviewRequest;
 const git=(...args)=>execFileSync('git',args,{encoding:'utf8',maxBuffer:8*1024*1024}).trim();
 const sha=p=>git('rev-parse',req.sourceQaHead+':'+p);
-test('composite signed Preview requires exact backend owner and prohibits LIVE',()=>{
- assert.ok(Number.isSafeInteger(req.version)&&req.version>0);
- assert.equal(req.mode,'COMPOSITE_ARTIFACT_HOSTING_PREVIEW_ONLY');
- assert.equal(req.fourFunctionExactPreviewRequired,true);
- assert.deepEqual(req.backendPaths,['functions/product-ops-leads-domain.js']);
- assert.equal(req.backendPathBlobs[req.backendPaths[0]],sha(req.backendPaths[0]));
- assert.equal(req.backendPreviewRequired,true);
- assert.equal(req.backendLiveDeployAllowed,false);
- assert.equal(req.realDataWritesAllowed,false);
+const frontendPath=p=>/^orbit360-platform\/(modules|core)\/[\w.-]+\.js$/.test(p);
+function assertRequestMode(request,blobFor){
+ assert.ok(Number.isSafeInteger(request.version)&&request.version>0,'REQUEST_VERSION_REQUIRED');
+ const composite=request.mode==='COMPOSITE_ARTIFACT_HOSTING_PREVIEW_ONLY';
+ assert.ok(composite||request.mode==='PREVIEW_HOSTING_ONLY','REQUEST_MODE_REQUIRED');
+ assert.ok(Array.isArray(request.productPaths)&&request.productPaths.length>0,'PRODUCT_PATHS_REQUIRED');
+ assert.ok(request.productPaths.some(frontendPath),'FRONTEND_PATH_REQUIRED');
+ if(composite){
+  assert.equal(request.fourFunctionExactPreviewRequired,true);
+  assert.deepEqual(request.backendPaths,['functions/product-ops-leads-domain.js']);
+  assert.equal(request.backendPathBlobs[request.backendPaths[0]],blobFor(request.backendPaths[0]));
+  assert.equal(request.backendPreviewRequired,true);
+  assert.deepEqual(request.productPaths.filter(p=>!frontendPath(p)),request.backendPaths);
+ }else{
+  // A focal frontend successor preserves the prior composite acceptance; it
+  // cannot inherit a backend deploy request or claim a four-function Preview.
+  assert.ok(request.productPaths.every(frontendPath),'FRONTEND_ONLY_PRODUCT_SCOPE');
+  assert.deepEqual(request.backendPaths===undefined?[]:request.backendPaths,[]);
+  assert.deepEqual(request.backendPathBlobs===undefined?{}:request.backendPathBlobs,{});
+  for(const field of ['backendPreviewRequired','fourFunctionExactPreviewRequired','immutableArtifactMustCoverBothFrontendAndBackend'])
+   assert.ok(request[field]===undefined||request[field]===false,'FRONTEND_ONLY_NO_BACKEND_'+field);
+ }
+ assert.equal(request.backendLiveDeployAllowed,false);
+ assert.equal(request.realDataWritesAllowed,false);
+}
+test('current signed Preview retains its exact mode scope and prohibits LIVE',()=>{
+ assertRequestMode(req,sha);
  // The request authorizes Preview only. A later LIVE transition has its own
  // exact candidate and signed-QA authority; it does not rewrite this request.
  if(control.status==='OPERATIONAL_EXACT_LIVE_PROMOTION_AUTHORIZED'){
@@ -46,7 +64,7 @@ test('signed request binds exact product paths and predecessor receipt at its so
    .split('\n').filter(Boolean);
  assert.deepEqual(req.productPaths,paths);
  assert.ok(paths.some(p=>/^orbit360-platform\/(modules|core)\/[\w.-]+\.js$/.test(p)));
- assert.deepEqual(paths.filter(p=>!/^orbit360-platform\/(modules|core)\/[\w.-]+\.js$/.test(p)),req.backendPaths);
+ assert.deepEqual(paths.filter(p=>!frontendPath(p)),req.mode==='COMPOSITE_ARTIFACT_HOSTING_PREVIEW_ONLY'?req.backendPaths:[]);
  assert.equal(req.manifestBlob,sha('artifacts/orbit360-recovery/release-control/I6_6_APPROVED_PRODUCT_DELTA_MANIFEST_20261110.json'));
  for(const id of [req.sourceQaRunId,req.guardRunId])assert.ok(Number.isSafeInteger(id)&&id>0);
  assert.notEqual(req.sourceQaRunId,req.guardRunId);
@@ -57,4 +75,62 @@ test('a request is admitted once and its next version cannot drift or skip',()=>
  assert.equal(previewRequestTransition({version:12,sourceQaHead:'b'.repeat(40)},old),true);
  for(const version of [10,11,13])assert.throws(()=>previewRequestTransition({version,sourceQaHead:'b'.repeat(40)},old),/PREVIEW_REQUEST_VERSION_DRIFT/);
  for(const version of [0,-1,1.5,'12',undefined])assert.throws(()=>previewRequestTransition({version},old),/PREVIEW_REQUEST_VERSION_INVALID/);
+});
+
+const fixtureBackend='functions/product-ops-leads-domain.js',fixtureBlob='a'.repeat(40);
+function requestFixture(mode){
+ const composite=mode==='COMPOSITE_ARTIFACT_HOSTING_PREVIEW_ONLY';
+ return {version:composite?14:15,mode,productPaths:composite?
+  [fixtureBackend,'orbit360-platform/core/queries.js']:['orbit360-platform/core/queries.js'],
+  backendPaths:composite?[fixtureBackend]:[],backendPathBlobs:composite?{[fixtureBackend]:fixtureBlob}:{},
+  backendPreviewRequired:composite,fourFunctionExactPreviewRequired:composite,
+  immutableArtifactMustCoverBothFrontendAndBackend:composite,
+  backendLiveDeployAllowed:false,realDataWritesAllowed:false};
+}
+test('v15 frontend-only fixture proves exact frontend paths with no backend request',()=>{
+ const request=requestFixture('PREVIEW_HOSTING_ONLY');
+ assertRequestMode(request,()=>assert.fail('frontend-only must not resolve a backend source'));
+ // Backend-only fields may be omitted rather than copied from the consumed
+ // composite request. The two explicit no-write flags remain mandatory.
+ for(const field of ['backendPaths','backendPathBlobs','backendPreviewRequired',
+   'fourFunctionExactPreviewRequired','immutableArtifactMustCoverBothFrontendAndBackend'])delete request[field];
+ assertRequestMode(request,()=>assert.fail('frontend-only must not resolve a backend source'));
+});
+test('frontend-only request rejects backend scope, stale composite flags and write authorization',()=>{
+ const mutations=[
+  ['unknown mode',r=>{r.mode='HOSTING_AND_BACKEND';}],
+  ['empty product scope',r=>{r.productPaths=[];}],
+  ['backend product path',r=>{r.productPaths.push(fixtureBackend);}],
+  ['non-module product path',r=>{r.productPaths.push('firebase.json');}],
+  ['backend request',r=>{r.backendPaths=[fixtureBackend];}],
+  ['backend blob request',r=>{r.backendPathBlobs={[fixtureBackend]:fixtureBlob};}],
+  ['backend Preview',r=>{r.backendPreviewRequired=true;}],
+  ['four-function claim',r=>{r.fourFunctionExactPreviewRequired=true;}],
+  ['composite artifact claim',r=>{r.immutableArtifactMustCoverBothFrontendAndBackend=true;}],
+  ['string false flag',r=>{r.backendPreviewRequired='false';}],
+  ['backend LIVE',r=>{r.backendLiveDeployAllowed=true;}],
+  ['real data writes',r=>{r.realDataWritesAllowed=true;}]
+ ];
+ for(const [name,mutate]of mutations){
+  const request=requestFixture('PREVIEW_HOSTING_ONLY');mutate(request);
+  assert.throws(()=>assertRequestMode(request,()=>fixtureBlob),undefined,name);
+ }
+});
+test('composite fixture retains all exact backend assertions and rejection cases',()=>{
+ assertRequestMode(requestFixture('COMPOSITE_ARTIFACT_HOSTING_PREVIEW_ONLY'),()=>fixtureBlob);
+ const mutations=[
+  ['four-function proof missing',r=>{r.fourFunctionExactPreviewRequired=false;}],
+  ['backend scope missing',r=>{r.backendPaths=[];}],
+  ['backend scope enlarged',r=>{r.backendPaths.push('functions/bootstrap.js');}],
+  ['backend blob changed',r=>{r.backendPathBlobs[fixtureBackend]='b'.repeat(40);}],
+  ['backend Preview missing',r=>{r.backendPreviewRequired=false;}],
+  ['frontend delta missing',r=>{r.productPaths=[fixtureBackend];}],
+  ['unlisted backend delta',r=>{r.productPaths.push('functions/bootstrap.js');}],
+  ['backend LIVE',r=>{r.backendLiveDeployAllowed=true;}],
+  ['real data writes',r=>{r.realDataWritesAllowed=true;}]
+ ];
+ for(const [name,mutate]of mutations){
+  const request=requestFixture('COMPOSITE_ARTIFACT_HOSTING_PREVIEW_ONLY');mutate(request);
+  assert.throws(()=>assertRequestMode(request,()=>fixtureBlob),undefined,name);
+ }
 });

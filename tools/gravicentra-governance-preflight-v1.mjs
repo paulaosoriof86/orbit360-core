@@ -53,10 +53,11 @@ if(i66Active&&control.i66ActiveRecoveryCursor){
       throw Error('I66_PROGRESS_CURSOR_BLOB_DRIFT:'+String(path));
   }
   const p=JSON.parse(fs.readFileSync(c.currentEvidencePath,'utf8'));
-  // Validate only the active composite cursor. Sealed historical snapshots are
-  // not rewritten or reinterpreted by this post-acceptance continuity check.
-  if(control.i66FrontendReleaseHead?.scope==='COMPOSITE')
+  // Validate the active versioned cursor for either release scope. A frontend
+  // successor archives the previous observers; historical snapshots stay sealed.
+  if(control.i66FrontendReleaseHead)
     frontendControl.assertExecutionProgress(control,p,fs);
+  frontendControl.assertActiveReleaseProgress(control,p,JSON.parse(fs.readFileSync(frontendControl.P.transport,'utf8')));
   if(c.executionSynchronizationVersion===1){
     const executionTransport=JSON.parse(fs.readFileSync(frontendControl.P.transport,'utf8'));
     assert.deepEqual(p.executionSynchronization,frontendControl.executionSnapshot(executionTransport),
