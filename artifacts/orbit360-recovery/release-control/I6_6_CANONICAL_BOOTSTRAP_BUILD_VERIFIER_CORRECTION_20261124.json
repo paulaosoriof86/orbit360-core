@@ -1,0 +1,215 @@
+{
+  "schema": "GI_I66_CANONICAL_BUILD_VERIFIER_CAUSAL_CORRECTION_V1",
+  "recordedAtUtc": "2026-11-24T10:26:59.463Z",
+  "activeGate": "I6.6",
+  "status": "LOCAL_CANONICAL_BUILD_VERIFIER_CAUSAL_CORRECTION_PASS_NEW_SIGNED_QA_AND_REBUILD_REQUIRED",
+  "preparedAgainstHead": "99f2da6616f37dfad9d54ea2c81cb06cf536ef63",
+  "cause": {
+    "observedIn": "READONLY_LOCAL_VERIFICATION_OF_THE_ACTUAL_SIGNED_V18_ARTIFACT_BEFORE_BACKEND_PREVIEW",
+    "priorRawBootstrapComparison": "FAIL_REPRODUCED",
+    "backendWorkflowFailureClaimed": false,
+    "explanation": "The canonical pinned packager appends exactly one B4 scoped-callable export to bootstrap.js. The three new Make byte-comparison blocks compared packaged bootstrap to raw source, unlike the canonical build verifier. This would reject the valid immutable bundle before backend deployment or a protected configuration operation.",
+    "affectedBlocks": [
+      "EXACT_BACKEND_PREVIEW",
+      "EXACT_BACKEND_LIVE",
+      "PROTECTED_MAKE_CONFIGURATION"
+    ],
+    "packagerPath": "tools/gravicentra-i6-1-preview-package.mjs",
+    "packagerBlob": "c774bbcec55878fa7136f906443e605be43334d4",
+    "rawBootstrapBlob": "bd0837a9d5296a456e0575aec555b2971fdedcd7",
+    "packagedBootstrapBlob": "688ae482ed1a93d0d9f2e71a13ec01f32eea1a0e"
+  },
+  "correction": {
+    "owner": "tools/gravicentra-i66-make-release-scope.cjs",
+    "method": "Require the exact canonical packager blob, derive the complete bootstrap output from its existing deterministic B4 suffix, and compare complete bytes. Other five declared source paths remain exact raw-source comparisons. No startsWith admission or broad output exemption.",
+    "immutableArtifactEdited": false,
+    "productSourceChanged": false,
+    "sourceManifestChanged": false,
+    "changedPins": [
+      {
+        "path": "tools/gravicentra-i66-make-release-scope.cjs",
+        "priorGitBlobSha": "bfdadef022b3b70b4628968f2622ab5be9cd94c6",
+        "gitBlobSha": "7e12a9132bde60dfbff496db39a95e186a558465"
+      },
+      {
+        "path": "tools/gravicentra-i66-make-release-scope.test.cjs",
+        "priorGitBlobSha": "cfa0fd7628acb087983ab0df4dee0bd39d1753ac",
+        "gitBlobSha": "0b92b42cc492665c88695ee2968e6508e6aa760e"
+      },
+      {
+        "path": ".github/workflows/gravicentra-i66-privileged-role-three-function-preview-uat.yml",
+        "priorGitBlobSha": "9cbfac18fc0e473878d83a7f9bb901e8e660c179",
+        "gitBlobSha": "b6ee9c071b3e045e512884248ffbbe46ed6c1f1a"
+      },
+      {
+        "path": ".github/workflows/gravicentra-i66-privileged-role-exact-live-promotion.yml",
+        "priorGitBlobSha": "9cab0eae6b4c6107f18c9cf36663f32279367d1c",
+        "gitBlobSha": "a0ebd06feef87a25e868f6b64212b78be2e0e534"
+      }
+    ]
+  },
+  "preservedV18": {
+    "status": "IMMUTABLE_BUILD_AND_HOSTING_PREVIEW_224_READBACK_PASS_BACKEND_PREVIEW_NOT_RUN",
+    "sourceSha": "99f2da6616f37dfad9d54ea2c81cb06cf536ef63",
+    "buildId": "gi-i66-99f2da6616f3-57f234755dc1",
+    "buildRunId": 45372999520,
+    "jobId": 138371984563,
+    "artifactId": 14909738272,
+    "artifactDigest": "sha256:39e8ec2183f9347ea41a94d887c81a5656403dc4d6746f9fd61993e856f2658c",
+    "tarDigest": "sha256:4b589ad0c68e151d003fcfcda2f641db752416b5802b3d45f4182f2a5b254fc5",
+    "previewUrl": "https://ays-orbit-360-lab--gi-i66-rc-45372999520-07y0gfca.web.app",
+    "previewChannel": "gi-i66-rc-45372999520",
+    "hostingVersion": null,
+    "hostingVersionNotExposedByBuildReceipt": true,
+    "exactManifestCounts": {
+      "site": 224,
+      "backend": 48,
+      "bundle": 274
+    },
+    "packageOutput": {
+      "buildId": "gi-i66-99f2da6616f3-57f234755dc1",
+      "buildBoundAssetCount": 138,
+      "hostedFileCount": 224,
+      "hostedPayloadDigest": "038d95b93460d3d042613e3ae2da78678283fb0479057bbc6cc5c06b719b0376",
+      "backendFileCount": 48,
+      "backendSourceDigest": "5df17c7e1e49107e0b9aff93c6986fb4aec2f18b76af1aa19a39cb3af6778a06",
+      "bundleFileCount": 274,
+      "bundleDigest": "dc7a26af78dbdbce665657c19f9b2bdc412c25cd24a5cc07ee6061f32fb797c7",
+      "reachableProductFiles": 217
+    },
+    "signedReadbackStep": {
+      "number": 12,
+      "name": "Preview readback all artifact files and confirm both LIVE origins are untouched",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    "bothLiveOriginsFingerprintUnchanged": true,
+    "backendDeploys": 0,
+    "backendPreviewAccepted": false,
+    "liveAccepted": false
+  },
+  "localValidation": {
+    "scopeTests": {
+      "passed": 11,
+      "failed": 0,
+      "cancelled": 0,
+      "skipped": 0
+    },
+    "composedSuites": {
+      "passed": 253,
+      "failed": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "logSha256": "004b0e1574f16eb119ff64255c5917f2ca9a1bf59b899356ddea9b826cf47ea4"
+    },
+    "artifactVerification": {
+      "oldRawBootstrapCheck": "REPRODUCED_FAILURE",
+      "newExactCanonicalBuildVerification": "PASS",
+      "artifactMutations": 0,
+      "rows": [
+        {
+          "path": "functions/b4-003-scoped-related-reader.js",
+          "sourceBlob": "439bea6d90ef9a6a03ca2539096cb626cc43695d",
+          "packagedBlob": "439bea6d90ef9a6a03ca2539096cb626cc43695d",
+          "rawEquals": true,
+          "canonicalBuildEquals": true
+        },
+        {
+          "path": "functions/bootstrap.js",
+          "sourceBlob": "bd0837a9d5296a456e0575aec555b2971fdedcd7",
+          "packagedBlob": "688ae482ed1a93d0d9f2e71a13ec01f32eea1a0e",
+          "rawEquals": false,
+          "canonicalBuildEquals": true
+        },
+        {
+          "path": "functions/make-lead-ingress-bridge.js",
+          "sourceBlob": "8b519ad21da032ffeeee7f9f9cc3e9c3fe6c1317",
+          "packagedBlob": "8b519ad21da032ffeeee7f9f9cc3e9c3fe6c1317",
+          "rawEquals": true,
+          "canonicalBuildEquals": true
+        },
+        {
+          "path": "functions/product-lead-ingress-contract.js",
+          "sourceBlob": "ee29ee1fb12b1a30bf24b7c2c2a8180a2f2ef937",
+          "packagedBlob": "ee29ee1fb12b1a30bf24b7c2c2a8180a2f2ef937",
+          "rawEquals": true,
+          "canonicalBuildEquals": true
+        },
+        {
+          "path": "functions/product-lead-ingress-owner-support.js",
+          "sourceBlob": "0f07f1620e3968cacf684a88c895faa64eb8a1a1",
+          "packagedBlob": "0f07f1620e3968cacf684a88c895faa64eb8a1a1",
+          "rawEquals": true,
+          "canonicalBuildEquals": true
+        },
+        {
+          "path": "functions/product-ops-leads-domain.js",
+          "sourceBlob": "affde2677b4c997b89abdabf3af2cb920128935d",
+          "packagedBlob": "affde2677b4c997b89abdabf3af2cb920128935d",
+          "rawEquals": true,
+          "canonicalBuildEquals": true
+        }
+      ]
+    },
+    "negatives": [
+      "all six owner files reject one-byte changes",
+      "missing bootstrap transform",
+      "duplicate transform",
+      "changed export",
+      "extra prefix or suffix",
+      "truncated suffix",
+      "ambiguous preintegration",
+      "twelve undeclared paths",
+      "changed packager blob",
+      "non-buffer input"
+    ],
+    "actualCanonicalPackagerTransformationExecuted": true,
+    "allThreeWorkflowVerificationBlocksExecuted": true
+  },
+  "preserved": {
+    "manifestBlob": "677354250c84ef0a5af0b562e29586dfe1559553",
+    "productPins": [
+      {
+        "path": "functions/b4-003-scoped-related-reader.js",
+        "gitBlobSha": "439bea6d90ef9a6a03ca2539096cb626cc43695d"
+      },
+      {
+        "path": "functions/bootstrap.js",
+        "gitBlobSha": "bd0837a9d5296a456e0575aec555b2971fdedcd7"
+      },
+      {
+        "path": "functions/make-lead-ingress-bridge.js",
+        "gitBlobSha": "8b519ad21da032ffeeee7f9f9cc3e9c3fe6c1317"
+      },
+      {
+        "path": "functions/product-lead-ingress-contract.js",
+        "gitBlobSha": "ee29ee1fb12b1a30bf24b7c2c2a8180a2f2ef937"
+      },
+      {
+        "path": "functions/product-lead-ingress-owner-support.js",
+        "gitBlobSha": "0f07f1620e3968cacf684a88c895faa64eb8a1a1"
+      },
+      {
+        "path": "functions/product-ops-leads-domain.js",
+        "gitBlobSha": "affde2677b4c997b89abdabf3af2cb920128935d"
+      }
+    ],
+    "currentAcceptedGeneration": 3,
+    "currentAcceptedArtifactId": 14873426438,
+    "currentAcceptedSourceSha": "65c825b2808a615ca4195bdde6689dbdbe3193b2",
+    "sourceHistoryReceiptPath": "artifacts/orbit360-recovery/release-control/I6_6_A13_A14_TRANSPORT_COMPOSED_SOURCE_20261124.json",
+    "sourceHistoryReceiptBlob": "09f858e4f33c8fd238df4e04460c9d97fb2a2e98",
+    "financialWrites": 0,
+    "externalMessages": 0,
+    "makeModuleRemainsDisabled": true
+  },
+  "next": {
+    "requestVersion": 19,
+    "newSignedSourceQaRequired": true,
+    "newGuardRequired": true,
+    "newImmutableBuildRequired": true,
+    "sameNewArtifactRequiredForPreviewAndLive": true,
+    "noV18ArtifactPatch": true,
+    "productionAcceptanceClaimed": false
+  }
+}

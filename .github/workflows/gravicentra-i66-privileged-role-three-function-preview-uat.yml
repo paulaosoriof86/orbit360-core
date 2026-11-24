@@ -148,10 +148,15 @@ jobs:
             cmp "$RUNNER_TEMP/i66-source-$p" "$BACKEND/$p"
           done
           if test "$I66_MAKE_INGRESS" = true;then
-            for p in bootstrap.js make-lead-ingress-bridge.js product-lead-ingress-contract.js product-lead-ingress-owner-support.js;do
-              git show "$SOURCE_SHA:functions/$p" > "$RUNNER_TEMP/i66-source-$p"
-              cmp "$RUNNER_TEMP/i66-source-$p" "$BACKEND/$p"
-            done
+            node - <<'MAKE_BYTES'
+          const fs=require('node:fs'),{execFileSync}=require('node:child_process');
+          const scope=require('./tools/gravicentra-i66-make-release-scope.cjs');
+          const source=file=>execFileSync('git',['show',process.env.SOURCE_SHA+':'+file]);
+          const packager=source(scope.PACKAGER_PATH);
+          for(const file of scope.SOURCE_PATHS)scope.validatePackagedSourceBytes(file,source(file),
+            fs.readFileSync(process.env.I66_PACKAGE_ROOT+'/bundle/backend/'+file.slice(10)),packager);
+          console.log('I66_MAKE_SIX_PINNED_OWNERS_EXACT_CANONICAL_BUILD_BYTES_PASS');
+          MAKE_BYTES
           fi
           test -f "$BACKEND/index.js"
           node --check "$BACKEND/index.js"

@@ -155,9 +155,13 @@ jobs:
             ['backend/i66-conciliaciones-active-ledger-projection.js','functions/i66-conciliaciones-active-ledger-projection.js'],
             ['site/core/access-scope.js','orbit360-platform/core/access-scope.js']
           ])assert.ok(fs.readFileSync(p+'/'+target).equals(execFileSync('git',['show',process.env.I66_ROLE_SOURCE_SHA+':'+source])),'I66_ROLE_PRODUCT_OWNER_BYTES_DIFFER:'+source);
-          if(process.env.I66_MAKE_INGRESS==='true')for(const file of require('./tools/gravicentra-i66-make-release-scope.cjs').SOURCE_PATHS)
-            assert.ok(fs.readFileSync(p+'/backend/'+file.slice(10)).equals(execFileSync('git',['show',process.env.I66_ROLE_SOURCE_SHA+':'+file])),
-              'I66_MAKE_PRODUCT_OWNER_BYTES_DIFFER:'+file);
+          if(process.env.I66_MAKE_INGRESS==='true'){
+            const scope=require('./tools/gravicentra-i66-make-release-scope.cjs');
+            const source=file=>execFileSync('git',['show',process.env.I66_ROLE_SOURCE_SHA+':'+file]);
+            const packager=source(scope.PACKAGER_PATH);
+            for(const file of scope.SOURCE_PATHS)scope.validatePackagedSourceBytes(file,source(file),
+              fs.readFileSync(p+'/backend/'+file.slice(10)),packager);
+          }
           assert.ok(fs.existsSync(p+'/backend/bootstrap.js')&&fs.existsSync(p+'/backend/package-lock.json'));
           console.log('I66_ROLE_ORIGINAL_PREVIEW_ARTIFACT_EXACT_BACKEND_AND_FRONTEND_BYTES_PASS');
           NODE
@@ -539,10 +543,12 @@ jobs:
           tar -xzf "${TARS[0]}" -C "$I66_PACKAGE_ROOT" --no-same-owner
           (cd "$I66_PACKAGE_ROOT/bundle/backend" && sha256sum --check --quiet "$I66_PACKAGE_ROOT/evidence/backend-manifest.sha256")
           node - <<'NODE'
-          const fs=require('node:fs'),assert=require('node:assert/strict'),{execFileSync}=require('node:child_process');
+          const fs=require('node:fs'),{execFileSync}=require('node:child_process');
           const s=require('./tools/gravicentra-i66-make-release-scope.cjs');
-          for(const file of s.SOURCE_PATHS)assert.ok(fs.readFileSync(process.env.I66_PACKAGE_ROOT+'/bundle/backend/'+file.slice(10))
-            .equals(execFileSync('git',['show',process.env.I66_ROLE_SOURCE_SHA+':'+file])));
+          const source=file=>execFileSync('git',['show',process.env.I66_ROLE_SOURCE_SHA+':'+file]);
+          const packager=source(s.PACKAGER_PATH);
+          for(const file of s.SOURCE_PATHS)s.validatePackagedSourceBytes(file,source(file),
+            fs.readFileSync(process.env.I66_PACKAGE_ROOT+'/bundle/backend/'+file.slice(10)),packager);
           NODE
           (cd "$I66_PACKAGE_ROOT/bundle/backend" && npm ci --ignore-scripts --no-audit --no-fund >/dev/null)
           echo "I66_PACKAGE_ROOT=$I66_PACKAGE_ROOT" >> "$GITHUB_ENV"

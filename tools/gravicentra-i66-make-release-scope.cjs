@@ -24,6 +24,8 @@ const SOURCE_PATHS=Object.freeze(['functions/b4-003-scoped-related-reader.js','f
 const FRONTEND_PATH='orbit360-platform/core/queries.js';
 const FRONTEND_BLOB='b77b65f86ef6ac2ab6dc157fdbc9ad5e34dbcdcc';
 const PRODUCT_PATHS=Object.freeze([...SOURCE_PATHS,FRONTEND_PATH]);
+const PACKAGER_PATH='tools/gravicentra-i6-1-preview-package.mjs';
+const PACKAGER_BLOB='c774bbcec55878fa7136f906443e605be43334d4';
 const BALANCE_RECEIPT_PATH='artifacts/orbit360-recovery/release-control/I6_6_FUTURE_PENDING_BALANCE_OWNER_CAUSAL_CORRECTION_20261124.json';
 const BALANCE_RECEIPT_BLOB='c05769d469b0a5e88e72e9e946095cb47bfc9d32';
 const BALANCE_CORRECTION=Object.freeze({path:FRONTEND_PATH,gitBlobSha:FRONTEND_BLOB,
@@ -39,6 +41,25 @@ const sha64=(s,m)=>assert.match(String(s||''),/^[a-f0-9]{64}$/,m);
 const digest=s=>crypto.createHash('sha256').update(s).digest('hex');
 const blob=s=>crypto.createHash('sha1').update('blob '+Buffer.byteLength(s)+'\0').update(s).digest('hex');
 const isMake=p=>p?.makeIngressComposite===true;
+// The pinned canonical builder adds exactly this B4 export to bootstrap once.
+// Verify its complete deterministic output; every other declared owner remains
+// byte-identical, and no packaged file is edited by this verifier.
+function validatePackagedSourceBytes(sourcePath,sourceBytes,packagedBytes,packagerBytes){
+  assert.ok(SOURCE_PATHS.includes(sourcePath),'I66_MAKE_PACKAGED_SOURCE_PATH_FORBIDDEN');
+  for(const bytes of [sourceBytes,packagedBytes,packagerBytes])assert.ok(Buffer.isBuffer(bytes),'I66_MAKE_PACKAGED_SOURCE_BUFFER_REQUIRED');
+  assert.equal(blob(packagerBytes),PACKAGER_BLOB,'I66_MAKE_CANONICAL_PACKAGER_PIN_DRIFT');
+  let expected=sourceBytes;
+  if(sourcePath==='functions/bootstrap.js'){
+    const source=sourceBytes.toString('utf8');
+    assert.ok(Buffer.from(source,'utf8').equals(sourceBytes),'I66_MAKE_BOOTSTRAP_SOURCE_ENCODING_DRIFT');
+    const integrated=source.includes("require('./b4-003-scoped-policy-callable')");
+    assert.ok(!source.includes('b4-003-scoped-policy-callable')||integrated,'B4_003_SCOPED_EXPORT_DUPLICATE');
+    const suffix="\n// B4-003 dual-name source; executor deploys Preview only.\nObject.assign(module.exports,require('./b4-003-scoped-policy-callable'));\n";
+    if(!integrated)expected=Buffer.concat([sourceBytes,Buffer.from(suffix,'utf8')]);
+  }
+  assert.ok(expected.equals(packagedBytes),'I66_MAKE_PRODUCT_OWNER_BUILD_BYTES_DIFFER:'+sourcePath);
+  return true;
+}
 function target(p,phase){assert.ok(isMake(p),'I66_MAKE_SCOPE_REQUIRED');assert.ok(ADDED[phase]);return ADDED[phase];}
 function validateScope(scope,{sourceSha,phase}={}){
   assert.equal(scope?.schema,SCOPE,'I66_MAKE_RELEASE_SCHEMA');
@@ -106,6 +127,7 @@ function validateCandidate(p,phase){
 function verifySourcePins(p){
   const s=validateScope(p.makeIngress,{sourceSha:p.sourceSha});
   const at=(sha,pth)=>execFileSync('git',['show',sha+':'+pth]);
+  assert.equal(blob(at(p.sourceSha,PACKAGER_PATH)),PACKAGER_BLOB,'I66_MAKE_CANONICAL_PACKAGER_PIN_DRIFT');
   assert.equal(blob(at(p.sourceSha,CONTRACT_PATH)),CONTRACT_BLOB,'I66_MAKE_APPROVED_CONTRACT_CHANGED');
   const decisionBytes=at(p.sourceSha,COMMUNICATION_DECISION_PATH);
   assert.equal(blob(decisionBytes),COMMUNICATION_DECISION_BLOB,'I66_MAKE_COMMUNICATION_DECISION_CHANGED');
@@ -195,5 +217,5 @@ function validateLiveProof(p,proof){
   assert.equal(row.currentRevision,proof.makeIngress.closedTrigger.revision);
   return proof;
 }
-module.exports={SCOPE,REQUEST_MODE,CONTRACT_PATH,CONTRACT_BLOB,COMMUNICATION_DECISION_PATH,COMMUNICATION_DECISION_BLOB,META_RECEIPT_PATH,META_RECEIPT_BLOB,EVENT_TYPE,SECRET,RUNTIME,RUNTIME_RECEIPT_PATH,RUNTIME_RECEIPT_BLOB,RUNTIME_REPORT_DIGEST,SOURCE_PATHS,FRONTEND_PATH,FRONTEND_BLOB,PRODUCT_PATHS,BALANCE_RECEIPT_PATH,BALANCE_RECEIPT_BLOB,BALANCE_CORRECTION,ADDED,PREVIEW_STATUS,LIVE_STATUS,
-  isMake,target,validateScope,validateCandidate,verifySourcePins,validateInventoryBefore,validateInventoryAfter,validateTrigger,validatePreviewProof,validateLiveProof};
+module.exports={SCOPE,REQUEST_MODE,CONTRACT_PATH,CONTRACT_BLOB,COMMUNICATION_DECISION_PATH,COMMUNICATION_DECISION_BLOB,META_RECEIPT_PATH,META_RECEIPT_BLOB,EVENT_TYPE,SECRET,RUNTIME,RUNTIME_RECEIPT_PATH,RUNTIME_RECEIPT_BLOB,RUNTIME_REPORT_DIGEST,SOURCE_PATHS,FRONTEND_PATH,FRONTEND_BLOB,PRODUCT_PATHS,PACKAGER_PATH,PACKAGER_BLOB,BALANCE_RECEIPT_PATH,BALANCE_RECEIPT_BLOB,BALANCE_CORRECTION,ADDED,PREVIEW_STATUS,LIVE_STATUS,
+  isMake,target,validatePackagedSourceBytes,validateScope,validateCandidate,verifySourcePins,validateInventoryBefore,validateInventoryAfter,validateTrigger,validatePreviewProof,validateLiveProof};

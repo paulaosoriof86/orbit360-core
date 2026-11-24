@@ -2,6 +2,79 @@
 const test=require('node:test'),assert=require('node:assert/strict');
 const s=require('./gravicentra-i66-make-release-scope.cjs'),g=require('./gravicentra-i6-6-operational-release-candidate.cjs');
 const clone=v=>structuredClone(v);
+const fs=require('node:fs'),path=require('node:path'),vm=require('node:vm');
+const packagerBytes=fs.readFileSync(path.join(__dirname,'..',s.PACKAGER_PATH));
+// Execute the transformation from the real pinned builder; the oracle is not
+// another copy of the expected suffix in this test.
+function builtBootstrap(source){
+ const text=packagerBytes.toString('utf8');
+ const begin=text.indexOf(" const entry=path.join(BACKEND,'bootstrap.js');");
+ const end=text.indexOf(" fs.writeFileSync(path.join(EVIDENCE,'scoped-preview-authorization.json')",begin);
+ assert.ok(begin>0&&end>begin,'canonical bootstrap builder block must be found');
+ let output=Buffer.from(source);
+ vm.runInNewContext(text.slice(begin,end),{BACKEND:'backend',path,read:p=>{
+  assert.equal(p,'backend/bootstrap.js');return source.toString('utf8');
+ },fs:{writeFileSync:(p,value)=>{assert.equal(p,'backend/bootstrap.js');output=Buffer.from(value,'utf8');}}});
+ return output;
+}
+test('packaged Make owners match the complete canonical builder output and retain exact ordinary source bytes',()=>{
+ for(const file of s.SOURCE_PATHS){
+  const source=fs.readFileSync(path.join(__dirname,'..',file));
+  const target=file==='functions/bootstrap.js'?builtBootstrap(source):source;
+  assert.equal(s.validatePackagedSourceBytes(file,source,target,packagerBytes),true,file);
+  const changed=Buffer.from(target);changed[Math.floor(changed.length/2)]^=1;
+  assert.throws(()=>s.validatePackagedSourceBytes(file,source,changed,packagerBytes),/PRODUCT_OWNER_BUILD_BYTES_DIFFER/,file);
+ }
+});
+test('bootstrap verifier rejects missing, duplicate, changed and additional suffix bytes without editing its input',()=>{
+ const file='functions/bootstrap.js',source=fs.readFileSync(path.join(__dirname,'..',file));
+ const built=builtBootstrap(source),suffix=built.subarray(source.length),before=Buffer.from(built);
+ assert.ok(suffix.length>0,'the current canonical source requires its build suffix');
+ for(const bad of [source,Buffer.concat([built,suffix]),Buffer.concat([built,Buffer.from('\n')]),
+  Buffer.from(built.toString('utf8').replace("require('./b4-003-scoped-policy-callable')","require('./other')")),
+  Buffer.concat([Buffer.from('//extra\n'),built]),built.subarray(0,built.length-1)]){
+  assert.throws(()=>s.validatePackagedSourceBytes(file,source,bad,packagerBytes),/PRODUCT_OWNER_BUILD_BYTES_DIFFER/);
+ }
+ assert.ok(built.equals(before),'the certified artifact bytes are read-only');
+ assert.equal(s.validatePackagedSourceBytes(file,built,builtBootstrap(built),packagerBytes),true,'already integrated canonical input remains idempotent');
+ const ambiguous=Buffer.from("// b4-003-scoped-policy-callable\nmodule.exports={};\n");
+ assert.throws(()=>s.validatePackagedSourceBytes(file,ambiguous,ambiguous,packagerBytes),/B4_003_SCOPED_EXPORT_DUPLICATE/);
+});
+test('packaged source verifier accepts only the six exact paths and the sealed canonical packager',()=>{
+ const data=Buffer.from('owner');
+ for(const file of ['functions/bootstrap.js.extra','functions/bootstrap.js/other','functions/../bootstrap.js','./functions/bootstrap.js',
+  'functions//bootstrap.js','functions/Bootstrap.js','functions/bootstrap.jsx','functions/other.js',
+  'bootstrap.js','backend/bootstrap.js','functions/product-lead-ingress-contract.js.extra','functions/product-ops-leads-domain.js/../other.js'])
+  assert.throws(()=>s.validatePackagedSourceBytes(file,data,data,packagerBytes),/PACKAGED_SOURCE_PATH_FORBIDDEN/);
+ assert.throws(()=>s.validatePackagedSourceBytes(s.SOURCE_PATHS[0],data,data,Buffer.concat([packagerBytes,Buffer.from('\n')])),/CANONICAL_PACKAGER_PIN_DRIFT/);
+ assert.throws(()=>s.validatePackagedSourceBytes(s.SOURCE_PATHS[0],data.toString(),data,packagerBytes),/PACKAGED_SOURCE_BUFFER_REQUIRED/);
+});
+test('Preview, LIVE and protected configuration byte-verification blocks execute the same complete pinned owner validator',()=>{
+ const files=['.github/workflows/gravicentra-i66-privileged-role-three-function-preview-uat.yml',
+  '.github/workflows/gravicentra-i66-privileged-role-exact-live-promotion.yml',
+  '.github/workflows/gravicentra-i66-privileged-role-exact-live-promotion.yml'];
+ for(const [index,file] of files.entries()){
+  const text=fs.readFileSync(path.join(__dirname,'..',file),'utf8');
+  const block=index===0?text.match(/node - <<'MAKE_BYTES'\n([\s\S]*?)\n          MAKE_BYTES/)[1]:index===1?
+   text.match(/if\(process.env.I66_MAKE_INGRESS==='true'\)\{\n([\s\S]*?)\n          \}/)[1]:
+   text.slice(text.indexOf('- name: Reuse immutable backend SDK and verify every ingress source byte')).match(/node - <<'NODE'\n([\s\S]*?)\n          NODE/)[1];
+  const checked=[];
+  const source=file=>file===s.PACKAGER_PATH?packagerBytes:fs.readFileSync(path.join(__dirname,'..',file));
+  vm.runInNewContext(block,{p:'package/bundle',process:{env:{SOURCE_SHA:'1'.repeat(40),I66_ROLE_SOURCE_SHA:'1'.repeat(40),I66_PACKAGE_ROOT:'package'}},console:{log:()=>{}},require:name=>{
+   if(name==='node:fs')return{readFileSync:target=>{
+    assert.ok(target.startsWith('package/bundle/backend/'));const file='functions/'+target.slice('package/bundle/backend/'.length);
+    assert.ok(s.SOURCE_PATHS.includes(file));const raw=source(file);return file==='functions/bootstrap.js'?builtBootstrap(raw):raw;
+   }};
+   if(name==='node:child_process')return{execFileSync:(cmd,args)=>{assert.equal(cmd,'git');assert.equal(args[0],'show');
+    assert.equal(args[1].slice(0,41),'1'.repeat(40)+':');return source(args[1].slice(41));}};
+   assert.equal(name,'./tools/gravicentra-i66-make-release-scope.cjs');return{...s,validatePackagedSourceBytes:(...args)=>{checked.push(args[0]);return s.validatePackagedSourceBytes(...args);}};
+  },fs:{readFileSync:target=>{
+   assert.ok(target.startsWith('package/bundle/backend/'));const file='functions/'+target.slice('package/bundle/backend/'.length);
+   assert.ok(s.SOURCE_PATHS.includes(file));const raw=source(file);return file==='functions/bootstrap.js'?builtBootstrap(raw):raw;
+  }},execFileSync:(cmd,args)=>{assert.equal(cmd,'git');assert.equal(args[0],'show');assert.equal(args[1].slice(0,41),'1'.repeat(40)+':');return source(args[1].slice(41));}});
+  assert.deepEqual(checked,[...s.SOURCE_PATHS],file);
+ }
+});
 function fixture(){
  const physical={sourceSha:'1'.repeat(40),buildId:'gi-i66-'+ '1'.repeat(12)+'-57f234755dc1',artifactId:148,
   artifactDigest:'sha256:'+'a'.repeat(64),previewRunId:149,liveCloneRunId:150,liveHostingVersion:'sites/ays-orbit-360-lab/versions/physical'};
