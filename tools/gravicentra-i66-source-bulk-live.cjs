@@ -286,12 +286,22 @@ async function locateAttestedPayments(db,groups,rows){
 
 async function main(){
   const mode=str(process.env.GI_I66_BULK_MODE);
-  assert.ok(['preflight','case-readback','apply'].includes(mode),'I66_BULK_MODE_MUST_BE_EXPLICIT');
+  assert.ok(['preflight','case-readback','mapfre-readback','apply'].includes(mode),'I66_BULK_MODE_MUST_BE_EXPLICIT');
   assert.equal(process.env.GCLOUD_PROJECT,PROJECT,'I66_PROJECT_NOT_EXISTING_FIREBASE');
-  const source=sealedSource();
   const admin=require('firebase-admin');
   admin.initializeApp({credential:admin.credential.applicationDefault(),projectId:PROJECT});
   const db=admin.firestore();
+  if(mode==='mapfre-readback'){
+    const review=await require('./gravicentra-i66-financial-identity-readback.cjs').mapfreFreshPreflight(db);
+    output('GI_I66_BULK_REPORT_OUT',review);
+    output('GI_I66_BULK_PLAN_OUT',{status:'BULK_MAPFRE_READONLY_PREFLIGHT_NO_WRITES',readOnly:true,
+      writes:0,paymentWriteEligibleCount:0,inputRows:2,chunks:[],privateReportRequired:true,
+      correctionEligibleCount:review.correctionEligibleCount,beforeHash:review.beforeHash});
+    console.log('I66_MAPFRE_FRESH_PREFLIGHT originals='+review.originals.filter(x=>x.status==='ORIGINAL_BYTES_VERIFIED').length+
+      ' correctionEligible='+review.correctionEligibleCount+' holds='+review.globalHolds.join(',')+' PAYMENT_WRITES_0');
+    return;
+  }
+  const source=sealedSource();
   if(mode==='case-readback'){
     const rows=selectReadbackCase(source.data.rows,str(process.env.GI_I66_BULK_READBACK_CASE));
     const groups=await readGroups(db,rows),plan=planSourceBatch(rows,groups,{chunkSize:250});

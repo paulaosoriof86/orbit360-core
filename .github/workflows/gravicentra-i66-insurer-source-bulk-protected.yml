@@ -23,6 +23,7 @@ on:
       - tools/gravicentra-i66-source-bulk-plan.cjs
       - tools/gravicentra-i66-source-bulk-apply.cjs
       - tools/gravicentra-i66-source-bulk-live.cjs
+      - tools/gravicentra-i66-financial-identity-readback.cjs
       - tools/gravicentra-i66-source-bulk-plan.test.cjs
       - tools/gravicentra-i66-source-bulk-apply.test.cjs
       - tools/gravicentra-i66-source-bulk-readback.test.cjs
@@ -48,6 +49,7 @@ jobs:
       github.repository == 'paulaosoriof86/orbit360-core' &&
       github.ref == 'refs/heads/recovery/fase-a-clean-20260831' &&
       (github.event_name == 'workflow_dispatch' ||
+      contains(github.event.head_commit.message, 'I66_MAPFRE_PAYMENT_PREFLIGHT') ||
       contains(github.event.head_commit.message, 'I66_SOURCE_BULK_READY') ||
       contains(github.event.head_commit.message, 'I66_REFRESH_PINNED_SOURCE') ||
       contains(github.event.head_commit.message, 'I66_ROBLE_0043_READBACK'))
@@ -117,7 +119,7 @@ jobs:
         shell: bash
         env:
           GI_I66_ATTESTED_TARGETS: ${{ contains(github.event.head_commit.message, 'I66_ATTESTED_READBACK') }}
-          GI_I66_BULK_MODE: ${{ contains(github.event.head_commit.message, 'I66_ROBLE_0043_READBACK') && 'case-readback' || 'preflight' }}
+          GI_I66_BULK_MODE: ${{ contains(github.event.head_commit.message, 'I66_MAPFRE_PAYMENT_PREFLIGHT') && 'mapfre-readback' || (contains(github.event.head_commit.message, 'I66_ROBLE_0043_READBACK') && 'case-readback' || 'preflight') }}
           GI_I66_BULK_READBACK_CASE: ${{ contains(github.event.head_commit.message, 'I66_ROBLE_0043_READBACK') && 'ROBLE_NOV20_0043' || '' }}
           GI_I66_BULK_PLAN_OUT: ${{ runner.temp }}/gi-i66-bulk-plan.json
           GI_I66_BULK_REPORT_OUT: ${{ runner.temp }}/gi-i66-bulk-preflight.json
@@ -184,6 +186,13 @@ jobs:
           node - <<'JS'
           const fs=require('node:fs'),assert=require('node:assert/strict');
           const p=JSON.parse(fs.readFileSync(process.env.GI_I66_BULK_PLAN_OUT,'utf8'));
+          if(p.status==='BULK_MAPFRE_READONLY_PREFLIGHT_NO_WRITES'){
+            assert.equal(p.readOnly,true);assert.equal(p.writes,0);assert.equal(p.paymentWriteEligibleCount,0);
+            assert.equal(p.inputRows,2);assert.deepEqual(p.chunks,[]);
+            fs.appendFileSync(process.env.GITHUB_OUTPUT,'ready=false\nreadonly=true\n');
+            console.log('I66_MAPFRE_PRIVATE_CAS_PREFLIGHT_ZERO_WRITES_PROTECTED_APPLY_DISABLED');
+            process.exit(0);
+          }
           if(p.status==='BULK_SOURCE_CASE_READBACK_ONLY_NO_WRITES'){
             assert.equal(p.readOnly,true);assert.equal(p.caseId,'ROBLE_NOV20_0043');
             assert.equal(p.inputRows,1);assert.equal(p.writes,0);assert.deepEqual(p.chunks,[]);

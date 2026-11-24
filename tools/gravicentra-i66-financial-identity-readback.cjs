@@ -287,5 +287,146 @@ function appendEvidence(fs,runnerTemp,reports,execution){
  // The immutable eligibility plan file is never opened or changed here.
  return {file:'gi-i66-bulk-preflight.json',originalSourceReportSha256:sha(bytes)};
 }
+// Complete the already documented MAPFRE preflight in this same read owner.
+// Originals and full CAS images are private artifact data. This entry cannot
+// enter any writer, create payments or reinterpret a paid source as pending.
+const mapfrePins={
+ preflight:['artifacts/orbit360-recovery/release-control/I6_6_MAPFRE_NEXT_CONTROLLED_PREFLIGHT_20261124_R46.json','6e8003a6ecb3ac5eafbe417e044980668b8d16c8f07c9264082cc77996021162'],
+ holder:['artifacts/orbit360-recovery/release-control/I6_6_MAPFRE57714_HOLDER_WITNESS_CAUSAL_READONLY_20261124.json','378e729cfb71a6b54758b9f3356c14326015978ceaaa2a3ecdd52cd979e080c2'],
+ source:[newStatementSource.path,newStatementSource.sha256],
+ authority:['artifacts/orbit360-recovery/release-control/I6_6_DIRECTION_URGENT_COMPLETION_TOLERANCE_AND_DIRECT_RENEWAL_20261124.json','cda5d408666e6e959248ea0a08ffa13f9e05a695fe41b3dedee20ba3d93f7c3d']
+};
+function mapfreBinding(){
+ const fs=require('node:fs'),path=require('node:path'),value={};
+ for(const [key,[name,digest]] of Object.entries(mapfrePins)){
+  const bytes=fs.readFileSync(path.join(__dirname,'..',name));
+  assert.equal(crypto.createHash('sha256').update(bytes).digest('hex'),digest,'MAPFRE_PIN_CHANGED_'+key);
+  value[key]=JSON.parse(bytes);
+ }
+ assert.equal(value.authority.decisions.extendPreviouslyApprovedToleranceToAllInsurersAndCases,true);
+ assert.equal(value.preflight.scope.policyNumber,'3002400057714');
+ assert.equal(value.preflight.twoCases.length,2);
+ for(const target of value.preflight.twoCases){
+  const fact=value.source.facts.find(f=>f.sourceFactId===target.sourceFactId);
+  assert.ok(fact&&fact.paymentConfirmed===true&&fact.actualPaidDateEvidence===true);
+  assert.ok(['PAID','COMMISSION_ANCHOR'].includes(fact.state),'MAPFRE_TRUTHFUL_SOURCE_STATE_REQUIRED');
+  assert.equal(fact.grossCents,target.documentedTarget.grossCents);
+  assert.equal(fact.paidDate,target.documentedTarget.paidDate);
+  assert.equal(fact.requirement,target.requirement);
+  assert.equal(fact.sourceRowSha256,target.source.sourceRowSha256);
+  assert.equal(fact.sourceSha256,target.source.sha256);
+ }
+ return value;
+}
+async function mapfreOriginals(binding,fetcher=fetch,headers){
+ if(!headers){const {GoogleAuth}=require('google-auth-library');
+  headers=await (await new GoogleAuth({scopes:['https://www.googleapis.com/auth/drive.readonly']}).getClient()).getRequestHeaders();}
+ return Promise.all(binding.preflight.originalDocumentPins.map(async ref=>{
+  const result={kind:ref.kind,fileId:ref.driveFileId,expectedSha256:ref.sha256};
+  try{
+   const response=await fetcher('https://www.googleapis.com/drive/v3/files/'+encodeURIComponent(ref.driveFileId)+'?alt=media&supportsAllDrives=true',
+    {headers,signal:AbortSignal.timeout(25000)});
+   if(!response.ok)return {...result,http:response.status,status:'ORIGINAL_HTTP_HOLD'};
+   const bytes=Buffer.from(await response.arrayBuffer()),digest=crypto.createHash('sha256').update(bytes).digest('hex');
+   return {...result,http:response.status,bytes:bytes.length,sha256:digest,
+    status:bytes.length>0&&bytes.length<=4e6&&digest===ref.sha256?'ORIGINAL_BYTES_VERIFIED':'ORIGINAL_DIGEST_HOLD'};
+  }catch{return {...result,status:'ORIGINAL_TRANSPORT_HOLD'};}
+ }));
+}
+async function mapfreSnapshot(db,binding){
+ const tenant=db.collection('tenants').doc(binding.preflight.scope.tenantId);
+ const at=col=>tenant.collection('data').doc(col).collection('items');
+ const raw=s=>({id:s.id,exists:s.exists===true,updateTime:s.updateTime?.toJSON?s.updateTime.toJSON():s.updateTime||null,
+  data:s.exists?s.data():null});
+ const collections={};
+ await Promise.all(['polizas','recibosEsperados','carteraPrimas','cobros','aseguradoras'].map(async col=>{
+  const snap=await at(col).limit(15001).get();assert.ok(snap.size<=15000,'MAPFRE_CENSUS_BOUNDARY_'+col);
+  collections[col]=snap.docs.map(raw);
+ }));
+ const s=binding.preflight.scope,client=raw(await at('clientes').doc(s.clientId).get());
+ const requests=await db.getAll(...binding.preflight.twoCases.map(t=>tenant.collection('reconciliationRequests').doc(t.pendingConditionalCanonicalCall.requestId)));
+ return {collections,client,requests:requests.map(raw),complete:true,observedAtUtc:new Date().toISOString()};
+}
+function mapfreReview(binding,snapshot,originals){
+ const s=binding.preflight.scope,{moneyCents,paid}=require('./gravicentra-i66-source-bulk-plan.cjs');
+ const all=snapshot.collections,holds=[],entries=[],find=(col,id)=>all[col].find(e=>e.id===id);
+ const p=find('polizas',s.policyId),insurer=find('aseguradoras',s.insurerId),client=snapshot.client;
+ const add=e=>{if(e&&!entries.some(x=>x.collection===e.collection&&x.id===e.id))entries.push(e);};
+ const policy=p?.data;
+ const witnesses=binding.holder.sources,knownHolderHashes=new Set(witnesses.flatMap(w=>[w.sourceNormalizedHolderSha256,w.issuedPdfNormalizedHolderSha256]));
+ const holderEvidence=Object.fromEntries(['nombre','nombreCompleto','razonSocial'].map(k=>[k,{present:!!str(client.data?.[k]),
+  matchesPinnedOriginal:!!str(client.data?.[k])&&knownHolderHashes.has(sha(norm(client.data[k])))}]));
+ if(!snapshot.complete||originals.length!==3||originals.some(o=>o.status!=='ORIGINAL_BYTES_VERIFIED'))holds.push('MAPFRE_ORIGINAL_ACCESS_UNVERIFIED');
+ if(!policy||policy.clienteId!==s.clientId||policy.aseguradoraId!==s.insurerId||policy.pais!=='GT'||policy.moneda!=='GTQ'||
+  policy.vigenciaInicio!==s.issuedTerm[0]||policy.vigenciaFin!==s.issuedTerm[1]||
+  !fields.some(k=>norm(policy[k])===norm(s.policyNumber))||fields.some(k=>str(policy[k])&&norm(policy[k])!==norm(s.policyNumber))||
+  (policy.tenantId&&policy.tenantId!==s.tenantId)||!insurer?.exists||!/mapfre/i.test(str(insurer.data.nombre||insurer.data.razonSocial)))holds.push('MAPFRE_POLICY_IDENTITY_HOLD');
+ if(!client.exists||client.id!==s.clientId||!Object.values(holderEvidence).some(v=>v.matchesPinnedOriginal)||
+  (client.data.tenantId&&client.data.tenantId!==s.tenantId)||(client.data.pais&&!['GT','GUATEMALA'].includes(str(client.data.pais).toUpperCase())))holds.push('MAPFRE_HOLDER_IDENTITY_HOLD');
+ const candidates=all.polizas.filter(e=>fields.some(k=>norm(e.data[k])===norm(s.policyNumber))&&
+  e.data.vigenciaInicio===s.issuedTerm[0]&&e.data.vigenciaFin===s.issuedTerm[1]&&e.data.pais==='GT');
+ if(candidates.length!==1||candidates[0].id!==s.policyId)holds.push('MAPFRE_POLICY_EDITION_NOT_UNIQUE');
+ for(const [col,e] of [['polizas',p],['aseguradoras',insurer],['clientes',client]])if(e)add({...e,collection:col});
+ const targets=binding.preflight.twoCases.map(t=>{
+  const local=[],r=find('recibosEsperados',t.receiptId),c=find('carteraPrimas',t.portfolioId);
+  const source=binding.source.facts.find(f=>f.sourceFactId===t.sourceFactId),matched={};
+  for(const [col,e] of [['recibosEsperados',r],['carteraPrimas',c]]){
+   if(!e?.exists||!e.updateTime){local.push('MAPFRE_EXISTING_PREIMAGE_REQUIRED');continue;}
+   add({...e,collection:col});const d=e.data;
+   if(str(d.polizaId)!==s.policyId||(col==='carteraPrimas'&&str(d.reciboId)!==t.receiptId)||
+    (d.policyId&&d.policyId!==s.policyId)||(d.clienteId&&d.clienteId!==s.clientId)||
+    (d.aseguradoraId&&d.aseguradoraId!==s.insurerId)||(d.moneda&&d.moneda!=='GTQ')||
+    (d.pais&&!['GT','GUATEMALA'].includes(str(d.pais).toUpperCase()))||(d.tenantId&&d.tenantId!==s.tenantId)||
+    str(d.serie)!==t.installment+'/12')local.push('MAPFRE_TARGET_IDENTITY_HOLD');
+   const amounts=['primaTotal','monto','montoTotal'].filter(k=>d[k]!==undefined&&d[k]!==null&&d[k]!=='').map(k=>moneyCents(d[k]));
+   if(!amounts.length||amounts.some(v=>!Number.isSafeInteger(v)||v!==amounts[0])||
+    Math.abs(amounts[0]-source.grossCents)>5)local.push('MAPFRE_GROSS_OR_TOLERANCE_HOLD');
+   if(paid(d)||[d.paymentState,d.applicationState].some(v=>/^(?:PAID|APPLIED)_/i.test(str(v)))||
+    ['fechaPagoReportada','fechaPago','paidDate','reversedAt','reversalId'].some(k=>str(d[k]))||
+    ['reversal','reversed','partialPayment','inferredPaid'].some(k=>d[k]===true)||
+    /anulad|parcial|partial|revers/i.test(str(d.estado)+' '+str(d.estadoOperativo)))local.push('MAPFRE_PAYMENT_STATE_REVIEW');
+   const reference=str(d.numeroReciboFuente);
+   if(reference&&!reference.startsWith('rec_')&&reference!==t.requirement)local.push('MAPFRE_EXTERNAL_REFERENCE_CONFLICT');
+   matched[col]={id:e.id,sha256:sha(JSON.stringify(stable(d))),updateTime:e.updateTime,grossCents:amounts[0],
+    sourceGrossCents:source.grossCents,varianceCents:source.grossCents-amounts[0],operationalLimit:day(d.fechaLimite),
+    currentContractualDue:day(d.fechaVencimientoContractual||d.vence||d.fechaVencimiento),sourceContractualDue:source.due};
+  }
+  const payments=all.cobros.filter(e=>e.id===t.pendingConditionalCanonicalCall.expectedNewCobroIdIfAbsent||
+   ['reciboId','receiptId','reciboEsperadoId','expectedReceiptId'].some(k=>e.data[k]===t.receiptId)||
+   ['evidenceId','sourceRef','sourceFactId'].some(k=>e.data[k]===t.sourceFactId));
+  const portfolios=all.carteraPrimas.filter(e=>['reciboId','receiptId'].some(k=>e.data[k]===t.receiptId));
+  const duplicateReq=all.recibosEsperados.filter(e=>e.id!==t.receiptId&&
+   [e.data.polizaId,e.data.policyId].includes(s.policyId)&&
+   (['numeroReciboFuente','numeroRequerimiento','requerimiento'].some(k=>str(e.data[k])===t.requirement)||str(e.data.serie)===t.installment+'/12'));
+  if(payments.length||snapshot.requests.some(e=>e.id===t.pendingConditionalCanonicalCall.requestId&&e.exists))local.push('MAPFRE_EXISTING_PAYMENT_OR_REQUEST_REVIEW');
+  if(portfolios.length!==1||portfolios[0].id!==t.portfolioId||duplicateReq.length)local.push('MAPFRE_TARGET_RELATION_NOT_UNIQUE');
+  return {sourceFactId:t.sourceFactId,installment:t.installment,requirement:t.requirement,matched,
+   sourceState:source.state,sourceGrossCents:source.grossCents,paidDate:source.paidDate,
+   localHolds:[...new Set(local)],correctionEligible:holds.length===0&&local.length===0,
+   canonicalPaymentRequest:t.pendingConditionalCanonicalCall};
+ });
+ for(const col of ['recibosEsperados','carteraPrimas','cobros'])for(const e of all[col])
+  if([e.data.polizaId,e.data.policyId].includes(s.policyId))add({...e,collection:col});
+ const previous=binding.preflight.preservedPayments;
+ assert.equal(previous.length,9,'MAPFRE_PRESERVED_PAYMENT_SCOPE_REQUIRED');
+ const missingPreserved=previous.filter(t=>{
+  const payment=find('cobros',t.cobroId),receipt=find('recibosEsperados',t.receiptId);
+  return !payment||!receipt||payment.data.reciboId!==t.receiptId||
+   str(payment.data.polizaId)!==s.policyId||moneyCents(payment.data.monto??payment.data.primaTotal)!==t.amountCents;
+ });
+ if(missingPreserved.length)holds.push('MAPFRE_PRIOR_PAYMENT_PRESERVATION_REQUIRES_REVIEW');
+ for(const target of targets)target.correctionEligible=target.correctionEligible&&holds.length===0;
+ return {schema:'GI_I66_MAPFRE_FRESH_CONTROLLED_PREFLIGHT_V1',status:'READONLY_PREFLIGHT_NO_PAYMENT_ADMISSION',
+  sourcePins:mapfrePins,policyId:s.policyId,observedAtUtc:snapshot.observedAtUtc,originals,holderEvidence,
+  globalHolds:[...new Set(holds)],targets,correctionEligibleCount:targets.filter(t=>t.correctionEligible).length,
+  paymentWriteEligibleCount:0,writes:0,newPayments:0,annualVarianceCents:3,maxApprovedGtqVarianceCents:5,
+  annualVariancePreserved:true,installment12Excluded:true,privatePreimages:entries,canonicalRequests:snapshot.requests,
+  beforeHash:sha(JSON.stringify(stable({entries,requests:snapshot.requests}))),
+  next:'Existing protected obligation owner CAS; then actual authenticated canonical payment owner and independent readback.'};
+}
+async function mapfreFreshPreflight(db){
+ const binding=mapfreBinding(),originals=await mapfreOriginals(binding),snapshot=await mapfreSnapshot(db,binding);
+ return mapfreReview(binding,snapshot,originals);
+}
 module.exports={validate,select,report,numberRelation,financialReport,financialPolicyIds,appendEvidence,
- newStatementSource,statementPolicyMatches};
+ newStatementSource,statementPolicyMatches,mapfreBinding,mapfreOriginals,mapfreSnapshot,mapfreReview,mapfreFreshPreflight};

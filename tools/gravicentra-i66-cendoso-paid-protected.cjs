@@ -854,11 +854,19 @@ function assessApplication(target,source,snapshot,binding){
     row.periodStart!==target.periodStart||row.due!==target.due||objhash(row.sourceRows)!==target.sourceRowsSha256)return hold('APPLICATION_SOURCE_CHANGED');
   const policy=snapshot.policies.find(p=>p.id===target.policyId),client=policy&&snapshot.clients.find(c=>c.id===policy.clienteId),
     insurer=policy&&snapshot.insurers.find(i=>i.id===policy.aseguradoraId);
-  if(!policy||!client||!insurer||policyCountry(policy)!=='GT'||norm(policy.moneda)!=='GTQ'||
-    (client.tenantId&&client.tenantId!==TENANT)||(client.pais&&!['GT','GUATEMALA'].includes(norm(client.pais)))||
-    !policyMatches(row.policy,policyIdentityNumber(policy))||date(policy.vigenciaInicio)!==row.coverageStart||date(policy.vigenciaFin)!==row.coverageEnd||
-    !insurerMatches(row.insurer,insurer.nombre||insurer.razonSocial)||
-    (target.clientId&&target.clientId!==client.id)||(target.insurerId&&target.insurerId!==insurer.id))return hold('APPLICATION_PARENT_IDENTITY_CHANGED');
+  const parentChecks={policyExists:!!policy,clientExists:!!client,insurerExists:!!insurer,
+    policyCountryMatches:!!policy&&policyCountry(policy)==='GT',policyCurrencyMatches:!!policy&&norm(policy.moneda)==='GTQ',
+    clientTenantMatches:!!client&&(!client.tenantId||client.tenantId===TENANT),
+    clientCountryMatches:!!client&&(!client.pais||['GT','GUATEMALA'].includes(norm(client.pais))),
+    policyNumberMatches:!!policy&&policyMatches(row.policy,policyIdentityNumber(policy)),
+    termStartMatches:!!policy&&date(policy.vigenciaInicio)===row.coverageStart,
+    termEndMatches:!!policy&&date(policy.vigenciaFin)===row.coverageEnd,
+    insurerNameMatches:!!insurer&&insurerMatches(row.insurer,insurer.nombre||insurer.razonSocial),
+    clientIdMatches:!!client&&(!target.clientId||target.clientId===client.id),
+    insurerIdMatches:!!insurer&&(!target.insurerId||target.insurerId===insurer.id)};
+  if(Object.values(parentChecks).some(value=>!value))return {hold:{...hold('APPLICATION_PARENT_IDENTITY_CHANGED').hold,
+    failedChecks:Object.keys(parentChecks).filter(key=>!parentChecks[key]),
+    actualCountries:{policy:policy?policyCountry(policy):null,client:client?norm(client.pais):null}}};
   const insurers=new Map(snapshot.insurers.map(i=>[i.id,i]));
   const peers=snapshot.policies.filter(p=>policyCountry(p)==='GT'&&norm(p.moneda)==='GTQ'&&
     policyNumberFields.some(field=>policyMatches(row.policy,p[field]))&&date(p.vigenciaInicio)===row.coverageStart&&date(p.vigenciaFin)===row.coverageEnd&&
