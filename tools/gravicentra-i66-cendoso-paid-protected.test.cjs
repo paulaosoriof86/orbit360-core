@@ -153,8 +153,13 @@ function fakeReader(records){
   assert.equal(policyIdentityNumber(productConflict.policy),'',
     'a bare canonical number cannot bridge two conflicting product labels');
   assert.equal(planBatch({candidates:[labeled]},[productConflict]).holdCounts.POLICY_NUMBER_FIELDS_CONFLICT,1);
-  assert.equal(policyIdentityNumber({...productConflict.policy,polizaNumero:'AUTO 39012'}),'39012',
+  assert.equal(policyIdentityNumber({...productConflict.policy,polizaNumero:'AUTO 39012'}),'AUTO - 39012',
     'consistent persisted product aliases remain eligible');
+  const differentSourceProduct={...labeledGroup,policy:{...labeledGroup.policy,
+    numero:'39012',numeroPoliza:'TECD - 39012'}};
+  assert.equal(policyIdentityNumber(differentSourceProduct.policy),'TECD - 39012');
+  assert.equal(planBatch({candidates:[labeled]},[differentSourceProduct]).readyCount,0,
+    'the source cannot cross a known different product label via a bare stored number');
   const wrongEdition={...actual[0],policy:{...actual[0].policy,vigenciaInicio:'2026-08-05'}};
   assert.equal(planBatch({candidates:[raw]},[wrongEdition]).holdCounts.EXACT_POLICY_EDITION_NOT_FOUND,1);
   const otherInsurer={...actual[0],insurerName:'Universales'};

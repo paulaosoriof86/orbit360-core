@@ -56,7 +56,9 @@ function policyIdentityNumber(policy){
   for(let i=0;i<values.length;i++)for(let j=i+1;j<values.length;j++){
     if(!policyMatches(values[i],values[j])&&!policyMatches(values[j],values[i]))return '';
   }
-  return values[0];
+  // Preserve any known product label when comparing the source. Returning a
+  // bare first field would let an AUTO source cross into a TECD alias.
+  return values.find(value=>labeledPolicy(value))||values[0];
 }
 const item=(db,col)=>db.collection('tenants').doc(TENANT).collection('data').doc(col).collection('items');
 const request=(db,id)=>db.collection('tenants').doc(TENANT).collection('operationalRequests').doc(id);
