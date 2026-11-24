@@ -503,8 +503,8 @@ function distinctFixture(){
 const applicationBinding=H.loadApplicationBinding(source);
 assert.equal(applicationBinding.manifest.targets.length,155);
 assert.equal(applicationBinding.manifest.targets.reduce((n,t)=>n+t.grossCents,0),7880643);
-function applicationFixture(){
- const db=memoryFirestore(),chosen=['cendoso_923114254eae488f66c70cf5',applicationBinding.manifest.targets[0].sourceId,'cendoso_d5eb7e075150b2c3989782dd'];
+function applicationFixture(selected){
+ const db=memoryFirestore(),chosen=selected||['cendoso_923114254eae488f66c70cf5',applicationBinding.manifest.targets[0].sourceId,'cendoso_d5eb7e075150b2c3989782dd'];
  const targets=chosen.map(id=>applicationBinding.manifest.targets.find(t=>t.sourceId===id));
  const packet={candidates:source.candidates.filter(r=>chosen.includes(r.candidateId))};
  const binding={...applicationBinding,manifest:{...applicationBinding.manifest,targets,targetCount:targets.length}};
@@ -616,5 +616,22 @@ async function applicationPlan(f){return H.planApplications(f.packet,await H.rea
  const duplicate=applicationFixture(),du=await applicationPlan(duplicate);
  await assert.rejects(H.applyApplicationChunk(duplicate.db,[du.ready[0],du.ready[0]],duplicate.packet,duplicate.binding),/APPLICATION_DUPLICATE_PLAN/);checks++;
  assert.equal(duplicate.db.stats.creates,0);assert.equal(duplicate.db.stats.updates,0);
+ const cross=applicationFixture(applicationBinding.crossCountryEvidence.sourceIds),crossClient=cross.targets[0].clientId;
+ cross.db.seed('clientes',crossClient,{...cross.db.read('clientes',crossClient),pais:'CO'});
+ const clientBefore=cross.db.read('clientes',crossClient),crossPlan=await applicationPlan(cross);
+ assert.equal(crossPlan.readyCount,2);assert.equal(crossPlan.holdsCount,0);
+ assert.ok(crossPlan.ready.every(r=>r.crossCountryLinkPreserved.sha256===applicationBinding.crossCountryEvidence.sha256));checks++;
+ const crossDone=await H.applyApplicationChunk(cross.db,crossPlan.ready,cross.packet,cross.binding);
+ assert.equal(crossDone.accepted.length,2);assert.equal(crossDone.knownFinancialDocumentUpdates,6);
+ assert.deepEqual(cross.db.read('clientes',crossClient),clientBefore);assert.equal(cross.db.stats.updates,6);
+ assert.equal(cross.db.stats.creates,2);checks++;
+ const crossReplay=await applicationPlan(cross);assert.equal(crossReplay.unchangedCount,2);assert.equal(crossReplay.readyCount,0);checks++;
+ const missingProof=applicationFixture(applicationBinding.crossCountryEvidence.sourceIds);
+ missingProof.db.seed('clientes',crossClient,{...missingProof.db.read('clientes',crossClient),pais:'CO'});
+ delete missingProof.binding.crossCountryEvidence;
+ assert.equal((await applicationPlan(missingProof)).holdsCount,2);assert.equal(missingProof.db.stats.updates,0);checks++;
+ const changedBorder=applicationFixture(applicationBinding.crossCountryEvidence.sourceIds);
+ changedBorder.db.seed('clientes',crossClient,{...changedBorder.db.read('clientes',crossClient),pais:'US'});
+ assert.equal((await applicationPlan(changedBorder)).holdsCount,2);assert.equal(changedBorder.db.stats.updates,0);checks++;
  console.log('I66_EXISTING_DIRECT_MANUAL_APPLICATION_PASS '+checks+' meaningful_cases 155_PINNED_TARGETS 0_NEW_PAYMENTS 0_BANK_MOVEMENTS');
 })().catch(error=>{console.error(error);process.exitCode=1;});

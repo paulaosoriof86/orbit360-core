@@ -792,6 +792,8 @@ const APPLICATION_AUTHORITY='artifacts/orbit360-recovery/release-control/I6_6_DI
 const APPLICATION_AUTHORITY_SHA='cda5d408666e6e959248ea0a08ffa13f9e05a695fe41b3dedee20ba3d93f7c3d';
 const APPLICATION_TARGETS='artifacts/orbit360-recovery/source-batches/I6_6_CENDOSO_155_EXISTING_DIRECT_APPLICATION_TARGETS_20261124.json';
 const APPLICATION_TARGETS_SHA='8619d7953c05b7a82eeb0c837796064bc8e46fe5bc12c051345f3e5152a2ec66';
+const APPLICATION_CROSS_COUNTRY_EVIDENCE='artifacts/orbit360-recovery/release-control/I6_5_B4_003_CARLOS_FINANCE_TRANSVERSAL_SIGNED_UAT_20261103.json';
+const APPLICATION_CROSS_COUNTRY_SHA='f6559d44962f5823ee69aa6eb4f0bb9e689b9c3e90d234766c4ac11ed404b836';
 const applicationAuditId=sourceId=>'gi_i66_direct_application_'+sha(`${TENANT}|${APPLICATION_DECISION}|${sourceId}`).slice(0,30);
 const applicationKey=(collection,id)=>collection+'/'+id;
 function loadApplicationBinding(source){
@@ -822,7 +824,24 @@ function loadApplicationBinding(source){
     assert.equal(objhash(row.sourceRows),target.sourceRowsSha256);assert.equal(target.cobroId,cobroId(target.receiptId));
     assert.equal(target.originalPostingAuditId,auditId(target.sourceId));
   }
-  return {manifest,authoritySha256:APPLICATION_AUTHORITY_SHA,manifestSha256:APPLICATION_TARGETS_SHA};
+  // Country on a client is not the jurisdiction of every linked policy.
+  // Preserve the one previously identified cross-border relationship exactly;
+  // the current Direction instruction, not this older UAT, authorizes payment
+  // application. No client country, owner, amount or payment identity changes.
+  const evidenceBytes=fs.readFileSync(path.join(__dirname,'..',APPLICATION_CROSS_COUNTRY_EVIDENCE));
+  assert.equal(sha(evidenceBytes),APPLICATION_CROSS_COUNTRY_SHA,'APPLICATION_CROSS_COUNTRY_EVIDENCE_CHANGED');
+  const evidence=JSON.parse(evidenceBytes),witness=evidence.checks.find(c=>c.id==='GT_CROSS_COUNTRY_POLICY_LINK');
+  assert.equal(evidence.authentication.realSignedSession,true);
+  assert.equal(witness.status,'EXCEPTION_IDENTIFIED_REAL_POLICY');
+  assert.equal(witness.observed.policyNumber,'02-01-858-601-0');
+  assert.equal(witness.observed.policyCountryUniverse,'GT');assert.equal(witness.observed.linkedClientCountry,'CO');
+  const sourceIds=['cendoso_2e30164bbd1fd037a29f7e98','cendoso_a8ce8624a56a1d09483261a1'];
+  assert.ok(sourceIds.every(id=>manifest.targets.some(t=>t.sourceId===id&&t.policyId==='pol_332e5d1b78827cc8fa6643529afa'&&
+    t.clientId==='cli_siga_c01bf69e8a2f009ada'&&t.policyNumber===witness.observed.policyNumber)));
+  return {manifest,authoritySha256:APPLICATION_AUTHORITY_SHA,manifestSha256:APPLICATION_TARGETS_SHA,
+    crossCountryEvidence:{path:APPLICATION_CROSS_COUNTRY_EVIDENCE,sha256:APPLICATION_CROSS_COUNTRY_SHA,
+      policyId:'pol_332e5d1b78827cc8fa6643529afa',clientId:'cli_siga_c01bf69e8a2f009ada',
+      policyCountry:'GT',clientCountry:'CO',policyNumber:witness.observed.policyNumber,sourceIds}};
 }
 async function readApplicationSnapshot(db,source,binding,tx){
   const snapshot=await readHistoricalSnapshot(db,source,tx),getAll=(...refs)=>tx?tx.getAll(...refs):db.getAll(...refs);
@@ -854,10 +873,14 @@ function assessApplication(target,source,snapshot,binding){
     row.periodStart!==target.periodStart||row.due!==target.due||objhash(row.sourceRows)!==target.sourceRowsSha256)return hold('APPLICATION_SOURCE_CHANGED');
   const policy=snapshot.policies.find(p=>p.id===target.policyId),client=policy&&snapshot.clients.find(c=>c.id===policy.clienteId),
     insurer=policy&&snapshot.insurers.find(i=>i.id===policy.aseguradoraId);
+  const border=binding.crossCountryEvidence,crossCountryPreserved=!!border&&border.sha256===APPLICATION_CROSS_COUNTRY_SHA&&
+    border.path===APPLICATION_CROSS_COUNTRY_EVIDENCE&&border.sourceIds.includes(target.sourceId)&&
+    policy?.id===border.policyId&&target.policyId===border.policyId&&client?.id===border.clientId&&target.clientId===border.clientId&&
+    policyCountry(policy)==='GT'&&norm(client.pais)==='CO'&&policyMatches(border.policyNumber,policyIdentityNumber(policy));
   const parentChecks={policyExists:!!policy,clientExists:!!client,insurerExists:!!insurer,
     policyCountryMatches:!!policy&&policyCountry(policy)==='GT',policyCurrencyMatches:!!policy&&norm(policy.moneda)==='GTQ',
     clientTenantMatches:!!client&&(!client.tenantId||client.tenantId===TENANT),
-    clientCountryMatches:!!client&&(!client.pais||['GT','GUATEMALA'].includes(norm(client.pais))),
+    clientCountryMatches:!!client&&(!client.pais||['GT','GUATEMALA'].includes(norm(client.pais))||crossCountryPreserved),
     policyNumberMatches:!!policy&&policyMatches(row.policy,policyIdentityNumber(policy)),
     termStartMatches:!!policy&&date(policy.vigenciaInicio)===row.coverageStart,
     termEndMatches:!!policy&&date(policy.vigenciaFin)===row.coverageEnd,
@@ -911,6 +934,8 @@ function assessApplication(target,source,snapshot,binding){
       audit.authoritySha256!==binding.authoritySha256||audit.manifestSha256!==binding.manifestSha256||
       audit.sourceId!==target.sourceId||audit.receiptId!==target.receiptId||audit.portfolioId!==target.portfolioId||audit.cobroId!==target.cobroId)
       return hold('APPLICATION_AUDIT_COLLISION');
+    if(crossCountryPreserved&&stableHash(audit.crossCountryLinkPreserved)!==stableHash(border))
+      return hold('APPLICATION_CROSS_COUNTRY_AUDIT_REQUIRED');
     if(stableHash(audit.afterHashes)!==stableHash(hashes)||!Object.values(records).every(r=>r.applicationState==='APPLIED_DIRECT'))
       return hold('APPLICATION_REPLAY_POSTIMAGE_CHANGED');
     return {unchanged:{sourceId:target.sourceId,status:'ALREADY_APPLIED_READBACK_PASS',newPayments:0}};
@@ -919,6 +944,7 @@ function assessApplication(target,source,snapshot,binding){
   const updateTimes=Object.fromEntries(roots.map(([col,id])=>{const key=applicationKey(col,id);return [key,snapshot.updateTimes[key]];}));
   const before={records,updateTimes,policyHash:stableHash(policy),clientHash:stableHash(client),insurerHash:stableHash(insurer),originalAuditHash:stableHash(original)};
   return {ready:{...target,before,beforeHash:stableHash(before),applicationAuditId:applicationAuditId(target.sourceId),
+    ...(crossCountryPreserved?{crossCountryLinkPreserved:border}:{}),
     collectionsToUpdate:roots.filter(([col,id])=>records[applicationKey(col,id)].applicationState==='PENDING_APPLICATION').map(([col])=>col)}};
 }
 function planApplications(source,snapshot,binding){
@@ -958,6 +984,7 @@ async function applyApplicationChunk(db,plans,source,binding){
         decisionId:APPLICATION_DECISION,authorityPath:APPLICATION_AUTHORITY,authoritySha256:binding.authoritySha256,manifestSha256:binding.manifestSha256,
         sourceId:plan.sourceId,sourceSha256:SOURCE_SHA,originalPostingAuditId:plan.originalPostingAuditId,
         policyId:plan.policyId,receiptId:plan.receiptId,portfolioId:plan.portfolioId,cobroId:plan.cobroId,
+        ...(plan.crossCountryLinkPreserved?{crossCountryLinkPreserved:plan.crossCountryLinkPreserved}:{}),
         beforeHash:plan.beforeHash,beforeUpdateTimes:plan.before.updateTimes,rollback:{records:before,onlyIfCurrentAfterHashesMatch:true},
         beforeHashes:Object.fromEntries(Object.entries(before).map(([key,value])=>[key,stableHash(value)])),
         afterHashes:Object.fromEntries(Object.entries(after).map(([key,value])=>[key,stableHash(value)])),
