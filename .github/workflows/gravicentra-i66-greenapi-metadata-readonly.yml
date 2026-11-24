@@ -1,3 +1,4 @@
+# I6.6 20261124 R44: refresh existing inbound config preflight after external capacity restoration.
 # I6.6 GREENAPI METADATA PROBE -- read-only evidence, no delivery.
 # Manual read-only inventory of existing GCP Secret Manager/Functions/Cloud Run.
 # Metadata job: no payload access. Config job: exact existing secret validation in memory,

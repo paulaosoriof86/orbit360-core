@@ -13,7 +13,7 @@
   "deploymentAuthorized": false,
   "previewBuildRequest20261113": {
     "status": "IMMUTABLE_PREVIEW_BUILD_REQUESTED_NOT_YET_ACCEPTED",
-    "initiatedBy": "Paula Direccion — urgente corregir y certificar por lote antes de LIVE",
+    "initiatedBy": "Paula Direccion \u2014 urgente corregir y certificar por lote antes de LIVE",
     "approvedProductSourceCommit": "36d997b7b696e471344faaa84e927253f1dfafd9",
     "controlPlaneCommit": "f965372c0714090a85a3dfe3baf1056ba59d2a41",
     "authorizedScope": "Existing isolated I6.6 Preview Hosting only; no live Hosting, Firestore business data, Rules/Auth, or backend function deploy",
@@ -191,14 +191,14 @@
     {
       "id": "I6_6_CLIENTE360_LINKED_POLICY_CREATE_CTA_P0",
       "approvedByDirection": true,
-      "receipt": "Paula Andrea Osorio Franco, Dirección, 2026-11-10: desde la ficha Cliente360 habilitar '+ Crear póliza' pre-vinculada al cliente actual; Carlos como Asesor estaba correctamente bloqueado y como Operativo sí crea desde Pólizas. Sólo UI, sin ampliar permisos ni crear clientes, sin LIVE hasta pruebas.",
+      "receipt": "Paula Andrea Osorio Franco, Direcci\u00f3n, 2026-11-10: desde la ficha Cliente360 habilitar '+ Crear p\u00f3liza' pre-vinculada al cliente actual; Carlos como Asesor estaba correctamente bloqueado y como Operativo s\u00ed crea desde P\u00f3lizas. S\u00f3lo UI, sin ampliar permisos ni crear clientes, sin LIVE hasta pruebas.",
       "sourceCommit": "d947f97efa3049dadb5f2e06ee5e75c7ccdb83ec",
       "sourceStatus": "UI_SOURCE_COMMITTED_EXACT_READBACK_PASS_PREVIEW_AND_LIVE_PENDING",
       "capabilityOwners": [
         "CLIENTE360_PRIMARY_RUNTIME",
         "POLIZAS_PRIMARY_RUNTIME"
       ],
-      "scope": "Agregar un CTA en cabecera de ficha Cliente360 reutilizando Orbit.modules.cliente360.nuevaPoliza(cid), preselección de cliente y guard de país/tenant ya existentes. No modificar rol Asesor, backend, Functions, datos ni flujo de Pólizas.",
+      "scope": "Agregar un CTA en cabecera de ficha Cliente360 reutilizando Orbit.modules.cliente360.nuevaPoliza(cid), preselecci\u00f3n de cliente y guard de pa\u00eds/tenant ya existentes. No modificar rol Asesor, backend, Functions, datos ni flujo de P\u00f3lizas.",
       "paths": [
         {
           "path": "orbit360-platform/modules/cliente360.js",
@@ -369,7 +369,7 @@
     {
       "id": "I6_6_OPS_COBROS_SAFE_FAILURE_DIAGNOSTICS_P0",
       "approvedByDirection": true,
-      "receipt": "Paula Andrea Osorio Franco, Dirección 2026-11-10: targeted I6.6 Ops deletion and Cobros advisor payment failure diagnostics; root confirms one combined source release, no data/role/backend change, fail-closed, no false success",
+      "receipt": "Paula Andrea Osorio Franco, Direcci\u00f3n 2026-11-10: targeted I6.6 Ops deletion and Cobros advisor payment failure diagnostics; root confirms one combined source release, no data/role/backend change, fail-closed, no false success",
       "sourceStatus": "DIAGNOSTIC_SOURCE_QA_14_OF_14_PASS_PREVIEW_AND_LIVE_NOT_APPLIED",
       "capabilityOwners": [
         "OPS_PRIMARY_RUNTIME",
@@ -416,7 +416,7 @@
     {
       "id": "I6_6_OPS_MANAGEMENT_DELETE_LEGACY_DIAGNOSTIC_COMPAT_P0",
       "approvedByDirection": true,
-      "receipt": "Dirección 2026-11-10 approved I6.6 same-source fail-closed Ops diagnostic compatibility after guard 42906473061 rejected missing management delete marker; canonical backend, authorization, CRUD semantics and live data unchanged",
+      "receipt": "Direcci\u00f3n 2026-11-10 approved I6.6 same-source fail-closed Ops diagnostic compatibility after guard 42906473061 rejected missing management delete marker; canonical backend, authorization, CRUD semantics and live data unchanged",
       "sourceStatus": "SOURCE_QA_LEGACY_AND_NEW_OPS_DIAGNOSTIC_PASS_PREVIEW_LIVE_NOT_APPLIED",
       "capabilityOwners": [
         "OPS_PRIMARY_RUNTIME",
@@ -454,7 +454,7 @@
     {
       "id": "I6_6_GREENAPI_DIRECT_WHATSAPP_GROUP_QA_DISABLED_P0",
       "approvedByDirection": true,
-      "receipt": "Paula Dirección 2026-11-10 authorized direct Green API backend QA-only on same recovery candidate, OFF by default, no secrets, Make, external sends, production deploy or retroactive backlog; Ops/AyS Pagos GT exact groups, no advisor/client messages in this gate",
+      "receipt": "Paula Direcci\u00f3n 2026-11-10 authorized direct Green API backend QA-only on same recovery candidate, OFF by default, no secrets, Make, external sends, production deploy or retroactive backlog; Ops/AyS Pagos GT exact groups, no advisor/client messages in this gate",
       "sourceStatus": "BACKEND_SOURCE_CANDIDATE_44_OF_44_MOCK_QA_PASS_FUNCTIONS_PREVIEW_LIVE_AND_REAL_PROVIDER_UAT_HOLD",
       "capabilityOwners": [
         "IN_APP_NOTIFICATION_OUTBOX",
@@ -517,7 +517,7 @@
     {
       "id": "I6_6_OPS_PROTECTED_ENDORSEMENT_BOARD_HIDE_TRANSVERSAL_P0",
       "approvedByDirection": true,
-      "receipt": "Dirección 2026-11-10 autorizó corregir el retiro de fichas de Ops aplicadas y vinculadas: mantener guard de archive_management, ocultar solo tarjeta activa bajo rol operativo/dirección con auditoría y preservar póliza, historial, comentarios y país; QA B4-003 vinculada probada por lectura LIVE 42935999204; no borrar ni reimportar registros",
+      "receipt": "Direcci\u00f3n 2026-11-10 autoriz\u00f3 corregir el retiro de fichas de Ops aplicadas y vinculadas: mantener guard de archive_management, ocultar solo tarjeta activa bajo rol operativo/direcci\u00f3n con auditor\u00eda y preservar p\u00f3liza, historial, comentarios y pa\u00eds; QA B4-003 vinculada probada por lectura LIVE 42935999204; no borrar ni reimportar registros",
       "sourceStatus": "SOURCE_STATIC_QA_11_OF_11_PASS_EMULATOR_TRIGGERED_BY_TEST_DELTA_PREVIEW_LIVE_HOLD",
       "capabilityOwners": [
         "OPS_PRIMARY_RUNTIME",
@@ -585,14 +585,14 @@
     {
       "id": "I6_6_PAYMENT_COUNTRY_DIRECT_AND_INFERRED_WRITE_BOUNDARY_P0",
       "approvedByDirection": true,
-      "receipt": "Paula Andrea Osorio Franco, Dirección, 2026-11-11: corrección urgente y transversal de regresiones de pagos por rol y país; probar antes de publicar; conversación activa Gravicentra Insurance",
+      "receipt": "Paula Andrea Osorio Franco, Direcci\u00f3n, 2026-11-11: correcci\u00f3n urgente y transversal de regresiones de pagos por rol y pa\u00eds; probar antes de publicar; conversaci\u00f3n activa Gravicentra Insurance",
       "sourceStatus": "SOURCE_COUNTRY_SCOPE_GUARDED; EMULATOR_AND_CONTROL_PLANE_RETST_PENDING; PREVIEW_AND_LIVE_HOLD",
       "capabilityOwners": [
         "COBROS_RECONCILIATION",
         "RECIBOS_CARTERA_PRIMARY_RUNTIME",
         "ROLE_SCOPE_RUNTIME"
       ],
-      "scope": "Requerir país consistente póliza/recibo y membership de rol antes de aplicar pago directo o inferido; preservar contrato existente de rol asesor, idempotencia, origen y ledger; sin alterar clientes/recibos reales ni aumentar permisos.",
+      "scope": "Requerir pa\u00eds consistente p\u00f3liza/recibo y membership de rol antes de aplicar pago directo o inferido; preservar contrato existente de rol asesor, idempotencia, origen y ledger; sin alterar clientes/recibos reales ni aumentar permisos.",
       "paths": [
         {
           "path": "functions/cobros-reconciliation-domain.js",
@@ -614,14 +614,14 @@
     {
       "id": "I6_6_PAYMENT_REPEAT_AND_PORTFOLIO_INTEGRITY_WRITE_BOUNDARY_P0",
       "approvedByDirection": true,
-      "receipt": "Paula Dirección 2026-11-10: solicita urgentemente garantizar flujo transversal de pagos antes de habilitar a Carlos y cobrar/inferir en lote; hallazgo forense de reintento con requestId distinto y obligación activa ausente",
+      "receipt": "Paula Direcci\u00f3n 2026-11-10: solicita urgentemente garantizar flujo transversal de pagos antes de habilitar a Carlos y cobrar/inferir en lote; hallazgo forense de reintento con requestId distinto y obligaci\u00f3n activa ausente",
       "sourceStatus": "SOURCE_GUARDS_PENDING_EMULATOR_AND_EXACT_PREVIEW_LIVE_GATE",
       "capabilityOwners": [
         "COBROS_RECONCILIATION",
         "RECIBOS_CARTERA_PRIMARY_RUNTIME",
         "ROLE_SCOPE_RUNTIME"
       ],
-      "scope": "Rechazar segunda aplicación del mismo recibo aunque cambie requestId, y prohibir pago nuevo sin única obligación activa en cartera; conservar enriquecimiento posterior con factura/estado de cuenta real y reintento idempotente por mismo requestId. Sin reimportar ni cambiar datos existentes.",
+      "scope": "Rechazar segunda aplicaci\u00f3n del mismo recibo aunque cambie requestId, y prohibir pago nuevo sin \u00fanica obligaci\u00f3n activa en cartera; conservar enriquecimiento posterior con factura/estado de cuenta real y reintento idempotente por mismo requestId. Sin reimportar ni cambiar datos existentes.",
       "paths": [
         {
           "path": "functions/cobros-reconciliation-domain.js",
@@ -731,7 +731,7 @@
         "ROLE_SCOPE_RUNTIME",
         "TENANT_DOMAIN_CONFIG_CLIENT"
       ],
-      "scope": "Align active Operativo/Admin/AdminTenant/SuperAdmin/Dirección insurer directory edit preflight with signed role matrix, country and backend insurer writer; default propios does not require an advisor on a tenant directory. Preserve explicit none, roleScope ceilings, restricted modules, Asesor limitations, and backend. No insurer data, auth, Rules, or other backend write.",
+      "scope": "Align active Operativo/Admin/AdminTenant/SuperAdmin/Direcci\u00f3n insurer directory edit preflight with signed role matrix, country and backend insurer writer; default propios does not require an advisor on a tenant directory. Preserve explicit none, roleScope ceilings, restricted modules, Asesor limitations, and backend. No insurer data, auth, Rules, or other backend write.",
       "paths": [
         {
           "path": "orbit360-platform/core/access-scope.js",
@@ -1118,7 +1118,7 @@
         "ASEGURADORAS_OPERATIONAL_DIRECTORY",
         "ROLE_SCOPE_RUNTIME"
       ],
-      "scope": "Dirección and Operativo insurer edits must not fail because unchanged historical username/password keys coexist on the real row. Record/country permissions use full row; secure-field blocking uses only actual durable delta. No credential replay or relaxation, no financial or insurer data writes during source QA.",
+      "scope": "Direcci\u00f3n and Operativo insurer edits must not fail because unchanged historical username/password keys coexist on the real row. Record/country permissions use full row; secure-field blocking uses only actual durable delta. No credential replay or relaxation, no financial or insurer data writes during source QA.",
       "paths": [
         {
           "path": "orbit360-platform/data/store-firestore-product-operational-p0.js",
@@ -1147,7 +1147,7 @@
         "ASEGURADORAS_CREDENTIAL_REVEAL",
         "ROLE_SCOPE_RUNTIME"
       ],
-      "scope": "In the reachable primary Aseguradoras module, a missing vault ref or legacy backend_required sentinel must never be introduced on portal edits. Preserve server-issued cred_ references; the reachable secure credential provider enforces actual reference format. Bank-account numbers remain editable for Dirección and approved Operativo in the main insurer editor; Asesor cannot edit. The dormant July P02 DOM decorator is intentionally excluded from this canonical product build; it is not the owner. No insurer/financial writes in source tests.",
+      "scope": "In the reachable primary Aseguradoras module, a missing vault ref or legacy backend_required sentinel must never be introduced on portal edits. Preserve server-issued cred_ references; the reachable secure credential provider enforces actual reference format. Bank-account numbers remain editable for Direcci\u00f3n and approved Operativo in the main insurer editor; Asesor cannot edit. The dormant July P02 DOM decorator is intentionally excluded from this canonical product build; it is not the owner. No insurer/financial writes in source tests.",
       "paths": [
         {
           "path": "orbit360-platform/modules/aseguradoras.js",
@@ -1291,7 +1291,7 @@
         "SCOPED_READER",
         "OPERATIONAL_WRITERS"
       ],
-      "scope": "Preserve signed Operativo tenant-country boundaries while aligning cross-advisor workflow CRUD with already-approved all-scope Pólizas/Cobros. Display the same protected Cronograma tasks in Ops, add Ops task creation/completion, require explicit task country in TODOS mode. Never convert a tarea into a duplicated gestion. All source QA synthetic; Preview/LIVE functional write and exact release not yet accepted.",
+      "scope": "Preserve signed Operativo tenant-country boundaries while aligning cross-advisor workflow CRUD with already-approved all-scope P\u00f3lizas/Cobros. Display the same protected Cronograma tasks in Ops, add Ops task creation/completion, require explicit task country in TODOS mode. Never convert a tarea into a duplicated gestion. All source QA synthetic; Preview/LIVE functional write and exact release not yet accepted.",
       "paths": [
         {
           "path": "functions/b4-003-scoped-access-boundary.js",
@@ -1404,14 +1404,14 @@
     {
       "id": "I6_6_CARLOS_PAYMENT_SYNTHETIC_PREVIEW_TRANSPORT_AND_LEDGER_P0",
       "approvedByDirection": true,
-      "receipt": "Paula Dirección 2026-11-12: completar Cobros para Carlos con paridad Preview y publicar únicamente después de QA; autorización restringida a fixtures sintéticas",
+      "receipt": "Paula Direcci\u00f3n 2026-11-12: completar Cobros para Carlos con paridad Preview y publicar \u00fanicamente despu\u00e9s de QA; autorizaci\u00f3n restringida a fixtures sint\u00e9ticas",
       "sourceStatus": "PREVIEW_PACKAGE_REQUESTED_SIGNED_PAYMENT_UAT_PENDING_NO_LIVE",
       "capabilityOwners": [
         "COBROS_PRIMARY_RUNTIME",
         "PRODUCT_RUNTIME_PROVIDER",
         "RECONCILIACION_PAYMENT_BACKEND"
       ],
-      "scope": "Permitir en el Hosting Preview I6.6 solamente lectura/aplicación/conciliación de pago de fixtures sintéticas por callable preexistente us-central1. Exigir marcas QA en recibo, póliza, cliente, cartera, cobro y relaciones; aislar request/event de Preview para no afectar ledger LIVE. Denegar otras operaciones, nombres LIVE y referencias auténticas. Ningún cambio de permisos de asesor, país, Auth, Rules ni dato real.",
+      "scope": "Permitir en el Hosting Preview I6.6 solamente lectura/aplicaci\u00f3n/conciliaci\u00f3n de pago de fixtures sint\u00e9ticas por callable preexistente us-central1. Exigir marcas QA en recibo, p\u00f3liza, cliente, cartera, cobro y relaciones; aislar request/event de Preview para no afectar ledger LIVE. Denegar otras operaciones, nombres LIVE y referencias aut\u00e9nticas. Ning\u00fan cambio de permisos de asesor, pa\u00eds, Auth, Rules ni dato real.",
       "paths": [
         {
           "path": "orbit360-platform/core/product-runtime-browser-providers-p0.js",
@@ -1442,7 +1442,7 @@
     {
       "id": "I6_6_CARLOS_PAYMENT_ONCALL_RESPONSE_MODE_HOTFIX_P0",
       "approvedByDirection": true,
-      "receipt": "Paula Dirección 2026-11-12: Carlos debe poder aplicar cobros LIVE, no acumular correcciones; signed LIVE test 43311517495 detected Firebase CallableResponse bound to previewOnly, with synthetic cleanup PASS. Scoped exact backend Preview to LIVE hotfix authorized by existing publication rule.",
+      "receipt": "Paula Direcci\u00f3n 2026-11-12: Carlos debe poder aplicar cobros LIVE, no acumular correcciones; signed LIVE test 43311517495 detected Firebase CallableResponse bound to previewOnly, with synthetic cleanup PASS. Scoped exact backend Preview to LIVE hotfix authorized by existing publication rule.",
       "sourceStatus": "SECOND_ARGUMENT_CAUSE_ROOT_CONFIRMED_REGRESSION_PASS_EXACT_BACKEND_PREVIEW_LIVE_SIGNED_UAT_IN_PROGRESS",
       "capabilityOwners": [
         "COBROS_PRIMARY_RUNTIME",
@@ -1495,7 +1495,7 @@
     {
       "id": "I6_6_OPERATIVO_SUPERIORS_BUSINESS_WRITE_ROLE_PARITY_P0",
       "approvedByDirection": true,
-      "receipt": "Paula Dirección 2026-11-12: Operativo escribe todos los módulos operativos autorizados, igual o superior Dirección/Admin/AdminTenant/SuperAdmin; aplicar transversalmente los hallazgos de Carlos, respetar países/tenant, no ampliar Asesor ni el libro financiero y certificar Preview antes de LIVE.",
+      "receipt": "Paula Direcci\u00f3n 2026-11-12: Operativo escribe todos los m\u00f3dulos operativos autorizados, igual o superior Direcci\u00f3n/Admin/AdminTenant/SuperAdmin; aplicar transversalmente los hallazgos de Carlos, respetar pa\u00edses/tenant, no ampliar Asesor ni el libro financiero y certificar Preview antes de LIVE.",
       "sourceStatus": "SOURCE_5_ROLES_12_DOMAINS_SYNTHETIC_TRANSACTION_AND_NEGATIVES_PASS_PREVIEW_BACKEND_AND_LIVE_NOT_YET_ACCEPTED",
       "capabilityOwners": [
         "ROLE_SCOPE_CLIENT_SERVER",
@@ -1556,7 +1556,7 @@
     {
       "id": "I6_6_ACTIVE_LEDGER_STAGE_INDEXED_UI_READONLY_P0",
       "approvedByDirection": true,
-      "receipt": "Dirección Paula 2026-11-13: continuar el primer gate I6.6 pendiente, conectar la lectura de Conciliaciones con el libro activo sin reimportar datos ni escribir pagos; solo Preview probado antes de mismo artifact LIVE; retener las 80 propuestas con póliza ambigua.",
+      "receipt": "Direcci\u00f3n Paula 2026-11-13: continuar el primer gate I6.6 pendiente, conectar la lectura de Conciliaciones con el libro activo sin reimportar datos ni escribir pagos; solo Preview probado antes de mismo artifact LIVE; retener las 80 propuestas con p\u00f3liza ambigua.",
       "sourceStatus": "SOURCE_SYNTHETIC_52_UNIQUE_80_AMBIGUOUS_HOLD_PREVIEW_SIGNED_AND_LIVE_NOT_CERTIFIED",
       "capabilityOwners": [
         "CONCILIACIONES_READONLY",
@@ -1589,14 +1589,14 @@
     {
       "id": "I6_6_EQUIPOS_ROLE_DEFAULTS_DIRECCION_SUPERADMIN_ADMIN_OPERATIVO_P0",
       "approvedByDirection": true,
-      "receipt": "Paula Andrea Osorio Franco, Dirección, instrucción expresa 2026-11-13: terminar escritura transversal, priorizar Operativo y garantizar SuperAdmin/Admin/Dirección, gestionar permisos por Equipos y certificar antes de LIVE; autorización de corrección y publicación sujeta a PASS real.",
+      "receipt": "Paula Andrea Osorio Franco, Direcci\u00f3n, instrucci\u00f3n expresa 2026-11-13: terminar escritura transversal, priorizar Operativo y garantizar SuperAdmin/Admin/Direcci\u00f3n, gestionar permisos por Equipos y certificar antes de LIVE; autorizaci\u00f3n de correcci\u00f3n y publicaci\u00f3n sujeta a PASS real.",
       "sourceCommit": "e2859e8ce8c29a48ed8f34b1f32e752558ca032d",
       "sourceStatus": "SOURCE_QA_17_OF_17_PASS_PREVIEW_QUOTA_RECOVERY_CURRENT_LIVE_BACKUP_REBUILD_REQUESTED_LIVE_HOLD",
       "capabilityOwners": [
         "ROLE_SCOPE_RUNTIME",
         "EQUIPOS_ROLE_PERMISSIONS"
       ],
-      "scope": "Repair Equipos default permission matrix when canonical memberships omit legacy nivel: Admin/Dirección/SuperAdmin full defaults and Operativo edit on assigned operational modules, preserving configurable server-protected overrides, tenant/country hard boundaries and no new grants to Asesor; zero data writes.",
+      "scope": "Repair Equipos default permission matrix when canonical memberships omit legacy nivel: Admin/Direcci\u00f3n/SuperAdmin full defaults and Operativo edit on assigned operational modules, preserving configurable server-protected overrides, tenant/country hard boundaries and no new grants to Asesor; zero data writes.",
       "dataWrites": 0,
       "paths": [
         {
@@ -1703,13 +1703,13 @@
     {
       "id": "I6_6_CONCILIACIONES_HUMAN_CLIENT_NAMES_20261113",
       "approvedByDirection": true,
-      "receipt": "Paula Dirección 2026-11-13: en Conciliaciones mostrar cliente real y estados comprensibles, sin identificadores técnicos visibles; conservar auditoría y no aplicar propuestas automáticamente",
+      "receipt": "Paula Direcci\u00f3n 2026-11-13: en Conciliaciones mostrar cliente real y estados comprensibles, sin identificadores t\u00e9cnicos visibles; conservar auditor\u00eda y no aplicar propuestas autom\u00e1ticamente",
       "sourceStatus": "SOURCE_TESTED_LOCAL_PENDING_IMMUTABLE_PREVIEW_AND_LIVE_PROOF",
       "capabilityOwners": [
         "CONCILIACIONES_ACTIVE_LEDGER_SCOPED_READ",
         "CONCILIACIONES_UI"
       ],
-      "scope": "El servidor proyecta el nombre desde el cliente canónico previamente validado. La interfaz usa nombre autorizado o ficha local, oculta referencias técnicas y traduce estados. Se conservan 52 propuestas con vínculo único, 80 ambiguas en espera y cero escrituras financieras.",
+      "scope": "El servidor proyecta el nombre desde el cliente can\u00f3nico previamente validado. La interfaz usa nombre autorizado o ficha local, oculta referencias t\u00e9cnicas y traduce estados. Se conservan 52 propuestas con v\u00ednculo \u00fanico, 80 ambiguas en espera y cero escrituras financieras.",
       "dataWrites": 0,
       "paths": [
         {
@@ -1754,7 +1754,7 @@
         "OPS_DURABLE_AUDIT",
         "DOCUMENT_DRIVE_TENANT_STATE_ERRORS"
       ],
-      "scope": "Quitar del tablero accionable versiones históricas/renovadas o sucesión contradictoria; conservarlas en revisión. Registrar renovación ya emitida desde Cliente 360 o Renovaciones para Dirección/Admin/Operativo sin formulario Ops intermedio, con aceptación expresa, gestión canónica única y readback, sin póliza ficticia. Drive muestra estado real del tenant al fallar carga y conserva requisito documental; la conexión OAuth administrativa sigue pendiente y no se certifica upload real.",
+      "scope": "Quitar del tablero accionable versiones hist\u00f3ricas/renovadas o sucesi\u00f3n contradictoria; conservarlas en revisi\u00f3n. Registrar renovaci\u00f3n ya emitida desde Cliente 360 o Renovaciones para Direcci\u00f3n/Admin/Operativo sin formulario Ops intermedio, con aceptaci\u00f3n expresa, gesti\u00f3n can\u00f3nica \u00fanica y readback, sin p\u00f3liza ficticia. Drive muestra estado real del tenant al fallar carga y conserva requisito documental; la conexi\u00f3n OAuth administrativa sigue pendiente y no se certifica upload real.",
       "dataWrites": 0,
       "paths": [
         {
@@ -2020,7 +2020,7 @@
     {
       "id": "I6_6_ADVISOR_CXP_PREVIEW_ENVELOPE_READBACK_CURRENCY_20261115",
       "approvedByDirection": true,
-      "receipt": "Paula Dirección 15/11/2026: liquidar octubre de Paula y Samuel además de Fernando y Germán; registrar en Finanzas donde corresponde, corregir y probar la escritura y publicar el mismo artifact certificado. Los PDFs no acreditan una escritura ni pago. Restauración exclusiva Preview respaldada por autorización exacta y recibo de inventario; LIVE permanece R11 hasta nuevo QA completo.",
+      "receipt": "Paula Direcci\u00f3n 15/11/2026: liquidar octubre de Paula y Samuel adem\u00e1s de Fernando y Germ\u00e1n; registrar en Finanzas donde corresponde, corregir y probar la escritura y publicar el mismo artifact certificado. Los PDFs no acreditan una escritura ni pago. Restauraci\u00f3n exclusiva Preview respaldada por autorizaci\u00f3n exacta y recibo de inventario; LIVE permanece R11 hasta nuevo QA completo.",
       "paths": [
         {
           "path": "functions/advisor-commission-payable-contract.js",
@@ -3016,9 +3016,9 @@
     {
       "id": "I6_6_CASH_ISSUANCE_MONTH_SERGIO_TRANSVERSAL_20261119",
       "approvedByDirection": true,
-      "receipt": "Paula 2026-11-19: para pago contado el requerimiento del recibo vence un mes calendario después de la fecha real de emisión; la fecha de emisión se consulta al documento, no se deduce de la vigencia. Aplicar de forma transversal sin modificar calendarios históricos ni requerimientos documentados.",
+      "receipt": "Paula 2026-11-19: para pago contado el requerimiento del recibo vence un mes calendario despu\u00e9s de la fecha real de emisi\u00f3n; la fecha de emisi\u00f3n se consulta al documento, no se deduce de la vigencia. Aplicar de forma transversal sin modificar calendarios hist\u00f3ricos ni requerimientos documentados.",
       "sourceStatus": "LOCAL_12_OF_12_CASH_CALENDAR_TESTS_PASS_PREVIEW_LIVE_PENDING",
-      "scope": "Captura explícita de fecha de emisión; vencimiento contractual de contado al mes calendario, con conservación de fechas documentadas y compatibilidad retroactiva. Certificación firmada Preview/LIVE pendiente; cero escrituras de asegurados reales.",
+      "scope": "Captura expl\u00edcita de fecha de emisi\u00f3n; vencimiento contractual de contado al mes calendario, con conservaci\u00f3n de fechas documentadas y compatibilidad retroactiva. Certificaci\u00f3n firmada Preview/LIVE pendiente; cero escrituras de asegurados reales.",
       "paths": [
         {
           "path": "orbit360-platform/core/primas.js",
@@ -3171,7 +3171,7 @@
     {
       "id": "I6_6_OWNER_VEHICLE_EDIT_ROLE_WRITE_AND_IMMUTABLE_PACKAGE_20261119",
       "approvedByDirection": true,
-      "receipt": "Paula 2026-11-19: corregir transversalmente permission-denied al editar el vehiculo de Ashlyn Aguilar desde rol Operativo, conservar derechos por rol para Carlos y publicar cada correccion tras certificacion; completar tambien empaquetador canónico que omitio modulo aprobado en I6.6.",
+      "receipt": "Paula 2026-11-19: corregir transversalmente permission-denied al editar el vehiculo de Ashlyn Aguilar desde rol Operativo, conservar derechos por rol para Carlos y publicar cada correccion tras certificacion; completar tambien empaquetador can\u00f3nico que omitio modulo aprobado en I6.6.",
       "sourceStatus": "LOCAL_5_OF_5_TARGETED_TESTS_PASS_SIGNED_PREVIEW_AND_LIVE_PENDING",
       "scope": "La edicion puntual de un vehiculo ligado a poliza escribe solo vehiculos y auditoria en transaccion durable, sin regenerar recibos/cartera/pagos. La composicion I6.6 incluye un bridge aprobado SHA-pinned como fuente dormida, sin cargar LAB ni modificar el unico entrypoint. No reconfigura por suposicion permisos, pertenencia, paises ni Firestore Rules y no afirma LIVE.",
       "paths": [
@@ -3208,7 +3208,7 @@
     {
       "id": "I6_6_OPS_ATOMIC_CLIENT360_ACTIVITY_DIRECT_ISSUED_VEHICLE_SUBSTITUTION_20261119",
       "approvedByDirection": true,
-      "receipt": "Paula 2026-11-19: una gestión creada desde Cliente 360 debe dejar actividad auditable; sustitución vehicular ya emitida debe registrarse desde póliza sin navegar Ops; la gestión no emitida se resuelve por Ops al aplicar endoso aprobado. Corregir transversalmente, probar por gates y publicar sin acumular.",
+      "receipt": "Paula 2026-11-19: una gesti\u00f3n creada desde Cliente 360 debe dejar actividad auditable; sustituci\u00f3n vehicular ya emitida debe registrarse desde p\u00f3liza sin navegar Ops; la gesti\u00f3n no emitida se resuelve por Ops al aplicar endoso aprobado. Corregir transversalmente, probar por gates y publicar sin acumular.",
       "sourceStatus": "SOURCE_BLOBS_SYNTAX_PASS_SIGNED_PREVIEW_AND_LIVE_PENDING",
       "scope": "Server Ops owner writes gestiones+Cliente360 actividades atomically on create_management with canonical readback, excluding separate endorsement activity; frontend removes optimistic silent activity insert and reports incomplete server linkage. UI adds documented already-issued vehicle substitution direct from policy via existing E.createRequest/E.apply with conservative reuse handling, audited previous vehicle history, and optional Ops fallback. No production write, no pending paid or receipts batch changed.",
       "paths": [
@@ -3305,7 +3305,7 @@
     {
       "id": "I6_6_CLIENTE360_EQUIPO_CANONICAL_ADVISOR_EDIT_CREATE_ROOTFIX_20261119",
       "approvedByDirection": true,
-      "receipt": "Paula Dirección 2026-11-19: Carlos Operativo muestra físicamente en Cliente360 / Editar ficha que Germán Reyes y Priscila no figuran aunque Equipo los reconoce. Se autoriza corregir dentro del gate I6.6, preservar todas las capacidades aprobadas, certificar y publicar el mismo artefacto de manera acumulativa; no reconstruir, no editar datos operativos para reparar el selector.",
+      "receipt": "Paula Direcci\u00f3n 2026-11-19: Carlos Operativo muestra f\u00edsicamente en Cliente360 / Editar ficha que Germ\u00e1n Reyes y Priscila no figuran aunque Equipo los reconoce. Se autoriza corregir dentro del gate I6.6, preservar todas las capacidades aprobadas, certificar y publicar el mismo artefacto de manera acumulativa; no reconstruir, no editar datos operativos para reparar el selector.",
       "sourceStatus": "SOURCE_PATCH_PENDING_CANONICAL_GUARD_SIGNED_PREVIEW_AND_SAME_ARTIFACT_LIVE_QA_NOT_PRODUCTION_ACCEPTED",
       "capabilityOwners": [
         "CLIENTE360_PRIMARY_RUNTIME",
@@ -3332,7 +3332,7 @@
       ],
       "releaseConditions": [
         "signed source QA passes current manifest",
-        "signed Carlos GT LIVE/Preview actual Editar+Nuevo selectors Germán and Priscila",
+        "signed Carlos GT LIVE/Preview actual Editar+Nuevo selectors Germ\u00e1n and Priscila",
         "save fixture persistence reload and no unrelated advisor or country changes",
         "existing cumulative I6.6 source build and same artifact preview/live",
         "readback both live origins and affected module acceptance without customer data mutation"
@@ -3341,7 +3341,7 @@
     {
       "id": "I6_6_CRM_EFFECTIVE_NEW_CLIENT_SHADOW_ADVISOR_ROSTER_ROOTFIX_20261119",
       "approvedByDirection": true,
-      "receipt": "Paula Dirección, 19-nov-2026, exige cerrar la raíz de los selectores incoherentes en todas las rutas efectivas y publicar. Signed current Preview discovered Nuevo Cliente uses legacy CRM v1198 override despite a Cliente360 base form fix. This addendum binds the actual owner to signed Equipos roster, no new identity, no other modules removed.",
+      "receipt": "Paula Direcci\u00f3n, 19-nov-2026, exige cerrar la ra\u00edz de los selectores incoherentes en todas las rutas efectivas y publicar. Signed current Preview discovered Nuevo Cliente uses legacy CRM v1198 override despite a Cliente360 base form fix. This addendum binds the actual owner to signed Equipos roster, no new identity, no other modules removed.",
       "sourceStatus": "SOURCE_SIGNED_QA_AND_NEW_IMMUTABLE_PREVIEW_REQUIRED_NO_LIVE_ACCEPTANCE",
       "capabilityOwners": [
         "CLIENTE360_PRIMARY_RUNTIME",
@@ -3365,7 +3365,7 @@
     {
       "id": "I6_6_OPERATIVO_CLIENT_EDIT_ACTIVITY_COUNTRY_PERSISTENCE_20261119",
       "approvedByDirection": true,
-      "receipt": "Paula Dirección 2026-11-19: Carlos Operativo no puede guardar teléfono ni reasignación de asesor en ficha de cliente; corregir inmediatamente, probar, certificar y publicar con misma fuente sin ampliar el rol a administrador. La actividad de su lote durable carecía de país y el servidor exige país para toda escritura. A&S conserva motivo auditable, sin audit optimista previo al commit.",
+      "receipt": "Paula Direcci\u00f3n 2026-11-19: Carlos Operativo no puede guardar tel\u00e9fono ni reasignaci\u00f3n de asesor en ficha de cliente; corregir inmediatamente, probar, certificar y publicar con misma fuente sin ampliar el rol a administrador. La actividad de su lote durable carec\u00eda de pa\u00eds y el servidor exige pa\u00eds para toda escritura. A&S conserva motivo auditable, sin audit optimista previo al commit.",
       "sourceStatus": "SOURCE_PATCH_PENDING_SIGNED_RUNTIME_WRITE_AND_LIVE_RELEASE",
       "capabilityOwners": [
         "CLIENTE360_PRIMARY_RUNTIME",
@@ -3403,7 +3403,7 @@
     {
       "id": "I6_6_PREVIEW_CLIENT_ACTIVITY_MARKER_20261119",
       "approvedByDirection": true,
-      "receipt": "Dirección I6.6 19/11: corregir el contrato de la actividad sintética sin relajar Preview ni producción. Rechazo real I66_PREVIEW_MUTATION_CALLABLE_DENIED en QA 44671336690.",
+      "receipt": "Direcci\u00f3n I6.6 19/11: corregir el contrato de la actividad sint\u00e9tica sin relajar Preview ni producci\u00f3n. Rechazo real I66_PREVIEW_MUTATION_CALLABLE_DENIED en QA 44671336690.",
       "sourceStatus": "SOURCE_PENDING_IMMUTABLE_PREVIEW_AND_SIGNED_UAT",
       "capabilityOwners": [
         "CLIENTE360_PRIMARY_RUNTIME",
@@ -3437,7 +3437,7 @@
     {
       "id": "I6_6_OPS_LEADS_DIRECTED_COLLABORATION_QUEUE_20261119",
       "approvedByDirection": true,
-      "receipt": "Dirección 19/11: devolución al asesor y reenvío a Operaciones con el mismo ID y registro. Reproducido en la tarjeta LIVE de Juan Carlos Corado García.",
+      "receipt": "Direcci\u00f3n 19/11: devoluci\u00f3n al asesor y reenv\u00edo a Operaciones con el mismo ID y registro. Reproducido en la tarjeta LIVE de Juan Carlos Corado Garc\u00eda.",
       "sourceStatus": "SOURCE_PENDING_SIGNED_UI_READBACK_AND_SAME_ARTIFACT_RELEASE",
       "capabilityOwners": [
         "CLIENTE360_PRIMARY_RUNTIME",
@@ -3492,7 +3492,7 @@
     {
       "id": "I6_6_ISSUED_RENEWAL_TERMS_AND_EXISTING_PAYMENT_MESSAGE_20261120",
       "approvedByDirection": true,
-      "receipt": "Dirección 20/11/2026, I6.6 apartados 4, 6 y 10; lectura de cuotas 44798516716.",
+      "receipt": "Direcci\u00f3n 20/11/2026, I6.6 apartados 4, 6 y 10; lectura de cuotas 44798516716.",
       "sourceStatus": "SOURCE_PENDING_SIGNED_PREVIEW_AND_EXACT_LIVE",
       "capabilityOwners": [
         "COBROS_RECONCILIATION",
@@ -3546,7 +3546,7 @@
     {
       "id": "I6_6_IMPORT_REVIEW_SOURCE_ROWS_ONLY_20261120",
       "approvedByDirection": true,
-      "receipt": "Dirección, I6.6 20/11/2026, apartados 4, 9 y 10. Reproducción desde la ficha Cliente 360 con PDF original y sin confirmar el mapeo.",
+      "receipt": "Direcci\u00f3n, I6.6 20/11/2026, apartados 4, 9 y 10. Reproducci\u00f3n desde la ficha Cliente 360 con PDF original y sin confirmar el mapeo.",
       "sourceStatus": "SOURCE_PENDING_SIGNED_PREVIEW_AND_EXACT_LIVE",
       "scope": "Require rows read from the selected source before confirming a structured import. Retain document-only Drive and existing canonical source-intake owners. No contractual values or financial writes in source QA.",
       "paths": [
@@ -3570,7 +3570,7 @@
     {
       "id": "I6_6_CLIENT_PAYMENT_CANONICAL_PAID_WITH_OPTIONAL_DOCUMENT_RECOVERY_20261120",
       "approvedByDirection": true,
-      "receipt": "Paula Dirección, 20-nov-2026: aplicar pago del cliente directamente al requerimiento, descargar cartera incluso cuando falte conciliación aseguradora; adjuntos opcionales no deben paralizar la transacción; cuando ya exista factura y fecha, pagar y conciliar en una única operación, conservar evidencia, sin repetir pagos. Solo modifica la interfaz de Cobros y mantiene los contratos de seguridad y servidor, con signed Preview/LIVE obligatorios.",
+      "receipt": "Paula Direcci\u00f3n, 20-nov-2026: aplicar pago del cliente directamente al requerimiento, descargar cartera incluso cuando falte conciliaci\u00f3n aseguradora; adjuntos opcionales no deben paralizar la transacci\u00f3n; cuando ya exista factura y fecha, pagar y conciliar en una \u00fanica operaci\u00f3n, conservar evidencia, sin repetir pagos. Solo modifica la interfaz de Cobros y mantiene los contratos de seguridad y servidor, con signed Preview/LIVE obligatorios.",
       "sourceStatus": "SOURCE_PATCH_NEEDS_SIGNED_PREVIEW_REAL_ROLE_AND_SAME_ARTIFACT_LIVE",
       "capabilityOwners": [
         "COBROS_PRIMARY_RUNTIME",
@@ -3608,7 +3608,7 @@
     {
       "id": "I6_6_CLIENT_LINKED_DEAL_TIMELINE_20261122",
       "approvedByDirection": true,
-      "receipt": "Dirección, 22/11/2026: mostrar la actividad y las inspecciones del cliente sin duplicar la gestión, respetar ID canónico, rol y país y certificar antes de promover.",
+      "receipt": "Direcci\u00f3n, 22/11/2026: mostrar la actividad y las inspecciones del cliente sin duplicar la gesti\u00f3n, respetar ID can\u00f3nico, rol y pa\u00eds y certificar antes de promover.",
       "sourceStatus": "SOURCE_REQUIRES_EXACT_PREVIEW_AND_LIVE_UI_PROOF",
       "capabilityOwners": [
         "CLIENTE360",
@@ -3637,7 +3637,7 @@
     {
       "id": "I6_6_STANDARD_MANAGEMENT_AND_CLIENT_COUNTRY_SCOPE_20261122",
       "approvedByDirection": true,
-      "receipt": "Dirección I6.6 D05 y D08: escritura operativa, expediente canónico y separación GT/CO. Se requiere nueva prueba UI antes de promover.",
+      "receipt": "Direcci\u00f3n I6.6 D05 y D08: escritura operativa, expediente can\u00f3nico y separaci\u00f3n GT/CO. Se requiere nueva prueba UI antes de promover.",
       "sourceStatus": "SOURCE_REQUIRES_EXACT_PREVIEW_AND_LIVE_UI_PROOF",
       "capabilityOwners": [
         "CLIENTE360",
@@ -3675,7 +3675,7 @@
     {
       "id": "I6_6_RESTORE_SIGNED_SESSION_MEMBERSHIP_20261122",
       "approvedByDirection": true,
-      "receipt": "Mandato I6.6, secciones 4, 10 y 11. Alcance autorizado para corrección y Preview. La aceptación visual y LIVE de esta candidata siguen pendientes.",
+      "receipt": "Mandato I6.6, secciones 4, 10 y 11. Alcance autorizado para correcci\u00f3n y Preview. La aceptaci\u00f3n visual y LIVE de esta candidata siguen pendientes.",
       "sourceStatus": "SOURCE_REQUIRES_EXACT_PREVIEW_AND_LIVE_UI_PROOF",
       "capabilityOwners": [
         "LOGIN",
@@ -3712,7 +3712,7 @@
     {
       "id": "I6_6_RESTORE_RETRY_EXISTING_MESSAGE_20261122",
       "approvedByDirection": true,
-      "receipt": "Mandato I6.6, secciones 4, 10 y 11. Alcance autorizado para corrección y Preview. La aceptación visual y LIVE de esta candidata siguen pendientes.",
+      "receipt": "Mandato I6.6, secciones 4, 10 y 11. Alcance autorizado para correcci\u00f3n y Preview. La aceptaci\u00f3n visual y LIVE de esta candidata siguen pendientes.",
       "scope": "Retain the previously accepted recovery message next to the new authenticated retry control, per central regression 45092586518.",
       "sourceStatus": "SOURCE_REQUIRES_EXACT_PREVIEW_AND_LIVE_UI_PROOF",
       "capabilityOwners": [
@@ -3740,7 +3740,7 @@
     {
       "id": "I6_6_PORTAL_SHARED_CLIENT360_ACTIVITY_ATOMIC_20261122",
       "approvedByDirection": true,
-      "receipt": "Dirección 2026-11-22/23: reparar gestiones de Cliente 360 y portal transversalmente, preservar historial y no duplicar; I6_6_OPS_ATOMIC_CLIENT360_ACTIVITY_DIRECT_ISSUED_VEHICLE_SUBSTITUTION_20261119; fuente y pruebas autorizadas en el mismo gate.",
+      "receipt": "Direcci\u00f3n 2026-11-22/23: reparar gestiones de Cliente 360 y portal transversalmente, preservar historial y no duplicar; I6_6_OPS_ATOMIC_CLIENT360_ACTIVITY_DIRECT_ISSUED_VEHICLE_SUBSTITUTION_20261119; fuente y pruebas autorizadas en el mismo gate.",
       "sourceStatus": "SOURCE_QA_PENDING_EXACT_PREVIEW_SIGNED_MULTIROLE_LIVE_HOLD",
       "capabilityOwners": [
         "OPS_PRIMARY_RUNTIME",
@@ -3792,7 +3792,7 @@
     {
       "id": "I6_6_PORTAL_CLAIM_OPS_CANONICAL_RELATION_AND_RETRY_20261122",
       "approvedByDirection": true,
-      "receipt": "Dirección 2026-11-22/23: continuidad I6.6 de solicitudes y siniestros desde Portal, Ops y Cliente360 con relaciones persistentes y no duplicar al reintentar; preserva la corrección transaccional aprobada.",
+      "receipt": "Direcci\u00f3n 2026-11-22/23: continuidad I6.6 de solicitudes y siniestros desde Portal, Ops y Cliente360 con relaciones persistentes y no duplicar al reintentar; preserva la correcci\u00f3n transaccional aprobada.",
       "sourceStatus": "SOURCE_QA_PENDING_IMMUTABLE_BACKEND_PREVIEW_SIGNED_UAT_AND_LIVE_HOLD",
       "capabilityOwners": [
         "OPS_PRIMARY_RUNTIME",
@@ -3845,7 +3845,7 @@
     {
       "id": "I6_6_STANDARD_OPS_MANAGEMENT_NO_ADMIN_CATALOG_WRITE_20261122",
       "approvedByDirection": true,
-      "receipt": "Dirección I6.6 2026-11-22 R9: Carlos Operativo debe poder crear cualquier gestión estándar en Ops y Cliente360; eliminar bloqueo de catálogo administrativo en acción operativa sin conceder permisos de configuración ni forzar casos por cliente.",
+      "receipt": "Direcci\u00f3n I6.6 2026-11-22 R9: Carlos Operativo debe poder crear cualquier gesti\u00f3n est\u00e1ndar en Ops y Cliente360; eliminar bloqueo de cat\u00e1logo administrativo en acci\u00f3n operativa sin conceder permisos de configuraci\u00f3n ni forzar casos por cliente.",
       "sourceStatus": "FOCAL_SOURCE_CHANGE_QA_PENDING_PREVIEW_AND_LIVE_UAT_NOT_CLAIMED",
       "capabilityOwners": [
         "OPS_PRIMARY_RUNTIME",
@@ -3880,7 +3880,7 @@
     {
       "id": "I6_6_MANAGEMENT_CATALOG_FALLBACK_OPTIONAL_DRIVE_POSTCOMMIT_20261122",
       "approvedByDirection": true,
-      "receipt": "Dirección I6.6 2026-11-22 exige escritura real de gestiones con Operativo sin permiso de configuración; documentos opcionales no deben convertir el commit ya confirmado en falso error ni inducir duplicados.",
+      "receipt": "Direcci\u00f3n I6.6 2026-11-22 exige escritura real de gestiones con Operativo sin permiso de configuraci\u00f3n; documentos opcionales no deben convertir el commit ya confirmado en falso error ni inducir duplicados.",
       "sourceStatus": "SOURCE_QA_REVALIDATION_PENDING_PREVIEW_AND_LIVE",
       "capabilityOwners": [
         "OPS_PRIMARY_RUNTIME",
@@ -3914,14 +3914,14 @@
     {
       "id": "I6_6_COBROS_VISIBLE_SNAPSHOT_AND_DOCUMENTED_CALENDAR_QA_20261123",
       "approvedByDirection": true,
-      "receipt": "Dirección 2026-11-23: completar y publicar lo pendiente, corregir de raíz la sincronización de ejecución, escrituras financieras y operación. Corrección causal de lecturas repetidas de Cobros y del helper que llenaba calendario documental cerrado; no nueva regla de negocio.",
+      "receipt": "Direcci\u00f3n 2026-11-23: completar y publicar lo pendiente, corregir de ra\u00edz la sincronizaci\u00f3n de ejecuci\u00f3n, escrituras financieras y operaci\u00f3n. Correcci\u00f3n causal de lecturas repetidas de Cobros y del helper que llenaba calendario documental cerrado; no nueva regla de negocio.",
       "sourceStatus": "SOURCE_QA_PENDING_NEW_IMMUTABLE_ARTIFACT_PREVIEW_AND_LIVE_NOT_CLAIMED",
       "capabilityOwners": [
         "COBROS_PRIMARY_RUNTIME",
         "ROLE_SCOPE_RUNTIME",
         "CROSS_MODULE_RELATIONSHIPS"
       ],
-      "scope": "Cobros reutiliza sólo un snapshot visible por render/Reportes, con IDs exactos, sin persistir cache ni cambiar importes, fechas, permisos o writers. El helper firmado abre por clic la sección documental opcional, conserva todos los asserts de UI, writer, readback y cleanup. Artifact anterior permanece fallido, sin parchearlo ni promoverlo.",
+      "scope": "Cobros reutiliza s\u00f3lo un snapshot visible por render/Reportes, con IDs exactos, sin persistir cache ni cambiar importes, fechas, permisos o writers. El helper firmado abre por clic la secci\u00f3n documental opcional, conserva todos los asserts de UI, writer, readback y cleanup. Artifact anterior permanece fallido, sin parchearlo ni promoverlo.",
       "paths": [
         {
           "path": "orbit360-platform/modules/cobros.js",
@@ -4055,6 +4055,52 @@
         {
           "path": "tools/gravicentra-i6-6-financial-page-read-efficiency.test.cjs",
           "gitBlobSha": "b090a37debd6e397d597410efe237083a8fff84f"
+        }
+      ]
+    },
+    {
+      "id": "I6_6_STARTUP_PENDING_READ_RETRY_20261124",
+      "approvedByDirection": true,
+      "receipt": "artifacts/orbit360-recovery/release-control/I6_6_STARTUP_PENDING_READ_RETRY_CAUSAL_SOURCE_20261124.json",
+      "receiptGitBlobSha": "bdfbdb3a1764883579907797b0b198debda773e0",
+      "sourceStatus": "CAUSAL_SOURCE_REPRODUCED_LOCAL_PASS_PREVIEW_LIVE_PENDING",
+      "capabilityOwners": [
+        "STARTUP_PERFORMANCE",
+        "LOGIN_AND_ACCESS"
+      ],
+      "scope": "Publish exact pending transport retries before emitting, classify only those required sources as still missing, preserve terminal denied/integrity failures, cancel stale recovery on detach and role change.",
+      "paths": [
+        {
+          "path": "orbit360-platform/core/product-hydration-required-optional-p0.js",
+          "gitBlobSha": "f2f42ef536b00b89c7198710a20aadb633a7eb29"
+        },
+        {
+          "path": "orbit360-platform/data/store-firestore-product-readonly-p0.js",
+          "gitBlobSha": "fa8e507c03aba7bc7e99214c3b4e695f2c5fe222",
+          "replaces": {
+            "path": "orbit360-platform/data/store-firestore-product-readonly-p0.js",
+            "priorGitBlobSha": "062e5633e97ba830a4149fcf4d4ef49cd9f7f8cb",
+            "priorChangeId": "I6_6_CONCILIACIONES_PROTECTED_SCOPED_READ_BRIDGE_P0"
+          }
+        }
+      ],
+      "tests": [
+        {
+          "path": "tools/gravicentra-i6-6-startup-pending-read-retry.test.cjs",
+          "gitBlobSha": "aa2e1215dbdaf80a11fa73f319dc61e54a5267d1"
+        },
+        {
+          "path": "tools/gravicentra-i6-6-make-lead-ingress-release.test.cjs",
+          "gitBlobSha": "a9e5d16b86f15cffaadd73c1b17662ce9cc0d187",
+          "replaces": {
+            "path": "tools/gravicentra-i6-6-make-lead-ingress-release.test.cjs",
+            "priorGitBlobSha": "eb800c9b5ac086609c03ff7a619dd364c3132ac6",
+            "priorChangeId": "I6_6_A13_A14_CANONICAL_MACHINE_INGRESS_AND_PAGED_READ_20261124"
+          }
+        },
+        {
+          "path": "tools/gravicentra-i6-6-composite-preview-admission.test.cjs",
+          "gitBlobSha": "6fc899bf4f087eec987d7c63c99cccc361e7273a"
         }
       ]
     }

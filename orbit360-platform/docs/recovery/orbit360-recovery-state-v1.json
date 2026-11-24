@@ -10,7 +10,7 @@
   "branch": "recovery/fase-a-clean-20260831",
   "forensicOriginSha": "9c95f31461f2eabe9804625b5659bee772f5602a",
   "createdAtUtc": "2026-08-31T18:00:00Z",
-  "updatedAtUtc": "2026-11-19T12:52:38.648Z",
+  "updatedAtUtc": "2026-11-24T14:50:06.473585Z",
   "status": "I6_6_LIVE_CONTROLLED_PORTFOLIO_UPDATE_IN_PROGRESS",
   "currentIteration": 6,
   "lastCompletedIteration": 5,
@@ -56,11 +56,11 @@
       "artifactDigest": "sha256:7cb782848a45083047c4899bc30c13bf5be46429607e42597d09342becfc9acc",
       "hostingVersion": "sites/ays-orbit-360-lab/versions/332999a55b189108"
     },
-    "evidencePath": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_EXECUTION_PROGRESS_20261124_R43.json",
-    "evidenceGitBlobSha": "dddf692452a4fd8abf480ef4d3b0daeaba37cbee",
+    "evidencePath": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_EXECUTION_PROGRESS_20261124_R44.json",
+    "evidenceGitBlobSha": "619149f70d7fde123bfb76bf421c939a79fb3d72",
     "activeGate": "I6.6",
-    "currentWork": "I6.6: ejecutar el owner readonlyObserver performance sobre E3 aceptado en modo six-existing-receipts. Capturar fase/código de bootstrap y clases de errores durante recargas de los mismos seis recibos; conservar HOLD de saldo si corresponde. Esta observación no acepta v20/E6, no promueve Hosting, no ejecuta pagos ni habilita A05. Resolver la causa demostrada dentro del gate activo antes de un nuevo artifact o intento de release.",
-    "nextAction": "I6.6: ejecutar el owner readonlyObserver performance sobre E3 aceptado en modo six-existing-receipts. Capturar fase/código de bootstrap y clases de errores durante recargas de los mismos seis recibos; conservar HOLD de saldo si corresponde. Esta observación no acepta v20/E6, no promueve Hosting, no ejecuta pagos ni habilita A05. Resolver la causa demostrada dentro del gate activo antes de un nuevo artifact o intento de release.",
+    "currentWork": "I6.6: freeze signed source QA and guard for the reproduced two-owner startup retry correction; build a new immutable candidate through the existing composed Preview owner, preserving exact v20 deferred backend pins. Require 48 financial Preview and 48 LIVE stages on that artifact before acceptance. R43 observer is complete: six reloads, unchanged server data, balance still HOLD. Make capacity is restored but ingress remains CLOSED; prepare the existing five-function gate without claiming it passed. Preserve all financial writes and keep Historial candidate separate until its affected gate is proven.",
+    "nextAction": "I6.6: freeze signed source QA and guard for the reproduced two-owner startup retry correction; build a new immutable candidate through the existing composed Preview owner, preserving exact v20 deferred backend pins. Require 48 financial Preview and 48 LIVE stages on that artifact before acceptance. R43 observer is complete: six reloads, unchanged server data, balance still HOLD. Make capacity is restored but ingress remains CLOSED; prepare the existing five-function gate without claiming it passed. Preserve all financial writes and keep Historial candidate separate until its affected gate is proven.",
     "frontendPreviewRequest": {
       "version": 20,
       "sourceQaHead": "b4f90d00c0468a54fc9b542d48212919e1a14144",
@@ -564,7 +564,7 @@
     "phaseAIterationStatuses": "HISTORICAL_FIELDS_ABOVE_PRESERVED_UNTIL_FORMAL_GATE_EVIDENCE;_NO_NEW_PASS_INFERRED",
     "labDataWriteScope": "ONLY_35_AUTHORIZED_COUNTRY_FIELDS;_NO_AUGUST_REFRESH"
   },
-  "nextAction": "I6.6: ejecutar el owner readonlyObserver performance sobre E3 aceptado en modo six-existing-receipts. Capturar fase/código de bootstrap y clases de errores durante recargas de los mismos seis recibos; conservar HOLD de saldo si corresponde. Esta observación no acepta v20/E6, no promueve Hosting, no ejecuta pagos ni habilita A05. Resolver la causa demostrada dentro del gate activo antes de un nuevo artifact o intento de release.",
+  "nextAction": "I6.6: freeze signed source QA and guard for the reproduced two-owner startup retry correction; build a new immutable candidate through the existing composed Preview owner, preserving exact v20 deferred backend pins. Require 48 financial Preview and 48 LIVE stages on that artifact before acceptance. R43 observer is complete: six reloads, unchanged server data, balance still HOLD. Make capacity is restored but ingress remains CLOSED; prepare the existing five-function gate without claiming it passed. Preserve all financial writes and keep Historial candidate separate until its affected gate is proven.",
   "sourceOfTruth": {
     "projectBoundaryPrevalentAddendum": "orbit360-platform/docs/recovery/ADDENDUM_PREVALENTE_CHATGPT_PROJECT_BOUNDARY_20260831.md",
     "mutableState": "orbit360-platform/docs/recovery/orbit360-recovery-state-v1.json",
@@ -4717,6 +4717,37 @@
           "guardRunId": 45382071816
         }
       }
+    },
+    {
+      "reason": "ACTIVE_OWNER_PLAN_SUMMARY_SUPERSEDED",
+      "priorGitBlobSha": "5bea133b6cfefd7ca980520042ccaa84fd7fa82f",
+      "supersededByGeneration": 3,
+      "prior": {
+        "schema": "GI_I66_ACTIVE_OWNER_PLAN_CONTINUATION_V1",
+        "authorityPointer": "artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json#i66OperationalContinuation20261115",
+        "generation": 3,
+        "latestProvenLiveSource": "65c825b2808a615ca4195bdde6689dbdbe3193b2",
+        "latestPhysicalFrontendLiveReceipt": "artifacts/orbit360-recovery/release-control/I6_6_FRONTEND_E00003_RECEIPT.json",
+        "currentPhysicalFrontend": {
+          "generation": 3,
+          "sourceSha": "65c825b2808a615ca4195bdde6689dbdbe3193b2",
+          "buildId": "gi-i66-65c825b2808a-57f234755dc1",
+          "artifactId": 14873426438,
+          "artifactDigest": "sha256:7cb782848a45083047c4899bc30c13bf5be46429607e42597d09342becfc9acc",
+          "hostingVersion": "sites/ays-orbit-360-lab/versions/332999a55b189108"
+        },
+        "evidencePath": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_EXECUTION_PROGRESS_20261124_R44.json",
+        "evidenceGitBlobSha": "200d5d4fed43e16a62cab93bbd90f002fb0cec84",
+        "activeGate": "I6.6",
+        "currentWork": "I6.6: freeze signed source QA and guard for the reproduced two-owner startup retry correction; build a new immutable candidate through the existing composed Preview owner, preserving exact v20 deferred backend pins. Require 48 financial Preview and 48 LIVE stages on that artifact before acceptance. R43 observer is complete: six reloads, unchanged server data, balance still HOLD. Make capacity is restored but ingress remains CLOSED; prepare the existing five-function gate without claiming it passed. Preserve all financial writes and keep Historial candidate separate until its affected gate is proven.",
+        "nextAction": "I6.6: freeze signed source QA and guard for the reproduced two-owner startup retry correction; build a new immutable candidate through the existing composed Preview owner, preserving exact v20 deferred backend pins. Require 48 financial Preview and 48 LIVE stages on that artifact before acceptance. R43 observer is complete: six reloads, unchanged server data, balance still HOLD. Make capacity is restored but ingress remains CLOSED; prepare the existing five-function gate without claiming it passed. Preserve all financial writes and keep Historial candidate separate until its affected gate is proven.",
+        "frontendPreviewRequest": {
+          "version": 20,
+          "sourceQaHead": "b4f90d00c0468a54fc9b542d48212919e1a14144",
+          "sourceQaRunId": 45382071947,
+          "guardRunId": 45382071816
+        }
+      }
     }
   ],
   "i66E6RollbackStartupDiagnostic20261124": {
@@ -4748,5 +4779,35 @@
       "receiptGitBlobSha": "11fdb3bee494541513482666d6215f45cbad0567",
       "receiptCommit": "f80c37e174406ccb489569b3bc7dd6073c2c4273"
     }
+  },
+  "i66R43ObserverCompleted20261124": {
+    "runId": 45395937255,
+    "path": "artifacts/orbit360-recovery/release-control/I6_6_E3_R43_COMPLETED_OBSERVER_READBACK_20261124.json",
+    "gitBlobSha": "f373d630c4a9af4c22010f34a9c52b1a41a989b2",
+    "reloadsPassed": 6,
+    "stagesCollected": 12,
+    "serverUnchanged": true,
+    "terminalCode": "I66_SIX_VISIBLE_VALUES_OR_BALANCE_HOLD",
+    "startupFailureObserved": false,
+    "e6FailureUniquelyExplained": false
+  },
+  "i66StartupRecoverySource20261124": {
+    "path": "artifacts/orbit360-recovery/release-control/I6_6_STARTUP_PENDING_READ_RETRY_CAUSAL_SOURCE_20261124.json",
+    "gitBlobSha": "bdfbdb3a1764883579907797b0b198debda773e0",
+    "status": "CAUSAL_SOURCE_REPRODUCED_LOCAL_PASS_PREVIEW_LIVE_PENDING",
+    "causalTestsPassed": 18,
+    "regressionTestsPassed": 151,
+    "signedSourceQaPending": true,
+    "previewAccepted": false,
+    "liveAccepted": false
+  },
+  "i66MakeCapacityRestored20261124": {
+    "path": "artifacts/orbit360-recovery/release-control/I6_6_MAKE_CAPACITY_RESTORED_READONLY_20261124.json",
+    "gitBlobSha": "9f9a1f3aecee777735fb9e779ef8648eaf387693",
+    "externalCapacityRestored": true,
+    "purchasePerformedByThisSession": false,
+    "purchaseAmountVerified": false,
+    "canonicalLeadCreationAccepted": false,
+    "writerEnabled": false
   }
 }

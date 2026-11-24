@@ -26,7 +26,7 @@
     var protectedMode=options.protectedReadCandidate===true,protectedEpoch=0,protectedPoliciesPromise=null;
     // Role changes can leave prior-epoch callable requests in flight. Prioritize
     // the new role's required source before starting optional route fan-out.
-    var protectedRoleRecovery=false,protectedDeferredQueue=[],protectedDeferredActive=new Set(),protectedRetryCounts={};
+    var protectedRoleRecovery=false,protectedDeferredQueue=[],protectedDeferredActive=new Set(),protectedRetryCounts={},protectedRetryTimers=Object.create(null);
     // I6.6: server-scoped callable rows are JSON-compatible. Clone their
     // authorized read snapshots in one native operation, preserving deep-copy
     // isolation while avoiding thousands of per-row stringify/parse cycles on
@@ -62,11 +62,18 @@
     // source stays unconfirmed; only its scheduling barrier is settled so
     // independent, permitted current-route sources can still hydrate.
     function roleRecoveryStartupSettled() { return startupCollections.every(function (name) { return state.serverConfirmedCollections.indexOf(name) >= 0 || state.deniedCollections.indexOf(name) >= 0 || !!state.snapshotErrors[name]; }); }
+    function clearProtectedRetry(collection) {
+      if(Object.prototype.hasOwnProperty.call(protectedRetryTimers,collection)){
+        clearTimeout(protectedRetryTimers[collection]);
+        delete protectedRetryTimers[collection];
+      }
+    }
+    function clearProtectedRetries() { Object.keys(protectedRetryTimers).forEach(clearProtectedRetry); }
     function recordError(collection, error, phase) {
       var code=String(error && (error.code || error.message || error) || error);
+      clearProtectedRetry(collection);
       state.snapshotErrors[collection]=code;
       state.status=phase==='attach'?'attach-error':'snapshot-error';
-      emit(collection);
       // Only bounded, transport-transient failures may retry. Denied roles,
       // malformed pages, foreign scopes and failed integrity checks stay closed.
       if(protectedMode&&phase==='snapshot'&&
@@ -74,13 +81,19 @@
          (protectedRetryCounts[collection]||0)<1){
         protectedRetryCounts[collection]=(protectedRetryCounts[collection]||0)+1;
         var epoch=protectedEpoch;
-        setTimeout(function(){
+        // Publish scheduled recovery before emitting the error. Otherwise the
+        // bootstrap's 100ms readiness check detaches this same store before its
+        // existing 1200ms retry can execute. The total startup budget is unchanged.
+        state.status='waiting-protected-retry';
+        protectedRetryTimers[collection]=setTimeout(function(){
           if(epoch!==protectedEpoch||!state.snapshotErrors[collection])return;
+          clearProtectedRetry(collection);
           delete attachStarted[collection];delete state.snapshotErrors[collection];
           state.status='waiting-protected-retry';emit(collection);
           attachCollection(collection,true);
         },1200);
       }
+      emit(collection);
     }
     function subscribeBuilt(collection, built) {
       var unsubscribe = subscribeRef(built.ref, function (snapshot) { var meta = snapshot && snapshot.metadata ? { fromCache: snapshot.metadata.fromCache === true } : { fromCache: false }; acceptRows(collection, docRows(snapshot), meta); }, function (error) { recordError(collection, error, 'snapshot'); });
@@ -262,7 +275,7 @@
       if(!protectedMode)return;
       // Invalidate all old-role bytes synchronously; do not refetch every
       // previously opened optional module on a role change.
-      ++protectedEpoch;protectedPoliciesPromise=null;attachStarted={};collections.forEach(function(k){cache[k]=[];});
+      clearProtectedRetries();++protectedEpoch;protectedPoliciesPromise=null;attachStarted={};collections.forEach(function(k){cache[k]=[];});
       protectedRoleRecovery=true;protectedDeferredQueue=[];protectedDeferredActive.clear();protectedRetryCounts={};
       state.serverConfirmedCollections=[];state.attachedCollections=[];state.observedCollections=[];
       state.snapshotSources={};state.queryPlans={};state.snapshotErrors={};state.deniedCollections=[];
@@ -340,7 +353,7 @@
       if (!state.ready && state.status === 'attaching') state.status = 'waiting-authoritative-snapshots';
       return startupCollections.every(function (name) { return !state.snapshotErrors[name] && state.deniedCollections.indexOf(name) < 0; });
     }
-    function detach() { ++protectedEpoch; protectedPoliciesPromise=null;protectedRoleRecovery=false;protectedDeferredQueue=[];protectedDeferredActive.clear();protectedRetryCounts={}; if(protectedMode&&typeof document!=='undefined'&&document.removeEventListener)document.removeEventListener('orbit:active-role-changed',roleChanged); unsubscribers.splice(0).forEach(function (unsubscribe) { try { unsubscribe(); } catch (e) {} }); state.attachedCollections = []; state.observedCollections = []; state.serverConfirmedCollections = []; state.cacheOnlyCollections = []; state.snapshotSources = {}; state.ready = false; state.status = 'detached'; deferredAttached = false; deferredScheduled = false; deferredCursor = 0; deferredPauseUntil = 0; attachStarted = {}; state.deferredAttached = false; }
+    function detach() { clearProtectedRetries();++protectedEpoch; protectedPoliciesPromise=null;protectedRoleRecovery=false;protectedDeferredQueue=[];protectedDeferredActive.clear();protectedRetryCounts={}; if(protectedMode&&typeof document!=='undefined'&&document.removeEventListener)document.removeEventListener('orbit:active-role-changed',roleChanged); unsubscribers.splice(0).forEach(function (unsubscribe) { try { unsubscribe(); } catch (e) {} }); state.attachedCollections = []; state.observedCollections = []; state.serverConfirmedCollections = []; state.cacheOnlyCollections = []; state.snapshotSources = {}; state.ready = false; state.status = 'detached'; deferredAttached = false; deferredScheduled = false; deferredCursor = 0; deferredPauseUntil = 0; attachStarted = {}; state.deferredAttached = false; }
     if(protectedMode&&typeof document!=='undefined'&&document.addEventListener)document.addEventListener('orbit:active-role-changed',roleChanged);
     function buildRelationIndexes() {
       var policyById = new Map(), clientById = new Map();
@@ -432,8 +445,8 @@
     }
     function on(collection, callback) { if (typeof collection === 'function') { callback = collection; collection = '*'; } var listener = function (changed) { if (collection === '*' || collection === changed || changed === '*') callback(changed); }; listeners.push(listener); return function () { listeners = listeners.filter(function (item) { return item !== listener; }); }; }
     function pref(key, defaultValue) { return Object.prototype.hasOwnProperty.call(prefs, key) ? clone(prefs[key]) : defaultValue; }
-    function raw() { var out = {}; collections.forEach(function (collection) { out[collection] = all(collection); }); out.__prefs = clone(prefs); out.__backend = Object.assign({}, state, { quarantinedRows: clone(state.quarantinedRows), queryPlans: clone(state.queryPlans) }); return out; }
-    var api = { all: all, get: get, where: where, find: find, insert: fail, update: fail, remove: fail, on: on, _emit: emit, pref: pref, setPref: fail, init: function () { return api; }, reseed: fail, raw: raw, subscribe: on, _subscribe: on, _attachSnapshots: attach, _detachSnapshots: detach, _ensureCollections: ensureCollections, _productStatus: function () { return Object.assign({}, state, { quarantinedRows: clone(state.quarantinedRows), queryPlans: clone(state.queryPlans) }); }, __productReadOnlyP0: true };
+    function raw() { var out = {}; collections.forEach(function (collection) { out[collection] = all(collection); }); out.__prefs = clone(prefs); out.__backend = Object.assign({}, state, { quarantinedRows: clone(state.quarantinedRows), queryPlans: clone(state.queryPlans), pendingSnapshotRetries: Object.keys(protectedRetryTimers) }); return out; }
+    var api = { all: all, get: get, where: where, find: find, insert: fail, update: fail, remove: fail, on: on, _emit: emit, pref: pref, setPref: fail, init: function () { return api; }, reseed: fail, raw: raw, subscribe: on, _subscribe: on, _attachSnapshots: attach, _detachSnapshots: detach, _ensureCollections: ensureCollections, _productStatus: function () { return Object.assign({}, state, { quarantinedRows: clone(state.quarantinedRows), queryPlans: clone(state.queryPlans), pendingSnapshotRetries: Object.keys(protectedRetryTimers) }); }, __productReadOnlyP0: true };
     if(protectedMode){
       api._protectedReadRelated=function(collection,policyId){
         if(!['vehiculos','recibosEsperados','carteraPrimas','cobros'].includes(collection)||!text(policyId))

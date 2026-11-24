@@ -1,0 +1,54 @@
+{
+  "schema": "GI_I66_STARTUP_PENDING_READ_RETRY_CAUSAL_SOURCE_V1",
+  "status": "CAUSAL_SOURCE_REPRODUCED_LOCAL_PASS_PREVIEW_LIVE_PENDING",
+  "activeGate": "I6.6",
+  "approvedByDirection": true,
+  "ownerAuthorization": "Continue the existing recovery, resolve operational findings and publish corrections after exact Preview/LIVE gates; no new business decision.",
+  "createdAtUtc": "2026-11-24T14:50:06.473585Z",
+  "sourcePaths": [
+    {
+      "path": "orbit360-platform/core/product-hydration-required-optional-p0.js",
+      "gitBlobSha": "f2f42ef536b00b89c7198710a20aadb633a7eb29",
+      "previousGitBlobSha": "4eb68250d46f11f1c8e9c139d03f0ec005d81401"
+    },
+    {
+      "path": "orbit360-platform/data/store-firestore-product-readonly-p0.js",
+      "gitBlobSha": "fa8e507c03aba7bc7e99214c3b4e695f2c5fe222",
+      "previousGitBlobSha": "062e5633e97ba830a4149fcf4d4ef49cd9f7f8cb"
+    }
+  ],
+  "causalTest": {
+    "path": "tools/gravicentra-i6-6-startup-pending-read-retry.test.cjs",
+    "gitBlobSha": "aa2e1215dbdaf80a11fa73f319dc61e54a5267d1",
+    "passed": 18,
+    "failed": 0,
+    "baselineFailures": 8,
+    "baselinePassed": 10,
+    "specificCausalFailures": [
+      "functions/unavailable",
+      "functions/deadline-exceeded",
+      "functions/resource-exhausted"
+    ],
+    "baselineMeaning": "Real bootstrap waiter detached the real hydration/store adapter at its first 100ms poll before the existing 1200ms recovery."
+  },
+  "regression": {
+    "passed": 151,
+    "failed": 0,
+    "command": "node --test tools/gravicentra-i6-6-protected-role-policy-hydration.test.cjs tools/gravicentra-i6-6-active-session-recovery.test.cjs tools/gravicentra-i66-auth-first-startup.test.cjs tools/gravicentra-b4-003-protected-hydration.test.cjs tools/gravicentra-i6-6-startup-readiness-diagnostics.test.cjs"
+  },
+  "cause": "recordError emitted snapshot-error before its bounded retry; hydration converted that pending recovery to a terminal required failure, so bootstrap detached the store before the retry could execute.",
+  "correction": "Publish exact pending transport retries before emitting, classify only those required sources as still missing, preserve terminal denied/integrity failures, cancel stale recovery on detach and role change.",
+  "maxRetries": 1,
+  "retryDelayMs": 1200,
+  "snapshotTimeoutChanged": false,
+  "noBackendChanges": true,
+  "noDataWrites": true,
+  "noPermissionChanges": true,
+  "noNewRetryPolicy": true,
+  "noFallback": true,
+  "noSyntheticProductionWrites": true,
+  "priorE6FailureCausality": "This local defect is reproduced, but the E6 production failure did not retain enough boot detail to attribute it uniquely. New exact-package Preview/LIVE proof is still required.",
+  "previewAccepted": false,
+  "liveAccepted": false,
+  "deferredBackendPolicy": "Preserve the exact undeployed v20 Make/A14 owners; no backend deployment follows from this source correction."
+}

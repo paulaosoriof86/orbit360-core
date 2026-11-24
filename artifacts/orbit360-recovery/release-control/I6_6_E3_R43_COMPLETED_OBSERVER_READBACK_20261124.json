@@ -1,0 +1,71 @@
+{
+  "schema": "GI_I66_R43_ARTIFACT_INSPECTION_SANITIZED_V1",
+  "sourceFile": "gi-i66-live-perf-summary.json",
+  "sourceFileSha256": "1a0e334480cd64fa88fe0778814f5c59ee704b60e0ea282445554d45c6f06344",
+  "runId": 45395937255,
+  "artifactId": 14921181856,
+  "artifactZipSha256": "35679702a913af65aa19c50ca83d00c44c466ede1a8b295397a5f8c9891509ba",
+  "workflowHeadSha": "db79a285c0b1f2141dca4a407715eb7abb522ed6",
+  "acceptedSourceSha": "65c825b2808a615ca4195bdde6689dbdbe3193b2",
+  "buildId": "gi-i66-65c825b2808a-57f234755dc1",
+  "status": "HOLD",
+  "errorCodes": [
+    "I66_SIX_VISIBLE_VALUES_OR_BALANCE_HOLD"
+  ],
+  "sixRows": 6,
+  "stages": 12,
+  "reloadsPassed": 6,
+  "reloadComparisonsFailed": 0,
+  "checks": {
+    "gross": 12,
+    "contractualDue": 12,
+    "operationalLimit": 12,
+    "status": 12,
+    "balanceVerified": 0,
+    "balanceValue": 12,
+    "balanceState": 0
+  },
+  "allRuntimeReady": true,
+  "allActorMatches": true,
+  "allRolesOperativo": true,
+  "allCountryGT": true,
+  "relevantUiErrors": 0,
+  "financialInputFingerprintStable": true,
+  "serverUnchanged": true,
+  "serverSnapshotBeforeAfterEqual": true,
+  "serverSnapshotSha256Before": "2fd590d84fdd311a1a1d4edfc457e7052fdf770f7388a502f9be22ced8a6fcab",
+  "serverSnapshotSha256After": "2fd590d84fdd311a1a1d4edfc457e7052fdf770f7388a502f9be22ced8a6fcab",
+  "startupTimeoutReproduced": false,
+  "startupCaptureReason": "Generic failure capture after visible balance HOLD, not READINESS_TIMEOUT",
+  "startupFinalFlags": {
+    "initialized": true,
+    "activating": false,
+    "started": true,
+    "routerStarted": true,
+    "tenantContextReady": true,
+    "operationalWriteReady": true,
+    "lastError": ""
+  },
+  "startupLastPhase": "ready-read-only",
+  "startupAuthRestoring": false,
+  "diagnosticErrorCounts": {
+    "console": {},
+    "warning": {
+      "OTHER": 1
+    },
+    "page": {},
+    "request": {
+      "NETWORK_ABORTED": 1
+    }
+  },
+  "diagnosticCausalAttribution": "VIEW_LIFETIME_OBSERVATION_WINDOWS_NOT_CAUSAL_DOCUMENT_ATTRIBUTION",
+  "writes": {
+    "firestoreWrites": 0,
+    "businessActions": 0,
+    "paymentActions": 0,
+    "syntheticFixtures": 0,
+    "pushNotifications": 0
+  },
+  "uiAccepted": false,
+  "claimBoundary": "Six Operativo GT reloads on accepted E3 only. Balance remains unverified in 12 stages. Default persistence observer differs from browserSessionPersistence used by release48. Does not certify V20/E6 recovery or any new product source."
+}

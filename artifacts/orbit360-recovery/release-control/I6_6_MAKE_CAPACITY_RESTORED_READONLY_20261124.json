@@ -1,0 +1,254 @@
+{
+  "schema": "GI_I66_MAKE_FRESH_READONLY_CAPACITY_AND_SCENARIO_RECEIPT_V1",
+  "recordType": "SCRATCH_SUBORDINATE_READONLY_EVIDENCE_NOT_RELEASE_AUTHORITY",
+  "observedAtUtc": "2026-11-24 14:44:14 UTC",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "canonicalAuditHead": "db79a285c0b1f2141dca4a407715eb7abb522ed6",
+  "zone": "eu2.make.com",
+  "organization": {
+    "id": 4090072,
+    "name": "AyS - TyA",
+    "isPaused": false,
+    "includedCredits": 10000,
+    "extraCredits": 6000,
+    "consumedCredits": 14076,
+    "unusedCredits": 1924,
+    "autoPurchasingActivated": false,
+    "autoPurchaseInProgress": false,
+    "lastReset": "2026-11-19T12:33:54.259Z",
+    "nextReset": "2026-12-19T12:33:54.259Z"
+  },
+  "priorCreditHold": {
+    "path": "artifacts/orbit360-recovery/release-control/I6_6_MAKE_ORGANIZATION_CREDIT_PAUSE_HOLD_20261124.json",
+    "gitBlobSha": "0fb439fad51866e495c9f9070bfc2c0d4df5664a",
+    "observedAtUtc": "2026-11-24T11:51:31.962Z",
+    "isPaused": true,
+    "extraCredits": 4000,
+    "consumedCredits": 14067,
+    "unusedCredits": -67
+  },
+  "capacityDelta": {
+    "additionalCreditsObserved": 2000,
+    "purchaserVerified": false,
+    "chargeAmountVerified": false,
+    "invoiceVerified": false,
+    "purchaseByThisAudit": false
+  },
+  "scenarios": [
+    {
+      "scenario": {
+        "id": 10196136,
+        "name": "Gravicentra Insurance · AyS ACTIVA · lectura WA segura para leads",
+        "description": "Lector A&S para atribución de anuncios: solo chats individuales. Sin escritor ni envíos; no crear leads sin sourceType=ad y sourceId. I6.6.",
+        "teamId": 1975919,
+        "status": "active",
+        "isLockedForEditing": false,
+        "isWaitingOnIncompleteExecutions": false,
+        "incompleteExecutions": 0,
+        "lastEdit": "2026-11-24T11:42:13.586Z",
+        "nextScheduledExecution": "2026-11-24T14:46:21.278Z"
+      },
+      "trigger": {
+        "moduleId": 1,
+        "module": "green-api:LastIncomingMessages",
+        "kind": "scheduled",
+        "scheduling": {
+          "type": "indefinitely",
+          "interval": 300
+        }
+      },
+      "modules": [
+        {
+          "id": 1,
+          "module": "green-api:LastIncomingMessages",
+          "version": 1,
+          "label": "AyS Green API activa · últimos 15 minutos (solo lectura)",
+          "root": "main"
+        },
+        {
+          "id": 2,
+          "module": "green-api:getMessage",
+          "version": 1,
+          "label": "Comprobar procedencia del mensaje de chat individual",
+          "follows": 1,
+          "filter": {
+            "name": "Solo chats individuales e ID",
+            "conditions": [
+              [
+                {
+                  "a": "{{1.chatId}}",
+                  "b": "@c\\.us$",
+                  "o": "text:pattern"
+                },
+                {
+                  "a": "{{1.idMessage}}",
+                  "o": "exist"
+                }
+              ]
+            ]
+          }
+        },
+        {
+          "id": 3,
+          "module": "google-cloud-firestore:createDocument",
+          "version": 1,
+          "label": "Ingreso AyS · sonda autenticada cerrada",
+          "follows": 2,
+          "disabled": true
+        }
+      ],
+      "connections": [
+        {
+          "id": 14749710,
+          "app": "green-api",
+          "status": "ok",
+          "usedByModules": [
+            1,
+            2
+          ]
+        },
+        {
+          "id": 14756714,
+          "app": "google-custom",
+          "status": "ok",
+          "usedByModules": [
+            3
+          ]
+        }
+      ],
+      "declaredOutputFields": []
+    },
+    {
+      "scenario": {
+        "id": 10221181,
+        "name": "Gravicentra Insurance · correo HostDime piloto · recepción bajo demanda",
+        "teamId": 1975919,
+        "status": "active",
+        "isLockedForEditing": false,
+        "isWaitingOnIncompleteExecutions": false,
+        "incompleteExecutions": 0,
+        "lastEdit": "2026-11-24T08:47:58.391Z"
+      },
+      "trigger": {
+        "moduleId": 1,
+        "module": "scenario-service:StartSubscenario",
+        "kind": "on-demand",
+        "scheduling": {
+          "type": "on-demand"
+        }
+      },
+      "modules": [
+        {
+          "id": 1,
+          "module": "scenario-service:StartSubscenario",
+          "version": 2,
+          "label": "Recepción piloto bajo demanda; sin envíos",
+          "root": "main"
+        },
+        {
+          "id": 2,
+          "module": "email:ActionGetEmails",
+          "version": 7,
+          "label": "IMAP finanzas · 23 Nov · máximo un correo · sin marcar leído",
+          "follows": 1
+        },
+        {
+          "id": 3,
+          "module": "scenario-service:ReturnData",
+          "version": 2,
+          "label": "Solo metadatos para asociación; sin contenido ni fichero",
+          "follows": 2
+        }
+      ],
+      "connections": [],
+      "declaredOutputFields": [
+        {
+          "name": "mailbox",
+          "type": "text"
+        },
+        {
+          "name": "folder",
+          "type": "text"
+        },
+        {
+          "name": "messageUid",
+          "type": "number"
+        },
+        {
+          "name": "messageId",
+          "type": "text"
+        },
+        {
+          "name": "messageDate",
+          "type": "text"
+        },
+        {
+          "name": "firstReference",
+          "type": "text"
+        },
+        {
+          "name": "inReplyTo",
+          "type": "text"
+        },
+        {
+          "name": "attachmentFileName",
+          "type": "text"
+        },
+        {
+          "name": "attachmentContentType",
+          "type": "text"
+        },
+        {
+          "name": "attachmentFileSize",
+          "type": "number"
+        }
+      ]
+    }
+  ],
+  "scenarioUrls": [
+    "https://eu2.make.com/1975919/scenarios/10196136",
+    "https://eu2.make.com/1975919/scenarios/10221181"
+  ],
+  "toolFacts": [
+    {
+      "tool": "mcp__codex_apps__make_environment_get",
+      "arguments": {},
+      "observations": {
+        "zone": "eu2.make.com",
+        "organizationId": 4090072,
+        "teamId": 1975919
+      }
+    },
+    {
+      "tool": "mcp__codex_apps__make_organization_get",
+      "arguments": {
+        "organizationId": 4090072
+      }
+    },
+    {
+      "tool": "mcp__codex_apps__make_scenario_get",
+      "arguments": {
+        "scenarioId": 10196136
+      }
+    },
+    {
+      "tool": "mcp__codex_apps__make_scenario_get",
+      "arguments": {
+        "scenarioId": 10221181
+      }
+    }
+  ],
+  "conclusion": "PROVIDER_CAPACITY_RESTORED_WRITER_DISABLED_CANONICAL_LEAD_ACCEPTANCE_PENDING",
+  "executionBoundaries": {
+    "scenarioMutations": 0,
+    "scenarioExecutionsRequested": 0,
+    "billingChanges": 0,
+    "providerMessagesSent": 0,
+    "canonicalLeadWrites": 0,
+    "productSourceChanges": 0,
+    "credentialsOrMessageBodiesIncluded": false,
+    "connectionLabelsRemoved": true,
+    "liveAcceptanceClaim": false
+  }
+}

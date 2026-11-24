@@ -134,8 +134,15 @@
       var cacheOnly = unique(raw.cacheOnlyCollections);
       var denied = unique(raw.deniedCollections);
       var errors = raw.snapshotErrors && typeof raw.snapshotErrors === 'object' ? raw.snapshotErrors : {};
-      var requiredFailed = hydration.required.filter(function (name) { return !!errors[name] || denied.indexOf(name) >= 0; });
-      var requiredMissing = hydration.required.filter(function (name) { return confirmed.indexOf(name) < 0 && requiredFailed.indexOf(name) < 0; });
+      var pendingRetries = unique(raw.pendingSnapshotRetries);
+      // A real, bounded transport retry is still missing authoritative data.
+      // It is neither readiness nor a terminal scope/integrity failure.
+      var requiredRecovering = hydration.required.filter(function (name) {
+        return pendingRetries.indexOf(name) >= 0 && denied.indexOf(name) < 0 &&
+          /^functions\/(deadline-exceeded|unavailable|resource-exhausted)$/i.test(text(errors[name]));
+      });
+      var requiredFailed = hydration.required.filter(function (name) { return (!!errors[name] && requiredRecovering.indexOf(name) < 0) || denied.indexOf(name) >= 0; });
+      var requiredMissing = hydration.required.filter(function (name) { return (confirmed.indexOf(name) < 0 || requiredRecovering.indexOf(name) >= 0) && requiredFailed.indexOf(name) < 0; });
       var requiredObservedButUnconfirmed = requiredMissing.filter(function (name) { return observed.indexOf(name) >= 0 || cacheOnly.indexOf(name) >= 0; });
       var optionalFailed = hydration.optional.filter(function (name) { return !!errors[name] || denied.indexOf(name) >= 0; });
       var optionalMissing = hydration.optional.filter(function (name) { return confirmed.indexOf(name) < 0 && optionalFailed.indexOf(name) < 0; });
@@ -151,6 +158,7 @@
         requiredMissing: requiredMissing,
         requiredObservedButUnconfirmed: requiredObservedButUnconfirmed,
         requiredFailed: requiredFailed,
+        requiredRecovering: requiredRecovering,
         serverConfirmedCollections: confirmed,
         cacheOnlyCollections: cacheOnly,
         optionalMissing: optionalMissing,
