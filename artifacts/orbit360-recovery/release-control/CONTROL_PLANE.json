@@ -27,7 +27,7 @@
     "activeGate": "I6.6",
     "closedHistoricalGate": "B4-007",
     "latestProvenLiveSource": "65c825b2808a615ca4195bdde6689dbdbe3193b2",
-    "currentWork": "I6.6: obtain signed source QA and guard for the corrected immutable-package readback owner, then request one new immutable v22 artifact. Preserve failed v21 with its diagnostic224/224 and no acceptance override. After complete build/readback success, run the existing five-function Make Preview before48 financial COMPOSITE Preview stages and exact-artifact LIVE/48 checks. E3, all prior financial writes, Historial and mailbox stored candidates remain preserved; MAPFRE awaits fresh preimages and two controlled1-cent corrections in its existing writer gate.",
+    "currentWork": "I6.6: execute request22 once from signed source b2eb935f070cc7bcd8221329ed88c4a383dcd586 and require terminal immutable-build plus224-file Preview readback success with both LIVE fingerprints unchanged. Then run the existing five-function Make Preview,48 financial COMPOSITE Preview stages and exact-artifact LIVE/48 checks. Failed v21 remains ineligible. E3 and all financial writes remain accepted/preserved; Historial and mailbox candidates remain stored and unapplied.",
     "latestHostingPreviewEvidence": "artifacts/orbit360-recovery/release-control/I6_6_NETWORK_DIAGNOSTICS_PREVIEW_BUILD_20261117.json",
     "latestHostingPreviewSource": "1b65a790530d49fe1d1fb451f02838fd9a713c53",
     "operationsEvidenceReview": "artifacts/orbit360-recovery/release-control/I6_6_OPS_EVIDENCE_AND_PREVIEW_BINDING_REVIEW_20261116.json",
@@ -6612,7 +6612,7 @@
     "i63LiveReadbackPass": true,
     "i63DeterministicDiffReady": true
   },
-  "nextAction": "I6.6: obtain signed source QA and guard for the corrected immutable-package readback owner, then request one new immutable v22 artifact. Preserve failed v21 with its diagnostic224/224 and no acceptance override. After complete build/readback success, run the existing five-function Make Preview before48 financial COMPOSITE Preview stages and exact-artifact LIVE/48 checks. E3, all prior financial writes, Historial and mailbox stored candidates remain preserved; MAPFRE awaits fresh preimages and two controlled1-cent corrections in its existing writer gate.",
+  "nextAction": "I6.6: execute request22 once from signed source b2eb935f070cc7bcd8221329ed88c4a383dcd586 and require terminal immutable-build plus224-file Preview readback success with both LIVE fingerprints unchanged. Then run the existing five-function Make Preview,48 financial COMPOSITE Preview stages and exact-artifact LIVE/48 checks. Failed v21 remains ineligible. E3 and all financial writes remain accepted/preserved; Historial and mailbox candidates remain stored and unapplied.",
   "postproductionExitProgress": {
     "formalPercent": 60,
     "frozenMiniGates": 6,
@@ -26285,8 +26285,8 @@
   },
   "i66ActiveRecoveryCursor": {
     "status": "FROZEN_I66_SHOCK_EXECUTION_CONTINUES_NO_GATE_REPLACEMENT",
-    "currentEvidencePath": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_EXECUTION_PROGRESS_20261124_R46.json",
-    "currentEvidenceBlobSha": "8e08f8af596209f29d7a478f9cc8d8e1e91fffe2",
+    "currentEvidencePath": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_EXECUTION_PROGRESS_20261124_R47.json",
+    "currentEvidenceBlobSha": "a1f9421503f751ba5a6d034982aa30f0e158f774",
     "frozenPlanPath": "artifacts/orbit360-recovery/release-control/I6_6_PLAN_CHOQUE_FUNCIONAL_FINANCIERO_20261122.md",
     "frozenPlanBlobSha": "fbfd54d229a13101fbfb0dfc6e92a5fa524999b6",
     "fullInventoryPath": "artifacts/orbit360-recovery/release-control/I6_6_INVENTARIO_INTEGRAL_295_20261122.md",
@@ -26303,12 +26303,12 @@
     "financialRowsAppliedThisIteration": 104,
     "lastEvidenceDateLocal": "2026-11-24",
     "noNormativeProjectSourceChange": true,
-    "next": "I6.6: obtain signed source QA and guard for the corrected immutable-package readback owner, then request one new immutable v22 artifact. Preserve failed v21 with its diagnostic224/224 and no acceptance override. After complete build/readback success, run the existing five-function Make Preview before48 financial COMPOSITE Preview stages and exact-artifact LIVE/48 checks. E3, all prior financial writes, Historial and mailbox stored candidates remain preserved; MAPFRE awaits fresh preimages and two controlled1-cent corrections in its existing writer gate.",
+    "next": "I6.6: execute request22 once from signed source b2eb935f070cc7bcd8221329ed88c4a383dcd586 and require terminal immutable-build plus224-file Preview readback success with both LIVE fingerprints unchanged. Then run the existing five-function Make Preview,48 financial COMPOSITE Preview stages and exact-artifact LIVE/48 checks. Failed v21 remains ineligible. E3 and all financial writes remain accepted/preserved; Historial and mailbox candidates remain stored and unapplied.",
     "lastFunctionalLiveUatRunId": 45074429319,
     "lastFunctionalLiveUatJobId": 137352857627,
     "lastFunctionalLiveScope": "TWO_ROLE_RENEWAL_INSURER_SYNTHETIC_PASS_REAL_ISSUANCE_AND_DOCUMENT_HOLD",
-    "previousEvidencePath": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_EXECUTION_PROGRESS_20261124_R45.json",
-    "previousEvidenceBlobSha": "c0402580c987d6b888b3d21ab542a61c8a2fcc44",
+    "previousEvidencePath": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_EXECUTION_PROGRESS_20261124_R46.json",
+    "previousEvidenceBlobSha": "8e08f8af596209f29d7a478f9cc8d8e1e91fffe2",
     "lastFunctionalLiveUatStatus": "LIVE_PHYSICAL_STEPS_PASS_FIVE_ROLE_FINAL_COVERAGE_FAIL_CLOSED",
     "lastFinancialProtectedPreflightRunId": 45332501697,
     "lastFinancialSourceStatus": "155_DIRECT_HISTORICAL_PAYMENTS_46_NEW_OBLIGATIONS_READBACK_VERIFIED_607_AND_302_NOT_FULLY_CLOSED",
@@ -26339,7 +26339,7 @@
     "moduleReleasedThisIterationScope": "Startup source signed QA passed; v21 Hosting Preview deployed but build readback failed. No new accepted Hosting/backend/data release.",
     "lastLivePromotionAttemptRunId": 45391827840,
     "lastLivePromotionAttemptStatus": "ROLLED_BACK",
-    "nextAction": "I6.6: obtain signed source QA and guard for the corrected immutable-package readback owner, then request one new immutable v22 artifact. Preserve failed v21 with its diagnostic224/224 and no acceptance override. After complete build/readback success, run the existing five-function Make Preview before48 financial COMPOSITE Preview stages and exact-artifact LIVE/48 checks. E3, all prior financial writes, Historial and mailbox stored candidates remain preserved; MAPFRE awaits fresh preimages and two controlled1-cent corrections in its existing writer gate."
+    "nextAction": "I6.6: execute request22 once from signed source b2eb935f070cc7bcd8221329ed88c4a383dcd586 and require terminal immutable-build plus224-file Preview readback success with both LIVE fingerprints unchanged. Then run the existing five-function Make Preview,48 financial COMPOSITE Preview stages and exact-artifact LIVE/48 checks. Failed v21 remains ineligible. E3 and all financial writes remain accepted/preserved; Historial and mailbox candidates remain stored and unapplied."
   },
   "i66PreversionedControlViewBlob": "de401082f688ce1c59f025f6f39e3c947dceaa35",
   "i66FrontendReleaseHead": {

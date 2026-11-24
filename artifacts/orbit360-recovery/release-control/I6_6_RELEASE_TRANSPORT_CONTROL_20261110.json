@@ -4821,12 +4821,12 @@
     "liveProofSha256": "4013a99719ba5f8bb3087a5e5f43c189a22daf55aabfcea37e8df5030bb5653c"
   },
   "frontendPreviewRequest": {
-    "version": 21,
+    "version": 22,
     "mode": "A13_A14_BALANCE_COMPOSITE_ARTIFACT_HOSTING_PREVIEW_ONLY",
-    "sourceQaHead": "99c73aa4f82eaec660e4920197dd2c8a11b14ae7",
+    "sourceQaHead": "b2eb935f070cc7bcd8221329ed88c4a383dcd586",
     "manifestBlob": "941497d0b161e04b0ec3e3eee5933139f176b6f5",
-    "sourceQaRunId": 45420172812,
-    "guardRunId": 45420172656,
+    "sourceQaRunId": 45425186751,
+    "guardRunId": 45425186471,
     "previousReceiptBlob": "11fdb3bee494541513482666d6215f45cbad0567",
     "productPaths": [
       "functions/b4-003-scoped-related-reader.js",
@@ -4873,11 +4873,11 @@
     "realCustomerWritesAllowed": false,
     "liveDeployAuthorized": false,
     "releaseAfterPreviewAllowed": false,
-    "releaseMechanismSourceSha": "99c73aa4f82eaec660e4920197dd2c8a11b14ae7",
+    "releaseMechanismSourceSha": "b2eb935f070cc7bcd8221329ed88c4a383dcd586",
     "ownerInstruction": "Continue authorized recovery and existing parallel work; certify the exact newly composed source without losing prior acceptance, financial receipts, or communication rules.",
     "scope": "Existing A13/A14 composite plus the exact two-owner bounded startup recovery and canonical future-pending balance. Build once and publish isolated Hosting Preview only; exact five-function Preview and financial48 proofs remain separate required gates.",
-    "reason": "E6 rolled back to E3. R43 completed six reloads with unchanged server data but missing current-balance display. Reproduced startup prematurely cancelling its existing1200ms retry;18 focal and151 regression pass. New immutable v21 required; never patch v20.",
-    "causalReceipt": "artifacts/orbit360-recovery/release-control/I6_6_STARTUP_PENDING_READ_RETRY_CAUSAL_SOURCE_20261124.json",
+    "reason": "v21 isolated Hosting Preview build failed its silent marker readback. Later224/224 public bytes are diagnostic only. Corrected the same release verifier with bounded uncached readback, exact bytes, terminal auth failures, both predeploy LIVE fingerprints and retained diagnostics. Signed SourceQA45425186751 and guard45425186471 passed on b2eb935f070cc7bcd8221329ed88c4a383dcd586. Build one new immutable v22; preserve failed v21 and do not rebuild or patch it.",
+    "causalReceipt": "artifacts/orbit360-recovery/release-control/I6_6_V21_READBACK_HOLD_AND_TRANSPORT_CORRECTION_20261124.json",
     "startupRecovery": {
       "schema": "GI_I66_STARTUP_RECOVERY_PREVIEW_EXTENSION_V1",
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_STARTUP_PENDING_READ_RETRY_CAUSAL_SOURCE_20261124.json",
