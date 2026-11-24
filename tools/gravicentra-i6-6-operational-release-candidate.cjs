@@ -141,6 +141,8 @@ const PINNED_OWNER_PATHS = Object.freeze([
   'tools/gravicentra-i6-6-source-lineage-preview-transport.test.cjs',
   'tools/gravicentra-i6-6-frontend-preview-authority.cjs',
   'tools/gravicentra-i6-6-composite-preview-admission.test.cjs',
+  'tools/gravicentra-i6-6-preview-package-readback.cjs',
+  'tools/gravicentra-i6-6-preview-package-readback.test.cjs',
   'tools/gravicentra-i6-6-workflow-candidate-resolution.test.cjs',
   'tools/gravicentra-i6-6-readonly-observer-authority.test.cjs',
   'tools/gravicentra-i6-6-five-role-assigned-selection.test.cjs',

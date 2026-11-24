@@ -592,6 +592,8 @@ jobs:
           node --check tools/gravicentra-governance-preflight-v1.mjs
           node --check tools/gravicentra-i6-6-delta-guard.mjs
           node --test tools/gravicentra-i6-6-composite-preview-admission.test.cjs
+          node --check tools/gravicentra-i6-6-preview-package-readback.cjs
+          node --test tools/gravicentra-i6-6-preview-package-readback.test.cjs
           node --test tools/gravicentra-i6-6-make-lead-ingress-release.test.cjs tools/gravicentra-i6-6-financial-page-read-efficiency.test.cjs
           node --test tools/gravicentra-i6-6-composite-ops-four-function-gate.test.cjs
           node --check tools/gravicentra-i6-1-preview-package.mjs
@@ -892,6 +894,7 @@ jobs:
           retention-days: 30
           if-no-files-found: ignore
       - name: Preview readback all artifact files and confirm both LIVE origins are untouched
+        working-directory: candidate
         env:
           PREVIEW_URL: ${{ steps.preview.outputs.url }}
           PREVIEW_CHANNEL: ${{ steps.preview.outputs.channel }}
@@ -899,25 +902,7 @@ jobs:
           ARTIFACT_DIGEST: ${{ steps.immutable_artifact.outputs.artifact-digest }}
         run: |
           set -euo pipefail
-          ROOT="$RUNNER_TEMP/gi-i66-package/bundle/site"
-          mkdir -p "$RUNNER_TEMP/gi-i66-readback"
-          READY=0
-          for attempt in $(seq 1 25); do
-            if curl -fsSL --max-time 15 "$PREVIEW_URL/__recovery__/build.json" -o "$RUNNER_TEMP/gi-i66-readback/build.json" 2>/dev/null &&
-               cmp -s "$ROOT/__recovery__/build.json" "$RUNNER_TEMP/gi-i66-readback/build.json"; then READY=1;break;fi
-            sleep 4
-          done
-          test "$READY" = 1
-          while IFS= read -r line; do
-            rel="${line#*  }"
-            mkdir -p "$RUNNER_TEMP/gi-i66-readback/$(dirname "$rel")"
-            curl -fsSL --retry 3 --retry-all-errors --retry-delay 2 --max-time 25 "$PREVIEW_URL/$rel" -o "$RUNNER_TEMP/gi-i66-readback/$rel"
-            cmp "$ROOT/$rel" "$RUNNER_TEMP/gi-i66-readback/$rel"
-          done < "$RUNNER_TEMP/gi-i66-package/evidence/site-manifest.sha256"
-          curl --fail --location --silent --show-error --max-time 30 https://ays-orbit-360-lab.web.app/ | sha256sum > "$RUNNER_TEMP/gi-i66-live-after.sha"
-          curl --fail --location --silent --show-error --max-time 30 https://app.aysseguros.com/ | sha256sum > "$RUNNER_TEMP/gi-i66-staff-after.sha"
-          cmp "$RUNNER_TEMP/gi-i66-live-before.sha" "$RUNNER_TEMP/gi-i66-live-after.sha"
-          cmp "$RUNNER_TEMP/gi-i66-staff-before.sha" "$RUNNER_TEMP/gi-i66-staff-after.sha"
+          node tools/gravicentra-i6-6-preview-package-readback.cjs
           echo "## I6.6 — Preview exact, LIVE untouched" >> "$GITHUB_STEP_SUMMARY"
           echo "- Source SHA: $SOURCE_SHA" >> "$GITHUB_STEP_SUMMARY"
           echo "- Immutable artifact ID: $ARTIFACT_ID" >> "$GITHUB_STEP_SUMMARY"
@@ -926,6 +911,14 @@ jobs:
           echo "- Preview URL: $PREVIEW_URL" >> "$GITHUB_STEP_SUMMARY"
           echo "- LIVE and staff-origin fingerprints: UNCHANGED" >> "$GITHUB_STEP_SUMMARY"
           echo "- LIVE promotion: REQUIRES SEPARATE HUMAN GATE" >> "$GITHUB_STEP_SUMMARY"
+      - name: Preserve Preview package readback diagnostic on every outcome
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gi-i66-preview-package-readback-${{ github.run_id }}
+          path: ${{ runner.temp }}/gi-i66-preview-package-readback.json
+          retention-days: 30
+          if-no-files-found: warn
       - name: Verify current technical Preview rollover and preserve every other channel
         if: always()
         env:

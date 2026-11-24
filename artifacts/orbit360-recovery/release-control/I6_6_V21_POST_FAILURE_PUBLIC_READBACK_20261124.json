@@ -1,0 +1,1361 @@
+{
+  "schema": "GI_I66_V21_POST_FAILURE_PUBLIC_READBACK_DIAGNOSTIC_V1",
+  "observedAtUtc": "2026-11-24T15:14:40Z",
+  "buildRunId": 45420930344,
+  "buildConclusion": "failure",
+  "releaseEligible": false,
+  "sourceSha": "cc2ea5deda4d84078700052655e1cb80415a1d50",
+  "artifactId": 14933569332,
+  "artifactDigest": "sha256:144fa3f2576066c423bbb98d705ee1e68b2650fd0915cd12cb11292d1c7b812b",
+  "previewUrl": "https://ays-orbit-360-lab--gi-i66-rc-45420930344-yx5e4wd9.web.app",
+  "total": 224,
+  "matched": 224,
+  "files": [
+    {
+      "path": "__recovery__/build.json",
+      "status": 200,
+      "sha256": "6e0605e66f76652ef15bfbb4f5e0b80116bfa703224ef1b653ac02c37f4ac272",
+      "matches": true
+    },
+    {
+      "path": "assets/icons/gravicentra-192.png",
+      "status": 200,
+      "sha256": "48a916454ceb5cec8cb13324f66de8e61d84477de16ae2b5c57d8a17b1d11665",
+      "matches": true
+    },
+    {
+      "path": "assets/icons/gravicentra-512.png",
+      "status": 200,
+      "sha256": "965aed171811f52ac0a43fb496fd8961e1e58681fe0b761a28e8a590cbad4e42",
+      "matches": true
+    },
+    {
+      "path": "assets/tenant/alianzas-soluciones/logo-bolita-192.png",
+      "status": 200,
+      "sha256": "7f46cadb31091877ed1692bb87504e96bd11e38f9c3324c704fdfb71efc889af",
+      "matches": true
+    },
+    {
+      "path": "assets/tenant/alianzas-soluciones/logo-bolita-512.png",
+      "status": 200,
+      "sha256": "34e583b2a98d6f88d97dbe73a7bffb07289089921192050ad7b46a6fecee495e",
+      "matches": true
+    },
+    {
+      "path": "assets/tenant/alianzas-soluciones/logo-bolita-96.png",
+      "status": 200,
+      "sha256": "2a79b7a7943459c9610ec15f98d4d726029d2b6efafb51ec9184caebdd003a4a",
+      "matches": true
+    },
+    {
+      "path": "assets/tenant/alianzas-soluciones/logo-oficial-360.png",
+      "status": 200,
+      "sha256": "12d7ef38ab0d6ede389653cd01d722ddeeeb0571dc9b172899aad83c0f169e61",
+      "matches": true
+    },
+    {
+      "path": "core/academia-product-catalog-p0.js",
+      "status": 200,
+      "sha256": "3eb8a8363d5333b64100363c4b84cb2e8a42e2c18ca901002786b3087051fb3d",
+      "matches": true
+    },
+    {
+      "path": "core/academia-static-content-write-policy-v20260729.js",
+      "status": 200,
+      "sha256": "5bc4b354f71b8cfcf828694657ea8e28f7d8a59e133d7f5ef2d1398272b9b1c1",
+      "matches": true
+    },
+    {
+      "path": "core/access-ceilings-v1199.js",
+      "status": 200,
+      "sha256": "301bc24b0df2af2795994a5641ca394a71f4d2bf55fd0fc3a42068fac0ad5112",
+      "matches": true
+    },
+    {
+      "path": "core/access-role-session-owner-v20260728.js",
+      "status": 200,
+      "sha256": "b8aa9f37f46ff43883b3d52f4370be0c9063e095b22093fceec0ff6da04bfcf6",
+      "matches": true
+    },
+    {
+      "path": "core/access-scope.js",
+      "status": 200,
+      "sha256": "e18a8ed5f89c10d4cab7b287c7fa092f89b26595757df3f8da0c4d15e451bbf8",
+      "matches": true
+    },
+    {
+      "path": "core/aseguradoras-batch-admin-actions-p09i.js",
+      "status": 200,
+      "sha256": "492391fe481d424d210b17137c37c2ce57c99989d6ee7a1144734c100fb2f6ff",
+      "matches": true
+    },
+    {
+      "path": "core/aseguradoras-batch-history-p09h.js",
+      "status": 200,
+      "sha256": "ce396a63debdbc458df3bdd30c9520763d1e376a6c34f41e3a2aab77d269cc57",
+      "matches": true
+    },
+    {
+      "path": "core/aseguradoras-batch-orchestrator-p09g.js",
+      "status": 200,
+      "sha256": "4213e471f6a6cd3cd4b41a461ca6a84cee1819f505efa53eb48209c25bb00a03",
+      "matches": true
+    },
+    {
+      "path": "core/aseguradoras-binding-enablement-lab-v1208.js",
+      "status": 200,
+      "sha256": "ee4ab3e4cd995558a877ccf474527728b8d82a69450c421eec15601bf35a83bc",
+      "matches": true
+    },
+    {
+      "path": "core/aseguradoras-credentials-provider-lab-v20260720.js",
+      "status": 200,
+      "sha256": "201f1edac74974d82924a1bf22246ee5742499e337207bf57427db439885a3c2",
+      "matches": true
+    },
+    {
+      "path": "core/aseguradoras-first-source-orchestrator-p09f.js",
+      "status": 200,
+      "sha256": "cd380c4e618be03b15706d51bece9c3fff178db88072d8fa7e1955fa9a0715fa",
+      "matches": true
+    },
+    {
+      "path": "core/aseguradoras-knowledge-runtime-p09.js",
+      "status": 200,
+      "sha256": "36e07451f27bbcb770ca4120a4b72c13b2a7c597d9954bf82b857c5cf1d53e8c",
+      "matches": true
+    },
+    {
+      "path": "core/aseguradoras-lab-collections-p09e.js",
+      "status": 200,
+      "sha256": "b7de31c5292a933d3677166749fa5f717ea4ea395d51df46dd29fff3195133d4",
+      "matches": true
+    },
+    {
+      "path": "core/aseguradoras-lab-persistence-p09e.js",
+      "status": 200,
+      "sha256": "8f47d2f1ef4aa01f3a28a9cfae91d9a2ee8cd8cbd6087420e7c2d6ca17b80f19",
+      "matches": true
+    },
+    {
+      "path": "core/aseguradoras-op2-operational-access-policy.js",
+      "status": 200,
+      "sha256": "894383a189294583c3e51331b21f525eba5803310a6014ea4fc7f9a246844c04",
+      "matches": true
+    },
+    {
+      "path": "core/aseguradoras-op2-secure-provider-policy-guard.js",
+      "status": 200,
+      "sha256": "2712438364f026026ef33fad9c7a79bee3496d177781ca38d2aa655830c74c2a",
+      "matches": true
+    },
+    {
+      "path": "core/aseguradoras-runtime-bootstrap-p09f.js",
+      "status": 200,
+      "sha256": "25bb38e80ed867c753d92cb0d8ad32711fe567fdcc95d6a703b995b2fe115bce",
+      "matches": true
+    },
+    {
+      "path": "core/aseguradoras-runtime-observer-p09n.js",
+      "status": 200,
+      "sha256": "b47e628c81f823acfe8c6afeee552623a47d38c1f4a90969e44e2507c6d70244",
+      "matches": true
+    },
+    {
+      "path": "core/aseguradoras-source-reference-broker-p09j.js",
+      "status": 200,
+      "sha256": "8464c45dd6c1d43020d33117d03ed2ccc492443201eb3bbaec9b1cab19b2172b",
+      "matches": true
+    },
+    {
+      "path": "core/assignable-advisor-roster-client.js",
+      "status": 200,
+      "sha256": "af1510ac92e39ab73a49b207a70ebd7ca48b09d6ecefd82bd14f2c99c3ee6419",
+      "matches": true
+    },
+    {
+      "path": "core/auth-password-change-v20260805.js",
+      "status": 200,
+      "sha256": "9ba37b1f9b83153fb663087cc6791082d84bb13f3c66fb350f74172e24322435",
+      "matches": true
+    },
+    {
+      "path": "core/auth-product-runtime-p0.js",
+      "status": 200,
+      "sha256": "c77e25cbd6ca038410fb597b86205e56dfab8906dddd22c638f2ebab8452fdec",
+      "matches": true
+    },
+    {
+      "path": "core/backend-lab-receipts-portfolio-native-bridge-v20260801.js",
+      "status": 200,
+      "sha256": "a2821a0948abff9ef5ddddf13ea36968628a14f378924246d9165b6934d356ec",
+      "matches": true
+    },
+    {
+      "path": "core/backend-lab-security-guard.js",
+      "status": 200,
+      "sha256": "9da2b42806d915e4cc5ac251dc7a1486ff1ac24166ecd314432d1890f78323b6",
+      "matches": true
+    },
+    {
+      "path": "core/backend-product-readiness-contract-p0.js",
+      "status": 200,
+      "sha256": "4d1caf5ef2375422f93aec6db7d55a27c540383e2c890adfd23b2ce46037db47",
+      "matches": true
+    },
+    {
+      "path": "core/backend-product-readonly-bootstrap-p0.js",
+      "status": 200,
+      "sha256": "94d2df68bc577ef543648438dbcb4276e22320ca87b30ed712b21c214e40474c",
+      "matches": true
+    },
+    {
+      "path": "core/backend-resource-contracts.js",
+      "status": 200,
+      "sha256": "36a3c42ffc39372f751bb24244572c7fb7fb1305b22bad75a26c7ecf70ba742c",
+      "matches": true
+    },
+    {
+      "path": "core/ciclo.js",
+      "status": 200,
+      "sha256": "b87a337d82dc6dea7252b0498bd01a2c7b3f238e294f1b570741b3ceccfe1719",
+      "matches": true
+    },
+    {
+      "path": "core/client-canonical-view-projection-v20260716.js",
+      "status": 200,
+      "sha256": "7804236d602bf0a7e8261746c06b8efae3a34333800f7ce9d0861185b650b118",
+      "matches": true
+    },
+    {
+      "path": "core/client-insurer-edit-owner-v20260722.js",
+      "status": 200,
+      "sha256": "afe1da460cb4a591b175bbfec4e3e73c8c254c5d5ee51ab5e57a13d1b1631d0a",
+      "matches": true
+    },
+    {
+      "path": "core/client-insurer-operational-directory-owner-v20260722.js",
+      "status": 200,
+      "sha256": "69baa67f06469a2e1d6c00f3dc68661fec92c919204c66889981c31c59d531c3",
+      "matches": true
+    },
+    {
+      "path": "core/client-insurer-visual-contract-v20260720.js",
+      "status": 200,
+      "sha256": "5a95a00b8b93c79d1816ec12000c4780b92a9ea6dd45070e1138f0d18a3bb0e2",
+      "matches": true
+    },
+    {
+      "path": "core/client-insurer-visual-stability-barrier-v20260721.js",
+      "status": 200,
+      "sha256": "7183a44abc68a4bb24e34f94ede933cfc3697be37a15e9ac95e765af348872d8",
+      "matches": true
+    },
+    {
+      "path": "core/cobros-authorization-package-p0.js",
+      "status": 200,
+      "sha256": "e8a11163983efad709de4b6c5cea35e888e20fa362b947db8bd8c4a593b72e89",
+      "matches": true
+    },
+    {
+      "path": "core/cobros-private-authorization-materializer-p0.js",
+      "status": 200,
+      "sha256": "cf6585f0a50b54b76c4e60c3081cf302bfdd8b60f24e6cfdddeaa3fbeca175e6",
+      "matches": true
+    },
+    {
+      "path": "core/cobros-proposal-queue-p0.js",
+      "status": 200,
+      "sha256": "c1d2cd765b4d700f495cce805e0d2276cb13da1f36eb31fb9973cedab0e01bec",
+      "matches": true
+    },
+    {
+      "path": "core/cobros-reconciliation-domain-client.js",
+      "status": 200,
+      "sha256": "dca074682bba1af538f2632b1895e51115946e4cc893d36488ca716930c17b72",
+      "matches": true
+    },
+    {
+      "path": "core/comisiones-eng.js",
+      "status": 200,
+      "sha256": "95f128f9564e99aa3ab84d42583820127fd15314cd0f501b1f75b9378fedf116",
+      "matches": true
+    },
+    {
+      "path": "core/config.js",
+      "status": 200,
+      "sha256": "466636727a0c059c566c26b5f2a10d7b0aa16487d2db38f881bd1f0514896e61",
+      "matches": true
+    },
+    {
+      "path": "core/correo.js",
+      "status": 200,
+      "sha256": "8502318fd15c675ba8c39ccb528430b72b1606051379ef5d113cc5cda59c5167",
+      "matches": true
+    },
+    {
+      "path": "core/cotizacion-esquema-aseguradora-p0.js",
+      "status": 200,
+      "sha256": "8d9c1e80a5e449ebcfc14c194ffec4756de535aefb720f1cb7f8a9535ec228b1",
+      "matches": true
+    },
+    {
+      "path": "core/credential-vault.js",
+      "status": 200,
+      "sha256": "7207c0d341626029902c069759c09a56e7a651f999a44466cb2905754d6eca1d",
+      "matches": true
+    },
+    {
+      "path": "core/crmkit.js",
+      "status": 200,
+      "sha256": "76ee494fe7335ebcb4221b367b7c1ac512972fa111f41418ee7fd6f76fff00cf",
+      "matches": true
+    },
+    {
+      "path": "core/document-provider-bridge-p09b.js",
+      "status": 200,
+      "sha256": "c6fceb9a6210ef91b2f1fdb5bdadf02878c3be3203ff3c0a8b832243c298418c",
+      "matches": true
+    },
+    {
+      "path": "core/document-provider-registry-p09.js",
+      "status": 200,
+      "sha256": "0703a164b5f05597c4002151b66f04e35cc850d0d24765440254c212d6b2c44a",
+      "matches": true
+    },
+    {
+      "path": "core/document-source-contract-p04.js",
+      "status": 200,
+      "sha256": "64b2a1edcf3c178d1257868d0a5b8f722c9b5b5dbe07a1cbad10d36c106b4d6a",
+      "matches": true
+    },
+    {
+      "path": "core/document-viewer.js",
+      "status": 200,
+      "sha256": "0fbad66f9dffdc9f5463f5ff82390764091bdb771a0f103f027340da28325b73",
+      "matches": true
+    },
+    {
+      "path": "core/endorsement-workflow-v1201.js",
+      "status": 200,
+      "sha256": "2607feb7d0b04e7286f3474a4c4edd09f65bf790ba36335ae08a64711214a526",
+      "matches": true
+    },
+    {
+      "path": "core/excel-rule-proposal-adapter-p06b.js",
+      "status": 200,
+      "sha256": "282550411d5c5b823c67bc51c2ac4892b1b8c0560ff715861d28db0af09eb643",
+      "matches": true
+    },
+    {
+      "path": "core/ia.js",
+      "status": 200,
+      "sha256": "d54827bad0e30a406ec1d29c3b49bd22624ca77135ab9888ac4f0cdeba0fe297",
+      "matches": true
+    },
+    {
+      "path": "core/importa-banco-comisiones-p0-wire.js",
+      "status": 200,
+      "sha256": "eaf822a569346e44ae5047780ba71d9995ecb452fcdefca0f61896d6f5472516",
+      "matches": true
+    },
+    {
+      "path": "core/importa-banco-comisiones-p0.js",
+      "status": 200,
+      "sha256": "399bdefedb07bd578acd113e839ad3ca27ec42de652dc7c94969c674f7fe6066",
+      "matches": true
+    },
+    {
+      "path": "core/importa-calendario-marketing-p0.js",
+      "status": 200,
+      "sha256": "cdfda9a41907f9b6605bd6cb206574186e78ae77b40032534b9f1354a03b319a",
+      "matches": true
+    },
+    {
+      "path": "core/importa-cartera-p0-wire.js",
+      "status": 200,
+      "sha256": "45bf67def3bb324607cd5a465c50fac29960218b9f42278febc627237755a953",
+      "matches": true
+    },
+    {
+      "path": "core/importa-cartera-p0.js",
+      "status": 200,
+      "sha256": "28fea8d8bc99e871930f1e541331e0ab7ef757c11f3b738082fc16006edbc8ea",
+      "matches": true
+    },
+    {
+      "path": "core/importa-clientes-p0-wire.js",
+      "status": 200,
+      "sha256": "5dfaed055622736a602bab395d21d022942290d1bdd210956694faf564284d18",
+      "matches": true
+    },
+    {
+      "path": "core/importa-clientes-p0.js",
+      "status": 200,
+      "sha256": "1013295827db095916bca35af5db0a18e9f89c9a0732bb3272306febbba40aba",
+      "matches": true
+    },
+    {
+      "path": "core/importa-cobros-conciliacion-p0.js",
+      "status": 200,
+      "sha256": "13f47081d1d26e0265ee75020d26706ac43260259b19631675f99e2c06cf2ac7",
+      "matches": true
+    },
+    {
+      "path": "core/importa-cobros-evidencia-temporal-p0.js",
+      "status": 200,
+      "sha256": "f3753a833f0a0bba14c31e620026948f674188ccb048f74700d2286da472f177",
+      "matches": true
+    },
+    {
+      "path": "core/importa-cobros-matriz-multievidencia-p0.js",
+      "status": 200,
+      "sha256": "475236256b9fe3c31e2d62aae1ab86e135fd6d036c1862df6c573f36ac9934ca",
+      "matches": true
+    },
+    {
+      "path": "core/importa-comisiones-p0-wire.js",
+      "status": 200,
+      "sha256": "77ca27f47ab09606e7a637f3a1326f7a061e7a70df634bab78fcddd10178147e",
+      "matches": true
+    },
+    {
+      "path": "core/importa-comisiones-p0.js",
+      "status": 200,
+      "sha256": "1626922d20bcee17590b1c8de420baf3be1ed4440a9acd122ac1d02b80e35b5c",
+      "matches": true
+    },
+    {
+      "path": "core/importa-directorio-aseguradoras-p0.js",
+      "status": 200,
+      "sha256": "af5d20ee41c761716d002ed5cc9afdb15651ed2ac49d36d59c811fde6baa2cc6",
+      "matches": true
+    },
+    {
+      "path": "core/importa-dryrun-p0-wire.js",
+      "status": 200,
+      "sha256": "7a9f1f41a50b50322f60d7ac3a1a69335f047c6a853e94513afd78dd64fcf202",
+      "matches": true
+    },
+    {
+      "path": "core/importa-dryrun-p0.js",
+      "status": 200,
+      "sha256": "098e7d4622dc4c8ecae26ac48cf4202dc1a319634fd4526367691ed27bcd672a",
+      "matches": true
+    },
+    {
+      "path": "core/importa-identidad-marca-p0.js",
+      "status": 200,
+      "sha256": "67d97f8c8c9b94e26ec6ce61a9803d9cfd003318482daea4d063a45d9e6c5a00",
+      "matches": true
+    },
+    {
+      "path": "core/importa-identity-dryrun-wire-v20260731.js",
+      "status": 200,
+      "sha256": "f5a10ff39c35ce64747d8343957ec14852e86ca4d3f4b02b2e1586926481715f",
+      "matches": true
+    },
+    {
+      "path": "core/importa-identity-upsert-v20260731.js",
+      "status": 200,
+      "sha256": "4c8512ccb6b5270b16a351e639542c22467589d2242c3956a27355c6a29db687",
+      "matches": true
+    },
+    {
+      "path": "core/importa-identity-writer-wire-v20260731.js",
+      "status": 200,
+      "sha256": "8ab2f8c614c713f307d9f437c9ee6eebd3d82bfac5c52c685ee44213c2774b85",
+      "matches": true
+    },
+    {
+      "path": "core/importa-polizas-p0-wire.js",
+      "status": 200,
+      "sha256": "3d6600ec06d699074c7800209b29f408bb1a8916281e1be17dd5ca72f8a3250b",
+      "matches": true
+    },
+    {
+      "path": "core/importa-polizas-p0.js",
+      "status": 200,
+      "sha256": "40746151d540750ef2b49557f9c70ef41c2c17b758c1a27c582759f3dcdd3c7f",
+      "matches": true
+    },
+    {
+      "path": "core/importa-transversal-p0-bootstrap-v20260731.js",
+      "status": 200,
+      "sha256": "ae51a6796a5a188cf7f3813171f05963682ad5b9a66aaf0ee859ebdb345cb725",
+      "matches": true
+    },
+    {
+      "path": "core/importa-write-p0.js",
+      "status": 200,
+      "sha256": "f263409bffc0ee764118002af055d1eafde56bdacf3ee72656fe763a1ca742c9",
+      "matches": true
+    },
+    {
+      "path": "core/importa.js",
+      "status": 200,
+      "sha256": "2bc8cbf16601688d5e4508aa801b543e701858e2f9af5df3be7f7fe5c24e4b4c",
+      "matches": true
+    },
+    {
+      "path": "core/importer-controlled-write-contract-v20260721.js",
+      "status": 200,
+      "sha256": "cbf6482dd2fd8978fd949ffeca215c71ab6c9796827b1f84e921beb4e4dce10a",
+      "matches": true
+    },
+    {
+      "path": "core/importer-execution-contract-v20260720.js",
+      "status": 200,
+      "sha256": "649817c66e19c752cfcfa30e5e6fccdad4324eba8e355ae40f44bfec420523dd",
+      "matches": true
+    },
+    {
+      "path": "core/insurer-directory-import-v1202-security.js",
+      "status": 200,
+      "sha256": "aa9f69adfd71f3cb2bd82607da84ee502414bac4cb0edd7983e5119efbc1dbbb",
+      "matches": true
+    },
+    {
+      "path": "core/insurer-directory-import-v1202.js",
+      "status": 200,
+      "sha256": "2b68fa873c9d61c2ec2c6a130d92997a02748416b48a7ee7b6e10d465be8940f",
+      "matches": true
+    },
+    {
+      "path": "core/insurer-secure-target-bridge-v20260720.js",
+      "status": 200,
+      "sha256": "f656daaf1d1927e330a090304dd1b7deb4463bf23d92fafe8b912d9348dfd462",
+      "matches": true
+    },
+    {
+      "path": "core/integraciones-lab-mock.js",
+      "status": 200,
+      "sha256": "d1f335f11a4ed4b7ed45ec55b13e69b65df12262e801bad98ea33097747b0641",
+      "matches": true
+    },
+    {
+      "path": "core/integraciones-panel.js",
+      "status": 200,
+      "sha256": "f5b1efe7c9480e36c01fbd92a7b62129bf349120a3caead07e1eca8d65a11505",
+      "matches": true
+    },
+    {
+      "path": "core/integraciones.js",
+      "status": 200,
+      "sha256": "08b291f560608939bd2e6633dc3ca14f267d7859c30ffc2799a7c0b9b1cac6ff",
+      "matches": true
+    },
+    {
+      "path": "core/issuance-workflow-v1201-refinements.js",
+      "status": 200,
+      "sha256": "4f8e2e2dd14c73994930812fde7c9ee4221ffde5d725b3d9a3aff38d2e304547",
+      "matches": true
+    },
+    {
+      "path": "core/issuance-workflow-v1201.js",
+      "status": 200,
+      "sha256": "230d810719fc0f0a19ae0be1984944d22be2aa55475bf11633bb7c15638e7e17",
+      "matches": true
+    },
+    {
+      "path": "core/knowledge-binding-gate-p08.js",
+      "status": 200,
+      "sha256": "25cea4d4bc78b55deeaee6a7037076e39166bad57609fa53f19e8c3473c9c306",
+      "matches": true
+    },
+    {
+      "path": "core/knowledge-binding-policy-p08.js",
+      "status": 200,
+      "sha256": "6b5a58b77ae444448cb9ce98ab2c871f0140a7486d01786728bddbc14275e3a8",
+      "matches": true
+    },
+    {
+      "path": "core/legal.js",
+      "status": 200,
+      "sha256": "b74a965b7be0d67862d82bcf73dacc0d5a8293dcf30cb4f5f3fdeaa6ee1c68a3",
+      "matches": true
+    },
+    {
+      "path": "core/membership-multirol-contract-p0.js",
+      "status": 200,
+      "sha256": "844ab542505016716cc14c7dfba093bed496cd59d471c25a2cfb536359f11d8d",
+      "matches": true
+    },
+    {
+      "path": "core/membership-multirol-effective-p0.js",
+      "status": 200,
+      "sha256": "588dd96ced70178961a1ada86b537b551d43c61247959dab3a0c2ce01deec40f",
+      "matches": true
+    },
+    {
+      "path": "core/notify.js",
+      "status": 200,
+      "sha256": "1ee20eea2a0049a03af1172a1c2d566362229762b40382aa65e33c66fe7f9c0f",
+      "matches": true
+    },
+    {
+      "path": "core/novedades.js",
+      "status": 200,
+      "sha256": "29906a35cad7d52055d4d121d3a7a14df943f81ffd5b28b61ab9ddc368aee381",
+      "matches": true
+    },
+    {
+      "path": "core/operational-directory-field-policy-v20260722.js",
+      "status": 200,
+      "sha256": "ae1b7cfd55e13185e435ddd78b08f63065b57eaeaf725968b026345319526df5",
+      "matches": true
+    },
+    {
+      "path": "core/ops-leads-domain-client.js",
+      "status": 200,
+      "sha256": "cadadb51a1891373a0922d4239e12216d2d6535ffbb42319f19f12510ad6718a",
+      "matches": true
+    },
+    {
+      "path": "core/pdf-quote-adapter-p07.js",
+      "status": 200,
+      "sha256": "aed4d4059c2e7fc58bca545ed73c2b42bca6181aee3ea968c80ba1995668e6ee",
+      "matches": true
+    },
+    {
+      "path": "core/policy-receipts-engine.js",
+      "status": 200,
+      "sha256": "d9c8a63749d7e80ed81a6a3a3f8b2f4ccd3a164e3b706ab7660009c1e785b2cf",
+      "matches": true
+    },
+    {
+      "path": "core/policy-receipts-v1199-refinements.js",
+      "status": 200,
+      "sha256": "79ab64ec77ab18ee0f7727709f4f50da602e82ad671c6596ab16dc2ce9e94bc1",
+      "matches": true
+    },
+    {
+      "path": "core/primas.js",
+      "status": 200,
+      "sha256": "4ff9a0936859f3a9c10542431db7b02f1db051a72e210afc010b6b2e05b25675",
+      "matches": true
+    },
+    {
+      "path": "core/product-app-p0.js",
+      "status": 200,
+      "sha256": "da0f270815c7693dc1d20867110ba8c993f489252737e0f11bf873eab1de7190",
+      "matches": true
+    },
+    {
+      "path": "core/product-drive-document-provider-p0.js",
+      "status": 200,
+      "sha256": "7a785fe187a99ba842156ba70fd4acbedc1e8e63e7a569a8a41552ec8b9b0b34",
+      "matches": true
+    },
+    {
+      "path": "core/product-hydration-required-optional-p0.js",
+      "status": 200,
+      "sha256": "cec2a66093570cad27f9946bb82c34dc398f8f782f38f5a9a31b56495ed27be8",
+      "matches": true
+    },
+    {
+      "path": "core/product-insurer-credential-provider-p0.js",
+      "status": 200,
+      "sha256": "69dc8c1ebb531fdc4d4a760e0eb4052ac1681fa79794659e0c0c4ed83c87edcd",
+      "matches": true
+    },
+    {
+      "path": "core/product-membership-access-bridge-p0.js",
+      "status": 200,
+      "sha256": "2fbb4ff0d45394f2413fd05f0cd05c7035785a50dad664865ca491a6479cf49e",
+      "matches": true
+    },
+    {
+      "path": "core/product-prebootstrap-store-p0.js",
+      "status": 200,
+      "sha256": "bd438bb55914d82cb8989576653266f53caa46bb0f7df46e5c9bd7270550b9cb",
+      "matches": true
+    },
+    {
+      "path": "core/product-query-planner-contract-p0.js",
+      "status": 200,
+      "sha256": "a38174f5f0c8cb97c3b82d639f85b4dd2d963764d1f4be9c60352f04bb07fcc5",
+      "matches": true
+    },
+    {
+      "path": "core/product-role-taxonomy-p0.js",
+      "status": 200,
+      "sha256": "00de8b226d0b0f54a6c081e5b83b45eb02488fe901f207e7bc1fa4d3dc899ca8",
+      "matches": true
+    },
+    {
+      "path": "core/product-runtime-browser-providers-p0.js",
+      "status": 200,
+      "sha256": "2373f71dadc79f1b9cbfdbaa660d7f5dac420f2dc82c1fd2fea4c380ee309f36",
+      "matches": true
+    },
+    {
+      "path": "core/product-tenant-runtime-context-bridge-p0.js",
+      "status": 200,
+      "sha256": "676a7f2ba251e2508a7c6257348793bf3b3b2c9cf0fa3de71ff2a70dc8203556",
+      "matches": true
+    },
+    {
+      "path": "core/public-tenant-branding.js",
+      "status": 200,
+      "sha256": "a090641ebdbbbb38ff4d2dc3c3a8c909ac63219ca630bca6c9d8412435f11f2c",
+      "matches": true
+    },
+    {
+      "path": "core/pwa.js",
+      "status": 200,
+      "sha256": "b1cd7bcd43af86e57e98c6bfa9dc4e5029f72394c874d531e40e1965ab2a976c",
+      "matches": true
+    },
+    {
+      "path": "core/queries.js",
+      "status": 200,
+      "sha256": "d0892ba4135e4b4d4c6e9e9e0c59208eedeecf5546218b44ed0dc8050d82104e",
+      "matches": true
+    },
+    {
+      "path": "core/quote-authority-contract-v1.js",
+      "status": 200,
+      "sha256": "f48dacb8e36db1913f36eb768858132b91b630c9bb5931486e2b1b3d77a7e7b1",
+      "matches": true
+    },
+    {
+      "path": "core/quote-comparison-contracts-v1203-refinements.js",
+      "status": 200,
+      "sha256": "25e1eff545d627f49368cb43eccddb12d2c11d134b9ae64ba35947b65c6eae31",
+      "matches": true
+    },
+    {
+      "path": "core/quote-comparison-contracts-v1203.js",
+      "status": 200,
+      "sha256": "69b3b3a26167dbe8e14e98f364440d5d738c07b4182088c090ec6a7eed6a6e86",
+      "matches": true
+    },
+    {
+      "path": "core/quote-comparison-p06-runtime-adapter-v1208.js",
+      "status": 200,
+      "sha256": "cd6f58302846443f2f501a0cfc7cdbbf6920c76a09a92aa922c8f10aec0a67c9",
+      "matches": true
+    },
+    {
+      "path": "core/record-delete.js",
+      "status": 200,
+      "sha256": "eba523d7e62dbc49374d8d30d73500898a43e4f674852a6c946a5301cca03517",
+      "matches": true
+    },
+    {
+      "path": "core/router-tenant-config-bootstrap.js",
+      "status": 200,
+      "sha256": "35033d88cec04a3f225811d11b4248be36411df120108ad1adf02a966f43eb8c",
+      "matches": true
+    },
+    {
+      "path": "core/router-tenant-config-product-bootstrap-p0.js",
+      "status": 200,
+      "sha256": "0149c641ddff6322f3b440f42dbf4b0b2dc701669f758ef8f91fcbf9fc5d362b",
+      "matches": true
+    },
+    {
+      "path": "core/router.js",
+      "status": 200,
+      "sha256": "b52a453acd720877df043db6c755bd241cd5e87c997a45c00cc877c6212dcdb9",
+      "matches": true
+    },
+    {
+      "path": "core/secure-resource-fields-v1202.js",
+      "status": 200,
+      "sha256": "8e7250c49cde4eb566e84dabd8fe7746545149b72c24eb548b0532dd63e5eb4b",
+      "matches": true
+    },
+    {
+      "path": "core/session-readiness-contract-v20260720.js",
+      "status": 200,
+      "sha256": "e697a8365d5cb6d426b7f8c3dcdbea5c6e76e2f64a06b2401436d2f311e956db",
+      "matches": true
+    },
+    {
+      "path": "core/tariff-quote-reconciliation-p06c.js",
+      "status": 200,
+      "sha256": "4dd81200f4c71ffb77c69058ef30e90e728475b4aab1101b9b65a1e87db4f5d1",
+      "matches": true
+    },
+    {
+      "path": "core/tariff-rule-proposal-p06.js",
+      "status": 200,
+      "sha256": "0d9a09f324737e77340716efc2985bdedec8cd02d15e240366edf89b913e7ef2",
+      "matches": true
+    },
+    {
+      "path": "core/tenant-access-policy-contract-p0.js",
+      "status": 200,
+      "sha256": "b9edeb7c38b16dd7c583772251714e28121c3754467c97d75d8c5c73e6c136bd",
+      "matches": true
+    },
+    {
+      "path": "core/tenant-access-policy-effective-p0.js",
+      "status": 200,
+      "sha256": "cece61b730091cf37a3c13a0bd6896f194c38ca9d49aaf49d1d826ec8bcddd39",
+      "matches": true
+    },
+    {
+      "path": "core/tenant-access-policy-product-p0.js",
+      "status": 200,
+      "sha256": "3de1cb1ded80480ff0d42d5f3f8272ebd0075da4dd673d090b164214683ab77e",
+      "matches": true
+    },
+    {
+      "path": "core/tenant-binding-plan-p10c.js",
+      "status": 200,
+      "sha256": "b6f1cceb33b5ee8be2ddb4c30f849eb9f9871244d9912ce76b84549078f7edd9",
+      "matches": true
+    },
+    {
+      "path": "core/tenant-canonical-paths-contract-p0.js",
+      "status": 200,
+      "sha256": "2e8c72e4c530479e03f78968f95ca0909f0d4d33bcc74d979211c194c5319876",
+      "matches": true
+    },
+    {
+      "path": "core/tenant-domain-config-client.js",
+      "status": 200,
+      "sha256": "8338f7ddb999906bcb3e6a7f13613b003525dce554ac79bf15aa76d68a0ad4d8",
+      "matches": true
+    },
+    {
+      "path": "core/tenant-insurer-config-p10.js",
+      "status": 200,
+      "sha256": "82e99f514ee08c04870d7915fa7c69f23178e4d4589e55d345395563ddd730b1",
+      "matches": true
+    },
+    {
+      "path": "core/tenant-source-batch-adapter-p10.js",
+      "status": 200,
+      "sha256": "0a7d009648b3ab07d24e9cfa83080215794baf584be463fea501cbd0371d94a1",
+      "matches": true
+    },
+    {
+      "path": "core/theme.js",
+      "status": 200,
+      "sha256": "e437b21359eccfb744add21a530d09d61cbbe0d751db113b9c37f4ffc968a0f8",
+      "matches": true
+    },
+    {
+      "path": "core/ui.js",
+      "status": 200,
+      "sha256": "c792483e47784b08a5ac2bddf7ec6b86b9332e3901a21f9944e9c540845e14e0",
+      "matches": true
+    },
+    {
+      "path": "core/user-credential-selfservice-v20260805.js",
+      "status": 200,
+      "sha256": "7936239d0ab454f7f3ecf0475cf7ace8068a41bf0f7ee773a623e085ede53b06",
+      "matches": true
+    },
+    {
+      "path": "core/user-onboarding.js",
+      "status": 200,
+      "sha256": "33327653d20db94299b47a79f31f8be304cfd5c1e67c5651b7e0e711f98c4844",
+      "matches": true
+    },
+    {
+      "path": "data/academia-product-catalog-v1.js",
+      "status": 200,
+      "sha256": "7fbe38bbabc87b9e5b0f3004538461f18ab79d29623ed4685415b3f4d073d3b8",
+      "matches": true
+    },
+    {
+      "path": "data/academia-v1225-importadores-e2e.js",
+      "status": 200,
+      "sha256": "20fb352bbdb8dc4171d4c0b4d2c9d52b70bcba2c518c7a20f671ed12bcfe4079",
+      "matches": true
+    },
+    {
+      "path": "data/academia-v1230-operational-directory-v20260722.js",
+      "status": 200,
+      "sha256": "612b580d53adf195d540ddc2d7f9f72754809d72b23e5a3d93cae3c7bd08c7d2",
+      "matches": true
+    },
+    {
+      "path": "data/geo-gt-co-authoritative-v20261004.js",
+      "status": 200,
+      "sha256": "7f486f4a233d4c1c47695fb4bbc040c0f6b9ca053da16a91d495f42c48832d2c",
+      "matches": true
+    },
+    {
+      "path": "data/store-firestore-lab.local.js",
+      "status": 200,
+      "sha256": "bbe4aa2f6e749c085d2bf57cceccfbf6d0c6d520b991bd1c9cce3d566aba22a1",
+      "matches": true
+    },
+    {
+      "path": "data/store-firestore-product-operational-p0.js",
+      "status": 200,
+      "sha256": "124e9ebc2eb76cf7aaa0f151aafabc92df9007087a65b7e4915318bfbeb350af",
+      "matches": true
+    },
+    {
+      "path": "data/store-firestore-product-readonly-p0.js",
+      "status": 200,
+      "sha256": "3789e655ae8425ef84e18730ca900e0471bf44e85ae13212c265d51e4316d886",
+      "matches": true
+    },
+    {
+      "path": "data/store.js",
+      "status": 200,
+      "sha256": "1ec42cf35458c607333a494c4fd7fa74e04101869185423d8cd71ae8098fd838",
+      "matches": true
+    },
+    {
+      "path": "data/tenant-alianzas-soluciones-binding-plan-p10c.js",
+      "status": 200,
+      "sha256": "dc69b87f23fcce881e2cb37a453391c882647bb7c58a6fe6aefcb9daacb88d71",
+      "matches": true
+    },
+    {
+      "path": "data/tenant-alianzas-soluciones-first-source-p09f.js",
+      "status": 200,
+      "sha256": "afbf7f72195032697cf9b8ac7f836c61960d2ba50de006faa376b6ce3849b654",
+      "matches": true
+    },
+    {
+      "path": "data/tenant-alianzas-soluciones-insurers-p10.js",
+      "status": 200,
+      "sha256": "113d83d6f41b3bac7cca161748ac1d8f0709193d826e96dddc949aeafe455e80",
+      "matches": true
+    },
+    {
+      "path": "data/tenant-alianzas-soluciones-source-batch-p09g.js",
+      "status": 200,
+      "sha256": "15695d250e5f138e1264fdb8fcb7937fc6a69d3e545037b0a49b305113328a2e",
+      "matches": true
+    },
+    {
+      "path": "data/tenant-config/alianzas-soluciones.aseguradoras-knowledge-summary-v20261003.js",
+      "status": 200,
+      "sha256": "57c786161f10f9c478deb629daa081e8c69d9952f7322efd7f73f36c1f0155b0",
+      "matches": true
+    },
+    {
+      "path": "data/tenant-public-branding-snapshot.generated.js",
+      "status": 200,
+      "sha256": "821378cc705fa0115781daced6fb27dc6e203d13fe77c94ca4b84f73dc1ab161",
+      "matches": true
+    },
+    {
+      "path": "data/tenant-runtime-config-index.js",
+      "status": 200,
+      "sha256": "4d9520cffa24d6354c679aa8c0332eea73a745801094cbdd0a9c21ebf66638bd",
+      "matches": true
+    },
+    {
+      "path": "index.html",
+      "status": 200,
+      "sha256": "90fe163be41d65d45ae1c06c52985c77238fbc93c77084454c6abc86c84ba66e",
+      "matches": true
+    },
+    {
+      "path": "manifest.webmanifest",
+      "status": 200,
+      "sha256": "77ff198f52f38de6c4022f0491fe42d9244b65da81da3ab857352175b6e3c21b",
+      "matches": true
+    },
+    {
+      "path": "modules/academia.js",
+      "status": 200,
+      "sha256": "cee0558c10d3ae01236d185a01c87a522714e8ccfaaac517dd94c112e306a1c8",
+      "matches": true
+    },
+    {
+      "path": "modules/aseguradoras-batch-admin-form-p09j.js",
+      "status": 200,
+      "sha256": "9f8c7d01a8a3172f00fbe2f29fdd98b06c3eaae682aaeec2b3bc73ac3edd4b0f",
+      "matches": true
+    },
+    {
+      "path": "modules/aseguradoras-knowledge-p09.js",
+      "status": 200,
+      "sha256": "05c47a5e7f1802e99d81843ea0ede9884b4fb3af222b8a8e49461617124f3895",
+      "matches": true
+    },
+    {
+      "path": "modules/aseguradoras-knowledge-panel-p09f.js",
+      "status": 200,
+      "sha256": "bcf26e88565a15cb971f5980cbd168bb9b4cc0083c7690558b9c6eeec7a61125",
+      "matches": true
+    },
+    {
+      "path": "modules/aseguradoras-op2-permission-guard.js",
+      "status": 200,
+      "sha256": "f83c82efa5f7514b153f5e47b50bb3fd92262cfe81e59f17be92de033f9d121b",
+      "matches": true
+    },
+    {
+      "path": "modules/aseguradoras-v1197-ux-bridge.js",
+      "status": 200,
+      "sha256": "274ed24c71f13ee416c7ec82f26b086dc66e57ecfe12557f70bcae4b9d9034bb",
+      "matches": true
+    },
+    {
+      "path": "modules/aseguradoras-v1202-import-bridge.js",
+      "status": 200,
+      "sha256": "675b0bd200b81c73d8b61d3e31702a7aa13e4078753edd932d4fa5d06ea14815",
+      "matches": true
+    },
+    {
+      "path": "modules/aseguradoras-v1202-resources-bridge.js",
+      "status": 200,
+      "sha256": "0f81169d2ee59372e7bebe10d4ff2d5a4e5819e93a3eaf1b98379ff6027050c6",
+      "matches": true
+    },
+    {
+      "path": "modules/aseguradoras.js",
+      "status": 200,
+      "sha256": "6de3e4cddb8c4ca1bc45ac970bd3c73179c628e55a49b14e427fa29954311a8b",
+      "matches": true
+    },
+    {
+      "path": "modules/automatizaciones.js",
+      "status": 200,
+      "sha256": "651f3d7109f3dd3fc933477f3301af827c8ebfad31ddb9d66e9cc7fab7546188",
+      "matches": true
+    },
+    {
+      "path": "modules/calidad.js",
+      "status": 200,
+      "sha256": "7315d26ed76a74269a2a3981ae5295edf7a581aa2eae2c58ead0dddcb317f782",
+      "matches": true
+    },
+    {
+      "path": "modules/cancelaciones.js",
+      "status": 200,
+      "sha256": "53b073a98b2320d1e2329e877affb7e1a5a5d0cea37f94388da8d2dd72414f02",
+      "matches": true
+    },
+    {
+      "path": "modules/cliente360.js",
+      "status": 200,
+      "sha256": "9408c2b7e96bb848fd87a537e4be7f79bcf8ceafb311465d359e44481e9b850d",
+      "matches": true
+    },
+    {
+      "path": "modules/cobros-cartera-i65-closure-bridge.js",
+      "status": 200,
+      "sha256": "778c992d2347771227e77149faf929080cbbbaf6bc27682b7a86ed6a3bd76d94",
+      "matches": true
+    },
+    {
+      "path": "modules/cobros.js",
+      "status": 200,
+      "sha256": "2b44a4208810b616e79678cedf3865e8890cf141bf2baea8728c7c9069a35f07",
+      "matches": true
+    },
+    {
+      "path": "modules/comisiones.js",
+      "status": 200,
+      "sha256": "2ef4607bba3395323f8eb0ccfdaa48ea358750b103014e379d84b10279e56886",
+      "matches": true
+    },
+    {
+      "path": "modules/comparativo-v1203-operational-bridge.js",
+      "status": 200,
+      "sha256": "192a29c1521dbacddf60c0f753c38d89c89c7d03a3e48ab999682b5cfc532069",
+      "matches": true
+    },
+    {
+      "path": "modules/comparativo.js",
+      "status": 200,
+      "sha256": "58aa903f7231013c329ed3079449febdfd6edad98f78790567c9ea8c8a52fc1a",
+      "matches": true
+    },
+    {
+      "path": "modules/conciliaciones.js",
+      "status": 200,
+      "sha256": "f05446e90e9db2f293a35c9170c6013fd3ee5129f0d55ffc2e54e3d9c93a9a9a",
+      "matches": true
+    },
+    {
+      "path": "modules/config-domain-v20260804-bridge.js",
+      "status": 200,
+      "sha256": "317ff8d83887d2ee4f22f63b18602399e3580d5e91636ac53307369b9b3d2340",
+      "matches": true
+    },
+    {
+      "path": "modules/configuracion.js",
+      "status": 200,
+      "sha256": "7edd09f5cd681086f5f55e23415f42afb92b6570b4785c35e347fc98726a81ef",
+      "matches": true
+    },
+    {
+      "path": "modules/correo.js",
+      "status": 200,
+      "sha256": "c8c31afdac0b9fe198ca9c924480db36756d4c2b63f6647dfc17c96ccda7e731",
+      "matches": true
+    },
+    {
+      "path": "modules/cotizador-v1203-source-gate.js",
+      "status": 200,
+      "sha256": "d49fca18dd1a56eaa0324b4d5c2e8877f0768c331914588fd62b4e2b9947dc09",
+      "matches": true
+    },
+    {
+      "path": "modules/cotizador.js",
+      "status": 200,
+      "sha256": "337659c9fd459ebb0273945ec846fb3f0a52be87454760c784a69667f8dc5d61",
+      "matches": true
+    },
+    {
+      "path": "modules/crm-v1198-operational-bridge.js",
+      "status": 200,
+      "sha256": "163deb9c99e971f27e96359a15a61a03dac58012c8670c11f2ca332466b2c7b4",
+      "matches": true
+    },
+    {
+      "path": "modules/cronograma.js",
+      "status": 200,
+      "sha256": "08577de9936c2ef2efe44e6781e13773045cc2f52624b217e1cf8b6b3ba012a1",
+      "matches": true
+    },
+    {
+      "path": "modules/equipo-credential-admin-v20260805-bridge.js",
+      "status": 200,
+      "sha256": "e0d84319b1da01ff696fa7cfa7ce002af014487e651c311bb14b69a427ce5e0b",
+      "matches": true
+    },
+    {
+      "path": "modules/equipo-onboarding-v20260804-bridge.js",
+      "status": 200,
+      "sha256": "6fd3c29cdbae44adf30a9c91c0d03885f0818963f343b168f64646bd4b915bed",
+      "matches": true
+    },
+    {
+      "path": "modules/equipo.js",
+      "status": 200,
+      "sha256": "955fe70adc3c774fcd82b75550b5651cdecc87f1303af067a6355dc24a2d7dd8",
+      "matches": true
+    },
+    {
+      "path": "modules/finanzas.js",
+      "status": 200,
+      "sha256": "11df358e7e87d4364acb3096263ba509896f9393fd02c01f72b6b4e84ec5deed",
+      "matches": true
+    },
+    {
+      "path": "modules/historial.js",
+      "status": 200,
+      "sha256": "109e91299d78bd3444f9df7be3ca54625146531891fa5bb3f72b91141ed17324",
+      "matches": true
+    },
+    {
+      "path": "modules/ia.js",
+      "status": 200,
+      "sha256": "68c8361e98f32029fd5e1b1fb32ed6b057613ba5056917e125fc127b787fa739",
+      "matches": true
+    },
+    {
+      "path": "modules/importar-p0-confirmacion.js",
+      "status": 200,
+      "sha256": "9210c6ec332d0a4d515d5f5769c24f7cb76e8434a0fc727200ba630e78f57e5b",
+      "matches": true
+    },
+    {
+      "path": "modules/importar-p0-dashboard.js",
+      "status": 200,
+      "sha256": "5b76e127db7d19978396147bd8dda0a0c382a93630b6d4b20c0fd736d1c3c960",
+      "matches": true
+    },
+    {
+      "path": "modules/importar.js",
+      "status": 200,
+      "sha256": "a77d1cb6dff1b6962190e7c2686f8ddf6d55302851d79a5ead026b74e6477938",
+      "matches": true
+    },
+    {
+      "path": "modules/inicio.js",
+      "status": 200,
+      "sha256": "6a4608961aea4a74fd0e2f591791793d05d312123ad60942c21a608f6aa3b56f",
+      "matches": true
+    },
+    {
+      "path": "modules/insights.js",
+      "status": 200,
+      "sha256": "375c45c0e3a07a0c8c97e6d5a972cd869c7116ca00431d6993f54156d5bd3f91",
+      "matches": true
+    },
+    {
+      "path": "modules/issuance-endosos-v1201-bridge.js",
+      "status": 200,
+      "sha256": "26e77caebba80322a72d232d07ec0374719c85522dda8fcd613f062a2248aa96",
+      "matches": true
+    },
+    {
+      "path": "modules/issuance-endosos-v1201-refinements.js",
+      "status": 200,
+      "sha256": "b07697eae9250dada8059f7e2d8bb2fb9ece33363df7fc4d03bb6935ffac31d3",
+      "matches": true
+    },
+    {
+      "path": "modules/leads.js",
+      "status": 200,
+      "sha256": "ccae01f57ac9f5c11b1a4afe5570d7a4606e5ef6522178acf3cb49451523ebb3",
+      "matches": true
+    },
+    {
+      "path": "modules/marketing.js",
+      "status": 200,
+      "sha256": "ee284e35a208e41f2d9d32b673e76606a8376775c2a3f618b6ab1407a64b6c83",
+      "matches": true
+    },
+    {
+      "path": "modules/notificaciones.js",
+      "status": 200,
+      "sha256": "29fd1a70a13aa6e1272c493689eb3838047057e0ab0256c4f434f7a36f2ee14c",
+      "matches": true
+    },
+    {
+      "path": "modules/ops-workflows-v1201-bridge.js",
+      "status": 200,
+      "sha256": "dc08dfb41ff646463c9394c059a63961a062333b5d6ef117ba17b47226e63eed",
+      "matches": true
+    },
+    {
+      "path": "modules/ops.js",
+      "status": 200,
+      "sha256": "4be03d1239545b221040a3cf97ef95aeb7d22e9941d22750cab6000ef6d1bd56",
+      "matches": true
+    },
+    {
+      "path": "modules/plantillas.js",
+      "status": 200,
+      "sha256": "3804549b4f70b65c8a7a819f000c493bce84ffcc66b54649885e559a016d1134",
+      "matches": true
+    },
+    {
+      "path": "modules/policy-receipts-v1199-bridge.js",
+      "status": 200,
+      "sha256": "4357cd51071f92264e2792b19fab1649bdc9bbf30c674e4af97f11f9e797df18",
+      "matches": true
+    },
+    {
+      "path": "modules/policy-receipts-v1199-detail-guard.js",
+      "status": 200,
+      "sha256": "fd927d16e6fdcd521e68a48f3d42cad88e13238ac79bf2f1496281ac1489fea1",
+      "matches": true
+    },
+    {
+      "path": "modules/polizas.js",
+      "status": 200,
+      "sha256": "8b1a4fed14cd247df0bad117074c39b698ddf7a3b4914bf385c19c94cb95a3a2",
+      "matches": true
+    },
+    {
+      "path": "modules/portal-v1142-copyfix.js",
+      "status": 200,
+      "sha256": "d3ff2c470435f161dd85657e8391d2898f7a62832ab076a647250ce7e493d419",
+      "matches": true
+    },
+    {
+      "path": "modules/portal-v1198-scope-viewer-bridge.js",
+      "status": 200,
+      "sha256": "d6a4a5d7b23ce470e13e623983e07150ae15948cb74e03ce79b543109df3c858",
+      "matches": true
+    },
+    {
+      "path": "modules/portal.js",
+      "status": 200,
+      "sha256": "8fde3256f05137b21ae5a62c46d356bdbc37f53ccbe842106bdb78bb6d0ee35b",
+      "matches": true
+    },
+    {
+      "path": "modules/renewals-v1200-operational-bridge.js",
+      "status": 200,
+      "sha256": "800017f99cfa237e3ba8d54caf245ebfda0088600d444f5587e1e10e70f152c1",
+      "matches": true
+    },
+    {
+      "path": "modules/renewals-v1200-permission-guard.js",
+      "status": 200,
+      "sha256": "ae6f0975c010169764c4395d72645f3caa51051ef2e16eacc44ab20739ca8c25",
+      "matches": true
+    },
+    {
+      "path": "modules/renewals-v1201-issued-filter.js",
+      "status": 200,
+      "sha256": "9e72e947503a31646b0f456a1158b9733ca3e5925196dcbc0af63127255640b4",
+      "matches": true
+    },
+    {
+      "path": "modules/renovaciones.js",
+      "status": 200,
+      "sha256": "03f97e2b7e082883f13e0db43a0b8db168b5c46d516b5d59efc43d852d11b005",
+      "matches": true
+    },
+    {
+      "path": "modules/reportes.js",
+      "status": 200,
+      "sha256": "1c03e625265722e7b809df47ac35ba42a071a4b19b38a7797a7e70dd815e3d1d",
+      "matches": true
+    },
+    {
+      "path": "modules/siniestros.js",
+      "status": 200,
+      "sha256": "6beb41925d9f12bf2fcd00edae84f29f1c81d36d3eac205984417ef415ed0743",
+      "matches": true
+    },
+    {
+      "path": "product-runtime-config.js",
+      "status": 200,
+      "sha256": "22ea169c9e949cb8573deb276edefeefbbde5c82575063e286b4e09505ef42db",
+      "matches": true
+    },
+    {
+      "path": "styles/aseguradoras-candidate.css",
+      "status": 200,
+      "sha256": "2577a05cf1be5d6f4dd637eedb5407dfadff44480a291661f632b5fc687bfbff",
+      "matches": true
+    },
+    {
+      "path": "styles/base.css",
+      "status": 200,
+      "sha256": "760d3f67ff013a03be73f96d04e93d626ea6206fb5ed2ea5c1160a92f7600ed2",
+      "matches": true
+    },
+    {
+      "path": "styles/client-insurer-edit-mode-v20260722.css",
+      "status": 200,
+      "sha256": "c63ba6262dbe86a77a40f90e119a6a578e40b5914982a96fd6ddb76479b46d3d",
+      "matches": true
+    },
+    {
+      "path": "styles/client-insurer-visual-contract-v20260720.css",
+      "status": 200,
+      "sha256": "c0302660c8a4ce79be0f28a09feb2f3c23908b6a3e9cdd5d0520a94f67e83f8b",
+      "matches": true
+    },
+    {
+      "path": "styles/infra.css",
+      "status": 200,
+      "sha256": "117acb8f2ddc928b6a9e7b8ac7a52e1d775fff03bec6dda9ade0ae47ea01c6a2",
+      "matches": true
+    },
+    {
+      "path": "styles/tokens.css",
+      "status": 200,
+      "sha256": "4c0ec96c81bd45a75e661b3371405e6fdc02b97e459b465e88214c3e0e877668",
+      "matches": true
+    },
+    {
+      "path": "styles/v1197-empalme.css",
+      "status": 200,
+      "sha256": "8b5a298f9f39d3e9d018c74415dbd66b4194b5aadf11a8398440949ec75f1614",
+      "matches": true
+    },
+    {
+      "path": "sw.js",
+      "status": 200,
+      "sha256": "55f77c7bb077b53b6e97a33dc5e51b072a66103ce2e14b1d1b388302f750b53e",
+      "matches": true
+    }
+  ],
+  "dataWrites": 0,
+  "artifactModified": false
+}

@@ -56,11 +56,11 @@
       "artifactDigest": "sha256:7cb782848a45083047c4899bc30c13bf5be46429607e42597d09342becfc9acc",
       "hostingVersion": "sites/ays-orbit-360-lab/versions/332999a55b189108"
     },
-    "evidencePath": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_EXECUTION_PROGRESS_20261124_R45.json",
-    "evidenceGitBlobSha": "c0402580c987d6b888b3d21ab542a61c8a2fcc44",
+    "evidencePath": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_EXECUTION_PROGRESS_20261124_R46.json",
+    "evidenceGitBlobSha": "8e08f8af596209f29d7a478f9cc8d8e1e91fffe2",
     "activeGate": "I6.6",
-    "currentWork": "I6.6: build immutable v21 from successful source QA45420172812 and guard45420172656 at99c73aa4f82eaec660e4920197dd2c8a11b14ae7; verify224 exact Preview files while preserving accepted E3. Then execute the existing five-function closed Make Preview and48-stage financial Preview before any promotion. Preserve financial writes and the stored Historial/email candidates.",
-    "nextAction": "I6.6: build immutable v21 from successful source QA45420172812 and guard45420172656 at99c73aa4f82eaec660e4920197dd2c8a11b14ae7; verify224 exact Preview files while preserving accepted E3. Then execute the existing five-function closed Make Preview and48-stage financial Preview before any promotion. Preserve financial writes and the stored Historial/email candidates.",
+    "currentWork": "I6.6: obtain signed source QA and guard for the corrected immutable-package readback owner, then request one new immutable v22 artifact. Preserve failed v21 with its diagnostic224/224 and no acceptance override. After complete build/readback success, run the existing five-function Make Preview before48 financial COMPOSITE Preview stages and exact-artifact LIVE/48 checks. E3, all prior financial writes, Historial and mailbox stored candidates remain preserved; MAPFRE awaits fresh preimages and two controlled1-cent corrections in its existing writer gate.",
+    "nextAction": "I6.6: obtain signed source QA and guard for the corrected immutable-package readback owner, then request one new immutable v22 artifact. Preserve failed v21 with its diagnostic224/224 and no acceptance override. After complete build/readback success, run the existing five-function Make Preview before48 financial COMPOSITE Preview stages and exact-artifact LIVE/48 checks. E3, all prior financial writes, Historial and mailbox stored candidates remain preserved; MAPFRE awaits fresh preimages and two controlled1-cent corrections in its existing writer gate.",
     "frontendPreviewRequest": {
       "version": 21,
       "sourceQaHead": "99c73aa4f82eaec660e4920197dd2c8a11b14ae7",
@@ -564,7 +564,7 @@
     "phaseAIterationStatuses": "HISTORICAL_FIELDS_ABOVE_PRESERVED_UNTIL_FORMAL_GATE_EVIDENCE;_NO_NEW_PASS_INFERRED",
     "labDataWriteScope": "ONLY_35_AUTHORIZED_COUNTRY_FIELDS;_NO_AUGUST_REFRESH"
   },
-  "nextAction": "I6.6: build immutable v21 from successful source QA45420172812 and guard45420172656 at99c73aa4f82eaec660e4920197dd2c8a11b14ae7; verify224 exact Preview files while preserving accepted E3. Then execute the existing five-function closed Make Preview and48-stage financial Preview before any promotion. Preserve financial writes and the stored Historial/email candidates.",
+  "nextAction": "I6.6: obtain signed source QA and guard for the corrected immutable-package readback owner, then request one new immutable v22 artifact. Preserve failed v21 with its diagnostic224/224 and no acceptance override. After complete build/readback success, run the existing five-function Make Preview before48 financial COMPOSITE Preview stages and exact-artifact LIVE/48 checks. E3, all prior financial writes, Historial and mailbox stored candidates remain preserved; MAPFRE awaits fresh preimages and two controlled1-cent corrections in its existing writer gate.",
   "sourceOfTruth": {
     "projectBoundaryPrevalentAddendum": "orbit360-platform/docs/recovery/ADDENDUM_PREVALENTE_CHATGPT_PROJECT_BOUNDARY_20260831.md",
     "mutableState": "orbit360-platform/docs/recovery/orbit360-recovery-state-v1.json",
@@ -4800,6 +4800,37 @@
         },
         "evidencePath": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_EXECUTION_PROGRESS_20261124_R45.json",
         "evidenceGitBlobSha": "fb65a136e540d5934bc05937b70afcc5bb07549d",
+        "activeGate": "I6.6",
+        "currentWork": "I6.6: build immutable v21 from successful source QA45420172812 and guard45420172656 at99c73aa4f82eaec660e4920197dd2c8a11b14ae7; verify224 exact Preview files while preserving accepted E3. Then execute the existing five-function closed Make Preview and48-stage financial Preview before any promotion. Preserve financial writes and the stored Historial/email candidates.",
+        "nextAction": "I6.6: build immutable v21 from successful source QA45420172812 and guard45420172656 at99c73aa4f82eaec660e4920197dd2c8a11b14ae7; verify224 exact Preview files while preserving accepted E3. Then execute the existing five-function closed Make Preview and48-stage financial Preview before any promotion. Preserve financial writes and the stored Historial/email candidates.",
+        "frontendPreviewRequest": {
+          "version": 21,
+          "sourceQaHead": "99c73aa4f82eaec660e4920197dd2c8a11b14ae7",
+          "sourceQaRunId": 45420172812,
+          "guardRunId": 45420172656
+        }
+      }
+    },
+    {
+      "reason": "ACTIVE_OWNER_PLAN_SUMMARY_SUPERSEDED",
+      "priorGitBlobSha": "3ac1f04a24703c3c069f2f91299798d529e60940",
+      "supersededByGeneration": 3,
+      "prior": {
+        "schema": "GI_I66_ACTIVE_OWNER_PLAN_CONTINUATION_V1",
+        "authorityPointer": "artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json#i66OperationalContinuation20261115",
+        "generation": 3,
+        "latestProvenLiveSource": "65c825b2808a615ca4195bdde6689dbdbe3193b2",
+        "latestPhysicalFrontendLiveReceipt": "artifacts/orbit360-recovery/release-control/I6_6_FRONTEND_E00003_RECEIPT.json",
+        "currentPhysicalFrontend": {
+          "generation": 3,
+          "sourceSha": "65c825b2808a615ca4195bdde6689dbdbe3193b2",
+          "buildId": "gi-i66-65c825b2808a-57f234755dc1",
+          "artifactId": 14873426438,
+          "artifactDigest": "sha256:7cb782848a45083047c4899bc30c13bf5be46429607e42597d09342becfc9acc",
+          "hostingVersion": "sites/ays-orbit-360-lab/versions/332999a55b189108"
+        },
+        "evidencePath": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_EXECUTION_PROGRESS_20261124_R45.json",
+        "evidenceGitBlobSha": "c0402580c987d6b888b3d21ab542a61c8a2fcc44",
         "activeGate": "I6.6",
         "currentWork": "I6.6: build immutable v21 from successful source QA45420172812 and guard45420172656 at99c73aa4f82eaec660e4920197dd2c8a11b14ae7; verify224 exact Preview files while preserving accepted E3. Then execute the existing five-function closed Make Preview and48-stage financial Preview before any promotion. Preserve financial writes and the stored Historial/email candidates.",
         "nextAction": "I6.6: build immutable v21 from successful source QA45420172812 and guard45420172656 at99c73aa4f82eaec660e4920197dd2c8a11b14ae7; verify224 exact Preview files while preserving accepted E3. Then execute the existing five-function closed Make Preview and48-stage financial Preview before any promotion. Preserve financial writes and the stored Historial/email candidates.",

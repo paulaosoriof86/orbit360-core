@@ -6,12 +6,15 @@ on:
       - .github/workflows/gravicentra-i66-privileged-role-parity-source-qa.yml
       - .github/workflows/gravicentra-i66-privileged-role-three-function-preview-uat.yml
       - .github/workflows/gravicentra-i66-privileged-role-exact-live-promotion.yml
+      - .github/workflows/gravicentra-release-delta-66-package.yml
       - tools/gravicentra-i6-6-operational-release-candidate.cjs
       - tools/gravicentra-i6-6-delta-guard.mjs
       - tools/gravicentra-i6-6-delta-test-revisions.cjs
       - tools/gravicentra-i6-6-source-lineage-preview-transport.test.cjs
       - tools/gravicentra-i6-6-frontend-preview-authority.cjs
       - tools/gravicentra-i6-6-composite-preview-admission.test.cjs
+      - tools/gravicentra-i6-6-preview-package-readback.cjs
+      - tools/gravicentra-i6-6-preview-package-readback.test.cjs
       - tools/gravicentra-i6-6-workflow-candidate-resolution.test.cjs
       - tools/gravicentra-i66-frontend-control.cjs
       - tools/gravicentra-i66-frontend-hosting-io.cjs
@@ -90,6 +93,8 @@ jobs:
           node tools/gravicentra-i6-6-source-lineage-preview-transport.test.cjs
           node --test tools/gravicentra-i6-6-readonly-observer-authority.test.cjs tools/gravicentra-i6-6-five-role-assigned-selection.test.cjs tools/gravicentra-i6-6-performance-first-route-source-timeline.test.cjs tools/gravicentra-i6-6-six-existing-receipts-ui-readonly.test.cjs
           node --test tools/gravicentra-i6-6-composite-preview-admission.test.cjs tools/gravicentra-i6-6-workflow-candidate-resolution.test.cjs
+          node --check tools/gravicentra-i6-6-preview-package-readback.cjs
+          node --test tools/gravicentra-i6-6-preview-package-readback.test.cjs
           node --test tools/gravicentra-i66-composite-acceptance.test.cjs tools/gravicentra-i66-frontend-control.test.cjs tools/gravicentra-i66-frontend-promotion-transaction.test.cjs
           node --test tools/gravicentra-i6-6-financial-page-read-efficiency.test.cjs tools/gravicentra-i6-6-make-lead-ingress-release.test.cjs
           node --test tools/gravicentra-i6-6-direction-preview-i66-consent-scope.test.cjs tools/gravicentra-i6-6-direction-live-legal-acceptance.test.cjs

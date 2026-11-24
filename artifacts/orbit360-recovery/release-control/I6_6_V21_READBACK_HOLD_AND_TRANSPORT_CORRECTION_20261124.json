@@ -1,0 +1,141 @@
+{
+  "schema": "GI_I66_V21_PREVIEW_READBACK_HOLD_AND_CAUSAL_TRANSPORT_CORRECTION_V1",
+  "activeGate": "I6.6",
+  "approvedByDirection": true,
+  "status": "SOURCE_LOCAL_VERIFIED_SIGNED_QA_PENDING",
+  "createdAtUtc": "2026-11-24T15:15:38.106135+00:00",
+  "build": {
+    "sourceSha": "cc2ea5deda4d84078700052655e1cb80415a1d50",
+    "buildId": "gi-i66-cc2ea5deda4d-57f234755dc1",
+    "runId": 45420930344,
+    "jobId": 138540248250,
+    "conclusion": "failure",
+    "artifactId": 14933569332,
+    "artifactDigest": "sha256:144fa3f2576066c423bbb98d705ee1e68b2650fd0915cd12cb11292d1c7b812b",
+    "innerPackageSha256": "9934a98f262866fc088c593180d661c0ded7afdd2c6b02d89ee975efd8e36ca2",
+    "previewChannel": "gi-i66-rc-45420930344",
+    "previewUrl": "https://ays-orbit-360-lab--gi-i66-rc-45420930344-yx5e4wd9.web.app",
+    "releaseEligible": false,
+    "previewAccepted": false,
+    "liveAccepted": false
+  },
+  "observedSuccessfulStages": [
+    "source_and_historical_seals",
+    "immutable_build",
+    "artifact_upload",
+    "live_before_fingerprints",
+    "isolated_hosting_preview_deploy"
+  ],
+  "failedStage": "Preview readback all artifact files and confirm both LIVE origins are untouched",
+  "failedStageStartedAtUtc": "2026-11-24T15:05:30.5130650Z",
+  "failedStageEndedAtUtc": "2026-11-24T15:07:12.0328657Z",
+  "originalHttpFailureAttribution": "UNKNOWN_ORIGINAL_HTTP_RESPONSES_AND_COMPARISON_DIAGNOSTICS_WERE_NOT_RETAINED",
+  "codeProvenDefect": "The readiness loop discarded curl stderr and failed without persisting HTTP status, observed marker hash, attempt outcomes, or which comparison failed. The fixed100-second polling window had no separate diagnostic proof.",
+  "inferenceOnly": "Duration is consistent with25 marker polls separated by4seconds; original response cannot be attributed uniquely to cache, propagation, network, or mismatch.",
+  "postFailurePhysicalReadback": {
+    "path": "artifacts/orbit360-recovery/release-control/I6_6_V21_POST_FAILURE_PUBLIC_READBACK_20261124.json",
+    "gitBlobSha": "c25522c8be1f3b8513e763db6c70ee50c508f904",
+    "matched": 224,
+    "total": 224,
+    "observedAtUtc": "2026-11-24T15:14:40Z",
+    "markerMatched": true,
+    "artifactModified": false,
+    "buildFailureOverridden": false
+  },
+  "requiredCorrection": "Retain bounded sanitized diagnostics on every outcome in the same build workflow, request uncached source-bound marker bytes, preserve exact file/LIVE comparisons and deny terminal authorization failures. Any changed executor source requires new signed source QA and a new immutable candidate; never rerun-build or patch v21.",
+  "correctionSourcePinsPending": false,
+  "businessWrites": 0,
+  "liveHostingWrites": 0,
+  "backendWrites": 0,
+  "newWorkflowOrParallelReleaseMethod": false,
+  "acceptedProductionRemains": "E3",
+  "fullI66Accepted": false,
+  "sourceBaseSha": "cc2ea5deda4d84078700052655e1cb80415a1d50",
+  "changedPins": [
+    {
+      "path": "tools/gravicentra-i6-6-preview-package-readback.cjs",
+      "priorGitBlobSha": null,
+      "gitBlobSha": "3de4214b2e0b743703ead8c89017e0030197a65d"
+    },
+    {
+      "path": "tools/gravicentra-i6-6-preview-package-readback.test.cjs",
+      "priorGitBlobSha": null,
+      "gitBlobSha": "9c038519f772c70f2277b32ff66ced1bf3fe44fc"
+    },
+    {
+      "path": ".github/workflows/gravicentra-release-delta-66-package.yml",
+      "priorGitBlobSha": "19540c5c5cab3384ec9fa819ba1685e6b55129e7",
+      "gitBlobSha": "d1fb64f150bf2182f9b65f7b04637beac61f5e30"
+    },
+    {
+      "path": ".github/workflows/gravicentra-i66-privileged-role-parity-source-qa.yml",
+      "priorGitBlobSha": "37d150c7bcfb884152409ebefe512bdab26e5df9",
+      "gitBlobSha": "9841a2959ceb66de90594d90a23e09ba87d63086"
+    },
+    {
+      "path": "tools/gravicentra-i6-6-operational-release-candidate.cjs",
+      "priorGitBlobSha": "badcc35dc58ce606371437d8b4e0fd086bbcd7dc",
+      "gitBlobSha": "bddacd2c47b46933e9b8db667247cab332ca0c92"
+    }
+  ],
+  "correction": {
+    "sameExistingWorkflow": true,
+    "noNewWorkflow": true,
+    "readinessDeadlineMs": 240000,
+    "requestTimeoutMs": 15000,
+    "markerPollMs": 4000,
+    "allManifestFilesRequired": 224,
+    "fileAttempts": 4,
+    "bytesExact": true,
+    "authFailuresTerminal": true,
+    "redirectsForbidden": true,
+    "uncachedRequestNonce": true,
+    "bothLivePredeployFingerprintsRequired": true,
+    "atomicSanitizedDiagnostic": true,
+    "diagnosticRetentionAlways": true,
+    "uploadArtifactRaw64NormalizedOnlyAtCliBoundary": true,
+    "appStartupTimeoutChanged": false
+  },
+  "localValidation": {
+    "focal": {
+      "command": "node --test --test-reporter=tap tools/gravicentra-i6-6-preview-package-readback.test.cjs",
+      "tests": 24,
+      "passed": 24,
+      "failed": 0,
+      "logSha256": "1f23148441e0185e6b6ce96a4b3f8ab47b9013ea90e28bb896eb9298d43aa39d"
+    },
+    "bindingRegression": {
+      "command": "node --test --test-reporter=tap tools/gravicentra-i6-6-preview-candidate-binding.test.cjs tools/gravicentra-i6-6-composite-preview-admission.test.cjs tools/gravicentra-i6-6-workflow-candidate-resolution.test.cjs",
+      "tests": 86,
+      "passed": 86,
+      "failed": 0,
+      "logSha256": "c59eedc63538f390cfa486afae00c2ab92fed3fce36a0ce07277a1f84b2dd79b"
+    },
+    "workflowYamlParse": true,
+    "syntaxChecks": true,
+    "diffWhitespaceCheck": true,
+    "originalHttpFailureReproduced": false,
+    "failedPriorIntegrationTest": "The existing workflow did not execute the new diagnostic owner before integration; this is not a reproduction of the original HTTP failure.",
+    "v21LocalManifestCompatibility": {
+      "paths": 224,
+      "hashesExact": 224,
+      "readOnly": true,
+      "eligibilityChanged": false
+    }
+  },
+  "preserved": {
+    "productSourceChanged": false,
+    "manifestChanged": false,
+    "manifestBlob": "941497d0b161e04b0ec3e3eee5933139f176b6f5",
+    "failedArtifactBytesUnchanged": true,
+    "priorAcceptanceUnchanged": true,
+    "newArtifactRequiresSignedSourceQaAndGuard": true,
+    "newBuildRequestVersion": 22
+  },
+  "signedSourceValidation": {
+    "status": "PENDING",
+    "sourceSha": null,
+    "sourceQaRunId": null,
+    "guardRunId": null
+  }
+}
