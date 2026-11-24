@@ -1,0 +1,62 @@
+{
+  "schema": "GI_I66_MAKE_QUEUE_EXECUTION_RECEIPT_V1",
+  "status": "success",
+  "scenarioId": 10196136,
+  "connectionId": 14756714,
+  "module": "google-cloud-firestore:createDocument",
+  "moduleId": 3,
+  "executionId": "f8a737420603407a910d9872500baa79",
+  "documentName": "projects/ays-orbit-360-lab/databases/(default)/documents/tenants/alianzas-soluciones/previewLeadIngressRequests/ttrxWV1VJ2d2jaM9WUO2",
+  "documentCreateTime": "2026-11-24T16:58:48.231Z",
+  "externalMessagesSent": 0,
+  "stage": "PROBE",
+  "phase": "preview",
+  "sourceSha": "31741e5150c5a2879dafd96351f6cce70ed05d78",
+  "artifactId": 14940808746,
+  "artifactDigest": "sha256:7770d117745170604bcdd860d7c44beea97027c869c674c6ac162d3a9160e7f4",
+  "buildRunId": 45438092615,
+  "backendPreviewRunId": 45442224026,
+  "closedConfigurationDigest": "ed2ec7177ce54a4ae52b32f6fd3a51fe9594d98df51f079ea2712debaa23206f",
+  "closedConfigurationRecordedAt": "2026-11-24T16:55:58.631Z",
+  "closedProbeDeadline": "2026-11-24T17:00:58.631Z",
+  "startedAt": "2026-11-24T16:58:47.265Z",
+  "durationMs": 4239,
+  "queueModuleFinishedAt": "2026-11-24T16:58:48.334Z",
+  "queueOnly": true,
+  "canonicalLeadAcceptanceClaim": false,
+  "authContextProven": false,
+  "authContextVerificationPending": true,
+  "nonceSha256": "0f8f342606a9149cb7140b44dea0a6d6294051dd78bfac566eb7bad57ec8ce1b",
+  "inputAndOutputNonceMatch": true,
+  "readback": {
+    "topology": [
+      3,
+      1,
+      2
+    ],
+    "scheduling": {
+      "type": "on-demand"
+    },
+    "scenarioStatus": "active",
+    "writerDisabled": true,
+    "lastEdit": "2026-11-24T16:58:55.262Z",
+    "queueModuleInvocations": 1,
+    "queueModuleErrors": 0,
+    "readerConfigurationsChangedByStage": false,
+    "originalModule2FilterPreserved": true,
+    "explicitScenarioRunRequested": true,
+    "explicitScenarioRunCallCount": 1,
+    "stageMapperRetainedWhileDisabled": true,
+    "finalStructuralRestorePending": true
+  },
+  "evidence": {
+    "moduleReadCycle": 1,
+    "cycleSelectionBasis": "scenario_execution_inspect returned no cycle fields and explicitly instructed using cycle1; returned records match exact executionId, request nonce and queue.",
+    "inputRecordError": false,
+    "outputRecordError": false,
+    "truncated": false,
+    "actualOutputDocumentVerified": true,
+    "onlyModule3PayloadRead": true,
+    "privateGreenApiMessageBodiesRead": false
+  }
+}

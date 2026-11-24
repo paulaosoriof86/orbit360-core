@@ -7495,5 +7495,24 @@
         "buildId": "gi-i66-31741e5150c5-57f234755dc1"
       }
     }
+  },
+  "makeIngressProtectedOperation": {
+    "schema": "GI_I66_MAKE_INGRESS_PROTECTED_OPERATION_V1",
+    "phase": "preview",
+    "scopeContractBlob": "7ce546736ac8d08b8ac922d19f3e6e4c2bac0021",
+    "sourceSha": "31741e5150c5a2879dafd96351f6cce70ed05d78",
+    "artifactDigest": "sha256:7770d117745170604bcdd860d7c44beea97027c869c674c6ac162d3a9160e7f4",
+    "approvedByDirection": true,
+    "externalMessagesSent": 0,
+    "action": "VERIFY_PROBE",
+    "version": 1,
+    "expectedConfigDigest": "ed2ec7177ce54a4ae52b32f6fd3a51fe9594d98df51f079ea2712debaa23206f",
+    "expiresAt": "2026-11-24T17:14:07Z",
+    "probeRequestId": "ttrxWV1VJ2d2jaM9WUO2",
+    "makeExecutionReceipt": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_6_MAKE_V23_PREVIEW_PROBE_EXECUTION_20261124.json",
+      "gitBlobSha": "d05dd26619e0ac4a2942717ea33730527f41ce3f",
+      "sha256": "0bcf1caf43e234c61f79406ae47cd8395847a83fe19418fa1245058903e19167"
+    }
   }
 }
