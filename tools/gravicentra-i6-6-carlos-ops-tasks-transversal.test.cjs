@@ -112,7 +112,8 @@ test('Workflow server advisor scope requires a signed Operativo grant; Asesor ca
  const snippet=backendSource.match(/function scope\(m,domain,activeRole,accessConfig\)[\s\S]*?(?=function collaborationWriteDirection)/);
  assert.ok(snippet,'one canonical backend workflow scope helper');
  const norm=v=>String(v||'').toLowerCase(),text=v=>String(v||'').trim();
- const advisorAllowed=new Function('norm','text','unique',snippet[0]+'\nreturn advisorAllowed;')(norm,text,v=>[...new Set([].concat(v||[]))]);
+ // Bind the private source dependency for this isolated human-membership harness.
+ const advisorAllowed=new Function('norm','text','unique','INGRESS_CAPABILITY',snippet[0]+'\nreturn advisorAllowed;')(norm,text,v=>[...new Set([].concat(v||[]))],Symbol('canonical-lead-ingress'));
  const m={advisorId:'a1',dataScopes:{default:'own'},countries:['GT']};
  assert.equal(advisorAllowed(m,'a2','ops','operativo',{roleScopes:{Operativo:'all'}}),true);
  assert.equal(advisorAllowed(m,'a2','leads','operativo',{roleScopes:{Operativo:'all'}}),true);
