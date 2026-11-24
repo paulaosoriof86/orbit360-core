@@ -2,8 +2,8 @@
   "schema": "GI_I66_PROTECTED_SOURCE_BULK_REFRESH_REQUEST_V1",
   "dateGuatemala": "2026-11-23",
   "gate": "I6.6",
-  "authority": "Dirección confirms apply identity-proven financial delta urgently, without reasking D01-D06 or owner-attested decisions",
-  "requestedExecution": "EXISTING_PROTECTED_BULK_WORKFLOW_PREFLIGHT_THEN_CAS_ONLY_IF_READY",
+  "authority": "Direcci\u00f3n confirms apply identity-proven financial delta urgently, without reasking D01-D06 or owner-attested decisions",
+  "requestedExecution": "EXISTING_WORKFLOW_READONLY_POST_COMMIT_CENSUS_302",
   "workflow": ".github/workflows/gravicentra-i66-insurer-source-bulk-protected.yml",
   "sourceManifest": "artifacts/orbit360-recovery/source-batches/I6_6_SOURCE_BULK_20261120_MULTI_302.json",
   "branch": "recovery/fase-a-clean-20260831",
@@ -17,10 +17,19 @@
   },
   "businessOwnerApprovals": "artifacts/orbit360-recovery/release-control/I6_6_DIRECCION_DECISIONES_FINANCIERAS_Y_PLAN_INTEGRAL_20261122.md and I6_6_DIRECTION_119_EXCEPTIONS_20261122.json",
   "requires": "fresh actual Firestore preimages; unique tenant country insurer policy edition and receipt; write only rows with CAS deterministic proof; no duplicate applications; postimage readback and rollback receipts; HOLD uncertain cases",
-  "mustNot": "Never infer pending as paid; no fabricated payment dates, no fabricated endorsement, no duplicate write of prior 58 obligations, 33 Cendoso payments or 110 El Roble adjustments",
-  "workflowMayApplyReadyRows": true,
+  "mustNot": "Preserve prior 58 obligations and newly committed 24; preserve original Cendoso 303+18+15, the later 2+146 paid facts, prior 110 source adjustments and six existing date corrections. No fabricated payments, no repeated writes, no full reimport.",
+  "workflowMayApplyReadyRows": false,
   "writingAuthorizedOnlyAfterExistingProtectedGate": true,
   "customerWritesClaimedByThisReceipt": 0,
   "sourceQaNotLiveProof": true,
-  "scope": "No new iteration, repo, Firebase, branch, rules, Auth, or general ledger reimport"
+  "scope": "No new iteration, repo, Firebase, branch, rules, Auth, or general ledger reimport",
+  "protectedWritesApprovedForThisRefresh": false,
+  "requestedAtUtc": "2026-11-24T05:18:55.042808+00:00",
+  "afterCommercialReadbackRuns": [
+    45330498452,
+    45330498425
+  ],
+  "previousRequestGitBlobSha": "a495d9815ad84f050f7cfd82f9454ec20a78b830",
+  "effectiveWriteBoundary": "The existing workflow reads marker and source manifest, not the fields in this JSON. This refresh requests preflight only; any unexpected eligible writes require a separate reviewed protected-environment approval, which is not authorized by this refresh.",
+  "priorIndependentReadbackScope": "Historical snapshot before later writes; must not be reported as current. Fresh census output is required."
 }
