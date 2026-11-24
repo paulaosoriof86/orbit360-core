@@ -105,3 +105,71 @@ assert.ok(src.includes('periodoInicioFuente:oldPlan.periodStart'));
 assert.ok(src.includes('receiptDue(rr.data())!==oldPlan.due'));
 assert.ok(!src.includes('forceReconciliation:true'));
 console.log('I66_CENDOSO_PROTECTED_PAID_UNIT_PASS 607_SOURCE 574_GTQ_NO_SOURCE_HOLD 12_GUARDS');
+
+// Causal reader regression: the same exact policy and receipt are invisible
+// through numero alone when an approved persisted alias owns the number.
+// No policy is rewritten, and a conflicting alias never becomes eligible.
+const {readGroups,policyIdentityNumber,heldPolicyDiagnostics}=require('./gravicentra-i66-cendoso-paid-protected.cjs');
+function fakeReader(records){
+  const calls=[];
+  const doc=(id,data)=>({id,exists:data!=null,data:()=>data});
+  const at=parts=>({
+    collection(name){return at([...parts,name]);},
+    doc(id){return at([...parts,id]);},
+    where(field,operator,value){
+      assert.equal(operator,'==');const name=parts[3];
+      return {limit(max){return {async get(){
+        calls.push({name,field,value,max});
+        const docs=Object.entries(records[name]||{}).filter(([,r])=>r[field]===value).slice(0,max).map(([id,r])=>doc(id,r));
+        return {size:docs.length,docs};
+      }}}};
+    },
+    async get(){return doc(parts[parts.length-1],records[parts[3]]?.[parts[parts.length-1]]);}
+  });
+  return {db:at([]),calls};
+}
+(async()=>{
+  const aliasPolicy={...group.policy,numeroPoliza:'91-169567',polizaNumero:'91-0169567',aseguradoraId:'ins1'};
+  delete aliasPolicy.numero;
+  const records={polizas:{p1:aliasPolicy},clientes:{cli1:{nombre:'PRIVATE_CUSTOMER',email:'PRIVATE_EMAIL'}},
+    aseguradoras:{ins1:{nombre:'Seguros El Roble',activo:true}},
+    recibosEsperados:{r1:receipt},carteraPrimas:{c1:cartera},cobros:{}};
+  const before=JSON.stringify(records),reader=fakeReader(records);
+  const oldLookup=await reader.db.collection('tenants').doc('alianzas-soluciones').collection('data')
+    .doc('polizas').collection('items').where('numero','==','91-169567').limit(16).get();
+  assert.equal(oldLookup.size,0,'original single-field lookup reproduces missing policy');
+  const actual=await readGroups(reader.db,{candidates:[raw]});
+  assert.equal(actual.length,1,'alias queries deduplicate the same physical policy');
+  assert.equal(actual[0].policy.numero,undefined,'no persisted canonical field is invented');
+  assert.equal(planBatch({candidates:[raw]},actual).readyCount,1);
+  assert.deepEqual([...new Set(reader.calls.filter(x=>x.name==='polizas').map(x=>x.field))].sort(),
+    ['numero','numeroPoliza','polizaNumero'].sort());
+  assert.equal(JSON.stringify(records),before,'bounded readback cannot mutate records');
+  const conflict={...actual[0],policy:{...actual[0].policy,polizaNumero:'91-169568'}};
+  assert.equal(policyIdentityNumber(conflict.policy),'');
+  assert.equal(planBatch({candidates:[raw]},[conflict]).holdCounts.POLICY_NUMBER_FIELDS_CONFLICT,1);
+  const productConflict={...labeledGroup,policy:{...labeledGroup.policy,
+    numero:'39012',numeroPoliza:'AUTO - 39012',polizaNumero:'TECD - 39012'}};
+  assert.equal(policyIdentityNumber(productConflict.policy),'',
+    'a bare canonical number cannot bridge two conflicting product labels');
+  assert.equal(planBatch({candidates:[labeled]},[productConflict]).holdCounts.POLICY_NUMBER_FIELDS_CONFLICT,1);
+  assert.equal(policyIdentityNumber({...productConflict.policy,polizaNumero:'AUTO 39012'}),'39012',
+    'consistent persisted product aliases remain eligible');
+  const wrongEdition={...actual[0],policy:{...actual[0].policy,vigenciaInicio:'2026-08-05'}};
+  assert.equal(planBatch({candidates:[raw]},[wrongEdition]).holdCounts.EXACT_POLICY_EDITION_NOT_FOUND,1);
+  const otherInsurer={...actual[0],insurerName:'Universales'};
+  assert.equal(planBatch({candidates:[raw]},[otherInsurer]).holdCounts.EXACT_POLICY_EDITION_NOT_FOUND,1);
+  const rival={...actual[0],policy:{...actual[0].policy,id:'p2'}};
+  assert.equal(planBatch({candidates:[raw]},[actual[0],rival]).holdCounts.MULTIPLE_POLICY_EDITIONS,1);
+  const paidGroup={...actual[0],cobros:[{id:'existing',reciboId:'r1',estado:'Pagado'}]};
+  assert.equal(planBatch({candidates:[raw]},[paidGroup]).holdCounts.ALREADY_PAID_WITH_COBRO_PRESERVE,1);
+  const missing={...actual[0],receipts:[]};
+  const missingPlan=planBatch({candidates:[raw]},[missing]);
+  const diagnosed=heldPolicyDiagnostics({candidates:[raw]},[missing],missingPlan.holds);
+  assert.equal(diagnosed.length,1);assert.equal(diagnosed[0].editions[0].receiptCount,0);
+  assert.equal(diagnosed[0].sourceRows[0].reason,'RECEIPT_PERIOD_OR_DUE_NOT_FOUND');
+  assert.ok(!JSON.stringify(diagnosed).includes('PRIVATE_'),'diagnostic contains no customer fields');
+  assert.deepEqual(heldPolicyDiagnostics({candidates:[raw]},[paidGroup],
+    planBatch({candidates:[raw]},[paidGroup]).holds),[],'already-paid history is not reopened');
+  console.log('I66_CENDOSO_ALIAS_READER_CAUSAL_PASS OLD_ZERO_NEW_ONE_CONFLICT_HOLD_NO_WRITES');
+})().catch(error=>{console.error(error);process.exitCode=1;});

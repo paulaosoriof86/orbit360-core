@@ -1,0 +1,45 @@
+{
+  "schema": "GI_I66_CENDOSO_ALIAS_LOOKUP_CAUSAL_CORRECTION_V1",
+  "gate": "I6.6",
+  "dateGuatemala": "2026-11-23",
+  "userRequest": "Continue the authorized financial batches at scale; preserve prior applied payments and source decisions.",
+  "scope": "Existing Cendoso607 protected writer; bounded complete policy lookup only; no new payment authority or reconciliation.",
+  "source": {
+    "path": "artifacts/orbit360-recovery/source-batches/I6_6_SOURCE_CENDOSO_PAID_CANDIDATES_2026.json.gz",
+    "sha256": "649fa315a90b176b794abf6eef3d9f893d47de64cfe558d203a099c408692aa0",
+    "distinct": 607,
+    "sourceEligibleAllCurrencies": 603,
+    "GTQWithoutSourceHold": 574
+  },
+  "cause": "The paid-source reader queried numero only; approved records also persist numeroPoliza or polizaNumero. Missing lookup must not be mistaken for absent policy.",
+  "fix": "Query all three exact fields with bounded results, de-duplicate physical documents, require pairwise-compatible persisted number aliases, and retain exact insurer/edition/country/currency/receipt/date/CAS/idempotency guards.",
+  "validation": {
+    "localSourceTests": "PASS",
+    "causalOldReaderMatches": 0,
+    "causalFixedReaderMatches": 1,
+    "pairwiseBareAutoTecdConflict": "HOLD",
+    "duplicateSourceReceipt": "HOLD",
+    "previousPayments": "PRESERVE",
+    "independentReview": "PASS"
+  },
+  "files": [
+    {
+      "path": "tools/gravicentra-i66-cendoso-paid-protected.cjs",
+      "gitBlobSha": "39731556be5b02a6279f3af167a31b8399968427"
+    },
+    {
+      "path": "tools/gravicentra-i66-cendoso-paid-protected.test.cjs",
+      "gitBlobSha": "bac94c0b5d0eca92636ac72de4f1fcb887c7a75f"
+    }
+  ],
+  "execution": {
+    "requested": "I66_CENDOSO_PAID_BATCH_READY",
+    "preflightWrites": 0,
+    "liveApply": "Only eligible deterministic deltas in the existing gravicentra-live-data-writes environment after current before-image recheck.",
+    "liveWritesClaimed": 0,
+    "readyCount": "PENDING_FRESH_PREFLIGHT"
+  },
+  "noFrontendDeployment": true,
+  "noRebuildOfAcceptedE3": true,
+  "fullI66Accepted": false
+}

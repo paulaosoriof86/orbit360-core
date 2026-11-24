@@ -43,6 +43,21 @@ function policyLookupVariants(value){
   if(/^91-0+(\d+)$/.test(canonical))variants.add('91-'+canonical.split('-')[1].replace(/^0+/,''));
   return [...variants];
 }
+// The approved policy contract has three persisted number fields. Read all
+// three without changing the document or treating a conflicting alias as an
+// alternate policy. A suffix remains part of the renewal identity.
+const policyNumberFields=['numero','numeroPoliza','polizaNumero'];
+function policyIdentityNumber(policy){
+  const values=policyNumberFields.map(field=>str(policy?.[field])).filter(Boolean);
+  if(!values.length)return '';
+  // Compatibility is not transitive: a bare number can match either product
+  // label, but AUTO and TECD must never become the same policy via that bare
+  // number. Check every pair rather than only the first persisted field.
+  for(let i=0;i<values.length;i++)for(let j=i+1;j<values.length;j++){
+    if(!policyMatches(values[i],values[j])&&!policyMatches(values[j],values[i]))return '';
+  }
+  return values[0];
+}
 const item=(db,col)=>db.collection('tenants').doc(TENANT).collection('data').doc(col).collection('items');
 const request=(db,id)=>db.collection('tenants').doc(TENANT).collection('operationalRequests').doc(id);
 const aliases=['monto','montoTotal'];
@@ -99,7 +114,10 @@ function assess(row,groups){
   if(row.hold.length)return {code:'CONFLICTING_SOURCE_DATES'};
   if(row.currency!=='GTQ')return {code:'SOURCE_CURRENCY_NOT_GTQ'};
   if(row.paid<'2026-01-01'||row.paid>'2026-12-31')return {code:'SOURCE_DATE_OUT_OF_SCOPE'};
-  const possible=(groups||[]).filter(g=>policyMatches(row.policy,g.policy.numero));
+  const conflicts=(groups||[]).filter(g=>!policyIdentityNumber(g.policy)&&
+    policyNumberFields.some(field=>policyMatches(row.policy,g.policy[field])));
+  if(conflicts.length)return {code:'POLICY_NUMBER_FIELDS_CONFLICT'};
+  const possible=(groups||[]).filter(g=>policyMatches(row.policy,policyIdentityNumber(g.policy)));
   if(!possible.length)return {code:'POLICY_NUMBER_NOT_FOUND'};
   const editions=possible.filter(g=>date(g.policy.vigenciaInicio)===row.coverageStart&&
     date(g.policy.vigenciaFin)===row.coverageEnd&&policyCountry(g.policy)==='GT'&&
@@ -187,9 +205,11 @@ async function readGroups(db,source){
   for(let i=0;i<numbers.length;i+=8){
     const next=await Promise.all(numbers.slice(i,i+8).map(async number=>{
       const variants=policyLookupVariants(number);
-      const found=await Promise.all(variants.map(n=>item(db,'polizas').where('numero','==',n).limit(16).get()));
+      const found=await Promise.all(variants.flatMap(n=>policyNumberFields.map(field=>
+        item(db,'polizas').where(field,'==',n).limit(16).get())));
       assert.ok(found.every(s=>s.size<16),'I66_PAID_UNBOUNDED_POLICY_EDITIONS');
       const policies=[...new Map(found.flatMap(s=>s.docs).map(d=>[d.id,d])).values()];
+      assert.ok(policies.length<16,'I66_PAID_UNBOUNDED_UNIQUE_POLICY_EDITIONS');
       const out=[];
       for(const doc of policies){
         const p={...doc.data(),id:doc.id};
@@ -217,7 +237,9 @@ async function readGroups(db,source){
 }
 function planBatch(source,groups){
   const by=new Map();for(const g of groups){
-    for(const key of policyLookupVariants(g.policy.numero)){
+    // Conflicting aliases remain discoverable so assess can isolate the row
+    // explicitly; they never become an eligible payment through a first match.
+    for(const key of [...new Set(policyNumberFields.flatMap(field=>policyLookupVariants(g.policy[field])))].filter(Boolean)){
       const canonical=canonicalPolicyNumber(key);
       if(!by.has(canonical))by.set(canonical,[]);
       by.get(canonical).push(g);
@@ -242,6 +264,38 @@ function planBatch(source,groups){
     status:'READONLY_PREFLIGHT_NO_WRITES',writes:0,inputCount:source.candidates.length,
     readyCount:ready.length,holdsCount:holds.length,holdCounts:counts,ready,
     holds,createdAt:new Date().toISOString()};
+}
+// Private read-only evidence for the next deterministic delta. Expose no
+// customer names, contacts, credentials or unrelated records, and never derive
+// eligibility from these explanations. The protected plan remains assess().
+function heldPolicyDiagnostics(source,groups,holds){
+  const inspect=new Set(['POLICY_NUMBER_NOT_FOUND','EXACT_POLICY_EDITION_NOT_FOUND',
+    'POLICY_NUMBER_FIELDS_CONFLICT','RECEIPT_PERIOD_OR_DUE_NOT_FOUND',
+    'MULTIPLE_POLICY_EDITIONS','MULTIPLE_RECEIPTS_FOR_PERIOD_OR_AMOUNT',
+    'NET_PREMIUM_CHANGED_REQUIRES_COMMISSION_RECOMPUTE']);
+  const reasons=new Map(holds.filter(h=>inspect.has(h.reason)).map(h=>[h.sourceId,h.reason]));
+  const byPolicy=new Map();
+  for(const raw of source.candidates){
+    if(!reasons.has(raw.candidateId))continue;
+    const row=sourceRow(raw),key=[row.insurer,row.policy,row.coverageStart,row.coverageEnd].join('|');
+    if(!byPolicy.has(key))byPolicy.set(key,{sourcePolicy:row.policy,sourceInsurer:row.insurer,
+      sourceTerm:[row.coverageStart,row.coverageEnd],sourceRows:[],editions:groups.filter(g=>
+        policyNumberFields.some(f=>policyMatches(row.policy,g.policy[f]))).map(g=>({
+        policyId:g.policy.id,policyNumbers:Object.fromEntries(policyNumberFields.filter(f=>str(g.policy[f])).map(f=>[f,str(g.policy[f])])),
+        numberFieldsConflict:!policyIdentityNumber(g.policy),country:policyCountry(g.policy),
+        currency:norm(g.policy.moneda),term:[date(g.policy.vigenciaInicio),date(g.policy.vigenciaFin)],
+        frequency:str(g.policy.frecuencia),clientExists:g.clientExists===true,
+        insurerVerified:g.insurerVerified===true,insurerMatches:insurerMatches(row.insurer,g.insurerName),
+        receiptCount:g.receipts.length,portfolioCount:g.portfolio.length,cobroCount:g.cobros.length,
+        receipts:g.receipts.map(r=>({...receiptIdentity(r),
+          sequence:r.secuencia??null,installment:r.numeroCuota??null,quota:str(r.cuota),
+          portfolioLinks:g.portfolio.filter(c=>str(c.reciboId)===str(r.id)).length,
+          cobroLinks:g.cobros.filter(c=>str(c.reciboId)===str(r.id)).length}))
+      }))});
+    byPolicy.get(key).sourceRows.push({sourceId:row.id,reason:reasons.get(row.id),
+      periodStart:row.periodStart,due:row.due,paid:row.paid,grossCents:row.total,netCents:row.net});
+  }
+  return [...byPolicy.values()];
 }
 const cobroId=receiptId=>'cob_'+sha(`${TENANT}|receipt|${receiptId}`).slice(0,28);
 const auditId=sourceId=>'gi_i66_cendoso_paid_'+sha(`${TENANT}|${SOURCE_SHA}|${sourceId}`).slice(0,30);
@@ -269,7 +323,7 @@ async function applyOne(db,oldPlan,source){
       c=cs.exists?{...cs.data(),id:cs.id}:{id:cRef.id,polizaId:ps.id,reciboId:rs.id},
       p={...ps.data(),id:ps.id};
     if(str(r.polizaId)!==p.id||str(c.polizaId||c.policyId)!==p.id||
-      !policyMatches(oldPlan.policyNumber,p.numero)||
+      !policyMatches(oldPlan.policyNumber,policyIdentityNumber(p))||
       date(p.vigenciaInicio)!==sourceRow(row).coverageStart||date(p.vigenciaFin)!==sourceRow(row).coverageEnd||
       policyCountry(p)!=='GT'||norm(p.moneda)!=='GTQ'||
       (!oldPlan.backfill&&(isPaid(r)||isPaid(c)))||
@@ -425,6 +479,7 @@ async function main(){
     report('GI_I66_CENDOSO_REPORT_OUT',{status:'READONLY_PREFLIGHT_NO_WRITES',
       sourceSha256:SOURCE_SHA,inputCount:p.inputCount,readyCount:p.readyCount,
       holdsCount:p.holdsCount,holdCounts:p.holdCounts,
+      privatePolicyDiagnostics:heldPolicyDiagnostics(source,groups,p.holds),
       holdExamples:p.holds.slice(0,55),writes:0});
     console.log('I66_CENDOSO_PREFLIGHT input='+p.inputCount+' ready='+p.readyCount+
       ' holds='+p.holdsCount+' reasons='+JSON.stringify(p.holdCounts)+' ZERO_WRITES');return;
@@ -459,4 +514,4 @@ async function main(){
 }
 if(require.main===module)main().catch(e=>{console.error('I66_CENDOSO_HOLD '+e.message);process.exitCode=1;});
 module.exports={sourceRow,assess,planBatch,loadSource,receiptIdentity,insurerMatches,
-  policyMatches,policyLookupVariants};
+  policyMatches,policyLookupVariants,policyIdentityNumber,readGroups,heldPolicyDiagnostics};
