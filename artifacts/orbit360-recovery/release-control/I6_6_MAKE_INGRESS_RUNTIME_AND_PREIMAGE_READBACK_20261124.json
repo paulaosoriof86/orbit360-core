@@ -1,0 +1,95 @@
+{
+  "schema": "GI_I66_MAKE_INGRESS_RUNTIME_AND_PREIMAGE_READBACK_V1",
+  "status": "READONLY_RUNTIME_READY_AND_ABSENT_PREIMAGES_CONFIRMED",
+  "sourceSha": "f21597f2c472d0bbc7dab11ed11d6939824782db",
+  "runId": 45370280964,
+  "jobId": 138362497190,
+  "jobConclusion": "success",
+  "workflowPath": ".github/workflows/gravicentra-i66-greenapi-metadata-readonly.yml",
+  "logEvidence": {
+    "observedAtUtc": "2026-11-24T09:59:01.1780805Z",
+    "redactedPayloadReconstructed": false,
+    "excerptSha256": "de910459fe7dbd9992fae9278ffe2d18e5c7ff7fe4bae228450e0e54b9c9df75",
+    "eventarcReportDigest": "9a38ad98878465f9d51836d2b9c518a477b575344d094c87c1f0526b3041d65f",
+    "preimagesReportDigest": "03066f345f44da40d839170085de9886ab5d74c85ca3fc084b2884a82ff841b1",
+    "scalarObservationsTranscribedFromVisibleFields": true
+  },
+  "eventarc": {
+    "status": "EVENTARC_RUNTIME_AND_PROJECT_IAM_READY",
+    "canonicalRuntime": "646761409743-compute@developer.gserviceaccount.com",
+    "runtimeImpersonationVerified": true,
+    "runtimeEventarcPermissionsVerified": true,
+    "cliWouldAddProjectBindings": false,
+    "projectPolicyDigest": "2c928d027f3632fc4e9fa2f591127952590746b2f02a588015a0fed97dc0590f",
+    "permissions": [
+      {
+        "permission": "eventarc.events.receiveEvent",
+        "resource": "projects/ays-orbit-360-lab",
+        "granted": true
+      },
+      {
+        "permission": "run.routes.invoke",
+        "resource": "projects/ays-orbit-360-lab/locations/us-central1/services/orbit360opsleadscommand",
+        "granted": true
+      },
+      {
+        "permission": "run.routes.invoke",
+        "resource": "projects/ays-orbit-360-lab/locations/us-east1/services/orbit360opsleadscommandpreview",
+        "granted": true
+      }
+    ]
+  },
+  "preimages": {
+    "status": "PREIMAGES_CONFIRMED_FOR_CLOSED_INITIALIZATION",
+    "closedConfiguration": {
+      "preview": {
+        "path": "tenants/alianzas-soluciones/config/makeLeadIngressPreview",
+        "readVerified": true,
+        "exists": false,
+        "expectedDigest": "ABSENT"
+      },
+      "live": {
+        "path": "tenants/alianzas-soluciones/config/makeLeadIngress",
+        "readVerified": true,
+        "exists": false,
+        "expectedDigest": "ABSENT"
+      }
+    },
+    "targetBefore": {
+      "preview": {
+        "name": "orbit360MakeLeadIngressPreview",
+        "region": "us-east1",
+        "state": "ABSENT",
+        "revision": null,
+        "readVerified": true,
+        "httpStatus": 404
+      },
+      "live": {
+        "name": "orbit360MakeLeadIngress",
+        "region": "us-central1",
+        "state": "ABSENT",
+        "revision": null,
+        "readVerified": true,
+        "httpStatus": 404
+      }
+    }
+  },
+  "queueRules": {
+    "sourcePath": "firestore.rules",
+    "sourceBlob": "35fba451bbbeb97dbae3f08303b786ddbcbdd29f"
+  },
+  "runtimeAccess": {
+    "status": "EXACT_SECRET_IAM_DELTA_REQUIRED",
+    "reportDigest": "696fe4e0f3122bed2d32520ab2697f78bab39a2ff74d2db4d15813f01af3d47a",
+    "firestoreCapabilitiesVerified": true,
+    "exactSecretIamDeltaDeferredToProtectedLiveExecutor": true
+  },
+  "firestoreReads": 2,
+  "functionReads": 2,
+  "firestoreWrites": 0,
+  "functionWrites": 0,
+  "projectIamWrites": 0,
+  "secretIamWrites": 0,
+  "externalMessagesSent": 0,
+  "noReleaseAcceptanceClaim": true
+}

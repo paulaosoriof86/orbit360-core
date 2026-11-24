@@ -56,16 +56,16 @@
       "artifactDigest": "sha256:7cb782848a45083047c4899bc30c13bf5be46429607e42597d09342becfc9acc",
       "hostingVersion": "sites/ays-orbit-360-lab/versions/332999a55b189108"
     },
-    "evidencePath": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_EXECUTION_PROGRESS_20261124_R30.json",
-    "evidenceGitBlobSha": "3e96a53e146c4338d0d5712d9414cbe874a6f8f2",
+    "evidencePath": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_EXECUTION_PROGRESS_20261124_R31.json",
+    "evidenceGitBlobSha": "5b06e8bf68bc5af478e07172cb73a887bc852fd8",
     "activeGate": "I6.6",
-    "currentWork": "I6.6: conservar E3 vigente y los dos rollbacks E4/E5. Preservar 155 pagos históricos DIRECT por Q78806.43 pendientes de aplicación y 36 obligaciones documentadas por Q10017.66. Corregir el transporte del owner con evidencia causal, componer saldo + Make + lectura A14 en un nuevo artifact y exigir la aceptación firmada correspondiente. Continuar fuentes financieras nuevas mediante el motor canónico y correo por usuario con deduplicación y permisos; ningún nuevo PASS global se declara.",
-    "nextAction": "I6.6: conservar E3 vigente y los dos rollbacks E4/E5. Preservar 155 pagos históricos DIRECT por Q78806.43 pendientes de aplicación y 36 obligaciones documentadas por Q10017.66. Corregir el transporte del owner con evidencia causal, componer saldo + Make + lectura A14 en un nuevo artifact y exigir la aceptación firmada correspondiente. Continuar fuentes financieras nuevas mediante el motor canónico y correo por usuario con deduplicación y permisos; ningún nuevo PASS global se declara.",
+    "currentWork": "I6.6: construir v18 una sola vez con fuente y QA firmadas; verificar el mismo artifact en Preview y LIVE, incluido saldo de seis recibos y contrato compuesto de cinco funciones con ingreso Make cerrado. Conservar E3 vigente hasta aceptación completa, los dos rollbacks E4/E5, los 155 pagos DIRECT registrados por Q78806.43 pendientes de aplicación y las 46 obligaciones documentadas nuevas por Q17908.06 (104 en el alcance auditado). Continuar correos por usuario y trazabilidad sin duplicar recepciones ni actividad canónica; no se declara aceptación global.",
+    "nextAction": "I6.6: construir v18 una sola vez con fuente y QA firmadas; verificar el mismo artifact en Preview y LIVE, incluido saldo de seis recibos y contrato compuesto de cinco funciones con ingreso Make cerrado. Conservar E3 vigente hasta aceptación completa, los dos rollbacks E4/E5, los 155 pagos DIRECT registrados por Q78806.43 pendientes de aplicación y las 46 obligaciones documentadas nuevas por Q17908.06 (104 en el alcance auditado). Continuar correos por usuario y trazabilidad sin duplicar recepciones ni actividad canónica; no se declara aceptación global.",
     "frontendPreviewRequest": {
-      "version": 17,
-      "sourceQaHead": "f0a0d8743cec6adfbcf19637e25200b66c01d4a8",
-      "sourceQaRunId": 45350431726,
-      "guardRunId": 45350431847
+      "version": 18,
+      "sourceQaHead": "d05a2cc82207773da6c8f9306fe8a91ca26cfd81",
+      "sourceQaRunId": 45372224633,
+      "guardRunId": 45372224612
     }
   },
   "iterationProgressAuthority": "CONTROL_PLANE.json#gateState: I0-I5 certified in earlier release epoch; I6.6 active for current successor. Timestamped iterationN evidence snapshots remain immutable historical observations.",
@@ -564,7 +564,7 @@
     "phaseAIterationStatuses": "HISTORICAL_FIELDS_ABOVE_PRESERVED_UNTIL_FORMAL_GATE_EVIDENCE;_NO_NEW_PASS_INFERRED",
     "labDataWriteScope": "ONLY_35_AUTHORIZED_COUNTRY_FIELDS;_NO_AUGUST_REFRESH"
   },
-  "nextAction": "I6.6: conservar E3 vigente y los dos rollbacks E4/E5. Preservar 155 pagos históricos DIRECT por Q78806.43 pendientes de aplicación y 36 obligaciones documentadas por Q10017.66. Corregir el transporte del owner con evidencia causal, componer saldo + Make + lectura A14 en un nuevo artifact y exigir la aceptación firmada correspondiente. Continuar fuentes financieras nuevas mediante el motor canónico y correo por usuario con deduplicación y permisos; ningún nuevo PASS global se declara.",
+  "nextAction": "I6.6: construir v18 una sola vez con fuente y QA firmadas; verificar el mismo artifact en Preview y LIVE, incluido saldo de seis recibos y contrato compuesto de cinco funciones con ingreso Make cerrado. Conservar E3 vigente hasta aceptación completa, los dos rollbacks E4/E5, los 155 pagos DIRECT registrados por Q78806.43 pendientes de aplicación y las 46 obligaciones documentadas nuevas por Q17908.06 (104 en el alcance auditado). Continuar correos por usuario y trazabilidad sin duplicar recepciones ni actividad canónica; no se declara aceptación global.",
   "sourceOfTruth": {
     "projectBoundaryPrevalentAddendum": "orbit360-platform/docs/recovery/ADDENDUM_PREVALENTE_CHATGPT_PROJECT_BOUNDARY_20260831.md",
     "mutableState": "orbit360-platform/docs/recovery/orbit360-recovery-state-v1.json",
@@ -4304,6 +4304,37 @@
         },
         "evidencePath": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_EXECUTION_PROGRESS_20261124_R30.json",
         "evidenceGitBlobSha": "fbf2c4ad048d207985f5358a98ab21d2b7640137",
+        "activeGate": "I6.6",
+        "currentWork": "I6.6: conservar E3 vigente y los dos rollbacks E4/E5. Preservar 155 pagos históricos DIRECT por Q78806.43 pendientes de aplicación y 36 obligaciones documentadas por Q10017.66. Corregir el transporte del owner con evidencia causal, componer saldo + Make + lectura A14 en un nuevo artifact y exigir la aceptación firmada correspondiente. Continuar fuentes financieras nuevas mediante el motor canónico y correo por usuario con deduplicación y permisos; ningún nuevo PASS global se declara.",
+        "nextAction": "I6.6: conservar E3 vigente y los dos rollbacks E4/E5. Preservar 155 pagos históricos DIRECT por Q78806.43 pendientes de aplicación y 36 obligaciones documentadas por Q10017.66. Corregir el transporte del owner con evidencia causal, componer saldo + Make + lectura A14 en un nuevo artifact y exigir la aceptación firmada correspondiente. Continuar fuentes financieras nuevas mediante el motor canónico y correo por usuario con deduplicación y permisos; ningún nuevo PASS global se declara.",
+        "frontendPreviewRequest": {
+          "version": 17,
+          "sourceQaHead": "f0a0d8743cec6adfbcf19637e25200b66c01d4a8",
+          "sourceQaRunId": 45350431726,
+          "guardRunId": 45350431847
+        }
+      }
+    },
+    {
+      "reason": "ACTIVE_OWNER_PLAN_SUMMARY_SUPERSEDED",
+      "priorGitBlobSha": "c815e8b4fb7807ff51572871e3c719dfdea9eed1",
+      "supersededByGeneration": 3,
+      "prior": {
+        "schema": "GI_I66_ACTIVE_OWNER_PLAN_CONTINUATION_V1",
+        "authorityPointer": "artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json#i66OperationalContinuation20261115",
+        "generation": 3,
+        "latestProvenLiveSource": "65c825b2808a615ca4195bdde6689dbdbe3193b2",
+        "latestPhysicalFrontendLiveReceipt": "artifacts/orbit360-recovery/release-control/I6_6_FRONTEND_E00003_RECEIPT.json",
+        "currentPhysicalFrontend": {
+          "generation": 3,
+          "sourceSha": "65c825b2808a615ca4195bdde6689dbdbe3193b2",
+          "buildId": "gi-i66-65c825b2808a-57f234755dc1",
+          "artifactId": 14873426438,
+          "artifactDigest": "sha256:7cb782848a45083047c4899bc30c13bf5be46429607e42597d09342becfc9acc",
+          "hostingVersion": "sites/ays-orbit-360-lab/versions/332999a55b189108"
+        },
+        "evidencePath": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_EXECUTION_PROGRESS_20261124_R30.json",
+        "evidenceGitBlobSha": "3e96a53e146c4338d0d5712d9414cbe874a6f8f2",
         "activeGate": "I6.6",
         "currentWork": "I6.6: conservar E3 vigente y los dos rollbacks E4/E5. Preservar 155 pagos históricos DIRECT por Q78806.43 pendientes de aplicación y 36 obligaciones documentadas por Q10017.66. Corregir el transporte del owner con evidencia causal, componer saldo + Make + lectura A14 en un nuevo artifact y exigir la aceptación firmada correspondiente. Continuar fuentes financieras nuevas mediante el motor canónico y correo por usuario con deduplicación y permisos; ningún nuevo PASS global se declara.",
         "nextAction": "I6.6: conservar E3 vigente y los dos rollbacks E4/E5. Preservar 155 pagos históricos DIRECT por Q78806.43 pendientes de aplicación y 36 obligaciones documentadas por Q10017.66. Corregir el transporte del owner con evidencia causal, componer saldo + Make + lectura A14 en un nuevo artifact y exigir la aceptación firmada correspondiente. Continuar fuentes financieras nuevas mediante el motor canónico y correo por usuario con deduplicación y permisos; ningún nuevo PASS global se declara.",

@@ -1,0 +1,77 @@
+{
+  "schema": "GI_I66_MAKE_DISABLED_QUEUE_MODULE_READBACK_V1",
+  "status": "QUEUE_MODULE_PREPARED_DISABLED_NOT_EXECUTED",
+  "scenarioId": 10196136,
+  "moduleId": 3,
+  "module": "google-cloud-firestore:createDocument",
+  "version": 1,
+  "connectionId": 14756714,
+  "sourceHelperCommit": "f21597f2c472d0bbc7dab11ed11d6939824782db",
+  "sourceHelperBlobs": {
+    "tools/gravicentra-i66-make-lead-ingress-scenario.cjs": "438a3e514a10a3876afb565c18c3ba6d4e75f221",
+    "tools/gravicentra-i66-make-lead-ingress-config.cjs": "cc3c46b4d5097da8172711d6ad5daa00c5027155",
+    "tools/gravicentra-i66-make-lead-protected-executor.cjs": "64ebca22b1ae8b91e4e5ede7e69f6cfad363bd5b"
+  },
+  "beforeLastEdit": "2026-11-23T19:54:17.962Z",
+  "afterLastEdit": "2026-11-24T10:03:48.804Z",
+  "changes": [
+    {
+      "operation": "module_add",
+      "requestedDisabled": true,
+      "firstReadbackDisabledFlagAbsent": true,
+      "lastEdit": "2026-11-24T10:03:11.306Z"
+    },
+    {
+      "operation": "module_disabled_set",
+      "disabled": true,
+      "lastEdit": "2026-11-24T10:03:48.804Z",
+      "readbackDisabled": true
+    }
+  ],
+  "scope": {
+    "phase": "preview",
+    "queuePath": "projects/ays-orbit-360-lab/databases/(default)/documents/tenants/alianzas-soluciones/previewLeadIngressRequests",
+    "probeSchema": "GI_I66_MAKE_LEAD_PRINCIPAL_PROBE_V1",
+    "nonceSha256": "d147bb86451e0b301fe4ca55854faf48f41ff46b3ec80e0be6489b1b34d209c6",
+    "configurationSha256": "3e9d0962c9f82c75ecd5f6c05c779e2dfcc7a277a8fb5745cd42a6901b937e42"
+  },
+  "preserved": {
+    "readerIds": [
+      1,
+      2
+    ],
+    "readerConfigurationsExact": true,
+    "readerWiringAndFilterExact": true,
+    "triggerExact": true,
+    "scheduling": {
+      "type": "indefinitely",
+      "interval": 300
+    },
+    "readerConnectionId": 14749710,
+    "scenarioStatus": "active"
+  },
+  "historyEvidence": {
+    "windowFrom": "2026-11-24T10:03:00Z",
+    "windowTo": "2026-11-24T10:04:00Z",
+    "addedAt": "2026-11-24T10:03:11.306Z",
+    "disabledAt": "2026-11-24T10:03:48.804Z",
+    "nextScheduledExecutionAfterDisable": "2026-11-24T10:04:53.226Z",
+    "independentListReads": 2,
+    "executionsObserved": 0,
+    "queueCreatesObservedInScenarioHistory": 0,
+    "noExecutionWasRequested": true,
+    "globalFirestoreAbsenceInferred": false
+  },
+  "makeConfigurationSaves": 2,
+  "scenarioActivationChanges": 0,
+  "realLeadActivation": false,
+  "externalMessagesSent": 0,
+  "nextGate": "WAIT_SOURCE_QA_IMMUTABLE_BUILD_AND_PROTECTED_PREVIEW_CLOSED_BEFORE_ENABLING_PROBE",
+  "futureNewModuleRequirement": "ADD_ORPHAN_THEN_ATOMIC_DISABLED_SET_AND_MOVE_WITH_RETURNED_ID",
+  "backups": {
+    "beforeFile": "make-10196136-backup-prepreview.json",
+    "structureAfterFile": "make-disabled-probe-readback.json",
+    "completeConfigFile": "make-disabled-probe-complete-configs.json",
+    "nonceSource": "make-ingress-scope-f21597f.json"
+  }
+}
