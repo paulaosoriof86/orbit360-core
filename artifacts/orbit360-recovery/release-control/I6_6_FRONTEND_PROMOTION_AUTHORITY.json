@@ -1,6 +1,6 @@
 {
   "schema": "GI_I66_FRONTEND_AUTHORITY_V1",
-  "status": "DIRECTION_AUTHORIZED_EXACT_PREVIEW_READONLY",
+  "status": "DIRECTION_APPROVED_EXACT_PREVIEW",
   "gate": "I6.6",
   "approvedByDirection": true,
   "scopeId": "SIX_RECEIPT_CURRENT_BALANCE_READONLY",
@@ -15,13 +15,14 @@
     "artifactId": 14900297283,
     "artifactDigest": "sha256:58a2286811ba8b5ce891d07a24bddabddd1700ca61cb6daccd71ef3fe248b0a7",
     "previewChannel": "gi-i66-rc-45351191795",
-    "previewUrl": "https://ays-orbit-360-lab--gi-i66-rc-45351191795-zqi3xeww.web.app"
+    "previewUrl": "https://ays-orbit-360-lab--gi-i66-rc-45351191795-zqi3xeww.web.app",
+    "previewUiRunId": 45351824251
   },
   "previousReceiptBlob": "11fdb3bee494541513482666d6215f45cbad0567",
   "previousHostingVersion": "sites/ays-orbit-360-lab/versions/332999a55b189108",
   "previousArtifactDigest": "sha256:7cb782848a45083047c4899bc30c13bf5be46429607e42597d09342becfc9acc",
-  "guardRun": 45351191594,
-  "guardHead": "658246bb953c0c1b7aa6f54e98cd5c4e39c5b85d",
+  "guardRun": 45351824115,
+  "guardHead": "7641e056d57c5ad61d086204988cd1917fe12989",
   "ownerPins": {
     ".github/workflows/gravicentra-delta-66-exact-live-clone.yml": "35126531cfa17ba34c6117b905852c33dcedd391",
     ".github/workflows/gravicentra-i66-live-performance-readonly.yml": "12225700cec41aafabc477d60fe7f525ba957e12",
@@ -44,5 +45,7 @@
     "tools/gravicentra-i66-frontend-promotion-transaction.cjs": "7e99182ff7854be39c8c5e90056ec6ee69d09994",
     "tools/gravicentra-i66-frontend-promotion-transaction.test.cjs": "617e476d2888831c15b5a0ee6b23358e3abc331d",
     "tools/gravicentra-i66-live-performance-readonly.mjs": "8849427a7dfab1fa7f35324111c20d26f069155b"
-  }
+  },
+  "previewReceiptPath": "artifacts/orbit360-recovery/release-control/I6_6_FRONTEND_E00004_PREVIEW_UI.json",
+  "previewReceiptBlob": "956e2676d2f9d6cfe18ed0af92784574862ae232"
 }
