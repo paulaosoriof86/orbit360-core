@@ -211,7 +211,10 @@ function appendEvidence(fs,runnerTemp,reports,execution){
  const path=require('node:path');assert.ok(path.isAbsolute(runnerTemp),'READONLY_ARTIFACT_ROOT_REQUIRED');
  assert.match(execution.sourceSha,/^[a-f0-9]{40}$/);assert.match(execution.runId,/^\d+$/);
  const dest=path.join(runnerTemp,'gi-i66-bulk-preflight.json'),bytes=fs.readFileSync(dest),original=JSON.parse(bytes);
- assert.ok(['BULK_SOURCE_CASE_READBACK_ONLY_NO_WRITES','BULK_SOURCE_PREFLIGHT_ONLY_NO_WRITES'].includes(original.status));
+ assert.ok(['BULK_SOURCE_CASE_READBACK_ONLY_NO_WRITES','BULK_SOURCE_PREFLIGHT_ONLY_NO_WRITES',
+  'BULK_SOURCE_NO_ELIGIBLE_ROWS_DIAGNOSTIC_HOLD'].includes(original.status));
+ if(original.status==='BULK_SOURCE_NO_ELIGIBLE_ROWS_DIAGNOSTIC_HOLD')
+  assert.equal(original.readyCount,0,'READONLY_ZERO_ELIGIBILITY_REPORT_REQUIRED');
  assert.equal(original.writes,0,'READONLY_ARTIFACT_WRITE_BOUNDARY');
  assert.ok(Array.isArray(reports)&&reports.every(r=>r.writes===0&&r.diagnosticOnly===true&&r.noEligibilityEffect===true));
  const enriched={...original,privateReadonlyIdentityReadbacks:{execution,originalSourceReportSha256:sha(bytes),reports}};

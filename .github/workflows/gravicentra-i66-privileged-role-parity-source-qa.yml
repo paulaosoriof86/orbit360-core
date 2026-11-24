@@ -171,3 +171,5 @@ jobs:
           path: ${{ runner.temp }}/gi-i66-detach-causal.tap
           if-no-files-found: warn
           retention-days: 14
+
+# Frozen v17 QA: execute actual Chromium precheck-budget and detach regressions before immutable build.

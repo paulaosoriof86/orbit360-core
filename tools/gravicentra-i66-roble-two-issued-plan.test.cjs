@@ -354,6 +354,23 @@ test('private diagnostics are preserved in the existing artifact report while el
  assert.throws(()=>identityDiagnostic.appendEvidence(fakeFs,'/test',[d],execution));
  assert.equal(files.get('/test/gi-i66-bulk-preflight.json'),committed);
  assert.throws(()=>identityDiagnostic.appendEvidence(fakeFs,'../elsewhere',[d],execution),/ROOT_REQUIRED/);
+ // The normal 302-row owner emits this exact status when generic updates are
+ // zero; a separate issued-identity preflight may still be eligible. Attaching
+ // private diagnostics must not abort that owner's signed output transport.
+ const normal={status:'BULK_SOURCE_NO_ELIGIBLE_ROWS_DIAGNOSTIC_HOLD',inputRows:302,
+  readyCount:0,unchangedCount:214,exceptionCount:88,chunks:[],writes:0};
+ const normalBytes=JSON.stringify(normal),planBytes=files.get('/test/gi-i66-bulk-plan.json');
+ files.set('/test/gi-i66-bulk-preflight.json',normalBytes);
+ identityDiagnostic.appendEvidence(fakeFs,'/test',[d],execution);
+ const {privateReadonlyIdentityReadbacks:normalEvidence,...unchangedNormal}=JSON.parse(files.get('/test/gi-i66-bulk-preflight.json'));
+ assert.deepEqual(unchangedNormal,normal);assert.equal(normalEvidence.originalSourceReportSha256,C.sha(normalBytes));
+ assert.equal(files.get('/test/gi-i66-bulk-plan.json'),planBytes);
+ for(const inconsistent of [{...normal,readyCount:1},{...normal,writes:1},{...normal,status:'COMMITTED'}]){
+  const bytes=JSON.stringify(inconsistent);files.set('/test/gi-i66-bulk-preflight.json',bytes);
+  assert.throws(()=>identityDiagnostic.appendEvidence(fakeFs,'/test',[d],execution));
+  assert.equal(files.get('/test/gi-i66-bulk-preflight.json'),bytes);
+  assert.equal(files.get('/test/gi-i66-bulk-plan.json'),planBytes);
+ }
 });
 test('protected writer rejects a changed parent after preflight and a source requirement already in use',async()=>{
  const c=newCases()[0],state=isolatedStore(newFixture(c)),preflight=await executeProtected(c,state,'preflight');
