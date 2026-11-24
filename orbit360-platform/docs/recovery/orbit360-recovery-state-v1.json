@@ -56,11 +56,11 @@
       "artifactDigest": "sha256:7cb782848a45083047c4899bc30c13bf5be46429607e42597d09342becfc9acc",
       "hostingVersion": "sites/ays-orbit-360-lab/versions/332999a55b189108"
     },
-    "evidencePath": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_EXECUTION_PROGRESS_20261124_R47.json",
-    "evidenceGitBlobSha": "a1f9421503f751ba5a6d034982aa30f0e158f774",
+    "evidencePath": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_EXECUTION_PROGRESS_20261124_R48.json",
+    "evidenceGitBlobSha": "ad15d717937dba2b1f4fe193186fe1fbc997c464",
     "activeGate": "I6.6",
-    "currentWork": "I6.6: execute request22 once from signed source b2eb935f070cc7bcd8221329ed88c4a383dcd586 and require terminal immutable-build plus224-file Preview readback success with both LIVE fingerprints unchanged. Then run the existing five-function Make Preview,48 financial COMPOSITE Preview stages and exact-artifact LIVE/48 checks. Failed v21 remains ineligible. E3 and all financial writes remain accepted/preserved; Historial and mailbox candidates remain stored and unapplied.",
-    "nextAction": "I6.6: execute request22 once from signed source b2eb935f070cc7bcd8221329ed88c4a383dcd586 and require terminal immutable-build plus224-file Preview readback success with both LIVE fingerprints unchanged. Then run the existing five-function Make Preview,48 financial COMPOSITE Preview stages and exact-artifact LIVE/48 checks. Failed v21 remains ineligible. E3 and all financial writes remain accepted/preserved; Historial and mailbox candidates remain stored and unapplied.",
+    "currentWork": "I6.6: run the existing five-function synthetic-only Preview workflow on immutable v22 source68a37a8e6f5bef24299773d8bc73f2d567c786cf/artifact14934674207. Execute authentic Make probe, principal binding and synthetic create/readback/replay/reject/restore under the existing protected owner; retain scenario safety and restore its original scheduling. Require terminal five-function Preview proof, then48 financial COMPOSITE Preview stages before same-artifact LIVE and48 stages. E3 remains accepted; v21 remains failed; all prior financial writes and successor candidates are preserved.",
+    "nextAction": "I6.6: run the existing five-function synthetic-only Preview workflow on immutable v22 source68a37a8e6f5bef24299773d8bc73f2d567c786cf/artifact14934674207. Execute authentic Make probe, principal binding and synthetic create/readback/replay/reject/restore under the existing protected owner; retain scenario safety and restore its original scheduling. Require terminal five-function Preview proof, then48 financial COMPOSITE Preview stages before same-artifact LIVE and48 stages. E3 remains accepted; v21 remains failed; all prior financial writes and successor candidates are preserved.",
     "frontendPreviewRequest": {
       "version": 22,
       "sourceQaHead": "b2eb935f070cc7bcd8221329ed88c4a383dcd586",
@@ -564,7 +564,7 @@
     "phaseAIterationStatuses": "HISTORICAL_FIELDS_ABOVE_PRESERVED_UNTIL_FORMAL_GATE_EVIDENCE;_NO_NEW_PASS_INFERRED",
     "labDataWriteScope": "ONLY_35_AUTHORIZED_COUNTRY_FIELDS;_NO_AUGUST_REFRESH"
   },
-  "nextAction": "I6.6: execute request22 once from signed source b2eb935f070cc7bcd8221329ed88c4a383dcd586 and require terminal immutable-build plus224-file Preview readback success with both LIVE fingerprints unchanged. Then run the existing five-function Make Preview,48 financial COMPOSITE Preview stages and exact-artifact LIVE/48 checks. Failed v21 remains ineligible. E3 and all financial writes remain accepted/preserved; Historial and mailbox candidates remain stored and unapplied.",
+  "nextAction": "I6.6: run the existing five-function synthetic-only Preview workflow on immutable v22 source68a37a8e6f5bef24299773d8bc73f2d567c786cf/artifact14934674207. Execute authentic Make probe, principal binding and synthetic create/readback/replay/reject/restore under the existing protected owner; retain scenario safety and restore its original scheduling. Require terminal five-function Preview proof, then48 financial COMPOSITE Preview stages before same-artifact LIVE and48 stages. E3 remains accepted; v21 remains failed; all prior financial writes and successor candidates are preserved.",
   "sourceOfTruth": {
     "projectBoundaryPrevalentAddendum": "orbit360-platform/docs/recovery/ADDENDUM_PREVALENTE_CHATGPT_PROJECT_BOUNDARY_20260831.md",
     "mutableState": "orbit360-platform/docs/recovery/orbit360-recovery-state-v1.json",
@@ -4870,6 +4870,37 @@
           "sourceQaHead": "99c73aa4f82eaec660e4920197dd2c8a11b14ae7",
           "sourceQaRunId": 45420172812,
           "guardRunId": 45420172656
+        }
+      }
+    },
+    {
+      "reason": "ACTIVE_OWNER_PLAN_SUMMARY_SUPERSEDED",
+      "priorGitBlobSha": "b41708d495915fe0cde2eaf0eaa96676a07bb769",
+      "supersededByGeneration": 3,
+      "prior": {
+        "schema": "GI_I66_ACTIVE_OWNER_PLAN_CONTINUATION_V1",
+        "authorityPointer": "artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json#i66OperationalContinuation20261115",
+        "generation": 3,
+        "latestProvenLiveSource": "65c825b2808a615ca4195bdde6689dbdbe3193b2",
+        "latestPhysicalFrontendLiveReceipt": "artifacts/orbit360-recovery/release-control/I6_6_FRONTEND_E00003_RECEIPT.json",
+        "currentPhysicalFrontend": {
+          "generation": 3,
+          "sourceSha": "65c825b2808a615ca4195bdde6689dbdbe3193b2",
+          "buildId": "gi-i66-65c825b2808a-57f234755dc1",
+          "artifactId": 14873426438,
+          "artifactDigest": "sha256:7cb782848a45083047c4899bc30c13bf5be46429607e42597d09342becfc9acc",
+          "hostingVersion": "sites/ays-orbit-360-lab/versions/332999a55b189108"
+        },
+        "evidencePath": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_EXECUTION_PROGRESS_20261124_R47.json",
+        "evidenceGitBlobSha": "a1f9421503f751ba5a6d034982aa30f0e158f774",
+        "activeGate": "I6.6",
+        "currentWork": "I6.6: execute request22 once from signed source b2eb935f070cc7bcd8221329ed88c4a383dcd586 and require terminal immutable-build plus224-file Preview readback success with both LIVE fingerprints unchanged. Then run the existing five-function Make Preview,48 financial COMPOSITE Preview stages and exact-artifact LIVE/48 checks. Failed v21 remains ineligible. E3 and all financial writes remain accepted/preserved; Historial and mailbox candidates remain stored and unapplied.",
+        "nextAction": "I6.6: execute request22 once from signed source b2eb935f070cc7bcd8221329ed88c4a383dcd586 and require terminal immutable-build plus224-file Preview readback success with both LIVE fingerprints unchanged. Then run the existing five-function Make Preview,48 financial COMPOSITE Preview stages and exact-artifact LIVE/48 checks. Failed v21 remains ineligible. E3 and all financial writes remain accepted/preserved; Historial and mailbox candidates remain stored and unapplied.",
+        "frontendPreviewRequest": {
+          "version": 22,
+          "sourceQaHead": "b2eb935f070cc7bcd8221329ed88c4a383dcd586",
+          "sourceQaRunId": 45425186751,
+          "guardRunId": 45425186471
         }
       }
     }

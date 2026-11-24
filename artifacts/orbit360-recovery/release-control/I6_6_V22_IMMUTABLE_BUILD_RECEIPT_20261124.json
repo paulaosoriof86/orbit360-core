@@ -1,0 +1,65 @@
+{
+  "schema": "GI_I66_V22_IMMUTABLE_BUILD_AND_EXACT_PREVIEW_READBACK_RECEIPT_V1",
+  "status": "IMMUTABLE_BUILD_AND_HOSTING_PREVIEW_READBACK_PASS_BACKEND_AND_UI_PENDING",
+  "activeGate": "I6.6",
+  "sourceSha": "68a37a8e6f5bef24299773d8bc73f2d567c786cf",
+  "buildId": "gi-i66-68a37a8e6f5b-57f234755dc1",
+  "buildRunId": 45425699992,
+  "jobId": 138557280808,
+  "buildConclusion": "success",
+  "artifactId": 14934674207,
+  "artifactDigest": "sha256:bb7bf72757801ba8312c30f196a33b6920f941240bff9ee3354a58542407cfb7",
+  "innerPackageSha256": "5ee8fbb2b46adc5865db2c3be17e95201e80c687da800f3b902f2d054274a436",
+  "previewUrl": "https://ays-orbit-360-lab--gi-i66-rc-45425699992-f9ijbdbs.web.app",
+  "previewChannel": "gi-i66-rc-45425699992",
+  "siteFileCount": 224,
+  "readback": {
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_V22_IMMUTABLE_PACKAGE_READBACK_20261124.json",
+    "receiptGitBlobSha": "2b09bf06304d234d9723c8adbc080d0ae3609e18",
+    "reportSha256": "21f482000c3a04ea168a87d528ea15e29fb13f98af9acb8f65c4ab053f4d5920",
+    "artifactId": 14936333699,
+    "artifactDigest": "sha256:79868156a3fa3355622649e0ea5e6cb1fca83e6fe22a6638d68f5ffb6fd7a8c0",
+    "readinessAttempts": 1,
+    "markerReadinessElapsedMs": 191,
+    "totalElapsedMs": 26970,
+    "matchedFiles": 224,
+    "liveFingerprints": [
+      {
+        "label": "FIREBASE_LIVE",
+        "status": "PASS",
+        "beforeSha256": "7a9a23d24f80cbb31858fdc5b3836b703f2f2120911e2f1dca8bfb5c2c92bb84",
+        "afterSha256": "7a9a23d24f80cbb31858fdc5b3836b703f2f2120911e2f1dca8bfb5c2c92bb84"
+      },
+      {
+        "label": "STAFF_LIVE",
+        "status": "PASS",
+        "beforeSha256": "7a9a23d24f80cbb31858fdc5b3836b703f2f2120911e2f1dca8bfb5c2c92bb84",
+        "afterSha256": "7a9a23d24f80cbb31858fdc5b3836b703f2f2120911e2f1dca8bfb5c2c92bb84"
+      }
+    ]
+  },
+  "sourceQa": {
+    "head": "b2eb935f070cc7bcd8221329ed88c4a383dcd586",
+    "runId": 45425186751,
+    "guardRunId": 45425186471,
+    "conclusion": "success"
+  },
+  "requestHeadGuard": {
+    "head": "68a37a8e6f5bef24299773d8bc73f2d567c786cf",
+    "runId": 45425700116,
+    "conclusion": "success"
+  },
+  "manifestBlob": "941497d0b161e04b0ec3e3eee5933139f176b6f5",
+  "v21FailurePreserved": true,
+  "v21PatchedOrRebuilt": false,
+  "originalV21HttpFailureAttribution": "UNKNOWN",
+  "productSourceChangedSince99c": false,
+  "backendDeployments": 0,
+  "liveHostingDeployments": 0,
+  "financialWrites": 0,
+  "backendPreviewAccepted": false,
+  "financialPreview48Accepted": false,
+  "liveAccepted": false,
+  "fullI66Accepted": false,
+  "acceptedProductionRemains": "E3"
+}
