@@ -1,0 +1,77 @@
+{
+  "schema": "GI_I66_MAKE_CANONICAL_RUNTIME_ACCESS_RECEIPT_V1",
+  "status": "EXACT_SECRET_IAM_DELTA_REQUIRED",
+  "gate": "I6.6",
+  "dateUtc": "2026-11-24",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "sourceSha": "a6118087cfe7a2fb0e46dcaf62339b24baa77097",
+  "runId": 45352724136,
+  "jobId": 138302908866,
+  "jobConclusion": "success",
+  "runUrl": "https://github.com/paulaosoriof86/orbit360-core/actions/runs/45352724136",
+  "scopeContractBlob": "7ce546736ac8d08b8ac922d19f3e6e4c2bac0021",
+  "probeSourceBlob": "21714d64da86cd896fc3b814d3b92cc68efeb0be",
+  "probeTestBlob": "c31c7fa9b483f7b061844a1a4808cb8e310a2c69",
+  "testProof": {
+    "tests": 13,
+    "pass": 13,
+    "fail": 0
+  },
+  "logEvidence": {
+    "marker": "I66_MAKE_RUNTIME_ACCESS_PREFLIGHT",
+    "observedReportDigest": "696fe4e0f3122bed2d32520ab2697f78bab39a2ff74d2db4d15813f01af3d47a",
+    "decodedLogSha256": "9d64d2f2aa44d43b8683e8bb9267e5a73ebed3ef25468ba407cf77e54dd3ec7e",
+    "observedLineSha256": "40138272d17a9587b90c3254e8e7f6441c3e0e0100c6e9a7cc48ac1b6b9f8856",
+    "providerPunctuationRedacted": true,
+    "redactedPayloadReconstructed": false,
+    "artifactId": null
+  },
+  "observedCanonicalRuntime": {
+    "principal": "646761409743-compute@developer.gserviceaccount.com",
+    "liveFunction": "orbit360OpsLeadsCommand",
+    "liveRegion": "us-central1",
+    "liveRevision": "orbit360opsleadscommand-00014-vep",
+    "previewFunction": "orbit360OpsLeadsCommandPreview",
+    "previewRegion": "us-east1",
+    "previewRevision": "orbit360opsleadscommandpreview-00240-zor",
+    "bothFunctionsActive": true,
+    "impersonationVerified": true,
+    "firestoreCapabilitiesVerified": true,
+    "verifiedPermissions": [
+      "datastore.databases.get",
+      "datastore.entities.get",
+      "datastore.entities.list",
+      "datastore.entities.create",
+      "datastore.entities.update"
+    ],
+    "secretVersionAccessVerified": false,
+    "secretStatus": "PERMISSION_DENIED"
+  },
+  "exactRemediationScope": {
+    "principal": "646761409743-compute@developer.gserviceaccount.com",
+    "secretResource": "projects/ays-orbit-360-lab/secrets/orbit360-greenapi-gt-alianzas-soluciones",
+    "secretVersion": "1",
+    "role": "roles/secretmanager.secretAccessor",
+    "requiredGrantCount": 1,
+    "useExistingProtectedReleaseLane": true,
+    "requireEtagCompareAndSet": true,
+    "requireRuntimeReadback": true,
+    "projectIamWritesAllowed": false,
+    "serviceAccountCreationAllowed": false,
+    "secretValueOrVersionChangesAllowed": false
+  },
+  "actualActions": {
+    "iamWrites": 0,
+    "firestoreWrites": 0,
+    "providerRequests": 0,
+    "externalMessagesSent": 0,
+    "credentialsPrinted": false
+  },
+  "acceptance": {
+    "providerAuthorizedSeparatelyVerified": true,
+    "fullA13Accepted": false,
+    "realCanonicalLeadVerified": false,
+    "ingressActivated": false
+  }
+}

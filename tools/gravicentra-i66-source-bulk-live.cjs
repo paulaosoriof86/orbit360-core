@@ -316,7 +316,8 @@ async function main(){
     console.log('I66_ISSUED_IDENTITY_WITNESSES='+JSON.stringify(crosswalk));
     const five=await require('./gravicentra-i66-roble-five-issuer-crosswalk-readonly.cjs').crosswalk(name=>internal(name,db));
     console.log('I66_ROBLE_FIVE_49_ISSUED_EDITION_CROSSWALK='+JSON.stringify(five));
-    const plan=planSourceBatch(source.data.rows,groups,{chunkSize:250});
+    const plan=await require('./gravicentra-i66-universales-issued-editions.cjs').enrichPlan(db,source,
+      planSourceBatch(source.data.rows,groups,{chunkSize:250}));
     console.log('I66_MULTICARRIER_ISSUED_FIRESTORE_READBACK='+JSON.stringify(issuedMulticarrierReadback(groups,source.data.rows,plan)));
     console.log('I66_ISSUED_PREDECESSOR_SUCCESSOR_LINKS='+JSON.stringify(await readIssuedSuccessorLinks(db,groups)));
     const exceptionCodes={};
@@ -358,6 +359,7 @@ async function main(){
       sourceManifestSha256:source.bytesSha256,planSha256,inputRows:plan.inputRows,
       readyCount:plan.readyCount,unchangedCount:plan.unchangedCount,
       exceptionCount:plan.exceptionCount,exceptionCodes,diagnostic,
+      documentaryDiagnostics:plan.documentaryDiagnostics||[],
       privatePolicyDiagnostics:policyDiagnostics,
       privatePaymentPortfolioHolds:paymentPortfolioHoldDiagnostics(source.data.rows,groups,plan.exceptions),
       exceptionSamples:plan.exceptions.slice(0,35),

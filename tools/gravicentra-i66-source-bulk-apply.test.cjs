@@ -287,8 +287,174 @@ const plan=planSourceBatch(source,groups),gate={environment:'gravicentra-live-da
     {monto:288.07,montoTotal:288.07});
   assert.deepEqual(aliasAudit.rollback.carteraGrossAliases,{montoTotal:288.07});
   assert.equal((await applyProtectedBatch(aliasDb,aliasPlan,gate)).alreadyApplied,1);
+  await testIssuedMedicalCreation();
   console.log('I66_BULK_PROTECTED_WRITER_SYNTHETIC_PASS 1 receipt 1 cartera 1 audit; retry idempotent; CAS hold');
   console.log('I66_BULK_PROTECTED_WRITER_SYNTHETIC_750_ROWS_PASS 3 chunks x 250; 1500 materialized receipt/cartera rows; 750 audit; 0 duplicate replay writes');
   console.log('I66_EL_ROBLE_MONTHLY_19_SYNTHETIC_PASS source due, aliases, CAS, exact readback, replay');
   console.log('I66_LEGACY_GROSS_ALIASES_SYNTHETIC_PASS issuer update, preserved net/limit, audit, replay and ambiguous-alias hold');
 })().catch(error=>{console.error(error);process.exitCode=1;});
+
+async function testIssuedMedicalCreation(){
+  const fs=require('node:fs'),path=require('node:path'),vm=require('node:vm'),crypto=require('node:crypto');
+  const medical=require('./gravicentra-i66-universales-issued-editions.cjs');
+  const sourceBytes=fs.readFileSync(path.join(__dirname,'../artifacts/orbit360-recovery/source-batches/I6_6_SOURCE_BULK_20261120_MULTI_302.json'));
+  const source={data:JSON.parse(sourceBytes),bytesSha256:crypto.createHash('sha256').update(sourceBytes).digest('hex')};
+  assert.equal(source.bytesSha256,medical.manifest.source302Sha256);
+  assert.equal(medical.load().cases.reduce((n,c)=>n+c.pendingRows.length,0),22);
+  // Synthetic names remain local to these in-memory tests. Original PDF
+  // identity witnesses and the pinned manifest bytes are never rewritten.
+  const originalWitnesses=medical.manifest.cases.map(c=>c.holderWitness);
+  medical.manifest.cases.forEach((c,i)=>{c.holderWitness=crypto.createHash('sha256')
+    .update(c.sourcePdfSha256+'|SYNTHETICHOLDER'+i).digest('hex');});
+  const oldRun=process.env.GITHUB_RUN_ID;process.env.GITHUB_RUN_ID='synthetic-medical-22';
+  let tests=0;
+  try{
+    class TimestampWitness{toJSON(){return {seconds:1790000000,nanoseconds:123};}}
+    function firestoreShape(value){
+      if(Array.isArray(value)){assert.ok(value.every(v=>!Array.isArray(v)),'FIRESTORE_REJECTS_NESTED_ARRAYS');value.forEach(firestoreShape);}
+      else if(value&&typeof value==='object')Object.values(value).forEach(firestoreShape);
+      else assert.notEqual(value,undefined,'FIRESTORE_REJECTS_UNDEFINED_FIELDS');
+    }
+    class MedicalDb extends MockDb{
+      async runTransaction(work,options){
+        const staged=[];let hasWrite=false;
+        const tx={get:ref=>{assert.equal(hasWrite,false,'ALL_READS_MUST_PRECEDE_WRITES');return ref.get();},
+          update:(ref,value)=>{hasWrite=true;staged.push(['update',ref.path,value]);},
+          create:(ref,value)=>{hasWrite=true;staged.push(['create',ref.path,value]);}};
+        const result=await work(tx);
+        if(options?.readOnly)assert.equal(staged.length,0,'READONLY_CANNOT_STAGE_WRITES');
+        for(const [op,key,value] of staged){firestoreShape(value);if(op==='create')assert.equal(this.docs.has(key),false,'CREATE_MUST_BE_ABSENT');}
+        for(const [op,key,value] of staged){this.docs.set(key,op==='create'?{...value}:{...this.docs.get(key),...value});this.writes++;}
+        if(staged.length&&this.afterCommit){const fn=this.afterCommit;delete this.afterCommit;fn(this);}
+        if(staged.length&&this.throwAfterCommit){this.throwAfterCommit=false;throw Error('SIMULATED_COMMIT_RESPONSE_LOST');}
+        return result;
+      }
+    }
+    function fixture(){
+      const db=new MedicalDb();
+      db.docs.set(name('aseguradoras')+'medical-insurer',{id:'medical-insurer',pais:'GT',activo:true,nombre:'SEGUROS UNIVERSALES'});
+      medical.manifest.cases.forEach((c,i)=>{
+        db.docs.set(name('clientes')+'medical-client-'+i,{id:'medical-client-'+i,pais:'GT',asesorId:'medical-advisor-'+i,
+          nombre:'SYNTHETIC HOLDER '+i,updatedAt:new TimestampWitness()});
+        // Shared-country advisers may omit pais in the existing owner contract.
+        db.docs.set(name('asesores')+'medical-advisor-'+i,{id:'medical-advisor-'+i,activo:true,...(i?{paises:['GT']}:{})});
+        if(c.expectedPredecessorId)db.docs.set(name('polizas')+c.expectedPredecessorId,
+          {id:c.expectedPredecessorId,numero:c.expectedPredecessor.number,pais:'GT',moneda:'GTQ',
+            vigenciaInicio:c.expectedPredecessor.termStart,vigenciaFin:c.expectedPredecessor.termEnd,
+            estado:'Renovada',clienteId:'medical-client-'+i,aseguradoraId:'medical-insurer',asesorId:'medical-advisor-'+i,
+            sourceHistoricalField:'must remain intact',updatedAt:new TimestampWitness()});
+      });
+      db.docs.set(name('polizas')+'qa-parent',{id:'qa-parent',numero:'91-0234395',pais:'GT',moneda:'GTQ',
+        vigenciaInicio:'2026-05-02',vigenciaFin:'2027-05-02',estado:'Vigente'});
+      db.docs.set(name('recibosEsperados')+'qa-receipt',{id:'qa-receipt',polizaId:'qa-parent',primaTotal:278.26,numeroReciboFuente:'5228533'});
+      db.docs.set(name('cobros')+'already-paid-10738',{id:'already-paid-10738',polizaId:'qa-parent',primaTotal:1479.35,conciliado:true});
+      return db;
+    }
+    const base=planSourceBatch(source.data.rows,[]),verified=async()=>true;
+    const approvedGate={...gate,sourceManifestSha256:source.bytesSha256};
+    const wrapped={exports:{}};
+    // Execute the real bulk adapter. Only the network document fetch is
+    // replaced; assess, transactional CAS, mutation and readback are real.
+    vm.runInNewContext(fs.readFileSync(path.join(__dirname,'gravicentra-i66-source-bulk-apply.cjs'),'utf8'),{
+      module:wrapped,exports:wrapped.exports,require:id=>id==='./gravicentra-i66-universales-issued-editions.cjs'?
+        {...medical,applyChunk:(db,c,g)=>medical.applyChunk(db,c,g,verified)}:require(id),console});
+    const apply=wrapped.exports.applyProtectedBatch;
+    const prepare=db=>medical.enrichPlan(db,source,base,verified);
+    const db=fixture(),untouched=new Map([...db.docs].map(([k,v])=>[k,medical.hash(v)]));
+    const plan=await prepare(db);assert.equal(plan.readyCount,22);assert.equal(plan.exceptionCount,base.exceptionCount-22);
+    assert.deepEqual(plan.chunks.map(c=>c.count),[12,10]);assert.equal(db.writes,0);tests++;
+    const selected=new Set(medical.manifest.cases.flatMap(c=>c.pendingRows.map(r=>r.caseId)));
+    assert.deepEqual(plan.exceptions,base.exceptions.filter(r=>!selected.has(r.caseId)));
+    const result=await apply(db,plan,approvedGate);
+    assert.equal(result.status,'BULK_PROTECTED_READBACK_PASS');assert.equal(result.applied,22);
+    assert.equal(result.receiptWrites,22);assert.equal(result.portfolioWrites,22);
+    assert.equal(result.policyCreates,2);assert.equal(result.activityCreates,2);assert.equal(result.auditCreates,2);
+    assert.equal(result.priorPolicyUpdates,1);assert.equal(result.technicalDocumentWrites,51);
+    assert.equal(result.cobroWrites,0);assert.equal(result.paymentWrites,0);assert.equal(db.writes,51);tests++;
+    const first=medical.manifest.cases[0],second=medical.manifest.cases[1];
+    for(const [key,before] of untouched)if(key!==name('polizas')+first.expectedPredecessorId)
+      assert.equal(medical.hash(db.docs.get(key)),before,'UNRELATED_OR_PARENT_DOCUMENT_CHANGED');
+    const prior=db.docs.get(name('polizas')+first.expectedPredecessorId);
+    assert.equal(prior.estado,'Renovada');assert.equal(prior.sourceHistoricalField,'must remain intact');
+    assert.equal(prior.renovadaPor,'pol_'+plan.chunks[0].operation);tests++;
+    let gross=0;
+    for(let i=0;i<2;i++){
+      const c=medical.manifest.cases[i],op=plan.chunks[i].operation,policy=db.docs.get(name('polizas')+'pol_'+op);
+      assert.equal(policy.estado,i?'Emitida':'SIN COBERTURA');assert.equal(policy.coverageActiveInferred,false);
+      assert.equal(policy.primaTotal,c.header.grossCents/100);assert.equal(policy.saldoPendienteDocumental,c.pendingGrossCents/100);
+      assert.equal(policy.vigenciaFin,'2027-09-30');assert.equal(policy.vigenciaFinConvention,'INCLUSIVE_ISSUER_DATE');
+      assert.equal(policy.vehiculoId,undefined);
+      if(!i){assert.equal(policy.advertenciaCoberturaFuente.literal,'SIN COBERTURA');
+        assert.equal(policy.advertenciaCoberturaFuente.fechaPosibleAnulacion,'2026-11-30');
+        assert.equal(policy.advertenciaCoberturaFuente.anulacionEjecutada,false);}
+      for(const row of c.pendingRows){const r=db.docs.get(name('recibosEsperados')+'rec_'+op+'_'+row.requirement);
+        assert.equal(r.numeroCuota,row.sequence);assert.equal(r.serie,row.sequence+'/12');assert.equal(r.primaTotal,row.grossCents/100);
+        assert.equal(r.fechaVencimientoContractual,row.due);assert.equal(r.fechaPago,null);assert.equal(r.conciliado,false);
+        assert.equal(r.primaNeta,undefined);assert.equal(r.paymentState,undefined);gross+=row.grossCents;}
+      const a=db.docs.get(tenant+'/operationalRequests/'+op);
+      assert.equal(a.rollback.deleteCreatedTargets.length,c.pendingRows.length*2+2);
+      if(!i)assert.equal(a.rollback.prior.renovadaPorWasPresent,false);
+    }
+    assert.equal(gross,1122994);tests++;
+    const replay=await apply(db,plan,approvedGate);assert.equal(replay.applied,0);assert.equal(replay.alreadyApplied,22);
+    assert.equal(replay.technicalDocumentWrites,0);assert.equal(db.writes,51);tests++;
+    const groups=plan.chunks.map(c=>{const pid='pol_'+c.operation;return {policy:db.docs.get(name('polizas')+pid),
+      clientExists:true,insurerVerified:true,insurerName:'SEGUROS UNIVERSALES',cobros:[],
+      receipts:[...db.docs].filter(([k,v])=>k.startsWith(name('recibosEsperados'))&&v.polizaId===pid).map(([,v])=>v),
+      portfolio:[...db.docs].filter(([k,v])=>k.startsWith(name('carteraPrimas'))&&v.polizaId===pid).map(([,v])=>v)};});
+    const fresh=await medical.enrichPlan(db,source,planSourceBatch(source.data.rows,groups),verified);
+    assert.equal(fresh.readyCount,0);assert.equal(fresh.unchangedCount,22);assert.equal(db.writes,51);tests++;
+    const p1=plan.chunks[0],docFalse=fixture();
+    assert.equal((await medical.enrichPlan(docFalse,source,base,async()=>false)).readyCount,0);assert.equal(docFalse.writes,0);tests++;
+    await assert.rejects(medical.applyChunk(docFalse,p1,approvedGate,async()=>false),/MEDICAL_DOCUMENT_BYTES_NOT_VERIFIED/);
+    assert.equal(docFalse.writes,0);tests++;
+    const mutations=[
+      ['duplicate holder',d=>d.docs.set(name('clientes')+'duplicate-holder',{id:'duplicate-holder',pais:'GT',nombre:'SYNTHETIC HOLDER 0'})],
+      ['parent CAS',d=>d.docs.get(name('clientes')+'medical-client-0').sourceTag='changed'],
+      ['advisor inactive',d=>d.docs.get(name('asesores')+'medical-advisor-0').activo=false],
+      ['advisor wrong country',d=>d.docs.get(name('asesores')+'medical-advisor-0').pais='CO'],
+      ['advisor explicitly empty country scope',d=>d.docs.get(name('asesores')+'medical-advisor-0').paises=[]],
+      ['advisor explicitly foreign country scope',d=>d.docs.get(name('asesores')+'medical-advisor-0').paises=['CO']],
+      ['advisor country contradicts scope',d=>Object.assign(d.docs.get(name('asesores')+'medical-advisor-0'),{pais:'GT',paises:['CO']})],
+      ['advisor foreign country contradicts GT scope',d=>Object.assign(d.docs.get(name('asesores')+'medical-advisor-0'),{pais:'CO',paises:['GT']})],
+      ['advisor declared country scope malformed',d=>d.docs.get(name('asesores')+'medical-advisor-0').paises=null],
+      ['client tenant contradiction',d=>d.docs.get(name('clientes')+'medical-client-0').tenantId='other'],
+      ['prior number contradiction',d=>d.docs.get(name('polizas')+first.expectedPredecessorId).numeroPoliza='99999-3'],
+      ['prior linked elsewhere',d=>d.docs.get(name('polizas')+first.expectedPredecessorId).renovadaPor='other'],
+      ['orphan country edition',d=>d.docs.set(name('polizas')+'orphan',{id:'orphan',numeroPoliza:'12289-4',vigenciaInicio:first.termStart,vigenciaFin:first.termEnd})],
+      ['bare competing current edition',d=>d.docs.set(name('polizas')+'other',{id:'other',numero:'12289',pais:'GT',vigenciaInicio:first.termStart,vigenciaFin:first.termEnd})],
+      ['new policy linked to predecessor',d=>d.docs.set(name('polizas')+'link',{id:'link',renuevaDe:first.expectedPredecessorId,pais:'GT'})],
+      ['source requirement receipt',d=>d.docs.set(name('recibosEsperados')+'duplicate',{numeroReciboFuente:'39196269',polizaId:'qa-parent'})],
+      ['source requirement portfolio',d=>d.docs.set(name('carteraPrimas')+'duplicate',{numeroReciboAseguradora:'39196269',polizaId:'qa-parent'})],
+      ['source requirement payment',d=>d.docs.set(name('cobros')+'duplicate',{numeroRequerimiento:'39196269',polizaId:'qa-parent'})],
+      ['misparented policy alias',d=>d.docs.set(name('recibosEsperados')+'wrong-parent',{numeroPolizaFuente:'12289-4',polizaId:'qa-parent',primaTotal:278.29})],
+      ['orphan due amount',d=>d.docs.set(name('recibosEsperados')+'orphan-financial',{primaTotal:278.29,fechaLimite:'2026-10-01',polizaId:'unknown'})],
+      ['target occupied',d=>d.docs.set(name('recibosEsperados')+'rec_'+p1.operation+'_39196269',{polizaId:'qa-parent'})]
+    ];
+    for(const [label,change] of mutations){const d=fixture();change(d);
+      const held=await medical.applyChunk(d,p1,approvedGate,verified);assert.equal(held.status,'HOLD',label);assert.equal(d.writes,0,label);tests++;}
+    for(const change of [c=>{c.rows[0].grossCents++;},c=>{c.rows[0].due='2026-10-02';},c=>{c.beforeHash='0'.repeat(64);},
+      c=>{c.documentaryManifestSha256='0'.repeat(64);},c=>{c.rows[0].policy=second.policy;},c=>{c.rows[0].state='PAID';}]){
+      const d=fixture(),c=structuredClone(p1);change(c);
+      await assert.rejects(medical.applyChunk(d,c,approvedGate,verified));assert.equal(d.writes,0);tests++;}
+    for(const invalid of [{...approvedGate,reviewerEvidence:false},{...approvedGate,sourceManifestSha256:'0'.repeat(64)},
+      {...approvedGate,ref:'refs/heads/main'}]){const d=fixture();await assert.rejects(medical.applyChunk(d,p1,invalid,verified));assert.equal(d.writes,0);tests++;}
+    for(const chunks of [[{...p1,operationKind:'UNKNOWN'}],[p1,p1],[{...p1,operationKind:undefined}]]){
+      const d=fixture();await assert.rejects(apply(d,{...plan,chunks},approvedGate));assert.equal(d.writes,0);tests++;}
+    const post=fixture();post.afterCommit=d=>{d.docs.get(name('recibosEsperados')+'rec_'+p1.operation+'_39196269').primaTotal=1;};
+    const held=await apply(post,{...plan,chunks:[p1]},approvedGate);
+    assert.equal(held.status,'BULK_PARTIAL_HOLD');assert.equal(held.applied,0);assert.equal(held.receiptWrites,12);
+    assert.equal(held.technicalDocumentWrites,28);assert.equal(held.failed.length,12);assert.equal(post.writes,28);tests++;
+    const lost=fixture();lost.throwAfterCommit=true;
+    const recovered=await medical.applyChunk(lost,p1,approvedGate,verified);
+    assert.equal(recovered.status,'APPLIED_READBACK_PASS');assert.equal(recovered.recoveredAfterTransactionError,true);
+    assert.equal(recovered.technicalWrites,28);assert.equal(lost.writes,28);tests++;
+    const badReplay=await medical.applyChunk(post,p1,approvedGate,verified);assert.equal(badReplay.status,'HOLD');assert.equal(post.writes,28);tests++;
+    db.docs.get(tenant+'/operationalRequests/'+p1.operation).rollback.prior.renovadaPorWasPresent=true;
+    const badAudit=await medical.applyChunk(db,p1,approvedGate,verified);assert.equal(badAudit.status,'HOLD');assert.equal(db.writes,51);tests++;
+    console.log('I66_UNIVERSALES_22_DOCUMENTARY_CREATE_SYNTHETIC_PASS '+tests+' checks; 22 obligations, 51 writes, 0 payments/vehicles, exact readback and replay0; source302 general matching preserved');
+  }finally{
+    medical.manifest.cases.forEach((c,i)=>{c.holderWitness=originalWitnesses[i];});
+    if(oldRun===undefined)delete process.env.GITHUB_RUN_ID;else process.env.GITHUB_RUN_ID=oldRun;
+  }
+}

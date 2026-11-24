@@ -153,11 +153,35 @@ async function applyOne(db,row,gate){
 }
 async function applyProtectedBatch(db,plan,gate){
   if(!gateValid(gate,plan))hold('ENVIRONMENT_OR_PLAN_NOT_APPROVED');
-  const accepted=[],failed=[];
+  const accepted=[],failed=[],documentaryResults=[],documentaryOperations=new Set();
+  for(const chunk of plan.chunks){
+    if(!chunk.operationKind){if(chunk.rows.some(r=>r.operationKind))hold('DOCUMENTARY_DISCRIMINATOR_MISSING');continue;}
+    const medical=require('./gravicentra-i66-universales-issued-editions.cjs');
+    if(chunk.operationKind!==medical.KIND)hold('UNKNOWN_DOCUMENTARY_OPERATION');
+    if(documentaryOperations.has(chunk.operation))hold('DUPLICATE_DOCUMENTARY_OPERATION');
+    documentaryOperations.add(chunk.operation);
+  }
   // Bounded chunks keep a large manifest under one reviewer gate. Per-row CAS
   // isolates real exceptions and can never mark an unverified row as applied.
   for(const chunk of plan.chunks){
     if(chunk.rows.length!==chunk.count||chunk.rows.length>MAX_CHUNK)hold('CHUNK_DRIFT');
+    if(chunk.operationKind){
+      const medical=require('./gravicentra-i66-universales-issued-editions.cjs');
+      let result;
+      try{result=await medical.applyChunk(db,chunk,gate);}
+      catch(error){result={status:'HOLD',technicalWrites:0,
+        reason:/^[A-Z0-9_]+$/.test(error.message)?error.message:'MEDICAL_PLAN_OR_DOCUMENT_HOLD'};}
+      documentaryResults.push({policy:chunk.policy,operationKind:chunk.operationKind,...result});
+      if(['APPLIED_READBACK_PASS','ALREADY_APPLIED_READBACK_PASS'].includes(result.status)){
+        for(const row of chunk.rows)accepted.push({status:result.status,caseId:row.caseId,
+          operationKind:chunk.operationKind,policy:chunk.policy,operation:chunk.operation,
+          receiptId:'rec_'+chunk.operation+'_'+row.requirement,
+          portfolioId:'car_rec_'+chunk.operation+'_'+row.requirement});
+      }else for(const row of chunk.rows)failed.push({caseId:row.caseId,code:result.reason||'MEDICAL_READBACK_HOLD',
+        operationKind:chunk.operationKind,committed:result.status==='COMMITTED_READBACK_HOLD',
+        writeOutcomeIndeterminate:result.writeOutcomeIndeterminate===true});
+      continue;
+    }
     for(let i=0;i<chunk.rows.length;i+=6){
       const six=chunk.rows.slice(i,i+6);
       const completed=await Promise.all(six.map(async row=>{
@@ -168,13 +192,23 @@ async function applyProtectedBatch(db,plan,gate){
       for(const r of completed)(r.ok?accepted:failed).push(r.ok?r.value:{caseId:r.caseId,code:r.code});
     }
   }
+  const normalApplied=accepted.filter(x=>x.status==='APPLIED_READBACK_PASS'&&!x.operationKind).length;
+  const documentaryCommitted=documentaryResults.filter(x=>
+    ['APPLIED_READBACK_PASS','COMMITTED_READBACK_HOLD'].includes(x.status));
+  const documentaryRows=documentaryCommitted.reduce((n,r)=>n+
+    plan.chunks.find(c=>c.policy===r.policy&&c.operationKind===r.operationKind).count,0);
   return {status:failed.length?'BULK_PARTIAL_HOLD':'BULK_PROTECTED_READBACK_PASS',
     approvedManifest:gate.sourceManifestSha256,
     inputRows:plan.inputRows,readyCount:plan.readyCount,sourceExceptions:plan.exceptionCount,
     applied:accepted.filter(x=>x.status==='APPLIED_READBACK_PASS').length,
     alreadyApplied:accepted.filter(x=>x.status==='ALREADY_APPLIED_READBACK_PASS').length,
-    receiptWrites:accepted.filter(x=>x.status==='APPLIED_READBACK_PASS').length,
-    portfolioWrites:accepted.filter(x=>x.status==='APPLIED_READBACK_PASS').length,
-    cobroWrites:0,paymentWrites:0,failed,accepted};
+    receiptWrites:normalApplied+documentaryRows,
+    portfolioWrites:normalApplied+documentaryRows,
+    policyCreates:documentaryCommitted.length,activityCreates:documentaryCommitted.length,
+    priorPolicyUpdates:documentaryCommitted.reduce((n,r)=>n+(r.priorUpdates||0),0),
+    auditCreates:normalApplied+documentaryCommitted.length,
+    technicalDocumentWrites:normalApplied*3+documentaryCommitted.reduce((n,r)=>n+r.technicalWrites,0),
+    writeOutcomeIndeterminate:documentaryResults.some(r=>r.writeOutcomeIndeterminate),
+    documentaryResults,cobroWrites:0,paymentWrites:0,failed,accepted};
 }
 module.exports={gateValid,applyOne,applyProtectedBatch};

@@ -1,0 +1,281 @@
+{
+  "schema": "GI_I66_UNIVERSALES_TWO_ISSUED_MEDICAL_22_V1",
+  "recordType": "SOURCE_PINNED_DOCUMENTARY_CREATION_PLAN_NO_WRITES",
+  "country": "GT",
+  "currency": "GTQ",
+  "tenant": "alianzas-soluciones",
+  "project": "ays-orbit-360-lab",
+  "authorityPath": "artifacts/orbit360-recovery/release-control/I6_6_DIRECCION_DECISIONES_FINANCIERAS_Y_PLAN_INTEGRAL_20261122.md",
+  "authorityBlob": "53b08239aa8807378ec95a4b4704c5d97622bc84",
+  "source302Sha256": "35b548913253c836e63db6cb3cac79bda541a6ceda776494969d23393504e225",
+  "currentStatement": {
+    "driveFileId": "1Rz4dcdQ-aVf64gUR0qc3qDfsPXJ3NLoi",
+    "sha256": "0e4f7cb29813ecb54487b555f306582a59d8630b819dfb9cd427dba1bdb1dcce",
+    "asOf": "2026-11-23"
+  },
+  "coverageWarning": {
+    "driveFileId": "1yOmuDTRsejDiZ9uET6tXBEuMNFgbFAal",
+    "sha256": "1a57be74a480fb97486b63723137ff9b59e502a128affb0364104b584491091d",
+    "asOf": "2026-11-23",
+    "policy": "04-05-01-12289-4",
+    "literal": "SIN COBERTURA",
+    "possibleCancellationDate": "2026-11-30",
+    "cancellationExecuted": false
+  },
+  "cases": [
+    {
+      "policy": "04-05-01-12289-4",
+      "sourcePdfId": "1vCSFXQD5NDGYHOrT-kxPoFbiciqnLIRI",
+      "sourcePdfSha256": "6c360b74ef73c971f856a66eb4f4aa906ea8c303faafcfe972e027b16620fc7e",
+      "holderWitness": "03f36c92b3123475ce427293209902b7a708324f725fc87f857c45f55aae2bd3",
+      "country": "GT",
+      "currency": "GTQ",
+      "riskKind": "MEDICAL",
+      "branchLabel": "Gastos Médicos",
+      "product": "Medic Centroamericano",
+      "termStart": "2026-10-01",
+      "termEnd": "2027-09-30",
+      "termEndConvention": "INCLUSIVE_ISSUER_DATE",
+      "issuedDate": "2026-10-01",
+      "operation": "RENEWAL",
+      "header": {
+        "netCents": 283971,
+        "expensesCents": 14199,
+        "ivaCents": 35780,
+        "grossCents": 333950
+      },
+      "monthlyInstallments": 12,
+      "pendingRows": [
+        {
+          "caseId": "UNIVERSALES_NOV16_39196269",
+          "requirement": "39196269",
+          "due": "2026-10-01",
+          "grossCents": 27829,
+          "sourceRowNumber": 22,
+          "sequence": 1
+        },
+        {
+          "caseId": "UNIVERSALES_NOV16_39196270",
+          "requirement": "39196270",
+          "due": "2026-11-01",
+          "grossCents": 27829,
+          "sourceRowNumber": 23,
+          "sequence": 2
+        },
+        {
+          "caseId": "UNIVERSALES_NOV16_39196271",
+          "requirement": "39196271",
+          "due": "2026-12-01",
+          "grossCents": 27829,
+          "sourceRowNumber": 24,
+          "sequence": 3
+        },
+        {
+          "caseId": "UNIVERSALES_NOV16_39196272",
+          "requirement": "39196272",
+          "due": "2027-01-01",
+          "grossCents": 27829,
+          "sourceRowNumber": 25,
+          "sequence": 4
+        },
+        {
+          "caseId": "UNIVERSALES_NOV16_39196273",
+          "requirement": "39196273",
+          "due": "2027-02-01",
+          "grossCents": 27829,
+          "sourceRowNumber": 26,
+          "sequence": 5
+        },
+        {
+          "caseId": "UNIVERSALES_NOV16_39196274",
+          "requirement": "39196274",
+          "due": "2027-03-01",
+          "grossCents": 27829,
+          "sourceRowNumber": 27,
+          "sequence": 6
+        },
+        {
+          "caseId": "UNIVERSALES_NOV16_39196275",
+          "requirement": "39196275",
+          "due": "2027-04-01",
+          "grossCents": 27829,
+          "sourceRowNumber": 28,
+          "sequence": 7
+        },
+        {
+          "caseId": "UNIVERSALES_NOV16_39196276",
+          "requirement": "39196276",
+          "due": "2027-05-01",
+          "grossCents": 27829,
+          "sourceRowNumber": 29,
+          "sequence": 8
+        },
+        {
+          "caseId": "UNIVERSALES_NOV16_39196277",
+          "requirement": "39196277",
+          "due": "2027-06-01",
+          "grossCents": 27829,
+          "sourceRowNumber": 30,
+          "sequence": 9
+        },
+        {
+          "caseId": "UNIVERSALES_NOV16_39196278",
+          "requirement": "39196278",
+          "due": "2027-07-01",
+          "grossCents": 27829,
+          "sourceRowNumber": 31,
+          "sequence": 10
+        },
+        {
+          "caseId": "UNIVERSALES_NOV16_39196279",
+          "requirement": "39196279",
+          "due": "2027-08-01",
+          "grossCents": 27829,
+          "sourceRowNumber": 32,
+          "sequence": 11
+        },
+        {
+          "caseId": "UNIVERSALES_NOV16_39196280",
+          "requirement": "39196280",
+          "due": "2027-09-01",
+          "grossCents": 27835,
+          "sourceRowNumber": 33,
+          "sequence": 12
+        }
+      ],
+      "pendingGrossCents": 333954,
+      "expectedPredecessorId": "pol_5080266a15e6f2b39f20017d08e4",
+      "coverageStatusLiteral": "SIN COBERTURA",
+      "storedPolicyState": "SIN COBERTURA",
+      "coverageActiveInferred": false,
+      "maximumLifetimeCents": 150000000,
+      "expectedPredecessor": {
+        "number": "12289-3",
+        "termStart": "2025-10-01",
+        "termEnd": "2026-09-30",
+        "policyStatePreserved": "Renovada"
+      },
+      "possibleCancellationDate": "2026-11-30",
+      "cancellationExecuted": false
+    },
+    {
+      "policy": "04-05-01-15590-0",
+      "sourcePdfId": "1nHigtnI2GJlKePaeyVyXlB_giCyIH2ss",
+      "sourcePdfSha256": "78d78df726fa54c8ef2af5d728a50265db6956208b4a593eab433457f24b4e62",
+      "holderWitness": "50972cb17a3fcc867396a6d6ef797569a11e6eb42aa906fc5f4dc56842e128ac",
+      "country": "GT",
+      "currency": "GTQ",
+      "riskKind": "MEDICAL",
+      "branchLabel": "Gastos Médicos",
+      "product": "Medic Centroamericano Plus",
+      "termStart": "2026-10-01",
+      "termEnd": "2027-09-30",
+      "termEndConvention": "INCLUSIVE_ISSUER_DATE",
+      "issuedDate": "2026-10-14",
+      "operation": "NEW_POLICY",
+      "header": {
+        "netCents": 780000,
+        "expensesCents": 39000,
+        "ivaCents": 98280,
+        "grossCents": 917280
+      },
+      "monthlyInstallments": 12,
+      "pendingRows": [
+        {
+          "caseId": "UNIVERSALES_NOV16_39470708",
+          "requirement": "39470708",
+          "due": "2026-12-01",
+          "grossCents": 78904,
+          "sourceRowNumber": 37,
+          "sequence": 3
+        },
+        {
+          "caseId": "UNIVERSALES_NOV16_39470709",
+          "requirement": "39470709",
+          "due": "2027-01-01",
+          "grossCents": 78904,
+          "sourceRowNumber": 38,
+          "sequence": 4
+        },
+        {
+          "caseId": "UNIVERSALES_NOV16_39470710",
+          "requirement": "39470710",
+          "due": "2027-02-01",
+          "grossCents": 78904,
+          "sourceRowNumber": 39,
+          "sequence": 5
+        },
+        {
+          "caseId": "UNIVERSALES_NOV16_39470711",
+          "requirement": "39470711",
+          "due": "2027-03-01",
+          "grossCents": 78904,
+          "sourceRowNumber": 40,
+          "sequence": 6
+        },
+        {
+          "caseId": "UNIVERSALES_NOV16_39470712",
+          "requirement": "39470712",
+          "due": "2027-04-01",
+          "grossCents": 78904,
+          "sourceRowNumber": 41,
+          "sequence": 7
+        },
+        {
+          "caseId": "UNIVERSALES_NOV16_39470713",
+          "requirement": "39470713",
+          "due": "2027-05-01",
+          "grossCents": 78904,
+          "sourceRowNumber": 42,
+          "sequence": 8
+        },
+        {
+          "caseId": "UNIVERSALES_NOV16_39470714",
+          "requirement": "39470714",
+          "due": "2027-06-01",
+          "grossCents": 78904,
+          "sourceRowNumber": 43,
+          "sequence": 9
+        },
+        {
+          "caseId": "UNIVERSALES_NOV16_39470715",
+          "requirement": "39470715",
+          "due": "2027-07-01",
+          "grossCents": 78904,
+          "sourceRowNumber": 44,
+          "sequence": 10
+        },
+        {
+          "caseId": "UNIVERSALES_NOV16_39470716",
+          "requirement": "39470716",
+          "due": "2027-08-01",
+          "grossCents": 78904,
+          "sourceRowNumber": 45,
+          "sequence": 11
+        },
+        {
+          "caseId": "UNIVERSALES_NOV16_39470717",
+          "requirement": "39470717",
+          "due": "2027-09-01",
+          "grossCents": 78904,
+          "sourceRowNumber": 46,
+          "sequence": 12
+        }
+      ],
+      "pendingGrossCents": 789040,
+      "expectedPredecessorId": null,
+      "coverageStatusLiteral": null,
+      "storedPolicyState": "Emitida",
+      "coverageActiveInferred": false,
+      "maximumLifetimeCents": 250000000
+    }
+  ],
+  "counts": {
+    "policies": 2,
+    "pendingReceipts": 22,
+    "pendingGrossCents": 1122994,
+    "newVehicle": 0,
+    "payments": 0
+  },
+  "semanticRule": "Issuer original preserves contract/header; current insurer statement supplies each pending requirement. No pro-rata net premium, payment inference or coverage inference. Prior policy lifecycle remains exact."
+}
