@@ -1,0 +1,77 @@
+{
+  "schema": "GI_I66_MAKE_QUEUE_EXECUTION_RECEIPT_V1",
+  "status": "success",
+  "scenarioId": 10196136,
+  "connectionId": 14756714,
+  "module": "google-cloud-firestore:createDocument",
+  "moduleId": 3,
+  "executionId": "bb8f16ab6bd9470e89d4023167a7fa8d",
+  "documentName": "projects/ays-orbit-360-lab/databases/(default)/documents/tenants/alianzas-soluciones/previewLeadIngressRequests/F8lDH5gK52bduaMZPvTl",
+  "documentCreateTime": "2026-11-24T15:51:06.075Z",
+  "externalMessagesSent": 0,
+  "stage": "PROBE",
+  "phase": "preview",
+  "sourceSha": "68a37a8e6f5bef24299773d8bc73f2d567c786cf",
+  "artifactId": 14934674207,
+  "artifactDigest": "sha256:bb7bf72757801ba8312c30f196a33b6920f941240bff9ee3354a58542407cfb7",
+  "buildRunId": 45425699992,
+  "backendPreviewRunId": 45429218736,
+  "closedConfigurationDigest": "9f63fef4dd696488b8efa335ce50598c5b1fff4ecc13f17c9889825fa06c8c5e",
+  "closedConfigurationRecordedAt": "2026-11-24T15:48:36.347Z",
+  "closedProbeDeadline": "2026-11-24T15:53:36.347Z",
+  "startedAt": "2026-11-24T15:51:05.103Z",
+  "durationMs": 1588,
+  "queueModuleFinishedAt": "2026-11-24T15:51:06.154Z",
+  "queueOnly": true,
+  "canonicalLeadAcceptanceClaim": false,
+  "authContextProven": false,
+  "authContextVerificationPending": true,
+  "nonceSha256": "66456e7007840f38f7601c5cc645725bb7570e2de4e9680cdfaa817186f0b57f",
+  "inputAndOutputNonceMatch": true,
+  "readback": {
+    "topology": [
+      3,
+      1,
+      2
+    ],
+    "scheduling": {
+      "type": "on-demand"
+    },
+    "scenarioStatus": "active",
+    "writerDisabled": true,
+    "lastEdit": "2026-11-24T15:51:12.361Z",
+    "queueModuleInvocations": 1,
+    "queueModuleErrors": 0,
+    "readerConfigurationsChangedByStage": false,
+    "originalModule2FilterPreserved": true,
+    "windowFrom": "2026-11-24T15:50:19Z",
+    "windowExecutions": [
+      {
+        "id": "bb8f16ab6bd9470e89d4023167a7fa8d",
+        "startedAt": "2026-11-24T15:51:05.103Z",
+        "status": "success",
+        "startedBy": "auto",
+        "duration": 1588,
+        "operations": 2,
+        "credits": 2,
+        "dataTransfer": 16153,
+        "isReplayable": true
+      }
+    ],
+    "explicitScenarioRunRequested": true,
+    "explicitScenarioRunCallCount": 1,
+    "providerStartedByLabel": "auto",
+    "stageMapperRetainedWhileDisabled": true,
+    "finalStructuralRestorePending": true
+  },
+  "evidence": {
+    "moduleReadCycle": 1,
+    "cycleSelectionBasis": "scenario_execution_inspect returned no cycle fields and explicitly instructed using cycle1; returned records match exact executionId, request nonce and queue.",
+    "inputRecordError": false,
+    "outputRecordError": false,
+    "truncated": false,
+    "actualOutputDocumentVerified": true,
+    "onlyModule3PayloadRead": true,
+    "privateGreenApiMessageBodiesRead": false
+  }
+}

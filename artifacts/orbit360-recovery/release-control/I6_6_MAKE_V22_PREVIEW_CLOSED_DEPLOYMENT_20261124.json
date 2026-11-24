@@ -1,0 +1,58 @@
+{
+  "schema": "GI_I66_MAKE_CLOSED_DEPLOYMENT_RECEIPT_V1",
+  "status": "CLOSED_PENDING_AUTH_CONTEXT_PROBE",
+  "phase": "preview",
+  "sourceSha": "68a37a8e6f5bef24299773d8bc73f2d567c786cf",
+  "artifactDigest": "sha256:bb7bf72757801ba8312c30f196a33b6920f941240bff9ee3354a58542407cfb7",
+  "authorityBlob": "9184fa7b2b6a38cf2f06b8c849e88b8f2663a009",
+  "function": {
+    "name": "orbit360MakeLeadIngressPreview",
+    "region": "us-east1",
+    "revision": "orbit360makeleadingresspreview-00001-big",
+    "runtimePrincipal": "646761409743-compute@developer.gserviceaccount.com",
+    "eventType": "google.cloud.firestore.document.v1.created.withAuthContext",
+    "database": "(default)",
+    "document": "tenants/alianzas-soluciones/previewLeadIngressRequests/{requestId}",
+    "retryPolicy": "RETRY_POLICY_RETRY",
+    "trigger": "projects/ays-orbit-360-lab/locations/nam5/triggers/orbit360makeleadingresspreview-949424",
+    "service": "projects/ays-orbit-360-lab/locations/us-east1/services/orbit360makeleadingresspreview",
+    "configurationDigest": "fb1603408943709d2e88eef8c740574f30b6f4547a84b9e8a766d31072a7683b"
+  },
+  "rules": {
+    "queueRulesDenyClient": true,
+    "rulesetName": "projects/ays-orbit-360-lab/rulesets/6b03deab-0ff4-4c5d-8e74-550982bafc34",
+    "rulesSourceBlob": "35fba451bbbeb97dbae3f08303b786ddbcbdd29f",
+    "rulesSourceSha256": "105f13e095d021a32d49c9b30400e7b509756f8bb45ea958c7483c7a2316bae3"
+  },
+  "projectIamReadback": {
+    "status": "PROJECT_IAM_UNCHANGED_AND_CLI_WRITES_FORBIDDEN",
+    "cliVersion": "14.10.1",
+    "beforeDigest": "2c928d027f3632fc4e9fa2f591127952590746b2f02a588015a0fed97dc0590f",
+    "afterDigest": "2c928d027f3632fc4e9fa2f591127952590746b2f02a588015a0fed97dc0590f",
+    "projectIamWrites": 0
+  },
+  "config": {
+    "schema": "GI_I66_MAKE_LEAD_CONFIGURATION_TRANSITION_V1",
+    "action": "PREPARE_CLOSED",
+    "phase": "preview",
+    "sourceSha": "68a37a8e6f5bef24299773d8bc73f2d567c786cf",
+    "authorityReceiptBlob": "9184fa7b2b6a38cf2f06b8c849e88b8f2663a009",
+    "requestDigest": "7e9c2638095b3107ee70011390c8f6f7a9aec1632bd9668edfb85a90bd1294bd",
+    "beforeDigest": "1c6037d63c165f20a5e28e4e18da5d568a36d8d8434fdf6b42707516e5c11ba4",
+    "afterDigest": "9f63fef4dd696488b8efa335ce50598c5b1fff4ecc13f17c9889825fa06c8c5e",
+    "state": "CLOSED",
+    "enabled": false,
+    "configurationWrites": 1,
+    "auditWrites": 1,
+    "canonicalLeadWrites": 0,
+    "notificationsCreated": 0,
+    "externalMessagesSent": 0,
+    "principalSha256": "",
+    "recordedAt": "2026-11-24T15:48:36.347Z",
+    "configReadback": true,
+    "auditReadback": true
+  },
+  "canonicalLeadWrites": 0,
+  "externalMessagesSent": 0,
+  "a13RealLeadAccepted": false
+}
