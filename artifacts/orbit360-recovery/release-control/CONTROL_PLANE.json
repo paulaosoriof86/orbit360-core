@@ -27,7 +27,7 @@
     "activeGate": "I6.6",
     "closedHistoricalGate": "B4-007",
     "latestProvenLiveSource": "65c825b2808a615ca4195bdde6689dbdbe3193b2",
-    "currentWork": "I6.6: repetir la sonda cerrada y el Preview firmado de cinco funciones usando el MISMO artifactV20, con nonce nuevo y preimagen CLOSED verificada después de compensación. Ejecutar Make dentro de la ventana vigente y restaurar su escenario. Después del cierre/restauración y padre estable, autorizar financiera48; E3 sigue aceptado.",
+    "currentWork": "I6.6: verificar compensación normal del run45386037158 (Make Preview ABSENT y config CLOSED) tras pausa externa por créditos. Preservar v20 inmutable y A13 HOLD. Evaluar salida FRONTEND_ONLY canónica del saldo con48 Preview y48 LIVE, sin desplegar backend ni declarar aceptación Make.",
     "latestHostingPreviewEvidence": "artifacts/orbit360-recovery/release-control/I6_6_NETWORK_DIAGNOSTICS_PREVIEW_BUILD_20261117.json",
     "latestHostingPreviewSource": "1b65a790530d49fe1d1fb451f02838fd9a713c53",
     "operationsEvidenceReview": "artifacts/orbit360-recovery/release-control/I6_6_OPS_EVIDENCE_AND_PREVIEW_BINDING_REVIEW_20261116.json",
@@ -2061,7 +2061,7 @@
       "lastFinancialApplicationAtUtc": "2026-11-24T09:49:10.0274037Z"
     },
     "frontendBalanceCorrection20261124": {
-      "status": "V20_SAME_ARTIFACT_NEW_CLOSED_PROBE_AUTHORIZED_AFTER_VERIFIED_COMPENSATION",
+      "status": "V20_IMMUTABLE_PRESERVED_EXTERNAL_MAKE_CREDIT_HOLD_FRONTEND_PATH_EVALUATION",
       "sourceQaHead": "b4f90d00c0468a54fc9b542d48212919e1a14144",
       "sourceQaRunId": 45382071947,
       "guardRunId": 45382071816,
@@ -7049,7 +7049,7 @@
     "i63LiveReadbackPass": true,
     "i63DeterministicDiffReady": true
   },
-  "nextAction": "I6.6: repetir la sonda cerrada y el Preview firmado de cinco funciones usando el MISMO artifactV20, con nonce nuevo y preimagen CLOSED verificada después de compensación. Ejecutar Make dentro de la ventana vigente y restaurar su escenario. Después del cierre/restauración y padre estable, autorizar financiera48; E3 sigue aceptado.",
+  "nextAction": "I6.6: verificar compensación normal del run45386037158 (Make Preview ABSENT y config CLOSED) tras pausa externa por créditos. Preservar v20 inmutable y A13 HOLD. Evaluar salida FRONTEND_ONLY canónica del saldo con48 Preview y48 LIVE, sin desplegar backend ni declarar aceptación Make.",
   "postproductionExitProgress": {
     "formalPercent": 60,
     "frozenMiniGates": 6,
@@ -26722,8 +26722,8 @@
   },
   "i66ActiveRecoveryCursor": {
     "status": "FROZEN_I66_SHOCK_EXECUTION_CONTINUES_NO_GATE_REPLACEMENT",
-    "currentEvidencePath": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_EXECUTION_PROGRESS_20261124_R38.json",
-    "currentEvidenceBlobSha": "afc4ab93d8e1b4fcf1e727ba6a9fa430f9ef0cec",
+    "currentEvidencePath": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_EXECUTION_PROGRESS_20261124_R39.json",
+    "currentEvidenceBlobSha": "033a5b24aa847ab485868220b01291a2064ee7af",
     "frozenPlanPath": "artifacts/orbit360-recovery/release-control/I6_6_PLAN_CHOQUE_FUNCIONAL_FINANCIERO_20261122.md",
     "frozenPlanBlobSha": "fbfd54d229a13101fbfb0dfc6e92a5fa524999b6",
     "fullInventoryPath": "artifacts/orbit360-recovery/release-control/I6_6_INVENTARIO_INTEGRAL_295_20261122.md",
@@ -26740,12 +26740,12 @@
     "financialRowsAppliedThisIteration": 104,
     "lastEvidenceDateLocal": "2026-11-24",
     "noNormativeProjectSourceChange": true,
-    "next": "I6.6: repetir la sonda cerrada y el Preview firmado de cinco funciones usando el MISMO artifactV20, con nonce nuevo y preimagen CLOSED verificada después de compensación. Ejecutar Make dentro de la ventana vigente y restaurar su escenario. Después del cierre/restauración y padre estable, autorizar financiera48; E3 sigue aceptado.",
+    "next": "I6.6: verificar compensación normal del run45386037158 (Make Preview ABSENT y config CLOSED) tras pausa externa por créditos. Preservar v20 inmutable y A13 HOLD. Evaluar salida FRONTEND_ONLY canónica del saldo con48 Preview y48 LIVE, sin desplegar backend ni declarar aceptación Make.",
     "lastFunctionalLiveUatRunId": 45074429319,
     "lastFunctionalLiveUatJobId": 137352857627,
     "lastFunctionalLiveScope": "TWO_ROLE_RENEWAL_INSURER_SYNTHETIC_PASS_REAL_ISSUANCE_AND_DOCUMENT_HOLD",
-    "previousEvidencePath": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_EXECUTION_PROGRESS_20261124_R37.json",
-    "previousEvidenceBlobSha": "68da8742780dc390f4e2be0e41a9bffae9cc6967",
+    "previousEvidencePath": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_EXECUTION_PROGRESS_20261124_R38.json",
+    "previousEvidenceBlobSha": "afc4ab93d8e1b4fcf1e727ba6a9fa430f9ef0cec",
     "lastFunctionalLiveUatStatus": "LIVE_PHYSICAL_STEPS_PASS_FIVE_ROLE_FINAL_COVERAGE_FAIL_CLOSED",
     "lastFinancialProtectedPreflightRunId": 45332501697,
     "lastFinancialSourceStatus": "155_DIRECT_HISTORICAL_PAYMENTS_46_NEW_OBLIGATIONS_READBACK_VERIFIED_607_AND_302_NOT_FULLY_CLOSED",
@@ -26773,7 +26773,7 @@
     "financialHistoricalPaymentsAppliedThisContinuation": 155,
     "financialHistoricalPaidReceiptsMaterializedThisContinuation": 153,
     "financialNewPendingObligationsThisContinuation": 46,
-    "moduleReleasedThisIterationScope": "Verified closed-probe compensation and same immutable v20 retry authorization; signed backend Preview, financial48 and LIVE remain pending."
+    "moduleReleasedThisIterationScope": "Closed external-credit-blocked Make test; immutable v20 preserved, compensation and independent frontend validation pending."
   },
   "i66PreversionedControlViewBlob": "de401082f688ce1c59f025f6f39e3c947dceaa35",
   "i66FrontendReleaseHead": {

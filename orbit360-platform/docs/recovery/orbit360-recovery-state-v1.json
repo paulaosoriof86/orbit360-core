@@ -56,11 +56,11 @@
       "artifactDigest": "sha256:7cb782848a45083047c4899bc30c13bf5be46429607e42597d09342becfc9acc",
       "hostingVersion": "sites/ays-orbit-360-lab/versions/332999a55b189108"
     },
-    "evidencePath": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_EXECUTION_PROGRESS_20261124_R38.json",
-    "evidenceGitBlobSha": "afc4ab93d8e1b4fcf1e727ba6a9fa430f9ef0cec",
+    "evidencePath": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_EXECUTION_PROGRESS_20261124_R39.json",
+    "evidenceGitBlobSha": "033a5b24aa847ab485868220b01291a2064ee7af",
     "activeGate": "I6.6",
-    "currentWork": "I6.6: repetir la sonda cerrada y el Preview firmado de cinco funciones usando el MISMO artifactV20, con nonce nuevo y preimagen CLOSED verificada después de compensación. Ejecutar Make dentro de la ventana vigente y restaurar su escenario. Después del cierre/restauración y padre estable, autorizar financiera48; E3 sigue aceptado.",
-    "nextAction": "I6.6: repetir la sonda cerrada y el Preview firmado de cinco funciones usando el MISMO artifactV20, con nonce nuevo y preimagen CLOSED verificada después de compensación. Ejecutar Make dentro de la ventana vigente y restaurar su escenario. Después del cierre/restauración y padre estable, autorizar financiera48; E3 sigue aceptado.",
+    "currentWork": "I6.6: verificar compensación normal del run45386037158 (Make Preview ABSENT y config CLOSED) tras pausa externa por créditos. Preservar v20 inmutable y A13 HOLD. Evaluar salida FRONTEND_ONLY canónica del saldo con48 Preview y48 LIVE, sin desplegar backend ni declarar aceptación Make.",
+    "nextAction": "I6.6: verificar compensación normal del run45386037158 (Make Preview ABSENT y config CLOSED) tras pausa externa por créditos. Preservar v20 inmutable y A13 HOLD. Evaluar salida FRONTEND_ONLY canónica del saldo con48 Preview y48 LIVE, sin desplegar backend ni declarar aceptación Make.",
     "frontendPreviewRequest": {
       "version": 20,
       "sourceQaHead": "b4f90d00c0468a54fc9b542d48212919e1a14144",
@@ -564,7 +564,7 @@
     "phaseAIterationStatuses": "HISTORICAL_FIELDS_ABOVE_PRESERVED_UNTIL_FORMAL_GATE_EVIDENCE;_NO_NEW_PASS_INFERRED",
     "labDataWriteScope": "ONLY_35_AUTHORIZED_COUNTRY_FIELDS;_NO_AUGUST_REFRESH"
   },
-  "nextAction": "I6.6: repetir la sonda cerrada y el Preview firmado de cinco funciones usando el MISMO artifactV20, con nonce nuevo y preimagen CLOSED verificada después de compensación. Ejecutar Make dentro de la ventana vigente y restaurar su escenario. Después del cierre/restauración y padre estable, autorizar financiera48; E3 sigue aceptado.",
+  "nextAction": "I6.6: verificar compensación normal del run45386037158 (Make Preview ABSENT y config CLOSED) tras pausa externa por créditos. Preservar v20 inmutable y A13 HOLD. Evaluar salida FRONTEND_ONLY canónica del saldo con48 Preview y48 LIVE, sin desplegar backend ni declarar aceptación Make.",
   "sourceOfTruth": {
     "projectBoundaryPrevalentAddendum": "orbit360-platform/docs/recovery/ADDENDUM_PREVALENTE_CHATGPT_PROJECT_BOUNDARY_20260831.md",
     "mutableState": "orbit360-platform/docs/recovery/orbit360-recovery-state-v1.json",
@@ -4555,6 +4555,37 @@
         "activeGate": "I6.6",
         "currentWork": "I6.6: verificar la compensación del run45383695751 después del retiro de la sonda CLOSED vencida: trigger Preview ABSENT y configuración CLOSED con su digest actual. Luego reautorizar el MISMO artifactV20 con nonce nuevo y preimagen real. No reconstruir, no cancelar el executor, no adelantar financiera48 ni aceptación LIVE.",
         "nextAction": "I6.6: verificar la compensación del run45383695751 después del retiro de la sonda CLOSED vencida: trigger Preview ABSENT y configuración CLOSED con su digest actual. Luego reautorizar el MISMO artifactV20 con nonce nuevo y preimagen real. No reconstruir, no cancelar el executor, no adelantar financiera48 ni aceptación LIVE.",
+        "frontendPreviewRequest": {
+          "version": 20,
+          "sourceQaHead": "b4f90d00c0468a54fc9b542d48212919e1a14144",
+          "sourceQaRunId": 45382071947,
+          "guardRunId": 45382071816
+        }
+      }
+    },
+    {
+      "reason": "ACTIVE_OWNER_PLAN_SUMMARY_SUPERSEDED",
+      "priorGitBlobSha": "2f802e60ec34c174318a7af5341a5e51035eced5",
+      "supersededByGeneration": 3,
+      "prior": {
+        "schema": "GI_I66_ACTIVE_OWNER_PLAN_CONTINUATION_V1",
+        "authorityPointer": "artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json#i66OperationalContinuation20261115",
+        "generation": 3,
+        "latestProvenLiveSource": "65c825b2808a615ca4195bdde6689dbdbe3193b2",
+        "latestPhysicalFrontendLiveReceipt": "artifacts/orbit360-recovery/release-control/I6_6_FRONTEND_E00003_RECEIPT.json",
+        "currentPhysicalFrontend": {
+          "generation": 3,
+          "sourceSha": "65c825b2808a615ca4195bdde6689dbdbe3193b2",
+          "buildId": "gi-i66-65c825b2808a-57f234755dc1",
+          "artifactId": 14873426438,
+          "artifactDigest": "sha256:7cb782848a45083047c4899bc30c13bf5be46429607e42597d09342becfc9acc",
+          "hostingVersion": "sites/ays-orbit-360-lab/versions/332999a55b189108"
+        },
+        "evidencePath": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_EXECUTION_PROGRESS_20261124_R38.json",
+        "evidenceGitBlobSha": "afc4ab93d8e1b4fcf1e727ba6a9fa430f9ef0cec",
+        "activeGate": "I6.6",
+        "currentWork": "I6.6: repetir la sonda cerrada y el Preview firmado de cinco funciones usando el MISMO artifactV20, con nonce nuevo y preimagen CLOSED verificada después de compensación. Ejecutar Make dentro de la ventana vigente y restaurar su escenario. Después del cierre/restauración y padre estable, autorizar financiera48; E3 sigue aceptado.",
+        "nextAction": "I6.6: repetir la sonda cerrada y el Preview firmado de cinco funciones usando el MISMO artifactV20, con nonce nuevo y preimagen CLOSED verificada después de compensación. Ejecutar Make dentro de la ventana vigente y restaurar su escenario. Después del cierre/restauración y padre estable, autorizar financiera48; E3 sigue aceptado.",
         "frontendPreviewRequest": {
           "version": 20,
           "sourceQaHead": "b4f90d00c0468a54fc9b542d48212919e1a14144",
