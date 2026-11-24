@@ -4821,12 +4821,12 @@
     "liveProofSha256": "4013a99719ba5f8bb3087a5e5f43c189a22daf55aabfcea37e8df5030bb5653c"
   },
   "frontendPreviewRequest": {
-    "version": 15,
+    "version": 16,
     "mode": "PREVIEW_HOSTING_ONLY",
-    "sourceQaHead": "c6401502e0a00843e0ea2e1e0494accfa3e40586",
+    "sourceQaHead": "fa1afbbc531313333cda99be01a186ed6afd2e13",
     "manifestBlob": "2d9d4e08648b562d9d51f1dd96ea97abc8b2bf69",
-    "sourceQaRunId": 45338141255,
-    "guardRunId": 45338141269,
+    "sourceQaRunId": 45347366830,
+    "guardRunId": 45347366852,
     "previousReceiptBlob": "11fdb3bee494541513482666d6215f45cbad0567",
     "productPaths": [
       "orbit360-platform/core/queries.js"
@@ -4840,7 +4840,7 @@
     "realCustomerWritesAllowed": false,
     "liveDeployAuthorized": false,
     "releaseAfterPreviewAllowed": false,
-    "releaseMechanismSourceSha": "c6401502e0a00843e0ea2e1e0494accfa3e40586",
+    "releaseMechanismSourceSha": "fa1afbbc531313333cda99be01a186ed6afd2e13",
     "ownerInstruction": "Continue the authorized I6.6 causal correction and publish only after exact Preview and LIVE proof. Preserve all accepted financial writes and previous release evidence.",
     "scope": "I6.6 frontend-only canonical future-pending balance proof. Build once and publish Hosting Preview only. No backend, data, rules, or Auth changes.",
     "reason": "Signed E3 observation45332501772 proves the canonical producer emits futuro_pendiente while the read-model balance fallback rejects it. Correct exact known pending semantics with contradictory-payment guards, then verify48 real role/viewport/reload stages per phase on the SAME artifact.",
@@ -5955,5 +5955,31 @@
     "previousPreviewFailureStage": "FORM_FIELDS",
     "previousLivePromotionFailureRun": 45284653398,
     "previousLivePromotionFailureCheck": "HISTORICAL_PREVIEW_FLAGS_APPLIED_TO_CURRENT_AUTHORIZED_LIVE"
+  },
+  "priorFrontendPreviewRequestBeforeV16_20261124": {
+    "version": 15,
+    "mode": "PREVIEW_HOSTING_ONLY",
+    "sourceQaHead": "c6401502e0a00843e0ea2e1e0494accfa3e40586",
+    "manifestBlob": "2d9d4e08648b562d9d51f1dd96ea97abc8b2bf69",
+    "sourceQaRunId": 45338141255,
+    "guardRunId": 45338141269,
+    "previousReceiptBlob": "11fdb3bee494541513482666d6215f45cbad0567",
+    "productPaths": [
+      "orbit360-platform/core/queries.js"
+    ],
+    "backendPaths": [],
+    "backendPathBlobs": {},
+    "backendPreviewRequired": false,
+    "backendLiveDeployAllowed": false,
+    "fourFunctionExactPreviewRequired": false,
+    "realDataWritesAllowed": false,
+    "realCustomerWritesAllowed": false,
+    "liveDeployAuthorized": false,
+    "releaseAfterPreviewAllowed": false,
+    "releaseMechanismSourceSha": "c6401502e0a00843e0ea2e1e0494accfa3e40586",
+    "ownerInstruction": "Continue the authorized I6.6 causal correction and publish only after exact Preview and LIVE proof. Preserve all accepted financial writes and previous release evidence.",
+    "scope": "I6.6 frontend-only canonical future-pending balance proof. Build once and publish Hosting Preview only. No backend, data, rules, or Auth changes.",
+    "reason": "Signed E3 observation45332501772 proves the canonical producer emits futuro_pendiente while the read-model balance fallback rejects it. Correct exact known pending semantics with contradictory-payment guards, then verify48 real role/viewport/reload stages per phase on the SAME artifact.",
+    "causalReceipt": "artifacts/orbit360-recovery/release-control/I6_6_FUTURE_PENDING_BALANCE_OWNER_CAUSAL_CORRECTION_20261124.json"
   }
 }

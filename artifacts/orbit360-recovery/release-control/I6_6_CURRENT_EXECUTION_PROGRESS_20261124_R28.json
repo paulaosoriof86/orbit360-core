@@ -1,0 +1,2517 @@
+{
+  "schema": "GRAVICENTRA_I66_OPERATIONAL_SHOCK_PROGRESS_DERIVED_V2",
+  "recordType": "SUBORDINATE_APPEND_ONLY_EXECUTION_RECEIPT_NOT_RELEASE_GATE_AUTHORITY",
+  "product": "Gravicentra Insurance",
+  "repo": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "createdDateLocal": "2026-11-24",
+  "activeGate": "I6.6",
+  "frozenPlan": {
+    "path": "artifacts/orbit360-recovery/release-control/I6_6_PLAN_CHOQUE_FUNCIONAL_FINANCIERO_20261122.md",
+    "gitBlobSha": "fbfd54d229a13101fbfb0dfc6e92a5fa524999b6"
+  },
+  "fullFindings": {
+    "path": "artifacts/orbit360-recovery/release-control/I6_6_INVENTARIO_INTEGRAL_295_20261122.md",
+    "gitBlobSha": "6d5a15d6d05c1145a2ff536b085eaa6629722273",
+    "count": 295,
+    "originalLedgerUnmodified": true
+  },
+  "frozenBusinessDecision": "No reconstruir ni reimportar; un solo artifact por deploy, actualizar solo deltas probados, publicar cada corrección que supere su gate, no declarar PASS por fuente o UI aislada, permisos Operativo escritos en módulos asignados.",
+  "officialProgress": {
+    "phaseAHistoricalGates": {
+      "closed": 7,
+      "total": 7,
+      "percent": 100
+    },
+    "postproductionI6": {
+      "closed": 6,
+      "total": 10,
+      "percent": 60
+    },
+    "currentSubgate": "I6.6",
+    "fullI66Accepted": false
+  },
+  "shockObjectives": {
+    "total": 14,
+    "physicallyPassed": 2,
+    "percent": 14.3,
+    "meaning": "Solo puntos discretos del plan de choque, no progreso funcional total de la plataforma",
+    "items": [
+      {
+        "id": "A01",
+        "title": "DNS/HTTPS público + mismo build en ambos LIVE",
+        "status": "AVAILABILITY_EXTERNAL_SIGNED_PASS",
+        "evidence": "45294264050 / availability job138110539134 / accepted E3 exact source65c825",
+        "next": "HTTP 200 en 4 rutas, SHA exacta, DNS público",
+        "passForShock": true
+      },
+      {
+        "id": "A02",
+        "title": "Control Plane ↔ transporte ↔ puntero LIVE y guard",
+        "status": "AUTHORITY_SIGNED_PASS",
+        "evidence": "45292163934 / E3 COMMITTED frontend+4backend / post-acceptance guard45294264050",
+        "next": "E3: 224/224 archivos por origen, cuatro revisiones al 100 %, CP/state/transport/ledger sincronizados y guard posterior PASS.",
+        "passForShock": true
+      },
+      {
+        "id": "A03",
+        "title": "Acceso desde Chrome de Dirección",
+        "status": "CONNECTED_CHROME_NEW_TAB_CONTROL_LOGIN_OBSERVED_AUTHENTICATED_DIRECTION_SESSION_OPEN",
+        "evidence": "Chrome extension inventory and new GitHub protected-review tabs worked; new production tab1088577816 displayed login. Existing production tab1088577369 failed focus emulation; no authenticated Direction module pass claimed.",
+        "next": "Continue authenticated Direction UI after legitimate sign-in; preserve working connected browser and exact E3 CI proof. The old tab focus timeout is not evidence of browser disconnection.",
+        "passForShock": false,
+        "previousSessionStatus": "PARTIAL_CARLOS_CONNECTED_CHROME_INICIO_5_5_READY_SECOND_TAB_RESTORING"
+      },
+      {
+        "id": "A04",
+        "title": "Matriz completa de permisos reales Operativo/Admin/SuperAdmin/Dirección/Asesor",
+        "status": "PASS_SCOPED_GT_FIVE_ROLES_READONLY_FULL_A04_HOLD",
+        "evidence": "45298628816 / job138125264398 / artifact14878390250 / GT5 roles x2viewports x14routes =140; advisor directory denial before/after reload; fullA04 false",
+        "next": "Preserve five-role GT read-only PASS140. Complete CO and backend negative write permissions with legitimate assigned actors; do not repeat this completed GT read-only proof or infer real CRUD acceptance.",
+        "passForShock": false
+      },
+      {
+        "id": "A05",
+        "title": "Cliente360 edición, gestiones, actividad, notas y adjuntos",
+        "status": "LINKED_DEAL_HISTORY_LIVE_UI_PASS_OTHER_ACTIONS_OPEN",
+        "evidence": "run 45072928898 live job 137364601383",
+        "next": "Test real existing-client edit, management/activity/notes/attachments including Drive roundtrip with user and readback; no false pass.",
+        "passForShock": false
+      },
+      {
+        "id": "A06",
+        "title": "Ops/Leads y oportunidad/inspección desde cliente existente",
+        "status": "EXISTING_INSPECTION_LINKED_HISTORY_LIVE_PASS_MANAGEMENT_WRITE_OPEN",
+        "evidence": "run 45072928898 live job 137364601383; existing Corado ops0 leads1",
+        "next": "Complete Carlos Corado existing-client inspection and opportunity canonical linking; retain signed Ops task synthetic PASS.",
+        "passForShock": false
+      },
+      {
+        "id": "A07",
+        "title": "Emisión de póliza nueva, asesor y primas de Sergio",
+        "status": "HOLD_REAL_ISSUANCE",
+        "evidence": "I6_6_FINANCIAL_OPS_LEADS_CONTINUITY_READBACK_20261119.json",
+        "next": "Sin nueva póliza real certificada",
+        "passForShock": false
+      },
+      {
+        "id": "A08",
+        "title": "Renovación en firme, hija, calendarios y Kanban",
+        "status": "TWO_ADDITIONAL_ISSUED_SUCCESSORS_24_OBLIGATIONS_SERVER_READBACK_PASS_UI_KANBAN_OPEN",
+        "evidence": "45330498425 / job138231284166: two additional issuer-original successors, 24 new obligations/Q6678.12, two prior cases preserved with zero writes; earlier four commercial successor proofs preserved.",
+        "next": "Preserve new and prior exact server commits. Complete the real browser renewal-button/PDF/reload/Kanban flow; investigate the single current-risk conflict of the remaining issued case using its actual parent evidence.",
+        "passForShock": false
+      },
+      {
+        "id": "A09",
+        "title": "Sustitución de vehículo con endoso emitido exacto",
+        "status": "ISSUED_199154_APRIL_CERTIFICATE_1_TO_2_FOUND_EXACT_CURRENT_RISK_OPEN",
+        "evidence": "I6_6_FINANCIAL_OPS_LEADS_CONTINUITY_READBACK_20261119.json",
+        "next": "Fecha/referencia previa difiere",
+        "passForShock": false
+      },
+      {
+        "id": "A10",
+        "title": "Cobros reales sin documentos y con factura en una operación",
+        "status": "SIGNED_LIVE_SYNTHETIC_PAYMENT_RECONCILE_NO_DUPLICATE_PASS_EDSON_ONE_STEP_INVOICE_HOLD",
+        "evidence": "run 45072928898 signed LIVE; optional Drive fail source f1eb",
+        "next": "Original Edson requestId, exact receipt current server preimage; one-step real invoice upload and payment reconciliation; no blind retry.",
+        "passForShock": false
+      },
+      {
+        "id": "A11",
+        "title": "Drive OAuth y subida/lectura de documentos real",
+        "status": "HOLD_TENANT_SETUP_REQUIRED_GOOGLE_OAUTH_CURRENT_READBACK",
+        "evidence": "run 45282695083 job 138070969557; Dirección and Carlos signed status HTTP200 tenant_setup_required",
+        "next": "Complete existing tenant Google OAuth consent and prove actual upload/readback. Optional-document payment remains independent.",
+        "passForShock": false
+      },
+      {
+        "id": "A12",
+        "title": "Lote incremental real aplicado y probado",
+        "status": "148_HISTORICAL_PAYMENTS_24_ISSUED_OBLIGATIONS_PASS_CAUSAL_BALANCE_SOURCE_QA_PASS_PREVIEW_AND_LIVE_PENDING",
+        "evidence": "45328403470:2 payments;45330498452:146 payments;45330498425:24 obligations;45332501697:fresh302=214unchanged/88held/0ready; six UI 45332501772 I66_SIX_VISIBLE_VALUES_OR_BALANCE_HOLD; causal source95214f67, frozen SourceQA45338141255 and guard45338141269; v15 immutable build45338620622 exact224; Preview45339573549 partial24 and transient DOM detach HOLD, no promotion; causal source95214f67, frozen SourceQA45347366830 and guard45347366852",
+        "next": "Execute frontend-only v16 once, exact48-stage Preview and same-artifact48-stage LIVE; preserve completed financial batches and the prior observer45332501772. Continue source607 remaining117 and source302 remaining88 by exact cause; their universes may overlap.",
+        "passForShock": false
+      },
+      {
+        "id": "A13",
+        "title": "Leads WhatsApp/form/correo mediante Make escritor autorizado",
+        "status": "WHATSAPP_READER_ACTIVE_IMAP_REAL_RECEIVE_PASS_CANONICAL_WRITER_OPEN",
+        "evidence": "Make10196136 active; IMAP10221181 execution3cde1527cb824947a38123ddee794674 success; existing configuration probe45342932589/job138270601689: tenant and secret binding valid, inbound route not configured; approved assignment pending_operations in receipt7ce546736ac8d08b8ac922d19f3e6e4c2bac0021",
+        "next": "Complete the authenticated existing Make reader adapter to the canonical Leads transaction using the approved pending_operations assignment, exact ad/sourceId and activation boundary. Require actual lead write/readback/replay and visibility; preserve outbound=false and no implicit historical backfill. Email/source classifier and the real webform source remain distinct open parts of A13.",
+        "passForShock": false
+      },
+      {
+        "id": "A14",
+        "title": "QA transversal módulos, viewport, rendimiento y reinicio",
+        "status": "LIVE_SOURCE_TIMELINE_13350MS_11581MS_SOURCES_PLUS_1769MS_DOM_THREE_SOURCE_PLAN_DENIALS_OPEN",
+        "evidence": "45299330794 / job138127612969 / artifact14878846193 / exactE3 source65c825",
+        "next": "Use measured source timeline to resolve receipt/portfolio readiness latency and three exact source plan denials; GT5-role read-only is proved, CO/CRUD/full responsive and performance acceptance remain open.",
+        "passForShock": false
+      }
+    ]
+  },
+  "releasedFrontend": {
+    "sourceSha": "65c825b2808a615ca4195bdde6689dbdbe3193b2",
+    "buildId": "gi-i66-65c825b2808a-57f234755dc1",
+    "artifactId": 14873426438,
+    "digest": "sha256:7cb782848a45083047c4899bc30c13bf5be46429607e42597d09342becfc9acc",
+    "fileCount": 224,
+    "hostingVersion": "sites/ays-orbit-360-lab/versions/332999a55b189108",
+    "liveReceipt": "artifacts/orbit360-recovery/release-control/I6_6_FRONTEND_E00003_RECEIPT.json"
+  },
+  "externalAvailability": {
+    "status": "PASS_PUBLIC_ANONYMOUS_EXACT_BUILD_ONLY",
+    "runId": 45068427094,
+    "checkedAtUtc": "2026-11-22T20:47:40.419439+00:00",
+    "customHttp": 200,
+    "firebaseHttp": 200,
+    "bothMarkersExact": true,
+    "localChromeStatus": "REPORTED_ERR_FAILED_NOT_RETESTED_ON_LOCAL"
+  },
+  "technicalRootFixes": {
+    "cpTransportDrift": "FIXED_IN_5a486_and_guard",
+    "staleUat": "FIXED_47ef35b_run45064138268_PASS",
+    "consumedBuildAuthorization": "FIXED_4c4c72_run45064931462_PASS",
+    "dualOriginMonitor": "PRESENT_d273ac_job137349710564_PASS",
+    "currentI66PerformanceQaSourceSha": "2c7bdb7d7a40f3af6f464fcaf2545a97e9273f29",
+    "historicalStalePerfPushDisabledAt": "849a9f72655d39c2cf48ff4716b27add19a55e11",
+    "roleMatrixCanonicalAdvisorUidRerunAt": "b6d27447786779e5b2b678261ef50c3568f7a19d",
+    "executionProgressProjectionAndObserverRetirement": {
+      "sourceCommit": "febc81c04275cf8ecbb8b8b9a30952542fd169a9",
+      "sourceQaRunId": 45329546346,
+      "guardRunId": 45329546355,
+      "sourceQaVerified": true,
+      "guardVerified": true,
+      "oldArtifactProofCannotTransferToSuccessor": true
+    }
+  },
+  "financialWork": {
+    "previousAppliedCobrosCendoso": 336,
+    "previousInsurerReceiptAndCarteraCorrections": 110,
+    "readySourceBatch": {
+      "path": "artifacts/orbit360-recovery/source-batches/I6_6_ROBLE_113_EDITION_DOC_READINESS_20261122.json",
+      "blobSha": "fbe3be3bb09d1965653b1049b50b6141ede4acf9",
+      "rows": 113,
+      "policies": 14,
+      "appliedNow": 0
+    },
+    "otherSourceRows302": {
+      "snapshotPhase": "AFTER_APPLY_FRESH_SERVER_CENSUS",
+      "unchanged": 214,
+      "held": 88,
+      "ready": 0,
+      "priorExistingUpdatesPreserved": 6,
+      "newObligationsThisExecution": 24,
+      "runId": 45332501697
+    },
+    "currentIterationRealCustomerFinancialWrites": 82,
+    "doNotRepeatPaid": true,
+    "fresh302SourcePreflight": {
+      "sourceRows": 302,
+      "unchanged": 214,
+      "exceptions": 88,
+      "ready": 0,
+      "writes": 0,
+      "runId": 45332501697,
+      "jobId": 138236726429,
+      "receipt": {
+        "path": "artifacts/orbit360-recovery/release-control/I6_6_SOURCE_302_POST_COMMERCIAL_READONLY_CENSUS_20261124.json",
+        "gitBlobSha": "12a837cb1f85aae99af8cebb82ed7535064be43e"
+      },
+      "fullRescanAfterWrites": true,
+      "exceptionCodes": {
+        "POLICY_EDITION_MISSING": 67,
+        "RECEIPT_NOT_IDENTIFIED": 20,
+        "PAYMENT_OR_PORTFOLIO_EXCEPTION": 1
+      },
+      "alreadyPaid0043PreservedSeparateFromGenericExceptionCount": true,
+      "snapshotPhase": "AFTER_24_NEW_OBLIGATIONS_AND_SIX_PRIOR_CORRECTIONS"
+    },
+    "issuerDocumentCrosscheck": {
+      "path": "artifacts/orbit360-recovery/source-batches/I6_6_ROBLE_THREE_ISSUED_TERMS_DOCUMENTARY_CROSSCHECK_20261122.json",
+      "gitBlobSha": "9e2aae3fdfa758480a46088890be6337bf7d8a74",
+      "policies": 3,
+      "affectedStatementRows": 22,
+      "applied": 0,
+      "keyFindings": [
+        "91-4143471 missing issued edition; 12 original requirements, 10 pending, Q0.05 cover/schedule conflict",
+        "91-8357452 one original issued requirement exactly matches pending statement but Firestore only 2025–2026 edition",
+        "91-8322914 original issuer schedule one requirement 5654713 for Q5502.36; newer pending statement eleven separate 5773297–5773307 Q5635.08; new issuer endoso/plan unverified"
+      ]
+    },
+    "measure": "Known prior 58 plus new 24 issuer schedule obligations. Excludes 146 separately materialized historical paid receipts and six updates of existing obligations; not the full database count.",
+    "commercialReceipts": [
+      {
+        "path": "artifacts/orbit360-recovery/release-control/I6_6_D02_COMMERCIAL_RENEWAL_SERVER_READBACK_20261122.json",
+        "blobSha": "8b27885da3f12fee7cbe9d5a517d9fe85e2bafcc"
+      },
+      {
+        "path": "artifacts/orbit360-recovery/release-control/I6_6_D01_COMMERCIAL_ISSUED_SCHEDULE_SERVER_READBACK_20261122.json",
+        "blobSha": "abcc3948ba35c6a1edb8bb9b7a971d770a8d728e"
+      },
+      {
+        "path": "artifacts/orbit360-recovery/release-control/I6_6_D03_COMMERCIAL_ISSUED_SCHEDULE_SERVER_READBACK_20261122.json",
+        "blobSha": "eb65de63f679ddd6a1249b44dd8926c3eb65ee84"
+      },
+      {
+        "path": "artifacts/orbit360-recovery/release-control/I6_6_EL_ROBLE_91_8324489_CANONICAL_RECEIPT_20261122.json",
+        "blobSha": "3fa3649d2c847bc06a81b93d75c9da0e89510338"
+      },
+      {
+        "path": "artifacts/orbit360-recovery/release-control/I6_6_EL_ROBLE_91_8343059_CANONICAL_RECEIPT_20261122.json",
+        "blobSha": "607056c95e9e9bc27c82f329529599b955c46756"
+      },
+      {
+        "path": "artifacts/orbit360-recovery/release-control/I6_6_GYT_519815_MINIFREEZE_20261122.json",
+        "blobSha": "6d995b32220581625f2724a145961afcacc0bda3"
+      },
+      {
+        "path": "artifacts/orbit360-recovery/release-control/I6_6_EL_ROBLE_91_8323091_CANONICAL_RECEIPT_20261124.json",
+        "blobSha": "0e0fd2021ce1a275e97aa69428b20605f3077563"
+      },
+      {
+        "path": "artifacts/orbit360-recovery/release-control/I6_6_EL_ROBLE_91_8342189_CANONICAL_RECEIPT_20261124.json",
+        "blobSha": "3a9b1147b28ac83474526cc9a518a1d8ae8c6b2f"
+      }
+    ],
+    "previous302Snapshot": {
+      "runId": 45095576694,
+      "runAttempt": 1,
+      "jobId": 137434517660,
+      "examined": 302,
+      "sourcePolicies": 47,
+      "currentPolicyEditionsRead": 102,
+      "unchanged": 185,
+      "previouslyUnchangedPreserved": 137,
+      "newStatementRowsMatched": 48,
+      "additionalInferredRowsOutsideOpenStatement": 2,
+      "missingExactEdition": 97,
+      "receiptIdentityHolds": 20,
+      "exceptions": 117,
+      "eligible": 0,
+      "repeatWrites": 0,
+      "additionalFutureContractRowsOutsideOpenStatement": 8
+    },
+    "existingObligationCorrectionReceipts": [
+      {
+        "path": "artifacts/orbit360-recovery/release-control/I6_6_FINANCIAL_SIX_EXISTING_RECEIPTS_READBACK_20261123_RUN45272554046.json",
+        "blobSha": "f9770f11151cb0694acce8e8526dd5390db66e0c",
+        "runId": 45272554046,
+        "applied": 6,
+        "newObligations": 0,
+        "amountDeltaCents": 0
+      }
+    ],
+    "currentSessionFinancialCorrections": {
+      "existingObligationsUpdated": 6,
+      "financialDocumentUpdates": 12,
+      "auditCreates": 6,
+      "payments": 0,
+      "newObligations": 0,
+      "unchangedGrossGTQCents": 166956,
+      "grossDeltaCents": 0
+    },
+    "currentSignedUiReadback": {
+      "status": "SIX_EXACT_UI_DATES_AMOUNTS_STATUS_AND_RELOAD_PASS_CANONICAL_FUTURO_PENDIENTE_BALANCE_OWNER_HOLD",
+      "runId": 45332501772,
+      "jobId": 138236726700,
+      "workflowHeadSha": "155918f7b422b6ed2e974f9bd66852c0029bbdf1",
+      "qaSourceSha": "2c7bdb7d7a40f3af6f464fcaf2545a97e9273f29",
+      "sourceQaRunId": 45332244652,
+      "guardRunId": 45332244634,
+      "artifactId": 14893555540,
+      "artifactDigest": "sha256:d991dcf312991aaa0bd9522925f42a0fbcc0ad21988d6ff339d744b3df0bdc7c",
+      "reportSha256": "d24326a3101f372fd43763e1485a64fc86724dd687dd9f9a0247b89b18df0abf",
+      "observedFailureCode": "I66_SIX_VISIBLE_VALUES_OR_BALANCE_HOLD",
+      "actualExecutionStage": "SIGNED_READONLY_SIX_EXISTING_RECEIPTS_ALL_TWELVE_STAGES",
+      "terminalCertificateStep": "SKIPPED_AFTER_BALANCE_OWNER_HOLD",
+      "priorProtectedApplyRunId": 45272554046,
+      "priorProtectedReadback": "BULK_PROTECTED_READBACK_PASS",
+      "existingObligationsUpdated": 6,
+      "receiptUpdates": 6,
+      "portfolioUpdates": 6,
+      "auditCreates": 6,
+      "newPayments": 0,
+      "newObligations": 0,
+      "newWritesInObserver": 0,
+      "grossDeltaCents": 0,
+      "unchangedGrossGTQCents": 166956,
+      "fullA12Passed": false,
+      "uiAccepted": false,
+      "rootCauseProven": true,
+      "cause": "The accepted engine produces canonical estadoOperativo=futuro_pendiente; E3 portfolioAmountProof fallback excludes that exact known pending state when cartera.monto/saldo are absent. Calendar status and all monetary/source/date/identity comparisons pass.",
+      "causeOwner": "orbit360-platform/core/queries.js#portfolioAmountProof",
+      "producerOwner": "orbit360-platform/core/policy-receipts-engine.js#portfolioState",
+      "target": {
+        "generation": 3,
+        "sourceSha": "65c825b2808a615ca4195bdde6689dbdbe3193b2",
+        "buildId": "gi-i66-65c825b2808a-57f234755dc1",
+        "buildRunId": 45287432665,
+        "artifactId": 14873426438,
+        "artifactDigest": "sha256:7cb782848a45083047c4899bc30c13bf5be46429607e42597d09342becfc9acc",
+        "hostingVersion": "sites/ays-orbit-360-lab/versions/332999a55b189108",
+        "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_FRONTEND_E00003_RECEIPT.json",
+        "receiptGitBlobSha": "11fdb3bee494541513482666d6215f45cbad0567",
+        "receiptCommit": "f80c37e174406ccb489569b3bc7dd6073c2c4273"
+      },
+      "qaPins": {
+        ".github/workflows/gravicentra-i66-live-performance-readonly.yml": "12225700cec41aafabc477d60fe7f525ba957e12",
+        ".github/workflows/gravicentra-i66-privileged-role-parity-source-qa.yml": "6a30bbd84977abb4ebd82c681b0a63f8f02821f3",
+        ".github/workflows/gravicentra-release-lock-sync.yml": "379f7d4fef9daedfa0c060cadc7646ce788f7b6e",
+        "tools/gravicentra-governance-preflight-v1.mjs": "fbeda06fdd13e0351060f5fdec7f6b8dfcf580fe",
+        "tools/gravicentra-i6-6-delta-guard.mjs": "576eda7cd5767c8a7e3bd033f36a8805f06890e8",
+        "tools/gravicentra-i6-6-delta-test-revisions.cjs": "b99b4e8ac0def995efbc4f1fdb00b67efdc31a49",
+        "tools/gravicentra-i6-6-direction-preview-legal-acceptance.cjs": "b3a6539596fb9ed706f7a6e21aa982bf97129780",
+        "tools/gravicentra-i6-6-operational-release-candidate.cjs": "95d1221eeab7b5cc818dde314d5c8c0528823911",
+        "tools/gravicentra-i6-6-performance-first-route-source-timeline.test.cjs": "5a9b7fccbbce89b85669bc6a8bbd82cc30481563",
+        "tools/gravicentra-i6-6-readonly-observer-authority.test.cjs": "4d03114cddcdd59f4af3e9e916bead8548351619",
+        "tools/gravicentra-i6-6-six-existing-receipts-ui-readonly.test.cjs": "d8a3984718ae06c3071fcbd7e3a7e40ebbf7677a",
+        "tools/gravicentra-i66-frontend-control.cjs": "81b2f844856d188dd6cf915f10ee29b8daf08f98",
+        "tools/gravicentra-i66-frontend-promotion-transaction.cjs": "7e99182ff7854be39c8c5e90056ec6ee69d09994",
+        "tools/gravicentra-i66-live-performance-readonly.mjs": "3abfc5a95f0ea19d7cd79e9f0dc743ac830a8eac"
+      },
+      "stageCount": 12,
+      "grossChecksPassed": 12,
+      "contractualDueChecksPassed": 12,
+      "operationalLimitChecksPassed": 12,
+      "statusChecksPassed": 12,
+      "balanceVerifiedFailures": 12,
+      "balanceStateFailures": 12,
+      "reloadComparisonsFailed": 0,
+      "signedReloadsPassed": 6,
+      "serverUnchanged": true,
+      "sourceSnapshotBeforeEqualsAfter": true,
+      "additionalWrites": 0,
+      "errorCounts": {
+        "pageErrors": 0,
+        "consoleErrors": 0,
+        "httpClasses": {},
+        "blockedWrites": 0
+      },
+      "finalObserverAuthorityCheckPerformed": false,
+      "finalCobrosEngineCertificatePerformed": false,
+      "rawFinancialInputsCompared": true,
+      "rawCountryProjectionOnly": "functions/b4-003-scoped-related-reader.js#financialView pais projection",
+      "sourceRequirements": [
+        "5228533",
+        "5228534",
+        "5228535",
+        "5228536",
+        "5228537",
+        "5228538"
+      ],
+      "contractualDueDates": [
+        "2026-11-02",
+        "2026-12-02",
+        "2027-01-02",
+        "2027-02-02",
+        "2027-03-02",
+        "2027-04-02"
+      ],
+      "displayedStatuses": [
+        "Vencido",
+        "Por vencer",
+        "Por vencer",
+        "Por vencer",
+        "Por vencer",
+        "Por vencer"
+      ],
+      "next": "Correct the proven canonical amount-proof omission for futuro_pendiente in queries.js without changing persisted financial data or QA acceptance. Preserve all unique relationship, policy, country, currency, date, payment and explicit-zero guards; build a new immutable artifact, pass exact Preview, promote the same digest and run signed LIVE readback/reload. Preserve the six earlier writes and the completed large financial batches.",
+      "caseEvidence": [
+        {
+          "sourceRequirement": "5228533",
+          "receiptId": "rec_98478284ecec24ad3d851ec0",
+          "portfolioId": "car_f08268f1ce68554f0375fcac",
+          "grossCents": 27826,
+          "contractualDue": "2026-11-02",
+          "operationalLimit": "2026-11-02",
+          "receiptOperationalState": "futuro_pendiente",
+          "portfolioOperationalState": "futuro_pendiente",
+          "displayedStatus": "Vencido",
+          "canonicalStatus": "Vencido",
+          "amountProofSource": "UNVERIFIED",
+          "open": true,
+          "balanceState": "unverified",
+          "balanceCents": null,
+          "portfolioAmountPresent": false,
+          "portfolioBalancePresent": false,
+          "beforeChecks": {
+            "gross": true,
+            "contractualDue": true,
+            "operationalLimit": true,
+            "status": true,
+            "balanceVerified": false,
+            "balanceValue": true,
+            "balanceState": false
+          },
+          "afterChecks": {
+            "gross": true,
+            "contractualDue": true,
+            "operationalLimit": true,
+            "status": true,
+            "balanceVerified": false,
+            "balanceValue": true,
+            "balanceState": false
+          },
+          "reloadPass": true,
+          "rawFinancialInputsFingerprint": "203a66af91d711fb09b826c90230b32f8ca4e43ffe7fa87092c2c949d80e2161",
+          "projectedFinancialInputsFingerprint": "7ce2d68663503f34813a17e76dadf42f1f132d5e8cd7c59cdb23c74fd5c68c48",
+          "receiptFingerprint": "fa69ebb3c32507cfb9f7a555b8c8822c789dd181712d5b5324c0343c938170ba",
+          "portfolioFingerprint": "da85d32506a50cccd5a1debc3db1338b99b8b932576724b412574a8d7dff6827",
+          "auditFingerprint": "9735cdd8f67d05999151b92ee365d53ca6a184992f14fc1d1be7670c43dbff5b",
+          "rollbackPresent": true,
+          "auditIdentity": true,
+          "linkedCobros": 0
+        },
+        {
+          "sourceRequirement": "5228534",
+          "receiptId": "rec_fb4ae3b5ee66fb31dbe34702",
+          "portfolioId": "car_55c55df1fd5bcc541b70fc86",
+          "grossCents": 27826,
+          "contractualDue": "2026-12-02",
+          "operationalLimit": "2026-12-02",
+          "receiptOperationalState": "futuro_pendiente",
+          "portfolioOperationalState": "futuro_pendiente",
+          "displayedStatus": "Por vencer",
+          "canonicalStatus": "Por vencer",
+          "amountProofSource": "UNVERIFIED",
+          "open": true,
+          "balanceState": "unverified",
+          "balanceCents": null,
+          "portfolioAmountPresent": false,
+          "portfolioBalancePresent": false,
+          "beforeChecks": {
+            "gross": true,
+            "contractualDue": true,
+            "operationalLimit": true,
+            "status": true,
+            "balanceVerified": false,
+            "balanceValue": true,
+            "balanceState": false
+          },
+          "afterChecks": {
+            "gross": true,
+            "contractualDue": true,
+            "operationalLimit": true,
+            "status": true,
+            "balanceVerified": false,
+            "balanceValue": true,
+            "balanceState": false
+          },
+          "reloadPass": true,
+          "rawFinancialInputsFingerprint": "ec97188cf094028a59b39df76b7046c109e1f4f0185c6e51e2c55529023251d1",
+          "projectedFinancialInputsFingerprint": "cd009bffeec04df415c8edf49addc090267e8698a53e75c9b46664db19c96125",
+          "receiptFingerprint": "9b9d83a4eb70f8f0c03d0ecf0bd1af62756a311e234f6aba51ffc1b92e70b960",
+          "portfolioFingerprint": "f88bf2e64baad77f6d1a60e8e44f21f5c02f27b1f6b7b7bbd727f0ab0924fe2f",
+          "auditFingerprint": "9081baa1df02ac182c93bf16fa59cff4a266eaf08d93678751714fff77fc3d31",
+          "rollbackPresent": true,
+          "auditIdentity": true,
+          "linkedCobros": 0
+        },
+        {
+          "sourceRequirement": "5228535",
+          "receiptId": "rec_d76a756f3ab691bd675adebd",
+          "portfolioId": "car_e923fc80be31f62b5a0fa720",
+          "grossCents": 27826,
+          "contractualDue": "2027-01-02",
+          "operationalLimit": "2027-01-02",
+          "receiptOperationalState": "futuro_pendiente",
+          "portfolioOperationalState": "futuro_pendiente",
+          "displayedStatus": "Por vencer",
+          "canonicalStatus": "Por vencer",
+          "amountProofSource": "UNVERIFIED",
+          "open": true,
+          "balanceState": "unverified",
+          "balanceCents": null,
+          "portfolioAmountPresent": false,
+          "portfolioBalancePresent": false,
+          "beforeChecks": {
+            "gross": true,
+            "contractualDue": true,
+            "operationalLimit": true,
+            "status": true,
+            "balanceVerified": false,
+            "balanceValue": true,
+            "balanceState": false
+          },
+          "afterChecks": {
+            "gross": true,
+            "contractualDue": true,
+            "operationalLimit": true,
+            "status": true,
+            "balanceVerified": false,
+            "balanceValue": true,
+            "balanceState": false
+          },
+          "reloadPass": true,
+          "rawFinancialInputsFingerprint": "287d5cd57c7159afdebb20c038b271bab4d39337a78512eec19532db8cffcc5f",
+          "projectedFinancialInputsFingerprint": "84ba353475f5ef7bf62ab78057a10566791572e3f3f7f1cc4eafd63f7615bf7f",
+          "receiptFingerprint": "4344e5af58f708dabbb841efa26180ac764a7d1975ef1eafdb2a8a2c9735cb1c",
+          "portfolioFingerprint": "c76a023a6f9fe28463039b9b948ab55b55687c410c37a8c093cc0fce1a3ed37c",
+          "auditFingerprint": "ec0d1652f4f5f3a9916494ce224721f91d243952654e3da225609eb8cbaa80fa",
+          "rollbackPresent": true,
+          "auditIdentity": true,
+          "linkedCobros": 0
+        },
+        {
+          "sourceRequirement": "5228536",
+          "receiptId": "rec_4f659319f7e5e56008788817",
+          "portfolioId": "car_64d4f76fc02fc36cdff837ed",
+          "grossCents": 27826,
+          "contractualDue": "2027-02-02",
+          "operationalLimit": "2027-02-02",
+          "receiptOperationalState": "futuro_pendiente",
+          "portfolioOperationalState": "futuro_pendiente",
+          "displayedStatus": "Por vencer",
+          "canonicalStatus": "Por vencer",
+          "amountProofSource": "UNVERIFIED",
+          "open": true,
+          "balanceState": "unverified",
+          "balanceCents": null,
+          "portfolioAmountPresent": false,
+          "portfolioBalancePresent": false,
+          "beforeChecks": {
+            "gross": true,
+            "contractualDue": true,
+            "operationalLimit": true,
+            "status": true,
+            "balanceVerified": false,
+            "balanceValue": true,
+            "balanceState": false
+          },
+          "afterChecks": {
+            "gross": true,
+            "contractualDue": true,
+            "operationalLimit": true,
+            "status": true,
+            "balanceVerified": false,
+            "balanceValue": true,
+            "balanceState": false
+          },
+          "reloadPass": true,
+          "rawFinancialInputsFingerprint": "ee2f0e63514e07c28daf2297090168a4b1bcfae34b56f9752c47e40a99115d39",
+          "projectedFinancialInputsFingerprint": "0cab1c1f2ae4dec6485c03915c49730a99774ff70d712ab05ec8f241fada5a05",
+          "receiptFingerprint": "fbe5469d8e0c30b72690bd25c6845679dfbacfc46c8b7d9be520be8edfbdb4e5",
+          "portfolioFingerprint": "31628c648f9666b8780ca32d2597e3f3900ab8890e768405cf4637c8638607cd",
+          "auditFingerprint": "e7112948ebcd783cf9a2b182c921e3c9b2c62827d1f5c7a52d98dd08fc201681",
+          "rollbackPresent": true,
+          "auditIdentity": true,
+          "linkedCobros": 0
+        },
+        {
+          "sourceRequirement": "5228537",
+          "receiptId": "rec_6dad42c3f5d06b15fea34726",
+          "portfolioId": "car_3c6dd87039503edb71f2b84e",
+          "grossCents": 27826,
+          "contractualDue": "2027-03-02",
+          "operationalLimit": "2027-03-02",
+          "receiptOperationalState": "futuro_pendiente",
+          "portfolioOperationalState": "futuro_pendiente",
+          "displayedStatus": "Por vencer",
+          "canonicalStatus": "Por vencer",
+          "amountProofSource": "UNVERIFIED",
+          "open": true,
+          "balanceState": "unverified",
+          "balanceCents": null,
+          "portfolioAmountPresent": false,
+          "portfolioBalancePresent": false,
+          "beforeChecks": {
+            "gross": true,
+            "contractualDue": true,
+            "operationalLimit": true,
+            "status": true,
+            "balanceVerified": false,
+            "balanceValue": true,
+            "balanceState": false
+          },
+          "afterChecks": {
+            "gross": true,
+            "contractualDue": true,
+            "operationalLimit": true,
+            "status": true,
+            "balanceVerified": false,
+            "balanceValue": true,
+            "balanceState": false
+          },
+          "reloadPass": true,
+          "rawFinancialInputsFingerprint": "87f0474b5c92c7c3676cb30a4af950772fe1cb2597c52dbeb3b9b7dd674fe622",
+          "projectedFinancialInputsFingerprint": "1e92cdc0c4eff6ce792a60e41e26e685426f2155313fe17f0c3f5fc313c68310",
+          "receiptFingerprint": "8897f4003b8a86c03c31470a0c63edb9e0aa2245289f1d689d1070a3e5dc93c5",
+          "portfolioFingerprint": "24aa70b7b5f6dd17e96edf730ca4800bffb132cf348181178320198bbf5a5071",
+          "auditFingerprint": "862e04d4a98220d885c31c8f8471164aad60cd646cf63512349caff4961c2909",
+          "rollbackPresent": true,
+          "auditIdentity": true,
+          "linkedCobros": 0
+        },
+        {
+          "sourceRequirement": "5228538",
+          "receiptId": "rec_538e6f8235084bb286d2d6d6",
+          "portfolioId": "car_d9fa6067a3a3930d14df779a",
+          "grossCents": 27826,
+          "contractualDue": "2027-04-02",
+          "operationalLimit": "2027-04-02",
+          "receiptOperationalState": "futuro_pendiente",
+          "portfolioOperationalState": "futuro_pendiente",
+          "displayedStatus": "Por vencer",
+          "canonicalStatus": "Por vencer",
+          "amountProofSource": "UNVERIFIED",
+          "open": true,
+          "balanceState": "unverified",
+          "balanceCents": null,
+          "portfolioAmountPresent": false,
+          "portfolioBalancePresent": false,
+          "beforeChecks": {
+            "gross": true,
+            "contractualDue": true,
+            "operationalLimit": true,
+            "status": true,
+            "balanceVerified": false,
+            "balanceValue": true,
+            "balanceState": false
+          },
+          "afterChecks": {
+            "gross": true,
+            "contractualDue": true,
+            "operationalLimit": true,
+            "status": true,
+            "balanceVerified": false,
+            "balanceValue": true,
+            "balanceState": false
+          },
+          "reloadPass": true,
+          "rawFinancialInputsFingerprint": "b7ca7f8a14ee6a1521868a626ce73280fed7c21e3e04612e2d0c93a61d84d0ac",
+          "projectedFinancialInputsFingerprint": "fd1da08849d70b5ebd63ee113947066b4ffb770f7a814490b120ec7cfddb1adf",
+          "receiptFingerprint": "827a1b1c68e408bee0da3df9e976d94e977ac36a34088df71f7747af8083344c",
+          "portfolioFingerprint": "6e83fcf0f7aa57c321d18ffbc934193fb269dc77be442220ad0486db6269bdcd",
+          "auditFingerprint": "23df506af121c585b48844e612f75babc388f4c47ba26649e52999ede42a7ea0",
+          "rollbackPresent": true,
+          "auditIdentity": true,
+          "linkedCobros": 0
+        }
+      ],
+      "causalOwnerBlobs": {
+        "orbit360-platform/core/queries.js": "2ba6edc8a04e7cc6140db2bcad0ee213c17d785a",
+        "orbit360-platform/core/policy-receipts-engine.js": "1a42767f5d1b7fc455e4a332b4d0e6eda2f87014",
+        "functions/b4-003-scoped-related-reader.js": "aafdbe3384506b1772c7e409d565de88bf287b21"
+      }
+    },
+    "currentExecution20261124": {
+      "schema": "GI_I66_CURRENT_FINANCIAL_EXECUTION_V1",
+      "recordedAtUtc": "2026-11-24T05:34:59.317Z",
+      "historicalPayments": {
+        "applied": 148,
+        "grossCents": 7663847,
+        "currency": "GTQ",
+        "runs": [
+          45328403470,
+          45330498452
+        ],
+        "receipts": [
+          {
+            "path": "artifacts/orbit360-recovery/release-control/I6_6_CENDOSO_TWO_EXACT_LEGACY_PERIOD_LIVE_READBACK_20261124.json",
+            "gitBlobSha": "54172f6e0c49fbffdbeb0a6f9656815da318c1ef"
+          },
+          {
+            "path": "artifacts/orbit360-recovery/release-control/I6_6_CENDOSO_146_HISTORICAL_LIVE_READBACK_20261124.json",
+            "gitBlobSha": "26cd08a97de7cafe3b9448e20f0a01eee9e5d2cc"
+          }
+        ],
+        "currentDebtCreated": 0,
+        "automaticReconciliations": 0,
+        "newMoneyTransfers": 0,
+        "historicalClosedReceiptCreates": 146,
+        "historicalClosedPortfolioCreates": 146,
+        "confirmedUnreconciledCobrosCreated": 148,
+        "sourceIdOverlapBetweenNewLots": 0
+      },
+      "newPendingObligations": {
+        "obligations": 24,
+        "grossCents": 667812,
+        "currency": "GTQ",
+        "runId": 45330498425,
+        "jobId": 138231284166,
+        "receipt": {
+          "path": "artifacts/orbit360-recovery/release-control/I6_6_ROBLE_REMAINING_24_COMMERCIAL_SERVER_READBACK_20261124.json",
+          "gitBlobSha": "c62300fab11d3f764ab011f957ede7fcf7c30c1d"
+        },
+        "newPolicySuccessors": 2,
+        "receiptCreates": 24,
+        "portfolioCreates": 24,
+        "totalTechnicalWrites": 58,
+        "paymentsCreated": 0,
+        "previousCasesPreserved": 2,
+        "previousObligationsPreserved": 24,
+        "isolatedRiskConflictCases": 1,
+        "uiKanbanAccepted": false
+      },
+      "previouslyCreatedIssuedScheduleObligations": 58,
+      "knownIssuedScheduleObligationsAfterThisExecution": 82,
+      "issuedScheduleCountScope": "Known prior 58 plus new 24 issuer schedule obligations. Excludes 146 separately materialized historical paid receipts and six updates of existing obligations; not the full database count.",
+      "cendoso607Disposition": {
+        "basis": "Exact preflight plus 146 protected transaction readbacks, not a new post-apply full607 scan",
+        "sourceRows": 607,
+        "preservedBefore146": 344,
+        "applied146": 146,
+        "isolatedExceptions": 117,
+        "coveredPaidFacts": 490,
+        "receipt": {
+          "path": "artifacts/orbit360-recovery/release-control/I6_6_CENDOSO_146_HISTORICAL_LIVE_READBACK_20261124.json",
+          "gitBlobSha": "26cd08a97de7cafe3b9448e20f0a01eee9e5d2cc"
+        },
+        "full607Closed": false
+      },
+      "source302PostCommitCensus": {
+        "sourceRows": 302,
+        "unchanged": 214,
+        "exceptions": 88,
+        "ready": 0,
+        "writes": 0,
+        "runId": 45332501697,
+        "jobId": 138236726429,
+        "receipt": {
+          "path": "artifacts/orbit360-recovery/release-control/I6_6_SOURCE_302_POST_COMMERCIAL_READONLY_CENSUS_20261124.json",
+          "gitBlobSha": "12a837cb1f85aae99af8cebb82ed7535064be43e"
+        },
+        "fullRescanAfterWrites": true,
+        "exceptionCodes": {
+          "POLICY_EDITION_MISSING": 67,
+          "RECEIPT_NOT_IDENTIFIED": 20,
+          "PAYMENT_OR_PORTFOLIO_EXCEPTION": 1
+        },
+        "alreadyPaid0043PreservedSeparateFromGenericExceptionCount": true
+      },
+      "sourceUniversesMayOverlap": true,
+      "sourceExceptionCountsMustNotBeAddedAsUniqueBusinessCases": true,
+      "previousCendosoLots": {
+        "applied": 336,
+        "components": [
+          {
+            "count": 303,
+            "runId": 44552961713
+          },
+          {
+            "count": 18,
+            "runId": 44569134138
+          },
+          {
+            "count": 15,
+            "runId": 44593852150
+          }
+        ],
+        "thirtyThreeWasOnlyLaterIncrement": true
+      },
+      "batchMechanism": {
+        "existingProtectedWriters": true,
+        "sourceIntakeMaximum": 5000,
+        "correctionChunkMaximum": 250,
+        "historicalCreationChunkMaximum": 100,
+        "actualHistoricalChunks": [
+          100,
+          46
+        ],
+        "actualHistoricalDocumentCreates": [
+          400,
+          184
+        ],
+        "exactPreimageCas": true,
+        "deterministicIds": true,
+        "afterCommitReadback": true,
+        "isolatedHolds": true,
+        "repeatAcceptedRecords": false
+      },
+      "fullA12Passed": false,
+      "fullI66ProductionAccepted": false
+    },
+    "previousAppliedCobrosCendosoScope": "303 initial plus 18 and 15 later; 33 was only the later increment. New 2+146 in currentExecution20261124 are separate.",
+    "previousFresh302SourcePreflight": {
+      "runId": 45272554046,
+      "preflightJobId": 138035856797,
+      "snapshotPhase": "BEFORE_APPLY",
+      "examined": 302,
+      "sourcePolicies": 47,
+      "currentPolicyEditionsRead": 106,
+      "unchanged": 184,
+      "missingExactEdition": 91,
+      "paymentOrPortfolioException": 1,
+      "receiptIdentityHolds": 20,
+      "exceptions": 112,
+      "eligible": 6,
+      "appliedExistingObligationUpdates": 6,
+      "newObligations": 0,
+      "receiptUpdates": 6,
+      "portfolioUpdates": 6,
+      "auditCreates": 6,
+      "paymentWrites": 0,
+      "readback": "BULK_PROTECTED_READBACK_PASS",
+      "protectedJobId": 138036188448,
+      "wholeBatchRescanAfterApply": false
+    },
+    "existingCommercialWritesNotRepeated": true
+  },
+  "parallelLanes": [
+    {
+      "id": "L1",
+      "name": "Site/DNS/HTTPS/Chrome",
+      "status": "CONNECTED_CHROME_NEW_TAB_CONTROL_AND_PRODUCTION_LOGIN_OBSERVED_AUTHENTICATED_SESSION_OPEN",
+      "owner": "I6.6"
+    },
+    {
+      "id": "L2",
+      "name": "CP/transport/release provenance",
+      "status": "E3_COMPOSITE_SIGNED_LIVE_ACCEPTED_AND_POST_ACCEPTANCE_GUARD_PASS",
+      "owner": "I6.6"
+    },
+    {
+      "id": "L3",
+      "name": "Functional LIVE Operativo/roles/CRUD",
+      "status": "FIVE_ASSIGNED_GT_ROLES_140_READONLY_ROUTES_AND_ADVISOR_SERVER_DENIAL_PASS_CO_REAL_CRUD_AND_WRITE_NEGATIVES_OPEN",
+      "owner": "I6.6"
+    },
+    {
+      "id": "L4",
+      "name": "Financial source-delta/inferences",
+      "status": "148_HISTORICAL_PAYMENTS_24_NEW_ISSUED_OBLIGATIONS_READBACK_PASS_SIX_UI_AND_ISOLATED_EXCEPTIONS_OPEN",
+      "owner": "I6.6"
+    },
+    {
+      "id": "L5",
+      "name": "Drive/Make/notifications",
+      "status": "WHATSAPP_AND_IMAP_INBOUND_WORKING_CANONICAL_WRITERS_AND_DRIVE_OAUTH_OPEN",
+      "owner": "I6.6"
+    }
+  ],
+  "updateDiscipline": {
+    "oneSourceBatchMinimumPerCycle": "Build OR process a deterministic source batch; record zero-write blockers rather than falsely claim data applied.",
+    "onEveryIteration": [
+      "Record last successful gate/run and source SHA",
+      "Report per-lane state and binary shock objective count/14",
+      "Report official I6 frozen fraction 6/10 until a formal seal",
+      "Report source batches built/applied/held and exact real writes",
+      "Specify modules newly LIVE accepted and safe for business data refresh",
+      "Report blockers, next one causal action per lane"
+    ],
+    "whenModuleAvailable": "Announce only after exact LIVE proof of module create/update readback reload roles; do not announce from Preview or green skipped jobs.",
+    "crossChatResume": "Read Control Plane i66ActiveRecoveryCursor, its progress receipt, original 295 ledger, frozen plan, latest physical LIVE receipt; do not use transcript as authority.",
+    "lastIteration": "I6.6-V16-CAUSAL-BALANCE-FROZEN-SOURCE",
+    "completedSincePrior": [
+      "Preserved v15 immutable build and its partial24-stage Preview HOLD; no promotion was attempted. Preserved exact canonical future-pending balance product bytes.",
+      "Frozen bounded DOM-reattachment QA recovery and existing Preview/LIVE48-stage promotion owners before a new immutable build; source, causal Chromium and guard runs passed.",
+      "Adopted a derived active state summary and preserved its previous mixed historical object; completed financial data receipts remain unchanged."
+    ],
+    "nextIncomplete": [
+      "A03: Continue authenticated Direction UI after legitimate sign-in; preserve working connected browser and exact E3 CI proof. The old tab focus timeout is not evidence of browser disconnection.",
+      "A04: Preserve five-role GT read-only PASS140. Complete CO and backend negative write permissions with legitimate assigned actors; do not repeat this completed GT read-only proof or infer real CRUD acceptance.",
+      "A05: Test real existing-client edit, management/activity/notes/attachments including Drive roundtrip with user and readback; no false pass.",
+      "A06: Complete Carlos Corado existing-client inspection and opportunity canonical linking; retain signed Ops task synthetic PASS.",
+      "A07: Sin nueva póliza real certificada",
+      "A08: Preserve new and prior exact server commits. Complete the real browser renewal-button/PDF/reload/Kanban flow; investigate the single current-risk conflict of the remaining issued case using its actual parent evidence.",
+      "A09: Fecha/referencia previa difiere",
+      "A10: Original Edson requestId, exact receipt current server preimage; one-step real invoice upload and payment reconciliation; no blind retry.",
+      "A11: Complete existing tenant Google OAuth consent and prove actual upload/readback. Optional-document payment remains independent.",
+      "A12: Execute frontend-only v16 once, exact48-stage Preview and same-artifact48-stage LIVE; preserve completed financial batches and the prior observer45332501772. Continue source607 remaining117 and source302 remaining88 by exact cause; their universes may overlap.",
+      "A13: Complete the authenticated existing Make reader adapter to the canonical Leads transaction using the approved pending_operations assignment, exact ad/sourceId and activation boundary. Require actual lead write/readback/replay and visibility; preserve outbound=false and no implicit historical backfill. Email/source classifier and the real webform source remain distinct open parts of A13.",
+      "A14: Use measured source timeline to resolve receipt/portfolio readiness latency and three exact source plan denials; GT5-role read-only is proved, CO/CRUD/full responsive and performance acceptance remain open."
+    ]
+  },
+  "notTouched": {
+    "productSource": false,
+    "firestoreRealWrites": false,
+    "hostingProduction": true,
+    "backendDeploy": true
+  },
+  "next": "I6.6: construir una sola vez la corrección causal de saldo futuro pendiente y sus owners de QA congelados; probar 48 etapas en Preview, promover exactamente el mismo artifact y demostrar 48 etapas LIVE con lectura final y rollback. E3 sigue siendo el release físico hasta aceptación de su sucesor. Preservar 148 pagos históricos, 24 obligaciones nuevas y todas las pruebas previas; continuar los demás objetivos incompletos sin declararlos PASS.",
+  "previousEvidencePath": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_EXECUTION_PROGRESS_20261124_R27.json",
+  "previousEvidenceBlobSha": "ace5c44721a75b8fc04dd41d7c7d6c72067e5bc3",
+  "version": 28,
+  "lastFunctionalQaRunId": 45069138814,
+  "lastFunctionalQaJobId": 137352857627,
+  "recentSignedFunctionalProof": {
+    "runId": 45069138814,
+    "runStatus": "SUCCESS",
+    "sourceSha": "f1eb5bc6397f0b159079be516a521dd7b1e5d9ba",
+    "preview": {
+      "jobId": 137351934479,
+      "status": "PASS",
+      "focus": [
+        "Cliente360 edit/advisor activity reload",
+        "Ops/Leads synthetic tasks",
+        "renewal hydration readonly",
+        "payment application/synthetic receipt/cobro/portfolio",
+        "Germán and Priscila roster",
+        "Corado readback ops=0 leads=1"
+      ]
+    },
+    "live": {
+      "jobId": 137352857627,
+      "status": "SCOPED_SYNTHETIC_PASS",
+      "roles": [
+        "Operativo GT",
+        "Dirección GT"
+      ],
+      "directRenewal": "CREATE_ISSUED_POLICY_WITH_SYNTHETIC_DOCUMENT_FIXTURE_READBACK_RELOAD_IDEMPOTENCE_OPS_RECEIPTS_CARTERA_PASS",
+      "insurerDirectory": "SYNTHETIC_CREATE_EDIT_ACCOUNT_AUDIT_RELOAD_NEGATIVE_SCOPE_AND_CLEANUP_PASS",
+      "syntheticRestored": true,
+      "realClientPoliciesPaymentsWritten": 0,
+      "realInsurerRowsModified": 0,
+      "genuineInsurerIssuedPdfCertified": false
+    },
+    "mustNotPromote": "No real insured issued-renewal acceptance or AdminTenant/SuperAdmin complete role matrix is inferred from this 2-actor QA."
+  },
+  "functionalLive20261122": {
+    "sourceSha": "f1eb5bc6397f0b159079be516a521dd7b1e5d9ba",
+    "buildId": "gi-i66-f1eb5bc6397f-57f234755dc1",
+    "signedRunId": 45072928898,
+    "jobName": "signed-live-functional-regression",
+    "jobConclusion": "success",
+    "previousSignedRunId": 45069138814,
+    "capabilityProofs": [
+      {
+        "module": "Renovaciones y póliza sucesora",
+        "syntheticLiveStatus": "PASS",
+        "realIssuedTerm": "HOLD"
+      },
+      {
+        "module": "Aseguradoras create/edit accounts",
+        "syntheticLiveStatus": "PASS",
+        "realSecretsUnmodified": true
+      },
+      {
+        "module": "Cliente360 editar+asignar asesor+actividad",
+        "syntheticLiveStatus": "PASS",
+        "realCustomerWrite": 0
+      },
+      {
+        "module": "Ops/Leads tareas/gestiones",
+        "syntheticLiveStatus": "PASS",
+        "coradoRealOps": 0,
+        "coradoRealLeads": 1
+      },
+      {
+        "module": "Cobros pago, cartera y conciliación",
+        "syntheticLiveStatus": "PASS",
+        "realPaymentWrite": 0
+      }
+    ],
+    "renderPerformance": {
+      "artifactId": 14773364439,
+      "carlosSignedLive": true,
+      "authActivateMs": 2034,
+      "authorizedRoutesRendered": 12,
+      "conciliacionesCorrectlyDenied": 1,
+      "expectedCoreRoutes": 13,
+      "pageErrors": 0,
+      "consoleErrors": 0,
+      "httpErrors": 0,
+      "mobileMenuEventMs": 0.6,
+      "cobrosFirstContentMs": 970,
+      "cobrosFinancialReadyMs": 10563,
+      "cobrosRenderTotalMs": 4000.3,
+      "cobrosStoreGetCalls": 12402,
+      "polizasFirstReadyMs": 4858,
+      "unavailableClient360Sections": 1,
+      "optionalSnapshotErrorCollections": [
+        "estadosCuentaAseguradora",
+        "recibosAseguradora",
+        "reclamos"
+      ],
+      "note": "First content is NOT full financial readiness; sourceSha in historical performance report was runner SHA and was corrected for future current-LIVE report, without modifying application."
+    },
+    "fiveRoles": {
+      "previousRunId": 45073437828,
+      "artifactId": 14774441405,
+      "status": "PARTIAL_FAIL_CLOSED",
+      "signedLiveSessionCoverage": [
+        {
+          "role": "admintenant",
+          "viewports": [
+            1280,
+            390
+          ],
+          "routes": 28,
+          "status": "FOCAL_PASS"
+        },
+        {
+          "role": "superadmin",
+          "viewports": [
+            1280,
+            390
+          ],
+          "routes": 28,
+          "status": "FOCAL_PASS"
+        }
+      ],
+      "unproven": [
+        "operativo actor selected by old script returned ambiguous",
+        "direccion actor selected by old script returned ambiguous",
+        "asesor GT verified actor missing"
+      ],
+      "nextRerunId": 45074429319,
+      "ambiguityNotEvidenceOfDeniedRights": true
+    }
+  },
+  "noRealCommercialWritesThisIteration": false,
+  "latestSignedRoleMatrix20261122": {
+    "runId": 45074429319,
+    "overallRunStatus": "FAILED_FAIL_CLOSED_FIVE_ROLE_COVERAGE",
+    "previewJobStatus": "success",
+    "liveJobOtherSteps": "ALL_PHYSICAL_TEST_STEPS_PASSED_EXCEPT_FINAL_FULL_COVERAGE_DISPOSITION",
+    "reportArtifactId": 14774379216,
+    "reportStatus": "HOLD",
+    "actualRolesAuthenticated": [
+      "operativo",
+      "direccion",
+      "admintenant",
+      "superadmin"
+    ],
+    "roleContexts": 8,
+    "viewports": [
+      1280,
+      390
+    ],
+    "routesPerContext": 14,
+    "routeChecks": 112,
+    "routeFailures": 0,
+    "pageErrors": 0,
+    "httpFailures": 0,
+    "everyTestedRoleCore8Visible": true,
+    "renewalsCobrosInsurerRightsAllPositive": true,
+    "sessionReloadPassForAll": true,
+    "missingRole": "asesor",
+    "missingReason": "NO_VERIFIED_ACTIVE_GT_ROLE_asesor",
+    "noEvidenceOfAsesorAccessLeak": true,
+    "noEvidenceAsesorDeniedByLive": false,
+    "realCommercialWrites": 0,
+    "backendAuthRoleChanges": 0,
+    "qaManualLegalConsentsGranted": 0
+  },
+  "latestCarlosPerformance20261122": {
+    "runId": 45074429319,
+    "artifactId": 14775062360,
+    "status": "LIVE_READONLY_MEASURED",
+    "liveSourceSha": "f1eb5bc6397f0b159079be516a521dd7b1e5d9ba",
+    "sourceAndRunnerHeadSeparated": true,
+    "activationMs": 2385,
+    "policiesReadyMs": 5501,
+    "cobrosCoreVisibleMs": 1647,
+    "cobrosFinancialReadyMs": 13791,
+    "priorCobrosFinancialReadyMs": 10563,
+    "cobrosRenderTotalMs": 6893.1,
+    "cobrosStoreGetCalls": 12402,
+    "missingOptionalSourceClasses": [
+      "estadosCuentaAseguradora",
+      "recibosAseguradora",
+      "reclamos"
+    ],
+    "client360OneUnavailableSection": true,
+    "pageErrors": 0,
+    "versionDriftDetected": false,
+    "remediationRequired": "P0 diagnosis of repeated per-row store retrieval/render+missing optional backend collections; do not infer data loss or fail for legitimate role-denied collection without exception provenance."
+  },
+  "thisCycle": {
+    "decisionSource": "55edd15501efaa1b50b15613cac225faa85fb056",
+    "preview": {
+      "runId": 45081926149,
+      "sourceSha": "15e849bd606bd8c93e4c0471da1193e85004aecd",
+      "artifactId": 14777966155,
+      "digest": "sha256:78a409a419e21648f2e074b49767d1dd55731140f8a83f6064b3ae1c8073b453",
+      "url": "https://ays-orbit-360-lab--gi-i66-rc-45081926149-b9hkley0.web.app",
+      "productFix": "c1ae680ea5160f0f6b1412d5a7d09f6358614801",
+      "userApprovedVisualScope": "Cliente 360 opportunity chronology and opening linked opportunity",
+      "readOnlyUi": [
+        "Ficha cliente",
+        "Historial",
+        "Abrir oportunidad",
+        "Cerrar",
+        "Recargar",
+        "same three entries after reload"
+      ]
+    },
+    "role": {
+      "operatorLive": "existing authenticated session",
+      "directionPreview": "existing authenticated direction session",
+      "advisorViewCountries": [
+        "GT",
+        "CO"
+      ],
+      "serverNegativeAuthorizationProven": false
+    },
+    "management": {
+      "realSaveAttempts": 2,
+      "serverReadbackRun": 45082105369,
+      "linkedManagements": 0,
+      "linkedDeals": 1,
+      "linkedDealHistory": 3,
+      "linkedActivities": 0,
+      "canonicalCatalog": {
+        "runId": 45088171338,
+        "jobId": 137411415955,
+        "tenantCatalogExists": false,
+        "actorIsOperativo": true,
+        "actorHasCatalogConfigurationGrant": false,
+        "canonicalManagements": 0,
+        "linkedDeals": 1,
+        "linkedEmbeddedEvents": 3
+      }
+    },
+    "financialExceptions": {
+      "D01": "COMMITTED_V7_2_INFERRED_10_PENDING",
+      "D02": "COMMITTED_SUCCESSOR_1_PENDING",
+      "D03": "COMMITTED_ORIGINAL_CONTRACT_11_STATEMENT_PENDING; LABEL_AMENDMENT_11_RECEIPTS_11_PORTFOLIO_ONE_AUDIT_AND_LIVE_UI_CONFIRMED"
+    },
+    "derivedFindings": [
+      {
+        "id": "I66-C360-OPP-HISTORY-01",
+        "status": "CLOSED_FOCAL_EXACT_PREVIEW_LIVE_BUTTON_AND_RELOAD_GENERATION_2"
+      },
+      {
+        "id": "I66-OPS-MGMT-SAVE-02",
+        "status": "LIVE_AND_PREVIEW_REAL_SAVE_NO_COMMIT",
+        "lastSignedReadbackRun": 45090672854
+      },
+      {
+        "id": "I66-ROLES-ADVISOR-SCOPE-03",
+        "status": "GT_CO_UI_VERIFIED_SIGNED_BACKEND_STILL_OPEN"
+      },
+      {
+        "id": "I66-OPS-INSPECTION-VISIBILITY-04",
+        "status": "LEADS_CARD_LABEL_VS_ADVISOR_QUEUE_MISMATCH"
+      },
+      {
+        "id": "I66-FIN-SOURCE-D02-05",
+        "status": "COMMERCIAL_SERVER_COMMIT_AND_LIVE_UI_CONFIRMED"
+      },
+      {
+        "id": "I66-FIN-D03-SERIES-06",
+        "status": "CLOSED_EXACT_11_CURRENT_RECEIPTS_AFTER_RELOAD_0_AMOUNT_CHANGE",
+        "run": 45086559230,
+        "job": 137406535792,
+        "sourceRows": 11,
+        "portfolioRows": 11,
+        "audit": 1,
+        "uiObserved": "11 de 11 requerimientos vigentes, 5773297 through 5773307"
+      },
+      {
+        "id": "I66-C360-COUNTRY-HEADER-07",
+        "status": "TWO_AUTHENTICATED_PREVIEWS_GT_CO_VERIFIED_LIVE_PENDING",
+        "source": "a2677eb25ba87e72eabaae17748902deb73fca88"
+      },
+      {
+        "id": "I66-RELEASE-PROSPECTIVE-TREE-08",
+        "status": "CLOSED_REAL_ROLLBACK_AND_GENERATION_2_COMMITTED",
+        "runs": [
+          45087386473,
+          45088457923
+        ]
+      },
+      {
+        "id": "I66-VEH-ENDORSEMENT-09",
+        "status": "APRIL_AND_NOVEMBER_DIFFERENT_VARIANCE_ACCEPTED_CANONICAL_TARGET_PENDING"
+      },
+      {
+        "id": "I66-AUTH-RESTORE-MEMBERSHIP-10",
+        "status": "TWO_RELOADS_RECOVERED_LATEST_PREVIEW_ACTUAL_MEMBERSHIP_FAILURE_RETRY_AND_LIVE_PENDING"
+      },
+      {
+        "id": "I66-INICIO-ADVISOR-READ-11",
+        "status": "FOUR_OF_FIVE_SOURCES_ADVISOR_QUERY_UNAVAILABLE_AFTER_DASHBOARD_RETRY"
+      },
+      {
+        "id": "I66-OPS-DOC-FORM-12",
+        "status": "OPEN_NO_SAVE_CLICK_OR_UPLOAD_SERVER_CONFIRMS_SYNTHETIC_REMOVED",
+        "job": 137444696361,
+        "independentAfterJob": 137445272383
+      }
+    ],
+    "syntheticCaseWritesThisCycle": 1,
+    "make": {
+      "scenariosInspected": [
+        10196136,
+        10195867
+      ],
+      "enabled": false,
+      "canonicalWriterEndToEnd": false,
+      "commercialMessagesSent": 0
+    },
+    "qaSourceCensusRun": 45080189973,
+    "financialTotals": {
+      "newPolicies": 1,
+      "documentaryRenewals": 5,
+      "newReceiptRows": 58,
+      "pendingPortfolioRows": 56,
+      "inferredPayments": 2,
+      "directPayments": 0,
+      "bankConciliations": 0,
+      "initialDocumentWriteOperations": 145,
+      "documentaryLabelCorrectionOperations": 23,
+      "physicalDocumentWrites": 168,
+      "pendingGrossCents": 2709720,
+      "inferredGrossCents": 66855,
+      "currency": "GTQ",
+      "statementPendingRows": 48,
+      "statementPendingGrossCents": 2177931,
+      "extraFutureContractRows": 8,
+      "extraFutureContractGrossCents": 531789
+    },
+    "thisRelease": {
+      "physicalScope": "FRONTEND_ONLY",
+      "generation": 2,
+      "journal": "artifacts/orbit360-recovery/release-control/I6_6_FRONTEND_E00002_JOURNAL.json",
+      "commit": "bb921d9e4e8803305581faa14558b08a3bd21593",
+      "signedReceiptCommit": "5c5adeb6f9bdb25e40f01c1ca386c4455197b6ef",
+      "productionUi": "artifacts/orbit360-recovery/release-control/I6_6_FRONTEND_E00002_LIVE_UI.json",
+      "attempt1Rollback": "artifacts/orbit360-recovery/release-control/I6_6_FRONTEND_E00001_JOURNAL.json",
+      "runId": 45088457923,
+      "previewMobileCssPixels": 390,
+      "readbackFilesEachOrigin": 224,
+      "writes": 0
+    },
+    "drive": {
+      "liveOperativo": "Configurar Drive returned secure Google Drive configuration unavailable. No OAuth popup.",
+      "previewDireccion": "Cargar documento returned unable to verify repository.",
+      "retrievableDossierUpload": false,
+      "moduleUploadReloadRoundtripsCompletedThisCycle": 0
+    },
+    "substitutionSource": {
+      "case": "91-9105495",
+      "issuedEndorsement": "199154",
+      "sourceSha256": "14c5a6209463713fea26a6ca35316276211382ee3b93a63a2d017d3285d7e031",
+      "sourcePages": 46,
+      "sourceConcept": "SUSTITUCION CERT 1 X 2",
+      "effectiveDate": "2026-04-09",
+      "materializationThisCycle": false,
+      "newNovemberEndorsementProven": false
+    },
+    "recoveryPreview": {
+      "run": 45093054745,
+      "sourceSha": "0e7dcdb04cf66f427f160b1642715a6382d05aba",
+      "artifactId": 14781986828,
+      "digest": "sha256:eebd6dc92d509ca7c194153153d75d6b6f9fc1501683087bf643642bcb54c558",
+      "role": "Operativo",
+      "reloadsToInicio": 2,
+      "gtDossierFound": true,
+      "countryCOExcludedDossier": true,
+      "membershipFailureRetryButtonTestedInBrowser": false,
+      "advisorPanelStillUnavailableAfterDashboardRetry": true,
+      "promoted": false
+    },
+    "attestedTargetReadback": {
+      "decisionCommit": "17da2b397a3ee208c4a49f67acba67952f5f30a6",
+      "run": 45095839488,
+      "job": 137435332190,
+      "ficohsa7317082": "No successor, no receipt by any issuer reference, paid per Dirección, no actual payment date.",
+      "roble5838167": "Payment and Q0.04 variance accepted. Two existing payments with different amounts and no link to the November endorsement. No target for exact application.",
+      "writes": 0
+    },
+    "writtenReport": "artifacts/orbit360-recovery/release-control/I6_6_INFORME_DIRECCION_OPERACIONES_20261122.md",
+    "realReceiptUiAfterReload": "artifacts/orbit360-recovery/release-control/I6_6_GYT_519815_MINIFREEZE_20261122.json",
+    "opsDocumentFixture": {
+      "finding": "I66-OPS-DOC-FORM-12",
+      "fixtureId": "b4003qa_user_mwsm9tay_obiqrj",
+      "role": "Operativo",
+      "country": "GT",
+      "previewRun": 45093054745,
+      "syntheticBusinessesCreated": 1,
+      "realDossierWrites": 0,
+      "syntheticBusinessesRemoved": 1,
+      "restoreAudit": true,
+      "independentServerReadAfterRemovalUtc": "2026-11-23T02:14:21.737Z",
+      "independentReadAfterRemovalCount": 0,
+      "jobBefore": 137441598446,
+      "jobRestore": 137444696361,
+      "jobAfter": 137445272383,
+      "savedClick": false,
+      "uploadOrSaveRequestsObserved": 0,
+      "fileName": "Gravicentra_I66_prueba_Ops.txt",
+      "fileSize": 147,
+      "sha256": "8ee8a79311b818cf9c4ee13bf08ffa0d12210929e7c723791724b1ebd86ee0f8",
+      "remainingDocumentRefs": 0,
+      "receipt": "artifacts/orbit360-recovery/release-control/I6_6_OPS_DOCUMENT_FIXTURE_NONPASS_20261122.json",
+      "receiptBlobSha": "d7639e34ae1e89bc61867a671f55695a8626aafa",
+      "newQaGuardCommit": "74a45e5600d6c0eab66cce6268cc00be0fba58fe",
+      "negativeQaJob": 137446516998
+    },
+    "optionalReaderServiceResult": {
+      "jobId": 137445272383,
+      "noDocumentsObserved": [
+        "estadosCuentaAseguradora",
+        "recibosAseguradora",
+        "reclamos"
+      ],
+      "scope": [
+        "tenant",
+        "GT",
+        "CO"
+      ],
+      "authorizationResultPerRole": "OPEN"
+    },
+    "universalesDocumentaryCrosswalk": {
+      "source": "artifacts/orbit360-recovery/source-batches/I6_6_UNIVERSALES_25_PENDING_2_PAID_9_INFERRED_20261122.json",
+      "blobSha": "00afcc054f888653f8fe9be4ceaa7530217461d9",
+      "pending": 25,
+      "openGrossCents": 1574183,
+      "documentedPaid": 2,
+      "candidateInferences": 9,
+      "written": 0,
+      "reason": "current edition identity unresolved",
+      "batch302DispositionChanged": false
+    },
+    "v12SignedPreviewFailure": {
+      "runId": 45277851717,
+      "cleanup": "PASS",
+      "remaining": 0,
+      "sourceCorrectionPrepared": true,
+      "productionPublished": false
+    }
+  },
+  "frontendReleaseGeneration": 3,
+  "frontendPromotionBusinessWrites": 0,
+  "recordedAtUtc": "2026-11-24T07:23:29.942Z",
+  "executionSynchronization": {
+    "transportStatus": "OPERATIONAL_EXACT_LIVE_ACCEPTED_LOCKED",
+    "previewRequest": {
+      "version": 16,
+      "sourceQaHead": "fa1afbbc531313333cda99be01a186ed6afd2e13",
+      "sourceQaRunId": 45347366830,
+      "guardRunId": 45347366852
+    },
+    "scopedPreview": null,
+    "operationalCandidate": null
+  },
+  "makeExecution": {
+    "path": "artifacts/orbit360-recovery/release-control/I6_6_MAKE_IMAP_RECEIVE_AND_INGRESS_CAUSAL_EVIDENCE_20261123.json",
+    "blobSha": "e45c6276f07d6e59b740001a1711e134adab510f",
+    "whatsappReaderActive": true,
+    "imapRealReceiveVerified": true,
+    "canonicalLeadWriterCertified": false,
+    "fullEmailModuleCertified": false
+  },
+  "causalCorrection": {
+    "path": "artifacts/orbit360-recovery/release-control/I6_6_EXECUTION_SYNCHRONIZATION_CAUSAL_CORRECTION_20261123.json",
+    "blobSha": "00cb75947499f1b4183b7e70a8b300a93e7c4a18"
+  },
+  "releaseExecution": {
+    "status": "COMPOSITE_FOUR_FUNCTIONS_SIGNED_LIVE_ACCEPTED",
+    "sourceSha": "65c825b2808a615ca4195bdde6689dbdbe3193b2",
+    "buildId": "gi-i66-65c825b2808a-57f234755dc1",
+    "buildRunId": 45287432665,
+    "artifactId": 14873426438,
+    "artifactDigest": "sha256:7cb782848a45083047c4899bc30c13bf5be46429607e42597d09342becfc9acc",
+    "artifactBuilt": true,
+    "previewSignedPass": true,
+    "livePromoted": true,
+    "signedPreviewRunId": 45290957490,
+    "liveRunId": 45292163934,
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_FRONTEND_E00003_RECEIPT.json",
+    "proofPath": "artifacts/orbit360-recovery/release-control/I6_6_FRONTEND_E00003_LIVE_PROOF.json",
+    "proofSha256": "4013a99719ba5f8bb3087a5e5f43c189a22daf55aabfcea37e8df5030bb5653c",
+    "backendFunctionsChanged": 4,
+    "sourceQaHead": "976a3705126b764d2fcd8d3eb5d368082dd75082",
+    "sourceQaRunId": 45287058338,
+    "guardRunId": 45287058194,
+    "frontendPreviewRequestVersion": 14,
+    "recordedAtUtc": "2026-11-24T00:01:11.706Z",
+    "fullI66ProductionAccepted": false
+  },
+  "previousReleaseExecution": {
+    "status": "V14_FOUR_FUNCTION_SIGNED_PREVIEW_PASS_EXACT_LIVE_PROMOTION_AUTHORIZED",
+    "sourceQaHead": "976a3705126b764d2fcd8d3eb5d368082dd75082",
+    "sourceQaRunId": 45287058338,
+    "guardRunId": 45287058194,
+    "frontendPreviewRequestVersion": 14,
+    "sourceSha": "65c825b2808a615ca4195bdde6689dbdbe3193b2",
+    "buildRunId": 45287432665,
+    "buildRunAttempt": 2,
+    "artifactId": 14873426438,
+    "artifactDigest": "sha256:7cb782848a45083047c4899bc30c13bf5be46429607e42597d09342becfc9acc",
+    "buildId": "gi-i66-65c825b2808a-57f234755dc1",
+    "previewUrl": "https://ays-orbit-360-lab--gi-i66-rc-45287432665-qxusovq3.web.app",
+    "previewChannelId": "gi-i66-rc-45287432665",
+    "hostedFiles": 224,
+    "backendFiles": 45,
+    "productChangesSinceV13": 0,
+    "artifactBuilt": true,
+    "previewSignedPass": true,
+    "livePromoted": false,
+    "fullI66ProductionAccepted": false,
+    "retryReceipt": "artifacts/orbit360-recovery/release-control/I6_6_V14_READBACK_RETRY_EXACT_ARTIFACT_20261123.json",
+    "signedPreviewRunId": 45290957490,
+    "signedPreviewHeadSha": "68b18de6a285eedd0dd678ff7f89fe18f7b6a882",
+    "signedPreviewArtifactId": 14874980702,
+    "signedPreviewArtifactDigest": "sha256:3a9a6aed22139310a94d0f050b4ef86f394506495ce9d773a530f64b9b1dfddd",
+    "signedPreviewReceipt": "artifacts/orbit360-recovery/release-control/I6_6_V14_SIGNED_PREVIEW_RECEIPT_20261123_RUN45290957490.json"
+  },
+  "financialScopedReadback": {
+    "caseId": "ROBLE_NOV20_0043",
+    "status": "PRESERVE_EXISTING_PAID_FACT_ZERO_DELTA",
+    "runId": 45285665141,
+    "artifactId": 14871851091,
+    "artifactDigest": "sha256:85059f5f2bc83fa5a74f7f6f6b168c9b0d3acf185070f3e64a42e137f4687c34",
+    "receipt": "artifacts/orbit360-recovery/release-control/I6_6_FINANCIAL_0043_EXISTING_PAID_FACT_READBACK_20261123_RUN45285665141.json",
+    "sourceRequirement": "5693797",
+    "sourceGrossCents": 33437,
+    "uniqueActivePortfolio": 1,
+    "uniqueLinkedPayment": 1,
+    "newPayments": 0,
+    "newWrites": 0,
+    "full302Rescan": false
+  },
+  "releasedBackend": {
+    "generation": 3,
+    "gate": "I6.6",
+    "scope": "COMPOSITE",
+    "status": "SIGNED_LIVE_VERIFIED",
+    "sourceSha": "65c825b2808a615ca4195bdde6689dbdbe3193b2",
+    "artifactId": 14873426438,
+    "artifactDigest": "sha256:7cb782848a45083047c4899bc30c13bf5be46429607e42597d09342becfc9acc",
+    "buildId": "gi-i66-65c825b2808a-57f234755dc1",
+    "functionsChanged": 4,
+    "revisions": [
+      {
+        "name": "orbit360ProductOperationalCommand",
+        "region": "us-central1",
+        "service": "orbit360productoperationalcommand",
+        "previousRevision": "orbit360productoperationalcommand-00071-rax",
+        "currentRevision": "orbit360productoperationalcommand-00072-mab",
+        "trafficPercent": 100,
+        "ready": true
+      },
+      {
+        "name": "orbit360CobrosReconciliationCommand",
+        "region": "us-central1",
+        "service": "orbit360cobrosreconciliationcommand",
+        "previousRevision": "orbit360cobrosreconciliationcommand-00019-cux",
+        "currentRevision": "orbit360cobrosreconciliationcommand-00021-zex",
+        "trafficPercent": 100,
+        "ready": true
+      },
+      {
+        "name": "orbit360ScopedPolicyRead",
+        "region": "us-east1",
+        "service": "orbit360scopedpolicyread",
+        "previousRevision": "orbit360scopedpolicyread-00013-gen",
+        "currentRevision": "orbit360scopedpolicyread-00014-nec",
+        "trafficPercent": 100,
+        "ready": true
+      },
+      {
+        "name": "orbit360OpsLeadsCommand",
+        "region": "us-central1",
+        "service": "orbit360opsleadscommand",
+        "previousRevision": "orbit360opsleadscommand-00013-fad",
+        "currentRevision": "orbit360opsleadscommand-00014-vep",
+        "trafficPercent": 100,
+        "ready": true
+      }
+    ],
+    "liveRunId": 45292163934,
+    "proofPath": "artifacts/orbit360-recovery/release-control/I6_6_FRONTEND_E00003_LIVE_PROOF.json",
+    "proofSha256": "4013a99719ba5f8bb3087a5e5f43c189a22daf55aabfcea37e8df5030bb5653c",
+    "rollbackHostingVersion": "sites/ays-orbit-360-lab/versions/e4e8f31b02ba2aef",
+    "fullI66ProductionAccepted": false
+  },
+  "releaseScope": "COMPOSITE",
+  "consumedPreviewRequest": {
+    "version": 14,
+    "mode": "COMPOSITE_ARTIFACT_HOSTING_PREVIEW_ONLY",
+    "sourceQaHead": "976a3705126b764d2fcd8d3eb5d368082dd75082",
+    "manifestBlob": "7f693bd0e1a7faaa6cbc95794ef5123c91c5efa4",
+    "sourceQaRunId": 45287058338,
+    "guardRunId": 45287058194,
+    "previousReceiptBlob": "d39f216defb2959b47087da84cc87b32b97faa94",
+    "productPaths": [
+      "functions/product-ops-leads-domain.js",
+      "orbit360-platform/core/auth-product-runtime-p0.js",
+      "orbit360-platform/core/backend-product-readonly-bootstrap-p0.js",
+      "orbit360-platform/core/ciclo.js",
+      "orbit360-platform/modules/cliente360.js",
+      "orbit360-platform/modules/cobros.js",
+      "orbit360-platform/modules/portal.js"
+    ],
+    "backendPaths": [
+      "functions/product-ops-leads-domain.js"
+    ],
+    "backendPathBlobs": {
+      "functions/product-ops-leads-domain.js": "b7921ca88343ced65bdad4cd9de26fa120647083"
+    },
+    "backendPreviewRequired": true,
+    "backendLiveDeployAllowed": false,
+    "realDataWritesAllowed": false,
+    "immutableArtifactMustCoverBothFrontendAndBackend": true,
+    "ownerInstruction": "23-Nov Dirección: publish only current approved cumulative source after signed Preview and exact SAME digest; never deploy backend LIVE or production writes from this request.",
+    "scope": "I6.6 only: build one exact frontend+backend artifact; publish Hosting Preview only, then separately authorize scoped backend Preview tests. No LIVE.",
+    "reason": "V13 signed Preview passed; LIVE failed before mutation because a historical Preview test required current LIVE authorization to remain false. V14 preserves all product bytes and historical facts, fixes phase-scoped QA and linked test-only manifest revisions, freezes those release owners before a NEW immutable build.",
+    "opsLeadsPreviewFunction": "orbit360OpsLeadsCommandPreview",
+    "opsLeadsLiveFunction": "orbit360OpsLeadsCommand",
+    "fourFunctionExactPreviewRequired": true,
+    "realCustomerWritesAllowed": false,
+    "liveDeployAuthorized": false,
+    "previousPreviewFailureRun": 45277851717,
+    "previousPreviewFailureCheck": "I66_DOCUMENTED_TERMS_SIGNED_HOLD",
+    "releaseAfterPreviewAllowed": false,
+    "releaseMechanismSourceSha": "976a3705126b764d2fcd8d3eb5d368082dd75082",
+    "previousBuildFailureRun": 45266197734,
+    "previousBuildFailureCheck": "FIXED_REQUEST_VERSION_ASSERTION",
+    "previousPreviewFailureStage": "FORM_FIELDS",
+    "previousLivePromotionFailureRun": 45284653398,
+    "previousLivePromotionFailureCheck": "HISTORICAL_PREVIEW_FLAGS_APPLIED_TO_CURRENT_AUTHORIZED_LIVE"
+  },
+  "remainingExecutionLanes": [
+    {
+      "id": "A03",
+      "title": "Acceso desde Chrome de Dirección",
+      "status": "CONNECTED_CHROME_NEW_TAB_CONTROL_LOGIN_OBSERVED_AUTHENTICATED_DIRECTION_SESSION_OPEN",
+      "evidence": "Chrome extension inventory and new GitHub protected-review tabs worked; new production tab1088577816 displayed login. Existing production tab1088577369 failed focus emulation; no authenticated Direction module pass claimed.",
+      "next": "Continue authenticated Direction UI after legitimate sign-in; preserve working connected browser and exact E3 CI proof. The old tab focus timeout is not evidence of browser disconnection."
+    },
+    {
+      "id": "A04",
+      "title": "Matriz completa de permisos reales Operativo/Admin/SuperAdmin/Dirección/Asesor",
+      "status": "PASS_SCOPED_GT_FIVE_ROLES_READONLY_FULL_A04_HOLD",
+      "evidence": "45298628816 / job138125264398 / artifact14878390250 / GT5 roles x2viewports x14routes =140; advisor directory denial before/after reload; fullA04 false",
+      "next": "Preserve five-role GT read-only PASS140. Complete CO and backend negative write permissions with legitimate assigned actors; do not repeat this completed GT read-only proof or infer real CRUD acceptance."
+    },
+    {
+      "id": "A05",
+      "title": "Cliente360 edición, gestiones, actividad, notas y adjuntos",
+      "status": "LINKED_DEAL_HISTORY_LIVE_UI_PASS_OTHER_ACTIONS_OPEN",
+      "evidence": "run 45072928898 live job 137364601383",
+      "next": "Test real existing-client edit, management/activity/notes/attachments including Drive roundtrip with user and readback; no false pass."
+    },
+    {
+      "id": "A06",
+      "title": "Ops/Leads y oportunidad/inspección desde cliente existente",
+      "status": "EXISTING_INSPECTION_LINKED_HISTORY_LIVE_PASS_MANAGEMENT_WRITE_OPEN",
+      "evidence": "run 45072928898 live job 137364601383; existing Corado ops0 leads1",
+      "next": "Complete Carlos Corado existing-client inspection and opportunity canonical linking; retain signed Ops task synthetic PASS."
+    },
+    {
+      "id": "A07",
+      "title": "Emisión de póliza nueva, asesor y primas de Sergio",
+      "status": "HOLD_REAL_ISSUANCE",
+      "evidence": "I6_6_FINANCIAL_OPS_LEADS_CONTINUITY_READBACK_20261119.json",
+      "next": "Sin nueva póliza real certificada"
+    },
+    {
+      "id": "A08",
+      "title": "Renovación en firme, hija, calendarios y Kanban",
+      "status": "TWO_ADDITIONAL_ISSUED_SUCCESSORS_24_OBLIGATIONS_SERVER_READBACK_PASS_UI_KANBAN_OPEN",
+      "evidence": "45330498425 / job138231284166: two additional issuer-original successors, 24 new obligations/Q6678.12, two prior cases preserved with zero writes; earlier four commercial successor proofs preserved.",
+      "next": "Preserve new and prior exact server commits. Complete the real browser renewal-button/PDF/reload/Kanban flow; investigate the single current-risk conflict of the remaining issued case using its actual parent evidence."
+    },
+    {
+      "id": "A09",
+      "title": "Sustitución de vehículo con endoso emitido exacto",
+      "status": "ISSUED_199154_APRIL_CERTIFICATE_1_TO_2_FOUND_EXACT_CURRENT_RISK_OPEN",
+      "evidence": "I6_6_FINANCIAL_OPS_LEADS_CONTINUITY_READBACK_20261119.json",
+      "next": "Fecha/referencia previa difiere"
+    },
+    {
+      "id": "A10",
+      "title": "Cobros reales sin documentos y con factura en una operación",
+      "status": "SIGNED_LIVE_SYNTHETIC_PAYMENT_RECONCILE_NO_DUPLICATE_PASS_EDSON_ONE_STEP_INVOICE_HOLD",
+      "evidence": "run 45072928898 signed LIVE; optional Drive fail source f1eb",
+      "next": "Original Edson requestId, exact receipt current server preimage; one-step real invoice upload and payment reconciliation; no blind retry."
+    },
+    {
+      "id": "A11",
+      "title": "Drive OAuth y subida/lectura de documentos real",
+      "status": "HOLD_TENANT_SETUP_REQUIRED_GOOGLE_OAUTH_CURRENT_READBACK",
+      "evidence": "run 45282695083 job 138070969557; Dirección and Carlos signed status HTTP200 tenant_setup_required",
+      "next": "Complete existing tenant Google OAuth consent and prove actual upload/readback. Optional-document payment remains independent."
+    },
+    {
+      "id": "A12",
+      "title": "Lote incremental real aplicado y probado",
+      "status": "148_HISTORICAL_PAYMENTS_24_ISSUED_OBLIGATIONS_PASS_CAUSAL_BALANCE_SOURCE_QA_PASS_PREVIEW_AND_LIVE_PENDING",
+      "evidence": "45328403470:2 payments;45330498452:146 payments;45330498425:24 obligations;45332501697:fresh302=214unchanged/88held/0ready; six UI 45332501772 I66_SIX_VISIBLE_VALUES_OR_BALANCE_HOLD; causal source95214f67, frozen SourceQA45338141255 and guard45338141269; v15 immutable build45338620622 exact224; Preview45339573549 partial24 and transient DOM detach HOLD, no promotion; causal source95214f67, frozen SourceQA45347366830 and guard45347366852",
+      "next": "Execute frontend-only v16 once, exact48-stage Preview and same-artifact48-stage LIVE; preserve completed financial batches and the prior observer45332501772. Continue source607 remaining117 and source302 remaining88 by exact cause; their universes may overlap."
+    },
+    {
+      "id": "A13",
+      "title": "Leads WhatsApp/form/correo mediante Make escritor autorizado",
+      "status": "WHATSAPP_READER_ACTIVE_IMAP_REAL_RECEIVE_PASS_CANONICAL_WRITER_OPEN",
+      "evidence": "Make10196136 active; IMAP10221181 execution3cde1527cb824947a38123ddee794674 success; existing configuration probe45342932589/job138270601689: tenant and secret binding valid, inbound route not configured; approved assignment pending_operations in receipt7ce546736ac8d08b8ac922d19f3e6e4c2bac0021",
+      "next": "Complete the authenticated existing Make reader adapter to the canonical Leads transaction using the approved pending_operations assignment, exact ad/sourceId and activation boundary. Require actual lead write/readback/replay and visibility; preserve outbound=false and no implicit historical backfill. Email/source classifier and the real webform source remain distinct open parts of A13."
+    },
+    {
+      "id": "A14",
+      "title": "QA transversal módulos, viewport, rendimiento y reinicio",
+      "status": "LIVE_SOURCE_TIMELINE_13350MS_11581MS_SOURCES_PLUS_1769MS_DOM_THREE_SOURCE_PLAN_DENIALS_OPEN",
+      "evidence": "45299330794 / job138127612969 / artifact14878846193 / exactE3 source65c825",
+      "next": "Use measured source timeline to resolve receipt/portfolio readiness latency and three exact source plan denials; GT5-role read-only is proved, CO/CRUD/full responsive and performance acceptance remain open."
+    }
+  ],
+  "postAcceptanceVerification": {
+    "receipt": "artifacts/orbit360-recovery/release-control/I6_6_E3_POSTLIVE_READONLY_PERFORMANCE_20261124_RUN45294264139.json",
+    "guardRunId": 45294264050,
+    "performanceRunId": 45294264139,
+    "performanceArtifactId": 14875886785,
+    "performanceArtifactDigest": "sha256:b8f73504396c1ba7f1ee0699bb758881088a6f8c37a6f1e9cd27e5a89b89ad10"
+  },
+  "currentLivePerformance20261124": {
+    "receipt": "artifacts/orbit360-recovery/release-control/I6_6_POST_ACCEPTANCE_OBSERVER_RESULTS_RECONCILIATION_20261124_R2.json",
+    "status": "LIVE_READONLY_MEASURED_FULL_A14_HOLD",
+    "runId": 45299330794,
+    "jobId": 138127612969,
+    "workflowHeadSha": "042f3ecdf579b8db78b768733f72c824c5b01062",
+    "artifactId": 14878846193,
+    "artifactDigest": "sha256:e83e5e457b22fadcafa9ca78d25036cc0444e2aed6017e7c614eb36e6914fa64",
+    "reportSha256": "45951e4278a1d233581db71f6a5e29c410cd6e55eb786bd289ebfa8c757ecd81",
+    "activationMs": 3809,
+    "firstSearchMs": 181,
+    "cobrosFinancialReadyMs": 13350,
+    "cobrosSourcesConfirmedMs": 11581,
+    "cobrosFinancialDomAfterSourcesMs": 1769,
+    "optionalSourceErrors": [
+      "estadosCuentaAseguradora",
+      "recibosAseguradora",
+      "reclamos"
+    ],
+    "sourcePlanDenials": [
+      {
+        "collection": "estadosCuentaAseguradora",
+        "errorCode": "PROTECTED_READ_PLAN_DENIED",
+        "queryPlanErrors": [
+          "politica_no_autoriza_consulta"
+        ]
+      },
+      {
+        "collection": "recibosAseguradora",
+        "errorCode": "PROTECTED_READ_PLAN_DENIED",
+        "queryPlanErrors": [
+          "politica_no_autoriza_consulta"
+        ]
+      },
+      {
+        "collection": "reclamos",
+        "errorCode": "PROTECTED_READ_PLAN_DENIED",
+        "queryPlanErrors": [
+          "modulo_no_visible"
+        ]
+      }
+    ],
+    "businessWrites": 0,
+    "firestoreWrites": 0,
+    "fullA14Passed": false,
+    "sixReceiptCertificateRunInThisJob": false,
+    "meaning": "Measurement succeeded; remaining source-plan denials and financial readiness delay are still open. This separate performance run did not clear the six-receipt UI HOLD."
+  },
+  "makeChannelScopeReceipt": {
+    "path": "artifacts/orbit360-recovery/release-control/I6_6_A13_CHANNEL_SCOPE_AND_EXISTING_EXECUTORS_20261124.json",
+    "gitBlobSha": "7ce546736ac8d08b8ac922d19f3e6e4c2bac0021",
+    "readOnlyObservationUtc": "2026-11-23T23:58:13.914649+00:00",
+    "whatsappRuntimeWriter": false,
+    "webformSourceIdentified": false,
+    "emailIngressWriter": false,
+    "allA13Passed": false
+  },
+  "immediateExecution": {
+    "status": "CAUSAL_BALANCE_FRONTEND_SOURCE_FROZEN_EXACT_PREVIEW_BUILD_REQUESTED",
+    "financialFocal": "Execute frontend-only v16 once, exact48-stage Preview and same-artifact48-stage LIVE; preserve completed financial batches and the prior observer45332501772. Continue source607 remaining117 and source302 remaining88 by exact cause; their universes may overlap.",
+    "largeFinancialBatches": "146 historical facts already applied in 100+46 and 24 issuer obligations applied; preserve these commits. Existing intake supports up to5000, correction chunks250, historical creation chunks100; never use six as a batch ceiling.",
+    "make": "WhatsApp reader active and real HostDime IMAP receipt proved. Neither channel yet has certified canonical Gravicentra lead writer; webform source remains unidentified. SMTP does not block receiving.",
+    "alreadyPublishedArtifactMustNotBeRebuilt": true,
+    "sourceScopeReceipt": "artifacts/orbit360-recovery/release-control/I6_6_READONLY_OBSERVER_SOURCE_SCOPE_20261124.json",
+    "observerResultsReceipt": "artifacts/orbit360-recovery/release-control/I6_6_POST_ACCEPTANCE_OBSERVER_RESULTS_RECONCILIATION_20261124_R2.json",
+    "fullA04Passed": false,
+    "fullA12Passed": false,
+    "fullA14Passed": false,
+    "fullI66ProductionAccepted": false
+  },
+  "postAcceptanceObserverResults": {
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_POST_ACCEPTANCE_OBSERVER_RESULTS_RECONCILIATION_20261124_R2.json",
+    "receiptGitBlobSha": "c1ba5d3882b01a61e4f0be39e6d087efb38ac62d",
+    "fiveRoles": {
+      "status": "PASS_SCOPED_GT_FIVE_ROLES_READONLY_FULL_A04_HOLD",
+      "runId": 45298628816,
+      "jobId": 138125264398,
+      "workflowHeadSha": "308d80f68304ea8cbf383db43b9223e05b14580e",
+      "artifactId": 14878390250,
+      "artifactDigest": "sha256:0436caf4917f3499e371b4ae7a94cdef83e94ea06c2bb6c639bc2d466da6bd08",
+      "reportSha256": "27875dbe2e4040c0eba3235e3d8ed65f27571b03efce7baae8eab4a16d6ba5a0",
+      "result": "PASS",
+      "roles": [
+        "operativo",
+        "direccion",
+        "admintenant",
+        "superadmin",
+        "asesor"
+      ],
+      "country": "GT",
+      "viewports": [
+        1280,
+        390
+      ],
+      "roleContexts": 10,
+      "routesPerContext": 14,
+      "routeChecks": 140,
+      "holds": [],
+      "reloadEveryContext": true,
+      "unexpectedHttp": 0,
+      "unexpectedBrowserLogs": 0,
+      "runtimeConsoleErrors": 0,
+      "assignedRoleSelectionOnly": true,
+      "authWrites": 0,
+      "membershipWrites": 0,
+      "businessWrites": 0,
+      "advisorReadBoundaryBeforeAndAfterReload": true,
+      "fullA04Accepted": false,
+      "backendWriteNegativeProven": false,
+      "COCoverageProven": false,
+      "remaining": "CO and backend write-negative authorization tests remain unproved; GT read-only route PASS does not certify real CRUD or the complete A04 gate."
+    },
+    "performance": {
+      "status": "LIVE_READONLY_MEASURED_FULL_A14_HOLD",
+      "runId": 45299330794,
+      "jobId": 138127612969,
+      "workflowHeadSha": "042f3ecdf579b8db78b768733f72c824c5b01062",
+      "artifactId": 14878846193,
+      "artifactDigest": "sha256:e83e5e457b22fadcafa9ca78d25036cc0444e2aed6017e7c614eb36e6914fa64",
+      "reportSha256": "45951e4278a1d233581db71f6a5e29c410cd6e55eb786bd289ebfa8c757ecd81",
+      "activationMs": 3809,
+      "firstSearchMs": 181,
+      "cobrosFinancialReadyMs": 13350,
+      "cobrosSourcesConfirmedMs": 11581,
+      "cobrosFinancialDomAfterSourcesMs": 1769,
+      "optionalSourceErrors": [
+        "estadosCuentaAseguradora",
+        "recibosAseguradora",
+        "reclamos"
+      ],
+      "sourcePlanDenials": [
+        {
+          "collection": "estadosCuentaAseguradora",
+          "errorCode": "PROTECTED_READ_PLAN_DENIED",
+          "queryPlanErrors": [
+            "politica_no_autoriza_consulta"
+          ]
+        },
+        {
+          "collection": "recibosAseguradora",
+          "errorCode": "PROTECTED_READ_PLAN_DENIED",
+          "queryPlanErrors": [
+            "politica_no_autoriza_consulta"
+          ]
+        },
+        {
+          "collection": "reclamos",
+          "errorCode": "PROTECTED_READ_PLAN_DENIED",
+          "queryPlanErrors": [
+            "modulo_no_visible"
+          ]
+        }
+      ],
+      "businessWrites": 0,
+      "firestoreWrites": 0,
+      "fullA14Passed": false,
+      "sixReceiptCertificateRunInThisJob": false,
+      "meaning": "Measurement succeeded; remaining source-plan denials and financial readiness delay are still open. This separate performance run did not clear the six-receipt UI HOLD."
+    },
+    "financialSixReceiptUi": {
+      "status": "SIX_EXACT_UI_DATES_AMOUNTS_STATUS_AND_RELOAD_PASS_CANONICAL_FUTURO_PENDIENTE_BALANCE_OWNER_HOLD",
+      "runId": 45332501772,
+      "jobId": 138236726700,
+      "workflowHeadSha": "155918f7b422b6ed2e974f9bd66852c0029bbdf1",
+      "qaSourceSha": "2c7bdb7d7a40f3af6f464fcaf2545a97e9273f29",
+      "sourceQaRunId": 45332244652,
+      "guardRunId": 45332244634,
+      "artifactId": 14893555540,
+      "artifactDigest": "sha256:d991dcf312991aaa0bd9522925f42a0fbcc0ad21988d6ff339d744b3df0bdc7c",
+      "reportSha256": "d24326a3101f372fd43763e1485a64fc86724dd687dd9f9a0247b89b18df0abf",
+      "observedFailureCode": "I66_SIX_VISIBLE_VALUES_OR_BALANCE_HOLD",
+      "actualExecutionStage": "SIGNED_READONLY_SIX_EXISTING_RECEIPTS_ALL_TWELVE_STAGES",
+      "terminalCertificateStep": "SKIPPED_AFTER_BALANCE_OWNER_HOLD",
+      "priorProtectedApplyRunId": 45272554046,
+      "priorProtectedReadback": "BULK_PROTECTED_READBACK_PASS",
+      "existingObligationsUpdated": 6,
+      "receiptUpdates": 6,
+      "portfolioUpdates": 6,
+      "auditCreates": 6,
+      "newPayments": 0,
+      "newObligations": 0,
+      "newWritesInObserver": 0,
+      "grossDeltaCents": 0,
+      "unchangedGrossGTQCents": 166956,
+      "fullA12Passed": false,
+      "uiAccepted": false,
+      "rootCauseProven": true,
+      "cause": "The accepted engine produces canonical estadoOperativo=futuro_pendiente; E3 portfolioAmountProof fallback excludes that exact known pending state when cartera.monto/saldo are absent. Calendar status and all monetary/source/date/identity comparisons pass.",
+      "causeOwner": "orbit360-platform/core/queries.js#portfolioAmountProof",
+      "producerOwner": "orbit360-platform/core/policy-receipts-engine.js#portfolioState",
+      "target": {
+        "generation": 3,
+        "sourceSha": "65c825b2808a615ca4195bdde6689dbdbe3193b2",
+        "buildId": "gi-i66-65c825b2808a-57f234755dc1",
+        "buildRunId": 45287432665,
+        "artifactId": 14873426438,
+        "artifactDigest": "sha256:7cb782848a45083047c4899bc30c13bf5be46429607e42597d09342becfc9acc",
+        "hostingVersion": "sites/ays-orbit-360-lab/versions/332999a55b189108",
+        "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_FRONTEND_E00003_RECEIPT.json",
+        "receiptGitBlobSha": "11fdb3bee494541513482666d6215f45cbad0567",
+        "receiptCommit": "f80c37e174406ccb489569b3bc7dd6073c2c4273"
+      },
+      "qaPins": {
+        ".github/workflows/gravicentra-i66-live-performance-readonly.yml": "12225700cec41aafabc477d60fe7f525ba957e12",
+        ".github/workflows/gravicentra-i66-privileged-role-parity-source-qa.yml": "6a30bbd84977abb4ebd82c681b0a63f8f02821f3",
+        ".github/workflows/gravicentra-release-lock-sync.yml": "379f7d4fef9daedfa0c060cadc7646ce788f7b6e",
+        "tools/gravicentra-governance-preflight-v1.mjs": "fbeda06fdd13e0351060f5fdec7f6b8dfcf580fe",
+        "tools/gravicentra-i6-6-delta-guard.mjs": "576eda7cd5767c8a7e3bd033f36a8805f06890e8",
+        "tools/gravicentra-i6-6-delta-test-revisions.cjs": "b99b4e8ac0def995efbc4f1fdb00b67efdc31a49",
+        "tools/gravicentra-i6-6-direction-preview-legal-acceptance.cjs": "b3a6539596fb9ed706f7a6e21aa982bf97129780",
+        "tools/gravicentra-i6-6-operational-release-candidate.cjs": "95d1221eeab7b5cc818dde314d5c8c0528823911",
+        "tools/gravicentra-i6-6-performance-first-route-source-timeline.test.cjs": "5a9b7fccbbce89b85669bc6a8bbd82cc30481563",
+        "tools/gravicentra-i6-6-readonly-observer-authority.test.cjs": "4d03114cddcdd59f4af3e9e916bead8548351619",
+        "tools/gravicentra-i6-6-six-existing-receipts-ui-readonly.test.cjs": "d8a3984718ae06c3071fcbd7e3a7e40ebbf7677a",
+        "tools/gravicentra-i66-frontend-control.cjs": "81b2f844856d188dd6cf915f10ee29b8daf08f98",
+        "tools/gravicentra-i66-frontend-promotion-transaction.cjs": "7e99182ff7854be39c8c5e90056ec6ee69d09994",
+        "tools/gravicentra-i66-live-performance-readonly.mjs": "3abfc5a95f0ea19d7cd79e9f0dc743ac830a8eac"
+      },
+      "stageCount": 12,
+      "grossChecksPassed": 12,
+      "contractualDueChecksPassed": 12,
+      "operationalLimitChecksPassed": 12,
+      "statusChecksPassed": 12,
+      "balanceVerifiedFailures": 12,
+      "balanceStateFailures": 12,
+      "reloadComparisonsFailed": 0,
+      "signedReloadsPassed": 6,
+      "serverUnchanged": true,
+      "sourceSnapshotBeforeEqualsAfter": true,
+      "additionalWrites": 0,
+      "errorCounts": {
+        "pageErrors": 0,
+        "consoleErrors": 0,
+        "httpClasses": {},
+        "blockedWrites": 0
+      },
+      "finalObserverAuthorityCheckPerformed": false,
+      "finalCobrosEngineCertificatePerformed": false,
+      "rawFinancialInputsCompared": true,
+      "rawCountryProjectionOnly": "functions/b4-003-scoped-related-reader.js#financialView pais projection",
+      "sourceRequirements": [
+        "5228533",
+        "5228534",
+        "5228535",
+        "5228536",
+        "5228537",
+        "5228538"
+      ],
+      "contractualDueDates": [
+        "2026-11-02",
+        "2026-12-02",
+        "2027-01-02",
+        "2027-02-02",
+        "2027-03-02",
+        "2027-04-02"
+      ],
+      "displayedStatuses": [
+        "Vencido",
+        "Por vencer",
+        "Por vencer",
+        "Por vencer",
+        "Por vencer",
+        "Por vencer"
+      ],
+      "next": "Correct the proven canonical amount-proof omission for futuro_pendiente in queries.js without changing persisted financial data or QA acceptance. Preserve all unique relationship, policy, country, currency, date, payment and explicit-zero guards; build a new immutable artifact, pass exact Preview, promote the same digest and run signed LIVE readback/reload. Preserve the six earlier writes and the completed large financial batches.",
+      "caseEvidence": [
+        {
+          "sourceRequirement": "5228533",
+          "receiptId": "rec_98478284ecec24ad3d851ec0",
+          "portfolioId": "car_f08268f1ce68554f0375fcac",
+          "grossCents": 27826,
+          "contractualDue": "2026-11-02",
+          "operationalLimit": "2026-11-02",
+          "receiptOperationalState": "futuro_pendiente",
+          "portfolioOperationalState": "futuro_pendiente",
+          "displayedStatus": "Vencido",
+          "canonicalStatus": "Vencido",
+          "amountProofSource": "UNVERIFIED",
+          "open": true,
+          "balanceState": "unverified",
+          "balanceCents": null,
+          "portfolioAmountPresent": false,
+          "portfolioBalancePresent": false,
+          "beforeChecks": {
+            "gross": true,
+            "contractualDue": true,
+            "operationalLimit": true,
+            "status": true,
+            "balanceVerified": false,
+            "balanceValue": true,
+            "balanceState": false
+          },
+          "afterChecks": {
+            "gross": true,
+            "contractualDue": true,
+            "operationalLimit": true,
+            "status": true,
+            "balanceVerified": false,
+            "balanceValue": true,
+            "balanceState": false
+          },
+          "reloadPass": true,
+          "rawFinancialInputsFingerprint": "203a66af91d711fb09b826c90230b32f8ca4e43ffe7fa87092c2c949d80e2161",
+          "projectedFinancialInputsFingerprint": "7ce2d68663503f34813a17e76dadf42f1f132d5e8cd7c59cdb23c74fd5c68c48",
+          "receiptFingerprint": "fa69ebb3c32507cfb9f7a555b8c8822c789dd181712d5b5324c0343c938170ba",
+          "portfolioFingerprint": "da85d32506a50cccd5a1debc3db1338b99b8b932576724b412574a8d7dff6827",
+          "auditFingerprint": "9735cdd8f67d05999151b92ee365d53ca6a184992f14fc1d1be7670c43dbff5b",
+          "rollbackPresent": true,
+          "auditIdentity": true,
+          "linkedCobros": 0
+        },
+        {
+          "sourceRequirement": "5228534",
+          "receiptId": "rec_fb4ae3b5ee66fb31dbe34702",
+          "portfolioId": "car_55c55df1fd5bcc541b70fc86",
+          "grossCents": 27826,
+          "contractualDue": "2026-12-02",
+          "operationalLimit": "2026-12-02",
+          "receiptOperationalState": "futuro_pendiente",
+          "portfolioOperationalState": "futuro_pendiente",
+          "displayedStatus": "Por vencer",
+          "canonicalStatus": "Por vencer",
+          "amountProofSource": "UNVERIFIED",
+          "open": true,
+          "balanceState": "unverified",
+          "balanceCents": null,
+          "portfolioAmountPresent": false,
+          "portfolioBalancePresent": false,
+          "beforeChecks": {
+            "gross": true,
+            "contractualDue": true,
+            "operationalLimit": true,
+            "status": true,
+            "balanceVerified": false,
+            "balanceValue": true,
+            "balanceState": false
+          },
+          "afterChecks": {
+            "gross": true,
+            "contractualDue": true,
+            "operationalLimit": true,
+            "status": true,
+            "balanceVerified": false,
+            "balanceValue": true,
+            "balanceState": false
+          },
+          "reloadPass": true,
+          "rawFinancialInputsFingerprint": "ec97188cf094028a59b39df76b7046c109e1f4f0185c6e51e2c55529023251d1",
+          "projectedFinancialInputsFingerprint": "cd009bffeec04df415c8edf49addc090267e8698a53e75c9b46664db19c96125",
+          "receiptFingerprint": "9b9d83a4eb70f8f0c03d0ecf0bd1af62756a311e234f6aba51ffc1b92e70b960",
+          "portfolioFingerprint": "f88bf2e64baad77f6d1a60e8e44f21f5c02f27b1f6b7b7bbd727f0ab0924fe2f",
+          "auditFingerprint": "9081baa1df02ac182c93bf16fa59cff4a266eaf08d93678751714fff77fc3d31",
+          "rollbackPresent": true,
+          "auditIdentity": true,
+          "linkedCobros": 0
+        },
+        {
+          "sourceRequirement": "5228535",
+          "receiptId": "rec_d76a756f3ab691bd675adebd",
+          "portfolioId": "car_e923fc80be31f62b5a0fa720",
+          "grossCents": 27826,
+          "contractualDue": "2027-01-02",
+          "operationalLimit": "2027-01-02",
+          "receiptOperationalState": "futuro_pendiente",
+          "portfolioOperationalState": "futuro_pendiente",
+          "displayedStatus": "Por vencer",
+          "canonicalStatus": "Por vencer",
+          "amountProofSource": "UNVERIFIED",
+          "open": true,
+          "balanceState": "unverified",
+          "balanceCents": null,
+          "portfolioAmountPresent": false,
+          "portfolioBalancePresent": false,
+          "beforeChecks": {
+            "gross": true,
+            "contractualDue": true,
+            "operationalLimit": true,
+            "status": true,
+            "balanceVerified": false,
+            "balanceValue": true,
+            "balanceState": false
+          },
+          "afterChecks": {
+            "gross": true,
+            "contractualDue": true,
+            "operationalLimit": true,
+            "status": true,
+            "balanceVerified": false,
+            "balanceValue": true,
+            "balanceState": false
+          },
+          "reloadPass": true,
+          "rawFinancialInputsFingerprint": "287d5cd57c7159afdebb20c038b271bab4d39337a78512eec19532db8cffcc5f",
+          "projectedFinancialInputsFingerprint": "84ba353475f5ef7bf62ab78057a10566791572e3f3f7f1cc4eafd63f7615bf7f",
+          "receiptFingerprint": "4344e5af58f708dabbb841efa26180ac764a7d1975ef1eafdb2a8a2c9735cb1c",
+          "portfolioFingerprint": "c76a023a6f9fe28463039b9b948ab55b55687c410c37a8c093cc0fce1a3ed37c",
+          "auditFingerprint": "ec0d1652f4f5f3a9916494ce224721f91d243952654e3da225609eb8cbaa80fa",
+          "rollbackPresent": true,
+          "auditIdentity": true,
+          "linkedCobros": 0
+        },
+        {
+          "sourceRequirement": "5228536",
+          "receiptId": "rec_4f659319f7e5e56008788817",
+          "portfolioId": "car_64d4f76fc02fc36cdff837ed",
+          "grossCents": 27826,
+          "contractualDue": "2027-02-02",
+          "operationalLimit": "2027-02-02",
+          "receiptOperationalState": "futuro_pendiente",
+          "portfolioOperationalState": "futuro_pendiente",
+          "displayedStatus": "Por vencer",
+          "canonicalStatus": "Por vencer",
+          "amountProofSource": "UNVERIFIED",
+          "open": true,
+          "balanceState": "unverified",
+          "balanceCents": null,
+          "portfolioAmountPresent": false,
+          "portfolioBalancePresent": false,
+          "beforeChecks": {
+            "gross": true,
+            "contractualDue": true,
+            "operationalLimit": true,
+            "status": true,
+            "balanceVerified": false,
+            "balanceValue": true,
+            "balanceState": false
+          },
+          "afterChecks": {
+            "gross": true,
+            "contractualDue": true,
+            "operationalLimit": true,
+            "status": true,
+            "balanceVerified": false,
+            "balanceValue": true,
+            "balanceState": false
+          },
+          "reloadPass": true,
+          "rawFinancialInputsFingerprint": "ee2f0e63514e07c28daf2297090168a4b1bcfae34b56f9752c47e40a99115d39",
+          "projectedFinancialInputsFingerprint": "0cab1c1f2ae4dec6485c03915c49730a99774ff70d712ab05ec8f241fada5a05",
+          "receiptFingerprint": "fbe5469d8e0c30b72690bd25c6845679dfbacfc46c8b7d9be520be8edfbdb4e5",
+          "portfolioFingerprint": "31628c648f9666b8780ca32d2597e3f3900ab8890e768405cf4637c8638607cd",
+          "auditFingerprint": "e7112948ebcd783cf9a2b182c921e3c9b2c62827d1f5c7a52d98dd08fc201681",
+          "rollbackPresent": true,
+          "auditIdentity": true,
+          "linkedCobros": 0
+        },
+        {
+          "sourceRequirement": "5228537",
+          "receiptId": "rec_6dad42c3f5d06b15fea34726",
+          "portfolioId": "car_3c6dd87039503edb71f2b84e",
+          "grossCents": 27826,
+          "contractualDue": "2027-03-02",
+          "operationalLimit": "2027-03-02",
+          "receiptOperationalState": "futuro_pendiente",
+          "portfolioOperationalState": "futuro_pendiente",
+          "displayedStatus": "Por vencer",
+          "canonicalStatus": "Por vencer",
+          "amountProofSource": "UNVERIFIED",
+          "open": true,
+          "balanceState": "unverified",
+          "balanceCents": null,
+          "portfolioAmountPresent": false,
+          "portfolioBalancePresent": false,
+          "beforeChecks": {
+            "gross": true,
+            "contractualDue": true,
+            "operationalLimit": true,
+            "status": true,
+            "balanceVerified": false,
+            "balanceValue": true,
+            "balanceState": false
+          },
+          "afterChecks": {
+            "gross": true,
+            "contractualDue": true,
+            "operationalLimit": true,
+            "status": true,
+            "balanceVerified": false,
+            "balanceValue": true,
+            "balanceState": false
+          },
+          "reloadPass": true,
+          "rawFinancialInputsFingerprint": "87f0474b5c92c7c3676cb30a4af950772fe1cb2597c52dbeb3b9b7dd674fe622",
+          "projectedFinancialInputsFingerprint": "1e92cdc0c4eff6ce792a60e41e26e685426f2155313fe17f0c3f5fc313c68310",
+          "receiptFingerprint": "8897f4003b8a86c03c31470a0c63edb9e0aa2245289f1d689d1070a3e5dc93c5",
+          "portfolioFingerprint": "24aa70b7b5f6dd17e96edf730ca4800bffb132cf348181178320198bbf5a5071",
+          "auditFingerprint": "862e04d4a98220d885c31c8f8471164aad60cd646cf63512349caff4961c2909",
+          "rollbackPresent": true,
+          "auditIdentity": true,
+          "linkedCobros": 0
+        },
+        {
+          "sourceRequirement": "5228538",
+          "receiptId": "rec_538e6f8235084bb286d2d6d6",
+          "portfolioId": "car_d9fa6067a3a3930d14df779a",
+          "grossCents": 27826,
+          "contractualDue": "2027-04-02",
+          "operationalLimit": "2027-04-02",
+          "receiptOperationalState": "futuro_pendiente",
+          "portfolioOperationalState": "futuro_pendiente",
+          "displayedStatus": "Por vencer",
+          "canonicalStatus": "Por vencer",
+          "amountProofSource": "UNVERIFIED",
+          "open": true,
+          "balanceState": "unverified",
+          "balanceCents": null,
+          "portfolioAmountPresent": false,
+          "portfolioBalancePresent": false,
+          "beforeChecks": {
+            "gross": true,
+            "contractualDue": true,
+            "operationalLimit": true,
+            "status": true,
+            "balanceVerified": false,
+            "balanceValue": true,
+            "balanceState": false
+          },
+          "afterChecks": {
+            "gross": true,
+            "contractualDue": true,
+            "operationalLimit": true,
+            "status": true,
+            "balanceVerified": false,
+            "balanceValue": true,
+            "balanceState": false
+          },
+          "reloadPass": true,
+          "rawFinancialInputsFingerprint": "b7ca7f8a14ee6a1521868a626ce73280fed7c21e3e04612e2d0c93a61d84d0ac",
+          "projectedFinancialInputsFingerprint": "fd1da08849d70b5ebd63ee113947066b4ffb770f7a814490b120ec7cfddb1adf",
+          "receiptFingerprint": "827a1b1c68e408bee0da3df9e976d94e977ac36a34088df71f7747af8083344c",
+          "portfolioFingerprint": "6e83fcf0f7aa57c321d18ffbc934193fb269dc77be442220ad0486db6269bdcd",
+          "auditFingerprint": "23df506af121c585b48844e612f75babc388f4c47ba26649e52999ede42a7ea0",
+          "rollbackPresent": true,
+          "auditIdentity": true,
+          "linkedCobros": 0
+        }
+      ],
+      "causalOwnerBlobs": {
+        "orbit360-platform/core/queries.js": "2ba6edc8a04e7cc6140db2bcad0ee213c17d785a",
+        "orbit360-platform/core/policy-receipts-engine.js": "1a42767f5d1b7fc455e4a332b4d0e6eda2f87014",
+        "functions/b4-003-scoped-related-reader.js": "aafdbe3384506b1772c7e409d565de88bf287b21"
+      }
+    }
+  },
+  "currentSignedRoleMatrix20261124": {
+    "status": "PASS_SCOPED_GT_FIVE_ROLES_READONLY_FULL_A04_HOLD",
+    "runId": 45298628816,
+    "jobId": 138125264398,
+    "workflowHeadSha": "308d80f68304ea8cbf383db43b9223e05b14580e",
+    "artifactId": 14878390250,
+    "artifactDigest": "sha256:0436caf4917f3499e371b4ae7a94cdef83e94ea06c2bb6c639bc2d466da6bd08",
+    "reportSha256": "27875dbe2e4040c0eba3235e3d8ed65f27571b03efce7baae8eab4a16d6ba5a0",
+    "result": "PASS",
+    "roles": [
+      "operativo",
+      "direccion",
+      "admintenant",
+      "superadmin",
+      "asesor"
+    ],
+    "country": "GT",
+    "viewports": [
+      1280,
+      390
+    ],
+    "roleContexts": 10,
+    "routesPerContext": 14,
+    "routeChecks": 140,
+    "holds": [],
+    "reloadEveryContext": true,
+    "unexpectedHttp": 0,
+    "unexpectedBrowserLogs": 0,
+    "runtimeConsoleErrors": 0,
+    "assignedRoleSelectionOnly": true,
+    "authWrites": 0,
+    "membershipWrites": 0,
+    "businessWrites": 0,
+    "advisorReadBoundaryBeforeAndAfterReload": true,
+    "fullA04Accepted": false,
+    "backendWriteNegativeProven": false,
+    "COCoverageProven": false,
+    "remaining": "CO and backend write-negative authorization tests remain unproved; GT read-only route PASS does not certify real CRUD or the complete A04 gate."
+  },
+  "historicalSnapshotFieldsPreserved": [
+    "thisCycle",
+    "latestSignedRoleMatrix20261122",
+    "latestCarlosPerformance20261122",
+    "externalAvailability",
+    "previousReleaseExecution",
+    "financialWork.previousFresh302SourcePreflight",
+    "financialWork.previous302Snapshot",
+    "financialWork.issuerDocumentCrosscheck",
+    "financialWork.readySourceBatch",
+    "financialWork.currentSessionFinancialCorrections",
+    "postAcceptanceVerification"
+  ],
+  "historicalSnapshotRule": "Named historical snapshots retain their original scope and bytes. Current release is releasedFrontend/releasedBackend; current observers are postAcceptanceObserverResults; current financial execution and refreshed counts are financialWork.currentExecution20261124. Historical currentSessionFinancialCorrections is specifically the six earlier date corrections.",
+  "currentExecutionMutations": {
+    "sourceQaAndProtectedWriterCodePublished": true,
+    "businessWrites": true,
+    "productSourceChanged": true,
+    "hostingDeploy": false,
+    "backendDeploy": false
+  },
+  "causalMetadataCorrection": {
+    "failedGuardRunId": 45334439406,
+    "failure": "I66_COMMERCIAL_RECEIPT_BLOB_DRIFT",
+    "cause": "Aggregate readback used gitBlobSha and a summary schema where the established commercial ledger requires one GI_I66_COMMERCIAL_SOURCE_RECEIPT_V1 with blobSha per audited policy.",
+    "resolution": "Preserve aggregate receipt; add two exact per-policy canonical receipts backed by the same committed transaction readbacks, without changing guard contracts or data.",
+    "priorProgressPreserved": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_EXECUTION_PROGRESS_20261124_R24.json",
+    "additionalBusinessWrites": 0
+  },
+  "frontendBalanceCorrection": {
+    "status": "SOURCE_AND_QA_FROZEN_PREVIEW_BUILD_REQUESTED_NOT_DEPLOYED",
+    "sourceProductCommit": "95214f67dd607713b5a9b46e2af4ba58c6513cad",
+    "sourceQaHead": "fa1afbbc531313333cda99be01a186ed6afd2e13",
+    "sourceQaRunId": 45347366830,
+    "guardRunId": 45347366852,
+    "causalDomJobId": 138285079434,
+    "causalQaPins": {
+      "tools/gravicentra-i66-live-performance-readonly.mjs": "5a3fcb0387754abdec466311155adbb1768ee88e",
+      "tools/gravicentra-i6-6-six-existing-receipts-ui-readonly.test.cjs": "7f512c1bd18f895ec35d83e7bfad63596ae12637",
+      ".github/workflows/gravicentra-i66-privileged-role-parity-source-qa.yml": "9aa85099324aaf072a84f06aeb216a13403bd3fe"
+    },
+    "productPath": "orbit360-platform/core/queries.js",
+    "productGitBlobSha": "b77b65f86ef6ac2ab6dc157fdbc9ad5e34dbcdcc",
+    "manifestGitBlobSha": "2d9d4e08648b562d9d51f1dd96ea97abc8b2bf69",
+    "requestVersion": 16,
+    "mode": "PREVIEW_HOSTING_ONLY",
+    "causalObserverRunId": 45332501772,
+    "expectedPreviewStages": 48,
+    "expectedLiveStages": 48,
+    "frontendOnly": true,
+    "backendDeploys": 0,
+    "financialWrites": 0,
+    "previewAccepted": false,
+    "liveAccepted": false,
+    "fullI66ProductionAccepted": false
+  },
+  "parallelFinancialIdentityWork20261124": {
+    "status": "FOCAL_EXISTING_POLICY_FINANCIAL_LINK_READBACK_COMPLETE_SOURCE_BACKED_CAS_PENDING",
+    "pins": {
+      "tools/gravicentra-i66-financial-identity-readback.cjs": "beb847bc71e3e0ff7010a1a3c52c52444226afcc",
+      "tools/gravicentra-i66-roble-two-issued-protected.cjs": "8ad05ee12fd38f190285246ce77201f57c25c54a",
+      "tools/gravicentra-i66-roble-two-issued-plan.test.cjs": "7dc596d1bdf5a2de5d7d039a017ca13576a14e32",
+      "artifacts/orbit360-recovery/release-control/I6_6_20261123_PROTECTED_SOURCE_BULK_REFRESH_REQUEST.json": "022c4f90ec452073913be599518782d81ebbb9f6"
+    },
+    "existingWorkflow": "gravicentra-i66-insurer-source-bulk-protected.yml",
+    "markers": [
+      "I66_ROBLE_0043_READBACK",
+      "I66_ROBLE_TWO_24_CAS"
+    ],
+    "scopes": [
+      "Three exact Universales source policy identities and documentary aliases",
+      "Existing current-risk parent for issued Roble91-4140843"
+    ],
+    "writes": 0,
+    "protectedApplyAllowed": false,
+    "matcherChanged": false,
+    "eligibilityChanged": false,
+    "coverageStatusConstraint": "Preserve literal SIN COBERTURA for source04-05-01-12289-4; do not infer Vigente.",
+    "priorPreparation": {
+      "status": "READONLY_IDENTITY_DIAGNOSTIC_REQUESTED_NOT_APPLIED",
+      "pins": {
+        "tools/gravicentra-i66-financial-identity-readback.cjs": "38beef2d21b984964f1646941f3f632dbad4b751",
+        "tools/gravicentra-i66-roble-two-issued-protected.cjs": "db61a974292dc7d381167cae161d035ff6180fe0",
+        "tools/gravicentra-i66-roble-two-issued-plan.test.cjs": "36f59e34925b204a813418aab39dec079b59133f",
+        "artifacts/orbit360-recovery/release-control/I6_6_20261123_PROTECTED_SOURCE_BULK_REFRESH_REQUEST.json": "b7c859eb61da2b580b2afe96ced568a0ac9a0f67"
+      },
+      "existingWorkflow": "gravicentra-i66-insurer-source-bulk-protected.yml",
+      "markers": [
+        "I66_ROBLE_0043_READBACK",
+        "I66_ROBLE_TWO_24_CAS"
+      ],
+      "scopes": [
+        "Three exact Universales source policy identities and documentary aliases",
+        "Existing current-risk parent for issued Roble91-4140843"
+      ],
+      "writes": 0,
+      "protectedApplyAllowed": false,
+      "matcherChanged": false,
+      "eligibilityChanged": false,
+      "coverageStatusConstraint": "Preserve literal SIN COBERTURA for source04-05-01-12289-4; do not infer Vigente."
+    },
+    "probeCommit": "c487800607ba98a7990efba11226c43563213d7b",
+    "probeRunId": 45346736089,
+    "firstReadback": {
+      "runId": 45343791462,
+      "jobId": 138273382608,
+      "artifactId": 14897227753,
+      "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_SOURCE_IDENTITY_READONLY_PROBE_20261124.json",
+      "receiptBlobSha": "00493eba0a9ffc157448512d8b46a1cbb5ba6245",
+      "artifactDigest": "sha256:ffcd1cee86aaab43bfb56e73c332c6ee8a92525eca332e1bba934393b031da08",
+      "reportSha256": "4d29c16be1664183b28626657dbf7caaebb7866d0b416746faae1596c177f896",
+      "currentIssuedPolicyAlreadyExistsUnderTruncatedNumber": true,
+      "exactCurrentPolicyId": "pol_7ab15779e3626402f1cb4349fa69",
+      "correctionNotApplied": true,
+      "writes": 0,
+      "protectedJobsSkipped": 6
+    },
+    "exactFinancialPolicyIds": [
+      "pol_7ab15779e3626402f1cb4349fa69",
+      "pol_243608bce078afdf9640c8554ac4",
+      "pol_6537ecb219275945f57fc567610c",
+      "pol_c0001022fe28c0fa04d405d4a5b8",
+      "pol_4cc6dba30e87de60562e32306c3c"
+    ],
+    "secondReadback": {
+      "runId": 45346736089,
+      "jobId": 138283003919,
+      "artifactId": 14897739308,
+      "artifactDigest": "sha256:d89a0eeed183399f1627dab183aa8b188506defbe6e9df6d406eb818f850e693",
+      "reportSha256": "e6631ae63f4e02fbf90917df05bfb42ad42e8ce585c542c73bf5a4aef4c1c12e",
+      "diagnosticSha256": "2b2ac19e777b1b072a33332527c3bf3fdec843fcdb0cef88c0285d32c7177ebe",
+      "writes": 0,
+      "protectedJobsSkipped": 6,
+      "currentTruncatedPolicyExistingReceipts": 1,
+      "currentTruncatedPolicyExistingPortfolio": 1,
+      "currentTruncatedPolicyExistingPayments": 0,
+      "noNewObligationRequiredForTruncatedPolicy": true
+    }
+  },
+  "parallelMakeIngressWork20261124": {
+    "status": "EXISTING_CONFIGURATION_READONLY_PROBE_COMPLETED_CANDIDATE_IN_PREPARATION",
+    "probeCommit": "6a93bb4a8cf962f148dde324bce48651473b246e",
+    "probeRunId": 45342932589,
+    "probeJobId": 138270601689,
+    "secretVersionAccessible": true,
+    "tenantCountryInstanceMatch": true,
+    "inboundBlockPresent": false,
+    "inboundEnabled": false,
+    "existingRoutingCandidatePresent": false,
+    "approvedAssignment": "pending_operations",
+    "scopeReceiptPath": "artifacts/orbit360-recovery/release-control/I6_6_A13_CHANNEL_SCOPE_AND_EXISTING_EXECUTORS_20261124.json",
+    "scopeReceiptBlobSha": "7ce546736ac8d08b8ac922d19f3e6e4c2bac0021",
+    "providerMessagesSent": 0,
+    "canonicalLeadWritesCertified": 0,
+    "scope": "Validate existing tenant, provider and machine identity before connecting the existing Make reader to the canonical Leads transaction. No human actor impersonation and no duplicate writer."
+  },
+  "priorFrontendBalanceCorrections": [
+    {
+      "status": "V15_PREVIEW_HOLD_CAUSAL_QA_RECOVERY_SOURCE_PREPARED_NEW_BUILD_REQUIRED",
+      "sourceProductCommit": "95214f67dd607713b5a9b46e2af4ba58c6513cad",
+      "sourceQaHead": "c6401502e0a00843e0ea2e1e0494accfa3e40586",
+      "sourceQaRunId": 45338141255,
+      "guardRunId": 45338141269,
+      "productPath": "orbit360-platform/core/queries.js",
+      "productGitBlobSha": "b77b65f86ef6ac2ab6dc157fdbc9ad5e34dbcdcc",
+      "manifestGitBlobSha": "2d9d4e08648b562d9d51f1dd96ea97abc8b2bf69",
+      "requestVersion": 15,
+      "mode": "PREVIEW_HOSTING_ONLY",
+      "causalObserverRunId": 45332501772,
+      "expectedPreviewStages": 48,
+      "expectedLiveStages": 48,
+      "frontendOnly": true,
+      "backendDeploys": 0,
+      "financialWrites": 0,
+      "previewAccepted": false,
+      "liveAccepted": false,
+      "fullI66ProductionAccepted": false,
+      "immutableBuild": {
+        "runId": 45338620622,
+        "sourceSha": "a7a934529b54730550525445dab080216ad21a73",
+        "buildId": "gi-i66-a7a934529b54-57f234755dc1",
+        "artifactId": 14894812748,
+        "artifactDigest": "sha256:ac0234b3b10770b12765a015fba56c10c32f36b7cbe62e721f9a27f7275e9698",
+        "siteFilesVerified": 224,
+        "receipt": {
+          "path": "artifacts/orbit360-recovery/release-control/I6_6_V15_IMMUTABLE_BUILD_PREVIEW_READBACK_20261124.json",
+          "blobSha": "9c856ea033babda14328236691476dba08095034"
+        }
+      },
+      "previewAttempt": {
+        "status": "HOLD",
+        "runId": 45339573549,
+        "jobId": 138259713483,
+        "artifactId": 14896091574,
+        "artifactDigest": "sha256:72e3e3d31294b7832eea67aa5963d088861badbea0d28ed52fe724795c93e955",
+        "reportSha256": "1a4e875fc587a30366837208b9e51a948959c90ffac583a8ccd8591980488dd3",
+        "receipt": {
+          "path": "artifacts/orbit360-recovery/release-control/I6_6_FRONTEND_E00004_PREVIEW_HOLD_20261124_RUN45339573549.json",
+          "blobSha": "c46ca54c5381fa80899080b11f16b9ccd23a4c0c"
+        },
+        "successfulStages": 24,
+        "requiredStages": 48,
+        "observedCause": "locator.scrollIntoViewIfNeeded: Element is not attached to the DOM",
+        "operativeDesktopStages": 12,
+        "operativeMobileStages": 12,
+        "directionStages": 0,
+        "finalMatrixServerSnapshotAvailable": false,
+        "finalAuthorityAvailable": false,
+        "promoted": false
+      },
+      "causalQaRecovery": {
+        "status": "SOURCE_PREPARED_CI_REAL_DOM_VALIDATION_REQUIRED",
+        "pins": {
+          "tools/gravicentra-i66-live-performance-readonly.mjs": "5a3fcb0387754abdec466311155adbb1768ee88e",
+          "tools/gravicentra-i6-6-six-existing-receipts-ui-readonly.test.cjs": "767fd4788a38322019c5f95a7dc8b49ffe1ff8fa",
+          ".github/workflows/gravicentra-i66-privileged-role-parity-source-qa.yml": "62babd644a1aa18ecdc71011688dd669601afe61"
+        },
+        "maximumAttempts": 3,
+        "onlyExactTransientDetach": true,
+        "allAcceptanceConditionsPreserved": true,
+        "syntheticTestRequiresBrowser": true,
+        "localBrowserBlockedNoPassClaimed": true
+      }
+    }
+  ],
+  "causalQaValidationAttempts": [
+    {
+      "runId": 45343789645,
+      "headSha": "19813609f65dd1460f8cf6e468bbf487443fc450",
+      "status": "REJECTED_BEFORE_TEST_EXECUTION",
+      "jobs": 0,
+      "cause": "Runner path expression used before runner allocation; fixed in the existing Source QA workflow.",
+      "productionWrites": 0
+    },
+    {
+      "runId": 45344003395,
+      "headSha": "10e6f1967890537d43d000060640c58e41892045",
+      "status": "HOLD",
+      "sourceJobId": 138274071866,
+      "sourceConclusion": "success",
+      "causalDomJobId": 138274071610,
+      "causalDomConclusion": "failure",
+      "browserInstalled": true,
+      "cause": "Synthetic test seam changed the Playwright API error label to locator._withElement; production recovery signature stayed strict.",
+      "productionWrites": 0
+    },
+    {
+      "runId": 45345798637,
+      "headSha": "b5915b302f8168e9c0ba5ecda30024a41be8545e",
+      "status": "HOLD",
+      "sourceJobId": 138279916318,
+      "sourceConclusion": "success",
+      "causalDomJobId": 138279916422,
+      "causalDomConclusion": "failure",
+      "browserInstalled": true,
+      "artifactId": 14898322472,
+      "artifactDigest": "sha256:67c54ca3f54e16eb8806ab95043bcaa2343687940e01ac8a7a22ac4e232159a9",
+      "cause": "Actual detach reproduction, transient recovery and persistent rejection reached the final negative layout case; its nested wide element did not create viewport overflow. Corrected only the synthetic overflow fixture.",
+      "productionWrites": 0
+    },
+    {
+      "runId": 45347366830,
+      "headSha": "fa1afbbc531313333cda99be01a186ed6afd2e13",
+      "status": "PASS",
+      "sourceConclusion": "success",
+      "causalDomJobId": 138285079434,
+      "causalDomConclusion": "success",
+      "artifactId": 14898347510,
+      "artifactDigest": "sha256:5a898a3e313998045ffe9e40b6cb79e72c07cb083692a17dc122060a3d84ce90",
+      "realChromiumSubtests": 3,
+      "passed": 3,
+      "failed": 0,
+      "skipped": 0,
+      "pins": {
+        "tools/gravicentra-i66-live-performance-readonly.mjs": "5a3fcb0387754abdec466311155adbb1768ee88e",
+        "tools/gravicentra-i6-6-six-existing-receipts-ui-readonly.test.cjs": "7f512c1bd18f895ec35d83e7bfad63596ae12637",
+        ".github/workflows/gravicentra-i66-privileged-role-parity-source-qa.yml": "9aa85099324aaf072a84f06aeb216a13403bd3fe"
+      },
+      "productionWrites": 0
+    }
+  ]
+}

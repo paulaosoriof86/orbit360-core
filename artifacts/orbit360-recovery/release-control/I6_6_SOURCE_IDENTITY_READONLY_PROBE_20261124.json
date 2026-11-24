@@ -1,0 +1,178 @@
+{
+  "schema": "GI_I66_SOURCE_IDENTITY_READONLY_PROBE_RECEIPT_V1",
+  "status": "READONLY_PROBE_COMPLETED_NO_FINANCIAL_DELTA_APPLIED",
+  "dateUtc": "2026-11-24",
+  "gate": "I6.6",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "sourceSha": "19813609f65dd1460f8cf6e468bbf487443fc450",
+  "workflow": ".github/workflows/gravicentra-i66-insurer-source-bulk-protected.yml",
+  "runId": 45343791462,
+  "preflightJobId": 138273382608,
+  "runUrl": "https://github.com/paulaosoriof86/orbit360-core/actions/runs/45343791462",
+  "preflightStatus": "success",
+  "writes": 0,
+  "directPaymentsCreated": 0,
+  "newObligationsCreated": 0,
+  "protectedJobs": [
+    {
+      "id": 138273741123,
+      "name": "protected-source-bulk-live",
+      "conclusion": "skipped"
+    },
+    {
+      "id": 138273741208,
+      "name": "protected-issued-d01-source-schedule",
+      "conclusion": "skipped"
+    },
+    {
+      "id": 138273741370,
+      "name": "protected-issued-d03-source-schedule",
+      "conclusion": "skipped"
+    },
+    {
+      "id": 138273741421,
+      "name": "protected-d03-statement-series",
+      "conclusion": "skipped"
+    },
+    {
+      "id": 138273741588,
+      "name": "protected-issued-documentary-successor",
+      "conclusion": "skipped"
+    },
+    {
+      "id": 138273741603,
+      "name": "protected-issued-roble-two-24",
+      "conclusion": "skipped"
+    }
+  ],
+  "activationMarkers": [
+    "I66_ROBLE_0043_READBACK",
+    "I66_ROBLE_TWO_24_CAS"
+  ],
+  "artifact": {
+    "id": 14897227753,
+    "name": "gi-i66-source-bulk-preflight-45343791462",
+    "digest": "sha256:ffcd1cee86aaab43bfb56e73c332c6ee8a92525eca332e1bba934393b031da08",
+    "downloadedZipSha256": "ffcd1cee86aaab43bfb56e73c332c6ee8a92525eca332e1bba934393b031da08",
+    "downloadedBytesMatchPublishedDigest": true,
+    "files": [
+      {
+        "name": "gi-i66-bulk-plan.json",
+        "sha256": "39dd8eb6e41b712562bbd2e6b7c8a247a8a7df4d9c00b859b7e8c1c57fd6cd5b"
+      },
+      {
+        "name": "gi-i66-bulk-preflight.json",
+        "sha256": "39dd8eb6e41b712562bbd2e6b7c8a247a8a7df4d9c00b859b7e8c1c57fd6cd5b"
+      }
+    ],
+    "scope": "Single paid-source case readback only. Roble identity diagnostic was printed in the sanitized job log, not in these two original artifact files."
+  },
+  "jobLog": {
+    "retrievedSanitizedLogSha256": "694fbff33982f9046debba6bc2b6cc1e57f93f1b1d1d92845a9a275611132aff",
+    "containsRawCredentials": false,
+    "providerRedactionPreserved": true,
+    "diagnosticRequestSha256": "c3af5ad8e1c16b76d72a92e8ef82841b95310475ed744443a69146e754c12fe6",
+    "diagnosticPreimageDigest": "f7147b65c1c912a2f5d191b6425ea1286f322ea742e637d484a6ccc9da016b0b",
+    "diagnosticReportSha256PrintedByOwner": "4d29c16be1664183b28626657dbf7caaebb7866d0b416746faae1596c177f896",
+    "reportDigestIsOwnerEmitted": "The JSON delimiters are masked in provider logs. No redacted values or delimiters were reconstructed to assert a raw JSON artifact digest."
+  },
+  "currentReadback": {
+    "robleCases": 5,
+    "eligible": 0,
+    "alreadyApplied": 4,
+    "holds": 1,
+    "writes": 0,
+    "sourceCaseIdsPreserved": [
+      "91-8324489",
+      "91-8343059",
+      "91-8323091",
+      "91-8342189"
+    ],
+    "receiptsPreserved": 48,
+    "portfolioPreserved": 48,
+    "grossCentsPreserved": 1508597,
+    "scope": "Original 24 obligations plus subsequent 24 obligations verified by exact existing audits. This is not a new application."
+  },
+  "scopedPaidCase": {
+    "caseId": "ROBLE_NOV20_0043",
+    "sourceRequirement": "5693797",
+    "grossCents": 33437,
+    "paidRecordPreserved": true,
+    "genericPlannerException": "PAYMENT_OR_PORTFOLIO_EXCEPTION",
+    "newPaymentCreated": false,
+    "isFresh302Census": false
+  },
+  "findings": {
+    "roble4140843": {
+      "issuedPolicy": "91-4140843",
+      "storedPolicy": "91-414084",
+      "currentPolicyId": "pol_7ab15779e3626402f1cb4349fa69",
+      "term": [
+        "2026-09-10",
+        "2027-09-10"
+      ],
+      "currentRiskId": "veh_89b8d29c9ed558c356dc0f75",
+      "currentPolicySnapshotSha256": "1814d9e55f222e8998d139e2795e458c3597c3d0d7485e5a60fe50c057a43f56",
+      "currentRiskSnapshotSha256": "e34df3862b53d33746adc42ee399671fec31a2e1a4d5cbff4d0bc5411d56ba64",
+      "sameHolder": true,
+      "sameInsurer": true,
+      "country": "GT",
+      "currency": "GTQ",
+      "priorPolicyId": "pol_adfc142e568bc3f254410e7c4436",
+      "priorStoredPolicy": "91-414084",
+      "priorTerm": [
+        "2025-09-10",
+        "2026-09-10"
+      ],
+      "nextAction": "Read exact existing financial records and verify all current risk aliases, then propose source-backed CAS on the current edition only. Do not create a duplicate policy or correct the prior edition without its issued original."
+    },
+    "universales10738": {
+      "sourcePolicy": "04-05-01-10738-6",
+      "storedPolicy": "10738",
+      "currentPolicyId": "pol_243608bce078afdf9640c8554ac4",
+      "term": [
+        "2026-03-01",
+        "2027-03-01"
+      ],
+      "snapshotSha256": "1d07c4b304518bd4df561c5fca078d4aef330d3db6f02c1e55406608b53b3cc1",
+      "holderWitnessUnique": true,
+      "nextAction": "Cross-check exact receipt identities before any update; a short number alone is not payment eligibility."
+    },
+    "universales12289": {
+      "sourcePolicy": "04-05-01-12289-4",
+      "documentaryTerm": [
+        "2026-10-01",
+        "2027-09-30"
+      ],
+      "lastEditionFoundForVerifiedHolder": "12289-3",
+      "lastEditionId": "pol_5080266a15e6f2b39f20017d08e4",
+      "lastEditionTerm": [
+        "2025-10-01",
+        "2026-09-30"
+      ],
+      "holderWitnessUnique": true,
+      "coverageStatusLiteral": "SIN COBERTURA",
+      "nextAction": "Global duplicate proof and source-backed edition creation must preserve the current coverage warning; no default Vigente."
+    },
+    "universales15590": {
+      "sourcePolicy": "04-05-01-15590-0",
+      "documentaryTerm": [
+        "2026-10-01",
+        "2027-09-30"
+      ],
+      "holderWitnessUnique": true,
+      "editionsFoundForVerifiedHolderAndInsurer": 0,
+      "nextAction": "Use issued original plus current statement, verified existing holder/advisor and complete duplicate census before a proposed create."
+    }
+  },
+  "existingFinancePreservation": {
+    "mustPreservePreviouslyAppliedHistoricalPayments": 148,
+    "mustPreservePreviouslyAppliedHistoricalGrossCents": 7663847,
+    "mustPreserveNewRobleObligations": 24,
+    "mustPreserveNewRobleGrossCents": 667812,
+    "cendoso148WereNotReauditedByThisProbe": true,
+    "sixFocalReceiptDataWrites": 0,
+    "noFullI66AcceptanceClaimed": true
+  }
+}
