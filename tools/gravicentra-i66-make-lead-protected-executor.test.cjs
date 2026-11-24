@@ -78,7 +78,17 @@ function functionRow(p,phase='live'){
     eventFilters:[{attribute:'database',value:'(default)'},{attribute:'namespace',value:'(default)'},
       {attribute:'document',value:`${ROOT}/${phase==='preview'?c.PREVIEW_QUEUE:c.QUEUE}/{requestId}`,operator:'match-path-pattern'}]}};
 }
-const authFor=get=>({request:async()=>{const value=get();if(value===null)throw{response:{status:404}};return{data:clone(value)};}});
+function runServiceRow(fn,{revision=fn.serviceConfig.revision,generation='1',type='TRAFFIC_TARGET_ALLOCATION_TYPE_REVISION'}={}){
+ return{name:fn.serviceConfig.service,uid:'12345678-1234-4234-8234-123456789abc',generation,observedGeneration:generation,
+  terminalCondition:{state:'CONDITION_SUCCEEDED'},reconciling:false,
+  latestReadyRevision:fn.serviceConfig.revision,trafficStatuses:[{type,revision,percent:100}]};
+}
+const authFor=(get,getTraffic)=>({request:async op=>{
+ assert.equal(op.method,'GET');const value=get();if(value===null)throw{response:{status:404}};
+ if(op.url==='https://cloudfunctions.googleapis.com/v2/'+value.name)return{data:clone(value)};
+ assert.match(op.url,/^https:\/\/run\.googleapis\.com\/v2\/projects\/ays-orbit-360-lab\/locations\/(us-east1|us-central1)\/services\/orbit360makeleadingress(preview)?$/);
+ return{data:clone(getTraffic?getTraffic():runServiceRow(value))};
+}});
 test('deployment proof uses real AuthContext event filters, runtime and revision, independent of Cloud Run traffic',()=>{
  const {p}=fixture(),row=functionRow(p),proof=e.fnProjection(row,p,'live');assert.equal(proof.eventType,s.EVENT_TYPE);
  for(const mutate of [r=>r.name+='wrong',r=>r.state='DEPLOYING',r=>r.serviceConfig.serviceAccountEmail='another',
@@ -118,9 +128,14 @@ test('existing Preview rollback restores only its exact captured postimage and r
  const {p}=fixture(),phase='preview';let current=functionRow(p,phase),restored=0;const projection=e.fnProjection(current,p,phase);
  p.makeIngress.targetBefore.preview={...s.ADDED.preview,state:'EXISTING_APPROVED',revision:projection.revision,
   configurationDigest:projection.configurationDigest,receiptBlob:'c'.repeat(40)};
- const auth=authFor(()=>current),snapshot=await e.snapshotTrigger({auth,p,phase});
+ let traffic=runServiceRow(current);const auth=authFor(()=>current,()=>traffic),snapshot=await e.snapshotTrigger({auth,p,phase});
  current.serviceConfig.revision=current.serviceConfig.revision.replace('00001','00002');
- const restorePreviousRevision=async fn=>{assert.deepEqual(fn,snapshot.function);restored++;};
+ traffic=runServiceRow(current,{generation:'2'});
+ const restorePreviousRevision=async target=>{
+  assert.deepEqual(target,{service:snapshot.traffic.service,region:s.ADDED.preview.region,
+   revision:snapshot.traffic.targets[0].revision,percent:100});restored++;
+  traffic=runServiceRow(current,{revision:target.revision,generation:'3'});
+ };
  await assert.rejects(e.rollbackCreatedTrigger({auth,p,phase,snapshot,restorePreviousRevision}),/POSTIMAGE_REQUIRED_FOR_RESTORE/);
  const postimage=await e.captureTrigger({auth,p,phase,snapshot});
  const result=await e.rollbackCreatedTrigger({auth,p,phase,snapshot,postimage,restorePreviousRevision});
@@ -128,6 +143,134 @@ test('existing Preview rollback restores only its exact captured postimage and r
  current.serviceConfig.revision+='-concurrent';
  await assert.rejects(e.rollbackCreatedTrigger({auth,p,phase,snapshot,postimage,restorePreviousRevision}),/POSTIMAGE_CHANGED/);
  assert.equal(restored,1);
+});
+function trafficRollbackFixture(){
+ const {p}=fixture(),phase='preview';let current=functionRow(p,phase);
+ current.serviceConfig.revision='orbit360makeleadingresspreview-00002-wem';
+ const projection=e.fnProjection(current,p,phase);
+ p.makeIngress.targetBefore.preview={...s.ADDED.preview,state:'EXISTING_APPROVED',revision:projection.revision,
+  configurationDigest:projection.configurationDigest,receiptBlob:'c'.repeat(40)};
+ let traffic=runServiceRow(current,{revision:'orbit360makeleadingresspreview-00001-cuy',generation:'8'});
+ const calls=[],inner=authFor(()=>current,()=>traffic);
+ const auth={request:async op=>{calls.push(clone(op));return inner.request(op);}};
+ return{p,phase,auth,calls,get current(){return current;},get traffic(){return traffic;},
+  deploy(){current.serviceConfig.revision='orbit360makeleadingresspreview-00003-new';traffic=runServiceRow(current,{generation:'9'});},
+  setTraffic(value){traffic=value;},setFunction(value){current=value;}};
+}
+test('reproduces API wem with traffic cuy and restores observed cuy with authenticated readback',async()=>{
+ const f=trafficRollbackFixture(),snapshot=await e.snapshotTrigger(f);
+ assert.equal(snapshot.function.revision,'orbit360makeleadingresspreview-00002-wem');
+ assert.equal(snapshot.traffic.targets[0].revision,'orbit360makeleadingresspreview-00001-cuy');
+ assert.notEqual(snapshot.function.revision,snapshot.traffic.targets[0].revision,'the old restore argument chose the wrong revision');
+ assert.ok(f.calls.every(x=>x.method==='GET'));assert.equal(f.calls.filter(x=>x.url.startsWith('https://run.googleapis.com/v2/')).length,1);
+ f.deploy();const postimage=await e.captureTrigger({...f,snapshot});let writes=0;
+ const restorePreviousRevision=async target=>{
+  writes++;assert.equal(target.revision,'orbit360makeleadingresspreview-00001-cuy');assert.equal(target.percent,100);
+  assert.equal(target.configurationDigest,undefined,'routing target is not a rewritten Functions projection');
+  f.setTraffic(runServiceRow(f.current,{revision:target.revision,generation:'10'}));
+ };
+ const result=await e.rollbackCreatedTrigger({...f,snapshot,postimage,restorePreviousRevision});
+ assert.equal(result.status,'EXACT_PREVIOUS_PREVIEW_REVISION_RESTORED');assert.equal(result.trafficWrites,1);assert.equal(writes,1);
+ assert.equal(result.restoredRevision,'orbit360makeleadingresspreview-00001-cuy');
+ assert.equal(f.current.serviceConfig.revision,'orbit360makeleadingresspreview-00003-new','Functions metadata is not relabeled by routing rollback');
+ const again=await e.rollbackCreatedTrigger({...f,snapshot,postimage,restorePreviousRevision});
+ assert.equal(again.status,'EXACT_PREVIOUS_PREVIEW_REVISION_ALREADY_RESTORED');assert.equal(again.trafficWrites,0);assert.equal(writes,1);
+});
+test('preflight unchanged Functions metadata cannot hide a traffic-only concurrent change',async()=>{
+ const f=trafficRollbackFixture(),snapshot=await e.snapshotTrigger(f);let writes=0;
+ f.setTraffic(runServiceRow(f.current,{revision:'orbit360makeleadingresspreview-00004-other',generation:'9'}));
+ await assert.rejects(e.rollbackCreatedTrigger({...f,snapshot,restorePreviousRevision:async()=>{writes++;}}),/TRAFFIC_PREIMAGE_CHANGED/);
+ assert.equal(writes,0);
+});
+test('historical existing snapshots without traffic remain readable but cannot authorize restore or unchanged success',async()=>{
+ const f=trafficRollbackFixture(),snapshot=await e.snapshotTrigger(f);delete snapshot.traffic;let writes=0;
+ await assert.rejects(e.rollbackCreatedTrigger({...f,snapshot,restorePreviousRevision:async()=>{writes++;}}),/PREVIOUS_TRAFFIC_PROOF_REQUIRED/);
+ f.deploy();const postimage=await e.captureTrigger({...f,snapshot});
+ await assert.rejects(e.rollbackCreatedTrigger({...f,snapshot,postimage,restorePreviousRevision:async()=>{writes++;}}),/PREVIOUS_TRAFFIC_PROOF_REQUIRED/);
+ assert.equal(writes,0);
+});
+test('a missing snapshot is never permission to infer a previous serving revision',async()=>{
+ const f=trafficRollbackFixture();let writes=0;
+ await assert.rejects(e.rollbackCreatedTrigger({...f,restorePreviousRevision:async()=>{writes++;}}));
+ assert.equal(writes,0);assert.equal(f.calls.length,0);
+});
+test('historical ABSENT snapshots retain the exact created-function deletion contract without inferred traffic',async()=>{
+ const {p}=fixture(),phase='live';let current=null,deletes=0;
+ const auth=authFor(()=>current),snapshot=await e.snapshotTrigger({auth,p,phase});delete snapshot.traffic;
+ current=functionRow(p,phase);const postimage=await e.captureTrigger({auth,p,phase,snapshot});delete postimage.traffic;
+ const result=await e.rollbackCreatedTrigger({auth,p,phase,snapshot,postimage,deleteFunction:async()=>{deletes++;current=null;}});
+ assert.equal(result.functionDeletes,1);assert.equal(deletes,1);
+});
+test('a successful restore command without an exact traffic readback remains HOLD',async()=>{
+ const f=trafficRollbackFixture(),snapshot=await e.snapshotTrigger(f);f.deploy();
+ const postimage=await e.captureTrigger({...f,snapshot});let writes=0;
+ await assert.rejects(e.rollbackCreatedTrigger({...f,snapshot,postimage,restorePreviousRevision:async()=>{writes++;}}),/TRAFFIC_RESTORE_UNVERIFIED/);
+ assert.equal(writes,1);
+});
+for(const [label,mutate] of [
+ ['missing postimage traffic',(f,p)=>{delete p.traffic;}],
+ ['changed traffic revision',f=>{f.setTraffic(runServiceRow(f.current,{revision:'orbit360makeleadingresspreview-00004-other',generation:'10'}));}],
+ ['changed service identity',f=>{f.traffic.uid='87654321-4321-4321-8321-cba987654321';}],
+ ['changed traffic generation',f=>{f.traffic.generation=f.traffic.observedGeneration='10';}]
+])test('compensation rejects '+label+' before any traffic write',async()=>{
+ const f=trafficRollbackFixture(),snapshot=await e.snapshotTrigger(f);f.deploy();
+ const postimage=await e.captureTrigger({...f,snapshot});mutate(f,postimage);let writes=0;
+ await assert.rejects(e.rollbackCreatedTrigger({...f,snapshot,postimage,restorePreviousRevision:async()=>{writes++;}}));
+ assert.equal(writes,0);
+});
+test('the observed Cloud Run revision must be the new deployment at postimage capture',async()=>{
+ const f=trafficRollbackFixture(),snapshot=await e.snapshotTrigger(f);f.deploy();
+ f.setTraffic(runServiceRow(f.current,{revision:'orbit360makeleadingresspreview-00001-cuy',generation:'9'}));
+ await assert.rejects(e.captureTrigger({...f,snapshot}),/DEPLOYED_REVISION_NOT_SERVING/);
+});
+for(const [label,mutate] of [
+ ['missing traffic',r=>{delete r.trafficStatuses;}],
+ ['two revisions',r=>{r.trafficStatuses[0].percent=50;r.trafficStatuses.push({...r.trafficStatuses[0],revision:'orbit360makeleadingresspreview-00009-split'});}],
+ ['zero-percent extra target',r=>{r.trafficStatuses.push({...r.trafficStatuses[0],percent:0});}],
+ ['partial traffic',r=>{r.trafficStatuses[0].percent=99;}],
+ ['string percent',r=>{r.trafficStatuses[0].percent='100';}],
+ ['tagged traffic',r=>{r.trafficStatuses[0].tag='candidate';}],
+ ['malformed tag',r=>{r.trafficStatuses[0].tag=false;}],
+ ['unknown allocation',r=>{r.trafficStatuses[0].type='TRAFFIC_TARGET_ALLOCATION_TYPE_UNSPECIFIED';}],
+ ['reconciling',r=>{r.reconciling=true;}],
+ ['not ready',r=>{r.terminalCondition.state='CONDITION_FAILED';}],
+ ['missing readiness',r=>{delete r.terminalCondition;}],
+ ['unobserved generation',r=>{r.observedGeneration='7';}],
+ ['numeric generation',r=>{r.generation=r.observedGeneration=8;}],
+ ['missing UID',r=>{delete r.uid;}],
+ ['foreign service',r=>{r.name=r.name.replace('ays-orbit-360-lab','other-project');}],
+ ['foreign revision',r=>{r.trafficStatuses[0].revision='projects/other-project/locations/us-east1/services/orbit360makeleadingresspreview/revisions/orbit360makeleadingresspreview-00001-cuy';}]
+])test('traffic snapshot fails closed on '+label,async()=>{
+ const f=trafficRollbackFixture();mutate(f.traffic);
+ await assert.rejects(e.snapshotTrigger(f));assert.ok(f.calls.every(x=>x.method==='GET'));
+});
+test('project ID/number and qualified/short revisions normalize only within the exact allowlist',()=>{
+ const f=trafficRollbackFixture(),fn=e.fnProjection(f.current,f.p,f.phase),row=clone(f.traffic);
+ row.name=row.name.replace('projects/ays-orbit-360-lab/','projects/646761409743/');
+ row.trafficStatuses[0].revision=row.name+'/revisions/'+row.trafficStatuses[0].revision;
+ const projection=e.trafficProjection(row,fn,f.phase);
+ assert.equal(projection.service,fn.service);assert.equal(projection.targets[0].revision,'orbit360makeleadingresspreview-00001-cuy');
+ row.trafficStatuses[0].type='TRAFFIC_TARGET_ALLOCATION_TYPE_LATEST';
+ row.latestReadyRevision=row.trafficStatuses[0].revision;
+ delete row.reconciling;
+ assert.equal(e.trafficProjection(row,fn,f.phase).targets[0].revision,'orbit360makeleadingresspreview-00001-cuy');
+ row.latestReadyRevision=fn.revision;
+ assert.throws(()=>e.trafficProjection(row,fn,f.phase),/LATEST_NOT_OBSERVED/);
+});
+test('routing observation cannot request an arbitrary project/service URL or tolerate auth failure',async()=>{
+ const f=trafficRollbackFixture(),fn=e.fnProjection(f.current,f.p,f.phase);let requests=0;
+ const auth={request:async()=>{requests++;throw{response:{status:403}};}};
+ await assert.rejects(e.deployedTraffic(auth,f.p,f.phase,{...fn,service:'projects/other/locations/us-east1/services/foreign'}),/SERVICE_SCOPE_DENIED/);
+ assert.equal(requests,0);
+ await assert.rejects(e.deployedTraffic(auth,f.p,f.phase,fn));assert.equal(requests,1);
+});
+test('Functions metadata drifting during the routing observation invalidates the snapshot',async()=>{
+ const f=trafficRollbackFixture(),fn=e.fnProjection(f.current,f.p,f.phase),inner=f.auth;
+ const auth={request:async op=>{const result=await inner.request(op);
+  if(op.url.startsWith('https://run.googleapis.com/'))f.current.serviceConfig.revision='orbit360makeleadingresspreview-00099-concurrent';
+  return result;
+ }};
+ await assert.rejects(e.deployedTraffic(auth,f.p,f.phase,fn),/FUNCTION_CHANGED_DURING_TRAFFIC_READ/);
 });
 test('protected operation requires exact source, artifact, scope, fresh expiry and explicit action',()=>{
  const {p}=fixture(),now=Date.parse('2026-11-24T12:00:00Z'),op={schema:'GI_I66_MAKE_INGRESS_PROTECTED_OPERATION_V1',

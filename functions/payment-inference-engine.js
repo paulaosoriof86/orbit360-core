@@ -116,6 +116,48 @@ function resolveAnchor(receipts, evidence) {
   const idx = anchorIndex(evidence);
   return { index: idx, matches: idx == null ? [] : receipts.filter(row => row.__sequence === idx) };
 }
+function documentaryAmountVariance(input) {
+  input = input || {};
+  const left = input.original || {}, right = input.documented || {};
+  const country = String(input.country || '').trim().toUpperCase();
+  const currency = String(input.currency || '').trim().toUpperCase();
+  const cents = value => {
+    if (value == null || value === '' || typeof value === 'boolean') return null;
+    const amount = Number(value), result = Math.round(amount * 100);
+    return Number.isFinite(amount) && amount >= 0 && Number.isSafeInteger(result) &&
+      Math.abs(amount * 100 - result) <= 1e-6 ? result : null;
+  };
+  const originalCents = cents(left.amount), documentedCents = cents(right.amount);
+  const originalSourceRef = String(left.sourceRef || '').trim();
+  const documentedSourceRef = String(right.sourceRef || '').trim();
+  const kindApproved = ['CONTRACT_SCHEDULE', 'APPLICATION_DOCUMENT'].includes(input.kind);
+  const scopeApproved = country === 'GT' && currency === 'GTQ';
+  const identityExact = input.identityExact === true;
+  const sourcesPresent = !!originalSourceRef && !!documentedSourceRef;
+  const amountsValid = originalCents != null && documentedCents != null;
+  const eligible = kindApproved && scopeApproved && identityExact && sourcesPresent && amountsValid;
+  const differenceCents = amountsValid ? documentedCents - originalCents : null;
+  const withinTolerance = eligible && Math.abs(differenceCents) <= 5;
+  return {
+    schema: 'GI_R51_DOCUMENTARY_AMOUNT_VARIANCE_V1',
+    authorityRef: 'artifacts/orbit360-recovery/release-control/I6_6_DIRECTION_URGENT_COMPLETION_TOLERANCE_AND_DIRECT_RENEWAL_20261124.json#/decisions/extendPreviouslyApprovedToleranceToAllInsurersAndCases',
+    authorityBlob: 'c1e69da9d018a75c0a73c5dbf3a3495e9afcd550',
+    thresholdAuthorityRef: 'artifacts/orbit360-recovery/release-control/I6_6_DIRECCION_DECISIONES_FINANCIERAS_Y_PLAN_INTEGRAL_20261122.md#D01',
+    kind: String(input.kind || ''), country, currency, scopeApproved, identityExact, sourcesPresent, amountsValid,
+    eligible, accepted: withinTolerance,
+    reason: !kindApproved ? 'DOCUMENTARY_COMPARISON_KIND_REQUIRED' : !scopeApproved ? 'R51_GT_GTQ_SCOPE_REQUIRED'
+      : !identityExact ? 'DOCUMENTARY_EXACT_IDENTITY_REQUIRED' : !sourcesPresent ? 'DOCUMENTARY_SOURCE_REFERENCES_REQUIRED'
+      : !amountsValid ? 'DOCUMENTARY_AMOUNT_PRECISION_INVALID' : !withinTolerance ? 'DOCUMENTARY_VARIANCE_EXCEEDS_R51'
+      : differenceCents === 0 ? 'EXACT_DOCUMENTARY_AMOUNTS' : 'DOCUMENTARY_ROUNDING_VARIANCE',
+    originalAmount: originalCents == null ? null : originalCents / 100,
+    documentedAmount: documentedCents == null ? null : documentedCents / 100,
+    originalSourceRef, documentedSourceRef, differenceCents,
+    differenceAmount: differenceCents == null ? null : differenceCents / 100,
+    toleranceCents: scopeApproved && kindApproved ? 5 : 0,
+    amountsPreserved: true, bankSettlementProved: false
+  };
+}
+
 function planEvidence(input) {
   input = input || {};
   const policy = input.policy || {}, evidence = input.evidence || {}, config = input.reconciliationConfig || {};
@@ -299,5 +341,6 @@ module.exports = Object.freeze({
   evidenceKind,
   installment,
   receiptSequence,
-  ruleForPolicy
+  ruleForPolicy,
+  documentaryAmountVariance
 });

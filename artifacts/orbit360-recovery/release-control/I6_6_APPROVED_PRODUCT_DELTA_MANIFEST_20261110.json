@@ -4169,6 +4169,190 @@
           "gitBlobSha": "c94efcac56e1767c976094b5d2a0452b2b874651"
         }
       ]
+    },
+    {
+      "id": "I6_6_R51_DOCUMENTARY_TOLERANCE_AND_CANONICAL_DOCUMENTARY_PAYMENT_UI_20261124",
+      "approvedByDirection": true,
+      "receipt": "artifacts/orbit360-recovery/release-control/I6_6_DIRECTION_URGENT_COMPLETION_TOLERANCE_AND_DIRECT_RENEWAL_20261124.json",
+      "scope": "Six existing financial owners; GT/GTQ documentary variance up to five cents preserves real payment facts; canonical documentary payment form retains exact source/date/request IDs and suppresses notices. No bank allocation tolerance or auth change.",
+      "paths": [
+        {
+          "path": "functions/cobros-reconciliation-domain.js",
+          "gitBlobSha": "3d84423fd985841c6f9b230dcf729b41f2512556",
+          "replaces": {
+            "path": "functions/cobros-reconciliation-domain.js",
+            "priorGitBlobSha": "add21a5888f61fceea5ffd7aef7cf7318a31225e",
+            "priorChangeId": "I6_6_INSURER_GROSS_TOTAL_AND_DISTINCT_REQUIREMENT_20261118"
+          }
+        },
+        {
+          "path": "functions/payment-inference-engine.js",
+          "gitBlobSha": "a3d6bf99288c0c309759dce954d48c1ecc4db9dc",
+          "replaces": {
+            "path": "functions/payment-inference-engine.js",
+            "priorGitBlobSha": "5bebc3d134a129c608125b36da0109dfc52b812f",
+            "priorChangeId": "I6_6_CONCILIATION_APPROVAL_AND_ADVISOR_CXP_20261115"
+          }
+        },
+        {
+          "path": "orbit360-platform/core/primas.js",
+          "gitBlobSha": "0d5d343ef11760312092314b719fc82da0eaa147",
+          "replaces": {
+            "path": "orbit360-platform/core/primas.js",
+            "priorGitBlobSha": "fbd41a84bba4a5083027689a457b427dac88f36e",
+            "priorChangeId": "I6_6_CASH_ISSUANCE_MONTH_SERGIO_TRANSVERSAL_20261119"
+          }
+        },
+        {
+          "path": "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js",
+          "gitBlobSha": "97d30b85b5c59b2c84b25dfe85aa0daeea4c74c2",
+          "replaces": {
+            "path": "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js",
+            "priorGitBlobSha": "25f557054a37c7116fa88863a7357ed79d8a82e0",
+            "priorChangeId": "I6_6_DOCUMENTED_NON_TAXED_CHARGE_AND_CONTRACTUAL_RECEIPT_CALENDAR_20261117"
+          }
+        },
+        {
+          "path": "orbit360-platform/modules/config-domain-v20260804-bridge.js",
+          "gitBlobSha": "b0c3d6e2399ab9a13a60ea473fc8cc1e9edd00f9",
+          "replaces": {
+            "path": "orbit360-platform/modules/config-domain-v20260804-bridge.js",
+            "priorGitBlobSha": "30fa9845bb38a3dc0ff72771675fdf1e9aa25625",
+            "priorChangeId": "I6_6_OWNER_APPROVED_SOURCE_LINEAGE_SUCCESSOR_20261119"
+          }
+        },
+        {
+          "path": "orbit360-platform/modules/cobros.js",
+          "gitBlobSha": "687be0b6b54352894f1a48b417cb990a6536f080",
+          "replaces": {
+            "path": "orbit360-platform/modules/cobros.js",
+            "priorGitBlobSha": "b7813be360a778cd199579cc3898a0179f2e3c2a",
+            "priorChangeId": "I6_6_COBROS_VISIBLE_SNAPSHOT_AND_DOCUMENTED_CALENDAR_QA_20261123"
+          }
+        }
+      ],
+      "tests": [
+        {
+          "path": "tools/gravicentra-i6-6-r51-payment-application-preservation.test.cjs",
+          "gitBlobSha": "b519081d11a4309d3eea6a58c7e6831bbecdd189"
+        },
+        {
+          "path": "tools/gravicentra-i6-6-r51-documentary-variance.test.cjs",
+          "gitBlobSha": "637a2b5c5980d5dab850f61e2f67376130090a4a"
+        },
+        {
+          "path": "tools/gravicentra-i6-6-documentary-payment-ui.test.cjs",
+          "gitBlobSha": "8ae02feff6b6afe81cd080d35ef8eaa5385e524c"
+        },
+        {
+          "path": "tools/gravicentra-i6-6-cobros-payment-failure-category.test.cjs",
+          "gitBlobSha": "a59e96726a6d8516e5218f34a8b1aa30c814cf89",
+          "replaces": {
+            "path": "tools/gravicentra-i6-6-cobros-payment-failure-category.test.cjs",
+            "priorGitBlobSha": "491e11bda5c7b021478771e87f0b7ec682561cab",
+            "priorChangeId": "I6_6_ISSUED_RENEWAL_TERMS_AND_EXISTING_PAYMENT_MESSAGE_20261120"
+          }
+        }
+      ]
+    },
+    {
+      "id": "I6_6_SELECTED_PAYMENT_ATTACHMENT_PRESERVATION_20261124",
+      "approvedByDirection": true,
+      "receipt": "artifacts/orbit360-recovery/release-control/I6_6_SELECTED_PAYMENT_ATTACHMENT_PRESERVATION_20261124_SOURCE.json",
+      "sourceStatus": "SOURCE_PATCH_NEEDS_SIGNED_PREVIEW_REAL_ROLE_AND_SAME_ARTIFACT_LIVE",
+      "capabilityOwners": [
+        "COBROS_PRIMARY_RUNTIME",
+        "DOCUMENT_DRIVE_TENANT_STATE_ERRORS"
+      ],
+      "scope": "Latest reported selected-attachment failure: retain chosen Files and confirmed staged references; block applyPayment only when a selected attachment is not confirmed; retry missing files; leave no-file payment available. Preserve R51 and documentary source facts, existing server authorization/lifecycle and five release targets. A committed payment with unconfirmed finalization stays visible and cannot be submitted a second time. No OAuth, role, writer, server or real financial-data change.",
+      "paths": [
+        {
+          "path": "orbit360-platform/modules/cobros.js",
+          "gitBlobSha": "e86ea782c6aacf97fe4ab4900ed40dec07537a22",
+          "replaces": {
+            "path": "orbit360-platform/modules/cobros.js",
+            "priorGitBlobSha": "687be0b6b54352894f1a48b417cb990a6536f080",
+            "priorChangeId": "I6_6_R51_DOCUMENTARY_TOLERANCE_AND_CANONICAL_DOCUMENTARY_PAYMENT_UI_20261124"
+          }
+        }
+      ],
+      "tests": [
+        {
+          "path": "tools/gravicentra-i6-6-payment-optional-evidence.test.cjs",
+          "gitBlobSha": "e5f1ecf7459b7cae62fdf9c890517435b150eeae",
+          "replaces": {
+            "path": "tools/gravicentra-i6-6-payment-optional-evidence.test.cjs",
+            "priorGitBlobSha": "519a0a7089336f33c279fb7ba113f8863e0509f4",
+            "priorChangeId": "I6_6_CLIENT_PAYMENT_CANONICAL_PAID_WITH_OPTIONAL_DOCUMENT_RECOVERY_20261120"
+          }
+        }
+      ]
+    },
+    {
+      "id": "I6_6_EFFECTIVE_CANCELLATION_DIRECT_OR_OPS_20261124",
+      "approvedByDirection": true,
+      "receipt": "artifacts/orbit360-recovery/release-control/I6_6_EFFECTIVE_CANCELLATION_DIRECT_OR_OPS_CAUSAL_SOURCE_20261124.json",
+      "receiptGitBlobSha": "4dc8fe03cee4545a5b93db9816222b6e50fad66c",
+      "sourceStatus": "SOURCE_FOCAL_REGRESSION_PASS_SIGNED_PREVIEW_LIVE_PENDING",
+      "capabilityOwners": [
+        "POLICIES",
+        "OPS",
+        "CLIENT360"
+      ],
+      "scope": "Owner-requested effective cancellation directly from policy with the existing optional Ops request preserved. Sparse canonical policy+activity command requires issued confirmation, date, motive and document reference. Preserve all receipts, payment facts, premium facts, country and tenant scope. Synthetic signed two-role Preview and LIVE evidence remains required.",
+      "paths": [
+        {
+          "path": "orbit360-platform/core/policy-receipts-engine.js",
+          "gitBlobSha": "698fbaa0d15989f1393f0c6ec1eefb9da8153d87",
+          "replaces": {
+            "path": "orbit360-platform/core/policy-receipts-engine.js",
+            "priorGitBlobSha": "1a42767f5d1b7fc455e4a332b4d0e6eda2f87014",
+            "priorChangeId": "I6_6_OWNER_VEHICLE_EDIT_ROLE_WRITE_AND_IMMUTABLE_PACKAGE_20261119"
+          }
+        },
+        {
+          "path": "orbit360-platform/data/store-firestore-product-operational-p0.js",
+          "gitBlobSha": "d9b6806958da950f7a3aff28ca8b164220f827d6",
+          "replaces": {
+            "path": "orbit360-platform/data/store-firestore-product-operational-p0.js",
+            "priorGitBlobSha": "0138ba3d11b767d38a664db76e8a4d4b2c948919",
+            "priorChangeId": "I6_6_ADVISOR_PORTFOLIO_HISTORICAL_BENEFICIARY_AND_COMPONENT_ROUNDING_20261115"
+          }
+        },
+        {
+          "path": "orbit360-platform/modules/policy-receipts-v1199-bridge.js",
+          "gitBlobSha": "583b87763fe7931d211e8c67a4f08ef0265b0dfb",
+          "replaces": {
+            "path": "orbit360-platform/modules/policy-receipts-v1199-bridge.js",
+            "priorGitBlobSha": "7c273a429fff0ec2a88bfdf9bcbe50ff631cdb33",
+            "priorChangeId": "I6_6_POLICY_INSURER_EXPLICIT_SELECTION_ROOTFIX_20261119"
+          }
+        },
+        {
+          "path": "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js",
+          "gitBlobSha": "74298d8565902895e5b2d2a5de030ed08847243c",
+          "replaces": {
+            "path": "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js",
+            "priorGitBlobSha": "97d30b85b5c59b2c84b25dfe85aa0daeea4c74c2",
+            "priorChangeId": "I6_6_R51_DOCUMENTARY_TOLERANCE_AND_CANONICAL_DOCUMENTARY_PAYMENT_UI_20261124"
+          }
+        }
+      ],
+      "tests": [
+        {
+          "path": "tools/gravicentra-i6-6-effective-cancellation-direct-form.test.cjs",
+          "gitBlobSha": "8e0c1e3debf93523e044bc74559b50aad8dea644"
+        },
+        {
+          "path": "tools/gravicentra-i6-6-direct-forms-signed-driver.test.cjs",
+          "gitBlobSha": "cb8509355f43247ffe3f9ac1b6431f004dc7c4d1",
+          "replaces": {
+            "path": "tools/gravicentra-i6-6-direct-forms-signed-driver.test.cjs",
+            "priorGitBlobSha": "c94efcac56e1767c976094b5d2a0452b2b874651",
+            "priorChangeId": "I6_6_DIRECT_RENEWAL_AND_ISSUED_ENDORSEMENT_ENTRY_20261124"
+          }
+        }
+      ]
     }
   ],
   "i66R11PreviewBuildRequest20261113": {
@@ -4290,6 +4474,72 @@
             "path": "tools/gravicentra-i6-6-composite-preview-admission.test.cjs",
             "priorGitBlobSha": "6fc899bf4f087eec987d7c63c99cccc361e7273a",
             "priorChangeId": "I6_6_STARTUP_PENDING_READ_RETRY_20261124"
+          }
+        }
+      ]
+    },
+    {
+      "id": "I6_6_R51_DOCUMENTARY_PAYMENT_AND_ADMISSION_QA_20261124",
+      "approvedByDirection": true,
+      "scope": "EXISTING_DECLARED_TESTS_ONLY",
+      "paths": [],
+      "receipt": "artifacts/orbit360-recovery/release-control/I6_6_R51_DOCUMENTARY_PAYMENT_AND_ADMISSION_QA_20261124.json",
+      "receiptGitBlobSha": "9e21e7e71dc927da3546a34e60971f901eafe2b6",
+      "tests": [
+        {
+          "path": "tools/gravicentra-i6-6-composite-preview-admission.test.cjs",
+          "gitBlobSha": "abd35d228b8c92c409e7ac09ce1abd002b73d5c6",
+          "replaces": {
+            "path": "tools/gravicentra-i6-6-composite-preview-admission.test.cjs",
+            "priorGitBlobSha": "407b7e6b150762e8de4b6c9cc0d8bf02f149be0e",
+            "priorChangeId": "I6_6_DIRECT_FORMS_EXACT_PREVIEW_ADMISSION_QA_20261124"
+          }
+        },
+        {
+          "path": "tools/gravicentra-i6-6-proposal-application-signed-uat.test.cjs",
+          "gitBlobSha": "e209eb5a3a3f5bdd88ae944672c344ea1ed2fa99",
+          "replaces": {
+            "path": "tools/gravicentra-i6-6-proposal-application-signed-uat.test.cjs",
+            "priorGitBlobSha": "e3a70bd72b7a07b5b670ed1946f68af1065154e2",
+            "priorChangeId": "I6_6_CONCILIATION_APPROVAL_AND_ADVISOR_CXP_20261115"
+          }
+        }
+      ]
+    },
+    {
+      "id": "I6_6_FINANCE_DIAGNOSTIC_VM_REPORT_OWNERSHIP_QA_CORRECTION_20261124",
+      "approvedByDirection": true,
+      "scope": "EXISTING_DECLARED_TESTS_ONLY",
+      "paths": [],
+      "receipt": "artifacts/orbit360-recovery/release-control/I6_6_FINANCE_DIAGNOSTIC_VM_REPORT_OWNERSHIP_QA_CORRECTION_20261124.json",
+      "receiptGitBlobSha": "f66377f8f85615c8cb4bb26429a2c059e0ce4185",
+      "tests": [
+        {
+          "path": "tools/gravicentra-i6-6-finance-ui-diagnostics.test.cjs",
+          "gitBlobSha": "6296aac722b82831185abd4a667ca72f1a436e72",
+          "replaces": {
+            "path": "tools/gravicentra-i6-6-finance-ui-diagnostics.test.cjs",
+            "priorGitBlobSha": "c37fa124c67427b265c9c4f6cc63ea63735e4bbb",
+            "priorChangeId": "I6_6_DOCUMENTED_POLICY_CENT_PRECISION_AND_DIAGNOSTIC_RETENTION_20261117"
+          }
+        }
+      ]
+    },
+    {
+      "id": "I6_6_DIRECT_FORMS_FAILURE_RETENTION_QA_20261124",
+      "approvedByDirection": true,
+      "scope": "EXISTING_DECLARED_TESTS_ONLY",
+      "paths": [],
+      "receipt": "artifacts/orbit360-recovery/release-control/I6_6_DIRECT_FORMS_FAILURE_RETENTION_QA_20261124.json",
+      "receiptGitBlobSha": "ccb243d7e6612733ea8b457665c7ee958d680c26",
+      "tests": [
+        {
+          "path": "tools/gravicentra-i6-6-preview-failure-diagnostics-retention.test.cjs",
+          "gitBlobSha": "b28d361e07bdaf3eb32ad42c019e47b739808658",
+          "replaces": {
+            "path": "tools/gravicentra-i6-6-preview-failure-diagnostics-retention.test.cjs",
+            "priorGitBlobSha": "1377a2f1f6924a901cdd12b4ba3b05c4bc5ea3d9",
+            "priorChangeId": "I6_6_DOCUMENTED_POLICY_CENT_PRECISION_AND_DIAGNOSTIC_RETENTION_20261117"
           }
         }
       ]

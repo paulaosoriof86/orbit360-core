@@ -447,6 +447,23 @@
         return Promise.reject(new Error('PRODUCT_RENEWABILITY_PATCH_CONTRACT_INVALID'));
       }
     }
+    if(options.policyCancellationOnly===true){
+      if(['Dirección','SuperAdmin','AdminTenant','Admin','Operativo'].indexOf(member().activeRole)<0)
+        return Promise.reject(new Error('PRODUCT_POLICY_CANCELLATION_ROLE_DENIED'));
+      var cancellationPolicies=mutations.filter(function(m){return m&&m.collection==='polizas';});
+      var cancellationActivities=mutations.filter(function(m){return m&&m.collection==='actividades';});
+      var cancellationPatch=cancellationPolicies[0]&&cancellationPolicies[0].payload;
+      var cancellationKeys=['estado','fechaCancelacion','motivoCancelacion','cancelacionDocumentoRef','referenciaCancelacion'];
+      if(mutations.length!==2||cancellationPolicies.length!==1||cancellationActivities.length!==1||
+         cancellationPolicies[0].action!=='update'||cancellationActivities[0].action!=='insert'||
+         !cancellationPatch||cancellationPatch.estado!=='Cancelada'||
+         Object.keys(cancellationPatch).length!==cancellationKeys.length||
+         cancellationKeys.some(function(k){return typeof cancellationPatch[k]!=='string'||!text(cancellationPatch[k]);})||
+         Object.keys(cancellationPatch).some(function(k){return cancellationKeys.indexOf(k)<0;})||
+         text(cancellationActivities[0].payload&&cancellationActivities[0].payload.polizaId)!==text(cancellationPolicies[0].id)){
+        return Promise.reject(new Error('PRODUCT_POLICY_CANCELLATION_PATCH_CONTRACT_INVALID'));
+      }
+    }
     if(options.policyMetadataOnly===true){
       var metadataPolicies=mutations.filter(function(m){return m&&m.collection==='polizas';});
       var metadataActivities=mutations.filter(function(m){return m&&m.collection==='actividades';});
@@ -466,7 +483,7 @@
       if(x.payload&&x.payload.__syntheticQa===true)return true;
       // A narrow metadata patch intentionally omits the full policy, including
       // its QA flag. Reuse only an already marked, uniquely prefixed fixture.
-      var prior=options.policyMetadataOnly===true&&x.action==='update'?get('polizas',x.id):null;
+      var prior=(options.policyMetadataOnly===true||options.policyCancellationOnly===true)&&x.action==='update'?get('polizas',x.id):null;
       return !!(prior&&prior.__syntheticQa===true);
     }):null;
     var linkedSynthetic=function(payload){return !!payload&&['id','polizaId','clienteId','reciboId'].some(function(k){return syntheticId(payload[k]);});};
@@ -515,7 +532,8 @@
         // For existing insurer obligations, transmit only the changed fields. The server merges the patch in a Firestore transaction with the latest row; a cached complete row could erase concurrent LIVE changes.
         var preserveConcurrentFields=x.action==='update'&&(x.collection==='recibosEsperados'||x.collection==='carteraPrimas')||
           (x.action==='update'&&x.collection==='polizas'&&options.policyRenewabilityOnly===true)||
-          (x.action==='update'&&x.collection==='polizas'&&options.policyMetadataOnly===true);
+          (x.action==='update'&&x.collection==='polizas'&&options.policyMetadataOnly===true)||
+          (x.action==='update'&&x.collection==='polizas'&&options.policyCancellationOnly===true);
         var mutation={action:x.action,collection:x.collection,id:x.id,payload:x.action==='remove'?null:clone(preserveConcurrentFields?x.payload:x.row)};
         if(x.collection==='polizas'&&x.action==='update'&&options.policyRenewabilityOnly===true){
           mutation.expectedBefore={renovable:x.prior&&Object.prototype.hasOwnProperty.call(x.prior,'renovable')?clone(x.prior.renovable):null};

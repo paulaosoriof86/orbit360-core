@@ -50,6 +50,11 @@ on:
       - artifacts/orbit360-recovery/release-control/I6_6_CURRENT_PHYSICAL_PREVIEW_V24_ROLLOVER_20261124.json
       - artifacts/orbit360-recovery/release-control/I6_6_CURRENT_PHYSICAL_PREVIEW_V24_ROLLOVER_V2_20261124.json
       - artifacts/orbit360-recovery/release-control/I6_6_CURRENT_PHYSICAL_PREVIEW_V27_RESIDUAL_ROLLOVER_V3_20261124.json
+      - artifacts/orbit360-recovery/release-control/I6_6_CURRENT_PHYSICAL_PREVIEW_V28_ROLLOVER_V4_20261124.json
+      - tools/gravicentra-i66-make-lead-protected-executor.cjs
+      - tools/gravicentra-i66-make-lead-protected-executor.test.cjs
+      - artifacts/orbit360-recovery/release-control/I6_6_MAKE_PREVIEW_TRAFFIC_ROLLBACK_CAUSAL_CORRECTION_20261124.json
+      - artifacts/orbit360-recovery/release-control/I6_6_V28_IMMUTABLE_BUILD_RECEIPT_20261124.json
       - artifacts/orbit360-recovery/release-control/I6_6_V27_UNACCEPTED_PREVIEW_BACKUP_ONLY_20261124.json
       - tools/gravicentra-i6-6-source-intake-readiness.test.cjs
       - tools/gravicentra-i6-6-operational-live-acceptance.test.cjs

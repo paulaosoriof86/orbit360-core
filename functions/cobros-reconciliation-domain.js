@@ -6,7 +6,7 @@ const { getFirestore, FieldValue } = require('firebase-admin/firestore');
 const { HttpsError, onCall } = require('firebase-functions/v2/https');
 const { validateActiveLedgerContract } = require('./cobros-ledger-contract');
 const { normalizeRole, resolveProductActiveRole } = require('./product-active-role-contract');
-const { planEvidence } = require('./payment-inference-engine');
+const { planEvidence, documentaryAmountVariance } = require('./payment-inference-engine');
 const proposalBoundary = require('./proposal-application-boundary');
 const proposalAccess = require('./b4-003-scoped-access-boundary');
 const sourceIntake = require('./cobros-source-intake-v2');
@@ -427,6 +427,61 @@ async function reportAdvisorPayment(authz, data, payload) {
   return result;
 }
 
+const RECORDED_PAYMENT_FIELDS = Object.freeze([
+  'paymentState', 'directOrInferred', 'paymentEvidenceType', 'paymentOrigin',
+  'evidenceId', 'evidenceType', 'sourceRef', 'evidenceAsOfDate',
+  'paidDate', 'fechaPago', 'paymentMethod', 'metodo', 'metodoPago',
+  'paymentSupportDocumentRef', 'soportePagoRef', 'inferredEffectiveDate',
+  'anchorInstallment', 'inferenceRuleId', 'confidence', 'inferenceProvenance'
+]);
+function recordedPaymentFacts(row) {
+  return Object.fromEntries(RECORDED_PAYMENT_FIELDS.filter(key => row && Object.prototype.hasOwnProperty.call(row,key) && row[key] !== undefined)
+    .map(key => [key, row[key]]));
+}
+function preserveRecordedPayment(target, row) {
+  // Missing/blank original provenance is not evidence from the new invoice.
+  // Keep confirmed state/date derivation, but strip every unproved new source,
+  // method, support or inference field before restoring its original presence.
+  const derivedStateOrDate = new Set(['paymentState','directOrInferred','paidDate','fechaPago']);
+  for (const key of RECORDED_PAYMENT_FIELDS) {
+    if (derivedStateOrDate.has(key)) {
+      if (row && row[key] != null && row[key] !== '') target[key]=row[key];
+    } else if (row && Object.prototype.hasOwnProperty.call(row,key) && row[key] !== undefined) target[key]=row[key];
+    else delete target[key];
+  }
+  return target;
+}
+function assertPaymentRecordAliases(record, monetary = false) {
+  const present=value=>value!=null&&text(value,500)!=='';
+  for (const [canonical,alias] of [['polizaId','policyId'],['clienteId','clientId'],['reciboId','receiptId'],
+      ['moneda','currency'],['moneda','divisa'],['pais','country'],['paymentSupportDocumentRef','soportePagoRef']]) {
+    const normalize=value=>canonical==='pais'?paymentCountry(value):canonical==='moneda'?text(value,12).toUpperCase():text(value,500);
+    if (present(record[canonical]) && present(record[alias]) && normalize(record[canonical])!==normalize(record[alias]))
+      throw new HttpsError('failed-precondition','PAYMENT_FINANCIAL_IDENTITY_ALIASES_CONFLICT');
+  }
+  if (monetary) {
+    // saldo is a balance, not an alias of a total when the total exists.
+    const keys=['monto','montoTotal','primaTotal'].filter(key=>present(record[key]));
+    if (!keys.length && present(record.saldo)) keys.push('saldo');
+    const amounts=keys.map(key=>Number(record[key]));
+    if (keys.some(key=>typeof record[key]==='boolean') ||
+        amounts.some(value=>!Number.isFinite(value)||value<0||Math.abs(value*100-Math.round(value*100))>1e-6)||
+        new Set(amounts.map(value=>Math.round(value*100))).size>1)
+      throw new HttpsError('failed-precondition','PAYMENT_RECORDED_AMOUNT_ALIASES_CONFLICT');
+  }
+}
+function assertPaymentIdentity(authz, policy, receipt, row, kind, amountMustMatch = true) {
+  assertPaymentRecordAliases(policy);
+  assertPaymentRecordAliases(receipt,true);
+  assertPaymentRecordAliases(row,true);
+  assertReconciliationFinancialTarget(authz, policy, receipt, row, kind, { amountMustMatch });
+  if (text(row.polizaId || row.policyId, 180) !== policy.id ||
+      text(row.clienteId || row.clientId, 180) !== text(receipt.clienteId || policy.clienteId, 180))
+    throw new HttpsError('failed-precondition', 'PAYMENT_EXACT_FINANCIAL_IDENTITY_REQUIRED');
+  if (row.paidDate && row.fechaPago && row.paidDate !== row.fechaPago)
+    throw new HttpsError('failed-precondition', 'PAYMENT_EXISTING_PAID_DATE_ALIASES_CONFLICT');
+}
+
 async function applyPayment(authz, data, payload, operationName = 'apply_payment', previewOnly = false) {
   const receiptId = id(payload.receiptId || payload.reciboId, 'reciboId');
   const source = paymentSource(payload.sourceType || payload.fuentePago || 'manual');
@@ -440,7 +495,15 @@ async function applyPayment(authz, data, payload, operationName = 'apply_payment
   const paymentMethod = text(payload.paymentMethod || payload.metodoPago || payload.metodo, 180);
   const paymentSupportDocumentRef = text(payload.paymentSupportDocumentRef || payload.soportePagoRef, 500);
   const invoiceDocumentRef = text(payload.invoiceDocumentRef || payload.facturaRef, 500);
-  const explicitAmount = money(payload.amount || payload.monto, 'Monto');
+  if (payload.amount != null && payload.monto != null && Number(payload.amount) !== Number(payload.monto))
+    throw new HttpsError('invalid-argument','PAYMENT_AMOUNT_ALIASES_CONFLICT');
+  if (payload.currency && payload.moneda && text(payload.currency,12).toUpperCase() !== text(payload.moneda,12).toUpperCase())
+    throw new HttpsError('invalid-argument','PAYMENT_CURRENCY_ALIASES_CONFLICT');
+  const explicitAmountInput = payload.amount != null ? payload.amount : payload.monto;
+  if (explicitAmountInput != null && explicitAmountInput !== '' && (typeof explicitAmountInput === 'boolean' ||
+      !Number.isFinite(Number(explicitAmountInput)) || Math.abs(Number(explicitAmountInput)*100-Math.round(Number(explicitAmountInput)*100)) > 1e-6))
+    throw new HttpsError('invalid-argument', 'PAYMENT_AMOUNT_PRECISION_INVALID');
+  const explicitAmount = money(explicitAmountInput, 'Monto');
   const evidenceId = text(payload.evidenceId || payload.sourceRef || payload.documentRef, 500);
   const evidenceType = text(payload.evidenceType || payload.tipoEvidencia, 120);
   const anchorInstallment = Number(payload.anchorInstallment || payload.cuotaAncla || 0) || null;
@@ -450,6 +513,8 @@ async function applyPayment(authz, data, payload, operationName = 'apply_payment
   if (inferred && paidDate && payload.actualPaidDateEvidence !== true) {
     throw new HttpsError('failed-precondition', 'Una inferencia no puede inventar fecha real de pago.');
   }
+  if (payload.partialPayment === true || payload.reversal === true || payload.conflictingEvidence === true)
+    throw new HttpsError('failed-precondition', 'PAYMENT_CONTRADICTORY_OR_PARTIAL_EVIDENCE_REQUIRES_REVIEW');
   const applicationEvidenceTypeInput = text(payload.applicationEvidenceType || payload.tipoEvidenciaAplicacion, 120).toUpperCase();
   const applicationProved = Boolean(payload.forceReconciliation === true || applicationDate || invoiceNumber || invoiceDocumentRef || ['insurer_invoice','insurer_statement','commission_statement'].includes(source));
   const receiptRef = tenantData(authz.tenantId, 'recibosEsperados').doc(receiptId);
@@ -457,7 +522,8 @@ async function applyPayment(authz, data, payload, operationName = 'apply_payment
     receiptId, source, inferred, paidDate, inferredEffectiveDate, evidenceAsOfDate, applicationDate, invoiceDate,
     invoiceNumber, paymentMethod, paymentSupportDocumentRef, invoiceDocumentRef, amount: explicitAmount,
     evidenceId, evidenceType, anchorInstallment, inferenceRuleId, confidence,
-    forceReconciliation: payload.forceReconciliation === true, applicationEvidenceType: applicationEvidenceTypeInput
+    forceReconciliation: payload.forceReconciliation === true, applicationEvidenceType: applicationEvidenceTypeInput,
+    currency:text(payload.currency || payload.moneda,12).toUpperCase(), actualPaidDateEvidence:payload.actualPaidDateEvidence === true
   };
   const reqId = operationRequestId(authz.tenantId, operationName, reqPayload, data.requestId);
   const reqRef = requestRef(authz.tenantId, reqId, previewOnly);
@@ -478,8 +544,13 @@ async function applyPayment(authz, data, payload, operationName = 'apply_payment
     const policySnap = await tx.get(policyRef);
     if (!policySnap.exists) throw new HttpsError('failed-precondition', 'La póliza vinculada no existe.');
     const policy = Object.assign({ id: policySnap.id }, policySnap.data() || {});
-    assertPaymentCountryScope(authz, policy, receipt);
+    assertPaymentRecordAliases(policy);
+    assertPaymentRecordAliases(receipt,true);
+    const paymentCountryCode = assertPaymentCountryScope(authz, policy, receipt);
     const clientId = id(receipt.clienteId || policy.clienteId, 'clienteId');
+    if (receipt.tenantId && receipt.tenantId !== authz.tenantId || policy.tenantId && policy.tenantId !== authz.tenantId ||
+        receipt.clienteId && policy.clienteId && receipt.clienteId !== policy.clienteId)
+      throw new HttpsError('failed-precondition', 'PAYMENT_POLICY_RECEIPT_IDENTITY_MISMATCH');
     if (previewOnly) {
       // Protect every root of the payment transaction, not just the submitted
       // receipt ID. No authentic customer, policy or advisor relationship may
@@ -526,9 +597,44 @@ async function applyPayment(authz, data, payload, operationName = 'apply_payment
     if (!existingPaid && activePortfolioRows.length !== 1)
       throw new HttpsError('failed-precondition', 'PAYMENT_ACTIVE_PORTFOLIO_REQUIRED: falta obligación activa única para aplicar el pago.');
 
-    const amount = explicitAmount != null ? explicitAmount : receiptAmount(receipt);
-    if (amount == null || amount <= 0) throw new HttpsError('failed-precondition', 'El recibo no tiene monto válido.');
+    const obligationAmount = receiptAmount(receipt);
+    const documentedAmount = explicitAmount != null ? explicitAmount : obligationAmount;
     const receiptCurrency = text(receipt.moneda || policy.moneda, 12).toUpperCase();
+    if (!receiptCurrency || text(policy.moneda,12).toUpperCase() !== receiptCurrency ||
+        payload.currency && text(payload.currency,12).toUpperCase() !== receiptCurrency ||
+        payload.moneda && text(payload.moneda,12).toUpperCase() !== receiptCurrency)
+      throw new HttpsError('failed-precondition', 'PAYMENT_EXACT_CURRENCY_REQUIRED');
+    if (existingCobro) assertPaymentIdentity(authz, policy, receipt, existingCobro, 'COBRO', !cobroPaid);
+    for (const row of activePortfolioRows) assertPaymentIdentity(authz, policy, receipt, row.data(), 'PORTFOLIO');
+    // R51 concerns documentary rounding. It never reallocates a new bank or
+    // client payment, nor replaces a recorded paid amount with a later invoice.
+    const amount = cobroPaid ? Number(existingCobro.monto) : (existingPaid ? obligationAmount : documentedAmount);
+    if (!Number.isFinite(amount) || Math.abs(amount*100-Math.round(amount*100)) > 1e-6)
+      throw new HttpsError('failed-precondition', 'PAYMENT_RECORDED_AMOUNT_PRECISION_INVALID');
+    if (amount == null || amount <= 0 || obligationAmount == null || obligationAmount <= 0)
+      throw new HttpsError('failed-precondition', 'El recibo o el pago no tiene monto válido.');
+    if (Math.round(amount*100) !== Math.round(obligationAmount*100)) {
+      const code = existingPaid ? 'PAYMENT_EXISTING_RESIDUAL_REQUIRES_ALLOCATION' : 'PAYMENT_AMOUNT_REQUIRES_EXACT_ALLOCATION';
+      const residualAmount=(Math.round(obligationAmount*100)-Math.round(amount*100))/100;
+      const explanation=residualAmount>0?'Faltan '+receiptCurrency+' '+residualAmount.toFixed(2)+'.':'El pago supera la obligación en '+receiptCurrency+' '+Math.abs(residualAmount).toFixed(2)+'.';
+      throw new HttpsError('failed-precondition','Pago: '+receiptCurrency+' '+amount.toFixed(2)+'; obligación: '+receiptCurrency+' '+obligationAmount.toFixed(2)+'. '+explanation+' Se requiere asignar la diferencia antes de cerrar el recibo.', {reason:code,recordedPaymentAmount:amount,obligationAmount,
+        residualAmount,
+        residualCents:Math.round(obligationAmount*100)-Math.round(amount*100),currency:receiptCurrency,
+        financialWrites:0,roundingPolicyCannotSettleMoney:true});
+    }
+    const applicationEvidenceRef = evidenceId || invoiceDocumentRef || invoiceNumber;
+    const compare = (original, documented, originalRef, documentedRef) => documentaryAmountVariance({
+      kind:'APPLICATION_DOCUMENT',country:paymentCountryCode,currency:receiptCurrency,identityExact:true,
+      original:{amount:original,sourceRef:originalRef},documented:{amount:documented,sourceRef:documentedRef}
+    });
+    const applicationVariance = enrichment ? compare(amount,documentedAmount,
+      (cobroSnap.empty?'recibosEsperados/'+receiptId:'cobros/'+cobroSnap.docs[0].id)+'#monto',applicationEvidenceRef) : null;
+    const obligationVariance = enrichment ? compare(obligationAmount,documentedAmount,
+      'recibosEsperados/'+receiptId+'#monto',applicationEvidenceRef) : null;
+    if (enrichment && [applicationVariance,obligationVariance].some(v=>v.differenceCents!==0&&!v.accepted))
+      throw new HttpsError('failed-precondition', 'PAYMENT_APPLICATION_VARIANCE_REQUIRES_REVIEW');
+    if (legacyPaidReceiptReconciliation && Math.round(documentedAmount*100)!==Math.round(obligationAmount*100))
+      throw new HttpsError('failed-precondition', 'PAYMENT_LEGACY_ACTUAL_AMOUNT_UNPROVEN');
     const cobroDoc = cobroSnap.empty ? null : cobroSnap.docs[0];
     const cobroId = cobroDoc ? cobroDoc.id : deterministicCobroId(authz.tenantId, receiptId);
     const cobroRef = tenantData(authz.tenantId, 'cobros').doc(cobroId);
@@ -537,13 +643,21 @@ async function applyPayment(authz, data, payload, operationName = 'apply_payment
     const beforeCobro = cobroDoc ? (cobroDoc.data() || {}) : {};
     const advisorReported = advisorReportPending(receipt);
     const existingPaidDate = text(beforeCobro.paidDate || beforeCobro.fechaPago || (existingPaid ? (receipt.paidDate || receipt.fechaPago) : ''), 32);
+    const receiptPaidDate = text(receipt.paidDate || receipt.fechaPago,32);
+    if (enrichment && (receipt.paidDate && receipt.fechaPago && receipt.paidDate !== receipt.fechaPago ||
+        receiptPaidDate && existingPaidDate && receiptPaidDate !== existingPaidDate))
+      throw new HttpsError('failed-precondition','PAYMENT_EXISTING_PAID_DATE_CONFLICT');
+    if (enrichment && receipt.paymentState && beforeCobro.paymentState && receipt.paymentState !== beforeCobro.paymentState)
+      throw new HttpsError('failed-precondition','PAYMENT_EXISTING_STATE_CONFLICT');
     const existingApplicationDate = text(beforeCobro.applicationDate || beforeCobro.fechaAplicacion || (existingPaid ? receipt.applicationDate : ''), 32);
     const reportPaidDate = advisorReported ? text(receipt.fechaPagoReportada || receipt.paidDate || receipt.fechaPago, 32) : '';
-    const finalPaidDate = paidDate || reportPaidDate || existingPaidDate;
+    const finalPaidDate = enrichment ? (existingPaidDate || (payload.actualPaidDateEvidence === true ? paidDate : '')) : (paidDate || reportPaidDate || existingPaidDate);
     const finalApplicationDate = applicationDate || existingApplicationDate;
     const finalInvoiceDate = invoiceDate || text(beforeCobro.invoiceDate || (existingPaid ? receipt.invoiceDate : ''), 32);
-    const finalPaymentMethod = paymentMethod || (advisorReported ? text(receipt.metodoPago || receipt.paymentMethod, 180) : '') || text(beforeCobro.paymentMethod || beforeCobro.metodo || (existingPaid ? (receipt.paymentMethod || receipt.metodoPago) : ''), 180);
-    const finalPaymentSupportDocumentRef = paymentSupportDocumentRef || (advisorReported ? text(receipt.paymentSupportDocumentRef || receipt.soportePagoRef, 500) : '') || text(beforeCobro.paymentSupportDocumentRef || (existingPaid ? receipt.paymentSupportDocumentRef : ''), 500);
+    const existingPaymentMethod = text(beforeCobro.paymentMethod || beforeCobro.metodo || beforeCobro.metodoPago || (existingPaid ? (receipt.paymentMethod || receipt.metodo || receipt.metodoPago) : ''),180);
+    const finalPaymentMethod = enrichment ? existingPaymentMethod : (paymentMethod || (advisorReported ? text(receipt.metodoPago || receipt.paymentMethod,180) : '') || existingPaymentMethod);
+    const existingPaymentSupportDocumentRef = text(beforeCobro.paymentSupportDocumentRef || beforeCobro.soportePagoRef || (existingPaid ? (receipt.paymentSupportDocumentRef || receipt.soportePagoRef) : ''),500);
+    const finalPaymentSupportDocumentRef = enrichment ? existingPaymentSupportDocumentRef : (paymentSupportDocumentRef || (advisorReported ? text(receipt.paymentSupportDocumentRef || receipt.soportePagoRef,500) : '') || existingPaymentSupportDocumentRef);
     const isApplicationEnrichment = existingPaid && applicationEvidenceSource;
     const existingPaymentState = text(beforeCobro.paymentState || (existingPaid ? receipt.paymentState : ''), 80);
     const existingDirectOrInferred = text(beforeCobro.directOrInferred || (existingPaid ? receipt.directOrInferred : '') || (existingPaymentState === 'PAID_INFERRED' ? 'INFERRED' : ''), 80);
@@ -596,6 +710,20 @@ async function applyPayment(authz, data, payload, operationName = 'apply_payment
     if (finalInvoiceDate) shared.invoiceDate = finalInvoiceDate;
     if (invoiceNumber) shared.invoiceNumber = invoiceNumber;
     if (invoiceDocumentRef) shared.invoiceDocumentRef = invoiceDocumentRef;
+    if (enrichment) {
+      preserveRecordedPayment(shared, cobroPaid ? beforeCobro : receipt);
+      shared.applicationAmount = documentedAmount;
+      shared.applicationEvidence = { sourceType:source,evidenceId,sourceRef:text(payload.sourceRef || payload.documentRef || applicationEvidenceRef,500),
+        evidenceType:applicationEvidenceType,evidenceAsOfDate,invoiceNumber,invoiceDocumentRef,
+        reportedPaidDate:paidDate,actualPaidDateEvidence:payload.actualPaidDateEvidence===true,applicationDate:finalApplicationDate,
+        reportedPaymentMethod:paymentMethod,reportedPaymentSupportDocumentRef:paymentSupportDocumentRef };
+      shared.documentaryAmountVariance = applicationVariance;
+      shared.documentaryObligationVariance = obligationVariance;
+      shared.paymentAmountComparison = { recordedPaymentAmount:amount,obligationAmount,documentedApplicationAmount:documentedAmount,
+        obligationMinusPaymentCents:Math.round(obligationAmount*100)-Math.round(amount*100),
+        obligationMinusPaymentAmount:(Math.round(obligationAmount*100)-Math.round(amount*100))/100,
+        currency:receiptCurrency,bankSettlementProved:false,amountAdjustmentCreated:false };
+    }
 
     const cobro = Object.assign({}, beforeCobro, {
       id: cobroId,
@@ -637,7 +765,8 @@ async function applyPayment(authz, data, payload, operationName = 'apply_payment
       receiptPatch.fechaPago = finalPaidDate;
       if (source === 'client_reported') receiptPatch.fechaPagoReportada = finalPaidDate;
     }
-    if (paymentMethod) receiptPatch.metodoPago = paymentMethod;
+    if (finalPaymentMethod) receiptPatch.metodoPago = finalPaymentMethod;
+    if (enrichment) preserveRecordedPayment(receiptPatch, receipt);
     if (invoiceNumber) receiptPatch.numeroFactura = invoiceNumber;
 
     tx.set(cobroRef, cobro, { merge: true });
@@ -668,7 +797,8 @@ async function applyPayment(authz, data, payload, operationName = 'apply_payment
         updatedByUid: authz.actor.uid
       };
       if (finalPaidDate) portfolioPatch.fechaPago = finalPaidDate;
-      if (inferredEffectiveDate) portfolioPatch.inferredEffectiveDate = inferredEffectiveDate;
+      if (shared.inferredEffectiveDate) portfolioPatch.inferredEffectiveDate = shared.inferredEffectiveDate;
+      if (enrichment) { portfolioPatch.paymentAmountComparison = shared.paymentAmountComparison; portfolioPatch.documentaryAmountVariance = applicationVariance; }
       if (finalApplicationDate) portfolioPatch.applicationDate = finalApplicationDate;
       tx.set(pRef, portfolioPatch, { merge: true });
     }
@@ -682,11 +812,14 @@ async function applyPayment(authz, data, payload, operationName = 'apply_payment
       clientId,
       paymentState,
       applicationState,
+      amount,
+      ...(enrichment ? { applicationAmount:documentedAmount,documentaryAmountVariance:applicationVariance,paymentAmountComparison:shared.paymentAmountComparison } : {}),
+      paymentFactsDigest: digest(recordedPaymentFacts(cobro)),
       paidDate: finalPaidDate || '',
-      inferredEffectiveDate: inferredEffectiveDate || '',
+      inferredEffectiveDate: shared.inferredEffectiveDate || '',
       applicationDate: finalApplicationDate || '',
       invoiceDate: finalInvoiceDate || '',
-      paymentOrigin,
+      ...(Object.prototype.hasOwnProperty.call(shared,'paymentOrigin')?{paymentOrigin:shared.paymentOrigin}:{}),
       linkedManagementId: advisorReported ? text(receipt.linkedOpsManagementId, 180) : '',
       invoiceNumber: invoiceNumber || text(beforeCobro.invoiceNumber || beforeCobro.numeroFactura, 180),
       portfolioUpdated: activePortfolioRows.length === 1,
@@ -705,6 +838,9 @@ async function applyPayment(authz, data, payload, operationName = 'apply_payment
       cobroId,
       payloadDigest: digest(reqPayload),
       resultDigest: digest(committed),
+      ...(enrichment ? { recordedPaymentBefore:{amount,sourceCollection:cobroPaid?'cobros':'recibosEsperados',sourceId:cobroPaid?cobroId:receiptId,facts:recordedPaymentFacts(cobroPaid?beforeCobro:receipt)},
+        recordedPaymentAfter:{amount,facts:recordedPaymentFacts(cobro)},applicationEvidence:shared.applicationEvidence,
+        documentaryAmountVariance:applicationVariance,paymentAmountComparison:shared.paymentAmountComparison } : {}),
       createdAt: technicalNow
     }, { merge: false });
     tx.set(reqRef, { status: 'committed', operation: operationName, eventId, payloadDigest: digest(reqPayload), result: committed, committedAt: technicalNow }, { merge: true });
@@ -714,7 +850,11 @@ async function applyPayment(authz, data, payload, operationName = 'apply_payment
   const [receiptReadback, cobroReadback] = await Promise.all([receiptRef.get(), tenantData(authz.tenantId, 'cobros').doc(result.cobroId).get()]);
   if (!receiptReadback.exists || !cobroReadback.exists) throw new HttpsError('data-loss', 'No fue posible confirmar la persistencia del pago.');
   const confirmedReceipt = receiptReadback.data() || {}, confirmedCobro = cobroReadback.data() || {};
-  if (confirmedReceipt.paymentState !== result.paymentState || confirmedCobro.paymentState !== result.paymentState ||
+  if (result.amount != null && receiptAmount(confirmedCobro) !== result.amount ||
+      result.paymentFactsDigest && digest(recordedPaymentFacts(confirmedCobro)) !== result.paymentFactsDigest ||
+      result.documentaryAmountVariance && (digest(confirmedCobro.documentaryAmountVariance) !== digest(result.documentaryAmountVariance) ||
+        digest(confirmedReceipt.documentaryAmountVariance) !== digest(result.documentaryAmountVariance)) ||
+      confirmedReceipt.paymentState !== result.paymentState || confirmedCobro.paymentState !== result.paymentState ||
       confirmedReceipt.applicationState !== result.applicationState || confirmedCobro.applicationState !== result.applicationState ||
       confirmedReceipt.conciliado !== /^APPLIED_/.test(result.applicationState) || confirmedCobro.conciliado !== /^APPLIED_/.test(result.applicationState) ||
       (result.invoiceDate && (confirmedReceipt.invoiceDate !== result.invoiceDate || confirmedCobro.invoiceDate !== result.invoiceDate)))
@@ -749,7 +889,7 @@ function syntheticProposalRun(tenantId,payload) {
   return tenantId==='alianzas-soluciones'&&/^cobledgerqa_[a-z0-9_]{12,80}$/.test(text(payload.sourceRunId,180))&&
     /^b3005qa_i66_proposal_[a-z0-9_]{12,100}$/.test(text(payload.proposalId,180))?text(payload.sourceRunId,180):'';
 }
-function assertReconciliationFinancialTarget(authz,policy,receipt,row,kind) {
+function assertReconciliationFinancialTarget(authz,policy,receipt,row,kind,options = {}) {
   const currency=text(receipt.moneda||receipt.currency||policy.moneda,12).toUpperCase();
   const rowCurrency=text(row.moneda||row.currency,12).toUpperCase();
   const policyId=text(policy.id,180),clientId=text(receipt.clienteId||policy.clienteId,180);
@@ -763,7 +903,7 @@ function assertReconciliationFinancialTarget(authz,policy,receipt,row,kind) {
   if((row.clienteId||row.clientId)&&text(row.clienteId||row.clientId,180)!==clientId)mismatch('cliente');
   if(!rowCurrency||rowCurrency!==currency)mismatch('moneda');
   let matchingAmount=false;try{matchingAmount=receiptAmount(row)===receiptAmount(receipt);}catch(_){}
-  if(!matchingAmount)mismatch('importe');
+  if(options.amountMustMatch !== false && !matchingAmount)mismatch('importe');
 }
 async function proposalApplicationContext(authz, payload, read,requireWrite=false) {
   const configSnap = await read(reconciliationConfigRef(authz.tenantId));
@@ -1173,13 +1313,19 @@ async function reconcileEvidence(authz, data, payload, previewOnly, proposalRequ
         evidenceAsOfDate: text(beforeCobro.evidenceAsOfDate, 32),
         confidence: text(beforeCobro.confidence, 40) || 'HIGH'
       } : null);
+      const recordedPaid = /^PAID_(DIRECT|REPORTED)$/.test(text(beforeCobro.paymentState,80)) ||
+        norm(beforeCobro.estado) === 'pagado' && text(beforeCobro.paymentState,80) !== 'PAID_INFERRED' && text(beforeCobro.directOrInferred,80) !== 'INFERRED';
+      if (recordedPaid) assertPaymentIdentity(authz,policy,receipt,beforeCobro,'COBRO');
       const existingDirect = ['PAID_DIRECT','PAID_REPORTED'].includes(text(beforeCobro.paymentState, 80));
-      const paymentState = isInferred && existingDirect ? text(beforeCobro.paymentState, 80) : target.paymentState;
-      const applicationState = isInferred && text(beforeCobro.applicationState, 80) === 'APPLIED_DIRECT' ? 'APPLIED_DIRECT' : target.applicationState;
-      const directOrInferred = isInferred && !existingDirect ? 'INFERRED' : 'DIRECT';
+      const paymentState = recordedPaid && text(beforeCobro.paymentState,80) ? text(beforeCobro.paymentState,80) : target.paymentState;
+      const applicationState = recordedPaid && /^APPLIED_/.test(text(beforeCobro.applicationState,80)) ? text(beforeCobro.applicationState,80) : target.applicationState;
+      const directOrInferred = recordedPaid && text(beforeCobro.directOrInferred,80) ? text(beforeCobro.directOrInferred,80) : (isInferred && !existingDirect ? 'INFERRED' : 'DIRECT');
       // A commission figure is not the premium settled. The canonical receipt
       // provides the payment amount for commission-based inference.
-      const amount = (!isInferred && plan.evidenceType!=='COMMISSION_STATEMENT_INSTALLMENT_N' && evidencePayload.amount != null) ? evidencePayload.amount : receiptAmount(receipt);
+      const evidenceAmount = (!isInferred && plan.evidenceType!=='COMMISSION_STATEMENT_INSTALLMENT_N' && evidencePayload.amount != null) ? evidencePayload.amount : receiptAmount(receipt);
+      if (recordedPaid && Math.round(evidenceAmount*100)!==Math.round(receiptAmount(beforeCobro)*100))
+        throw new HttpsError('failed-precondition','EXISTING_PAYMENT_REQUIRES_APPLICATION_ENRICHMENT');
+      const amount = recordedPaid ? receiptAmount(beforeCobro) : evidenceAmount;
       if (amount == null || amount <= 0) throw new HttpsError('failed-precondition', 'El recibo no tiene monto válido.');
       const correctSourceTotal = !isInferred&&authorizedInvoiceTotal&&
         Math.round(amount*100)!==Math.round(receiptAmount(receipt)*100);
@@ -1189,7 +1335,8 @@ async function reconcileEvidence(authz, data, payload, previewOnly, proposalRequ
         insurerTotalEvidenceType:'INVOICE_INSTALLMENT_N',
         insurerTotalBefore:receiptAmount(receipt)
       } : {};
-      const paidDate = !isInferred && evidencePayload.paidDate && (plan.evidenceType === 'BANK_STATEMENT_MATCH' || evidencePayload.actualPaidDateEvidence === true) ? evidencePayload.paidDate : text(beforeCobro.paidDate || beforeCobro.fechaPago, 32);
+      const originalPaidDate = text(beforeCobro.paidDate || beforeCobro.fechaPago,32);
+      const paidDate = recordedPaid && originalPaidDate ? originalPaidDate : (!isInferred && evidencePayload.paidDate && (plan.evidenceType === 'BANK_STATEMENT_MATCH' || evidencePayload.actualPaidDateEvidence === true) ? evidencePayload.paidDate : originalPaidDate);
       const applicationDate = !isInferred ? (evidencePayload.applicationDate || text(beforeCobro.applicationDate, 32)) : text(beforeCobro.applicationDate, 32);
       const inferenceProvenance = isInferred ? {
         evidenceType: plan.evidenceType,
@@ -1233,6 +1380,12 @@ async function reconcileEvidence(authz, data, payload, previewOnly, proposalRequ
       if (!isInferred && evidencePayload.paymentSupportDocumentRef) shared.paymentSupportDocumentRef = evidencePayload.paymentSupportDocumentRef;
       if (!isInferred && evidencePayload.invoiceDocumentRef) shared.invoiceDocumentRef = evidencePayload.invoiceDocumentRef;
       if (!isInferred && evidencePayload.paymentMethod) shared.paymentMethod = evidencePayload.paymentMethod;
+      if (recordedPaid) {
+        preserveRecordedPayment(shared,beforeCobro);
+        shared.reconciliationEvidence = {evidenceType:plan.evidenceType,evidenceId:plan.evidenceId,sourceRef:plan.sourceRef,
+          evidenceAsOfDate:plan.evidenceAsOfDate||'',documentedAmount:evidenceAmount,
+          reportedPaymentMethod:evidencePayload.paymentMethod||'',reportedPaymentSupportDocumentRef:evidencePayload.paymentSupportDocumentRef||''};
+      }
 
       const cobro = Object.assign({}, beforeCobro, {
         id: cobroId,
@@ -1265,6 +1418,7 @@ async function reconcileEvidence(authz, data, payload, previewOnly, proposalRequ
       }, shared,sourceTotalPatch);
       if (paidDate) receiptPatch.fechaPago = paidDate;
       if (!isInferred && evidencePayload.invoiceNumber) receiptPatch.numeroFactura = evidencePayload.invoiceNumber;
+      if (recordedPaid) preserveRecordedPayment(receiptPatch,receipt);
       tx.set(tenantData(authz.tenantId, 'recibosEsperados').doc(receiptId), receiptPatch, { merge: true });
       if (proposalRequest) beforeAfter.push(
         {collection:'recibosEsperados',id:receiptId,before:receipt,after:auditAfter(Object.assign({},receipt,receiptPatch))},

@@ -1,0 +1,93 @@
+{
+  "schema": "GI_I66_SELECTED_PAYMENT_ATTACHMENT_CAUSAL_SOURCE_V1",
+  "id": "I6_6_SELECTED_PAYMENT_ATTACHMENT_PRESERVATION_20261124",
+  "status": "SOURCE_VERIFIED_NOT_SIGNED_PREVIEW_OR_LIVE",
+  "sourceOnly": true,
+  "authority": {
+    "latestFinding": "A selected payment support must not be lost when Drive fails; preserve the attachment and complete its evidence through the canonical flow.",
+    "priorRulePreserved": "A payment begun without an attachment remains permitted.",
+    "supersededNarrowBehavior": "Continuing automatically with an empty reference after a selected file failed."
+  },
+  "causalFindings": [
+    "The canonical Drive provider already returns tenant connection status but Cobros discarded it in a generic exception.",
+    "Cobros Promise.allSettled previously called applyPayment with an empty reference after upload rejection.",
+    "An in-flight payment modal could be closed or replaced, dropping the selected File from visible UI."
+  ],
+  "latestEnvironmentEvidence": {
+    "reportedBy": "root",
+    "workflowRunId": 45282695083,
+    "runAttempt": 2,
+    "jobId": 138768618494,
+    "observedAt": "2026-11-24T20:52:33Z",
+    "directionStatus": {
+      "httpStatus": 200,
+      "status": "tenant_setup_required",
+      "available": false,
+      "bootstrapRequired": true,
+      "bootstrapClientIdPresent": true,
+      "configured": false
+    },
+    "operativeStatus": {
+      "status": "tenant_setup_required",
+      "bootstrapClientIdPresent": false,
+      "configured": false
+    },
+    "interpretation": "Tenant administrative connection is missing. No per-user OAuth delegation or role expansion is introduced by this source fix.",
+    "readerReexecutedByThisSubagent": false
+  },
+  "paths": {
+    "orbit360-platform/modules/cobros.js": {
+      "before": {
+        "gitBlobSha": "687be0b6b54352894f1a48b417cb990a6536f080",
+        "sha256": "383406113f76b9534b2fb24567b19c1ebc6973fdaa41e86ff5389fa6f40cc02c",
+        "bytes": 117656
+      },
+      "after": {
+        "gitBlobSha": "e86ea782c6aacf97fe4ab4900ed40dec07537a22",
+        "sha256": "c956d689c05ffa8972ece1b961447d70e07601c2c38b7192b92ac8b36b11643a",
+        "bytes": 121969
+      }
+    },
+    "tools/gravicentra-i6-6-payment-optional-evidence.test.cjs": {
+      "before": {
+        "gitBlobSha": "519a0a7089336f33c279fb7ba113f8863e0509f4",
+        "sha256": "7c2d3e3a5ef5341c4bcf77fed89c3103d005ccb7d8a2f81d604acd3150f7e518",
+        "bytes": 1856
+      },
+      "after": {
+        "gitBlobSha": "e5f1ecf7459b7cae62fdf9c890517435b150eeae",
+        "sha256": "629f9c36d5e7e5b9bcf42582bbe26700738457cbdb1a0081bf055c5896ac57f1",
+        "bytes": 14976
+      }
+    }
+  },
+  "invariants": {
+    "realFinancialWrites": 0,
+    "cloudWrites": 0,
+    "credentialsRead": false,
+    "permissionsChanged": false,
+    "newBackendWriter": false,
+    "newFunctions": 0,
+    "selectedFilesRetainedInOpenModal": true,
+    "confirmedStagedReferencesReusedBeforePayment": true,
+    "unknownPaymentOutcomeRequiresReadback": true,
+    "documentQuarantineConfirmedReferencesNotReused": true,
+    "documentarySourceAndNotificationGuardsPreserved": true
+  },
+  "checks": {
+    "attachmentModalCases": 21,
+    "attachmentPassed": 21,
+    "attachmentFailed": 0,
+    "baselinePassed": 4,
+    "baselineFailed": 17,
+    "documentaryPayloadGuards": 15,
+    "providerStatusGuards": 4,
+    "syntax": "PASS",
+    "gitApplyCheckAgainstCurrentParentWorkingTree": "PASS"
+  },
+  "limitations": [
+    "Isolated source tests are not a signed browser acceptance. Same immutable Preview/LIVE gates still apply.",
+    "If the payment succeeds but Drive finalization is unconfirmed, the modal preserves the file and shows the already-registered payment; controlled document recovery remains necessary and a second payment is blocked.",
+    "No assertion of completed tenant OAuth bootstrap or uploaded real document is made."
+  ]
+}

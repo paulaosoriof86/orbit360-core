@@ -57,6 +57,12 @@ const ADVISOR_QA_ISOLATION = Object.freeze({
   financialPayments:0,bankMovements:0,authOrMembershipMutations:0
 });
 const PINNED_OWNER_PATHS = Object.freeze([
+  'artifacts/orbit360-recovery/release-control/I6_6_EFFECTIVE_CANCELLATION_DIRECT_OR_OPS_CAUSAL_SOURCE_20261124.json',
+  'tools/gravicentra-i6-6-effective-cancellation-direct-form.test.cjs',
+  'artifacts/orbit360-recovery/release-control/I6_6_R51_DOCUMENTARY_PAYMENT_FINANCIAL_RECOVERY_SOURCE_20261124.json',
+  'tools/gravicentra-i6-6-frontend-preview-authority.cjs',
+  'tools/gravicentra-i6-6-composite-preview-admission.test.cjs',
+  'tools/gravicentra-i6-6-proposal-application-signed-uat.test.cjs',
   'functions','orbit360-platform','firebase.json','firestore.rules','storage.rules',
   ...DRIVERS,DIRECT_FORMS_DRIVER,'tools/gravicentra-i6-6-direct-forms-signed-driver.test.cjs',
   'tools/gravicentra-i6-6-carlos-paula-live-synthetic-ops-leads-uat.cjs',
@@ -82,6 +88,9 @@ const PINNED_OWNER_PATHS = Object.freeze([
   'artifacts/orbit360-recovery/release-control/I6_6_CURRENT_PHYSICAL_PREVIEW_V24_ROLLOVER_20261124.json',
   'artifacts/orbit360-recovery/release-control/I6_6_CURRENT_PHYSICAL_PREVIEW_V24_ROLLOVER_V2_20261124.json',
   'artifacts/orbit360-recovery/release-control/I6_6_CURRENT_PHYSICAL_PREVIEW_V27_RESIDUAL_ROLLOVER_V3_20261124.json',
+  'artifacts/orbit360-recovery/release-control/I6_6_CURRENT_PHYSICAL_PREVIEW_V28_ROLLOVER_V4_20261124.json',
+  'artifacts/orbit360-recovery/release-control/I6_6_MAKE_PREVIEW_TRAFFIC_ROLLBACK_CAUSAL_CORRECTION_20261124.json',
+  'artifacts/orbit360-recovery/release-control/I6_6_V28_IMMUTABLE_BUILD_RECEIPT_20261124.json',
   'artifacts/orbit360-recovery/release-control/I6_6_V27_UNACCEPTED_PREVIEW_BACKUP_ONLY_20261124.json',
   'tools/gravicentra-i6-6-source-intake-readiness.test.cjs',
   'artifacts/orbit360-recovery/release-control/I6_6_DAILY_PLAN_FREEZE_AND_SOURCE_INTAKE_RELOAD_20261117.json',
@@ -94,6 +103,10 @@ const PINNED_OWNER_PATHS = Object.freeze([
   'tools/gravicentra-i6-6-source-intake-preview-transport.test.cjs',
   'tools/gravicentra-i6-6-live-proof-artifact-layout.test.cjs',
   'tools/gravicentra-i6-6-documented-premium-terms.test.cjs',
+  'tools/gravicentra-i6-6-r51-payment-application-preservation.test.cjs',
+  'tools/gravicentra-i6-6-r51-documentary-variance.test.cjs',
+  'tools/gravicentra-i6-6-documentary-payment-ui.test.cjs',
+  'tools/gravicentra-i6-6-cobros-payment-failure-category.test.cjs',
   'tools/gravicentra-i6-6-documented-terms-signed-check.cjs',
   'tools/gravicentra-i6-6-documented-terms-signed-check.test.cjs',
   'tools/gravicentra-i6-6-cobros-visible-snapshot-performance.test.cjs',
@@ -201,6 +214,8 @@ function previewIdentity(p) {
 }
 function validateBuildMarker(p,marker,packageMarker) {
   previewIdentity(p);
+  if(p.financialRecoveryQa!==undefined)
+    require('./gravicentra-i6-6-proposal-application-signed-uat.cjs').validateDocumentaryPaymentQaBinding(p.financialRecoveryQa);
   assert.ok(marker&&typeof marker==='object'&&!Array.isArray(marker),'I66_OPERATIONAL_BUILD_MARKER_REQUIRED');
   assert.equal(marker.sourceSha,p.sourceSha,'I66_OPERATIONAL_BUILD_MARKER_SOURCE_DRIFT');
   assert.equal(marker.gate,'I6.6','I66_OPERATIONAL_BUILD_MARKER_GATE_DRIFT');
@@ -283,6 +298,25 @@ function candidateForPhase(control,phase) {
   assert.equal(control.noHostingPromotion,phase==='preview');
   const p=control.operationalReleaseCandidate;
   assert.ok(p,'I66_OPERATIONAL_CANDIDATE_MISSING');
+  if(p.financialRecoveryQa!==undefined)
+    require('./gravicentra-i6-6-proposal-application-signed-uat.cjs').validateDocumentaryPaymentQaBinding(p.financialRecoveryQa);
+  if(control.frontendPreviewRequest?.financialRecovery!==undefined){
+    require('./gravicentra-i6-6-proposal-application-signed-uat.cjs').validateDocumentaryPaymentQaBinding(control.frontendPreviewRequest.financialRecoveryQa);
+    assert.deepEqual(p.financialRecoveryQa,control.frontendPreviewRequest.financialRecoveryQa,'I66_FINANCIAL_REQUIRED_UI_QA_REMOVED');
+  }
+  if(control.frontendPreviewRequest?.cancellationRecovery!==undefined){
+    assert.equal(p.cancellationQa,true,'I66_CANCELLATION_REQUIRED_UI_QA_REMOVED');
+    assert.deepEqual(p.cancellationRecoveryQa,control.frontendPreviewRequest.cancellationRecoveryQa,'I66_CANCELLATION_QA_BINDING_DRIFT');
+  }
+  if(p.cancellationQa!==undefined){
+    assert.equal(p.cancellationQa,true,'I66_CANCELLATION_QA_PROFILE_INVALID');
+    assert.equal(p.directFormsQa,true,'I66_CANCELLATION_DIRECT_FORMS_QA_REQUIRED');
+    const authority=require('./gravicentra-i6-6-frontend-preview-authority.cjs');
+    assert.deepEqual(Object.keys(p.cancellationRecoveryQa||{}).sort(),['profile','receiptBlob','receiptPath'],'I66_CANCELLATION_EXACT_QA_BINDING_REQUIRED');
+    assert.equal(p.cancellationRecoveryQa.profile,authority.CANCELLATION_QA_PROFILE,'I66_CANCELLATION_QA_PROFILE_DRIFT');
+    assert.equal(p.cancellationRecoveryQa.receiptPath,authority.CANCELLATION_RECEIPT_PATH,'I66_CANCELLATION_QA_RECEIPT_DRIFT');
+    checkSha(p.cancellationRecoveryQa.receiptBlob,'I66_CANCELLATION_QA_RECEIPT_BLOB');
+  }else assert.equal(p.cancellationRecoveryQa,undefined,'I66_CANCELLATION_QA_FLAG_REQUIRED');
   assert.equal(p.schema,'I6_6_OPERATIONAL_EXACT_RELEASE_V1');
   assert.equal(p.approvedByDirection,true);
   assert.equal(p.status,phase==='preview'?'EXACT_BACKEND_PREVIEW_SIGNED_QA_AUTHORIZED':'EXACT_PREVIEW_SIGNED_LIVE_AUTHORIZED');
@@ -396,6 +430,7 @@ function validateProof(p,proof) {
   assert.equal(proof.realFinancialOrCustomerWrites,0);assert.equal(proof.syntheticRestoreComplete,true);
   assert.equal(proof.liveHostingUnchanged,true);assert.equal(proof.liveBackendUnchanged,true);
   if(makeScope.isMake(p))makeScope.validatePreviewProof(p,proof.makeIngress);
+  if(p.financialRecoveryQa!==undefined)validateFinancialRecoverySummary(p,'PREVIEW',proof.focusedReports?.proposalApplication?.documentaryPayments);
   assert.deepEqual(Object.keys(proof.focusedReports||{}).sort(),p.directFormsQa===true?['advisorPayables','directForms','proposalApplication']:['advisorPayables','proposalApplication']);
   for(const report of Object.values(proof.focusedReports)){
     assert.equal(report.status,'PASS');assert.equal(report.cleanup,'PASS');
@@ -404,7 +439,8 @@ function validateProof(p,proof) {
   }
   if(p.directFormsQa===true){
     assert.equal(proof.focusedReports.directForms.phase,'PREVIEW');
-    assert.equal(proof.focusedReports.directForms.coverage,'SIGNED_PUBLIC_ENTRIES_READONLY');
+    assert.equal(proof.focusedReports.directForms.coverage,p.cancellationQa===true?'SIGNED_PUBLIC_ENTRIES_AND_CANCELLATION_READONLY':'SIGNED_PUBLIC_ENTRIES_READONLY');
+    if(p.cancellationQa===true)assert.equal(proof.focusedReports.directForms.checks,63,'I66_CANCELLATION_PREVIEW_CHECKS_REQUIRED');
   }
   if(p.signedObservabilityProfile===SIGNED_OBSERVABILITY_PROFILE){
     assert.deepEqual(proof.focusedReports.advisorPayables.observability,
@@ -433,6 +469,14 @@ function signedObservabilityReports(p,advisor,proposal){
     proposalApplication:{profile:SIGNED_OBSERVABILITY_PROFILE,status:'PASS',mode:ui.mode}
   };
 }
+function validateFinancialRecoverySummary(p,phase,summary){
+  const owner=require('./gravicentra-i6-6-proposal-application-signed-uat.cjs');owner.validateDocumentaryPaymentQaBinding(p.financialRecoveryQa);
+  assert.deepEqual(Object.keys(summary||{}).sort(),['profile','status','phase','sourceSha','buildId','receiptBlob','sources','cases','syntheticPayments','replayAdditionalPayments','realFinancialWrites','remaining','proofDigest'].sort(),'I66_FINANCIAL_UI_SUMMARY_REQUIRED');
+  assert.deepEqual(Object.fromEntries(Object.entries(summary).filter(([k])=>k!=='proofDigest')),
+    {profile:owner.DOCUMENTARY_PAYMENT_QA_PROFILE,status:'PASS',phase,sourceSha:p.sourceSha,buildId:p.buildId,receiptBlob:p.financialRecoveryQa.receiptBlob,
+      sources:[...owner.DOCUMENTARY_PAYMENT_SOURCES],cases:2,syntheticPayments:2,replayAdditionalPayments:0,realFinancialWrites:0,remaining:0},'I66_FINANCIAL_UI_SUMMARY_DRIFT');
+  checkDigest(summary.proofDigest,'I66_FINANCIAL_UI_PROOF_DIGEST_REQUIRED');return summary;
+}
 function validateFocusedReports(p,phase,advisor,proposal){
   for(const report of [advisor,proposal]){
     assert.equal(report.sourceSha,p.sourceSha);assert.equal(report.phase,phase);
@@ -442,6 +486,9 @@ function validateFocusedReports(p,phase,advisor,proposal){
   }
   for(const field of ['realCustomerWritesRequested','bankMovements','financialPayments','authOrMembershipMutations'])assert.equal(advisor[field],0);
   assert.equal(proposal.syntheticOnly,true);assert.equal(proposal.realControlUnchanged,true);
+  if(p.financialRecoveryQa!==undefined)
+    require('./gravicentra-i6-6-proposal-application-signed-uat.cjs').validateDocumentaryPaymentUiEvidence(proposal.documentaryPayments,
+      {phase,sourceSha:p.sourceSha,buildId:p.buildId,binding:p.financialRecoveryQa});
   signedObservabilityReports(p,advisor,proposal);
   if(phase==='LIVE'){
     const {validateLiveAcceptanceProof}=require('./gravicentra-i6-6-direction-preview-legal-acceptance.cjs');
@@ -454,7 +501,15 @@ function validateFocusedReports(p,phase,advisor,proposal){
     for(const key of ['actorUidSha256','scopeSha256'])assert.equal(advisor.directionLegalAcceptance[key],proposal.directionLegalAcceptance[key],'I66_OPERATIONAL_LEGAL_SIGNED_ACTOR_SCOPE_DRIFT');
   }
 }
+function assertDirectFormsPersonalAuthority(p,phase,readCurrent){
+  assert.ok(['PREVIEW','LIVE'].includes(phase));
+  if(p.directFormsQa!==true)return null;
+  const driver=require('./gravicentra-i6-6-carlos-paula-live-direct-renewal-synthetic-uat.cjs');
+  const read=readCurrent||driver.readCurrentPersonalLegalAuthority;
+  return read({cfg:{phase,source:p.sourceSha,origin:phase==='LIVE'?LIVE:p.previewUrl},candidate:p});
+}
 function focusedReportsFromDisk(p,phase,env=process.env){
+  const personalAuthority=assertDirectFormsPersonalAuthority(p,phase);
   assert.ok(['PREVIEW','LIVE'].includes(phase));
   const paths={advisorPayables:env.I66_ADVISOR_PAYABLE_UAT_REPORT||path.join(env.RUNNER_TEMP,'gravicentra-i66-advisor-payables-signed-uat-'+phase.toLowerCase()+'.json'),
     proposalApplication:path.join(env.I66_PACKAGE_ROOT,'evidence','i66-proposal-application-signed-uat-'+phase.toLowerCase()+'.json')};
@@ -463,17 +518,28 @@ function focusedReportsFromDisk(p,phase,env=process.env){
   validateFocusedReports(p,phase,reports.advisorPayables,reports.proposalApplication);
   const observability=signedObservabilityReports(p,reports.advisorPayables,reports.proposalApplication);
   const focused=Object.fromEntries(Object.entries(reports).map(([key,r])=>[key,{status:r.status,cleanup:r.cleanup.status,checks:r.checks.length,digest:'sha256:'+crypto.createHash('sha256').update(bytes[key]).digest('hex'),...(observability?{observability:observability[key]}:{})}]));
+  if(p.financialRecoveryQa!==undefined)focused.proposalApplication.documentaryPayments=
+    require('./gravicentra-i6-6-proposal-application-signed-uat.cjs').validateDocumentaryPaymentUiEvidence(reports.proposalApplication.documentaryPayments,
+      {phase,sourceSha:p.sourceSha,buildId:p.buildId,binding:p.financialRecoveryQa});
   if(p.directFormsQa===true){
     const raw=fs.readFileSync(path.join(env.RUNNER_TEMP,'gi-i66-direct-forms-'+phase.toLowerCase()+'.json'));
     const direct=JSON.parse(raw);
-    require('./gravicentra-i6-6-carlos-paula-live-direct-renewal-synthetic-uat.cjs').validateSignedReport(direct,{phase,sourceSha:p.sourceSha,buildId:p.buildId});
-    focused.directForms={status:'PASS',cleanup:'PASS',checks:direct.actors.reduce((n,a)=>n+a.entries.length+1,0),
+    const verified=require('./gravicentra-i6-6-carlos-paula-live-direct-renewal-synthetic-uat.cjs').validateSignedReport(direct,{phase,sourceSha:p.sourceSha,buildId:p.buildId,personalAuthority,cancellationQa:p.cancellationQa===true});
+    focused.directForms={status:'PASS',cleanup:'PASS',checks:verified.checks,
       digest:'sha256:'+crypto.createHash('sha256').update(raw).digest('hex'),phase,
-      coverage:phase==='PREVIEW'?'SIGNED_PUBLIC_ENTRIES_READONLY':'SIGNED_NORMAL_UI_SAVE_READBACK_RELOAD_REPLAY_RESTORE'};
+      coverage:p.cancellationQa===true?'SIGNED_'+verified.coverage:phase==='PREVIEW'?'SIGNED_PUBLIC_ENTRIES_READONLY':'SIGNED_NORMAL_UI_SAVE_READBACK_RELOAD_REPLAY_RESTORE'};
   }
   return focused;
 }
 function verifyPinnedOwners(p) {
+  if(p.cancellationQa===true){
+    const binding=p.cancellationRecoveryQa;
+    for(const ref of [p.sourceSha,'HEAD'])assert.equal(execFileSync('git',['rev-parse',ref+':'+binding.receiptPath],{encoding:'utf8'}).trim(),binding.receiptBlob,'I66_CANCELLATION_CAUSAL_RECEIPT_SOURCE_DRIFT');
+  }
+  if(p.financialRecoveryQa!==undefined){
+    const binding=require('./gravicentra-i6-6-proposal-application-signed-uat.cjs').validateDocumentaryPaymentQaBinding(p.financialRecoveryQa);
+    for(const ref of [p.sourceSha,'HEAD'])assert.equal(execFileSync('git',['rev-parse',ref+':'+binding.receiptPath],{encoding:'utf8'}).trim(),binding.receiptBlob,'I66_FINANCIAL_CAUSAL_RECEIPT_SOURCE_DRIFT');
+  }
   if(makeScope.isMake(p))makeScope.verifySourcePins(p);
   execFileSync('git',['merge-base','--is-ancestor',p.sourceSha,'HEAD'],{stdio:'pipe'});
   assert.equal(execFileSync('git',['diff','--name-only',p.sourceSha,'HEAD','--',...PINNED_OWNER_PATHS],{encoding:'utf8'}).trim(),'','I66_OPERATIONAL_SOURCE_OR_QA_OWNER_DRIFT');
@@ -487,7 +553,7 @@ async function fetchJson(url){
   assert.ok(r.ok,'I66_OPERATIONAL_PROOF_API_UNAVAILABLE');return r.json();
 }
 function envFor(p){return {
-  I66_DIRECT_FORMS_QA:String(p.directFormsQa===true),I66_LIVE_ORIGIN:LIVE,
+  I66_DIRECT_FORMS_QA:String(p.directFormsQa===true),I66_CANCELLATION_QA:p.cancellationQa===true?'1':'0',I66_LIVE_ORIGIN:LIVE,
   I66_MAKE_INGRESS:String(makeScope.isMake(p)),I66_MAKE_TRIGGER_PREVIOUS_STATE:makeScope.isMake(p)?p.makeIngress.targetBefore.live.state:'',
   I66_OPERATIONAL_CANDIDATE:'true',SOURCE_SHA:p.sourceSha,I66_SOURCE_SHA:p.sourceSha,
   SOURCE_PACKAGE_RUN:p.buildRunId,SOURCE_ARTIFACT_ID:p.artifactId,SOURCE_ARTIFACT_DIGEST:p.artifactDigest,
@@ -500,7 +566,9 @@ function envFor(p){return {
 };}
 async function main(){
   const phase=process.argv[2],control=JSON.parse(fs.readFileSync(CONTROL,'utf8'));
-  const p=candidateForPhase(control,phase);verifyPinnedOwners(p);
+  const p=candidateForPhase(control,phase);
+  assertDirectFormsPersonalAuthority(p,phase.toUpperCase()); // Before any backend/Make deployment.
+  verifyPinnedOwners(p);
   const api='https://api.github.com/repos/paulaosoriof86/orbit360-core/actions/';
   const [run,artifact]=await Promise.all([fetchJson(api+'runs/'+p.buildRunId),fetchJson(api+'artifacts/'+p.artifactId)]);
   validateArtifact(p,run,artifact);
@@ -561,8 +629,10 @@ function validateLiveProof(p,proof){
   }
   if(p.directFormsQa===true){
     assert.equal(focus.directForms.phase,'LIVE');
-    assert.equal(focus.directForms.coverage,'SIGNED_NORMAL_UI_SAVE_READBACK_RELOAD_REPLAY_RESTORE');
+    assert.equal(focus.directForms.coverage,p.cancellationQa===true?'SIGNED_NORMAL_UI_RENEWAL_ENDORSEMENT_CANCELLATION_READBACK_RELOAD_REPLAY':'SIGNED_NORMAL_UI_SAVE_READBACK_RELOAD_REPLAY_RESTORE');
+    if(p.cancellationQa===true)assert.equal(focus.directForms.checks,113,'I66_CANCELLATION_LIVE_CHECKS_REQUIRED');
   }
+  if(p.financialRecoveryQa!==undefined)validateFinancialRecoverySummary(p,'LIVE',focus.proposalApplication?.documentaryPayments);
   assert.equal(p.signedObservabilityProfile,SIGNED_OBSERVABILITY_PROFILE);
   assert.deepEqual(focus.advisorPayables.observability,{profile:SIGNED_OBSERVABILITY_PROFILE,status:'PASS',unexpectedConsoleErrors:0,unexpectedHttpErrors:0,pageErrorCount:0,telemetryFailures:0});
   assert.equal(focus.proposalApplication.observability?.profile,SIGNED_OBSERVABILITY_PROFILE);
@@ -683,5 +753,5 @@ function acceptedForPreflight(control,state,transport,latest,io=fs){
   assert.equal(latest.previousLiveVersionForRollback,r11.hostingVersion);
   return {status:ACCEPTED_STATUS,sourceSha:p.sourceSha,receipt:ACCEPTANCE_RECEIPT};
 }
-module.exports={CONTROL,SITE,PREVIEW,CHANNEL,LIVE,TARGETS,COMPOSITE_TARGETS,MAKE_TARGETS,targetsForCandidate,DRIVERS,PROPOSAL_QA_ISOLATION,ADVISOR_QA_ISOLATION,PINNED_OWNER_PATHS,SIGNED_OBSERVABILITY_PROFILE,previewIdentity,validateBuildMarker,signedMatrixBinding,candidateForPhase,continuationForPreflight,validateArtifact,validatePreviewQa,validateProof,validateFocusedReports,signedObservabilityReports,focusedReportsFromDisk,envFor,ACCEPTANCE_KEY,ACCEPTANCE_RECEIPT,ACCEPTANCE_PROOF,ACCEPTED_STATUS,LIVE_SIGNED_STATUS,validateLiveProof,acceptedForPreflight};
+module.exports={CONTROL,SITE,PREVIEW,CHANNEL,LIVE,TARGETS,COMPOSITE_TARGETS,MAKE_TARGETS,targetsForCandidate,DRIVERS,PROPOSAL_QA_ISOLATION,ADVISOR_QA_ISOLATION,PINNED_OWNER_PATHS,SIGNED_OBSERVABILITY_PROFILE,previewIdentity,validateBuildMarker,signedMatrixBinding,candidateForPhase,continuationForPreflight,validateArtifact,validatePreviewQa,validateProof,validateFocusedReports,validateFinancialRecoverySummary,signedObservabilityReports,focusedReportsFromDisk,assertDirectFormsPersonalAuthority,envFor,ACCEPTANCE_KEY,ACCEPTANCE_RECEIPT,ACCEPTANCE_PROOF,ACCEPTED_STATUS,LIVE_SIGNED_STATUS,validateLiveProof,acceptedForPreflight};
 if(require.main===module)main().catch(error=>{console.error(String(error.message||error));process.exitCode=1;});

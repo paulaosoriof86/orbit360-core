@@ -52,6 +52,9 @@ Orbit.policyReceipts = (function () {
     if (restricted.includes('polizas_editar') || restricted.includes('polizas')) return false;
     return MANAGE_ROLES.has(r) || extra.includes('polizas_editar');
   }
+  function canRegisterEffectiveCancellation() {
+    return MANAGE_ROLES.has(role()) && canManagePolicies();
+  }
   function canApplyPayments() {
     const r = role();
     const advisor = A() && A().actorAdvisor ? A().actorAdvisor() : {};
@@ -575,10 +578,80 @@ Orbit.policyReceipts = (function () {
     }
   }
 
+  // An already issued cancellation is a documented state change of this exact
+  // policy. It never normalizes its premium or regenerates financial records.
+  // This method deliberately precedes the generic comparison/refinement path.
+  async function registerEffectiveCancellation(id, input, options) {
+    options = options || {}; input = input || {};
+    const opId = options.operationId || operationId('polcan');
+    const hold = code => ({ok:false,errors:[code],operationId:opId});
+    if (!canRegisterEffectiveCancellation()) return hold('permiso_cancelacion_denegado');
+    if (!S() || typeof S().batchDurable !== 'function') return hold('contrato_atomico_no_disponible');
+    const current = S().get('polizas', id);
+    if (!current) return hold('poliza_no_encontrada');
+    const before = clone(current), client = S().get('clientes', before.clienteId);
+    if (!clean(tenantId()) || clean(before.tenantId) !== clean(tenantId()) || !client ||
+        clean(client.id) !== clean(before.clienteId) || !clean(before.pais) ||
+        clean(client.pais) !== clean(before.pais) ||
+        (client.tenantId && clean(client.tenantId) !== clean(before.tenantId)) ||
+        !A() || typeof A().canView !== 'function' ||
+        !A().canView('polizas', before, 'polizas') || !A().canView('clientes', client, 'cliente360'))
+      return hold('cancelacion_identidad_fuera_alcance');
+    const fields = ['fechaCancelacion','motivoCancelacion','cancelacionDocumentoRef','referenciaCancelacion'];
+    if (Object.keys(input).some(key => !fields.includes(key))) return hold('cancelacion_campos_no_autorizados');
+    if (options.issuedConfirmed !== true) return hold('cancelacion_emision_requerida');
+    if (!['vigente','porrenovar','vencida','requierevalidacion','cancelada'].includes(norm(before.estado)))
+      return hold('cancelacion_estado_invalido');
+    const patch = {estado:'Cancelada'};
+    fields.forEach(key => { patch[key] = clean(input[key]); });
+    const validDate = value => /^\d{4}-\d{2}-\d{2}$/.test(value) &&
+      Number.isFinite(Date.parse(value+'T00:00:00Z')) && new Date(value+'T00:00:00Z').toISOString().slice(0,10) === value;
+    if (!validDate(patch.fechaCancelacion) || patch.fechaCancelacion > today()) return hold('cancelacion_fecha_invalida');
+    const start = clean(before.vigenciaInicio || before.vigenciaIni), end = clean(before.vigenciaFin);
+    if (!validDate(start) || !validDate(end) || patch.fechaCancelacion < start || patch.fechaCancelacion > end)
+      return hold('cancelacion_fecha_fuera_vigencia');
+    if (!patch.motivoCancelacion) return hold('cancelacion_motivo_requerido');
+    if (!patch.cancelacionDocumentoRef) return hold('cancelacion_documento_requerido');
+    if (!patch.referenciaCancelacion) return hold('cancelacion_referencia_requerida');
+    if (norm(before.estado) === 'cancelada') {
+      if (fields.every(key => clean(before[key]) === patch[key]))
+        return {ok:false,alreadyRecorded:true,errors:['cancelacion_ya_registrada'],operationId:opId};
+      // Legacy cancelled records may be completed, but known documentary facts
+      // cannot silently be replaced by a new cancellation registration.
+      if (fields.some(key => clean(before[key]) && clean(before[key]) !== patch[key]) ||
+          (clean(before.cancellationDate) && clean(before.cancellationDate) !== patch.fechaCancelacion) ||
+          (clean(before.cancellationReason) && clean(before.cancellationReason) !== patch.motivoCancelacion))
+        return hold('cancelacion_existente_difiere');
+    }
+    const finalPolicy = Object.assign({},before,patch);
+    const activity = activityRow(finalPolicy,'Cancelación efectiva registrada: '+(before.numero||id),
+      patch.fechaCancelacion+' · '+patch.motivoCancelacion+' · Referencia: '+patch.referenciaCancelacion+
+      ' · Soporte: '+patch.cancelacionDocumentoRef,opId);
+    activity.polizaId = id;
+    try {
+      const result = await S().batchDurable([
+        {action:'update',collection:'polizas',id,payload:patch},
+        {action:'insert',collection:'actividades',id:activity.id,payload:activity}
+      ],{requestId:opId,policyCancellationOnly:true});
+      if (!result || result.canonicalReadback !== true) throw Error('PRODUCT_SERVER_CANONICAL_READBACK_REQUIRED');
+      const readback = S().get('polizas',id);
+      if (!readback || Object.keys(patch).some(key => readback[key] !== patch[key]))
+        throw Error('PRODUCT_CANCELLATION_READBACK_MISMATCH');
+      return {ok:true,cancellationEffective:true,policy:clone(readback),operationId:opId,
+        receipts:{preserved:true},portfolio:{preserved:true},atomicServerCommit:true,canonicalReadback:true};
+    } catch (error) {
+      return {ok:false,errors:['operacion_atomica_no_confirmada'],
+        error:String(error&&(error.code||error.message||error)),operationId:opId};
+    }
+  }
+
   async function updatePolicy(id, patch, options) {
     options=options||{};if(!canManagePolicies())return{ok:false,errors:['permiso_poliza_denegado']};if(!S()||typeof S().batchDurable!=='function')return{ok:false,errors:['contrato_atomico_no_disponible']};
     const current=S().get('polizas',id);if(!current)return{ok:false,errors:['poliza_no_encontrada']};
     const before=clone(current),opId=options.operationId||operationId('polupd');
+    if (patch && (['fechaCancelacion','motivoCancelacion','cancelacionDocumentoRef','referenciaCancelacion'].some(key=>Object.prototype.hasOwnProperty.call(patch,key)) ||
+        (norm(patch.estado)==='cancelada' && norm(before.estado)!=='cancelada')))
+      return {ok:false,errors:['cancelacion_usar_ficha_efectiva'],operationId:opId};
     // A vehicle-data correction is NOT a policy premium/receipt renewal.
     // Keep its existing canonical vehicle identity and relationship; write only
     // the vehicle and one audit activity through the same durable server path.
@@ -772,7 +845,7 @@ Orbit.policyReceipts = (function () {
   }
 
   return {
-    ACTIVE, isActiveState, isPaidReceipt, canManagePolicies, canApplyPayments,
+    ACTIVE, isActiveState, isPaidReceipt, canManagePolicies, canRegisterEffectiveCancellation, registerEffectiveCancellation, canApplyPayments,
     canonicalPolicyKey, policyVersionKey, validatePolicy, preparePolicy, normalizeVehicle, expectedReceipts, syncReceipts, syncPortfolio, buildAtomicWritePlan,
     createPolicy, updatePolicy, correctAdvisorAssignment, linkVehicleToPolicy, updateReceipt, receiptEditLocked, applyPayment, createReconciliationProposal, updateClientState,
     receiptId, sequenceOf, installmentsForFrequency, policyCurrencies

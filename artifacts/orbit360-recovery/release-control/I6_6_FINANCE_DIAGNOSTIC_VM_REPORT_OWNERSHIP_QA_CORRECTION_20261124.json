@@ -1,0 +1,78 @@
+{
+  "schema": "GI_I66_EXISTING_TEST_REVISION_AUTHORITY_V1",
+  "gate": "I6.6",
+  "revisionId": "I6_6_FINANCE_DIAGNOSTIC_VM_REPORT_OWNERSHIP_QA_CORRECTION_20261124",
+  "scope": "EXISTING_DECLARED_TESTS_ONLY",
+  "productSourceChanges": 0,
+  "productionAcceptanceClaimed": false,
+  "approvedByDirection": true,
+  "ownerInstruction": "24-Nov: corregir los hallazgos y el mecanismo causal dentro de los owners existentes, preservar el trabajo y publicar después de los gates exactos autorizados.",
+  "causeEvidence": {
+    "sourceHead": "090bc159db922cc790f8fe60f03becd6b227e405",
+    "guardFailure": "I6_6_DELTA_GUARD:DECLARED_CHANGE_TEST_FAILED:tools/gravicentra-i6-6-finance-ui-diagnostics.test.cjs",
+    "testName": "failed-preview artifact transports sanitized click evidence and exact source location through the workflow code",
+    "failure": "UNEXPECTED_DIAGNOSTIC_DEPENDENCY",
+    "failureTestLine": 96,
+    "failureRequireLine": 115,
+    "workflow": {
+      "path": ".github/workflows/gravicentra-i66-privileged-role-three-function-preview-uat.yml",
+      "gitBlobSha": "65a1783cb52f8c7bccd9aefc84cb46ec10081de1",
+      "sha256": "05fa28c669a3bb0147b903210ad4ccfbd6e469b2706a483b8a02dbabcdb45002"
+    },
+    "localGuardLogSha256": "0a077d522207a6d8831231164c5cb3144454876b04745d7ddde331febb50100f"
+  },
+  "rootCause": "The focused Advisor fixture claimed every filesystem path existed and returned its one Advisor report for every path. After the existing failure workflow added a DirectForms diagnostic candidate, this fabricated an additional DirectForms file and attempted a module outside the closed VM require allowlist. The production workflow correctly preserves owners independently.",
+  "correction": "Limit fixture existence and reads to its exact Advisor report path. Assert the exact read/probe paths and the expected Advisor captured, Proposal path unavailable, DirectForms not found availability. Retain the closed require allowlist and every existing failure-evidence assertion.",
+  "tests": [
+    {
+      "path": "tools/gravicentra-i6-6-finance-ui-diagnostics.test.cjs",
+      "gitBlobSha": "6296aac722b82831185abd4a667ca72f1a436e72",
+      "replaces": {
+        "path": "tools/gravicentra-i6-6-finance-ui-diagnostics.test.cjs",
+        "priorGitBlobSha": "c37fa124c67427b265c9c4f6cc63ea63735e4bbb",
+        "priorChangeId": "I6_6_DOCUMENTED_POLICY_CENT_PRECISION_AND_DIAGNOSTIC_RETENTION_20261117"
+      }
+    }
+  ],
+  "preimages": {
+    "test": {
+      "path": "tools/gravicentra-i6-6-finance-ui-diagnostics.test.cjs",
+      "gitBlobSha": "c37fa124c67427b265c9c4f6cc63ea63735e4bbb",
+      "sha256": "01a897cb031d6f8077e9b1a1c7316b4286f2e7719158876f0c0ab543befaa51b"
+    },
+    "retentionTest": {
+      "path": "tools/gravicentra-i6-6-preview-failure-diagnostics-retention.test.cjs",
+      "gitBlobSha": "b28d361e07bdaf3eb32ad42c019e47b739808658",
+      "sha256": "afd7675523bdca825aceb890a219e07d79e88b7ee7e1cdf1a89d558971dd8cc6"
+    }
+  },
+  "localVerification": {
+    "command": "node --test tools/gravicentra-i6-6-finance-ui-diagnostics.test.cjs tools/gravicentra-i6-6-preview-failure-diagnostics-retention.test.cjs",
+    "financeDiagnostics": {
+      "passed": 18,
+      "failed": 0,
+      "skipped": 0
+    },
+    "failureRetention": {
+      "passed": 62,
+      "failed": 0,
+      "skipped": 0
+    },
+    "totalPassed": 80,
+    "totalFailed": 0,
+    "execution": "OFFLINE_LOCAL_SOURCE_ONLY"
+  },
+  "preservation": {
+    "existingTestsRemoved": 0,
+    "requireAllowlistWidened": false,
+    "workflowChanges": 0,
+    "runtimeDriverChanges": 0,
+    "productSourceChanges": 0,
+    "releaseAuthorityChanges": 0,
+    "legalAuthorityChanges": 0,
+    "remoteWrites": 0,
+    "financialWrites": 0,
+    "historicalReceiptsModified": 0
+  },
+  "nextAction": "Append this exact linked QA-only testRevision, commit the test and receipt, then run the existing canonical guard and signed Source QA on the resulting exact source. No Preview or LIVE acceptance is claimed."
+}

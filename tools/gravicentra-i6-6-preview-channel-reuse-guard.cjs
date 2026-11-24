@@ -132,6 +132,16 @@ const PHYSICAL_PREVIOUS_SOURCE = 'fbe7f289ce60cb3a8232d9c5886441c180cb72d4';
 const PHYSICAL_PREVIOUS_BUILD = 45460310493;
 const PHYSICAL_PREVIOUS_ARTIFACT = 14950444825;
 const PHYSICAL_PREVIOUS_DIGEST = 'sha256:dcfcd046d203c5ec9c2c8f59f798acf9483fbdbf6cd692fe9766f0088b53d87e';
+// V4 backs up the wholly successful v28 immutable build. V3 remains an
+// independently closed historical profile, including its exact failed27 proof.
+const PHYSICAL_V4_RECEIPT_PATH = 'artifacts/orbit360-recovery/release-control/I6_6_CURRENT_PHYSICAL_PREVIEW_V28_ROLLOVER_V4_20261124.json';
+const PHYSICAL_V4_RECEIPT_SHA256 = 'dd56c0a2a9ea19e261da36f53a62b3b7a29fbf7a9a54f20ad24dfa24d505c971';
+const PHYSICAL_V4_PROFILE = 'I66_CURRENT_PHYSICAL_E3_PREVIEW_V28_SUCCESSOR_V4';
+const PHYSICAL_V4_SOURCE = '74ae28c6e6e6b40f845567c9b00738a58307b3cb';
+const PHYSICAL_V4_BUILD = 45464287026;
+const PHYSICAL_V4_ARTIFACT = 14953553588;
+const PHYSICAL_V4_DIGEST = 'sha256:8dae2c413cc774be504e3aa224b4333e2968c176fc74116c6c5f42c0a6a46290';
+const isPhysicalProfile = a => [PHYSICAL_PROFILE, PHYSICAL_V4_PROFILE].includes(a?.profile);
 const PHYSICAL_LIVE_SOURCE = '65c825b2808a615ca4195bdde6689dbdbe3193b2';
 const PHYSICAL_LIVE_WORKFLOW = '.github/workflows/gravicentra-i66-privileged-role-exact-live-promotion.yml';
 const technicalSha = bytes => crypto.createHash('sha256').update(bytes).digest('hex');
@@ -151,7 +161,7 @@ function technicalRolloverCandidatePin() {
   };
 }
 
-function currentPhysicalRolloverCandidatePin() {
+function residualPhysicalRolloverCandidatePin() {
   return {
     receiptPath: PHYSICAL_RECEIPT_PATH, receiptSha256: PHYSICAL_RECEIPT_SHA256,
     channel: PHYSICAL_CHANNEL, origin: PHYSICAL_ORIGIN,
@@ -160,26 +170,46 @@ function currentPhysicalRolloverCandidatePin() {
   };
 }
 
+function currentPhysicalRolloverCandidatePin() {
+  return {
+    receiptPath: PHYSICAL_V4_RECEIPT_PATH, receiptSha256: PHYSICAL_V4_RECEIPT_SHA256,
+    channel: PHYSICAL_CHANNEL, origin: PHYSICAL_ORIGIN,
+    previousSourceSha: PHYSICAL_V4_SOURCE, previousArtifactId: PHYSICAL_V4_ARTIFACT,
+    previousArtifactDigest: PHYSICAL_V4_DIGEST
+  };
+}
+
+function physicalReleaseProfile(pin) {
+  const current = pin?.receiptPath === PHYSICAL_V4_RECEIPT_PATH;
+  if (!current && pin?.receiptPath !== PHYSICAL_RECEIPT_PATH) return null;
+  const candidatePin = current ? currentPhysicalRolloverCandidatePin() : residualPhysicalRolloverCandidatePin();
+  return { ...candidatePin, candidatePin, sourceBaseHead: current ? PHYSICAL_V4_SOURCE : PHYSICAL_BASE,
+    profileName: current ? PHYSICAL_V4_PROFILE : PHYSICAL_PROFILE, requestVersion: current ? 29 : 28,
+    previousBuildRunId: current ? PHYSICAL_V4_BUILD : PHYSICAL_PREVIOUS_BUILD,
+    residualPreviousBuild: !current, expectedSiteFileCount: 224,
+    deniedSources: [...(current ? [PHYSICAL_V4_SOURCE] : []), PHYSICAL_BASE, 'cb3b8f5d505a53bfbafca80a9334d873d712d73e',
+      '478c045c168c2e1b80f28a94094f4dbbbfdf1f81', '60ac1ae2d765484ed40c820a942dcc0966385da7',
+      PHYSICAL_PREVIOUS_SOURCE, PHYSICAL_LIVE_SOURCE],
+    deniedBuilds: [...(current ? [PHYSICAL_V4_BUILD] : []), 45460310493, 45458031865, 45452721643, 45448470011,
+      PHYSICAL_PREVIOUS_BUILD, 45287432665] };
+}
+
 function technicalProfile(pin) {
-  return pin?.receiptPath === PHYSICAL_RECEIPT_PATH
-    ? { ...currentPhysicalRolloverCandidatePin(), sourceBaseHead: PHYSICAL_BASE, expectedSiteFileCount: 224,
-      deniedSources: [PHYSICAL_BASE, 'cb3b8f5d505a53bfbafca80a9334d873d712d73e', '478c045c168c2e1b80f28a94094f4dbbbfdf1f81',
-        '60ac1ae2d765484ed40c820a942dcc0966385da7', PHYSICAL_PREVIOUS_SOURCE, PHYSICAL_LIVE_SOURCE],
-      deniedBuilds: [45460310493, 45458031865, 45452721643, 45448470011, PHYSICAL_PREVIOUS_BUILD, 45287432665] }
-    : { ...technicalRolloverCandidatePin(), sourceBaseHead: TECHNICAL_BASE, expectedSiteFileCount: 223,
-      deniedSources: [TECHNICAL_OLD_SOURCE, TECHNICAL_PREVIOUS_SOURCE],
-      deniedBuilds: [44009981499, TECHNICAL_OLD_BUILD, TECHNICAL_PREVIOUS_BUILD] };
+  return physicalReleaseProfile(pin) || {
+    ...technicalRolloverCandidatePin(), sourceBaseHead: TECHNICAL_BASE, expectedSiteFileCount: 223,
+    deniedSources: [TECHNICAL_OLD_SOURCE, TECHNICAL_PREVIOUS_SOURCE],
+    deniedBuilds: [44009981499, TECHNICAL_OLD_BUILD, TECHNICAL_PREVIOUS_BUILD] };
 }
 
 function validateTechnicalRolloverCandidate(p) {
-  if (p?.previewRollover?.receiptPath === PHYSICAL_RECEIPT_PATH) {
-    const profile = technicalProfile(p.previewRollover);
-    assert.deepEqual(p.previewRollover, currentPhysicalRolloverCandidatePin(), 'I66_TECHNICAL_ROLLOVER_CANDIDATE_PIN_DRIFT');
+  const profile = physicalReleaseProfile(p?.previewRollover);
+  if (profile) {
+    assert.deepEqual(p.previewRollover, profile.candidatePin, 'I66_TECHNICAL_ROLLOVER_CANDIDATE_PIN_DRIFT');
     assert.equal(p.previewChannelId, profile.channel, 'I66_TECHNICAL_ROLLOVER_CANDIDATE_CHANNEL_DRIFT');
     assert.equal(p.previewUrl, profile.origin, 'I66_TECHNICAL_ROLLOVER_CANDIDATE_ORIGIN_DRIFT');
     technicalFail(/^[a-f0-9]{40}$/.test(p.sourceSha || '') && !profile.deniedSources.includes(p.sourceSha), 'NEW_SOURCE_REQUIRED');
     technicalFail(Number.isSafeInteger(p.buildRunId) && p.buildRunId > 0 && !profile.deniedBuilds.includes(p.buildRunId), 'NEW_BUILD_RUN_REQUIRED');
-    return currentPhysicalRolloverCandidatePin();
+    return profile.candidatePin;
   }
   assert.deepEqual(p?.previewRollover, technicalRolloverCandidatePin(), 'I66_TECHNICAL_ROLLOVER_CANDIDATE_PIN_DRIFT');
   assert.equal(p.previewChannelId, TECHNICAL_CHANNEL, 'I66_TECHNICAL_ROLLOVER_CANDIDATE_CHANNEL_DRIFT');
@@ -190,8 +220,8 @@ function validateTechnicalRolloverCandidate(p) {
 }
 
 function validateTechnicalAuthorization(control, receiptText) {
-  if (control?.currentTechnicalPreviewRollover?.receiptPath === PHYSICAL_RECEIPT_PATH ||
-      (typeof receiptText === 'string' && technicalSha(receiptText) === PHYSICAL_RECEIPT_SHA256))
+  if (physicalReleaseProfile(control?.currentTechnicalPreviewRollover) ||
+      (typeof receiptText === 'string' && [PHYSICAL_RECEIPT_SHA256, PHYSICAL_V4_RECEIPT_SHA256].includes(technicalSha(receiptText))))
     return validatePhysicalAuthorization(control, receiptText);
   technicalFail(typeof receiptText === 'string' && technicalSha(receiptText) === TECHNICAL_RECEIPT_SHA256, 'EXACT_RECEIPT_BYTES_REQUIRED');
   const a = JSON.parse(receiptText), c = control || {};
@@ -219,15 +249,16 @@ function validateTechnicalAuthorization(control, receiptText) {
 }
 
 function validatePhysicalAuthorization(control, receiptText) {
-  technicalFail(typeof receiptText === 'string' && technicalSha(receiptText) === PHYSICAL_RECEIPT_SHA256, 'EXACT_RECEIPT_BYTES_REQUIRED');
+  const profile = physicalReleaseProfile(control?.currentTechnicalPreviewRollover);
+  technicalFail(profile && typeof receiptText === 'string' && technicalSha(receiptText) === profile.receiptSha256, 'EXACT_RECEIPT_BYTES_REQUIRED');
   const a = JSON.parse(receiptText), c = control || {};
   assert.deepEqual(c.currentTechnicalPreviewRollover,
-    { receiptPath: PHYSICAL_RECEIPT_PATH, receiptSha256: PHYSICAL_RECEIPT_SHA256 }, 'I66_TECHNICAL_ROLLOVER_CONTROL_PIN_DRIFT');
+    { receiptPath: profile.receiptPath, receiptSha256: profile.receiptSha256 }, 'I66_TECHNICAL_ROLLOVER_CONTROL_PIN_DRIFT');
   assert.equal(c.schema, 'GRAVICENTRA_I6_6_SINGLE_ARTIFACT_RELEASE_TRANSPORT_V1');
   assert.equal(c.gate, 'I6.6'); assert.equal(c.historicalClosedGate, 'B4-007');
   assert.equal(c.status, 'OPERATIONAL_EXACT_LIVE_ACCEPTED_LOCKED', 'I66_TECHNICAL_ROLLOVER_PHYSICAL_GATE_REQUIRED');
   const request = c.frontendPreviewRequest;
-  assert.equal(request?.version, 28, 'I66_TECHNICAL_ROLLOVER_SUCCESSOR_REQUEST_REQUIRED');
+  assert.equal(request?.version, profile.requestVersion, 'I66_TECHNICAL_ROLLOVER_SUCCESSOR_REQUEST_REQUIRED');
   assert.equal(request.mode, 'A13_A14_BALANCE_COMPOSITE_ARTIFACT_HOSTING_PREVIEW_ONLY');
   assert.equal(request.previousReceiptBlob, '11fdb3bee494541513482666d6215f45cbad0567');
   for (const key of ['realDataWritesAllowed', 'realCustomerWritesAllowed', 'liveDeployAuthorized',
@@ -240,8 +271,8 @@ function validatePhysicalAuthorization(control, receiptText) {
   assert.equal(c.scopedBackendPreviewI66, undefined, 'I66_TECHNICAL_ROLLOVER_PENDING_BACKEND_AUTHORITY');
   assert.equal(c.operationalReleaseCandidate, undefined, 'I66_TECHNICAL_ROLLOVER_PENDING_LIVE_AUTHORITY');
   assert.equal(a.schema, 'GI_I66_CURRENT_TECHNICAL_PREVIEW_ROLLOVER_V1');
-  assert.equal(a.profile, PHYSICAL_PROFILE); assert.equal(a.phase, 'PREVIEW');
-  assert.equal(a.sourceBaseHead, PHYSICAL_BASE);
+  assert.equal(a.profile, profile.profileName); assert.equal(a.phase, 'PREVIEW');
+  assert.equal(a.sourceBaseHead, profile.sourceBaseHead);
   assert.equal(a.channel.id, PHYSICAL_CHANNEL); assert.equal(a.channel.origin, PHYSICAL_ORIGIN);
   assert.equal(a.executionAuthority.newLegalConsentGrantUsedForHosting, false);
   for (const value of Object.values(a.constraints)) assert.equal(value, true, 'I66_TECHNICAL_ROLLOVER_CONSTRAINT_REQUIRED');
@@ -254,14 +285,23 @@ function validatePhysicalAuthorization(control, receiptText) {
   assert.equal(live.sourceSha, PHYSICAL_LIVE_SOURCE); assert.equal(live.expectedSiteFileCount, 224);
   assert.equal(live.liveWorkflowPath, PHYSICAL_LIVE_WORKFLOW);
   assert.deepEqual(live.origins, TECHNICAL_LIVE_ORIGINS);
-  assert.equal(a.previousCandidate.sourceSha, PHYSICAL_PREVIOUS_SOURCE);
-  assert.equal(a.previousCandidate.buildRunId, PHYSICAL_PREVIOUS_BUILD);
-  assert.equal(a.previousCandidate.artifactId, PHYSICAL_PREVIOUS_ARTIFACT);
-  assert.equal(a.previousCandidate.artifactDigest, PHYSICAL_PREVIOUS_DIGEST);
+  assert.equal(a.previousCandidate.sourceSha, profile.previousSourceSha);
+  assert.equal(a.previousCandidate.buildRunId, profile.previousBuildRunId);
+  assert.equal(a.previousCandidate.artifactId, profile.previousArtifactId);
+  assert.equal(a.previousCandidate.artifactDigest, profile.previousArtifactDigest);
   assert.equal(a.previousCandidate.expectedSiteFileCount, 224);
-  assert.equal(a.previousCandidate.backupOnlyPostDeployFailure.purpose, 'RECOVERABLE_UNACCEPTED_PREVIEW_BACKUP_ONLY');
-  assert.equal(a.previousCandidate.backupOnlyPostDeployFailure.neverEligibleForLive, true);
-  assert.equal(a.previousCandidate.backupOnlyPostDeployFailure.buildConclusionMustRemainFailure, true);
+  if (profile.residualPreviousBuild) {
+    assert.equal(a.previousCandidate.backupOnlyPostDeployFailure.purpose, 'RECOVERABLE_UNACCEPTED_PREVIEW_BACKUP_ONLY');
+    assert.equal(a.previousCandidate.backupOnlyPostDeployFailure.neverEligibleForLive, true);
+    assert.equal(a.previousCandidate.backupOnlyPostDeployFailure.buildConclusionMustRemainFailure, true);
+  } else {
+    assert.equal(a.previousCandidate.backupOnlyPostDeployFailure, undefined);
+    assert.equal(a.previousCandidate.buildRunAttempt, 1);
+    assert.equal(a.previousCandidate.wholeBuildConclusionRequired, 'success');
+    assert.equal(a.previousCandidate.purpose, 'RECOVERABLE_UNACCEPTED_PREVIEW_BACKUP_ONLY');
+    assert.equal(a.previousCandidate.productAccepted, false);
+    assert.equal(a.previousCandidate.releaseEligibleByThisReceipt, false);
+  }
   assert.equal(a.expectedNewSiteFileCount, 224);
   return a;
 }
@@ -319,7 +359,7 @@ function validateTechnicalChannels(control, receiptText, inventory) {
   assert.equal(target.createTime, a.channel.createdAt, 'I66_TECHNICAL_ROLLOVER_CREATE_TIME_DRIFT');
   assert.equal(technicalVersion(target), a.channel.expectedVersion, 'I66_TECHNICAL_ROLLOVER_PREVIEW_VERSION_DRIFT');
   assert.equal(technicalVersion(live), a.protectedLive.version, 'I66_TECHNICAL_ROLLOVER_LIVE_VERSION_DRIFT');
-  if (a.profile === PHYSICAL_PROFILE) {
+  if (isPhysicalProfile(a)) {
     validateTechnicalInventoryPreimage(inventory, a.freshInventoryEvidence);
     technicalFail(Number.isFinite(Date.parse(target.expireTime || target.expirationTime)) &&
       Date.parse(target.expireTime || target.expirationTime) > Date.now(), 'PREVIOUS_PREVIEW_EXPIRED');
@@ -351,7 +391,7 @@ function technicalMetadataDifferences(first, final) {
 // https://firebase.google.com/docs/reference/hosting/rest/v1beta1/sites.versions
 function validateTechnicalAfterInventories(initial, first, final, authorization) {
   const a = authorization;
-  assert.equal(a?.profile, PHYSICAL_PROFILE, 'I66_TECHNICAL_ROLLOVER_AFTER_PROFILE_DENIED');
+  technicalFail(isPhysicalProfile(a), 'AFTER_PROFILE_DENIED');
   const inventories = [initial, first, final], selections = [];
   for (const inventory of inventories) {
     const rows = technicalRows(inventory), ids = rows.map(technicalChannelIdentity);
@@ -642,7 +682,7 @@ function technicalEnvironment(env) {
   execFileSync('git', ['merge-base', '--is-ancestor', profile.sourceBaseHead, env.SOURCE_SHA], { cwd: repo, stdio: 'pipe' });
   const receiptText = fs.readFileSync(path.join(repo, profile.receiptPath), 'utf8');
   const authorization = validateTechnicalAuthorization(control, receiptText);
-  if (authorization.profile === PHYSICAL_PROFILE) {
+  if (isPhysicalProfile(authorization)) {
     const physical = require('./gravicentra-i66-frontend-control.cjs');
     const readFileSync = (relative, encoding) => fs.readFileSync(path.join(repo, relative), encoding);
     const head = physical.physicalGuard(JSON.parse(readFileSync(physical.P.cp, 'utf8')),
@@ -807,9 +847,9 @@ function technicalRuntimeIo(env, root, authorization) {
       const run = await json('runs/' + a.protectedLive.liveRunId);
       assert.equal(run.id, a.protectedLive.liveRunId);
       assert.equal(run.head_branch, TECHNICAL_BRANCH);
-      assert.equal(run.path, a.profile === PHYSICAL_PROFILE ? PHYSICAL_LIVE_WORKFLOW
+      assert.equal(run.path, isPhysicalProfile(a) ? PHYSICAL_LIVE_WORKFLOW
         : '.github/workflows/gravicentra-i66-r11-renewal-drive-frontend-exact-live-promotion.yml');
-      if (a.profile === PHYSICAL_PROFILE) {
+      if (isPhysicalProfile(a)) {
         assert.equal(run.head_sha, a.protectedLive.liveRunHeadSha);
         assert.equal(run.run_attempt, a.protectedLive.liveRunAttempt);
       }
@@ -910,7 +950,7 @@ async function runtimeFinishTechnicalRollover(env = process.env) {
     technicalWriteJson(path.join(root, 'inventory-after-final.json'), finalInventory);
     report.finalInventorySha256 = technicalSha(fs.readFileSync(path.join(root, 'inventory-after-final.json')));
     report.inventoryMetadataDifferences = technicalMetadataDifferences(after, finalInventory);
-    if (a.profile === PHYSICAL_PROFILE) report.inventoryComparison = validateTechnicalAfterInventories(initial, after, finalInventory, a);
+    if (isPhysicalProfile(a)) report.inventoryComparison = validateTechnicalAfterInventories(initial, after, finalInventory, a);
     else assert.deepEqual(technicalOrderedRows(finalInventory), technicalOrderedRows(after), 'I66_TECHNICAL_ROLLOVER_CONCURRENT_AFTER_CHANGE');
     technicalWriteJson(path.join(root, 'inventory-after.json'), finalInventory);
     report.hostingVersion = technicalVersion(target[0]); report.totalChannels = rows.length;

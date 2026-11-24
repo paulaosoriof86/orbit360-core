@@ -440,19 +440,25 @@ jobs:
           }
           const candidates=[
             path.join(process.env.RUNNER_TEMP,'gravicentra-i66-advisor-payables-signed-uat-preview.json'),
-            process.env.I66_PACKAGE_ROOT?path.join(process.env.I66_PACKAGE_ROOT,'evidence','i66-proposal-application-signed-uat-preview.json'):null
+            process.env.I66_PACKAGE_ROOT?path.join(process.env.I66_PACKAGE_ROOT,'evidence','i66-proposal-application-signed-uat-preview.json'):null,
+            path.join(process.env.RUNNER_TEMP,'gi-i66-direct-forms-preview.json')
           ].filter(Boolean);
           const source=process.env.SOURCE_SHA,workflowRunId=Number(process.env.GITHUB_RUN_ID);
           const safe={schema:'I6_6_PREVIEW_DIAGNOSTIC_ONLY_V1',status:'FAILED_NOT_ACCEPTED',runId:Number.isSafeInteger(workflowRunId)&&workflowRunId>0?workflowRunId:null,
             sourceSha:typeof source==='string'&&source.length===40&&/^[a-f0-9]{40}$/.test(source)?source:null,reports:[],reportAvailability:[]};
           if(!process.env.I66_PACKAGE_ROOT)safe.reportAvailability.push({owner:'PROPOSAL',status:'REPORT_PATH_UNAVAILABLE'});
           for(const file of candidates){
-            const owner=path.basename(file)==='i66-proposal-application-signed-uat-preview.json'?'PROPOSAL':'ADVISOR';
+            const owner=path.basename(file)==='i66-proposal-application-signed-uat-preview.json'?'PROPOSAL':
+              path.basename(file)==='gi-i66-direct-forms-preview.json'?'DIRECT_FORMS':'ADVISOR';
             if(!fs.existsSync(file)){safe.reportAvailability.push({owner,status:'REPORT_NOT_FOUND'});continue;}
             let r;
             try{const bytes=fs.readFileSync(file,'utf8');if(bytes.length>4194304)throw Error('REPORT_BOUND');r=JSON.parse(bytes);if(!r||typeof r!=='object'||Array.isArray(r))throw Error('REPORT_SHAPE');}
             catch{safe.reportAvailability.push({owner,status:'REPORT_UNREADABLE'});continue;}
             safe.reportAvailability.push({owner,status:'REPORT_CAPTURED'});const out={owner};
+            if(owner==='DIRECT_FORMS'){
+              const {safeDirectFormsDiagnosticReport}=require('./tools/gravicentra-i6-6-carlos-paula-live-direct-renewal-synthetic-uat.cjs');
+              safe.reports.push(safeDirectFormsDiagnosticReport(r));continue;
+            }
             if(path.basename(file)==='i66-proposal-application-signed-uat-preview.json'){
               const {safeProposalDiagnosticReport}=require('./tools/gravicentra-i6-6-proposal-uat-diagnostics.cjs');
               safe.reports.push(safeProposalDiagnosticReport(r));continue;

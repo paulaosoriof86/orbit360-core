@@ -49,6 +49,56 @@ function synchronizeExecutionProgress(progress){
   }
   return projection;
 }
+function assertRetiredReleaseContinuation(control,progress){
+  // Scope this check to active execution fields. Evidence text and archived
+  // receipts remain immutable, even when they describe a once-valid next step.
+  const retired=[progress.latestImmutableBuild,progress.immediateExecution?.latestImmutableBuild]
+    .filter(row=>row&&row.liveAccepted===false&&row.successorNeedsNewOwnerPinnedBuild===true&&
+      /NOT_RELEASE_ELIGIBLE/.test(String(row.status||'')));
+  if(!retired.length)return;
+  const fields=[];
+  const add=(name,value)=>{if(typeof value==='string')fields.push([name,value]);};
+  add('next',progress.next);
+  for(const row of (progress.shockObjectives?.items||[]).filter(row=>row.passForShock!==true))add('objective.'+row.id,row.next);
+  for(const row of progress.remainingExecutionLanes||[])add('remaining.'+row.id,row.next);
+  for(const [i,value] of (progress.updateDiscipline?.nextIncomplete||[]).entries())add('nextIncomplete.'+i,value);
+  for(const row of progress.parallelLanes||[])add('parallel.'+row.id,row.next);
+  for(const [name,value] of Object.entries({immediate:progress.immediateExecution?.next,financialFocal:progress.immediateExecution?.financialFocal,
+    frontendBalance:progress.frontendBalanceCorrection?.next,successorRelease:progress.currentSuccessorPlan?.releaseNext,
+    successorFinance:progress.currentSuccessorPlan?.financeNext,successorLeads:progress.currentSuccessorPlan?.leadsNext,
+    statements:progress.newStatementSourceWork20261124?.next,make:progress.parallelMakeIngressWork20261124?.next,
+    prospectiveLeads:progress.prospectiveLeadPriority?.next,control:control.nextAction,cursor:control.i66ActiveRecoveryCursor?.next,
+    cursorAction:control.i66ActiveRecoveryCursor?.nextAction,currentWork:control.i66OperationalContinuation20261115?.currentWork,
+    nextSourceWork:control.i66OperationalContinuation20261115?.nextSourceWork}))add(name,value);
+  const escape=value=>String(value).replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+  for(const target of retired){
+    const version=Number(String(target.receiptPath||'').match(/_V([1-9][0-9]*)_IMMUTABLE_BUILD_RECEIPT_/)?.[1])||null;
+    const pending=progress.pendingImmutableBuild;
+    if(pending){
+      for(const key of ['sourceSha','buildId','artifactId','artifactDigest'])
+        assert.ok(target[key]===undefined||pending[key]!==target[key],'I66_PROGRESS_RETIRED_PENDING_TARGET_'+key);
+      if(version)assert.notEqual(pending.version,version,'I66_PROGRESS_RETIRED_PENDING_VERSION');
+      assert.notEqual(pending.receipt?.path,target.receiptPath,'I66_PROGRESS_RETIRED_PENDING_RECEIPT');
+    }
+    const identities=['sourceSha','buildId','buildRunId','artifactId','artifactDigest'].map(k=>target[k]).filter(x=>x!==undefined&&x!==null).map(escape);
+    if(version)identities.push('\\b(?:v|preview)\\s*'+version+'\\b');
+    if(!identities.length)continue;
+    const identity=new RegExp(identities.join('|'),'i');
+    for(const [name,text] of fields){
+      for(const clause of text.split(/[.;,\n]|\b(?:but|pero|sin embargo)\b/i)){
+        if(!identity.test(clause))continue;
+        const actions=/\b(?:execute|executed|executing|rerun|re-run|run|retry|replay|promote|promoted|promoting|publish|published|deploy|deployed|ejecutar|ejecuta|ejecute|promover|promueve|publicar|publica|desplegar|reintentar|reintenta)\b/ig;
+        for(const action of clause.matchAll(actions)){
+          const prefix=clause.slice(0,action.index);
+          // An explicit prohibition is not an instruction to retry. Separate
+          // sentences/clauses still detect an appended contradictory command.
+          if(/\b(?:do not|don't|must not|never|no|nunca|sin)\b/i.test(prefix))continue;
+          assert.fail('I66_PROGRESS_RETIRED_NEXT_TARGET_'+name);
+        }
+      }
+    }
+  }
+}
 const observerTargetKeys=['generation','sourceSha','buildId','artifactId','artifactDigest','hostingVersion'];
 const observerCursorKeys=cursor=>Object.keys(cursor).filter(key=>/^(lastObserverResults|lastFiveRoleMatrix|lastPerformance|lastFinancialUiReadback)/.test(key));
 const observerSummaryKeys=progress=>Object.keys(progress).filter(key=>/^current(SignedRoleMatrix|LivePerformance)\d{8}$/.test(key));
@@ -202,6 +252,7 @@ function assertExecutionProgress(control,progress,io){
   const projection=executionProgressProjection(progress),cursor=control.i66ActiveRecoveryCursor||{};
   assert.deepEqual(progress.remainingExecutionLanes,projection.remainingExecutionLanes,'I66_PROGRESS_REMAINING_LANES_DRIFT');
   assert.deepEqual(progress.updateDiscipline?.nextIncomplete,projection.nextIncomplete,'I66_PROGRESS_NEXT_INCOMPLETE_DRIFT');
+  assertRetiredReleaseContinuation(control,progress);
   const observations=progress.postAcceptanceObserverResults;
   if(!observations&&!cursor.lastObserverResultsReceipt){
     assert.equal(observerSummaryKeys(progress).length,0,'I66_PROGRESS_CURRENT_SUMMARY_WITHOUT_OBSERVER_RECEIPT');
@@ -678,6 +729,6 @@ async function verifyReadonlyObserver(resolution,{env=process.env,api,readMarker
     sourceQaVerified,remoteControlHead:remoteHead,target:resolution.target,readOnly:true,
     productWrites:0,syntheticWrites:0,releaseTransitions:0,hostedMarkersVerified:origins};
 }
-module.exports={P,genName,serial,blob,physicalGuard,closeFiles,executionSnapshot,executionProgressProjection,synchronizeExecutionProgress,archiveExecutionObservers,assertExecutionProgress,
+module.exports={P,genName,serial,blob,physicalGuard,closeFiles,executionSnapshot,executionProgressProjection,synchronizeExecutionProgress,archiveExecutionObservers,assertExecutionProgress,assertRetiredReleaseContinuation,
   ownerPlanContinuationProjection,synchronizeOwnerPlanContinuation,assertOwnerPlanContinuation,assertActiveReleaseProgress,
   compositeReceipt,closeCompositeFiles,READONLY_PROFILES,readonlyObserverPaths,readonlyObserverTarget,resolveReadonlyObserver,verifyReadonlyObserver};

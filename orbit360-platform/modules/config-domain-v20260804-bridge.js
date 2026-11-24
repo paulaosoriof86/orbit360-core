@@ -152,7 +152,8 @@
       ${toggle('rc-negative', cfg.holdOnNegative !== false, 'Líneas negativas a validación')}
       ${toggle('rc-reversal', cfg.holdOnReversal !== false, 'Reversos a validación')}
       ${toggle('rc-duplicate', cfg.holdOnDuplicate !== false, 'Duplicados a validación')}
-      ${field('Tolerancia de monto', `<input id="rc-amount" type="number" step="0.01" min="0" class="o-sel" value="${Number(cfg.amountTolerance == null ? 0.02 : cfg.amountTolerance)}" style="width:130px">`)}
+      <div class="cfg-note" data-gtq-documentary-rounding="1"><b>Guatemala / GTQ: Q0.05.</b> Tolerancia para variaciones documentales de todas las aseguradoras. Se conservan los importes de cada fuente; los pagos se aplican por su importe real y moneda exacta.</div>
+      ${field('Tolerancia documental general', `<input id="rc-amount" type="number" step="0.01" min="0" class="o-sel" value="${Number(cfg.amountTolerance == null ? 0.02 : cfg.amountTolerance)}" style="width:130px">`)}
       ${field('Tolerancia de fecha', `<input id="rc-days" type="number" min="0" class="o-sel" value="${Number(cfg.dateToleranceDays == null ? 7 : cfg.dateToleranceDays)}" style="width:130px"> días`)}
       <div style="display:flex;justify-content:flex-end;margin-top:14px"><button class="btn primary" id="rc-save">Guardar reglas</button></div>`;
 

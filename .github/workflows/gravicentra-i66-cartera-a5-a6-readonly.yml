@@ -12,6 +12,12 @@ on:
       - artifacts/orbit360-recovery/release-control/I6_6_CARTERA_A5_A6_SOURCE_EXACT_20261112.json
       - artifacts/orbit360-recovery/release-control/I6_6_A5_A6_INSURER_ISSUED_INSTALLMENT_SCHEDULE_LIVE_DIFF_20261112.json
   workflow_dispatch:
+    inputs:
+      readonly_reference_query:
+        description: Optional bounded private source-reference JSON; read-only, never an apply plan
+        required: false
+        type: string
+        default: ''
 permissions:
   contents: read
 concurrency:

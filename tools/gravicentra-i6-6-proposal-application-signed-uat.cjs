@@ -45,8 +45,209 @@ function intakeUiRequest(request,fixture,cfg){
  return request.method()==='POST'&&request.url()==='https://us-central1-'+PROJECT+'.cloudfunctions.net/'+name&&body?.data?.operation==='intake_source_run'&&
   body.data.tenantId===TENANT&&norm(body.data.activeRole)==='direccion'&&digest(body.data.payload)===digest(fixture.payload);
 }
+const DOCUMENTARY_PAYMENT_QA_PROFILE='I66_R51_DOCUMENTARY_PAYMENT_UI_SIGNED_QA_V1';
+const DOCUMENTARY_PAYMENT_QA_RECEIPT='artifacts/orbit360-recovery/release-control/I6_6_R51_DOCUMENTARY_PAYMENT_FINANCIAL_RECOVERY_SOURCE_20261124.json';
+const DOCUMENTARY_PAYMENT_SOURCES=Object.freeze(['commission_statement','insurer_statement']);
+function validateDocumentaryPaymentQaBinding(binding){
+ assert.deepEqual(Object.keys(binding||{}).sort(),['profile','receiptBlob','receiptPath'],'I66_DOCUMENTARY_QA_BINDING_REQUIRED');
+ assert.equal(binding.profile,DOCUMENTARY_PAYMENT_QA_PROFILE);assert.equal(binding.receiptPath,DOCUMENTARY_PAYMENT_QA_RECEIPT);
+ assert.match(binding.receiptBlob||'',/^[a-f0-9]{40}$/,'I66_DOCUMENTARY_QA_RECEIPT_PIN_REQUIRED');return binding;
+}
+function documentaryPaymentFixture(nonce,sourceType){
+ assert.match(nonce,/^[a-z0-9_]{12,60}$/,'I66_DOCUMENTARY_QA_NONCE_REQUIRED');
+ assert.ok(DOCUMENTARY_PAYMENT_SOURCES.includes(sourceType),'I66_DOCUMENTARY_QA_SOURCE_DENIED');
+ const key='b3004qa_i66_doc_'+(sourceType==='commission_statement'?'commission':'insurer')+'_'+nonce;
+ const ids={client:key+'_client',policy:key+'_policy',receipt:key+'_receipt',portfolio:key+'_portfolio'};
+ const requestId=key+'_request',eventId='payevt_'+hash(TENANT+'|'+ids.receipt+'|'+requestId).slice(0,28);
+ const cobroId='cob_'+hash(TENANT+'|receipt|'+ids.receipt).slice(0,28),qaRunId=key+'_run';
+ const mark={tenantId:TENANT,__syntheticQa:true,qaRunId},amount=sourceType==='commission_statement'?173.23:67.89;
+ const paidDate=sourceType==='commission_statement'?'2026-11-12':'2026-11-13',sourceRef='drive:qa_documentary_original_'+nonce+'_'+(sourceType==='commission_statement'?'c':'i');
+ const payload={receiptId:ids.receipt,sourceType,amount,paidDate,actualPaidDateEvidence:true,evidenceId:key+'_evidence',sourceRef,
+  evidenceType:sourceType==='commission_statement'?'COMMISSION_STATEMENT_INSTALLMENT_N':'INSURER_CONFIRMED_PAID_STATEMENT',
+  evidenceAsOfDate:'2026-11-15',paymentSupportDocumentRef:sourceRef};
+ const ghost='b3004qa_no_real_advisor';
+ const seed={
+  client:{id:ids.client,...mark,pais:'GT',asesorId:ghost,nombre:'I6.6 pago documental sintético, sin destinatario real'},
+  policy:{id:ids.policy,...mark,clienteId:ids.client,asesorId:ghost,pais:'GT',moneda:'GTQ',estado:'Vigente',numero:'QA-DOC-'+nonce,
+   vigenciaDesde:'2026-01-01',vigenciaHasta:'2027-01-01'},
+  receipt:{id:ids.receipt,...mark,polizaId:ids.policy,clienteId:ids.client,asesorId:ghost,pais:'GT',moneda:'GTQ',monto:amount,primaTotal:amount,
+   estado:'Pendiente',cuota:'1/1',vence:'2026-11-01'},
+  portfolio:{id:ids.portfolio,...mark,polizaId:ids.policy,clienteId:ids.client,reciboId:ids.receipt,asesorId:ghost,pais:'GT',moneda:'GTQ',
+   monto:amount,primaTotal:amount,estado:'Pendiente',carteraActiva:true}
+ };
+ return{ids,requestId,eventId,cobroId,qaRunId,payload,seed};
+}
+function documentaryPaymentRequest(request,fixture,cfg){
+ let body;try{body=request.postDataJSON();}catch{return false;}
+ const endpoint='https://us-central1-'+PROJECT+'.cloudfunctions.net/orbit360CobrosReconciliationCommand'+(cfg.phase==='PREVIEW'?'Preview':'');
+ return request.method()==='POST'&&request.url()===endpoint&&body?.data?.tenantId===TENANT&&norm(body.data.activeRole)==='direccion'&&
+  body.data.operation==='apply_payment'&&body.data.requestId===fixture.requestId&&digest(body.data.payload)===digest(fixture.payload);
+}
+function assertDocumentaryPaymentOwned(kind,row,fixture,actor){
+ const {ids,seed,payload}=fixture;
+ assert.ok(row&&typeof row==='object','I66_DOCUMENTARY_QA_RESTORE_ROW_REQUIRED');
+ if(kind==='request'){
+  assert.equal(row.status,'committed');assert.equal(row.operation,'apply_payment');assert.equal(row.eventId,fixture.eventId);
+  for(const [field,value] of Object.entries({receiptId:ids.receipt,cobroId:fixture.cobroId,policyId:ids.policy,clientId:ids.client,amount:payload.amount}))assert.equal(row.result?.[field],value,'I66_DOCUMENTARY_QA_REQUEST_OWNERSHIP');
+  return;
+ }
+ if(kind==='event'){
+  assert.equal(row.tenantId,TENANT);assert.equal(row.eventId,fixture.eventId);assert.equal(row.requestId,fixture.requestId);
+  assert.equal(row.operation,'apply_payment');assert.equal(row.receiptId,ids.receipt);assert.equal(row.cobroId,fixture.cobroId);
+  assert.equal(row.actor?.uid,actor.uid,'I66_DOCUMENTARY_QA_EVENT_ACTOR');return;
+ }
+ assert.equal(row.tenantId,TENANT);assert.equal(row.pais,'GT');
+ if(kind==='client'||kind==='policy'){assert.deepEqual(row,seed[kind],'I66_DOCUMENTARY_QA_PARENT_CHANGED');return;}
+ assert.equal(row.id,kind==='cobro'?fixture.cobroId:ids[kind]);assert.equal(row.polizaId,ids.policy);assert.equal(row.clienteId,ids.client);
+ assert.equal(row.moneda,'GTQ');assert.equal(row.monto,payload.amount,'I66_DOCUMENTARY_QA_AMOUNT_CHANGED');
+ if(kind==='cobro'){
+  assert.equal(row.reciboId,ids.receipt);assert.equal(row.updatedByUid,actor.uid);assert.equal(row.paymentState,'PAID_DIRECT');
+  assert.equal(row.applicationState,'APPLIED_DIRECT');assert.equal(row.sourceRef,payload.sourceRef);assert.equal(row.evidenceId,payload.evidenceId);
+ }else{
+  assert.equal(row.__syntheticQa,true);assert.equal(row.qaRunId,fixture.qaRunId);
+  if(kind==='portfolio')assert.equal(row.reciboId,ids.receipt);
+ }
+}
+function assertDocumentaryPaymentReadback(rows,fixture,actor){
+ for(const [kind,row] of Object.entries(rows))assertDocumentaryPaymentOwned(kind,row,fixture,actor);
+ for(const kind of ['receipt','portfolio','cobro']){
+  const row=rows[kind];
+  assert.equal(row.estado,'Pagado');assert.equal(row.paymentState,'PAID_DIRECT');assert.equal(row.applicationState,'APPLIED_DIRECT');
+  assert.equal(row.paidDate||row.fechaPago,fixture.payload.paidDate);
+  if(kind!=='portfolio'){
+   assert.equal(row.evidenceId,fixture.payload.evidenceId);assert.equal(row.evidenceType,fixture.payload.evidenceType);assert.equal(row.sourceRef,fixture.payload.sourceRef);
+   assert.equal(row.paymentSupportDocumentRef,fixture.payload.sourceRef);assert.equal(row.directOrInferred,'DIRECT');
+  }
+  for(const field of ['applicationDate','invoiceDate','invoiceNumber','paymentMethod'])assert.ok(row[field]===undefined||row[field]==='','I66_DOCUMENTARY_QA_OPTIONAL_FACT_INVENTED');
+ }
+ assert.equal(rows.request.payloadDigest,rows.event.payloadDigest);assert.equal(digest(rows.request.result),rows.event.resultDigest);
+}
+function validateDocumentaryPaymentUiEvidence(proof,{phase,sourceSha,buildId,binding}){
+ validateDocumentaryPaymentQaBinding(binding);
+ assert.deepEqual(Object.keys(proof||{}).sort(),['artifactBytesExact','authOrMembershipMutations','binding','buildId','cases','cleanup','externalMessages','phase','profile','realCustomerWrites','realFinancialWrites','role','sourceSha','status'].sort(),'I66_DOCUMENTARY_QA_PROOF_SHAPE');
+ assert.equal(proof.profile,DOCUMENTARY_PAYMENT_QA_PROFILE);assert.equal(proof.status,'PASS');assert.equal(proof.phase,phase);
+ assert.equal(proof.sourceSha,sourceSha);assert.equal(proof.buildId,buildId);assert.deepEqual(proof.binding,binding);assert.equal(proof.role,'direccion');
+ assert.equal(proof.artifactBytesExact,true);
+ for(const field of ['realCustomerWrites','realFinancialWrites','externalMessages','authOrMembershipMutations'])assert.equal(proof[field],0);
+ assert.deepEqual(proof.cleanup,{status:'PASS',remaining:0,removedOwnedTargets:14});
+ assert.deepEqual(proof.cases.map(c=>c.sourceType),DOCUMENTARY_PAYMENT_SOURCES);
+ for(const row of proof.cases){
+  assert.deepEqual(Object.keys(row).sort(),['beforeDigest','afterDigest','sourceType','normalUiRequest','normalUiResponse','signedActorPreserved','amountDateSourcePreserved',
+   'readbackAfterReload','canonicalSameRequestReplay','replayDataAndUpdateTimesUnchanged','replayAdditionalPayments','paymentsAfter','noticeDisabled','beforePaymentAbsent','receiptPortfolioCobroExact'].sort());
+  for(const field of ['beforeDigest','afterDigest'])assert.match(row[field],/^[a-f0-9]{64}$/);
+  assert.notEqual(row.beforeDigest,row.afterDigest);
+  for(const field of ['normalUiRequest','normalUiResponse','signedActorPreserved','amountDateSourcePreserved','readbackAfterReload','canonicalSameRequestReplay',
+   'replayDataAndUpdateTimesUnchanged','noticeDisabled','beforePaymentAbsent','receiptPortfolioCobroExact'])assert.equal(row[field],true,'I66_DOCUMENTARY_QA_MISSING_'+field);
+  assert.equal(row.replayAdditionalPayments,0);assert.equal(row.paymentsAfter,1);
+ }
+ return{profile:DOCUMENTARY_PAYMENT_QA_PROFILE,status:'PASS',phase,sourceSha,buildId,receiptBlob:binding.receiptBlob,
+  sources:[...DOCUMENTARY_PAYMENT_SOURCES],cases:2,syntheticPayments:2,replayAdditionalPayments:0,realFinancialWrites:0,remaining:0,
+  proofDigest:'sha256:'+digest(proof)};
+}
+async function exerciseDocumentaryPayments({page,actor,cfg,tenant,item,nonce,binding,buildId},io={}){
+ validateDocumentaryPaymentQaBinding(binding);assert.equal(actor.role,'direccion');assert.ok(actor.uid);
+ const proof={profile:DOCUMENTARY_PAYMENT_QA_PROFILE,status:'HOLD',phase:cfg.phase,sourceSha:cfg.sourceSha,buildId,binding,role:'direccion',
+  artifactBytesExact:false,realCustomerWrites:0,realFinancialWrites:0,externalMessages:0,authOrMembershipMutations:0,cases:[],cleanup:{status:'HOLD',remaining:null,removedOwnedTargets:0}};
+ const readFile=io.readFileSync||fs.readFileSync,fetcher=io.fetch||fetch;
+ const legalReadiness=io.requireExistingLegalReadiness||require('./gravicentra-i6-6-carlos-paula-live-direct-renewal-synthetic-uat.cjs').requireExistingLegalReadiness;
+ assert.equal(typeof legalReadiness,'function','I66_DOCUMENTARY_QA_LEGAL_READINESS_OWNER_REQUIRED');
+ const bytes=readFile(path.join(cfg.packageRoot,'bundle/site/modules/cobros.js'));
+ const served=await fetcher(cfg.origin+'/modules/cobros.js',{redirect:'error',headers:{'cache-control':'no-cache'},signal:AbortSignal.timeout(30000)});
+ assert.equal(served.status,200);assert.equal(hash(Buffer.from(await served.arrayBuffer())),hash(bytes),'I66_DOCUMENTARY_QA_UI_ARTIFACT_DRIFT');proof.artifactBytesExact=true;
+ const targets=[];let failure=null,writerSettled=true,pageClosed=false;
+ const readSet=async refs=>Object.fromEntries(await Promise.all(Object.entries(refs).map(async([kind,ref])=>{
+  const s=await ref.get();if(s.exists)assert.ok(Number.isSafeInteger(s.updateTime?.seconds)&&Number.isSafeInteger(s.updateTime?.nanoseconds),'I66_DOCUMENTARY_QA_EXACT_VERSION_REQUIRED');
+  return[kind,{exists:s.exists,data:s.exists?s.data():null,updateTime:s.exists?String(s.updateTime.seconds)+':'+String(s.updateTime.nanoseconds):null}];
+ })));
+ const dataOf=s=>Object.fromEntries(Object.entries(s).map(([k,v])=>[k,v.data]));
+ try{
+  for(const sourceType of DOCUMENTARY_PAYMENT_SOURCES){
+   const fixture=documentaryPaymentFixture(nonce,sourceType),{ids}=fixture;
+   const refs={client:item('clientes',ids.client),policy:item('polizas',ids.policy),receipt:item('recibosEsperados',ids.receipt),portfolio:item('carteraPrimas',ids.portfolio),
+    cobro:item('cobros',fixture.cobroId),request:tenant.collection(cfg.phase==='PREVIEW'?'previewReconciliationRequests':'reconciliationRequests').doc(fixture.requestId),
+    event:tenant.collection(cfg.phase==='PREVIEW'?'previewReconciliationEvents':'reconciliationEvents').doc(fixture.eventId)};
+   for(const ref of Object.values(refs))assert.equal((await ref.get()).exists,false,'I66_DOCUMENTARY_QA_COLLISION');
+   for(const field of ['reciboId','receiptId'])assert.equal((await item('cobros','_').parent.where(field,'==',ids.receipt).limit(2).get()).size,0,'I66_DOCUMENTARY_QA_PAYMENT_PREEXISTED');
+   for(const [kind,ref] of Object.entries(refs))targets.push({kind,ref,fixture});
+   for(const [kind,row] of Object.entries(fixture.seed))await refs[kind].create(row);
+   const before=await readSet(refs);assert.equal(before.cobro.exists,false);assert.equal(before.request.exists,false);assert.equal(before.event.exists,false);
+   await page.goto(cfg.origin+'/#/cobros',{waitUntil:'commit',timeout:30000});
+   await page.waitForFunction(()=>!!window.Orbit?.productAppP0&&!!window.Orbit?.reconciliationDomain&&!!window.Orbit?.modules?.cobros,null,{timeout:30000});
+   const signed=await page.evaluate(async()=>{
+    const p=Orbit.productRuntimeBrowserProvidersP0;await p.initialize();const user=await p.waitForUser();const active=await Orbit.productAppP0.activate();
+    await Orbit.store._ensureCollections(['clientes','polizas','recibosEsperados','carteraPrimas','cobros']);
+    return{uid:user?.uid,role:Orbit.session.rol(),started:active?.started===true,endpoint:Orbit.reconciliationDomain.status()?.functionName};
+   });
+   assert.equal(signed.uid,actor.uid);assert.equal(norm(signed.role),'direccion');assert.equal(signed.started,true);
+   assert.equal(signed.endpoint,'orbit360CobrosReconciliationCommand'+(cfg.phase==='PREVIEW'?'Preview':''));
+   await legalReadiness(page);
+   await page.waitForFunction(x=>['clientes','polizas','recibosEsperados','carteraPrimas'].every((c,i)=>!!Orbit.store.get(c,x[i])),[ids.client,ids.policy,ids.receipt,ids.portfolio],{timeout:30000});
+   // Public modal entry; the actual mutation is exclusively the normal form button.
+   await page.evaluate(id=>Orbit.modules.cobros.aplicarPago(id),ids.receipt);
+   const form=page.locator('#cob-pay');await form.waitFor({state:'visible',timeout:10000});
+   await form.locator('#pm-source').selectOption(sourceType);
+   assert.equal(await form.locator('#pm-avisar').isChecked(),false);assert.equal(await form.locator('#pm-avisar').isDisabled(),true);
+   assert.equal(await form.locator('#pm-support-btn').isDisabled(),true);
+   await form.locator('#pm-source-ref').fill(fixture.payload.sourceRef);await form.locator('#pm-source-asof').fill(fixture.payload.evidenceAsOfDate);
+   await form.locator('details summary').click();await form.locator('#pm-evidence-id').fill(fixture.payload.evidenceId);await form.locator('#pm-request-id').fill(fixture.requestId);
+   await form.locator('#pm-paid').fill(fixture.payload.paidDate);await form.locator('#pm-source-reviewed').check();
+   for(const selector of ['#pm-app','#pm-invoice-date','#pm-invoice-number','#pm-metodo'])assert.equal(await form.locator(selector).inputValue(),'');
+   const waiting=page.waitForResponse(r=>documentaryPaymentRequest(r.request(),fixture,cfg),{timeout:30000}).then(response=>({response}),error=>({error}));
+   writerSettled=false;await form.locator('#pm-ok').click();const observed=await waiting;if(observed.error)throw observed.error;
+   const body=await observed.response.json();writerSettled=true;
+   assert.equal(observed.response.status(),200,'I66_DOCUMENTARY_QA_HTTP');const result=body.result??body.data;
+   assert.ok(result?.ok===true&&result.serverOwned===true&&result.idempotent===true&&result.portfolioUpdated===true);
+   assert.equal(result.receiptId,ids.receipt);assert.equal(result.cobroId,fixture.cobroId);assert.equal(result.amount,fixture.payload.amount);
+   assert.equal(result.paymentState,'PAID_DIRECT');assert.equal(result.applicationState,'APPLIED_DIRECT');assert.equal(result.paidDate,fixture.payload.paidDate);
+   await form.waitFor({state:'detached',timeout:10000});
+   const after=await readSet(refs);assertDocumentaryPaymentReadback(dataOf(after),fixture,actor);
+   assert.equal((await item('cobros','_').parent.where('reciboId','==',ids.receipt).get()).size,1,'I66_DOCUMENTARY_QA_DUPLICATE_PAYMENT');
+   await page.reload({waitUntil:'commit',timeout:30000});
+   await page.waitForFunction(()=>!!window.Orbit?.productAppP0&&!!window.Orbit?.reconciliationDomain,null,{timeout:30000});
+   const reloaded=await page.evaluate(async ids=>{
+    const p=Orbit.productRuntimeBrowserProvidersP0;await p.initialize();const user=await p.waitForUser();await Orbit.productAppP0.activate();
+    await Orbit.store._ensureCollections(['recibosEsperados','carteraPrimas','cobros']);
+    return{uid:user?.uid,role:Orbit.session.rol()};
+   },{...ids,cobro:fixture.cobroId});
+   await page.waitForFunction(x=>!!Orbit.store.get('recibosEsperados',x.receipt)&&!!Orbit.store.get('carteraPrimas',x.portfolio)&&!!Orbit.store.get('cobros',x.cobro),{...ids,cobro:fixture.cobroId},{timeout:30000});
+   Object.assign(reloaded,await page.evaluate(x=>({receipt:Orbit.store.get('recibosEsperados',x.receipt),portfolio:Orbit.store.get('carteraPrimas',x.portfolio),cobro:Orbit.store.get('cobros',x.cobro)}),{...ids,cobro:fixture.cobroId}));
+   assert.equal(reloaded.uid,actor.uid);assert.equal(norm(reloaded.role),'direccion');
+   for(const kind of ['receipt','portfolio','cobro']){assert.equal(reloaded[kind]?.paymentState,'PAID_DIRECT');assert.equal(reloaded[kind]?.applicationState,'APPLIED_DIRECT');assert.equal(reloaded[kind]?.paidDate||reloaded[kind]?.fechaPago,fixture.payload.paidDate);}
+   assert.deepEqual(await readSet(refs),after,'I66_DOCUMENTARY_QA_RELOAD_CHANGED_DATA');
+   const exact=observed.response.request().postDataJSON().data;
+   writerSettled=false;const replay=await page.evaluate(async x=>Orbit.reconciliationDomain.applyPayment(x.payload.receiptId,{requestId:x.requestId,payload:x.payload,reason:x.reason}),exact);writerSettled=true;
+   assert.equal(replay?.reused,true,'I66_DOCUMENTARY_QA_REPLAY_NOT_REUSED');assert.equal(replay.cobroId,fixture.cobroId);
+   assert.deepEqual(await readSet(refs),after,'I66_DOCUMENTARY_QA_REPLAY_MUTATED_DATA');
+   assert.equal((await item('cobros','_').parent.where('reciboId','==',ids.receipt).get()).size,1,'I66_DOCUMENTARY_QA_REPLAY_DUPLICATE');
+   proof.cases.push({sourceType,beforeDigest:digest(before),afterDigest:digest(after),normalUiRequest:true,normalUiResponse:true,signedActorPreserved:true,
+    amountDateSourcePreserved:true,readbackAfterReload:true,canonicalSameRequestReplay:true,replayDataAndUpdateTimesUnchanged:true,replayAdditionalPayments:0,
+    paymentsAfter:1,noticeDisabled:true,beforePaymentAbsent:true,receiptPortfolioCobroExact:true});
+  }
+ }catch(error){failure=error;}
+ finally{
+  // Close the signed page before any restore; no pending UI writer may race cleanup.
+  try{await page.close();pageClosed=true;}catch(error){failure=failure||error;}
+  let removed=0;const errors=[];
+  if(!writerSettled||!pageClosed){errors.push('WRITER_NOT_PROVEN_SETTLED');failure=failure||Error('I66_DOCUMENTARY_QA_WRITER_NOT_PROVEN_SETTLED');}
+  // An uncertain response retains the owned namespace for readback. Deleting it
+  // while a server command may still commit would create an orphaned payment.
+  for(const target of writerSettled&&pageClosed?targets.slice().reverse():[]){
+   try{const s=await target.ref.get();if(!s.exists)continue;assert.ok(s.updateTime,'I66_DOCUMENTARY_QA_CAS_REQUIRED');
+    assertDocumentaryPaymentOwned(target.kind,s.data(),target.fixture,actor);await target.ref.delete({lastUpdateTime:s.updateTime});
+    assert.equal((await target.ref.get()).exists,false,'I66_DOCUMENTARY_QA_RESTORE_READBACK');removed++;
+   }catch(error){errors.push('OWNERSHIP_OR_CAS_HOLD');failure=failure||error;}
+  }
+  const remaining=(await Promise.all(targets.map(t=>t.ref.get()))).filter(s=>s.exists).length;
+  proof.cleanup={status:errors.length||remaining?'HOLD':'PASS',remaining,removedOwnedTargets:removed};
+ }
+ if(failure){failure.documentaryPaymentEvidence=proof;throw failure;}proof.status='PASS';validateDocumentaryPaymentUiEvidence(proof,{...cfg,buildId,binding});return proof;
+}
 async function main(){
  const cfg=validateEnvironment(process.env);
+ const release=require('./gravicentra-i6-6-operational-release-candidate.cjs');
+ const candidate=release.candidateForPhase(JSON.parse(fs.readFileSync(release.CONTROL,'utf8')),cfg.phase.toLowerCase());
+ assert.equal(candidate.sourceSha,cfg.sourceSha,'I66_PROPOSAL_CANDIDATE_SOURCE_DRIFT');
+ const documentaryBinding=candidate.financialRecoveryQa===undefined?null:validateDocumentaryPaymentQaBinding(candidate.financialRecoveryQa);
  if(cfg.phase==='LIVE')assertDirectionLiveLegalAuthority({sourceSha:cfg.sourceSha});
  const reportPath=path.join(cfg.packageRoot,'evidence','i66-proposal-application-signed-uat-'+cfg.phase.toLowerCase()+'.json');
  const report={sourceSha:cfg.sourceSha,phase:cfg.phase,status:'HOLD',syntheticOnly:true,realControlUnchanged:false,checks:[],cleanup:{status:'HOLD',remaining:null},proposalDiagnostics:{prerequisites:null,calls:[]}};
@@ -374,7 +575,11 @@ async function main(){
   intakeDiagnosticsStop();intakeDiagnosticsStop=null;assert.ok(report.sourceIntake.consoleErrors===0&&report.sourceIntake.pageErrors===0&&report.sourceIntake.httpErrors===0,'I66_INTAKE_BROWSER_ERRORS');
   enter('SOURCE_INTAKE_COMPLETE');report.sourceIntake=safeSourceIntakeEvidence({...report.sourceIntake,status:'PASS',syntheticOnly:true,stage:'SOURCE_INTAKE_COMPLETE',sourceFileHashVerified:true,sourceMetadataDigestVerified:true,normalUiRequest:true,normalUiResponseConfirmed:true,
    readbackAfterReload:true,signedActorPreserved:true,realLedgerPointerUnchanged:true,financialWrites:0,sourceRows:1,proposals:1,holds:0,countsExact:true,qaAuthorityExact:true,normalUiIdempotentReplay:true,replayIntakeWrites:0});
- }catch(error){failure=error;Object.assign(report,failureDetails(error,stage));}
+  if(documentaryBinding){
+   report.documentaryPayments=await exerciseDocumentaryPayments({page:direction,actor:actors[0],cfg,tenant,item,nonce,binding:documentaryBinding,buildId:report.buildId});
+   checked('DOCUMENTARY_PAYMENT_TWO_SOURCES_NORMAL_UI_READBACK_RELOAD_REPLAY_RESTORE');
+  }
+ }catch(error){failure=error;if(error.documentaryPaymentEvidence)report.documentaryPayments=error.documentaryPaymentEvidence;Object.assign(report,failureDetails(error,stage));}
  finally{
   if(intakeDiagnosticsStop){intakeDiagnosticsStop();intakeDiagnosticsStop=null;}
   if(report.sourceIntake)report.sourceIntake=safeSourceIntakeEvidence(report.sourceIntake);
@@ -411,5 +616,6 @@ async function main(){
  console.log(JSON.stringify({sourceSha:report.sourceSha,phase:report.phase,status:report.status,checks:report.checks.length,cleanup:report.cleanup,realControlUnchanged:report.realControlUnchanged}));
  if(report.status!=='PASS')throw failure||Error('I66_PROPOSAL_SIGNED_UAT_HOLD');
 }
-module.exports={validateEnvironment,owned,makeStage,sourceIntakeFixture,intakeUiRequest};
+module.exports={validateEnvironment,owned,makeStage,sourceIntakeFixture,intakeUiRequest,DOCUMENTARY_PAYMENT_QA_PROFILE,DOCUMENTARY_PAYMENT_QA_RECEIPT,DOCUMENTARY_PAYMENT_SOURCES,
+ validateDocumentaryPaymentQaBinding,documentaryPaymentFixture,documentaryPaymentRequest,assertDocumentaryPaymentOwned,assertDocumentaryPaymentReadback,validateDocumentaryPaymentUiEvidence,exerciseDocumentaryPayments};
 if(require.main===module)main().catch(error=>{const safe=failureDetails(error,'BOOT');console.error('I66_PROPOSAL_SIGNED_UAT_HOLD '+safe.failureCode+' '+safe.failureCheck);process.exitCode=1;});

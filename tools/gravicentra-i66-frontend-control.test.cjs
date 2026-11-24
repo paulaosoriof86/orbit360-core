@@ -8,6 +8,57 @@ const {P,genName,physicalGuard,blob}=owner;
 const read=p=>JSON.parse(fs.readFileSync(p,'utf8'));
 const serial=value=>JSON.stringify(value,null,2)+'\n';
 
+function retiredContinuationFixture(){
+  const cp=read(P.cp),progress=read('artifacts/orbit360-recovery/release-control/I6_6_CURRENT_EXECUTION_PROGRESS_20261124_R60.json');
+  return {cp,progress,verify:()=>owner.assertRetiredReleaseContinuation(cp,progress)};
+}
+test('current R60 continuation preserves retired Preview28 evidence without directing its execution',()=>{
+  const f=retiredContinuationFixture(),before=serial(f);assert.doesNotThrow(f.verify);assert.equal(serial(f),before);
+});
+test('R59 A12 retry is rejected even after its objective, remaining lane and nextIncomplete are synchronized',()=>{
+  const f=retiredContinuationFixture(),old=read('artifacts/orbit360-recovery/release-control/I6_6_CURRENT_EXECUTION_PROGRESS_20261124_R59.json');
+  f.progress.shockObjectives.items.find(x=>x.id==='A12').next=old.shockObjectives.items.find(x=>x.id==='A12').next;
+  owner.synchronizeExecutionProgress(f.progress);
+  assert.deepEqual(f.progress.remainingExecutionLanes,owner.executionProgressProjection(f.progress).remainingExecutionLanes);
+  assert.throws(()=>owner.assertExecutionProgress(f.cp,f.progress,fs),/I66_PROGRESS_RETIRED_NEXT_TARGET_objective.A12/);
+});
+test('a built but retired target cannot reappear as the pending immutable build',()=>{
+  const old=read('artifacts/orbit360-recovery/release-control/I6_6_CURRENT_EXECUTION_PROGRESS_20261124_R59.json');
+  const f=retiredContinuationFixture();f.progress.pendingImmutableBuild=structuredClone(old.pendingImmutableBuild);
+  assert.throws(f.verify,/I66_PROGRESS_RETIRED_PENDING_VERSION/);
+  for(const key of ['sourceSha','buildId','artifactId','artifactDigest']){
+    const changed=retiredContinuationFixture();changed.progress.pendingImmutableBuild[key]=changed.progress.latestImmutableBuild[key];
+    assert.throws(changed.verify,new RegExp('I66_PROGRESS_RETIRED_PENDING_TARGET_'+key));
+  }
+});
+test('active execution aliases independently reject a retired retry; an archived old next step remains historical',()=>{
+  for(const mutate of [
+    f=>{f.progress.immediateExecution.financialFocal='Execute exact Preview on immutable v28.';},
+    f=>{f.progress.frontendBalanceCorrection.next='Promote artifact '+f.progress.latestImmutableBuild.artifactId+'.';},
+    f=>{f.progress.parallelLanes[0].next='Run Preview28 now.';},
+    f=>{f.cp.i66ActiveRecoveryCursor.next='Publicar v28 en producción.';},
+    f=>{f.cp.nextAction='Deploy '+f.progress.latestImmutableBuild.sourceSha+'.';},
+    f=>{f.cp.i66OperationalContinuation20261115.currentWork='Reintentar v28.';}
+  ]){const f=retiredContinuationFixture();mutate(f);assert.throws(f.verify,/I66_PROGRESS_RETIRED_NEXT_TARGET_/);}
+  const historical=retiredContinuationFixture();
+  historical.progress.continuationBeforeR60.extraOldNext='Execute exact Preview on immutable v28.';
+  historical.progress.shockObjectives.items.find(x=>x.id==='A12').evidence+=' Historical instruction: promote v28.';
+  assert.doesNotThrow(historical.verify);
+});
+test('retired prohibitions and a distinct successor are allowed, but a contradictory appended retry is rejected',()=>{
+  for(const next of ['Do not execute or promote failed Preview28. Execute exact Preview v29.',
+    'No ejecutar v28; publicar v29 después de pruebas.',
+    'Never rerun v28. Preserve its failed proof.',
+    'Promote the verified v29 artifact after exact Preview.']){
+    const f=retiredContinuationFixture();f.progress.next=next;assert.doesNotThrow(f.verify);
+  }
+  for(const next of ['Do not execute v28; promote v28.',
+    'Never rerun v28, but deploy v28.',
+    'No ejecutar Preview28. Publicar Preview28.']){
+    const f=retiredContinuationFixture();f.progress.next=next;assert.throws(f.verify,/I66_PROGRESS_RETIRED_NEXT_TARGET_next/);
+  }
+});
+
 test('execution snapshot tracks request, scoped Preview and operational candidate without mutable aliases',()=>{
   const transport={status:'PREVIEW_AUTHORIZED',frontendPreviewRequest:{version:12,sourceQaHead:'source-a',sourceQaRunId:101,guardRunId:102},
     scopedBackendPreviewI66:{sourceSha:'source-a',artifactDigest:'digest-a'},

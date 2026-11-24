@@ -97,7 +97,12 @@ Orbit.modules = Orbit.modules || {};
     normalized.sumaAsegurada = numberOrNull(first(normalized.sumaAsegurada, v.valorAsegurado));
     return normalized;
   }
-  function reconciliationTolerance() {
+  function reconciliationTolerance(policy) {
+    const country=String(policy&&policy.pais||'').trim().toUpperCase(),currency=String(policy&&policy.moneda||'').trim().toUpperCase();
+    if(['GT','GUATEMALA'].includes(country)&&currency==='GTQ')return 0.05;
+    // Preserve the existing comparison setting outside the approved GTQ scope.
+    // This setting never authorizes a bank/payment allocation.
+
     try {
       const cfg = Orbit.domainConfig && typeof Orbit.domainConfig.peek === 'function' ? Orbit.domainConfig.peek('reconciliation') : {};
       const n = Number(cfg && cfg.amountTolerance);
@@ -295,22 +300,50 @@ Orbit.modules = Orbit.modules || {};
     const policy=S().get('polizas',policyId)||{},all=(S().all('recibosEsperados') || []).filter(r=>r.polizaId===policyId);
     return receiptScheduleFromRows(policy,all);
   }
+  function documentaryScheduleVariance(policy, schedule) {
+    const compare=Orbit.primas&&Orbit.primas.documentaryAmountVariance;
+    if(typeof compare!=='function')return null;
+    const rows=schedule&&schedule.rows||[],country=value=>{
+      const key=String(value||'').trim().toUpperCase();
+      return key==='GUATEMALA'?'GT':key==='COLOMBIA'?'CO':key;
+    },currency=String(policy&&policy.moneda||'').trim().toUpperCase();
+    const policyCountry=country(policy&&policy.pais),policyId=String(policy&&policy.id||'');
+    const expected=Number(policy&&policy.cuotas)||receiptPlanDenominator(rows[0]);
+    const ordinals=rows.map(receiptPlanOrdinal);
+    const identityExact=!!policyId&&rows.length>0&&expected===rows.length&&
+      new Set(rows.map(r=>r.id)).size===rows.length&&new Set(ordinals).size===rows.length&&
+      ordinals.every(n=>Number.isSafeInteger(n)&&n>0&&n<=expected)&&
+      !schedule.reviewRows.length&&['POLICY_CUOTAS','SINGLE_PHYSICAL_CALENDAR'].includes(schedule.calendarAuthority)&&
+      rows.every(r=>r.id&&String(r.polizaId||'')===policyId&&
+        country(r.pais)===policyCountry&&String(r.moneda||'').trim().toUpperCase()===currency&&
+        (!r.tenantId||!policy.tenantId||r.tenantId===policy.tenantId)&&
+        (!r.clienteId||!policy.clienteId||r.clienteId===policy.clienteId));
+    return compare({kind:'CONTRACT_SCHEDULE',country:policyCountry,currency,identityExact,
+      original:{amount:numberOrNull(first(policy.primaTotal,policy.prima)),
+        sourceRef:String(first(policy.primaFuente,policy.primaSourceRef,policy.sourceDocumentId,policy.sourceRef)||('polizas/'+policyId+'#primaTotal'))},
+      documented:{amount:numberOrNull(schedule.total),
+        sourceRef:rows.map(r=>'recibosEsperados/'+r.id+'#primaTotal').join(';')}
+    });
+  }
   function financialIntegrityBatch(policies) {
-    const selected=[].concat(policies||[]).filter(p=>p&&p.id),receiptsByPolicy=group(S().all('recibosEsperados')||[],'polizaId'),tol=reconciliationTolerance(),issues=[];
+    const selected=[].concat(policies||[]).filter(p=>p&&p.id),receiptsByPolicy=group(S().all('recibosEsperados')||[],'polizaId'),issues=[];
     selected.forEach(p=>{
       const sch=receiptScheduleFromRows(p,receiptsByPolicy.get(p.id)||[]),total=numberOrNull(first(p.primaTotal,p.prima)),schedule=numberOrNull(sch.total);
       if(total==null||schedule==null)return;
-      const delta=schedule-total;
-      if(Math.abs(delta)<=tol)return;
+      const variance=documentaryScheduleVariance(p,sch),delta=variance&&variance.differenceAmount!=null?variance.differenceAmount:schedule-total;
+      const tol=variance&&variance.eligible?reconciliationTolerance(p):reconciliationTolerance();
+      if(variance&&variance.accepted)return;
+      if(!(variance&&variance.scopeApproved)&&Math.abs(delta)<=tol)return;
       const explicitSource=first(p.primaFuente,p.primaSource,p.primaSourceRef,p.sourceDocumentId,p.sourceRef,p.importSource,p.fuente);
       const contractualSource=explicitSource?String(explicitSource):(p.primaTotal!=null&&p.primaTotal!==''?'Póliza · prima total':p.prima!=null&&p.prima!==''?'Póliza · prima':'Fuente contractual no identificada');
       let reason='';
-      if(sch.reviewRows.length) reason='Hay '+sch.reviewRows.length+' recibo(s) con numeración o plan incompatible pendientes de validar; no forman parte del calendario activo hasta confirmar la fuente.';
+      if(variance&&variance.scopeApproved&&!variance.eligible) reason='La identidad, moneda o secuencia del calendario requiere revisión; la tolerancia documental no sustituye esas comprobaciones.';
+      else if(sch.reviewRows.length) reason='Hay '+sch.reviewRows.length+' recibo(s) con numeración o plan incompatible pendientes de validar; no forman parte del calendario activo hasta confirmar la fuente.';
       else if(sch.calendarAuthority==='NO_DENOMINATOR') reason='Los recibos activos no confirman una secuencia N/N; valida periodicidad, cantidad de cuotas y montos antes de corregir.';
       else if(sch.calendarAuthority==='AMBIGUOUS_FAIL_CLOSED') reason='Existen calendarios incompatibles y la plataforma no puede elegir uno por inferencia; valida la fuente que gobierna esta vigencia.';
       else if(sch.shadowRows.length) reason='Se excluyeron '+sch.shadowRows.length+' registro(s) histórico(s) duplicado(s); el calendario activo aún '+(delta>0?'supera':'queda por debajo de')+' la prima contractual.';
       else reason='El calendario activo '+(delta>0?'suma más':'suma menos')+' que la prima contractual; valida cuotas y montos contra la fuente antes de modificar.';
-      issues.push({p,total,schedule,delta:Math.abs(delta)<0.0000001?0:delta,tolerance:tol,receipts:sch.rows.length,rows:sch.rows,reviewRows:sch.reviewRows.length,shadowRows:sch.shadowRows.length,calendarAuthority:sch.calendarAuthority,contractualSource,reason});
+      issues.push({p,total,schedule,documentaryVariance:variance,delta:Math.abs(delta)<0.0000001?0:delta,tolerance:tol,receipts:sch.rows.length,rows:sch.rows,reviewRows:sch.reviewRows.length,shadowRows:sch.shadowRows.length,calendarAuthority:sch.calendarAuthority,contractualSource,reason});
     });
     return issues.sort((a,b)=>Math.abs(b.delta)-Math.abs(a.delta));
   }
@@ -327,6 +360,7 @@ Orbit.modules = Orbit.modules || {};
       iva:numberOrNull(first(p.ivaMonto,p.iva,p.impuestos,p.impuestosIVA)) ?? sch.iva,
       total:numberOrNull(first(p.primaTotal,p.prima)),
       scheduleTotal:sch.total,
+      documentaryVariance:documentaryScheduleVariance(p,sch),
       receipts:sch.rows,
       shadowRows:sch.shadowRows,
       shadowCount:sch.shadowRows.length
@@ -467,18 +501,26 @@ Orbit.modules = Orbit.modules || {};
       ? `<a class="btn ghost" href="${back}">Abrir ficha del cliente</a>`
       : '<div class="cfg-note" data-policy-client-scope-note="1">La póliza está disponible en tu alcance, pero la ficha del cliente no está autorizada o no figura en la lectura confirmada. No se han cambiado países, relaciones ni permisos.</div>';
     const scheduleDelta = receiptsReady && pb.total != null && pb.scheduleTotal != null ? pb.scheduleTotal - pb.total : null;
-    const scheduleTolerance = reconciliationTolerance();
+    const scheduleVariance=pb.documentaryVariance;
+    const scheduleTolerance = scheduleVariance&&scheduleVariance.eligible?reconciliationTolerance(p):reconciliationTolerance();
+    const scheduleNeedsReview=scheduleDelta!=null&&((scheduleVariance&&scheduleVariance.scopeApproved&&!scheduleVariance.eligible)||
+      (!(scheduleVariance&&scheduleVariance.accepted)&&Math.abs(scheduleDelta)>scheduleTolerance));
     const canManage = canEditVehicle();
     const renewAction = renewalEligible(p) ? `<button class="btn primary" onclick="Orbit.policyVehicleReadModelV1199c.startRenewal('${esc(p.id)}')">🔄 Renovar</button>` : '';
     const endosoAction = Orbit.endorsements && Orbit.modules.cliente360 && typeof Orbit.modules.cliente360.endoso === 'function'
       ? '<button class="btn ghost" type="button" data-policy-endoso-request="1">📜 Solicitar endoso</button>' : '';
+    const cancellationAction = Orbit.policyReceipts && Orbit.policyReceipts.canRegisterEffectiveCancellation &&
+      Orbit.policyReceipts.canRegisterEffectiveCancellation() && Orbit.modules.cliente360 &&
+      typeof Orbit.modules.cliente360.registrarCancelacionEfectiva === 'function'
+      ? '<button class="btn ghost" type="button" data-policy-cancellation-effective="1">Registrar cancelación efectiva</button>' : '';
+    const cancellationRequest = '<button class="btn ghost" type="button" data-policy-cancellation-request="1">Solicitar cancelación</button>';
     const deleteAction = canManage ? `<button class="btn ghost" style="color:var(--danger,var(--red))" onclick="Orbit.policyVehicleReadModelV1199c.deletePolicy('${esc(p.id)}')">Eliminar</button>` : '';
     host.innerHTML = `<div class="page orbit-policy-fullpage" data-policy-fullpage="1" data-policy-context-vehicle="${esc(contextVehicleId||'')}">
       <div class="crumb" style="margin-bottom:14px"><a style="cursor:pointer;color:var(--red)" href="${clientLinkAllowed?back:'#/polizas'}">‹ ${clientLinkAllowed?esc(cli.nombre || 'Cliente 360'):'Pólizas'}</a> / Póliza ${esc(p.numero || '')}</div>
       <div class="card gi-policy-hero" style="overflow:hidden;margin-bottom:16px">
         <div style="padding:20px 22px;background:linear-gradient(120deg,var(--graph),#10141a);display:flex;align-items:flex-start;gap:18px;justify-content:space-between;flex-wrap:wrap">
           <div style="min-width:0;display:flex;gap:14px;align-items:flex-start"><div class="gi-hero-icon">📑</div><div><div class="muted" style="color:rgba(255,255,255,.7);font-size:11px;text-transform:uppercase;letter-spacing:.12em">Póliza · ${esc(p.tipoPoliza)}</div><h2 style="color:#fff;margin:4px 0 3px;font-family:var(--f-display);font-size:24px;overflow-wrap:anywhere">${esc(p.ramo || 'Póliza')} · ${esc(p.producto || p.subramo || 'Detalle')}</h2><div class="mono" style="color:rgba(255,255,255,.86)">${esc(p.numero || 'Número pendiente')} · ${esc(insurerName || 'Aseguradora pendiente')} · ${esc(fmtDate(p.vigenciaInicio))} → ${esc(fmtDate(p.vigenciaFin))}</div></div></div>
-          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">${badge(p.estado)}${renewAction}<button class="btn primary" onclick="Orbit.modules.cliente360.editarPoliza('${esc(p.id)}')">✏️ Editar póliza</button>${endosoAction}<button class="btn ghost" onclick="Orbit.ciclo&&Orbit.ciclo.solicitarGestion&&Orbit.ciclo.solicitarGestion('${esc(p.clienteId)}','${esc(p.id)}',false,{tipo:'Gestión de póliza',lista:'Gestiones Admin',origen:'Póliza'})">🗂 Gestión</button>${deleteAction}${clientAction}</div>
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">${badge(p.estado)}${renewAction}<button class="btn primary" onclick="Orbit.modules.cliente360.editarPoliza('${esc(p.id)}')">✏️ Editar póliza</button>${endosoAction}${cancellationAction}${cancellationRequest}<button class="btn ghost" onclick="Orbit.ciclo&&Orbit.ciclo.solicitarGestion&&Orbit.ciclo.solicitarGestion('${esc(p.clienteId)}','${esc(p.id)}',false,{tipo:'Gestión de póliza',lista:'Gestiones Admin',origen:'Póliza'})">🗂 Gestión</button>${deleteAction}${clientAction}</div>
         </div>
       </div>
       ${versionContext}
@@ -497,6 +539,12 @@ Orbit.modules = Orbit.modules || {};
             field('Inicio de vigencia', fmtDate(p.vigenciaInicio)), field('Fin de vigencia', fmtDate(p.vigenciaFin)), field('Renovación', renewabilityHtml(p), {html:true}),
             field('Suma asegurada', moneyDetail(p.sumaAsegurada, cur)), field('Concepto / riesgo', p.concepto), field('Calidad de información', vehiclesReady ? qualityBlock(p, vehicle) : '<span class="muted">Actualizando relaciones</span>', {html:true})
           ], 3))}
+          ${p.fechaCancelacion || p.cancelacionDocumentoRef ? section('Cancelación efectiva', grid([
+            field('Fecha efectiva',fmtDate(p.fechaCancelacion || p.cancellationDate)),
+            field('Referencia de la aseguradora',p.referenciaCancelacion),
+            field('Motivo',p.motivoCancelacion || p.cancellationReason),
+            field('Documento emitido / soporte',p.cancelacionDocumentoRef)
+          ],2)) : ''}
           ${section('💰 Prima y condiciones de pago', `<div class="gi-payment-overview">
             <div class="gi-payment-total"><span>Prima total de póliza</span><b>${esc(moneyDetail(pb.total,cur))}</b><small>Valor contractual de la vigencia</small></div>
             <div class="gi-payment-focus"><span>Prima neta</span><b>${esc(moneyDetail(pb.net,cur))}</b><small>Antes de cargos e impuestos</small></div>
@@ -507,7 +555,8 @@ Orbit.modules = Orbit.modules || {};
             ['Gastos de expedición', pb.expedition], ['Gastos financieros', pb.finance], ['Descuento / ajuste', pb.sourceAdjustment], ['Otros / asistencias', pb.other], ...(pb.taxable == null ? [] : [['Base imponible para IVA', pb.taxable]]), [ivaLabel, pb.iva], ['Cargo no gravado'+(p.cargoNoGravadoConcepto?' · '+p.cargoNoGravadoConcepto:''), pb.nonVat]
           ].map(([k,v])=>`<div class="gi-premium-row"><span>${esc(k)}</span><b>${esc(moneyDetail(v,cur))}</b></div>`).join('')}</div>
           ${p.cargoNoGravadoDocumentRef?`<div class="cfg-note">Documento del cargo no gravado: ${esc(p.cargoNoGravadoDocumentRef)}. No integra la base del IVA ni de la comisión sobre prima neta.</div>`:''}
-          ${scheduleDelta!=null&&Math.abs(scheduleDelta)>scheduleTolerance?`<div class="badge warn gi-schedule-delta">Diferencia póliza vs calendario: ${esc(moneyDetail(scheduleDelta,cur))} · supera tolerancia ${esc(moneyDetail(scheduleTolerance,cur))} y requiere conciliación</div>`:''}
+          ${scheduleNeedsReview?`<div class="badge warn gi-schedule-delta">Diferencia póliza vs calendario: ${esc(moneyDetail(scheduleDelta,cur))} · ${scheduleVariance&&scheduleVariance.scopeApproved&&!scheduleVariance.eligible?'requiere validar identidad, moneda y secuencia del calendario':'supera tolerancia '+esc(moneyDetail(scheduleTolerance,cur))+' y requiere conciliación'}</div>`:''}
+          ${scheduleVariance&&scheduleVariance.accepted&&scheduleVariance.differenceCents!==0?`<div class="cfg-note" data-documentary-rounding-variance="1">Variación póliza vs calendario: ${esc(moneyDetail(scheduleVariance.differenceAmount,cur))}, dentro de la tolerancia de ${esc(moneyDetail(0.05,cur))}. Se conservan ambos importes; cada recibo mantiene su obligación original.</div>`:''}
           <div class="gi-payment-subtitle">Condiciones de pago</div>
           <div class="gi-payment-conditions">${grid([
             field('Frecuencia', first(p.frecuencia, p.forma)), field('Forma de pago', p.formaPago), field('Conducto', p.conducto)
@@ -522,6 +571,13 @@ Orbit.modules = Orbit.modules || {};
         </div>
       </div>
     </div>`;
+    const effectiveCancellation = host.querySelector('[data-policy-cancellation-effective]');
+    if (effectiveCancellation) effectiveCancellation.addEventListener('click', () => Orbit.modules.cliente360.registrarCancelacionEfectiva(p.id));
+    const requestCancellation = host.querySelector('[data-policy-cancellation-request]');
+    if (requestCancellation) requestCancellation.addEventListener('click', () => {
+      if (Orbit.ciclo && typeof Orbit.ciclo.solicitarGestion === 'function')
+        Orbit.ciclo.solicitarGestion(p.clienteId,p.id,false,{tipo:'Solicitud de cancelación',lista:'Gestiones Admin',origen:'Póliza'});
+    });
     const requestEndoso = host.querySelector('[data-policy-endoso-request]');
     if (requestEndoso) requestEndoso.addEventListener('click', () => Orbit.modules.cliente360.endoso(p.id));
   }
@@ -727,7 +783,7 @@ Orbit.modules = Orbit.modules || {};
 
   Orbit.policyVehicleReadModelV1199c = {
     version: '20260731.1', ownerRevision:'20260731.4-human-visual',
-    policyVisual, vehicleVisual, rebuildIndexes, invalidate, numberOrNull, moneyDetail, policyCompleteness, isVehiclePolicy, receiptSchedule, financialIntegrityBatch, premiumBreakdown, reconciliationTolerance, openVehicleLinker, vehicleCandidates, renewalEligible, startRenewal, deletePolicy, deleteVehicle,
+    policyVisual, vehicleVisual, rebuildIndexes, invalidate, numberOrNull, moneyDetail, policyCompleteness, isVehiclePolicy, receiptSchedule, financialIntegrityBatch, premiumBreakdown, reconciliationTolerance, documentaryScheduleVariance, openVehicleLinker, vehicleCandidates, renewalEligible, startRenewal, deletePolicy, deleteVehicle,
     fullPagePolicy: true, fullPageVehicle: true,
     indexedClientSummary: true,
     writesStore: false,

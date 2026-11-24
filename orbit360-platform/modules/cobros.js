@@ -640,17 +640,44 @@ Orbit.modules.cobros = (function () {
   }
   async function uploadPaymentDocument(file, kind, cobro, receiptId) {
     if (!file) return '';
+    const failure = out => {
+      const error = new Error('PAYMENT_DOCUMENT_UPLOAD_NOT_CONFIRMED');
+      error.paymentDocument = {
+        status: String(out && out.status || 'no_disponible'),
+        action: String(out && out.action || '')
+      };
+      return error;
+    };
     const provider = Orbit.productDriveDocumentProviderP0;
-    if (!provider || typeof provider.upload !== 'function') throw new Error('PAYMENT_DOCUMENT_PROVIDER_UNAVAILABLE');
-    const out = await provider.upload(file, {
-      documentType: kind,
-      clienteId: cobro.clienteId || '',
-      polizaId: cobro.polizaId || '',
-      receiptId: receiptId || '',
-      sourceModule: 'cobros'
-    });
-    if (!out || out.ok !== true || !(out.documentRef || out.driveUrl || out.externalUrl)) throw new Error('PAYMENT_DOCUMENT_UPLOAD_FAILED');
+    if (!provider || typeof provider.upload !== 'function') throw failure({status:'proveedor_no_disponible'});
+    let out;
+    try {
+      out = await provider.upload(file, {
+        documentType: kind,
+        clienteId: cobro.clienteId || '',
+        polizaId: cobro.polizaId || '',
+        receiptId: receiptId || '',
+        sourceModule: 'cobros'
+      });
+    } catch (_) { throw failure({status:'no_disponible'}); }
+    if (!out || out.ok !== true || !(out.documentRef || out.driveUrl || out.externalUrl)) throw failure(out);
     return out.documentRef || out.driveUrl || out.externalUrl;
+  }
+  function paymentDocumentFailureFeedback(error) {
+    const info = error && error.paymentDocument || {};
+    const messages = {
+      tenant_setup_required: 'Drive requiere la conexión administrativa. Dirección o administración puede abrir Clientes 360 → Documentos → Configurar Drive.',
+      tenant_connection_invalid: 'La conexión administrativa de Drive necesita revisión por Dirección o administración.',
+      sin_permiso: 'Drive no autorizó guardar el archivo. Revisa el acceso al expediente y a su carpeta.',
+      sin_referencia: 'No se encontró el expediente o la carpeta de destino en Drive.',
+      archivo_demasiado_grande: 'El archivo supera el límite de 15 MB. Selecciona un archivo de menor tamaño.',
+      lectura_fallida: 'No fue posible leer el archivo. Selecciónalo de nuevo.',
+      proveedor_no_disponible: 'El repositorio documental todavía no está disponible en esta sesión.',
+      sin_readback: 'Drive no confirmó el archivo. Verifica el expediente antes de volver a subirlo.',
+      no_disponible: 'Drive no confirmó el guardado. Verifica la conexión y el expediente antes de reintentar.'
+    };
+    const status = Object.prototype.hasOwnProperty.call(messages,info.status) ? info.status : 'no_disponible';
+    return {status,message:messages[status]};
   }
 
   /* ---- Detalle del recibo (drawer) — abre el detalle del cobro, no la póliza ---- */
@@ -939,6 +966,75 @@ Orbit.modules.cobros = (function () {
     return { code, uncertain, message, requestId, alreadyApplied: knownReason === 'PAYMENT_ALREADY_APPLIED' };
   }
 
+  function documentaryInputError(message) {
+    const error=new Error('PAYMENT_DOCUMENTARY_INPUT');error.code='invalid-argument';error.documentaryMessage=message;return error;
+  }
+  function documentaryDay(value,label) {
+    const day=String(value||'').trim();
+    if(!/^\d{4}-\d\d-\d\d$/.test(day)||!Number.isFinite(Date.parse(day+'T00:00:00Z'))||
+      new Date(day+'T00:00:00Z').toISOString().slice(0,10)!==day)
+      throw documentaryInputError('Completa una fecha válida para '+label+'.');
+    return day;
+  }
+  function documentaryDriveRef(value) {
+    const raw=String(value||'').trim(),id='[A-Za-z0-9_-]{10,180}';
+    const direct=new RegExp('^(?:drive:)?('+id+')$').exec(raw);
+    if(direct)return 'drive:'+direct[1];
+    try {
+      const u=new URL(raw),match=new RegExp('^/file/d/('+id+')(?:/view)?$').exec(u.pathname);
+      if(u.protocol==='https:'&&u.hostname==='drive.google.com'&&!u.username&&!u.password&&!u.port&&!u.hash&&
+        Array.from(u.searchParams.keys()).every(k=>k==='usp')&&match)return 'drive:'+match[1];
+    }catch(_){}
+    throw documentaryInputError('Indica la referencia o el enlace del documento original en Drive.');
+  }
+  async function documentaryDigest(value) {
+    if(!window.crypto||!window.crypto.subtle)throw documentaryInputError('No se pudo preparar la referencia de control. Recarga la página.');
+    const bytes=await window.crypto.subtle.digest('SHA-256',new TextEncoder().encode(value));
+    return Array.from(new Uint8Array(bytes)).map(x=>x.toString(16).padStart(2,'0')).join('');
+  }
+  async function documentaryPaymentCommand(receipt,cobro,values,manualPayload) {
+    if(values.sourceType==='manual')return null;
+    const kinds={commission_statement:'COMMISSION_STATEMENT_INSTALLMENT_N',insurer_statement:'INSURER_CONFIRMED_PAID_STATEMENT'};
+    if(!Object.prototype.hasOwnProperty.call(kinds,values.sourceType))throw documentaryInputError('Selecciona un origen de pago válido.');
+    if(values.reviewed!==true)throw documentaryInputError('Confirma que el documento acredita el pago de esta cuota.');
+    if(/^PAID_/.test(String(receipt.paymentState||''))||/^pagado$/i.test(String(receipt.estado||''))||receipt.conciliadoPago===true)
+      throw documentaryInputError('Este recibo ya figura pagado. Consulta el mismo cobro antes de registrar otro pago.');
+    const asOf=documentaryDay(values.evidenceAsOfDate,'el corte del documento'),paid=documentaryDay(manualPayload.paidDate,'el pago real');
+    if(paid>asOf)throw documentaryInputError('La fecha real de pago no puede ser posterior al corte del documento.');
+    const sourceRef=documentaryDriveRef(values.sourceRef),amount=Number(cobro.monto);
+    const aliases=['primaTotal','monto','montoTotal'].filter(k=>receipt[k]!==undefined&&receipt[k]!==null&&receipt[k]!=='');
+    if(!Number.isFinite(amount)||amount<=0||Math.abs(amount*100-Math.round(amount*100))>1e-6||!aliases.length||
+      aliases.some(k=>!Number.isFinite(Number(receipt[k]))||Math.round(Number(receipt[k])*100)!==Math.round(amount*100)))
+      throw documentaryInputError('La prima total del recibo necesita revisión. Este formulario no ajusta importes.');
+    const tenantId=String(window.OrbitBackend&&OrbitBackend.tenantId||'').trim();
+    if(!tenantId||!receipt.id||!receipt.polizaId)throw documentaryInputError('No se confirmó el recibo y su póliza para esta sesión.');
+    const reference=(value,label)=>{const v=String(value||'').trim();if(v&&(!/^[A-Za-z0-9][A-Za-z0-9._:-]{1,179}$/.test(v)||/^propapp_/i.test(v)))
+      throw documentaryInputError('La referencia de '+label+' no es válida.');return v;};
+    const evidenceId=reference(values.evidenceId,'evidencia')||'docsrc_'+(await documentaryDigest(
+      JSON.stringify([tenantId,receipt.id,values.sourceType,sourceRef,paid,Math.round(amount*100)]))).slice(0,40);
+    const payload={receiptId:receipt.id,sourceType:values.sourceType,amount,paidDate:paid,actualPaidDateEvidence:true,
+      evidenceId,sourceRef,evidenceType:kinds[values.sourceType],evidenceAsOfDate:asOf,paymentSupportDocumentRef:sourceRef};
+    for(const field of ['paymentMethod','applicationDate','invoiceDate','invoiceNumber','invoiceDocumentRef'])
+      if(String(manualPayload[field]||'').trim())payload[field]=String(manualPayload[field]).trim();
+    const requestId=reference(values.requestId,'la operación')||'docpay_'+(await documentaryDigest(JSON.stringify([
+      tenantId,receipt.id,payload.sourceType,payload.amount,payload.paidDate,payload.evidenceId,payload.sourceRef,
+      payload.evidenceType,payload.evidenceAsOfDate,payload.invoiceNumber||'',payload.paymentMethod||'',
+      payload.applicationDate||'',payload.invoiceDate||'',payload.invoiceDocumentRef||'']))).slice(0,40);
+    return {requestId,payload,reason:'Pago documental de la cuota revisado contra el original; sin aviso automático al cliente.'};
+  }
+  function verifyDocumentaryPaymentResult(result,command,receipt) {
+    if(!result||result.ok!==true||result.serverOwned!==true||result.portfolioUpdated!==true||
+      result.receiptId!==receipt.id||result.policyId!==receipt.polizaId||!result.cobroId||
+      result.paymentState!=='PAID_DIRECT'||result.applicationState!=='APPLIED_DIRECT'||result.paidDate!==command.payload.paidDate||
+      (result.requestId&&result.requestId!==command.requestId)||
+      String(result.invoiceNumber||'')!==String(command.payload.invoiceNumber||'')||
+      String(result.applicationDate||'')!==String(command.payload.applicationDate||'')||
+      String(result.invoiceDate||'')!==String(command.payload.invoiceDate||'')) {
+      const error=new Error('PAYMENT_DOCUMENTARY_READBACK_REQUIRED');error.code='data-loss';
+      error.gravicentraPayment={operation:'apply_payment',requestId:command.requestId};throw error;
+    }
+  }
+
   /* ---- Registrar pago por el owner canónico: pago y aplicación son hechos distintos ---- */
   function aplicarPago(cobroId) {
     if (!directPaymentRole()) return U.toast('El rol Asesor reporta el pago a Ops; no puede aplicarlo directamente.');
@@ -949,13 +1045,23 @@ Orbit.modules.cobros = (function () {
     if(!previewGuard(receipt)) return false;
     const p=S().get('polizas',c.polizaId)||{};
     const cli=S().get('clientes',c.clienteId)||{};
-    let pm=document.getElementById('cob-pay'); if(pm)pm.remove();
+    let pm=document.getElementById('cob-pay');
+    if(pm&&pm.getAttribute('aria-busy')==='true')return U.toast('Espera la confirmación del registro que está en curso. Los adjuntos siguen en ese formulario.');
+    if(pm)pm.remove();
     pm=document.createElement('div');pm.id='cob-pay';pm.className='drawer-back open';pm.style.cssText='display:grid;place-items:center;z-index:210;padding:12px;box-sizing:border-box;overflow:auto';
     pm.innerHTML='<div class="card" style="width:min(520px,100%);padding:0;max-height:calc(100dvh - 24px);overflow:auto;display:flex;flex-direction:column">'
       +'<div style="padding:16px 20px;background:linear-gradient(120deg,var(--graph),#10141a);display:flex;justify-content:space-between;align-items:center"><div><div style="font-size:11px;font-weight:700;letter-spacing:.1em;color:rgba(255,255,255,.6);text-transform:uppercase">Cobros · registrar pago</div><b style="font-family:var(--f-display);font-size:16px;color:#fff">💳 '+U.money(c.monto,c.moneda)+'</b></div><button class="imp-x" id="pm-x" style="background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.25);color:#fff">✕</button></div>'
       +'<div style="padding:18px 20px;display:grid;gap:12px">'
-      +'<div class="cfg-note"><b>Pago</b> y <b>aplicación de la aseguradora</b> son fechas distintas. Ningún soporte es obligatorio. Si no conoces un dato, puede completarse después sin duplicar el cobro.</div>'
-      +'<label class="ce-l">Fecha real del pago <span class="muted">(opcional)</span><input id="pm-paid" class="o-sel" type="date" value="'+U.esc(c.paidDate||c.fechaPago||'')+'"></label>'
+      +'<div class="cfg-note"><b>Pago</b> y <b>aplicación de la aseguradora</b> son fechas distintas. Adjuntar archivos es opcional. Si seleccionas uno, se conservará en este formulario hasta confirmar su guardado. Si no conoces un dato, puede completarse después sin duplicar el cobro.</div>'
+      +'<label class="ce-l">Origen del pago<select id="pm-source" class="o-sel"><option value="manual">Registro manual</option><option value="commission_statement">Planilla de comisiones de la aseguradora</option><option value="insurer_statement">Estado de cuenta con pago confirmado</option></select></label>'
+      +'<section id="pm-documentary" hidden style="display:none;gap:10px"><p class="cfg-note">La fuente debe acreditar el pago de esta cuota por la prima total mostrada; el importe de la comisión no sustituye la prima. Este registro no envía avisos al cliente.</p>'
+      +'<label class="ce-l">Documento original en Drive<input id="pm-source-ref" class="o-sel" placeholder="Enlace o referencia del documento"></label>'
+      +'<label class="ce-l">Fecha de corte del documento<input id="pm-source-asof" class="o-sel" type="date"></label>'
+      +'<details><summary>Referencias de control existentes (opcional)</summary><p class="muted">Si este pago ya tiene una referencia documentada de revisión, conserva la misma. Si se deja en blanco, se prepara automáticamente.</p>'
+      +'<label class="ce-l">Referencia de la evidencia<input id="pm-evidence-id" class="o-sel" maxlength="180"></label>'
+      +'<label class="ce-l">Referencia de esta operación<input id="pm-request-id" class="o-sel" maxlength="180"></label></details>'
+      +'<label style="display:flex;gap:8px;align-items:flex-start"><input id="pm-source-reviewed" type="checkbox">Revisé el original y confirma el pago de esta cuota, su importe y fecha real.</label></section>'
+      +'<label class="ce-l">Fecha real del pago <span id="pm-paid-hint" class="muted">(opcional)</span><input id="pm-paid" class="o-sel" type="date" value="'+U.esc(c.paidDate||c.fechaPago||'')+'"></label>'
       +'<label class="ce-l">Método de pago <span class="muted">(opcional)</span><select id="pm-metodo" class="o-sel"><option value="">Sin especificar</option><option>Transferencia bancaria</option><option>Tarjeta de crédito</option><option>Tarjeta de débito</option><option>Cheque</option><option>Efectivo</option><option>Visa cuotas</option><option>Link de pago</option></select></label>'
       +'<div class="ce-l"><span style="font-size:12.5px;font-weight:600;color:var(--ink-2);display:block;margin-bottom:7px">Soporte del pago del cliente <span class="muted">(opcional)</span></span><div style="display:flex;gap:8px;align-items:center"><button class="btn ghost sm" id="pm-support-btn">⬆ Adjuntar soporte</button><span id="pm-support-name" class="muted" style="font-size:12px">Sin archivo</span></div></div>'
       +'<hr style="border:0;border-top:1px solid var(--line)">'
@@ -967,46 +1073,92 @@ Orbit.modules.cobros = (function () {
       +'</div><div data-cobros-modal-footer="apply" style="padding:14px 20px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:flex-end;align-items:center;flex-wrap:wrap;position:sticky;bottom:0;background:var(--card);z-index:2"><span id="pm-save-state" class="muted" aria-live="polite" style="font-size:12px;margin-right:auto"></span><button class="btn ghost" id="pm-cancel">Cancelar</button><button class="btn primary" id="pm-ok">Registrar pago</button></div></div>';
     document.body.appendChild(pm);
     let supportFile=null,invoiceFile=null;
-    const close=()=>pm.remove();
+    const uploadedFiles={payment_support:new Map(),insurer_invoice:new Map()};
+    const selectedUpload=async(file,kind)=>{
+      if(!file)return '';
+      const known=uploadedFiles[kind];
+      if(known.has(file))return known.get(file);
+      const ref=await uploadPaymentDocument(file,kind,c,receipt.id);
+      known.set(file,ref);return ref;
+    };
+    const uploadedRefs=()=>Object.values(uploadedFiles).flatMap(rows=>Array.from(rows.values()));
+    const releaseQuarantinedUploads=error=>{
+      const lifecycle=error&&error.gravicentraPayment&&error.gravicentraPayment.documentLifecycle;
+      if(!lifecycle||lifecycle.action!=='quarantine')return false;
+      const refs=Array.isArray(lifecycle.refs)?lifecycle.refs:[],results=Array.isArray(lifecycle.results)?lifecycle.results:[];
+      for(let i=0;i<refs.length;i++)if(results[i]&&results[i].ok===true)
+        for(const rows of Object.values(uploadedFiles))for(const [file,ref] of rows)if(ref===refs[i])rows.delete(file);
+      return lifecycle.ok!==true;
+    };
+    const close=()=>{if(pm.getAttribute('aria-busy')!=='true')pm.remove();};
     pm.addEventListener('click',e=>{if(e.target===pm)close();});pm.querySelector('#pm-x').onclick=close;pm.querySelector('#pm-cancel').onclick=close;
-    const choose=(id,label,setter)=>{pm.querySelector(id).onclick=()=>{const fi=document.createElement('input');fi.type='file';fi.accept='.pdf,image/*';fi.onchange=()=>{const file=fi.files&&fi.files[0]||null;setter(file);pm.querySelector(label).textContent=file?file.name:'Sin archivo';};fi.click();};};
+    const choose=(id,label,setter)=>{pm.querySelector(id).onclick=()=>{const fi=document.createElement('input');fi.type='file';fi.accept='.pdf,image/*';fi.onchange=()=>{if(pm.getAttribute('aria-busy')==='true')return;const file=fi.files&&fi.files[0]||null;setter(file);pm.querySelector(label).textContent=file?file.name:'Sin archivo';};fi.click();};};
     choose('#pm-support-btn','#pm-support-name',f=>supportFile=f);choose('#pm-invoice-btn','#pm-invoice-name',f=>invoiceFile=f);
+    const sourceSelect=pm.querySelector('#pm-source'),notifyBox=pm.querySelector('#pm-avisar');
+    let manualNotify=notifyBox.checked,documentaryMode=false;
+    sourceSelect.onchange=()=>{
+      const documentary=sourceSelect.value!=='manual';
+      if(documentary&&!documentaryMode)manualNotify=notifyBox.checked;
+      pm.querySelector('#pm-documentary').hidden=!documentary;
+      pm.querySelector('#pm-documentary').style.display=documentary?'grid':'none';
+      pm.querySelector('#pm-paid-hint').textContent=documentary?'(acreditada por el documento)':'(opcional)';
+      pm.querySelector('#pm-support-btn').disabled=documentary;
+      if(documentary){supportFile=null;pm.querySelector('#pm-support-name').textContent='Se utiliza el original de Drive';notifyBox.checked=false;}
+      else{pm.querySelector('#pm-support-name').textContent='Sin archivo';notifyBox.checked=manualNotify;}
+      notifyBox.disabled=documentary;documentaryMode=documentary;
+    };
+    sourceSelect.onchange();
     pm.querySelector('#pm-ok').onclick=async()=>{
       const btn=pm.querySelector('#pm-ok'),state=pm.querySelector('#pm-save-state');
+      if(btn.disabled)return;
+      const submittedDocumentary=sourceSelect.value!=='manual';sourceSelect.disabled=true;
       btn.disabled=true;btn.textContent='Guardando…';pm.setAttribute('aria-busy','true');if(state)state.textContent='Guardando documentos…';
+      pm.querySelector('#pm-support-btn').disabled=true;pm.querySelector('#pm-invoice-btn').disabled=true;
       try{
         const domain=Orbit.reconciliationDomain;if(!domain||typeof domain.applyPayment!=='function')throw new Error('PAYMENT_DOMAIN_UNAVAILABLE');
-        // Payment is the primary, server-owned transaction. An optional Drive
-        // upload must not prevent confirming the client's payment if OAuth,
-        // permissions or the document provider are temporarily unavailable.
-        // Do not claim any failed document was uploaded or reconciled.
+        const formValues={sourceType:sourceSelect.value,sourceRef:pm.querySelector('#pm-source-ref').value,
+          evidenceAsOfDate:pm.querySelector('#pm-source-asof').value,evidenceId:pm.querySelector('#pm-evidence-id').value,
+          requestId:pm.querySelector('#pm-request-id').value,reviewed:pm.querySelector('#pm-source-reviewed').checked};
+        const manualDraft={paidDate:pm.querySelector('#pm-paid').value||'',paymentMethod:pm.querySelector('#pm-metodo').value||'',
+          applicationDate:pm.querySelector('#pm-app').value||'',invoiceDate:pm.querySelector('#pm-invoice-date').value||'',
+          invoiceNumber:pm.querySelector('#pm-invoice-number').value.trim()};
+        // Validate the exact documentary request before uploading or calling.
+        const documentaryDraft=await documentaryPaymentCommand(receipt,c,formValues,manualDraft);
+        // Files are optional until selected. Once selected, preserve their
+        // confirmed references and stop before the financial command if a
+        // document was not confirmed. A retry uploads only the missing file.
         const [supportUpload,invoiceUpload]=await Promise.allSettled([
-          uploadPaymentDocument(supportFile,'payment_support',c,receipt.id),
-          uploadPaymentDocument(invoiceFile,'insurer_invoice',c,receipt.id)
+          selectedUpload(supportFile,'payment_support'),
+          selectedUpload(invoiceFile,'insurer_invoice')
         ]);
         const supportRef=supportUpload.status==='fulfilled'?supportUpload.value:'';
         const invoiceRef=invoiceUpload.status==='fulfilled'?invoiceUpload.value:'';
         const pendingEvidence=[];
-        if(supportFile&&supportUpload.status==='rejected')pendingEvidence.push('comprobante del cliente');
-        if(invoiceFile&&invoiceUpload.status==='rejected')pendingEvidence.push('factura de la aseguradora');
+        if(supportFile&&supportUpload.status==='rejected')pendingEvidence.push({label:'comprobante del cliente',error:supportUpload.reason});
+        if(invoiceFile&&invoiceUpload.status==='rejected')pendingEvidence.push({label:'factura de la aseguradora',error:invoiceUpload.reason});
         if(pendingEvidence.length) {
-          console.warn('[Gravicentra][Cobros] PAYMENT_OPTIONAL_DOCUMENT_UPLOAD_HOLD',{
-            receiptId:String(receipt.id||''),documentKinds:pendingEvidence
-          });
-          if(state)state.textContent='El adjunto no se pudo guardar. Se registrará el pago sin ese archivo; conserva el original para completar evidencia.';
-        } else if(state)state.textContent='Registrando pago y confirmando persistencia…';
-        const applied=await domain.applyPayment(receipt.id,{payload:{
+          const details=pendingEvidence.map(item=>item.label+': '+paymentDocumentFailureFeedback(item.error).message).join(' ');
+          const saved=uploadedRefs().length?' Los adjuntos ya cargados se conservaron en preparación y no se subirán otra vez.':'';
+          const message='No se registró el pago. '+details+' El archivo sigue seleccionado en este formulario.'+saved;
+          btn.disabled=false;btn.textContent='Reintentar guardado';pm.removeAttribute('aria-busy');
+          if(state)state.textContent=message;U.toast(message);return;
+        }
+        if(state)state.textContent='Registrando pago y confirmando persistencia…';
+        const manualPayload={
           sourceType:'manual',
-          paidDate:pm.querySelector('#pm-paid').value||'',
-          paymentMethod:pm.querySelector('#pm-metodo').value||'',
+          paidDate:manualDraft.paidDate,
+          paymentMethod:manualDraft.paymentMethod,
           paymentSupportDocumentRef:supportRef,
-          applicationDate:pm.querySelector('#pm-app').value||'',
-           invoiceDate:pm.querySelector('#pm-invoice-date').value||'',
-          invoiceNumber:pm.querySelector('#pm-invoice-number').value.trim(),
+          applicationDate:manualDraft.applicationDate,
+          invoiceDate:manualDraft.invoiceDate,
+          invoiceNumber:manualDraft.invoiceNumber,
           invoiceDocumentRef:invoiceRef,
           amount:c.monto
-        }});
-        const avisar=pm.querySelector('#pm-avisar')&&pm.querySelector('#pm-avisar').checked;
+        };
+        const documentaryCommand=documentaryDraft?await documentaryPaymentCommand(receipt,c,formValues,{...manualDraft,invoiceDocumentRef:invoiceRef}):null;
+        const applied=await domain.applyPayment(receipt.id,documentaryCommand||{payload:manualPayload});
+        if(documentaryCommand)verifyDocumentaryPaymentResult(applied,documentaryCommand,receipt);
+        const avisar=!documentaryCommand&&pm.querySelector('#pm-avisar')&&pm.querySelector('#pm-avisar').checked;
         const docsOk=!(applied&&applied.documentLifecycleOk===false);
         const reconciled=!!(applied&&/^APPLIED_/.test(String(applied.applicationState||'')));
         const cartera=applied&&applied.portfolioUpdated===true
@@ -1015,13 +1167,17 @@ Orbit.modules.cobros = (function () {
         const paymentResult=reconciled
           ? '✓ Pago registrado y conciliado con la aseguradora.'
           : '✓ Pago del cliente registrado. La aplicación por la aseguradora puede conciliarse después; no es un pago pendiente.';
-        const documentaryHold=pendingEvidence.length
-          ? ' No se guardó: '+pendingEvidence.join(' y ')+'. Conserva el archivo y completa el adjunto cuando Drive esté disponible.'
-          : docsOk?'':' Un documento requiere recuperación controlada.';
-        close();U.toast(paymentResult+cartera+documentaryHold);baseCache=null;
+        const documentaryHold=docsOk?'':' El pago sí quedó registrado, pero Drive no confirmó el vínculo final del adjunto. El archivo se conserva en este formulario; revisa el expediente antes de cerrarlo. No registres el pago de nuevo.';
+        pm.removeAttribute('aria-busy');baseCache=null;
+        if(docsOk)close();
+        else{btn.disabled=true;btn.textContent='Pago registrado';if(state)state.textContent=paymentResult+cartera+documentaryHold;}
+        U.toast(paymentResult+cartera+documentaryHold);
         if(avisar&&Orbit.notify&&cli&&cli.id){Orbit.notify.pedir(cli.id,{tipo:'Aviso de pago confirmado',icon:'💳',asunto:'Confirmación de pago · póliza '+(p.numero||''),mensaje:'Hola '+(cli.nombre||'')+', registramos tu pago de '+U.money(c.monto,c.moneda)+' (cuota '+(c.cuota||'')+') de la póliza '+(p.numero||'')+'. ¡Gracias por tu confianza!'});}
         /* B3-004 R14: router/store reactive owner preserves the active payment context. */
       } catch (error) {
+        if(error.documentaryMessage){sourceSelect.disabled=false;btn.disabled=false;btn.textContent='Registrar pago';pm.removeAttribute('aria-busy');
+          if(state)state.textContent=error.documentaryMessage;U.toast(error.documentaryMessage);return;}
+        const documentRecoveryRequired=releaseQuarantinedUploads(error);
         const feedback = paymentFailureFeedback(error);
         console.error('[Gravicentra][Cobros] Registrar pago falló', {
           code: String(error && (error.code || error.message) || 'UNKNOWN'),
@@ -1029,13 +1185,24 @@ Orbit.modules.cobros = (function () {
           diagnosticCategory: feedback.code,
           cobroId: c.id || '', receiptId: receipt.id || ''
         });
-        btn.disabled = false; btn.textContent = 'Registrar pago'; pm.removeAttribute('aria-busy');
+        btn.disabled = submittedDocumentary&&feedback.uncertain;
+        if(((supportFile||invoiceFile)&&feedback.uncertain)||documentRecoveryRequired)btn.disabled=true;
+        sourceSelect.disabled=btn.disabled;
+        btn.textContent = btn.disabled?'Verifica antes de reintentar':'Registrar pago'; pm.removeAttribute('aria-busy');
         const status = feedback.uncertain
           ? 'Resultado no confirmado. Recarga y comprueba si ya quedó aplicado antes de reintentar.'
-          : feedback.alreadyApplied ? 'No se creó un segundo cobro.' : 'No se guardaron cambios.';
+          : feedback.alreadyApplied ? 'No se creó un segundo cobro.'
+          : documentRecoveryRequired ? 'No se confirmó el pago ni la recuperación documental. Conserva este formulario y verifica el expediente antes de reintentar.'
+          : uploadedRefs().length ? 'No se confirmó el pago. Hay adjuntos en preparación; el formulario conserva sus referencias.'
+          : 'No se guardó el pago. Los archivos seleccionados se conservan en este formulario.';
         const reference = feedback.requestId ? ' · Ref. ' + feedback.requestId : '';
         if (state) state.textContent = status + ' Código: ' + feedback.code + reference;
         U.toast((isPreviewHost() ? 'Preview: ' : '') + feedback.message + ' Código: ' + feedback.code + reference + '. ' + status);
+      } finally {
+        const blocked=btn.disabled;
+        sourceSelect.disabled=blocked||uploadedRefs().length>0;
+        pm.querySelector('#pm-support-btn').disabled=blocked||documentaryMode||!!(supportFile&&uploadedFiles.payment_support.has(supportFile));
+        pm.querySelector('#pm-invoice-btn').disabled=blocked||!!(invoiceFile&&uploadedFiles.insurer_invoice.has(invoiceFile));
       }
     };
   }

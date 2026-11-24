@@ -283,6 +283,144 @@ async function scan(db){
   }
   return output;
 }
+// Optional bounded query to the same read-only owner. Source references remain
+// in dispatch input/private artifact; no customer rows enter repository files.
+function validateReferenceQuery(input){
+  assert.equal(typeof input,'string','I66_EXTRA_QUERY_STRING_REQUIRED');
+  assert.ok(Buffer.byteLength(input,'utf8')<=48000,'I66_EXTRA_QUERY_TOO_LARGE');
+  const q=JSON.parse(input);
+  assert.deepEqual(Object.keys(q).sort(),['schema','tenantId','projectId','writes','noEligibilityEffect','sources','targets','responsePublicKeyPem'].sort(),'I66_EXTRA_QUERY_FIELDS');
+  const key=crypto.createPublicKey(q.responsePublicKeyPem);
+  assert.equal(key.asymmetricKeyType,'rsa');
+  assert.ok(key.asymmetricKeyDetails.modulusLength>=3072&&key.asymmetricKeyDetails.modulusLength<=8192,'I66_EXTRA_RESPONSE_KEY_BOUND');
+  assert.equal(q.schema,'GI_I66_READONLY_INSURER_REFERENCE_QUERY_V1');
+  assert.equal(q.projectId,PROJECT);assert.equal(q.tenantId,TENANT);
+  assert.equal(q.writes,0);assert.equal(q.noEligibilityEffect,true);
+  assert.ok(Array.isArray(q.sources)&&q.sources.length>=1&&q.sources.length<=20);
+  assert.ok(q.sources.every(s=>Object.keys(s).sort().join(',')==='key,sha256'&&/^[a-z0-9_]{10,100}$/.test(s.key)&&/^[a-f0-9]{64}$/.test(s.sha256)));
+  assert.equal(new Set(q.sources.map(s=>s.key)).size,q.sources.length);
+  assert.ok(Array.isArray(q.targets)&&q.targets.length>=1&&q.targets.length<=60);
+  let refs=0;
+  for(const t of q.targets){
+    assert.deepEqual(Object.keys(t).sort(),['insurer','policy','aliases','sourceKey','holderWitness','references'].sort(),'I66_EXTRA_TARGET_FIELDS');
+    assert.ok(['COLUMNA','ASEGURADORA_GUATEMALTECA','ASEGURADORA_RURAL'].includes(t.insurer));
+    assert.ok(/^[A-Za-z0-9 /-]{1,80}$/.test(t.policy));
+    assert.ok(q.sources.some(s=>s.key===t.sourceKey));
+    assert.ok(!t.holderWitness||/^[a-f0-9]{64}$/.test(t.holderWitness));
+    assert.ok(Array.isArray(t.aliases)&&t.aliases.length>=1&&t.aliases.length<=8);
+    assert.ok(t.aliases.every(a=>typeof a==='string'&&/^[A-Za-z0-9 /-]{1,80}$/.test(a)));
+    assert.ok(Array.isArray(t.references)&&t.references.length>=1&&t.references.length<=120);
+    for(const r of t.references){
+      assert.ok(Object.keys(r).every(k=>['sourceFactId','requirement','invoiceNumber','installment','totalInstallments'].includes(k)),'I66_EXTRA_PRIVATE_SOURCE_FIELDS_FORBIDDEN');
+      assert.ok(/^[a-zA-Z0-9_-]{1,100}$/.test(r.sourceFactId));
+      for(const k of ['requirement','invoiceNumber'])if(r[k]!=null)assert.ok(/^[A-Za-z0-9 /-]{1,100}$/.test(r[k]));
+      assert.ok(r.requirement||r.invoiceNumber);
+      for(const k of ['installment','totalInstallments'])if(r[k]!=null)assert.ok(Number.isSafeInteger(r[k])&&r[k]>=1&&r[k]<=120);
+      refs++;
+    }
+  }
+  assert.ok(refs<=500,'I66_EXTRA_REFERENCE_BOUND');
+  assert.equal(new Set(q.targets.map(t=>t.insurer+'|'+t.policy)).size,q.targets.length);
+  return q;
+}
+const stableReferenceValue=v=>Array.isArray(v)?v.map(stableReferenceValue):v&&typeof v==='object'?
+  Object.fromEntries(Object.keys(v).sort().map(k=>[k,stableReferenceValue(v[k])])):v;
+const referenceDigest=v=>crypto.createHash('sha256').update(JSON.stringify(stableReferenceValue(v))).digest('hex');
+function projectReferenceDocument(d){
+  const value=d.data()||{},keys=[
+    'numero','numeroPoliza','numero_poliza','numPoliza','polizaNumero','policyNumber',
+    'pais','moneda','clienteId','clientId','aseguradoraId','companiaId','asesorId','renuevaDe','renovadaPor',
+    'vigenciaInicio','vigenciaFin','fechaInicio','fechaFin','frecuencia','cuotas',
+    'polizaId','policyId','reciboId','receiptId','reciboEsperadoId','cobroId','carteraId',
+    'secuencia','numeroCuota','cuotaNumero','cuota','serie','totalCuotas','totalInstallments',
+    'numeroReciboFuente','numeroReciboAseguradora','numeroRequerimiento','requerimiento','numeroBoleta',
+    'sourceNumber','referenciaCobro','receiptNumber','numeroRecibo','sourceId','sourceRef','evidenceId',
+    'numeroFactura','invoiceNumber','serieFactura','invoiceSeries',
+    'primaTotal','monto','montoTotal','primaNeta','neta','saldo','saldoPendiente','montoPagado',
+    'periodoInicioFuente','periodStart','receiptPeriodStart','fechaVencimientoContractual','vence','fechaVencimiento','fechaLimite',
+    'fechaPago','paidDate','actualPaidDate','inferredEffectiveDate','evidenceAsOfDate','applicationDate','fechaAplicacion',
+    'estado','paymentState','applicationState','pagado','confirmado','conciliado','conciliadoPago','inferredPaid',
+    'carteraActiva','historicalExigible','paymentOrigin','paymentEvidenceType','directOrInferred',
+    'auditId','operationId','requestId','applicationAuditId','applicationEvidenceVerified'];
+  return {id:d.id,updateTime:d.updateTime?.toJSON?.()||null,documentSha256:referenceDigest(value),
+    fields:Object.fromEntries(keys.filter(k=>value[k]!=null).map(k=>[k,value[k]]))};
+}
+async function scanReferenceQuery(db,q){
+  const col=n=>db.collection('tenants').doc(TENANT).collection('data').doc(n).collection('items');
+  const byId=docs=>Object.values(Object.fromEntries(docs.map(d=>[d.id,d])));
+  const insurerMatch=(name,wanted)=>wanted==='COLUMNA'?norm(name).includes('COLUMNA'):
+    wanted==='ASEGURADORA_GUATEMALTECA'?norm(name).includes('GUATEMALTECA'):
+    /ASEGURADORA RURAL|SEGUROS RURAL|BANRURAL/.test(norm(name));
+  async function bounded(promises,limit=120){
+    const snaps=await Promise.all(promises);assert.ok(snaps.every(s=>s.size<=limit),'I66_EXTRA_QUERY_ROWS_BOUND');
+    return byId(snaps.flatMap(s=>s.docs));
+  }
+  const results=[];
+  for(const t of q.targets){
+    const values=[...t.aliases,...t.aliases.filter(a=>/^\d+$/.test(a)).map(Number)];
+    const requests=['numero','numeroPoliza','numero_poliza','numPoliza','polizaNumero','policyNumber']
+      .flatMap(f=>values.map(v=>()=>col('polizas').where(f,'==',v).limit(21).get()));
+    let docs=[];
+    for(let i=0;i<requests.length;i+=6)docs.push(...await bounded(requests.slice(i,i+6).map(f=>f()),20));
+    docs=byId(docs);assert.ok(docs.length<=24,'I66_EXTRA_POLICY_EDITIONS_BOUND');
+    const editions=[];
+    for(const d of docs){
+      const p=d.data()||{};if(text(p.pais).toUpperCase()!=='GT')continue;
+      const insurerId=text(p.aseguradoraId||p.companiaId);
+      const insurer=insurerId?await col('aseguradoras').doc(insurerId).get():null;
+      if(!insurer?.exists||!insurerMatch(insurer.data()?.nombre||insurer.data()?.razonSocial,t.insurer))continue;
+      const clientId=text(p.clienteId||p.clientId);
+      const client=clientId?await col('clientes').doc(clientId).get():null;
+      const readRelated=name=>bounded(['polizaId','policyId'].map(f=>col(name).where(f,'==',d.id).limit(121).get()));
+      const receipts=await readRelated('recibosEsperados');
+      const linked={};
+      for(const name of ['carteraPrimas','cobros']){
+        let rows=await readRelated(name);
+        for(let i=0;i<receipts.length;i+=10){
+          const ids=receipts.slice(i,i+10).map(r=>r.id);
+          rows.push(...await bounded(['reciboId','reciboEsperadoId','receiptId'].map(f=>col(name).where(f,'in',ids).limit(121).get())));
+        }
+        linked[name]=byId(rows);assert.ok(linked[name].length<=240,'I66_EXTRA_LINKED_ROWS_BOUND');
+      }
+      const sourceSha=q.sources.find(s=>s.key===t.sourceKey).sha256;
+      const holderMatched=!!client?.exists&&!!t.holderWitness&&['nombre','nombreCompleto','razonSocial'].some(k=>
+        text(client.data()?.[k])&&crypto.createHash('sha256').update(sourceSha+'|'+norm(client.data()[k]).replace(/ /g,'')).digest('hex')===t.holderWitness);
+      const rr=receipts.map(projectReferenceDocument),cc=linked.cobros.map(projectReferenceDocument);
+      const comparisons=t.references.map(ref=>{
+        const external=ref.requirement||ref.invoiceNumber;
+        const matched=rr.filter(r=>EXTERNAL_REFERENCE_FIELDS.concat('numeroRecibo').some(k=>text(r.fields[k])===text(external)));
+        const ordinal=ref.installment==null?[]:rr.filter(r=>receiptOrdinal(r.fields)===ref.installment);
+        const exactIds=matched.map(r=>r.id);
+        const cobros=cc.filter(c=>['reciboId','reciboEsperadoId','receiptId'].some(k=>exactIds.includes(c.fields[k])));
+        return {sourceFactId:ref.sourceFactId,exactReferenceReceiptIds:exactIds,ordinalCandidateReceiptIds:ordinal.map(r=>r.id),
+          linkedCobroIds:cobros.map(c=>c.id),
+          paymentEvidenceReceiptIds:matched.filter(r=>paymentOrReportEvidence(r.fields)).map(r=>r.id),
+          writeEligible:false,reason:'READ_ONLY_EVIDENCE_REQUIRES_CANONICAL_WRITER_PREFLIGHT'};
+      });
+      editions.push({policy:projectReferenceDocument(d),insurer:projectReferenceDocument(insurer),
+        clientExists:!!client?.exists,clientId:client?.exists?client.id:null,holderWitnessMatches:holderMatched,
+        receipts:rr,portfolio:linked.carteraPrimas.map(projectReferenceDocument),cobros:cc,comparisons});
+    }
+    results.push({insurer:t.insurer,policy:t.policy,sourceKey:t.sourceKey,editions,
+      diagnosticOnly:true,noEligibilityEffect:true,writes:0});
+  }
+  return {schema:'GI_I66_READONLY_INSURER_REFERENCE_RESULT_V1',readOnly:true,writes:0,noEligibilityEffect:true,
+    projectId:PROJECT,tenantId:TENANT,sourceQuerySha256:referenceDigest(q),observedAtUtc:new Date().toISOString(),
+    sourceSha:process.env.GITHUB_SHA||null,runId:process.env.GITHUB_RUN_ID||null,targets:results,
+    guard:'No write plan; fresh canonical writer must verify preimages and exact source identity before any financial mutation'};
+}
+
+function sealReferenceReport(result,publicKeyPem){
+  const bytes=Buffer.from(JSON.stringify(result)),key=crypto.randomBytes(32),iv=crypto.randomBytes(12);
+  const cipher=crypto.createCipheriv('aes-256-gcm',key,iv);
+  const encrypted=Buffer.concat([cipher.update(bytes),cipher.final()]);
+  return {schema:'GI_I66_READONLY_ENCRYPTED_REFERENCE_RESULT_V1',algorithm:'RSA-OAEP-SHA256+AES-256-GCM',
+    wrappedKey:crypto.publicEncrypt({key:publicKeyPem,oaepHash:'sha256',padding:crypto.constants.RSA_PKCS1_OAEP_PADDING},key).toString('base64'),
+    iv:iv.toString('base64'),tag:cipher.getAuthTag().toString('base64'),ciphertext:encrypted.toString('base64'),
+    plaintextSha256:crypto.createHash('sha256').update(bytes).digest('hex'),sourceQuerySha256:result.sourceQuerySha256,
+    targetCount:result.targets.length,writes:0,noEligibilityEffect:true};
+}
+
 async function main(){
   validateSource();
   assert.equal(process.env.GCLOUD_PROJECT,PROJECT);
@@ -291,6 +429,20 @@ async function main(){
   const {getFirestore}=require('firebase-admin/firestore');
   const {initializeApp,getApps}=require('firebase-admin/app');
   const db=getFirestore(getApps()[0]||initializeApp({projectId:PROJECT}));
+  // Read dispatch selectors from the runner event file: never interpolate or
+  // bind customer input into shell/job env, where Actions may echo it.
+  const referenceInput=process.env.GITHUB_EVENT_NAME==='workflow_dispatch'&&process.env.GITHUB_EVENT_PATH?
+    JSON.parse(fs.readFileSync(process.env.GITHUB_EVENT_PATH,'utf8')).inputs?.readonly_reference_query||'':'';
+  if(referenceInput){
+    const query=validateReferenceQuery(referenceInput);
+    const result=await scanReferenceQuery(db,query);
+    const dest=text(process.env.GI_I66_CARTERA_REPORT),prefix=text(process.env.RUNNER_TEMP)+'/';
+    assert.ok(prefix.startsWith('/home/runner/work/_temp/')&&dest.startsWith(prefix)&&dest.endsWith('/gi-i66-a5-a6-live-readonly.json'));
+    fs.writeFileSync(dest,JSON.stringify(sealReferenceReport(result,query.responsePublicKeyPem),null,2)+'\n',{flag:'wx',mode:0o600});
+    console.log('I66_REFERENCE_QUERY_READONLY '+JSON.stringify({targets:result.targets.length,
+      editions:result.targets.reduce((n,t)=>n+t.editions.length,0),writes:0,noEligibilityEffect:true}));
+    return;
+  }
   const first=await scan(db),second=await scan(db);
   assert.deepEqual(first,second,'I66_A5_A6_CONCURRENT_LIVE_CHANGE_HOLD');
   const counts=first.reduce((m,r)=>(m[r.status]=(m[r.status]||0)+1,m),{});
@@ -317,4 +469,4 @@ if(require.main===module)main().catch(e=>{
   console.error(/^I66_A5_A6_[A-Z0-9_]+$/.test(text(e.message))?e.message:'I66_A5_A6_READONLY_HOLD');
   process.exitCode=1;
 });
-module.exports={validateSource,CASES,aliases,sameInsurer,issuerInstallments,receiptOrdinal,paymentOrReportEvidence,issuerSchedulePreview,issuerScheduleAdjudication};
+module.exports={validateSource,CASES,aliases,sameInsurer,issuerInstallments,receiptOrdinal,paymentOrReportEvidence,issuerSchedulePreview,issuerScheduleAdjudication,validateReferenceQuery,scanReferenceQuery,projectReferenceDocument,sealReferenceReport};

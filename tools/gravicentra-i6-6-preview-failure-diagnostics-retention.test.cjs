@@ -5,17 +5,20 @@ const test=require('node:test'),assert=require('node:assert/strict'),fs=require(
 const advisor=require('./gravicentra-i6-6-advisor-payables-signed-uat.cjs');
 const proposal=require('./gravicentra-i6-6-proposal-uat-diagnostics.cjs');
 const documented=require('./gravicentra-i6-6-documented-terms-signed-check.cjs');
+const directForms=require('./gravicentra-i6-6-carlos-paula-live-direct-renewal-synthetic-uat.cjs');
 const workflow=path.join(__dirname,'../.github/workflows/gravicentra-i66-privileged-role-three-function-preview-uat.yml');
 const yaml=fs.readFileSync(workflow,'utf8');
 const section=yaml.split('- name: Preserve sanitized failure diagnostics without an acceptance proof')[1].split('- name: Upload diagnostics only')[0];
 const code=section.split("node - <<'NODE'\n")[1].split('\n          NODE')[0].split('\n').map(line=>line.replace(/^          /,'')).join('\n');
 const clone=value=>JSON.parse(JSON.stringify(value)),secret='PRIVATE_CUSTOMER_EMAIL_TOKEN_DO_NOT_EXPORT';
 const names={advisor:'/tmp/i66-retention/gravicentra-i66-advisor-payables-signed-uat-preview.json',
-  proposal:'/tmp/i66-package/evidence/i66-proposal-application-signed-uat-preview.json'};
-function execute({advisor:advisorReport,proposal:proposalReport,raw={},readErrors=[],env={}}={}){
+  proposal:'/tmp/i66-package/evidence/i66-proposal-application-signed-uat-preview.json',
+  directForms:'/tmp/i66-retention/gi-i66-direct-forms-preview.json'};
+function execute({advisor:advisorReport,proposal:proposalReport,directForms:directFormsReport,raw={},readErrors=[],env={}}={}){
   const files=new Map();
   if(advisorReport!==undefined)files.set(names.advisor,JSON.stringify(advisorReport));
   if(proposalReport!==undefined)files.set(names.proposal,JSON.stringify(proposalReport));
+  if(directFormsReport!==undefined)files.set(names.directForms,JSON.stringify(directFormsReport));
   for(const [key,value] of Object.entries(raw))files.set(names[key],value);
   let written;const writes=[];
   const fakeFs={existsSync:name=>files.has(name),readFileSync:name=>{if(readErrors.includes(name))throw Error(secret);return files.get(name);},
@@ -25,6 +28,7 @@ function execute({advisor:advisorReport,proposal:proposalReport,raw={},readError
     if(name==='./tools/gravicentra-i6-6-advisor-payables-signed-uat.cjs')return advisor;
     if(name==='./tools/gravicentra-i6-6-proposal-uat-diagnostics.cjs')return proposal;
     if(name==='./tools/gravicentra-i6-6-documented-terms-signed-check.cjs')return documented;
+    if(name==='./tools/gravicentra-i6-6-carlos-paula-live-direct-renewal-synthetic-uat.cjs')return directForms;
     throw Error('UNEXPECTED_DIAGNOSTIC_DEPENDENCY');
   },process:{env:{RUNNER_TEMP:'/tmp/i66-retention',I66_PACKAGE_ROOT:'/tmp/i66-package',GITHUB_RUN_ID:'44027761291',SOURCE_SHA:'a'.repeat(40),...env}}});
   assert.deepEqual(writes,['/tmp/i66-retention/i66-preview-failure-diagnostic.json']);return written;
@@ -66,7 +70,7 @@ test('actual workflow preserves correlated HOLD evidence and exact counters with
   assert.deepEqual(obs.actors[0].denials,input.browserObservability.actors[0].denials);
   assert.equal(obs.actors[0].events[0].requestKey,obs.actors[0].events[1].requestKey);
   assert.equal(obs.actors[0].events[0].pathSha256,obs.actors[0].events[1].pathSha256);
-  assert.deepEqual(out.reportAvailability,[{owner:'ADVISOR',status:'REPORT_CAPTURED'},{owner:'PROPOSAL',status:'REPORT_NOT_FOUND'}]);
+  assert.deepEqual(out.reportAvailability,[{owner:'ADVISOR',status:'REPORT_CAPTURED'},{owner:'PROPOSAL',status:'REPORT_NOT_FOUND'},{owner:'DIRECT_FORMS',status:'REPORT_NOT_FOUND'}]);
   assert.throws(()=>advisor.validateBrowserObservability(obs),'a diagnostic projection is never an acceptance receipt');
 });
 test('safe telemetry, page, cancellation and application events survive even though the PASS validator rejects them',()=>{
@@ -129,12 +133,12 @@ test('historical report without browser telemetry stays usable and does not fabr
 });
 for(const bad of ['not-json '+secret,'null','[]','42','"'+secret+'"','x'.repeat(4194305)])test('unreadable advisor report cannot erase a separate proposal report: '+bad.slice(0,20),()=>{
   const out=execute({raw:{advisor:bad},proposal:{status:'HOLD',phase:'PREVIEW',checks:[],cleanup:{status:'PASS',remaining:0}}});
-  assert.deepEqual(out.reportAvailability,[{owner:'ADVISOR',status:'REPORT_UNREADABLE'},{owner:'PROPOSAL',status:'REPORT_CAPTURED'}]);
+  assert.deepEqual(out.reportAvailability,[{owner:'ADVISOR',status:'REPORT_UNREADABLE'},{owner:'PROPOSAL',status:'REPORT_CAPTURED'},{owner:'DIRECT_FORMS',status:'REPORT_NOT_FOUND'}]);
   assert.equal(out.reports.length,1);assert.equal(out.reports[0].owner,'PROPOSAL');assert.equal(out.status,'FAILED_NOT_ACCEPTED');assert.doesNotMatch(JSON.stringify(out),new RegExp(secret));
 });
 test('read failure and absent report paths are explicit without exposing filesystem or exception details',()=>{
   const out=execute({advisor:fixture(),readErrors:[names.advisor],env:{I66_PACKAGE_ROOT:''}});
-  assert.deepEqual(out.reportAvailability,[{owner:'PROPOSAL',status:'REPORT_PATH_UNAVAILABLE'},{owner:'ADVISOR',status:'REPORT_UNREADABLE'}]);
+  assert.deepEqual(out.reportAvailability,[{owner:'PROPOSAL',status:'REPORT_PATH_UNAVAILABLE'},{owner:'ADVISOR',status:'REPORT_UNREADABLE'},{owner:'DIRECT_FORMS',status:'REPORT_NOT_FOUND'}]);
   assert.deepEqual(out.reports,[]);assert.doesNotMatch(JSON.stringify(out),/\/tmp\/|PRIVATE/);
 });
 test('top-level diagnostics also reject arbitrary enum values and source identifiers',()=>{
@@ -166,4 +170,60 @@ test('the diagnostic workflow and its regression test are sealed source owners',
   for(const owner of ['.github/workflows/gravicentra-i66-privileged-role-three-function-preview-uat.yml',
     'tools/gravicentra-i6-6-preview-failure-diagnostics-retention.test.cjs'])
     assert.equal(PINNED_OWNER_PATHS.filter(value=>value===owner).length,1);
+});
+
+function directFixture(){
+  return {schema:'I66_DIRECT_RENEWAL_ISSUED_ENDORSEMENT_SIGNED_UI_V1',phase:'PREVIEW',sourceSha:'a'.repeat(40),status:'HOLD',actors:[{
+    role:'operativo',status:'HOLD',restored:true,entries:[],failureStage:'BOTH_PUBLIC_RENEWAL_ENTRIES',failureCode:'TIMEOUT_ERROR',
+    clickDiagnostic:{beforeClick:{snapshotStatus:'CAPTURED',target:'RENEWAL_DIRECT',targetCount:1,targetVisible:true,targetEnabled:true,targetReceivesPointer:true,topOwner:'TARGET',legalOverlayCount:0},
+      onFailure:{snapshotStatus:'CAPTURED',target:'RENEWAL_DIRECT',targetCount:1,targetVisible:true,targetEnabled:true,targetReceivesPointer:false,topOwner:'LEGAL_GATE',legalOverlayCount:1,legalOverlayAtTarget:true},
+      failureClass:'TIMEOUT_ERROR',actionability:{pointerInterception:true},knownInterceptors:{legalGate:true,authRestoring:false}},
+    failureUi:{snapshotStatus:'CAPTURED',target:'RENEWAL_DIRECT',topOwner:'LEGAL_GATE',legalOverlayCount:1}
+  }]};
+}
+
+test('actual failure heredoc exports the direct-forms report even when both historic reports are absent',()=>{
+  const input=directFixture(),out=execute({directForms:input});
+  assert.equal(out.status,'FAILED_NOT_ACCEPTED');assert.equal(out.reports.length,1);
+  assert.deepEqual(out.reports[0],directForms.safeDirectFormsDiagnosticReport(input));
+  assert.equal(out.reports[0].diagnosticOnly,true);assert.equal(out.reports[0].actors[0].restored,true);
+  assert.equal(out.reports[0].actors[0].clickDiagnostic.beforeClick.topOwner,'TARGET');
+  assert.equal(out.reports[0].actors[0].clickDiagnostic.onFailure.topOwner,'LEGAL_GATE');
+  assert.equal(out.reports[0].actors[0].clickDiagnostic.actionability.pointerInterception,true);
+  assert.deepEqual(out.reportAvailability,[{owner:'ADVISOR',status:'REPORT_NOT_FOUND'},{owner:'PROPOSAL',status:'REPORT_NOT_FOUND'},{owner:'DIRECT_FORMS',status:'REPORT_CAPTURED'}]);
+});
+
+test('direct-forms DOM, error and identity values never escape the actual workflow export',()=>{
+  const input=directFixture(),actor=input.actors[0];input.rawError=secret;input.actorUid=secret;input.token=secret;actor.name=secret;actor.uid=secret;
+  actor.clickDiagnostic.rawError=secret;actor.clickDiagnostic.scope='user:'+secret;actor.clickDiagnostic.headers={Authorization:secret};
+  for(const row of [actor.clickDiagnostic.beforeClick,actor.clickDiagnostic.onFailure,actor.failureUi])Object.assign(row,{text:secret,outerHTML:'<div>'+secret+'</div>',url:'https://example.invalid/'+secret,topId:secret,attributes:{'data-legal-gate':'user:'+secret}});
+  const out=execute({advisor:fixture(),proposal:{status:'HOLD',phase:'PREVIEW'},directForms:input}),r=out.reports.find(row=>row.owner==='DIRECT_FORMS');
+  assert.equal(out.reports.length,3);assert.equal(r.actors[0].clickDiagnostic.knownInterceptors.legalGate,true);
+  assert.doesNotMatch(JSON.stringify(out),new RegExp(secret));assert.doesNotMatch(JSON.stringify(r),/https:|outerHTML|Authorization|actorUid|"headers"|user:/);
+});
+
+for(const bad of ['not-json '+secret,'null','[]','42','"'+secret+'"','x'.repeat(4194305)])test('malformed direct forms cannot erase independent advisor/proposal diagnostics: '+bad.slice(0,20),()=>{
+  const a=fixture(),p={status:'HOLD',phase:'PREVIEW',checks:[],cleanup:{status:'PASS',remaining:0}},baseline=execute({advisor:a,proposal:p});
+  const out=execute({advisor:a,proposal:p,raw:{directForms:bad}});
+  assert.deepEqual(out.reports,baseline.reports);assert.equal(out.reports.length,2);assert.equal(out.status,'FAILED_NOT_ACCEPTED');
+  assert.deepEqual(out.reportAvailability.at(-1),{owner:'DIRECT_FORMS',status:'REPORT_UNREADABLE'});assert.doesNotMatch(JSON.stringify(out),new RegExp(secret));
+});
+
+test('unreadable historic reports cannot erase direct-forms diagnostics or require a package path',()=>{
+  const input=directFixture(),out=execute({raw:{advisor:'invalid'},directForms:input,env:{I66_PACKAGE_ROOT:''}});
+  assert.deepEqual(out.reports,[directForms.safeDirectFormsDiagnosticReport(input)]);
+  assert.deepEqual(out.reportAvailability,[{owner:'PROPOSAL',status:'REPORT_PATH_UNAVAILABLE'},{owner:'ADVISOR',status:'REPORT_UNREADABLE'},{owner:'DIRECT_FORMS',status:'REPORT_CAPTURED'}]);
+});
+
+test('direct-forms filesystem read failures remain explicit and cannot expose raw exception details',()=>{
+  const out=execute({advisor:fixture(),directForms:directFixture(),readErrors:[names.directForms]});
+  assert.equal(out.reports.length,1);assert.equal(out.reports[0].owner,'ADVISOR');
+  assert.deepEqual(out.reportAvailability.at(-1),{owner:'DIRECT_FORMS',status:'REPORT_UNREADABLE'});assert.doesNotMatch(JSON.stringify(out),/PRIVATE|\/tmp\//);
+});
+
+test('a direct-forms PASS label in a failed job remains diagnostic only and cannot authorize a release',()=>{
+  const input=directFixture();input.status='SIGNED_PREVIEW_DIRECT_FORMS_READONLY_PASS';input.actors[0].status='SIGNED_PREVIEW_ENTRIES_READONLY_PASS';
+  const out=execute({directForms:input});assert.equal(out.status,'FAILED_NOT_ACCEPTED');assert.equal(out.reports[0].status,'FAILED_NOT_ACCEPTED');assert.equal(out.reports[0].diagnosticOnly,true);
+  assert.doesNotMatch(code,/validateSignedReport\(|acceptCarlos|acceptDirection|\b(?:registrar|register)\s*\(|force:\s*true/);
+  assert.match(code,/safeDirectFormsDiagnosticReport\(r\)/);
 });

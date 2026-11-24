@@ -107,7 +107,12 @@ test('failed-preview artifact transports sanitized click evidence and exact sour
       onFailure:{snapshotStatus:'CAPTURED',route:secret,legalOverlayAtTarget:true},actionability:{pointerInterception:true,message:secret},actorUid:secret},
     checks:[{name:'EXACT_SOURCE',status:'PASS'}],cleanup:{status:'PASS',remaining:0},rawError:secret};
   let written;
-  const fakeFs={existsSync:()=>true,readFileSync:()=>JSON.stringify(report),writeFileSync:(name,value)=>{assert.equal(name,'/tmp/qa/i66-preview-failure-diagnostic.json');written=JSON.parse(value);}};
+  // This focused fixture owns one advisor report. A blanket existsSync=true
+  // wrongly fabricates the same report under every later diagnostic owner.
+  const reportPath='/tmp/qa/gravicentra-i66-advisor-payables-signed-uat-preview.json',reads=[],probes=[];
+  const fakeFs={existsSync:name=>{probes.push(name);return name===reportPath;},
+    readFileSync:name=>{assert.equal(name,reportPath,'UNEXPECTED_DIAGNOSTIC_REPORT_READ');reads.push(name);return JSON.stringify(report);},
+    writeFileSync:(name,value)=>{assert.equal(name,'/tmp/qa/i66-preview-failure-diagnostic.json');written=JSON.parse(value);}};
   const fixtureRequire=name=>{
     if(name==='node:fs')return fakeFs;if(name==='node:path')return path;
     if(name==='./tools/gravicentra-i6-6-advisor-payables-signed-uat.cjs')return driver;
@@ -116,6 +121,9 @@ test('failed-preview artifact transports sanitized click evidence and exact sour
   };
   vm.runInNewContext(code,{require:fixtureRequire,process:{env:{RUNNER_TEMP:'/tmp/qa',GITHUB_RUN_ID:'71',SOURCE_SHA:'a'.repeat(40)}}});
   assert.equal(written.status,'FAILED_NOT_ACCEPTED');assert.equal(written.reports.length,1);
+  assert.deepEqual(reads,[reportPath]);assert.deepEqual(probes,[reportPath,'/tmp/qa/gi-i66-direct-forms-preview.json']);
+  assert.deepEqual(written.reportAvailability,[{owner:'PROPOSAL',status:'REPORT_PATH_UNAVAILABLE'},
+    {owner:'ADVISOR',status:'REPORT_CAPTURED'},{owner:'DIRECT_FORMS',status:'REPORT_NOT_FOUND'}]);
   assert.deepEqual(written.reports[0].failureLocation,report.failureLocation);
   assert.equal(written.reports[0].failureCheck,'DIRECTION_LEGAL_RUNTIME_SCOPE_MISMATCH');
   assert.equal(written.reports[0].failureLegalSubstage,'PRE_CLICK_PRESENTATION');

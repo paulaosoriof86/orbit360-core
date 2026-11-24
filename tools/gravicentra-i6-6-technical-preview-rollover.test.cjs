@@ -779,9 +779,16 @@ for (const [childCode, safeCode] of [['ETIMEDOUT', 'INVENTORY_CLI_TIMEOUT'], ['E
 // Current physical E3 / v24 successor: these sanitized fixtures are contract
 // tests only. The complete observed inventory remains in the pinned Actions
 // artifact; its full canonical digest is checked against fresh Cloud reads.
-const physicalPin = guard.currentPhysicalRolloverCandidatePin();
-const physicalText = fs.readFileSync(path.join(__dirname, '..', physicalPin.receiptPath), 'utf8');
+// V3 is named explicitly so the historical failed27 contract cannot be
+// silently rebound when the current successful-package successor advances.
+const physicalV3Path = 'artifacts/orbit360-recovery/release-control/I6_6_CURRENT_PHYSICAL_PREVIEW_V27_RESIDUAL_ROLLOVER_V3_20261124.json';
+const physicalText = fs.readFileSync(path.join(__dirname, '..', physicalV3Path), 'utf8');
 const physicalReceipt = JSON.parse(physicalText);
+const physicalPin = { receiptPath: physicalV3Path, receiptSha256: digest(physicalText),
+  channel: physicalReceipt.channel.id, origin: physicalReceipt.channel.origin,
+  previousSourceSha: physicalReceipt.previousCandidate.sourceSha,
+  previousArtifactId: physicalReceipt.previousCandidate.artifactId,
+  previousArtifactDigest: physicalReceipt.previousCandidate.artifactDigest };
 const physicalV2Path = 'artifacts/orbit360-recovery/release-control/I6_6_CURRENT_PHYSICAL_PREVIEW_V24_ROLLOVER_V2_20261124.json';
 const physicalV2Text = fs.readFileSync(path.join(__dirname, '..', physicalV2Path), 'utf8');
 const physicalV2Receipt = JSON.parse(physicalV2Text);
@@ -1192,4 +1199,150 @@ for (const [label, mutate] of [
   ['readback artifact mutation', f => { f.readback.noArtifactMutation = false; }]
 ]) test('v27 residual rejects ' + label, () => {
   const f = physicalResidualFixture(); mutate(f); assert.throws(() => api.validatePhysicalResidualBackup(f));
+});
+
+// V4 is the current closed successor. These unit fixtures are sanitized contract
+// inputs; the exact provider metadata, full inventory and archives are verified
+// separately from private Actions evidence before this profile is published.
+const successfulPhysicalPin = guard.currentPhysicalRolloverCandidatePin();
+const successfulPhysicalText = fs.readFileSync(path.join(__dirname, '..', successfulPhysicalPin.receiptPath), 'utf8');
+const successfulPhysicalReceipt = JSON.parse(successfulPhysicalText);
+function successfulPhysicalFixture() {
+  const f = physicalFixture();
+  f.a = clone(successfulPhysicalReceipt);
+  f.control.currentTechnicalPreviewRollover = {
+    receiptPath: successfulPhysicalPin.receiptPath, receiptSha256: successfulPhysicalPin.receiptSha256 };
+  f.control.frontendPreviewRequest.version = 29;
+  f.candidate = { sourceSha: 'e'.repeat(40), buildRunId: 45470000001,
+    previewChannelId: successfulPhysicalPin.channel, previewUrl: successfulPhysicalPin.origin,
+    previewRollover: clone(successfulPhysicalPin) };
+  const expected = f.a.previousCandidate;
+  f.run = { id: expected.buildRunId, head_sha: expected.sourceSha, head_branch: f.a.branch,
+    path: '.github/workflows/gravicentra-release-delta-66-package.yml',
+    status: 'completed', conclusion: 'success', run_attempt: 1 };
+  f.artifact = { id: expected.artifactId, name: 'gi-i66-immutable-' + expected.sourceSha,
+    digest: expected.artifactDigest, expired: false, size_in_bytes: 1024,
+    workflow_run: { id: expected.buildRunId, head_sha: expected.sourceSha, head_branch: f.a.branch } };
+  return f;
+}
+test('V4 pins successful build28 as unaccepted Preview backup and preserves V3 byte history', () => {
+  const f = successfulPhysicalFixture(), a = successfulPhysicalReceipt;
+  assert.equal(digest(successfulPhysicalText), successfulPhysicalPin.receiptSha256);
+  assert.equal(a.profile, 'I66_CURRENT_PHYSICAL_E3_PREVIEW_V28_SUCCESSOR_V4');
+  assert.equal(a.channel.expectedVersion, 'sites/ays-orbit-360-lab/versions/4d23b74c673db5df');
+  assert.equal(a.previousCandidate.sourceSha, '74ae28c6e6e6b40f845567c9b00738a58307b3cb');
+  assert.equal(a.previousCandidate.buildRunId, 45464287026);
+  assert.equal(a.previousCandidate.artifactId, 14953553588);
+  assert.equal(a.previousCandidate.backupOnlyPostDeployFailure, undefined);
+  assert.equal(a.previousCandidate.wholeBuildConclusionRequired, 'success');
+  assert.equal(a.previousCandidate.productAccepted, false);
+  assert.equal(a.previousCandidate.releaseEligibleByThisReceipt, false);
+  assert.equal(a.signedPreviewFailurePreserved.wholeRun, 'FAILURE');
+  assert.equal(a.signedPreviewFailurePreserved.runId, 45465410675);
+  assert.equal(a.signedPreviewFailurePreserved.noLiveAuthorization, true);
+  assert.equal(a.freshInventoryEvidence.totalChannels, 51);
+  assert.equal(a.freshInventoryEvidence.orderedChannelMetadataSha256, 'cb29e689c3908709a446817a26dd6e56eba608f977295946732621c137ddc6f8');
+  assert.deepEqual(a.priorRolloverReceipt, {
+    path: physicalV3Path, sha256: 'adb38e8b94c32ab83cb447c9cfeb9c14f86cd88f2e26c34326d2ced37e373df7',
+    preserveBytes: true, status: 'V3_PRESERVED_EXACT_RESIDUAL27_BACKUP_ONLY_AND_SUCCESSFUL_BUILD28' });
+  assert.deepEqual(a.protectedLive, physicalReceipt.protectedLive);
+  assert.equal(a.protectedLive.buildRunAttempt, 2);
+  assert.equal(api.validateAuthorization(f.control, successfulPhysicalText).channel.id, 'gi-i66-rc-45448470011');
+});
+test('V4 and historical V3 cannot borrow each other request, receipt bytes or candidate pins', () => {
+  const current = successfulPhysicalFixture(), historical = physicalFixture();
+  assert.equal(api.validateCandidateReuse(current.candidate).receiptSha256, successfulPhysicalPin.receiptSha256);
+  historical.candidate.sourceSha = '74ae28c6e6e6b40f845567c9b00738a58307b3cb';
+  historical.candidate.buildRunId = 45464287026;
+  assert.equal(api.validateCandidateReuse(historical.candidate).receiptSha256, physicalPin.receiptSha256);
+  assert.equal(api.validateAuthorization(historical.control, physicalText).profile, physicalReceipt.profile);
+  assert.throws(() => api.validateAuthorization(current.control, physicalText), /EXACT_RECEIPT_BYTES_REQUIRED/);
+  assert.throws(() => api.validateAuthorization(historical.control, successfulPhysicalText), /EXACT_RECEIPT_BYTES_REQUIRED/);
+  for (const version of [27, 28, 30]) {
+    const f = successfulPhysicalFixture(); f.control.frontendPreviewRequest.version = version;
+    assert.throws(() => api.validateAuthorization(f.control, successfulPhysicalText), /SUCCESSOR_REQUEST_REQUIRED/);
+  }
+});
+test('V4 preserves only the exact inherited 224-file E3 contract and frozen authorities', () => {
+  const profile = privateRuntimeExports().profile(successfulPhysicalPin);
+  assert.equal(profile.expectedSiteFileCount, 224); assert.equal(profile.requestVersion, 29);
+  assert.equal(profile.residualPreviousBuild, false);
+  assert.equal(privateRuntimeExports().profile(physicalPin).requestVersion, 28);
+  assert.equal(privateRuntimeExports().profile().expectedSiteFileCount, 223);
+  assert.ok(candidateGuard.PINNED_OWNER_PATHS.includes(successfulPhysicalPin.receiptPath));
+  assert.ok(candidateGuard.PINNED_OWNER_PATHS.includes(successfulPhysicalReceipt.previousCandidate.receiptPath));
+  const workflow = fs.readFileSync(path.join(__dirname, '../.github/workflows/gravicentra-release-delta-66-package.yml'), 'utf8');
+  assert.ok(workflow.includes(successfulPhysicalPin.receiptPath));
+  assert.ok(workflow.includes(successfulPhysicalReceipt.previousCandidate.receiptPath));
+  const previousBytes = fs.readFileSync(path.join(__dirname, '..', successfulPhysicalReceipt.previousCandidate.receiptPath));
+  const gitBlob = crypto.createHash('sha1').update('blob ' + previousBytes.length + '\0').update(previousBytes).digest('hex');
+  assert.equal(gitBlob, successfulPhysicalReceipt.previousCandidate.receiptGitBlobSha);
+});
+for (const [label, mutate] of [
+  ['backend authority', f => { f.control.scopedBackendPreviewI66 = {}; }],
+  ['live authority', f => { f.control.operationalReleaseCandidate = {}; }],
+  ['real data write', f => { f.control.frontendPreviewRequest.realDataWritesAllowed = true; }],
+  ['live deploy', f => { f.control.frontendPreviewRequest.liveDeployAuthorized = true; }],
+  ['physical live version', f => { f.control.currentPhysicalHostingRelease.liveHostingVersion = 'sites/ays-orbit-360-lab/versions/drift'; }],
+  ['receipt whitespace', f => { f.receiptOverride = successfulPhysicalText + '\n'; }],
+]) test('V4 refuses ' + label, () => {
+  const f = successfulPhysicalFixture(); mutate(f);
+  assert.throws(() => api.validateAuthorization(f.control, f.receiptOverride || successfulPhysicalText));
+});
+for (const key of Object.keys(successfulPhysicalPin))
+  test('V4 candidate rejects changed exact pin ' + key, () => {
+    const f = successfulPhysicalFixture(); f.candidate.previewRollover[key] = 'different';
+    assert.throws(() => api.validateCandidateReuse(f.candidate));
+  });
+test('V4 requires a new source and build and cannot recycle any frozen previous candidate', () => {
+  const values = {
+    sourceSha: ['74ae28c6e6e6b40f845567c9b00738a58307b3cb', 'fbe7f289ce60cb3a8232d9c5886441c180cb72d4',
+      'cb3b8f5d505a53bfbafca80a9334d873d712d73e', '478c045c168c2e1b80f28a94094f4dbbbfdf1f81',
+      '60ac1ae2d765484ed40c820a942dcc0966385da7', successfulPhysicalReceipt.protectedLive.sourceSha],
+    buildRunId: [45464287026, 45460310493, 45458031865, 45452721643, 45448470011, 45287432665] };
+  for (const [field, choices] of Object.entries(values)) for (const value of choices) {
+    const f = successfulPhysicalFixture(); f.candidate[field] = value;
+    assert.throws(() => api.validateCandidateReuse(f.candidate));
+  }
+});
+test('V4 successful backup requires whole SUCCESS and cannot adopt the V3 failed residual exception', () => {
+  const f = successfulPhysicalFixture(), expected = f.a.previousCandidate;
+  assert.equal(api.validateArtifact(f.run, f.artifact, expected), expected);
+  assert.throws(() => api.validateArtifact({ ...f.run, conclusion: 'failure' }, f.artifact, expected), /BACKUP_BUILD_NOT_SUCCESS/);
+  assert.throws(() => api.validateArtifact({ ...f.run, status: 'in_progress', conclusion: null }, f.artifact, expected), /BACKUP_BUILD_INCOMPLETE/);
+  assert.throws(() => api.validateArtifact({ ...f.run, run_attempt: 2 }, f.artifact, expected), /BUILD_ATTEMPT_DRIFT/);
+  const forged = { ...expected, backupOnlyPostDeployFailure: physicalReceipt.previousCandidate.backupOnlyPostDeployFailure };
+  assert.throws(() => api.validateArtifact({ ...f.run, conclusion: 'failure' }, f.artifact, forged,
+    { residualBackupProof: api.validatePhysicalResidualBackup(physicalResidualFixture()) }));
+});
+for (const [label, mutate] of [
+  ['source', f => { f.run.head_sha = 'a'.repeat(40); }],
+  ['workflow', f => { f.run.path = '.github/workflows/other.yml'; }],
+  ['expired archive', f => { f.artifact.expired = true; }],
+  ['artifact source', f => { f.artifact.workflow_run.head_sha = 'a'.repeat(40); }],
+  ['artifact run', f => { f.artifact.workflow_run.id++; }],
+  ['artifact bytes digest', f => { f.artifact.digest = 'sha256:' + 'a'.repeat(64); }]
+]) test('V4 backup rejects ' + label, () => {
+  const f = successfulPhysicalFixture(); mutate(f);
+  assert.throws(() => api.validateArtifact(f.run, f.artifact, f.a.previousCandidate));
+});
+test('V4 uses the same strict final inventory comparison and only documented target statistics may settle', () => {
+  const f = afterInventoriesFixture(); f.authorization.profile = successfulPhysicalReceipt.profile;
+  f.final.result[0].release.version.fileCount = '224';
+  assert.equal(validateAfter(f).otherChannelsUnchanged, 50);
+  f.final.result[1].release.version.fileCount = '224';
+  assert.throws(() => validateAfter(f), /OTHER_CHANNEL_CHANGED/);
+  delete f.final.result[1].release.version.fileCount;
+  f.final.result[0].unknownMetadata = true;
+  assert.throws(() => validateAfter(f), /TARGET_CONTENT_IDENTITY_CHANGED/);
+});
+test('V4 validates accepted E3 LIVE with the original exact workflow/head/attempt', async () => {
+  const a = successfulPhysicalReceipt, p = a.protectedLive;
+  const run = { id: p.liveRunId, head_branch: a.branch, path: p.liveWorkflowPath,
+    head_sha: p.liveRunHeadSha, run_attempt: p.liveRunAttempt, status: 'completed', conclusion: 'success' };
+  const makeIo = value => privateRuntimeExports({ fetch: async () => ({ ok: true, json: async () => value }) })
+    .io({ GH_TOKEN: 'synthetic-contract-only' }, '/unused', a);
+  await makeIo(run).validateAcceptedLive(a);
+  for (const [key, value] of [['head_sha', 'd'.repeat(40)], ['run_attempt', 2], ['path', '.github/workflows/other.yml'], ['conclusion', 'failure']])
+    await assert.rejects(makeIo({ ...run, [key]: value }).validateAcceptedLive(a));
 });

@@ -1,0 +1,30 @@
+{
+  "schema": "GI_I66_EXISTING_DIAGNOSTIC_RETENTION_TEST_REVISION_V1",
+  "revisionId": "I6_6_DIRECT_FORMS_FAILURE_RETENTION_QA_20261124",
+  "scope": "EXISTING_DECLARED_TESTS_ONLY",
+  "productSourceChanges": 0,
+  "productionAcceptanceClaimed": false,
+  "status": "SOURCE_QA_PASS_SIGNED_PREVIEW_LIVE_PENDING",
+  "tests": [
+    {
+      "path": "tools/gravicentra-i6-6-preview-failure-diagnostics-retention.test.cjs",
+      "gitBlobSha": "b28d361e07bdaf3eb32ad42c019e47b739808658",
+      "replaces": {
+        "path": "tools/gravicentra-i6-6-preview-failure-diagnostics-retention.test.cjs",
+        "priorGitBlobSha": "1377a2f1f6924a901cdd12b4ba3b05c4bc5ea3d9",
+        "priorChangeId": "I6_6_DOCUMENTED_POLICY_CENT_PRECISION_AND_DIAGNOSTIC_RETENTION_20261117"
+      }
+    }
+  ],
+  "causalSource": {
+    "path": "artifacts/orbit360-recovery/release-control/I6_6_DIRECT_FORMS_LEGAL_READINESS_AND_PERSONAL_AUTHORITY_CAUSAL_SOURCE_20261124.json",
+    "gitBlobSha": "70207f0c0dce31b1412744a9f679ae6734e513a4"
+  },
+  "reason": "Preserve sanitized DirectForms click/readiness diagnostics on failed Preview and keep the existing bounded failure-retention contract. No acceptance or authority bypass.",
+  "verification": {
+    "pass": 62,
+    "fail": 0,
+    "skip": 0,
+    "reportSha256": "6aa7ec00f2a833908713cbe074f805a36b2811d143650672693c16b3c762b3e8"
+  }
+}

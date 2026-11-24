@@ -1,0 +1,52 @@
+{
+  "schema": "GI_I66_EXISTING_FINANCIAL_AND_ADMISSION_TEST_REVISION_V1",
+  "revisionId": "I6_6_R51_DOCUMENTARY_PAYMENT_AND_ADMISSION_QA_20261124",
+  "scope": "EXISTING_DECLARED_TESTS_ONLY",
+  "productSourceChanges": 0,
+  "productionAcceptanceClaimed": false,
+  "status": "SOURCE_QA_PASS_SIGNED_PREVIEW_LIVE_PENDING",
+  "tests": [
+    {
+      "path": "tools/gravicentra-i6-6-composite-preview-admission.test.cjs",
+      "gitBlobSha": "abd35d228b8c92c409e7ac09ce1abd002b73d5c6",
+      "replaces": {
+        "path": "tools/gravicentra-i6-6-composite-preview-admission.test.cjs",
+        "priorGitBlobSha": "407b7e6b150762e8de4b6c9cc0d8bf02f149be0e",
+        "priorChangeId": "I6_6_DIRECT_FORMS_EXACT_PREVIEW_ADMISSION_QA_20261124"
+      }
+    },
+    {
+      "path": "tools/gravicentra-i6-6-proposal-application-signed-uat.test.cjs",
+      "gitBlobSha": "e209eb5a3a3f5bdd88ae944672c344ea1ed2fa99",
+      "replaces": {
+        "path": "tools/gravicentra-i6-6-proposal-application-signed-uat.test.cjs",
+        "priorGitBlobSha": "e3a70bd72b7a07b5b670ed1946f68af1065154e2",
+        "priorChangeId": "I6_6_CONCILIATION_APPROVAL_AND_ADVISOR_CXP_20261115"
+      }
+    }
+  ],
+  "causalSource": {
+    "path": "artifacts/orbit360-recovery/release-control/I6_6_R51_DOCUMENTARY_PAYMENT_FINANCIAL_RECOVERY_SOURCE_20261124.json",
+    "gitBlobSha": "60fcca730463b28892f715a27dd89b20be255805"
+  },
+  "verification": {
+    "documentary": {
+      "passed": 13,
+      "failed": 0,
+      "skipped": 0,
+      "reportSha256": "77610aad2862f85a652ceae23ab446aa5836a0194c28f010df21135feda8c849"
+    },
+    "admission": {
+      "passed": 75,
+      "failed": 0,
+      "skipped": 0,
+      "reportSha256": "bdc4f62cf8cfc4688c4ae23e74f36f7e888cb72553589bc8ab874e9215716490"
+    },
+    "common": {
+      "passed": 134,
+      "failed": 0,
+      "skipped": 0,
+      "reportSha256": "feab468398c4977119826c96a4c0b68c2fe76eab51897c2e5054412dd91c21dd"
+    }
+  }
+}

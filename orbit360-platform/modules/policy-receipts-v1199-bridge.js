@@ -48,6 +48,19 @@ Orbit.modules = Orbit.modules || {};
     pagos_existentes_requieren_endoso: 'La póliza tiene pagos aplicados. Los cambios financieros o de asignación requieren un endoso/gestión controlada.',
     operacion_incompleta: 'La operación quedó marcada para revisión; no la repitas sin verificar.',
     operacion_atomica_no_confirmada: 'No fue posible confirmar el guardado en el servidor. Ningún cambio debe darse por aplicado hasta obtener readback.',
+    permiso_cancelacion_denegado: 'El rol activo no puede registrar una cancelación efectiva. Puedes crear una solicitud en Gestión.',
+    cancelacion_identidad_fuera_alcance: 'Confirma el cliente, país y póliza dentro de tu alcance antes de registrar la cancelación.',
+    cancelacion_campos_no_autorizados: 'La cancelación sólo admite su fecha, motivo, referencia y soporte.',
+    cancelacion_emision_requerida: 'Confirma que la cancelación ya fue emitida y corresponde a esta póliza.',
+    cancelacion_fecha_invalida: 'Ingresa la fecha efectiva real, válida y no futura, del documento de cancelación.',
+    cancelacion_fecha_fuera_vigencia: 'La fecha efectiva debe corresponder a la vigencia de la póliza seleccionada.',
+    cancelacion_motivo_requerido: 'Indica el motivo documentado de la cancelación.',
+    cancelacion_documento_requerido: 'Ingresa la referencia o enlace del documento de cancelación emitido.',
+    cancelacion_referencia_requerida: 'Ingresa el número o referencia con que la aseguradora identifica la cancelación.',
+    cancelacion_estado_invalido: 'El estado actual de la póliza requiere revisión antes de registrar una cancelación.',
+    cancelacion_ya_registrada: 'La póliza ya muestra esta cancelación. Revisa los datos guardados antes de registrar otro cambio.',
+    cancelacion_existente_difiere: 'La póliza ya tiene una cancelación registrada con otros datos. Revisa el registro antes de sustituirlo.',
+    cancelacion_usar_ficha_efectiva: 'Usa Registrar cancelación efectiva en la ficha de esta póliza para indicar fecha, referencia y soporte.',
     CORRECTION_DIRECTION_REQUIRED: 'La corrección documentada de asesor requiere Dirección como rol activo.',
     CORRECTION_TRANSPORT_UNAVAILABLE: 'La corrección documentada aún no está disponible en esta versión.',
     CORRECTION_STALE_PREIMAGE: 'El cliente o la póliza cambió. Revisa una nueva previsualización antes de confirmar.',
@@ -157,6 +170,68 @@ Orbit.modules = Orbit.modules || {};
     document.head.appendChild(style);
   }
 
+  function openEffectiveCancellationForm(existing, client) {
+    if (!existing || typeof E.registerEffectiveCancellation !== 'function') return toast('Póliza no disponible');
+    if (!E.canRegisterEffectiveCancellation || !E.canRegisterEffectiveCancellation())
+      return toast(ERROR_LABELS.permiso_cancelacion_denegado);
+    if (!A.canView('polizas',existing,'polizas')) return toast('Póliza fuera de tu alcance');
+    const insurer = S().get('aseguradoras',existing.aseguradoraId) || {};
+    const inner = `<div style="padding:17px 20px;display:flex;justify-content:space-between;align-items:center"><div><small>Ficha de póliza</small><b style="display:block">Registrar cancelación efectiva</b></div><button class="imp-x" data-close>✕</button></div>
+      <div style="padding:18px 20px;display:grid;gap:14px">
+        <div class="cfg-note">Registra aquí la cancelación que ya emitió la aseguradora. Para una cancelación aún pendiente, utiliza Solicitar cancelación en la ficha.</div>
+        <div class="cgrid" data-cancellation-context>
+          <label class="ce-l">Póliza<input class="o-sel" data-cancellation-policy readonly value="${esc(existing.numero)}"></label>
+          <label class="ce-l">Cliente<input class="o-sel" data-cancellation-client readonly value="${esc(client.nombre || existing.aseguradoNombreFuente || '')}"></label>
+          <label class="ce-l">Aseguradora<input class="o-sel" data-cancellation-insurer readonly value="${esc(insurer.nombre || existing.aseguradoraNombreVerificado || '')}"></label>
+          <label class="ce-l">Vigencia<input class="o-sel" data-cancellation-term readonly value="${esc(existing.vigenciaInicio || existing.vigenciaIni)} → ${esc(existing.vigenciaFin)}"></label>
+          <label class="ce-l">País / moneda<input class="o-sel" readonly value="${esc(existing.pais)} · ${esc(existing.moneda)}"></label>
+          <label class="ce-l">Prima de la póliza<input class="o-sel" data-cancellation-premium readonly value="${esc(money(existing.moneda,existing.primaTotal))}"></label>
+        </div>
+        <div class="gi-form-section-title">Datos del documento de cancelación</div>
+        <div class="cgrid">
+          <label class="ce-l">Fecha efectiva *<input type="date" class="o-sel" data-cancellation-date min="${esc(existing.vigenciaInicio || existing.vigenciaIni)}" max="${esc(today())}" value="${esc(existing.fechaCancelacion || existing.cancellationDate || '')}"></label>
+          <label class="ce-l">Número / referencia de la aseguradora *<input class="o-sel" data-cancellation-reference value="${esc(existing.referenciaCancelacion || '')}" placeholder="Referencia del documento emitido"></label>
+        </div>
+        <label class="ce-l">Motivo documentado *<textarea class="o-sel" data-cancellation-reason rows="3">${esc(existing.motivoCancelacion || existing.cancellationReason || '')}</textarea></label>
+        <label class="ce-l">Documento emitido / enlace del soporte *<input class="o-sel" data-cancellation-document value="${esc(existing.cancelacionDocumentoRef || '')}" placeholder="Referencia verificable o enlace del documento"></label>
+        <label class="ce-l"><span><input type="checkbox" data-cancellation-confirmed> Confirmo que la cancelación ya fue emitida y que el documento corresponde a esta póliza y vigencia.</span></label>
+        <div class="cfg-note">Se conservarán los recibos, pagos e importes registrados. Los ajustes de prima o devoluciones se registran con su respaldo correspondiente.</div>
+        <div class="hint error" data-error style="display:none"></div>
+      </div>
+      <div style="padding:14px 20px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap"><button class="btn ghost" data-close>Cerrar</button><button class="btn primary" data-save>Registrar cancelación efectiva</button></div>`;
+    const b = modal('policy-v1199',inner,800), $ = selector => b.querySelector(selector);
+    const requestId = 'polcan_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,7);
+    let saving = false, uncertain = false;
+    $('[data-save]').addEventListener('click',async () => {
+      if (saving || uncertain) return;
+      const save=$('[data-save]'), err=$('[data-error]');
+      if (protectedPreviewRealPolicy(existing.id)) {err.style.display='';err.textContent='Esta Preview protege los registros reales. El registro se valida aquí con una póliza sintética equivalente.';return;}
+      const input={fechaCancelacion:$('[data-cancellation-date]').value,
+        motivoCancelacion:$('[data-cancellation-reason]').value,
+        cancelacionDocumentoRef:$('[data-cancellation-document]').value,
+        referenciaCancelacion:$('[data-cancellation-reference]').value};
+      saving=true;save.disabled=true;save.textContent='Guardando…';
+      try {
+        const result=await E.registerEffectiveCancellation(existing.id,input,{operationId:requestId,
+          issuedConfirmed:$('[data-cancellation-confirmed]').checked === true});
+        if (!result || !result.ok) {
+          err.style.display='';err.textContent=errorText(result&&result.errors);
+          uncertain=!!(result&&(result.errors||[]).includes('operacion_atomica_no_confirmada'));
+          if (uncertain) err.textContent+=' Referencia: '+requestId+'. Verifica la póliza antes de repetir el registro.';
+          save.disabled=uncertain;save.textContent=uncertain?'Verificación requerida':'Registrar cancelación efectiva';
+          return;
+        }
+        b.remove();toast('Cancelación efectiva registrada; recibos y pagos conservados.');
+        const route='cliente360?c='+encodeURIComponent(existing.clienteId)+'&p='+encodeURIComponent(existing.id);
+        if(Orbit.router&&typeof Orbit.router.go==='function')Orbit.router.go(route);else location.hash='#/'+route;
+      } catch (error) {
+        uncertain=true;err.style.display='';err.textContent='No fue posible confirmar el registro. Verifica la póliza antes de repetirlo. Referencia: '+requestId+'.';
+        save.disabled=true;save.textContent='Verificación requerida';
+      } finally { saving=false; }
+    });
+    return b;
+  }
+
   function openPolicyForm(opts) {
     installB2VisualContract();
     opts = opts || {};
@@ -164,6 +239,7 @@ Orbit.modules = Orbit.modules || {};
     const clients = scopedClients();
     const selectedClient = existing ? S().get('clientes', existing.clienteId) : S().get('clientes', opts.clientId) || clients[0];
     if (!selectedClient || !A.canView('clientes', selectedClient, 'cliente360')) return toast('Cliente fuera de tu alcance');
+    if (opts.operation === 'effectiveCancellation') return openEffectiveCancellationForm(existing,selectedClient);
     if (!E.canManagePolicies()) return requestCorrection(selectedClient, existing && existing.id, existing ? 'editar póliza' : 'crear póliza');
 
     const start = existing && existing.vigenciaInicio || today();
@@ -779,6 +855,7 @@ Orbit.modules = Orbit.modules || {};
     clientMod.__policyReceiptsV1199={nuevaPoliza:clientMod.nuevaPoliza,editarPoliza:clientMod.editarPoliza,renovar:clientMod.renovar,endoso:clientMod.endoso};
     clientMod.nuevaPoliza=function(clientId){const c=S().get('clientes',clientId)||scopedClients()[0];if(!c)return toast('No hay clientes disponibles');return openPolicyForm({clientId:c.id});};
     clientMod.editarPoliza=function(policyId,focusField){return openPolicyForm({policyId,focusField});};
+    clientMod.registrarCancelacionEfectiva=function(policyId){return openPolicyForm({policyId,operation:'effectiveCancellation'});};
     clientMod.editarVehiculo=function(vehicleId){return openVehicleForm(vehicleId);};
     clientMod.renovar=function(policyId){const p=S().get('polizas',policyId),c=p&&S().get('clientes',p.clienteId);if(c)requestCorrection(c,policyId,'renovación; definir número y vigencia de la nueva póliza');};
     clientMod.endoso=function(policyId){const p=S().get('polizas',policyId),c=p&&S().get('clientes',p.clienteId);if(c)requestCorrection(c,policyId,'endoso; requiere tipo, fecha efectiva y documento');};

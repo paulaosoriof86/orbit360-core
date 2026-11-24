@@ -17,7 +17,8 @@ const helper = new Function(source.slice(start, end) + '\nreturn paymentFailureF
 
 test('script compiles and retains canonical callable applyPayment once', () => {
   new vm.Script(source, { filename: 'cobros.js' });
-  assert.match(source, /domain\.applyPayment\(receipt\.id,\{payload:\{/);
+  assert.match(source, /await\s+domain\.applyPayment\s*\(\s*receipt\.id\s*,/);
+  assert.equal((source.match(/\bdomain\.applyPayment\s*\(/g) || []).length, 1, 'one canonical payment call for manual or documentary input');
   assert.equal((source.match(/function paymentFailureFeedback\(error\)/g) || []).length, 1);
 });
 

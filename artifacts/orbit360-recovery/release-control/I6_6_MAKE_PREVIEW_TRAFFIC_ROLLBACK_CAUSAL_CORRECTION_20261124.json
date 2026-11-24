@@ -1,0 +1,100 @@
+{
+  "schema": "GI_I66_MAKE_PREVIEW_TRAFFIC_ROLLBACK_CAUSAL_SOURCE_PROPOSAL_V1",
+  "status": "SOURCE_ONLY_CAUSAL_REPRODUCTION_PASS_RUNTIME_VALIDATION_PENDING",
+  "gate": "I6.6",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "rootAuthorization": "Prepare the bounded correction inside the existing protected executor and its existing test; no repository/control mutation or Cloud execution during preparation.",
+  "cause": {
+    "code": "FUNCTIONS_API_REVISION_USED_AS_CLOUD_RUN_TRAFFIC_PREIMAGE",
+    "description": "The old snapshot retained Cloud Functions serviceConfig.revision only. The Preview rollback used it as the Cloud Run traffic destination, and the unchanged shortcut compared only Functions metadata. A prior routing rollback can leave the serving revision different from the Functions API revision.",
+    "oldExecutorBlob": "5beb3da00486eae3d2da1e14348cc67e2695bf50",
+    "sourceReproduction": "With Functions API revision wem and independently observed traffic cuy, the old restoration argument selects wem; the corrected owner selects cuy and requires a routing readback.",
+    "observedEvidence": {
+      "previewRunId": 45465410675,
+      "jobId": 138699097572,
+      "wholeRun": "FAILURE",
+      "diagnosticsArtifactId": 14955942051,
+      "diagnosticsArtifactDigest": "sha256:d61a39b22e674579fde71258606e5e10abf8f9f3e2d3e30263ddae7ac41645d4",
+      "capturedFunctionProjectionSha256": "a43a66b5dc82ded575cb0a3643b2bf74e21105aa1ab6f2f032738e90c58edfe9",
+      "functionsApiRevisionBeforeCompensation": "orbit360makeleadingresspreview-00002-wem",
+      "rollbackReceiptSha256": "2eafa15f49d608f3b5ee57bee9553fea3b0d87ab1d24ed0299246179b317501f",
+      "trafficRevisionRestoredByVerifiedCompensation": "orbit360makeleadingresspreview-00001-cuy",
+      "simultaneousFreshPostCompensationApiAndTrafficObservation": false,
+      "noInferenceThatCloudRunTrafficChangesFunctionsServiceConfig": true
+    }
+  },
+  "correction": {
+    "owner": "tools/gravicentra-i66-make-lead-protected-executor.cjs",
+    "sameProtectedWorkflows": true,
+    "readMethod": "GET",
+    "readApi": "https://run.googleapis.com/v2/",
+    "resourceAllowlist": [
+      "projects/ays-orbit-360-lab/locations/us-east1/services/orbit360makeleadingresspreview",
+      "projects/ays-orbit-360-lab/locations/us-central1/services/orbit360makeleadingress"
+    ],
+    "sameProjectNumberAlias": "646761409743",
+    "readCredential": "Existing protected executor GoogleAuth client; no new secret, principal, scope or permission.",
+    "trafficEvidence": "Cloud Run trafficStatuses observed revision, stable observed generation, service identity and successful readiness.",
+    "snapshotSchemaCompatibility": "GI_I66_MAKE_TRIGGER_SNAPSHOT_V1 and GI_I66_MAKE_TRIGGER_POSTIMAGE_V1 remain readable; new snapshots add typed independent traffic evidence.",
+    "existingLegacySnapshotWithoutTraffic": "HOLD before a restore or an unchanged claim; no inference from Functions API revision.",
+    "historicalAbsentSnapshot": "Preserves the exact observed-created-function deletion and absence-readback contract; no prior traffic inferred.",
+    "liveExistingRollback": "Still delegated to the existing LIVE revision owner; this proposal creates no new LIVE authority.",
+    "postimage": "Require the newly deployed API revision to be the independently observed serving revision, retain service identity and routing generation.",
+    "rollback": "Compare actual Functions and traffic postimages before the existing scoped traffic command, restore the single previously observed revision at 100 percent, and read it back independently.",
+    "repeatedRollback": "Returns verified already-restored with zero additional traffic writes when the current exact deployment already serves the prior observed target.",
+    "preflightNoop": "Requires both Functions projection and independently observed traffic to match the snapshot.",
+    "supportedTraffic": "Exactly one untagged serving revision at 100 percent. Multiple revisions, tagged/extra zero-percent targets, malformed values, unresolved readiness and unobserved generation fail closed.",
+    "providerMutationAtomicity": "Existing serialized workflow with exact before/readback checks; no claim of provider-level atomic compare-and-swap.",
+    "noRoutingDataDerivedFromApiRevision": true
+  },
+  "primaryReference": {
+    "url": "https://docs.cloud.google.com/run/docs/reference/rest/v2/projects.locations.services",
+    "relevantContract": "trafficStatuses describes observed traffic; routing values may be transient while reconciling. A completed successful reconciliation is identified by terminalCondition and matching generation/observedGeneration."
+  },
+  "sourceOwners": [
+    {
+      "path": "tools/gravicentra-i66-make-lead-protected-executor.cjs",
+      "blobSha": "85070cdd546198d964d76cb3643cece9d8b73311",
+      "sha256": "e879f2a1fe73d0873c72f211826fc8feda719066efb6c24eda9e96ea7ebed14b"
+    },
+    {
+      "path": "tools/gravicentra-i66-make-lead-protected-executor.test.cjs",
+      "blobSha": "f9a7797349373c84f2a1d359d9c922c6ec747677",
+      "sha256": "0b50edc1edf2e45173f2e1d171d2af0fc77667c1116e7a014e41563a889e58ab"
+    }
+  ],
+  "validation": {
+    "targetedTestCommand": "node --test tools/gravicentra-i66-make-lead-protected-executor.test.cjs",
+    "tests": 63,
+    "passed": 63,
+    "failed": 0,
+    "skipped": 0,
+    "fixtureStatus": "SYNTHETIC_SEMANTIC_REPRODUCTION_NOT_CLOUD_EXECUTION",
+    "cases": [
+      "API wem with traffic cuy",
+      "exact restore and independent readback",
+      "idempotent second rollback",
+      "traffic-only preflight/concurrent drift",
+      "missing snapshot",
+      "legacy existing snapshot lacks routing evidence",
+      "historical ABSENT deletion compatibility",
+      "missing postimage routing evidence",
+      "successful command with failed readback",
+      "split or tagged traffic rejection",
+      "failed auth or foreign resource rejection",
+      "Functions changes during traffic observation",
+      "project ID and project number normalization constrained to the exact service",
+      "malformed generation/tag/percent rejection"
+    ],
+    "cloudRuntimeValidation": "PENDING_EXACT_NEW_IMMUTABLE_BUILD_AND_AUTHORIZED_PREVIEW"
+  },
+  "cloudWritesDuringPreparation": 0,
+  "newCloudCredentials": 0,
+  "repositoryChangesDuringPreparation": 0,
+  "realLeadActivation": false,
+  "liveAuthorization": false,
+  "productAcceptance": false,
+  "priorProofsPreserved": true,
+  "sourceChangeRequiresNewBuildDigest": true
+}
