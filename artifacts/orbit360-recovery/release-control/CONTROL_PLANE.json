@@ -27,7 +27,7 @@
     "activeGate": "I6.6",
     "closedHistoricalGate": "B4-007",
     "latestProvenLiveSource": "65c825b2808a615ca4195bdde6689dbdbe3193b2",
-    "currentWork": "I6.6: freeze signed source QA and guard for the reproduced two-owner startup retry correction; build a new immutable candidate through the existing composed Preview owner, preserving exact v20 deferred backend pins. Require 48 financial Preview and 48 LIVE stages on that artifact before acceptance. R43 observer is complete: six reloads, unchanged server data, balance still HOLD. Make capacity is restored but ingress remains CLOSED; prepare the existing five-function gate without claiming it passed. Preserve all financial writes and keep Historial candidate separate until its affected gate is proven.",
+    "currentWork": "I6.6: build immutable v21 from successful source QA45420172812 and guard45420172656 at99c73aa4f82eaec660e4920197dd2c8a11b14ae7; verify224 exact Preview files while preserving accepted E3. Then execute the existing five-function closed Make Preview and48-stage financial Preview before any promotion. Preserve financial writes and the stored Historial/email candidates.",
     "latestHostingPreviewEvidence": "artifacts/orbit360-recovery/release-control/I6_6_NETWORK_DIAGNOSTICS_PREVIEW_BUILD_20261117.json",
     "latestHostingPreviewSource": "1b65a790530d49fe1d1fb451f02838fd9a713c53",
     "operationsEvidenceReview": "artifacts/orbit360-recovery/release-control/I6_6_OPS_EVIDENCE_AND_PREVIEW_BINDING_REVIEW_20261116.json",
@@ -3242,6 +3242,27 @@
       "appliedToCurrentProductSource": false,
       "previewAccepted": false,
       "liveAccepted": false
+    },
+    "startupRecoverySource": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_6_STARTUP_PENDING_READ_RETRY_CAUSAL_SOURCE_20261124.json",
+      "gitBlobSha": "bdfbdb3a1764883579907797b0b198debda773e0",
+      "status": "CAUSAL_SOURCE_REPRODUCED_LOCAL_PASS_PREVIEW_LIVE_PENDING",
+      "causalTestsPassed": 18,
+      "regressionTestsPassed": 151,
+      "signedSourceQaPending": false,
+      "previewAccepted": false,
+      "liveAccepted": false,
+      "sourceQaRunId": 45420172812
+    },
+    "makeRestoredCapacityPreflight": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_6_MAKE_RESTORED_CAPACITY_RUNTIME_PREFLIGHT_20261124_R45.json",
+      "gitBlobSha": "d013e1a600a7801c4afe004ab777a1090d8ffff9",
+      "runId": 45420172928,
+      "jobId": 138537231832,
+      "status": "READONLY_PREFLIGHT_CONFIRMED_FOR_V21_CLOSED_PREVIEW",
+      "providerMessagesSent": 0,
+      "configurationWrites": 0,
+      "previewPassed": false
     }
   },
   "b4003ActiveCertificationCursor20261106": {
@@ -6575,7 +6596,7 @@
     "i63LiveReadbackPass": true,
     "i63DeterministicDiffReady": true
   },
-  "nextAction": "I6.6: freeze signed source QA and guard for the reproduced two-owner startup retry correction; build a new immutable candidate through the existing composed Preview owner, preserving exact v20 deferred backend pins. Require 48 financial Preview and 48 LIVE stages on that artifact before acceptance. R43 observer is complete: six reloads, unchanged server data, balance still HOLD. Make capacity is restored but ingress remains CLOSED; prepare the existing five-function gate without claiming it passed. Preserve all financial writes and keep Historial candidate separate until its affected gate is proven.",
+  "nextAction": "I6.6: build immutable v21 from successful source QA45420172812 and guard45420172656 at99c73aa4f82eaec660e4920197dd2c8a11b14ae7; verify224 exact Preview files while preserving accepted E3. Then execute the existing five-function closed Make Preview and48-stage financial Preview before any promotion. Preserve financial writes and the stored Historial/email candidates.",
   "postproductionExitProgress": {
     "formalPercent": 60,
     "frozenMiniGates": 6,
@@ -26248,8 +26269,8 @@
   },
   "i66ActiveRecoveryCursor": {
     "status": "FROZEN_I66_SHOCK_EXECUTION_CONTINUES_NO_GATE_REPLACEMENT",
-    "currentEvidencePath": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_EXECUTION_PROGRESS_20261124_R44.json",
-    "currentEvidenceBlobSha": "619149f70d7fde123bfb76bf421c939a79fb3d72",
+    "currentEvidencePath": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_EXECUTION_PROGRESS_20261124_R45.json",
+    "currentEvidenceBlobSha": "c0402580c987d6b888b3d21ab542a61c8a2fcc44",
     "frozenPlanPath": "artifacts/orbit360-recovery/release-control/I6_6_PLAN_CHOQUE_FUNCIONAL_FINANCIERO_20261122.md",
     "frozenPlanBlobSha": "fbfd54d229a13101fbfb0dfc6e92a5fa524999b6",
     "fullInventoryPath": "artifacts/orbit360-recovery/release-control/I6_6_INVENTARIO_INTEGRAL_295_20261122.md",
@@ -26270,8 +26291,8 @@
     "lastFunctionalLiveUatRunId": 45074429319,
     "lastFunctionalLiveUatJobId": 137352857627,
     "lastFunctionalLiveScope": "TWO_ROLE_RENEWAL_INSURER_SYNTHETIC_PASS_REAL_ISSUANCE_AND_DOCUMENT_HOLD",
-    "previousEvidencePath": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_EXECUTION_PROGRESS_20261124_R43.json",
-    "previousEvidenceBlobSha": "dddf692452a4fd8abf480ef4d3b0daeaba37cbee",
+    "previousEvidencePath": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_EXECUTION_PROGRESS_20261124_R44.json",
+    "previousEvidenceBlobSha": "619149f70d7fde123bfb76bf421c939a79fb3d72",
     "lastFunctionalLiveUatStatus": "LIVE_PHYSICAL_STEPS_PASS_FIVE_ROLE_FINAL_COVERAGE_FAIL_CLOSED",
     "lastFinancialProtectedPreflightRunId": 45332501697,
     "lastFinancialSourceStatus": "155_DIRECT_HISTORICAL_PAYMENTS_46_NEW_OBLIGATIONS_READBACK_VERIFIED_607_AND_302_NOT_FULLY_CLOSED",
@@ -26301,7 +26322,8 @@
     "financialNewPendingObligationsThisContinuation": 46,
     "moduleReleasedThisIterationScope": "Reproduced startup source correction and completed R43 diagnostic; no new Hosting/backend/data publication.",
     "lastLivePromotionAttemptRunId": 45391827840,
-    "lastLivePromotionAttemptStatus": "ROLLED_BACK"
+    "lastLivePromotionAttemptStatus": "ROLLED_BACK",
+    "nextAction": "I6.6: build immutable v21 from successful source QA45420172812 and guard45420172656 at99c73aa4f82eaec660e4920197dd2c8a11b14ae7; verify224 exact Preview files while preserving accepted E3. Then execute the existing five-function closed Make Preview and48-stage financial Preview before any promotion. Preserve financial writes and the stored Historial/email candidates."
   },
   "i66PreversionedControlViewBlob": "de401082f688ce1c59f025f6f39e3c947dceaa35",
   "i66FrontendReleaseHead": {

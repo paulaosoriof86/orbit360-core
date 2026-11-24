@@ -4821,12 +4821,12 @@
     "liveProofSha256": "4013a99719ba5f8bb3087a5e5f43c189a22daf55aabfcea37e8df5030bb5653c"
   },
   "frontendPreviewRequest": {
-    "version": 20,
+    "version": 21,
     "mode": "A13_A14_BALANCE_COMPOSITE_ARTIFACT_HOSTING_PREVIEW_ONLY",
-    "sourceQaHead": "b4f90d00c0468a54fc9b542d48212919e1a14144",
-    "manifestBlob": "677354250c84ef0a5af0b562e29586dfe1559553",
-    "sourceQaRunId": 45382071947,
-    "guardRunId": 45382071816,
+    "sourceQaHead": "99c73aa4f82eaec660e4920197dd2c8a11b14ae7",
+    "manifestBlob": "941497d0b161e04b0ec3e3eee5933139f176b6f5",
+    "sourceQaRunId": 45420172812,
+    "guardRunId": 45420172656,
     "previousReceiptBlob": "11fdb3bee494541513482666d6215f45cbad0567",
     "productPaths": [
       "functions/b4-003-scoped-related-reader.js",
@@ -4835,7 +4835,9 @@
       "functions/product-lead-ingress-contract.js",
       "functions/product-lead-ingress-owner-support.js",
       "functions/product-ops-leads-domain.js",
-      "orbit360-platform/core/queries.js"
+      "orbit360-platform/core/product-hydration-required-optional-p0.js",
+      "orbit360-platform/core/queries.js",
+      "orbit360-platform/data/store-firestore-product-readonly-p0.js"
     ],
     "backendPaths": [
       "functions/b4-003-scoped-related-reader.js",
@@ -4871,11 +4873,20 @@
     "realCustomerWritesAllowed": false,
     "liveDeployAuthorized": false,
     "releaseAfterPreviewAllowed": false,
-    "releaseMechanismSourceSha": "b4f90d00c0468a54fc9b542d48212919e1a14144",
+    "releaseMechanismSourceSha": "99c73aa4f82eaec660e4920197dd2c8a11b14ae7",
     "ownerInstruction": "Continue authorized recovery and existing parallel work; certify the exact newly composed source without losing prior acceptance, financial receipts, or communication rules.",
-    "scope": "A13 closed machine-ingress plus A14 related-reader efficiency and canonical future-pending balance. Build once and publish Hosting Preview only; separate exact five-function Preview and LIVE gates remain required.",
-    "reason": "V19 is immutable historical Hosting evidence with failed backend and financial Preview. Restore the full composed financial release owner, exact retry-policy acknowledgement with destructive prompts denied, and bounded readonly timeout diagnostics; preserve product pins and build a new immutable V20 once.",
-    "causalReceipt": "artifacts/orbit360-recovery/release-control/I6_6_COMPOSITE_FINANCIAL_OWNER_RECOVERY_20261124.json"
+    "scope": "Existing A13/A14 composite plus the exact two-owner bounded startup recovery and canonical future-pending balance. Build once and publish isolated Hosting Preview only; exact five-function Preview and financial48 proofs remain separate required gates.",
+    "reason": "E6 rolled back to E3. R43 completed six reloads with unchanged server data but missing current-balance display. Reproduced startup prematurely cancelling its existing1200ms retry;18 focal and151 regression pass. New immutable v21 required; never patch v20.",
+    "causalReceipt": "artifacts/orbit360-recovery/release-control/I6_6_STARTUP_PENDING_READ_RETRY_CAUSAL_SOURCE_20261124.json",
+    "startupRecovery": {
+      "schema": "GI_I66_STARTUP_RECOVERY_PREVIEW_EXTENSION_V1",
+      "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_STARTUP_PENDING_READ_RETRY_CAUSAL_SOURCE_20261124.json",
+      "receiptBlob": "bdfbdb3a1764883579907797b0b198debda773e0",
+      "productPathBlobs": {
+        "orbit360-platform/core/product-hydration-required-optional-p0.js": "f2f42ef536b00b89c7198710a20aadb633a7eb29",
+        "orbit360-platform/data/store-firestore-product-readonly-p0.js": "fa8e507c03aba7bc7e99214c3b4e695f2c5fe222"
+      }
+    }
   },
   "previousPhysicalHostingRelease": {
     "sourceSha": "15e849bd606bd8c93e4c0471da1193e85004aecd",

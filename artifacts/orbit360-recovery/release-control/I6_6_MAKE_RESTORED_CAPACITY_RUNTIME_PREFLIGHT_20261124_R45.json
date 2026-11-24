@@ -1,0 +1,376 @@
+{
+  "schema": "GI_I66_MAKE_RESTORED_CAPACITY_RUNTIME_PREFLIGHT_RECEIPT_V1",
+  "status": "READONLY_PREFLIGHT_CONFIRMED_FOR_V21_CLOSED_PREVIEW",
+  "recordedAtUtc": "2026-11-24T15:01:01Z",
+  "activeGate": "I6.6",
+  "authority": false,
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "sourceSha": "99c73aa4f82eaec660e4920197dd2c8a11b14ae7",
+  "workflowPath": ".github/workflows/gravicentra-i66-greenapi-metadata-readonly.yml",
+  "runId": 45420172928,
+  "runUrl": "https://github.com/paulaosoriof86/orbit360-core/actions/runs/45420172928",
+  "runStatus": "completed",
+  "runConclusion": "success",
+  "runStartedAtUtc": "2026-11-24T14:58:58Z",
+  "runUpdatedAtUtc": "2026-11-24T14:59:30Z",
+  "jobId": 138537231832,
+  "jobName": "existing_inbound_config",
+  "jobConclusion": "success",
+  "jobUrl": "https://github.com/paulaosoriof86/orbit360-core/actions/runs/45420172928/job/138537231832",
+  "completedSteps": [
+    {
+      "name": "Set up job",
+      "status": "completed",
+      "conclusion": "success",
+      "number": 1
+    },
+    {
+      "name": "Run actions/checkout@v4",
+      "status": "completed",
+      "conclusion": "success",
+      "number": 2
+    },
+    {
+      "name": "Run actions/setup-node@v4",
+      "status": "completed",
+      "conclusion": "success",
+      "number": 3
+    },
+    {
+      "name": "Install existing server dependencies without lifecycle scripts",
+      "status": "completed",
+      "conclusion": "success",
+      "number": 4
+    },
+    {
+      "name": "Verify provider-readiness scope, secret isolation and bounded metadata reads",
+      "status": "completed",
+      "conclusion": "success",
+      "number": 5
+    },
+    {
+      "name": "Verify exact runtime discovery and Secret IAM CAS safeguards without writes",
+      "status": "completed",
+      "conclusion": "success",
+      "number": 6
+    },
+    {
+      "name": "Select existing same-project credential without printing it",
+      "status": "completed",
+      "conclusion": "success",
+      "number": 7
+    },
+    {
+      "name": "Validate exact existing inbound configuration without payload or credential output",
+      "status": "completed",
+      "conclusion": "success",
+      "number": 8
+    },
+    {
+      "name": "Verify exact mailbox-owner census isolation without writes",
+      "status": "completed",
+      "conclusion": "success",
+      "number": 9
+    },
+    {
+      "name": "Verify the owner-confirmed pilot mailbox against active membership and Auth without writes",
+      "status": "completed",
+      "conclusion": "success",
+      "number": 10
+    },
+    {
+      "name": "Read canonical Ops runtime and exact required capabilities without granting access",
+      "status": "completed",
+      "conclusion": "success",
+      "number": 11
+    },
+    {
+      "name": "Inspect existing Eventarc prerequisites and reject any implicit project IAM expansion",
+      "status": "completed",
+      "conclusion": "success",
+      "number": 12
+    },
+    {
+      "name": "Post Run actions/setup-node@v4",
+      "status": "completed",
+      "conclusion": "success",
+      "number": 23
+    },
+    {
+      "name": "Post Run actions/checkout@v4",
+      "status": "completed",
+      "conclusion": "success",
+      "number": 24
+    },
+    {
+      "name": "Complete job",
+      "status": "completed",
+      "conclusion": "success",
+      "number": 25
+    }
+  ],
+  "scopeContractBlob": "7ce546736ac8d08b8ac922d19f3e6e4c2bac0021",
+  "makeCapacityObservation": {
+    "observedAtUtc": "2026-11-24T14:54:03Z",
+    "tool": "mcp__codex_apps__make_organization_get",
+    "organizationId": 4090072,
+    "zone": "eu2.make.com",
+    "includedCredits": 10000,
+    "extraCredits": 6000,
+    "usedCredits": 14090,
+    "availableCredits": 1910,
+    "isPaused": false,
+    "autoPurchasingActivated": false,
+    "autoPurchaseInProgress": false,
+    "rechargePerformedByThisSession": false,
+    "rechargePayerAmountOrInvoiceVerified": false,
+    "historicalBlockedObservation": {
+      "observedAtUtc": "2026-11-24T11:51:00Z",
+      "observationTimePrecision": "MINUTE_FROM_CANONICAL_PRIOR_RECEIPT",
+      "includedCredits": 10000,
+      "extraCredits": 4000,
+      "usedCredits": 14067,
+      "availableCredits": -67,
+      "isPaused": true
+    },
+    "interpretation": "External capacity increase observed. This receipt does not establish a purchase amount or authorize provider spending."
+  },
+  "makeScenarioObservation": {
+    "observedAtUtc": "2026-11-24T15:01:01Z",
+    "tool": "mcp__codex_apps__make_scenario_get",
+    "scenarioId": 10196136,
+    "teamId": 1975919,
+    "url": "https://eu2.make.com/1975919/scenarios/10196136",
+    "status": "active",
+    "lastEdit": "2026-11-24T11:42:13.586Z",
+    "rootModuleId": 1,
+    "topology": [
+      1,
+      2,
+      3
+    ],
+    "queueModuleId": 3,
+    "queueModuleDisabled": true,
+    "scheduling": {
+      "type": "indefinitely",
+      "interval": 300
+    },
+    "connections": [
+      {
+        "id": 14749710,
+        "app": "green-api",
+        "status": "ok",
+        "usedByModules": [
+          1,
+          2
+        ]
+      },
+      {
+        "id": 14756714,
+        "app": "google-custom",
+        "status": "ok",
+        "usedByModules": [
+          3
+        ]
+      }
+    ],
+    "incompleteExecutions": 0,
+    "connectionLabelsExcluded": true
+  },
+  "observations": {
+    "provider": {
+      "observedAtUtc": "2026-11-24T14:59:22.0969411Z",
+      "secretVersionAccessibleByConfiguredSourceCredential": true,
+      "rootTenantCountryInstanceMatch": true,
+      "apiTokenFormatUsable": true,
+      "apiOriginAllowed": true,
+      "providerAuthorized": true,
+      "settingsIdentityMatches": true,
+      "inboundEnabled": false,
+      "runtimeSecretAccessVerified": false,
+      "runtimeSecretPermissionDenied": true,
+      "payloadOrCredentialPrinted": false,
+      "providerRequestMade": true,
+      "readOnlyMetadataRequestsOnly": true,
+      "firestoreWritten": false,
+      "cloudResourcesMutated": false
+    },
+    "runtime": {
+      "observedAtUtc": "2026-11-24T14:59:24.4575325Z",
+      "status": "EXACT_SECRET_IAM_DELTA_REQUIRED",
+      "selectedRuntime": "646761409743-compute@developer.gserviceaccount.com",
+      "selectedFrom": "OBSERVED_CANONICAL_OPS_RUNTIME",
+      "canonicalOpsRuntimeObserved": true,
+      "impersonationVerified": true,
+      "firestoreCapabilitiesVerified": true,
+      "secretVersionAccessVerified": false,
+      "secretStatus": "PERMISSION_DENIED",
+      "exactSecretGrantRequired": true,
+      "secretResource": "projects/ays-orbit-360-lab/secrets/orbit360-greenapi-gt-alianzas-soluciones",
+      "observedOpsRevisions": {
+        "live": "orbit360opsleadscommand-00014-vep",
+        "preview": "orbit360opsleadscommandpreview-00242-tow"
+      },
+      "grantedRequiredFirestorePermissions": [
+        "datastore.databases.get",
+        "datastore.entities.get",
+        "datastore.entities.list",
+        "datastore.entities.create",
+        "datastore.entities.update"
+      ],
+      "iamWrites": 0,
+      "firestoreWrites": 0,
+      "providerRequests": 0,
+      "externalMessagesSent": 0,
+      "credentialValuesPrinted": false,
+      "observedReportDigest": "0416877b786e4635a8a3ca3028e56fd5dac33d224eaa6ec76f3e1499a60ec47e"
+    },
+    "eventarc": {
+      "observedAtUtc": "2026-11-24T14:59:27.0206249Z",
+      "status": "EVENTARC_RUNTIME_AND_PROJECT_IAM_READY",
+      "projectId": "ays-orbit-360-lab",
+      "cliVersion": "14.10.1",
+      "canonicalRuntime": "646761409743-compute@developer.gserviceaccount.com",
+      "canonicalRuntimeObserved": true,
+      "inventoryComplete": true,
+      "existingRecognizedEventServices": [
+        "firestore"
+      ],
+      "functionCount": 96,
+      "inventoryDigest": "c75bd181d77cd6cf4feb6e3ee9bde9b7f966235ab12553ca1e69ca7522c841fd",
+      "projectPolicyRead": true,
+      "projectPolicyDigest": "2c928d027f3632fc4e9fa2f591127952590746b2f02a588015a0fed97dc0590f",
+      "cliWouldAddProjectBindings": false,
+      "runtimeImpersonationVerified": true,
+      "runtimeEventarcPermissionsVerified": true,
+      "firstEventBindings": [
+        {
+          "role": "roles/iam.serviceAccountTokenCreator",
+          "member": "serviceAccount:service-646761409743@gcp-sa-pubsub.iam.gserviceaccount.com",
+          "present": true
+        },
+        {
+          "role": "roles/run.invoker",
+          "member": "serviceAccount:646761409743-compute@developer.gserviceaccount.com",
+          "present": true
+        },
+        {
+          "role": "roles/eventarc.eventReceiver",
+          "member": "serviceAccount:646761409743-compute@developer.gserviceaccount.com",
+          "present": true
+        }
+      ],
+      "queueRules": {
+        "status": "EXACT_CANONICAL_RULESET_SOURCE_MATCH",
+        "sourcePath": "firestore.rules",
+        "sourceBlob": "35fba451bbbeb97dbae3f08303b786ddbcbdd29f",
+        "rulesetName": "projects/ays-orbit-360-lab/rulesets/6b03deab-0ff4-4c5d-8e74-550982bafc34",
+        "rulesWrites": 0,
+        "contentPublished": false
+      },
+      "projectIamWrites": 0,
+      "secretIamWrites": 0,
+      "firestoreWrites": 0,
+      "providerRequests": 0,
+      "externalMessagesSent": 0,
+      "privatePolicyPublished": false,
+      "observedReportDigest": "9a38ad98878465f9d51836d2b9c518a477b575344d094c87c1f0526b3041d65f"
+    },
+    "ingressPreimages": {
+      "observedAtUtc": "2026-11-24T14:59:27.4855770Z",
+      "status": "PREIMAGES_CONFIRMED_FOR_CLOSED_INITIALIZATION",
+      "projectId": "ays-orbit-360-lab",
+      "tenantId": "alianzas-soluciones",
+      "closedConfiguration": {
+        "preview": {
+          "path": "tenants/alianzas-soluciones/config/makeLeadIngressPreview",
+          "readVerified": true,
+          "exists": true,
+          "expectedDigest": "1c6037d63c165f20a5e28e4e18da5d568a36d8d8434fdf6b42707516e5c11ba4",
+          "state": "CLOSED",
+          "scopeVerified": true,
+          "status": "CLOSED_EXISTING"
+        },
+        "live": {
+          "path": "tenants/alianzas-soluciones/config/makeLeadIngress",
+          "readVerified": true,
+          "exists": false,
+          "expectedDigest": "ABSENT",
+          "state": null,
+          "scopeVerified": true,
+          "status": "ABSENT"
+        }
+      },
+      "targetBefore": {
+        "preview": {
+          "name": "orbit360MakeLeadIngressPreview",
+          "region": "us-east1",
+          "resource": "projects/ays-orbit-360-lab/locations/us-east1/functions/orbit360MakeLeadIngressPreview",
+          "readVerified": true,
+          "state": "ABSENT",
+          "revision": null,
+          "httpStatus": 404,
+          "status": "ABSENT"
+        },
+        "live": {
+          "name": "orbit360MakeLeadIngress",
+          "region": "us-central1",
+          "resource": "projects/ays-orbit-360-lab/locations/us-central1/functions/orbit360MakeLeadIngress",
+          "readVerified": true,
+          "state": "ABSENT",
+          "revision": null,
+          "httpStatus": 404,
+          "status": "ABSENT"
+        }
+      },
+      "firestoreReads": 2,
+      "functionReads": 2,
+      "firestoreWrites": 0,
+      "functionWrites": 0,
+      "projectIamWrites": 0,
+      "secretIamWrites": 0,
+      "externalMessagesSent": 0,
+      "privateBodiesPublished": false,
+      "observedReportDigest": "34a2ad208b36dcc4f0dfa85bb3e02035394a87a564a028c9d00557baa2a31bf5"
+    }
+  },
+  "logEvidence": {
+    "tool": "mcp__codex_apps__github_fetch_workflow_job_logs",
+    "jobId": 138537231832,
+    "redactedPayloadReconstructed": false,
+    "rawJsonParseClaimed": false,
+    "visibleFieldsProjected": true,
+    "digestRecomputedFromRedactedOutput": false,
+    "digestBasis": "Reported digest strings are observed verbatim. They are not recomputed from GitHub-redacted log JSON.",
+    "exactRedactedReportLines": [
+      "2026-11-24T14:59:22.0969411Z I66_GREENAPI_EXISTING_CONFIG_READONLY=***\"secretVersionAccessible\":true,\"secretJsonObject\":true,\"rootTenantCountryInstanceMatch\":true,\"senderWidFormatValid\":true,\"apiTokenFormatUsable\":true,\"apiOriginAllowed\":true,\"webhookBearerUsable\":false,\"inboundBlockPresent\":false,\"inboundEnabled\":false,\"exactInboundAdvisorConfigured\":false,\"existingRoutingCandidatePresent\":false,\"existingRoutingUnambiguous\":false,\"authorizationReceiptPresent\":false,\"activationDatePresent\":false,\"transportEnabledInExistingSecret\":false,\"payloadOrCredentialPrinted\":false,\"providerRequestMade\":true,\"firestoreWritten\":false,\"cloudResourcesMutated\":false,\"canonicalAdvisorReadPerformed\":false,\"canonicalAdvisorExists\":false,\"canonicalAdvisorIdentityMatches\":false,\"canonicalAdvisorActive\":false,\"canonicalAdvisorRoleEligible\":false,\"canonicalAdvisorCountryMatches\":false,\"runtimeImpersonationAttempted\":true,\"runtimeSourceCredentialReady\":true,\"runtimeSdkReady\":true,\"runtimeIdentityTokenReady\":true,\"runtimeSecretReadAttempted\":true,\"runtimeSecretReadReturned\":false,\"runtimeSecretResponseBounded\":false,\"runtimeSecretJsonParsed\":false,\"runtimeSecretAccessVerified\":false,\"runtimeSecretScopeMismatch\":false,\"runtimeSecretPermissionDenied\":true,\"runtimeSecretUnauthenticated\":false,\"runtimeSecretNotFound\":false,\"runtimeSecretTransientFailure\":false,\"runtimeSecretClientTypeError\":false,\"runtimeSecretUnknownFailure\":false,\"providerAuthorized\":true,\"settingsIdentityMatches\":true,\"readOnlyMetadataRequestsOnly\":true***",
+      "2026-11-24T14:59:24.4575325Z I66_MAKE_RUNTIME_ACCESS_PREFLIGHT=***\"schema\":\"GI_I66_MAKE_RUNTIME_ACCESS_PREFLIGHT_V1\",\"status\":\"EXACT_SECRET_IAM_DELTA_REQUIRED\",\"scopeContractBlob\":\"7ce546736ac8d08b8ac922d19f3e6e4c2bac0021\",\"secretResource\":\"projects/ays-orbit-360-lab/secrets/orbit360-greenapi-gt-alianzas-soluciones\",\"functions\":[***\"name\":\"orbit360OpsLeadsCommand\",\"region\":\"us-central1\",\"resource\":\"projects/ays-orbit-360-lab/locations/us-central1/functions/orbit360OpsLeadsCommand\",\"status\":\"OBSERVED_ACTIVE\",\"principal\":\"646761409743-compute@developer.gserviceaccount.com\",\"revision\":\"orbit360opsleadscommand-00014-vep\"***,***\"name\":\"orbit360OpsLeadsCommandPreview\",\"region\":\"us-east1\",\"resource\":\"projects/ays-orbit-360-lab/locations/us-east1/functions/orbit360OpsLeadsCommandPreview\",\"status\":\"OBSERVED_ACTIVE\",\"principal\":\"646761409743-compute@developer.gserviceaccount.com\",\"revision\":\"orbit360opsleadscommandpreview-00242-tow\"***],\"candidates\":[***\"principal\":\"646761409743-compute@developer.gserviceaccount.com\",\"canonicalOpsRuntime\":true,\"impersonationVerified\":true,\"firestoreCapabilitiesVerified\":true,\"secretVersionAccessVerified\":false,\"grantedRequiredPermissions\":[\"datastore.databases.get\",\"datastore.entities.get\",\"datastore.entities.list\",\"datastore.entities.create\",\"datastore.entities.update\"],\"firestoreStatus\":\"REQUIRED_PERMISSIONS_PRESENT\",\"secretStatus\":\"PERMISSION_DENIED\"***,***\"principal\":\"orbit360-secrets-lab@ays-orbit-360-lab.iam.gserviceaccount.com\",\"canonicalOpsRuntime\":false,\"impersonationVerified\":true,\"firestoreCapabilitiesVerified\":true,\"secretVersionAccessVerified\":false,\"grantedRequiredPermissions\":[\"datastore.databases.get\",\"datastore.entities.get\",\"datastore.entities.list\",\"datastore.entities.create\",\"datastore.entities.update\"],\"firestoreStatus\":\"REQUIRED_PERMISSIONS_PRESENT\",\"secretStatus\":\"PERMISSION_DENIED\"***],\"selectedRuntime\":\"646761409743-compute@developer.gserviceaccount.com\",\"selectedFrom\":\"OBSERVED_CANONICAL_OPS_RUNTIME\",\"exactSecretGrantRequired\":true,\"iamWrites\":0,\"firestoreWrites\":0,\"credentialValuesPrinted\":false,\"providerRequests\":0,\"externalMessagesSent\":0,\"reportDigest\":\"0416877b786e4635a8a3ca3028e56fd5dac33d224eaa6ec76f3e1499a60ec47e\"***",
+      "2026-11-24T14:59:27.0206249Z I66_MAKE_EVENTARC_PROJECT_IAM_READONLY=***\"schema\":\"GI_I66_MAKE_EVENTARC_PROJECT_IAM_READONLY_V1\",\"status\":\"EVENTARC_RUNTIME_AND_PROJECT_IAM_READY\",\"projectId\":\"ays-orbit-360-lab\",\"cliVersion\":\"14.10.1\",\"canonicalRuntime\":\"646761409743-compute@developer.gserviceaccount.com\",\"canonicalRuntimeObserved\":true,\"inventoryComplete\":true,\"existingRecognizedEventServices\":[\"firestore\"],\"projectPolicyRead\":true,\"projectPolicyDigest\":\"2c928d027f3632fc4e9fa2f591127952590746b2f02a588015a0fed97dc0590f\",\"firstEventBindings\":[***\"role\":\"roles/iam.serviceAccountTokenCreator\",\"member\":\"serviceAccount:service-646761409743@gcp-sa-pubsub.iam.gserviceaccount.com\",\"present\":true***,***\"role\":\"roles/run.invoker\",\"member\":\"serviceAccount:646761409743-compute@developer.gserviceaccount.com\",\"present\":true***,***\"role\":\"roles/eventarc.eventReceiver\",\"member\":\"serviceAccount:646761409743-compute@developer.gserviceaccount.com\",\"present\":true***],\"cliWouldAddProjectBindings\":false,\"queueRules\":***\"status\":\"EXACT_CANONICAL_RULESET_SOURCE_MATCH\",\"sourcePath\":\"firestore.rules\",\"sourceBlob\":\"35fba451bbbeb97dbae3f08303b786ddbcbdd29f\",\"rulesetName\":\"projects/ays-orbit-360-lab/rulesets/6b03deab-0ff4-4c5d-8e74-550982bafc34\",\"rulesWrites\":0,\"contentPublished\":false***,\"runtimeImpersonationVerified\":true,\"runtimeEventarcPermissionsVerified\":true,\"grantedRequiredPermissions\":[\"eventarc.events.receiveEvent\",\"run.routes.invoke\"],\"permissionChecks\":[***\"permission\":\"eventarc.events.receiveEvent\",\"resource\":\"projects/ays-orbit-360-lab\",\"granted\":true,\"status\":\"GRANTED\",\"httpStatus\":null,\"providerStatus\":null***,***\"permission\":\"run.routes.invoke\",\"resource\":\"projects/ays-orbit-360-lab/locations/us-central1/services/orbit360opsleadscommand\",\"granted\":true,\"status\":\"GRANTED\",\"httpStatus\":null,\"providerStatus\":null***,***\"permission\":\"run.routes.invoke\",\"resource\":\"projects/ays-orbit-360-lab/locations/us-east1/services/orbit360opsleadscommandpreview\",\"granted\":true,\"status\":\"GRANTED\",\"httpStatus\":null,\"providerStatus\":null***],\"failureStage\":null,\"failureStatus\":null,\"failureHttpStatus\":null,\"failureProviderStatus\":null,\"projectIamWrites\":0,\"secretIamWrites\":0,\"firestoreWrites\":0,\"providerRequests\":0,\"externalMessagesSent\":0,\"privatePolicyPublished\":false,\"functionCount\":96,\"inventoryDigest\":\"c75bd181d77cd6cf4feb6e3ee9bde9b7f966235ab12553ca1e69ca7522c841fd\",\"reportDigest\":\"9a38ad98878465f9d51836d2b9c518a477b575344d094c87c1f0526b3041d65f\"***",
+      "2026-11-24T14:59:27.4855770Z I66_MAKE_INGRESS_PREIMAGES_READONLY=***\"schema\":\"GI_I66_MAKE_INGRESS_PREIMAGES_READONLY_V1\",\"status\":\"PREIMAGES_CONFIRMED_FOR_CLOSED_INITIALIZATION\",\"projectId\":\"ays-orbit-360-lab\",\"tenantId\":\"alianzas-soluciones\",\"closedConfiguration\":***\"preview\":***\"path\":\"tenants/alianzas-soluciones/config/makeLeadIngressPreview\",\"readVerified\":true,\"exists\":true,\"expectedDigest\":\"1c6037d63c165f20a5e28e4e18da5d568a36d8d8434fdf6b42707516e5c11ba4\",\"state\":\"CLOSED\",\"scopeVerified\":true,\"status\":\"CLOSED_EXISTING\",\"httpStatus\":null,\"providerStatus\":null***,\"live\":***\"path\":\"tenants/alianzas-soluciones/config/makeLeadIngress\",\"readVerified\":true,\"exists\":false,\"expectedDigest\":\"ABSENT\",\"state\":null,\"scopeVerified\":true,\"status\":\"ABSENT\",\"httpStatus\":null,\"providerStatus\":null***,\"targetBefore\":***\"preview\":***\"name\":\"orbit360MakeLeadIngressPreview\",\"region\":\"us-east1\",\"resource\":\"projects/ays-orbit-360-lab/locations/us-east1/functions/orbit360MakeLeadIngressPreview\",\"readVerified\":true,\"state\":\"ABSENT\",\"revision\":null,\"httpStatus\":404,\"providerStatus\":null,\"status\":\"ABSENT\"***,\"live\":***\"name\":\"orbit360MakeLeadIngress\",\"region\":\"us-central1\",\"resource\":\"projects/ays-orbit-360-lab/locations/us-central1/functions/orbit360MakeLeadIngress\",\"readVerified\":true,\"state\":\"ABSENT\",\"revision\":null,\"httpStatus\":404,\"providerStatus\":null,\"status\":\"ABSENT\"***,\"firestoreReads\":2,\"functionReads\":2,\"firestoreWrites\":0,\"functionWrites\":0,\"projectIamWrites\":0,\"secretIamWrites\":0,\"externalMessagesSent\":0,\"privateBodiesPublished\":false,\"reportDigest\":\"34a2ad208b36dcc4f0dfa85bb3e02035394a87a564a028c9d00557baa2a31bf5\"***"
+    ]
+  },
+  "executionBoundary": {
+    "existingWorkflowOnly": true,
+    "previewFiveFunctionGateStillRequired": true,
+    "makeAuthenticatedProbeStillRequiredForV21": true,
+    "previewCanonicalCreateReplayRejectRestoreStillRequired": true,
+    "financial48CompositePreviewStillRequired": true,
+    "previewSecretIamWritesRequired": 0,
+    "previewRuntimeExecutorStatus": "PREVIEW_RUNTIME_VERIFIED_NO_SECRET_IAM_NEEDED",
+    "liveExactSecretIamDeltaRemainsPending": true,
+    "preserveHistoricalRuntimeReceiptPin": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_6_MAKE_CANONICAL_RUNTIME_ACCESS_READBACK_20261124.json",
+      "gitBlobSha": "e359231b4813145aa05346e9936bac8a5f13a2a4",
+      "reason": "Existing Make scope binds this historical remediation receipt. Fresh observation supplements rather than replaces that pin."
+    },
+    "noChangeToSourceManifestOwnersOrPhysicalE3": true,
+    "scenarioExecutionsByAuditor": 0,
+    "scenarioChangesByAuditor": 0,
+    "configWritesByAuditor": 0,
+    "providerPurchasesByAuditor": 0,
+    "canonicalLeadWrites": 0,
+    "externalMessagesSent": 0,
+    "productionAccepted": false
+  }
+}
