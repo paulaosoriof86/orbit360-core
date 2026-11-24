@@ -56,11 +56,11 @@
       "artifactDigest": "sha256:7cb782848a45083047c4899bc30c13bf5be46429607e42597d09342becfc9acc",
       "hostingVersion": "sites/ays-orbit-360-lab/versions/332999a55b189108"
     },
-    "evidencePath": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_EXECUTION_PROGRESS_20261124_R57.json",
-    "evidenceGitBlobSha": "a5bcd2679385bb5d2ce0c0d662f38cbe61f7f86c",
+    "evidencePath": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_EXECUTION_PROGRESS_20261124_R58.json",
+    "evidenceGitBlobSha": "0e75eb9edf5cdc3702f37a53bb1bf2f20ceb0fd4",
     "activeGate": "I6.6",
-    "currentWork": "I6.6: build immutable v28 with unchanged direct renewal/issued endorsement product and the corrected exact Preview-slot rollover. Back up the exact unaccepted v27 residual Preview and accepted E3, reuse only the pinned existing channel and verify224files plus every unrelated channel and bothLIVE unchanged. Execute five-function Preview, fresh Make1-5 and signed direct-form UI; freeze transport for48financialPreview. Promote identicalartifact, prove signedLIVE saves/reload/replay/restoration and48financialLIVE, then enable committedMake ingress. Preserve155appliedCendoso and finish twoMAPFREcanonicalpayments with legitimate assigned session.",
-    "nextAction": "I6.6: build immutable v28 with unchanged direct renewal/issued endorsement product and the corrected exact Preview-slot rollover. Back up the exact unaccepted v27 residual Preview and accepted E3, reuse only the pinned existing channel and verify224files plus every unrelated channel and bothLIVE unchanged. Execute five-function Preview, fresh Make1-5 and signed direct-form UI; freeze transport for48financialPreview. Promote identicalartifact, prove signedLIVE saves/reload/replay/restoration and48financialLIVE, then enable committedMake ingress. Preserve155appliedCendoso and finish twoMAPFREcanonicalpayments with legitimate assigned session.",
+    "currentWork": "I6.6: execute exact five-function Preview on immutable v28 74ae28c6e6e6b40f845567c9b00738a58307b3cb/artifact 14953553588. Complete fresh Make probe/bind/create/readback/replay/reject/restore, the four existing signed UI drivers and direct renewal/issued endorsement entry proof. Freeze transport for 48 financial Preview observations, promote the identical artifact and verify LIVE direct saves/readback/reload/replay/restoration plus 48 financial observations. Activate Make real ingress after COMMITTED. Preserve all 155 verified Cendoso applications and MAPFRE corrected obligations; complete its two documentary canonical payment calls through a legitimate supported session.",
+    "nextAction": "I6.6: execute exact five-function Preview on immutable v28 74ae28c6e6e6b40f845567c9b00738a58307b3cb/artifact 14953553588. Complete fresh Make probe/bind/create/readback/replay/reject/restore, the four existing signed UI drivers and direct renewal/issued endorsement entry proof. Freeze transport for 48 financial Preview observations, promote the identical artifact and verify LIVE direct saves/readback/reload/replay/restoration plus 48 financial observations. Activate Make real ingress after COMMITTED. Preserve all 155 verified Cendoso applications and MAPFRE corrected obligations; complete its two documentary canonical payment calls through a legitimate supported session.",
     "frontendPreviewRequest": {
       "version": 28,
       "sourceQaHead": "9e4928440380dfffda5fbbf9827fabd306676362",
@@ -564,7 +564,7 @@
     "phaseAIterationStatuses": "HISTORICAL_FIELDS_ABOVE_PRESERVED_UNTIL_FORMAL_GATE_EVIDENCE;_NO_NEW_PASS_INFERRED",
     "labDataWriteScope": "ONLY_35_AUTHORIZED_COUNTRY_FIELDS;_NO_AUGUST_REFRESH"
   },
-  "nextAction": "I6.6: build immutable v28 with unchanged direct renewal/issued endorsement product and the corrected exact Preview-slot rollover. Back up the exact unaccepted v27 residual Preview and accepted E3, reuse only the pinned existing channel and verify224files plus every unrelated channel and bothLIVE unchanged. Execute five-function Preview, fresh Make1-5 and signed direct-form UI; freeze transport for48financialPreview. Promote identicalartifact, prove signedLIVE saves/reload/replay/restoration and48financialLIVE, then enable committedMake ingress. Preserve155appliedCendoso and finish twoMAPFREcanonicalpayments with legitimate assigned session.",
+  "nextAction": "I6.6: execute exact five-function Preview on immutable v28 74ae28c6e6e6b40f845567c9b00738a58307b3cb/artifact 14953553588. Complete fresh Make probe/bind/create/readback/replay/reject/restore, the four existing signed UI drivers and direct renewal/issued endorsement entry proof. Freeze transport for 48 financial Preview observations, promote the identical artifact and verify LIVE direct saves/readback/reload/replay/restoration plus 48 financial observations. Activate Make real ingress after COMMITTED. Preserve all 155 verified Cendoso applications and MAPFRE corrected obligations; complete its two documentary canonical payment calls through a legitimate supported session.",
   "sourceOfTruth": {
     "projectBoundaryPrevalentAddendum": "orbit360-platform/docs/recovery/ADDENDUM_PREVALENTE_CHATGPT_PROJECT_BOUNDARY_20260831.md",
     "mutableState": "orbit360-platform/docs/recovery/orbit360-recovery-state-v1.json",
@@ -5180,6 +5180,37 @@
           "sourceQaHead": "1a807b640c4ffc8678524eb5a61da39ae9646fdf",
           "sourceQaRunId": 45459727988,
           "guardRunId": 45459727871
+        }
+      }
+    },
+    {
+      "reason": "ACTIVE_OWNER_PLAN_SUMMARY_SUPERSEDED",
+      "priorGitBlobSha": "9eb903ed5326457575d996a7829166990bc3e1e3",
+      "supersededByGeneration": 3,
+      "prior": {
+        "schema": "GI_I66_ACTIVE_OWNER_PLAN_CONTINUATION_V1",
+        "authorityPointer": "artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json#i66OperationalContinuation20261115",
+        "generation": 3,
+        "latestProvenLiveSource": "65c825b2808a615ca4195bdde6689dbdbe3193b2",
+        "latestPhysicalFrontendLiveReceipt": "artifacts/orbit360-recovery/release-control/I6_6_FRONTEND_E00003_RECEIPT.json",
+        "currentPhysicalFrontend": {
+          "generation": 3,
+          "sourceSha": "65c825b2808a615ca4195bdde6689dbdbe3193b2",
+          "buildId": "gi-i66-65c825b2808a-57f234755dc1",
+          "artifactId": 14873426438,
+          "artifactDigest": "sha256:7cb782848a45083047c4899bc30c13bf5be46429607e42597d09342becfc9acc",
+          "hostingVersion": "sites/ays-orbit-360-lab/versions/332999a55b189108"
+        },
+        "evidencePath": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_EXECUTION_PROGRESS_20261124_R57.json",
+        "evidenceGitBlobSha": "a5bcd2679385bb5d2ce0c0d662f38cbe61f7f86c",
+        "activeGate": "I6.6",
+        "currentWork": "I6.6: build immutable v28 with unchanged direct renewal/issued endorsement product and the corrected exact Preview-slot rollover. Back up the exact unaccepted v27 residual Preview and accepted E3, reuse only the pinned existing channel and verify224files plus every unrelated channel and bothLIVE unchanged. Execute five-function Preview, fresh Make1-5 and signed direct-form UI; freeze transport for48financialPreview. Promote identicalartifact, prove signedLIVE saves/reload/replay/restoration and48financialLIVE, then enable committedMake ingress. Preserve155appliedCendoso and finish twoMAPFREcanonicalpayments with legitimate assigned session.",
+        "nextAction": "I6.6: build immutable v28 with unchanged direct renewal/issued endorsement product and the corrected exact Preview-slot rollover. Back up the exact unaccepted v27 residual Preview and accepted E3, reuse only the pinned existing channel and verify224files plus every unrelated channel and bothLIVE unchanged. Execute five-function Preview, fresh Make1-5 and signed direct-form UI; freeze transport for48financialPreview. Promote identicalartifact, prove signedLIVE saves/reload/replay/restoration and48financialLIVE, then enable committedMake ingress. Preserve155appliedCendoso and finish twoMAPFREcanonicalpayments with legitimate assigned session.",
+        "frontendPreviewRequest": {
+          "version": 28,
+          "sourceQaHead": "9e4928440380dfffda5fbbf9827fabd306676362",
+          "sourceQaRunId": 45463931189,
+          "guardRunId": 45463931520
         }
       }
     }
