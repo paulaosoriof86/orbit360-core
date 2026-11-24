@@ -4821,12 +4821,12 @@
     "liveProofSha256": "4013a99719ba5f8bb3087a5e5f43c189a22daf55aabfcea37e8df5030bb5653c"
   },
   "frontendPreviewRequest": {
-    "version": 22,
+    "version": 23,
     "mode": "A13_A14_BALANCE_COMPOSITE_ARTIFACT_HOSTING_PREVIEW_ONLY",
-    "sourceQaHead": "b2eb935f070cc7bcd8221329ed88c4a383dcd586",
+    "sourceQaHead": "dd521ab149ba54d70eeca3c14875b9160b896ded",
     "manifestBlob": "941497d0b161e04b0ec3e3eee5933139f176b6f5",
-    "sourceQaRunId": 45425186751,
-    "guardRunId": 45425186471,
+    "sourceQaRunId": 45436746052,
+    "guardRunId": 45436746039,
     "previousReceiptBlob": "11fdb3bee494541513482666d6215f45cbad0567",
     "productPaths": [
       "functions/b4-003-scoped-related-reader.js",
@@ -4873,11 +4873,11 @@
     "realCustomerWritesAllowed": false,
     "liveDeployAuthorized": false,
     "releaseAfterPreviewAllowed": false,
-    "releaseMechanismSourceSha": "b2eb935f070cc7bcd8221329ed88c4a383dcd586",
+    "releaseMechanismSourceSha": "dd521ab149ba54d70eeca3c14875b9160b896ded",
     "ownerInstruction": "Continue authorized recovery and existing parallel work; certify the exact newly composed source without losing prior acceptance, financial receipts, or communication rules.",
     "scope": "Existing A13/A14 composite plus the exact two-owner bounded startup recovery and canonical future-pending balance. Build once and publish isolated Hosting Preview only; exact five-function Preview and financial48 proofs remain separate required gates.",
-    "reason": "v21 isolated Hosting Preview build failed its silent marker readback. Later224/224 public bytes are diagnostic only. Corrected the same release verifier with bounded uncached readback, exact bytes, terminal auth failures, both predeploy LIVE fingerprints and retained diagnostics. Signed SourceQA45425186751 and guard45425186471 passed on b2eb935f070cc7bcd8221329ed88c4a383dcd586. Build one new immutable v22; preserve failed v21 and do not rebuild or patch it.",
-    "causalReceipt": "artifacts/orbit360-recovery/release-control/I6_6_V21_READBACK_HOLD_AND_TRANSPORT_CORRECTION_20261124.json",
+    "reason": "The v22 immutable build passed exact224-file Hosting readback, but its full five-function Preview stopped at DIRECTION_LEGAL_PREVIEW_GATE_NOT_ACTIVE because the existing legal QA helper recognized FOUR and omitted the canonical FIVE scope. Corrected that predicate in the same owner without changing the approval, terms, UI, product, or permission boundary. Local144 tests passed and signed SourceQA45436746052 plus guard45436746039 passed on dd521ab149ba54d70eeca3c14875b9160b896ded. Build one new immutable v23 with the corrected existing QA owner; retain v22 failed full Preview and focal Make proof as historical evidence. Never patch or rerun the v22 artifact.",
+    "causalReceipt": "artifacts/orbit360-recovery/release-control/I6_6_FIVE_FUNCTION_PREVIEW_LEGAL_GATE_CAUSAL_CORRECTION_20261124.json",
     "startupRecovery": {
       "schema": "GI_I66_STARTUP_RECOVERY_PREVIEW_EXTENSION_V1",
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_STARTUP_PENDING_READ_RETRY_CAUSAL_SOURCE_20261124.json",
@@ -7119,6 +7119,74 @@
       "path": "artifacts/orbit360-recovery/release-control/I6_6_MAKE_V22_PREVIEW_COMPENSATION_20261124.json",
       "gitBlobSha": "963393dae0f834f0597d7359af4677238b846cd7",
       "sha256": "832eba7289a8c88997df1c0b45d25fadea74eca0d7a7868523c0cafe15300ad8"
+    }
+  },
+  "priorFrontendPreviewRequestBeforeV23_20261124": {
+    "version": 22,
+    "mode": "A13_A14_BALANCE_COMPOSITE_ARTIFACT_HOSTING_PREVIEW_ONLY",
+    "sourceQaHead": "b2eb935f070cc7bcd8221329ed88c4a383dcd586",
+    "manifestBlob": "941497d0b161e04b0ec3e3eee5933139f176b6f5",
+    "sourceQaRunId": 45425186751,
+    "guardRunId": 45425186471,
+    "previousReceiptBlob": "11fdb3bee494541513482666d6215f45cbad0567",
+    "productPaths": [
+      "functions/b4-003-scoped-related-reader.js",
+      "functions/bootstrap.js",
+      "functions/make-lead-ingress-bridge.js",
+      "functions/product-lead-ingress-contract.js",
+      "functions/product-lead-ingress-owner-support.js",
+      "functions/product-ops-leads-domain.js",
+      "orbit360-platform/core/product-hydration-required-optional-p0.js",
+      "orbit360-platform/core/queries.js",
+      "orbit360-platform/data/store-firestore-product-readonly-p0.js"
+    ],
+    "backendPaths": [
+      "functions/b4-003-scoped-related-reader.js",
+      "functions/bootstrap.js",
+      "functions/make-lead-ingress-bridge.js",
+      "functions/product-lead-ingress-contract.js",
+      "functions/product-lead-ingress-owner-support.js",
+      "functions/product-ops-leads-domain.js"
+    ],
+    "backendPathBlobs": {
+      "functions/b4-003-scoped-related-reader.js": "439bea6d90ef9a6a03ca2539096cb626cc43695d",
+      "functions/bootstrap.js": "bd0837a9d5296a456e0575aec555b2971fdedcd7",
+      "functions/make-lead-ingress-bridge.js": "8b519ad21da032ffeeee7f9f9cc3e9c3fe6c1317",
+      "functions/product-lead-ingress-contract.js": "ee29ee1fb12b1a30bf24b7c2c2a8180a2f2ef937",
+      "functions/product-lead-ingress-owner-support.js": "0f07f1620e3968cacf684a88c895faa64eb8a1a1",
+      "functions/product-ops-leads-domain.js": "affde2677b4c997b89abdabf3af2cb920128935d"
+    },
+    "backendPreviewRequired": true,
+    "backendLiveDeployAllowed": false,
+    "fiveFunctionExactPreviewRequired": true,
+    "scopeContractBlob": "7ce546736ac8d08b8ac922d19f3e6e4c2bac0021",
+    "balanceCorrection": {
+      "path": "orbit360-platform/core/queries.js",
+      "gitBlobSha": "b77b65f86ef6ac2ab6dc157fdbc9ad5e34dbcdcc",
+      "causalReceiptPath": "artifacts/orbit360-recovery/release-control/I6_6_FUTURE_PENDING_BALANCE_OWNER_CAUSAL_CORRECTION_20261124.json",
+      "causalReceiptBlob": "c05769d469b0a5e88e72e9e946095cb47bfc9d32",
+      "financialQaScope": "SIX_RECEIPT_CURRENT_BALANCE_READONLY",
+      "requiredStagesPerPhase": 48,
+      "sameArtifactBothPhases": true,
+      "fullA04A12A14Acceptance": false
+    },
+    "realDataWritesAllowed": false,
+    "realCustomerWritesAllowed": false,
+    "liveDeployAuthorized": false,
+    "releaseAfterPreviewAllowed": false,
+    "releaseMechanismSourceSha": "b2eb935f070cc7bcd8221329ed88c4a383dcd586",
+    "ownerInstruction": "Continue authorized recovery and existing parallel work; certify the exact newly composed source without losing prior acceptance, financial receipts, or communication rules.",
+    "scope": "Existing A13/A14 composite plus the exact two-owner bounded startup recovery and canonical future-pending balance. Build once and publish isolated Hosting Preview only; exact five-function Preview and financial48 proofs remain separate required gates.",
+    "reason": "v21 isolated Hosting Preview build failed its silent marker readback. Later224/224 public bytes are diagnostic only. Corrected the same release verifier with bounded uncached readback, exact bytes, terminal auth failures, both predeploy LIVE fingerprints and retained diagnostics. Signed SourceQA45425186751 and guard45425186471 passed on b2eb935f070cc7bcd8221329ed88c4a383dcd586. Build one new immutable v22; preserve failed v21 and do not rebuild or patch it.",
+    "causalReceipt": "artifacts/orbit360-recovery/release-control/I6_6_V21_READBACK_HOLD_AND_TRANSPORT_CORRECTION_20261124.json",
+    "startupRecovery": {
+      "schema": "GI_I66_STARTUP_RECOVERY_PREVIEW_EXTENSION_V1",
+      "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_STARTUP_PENDING_READ_RETRY_CAUSAL_SOURCE_20261124.json",
+      "receiptBlob": "bdfbdb3a1764883579907797b0b198debda773e0",
+      "productPathBlobs": {
+        "orbit360-platform/core/product-hydration-required-optional-p0.js": "f2f42ef536b00b89c7198710a20aadb633a7eb29",
+        "orbit360-platform/data/store-firestore-product-readonly-p0.js": "fa8e507c03aba7bc7e99214c3b4e695f2c5fe222"
+      }
     }
   }
 }
