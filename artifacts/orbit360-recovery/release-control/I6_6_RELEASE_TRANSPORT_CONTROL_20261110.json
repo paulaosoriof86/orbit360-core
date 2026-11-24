@@ -4821,12 +4821,12 @@
     "liveProofSha256": "4013a99719ba5f8bb3087a5e5f43c189a22daf55aabfcea37e8df5030bb5653c"
   },
   "frontendPreviewRequest": {
-    "version": 19,
+    "version": 20,
     "mode": "A13_A14_BALANCE_COMPOSITE_ARTIFACT_HOSTING_PREVIEW_ONLY",
-    "sourceQaHead": "31ed4207f8e73de1f3bdf08f6e56ebfcf2673116",
+    "sourceQaHead": "b4f90d00c0468a54fc9b542d48212919e1a14144",
     "manifestBlob": "677354250c84ef0a5af0b562e29586dfe1559553",
-    "sourceQaRunId": 45375595685,
-    "guardRunId": 45375595283,
+    "sourceQaRunId": 45382071947,
+    "guardRunId": 45382071816,
     "previousReceiptBlob": "11fdb3bee494541513482666d6215f45cbad0567",
     "productPaths": [
       "functions/b4-003-scoped-related-reader.js",
@@ -4871,11 +4871,11 @@
     "realCustomerWritesAllowed": false,
     "liveDeployAuthorized": false,
     "releaseAfterPreviewAllowed": false,
-    "releaseMechanismSourceSha": "31ed4207f8e73de1f3bdf08f6e56ebfcf2673116",
+    "releaseMechanismSourceSha": "b4f90d00c0468a54fc9b542d48212919e1a14144",
     "ownerInstruction": "Continue authorized recovery and existing parallel work; certify the exact newly composed source without losing prior acceptance, financial receipts, or communication rules.",
     "scope": "A13 closed machine-ingress plus A14 related-reader efficiency and canonical future-pending balance. Build once and publish Hosting Preview only; separate exact five-function Preview and LIVE gates remain required.",
-    "reason": "The canonical V18 package passed immutable build and224-file Hosting readback. Its newly composed Make verifier compared raw bootstrap to a deterministic B4 build output; correct that existing verifier and rebuild once without editing V18 or changing any product source.",
-    "causalReceipt": "artifacts/orbit360-recovery/release-control/I6_6_CANONICAL_BOOTSTRAP_BUILD_VERIFIER_CORRECTION_20261124.json"
+    "reason": "V19 is immutable historical Hosting evidence with failed backend and financial Preview. Restore the full composed financial release owner, exact retry-policy acknowledgement with destructive prompts denied, and bounded readonly timeout diagnostics; preserve product pins and build a new immutable V20 once.",
+    "causalReceipt": "artifacts/orbit360-recovery/release-control/I6_6_COMPOSITE_FINANCIAL_OWNER_RECOVERY_20261124.json"
   },
   "previousPhysicalHostingRelease": {
     "sourceSha": "15e849bd606bd8c93e4c0471da1193e85004aecd",
@@ -6664,5 +6664,62 @@
     "status": "ALREADY_ADMITTED_V19_FAILED_NO_REBUILD_UNTIL_NEW_SIGNED_REQUEST_20",
     "sourceSha": "04155aa7bc80e177ee57e50223506e47194bbe3d",
     "artifactId": 14911361853
+  },
+  "priorFrontendPreviewRequestBeforeV20_20261124": {
+    "version": 19,
+    "mode": "A13_A14_BALANCE_COMPOSITE_ARTIFACT_HOSTING_PREVIEW_ONLY",
+    "sourceQaHead": "31ed4207f8e73de1f3bdf08f6e56ebfcf2673116",
+    "manifestBlob": "677354250c84ef0a5af0b562e29586dfe1559553",
+    "sourceQaRunId": 45375595685,
+    "guardRunId": 45375595283,
+    "previousReceiptBlob": "11fdb3bee494541513482666d6215f45cbad0567",
+    "productPaths": [
+      "functions/b4-003-scoped-related-reader.js",
+      "functions/bootstrap.js",
+      "functions/make-lead-ingress-bridge.js",
+      "functions/product-lead-ingress-contract.js",
+      "functions/product-lead-ingress-owner-support.js",
+      "functions/product-ops-leads-domain.js",
+      "orbit360-platform/core/queries.js"
+    ],
+    "backendPaths": [
+      "functions/b4-003-scoped-related-reader.js",
+      "functions/bootstrap.js",
+      "functions/make-lead-ingress-bridge.js",
+      "functions/product-lead-ingress-contract.js",
+      "functions/product-lead-ingress-owner-support.js",
+      "functions/product-ops-leads-domain.js"
+    ],
+    "backendPathBlobs": {
+      "functions/b4-003-scoped-related-reader.js": "439bea6d90ef9a6a03ca2539096cb626cc43695d",
+      "functions/bootstrap.js": "bd0837a9d5296a456e0575aec555b2971fdedcd7",
+      "functions/make-lead-ingress-bridge.js": "8b519ad21da032ffeeee7f9f9cc3e9c3fe6c1317",
+      "functions/product-lead-ingress-contract.js": "ee29ee1fb12b1a30bf24b7c2c2a8180a2f2ef937",
+      "functions/product-lead-ingress-owner-support.js": "0f07f1620e3968cacf684a88c895faa64eb8a1a1",
+      "functions/product-ops-leads-domain.js": "affde2677b4c997b89abdabf3af2cb920128935d"
+    },
+    "backendPreviewRequired": true,
+    "backendLiveDeployAllowed": false,
+    "fiveFunctionExactPreviewRequired": true,
+    "scopeContractBlob": "7ce546736ac8d08b8ac922d19f3e6e4c2bac0021",
+    "balanceCorrection": {
+      "path": "orbit360-platform/core/queries.js",
+      "gitBlobSha": "b77b65f86ef6ac2ab6dc157fdbc9ad5e34dbcdcc",
+      "causalReceiptPath": "artifacts/orbit360-recovery/release-control/I6_6_FUTURE_PENDING_BALANCE_OWNER_CAUSAL_CORRECTION_20261124.json",
+      "causalReceiptBlob": "c05769d469b0a5e88e72e9e946095cb47bfc9d32",
+      "financialQaScope": "SIX_RECEIPT_CURRENT_BALANCE_READONLY",
+      "requiredStagesPerPhase": 48,
+      "sameArtifactBothPhases": true,
+      "fullA04A12A14Acceptance": false
+    },
+    "realDataWritesAllowed": false,
+    "realCustomerWritesAllowed": false,
+    "liveDeployAuthorized": false,
+    "releaseAfterPreviewAllowed": false,
+    "releaseMechanismSourceSha": "31ed4207f8e73de1f3bdf08f6e56ebfcf2673116",
+    "ownerInstruction": "Continue authorized recovery and existing parallel work; certify the exact newly composed source without losing prior acceptance, financial receipts, or communication rules.",
+    "scope": "A13 closed machine-ingress plus A14 related-reader efficiency and canonical future-pending balance. Build once and publish Hosting Preview only; separate exact five-function Preview and LIVE gates remain required.",
+    "reason": "The canonical V18 package passed immutable build and224-file Hosting readback. Its newly composed Make verifier compared raw bootstrap to a deterministic B4 build output; correct that existing verifier and rebuild once without editing V18 or changing any product source.",
+    "causalReceipt": "artifacts/orbit360-recovery/release-control/I6_6_CANONICAL_BOOTSTRAP_BUILD_VERIFIER_CORRECTION_20261124.json"
   }
 }

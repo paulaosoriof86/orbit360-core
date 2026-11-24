@@ -56,16 +56,16 @@
       "artifactDigest": "sha256:7cb782848a45083047c4899bc30c13bf5be46429607e42597d09342becfc9acc",
       "hostingVersion": "sites/ays-orbit-360-lab/versions/332999a55b189108"
     },
-    "evidencePath": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_EXECUTION_PROGRESS_20261124_R34.json",
-    "evidenceGitBlobSha": "d9f4e3794af90d1dded3cdb613b62ee268ebc2d4",
+    "evidencePath": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_EXECUTION_PROGRESS_20261124_R35.json",
+    "evidenceGitBlobSha": "f61b9c24cb14caa7ef309cfe53ff623a3a978ce6",
     "activeGate": "I6.6",
-    "currentWork": "I6.6: completar QA firmado de la composición financiera recuperada y de la corrección acotada de retry; congelar V20 y construir un artifact nuevo. Repetir Preview de cinco funciones con preimages frescos y Make cerrado; después verificar48 financieras con autoridad estable. E3 continúa aceptado, V19 queda histórico fallido y no se promueve. Conservar155 pagos DIRECT pendientes de aplicación,46 obligaciones nuevas Q17908.06 y104 del alcance auditado.",
-    "nextAction": "I6.6: completar QA firmado de la composición financiera recuperada y de la corrección acotada de retry; congelar V20 y construir un artifact nuevo. Repetir Preview de cinco funciones con preimages frescos y Make cerrado; después verificar48 financieras con autoridad estable. E3 continúa aceptado, V19 queda histórico fallido y no se promueve. Conservar155 pagos DIRECT pendientes de aplicación,46 obligaciones nuevas Q17908.06 y104 del alcance auditado.",
+    "currentWork": "I6.6: construir V20 una sola vez desde esta composición y QA firmadas. Mantener E3 aceptado y V19 histórico fallido sin parches. Completar Preview de cinco funciones con Make cerrado, luego48 financieras con autoridad estable, y promover el mismo artifact sólo tras todas las pruebas. Conservar104 obligaciones auditadas,46 nuevas Q17908.06 y155 pagos DIRECT pendientes de aplicación.",
+    "nextAction": "I6.6: construir V20 una sola vez desde esta composición y QA firmadas. Mantener E3 aceptado y V19 histórico fallido sin parches. Completar Preview de cinco funciones con Make cerrado, luego48 financieras con autoridad estable, y promover el mismo artifact sólo tras todas las pruebas. Conservar104 obligaciones auditadas,46 nuevas Q17908.06 y155 pagos DIRECT pendientes de aplicación.",
     "frontendPreviewRequest": {
-      "version": 19,
-      "sourceQaHead": "31ed4207f8e73de1f3bdf08f6e56ebfcf2673116",
-      "sourceQaRunId": 45375595685,
-      "guardRunId": 45375595283
+      "version": 20,
+      "sourceQaHead": "b4f90d00c0468a54fc9b542d48212919e1a14144",
+      "sourceQaRunId": 45382071947,
+      "guardRunId": 45382071816
     }
   },
   "iterationProgressAuthority": "CONTROL_PLANE.json#gateState: I0-I5 certified in earlier release epoch; I6.6 active for current successor. Timestamped iterationN evidence snapshots remain immutable historical observations.",
@@ -564,7 +564,7 @@
     "phaseAIterationStatuses": "HISTORICAL_FIELDS_ABOVE_PRESERVED_UNTIL_FORMAL_GATE_EVIDENCE;_NO_NEW_PASS_INFERRED",
     "labDataWriteScope": "ONLY_35_AUTHORIZED_COUNTRY_FIELDS;_NO_AUGUST_REFRESH"
   },
-  "nextAction": "I6.6: completar QA firmado de la composición financiera recuperada y de la corrección acotada de retry; congelar V20 y construir un artifact nuevo. Repetir Preview de cinco funciones con preimages frescos y Make cerrado; después verificar48 financieras con autoridad estable. E3 continúa aceptado, V19 queda histórico fallido y no se promueve. Conservar155 pagos DIRECT pendientes de aplicación,46 obligaciones nuevas Q17908.06 y104 del alcance auditado.",
+  "nextAction": "I6.6: construir V20 una sola vez desde esta composición y QA firmadas. Mantener E3 aceptado y V19 histórico fallido sin parches. Completar Preview de cinco funciones con Make cerrado, luego48 financieras con autoridad estable, y promover el mismo artifact sólo tras todas las pruebas. Conservar104 obligaciones auditadas,46 nuevas Q17908.06 y155 pagos DIRECT pendientes de aplicación.",
   "sourceOfTruth": {
     "projectBoundaryPrevalentAddendum": "orbit360-platform/docs/recovery/ADDENDUM_PREVALENTE_CHATGPT_PROJECT_BOUNDARY_20260831.md",
     "mutableState": "orbit360-platform/docs/recovery/orbit360-recovery-state-v1.json",
@@ -4431,6 +4431,37 @@
         "activeGate": "I6.6",
         "currentWork": "I6.6: ejecutar Preview firmado de las cinco funciones exactas y prueba financiera48 sobre el artifact v19 ya construido. El ingreso Make permanece cerrado; E3 continúa aceptado hasta promoción y comprobación LIVE del mismo artifact. Conservar104 obligaciones del alcance auditado y155 pagos registrados pendientes de aplicación; no repetir cargas ni reconstruir este artifact.",
         "nextAction": "I6.6: ejecutar Preview firmado de las cinco funciones exactas y prueba financiera48 sobre el artifact v19 ya construido. El ingreso Make permanece cerrado; E3 continúa aceptado hasta promoción y comprobación LIVE del mismo artifact. Conservar104 obligaciones del alcance auditado y155 pagos registrados pendientes de aplicación; no repetir cargas ni reconstruir este artifact.",
+        "frontendPreviewRequest": {
+          "version": 19,
+          "sourceQaHead": "31ed4207f8e73de1f3bdf08f6e56ebfcf2673116",
+          "sourceQaRunId": 45375595685,
+          "guardRunId": 45375595283
+        }
+      }
+    },
+    {
+      "reason": "ACTIVE_OWNER_PLAN_SUMMARY_SUPERSEDED",
+      "priorGitBlobSha": "1161103a24ab2d22195cdb3b0d72edbe21120920",
+      "supersededByGeneration": 3,
+      "prior": {
+        "schema": "GI_I66_ACTIVE_OWNER_PLAN_CONTINUATION_V1",
+        "authorityPointer": "artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json#i66OperationalContinuation20261115",
+        "generation": 3,
+        "latestProvenLiveSource": "65c825b2808a615ca4195bdde6689dbdbe3193b2",
+        "latestPhysicalFrontendLiveReceipt": "artifacts/orbit360-recovery/release-control/I6_6_FRONTEND_E00003_RECEIPT.json",
+        "currentPhysicalFrontend": {
+          "generation": 3,
+          "sourceSha": "65c825b2808a615ca4195bdde6689dbdbe3193b2",
+          "buildId": "gi-i66-65c825b2808a-57f234755dc1",
+          "artifactId": 14873426438,
+          "artifactDigest": "sha256:7cb782848a45083047c4899bc30c13bf5be46429607e42597d09342becfc9acc",
+          "hostingVersion": "sites/ays-orbit-360-lab/versions/332999a55b189108"
+        },
+        "evidencePath": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_EXECUTION_PROGRESS_20261124_R34.json",
+        "evidenceGitBlobSha": "d9f4e3794af90d1dded3cdb613b62ee268ebc2d4",
+        "activeGate": "I6.6",
+        "currentWork": "I6.6: completar QA firmado de la composición financiera recuperada y de la corrección acotada de retry; congelar V20 y construir un artifact nuevo. Repetir Preview de cinco funciones con preimages frescos y Make cerrado; después verificar48 financieras con autoridad estable. E3 continúa aceptado, V19 queda histórico fallido y no se promueve. Conservar155 pagos DIRECT pendientes de aplicación,46 obligaciones nuevas Q17908.06 y104 del alcance auditado.",
+        "nextAction": "I6.6: completar QA firmado de la composición financiera recuperada y de la corrección acotada de retry; congelar V20 y construir un artifact nuevo. Repetir Preview de cinco funciones con preimages frescos y Make cerrado; después verificar48 financieras con autoridad estable. E3 continúa aceptado, V19 queda histórico fallido y no se promueve. Conservar155 pagos DIRECT pendientes de aplicación,46 obligaciones nuevas Q17908.06 y104 del alcance auditado.",
         "frontendPreviewRequest": {
           "version": 19,
           "sourceQaHead": "31ed4207f8e73de1f3bdf08f6e56ebfcf2673116",
