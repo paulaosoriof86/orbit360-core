@@ -1,0 +1,163 @@
+{
+  "schema": "GRAVICENTRA_I66_CENDOSO_EXACT_LEGACY_PERIOD_READBACK_V1",
+  "status": "PROTECTED_PAID_READBACK_PASS",
+  "dateLocal": "2026-11-23",
+  "scope": "Two existing issuer-confirmed paid receipts matched by exact legacy source period; no future obligations created.",
+  "runId": 45328403470,
+  "preflightJobId": 138223420918,
+  "liveJobId": 138223621458,
+  "writerSourceSha": "65a3320c5bd19e0deff1f3fd4160ae0711630eee",
+  "sourceSha256": "649fa315a90b176b794abf6eef3d9f893d47de64cfe558d203a099c408692aa0",
+  "preflightArtifact": {
+    "id": 14891100862,
+    "digest": "sha256:ff6d451854e29bfcd4c514509892f0747e7c496efb7a276a6bd2aa2a60c6f044"
+  },
+  "liveArtifact": {
+    "id": 14891480356,
+    "digest": "sha256:5771d07d2ac5f02aefa6a47a6c81391be52e488a7d63672acd01342c8c505373"
+  },
+  "reviewedPlan": {
+    "inputCount": 607,
+    "readyCount": 2,
+    "grossCents": 54718,
+    "currency": "GTQ",
+    "alreadyPaidPreserved": 342,
+    "holdsCountIncludingPreserved": 605,
+    "holdCounts": {
+      "SOURCE_CURRENCY_NOT_GTQ": 29,
+      "EXACT_POLICY_EDITION_NOT_FOUND": 12,
+      "ALREADY_PAID_WITH_COBRO_PRESERVE": 342,
+      "POLICY_NUMBER_NOT_FOUND": 32,
+      "NET_PREMIUM_CHANGED_REQUIRES_COMMISSION_RECOMPUTE": 8,
+      "RECEIPT_PERIOD_OR_DUE_NOT_FOUND": 175,
+      "MULTIPLE_POLICY_EDITIONS": 1,
+      "MULTIPLE_RECEIPTS_FOR_PERIOD_OR_AMOUNT": 2,
+      "CONFLICTING_SOURCE_DATES": 4
+    },
+    "ready": [
+      {
+        "sourceId": "cendoso_923114254eae488f66c70cf5",
+        "policyId": "pol_6e557c18fc77e18c06bb63a46b7b",
+        "receiptId": "rec_16a29b06796f692f1401072e",
+        "portfolioId": "car_399d3e7ac154e4c5f46e4967",
+        "policyNumber": "91-8323091",
+        "insurer": "El Roble",
+        "paidDate": "2026-09-10",
+        "periodStart": "2026-07-11",
+        "due": "2026-07-21",
+        "grossCents": 27359,
+        "netCents": 18333,
+        "backfill": false,
+        "creatingPortfolio": false,
+        "before": {
+          "receipt": {
+            "id": "rec_16a29b06796f692f1401072e",
+            "polizaId": "pol_6e557c18fc77e18c06bb63a46b7b",
+            "state": "",
+            "due": "",
+            "limit": "2026-07-11",
+            "gross": 27359,
+            "amount": null,
+            "amountTotal": null,
+            "net": null,
+            "sourceReference": "4992323",
+            "paid": false
+          },
+          "portfolio": {
+            "id": "car_399d3e7ac154e4c5f46e4967",
+            "polizaId": "pol_6e557c18fc77e18c06bb63a46b7b",
+            "gross": 27359,
+            "amount": null,
+            "amountTotal": null,
+            "state": "",
+            "portfolioState": "",
+            "paid": false
+          },
+          "aliases": {
+            "receipt": {},
+            "cartera": {}
+          }
+        },
+        "beforeHash": "df0a6a9d36066c4302fff183d10f6677ac40096c3b13bcf9a6d5fe980ff0caae",
+        "sourceRowsSha256": "de13d4f98abfb0ef5c38d8bb458652eb056356e4961d2a79354be8b2442b2767",
+        "match": "LEGACY_INSURER_LIMIT_EXACT_SOURCE_PERIOD_GROSS_EQUAL"
+      },
+      {
+        "sourceId": "cendoso_e4a727f11d568503f660c13c",
+        "policyId": "pol_6e557c18fc77e18c06bb63a46b7b",
+        "receiptId": "rec_4f62305f64c7a0a0f9c0d73e",
+        "portfolioId": "car_526c3718c92c8d177a16d887",
+        "policyNumber": "91-8323091",
+        "insurer": "El Roble",
+        "paidDate": "2026-09-10",
+        "periodStart": "2026-08-11",
+        "due": "2026-08-21",
+        "grossCents": 27359,
+        "netCents": 18333,
+        "backfill": false,
+        "creatingPortfolio": false,
+        "before": {
+          "receipt": {
+            "id": "rec_4f62305f64c7a0a0f9c0d73e",
+            "polizaId": "pol_6e557c18fc77e18c06bb63a46b7b",
+            "state": "",
+            "due": "",
+            "limit": "2026-08-11",
+            "gross": 27359,
+            "amount": null,
+            "amountTotal": null,
+            "net": null,
+            "sourceReference": "4992324",
+            "paid": false
+          },
+          "portfolio": {
+            "id": "car_526c3718c92c8d177a16d887",
+            "polizaId": "pol_6e557c18fc77e18c06bb63a46b7b",
+            "gross": 27359,
+            "amount": null,
+            "amountTotal": null,
+            "state": "",
+            "portfolioState": "",
+            "paid": false
+          },
+          "aliases": {
+            "receipt": {},
+            "cartera": {}
+          }
+        },
+        "beforeHash": "dc3d0d6a1116ebd2d8567025faaecec55108e4ad1f8a08e9c6a84c1e40a02f54",
+        "sourceRowsSha256": "582ca76530f18c0b04529fa8c1573bd54d4e216cd73a2845757e9a41513e1465",
+        "match": "LEGACY_INSURER_LIMIT_EXACT_SOURCE_PERIOD_GROSS_EQUAL"
+      }
+    ]
+  },
+  "liveReadback": {
+    "status": "PROTECTED_PAID_READBACK_PASS",
+    "sourceSha256": "649fa315a90b176b794abf6eef3d9f893d47de64cfe558d203a099c408692aa0",
+    "inputCount": 607,
+    "preflightReady": 2,
+    "cobroWrites": 2,
+    "receiptPaidWrites": 2,
+    "portfolioPaidWrites": 2,
+    "reconciledWrites": 0,
+    "alreadyApplied": 0,
+    "holds": [],
+    "accepted": [
+      {
+        "sourceId": "cendoso_923114254eae488f66c70cf5",
+        "status": "APPLIED_READBACK_PASS"
+      },
+      {
+        "sourceId": "cendoso_e4a727f11d568503f660c13c",
+        "status": "APPLIED_READBACK_PASS"
+      }
+    ]
+  },
+  "notClaimed": [
+    "Full 607-candidate closure",
+    "Whole I6.6 production acceptance",
+    "New UI acceptance for the separate six due-date corrections",
+    "Bank reconciliation"
+  ],
+  "continuation": "Do not reapply these two paid facts. Include them in the next full preflight idempotent preservation census."
+}

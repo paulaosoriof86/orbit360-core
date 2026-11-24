@@ -73,7 +73,11 @@ function fixture(){
   return {request,proof,p,cp,state,transport,ledger,files,io,model,readFile,readText,jp,rp};
 }
 test('composite acceptance synchronizes one generation and four revisions without another deployment',async()=>{
-  const f=fixture(),out=await tx.acceptComposite(f.io,f.request,f.proof);await f.io.verifyCommitted(out);
+  const f=fixture(),priorProgressPath=f.cp.i66ActiveRecoveryCursor.currentEvidencePath;
+  const priorProgress=f.readFile(priorProgressPath),priorProgressBytes=f.readText(priorProgressPath);
+  const priorObservations=priorProgress.postAcceptanceObserverResults;
+  const priorObserverBytes=priorObservations?f.readText(priorObservations.receiptPath):null;
+  const out=await tx.acceptComposite(f.io,f.request,f.proof);await f.io.verifyCommitted(out);
   assert.equal(out.operation,'ACCEPT_EXECUTED_COMPOSITE_LIVE');assert.equal(f.model.clones,0);assert.equal(f.model.commits,1);
   const cp=f.readFile(P.cp),tr=f.readFile(P.transport),state=f.readFile(P.state),ledger=f.readFile(P.ledger),head=cp.i66FrontendReleaseHead;
   assert.equal(head.scope,'COMPOSITE');assert.equal(head.generation,f.request.generation);
@@ -98,7 +102,48 @@ test('composite acceptance synchronizes one generation and four revisions withou
     assert.equal(next,progress.next);
   assert.ok(!progress.next.includes('construir y leer el artifact nuevo de V12'));
   assert.ok(progress.remainingExecutionLanes.length>0);
-  assert.deepEqual(progress.shockObjectives,f.readFile(progress.previousEvidencePath).shockObjectives);
+  // An observation is scoped to the bytes it measured. A successor preserves
+  // every unrelated/closed objective and the exact old proof, but cannot keep
+  // that proof's PASS or HOLD labelled as a measurement of the new artifact.
+  const observedIds=new Set(['A04','A12','A14']);
+  const {items:priorItems,...priorTotals}=priorProgress.shockObjectives;
+  const {items:currentItems,...currentTotals}=progress.shockObjectives;
+  assert.deepEqual(currentTotals,priorTotals);
+  assert.deepEqual(currentItems.map(row=>row.id),priorItems.map(row=>row.id));
+  for(const before of priorItems){
+    const after=currentItems.find(row=>row.id===before.id);
+    if(!priorObservations||!observedIds.has(before.id)||before.passForShock===true){
+      assert.deepEqual(after,before);continue;
+    }
+    const {status:oldStatus,evidence:oldEvidence,next:oldNext,...unchangedBefore}=before;
+    const {status,evidence,next,...unchangedAfter}=after;
+    assert.deepEqual(unchangedAfter,unchangedBefore);
+    assert.equal(status,'CURRENT_ARTIFACT_OBSERVER_PENDING_PRIOR_RESULT_HISTORICAL');
+    assert.notEqual(status,oldStatus);
+    assert.ok(evidence.includes(oldEvidence));
+    assert.ok(next.includes(oldNext)&&next.includes(priorObservations.receiptPath));
+  }
+  assert.equal(f.readText(priorProgressPath),priorProgressBytes,'PREVIOUS_PROGRESS_MUST_REMAIN_IMMUTABLE');
+  if(priorObservations){
+    const receipt=JSON.parse(priorObserverBytes),archived=progress.priorPostAcceptanceObserverResults.at(-1);
+    assert.equal(blob(priorObserverBytes),priorObservations.receiptGitBlobSha);
+    assert.equal(f.readText(priorObservations.receiptPath),priorObserverBytes,'PREVIOUS_OBSERVER_RECEIPT_MUST_REMAIN_IMMUTABLE');
+    assert.deepEqual(archived.results,priorObservations);
+    assert.deepEqual(archived.target,receipt.target);
+    assert.deepEqual(archived.objectiveStates,priorItems.filter(row=>observedIds.has(row.id)));
+    assert.equal(archived.acceptanceScope,'HISTORICAL_ORIGINAL_ARTIFACT_ONLY');
+    assert.equal(archived.immutableReceiptRetained,true);
+    assert.equal(progress.postAcceptanceObserverResults,undefined);
+    assert.equal(cp.i66ActiveRecoveryCursor.lastObserverResultsReceipt,undefined);
+    assert.deepEqual(archived.supersededByTarget,progress.currentObserverStatus.target);
+  }
+  if(priorObservations||priorProgress.currentObserverStatus){
+    assert.equal(progress.currentObserverStatus.status,'PENDING_READONLY_OBSERVATION_ON_CURRENT_ACCEPTED_ARTIFACT');
+    assert.equal(progress.currentObserverStatus.acceptanceTransferred,false);
+    for(const key of ['generation','sourceSha','buildId','artifactId','artifactDigest','hostingVersion'])
+      assert.equal(progress.currentObserverStatus.target[key],head[key]);
+  }
+  owner.assertExecutionProgress(cp,progress,{readFileSync:f.readText});
   assert.deepEqual(progress.officialProgress,f.readFile(progress.previousEvidencePath).officialProgress);
   assert.equal(cp.i66ActiveRecoveryCursor.currentEvidenceBlobSha,blob(serial(progress)));
   assert.equal(progress.financialWork.currentIterationRealCustomerFinancialWrites,
