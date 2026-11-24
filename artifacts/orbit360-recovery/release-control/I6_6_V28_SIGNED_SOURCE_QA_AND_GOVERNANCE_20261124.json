@@ -1,0 +1,38 @@
+{
+  "schema": "GI_I66_V28_SOURCE_QA_AND_GOVERNANCE_VERIFICATION_V1",
+  "status": "SIGNED_SOURCE_QA_AND_GOVERNANCE_PASS",
+  "sourceHead": "9e4928440380dfffda5fbbf9827fabd306676362",
+  "branch": "recovery/fase-a-clean-20260831",
+  "sourceQa": {
+    "runId": 45463931189,
+    "workflow": ".github/workflows/gravicentra-i66-privileged-role-parity-source-qa.yml",
+    "headSha": "9e4928440380dfffda5fbbf9827fabd306676362",
+    "status": "completed",
+    "conclusion": "success",
+    "jobId": 138693647634,
+    "sourceSuiteStep": 4,
+    "lineageGuardStep": 5
+  },
+  "governance": {
+    "runId": 45463931520,
+    "workflow": ".github/workflows/gravicentra-release-lock-sync.yml",
+    "headSha": "9e4928440380dfffda5fbbf9827fabd306676362",
+    "status": "completed",
+    "conclusion": "success",
+    "preflightJobId": 138693651286,
+    "preflightStep": 4,
+    "availabilityJobId": 138693650110,
+    "canonicalPreflight": "PROVIDER_STEP_SUCCESS_VERIFIED"
+  },
+  "causalCorrectionReceipt": "artifacts/orbit360-recovery/release-control/I6_6_HOSTING_TARGET_METADATA_CAUSAL_CORRECTION_20261124.json",
+  "causalCorrectionBlob": "0260c2efc77e25cec3ff3af66a166319ad527c8c",
+  "actionsByReviewer": {
+    "productChanges": 0,
+    "backendChanges": 0,
+    "customerDataWrites": 0,
+    "productionDeploys": 0
+  },
+  "limitations": [
+    "Source and governance are verified; this is not acceptance of the successor Preview or LIVE."
+  ]
+}
