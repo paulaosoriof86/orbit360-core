@@ -1,0 +1,13 @@
+{
+  "schema": "GI_I66_MAKE_LEAD_AFTER_CREATE_SNAPSHOT_V1",
+  "status": "CANONICAL_CREATE_READBACK_CAPTURED",
+  "sourceSha": "68a37a8e6f5bef24299773d8bc73f2d567c786cf",
+  "artifactDigest": "sha256:bb7bf72757801ba8312c30f196a33b6920f941240bff9ee3354a58542407cfb7",
+  "snapshotId": "8aa8fca9c098f0dd9aea57d0aa6f83572135fe06d2e7bcc5fb7db73f0e716c42",
+  "snapshotDigest": "c3da0f571820a008656dd9cdb80ef86066faf57b684b2493a77c9da8ca6f1af5",
+  "canonicalSnapshotDigest": "70477d1cdcf8f12173e30a6f7626bad91af16989c2862a31bc0749c600035811",
+  "canonicalLeadWrites": 1,
+  "canonicalAuditWrites": 4,
+  "operationalWritesByVerifier": 0,
+  "externalMessagesSent": 0
+}

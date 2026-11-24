@@ -424,11 +424,12 @@ async function acceptDirectionPreviewLegal({page,actor,cfg}){
   let legalSubstage='AUTHORITY_VALIDATION';
   try{
   const control=JSON.parse(fs.readFileSync(CONTROL,'utf8'));
-  // The scoped four-function Preview leaves the production lock intact.
+  // The scoped four/five-function Preview leaves the production lock intact.
   // Validate that exact owner-approved synthetic-only authority rather than
   // requiring the former global Preview status. Never grant consent or skip UI.
   const scopedPreview=control.status==='OPERATIONAL_EXACT_LIVE_ACCEPTED_LOCKED' &&
-    control.scopedBackendPreviewI66?.status==='APPROVED_FOUR_FUNCTION_PREVIEW_SYNTHETIC_ONLY';
+    (control.scopedBackendPreviewI66?.status==='APPROVED_FOUR_FUNCTION_PREVIEW_SYNTHETIC_ONLY' ||
+     control.scopedBackendPreviewI66?.status===require('./gravicentra-i66-make-release-scope.cjs').PREVIEW_STATUS);
   if(!scopedPreview){
     assert.equal(control.status,'OPERATIONAL_BACKEND_PREVIEW_AUTHORIZED','DIRECTION_LEGAL_PREVIEW_GATE_NOT_ACTIVE');
   }

@@ -5,6 +5,7 @@ const test=require('node:test'),assert=require('node:assert/strict');
 const fs=require('node:fs'),path=require('node:path'),crypto=require('node:crypto'),vm=require('node:vm');
 const g=require('./gravicentra-i6-6-direction-preview-legal-acceptance.cjs');
 const release=require('./gravicentra-i6-6-operational-release-candidate.cjs');
+const makeScope=require('./gravicentra-i66-make-release-scope.cjs');
 const root=path.resolve(__dirname,'..'),copy=value=>JSON.parse(JSON.stringify(value));
 const hash=value=>crypto.createHash('sha256').update(value).digest('hex');
 const receiptBytes=fs.readFileSync(path.join(root,g.I66_SCOPE.receiptPath));
@@ -35,6 +36,40 @@ function fixture(){
   return {receipt:JSON.parse(receiptBytes),receiptSha256:hash(receiptBytes),candidate,control,
     cfg:{phase:'PREVIEW',origin:candidate.previewUrl,source:sourceSha,packageRoot:'/synthetic/exact-package'},
     actor:{role:'Dirección',advisorId:g.ADVISOR,uid:'synthetic-direction-uid'}};
+}
+function scopedFixture(f,makeIngress){
+  const p=f.candidate,physical=copy(f.control.currentExactHostingRelease);
+  Object.assign(p,{opsLeadsComposite:true,compositeVersion:makeIngress?2:1,
+    targets:copy(makeIngress?release.MAKE_TARGETS:release.COMPOSITE_TARGETS),expectedSiteFileCount:224,
+    opsLeadsBackendPath:'functions/product-ops-leads-domain.js',
+    opsLeadsBackendBlobSha:makeIngress?'b'.repeat(40):'b7921ca88343ced65bdad4cd9de26fa120647083',
+    currentPhysicalLive:copy(physical),rollbackFourBackendRevisionsAndHosting:true});
+  if(makeIngress)Object.assign(p,{makeIngressComposite:true,noRulesAuthIamWrites:false,
+    noRulesAuthMembershipWrites:true,onlyExactSecretIamDeltaAllowed:true,rollbackFiveBackendRevisionsAndHosting:true,
+    makeIngress:{schema:makeScope.SCOPE,scopeContractPath:makeScope.CONTRACT_PATH,scopeContractBlob:makeScope.CONTRACT_BLOB,
+      sourceSha:p.sourceSha,communicationDecision:{path:makeScope.COMMUNICATION_DECISION_PATH,gitBlobSha:makeScope.COMMUNICATION_DECISION_BLOB},
+      tenantId:'alianzas-soluciones',country:'GT',instanceId:'710522720868',scenarioId:10196136,firestoreConnectionId:14756714,
+      assignment:'pending_operations',outboundEnabled:false,noBackfill:true,authContextEventType:makeScope.EVENT_TYPE,deployState:'CLOSED',
+      realLeadActivationAfterCommittedOnly:true,rollbackNewFunctionAndExactSecretDelta:true,queueConfigurationWritesOutsideDataOnly:true,
+      sourcePaths:[...makeScope.SOURCE_PATHS],sourceBlobs:Object.fromEntries(makeScope.SOURCE_PATHS.map(file=>[file,'b'.repeat(40)])),
+      balanceCorrection:copy(makeScope.BALANCE_CORRECTION),
+      runtimeAccess:{principal:makeScope.RUNTIME,receiptPath:makeScope.RUNTIME_RECEIPT_PATH,receiptBlob:makeScope.RUNTIME_RECEIPT_BLOB,
+        reportDigest:makeScope.RUNTIME_REPORT_DIGEST,firestoreCapabilitiesVerified:true},
+      permissions:{secretResource:makeScope.SECRET,role:'roles/secretmanager.secretAccessor',principal:makeScope.RUNTIME,
+        exactSecretResourceOnly:true,etagCompareAndSwap:true,projectIamWrites:0,rulesAuthMembershipWrites:0,forbidCliProjectIamMutation:true},
+      queueRules:{sourcePath:'firestore.b4-003-scoped-candidate.rules',sourceBlob:'c'.repeat(40)},
+      closedConfiguration:{preview:{expectedDigest:'ABSENT',nonce:'d'.repeat(64)},live:{expectedDigest:'ABSENT',nonce:'e'.repeat(64)}},
+      targetBefore:Object.fromEntries(['preview','live'].map(phase=>[phase,{...makeScope.ADDED[phase],state:'ABSENT',revision:null}]))}});
+  delete f.control.operationalReleaseCandidate;
+  Object.assign(f.control,{status:'OPERATIONAL_EXACT_LIVE_ACCEPTED_LOCKED',forbidBackendFunctionDeploy:true,
+    backendFunctionPreviewOnly:false,currentPhysicalHostingRelease:physical,
+    scopedBackendPreviewI66:{schema:'GI_I66_SCOPED_BACKEND_PREVIEW_AUTHORIZATION_V1',
+      status:makeIngress?makeScope.PREVIEW_STATUS:'APPROVED_FOUR_FUNCTION_PREVIEW_SYNTHETIC_ONLY',approvedByDirection:true,
+      noLiveOrFinancialWrites:true,noRulesAuthIamWrites:!makeIngress,sameImmutableArtifactOnly:true,
+      ...(makeIngress?{noRulesAuthMembershipWrites:true,onlyExactSecretIamDeltaAllowed:true}:{}),
+      currentPhysicalLiveSourceSha:physical.sourceSha,currentPhysicalLiveArtifactDigest:physical.artifactDigest,
+      sourceSha:p.sourceSha,artifactDigest:p.artifactDigest,candidate:p}});
+  return f;
 }
 function marker(f){return{product:'Gravicentra Insurance',gate:'I6.6',sourceSha:f.cfg.source,
   buildId:f.candidate.buildId,environmentRef:'same-project-preview'};}
@@ -184,6 +219,57 @@ test('mocked executable helper verifies ancestry/source/owner and normal UI plus
   assert.equal(h.calls.fetch.length,3);assert.equal(h.calls.git.filter(args=>args[0]==='merge-base').length,1);
   assert.ok(!h.calls.git.some(args=>args[0]==='rev-parse'));
   g.validateAcceptanceProof(proof,h.f.candidate);
+});
+for(const [label,makeIngress] of [['FOUR',false],['FIVE',true]])
+test('scoped '+label+' executable legal helper validates canonical candidate and normal consent under the production lock',async()=>{
+  const h=harness({mutate:f=>scopedFixture(f,makeIngress)}),before=JSON.stringify(h.f.control);
+  assert.equal(release.candidateForPhase(h.f.control,'preview'),h.f.candidate);
+  const proof=await h.run();g.validateAcceptanceProof(proof,h.f.candidate);
+  assert.equal(proof.decisionId,g.I66_SCOPE.decisionId);assert.equal(proof.sourceSha,h.f.cfg.source);
+  assert.equal(proof.origin,h.f.cfg.origin);assert.equal(proof.buildId,h.f.candidate.buildId);
+  assert.equal(proof.immediateReadback,true);assert.equal(proof.reloadReadback,true);assert.equal(proof.reloadActorVerified,true);
+  assert.equal(h.calls.check,1);assert.equal(h.calls.click,1);assert.equal(h.calls.reload,1);assert.equal(h.calls.records,2);
+  assert.equal(h.calls.fetch.length,3);assert.equal(h.calls.git.filter(args=>args[0]==='merge-base').length,1);
+  assert.equal(JSON.stringify(h.f.control),before,'acceptance must not mutate the production lock or candidate');
+});
+const scopedFiveAuthorityFailures=[
+  ['unknown scoped status',f=>f.control.scopedBackendPreviewI66.status='APPROVED_ANY_PREVIEW',true],
+  ['missing scoped authorization',f=>delete f.control.scopedBackendPreviewI66,true],
+  ['wrong canonical status',f=>f.control.status='PREVIEW_BUILD_REQUESTED',true],
+  ['FOUR status attached to FIVE candidate',f=>f.control.scopedBackendPreviewI66.status='APPROVED_FOUR_FUNCTION_PREVIEW_SYNTHETIC_ONLY'],
+  ['open production lock',f=>f.control.forbidBackendLiveFunctionDeploy=false],
+  ['second raw candidate',f=>f.control.operationalReleaseCandidate=copy(f.candidate)],
+  ['future gate',f=>f.control.gate='I6.7'],
+  ['unapproved scope',f=>f.control.scopedBackendPreviewI66.approvedByDirection=false],
+  ['financial writes permitted',f=>f.control.scopedBackendPreviewI66.noLiveOrFinancialWrites=false],
+  ['scope source drift',f=>f.control.scopedBackendPreviewI66.sourceSha='d'.repeat(40)],
+  ['scope artifact drift',f=>f.control.scopedBackendPreviewI66.artifactDigest='sha256:'+'d'.repeat(64)],
+  ['physical LIVE drift',f=>f.control.scopedBackendPreviewI66.currentPhysicalLiveSourceSha='d'.repeat(40)],
+  ['candidate LIVE status',f=>f.candidate.status='EXACT_PREVIEW_SIGNED_LIVE_AUTHORIZED'],
+  ['candidate target expansion',f=>f.candidate.targets.preview.push({name:'otherFunction',region:'us-central1'})],
+  ['candidate Make source drift',f=>f.candidate.makeIngress.sourceSha='d'.repeat(40)],
+  ['candidate active ingress',f=>f.candidate.makeIngress.deployState='ACTIVE'],
+  ['candidate IAM expansion',f=>f.candidate.makeIngress.permissions.projectIamWrites=1],
+  ['candidate real writes permitted',f=>f.candidate.noRealFinancialOrCustomerWrites=false],
+  ['LIVE phase',f=>f.cfg.phase='LIVE'],
+  ['execution source drift',f=>f.cfg.source='d'.repeat(40)],
+  ['execution origin drift',f=>f.cfg.origin='https://app.aysseguros.com'],
+  ['consent source drift',f=>f.candidate.legalAcceptance.sourceSha='d'.repeat(40)],
+  ['consent receipt drift',f=>f.candidate.legalAcceptance.receiptSha256='d'.repeat(64)],
+  ['consent terms drift',f=>f.candidate.legalAcceptance.termsProjectionSha256='d'.repeat(64)],
+  ['wrong signed actor',f=>f.actor.role='Operativo']
+];
+for(const [label,mutate,gateInactive] of scopedFiveAuthorityFailures)
+test('scoped FIVE executable helper refuses '+label+' before hosted reads and UI',async()=>{
+  const h=harness({mutate:f=>{scopedFixture(f,true);mutate(f);}});
+  await assert.rejects(h.run(),error=>{
+    assert.equal(error.directionLegalSubstage,'AUTHORITY_VALIDATION');
+    if(gateInactive)assert.match(error.message,/DIRECTION_LEGAL_PREVIEW_GATE_NOT_ACTIVE/);
+    else assert.doesNotMatch(error.message,/DIRECTION_LEGAL_PREVIEW_GATE_NOT_ACTIVE/,'canonical candidate and consent validation must run');
+    return true;
+  });
+  assert.equal(h.calls.fetch.length,0);assert.equal(h.calls.wait,0);assert.equal(h.calls.check,0);
+  assert.equal(h.calls.click,0);assert.equal(h.calls.reload,0);
 });
 const preUiFailures=[
   ['source not descendant',{ancestorFails:true}],

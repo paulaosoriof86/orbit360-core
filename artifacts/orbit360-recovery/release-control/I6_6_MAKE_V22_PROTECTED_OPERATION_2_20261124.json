@@ -1,0 +1,21 @@
+{
+  "schema": "GI_I66_MAKE_LEAD_CONFIGURATION_TRANSITION_V1",
+  "action": "BIND_PRINCIPAL",
+  "phase": "preview",
+  "sourceSha": "68a37a8e6f5bef24299773d8bc73f2d567c786cf",
+  "authorityReceiptBlob": "8034c7b4770fe68caf41612e4da0b90b73f11e22",
+  "requestDigest": "38c1e5a161f7dfc1faafc36f87e9ca2155e9dde8dbe99b9ddb30b4b74cb28961",
+  "beforeDigest": "9f63fef4dd696488b8efa335ce50598c5b1fff4ecc13f17c9889825fa06c8c5e",
+  "afterDigest": "3184e3e9a949abf4a3d8d41eb1a91e1f991dc2a9eb9331313c6f34d51c246af4",
+  "state": "BOUND",
+  "enabled": false,
+  "configurationWrites": 1,
+  "auditWrites": 1,
+  "canonicalLeadWrites": 0,
+  "notificationsCreated": 0,
+  "externalMessagesSent": 0,
+  "principalSha256": "4ecf8133c53d47df7848ce95cbda92b78b8e0bb6c1d0db8deb3c9b7d7b30df02",
+  "recordedAt": "2026-11-24T15:57:56.843Z",
+  "configReadback": true,
+  "auditReadback": true
+}

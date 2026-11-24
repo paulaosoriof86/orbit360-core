@@ -1,0 +1,19 @@
+{
+  "schema": "GI_I66_MAKE_RELEASE_COMPENSATION_V1",
+  "phase": "preview",
+  "sourceSha": "68a37a8e6f5bef24299773d8bc73f2d567c786cf",
+  "artifactDigest": "sha256:bb7bf72757801ba8312c30f196a33b6920f941240bff9ee3354a58542407cfb7",
+  "status": "COMPENSATION_READBACK_VERIFIED",
+  "configuration": {
+    "status": "CLOSED_CONFIG_READBACK_VERIFIED",
+    "configurationWrites": 0
+  },
+  "trigger": {
+    "status": "EXACT_CREATED_FUNCTION_DELETED_ABSENCE_VERIFIED",
+    "functionDeletes": 1
+  },
+  "secretIam": null,
+  "canonicalLeadWrites": 0,
+  "externalMessagesSent": 0,
+  "failures": []
+}

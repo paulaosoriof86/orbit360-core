@@ -1,0 +1,186 @@
+{
+  "schema": "GI_I66_DIRECTION_FIVE_SCOPED_LEGAL_GATE_CAUSAL_RESULT_V1",
+  "status": "OFFLINE_CAUSAL_TESTS_PASS_REMOTE_ACCEPTANCE_PENDING",
+  "scope": "existing I6.6 scoped Preview legal gate; preserve FOUR and legacy",
+  "sourceHeadBeforeChanges": "939edb66f657c9604a86b1ebcc6254cb4b4a0cf6",
+  "realFailure": {
+    "workflowRunId": 45429218736,
+    "workflowHeadSha": "e3b42a9d6e8fe1eb002fa29239cfa728d09d606d",
+    "immutableArtifactSourceSha": "68a37a8e6f5bef24299773d8bc73f2d567c786cf",
+    "failureStage": "DIRECTION_LEGAL_ACCEPTANCE",
+    "failureCheck": "DIRECTION_LEGAL_PREVIEW_GATE_NOT_ACTIVE",
+    "legalSubstage": "AUTHORITY_VALIDATION",
+    "diagnosticSha256": "4dff0b10c9e9c0e95a3da36cd62b8c1f087035195727c343374042dfbd8969c5",
+    "cleanup": "PASS",
+    "remainingSyntheticRecords": 0
+  },
+  "causalCorrection": "Recognize the canonical Make PREVIEW_STATUS alongside the existing FOUR status under the unchanged production lock, then require the existing complete candidateForPhase(control,preview) validation before consent or UI.",
+  "sourcePaths": [
+    {
+      "path": "tools/gravicentra-i6-6-direction-preview-legal-acceptance.cjs",
+      "previousGitBlobSha": "b3a6539596fb9ed706f7a6e21aa982bf97129780",
+      "gitBlobSha": "af17ba22238b310d356a76c1a3349dc540974859",
+      "sha256": "5e94a3d0fa9b511db8f6d3be5248ddcc784a5c5d8d54835914f211064c140f28"
+    },
+    {
+      "path": "tools/gravicentra-i6-6-direction-preview-i66-consent-scope.test.cjs",
+      "previousGitBlobSha": "777f665c015b63ca8db08bef6683050f8e339476",
+      "gitBlobSha": "0025c64a4d9364fe35e7daa0c0d3e9f65b406379",
+      "sha256": "f4bcff55a8fc5ac8baae1d12e39df6ab3863e260d48f212e2b23887f0e608a90"
+    }
+  ],
+  "baseline": {
+    "phase": "BASELINE_WITH_CAUSAL_TESTS",
+    "remoteChanges": false,
+    "command": [
+      "node",
+      "--test",
+      "--test-reporter=tap",
+      "tools/gravicentra-i6-6-direction-preview-i66-consent-scope.test.cjs"
+    ],
+    "exitCode": 1,
+    "sourceHead": "939edb66f657c9604a86b1ebcc6254cb4b4a0cf6",
+    "ownerPath": "tools/gravicentra-i6-6-direction-preview-legal-acceptance.cjs",
+    "ownerGitBlob": "b3a6539596fb9ed706f7a6e21aa982bf97129780",
+    "testPath": "tools/gravicentra-i6-6-direction-preview-i66-consent-scope.test.cjs",
+    "testGitBlob": "0025c64a4d9364fe35e7daa0c0d3e9f65b406379",
+    "logSha256": "21c657a5d98f271034bd3ae5624bc5ab9538cde11414cd4e52fc2305555f1ff9",
+    "summary": [
+      "# tests 123",
+      "# pass 101",
+      "# fail 22",
+      "# skipped 0",
+      "# duration_ms 326.838887"
+    ],
+    "failedTests": [
+      "not ok 61 - scoped FIVE executable legal helper validates canonical candidate and normal consent under the production lock",
+      "not ok 66 - scoped FIVE executable helper refuses open production lock before hosted reads and UI",
+      "not ok 67 - scoped FIVE executable helper refuses second raw candidate before hosted reads and UI",
+      "not ok 68 - scoped FIVE executable helper refuses future gate before hosted reads and UI",
+      "not ok 69 - scoped FIVE executable helper refuses unapproved scope before hosted reads and UI",
+      "not ok 70 - scoped FIVE executable helper refuses financial writes permitted before hosted reads and UI",
+      "not ok 71 - scoped FIVE executable helper refuses scope source drift before hosted reads and UI",
+      "not ok 72 - scoped FIVE executable helper refuses scope artifact drift before hosted reads and UI",
+      "not ok 73 - scoped FIVE executable helper refuses physical LIVE drift before hosted reads and UI",
+      "not ok 74 - scoped FIVE executable helper refuses candidate LIVE status before hosted reads and UI",
+      "not ok 75 - scoped FIVE executable helper refuses candidate target expansion before hosted reads and UI",
+      "not ok 76 - scoped FIVE executable helper refuses candidate Make source drift before hosted reads and UI",
+      "not ok 77 - scoped FIVE executable helper refuses candidate active ingress before hosted reads and UI",
+      "not ok 78 - scoped FIVE executable helper refuses candidate IAM expansion before hosted reads and UI",
+      "not ok 79 - scoped FIVE executable helper refuses candidate real writes permitted before hosted reads and UI",
+      "not ok 80 - scoped FIVE executable helper refuses LIVE phase before hosted reads and UI",
+      "not ok 81 - scoped FIVE executable helper refuses execution source drift before hosted reads and UI",
+      "not ok 82 - scoped FIVE executable helper refuses execution origin drift before hosted reads and UI",
+      "not ok 83 - scoped FIVE executable helper refuses consent source drift before hosted reads and UI",
+      "not ok 84 - scoped FIVE executable helper refuses consent receipt drift before hosted reads and UI",
+      "not ok 85 - scoped FIVE executable helper refuses consent terms drift before hosted reads and UI",
+      "not ok 86 - scoped FIVE executable helper refuses wrong signed actor before hosted reads and UI"
+    ]
+  },
+  "corrected": {
+    "phase": "CORRECTED_WITH_SAME_CAUSAL_TESTS",
+    "remoteChanges": false,
+    "command": [
+      "node",
+      "--test",
+      "--test-reporter=tap",
+      "tools/gravicentra-i6-6-direction-preview-i66-consent-scope.test.cjs"
+    ],
+    "exitCode": 0,
+    "sourceHead": "939edb66f657c9604a86b1ebcc6254cb4b4a0cf6",
+    "ownerPath": "tools/gravicentra-i6-6-direction-preview-legal-acceptance.cjs",
+    "ownerGitBlob": "af17ba22238b310d356a76c1a3349dc540974859",
+    "testPath": "tools/gravicentra-i6-6-direction-preview-i66-consent-scope.test.cjs",
+    "testGitBlob": "0025c64a4d9364fe35e7daa0c0d3e9f65b406379",
+    "logSha256": "a787f36724aa83727d9b7ec7c90c07e17257b6bff459635389a50efe5ef7d485",
+    "summary": [
+      "# tests 123",
+      "# pass 123",
+      "# fail 0",
+      "# skipped 0",
+      "# duration_ms 297.767727"
+    ],
+    "failedTests": []
+  },
+  "legacyCompatibility": {
+    "phase": "LEGACY_LEGAL_COMPATIBILITY",
+    "command": [
+      "node",
+      "--test",
+      "--test-reporter=tap",
+      "tools/gravicentra-i6-6-direction-preview-legal-acceptance.test.cjs",
+      "tools/gravicentra-i6-6-direction-preview-qa-navigation-retry.test.cjs",
+      "tools/gravicentra-i6-6-direction-preview-proposal-diagnostic-retry.test.cjs"
+    ],
+    "exitCode": 0,
+    "logSha256": "643a574cacb11e49b9dab4d91e93196c1b7de9460ed4c1e4b000589c55fea8c0",
+    "summary": [
+      "# tests 21",
+      "# pass 21",
+      "# fail 0",
+      "# skipped 0",
+      "# duration_ms 409.209625"
+    ],
+    "failedTests": []
+  },
+  "newTests": {
+    "positive": 2,
+    "negative": 25,
+    "baselineFailingTests": 22,
+    "note": "One valid FIVE path reproduces the actual gate error; 21 negative-path assertions prove the old predicate prevents complete canonical validation. No claim that baseline permitted those invalid candidates."
+  },
+  "postCorrectionTotals": {
+    "passed": 144,
+    "failed": 0,
+    "skipped": 0
+  },
+  "invariants": {
+    "productionLockUnchanged": true,
+    "fullCanonicalCandidateValidatorRetained": true,
+    "fourFunctionSupportRetained": true,
+    "legacyConsentRetained": true,
+    "consentReceiptAndTermsUnchanged": true,
+    "normalCheckboxAndButtonRequired": true,
+    "immediateAndReloadReadbackRequired": true,
+    "noProductChanges": true,
+    "noManifestChanges": true,
+    "noTransportChanges": true,
+    "noWorkflowChanges": true,
+    "noRulesOrPermissionsChanges": true,
+    "noRetryChanges": true,
+    "noRemoteWrites": true,
+    "noCommitOrBuild": true
+  },
+  "ownerPins": {
+    "newPathsRequired": [],
+    "changedExistingPins": [
+      "tools/gravicentra-i6-6-direction-preview-legal-acceptance.cjs",
+      "tools/gravicentra-i6-6-direction-preview-i66-consent-scope.test.cjs"
+    ],
+    "canonicalMakeScopeAlreadyPinned": true,
+    "sourceQaAlreadyWatchesBothFiles": true,
+    "sourceQaAlreadyExecutesConsentSuite": true,
+    "sourceQaWorkflow": ".github/workflows/gravicentra-i66-privileged-role-parity-source-qa.yml"
+  },
+  "remainingGate": "Root to integrate R49 source and regenerate SourceQA, immutable build v23 and exact five-function Preview. Financial48 COMPOSITE and LIVE remain pending.",
+  "logBindings": [
+    {
+      "path": "artifacts/orbit360-recovery/release-control/I6_6_V23_LEGAL_GATE_BASELINE_20261124.json",
+      "gitBlobSha": "55fd6c790b661b7274f848d60e098de55882eb85",
+      "sha256": "93d0b940afe8f8d062dae2a65e470d18f9fa91b088371729fff907daec33b03e",
+      "sourceOutputSha256": "21c657a5d98f271034bd3ae5624bc5ab9538cde11414cd4e52fc2305555f1ff9"
+    },
+    {
+      "path": "artifacts/orbit360-recovery/release-control/I6_6_V23_LEGAL_GATE_CORRECTED_20261124.json",
+      "gitBlobSha": "fb870d4b996184d0597291ef3c14ef34c1a66fe1",
+      "sha256": "c603a69a4e5996609ac121b9e4200677da11e109543d53a06bcc902fa2f03fcb",
+      "sourceOutputSha256": "a787f36724aa83727d9b7ec7c90c07e17257b6bff459635389a50efe5ef7d485"
+    },
+    {
+      "path": "artifacts/orbit360-recovery/release-control/I6_6_V23_LEGAL_GATE_LEGACY_20261124.json",
+      "gitBlobSha": "9bcedcb2b32ee97096a1b68050da0b196c26a706",
+      "sha256": "debc860a63c2f9aa896ae304d38b41e13466287c728b6133a68cccf8a06d8a51",
+      "sourceOutputSha256": "643a574cacb11e49b9dab4d91e93196c1b7de9460ed4c1e4b000589c55fea8c0"
+    }
+  ]
+}

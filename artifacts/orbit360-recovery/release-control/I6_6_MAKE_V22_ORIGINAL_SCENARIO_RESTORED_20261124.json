@@ -1,0 +1,276 @@
+{
+  "schema": "GI_I66_MAKE_ORIGINAL_SCENARIO_RESTORATION_RECEIPT_V1",
+  "status": "ORIGINAL_SCENARIO_RESTORED_WRITER_DISABLED",
+  "recordedAt": "2026-11-24T16:17:24Z",
+  "scenarioId": 10196136,
+  "sourceSha": "68a37a8e6f5bef24299773d8bc73f2d567c786cf",
+  "buildRunId": 45425699992,
+  "artifactId": 14934674207,
+  "artifactDigest": "sha256:bb7bf72757801ba8312c30f196a33b6920f941240bff9ee3354a58542407cfb7",
+  "fivePreviewRunId": 45429218736,
+  "fivePreviewGateStatus": "HOLD_AFTER_MAKE_SEQUENCE_PASS",
+  "preimageBinding": {
+    "path": "/workspace/scratch/9c43cd389fa2/continuity-evidence/make-v21-scenario-preimage-1501.json",
+    "schema": "GI_I66_MAKE_PREVIEW_SCENARIO_PREIMAGE_V1",
+    "observationTime": "2026-11-24T15:01:01Z",
+    "gitBlobSha": "e2250caea25b5bc9557927dcd18b50de84825e45",
+    "sha256": "a6966840517ad33924c4841d51c17bdb6a1eec8274863e18c1e835d5648c7bf7"
+  },
+  "safeRestoration": {
+    "deactivatedBeforeUiSave": true,
+    "originalMapperRestoredWhileInactive": true,
+    "uiRestoredTopologyAndSchedule": true,
+    "uiSaveLastEdit": "2026-11-24T16:16:10.142Z",
+    "uiSaveDroppedWriterDisabled": true,
+    "writerDisabledRestoredByCASWhileInactive": true,
+    "disabledCAS": {
+      "expectedLastEdit": "2026-11-24T16:16:10.142Z",
+      "operations": [
+        {
+          "op": "module_disabled_set",
+          "moduleId": 3,
+          "disabled": true
+        }
+      ],
+      "applied": [
+        {
+          "op": "module_disabled_set",
+          "moduleId": 3
+        }
+      ],
+      "lastEdit": "2026-11-24T16:17:10.444Z"
+    },
+    "inactiveReadbackBeforeActivation": true,
+    "originalReaderReactivatedAfterVerifiedDisabled": true
+  },
+  "originalEquivalence": {
+    "scenarioName": true,
+    "scenarioDescription": true,
+    "scenarioStatus": true,
+    "topology": true,
+    "moduleIdsAndVersions": true,
+    "moduleLabels": true,
+    "readerConfigurations": true,
+    "writerParametersAndMapper": true,
+    "filters": true,
+    "connections": true,
+    "triggerAndSchedule": true
+  },
+  "scenario": {
+    "id": 10196136,
+    "name": "Gravicentra Insurance · AyS ACTIVA · lectura WA segura para leads",
+    "description": "Lector A&S para atribución de anuncios: solo chats individuales. Sin escritor ni envíos; no crear leads sin sourceType=ad y sourceId. I6.6.",
+    "teamId": 1975919,
+    "status": "active",
+    "isLockedForEditing": false,
+    "isWaitingOnIncompleteExecutions": false,
+    "incompleteExecutions": 0,
+    "lastEdit": "2026-11-24T16:17:10.444Z",
+    "nextScheduledExecution": "2026-11-24T16:22:22.108Z"
+  },
+  "trigger": {
+    "moduleId": 1,
+    "module": "green-api:LastIncomingMessages",
+    "kind": "scheduled",
+    "scheduling": {
+      "type": "indefinitely",
+      "interval": 300
+    }
+  },
+  "modules": [
+    {
+      "id": 1,
+      "module": "green-api:LastIncomingMessages",
+      "version": 1,
+      "label": "AyS Green API activa · últimos 15 minutos (solo lectura)",
+      "root": "main"
+    },
+    {
+      "id": 2,
+      "module": "green-api:getMessage",
+      "version": 1,
+      "label": "Comprobar procedencia del mensaje de chat individual",
+      "follows": 1,
+      "filter": {
+        "name": "Solo chats individuales e ID",
+        "conditions": [
+          [
+            {
+              "a": "{{1.chatId}}",
+              "b": "@c\\.us$",
+              "o": "text:pattern"
+            },
+            {
+              "a": "{{1.idMessage}}",
+              "o": "exist"
+            }
+          ]
+        ]
+      }
+    },
+    {
+      "id": 3,
+      "module": "google-cloud-firestore:createDocument",
+      "version": 1,
+      "label": "Ingreso AyS · sonda autenticada cerrada",
+      "follows": 2,
+      "disabled": true
+    }
+  ],
+  "connections": [
+    {
+      "id": 14749710,
+      "app": "green-api",
+      "usedByModules": [
+        1,
+        2
+      ],
+      "status": "ok"
+    },
+    {
+      "id": 14756714,
+      "app": "google-custom",
+      "usedByModules": [
+        3
+      ],
+      "status": "ok"
+    }
+  ],
+  "moduleConfigurations": [
+    {
+      "id": 1,
+      "module": "green-api:LastIncomingMessages",
+      "version": 1,
+      "config": {
+        "parameters": {
+          "minutes": 15,
+          "onlyFrom": false,
+          "__IMTCONN__": 14749710
+        },
+        "mapper": {
+          "limit": 100
+        }
+      }
+    },
+    {
+      "id": 2,
+      "module": "green-api:getMessage",
+      "version": 1,
+      "config": {
+        "parameters": {
+          "__IMTCONN__": 14749710
+        },
+        "mapper": {
+          "chatId": "{{1.chatId}}",
+          "idMessage": "{{1.idMessage}}"
+        }
+      }
+    },
+    {
+      "id": 3,
+      "module": "google-cloud-firestore:createDocument",
+      "version": 1,
+      "config": {
+        "parameters": {
+          "__IMTCONN__": 14756714
+        },
+        "mapper": {
+          "fields": [
+            {
+              "value": "GI_I66_MAKE_LEAD_PRINCIPAL_PROBE_V1",
+              "fieldName": "schema",
+              "valueType": "stringValue"
+            },
+            {
+              "value": "greenapi",
+              "fieldName": "provider",
+              "valueType": "stringValue"
+            },
+            {
+              "value": "alianzas-soluciones",
+              "fieldName": "tenantId",
+              "valueType": "stringValue"
+            },
+            {
+              "value": "GT",
+              "fieldName": "country",
+              "valueType": "stringValue"
+            },
+            {
+              "value": "710522720868",
+              "fieldName": "instanceId",
+              "valueType": "stringValue"
+            },
+            {
+              "value": 10196136,
+              "fieldName": "scenarioId",
+              "valueType": "integerValue"
+            },
+            {
+              "value": "935e15f15bce60f1b788458142239cbfc03e02b9e01341b75e667510eeef2c0c",
+              "fieldName": "nonce",
+              "valueType": "stringValue"
+            }
+          ],
+          "full_path": "projects/ays-orbit-360-lab/databases/(default)/documents/tenants/alianzas-soluciones/previewLeadIngressRequests",
+          "input_type": "manual"
+        }
+      }
+    }
+  ],
+  "executionSafety": {
+    "observedPreactivationHistoryFrom": "2026-11-24T16:05:25Z",
+    "observedPreactivationExecutions": [],
+    "scenarioRunCallsDuringRestoration": 0,
+    "writerEnableCallsDuringRestoration": 0,
+    "unrelatedScenariosMutated": 0,
+    "externalMessagesSentByRestoration": 0,
+    "readerScheduleResumed": true,
+    "postActivationExecutionHistoryNotRequested": true
+  },
+  "acceptanceBoundary": "This receipt proves original Make scenario restoration only. It does not override the HOLD of the complete five-function Preview gate.",
+  "toolFacts": [
+    {
+      "tool": "scenario_get",
+      "scenarioId": 10196136,
+      "stage": "after root UI Save"
+    },
+    {
+      "tool": "scenario_module_get",
+      "scenarioId": 10196136,
+      "moduleIds": [
+        1,
+        2,
+        3
+      ],
+      "stage": "after root UI Save"
+    },
+    {
+      "tool": "scenario_execution_list",
+      "scenarioId": 10196136,
+      "from": "2026-11-24T16:05:25Z",
+      "result": "empty"
+    },
+    {
+      "tool": "scenario_patch",
+      "scenarioId": 10196136,
+      "expectedLastEdit": "2026-11-24T16:16:10.142Z",
+      "operation": "module_disabled_set(3,true)"
+    },
+    {
+      "tool": "scenario_get",
+      "scenarioId": 10196136,
+      "stage": "INACTIVE/disabled true before activation"
+    },
+    {
+      "tool": "scenario_activate",
+      "scenarioId": 10196136,
+      "result": "active"
+    },
+    {
+      "tool": "scenario_get",
+      "scenarioId": 10196136,
+      "stage": "final ACTIVE/300/disabled true"
+    }
+  ]
+}
