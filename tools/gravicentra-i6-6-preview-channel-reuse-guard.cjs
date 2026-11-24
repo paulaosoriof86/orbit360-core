@@ -122,16 +122,16 @@ const TECHNICAL_PRIOR_RECEIPT_SHA256 = 'db754d7a0b26f6396e4320c7d60e09c3aba608b5
 const TECHNICAL_LIVE_ORIGINS = Object.freeze(['https://ays-orbit-360-lab.web.app', 'https://app.aysseguros.com']);
 // Closed successor of the current physical release. Historical R11 and
 // network-diagnostic profiles retain their original pins and 223-file contract.
-const PHYSICAL_RECEIPT_PATH = 'artifacts/orbit360-recovery/release-control/I6_6_CURRENT_PHYSICAL_PREVIEW_V24_ROLLOVER_V2_20261124.json';
-const PHYSICAL_RECEIPT_SHA256 = '07b445794fa1135f994308ee8ec29fddb3d0946d620405848a7bc6ed7eba78ea';
-const PHYSICAL_PROFILE = 'I66_CURRENT_PHYSICAL_E3_PREVIEW_V24_SUCCESSOR_V2';
-const PHYSICAL_BASE = 'cb3b8f5d505a53bfbafca80a9334d873d712d73e';
+const PHYSICAL_RECEIPT_PATH = 'artifacts/orbit360-recovery/release-control/I6_6_CURRENT_PHYSICAL_PREVIEW_V27_RESIDUAL_ROLLOVER_V3_20261124.json';
+const PHYSICAL_RECEIPT_SHA256 = 'adb38e8b94c32ab83cb447c9cfeb9c14f86cd88f2e26c34326d2ced37e373df7';
+const PHYSICAL_PROFILE = 'I66_CURRENT_PHYSICAL_E3_PREVIEW_V27_RESIDUAL_SUCCESSOR_V3';
+const PHYSICAL_BASE = 'fbe7f289ce60cb3a8232d9c5886441c180cb72d4';
 const PHYSICAL_CHANNEL = 'gi-i66-rc-45448470011';
 const PHYSICAL_ORIGIN = 'https://ays-orbit-360-lab--gi-i66-rc-45448470011-hrham9ah.web.app';
-const PHYSICAL_PREVIOUS_SOURCE = '60ac1ae2d765484ed40c820a942dcc0966385da7';
-const PHYSICAL_PREVIOUS_BUILD = 45448470011;
-const PHYSICAL_PREVIOUS_ARTIFACT = 14947396076;
-const PHYSICAL_PREVIOUS_DIGEST = 'sha256:bb660ae7e6e97f9d83ea20b576d1a38bbd9ea5a691c27622a53a9eb50ef8330e';
+const PHYSICAL_PREVIOUS_SOURCE = 'fbe7f289ce60cb3a8232d9c5886441c180cb72d4';
+const PHYSICAL_PREVIOUS_BUILD = 45460310493;
+const PHYSICAL_PREVIOUS_ARTIFACT = 14950444825;
+const PHYSICAL_PREVIOUS_DIGEST = 'sha256:dcfcd046d203c5ec9c2c8f59f798acf9483fbdbf6cd692fe9766f0088b53d87e';
 const PHYSICAL_LIVE_SOURCE = '65c825b2808a615ca4195bdde6689dbdbe3193b2';
 const PHYSICAL_LIVE_WORKFLOW = '.github/workflows/gravicentra-i66-privileged-role-exact-live-promotion.yml';
 const technicalSha = bytes => crypto.createHash('sha256').update(bytes).digest('hex');
@@ -163,8 +163,9 @@ function currentPhysicalRolloverCandidatePin() {
 function technicalProfile(pin) {
   return pin?.receiptPath === PHYSICAL_RECEIPT_PATH
     ? { ...currentPhysicalRolloverCandidatePin(), sourceBaseHead: PHYSICAL_BASE, expectedSiteFileCount: 224,
-      deniedSources: [PHYSICAL_BASE, '478c045c168c2e1b80f28a94094f4dbbbfdf1f81', PHYSICAL_PREVIOUS_SOURCE, PHYSICAL_LIVE_SOURCE],
-      deniedBuilds: [45458031865, 45452721643, PHYSICAL_PREVIOUS_BUILD, 45287432665] }
+      deniedSources: [PHYSICAL_BASE, 'cb3b8f5d505a53bfbafca80a9334d873d712d73e', '478c045c168c2e1b80f28a94094f4dbbbfdf1f81',
+        '60ac1ae2d765484ed40c820a942dcc0966385da7', PHYSICAL_PREVIOUS_SOURCE, PHYSICAL_LIVE_SOURCE],
+      deniedBuilds: [45460310493, 45458031865, 45452721643, 45448470011, PHYSICAL_PREVIOUS_BUILD, 45287432665] }
     : { ...technicalRolloverCandidatePin(), sourceBaseHead: TECHNICAL_BASE, expectedSiteFileCount: 223,
       deniedSources: [TECHNICAL_OLD_SOURCE, TECHNICAL_PREVIOUS_SOURCE],
       deniedBuilds: [44009981499, TECHNICAL_OLD_BUILD, TECHNICAL_PREVIOUS_BUILD] };
@@ -226,7 +227,7 @@ function validatePhysicalAuthorization(control, receiptText) {
   assert.equal(c.gate, 'I6.6'); assert.equal(c.historicalClosedGate, 'B4-007');
   assert.equal(c.status, 'OPERATIONAL_EXACT_LIVE_ACCEPTED_LOCKED', 'I66_TECHNICAL_ROLLOVER_PHYSICAL_GATE_REQUIRED');
   const request = c.frontendPreviewRequest;
-  assert.equal(request?.version, 27, 'I66_TECHNICAL_ROLLOVER_SUCCESSOR_REQUEST_REQUIRED');
+  assert.equal(request?.version, 28, 'I66_TECHNICAL_ROLLOVER_SUCCESSOR_REQUEST_REQUIRED');
   assert.equal(request.mode, 'A13_A14_BALANCE_COMPOSITE_ARTIFACT_HOSTING_PREVIEW_ONLY');
   assert.equal(request.previousReceiptBlob, '11fdb3bee494541513482666d6215f45cbad0567');
   for (const key of ['realDataWritesAllowed', 'realCustomerWritesAllowed', 'liveDeployAuthorized',
@@ -258,7 +259,9 @@ function validatePhysicalAuthorization(control, receiptText) {
   assert.equal(a.previousCandidate.artifactId, PHYSICAL_PREVIOUS_ARTIFACT);
   assert.equal(a.previousCandidate.artifactDigest, PHYSICAL_PREVIOUS_DIGEST);
   assert.equal(a.previousCandidate.expectedSiteFileCount, 224);
-  assert.equal(a.previousCandidate.backupOnlyPostDeployFailure, undefined);
+  assert.equal(a.previousCandidate.backupOnlyPostDeployFailure.purpose, 'RECOVERABLE_UNACCEPTED_PREVIEW_BACKUP_ONLY');
+  assert.equal(a.previousCandidate.backupOnlyPostDeployFailure.neverEligibleForLive, true);
+  assert.equal(a.previousCandidate.backupOnlyPostDeployFailure.buildConclusionMustRemainFailure, true);
   assert.equal(a.expectedNewSiteFileCount, 224);
   return a;
 }
@@ -324,13 +327,89 @@ function validateTechnicalChannels(control, receiptText, inventory) {
   return a;
 }
 
+function technicalMetadataDifferences(first, final) {
+  const changes = [];
+  function walk(a, b, location) {
+    if (JSON.stringify(technicalCanonical(a)) === JSON.stringify(technicalCanonical(b))) return;
+    const objects = value => value && typeof value === 'object' && !Array.isArray(value);
+    if (objects(a) && objects(b)) {
+      for (const key of [...new Set([...Object.keys(a), ...Object.keys(b)])].sort())
+        walk(a[key], b[key], location + '/' + key.replace(/~/g, '~0').replace(/\//g, '~1'));
+      return;
+    }
+    const hash = value => technicalSha(JSON.stringify(value === undefined ? { present: false } : { present: true, value: technicalCanonical(value) }));
+    changes.push({ path: location, beforeSha256: hash(a), afterSha256: hash(b) });
+  }
+  const byId = value => Object.fromEntries(technicalRows(value).map(row => [technicalChannelId(row), row]));
+  walk(byId(first), byId(final), '/channels');
+  return changes;
+}
+
+// Firebase Version documents fileCount/versionBytes as output-only int64 values
+// computed after FINALIZED. Only those two fields in the exact target may settle;
+// version/release/config/identity and every field of every other channel remain exact.
+// https://firebase.google.com/docs/reference/hosting/rest/v1beta1/sites.versions
+function validateTechnicalAfterInventories(initial, first, final, authorization) {
+  const a = authorization;
+  assert.equal(a?.profile, PHYSICAL_PROFILE, 'I66_TECHNICAL_ROLLOVER_AFTER_PROFILE_DENIED');
+  const inventories = [initial, first, final], selections = [];
+  for (const inventory of inventories) {
+    const rows = technicalRows(inventory), ids = rows.map(technicalChannelIdentity);
+    assert.equal(new Set(ids).size, ids.length, 'I66_TECHNICAL_ROLLOVER_DUPLICATE_OR_EMPTY_CHANNEL');
+    assert.equal(rows.length, a.freshInventoryEvidence.totalChannels, 'I66_TECHNICAL_ROLLOVER_AFTER_CHANNEL_COUNT_DRIFT');
+    const target = rows.filter(row => technicalChannelId(row) === a.channel.id);
+    assert.equal(target.length, 1, 'I66_TECHNICAL_ROLLOVER_AFTER_TARGET_NOT_UNIQUE');
+    assert.equal(target[0].createTime, a.channel.createdAt, 'I66_TECHNICAL_ROLLOVER_AFTER_CREATED_AT_DRIFT');
+    selections.push(target[0]);
+  }
+  const untouched = inventory => technicalOrderedRows(inventory).filter(row => technicalChannelId(row) !== a.channel.id);
+  for (const inventory of [first, final])
+    assert.deepEqual(untouched(inventory), untouched(initial), 'I66_TECHNICAL_ROLLOVER_OTHER_CHANNEL_CHANGED');
+  const [oldTarget, firstTarget, finalTarget] = selections;
+  assert.equal(technicalVersion(oldTarget), a.channel.expectedVersion, 'I66_TECHNICAL_ROLLOVER_PREVIEW_VERSION_DRIFT');
+  technicalFail(technicalVersion(firstTarget) !== a.channel.expectedVersion, 'NEW_PREVIEW_VERSION_NOT_VISIBLE');
+  const statisticKeys = ['fileCount', 'versionBytes'];
+  for (const target of [firstTarget, finalTarget]) {
+    assert.equal(target.release?.version?.status, 'FINALIZED', 'I66_TECHNICAL_ROLLOVER_TARGET_NOT_FINALIZED');
+    for (const key of statisticKeys) {
+      const value = target.release.version[key];
+      if (value === undefined) continue;
+      technicalFail(typeof value === 'string' && /^(?:0|[1-9][0-9]*)$/.test(value) &&
+        BigInt(value) <= 9223372036854775807n, 'VERSION_STATISTIC_INT64_INVALID');
+    }
+  }
+  const contentIdentity = target => {
+    const copy = structuredClone(target);
+    for (const key of statisticKeys) delete copy.release.version[key];
+    return copy;
+  };
+  assert.deepEqual(contentIdentity(finalTarget), contentIdentity(firstTarget),
+    'I66_TECHNICAL_ROLLOVER_TARGET_CONTENT_IDENTITY_CHANGED');
+  const statisticsTransitions = [];
+  for (const key of statisticKeys) {
+    const beforeValue = firstTarget.release.version[key], afterValue = finalTarget.release.version[key];
+    if (beforeValue === afterValue) continue;
+    const observed = value => value === undefined ? { present: false } : { present: true, value };
+    statisticsTransitions.push({ path: 'release.version.' + key, before: observed(beforeValue), after: observed(afterValue) });
+  }
+  return { otherChannelsUnchanged: a.freshInventoryEvidence.totalChannels - 1,
+    targetVersion: technicalVersion(finalTarget), statisticsTransitions };
+}
+
 function validateTechnicalArtifact(run, artifact, expected, { currentBuild = false, residualBackupProof } = {}) {
   assert.equal(run?.id, expected.buildRunId, 'I66_TECHNICAL_ROLLOVER_BUILD_ID_DRIFT');
   assert.equal(run.head_sha, expected.sourceSha, 'I66_TECHNICAL_ROLLOVER_BUILD_SOURCE_DRIFT');
   assert.equal(run.head_branch, TECHNICAL_BRANCH, 'I66_TECHNICAL_ROLLOVER_BUILD_BRANCH_DRIFT');
   assert.equal(run.path, BUILD_WORKFLOW, 'I66_TECHNICAL_ROLLOVER_BUILD_WORKFLOW_DRIFT');
   if (currentBuild) {
+    technicalFail(!expected.backupOnlyPostDeployFailure, 'RESIDUAL_BACKUP_CANNOT_BE_NEW_BUILD');
     technicalFail(run.status === 'in_progress' && run.conclusion === null, 'CURRENT_BUILD_NOT_RUNNING');
+  } else if (expected.backupOnlyPostDeployFailure && expected.sourceSha === PHYSICAL_PREVIOUS_SOURCE) {
+    assert.equal(expected.buildRunId, PHYSICAL_PREVIOUS_BUILD);
+    assert.equal(expected.artifactId, PHYSICAL_PREVIOUS_ARTIFACT);
+    assert.equal(expected.artifactDigest, PHYSICAL_PREVIOUS_DIGEST);
+    assert.equal(run.status, 'completed'); assert.equal(run.conclusion, 'failure');
+    assert.deepEqual(residualBackupProof, physicalResidualProof(), 'I66_TECHNICAL_ROLLOVER_RESIDUAL_BACKUP_PROVENANCE_REQUIRED');
   } else if (expected.backupOnlyPostDeployFailure) {
     // This is a recoverable residual Preview, never an accepted build. The
     // release-candidate validator still requires a wholly successful new run.
@@ -406,6 +485,98 @@ function validateTechnicalResidualBackup({ run, jobs, artifact, archiveDigest, b
   assert.equal(after.readOnlyVerifierWrites, 0); assert.equal(after.signedFunctionalPass, false);
   assert.equal(after.hostingVersion, undefined); assert.equal(after.readbacks, undefined);
   return technicalResidualProof();
+}
+
+function physicalResidualDefinition() {
+  const bytes = fs.readFileSync(path.join(__dirname, '..', PHYSICAL_RECEIPT_PATH));
+  assert.equal(technicalSha(bytes), PHYSICAL_RECEIPT_SHA256, 'I66_TECHNICAL_ROLLOVER_EXACT_RECEIPT_BYTES_REQUIRED');
+  return JSON.parse(bytes).previousCandidate;
+}
+function physicalResidualProof() {
+  const p = physicalResidualDefinition(), boundary = p.backupOnlyPostDeployFailure;
+  return { purpose: 'RECOVERABLE_UNACCEPTED_PREVIEW_BACKUP_ONLY', sourceSha: PHYSICAL_PREVIOUS_SOURCE,
+    buildRunId: PHYSICAL_PREVIOUS_BUILD, artifactId: PHYSICAL_PREVIOUS_ARTIFACT, artifactDigest: PHYSICAL_PREVIOUS_DIGEST,
+    evidenceArtifactId: boundary.evidenceArtifactId, evidenceArtifactDigest: boundary.evidenceArtifactDigest,
+    readbackArtifactId: boundary.readbackArtifactId, readbackArtifactDigest: boundary.readbackArtifactDigest,
+    productAccepted: false, releaseEligible: false };
+}
+function validatePhysicalResidualBackup({ run, jobs, artifact, archiveDigest, before, after,
+  inventorySha256, inventory, readbackArtifact, readbackArchiveDigest, readback }) {
+  const p = physicalResidualDefinition(), boundary = p.backupOnlyPostDeployFailure;
+  assert.equal(run.id, PHYSICAL_PREVIOUS_BUILD); assert.equal(run.run_attempt, 1);
+  assert.equal(run.status, 'completed'); assert.equal(run.conclusion, 'failure');
+  assert.equal(run.head_sha, PHYSICAL_PREVIOUS_SOURCE); assert.equal(run.head_branch, TECHNICAL_BRANCH);
+  assert.equal(run.path, BUILD_WORKFLOW);
+  for (const [value, id, digest, name, actualDigest] of [
+    [artifact, boundary.evidenceArtifactId, boundary.evidenceArtifactDigest, 'gi-i66-technical-preview-rollover-' + PHYSICAL_PREVIOUS_BUILD, archiveDigest],
+    [readbackArtifact, boundary.readbackArtifactId, boundary.readbackArtifactDigest, 'gi-i66-preview-package-readback-' + PHYSICAL_PREVIOUS_BUILD, readbackArchiveDigest]
+  ]) {
+    assert.equal(value.id, id); assert.equal(value.name, name); assert.equal(value.expired, false);
+    assert.equal(value.digest, digest); assert.equal(actualDigest, digest);
+    assert.equal(value.workflow_run?.id, PHYSICAL_PREVIOUS_BUILD);
+    assert.equal(value.workflow_run?.head_sha, PHYSICAL_PREVIOUS_SOURCE);
+    assert.equal(value.workflow_run?.head_branch, TECHNICAL_BRANCH);
+  }
+  assert.equal(jobs.length, 3, 'I66_TECHNICAL_ROLLOVER_RESIDUAL_JOB_SET_DRIFT');
+  const exactJobs = new Map(jobs.map(job => [job.name, job]));
+  assert.equal(exactJobs.size, 3); assert.equal(exactJobs.get('gate')?.conclusion, 'success');
+  assert.equal(exactJobs.get('protected-conciliaciones-reader-preview')?.conclusion, 'skipped');
+  const job = exactJobs.get('immutable-package');
+  assert.equal(job?.id, boundary.jobId); assert.equal(job.run_id, PHYSICAL_PREVIOUS_BUILD);
+  assert.equal(job.status, 'completed'); assert.equal(job.conclusion, 'failure');
+  const failed = job.steps.filter(step => step.conclusion === 'failure');
+  assert.equal(failed.length, 1, 'I66_TECHNICAL_ROLLOVER_RESIDUAL_OTHER_FAILURE');
+  assert.equal(failed[0].number, boundary.failedStepNumber);
+  assert.equal(failed[0].name, boundary.failedStepName);
+  for (const number of boundary.requiredSuccessSteps)
+    assert.equal(job.steps.find(step => step.number === number)?.conclusion, 'success', 'I66_TECHNICAL_ROLLOVER_RESIDUAL_STEP_NOT_SUCCESS');
+  for (const value of [before, after]) {
+    assert.equal(value.channelId, PHYSICAL_CHANNEL); assert.equal(value.channelOrigin, PHYSICAL_ORIGIN);
+    assert.equal(value.sourceSha, PHYSICAL_PREVIOUS_SOURCE); assert.equal(value.buildRunId, PHYSICAL_PREVIOUS_BUILD);
+    assert.equal(value.receiptSha256, boundary.priorReceiptSha256); assert.equal(value.productAccepted, false);
+    for (const key of ['liveWrites', 'backendWrites', 'businessDataWrites', 'channelDeletions', 'authRulesIamWrites'])
+      assert.equal(value[key], 0);
+  }
+  assert.equal(before.schema, 'GI_I66_TECHNICAL_PREVIEW_BEFORE_V1');
+  assert.equal(before.status, 'PREPARED_READONLY_NOT_ACCEPTED'); assert.equal(before.previewWrites, 0);
+  assert.deepEqual(before.newCandidate, { sourceSha: PHYSICAL_PREVIOUS_SOURCE, buildRunId: PHYSICAL_PREVIOUS_BUILD,
+    artifactId: PHYSICAL_PREVIOUS_ARTIFACT, artifactDigest: PHYSICAL_PREVIOUS_DIGEST, expectedSiteFileCount: 224 });
+  assert.equal(before.inventorySha256, boundary.beforeInventorySha256);
+  assert.equal(inventorySha256, boundary.beforeInventorySha256); assert.equal(technicalRows(inventory).length, 51);
+  assert.equal(after.schema, 'GI_I66_TECHNICAL_PREVIEW_AFTER_V1'); assert.equal(after.status, 'HOLD');
+  assert.equal(after.failureCode, boundary.failureCode); assert.equal(after.readOnlyVerifierWrites, 0);
+  assert.equal(after.signedFunctionalPass, false); assert.equal(after.hostingVersion, undefined);
+  const expectedReadbacks = [
+    [PHYSICAL_ORIGIN, PHYSICAL_PREVIOUS_SOURCE, '87a2072160fcf661ceb962d983b1bb11e1823489fcc06db9c76951310e615699'],
+    ...TECHNICAL_LIVE_ORIGINS.map(origin => [origin, PHYSICAL_LIVE_SOURCE, 'da40e7ad3f453107a44fdc868a58ff469f91139252c0204f9fc298a8d9f02905'])
+  ];
+  assert.equal(after.readbacks?.length, 3);
+  for (const [origin, sourceSha, manifestSha256] of expectedReadbacks) {
+    const matches = after.readbacks.filter(value => value.origin === origin);
+    assert.equal(matches.length, 1); assert.equal(matches[0].files, 224);
+    assert.equal(matches[0].manifestSha256, manifestSha256);
+    technicalValidateMarker(matches[0].marker, { sourceSha });
+  }
+  for (const [key, value] of Object.entries({ schema: 'GI_I66_PREVIEW_PACKAGE_READBACK_V1', status: 'PASS', stage: 'COMPLETE',
+    sourceSha: PHYSICAL_PREVIOUS_SOURCE, artifactId: PHYSICAL_PREVIOUS_ARTIFACT, artifactDigest: PHYSICAL_PREVIOUS_DIGEST,
+    previewChannel: PHYSICAL_CHANNEL, previewUrl: PHYSICAL_ORIGIN, expectedFiles: 224, verifiedFiles: 224,
+    manifestSha256: expectedReadbacks[0][2], noDeploymentPerformed: true, noArtifactMutation: true }))
+    assert.equal(readback[key], value, 'I66_TECHNICAL_ROLLOVER_RESIDUAL_READBACK_DRIFT_' + key);
+  assert.equal(readback.files?.length, 224);
+  assert.equal(new Set(readback.files.map(file => file.path)).size, 224);
+  for (const file of readback.files) {
+    assert.equal(file.status, 'PASS'); assert.match(file.expectedSha256, /^[a-f0-9]{64}$/);
+    technicalFail(file.attempts?.some(attempt => attempt.status === 200 && attempt.sha256 === file.expectedSha256),
+      'RESIDUAL_FILE_READBACK_MISSING');
+  }
+  assert.equal(readback.live?.length, 2);
+  assert.deepEqual(readback.live.map(value => value.label).sort(), ['FIREBASE_LIVE', 'STAFF_LIVE']);
+  for (const live of readback.live) {
+    assert.equal(live.status, 'PASS'); assert.equal(live.beforeSha256, live.afterSha256);
+    technicalFail(live.attempts?.some(attempt => attempt.status === 200 && attempt.sha256 === live.afterSha256),
+      'RESIDUAL_LIVE_READBACK_MISSING');
+  }
+  return physicalResidualProof();
 }
 
 function technicalParseManifest(text, expectedSiteFileCount = 223) {
@@ -532,7 +703,48 @@ function technicalRuntimeIo(env, root, authorization) {
       const runPath = 'runs/' + expected.buildRunId + (expected.buildRunAttempt ? '/attempts/' + expected.buildRunAttempt : '');
       const [run, artifact] = await Promise.all([json(runPath), json('artifacts/' + expected.artifactId)]);
       let residualBackupProof, residualInventory;
-      if (expected.backupOnlyPostDeployFailure) {
+      if (expected.backupOnlyPostDeployFailure && expected.sourceSha === PHYSICAL_PREVIOUS_SOURCE) {
+        technicalFail(!options.currentBuild, 'RESIDUAL_BACKUP_CANNOT_BE_NEW_BUILD');
+        assert.deepEqual(expected, physicalResidualDefinition(), 'I66_TECHNICAL_ROLLOVER_RESIDUAL_DEFINITION_DRIFT');
+        const boundary = expected.backupOnlyPostDeployFailure;
+        const [jobData, evidenceArtifact, readbackArtifact] = await Promise.all([
+          json('runs/' + PHYSICAL_PREVIOUS_BUILD + '/attempts/1/jobs?per_page=100'),
+          json('artifacts/' + boundary.evidenceArtifactId), json('artifacts/' + boundary.readbackArtifactId)
+        ]);
+        const dir = path.join(root, 'prior-v27-finish-hold'); fs.mkdirSync(dir, { mode: 0o700 });
+        async function evidenceZip(artifact, id, digest, name) {
+          assert.equal(artifact.id, id); assert.equal(artifact.digest, digest); assert.equal(artifact.expired, false);
+          technicalFail(Number.isSafeInteger(artifact.size_in_bytes) && artifact.size_in_bytes > 0 && artifact.size_in_bytes < 50 * 1024 * 1024,
+            'RESIDUAL_EVIDENCE_SIZE_INVALID');
+          const bytes = Buffer.from(await (await apiGet('artifacts/' + id + '/zip')).arrayBuffer());
+          assert.equal(bytes.length, artifact.size_in_bytes);
+          const actualDigest = 'sha256:' + technicalSha(bytes);
+          assert.equal(actualDigest, digest, 'I66_TECHNICAL_ROLLOVER_RESIDUAL_EVIDENCE_BYTES_DRIFT');
+          const zip = path.join(dir, name); fs.writeFileSync(zip, bytes, { flag: 'wx', mode: 0o600 });
+          const names = execFileSync('unzip', ['-Z1', zip], { encoding: 'utf8', stdio: 'pipe', maxBuffer: 1024 * 1024 }).trim().split(/\r?\n/);
+          return { zip, names, actualDigest };
+        }
+        const [proofZip, readbackZip] = await Promise.all([
+          evidenceZip(evidenceArtifact, boundary.evidenceArtifactId, boundary.evidenceArtifactDigest, 'verified-rollover-evidence.zip'),
+          evidenceZip(readbackArtifact, boundary.readbackArtifactId, boundary.readbackArtifactDigest, 'verified-readback-evidence.zip')
+        ]);
+        function entry(archive, name, expectedSha) {
+          assert.equal(archive.names.filter(value => value === name).length, 1, 'I66_TECHNICAL_ROLLOVER_RESIDUAL_ENTRY_NOT_UNIQUE');
+          const text = execFileSync('unzip', ['-p', archive.zip, name], { encoding: 'utf8', stdio: 'pipe', maxBuffer: 5 * 1024 * 1024 });
+          assert.equal(technicalSha(text), expectedSha, 'I66_TECHNICAL_ROLLOVER_RESIDUAL_ENTRY_BYTES_DRIFT');
+          fs.writeFileSync(path.join(dir, name), text, { flag: 'wx', mode: 0o600 });
+          return JSON.parse(text);
+        }
+        const before = entry(proofZip, 'before.json', boundary.beforeReportSha256);
+        const after = entry(proofZip, 'after.json', boundary.afterReportSha256);
+        residualInventory = entry(proofZip, 'inventory-before.json', boundary.beforeInventorySha256);
+        const readback = entry(readbackZip, 'gi-i66-preview-package-readback.json', boundary.readbackReportSha256);
+        assert.equal(proofZip.names.includes('inventory-after.json'), false);
+        residualBackupProof = validatePhysicalResidualBackup({ run, jobs: jobData.jobs, artifact: evidenceArtifact,
+          archiveDigest: proofZip.actualDigest, before, after, inventorySha256: boundary.beforeInventorySha256,
+          inventory: residualInventory, readbackArtifact, readbackArchiveDigest: readbackZip.actualDigest, readback });
+        technicalWriteJson(path.join(dir, 'backup-only-proof.json'), residualBackupProof);
+      } else if (expected.backupOnlyPostDeployFailure) {
         technicalFail(!options.currentBuild, 'RESIDUAL_BACKUP_CANNOT_BE_NEW_BUILD');
         assert.equal(expected.buildRunId, TECHNICAL_OLD_BUILD);
         assert.equal(expected.sourceSha, TECHNICAL_OLD_SOURCE);
@@ -682,7 +894,10 @@ async function runtimeFinishTechnicalRollover(env = process.env) {
     authRulesIamWrites: 0, productAccepted: false, signedFunctionalPass: false };
   const io = technicalRuntimeIo(env, root, a);
   try {
-    const after = io.inventory(), rows = technicalRows(after), target = rows.filter(row => technicalChannelIdentity(row) === a.channel.id);
+    const after = io.inventory();
+    technicalWriteJson(path.join(root, 'inventory-after-first.json'), after);
+    report.firstInventorySha256 = technicalSha(fs.readFileSync(path.join(root, 'inventory-after-first.json')));
+    const rows = technicalRows(after), target = rows.filter(row => technicalChannelIdentity(row) === a.channel.id);
     assert.equal(rows.length, technicalRows(initial).length, 'I66_TECHNICAL_ROLLOVER_AFTER_CHANNEL_COUNT_DRIFT');
     assert.equal(target.length, 1, 'I66_TECHNICAL_ROLLOVER_AFTER_TARGET_NOT_UNIQUE');
     assert.equal(target[0].createTime, a.channel.createdAt, 'I66_TECHNICAL_ROLLOVER_AFTER_CREATED_AT_DRIFT');
@@ -692,7 +907,11 @@ async function runtimeFinishTechnicalRollover(env = process.env) {
     report.readbacks = [await io.readback(a.channel.origin, next)];
     for (const origin of TECHNICAL_LIVE_ORIGINS) report.readbacks.push(await io.readback(origin, live));
     const finalInventory = io.inventory();
-    assert.deepEqual(technicalOrderedRows(finalInventory), technicalOrderedRows(after), 'I66_TECHNICAL_ROLLOVER_CONCURRENT_AFTER_CHANGE');
+    technicalWriteJson(path.join(root, 'inventory-after-final.json'), finalInventory);
+    report.finalInventorySha256 = technicalSha(fs.readFileSync(path.join(root, 'inventory-after-final.json')));
+    report.inventoryMetadataDifferences = technicalMetadataDifferences(after, finalInventory);
+    if (a.profile === PHYSICAL_PROFILE) report.inventoryComparison = validateTechnicalAfterInventories(initial, after, finalInventory, a);
+    else assert.deepEqual(technicalOrderedRows(finalInventory), technicalOrderedRows(after), 'I66_TECHNICAL_ROLLOVER_CONCURRENT_AFTER_CHANGE');
     technicalWriteJson(path.join(root, 'inventory-after.json'), finalInventory);
     report.hostingVersion = technicalVersion(target[0]); report.totalChannels = rows.length;
     report.newArtifactId = expectedNew.artifactId; report.newArtifactDigest = expectedNew.artifactDigest;
@@ -711,6 +930,8 @@ module.exports.technicalRollover = Object.freeze({
   validateAuthorization: validateTechnicalAuthorization, validateChannels: validateTechnicalChannels,
   validateArtifact: validateTechnicalArtifact, validateCandidateReuse: validateTechnicalRolloverCandidate,
   validateResidualBackup: validateTechnicalResidualBackup,
+  validatePhysicalResidualBackup,
+  validateAfterInventories: validateTechnicalAfterInventories,
   parseManifest: technicalParseManifest, validateMarker: technicalValidateMarker,
   inventoryDigest: technicalInventoryDigest, validateInventoryPreimage: validateTechnicalInventoryPreimage,
   runtimePrepare: runtimePrepareTechnicalRollover, runtimeFinish: runtimeFinishTechnicalRollover

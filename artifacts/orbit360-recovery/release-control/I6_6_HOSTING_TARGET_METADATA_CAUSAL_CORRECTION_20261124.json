@@ -1,0 +1,232 @@
+{
+  "schema": "GI_I66_HOSTING_TARGET_METADATA_CAUSAL_CORRECTION_V1",
+  "status": "EXACT_RESIDUAL_BACKUP_AND_BOUNDED_METADATA_CORRECTION_VERIFIED_NEW_BUILD_REQUIRED",
+  "activeGate": "I6.6",
+  "recordedAtUtc": "2026-11-24T18:50:31.440Z",
+  "baseHead": "fbe7f289ce60cb3a8232d9c5886441c180cb72d4",
+  "cause": {
+    "failedBuildRunId": 45460310493,
+    "failedBuildJobId": 138681128346,
+    "failedSourceSha": "fbe7f289ce60cb3a8232d9c5886441c180cb72d4",
+    "failedArtifactId": 14950444825,
+    "failedArtifactDigest": "sha256:dcfcd046d203c5ec9c2c8f59f798acf9483fbdbf6cd692fe9766f0088b53d87e",
+    "failure": "I66_TECHNICAL_ROLLOVER_CONCURRENT_AFTER_CHANGE",
+    "originalDifferingFields": "UNKNOWN_UNPERSISTED_INPUTS",
+    "causeProvenRetrospectively": false,
+    "correctedContract": "Persist every compared raw inventory before asserting. Compare all target metadata except the two documented computed version statistics, and compare every metadata field of the other fifty channels. Require finalized version identity and three complete 224-file readbacks.",
+    "documentedStatistics": [
+      "release.version.fileCount",
+      "release.version.versionBytes"
+    ],
+    "primaryReference": "https://firebase.google.com/docs/reference/hosting/rest/v1beta1/sites.versions",
+    "fieldSemantics": "Both fields are output-only int64 values calculated after FINALIZED; FINALIZED content can no longer change. No claim that these fields caused failed27.",
+    "failedRunRemainsFailed": true,
+    "newBuildRunMustSucceed": true,
+    "newSourceRequiresNewBuildDigest": true,
+    "productBytesPreservedFromV24": true,
+    "reuseFailedBuildAsPass": false,
+    "noRebuildOfCertifiedArtifactInPlace": true,
+    "knownObservationGap": "The failing owner persisted neither post-deploy comparison operand before asserting. The original differing fields cannot be recovered or attributed retrospectively.",
+    "newContractBasis": "The documented provider semantics permit only fileCount/versionBytes computation after FINALIZED. All remaining metadata and all other channels remain strict."
+  },
+  "currentObservedState": {
+    "schema": "GI_I66_V27_POST_FAILURE_CURRENT_INVENTORY_DIAGNOSIS_V1",
+    "failedBuildRunId": 45460310493,
+    "readOnlyRunId": 45454934099,
+    "readOnlyRunAttempt": 2,
+    "readOnlyJobId": 138687298881,
+    "readOnlyExpectedHold": "I66_CURRENT_BUILD_MARKER_SOURCE_DRIFT_PREVIEW_V24",
+    "artifactId": 14954585181,
+    "artifactDigest": "sha256:7ec8fe58a5e859d11f50897952ff4bf30d075277d1db79e8a7c486afdfee2806",
+    "currentInventorySha256": "5541459c898cca40b346b457c2a5a9b29903718b5759afbeb175523e53f9f7be",
+    "totalChannels": 51,
+    "otherChannelsUnchanged": 50,
+    "otherChangedIds": [],
+    "targetChannel": "gi-i66-rc-45448470011",
+    "targetChangesVersusPredeployV24": [
+      {
+        "path": "/expireTime",
+        "before": "2026-12-01T17:28:13.449397419Z",
+        "after": "2026-12-01T18:34:23.047029004Z"
+      },
+      {
+        "path": "/release/name",
+        "before": "projects/ays-orbit-360-lab/sites/ays-orbit-360-lab/channels/gi-i66-rc-45448470011/releases/1795541302587000",
+        "after": "projects/ays-orbit-360-lab/sites/ays-orbit-360-lab/channels/gi-i66-rc-45448470011/releases/1795545271073000"
+      },
+      {
+        "path": "/release/releaseTime",
+        "before": "2026-11-24T17:28:22.587Z",
+        "after": "2026-11-24T18:34:31.073Z"
+      },
+      {
+        "path": "/release/version/createTime",
+        "before": "2026-11-24T17:28:14.454117Z",
+        "after": "2026-11-24T18:34:24.272595Z"
+      },
+      {
+        "path": "/release/version/finalizeTime",
+        "before": "2026-11-24T17:28:21.151537Z",
+        "after": "2026-11-24T18:34:29.834972Z"
+      },
+      {
+        "path": "/release/version/name",
+        "before": "projects/ays-orbit-360-lab/sites/ays-orbit-360-lab/versions/6ed6067f16a02d40",
+        "after": "projects/ays-orbit-360-lab/sites/ays-orbit-360-lab/versions/72170524625624ab"
+      },
+      {
+        "path": "/release/version/versionBytes",
+        "before": "1659836",
+        "after": "1659839"
+      },
+      {
+        "path": "/updateTime",
+        "before": "2026-11-24T17:28:22.587Z",
+        "after": "2026-11-24T18:34:31.073Z"
+      }
+    ],
+    "currentTargetVersion": "projects/ays-orbit-360-lab/sites/ays-orbit-360-lab/versions/72170524625624ab",
+    "currentTargetCreateTime": "2026-11-24T17:28:13.449397419Z",
+    "currentTargetExpireTime": "2026-12-01T18:34:23.047029004Z",
+    "lostPostdeployComparisonRecoverable": false,
+    "causeOfOriginalDifference": "UNKNOWN_UNPERSISTED_INPUTS",
+    "failed27Accepted": false,
+    "cloudWrites": 0
+  },
+  "priorProfilePreserved": {
+    "path": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_PHYSICAL_PREVIEW_V24_ROLLOVER_V2_20261124.json",
+    "sha256": "07b445794fa1135f994308ee8ec29fddb3d0946d620405848a7bc6ed7eba78ea",
+    "preserveBytes": true,
+    "status": "V2_PRESERVED_FAILED27_POST_DEPLOY_INVENTORY_COMPARISON"
+  },
+  "correctedProfilePin": {
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_PHYSICAL_PREVIEW_V27_RESIDUAL_ROLLOVER_V3_20261124.json",
+    "receiptSha256": "adb38e8b94c32ab83cb447c9cfeb9c14f86cd88f2e26c34326d2ced37e373df7"
+  },
+  "requestVersionRequired": 28,
+  "actualProviderAndArchiveVerification": {
+    "schema": "GI_I66_V27_REAL_RESIDUAL_BACKUP_VALIDATION_V1",
+    "status": "REAL_METADATA_AND_BOTH_ZIP_PROVENANCE_VERIFIED_BACKUP_ONLY",
+    "proof": {
+      "purpose": "RECOVERABLE_UNACCEPTED_PREVIEW_BACKUP_ONLY",
+      "sourceSha": "fbe7f289ce60cb3a8232d9c5886441c180cb72d4",
+      "buildRunId": 45460310493,
+      "artifactId": 14950444825,
+      "artifactDigest": "sha256:dcfcd046d203c5ec9c2c8f59f798acf9483fbdbf6cd692fe9766f0088b53d87e",
+      "evidenceArtifactId": 14953580021,
+      "evidenceArtifactDigest": "sha256:945207ac0a3339ee1f698e7bf246dc19c6d242243253f9dcd77b523cbfb3e756",
+      "readbackArtifactId": 14951214696,
+      "readbackArtifactDigest": "sha256:7108386df3e1bcebccd3635ae0595e12897e4323176eb4c69c3a715904542645",
+      "productAccepted": false,
+      "releaseEligible": false
+    },
+    "currentInventoryCanonicalSha256": "db6944a2d60644d15ed55611f379e4452d9c85afc81e6d5ae569e28802b674d9",
+    "retrospectiveCause": "UNKNOWN_UNPERSISTED_INPUTS",
+    "failed27Accepted": false,
+    "negativeChecks": [
+      "RELABEL_FAILED_AS_SUCCESS_REJECTED",
+      "ANOTHER_FAILED_STEP_REJECTED"
+    ],
+    "cloudWrites": 0
+  },
+  "offlineRuntimeValidationWithRealProviderBytes": {
+    "schema": "GI_I66_V28_RUNTIME_REAL_PROVIDER_EVIDENCE_REPLAY_V1",
+    "status": "PASS_OFFLINE_RUNTIME_WITH_REAL_PROVIDER_METADATA_AND_ARCHIVE_BYTES",
+    "cloudCallsPerformed": 0,
+    "recordedProviderRequests": [
+      "runs/45460310493/attempts/1",
+      "artifacts/14950444825",
+      "runs/45460310493/attempts/1/jobs?per_page=100",
+      "artifacts/14953580021",
+      "artifacts/14951214696",
+      "artifacts/14953580021/zip",
+      "artifacts/14951214696/zip",
+      "artifacts/14950444825/zip"
+    ],
+    "validatedFiles": 224,
+    "backupOnly": true,
+    "failed27Accepted": false
+  },
+  "threeActualArchivesVerified": [
+    {
+      "label": "previous-preview",
+      "sourceSha": "60ac1ae2d765484ed40c820a942dcc0966385da7",
+      "zipSha256": "bb660ae7e6e97f9d83ea20b576d1a38bbd9ea5a691c27622a53a9eb50ef8330e",
+      "tarSha256": "580ead8df4eb4d4253dd5cd490d4f7c80711a522949090e60880239f0bcdbd6c",
+      "localFilesVerified": 224,
+      "siteManifestSha256": "66127cdf2ac0ae3b256455ca0ac3c0f80e63fef9387494fcb86b0edf0ccb7bef"
+    },
+    {
+      "label": "protected-live",
+      "sourceSha": "65c825b2808a615ca4195bdde6689dbdbe3193b2",
+      "zipSha256": "7cb782848a45083047c4899bc30c13bf5be46429607e42597d09342becfc9acc",
+      "tarSha256": "cb7b5d3cadd9f8e34684770fbbee20bf08f28a9fd6830e98027fdd7b3d1dfcd2",
+      "localFilesVerified": 224,
+      "siteManifestSha256": "da40e7ad3f453107a44fdc868a58ff469f91139252c0204f9fc298a8d9f02905"
+    },
+    {
+      "label": "new-candidate",
+      "sourceSha": "fbe7f289ce60cb3a8232d9c5886441c180cb72d4",
+      "zipSha256": "dcfcd046d203c5ec9c2c8f59f798acf9483fbdbf6cd692fe9766f0088b53d87e",
+      "tarSha256": "54beeea39517e326976ef573464ee793691110806fdaf0b9296d3f839e4fedb9",
+      "localFilesVerified": 224,
+      "siteManifestSha256": "87a2072160fcf661ceb962d983b1bb11e1823489fcc06db9c76951310e615699"
+    }
+  ],
+  "localFocusedTests": {
+    "tests": 480,
+    "passed": 480,
+    "failed": 0,
+    "skipped": 0,
+    "logSha256": "34184bf1158dcfc1b3187a8d1c3f0ef0f36a9ac3499c27a467b8d4c8cad9fd37"
+  },
+  "yamlAndShellParse": "PASS_16_RUN_BLOCKS",
+  "productOwnersUnchanged": {
+    "source": "60ac1ae2d765484ed40c820a942dcc0966385da7",
+    "owners": 11,
+    "changed": 0
+  },
+  "qaManifestRevision": {
+    "required": false,
+    "reason": "Modified technical rollover test is not in declared changes.tests/testRevisions; immutable owner pins and a new build remain mandatory."
+  },
+  "owners": {
+    "tools/gravicentra-i6-6-preview-channel-reuse-guard.cjs": "5c5e71328cce65190e1b09b1bb1fbac0cb978895",
+    "tools/gravicentra-i6-6-technical-preview-rollover.test.cjs": "0e700c8325149e226d4d121524ab635799195cf5",
+    "tools/gravicentra-i6-6-operational-release-candidate.cjs": "40466fa0b73bcea24b5e9a0f82c9c31f1e9a6090",
+    ".github/workflows/gravicentra-release-delta-66-package.yml": "e914bc14855be37870e84923a22d171d02b7280c",
+    "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_PHYSICAL_PREVIEW_V27_RESIDUAL_ROLLOVER_V3_20261124.json": "1f8d61b60dc02fb76a0531a6597af9660b5bff34",
+    "artifacts/orbit360-recovery/release-control/I6_6_V27_UNACCEPTED_PREVIEW_BACKUP_ONLY_20261124.json": "b949cb5b3e52153f4aacc047c177fbe670649a9c"
+  },
+  "preservedV27": {
+    "runId": 45460310493,
+    "runAttempt": 1,
+    "jobId": 138681128346,
+    "artifactId": 14950444825,
+    "artifactDigest": "sha256:dcfcd046d203c5ec9c2c8f59f798acf9483fbdbf6cd692fe9766f0088b53d87e",
+    "conclusion": "failure",
+    "verifiedLocalFiles": 224,
+    "verifiedHostedFiles": 224,
+    "hostingPreviewAccepted": false,
+    "releaseEligible": false,
+    "failureCode": "I66_TECHNICAL_ROLLOVER_CONCURRENT_AFTER_CHANGE",
+    "originalDifferingFields": "UNKNOWN_UNPERSISTED_INPUTS"
+  },
+  "notAcceptance": {
+    "sourceQaPending": true,
+    "newBuildRequired": true,
+    "newArtifactRequired": true,
+    "signedPreviewPending": true,
+    "livePromotionPending": true,
+    "fullI66Accepted": false
+  },
+  "executionMutations": {
+    "cloudWrites": 0,
+    "previewDeploys": 0,
+    "liveDeploys": 0,
+    "backendDeploys": 0,
+    "businessWrites": 0,
+    "authRulesIamWrites": 0,
+    "channelDeletions": 0
+  }
+}

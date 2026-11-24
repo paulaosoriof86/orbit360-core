@@ -782,6 +782,9 @@ for (const [childCode, safeCode] of [['ETIMEDOUT', 'INVENTORY_CLI_TIMEOUT'], ['E
 const physicalPin = guard.currentPhysicalRolloverCandidatePin();
 const physicalText = fs.readFileSync(path.join(__dirname, '..', physicalPin.receiptPath), 'utf8');
 const physicalReceipt = JSON.parse(physicalText);
+const physicalV2Path = 'artifacts/orbit360-recovery/release-control/I6_6_CURRENT_PHYSICAL_PREVIEW_V24_ROLLOVER_V2_20261124.json';
+const physicalV2Text = fs.readFileSync(path.join(__dirname, '..', physicalV2Path), 'utf8');
+const physicalV2Receipt = JSON.parse(physicalV2Text);
 function physicalFixture() {
   const a = clone(physicalReceipt), live = a.protectedLive;
   return { a, control: {
@@ -790,7 +793,7 @@ function physicalFixture() {
     forbidBackendFunctionDeploy: true, backendFunctionPreviewOnly: false, forbidBackendLiveFunctionDeploy: true,
     noHostingPromotion: true, forbidFirestoreRulesDataAuthWrites: true,
     currentTechnicalPreviewRollover: { receiptPath: physicalPin.receiptPath, receiptSha256: physicalPin.receiptSha256 },
-    frontendPreviewRequest: { version: 27, mode: 'A13_A14_BALANCE_COMPOSITE_ARTIFACT_HOSTING_PREVIEW_ONLY',
+    frontendPreviewRequest: { version: 28, mode: 'A13_A14_BALANCE_COMPOSITE_ARTIFACT_HOSTING_PREVIEW_ONLY',
       previousReceiptBlob: live.receiptGitBlobSha, realDataWritesAllowed: false, realCustomerWritesAllowed: false,
       liveDeployAuthorized: false, releaseAfterPreviewAllowed: false, backendLiveDeployAllowed: false },
     currentPhysicalHostingRelease: { sourceSha: live.sourceSha, previewRunId: live.buildRunId, artifactId: live.artifactId,
@@ -814,18 +817,23 @@ function privateRuntimeExports(overrides = {}) {
     name => overrides[name] || require(name), mod, mod.exports, __dirname, overrides.fetch || (() => { throw Error('UNEXPECTED_NETWORK'); }));
 }
 
-test('current physical successor pins v24 inventory and E3 without changing historical receipt or acceptance', () => {
+test('current physical successor pins unaccepted v27 residual and E3 without changing historical acceptance', () => {
   assert.equal(digest(physicalText), physicalPin.receiptSha256);
-  assert.equal(physicalReceipt.profile, 'I66_CURRENT_PHYSICAL_E3_PREVIEW_V24_SUCCESSOR_V2');
+  assert.equal(physicalReceipt.profile, 'I66_CURRENT_PHYSICAL_E3_PREVIEW_V27_RESIDUAL_SUCCESSOR_V3');
   assert.equal(api.validateAuthorization(physicalFixture().control, physicalText).channel.id, 'gi-i66-rc-45448470011');
-  assert.equal(physicalReceipt.freshInventoryEvidence.artifactId, 14951020393);
+  assert.equal(physicalReceipt.freshInventoryEvidence.artifactId, 14954585181);
+  assert.equal(physicalReceipt.freshInventoryEvidence.runAttempt, 2);
   assert.equal(physicalReceipt.freshInventoryEvidence.totalChannels, 51);
-  assert.equal(physicalReceipt.freshInventoryEvidence.beforeInventorySha256, physicalReceipt.freshInventoryEvidence.afterInventorySha256);
-  assert.equal(physicalReceipt.freshInventoryEvidence.orderedChannelMetadataSha256, '1b5de10b8434ff1a98b1f71588873f7788181fef02a405f5263e9a96c027d8de');
+  assert.equal(physicalReceipt.freshInventoryEvidence.afterInventorySha256, undefined);
+  assert.equal(physicalReceipt.freshInventoryEvidence.orderedChannelMetadataSha256, 'db6944a2d60644d15ed55611f379e4452d9c85afc81e6d5ae569e28802b674d9');
   assert.equal(physicalReceipt.freshInventoryEvidence.inventoryPath, undefined);
   assert.equal(physicalReceipt.protectedLive.sourceSha, '65c825b2808a615ca4195bdde6689dbdbe3193b2');
   assert.equal(physicalReceipt.protectedLive.expectedSiteFileCount, 224);
-  assert.equal(physicalReceipt.causalRetry.failedBuildRunId, 45458031865);
+  assert.equal(physicalReceipt.causalRetry.failedBuildRunId, 45460310493);
+  assert.equal(physicalReceipt.causalRetry.causeProvenRetrospectively, false);
+  assert.equal(physicalReceipt.previousCandidate.backupOnlyPostDeployFailure.neverEligibleForLive, true);
+  assert.equal(physicalReceipt.priorRolloverReceipt.path, physicalV2Path);
+  assert.equal(physicalReceipt.priorRolloverReceipt.sha256, digest(physicalV2Text));
   assert.equal(physicalReceipt.causalRetry.failedRunRemainsFailed, true);
   assert.equal(physicalReceipt.causalRetry.reuseFailedBuildAsPass, false);
   assert.equal(physicalReceipt.productAccepted, false);
@@ -879,8 +887,8 @@ test('physical successor cannot recycle failed v25/v26 or previous/live source a
     assert.throws(() => guard.validateTechnicalRolloverCandidate(f.candidate));
   }
 });
-test('current previous artifact must be its whole successful immutable build, never the failed v25 backup', () => {
-  const expected = physicalReceipt.previousCandidate;
+test('historical v24 backup still requires its whole successful build without borrowing the v27 residual exception', () => {
+  const expected = physicalV2Receipt.previousCandidate;
   const run = { id: expected.buildRunId, head_sha: expected.sourceSha, head_branch: physicalReceipt.branch,
     path: '.github/workflows/gravicentra-release-delta-66-package.yml', status: 'completed', conclusion: 'success', run_attempt: 1 };
   const artifact = { id: expected.artifactId, name: 'gi-i66-immutable-' + expected.sourceSha, digest: expected.artifactDigest,
@@ -930,12 +938,15 @@ test('physical runtime validates E3 exact LIVE workflow/head/attempt, preserving
     await assert.rejects(makeIo({ ...run, [key]: value }).validateAcceptedLive(physicalReceipt));
 });
 test('physical V2 preserves the failed V1 receipt and requires E3 successful build attempt2', () => {
-  const oldPath = path.join(__dirname, '..', physicalReceipt.priorRolloverReceipt.path);
+  assert.equal(digest(physicalV2Text), '07b445794fa1135f994308ee8ec29fddb3d0946d620405848a7bc6ed7eba78ea');
+  assert.equal(physicalV2Receipt.profile, 'I66_CURRENT_PHYSICAL_E3_PREVIEW_V24_SUCCESSOR_V2');
+  const oldPath = path.join(__dirname, '..', physicalV2Receipt.priorRolloverReceipt.path);
   const oldText = fs.readFileSync(oldPath, 'utf8'), old = JSON.parse(oldText);
   assert.equal(digest(oldText), 'cd80787cd2560939c0384ebca49ee58b4a06acbad5ba201d78b681029458368d');
-  assert.equal(physicalReceipt.priorRolloverReceipt.sha256, digest(oldText));
+  assert.equal(physicalV2Receipt.priorRolloverReceipt.sha256, digest(oldText));
   assert.equal(old.protectedLive.buildRunAttempt, 1);
-  assert.equal(physicalReceipt.protectedLive.buildRunAttempt, 2);
+  assert.equal(physicalV2Receipt.protectedLive.buildRunAttempt, 2);
+  assert.deepEqual(physicalReceipt.protectedLive, physicalV2Receipt.protectedLive);
   const expected = physicalReceipt.protectedLive;
   const run = { id: 45287432665, head_sha: expected.sourceSha, head_branch: physicalReceipt.branch,
     path: '.github/workflows/gravicentra-release-delta-66-package.yml', status: 'completed', conclusion: 'success', run_attempt: 2 };
@@ -946,11 +957,11 @@ test('physical V2 preserves the failed V1 receipt and requires E3 successful bui
   assert.throws(() => api.validateArtifact({ ...run, conclusion: 'failure', run_attempt: 1 }, artifact, old.protectedLive), /BACKUP_BUILD_NOT_SUCCESS/);
   assert.throws(() => api.validateArtifact(run, artifact, old.protectedLive), /BUILD_ATTEMPT_DRIFT/);
   assert.throws(() => api.validateArtifact({ ...run, conclusion: 'failure' }, artifact, expected), /BACKUP_BUILD_NOT_SUCCESS/);
-  assert.ok(Date.parse(artifact.created_at) >= Date.parse(physicalReceipt.causalRetry.correctAttemptStartedAt));
-  assert.ok(Date.parse(artifact.created_at) <= Date.parse(physicalReceipt.causalRetry.correctAttemptCompletedAt));
-  assert.equal(physicalReceipt.causalRetry.failedBuildRunId, 45458031865);
-  assert.equal(physicalReceipt.causalRetry.failedRunRemainsFailed, true);
-  assert.equal(physicalReceipt.freshInventoryEvidence.laterExactReadOnlyPreimage.previewWrites, 0);
+  assert.ok(Date.parse(artifact.created_at) >= Date.parse(physicalV2Receipt.causalRetry.correctAttemptStartedAt));
+  assert.ok(Date.parse(artifact.created_at) <= Date.parse(physicalV2Receipt.causalRetry.correctAttemptCompletedAt));
+  assert.equal(physicalV2Receipt.causalRetry.failedBuildRunId, 45458031865);
+  assert.equal(physicalV2Receipt.causalRetry.failedRunRemainsFailed, true);
+  assert.equal(physicalV2Receipt.freshInventoryEvidence.laterExactReadOnlyPreimage.previewWrites, 0);
 });
 test('finish fallback uses the successfully prepared channel/origin, never a historical hardcoded target', () => {
   const source = fs.readFileSync(path.join(__dirname, '../.github/workflows/gravicentra-release-delta-66-package.yml'), 'utf8');
@@ -958,4 +969,227 @@ test('finish fallback uses the successfully prepared channel/origin, never a his
   assert.match(finish, /before\.json.*channelId/); assert.match(finish, /before\.json.*channelOrigin/);
   assert.doesNotMatch(finish, /gi-i66-rc-44009981499/);
   assert.ok(source.includes(physicalPin.receiptPath));
+});
+
+// Sanitized 51-channel fixture. The two allowed fields are Hosting statistics,
+// not release identity or file-content proof. No actor from Cloud is copied here.
+function afterInventoriesFixture() {
+  const channelId = 'synthetic-preview', createdAt = '2026-11-24T00:00:00Z';
+  const resource = id => 'sites/ays-orbit-360-lab/channels/' + id;
+  const version = id => 'sites/ays-orbit-360-lab/versions/' + id;
+  const initial = { status: 'success', result: Array.from({ length: 51 }, (_, n) => ({
+    name: resource(n === 0 ? channelId : n === 1 ? 'live' : 'untouched-' + n),
+    createTime: createdAt, expireTime: '2040-11-24T00:00:00Z',
+    release: { name: resource(n === 0 ? channelId : n === 1 ? 'live' : 'untouched-' + n) + '/releases/old-' + n,
+      type: 'DEPLOY', releaseTime: '2026-11-24T00:00:01Z',
+      releaseUser: { email: 'synthetic-release-actor@example.invalid' },
+      version: { name: version('initial-' + n), status: 'FINALIZED',
+        config: { rewrites: [{ glob: '**', path: '/index.html' }] },
+        labels: { synthetic: 'true' } } }
+  })) };
+  const first = clone(initial);
+  Object.assign(first.result[0].release, { name: resource(channelId) + '/releases/new', releaseTime: '2026-11-24T01:00:00Z' });
+  first.result[0].release.version.name = version('next-preview');
+  const final = clone(first);
+  const authorization = { profile: 'I66_CURRENT_PHYSICAL_E3_PREVIEW_V27_RESIDUAL_SUCCESSOR_V3',
+    channel: { id: channelId, createdAt, expectedVersion: initial.result[0].release.version.name },
+    freshInventoryEvidence: { totalChannels: 51 } };
+  return { initial, first, final, authorization };
+}
+const validateAfter = f => api.validateAfterInventories(f.initial, f.first, f.final, f.authorization);
+test('after inventories retain all 50 untouched channels and the exact finalized target without mutating input', () => {
+  const f = afterInventoriesFixture(), before = clone(f), result = validateAfter(f);
+  assert.deepEqual(result, { otherChannelsUnchanged: 50,
+    targetVersion: 'sites/ays-orbit-360-lab/versions/next-preview', statisticsTransitions: [] });
+  assert.deepEqual(f, before);
+});
+test('after inventories preserve row and key order independence without dropping metadata', () => {
+  const f = afterInventoriesFixture();
+  f.final.result.reverse();
+  f.final.result = f.final.result.map(row => Object.fromEntries(Object.entries(row).reverse()));
+  assert.equal(validateAfter(f).otherChannelsUnchanged, 50);
+});
+test('only target fileCount/versionBytes appearance is allowed and reported with original presence and values', () => {
+  const f = afterInventoriesFixture();
+  Object.assign(f.final.result[0].release.version, { fileCount: '224', versionBytes: '1824240' });
+  const before = clone(f), result = validateAfter(f);
+  assert.deepEqual(result.statisticsTransitions, [
+    { path: 'release.version.fileCount', before: { present: false }, after: { present: true, value: '224' } },
+    { path: 'release.version.versionBytes', before: { present: false }, after: { present: true, value: '1824240' } }
+  ]);
+  assert.deepEqual(f, before);
+});
+test('target statistics changes retain both exact string int64 values, including values above JS safe integer', () => {
+  const f = afterInventoriesFixture();
+  Object.assign(f.first.result[0].release.version, { fileCount: '0', versionBytes: '9007199254740992' });
+  Object.assign(f.final.result[0].release.version, { fileCount: '224', versionBytes: '9223372036854775807' });
+  assert.deepEqual(validateAfter(f).statisticsTransitions, [
+    { path: 'release.version.fileCount', before: { present: true, value: '0' }, after: { present: true, value: '224' } },
+    { path: 'release.version.versionBytes', before: { present: true, value: '9007199254740992' }, after: { present: true, value: '9223372036854775807' } }
+  ]);
+});
+test('unchanged target statistics do not produce invented transitions', () => {
+  const f = afterInventoriesFixture();
+  for (const inventory of [f.first, f.final]) Object.assign(inventory.result[0].release.version, { fileCount: '224', versionBytes: '1824240' });
+  assert.deepEqual(validateAfter(f).statisticsTransitions, []);
+});
+for (const [label, mutate] of [
+  ['version identity', row => { row.release.version.name += '-other'; }],
+  ['release identity', row => { row.release.name += '-other'; }],
+  ['release time', row => { row.release.releaseTime = '2026-11-24T02:00:00Z'; }],
+  ['release type', row => { row.release.type = 'ROLLBACK'; }],
+  ['release actor', row => { row.release.releaseUser.email = 'different-synthetic-actor@example.invalid'; }],
+  ['version config', row => { row.release.version.config.rewrites[0].path = '/other.html'; }],
+  ['expiry', row => { row.expireTime = '2040-11-25T00:00:00Z'; }],
+  ['channel creation', row => { row.createTime = '2026-11-23T00:00:00Z'; }],
+  ['version labels', row => { row.release.version.labels.synthetic = 'different'; }],
+  ['unknown target metadata', row => { row.newMetadata = 'different'; }],
+  ['unknown version metadata', row => { row.release.version.newMetadata = 'different'; }],
+  ['lookalike root statistics', row => { row.fileCount = '224'; }],
+  ['lookalike release statistics', row => { row.release.versionBytes = '1824240'; }],
+  ['lookalike config statistics', row => { row.release.version.config.fileCount = '224'; }]
+]) test('after inventories reject target ' + label + ' drift even alongside valid statistics', () => {
+  const f = afterInventoriesFixture();
+  Object.assign(f.final.result[0].release.version, { fileCount: '224', versionBytes: '1824240' });
+  mutate(f.final.result[0]);
+  assert.throws(() => validateAfter(f));
+});
+for (const stage of ['first', 'final']) {
+  test(stage + ' inventory requires target FINALIZED before any statistics exception', () => {
+    const f = afterInventoriesFixture(); f[stage].result[0].release.version.status = 'CREATED';
+    assert.throws(() => validateAfter(f));
+  });
+  for (const [label, mutate] of [
+    ['one missing channel', rows => rows.pop()],
+    ['one extra channel', rows => rows.push({ ...clone(rows[2]), name: 'sites/ays-orbit-360-lab/channels/unexpected' })],
+    ['duplicate untouched identity', rows => { rows[2] = clone(rows[3]); }],
+    ['duplicate target identity', rows => { rows[2] = clone(rows[0]); }],
+    ['foreign resource', rows => { rows[0].name = 'projects/other/sites/ays-orbit-360-lab/channels/synthetic-preview'; }],
+    ['untouched metadata', rows => { rows[2].release.version.config.rewrites[0].path = '/other.html'; }],
+    ['untouched statistics', rows => { rows[2].release.version.fileCount = '224'; }],
+    ['live release', rows => { rows[1].release.version.name += '-other'; }]
+  ]) test(stage + ' inventory rejects ' + label, () => {
+    const f = afterInventoriesFixture(); mutate(f[stage].result); assert.throws(() => validateAfter(f));
+  });
+}
+test('matching foreign changes in both post inventories cannot supersede the untouched initial metadata', () => {
+  const f = afterInventoriesFixture();
+  for (const inventory of [f.first, f.final]) inventory.result[2].release.version.versionBytes = '224';
+  assert.throws(() => validateAfter(f));
+});
+test('unchanged original target version is not an accepted new Preview', () => {
+  const f = afterInventoriesFixture();
+  for (const inventory of [f.first, f.final]) inventory.result[0].release.version.name = f.authorization.channel.expectedVersion;
+  assert.throws(() => validateAfter(f));
+});
+for (const [label, value] of [['numeric', 224], ['negative', '-1'], ['fraction', '1.5'], ['exponent', '1e3'],
+  ['empty', ''], ['null', null], ['boolean', true], ['map', {}], ['array', []],
+  ['signed plus', '+1'], ['whitespace', ' 1'], ['int64 overflow', '9223372036854775808']])
+  test('target statistics reject ' + label + ' values in either post inventory', () => {
+    for (const stage of ['first', 'final']) for (const key of ['fileCount', 'versionBytes']) {
+      const f = afterInventoriesFixture(); f[stage].result[0].release.version[key] = clone(value);
+      assert.throws(() => validateAfter(f), stage + ':' + key);
+    }
+  });
+for (const stage of ['initial', 'first', 'final']) test(stage + ' inventory cannot hide API errors or incomplete pagination', () => {
+  for (const mutate of [i => { i.status = 'error'; }, i => { i.error = { message: 'synthetic error' }; },
+    i => { i.nextPageToken = 'more'; }, i => { i.result = { channels: i.result, nextPageToken: 'more' }; }]) {
+    const f = afterInventoriesFixture(); mutate(f[stage]); assert.throws(() => validateAfter(f));
+  }
+});
+
+// As for the historical fixture above, archive and raw-inventory digests here
+// model independently verified runtime inputs. These synthetic rows are never
+// presented as a Cloud archive or an accepted candidate.
+function physicalResidualFixture() {
+  const p = physicalReceipt.previousCandidate, boundary = p.backupOnlyPostDeployFailure;
+  const run = { id: p.buildRunId, run_attempt: p.buildRunAttempt, head_sha: p.sourceSha,
+    head_branch: physicalReceipt.branch, path: '.github/workflows/gravicentra-release-delta-66-package.yml',
+    status: 'completed', conclusion: 'failure' };
+  const metadata = (id, digest, name) => ({ id, digest, name, expired: false, size_in_bytes: 1024,
+    workflow_run: { id: p.buildRunId, head_sha: p.sourceSha, head_branch: physicalReceipt.branch } });
+  const artifact = metadata(boundary.evidenceArtifactId, boundary.evidenceArtifactDigest, 'gi-i66-technical-preview-rollover-' + p.buildRunId);
+  const readbackArtifact = metadata(boundary.readbackArtifactId, boundary.readbackArtifactDigest, 'gi-i66-preview-package-readback-' + p.buildRunId);
+  const steps = boundary.requiredSuccessSteps.map(number => ({ number, name: 'synthetic-success-' + number, status: 'completed', conclusion: 'success' }));
+  steps.push({ number: boundary.failedStepNumber, name: boundary.failedStepName, status: 'completed', conclusion: 'failure' });
+  const jobs = [
+    { id: 1, run_id: p.buildRunId, name: 'gate', status: 'completed', conclusion: 'success' },
+    { id: boundary.jobId, run_id: p.buildRunId, name: 'immutable-package', status: 'completed', conclusion: 'failure', steps },
+    { id: 3, run_id: p.buildRunId, name: 'protected-conciliaciones-reader-preview', status: 'completed', conclusion: 'skipped' }
+  ];
+  const common = { channelId: physicalReceipt.channel.id, channelOrigin: physicalReceipt.channel.origin,
+    sourceSha: p.sourceSha, buildRunId: p.buildRunId, receiptSha256: boundary.priorReceiptSha256,
+    productAccepted: false, liveWrites: 0, backendWrites: 0, businessDataWrites: 0, channelDeletions: 0, authRulesIamWrites: 0 };
+  const before = { ...common, schema: 'GI_I66_TECHNICAL_PREVIEW_BEFORE_V1', status: 'PREPARED_READONLY_NOT_ACCEPTED', previewWrites: 0,
+    newCandidate: { sourceSha: p.sourceSha, buildRunId: p.buildRunId, artifactId: p.artifactId, artifactDigest: p.artifactDigest, expectedSiteFileCount: 224 },
+    inventorySha256: boundary.beforeInventorySha256 };
+  const marker = sourceSha => ({ product: 'Gravicentra Insurance', gate: 'I6.6', sourceSha,
+    buildId: 'gi-i66-' + sourceSha.slice(0, 12) + '-57f234755dc1' });
+  const after = { ...common, schema: 'GI_I66_TECHNICAL_PREVIEW_AFTER_V1', status: 'HOLD',
+    failureCode: boundary.failureCode, readOnlyVerifierWrites: 0, signedFunctionalPass: false,
+    readbacks: [
+      { origin: physicalReceipt.channel.origin, files: 224, manifestSha256: physicalReceipt.previousPreviewReadback.manifestSha256, marker: marker(p.sourceSha) },
+      ...physicalReceipt.protectedLive.origins.map(origin => ({ origin, files: 224,
+        manifestSha256: 'da40e7ad3f453107a44fdc868a58ff469f91139252c0204f9fc298a8d9f02905', marker: marker(physicalReceipt.protectedLive.sourceSha) }))
+    ] };
+  const inventory = { result: Array.from({ length: 51 }, (_, n) => ({ channelId: 'synthetic-' + n })) };
+  const hash = 'a'.repeat(64), readback = { schema: 'GI_I66_PREVIEW_PACKAGE_READBACK_V1', status: 'PASS', stage: 'COMPLETE',
+    sourceSha: p.sourceSha, artifactId: p.artifactId, artifactDigest: p.artifactDigest,
+    previewChannel: physicalReceipt.channel.id, previewUrl: physicalReceipt.channel.origin,
+    expectedFiles: 224, verifiedFiles: 224, manifestSha256: physicalReceipt.previousPreviewReadback.manifestSha256,
+    noDeploymentPerformed: true, noArtifactMutation: true,
+    files: Array.from({ length: 224 }, (_, n) => ({ path: 'synthetic/' + n + '.txt', status: 'PASS', expectedSha256: hash,
+      attempts: [{ status: 200, sha256: hash }] })),
+    live: ['FIREBASE_LIVE', 'STAFF_LIVE'].map(label => ({ label, status: 'PASS', beforeSha256: hash, afterSha256: hash,
+      attempts: [{ status: 200, sha256: hash }] })) };
+  return { run, jobs, artifact, archiveDigest: artifact.digest, before, after, inventorySha256: boundary.beforeInventorySha256,
+    inventory, readbackArtifact, readbackArchiveDigest: readbackArtifact.digest, readback };
+}
+test('exact failed v27 can be proven recoverable only as backup with release eligibility false', () => {
+  const f = physicalResidualFixture(), before = clone(f), proof = api.validatePhysicalResidualBackup(f), p = physicalReceipt.previousCandidate;
+  assert.equal(proof.purpose, 'RECOVERABLE_UNACCEPTED_PREVIEW_BACKUP_ONLY');
+  assert.equal(proof.sourceSha, p.sourceSha); assert.equal(proof.buildRunId, p.buildRunId); assert.equal(proof.artifactId, p.artifactId);
+  assert.equal(proof.readbackArtifactId, f.readbackArtifact.id); assert.equal(proof.productAccepted, false); assert.equal(proof.releaseEligible, false);
+  assert.deepEqual(f, before);
+  const immutable = { ...f.artifact, id: p.artifactId, name: 'gi-i66-immutable-' + p.sourceSha, digest: p.artifactDigest };
+  assert.equal(api.validateArtifact(f.run, immutable, p, { residualBackupProof: proof }), p);
+  assert.throws(() => api.validateArtifact(f.run, immutable, p), /RESIDUAL_BACKUP_PROVENANCE_REQUIRED/);
+  assert.throws(() => api.validateArtifact(f.run, immutable, p, { currentBuild: true, residualBackupProof: proof }), /RESIDUAL_BACKUP_CANNOT_BE_NEW_BUILD/);
+  assert.throws(() => api.validateArtifact({ ...f.run, conclusion: 'success' }, immutable, p, { residualBackupProof: proof }));
+  assert.throws(() => api.validateArtifact(f.run, immutable, p, { residualBackupProof: { ...proof, releaseEligible: true } }));
+});
+for (const key of ['run', 'jobs', 'artifact', 'archiveDigest', 'before', 'after', 'inventorySha256', 'inventory', 'readbackArtifact', 'readbackArchiveDigest', 'readback'])
+  test('v27 residual requires independently supplied ' + key, () => {
+    const f = physicalResidualFixture(); delete f[key]; assert.throws(() => api.validatePhysicalResidualBackup(f));
+  });
+for (const [label, mutate] of [
+  ['another source', f => { f.run.head_sha = '0'.repeat(40); }],
+  ['successful build substitution', f => { f.run.conclusion = 'success'; }],
+  ['another run attempt', f => { f.run.run_attempt = 2; }],
+  ['another workflow', f => { f.run.path = '.github/workflows/other.yml'; }],
+  ['missing successful step', f => { f.jobs[1].steps = f.jobs[1].steps.filter(s => s.number !== 13); }],
+  ['another failed step', f => { f.jobs[1].steps.push({ number: 99, conclusion: 'failure', name: 'unexpected' }); }],
+  ['another failure code', f => { f.after.failureCode = 'SOMETHING_ELSE'; }],
+  ['accepted after state', f => { f.after.status = 'PASS'; }],
+  ['invented hosted version', f => { f.after.hostingVersion = physicalReceipt.channel.expectedVersion; }],
+  ['signed functional claim', f => { f.after.signedFunctionalPass = true; }],
+  ['business writes', f => { f.after.businessDataWrites = 1; }],
+  ['different diagnostic archive bytes', f => { f.archiveDigest = 'sha256:' + '0'.repeat(64); }],
+  ['different readback archive bytes', f => { f.readbackArchiveDigest = 'sha256:' + '0'.repeat(64); }],
+  ['expired readback artifact', f => { f.readbackArtifact.expired = true; }],
+  ['different readback artifact owner', f => { f.readbackArtifact.workflow_run.head_sha = '0'.repeat(40); }],
+  ['different original inventory bytes', f => { f.inventorySha256 = '0'.repeat(64); }],
+  ['missing inventory channel', f => { f.inventory.result.pop(); }],
+  ['missing dual LIVE readback', f => { f.after.readbacks.pop(); }],
+  ['foreign origin readback', f => { f.after.readbacks[0].origin = 'https://example.invalid'; }],
+  ['incorrect Preview marker', f => { f.after.readbacks[0].marker.sourceSha = '0'.repeat(40); }],
+  ['incorrect LIVE manifest', f => { f.after.readbacks[1].manifestSha256 = '0'.repeat(64); }],
+  ['partial file count', f => { f.readback.verifiedFiles = 223; }],
+  ['missing actual file response', f => { f.readback.files[0].attempts = []; }],
+  ['mismatched actual file bytes', f => { f.readback.files[0].attempts[0].sha256 = '0'.repeat(64); }],
+  ['duplicate file path', f => { f.readback.files[0].path = f.readback.files[1].path; }],
+  ['changed LIVE bytes', f => { f.readback.live[0].afterSha256 = '0'.repeat(64); }],
+  ['readback artifact mutation', f => { f.readback.noArtifactMutation = false; }]
+]) test('v27 residual rejects ' + label, () => {
+  const f = physicalResidualFixture(); mutate(f); assert.throws(() => api.validatePhysicalResidualBackup(f));
 });

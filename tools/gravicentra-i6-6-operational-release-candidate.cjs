@@ -81,6 +81,8 @@ const PINNED_OWNER_PATHS = Object.freeze([
   'artifacts/orbit360-recovery/release-control/I6_6_TECHNICAL_PREVIEW_NETWORK_DIAGNOSTIC_REBUILD_20261117.json',
   'artifacts/orbit360-recovery/release-control/I6_6_CURRENT_PHYSICAL_PREVIEW_V24_ROLLOVER_20261124.json',
   'artifacts/orbit360-recovery/release-control/I6_6_CURRENT_PHYSICAL_PREVIEW_V24_ROLLOVER_V2_20261124.json',
+  'artifacts/orbit360-recovery/release-control/I6_6_CURRENT_PHYSICAL_PREVIEW_V27_RESIDUAL_ROLLOVER_V3_20261124.json',
+  'artifacts/orbit360-recovery/release-control/I6_6_V27_UNACCEPTED_PREVIEW_BACKUP_ONLY_20261124.json',
   'tools/gravicentra-i6-6-source-intake-readiness.test.cjs',
   'artifacts/orbit360-recovery/release-control/I6_6_DAILY_PLAN_FREEZE_AND_SOURCE_INTAKE_RELOAD_20261117.json',
   'tools/gravicentra-i6-6-operational-live-acceptance.test.cjs',
