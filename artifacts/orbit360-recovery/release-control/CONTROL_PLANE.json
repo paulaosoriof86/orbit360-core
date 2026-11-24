@@ -27,7 +27,7 @@
     "activeGate": "I6.6",
     "closedHistoricalGate": "B4-007",
     "latestProvenLiveSource": "65c825b2808a615ca4195bdde6689dbdbe3193b2",
-    "currentWork": "I6.6: construir una sola vez la corrección causal de saldo futuro pendiente y sus owners de QA congelados; probar 48 etapas en Preview, promover exactamente el mismo artifact y demostrar 48 etapas LIVE con lectura final y rollback. E3 sigue siendo el release físico hasta aceptación de su sucesor. Preservar 148 pagos históricos, 24 obligaciones nuevas y todas las pruebas previas; continuar los demás objetivos incompletos sin declararlos PASS.",
+    "currentWork": "I6.6: construir v17 una sola vez con el mismo cambio causal de saldo y el observador corregido; exigir 48 etapas Preview y 48 LIVE sobre el mismo artifact. Preservar E3 hasta la promoción comprobada, los 148 pagos y las 24 obligaciones ya aplicados. Continuar correcciones financieras por evidencia exacta y Make hacia Leads mediante el owner canónico, manteniendo pendientes los objetivos sin prueba.",
     "latestHostingPreviewEvidence": "artifacts/orbit360-recovery/release-control/I6_6_NETWORK_DIAGNOSTICS_PREVIEW_BUILD_20261117.json",
     "latestHostingPreviewSource": "1b65a790530d49fe1d1fb451f02838fd9a713c53",
     "operationsEvidenceReview": "artifacts/orbit360-recovery/release-control/I6_6_OPS_EVIDENCE_AND_PREVIEW_BINDING_REVIEW_20261116.json",
@@ -1903,19 +1903,19 @@
     "frontendBalanceCorrection20261124": {
       "status": "SOURCE_AND_QA_FROZEN_PREVIEW_BUILD_REQUESTED_NOT_DEPLOYED",
       "sourceProductCommit": "95214f67dd607713b5a9b46e2af4ba58c6513cad",
-      "sourceQaHead": "fa1afbbc531313333cda99be01a186ed6afd2e13",
-      "sourceQaRunId": 45347366830,
-      "guardRunId": 45347366852,
-      "causalDomJobId": 138285079434,
+      "sourceQaHead": "f0a0d8743cec6adfbcf19637e25200b66c01d4a8",
+      "sourceQaRunId": 45350431726,
+      "guardRunId": 45350431847,
+      "causalDomJobId": 138295207549,
       "causalQaPins": {
-        "tools/gravicentra-i66-live-performance-readonly.mjs": "5a3fcb0387754abdec466311155adbb1768ee88e",
-        "tools/gravicentra-i6-6-six-existing-receipts-ui-readonly.test.cjs": "7f512c1bd18f895ec35d83e7bfad63596ae12637",
-        ".github/workflows/gravicentra-i66-privileged-role-parity-source-qa.yml": "9aa85099324aaf072a84f06aeb216a13403bd3fe"
+        "tools/gravicentra-i66-live-performance-readonly.mjs": "8849427a7dfab1fa7f35324111c20d26f069155b",
+        "tools/gravicentra-i6-6-six-existing-receipts-ui-readonly.test.cjs": "c4a999e72204f047de6d928591169bcf8626787f",
+        ".github/workflows/gravicentra-i66-privileged-role-parity-source-qa.yml": "7d648d91a77831e6897609d95894a147b58aa9b6"
       },
       "productPath": "orbit360-platform/core/queries.js",
       "productGitBlobSha": "b77b65f86ef6ac2ab6dc157fdbc9ad5e34dbcdcc",
       "manifestGitBlobSha": "2d9d4e08648b562d9d51f1dd96ea97abc8b2bf69",
-      "requestVersion": 16,
+      "requestVersion": 17,
       "mode": "PREVIEW_HOSTING_ONLY",
       "causalObserverRunId": 45332501772,
       "expectedPreviewStages": 48,
@@ -5259,7 +5259,7 @@
     "i63LiveReadbackPass": true,
     "i63DeterministicDiffReady": true
   },
-  "nextAction": "I6.6: construir una sola vez la corrección causal de saldo futuro pendiente y sus owners de QA congelados; probar 48 etapas en Preview, promover exactamente el mismo artifact y demostrar 48 etapas LIVE con lectura final y rollback. E3 sigue siendo el release físico hasta aceptación de su sucesor. Preservar 148 pagos históricos, 24 obligaciones nuevas y todas las pruebas previas; continuar los demás objetivos incompletos sin declararlos PASS.",
+  "nextAction": "I6.6: construir v17 una sola vez con el mismo cambio causal de saldo y el observador corregido; exigir 48 etapas Preview y 48 LIVE sobre el mismo artifact. Preservar E3 hasta la promoción comprobada, los 148 pagos y las 24 obligaciones ya aplicados. Continuar correcciones financieras por evidencia exacta y Make hacia Leads mediante el owner canónico, manteniendo pendientes los objetivos sin prueba.",
   "postproductionExitProgress": {
     "formalPercent": 60,
     "frozenMiniGates": 6,
@@ -24932,8 +24932,8 @@
   },
   "i66ActiveRecoveryCursor": {
     "status": "FROZEN_I66_SHOCK_EXECUTION_CONTINUES_NO_GATE_REPLACEMENT",
-    "currentEvidencePath": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_EXECUTION_PROGRESS_20261124_R28.json",
-    "currentEvidenceBlobSha": "04a7fd7d1c80d5e0e1eabec573233240f1b37563",
+    "currentEvidencePath": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_EXECUTION_PROGRESS_20261124_R29.json",
+    "currentEvidenceBlobSha": "f02de5466da8b9a3c64b948390e366b8035d0f87",
     "frozenPlanPath": "artifacts/orbit360-recovery/release-control/I6_6_PLAN_CHOQUE_FUNCIONAL_FINANCIERO_20261122.md",
     "frozenPlanBlobSha": "fbfd54d229a13101fbfb0dfc6e92a5fa524999b6",
     "fullInventoryPath": "artifacts/orbit360-recovery/release-control/I6_6_INVENTARIO_INTEGRAL_295_20261122.md",
@@ -24950,12 +24950,12 @@
     "financialRowsAppliedThisIteration": 82,
     "lastEvidenceDateLocal": "2026-11-24",
     "noNormativeProjectSourceChange": true,
-    "next": "I6.6: construir una sola vez la corrección causal de saldo futuro pendiente y sus owners de QA congelados; probar 48 etapas en Preview, promover exactamente el mismo artifact y demostrar 48 etapas LIVE con lectura final y rollback. E3 sigue siendo el release físico hasta aceptación de su sucesor. Preservar 148 pagos históricos, 24 obligaciones nuevas y todas las pruebas previas; continuar los demás objetivos incompletos sin declararlos PASS.",
+    "next": "I6.6: construir v17 una sola vez con el mismo cambio causal de saldo y el observador corregido; exigir 48 etapas Preview y 48 LIVE sobre el mismo artifact. Preservar E3 hasta la promoción comprobada, los 148 pagos y las 24 obligaciones ya aplicados. Continuar correcciones financieras por evidencia exacta y Make hacia Leads mediante el owner canónico, manteniendo pendientes los objetivos sin prueba.",
     "lastFunctionalLiveUatRunId": 45074429319,
     "lastFunctionalLiveUatJobId": 137352857627,
     "lastFunctionalLiveScope": "TWO_ROLE_RENEWAL_INSURER_SYNTHETIC_PASS_REAL_ISSUANCE_AND_DOCUMENT_HOLD",
-    "previousEvidencePath": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_EXECUTION_PROGRESS_20261124_R27.json",
-    "previousEvidenceBlobSha": "ace5c44721a75b8fc04dd41d7c7d6c72067e5bc3",
+    "previousEvidencePath": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_EXECUTION_PROGRESS_20261124_R28.json",
+    "previousEvidenceBlobSha": "04a7fd7d1c80d5e0e1eabec573233240f1b37563",
     "lastFunctionalLiveUatStatus": "LIVE_PHYSICAL_STEPS_PASS_FIVE_ROLE_FINAL_COVERAGE_FAIL_CLOSED",
     "lastFinancialProtectedPreflightRunId": 45332501697,
     "lastFinancialSourceStatus": "148_PAYMENTS_24_NEW_OBLIGATIONS_READBACK_PASS_302_REFRESH_214_UNCHANGED_88_ISOLATED_0_ELIGIBLE",
@@ -24983,7 +24983,7 @@
     "financialHistoricalPaymentsAppliedThisContinuation": 148,
     "financialHistoricalPaidReceiptsMaterializedThisContinuation": 146,
     "financialNewPendingObligationsThisContinuation": 24,
-    "moduleReleasedThisIterationScope": "Source correction and QA owners frozen; E3 physical release remains unchanged until same-artifact successor acceptance."
+    "moduleReleasedThisIterationScope": "v16 Preview HOLD preserved; corrected QA frozen for v17. Physical release E3 remains current."
   },
   "i66PreversionedControlViewBlob": "de401082f688ce1c59f025f6f39e3c947dceaa35",
   "i66FrontendReleaseHead": {
