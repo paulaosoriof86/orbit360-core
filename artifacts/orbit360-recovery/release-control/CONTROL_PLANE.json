@@ -27,7 +27,7 @@
     "activeGate": "I6.6",
     "closedHistoricalGate": "B4-007",
     "latestProvenLiveSource": "65c825b2808a615ca4195bdde6689dbdbe3193b2",
-    "currentWork": "I6.6: construir una sola vez la corrección causal de saldo futuro pendiente y sus owners de QA congelados; probar 48 etapas en Preview, promover exactamente el mismo artifact y demostrar 48 etapas LIVE con lectura final y rollback. E3 sigue siendo el release físico hasta aceptación de su sucesor. Preservar 148 pagos históricos, 24 obligaciones nuevas y todas las pruebas previas; continuar los demás objetivos incompletos sin declararlos PASS.",
+    "currentWork": "I6.6: conservar el build inmutable v15 y su Preview HOLD documentado; validar en Source QA y Chrome sintético la recuperación acotada del nodo desmontado. Congelar los owners corregidos antes de solicitar un nuevo build v16; exigir 48 etapas Preview y 48 LIVE sobre el mismo nuevo artifact. E3 sigue en producción. En paralelo, continuar diagnóstico financiero por identidades exactas y el adaptador Make al escritor canónico de Leads, sin repetir pagos ni obligaciones ya aplicados.",
     "latestHostingPreviewEvidence": "artifacts/orbit360-recovery/release-control/I6_6_NETWORK_DIAGNOSTICS_PREVIEW_BUILD_20261117.json",
     "latestHostingPreviewSource": "1b65a790530d49fe1d1fb451f02838fd9a713c53",
     "operationsEvidenceReview": "artifacts/orbit360-recovery/release-control/I6_6_OPS_EVIDENCE_AND_PREVIEW_BINDING_REVIEW_20261116.json",
@@ -1901,7 +1901,7 @@
       "fullI66ProductionAccepted": false
     },
     "frontendBalanceCorrection20261124": {
-      "status": "SOURCE_AND_QA_FROZEN_PREVIEW_BUILD_REQUESTED_NOT_DEPLOYED",
+      "status": "V15_PREVIEW_HOLD_CAUSAL_QA_RECOVERY_SOURCE_PREPARED_NEW_BUILD_REQUIRED",
       "sourceProductCommit": "95214f67dd607713b5a9b46e2af4ba58c6513cad",
       "sourceQaHead": "c6401502e0a00843e0ea2e1e0494accfa3e40586",
       "sourceQaRunId": 45338141255,
@@ -1919,7 +1919,53 @@
       "financialWrites": 0,
       "previewAccepted": false,
       "liveAccepted": false,
-      "fullI66ProductionAccepted": false
+      "fullI66ProductionAccepted": false,
+      "immutableBuild": {
+        "runId": 45338620622,
+        "sourceSha": "a7a934529b54730550525445dab080216ad21a73",
+        "buildId": "gi-i66-a7a934529b54-57f234755dc1",
+        "artifactId": 14894812748,
+        "artifactDigest": "sha256:ac0234b3b10770b12765a015fba56c10c32f36b7cbe62e721f9a27f7275e9698",
+        "siteFilesVerified": 224,
+        "receipt": {
+          "path": "artifacts/orbit360-recovery/release-control/I6_6_V15_IMMUTABLE_BUILD_PREVIEW_READBACK_20261124.json",
+          "blobSha": "9c856ea033babda14328236691476dba08095034"
+        }
+      },
+      "previewAttempt": {
+        "status": "HOLD",
+        "runId": 45339573549,
+        "jobId": 138259713483,
+        "artifactId": 14896091574,
+        "artifactDigest": "sha256:72e3e3d31294b7832eea67aa5963d088861badbea0d28ed52fe724795c93e955",
+        "reportSha256": "1a4e875fc587a30366837208b9e51a948959c90ffac583a8ccd8591980488dd3",
+        "receipt": {
+          "path": "artifacts/orbit360-recovery/release-control/I6_6_FRONTEND_E00004_PREVIEW_HOLD_20261124_RUN45339573549.json",
+          "blobSha": "c46ca54c5381fa80899080b11f16b9ccd23a4c0c"
+        },
+        "successfulStages": 24,
+        "requiredStages": 48,
+        "observedCause": "locator.scrollIntoViewIfNeeded: Element is not attached to the DOM",
+        "operativeDesktopStages": 12,
+        "operativeMobileStages": 12,
+        "directionStages": 0,
+        "finalMatrixServerSnapshotAvailable": false,
+        "finalAuthorityAvailable": false,
+        "promoted": false
+      },
+      "causalQaRecovery": {
+        "status": "SOURCE_PREPARED_CI_REAL_DOM_VALIDATION_REQUIRED",
+        "pins": {
+          "tools/gravicentra-i66-live-performance-readonly.mjs": "5a3fcb0387754abdec466311155adbb1768ee88e",
+          "tools/gravicentra-i6-6-six-existing-receipts-ui-readonly.test.cjs": "767fd4788a38322019c5f95a7dc8b49ffe1ff8fa",
+          ".github/workflows/gravicentra-i66-privileged-role-parity-source-qa.yml": "62babd644a1aa18ecdc71011688dd669601afe61"
+        },
+        "maximumAttempts": 3,
+        "onlyExactTransientDetach": true,
+        "allAcceptanceConditionsPreserved": true,
+        "syntheticTestRequiresBrowser": true,
+        "localBrowserBlockedNoPassClaimed": true
+      }
     }
   },
   "b4003ActiveCertificationCursor20261106": {
@@ -5253,7 +5299,7 @@
     "i63LiveReadbackPass": true,
     "i63DeterministicDiffReady": true
   },
-  "nextAction": "I6.6: construir una sola vez la corrección causal de saldo futuro pendiente y sus owners de QA congelados; probar 48 etapas en Preview, promover exactamente el mismo artifact y demostrar 48 etapas LIVE con lectura final y rollback. E3 sigue siendo el release físico hasta aceptación de su sucesor. Preservar 148 pagos históricos, 24 obligaciones nuevas y todas las pruebas previas; continuar los demás objetivos incompletos sin declararlos PASS.",
+  "nextAction": "I6.6: conservar el build inmutable v15 y su Preview HOLD documentado; validar en Source QA y Chrome sintético la recuperación acotada del nodo desmontado. Congelar los owners corregidos antes de solicitar un nuevo build v16; exigir 48 etapas Preview y 48 LIVE sobre el mismo nuevo artifact. E3 sigue en producción. En paralelo, continuar diagnóstico financiero por identidades exactas y el adaptador Make al escritor canónico de Leads, sin repetir pagos ni obligaciones ya aplicados.",
   "postproductionExitProgress": {
     "formalPercent": 60,
     "frozenMiniGates": 6,
@@ -24926,8 +24972,8 @@
   },
   "i66ActiveRecoveryCursor": {
     "status": "FROZEN_I66_SHOCK_EXECUTION_CONTINUES_NO_GATE_REPLACEMENT",
-    "currentEvidencePath": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_EXECUTION_PROGRESS_20261124_R26.json",
-    "currentEvidenceBlobSha": "6e088bd2173aa79e474f1e601c6128c8876e0be9",
+    "currentEvidencePath": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_EXECUTION_PROGRESS_20261124_R27.json",
+    "currentEvidenceBlobSha": "ace5c44721a75b8fc04dd41d7c7d6c72067e5bc3",
     "frozenPlanPath": "artifacts/orbit360-recovery/release-control/I6_6_PLAN_CHOQUE_FUNCIONAL_FINANCIERO_20261122.md",
     "frozenPlanBlobSha": "fbfd54d229a13101fbfb0dfc6e92a5fa524999b6",
     "fullInventoryPath": "artifacts/orbit360-recovery/release-control/I6_6_INVENTARIO_INTEGRAL_295_20261122.md",
@@ -24944,12 +24990,12 @@
     "financialRowsAppliedThisIteration": 82,
     "lastEvidenceDateLocal": "2026-11-24",
     "noNormativeProjectSourceChange": true,
-    "next": "I6.6: construir una sola vez la corrección causal de saldo futuro pendiente y sus owners de QA congelados; probar 48 etapas en Preview, promover exactamente el mismo artifact y demostrar 48 etapas LIVE con lectura final y rollback. E3 sigue siendo el release físico hasta aceptación de su sucesor. Preservar 148 pagos históricos, 24 obligaciones nuevas y todas las pruebas previas; continuar los demás objetivos incompletos sin declararlos PASS.",
+    "next": "I6.6: conservar el build inmutable v15 y su Preview HOLD documentado; validar en Source QA y Chrome sintético la recuperación acotada del nodo desmontado. Congelar los owners corregidos antes de solicitar un nuevo build v16; exigir 48 etapas Preview y 48 LIVE sobre el mismo nuevo artifact. E3 sigue en producción. En paralelo, continuar diagnóstico financiero por identidades exactas y el adaptador Make al escritor canónico de Leads, sin repetir pagos ni obligaciones ya aplicados.",
     "lastFunctionalLiveUatRunId": 45074429319,
     "lastFunctionalLiveUatJobId": 137352857627,
     "lastFunctionalLiveScope": "TWO_ROLE_RENEWAL_INSURER_SYNTHETIC_PASS_REAL_ISSUANCE_AND_DOCUMENT_HOLD",
-    "previousEvidencePath": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_EXECUTION_PROGRESS_20261124_R25.json",
-    "previousEvidenceBlobSha": "969982b9bd81b1a37283acf5cf5f3073a6351098",
+    "previousEvidencePath": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_EXECUTION_PROGRESS_20261124_R26.json",
+    "previousEvidenceBlobSha": "6e088bd2173aa79e474f1e601c6128c8876e0be9",
     "lastFunctionalLiveUatStatus": "LIVE_PHYSICAL_STEPS_PASS_FIVE_ROLE_FINAL_COVERAGE_FAIL_CLOSED",
     "lastFinancialProtectedPreflightRunId": 45332501697,
     "lastFinancialSourceStatus": "148_PAYMENTS_24_NEW_OBLIGATIONS_READBACK_PASS_302_REFRESH_214_UNCHANGED_88_ISOLATED_0_ELIGIBLE",
@@ -24977,7 +25023,7 @@
     "financialHistoricalPaymentsAppliedThisContinuation": 148,
     "financialHistoricalPaidReceiptsMaterializedThisContinuation": 146,
     "financialNewPendingObligationsThisContinuation": 24,
-    "moduleReleasedThisIterationScope": "Source correction and QA owners frozen; E3 physical release remains unchanged until same-artifact successor acceptance."
+    "moduleReleasedThisIterationScope": "v15 Preview HOLD; no successor promoted. Physical releaseE3 preserved."
   },
   "i66PreversionedControlViewBlob": "de401082f688ce1c59f025f6f39e3c947dceaa35",
   "i66FrontendReleaseHead": {

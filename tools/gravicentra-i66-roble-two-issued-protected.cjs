@@ -5,9 +5,12 @@
 const assert=require('node:assert/strict'),fs=require('node:fs');
 const admin=require('firebase-admin');
 const C=require('./gravicentra-i66-roble-two-issued-plan.cjs');
+const identityReadback=require('./gravicentra-i66-financial-identity-readback.cjs');
 const {sourceAliases}=require('./gravicentra-i66-source-bulk-plan.cjs');
 const mode=process.argv[2];
 assert.ok(['preflight','apply','readback'].includes(mode),'TWO_MODE_EXPLICIT_REQUIRED');
+const identityRequest=mode==='preflight'?require('../artifacts/orbit360-recovery/release-control/I6_6_20261123_PROTECTED_SOURCE_BULK_REFRESH_REQUEST.json').readonlyIdentityReadback:null;
+const identityReports=[];
 assert.equal(process.env.GITHUB_REPOSITORY,'paulaosoriof86/orbit360-core');
 assert.equal(process.env.GITHUB_REF,'refs/heads/recovery/fase-a-clean-20260831');
 assert.equal(process.env.GCLOUD_PROJECT,C.project);
@@ -37,6 +40,25 @@ async function scoped(tx,c){
  const arrays={clientes:clients.docs.map(row),aseguradoras:insurers.docs.map(row),polizas:policies.docs.map(row),
   vehiculos:vehicles.docs.map(row),asesores:advisors.docs.map(row)};
  const check=C.resolve(c,arrays);
+ // The diagnostic uses a separate projection and cannot change the matcher,
+ // its arrays, preimages, eligibility outputs, or any apply/readback path.
+ if(mode==='preflight'&&identityRequest?.enabled===true&&c.policy===identityRequest.riskPolicy){
+  try{
+  const selected=identityReadback.select(identityRequest,c,check,arrays),snapshots=[];
+  for(let offset=0;offset<selected.length;offset+=100){
+   const chunk=selected.slice(offset,offset+100);
+   snapshots.push(...await tx.getAll(...chunk.map(r=>col(r.collection).doc(r.id))));
+  }
+  const entries=snapshots.map((s,i)=>({...selected[i],exists:s.exists,data:s.exists?s.data():null,
+   updateTime:s.exists?{seconds:s.updateTime.seconds,nanoseconds:s.updateTime.nanoseconds}:null}));
+  const diagnostic=identityReadback.report(identityRequest,c,check,arrays,entries,beforeDigest(snapshots));
+  identityReports.splice(0,identityReports.length,diagnostic);
+  }catch(error){
+   identityReports.splice(0,identityReports.length,{schema:'GI_I66_SOURCE_IDENTITY_READBACK_RESULT_V1',
+    status:'READONLY_DIAGNOSTIC_HOLD',diagnosticOnly:true,noEligibilityEffect:true,writes:0,
+    reason:/^[A-Z0-9_]+$/.test(error.message)?error.message:'PRIVATE_IDENTITY_DIAGNOSTIC_FAILED'});
+  }
+ }
  // A replay must prove the exact existing operation, not classify its own
  // successor as a new ambiguity. Competing editions/risk references still hold.
  if(check.evidence.holderCount===1&&check.evidence.insurerCount===1&&check.holder&&check.insurer&&
@@ -217,7 +239,8 @@ async function verify(c,operation){
   writes:results.reduce((n,r)=>n+(r.writes||0),0)};
  const report={schema:'GI_I66_ROBLE_TWO_24_CAS_'+mode.toUpperCase()+'_V1',mode,
   results:results.map(r=>{const copy={...r};delete copy.operation;return copy;}),totals:sums,
-  commercialPaymentsCreated:0,newProductSourceVersion:false};
+  commercialPaymentsCreated:0,newProductSourceVersion:false,
+  ...(identityReports.length?{readonlyIdentityReadbacks:identityReports}:{})};
  console.log('I66_ROBLE_TWO_24_'+mode.toUpperCase()+'='+JSON.stringify(report));
  if(mode==='readback'){
   console.log('I66_TWO_RENEWALS_INDEPENDENT_READBACK='+JSON.stringify({

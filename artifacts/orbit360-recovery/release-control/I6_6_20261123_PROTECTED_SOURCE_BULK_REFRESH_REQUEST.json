@@ -2,7 +2,7 @@
   "schema": "GI_I66_PROTECTED_SOURCE_BULK_REFRESH_REQUEST_V1",
   "dateGuatemala": "2026-11-23",
   "gate": "I6.6",
-  "authority": "Direcci\u00f3n confirms apply identity-proven financial delta urgently, without reasking D01-D06 or owner-attested decisions",
+  "authority": "Dirección confirms apply identity-proven financial delta urgently, without reasking D01-D06 or owner-attested decisions",
   "requestedExecution": "EXISTING_WORKFLOW_READONLY_POST_COMMIT_CENSUS_302",
   "workflow": ".github/workflows/gravicentra-i66-insurer-source-bulk-protected.yml",
   "sourceManifest": "artifacts/orbit360-recovery/source-batches/I6_6_SOURCE_BULK_20261120_MULTI_302.json",
@@ -31,5 +31,45 @@
   ],
   "previousRequestGitBlobSha": "a495d9815ad84f050f7cfd82f9454ec20a78b830",
   "effectiveWriteBoundary": "The existing workflow reads marker and source manifest, not the fields in this JSON. This refresh requests preflight only; any unexpected eligible writes require a separate reviewed protected-environment approval, which is not authorized by this refresh.",
-  "priorIndependentReadbackScope": "Historical snapshot before later writes; must not be reported as current. Fresh census output is required."
+  "priorIndependentReadbackScope": "Historical snapshot before later writes; must not be reported as current. Fresh census output is required.",
+  "readonlyIdentityReadback": {
+    "schema": "GI_I66_SOURCE_IDENTITY_READBACK_V1",
+    "enabled": true,
+    "writes": 0,
+    "riskPolicy": "91-4140843",
+    "documentaryTargets": [
+      {
+        "policy": "04-05-01-12289-4",
+        "sourceDriveId": "1vCSFXQD5NDGYHOrT-kxPoFbiciqnLIRI",
+        "sourcePdfSha256": "6c360b74ef73c971f856a66eb4f4aa906ea8c303faafcfe972e027b16620fc7e",
+        "holderWitness": "03f36c92b3123475ce427293209902b7a708324f725fc87f857c45f55aae2bd3",
+        "sourceKind": "ISSUED_ORIGINAL",
+        "documentaryTerm": [
+          "2026-10-01",
+          "2027-09-30"
+        ],
+        "coverageStatusLiteral": "SIN COBERTURA",
+        "coverageStatusSourceDriveId": "1yOmuDTRsejDiZ9uET6tXBEuMNFgbFAal",
+        "coverageStatusSourceSha256": "1a57be74a480fb97486b63723137ff9b59e502a128affb0364104b584491091d"
+      },
+      {
+        "policy": "04-05-01-15590-0",
+        "sourceDriveId": "1nHigtnI2GJlKePaeyVyXlB_giCyIH2ss",
+        "sourcePdfSha256": "78d78df726fa54c8ef2af5d728a50265db6956208b4a593eab433457f24b4e62",
+        "holderWitness": "50972cb17a3fcc867396a6d6ef797569a11e6eb42aa906fc5f4dc56842e128ac",
+        "sourceKind": "ISSUED_ORIGINAL",
+        "documentaryTerm": [
+          "2026-10-01",
+          "2027-09-30"
+        ]
+      },
+      {
+        "policy": "04-05-01-10738-6",
+        "sourceDriveId": "13CIEJd0yEUTvnM3zomCZIzmDFhC5xoh_",
+        "sourcePdfSha256": "28762cf44ea50f1a2aa2ebc7285413c97286a54e600c345639aea75017d472a7",
+        "holderWitness": "adca312ed2ee3655264cc4e4c1a0228324ea4f7def902be52276b20611eab82c",
+        "sourceKind": "INSURER_CONFIRMED_PAYMENT_STATEMENT"
+      }
+    ]
+  }
 }

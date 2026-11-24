@@ -186,7 +186,7 @@ function isolatedStore(f){
  }};
  return {db,entries,base,clone};
 }
-async function executeProtected(c,state,mode,expected={},identityMatcher=originalMatcher){
+async function executeProtected(c,state,mode,expected={},identityMatcher=originalMatcher,identityRequest){
  const logs=[],errors=[],outputs=[],env={GITHUB_REPOSITORY:'paulaosoriof86/orbit360-core',
   GITHUB_REF:'refs/heads/recovery/fase-a-clean-20260831',GCLOUD_PROJECT:C.project,
   GI_I66_BULK_PROTECTED_ENV:'gravicentra-live-data-writes',GITHUB_RUN_ID:'ISOLATED_TEST',GITHUB_OUTPUT:'/test/output',
@@ -197,6 +197,7 @@ async function executeProtected(c,state,mode,expected={},identityMatcher=origina
   'firebase-admin':{initializeApp:()=>{},credential:{applicationDefault:()=>({})},firestore},
   'google-auth-library':{GoogleAuth:class{async getClient(){return {getRequestHeaders:async()=>({})};}}},
   './gravicentra-i66-roble-two-issued-plan.cjs':{...C,cases:[c],resolve:(c,a)=>C.resolve(c,a,identityMatcher),originals:{load:async()=>c}},
+  '../artifacts/orbit360-recovery/release-control/I6_6_20261123_PROTECTED_SOURCE_BULK_REFRESH_REQUEST.json':{readonlyIdentityReadback:identityRequest},
   'node:fs':{appendFileSync:(p,text)=>outputs.push(text)}
  };
  const source=fs.readFileSync(path.join(__dirname,'gravicentra-i66-roble-two-issued-protected.cjs'),'utf8');
@@ -223,6 +224,77 @@ test('protected writer CAS commits the source-defined risk and 12 obligations wh
  assert.equal(readback.report.totals.alreadyApplied,1);assert.equal(readback.report.totals.writes,0);
  assert.ok(readback.logs.some(x=>x.includes('ALL_ISSUED_CASES_READBACK_PASS')));
  assert.equal(JSON.stringify([...state.entries]),committed,'replay and independent readback preserve every record');
+});
+
+const identityDiagnostic=require('./gravicentra-i66-financial-identity-readback.cjs');
+function identityFixture(){
+ const c=newCases().find(c=>c.policy==='91-4140843'),f=newFixture(c),targets=[];
+ for(const [serial,suffix] of [['12289','4'],['15590','0'],['10738','6']]){
+  const policy='04-05-01-'+serial+'-'+suffix,holder='PRIVATE_UNIVERSALES_HOLDER_'+serial,pdfSha='a'.repeat(64);
+  targets.push({policy,sourceDriveId:'pdf-'+serial,sourcePdfSha256:pdfSha,
+   holderWitness:C.sha(pdfSha+'|'+holder.replace(/[^A-Z0-9]/g,'')),sourceKind:'ISSUED_ORIGINAL',
+   ...(serial==='12289'?{coverageStatusLiteral:'SIN COBERTURA',coverageStatusSourceDriveId:'source-status',coverageStatusSourceSha256:'b'.repeat(64)}:{})});
+  f.clientes.push({id:'cli-'+serial,pais:'GT',nombre:holder,asesorId:'adv',email:'PRIVATE_EMAIL'});
+ }
+ f.aseguradoras.push({id:'uni',pais:'GT',nombre:'SEGUROS UNIVERSALES',activo:true});
+ f.polizas.push({id:'uni-12289',numero:'04 05 01 012289 4',numeroPoliza:'04-05-01-12289-4',pais:'GT',moneda:'GTQ',clienteId:'cli-12289',aseguradoraId:'uni',vigenciaInicio:'2026-10-01',vigenciaFin:'2027-09-30',estado:'SIN COBERTURA',privateComment:'PRIVATE_POLICY_COMMENT'});
+ f.polizas.push({id:'uni-15590',numero:'15590',polizaNumero:'04-05-01-15590-0',pais:'GT',moneda:'GTQ',clienteId:'cli-15590',aseguradoraId:'uni',vigenciaInicio:'2026-10-01',vigenciaFin:'2027-09-30'});
+ f.polizas.push({id:'conflicting-risk-parent',numero:'91-0001111',pais:'GT',moneda:'GTQ',clienteId:'holder',aseguradoraId:'rob',vigenciaInicio:c.termStart,vigenciaFin:c.termEnd,estado:'Vigente'});
+ f.vehiculos.push({id:'conflicting-risk',pais:'GT',clienteId:'holder',polizaId:'conflicting-risk-parent',placa:originalPlate(c),vin:'PRIVATE_RISK_VIN',email:'PRIVATE_VEHICLE_EMAIL'});
+ return {c,f,request:{schema:'GI_I66_SOURCE_IDENTITY_READBACK_V1',enabled:true,writes:0,riskPolicy:c.policy,documentaryTargets:targets}};
+}
+test('readonly identity probe locates aliases and actual risk parent, preserves every matcher result and omits private values',async()=>{
+ const {c,f,request}=identityFixture(),state=isolatedStore(f),before=JSON.stringify([...state.entries]);
+ const baseline=await executeProtected(c,state,'preflight'),probe=await executeProtected(c,state,'preflight',{},originalMatcher,request);
+ assert.equal(probe.exitCode,0,probe.errors.join('\n'));assert.deepEqual(probe.report.results,baseline.report.results);
+ assert.deepEqual(probe.report.totals,baseline.report.totals);assert.equal(probe.report.totals.eligible,0);
+ const d=probe.report.readonlyIdentityReadbacks[0];assert.equal(d.writes,0);assert.equal(d.noEligibilityEffect,true);
+ assert.match(d.preimageDigest,/^[a-f0-9]{64}$/);assert.match(d.reportSha256,/^[a-f0-9]{64}$/);
+ const renewal=d.documentaryTargets.find(t=>t.sourcePolicy==='04-05-01-12289-4');
+ assert.equal(renewal.coverageStatusLiteral,'SIN COBERTURA');assert.equal(renewal.editions[0].state,'SIN COBERTURA');
+ assert.equal(renewal.editions[0].numberRelations.numero,'EXACT_FULL_NUMBER');
+ assert.equal(renewal.holderMatches[0].id,'cli-12289');assert.equal(renewal.editions[0].clientExists,true);
+ assert.equal(d.riskCase.risks[0].parent.id,'conflicting-risk-parent');
+ assert.equal(d.riskCase.risks[0].conflictInExistingMatcher,true);assert.equal(d.riskCase.risks[0].parentEndsNoLaterThanIssuedStart,false);
+ assert.match(d.riskCase.risks[0].parent.documentSha256,/^[a-f0-9]{64}$/);
+ assert.ok(!JSON.stringify(d).includes('PRIVATE_'));assert.ok(!JSON.stringify(d).includes(originalPlate(c)));
+ assert.equal(JSON.stringify([...state.entries]),before,'diagnostic and protected preflight perform zero writes');
+});
+test('diagnostic does not turn a short number, other endorsement, wrong holder, missing parent or invalid request into eligibility',async()=>{
+ assert.equal(identityDiagnostic.numberRelation('15590','04-05-01-15590-0'),'SHORT_NUMBER_UNVERIFIED');
+ assert.equal(identityDiagnostic.numberRelation('04 05 01 015590 1','04-05-01-15590-0'),'OTHER_ENDORSEMENT');
+ assert.equal(identityDiagnostic.numberRelation('04 05 01 015590','04-05-01-15590-0'),'ENDORSEMENT_ABSENT_UNVERIFIED');
+ assert.equal(identityDiagnostic.numberRelation('04 15 01 015590 0','04-05-01-15590-0'),'');
+ const {c,f,request}=identityFixture();f.clientes.find(h=>h.id==='cli-12289').nombre='WRONG_HOLDER';
+ f.vehiculos[0].polizaId='missing-parent';const state=isolatedStore(f);
+ const probe=await executeProtected(c,state,'preflight',{},originalMatcher,request),d=probe.report.readonlyIdentityReadbacks[0];
+ assert.equal(d.documentaryTargets[0].holderMatches.length,0);assert.equal(d.documentaryTargets[0].editions[0].holderWitnessMatches,false);
+ assert.equal(d.riskCase.risks[0].parent.exists,false);assert.equal(probe.report.totals.eligible,0);
+ const bad=await executeProtected(c,state,'preflight',{},originalMatcher,{...request,writes:1});
+ assert.deepEqual(bad.report.results,probe.report.results);assert.equal(bad.report.readonlyIdentityReadbacks[0].status,'READONLY_DIAGNOSTIC_HOLD');
+ const applied=await executeProtected(c,state,'apply',{},originalMatcher,request);
+ assert.equal(applied.report.readonlyIdentityReadbacks,undefined);assert.equal(applied.report.totals.writes,0);
+});
+test('existing workflow readonly marker overrides all six protected jobs even if every eligibility output is true',()=>{
+ const workflow=fs.readFileSync(path.join(__dirname,'../.github/workflows/gravicentra-i66-insurer-source-bulk-protected.yml'),'utf8');
+ assert.match(workflow,/GI_I66_BULK_MODE:.*I66_ROBLE_0043_READBACK.*case-readback/);
+ assert.match(workflow,/if: contains\(github\.event\.head_commit\.message, 'I66_ROBLE_TWO_24_CAS'\)/);
+ const jobs=[...workflow.matchAll(/^  (protected-[a-z0-9-]+):\n([\s\S]*?)(?=^  [a-z0-9-]+:|$(?![\s\S]))/gm)];
+ assert.equal(jobs.length,6,'new protected jobs must retain the read-only boundary');
+ const outputs={readonly:'true',ready:'true',gyt_ready:'true',issued_ready:'true',d01_ready:'true',d03_ready:'true',series_ready:'true',two_ready:'true'};
+ for(const [_,name,block] of jobs){
+  const condition=block.match(/^    if: (.+)$/m)?.[1];assert.ok(condition,name+' condition');
+  assert.ok(condition.includes("needs.preflight.outputs.readonly != 'true'"),name+' lacks read-only guard');
+  const evaluate=new Function('needs','return '+condition);
+  assert.equal(evaluate({preflight:{outputs}}),false,name+' cannot run in diagnostic readback');
+  assert.equal(evaluate({preflight:{outputs:{...outputs,readonly:'false'}}}),true,name+' normal gate remains intact');
+ }
+ const judge=workflow.split('name: Verify exact counts before protected financial writes')[1].split("node - <<'JS'\n")[1].split('\n          JS')[0];
+ const lines=[],STOP=Symbol('exit'),plan={status:'BULK_SOURCE_CASE_READBACK_ONLY_NO_WRITES',readOnly:true,caseId:'ROBLE_NOV20_0043',inputRows:1,writes:0,chunks:[],readyCount:999};
+ const context={require:n=>n==='node:fs'?{readFileSync:()=>JSON.stringify(plan),appendFileSync:(p,t)=>lines.push(t)}:require(n),
+  process:{env:{GI_I66_BULK_PLAN_OUT:'/test/plan',GITHUB_OUTPUT:'/test/output'},exit:n=>{assert.equal(n,0);throw STOP;}},console:{log:()=>{}}};
+ assert.throws(()=>vm.runInNewContext(judge,context),e=>e===STOP);assert.deepEqual(lines,['ready=false\nreadonly=true\n']);
+ plan.readOnly=false;lines.length=0;assert.throws(()=>vm.runInNewContext(judge,context));assert.deepEqual(lines,[]);
 });
 test('protected writer rejects a changed parent after preflight and a source requirement already in use',async()=>{
  const c=newCases()[0],state=isolatedStore(newFixture(c)),preflight=await executeProtected(c,state,'preflight');

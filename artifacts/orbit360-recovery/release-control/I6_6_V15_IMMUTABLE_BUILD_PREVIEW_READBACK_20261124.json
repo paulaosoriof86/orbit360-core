@@ -1,0 +1,292 @@
+{
+  "schema": "GI_I66_V15_BUILD_AND_PREVIEW_BYTES_RECEIPT_V1",
+  "gate": "I6.6",
+  "recordType": "SUBORDINATE_IMMUTABLE_BUILD_EVIDENCE_NOT_UI_OR_LIVE_ACCEPTANCE",
+  "recordedAtUtc": "2026-11-24T06:33:19.645Z",
+  "sourceQa": {
+    "sourceSha": "c6401502e0a00843e0ea2e1e0494accfa3e40586",
+    "sourceQaRunId": 45338141255,
+    "guardRunId": 45338141269
+  },
+  "immutablePackage": {
+    "sourceSha": "a7a934529b54730550525445dab080216ad21a73",
+    "buildId": "gi-i66-a7a934529b54-57f234755dc1",
+    "artifactId": 14894812748,
+    "artifactDigest": "sha256:ac0234b3b10770b12765a015fba56c10c32f36b7cbe62e721f9a27f7275e9698",
+    "buildRunId": 45338620622,
+    "artifactZipBytes": 1824489,
+    "immutableTarSha256": "d387ce92c8a7fe5cad5eb703c4773dddc2f1d7549ef4e14605e64389bf92d90b",
+    "immutableTarBytes": 1824051,
+    "siteFileCount": 224,
+    "allSiteManifestFileHashesMatched": true,
+    "queryGitBlobSha": "b77b65f86ef6ac2ab6dc157fdbc9ad5e34dbcdcc",
+    "queryBytes": 52144,
+    "packageVerification": "PASS",
+    "previewReadback": "PASS_ALL_224_FILES_WORKFLOW_STEP_12",
+    "livePromotion": "NOT_AUTHORIZED_BY_THIS_REPORT",
+    "previewUrl": "https://ays-orbit-360-lab--gi-i66-rc-45338620622-4s120ay5.web.app",
+    "previewChannel": "gi-i66-rc-45338620622",
+    "packageRunConclusion": "success",
+    "packageJobId": 138256772302,
+    "independentPreviewReadbacks": [
+      {
+        "path": "__recovery__/build.json",
+        "http": 200,
+        "bytes": 199,
+        "sha256": "9cb30ab768cd46eb95e16fef72eb69b725cfcebcd2fdbc279ec6d5f6ba601eb8",
+        "matchesImmutableArtifact": true
+      },
+      {
+        "path": "core/queries.js",
+        "http": 200,
+        "bytes": 52144,
+        "sha256": "d0892ba4135e4b4d4c6e9e9e0c59208eedeecf5546218b44ed0dc8050d82104e",
+        "matchesImmutableArtifact": true
+      }
+    ],
+    "liveMarkersReadOnly": [
+      {
+        "origin": "https://app.aysseguros.com",
+        "http": 200,
+        "sourceSha": "65c825b2808a615ca4195bdde6689dbdbe3193b2",
+        "buildId": "gi-i66-65c825b2808a-57f234755dc1",
+        "gate": "I6.6",
+        "product": "Gravicentra Insurance"
+      },
+      {
+        "origin": "https://ays-orbit-360-lab.web.app",
+        "http": 200,
+        "sourceSha": "65c825b2808a615ca4195bdde6689dbdbe3193b2",
+        "buildId": "gi-i66-65c825b2808a-57f234755dc1",
+        "gate": "I6.6",
+        "product": "Gravicentra Insurance"
+      }
+    ],
+    "liveHtmlBeforeAfter": "UNCHANGED_WORKFLOW_STEPS_9_AND_12",
+    "verifiedAt": "2026-11-24T06:18:56.298382+00:00"
+  },
+  "terminalWorkflow": {
+    "schema": "GI_I66_IMMUTABLE_PACKAGE_TERMINAL_EVIDENCE_V1",
+    "sourceSha": "a7a934529b54730550525445dab080216ad21a73",
+    "buildRunId": 45338620622,
+    "workflowUrl": "https://github.com/paulaosoriof86/orbit360-core/actions/runs/45338620622",
+    "buildJobId": 138256772302,
+    "packageConclusion": "success",
+    "previewUrl": "https://ays-orbit-360-lab--gi-i66-rc-45338620622-4s120ay5.web.app",
+    "previewChannel": "gi-i66-rc-45338620622",
+    "jobs": [
+      {
+        "id": 138256571260,
+        "name": "gate",
+        "status": "completed",
+        "conclusion": "success",
+        "run_id": 45338620622,
+        "logs_url": null,
+        "steps": [
+          {
+            "name": "Set up job",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 1
+          },
+          {
+            "name": "Run actions/checkout@v4",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 2
+          },
+          {
+            "name": "Certify insurer-source bulk preflight with isolated exceptions",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 3
+          },
+          {
+            "name": "Run set -euo pipefail",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 4
+          },
+          {
+            "name": "Post Run actions/checkout@v4",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 8
+          },
+          {
+            "name": "Complete job",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 9
+          }
+        ]
+      },
+      {
+        "id": 138256772302,
+        "name": "immutable-package",
+        "status": "completed",
+        "conclusion": "success",
+        "run_id": 45338620622,
+        "logs_url": null,
+        "steps": [
+          {
+            "name": "Set up job",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 1
+          },
+          {
+            "name": "Checkout exactly the selected canonical SHA with complete ancestry",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 2
+          },
+          {
+            "name": "Run actions/setup-node@v4",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 3
+          },
+          {
+            "name": "Verify latest I6.6 source and historical B4 seals without reopening B4",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 4
+          },
+          {
+            "name": "Set up existing Firebase LAB credentials for read-only public config and tenant branding",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 5
+          },
+          {
+            "name": "Build a single immutable package from the exact I6.6 source and config snapshot",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 6
+          },
+          {
+            "name": "Preserve byte-exact package, digest and source identity for Preview then LIVE",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 7
+          },
+          {
+            "name": "Run actions/upload-artifact@v4",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 8
+          },
+          {
+            "name": "Fingerprint both existing LIVE origins before isolated Preview deployment",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 9
+          },
+          {
+            "name": "Publish exact immutable site only to isolated Hosting Preview",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 10
+          },
+          {
+            "name": "Preserve exact Preview restore backups and receipt even on failure",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 11
+          },
+          {
+            "name": "Preview readback all artifact files and confirm both LIVE origins are untouched",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 12
+          },
+          {
+            "name": "Verify current technical Preview rollover and preserve every other channel",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 13
+          },
+          {
+            "name": "Retain actual technical Preview before-after and verified rollback backups",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 14
+          },
+          {
+            "name": "Post Run actions/setup-node@v4",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 27
+          },
+          {
+            "name": "Post Checkout exactly the selected canonical SHA with complete ancestry",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 28
+          },
+          {
+            "name": "Complete job",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 29
+          }
+        ]
+      },
+      {
+        "id": 138256774957,
+        "name": "protected-conciliaciones-reader-preview",
+        "status": "completed",
+        "conclusion": "skipped",
+        "run_id": 45338620622,
+        "logs_url": null,
+        "steps": null
+      }
+    ],
+    "liveMarkersReadOnly": [
+      {
+        "origin": "https://app.aysseguros.com",
+        "http": 200,
+        "sourceSha": "65c825b2808a615ca4195bdde6689dbdbe3193b2",
+        "buildId": "gi-i66-65c825b2808a-57f234755dc1",
+        "gate": "I6.6",
+        "product": "Gravicentra Insurance"
+      },
+      {
+        "origin": "https://ays-orbit-360-lab.web.app",
+        "http": 200,
+        "sourceSha": "65c825b2808a615ca4195bdde6689dbdbe3193b2",
+        "buildId": "gi-i66-65c825b2808a-57f234755dc1",
+        "gate": "I6.6",
+        "product": "Gravicentra Insurance"
+      }
+    ],
+    "previewFileReadback": {
+      "fileCount": 224,
+      "evidence": "immutable-package step 12 executed successful full site-manifest cmp loop against deployed Preview"
+    },
+    "liveUnchangedProof": {
+      "evidence": "immutable-package steps 9 and 12 compared before/after SHA256 fingerprints of HTML / for both LIVE origins",
+      "limits": "This proves unchanged LIVE HTML fingerprints and separately observed E3 build markers. It is not a claim of a fresh 224-file audit of LIVE."
+    },
+    "scopedUiAcceptance": "PENDING_PREVIEW_48_STAGE_READONLY_EXECUTION",
+    "productionPromotion": "NOT_PERFORMED_BY_PACKAGE_WORKFLOW"
+  },
+  "previousRelease": {
+    "generation": 3,
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_FRONTEND_E00003_RECEIPT.json",
+    "receiptGitBlobSha": "11fdb3bee494541513482666d6215f45cbad0567"
+  },
+  "productDelta": {
+    "path": "orbit360-platform/core/queries.js",
+    "gitBlobSha": "b77b65f86ef6ac2ab6dc157fdbc9ad5e34dbcdcc",
+    "manifestGitBlobSha": "2d9d4e08648b562d9d51f1dd96ea97abc8b2bf69",
+    "sourceCausalReceiptPath": "artifacts/orbit360-recovery/release-control/I6_6_FUTURE_PENDING_BALANCE_OWNER_CAUSAL_CORRECTION_20261124.json",
+    "sourceCausalReceiptGitBlobSha": "c05769d469b0a5e88e72e9e946095cb47bfc9d32"
+  },
+  "businessWrites": 0,
+  "backendDeploys": 0,
+  "uiAcceptance": false,
+  "livePromoted": false,
+  "fullI66ProductionAccepted": false
+}

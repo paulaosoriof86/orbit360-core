@@ -10,7 +10,7 @@ function harness(extra={}){
   assert.ok(start>0&&end>start);
   const context={require,URL,need:(ok,code)=>{if(!ok)throw Error(code);},norm:x=>String(x||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase(),
     fs:{readFileSync:()=>bytes},execFileSync:()=>bytes,pin:{sourceSha:'qa-source'},...extra};
-  vm.runInNewContext(source.slice(start,end)+'\nthis.probe={validateSixSourceRow,certifySixReceiptUi,inspectSixReceiptBrowser,installBootstrapObservation,sixReceiptAuthority,sixServerSnapshot,sixServerBalanceProof,focalHash,sixFinancialInputs,sixExpectedBrowserInputs,sixFinancialInputMetadata,sixFinancialInputDifferences,SIX_FINANCIAL_FIELDS,isSixReceiptBusinessWrite,visibleCivilDate,sixVisibleValueChecks,sixVisibleValueDiagnostic,collectSixVisibleResult,sixUiReloadValues,runSixReceiptUi,findFinancialActors,runFrontendFinancialMatrix};',context);
+  vm.runInNewContext(source.slice(start,end)+'\nthis.probe={validateSixSourceRow,certifySixReceiptUi,inspectSixReceiptBrowser,installBootstrapObservation,sixReceiptAuthority,sixServerSnapshot,sixServerBalanceProof,focalHash,sixFinancialInputs,sixExpectedBrowserInputs,sixFinancialInputMetadata,sixFinancialInputDifferences,SIX_FINANCIAL_FIELDS,isSixReceiptBusinessWrite,visibleCivilDate,sixVisibleValueChecks,sixVisibleValueDiagnostic,collectSixVisibleResult,sixUiReloadValues,showSixReceiptBalance,runSixReceiptUi,findFinancialActors,runFrontendFinancialMatrix};',context);
   return context;
 }
 function sourceRow(e=authority.rows[0]){
@@ -392,7 +392,7 @@ async function frontendMatrixFlow(options={}){
     viewports.push(viewport.width);let role='operativo',index=0,stage='BEFORE_RELOAD',route='receipt',firewall,balanceInView=false;
     const context={close:async()=>{closed++;},route:async(pattern,fn)=>{firewall=fn;},newPage:async()=>page};
     const page={on:()=>{},goto:async()=>{},waitForFunction:async()=>{},
-      locator:selector=>({count:async()=>1,inputValue:async()=> 'GT',selectOption:async value=>{if(selector==='#rol-sel')role=value;},
+      locator:selector=>({count:async()=>1,isVisible:async()=>true,inputValue:async()=> 'GT',selectOption:async value=>{if(selector==='#rol-sel')role=value;},
         scrollIntoViewIfNeeded:async()=>{assert.match(selector,/data-rp-current-balance/);readingScrolls++;balanceInView=!options.scrollCannotReveal;}}),
       reload:async()=>{stage='AFTER_RELOAD';balanceInView=false;},evaluate:async(fn,arg)=>{
         if(String(fn).includes('signInWithCustomToken'))return !options.authFailure;
@@ -450,4 +450,142 @@ test('the financial release owner rejects missing stages, invented full gates, s
     assert.throws(()=>r.owner.validateFinancialReport(report,r.target,'preview'));
   }
   assert.equal(r.report.buttonClicked,undefined);assert.equal(r.report.linkedDestination,undefined);
+});
+
+test('the reading scroll retries only exact detach with fresh locators and one bounded action budget',async()=>{
+  const detached=()=>Error('locator.scrollIntoViewIfNeeded: Element is not attached to the DOM\nCall log:');
+  let clock=0,locators=0,scrolls=0;const timeouts=[];
+  const h=harness({Date:{now:()=>clock}}),page={locator:()=>{locators++;return {
+    count:async()=>1,isVisible:async()=>true,scrollIntoViewIfNeeded:async({timeout})=>{
+      timeouts.push(timeout);scrolls++;clock+=100;if(scrolls<3)throw detached();
+    }};}};
+  assert.deepEqual(plain(await h.probe.showSixReceiptBalance(page,authority.rows[0],390,'BEFORE_RELOAD')),{attempts:3,detachments:2});
+  assert.equal(locators,3);assert.deepEqual(timeouts,[1500,1400,1300]);
+  let persistentCalls=0;const persistent={locator:()=>({count:async()=>1,isVisible:async()=>true,
+    scrollIntoViewIfNeeded:async()=>{persistentCalls++;throw detached();}})};
+  await assert.rejects(h.probe.showSixReceiptBalance(persistent,authority.rows[0],390,'AFTER_RELOAD'),error=>{
+    assert.equal(error.message,'I66_SIX_SCROLL_DETACH_PERSISTENT_HOLD');
+    assert.equal(error.sixScrollComparison.attempts,3);assert.equal(error.sixScrollComparison.detachments,3);
+    assert.equal(error.sixScrollComparison.stage,'AFTER_RELOAD');assert.equal(error.sixScrollComparison.uiAccepted,false);return true;
+  });assert.equal(persistentCalls,3);
+  for(const error of [Error('locator.scrollIntoViewIfNeeded: Target page, context or browser has been closed'),
+    Object.assign(detached(),{name:'TimeoutError'}),Error('some other operation: Element is not attached to the DOM')]){
+    let calls=0;const page={locator:()=>({count:async()=>1,isVisible:async()=>true,scrollIntoViewIfNeeded:async()=>{calls++;throw error;}})};
+    await assert.rejects(h.probe.showSixReceiptBalance(page,authority.rows[0],1365,'BEFORE_RELOAD'),x=>x===error);assert.equal(calls,1);
+  }
+  let exhausted=0;const slow={locator:()=>({count:async()=>1,isVisible:async()=>true,
+    scrollIntoViewIfNeeded:async()=>{exhausted++;clock+=1500;throw detached();}})};
+  await assert.rejects(h.probe.showSixReceiptBalance(slow,authority.rows[0],390,'BEFORE_RELOAD'),/DETACH_PERSISTENT_HOLD/);
+  assert.equal(exhausted,1,'A retry never resets the shared time budget');
+  assert.equal(await h.probe.showSixReceiptBalance({locator:()=>assert.fail('legacy non-viewport mode')},authority.rows[0],undefined,'BEFORE_RELOAD'),null);
+  assert.match(source,/report\.financialFocalScrollHold=error\.sixScrollComparison/);
+});
+
+test('a missing, duplicate or hidden balance cannot be recovered as a transient detach',async()=>{
+  for(const [count,visible,code] of [[0,true,'MISSING_OR_DUPLICATE'],[2,true,'MISSING_OR_DUPLICATE'],[1,false,'HIDDEN']]){
+    let locators=0,scrolls=0;const page={locator:()=>{locators++;return {count:async()=>count,isVisible:async()=>visible,
+      scrollIntoViewIfNeeded:async()=>{scrolls++;}};}};
+    await assert.rejects(harness().probe.showSixReceiptBalance(page,authority.rows[0],390,'BEFORE_RELOAD'),new RegExp(code));
+    assert.equal(locators,1);assert.equal(scrolls,0);
+  }
+});
+
+// This test is mandatory in the dedicated, credential-free Chromium CI job.
+// Ordinary source-only jobs report an explicit SKIP; they cannot claim DOM proof.
+test('real Chromium DOM reproduces canonical detail detachment and preserves strict acceptance after bounded recovery',{
+  skip:process.env.I66_SIX_REQUIRE_REAL_DOM==='1'?false:'Real DOM proof runs in the isolated I66_QA_DETACH_CAUSAL_CHECK job'
+},async t=>{
+  const {chromium}=require('playwright');
+  assert.equal(require('playwright/package.json').version,'1.55.0','The mandatory causal job uses the pinned browser driver');
+  const bridge=fs.readFileSync(path.join(repo,'orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js'),'utf8');
+  const queries=fs.readFileSync(path.join(repo,'orbit360-platform/core/queries.js'),'utf8');
+  const ui=fs.readFileSync(path.join(repo,'orbit360-platform/core/ui.js'),'utf8');
+  assert.match(bridge,/target\.innerHTML=/);assert.match(bridge,/if\(directId\)renderReceiptDetail\(directId,cid\)/);
+  assert.match(bridge,/orbit:store:emit/);assert.match(bridge,/data-rp-current-balance/);
+  const browser=await chromium.launch({headless:true,args:['--no-sandbox']});
+  try{
+    for(const width of [1365,390])await t.test('canonical renderer and real layout at '+width+'px',async()=>{
+      const context=await browser.newContext({viewport:{width,height:width===390?844:900}});
+      let requests=0;await context.route('**/*',route=>{requests++;return route.abort('blockedbyclient');});
+      const page=await context.newPage(),f=uiFixture(),errors=[];page.on('pageerror',error=>errors.push(error.message));
+      f.h.controlOwner=require('./gravicentra-i66-frontend-control.cjs');
+      try{
+        delete f.p.monto;f.p.fechaLimite=f.r.fechaLimite;f.r.estadoOperativo=f.p.estadoOperativo='futuro_pendiente';
+        f.r.pais=f.p.pais='GT';
+        const data=plain({...f.records,clientes:[{id:'qa-client',pais:'GT',moneda:'GTQ'}],vehiculos:[],aseguradoras:[]});
+        const input={...f.input,viewportWidth:width},selector='[data-rp-receipt-detail-id="'+f.e.receiptId+'"] [data-rp-current-balance]';
+        await page.setContent('<!doctype html><html><head><meta charset="utf-8"></head><body><div id="c360-body"></div></body></html>');
+        await page.evaluate(data=>{
+          window.__sixFixtureRecords=data;window.__sixFixtureWrites=0;
+          const refuse=()=>{window.__sixFixtureWrites++;throw Error('SYNTHETIC_DOM_TEST_WRITES_FORBIDDEN');};
+          window.Orbit={tenant:{demoDate:'2026-11-24'},pais:'GT',modules:{},route:{params:{}},
+            auth:{productUser:{uid:'qa-actor',tenantId:'alianzas-soluciones'}},session:{rol:()=> 'Dirección'},
+            store:{__productReadOnlyP0:true,_protectedCandidate:true,
+              _productStatus:()=>({tenantId:'alianzas-soluciones',serverConfirmedCollections:Object.keys(data),snapshotErrors:{}}),
+              all:key=>data[key]||[],get:(key,id)=>(data[key]||[]).find(row=>row.id===id)||null,
+              where:(key,fn)=>(data[key]||[]).filter(fn),find:(key,fn)=>(data[key]||[]).find(fn)||null,
+              insert:refuse,update:refuse,remove:refuse,batchDurable:refuse},
+            tenantCanonicalPathsP0:{dataCollectionPath:(tenant,key)=>'tenants/'+tenant+'/data/'+key+'/items'}};
+        },data);
+        for(const content of [ui,queries,bridge])await page.addScriptTag({content});
+        const render=async()=>assert.equal(await page.evaluate(({id,client})=>Orbit.receiptsPortfolioProjection.renderReceiptDetail(id,client),
+          {id:f.e.receiptId,client:'qa-client'}),true);
+        await render();
+        const before=await page.evaluate(f.h.probe.inspectSixReceiptBrowser,input);
+        assert.equal(before.balanceCents,27826);assert.equal(before.displayedBalanceCents,27826);
+        if(width===390)assert.equal(before.viewport.balanceVisible,false,'The actual stacked markup initially places the balance below the fold');
+        const server={...sourceRow(f.e),receiptState:plain(f.h.focalState(f.r)),portfolioState:plain(f.h.focalState(f.p)),
+          financialInputsFingerprint:f.h.probe.focalHash(before.financialInputs),
+          serverBalanceProof:f.h.probe.sixServerBalanceProof(f.r,[f.p],f.policy,[],queries)};
+        const original=JSON.stringify(data);
+        const detachingPage=remaining=>{
+          const trace=[];
+          return {trace,locator(css){
+            assert.equal(css,selector);const locator=page.locator(css),withElement=locator._withElement.bind(locator);
+            // Timing seam only: the real locator resolves the real DOM handle,
+            // then the unchanged product renderer replaces it. The original
+            // Playwright scroll must produce its own error; no result is faked.
+            locator._withElement=(task,...options)=>withElement(async(handle,...args)=>{
+              if(remaining>0){remaining--;assert.equal(await handle.evaluate(node=>node.isConnected),true);
+                await render();assert.equal(await handle.evaluate(node=>node.isConnected),false);trace.push('CANONICAL_DETAIL_REPLACED');}
+              return task(handle,...args);
+            },...options);
+            return locator;
+          }};
+        };
+        const old=detachingPage(1);
+        await assert.rejects(old.locator(selector).scrollIntoViewIfNeeded({timeout:1500}),
+          /^Error: locator\.scrollIntoViewIfNeeded: Element is not attached to the DOM/);
+        assert.equal(old.trace.length,1,'The old one-shot interaction reproduces the observed Preview failure');
+        const transient=detachingPage(1),recovered=await f.h.probe.showSixReceiptBalance(transient,f.e,width,'BEFORE_RELOAD');
+        assert.deepEqual(plain(recovered),{attempts:2,detachments:1});assert.equal(transient.trace.length,1);
+        const observed=await page.evaluate(f.h.probe.inspectSixReceiptBrowser,input);
+        f.h.probe.certifySixReceiptUi(f.e,server,observed,'BEFORE_RELOAD','direccion',width);
+        assert.equal(observed.displayedGrossCents,27826);assert.equal(observed.displayedBalanceCents,27826);
+        assert.equal(observed.viewport.horizontalOverflowPx,0);assert.equal(observed.viewport.balanceVisible,true);
+        await render();const persistent=detachingPage(Infinity);
+        await assert.rejects(f.h.probe.showSixReceiptBalance(persistent,f.e,width,'AFTER_RELOAD'),/SCROLL_DETACH_PERSISTENT_HOLD/);
+        assert.equal(persistent.trace.length,3,'Persistent real DOM replacement remains HOLD after exactly three attempts');
+        for(const kind of ['missing','hidden','duplicate','wrong-identity','overflow']){
+          await render();
+          await page.evaluate(kind=>{
+            const root=document.querySelector('[data-rp-receipt-detail-id]'),balance=root.querySelector('[data-rp-current-balance]');
+            if(kind==='missing')balance.remove();
+            if(kind==='hidden')balance.style.display='none';
+            if(kind==='duplicate')balance.parentNode.appendChild(balance.cloneNode(true));
+            if(kind==='wrong-identity')root.setAttribute('data-rp-receipt-detail-id','wrong-receipt');
+            if(kind==='overflow'){const wide=document.createElement('div');wide.style.width='3000px';root.appendChild(wide);}
+          },kind);
+          if(kind==='overflow'){
+            await f.h.probe.showSixReceiptBalance(page,f.e,width,'AFTER_RELOAD');
+            const overflow=await page.evaluate(f.h.probe.inspectSixReceiptBrowser,input);
+            assert.ok(overflow.viewport.horizontalOverflowPx>0);
+            assert.throws(()=>f.h.probe.certifySixReceiptUi(f.e,server,overflow,'AFTER_RELOAD','direccion',width),/UI_VIEWPORT_HOLD/);
+          }else await assert.rejects(f.h.probe.showSixReceiptBalance(page,f.e,width,'AFTER_RELOAD'),/SCROLL_BALANCE_(?:MISSING_OR_DUPLICATE|HIDDEN)_HOLD/,kind);
+        }
+        assert.equal(await page.evaluate(()=>JSON.stringify(window.__sixFixtureRecords)),original);
+        assert.equal(await page.evaluate(()=>window.__sixFixtureWrites),0);assert.equal(requests,0);assert.deepEqual(errors,[]);
+      }finally{await context.close();}
+    });
+  }finally{await browser.close();}
 });

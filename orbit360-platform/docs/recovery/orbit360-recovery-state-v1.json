@@ -56,11 +56,11 @@
       "artifactDigest": "sha256:7cb782848a45083047c4899bc30c13bf5be46429607e42597d09342becfc9acc",
       "hostingVersion": "sites/ays-orbit-360-lab/versions/332999a55b189108"
     },
-    "evidencePath": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_EXECUTION_PROGRESS_20261124_R26.json",
-    "evidenceGitBlobSha": "6e088bd2173aa79e474f1e601c6128c8876e0be9",
+    "evidencePath": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_EXECUTION_PROGRESS_20261124_R27.json",
+    "evidenceGitBlobSha": "ace5c44721a75b8fc04dd41d7c7d6c72067e5bc3",
     "activeGate": "I6.6",
-    "currentWork": "I6.6: construir una sola vez la corrección causal de saldo futuro pendiente y sus owners de QA congelados; probar 48 etapas en Preview, promover exactamente el mismo artifact y demostrar 48 etapas LIVE con lectura final y rollback. E3 sigue siendo el release físico hasta aceptación de su sucesor. Preservar 148 pagos históricos, 24 obligaciones nuevas y todas las pruebas previas; continuar los demás objetivos incompletos sin declararlos PASS.",
-    "nextAction": "I6.6: construir una sola vez la corrección causal de saldo futuro pendiente y sus owners de QA congelados; probar 48 etapas en Preview, promover exactamente el mismo artifact y demostrar 48 etapas LIVE con lectura final y rollback. E3 sigue siendo el release físico hasta aceptación de su sucesor. Preservar 148 pagos históricos, 24 obligaciones nuevas y todas las pruebas previas; continuar los demás objetivos incompletos sin declararlos PASS.",
+    "currentWork": "I6.6: conservar el build inmutable v15 y su Preview HOLD documentado; validar en Source QA y Chrome sintético la recuperación acotada del nodo desmontado. Congelar los owners corregidos antes de solicitar un nuevo build v16; exigir 48 etapas Preview y 48 LIVE sobre el mismo nuevo artifact. E3 sigue en producción. En paralelo, continuar diagnóstico financiero por identidades exactas y el adaptador Make al escritor canónico de Leads, sin repetir pagos ni obligaciones ya aplicados.",
+    "nextAction": "I6.6: conservar el build inmutable v15 y su Preview HOLD documentado; validar en Source QA y Chrome sintético la recuperación acotada del nodo desmontado. Congelar los owners corregidos antes de solicitar un nuevo build v16; exigir 48 etapas Preview y 48 LIVE sobre el mismo nuevo artifact. E3 sigue en producción. En paralelo, continuar diagnóstico financiero por identidades exactas y el adaptador Make al escritor canónico de Leads, sin repetir pagos ni obligaciones ya aplicados.",
     "frontendPreviewRequest": {
       "version": 15,
       "sourceQaHead": "c6401502e0a00843e0ea2e1e0494accfa3e40586",
@@ -564,7 +564,7 @@
     "phaseAIterationStatuses": "HISTORICAL_FIELDS_ABOVE_PRESERVED_UNTIL_FORMAL_GATE_EVIDENCE;_NO_NEW_PASS_INFERRED",
     "labDataWriteScope": "ONLY_35_AUTHORIZED_COUNTRY_FIELDS;_NO_AUGUST_REFRESH"
   },
-  "nextAction": "I6.6: construir una sola vez la corrección causal de saldo futuro pendiente y sus owners de QA congelados; probar 48 etapas en Preview, promover exactamente el mismo artifact y demostrar 48 etapas LIVE con lectura final y rollback. E3 sigue siendo el release físico hasta aceptación de su sucesor. Preservar 148 pagos históricos, 24 obligaciones nuevas y todas las pruebas previas; continuar los demás objetivos incompletos sin declararlos PASS.",
+  "nextAction": "I6.6: conservar el build inmutable v15 y su Preview HOLD documentado; validar en Source QA y Chrome sintético la recuperación acotada del nodo desmontado. Congelar los owners corregidos antes de solicitar un nuevo build v16; exigir 48 etapas Preview y 48 LIVE sobre el mismo nuevo artifact. E3 sigue en producción. En paralelo, continuar diagnóstico financiero por identidades exactas y el adaptador Make al escritor canónico de Leads, sin repetir pagos ni obligaciones ya aplicados.",
   "sourceOfTruth": {
     "projectBoundaryPrevalentAddendum": "orbit360-platform/docs/recovery/ADDENDUM_PREVALENTE_CHATGPT_PROJECT_BOUNDARY_20260831.md",
     "mutableState": "orbit360-platform/docs/recovery/orbit360-recovery-state-v1.json",
@@ -4126,6 +4126,37 @@
           "newLiveAcceptance": false,
           "realFinancialWritesApplied": 0,
           "guardRunId": 44185021399
+        }
+      }
+    },
+    {
+      "reason": "ACTIVE_OWNER_PLAN_SUMMARY_SUPERSEDED",
+      "priorGitBlobSha": "f644c5feb0ba81bb7aad5a936534f784609104f4",
+      "supersededByGeneration": 3,
+      "prior": {
+        "schema": "GI_I66_ACTIVE_OWNER_PLAN_CONTINUATION_V1",
+        "authorityPointer": "artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json#i66OperationalContinuation20261115",
+        "generation": 3,
+        "latestProvenLiveSource": "65c825b2808a615ca4195bdde6689dbdbe3193b2",
+        "latestPhysicalFrontendLiveReceipt": "artifacts/orbit360-recovery/release-control/I6_6_FRONTEND_E00003_RECEIPT.json",
+        "currentPhysicalFrontend": {
+          "generation": 3,
+          "sourceSha": "65c825b2808a615ca4195bdde6689dbdbe3193b2",
+          "buildId": "gi-i66-65c825b2808a-57f234755dc1",
+          "artifactId": 14873426438,
+          "artifactDigest": "sha256:7cb782848a45083047c4899bc30c13bf5be46429607e42597d09342becfc9acc",
+          "hostingVersion": "sites/ays-orbit-360-lab/versions/332999a55b189108"
+        },
+        "evidencePath": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_EXECUTION_PROGRESS_20261124_R26.json",
+        "evidenceGitBlobSha": "6e088bd2173aa79e474f1e601c6128c8876e0be9",
+        "activeGate": "I6.6",
+        "currentWork": "I6.6: construir una sola vez la corrección causal de saldo futuro pendiente y sus owners de QA congelados; probar 48 etapas en Preview, promover exactamente el mismo artifact y demostrar 48 etapas LIVE con lectura final y rollback. E3 sigue siendo el release físico hasta aceptación de su sucesor. Preservar 148 pagos históricos, 24 obligaciones nuevas y todas las pruebas previas; continuar los demás objetivos incompletos sin declararlos PASS.",
+        "nextAction": "I6.6: construir una sola vez la corrección causal de saldo futuro pendiente y sus owners de QA congelados; probar 48 etapas en Preview, promover exactamente el mismo artifact y demostrar 48 etapas LIVE con lectura final y rollback. E3 sigue siendo el release físico hasta aceptación de su sucesor. Preservar 148 pagos históricos, 24 obligaciones nuevas y todas las pruebas previas; continuar los demás objetivos incompletos sin declararlos PASS.",
+        "frontendPreviewRequest": {
+          "version": 15,
+          "sourceQaHead": "c6401502e0a00843e0ea2e1e0494accfa3e40586",
+          "sourceQaRunId": 45338141255,
+          "guardRunId": 45338141269
         }
       }
     }

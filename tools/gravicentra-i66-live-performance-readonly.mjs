@@ -397,6 +397,31 @@ function certifySixReceiptUi(expected,source,observed,stage='UNSPECIFIED',expect
     error.sixVisibleComparison=sixVisibleValueDiagnostic(expected,observed,stage,checks);throw error;
   }
 }
+async function showSixReceiptBalance(page,expected,viewportWidth,stage){
+  if(!viewportWidth)return null;
+  // The canonical bridge replaces this detail with innerHTML on reconciliation.
+  // Resolve a fresh locator only for that exact detached-node failure; all three
+  // attempts share one short action budget. Readiness and acceptance stay strict.
+  const maximumAttempts=3,budgetMs=1500,deadline=Date.now()+budgetMs;
+  let attempts=0,detachments=0;
+  try{
+    for(attempts=1;attempts<=maximumAttempts;attempts++){
+      const balance=page.locator('[data-rp-receipt-detail-id="'+expected.receiptId+'"] [data-rp-current-balance]');
+      need(await balance.count()===1,'I66_SIX_SCROLL_BALANCE_MISSING_OR_DUPLICATE_HOLD');
+      need(await balance.isVisible(),'I66_SIX_SCROLL_BALANCE_HIDDEN_HOLD');
+      const timeout=deadline-Date.now();need(timeout>0,'I66_SIX_SCROLL_ACTION_BUDGET_HOLD');
+      try{await balance.scrollIntoViewIfNeeded({timeout});return {attempts,detachments};}
+      catch(error){
+        if(error?.name==='TimeoutError'||!/^locator\.scrollIntoViewIfNeeded: Element is not attached to the DOM(?:\r?\n|$)/.test(String(error?.message||'')))throw error;
+        detachments++;
+        need(attempts<maximumAttempts&&Date.now()<deadline,'I66_SIX_SCROLL_DETACH_PERSISTENT_HOLD');
+      }
+    }
+  }catch(error){
+    error.sixScrollComparison={stage,sourceRequirement:expected.sourceRequirement,receiptId:expected.receiptId,
+      attempts,detachments,maximumAttempts,budgetMs,uiAccepted:false};throw error;
+  }
+}
 async function runSixReceiptUi(page,actor,errors){
   need(phase==='live'||(readMode==='six-frontend-release'&&frontendQa?.phase==='preview'),'I66_SIX_REAL_DATA_LIVE_ONLY');
   const authority=sixReceiptAuthority(),before=await sixServerSnapshot(authority);
@@ -416,12 +441,13 @@ async function runSixReceiptUi(page,actor,errors){
       ['clientes','polizas','recibosEsperados','carteraPrimas','cobros'].every(k=>(Orbit.store?._productStatus?.().serverConfirmedCollections||[]).includes(k)),expected.receiptId,{timeout:60000});
     // On the existing one-column mobile layout the balance follows the receipt
     // breakdown. Normal reading scroll exposes it without invoking any action.
-    const showBalance=async()=>{if(actor.viewportWidth)await page.locator('[data-rp-receipt-detail-id="'+expected.receiptId+'"] [data-rp-current-balance]').scrollIntoViewIfNeeded();};
-    await wait();await showBalance();const first=await page.evaluate(inspectSixReceiptBrowser,input);
+    await wait();const scrollBefore=await showSixReceiptBalance(page,expected,actor.viewportWidth,'BEFORE_RELOAD');
+    const first=await page.evaluate(inspectSixReceiptBrowser,input);
     const beforeCheck=collectSixVisibleResult(expected,source,first,'BEFORE_RELOAD',visibleFailures,actor.allowedRole||'operativo',actor.viewportWidth);
     const observation={sourceRequirement:expected.sourceRequirement,receiptId:expected.receiptId,portfolioId:expected.portfolioId,
-      beforeReload:first,beforeCheck,reloadPass:false};observations.push(observation);
-    await page.reload({waitUntil:'domcontentloaded',timeout:60000});await wait();await showBalance();
+      beforeReload:first,beforeCheck,scrollBefore,reloadPass:false};observations.push(observation);
+    await page.reload({waitUntil:'domcontentloaded',timeout:60000});await wait();
+    observation.scrollAfter=await showSixReceiptBalance(page,expected,actor.viewportWidth,'AFTER_RELOAD');
     const reloaded=await page.evaluate(inspectSixReceiptBrowser,input);
     const afterCheck=collectSixVisibleResult(expected,source,reloaded,'AFTER_RELOAD',visibleFailures,actor.allowedRole||'operativo',actor.viewportWidth);
     observation.afterReload=reloaded;observation.afterCheck=afterCheck;
@@ -1000,6 +1026,7 @@ try{
     report.financialFocalHold=error.sixFinancialComparison;
   if(error?.message==='I66_SIX_VISIBLE_VALUES_OR_BALANCE_HOLD')
     report.financialFocalHold=error.sixVisibleComparisons||error.sixVisibleComparison;
+  if(error?.sixScrollComparison)report.financialFocalScrollHold=error.sixScrollComparison;
   report.errors.push(String(error?.message||'PERF_UNKNOWN').replace(/[^A-Z0-9_:-]/gi,'').slice(0,100));
   console.error('I66_PERF_HOLD:'+report.errors[0]);
   process.exitCode=1;

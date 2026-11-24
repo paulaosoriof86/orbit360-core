@@ -131,3 +131,36 @@ jobs:
           path: ${{ runner.temp }}/gi-operational-regression.json
           if-no-files-found: warn
           retention-days: 14
+  synthetic-chromium-detach-causal-no-production-writes:
+    if: github.repository == 'paulaosoriof86/orbit360-core' && github.ref == 'refs/heads/recovery/fase-a-clean-20260831' && github.event_name == 'push' && contains(github.event.head_commit.message, 'I66_QA_DETACH_CAUSAL_CHECK')
+    runs-on: ubuntu-24.04
+    timeout-minutes: 16
+    env:
+      I66_SIX_REQUIRE_REAL_DOM: '1'
+      NODE_PATH: ${{ runner.temp }}/gi-i66-detach-deps/node_modules
+      PLAYWRIGHT_BROWSERS_PATH: ${{ runner.temp }}/gi-i66-detach-browsers
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install pinned Chromium driver for isolated synthetic DOM proof
+        run: |
+          set -euo pipefail
+          npm install --prefix "$RUNNER_TEMP/gi-i66-detach-deps" --no-package-lock --no-audit --no-fund playwright@1.55.0
+          node "$RUNNER_TEMP/gi-i66-detach-deps/node_modules/playwright/cli.js" install --with-deps chromium
+      - name: Prove real DOM detach recovery and persistent failure without credentials or business data
+        run: |
+          set -euo pipefail
+          node --test --test-name-pattern='real Chromium DOM' tools/gravicentra-i6-6-six-existing-receipts-ui-readonly.test.cjs | tee "$RUNNER_TEMP/gi-i66-detach-causal.tap"
+      - name: Preserve real DOM causal test outcome
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gi-i66-detach-causal-${{ github.run_id }}
+          path: ${{ runner.temp }}/gi-i66-detach-causal.tap
+          if-no-files-found: warn
+          retention-days: 14
