@@ -8644,10 +8644,10 @@
     "artifactDigest": "sha256:8dae2c413cc774be504e3aa224b4333e2968c176fc74116c6c5f42c0a6a46290",
     "approvedByDirection": true,
     "externalMessagesSent": 0,
-    "action": "VERIFY_PROBE",
-    "version": 1,
+    "action": "BIND_PRINCIPAL",
+    "version": 2,
     "expectedConfigDigest": "c3eeeeb5c9c952cbfaa4fac57921ccdecf8238f0168ff4239295256232b45194",
-    "expiresAt": "2026-11-24T19:19:29.534Z",
+    "expiresAt": "2026-11-24T19:20:25.979Z",
     "makeExecutionReceipt": {
       "path": "artifacts/orbit360-recovery/release-control/I6_6_MAKE_V28_PREVIEW_PROBE_EXECUTION_20261124.json",
       "gitBlobSha": "2e10e53baf6c5dfb352c4e14bcf39495cc21b0b3",
