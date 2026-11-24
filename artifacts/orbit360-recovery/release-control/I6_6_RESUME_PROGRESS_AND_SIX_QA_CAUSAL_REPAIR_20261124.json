@@ -1,0 +1,44 @@
+{
+  "schemaVersion": 1,
+  "status": "SOURCE_REPAIR_LOCAL_TESTS_PASSED_CI_AND_LIVE_OBSERVER_PENDING",
+  "target": {
+    "generation": 3,
+    "buildId": "gi-i66-65c825b2808a-57f234755dc1",
+    "sourceSha": "65c825b2808a615ca4195bdde6689dbdbe3193b2",
+    "artifactId": 14873426438,
+    "digest": "sha256:7cb782848a45083047c4899bc30c13bf5be46429607e42597d09342becfc9acc"
+  },
+  "defects": [
+    {
+      "id": "STALE_EXECUTION_PROGRESS_PROJECTIONS",
+      "cause": "Current objectives and observer receipts were updated independently from remainingExecutionLanes and updateDiscipline.nextIncomplete.",
+      "repair": "Derive both projections from shockObjectives; validate exact current observer receipt and target; archive prior-generation observations without transferring acceptance."
+    },
+    {
+      "id": "SIX_UI_RAW_VS_ACCEPTED_READ_PROJECTION",
+      "failedRunId": 45298628820,
+      "cause": "Observer compared raw server pais with the accepted financialView projection inherited from the verified parent policy.",
+      "acceptedReaderBlob": "aafdbe3384506b1772c7e409d565de88bf287b21",
+      "repair": "Apply only the actual accepted country projection to expected read values while retaining raw fingerprints and exact financial, identity, date and state checks."
+    }
+  ],
+  "localTests": {
+    "command": "node --test tools/gravicentra-i66-frontend-control.test.cjs tools/gravicentra-i6-6-six-existing-receipts-ui-readonly.test.cjs",
+    "pass": 45,
+    "fail": 0,
+    "scope": "Causal negative cases, physical existing E3 authority, generation transitions, exact accepted read projection and read-only firewall."
+  },
+  "pending": [
+    "Source QA on full checkout",
+    "Canonical release-lock synchronization guard",
+    "Repin exact observer QA authority after successful checks",
+    "Signed six-existing-receipts UI observer against unchanged accepted E3"
+  ],
+  "invariants": {
+    "productSourceChanged": false,
+    "artifactRebuilt": false,
+    "hostingRedeployed": false,
+    "financialDataReapplied": false,
+    "fullI66ProductionAccepted": false
+  }
+}

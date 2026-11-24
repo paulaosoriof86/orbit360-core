@@ -18,6 +18,176 @@ function executionSnapshot(transport){
     operationalCandidate:p?{status:p.status,sourceSha:p.sourceSha,artifactDigest:p.artifactDigest,
       previewQaRunId:p.previewQa?.runId||null}:null};
 }
+// The current objectives own the derived work list. Historical receipts keep
+// their bytes; updating one active objective must not leave an older next step
+// or an older observer result looking current elsewhere in the same cursor.
+function executionProgressProjection(progress){
+  assert.ok(Array.isArray(progress.shockObjectives?.items),'I66_PROGRESS_OBJECTIVES_MISSING');
+  const ids=new Set(),remainingExecutionLanes=[];
+  for(const row of progress.shockObjectives.items){
+    assert.ok(row&&typeof row.id==='string'&&!ids.has(row.id),'I66_PROGRESS_OBJECTIVE_ID_INVALID');
+    ids.add(row.id);
+    if(row.passForShock===true)continue;
+    for(const key of ['title','status','evidence','next'])
+      assert.equal(typeof row[key],'string','I66_PROGRESS_OBJECTIVE_FIELD_MISSING_'+row.id+'_'+key);
+    const {id,title,status,evidence,next}=row;
+    remainingExecutionLanes.push({id,title,status,evidence,next});
+  }
+  return {remainingExecutionLanes,nextIncomplete:remainingExecutionLanes.map(row=>row.id+': '+row.next)};
+}
+function synchronizeExecutionProgress(progress){
+  const projection=executionProgressProjection(progress);
+  progress.remainingExecutionLanes=projection.remainingExecutionLanes;
+  progress.updateDiscipline=progress.updateDiscipline||{};
+  progress.updateDiscipline.nextIncomplete=projection.nextIncomplete;
+  if(progress.postAcceptanceObserverResults&&progress.currentObserverStatus){
+    progress.previousPendingObserverStatus=progress.currentObserverStatus;
+    delete progress.currentObserverStatus;
+  }
+  return projection;
+}
+const observerTargetKeys=['generation','sourceSha','buildId','artifactId','artifactDigest','hostingVersion'];
+const observerCursorKeys=cursor=>Object.keys(cursor).filter(key=>/^(lastObserverResults|lastFiveRoleMatrix|lastPerformance|lastFinancialUiReadback)/.test(key));
+const observerSummaryKeys=progress=>Object.keys(progress).filter(key=>/^current(SignedRoleMatrix|LivePerformance)\d{8}$/.test(key));
+const observerContinuationKeys=continuation=>Object.keys(continuation).filter(key=>/^postAcceptanceObserverResults\d{8}$/.test(key));
+const observerTarget=target=>Object.fromEntries(observerTargetKeys.map(key=>[key,target[key]]));
+function sameObserverTarget(target,head){
+  return target&&['generation','sourceSha','artifactDigest'].every(key=>target[key]===head[key])&&
+    ['buildId','artifactId','hostingVersion'].every(key=>target[key]===undefined||target[key]===head[key]);
+}
+function retireObserverAuthorities(continuation,head,archived){
+  for(const [profile,authority] of Object.entries(continuation.postAcceptanceGovernanceQa?.observers||{})){
+    if(sameObserverTarget(authority.target,head))continue;
+    archived.observerAuthorities[profile]=authority;
+    delete continuation.postAcceptanceGovernanceQa.observers[profile];
+  }
+  for(const key of Object.keys(continuation).filter(key=>/^acceptedLivePerformance(?:Timeline)?Request\d{8}$/.test(key))){
+    const request=continuation[key];if(sameObserverTarget(request.target||request,head))continue;
+    archived.observerRequests[key]=request;delete continuation[key];
+  }
+}
+// A signed observation remains true for the artifact it measured. Publishing a
+// successor moves that evidence into history; it neither transfers its PASS to
+// the successor nor destroys the original proof or reopens unrelated gates.
+function archiveExecutionObservers(control,progress,head,read){
+  const observations=progress.postAcceptanceObserverResults;
+  if(!observations){
+    const pending=progress.currentObserverStatus;
+    if(!pending||sameObserverTarget(pending.target,head))return null;
+    const prior=progress.priorPostAcceptanceObserverResults?.find(item=>item.results.receiptPath===pending.previousResultsReceipt);
+    assert.ok(prior,'I66_PROGRESS_PREVIOUS_OBSERVER_HISTORY_MISSING');
+    const transition={previousUnobservedTarget:structuredClone(pending.target),target:observerTarget(head),
+      previousResultsReceipt:pending.previousResultsReceipt,observerAuthorities:{},observerRequests:{},acceptanceTransferred:false};
+    retireObserverAuthorities(control.i66OperationalContinuation20261115,head,transition);
+    progress.priorPendingObserverTransitions=[...(progress.priorPendingObserverTransitions||[]),transition];
+    pending.target=observerTarget(head);
+    synchronizeExecutionProgress(progress);
+    return prior;
+  }
+  const receipt=read(observations.receiptPath);
+  assert.equal(receipt.schema,'GI_I66_POST_ACCEPTANCE_OBSERVER_RESULTS_RECONCILIATION_V1');
+  if(sameObserverTarget(receipt.target,head))return null;
+  const cursor=control.i66ActiveRecoveryCursor,continuation=control.i66OperationalContinuation20261115;
+  const archived={schema:'GI_I66_SUPERSEDED_OBSERVER_RESULTS_V1',reason:'ACCEPTED_LIVE_TARGET_CHANGED',
+    target:structuredClone(receipt.target),supersededByTarget:observerTarget(head),
+    acceptanceScope:'HISTORICAL_ORIGINAL_ARTIFACT_ONLY',immutableReceiptRetained:true,
+    results:structuredClone(observations),progressSummaries:{},cursorPointers:{},continuationSummaries:{},
+    observerAuthorities:{},observerRequests:{},objectiveStates:[],parallelLaneStates:[]};
+  for(const key of observerSummaryKeys(progress)){
+    archived.progressSummaries[key]=progress[key];delete progress[key];
+  }
+  for(const key of ['postAcceptanceVerification'])if(progress[key]){
+    archived.progressSummaries[key]=progress[key];delete progress[key];
+  }
+  if(progress.financialWork?.currentSignedUiReadback){
+    archived.progressSummaries.currentSignedUiReadback=progress.financialWork.currentSignedUiReadback;
+    delete progress.financialWork.currentSignedUiReadback;
+  }
+  for(const key of observerCursorKeys(cursor)){
+    archived.cursorPointers[key]=cursor[key];delete cursor[key];
+  }
+  for(const key of observerContinuationKeys(continuation)){
+    archived.continuationSummaries[key]=continuation[key];delete continuation[key];
+  }
+  retireObserverAuthorities(continuation,head,archived);
+  for(const objective of progress.shockObjectives.items.filter(row=>['A04','A12','A14'].includes(row.id))){
+    archived.objectiveStates.push(structuredClone(objective));
+    if(objective.passForShock===true)continue;
+    objective.status='CURRENT_ARTIFACT_OBSERVER_PENDING_PRIOR_RESULT_HISTORICAL';
+    objective.evidence='Prior accepted artifact E'+receipt.target.generation+' only: '+objective.evidence;
+    objective.next='Observe the current accepted artifact for this pending scope; preserve the original proof at '+
+      observations.receiptPath+'. Remaining work recorded before publication: '+objective.next;
+  }
+  for(const lane of (progress.parallelLanes||[]).filter(row=>['L3','L4'].includes(row.id))){
+    archived.parallelLaneStates.push(structuredClone(lane));
+    lane.status='CURRENT_ARTIFACT_OBSERVER_PENDING_PRIOR_SCOPED_RESULTS_ARCHIVED';
+  }
+  if(cursor.nextRoleMatrixWork){archived.cursorPointers.nextRoleMatrixWork=cursor.nextRoleMatrixWork;delete cursor.nextRoleMatrixWork;}
+  if(progress.immediateExecution?.observerResultsReceipt){
+    archived.progressSummaries.immediateExecution=structuredClone(progress.immediateExecution);
+    delete progress.immediateExecution.observerResultsReceipt;
+    progress.immediateExecution.status='CURRENT_ARTIFACT_OBSERVERS_PENDING_PREVIOUS_RESULTS_ARCHIVED';
+  }
+  delete progress.postAcceptanceObserverResults;
+  progress.priorPostAcceptanceObserverResults=[...(progress.priorPostAcceptanceObserverResults||[]),archived];
+  progress.currentObserverStatus={status:'PENDING_READONLY_OBSERVATION_ON_CURRENT_ACCEPTED_ARTIFACT',
+    target:observerTarget(head),previousResultsReceipt:observations.receiptPath,
+    historicalProofsRemainValidForOriginalArtifact:true,acceptanceTransferred:false};
+  synchronizeExecutionProgress(progress);
+  return archived;
+}
+function assertExecutionProgress(control,progress,io){
+  const projection=executionProgressProjection(progress),cursor=control.i66ActiveRecoveryCursor||{};
+  assert.deepEqual(progress.remainingExecutionLanes,projection.remainingExecutionLanes,'I66_PROGRESS_REMAINING_LANES_DRIFT');
+  assert.deepEqual(progress.updateDiscipline?.nextIncomplete,projection.nextIncomplete,'I66_PROGRESS_NEXT_INCOMPLETE_DRIFT');
+  const observations=progress.postAcceptanceObserverResults;
+  if(!observations&&!cursor.lastObserverResultsReceipt){
+    assert.equal(observerSummaryKeys(progress).length,0,'I66_PROGRESS_CURRENT_SUMMARY_WITHOUT_OBSERVER_RECEIPT');
+    assert.equal(observerCursorKeys(cursor).length,0,'I66_PROGRESS_CURRENT_CURSOR_WITHOUT_OBSERVER_RECEIPT');
+    assert.ok(!progress.financialWork?.currentSignedUiReadback,'I66_PROGRESS_CURRENT_FINANCIAL_WITHOUT_OBSERVER_RECEIPT');
+    assert.equal(observerContinuationKeys(control.i66OperationalContinuation20261115||{}).length,0,'I66_PROGRESS_CURRENT_CONTINUATION_WITHOUT_OBSERVER_RECEIPT');
+    if(progress.currentObserverStatus){
+      const pending=progress.currentObserverStatus;
+      assert.equal(pending.status,'PENDING_READONLY_OBSERVATION_ON_CURRENT_ACCEPTED_ARTIFACT');
+      assert.deepEqual(pending.target,observerTarget(control.i66FrontendReleaseHead),'I66_PROGRESS_PENDING_OBSERVER_TARGET_DRIFT');
+      assert.equal(pending.acceptanceTransferred,false,'I66_PROGRESS_PREVIOUS_OBSERVER_ACCEPTANCE_TRANSFERRED');
+      assert.ok(progress.priorPostAcceptanceObserverResults?.some(item=>item.results.receiptPath===pending.previousResultsReceipt),
+        'I66_PROGRESS_PREVIOUS_OBSERVER_HISTORY_MISSING');
+    }
+    return projection;
+  }
+  assert.ok(observations,'I66_PROGRESS_OBSERVER_RESULTS_REMOVED');
+  assert.ok(!progress.currentObserverStatus,'I66_PROGRESS_STALE_PENDING_MARKER_WITH_CURRENT_OBSERVER_RESULTS');
+  assert.equal(observations.receiptPath,cursor.lastObserverResultsReceipt,'I66_PROGRESS_OBSERVER_RECEIPT_PATH_DRIFT');
+  assert.equal(observations.receiptGitBlobSha,cursor.lastObserverResultsReceiptGitBlobSha,'I66_PROGRESS_OBSERVER_RECEIPT_PIN_DRIFT');
+  assert.ok(/^artifacts\/orbit360-recovery\/release-control\/[A-Za-z0-9_.-]+\.json$/.test(observations.receiptPath),'I66_PROGRESS_OBSERVER_RECEIPT_PATH_INVALID');
+  const bytes=io.readFileSync(observations.receiptPath,'utf8'),receipt=JSON.parse(bytes);
+  assert.equal(blob(bytes),observations.receiptGitBlobSha,'I66_PROGRESS_OBSERVER_RECEIPT_BYTES_DRIFT');
+  assert.equal(receipt.schema,'GI_I66_POST_ACCEPTANCE_OBSERVER_RESULTS_RECONCILIATION_V1');
+  for(const key of ['generation','sourceSha','buildId','artifactId','artifactDigest','hostingVersion'])
+    assert.equal(receipt.target[key],control.i66FrontendReleaseHead[key],'I66_PROGRESS_OBSERVER_TARGET_DRIFT_'+key);
+  for(const [key,receiptKey] of [['fiveRoles','fiveRoleReadOnly'],['performance','performance'],['financialSixReceiptUi','financialSixReceiptUi']])
+    assert.deepEqual(observations[key],receipt[receiptKey],'I66_PROGRESS_OBSERVER_RESULT_DRIFT_'+key);
+  const role=observations.fiveRoles,performance=observations.performance,financial=observations.financialSixReceiptUi;
+  assert.equal(cursor.lastFiveRoleMatrixRunId,role.runId,'I66_PROGRESS_ROLE_RUN_DRIFT');
+  assert.equal(cursor.lastFiveRoleMatrixStatus,role.status,'I66_PROGRESS_ROLE_STATUS_DRIFT');
+  assert.equal(cursor.lastFiveRoleMatrixArtifactId,role.artifactId,'I66_PROGRESS_ROLE_ARTIFACT_DRIFT');
+  assert.equal(cursor.lastFiveRoleMatrixArtifactDigest,role.artifactDigest,'I66_PROGRESS_ROLE_ARTIFACT_DIGEST_DRIFT');
+  assert.equal(cursor.lastPerformanceRunId,performance.runId,'I66_PROGRESS_PERFORMANCE_RUN_DRIFT');
+  assert.equal(cursor.lastPerformanceEvidenceArtifactId,performance.artifactId,'I66_PROGRESS_PERFORMANCE_ARTIFACT_DRIFT');
+  assert.equal(cursor.lastFinancialUiReadbackRunId,financial.runId,'I66_PROGRESS_FINANCIAL_UI_RUN_DRIFT');
+  assert.equal(cursor.lastFinancialUiReadbackStatus,financial.status,'I66_PROGRESS_FINANCIAL_UI_STATUS_DRIFT');
+  assert.deepEqual(progress.currentSignedRoleMatrix20261124,role,'I66_PROGRESS_CURRENT_ROLE_SUMMARY_DRIFT');
+  assert.deepEqual(progress.financialWork?.currentSignedUiReadback,financial,'I66_PROGRESS_CURRENT_FINANCIAL_SUMMARY_DRIFT');
+  for(const key of Object.keys(performance))
+    assert.deepEqual(progress.currentLivePerformance20261124?.[key],performance[key],'I66_PROGRESS_CURRENT_PERFORMANCE_SUMMARY_DRIFT_'+key);
+  for(const [id,result,fullField] of [['A04',role,'fullA04Accepted'],['A12',financial,'fullA12Passed'],['A14',performance,'fullA14Passed']]){
+    const objective=progress.shockObjectives.items.find(row=>row.id===id);
+    assert.ok(objective&&objective.evidence.includes(String(result.runId)),'I66_PROGRESS_OBJECTIVE_OBSERVER_EVIDENCE_DRIFT_'+id);
+    if(result[fullField]!==true)assert.equal(objective.passForShock,false,'I66_PROGRESS_PARTIAL_OBSERVER_FALSE_FULL_PASS_'+id);
+  }
+  return projection;
+}
 function physicalGuard(control,state,transport,io){
   const head=control.i66FrontendReleaseHead;
   assert.ok(head&&Number.isSafeInteger(head.generation)&&head.generation>0,'I66_VERSIONED_FRONTEND_HEAD_MISSING');
@@ -119,6 +289,7 @@ function closeFiles(read,j,body){
   transport.frontendReleaseSequence=n;transport.consumedFrontendAuthorities=[...new Set([...(transport.consumedFrontendAuthorities||[]),j.request.approvalBlob])];
   ledger.frontendReleaseHead=head;
   const oldEvidence=c.currentEvidencePath,progress=read(oldEvidence),progressPath=genName(n,'FOCAL_PROGRESS');
+  const archivedObservers=archiveExecutionObservers(cp,progress,head,read);
   progress.previousEvidencePath=oldEvidence;progress.previousEvidenceBlobSha=c.currentEvidenceBlobSha;
   progress.releasedFrontend={sourceSha:t.sourceSha,buildId:t.buildId,artifactId:t.artifactId,digest:t.artifactDigest,fileCount:t.files,
     hostingVersion:t.hostingVersion,liveReceipt:receiptPath};
@@ -126,6 +297,11 @@ function closeFiles(read,j,body){
   c.previousEvidencePath=oldEvidence;c.previousEvidenceBlobSha=c.currentEvidenceBlobSha;c.currentEvidencePath=progressPath;
   c.currentEvidenceBlobSha=blob(serial(progress));c.lastPhysicalLiveRunId=head.liveCloneRunId;c.lastPhysicalLiveSourceSha=t.sourceSha;
   c.moduleReleasedThisIteration=true;
+  if(archivedObservers){
+    const next='I6.6: artifact '+head.artifactDigest+' accepted; continue the remaining capabilities and observe the new artifact. '+
+      'Prior observer results remain historical for E'+archivedObservers.target.generation+' at '+archivedObservers.results.receiptPath+'.';
+    c.next=progress.next=cp.i66OperationalContinuation20261115.currentWork=state.nextAction=cp.nextAction=next;
+  }
   if(c.executionSynchronizationVersion===1)progress.executionSynchronization=executionSnapshot(transport);
   c.currentEvidenceBlobSha=blob(serial(progress));
   return {...changes,[P.cp]:cp,[P.state]:state,[P.transport]:transport,[P.ledger]:ledger,[progressPath]:progress,[genName(n,'JOURNAL')]:body};
@@ -198,8 +374,7 @@ function closeCompositeFiles(read,j,body){
     frontendPreviewRequestVersion:transport.frontendPreviewRequest?.version,
     recordedAtUtc:j.liveProof.recordedAtUtc,fullI66ProductionAccepted:false};
   progress.recordedAtUtc=j.liveProof.recordedAtUtc;
-  progress.remainingExecutionLanes=(progress.shockObjectives?.items||[]).filter(row=>row.passForShock!==true)
-    .map(({id,title,status,next})=>({id,title,status,next}));
+  synchronizeExecutionProgress(progress);
   const next='I6.6: continuar las capacidades pendientes del plan congelado: '+
     progress.remainingExecutionLanes.map(row=>row.id+' '+row.title).join('; ')+
     '. El artifact '+head.artifactDigest+' ya está aceptado; retomar sus pruebas pendientes y la operación autorizada, sin repetir su build ni promoción.';
@@ -342,4 +517,4 @@ async function verifyReadonlyObserver(resolution,{env=process.env,api,readMarker
     sourceQaVerified,remoteControlHead:remoteHead,target:resolution.target,readOnly:true,
     productWrites:0,syntheticWrites:0,releaseTransitions:0,hostedMarkersVerified:origins};
 }
-module.exports={P,genName,serial,blob,physicalGuard,closeFiles,executionSnapshot,compositeReceipt,closeCompositeFiles,READONLY_PROFILES,readonlyObserverPaths,readonlyObserverTarget,resolveReadonlyObserver,verifyReadonlyObserver};
+module.exports={P,genName,serial,blob,physicalGuard,closeFiles,executionSnapshot,executionProgressProjection,synchronizeExecutionProgress,archiveExecutionObservers,assertExecutionProgress,compositeReceipt,closeCompositeFiles,READONLY_PROFILES,readonlyObserverPaths,readonlyObserverTarget,resolveReadonlyObserver,verifyReadonlyObserver};

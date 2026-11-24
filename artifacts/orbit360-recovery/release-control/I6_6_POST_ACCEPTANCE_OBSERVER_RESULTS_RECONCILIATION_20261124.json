@@ -1,0 +1,157 @@
+{
+  "schema": "GI_I66_POST_ACCEPTANCE_OBSERVER_RESULTS_RECONCILIATION_V1",
+  "recordType": "APPEND_ONLY_CAUSAL_EVIDENCE_NOT_NEW_RELEASE_ACCEPTANCE",
+  "gate": "I6.6",
+  "dateGuatemala": "2026-11-23",
+  "recordedAtUtc": "2026-11-24T04:31:14.915318Z",
+  "observedHead": "042f3ecdf579b8db78b768733f72c824c5b01062",
+  "previousControlPlaneGitBlobSha": "d7efedc9804eaa8a02a1ad53044cc2cb8b0f8535",
+  "target": {
+    "generation": 3,
+    "sourceSha": "65c825b2808a615ca4195bdde6689dbdbe3193b2",
+    "buildId": "gi-i66-65c825b2808a-57f234755dc1",
+    "artifactId": 14873426438,
+    "artifactDigest": "sha256:7cb782848a45083047c4899bc30c13bf5be46429607e42597d09342becfc9acc",
+    "hostingVersion": "sites/ays-orbit-360-lab/versions/332999a55b189108",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_FRONTEND_E00003_RECEIPT.json",
+    "receiptGitBlobSha": "11fdb3bee494541513482666d6215f45cbad0567"
+  },
+  "scope": "Reconcile completed post-acceptance read-only observers and stale derived next actions; no new product source, deployment or business writes.",
+  "fiveRoleReadOnly": {
+    "status": "PASS_SCOPED_GT_FIVE_ROLES_READONLY_FULL_A04_HOLD",
+    "runId": 45298628816,
+    "jobId": 138125264398,
+    "workflowHeadSha": "308d80f68304ea8cbf383db43b9223e05b14580e",
+    "artifactId": 14878390250,
+    "artifactDigest": "sha256:0436caf4917f3499e371b4ae7a94cdef83e94ea06c2bb6c639bc2d466da6bd08",
+    "reportSha256": "27875dbe2e4040c0eba3235e3d8ed65f27571b03efce7baae8eab4a16d6ba5a0",
+    "result": "PASS",
+    "roles": [
+      "operativo",
+      "direccion",
+      "admintenant",
+      "superadmin",
+      "asesor"
+    ],
+    "country": "GT",
+    "viewports": [
+      1280,
+      390
+    ],
+    "roleContexts": 10,
+    "routesPerContext": 14,
+    "routeChecks": 140,
+    "holds": [],
+    "reloadEveryContext": true,
+    "unexpectedHttp": 0,
+    "unexpectedBrowserLogs": 0,
+    "runtimeConsoleErrors": 0,
+    "assignedRoleSelectionOnly": true,
+    "authWrites": 0,
+    "membershipWrites": 0,
+    "businessWrites": 0,
+    "advisorReadBoundaryBeforeAndAfterReload": true,
+    "fullA04Accepted": false,
+    "backendWriteNegativeProven": false,
+    "COCoverageProven": false,
+    "remaining": "CO and backend write-negative authorization tests remain unproved; GT read-only route PASS does not certify real CRUD or the complete A04 gate."
+  },
+  "performance": {
+    "status": "LIVE_READONLY_MEASURED_FULL_A14_HOLD",
+    "runId": 45299330794,
+    "jobId": 138127612969,
+    "workflowHeadSha": "042f3ecdf579b8db78b768733f72c824c5b01062",
+    "artifactId": 14878846193,
+    "artifactDigest": "sha256:e83e5e457b22fadcafa9ca78d25036cc0444e2aed6017e7c614eb36e6914fa64",
+    "reportSha256": "45951e4278a1d233581db71f6a5e29c410cd6e55eb786bd289ebfa8c757ecd81",
+    "activationMs": 3809,
+    "firstSearchMs": 181,
+    "cobrosFinancialReadyMs": 13350,
+    "cobrosSourcesConfirmedMs": 11581,
+    "cobrosFinancialDomAfterSourcesMs": 1769,
+    "optionalSourceErrors": [
+      "estadosCuentaAseguradora",
+      "recibosAseguradora",
+      "reclamos"
+    ],
+    "sourcePlanDenials": [
+      {
+        "collection": "estadosCuentaAseguradora",
+        "errorCode": "PROTECTED_READ_PLAN_DENIED",
+        "queryPlanErrors": [
+          "politica_no_autoriza_consulta"
+        ]
+      },
+      {
+        "collection": "recibosAseguradora",
+        "errorCode": "PROTECTED_READ_PLAN_DENIED",
+        "queryPlanErrors": [
+          "politica_no_autoriza_consulta"
+        ]
+      },
+      {
+        "collection": "reclamos",
+        "errorCode": "PROTECTED_READ_PLAN_DENIED",
+        "queryPlanErrors": [
+          "modulo_no_visible"
+        ]
+      }
+    ],
+    "businessWrites": 0,
+    "firestoreWrites": 0,
+    "fullA14Passed": false,
+    "sixReceiptCertificateRunInThisJob": false,
+    "meaning": "Measurement succeeded; remaining source-plan denials and financial readiness delay are still open. This separate performance run did not clear the six-receipt UI HOLD."
+  },
+  "financialSixReceiptUi": {
+    "status": "SIX_EXISTING_CORRECTIONS_SERVER_READBACK_PRESERVED_UI_FINANCIAL_INPUTS_HOLD",
+    "runId": 45298628820,
+    "jobId": 138125264297,
+    "workflowHeadSha": "308d80f68304ea8cbf383db43b9223e05b14580e",
+    "artifactId": 14877661806,
+    "artifactDigest": "sha256:e285ccad0c095ea0ba1e81e9bd5a6fe44aa2a68f9074d86123543bc6e9b31742",
+    "observedFailureCode": "I66_SIX_UI_FINANCIAL_INPUTS_DIFFER_FROM_SERVER",
+    "actualExecutionStage": "Measure REAL Chromium origin timings as Carlos Operativo (no writes), with mode six-existing-receipts",
+    "terminalCertificateStep": "SKIPPED_AFTER_OBSERVER_FAILURE",
+    "priorProtectedApplyRunId": 45272554046,
+    "priorProtectedReadback": "BULK_PROTECTED_READBACK_PASS",
+    "existingObligationsUpdated": 6,
+    "receiptUpdates": 6,
+    "portfolioUpdates": 6,
+    "auditCreates": 6,
+    "newPayments": 0,
+    "newObligations": 0,
+    "newWritesInObserver": 0,
+    "grossDeltaCents": 0,
+    "unchangedGrossGTQCents": 166956,
+    "fullA12Passed": false,
+    "rootCauseProven": false,
+    "next": "Discriminate financial browser projection from fresh server semantic fields; correct proven reader/oracle defect and rerun the focal read-only observer. Do not reapply the six financial corrections."
+  },
+  "continuityCorrections": {
+    "previousProgress": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_EXECUTION_PROGRESS_20261124_R22.json",
+    "previousProgressGitBlobSha": "8b313765713e2459bd935fd7678e3bbfd149b449",
+    "staleFiveRoleCursor": "FOUR_ACTUAL_ROLES_112_ROUTES_PASS_FIFTH_ASSESOR_UNVERIFIED_FULL_GATE_HOLD",
+    "staleUpdateDisciplineNextIncomplete": [
+      "I6.6: ejecutar las cuatro funciones Preview del artifact14868486169, comprobar sesiones/roles/CRUD/persistencia/restore; sólo después promover exactamente el mismo digest a LIVE y cerrar la aceptación compuesta."
+    ],
+    "derivedRemainingLanesDisagreedWithObjectives": [
+      "A03",
+      "A14"
+    ],
+    "currentDerivedListsReconciled": true,
+    "guardGapProven": "Existing governance preflight validates transport snapshot, receipt blobs and denominators but does not assert remainingExecutionLanes equals current shockObjectives nor synchronize post-observer result metadata.",
+    "guardCodeChangedByThisReceipt": false,
+    "permanentMechanismFixClaimed": false
+  },
+  "historicalPassPreserved": true,
+  "fullI66ProductionAccepted": false,
+  "newReleaseTransition": false,
+  "realBusinessWrites": 0,
+  "newBankTransfers": 0,
+  "sourceEvidenceUrls": [
+    "https://github.com/paulaosoriof86/orbit360-core/actions/runs/45298628816",
+    "https://github.com/paulaosoriof86/orbit360-core/actions/runs/45298628820",
+    "https://github.com/paulaosoriof86/orbit360-core/actions/runs/45299330794"
+  ]
+}

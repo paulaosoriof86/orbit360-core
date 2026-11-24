@@ -10,7 +10,7 @@ function harness(extra={}){
   assert.ok(start>0&&end>start);
   const context={require,URL,need:(ok,code)=>{if(!ok)throw Error(code);},norm:x=>String(x||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase(),
     fs:{readFileSync:()=>bytes},execFileSync:()=>bytes,pin:{sourceSha:'qa-source'},...extra};
-  vm.runInNewContext(source.slice(start,end)+'\nthis.probe={validateSixSourceRow,certifySixReceiptUi,inspectSixReceiptBrowser,installBootstrapObservation,sixReceiptAuthority,sixServerSnapshot,focalHash,sixFinancialInputs,SIX_FINANCIAL_FIELDS,isSixReceiptBusinessWrite,visibleCivilDate};',context);
+  vm.runInNewContext(source.slice(start,end)+'\nthis.probe={validateSixSourceRow,certifySixReceiptUi,inspectSixReceiptBrowser,installBootstrapObservation,sixReceiptAuthority,sixServerSnapshot,focalHash,sixFinancialInputs,sixExpectedBrowserInputs,sixFinancialInputMetadata,sixFinancialInputDifferences,SIX_FINANCIAL_FIELDS,isSixReceiptBusinessWrite,visibleCivilDate};',context);
   return context;
 }
 function sourceRow(e=authority.rows[0]){
@@ -114,6 +114,67 @@ test('stale browser balance aliases and payment inputs cannot certify a self-con
   }
   const {h,e,input,records,server}=uiFixture();records.cobros.push({id:'qa-stale-payment',reciboId:e.receiptId,paymentState:'PAID_DIRECT'});
   assert.throws(()=>h.probe.certifySixReceiptUi(e,server,h.probe.inspectSixReceiptBrowser(input)),/UI_FINANCIAL_INPUTS_DIFFER_FROM_SERVER/);
+});
+test('accepted financialView country projection is reproduced exactly without normalizing financial inputs',()=>{
+  const h=harness(),reader=fs.readFileSync(path.join(repo,'functions/b4-003-scoped-related-reader.js'),'utf8');
+  // This is the actual accepted E3 reader blob, not a mock of its projection.
+  const crypto=require('node:crypto'),blob=crypto.createHash('sha1').update('blob '+Buffer.byteLength(reader)+'\0').update(reader).digest('hex');
+  assert.equal(blob,'aafdbe3384506b1772c7e409d565de88bf287b21');
+  const from=reader.indexOf('function financialView('),to=reader.indexOf('\nasync function verifiedCancellationView',from);
+  assert.ok(from>0&&to>from);
+  const context={clean:x=>String(x??'').trim(),Denied:Error,allowRow:(ctx,p)=>{
+    assert.equal(p.pais,'GT');assert.equal(ctx.country,'GT');
+  }};
+  vm.runInNewContext(reader.slice(from,to)+'\nthis.project=financialView;',context);
+  const policy={pais:'GT',moneda:'GTQ',estado:'Vigente',asesorId:'qa-advisor'};
+  const record={polizaId:'qa-policy',moneda:'GTQ',primaTotal:278.26,monto:278.26,fechaLimite:'2026-11-02',estado:'Pendiente'};
+  const raw={receipt:h.probe.sixFinancialInputs(record),portfolio:h.probe.sixFinancialInputs(record),
+    policy:h.probe.sixFinancialInputs(policy),cobros:[{id:'qa-payment',fields:h.probe.sixFinancialInputs(record)}]};
+  const actual=h.probe.sixFinancialInputs(context.project({country:'GT'},record,policy,null,'alianzas-soluciones','qa-receipt'));
+  const projected=h.probe.sixExpectedBrowserInputs(raw,policy);
+  assert.deepEqual(plain(projected.receipt),plain(actual));
+  assert.deepEqual(plain(projected.portfolio),plain(actual));
+  assert.deepEqual(plain(projected.cobros[0].fields),plain(actual));
+  assert.notEqual(h.probe.focalHash(raw),h.probe.focalHash(projected));
+  assert.equal(Object.hasOwn(record,'pais'),false);assert.equal(Object.hasOwn(raw.receipt,'pais'),false);
+  for(const key of Object.keys(raw.receipt))assert.deepEqual(projected.receipt[key],raw.receipt[key]);
+  assert.throws(()=>h.probe.sixExpectedBrowserInputs(raw,{pais:'CO'}),/COUNTRY_PROJECTION_HOLD/);
+  assert.throws(()=>h.probe.sixExpectedBrowserInputs(raw,{pais:'GT',country:'CO'}),/COUNTRY_PROJECTION_HOLD/);
+});
+test('raw-server country absence fails old QA while exact canonical projection passes and real changes still fail',()=>{
+  const {h,e,input,server,policy,records}=uiFixture();
+  const raw={receipt:h.probe.sixFinancialInputs(records.recibosEsperados[0]),portfolio:h.probe.sixFinancialInputs(records.carteraPrimas[0]),
+    policy:h.probe.sixFinancialInputs(policy),cobros:[]};
+  const projected=h.probe.sixExpectedBrowserInputs(raw,policy);
+  for(const kind of ['recibosEsperados','carteraPrimas'])records[kind][0].pais='GT';
+  assert.throws(()=>h.probe.certifySixReceiptUi(e,server,h.probe.inspectSixReceiptBrowser(input)),/FINANCIAL_INPUTS_DIFFER_FROM_SERVER/);
+  server.financialInputsFingerprint=h.probe.focalHash(projected);
+  Object.defineProperty(server,'_financialInputsMetadata',{value:h.probe.sixFinancialInputMetadata(projected)});
+  h.probe.certifySixReceiptUi(e,server,h.probe.inspectSixReceiptBrowser(input));
+  for(const [field,value] of [['monto',100],['saldo',100],['fechaVencimiento','1999-01-01'],['receiptId','foreign'],['pais','CO']]){
+    const record=records.carteraPrimas[0],prior=record[field],present=Object.hasOwn(record,field);record[field]=value;
+    let error;try{h.probe.certifySixReceiptUi(e,server,h.probe.inspectSixReceiptBrowser(input),'AFTER_RELOAD');}catch(e){error=e;}
+    assert.match(error?.message||'',/FINANCIAL_INPUTS_DIFFER_FROM_SERVER/,field);
+    assert.equal(error.sixFinancialComparison.stage,'AFTER_RELOAD');
+    assert.ok(error.sixFinancialComparison.mismatch.differences.some(d=>d.path==='portfolio.'+field));
+    if(present)record[field]=prior;else delete record[field];
+  }
+});
+test('mismatch diagnostics retain only bounded fields, types and salted digests, including payment membership differences',()=>{
+  const h=harness(),raw={receipt:{monto:278.26},portfolio:{moneda:'GTQ'},policy:{pais:'GT'},cobros:[]};
+  const changed={receipt:{monto:'278.26',saldo:500},portfolio:{moneda:'COP'},policy:{pais:'GT'},
+    cobros:[{id:'private-payment-id',fields:{reciboId:'private-receipt-id',fechaPago:'2026-11-23'}}]};
+  const before=h.probe.sixFinancialInputMetadata(raw),after=h.probe.sixFinancialInputMetadata(changed);
+  const diff=h.probe.sixFinancialInputDifferences(before,after),serialized=JSON.stringify(diff);
+  assert.equal(diff.serverCobrosCount,0);assert.equal(diff.browserCobrosCount,1);
+  assert.equal(diff.differingFieldCount,5);assert.equal(diff.truncated,false);
+  assert.equal(diff.differences.find(d=>d.path==='receipt.monto').serverType,'number');
+  assert.equal(diff.differences.find(d=>d.path==='receipt.monto').browserType,'string');
+  assert.doesNotMatch(serialized,/278\.26|:500[,}]|GTQ|COP|private-|2026-11-23/);
+  const other=harness();assert.notEqual(h.probe.sixFinancialInputMetadata(raw).receipt.monto.digest,
+    other.probe.sixFinancialInputMetadata(raw).receipt.monto.digest,'separate runs cannot expose enumerable low-entropy hashes');
+  assert.equal(h.probe.sixFinancialInputDifferences(before,h.probe.sixFinancialInputMetadata(raw)).differingFieldCount,0);
+  assert.match(source,/report\.financialFocalHold=error\.sixFinancialComparison/);
 });
 test('read-only firewall blocks REST mutations and callable writers while allowing the actual read transports',()=>{
   const check=harness().probe.isSixReceiptBusinessWrite,base='https://firestore.googleapis.com/v1/projects/p/databases/(default)/documents';
