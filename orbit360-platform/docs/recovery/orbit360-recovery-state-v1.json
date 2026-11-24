@@ -56,11 +56,11 @@
       "artifactDigest": "sha256:7cb782848a45083047c4899bc30c13bf5be46429607e42597d09342becfc9acc",
       "hostingVersion": "sites/ays-orbit-360-lab/versions/332999a55b189108"
     },
-    "evidencePath": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_EXECUTION_PROGRESS_20261124_R52.json",
-    "evidenceGitBlobSha": "10faab5be261aaf72dad8886cdd60b2808f4c69c",
+    "evidencePath": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_EXECUTION_PROGRESS_20261124_R53.json",
+    "evidenceGitBlobSha": "335018ea4ec76b2390d7586c93f0db766771ef96",
     "activeGate": "I6.6",
-    "currentWork": "I6.6: build immutable v24 from signed source a26e2bffd87d2c700e102c7e989eda20aa562772 with the two Direction-reported direct form fixes. Verify224-file Hosting readback, deploy exact five Preview functions and execute fresh Make1-5 then all signed UI including direct forms. Keep transport stable for48 financial Preview checks, promote the same artifact and prove signed LIVE direct saves, reload/replay/restoration and48 LIVE balance checks. Complete committed Make activation after proof; preserve all155 payment application results and finish exact MAPFRE canonical applications through a legitimate signed session.",
-    "nextAction": "I6.6: build immutable v24 from signed source a26e2bffd87d2c700e102c7e989eda20aa562772 with the two Direction-reported direct form fixes. Verify224-file Hosting readback, deploy exact five Preview functions and execute fresh Make1-5 then all signed UI including direct forms. Keep transport stable for48 financial Preview checks, promote the same artifact and prove signed LIVE direct saves, reload/replay/restoration and48 LIVE balance checks. Complete committed Make activation after proof; preserve all155 payment application results and finish exact MAPFRE canonical applications through a legitimate signed session.",
+    "currentWork": "I6.6: execute exact five-function Preview on immutable v24 60ac1ae2d765484ed40c820a942dcc0966385da7/artifact14947396076. Complete fresh Make probe/bind/create/readback/replay/reject/restore, all four existing signed UI drivers and the new signed direct renewal/issued endorsement entry proof. Then freeze transport for48 financial Preview reads, promote the identical artifact and verify LIVE direct saves/readback/reload/replay/restoration plus48 financial reads. Activate Make real ingress after COMMITTED proof. All155 Cendoso applications are verified; preserve MAPFRE corrected obligations and finish its two documented canonical payment calls through a legitimate supported session.",
+    "nextAction": "I6.6: execute exact five-function Preview on immutable v24 60ac1ae2d765484ed40c820a942dcc0966385da7/artifact14947396076. Complete fresh Make probe/bind/create/readback/replay/reject/restore, all four existing signed UI drivers and the new signed direct renewal/issued endorsement entry proof. Then freeze transport for48 financial Preview reads, promote the identical artifact and verify LIVE direct saves/readback/reload/replay/restoration plus48 financial reads. Activate Make real ingress after COMMITTED proof. All155 Cendoso applications are verified; preserve MAPFRE corrected obligations and finish its two documented canonical payment calls through a legitimate supported session.",
     "frontendPreviewRequest": {
       "version": 24,
       "sourceQaHead": "a26e2bffd87d2c700e102c7e989eda20aa562772",
@@ -564,7 +564,7 @@
     "phaseAIterationStatuses": "HISTORICAL_FIELDS_ABOVE_PRESERVED_UNTIL_FORMAL_GATE_EVIDENCE;_NO_NEW_PASS_INFERRED",
     "labDataWriteScope": "ONLY_35_AUTHORIZED_COUNTRY_FIELDS;_NO_AUGUST_REFRESH"
   },
-  "nextAction": "I6.6: build immutable v24 from signed source a26e2bffd87d2c700e102c7e989eda20aa562772 with the two Direction-reported direct form fixes. Verify224-file Hosting readback, deploy exact five Preview functions and execute fresh Make1-5 then all signed UI including direct forms. Keep transport stable for48 financial Preview checks, promote the same artifact and prove signed LIVE direct saves, reload/replay/restoration and48 LIVE balance checks. Complete committed Make activation after proof; preserve all155 payment application results and finish exact MAPFRE canonical applications through a legitimate signed session.",
+  "nextAction": "I6.6: execute exact five-function Preview on immutable v24 60ac1ae2d765484ed40c820a942dcc0966385da7/artifact14947396076. Complete fresh Make probe/bind/create/readback/replay/reject/restore, all four existing signed UI drivers and the new signed direct renewal/issued endorsement entry proof. Then freeze transport for48 financial Preview reads, promote the identical artifact and verify LIVE direct saves/readback/reload/replay/restoration plus48 financial reads. Activate Make real ingress after COMMITTED proof. All155 Cendoso applications are verified; preserve MAPFRE corrected obligations and finish its two documented canonical payment calls through a legitimate supported session.",
   "sourceOfTruth": {
     "projectBoundaryPrevalentAddendum": "orbit360-platform/docs/recovery/ADDENDUM_PREVALENTE_CHATGPT_PROJECT_BOUNDARY_20260831.md",
     "mutableState": "orbit360-platform/docs/recovery/orbit360-recovery-state-v1.json",
@@ -5025,6 +5025,37 @@
           "sourceQaHead": "dd521ab149ba54d70eeca3c14875b9160b896ded",
           "sourceQaRunId": 45436746052,
           "guardRunId": 45436746039
+        }
+      }
+    },
+    {
+      "reason": "ACTIVE_OWNER_PLAN_SUMMARY_SUPERSEDED",
+      "priorGitBlobSha": "914408d3246af414b983ed82873cdf12c000d3b6",
+      "supersededByGeneration": 3,
+      "prior": {
+        "schema": "GI_I66_ACTIVE_OWNER_PLAN_CONTINUATION_V1",
+        "authorityPointer": "artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json#i66OperationalContinuation20261115",
+        "generation": 3,
+        "latestProvenLiveSource": "65c825b2808a615ca4195bdde6689dbdbe3193b2",
+        "latestPhysicalFrontendLiveReceipt": "artifacts/orbit360-recovery/release-control/I6_6_FRONTEND_E00003_RECEIPT.json",
+        "currentPhysicalFrontend": {
+          "generation": 3,
+          "sourceSha": "65c825b2808a615ca4195bdde6689dbdbe3193b2",
+          "buildId": "gi-i66-65c825b2808a-57f234755dc1",
+          "artifactId": 14873426438,
+          "artifactDigest": "sha256:7cb782848a45083047c4899bc30c13bf5be46429607e42597d09342becfc9acc",
+          "hostingVersion": "sites/ays-orbit-360-lab/versions/332999a55b189108"
+        },
+        "evidencePath": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_EXECUTION_PROGRESS_20261124_R52.json",
+        "evidenceGitBlobSha": "10faab5be261aaf72dad8886cdd60b2808f4c69c",
+        "activeGate": "I6.6",
+        "currentWork": "I6.6: build immutable v24 from signed source a26e2bffd87d2c700e102c7e989eda20aa562772 with the two Direction-reported direct form fixes. Verify224-file Hosting readback, deploy exact five Preview functions and execute fresh Make1-5 then all signed UI including direct forms. Keep transport stable for48 financial Preview checks, promote the same artifact and prove signed LIVE direct saves, reload/replay/restoration and48 LIVE balance checks. Complete committed Make activation after proof; preserve all155 payment application results and finish exact MAPFRE canonical applications through a legitimate signed session.",
+        "nextAction": "I6.6: build immutable v24 from signed source a26e2bffd87d2c700e102c7e989eda20aa562772 with the two Direction-reported direct form fixes. Verify224-file Hosting readback, deploy exact five Preview functions and execute fresh Make1-5 then all signed UI including direct forms. Keep transport stable for48 financial Preview checks, promote the same artifact and prove signed LIVE direct saves, reload/replay/restoration and48 LIVE balance checks. Complete committed Make activation after proof; preserve all155 payment application results and finish exact MAPFRE canonical applications through a legitimate signed session.",
+        "frontendPreviewRequest": {
+          "version": 24,
+          "sourceQaHead": "a26e2bffd87d2c700e102c7e989eda20aa562772",
+          "sourceQaRunId": 45447374799,
+          "guardRunId": 45447374897
         }
       }
     }

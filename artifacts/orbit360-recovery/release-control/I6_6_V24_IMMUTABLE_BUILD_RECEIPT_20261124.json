@@ -1,0 +1,53 @@
+{
+  "schema": "GI_I66_V24_IMMUTABLE_BUILD_AND_EXACT_PREVIEW_READBACK_RECEIPT_V1",
+  "status": "IMMUTABLE_BUILD_AND_HOSTING_PREVIEW_READBACK_PASS_BACKEND_AND_DIRECT_FORMS_UI_PENDING",
+  "activeGate": "I6.6",
+  "sourceSha": "60ac1ae2d765484ed40c820a942dcc0966385da7",
+  "buildId": "gi-i66-60ac1ae2d765-57f234755dc1",
+  "buildRunId": 45448470011,
+  "jobId": 138638866192,
+  "buildConclusion": "success",
+  "artifactId": 14947396076,
+  "artifactDigest": "sha256:bb660ae7e6e97f9d83ea20b576d1a38bbd9ea5a691c27622a53a9eb50ef8330e",
+  "innerPackageSha256": "580ead8df4eb4d4253dd5cd490d4f7c80711a522949090e60880239f0bcdbd6c",
+  "previewUrl": "https://ays-orbit-360-lab--gi-i66-rc-45448470011-hrham9ah.web.app",
+  "previewChannel": "gi-i66-rc-45448470011",
+  "siteFileCount": 224,
+  "readback": {
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_V24_IMMUTABLE_PACKAGE_READBACK_20261124.json",
+    "receiptGitBlobSha": "1e28bddb3315e48295133ba74e4aa6502983eaa5",
+    "reportSha256": "41bd578511ea767cfe60237d26d12baa9bfa9acfd19fdc9cea316a5efd504092",
+    "artifactId": 14948041419,
+    "artifactDigest": "sha256:655dccc8f44c4e5edf056cda2dc7604b170547f690bdb5030c75b0e3438a05a0",
+    "matchedFiles": 224,
+    "liveFingerprints": [
+      {
+        "label": "FIREBASE_LIVE",
+        "status": "PASS",
+        "beforeSha256": "7a9a23d24f80cbb31858fdc5b3836b703f2f2120911e2f1dca8bfb5c2c92bb84",
+        "afterSha256": "7a9a23d24f80cbb31858fdc5b3836b703f2f2120911e2f1dca8bfb5c2c92bb84"
+      },
+      {
+        "label": "STAFF_LIVE",
+        "status": "PASS",
+        "beforeSha256": "7a9a23d24f80cbb31858fdc5b3836b703f2f2120911e2f1dca8bfb5c2c92bb84",
+        "afterSha256": "7a9a23d24f80cbb31858fdc5b3836b703f2f2120911e2f1dca8bfb5c2c92bb84"
+      }
+    ]
+  },
+  "sourceQa": {
+    "head": "a26e2bffd87d2c700e102c7e989eda20aa562772",
+    "runId": 45447374799,
+    "guardRunId": 45447374897,
+    "conclusion": "success"
+  },
+  "directFormsReceipt": "artifacts/orbit360-recovery/release-control/I6_6_DIRECT_RENEWAL_AND_ISSUED_ENDORSEMENT_CAUSAL_SOURCE_20261124.json",
+  "directFormsReceiptBlob": "844dac30f829bbac5b5a1b4f960cf2d41de03061",
+  "priorV23FullSignedPreviewPreserved": true,
+  "artifactPatched": false,
+  "backendPreviewAccepted": false,
+  "financialPreview48Accepted": false,
+  "liveAccepted": false,
+  "fullI66Accepted": false,
+  "acceptedProductionRemains": "E3"
+}
