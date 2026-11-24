@@ -1,0 +1,127 @@
+{
+  "schema": "GI_I66_SAME_ARTIFACT_PREVIEW_PROBE_RETRY_V1",
+  "recordType": "SUBORDINATE_COMPENSATION_EVIDENCE_NOT_RELEASE_ACCEPTANCE",
+  "recordedAtUtc": "2026-11-24T11:38:04.852Z",
+  "status": "EXACT_COMPENSATION_VERIFIED_SAME_V20_NEW_CLOSED_NONCE_AUTHORIZED",
+  "activeGate": "I6.6",
+  "reviewedHead": "f1c404901daf8447592ec8e0d58730d376b8e1d9",
+  "withdrawalReceipt": {
+    "path": "artifacts/orbit360-recovery/release-control/I6_6_V20_EXPIRED_CLOSED_PROBE_SCOPE_WITHDRAWAL_20261124.json",
+    "gitBlobSha": "3a10ba0182b6a1157a446816fadd0066ddb728d6"
+  },
+  "completedRun": {
+    "runId": 45383695751,
+    "jobId": 138409204371,
+    "runConclusion": "failure",
+    "failedStep": "Observe the existing Make Firestore connection through the closed trigger",
+    "failureDisposition": "EXPECTED_SCOPE_WITHDRAWAL",
+    "compensationStep": "Close machine ingress and compensate its exact Preview trigger on failure",
+    "compensationConclusion": "success",
+    "compensationStartedAtUtc": "2026-11-24T11:35:37Z",
+    "compensationCompletedAtUtc": "2026-11-24T11:35:52Z"
+  },
+  "evidenceArtifact": {
+    "artifactId": 14915747405,
+    "digest": "sha256:b487ed400a5b8b567e7d14c49046cbe71a5611a7a61a56561f08c98e4ea55732",
+    "downloadSha256Verified": true,
+    "file": "gi-make-preview-rollback.json",
+    "reportSha256": "113d67892c067149cd64205ee745d5b37e1cd11850fc2ed6dd34f7472023c67c"
+  },
+  "makePreparationMethod": {
+    "schema": "GI_I66_MAKE_ROOT_ROTATION_PROVIDER_VERIFICATION_V1",
+    "reportSha256": "cfa4d19638178151d3fe865fd9358efb35ab11af9915dd0f5d70f720497915f2",
+    "scenarioId": 10196136,
+    "observedProbeRootModule": 3,
+    "observedProbeTopology": [
+      3,
+      1,
+      2
+    ],
+    "restoredOriginalTopology": [
+      1,
+      2,
+      3
+    ],
+    "writerDisabledOnBothReadbacks": true,
+    "queueWrites": 0,
+    "manualRuns": 0,
+    "providerReadbackObservedAtUtc": "2026-11-24T11:36:27.202Z",
+    "supersedesEarlierPreparationOnly": "Use proven deterministic root3→1→2 with original2filter and restore1→2→3; no dependency on Green API bundle count."
+  },
+  "compensation": {
+    "schema": "GI_I66_MAKE_RELEASE_COMPENSATION_V1",
+    "phase": "preview",
+    "sourceSha": "48a7a6d4379759b6f32c7f2435e8e37c724989cc",
+    "artifactDigest": "sha256:531fddd76a010377bd9aa6c652d737dc584a99edc573c2aca313b56fd7efa405",
+    "status": "COMPENSATION_READBACK_VERIFIED",
+    "configuration": {
+      "status": "CLOSED_CONFIG_READBACK_VERIFIED",
+      "configurationWrites": 0
+    },
+    "trigger": {
+      "status": "EXACT_CREATED_FUNCTION_DELETED_ABSENCE_VERIFIED",
+      "functionDeletes": 1
+    },
+    "secretIam": null,
+    "canonicalLeadWrites": 0,
+    "externalMessagesSent": 0,
+    "failures": []
+  },
+  "finalPreviewPreimage": {
+    "configurationState": "CLOSED",
+    "configurationEnabled": false,
+    "configurationDigest": "1a0942d33cc932fb3fc83d55291efbd0d86000ffe51030fb71c3a7fc07703b34",
+    "digestEvidence": "Rollback closeForRollback compared the actual server grant with the initialized digest and verified CLOSED with zero further configuration writes.",
+    "trigger": {
+      "name": "orbit360MakeLeadIngressPreview",
+      "region": "us-east1",
+      "state": "ABSENT",
+      "revision": null
+    }
+  },
+  "priorReadonlyPreimageEvidence": {
+    "path": "artifacts/orbit360-recovery/release-control/I6_6_MAKE_INGRESS_RUNTIME_AND_PREIMAGE_READBACK_20261124.json",
+    "gitBlobSha": "890d42d46af9bc472dd40dfffea99fe35ce18744",
+    "runId": 45370280964,
+    "jobId": 138362497190,
+    "reportDigest": "03066f345f44da40d839170085de9886ab5d74c85ca3fc084b2884a82ff841b1"
+  },
+  "retry": {
+    "sourceSha": "48a7a6d4379759b6f32c7f2435e8e37c724989cc",
+    "artifactId": 14913484604,
+    "artifactDigest": "sha256:531fddd76a010377bd9aa6c652d737dc584a99edc573c2aca313b56fd7efa405",
+    "buildId": "gi-i66-48a7a6d43797-57f234755dc1",
+    "buildRunId": 45382606064,
+    "previewUrl": "https://ays-orbit-360-lab--gi-i66-rc-45382606064-6302t2f6.web.app",
+    "priorPreviewClosedConfiguration": {
+      "expectedDigest": "ABSENT",
+      "nonce": "ba1c41df50659128197ff0506ba32b0010cb11d13240f547beb5b7a4c4b42b46"
+    },
+    "newPreviewClosedConfiguration": {
+      "expectedDigest": "1a0942d33cc932fb3fc83d55291efbd0d86000ffe51030fb71c3a7fc07703b34",
+      "nonce": "935e15f15bce60f1b788458142239cbfc03e02b9e01341b75e667510eeef2c0c"
+    },
+    "liveClosedConfigurationPreserved": {
+      "expectedDigest": "ABSENT",
+      "nonce": "dcb020ddf46eac10d5bc2a0b315a4d8e50bb9838fb2eb14dce9f756f7c2182fb"
+    },
+    "liveTargetBeforePreserved": {
+      "name": "orbit360MakeLeadIngress",
+      "region": "us-central1",
+      "state": "ABSENT",
+      "revision": null
+    },
+    "sameImmutableArtifact": true,
+    "sourceChanges": 0,
+    "artifactMutations": 0,
+    "newBuildRequired": false,
+    "restoreOriginalMakeScenarioAfterProbe": true,
+    "realIngressActivationAllowed": false
+  },
+  "previewSecretIamDisposition": "No secret-IAM transition occurs in phase preview; the canonical rollback records null. Project IAM was independently read back unchanged by initialization.",
+  "newSignedBackendPreviewAccepted": false,
+  "financialPreview48Accepted": false,
+  "newLiveAcceptance": false,
+  "modulePassAdded": false,
+  "realCustomerOrFinancialWrites": 0
+}
