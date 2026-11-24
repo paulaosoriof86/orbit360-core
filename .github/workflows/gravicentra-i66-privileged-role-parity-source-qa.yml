@@ -137,8 +137,6 @@ jobs:
     timeout-minutes: 16
     env:
       I66_SIX_REQUIRE_REAL_DOM: '1'
-      NODE_PATH: ${{ runner.temp }}/gi-i66-detach-deps/node_modules
-      PLAYWRIGHT_BROWSERS_PATH: ${{ runner.temp }}/gi-i66-detach-browsers
     steps:
       - uses: actions/checkout@v4
         with:
@@ -147,6 +145,13 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
+      - name: Prepare isolated runtime paths after runner allocation
+        run: |
+          set -euo pipefail
+          {
+            printf 'NODE_PATH=%s\n' "$RUNNER_TEMP/gi-i66-detach-deps/node_modules"
+            printf 'PLAYWRIGHT_BROWSERS_PATH=%s\n' "$RUNNER_TEMP/gi-i66-detach-browsers"
+          } >> "$GITHUB_ENV"
       - name: Install pinned Chromium driver for isolated synthetic DOM proof
         run: |
           set -euo pipefail
