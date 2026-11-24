@@ -1739,6 +1739,28 @@
           }
         }
       }
+    },
+    "acceptedLivePerformanceTimelineRequest20261124": {
+      "status": "REQUESTED_READONLY_SOURCE_TIMELINE_ON_ACCEPTED_E3",
+      "requestedAtUtc": "2026-11-24T00:41:57.052718Z",
+      "qaSourceSha": "2309ddd27cba10725f7cce5a778afed505dbd1c4",
+      "target": {
+        "generation": 3,
+        "sourceSha": "65c825b2808a615ca4195bdde6689dbdbe3193b2",
+        "buildId": "gi-i66-65c825b2808a-57f234755dc1",
+        "buildRunId": 45287432665,
+        "artifactId": 14873426438,
+        "artifactDigest": "sha256:7cb782848a45083047c4899bc30c13bf5be46429607e42597d09342becfc9acc",
+        "hostingVersion": "sites/ays-orbit-360-lab/versions/332999a55b189108",
+        "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_FRONTEND_E00003_RECEIPT.json",
+        "receiptGitBlobSha": "11fdb3bee494541513482666d6215f45cbad0567",
+        "receiptCommit": "f80c37e174406ccb489569b3bc7dd6073c2c4273"
+      },
+      "mode": "performance",
+      "purpose": "Discriminate existing Cobros source-ready versus DOM-ready duration and the three observed optional source errors; no product, business or release writes.",
+      "previousMeasuredRunId": 45294264139,
+      "financialSixReceiptsSeparateHoldRunId": 45298628820,
+      "writesAuthorized": false
     }
   },
   "b4003ActiveCertificationCursor20261106": {
