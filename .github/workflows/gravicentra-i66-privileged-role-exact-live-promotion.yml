@@ -403,6 +403,9 @@ jobs:
           node tools/gravicentra-i6-6-carlos-paula-live-synthetic-ops-leads-uat.cjs
           I66_PREVIEW_ORIGIN=https://app.aysseguros.com I66_SIGNED_TEST_LIVE=true node tools/gravicentra-i6-6-advisor-payables-signed-uat.cjs
           I66_PREVIEW_ORIGIN=https://app.aysseguros.com I66_SIGNED_TEST_LIVE=true node tools/gravicentra-i6-6-proposal-application-signed-uat.cjs
+          if test "$I66_DIRECT_FORMS_QA" = true; then
+            I66_RENEWAL_QA_PHASE=LIVE node tools/gravicentra-i6-6-carlos-paula-live-direct-renewal-synthetic-uat.cjs
+          fi
           node "$FIREBASE_CLI_BIN" functions:list --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/gi-role-live-functions-after.json"
           node - <<'LIVE_INVENTORY'
           const assert=require('node:assert/strict');
@@ -479,6 +482,7 @@ jobs:
           path: |
             ${{ runner.temp }}/i66-role-live-exact-proof.json
             ${{ runner.temp }}/gravicentra-i66-advisor-payables-signed-uat-live.json
+            ${{ runner.temp }}/gi-i66-direct-forms-live.json
             ${{ env.I66_PACKAGE_ROOT }}/evidence/i66-proposal-application-signed-uat-live.json
             ${{ runner.temp }}/gi-make-live-*.json
           retention-days: 30

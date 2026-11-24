@@ -3,7 +3,7 @@
    - elimina estimaciones presentadas como propuestas;
    - prepara campañas sin simular envíos;
    - Propuestas crea gestión en Ops; no redirige al Cotizador;
-   - Renovar registra aprobación y crea gestión de renovación aceptada en Ops;
+   - Renovar abre la ficha heredada; aprobación y gestión se confirman al guardar;
    - Cotizar directamente es una acción separada para roles operativos superiores;
    - KPI con detalle y monedas separadas.
    ============================================================ */
@@ -195,35 +195,27 @@ Orbit.modules = Orbit.modules || {};
     window.__orbitRenewalContext=renewalContext(p,null);
     location.hash='#/cotizador?renueva='+encodeURIComponent(p.id);
   }
-  // Emisión ya recibida: registrar la aceptación en el dueño canónico de Ops
-  // y abrir inmediatamente el formulario de nueva póliza, sin ficha intermedia.
-  // La gestión persiste para trazabilidad incluso si se cancela el formulario.
+  // La ficha heredada es un borrador, no una afirmación de emisión. Una vencida
+  // con renovabilidad pendiente puede revisarse aquí; NO, conflictos y sucesoras
+  // siguen bloqueados. La aprobación y su gestión durable se exigen al guardar.
   function registrarEnFirmeDirectamente(p) {
     if(!canDirectRenewal()||!Orbit.ciclo||typeof Orbit.ciclo.crearGestionDurable!=='function')
       return U.toast('No está disponible la renovación directa segura para tu rol.');
-    const b=modal('renewal-direct-approval-v1201','Renovación emitida · '+p.numero,
-      '<div class="cfg-note">Si ya recibiste la renovación de la aseguradora, confirma la aprobación del cliente. Al continuar se abrirá directamente la nueva póliza. La gestión se guardará automáticamente para consulta en Ops, sin que debas pasar por allí.</div>'+
-      '<label class="ce-l" style="display:block;margin-top:12px">Medio o referencia de la aprobación (opcional)<textarea id="ren-direct-approval-note" class="o-sel" rows="2" placeholder="Correo, WhatsApp, aprobación del cliente…"></textarea></label>'+
-      '<label style="display:flex;gap:9px;align-items:flex-start;margin-top:14px"><input type="checkbox" id="ren-direct-approval-confirm"><span>Confirmo que el cliente aprobó esta renovación y cuento con soporte verificable.</span></label>',
-      '<button class="btn primary" data-direct-confirm>Continuar a la póliza emitida</button>');
-    const btn=b.querySelector('[data-direct-confirm]');
-    btn.onclick=async()=>{
-      if(!b.querySelector('#ren-direct-approval-confirm').checked)
-        return U.toast('Confirma la aprobación del cliente antes de continuar.');
-      if(btn.disabled)return;
-      btn.disabled=true;const original=btn.textContent;btn.textContent='Registrando aprobación…';
-      try{
+    const managementId='ges'+Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+    return Orbit.renewalDirect.open({sourcePolicyId:p.id,polizaId:p.id,
+      workflowType:'renewal_accepted',acceptedConfirmed:false},{
+      confirmAcceptance:async note=>{
         const current=S().get('polizas',p.id);
-        if(!current||!A.canView('polizas',current,'renovaciones')||!active(current)||!canDirectRenewal())
+        if(!current||!A.canView('polizas',current,'renovaciones')||
+          !(active(current)||overdueReviewAllowed(current))||!canDirectRenewal())
           throw new Error('RENEWAL_SOURCE_NO_LONGER_ACTIONABLE');
         if(!Orbit.cat||typeof Orbit.cat.ensure!=='function')throw new Error('RENEWAL_CATALOG_UNAVAILABLE');
         await Orbit.cat.ensure();
         let g=existingManagement(current.id,'renewal_accepted');
         if(g&&g.acceptedConfirmed!==true)throw new Error('RENEWAL_APPROVAL_CONFLICT');
         if(!g){
-          const note=String(b.querySelector('#ren-direct-approval-note').value||'').trim();
           g=await Orbit.ciclo.crearGestionDurable({
-            id:'ges'+Date.now().toString(36)+Math.random().toString(36).slice(2,7),
+            id:managementId,
             clienteId:current.clienteId,polizaId:current.id,sourcePolicyId:current.id,
             tipo:'Renovación aceptada',titulo:'Renovación aceptada · '+current.numero,
             lista:'Renovaciones / Modif.',estado:'Pendiente',prioridad:'Alta',
@@ -240,13 +232,9 @@ Orbit.modules = Orbit.modules || {};
         if(!g||!g.id||g.acceptedConfirmed!==true||!S().get('gestiones',g.id))
           throw new Error('RENEWAL_MANAGEMENT_READBACK_MISSING');
         window.__orbitRenewalContext=renewalContext(current,g);
-        b.remove();Orbit.renewalDirect.open(g);
-      }catch(error){
-        btn.disabled=false;btn.textContent=original;
-        U.toast('No se confirmó la gestión o su acceso. Revisa la aprobación y reintenta; no se creó una póliza.');
+        return g;
       }
-    };
-    return b;
+    });
   }
 
   function registrarAceptacionGestion(p,existing,direct) {
@@ -309,13 +297,14 @@ Orbit.modules = Orbit.modules || {};
   function registrarAceptacion(policyId) {
     const p=S().get('polizas',policyId);
     if(!p||!A.canView('polizas',p,'renovaciones'))return U.toast('Póliza fuera de tu alcance');
-    if(!active(p)){if(overdueReviewAllowed(p))return openOverdueReview(p,'accept');return U.toast('No hay aceptación de renovación acreditada para esta versión.');}
+    const review=overdueReviewAllowed(p);
+    if(!active(p)&&!(review&&canDirectRenewal())){if(review)return openOverdueReview(p,'accept');return U.toast('No hay aceptación de renovación acreditada para esta versión.');}
     const existing=existingManagement(p.id,'renewal_accepted');
     if(!canDirectRenewal())return registrarAceptacionGestion(p,existing,false);
     const b=modal('renewal-decision-v1200','Renovar · '+p.numero,
-      '<div class="cfg-note">Selecciona el resultado real. La renovación en firme exige número nuevo de póliza, vigencias, aprobación del cliente y soporte documental; no se crea una póliza sin esos datos.</div>',
+      '<div class="cfg-note">Selecciona el resultado real. La renovación en firme exige el número de póliza emitido, vigencias, aprobación del cliente y soporte documental; no se crea una póliza sin esos datos.</div>',
       '<button class="btn ghost" data-management>Crear gestión de renovación</button><button class="btn primary" data-direct>Registrar renovación en firme</button>');
-    b.querySelector('[data-management]').onclick=()=>{b.remove();registrarAceptacionGestion(p,existing,false);};
+    b.querySelector('[data-management]').onclick=()=>{b.remove();if(review)return openOverdueReview(p,'accept');registrarAceptacionGestion(p,existing,false);};
     b.querySelector('[data-direct]').onclick=()=>{b.remove();registrarAceptacionGestion(p,existing,true);};
   }
   function campana() {

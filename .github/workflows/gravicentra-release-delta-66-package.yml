@@ -62,6 +62,8 @@ on:
       - artifacts/orbit360-recovery/release-control/I6_6_DOCUMENTED_PREMIUM_CALENDAR_SOURCE_QA_20261117.json
       - tools/gravicentra-i6-6-preview-current-live-restore.cjs
       - tools/gravicentra-i6-6-operational-release-candidate.cjs
+      - tools/gravicentra-i6-6-carlos-paula-live-direct-renewal-synthetic-uat.cjs
+      - tools/gravicentra-i6-6-direct-forms-signed-driver.test.cjs
       - tools/gravicentra-i6-6-preview-candidate-binding.test.cjs
       - tools/gravicentra-i66-privileged-role-signed-ui-permissions-readonly.cjs
       - tools/gravicentra-i66-privileged-role-exact-live-transport.mjs

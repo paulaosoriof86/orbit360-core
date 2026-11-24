@@ -43,6 +43,7 @@ const DRIVERS = Object.freeze([
   'tools/gravicentra-i6-6-advisor-payables-signed-uat.cjs',
   'tools/gravicentra-i6-6-proposal-application-signed-uat.cjs'
 ]);
+const DIRECT_FORMS_DRIVER='tools/gravicentra-i6-6-carlos-paula-live-direct-renewal-synthetic-uat.cjs';
 const PROPOSAL_QA_ISOLATION = Object.freeze({
   tenantId:'alianzas-soluciones',runIdPrefix:'cobledgerqa_',entityIdPrefix:'b3005qa_',
   runCollection:'cobrosLedgerQaRuns',controlCollection:'cobrosLedgerQaControl',
@@ -57,7 +58,8 @@ const ADVISOR_QA_ISOLATION = Object.freeze({
 });
 const PINNED_OWNER_PATHS = Object.freeze([
   'functions','orbit360-platform','firebase.json','firestore.rules','storage.rules',
-  ...DRIVERS,'tools/gravicentra-i6-6-carlos-paula-live-synthetic-ops-leads-uat.cjs',
+  ...DRIVERS,DIRECT_FORMS_DRIVER,'tools/gravicentra-i6-6-direct-forms-signed-driver.test.cjs',
+  'tools/gravicentra-i6-6-carlos-paula-live-synthetic-ops-leads-uat.cjs',
   'tools/gravicentra-i6-6-startup-readiness-diagnostics.cjs',
   'tools/gravicentra-i6-6-startup-readiness-diagnostics.test.cjs',
   'tools/gravicentra-i6-6-advisor-startup-diagnostics.test.cjs',
@@ -307,6 +309,7 @@ function candidateForPhase(control,phase) {
     assert.notEqual(p.sourceSha,p.currentPhysicalLive.sourceSha,'I66_MAKE_ALREADY_LIVE');
   }
   assert.deepEqual(p.requiredPreviewDrivers,DRIVERS,'I66_OPERATIONAL_QA_DRIVER_SCOPE_DRIFT');
+  if(p.directFormsQa!==undefined)assert.equal(p.directFormsQa,true,'I66_DIRECT_FORMS_QA_PROFILE_INVALID');
   assert.equal(p.sameImmutableArtifactOnly,true);
   assert.equal(p.syntheticRecordsOnly,true);
   assert.equal(p.noRealFinancialOrCustomerWrites,true);
@@ -389,11 +392,15 @@ function validateProof(p,proof) {
   assert.equal(proof.realFinancialOrCustomerWrites,0);assert.equal(proof.syntheticRestoreComplete,true);
   assert.equal(proof.liveHostingUnchanged,true);assert.equal(proof.liveBackendUnchanged,true);
   if(makeScope.isMake(p))makeScope.validatePreviewProof(p,proof.makeIngress);
-  assert.deepEqual(Object.keys(proof.focusedReports||{}).sort(),['advisorPayables','proposalApplication']);
+  assert.deepEqual(Object.keys(proof.focusedReports||{}).sort(),p.directFormsQa===true?['advisorPayables','directForms','proposalApplication']:['advisorPayables','proposalApplication']);
   for(const report of Object.values(proof.focusedReports)){
     assert.equal(report.status,'PASS');assert.equal(report.cleanup,'PASS');
     assert.ok(Number.isSafeInteger(report.checks)&&report.checks>0);
     checkDigest(report.digest,'I66_OPERATIONAL_FOCUSED_REPORT_DIGEST_REQUIRED');
+  }
+  if(p.directFormsQa===true){
+    assert.equal(proof.focusedReports.directForms.phase,'PREVIEW');
+    assert.equal(proof.focusedReports.directForms.coverage,'SIGNED_PUBLIC_ENTRIES_READONLY');
   }
   if(p.signedObservabilityProfile===SIGNED_OBSERVABILITY_PROFILE){
     assert.deepEqual(proof.focusedReports.advisorPayables.observability,
@@ -451,7 +458,16 @@ function focusedReportsFromDisk(p,phase,env=process.env){
   const reports=Object.fromEntries(Object.entries(bytes).map(([k,b])=>[k,JSON.parse(b)]));
   validateFocusedReports(p,phase,reports.advisorPayables,reports.proposalApplication);
   const observability=signedObservabilityReports(p,reports.advisorPayables,reports.proposalApplication);
-  return Object.fromEntries(Object.entries(reports).map(([key,r])=>[key,{status:r.status,cleanup:r.cleanup.status,checks:r.checks.length,digest:'sha256:'+crypto.createHash('sha256').update(bytes[key]).digest('hex'),...(observability?{observability:observability[key]}:{})}]));
+  const focused=Object.fromEntries(Object.entries(reports).map(([key,r])=>[key,{status:r.status,cleanup:r.cleanup.status,checks:r.checks.length,digest:'sha256:'+crypto.createHash('sha256').update(bytes[key]).digest('hex'),...(observability?{observability:observability[key]}:{})}]));
+  if(p.directFormsQa===true){
+    const raw=fs.readFileSync(path.join(env.RUNNER_TEMP,'gi-i66-direct-forms-'+phase.toLowerCase()+'.json'));
+    const direct=JSON.parse(raw);
+    require('./gravicentra-i6-6-carlos-paula-live-direct-renewal-synthetic-uat.cjs').validateSignedReport(direct,{phase,sourceSha:p.sourceSha,buildId:p.buildId});
+    focused.directForms={status:'PASS',cleanup:'PASS',checks:direct.actors.reduce((n,a)=>n+a.entries.length+1,0),
+      digest:'sha256:'+crypto.createHash('sha256').update(raw).digest('hex'),phase,
+      coverage:phase==='PREVIEW'?'SIGNED_PUBLIC_ENTRIES_READONLY':'SIGNED_NORMAL_UI_SAVE_READBACK_RELOAD_REPLAY_RESTORE'};
+  }
+  return focused;
 }
 function verifyPinnedOwners(p) {
   if(makeScope.isMake(p))makeScope.verifySourcePins(p);
@@ -467,6 +483,7 @@ async function fetchJson(url){
   assert.ok(r.ok,'I66_OPERATIONAL_PROOF_API_UNAVAILABLE');return r.json();
 }
 function envFor(p){return {
+  I66_DIRECT_FORMS_QA:String(p.directFormsQa===true),I66_LIVE_ORIGIN:LIVE,
   I66_MAKE_INGRESS:String(makeScope.isMake(p)),I66_MAKE_TRIGGER_PREVIOUS_STATE:makeScope.isMake(p)?p.makeIngress.targetBefore.live.state:'',
   I66_OPERATIONAL_CANDIDATE:'true',SOURCE_SHA:p.sourceSha,I66_SOURCE_SHA:p.sourceSha,
   SOURCE_PACKAGE_RUN:p.buildRunId,SOURCE_ARTIFACT_ID:p.artifactId,SOURCE_ARTIFACT_DIGEST:p.artifactDigest,
@@ -533,10 +550,14 @@ function validateLiveProof(p,proof){
   }
   if(makeScope.isMake(p))makeScope.validateLiveProof(p,proof);
   const focus=proof.focusedReports||{};
-  assert.deepEqual(Object.keys(focus).sort(),['advisorPayables','proposalApplication']);
+  assert.deepEqual(Object.keys(focus).sort(),p.directFormsQa===true?['advisorPayables','directForms','proposalApplication']:['advisorPayables','proposalApplication']);
   for(const report of Object.values(focus)){
     assert.equal(report.status,'PASS');assert.equal(report.cleanup,'PASS');
     assert.ok(Number.isSafeInteger(report.checks)&&report.checks>0);checkDigest(report.digest,'I66_OPERATIONAL_LIVE_FOCUSED_DIGEST');
+  }
+  if(p.directFormsQa===true){
+    assert.equal(focus.directForms.phase,'LIVE');
+    assert.equal(focus.directForms.coverage,'SIGNED_NORMAL_UI_SAVE_READBACK_RELOAD_REPLAY_RESTORE');
   }
   assert.equal(p.signedObservabilityProfile,SIGNED_OBSERVABILITY_PROFILE);
   assert.deepEqual(focus.advisorPayables.observability,{profile:SIGNED_OBSERVABILITY_PROFILE,status:'PASS',unexpectedConsoleErrors:0,unexpectedHttpErrors:0,pageErrorCount:0,telemetryFailures:0});

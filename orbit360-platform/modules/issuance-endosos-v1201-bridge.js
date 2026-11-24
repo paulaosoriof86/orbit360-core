@@ -5,7 +5,7 @@
    - Propuestas → gestión en Ops; Cotizar es acción separada por rol.
    - Renovar → gestión de renovación aceptada en Ops.
    - Ops decide solicitar emisión o registrar renovación en firme.
-   - Endoso → gestión aprobable, no edición directa.
+   - Endoso solicitado o emitido → mismo dueño canónico con aprobación y auditoría.
    - Ops muestra controles de emisión/endoso en la ficha de gestión.
    ============================================================ */
 window.Orbit = window.Orbit || {};
@@ -366,9 +366,22 @@ Orbit.modules = Orbit.modules || {};
     };
   }
 
-  function endorsementProposalFromForm(b, type) {
+  function beneficiaryLabel(value, index) {
+    if(!value||typeof value!=='object')return String(value==null?'':value);
+    const name=value.nombre||value.nombreCompleto||value.name||value.beneficiario||('Beneficiario registrado '+(index+1));
+    const percentage=value.porcentaje!=null?value.porcentaje:value.participacion;
+    return [name,value.parentesco,percentage!=null&&String(percentage).trim()!==''?String(percentage)+'%':''].filter(Boolean).join(' · ');
+  }
+  function endorsementProposalFromForm(b, type, policy) {
     if (type === 'sustitucion_vehiculo') return { vehiculoId: (b.querySelector('#end-current') || {}).value || '', nuevoVehiculo: { marca: b.querySelector('#end-marca').value.trim(), linea: b.querySelector('#end-linea').value.trim(), anio: b.querySelector('#end-anio').value, placa: b.querySelector('#end-placa').value.trim(), chasis: b.querySelector('#end-chasis').value.trim(), motor: b.querySelector('#end-motor').value.trim() }, nota: b.querySelector('#end-note').value.trim() };
-    if (type === 'beneficiarios') return { beneficiarios: b.querySelector('#end-benef').value.split(/\n+/).map(x => x.trim()).filter(Boolean), nota: b.querySelector('#end-note').value.trim() };
+    if (type === 'beneficiarios') {
+      const previous=[].concat(policy&&policy.beneficiarios||[]);
+      const values=b.querySelector('#end-benef').value.split(/\n+/).map(x=>x.trim()).filter(Boolean);
+      return {beneficiarios:values.map(text=>{
+        const matches=previous.filter((value,index)=>beneficiaryLabel(value,index)===text);
+        return matches.length===1?matches[0]:text;
+      }),nota:b.querySelector('#end-note').value.trim()};
+    }
     if (type === 'forma_pago') return { frecuencia: b.querySelector('#end-freq').value, formaPago: b.querySelector('#end-form').value.trim(), cuotas: +b.querySelector('#end-cuotas').value || 1, conducto: b.querySelector('#end-conduct').value.trim(), nota: b.querySelector('#end-note').value.trim() };
     if (type === 'datos_riesgo') return { patch: { direccionRiesgo: b.querySelector('#end-dir').value.trim(), contactoRiesgo: b.querySelector('#end-contact').value.trim(), observacionesRiesgo: b.querySelector('#end-obs').value.trim() }, nota: b.querySelector('#end-note').value.trim() };
     return { nota: b.querySelector('#end-note').value.trim() };
@@ -378,35 +391,44 @@ Orbit.modules = Orbit.modules || {};
       const vehicles = (S().all('vehiculos') || []).filter(v => v.polizaId === policy.id && String(v.estado || '').toLowerCase() !== 'histórico');
       return `<div class="cgrid"><label class="ce-l">Vehículo actual<select id="end-current" class="o-sel"><option value="">— Identificar automáticamente —</option>${vehicles.map(v => `<option value="${esc(v.id)}">${esc([v.marca,v.linea,v.placa].filter(Boolean).join(' · '))}</option>`).join('')}</select></label><label class="ce-l">Marca nuevo vehículo<input id="end-marca" class="o-sel"></label><label class="ce-l">Línea<input id="end-linea" class="o-sel"></label><label class="ce-l">Año<input id="end-anio" type="number" class="o-sel"></label><label class="ce-l">Placa<input id="end-placa" class="o-sel"></label><label class="ce-l">Chasis<input id="end-chasis" class="o-sel"></label><label class="ce-l">Motor<input id="end-motor" class="o-sel"></label></div>`;
     }
-    if (type === 'beneficiarios') return '<label class="ce-l">Beneficiarios después del endoso<textarea id="end-benef" class="o-sel" style="min-height:100px" placeholder="Uno por línea"></textarea></label>';
-    if (type === 'forma_pago') return `<div class="cgrid"><label class="ce-l">Frecuencia<select id="end-freq" class="o-sel">${['Contado','Semestral','Cuatrimestral','Trimestral','Bimestral','Mensual'].map(x => `<option>${x}</option>`).join('')}</select></label><label class="ce-l">Cantidad de pagos<input id="end-cuotas" type="number" min="1" class="o-sel" value="1"></label><label class="ce-l">Forma de pago<input id="end-form" class="o-sel"></label><label class="ce-l">Conducto<input id="end-conduct" class="o-sel"></label></div>`;
-    if (type === 'datos_riesgo') return '<div class="cgrid"><label class="ce-l">Dirección del riesgo<input id="end-dir" class="o-sel"></label><label class="ce-l">Contacto del riesgo<input id="end-contact" class="o-sel"></label><label class="ce-l">Observaciones<input id="end-obs" class="o-sel"></label></div>';
+    if (type === 'beneficiarios') return `<label class="ce-l">Beneficiarios después del endoso<textarea id="end-benef" class="o-sel" style="min-height:100px" placeholder="Uno por línea">${esc([].concat(policy.beneficiarios||[]).map(beneficiaryLabel).join('\n'))}</textarea></label>`;
+    if (type === 'forma_pago') return `<div class="cgrid"><label class="ce-l">Frecuencia<select id="end-freq" class="o-sel">${['Contado','Semestral','Cuatrimestral','Trimestral','Bimestral','Mensual'].map(x => `<option ${x===policy.frecuencia?'selected':''}>${x}</option>`).join('')}</select></label><label class="ce-l">Cantidad de pagos<input id="end-cuotas" type="number" min="1" class="o-sel" value="${Math.max(1,+policy.cuotas||1)}"></label><label class="ce-l">Forma de pago<input id="end-form" class="o-sel" value="${esc(policy.formaPago||'')}"></label><label class="ce-l">Conducto<input id="end-conduct" class="o-sel" value="${esc(policy.conducto||'')}"></label></div>`;
+    if (type === 'datos_riesgo') return `<div class="cgrid"><label class="ce-l">Dirección del riesgo<input id="end-dir" class="o-sel" value="${esc(policy.direccionRiesgo||'')}"></label><label class="ce-l">Contacto del riesgo<input id="end-contact" class="o-sel" value="${esc(policy.contactoRiesgo||'')}"></label><label class="ce-l">Observaciones<input id="end-obs" class="o-sel" value="${esc(policy.observacionesRiesgo||'')}"></label></div>`;
     return '<div class="cfg-note">Este tipo se gestionará en Ops y no se aplicará automáticamente hasta que el tenant tenga reglas configuradas.</div>';
+  }
+  function directEndorsementAllowed(type) {
+    return E.canManage()&&['sustitucion_vehiculo','beneficiarios','forma_pago','datos_riesgo'].includes(type)&&E.typeDef(type)?.apply===true;
+  }
+  function sameEndorsementProposal(a,b) {
+    const stable=value=>Array.isArray(value)?value.map(stable):value&&typeof value==='object'?Object.fromEntries(Object.keys(value).sort().map(k=>[k,stable(value[k])])):value;
+    return JSON.stringify(stable(a||{}))===JSON.stringify(stable(b||{}));
   }
   function openEndorsementRequest(policyId) {
     const policy = S().get('polizas', policyId); if (!policy) return toast('Póliza no encontrada.');
     if (!A.canView('polizas', policy, 'cliente360')) return toast('Póliza fuera de tu alcance.');
     const types = E.typeDefs();
-    const body = `<div class="cfg-note" style="margin-bottom:12px">Si el endoso aún no fue emitido, crea la solicitud en Ops. Si la aseguradora ya emitió la sustitución, regístrala aquí y aplica el cambio sin tener que tramitar una gestión manual.</div><label class="ce-l">Tipo de endoso<select id="end-type" class="o-sel">${types.map(t => `<option value="${esc(t.id)}">${esc(t.label)}</option>`).join('')}</select></label><div id="end-dynamic" style="margin-top:12px"></div><label class="ce-l" style="margin-top:12px">Motivo / detalle<textarea id="end-note" class="o-sel" style="min-height:70px"></textarea></label><label class="ce-l" style="margin-top:10px">Documento inicial / endoso emitido<input id="end-doc" class="o-sel" placeholder="Referencia documental Drive; obligatoria para aplicación directa"></label><div id="end-direct-fields" style="margin-top:12px;display:none"><div class="cgrid"><label class="ce-l">Referencia del endoso emitido *<input id="end-direct-ref" class="o-sel"></label><label class="ce-l">Fecha efectiva *<input id="end-direct-date" type="date" class="o-sel" value="${esc(today())}"></label></div><small class="muted">La aplicación crea una trazabilidad interna cerrada, conserva el vehículo anterior como histórico y no obliga a navegar por Ops.</small></div>`;
-    const footer='<button class="btn ghost" data-create>Crear gestión Ops</button>'+
-      (E.canManage()?'<button class="btn primary" data-direct>Registrar sustitución ya emitida</button>':'');
+    const body = `<div class="cfg-note" style="margin-bottom:12px">Si el endoso aún no fue emitido, crea la solicitud en Ops. Si la aseguradora ya emitió el endoso, revisa los datos heredados y registra el cambio aquí con su soporte, referencia y fecha efectiva.</div><label class="ce-l">Tipo de endoso<select id="end-type" class="o-sel">${types.map(t => `<option value="${esc(t.id)}">${esc(t.label)}</option>`).join('')}</select></label><div id="end-dynamic" style="margin-top:12px"></div><label class="ce-l" style="margin-top:12px">Motivo / detalle<textarea id="end-note" class="o-sel" style="min-height:70px"></textarea></label><label class="ce-l" style="margin-top:10px">Documento inicial / endoso emitido<input id="end-doc" class="o-sel" placeholder="Referencia documental Drive; obligatoria para aplicación directa"></label><div id="end-direct-fields" style="margin-top:12px;display:none"><div class="cgrid"><label class="ce-l">Referencia del endoso emitido *<input id="end-direct-ref" class="o-sel"></label><label class="ce-l">Fecha efectiva *<input id="end-direct-date" type="date" class="o-sel" value="${esc(today())}"></label></div><small class="muted">La aplicación conserva el historial de la póliza y cierra su registro de trazabilidad. La sustitución también conserva el vehículo anterior como histórico.</small></div>`;
+    const footer='<button class="btn ghost" data-create>Solicitar endoso en Ops</button>'+
+      (E.canManage()?'<button class="btn primary" data-direct>Registrar endoso ya emitido</button>':'');
     const b = modal('endorsement-request-v1201','Endoso de póliza · ' + (policy.numero || ''),body,footer,720);
     const type = b.querySelector('#end-type'), dynamic = b.querySelector('#end-dynamic');
     const direct = b.querySelector('[data-direct]'), create = b.querySelector('[data-create]');
     const paint = () => {
       dynamic.innerHTML = endFields(type.value, policy);
-      const allowed=type.value==='sustitucion_vehiculo'&&E.canManage();
+      const allowed=directEndorsementAllowed(type.value);
+      if(direct)direct.textContent=type.value==='sustitucion_vehiculo'?'Registrar sustitución ya emitida':'Registrar endoso ya emitido';
       if(direct)direct.style.display=allowed?'':'none';
       b.querySelector('#end-direct-fields').style.display=allowed?'':'none';
     };
     type.onchange = paint; paint();
     const submit = async issued => {
-      if(issued&&!E.canManage())return toast('Tu rol activo no puede aplicar este endoso.');
+      if(create.disabled||direct&&direct.disabled)return;
+      if(issued&&!directEndorsementAllowed(type.value))return toast('Tu rol activo o este tipo de endoso no permiten aplicación directa.');
       const doc=b.querySelector('#end-doc').value.trim(),note=b.querySelector('#end-note').value.trim();
       const ref=b.querySelector('#end-direct-ref').value.trim(),date=b.querySelector('#end-direct-date').value;
       if(issued){
-        if(type.value!=='sustitucion_vehiculo')return toast('El registro directo está habilitado para sustituciones emitidas.');
         if(!doc||!ref||!date||!note)return toast('Indica documento, referencia, fecha efectiva y motivo del endoso emitido.');
+        if(type.value==='sustitucion_vehiculo'){
         const vehicles=(S().all('vehiculos')||[]).filter(v=>v.polizaId===policy.id&&String(v.estado||'').toLowerCase()!=='histórico');
         const selectedCurrent=b.querySelector('#end-current').value;
         if((vehicles.length>1&&!selectedCurrent)||(!vehicles.length&&!policy.vehiculoId))
@@ -414,15 +436,21 @@ Orbit.modules = Orbit.modules || {};
         if(![b.querySelector('#end-placa').value,b.querySelector('#end-marca').value,b.querySelector('#end-linea').value,
               b.querySelector('#end-chasis').value,b.querySelector('#end-motor').value].some(x=>String(x||'').trim()))
           return toast('Ingresa la identificación del nuevo vehículo antes de crear la gestión.');
+        }
+        if(type.value==='beneficiarios'&&!b.querySelector('#end-benef').value.trim())return toast('Indica los beneficiarios que quedan vigentes según el endoso.');
+        if(type.value==='forma_pago'&&(!b.querySelector('#end-form').value.trim()||!b.querySelector('#end-conduct').value.trim()||+b.querySelector('#end-cuotas').value<1))return toast('Completa forma de pago, conducto y cantidad de pagos emitidos.');
       }
       create.disabled=true;if(direct)direct.disabled=true;
       try{
-        const result=await E.createRequest(policy.id,type.value,endorsementProposalFromForm(b,type.value),
-          {documentRef:doc,nota:note,motivo:issued?'Endoso de sustitución ya emitido':'Solicitud de endoso desde Cliente 360'});
+        const proposal=endorsementProposalFromForm(b,type.value,policy);
+        const result=await E.createRequest(policy.id,type.value,proposal,
+          {documentRef:doc,nota:note,motivo:issued?'Endoso ya emitido por la aseguradora':'Solicitud de endoso desde Cliente 360'});
         if(!result.ok)return toast('No se creó: '+(result.errors||[]).join(', '));
         if(issued&&result.reused){
-          b.remove();location.hash='#/ops';window.__orbitOpenGestion=result.request.id;
-          return toast('Ya existe un endoso activo: confirma que la propuesta es la misma y aplica la aprobación desde esa gestión de Ops.');
+          const saved=result.request;
+          if(!sameEndorsementProposal(saved.propuestaCambios,proposal)||saved.documentRef&&saved.documentRef!==doc||
+             saved.endorsementStage==='APROBADO_PENDIENTE_APLICACION'&&(saved.referenciaAseguradora!==ref||saved.fechaEfectiva!==date))
+            return toast('Ya existe una gestión de este tipo con otros cambios o soporte. Revisa esa gestión antes de aplicar; esta ficha permanece abierta.');
         }
         if(!issued){
           b.remove();toast(result.reused?'Ya existe una gestión activa de este tipo.':'Endoso confirmado en Ops.');
@@ -430,10 +458,9 @@ Orbit.modules = Orbit.modules || {};
         }
         const applied=await E.apply(result.request.id,{referenciaAseguradora:ref,documentRef:doc,fechaEfectiva:date,motivo:note});
         if(!applied.ok){
-          b.remove();location.hash='#/ops';window.__orbitOpenGestion=result.request.id;
-          return toast('La sustitución no fue confirmada; conserva la gestión en Ops para completar la aplicación, sin duplicar el endoso.');
+          return toast('El endoso aún no quedó confirmado. La ficha conserva tus datos para reintentar la misma operación sin duplicar la gestión.');
         }
-        b.remove();toast(applied.alreadyApplied?'El endoso ya estaba aplicado.':'Sustitución emitida aplicada con historial del vehículo anterior.');
+        b.remove();toast(applied.alreadyApplied?'El endoso ya estaba aplicado.':'Endoso emitido aplicado y registrado en el historial de la póliza.');
         Orbit.modules.cliente360.verPoliza(applied.policy.id);
       }catch(error){toast('No se confirmó la operación. Revisa la gestión y la póliza antes de repetirla.');}
       finally{create.disabled=false;if(direct)direct.disabled=false;}
@@ -553,16 +580,20 @@ Orbit.modules = Orbit.modules || {};
     if (months > 0 && addMonths(start, months) === previousEnd) return addMonths(next, months);
     return '';
   }
-  function openDirectRenewal(g) {
+  function openDirectRenewal(g, options) {
     const role=String(Orbit.session&&Orbit.session.rol&&Orbit.session.rol()||'');
     if(!['Dirección','SuperAdmin','AdminTenant','Admin','Operativo'].includes(role)||!I.canManage()||
       !(A.can&&A.can('renovaciones','edit')))return toast('Tu rol activo no puede registrar la renovación.');
-    if(!g||g.workflowType!=='renewal_accepted'||g.acceptedConfirmed!==true)
+    const confirmAcceptance=options&&typeof options.confirmAcceptance==='function'?options.confirmAcceptance:null;
+    let approvalPending=!!(g&&g.acceptedConfirmed!==true&&confirmAcceptance);
+    if(!g||g.workflowType!=='renewal_accepted'||g.acceptedConfirmed!==true&&!approvalPending)
       return toast('Primero confirma la aceptación del cliente en la gestión canónica.');
     const source=renewalSource(g);if(!source)return toast('No se encontró la póliza origen.');
+    if(!A.canView('polizas',source,'renovaciones'))return toast('Póliza fuera de tu alcance.');
     const insurers=renewalInsurers(source),start=source.vigenciaFin||today(),payments=renewalDefaultPayments(source);
     const client=S().get('clientes',source.clienteId)||{};
-    const body=`<div class="cfg-note" style="margin-bottom:12px"><b>Póliza anterior ${esc(source.numero || '')}</b> · ${esc(client.nombre || client.nombreCompleto || '')}</div><div class="cfg-note" style="margin-bottom:12px">Usa esta opción cuando la aseguradora ya envió la <b>renovación en firme</b>. Al confirmar se crea una nueva póliza vinculada a la anterior, con sus recibos/cartera; la póliza origen se conserva.</div><div class="cgrid">
+    const body=`<div class="cfg-note" style="margin-bottom:12px"><b>Póliza anterior ${esc(source.numero || '')}</b> · ${esc(client.nombre || client.nombreCompleto || '')}</div><div class="cfg-note" style="margin-bottom:12px">Usa esta opción cuando la aseguradora ya envió la <b>renovación en firme</b>. Al confirmar se crea una nueva póliza vinculada a la anterior, con sus recibos/cartera; la póliza origen se conserva.</div>
+      ${approvalPending?'<div class="cfg-note" style="margin-bottom:12px"><label style="display:flex;gap:9px;align-items:flex-start"><input type="checkbox" id="rend-approval-confirm"><span>Confirmo que el cliente aprobó esta renovación y cuento con soporte verificable.</span></label><label class="ce-l" style="margin-top:10px">Medio o referencia de la aprobación (opcional)<textarea id="rend-approval-note" class="o-sel" rows="2" placeholder="Correo, WhatsApp, aprobación del cliente…"></textarea></label></div>':''}<div class="cgrid">
       <label class="ce-l">Aseguradora *<select id="rend-asg" class="o-sel"><option value="">Selecciona la aseguradora del documento</option>${insurers.map(a=>`<option value="${esc(a.id)}" ${a.id===source.aseguradoraId?'selected':''}>${esc(a.nombre)}</option>`).join('')}</select></label>
       <label class="ce-l">Número de póliza en el documento de renovación *<input id="rend-num" class="o-sel" value="${esc(source.numero || '')}"></label>
       <label class="ce-l">Vigencia inicio *<input id="rend-start" type="date" class="o-sel" value="${esc(start)}"></label>
@@ -637,7 +668,24 @@ Orbit.modules = Orbit.modules || {};
     ['#rend-gem','#rend-gfin','#rend-other','#rend-iva','#rend-nonvat','#rend-nonvat-concept','#rend-nonvat-ref','#rend-documented-calendar','#rend-doc'].forEach(sel=>$(sel).addEventListener('input',paintTotal));
     applyValidatedTariff();
     btn.onclick=async()=>{
+      if(btn.disabled)return;
+      if(approvalPending&&!$('#rend-approval-confirm').checked)return toast('Confirma la aprobación del cliente antes de guardar.');
+      if(!$('#rend-asg').value||!$('#rend-num').value.trim()||!$('#rend-start').value||!$('#rend-end').value)
+        return toast('Completa aseguradora, número y vigencias de la renovación en firme.');
+      if(!docInput.value.trim()&&!(docFile.files&&docFile.files[0]))return toast('Selecciona o carga el soporte de renovación en firme.');
       const original=btn.textContent;btn.disabled=true;btn.textContent='Guardando…';
+      if(approvalPending){
+        try{
+          const confirmed=await confirmAcceptance(String($('#rend-approval-note').value||'').trim());
+          if(!confirmed||!confirmed.id||confirmed.workflowType!=='renewal_accepted'||confirmed.acceptedConfirmed!==true||
+            String(confirmed.sourcePolicyId||confirmed.polizaId)!==String(source.id)||!S().get('gestiones',confirmed.id))
+            throw new Error('RENEWAL_MANAGEMENT_READBACK_MISSING');
+          g=confirmed;approvalPending=false;$('#rend-approval-confirm').disabled=true;$('#rend-approval-note').disabled=true;
+        }catch(error){
+          btn.disabled=false;btn.textContent=original;
+          return toast('No se confirmó la aprobación o su acceso. La ficha permanece abierta; no se creó una póliza.');
+        }
+      }
       let confirmedDocumentRef=docInput.value.trim();
       const supportFile=docFile.files&&docFile.files[0];
       if(supportFile&&!confirmedDocumentRef){

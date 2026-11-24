@@ -313,6 +313,9 @@ jobs:
           node tools/gravicentra-i6-6-carlos-real-signed-synthetic-preview-uat.cjs
           node tools/gravicentra-i6-6-advisor-payables-signed-uat.cjs
           node tools/gravicentra-i6-6-proposal-application-signed-uat.cjs
+          if test "$I66_DIRECT_FORMS_QA" = true; then
+            I66_RENEWAL_QA_PHASE=PREVIEW node tools/gravicentra-i6-6-carlos-paula-live-direct-renewal-synthetic-uat.cjs
+          fi
           echo 'I66_ROLE_PREVIEW_SIGNED_CARLOS_PAULA_SYNTHETIC_FUNCTIONAL_UAT_PASS_ZERO_REAL_CUSTOMER_WRITES'
       - name: Seal source-artifact-specific signed Preview evidence
         run: |
@@ -342,6 +345,7 @@ jobs:
             ${{ runner.temp }}/gi-make-preview-proof.json
             ${{ runner.temp }}/gi-make-preview-operation-*.json
             ${{ runner.temp }}/gravicentra-i66-advisor-payables-signed-uat-preview.json
+            ${{ runner.temp }}/gi-i66-direct-forms-preview.json
             ${{ env.I66_PACKAGE_ROOT }}/evidence/i66-proposal-application-signed-uat-preview.json
           retention-days: 30
           if-no-files-found: error

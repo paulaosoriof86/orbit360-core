@@ -36,6 +36,11 @@ on:
       - orbit360-platform/modules/issuance-endosos-v1201-bridge.js
       - tools/gravicentra-i6-6-cobros-payment-failure-category.test.cjs
       - tools/gravicentra-i6-6-operational-renewal-entry.test.cjs
+      - tools/gravicentra-i6-6-renewal-direct-form-entry.test.cjs
+      - tools/gravicentra-i6-6-issued-endorsement-direct-entry.test.cjs
+      - tools/gravicentra-i6-6-carlos-paula-live-direct-renewal-synthetic-uat.cjs
+      - tools/gravicentra-i6-6-direct-forms-signed-driver.test.cjs
+      - orbit360-platform/modules/renewals-v1200-operational-bridge.js
       - orbit360-platform/core/ciclo.js
       - tools/gravicentra-i6-6-management-default-and-client-country.test.cjs
       - tools/gravicentra-i6-6-active-session-recovery.test.cjs
@@ -101,6 +106,8 @@ jobs:
           node --test tools/gravicentra-i6-6-documented-terms-signed-check.test.cjs tools/gravicentra-i6-6-documented-premium-terms.test.cjs tools/gravicentra-i6-6-cobros-visible-snapshot-performance.test.cjs
           node --test tools/gravicentra-i6-6-import-source-preview.test.cjs
           node --test tools/gravicentra-i6-6-cobros-payment-failure-category.test.cjs tools/gravicentra-i6-6-operational-renewal-entry.test.cjs
+          node --test tools/gravicentra-i6-6-renewal-direct-form-entry.test.cjs tools/gravicentra-i6-6-issued-endorsement-direct-entry.test.cjs
+          node --test tools/gravicentra-i6-6-direct-forms-signed-driver.test.cjs
           node --test tools/gravicentra-i6-6-ops-collaboration-owner.test.cjs
           node --test tools/gravicentra-i6-6-ops-leads-inbox-projection.test.cjs
           node --check functions/b4-003-scoped-access-boundary.js

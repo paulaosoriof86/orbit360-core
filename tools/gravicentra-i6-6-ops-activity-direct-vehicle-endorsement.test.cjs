@@ -30,7 +30,8 @@ test('Client never claims success for optimistic activity nor swallows permissio
 });
 test('Already-issued substitution is an independent insured policy UI path',()=>{
   assert.match(issued,/Registrar sustitución ya emitida/);
-  assert.match(issued,/if\(type\.value!=='sustitucion_vehiculo'\)/);
+  assert.match(issued,/directEndorsementAllowed\(type\.value\)/);
+  assert.match(issued,/if\(type\.value==='sustitucion_vehiculo'\)/);
   assert.match(issued,/if\(!doc\|\|!ref\|\|!date\|\|!note\)/);
   assert.match(issued,/identificación del nuevo vehículo/);
   assert.match(issued,/const result=await E\.createRequest/);
