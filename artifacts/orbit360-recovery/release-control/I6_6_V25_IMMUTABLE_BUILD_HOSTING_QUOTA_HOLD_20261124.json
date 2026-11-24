@@ -1,0 +1,21 @@
+{
+  "schema": "GI_I66_V25_PRESERVED_BUILD_AFTER_HOSTING_QUOTA_V1",
+  "status": "IMMUTABLE_BYTES_AND_224_LOCAL_FILES_VERIFIED_HOSTING_QUOTA_HOLD",
+  "sourceSha": "478c045c168c2e1b80f28a94094f4dbbbfdf1f81",
+  "buildId": "gi-i66-478c045c168c-57f234755dc1",
+  "buildRunId": 45452721643,
+  "buildJobId": 138654105446,
+  "artifactId": 14947853959,
+  "artifactDigest": "sha256:abc5534ea11313490125acfe3282d485448b349b3b60c8b5d83a70297f144155",
+  "tarSha256": "36dd7f3c62d1e2fac7a11e6583f234cef30b487b6ece4a823a6cd7453d2e6f03",
+  "siteManifestSha256": "61c27c1bafd43110fea223036e9a33e38773fb65cdf9ee61e06595bf02e977a5",
+  "verifiedLocalFiles": 224,
+  "verifiedHostedFiles": 0,
+  "hostingPreviewAccepted": false,
+  "artifactRebuiltOrPatched": false,
+  "failureCode": "HTTP429_CHANNEL_QUOTA_THEN_HISTORICAL_ROLLOVER_BUILD_GATE_REQUIRED",
+  "buildConclusion": "failure",
+  "sourceQaPreserved": true,
+  "livePromoted": false,
+  "customerWrites": 0
+}
