@@ -1,5 +1,5 @@
 {
-  "phase": "PROMOTING",
+  "phase": "VERIFIED",
   "key": "32bf0a31259398a252be0a38cbdcdd2e4a6ab7ef3634390b93fbff357980c5e1",
   "generation": 6,
   "request": {
@@ -55,5 +55,14 @@
     "files": 224,
     "hostingVersion": "sites/ays-orbit-360-lab/versions/fdbec659ed0f3b71",
     "artifactDigest": "sha256:531fddd76a010377bd9aa6c652d737dc584a99edc573c2aca313b56fd7efa405"
+  },
+  "physical": {
+    "firebase": 224,
+    "custom": 224,
+    "sourceSha": "48a7a6d4379759b6f32c7f2435e8e37c724989cc",
+    "buildId": "gi-i66-48a7a6d43797-57f234755dc1",
+    "artifactDigest": "sha256:531fddd76a010377bd9aa6c652d737dc584a99edc573c2aca313b56fd7efa405",
+    "hostingVersion": "sites/ays-orbit-360-lab/versions/fdbec659ed0f3b71",
+    "manifestDigest": "sha256:5ef81bccb15adbe0bdc31d0b53f1986b591898b3290ee27b10ae4a1993dfd9b0"
   }
 }
