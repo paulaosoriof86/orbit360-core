@@ -775,3 +775,164 @@ for (const [childCode, safeCode] of [['ETIMEDOUT', 'INVENTORY_CLI_TIMEOUT'], ['E
       error => error.message === 'I66_TECHNICAL_ROLLOVER_' + safeCode);
   });
 }
+
+// Current physical E3 / v24 successor: these sanitized fixtures are contract
+// tests only. The complete observed inventory remains in the pinned Actions
+// artifact; its full canonical digest is checked against fresh Cloud reads.
+const physicalPin = guard.currentPhysicalRolloverCandidatePin();
+const physicalText = fs.readFileSync(path.join(__dirname, '..', physicalPin.receiptPath), 'utf8');
+const physicalReceipt = JSON.parse(physicalText);
+function physicalFixture() {
+  const a = clone(physicalReceipt), live = a.protectedLive;
+  return { a, control: {
+    schema: 'GRAVICENTRA_I6_6_SINGLE_ARTIFACT_RELEASE_TRANSPORT_V1', gate: 'I6.6', historicalClosedGate: 'B4-007',
+    status: 'OPERATIONAL_EXACT_LIVE_ACCEPTED_LOCKED', livePromotionAuthorized: false, previewApproved: false,
+    forbidBackendFunctionDeploy: true, backendFunctionPreviewOnly: false, forbidBackendLiveFunctionDeploy: true,
+    noHostingPromotion: true, forbidFirestoreRulesDataAuthWrites: true,
+    currentTechnicalPreviewRollover: { receiptPath: physicalPin.receiptPath, receiptSha256: physicalPin.receiptSha256 },
+    frontendPreviewRequest: { version: 26, mode: 'A13_A14_BALANCE_COMPOSITE_ARTIFACT_HOSTING_PREVIEW_ONLY',
+      previousReceiptBlob: live.receiptGitBlobSha, realDataWritesAllowed: false, realCustomerWritesAllowed: false,
+      liveDeployAuthorized: false, releaseAfterPreviewAllowed: false, backendLiveDeployAllowed: false },
+    currentPhysicalHostingRelease: { sourceSha: live.sourceSha, previewRunId: live.buildRunId, artifactId: live.artifactId,
+      artifactDigest: live.artifactDigest, liveCloneRunId: live.liveRunId, liveHostingVersion: live.version,
+      readbackEachOrigin: 224, receipt: live.receiptPath, status: 'COMPOSITE_LIVE_SIGNED_UI_VERIFIED', scope: 'COMPOSITE', backendFunctionsChanged: 4 }
+  }, candidate: { sourceSha: 'd'.repeat(40), buildRunId: 45460000001,
+    previewChannelId: physicalPin.channel, previewUrl: physicalPin.origin, previewRollover: clone(physicalPin) } };
+}
+function sanitizedInventoryFixture() {
+  const inventory = { status: 'success', result: [
+    { name: 'sites/ays-orbit-360-lab/channels/live', release: { version: { name: 'sites/ays-orbit-360-lab/versions/synthetic-live' } } },
+    { name: 'sites/ays-orbit-360-lab/channels/synthetic-preview', createTime: '2026-11-24T00:00:00Z',
+      release: { version: { name: 'sites/ays-orbit-360-lab/versions/synthetic-preview' }, type: 'DEPLOY' } }
+  ] };
+  return { inventory, evidence: { totalChannels: 2, orderedChannelMetadataSha256: api.inventoryDigest(inventory) } };
+}
+function privateRuntimeExports(overrides = {}) {
+  const filename = path.join(__dirname, 'gravicentra-i6-6-preview-channel-reuse-guard.cjs'), mod = { exports: {} };
+  return new Function('require', 'module', 'exports', '__dirname', 'fetch',
+    fs.readFileSync(filename, 'utf8') + '\nreturn {io:technicalRuntimeIo,load:technicalLoadBundle,profile:technicalProfile};')(
+    name => overrides[name] || require(name), mod, mod.exports, __dirname, overrides.fetch || (() => { throw Error('UNEXPECTED_NETWORK'); }));
+}
+
+test('current physical successor pins v24 inventory and E3 without changing historical receipt or acceptance', () => {
+  assert.equal(digest(physicalText), physicalPin.receiptSha256);
+  assert.equal(physicalReceipt.profile, 'I66_CURRENT_PHYSICAL_E3_PREVIEW_V24_SUCCESSOR_V1');
+  assert.equal(api.validateAuthorization(physicalFixture().control, physicalText).channel.id, 'gi-i66-rc-45448470011');
+  assert.equal(physicalReceipt.freshInventoryEvidence.artifactId, 14951020393);
+  assert.equal(physicalReceipt.freshInventoryEvidence.totalChannels, 51);
+  assert.equal(physicalReceipt.freshInventoryEvidence.beforeInventorySha256, physicalReceipt.freshInventoryEvidence.afterInventorySha256);
+  assert.equal(physicalReceipt.freshInventoryEvidence.orderedChannelMetadataSha256, '1b5de10b8434ff1a98b1f71588873f7788181fef02a405f5263e9a96c027d8de');
+  assert.equal(physicalReceipt.freshInventoryEvidence.inventoryPath, undefined);
+  assert.equal(physicalReceipt.protectedLive.sourceSha, '65c825b2808a615ca4195bdde6689dbdbe3193b2');
+  assert.equal(physicalReceipt.protectedLive.expectedSiteFileCount, 224);
+  assert.equal(physicalReceipt.causalRetry.failedBuildRunId, 45452721643);
+  assert.equal(physicalReceipt.causalRetry.failedRunRemainsFailed, true);
+  assert.equal(physicalReceipt.causalRetry.reuseFailedBuildAsPass, false);
+  assert.equal(physicalReceipt.productAccepted, false);
+  assert.equal(digest(receiptText), pin.receiptSha256);
+});
+test('both independently closed receipt profiles coexist without rebinding historical defaults', () => {
+  assert.equal(api.validateCandidateReuse(physicalFixture().candidate).receiptSha256, physicalPin.receiptSha256);
+  assert.equal(api.validateCandidateReuse(fixture().candidate).receiptSha256, pin.receiptSha256);
+  assert.notEqual(physicalPin.receiptSha256, pin.receiptSha256);
+  assert.throws(() => api.validateAuthorization(fixture().control, physicalText));
+  assert.throws(() => api.validateAuthorization(physicalFixture().control, receiptText));
+  assert.equal(privateRuntimeExports().profile().expectedSiteFileCount, 223);
+  assert.equal(privateRuntimeExports().profile(physicalPin).expectedSiteFileCount, 224);
+  assert.ok(candidateGuard.PINNED_OWNER_PATHS.includes(physicalPin.receiptPath));
+});
+for (const key of ['realDataWritesAllowed', 'realCustomerWritesAllowed', 'liveDeployAuthorized', 'releaseAfterPreviewAllowed', 'backendLiveDeployAllowed'])
+  test('physical successor denies new write scope ' + key, () => {
+    const f = physicalFixture(); f.control.frontendPreviewRequest[key] = true;
+    assert.throws(() => api.validateAuthorization(f.control, physicalText), /SUCCESSOR_SCOPE_DRIFT/);
+  });
+for (const key of ['livePromotionAuthorized', 'previewApproved', 'forbidBackendFunctionDeploy', 'backendFunctionPreviewOnly',
+  'forbidBackendLiveFunctionDeploy', 'noHostingPromotion', 'forbidFirestoreRulesDataAuthWrites'])
+  test('physical successor preserves existing terminal write boundary ' + key, () => {
+    const f = physicalFixture(); f.control[key] = !f.control[key];
+    assert.throws(() => api.validateAuthorization(f.control, physicalText), /SCOPE_DRIFT/);
+  });
+for (const key of Object.keys(physicalFixture().control.currentPhysicalHostingRelease))
+  test('physical successor rejects physical E3 pointer drift ' + key, () => {
+    const f = physicalFixture(); f.control.currentPhysicalHostingRelease[key] = 'different';
+    assert.throws(() => api.validateAuthorization(f.control, physicalText), /PHYSICAL_LIVE_POINTER_DRIFT/);
+  });
+test('physical successor cannot borrow stale request, historical gate or pending backend/live authority', () => {
+  for (const mutate of [c => c.frontendPreviewRequest.version = 25, c => c.status = 'PREVIEW_BUILD_REQUESTED',
+    c => c.scopedBackendPreviewI66 = {}, c => c.operationalReleaseCandidate = {}]) {
+    const f = physicalFixture(); mutate(f.control); assert.throws(() => api.validateAuthorization(f.control, physicalText));
+  }
+  for (const changed of [physicalText + ' ', JSON.stringify({ ...physicalReceipt, expectedNewSiteFileCount: 223 })])
+    assert.throws(() => api.validateAuthorization(physicalFixture().control, changed), /EXACT_RECEIPT_BYTES_REQUIRED/);
+});
+for (const key of Object.keys(physicalPin)) test('physical candidate requires exact successor pin ' + key, () => {
+  const f = physicalFixture(); f.candidate.previewRollover[key] = 'different';
+  assert.throws(() => guard.validateTechnicalRolloverCandidate(f.candidate));
+});
+test('physical successor cannot recycle failed v25 or previous/live source and build', () => {
+  for (const [key, values] of Object.entries({
+    sourceSha: [physicalReceipt.sourceBaseHead, physicalReceipt.previousCandidate.sourceSha, physicalReceipt.protectedLive.sourceSha],
+    buildRunId: [45452721643, physicalReceipt.previousCandidate.buildRunId, physicalReceipt.protectedLive.buildRunId],
+    previewChannelId: ['live', pin.channel], previewUrl: ['https://app.aysseguros.com', pin.origin]
+  })) for (const value of values) {
+    const f = physicalFixture(); f.candidate[key] = value;
+    assert.throws(() => guard.validateTechnicalRolloverCandidate(f.candidate));
+  }
+});
+test('current previous artifact must be its whole successful immutable build, never the failed v25 backup', () => {
+  const expected = physicalReceipt.previousCandidate;
+  const run = { id: expected.buildRunId, head_sha: expected.sourceSha, head_branch: physicalReceipt.branch,
+    path: '.github/workflows/gravicentra-release-delta-66-package.yml', status: 'completed', conclusion: 'success', run_attempt: 1 };
+  const artifact = { id: expected.artifactId, name: 'gi-i66-immutable-' + expected.sourceSha, digest: expected.artifactDigest,
+    expired: false, size_in_bytes: 1024, workflow_run: { id: expected.buildRunId, head_sha: expected.sourceSha, head_branch: physicalReceipt.branch } };
+  assert.equal(api.validateArtifact(run, artifact, expected), expected);
+  assert.throws(() => api.validateArtifact({ ...run, conclusion: 'failure' }, artifact, expected), /BACKUP_BUILD_NOT_SUCCESS/);
+  assert.throws(() => api.validateArtifact(run, { ...artifact, expired: true }, expected), /ARTIFACT_EXPIRED/);
+});
+test('complete inventory preimage canonicalizes only key/row order and preserves every metadata value', () => {
+  const f = sanitizedInventoryFixture(); assert.equal(api.validateInventoryPreimage(f.inventory, f.evidence), true);
+  const reorder = { result: clone(f.inventory.result).reverse(), status: 'success' };
+  reorder.result[0] = Object.fromEntries(Object.entries(reorder.result[0]).reverse());
+  assert.equal(api.validateInventoryPreimage(reorder, f.evidence), true);
+  for (const mutate of [i => i.result[0].release.version.name += '-drift', i => i.result[1].createTime = 'different',
+    i => i.result[1].release.type = 'different', i => i.result[0].unexpectedMetadata = 'changed',
+    i => i.result.push(clone(i.result[0])), i => i.result.pop(), i => i.result[1].name = 'sites/other/channels/synthetic-preview',
+    i => i.nextPageToken = 'more', i => i.result = { channels: i.result, nextPageToken: 'more' }, i => i.status = 'error']) {
+    const changed = clone(f.inventory); mutate(changed);
+    assert.throws(() => api.validateInventoryPreimage(changed, f.evidence));
+  }
+});
+test('223 historical and 224 physical manifests remain disjoint exact profiles', () => {
+  const current = manifest() + 'a'.repeat(64) + '  files/extra.js\n';
+  assert.equal(api.parseManifest(manifest()).length, 223);
+  assert.equal(api.parseManifest(current, 224).length, 224);
+  assert.throws(() => api.parseManifest(current), /FILE_COUNT_DRIFT/);
+  assert.throws(() => api.parseManifest(manifest(), 224), /FILE_COUNT_DRIFT/);
+  assert.throws(() => api.parseManifest(current, 225), /FILE_COUNT_PROFILE_DENIED/);
+});
+test('runtime readback reports 224 current files and rejects historical/foreign origins', async () => {
+  const bytes = Buffer.from('synthetic bytes only'), hash = digest(bytes), urls = [];
+  const bundle = { manifest: Array.from({ length: 224 }, (_, n) => ({ hash, relative: n + '.txt' })), manifestSha256: 'a'.repeat(64), marker: { synthetic: true } };
+  const io = privateRuntimeExports({ fetch: async (url, options) => {
+    urls.push(url); assert.equal(options.redirect, 'error'); return { ok: true, arrayBuffer: async () => bytes };
+  } }).io({}, '/unused', physicalReceipt);
+  assert.equal((await io.readback(physicalPin.origin, bundle)).files, 224);
+  assert.equal(urls.length, 224); assert.ok(urls.every(url => url.startsWith(physicalPin.origin + '/')));
+  await assert.rejects(io.readback(pin.origin, bundle), /READBACK_ORIGIN_DENIED/);
+  await assert.rejects(io.readback('https://example.invalid', bundle), /READBACK_ORIGIN_DENIED/);
+});
+test('physical runtime validates E3 exact LIVE workflow/head/attempt, preserving historical validator', async () => {
+  const p = physicalReceipt.protectedLive, run = { id: p.liveRunId, head_branch: physicalReceipt.branch,
+    path: p.liveWorkflowPath, head_sha: p.liveRunHeadSha, run_attempt: p.liveRunAttempt, status: 'completed', conclusion: 'success' };
+  const makeIo = result => privateRuntimeExports({ fetch: async () => ({ ok: true, json: async () => result }) }).io({ GH_TOKEN: 'fixture-only' }, '/unused', physicalReceipt);
+  await makeIo(run).validateAcceptedLive(physicalReceipt);
+  for (const [key, value] of [['path', '.github/workflows/other.yml'], ['head_sha', 'e'.repeat(40)], ['run_attempt', 2], ['conclusion', 'failure']])
+    await assert.rejects(makeIo({ ...run, [key]: value }).validateAcceptedLive(physicalReceipt));
+});
+test('finish fallback uses the successfully prepared channel/origin, never a historical hardcoded target', () => {
+  const source = fs.readFileSync(path.join(__dirname, '../.github/workflows/gravicentra-release-delta-66-package.yml'), 'utf8');
+  const finish = source.slice(source.indexOf('- name: Verify current technical Preview rollover and preserve every other channel'), source.indexOf('- name: Retain actual technical Preview before-after'));
+  assert.match(finish, /before\.json.*channelId/); assert.match(finish, /before\.json.*channelOrigin/);
+  assert.doesNotMatch(finish, /gi-i66-rc-44009981499/);
+  assert.ok(source.includes(physicalPin.receiptPath));
+});

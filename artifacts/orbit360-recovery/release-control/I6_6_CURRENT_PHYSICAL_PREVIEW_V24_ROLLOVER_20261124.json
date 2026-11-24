@@ -1,0 +1,124 @@
+{
+  "schema": "GI_I66_CURRENT_TECHNICAL_PREVIEW_ROLLOVER_V1",
+  "profile": "I66_CURRENT_PHYSICAL_E3_PREVIEW_V24_SUCCESSOR_V1",
+  "status": "AUTHORIZED_EXACT_V24_CHANNEL_SUCCESSOR_AFTER_QUOTA_ONLY",
+  "gate": "I6.6",
+  "phase": "PREVIEW",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "projectId": "ays-orbit-360-lab",
+  "sourceBaseHead": "478c045c168c2e1b80f28a94094f4dbbbfdf1f81",
+  "expectedNewSiteFileCount": 224,
+  "executionAuthority": {
+    "kind": "EXISTING_I66_CONTINUE_CORRECT_TEST_AND_PUBLISH_SCOPE",
+    "scope": "Reuse only the exact current v24 Preview after the observed new-channel quota; preserve original backup bytes and the physically accepted E3 on both LIVE origins. Root confirmed this closed successor within the existing recovery gate. No channel deletion, backend deployment, business write, identity write or LIVE change is authorized by this receipt.",
+    "newLegalConsentGrantUsedForHosting": false,
+    "mustStopOnBeforeStateDrift": true
+  },
+  "channel": {
+    "id": "gi-i66-rc-45448470011",
+    "origin": "https://ays-orbit-360-lab--gi-i66-rc-45448470011-hrham9ah.web.app",
+    "createdAt": "2026-11-24T17:28:13.449397419Z",
+    "expectedVersion": "sites/ays-orbit-360-lab/versions/6ed6067f16a02d40"
+  },
+  "previousCandidate": {
+    "sourceSha": "60ac1ae2d765484ed40c820a942dcc0966385da7",
+    "buildRunId": 45448470011,
+    "buildRunAttempt": 1,
+    "artifactId": 14947396076,
+    "artifactDigest": "sha256:bb660ae7e6e97f9d83ea20b576d1a38bbd9ea5a691c27622a53a9eb50ef8330e",
+    "expectedSiteFileCount": 224,
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_V24_IMMUTABLE_BUILD_RECEIPT_20261124.json",
+    "receiptGitBlobSha": "cf09c4ba7fa6917cb5fe7f7aba90c8a2db854858",
+    "runtimeProofRequired": "DOWNLOAD_HASH_ARCHIVE_VALIDATE_MANIFEST_AND_COMPARE_EVERY_HOSTED_FILE_INCLUDING_BUILD_JSON_BEFORE_REPLACEMENT"
+  },
+  "protectedLive": {
+    "sourceSha": "65c825b2808a615ca4195bdde6689dbdbe3193b2",
+    "buildRunId": 45287432665,
+    "buildRunAttempt": 1,
+    "artifactId": 14873426438,
+    "artifactDigest": "sha256:7cb782848a45083047c4899bc30c13bf5be46429607e42597d09342becfc9acc",
+    "liveRunId": 45292163934,
+    "liveRunAttempt": 1,
+    "liveRunHeadSha": "f509fe1a58c8067aeafe7d655e0244a99328c5ce",
+    "liveWorkflowPath": ".github/workflows/gravicentra-i66-privileged-role-exact-live-promotion.yml",
+    "version": "sites/ays-orbit-360-lab/versions/332999a55b189108",
+    "expectedSiteFileCount": 224,
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_FRONTEND_E00003_RECEIPT.json",
+    "receiptGitBlobSha": "11fdb3bee494541513482666d6215f45cbad0567",
+    "origins": [
+      "https://ays-orbit-360-lab.web.app",
+      "https://app.aysseguros.com"
+    ]
+  },
+  "freshInventoryEvidence": {
+    "runId": 45454934099,
+    "runAttempt": 1,
+    "workflowHeadSha": "89b10b8eff6512d83ff77f00759e15e25c0412fa",
+    "jobId": 138661697442,
+    "workflowPath": ".github/workflows/gravicentra-i66-preview-channel-inventory-readonly.yml",
+    "wholeRun": "SUCCESS",
+    "wholeJob": "SUCCESS",
+    "artifactId": 14951020393,
+    "artifactDigest": "sha256:765b482a851ba6e3138494cdb53fe867330b751397784f01a0d7d87f941929a8",
+    "observedAtUtc": "2026-11-24T18:01:52.936Z",
+    "totalChannels": 51,
+    "beforeInventorySha256": "b867974b89c1f794879bf59256a95788d3be62731a5fd14fa663d1b37f9935c3",
+    "afterInventorySha256": "b867974b89c1f794879bf59256a95788d3be62731a5fd14fa663d1b37f9935c3",
+    "orderedChannelMetadataSha256": "1b5de10b8434ff1a98b1f71588873f7788181fef02a405f5263e9a96c027d8de",
+    "comparison": "ALL_FIFTY_ONE_CHANNELS_FULL_METADATA_EXACT_BEFORE_AFTER",
+    "otherChannelsIdenticalFullMetadata": 50,
+    "writes": 0,
+    "freshRuntimeInventoryRequiredAgain": true,
+    "publicEvidence": "Artifact provenance and full raw/canonical digests only; actor metadata remains in the authenticated workflow artifact, never copied to source."
+  },
+  "constraints": {
+    "onlyWhenNewChannelQuotaIsExhausted": true,
+    "backupBeforeOverwrite": true,
+    "readbackBeforeAndAfter": true,
+    "sameNewImmutableArtifact": true,
+    "noLiveChanges": true,
+    "noOtherChannelChanges": true,
+    "noChannelDeletion": true,
+    "noBackendChanges": true,
+    "noBusinessDataWrites": true,
+    "noRulesAuthIamChanges": true,
+    "stopOnIdentityDrift": true
+  },
+  "notAcceptance": {
+    "hostingReplacementIsNotSignedFunctionalPass": true,
+    "hostingReplacementIsNotProductionAcceptance": true,
+    "noOperationalPercentIncrease": true
+  },
+  "priorRolloverReceipt": {
+    "path": "artifacts/orbit360-recovery/release-control/I6_6_TECHNICAL_PREVIEW_NETWORK_DIAGNOSTIC_REBUILD_20261117.json",
+    "sha256": "42b558b0720fdb5d8c8a907a8ed5415cb769232e2409efbb4dde9fdaef724c04",
+    "preserveBytes": true
+  },
+  "causalRetry": {
+    "failedBuildRunId": 45452721643,
+    "failedBuildJobId": 138654105446,
+    "failedSourceSha": "478c045c168c2e1b80f28a94094f4dbbbfdf1f81",
+    "failedArtifactId": 14947853959,
+    "failedArtifactDigest": "sha256:abc5534ea11313490125acfe3282d485448b349b3b60c8b5d83a70297f144155",
+    "failure": "HTTP_429_NEW_HOSTING_CHANNEL_QUOTA",
+    "secondaryFailure": "STALE_HISTORICAL_TECHNICAL_PROFILE_REQUIRED_PREVIEW_BUILD_REQUESTED_AND_R11_223",
+    "failedRunRemainsFailed": true,
+    "newBuildRunMustSucceed": true,
+    "newSourceRequiresNewBuildDigest": true,
+    "productBytesPreservedFromV24": true,
+    "reuseFailedBuildAsPass": false,
+    "noRebuildOfCertifiedArtifactInPlace": true
+  },
+  "previousPreviewReadback": {
+    "status": "IMMUTABLE_BUILD_AND_HOSTING_PREVIEW_READBACK_PASS_BACKEND_AND_DIRECT_FORMS_UI_PENDING",
+    "files": 224,
+    "reportPath": "artifacts/orbit360-recovery/release-control/I6_6_V24_IMMUTABLE_PACKAGE_READBACK_20261124.json",
+    "reportGitBlobSha": "1e28bddb3315e48295133ba74e4aa6502983eaa5",
+    "reportSha256": "41bd578511ea767cfe60237d26d12baa9bfa9acfd19fdc9cea316a5efd504092",
+    "hostingVersion": "sites/ays-orbit-360-lab/versions/6ed6067f16a02d40",
+    "runtimeFullReadbackRequiredAgain": true
+  },
+  "cloudWritesDuringAuthorizationPreparation": 0,
+  "productAccepted": false
+}

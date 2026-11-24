@@ -1,0 +1,104 @@
+{
+  "schema": "GI_I66_CURRENT_PHYSICAL_PREVIEW_QUOTA_CAUSAL_CORRECTION_V1",
+  "status": "SOURCE_CORRECTION_LOCALLY_VERIFIED_NEW_IMMUTABLE_BUILD_REQUIRED",
+  "activeGate": "I6.6",
+  "recordedAtUtc": "2026-11-24T18:10:08.172Z",
+  "baseHead": "89b10b8eff6512d83ff77f00759e15e25c0412fa",
+  "cause": {
+    "failedBuildRunId": 45452721643,
+    "failedBuildJobId": 138654105446,
+    "failedSourceSha": "478c045c168c2e1b80f28a94094f4dbbbfdf1f81",
+    "failedArtifactId": 14947853959,
+    "failedArtifactDigest": "sha256:abc5534ea11313490125acfe3282d485448b349b3b60c8b5d83a70297f144155",
+    "newChannelError": "HTTP_429_CHANNEL_QUOTA",
+    "fallbackError": "I66_TECHNICAL_ROLLOVER_BUILD_GATE_REQUIRED",
+    "causalMechanism": "The existing fallback only admitted historical PREVIEW_BUILD_REQUESTED/R11/223 identities. Current accepted E3 uses the versioned physical authority and224 files; v25 correctly stopped instead of weakening that historical boundary.",
+    "failedBuildRemainsFailed": true
+  },
+  "correction": {
+    "owner": "tools/gravicentra-i6-6-preview-channel-reuse-guard.cjs",
+    "newClosedProfile": "I66_CURRENT_PHYSICAL_E3_PREVIEW_V24_SUCCESSOR_V1",
+    "preserveHistoricalProfiles": true,
+    "authorityStatus": "OPERATIONAL_EXACT_LIVE_ACCEPTED_LOCKED",
+    "requiredRequestVersion": 26,
+    "reusedChannel": "gi-i66-rc-45448470011",
+    "reusedOrigin": "https://ays-orbit-360-lab--gi-i66-rc-45448470011-hrham9ah.web.app",
+    "exactPreviousArtifact": 14947396076,
+    "exactPhysicalLiveArtifact": 14873426438,
+    "currentPhysicalGuardRequired": true,
+    "fullInventoryDigestCheckedImmediatelyBefore": true,
+    "fullInventoryRepeatedBeforeAndAfter": true,
+    "archivesForPreviousLiveAndNewVerifiedBeforeOverwrite": true,
+    "readbackBeforeAndAfterFilesEachOrigin": 224,
+    "workflowFailureFallbackUsesPreparedIdentity": true,
+    "cloudMutationCodeAdded": false,
+    "channelDeletionAllowed": false
+  },
+  "currentProfilePin": {
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_PHYSICAL_PREVIEW_V24_ROLLOVER_20261124.json",
+    "receiptSha256": "cd80787cd2560939c0384ebca49ee58b4a06acbad5ba201d78b681029458368d"
+  },
+  "freshInventory": {
+    "runId": 45454934099,
+    "jobId": 138661697442,
+    "conclusion": "success",
+    "artifactId": 14951020393,
+    "artifactDigest": "sha256:765b482a851ba6e3138494cdb53fe867330b751397784f01a0d7d87f941929a8",
+    "rawSha256": "b867974b89c1f794879bf59256a95788d3be62731a5fd14fa663d1b37f9935c3",
+    "orderedChannelMetadataSha256": "1b5de10b8434ff1a98b1f71588873f7788181fef02a405f5263e9a96c027d8de",
+    "channels": 51,
+    "rawActorMetadataPublishedToGit": false,
+    "cloudWrites": 0
+  },
+  "localValidation": {
+    "focusedTests": {
+      "tests": 419,
+      "passed": 419,
+      "failed": 0,
+      "logSha256": "31328ac67cb572360e6e0cbc3bbee3af46ca935ac9d5f6a1a9de8eef319cc817"
+    },
+    "yamlAndShellParse": "PASS_16_RUN_BLOCKS",
+    "realInventoryValidation": {
+      "status": "PROFILE_VALIDATOR_AND_CURRENT_PHYSICAL_GUARD_PASS",
+      "receiptSha256": "cd80787cd2560939c0384ebca49ee58b4a06acbad5ba201d78b681029458368d",
+      "rawSha256": "b867974b89c1f794879bf59256a95788d3be62731a5fd14fa663d1b37f9935c3",
+      "orderedChannelMetadataSha256": "1b5de10b8434ff1a98b1f71588873f7788181fef02a405f5263e9a96c027d8de",
+      "liveGeneration": 3,
+      "futureRequestPublished": false
+    },
+    "productOwnerComparison": {
+      "againstSource": "60ac1ae2d765484ed40c820a942dcc0966385da7",
+      "declaredProductOwners": 11,
+      "changed": 0
+    },
+    "manifestTestRevision": {
+      "required": false,
+      "reason": "The modified technical-preview-rollover test is not a declared changes.tests/testRevisions path; immutable owner pin and fresh build apply."
+    }
+  },
+  "owners": {
+    ".github/workflows/gravicentra-i66-preview-channel-inventory-readonly.yml": "7428553d52ec2c28ead4351cc5a6488e6ef7e654",
+    ".github/workflows/gravicentra-release-delta-66-package.yml": "c1d2bd92440bc891462a9006d9671056e4a5bbb5",
+    "tools/gravicentra-i6-6-preview-channel-reuse-guard.cjs": "f7eb814e72661ec9b9c5a6cb9adc0fee90f77d0a",
+    "tools/gravicentra-i6-6-technical-preview-rollover.test.cjs": "1c480a0a111d36b48200707da8af5fb13f9a2edb",
+    "tools/gravicentra-i6-6-operational-release-candidate.cjs": "064387f8ffaacb2ee1373e49fb716594b314faa4",
+    "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_PHYSICAL_PREVIEW_V24_ROLLOVER_20261124.json": "cb256e2e9ba724287ac84ae915585e9f49ef4891"
+  },
+  "notAcceptance": {
+    "sourceQaPending": true,
+    "newBuildRequired": true,
+    "newArtifactRequired": true,
+    "signedPreviewPending": true,
+    "livePromotionPending": true,
+    "fullI66Accepted": false
+  },
+  "executionMutations": {
+    "cloudWrites": 0,
+    "previewDeploys": 0,
+    "liveDeploys": 0,
+    "backendDeploys": 0,
+    "businessWrites": 0,
+    "authRulesIamWrites": 0,
+    "channelDeletions": 0
+  }
+}
