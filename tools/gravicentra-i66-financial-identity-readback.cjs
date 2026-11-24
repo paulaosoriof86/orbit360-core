@@ -9,6 +9,8 @@ const safeId=x=>/^[A-Za-z0-9_-]{1,180}$/.test(str(x))?str(x):null;
 const day=x=>/^\d{4}-\d\d-\d\d$/.test(str(x))?str(x):null;
 const fields=['numero','numeroPoliza','polizaNumero'];
 const permitted=new Set(['04-05-01-12289-4','04-05-01-15590-0','04-05-01-10738-6']);
+const financialPolicyIds=new Set(['pol_7ab15779e3626402f1cb4349fa69','pol_243608bce078afdf9640c8554ac4',
+ 'pol_6537ecb219275945f57fc567610c','pol_c0001022fe28c0fa04d405d4a5b8','pol_4cc6dba30e87de60562e32306c3c']);
 const stable=x=>Array.isArray(x)?x.map(stable):x&&typeof x==='object'?
  Object.fromEntries(Object.keys(x).sort().map(k=>[k,stable(x[k])])):x;
 function validate(request){
@@ -17,6 +19,10 @@ function validate(request){
  assert.equal(request.riskPolicy,'91-4140843');
  assert.ok(Array.isArray(request.documentaryTargets)&&request.documentaryTargets.length===3);
  assert.deepEqual(new Set(request.documentaryTargets.map(t=>t.policy)),permitted);
+ if(request.financialPolicyIds){
+  assert.equal(request.financialPolicyIds.length,5,'FINANCIAL_IDENTITY_SCOPE_COUNT');
+  assert.deepEqual(new Set(request.financialPolicyIds),financialPolicyIds,'FINANCIAL_IDENTITY_SCOPE_DRIFT');
+ }
  for(const t of request.documentaryTargets){
   assert.match(t.sourcePdfSha256,/^[a-f0-9]{64}$/);assert.match(t.holderWitness,/^[a-f0-9]{64}$/);
   assert.ok(safeId(t.sourceDriveId));
@@ -34,6 +40,9 @@ function numberRelation(value,target){
  if(full&&full.slice(1,4).join('-')===wanted.slice(0,3).join('-')&&String(Number(full[4]))===serial)
   return String(Number(full[5]))===wanted[4]?'EXACT_FULL_NUMBER':'OTHER_ENDORSEMENT';
  if(/^\d{1,6}$/.test(v)&&String(Number(v))===serial)return 'SHORT_NUMBER_UNVERIFIED';
+ const shortSuffix=v.match(/^(\d{1,6})[ -]+(\d+)$/);
+ if(shortSuffix&&String(Number(shortSuffix[1]))===serial)
+  return String(Number(shortSuffix[2]))===wanted[4]?'SHORT_NUMBER_WITH_ENDORSEMENT_UNVERIFIED':'SHORT_NUMBER_OTHER_ENDORSEMENT';
  const withoutSuffix=v.match(/^(\d{2})[ -]+(\d{2})[ -]+(\d{2})[ -]+(\d{1,6})$/);
  if(withoutSuffix&&withoutSuffix.slice(1,4).join('-')===wanted.slice(0,3).join('-')&&
   String(Number(withoutSuffix[4]))===serial)return 'ENDORSEMENT_ABSENT_UNVERIFIED';
@@ -62,10 +71,14 @@ function select(request,c,check,arrays){
  }
  if(check.holder)add('clientes',check.holder.id);
  if(check.insurer)add('aseguradoras',check.insurer.id);
+ for(const id of request.financialPolicyIds||[]){
+  add('polizas',id);const p=arrays.polizas.find(p=>p.id===id);
+  if(p){add('clientes',p.clienteId);add('aseguradoras',p.aseguradoraId);}
+ }
  assert.ok(refs.size<=300,'IDENTITY_DIAGNOSTIC_REFERENCE_BOUNDARY');
  return [...refs.values()];
 }
-function report(request,c,check,arrays,entries,preimageDigest){
+function report(request,c,check,arrays,entries,preimageDigest,financialSnapshot,source){
  validate(request);assert.match(preimageDigest,/^[a-f0-9]{64}$/);
  const records=new Map(entries.map(e=>[e.collection+'|'+e.id,e]));
  const record=(collection,id)=>records.get(collection+'|'+id);
@@ -111,6 +124,15 @@ function report(request,c,check,arrays,entries,preimageDigest){
    conflictInExistingMatcher:(check.riskConflictIds||[]).includes(id),
    vehicleHolderMatches:v.clienteId===check.holder?.id,
    parentHolderMatches:p.exists&&p.clientId===check.holder?.id,
+   originalRiskMatches:Object.fromEntries([
+    ['plate',['placa','placaFuente'],['placa','placaFuente']],
+    ['chassis',['vin','chasis','chasisFuente'],['vin','chasis','chasisFuente']]
+   ].map(([kind,storedFields,sourceFields])=>{
+    const expected=[...new Set(sourceFields.map(k=>norm(c.originalRisk?.[k])).filter(Boolean))];
+    const observed=storedFields.map(k=>norm(v[k])).filter(Boolean);
+    return [kind,{storedPopulated:observed.length>0,sourcePopulated:expected.length>0,
+     everyStoredAliasMatches:observed.length>0&&expected.length===1&&observed.every(x=>x===expected[0])}];
+   })),
    parentEndsNoLaterThanIssuedStart:Boolean(p.term?.[1]&&p.term[1]<=c.termStart)};
  });
  const result={schema:'GI_I66_SOURCE_IDENTITY_READBACK_RESULT_V1',diagnosticOnly:true,writes:0,
@@ -118,7 +140,83 @@ function report(request,c,check,arrays,entries,preimageDigest){
   readScope:'EXISTING_BOUNDED_GT_CLIENT_AND_INSURER_CENSUS_FULL_POLICY_AND_VEHICLE_CENSUS',
   documentaryTargets:targets,riskCase:{sourcePolicy:c.policy,existingMatcherStatus:check.status,
    issuedTerm:[c.termStart,c.termEnd],holderId:safeId(check.holder?.id),insurerId:safeId(check.insurer?.id),risks},
-  censusCounts:Object.fromEntries(['clientes','aseguradoras','polizas','vehiculos'].map(k=>[k,arrays[k].length]))};
+  censusCounts:Object.fromEntries(['clientes','aseguradoras','polizas','vehiculos'].map(k=>[k,arrays[k].length])),
+  ...(request.financialPolicyIds?{financial:financialReport(request,financialSnapshot,source,entries,policy)}:{})};
  return {...result,reportSha256:sha(JSON.stringify(stable(result)))};
 }
-module.exports={validate,select,report,numberRelation};
+function financialReport(request,snapshot,source,entries,policy){
+ assert.equal(snapshot?.complete,true,'FINANCIAL_COMPLETE_CENSUS_REQUIRED');
+ assert.equal(snapshot.sourceSha256,'649fa315a90b176b794abf6eef3d9f893d47de64cfe558d203a099c408692aa0');
+ assert.ok(Array.isArray(snapshot.records)&&Array.isArray(snapshot.audits));
+ const dateFields=['periodoInicioFuente','periodStart','receiptPeriodStart','periodoInicio','fechaInicio','inicioPeriodo',
+  'fechaVencimientoContractual','vence','fechaVencimiento','fechaLimite','fechaPago','paidDate','actualPaidDate'];
+ const amountFields=['primaTotal','monto','montoTotal','grossAmount','amount','primaNeta','neta','netPremium','saldo','saldoPendiente','montoPagado'];
+ const idFields=['polizaId','policyId','clienteId','clientId','asesorId','aseguradoraId','reciboId','receiptId','reciboEsperadoId',
+  'cobroId','sourceId','sourceRef','evidenceId','sourceCandidateId','auditId','operationId','requestId','documentRef','sourceDocumentRef'];
+ const referenceFields=['numeroReciboFuente','numeroReciboAseguradora','numeroRequerimiento','requerimiento','numeroRecibo',
+  'polizaNumero','numeroPoliza','policyNumber','policyNumberSource','numeroPolizaFuente','secuencia','numeroCuota','cuota','serie'];
+ const stateFields=['estado','estadoOperativo','paymentState','applicationState','paymentOrigin','paymentEvidenceType',
+  'directOrInferred','carteraTipo','estadoCartera','exigibilidad','actualPaidDateSource'];
+ const booleanFields=['pagado','confirmado','inferredPaid','conciliado','conciliadoPago','carteraActiva','historicalExigible','saldoConciliado'];
+ const knownStates=new Set(['PAID_DIRECT','PAID_INFERRED','PAID_REPORTED','PENDING','UNPAID','PAID','Pagado','Pendiente','Vencido','Cancelado','Anulado',
+  'DIRECT','INFERRED','REPORTED','PENDING_APPLICATION','APPLIED','CONFIRMED','RECONCILED','CRM_MIGRATED_DIRECT_PAYMENT',
+  'LEGACY_CENDOSO_FECHA_REAL_PAGADO','CENDOSO_FECHA_REAL_PAGADO','pagado_sin_saldo','historico_pagado_fuente',
+  'cerrada','exigible','futura','pendiente','pendiente_vencido','futuro_pendiente','cartera_activa']);
+ const val=(k,v)=>({type:typeof v,present:true,value:
+  typeof v==='number'&&Number.isFinite(v)?v:typeof v==='string'&&/^[+-]?\d+(?:\.\d{1,8})?$/.test(v.trim())?v:null,
+  ...(v!=null&&!['string','number'].includes(typeof v)?{valueSha256:sha(JSON.stringify(stable(v)))}:{})});
+ const project=r=>({collection:r.collection,id:safeId(r.id),documentSha256:sha(JSON.stringify(stable({...r,collection:undefined}))),
+  ids:Object.fromEntries(idFields.filter(k=>str(r[k])).map(k=>[k,safeId(r[k])])),
+  dates:Object.fromEntries(dateFields.filter(k=>r[k]!=null).map(k=>[k,
+   day(r[k])||{type:typeof r[k],valueSha256:sha(JSON.stringify(stable(r[k])))}])),
+  amounts:Object.fromEntries(amountFields.filter(k=>r[k]!=null).map(k=>[k,val(k,r[k])])),
+  references:Object.fromEntries(referenceFields.filter(k=>r[k]!=null).map(k=>[k,
+   /^(?:[A-Za-z]{1,8}[ -]*)?\d[\d /.-]{0,70}$/.test(str(r[k]))||/^(?:rec|car|cob|pol)_[a-z0-9_]{6,150}$/.test(str(r[k]))?
+    str(r[k]):{valueSha256:sha(JSON.stringify(stable(r[k])))}])),
+  states:Object.fromEntries(stateFields.filter(k=>r[k]!=null).map(k=>[k,
+   knownStates.has(str(r[k]))?str(r[k]):{type:typeof r[k],valueSha256:sha(JSON.stringify(stable(r[k])))}])),
+  flags:Object.fromEntries(booleanFields.filter(k=>r[k]!=null).map(k=>[k,typeof r[k]==='boolean'?r[k]:{type:typeof r[k]}])),
+  sourceRows:Array.isArray(r.sourceRows)?r.sourceRows.map(s=>({row:Number.isSafeInteger(s.row)?s.row:null,
+   sha256:/^[a-f0-9]{64}$/.test(str(s.sha256))?s.sha256:null,
+   file:/^\d\d-CobranzaCendoso-\d\d-\.xlsx$/.test(str(s.file))?s.file:null})):[],
+  originFields:Object.fromEntries(['fuente','source','origen','sourceType'].filter(k=>str(r[k])).map(k=>[k,
+   {family:/cendoso/i.test(str(r[k]))?'CENDOSO':/roble/i.test(str(r[k]))?'ROBLE':/universales/i.test(str(r[k]))?'UNIVERSALES':'OTHER',valueSha256:sha(str(r[k]))}])),
+  fieldNames:Object.keys(r).filter(k=>/^[A-Za-z_][A-Za-z0-9_]{0,80}$/.test(k)).sort()});
+ const receipts=new Map(snapshot.records.filter(r=>r.collection==='recibosEsperados').map(r=>[r.id,r]));
+ const owns=(r,id)=>[r.polizaId,r.policyId].includes(id)||[r.reciboId,r.receiptId,r.reciboEsperadoId]
+  .some(ref=>[receipts.get(ref)?.polizaId,receipts.get(ref)?.policyId].includes(id));
+ const targetSource=source.candidates.filter(r=>['AUTO-45580','VA-53105','91-8353989'].includes(r.policyNumberSource));
+ const sourceIds=new Set(targetSource.map(r=>r.candidateId));
+ const targets=request.financialPolicyIds.map(id=>{
+  const found=snapshot.records.filter(r=>owns(r,id));assert.ok(found.length<=300,'FINANCIAL_POLICY_DIAGNOSTIC_BOUNDARY');
+  const p=entries.find(e=>e.collection==='polizas'&&e.id===id)?.data||{};
+  return {policy:policy(id),policyAmountFields:Object.fromEntries(amountFields.filter(k=>p[k]!=null).map(k=>[k,val(k,p[k])])),
+   frequency:['Mensual','Pago Único','Contado','Anual','Trimestral','Semestral'].includes(p.frecuencia)?p.frecuencia:null,
+   counts:Object.fromEntries(['recibosEsperados','carteraPrimas','cobros'].map(k=>[k,found.filter(r=>r.collection===k).length])),
+   records:found.map(project)};
+ });
+ const relevantAudit=snapshot.audits.filter(a=>request.financialPolicyIds.includes(a.policyId)||sourceIds.has(a.sourceId));
+ return {complete:true,writes:0,sourceSha256:snapshot.sourceSha256,
+  censusCounts:Object.fromEntries(['recibosEsperados','carteraPrimas','cobros'].map(k=>[k,snapshot.records.filter(r=>r.collection===k).length])),
+  financialCensusSha256:sha(JSON.stringify(stable(snapshot.records))),targets,
+  sourceCandidates:targetSource.map(r=>({sourceId:r.candidateId,policy:r.policyNumberSource,term:[r.coverageStart,r.coverageEnd],
+   period:r.receiptPeriodStart,due:r.receiptDueDate,paid:r.actualPaidDate,gross:r.totalPremium,net:r.netPremium,
+   holdReasons:r.holdReasons,sourceRows:r.sourceRows})),
+  auditWitnesses:relevantAudit.map(a=>({id:safeId(a.id),policyId:safeId(a.policyId),sourceId:safeId(a.sourceId),
+   receiptId:safeId(a.receiptId),portfolioId:safeId(a.portfolioId),cobroId:safeId(a.cobroId),documentSha256:sha(JSON.stringify(stable(a)))})),
+  sourceLinkedOutsideTargets:snapshot.records.filter(r=>idFields.some(k=>sourceIds.has(r[k]))&&
+   !request.financialPolicyIds.some(id=>owns(r,id))).map(project)};
+}
+function appendEvidence(fs,runnerTemp,reports,execution){
+ const path=require('node:path');assert.ok(path.isAbsolute(runnerTemp),'READONLY_ARTIFACT_ROOT_REQUIRED');
+ assert.match(execution.sourceSha,/^[a-f0-9]{40}$/);assert.match(execution.runId,/^\d+$/);
+ const dest=path.join(runnerTemp,'gi-i66-bulk-preflight.json'),bytes=fs.readFileSync(dest),original=JSON.parse(bytes);
+ assert.ok(['BULK_SOURCE_CASE_READBACK_ONLY_NO_WRITES','BULK_SOURCE_PREFLIGHT_ONLY_NO_WRITES'].includes(original.status));
+ assert.equal(original.writes,0,'READONLY_ARTIFACT_WRITE_BOUNDARY');
+ assert.ok(Array.isArray(reports)&&reports.every(r=>r.writes===0&&r.diagnosticOnly===true&&r.noEligibilityEffect===true));
+ const enriched={...original,privateReadonlyIdentityReadbacks:{execution,originalSourceReportSha256:sha(bytes),reports}};
+ fs.writeFileSync(dest,JSON.stringify(enriched,null,2)+'\n',{mode:0o600});
+ // The immutable eligibility plan file is never opened or changed here.
+ return {file:'gi-i66-bulk-preflight.json',originalSourceReportSha256:sha(bytes)};
+}
+module.exports={validate,select,report,numberRelation,financialReport,financialPolicyIds,appendEvidence};

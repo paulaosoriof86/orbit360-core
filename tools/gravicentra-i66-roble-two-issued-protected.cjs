@@ -51,7 +51,12 @@ async function scoped(tx,c){
   }
   const entries=snapshots.map((s,i)=>({...selected[i],exists:s.exists,data:s.exists?s.data():null,
    updateTime:s.exists?{seconds:s.updateTime.seconds,nanoseconds:s.updateTime.nanoseconds}:null}));
-  const diagnostic=identityReadback.report(identityRequest,c,check,arrays,entries,beforeDigest(snapshots));
+  let financialSnapshot,paidSource;
+  if(identityRequest.financialPolicyIds){
+   const paid=require('./gravicentra-i66-cendoso-paid-protected.cjs');paidSource=paid.loadSource();
+   financialSnapshot=await paid.readHistoricalSnapshot(db,paidSource,tx);
+  }
+  const diagnostic=identityReadback.report(identityRequest,c,check,arrays,entries,beforeDigest(snapshots),financialSnapshot,paidSource);
   identityReports.splice(0,identityReports.length,diagnostic);
   }catch(error){
    identityReports.splice(0,identityReports.length,{schema:'GI_I66_SOURCE_IDENTITY_READBACK_RESULT_V1',
@@ -250,6 +255,9 @@ async function verify(c,operation){
   assert.equal(sums.alreadyApplied,C.cases.length,'ALL_ISSUED_AUDITS_NOT_VERIFIED');
  }
  if(mode==='preflight'){
+  if(identityReports.length&&process.env.RUNNER_TEMP)
+   identityReadback.appendEvidence(fs,process.env.RUNNER_TEMP,identityReports,
+    {sourceSha:process.env.GITHUB_SHA,runId:process.env.GITHUB_RUN_ID});
   assert.ok(process.env.GITHUB_OUTPUT);
   fs.appendFileSync(process.env.GITHUB_OUTPUT,
    'eligible='+String(sums.eligible>0)+'\npreimagesB64='+Buffer.from(JSON.stringify(preimages)).toString('base64url')+'\n');

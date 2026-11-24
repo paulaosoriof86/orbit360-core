@@ -262,6 +262,8 @@ test('readonly identity probe locates aliases and actual risk parent, preserves 
 });
 test('diagnostic does not turn a short number, other endorsement, wrong holder, missing parent or invalid request into eligibility',async()=>{
  assert.equal(identityDiagnostic.numberRelation('15590','04-05-01-15590-0'),'SHORT_NUMBER_UNVERIFIED');
+ assert.equal(identityDiagnostic.numberRelation('012289-4','04-05-01-12289-4'),'SHORT_NUMBER_WITH_ENDORSEMENT_UNVERIFIED');
+ assert.equal(identityDiagnostic.numberRelation('12289-3','04-05-01-12289-4'),'SHORT_NUMBER_OTHER_ENDORSEMENT');
  assert.equal(identityDiagnostic.numberRelation('04 05 01 015590 1','04-05-01-15590-0'),'OTHER_ENDORSEMENT');
  assert.equal(identityDiagnostic.numberRelation('04 05 01 015590','04-05-01-15590-0'),'ENDORSEMENT_ABSENT_UNVERIFIED');
  assert.equal(identityDiagnostic.numberRelation('04 15 01 015590 0','04-05-01-15590-0'),'');
@@ -295,6 +297,61 @@ test('existing workflow readonly marker overrides all six protected jobs even if
   process:{env:{GI_I66_BULK_PLAN_OUT:'/test/plan',GITHUB_OUTPUT:'/test/output'},exit:n=>{assert.equal(n,0);throw STOP;}},console:{log:()=>{}}};
  assert.throws(()=>vm.runInNewContext(judge,context),e=>e===STOP);assert.deepEqual(lines,['ready=false\nreadonly=true\n']);
  plan.readOnly=false;lines.length=0;assert.throws(()=>vm.runInNewContext(judge,context));assert.deepEqual(lines,[]);
+});
+test('focal financial census reads actual shared reader and preserves all parents, receipts and payments without broadening eligibility',async()=>{
+ const {c,f,request}=identityFixture();request.financialPolicyIds=[...identityDiagnostic.financialPolicyIds];
+ const oldPolicy=request.financialPolicyIds[2],riskPolicy=request.financialPolicyIds[0];
+ for(const id of request.financialPolicyIds)f.polizas.push({id,numero:id===oldPolicy?'AUTO-45580':'91-9998888',
+  pais:'GT',moneda:'GTQ',clienteId:'holder',aseguradoraId:'rob',vigenciaInicio:'2025-07-21',vigenciaFin:'2026-07-21',
+  primaTotal:299.94,frecuencia:'Mensual'});
+ f.recibosEsperados=[{id:'rec_fin_old',polizaId:oldPolicy,clienteId:'holder',fechaLimite:'2026-04-21',
+  periodoInicioFuente:'2026-04-21',primaTotal:299.94,monto:'299.94',privateHolder:'PRIVATE_FINANCIAL_HOLDER',
+  numeroReciboFuente:'PRIVATE_REFERENCE_NAME',paymentEvidenceType:'PRIVATE_FINANCIAL_NOTE'}];
+ f.carteraPrimas=[{id:'car_fin_old',reciboId:'rec_fin_old',policyId:riskPolicy,fechaLimite:'2026-04-21',primaTotal:299.94,
+  carteraActiva:true,saldo:299.94,privateAccount:'PRIVATE_ACCOUNT'}];
+ f.cobros=[{id:'cob_fin_old',reciboEsperadoId:'rec_fin_old',monto:299.94,fechaPago:'2026-04-30',confirmado:true,
+  sourceRows:[{file:'CUSTOMER_PRIVATE_FILENAME.pdf',row:2,sha256:'c'.repeat(64)}]}];
+ const state=isolatedStore(f),before=JSON.stringify([...state.entries]),baseline=await executeProtected(c,state,'preflight');
+ const probe=await executeProtected(c,state,'preflight',{},originalMatcher,request);assert.equal(probe.exitCode,0,probe.errors.join('\n'));
+ assert.deepEqual(probe.report.results,baseline.report.results);assert.deepEqual(probe.report.totals,baseline.report.totals);
+ const d=probe.report.readonlyIdentityReadbacks[0];assert.equal(d.financial.complete,true);assert.equal(d.financial.writes,0);
+ assert.deepEqual(d.financial.censusCounts,{recibosEsperados:1,carteraPrimas:1,cobros:1});
+ assert.match(d.financial.financialCensusSha256,/^[a-f0-9]{64}$/);
+ const target=d.financial.targets.find(t=>t.policy.id===oldPolicy);assert.equal(target.policy.exists,true);
+ assert.deepEqual(target.counts,{recibosEsperados:1,carteraPrimas:1,cobros:1});
+ const receipt=target.records.find(r=>r.collection==='recibosEsperados');
+ assert.equal(receipt.dates.periodoInicioFuente,'2026-04-21');assert.equal(receipt.amounts.primaTotal.value,299.94);
+ assert.equal(receipt.amounts.monto.type,'string');assert.equal(receipt.amounts.monto.value,'299.94');
+ assert.match(receipt.references.numeroReciboFuente.valueSha256,/^[a-f0-9]{64}$/);
+ assert.equal(target.records.find(r=>r.collection==='carteraPrimas').ids.policyId,riskPolicy,'contradictory parent aliases stay visible');
+ assert.ok(d.financial.sourceCandidates.length>14,'pinned source and covered next-edition row stay distinguishable');
+ assert.equal(JSON.stringify([...state.entries]),before);assert.ok(!JSON.stringify(d).includes('PRIVATE_'));
+ const applied=await executeProtected(c,state,'apply',{},originalMatcher,request);
+ assert.equal(applied.report.readonlyIdentityReadbacks,undefined);assert.equal(applied.report.totals.writes,0);
+});
+test('focal read rejects an expanded policy scope, incomplete census, and altered source digest',()=>{
+ const {request}=identityFixture();request.financialPolicyIds=[...identityDiagnostic.financialPolicyIds];
+ assert.throws(()=>identityDiagnostic.validate({...request,financialPolicyIds:[...request.financialPolicyIds,'six-qa-parent']}),/COUNT/);
+ assert.throws(()=>identityDiagnostic.validate({...request,financialPolicyIds:request.financialPolicyIds.map((x,i)=>i===0?'six-qa-parent':x)}),/SCOPE_DRIFT/);
+ assert.throws(()=>identityDiagnostic.financialReport(request,{complete:false},{candidates:[]},[],()=>({})),/COMPLETE_CENSUS/);
+ assert.throws(()=>identityDiagnostic.financialReport(request,{complete:true,sourceSha256:'d'.repeat(64)},{candidates:[]},[],()=>({})));
+});
+test('private diagnostics are preserved in the existing artifact report while eligibility-plan bytes remain untouched',()=>{
+ const report={status:'BULK_SOURCE_CASE_READBACK_ONLY_NO_WRITES',readOnly:true,readyCount:0,writes:0,chunks:[]};
+ const original=JSON.stringify(report),files=new Map([['/test/gi-i66-bulk-preflight.json',original],['/test/gi-i66-bulk-plan.json',original]]);
+ const fakeFs={readFileSync:p=>{assert.equal(p,'/test/gi-i66-bulk-preflight.json');return Buffer.from(files.get(p));},
+  writeFileSync:(p,t,o)=>{assert.equal(p,'/test/gi-i66-bulk-preflight.json');assert.equal(o.mode,0o600);files.set(p,t);}};
+ const d={writes:0,diagnosticOnly:true,noEligibilityEffect:true},execution={sourceSha:'a'.repeat(40),runId:'123'};
+ identityDiagnostic.appendEvidence(fakeFs,'/test',[d],execution);
+ const out=JSON.parse(files.get('/test/gi-i66-bulk-preflight.json'));
+ const {privateReadonlyIdentityReadbacks,...same}=out;assert.deepEqual(same,report);
+ assert.equal(privateReadonlyIdentityReadbacks.originalSourceReportSha256,C.sha(original));
+ assert.deepEqual(privateReadonlyIdentityReadbacks.execution,execution);
+ assert.equal(files.get('/test/gi-i66-bulk-plan.json'),original);
+ const committed=JSON.stringify({...report,status:'COMMITTED',writes:1});files.set('/test/gi-i66-bulk-preflight.json',committed);
+ assert.throws(()=>identityDiagnostic.appendEvidence(fakeFs,'/test',[d],execution));
+ assert.equal(files.get('/test/gi-i66-bulk-preflight.json'),committed);
+ assert.throws(()=>identityDiagnostic.appendEvidence(fakeFs,'../elsewhere',[d],execution),/ROOT_REQUIRED/);
 });
 test('protected writer rejects a changed parent after preflight and a source requirement already in use',async()=>{
  const c=newCases()[0],state=isolatedStore(newFixture(c)),preflight=await executeProtected(c,state,'preflight');

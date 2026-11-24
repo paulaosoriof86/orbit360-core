@@ -70,6 +70,13 @@
         "holderWitness": "adca312ed2ee3655264cc4e4c1a0228324ea4f7def902be52276b20611eab82c",
         "sourceKind": "INSURER_CONFIRMED_PAYMENT_STATEMENT"
       }
+    ],
+    "financialPolicyIds": [
+      "pol_7ab15779e3626402f1cb4349fa69",
+      "pol_243608bce078afdf9640c8554ac4",
+      "pol_6537ecb219275945f57fc567610c",
+      "pol_c0001022fe28c0fa04d405d4a5b8",
+      "pol_4cc6dba30e87de60562e32306c3c"
     ]
   }
 }
