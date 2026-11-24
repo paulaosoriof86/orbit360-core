@@ -1,0 +1,48 @@
+{
+  "schema": "GI_I66_CURRENT_DIRECTION_OPERATIONAL_CONTINUATION_V1",
+  "recordedAtUtc": "2026-11-24T21:35:29.979Z",
+  "timezone": "America/Guatemala",
+  "authority": "DIRECT_USER_INSTRUCTION_IN_CURRENT_CONVERSATION",
+  "activeGate": "I6.6",
+  "status": "AUTHORIZED_EXECUTION_REQUIREMENTS_NOT_EXECUTION_PROOF",
+  "decisions": {
+    "publishEachVerifiedCausalCorrectionImmediately": true,
+    "firmPolicyOperationsAndOptionalOpsRequest": {
+      "appliesTo": [
+        "renewal",
+        "issued_endorsement",
+        "effective_cancellation",
+        "other_authorized_policy_operations"
+      ],
+      "firmPath": "Use the existing policy form, inherit editable policy data, execute the canonical writer and verify persistence.",
+      "optionalRequestPath": "Keep solicitar gestion por Ops as a separate choice; never force an already issued operation through Ops."
+    },
+    "operativoWrites": "Create, edit and execute all approved operational actions in every authorized module, with the existing tenant/country/audit boundaries and role hierarchy.",
+    "insurerReadErrors": "Reproduce and repair the reported insurer directory/source read errors; verify the actual Operativo and Direccion interface after publication.",
+    "financialBatches": "Apply the largest safely adjudicated source-backed batches through the canonical writers, including approved inferences and missing receipts, without postponing eligible rows because other rows remain ambiguous.",
+    "latestStatements": "Inspect November account statements by insurer and recent account statements inside each insurer folder; deduplicate against already applied facts.",
+    "previouslyAppliedPayments": "Preserve all155 existing APPLIED_DIRECT payments and their Q78806.43 total; never replay them as new payments.",
+    "tolerance": "Existing Direction global GTQ5-cent documentary tolerance remains authorized across insurers and cases; preserve actual source amounts, currency and identities.",
+    "retrospectiveLeads": "Alice/Alys is collecting September-to-current prospects. Automation priority is prospective ingestion; do not duplicate the retrospective reconstruction.",
+    "massLeadIntake": "Ingest the completed recovered prospect list by actual stage, source and ownership using canonical deduplication; link existing client/lead history and preserve first request.",
+    "prospectiveChannels": [
+      "WhatsApp including ad attribution where verifiable",
+      "web form",
+      "per-user email",
+      "referrals and other identified origins"
+    ],
+    "aliceConnection": "Determine supported connector/API access and a shared import contract. Do not claim a persistent in-platform assistant integration until it is implemented and verified.",
+    "continuity": "Keep source, artifact, Preview, LIVE, financial applications and the next executable step synchronized in the current canonical cursor."
+  },
+  "boundaries": {
+    "existingRepositoryAndBranch": true,
+    "sameImmutableArtifactPreviewLive": true,
+    "noDuplicatePaymentsOrLeads": true,
+    "noBankTransfers": true,
+    "noExternalMessagesAuthorized": true,
+    "noNewAcceptanceClaimed": true
+  },
+  "productionWritesByThisReceipt": 0,
+  "financialWritesByThisReceipt": 0,
+  "leadWritesByThisReceipt": 0
+}
