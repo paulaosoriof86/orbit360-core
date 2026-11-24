@@ -451,6 +451,8 @@ jobs:
         run: npm ci --ignore-scripts --no-audit --no-fund
       - name: Verify provider-readiness scope, secret isolation and bounded metadata reads
         run: node --test tools/gravicentra-i66-greenapi-provider-readiness.test.cjs
+      - name: Verify exact runtime discovery and Secret IAM CAS safeguards without writes
+        run: node --test tools/gravicentra-i66-make-lead-runtime-access.test.cjs
       - name: Select existing same-project credential without printing it
         shell: bash
         run: |
@@ -474,4 +476,7 @@ jobs:
       - name: Validate exact existing inbound configuration without payload or credential output
         shell: bash
         run: node tools/gravicentra-i66-greenapi-existing-config-readonly.cjs
+      - name: Read canonical Ops runtime and exact required capabilities without granting access
+        run: node tools/gravicentra-i66-make-lead-runtime-access.cjs preflight
 # I6.6 continuation 2026-11-24: distinguish exact runtime Secret RPC, parsing and scope outcomes with allowlisted booleans; no messages or writes.
+# I6.6 continuation: observe canonical Ops runtime, exact Firestore permissions and existing Secret access; zero mutations.
