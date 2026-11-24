@@ -1,0 +1,275 @@
+{
+  "schema": "GI_I66_ROBLE_REMAINING_24_COMMERCIAL_SERVER_READBACK_V1",
+  "gate": "I6.6",
+  "recordedAtUtc": "2026-11-24T05:19:10Z",
+  "dateGuatemala": "2026-11-23",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "status": "REAL_BUSINESS_COMMITTED_AND_SERVER_READBACK_PASS_WITH_ONE_LOCAL_HOLD",
+  "scope": "Two remaining issuer-documented El Roble renewals, 24 new pending obligations; preserve the two previously committed renewals and isolate one unresolved current-risk relationship.",
+  "authority": {
+    "directionPath": "artifacts/orbit360-recovery/release-control/I6_6_DIRECCION_DECISIONES_FINANCIERAS_Y_PLAN_INTEGRAL_20261122.md",
+    "directionGitBlob": "53b08239aa8807378ec95a4b4704c5d97622bc84",
+    "decisions": [
+      "D02",
+      "D04",
+      "D06"
+    ],
+    "interpretation": "The authenticated issued original defines the new contract and risk. The prior risk remains immutable; a changed or absent legacy VIN is not permission to copy an incorrect vehicle. Existing current-risk conflicts, missing identity, duplicates, CAS changes and unverified country remain case-local holds."
+  },
+  "execution": {
+    "sourceCommit": "38e19499431a67b6826ed3adec53bf3ddc682766",
+    "workflow": ".github/workflows/gravicentra-i66-insurer-source-bulk-protected.yml",
+    "runId": 45330498425,
+    "runUrl": "https://github.com/paulaosoriof86/orbit360-core/actions/runs/45330498425",
+    "preflightJobId": 138230282406,
+    "protectedApplyJobId": 138231284166,
+    "protectedApplyJobUrl": "https://github.com/paulaosoriof86/orbit360-core/actions/runs/45330498425/job/138231284166",
+    "environment": "gravicentra-live-data-writes",
+    "tenantId": "alianzas-soluciones",
+    "country": "GT",
+    "currency": "GTQ",
+    "preflightEmittedAtUtc": "2026-11-24T05:05:07.7324366Z",
+    "applyReadbackEmittedAtUtc": "2026-11-24T05:12:36.5684468Z",
+    "conclusion": "success",
+    "preflightMarker": "I66_ROBLE_TWO_24_PREFLIGHT",
+    "applyMarker": "I66_ROBLE_TWO_24_APPLY"
+  },
+  "sources": {
+    "source302": {
+      "path": "artifacts/orbit360-recovery/source-batches/I6_6_SOURCE_BULK_20261120_MULTI_302.json",
+      "gitBlob": "ab64e111319e3447733a3af05bf378250698ccdb",
+      "sha256": "35b548913253c836e63db6cb3cac79bda541a6ceda776494969d23393504e225",
+      "rows": 302
+    },
+    "fiveIssued": {
+      "path": "artifacts/orbit360-recovery/source-batches/I6_6_ROBLE_FIVE_ISSUED_49_REQUIREMENTS_20261122.json",
+      "gitBlob": "9fd11d82a0838c6f6aa46d9da242670cf6a6ea38",
+      "policies": 5,
+      "obligations": 49,
+      "pendingCents": 1883337
+    },
+    "identityWitnesses": {
+      "path": "artifacts/orbit360-recovery/source-batches/I6_6_ROBLE_FIVE_ISSUED_IDENTITY_WITNESSES_20261122.json",
+      "gitBlob": "17dd0cc1970b233e38f0d4428ec77168abbf0c3a",
+      "historicalWitnessNotRewritten": true
+    },
+    "priorCommercialReceipt": "artifacts/orbit360-recovery/release-control/I6_6_ROBLE_TWO_24_COMMERCIAL_SERVER_READBACK_20261122.json",
+    "originalReadMethod": "Existing Drive read-only service identity; raw PDF SHA256; named insured on renewal cover and EMITIDA A FAVOR DE; one certificate; policy, endorsement and term; card/certificate plate and VIN; contract premium components; every issued installment compared to pinned insurer statement. No raw identities copied to this receipt."
+  },
+  "preflightArtifact": {
+    "id": 14891607020,
+    "name": "gi-i66-source-bulk-preflight-45330498425",
+    "digest": "sha256:e64e99b4f9458e7af85b70e9885b0d5dfeed017b5bd56c2050d4db5a04e0dcb4",
+    "scope": "302-source preflight JSON files from the same run. The Roble original-specific CAS verdict and commercial application proof are in the named job logs and committed operationalRequests audits, not a separate apply artifact.",
+    "commercialApplyArtifactId": null
+  },
+  "before": {
+    "issuedCasesExamined": 5,
+    "newEligibleCases": 2,
+    "newEligibleObligations": 24,
+    "newEligiblePendingCents": 667812,
+    "previouslyAppliedCasesVerified": 2,
+    "previouslyAppliedObligationsVerified": 24,
+    "previouslyAppliedPendingCents": 840785,
+    "localHoldCases": 1,
+    "localHoldObligations": 1,
+    "localHoldPendingCents": 374740,
+    "writes": 0,
+    "source302SnapshotBeforeThisApply": {
+      "unchanged": 190,
+      "ready": 0,
+      "exceptions": 112,
+      "writes": 0
+    }
+  },
+  "committedCases": [
+    {
+      "policy": "91-8323091",
+      "endorsement": "353922",
+      "termStart": "2026-10-11",
+      "termEnd": "2027-10-11",
+      "sourcePdfSha256": "e75ed257defa5ee055168fc196f8ae7b92d3888c5013f3463e239253b7af6319",
+      "status": "COMMITTED_AND_EXACT_SERVER_READBACK_PASS",
+      "beforeDigest": "4a607d4103f8947141920ff92efb06f2018346d1da86b7fda15c3b0a7434e9d7",
+      "casMatched": true,
+      "policySuccessors": 1,
+      "receipts": 12,
+      "portfolioRows": 12,
+      "vehicleVersions": 1,
+      "activities": 1,
+      "previousPolicyUpdates": 1,
+      "audits": 1,
+      "technicalWrites": 29,
+      "pendingCents": 331106,
+      "originalContractGrossCents": 331110,
+      "documentedCoverScheduleDifferenceCents": 4,
+      "newCobros": 0,
+      "historicalVehiclesPreservedExactly": 3,
+      "auditIdDigest": "175bebb682ca35bd3978b92ebcd22b41bfe49d3bf0565971fbb949d9ee950c23",
+      "policyIdDigest": "5fa75c12d03f29a5a52084e24f9bcbc9743c8556641c94dff850d408ba74c6bc",
+      "sourceReadbackDigest": "513478d6c601dc7f782676f84d1630cacff2a44295680e81aa0d4e2dfcd628f7"
+    },
+    {
+      "policy": "91-8342189",
+      "endorsement": "384443",
+      "termStart": "2026-11-12",
+      "termEnd": "2027-11-12",
+      "sourcePdfSha256": "1814d67bd274ccecbb523666fc9cd52fd8928cd41b8cbec4a725804c0e41a9ad",
+      "status": "COMMITTED_AND_EXACT_SERVER_READBACK_PASS",
+      "beforeDigest": "041bd5a1fce835d87369f12ce7d7315e524932b364c30f815fe52023da97475b",
+      "casMatched": true,
+      "policySuccessors": 1,
+      "receipts": 12,
+      "portfolioRows": 12,
+      "vehicleVersions": 1,
+      "activities": 1,
+      "previousPolicyUpdates": 1,
+      "audits": 1,
+      "technicalWrites": 29,
+      "pendingCents": 336706,
+      "originalContractGrossCents": 336710,
+      "documentedCoverScheduleDifferenceCents": 4,
+      "newCobros": 0,
+      "historicalVehiclesPreservedExactly": 1,
+      "auditIdDigest": "e20ad341770a5d8aad951572f8daf476c7501bb12661c576b657a61be1296270",
+      "policyIdDigest": "61a5f0d2624834817c1fb14816f15109bce4d6f4036b28096f7c61f9da604f92",
+      "sourceReadbackDigest": "5517f4bc73143d96a49f3fdfc1f95ec1f29ab39b7eb417bf3034525b7ad37d9d",
+      "documentaryRoleClarification": {
+        "contractHolderVerified": true,
+        "vehicleOwnerDistinctFromContractHolder": true,
+        "certificateCount": 1,
+        "inciso": "1",
+        "primaryEvidencePage": 4,
+        "historicalFirstCardHolderFlagIsNotAContractHolderConflict": true
+      }
+    }
+  ],
+  "preservedPriorCases": [
+    {
+      "policy": "91-8324489",
+      "status": "ALREADY_APPLIED_READBACK_PASS",
+      "originalRunId": 45088103756,
+      "newWrites": 0,
+      "receiptsVerified": 12,
+      "portfolioRowsVerified": 12,
+      "pendingCents": 336706,
+      "newCobros": 0,
+      "auditIdDigest": "8b422163ac505eedd5142b764c2759e9531ebeefa854a7a1e1ec9797ad02563d",
+      "policyIdDigest": "ba0dc9167d52fb30e4aacffc3d1b09a5c0a4fe1764514d5b0448dbfff782853a"
+    },
+    {
+      "policy": "91-8343059",
+      "status": "ALREADY_APPLIED_READBACK_PASS",
+      "originalRunId": 45088103756,
+      "newWrites": 0,
+      "receiptsVerified": 12,
+      "portfolioRowsVerified": 12,
+      "pendingCents": 504079,
+      "newCobros": 0,
+      "auditIdDigest": "343406f3d2ca565893c964446a0c8e1e2c20c50063510e83fa08140737fb6ab7",
+      "policyIdDigest": "c2c43ffdab76f0bba6d2b4a9dbcb0f71b3e7f71a864cc89e44b248b418c27509"
+    }
+  ],
+  "after": {
+    "newCommittedCases": 2,
+    "newObligations": 24,
+    "newPortfolioRows": 24,
+    "newPendingCents": 667812,
+    "dataCreates": 54,
+    "dataUpdates": 2,
+    "auditCreates": 2,
+    "totalTechnicalWrites": 58,
+    "newPolicies": 2,
+    "newVehicleVersions": 2,
+    "newActivities": 2,
+    "previousPoliciesLinked": 2,
+    "historicalVehiclesVerifiedUnchanged": 4,
+    "newCobros": 0,
+    "bankMovements": 0,
+    "automaticConciliations": 0,
+    "committedReadbackHolds": 0,
+    "previouslyAppliedCasesPreserved": 2,
+    "previouslyAppliedObligationsPreserved": 24,
+    "previouslyAppliedPendingCentsPreserved": 840785,
+    "fiveOriginalsScope": {
+      "materializedCases": 4,
+      "materializedObligations": 48,
+      "materializedPendingCents": 1508597,
+      "heldCases": 1,
+      "heldObligations": 1,
+      "heldPendingCents": 374740
+    },
+    "source302PostApplyCensus": "NOT_CLAIMED_BY_THIS_RECEIPT_REQUIRES_FRESH_READONLY_RUN"
+  },
+  "localHolds": [
+    {
+      "policy": "91-4140843",
+      "endorsement": "322984",
+      "termStart": "2026-09-10",
+      "termEnd": "2027-09-10",
+      "sourcePdfSha256": "a8b0b7cf358630ebcdf934a9dcfdcb5939b2192d55acf50cb8cea2f5a1c2fe44",
+      "sourceRequirement": "5574011",
+      "status": "HOLD",
+      "reason": "ISSUED_RISK_CURRENT_POLICY_OR_HOLDER_CONFLICT",
+      "obligationsExcluded": 1,
+      "pendingCentsExcluded": 374740,
+      "writes": 0,
+      "holderCount": 1,
+      "insurerCount": 1,
+      "advisorCount": 1,
+      "exactCurrentPolicyCount": 0,
+      "unverifiedCountryCount": 0,
+      "canonicalPredecessorCount": 0,
+      "documentaryRiskMatches": 4,
+      "currentRiskConflicts": 1,
+      "contractualOriginalOperation": "RENOVACION",
+      "sourceOriginalAndScheduleVerified": true,
+      "definitiveDuplicateEstablished": false,
+      "next": "Read the parent policy of the single conflicting current risk, its country, holder relation, number aliases and term against the authenticated issued renewal. Do not invent a predecessor, alter the old risk or reask already established document/holder/amount/advisor decisions."
+    }
+  ],
+  "verification": {
+    "pureAndProtectedEntrypointTestsPassed": 15,
+    "realLocalOriginalPdfParsesPassed": 3,
+    "realLocalIssuedLinesCompared": 25,
+    "commercialProof": "Protected transaction commits and fresh exact server postimages; each new policy/vehicle/activity, 24 receipts and 24 portfolio rows, predecessor link, original term/endorsement/PDF/requirements/gross and historical vehicle preimages verified.",
+    "idempotence": "Deterministic audit and target IDs; existing committed operations receive exact readback with zero new writes. Isolated tests execute second apply and independent readback for new and both original cases; current production run reverified both prior cases without rewriting.",
+    "negativeProofs": [
+      "Source insured/vehicle-owner roles separated without accepting a different contractual insured",
+      "Multiple certificates or altered source installment rejected",
+      "Overlapping current, other-holder and orphan risk references held",
+      "Compatible policy alias with missing country introduced between preflight and apply held without writes",
+      "Changed parent preimage rejected by CAS",
+      "Used insurer requirement rejected",
+      "Prior risks unchanged after write",
+      "Committed transaction plus failed readback retains actual write count and reports COMMITTED_READBACK_HOLD"
+    ],
+    "sourceBlobs": {
+      "tools/gravicentra-i66-roble-issued-original.cjs": "e88f9b55589e6af38205511fa4b71017738770ac",
+      "tools/gravicentra-i66-roble-two-issued-plan.cjs": "f00329a3f1f51be0800ea74319edfea36261978b",
+      "tools/gravicentra-i66-roble-two-issued-protected.cjs": "a54c227c318df86f9b316699bcc109904c48aab4",
+      "tools/gravicentra-i66-roble-two-issued-plan.test.cjs": "bad1ffac1ccc0d15a665547e674872ffa1de523d",
+      ".github/workflows/gravicentra-i66-insurer-source-bulk-protected.yml": "65594a61c2b1bb89f5963edee7ee5cc2f8441b2a"
+    }
+  },
+  "boundaries": {
+    "productFrontendFilesChanged": 0,
+    "productBuildPromoted": false,
+    "controlPlaneTransitionByThisReceipt": false,
+    "formalI66PassClaimed": false,
+    "fullFinancialBacklogClosed": false,
+    "browserClickFlowClaimed": false,
+    "source302AfterCountsInvented": false,
+    "extraProtectedWritesAuthorizedByThisReceipt": false
+  },
+  "privacy": {
+    "holderNamesCopied": false,
+    "contactOrAddressCopied": false,
+    "vehiclePlateVinEngineCopied": false,
+    "credentialsCopied": false,
+    "rawFirestoreDocumentIdsCopied": false,
+    "rawPdfCopied": false,
+    "caseReferencesAndDigestOnly": true
+  }
+}

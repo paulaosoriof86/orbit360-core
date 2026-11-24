@@ -1,0 +1,773 @@
+{
+  "schema": "GI_I66_SOURCE_302_POST_COMMERCIAL_READONLY_CENSUS_V1",
+  "gate": "I6.6",
+  "recordedAtUtc": "2026-11-24T05:24:17Z",
+  "dateGuatemala": "2026-11-23",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "status": "REAL_FIRESTORE_SOURCE_302_READONLY_CENSUS_PASS_WITH_ISOLATED_EXCEPTIONS",
+  "scope": "Fresh direct Firestore census of all 302 pinned source rows after the protected Cendoso and El Roble commercial runs. Counts and case identities are copied from this execution, not inferred from earlier totals or write arithmetic.",
+  "execution": {
+    "workflow": ".github/workflows/gravicentra-i66-insurer-source-bulk-protected.yml",
+    "runId": 45332501697,
+    "runNumber": 62,
+    "runAttempt": 1,
+    "runUrl": "https://github.com/paulaosoriof86/orbit360-core/actions/runs/45332501697",
+    "event": "push",
+    "triggerMarker": "I66_REFRESH_PINNED_SOURCE",
+    "sourceCommit": "155918f7b422b6ed2e974f9bd66852c0029bbdf1",
+    "status": "completed",
+    "conclusion": "success",
+    "startedAtUtc": "2026-11-24T05:19:26Z",
+    "completedMetadataAtUtc": "2026-11-24T05:19:58Z",
+    "preflightJob": {
+      "id": 138236726429,
+      "name": "preflight",
+      "conclusion": "success",
+      "jobUrl": "https://github.com/paulaosoriof86/orbit360-core/actions/runs/45332501697/job/138236726429",
+      "sourcePreflightEmittedAtUtc": "2026-11-24T05:19:52.9406526Z",
+      "verifiedCountEmittedAtUtc": "2026-11-24T05:19:53.0071321Z",
+      "countMarker": "I66_BULK_PROTECTED_PREFLIGHT_PASS input=302 ready=0 unchanged=214 exceptions=88 chunks=0 ZERO_WRITES"
+    },
+    "protectedJobs": [
+      {
+        "id": 138236919658,
+        "name": "protected-issued-documentary-successor",
+        "conclusion": "skipped"
+      },
+      {
+        "id": 138236919806,
+        "name": "protected-issued-d01-source-schedule",
+        "conclusion": "skipped"
+      },
+      {
+        "id": 138236919871,
+        "name": "protected-source-bulk-live",
+        "conclusion": "skipped"
+      },
+      {
+        "id": 138236919900,
+        "name": "protected-d03-statement-series",
+        "conclusion": "skipped"
+      },
+      {
+        "id": 138236920352,
+        "name": "protected-issued-roble-two-24",
+        "conclusion": "skipped"
+      },
+      {
+        "id": 138236920540,
+        "name": "protected-issued-d03-source-schedule",
+        "conclusion": "skipped"
+      }
+    ],
+    "protectedWriteApprovalsForThisRefresh": 0,
+    "commercialRunsPrecedingCensus": [
+      45330498452,
+      45330498425
+    ],
+    "priorCommercialResultsAreSeparateReceipts": [
+      "artifacts/orbit360-recovery/release-control/I6_6_CENDOSO_146_HISTORICAL_LIVE_READBACK_20261124.json",
+      "artifacts/orbit360-recovery/release-control/I6_6_ROBLE_REMAINING_24_COMMERCIAL_SERVER_READBACK_20261124.json"
+    ]
+  },
+  "request": {
+    "path": "artifacts/orbit360-recovery/release-control/I6_6_20261123_PROTECTED_SOURCE_BULK_REFRESH_REQUEST.json",
+    "gitBlobSha": "6a6e1190060029e63ebd9feb2df884ab01485563",
+    "bytesSha256": "e6bbe99aef2824deb9a13f793561ca7d9178f39091b8e93cc0642959686fd8f2",
+    "requestedExecution": "EXISTING_WORKFLOW_READONLY_POST_COMMIT_CENSUS_302",
+    "workflowMayApplyReadyRows": false,
+    "protectedWritesApprovedForThisRefresh": false,
+    "boundary": "The request file triggers the existing workflow through its push path and commit marker. Runtime zero-write proof is the preflight result plus all six protected jobs skipped; the workflow does not parse the request JSON fields as an execution guard."
+  },
+  "source": {
+    "manifest": "artifacts/orbit360-recovery/source-batches/I6_6_SOURCE_BULK_20261120_MULTI_302.json",
+    "manifestGitBlobSha": "ab64e111319e3447733a3af05bf378250698ccdb",
+    "manifestBytesSha256": "35b548913253c836e63db6cb3cac79bda541a6ceda776494969d23393504e225",
+    "verifiedSourceRows": 302,
+    "sourceCaseIdentityUniquenessVerified": true,
+    "sourceMutationInThisRun": false
+  },
+  "artifact": {
+    "id": 14892581914,
+    "name": "gi-i66-source-bulk-preflight-45332501697",
+    "url": "https://github.com/paulaosoriof86/orbit360-core/actions/runs/45332501697/artifacts/14892581914",
+    "archiveDigest": "sha256:8b49cf8f8bb5c3e442496b01ded8b609cc5713df359c36f849d38babe84cf75d",
+    "sizeInBytes": 27563,
+    "createdAtUtc": "2026-11-24T05:19:54Z",
+    "expiresAtUtc": "2026-12-08T05:19:53Z",
+    "files": [
+      {
+        "name": "gi-i66-bulk-plan.json",
+        "bytes": 209275,
+        "bytesSha256": "405447ef449b068d5ad5304290d326ad387c216adc293ce515e088ab4375e8e3",
+        "compactJsonStringifySha256": "5fe4370e1628cb6030d4b9d629b830e34c7dfe609708216f541f7216da20782d"
+      },
+      {
+        "name": "gi-i66-bulk-preflight.json",
+        "bytes": 42107,
+        "bytesSha256": "681fb60966cbef9b463446c5b57bda1a6e8bb86df1ec0d16c4241da7331bcfa9"
+      }
+    ],
+    "privateRawDiagnosticsNotCopiedToThisReceipt": true
+  },
+  "observedResult": {
+    "planStatus": "BULK_SOURCE_PREFLIGHT_ONLY_NO_WRITES",
+    "reportStatus": "BULK_SOURCE_NO_ELIGIBLE_ROWS_DIAGNOSTIC_HOLD",
+    "inputRows": 302,
+    "unchangedCount": 214,
+    "readyCount": 0,
+    "exceptionCount": 88,
+    "exceptionCodes": {
+      "POLICY_EDITION_MISSING": 67,
+      "PAYMENT_OR_PORTFOLIO_EXCEPTION": 1,
+      "RECEIPT_NOT_IDENTIFIED": 20
+    },
+    "writeChunks": 0,
+    "writes": 0,
+    "diagnostic": {
+      "sourcePolicyNumbers": 47,
+      "livePolicyEditions": 108,
+      "editionsWithReceipts": 60,
+      "editionsWithPortfolio": 59,
+      "editionsWithCobros": 36
+    },
+    "unchangedMeaning": "The source adapter matched each listed row against its current receipt and active portfolio and found no pending source difference eligible for this writer. This count is neither a count of newly created obligations nor a payment total.",
+    "exceptionMeaning": "These are the exact generic planner classifications. Local exceptions remain isolated and do not undo the 214 unchanged cases. PAYMENT_OR_PORTFOLIO_EXCEPTION for 0043 retains its separately evidenced preserve-existing-paid resolution below."
+  },
+  "exactUnchangedCaseIds": [
+    "ROBLE_NOV20_0001",
+    "ROBLE_NOV20_0002",
+    "ROBLE_NOV20_0003",
+    "ROBLE_NOV20_0004",
+    "ROBLE_NOV20_0005",
+    "ROBLE_NOV20_0006",
+    "ROBLE_NOV20_0007",
+    "ROBLE_NOV20_0008",
+    "ROBLE_NOV20_0009",
+    "ROBLE_NOV20_0010",
+    "ROBLE_NOV20_0011",
+    "ROBLE_NOV20_0012",
+    "ROBLE_NOV20_0013",
+    "ROBLE_NOV20_0014",
+    "ROBLE_NOV20_0015",
+    "ROBLE_NOV20_0016",
+    "ROBLE_NOV20_0017",
+    "ROBLE_NOV20_0018",
+    "ROBLE_NOV20_0019",
+    "ROBLE_NOV20_0020",
+    "ROBLE_NOV20_0021",
+    "ROBLE_NOV20_0022",
+    "ROBLE_NOV20_0023",
+    "ROBLE_NOV20_0024",
+    "ROBLE_NOV20_0025",
+    "ROBLE_NOV20_0026",
+    "ROBLE_NOV20_0027",
+    "ROBLE_NOV20_0028",
+    "ROBLE_NOV20_0029",
+    "ROBLE_NOV20_0030",
+    "ROBLE_NOV20_0031",
+    "ROBLE_NOV20_0032",
+    "ROBLE_NOV20_0033",
+    "ROBLE_NOV20_0034",
+    "ROBLE_NOV20_0035",
+    "ROBLE_NOV20_0036",
+    "ROBLE_NOV20_0037",
+    "ROBLE_NOV20_0038",
+    "ROBLE_NOV20_0039",
+    "ROBLE_NOV20_0041",
+    "ROBLE_NOV20_0042",
+    "ROBLE_NOV20_0044",
+    "ROBLE_NOV20_0045",
+    "ROBLE_NOV20_0046",
+    "ROBLE_NOV20_0047",
+    "ROBLE_NOV20_0048",
+    "ROBLE_NOV20_0049",
+    "ROBLE_NOV20_0050",
+    "ROBLE_NOV20_0051",
+    "ROBLE_NOV20_0052",
+    "ROBLE_NOV20_0053",
+    "ROBLE_NOV20_0054",
+    "ROBLE_NOV20_0055",
+    "ROBLE_NOV20_0056",
+    "ROBLE_NOV20_0057",
+    "ROBLE_NOV20_0058",
+    "ROBLE_NOV20_0059",
+    "ROBLE_NOV20_0060",
+    "ROBLE_NOV20_0061",
+    "ROBLE_NOV20_0062",
+    "ROBLE_NOV20_0063",
+    "ROBLE_NOV20_0064",
+    "ROBLE_NOV20_0065",
+    "ROBLE_NOV20_0066",
+    "ROBLE_NOV20_0067",
+    "ROBLE_NOV20_0068",
+    "ROBLE_NOV20_0069",
+    "ROBLE_NOV20_0082",
+    "ROBLE_NOV20_0083",
+    "ROBLE_NOV20_0084",
+    "ROBLE_NOV20_0085",
+    "ROBLE_NOV20_0086",
+    "ROBLE_NOV20_0087",
+    "ROBLE_NOV20_0088",
+    "ROBLE_NOV20_0089",
+    "ROBLE_NOV20_0091",
+    "ROBLE_NOV20_0092",
+    "ROBLE_NOV20_0093",
+    "ROBLE_NOV20_0094",
+    "ROBLE_NOV20_0106",
+    "ROBLE_NOV20_0107",
+    "ROBLE_NOV20_0108",
+    "ROBLE_NOV20_0109",
+    "ROBLE_NOV20_0110",
+    "ROBLE_NOV20_0111",
+    "ROBLE_NOV20_0112",
+    "ROBLE_NOV20_0113",
+    "ROBLE_NOV20_0114",
+    "ROBLE_NOV20_0115",
+    "ROBLE_NOV20_0116",
+    "ROBLE_NOV20_0117",
+    "ROBLE_NOV20_0118",
+    "ROBLE_NOV20_0119",
+    "ROBLE_NOV20_0120",
+    "ROBLE_NOV20_0121",
+    "ROBLE_NOV20_0122",
+    "ROBLE_NOV20_0123",
+    "ROBLE_NOV20_0124",
+    "ROBLE_NOV20_0125",
+    "ROBLE_NOV20_0126",
+    "ROBLE_NOV20_0127",
+    "ROBLE_NOV20_0128",
+    "ROBLE_NOV20_0129",
+    "ROBLE_NOV20_0130",
+    "ROBLE_NOV20_0131",
+    "ROBLE_NOV20_0132",
+    "ROBLE_NOV20_0133",
+    "ROBLE_NOV20_0134",
+    "ROBLE_NOV20_0135",
+    "ROBLE_NOV20_0136",
+    "ROBLE_NOV20_0137",
+    "ROBLE_NOV20_0138",
+    "ROBLE_NOV20_0139",
+    "ROBLE_NOV20_0140",
+    "ROBLE_NOV20_0141",
+    "ROBLE_NOV20_0142",
+    "ROBLE_NOV20_0143",
+    "ROBLE_NOV20_0144",
+    "ROBLE_NOV20_0145",
+    "ROBLE_NOV20_0146",
+    "ROBLE_NOV20_0147",
+    "ROBLE_NOV20_0148",
+    "ROBLE_NOV20_0149",
+    "ROBLE_NOV20_0150",
+    "ROBLE_NOV20_0151",
+    "ROBLE_NOV20_0152",
+    "ROBLE_NOV20_0153",
+    "ROBLE_NOV20_0154",
+    "ROBLE_NOV20_0155",
+    "ROBLE_NOV20_0156",
+    "ROBLE_NOV20_0157",
+    "ROBLE_NOV20_0158",
+    "ROBLE_NOV20_0159",
+    "ROBLE_NOV20_0160",
+    "ROBLE_NOV20_0161",
+    "ROBLE_NOV20_0162",
+    "ROBLE_NOV20_0163",
+    "ROBLE_NOV20_0164",
+    "ROBLE_NOV20_0165",
+    "ROBLE_NOV20_0166",
+    "ROBLE_NOV20_0167",
+    "ROBLE_NOV20_0168",
+    "ROBLE_NOV20_0169",
+    "ROBLE_NOV20_0170",
+    "ROBLE_NOV20_0171",
+    "ROBLE_NOV20_0172",
+    "ROBLE_NOV20_0173",
+    "ROBLE_NOV20_0174",
+    "ROBLE_NOV20_0175",
+    "ROBLE_NOV20_0176",
+    "ROBLE_NOV20_0177",
+    "ROBLE_NOV20_0178",
+    "ROBLE_NOV20_0179",
+    "ROBLE_NOV20_0187",
+    "ROBLE_NOV20_0188",
+    "ROBLE_NOV20_0189",
+    "ROBLE_NOV20_0190",
+    "ROBLE_NOV20_0191",
+    "ROBLE_NOV20_0192",
+    "ROBLE_NOV20_0193",
+    "ROBLE_NOV20_0194",
+    "ROBLE_NOV20_0195",
+    "ROBLE_NOV20_0196",
+    "ROBLE_NOV20_0197",
+    "ROBLE_NOV20_0198",
+    "ROBLE_NOV20_0199",
+    "ROBLE_NOV20_0200",
+    "ROBLE_NOV20_0201",
+    "ROBLE_NOV20_0202",
+    "ROBLE_NOV20_0203",
+    "ROBLE_NOV20_0204",
+    "ROBLE_NOV20_0205",
+    "ROBLE_NOV20_0206",
+    "ROBLE_NOV20_0207",
+    "ROBLE_NOV20_0208",
+    "ROBLE_NOV20_0209",
+    "ROBLE_NOV20_0210",
+    "ROBLE_NOV20_0211",
+    "ROBLE_NOV20_0212",
+    "ROBLE_NOV20_0213",
+    "ROBLE_NOV20_0214",
+    "ROBLE_NOV20_0215",
+    "ROBLE_NOV20_0216",
+    "ROBLE_NOV20_0217",
+    "ROBLE_NOV20_0218",
+    "ROBLE_NOV20_0219",
+    "ROBLE_NOV20_0220",
+    "ROBLE_NOV20_0221",
+    "ROBLE_NOV20_0222",
+    "ROBLE_NOV20_0223",
+    "ROBLE_NOV20_0224",
+    "ROBLE_NOV20_0225",
+    "ROBLE_NOV20_0226",
+    "ROBLE_NOV20_0227",
+    "ROBLE_NOV20_0228",
+    "ROBLE_NOV20_0229",
+    "ROBLE_NOV20_0231",
+    "ROBLE_NOV20_0232",
+    "ROBLE_NOV20_0233",
+    "ROBLE_NOV20_0234",
+    "ROBLE_NOV20_0235",
+    "ROBLE_NOV20_0236",
+    "UNIVERSALES_NOV16_39460328",
+    "UNIVERSALES_NOV16_39460329",
+    "UNIVERSALES_NOV16_39460330",
+    "UNIVERSALES_NOV16_39460331",
+    "UNIVERSALES_NOV16_39460332",
+    "UNIVERSALES_NOV16_39460333",
+    "UNIVERSALES_NOV16_39460334",
+    "UNIVERSALES_NOV16_39460335",
+    "UNIVERSALES_NOV16_39460336",
+    "UNIVERSALES_NOV16_39460337",
+    "GYT_NOV19_0003",
+    "GYT_NOV19_0005"
+  ],
+  "isolatedExceptions": [
+    {
+      "caseId": "ROBLE_NOV20_0040",
+      "code": "POLICY_EDITION_MISSING"
+    },
+    {
+      "caseId": "ROBLE_NOV20_0043",
+      "code": "PAYMENT_OR_PORTFOLIO_EXCEPTION"
+    },
+    {
+      "caseId": "ROBLE_NOV20_0070",
+      "code": "POLICY_EDITION_MISSING"
+    },
+    {
+      "caseId": "ROBLE_NOV20_0071",
+      "code": "POLICY_EDITION_MISSING"
+    },
+    {
+      "caseId": "ROBLE_NOV20_0072",
+      "code": "POLICY_EDITION_MISSING"
+    },
+    {
+      "caseId": "ROBLE_NOV20_0073",
+      "code": "POLICY_EDITION_MISSING"
+    },
+    {
+      "caseId": "ROBLE_NOV20_0074",
+      "code": "POLICY_EDITION_MISSING"
+    },
+    {
+      "caseId": "ROBLE_NOV20_0075",
+      "code": "POLICY_EDITION_MISSING"
+    },
+    {
+      "caseId": "ROBLE_NOV20_0076",
+      "code": "POLICY_EDITION_MISSING"
+    },
+    {
+      "caseId": "ROBLE_NOV20_0077",
+      "code": "POLICY_EDITION_MISSING"
+    },
+    {
+      "caseId": "ROBLE_NOV20_0078",
+      "code": "POLICY_EDITION_MISSING"
+    },
+    {
+      "caseId": "ROBLE_NOV20_0079",
+      "code": "POLICY_EDITION_MISSING"
+    },
+    {
+      "caseId": "ROBLE_NOV20_0080",
+      "code": "POLICY_EDITION_MISSING"
+    },
+    {
+      "caseId": "ROBLE_NOV20_0081",
+      "code": "POLICY_EDITION_MISSING"
+    },
+    {
+      "caseId": "ROBLE_NOV20_0090",
+      "code": "POLICY_EDITION_MISSING"
+    },
+    {
+      "caseId": "ROBLE_NOV20_0095",
+      "code": "POLICY_EDITION_MISSING"
+    },
+    {
+      "caseId": "ROBLE_NOV20_0096",
+      "code": "POLICY_EDITION_MISSING"
+    },
+    {
+      "caseId": "ROBLE_NOV20_0097",
+      "code": "POLICY_EDITION_MISSING"
+    },
+    {
+      "caseId": "ROBLE_NOV20_0098",
+      "code": "POLICY_EDITION_MISSING"
+    },
+    {
+      "caseId": "ROBLE_NOV20_0099",
+      "code": "POLICY_EDITION_MISSING"
+    },
+    {
+      "caseId": "ROBLE_NOV20_0100",
+      "code": "POLICY_EDITION_MISSING"
+    },
+    {
+      "caseId": "ROBLE_NOV20_0101",
+      "code": "POLICY_EDITION_MISSING"
+    },
+    {
+      "caseId": "ROBLE_NOV20_0102",
+      "code": "POLICY_EDITION_MISSING"
+    },
+    {
+      "caseId": "ROBLE_NOV20_0103",
+      "code": "POLICY_EDITION_MISSING"
+    },
+    {
+      "caseId": "ROBLE_NOV20_0104",
+      "code": "POLICY_EDITION_MISSING"
+    },
+    {
+      "caseId": "ROBLE_NOV20_0105",
+      "code": "POLICY_EDITION_MISSING"
+    },
+    {
+      "caseId": "ROBLE_NOV20_0180",
+      "code": "RECEIPT_NOT_IDENTIFIED"
+    },
+    {
+      "caseId": "ROBLE_NOV20_0181",
+      "code": "RECEIPT_NOT_IDENTIFIED"
+    },
+    {
+      "caseId": "ROBLE_NOV20_0182",
+      "code": "RECEIPT_NOT_IDENTIFIED"
+    },
+    {
+      "caseId": "ROBLE_NOV20_0183",
+      "code": "RECEIPT_NOT_IDENTIFIED"
+    },
+    {
+      "caseId": "ROBLE_NOV20_0184",
+      "code": "RECEIPT_NOT_IDENTIFIED"
+    },
+    {
+      "caseId": "ROBLE_NOV20_0185",
+      "code": "RECEIPT_NOT_IDENTIFIED"
+    },
+    {
+      "caseId": "ROBLE_NOV20_0186",
+      "code": "RECEIPT_NOT_IDENTIFIED"
+    },
+    {
+      "caseId": "ROBLE_NOV20_0230",
+      "code": "RECEIPT_NOT_IDENTIFIED"
+    },
+    {
+      "caseId": "ROBLE_NOV20_0237",
+      "code": "POLICY_EDITION_MISSING"
+    },
+    {
+      "caseId": "ROBLE_NOV20_0238",
+      "code": "RECEIPT_NOT_IDENTIFIED"
+    },
+    {
+      "caseId": "ROBLE_NOV20_0239",
+      "code": "RECEIPT_NOT_IDENTIFIED"
+    },
+    {
+      "caseId": "ROBLE_NOV20_0240",
+      "code": "RECEIPT_NOT_IDENTIFIED"
+    },
+    {
+      "caseId": "ROBLE_NOV20_0241",
+      "code": "RECEIPT_NOT_IDENTIFIED"
+    },
+    {
+      "caseId": "ROBLE_NOV20_0242",
+      "code": "RECEIPT_NOT_IDENTIFIED"
+    },
+    {
+      "caseId": "ROBLE_NOV20_0243",
+      "code": "RECEIPT_NOT_IDENTIFIED"
+    },
+    {
+      "caseId": "ROBLE_NOV20_0244",
+      "code": "RECEIPT_NOT_IDENTIFIED"
+    },
+    {
+      "caseId": "ROBLE_NOV20_0245",
+      "code": "RECEIPT_NOT_IDENTIFIED"
+    },
+    {
+      "caseId": "ROBLE_NOV20_0246",
+      "code": "RECEIPT_NOT_IDENTIFIED"
+    },
+    {
+      "caseId": "ROBLE_NOV20_0247",
+      "code": "RECEIPT_NOT_IDENTIFIED"
+    },
+    {
+      "caseId": "ROBLE_NOV20_0248",
+      "code": "RECEIPT_NOT_IDENTIFIED"
+    },
+    {
+      "caseId": "ROBLE_NOV20_0249",
+      "code": "POLICY_EDITION_MISSING"
+    },
+    {
+      "caseId": "ROBLE_NOV20_0250",
+      "code": "POLICY_EDITION_MISSING"
+    },
+    {
+      "caseId": "ROBLE_NOV20_0251",
+      "code": "POLICY_EDITION_MISSING"
+    },
+    {
+      "caseId": "ROBLE_NOV20_0252",
+      "code": "POLICY_EDITION_MISSING"
+    },
+    {
+      "caseId": "ROBLE_NOV20_0253",
+      "code": "POLICY_EDITION_MISSING"
+    },
+    {
+      "caseId": "ROBLE_NOV20_0254",
+      "code": "POLICY_EDITION_MISSING"
+    },
+    {
+      "caseId": "ROBLE_NOV20_0255",
+      "code": "POLICY_EDITION_MISSING"
+    },
+    {
+      "caseId": "ROBLE_NOV20_0256",
+      "code": "POLICY_EDITION_MISSING"
+    },
+    {
+      "caseId": "ROBLE_NOV20_0257",
+      "code": "POLICY_EDITION_MISSING"
+    },
+    {
+      "caseId": "ROBLE_NOV20_0258",
+      "code": "POLICY_EDITION_MISSING"
+    },
+    {
+      "caseId": "ROBLE_NOV20_0259",
+      "code": "POLICY_EDITION_MISSING"
+    },
+    {
+      "caseId": "UNIVERSALES_NOV16_37260365",
+      "code": "POLICY_EDITION_MISSING"
+    },
+    {
+      "caseId": "UNIVERSALES_NOV16_37260366",
+      "code": "POLICY_EDITION_MISSING"
+    },
+    {
+      "caseId": "UNIVERSALES_NOV16_37260367",
+      "code": "POLICY_EDITION_MISSING"
+    },
+    {
+      "caseId": "UNIVERSALES_NOV16_39196269",
+      "code": "POLICY_EDITION_MISSING"
+    },
+    {
+      "caseId": "UNIVERSALES_NOV16_39196270",
+      "code": "POLICY_EDITION_MISSING"
+    },
+    {
+      "caseId": "UNIVERSALES_NOV16_39196271",
+      "code": "POLICY_EDITION_MISSING"
+    },
+    {
+      "caseId": "UNIVERSALES_NOV16_39196272",
+      "code": "POLICY_EDITION_MISSING"
+    },
+    {
+      "caseId": "UNIVERSALES_NOV16_39196273",
+      "code": "POLICY_EDITION_MISSING"
+    },
+    {
+      "caseId": "UNIVERSALES_NOV16_39196274",
+      "code": "POLICY_EDITION_MISSING"
+    },
+    {
+      "caseId": "UNIVERSALES_NOV16_39196275",
+      "code": "POLICY_EDITION_MISSING"
+    },
+    {
+      "caseId": "UNIVERSALES_NOV16_39196276",
+      "code": "POLICY_EDITION_MISSING"
+    },
+    {
+      "caseId": "UNIVERSALES_NOV16_39196277",
+      "code": "POLICY_EDITION_MISSING"
+    },
+    {
+      "caseId": "UNIVERSALES_NOV16_39196278",
+      "code": "POLICY_EDITION_MISSING"
+    },
+    {
+      "caseId": "UNIVERSALES_NOV16_39196279",
+      "code": "POLICY_EDITION_MISSING"
+    },
+    {
+      "caseId": "UNIVERSALES_NOV16_39196280",
+      "code": "POLICY_EDITION_MISSING"
+    },
+    {
+      "caseId": "UNIVERSALES_NOV16_39470708",
+      "code": "POLICY_EDITION_MISSING"
+    },
+    {
+      "caseId": "UNIVERSALES_NOV16_39470709",
+      "code": "POLICY_EDITION_MISSING"
+    },
+    {
+      "caseId": "UNIVERSALES_NOV16_39470710",
+      "code": "POLICY_EDITION_MISSING"
+    },
+    {
+      "caseId": "UNIVERSALES_NOV16_39470711",
+      "code": "POLICY_EDITION_MISSING"
+    },
+    {
+      "caseId": "UNIVERSALES_NOV16_39470712",
+      "code": "POLICY_EDITION_MISSING"
+    },
+    {
+      "caseId": "UNIVERSALES_NOV16_39470713",
+      "code": "POLICY_EDITION_MISSING"
+    },
+    {
+      "caseId": "UNIVERSALES_NOV16_39470714",
+      "code": "POLICY_EDITION_MISSING"
+    },
+    {
+      "caseId": "UNIVERSALES_NOV16_39470715",
+      "code": "POLICY_EDITION_MISSING"
+    },
+    {
+      "caseId": "UNIVERSALES_NOV16_39470716",
+      "code": "POLICY_EDITION_MISSING"
+    },
+    {
+      "caseId": "UNIVERSALES_NOV16_39470717",
+      "code": "POLICY_EDITION_MISSING"
+    },
+    {
+      "caseId": "GYT_NOV19_0001",
+      "code": "RECEIPT_NOT_IDENTIFIED"
+    },
+    {
+      "caseId": "GYT_NOV19_0002",
+      "code": "POLICY_EDITION_MISSING"
+    },
+    {
+      "caseId": "GYT_NOV19_0004",
+      "code": "POLICY_EDITION_MISSING"
+    },
+    {
+      "caseId": "FICOHSA_OCT22_7301819",
+      "code": "POLICY_EDITION_MISSING"
+    },
+    {
+      "caseId": "FICOHSA_OCT22_7313398",
+      "code": "POLICY_EDITION_MISSING"
+    },
+    {
+      "caseId": "FICOHSA_OCT22_7317082",
+      "code": "POLICY_EDITION_MISSING"
+    }
+  ],
+  "scopedExistingPaidPreservation": {
+    "caseId": "ROBLE_NOV20_0043",
+    "currentGenericCensusCode": "PAYMENT_OR_PORTFOLIO_EXCEPTION",
+    "includedInGenericExceptionCount": true,
+    "priorScopedStatus": "SOURCE_PENDING_SUPERSEDED_BY_CURRENT_PAID_FACT_PRESERVE_NO_WRITES",
+    "canonicalReceipt": "artifacts/orbit360-recovery/release-control/I6_6_FINANCIAL_0043_EXISTING_PAID_FACT_READBACK_20261123_RUN45285665141.json",
+    "canonicalReceiptGitBlobSha": "ef95c1e0386fd11c1da1774a833931e5edd81502",
+    "receiptReadAtCommit": "155918f7b422b6ed2e974f9bd66852c0029bbdf1",
+    "priorScopedRunId": 45285665141,
+    "priorScopedJobId": 138081223060,
+    "priorScopedRunUrl": "https://github.com/paulaosoriof86/orbit360-core/actions/runs/45285665141",
+    "priorScopedArtifactId": 14871851091,
+    "priorScopedArtifactDigest": "sha256:85059f5f2bc83fa5a74f7f6f6b168c9b0d3acf185070f3e64a42e137f4687c34",
+    "sourceRequirement": "5693797",
+    "grossCents": 33437,
+    "currency": "GTQ",
+    "priorScopedFacts": {
+      "receiptPaid": true,
+      "portfolioPaid": true,
+      "activePortfolioCount": 1,
+      "exactLinkedCashCount": 1,
+      "inferredPaid": false
+    },
+    "decision": "Preserve the already paid receipt, portfolio and existing linked cash. Do not reapply the older pending-source row, create another payment, or reopen the owner decision.",
+    "newWrites": 0,
+    "scopedReadbackWasNotRerunByThisCensus": true,
+    "genericCountersAreReportedUnchangedRatherThanMechanicallyReclassified": true
+  },
+  "verification": {
+    "reportCountsEqualPlanCounts": true,
+    "all214UnchangedIdsAreUnique": true,
+    "all88ExceptionIdsAreUnique": true,
+    "unchangedAndExceptionSetsAreDisjoint": true,
+    "combinedCaseIdsExactlyEqualPinned302SourceIds": true,
+    "exceptionCodeHistogramMatchesReport": true,
+    "sourceBytesMatchBothPlanAndReport": true,
+    "compactPlanSha256MatchesReport": true,
+    "planCompactHashMethod": "SHA-256 of UTF-8 JSON.stringify(JSON.parse(plan-file)); verified with Node.js independently of the pretty-printed file-byte hash.",
+    "workflowRunSourceAndConclusionVerifiedThroughGitHubApi": true,
+    "protectedJobConclusionsVerifiedThroughGitHubApi": true,
+    "artifactDigestVerifiedThroughGitHubApiAndJobLog": true
+  },
+  "boundaries": {
+    "newFinancialWrites": 0,
+    "newObligationsClaimedByCensus": 0,
+    "newCobrosClaimedByCensus": 0,
+    "newBankMovementsClaimedByCensus": 0,
+    "newReconciliationsClaimedByCensus": 0,
+    "authOrMembershipWrites": 0,
+    "frontendBuildOrDeployClaimed": false,
+    "businessUiReadbackClaimed": false,
+    "allI66ExceptionsResolved": false,
+    "fullI66ClosureClaimed": false,
+    "futureWriteAuthorizationGrantedByReceipt": false,
+    "noArithmeticSubtractionUsedAsEvidenceForCurrentCounters": true,
+    "noGenericExceptionAutomaticallyReclassifiedAsUnpaid": true
+  },
+  "privacy": {
+    "containsPersonalNames": false,
+    "containsContactOrAddressData": false,
+    "containsVehiclePlatesVinsOrEngines": false,
+    "containsRawFirestoreDocumentIds": false,
+    "containsCredentialsOrSourcePdfContents": false,
+    "publishedIdentifiers": "Existing non-personal source case IDs, one already documented insurer requirement, evidence hashes, workflow/job/artifact IDs and repo-relative proof references only."
+  }
+}
