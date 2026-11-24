@@ -122,10 +122,10 @@ const TECHNICAL_PRIOR_RECEIPT_SHA256 = 'db754d7a0b26f6396e4320c7d60e09c3aba608b5
 const TECHNICAL_LIVE_ORIGINS = Object.freeze(['https://ays-orbit-360-lab.web.app', 'https://app.aysseguros.com']);
 // Closed successor of the current physical release. Historical R11 and
 // network-diagnostic profiles retain their original pins and 223-file contract.
-const PHYSICAL_RECEIPT_PATH = 'artifacts/orbit360-recovery/release-control/I6_6_CURRENT_PHYSICAL_PREVIEW_V24_ROLLOVER_20261124.json';
-const PHYSICAL_RECEIPT_SHA256 = 'cd80787cd2560939c0384ebca49ee58b4a06acbad5ba201d78b681029458368d';
-const PHYSICAL_PROFILE = 'I66_CURRENT_PHYSICAL_E3_PREVIEW_V24_SUCCESSOR_V1';
-const PHYSICAL_BASE = '478c045c168c2e1b80f28a94094f4dbbbfdf1f81';
+const PHYSICAL_RECEIPT_PATH = 'artifacts/orbit360-recovery/release-control/I6_6_CURRENT_PHYSICAL_PREVIEW_V24_ROLLOVER_V2_20261124.json';
+const PHYSICAL_RECEIPT_SHA256 = '07b445794fa1135f994308ee8ec29fddb3d0946d620405848a7bc6ed7eba78ea';
+const PHYSICAL_PROFILE = 'I66_CURRENT_PHYSICAL_E3_PREVIEW_V24_SUCCESSOR_V2';
+const PHYSICAL_BASE = 'cb3b8f5d505a53bfbafca80a9334d873d712d73e';
 const PHYSICAL_CHANNEL = 'gi-i66-rc-45448470011';
 const PHYSICAL_ORIGIN = 'https://ays-orbit-360-lab--gi-i66-rc-45448470011-hrham9ah.web.app';
 const PHYSICAL_PREVIOUS_SOURCE = '60ac1ae2d765484ed40c820a942dcc0966385da7';
@@ -163,8 +163,8 @@ function currentPhysicalRolloverCandidatePin() {
 function technicalProfile(pin) {
   return pin?.receiptPath === PHYSICAL_RECEIPT_PATH
     ? { ...currentPhysicalRolloverCandidatePin(), sourceBaseHead: PHYSICAL_BASE, expectedSiteFileCount: 224,
-      deniedSources: [PHYSICAL_BASE, PHYSICAL_PREVIOUS_SOURCE, PHYSICAL_LIVE_SOURCE],
-      deniedBuilds: [45452721643, PHYSICAL_PREVIOUS_BUILD, 45287432665] }
+      deniedSources: [PHYSICAL_BASE, '478c045c168c2e1b80f28a94094f4dbbbfdf1f81', PHYSICAL_PREVIOUS_SOURCE, PHYSICAL_LIVE_SOURCE],
+      deniedBuilds: [45458031865, 45452721643, PHYSICAL_PREVIOUS_BUILD, 45287432665] }
     : { ...technicalRolloverCandidatePin(), sourceBaseHead: TECHNICAL_BASE, expectedSiteFileCount: 223,
       deniedSources: [TECHNICAL_OLD_SOURCE, TECHNICAL_PREVIOUS_SOURCE],
       deniedBuilds: [44009981499, TECHNICAL_OLD_BUILD, TECHNICAL_PREVIOUS_BUILD] };
@@ -226,7 +226,7 @@ function validatePhysicalAuthorization(control, receiptText) {
   assert.equal(c.gate, 'I6.6'); assert.equal(c.historicalClosedGate, 'B4-007');
   assert.equal(c.status, 'OPERATIONAL_EXACT_LIVE_ACCEPTED_LOCKED', 'I66_TECHNICAL_ROLLOVER_PHYSICAL_GATE_REQUIRED');
   const request = c.frontendPreviewRequest;
-  assert.equal(request?.version, 26, 'I66_TECHNICAL_ROLLOVER_SUCCESSOR_REQUEST_REQUIRED');
+  assert.equal(request?.version, 27, 'I66_TECHNICAL_ROLLOVER_SUCCESSOR_REQUEST_REQUIRED');
   assert.equal(request.mode, 'A13_A14_BALANCE_COMPOSITE_ARTIFACT_HOSTING_PREVIEW_ONLY');
   assert.equal(request.previousReceiptBlob, '11fdb3bee494541513482666d6215f45cbad0567');
   for (const key of ['realDataWritesAllowed', 'realCustomerWritesAllowed', 'liveDeployAuthorized',

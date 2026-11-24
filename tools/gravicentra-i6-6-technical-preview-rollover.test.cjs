@@ -790,7 +790,7 @@ function physicalFixture() {
     forbidBackendFunctionDeploy: true, backendFunctionPreviewOnly: false, forbidBackendLiveFunctionDeploy: true,
     noHostingPromotion: true, forbidFirestoreRulesDataAuthWrites: true,
     currentTechnicalPreviewRollover: { receiptPath: physicalPin.receiptPath, receiptSha256: physicalPin.receiptSha256 },
-    frontendPreviewRequest: { version: 26, mode: 'A13_A14_BALANCE_COMPOSITE_ARTIFACT_HOSTING_PREVIEW_ONLY',
+    frontendPreviewRequest: { version: 27, mode: 'A13_A14_BALANCE_COMPOSITE_ARTIFACT_HOSTING_PREVIEW_ONLY',
       previousReceiptBlob: live.receiptGitBlobSha, realDataWritesAllowed: false, realCustomerWritesAllowed: false,
       liveDeployAuthorized: false, releaseAfterPreviewAllowed: false, backendLiveDeployAllowed: false },
     currentPhysicalHostingRelease: { sourceSha: live.sourceSha, previewRunId: live.buildRunId, artifactId: live.artifactId,
@@ -816,7 +816,7 @@ function privateRuntimeExports(overrides = {}) {
 
 test('current physical successor pins v24 inventory and E3 without changing historical receipt or acceptance', () => {
   assert.equal(digest(physicalText), physicalPin.receiptSha256);
-  assert.equal(physicalReceipt.profile, 'I66_CURRENT_PHYSICAL_E3_PREVIEW_V24_SUCCESSOR_V1');
+  assert.equal(physicalReceipt.profile, 'I66_CURRENT_PHYSICAL_E3_PREVIEW_V24_SUCCESSOR_V2');
   assert.equal(api.validateAuthorization(physicalFixture().control, physicalText).channel.id, 'gi-i66-rc-45448470011');
   assert.equal(physicalReceipt.freshInventoryEvidence.artifactId, 14951020393);
   assert.equal(physicalReceipt.freshInventoryEvidence.totalChannels, 51);
@@ -825,7 +825,7 @@ test('current physical successor pins v24 inventory and E3 without changing hist
   assert.equal(physicalReceipt.freshInventoryEvidence.inventoryPath, undefined);
   assert.equal(physicalReceipt.protectedLive.sourceSha, '65c825b2808a615ca4195bdde6689dbdbe3193b2');
   assert.equal(physicalReceipt.protectedLive.expectedSiteFileCount, 224);
-  assert.equal(physicalReceipt.causalRetry.failedBuildRunId, 45452721643);
+  assert.equal(physicalReceipt.causalRetry.failedBuildRunId, 45458031865);
   assert.equal(physicalReceipt.causalRetry.failedRunRemainsFailed, true);
   assert.equal(physicalReceipt.causalRetry.reuseFailedBuildAsPass, false);
   assert.equal(physicalReceipt.productAccepted, false);
@@ -858,7 +858,7 @@ for (const key of Object.keys(physicalFixture().control.currentPhysicalHostingRe
     assert.throws(() => api.validateAuthorization(f.control, physicalText), /PHYSICAL_LIVE_POINTER_DRIFT/);
   });
 test('physical successor cannot borrow stale request, historical gate or pending backend/live authority', () => {
-  for (const mutate of [c => c.frontendPreviewRequest.version = 25, c => c.status = 'PREVIEW_BUILD_REQUESTED',
+  for (const mutate of [c => c.frontendPreviewRequest.version = 26, c => c.status = 'PREVIEW_BUILD_REQUESTED',
     c => c.scopedBackendPreviewI66 = {}, c => c.operationalReleaseCandidate = {}]) {
     const f = physicalFixture(); mutate(f.control); assert.throws(() => api.validateAuthorization(f.control, physicalText));
   }
@@ -869,10 +869,10 @@ for (const key of Object.keys(physicalPin)) test('physical candidate requires ex
   const f = physicalFixture(); f.candidate.previewRollover[key] = 'different';
   assert.throws(() => guard.validateTechnicalRolloverCandidate(f.candidate));
 });
-test('physical successor cannot recycle failed v25 or previous/live source and build', () => {
+test('physical successor cannot recycle failed v25/v26 or previous/live source and build', () => {
   for (const [key, values] of Object.entries({
-    sourceSha: [physicalReceipt.sourceBaseHead, physicalReceipt.previousCandidate.sourceSha, physicalReceipt.protectedLive.sourceSha],
-    buildRunId: [45452721643, physicalReceipt.previousCandidate.buildRunId, physicalReceipt.protectedLive.buildRunId],
+    sourceSha: [physicalReceipt.sourceBaseHead, '478c045c168c2e1b80f28a94094f4dbbbfdf1f81', physicalReceipt.previousCandidate.sourceSha, physicalReceipt.protectedLive.sourceSha],
+    buildRunId: [45458031865, 45452721643, physicalReceipt.previousCandidate.buildRunId, physicalReceipt.protectedLive.buildRunId],
     previewChannelId: ['live', pin.channel], previewUrl: ['https://app.aysseguros.com', pin.origin]
   })) for (const value of values) {
     const f = physicalFixture(); f.candidate[key] = value;
@@ -928,6 +928,29 @@ test('physical runtime validates E3 exact LIVE workflow/head/attempt, preserving
   await makeIo(run).validateAcceptedLive(physicalReceipt);
   for (const [key, value] of [['path', '.github/workflows/other.yml'], ['head_sha', 'e'.repeat(40)], ['run_attempt', 2], ['conclusion', 'failure']])
     await assert.rejects(makeIo({ ...run, [key]: value }).validateAcceptedLive(physicalReceipt));
+});
+test('physical V2 preserves the failed V1 receipt and requires E3 successful build attempt2', () => {
+  const oldPath = path.join(__dirname, '..', physicalReceipt.priorRolloverReceipt.path);
+  const oldText = fs.readFileSync(oldPath, 'utf8'), old = JSON.parse(oldText);
+  assert.equal(digest(oldText), 'cd80787cd2560939c0384ebca49ee58b4a06acbad5ba201d78b681029458368d');
+  assert.equal(physicalReceipt.priorRolloverReceipt.sha256, digest(oldText));
+  assert.equal(old.protectedLive.buildRunAttempt, 1);
+  assert.equal(physicalReceipt.protectedLive.buildRunAttempt, 2);
+  const expected = physicalReceipt.protectedLive;
+  const run = { id: 45287432665, head_sha: expected.sourceSha, head_branch: physicalReceipt.branch,
+    path: '.github/workflows/gravicentra-release-delta-66-package.yml', status: 'completed', conclusion: 'success', run_attempt: 2 };
+  const artifact = { id: 14873426438, name: 'gi-i66-immutable-' + expected.sourceSha, digest: expected.artifactDigest,
+    expired: false, size_in_bytes: 1824240, created_at: '2026-11-23T23:31:23Z',
+    workflow_run: { id: run.id, head_sha: expected.sourceSha, head_branch: physicalReceipt.branch } };
+  assert.equal(api.validateArtifact(run, artifact, expected), expected);
+  assert.throws(() => api.validateArtifact({ ...run, conclusion: 'failure', run_attempt: 1 }, artifact, old.protectedLive), /BACKUP_BUILD_NOT_SUCCESS/);
+  assert.throws(() => api.validateArtifact(run, artifact, old.protectedLive), /BUILD_ATTEMPT_DRIFT/);
+  assert.throws(() => api.validateArtifact({ ...run, conclusion: 'failure' }, artifact, expected), /BACKUP_BUILD_NOT_SUCCESS/);
+  assert.ok(Date.parse(artifact.created_at) >= Date.parse(physicalReceipt.causalRetry.correctAttemptStartedAt));
+  assert.ok(Date.parse(artifact.created_at) <= Date.parse(physicalReceipt.causalRetry.correctAttemptCompletedAt));
+  assert.equal(physicalReceipt.causalRetry.failedBuildRunId, 45458031865);
+  assert.equal(physicalReceipt.causalRetry.failedRunRemainsFailed, true);
+  assert.equal(physicalReceipt.freshInventoryEvidence.laterExactReadOnlyPreimage.previewWrites, 0);
 });
 test('finish fallback uses the successfully prepared channel/origin, never a historical hardcoded target', () => {
   const source = fs.readFileSync(path.join(__dirname, '../.github/workflows/gravicentra-release-delta-66-package.yml'), 'utf8');

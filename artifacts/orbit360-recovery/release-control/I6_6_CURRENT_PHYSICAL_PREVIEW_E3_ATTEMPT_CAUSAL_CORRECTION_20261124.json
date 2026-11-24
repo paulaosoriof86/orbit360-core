@@ -1,0 +1,176 @@
+{
+  "schema": "GI_I66_CURRENT_PHYSICAL_PREVIEW_E3_ATTEMPT_CAUSAL_CORRECTION_V1",
+  "status": "REAL_BACKUP_PROVENANCE_AND_SOURCE_CORRECTION_VERIFIED_NEW_BUILD_REQUIRED",
+  "activeGate": "I6.6",
+  "recordedAtUtc": "2026-11-24T18:26:55.914Z",
+  "baseHead": "cb3b8f5d505a53bfbafca80a9334d873d712d73e",
+  "cause": {
+    "failedBuildRunId": 45458031865,
+    "failedBuildJobId": 138672864586,
+    "failedSourceSha": "cb3b8f5d505a53bfbafca80a9334d873d712d73e",
+    "failedArtifactId": 14952385758,
+    "failedArtifactDigest": "sha256:ad9fbc8d49c9069b46b9c07414c31dc8f02f039681f62da1669b76e458e08bce",
+    "failure": "I66_TECHNICAL_ROLLOVER_BACKUP_BUILD_NOT_SUCCESS",
+    "cause": "V1 explicitly pinned E3 buildRunAttempt1 without verifying the provider attempt. The immutable accepted E3 artifact belongs to successful attempt2. Preserve strict successful backup validation and correct the exact attempt only.",
+    "incorrectPinnedAttempt": 1,
+    "incorrectPinnedAttemptConclusion": "failure",
+    "correctAttempt": 2,
+    "correctAttemptConclusion": "success",
+    "correctAttemptJobId": 138093495625,
+    "correctAttemptStartedAt": "2026-11-23T23:29:28Z",
+    "correctAttemptCompletedAt": "2026-11-23T23:32:15Z",
+    "artifactCreatedAt": "2026-11-23T23:31:23Z",
+    "failedRunRemainsFailed": true,
+    "newBuildRunMustSucceed": true,
+    "newSourceRequiresNewBuildDigest": true,
+    "productBytesPreservedFromV24": true,
+    "reuseFailedBuildAsPass": false,
+    "noRebuildOfCertifiedArtifactInPlace": true
+  },
+  "priorProfilePreserved": {
+    "path": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_PHYSICAL_PREVIEW_V24_ROLLOVER_20261124.json",
+    "sha256": "cd80787cd2560939c0384ebca49ee58b4a06acbad5ba201d78b681029458368d",
+    "preserveBytes": true,
+    "status": "V1_WRONG_E3_BUILD_ATTEMPT_REMAINS_FAILED_PREDEPLOY"
+  },
+  "correctedProfilePin": {
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_PHYSICAL_PREVIEW_V24_ROLLOVER_V2_20261124.json",
+    "receiptSha256": "07b445794fa1135f994308ee8ec29fddb3d0946d620405848a7bc6ed7eba78ea"
+  },
+  "requestVersionRequired": 27,
+  "actualProviderAndArchiveVerification": {
+    "schema": "GI_I66_REAL_E3_BUILD_ATTEMPT_CORRECTION_VALIDATION_V1",
+    "status": "PASS_WITH_REAL_PROVIDER_METADATA_AND_THREE_DOWNLOADED_ARCHIVES",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_PHYSICAL_PREVIEW_V24_ROLLOVER_V2_20261124.json",
+    "receiptSha256": "07b445794fa1135f994308ee8ec29fddb3d0946d620405848a7bc6ed7eba78ea",
+    "e3Attempt1": {
+      "id": 45287432665,
+      "runAttempt": 1,
+      "status": "completed",
+      "conclusion": "failure",
+      "validator": "REJECTED_BACKUP_BUILD_NOT_SUCCESS"
+    },
+    "e3Attempt2": {
+      "id": 45287432665,
+      "runAttempt": 2,
+      "status": "completed",
+      "conclusion": "success",
+      "headSha": "65c825b2808a615ca4195bdde6689dbdbe3193b2",
+      "path": ".github/workflows/gravicentra-release-delta-66-package.yml",
+      "artifactId": 14873426438,
+      "artifactDigest": "sha256:7cb782848a45083047c4899bc30c13bf5be46429607e42597d09342becfc9acc",
+      "artifactCreatedAt": "2026-11-23T23:31:23Z",
+      "validator": "PASS"
+    },
+    "v24Attempt1": {
+      "id": 45448470011,
+      "runAttempt": 1,
+      "conclusion": "success",
+      "artifactId": 14947396076,
+      "artifactDigest": "sha256:bb660ae7e6e97f9d83ea20b576d1a38bbd9ea5a691c27622a53a9eb50ef8330e",
+      "validator": "PASS"
+    },
+    "v26": {
+      "id": 45458031865,
+      "conclusion": "failure",
+      "validator": "REJECTED_BACKUP_BUILD_NOT_SUCCESS",
+      "artifactId": 14952385758,
+      "artifactDigest": "sha256:ad9fbc8d49c9069b46b9c07414c31dc8f02f039681f62da1669b76e458e08bce",
+      "bytesVerified": true,
+      "releaseAccepted": false
+    },
+    "archives": [
+      {
+        "label": "e3",
+        "sourceSha": "65c825b2808a615ca4195bdde6689dbdbe3193b2",
+        "artifactDigest": "sha256:7cb782848a45083047c4899bc30c13bf5be46429607e42597d09342becfc9acc",
+        "archiveSha256": "7cb782848a45083047c4899bc30c13bf5be46429607e42597d09342becfc9acc",
+        "tarSha256": "cb7b5d3cadd9f8e34684770fbbee20bf08f28a9fd6830e98027fdd7b3d1dfcd2",
+        "siteManifestSha256": "da40e7ad3f453107a44fdc868a58ff469f91139252c0204f9fc298a8d9f02905",
+        "filesVerified": 224,
+        "buildId": "gi-i66-65c825b2808a-57f234755dc1",
+        "buildAcceptanceClaimed": false
+      },
+      {
+        "label": "v26",
+        "sourceSha": "cb3b8f5d505a53bfbafca80a9334d873d712d73e",
+        "artifactDigest": "sha256:ad9fbc8d49c9069b46b9c07414c31dc8f02f039681f62da1669b76e458e08bce",
+        "archiveSha256": "ad9fbc8d49c9069b46b9c07414c31dc8f02f039681f62da1669b76e458e08bce",
+        "tarSha256": "c07267bc915bcc8ea9d51e250735045bd91e58203ffbc6e36946488d17234269",
+        "siteManifestSha256": "26123e5e8544803bac15072370aa476e7b86f675bc94281062a49f7965cff6bf",
+        "filesVerified": 224,
+        "buildId": "gi-i66-cb3b8f5d505a-57f234755dc1",
+        "buildAcceptanceClaimed": false
+      },
+      {
+        "label": "v24",
+        "sourceSha": "60ac1ae2d765484ed40c820a942dcc0966385da7",
+        "artifactDigest": "sha256:bb660ae7e6e97f9d83ea20b576d1a38bbd9ea5a691c27622a53a9eb50ef8330e",
+        "archiveSha256": "bb660ae7e6e97f9d83ea20b576d1a38bbd9ea5a691c27622a53a9eb50ef8330e",
+        "tarSha256": "580ead8df4eb4d4253dd5cd490d4f7c80711a522949090e60880239f0bcdbd6c",
+        "siteManifestSha256": "66127cdf2ac0ae3b256455ca0ac3c0f80e63fef9387494fcb86b0edf0ccb7bef",
+        "filesVerified": 224,
+        "buildId": "gi-i66-60ac1ae2d765-57f234755dc1",
+        "buildAcceptanceClaimed": false
+      }
+    ],
+    "freshInventoryBeforeFailed26": "EXACT_AUTHORIZED_FULL_INVENTORY_MATCH",
+    "plannedRequestVersion": 27,
+    "cloudWrites": 0,
+    "liveChanges": 0
+  },
+  "localFocusedTests": {
+    "tests": 420,
+    "passed": 420,
+    "failed": 0,
+    "logSha256": "2ffe8e987246218be68033546f4455e3b0d2b3047d66e064f6c2c6d42da62dc1"
+  },
+  "yamlAndShellParse": "PASS_16_RUN_BLOCKS",
+  "productOwnersUnchanged": {
+    "source": "60ac1ae2d765484ed40c820a942dcc0966385da7",
+    "owners": 11,
+    "changed": 0
+  },
+  "qaManifestRevision": {
+    "required": false,
+    "reason": "Modified technical rollover test is not in declared changes.tests/testRevisions; exact immutable owner pins and new build remain mandatory."
+  },
+  "owners": {
+    "tools/gravicentra-i6-6-preview-channel-reuse-guard.cjs": "9146ddfacdc693102ff400cd81d8b03f7f7dbe62",
+    "tools/gravicentra-i6-6-technical-preview-rollover.test.cjs": "092b6bd6b3300de95931c6adb7760c9dbf23204d",
+    "tools/gravicentra-i6-6-operational-release-candidate.cjs": "7b7bd4c22f73236666c3d50d8a35d38c495a12ba",
+    ".github/workflows/gravicentra-release-delta-66-package.yml": "1f2b4fd77a08a8669790f07106c339894a5bc7fa",
+    "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_PHYSICAL_PREVIEW_V24_ROLLOVER_V2_20261124.json": "81dc192b1b19061f96c7a96c5100a4d3c2d4a909"
+  },
+  "preservedV26": {
+    "runId": 45458031865,
+    "jobId": 138672864586,
+    "artifactId": 14952385758,
+    "artifactDigest": "sha256:ad9fbc8d49c9069b46b9c07414c31dc8f02f039681f62da1669b76e458e08bce",
+    "conclusion": "failure",
+    "verifiedLocalFiles": 224,
+    "verifiedHostedFiles": 0,
+    "hostingPreviewAccepted": false,
+    "failureCode": "I66_TECHNICAL_ROLLOVER_BACKUP_BUILD_NOT_SUCCESS",
+    "rolloverEvidenceArtifactId": 14952041566,
+    "rolloverEvidenceArtifactDigest": "sha256:342e5a2c368492c535d8f160c2de61fa9e47407956aeb29b6c353da457042d09",
+    "previewWrites": 0
+  },
+  "notAcceptance": {
+    "sourceQaPending": true,
+    "newBuildRequired": true,
+    "newArtifactRequired": true,
+    "signedPreviewPending": true,
+    "livePromotionPending": true,
+    "fullI66Accepted": false
+  },
+  "executionMutations": {
+    "cloudWrites": 0,
+    "previewDeploys": 0,
+    "liveDeploys": 0,
+    "backendDeploys": 0,
+    "businessWrites": 0,
+    "authRulesIamWrites": 0,
+    "channelDeletions": 0
+  }
+}
