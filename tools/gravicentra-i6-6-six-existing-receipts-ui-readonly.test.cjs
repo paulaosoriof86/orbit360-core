@@ -381,7 +381,7 @@ async function frontendMatrixFlow(options={}){
   const actors=['operativo','direccion'].map(role=>({uid:'qa-'+role,allowedRole:role,requestedRole:role,actorSha256:crypto.hash('sha256',role)}));
   const fixtures=authority.rows.map(e=>uiFixture(e)),snapshot={clientId:'qa-client',policyFingerprint:'same',rows:fixtures.map(f=>({...f.server,
     serverBalanceProof:{sourceSha:target.sourceSha,ownerBlob:'a'.repeat(40),open:true,balanceCents:27826,source:'CARTERA_EXPLICIT'}}))};
-  let serverReads=0,authorityAfter=0,visited=0,closed=0;const viewports=[];
+  let serverReads=0,authorityAfter=0,visited=0,closed=0,readingScrolls=0;const viewports=[];
   const h=harness({phase,readMode:'six-frontend-release',frontendQa:before,report,pin:target,ORIGIN:report.origin,
     auth:{createCustomToken:async uid=>uid},financialOwner:{...owner,
       resolveFinancialQa:async()=>{authorityAfter++;if(options.authorityDrift)throw Error('FINANCIAL_QA_FINAL_AUTHORITY_DRIFT');return {...before,stage:'after'};},
@@ -389,32 +389,34 @@ async function frontendMatrixFlow(options={}){
   h.findFinancialActors=async()=>actors;h.sixReceiptAuthority=()=>authority;
   h.sixServerSnapshot=async()=>{serverReads++;return options.serverDrift&&serverReads>=10?{...snapshot,policyFingerprint:'changed'}:snapshot;};
   h.chromium={launch:async()=>({close:async()=>{},newContext:async({viewport})=>{
-    viewports.push(viewport.width);let role='operativo',index=0,stage='BEFORE_RELOAD',route='receipt',firewall;
+    viewports.push(viewport.width);let role='operativo',index=0,stage='BEFORE_RELOAD',route='receipt',firewall,balanceInView=false;
     const context={close:async()=>{closed++;},route:async(pattern,fn)=>{firewall=fn;},newPage:async()=>page};
     const page={on:()=>{},goto:async()=>{},waitForFunction:async()=>{},
-      locator:selector=>({count:async()=>1,inputValue:async()=> 'GT',selectOption:async value=>{if(selector==='#rol-sel')role=value;}}),
-      reload:async()=>{stage='AFTER_RELOAD';},evaluate:async(fn,arg)=>{
+      locator:selector=>({count:async()=>1,inputValue:async()=> 'GT',selectOption:async value=>{if(selector==='#rol-sel')role=value;},
+        scrollIntoViewIfNeeded:async()=>{assert.match(selector,/data-rp-current-balance/);readingScrolls++;balanceInView=!options.scrollCannotReveal;}}),
+      reload:async()=>{stage='AFTER_RELOAD';balanceInView=false;},evaluate:async(fn,arg)=>{
         if(String(fn).includes('signInWithCustomToken'))return !options.authFailure;
         if(String(fn).includes("document.querySelector('#rol-sel')"))return arg;
         if(arg===undefined){route='cobros';return;}
-        if(typeof arg==='string'){route='receipt';index=authority.rows.findIndex(r=>arg.includes(encodeURIComponent(r.receiptId)));stage='BEFORE_RELOAD';return;}
+        if(typeof arg==='string'){route='receipt';index=authority.rows.findIndex(r=>arg.includes(encodeURIComponent(r.receiptId)));stage='BEFORE_RELOAD';balanceInView=false;return;}
         if(route==='cobros')return {ready:true,totalGrossCents:166956,rows:authority.rows.map(e=>({receiptId:e.receiptId,count:1,
           rows:[{policyId:authority.scope.policyId,currency:'GTQ',grossCents:27826,due:e.operationalLimitBeforeAndAfter,state:'Pendiente'}]}))};
         const f=fixtures[index];f.Orbit.auth.productUser.uid='qa-'+role;f.Orbit.session.rol=()=>role;
         const observed=f.h.probe.inspectSixReceiptBrowser({...f.input,actorUid:'qa-'+role});
-        observed.viewport={width:viewport.width,detailVisible:true,balanceVisible:true,horizontalOverflowPx:0};visited++;
+        observed.viewport={width:viewport.width,detailVisible:true,balanceVisible:balanceInView,horizontalOverflowPx:0};visited++;
         if(options.mutate)options.mutate(observed,{role,width:viewport.width,index,stage});
         if(options.writeAttempt&&visited===1)await firewall({request:()=>({method:()=> 'POST',url:()=> 'https://firestore.googleapis.com/v1/projects/p/databases/(default)/documents:commit'}),abort:async()=>{}});
         return observed;
       }};return context;
   }})};
   let error;try{await h.probe.runFrontendFinancialMatrix();}catch(e){error=e;}
-  return {h,report:plain(report),error,visited,serverReads,authorityAfter,viewports,closed,owner,target};
+  return {h,report:plain(report),error,visited,serverReads,authorityAfter,viewports,closed,readingScrolls,owner,target};
 }
 test('the release matrix executes 48 actual receipt stages in Preview and LIVE across both actors and viewports',async()=>{
   for(const phase of ['preview','live']){
     const r=await frontendMatrixFlow({phase});assert.equal(r.error,undefined,r.error?.stack);
     assert.equal(r.visited,48);assert.equal(r.report.stageCount,48);assert.equal(r.authorityAfter,1);assert.equal(r.serverReads,10);
+    assert.equal(r.readingScrolls,48,'Every receipt/reload must expose the actual balance on the existing stacked layout');
     assert.deepEqual(r.viewports,[1365,390,1365,390]);assert.equal(r.closed,4);
     assert.equal(r.report.fullA04Accepted,false);assert.equal(r.report.fullA12Passed,false);
     assert.equal(r.report.roles.every(v=>v.financialFocal.observations.every(o=>o.beforeCheck.pass&&o.afterCheck.pass)),true);
@@ -431,7 +433,7 @@ test('matrix source, role, viewport, write and final authority failures cannot t
   const cases=[{authFailure:true},{mutate:o=>{o.actorMatches=false;}},{mutate:o=>{o.role='superadmin';}},
     {mutate:o=>{o.viewport.width=1280;}},{mutate:o=>{o.viewport.balanceVisible=false;}},
     {mutate:o=>{o.viewport.horizontalOverflowPx=200;}},{mutate:o=>{o.balanceCents=100;}},
-    {writeAttempt:true},{serverDrift:true},{authorityDrift:true}];
+    {writeAttempt:true},{serverDrift:true},{authorityDrift:true},{scrollCannotReveal:true}];
   for(const options of cases){const r=await frontendMatrixFlow(options);assert.ok(r.error);assert.notEqual(r.report.status,'FRONTEND_SIX_RECEIPTS_TWO_ROLE_TWO_VIEW_READONLY_PASS');
     if(options.authorityDrift){assert.equal(r.visited,48);assert.equal(r.authorityAfter,1);}}
 });

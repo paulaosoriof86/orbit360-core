@@ -414,11 +414,14 @@ async function runSixReceiptUi(page,actor,errors){
     await page.evaluate(hash=>{location.hash=hash;},'#/cliente360?c='+encodeURIComponent(before.clientId)+'&t=recibos&r='+encodeURIComponent(expected.receiptId));
     const wait=()=>page.waitForFunction(id=>!!document.querySelector('[data-rp-receipt-detail-id="'+CSS.escape(id)+'"]')&&
       ['clientes','polizas','recibosEsperados','carteraPrimas','cobros'].every(k=>(Orbit.store?._productStatus?.().serverConfirmedCollections||[]).includes(k)),expected.receiptId,{timeout:60000});
-    await wait();const first=await page.evaluate(inspectSixReceiptBrowser,input);
+    // On the existing one-column mobile layout the balance follows the receipt
+    // breakdown. Normal reading scroll exposes it without invoking any action.
+    const showBalance=async()=>{if(actor.viewportWidth)await page.locator('[data-rp-receipt-detail-id="'+expected.receiptId+'"] [data-rp-current-balance]').scrollIntoViewIfNeeded();};
+    await wait();await showBalance();const first=await page.evaluate(inspectSixReceiptBrowser,input);
     const beforeCheck=collectSixVisibleResult(expected,source,first,'BEFORE_RELOAD',visibleFailures,actor.allowedRole||'operativo',actor.viewportWidth);
     const observation={sourceRequirement:expected.sourceRequirement,receiptId:expected.receiptId,portfolioId:expected.portfolioId,
       beforeReload:first,beforeCheck,reloadPass:false};observations.push(observation);
-    await page.reload({waitUntil:'domcontentloaded',timeout:60000});await wait();
+    await page.reload({waitUntil:'domcontentloaded',timeout:60000});await wait();await showBalance();
     const reloaded=await page.evaluate(inspectSixReceiptBrowser,input);
     const afterCheck=collectSixVisibleResult(expected,source,reloaded,'AFTER_RELOAD',visibleFailures,actor.allowedRole||'operativo',actor.viewportWidth);
     observation.afterReload=reloaded;observation.afterCheck=afterCheck;
