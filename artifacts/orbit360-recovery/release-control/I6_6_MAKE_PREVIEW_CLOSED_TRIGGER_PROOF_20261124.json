@@ -1,0 +1,43 @@
+{
+  "schema": "GI_I66_MAKE_CLOSED_TRIGGER_PROOF_V1",
+  "phase": "preview",
+  "sourceSha": "48a7a6d4379759b6f32c7f2435e8e37c724989cc",
+  "artifactDigest": "sha256:531fddd76a010377bd9aa6c652d737dc584a99edc573c2aca313b56fd7efa405",
+  "closedTrigger": {
+    "name": "orbit360MakeLeadIngressPreview",
+    "region": "us-east1",
+    "revision": "orbit360makeleadingresspreview-00001-tot",
+    "runtimePrincipal": "646761409743-compute@developer.gserviceaccount.com",
+    "eventType": "google.cloud.firestore.document.v1.created.withAuthContext",
+    "database": "(default)",
+    "document": "tenants/alianzas-soluciones/previewLeadIngressRequests/{requestId}",
+    "retryPolicy": "RETRY_POLICY_RETRY",
+    "trigger": "projects/ays-orbit-360-lab/locations/nam5/triggers/orbit360makeleadingresspreview-791181",
+    "service": "projects/ays-orbit-360-lab/locations/us-east1/services/orbit360makeleadingresspreview",
+    "configurationDigest": "4f15af26f01952b23d4706b5815f36166ca544bacaed297b0dd38e8f071d7a3a",
+    "queueRulesDenyClient": true,
+    "rulesetName": "projects/ays-orbit-360-lab/rulesets/6b03deab-0ff4-4c5d-8e74-550982bafc34",
+    "rulesSourceBlob": "35fba451bbbeb97dbae3f08303b786ddbcbdd29f",
+    "rulesSourceSha256": "105f13e095d021a32d49c9b30400e7b509756f8bb45ea958c7483c7a2316bae3",
+    "projectIamReadback": {
+      "status": "PROJECT_IAM_UNCHANGED_AND_CLI_WRITES_FORBIDDEN",
+      "cliVersion": "14.10.1",
+      "beforeDigest": "2c928d027f3632fc4e9fa2f591127952590746b2f02a588015a0fed97dc0590f",
+      "afterDigest": "2c928d027f3632fc4e9fa2f591127952590746b2f02a588015a0fed97dc0590f",
+      "projectIamWrites": 0
+    },
+    "closedConfigurationVerified": true,
+    "probeOnly": true,
+    "realAuthContextObserved": true,
+    "principalProbeDigest": "33d1980ea0169673e0182324007af961c41af8d8b2151f6cea0dc003324bf55c",
+    "principalSha256": "4ecf8133c53d47df7848ce95cbda92b78b8e0bb6c1d0db8deb3c9b7d7b30df02",
+    "authType": "unknown",
+    "canonicalLeadWrites": 0,
+    "canonicalAuditWrites": 0,
+    "notificationsCreated": 0,
+    "externalMessagesSent": 0,
+    "providerRequests": 0
+  },
+  "canonicalLeadWrites": 0,
+  "externalMessagesSent": 0
+}

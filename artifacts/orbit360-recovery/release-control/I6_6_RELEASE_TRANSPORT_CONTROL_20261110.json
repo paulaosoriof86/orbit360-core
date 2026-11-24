@@ -7026,10 +7026,10 @@
     "artifactDigest": "sha256:531fddd76a010377bd9aa6c652d737dc584a99edc573c2aca313b56fd7efa405",
     "approvedByDirection": true,
     "externalMessagesSent": 0,
-    "action": "VERIFY_PROBE",
-    "version": 1,
+    "action": "BIND_PRINCIPAL",
+    "version": 2,
     "expectedConfigDigest": "1a5bb94bed8e44fd3236801026a221b5ed7b2f6ae1f093f10b0f74fbaac97cfe",
-    "expiresAt": "2026-11-24T11:53:07.525Z",
+    "expiresAt": "2026-11-24T11:56:59.034Z",
     "probeRequestId": "t6CFQ8BWzU5JNcG3A4yk",
     "makeExecutionReceipt": {
       "path": "artifacts/orbit360-recovery/release-control/I6_6_MAKE_PREVIEW_PROBE_EXECUTION_20261124.json",
