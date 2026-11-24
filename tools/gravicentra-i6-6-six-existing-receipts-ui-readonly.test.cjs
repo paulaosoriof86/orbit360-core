@@ -117,11 +117,15 @@ test('stale browser balance aliases and payment inputs cannot certify a self-con
 });
 test('accepted financialView country projection is reproduced exactly without normalizing financial inputs',()=>{
   const h=harness(),reader=fs.readFileSync(path.join(repo,'functions/b4-003-scoped-related-reader.js'),'utf8');
-  // This is the actual accepted E3 reader blob, not a mock of its projection.
+  // The A14 candidate changes batching, while preserving the exact accepted
+  // E3 financial projection. Bind both the reviewed reader and that invariant.
   const crypto=require('node:crypto'),blob=crypto.createHash('sha1').update('blob '+Buffer.byteLength(reader)+'\0').update(reader).digest('hex');
-  assert.equal(blob,'aafdbe3384506b1772c7e409d565de88bf287b21');
+  assert.equal(blob,'439bea6d90ef9a6a03ca2539096cb626cc43695d');
   const from=reader.indexOf('function financialView('),to=reader.indexOf('\nasync function verifiedCancellationView',from);
   assert.ok(from>0&&to>from);
+  assert.equal(crypto.createHash('sha256').update(reader.slice(from,to)).digest('hex'),
+    '447b6bdb10fba3583bc21953a881f82bfff11efd6a462e6be6f3629cf8fc30b7',
+    'A14 must preserve the accepted E3 financial projection byte for byte');
   const context={clean:x=>String(x??'').trim(),Denied:Error,allowRow:(ctx,p)=>{
     assert.equal(p.pais,'GT');assert.equal(ctx.country,'GT');
   }};

@@ -1,0 +1,64 @@
+{
+  "schema": "GI_I66_COMPOSED_SOURCE_QA_FIXTURE_CORRECTION_V1",
+  "recordType": "QA_ONLY_CAUSAL_SOURCE_RECEIPT_NOT_PRODUCT_OR_RELEASE_ACCEPTANCE",
+  "createdAtUtc": "2026-11-24T10:02:36+00:00",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "preparedAgainstHead": "f21597f2c472d0bbc7dab11ed11d6939824782db",
+  "status": "LOCAL_AFFECTED_QA_PASS_SIGNED_SOURCE_QA_AND_GUARD_REQUIRED",
+  "observedFailedRuns": [
+    {
+      "runId": 45370280739,
+      "jobId": 138362496300,
+      "workflow": "gravicentra-release-lock-sync.yml",
+      "cause": "The source-only VM extracted advisorAllowed without its new private INGRESS_CAPABILITY dependency; ReferenceError occurs before the unchanged membership checks complete."
+    },
+    {
+      "runId": 45370280824,
+      "jobId": 138362497139,
+      "workflow": "gravicentra-i66-privileged-role-parity-source-qa.yml",
+      "cause": "The financial projection test pins the complete E3 reader blob although the approved A14 delta changes batching. The accepted financialView function is byte-identical."
+    }
+  ],
+  "corrections": [
+    {
+      "path": "tools/gravicentra-b4-003-ops-leads-role-scopes.test.cjs",
+      "priorBlob": "b46a682592f7feaa278aa0d6bf1a130044429ad1",
+      "newBlob": "6fe709d33a58c04e7af00b5d15a31cc53baa3369",
+      "scope": "Supply the private Symbol to the extracted VM closure and retain all existing role/owner/membership checks; add six exact capability scope and spoofing cases. No backend change."
+    },
+    {
+      "path": "tools/gravicentra-i6-6-six-existing-receipts-ui-readonly.test.cjs",
+      "priorBlob": "c4a999e72204f047de6d928591169bcf8626787f",
+      "newBlob": "b981267c9049974bbd7c6e6a1ff6c2e3546e0620",
+      "scope": "Pin the approved A14 reader 439bea6d90ef9a6a03ca2539096cb626cc43695d and additionally require the exact accepted E3 financialView function SHA256; keep all financial, country, reload and negative assertions.",
+      "preservedFinancialProjectionSha256": "447b6bdb10fba3583bc21953a881f82bfff11efd6a462e6be6f3629cf8fc30b7"
+    }
+  ],
+  "localValidation": {
+    "roleScopeAssertions": 129,
+    "roleScopeResult": "PASS",
+    "roleScopeLogSha256": "ea0092109ff29f6b85f89a577b9a5ec03124a7a85ee2b9056867c5b330a846da",
+    "integratedSuiteTests": 280,
+    "passed": 279,
+    "failed": 0,
+    "cancelled": 0,
+    "skipped": 1,
+    "skippedScope": "Real Chromium DOM causal test; the existing signed sourceQA workflow must execute this separately with I66_QA_DETACH_CAUSAL_CHECK.",
+    "integratedLogSha256": "32f5a6d9dbd18570f7faffa76b3007015342117714e7738ef7b7ef3bb0b6e863"
+  },
+  "preservedAuthority": {
+    "productManifestPath": "artifacts/orbit360-recovery/release-control/I6_6_APPROVED_PRODUCT_DELTA_MANIFEST_20261110.json",
+    "productManifestBlob": "fda7bbdd4066b7ed1ef5b19bd93e41c6041bb115",
+    "productSourceChanges": 0,
+    "releaseOwnerChanges": 0,
+    "scopeValidationChanges": 0,
+    "financialSemanticChanges": 0,
+    "historicalReceiptsModified": 0
+  },
+  "manifestDisposition": "Neither corrected test is a declared manifest.changes.tests or testRevisions entry. Preserve the product manifest and its full succession chain unchanged; these exact test blobs are bound by this receipt and the same-head signed source QA.",
+  "nextAction": "Run the existing signed source QA and central guard on this exact corrective commit, including actual Chromium causal proof, then freeze v18. No new build exists and no release is accepted.",
+  "newRemoteWritesByThisLocalPreparation": 0,
+  "newFinancialWrites": 0,
+  "newProductionAcceptance": false
+}
