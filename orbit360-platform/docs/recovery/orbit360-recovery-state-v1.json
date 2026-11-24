@@ -56,11 +56,11 @@
       "artifactDigest": "sha256:7cb782848a45083047c4899bc30c13bf5be46429607e42597d09342becfc9acc",
       "hostingVersion": "sites/ays-orbit-360-lab/versions/332999a55b189108"
     },
-    "evidencePath": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_EXECUTION_PROGRESS_20261124_R32.json",
-    "evidenceGitBlobSha": "66a14e63fadb91d28c0ac901a7859fb37079c0a0",
+    "evidencePath": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_EXECUTION_PROGRESS_20261124_R33.json",
+    "evidenceGitBlobSha": "b8a71509e795f35c75562963f3c04b046793d492",
     "activeGate": "I6.6",
-    "currentWork": "I6.6: construir v19 una sola vez con el verificador canónico corregido y QA firmadas; conservar v18 como build y Hosting Preview224 PASS sin prueba backend. Completar Preview de cinco funciones cerrado, saldo48 y LIVE del mismo nuevo artifact antes de aceptar. E3 permanece vigente;104 obligaciones en alcance auditado,46 nuevas documentadas y155 pagos DIRECT registrados pendientes de aplicación se preservan sin repetir escrituras.",
-    "nextAction": "I6.6: construir v19 una sola vez con el verificador canónico corregido y QA firmadas; conservar v18 como build y Hosting Preview224 PASS sin prueba backend. Completar Preview de cinco funciones cerrado, saldo48 y LIVE del mismo nuevo artifact antes de aceptar. E3 permanece vigente;104 obligaciones en alcance auditado,46 nuevas documentadas y155 pagos DIRECT registrados pendientes de aplicación se preservan sin repetir escrituras.",
+    "currentWork": "I6.6: ejecutar Preview firmado de las cinco funciones exactas y prueba financiera48 sobre el artifact v19 ya construido. El ingreso Make permanece cerrado; E3 continúa aceptado hasta promoción y comprobación LIVE del mismo artifact. Conservar104 obligaciones del alcance auditado y155 pagos registrados pendientes de aplicación; no repetir cargas ni reconstruir este artifact.",
+    "nextAction": "I6.6: ejecutar Preview firmado de las cinco funciones exactas y prueba financiera48 sobre el artifact v19 ya construido. El ingreso Make permanece cerrado; E3 continúa aceptado hasta promoción y comprobación LIVE del mismo artifact. Conservar104 obligaciones del alcance auditado y155 pagos registrados pendientes de aplicación; no repetir cargas ni reconstruir este artifact.",
     "frontendPreviewRequest": {
       "version": 19,
       "sourceQaHead": "31ed4207f8e73de1f3bdf08f6e56ebfcf2673116",
@@ -564,7 +564,7 @@
     "phaseAIterationStatuses": "HISTORICAL_FIELDS_ABOVE_PRESERVED_UNTIL_FORMAL_GATE_EVIDENCE;_NO_NEW_PASS_INFERRED",
     "labDataWriteScope": "ONLY_35_AUTHORIZED_COUNTRY_FIELDS;_NO_AUGUST_REFRESH"
   },
-  "nextAction": "I6.6: construir v19 una sola vez con el verificador canónico corregido y QA firmadas; conservar v18 como build y Hosting Preview224 PASS sin prueba backend. Completar Preview de cinco funciones cerrado, saldo48 y LIVE del mismo nuevo artifact antes de aceptar. E3 permanece vigente;104 obligaciones en alcance auditado,46 nuevas documentadas y155 pagos DIRECT registrados pendientes de aplicación se preservan sin repetir escrituras.",
+  "nextAction": "I6.6: ejecutar Preview firmado de las cinco funciones exactas y prueba financiera48 sobre el artifact v19 ya construido. El ingreso Make permanece cerrado; E3 continúa aceptado hasta promoción y comprobación LIVE del mismo artifact. Conservar104 obligaciones del alcance auditado y155 pagos registrados pendientes de aplicación; no repetir cargas ni reconstruir este artifact.",
   "sourceOfTruth": {
     "projectBoundaryPrevalentAddendum": "orbit360-platform/docs/recovery/ADDENDUM_PREVALENTE_CHATGPT_PROJECT_BOUNDARY_20260831.md",
     "mutableState": "orbit360-platform/docs/recovery/orbit360-recovery-state-v1.json",
@@ -4374,6 +4374,37 @@
           "sourceQaHead": "d05a2cc82207773da6c8f9306fe8a91ca26cfd81",
           "sourceQaRunId": 45372224633,
           "guardRunId": 45372224612
+        }
+      }
+    },
+    {
+      "reason": "ACTIVE_OWNER_PLAN_SUMMARY_SUPERSEDED",
+      "priorGitBlobSha": "2acd9136664a3351ef0bd7a21d08831267e5e772",
+      "supersededByGeneration": 3,
+      "prior": {
+        "schema": "GI_I66_ACTIVE_OWNER_PLAN_CONTINUATION_V1",
+        "authorityPointer": "artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json#i66OperationalContinuation20261115",
+        "generation": 3,
+        "latestProvenLiveSource": "65c825b2808a615ca4195bdde6689dbdbe3193b2",
+        "latestPhysicalFrontendLiveReceipt": "artifacts/orbit360-recovery/release-control/I6_6_FRONTEND_E00003_RECEIPT.json",
+        "currentPhysicalFrontend": {
+          "generation": 3,
+          "sourceSha": "65c825b2808a615ca4195bdde6689dbdbe3193b2",
+          "buildId": "gi-i66-65c825b2808a-57f234755dc1",
+          "artifactId": 14873426438,
+          "artifactDigest": "sha256:7cb782848a45083047c4899bc30c13bf5be46429607e42597d09342becfc9acc",
+          "hostingVersion": "sites/ays-orbit-360-lab/versions/332999a55b189108"
+        },
+        "evidencePath": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_EXECUTION_PROGRESS_20261124_R32.json",
+        "evidenceGitBlobSha": "66a14e63fadb91d28c0ac901a7859fb37079c0a0",
+        "activeGate": "I6.6",
+        "currentWork": "I6.6: construir v19 una sola vez con el verificador canónico corregido y QA firmadas; conservar v18 como build y Hosting Preview224 PASS sin prueba backend. Completar Preview de cinco funciones cerrado, saldo48 y LIVE del mismo nuevo artifact antes de aceptar. E3 permanece vigente;104 obligaciones en alcance auditado,46 nuevas documentadas y155 pagos DIRECT registrados pendientes de aplicación se preservan sin repetir escrituras.",
+        "nextAction": "I6.6: construir v19 una sola vez con el verificador canónico corregido y QA firmadas; conservar v18 como build y Hosting Preview224 PASS sin prueba backend. Completar Preview de cinco funciones cerrado, saldo48 y LIVE del mismo nuevo artifact antes de aceptar. E3 permanece vigente;104 obligaciones en alcance auditado,46 nuevas documentadas y155 pagos DIRECT registrados pendientes de aplicación se preservan sin repetir escrituras.",
+        "frontendPreviewRequest": {
+          "version": 19,
+          "sourceQaHead": "31ed4207f8e73de1f3bdf08f6e56ebfcf2673116",
+          "sourceQaRunId": 45375595685,
+          "guardRunId": 45375595283
         }
       }
     }
