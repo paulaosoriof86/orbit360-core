@@ -1,0 +1,821 @@
+{
+  "schema": "GI_I66_MAPFRE57714_TWO_PAYMENTS_REVIEWABLE_NEXT_CHANGE_V1",
+  "status": "CANDIDATE_NOT_APPLIED_HOLD_FRESH_READ_AND_CONTROLLED_OBLIGATION_CORRECTION",
+  "recordedAtUtc": "2026-11-24T11:17:35.781807+00:00",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "sourceHeadRead": "153b28142a8c43a4bb81a2357fbed17a440d2c8f",
+  "projectId": "ays-orbit-360-lab",
+  "tenantId": "alianzas-soluciones",
+  "authority": {
+    "paymentLockPath": "artifacts/orbit360-recovery/release-control/I6_5_I6_6_PAYMENT_INFERENCE_RECONCILIATION_LOCK_V6_20261001.json",
+    "paymentLockBlob": "b47f91000713de9c8ac317e1f3fd118b2eafc0d5",
+    "existingBulkRequestBlob": "a711d420b01995be342d588b2d6dbaea2421f304",
+    "existingBulkRequestDoesNotAuthorizeSource56": true,
+    "userCurrentInstruction": "Prepare the two documented MAPFRE payments, no data/remote/source-v20 writes; fresh reads are required before any controlled application."
+  },
+  "sourceCrosswalk": {
+    "path": "artifacts/orbit360-recovery/release-control/I6_6_NEW56_FOCAL_ORIGINAL_CROSSWALK_20261124.json",
+    "blob": "b8af592f7cc9906ae7af3f81fc437e02e724b0a5",
+    "sha256": "81cc9b07fd9d94728e95b555e746657f1c143c3b99f6f5c2c0e9f738a3444be5"
+  },
+  "source56": {
+    "path": "artifacts/orbit360-recovery/source-batches/I6_6_NEW_INSURER_SOURCE_DELTA_20261124.json",
+    "sha256": "68ebdc6f04e0ee5e4d7aa92b2a3bd9564f17a8a5e7b23528522cc6381f782805",
+    "gitBlob": "ebf7350a664c851fe82f28eae241efc76bba7e1e"
+  },
+  "sourceOwners": [
+    {
+      "path": ".github/workflows/gravicentra-i66-insurer-source-bulk-protected.yml",
+      "gitBlob": "65594a61c2b1bb89f5963edee7ee5cc2f8441b2a",
+      "bytes": 28109
+    },
+    {
+      "path": "functions/cobros-reconciliation-domain.js",
+      "gitBlob": "add21a5888f61fceea5ffd7aef7cf7318a31225e",
+      "bytes": 95408
+    },
+    {
+      "path": "functions/cobros-source-intake-v2.js",
+      "gitBlob": "31bb921f5c58cd47af606ec43217b445be519c4a",
+      "bytes": 30718
+    },
+    {
+      "path": "functions/payment-inference-engine.js",
+      "gitBlob": "5bebc3d134a129c608125b36da0109dfc52b812f",
+      "bytes": 15491
+    },
+    {
+      "path": "functions/product-operational-domain.js",
+      "gitBlob": "513b89d8d58ef8ba780a614032591f4f0ad3e6f7",
+      "bytes": 100128
+    },
+    {
+      "path": "functions/proposal-application-boundary.js",
+      "gitBlob": "4c9cbf708a0dc353ca213c806fcedb580f7a25ec",
+      "bytes": 27355
+    },
+    {
+      "path": "orbit360-platform/core/policy-receipts-engine.js",
+      "gitBlob": "1a42767f5d1b7fc455e4a332b4d0e6eda2f87014",
+      "bytes": 56063
+    },
+    {
+      "path": "tools/gravicentra-i6-6-source-intake-v2.test.cjs",
+      "gitBlob": "2c1a2cf07a27ec2ebdbf427d013262233617fbfa",
+      "bytes": 47936
+    },
+    {
+      "path": "tools/gravicentra-i66-financial-identity-readback.cjs",
+      "gitBlob": "e4a08be43b3f188363b21f20c607d3601e05cfd2",
+      "bytes": 22826
+    },
+    {
+      "path": "tools/gravicentra-i66-source-bulk-apply.cjs",
+      "gitBlob": "e2dcdb300a4955b219827a2d55d6c0838f6fbe39",
+      "bytes": 13801
+    },
+    {
+      "path": "tools/gravicentra-i66-source-bulk-live.cjs",
+      "gitBlob": "8acdf1cbf3c80642f1fcc171b77d73fde1babb21",
+      "bytes": 29997
+    },
+    {
+      "path": "tools/gravicentra-i66-source-bulk-plan.cjs",
+      "gitBlob": "ac11d052490b1b014ea94fa6ab764a3dc3e8e38b",
+      "bytes": 14812
+    }
+  ],
+  "separateLegacySourceArchive": {
+    "path": "/workspace/scratch/417fea2ce331/finance-work/mapfre57714-next/I6_6_CANONICAL_INSTALLMENT_LEGACY_CANDIDATE_SNAPSHOT_20261124.json",
+    "canonicalSuggestedPath": "artifacts/orbit360-recovery/release-control/I6_6_CANONICAL_INSTALLMENT_LEGACY_CANDIDATE_SNAPSHOT_20261124.json",
+    "gitBlob": "8ddee57089858c4e02b3fef95583f0602c030e79",
+    "sha256": "5e07735a5b573cd77a245bddb00c4b8035dcf952902e3ed0bd437bdf55740bf4",
+    "bytes": 117608
+  },
+  "summary": {
+    "policyNumber": "3002400057714",
+    "policyId": "pol_841e35aca5a66214ceaeeb4e3da9",
+    "plannedPaymentCount": 2,
+    "plannedPaymentCents": 25554,
+    "currency": "GTQ",
+    "existingPaymentsPreserved": 9,
+    "obligationGrossCorrectionCents": 2,
+    "newObligations": 0,
+    "currentWriteEligibleCount": 0,
+    "priorScheduleGrossCents": 153312,
+    "afterOnlyTwoGrossCorrectionsCents": 153314,
+    "issuerAnnualGrossCents": 153317,
+    "remainingAnnualDifferenceHeldCents": 3,
+    "annualScheduleFullyReconciled": false
+  },
+  "cases": [
+    {
+      "installment": 10,
+      "totalInstallments": 12,
+      "insurerRequirement": "1993560",
+      "receiptId": "rec_f158c0b69f104189a49580c0",
+      "portfolioId": "rec_f158c0b69f104189a49580c0",
+      "sourceFactId": "stmt_5250964c3d5659d69d8e3513e077",
+      "source": {
+        "sourceId": "mapfre-commission-202610",
+        "insurer": "MAPFRE",
+        "driveFileId": "19U_xqMJmlitl8_muzZ8Jp__q0h0Dke1P",
+        "sha256": "235d23552a76f4ea90cc60fd71b44b68c76b009f97ec9f1456bacaa431e36a91",
+        "bytes": 6185,
+        "asOfDate": "2026-10-31",
+        "sourceKind": "COMMISSION_STATEMENT_INSTALLMENT_N",
+        "country": "GT",
+        "currency": "GTQ",
+        "fullContractualSequenceAttested": false,
+        "cutClassification": "PREVIOUSLY_PINNED_OCTOBER_COMMISSION",
+        "asOfDateBasis": "October commission period end from the pinned source inventory; generation date is not asserted.",
+        "evidencePeriod": [
+          "2026-10-01",
+          "2026-10-31"
+        ],
+        "rowNumber": 2,
+        "sheet": "HTML",
+        "sourceRowSha256": "364d5ef550644771ee6dbb4d8bf7d1bed640aa34248441a7fe79de6be6f59236",
+        "invoiceSeries": "0C2FAFDB",
+        "invoiceNumber": "4152705493"
+      },
+      "priorObservedBefore": {
+        "liveRunId": 45364013332,
+        "isWritePreimage": false,
+        "receiptAndPortfolio": [
+          {
+            "collection": "recibosEsperados",
+            "id": "rec_f158c0b69f104189a49580c0",
+            "documentSha256": "245d44650411fdb76d9703ea711861952611c3d604c125fab156de0c578709d2",
+            "ids": {
+              "polizaId": "pol_841e35aca5a66214ceaeeb4e3da9",
+              "clienteId": "cli_siga_bd1af17282973c3938",
+              "asesorId": "ase-fernando-arias",
+              "aseguradoraId": "gt-mapfre-seguros",
+              "sourceRef": null
+            },
+            "dates": {
+              "fechaLimite": "2026-10-03"
+            },
+            "amounts": {
+              "primaTotal": {
+                "type": "number",
+                "present": true,
+                "value": 127.76
+              },
+              "primaNeta": {
+                "type": "number",
+                "present": true,
+                "value": 79.62
+              }
+            },
+            "references": {
+              "numeroReciboFuente": "rec_f158c0b69f104189a49580c0",
+              "polizaNumero": "3002400057714",
+              "serie": "10/12"
+            },
+            "invoiceReferences": {},
+            "states": {
+              "estadoOperativo": "futuro_pendiente",
+              "exigibilidad": "futura"
+            },
+            "flags": {},
+            "sourceRows": [],
+            "originFields": {},
+            "fieldNames": [
+              "aseguradoraId",
+              "asesorId",
+              "clienteId",
+              "collection",
+              "conductoPago",
+              "descuento",
+              "enCartera",
+              "endoso",
+              "estadoOperativo",
+              "estadoVisual",
+              "exigibilidad",
+              "fechaCorteFuente",
+              "fechaLimite",
+              "fechaPagoReportada",
+              "formaPago",
+              "frecuencia",
+              "fuenteAutoridad",
+              "gastosExpedicion",
+              "gastosFinanciamiento",
+              "id",
+              "impuestosIVA",
+              "matchQuality",
+              "moneda",
+              "motivosCalidad",
+              "numeroReciboFuente",
+              "polizaId",
+              "polizaNumero",
+              "primaNeta",
+              "primaTotal",
+              "requiereValidacion",
+              "serie",
+              "sourceBundleSha256",
+              "sourceRef",
+              "sourceRefsI65",
+              "vigenciaFin",
+              "vigenciaInicio"
+            ]
+          },
+          {
+            "collection": "carteraPrimas",
+            "id": "rec_f158c0b69f104189a49580c0",
+            "documentSha256": "c6b5f3f742a64fb083e4555a08e2d9020cedc18f4d327570f54e32daa16b8a71",
+            "ids": {
+              "polizaId": "pol_841e35aca5a66214ceaeeb4e3da9",
+              "clienteId": "cli_siga_bd1af17282973c3938",
+              "asesorId": "ase-fernando-arias",
+              "aseguradoraId": "gt-mapfre-seguros",
+              "reciboId": "rec_f158c0b69f104189a49580c0",
+              "sourceRef": null
+            },
+            "dates": {
+              "fechaLimite": "2026-10-03"
+            },
+            "amounts": {
+              "primaTotal": {
+                "type": "number",
+                "present": true,
+                "value": 127.76
+              }
+            },
+            "references": {
+              "numeroReciboFuente": "rec_f158c0b69f104189a49580c0",
+              "polizaNumero": "3002400057714",
+              "serie": "10/12"
+            },
+            "invoiceReferences": {},
+            "states": {
+              "estadoOperativo": "futuro_pendiente",
+              "exigibilidad": "futura"
+            },
+            "flags": {},
+            "sourceRows": [],
+            "originFields": {},
+            "fieldNames": [
+              "aseguradoraId",
+              "asesorId",
+              "clienteId",
+              "collection",
+              "estadoOperativo",
+              "exigibilidad",
+              "fechaCorteFuente",
+              "fechaLimite",
+              "fuenteAutoridad",
+              "id",
+              "matchQuality",
+              "moneda",
+              "motivoCalidad",
+              "numeroReciboFuente",
+              "polizaId",
+              "polizaNumero",
+              "primaTotal",
+              "reciboId",
+              "requiereValidacion",
+              "serie",
+              "sourceBundleSha256",
+              "sourceRef",
+              "sourceRefsI65"
+            ]
+          }
+        ],
+        "expectedLinkedCobrosAtThatRead": 0
+      },
+      "requiredFreshIdentity": {
+        "policyId": "pol_841e35aca5a66214ceaeeb4e3da9",
+        "policyNumber": "3002400057714",
+        "country": "GT",
+        "currency": "GTQ",
+        "insurerId": "gt-mapfre-seguros",
+        "clientId": "cli_siga_bd1af17282973c3938",
+        "term": [
+          "2025-12-23",
+          "2026-12-23"
+        ],
+        "installment": 10,
+        "series": "10/12"
+      },
+      "obligationCorrectionIntent": {
+        "mode": "EXISTING_RECEIPT_AND_SINGLE_PORTFOLIO_ONLY",
+        "expectedOldGrossCentsOnlyIfFreshReadMatches": 12776,
+        "requiredGrossCentsAfterCorrection": 12777,
+        "grossDeltaCents": 1,
+        "requiredSourceRequirement": "1993560",
+        "sourceProvenContractualDue": "2026-10-03",
+        "preserveInternalSeries": "10/12",
+        "dateBoundary": "Read every actual due/grace alias first. The source proves contractual due; do not silently replace a separately documented operational deadline. The prior read exposes only fechaLimite.",
+        "amountBoundary": "Correct authoritative gross and all existing equivalent gross aliases on both records; do not infer net, taxes, expenses, discounts, or commission from gross or from the commission amount.",
+        "calendarEngine": "Orbit.policyReceipts.updateReceipt (same operational command underneath)",
+        "needsServerCasForRealCorrection": true,
+        "existingGenericMutationExpectedBeforeSupportsReceipt": false,
+        "executableNow": false,
+        "freshNoPaidOrReportedOrReversedEvidenceRequired": true,
+        "sourceProof": {
+          "driveFileId": "17-qRnEsQkKWac5oUaDIU9R_wGOg6yptu",
+          "sha256": "5f939c5020203cf9324bdb2c694c2e72cb359ee447a018988f2b6df360e979bb",
+          "sourceIsPaymentProof": false
+        },
+        "auditReason": "Corregir la obligación existente al importe y requerimiento originales MAPFRE, preservando su identidad y la historia de pagos; aplicar el pago en una operación separada con su evidencia real."
+      },
+      "conditionalCanonicalPaymentCall": {
+        "status": "DO_NOT_EXECUTE_UNTIL_ALL_FRESH_PRECONDITIONS_AND_CORRECTION_READBACK",
+        "owner": "functions/cobros-reconciliation-domain.js/applyPayment",
+        "callable": "orbit360CobrosReconciliationCommand",
+        "actor": "Existing authenticated Dirección or Operativo with verified assigned role and country scope; no hardcoded UID or impersonation.",
+        "data": {
+          "tenantId": "alianzas-soluciones",
+          "operation": "apply_payment",
+          "requestId": "mapfre_paid_b746dcd1465542de7781a6a7ee2f1b89",
+          "reason": "Aplicar una única vez el pago MAPFRE acreditado por la fila original, después de comprobar la corrección de la obligación y la ausencia de otro cobro.",
+          "payload": {
+            "receiptId": "rec_f158c0b69f104189a49580c0",
+            "sourceType": "commission_statement",
+            "amount": 127.77,
+            "paidDate": "2026-10-01",
+            "actualPaidDateEvidence": true,
+            "evidenceId": "stmt_5250964c3d5659d69d8e3513e077",
+            "sourceRef": "drive:19U_xqMJmlitl8_muzZ8Jp__q0h0Dke1P",
+            "evidenceType": "COMMISSION_STATEMENT_INSTALLMENT_N",
+            "evidenceAsOfDate": "2026-10-31",
+            "invoiceNumber": "4152705493",
+            "paymentSupportDocumentRef": "drive:19U_xqMJmlitl8_muzZ8Jp__q0h0Dke1P"
+          }
+        },
+        "noValueInventedFor": [
+          "applicationDate",
+          "invoiceDate",
+          "paymentMethod",
+          "invoiceDocumentRef",
+          "inferredEffectiveDate"
+        ],
+        "intakeEvidenceTypeAdmissionClaimed": false,
+        "expectedNewCobroIdIfAbsent": "cob_5aa179f62d2013799acd037e8ca7",
+        "expectedStatesIfUniqueDirectEvidenceConfirmed": {
+          "paymentState": "PAID_DIRECT",
+          "applicationState": "APPLIED_DIRECT",
+          "directOrInferred": "DIRECT",
+          "conciliado": true
+        },
+        "enrichExistingInsteadOfCreatingIfFound": true,
+        "requestReplay": "Same request returns existing result, no extra payment. A new insurer-evidence request enriches that same cobro and may append technical audit; it is not zero-write replay."
+      },
+      "requiredIndependentAfter": {
+        "sameReceiptAndPortfolioIds": true,
+        "exactlyOneCobroForReceipt": true,
+        "receiptPortfolioAndCobroGrossCents": 12777,
+        "paidDate": "2026-10-01",
+        "sourceRequirementAndInvoiceNumberPreserved": true,
+        "sourceFactIdAndDocumentReferenceLinked": true,
+        "noInferredPriorPayments": true,
+        "noInventedApplicationOrInvoiceDate": true,
+        "fullRecordsAndUpdateTimesInPrivateAudit": true,
+        "sourceDocumentDigestAndRowDigestInControlReceipt": true,
+        "serverAuditAndOperationalRequestReadBack": true,
+        "sameRequestSecondReadCreatesNoExtraPayments": true,
+        "signedReadReloadRequired": true
+      }
+    },
+    {
+      "installment": 11,
+      "totalInstallments": 12,
+      "insurerRequirement": "1993561",
+      "receiptId": "rec_94ab50a5f3ca8eac7aed5394",
+      "portfolioId": "rec_94ab50a5f3ca8eac7aed5394",
+      "sourceFactId": "stmt_89bc58a24b4c34507c60b8be22e4",
+      "source": {
+        "sourceId": "mapfre-cobros-20261122",
+        "insurer": "MAPFRE",
+        "driveFileId": "1MaHarJLB2xRXBZE6mZ5oBjcyvBxbzcR1",
+        "sha256": "71a33d9e4cc1ffe52dceca992231c499460c342aa2fb0f28b025decdb4674c2a",
+        "bytes": 7062,
+        "asOfDate": "2026-11-22",
+        "sourceKind": "INSURER_CONFIRMED_PAID_STATEMENT",
+        "country": "GT",
+        "currency": "GTQ",
+        "fullContractualSequenceAttested": false,
+        "rowNumber": 16,
+        "sheet": "HTML",
+        "sourceRowSha256": "3831485eda711f87f4fa9182bce5c128c5a8d5eb23439e47427a73dff395738b",
+        "invoiceSeries": "929F2F2C",
+        "invoiceNumber": "2463124570"
+      },
+      "priorObservedBefore": {
+        "liveRunId": 45364013332,
+        "isWritePreimage": false,
+        "receiptAndPortfolio": [
+          {
+            "collection": "recibosEsperados",
+            "id": "rec_94ab50a5f3ca8eac7aed5394",
+            "documentSha256": "215dc1b0a5a371753c30366b76afb1515561d6e63f8b0265a647579021cd137e",
+            "ids": {
+              "polizaId": "pol_841e35aca5a66214ceaeeb4e3da9",
+              "clienteId": "cli_siga_bd1af17282973c3938",
+              "asesorId": "ase-fernando-arias",
+              "aseguradoraId": "gt-mapfre-seguros",
+              "sourceRef": null
+            },
+            "dates": {
+              "fechaLimite": "2026-11-02"
+            },
+            "amounts": {
+              "primaTotal": {
+                "type": "number",
+                "present": true,
+                "value": 127.76
+              },
+              "primaNeta": {
+                "type": "number",
+                "present": true,
+                "value": 79.62
+              }
+            },
+            "references": {
+              "numeroReciboFuente": "rec_94ab50a5f3ca8eac7aed5394",
+              "polizaNumero": "3002400057714",
+              "serie": "11/12"
+            },
+            "invoiceReferences": {},
+            "states": {
+              "estadoOperativo": "futuro_pendiente",
+              "exigibilidad": "futura"
+            },
+            "flags": {},
+            "sourceRows": [],
+            "originFields": {},
+            "fieldNames": [
+              "aseguradoraId",
+              "asesorId",
+              "clienteId",
+              "collection",
+              "conductoPago",
+              "descuento",
+              "enCartera",
+              "endoso",
+              "estadoOperativo",
+              "estadoVisual",
+              "exigibilidad",
+              "fechaCorteFuente",
+              "fechaLimite",
+              "fechaPagoReportada",
+              "formaPago",
+              "frecuencia",
+              "fuenteAutoridad",
+              "gastosExpedicion",
+              "gastosFinanciamiento",
+              "id",
+              "impuestosIVA",
+              "matchQuality",
+              "moneda",
+              "motivosCalidad",
+              "numeroReciboFuente",
+              "polizaId",
+              "polizaNumero",
+              "primaNeta",
+              "primaTotal",
+              "requiereValidacion",
+              "serie",
+              "sourceBundleSha256",
+              "sourceRef",
+              "sourceRefsI65",
+              "vigenciaFin",
+              "vigenciaInicio"
+            ]
+          },
+          {
+            "collection": "carteraPrimas",
+            "id": "rec_94ab50a5f3ca8eac7aed5394",
+            "documentSha256": "7c1c0bd9208e9190178c1b166c796208bb99033b7a29b240f24ca1698be856d4",
+            "ids": {
+              "polizaId": "pol_841e35aca5a66214ceaeeb4e3da9",
+              "clienteId": "cli_siga_bd1af17282973c3938",
+              "asesorId": "ase-fernando-arias",
+              "aseguradoraId": "gt-mapfre-seguros",
+              "reciboId": "rec_94ab50a5f3ca8eac7aed5394",
+              "sourceRef": null
+            },
+            "dates": {
+              "fechaLimite": "2026-11-02"
+            },
+            "amounts": {
+              "primaTotal": {
+                "type": "number",
+                "present": true,
+                "value": 127.76
+              }
+            },
+            "references": {
+              "numeroReciboFuente": "rec_94ab50a5f3ca8eac7aed5394",
+              "polizaNumero": "3002400057714",
+              "serie": "11/12"
+            },
+            "invoiceReferences": {},
+            "states": {
+              "estadoOperativo": "futuro_pendiente",
+              "exigibilidad": "futura"
+            },
+            "flags": {},
+            "sourceRows": [],
+            "originFields": {},
+            "fieldNames": [
+              "aseguradoraId",
+              "asesorId",
+              "clienteId",
+              "collection",
+              "estadoOperativo",
+              "exigibilidad",
+              "fechaCorteFuente",
+              "fechaLimite",
+              "fuenteAutoridad",
+              "id",
+              "matchQuality",
+              "moneda",
+              "motivoCalidad",
+              "numeroReciboFuente",
+              "polizaId",
+              "polizaNumero",
+              "primaTotal",
+              "reciboId",
+              "requiereValidacion",
+              "serie",
+              "sourceBundleSha256",
+              "sourceRef",
+              "sourceRefsI65"
+            ]
+          }
+        ],
+        "expectedLinkedCobrosAtThatRead": 0
+      },
+      "requiredFreshIdentity": {
+        "policyId": "pol_841e35aca5a66214ceaeeb4e3da9",
+        "policyNumber": "3002400057714",
+        "country": "GT",
+        "currency": "GTQ",
+        "insurerId": "gt-mapfre-seguros",
+        "clientId": "cli_siga_bd1af17282973c3938",
+        "term": [
+          "2025-12-23",
+          "2026-12-23"
+        ],
+        "installment": 11,
+        "series": "11/12"
+      },
+      "obligationCorrectionIntent": {
+        "mode": "EXISTING_RECEIPT_AND_SINGLE_PORTFOLIO_ONLY",
+        "expectedOldGrossCentsOnlyIfFreshReadMatches": 12776,
+        "requiredGrossCentsAfterCorrection": 12777,
+        "grossDeltaCents": 1,
+        "requiredSourceRequirement": "1993561",
+        "sourceProvenContractualDue": "2026-11-03",
+        "preserveInternalSeries": "11/12",
+        "dateBoundary": "Read every actual due/grace alias first. The source proves contractual due; do not silently replace a separately documented operational deadline. The prior read exposes only fechaLimite.",
+        "amountBoundary": "Correct authoritative gross and all existing equivalent gross aliases on both records; do not infer net, taxes, expenses, discounts, or commission from gross or from the commission amount.",
+        "calendarEngine": "Orbit.policyReceipts.updateReceipt (same operational command underneath)",
+        "needsServerCasForRealCorrection": true,
+        "existingGenericMutationExpectedBeforeSupportsReceipt": false,
+        "executableNow": false,
+        "freshNoPaidOrReportedOrReversedEvidenceRequired": true,
+        "sourceProof": {
+          "driveFileId": "17-qRnEsQkKWac5oUaDIU9R_wGOg6yptu",
+          "sha256": "5f939c5020203cf9324bdb2c694c2e72cb359ee447a018988f2b6df360e979bb",
+          "sourceIsPaymentProof": false
+        },
+        "auditReason": "Corregir la obligación existente al importe y requerimiento originales MAPFRE, preservando su identidad y la historia de pagos; aplicar el pago en una operación separada con su evidencia real."
+      },
+      "conditionalCanonicalPaymentCall": {
+        "status": "DO_NOT_EXECUTE_UNTIL_ALL_FRESH_PRECONDITIONS_AND_CORRECTION_READBACK",
+        "owner": "functions/cobros-reconciliation-domain.js/applyPayment",
+        "callable": "orbit360CobrosReconciliationCommand",
+        "actor": "Existing authenticated Dirección or Operativo with verified assigned role and country scope; no hardcoded UID or impersonation.",
+        "data": {
+          "tenantId": "alianzas-soluciones",
+          "operation": "apply_payment",
+          "requestId": "mapfre_paid_097be0bd0940db4e86f41f716eadce54",
+          "reason": "Aplicar una única vez el pago MAPFRE acreditado por la fila original, después de comprobar la corrección de la obligación y la ausencia de otro cobro.",
+          "payload": {
+            "receiptId": "rec_94ab50a5f3ca8eac7aed5394",
+            "sourceType": "insurer_statement",
+            "amount": 127.77,
+            "paidDate": "2026-11-04",
+            "actualPaidDateEvidence": true,
+            "evidenceId": "stmt_89bc58a24b4c34507c60b8be22e4",
+            "sourceRef": "drive:1MaHarJLB2xRXBZE6mZ5oBjcyvBxbzcR1",
+            "evidenceType": "INSURER_CONFIRMED_PAID_STATEMENT",
+            "evidenceAsOfDate": "2026-11-22",
+            "invoiceNumber": "2463124570",
+            "paymentSupportDocumentRef": "drive:1MaHarJLB2xRXBZE6mZ5oBjcyvBxbzcR1"
+          }
+        },
+        "noValueInventedFor": [
+          "applicationDate",
+          "invoiceDate",
+          "paymentMethod",
+          "invoiceDocumentRef",
+          "inferredEffectiveDate"
+        ],
+        "intakeEvidenceTypeAdmissionClaimed": false,
+        "expectedNewCobroIdIfAbsent": "cob_c65cbea23ef827cc3ca5cb773d26",
+        "expectedStatesIfUniqueDirectEvidenceConfirmed": {
+          "paymentState": "PAID_DIRECT",
+          "applicationState": "APPLIED_DIRECT",
+          "directOrInferred": "DIRECT",
+          "conciliado": true
+        },
+        "enrichExistingInsteadOfCreatingIfFound": true,
+        "requestReplay": "Same request returns existing result, no extra payment. A new insurer-evidence request enriches that same cobro and may append technical audit; it is not zero-write replay."
+      },
+      "requiredIndependentAfter": {
+        "sameReceiptAndPortfolioIds": true,
+        "exactlyOneCobroForReceipt": true,
+        "receiptPortfolioAndCobroGrossCents": 12777,
+        "paidDate": "2026-11-04",
+        "sourceRequirementAndInvoiceNumberPreserved": true,
+        "sourceFactIdAndDocumentReferenceLinked": true,
+        "noInferredPriorPayments": true,
+        "noInventedApplicationOrInvoiceDate": true,
+        "fullRecordsAndUpdateTimesInPrivateAudit": true,
+        "sourceDocumentDigestAndRowDigestInControlReceipt": true,
+        "serverAuditAndOperationalRequestReadBack": true,
+        "sameRequestSecondReadCreatesNoExtraPayments": true,
+        "signedReadReloadRequired": true
+      }
+    }
+  ],
+  "freshReadSet": {
+    "serverContext": [
+      "project and tenant",
+      "authenticated actor/member active role and assigned countries",
+      "current deployed callable version/source acceptance",
+      "current recovery authority and exact protected plan"
+    ],
+    "identityAndFinancial": [
+      "unique policy edition and all policy-number aliases",
+      "canonical client and issuer identities",
+      "all 12 existing receipts with amounts/date aliases, state, source refs, document hashes/updateTimes",
+      "all policy-linked portfolio rows and all aliases of both target receipt IDs",
+      "all policy-linked cobros and source-fact/invoice/requirement matches outside target IDs",
+      "both deterministic cobro IDs, existing operational request IDs, reconciliation audit/source registry references",
+      "payment-report/reversal/partial-payment/contradiction fields, not only paid state"
+    ],
+    "sourceAndContract": [
+      "read exact three original Drive files through the execution identity and verify hashes",
+      "cross-check original holder/contract identity against current canonical client",
+      "verify exact requirement, installment, term, currency and gross in both original and paid evidence",
+      "separate source due from operational deadline; do not infer absent dates or components"
+    ],
+    "observedUnresolvedIdentitySignal": {
+      "holderWitnessMatchesInOldReader": false,
+      "treatAsVerified": false,
+      "requiredResolution": "Fresh source-to-canonical identity comparison; formatting-only policy relation and holder witness mismatch are diagnostic, not write eligibility."
+    },
+    "whyPriorReadCannotAuthorize": "The 45364013332 report is a redacted historical diagnostic, explicitly noEligibilityEffect. It lacks a transactional current preimage and cannot serve as a CAS token."
+  },
+  "freshReadExecution": {
+    "workflow": ".github/workflows/gravicentra-i66-insurer-source-bulk-protected.yml",
+    "workflowBlob": "65594a61c2b1bb89f5963edee7ee5cc2f8441b2a",
+    "sameReader": "tools/gravicentra-i66-financial-identity-readback.cjs",
+    "sameReaderEntryCommand": "node tools/gravicentra-i66-roble-two-issued-protected.cjs preflight",
+    "sameReadonlyIdentityRequest": {
+      "schema": "GI_I66_SOURCE_IDENTITY_READBACK_V1",
+      "enabled": true,
+      "writes": 0,
+      "riskPolicy": "91-4140843",
+      "documentaryTargets": [
+        {
+          "policy": "04-05-01-12289-4",
+          "sourceDriveId": "1vCSFXQD5NDGYHOrT-kxPoFbiciqnLIRI",
+          "sourcePdfSha256": "6c360b74ef73c971f856a66eb4f4aa906ea8c303faafcfe972e027b16620fc7e",
+          "holderWitness": "03f36c92b3123475ce427293209902b7a708324f725fc87f857c45f55aae2bd3",
+          "sourceKind": "ISSUED_ORIGINAL",
+          "documentaryTerm": [
+            "2026-10-01",
+            "2027-09-30"
+          ],
+          "coverageStatusLiteral": "SIN COBERTURA",
+          "coverageStatusSourceDriveId": "1yOmuDTRsejDiZ9uET6tXBEuMNFgbFAal",
+          "coverageStatusSourceSha256": "1a57be74a480fb97486b63723137ff9b59e502a128affb0364104b584491091d"
+        },
+        {
+          "policy": "04-05-01-15590-0",
+          "sourceDriveId": "1nHigtnI2GJlKePaeyVyXlB_giCyIH2ss",
+          "sourcePdfSha256": "78d78df726fa54c8ef2af5d728a50265db6956208b4a593eab433457f24b4e62",
+          "holderWitness": "50972cb17a3fcc867396a6d6ef797569a11e6eb42aa906fc5f4dc56842e128ac",
+          "sourceKind": "ISSUED_ORIGINAL",
+          "documentaryTerm": [
+            "2026-10-01",
+            "2027-09-30"
+          ]
+        },
+        {
+          "policy": "04-05-01-10738-6",
+          "sourceDriveId": "13CIEJd0yEUTvnM3zomCZIzmDFhC5xoh_",
+          "sourcePdfSha256": "28762cf44ea50f1a2aa2ebc7285413c97286a54e600c345639aea75017d472a7",
+          "holderWitness": "adca312ed2ee3655264cc4e4c1a0228324ea4f7def902be52276b20611eab82c",
+          "sourceKind": "INSURER_CONFIRMED_PAYMENT_STATEMENT"
+        }
+      ],
+      "financialPolicyIds": [
+        "pol_7ab15779e3626402f1cb4349fa69",
+        "pol_243608bce078afdf9640c8554ac4",
+        "pol_6537ecb219275945f57fc567610c",
+        "pol_c0001022fe28c0fa04d405d4a5b8",
+        "pol_4cc6dba30e87de60562e32306c3c"
+      ],
+      "newStatementSource": {
+        "path": "artifacts/orbit360-recovery/source-batches/I6_6_NEW_INSURER_SOURCE_DELTA_20261124.json",
+        "sha256": "68ebdc6f04e0ee5e4d7aa92b2a3bd9564f17a8a5e7b23528522cc6381f782805"
+      }
+    },
+    "existingTriggerRequires": [
+      "I66_REFRESH_PINNED_SOURCE",
+      "I66_ROBLE_TWO_24_CAS"
+    ],
+    "reasonPlainWorkflowDispatchIsInsufficient": "The independent financial identity reader step is conditioned on the second commit marker; a plain dispatch runs ordinary preflight but does not necessarily produce the required detailed identity census.",
+    "rootCoordinationRequired": true,
+    "dispatchedHere": false,
+    "doNotApproveAnyFinancialJobFromThisPreparation": true,
+    "possibleProtectedJob": "The existing workflow may queue its protected job if it discovers ready rows; those rows are outside this proposal until exact review. No current request flag is treated as a substitute for the protected gate.",
+    "knownReaderLimits": [
+      "receipt/cartera updateTimes and all full raw economic component fields are not exposed in this projection",
+      "existing source56 census is diagnostic and never a writer admission",
+      "current original-access list is pinned to earlier original documents; these MAPFRE originals need exact execution-identity proof before apply"
+    ]
+  },
+  "currentOwnerBoundaries": [
+    {
+      "owner": "cobros-reconciliation-domain/applyPayment",
+      "observation": "Truthful commission_statement and insurer_statement sources are accepted; conditional in-memory fixture creates exactly two payments with stated dates. It does not itself correct gross amounts or bind an expected-before digest.",
+      "releaseDisposition": "CONDITIONAL_ONLY_AFTER_PROTECTED_CORRECTION"
+    },
+    {
+      "owner": "policy-receipts-engine/updateReceipt + product-operational-domain",
+      "observation": "Current calendar edit creates sparse receipt/portfolio patches and an activity reason, but generic expectedBefore is restricted to policy renovable/advisor fields; no receipt CAS contract exists here.",
+      "releaseDisposition": "HOLD_CURRENT_GENERIC_CORRECTION_NOT_SAFE_AS_BATCH_CAS"
+    },
+    {
+      "owner": "gravicentra-i66-source-bulk-plan/apply",
+      "observation": "Existing CAS writer supports pending source gross corrections. True PAID rows are rejected with PAID_REQUIRES_COBRO_PROOF_AND_WRITER. These statements must not be renamed PENDING to pass.",
+      "releaseDisposition": "HOLD_PAID_SOURCE_NOT_ADMITTED"
+    },
+    {
+      "owner": "cobros-source-intake-v2 + payment-inference-engine",
+      "observation": "Current legacy series and numeric internal-ID bugs remain. Prior separately prepared parser candidate is preserved with its existing 114 intake + 17 bank tests; no deployment claim.",
+      "releaseDisposition": "SEPARATE_CANDIDATE_NOT_DEPLOYED"
+    },
+    {
+      "owner": "cobros-source-intake-v2",
+      "observation": "INSURER_CONFIRMED_PAID_STATEMENT is unsupported by source intake. The direct payment command supports insurer_statement; no false invoice/bank classification is proposed.",
+      "releaseDisposition": "DIRECT_OWNER_CONDITIONAL_PATH_DISTINCT_FROM_INTAKE"
+    }
+  ],
+  "actualNextStep": "Root coordinates a fresh read in the existing protected source workflow after the release freeze. Reconcile exact receipt/cartera preimages and holder/source identity, then pin one controlled obligation correction within the existing owner before enabling the two deterministic canonical payment calls. This file supplies no current CAS authorization.",
+  "localConditionalTest": {
+    "path": "current-owner-conditional-fixture.cjs",
+    "resultPath": "current-owner-conditional-fixture-result.json",
+    "casesPassed": 8,
+    "caseFailures": 0,
+    "realMobileOrLivePass": false,
+    "evidenceFiles": [
+      {
+        "path": "current-owner-conditional-fixture.cjs",
+        "gitBlob": "eee20cf9819704dece34cfd95b4a4485f467c962",
+        "sha256": "894d0d975a69fe9c114515825d556d3324c910942e1898f2118600430b7fa5ff",
+        "content": "'use strict';\n// READ-ONLY preparation: execute existing payment code against the existing\n// transactional test double. This file has no SDK credentials or network I/O.\n// Its projected records are fixtures, never current Firestore preimages.\nconst fs=require('node:fs'),path=require('node:path'),crypto=require('node:crypto'),vm=require('node:vm');\nconst assert=require('node:assert/strict');\nconst {createRequire}=require('node:module');\nconst root=path.resolve(__dirname,'../../integration-v18/repo');\nconst pins=JSON.parse(fs.readFileSync(path.join(__dirname,'source-pins.json')));\nconst sha=b=>crypto.createHash('sha256').update(b).digest('hex');\nconst blob=b=>crypto.createHash('sha1').update(Buffer.concat([Buffer.from('blob '+b.length+'\\0'),b])).digest('hex');\nfor(const p of pins.entries){\n const filename=p.path==='orbit360-platform/core/policy-receipts-engine.js'?path.join(__dirname,'policy-receipts-engine.current.js'):path.join(root,p.path);\n assert.equal(blob(fs.readFileSync(filename)),p.gitBlob,'PINNED_CURRENT_OWNER_CHANGED: '+p.path);\n}\nconst harnessPath=path.join(root,'tools/gravicentra-i6-6-source-intake-v2.test.cjs');\nconst harnessText=fs.readFileSync(harnessPath,'utf8');\nconst stop=harnessText.indexOf('beforeEach(seed);');\nassert.ok(stop>0,'EXISTING_HARNESS_NOT_FOUND');\nconst sandbox={module:{exports:{}},exports:{},require:createRequire(harnessPath),__dirname:path.dirname(harnessPath),\n __filename:harnessPath,console,process,structuredClone,Buffer};\nvm.runInNewContext(harnessText.slice(0,stop)+'\\nmodule.exports={seed,command,request,set,item,table,business,documents:()=>documents,writes:()=>writes};',sandbox,{filename:harnessPath});\nconst h=sandbox.module.exports;\nconst crosswalk=JSON.parse(fs.readFileSync(path.join(__dirname,'../next56/I6_6_NEW56_FOCAL_ORIGINAL_CROSSWALK_20261124.json')));\nconst mapfre=crosswalk.mapfre57714;\nconst policyId=mapfre.policyId,fixtureTenant='synthetic-intake-tenant';\nconst amount=127.77;\nfunction seed(corrected=true){\n h.seed();\n // Delete only in-memory synthetic financial rows made by the shared fixture.\n for(const key of [...h.documents().keys()])if(['/data/polizas/','/data/recibosEsperados/','/data/carteraPrimas/','/data/cobros/'].some(s=>key.includes(s)))h.documents().delete(key);\n h.set(h.item('polizas',policyId),{id:policyId,tenantId:fixtureTenant,numero:'3002400057714',clienteId:'client_qa',aseguradoraId:'insurer_qa',\n  pais:'GT',moneda:'GTQ',vigenciaInicio:'2025-12-23',vigenciaFin:'2026-12-23',estado:'Vigente'});\n for(const row of mapfre.fullIssuedSchedule){\n  const paid=row.installment<=9,focus=[10,11].includes(row.installment);\n  const premium=focus&&corrected?127.77:127.76;\n  h.set(h.item('recibosEsperados',row.receiptId),{id:row.receiptId,tenantId:fixtureTenant,polizaId:policyId,clienteId:'client_qa',aseguradoraId:'insurer_qa',\n   pais:'GT',moneda:'GTQ',serie:row.installment+'/12',numeroReciboFuente:focus&&corrected?row.requirement:row.receiptId,\n   primaTotal:premium,fechaLimite:focus&&corrected?row.contractualDue:row.beforeDates.fechaLimite,\n   ...(paid?{estado:'Pagado',paymentState:'PAID_DIRECT',applicationState:'PENDING_APPLICATION'}:{estado:'Pendiente'})});\n  for(const p of row.portfolios)h.set(h.item('carteraPrimas',p.id),{id:p.id,tenantId:fixtureTenant,polizaId:policyId,clienteId:'client_qa',\n   reciboId:row.receiptId,pais:'GT',moneda:'GTQ',primaTotal:premium,estado:paid?'Pagado':'Pendiente',carteraActiva:!paid});\n  for(const p of row.existingPayments)h.set(h.item('cobros',p.id),{id:p.id,tenantId:fixtureTenant,polizaId:policyId,clienteId:'client_qa',\n   reciboId:row.receiptId,pais:'GT',moneda:'GTQ',monto:p.amountCents/100,estado:'Pagado',paymentState:'PAID_DIRECT',applicationState:'PENDING_APPLICATION'});\n }\n}\nfunction payload(row){\n const f=row.sourceFact;\n return {receiptId:row.binding.receiptId,sourceType:f.state==='COMMISSION_ANCHOR'?'commission_statement':'insurer_statement',\n  amount,paidDate:f.paidDate,actualPaidDateEvidence:true,evidenceId:f.sourceFactId,sourceRef:'drive:'+f.sourceDriveId,\n  evidenceType:f.state==='COMMISSION_ANCHOR'?'COMMISSION_STATEMENT_INSTALLMENT_N':'INSURER_CONFIRMED_PAID_STATEMENT',\n  evidenceAsOfDate:f.state==='COMMISSION_ANCHOR'?'2026-10-31':'2026-11-22',invoiceNumber:f.invoiceNumber,\n  paymentSupportDocumentRef:'drive:'+f.sourceDriveId};\n}\nfunction request(row,suffix=''){\n const p=payload(row),req=h.request('apply_payment',p);\n req.data.requestId='mapfre_paid_'+sha(row.sourceFact.sourceRowSha256+'|'+row.binding.receiptId).slice(0,32)+suffix;\n req.data.reason='Fixture condicional de dos pagos documentados; no ejecutado en Firestore.';\n return req;\n}\nconst cases=[];\nfunction note(id,result){cases.push({id,result:'PASS',...result});}\nasync function main(){\n seed(true);\n const previous=new Map(h.table('cobros').map(([k,v])=>[k,JSON.stringify(v)]));\n for(const row of mapfre.provenPaymentCandidates){\n  const out=await h.command.run(request(row));\n  assert.equal(out.paymentState,'PAID_DIRECT');assert.equal(out.applicationState,'APPLIED_DIRECT');\n  assert.equal(out.paidDate,row.actualPaidDate);assert.equal(out.applicationDate,'');assert.equal(out.invoiceDate,'');\n  const receipt=h.documents().get(h.item('recibosEsperados',row.binding.receiptId));\n  const payment=h.documents().get(h.item('cobros',out.cobroId));\n  assert.equal(payment.monto,amount);assert.equal(receipt.primaTotal,amount);\n  assert.equal(payment.directOrInferred,'DIRECT');assert.equal(payment.inferredEffectiveDate,'');\n }\n assert.equal(h.table('cobros').length,11);\n for(const[k,v]of previous)assert.equal(JSON.stringify(h.documents().get(k)),v);\n const created=h.table('cobros').filter(([k])=>!previous.has(k));\n assert.equal(created.reduce((sum,[,v])=>sum+Math.round(v.monto*100),0),25554);\n note('canonical_two_payments_after_hypothetical_correction',{newPayments:2,newPaymentCents:25554,preservedHistoricalPayments:9,\n  applicationDateInvented:false,realExecution:false});\n const before=h.writes(),businessBefore=JSON.stringify(h.business());\n for(const row of mapfre.provenPaymentCandidates){const out=await h.command.run(request(row));assert.equal(out.reused,true);}\n assert.equal(h.writes(),before);assert.equal(JSON.stringify(h.business()),businessBefore);\n note('same_request_replay',{newFixtureWrites:0});\n const first=mapfre.provenPaymentCandidates[0];\n const existingCobroId=h.documents().get(h.item('recibosEsperados',first.binding.receiptId)).cobroId;\n const enrichment=await h.command.run(request(first,'_other'));\n assert.equal(enrichment.cobroId,existingCobroId);assert.equal(h.table('cobros').length,11);\n for(const[k,v]of previous)assert.equal(JSON.stringify(h.documents().get(k)),v);\n note('new_insurer_request_enriches_same_payment',{newPayments:0,sameCobroId:true,technicalFixtureWrites:h.writes()-before});\n for(const scenario of ['missing','duplicate']){\n  seed(true);const row=mapfre.provenPaymentCandidates[0],portfolio=row.binding.portfolios[0];\n  if(scenario==='missing')h.documents().delete(h.item('carteraPrimas',portfolio.id));\n  else h.set(h.item('carteraPrimas','duplicate_fixture'),{...h.documents().get(h.item('carteraPrimas',portfolio.id)),id:'duplicate_fixture'});\n  await assert.rejects(()=>h.command.run(request(row)));assert.equal(h.writes(),0);\n  note(scenario+'_portfolio_blocks',{newFixtureWrites:0});\n }\n // This is a causal limitation, NOT permission to exploit the direct writer:\n // amount override does not itself correct the obligation or bind a CAS digest.\n seed(false);const row=mapfre.provenPaymentCandidates[0];const out=await h.command.run(request(row));\n assert.equal(h.documents().get(h.item('recibosEsperados',row.binding.receiptId)).primaTotal,127.76);\n assert.equal(h.documents().get(h.item('cobros',out.cobroId)).monto,127.77);\n note('uncorrected_amount_override_is_not_a_valid_release_plan',{conditionalPlanStatus:'HOLD_OBLIGATION_CORRECTION_REQUIRED',\n  fixtureReceiptCents:12776,fixtureCobroCents:12777,realExecution:false});\n const intake=require(path.join(root,'functions/cobros-source-intake-v2.js'));\n const inference=require(path.join(root,'functions/payment-inference-engine.js'));\n const legacy={numeroReciboFuente:row.binding.receiptId,serie:'10/12'};\n assert.equal(intake.matchesCanonicalInstallment({installment:'10/12'},{},legacy),false);\n assert.equal(inference.receiptSequence(legacy),158);\n note('legacy_parser_remains_separate',{currentIntakeAccepts:false,currentParsedSequence:158});\n const bulk=require(path.join(root,'tools/gravicentra-i66-source-bulk-plan.cjs'));\n const plan=bulk.planSourceBatch(mapfre.provenPaymentCandidates.map(p=>({caseId:p.sourceFact.sourceFactId,insurer:'MAPFRE',policy:'3002400057714',\n  requirement:p.sourceFact.requirement,due:p.binding.contractualDue,installment:p.binding.installment,grossCents:12777,state:'PAID',sourceSha256:p.sourceFact.sourceSha256})),[]);\n assert.equal(plan.readyCount,0);assert.equal(plan.exceptions.length,2);\n assert.ok(plan.exceptions.every(p=>p.code==='PAID_REQUIRES_COBRO_PROOF_AND_WRITER'));\n note('pending_bulk_owner_does_not_accept_paid_source',{readyCount:0,exceptions:plan.exceptions});\n return {schema:'GI_I66_MAPFRE57714_CURRENT_OWNER_CONDITIONAL_FIXTURE_V1',status:'LOCAL_CONDITIONAL_SEMANTICS_VERIFIED_REAL_EXECUTION_HOLD',\n  sourceHead:pins.sourceHead,fixtureEngine:'existing authenticated domain and existing transactional in-memory harness',\n  cases,casesPassed:cases.length,caseFailures:0,remoteWrites:0,livePaymentEligibilityCertified:false,\n  fullFinancialPass:false,notProved:['fresh Firestore state','actual deployed callable blob','authentic actor scope','signed preview/live behavior',\n   'CAS-protected obligation correction','source proof read by execution service account','complete provider statement identity']};\n}\nmain().then(report=>{fs.writeFileSync(path.join(__dirname,'current-owner-conditional-fixture-result.json'),JSON.stringify(report,null,2)+'\\n');\n console.log(JSON.stringify({status:report.status,casesPassed:report.casesPassed,caseFailures:report.caseFailures,remoteWrites:0}));})\n .catch(error=>{console.error(error);process.exitCode=1;});\n"
+      },
+      {
+        "path": "current-owner-conditional-fixture-result.json",
+        "gitBlob": "f82b87753e86776a7168ca3596aa188923b23742",
+        "sha256": "4161bc3d663cf6020bc16a67e6a8f03b3f51d61a92977f971722595b6bc4c103",
+        "content": "{\n  \"schema\": \"GI_I66_MAPFRE57714_CURRENT_OWNER_CONDITIONAL_FIXTURE_V1\",\n  \"status\": \"LOCAL_CONDITIONAL_SEMANTICS_VERIFIED_REAL_EXECUTION_HOLD\",\n  \"sourceHead\": \"153b28142a8c43a4bb81a2357fbed17a440d2c8f\",\n  \"fixtureEngine\": \"existing authenticated domain and existing transactional in-memory harness\",\n  \"cases\": [\n    {\n      \"id\": \"canonical_two_payments_after_hypothetical_correction\",\n      \"result\": \"PASS\",\n      \"newPayments\": 2,\n      \"newPaymentCents\": 25554,\n      \"preservedHistoricalPayments\": 9,\n      \"applicationDateInvented\": false,\n      \"realExecution\": false\n    },\n    {\n      \"id\": \"same_request_replay\",\n      \"result\": \"PASS\",\n      \"newFixtureWrites\": 0\n    },\n    {\n      \"id\": \"new_insurer_request_enriches_same_payment\",\n      \"result\": \"PASS\",\n      \"newPayments\": 0,\n      \"sameCobroId\": true,\n      \"technicalFixtureWrites\": 5\n    },\n    {\n      \"id\": \"missing_portfolio_blocks\",\n      \"result\": \"PASS\",\n      \"newFixtureWrites\": 0\n    },\n    {\n      \"id\": \"duplicate_portfolio_blocks\",\n      \"result\": \"PASS\",\n      \"newFixtureWrites\": 0\n    },\n    {\n      \"id\": \"uncorrected_amount_override_is_not_a_valid_release_plan\",\n      \"result\": \"PASS\",\n      \"conditionalPlanStatus\": \"HOLD_OBLIGATION_CORRECTION_REQUIRED\",\n      \"fixtureReceiptCents\": 12776,\n      \"fixtureCobroCents\": 12777,\n      \"realExecution\": false\n    },\n    {\n      \"id\": \"legacy_parser_remains_separate\",\n      \"result\": \"PASS\",\n      \"currentIntakeAccepts\": false,\n      \"currentParsedSequence\": 158\n    },\n    {\n      \"id\": \"pending_bulk_owner_does_not_accept_paid_source\",\n      \"result\": \"PASS\",\n      \"readyCount\": 0,\n      \"exceptions\": [\n        {\n          \"caseId\": \"stmt_5250964c3d5659d69d8e3513e077\",\n          \"code\": \"PAID_REQUIRES_COBRO_PROOF_AND_WRITER\"\n        },\n        {\n          \"caseId\": \"stmt_89bc58a24b4c34507c60b8be22e4\",\n          \"code\": \"PAID_REQUIRES_COBRO_PROOF_AND_WRITER\"\n        }\n      ]\n    }\n  ],\n  \"casesPassed\": 8,\n  \"caseFailures\": 0,\n  \"remoteWrites\": 0,\n  \"livePaymentEligibilityCertified\": false,\n  \"fullFinancialPass\": false,\n  \"notProved\": [\n    \"fresh Firestore state\",\n    \"actual deployed callable blob\",\n    \"authentic actor scope\",\n    \"signed preview/live behavior\",\n    \"CAS-protected obligation correction\",\n    \"source proof read by execution service account\",\n    \"complete provider statement identity\"\n  ]\n}\n"
+      },
+      {
+        "path": "source-pins.json",
+        "gitBlob": "6782dcb75fce517c783b930c961f832f589821d4",
+        "sha256": "9d2287f620d21ffb203651a5e766d962c9f1b8c5a4b8c2ee451669c16f2e0fbd",
+        "content": "{\n  \"schema\": \"GI_I66_MAPFRE57714_PREPARATION_SOURCE_PINS_V1\",\n  \"sourceHead\": \"153b28142a8c43a4bb81a2357fbed17a440d2c8f\",\n  \"sourceTreeTruncated\": false,\n  \"entries\": [\n    {\n      \"path\": \".github/workflows/gravicentra-i66-insurer-source-bulk-protected.yml\",\n      \"gitBlob\": \"65594a61c2b1bb89f5963edee7ee5cc2f8441b2a\",\n      \"bytes\": 28109\n    },\n    {\n      \"path\": \"functions/cobros-reconciliation-domain.js\",\n      \"gitBlob\": \"add21a5888f61fceea5ffd7aef7cf7318a31225e\",\n      \"bytes\": 95408\n    },\n    {\n      \"path\": \"functions/cobros-source-intake-v2.js\",\n      \"gitBlob\": \"31bb921f5c58cd47af606ec43217b445be519c4a\",\n      \"bytes\": 30718\n    },\n    {\n      \"path\": \"functions/payment-inference-engine.js\",\n      \"gitBlob\": \"5bebc3d134a129c608125b36da0109dfc52b812f\",\n      \"bytes\": 15491\n    },\n    {\n      \"path\": \"functions/product-operational-domain.js\",\n      \"gitBlob\": \"513b89d8d58ef8ba780a614032591f4f0ad3e6f7\",\n      \"bytes\": 100128\n    },\n    {\n      \"path\": \"functions/proposal-application-boundary.js\",\n      \"gitBlob\": \"4c9cbf708a0dc353ca213c806fcedb580f7a25ec\",\n      \"bytes\": 27355\n    },\n    {\n      \"path\": \"orbit360-platform/core/policy-receipts-engine.js\",\n      \"gitBlob\": \"1a42767f5d1b7fc455e4a332b4d0e6eda2f87014\",\n      \"bytes\": 56063\n    },\n    {\n      \"path\": \"tools/gravicentra-i6-6-source-intake-v2.test.cjs\",\n      \"gitBlob\": \"2c1a2cf07a27ec2ebdbf427d013262233617fbfa\",\n      \"bytes\": 47936\n    },\n    {\n      \"path\": \"tools/gravicentra-i66-financial-identity-readback.cjs\",\n      \"gitBlob\": \"e4a08be43b3f188363b21f20c607d3601e05cfd2\",\n      \"bytes\": 22826\n    },\n    {\n      \"path\": \"tools/gravicentra-i66-source-bulk-apply.cjs\",\n      \"gitBlob\": \"e2dcdb300a4955b219827a2d55d6c0838f6fbe39\",\n      \"bytes\": 13801\n    },\n    {\n      \"path\": \"tools/gravicentra-i66-source-bulk-live.cjs\",\n      \"gitBlob\": \"8acdf1cbf3c80642f1fcc171b77d73fde1babb21\",\n      \"bytes\": 29997\n    },\n    {\n      \"path\": \"tools/gravicentra-i66-source-bulk-plan.cjs\",\n      \"gitBlob\": \"ac11d052490b1b014ea94fa6ab764a3dc3e8e38b\",\n      \"bytes\": 14812\n    }\n  ]\n}\n"
+      }
+    ],
+    "unfixedRiskReproduced": "A direct amount=127.77 payment on an uncorrected receipt=127.76 leaves them inconsistent. That possible invocation is explicitly not approved."
+  },
+  "preservation": {
+    "noGeneral136553Payment": true,
+    "general136553ExistingPaymentsUnchanged": true,
+    "all155HistoricalDirectPayments": "PRESERVE_DIRECT_PENDING_APPLICATION",
+    "prior46NewPendingObligationsAnd104IssuedObligations": "PRESERVE_NO_REPLAY",
+    "Universales12289And15590": "PRESERVE_NO_REPLAY",
+    "MAPFREOtherNinePayments": "PRESERVE_ALL_IDS_AMOUNTS_DATES_AND_STATES",
+    "MAPFREInstallment12": "NO_PAYMENT_OR_CORRECTION_IN_THIS_TWO_PAYMENT_PROPOSAL",
+    "legacyInstallmentFix": "legacy-installment-candidate-preserved.json; code bytes and existing tests unmodified",
+    "emailAndReleaseV20": "UNMODIFIED"
+  },
+  "customerDataWrites": 0,
+  "externalMutations": 0,
+  "sourceV20Modified": false,
+  "newPaymentEligibilityCertified": false,
+  "productionAccepted": false,
+  "rollbackBoundary": "Do not delete any payment on an uncertain response. Read the exact same request and cobro first. Any future rollback or reversal must use audited approved control and original beforeimages; old diagnostic snapshots are never restoration authority."
+}

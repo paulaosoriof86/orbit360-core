@@ -1,0 +1,228 @@
+{
+  "schema": "GI_I66_IMMUTABLE_BUILD_EXACT_PREVIEW_READBACK_V1",
+  "recordType": "SUBORDINATE_BUILD_EVIDENCE_NOT_LIVE_ACCEPTANCE",
+  "recordedAtUtc": "2026-11-24T11:21:46.033Z",
+  "status": "IMMUTABLE_BUILD_AND_EXACT_HOSTING_PREVIEW_READBACK_PASS_BACKEND_QA_PENDING",
+  "target": {
+    "sourceSha": "48a7a6d4379759b6f32c7f2435e8e37c724989cc",
+    "sourceTree": "31bd6f8d420bfa8c5c296d9561d7de0ff4442f74",
+    "manifestBlob": "677354250c84ef0a5af0b562e29586dfe1559553",
+    "compositionBlob": "33bf80768cb6cb311f2975d282a5f50935f680aa",
+    "files": 224,
+    "artifactId": 14913484604,
+    "artifactDigest": "sha256:531fddd76a010377bd9aa6c652d737dc584a99edc573c2aca313b56fd7efa405",
+    "buildRunId": 45382606064,
+    "buildId": "gi-i66-48a7a6d43797-57f234755dc1",
+    "previewUrl": "https://ays-orbit-360-lab--gi-i66-rc-45382606064-6302t2f6.web.app",
+    "previewChannel": "gi-i66-rc-45382606064",
+    "hostingVersion": null
+  },
+  "buildRunId": 45382606064,
+  "buildRunConclusion": "success",
+  "artifact": {
+    "id": 14913484604,
+    "node_id": "MDg6QXJ0aWZhY3QxNDkxMzQ4NDYwNA==",
+    "name": "gi-i66-immutable-48a7a6d4379759b6f32c7f2435e8e37c724989cc",
+    "size_in_bytes": 1837511,
+    "url": "https://api.github.com/repos/paulaosoriof86/orbit360-core/actions/artifacts/14913484604",
+    "archive_download_url": "https://api.github.com/repos/paulaosoriof86/orbit360-core/actions/artifacts/14913484604/zip",
+    "expired": false,
+    "digest": "sha256:531fddd76a010377bd9aa6c652d737dc584a99edc573c2aca313b56fd7efa405",
+    "created_at": "2026-11-24T11:19:02Z",
+    "updated_at": "2026-11-24T11:19:02Z",
+    "expires_at": "2026-12-24T11:19:00Z",
+    "workflow_run": {
+      "id": 45382606064,
+      "repository_id": 1275672866,
+      "head_repository_id": 1275672866,
+      "head_branch": "recovery/fase-a-clean-20260831",
+      "head_sha": "48a7a6d4379759b6f32c7f2435e8e37c724989cc"
+    }
+  },
+  "readback": {
+    "status": "PASS",
+    "fileCount": 224,
+    "sourceSha": "48a7a6d4379759b6f32c7f2435e8e37c724989cc",
+    "buildId": "gi-i66-48a7a6d43797-57f234755dc1",
+    "artifactDigest": "sha256:531fddd76a010377bd9aa6c652d737dc584a99edc573c2aca313b56fd7efa405",
+    "hostingVersion": null,
+    "hostingVersionNotExposedByBuildJob": true,
+    "origin": "https://ays-orbit-360-lab--gi-i66-rc-45382606064-6302t2f6.web.app",
+    "exactFileDigests": true,
+    "marker": {
+      "product": "Gravicentra Insurance",
+      "gate": "I6.6",
+      "sourceSha": "48a7a6d4379759b6f32c7f2435e8e37c724989cc",
+      "buildId": "gi-i66-48a7a6d43797-57f234755dc1",
+      "environmentRef": "firebase-hosting-preview-i6-6"
+    },
+    "jobId": 138405408053,
+    "jobConclusion": "success",
+    "signedReadbackStep": {
+      "name": "Preview readback all artifact files and confirm both LIVE origins are untouched",
+      "status": "completed",
+      "conclusion": "success",
+      "number": 12,
+      "started_at": "2026-11-24T11:19:30Z",
+      "completed_at": "2026-11-24T11:20:06Z"
+    },
+    "bothLiveOriginsFingerprintUnchanged": true,
+    "localArchiveVerification": {
+      "status": "IMMUTABLE_PACKAGE_BYTES_VERIFIED",
+      "artifactId": 14913484604,
+      "artifactDigest": "sha256:531fddd76a010377bd9aa6c652d737dc584a99edc573c2aca313b56fd7efa405",
+      "tarSha256": "21df46d2398a933e92363504bec08e71baf7ccc70f71a565e62c1eabfe1b3d52",
+      "marker": {
+        "product": "Gravicentra Insurance",
+        "gate": "I6.6",
+        "sourceSha": "48a7a6d4379759b6f32c7f2435e8e37c724989cc",
+        "buildId": "gi-i66-48a7a6d43797-57f234755dc1",
+        "environmentRef": "firebase-hosting-preview-i6-6"
+      },
+      "manifests": {
+        "site": {
+          "files": 224,
+          "manifestSha256": "5ef81bccb15adbe0bdc31d0b53f1986b591898b3290ee27b10ae4a1993dfd9b0",
+          "allBytesVerified": true
+        },
+        "backend": {
+          "files": 48,
+          "manifestSha256": "5df17c7e1e49107e0b9aff93c6986fb4aec2f18b76af1aa19a39cb3af6778a06",
+          "allBytesVerified": true
+        },
+        "bundle": {
+          "files": 274,
+          "manifestSha256": "1e758b5cfca4dd41265a93867485587ee9c25a3fcbbbde4dc5a0b61ac75bd0e7",
+          "allBytesVerified": true
+        }
+      },
+      "artifactMutations": 0,
+      "hostingReadbackClaimedByThisLocalCheck": false
+    },
+    "canonicalOwnerVerification": {
+      "sourceSha": "48a7a6d4379759b6f32c7f2435e8e37c724989cc",
+      "status": "EXACT_CANONICAL_BUILD_OWNER_BYTES_VERIFIED",
+      "artifactMutations": 0,
+      "rows": [
+        {
+          "path": "functions/b4-003-scoped-related-reader.js",
+          "sourceBlob": "439bea6d90ef9a6a03ca2539096cb626cc43695d",
+          "packagedBlob": "439bea6d90ef9a6a03ca2539096cb626cc43695d",
+          "canonicalBuildEquals": true
+        },
+        {
+          "path": "functions/bootstrap.js",
+          "sourceBlob": "bd0837a9d5296a456e0575aec555b2971fdedcd7",
+          "packagedBlob": "688ae482ed1a93d0d9f2e71a13ec01f32eea1a0e",
+          "canonicalBuildEquals": true
+        },
+        {
+          "path": "functions/make-lead-ingress-bridge.js",
+          "sourceBlob": "8b519ad21da032ffeeee7f9f9cc3e9c3fe6c1317",
+          "packagedBlob": "8b519ad21da032ffeeee7f9f9cc3e9c3fe6c1317",
+          "canonicalBuildEquals": true
+        },
+        {
+          "path": "functions/product-lead-ingress-contract.js",
+          "sourceBlob": "ee29ee1fb12b1a30bf24b7c2c2a8180a2f2ef937",
+          "packagedBlob": "ee29ee1fb12b1a30bf24b7c2c2a8180a2f2ef937",
+          "canonicalBuildEquals": true
+        },
+        {
+          "path": "functions/product-lead-ingress-owner-support.js",
+          "sourceBlob": "0f07f1620e3968cacf684a88c895faa64eb8a1a1",
+          "packagedBlob": "0f07f1620e3968cacf684a88c895faa64eb8a1a1",
+          "canonicalBuildEquals": true
+        },
+        {
+          "path": "functions/product-ops-leads-domain.js",
+          "sourceBlob": "affde2677b4c997b89abdabf3af2cb920128935d",
+          "packagedBlob": "affde2677b4c997b89abdabf3af2cb920128935d",
+          "canonicalBuildEquals": true
+        }
+      ],
+      "frontendQueryBlob": "b77b65f86ef6ac2ab6dc157fdbc9ad5e34dbcdcc"
+    }
+  },
+  "sourceQaHead": "b4f90d00c0468a54fc9b542d48212919e1a14144",
+  "sourceQaRunId": 45382071947,
+  "guardRunId": 45382071816,
+  "sourceBlobs": {
+    "functions/b4-003-scoped-related-reader.js": "439bea6d90ef9a6a03ca2539096cb626cc43695d",
+    "functions/bootstrap.js": "bd0837a9d5296a456e0575aec555b2971fdedcd7",
+    "functions/make-lead-ingress-bridge.js": "8b519ad21da032ffeeee7f9f9cc3e9c3fe6c1317",
+    "functions/product-lead-ingress-contract.js": "ee29ee1fb12b1a30bf24b7c2c2a8180a2f2ef937",
+    "functions/product-lead-ingress-owner-support.js": "0f07f1620e3968cacf684a88c895faa64eb8a1a1",
+    "functions/product-ops-leads-domain.js": "affde2677b4c997b89abdabf3af2cb920128935d"
+  },
+  "requestVersion": 20,
+  "immutableArtifactBuiltOnce": true,
+  "backendSignedPreviewAccepted": false,
+  "financialPreview48Accepted": false,
+  "liveAccepted": false,
+  "noRealFinancialOrCustomerWrites": true,
+  "currentAcceptedRelease": {
+    "generation": 3,
+    "gate": "I6.6",
+    "status": "COMPOSITE_LIVE_SIGNED_UI_VERIFIED",
+    "sourceSha": "65c825b2808a615ca4195bdde6689dbdbe3193b2",
+    "sourceTree": "e7f197675e7124caee45460fc131b526cd43dae1",
+    "compositionBlob": "33bf80768cb6cb311f2975d282a5f50935f680aa",
+    "manifestBlob": "7f693bd0e1a7faaa6cbc95794ef5123c91c5efa4",
+    "artifactId": 14873426438,
+    "artifactDigest": "sha256:7cb782848a45083047c4899bc30c13bf5be46429607e42597d09342becfc9acc",
+    "hostingVersion": "sites/ays-orbit-360-lab/versions/332999a55b189108",
+    "buildId": "gi-i66-65c825b2808a-57f234755dc1",
+    "hostedFilesEachOrigin": 224,
+    "previewUrl": "https://ays-orbit-360-lab--gi-i66-rc-45287432665-qxusovq3.web.app",
+    "buildRunId": 45287432665,
+    "rollback": "sites/ays-orbit-360-lab/versions/e4e8f31b02ba2aef",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_FRONTEND_E00003_RECEIPT.json",
+    "receiptGitBlobSha": "11fdb3bee494541513482666d6215f45cbad0567",
+    "receiptCommit": "f80c37e174406ccb489569b3bc7dd6073c2c4273",
+    "fullI66ProductionAccepted": false,
+    "liveCloneRunId": 45292163934,
+    "scope": "COMPOSITE",
+    "backendFunctionsChanged": 4,
+    "backendRevisions": [
+      {
+        "name": "orbit360ProductOperationalCommand",
+        "region": "us-central1",
+        "service": "orbit360productoperationalcommand",
+        "previousRevision": "orbit360productoperationalcommand-00071-rax",
+        "currentRevision": "orbit360productoperationalcommand-00072-mab",
+        "trafficPercent": 100,
+        "ready": true
+      },
+      {
+        "name": "orbit360CobrosReconciliationCommand",
+        "region": "us-central1",
+        "service": "orbit360cobrosreconciliationcommand",
+        "previousRevision": "orbit360cobrosreconciliationcommand-00019-cux",
+        "currentRevision": "orbit360cobrosreconciliationcommand-00021-zex",
+        "trafficPercent": 100,
+        "ready": true
+      },
+      {
+        "name": "orbit360ScopedPolicyRead",
+        "region": "us-east1",
+        "service": "orbit360scopedpolicyread",
+        "previousRevision": "orbit360scopedpolicyread-00013-gen",
+        "currentRevision": "orbit360scopedpolicyread-00014-nec",
+        "trafficPercent": 100,
+        "ready": true
+      },
+      {
+        "name": "orbit360OpsLeadsCommand",
+        "region": "us-central1",
+        "service": "orbit360opsleadscommand",
+        "previousRevision": "orbit360opsleadscommand-00013-fad",
+        "currentRevision": "orbit360opsleadscommand-00014-vep",
+        "trafficPercent": 100,
+        "ready": true
+      }
+    ],
+    "liveProofPath": "artifacts/orbit360-recovery/release-control/I6_6_FRONTEND_E00003_LIVE_PROOF.json",
+    "liveProofSha256": "4013a99719ba5f8bb3087a5e5f43c189a22daf55aabfcea37e8df5030bb5653c"
+  }
+}

@@ -1,0 +1,160 @@
+{
+  "schema": "GI_I66_MAPFRE57714_HOLDER_WITNESS_CAUSAL_READONLY_V1",
+  "status": "DOCUMENTARY_NAME_ORDER_CAUSE_REPRODUCED_CANONICAL_CLIENT_FIELD_READBACK_PENDING",
+  "recordedAtUtc": "2026-11-24T11:22:16.185580+00:00",
+  "sourceHeadRead": "153b28142a8c43a4bb81a2357fbed17a440d2c8f",
+  "owner": {
+    "path": "tools/gravicentra-i66-financial-identity-readback.cjs",
+    "blob": "e4a08be43b3f188363b21f20c607d3601e05cfd2",
+    "fieldsCompared": [
+      "nombre",
+      "nombreCompleto",
+      "razonSocial"
+    ],
+    "formula": "SHA256(sourceDocumentSHA256 + \"|\" + NFD_UPPERCASE_NAME_WITH_NON_ASCII_ALPHANUMERIC_REMOVED)",
+    "tokenOrderPreserved": true
+  },
+  "documentaryFinding": "Both original MAPFRE statements contain the same four name components as the issued policy, in positions 3,4,1,2. Comma and whitespace differences disappear under current normalization. Name order does not. Producer and reader formulas agree; no wrong salt or bad source witness was found.",
+  "sources": [
+    {
+      "sourceFactId": "stmt_89bc58a24b4c34507c60b8be22e4",
+      "sourceDriveId": "1MaHarJLB2xRXBZE6mZ5oBjcyvBxbzcR1",
+      "sourceSha256": "71a33d9e4cc1ffe52dceca992231c499460c342aa2fb0f28b025decdb4674c2a",
+      "sourceExtractionSheet": "HTML",
+      "sourceExtractionRow": 16,
+      "requirement": "1993561",
+      "sourceRowSha256": "3831485eda711f87f4fa9182bce5c128c5a8d5eb23439e47427a73dff395738b",
+      "witnessRecomputedFromOriginalHtml": "52bb3c96332c67f6db5a612f10f500ec6cb898db7473ac914570ff1133792d34",
+      "sourceNormalizedHolderSha256": "244155b0bb8d646460e6205570b46d41fb906bde51960183d9d94b596afeea8a",
+      "issuedPdfNormalizedHolderSha256": "b3aa5788b5424679510337a7dfa3ce974b3dd0994d9bf1e1e605ed0dae57c4b7",
+      "sameFourTokens": true,
+      "normalizedSourceToPdfMatch": false,
+      "sourceTokenOrderRelativeToPdf": [
+        3,
+        4,
+        1,
+        2
+      ],
+      "issuedPdfHolderUsingThisSourceSaltWitness": "2f57ba3d8af3cf99ea50cb54e4532c27cddcd4d3d260bf1ecce52222a656f786"
+    },
+    {
+      "sourceFactId": "stmt_5250964c3d5659d69d8e3513e077",
+      "sourceDriveId": "19U_xqMJmlitl8_muzZ8Jp__q0h0Dke1P",
+      "sourceSha256": "235d23552a76f4ea90cc60fd71b44b68c76b009f97ec9f1456bacaa431e36a91",
+      "sourceExtractionSheet": "HTML",
+      "sourceExtractionRow": 2,
+      "requirement": "1993560",
+      "sourceRowSha256": "364d5ef550644771ee6dbb4d8bf7d1bed640aa34248441a7fe79de6be6f59236",
+      "witnessRecomputedFromOriginalHtml": "e8ec6efcce0c91ed8fd457661ea063efd2387469b2e9f3def045ffb7656b96e9",
+      "sourceNormalizedHolderSha256": "244155b0bb8d646460e6205570b46d41fb906bde51960183d9d94b596afeea8a",
+      "issuedPdfNormalizedHolderSha256": "b3aa5788b5424679510337a7dfa3ce974b3dd0994d9bf1e1e605ed0dae57c4b7",
+      "sameFourTokens": true,
+      "normalizedSourceToPdfMatch": false,
+      "sourceTokenOrderRelativeToPdf": [
+        3,
+        4,
+        1,
+        2
+      ],
+      "issuedPdfHolderUsingThisSourceSaltWitness": "62fd17349afe50c8cbe3a8119a7f8615ade38b3dfa220895a6847930501126fb"
+    }
+  ],
+  "actualExistingReaderReproduction": [
+    {
+      "sourceOrderMatches": true,
+      "issuedPdfOrderMatches": false,
+      "missingSupportedNameFieldsMatches": false
+    },
+    {
+      "sourceOrderMatches": true,
+      "issuedPdfOrderMatches": false,
+      "missingSupportedNameFieldsMatches": false
+    }
+  ],
+  "observedCanonicalPolicy": {
+    "id": "pol_841e35aca5a66214ceaeeb4e3da9",
+    "exists": true,
+    "updateTime": {
+      "seconds": 1791319459,
+      "nanoseconds": 883602000
+    },
+    "documentSha256": "7ffdf12434016b48ae6c0d68db7866ad618baab72b6c79d0331055e84ec67914",
+    "aliases": {
+      "numero": "3002400057714"
+    },
+    "country": "GT",
+    "currency": "GTQ",
+    "term": [
+      "2025-12-23",
+      "2026-12-23"
+    ],
+    "state": "Vigente",
+    "clientId": "cli_siga_bd1af17282973c3938",
+    "insurerId": "gt-mapfre-seguros",
+    "advisorId": "ase-fernando-arias",
+    "clientExists": true,
+    "insurerExists": true,
+    "renewsFromId": null,
+    "renewedById": null,
+    "vehicleId": null,
+    "sourceDocumentIds": [],
+    "issuerDocumentSha256": null
+  },
+  "oldReadback": {
+    "runId": 45364013332,
+    "bothHolderWitnessMatches": false,
+    "clientNameFieldsNotExposed": true,
+    "clientDocumentHashAndUpdateTimeNotExposedForThisTarget": true,
+    "notCurrentWritePreimage": true
+  },
+  "causalLimit": "This proves the documentary order mismatch and reproduces false if the canonical name follows the issued policy order. It does not prove which fields or name order the canonical client actually has. Missing supported name fields or another name representation can also produce false.",
+  "minimumFreshRead": {
+    "policyPath": "tenants/alianzas-soluciones/data/polizas/items/pol_841e35aca5a66214ceaeeb4e3da9",
+    "policyFields": [
+      "clienteId",
+      "numero",
+      "numeroPoliza",
+      "polizaNumero",
+      "aseguradoraId",
+      "pais",
+      "moneda",
+      "vigenciaInicio",
+      "vigenciaFin"
+    ],
+    "clientPathIfPolicyLinkStillSame": "tenants/alianzas-soluciones/data/clientes/items/cli_siga_bd1af17282973c3938",
+    "clientFields": [
+      "nombre",
+      "nombreCompleto",
+      "razonSocial",
+      "tenantId",
+      "pais"
+    ],
+    "readDocumentHashAndUpdateTime": true,
+    "emitOnlyPrivateDiagnostic": {
+      "perNameField": [
+        "present",
+        "type",
+        "nonempty",
+        "normalizedSha256",
+        "matchesIssuedPdfNameOrder",
+        "matchesStatementNameOrder",
+        "witnessUsingEachPinnedSourceHash"
+      ],
+      "doNotLogActualNames": true
+    },
+    "conditionalDisposition": "If a current supported canonical field matches the issued-policy order and the current policy still links this client/issuer/term, the false is confirmed as name-order mismatch. Otherwise retain HOLD and identify the actual missing/different field. Never authorize payment from a sorted-token comparison alone."
+  },
+  "notChanged": [
+    "holderMatch",
+    "source56 witnesses",
+    "canonical client or policy",
+    "two MAPFRE payment proposal",
+    "General136553",
+    "remaining MAPFRE installments and Q0.03 residual",
+    "source V20"
+  ],
+  "customerDataWrites": 0,
+  "externalMutations": 0,
+  "fullIdentityVerified": false,
+  "paymentEligibilityCertified": false
+}
