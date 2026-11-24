@@ -7037,14 +7037,31 @@
     "artifactDigest": "sha256:bb7bf72757801ba8312c30f196a33b6920f941240bff9ee3354a58542407cfb7",
     "approvedByDirection": true,
     "externalMessagesSent": 0,
-    "expiresAt": "2026-11-24T16:09:27.136Z",
-    "version": 2,
-    "action": "BIND_PRINCIPAL",
-    "expectedConfigDigest": "9f63fef4dd696488b8efa335ce50598c5b1fff4ecc13f17c9889825fa06c8c5e",
-    "probeRequestId": "F8lDH5gK52bduaMZPvTl",
-    "makeExecutionReceipt": {
-      "path": "artifacts/orbit360-recovery/release-control/I6_6_MAKE_V22_PREVIEW_PROBE_EXECUTION_20261124.json",
-      "gitBlobSha": "c00195c44ef6730fe8a27116a4c95540feb03dd2"
+    "expiresAt": "2026-11-24T16:10:28.578Z",
+    "version": 3,
+    "action": "ACTIVATE",
+    "expectedConfigDigest": "3184e3e9a949abf4a3d8d41eb1a91e1f991dc2a9eb9331313c6f34d51c246af4",
+    "qaFixture": {
+      "nonce": "e85daaabcd2ad44f36988ae1bb88893887801f3b026083209ff049ec43869fc0",
+      "packet": {
+        "type": "incoming",
+        "typeMessage": "extendedTextMessage",
+        "idMessage": "I66_V22_SYNTHETIC_45429218736",
+        "chatId": "50255550000@c.us",
+        "senderId": "50255550000@c.us",
+        "timestamp": 1795536088,
+        "senderContactName": "Persona sintética Gravicentra v22",
+        "isRead": false,
+        "isDeleted": false,
+        "isEdited": false,
+        "extendedTextMessage": {
+          "text": "Solicitud sintética de información de cobertura para validar la integración v22.",
+          "sourceType": "ad",
+          "sourceId": "AD_SYNTHETIC_V22_45429218736",
+          "ctwaClid": "I66_SYNTHETIC_CTWA_V22"
+        }
+      },
+      "providerPacketSha256": "0a8d21233074df95dac1dfb01f7254b89074884ed7fdeddc5c0dbc55f34020d0"
     }
   }
 }
