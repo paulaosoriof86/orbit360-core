@@ -1,0 +1,140 @@
+{
+  "schema": "GI_I66_V30_IMMUTABLE_ARTIFACT_AND_PREVIEW_TRANSPORT_HOLD_R66_V1",
+  "recordType": "EXECUTION_READBACK_AND_CAUSAL_HOLD_NOT_DEPLOYMENT_OR_ACCEPTANCE_AUTHORITY",
+  "recordedAtUtc": "2026-11-24T23:45:08.923Z",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "gate": "I6.6",
+  "sourceBase": "a88bfec8cb589c7cba8c703244b24ac4fa9ca787",
+  "previousProgress": {
+    "path": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_EXECUTION_PROGRESS_20261124_R65.json",
+    "gitBlobSha": "6ed214f4d628ef5ff041ff97c49f0c0304385e35",
+    "sha256": "8ebbeaef8a40501cef9f0ea917425907136bd5999d2f7e54d97d367aab5f8cca"
+  },
+  "build30": {
+    "status": "IMMUTABLE_PACKAGE_CREATED_AND_RETAINED_PREVIEW_TRANSPORT_FAILED_NOT_ACCEPTED",
+    "version": 30,
+    "sourceSha": "96bc5388c5c22c1df9256bd11cdb4209681779dc",
+    "buildRunId": 45510996597,
+    "artifactId": 14976066036,
+    "artifactDigest": "sha256:d31b59d7b5fd6804b79f624e119d81d8316ae2d7d57763e8b87740ac5f7c5bb0",
+    "name": "gi-i66-immutable-96bc5388c5c22c1df9256bd11cdb4209681779dc",
+    "sizeInBytes": 1852219,
+    "expiresAtUtc": "2026-12-24T23:37:05Z",
+    "buildId": null,
+    "buildIdStatus": "NOT_EXTRACTED_FROM_RETAINED_ARTIFACT_BY_THIS_CHECKPOINT",
+    "expectedSiteFiles": 224,
+    "runConclusion": "failure",
+    "immutablePackageJobId": 138858490629,
+    "sourceAdmission": "success",
+    "build": "success",
+    "freeze": "success",
+    "artifactUpload": "success",
+    "liveFingerprintBefore": "success",
+    "hostingPreviewDeploy": "failure",
+    "previewReadback": "skipped",
+    "protectedReaderPreview": "skipped",
+    "artifactCreated": true,
+    "artifactByteRewrite": false,
+    "hostingError": "HTTP 429 channel quota",
+    "fallbackError": "I66_TECHNICAL_ROLLOVER_SUCCESSOR_REQUEST_REQUIRED",
+    "newPreviewAccepted": false,
+    "newLiveAccepted": false,
+    "technicalRolloverProven": false,
+    "retentionStepSuccessDoesNotProveBackupsOrReadback": true,
+    "providerUrl": "https://github.com/paulaosoriof86/orbit360-core/actions/runs/45510996597"
+  },
+  "e4": {
+    "sourceSha": "a88bfec8cb589c7cba8c703244b24ac4fa9ca787",
+    "runId": 45511496522,
+    "jobId": 138860056581,
+    "conclusion": "success",
+    "crossModule": {
+      "tests": 8,
+      "passed": 8,
+      "failed": 0,
+      "skipped": 0
+    },
+    "reports": {
+      "tests": 20,
+      "passed": 20
+    },
+    "anulado": {
+      "tests": 1,
+      "passed": 1
+    },
+    "physicalReadOnlyJob": "skipped",
+    "runtimeAcceptance": false
+  },
+  "governance": {
+    "sourceSha": "a88bfec8cb589c7cba8c703244b24ac4fa9ca787",
+    "runId": 45511496132,
+    "jobId": 138860056052,
+    "conclusion": "success",
+    "finalMarker": "GRAVICENTRA_GOVERNANCE_PREFLIGHT=PASS",
+    "publicAvailabilityJobId": 138860055537,
+    "publicAvailabilityScope": "EXISTING_E3_BOTH_ORIGINS_ONLY",
+    "b4003Emulator": "skipped"
+  },
+  "certifiedSourceGraph": {
+    "sourceQaHead": "b67845000de4a8a2472ce3ea432118344c0c21e7",
+    "sourceQaRunId": 45506690080,
+    "sourceGuardRunId": 45506690057,
+    "buildSource": "96bc5388c5c22c1df9256bd11cdb4209681779dc",
+    "pinnedOwnerPathspecCount": 141,
+    "sourceQaToBuildPinnedDifferences": 0,
+    "buildToE4PinnedDifferences": 0,
+    "sourceQaOnR64R65OrA88Claimed": false,
+    "productOrSealedQaChangesByE4Filter": false
+  },
+  "transportCause": {
+    "owner": {
+      "path": "tools/gravicentra-i6-6-preview-channel-reuse-guard.cjs",
+      "gitBlobSha": "bbc92ab570e959efea3a0446da4f03167cacab9d",
+      "sha256": "92d60c2854a6a3f353704bfde585ce7ce479a26976c720faa643af6362d71745"
+    },
+    "candidateOwner": {
+      "path": "tools/gravicentra-i6-6-operational-release-candidate.cjs",
+      "gitBlobSha": "9e91c35bed88b98bc4a3805abb826d632e51b7bf",
+      "sha256": "e96df4186c9ceb73f7f148d3f99a5222f12d794fbd96a9591b507bfdac5e12d3"
+    },
+    "workflow": {
+      "path": ".github/workflows/gravicentra-release-delta-66-package.yml",
+      "gitBlobSha": "97943006e2bda100739af1e5edad66a6135239a4",
+      "sha256": "3df1040c04f5ac1d712bf34d1abdef73ee5ed45976babf0ea9b72ea88597deef"
+    },
+    "exactChannel": "gi-i66-rc-45448470011",
+    "newChannelAttempt": "gi-i66-rc-45510996597",
+    "physicalV4RequestVersion": 29,
+    "actualRequestVersion": 30,
+    "immediateGuard": "validatePhysicalAuthorization requires equality with physicalReleaseProfile.requestVersion",
+    "prepareGuard": "runtimePrepareTechnicalRollover binds the artifact to GITHUB_RUN_ID and requires currentBuild in_progress with null conclusion",
+    "candidateGuard": "validateArtifact currently requires success of the original build run",
+    "existingPostFailureResumeCommandAvailable": false,
+    "changing29To30AloneSufficient": false,
+    "noNewArtifactOrPreviewAcceptanceFromSuccessfulRetentionWrappers": true
+  },
+  "requiredCausalContinuation": [
+    "Preserve the exact retained V30 artifact, original failure and all successful stage proofs.",
+    "Repair only the existing transport and candidate owners so a completed build/upload with the exact quota-only Hosting failure can obtain a separately verified transport-completion receipt; never relabel the failed original run as success.",
+    "Maintain exact artifact/source/digest, source and QA owner lineage, original ZIP/tar/manifest/marker verification, fresh inventory, prior Preview and E3 backups, and all other channels.",
+    "Complete only the authorized existing isolated Preview transport and read back all224 files, then the five-function signed Preview and financial48 before any same-artifact LIVE acceptance."
+  ],
+  "prohibitedShortcuts": [
+    "Blind rerun of immutable-package",
+    "Artifact patching",
+    "Manual publish bypassing candidate validation",
+    "Channel deletion",
+    "New request31 without a separately established source cause",
+    "Repeat155 applied payments"
+  ],
+  "effects": {
+    "productChanges": 0,
+    "transportRequestChanges": 0,
+    "artifactChanges": 0,
+    "deployments": 0,
+    "businessWrites": 0,
+    "formalGateCredit": 0
+  },
+  "noRuntimePassClaimed": true
+}
