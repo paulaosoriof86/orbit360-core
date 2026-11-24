@@ -208,4 +208,138 @@ function closeCompositeFiles(read,j,body){
   c.currentEvidenceBlobSha=blob(serial(progress));
   return {...changes,[genName(j.generation,'RECEIPT')]:receipt,[receipt.liveProof.path]:j.liveProof};
 }
-module.exports={P,genName,serial,blob,physicalGuard,closeFiles,executionSnapshot,compositeReceipt,closeCompositeFiles};
+// Observation code has its own exact source authority. It cannot change the
+// accepted artifact, grant a release, or run a synthetic/business writer.
+const READONLY_COMMON_PATHS=Object.freeze([
+  'tools/gravicentra-i66-frontend-control.cjs','tools/gravicentra-i66-frontend-promotion-transaction.cjs',
+  'tools/gravicentra-i6-6-operational-release-candidate.cjs','tools/gravicentra-i6-6-direction-preview-legal-acceptance.cjs',
+  'tools/gravicentra-i6-6-readonly-observer-authority.test.cjs',
+  'tools/gravicentra-governance-preflight-v1.mjs','tools/gravicentra-i6-6-delta-guard.mjs','tools/gravicentra-i6-6-delta-test-revisions.cjs',
+  '.github/workflows/gravicentra-i66-privileged-role-parity-source-qa.yml','.github/workflows/gravicentra-release-lock-sync.yml'
+]);
+const READONLY_PROFILES=Object.freeze({
+  fiveRoles:{workflow:'.github/workflows/gravicentra-i66-current-exact-preview-cross-module-uat-20261119.yml',
+    paths:['tools/gravicentra-i6-6-current-live-five-role-route-readonly.cjs','tools/gravicentra-i6-6-five-role-assigned-selection.test.cjs'],
+    productDependencies:['functions/product-active-role-contract.js']},
+  performance:{workflow:'.github/workflows/gravicentra-i66-live-performance-readonly.yml',
+    paths:['tools/gravicentra-i66-live-performance-readonly.mjs','tools/gravicentra-i6-6-performance-first-route-source-timeline.test.cjs',
+      'tools/gravicentra-i6-6-six-existing-receipts-ui-readonly.test.cjs'],productDependencies:[]}
+});
+function readonlyObserverPaths(profile){
+  const spec=READONLY_PROFILES[profile];assert.ok(spec,'READONLY_OBSERVER_PROFILE_NOT_ALLOWED');
+  return [...new Set([...READONLY_COMMON_PATHS,...spec.paths,spec.workflow,...spec.productDependencies])].sort();
+}
+function readonlyObserverTarget(pin){
+  return Object.fromEntries(['generation','sourceSha','buildId','buildRunId','artifactId','artifactDigest',
+    'hostingVersion','receiptPath','receiptGitBlobSha','receiptCommit'].map(k=>[k,pin[k]]));
+}
+function resolveReadonlyObserver(profile,control,state,transport,io,gitRead,headSha){
+  const paths=readonlyObserverPaths(profile),spec=READONLY_PROFILES[profile];
+  assert.match(headSha||'',/^[a-f0-9]{40}$/,'READONLY_OBSERVER_EXECUTION_HEAD_REQUIRED');
+  const pin=physicalGuard(control,state,transport,io),target=readonlyObserverTarget(pin);
+  const sourceText=(sha,file)=>gitRead('show',sha+':'+file),localText=file=>io.readFileSync(file,'utf8');
+  const equalSource=(sha,file)=>Buffer.from(localText(file)).equals(Buffer.from(sourceText(sha,file)));
+  for(const file of spec.productDependencies)assert.ok(equalSource(pin.sourceSha,file),'READONLY_OBSERVER_LIVE_PRODUCT_DEPENDENCY_DRIFT_'+file);
+  const sourcePins=Object.fromEntries(paths.map(file=>[file,blob(localText(file))]));
+  const artifactMatched=paths.every(file=>{try{return equalSource(pin.sourceSha,file);}catch{return false;}});
+  if(artifactMatched)return {profile,mode:'ARTIFACT_SOURCE',target,physical:pin,qaSourceSha:pin.sourceSha,
+    qaPins:sourcePins,workflow:spec.workflow,executionHeadSha:headSha,readOnly:true,noReleaseTransition:true};
+  const authority=control.i66OperationalContinuation20261115?.postAcceptanceGovernanceQa?.observers?.[profile];
+  assert.equal(authority?.schema,'GI_I66_READONLY_OBSERVER_AUTHORITY_V1','READONLY_OBSERVER_EXACT_QA_AUTHORITY_REQUIRED');
+  assert.equal(authority.status,'APPROVED_EXACT_QA_ON_ACCEPTED_LIVE');assert.equal(authority.profile,profile);
+  for(const key of ['approvedByDirection','readOnly','noProductWrites','noReleaseTransitions','noSyntheticWrites'])assert.equal(authority[key],true,'READONLY_OBSERVER_BOUNDARY_'+key);
+  assert.deepEqual(authority.target,target,'READONLY_OBSERVER_ACCEPTED_TARGET_DRIFT');
+  assert.match(authority.qaSourceSha||'',/^[a-f0-9]{40}$/,'READONLY_OBSERVER_QA_SOURCE_REQUIRED');
+  for(const key of ['sourceQaRunId','guardRunId'])assert.ok(Number.isSafeInteger(authority[key])&&authority[key]>0,'READONLY_OBSERVER_RUN_REQUIRED_'+key);
+  assert.notEqual(authority.sourceQaRunId,authority.guardRunId);
+  gitRead('merge-base','--is-ancestor',pin.sourceSha,authority.qaSourceSha);
+  gitRead('merge-base','--is-ancestor',authority.qaSourceSha,headSha);
+  assert.deepEqual(Object.keys(authority.qaPins||{}).sort(),paths,'READONLY_OBSERVER_EXACT_PIN_SET_REQUIRED');
+  assert.deepEqual(authority.qaPins,sourcePins,'READONLY_OBSERVER_EXECUTING_BYTES_DRIFT');
+  for(const file of paths){
+    assert.match(authority.qaPins[file],/^[a-f0-9]{40}$/);
+    assert.equal(String(gitRead('rev-parse',authority.qaSourceSha+':'+file)).trim(),authority.qaPins[file],'READONLY_OBSERVER_QA_SOURCE_BLOB_DRIFT_'+file);
+    assert.ok(equalSource(authority.qaSourceSha,file),'READONLY_OBSERVER_QA_SOURCE_BYTES_DRIFT_'+file);
+  }
+  return {profile,mode:'INDEPENDENT_READONLY_QA',target,physical:pin,qaSourceSha:authority.qaSourceSha,
+    qaPins:sourcePins,workflow:spec.workflow,executionHeadSha:headSha,authority,
+    readOnly:true,noReleaseTransition:true};
+}
+async function verifyReadonlyObserver(resolution,{env=process.env,api,readMarker,stage='before'}={}){
+  assert.ok(['before','after'].includes(stage));assert.ok(READONLY_PROFILES[resolution.profile]);
+  const repository='paulaosoriof86/orbit360-core',branch='recovery/fase-a-clean-20260831';
+  assert.equal(env.GITHUB_REPOSITORY,repository);assert.equal(env.GITHUB_REF_NAME,branch);
+  assert.equal(env.GITHUB_SHA,resolution.executionHeadSha,'READONLY_OBSERVER_CURRENT_EXECUTION_HEAD_DRIFT');
+  const runId=Number(env.GITHUB_RUN_ID);assert.ok(Number.isSafeInteger(runId)&&runId>0,'READONLY_OBSERVER_CURRENT_RUN_REQUIRED');
+  if(!api){
+    assert.ok(env.GITHUB_TOKEN,'READONLY_OBSERVER_GITHUB_READ_TOKEN_REQUIRED');
+    api=async route=>{
+      const response=await fetch('https://api.github.com/repos/'+repository+'/'+route,{headers:{Authorization:'Bearer '+env.GITHUB_TOKEN,
+        Accept:'application/vnd.github+json','User-Agent':'Gravicentra-Readonly-Observer'},redirect:'error',signal:AbortSignal.timeout(30000)});
+      assert.equal(response.status,200,'READONLY_OBSERVER_GITHUB_HTTP_'+response.status);return response.json();
+    };
+  }
+  const current=await api('actions/runs/'+runId);
+  assert.equal(current.id,runId);assert.equal(current.path,resolution.workflow);assert.equal(current.head_sha,env.GITHUB_SHA);
+  assert.equal(current.head_branch,branch);assert.equal(current.status,'in_progress','READONLY_OBSERVER_JOB_NOT_EXECUTING');
+  let sourceQaVerified=resolution.mode==='ARTIFACT_SOURCE';
+  if(resolution.mode==='INDEPENDENT_READONLY_QA'){
+    const a=resolution.authority;
+    const checks=[[a.sourceQaRunId,'.github/workflows/gravicentra-i66-privileged-role-parity-source-qa.yml','signed-source-gate-no-production-writes',
+      ['Source test with 5 roles, 12 domain writers and explicit negative boundaries','Canonical source blob and historic release guard without re-opening B4']],
+      [a.guardRunId,'.github/workflows/gravicentra-release-lock-sync.yml','verify-control-plane',
+        ['Fail closed through canonical shared governance preflight']]];
+    await Promise.all(checks.map(async([id,workflow,jobName,stepNames])=>{
+      const [run,jobs]=await Promise.all([api('actions/runs/'+id),api('actions/runs/'+id+'/jobs?per_page=100')]);
+      assert.deepEqual([run.id,run.path,run.head_sha,run.head_branch,run.status,run.conclusion],
+        [id,workflow,a.qaSourceSha,branch,'completed','success'],'READONLY_OBSERVER_SOURCE_QA_IDENTITY_DRIFT');
+      assert.ok(Array.isArray(jobs.jobs)&&jobs.jobs.length>0&&jobs.jobs.length<100,'READONLY_OBSERVER_JOB_INVENTORY_INVALID');
+      const matched=jobs.jobs.filter(j=>j.name===jobName);assert.equal(matched.length,1,'READONLY_OBSERVER_EXACT_SOURCE_QA_JOB_REQUIRED');
+      const job=matched[0];assert.equal(job.status,'completed');assert.equal(job.conclusion,'success','READONLY_OBSERVER_SOURCE_QA_JOB_NOT_EXECUTED');
+      for(const name of stepNames){const steps=job.steps?.filter(s=>s.name===name)||[];
+        assert.equal(steps.length,1,'READONLY_OBSERVER_EXACT_SOURCE_QA_STEP_REQUIRED');
+        assert.equal(steps[0].status,'completed');assert.equal(steps[0].conclusion,'success','READONLY_OBSERVER_SOURCE_QA_STEP_NOT_EXECUTED');
+      }
+    }));sourceQaVerified=true;
+  }else assert.equal(resolution.mode,'ARTIFACT_SOURCE','READONLY_OBSERVER_MODE_NOT_ALLOWED');
+  // Re-read the canonical control and receipt at one remote commit. This is
+  // observation only; the stored authority never changes the release head.
+  const ref=await api('git/ref/heads/'+branch),remoteHead=ref.object?.sha;
+  assert.match(remoteHead||'',/^[a-f0-9]{40}$/,'READONLY_OBSERVER_REMOTE_HEAD_REQUIRED');
+  const files=new Map();
+  async function file(relative){
+    const value=await api('contents/'+relative.split('/').map(encodeURIComponent).join('/')+'?ref='+remoteHead);
+    assert.equal(value.path,relative);assert.match(value.sha||'',/^[a-f0-9]{40}$/);
+    assert.ok(Number.isSafeInteger(value.size)&&value.size>0&&value.size<=4*1024*1024,'READONLY_OBSERVER_METADATA_SIZE_INVALID');
+    const raw=value.encoding==='base64'?value:await api('git/blobs/'+value.sha);
+    assert.equal(raw.encoding,'base64');const text=Buffer.from(raw.content,'base64').toString('utf8');
+    assert.equal(blob(text),value.sha,'READONLY_OBSERVER_REMOTE_METADATA_BLOB_DRIFT');files.set(relative,text);return JSON.parse(text);
+  }
+  const [control,state,transport]=await Promise.all([file(P.cp),file(P.state),file(P.transport),file(P.ledger)]);
+  const head=control.i66FrontendReleaseHead;assert.ok(head,'READONLY_OBSERVER_REMOTE_PHYSICAL_HEAD_MISSING');
+  await Promise.all([file(genName(head.generation,'RECEIPT')),file(genName(head.generation,'JOURNAL')),
+    ...(head.scope==='COMPOSITE'?[file(genName(head.generation,'LIVE_PROOF'))]:[])]);
+  const physical=physicalGuard(control,state,transport,{readFileSync:relative=>{
+    assert.ok(files.has(relative),'READONLY_OBSERVER_UNEXPECTED_REMOTE_METADATA_PATH');return files.get(relative);
+  }});
+  assert.deepEqual(readonlyObserverTarget(physical),resolution.target,'READONLY_OBSERVER_PHYSICAL_RELEASE_CHANGED');
+  if(resolution.mode==='INDEPENDENT_READONLY_QA')assert.deepEqual(
+    control.i66OperationalContinuation20261115?.postAcceptanceGovernanceQa?.observers?.[resolution.profile],resolution.authority,
+    'READONLY_OBSERVER_AUTHORITY_CHANGED');
+  const origins=['https://app.aysseguros.com','https://ays-orbit-360-lab.web.app'];
+  if(!readMarker)readMarker=async origin=>{
+    const response=await fetch(origin+'/__recovery__/build.json',{headers:{'Cache-Control':'no-cache'},redirect:'error',signal:AbortSignal.timeout(30000)});
+    assert.equal(response.status,200,'READONLY_OBSERVER_MARKER_HTTP_'+response.status);return response.json();
+  };
+  for(const origin of origins){const marker=await readMarker(origin);
+    assert.equal(marker.sourceSha,physical.sourceSha,'READONLY_OBSERVER_SERVED_SOURCE_DRIFT');
+    assert.equal(marker.buildId,physical.buildId,'READONLY_OBSERVER_SERVED_BUILD_DRIFT');
+    assert.equal(marker.gate,'I6.6');assert.equal(marker.product,'Gravicentra Insurance');
+  }
+  return {schema:'GI_I66_READONLY_OBSERVER_EXECUTION_V1',stage,profile:resolution.profile,mode:resolution.mode,
+    qaSourceSha:resolution.qaSourceSha,qaPins:resolution.qaPins,workflowHeadSha:env.GITHUB_SHA,runId,
+    sourceQaRunId:resolution.authority?.sourceQaRunId||null,guardRunId:resolution.authority?.guardRunId||null,
+    sourceQaVerified,remoteControlHead:remoteHead,target:resolution.target,readOnly:true,
+    productWrites:0,syntheticWrites:0,releaseTransitions:0,hostedMarkersVerified:origins};
+}
+module.exports={P,genName,serial,blob,physicalGuard,closeFiles,executionSnapshot,compositeReceipt,closeCompositeFiles,READONLY_PROFILES,readonlyObserverPaths,readonlyObserverTarget,resolveReadonlyObserver,verifyReadonlyObserver};

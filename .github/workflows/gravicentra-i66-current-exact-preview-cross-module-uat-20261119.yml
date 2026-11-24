@@ -1,5 +1,6 @@
 name: Gravicentra I6.6 Current Exact Preview Signed Cross-Module UAT
 on:
+  workflow_dispatch:
   push:
     branches: [recovery/fase-a-clean-20260831]
     paths:
@@ -7,6 +8,7 @@ on:
       - tools/gravicentra-i66-ops-document-fixture-ui.cjs
       - tools/gravicentra-i6-6-carlos-client-edit-signed-synthetic-uat.cjs
       - tools/gravicentra-i6-6-current-live-five-role-route-readonly.cjs
+      - artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json
 permissions:
   contents: read
   actions: read
@@ -14,8 +16,60 @@ concurrency:
   group: gi-i66-current-exact-preview-crossmodule-qa
   cancel-in-progress: false
 jobs:
+  current-live-five-role-readonly:
+    if: github.repository == 'paulaosoriof86/orbit360-core' && github.ref == 'refs/heads/recovery/fase-a-clean-20260831' && (github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, 'I66_LIVE_FIVE_ROLE_MATRIX'))
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      I66_LIVE_ORIGIN: https://app.aysseguros.com
+      I66_FIVE_ROLE_REPORT: ${{ runner.temp }}/gi-i66-five-role-live-matrix.json
+      GITHUB_TOKEN: ${{ github.token }}
+      SA_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_ALT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Guard current physical artifact, receipt and unchanged signed driver
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          test -z "${FIRESTORE_EMULATOR_HOST:-}"
+          node --check tools/gravicentra-i6-6-current-live-five-role-route-readonly.cjs
+          node --test tools/gravicentra-i6-6-five-role-assigned-selection.test.cjs
+          node --test tools/gravicentra-i6-6-readonly-observer-authority.test.cjs
+          node - <<'NODE'
+          const fs=require('node:fs'),assert=require('node:assert/strict'),{execFileSync}=require('node:child_process');
+          const owner=require('./tools/gravicentra-i66-frontend-control.cjs');
+          const json=p=>JSON.parse(fs.readFileSync(p,'utf8'));
+          const observer=owner.resolveReadonlyObserver('fiveRoles',json(owner.P.cp),json(owner.P.state),json(owner.P.transport),
+            fs,(...args)=>execFileSync('git',args),process.env.GITHUB_SHA),pin=observer.physical;
+          fs.appendFileSync(process.env.GITHUB_ENV,'I66_APPROVED_LIVE_SOURCE_SHA='+pin.sourceSha+'\n');
+          console.log('I66_FIVE_ROLE_CURRENT_PHYSICAL_OWNER_RECEIPT_AND_SOURCE_BOUND_PASS');
+          NODE
+      - name: Install existing pinned signed read-only browser dependencies
+        run: |
+          set -euo pipefail
+          npm install --no-save --package-lock=false --ignore-scripts --no-audit --no-fund firebase-admin@13.4.0 playwright@1.55.0 >/dev/null
+          node node_modules/playwright/cli.js install --with-deps chromium >/dev/null
+      - name: Exercise five assigned roles by normal UI selection and server read boundary
+        run: node tools/gravicentra-i6-6-current-live-five-role-route-readonly.cjs
+      - name: Preserve bounded role diagnostics and actual route results on every outcome
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gi-i66-five-role-route-matrix-${{ github.run_id }}
+          path: ${{ runner.temp }}/gi-i66-five-role-live-matrix.json
+          if-no-files-found: warn
+          retention-days: 90
   existing-preview-document-fixture:
-    if: github.repository == 'paulaosoriof86/orbit360-core' && github.ref == 'refs/heads/recovery/fase-a-clean-20260831' && contains(github.event.head_commit.message, 'I66_EXISTING_DOC_FIXTURE')
+    if: github.repository == 'paulaosoriof86/orbit360-core' && github.ref == 'refs/heads/recovery/fase-a-clean-20260831' && contains(github.event.head_commit.message, 'I66_EXISTING_DOC_FIXTURE') && !contains(github.event.head_commit.message, 'I66_LIVE_FIVE_ROLE_MATRIX')
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     env:
@@ -46,7 +100,7 @@ jobs:
           if-no-files-found: ignore
           retention-days: 90
   signed-preview:
-    if: github.repository == 'paulaosoriof86/orbit360-core' && github.ref == 'refs/heads/recovery/fase-a-clean-20260831' && !contains(github.event.head_commit.message, 'I66_EXISTING_DOC_FIXTURE')
+    if: github.repository == 'paulaosoriof86/orbit360-core' && github.ref == 'refs/heads/recovery/fase-a-clean-20260831' && github.event_name == 'push' && contains(github.event.head_commit.message, 'I66_CURRENT_EXACT_CROSS_MODULE_UAT') && !contains(github.event.head_commit.message, 'I66_EXISTING_DOC_FIXTURE') && !contains(github.event.head_commit.message, 'I66_LIVE_FIVE_ROLE_MATRIX')
     runs-on: ubuntu-24.04
     timeout-minutes: 48
     env:

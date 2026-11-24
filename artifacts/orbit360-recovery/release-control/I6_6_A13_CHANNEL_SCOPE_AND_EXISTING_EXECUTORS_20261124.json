@@ -1,0 +1,154 @@
+{
+  "schema": "GI_I66_A13_CHANNEL_SCOPE_AND_EXISTING_EXECUTORS_V1",
+  "recordType": "READ_ONLY_SCOPE_EVIDENCE_NOT_RELEASE_OR_OBJECTIVE_ACCEPTANCE",
+  "recordedAtUtc": "2026-11-23T23:58:13.914649+00:00",
+  "sourceHead": "f509fe1a58c8067aeafe7d655e0244a99328c5ce",
+  "objective": "A13",
+  "sourceRefs": [
+    {
+      "path": "artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json",
+      "gitBlobSha": "16e689de72cfcbb5e47f7cfbf23be58bb2cdc85b"
+    },
+    {
+      "path": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_EXECUTION_PROGRESS_20261123_R21.json",
+      "gitBlobSha": "184199441af0de762bcec3927258494fb275f269"
+    },
+    {
+      "path": "artifacts/orbit360-recovery/release-control/I6_6_PLAN_CHOQUE_FUNCIONAL_FINANCIERO_20261122.md",
+      "gitBlobSha": "fbfd54d229a13101fbfb0dfc6e92a5fa524999b6"
+    },
+    {
+      "path": "artifacts/orbit360-recovery/release-control/I6_6_DIRECCION_DECISIONES_FINANCIERAS_Y_PLAN_INTEGRAL_20261122.md",
+      "gitBlobSha": "53b08239aa8807378ec95a4b4704c5d97622bc84"
+    },
+    {
+      "path": "artifacts/orbit360-recovery/release-control/I6_6_OWNER_DECISIONS_GREENAPI_EMAIL_AND_PAYMENT_20261119.json",
+      "gitBlobSha": "2bb15e7a7bea48bdf0689d5ceced8bff2e8e62b0"
+    },
+    {
+      "path": "artifacts/orbit360-recovery/release-control/I6_6_OPERATIONAL_CONTINUATION_20261115.json",
+      "gitBlobSha": "20d1a9c169b2230158f13a60e7f291771b05859f"
+    },
+    {
+      "path": "artifacts/orbit360-recovery/release-control/I6_6_FINANCIAL_OPS_LEADS_CONTINUITY_READBACK_20261119.json",
+      "gitBlobSha": "d44ead4ecc34dc01ad8e594f9077076e2d3542d2"
+    },
+    {
+      "path": "artifacts/orbit360-recovery/release-control/I6_6_MAKE_IMAP_RECEIVE_AND_INGRESS_CAUSAL_EVIDENCE_20261123.json",
+      "gitBlobSha": "e45c6276f07d6e59b740001a1711e134adab510f"
+    },
+    {
+      "path": "orbit360-platform/core/correo.js",
+      "gitBlobSha": "ed0d2b0cbe98db4d6becd35d04a37a6ed43a2d96"
+    }
+  ],
+  "authority": {
+    "currentCursor": "I6_6_CURRENT_EXECUTION_PROGRESS_20261123_R21.json",
+    "title": "Leads WhatsApp/form/correo mediante Make escritor autorizado",
+    "passForShock": false,
+    "noOptionalWaiverForFormOrEmailFoundInInspectedCurrentAuthorities": true,
+    "fullPersonalMailboxSeparatelyQueuedAs": "PHASEB-INTEGRATION-MAIL-01",
+    "scopeInterpretation": "Inbound email lead intake remains named in current A13. Complete personal mailbox send/receive UI is a separately queued capability; lack of SMTP must not be invented as a prerequisite for inbound-only lead ingestion."
+  },
+  "liveMakeReadback": {
+    "teamId": 1975919,
+    "search": "Gravicentra",
+    "matches": 4,
+    "searchTruncated": false,
+    "scenarioIds": [
+      10196136,
+      10195867,
+      10221181,
+      10221359
+    ],
+    "mutations": 0,
+    "executionsTriggered": 0
+  },
+  "channels": {
+    "whatsapp": {
+      "status": "READER_ACTIVE_WRITER_SOURCE_READY_NOT_RUNTIME_CERTIFIED",
+      "existingExecutor": 10196136,
+      "providerConnection": 14749710,
+      "currentModuleCount": 2,
+      "currentWriterModules": 0,
+      "nextExecutor": "Same scenario10196136 -> private HTTP connection -> existing canonical DeliveryStatus handler -> product-ops-leads-domain transaction",
+      "nextGate": "V2 exact publication, effective private Make credential probe, controlled scenario switch, actual incoming direct ad -> business/readback/replay/internal operations notice",
+      "globalA13PassAfterWaOnly": false
+    },
+    "webform": {
+      "status": "SOURCE_NOT_IDENTIFIED_AND_QA_TRIGGER_ONLY",
+      "existingExecutor": 10195867,
+      "currentStatus": "inactive",
+      "hookId": 4527367,
+      "currentModuleCount": 1,
+      "currentModules": [
+        "gateway:CustomWebHook"
+      ],
+      "mapperPresent": false,
+      "canonicalWriterPresent": false,
+      "actualFormIdOrUrlPinnedInInspectedCurrentAuthorities": false,
+      "latestDocumentedProviderObservationDate": "2026-11-20",
+      "latestDocumentedProviderObservation": "Three ad sets destination WhatsApp; no native forms selectable on the two authorized pages. This is dated evidence, not a new live Meta query.",
+      "nextExistingExecutor": "Reuse isolated10195867 only after a real authorized form source/schema is identified; add authenticated source/consent mapping into canonical business writer in a reviewed successor. Do not activate trigger alone.",
+      "notProvenOptional": true
+    },
+    "email": {
+      "status": "REAL_IMAP_RECEIVE_PASS_NO_ERP_INGEST",
+      "existingExecutor": 10221181,
+      "currentStatus": "active",
+      "trigger": "on-demand",
+      "recurringSchedule": false,
+      "providerConnection": 14756803,
+      "currentModuleCount": 3,
+      "folder": "INBOX",
+      "markSeen": false,
+      "dateSince": "2026-11-23",
+      "dateBefore": "2026-11-24",
+      "maxResults": 1,
+      "metadataOnlyReturn": true,
+      "realReceiveExecutionId": "3cde1527cb824947a38123ddee794674",
+      "receivedSourceClassification": "CLAIMS_ACTIVITY_REPORT_NOT_LEAD_OR_PAYMENT",
+      "erpWrites": 0,
+      "perUserMailboxOwnerDecisionAlreadyApproved": true,
+      "nextExistingExecutor": "Reuse10221181/14756803 and existing product-ops-leads-domain owner. Add verified mailbox->user/tenant/country binding, eligible lead/source/consent mapping, Message-ID/References dedupe and durable thread association; exact correlation or human confirmation for ambiguity. Signed two-user privacy/readback/replay required.",
+      "missingInboundCredential": false,
+      "missingWriterAndSourceClassifier": true,
+      "smtpStatus": "NOT_CONNECTED; only relevant to separately required outbound mail proof, not prerequisite to inbound-only processing",
+      "arbitraryMailboxToLeadImportForbidden": true
+    }
+  },
+  "waActivationContract": {
+    "sourceContractPath": "make_ingress_candidate/functions/greenapi-inbound-ad-contract.js",
+    "realMessageType": "incoming",
+    "attributionRequired": [
+      "sourceType=ad",
+      "sourceId"
+    ],
+    "onlyPersonalChat": true,
+    "forwardedDeletedEditedExcluded": true,
+    "makeWriterOnly": true,
+    "scenarioId": 10196136,
+    "connectionId": 14749710,
+    "tenant": "alianzas-soluciones",
+    "country": "GT",
+    "assignment": "pending_operations",
+    "outboundEnabled": false,
+    "activationNotBeforeRequired": true,
+    "olderThanActivationOutcome": "ignored:before-approved-activation; zero writes",
+    "pollWindowDoesNotAuthorizeBackfill": true,
+    "historical30DayRequest": "Preserved as conditional separate evidence-backed intake; not implemented or implicitly authorized by this activation",
+    "realAdReadbackNeededForMakeBusinessPass": true,
+    "probeOrNativeSyntheticQaAloneNotEnough": true
+  },
+  "executionLimits": {
+    "canonicalCheckoutEdits": 0,
+    "candidateSourceEdits": 0,
+    "scenarioEdits": 0,
+    "newScenarios": 0,
+    "newWorkflows": 0,
+    "credentialChanges": 0,
+    "providerSettingsChanges": 0,
+    "messagesSent": 0,
+    "newLeadWrites": 0
+  }
+}

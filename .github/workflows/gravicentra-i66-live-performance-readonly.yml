@@ -6,6 +6,12 @@ name: Gravicentra I6.6 LIVE Performance READ ONLY
 # Same existing signed measurement; origin/source/artifact come from the current canonical release authority.
 on:
   workflow_dispatch:
+    inputs:
+      read_mode:
+        description: 'Existing signed driver mode; no business writes'
+        type: choice
+        options: [performance, six-existing-receipts]
+        default: performance
   push:
     branches: [recovery/fase-a-clean-20260831]
     paths:
@@ -13,6 +19,7 @@ on:
 
 permissions:
   contents: read
+  actions: read
 
 concurrency:
   group: gi-i66-live-performance-readonly
@@ -20,13 +27,15 @@ concurrency:
 
 jobs:
   real-chrome-perf:
-    if: github.repository == 'paulaosoriof86/orbit360-core' && github.ref_name == 'recovery/fase-a-clean-20260831' && (github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, 'I66_LIVE_PERFORMANCE'))
+    if: github.repository == 'paulaosoriof86/orbit360-core' && github.ref_name == 'recovery/fase-a-clean-20260831' && (github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, 'I66_LIVE_PERFORMANCE') || contains(github.event.head_commit.message, 'I66_SIX_RECEIPTS_UI_READONLY'))
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     env:
       GI_I66_PERF_PROJECT: ays-orbit-360-lab
       GI_I66_PERF_TENANT: alianzas-soluciones
       GI_I66_PERF_PHASE: live
+      GITHUB_TOKEN: ${{ github.token }}
+      GI_I66_READONLY_MODE: ${{ inputs.read_mode || (contains(github.event.head_commit.message, 'I66_SIX_RECEIPTS_UI_READONLY') && 'six-existing-receipts') || 'performance' }}
       SA_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
       SA_LAB_ALT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
       SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
@@ -46,6 +55,7 @@ jobs:
           test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
           test -z "${FIRESTORE_EMULATOR_HOST:-}"
           node --check tools/gravicentra-i66-live-performance-readonly.mjs
+          node --test tools/gravicentra-i6-6-readonly-observer-authority.test.cjs tools/gravicentra-i6-6-performance-first-route-source-timeline.test.cjs tools/gravicentra-i6-6-six-existing-receipts-ui-readonly.test.cjs
           node - <<'NODE'
           const fs=require('node:fs');
           const s=fs.readFileSync('tools/gravicentra-i66-live-performance-readonly.mjs','utf8');
@@ -86,13 +96,16 @@ jobs:
           set -euo pipefail
           node tools/gravicentra-i66-live-performance-readonly.mjs
       - name: Certify LIVE topbar cold first-search latency independently
+        if: env.GI_I66_READONLY_MODE == 'performance'
         run: |
           set -euo pipefail
           node - <<'NODE'
           const x=require(process.env.RUNNER_TEMP+'/gi-i66-live-perf-summary.json');
           const s=x.globalTopbarSearch||{},t=x.globalTopbarTiming||{};
           if(x.status!=='LIVE_READONLY_MEASURED'||x.origin!=='https://app.aysseguros.com'||
-             x.auth?.activation?.role!=='Operativo'||x.auth?.pageErrors!==0||
+             x.auth?.activation?.role!=='Operativo'||x.auth?.pageErrors!==0||x.auth?.consoleErrors!==0||
+             !x.auth?.httpErrorClasses||typeof x.auth.httpErrorClasses!=='object'||Array.isArray(x.auth.httpErrorClasses)||
+             Object.keys(x.auth.httpErrorClasses).length!==0||
              x.firestoreWrites!==0||x.paymentActions!==0||
              !s.ready||!s.first?.resultCount||s.first.timeMs>=2200||
              s.second?.timeMs>=1000||s.second.resultCount!==s.first.resultCount||
@@ -101,7 +114,23 @@ jobs:
           console.log('I66_LIVE_GLOBAL_TOPBAR_2P2S_0_REPROJECTIONS_CARLOS_OPERATIVO_PASS');
           console.log('I66_LIVE_FOUR_HUNDRED_PLUS_CLIENTS_AUTHORIZED_READ_ONLY_BROWSER_PASS');
           NODE
-      - name: Preserve aggregate evidence for I6.6 (no IDs, tokens or amounts)
+      - name: Certify exact six existing obligations after signed reload
+        if: env.GI_I66_READONLY_MODE == 'six-existing-receipts'
+        run: |
+          set -euo pipefail
+          node - <<'NODE'
+          const assert=require('node:assert/strict');
+          const r=require(process.env.RUNNER_TEMP+'/gi-i66-live-perf-summary.json');
+          assert.equal(r.status,'LIVE_SIX_EXISTING_RECEIPTS_SIGNED_UI_RELOAD_CALCULATION_PASS');
+          assert.equal(r.financialFocal?.distinctObligationCount,6);
+          assert.equal(r.financialFocal?.sourceGrossCents,166956);
+          assert.equal(r.financialFocal?.additionalWrites,0);
+          assert.equal(r.financialFocal?.newObligations,0);
+          assert.equal(r.financialFocal?.observations?.filter(x=>x.reloadPass).length,6);
+          assert.equal(r.firestoreWrites,0);assert.equal(r.paymentActions,0);
+          console.log('I66_SIX_EXISTING_OBLIGATIONS_UI_RELOAD_CALCULATION_PASS_ADDITIONAL_WRITES_0');
+          NODE
+      - name: Preserve scoped read-only evidence without customer identity or tokens
         if: always()
         uses: actions/upload-artifact@v4
         with:

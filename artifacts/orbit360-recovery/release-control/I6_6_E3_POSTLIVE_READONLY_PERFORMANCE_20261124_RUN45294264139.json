@@ -1,0 +1,260 @@
+{
+  "schema": "GI_I66_E3_POSTLIVE_READONLY_MEASUREMENT_RECEIPT_V1",
+  "recordedAtUtc": "2026-11-24T00:13:24.201Z",
+  "gate": "I6.6",
+  "generation": 3,
+  "sourceSha": "65c825b2808a615ca4195bdde6689dbdbe3193b2",
+  "buildId": "gi-i66-65c825b2808a-57f234755dc1",
+  "artifactId": 14873426438,
+  "artifactDigest": "sha256:7cb782848a45083047c4899bc30c13bf5be46429607e42597d09342becfc9acc",
+  "acceptedRelease": {
+    "runId": 45292163934,
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_FRONTEND_E00003_RECEIPT.json",
+    "receiptGitBlobSha": "11fdb3bee494541513482666d6215f45cbad0567",
+    "proofPath": "artifacts/orbit360-recovery/release-control/I6_6_FRONTEND_E00003_LIVE_PROOF.json",
+    "proofSha256": "4013a99719ba5f8bb3087a5e5f43c189a22daf55aabfcea37e8df5030bb5653c",
+    "signedProofArtifactId": 14876355144,
+    "signedProofArtifactDigest": "sha256:7d106dc157740adb0a014613021a4f027fe1d802d96159f67e0cb81694f929a2",
+    "detailedReportsHashesAndValidatorsChecked": true
+  },
+  "postAcceptanceGuard": {
+    "runId": 45294264050,
+    "controlPlaneJobId": 138110538743,
+    "availabilityJobId": 138110539134,
+    "conclusion": "success"
+  },
+  "measurement": {
+    "runId": 45294264139,
+    "jobId": 138110539529,
+    "workflowHeadSha": "1ec008f96970f3fc9fd14e38741831cf12d9dc7c",
+    "artifactId": 14875886785,
+    "artifactDigest": "sha256:b8f73504396c1ba7f1ee0699bb758881088a6f8c37a6f1e9cd27e5a89b89ad10",
+    "reportSha256": "5c58a814cda72b13dcec6b1108038168f9ad69df7652a80321bf8d464a244425",
+    "singleObservedRun": true,
+    "firestoreWrites": 0,
+    "businessActions": 0,
+    "paymentActions": 0,
+    "activation": {
+      "ok": true,
+      "signedInMs": 223,
+      "activateMs": 2508,
+      "role": "Operativo",
+      "storeStatus": "ready-read-only",
+      "readyCollection": "clientes",
+      "hasRouter": false
+    },
+    "authPageErrors": 0,
+    "authConsoleErrors": 0,
+    "errors": [],
+    "routes": [
+      {
+        "route": "cliente360",
+        "contentMs": 68,
+        "readyMs": 68,
+        "cobrosFinancialReadyMs": null,
+        "snapshotErrorCount": 0,
+        "snapshotErrorSources": [],
+        "complete": true,
+        "denied": false
+      },
+      {
+        "route": "polizas",
+        "contentMs": 16,
+        "readyMs": 6008,
+        "cobrosFinancialReadyMs": null,
+        "snapshotErrorCount": 3,
+        "snapshotErrorSources": [
+          "estadosCuentaAseguradora",
+          "recibosAseguradora",
+          "reclamos"
+        ],
+        "complete": true,
+        "denied": false
+      },
+      {
+        "route": "cobros",
+        "contentMs": 1716,
+        "readyMs": 1716,
+        "cobrosFinancialReadyMs": 13375,
+        "snapshotErrorCount": 3,
+        "snapshotErrorSources": [
+          "estadosCuentaAseguradora",
+          "recibosAseguradora",
+          "reclamos"
+        ],
+        "complete": true,
+        "denied": false
+      },
+      {
+        "route": "aseguradoras",
+        "contentMs": 921,
+        "readyMs": 921,
+        "cobrosFinancialReadyMs": null,
+        "snapshotErrorCount": 3,
+        "snapshotErrorSources": [
+          "estadosCuentaAseguradora",
+          "recibosAseguradora",
+          "reclamos"
+        ],
+        "complete": true,
+        "denied": false
+      },
+      {
+        "route": "renovaciones",
+        "contentMs": 374,
+        "readyMs": 374,
+        "cobrosFinancialReadyMs": null,
+        "snapshotErrorCount": 3,
+        "snapshotErrorSources": [
+          "estadosCuentaAseguradora",
+          "recibosAseguradora",
+          "reclamos"
+        ],
+        "complete": true,
+        "denied": false
+      },
+      {
+        "route": "cronograma",
+        "contentMs": 1031,
+        "readyMs": 1031,
+        "cobrosFinancialReadyMs": null,
+        "snapshotErrorCount": 3,
+        "snapshotErrorSources": [
+          "estadosCuentaAseguradora",
+          "recibosAseguradora",
+          "reclamos"
+        ],
+        "complete": true,
+        "denied": false
+      },
+      {
+        "route": "ops",
+        "contentMs": 40,
+        "readyMs": 40,
+        "cobrosFinancialReadyMs": null,
+        "snapshotErrorCount": 3,
+        "snapshotErrorSources": [
+          "estadosCuentaAseguradora",
+          "recibosAseguradora",
+          "reclamos"
+        ],
+        "complete": true,
+        "denied": false
+      },
+      {
+        "route": "leads",
+        "contentMs": 26,
+        "readyMs": 26,
+        "cobrosFinancialReadyMs": null,
+        "snapshotErrorCount": 3,
+        "snapshotErrorSources": [
+          "estadosCuentaAseguradora",
+          "recibosAseguradora",
+          "reclamos"
+        ],
+        "complete": true,
+        "denied": false
+      },
+      {
+        "route": "siniestros",
+        "contentMs": 9,
+        "readyMs": 9,
+        "cobrosFinancialReadyMs": null,
+        "snapshotErrorCount": 3,
+        "snapshotErrorSources": [
+          "estadosCuentaAseguradora",
+          "recibosAseguradora",
+          "reclamos"
+        ],
+        "complete": true,
+        "denied": false
+      },
+      {
+        "route": "calidad",
+        "contentMs": 1071,
+        "readyMs": 1071,
+        "cobrosFinancialReadyMs": null,
+        "snapshotErrorCount": 3,
+        "snapshotErrorSources": [
+          "estadosCuentaAseguradora",
+          "recibosAseguradora",
+          "reclamos"
+        ],
+        "complete": true,
+        "denied": false
+      },
+      {
+        "route": "historial",
+        "contentMs": 98,
+        "readyMs": 98,
+        "cobrosFinancialReadyMs": null,
+        "snapshotErrorCount": 3,
+        "snapshotErrorSources": [
+          "estadosCuentaAseguradora",
+          "recibosAseguradora",
+          "reclamos"
+        ],
+        "complete": true,
+        "denied": false
+      },
+      {
+        "route": "conciliaciones",
+        "contentMs": 5,
+        "readyMs": null,
+        "cobrosFinancialReadyMs": null,
+        "snapshotErrorCount": 3,
+        "snapshotErrorSources": [
+          "estadosCuentaAseguradora",
+          "recibosAseguradora",
+          "reclamos"
+        ],
+        "complete": true,
+        "denied": true
+      },
+      {
+        "route": "inicio",
+        "contentMs": 1659,
+        "readyMs": 1659,
+        "cobrosFinancialReadyMs": null,
+        "snapshotErrorCount": 3,
+        "snapshotErrorSources": [
+          "estadosCuentaAseguradora",
+          "recibosAseguradora",
+          "reclamos"
+        ],
+        "complete": true,
+        "denied": false
+      }
+    ],
+    "globalTopbarSearch": {
+      "ready": true,
+      "first": {
+        "termType": "basic",
+        "ready": true,
+        "timeMs": 215,
+        "resultCount": 2
+      },
+      "second": {
+        "termType": "accent",
+        "ready": true,
+        "timeMs": 150,
+        "resultCount": 2
+      },
+      "createdFinancialWrites": 0
+    },
+    "mobile": {
+      "viewportWidth": 390,
+      "eventMs": 0.7,
+      "twoFramesMs": 24.9,
+      "menuOpen": true,
+      "navItems": 17
+    }
+  },
+  "interpretation": {
+    "coldUserLatencyGuarantee": false,
+    "allPerformanceIssuesResolved": false,
+    "threeOptionalSourceIssuesStillOpen": true,
+    "fullRoleModuleViewportMatrixPassed": false,
+    "fullI66ProductionAccepted": false
+  }
+}

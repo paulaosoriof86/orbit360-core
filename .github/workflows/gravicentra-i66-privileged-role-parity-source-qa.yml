@@ -56,6 +56,14 @@ on:
       - tools/gravicentra-i6-6-privileged-role-writer-transaction.test.cjs
       - tools/gravicentra-i6-6-equipo-protected-role-defaults.test.cjs
       - artifacts/orbit360-recovery/release-control/I6_6_APPROVED_PRODUCT_DELTA_MANIFEST_20261110.json
+      - .github/workflows/gravicentra-i66-current-exact-preview-cross-module-uat-20261119.yml
+      - .github/workflows/gravicentra-i66-live-performance-readonly.yml
+      - tools/gravicentra-i6-6-current-live-five-role-route-readonly.cjs
+      - tools/gravicentra-i66-live-performance-readonly.mjs
+      - tools/gravicentra-i6-6-five-role-assigned-selection.test.cjs
+      - tools/gravicentra-i6-6-performance-first-route-source-timeline.test.cjs
+      - tools/gravicentra-i6-6-six-existing-receipts-ui-readonly.test.cjs
+      - tools/gravicentra-i6-6-readonly-observer-authority.test.cjs
   workflow_dispatch:
 permissions:
   contents: read
@@ -80,6 +88,7 @@ jobs:
           set -euo pipefail
           node --check tools/gravicentra-i6-6-delta-test-revisions.cjs
           node tools/gravicentra-i6-6-source-lineage-preview-transport.test.cjs
+          node --test tools/gravicentra-i6-6-readonly-observer-authority.test.cjs tools/gravicentra-i6-6-five-role-assigned-selection.test.cjs tools/gravicentra-i6-6-performance-first-route-source-timeline.test.cjs tools/gravicentra-i6-6-six-existing-receipts-ui-readonly.test.cjs
           node --test tools/gravicentra-i6-6-composite-preview-admission.test.cjs tools/gravicentra-i6-6-workflow-candidate-resolution.test.cjs
           node --test tools/gravicentra-i66-composite-acceptance.test.cjs tools/gravicentra-i66-frontend-control.test.cjs tools/gravicentra-i66-frontend-promotion-transaction.test.cjs
           node --test tools/gravicentra-i6-6-direction-preview-i66-consent-scope.test.cjs tools/gravicentra-i6-6-direction-live-legal-acceptance.test.cjs
