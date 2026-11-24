@@ -401,16 +401,23 @@ async function showSixReceiptBalance(page,expected,viewportWidth,stage){
   if(!viewportWidth)return null;
   // The canonical bridge replaces this detail with innerHTML on reconciliation.
   // Resolve a fresh locator only for that exact detached-node failure; all three
-  // attempts share one short action budget. Readiness and acceptance stay strict.
-  const maximumAttempts=3,budgetMs=1500,deadline=Date.now()+budgetMs;
-  let attempts=0,detachments=0;
+  // attempts share the original 1500 ms scroll-action budget. The first count
+  // and visibility checks precede that action; browser reconciliation during
+  // those reads must not consume a scroll that has not started. A detach retry
+  // keeps the same deadline, including its repeated prechecks.
+  const maximumAttempts=3,budgetMs=1500;
+  let attempts=0,detachments=0,deadline=null,actionStartedAt=null,precheckElapsedMs=0,scrollCalls=0;
   try{
     for(attempts=1;attempts<=maximumAttempts;attempts++){
       const balance=page.locator('[data-rp-receipt-detail-id="'+expected.receiptId+'"] [data-rp-current-balance]');
-      need(await balance.count()===1,'I66_SIX_SCROLL_BALANCE_MISSING_OR_DUPLICATE_HOLD');
-      need(await balance.isVisible(),'I66_SIX_SCROLL_BALANCE_HIDDEN_HOLD');
+      const precheckStartedAt=Date.now();
+      try{
+        need(await balance.count()===1,'I66_SIX_SCROLL_BALANCE_MISSING_OR_DUPLICATE_HOLD');
+        need(await balance.isVisible(),'I66_SIX_SCROLL_BALANCE_HIDDEN_HOLD');
+      }finally{precheckElapsedMs+=Date.now()-precheckStartedAt;}
+      if(deadline===null){actionStartedAt=Date.now();deadline=actionStartedAt+budgetMs;}
       const timeout=deadline-Date.now();need(timeout>0,'I66_SIX_SCROLL_ACTION_BUDGET_HOLD');
-      try{await balance.scrollIntoViewIfNeeded({timeout});return {attempts,detachments};}
+      try{scrollCalls++;await balance.scrollIntoViewIfNeeded({timeout});return {attempts,detachments};}
       catch(error){
         if(error?.name==='TimeoutError'||!/^locator\.scrollIntoViewIfNeeded: Element is not attached to the DOM(?:\r?\n|$)/.test(String(error?.message||'')))throw error;
         detachments++;
@@ -419,7 +426,9 @@ async function showSixReceiptBalance(page,expected,viewportWidth,stage){
     }
   }catch(error){
     error.sixScrollComparison={stage,sourceRequirement:expected.sourceRequirement,receiptId:expected.receiptId,
-      attempts,detachments,maximumAttempts,budgetMs,uiAccepted:false};throw error;
+      attempts,detachments,maximumAttempts,budgetMs,precheckElapsedMs,scrollCalls,
+      actionStarted:actionStartedAt!==null,actionElapsedMs:actionStartedAt===null?0:Date.now()-actionStartedAt,
+      uiAccepted:false};throw error;
   }
 }
 async function runSixReceiptUi(page,actor,errors){

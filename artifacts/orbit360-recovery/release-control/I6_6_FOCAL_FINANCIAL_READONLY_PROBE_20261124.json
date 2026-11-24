@@ -1,0 +1,138 @@
+{
+  "schema": "GI_I66_FOCAL_FINANCIAL_READONLY_PROBE_RECEIPT_V1",
+  "status": "READONLY_FINANCIAL_PROBE_PASS_ZERO_WRITES",
+  "dateUtc": "2026-11-24",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "sourceSha": "c487800607ba98a7990efba11226c43563213d7b",
+  "workflow": ".github/workflows/gravicentra-i66-insurer-source-bulk-protected.yml",
+  "runId": 45346736089,
+  "preflightJobId": 138283003919,
+  "runUrl": "https://github.com/paulaosoriof86/orbit360-core/actions/runs/45346736089",
+  "preflightStatus": "success",
+  "writes": 0,
+  "directPaymentsCreated": 0,
+  "newObligationsCreated": 0,
+  "protectedJobs": [
+    {
+      "id": 138283335993,
+      "name": "protected-issued-d01-source-schedule",
+      "conclusion": "skipped"
+    },
+    {
+      "id": 138283336100,
+      "name": "protected-issued-documentary-successor",
+      "conclusion": "skipped"
+    },
+    {
+      "id": 138283336120,
+      "name": "protected-d03-statement-series",
+      "conclusion": "skipped"
+    },
+    {
+      "id": 138283336206,
+      "name": "protected-issued-roble-two-24",
+      "conclusion": "skipped"
+    },
+    {
+      "id": 138283336387,
+      "name": "protected-source-bulk-live",
+      "conclusion": "skipped"
+    },
+    {
+      "id": 138283336665,
+      "name": "protected-issued-d03-source-schedule",
+      "conclusion": "skipped"
+    }
+  ],
+  "artifact": {
+    "id": 14897739308,
+    "name": "gi-i66-source-bulk-preflight-45346736089",
+    "digest": "sha256:d89a0eeed183399f1627dab183aa8b188506defbe6e9df6d406eb818f850e693",
+    "downloadedZipSha256": "d89a0eeed183399f1627dab183aa8b188506defbe6e9df6d406eb818f850e693",
+    "files": [
+      {
+        "name": "gi-i66-bulk-plan.json",
+        "sha256": "39dd8eb6e41b712562bbd2e6b7c8a247a8a7df4d9c00b859b7e8c1c57fd6cd5b"
+      },
+      {
+        "name": "gi-i66-bulk-preflight.json",
+        "sha256": "e6631ae63f4e02fbf90917df05bfb42ad42e8ce585c542c73bf5a4aef4c1c12e"
+      }
+    ],
+    "originalEligibilityPlanBytesUnchanged": true
+  },
+  "diagnostic": {
+    "execution": {
+      "sourceSha": "c487800607ba98a7990efba11226c43563213d7b",
+      "runId": "45346736089"
+    },
+    "requestSha256": "ed11336ef324555102c1293b0c16aabaf768bb661aaf8706cde071fc02ec757c",
+    "preimageDigest": "134aeabcc52ad187a31d57cf872f7efd8f47d5e3b42224239b265b6050eddb5d",
+    "reportSha256": "2b2ac19e777b1b072a33332527c3bf3fdec843fcdb0cef88c0285d32c7177ebe",
+    "reportDigestVerifiedFromArtifact": true,
+    "noEligibilityEffect": true,
+    "completeFinancialCensus": true,
+    "financialCensusCounts": {
+      "recibosEsperados": 2232,
+      "carteraPrimas": 2004,
+      "cobros": 513
+    },
+    "financialCensusSha256": "c04f787c9c515c93df875860466563545f85c80ffcd42c1eb410902f321dcffe"
+  },
+  "roble4140843": {
+    "policyId": "pol_7ab15779e3626402f1cb4349fa69",
+    "storedNumber": "91-414084",
+    "issuedNumber": "91-4140843",
+    "existingReceipts": 1,
+    "existingPortfolio": 1,
+    "existingPayments": 0,
+    "grossCents": 374740,
+    "originalRequirement": "5574011",
+    "originalContractualDue": "2026-10-10",
+    "existingOperationalDatePreserved": "2026-09-25",
+    "currentPolicySnapshotSha256": "1814d9e55f222e8998d139e2795e458c3597c3d0d7485e5a60fe50c057a43f56",
+    "financialPreimages": [
+      {
+        "collection": "recibosEsperados",
+        "id": "rec_i65_59e37e009188644b34059e4a",
+        "sha256": "80bcc91080d56f31377c0c14d418f64dace4f328044749d50943675ff6c0986f"
+      },
+      {
+        "collection": "carteraPrimas",
+        "id": "car_i65_ed31ae1fb408d4a4e95d2ca3",
+        "sha256": "b6e145fd4a19b59f1f83ceb5eda11b2b8ec525460295c049e366b25b2978fa3d"
+      }
+    ],
+    "result": "EXISTING_OBLIGATION_IDENTIFIED_NO_DUPLICATE_CREATE"
+  },
+  "universales10738": {
+    "policyId": "pol_243608bce078afdf9640c8554ac4",
+    "receipts": 19,
+    "portfolio": 19,
+    "payments": 8,
+    "preserveAlreadyReconciledPayment": {
+      "receiptId": "rec_i65_6bf5a5bc37034801b8a86c64",
+      "paymentId": "cob_0e014f4a4cde754d67ce16c4cafb",
+      "paidDate": "2026-11-13",
+      "grossCents": 147935,
+      "conciliado": true
+    },
+    "result": "TWO_RECEIPT_FAMILIES_REQUIRE_SOURCE_IDENTITY_CONSOLIDATION_NO_NEW_PAYMENT"
+  },
+  "universales12289": {
+    "sourcePolicy": "04-05-01-12289-4",
+    "coverageStatusLiteral": "SIN COBERTURA",
+    "sourcePdfSha256": "6c360b74ef73c971f856a66eb4f4aa906ea8c303faafcfe972e027b16620fc7e",
+    "statusSourceSha256": "1a57be74a480fb97486b63723137ff9b59e502a128affb0364104b584491091d",
+    "writes": 0
+  },
+  "scope": {
+    "notFresh302Census": true,
+    "notFresh607Census": true,
+    "prior148PaymentsNotReapplied": true,
+    "prior24NewObligationsNotReapplied": true,
+    "sixFocalReceiptWrites": 0,
+    "fullI66Accepted": false
+  }
+}

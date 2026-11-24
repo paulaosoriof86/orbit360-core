@@ -34,3 +34,21 @@ test('exceptions containing credential-bearing URLs are never emitted',async()=>
   const s=secret(),r=await p.probeProviderReadiness(s,{runtimeReader:async()=>s,fetchImpl:async()=>{throw Error('https://api.green-api.com/'+s.apiTokenInstance);}});
   assert.equal(r.providerRequestMade,true);assert.equal(r.providerAuthorized,false);assert.equal(JSON.stringify(r).includes(s.apiTokenInstance),false);
 });
+test('runtime failure categories distinguish denied IAM, missing resource, transport and SDK without error text',async()=>{
+  for(const [code,key] of [[7,'runtimeSecretPermissionDenied'],[403,'runtimeSecretPermissionDenied'],[16,'runtimeSecretUnauthenticated'],
+    [5,'runtimeSecretNotFound'],[14,'runtimeSecretTransientFailure'],[999,'runtimeSecretUnknownFailure']]){
+    const r=await p.probeProviderReadiness(secret(),{runtimeReader:async progress=>{
+      progress.runtimeSourceCredentialReady=true;progress.runtimeSdkReady=true;progress.runtimeIdentityTokenReady=true;progress.runtimeSecretReadAttempted=true;
+      throw Object.assign(Error('SENSITIVE_EXCEPTION_TEXT'),{code});},fetchImpl:async()=>response({})});
+    assert.equal(r[key],true);assert.equal(r.runtimeSecretReadReturned,false);assert.equal(r.runtimeSecretAccessVerified,false);
+    assert.equal(Object.values(r).every(v=>typeof v==='boolean'),true);assert.equal(JSON.stringify(r).includes('SENSITIVE'),false);
+  }
+  const sdk=await p.probeProviderReadiness(secret(),{runtimeReader:async()=>{throw new TypeError('PRIVATE_SDK_DETAILS');},fetchImpl:async()=>response({})});
+  assert.equal(sdk.runtimeSecretClientTypeError,true);assert.equal(sdk.runtimeSecretPermissionDenied,false);
+});
+test('returned but mismatched runtime secret is reported separately from permission denial',async()=>{
+  const r=await p.probeProviderReadiness(secret(),{runtimeReader:async progress=>{
+    progress.runtimeSecretReadReturned=true;progress.runtimeSecretResponseBounded=true;progress.runtimeSecretJsonParsed=true;
+    return{...secret(),tenantId:'foreign'};},fetchImpl:async()=>response({})});
+  assert.equal(r.runtimeSecretScopeMismatch,true);assert.equal(r.runtimeSecretPermissionDenied,false);assert.equal(r.runtimeSecretJsonParsed,true);
+});

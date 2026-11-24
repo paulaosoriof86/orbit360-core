@@ -474,4 +474,4 @@ jobs:
       - name: Validate exact existing inbound configuration without payload or credential output
         shell: bash
         run: node tools/gravicentra-i66-greenapi-existing-config-readonly.cjs
-# I6.6 continuation 2026-11-24: verify existing runtime secret access and provider identity using bounded metadata GETs; no messages or writes.
+# I6.6 continuation 2026-11-24: distinguish exact runtime Secret RPC, parsing and scope outcomes with allowlisted booleans; no messages or writes.

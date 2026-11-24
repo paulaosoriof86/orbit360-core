@@ -1,0 +1,54 @@
+{
+  "schema": "GI_I66_IMMUTABLE_BUILD_PREVIEW_READBACK_V1",
+  "gate": "I6.6",
+  "recordedAtUtc": "2026-11-24T07:40:31.672497Z",
+  "recordType": "SUBORDINATE_BUILD_EVIDENCE_NOT_UI_OR_LIVE_ACCEPTANCE",
+  "requestVersion": 16,
+  "target": {
+    "sourceSha": "1a83e0584f099bf1d76bbf8a58533c716d874e6c",
+    "buildRunId": 45347810682,
+    "buildId": "gi-i66-1a83e0584f09-57f234755dc1",
+    "artifactId": 14899061664,
+    "artifactDigest": "sha256:17b8ff3f0ebd16bc4ce90543427a72fa9db599dbb5e30f152bd1501a3d5726d1",
+    "previewChannel": "gi-i66-rc-45347810682",
+    "previewUrl": "https://ays-orbit-360-lab--gi-i66-rc-45347810682-zgh0sve4.web.app"
+  },
+  "sourceQa": {
+    "sourceSha": "fa1afbbc531313333cda99be01a186ed6afd2e13",
+    "sourceQaRunId": 45347366830,
+    "sourceJobId": 138285079880,
+    "realChromiumJobId": 138285079434,
+    "realChromiumTests": 3,
+    "passed": 3,
+    "failed": 0,
+    "skipped": 0,
+    "guardRunId": 45347366852
+  },
+  "immutablePackage": {
+    "buildConclusion": "success",
+    "buildJobId": 138286710183,
+    "gateJobId": 138286535028,
+    "artifactZipBytes": 1824504,
+    "immutableTarSha256": "9b4b05cc802664e5abfa3e1d5d0f613e5def9420f3946a21bdd58c236862ea71",
+    "immutableTarBytes": 1824061,
+    "sourceMarkerMatched": true,
+    "queryGitBlobSha": "b77b65f86ef6ac2ab6dc157fdbc9ad5e34dbcdcc",
+    "querySha256": "d0892ba4135e4b4d4c6e9e9e0c59208eedeecf5546218b44ed0dc8050d82104e"
+  },
+  "previewReadback": {
+    "fileCount": 224,
+    "status": "PASS_ALL_MANIFEST_FILES",
+    "evidence": "immutable-package step 12 completed successful full artifact-file readback",
+    "liveHtmlBeforeAfter": "UNCHANGED_WORKFLOW_STEPS_9_AND_12"
+  },
+  "previousPhysicalRelease": {
+    "generation": 3,
+    "sourceSha": "65c825b2808a615ca4195bdde6689dbdbe3193b2",
+    "receiptBlobSha": "11fdb3bee494541513482666d6215f45cbad0567"
+  },
+  "previewUiAccepted": false,
+  "livePromoted": false,
+  "backendDeploys": 0,
+  "financialWrites": 0,
+  "fullI66Accepted": false
+}

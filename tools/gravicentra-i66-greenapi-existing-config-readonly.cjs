@@ -78,9 +78,11 @@ async function readRuntimeSecret(progress){
     await runtime.getAccessToken();progress.runtimeIdentityTokenReady=true;
     progress.runtimeSecretReadAttempted=true;
     const [version]=await client.accessSecretVersion({name:SECRET_REFERENCE});
+    progress.runtimeSecretReadReturned=true;
     const bytes=version?.payload?.data;
     if(!bytes||bytes.length>8000)throw Error('RUNTIME_SECRET_FORMAT');
-    return JSON.parse(Buffer.from(bytes).toString('utf8'));
+    progress.runtimeSecretResponseBounded=true;
+    const value=JSON.parse(Buffer.from(bytes).toString('utf8'));progress.runtimeSecretJsonParsed=true;return value;
   }finally{try{await client.close();}catch{/* Fixed stage booleans remain the only output. */}}
 }
 async function boundedJson(response){
@@ -97,13 +99,28 @@ async function boundedJson(response){
 }
 async function probeProviderReadiness(secret,{runtimeReader=readRuntimeSecret,fetchImpl=fetch}={}){
   const result={runtimeImpersonationAttempted:false,runtimeSourceCredentialReady:false,runtimeSdkReady:false,
-    runtimeIdentityTokenReady:false,runtimeSecretReadAttempted:false,runtimeSecretAccessVerified:false,
+    runtimeIdentityTokenReady:false,runtimeSecretReadAttempted:false,runtimeSecretReadReturned:false,
+    runtimeSecretResponseBounded:false,runtimeSecretJsonParsed:false,runtimeSecretAccessVerified:false,runtimeSecretScopeMismatch:false,
+    runtimeSecretPermissionDenied:false,runtimeSecretUnauthenticated:false,runtimeSecretNotFound:false,
+    runtimeSecretTransientFailure:false,runtimeSecretClientTypeError:false,runtimeSecretUnknownFailure:false,
     providerRequestMade:false,providerAuthorized:false,settingsIdentityMatches:false,readOnlyMetadataRequestsOnly:true};
   const check=inspectSecret(secret).report;
   if(!check.rootTenantCountryInstanceMatch)return result;
   result.runtimeImpersonationAttempted=true;
-  try{const runtimeSecret=await runtimeReader(result);result.runtimeSecretAccessVerified=inspectSecret(runtimeSecret).report.rootTenantCountryInstanceMatch===true;}
-  catch{/* Fixed booleans only; IAM/credential/provider exception text is never printed. */}
+  try{const runtimeSecret=await runtimeReader(result);result.runtimeSecretAccessVerified=inspectSecret(runtimeSecret).report.rootTenantCountryInstanceMatch===true;
+    result.runtimeSecretScopeMismatch=!result.runtimeSecretAccessVerified;}
+  catch(error){
+    // Allowlisted status categories only. No message, stack, details, request,
+    // payload or arbitrary status string may enter the public diagnostic.
+    const code=Number(error?.code);
+    result.runtimeSecretPermissionDenied=code===7||code===403;
+    result.runtimeSecretUnauthenticated=code===16||code===401;
+    result.runtimeSecretNotFound=code===5||code===404;
+    result.runtimeSecretTransientFailure=[4,13,14,429,500,502,503,504].includes(code);
+    result.runtimeSecretClientTypeError=error instanceof TypeError;
+    result.runtimeSecretUnknownFailure=![result.runtimeSecretPermissionDenied,result.runtimeSecretUnauthenticated,
+      result.runtimeSecretNotFound,result.runtimeSecretTransientFailure,result.runtimeSecretClientTypeError].some(Boolean);
+  }
   if(!check.apiTokenFormatUsable||!check.apiOriginAllowed)return result;
   const origin=providerOrigin(secret);
   const metadata=async name=>{

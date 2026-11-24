@@ -452,6 +452,42 @@ test('the financial release owner rejects missing stages, invented full gates, s
   assert.equal(r.report.buttonClicked,undefined);assert.equal(r.report.linkedDestination,undefined);
 });
 
+// Immutable regression fixture from built v16 source 1a83e0584f099bf1d76bbf8a58533c716d874e6c,
+// driver blob 5a3fcb0387754abdec466311155adbb1768ee88e. This is the exact old
+// helper, not a substitute for the current owner or the browser's DOM results.
+const V16_SCROLL_HELPER=String.raw`async function showSixReceiptBalance(page,expected,viewportWidth,stage){
+  if(!viewportWidth)return null;
+  // The canonical bridge replaces this detail with innerHTML on reconciliation.
+  // Resolve a fresh locator only for that exact detached-node failure; all three
+  // attempts share one short action budget. Readiness and acceptance stay strict.
+  const maximumAttempts=3,budgetMs=1500,deadline=Date.now()+budgetMs;
+  let attempts=0,detachments=0;
+  try{
+    for(attempts=1;attempts<=maximumAttempts;attempts++){
+      const balance=page.locator('[data-rp-receipt-detail-id="'+expected.receiptId+'"] [data-rp-current-balance]');
+      need(await balance.count()===1,'I66_SIX_SCROLL_BALANCE_MISSING_OR_DUPLICATE_HOLD');
+      need(await balance.isVisible(),'I66_SIX_SCROLL_BALANCE_HIDDEN_HOLD');
+      const timeout=deadline-Date.now();need(timeout>0,'I66_SIX_SCROLL_ACTION_BUDGET_HOLD');
+      try{await balance.scrollIntoViewIfNeeded({timeout});return {attempts,detachments};}
+      catch(error){
+        if(error?.name==='TimeoutError'||!/^locator\.scrollIntoViewIfNeeded: Element is not attached to the DOM(?:\r?\n|$)/.test(String(error?.message||'')))throw error;
+        detachments++;
+        need(attempts<maximumAttempts&&Date.now()<deadline,'I66_SIX_SCROLL_DETACH_PERSISTENT_HOLD');
+      }
+    }
+  }catch(error){
+    error.sixScrollComparison={stage,sourceRequirement:expected.sourceRequirement,receiptId:expected.receiptId,
+      attempts,detachments,maximumAttempts,budgetMs,uiAccepted:false};throw error;
+  }
+}`;
+assert.equal(require('node:crypto').createHash('sha256').update(V16_SCROLL_HELPER).digest('hex'),
+  '6d20028e07cc17e7902cc631eefdae65ab1c4d3444be8d12ba714aabda5a3d83');
+function v16ScrollHelper(extra={}){
+  const context={need:(ok,code)=>{if(!ok)throw Error(code);},...extra};
+  vm.runInNewContext(V16_SCROLL_HELPER+'\nthis.run=showSixReceiptBalance;',context);
+  return context.run;
+}
+
 test('the reading scroll retries only exact detach with fresh locators and one bounded action budget',async()=>{
   const detached=()=>Error('locator.scrollIntoViewIfNeeded: Element is not attached to the DOM\nCall log:');
   let clock=0,locators=0,scrolls=0;const timeouts=[];
@@ -488,6 +524,33 @@ test('a missing, duplicate or hidden balance cannot be recovered as a transient 
     await assert.rejects(harness().probe.showSixReceiptBalance(page,authority.rows[0],390,'BEFORE_RELOAD'),new RegExp(code));
     assert.equal(locators,1);assert.equal(scrolls,0);
   }
+});
+
+test('v16 precheck latency reproduces the zero-scroll HOLD while the original action timeout remains 1500 ms',async()=>{
+  let clock=0,scrolls=0;const timeouts=[];
+  const page={locator:()=>({count:async()=>{clock+=900;return 1;},isVisible:async()=>{clock+=700;return true;},
+    scrollIntoViewIfNeeded:async({timeout})=>{scrolls++;timeouts.push(timeout);}})};
+  await assert.rejects(v16ScrollHelper({Date:{now:()=>clock}})(page,authority.rows[0],1365,'BEFORE_RELOAD'),error=>{
+    assert.equal(error.message,'I66_SIX_SCROLL_ACTION_BUDGET_HOLD');
+    assert.equal(error.sixScrollComparison.attempts,1);assert.equal(error.sixScrollComparison.detachments,0);return true;
+  });assert.equal(scrolls,0);
+  clock=0;
+  assert.deepEqual(plain(await harness({Date:{now:()=>clock}}).probe.showSixReceiptBalance(page,authority.rows[0],1365,'BEFORE_RELOAD')),
+    {attempts:1,detachments:0});
+  assert.equal(scrolls,1);assert.deepEqual(timeouts,[1500]);
+});
+
+test('a detach retry retains its first action deadline even when later prechecks are slow',async()=>{
+  let clock=0,scrolls=0;const timeouts=[];
+  const page={locator:()=>({count:async()=>{clock+=1600;return 1;},isVisible:async()=>true,
+    scrollIntoViewIfNeeded:async({timeout})=>{scrolls++;timeouts.push(timeout);clock+=100;
+      throw Error('locator.scrollIntoViewIfNeeded: Element is not attached to the DOM\nCall log:');}})};
+  await assert.rejects(harness({Date:{now:()=>clock}}).probe.showSixReceiptBalance(page,authority.rows[0],390,'AFTER_RELOAD'),error=>{
+    assert.equal(error.message,'I66_SIX_SCROLL_ACTION_BUDGET_HOLD');
+    assert.equal(error.sixScrollComparison.attempts,2);assert.equal(error.sixScrollComparison.detachments,1);
+    assert.equal(error.sixScrollComparison.scrollCalls,1);assert.equal(error.sixScrollComparison.precheckElapsedMs,3200);
+    assert.equal(error.sixScrollComparison.actionElapsedMs,1700);assert.equal(error.sixScrollComparison.uiAccepted,false);return true;
+  });assert.equal(scrolls,1);assert.deepEqual(timeouts,[1500]);
 });
 
 // This test is mandatory in the dedicated, credential-free Chromium CI job.
@@ -538,6 +601,53 @@ test('real Chromium DOM reproduces canonical detail detachment and preserves str
           financialInputsFingerprint:f.h.probe.focalHash(before.financialInputs),
           serverBalanceProof:f.h.probe.sixServerBalanceProof(f.r,[f.p],f.policy,[],queries)};
         const original=JSON.stringify(data);
+        const reconcilingPrecheckPage=()=>{
+          const trace=[],frame=page.mainFrame(),channel=frame._channel;let occupied=false,scrollResolutions=0;
+          frame._channel=new Proxy(channel,{get(target,key){
+            const value=Reflect.get(target,key);
+            if(!['queryCount','waitForSelector'].includes(key))return value;
+            return async params=>{
+              if(params.selector===selector&&key==='queryCount'&&!occupied){
+                occupied=true;
+                // Real browser work inside the first precheck: repeatedly use
+                // the unchanged renderer and force its actual layout. No fake
+                // clock, delayed Promise, invented locator result or UI value.
+                trace.push(await page.evaluate(({id,client,selector})=>{
+                  const started=performance.now();let renders=0;
+                  while(performance.now()-started<1600&&renders<20000){
+                    if(Orbit.receiptsPortfolioProjection.renderReceiptDetail(id,client)!==true)throw Error('CANONICAL_RENDER_FAILED');
+                    const balance=document.querySelector(selector);if(!balance)throw Error('CANONICAL_BALANCE_MISSING');
+                    balance.getBoundingClientRect();renders++;
+                  }
+                  return {elapsedMs:performance.now()-started,renders};
+                },{id:f.e.receiptId,client:'qa-client',selector}));
+              }
+              if(params.selector===selector&&key==='waitForSelector')scrollResolutions++;
+              return await value(params);
+            };
+          }});
+          return {trace,get scrollResolutions(){return scrollResolutions;},restore:()=>{frame._channel=channel;},
+            locator(css){assert.equal(css,selector);return page.locator(css);}};
+        };
+        const precheckV16=reconcilingPrecheckPage();
+        try{
+          await assert.rejects(v16ScrollHelper()(precheckV16,f.e,width,'BEFORE_RELOAD'),error=>{
+            assert.equal(error.message,'I66_SIX_SCROLL_ACTION_BUDGET_HOLD');
+            assert.equal(error.sixScrollComparison.attempts,1);assert.equal(error.sixScrollComparison.detachments,0);return true;
+          });
+          assert.equal(precheckV16.scrollResolutions,0,'The exact built-v16 helper exhausts its budget before any scroll');
+          assert.ok(precheckV16.trace[0].renders>0);assert.ok(precheckV16.trace[0].elapsedMs>=1600);
+        }finally{precheckV16.restore();}
+        const precheckCurrent=reconcilingPrecheckPage();
+        try{
+          const result=await f.h.probe.showSixReceiptBalance(precheckCurrent,f.e,width,'BEFORE_RELOAD');
+          assert.deepEqual(plain(result),{attempts:1,detachments:0});assert.equal(precheckCurrent.scrollResolutions,1);
+          assert.ok(precheckCurrent.trace[0].renders>0);assert.ok(precheckCurrent.trace[0].elapsedMs>=1600);
+          const visible=await page.evaluate(f.h.probe.inspectSixReceiptBrowser,input);
+          f.h.probe.certifySixReceiptUi(f.e,server,visible,'BEFORE_RELOAD','direccion',width);
+          assert.equal(visible.viewport.balanceVisible,true);assert.equal(visible.viewport.horizontalOverflowPx,0);
+          assert.equal(visible.displayedBalanceCents,27826);assert.equal(visible.displayedGrossCents,27826);
+        }finally{precheckCurrent.restore();}
         const detachingPage=remaining=>{
           const trace=[],frame=page.mainFrame(),channel=frame._channel;
           // Timing seam only, inside the already active public scroll API zone:
