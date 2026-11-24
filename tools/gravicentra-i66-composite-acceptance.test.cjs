@@ -211,6 +211,34 @@ test('a verified rollback preserves its immutable receipt and permits the next g
 function rollbackContext(f){
   return {runId:f.proof.runId,sourceSha:f.request.target.sourceSha,previous:f.request.previous,transport:f.readFile(P.transport)};
 }
+function financialReport(f,j,phase='live'){
+  const releaseOwner=require('./gravicentra-i66-frontend-promotion-owner.cjs'),binding=f.request.financialQa;
+  const rows=Array.from({length:6},(_,i)=>({receiptId:'offline-existing-'+i,serverBalanceProof:{sourceSha:f.p.sourceSha,
+    ownerBlob:'a'.repeat(40),open:true,balanceCents:27826,source:'CARTERA_EXPLICIT'}}));
+  const checks=Object.fromEntries(['balanceState','balanceValue','balanceVerified','contractualDue','gross','operationalLimit','status'].map(k=>[k,true]));
+  const roles=['operativo','direccion'].flatMap((role,index)=>[1365,390].map(width=>{
+    const observations=rows.map(row=>{const ui={actorMatches:true,role,country:'GT',protectedCandidate:true,confirmed:true,
+      relevantErrors:[],detailCount:1,balanceCents:27826,displayedBalanceCents:27826,balanceState:'open',open:true,
+      amountProofSource:'CARTERA_EXPLICIT',viewport:{width,detailVisible:true,balanceVisible:true,horizontalOverflowPx:0}};
+      return {receiptId:row.receiptId,reloadPass:true,beforeCheck:{pass:true,checks:clone(checks)},afterCheck:{pass:true,checks:clone(checks)},
+        beforeReload:clone(ui),afterReload:clone(ui)};});
+    return {role,width,actorSha256:String(index+1).repeat(64),authenticated:true,assignedRoleVerified:true,country:'GT',viewportVerified:true,
+      financialFocal:{sixExistingObligations:true,distinctObligationCount:6,newObligations:0,additionalWrites:0,sourceGrossCents:166956,
+        currentOutstandingCents:166956,policyUnchanged:true,sourceSnapshotBefore:clone(rows),sourceSnapshotAfter:clone(rows),observations,
+        cobrosEngineBeforeReload:{totalGrossCents:166956},cobrosEngineAfterReload:{totalGrossCents:166956},
+        errors:{pageErrors:0,consoleErrors:0,blockedWrites:0,httpClasses:{}}}};
+  }));
+  const before={stage:'before',phase,scopeId:binding.scopeId,readOnly:true,releaseScope:'COMPOSITE',generation:f.request.generation,
+    target:releaseOwner.financialTarget(f.request.target),authorityBlob:binding.authorityBlob,parentAuthorityBlob:binding.parentAuthorityBlob,
+    physicalPhaseKey:phase==='live'?j.key:null,runId:f.proof.runId,workflowHeadSha:f.proof.headSha};
+  return {schema:'GI_I66_BROWSER_PERFORMANCE_READONLY_V2',status:'FRONTEND_SIX_RECEIPTS_TWO_ROLE_TWO_VIEW_READONLY_PASS',phase,
+    scopeId:binding.scopeId,sourceSha:f.p.sourceSha,buildId:f.p.buildId,releaseArtifactId:f.p.artifactId,
+    releaseArtifactDigest:f.p.artifactDigest,releaseBuildRunId:f.p.buildRunId,workflowHeadSha:f.proof.headSha,
+    origin:phase==='live'?'https://app.aysseguros.com':f.p.previewUrl,firestoreWrites:0,businessActions:0,paymentActions:0,
+    syntheticFixtures:0,pushNotifications:0,readOnly:true,roleChanged:false,assignedRoleSelectionOnly:true,
+    fullA04Accepted:false,fullA12Passed:false,errors:[],roles,matrixServerSnapshotBefore:rows,matrixServerSnapshotAfter:clone(rows),
+    frontendQaBefore:before,frontendQaAfter:{...clone(before),stage:'after'},stageCount:48};
+}
 function makeFixture(){
   const f=fixture(),scope=require('./gravicentra-i66-make-release-scope.cjs');
   const examples=makeExamples,sample=examples.fixture().p;
@@ -232,6 +260,24 @@ function makeFixture(){
       canonicalReadback:true,sameImmutableArtifact:true,noOtherOperationalMutations:true,syntheticRestoreComplete:true,
       createdCanonicalLeads:1,replayCanonicalWrites:0,rejectCanonicalWrites:0,externalMessagesSent:0,realLeadAccepted:false,
       reportSha256:'e'.repeat(64),reportBlobSha:'f'.repeat(40)}};
+  const previewReceipt={schema:'GI_I66_FRONTEND_FINANCIAL_PREVIEW_UI_RECEIPT_V1',result:'PASS',readOnly:true,
+    releaseScope:'COMPOSITE',sourceSha:f.p.sourceSha,artifactDigest:f.p.artifactDigest,buildId:f.p.buildId};
+  f.p.financialPreviewQa.receiptPath=genName(f.request.generation,'PREVIEW_UI');
+  f.p.financialPreviewQa.receiptBlob=blob(serial(previewReceipt));
+  f.files.set(f.p.financialPreviewQa.receiptPath,previewReceipt);
+  f.request.financialQa={scopeId:'SIX_RECEIPT_CURRENT_BALANCE_READONLY',authorityBlob:'a'.repeat(40),parentAuthorityBlob:f.request.approvalBlob,
+    previewReceiptPath:f.p.financialPreviewQa.receiptPath,previewReceiptBlob:f.p.financialPreviewQa.receiptBlob};
+  f.model.financialProofs=0;f.model.signedReceipts=0;
+  const signed=f.io.signedReceipt;f.io.signedReceipt=async j=>{f.model.signedReceipts++;return signed(j);};
+  f.financialReport=financialReport;
+  f.io.financialLiveUiProof=async j=>{
+    f.model.financialProofs++;const report=financialReport(f,j),receipt=tx.compositeFinancialUiReceipt(f.request,j,report);
+    const receiptPath=genName(j.generation,'LIVE_UI');f.files.set(receiptPath,receipt);
+    return {result:'PASS',scopeId:f.request.financialQa.scopeId,generation:j.generation,sourceSha:f.p.sourceSha,
+      artifactDigest:f.p.artifactDigest,buildId:f.p.buildId,authorityBlob:f.request.financialQa.authorityBlob,
+      parentAuthorityBlob:f.request.approvalBlob,physicalPhaseKey:j.key,receiptPath,receiptBlob:blob(serial(receipt)),
+      reportSha256:receipt.reportSha256,runId:f.proof.runId,financialQa:report};
+  };
   return f;
 }
 test('five-target successor closes the same artifact with a CLOSED machine ingress and preserves all financial evidence',async()=>{
@@ -239,6 +285,8 @@ test('five-target successor closes the same artifact with a CLOSED machine ingre
   const j=await tx.acceptComposite(f.io,f.request,f.proof);await f.io.verifyCommitted(j);
   const cp=f.readFile(P.cp),tr=f.readFile(P.transport),state=f.readFile(P.state),progress=f.readFile(cp.i66ActiveRecoveryCursor.currentEvidencePath);
   assert.equal(j.phase,'COMMITTED');assert.equal(f.model.clones,0);assert.equal(f.model.commits,1);
+  assert.equal(f.model.financialProofs,1);assert.equal(f.model.signedReceipts,1);
+  assert.equal(j.financialUi.result,'PASS');assert.equal(f.readFile(j.financialUi.receiptPath).financialQa.stageCount,48);
   assert.equal(tr.currentPhysicalBackendRelease.functionsChanged,5);assert.equal(tr.currentPhysicalHostingRelease.backendFunctionsChanged,5);
   assert.equal(cp.i66OperationalContinuation20261115.latestProvenLiveSourceScope,'COMPOSITE_FRONTEND_AND_FIVE_BACKEND_FUNCTIONS_CLOSED_INGRESS_SIGNED_PROOF');
   assert.equal(progress.releaseExecution.status,'COMPOSITE_FIVE_FUNCTIONS_CLOSED_INGRESS_SIGNED_LIVE_ACCEPTED');
@@ -254,6 +302,82 @@ test('five-target successor closes the same artifact with a CLOSED machine ingre
   assert.deepEqual(state.currentPhysicalBackend,tr.currentPhysicalBackendRelease);
   assert.equal(j.liveProof.fullI66ProductionAccepted,false);
   await tx.acceptComposite(f.io,f.request,f.proof);assert.equal(f.model.commits,1);
+  assert.equal(f.model.financialProofs,1);assert.equal(f.model.signedReceipts,1);
+});
+for(const [name,mutate] of [
+  ['missing financial driver',f=>delete f.io.financialLiveUiProof],
+  ['missing binding',f=>delete f.request.financialQa],
+  ['wrong parent',f=>f.request.financialQa.parentAuthorityBlob='0'.repeat(40)],
+  ['failed LIVE observation',f=>f.io.financialLiveUiProof=async()=>{throw Error('OFFLINE_LIVE_UI_HOLD');}],
+  ['47 stages',f=>{const fn=f.io.financialLiveUiProof;f.io.financialLiveUiProof=async j=>{const x=await fn(j);x.financialQa.stageCount=47;return x;};}],
+  ['wrong role',f=>{const fn=f.io.financialLiveUiProof;f.io.financialLiveUiProof=async j=>{const x=await fn(j);x.financialQa.roles[0].role='admin';return x;};}],
+  ['changed source snapshot',f=>{const fn=f.io.financialLiveUiProof;f.io.financialLiveUiProof=async j=>{const x=await fn(j);x.financialQa.matrixServerSnapshotAfter[0].serverBalanceProof.balanceCents++;return x;};}],
+  ['reload not proved',f=>{const fn=f.io.financialLiveUiProof;f.io.financialLiveUiProof=async j=>{const x=await fn(j);x.financialQa.roles[0].financialFocal.observations[0].reloadPass=false;return x;};}],
+  ['wrong artifact',f=>{const fn=f.io.financialLiveUiProof;f.io.financialLiveUiProof=async j=>{const x=await fn(j);x.financialQa.releaseArtifactDigest='sha256:'+'0'.repeat(64);return x;};}],
+  ['wrong report hash',f=>{const fn=f.io.financialLiveUiProof;f.io.financialLiveUiProof=async j=>({...await fn(j),reportSha256:'0'.repeat(64)});}],
+  ['wrong receipt bytes',f=>{const fn=f.io.financialLiveUiProof;f.io.financialLiveUiProof=async j=>({...await fn(j),receiptBlob:'0'.repeat(40)});}],
+  ['financial write',f=>{const fn=f.io.financialLiveUiProof;f.io.financialLiveUiProof=async j=>{const x=await fn(j);x.financialQa.firestoreWrites=1;return x;};}]
+])test('five-target acceptance refuses '+name+' before signing or advancing physical control',async()=>{
+  const f=makeFixture(),before=serial(f.readFile(P.cp));mutate(f);await assert.rejects(tx.acceptComposite(f.io,f.request,f.proof));
+  assert.equal(f.model.signedReceipts,0);assert.equal(f.model.commits,0);assert.equal(serial(f.readFile(P.cp)),before);
+});
+test('the actual financial certifier keeps the parent responsive and recovers a lost signed-UI acknowledgement before one close',async()=>{
+  const releaseOwner=require('./gravicentra-i66-frontend-promotion-owner.cjs'),f=makeFixture(),vm=require('node:vm');
+  const path=require('node:path'),os=require('node:os'),crypto=require('node:crypto');
+  const tmp=fs.mkdtempSync(path.join(os.tmpdir(),'offline-composite-financial-certifier-'));
+  const source=fs.readFileSync(require.resolve('./gravicentra-i66-frontend-promotion-owner.cjs'),'utf8');
+  const start=source.indexOf('async function certifyCompositeFinancialLive('),end=source.indexOf('\nfunction nextCompositeGeneration(',start);
+  assert.ok(start>0&&end>start);let heartbeat=0,writes=0,reads=0,signatures=0,children=0;
+  const timer=setInterval(()=>heartbeat++,2),sha='b'.repeat(40),financialDriver='tools/gravicentra-i66-live-performance-readonly.mjs';
+  const context={assert,fs,path,crypto,JSON,genName,serial,blob,runId:f.proof.runId,FINANCIAL_DRIVER:financialDriver,FINANCIAL_SCOPE:releaseOwner.FINANCIAL_SCOPE,
+    process:{execPath:process.execPath,env:{RUNNER_TEMP:tmp}},remote:()=>sha,
+    optional:(_head,p)=>f.files.get(p)||null,blobAt:(_head,p)=>blob(serial(f.readFile(p))),
+    validateFinancialPhasePair:releaseOwner.validateFinancialPhasePair,
+    runReleaseChild:async(file,args,options)=>{
+      children++;assert.equal(file,process.execPath);assert.deepEqual(Array.from(args),[financialDriver]);
+      assert.equal(options.env.GI_I66_READONLY_MODE,'six-frontend-release');assert.equal(options.env.GI_I66_PERF_PHASE,'live');
+      const j=f.files.get(f.jp),encoded=Buffer.from(serial(financialReport(f,j))).toString('base64');
+      const child="setTimeout(()=>require('node:fs').writeFileSync(process.argv[1],Buffer.from(process.argv[2],'base64')),75)";
+      await releaseOwner.runReleaseChild(file,['-e',child,options.env.GI_I66_PERF_REPORT,encoded],{stdio:'ignore',timeout:5000});
+      assert.ok(heartbeat>1,'FINANCIAL_CHILD_BLOCKED_RELEASE_PARENT');
+    },
+    casCommit:async(head,_headline,entries)=>{
+      assert.equal(head,sha);
+      return releaseOwner.commitWithReadback({write:async()=>{
+        writes++;for(const [p,value]of Object.entries(entries))f.files.set(p,JSON.parse(serial(value)));
+        throw Object.assign(new TypeError('fetch failed'),{cause:{code:'ECONNRESET'}});
+      },readback:async()=>{reads++;for(const [p,value]of Object.entries(entries))assert.equal(blob(serial(f.readFile(p))),blob(serial(value)));
+        return {status:'EXACT_COMMIT',sha};},verifySignature:async value=>{assert.equal(value,sha);signatures++;},pause:async()=>{}});
+    }
+  };
+  vm.runInNewContext(source.slice(start,end)+'\nthis.certify=certifyCompositeFinancialLive;',context);
+  f.io.financialLiveUiProof=async j=>context.certify({request:f.request,journal:j,validateCurrent:head=>assert.equal(head,sha),
+    preview:{report:financialReport(f,j,'preview'),qa:{previewReadOnlyAuthorityBlob:f.request.financialQa.authorityBlob,
+      parentAuthorityBlob:f.request.approvalBlob}}});
+  try{const j=await tx.acceptComposite(f.io,f.request,f.proof);await f.io.verifyCommitted(j);
+    assert.equal(j.phase,'COMMITTED');assert.deepEqual({children,writes,reads,signatures},{children:1,writes:1,reads:1,signatures:1});
+    assert.equal(f.model.signedReceipts,1);assert.equal(f.model.commits,1);}
+  finally{clearInterval(timer);fs.rmSync(tmp,{recursive:true,force:true});}
+});
+test('composed financial authority keeps its exact parent binding and cross-phase source snapshots',()=>{
+  const releaseOwner=require('./gravicentra-i66-frontend-promotion-owner.cjs'),f=makeFixture(),j={key:tx.digest(f.request)};
+  const raw={scopeId:releaseOwner.FINANCIAL_SCOPE,gate:'I6.6',status:'DIRECTION_APPROVED_EXACT_PREVIEW',approvedByDirection:true,
+    generation:f.request.generation,readOnlyQa:true,backendDeployAllowed:false,businessWritesAllowed:false,releaseScope:'COMPOSITE',
+    parentScopeId:require('./gravicentra-i66-make-release-scope.cjs').SCOPE,parentAuthorityBlob:f.request.approvalBlob,
+    target:releaseOwner.financialTarget(f.request.target),ownerPins:Object.fromEntries(releaseOwner.financialQaPaths('COMPOSITE').map(p=>[p,'1'.repeat(40)])),
+    previewReceiptPath:f.p.financialPreviewQa.receiptPath,previewReceiptBlob:f.p.financialPreviewQa.receiptBlob};
+  assert.deepEqual(releaseOwner.compositeFinancialBinding(raw,f.request.financialQa.authorityBlob,f.transport,f.request.approvalBlob,f.p),f.request.financialQa);
+  for(const mutate of [x=>x.parentAuthorityBlob='0'.repeat(40),x=>x.businessWritesAllowed=true,x=>x.backendDeployAllowed=true,
+    x=>x.target.artifactDigest='sha256:'+'0'.repeat(64),x=>delete x.ownerPins['tools/gravicentra-i66-frontend-promotion-owner.cjs'],
+    x=>x.previewReceiptBlob='0'.repeat(40)]){
+    const bad=clone(raw);mutate(bad);assert.throws(()=>releaseOwner.compositeFinancialBinding(bad,f.request.financialQa.authorityBlob,f.transport,f.request.approvalBlob,f.p));
+  }
+  const preview=financialReport(f,j,'preview'),live=financialReport(f,j),options={previewAuthorityBlob:f.request.financialQa.authorityBlob,
+    previewParentAuthorityBlob:f.request.approvalBlob,authorityBlob:f.request.financialQa.authorityBlob,parentAuthorityBlob:f.request.approvalBlob,physicalPhaseKey:j.key};
+  assert.doesNotThrow(()=>releaseOwner.validateFinancialPhasePair(preview,live,f.request.target,options));
+  const changed=clone(live);for(const rows of [changed.matrixServerSnapshotBefore,changed.matrixServerSnapshotAfter,
+    ...changed.roles.flatMap(row=>[row.financialFocal.sourceSnapshotBefore,row.financialFocal.sourceSnapshotAfter])])rows[0].financialAudit='changed';
+  assert.throws(()=>releaseOwner.validateFinancialPhasePair(preview,changed,f.request.target,options),/SOURCE_CHANGED_BETWEEN_PREVIEW_AND_LIVE/);
 });
 test('five-target close refuses fake previous revision, active ingress, missing AuthContext or widened IAM',async()=>{
   for(const mutate of [f=>f.proof.backendRevisions[4].previousRevision='invented-prior',

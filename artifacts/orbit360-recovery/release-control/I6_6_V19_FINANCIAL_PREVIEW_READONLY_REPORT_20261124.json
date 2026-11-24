@@ -1,0 +1,3707 @@
+{
+  "schema": "GI_I66_BROWSER_PERFORMANCE_READONLY_V2",
+  "project": "ays-orbit-360-lab",
+  "tenant": "alianzas-soluciones",
+  "origin": "https://ays-orbit-360-lab--gi-i66-rc-45376108486-ay88xomk.web.app",
+  "gate": "I6.6",
+  "sourceSha": "04155aa7bc80e177ee57e50223506e47194bbe3d",
+  "buildId": "gi-i66-04155aa7bc80-57f234755dc1",
+  "releaseArtifactId": 14911361853,
+  "releaseArtifactDigest": "sha256:d0e721bcd56dd0d4bc4aa31d5579e8f1d140eb1990c7bbbb543014cbb40977b1",
+  "releaseBuildRunId": 45376108486,
+  "phase": "preview",
+  "workflowHeadSha": "153b28142a8c43a4bb81a2357fbed17a440d2c8f",
+  "readOnly": true,
+  "firestoreWrites": 0,
+  "businessActions": 0,
+  "paymentActions": 0,
+  "syntheticFixtures": 0,
+  "pushNotifications": 0,
+  "roleChanged": false,
+  "auth": {},
+  "routes": [],
+  "mobile": {},
+  "errors": [
+    "pagewaitForFunction:Timeout60000msexceeded"
+  ],
+  "notes": [],
+  "scopeId": "SIX_RECEIPT_CURRENT_BALANCE_READONLY",
+  "frontendQaBefore": {
+    "schema": "GI_I66_FRONTEND_FINANCIAL_QA_AUTHORITY_V1",
+    "stage": "before",
+    "phase": "preview",
+    "scopeId": "SIX_RECEIPT_CURRENT_BALANCE_READONLY",
+    "generation": 6,
+    "target": {
+      "sourceSha": "04155aa7bc80e177ee57e50223506e47194bbe3d",
+      "artifactId": 14911361853,
+      "artifactDigest": "sha256:d0e721bcd56dd0d4bc4aa31d5579e8f1d140eb1990c7bbbb543014cbb40977b1",
+      "buildId": "gi-i66-04155aa7bc80-57f234755dc1",
+      "buildRunId": 45376108486,
+      "previewUrl": "https://ays-orbit-360-lab--gi-i66-rc-45376108486-ay88xomk.web.app",
+      "previewChannel": "gi-i66-rc-45376108486"
+    },
+    "authorityBlob": "40bed3876a16788b08206dd7815d5923ddc3e9b9",
+    "physicalPhaseKey": null,
+    "runId": 45377039246,
+    "workflowHeadSha": "153b28142a8c43a4bb81a2357fbed17a440d2c8f",
+    "remoteControlHead": "153b28142a8c43a4bb81a2357fbed17a440d2c8f",
+    "readOnly": true
+  },
+  "assignedRoleSelectionOnly": true,
+  "fullA04Accepted": false,
+  "fullA12Passed": false,
+  "roles": [
+    {
+      "role": "operativo",
+      "actorSha256": "d5384adb0f2e3a0612923fff21861f8e6583c7d3ef8b9f5ea7d01ad6664e5f1d",
+      "country": "GT",
+      "width": 1365,
+      "authenticated": true,
+      "assignedRoleVerified": true,
+      "viewportVerified": true,
+      "financialFocal": {
+        "authorityPath": "artifacts/orbit360-recovery/release-control/I6_6_FINANCIAL_SIX_EXISTING_RECEIPTS_READBACK_20261123_RUN45272554046.json",
+        "authoritySha256": "57fea2606809ddae2a5141f40af196348138b78d2a1d5ae340d42f3481b720ec",
+        "writeRunId": 45272554046,
+        "sixExistingObligations": true,
+        "newObligations": 0,
+        "additionalWrites": 0,
+        "sourceSnapshotBefore": [
+          {
+            "receiptId": "rec_98478284ecec24ad3d851ec0",
+            "portfolioId": "car_f08268f1ce68554f0375fcac",
+            "policyId": "pol_08ef784b45dab5a2acbfa556442c",
+            "portfolioPolicyId": "pol_08ef784b45dab5a2acbfa556442c",
+            "portfolioReceiptId": "rec_98478284ecec24ad3d851ec0",
+            "clientCoherent": true,
+            "requirement": "5228533",
+            "contractualDue": "2026-11-02",
+            "operationalLimit": "2026-11-02",
+            "currency": "GTQ",
+            "portfolioCurrency": "GTQ",
+            "grossCents": 27826,
+            "portfolioGrossCents": 27826,
+            "receiptState": {
+              "estadoOperativo": "futuro_pendiente"
+            },
+            "portfolioState": {
+              "estadoOperativo": "futuro_pendiente"
+            },
+            "portfolioMatches": 1,
+            "cobrosTruncated": false,
+            "cobrosCount": 0,
+            "cobrosFingerprints": [],
+            "rawFinancialInputsFingerprint": "13dd1663f01083a6d7dc613cd8d7bf079e2c0f39754da8f9fce6f5a53e920409",
+            "financialInputsFingerprint": "f20d302806ed1fdd9fcf183aa47ace522cd0f617cbdc340c801d3b7c11a3a89c",
+            "financialReadProjection": {
+              "owner": "functions/b4-003-scoped-related-reader.js#financialView",
+              "acceptedSourceSha": "04155aa7bc80e177ee57e50223506e47194bbe3d",
+              "fields": [
+                "pais"
+              ],
+              "country": "GT",
+              "rawToProjection": {
+                "schema": "GI_I66_REDACTED_FINANCIAL_INPUT_DIFF_V1",
+                "detailsAvailable": true,
+                "serverCobrosCount": 0,
+                "browserCobrosCount": 0,
+                "differingFieldCount": 2,
+                "differences": [
+                  {
+                    "path": "receipt.pais",
+                    "serverPresent": false,
+                    "browserPresent": true,
+                    "serverType": "absent",
+                    "browserType": "string",
+                    "serverDigest": null,
+                    "browserDigest": "2af2fd09c5f6a9a429030371f7529aa25b3a4b7ce5fc478585cb5be5e446afe8"
+                  },
+                  {
+                    "path": "portfolio.pais",
+                    "serverPresent": false,
+                    "browserPresent": true,
+                    "serverType": "absent",
+                    "browserType": "string",
+                    "serverDigest": null,
+                    "browserDigest": "2af2fd09c5f6a9a429030371f7529aa25b3a4b7ce5fc478585cb5be5e446afe8"
+                  }
+                ],
+                "truncated": false,
+                "valueDisclosure": "NONE_EPHEMERALLY_SALTED_HASHES_ONLY"
+              }
+            },
+            "rollbackPresent": true,
+            "auditIdentity": true,
+            "receiptFingerprint": "fa69ebb3c32507cfb9f7a555b8c8822c789dd181712d5b5324c0343c938170ba",
+            "portfolioFingerprint": "da85d32506a50cccd5a1debc3db1338b99b8b932576724b412574a8d7dff6827",
+            "auditFingerprint": "9735cdd8f67d05999151b92ee365d53ca6a184992f14fc1d1be7670c43dbff5b",
+            "serverBalanceProof": {
+              "sourceSha": "04155aa7bc80e177ee57e50223506e47194bbe3d",
+              "ownerBlob": "b77b65f86ef6ac2ab6dc157fdbc9ad5e34dbcdcc",
+              "source": "MATCHED_EXPECTED_RECEIPT_CONTRACTUAL_AMOUNT",
+              "open": true,
+              "balanceCents": 27826,
+              "scope": "EXACT_RECEIPT_LINKED_PORTFOLIO_POLICY_AND_LINKED_PAYMENTS"
+            }
+          },
+          {
+            "receiptId": "rec_fb4ae3b5ee66fb31dbe34702",
+            "portfolioId": "car_55c55df1fd5bcc541b70fc86",
+            "policyId": "pol_08ef784b45dab5a2acbfa556442c",
+            "portfolioPolicyId": "pol_08ef784b45dab5a2acbfa556442c",
+            "portfolioReceiptId": "rec_fb4ae3b5ee66fb31dbe34702",
+            "clientCoherent": true,
+            "requirement": "5228534",
+            "contractualDue": "2026-12-02",
+            "operationalLimit": "2026-12-02",
+            "currency": "GTQ",
+            "portfolioCurrency": "GTQ",
+            "grossCents": 27826,
+            "portfolioGrossCents": 27826,
+            "receiptState": {
+              "estadoOperativo": "futuro_pendiente"
+            },
+            "portfolioState": {
+              "estadoOperativo": "futuro_pendiente"
+            },
+            "portfolioMatches": 1,
+            "cobrosTruncated": false,
+            "cobrosCount": 0,
+            "cobrosFingerprints": [],
+            "rawFinancialInputsFingerprint": "112fe49cf5dd04db01ebe11b98a23e69a3b43f67c2fcf030c5b0793b89d566ce",
+            "financialInputsFingerprint": "6d42e2403e8ca4e79d71200bedf1e2705ef633f197fde87d32403657fa805ff2",
+            "financialReadProjection": {
+              "owner": "functions/b4-003-scoped-related-reader.js#financialView",
+              "acceptedSourceSha": "04155aa7bc80e177ee57e50223506e47194bbe3d",
+              "fields": [
+                "pais"
+              ],
+              "country": "GT",
+              "rawToProjection": {
+                "schema": "GI_I66_REDACTED_FINANCIAL_INPUT_DIFF_V1",
+                "detailsAvailable": true,
+                "serverCobrosCount": 0,
+                "browserCobrosCount": 0,
+                "differingFieldCount": 2,
+                "differences": [
+                  {
+                    "path": "receipt.pais",
+                    "serverPresent": false,
+                    "browserPresent": true,
+                    "serverType": "absent",
+                    "browserType": "string",
+                    "serverDigest": null,
+                    "browserDigest": "2af2fd09c5f6a9a429030371f7529aa25b3a4b7ce5fc478585cb5be5e446afe8"
+                  },
+                  {
+                    "path": "portfolio.pais",
+                    "serverPresent": false,
+                    "browserPresent": true,
+                    "serverType": "absent",
+                    "browserType": "string",
+                    "serverDigest": null,
+                    "browserDigest": "2af2fd09c5f6a9a429030371f7529aa25b3a4b7ce5fc478585cb5be5e446afe8"
+                  }
+                ],
+                "truncated": false,
+                "valueDisclosure": "NONE_EPHEMERALLY_SALTED_HASHES_ONLY"
+              }
+            },
+            "rollbackPresent": true,
+            "auditIdentity": true,
+            "receiptFingerprint": "9b9d83a4eb70f8f0c03d0ecf0bd1af62756a311e234f6aba51ffc1b92e70b960",
+            "portfolioFingerprint": "f88bf2e64baad77f6d1a60e8e44f21f5c02f27b1f6b7b7bbd727f0ab0924fe2f",
+            "auditFingerprint": "9081baa1df02ac182c93bf16fa59cff4a266eaf08d93678751714fff77fc3d31",
+            "serverBalanceProof": {
+              "sourceSha": "04155aa7bc80e177ee57e50223506e47194bbe3d",
+              "ownerBlob": "b77b65f86ef6ac2ab6dc157fdbc9ad5e34dbcdcc",
+              "source": "MATCHED_EXPECTED_RECEIPT_CONTRACTUAL_AMOUNT",
+              "open": true,
+              "balanceCents": 27826,
+              "scope": "EXACT_RECEIPT_LINKED_PORTFOLIO_POLICY_AND_LINKED_PAYMENTS"
+            }
+          },
+          {
+            "receiptId": "rec_d76a756f3ab691bd675adebd",
+            "portfolioId": "car_e923fc80be31f62b5a0fa720",
+            "policyId": "pol_08ef784b45dab5a2acbfa556442c",
+            "portfolioPolicyId": "pol_08ef784b45dab5a2acbfa556442c",
+            "portfolioReceiptId": "rec_d76a756f3ab691bd675adebd",
+            "clientCoherent": true,
+            "requirement": "5228535",
+            "contractualDue": "2027-01-02",
+            "operationalLimit": "2027-01-02",
+            "currency": "GTQ",
+            "portfolioCurrency": "GTQ",
+            "grossCents": 27826,
+            "portfolioGrossCents": 27826,
+            "receiptState": {
+              "estadoOperativo": "futuro_pendiente"
+            },
+            "portfolioState": {
+              "estadoOperativo": "futuro_pendiente"
+            },
+            "portfolioMatches": 1,
+            "cobrosTruncated": false,
+            "cobrosCount": 0,
+            "cobrosFingerprints": [],
+            "rawFinancialInputsFingerprint": "e0c306e2912d99bb8b5782ec455fa3d425947992645a9af878a5695e40a99479",
+            "financialInputsFingerprint": "042bf8e811678bd6313775fb34205b84d9b22f0e67cc0e021d0a2d2d2f262486",
+            "financialReadProjection": {
+              "owner": "functions/b4-003-scoped-related-reader.js#financialView",
+              "acceptedSourceSha": "04155aa7bc80e177ee57e50223506e47194bbe3d",
+              "fields": [
+                "pais"
+              ],
+              "country": "GT",
+              "rawToProjection": {
+                "schema": "GI_I66_REDACTED_FINANCIAL_INPUT_DIFF_V1",
+                "detailsAvailable": true,
+                "serverCobrosCount": 0,
+                "browserCobrosCount": 0,
+                "differingFieldCount": 2,
+                "differences": [
+                  {
+                    "path": "receipt.pais",
+                    "serverPresent": false,
+                    "browserPresent": true,
+                    "serverType": "absent",
+                    "browserType": "string",
+                    "serverDigest": null,
+                    "browserDigest": "2af2fd09c5f6a9a429030371f7529aa25b3a4b7ce5fc478585cb5be5e446afe8"
+                  },
+                  {
+                    "path": "portfolio.pais",
+                    "serverPresent": false,
+                    "browserPresent": true,
+                    "serverType": "absent",
+                    "browserType": "string",
+                    "serverDigest": null,
+                    "browserDigest": "2af2fd09c5f6a9a429030371f7529aa25b3a4b7ce5fc478585cb5be5e446afe8"
+                  }
+                ],
+                "truncated": false,
+                "valueDisclosure": "NONE_EPHEMERALLY_SALTED_HASHES_ONLY"
+              }
+            },
+            "rollbackPresent": true,
+            "auditIdentity": true,
+            "receiptFingerprint": "4344e5af58f708dabbb841efa26180ac764a7d1975ef1eafdb2a8a2c9735cb1c",
+            "portfolioFingerprint": "c76a023a6f9fe28463039b9b948ab55b55687c410c37a8c093cc0fce1a3ed37c",
+            "auditFingerprint": "ec0d1652f4f5f3a9916494ce224721f91d243952654e3da225609eb8cbaa80fa",
+            "serverBalanceProof": {
+              "sourceSha": "04155aa7bc80e177ee57e50223506e47194bbe3d",
+              "ownerBlob": "b77b65f86ef6ac2ab6dc157fdbc9ad5e34dbcdcc",
+              "source": "MATCHED_EXPECTED_RECEIPT_CONTRACTUAL_AMOUNT",
+              "open": true,
+              "balanceCents": 27826,
+              "scope": "EXACT_RECEIPT_LINKED_PORTFOLIO_POLICY_AND_LINKED_PAYMENTS"
+            }
+          },
+          {
+            "receiptId": "rec_4f659319f7e5e56008788817",
+            "portfolioId": "car_64d4f76fc02fc36cdff837ed",
+            "policyId": "pol_08ef784b45dab5a2acbfa556442c",
+            "portfolioPolicyId": "pol_08ef784b45dab5a2acbfa556442c",
+            "portfolioReceiptId": "rec_4f659319f7e5e56008788817",
+            "clientCoherent": true,
+            "requirement": "5228536",
+            "contractualDue": "2027-02-02",
+            "operationalLimit": "2027-02-02",
+            "currency": "GTQ",
+            "portfolioCurrency": "GTQ",
+            "grossCents": 27826,
+            "portfolioGrossCents": 27826,
+            "receiptState": {
+              "estadoOperativo": "futuro_pendiente"
+            },
+            "portfolioState": {
+              "estadoOperativo": "futuro_pendiente"
+            },
+            "portfolioMatches": 1,
+            "cobrosTruncated": false,
+            "cobrosCount": 0,
+            "cobrosFingerprints": [],
+            "rawFinancialInputsFingerprint": "37668ae675e2119893a989b4ee51c43cd6fb48cee9842b85ab22ab2f59aa5955",
+            "financialInputsFingerprint": "7ef2ccb37f6039e236498e6303d7e203b8526278e6c83b9791d5af0ef51bee2f",
+            "financialReadProjection": {
+              "owner": "functions/b4-003-scoped-related-reader.js#financialView",
+              "acceptedSourceSha": "04155aa7bc80e177ee57e50223506e47194bbe3d",
+              "fields": [
+                "pais"
+              ],
+              "country": "GT",
+              "rawToProjection": {
+                "schema": "GI_I66_REDACTED_FINANCIAL_INPUT_DIFF_V1",
+                "detailsAvailable": true,
+                "serverCobrosCount": 0,
+                "browserCobrosCount": 0,
+                "differingFieldCount": 2,
+                "differences": [
+                  {
+                    "path": "receipt.pais",
+                    "serverPresent": false,
+                    "browserPresent": true,
+                    "serverType": "absent",
+                    "browserType": "string",
+                    "serverDigest": null,
+                    "browserDigest": "2af2fd09c5f6a9a429030371f7529aa25b3a4b7ce5fc478585cb5be5e446afe8"
+                  },
+                  {
+                    "path": "portfolio.pais",
+                    "serverPresent": false,
+                    "browserPresent": true,
+                    "serverType": "absent",
+                    "browserType": "string",
+                    "serverDigest": null,
+                    "browserDigest": "2af2fd09c5f6a9a429030371f7529aa25b3a4b7ce5fc478585cb5be5e446afe8"
+                  }
+                ],
+                "truncated": false,
+                "valueDisclosure": "NONE_EPHEMERALLY_SALTED_HASHES_ONLY"
+              }
+            },
+            "rollbackPresent": true,
+            "auditIdentity": true,
+            "receiptFingerprint": "fbe5469d8e0c30b72690bd25c6845679dfbacfc46c8b7d9be520be8edfbdb4e5",
+            "portfolioFingerprint": "31628c648f9666b8780ca32d2597e3f3900ab8890e768405cf4637c8638607cd",
+            "auditFingerprint": "e7112948ebcd783cf9a2b182c921e3c9b2c62827d1f5c7a52d98dd08fc201681",
+            "serverBalanceProof": {
+              "sourceSha": "04155aa7bc80e177ee57e50223506e47194bbe3d",
+              "ownerBlob": "b77b65f86ef6ac2ab6dc157fdbc9ad5e34dbcdcc",
+              "source": "MATCHED_EXPECTED_RECEIPT_CONTRACTUAL_AMOUNT",
+              "open": true,
+              "balanceCents": 27826,
+              "scope": "EXACT_RECEIPT_LINKED_PORTFOLIO_POLICY_AND_LINKED_PAYMENTS"
+            }
+          },
+          {
+            "receiptId": "rec_6dad42c3f5d06b15fea34726",
+            "portfolioId": "car_3c6dd87039503edb71f2b84e",
+            "policyId": "pol_08ef784b45dab5a2acbfa556442c",
+            "portfolioPolicyId": "pol_08ef784b45dab5a2acbfa556442c",
+            "portfolioReceiptId": "rec_6dad42c3f5d06b15fea34726",
+            "clientCoherent": true,
+            "requirement": "5228537",
+            "contractualDue": "2027-03-02",
+            "operationalLimit": "2027-03-02",
+            "currency": "GTQ",
+            "portfolioCurrency": "GTQ",
+            "grossCents": 27826,
+            "portfolioGrossCents": 27826,
+            "receiptState": {
+              "estadoOperativo": "futuro_pendiente"
+            },
+            "portfolioState": {
+              "estadoOperativo": "futuro_pendiente"
+            },
+            "portfolioMatches": 1,
+            "cobrosTruncated": false,
+            "cobrosCount": 0,
+            "cobrosFingerprints": [],
+            "rawFinancialInputsFingerprint": "de7000616ba08f70cb7185df110b2aadc68268f7575b07ed8db91d38fe9ff80c",
+            "financialInputsFingerprint": "350f638df53c2ade5098f8926a6d4c1c7f821079816a9a207af8ed3e40268a85",
+            "financialReadProjection": {
+              "owner": "functions/b4-003-scoped-related-reader.js#financialView",
+              "acceptedSourceSha": "04155aa7bc80e177ee57e50223506e47194bbe3d",
+              "fields": [
+                "pais"
+              ],
+              "country": "GT",
+              "rawToProjection": {
+                "schema": "GI_I66_REDACTED_FINANCIAL_INPUT_DIFF_V1",
+                "detailsAvailable": true,
+                "serverCobrosCount": 0,
+                "browserCobrosCount": 0,
+                "differingFieldCount": 2,
+                "differences": [
+                  {
+                    "path": "receipt.pais",
+                    "serverPresent": false,
+                    "browserPresent": true,
+                    "serverType": "absent",
+                    "browserType": "string",
+                    "serverDigest": null,
+                    "browserDigest": "2af2fd09c5f6a9a429030371f7529aa25b3a4b7ce5fc478585cb5be5e446afe8"
+                  },
+                  {
+                    "path": "portfolio.pais",
+                    "serverPresent": false,
+                    "browserPresent": true,
+                    "serverType": "absent",
+                    "browserType": "string",
+                    "serverDigest": null,
+                    "browserDigest": "2af2fd09c5f6a9a429030371f7529aa25b3a4b7ce5fc478585cb5be5e446afe8"
+                  }
+                ],
+                "truncated": false,
+                "valueDisclosure": "NONE_EPHEMERALLY_SALTED_HASHES_ONLY"
+              }
+            },
+            "rollbackPresent": true,
+            "auditIdentity": true,
+            "receiptFingerprint": "8897f4003b8a86c03c31470a0c63edb9e0aa2245289f1d689d1070a3e5dc93c5",
+            "portfolioFingerprint": "24aa70b7b5f6dd17e96edf730ca4800bffb132cf348181178320198bbf5a5071",
+            "auditFingerprint": "862e04d4a98220d885c31c8f8471164aad60cd646cf63512349caff4961c2909",
+            "serverBalanceProof": {
+              "sourceSha": "04155aa7bc80e177ee57e50223506e47194bbe3d",
+              "ownerBlob": "b77b65f86ef6ac2ab6dc157fdbc9ad5e34dbcdcc",
+              "source": "MATCHED_EXPECTED_RECEIPT_CONTRACTUAL_AMOUNT",
+              "open": true,
+              "balanceCents": 27826,
+              "scope": "EXACT_RECEIPT_LINKED_PORTFOLIO_POLICY_AND_LINKED_PAYMENTS"
+            }
+          },
+          {
+            "receiptId": "rec_538e6f8235084bb286d2d6d6",
+            "portfolioId": "car_d9fa6067a3a3930d14df779a",
+            "policyId": "pol_08ef784b45dab5a2acbfa556442c",
+            "portfolioPolicyId": "pol_08ef784b45dab5a2acbfa556442c",
+            "portfolioReceiptId": "rec_538e6f8235084bb286d2d6d6",
+            "clientCoherent": true,
+            "requirement": "5228538",
+            "contractualDue": "2027-04-02",
+            "operationalLimit": "2027-04-02",
+            "currency": "GTQ",
+            "portfolioCurrency": "GTQ",
+            "grossCents": 27826,
+            "portfolioGrossCents": 27826,
+            "receiptState": {
+              "estadoOperativo": "futuro_pendiente"
+            },
+            "portfolioState": {
+              "estadoOperativo": "futuro_pendiente"
+            },
+            "portfolioMatches": 1,
+            "cobrosTruncated": false,
+            "cobrosCount": 0,
+            "cobrosFingerprints": [],
+            "rawFinancialInputsFingerprint": "2f6165686b07a8a399dc07853908cafe87571a2f04d3a29122e7e55a2d703438",
+            "financialInputsFingerprint": "d9d2d1eec36ab5e9b6bbb009330d6841baf83ad250651510c80d250bb2e2f196",
+            "financialReadProjection": {
+              "owner": "functions/b4-003-scoped-related-reader.js#financialView",
+              "acceptedSourceSha": "04155aa7bc80e177ee57e50223506e47194bbe3d",
+              "fields": [
+                "pais"
+              ],
+              "country": "GT",
+              "rawToProjection": {
+                "schema": "GI_I66_REDACTED_FINANCIAL_INPUT_DIFF_V1",
+                "detailsAvailable": true,
+                "serverCobrosCount": 0,
+                "browserCobrosCount": 0,
+                "differingFieldCount": 2,
+                "differences": [
+                  {
+                    "path": "receipt.pais",
+                    "serverPresent": false,
+                    "browserPresent": true,
+                    "serverType": "absent",
+                    "browserType": "string",
+                    "serverDigest": null,
+                    "browserDigest": "2af2fd09c5f6a9a429030371f7529aa25b3a4b7ce5fc478585cb5be5e446afe8"
+                  },
+                  {
+                    "path": "portfolio.pais",
+                    "serverPresent": false,
+                    "browserPresent": true,
+                    "serverType": "absent",
+                    "browserType": "string",
+                    "serverDigest": null,
+                    "browserDigest": "2af2fd09c5f6a9a429030371f7529aa25b3a4b7ce5fc478585cb5be5e446afe8"
+                  }
+                ],
+                "truncated": false,
+                "valueDisclosure": "NONE_EPHEMERALLY_SALTED_HASHES_ONLY"
+              }
+            },
+            "rollbackPresent": true,
+            "auditIdentity": true,
+            "receiptFingerprint": "827a1b1c68e408bee0da3df9e976d94e977ac36a34088df71f7747af8083344c",
+            "portfolioFingerprint": "6e83fcf0f7aa57c321d18ffbc934193fb269dc77be442220ad0486db6269bdcd",
+            "auditFingerprint": "23df506af121c585b48844e612f75babc388f4c47ba26649e52999ede42a7ea0",
+            "serverBalanceProof": {
+              "sourceSha": "04155aa7bc80e177ee57e50223506e47194bbe3d",
+              "ownerBlob": "b77b65f86ef6ac2ab6dc157fdbc9ad5e34dbcdcc",
+              "source": "MATCHED_EXPECTED_RECEIPT_CONTRACTUAL_AMOUNT",
+              "open": true,
+              "balanceCents": 27826,
+              "scope": "EXACT_RECEIPT_LINKED_PORTFOLIO_POLICY_AND_LINKED_PAYMENTS"
+            }
+          }
+        ],
+        "sourceSnapshotAfter": [
+          {
+            "receiptId": "rec_98478284ecec24ad3d851ec0",
+            "portfolioId": "car_f08268f1ce68554f0375fcac",
+            "policyId": "pol_08ef784b45dab5a2acbfa556442c",
+            "portfolioPolicyId": "pol_08ef784b45dab5a2acbfa556442c",
+            "portfolioReceiptId": "rec_98478284ecec24ad3d851ec0",
+            "clientCoherent": true,
+            "requirement": "5228533",
+            "contractualDue": "2026-11-02",
+            "operationalLimit": "2026-11-02",
+            "currency": "GTQ",
+            "portfolioCurrency": "GTQ",
+            "grossCents": 27826,
+            "portfolioGrossCents": 27826,
+            "receiptState": {
+              "estadoOperativo": "futuro_pendiente"
+            },
+            "portfolioState": {
+              "estadoOperativo": "futuro_pendiente"
+            },
+            "portfolioMatches": 1,
+            "cobrosTruncated": false,
+            "cobrosCount": 0,
+            "cobrosFingerprints": [],
+            "rawFinancialInputsFingerprint": "13dd1663f01083a6d7dc613cd8d7bf079e2c0f39754da8f9fce6f5a53e920409",
+            "financialInputsFingerprint": "f20d302806ed1fdd9fcf183aa47ace522cd0f617cbdc340c801d3b7c11a3a89c",
+            "financialReadProjection": {
+              "owner": "functions/b4-003-scoped-related-reader.js#financialView",
+              "acceptedSourceSha": "04155aa7bc80e177ee57e50223506e47194bbe3d",
+              "fields": [
+                "pais"
+              ],
+              "country": "GT",
+              "rawToProjection": {
+                "schema": "GI_I66_REDACTED_FINANCIAL_INPUT_DIFF_V1",
+                "detailsAvailable": true,
+                "serverCobrosCount": 0,
+                "browserCobrosCount": 0,
+                "differingFieldCount": 2,
+                "differences": [
+                  {
+                    "path": "receipt.pais",
+                    "serverPresent": false,
+                    "browserPresent": true,
+                    "serverType": "absent",
+                    "browserType": "string",
+                    "serverDigest": null,
+                    "browserDigest": "2af2fd09c5f6a9a429030371f7529aa25b3a4b7ce5fc478585cb5be5e446afe8"
+                  },
+                  {
+                    "path": "portfolio.pais",
+                    "serverPresent": false,
+                    "browserPresent": true,
+                    "serverType": "absent",
+                    "browserType": "string",
+                    "serverDigest": null,
+                    "browserDigest": "2af2fd09c5f6a9a429030371f7529aa25b3a4b7ce5fc478585cb5be5e446afe8"
+                  }
+                ],
+                "truncated": false,
+                "valueDisclosure": "NONE_EPHEMERALLY_SALTED_HASHES_ONLY"
+              }
+            },
+            "rollbackPresent": true,
+            "auditIdentity": true,
+            "receiptFingerprint": "fa69ebb3c32507cfb9f7a555b8c8822c789dd181712d5b5324c0343c938170ba",
+            "portfolioFingerprint": "da85d32506a50cccd5a1debc3db1338b99b8b932576724b412574a8d7dff6827",
+            "auditFingerprint": "9735cdd8f67d05999151b92ee365d53ca6a184992f14fc1d1be7670c43dbff5b",
+            "serverBalanceProof": {
+              "sourceSha": "04155aa7bc80e177ee57e50223506e47194bbe3d",
+              "ownerBlob": "b77b65f86ef6ac2ab6dc157fdbc9ad5e34dbcdcc",
+              "source": "MATCHED_EXPECTED_RECEIPT_CONTRACTUAL_AMOUNT",
+              "open": true,
+              "balanceCents": 27826,
+              "scope": "EXACT_RECEIPT_LINKED_PORTFOLIO_POLICY_AND_LINKED_PAYMENTS"
+            }
+          },
+          {
+            "receiptId": "rec_fb4ae3b5ee66fb31dbe34702",
+            "portfolioId": "car_55c55df1fd5bcc541b70fc86",
+            "policyId": "pol_08ef784b45dab5a2acbfa556442c",
+            "portfolioPolicyId": "pol_08ef784b45dab5a2acbfa556442c",
+            "portfolioReceiptId": "rec_fb4ae3b5ee66fb31dbe34702",
+            "clientCoherent": true,
+            "requirement": "5228534",
+            "contractualDue": "2026-12-02",
+            "operationalLimit": "2026-12-02",
+            "currency": "GTQ",
+            "portfolioCurrency": "GTQ",
+            "grossCents": 27826,
+            "portfolioGrossCents": 27826,
+            "receiptState": {
+              "estadoOperativo": "futuro_pendiente"
+            },
+            "portfolioState": {
+              "estadoOperativo": "futuro_pendiente"
+            },
+            "portfolioMatches": 1,
+            "cobrosTruncated": false,
+            "cobrosCount": 0,
+            "cobrosFingerprints": [],
+            "rawFinancialInputsFingerprint": "112fe49cf5dd04db01ebe11b98a23e69a3b43f67c2fcf030c5b0793b89d566ce",
+            "financialInputsFingerprint": "6d42e2403e8ca4e79d71200bedf1e2705ef633f197fde87d32403657fa805ff2",
+            "financialReadProjection": {
+              "owner": "functions/b4-003-scoped-related-reader.js#financialView",
+              "acceptedSourceSha": "04155aa7bc80e177ee57e50223506e47194bbe3d",
+              "fields": [
+                "pais"
+              ],
+              "country": "GT",
+              "rawToProjection": {
+                "schema": "GI_I66_REDACTED_FINANCIAL_INPUT_DIFF_V1",
+                "detailsAvailable": true,
+                "serverCobrosCount": 0,
+                "browserCobrosCount": 0,
+                "differingFieldCount": 2,
+                "differences": [
+                  {
+                    "path": "receipt.pais",
+                    "serverPresent": false,
+                    "browserPresent": true,
+                    "serverType": "absent",
+                    "browserType": "string",
+                    "serverDigest": null,
+                    "browserDigest": "2af2fd09c5f6a9a429030371f7529aa25b3a4b7ce5fc478585cb5be5e446afe8"
+                  },
+                  {
+                    "path": "portfolio.pais",
+                    "serverPresent": false,
+                    "browserPresent": true,
+                    "serverType": "absent",
+                    "browserType": "string",
+                    "serverDigest": null,
+                    "browserDigest": "2af2fd09c5f6a9a429030371f7529aa25b3a4b7ce5fc478585cb5be5e446afe8"
+                  }
+                ],
+                "truncated": false,
+                "valueDisclosure": "NONE_EPHEMERALLY_SALTED_HASHES_ONLY"
+              }
+            },
+            "rollbackPresent": true,
+            "auditIdentity": true,
+            "receiptFingerprint": "9b9d83a4eb70f8f0c03d0ecf0bd1af62756a311e234f6aba51ffc1b92e70b960",
+            "portfolioFingerprint": "f88bf2e64baad77f6d1a60e8e44f21f5c02f27b1f6b7b7bbd727f0ab0924fe2f",
+            "auditFingerprint": "9081baa1df02ac182c93bf16fa59cff4a266eaf08d93678751714fff77fc3d31",
+            "serverBalanceProof": {
+              "sourceSha": "04155aa7bc80e177ee57e50223506e47194bbe3d",
+              "ownerBlob": "b77b65f86ef6ac2ab6dc157fdbc9ad5e34dbcdcc",
+              "source": "MATCHED_EXPECTED_RECEIPT_CONTRACTUAL_AMOUNT",
+              "open": true,
+              "balanceCents": 27826,
+              "scope": "EXACT_RECEIPT_LINKED_PORTFOLIO_POLICY_AND_LINKED_PAYMENTS"
+            }
+          },
+          {
+            "receiptId": "rec_d76a756f3ab691bd675adebd",
+            "portfolioId": "car_e923fc80be31f62b5a0fa720",
+            "policyId": "pol_08ef784b45dab5a2acbfa556442c",
+            "portfolioPolicyId": "pol_08ef784b45dab5a2acbfa556442c",
+            "portfolioReceiptId": "rec_d76a756f3ab691bd675adebd",
+            "clientCoherent": true,
+            "requirement": "5228535",
+            "contractualDue": "2027-01-02",
+            "operationalLimit": "2027-01-02",
+            "currency": "GTQ",
+            "portfolioCurrency": "GTQ",
+            "grossCents": 27826,
+            "portfolioGrossCents": 27826,
+            "receiptState": {
+              "estadoOperativo": "futuro_pendiente"
+            },
+            "portfolioState": {
+              "estadoOperativo": "futuro_pendiente"
+            },
+            "portfolioMatches": 1,
+            "cobrosTruncated": false,
+            "cobrosCount": 0,
+            "cobrosFingerprints": [],
+            "rawFinancialInputsFingerprint": "e0c306e2912d99bb8b5782ec455fa3d425947992645a9af878a5695e40a99479",
+            "financialInputsFingerprint": "042bf8e811678bd6313775fb34205b84d9b22f0e67cc0e021d0a2d2d2f262486",
+            "financialReadProjection": {
+              "owner": "functions/b4-003-scoped-related-reader.js#financialView",
+              "acceptedSourceSha": "04155aa7bc80e177ee57e50223506e47194bbe3d",
+              "fields": [
+                "pais"
+              ],
+              "country": "GT",
+              "rawToProjection": {
+                "schema": "GI_I66_REDACTED_FINANCIAL_INPUT_DIFF_V1",
+                "detailsAvailable": true,
+                "serverCobrosCount": 0,
+                "browserCobrosCount": 0,
+                "differingFieldCount": 2,
+                "differences": [
+                  {
+                    "path": "receipt.pais",
+                    "serverPresent": false,
+                    "browserPresent": true,
+                    "serverType": "absent",
+                    "browserType": "string",
+                    "serverDigest": null,
+                    "browserDigest": "2af2fd09c5f6a9a429030371f7529aa25b3a4b7ce5fc478585cb5be5e446afe8"
+                  },
+                  {
+                    "path": "portfolio.pais",
+                    "serverPresent": false,
+                    "browserPresent": true,
+                    "serverType": "absent",
+                    "browserType": "string",
+                    "serverDigest": null,
+                    "browserDigest": "2af2fd09c5f6a9a429030371f7529aa25b3a4b7ce5fc478585cb5be5e446afe8"
+                  }
+                ],
+                "truncated": false,
+                "valueDisclosure": "NONE_EPHEMERALLY_SALTED_HASHES_ONLY"
+              }
+            },
+            "rollbackPresent": true,
+            "auditIdentity": true,
+            "receiptFingerprint": "4344e5af58f708dabbb841efa26180ac764a7d1975ef1eafdb2a8a2c9735cb1c",
+            "portfolioFingerprint": "c76a023a6f9fe28463039b9b948ab55b55687c410c37a8c093cc0fce1a3ed37c",
+            "auditFingerprint": "ec0d1652f4f5f3a9916494ce224721f91d243952654e3da225609eb8cbaa80fa",
+            "serverBalanceProof": {
+              "sourceSha": "04155aa7bc80e177ee57e50223506e47194bbe3d",
+              "ownerBlob": "b77b65f86ef6ac2ab6dc157fdbc9ad5e34dbcdcc",
+              "source": "MATCHED_EXPECTED_RECEIPT_CONTRACTUAL_AMOUNT",
+              "open": true,
+              "balanceCents": 27826,
+              "scope": "EXACT_RECEIPT_LINKED_PORTFOLIO_POLICY_AND_LINKED_PAYMENTS"
+            }
+          },
+          {
+            "receiptId": "rec_4f659319f7e5e56008788817",
+            "portfolioId": "car_64d4f76fc02fc36cdff837ed",
+            "policyId": "pol_08ef784b45dab5a2acbfa556442c",
+            "portfolioPolicyId": "pol_08ef784b45dab5a2acbfa556442c",
+            "portfolioReceiptId": "rec_4f659319f7e5e56008788817",
+            "clientCoherent": true,
+            "requirement": "5228536",
+            "contractualDue": "2027-02-02",
+            "operationalLimit": "2027-02-02",
+            "currency": "GTQ",
+            "portfolioCurrency": "GTQ",
+            "grossCents": 27826,
+            "portfolioGrossCents": 27826,
+            "receiptState": {
+              "estadoOperativo": "futuro_pendiente"
+            },
+            "portfolioState": {
+              "estadoOperativo": "futuro_pendiente"
+            },
+            "portfolioMatches": 1,
+            "cobrosTruncated": false,
+            "cobrosCount": 0,
+            "cobrosFingerprints": [],
+            "rawFinancialInputsFingerprint": "37668ae675e2119893a989b4ee51c43cd6fb48cee9842b85ab22ab2f59aa5955",
+            "financialInputsFingerprint": "7ef2ccb37f6039e236498e6303d7e203b8526278e6c83b9791d5af0ef51bee2f",
+            "financialReadProjection": {
+              "owner": "functions/b4-003-scoped-related-reader.js#financialView",
+              "acceptedSourceSha": "04155aa7bc80e177ee57e50223506e47194bbe3d",
+              "fields": [
+                "pais"
+              ],
+              "country": "GT",
+              "rawToProjection": {
+                "schema": "GI_I66_REDACTED_FINANCIAL_INPUT_DIFF_V1",
+                "detailsAvailable": true,
+                "serverCobrosCount": 0,
+                "browserCobrosCount": 0,
+                "differingFieldCount": 2,
+                "differences": [
+                  {
+                    "path": "receipt.pais",
+                    "serverPresent": false,
+                    "browserPresent": true,
+                    "serverType": "absent",
+                    "browserType": "string",
+                    "serverDigest": null,
+                    "browserDigest": "2af2fd09c5f6a9a429030371f7529aa25b3a4b7ce5fc478585cb5be5e446afe8"
+                  },
+                  {
+                    "path": "portfolio.pais",
+                    "serverPresent": false,
+                    "browserPresent": true,
+                    "serverType": "absent",
+                    "browserType": "string",
+                    "serverDigest": null,
+                    "browserDigest": "2af2fd09c5f6a9a429030371f7529aa25b3a4b7ce5fc478585cb5be5e446afe8"
+                  }
+                ],
+                "truncated": false,
+                "valueDisclosure": "NONE_EPHEMERALLY_SALTED_HASHES_ONLY"
+              }
+            },
+            "rollbackPresent": true,
+            "auditIdentity": true,
+            "receiptFingerprint": "fbe5469d8e0c30b72690bd25c6845679dfbacfc46c8b7d9be520be8edfbdb4e5",
+            "portfolioFingerprint": "31628c648f9666b8780ca32d2597e3f3900ab8890e768405cf4637c8638607cd",
+            "auditFingerprint": "e7112948ebcd783cf9a2b182c921e3c9b2c62827d1f5c7a52d98dd08fc201681",
+            "serverBalanceProof": {
+              "sourceSha": "04155aa7bc80e177ee57e50223506e47194bbe3d",
+              "ownerBlob": "b77b65f86ef6ac2ab6dc157fdbc9ad5e34dbcdcc",
+              "source": "MATCHED_EXPECTED_RECEIPT_CONTRACTUAL_AMOUNT",
+              "open": true,
+              "balanceCents": 27826,
+              "scope": "EXACT_RECEIPT_LINKED_PORTFOLIO_POLICY_AND_LINKED_PAYMENTS"
+            }
+          },
+          {
+            "receiptId": "rec_6dad42c3f5d06b15fea34726",
+            "portfolioId": "car_3c6dd87039503edb71f2b84e",
+            "policyId": "pol_08ef784b45dab5a2acbfa556442c",
+            "portfolioPolicyId": "pol_08ef784b45dab5a2acbfa556442c",
+            "portfolioReceiptId": "rec_6dad42c3f5d06b15fea34726",
+            "clientCoherent": true,
+            "requirement": "5228537",
+            "contractualDue": "2027-03-02",
+            "operationalLimit": "2027-03-02",
+            "currency": "GTQ",
+            "portfolioCurrency": "GTQ",
+            "grossCents": 27826,
+            "portfolioGrossCents": 27826,
+            "receiptState": {
+              "estadoOperativo": "futuro_pendiente"
+            },
+            "portfolioState": {
+              "estadoOperativo": "futuro_pendiente"
+            },
+            "portfolioMatches": 1,
+            "cobrosTruncated": false,
+            "cobrosCount": 0,
+            "cobrosFingerprints": [],
+            "rawFinancialInputsFingerprint": "de7000616ba08f70cb7185df110b2aadc68268f7575b07ed8db91d38fe9ff80c",
+            "financialInputsFingerprint": "350f638df53c2ade5098f8926a6d4c1c7f821079816a9a207af8ed3e40268a85",
+            "financialReadProjection": {
+              "owner": "functions/b4-003-scoped-related-reader.js#financialView",
+              "acceptedSourceSha": "04155aa7bc80e177ee57e50223506e47194bbe3d",
+              "fields": [
+                "pais"
+              ],
+              "country": "GT",
+              "rawToProjection": {
+                "schema": "GI_I66_REDACTED_FINANCIAL_INPUT_DIFF_V1",
+                "detailsAvailable": true,
+                "serverCobrosCount": 0,
+                "browserCobrosCount": 0,
+                "differingFieldCount": 2,
+                "differences": [
+                  {
+                    "path": "receipt.pais",
+                    "serverPresent": false,
+                    "browserPresent": true,
+                    "serverType": "absent",
+                    "browserType": "string",
+                    "serverDigest": null,
+                    "browserDigest": "2af2fd09c5f6a9a429030371f7529aa25b3a4b7ce5fc478585cb5be5e446afe8"
+                  },
+                  {
+                    "path": "portfolio.pais",
+                    "serverPresent": false,
+                    "browserPresent": true,
+                    "serverType": "absent",
+                    "browserType": "string",
+                    "serverDigest": null,
+                    "browserDigest": "2af2fd09c5f6a9a429030371f7529aa25b3a4b7ce5fc478585cb5be5e446afe8"
+                  }
+                ],
+                "truncated": false,
+                "valueDisclosure": "NONE_EPHEMERALLY_SALTED_HASHES_ONLY"
+              }
+            },
+            "rollbackPresent": true,
+            "auditIdentity": true,
+            "receiptFingerprint": "8897f4003b8a86c03c31470a0c63edb9e0aa2245289f1d689d1070a3e5dc93c5",
+            "portfolioFingerprint": "24aa70b7b5f6dd17e96edf730ca4800bffb132cf348181178320198bbf5a5071",
+            "auditFingerprint": "862e04d4a98220d885c31c8f8471164aad60cd646cf63512349caff4961c2909",
+            "serverBalanceProof": {
+              "sourceSha": "04155aa7bc80e177ee57e50223506e47194bbe3d",
+              "ownerBlob": "b77b65f86ef6ac2ab6dc157fdbc9ad5e34dbcdcc",
+              "source": "MATCHED_EXPECTED_RECEIPT_CONTRACTUAL_AMOUNT",
+              "open": true,
+              "balanceCents": 27826,
+              "scope": "EXACT_RECEIPT_LINKED_PORTFOLIO_POLICY_AND_LINKED_PAYMENTS"
+            }
+          },
+          {
+            "receiptId": "rec_538e6f8235084bb286d2d6d6",
+            "portfolioId": "car_d9fa6067a3a3930d14df779a",
+            "policyId": "pol_08ef784b45dab5a2acbfa556442c",
+            "portfolioPolicyId": "pol_08ef784b45dab5a2acbfa556442c",
+            "portfolioReceiptId": "rec_538e6f8235084bb286d2d6d6",
+            "clientCoherent": true,
+            "requirement": "5228538",
+            "contractualDue": "2027-04-02",
+            "operationalLimit": "2027-04-02",
+            "currency": "GTQ",
+            "portfolioCurrency": "GTQ",
+            "grossCents": 27826,
+            "portfolioGrossCents": 27826,
+            "receiptState": {
+              "estadoOperativo": "futuro_pendiente"
+            },
+            "portfolioState": {
+              "estadoOperativo": "futuro_pendiente"
+            },
+            "portfolioMatches": 1,
+            "cobrosTruncated": false,
+            "cobrosCount": 0,
+            "cobrosFingerprints": [],
+            "rawFinancialInputsFingerprint": "2f6165686b07a8a399dc07853908cafe87571a2f04d3a29122e7e55a2d703438",
+            "financialInputsFingerprint": "d9d2d1eec36ab5e9b6bbb009330d6841baf83ad250651510c80d250bb2e2f196",
+            "financialReadProjection": {
+              "owner": "functions/b4-003-scoped-related-reader.js#financialView",
+              "acceptedSourceSha": "04155aa7bc80e177ee57e50223506e47194bbe3d",
+              "fields": [
+                "pais"
+              ],
+              "country": "GT",
+              "rawToProjection": {
+                "schema": "GI_I66_REDACTED_FINANCIAL_INPUT_DIFF_V1",
+                "detailsAvailable": true,
+                "serverCobrosCount": 0,
+                "browserCobrosCount": 0,
+                "differingFieldCount": 2,
+                "differences": [
+                  {
+                    "path": "receipt.pais",
+                    "serverPresent": false,
+                    "browserPresent": true,
+                    "serverType": "absent",
+                    "browserType": "string",
+                    "serverDigest": null,
+                    "browserDigest": "2af2fd09c5f6a9a429030371f7529aa25b3a4b7ce5fc478585cb5be5e446afe8"
+                  },
+                  {
+                    "path": "portfolio.pais",
+                    "serverPresent": false,
+                    "browserPresent": true,
+                    "serverType": "absent",
+                    "browserType": "string",
+                    "serverDigest": null,
+                    "browserDigest": "2af2fd09c5f6a9a429030371f7529aa25b3a4b7ce5fc478585cb5be5e446afe8"
+                  }
+                ],
+                "truncated": false,
+                "valueDisclosure": "NONE_EPHEMERALLY_SALTED_HASHES_ONLY"
+              }
+            },
+            "rollbackPresent": true,
+            "auditIdentity": true,
+            "receiptFingerprint": "827a1b1c68e408bee0da3df9e976d94e977ac36a34088df71f7747af8083344c",
+            "portfolioFingerprint": "6e83fcf0f7aa57c321d18ffbc934193fb269dc77be442220ad0486db6269bdcd",
+            "auditFingerprint": "23df506af121c585b48844e612f75babc388f4c47ba26649e52999ede42a7ea0",
+            "serverBalanceProof": {
+              "sourceSha": "04155aa7bc80e177ee57e50223506e47194bbe3d",
+              "ownerBlob": "b77b65f86ef6ac2ab6dc157fdbc9ad5e34dbcdcc",
+              "source": "MATCHED_EXPECTED_RECEIPT_CONTRACTUAL_AMOUNT",
+              "open": true,
+              "balanceCents": 27826,
+              "scope": "EXACT_RECEIPT_LINKED_PORTFOLIO_POLICY_AND_LINKED_PAYMENTS"
+            }
+          }
+        ],
+        "policyUnchanged": true,
+        "observations": [
+          {
+            "sourceRequirement": "5228533",
+            "receiptId": "rec_98478284ecec24ad3d851ec0",
+            "portfolioId": "car_f08268f1ce68554f0375fcac",
+            "beforeReload": {
+              "ready": true,
+              "viewport": {
+                "width": 1365,
+                "detailVisible": true,
+                "balanceVisible": true,
+                "horizontalOverflowPx": 0
+              },
+              "receiptId": "rec_98478284ecec24ad3d851ec0",
+              "detailCount": 1,
+              "actorMatches": true,
+              "role": "Operativo",
+              "country": "GT",
+              "protectedCandidate": true,
+              "confirmed": true,
+              "relevantErrors": [],
+              "source": {
+                "receiptId": "rec_98478284ecec24ad3d851ec0",
+                "portfolioId": "car_f08268f1ce68554f0375fcac",
+                "policyId": "pol_08ef784b45dab5a2acbfa556442c",
+                "portfolioPolicyId": "pol_08ef784b45dab5a2acbfa556442c",
+                "portfolioReceiptId": "rec_98478284ecec24ad3d851ec0",
+                "clientCoherent": true,
+                "requirement": "5228533",
+                "contractualDue": "2026-11-02",
+                "operationalLimit": "2026-11-02",
+                "currency": "GTQ",
+                "portfolioCurrency": "GTQ",
+                "grossCents": 27826,
+                "portfolioGrossCents": 27826,
+                "receiptState": {
+                  "estadoOperativo": "futuro_pendiente"
+                },
+                "portfolioState": {
+                  "estadoOperativo": "futuro_pendiente"
+                }
+              },
+              "displayedGrossCents": 27826,
+              "displayedContractualDue": "02 nov 2026",
+              "displayedOperationalLimit": "02 nov 2026",
+              "displayedStatus": "Vencido",
+              "canonicalStatus": "Vencido",
+              "displayedBalanceCents": 27826,
+              "balanceCents": 27826,
+              "balanceState": "open",
+              "open": true,
+              "amountProofSource": "MATCHED_EXPECTED_RECEIPT_CONTRACTUAL_AMOUNT",
+              "ownerDecision": {
+                "open": true,
+                "proofSource": "MATCHED_EXPECTED_RECEIPT_CONTRACTUAL_AMOUNT",
+                "proofValueCents": 27826,
+                "currentBalanceCents": 27826,
+                "portfolioAmount": {
+                  "present": false,
+                  "type": "undefined",
+                  "value": null
+                },
+                "portfolioBalance": {
+                  "present": false,
+                  "type": "undefined",
+                  "value": null
+                },
+                "receiptOperationalState": {
+                  "present": true,
+                  "type": "string",
+                  "value": "OTHER"
+                },
+                "portfolioOperationalState": {
+                  "present": true,
+                  "type": "string",
+                  "value": "OTHER"
+                },
+                "policyState": {
+                  "present": true,
+                  "type": "string",
+                  "value": "vigente"
+                },
+                "policyCountry": {
+                  "present": true,
+                  "type": "string",
+                  "value": "gt"
+                },
+                "policyCurrency": {
+                  "present": true,
+                  "type": "string",
+                  "value": "gtq"
+                },
+                "duplicateReceipt": false,
+                "portfoliosForReceipt": 1,
+                "linkedPaymentInContext": false,
+                "policyPresent": true,
+                "portfolioDue": "2026-11-02",
+                "receiptDue": "2026-11-02"
+              },
+              "visibleFormats": {
+                "grossShape": "a 999.99",
+                "balanceShape": "aaaaa aaaaaaaaa: a 999.99"
+              },
+              "financialInputsFingerprint": "f20d302806ed1fdd9fcf183aa47ace522cd0f617cbdc340c801d3b7c11a3a89c"
+            },
+            "beforeCheck": {
+              "pass": true,
+              "stage": "BEFORE_RELOAD",
+              "checks": {
+                "gross": true,
+                "contractualDue": true,
+                "operationalLimit": true,
+                "status": true,
+                "balanceVerified": true,
+                "balanceValue": true,
+                "balanceState": true
+              }
+            },
+            "scrollBefore": {
+              "attempts": 1,
+              "detachments": 0
+            },
+            "reloadPass": true,
+            "scrollAfter": {
+              "attempts": 1,
+              "detachments": 0
+            },
+            "afterReload": {
+              "ready": true,
+              "viewport": {
+                "width": 1365,
+                "detailVisible": true,
+                "balanceVisible": true,
+                "horizontalOverflowPx": 0
+              },
+              "receiptId": "rec_98478284ecec24ad3d851ec0",
+              "detailCount": 1,
+              "actorMatches": true,
+              "role": "Operativo",
+              "country": "GT",
+              "protectedCandidate": true,
+              "confirmed": true,
+              "relevantErrors": [],
+              "source": {
+                "receiptId": "rec_98478284ecec24ad3d851ec0",
+                "portfolioId": "car_f08268f1ce68554f0375fcac",
+                "policyId": "pol_08ef784b45dab5a2acbfa556442c",
+                "portfolioPolicyId": "pol_08ef784b45dab5a2acbfa556442c",
+                "portfolioReceiptId": "rec_98478284ecec24ad3d851ec0",
+                "clientCoherent": true,
+                "requirement": "5228533",
+                "contractualDue": "2026-11-02",
+                "operationalLimit": "2026-11-02",
+                "currency": "GTQ",
+                "portfolioCurrency": "GTQ",
+                "grossCents": 27826,
+                "portfolioGrossCents": 27826,
+                "receiptState": {
+                  "estadoOperativo": "futuro_pendiente"
+                },
+                "portfolioState": {
+                  "estadoOperativo": "futuro_pendiente"
+                }
+              },
+              "displayedGrossCents": 27826,
+              "displayedContractualDue": "02 nov 2026",
+              "displayedOperationalLimit": "02 nov 2026",
+              "displayedStatus": "Vencido",
+              "canonicalStatus": "Vencido",
+              "displayedBalanceCents": 27826,
+              "balanceCents": 27826,
+              "balanceState": "open",
+              "open": true,
+              "amountProofSource": "MATCHED_EXPECTED_RECEIPT_CONTRACTUAL_AMOUNT",
+              "ownerDecision": {
+                "open": true,
+                "proofSource": "MATCHED_EXPECTED_RECEIPT_CONTRACTUAL_AMOUNT",
+                "proofValueCents": 27826,
+                "currentBalanceCents": 27826,
+                "portfolioAmount": {
+                  "present": false,
+                  "type": "undefined",
+                  "value": null
+                },
+                "portfolioBalance": {
+                  "present": false,
+                  "type": "undefined",
+                  "value": null
+                },
+                "receiptOperationalState": {
+                  "present": true,
+                  "type": "string",
+                  "value": "OTHER"
+                },
+                "portfolioOperationalState": {
+                  "present": true,
+                  "type": "string",
+                  "value": "OTHER"
+                },
+                "policyState": {
+                  "present": true,
+                  "type": "string",
+                  "value": "vigente"
+                },
+                "policyCountry": {
+                  "present": true,
+                  "type": "string",
+                  "value": "gt"
+                },
+                "policyCurrency": {
+                  "present": true,
+                  "type": "string",
+                  "value": "gtq"
+                },
+                "duplicateReceipt": false,
+                "portfoliosForReceipt": 1,
+                "linkedPaymentInContext": false,
+                "policyPresent": true,
+                "portfolioDue": "2026-11-02",
+                "receiptDue": "2026-11-02"
+              },
+              "visibleFormats": {
+                "grossShape": "a 999.99",
+                "balanceShape": "aaaaa aaaaaaaaa: a 999.99"
+              },
+              "financialInputsFingerprint": "f20d302806ed1fdd9fcf183aa47ace522cd0f617cbdc340c801d3b7c11a3a89c"
+            },
+            "afterCheck": {
+              "pass": true,
+              "stage": "AFTER_RELOAD",
+              "checks": {
+                "gross": true,
+                "contractualDue": true,
+                "operationalLimit": true,
+                "status": true,
+                "balanceVerified": true,
+                "balanceValue": true,
+                "balanceState": true
+              }
+            }
+          },
+          {
+            "sourceRequirement": "5228534",
+            "receiptId": "rec_fb4ae3b5ee66fb31dbe34702",
+            "portfolioId": "car_55c55df1fd5bcc541b70fc86",
+            "beforeReload": {
+              "ready": true,
+              "viewport": {
+                "width": 1365,
+                "detailVisible": true,
+                "balanceVisible": true,
+                "horizontalOverflowPx": 0
+              },
+              "receiptId": "rec_fb4ae3b5ee66fb31dbe34702",
+              "detailCount": 1,
+              "actorMatches": true,
+              "role": "Operativo",
+              "country": "GT",
+              "protectedCandidate": true,
+              "confirmed": true,
+              "relevantErrors": [],
+              "source": {
+                "receiptId": "rec_fb4ae3b5ee66fb31dbe34702",
+                "portfolioId": "car_55c55df1fd5bcc541b70fc86",
+                "policyId": "pol_08ef784b45dab5a2acbfa556442c",
+                "portfolioPolicyId": "pol_08ef784b45dab5a2acbfa556442c",
+                "portfolioReceiptId": "rec_fb4ae3b5ee66fb31dbe34702",
+                "clientCoherent": true,
+                "requirement": "5228534",
+                "contractualDue": "2026-12-02",
+                "operationalLimit": "2026-12-02",
+                "currency": "GTQ",
+                "portfolioCurrency": "GTQ",
+                "grossCents": 27826,
+                "portfolioGrossCents": 27826,
+                "receiptState": {
+                  "estadoOperativo": "futuro_pendiente"
+                },
+                "portfolioState": {
+                  "estadoOperativo": "futuro_pendiente"
+                }
+              },
+              "displayedGrossCents": 27826,
+              "displayedContractualDue": "02 dic 2026",
+              "displayedOperationalLimit": "02 dic 2026",
+              "displayedStatus": "Por vencer",
+              "canonicalStatus": "Por vencer",
+              "displayedBalanceCents": 27826,
+              "balanceCents": 27826,
+              "balanceState": "open",
+              "open": true,
+              "amountProofSource": "MATCHED_EXPECTED_RECEIPT_CONTRACTUAL_AMOUNT",
+              "ownerDecision": {
+                "open": true,
+                "proofSource": "MATCHED_EXPECTED_RECEIPT_CONTRACTUAL_AMOUNT",
+                "proofValueCents": 27826,
+                "currentBalanceCents": 27826,
+                "portfolioAmount": {
+                  "present": false,
+                  "type": "undefined",
+                  "value": null
+                },
+                "portfolioBalance": {
+                  "present": false,
+                  "type": "undefined",
+                  "value": null
+                },
+                "receiptOperationalState": {
+                  "present": true,
+                  "type": "string",
+                  "value": "OTHER"
+                },
+                "portfolioOperationalState": {
+                  "present": true,
+                  "type": "string",
+                  "value": "OTHER"
+                },
+                "policyState": {
+                  "present": true,
+                  "type": "string",
+                  "value": "vigente"
+                },
+                "policyCountry": {
+                  "present": true,
+                  "type": "string",
+                  "value": "gt"
+                },
+                "policyCurrency": {
+                  "present": true,
+                  "type": "string",
+                  "value": "gtq"
+                },
+                "duplicateReceipt": false,
+                "portfoliosForReceipt": 1,
+                "linkedPaymentInContext": false,
+                "policyPresent": true,
+                "portfolioDue": "2026-12-02",
+                "receiptDue": "2026-12-02"
+              },
+              "visibleFormats": {
+                "grossShape": "a 999.99",
+                "balanceShape": "aaaaa aaaaaaaaa: a 999.99"
+              },
+              "financialInputsFingerprint": "6d42e2403e8ca4e79d71200bedf1e2705ef633f197fde87d32403657fa805ff2"
+            },
+            "beforeCheck": {
+              "pass": true,
+              "stage": "BEFORE_RELOAD",
+              "checks": {
+                "gross": true,
+                "contractualDue": true,
+                "operationalLimit": true,
+                "status": true,
+                "balanceVerified": true,
+                "balanceValue": true,
+                "balanceState": true
+              }
+            },
+            "scrollBefore": {
+              "attempts": 1,
+              "detachments": 0
+            },
+            "reloadPass": true,
+            "scrollAfter": {
+              "attempts": 1,
+              "detachments": 0
+            },
+            "afterReload": {
+              "ready": true,
+              "viewport": {
+                "width": 1365,
+                "detailVisible": true,
+                "balanceVisible": true,
+                "horizontalOverflowPx": 0
+              },
+              "receiptId": "rec_fb4ae3b5ee66fb31dbe34702",
+              "detailCount": 1,
+              "actorMatches": true,
+              "role": "Operativo",
+              "country": "GT",
+              "protectedCandidate": true,
+              "confirmed": true,
+              "relevantErrors": [],
+              "source": {
+                "receiptId": "rec_fb4ae3b5ee66fb31dbe34702",
+                "portfolioId": "car_55c55df1fd5bcc541b70fc86",
+                "policyId": "pol_08ef784b45dab5a2acbfa556442c",
+                "portfolioPolicyId": "pol_08ef784b45dab5a2acbfa556442c",
+                "portfolioReceiptId": "rec_fb4ae3b5ee66fb31dbe34702",
+                "clientCoherent": true,
+                "requirement": "5228534",
+                "contractualDue": "2026-12-02",
+                "operationalLimit": "2026-12-02",
+                "currency": "GTQ",
+                "portfolioCurrency": "GTQ",
+                "grossCents": 27826,
+                "portfolioGrossCents": 27826,
+                "receiptState": {
+                  "estadoOperativo": "futuro_pendiente"
+                },
+                "portfolioState": {
+                  "estadoOperativo": "futuro_pendiente"
+                }
+              },
+              "displayedGrossCents": 27826,
+              "displayedContractualDue": "02 dic 2026",
+              "displayedOperationalLimit": "02 dic 2026",
+              "displayedStatus": "Por vencer",
+              "canonicalStatus": "Por vencer",
+              "displayedBalanceCents": 27826,
+              "balanceCents": 27826,
+              "balanceState": "open",
+              "open": true,
+              "amountProofSource": "MATCHED_EXPECTED_RECEIPT_CONTRACTUAL_AMOUNT",
+              "ownerDecision": {
+                "open": true,
+                "proofSource": "MATCHED_EXPECTED_RECEIPT_CONTRACTUAL_AMOUNT",
+                "proofValueCents": 27826,
+                "currentBalanceCents": 27826,
+                "portfolioAmount": {
+                  "present": false,
+                  "type": "undefined",
+                  "value": null
+                },
+                "portfolioBalance": {
+                  "present": false,
+                  "type": "undefined",
+                  "value": null
+                },
+                "receiptOperationalState": {
+                  "present": true,
+                  "type": "string",
+                  "value": "OTHER"
+                },
+                "portfolioOperationalState": {
+                  "present": true,
+                  "type": "string",
+                  "value": "OTHER"
+                },
+                "policyState": {
+                  "present": true,
+                  "type": "string",
+                  "value": "vigente"
+                },
+                "policyCountry": {
+                  "present": true,
+                  "type": "string",
+                  "value": "gt"
+                },
+                "policyCurrency": {
+                  "present": true,
+                  "type": "string",
+                  "value": "gtq"
+                },
+                "duplicateReceipt": false,
+                "portfoliosForReceipt": 1,
+                "linkedPaymentInContext": false,
+                "policyPresent": true,
+                "portfolioDue": "2026-12-02",
+                "receiptDue": "2026-12-02"
+              },
+              "visibleFormats": {
+                "grossShape": "a 999.99",
+                "balanceShape": "aaaaa aaaaaaaaa: a 999.99"
+              },
+              "financialInputsFingerprint": "6d42e2403e8ca4e79d71200bedf1e2705ef633f197fde87d32403657fa805ff2"
+            },
+            "afterCheck": {
+              "pass": true,
+              "stage": "AFTER_RELOAD",
+              "checks": {
+                "gross": true,
+                "contractualDue": true,
+                "operationalLimit": true,
+                "status": true,
+                "balanceVerified": true,
+                "balanceValue": true,
+                "balanceState": true
+              }
+            }
+          },
+          {
+            "sourceRequirement": "5228535",
+            "receiptId": "rec_d76a756f3ab691bd675adebd",
+            "portfolioId": "car_e923fc80be31f62b5a0fa720",
+            "beforeReload": {
+              "ready": true,
+              "viewport": {
+                "width": 1365,
+                "detailVisible": true,
+                "balanceVisible": true,
+                "horizontalOverflowPx": 0
+              },
+              "receiptId": "rec_d76a756f3ab691bd675adebd",
+              "detailCount": 1,
+              "actorMatches": true,
+              "role": "Operativo",
+              "country": "GT",
+              "protectedCandidate": true,
+              "confirmed": true,
+              "relevantErrors": [],
+              "source": {
+                "receiptId": "rec_d76a756f3ab691bd675adebd",
+                "portfolioId": "car_e923fc80be31f62b5a0fa720",
+                "policyId": "pol_08ef784b45dab5a2acbfa556442c",
+                "portfolioPolicyId": "pol_08ef784b45dab5a2acbfa556442c",
+                "portfolioReceiptId": "rec_d76a756f3ab691bd675adebd",
+                "clientCoherent": true,
+                "requirement": "5228535",
+                "contractualDue": "2027-01-02",
+                "operationalLimit": "2027-01-02",
+                "currency": "GTQ",
+                "portfolioCurrency": "GTQ",
+                "grossCents": 27826,
+                "portfolioGrossCents": 27826,
+                "receiptState": {
+                  "estadoOperativo": "futuro_pendiente"
+                },
+                "portfolioState": {
+                  "estadoOperativo": "futuro_pendiente"
+                }
+              },
+              "displayedGrossCents": 27826,
+              "displayedContractualDue": "02 ene 2027",
+              "displayedOperationalLimit": "02 ene 2027",
+              "displayedStatus": "Por vencer",
+              "canonicalStatus": "Por vencer",
+              "displayedBalanceCents": 27826,
+              "balanceCents": 27826,
+              "balanceState": "open",
+              "open": true,
+              "amountProofSource": "MATCHED_EXPECTED_RECEIPT_CONTRACTUAL_AMOUNT",
+              "ownerDecision": {
+                "open": true,
+                "proofSource": "MATCHED_EXPECTED_RECEIPT_CONTRACTUAL_AMOUNT",
+                "proofValueCents": 27826,
+                "currentBalanceCents": 27826,
+                "portfolioAmount": {
+                  "present": false,
+                  "type": "undefined",
+                  "value": null
+                },
+                "portfolioBalance": {
+                  "present": false,
+                  "type": "undefined",
+                  "value": null
+                },
+                "receiptOperationalState": {
+                  "present": true,
+                  "type": "string",
+                  "value": "OTHER"
+                },
+                "portfolioOperationalState": {
+                  "present": true,
+                  "type": "string",
+                  "value": "OTHER"
+                },
+                "policyState": {
+                  "present": true,
+                  "type": "string",
+                  "value": "vigente"
+                },
+                "policyCountry": {
+                  "present": true,
+                  "type": "string",
+                  "value": "gt"
+                },
+                "policyCurrency": {
+                  "present": true,
+                  "type": "string",
+                  "value": "gtq"
+                },
+                "duplicateReceipt": false,
+                "portfoliosForReceipt": 1,
+                "linkedPaymentInContext": false,
+                "policyPresent": true,
+                "portfolioDue": "2027-01-02",
+                "receiptDue": "2027-01-02"
+              },
+              "visibleFormats": {
+                "grossShape": "a 999.99",
+                "balanceShape": "aaaaa aaaaaaaaa: a 999.99"
+              },
+              "financialInputsFingerprint": "042bf8e811678bd6313775fb34205b84d9b22f0e67cc0e021d0a2d2d2f262486"
+            },
+            "beforeCheck": {
+              "pass": true,
+              "stage": "BEFORE_RELOAD",
+              "checks": {
+                "gross": true,
+                "contractualDue": true,
+                "operationalLimit": true,
+                "status": true,
+                "balanceVerified": true,
+                "balanceValue": true,
+                "balanceState": true
+              }
+            },
+            "scrollBefore": {
+              "attempts": 1,
+              "detachments": 0
+            },
+            "reloadPass": true,
+            "scrollAfter": {
+              "attempts": 1,
+              "detachments": 0
+            },
+            "afterReload": {
+              "ready": true,
+              "viewport": {
+                "width": 1365,
+                "detailVisible": true,
+                "balanceVisible": true,
+                "horizontalOverflowPx": 0
+              },
+              "receiptId": "rec_d76a756f3ab691bd675adebd",
+              "detailCount": 1,
+              "actorMatches": true,
+              "role": "Operativo",
+              "country": "GT",
+              "protectedCandidate": true,
+              "confirmed": true,
+              "relevantErrors": [],
+              "source": {
+                "receiptId": "rec_d76a756f3ab691bd675adebd",
+                "portfolioId": "car_e923fc80be31f62b5a0fa720",
+                "policyId": "pol_08ef784b45dab5a2acbfa556442c",
+                "portfolioPolicyId": "pol_08ef784b45dab5a2acbfa556442c",
+                "portfolioReceiptId": "rec_d76a756f3ab691bd675adebd",
+                "clientCoherent": true,
+                "requirement": "5228535",
+                "contractualDue": "2027-01-02",
+                "operationalLimit": "2027-01-02",
+                "currency": "GTQ",
+                "portfolioCurrency": "GTQ",
+                "grossCents": 27826,
+                "portfolioGrossCents": 27826,
+                "receiptState": {
+                  "estadoOperativo": "futuro_pendiente"
+                },
+                "portfolioState": {
+                  "estadoOperativo": "futuro_pendiente"
+                }
+              },
+              "displayedGrossCents": 27826,
+              "displayedContractualDue": "02 ene 2027",
+              "displayedOperationalLimit": "02 ene 2027",
+              "displayedStatus": "Por vencer",
+              "canonicalStatus": "Por vencer",
+              "displayedBalanceCents": 27826,
+              "balanceCents": 27826,
+              "balanceState": "open",
+              "open": true,
+              "amountProofSource": "MATCHED_EXPECTED_RECEIPT_CONTRACTUAL_AMOUNT",
+              "ownerDecision": {
+                "open": true,
+                "proofSource": "MATCHED_EXPECTED_RECEIPT_CONTRACTUAL_AMOUNT",
+                "proofValueCents": 27826,
+                "currentBalanceCents": 27826,
+                "portfolioAmount": {
+                  "present": false,
+                  "type": "undefined",
+                  "value": null
+                },
+                "portfolioBalance": {
+                  "present": false,
+                  "type": "undefined",
+                  "value": null
+                },
+                "receiptOperationalState": {
+                  "present": true,
+                  "type": "string",
+                  "value": "OTHER"
+                },
+                "portfolioOperationalState": {
+                  "present": true,
+                  "type": "string",
+                  "value": "OTHER"
+                },
+                "policyState": {
+                  "present": true,
+                  "type": "string",
+                  "value": "vigente"
+                },
+                "policyCountry": {
+                  "present": true,
+                  "type": "string",
+                  "value": "gt"
+                },
+                "policyCurrency": {
+                  "present": true,
+                  "type": "string",
+                  "value": "gtq"
+                },
+                "duplicateReceipt": false,
+                "portfoliosForReceipt": 1,
+                "linkedPaymentInContext": false,
+                "policyPresent": true,
+                "portfolioDue": "2027-01-02",
+                "receiptDue": "2027-01-02"
+              },
+              "visibleFormats": {
+                "grossShape": "a 999.99",
+                "balanceShape": "aaaaa aaaaaaaaa: a 999.99"
+              },
+              "financialInputsFingerprint": "042bf8e811678bd6313775fb34205b84d9b22f0e67cc0e021d0a2d2d2f262486"
+            },
+            "afterCheck": {
+              "pass": true,
+              "stage": "AFTER_RELOAD",
+              "checks": {
+                "gross": true,
+                "contractualDue": true,
+                "operationalLimit": true,
+                "status": true,
+                "balanceVerified": true,
+                "balanceValue": true,
+                "balanceState": true
+              }
+            }
+          },
+          {
+            "sourceRequirement": "5228536",
+            "receiptId": "rec_4f659319f7e5e56008788817",
+            "portfolioId": "car_64d4f76fc02fc36cdff837ed",
+            "beforeReload": {
+              "ready": true,
+              "viewport": {
+                "width": 1365,
+                "detailVisible": true,
+                "balanceVisible": true,
+                "horizontalOverflowPx": 0
+              },
+              "receiptId": "rec_4f659319f7e5e56008788817",
+              "detailCount": 1,
+              "actorMatches": true,
+              "role": "Operativo",
+              "country": "GT",
+              "protectedCandidate": true,
+              "confirmed": true,
+              "relevantErrors": [],
+              "source": {
+                "receiptId": "rec_4f659319f7e5e56008788817",
+                "portfolioId": "car_64d4f76fc02fc36cdff837ed",
+                "policyId": "pol_08ef784b45dab5a2acbfa556442c",
+                "portfolioPolicyId": "pol_08ef784b45dab5a2acbfa556442c",
+                "portfolioReceiptId": "rec_4f659319f7e5e56008788817",
+                "clientCoherent": true,
+                "requirement": "5228536",
+                "contractualDue": "2027-02-02",
+                "operationalLimit": "2027-02-02",
+                "currency": "GTQ",
+                "portfolioCurrency": "GTQ",
+                "grossCents": 27826,
+                "portfolioGrossCents": 27826,
+                "receiptState": {
+                  "estadoOperativo": "futuro_pendiente"
+                },
+                "portfolioState": {
+                  "estadoOperativo": "futuro_pendiente"
+                }
+              },
+              "displayedGrossCents": 27826,
+              "displayedContractualDue": "02 feb 2027",
+              "displayedOperationalLimit": "02 feb 2027",
+              "displayedStatus": "Por vencer",
+              "canonicalStatus": "Por vencer",
+              "displayedBalanceCents": 27826,
+              "balanceCents": 27826,
+              "balanceState": "open",
+              "open": true,
+              "amountProofSource": "MATCHED_EXPECTED_RECEIPT_CONTRACTUAL_AMOUNT",
+              "ownerDecision": {
+                "open": true,
+                "proofSource": "MATCHED_EXPECTED_RECEIPT_CONTRACTUAL_AMOUNT",
+                "proofValueCents": 27826,
+                "currentBalanceCents": 27826,
+                "portfolioAmount": {
+                  "present": false,
+                  "type": "undefined",
+                  "value": null
+                },
+                "portfolioBalance": {
+                  "present": false,
+                  "type": "undefined",
+                  "value": null
+                },
+                "receiptOperationalState": {
+                  "present": true,
+                  "type": "string",
+                  "value": "OTHER"
+                },
+                "portfolioOperationalState": {
+                  "present": true,
+                  "type": "string",
+                  "value": "OTHER"
+                },
+                "policyState": {
+                  "present": true,
+                  "type": "string",
+                  "value": "vigente"
+                },
+                "policyCountry": {
+                  "present": true,
+                  "type": "string",
+                  "value": "gt"
+                },
+                "policyCurrency": {
+                  "present": true,
+                  "type": "string",
+                  "value": "gtq"
+                },
+                "duplicateReceipt": false,
+                "portfoliosForReceipt": 1,
+                "linkedPaymentInContext": false,
+                "policyPresent": true,
+                "portfolioDue": "2027-02-02",
+                "receiptDue": "2027-02-02"
+              },
+              "visibleFormats": {
+                "grossShape": "a 999.99",
+                "balanceShape": "aaaaa aaaaaaaaa: a 999.99"
+              },
+              "financialInputsFingerprint": "7ef2ccb37f6039e236498e6303d7e203b8526278e6c83b9791d5af0ef51bee2f"
+            },
+            "beforeCheck": {
+              "pass": true,
+              "stage": "BEFORE_RELOAD",
+              "checks": {
+                "gross": true,
+                "contractualDue": true,
+                "operationalLimit": true,
+                "status": true,
+                "balanceVerified": true,
+                "balanceValue": true,
+                "balanceState": true
+              }
+            },
+            "scrollBefore": {
+              "attempts": 1,
+              "detachments": 0
+            },
+            "reloadPass": true,
+            "scrollAfter": {
+              "attempts": 1,
+              "detachments": 0
+            },
+            "afterReload": {
+              "ready": true,
+              "viewport": {
+                "width": 1365,
+                "detailVisible": true,
+                "balanceVisible": true,
+                "horizontalOverflowPx": 0
+              },
+              "receiptId": "rec_4f659319f7e5e56008788817",
+              "detailCount": 1,
+              "actorMatches": true,
+              "role": "Operativo",
+              "country": "GT",
+              "protectedCandidate": true,
+              "confirmed": true,
+              "relevantErrors": [],
+              "source": {
+                "receiptId": "rec_4f659319f7e5e56008788817",
+                "portfolioId": "car_64d4f76fc02fc36cdff837ed",
+                "policyId": "pol_08ef784b45dab5a2acbfa556442c",
+                "portfolioPolicyId": "pol_08ef784b45dab5a2acbfa556442c",
+                "portfolioReceiptId": "rec_4f659319f7e5e56008788817",
+                "clientCoherent": true,
+                "requirement": "5228536",
+                "contractualDue": "2027-02-02",
+                "operationalLimit": "2027-02-02",
+                "currency": "GTQ",
+                "portfolioCurrency": "GTQ",
+                "grossCents": 27826,
+                "portfolioGrossCents": 27826,
+                "receiptState": {
+                  "estadoOperativo": "futuro_pendiente"
+                },
+                "portfolioState": {
+                  "estadoOperativo": "futuro_pendiente"
+                }
+              },
+              "displayedGrossCents": 27826,
+              "displayedContractualDue": "02 feb 2027",
+              "displayedOperationalLimit": "02 feb 2027",
+              "displayedStatus": "Por vencer",
+              "canonicalStatus": "Por vencer",
+              "displayedBalanceCents": 27826,
+              "balanceCents": 27826,
+              "balanceState": "open",
+              "open": true,
+              "amountProofSource": "MATCHED_EXPECTED_RECEIPT_CONTRACTUAL_AMOUNT",
+              "ownerDecision": {
+                "open": true,
+                "proofSource": "MATCHED_EXPECTED_RECEIPT_CONTRACTUAL_AMOUNT",
+                "proofValueCents": 27826,
+                "currentBalanceCents": 27826,
+                "portfolioAmount": {
+                  "present": false,
+                  "type": "undefined",
+                  "value": null
+                },
+                "portfolioBalance": {
+                  "present": false,
+                  "type": "undefined",
+                  "value": null
+                },
+                "receiptOperationalState": {
+                  "present": true,
+                  "type": "string",
+                  "value": "OTHER"
+                },
+                "portfolioOperationalState": {
+                  "present": true,
+                  "type": "string",
+                  "value": "OTHER"
+                },
+                "policyState": {
+                  "present": true,
+                  "type": "string",
+                  "value": "vigente"
+                },
+                "policyCountry": {
+                  "present": true,
+                  "type": "string",
+                  "value": "gt"
+                },
+                "policyCurrency": {
+                  "present": true,
+                  "type": "string",
+                  "value": "gtq"
+                },
+                "duplicateReceipt": false,
+                "portfoliosForReceipt": 1,
+                "linkedPaymentInContext": false,
+                "policyPresent": true,
+                "portfolioDue": "2027-02-02",
+                "receiptDue": "2027-02-02"
+              },
+              "visibleFormats": {
+                "grossShape": "a 999.99",
+                "balanceShape": "aaaaa aaaaaaaaa: a 999.99"
+              },
+              "financialInputsFingerprint": "7ef2ccb37f6039e236498e6303d7e203b8526278e6c83b9791d5af0ef51bee2f"
+            },
+            "afterCheck": {
+              "pass": true,
+              "stage": "AFTER_RELOAD",
+              "checks": {
+                "gross": true,
+                "contractualDue": true,
+                "operationalLimit": true,
+                "status": true,
+                "balanceVerified": true,
+                "balanceValue": true,
+                "balanceState": true
+              }
+            }
+          },
+          {
+            "sourceRequirement": "5228537",
+            "receiptId": "rec_6dad42c3f5d06b15fea34726",
+            "portfolioId": "car_3c6dd87039503edb71f2b84e",
+            "beforeReload": {
+              "ready": true,
+              "viewport": {
+                "width": 1365,
+                "detailVisible": true,
+                "balanceVisible": true,
+                "horizontalOverflowPx": 0
+              },
+              "receiptId": "rec_6dad42c3f5d06b15fea34726",
+              "detailCount": 1,
+              "actorMatches": true,
+              "role": "Operativo",
+              "country": "GT",
+              "protectedCandidate": true,
+              "confirmed": true,
+              "relevantErrors": [],
+              "source": {
+                "receiptId": "rec_6dad42c3f5d06b15fea34726",
+                "portfolioId": "car_3c6dd87039503edb71f2b84e",
+                "policyId": "pol_08ef784b45dab5a2acbfa556442c",
+                "portfolioPolicyId": "pol_08ef784b45dab5a2acbfa556442c",
+                "portfolioReceiptId": "rec_6dad42c3f5d06b15fea34726",
+                "clientCoherent": true,
+                "requirement": "5228537",
+                "contractualDue": "2027-03-02",
+                "operationalLimit": "2027-03-02",
+                "currency": "GTQ",
+                "portfolioCurrency": "GTQ",
+                "grossCents": 27826,
+                "portfolioGrossCents": 27826,
+                "receiptState": {
+                  "estadoOperativo": "futuro_pendiente"
+                },
+                "portfolioState": {
+                  "estadoOperativo": "futuro_pendiente"
+                }
+              },
+              "displayedGrossCents": 27826,
+              "displayedContractualDue": "02 mar 2027",
+              "displayedOperationalLimit": "02 mar 2027",
+              "displayedStatus": "Por vencer",
+              "canonicalStatus": "Por vencer",
+              "displayedBalanceCents": 27826,
+              "balanceCents": 27826,
+              "balanceState": "open",
+              "open": true,
+              "amountProofSource": "MATCHED_EXPECTED_RECEIPT_CONTRACTUAL_AMOUNT",
+              "ownerDecision": {
+                "open": true,
+                "proofSource": "MATCHED_EXPECTED_RECEIPT_CONTRACTUAL_AMOUNT",
+                "proofValueCents": 27826,
+                "currentBalanceCents": 27826,
+                "portfolioAmount": {
+                  "present": false,
+                  "type": "undefined",
+                  "value": null
+                },
+                "portfolioBalance": {
+                  "present": false,
+                  "type": "undefined",
+                  "value": null
+                },
+                "receiptOperationalState": {
+                  "present": true,
+                  "type": "string",
+                  "value": "OTHER"
+                },
+                "portfolioOperationalState": {
+                  "present": true,
+                  "type": "string",
+                  "value": "OTHER"
+                },
+                "policyState": {
+                  "present": true,
+                  "type": "string",
+                  "value": "vigente"
+                },
+                "policyCountry": {
+                  "present": true,
+                  "type": "string",
+                  "value": "gt"
+                },
+                "policyCurrency": {
+                  "present": true,
+                  "type": "string",
+                  "value": "gtq"
+                },
+                "duplicateReceipt": false,
+                "portfoliosForReceipt": 1,
+                "linkedPaymentInContext": false,
+                "policyPresent": true,
+                "portfolioDue": "2027-03-02",
+                "receiptDue": "2027-03-02"
+              },
+              "visibleFormats": {
+                "grossShape": "a 999.99",
+                "balanceShape": "aaaaa aaaaaaaaa: a 999.99"
+              },
+              "financialInputsFingerprint": "350f638df53c2ade5098f8926a6d4c1c7f821079816a9a207af8ed3e40268a85"
+            },
+            "beforeCheck": {
+              "pass": true,
+              "stage": "BEFORE_RELOAD",
+              "checks": {
+                "gross": true,
+                "contractualDue": true,
+                "operationalLimit": true,
+                "status": true,
+                "balanceVerified": true,
+                "balanceValue": true,
+                "balanceState": true
+              }
+            },
+            "scrollBefore": {
+              "attempts": 1,
+              "detachments": 0
+            },
+            "reloadPass": true,
+            "scrollAfter": {
+              "attempts": 1,
+              "detachments": 0
+            },
+            "afterReload": {
+              "ready": true,
+              "viewport": {
+                "width": 1365,
+                "detailVisible": true,
+                "balanceVisible": true,
+                "horizontalOverflowPx": 0
+              },
+              "receiptId": "rec_6dad42c3f5d06b15fea34726",
+              "detailCount": 1,
+              "actorMatches": true,
+              "role": "Operativo",
+              "country": "GT",
+              "protectedCandidate": true,
+              "confirmed": true,
+              "relevantErrors": [],
+              "source": {
+                "receiptId": "rec_6dad42c3f5d06b15fea34726",
+                "portfolioId": "car_3c6dd87039503edb71f2b84e",
+                "policyId": "pol_08ef784b45dab5a2acbfa556442c",
+                "portfolioPolicyId": "pol_08ef784b45dab5a2acbfa556442c",
+                "portfolioReceiptId": "rec_6dad42c3f5d06b15fea34726",
+                "clientCoherent": true,
+                "requirement": "5228537",
+                "contractualDue": "2027-03-02",
+                "operationalLimit": "2027-03-02",
+                "currency": "GTQ",
+                "portfolioCurrency": "GTQ",
+                "grossCents": 27826,
+                "portfolioGrossCents": 27826,
+                "receiptState": {
+                  "estadoOperativo": "futuro_pendiente"
+                },
+                "portfolioState": {
+                  "estadoOperativo": "futuro_pendiente"
+                }
+              },
+              "displayedGrossCents": 27826,
+              "displayedContractualDue": "02 mar 2027",
+              "displayedOperationalLimit": "02 mar 2027",
+              "displayedStatus": "Por vencer",
+              "canonicalStatus": "Por vencer",
+              "displayedBalanceCents": 27826,
+              "balanceCents": 27826,
+              "balanceState": "open",
+              "open": true,
+              "amountProofSource": "MATCHED_EXPECTED_RECEIPT_CONTRACTUAL_AMOUNT",
+              "ownerDecision": {
+                "open": true,
+                "proofSource": "MATCHED_EXPECTED_RECEIPT_CONTRACTUAL_AMOUNT",
+                "proofValueCents": 27826,
+                "currentBalanceCents": 27826,
+                "portfolioAmount": {
+                  "present": false,
+                  "type": "undefined",
+                  "value": null
+                },
+                "portfolioBalance": {
+                  "present": false,
+                  "type": "undefined",
+                  "value": null
+                },
+                "receiptOperationalState": {
+                  "present": true,
+                  "type": "string",
+                  "value": "OTHER"
+                },
+                "portfolioOperationalState": {
+                  "present": true,
+                  "type": "string",
+                  "value": "OTHER"
+                },
+                "policyState": {
+                  "present": true,
+                  "type": "string",
+                  "value": "vigente"
+                },
+                "policyCountry": {
+                  "present": true,
+                  "type": "string",
+                  "value": "gt"
+                },
+                "policyCurrency": {
+                  "present": true,
+                  "type": "string",
+                  "value": "gtq"
+                },
+                "duplicateReceipt": false,
+                "portfoliosForReceipt": 1,
+                "linkedPaymentInContext": false,
+                "policyPresent": true,
+                "portfolioDue": "2027-03-02",
+                "receiptDue": "2027-03-02"
+              },
+              "visibleFormats": {
+                "grossShape": "a 999.99",
+                "balanceShape": "aaaaa aaaaaaaaa: a 999.99"
+              },
+              "financialInputsFingerprint": "350f638df53c2ade5098f8926a6d4c1c7f821079816a9a207af8ed3e40268a85"
+            },
+            "afterCheck": {
+              "pass": true,
+              "stage": "AFTER_RELOAD",
+              "checks": {
+                "gross": true,
+                "contractualDue": true,
+                "operationalLimit": true,
+                "status": true,
+                "balanceVerified": true,
+                "balanceValue": true,
+                "balanceState": true
+              }
+            }
+          },
+          {
+            "sourceRequirement": "5228538",
+            "receiptId": "rec_538e6f8235084bb286d2d6d6",
+            "portfolioId": "car_d9fa6067a3a3930d14df779a",
+            "beforeReload": {
+              "ready": true,
+              "viewport": {
+                "width": 1365,
+                "detailVisible": true,
+                "balanceVisible": true,
+                "horizontalOverflowPx": 0
+              },
+              "receiptId": "rec_538e6f8235084bb286d2d6d6",
+              "detailCount": 1,
+              "actorMatches": true,
+              "role": "Operativo",
+              "country": "GT",
+              "protectedCandidate": true,
+              "confirmed": true,
+              "relevantErrors": [],
+              "source": {
+                "receiptId": "rec_538e6f8235084bb286d2d6d6",
+                "portfolioId": "car_d9fa6067a3a3930d14df779a",
+                "policyId": "pol_08ef784b45dab5a2acbfa556442c",
+                "portfolioPolicyId": "pol_08ef784b45dab5a2acbfa556442c",
+                "portfolioReceiptId": "rec_538e6f8235084bb286d2d6d6",
+                "clientCoherent": true,
+                "requirement": "5228538",
+                "contractualDue": "2027-04-02",
+                "operationalLimit": "2027-04-02",
+                "currency": "GTQ",
+                "portfolioCurrency": "GTQ",
+                "grossCents": 27826,
+                "portfolioGrossCents": 27826,
+                "receiptState": {
+                  "estadoOperativo": "futuro_pendiente"
+                },
+                "portfolioState": {
+                  "estadoOperativo": "futuro_pendiente"
+                }
+              },
+              "displayedGrossCents": 27826,
+              "displayedContractualDue": "02 abr 2027",
+              "displayedOperationalLimit": "02 abr 2027",
+              "displayedStatus": "Por vencer",
+              "canonicalStatus": "Por vencer",
+              "displayedBalanceCents": 27826,
+              "balanceCents": 27826,
+              "balanceState": "open",
+              "open": true,
+              "amountProofSource": "MATCHED_EXPECTED_RECEIPT_CONTRACTUAL_AMOUNT",
+              "ownerDecision": {
+                "open": true,
+                "proofSource": "MATCHED_EXPECTED_RECEIPT_CONTRACTUAL_AMOUNT",
+                "proofValueCents": 27826,
+                "currentBalanceCents": 27826,
+                "portfolioAmount": {
+                  "present": false,
+                  "type": "undefined",
+                  "value": null
+                },
+                "portfolioBalance": {
+                  "present": false,
+                  "type": "undefined",
+                  "value": null
+                },
+                "receiptOperationalState": {
+                  "present": true,
+                  "type": "string",
+                  "value": "OTHER"
+                },
+                "portfolioOperationalState": {
+                  "present": true,
+                  "type": "string",
+                  "value": "OTHER"
+                },
+                "policyState": {
+                  "present": true,
+                  "type": "string",
+                  "value": "vigente"
+                },
+                "policyCountry": {
+                  "present": true,
+                  "type": "string",
+                  "value": "gt"
+                },
+                "policyCurrency": {
+                  "present": true,
+                  "type": "string",
+                  "value": "gtq"
+                },
+                "duplicateReceipt": false,
+                "portfoliosForReceipt": 1,
+                "linkedPaymentInContext": false,
+                "policyPresent": true,
+                "portfolioDue": "2027-04-02",
+                "receiptDue": "2027-04-02"
+              },
+              "visibleFormats": {
+                "grossShape": "a 999.99",
+                "balanceShape": "aaaaa aaaaaaaaa: a 999.99"
+              },
+              "financialInputsFingerprint": "d9d2d1eec36ab5e9b6bbb009330d6841baf83ad250651510c80d250bb2e2f196"
+            },
+            "beforeCheck": {
+              "pass": true,
+              "stage": "BEFORE_RELOAD",
+              "checks": {
+                "gross": true,
+                "contractualDue": true,
+                "operationalLimit": true,
+                "status": true,
+                "balanceVerified": true,
+                "balanceValue": true,
+                "balanceState": true
+              }
+            },
+            "scrollBefore": {
+              "attempts": 1,
+              "detachments": 0
+            },
+            "reloadPass": true,
+            "scrollAfter": {
+              "attempts": 1,
+              "detachments": 0
+            },
+            "afterReload": {
+              "ready": true,
+              "viewport": {
+                "width": 1365,
+                "detailVisible": true,
+                "balanceVisible": true,
+                "horizontalOverflowPx": 0
+              },
+              "receiptId": "rec_538e6f8235084bb286d2d6d6",
+              "detailCount": 1,
+              "actorMatches": true,
+              "role": "Operativo",
+              "country": "GT",
+              "protectedCandidate": true,
+              "confirmed": true,
+              "relevantErrors": [],
+              "source": {
+                "receiptId": "rec_538e6f8235084bb286d2d6d6",
+                "portfolioId": "car_d9fa6067a3a3930d14df779a",
+                "policyId": "pol_08ef784b45dab5a2acbfa556442c",
+                "portfolioPolicyId": "pol_08ef784b45dab5a2acbfa556442c",
+                "portfolioReceiptId": "rec_538e6f8235084bb286d2d6d6",
+                "clientCoherent": true,
+                "requirement": "5228538",
+                "contractualDue": "2027-04-02",
+                "operationalLimit": "2027-04-02",
+                "currency": "GTQ",
+                "portfolioCurrency": "GTQ",
+                "grossCents": 27826,
+                "portfolioGrossCents": 27826,
+                "receiptState": {
+                  "estadoOperativo": "futuro_pendiente"
+                },
+                "portfolioState": {
+                  "estadoOperativo": "futuro_pendiente"
+                }
+              },
+              "displayedGrossCents": 27826,
+              "displayedContractualDue": "02 abr 2027",
+              "displayedOperationalLimit": "02 abr 2027",
+              "displayedStatus": "Por vencer",
+              "canonicalStatus": "Por vencer",
+              "displayedBalanceCents": 27826,
+              "balanceCents": 27826,
+              "balanceState": "open",
+              "open": true,
+              "amountProofSource": "MATCHED_EXPECTED_RECEIPT_CONTRACTUAL_AMOUNT",
+              "ownerDecision": {
+                "open": true,
+                "proofSource": "MATCHED_EXPECTED_RECEIPT_CONTRACTUAL_AMOUNT",
+                "proofValueCents": 27826,
+                "currentBalanceCents": 27826,
+                "portfolioAmount": {
+                  "present": false,
+                  "type": "undefined",
+                  "value": null
+                },
+                "portfolioBalance": {
+                  "present": false,
+                  "type": "undefined",
+                  "value": null
+                },
+                "receiptOperationalState": {
+                  "present": true,
+                  "type": "string",
+                  "value": "OTHER"
+                },
+                "portfolioOperationalState": {
+                  "present": true,
+                  "type": "string",
+                  "value": "OTHER"
+                },
+                "policyState": {
+                  "present": true,
+                  "type": "string",
+                  "value": "vigente"
+                },
+                "policyCountry": {
+                  "present": true,
+                  "type": "string",
+                  "value": "gt"
+                },
+                "policyCurrency": {
+                  "present": true,
+                  "type": "string",
+                  "value": "gtq"
+                },
+                "duplicateReceipt": false,
+                "portfoliosForReceipt": 1,
+                "linkedPaymentInContext": false,
+                "policyPresent": true,
+                "portfolioDue": "2027-04-02",
+                "receiptDue": "2027-04-02"
+              },
+              "visibleFormats": {
+                "grossShape": "a 999.99",
+                "balanceShape": "aaaaa aaaaaaaaa: a 999.99"
+              },
+              "financialInputsFingerprint": "d9d2d1eec36ab5e9b6bbb009330d6841baf83ad250651510c80d250bb2e2f196"
+            },
+            "afterCheck": {
+              "pass": true,
+              "stage": "AFTER_RELOAD",
+              "checks": {
+                "gross": true,
+                "contractualDue": true,
+                "operationalLimit": true,
+                "status": true,
+                "balanceVerified": true,
+                "balanceValue": true,
+                "balanceState": true
+              }
+            }
+          }
+        ],
+        "cobrosEngineBeforeReload": {
+          "ready": true,
+          "rows": [
+            {
+              "receiptId": "rec_98478284ecec24ad3d851ec0",
+              "count": 1,
+              "rows": [
+                {
+                  "policyId": "pol_08ef784b45dab5a2acbfa556442c",
+                  "currency": "GTQ",
+                  "grossCents": 27826,
+                  "due": "2026-11-02",
+                  "state": "Vencido"
+                }
+              ]
+            },
+            {
+              "receiptId": "rec_fb4ae3b5ee66fb31dbe34702",
+              "count": 1,
+              "rows": [
+                {
+                  "policyId": "pol_08ef784b45dab5a2acbfa556442c",
+                  "currency": "GTQ",
+                  "grossCents": 27826,
+                  "due": "2026-12-02",
+                  "state": "Pendiente"
+                }
+              ]
+            },
+            {
+              "receiptId": "rec_d76a756f3ab691bd675adebd",
+              "count": 1,
+              "rows": [
+                {
+                  "policyId": "pol_08ef784b45dab5a2acbfa556442c",
+                  "currency": "GTQ",
+                  "grossCents": 27826,
+                  "due": "2027-01-02",
+                  "state": "Pendiente"
+                }
+              ]
+            },
+            {
+              "receiptId": "rec_4f659319f7e5e56008788817",
+              "count": 1,
+              "rows": [
+                {
+                  "policyId": "pol_08ef784b45dab5a2acbfa556442c",
+                  "currency": "GTQ",
+                  "grossCents": 27826,
+                  "due": "2027-02-02",
+                  "state": "Pendiente"
+                }
+              ]
+            },
+            {
+              "receiptId": "rec_6dad42c3f5d06b15fea34726",
+              "count": 1,
+              "rows": [
+                {
+                  "policyId": "pol_08ef784b45dab5a2acbfa556442c",
+                  "currency": "GTQ",
+                  "grossCents": 27826,
+                  "due": "2027-03-02",
+                  "state": "Pendiente"
+                }
+              ]
+            },
+            {
+              "receiptId": "rec_538e6f8235084bb286d2d6d6",
+              "count": 1,
+              "rows": [
+                {
+                  "policyId": "pol_08ef784b45dab5a2acbfa556442c",
+                  "currency": "GTQ",
+                  "grossCents": 27826,
+                  "due": "2027-04-02",
+                  "state": "Pendiente"
+                }
+              ]
+            }
+          ],
+          "totalGrossCents": 166956
+        },
+        "cobrosEngineAfterReload": {
+          "ready": true,
+          "rows": [
+            {
+              "receiptId": "rec_98478284ecec24ad3d851ec0",
+              "count": 1,
+              "rows": [
+                {
+                  "policyId": "pol_08ef784b45dab5a2acbfa556442c",
+                  "currency": "GTQ",
+                  "grossCents": 27826,
+                  "due": "2026-11-02",
+                  "state": "Vencido"
+                }
+              ]
+            },
+            {
+              "receiptId": "rec_fb4ae3b5ee66fb31dbe34702",
+              "count": 1,
+              "rows": [
+                {
+                  "policyId": "pol_08ef784b45dab5a2acbfa556442c",
+                  "currency": "GTQ",
+                  "grossCents": 27826,
+                  "due": "2026-12-02",
+                  "state": "Pendiente"
+                }
+              ]
+            },
+            {
+              "receiptId": "rec_d76a756f3ab691bd675adebd",
+              "count": 1,
+              "rows": [
+                {
+                  "policyId": "pol_08ef784b45dab5a2acbfa556442c",
+                  "currency": "GTQ",
+                  "grossCents": 27826,
+                  "due": "2027-01-02",
+                  "state": "Pendiente"
+                }
+              ]
+            },
+            {
+              "receiptId": "rec_4f659319f7e5e56008788817",
+              "count": 1,
+              "rows": [
+                {
+                  "policyId": "pol_08ef784b45dab5a2acbfa556442c",
+                  "currency": "GTQ",
+                  "grossCents": 27826,
+                  "due": "2027-02-02",
+                  "state": "Pendiente"
+                }
+              ]
+            },
+            {
+              "receiptId": "rec_6dad42c3f5d06b15fea34726",
+              "count": 1,
+              "rows": [
+                {
+                  "policyId": "pol_08ef784b45dab5a2acbfa556442c",
+                  "currency": "GTQ",
+                  "grossCents": 27826,
+                  "due": "2027-03-02",
+                  "state": "Pendiente"
+                }
+              ]
+            },
+            {
+              "receiptId": "rec_538e6f8235084bb286d2d6d6",
+              "count": 1,
+              "rows": [
+                {
+                  "policyId": "pol_08ef784b45dab5a2acbfa556442c",
+                  "currency": "GTQ",
+                  "grossCents": 27826,
+                  "due": "2027-04-02",
+                  "state": "Pendiente"
+                }
+              ]
+            }
+          ],
+          "totalGrossCents": 166956
+        },
+        "cobrosEvidenceScope": "Canonical reportableRows calculation after real Cobros readiness and reload; individual Cobros DOM rows are not certified",
+        "currentOutstandingCents": 166956,
+        "sourceGrossCents": 166956,
+        "distinctObligationCount": 6,
+        "errors": {
+          "pageErrors": 0,
+          "consoleErrors": 0,
+          "httpClasses": {},
+          "blockedWrites": 0
+        },
+        "scope": "Exact six-row UI/reload/calculation only; other source universes and exceptions retain their own gates; mini-freeze adjudication external"
+      }
+    },
+    {
+      "role": "operativo",
+      "actorSha256": "d5384adb0f2e3a0612923fff21861f8e6583c7d3ef8b9f5ea7d01ad6664e5f1d",
+      "country": "GT",
+      "width": 390,
+      "authenticated": true,
+      "assignedRoleVerified": true,
+      "viewportVerified": false
+    }
+  ],
+  "financialFocalProgress": {
+    "status": "READONLY_CHECKS_IN_PROGRESS",
+    "observations": [
+      {
+        "sourceRequirement": "5228533",
+        "receiptId": "rec_98478284ecec24ad3d851ec0",
+        "portfolioId": "car_f08268f1ce68554f0375fcac",
+        "beforeReload": {
+          "ready": true,
+          "viewport": {
+            "width": 390,
+            "detailVisible": true,
+            "balanceVisible": true,
+            "horizontalOverflowPx": 0
+          },
+          "receiptId": "rec_98478284ecec24ad3d851ec0",
+          "detailCount": 1,
+          "actorMatches": true,
+          "role": "Operativo",
+          "country": "GT",
+          "protectedCandidate": true,
+          "confirmed": true,
+          "relevantErrors": [],
+          "source": {
+            "receiptId": "rec_98478284ecec24ad3d851ec0",
+            "portfolioId": "car_f08268f1ce68554f0375fcac",
+            "policyId": "pol_08ef784b45dab5a2acbfa556442c",
+            "portfolioPolicyId": "pol_08ef784b45dab5a2acbfa556442c",
+            "portfolioReceiptId": "rec_98478284ecec24ad3d851ec0",
+            "clientCoherent": true,
+            "requirement": "5228533",
+            "contractualDue": "2026-11-02",
+            "operationalLimit": "2026-11-02",
+            "currency": "GTQ",
+            "portfolioCurrency": "GTQ",
+            "grossCents": 27826,
+            "portfolioGrossCents": 27826,
+            "receiptState": {
+              "estadoOperativo": "futuro_pendiente"
+            },
+            "portfolioState": {
+              "estadoOperativo": "futuro_pendiente"
+            }
+          },
+          "displayedGrossCents": 27826,
+          "displayedContractualDue": "02 nov 2026",
+          "displayedOperationalLimit": "02 nov 2026",
+          "displayedStatus": "Vencido",
+          "canonicalStatus": "Vencido",
+          "displayedBalanceCents": 27826,
+          "balanceCents": 27826,
+          "balanceState": "open",
+          "open": true,
+          "amountProofSource": "MATCHED_EXPECTED_RECEIPT_CONTRACTUAL_AMOUNT",
+          "ownerDecision": {
+            "open": true,
+            "proofSource": "MATCHED_EXPECTED_RECEIPT_CONTRACTUAL_AMOUNT",
+            "proofValueCents": 27826,
+            "currentBalanceCents": 27826,
+            "portfolioAmount": {
+              "present": false,
+              "type": "undefined",
+              "value": null
+            },
+            "portfolioBalance": {
+              "present": false,
+              "type": "undefined",
+              "value": null
+            },
+            "receiptOperationalState": {
+              "present": true,
+              "type": "string",
+              "value": "OTHER"
+            },
+            "portfolioOperationalState": {
+              "present": true,
+              "type": "string",
+              "value": "OTHER"
+            },
+            "policyState": {
+              "present": true,
+              "type": "string",
+              "value": "vigente"
+            },
+            "policyCountry": {
+              "present": true,
+              "type": "string",
+              "value": "gt"
+            },
+            "policyCurrency": {
+              "present": true,
+              "type": "string",
+              "value": "gtq"
+            },
+            "duplicateReceipt": false,
+            "portfoliosForReceipt": 1,
+            "linkedPaymentInContext": false,
+            "policyPresent": true,
+            "portfolioDue": "2026-11-02",
+            "receiptDue": "2026-11-02"
+          },
+          "visibleFormats": {
+            "grossShape": "a 999.99",
+            "balanceShape": "aaaaa aaaaaaaaa: a 999.99"
+          },
+          "financialInputsFingerprint": "f20d302806ed1fdd9fcf183aa47ace522cd0f617cbdc340c801d3b7c11a3a89c"
+        },
+        "beforeCheck": {
+          "pass": true,
+          "stage": "BEFORE_RELOAD",
+          "checks": {
+            "gross": true,
+            "contractualDue": true,
+            "operationalLimit": true,
+            "status": true,
+            "balanceVerified": true,
+            "balanceValue": true,
+            "balanceState": true
+          }
+        },
+        "scrollBefore": {
+          "attempts": 1,
+          "detachments": 0
+        },
+        "reloadPass": true,
+        "scrollAfter": {
+          "attempts": 1,
+          "detachments": 0
+        },
+        "afterReload": {
+          "ready": true,
+          "viewport": {
+            "width": 390,
+            "detailVisible": true,
+            "balanceVisible": true,
+            "horizontalOverflowPx": 0
+          },
+          "receiptId": "rec_98478284ecec24ad3d851ec0",
+          "detailCount": 1,
+          "actorMatches": true,
+          "role": "Operativo",
+          "country": "GT",
+          "protectedCandidate": true,
+          "confirmed": true,
+          "relevantErrors": [],
+          "source": {
+            "receiptId": "rec_98478284ecec24ad3d851ec0",
+            "portfolioId": "car_f08268f1ce68554f0375fcac",
+            "policyId": "pol_08ef784b45dab5a2acbfa556442c",
+            "portfolioPolicyId": "pol_08ef784b45dab5a2acbfa556442c",
+            "portfolioReceiptId": "rec_98478284ecec24ad3d851ec0",
+            "clientCoherent": true,
+            "requirement": "5228533",
+            "contractualDue": "2026-11-02",
+            "operationalLimit": "2026-11-02",
+            "currency": "GTQ",
+            "portfolioCurrency": "GTQ",
+            "grossCents": 27826,
+            "portfolioGrossCents": 27826,
+            "receiptState": {
+              "estadoOperativo": "futuro_pendiente"
+            },
+            "portfolioState": {
+              "estadoOperativo": "futuro_pendiente"
+            }
+          },
+          "displayedGrossCents": 27826,
+          "displayedContractualDue": "02 nov 2026",
+          "displayedOperationalLimit": "02 nov 2026",
+          "displayedStatus": "Vencido",
+          "canonicalStatus": "Vencido",
+          "displayedBalanceCents": 27826,
+          "balanceCents": 27826,
+          "balanceState": "open",
+          "open": true,
+          "amountProofSource": "MATCHED_EXPECTED_RECEIPT_CONTRACTUAL_AMOUNT",
+          "ownerDecision": {
+            "open": true,
+            "proofSource": "MATCHED_EXPECTED_RECEIPT_CONTRACTUAL_AMOUNT",
+            "proofValueCents": 27826,
+            "currentBalanceCents": 27826,
+            "portfolioAmount": {
+              "present": false,
+              "type": "undefined",
+              "value": null
+            },
+            "portfolioBalance": {
+              "present": false,
+              "type": "undefined",
+              "value": null
+            },
+            "receiptOperationalState": {
+              "present": true,
+              "type": "string",
+              "value": "OTHER"
+            },
+            "portfolioOperationalState": {
+              "present": true,
+              "type": "string",
+              "value": "OTHER"
+            },
+            "policyState": {
+              "present": true,
+              "type": "string",
+              "value": "vigente"
+            },
+            "policyCountry": {
+              "present": true,
+              "type": "string",
+              "value": "gt"
+            },
+            "policyCurrency": {
+              "present": true,
+              "type": "string",
+              "value": "gtq"
+            },
+            "duplicateReceipt": false,
+            "portfoliosForReceipt": 1,
+            "linkedPaymentInContext": false,
+            "policyPresent": true,
+            "portfolioDue": "2026-11-02",
+            "receiptDue": "2026-11-02"
+          },
+          "visibleFormats": {
+            "grossShape": "a 999.99",
+            "balanceShape": "aaaaa aaaaaaaaa: a 999.99"
+          },
+          "financialInputsFingerprint": "f20d302806ed1fdd9fcf183aa47ace522cd0f617cbdc340c801d3b7c11a3a89c"
+        },
+        "afterCheck": {
+          "pass": true,
+          "stage": "AFTER_RELOAD",
+          "checks": {
+            "gross": true,
+            "contractualDue": true,
+            "operationalLimit": true,
+            "status": true,
+            "balanceVerified": true,
+            "balanceValue": true,
+            "balanceState": true
+          }
+        }
+      },
+      {
+        "sourceRequirement": "5228534",
+        "receiptId": "rec_fb4ae3b5ee66fb31dbe34702",
+        "portfolioId": "car_55c55df1fd5bcc541b70fc86",
+        "beforeReload": {
+          "ready": true,
+          "viewport": {
+            "width": 390,
+            "detailVisible": true,
+            "balanceVisible": true,
+            "horizontalOverflowPx": 0
+          },
+          "receiptId": "rec_fb4ae3b5ee66fb31dbe34702",
+          "detailCount": 1,
+          "actorMatches": true,
+          "role": "Operativo",
+          "country": "GT",
+          "protectedCandidate": true,
+          "confirmed": true,
+          "relevantErrors": [],
+          "source": {
+            "receiptId": "rec_fb4ae3b5ee66fb31dbe34702",
+            "portfolioId": "car_55c55df1fd5bcc541b70fc86",
+            "policyId": "pol_08ef784b45dab5a2acbfa556442c",
+            "portfolioPolicyId": "pol_08ef784b45dab5a2acbfa556442c",
+            "portfolioReceiptId": "rec_fb4ae3b5ee66fb31dbe34702",
+            "clientCoherent": true,
+            "requirement": "5228534",
+            "contractualDue": "2026-12-02",
+            "operationalLimit": "2026-12-02",
+            "currency": "GTQ",
+            "portfolioCurrency": "GTQ",
+            "grossCents": 27826,
+            "portfolioGrossCents": 27826,
+            "receiptState": {
+              "estadoOperativo": "futuro_pendiente"
+            },
+            "portfolioState": {
+              "estadoOperativo": "futuro_pendiente"
+            }
+          },
+          "displayedGrossCents": 27826,
+          "displayedContractualDue": "02 dic 2026",
+          "displayedOperationalLimit": "02 dic 2026",
+          "displayedStatus": "Por vencer",
+          "canonicalStatus": "Por vencer",
+          "displayedBalanceCents": 27826,
+          "balanceCents": 27826,
+          "balanceState": "open",
+          "open": true,
+          "amountProofSource": "MATCHED_EXPECTED_RECEIPT_CONTRACTUAL_AMOUNT",
+          "ownerDecision": {
+            "open": true,
+            "proofSource": "MATCHED_EXPECTED_RECEIPT_CONTRACTUAL_AMOUNT",
+            "proofValueCents": 27826,
+            "currentBalanceCents": 27826,
+            "portfolioAmount": {
+              "present": false,
+              "type": "undefined",
+              "value": null
+            },
+            "portfolioBalance": {
+              "present": false,
+              "type": "undefined",
+              "value": null
+            },
+            "receiptOperationalState": {
+              "present": true,
+              "type": "string",
+              "value": "OTHER"
+            },
+            "portfolioOperationalState": {
+              "present": true,
+              "type": "string",
+              "value": "OTHER"
+            },
+            "policyState": {
+              "present": true,
+              "type": "string",
+              "value": "vigente"
+            },
+            "policyCountry": {
+              "present": true,
+              "type": "string",
+              "value": "gt"
+            },
+            "policyCurrency": {
+              "present": true,
+              "type": "string",
+              "value": "gtq"
+            },
+            "duplicateReceipt": false,
+            "portfoliosForReceipt": 1,
+            "linkedPaymentInContext": false,
+            "policyPresent": true,
+            "portfolioDue": "2026-12-02",
+            "receiptDue": "2026-12-02"
+          },
+          "visibleFormats": {
+            "grossShape": "a 999.99",
+            "balanceShape": "aaaaa aaaaaaaaa: a 999.99"
+          },
+          "financialInputsFingerprint": "6d42e2403e8ca4e79d71200bedf1e2705ef633f197fde87d32403657fa805ff2"
+        },
+        "beforeCheck": {
+          "pass": true,
+          "stage": "BEFORE_RELOAD",
+          "checks": {
+            "gross": true,
+            "contractualDue": true,
+            "operationalLimit": true,
+            "status": true,
+            "balanceVerified": true,
+            "balanceValue": true,
+            "balanceState": true
+          }
+        },
+        "scrollBefore": {
+          "attempts": 1,
+          "detachments": 0
+        },
+        "reloadPass": true,
+        "scrollAfter": {
+          "attempts": 1,
+          "detachments": 0
+        },
+        "afterReload": {
+          "ready": true,
+          "viewport": {
+            "width": 390,
+            "detailVisible": true,
+            "balanceVisible": true,
+            "horizontalOverflowPx": 0
+          },
+          "receiptId": "rec_fb4ae3b5ee66fb31dbe34702",
+          "detailCount": 1,
+          "actorMatches": true,
+          "role": "Operativo",
+          "country": "GT",
+          "protectedCandidate": true,
+          "confirmed": true,
+          "relevantErrors": [],
+          "source": {
+            "receiptId": "rec_fb4ae3b5ee66fb31dbe34702",
+            "portfolioId": "car_55c55df1fd5bcc541b70fc86",
+            "policyId": "pol_08ef784b45dab5a2acbfa556442c",
+            "portfolioPolicyId": "pol_08ef784b45dab5a2acbfa556442c",
+            "portfolioReceiptId": "rec_fb4ae3b5ee66fb31dbe34702",
+            "clientCoherent": true,
+            "requirement": "5228534",
+            "contractualDue": "2026-12-02",
+            "operationalLimit": "2026-12-02",
+            "currency": "GTQ",
+            "portfolioCurrency": "GTQ",
+            "grossCents": 27826,
+            "portfolioGrossCents": 27826,
+            "receiptState": {
+              "estadoOperativo": "futuro_pendiente"
+            },
+            "portfolioState": {
+              "estadoOperativo": "futuro_pendiente"
+            }
+          },
+          "displayedGrossCents": 27826,
+          "displayedContractualDue": "02 dic 2026",
+          "displayedOperationalLimit": "02 dic 2026",
+          "displayedStatus": "Por vencer",
+          "canonicalStatus": "Por vencer",
+          "displayedBalanceCents": 27826,
+          "balanceCents": 27826,
+          "balanceState": "open",
+          "open": true,
+          "amountProofSource": "MATCHED_EXPECTED_RECEIPT_CONTRACTUAL_AMOUNT",
+          "ownerDecision": {
+            "open": true,
+            "proofSource": "MATCHED_EXPECTED_RECEIPT_CONTRACTUAL_AMOUNT",
+            "proofValueCents": 27826,
+            "currentBalanceCents": 27826,
+            "portfolioAmount": {
+              "present": false,
+              "type": "undefined",
+              "value": null
+            },
+            "portfolioBalance": {
+              "present": false,
+              "type": "undefined",
+              "value": null
+            },
+            "receiptOperationalState": {
+              "present": true,
+              "type": "string",
+              "value": "OTHER"
+            },
+            "portfolioOperationalState": {
+              "present": true,
+              "type": "string",
+              "value": "OTHER"
+            },
+            "policyState": {
+              "present": true,
+              "type": "string",
+              "value": "vigente"
+            },
+            "policyCountry": {
+              "present": true,
+              "type": "string",
+              "value": "gt"
+            },
+            "policyCurrency": {
+              "present": true,
+              "type": "string",
+              "value": "gtq"
+            },
+            "duplicateReceipt": false,
+            "portfoliosForReceipt": 1,
+            "linkedPaymentInContext": false,
+            "policyPresent": true,
+            "portfolioDue": "2026-12-02",
+            "receiptDue": "2026-12-02"
+          },
+          "visibleFormats": {
+            "grossShape": "a 999.99",
+            "balanceShape": "aaaaa aaaaaaaaa: a 999.99"
+          },
+          "financialInputsFingerprint": "6d42e2403e8ca4e79d71200bedf1e2705ef633f197fde87d32403657fa805ff2"
+        },
+        "afterCheck": {
+          "pass": true,
+          "stage": "AFTER_RELOAD",
+          "checks": {
+            "gross": true,
+            "contractualDue": true,
+            "operationalLimit": true,
+            "status": true,
+            "balanceVerified": true,
+            "balanceValue": true,
+            "balanceState": true
+          }
+        }
+      },
+      {
+        "sourceRequirement": "5228535",
+        "receiptId": "rec_d76a756f3ab691bd675adebd",
+        "portfolioId": "car_e923fc80be31f62b5a0fa720",
+        "beforeReload": {
+          "ready": true,
+          "viewport": {
+            "width": 390,
+            "detailVisible": true,
+            "balanceVisible": true,
+            "horizontalOverflowPx": 0
+          },
+          "receiptId": "rec_d76a756f3ab691bd675adebd",
+          "detailCount": 1,
+          "actorMatches": true,
+          "role": "Operativo",
+          "country": "GT",
+          "protectedCandidate": true,
+          "confirmed": true,
+          "relevantErrors": [],
+          "source": {
+            "receiptId": "rec_d76a756f3ab691bd675adebd",
+            "portfolioId": "car_e923fc80be31f62b5a0fa720",
+            "policyId": "pol_08ef784b45dab5a2acbfa556442c",
+            "portfolioPolicyId": "pol_08ef784b45dab5a2acbfa556442c",
+            "portfolioReceiptId": "rec_d76a756f3ab691bd675adebd",
+            "clientCoherent": true,
+            "requirement": "5228535",
+            "contractualDue": "2027-01-02",
+            "operationalLimit": "2027-01-02",
+            "currency": "GTQ",
+            "portfolioCurrency": "GTQ",
+            "grossCents": 27826,
+            "portfolioGrossCents": 27826,
+            "receiptState": {
+              "estadoOperativo": "futuro_pendiente"
+            },
+            "portfolioState": {
+              "estadoOperativo": "futuro_pendiente"
+            }
+          },
+          "displayedGrossCents": 27826,
+          "displayedContractualDue": "02 ene 2027",
+          "displayedOperationalLimit": "02 ene 2027",
+          "displayedStatus": "Por vencer",
+          "canonicalStatus": "Por vencer",
+          "displayedBalanceCents": 27826,
+          "balanceCents": 27826,
+          "balanceState": "open",
+          "open": true,
+          "amountProofSource": "MATCHED_EXPECTED_RECEIPT_CONTRACTUAL_AMOUNT",
+          "ownerDecision": {
+            "open": true,
+            "proofSource": "MATCHED_EXPECTED_RECEIPT_CONTRACTUAL_AMOUNT",
+            "proofValueCents": 27826,
+            "currentBalanceCents": 27826,
+            "portfolioAmount": {
+              "present": false,
+              "type": "undefined",
+              "value": null
+            },
+            "portfolioBalance": {
+              "present": false,
+              "type": "undefined",
+              "value": null
+            },
+            "receiptOperationalState": {
+              "present": true,
+              "type": "string",
+              "value": "OTHER"
+            },
+            "portfolioOperationalState": {
+              "present": true,
+              "type": "string",
+              "value": "OTHER"
+            },
+            "policyState": {
+              "present": true,
+              "type": "string",
+              "value": "vigente"
+            },
+            "policyCountry": {
+              "present": true,
+              "type": "string",
+              "value": "gt"
+            },
+            "policyCurrency": {
+              "present": true,
+              "type": "string",
+              "value": "gtq"
+            },
+            "duplicateReceipt": false,
+            "portfoliosForReceipt": 1,
+            "linkedPaymentInContext": false,
+            "policyPresent": true,
+            "portfolioDue": "2027-01-02",
+            "receiptDue": "2027-01-02"
+          },
+          "visibleFormats": {
+            "grossShape": "a 999.99",
+            "balanceShape": "aaaaa aaaaaaaaa: a 999.99"
+          },
+          "financialInputsFingerprint": "042bf8e811678bd6313775fb34205b84d9b22f0e67cc0e021d0a2d2d2f262486"
+        },
+        "beforeCheck": {
+          "pass": true,
+          "stage": "BEFORE_RELOAD",
+          "checks": {
+            "gross": true,
+            "contractualDue": true,
+            "operationalLimit": true,
+            "status": true,
+            "balanceVerified": true,
+            "balanceValue": true,
+            "balanceState": true
+          }
+        },
+        "scrollBefore": {
+          "attempts": 1,
+          "detachments": 0
+        },
+        "reloadPass": false
+      }
+    ],
+    "visibleFailures": [],
+    "sourceSnapshotBefore": [
+      {
+        "receiptId": "rec_98478284ecec24ad3d851ec0",
+        "portfolioId": "car_f08268f1ce68554f0375fcac",
+        "policyId": "pol_08ef784b45dab5a2acbfa556442c",
+        "portfolioPolicyId": "pol_08ef784b45dab5a2acbfa556442c",
+        "portfolioReceiptId": "rec_98478284ecec24ad3d851ec0",
+        "clientCoherent": true,
+        "requirement": "5228533",
+        "contractualDue": "2026-11-02",
+        "operationalLimit": "2026-11-02",
+        "currency": "GTQ",
+        "portfolioCurrency": "GTQ",
+        "grossCents": 27826,
+        "portfolioGrossCents": 27826,
+        "receiptState": {
+          "estadoOperativo": "futuro_pendiente"
+        },
+        "portfolioState": {
+          "estadoOperativo": "futuro_pendiente"
+        },
+        "portfolioMatches": 1,
+        "cobrosTruncated": false,
+        "cobrosCount": 0,
+        "cobrosFingerprints": [],
+        "rawFinancialInputsFingerprint": "13dd1663f01083a6d7dc613cd8d7bf079e2c0f39754da8f9fce6f5a53e920409",
+        "financialInputsFingerprint": "f20d302806ed1fdd9fcf183aa47ace522cd0f617cbdc340c801d3b7c11a3a89c",
+        "financialReadProjection": {
+          "owner": "functions/b4-003-scoped-related-reader.js#financialView",
+          "acceptedSourceSha": "04155aa7bc80e177ee57e50223506e47194bbe3d",
+          "fields": [
+            "pais"
+          ],
+          "country": "GT",
+          "rawToProjection": {
+            "schema": "GI_I66_REDACTED_FINANCIAL_INPUT_DIFF_V1",
+            "detailsAvailable": true,
+            "serverCobrosCount": 0,
+            "browserCobrosCount": 0,
+            "differingFieldCount": 2,
+            "differences": [
+              {
+                "path": "receipt.pais",
+                "serverPresent": false,
+                "browserPresent": true,
+                "serverType": "absent",
+                "browserType": "string",
+                "serverDigest": null,
+                "browserDigest": "2af2fd09c5f6a9a429030371f7529aa25b3a4b7ce5fc478585cb5be5e446afe8"
+              },
+              {
+                "path": "portfolio.pais",
+                "serverPresent": false,
+                "browserPresent": true,
+                "serverType": "absent",
+                "browserType": "string",
+                "serverDigest": null,
+                "browserDigest": "2af2fd09c5f6a9a429030371f7529aa25b3a4b7ce5fc478585cb5be5e446afe8"
+              }
+            ],
+            "truncated": false,
+            "valueDisclosure": "NONE_EPHEMERALLY_SALTED_HASHES_ONLY"
+          }
+        },
+        "rollbackPresent": true,
+        "auditIdentity": true,
+        "receiptFingerprint": "fa69ebb3c32507cfb9f7a555b8c8822c789dd181712d5b5324c0343c938170ba",
+        "portfolioFingerprint": "da85d32506a50cccd5a1debc3db1338b99b8b932576724b412574a8d7dff6827",
+        "auditFingerprint": "9735cdd8f67d05999151b92ee365d53ca6a184992f14fc1d1be7670c43dbff5b",
+        "serverBalanceProof": {
+          "sourceSha": "04155aa7bc80e177ee57e50223506e47194bbe3d",
+          "ownerBlob": "b77b65f86ef6ac2ab6dc157fdbc9ad5e34dbcdcc",
+          "source": "MATCHED_EXPECTED_RECEIPT_CONTRACTUAL_AMOUNT",
+          "open": true,
+          "balanceCents": 27826,
+          "scope": "EXACT_RECEIPT_LINKED_PORTFOLIO_POLICY_AND_LINKED_PAYMENTS"
+        }
+      },
+      {
+        "receiptId": "rec_fb4ae3b5ee66fb31dbe34702",
+        "portfolioId": "car_55c55df1fd5bcc541b70fc86",
+        "policyId": "pol_08ef784b45dab5a2acbfa556442c",
+        "portfolioPolicyId": "pol_08ef784b45dab5a2acbfa556442c",
+        "portfolioReceiptId": "rec_fb4ae3b5ee66fb31dbe34702",
+        "clientCoherent": true,
+        "requirement": "5228534",
+        "contractualDue": "2026-12-02",
+        "operationalLimit": "2026-12-02",
+        "currency": "GTQ",
+        "portfolioCurrency": "GTQ",
+        "grossCents": 27826,
+        "portfolioGrossCents": 27826,
+        "receiptState": {
+          "estadoOperativo": "futuro_pendiente"
+        },
+        "portfolioState": {
+          "estadoOperativo": "futuro_pendiente"
+        },
+        "portfolioMatches": 1,
+        "cobrosTruncated": false,
+        "cobrosCount": 0,
+        "cobrosFingerprints": [],
+        "rawFinancialInputsFingerprint": "112fe49cf5dd04db01ebe11b98a23e69a3b43f67c2fcf030c5b0793b89d566ce",
+        "financialInputsFingerprint": "6d42e2403e8ca4e79d71200bedf1e2705ef633f197fde87d32403657fa805ff2",
+        "financialReadProjection": {
+          "owner": "functions/b4-003-scoped-related-reader.js#financialView",
+          "acceptedSourceSha": "04155aa7bc80e177ee57e50223506e47194bbe3d",
+          "fields": [
+            "pais"
+          ],
+          "country": "GT",
+          "rawToProjection": {
+            "schema": "GI_I66_REDACTED_FINANCIAL_INPUT_DIFF_V1",
+            "detailsAvailable": true,
+            "serverCobrosCount": 0,
+            "browserCobrosCount": 0,
+            "differingFieldCount": 2,
+            "differences": [
+              {
+                "path": "receipt.pais",
+                "serverPresent": false,
+                "browserPresent": true,
+                "serverType": "absent",
+                "browserType": "string",
+                "serverDigest": null,
+                "browserDigest": "2af2fd09c5f6a9a429030371f7529aa25b3a4b7ce5fc478585cb5be5e446afe8"
+              },
+              {
+                "path": "portfolio.pais",
+                "serverPresent": false,
+                "browserPresent": true,
+                "serverType": "absent",
+                "browserType": "string",
+                "serverDigest": null,
+                "browserDigest": "2af2fd09c5f6a9a429030371f7529aa25b3a4b7ce5fc478585cb5be5e446afe8"
+              }
+            ],
+            "truncated": false,
+            "valueDisclosure": "NONE_EPHEMERALLY_SALTED_HASHES_ONLY"
+          }
+        },
+        "rollbackPresent": true,
+        "auditIdentity": true,
+        "receiptFingerprint": "9b9d83a4eb70f8f0c03d0ecf0bd1af62756a311e234f6aba51ffc1b92e70b960",
+        "portfolioFingerprint": "f88bf2e64baad77f6d1a60e8e44f21f5c02f27b1f6b7b7bbd727f0ab0924fe2f",
+        "auditFingerprint": "9081baa1df02ac182c93bf16fa59cff4a266eaf08d93678751714fff77fc3d31",
+        "serverBalanceProof": {
+          "sourceSha": "04155aa7bc80e177ee57e50223506e47194bbe3d",
+          "ownerBlob": "b77b65f86ef6ac2ab6dc157fdbc9ad5e34dbcdcc",
+          "source": "MATCHED_EXPECTED_RECEIPT_CONTRACTUAL_AMOUNT",
+          "open": true,
+          "balanceCents": 27826,
+          "scope": "EXACT_RECEIPT_LINKED_PORTFOLIO_POLICY_AND_LINKED_PAYMENTS"
+        }
+      },
+      {
+        "receiptId": "rec_d76a756f3ab691bd675adebd",
+        "portfolioId": "car_e923fc80be31f62b5a0fa720",
+        "policyId": "pol_08ef784b45dab5a2acbfa556442c",
+        "portfolioPolicyId": "pol_08ef784b45dab5a2acbfa556442c",
+        "portfolioReceiptId": "rec_d76a756f3ab691bd675adebd",
+        "clientCoherent": true,
+        "requirement": "5228535",
+        "contractualDue": "2027-01-02",
+        "operationalLimit": "2027-01-02",
+        "currency": "GTQ",
+        "portfolioCurrency": "GTQ",
+        "grossCents": 27826,
+        "portfolioGrossCents": 27826,
+        "receiptState": {
+          "estadoOperativo": "futuro_pendiente"
+        },
+        "portfolioState": {
+          "estadoOperativo": "futuro_pendiente"
+        },
+        "portfolioMatches": 1,
+        "cobrosTruncated": false,
+        "cobrosCount": 0,
+        "cobrosFingerprints": [],
+        "rawFinancialInputsFingerprint": "e0c306e2912d99bb8b5782ec455fa3d425947992645a9af878a5695e40a99479",
+        "financialInputsFingerprint": "042bf8e811678bd6313775fb34205b84d9b22f0e67cc0e021d0a2d2d2f262486",
+        "financialReadProjection": {
+          "owner": "functions/b4-003-scoped-related-reader.js#financialView",
+          "acceptedSourceSha": "04155aa7bc80e177ee57e50223506e47194bbe3d",
+          "fields": [
+            "pais"
+          ],
+          "country": "GT",
+          "rawToProjection": {
+            "schema": "GI_I66_REDACTED_FINANCIAL_INPUT_DIFF_V1",
+            "detailsAvailable": true,
+            "serverCobrosCount": 0,
+            "browserCobrosCount": 0,
+            "differingFieldCount": 2,
+            "differences": [
+              {
+                "path": "receipt.pais",
+                "serverPresent": false,
+                "browserPresent": true,
+                "serverType": "absent",
+                "browserType": "string",
+                "serverDigest": null,
+                "browserDigest": "2af2fd09c5f6a9a429030371f7529aa25b3a4b7ce5fc478585cb5be5e446afe8"
+              },
+              {
+                "path": "portfolio.pais",
+                "serverPresent": false,
+                "browserPresent": true,
+                "serverType": "absent",
+                "browserType": "string",
+                "serverDigest": null,
+                "browserDigest": "2af2fd09c5f6a9a429030371f7529aa25b3a4b7ce5fc478585cb5be5e446afe8"
+              }
+            ],
+            "truncated": false,
+            "valueDisclosure": "NONE_EPHEMERALLY_SALTED_HASHES_ONLY"
+          }
+        },
+        "rollbackPresent": true,
+        "auditIdentity": true,
+        "receiptFingerprint": "4344e5af58f708dabbb841efa26180ac764a7d1975ef1eafdb2a8a2c9735cb1c",
+        "portfolioFingerprint": "c76a023a6f9fe28463039b9b948ab55b55687c410c37a8c093cc0fce1a3ed37c",
+        "auditFingerprint": "ec0d1652f4f5f3a9916494ce224721f91d243952654e3da225609eb8cbaa80fa",
+        "serverBalanceProof": {
+          "sourceSha": "04155aa7bc80e177ee57e50223506e47194bbe3d",
+          "ownerBlob": "b77b65f86ef6ac2ab6dc157fdbc9ad5e34dbcdcc",
+          "source": "MATCHED_EXPECTED_RECEIPT_CONTRACTUAL_AMOUNT",
+          "open": true,
+          "balanceCents": 27826,
+          "scope": "EXACT_RECEIPT_LINKED_PORTFOLIO_POLICY_AND_LINKED_PAYMENTS"
+        }
+      },
+      {
+        "receiptId": "rec_4f659319f7e5e56008788817",
+        "portfolioId": "car_64d4f76fc02fc36cdff837ed",
+        "policyId": "pol_08ef784b45dab5a2acbfa556442c",
+        "portfolioPolicyId": "pol_08ef784b45dab5a2acbfa556442c",
+        "portfolioReceiptId": "rec_4f659319f7e5e56008788817",
+        "clientCoherent": true,
+        "requirement": "5228536",
+        "contractualDue": "2027-02-02",
+        "operationalLimit": "2027-02-02",
+        "currency": "GTQ",
+        "portfolioCurrency": "GTQ",
+        "grossCents": 27826,
+        "portfolioGrossCents": 27826,
+        "receiptState": {
+          "estadoOperativo": "futuro_pendiente"
+        },
+        "portfolioState": {
+          "estadoOperativo": "futuro_pendiente"
+        },
+        "portfolioMatches": 1,
+        "cobrosTruncated": false,
+        "cobrosCount": 0,
+        "cobrosFingerprints": [],
+        "rawFinancialInputsFingerprint": "37668ae675e2119893a989b4ee51c43cd6fb48cee9842b85ab22ab2f59aa5955",
+        "financialInputsFingerprint": "7ef2ccb37f6039e236498e6303d7e203b8526278e6c83b9791d5af0ef51bee2f",
+        "financialReadProjection": {
+          "owner": "functions/b4-003-scoped-related-reader.js#financialView",
+          "acceptedSourceSha": "04155aa7bc80e177ee57e50223506e47194bbe3d",
+          "fields": [
+            "pais"
+          ],
+          "country": "GT",
+          "rawToProjection": {
+            "schema": "GI_I66_REDACTED_FINANCIAL_INPUT_DIFF_V1",
+            "detailsAvailable": true,
+            "serverCobrosCount": 0,
+            "browserCobrosCount": 0,
+            "differingFieldCount": 2,
+            "differences": [
+              {
+                "path": "receipt.pais",
+                "serverPresent": false,
+                "browserPresent": true,
+                "serverType": "absent",
+                "browserType": "string",
+                "serverDigest": null,
+                "browserDigest": "2af2fd09c5f6a9a429030371f7529aa25b3a4b7ce5fc478585cb5be5e446afe8"
+              },
+              {
+                "path": "portfolio.pais",
+                "serverPresent": false,
+                "browserPresent": true,
+                "serverType": "absent",
+                "browserType": "string",
+                "serverDigest": null,
+                "browserDigest": "2af2fd09c5f6a9a429030371f7529aa25b3a4b7ce5fc478585cb5be5e446afe8"
+              }
+            ],
+            "truncated": false,
+            "valueDisclosure": "NONE_EPHEMERALLY_SALTED_HASHES_ONLY"
+          }
+        },
+        "rollbackPresent": true,
+        "auditIdentity": true,
+        "receiptFingerprint": "fbe5469d8e0c30b72690bd25c6845679dfbacfc46c8b7d9be520be8edfbdb4e5",
+        "portfolioFingerprint": "31628c648f9666b8780ca32d2597e3f3900ab8890e768405cf4637c8638607cd",
+        "auditFingerprint": "e7112948ebcd783cf9a2b182c921e3c9b2c62827d1f5c7a52d98dd08fc201681",
+        "serverBalanceProof": {
+          "sourceSha": "04155aa7bc80e177ee57e50223506e47194bbe3d",
+          "ownerBlob": "b77b65f86ef6ac2ab6dc157fdbc9ad5e34dbcdcc",
+          "source": "MATCHED_EXPECTED_RECEIPT_CONTRACTUAL_AMOUNT",
+          "open": true,
+          "balanceCents": 27826,
+          "scope": "EXACT_RECEIPT_LINKED_PORTFOLIO_POLICY_AND_LINKED_PAYMENTS"
+        }
+      },
+      {
+        "receiptId": "rec_6dad42c3f5d06b15fea34726",
+        "portfolioId": "car_3c6dd87039503edb71f2b84e",
+        "policyId": "pol_08ef784b45dab5a2acbfa556442c",
+        "portfolioPolicyId": "pol_08ef784b45dab5a2acbfa556442c",
+        "portfolioReceiptId": "rec_6dad42c3f5d06b15fea34726",
+        "clientCoherent": true,
+        "requirement": "5228537",
+        "contractualDue": "2027-03-02",
+        "operationalLimit": "2027-03-02",
+        "currency": "GTQ",
+        "portfolioCurrency": "GTQ",
+        "grossCents": 27826,
+        "portfolioGrossCents": 27826,
+        "receiptState": {
+          "estadoOperativo": "futuro_pendiente"
+        },
+        "portfolioState": {
+          "estadoOperativo": "futuro_pendiente"
+        },
+        "portfolioMatches": 1,
+        "cobrosTruncated": false,
+        "cobrosCount": 0,
+        "cobrosFingerprints": [],
+        "rawFinancialInputsFingerprint": "de7000616ba08f70cb7185df110b2aadc68268f7575b07ed8db91d38fe9ff80c",
+        "financialInputsFingerprint": "350f638df53c2ade5098f8926a6d4c1c7f821079816a9a207af8ed3e40268a85",
+        "financialReadProjection": {
+          "owner": "functions/b4-003-scoped-related-reader.js#financialView",
+          "acceptedSourceSha": "04155aa7bc80e177ee57e50223506e47194bbe3d",
+          "fields": [
+            "pais"
+          ],
+          "country": "GT",
+          "rawToProjection": {
+            "schema": "GI_I66_REDACTED_FINANCIAL_INPUT_DIFF_V1",
+            "detailsAvailable": true,
+            "serverCobrosCount": 0,
+            "browserCobrosCount": 0,
+            "differingFieldCount": 2,
+            "differences": [
+              {
+                "path": "receipt.pais",
+                "serverPresent": false,
+                "browserPresent": true,
+                "serverType": "absent",
+                "browserType": "string",
+                "serverDigest": null,
+                "browserDigest": "2af2fd09c5f6a9a429030371f7529aa25b3a4b7ce5fc478585cb5be5e446afe8"
+              },
+              {
+                "path": "portfolio.pais",
+                "serverPresent": false,
+                "browserPresent": true,
+                "serverType": "absent",
+                "browserType": "string",
+                "serverDigest": null,
+                "browserDigest": "2af2fd09c5f6a9a429030371f7529aa25b3a4b7ce5fc478585cb5be5e446afe8"
+              }
+            ],
+            "truncated": false,
+            "valueDisclosure": "NONE_EPHEMERALLY_SALTED_HASHES_ONLY"
+          }
+        },
+        "rollbackPresent": true,
+        "auditIdentity": true,
+        "receiptFingerprint": "8897f4003b8a86c03c31470a0c63edb9e0aa2245289f1d689d1070a3e5dc93c5",
+        "portfolioFingerprint": "24aa70b7b5f6dd17e96edf730ca4800bffb132cf348181178320198bbf5a5071",
+        "auditFingerprint": "862e04d4a98220d885c31c8f8471164aad60cd646cf63512349caff4961c2909",
+        "serverBalanceProof": {
+          "sourceSha": "04155aa7bc80e177ee57e50223506e47194bbe3d",
+          "ownerBlob": "b77b65f86ef6ac2ab6dc157fdbc9ad5e34dbcdcc",
+          "source": "MATCHED_EXPECTED_RECEIPT_CONTRACTUAL_AMOUNT",
+          "open": true,
+          "balanceCents": 27826,
+          "scope": "EXACT_RECEIPT_LINKED_PORTFOLIO_POLICY_AND_LINKED_PAYMENTS"
+        }
+      },
+      {
+        "receiptId": "rec_538e6f8235084bb286d2d6d6",
+        "portfolioId": "car_d9fa6067a3a3930d14df779a",
+        "policyId": "pol_08ef784b45dab5a2acbfa556442c",
+        "portfolioPolicyId": "pol_08ef784b45dab5a2acbfa556442c",
+        "portfolioReceiptId": "rec_538e6f8235084bb286d2d6d6",
+        "clientCoherent": true,
+        "requirement": "5228538",
+        "contractualDue": "2027-04-02",
+        "operationalLimit": "2027-04-02",
+        "currency": "GTQ",
+        "portfolioCurrency": "GTQ",
+        "grossCents": 27826,
+        "portfolioGrossCents": 27826,
+        "receiptState": {
+          "estadoOperativo": "futuro_pendiente"
+        },
+        "portfolioState": {
+          "estadoOperativo": "futuro_pendiente"
+        },
+        "portfolioMatches": 1,
+        "cobrosTruncated": false,
+        "cobrosCount": 0,
+        "cobrosFingerprints": [],
+        "rawFinancialInputsFingerprint": "2f6165686b07a8a399dc07853908cafe87571a2f04d3a29122e7e55a2d703438",
+        "financialInputsFingerprint": "d9d2d1eec36ab5e9b6bbb009330d6841baf83ad250651510c80d250bb2e2f196",
+        "financialReadProjection": {
+          "owner": "functions/b4-003-scoped-related-reader.js#financialView",
+          "acceptedSourceSha": "04155aa7bc80e177ee57e50223506e47194bbe3d",
+          "fields": [
+            "pais"
+          ],
+          "country": "GT",
+          "rawToProjection": {
+            "schema": "GI_I66_REDACTED_FINANCIAL_INPUT_DIFF_V1",
+            "detailsAvailable": true,
+            "serverCobrosCount": 0,
+            "browserCobrosCount": 0,
+            "differingFieldCount": 2,
+            "differences": [
+              {
+                "path": "receipt.pais",
+                "serverPresent": false,
+                "browserPresent": true,
+                "serverType": "absent",
+                "browserType": "string",
+                "serverDigest": null,
+                "browserDigest": "2af2fd09c5f6a9a429030371f7529aa25b3a4b7ce5fc478585cb5be5e446afe8"
+              },
+              {
+                "path": "portfolio.pais",
+                "serverPresent": false,
+                "browserPresent": true,
+                "serverType": "absent",
+                "browserType": "string",
+                "serverDigest": null,
+                "browserDigest": "2af2fd09c5f6a9a429030371f7529aa25b3a4b7ce5fc478585cb5be5e446afe8"
+              }
+            ],
+            "truncated": false,
+            "valueDisclosure": "NONE_EPHEMERALLY_SALTED_HASHES_ONLY"
+          }
+        },
+        "rollbackPresent": true,
+        "auditIdentity": true,
+        "receiptFingerprint": "827a1b1c68e408bee0da3df9e976d94e977ac36a34088df71f7747af8083344c",
+        "portfolioFingerprint": "6e83fcf0f7aa57c321d18ffbc934193fb269dc77be442220ad0486db6269bdcd",
+        "auditFingerprint": "23df506af121c585b48844e612f75babc388f4c47ba26649e52999ede42a7ea0",
+        "serverBalanceProof": {
+          "sourceSha": "04155aa7bc80e177ee57e50223506e47194bbe3d",
+          "ownerBlob": "b77b65f86ef6ac2ab6dc157fdbc9ad5e34dbcdcc",
+          "source": "MATCHED_EXPECTED_RECEIPT_CONTRACTUAL_AMOUNT",
+          "open": true,
+          "balanceCents": 27826,
+          "scope": "EXACT_RECEIPT_LINKED_PORTFOLIO_POLICY_AND_LINKED_PAYMENTS"
+        }
+      }
+    ],
+    "additionalWrites": 0
+  },
+  "status": "HOLD"
+}

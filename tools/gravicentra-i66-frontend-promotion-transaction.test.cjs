@@ -43,6 +43,67 @@ test('concurrent third version during compensation remains untouched',async()=>{
 test('lost reply after committed metadata cannot trigger rollback',async()=>{const f=fixture(),commit=f.io.commitAll;f.io.commitAll=async(...args)=>{await commit(...args);throw Error('LOST_ACK');};assert.equal((await promote(f.io,f.req)).phase,'COMMITTED');assert.equal(f.state.clones,1);});
 
 const frontendOwner=require('./gravicentra-i66-frontend-promotion-owner.cjs');
+function ownerSelectionRepo(check){
+  const fs=require('node:fs'),path=require('node:path'),os=require('node:os'),{execFileSync}=require('node:child_process');
+  const cwd=fs.mkdtempSync(path.join(os.tmpdir(),'offline-financial-owner-selection-'));
+  const gitRead=(...args)=>execFileSync('git',args,{cwd,stdio:['ignore','pipe','pipe'],maxBuffer:8*1024*1024});
+  const write=(p,text)=>{fs.mkdirSync(path.dirname(path.join(cwd,p)),{recursive:true});fs.writeFileSync(path.join(cwd,p),text);};
+  const commit=()=>{gitRead('add','--all');gitRead('-c','user.name=Offline Fixture','-c','user.email=fixture@example.invalid','commit','-qm','offline selection fixture');return String(gitRead('rev-parse','HEAD')).trim();};
+  try{
+    gitRead('init','--quiet');for(const p of frontendOwner.financialQaPaths('COMPOSITE'))write(p,'offline fixture owner '+p+'\n');
+    write('functions/not-an-explicit-qa-pin.js','offline function leaf\n');
+    write('orbit360-platform/test-leaf.js','offline platform leaf\n');
+    write('orbit360-platform/docs/recovery/orbit360-recovery-state-v1.json','{"offline":1}\n');
+    const source=commit();return check({cwd,source,gitRead,write,commit,fs,path});
+  }finally{fs.rmSync(cwd,{recursive:true,force:true});}
+}
+test('composite financial pins select exact regular blobs and treat only historical storage.rules as optional',()=>ownerSelectionRepo(f=>{
+  const selected=frontendOwner.financialQaOwnerSelection(f.source,f);
+  assert.deepEqual(selected.paths,frontendOwner.financialQaPaths('COMPOSITE'));
+  assert.deepEqual(selected.optionalAbsent,['storage.rules']);
+  assert.ok(!selected.paths.some(p=>['functions','orbit360-platform'].includes(p)||p.startsWith(':(')));
+  for(const p of selected.paths)assert.equal(selected.pins[p],String(f.gitRead('rev-parse',f.source+':'+p)).trim());
+  f.write('storage.rules','offline optional owner\n');const withOptional=f.commit();
+  assert.ok(frontendOwner.financialQaOwnerSelection(withOptional,f).paths.includes('storage.rules'));
+  f.fs.rmSync(f.path.join(f.cwd,selected.paths[0]));const missing=f.commit();
+  assert.throws(()=>frontendOwner.financialQaOwnerSelection(missing,f),/FINANCIAL_QA_REQUIRED_OWNER_ABSENT/);
+  assert.throws(()=>frontendOwner.financialQaPaths('COMPOSITE',['missing-arbitrary-owner.cjs']),/UNKNOWN_OPTIONAL_OWNER/);
+}));
+test('complete financial composition protects directory leaves outside individual pins and excludes only recovery state',()=>ownerSelectionRepo(f=>{
+  const check=()=>frontendOwner.assertFinancialComposition(f.source,f.source,f);
+  assert.doesNotThrow(check);
+  for(const p of ['functions/not-an-explicit-qa-pin.js','orbit360-platform/test-leaf.js',
+    'tools/gravicentra-i66-frontend-promotion-owner.cjs']){
+    f.write(p,'changed offline owner\n');assert.throws(check);f.gitRead('restore','--',p);
+  }
+  f.write('orbit360-platform/docs/recovery/orbit360-recovery-state-v1.json','{"offline":2}\n');
+  assert.doesNotThrow(check);const stateOnly=f.commit();
+  assert.doesNotThrow(()=>frontendOwner.assertFinancialComposition(f.source,stateOnly,f));
+  f.write('functions/not-an-explicit-qa-pin.js','committed changed leaf\n');const changed=f.commit();
+  assert.throws(()=>frontendOwner.assertFinancialComposition(f.source,changed,f));
+}));
+test('new storage.rules or an untracked protected directory leaf cannot silently bypass the frozen composition',()=>ownerSelectionRepo(f=>{
+  f.write('functions/new-untracked-leaf.js','new offline function\n');
+  assert.throws(()=>frontendOwner.assertFinancialComposition(f.source,f.source,f),/UNTRACKED_COMPOSITION_FILE/);
+  f.fs.rmSync(f.path.join(f.cwd,'functions/new-untracked-leaf.js'));
+  f.write('storage.rules','new offline rules\n');
+  assert.throws(()=>frontendOwner.assertFinancialComposition(f.source,f.source,f),/UNTRACKED_COMPOSITION_FILE/);
+  f.gitRead('add','storage.rules');assert.throws(()=>frontendOwner.assertFinancialComposition(f.source,f.source,f));
+  const changed=f.commit();assert.throws(()=>frontendOwner.assertFinancialComposition(f.source,changed,f));
+}));
+test('each release-owner command invoked by either deployment workflow dispatches to its real action and unknown commands fail closed',async()=>{
+  const fs=require('node:fs'),actions=new Set();
+  for(const p of ['.github/workflows/gravicentra-delta-66-exact-live-clone.yml',
+    '.github/workflows/gravicentra-i66-privileged-role-exact-live-promotion.yml']){
+    for(const m of fs.readFileSync(p,'utf8').matchAll(/node tools\/gravicentra-i66-frontend-promotion-owner\.cjs(?:[ \t]+(--[a-z-]+))?/g))actions.add(m[1]);
+  }
+  assert.deepEqual([...actions].sort(),[undefined,'--verify-composite-financial-preview','--accept-composite-live','--authorize-composite-rollback','--record-composite-rollback'].sort());
+  const map={'--verify-composite-financial-preview':'verifyCompositeFinancialPreview','--accept-composite-live':'runCompositeAcceptance',
+    '--authorize-composite-rollback':'authorizeCompositeRollback','--record-composite-rollback':'recordCompositeRollback'};
+  for(const action of actions){const calls=[],handlers=Object.fromEntries(['run',...Object.values(map)].map(name=>[name,async()=>calls.push(name)]));
+    await frontendOwner.dispatchReleaseAction(action,handlers);assert.deepEqual(calls,[action===undefined?'run':map[action]]);}
+  await assert.rejects(frontendOwner.dispatchReleaseAction('--not-authorized',{}),/RELEASE_OWNER_UNKNOWN_OPERATION/);
+});
 function financialAuthority(phase='preview'){
   const physical={...release('a'),generation:3,receiptGitBlobSha:'e'.repeat(40)},authorityBlob='f'.repeat(40);
   const target={...release('b'),buildId:'gi-i66-bbbbbbbbbbbb-123456789abc',buildRunId:101,

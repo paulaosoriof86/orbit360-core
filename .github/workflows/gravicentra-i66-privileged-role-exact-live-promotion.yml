@@ -349,7 +349,7 @@ jobs:
             node tools/gravicentra-i66-make-lead-protected-executor.cjs before-deploy live
             node tools/gravicentra-i66-make-firebase-project-iam-guard.cjs "$FIREBASE_CLI_BIN" live deploy \
             --only functions:orbit360ProductOperationalCommand,functions:orbit360CobrosReconciliationCommand,functions:orbit360ScopedPolicyRead,functions:orbit360OpsLeadsCommand,functions:orbit360MakeLeadIngress \
-            --config "$I66_LIVE_FIREBASE_CONFIG" --project "$PROJECT_ID" --non-interactive
+            --config "$I66_LIVE_FIREBASE_CONFIG" --project "$PROJECT_ID" --non-interactive --force
             node tools/gravicentra-i66-make-lead-protected-executor.cjs capture-trigger live
             node tools/gravicentra-i66-make-lead-protected-executor.cjs initialize-closed live
             node tools/gravicentra-i66-make-lead-protected-executor.cjs wait-probe live

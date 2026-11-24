@@ -431,6 +431,111 @@ async function showSixReceiptBalance(page,expected,viewportWidth,stage){
       uiAccepted:false};throw error;
   }
 }
+// A readiness failure must retain the observed failure, not manufacture another
+// attempt or turn a later recovery into PASS. Read only bounded structural flags;
+// never return DOM text, URLs, query values, user names, tokens or record values.
+function inspectSixReadinessHold(input){
+  const o=window.Orbit,store=o?.store,names=['clientes','polizas','recibosEsperados','carteraPrimas','cobros'];
+  let status={},statusReadFailed=false;
+  try{status=store?._productStatus?.()||{};}catch{statusReadFailed=true;}
+  const count=n=>Number.isSafeInteger(n)&&n>=0?Math.min(n,1000000):0;
+  const list=x=>Array.isArray(x)?x:[];
+  const knownRole=value=>['operativo','direccion'].includes(String(value||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase())?
+    String(value).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase():'OTHER';
+  const knownRoute=value=>['cliente360','cobros','inicio','login'].includes(value)?value:'OTHER';
+  const errorClass=value=>{
+    const code=typeof value==='string'?value:typeof value?.code==='string'?value.code:'';
+    return ['permission-denied','unauthenticated','deadline-exceeded','unavailable','resource-exhausted','internal',
+      'failed-precondition','not-found','cancelled','unknown'].find(x=>code===x||code==='functions/'+x)||
+      (value?'UNCLASSIFIED_ERROR':null);
+  };
+  const selector='[data-rp-receipt-detail-id="'+CSS.escape(input.expected.receiptId)+'"]';
+  const root=document.querySelector(selector),host=document.getElementById('host');
+  const hash=String(location.hash||''),parts=hash.replace(/^#\/?/,'').split('?'),query=new URLSearchParams(parts.slice(1).join('?'));
+  let activeRole='OTHER';try{activeRole=knownRole(o?.session?.rol?.());}catch{}
+  const sources=Object.fromEntries(names.map(name=>{
+    const plan=status.queryPlans?.[name];return [name,{confirmed:list(status.serverConfirmedCollections).includes(name),
+      denied:list(status.deniedCollections).includes(name),errorClass:errorClass(status.snapshotErrors?.[name]),
+      queryPlanPresent:!!plan,queryPlanOk:plan?.ok===true,queryPlanDenied:plan?.denied===true,
+      queryPlanHardError:plan?.hardError===true,queryPlanErrorCount:count(list(plan?.errors).length)}];
+  }));
+  const available=(collection,id)=>{try{return typeof store?.get==='function'?!!store.get(collection,id):null;}catch{return null;}};
+  const detailCount=count(document.querySelectorAll(selector).length);
+  return {schema:'GI_I66_SIX_READINESS_DOM_FLAGS_V1',valueDisclosure:'NONE_STRUCTURAL_FLAGS_ONLY',
+    documentState:['loading','interactive','complete'].includes(document.readyState)?document.readyState:'OTHER',
+    orbitPresent:!!o,storePresent:!!store,statusReaderPresent:typeof store?._productStatus==='function',statusReadFailed,
+    runtimeProvidersPresent:!!o?.productRuntimeBrowserProvidersP0,productAppPresent:!!o?.productAppP0,
+    protectedCandidate:store?._protectedCandidate===true,hostPresent:!!host,
+    pagePresent:!!host?.querySelector('.page'),clientListReady:!!host?.querySelector('[data-c360-list-ready="1"]'),
+    expectedDetailCount:detailCount,anyDetailCount:count(document.querySelectorAll('[data-rp-receipt-detail-id]').length),
+    detailValuesPresent:!!root?.querySelector('[data-rp-detail-values]'),balancePresent:!!root?.querySelector('[data-rp-current-balance]'),
+    allRequiredSourcesConfirmed:names.every(name=>sources[name].confirmed),readyPredicateAtCapture:detailCount>0&&names.every(name=>sources[name].confirmed),
+    sources,sourceRecordPresence:{receipt:available('recibosEsperados',input.expected.receiptId),
+      portfolio:available('carteraPrimas',input.expected.portfolioId),policy:available('polizas',input.policyId)},
+    actorMatches:o?.auth?.productUser?.uid===input.actorUid,tenantMatches:o?.auth?.productUser?.tenantId==='alianzas-soluciones',
+    activeRole,expectedRoleMatches:activeRole===input.expectedRole,country:['GT','CO'].includes(o?.pais)?o.pais:'OTHER',
+    roleSelectorPresent:!!document.querySelector('#rol-sel'),countrySelectorPresent:!!document.querySelector('#pais-sel'),
+    viewport:{width:count(innerWidth),height:count(innerHeight)},
+    route:{hashRoute:knownRoute(parts[0]),runtimeRoute:knownRoute(o?.route?.key),clientParamPresent:query.has('c'),
+      receiptParamPresent:query.has('r'),tabIsReceipts:query.get('t')==='recibos',clientMatches:query.get('c')===input.clientId,
+      receiptMatches:query.get('r')===input.expected.receiptId,otherParamCount:[...query.keys()].filter(k=>!['c','r','t'].includes(k)).length},
+    scriptShape:{total:count(document.querySelectorAll('script[src]').length),modules:count(document.querySelectorAll('script[type="module"][src]').length)}};
+}
+function sixDiagnosticErrorCounts(read){
+  try{
+    const e=read(),count=x=>Number.isSafeInteger(x)&&x>=0?Math.min(x,1000000):0;
+    return {available:true,pageErrors:count(e.pageErrors),consoleErrors:count(e.consoleErrors),blockedWrites:count(e.blockedWrites),
+      httpClasses:Object.fromEntries(Object.entries(e.httpClasses||{}).filter(([key])=>/^HTTP_[45]\d{2}$/.test(key))
+        .slice(0,200).map(([key,value])=>[key,count(value)]))};
+  }catch{return {available:false,reason:'COUNTERS_UNAVAILABLE'};}
+}
+function sixPartialStageCounts(value){
+  const seen=new Set();let completed=0,passed=0;
+  const add=f=>{if(!f||seen.has(f))return;seen.add(f);for(const row of f.observations||[])
+    for(const check of [row.beforeCheck,row.afterCheck])if(check){completed++;if(check.pass===true)passed++;}};
+  for(const row of value.roles||[]){add(row.financialFocal);add(row.progress);}add(value.financialFocalProgress);
+  return {completed,passed};
+}
+async function sixBoundedDiagnosticRead(work,budgetMs){
+  let timer;try{return await Promise.race([
+    Promise.resolve().then(work).then(value=>({status:'CAPTURED',value}),()=>({status:'UNAVAILABLE',reason:'READ_FAILED'})),
+    new Promise(resolve=>{timer=setTimeout(()=>resolve({status:'UNAVAILABLE',reason:'DIAGNOSTIC_DEADLINE'}),budgetMs);})
+  ]);}finally{clearTimeout(timer);}
+}
+async function waitSixReceiptReady(page,{input,actor,stage,index,authority,before,errors}){
+  try{return await page.waitForFunction(id=>!!document.querySelector('[data-rp-receipt-detail-id="'+CSS.escape(id)+'"]')&&
+    ['clientes','polizas','recibosEsperados','carteraPrimas','cobros'].every(k=>(Orbit.store?._productStatus?.().serverConfirmedCollections||[]).includes(k)),
+    input.expected.receiptId,{timeout:60000});}
+  catch(error){
+    const partial=sixPartialStageCounts(report),budgetMs=2000,progress=report.financialFocalProgress;
+    const diagnostic={schema:'GI_I66_SIX_READINESS_WAIT_HOLD_V1',status:'HOLD',
+      cause:error?.name==='TimeoutError'?'READINESS_TIMEOUT':'READINESS_WAIT_REJECTED',phase,
+      stage,receiptOrdinal:index+1,role:['operativo','direccion'].includes(actor.allowedRole)?actor.allowedRole:'OTHER',
+      viewportWidth:Number.isSafeInteger(actor.viewportWidth)?actor.viewportWidth:null,
+      expectedSourceSha:/^[a-f0-9]{40}$/.test(pin.sourceSha||'')?pin.sourceSha:null,
+      expectedBuildId:/^gi-i66-[a-f0-9]{12}-[a-f0-9]{12}$/.test(pin.buildId||'')?pin.buildId:null,
+      targetBinding:'EXISTING_SIGNED_QA_TARGET_NOT_A_FRESH_RUNTIME_BUILD_READ',
+      waitTimeoutMs:60000,waitAttempts:1,diagnosticBudgetMs:budgetMs,
+      completedStages:partial.completed,passedStages:partial.passed,errors:sixDiagnosticErrorCounts(errors),
+      uiAccepted:false,additionalWrites:0,retryPerformed:false};
+    report.status='HOLD';report.stageCount=partial.completed;
+    // Independent, bounded reads only after failure. Neither changes the wait,
+    // reruns navigation, supplies missing UI values or reclassifies the failure.
+    const [dom,server]=await Promise.all([
+      sixBoundedDiagnosticRead(()=>page.evaluate(inspectSixReadinessHold,{...input,policyId:authority.scope.policyId,
+        expectedRole:diagnostic.role}),budgetMs),
+      sixBoundedDiagnosticRead(()=>sixServerSnapshot(authority),budgetMs)
+    ]);
+    diagnostic.browser=dom.status==='CAPTURED'?{status:'CAPTURED',flags:dom.value}:dom;
+    if(server.status==='CAPTURED'){
+      const after=server.value;diagnostic.serverFinancialReadback={status:'CAPTURED',beforeFingerprint:focalHash(before),
+        afterFingerprint:focalHash(after),serverUnchanged:focalHash(before)===focalHash(after),rowCount:after.rows.length};
+      if(progress)progress.sourceSnapshotAfter=after.rows;
+    }else diagnostic.serverFinancialReadback=server;
+    if(progress){progress.status='READINESS_WAIT_HOLD';progress.readinessHold=diagnostic;progress.errors=diagnostic.errors;}
+    error.sixReadinessHold=diagnostic;throw error;
+  }
+}
 async function runSixReceiptUi(page,actor,errors){
   need(phase==='live'||(readMode==='six-frontend-release'&&frontendQa?.phase==='preview'),'I66_SIX_REAL_DATA_LIVE_ONLY');
   const authority=sixReceiptAuthority(),before=await sixServerSnapshot(authority);
@@ -446,16 +551,15 @@ async function runSixReceiptUi(page,actor,errors){
     const expected=authority.rows[i],source=before.rows[i],input={expected,clientId:before.clientId,actorUid:actor.uid,
       financialFields:SIX_FINANCIAL_FIELDS,viewportWidth:actor.viewportWidth};
     await page.evaluate(hash=>{location.hash=hash;},'#/cliente360?c='+encodeURIComponent(before.clientId)+'&t=recibos&r='+encodeURIComponent(expected.receiptId));
-    const wait=()=>page.waitForFunction(id=>!!document.querySelector('[data-rp-receipt-detail-id="'+CSS.escape(id)+'"]')&&
-      ['clientes','polizas','recibosEsperados','carteraPrimas','cobros'].every(k=>(Orbit.store?._productStatus?.().serverConfirmedCollections||[]).includes(k)),expected.receiptId,{timeout:60000});
+    const wait=stage=>waitSixReceiptReady(page,{input,actor,stage,index:i,authority,before,errors});
     // On the existing one-column mobile layout the balance follows the receipt
     // breakdown. Normal reading scroll exposes it without invoking any action.
-    await wait();const scrollBefore=await showSixReceiptBalance(page,expected,actor.viewportWidth,'BEFORE_RELOAD');
+    await wait('BEFORE_RELOAD');const scrollBefore=await showSixReceiptBalance(page,expected,actor.viewportWidth,'BEFORE_RELOAD');
     const first=await page.evaluate(inspectSixReceiptBrowser,input);
     const beforeCheck=collectSixVisibleResult(expected,source,first,'BEFORE_RELOAD',visibleFailures,actor.allowedRole||'operativo',actor.viewportWidth);
     const observation={sourceRequirement:expected.sourceRequirement,receiptId:expected.receiptId,portfolioId:expected.portfolioId,
       beforeReload:first,beforeCheck,scrollBefore,reloadPass:false};observations.push(observation);
-    await page.reload({waitUntil:'domcontentloaded',timeout:60000});await wait();
+    await page.reload({waitUntil:'domcontentloaded',timeout:60000});await wait('AFTER_RELOAD');
     observation.scrollAfter=await showSixReceiptBalance(page,expected,actor.viewportWidth,'AFTER_RELOAD');
     const reloaded=await page.evaluate(inspectSixReceiptBrowser,input);
     const afterCheck=collectSixVisibleResult(expected,source,reloaded,'AFTER_RELOAD',visibleFailures,actor.allowedRole||'operativo',actor.viewportWidth);
@@ -593,6 +697,8 @@ async function runFrontendFinancialMatrix(){
         row.financialFocal=report.financialFocal;delete report.financialFocal;
         row.viewportVerified=row.financialFocal.observations.every(x=>[x.beforeReload,x.afterReload].every(u=>u.viewport?.width===width&&u.viewport.detailVisible&&u.viewport.balanceVisible&&u.viewport.horizontalOverflowPx===0));
       }catch(error){
+        if(error?.sixReadinessHold){row.readinessHold=error.sixReadinessHold;row.progress=report.financialFocalProgress;
+          report.stageCount=sixPartialStageCounts(report).completed;throw error;}
         if(error?.message!=='I66_SIX_VISIBLE_VALUES_OR_BALANCE_HOLD'||!error.sixVisibleComparisons)throw error;
         row.visibleHold=error.sixVisibleComparisons;row.progress=report.financialFocalProgress;delete report.financialFocalProgress;
       }finally{await context.close();}
@@ -1036,7 +1142,9 @@ try{
   if(error?.message==='I66_SIX_VISIBLE_VALUES_OR_BALANCE_HOLD')
     report.financialFocalHold=error.sixVisibleComparisons||error.sixVisibleComparison;
   if(error?.sixScrollComparison)report.financialFocalScrollHold=error.sixScrollComparison;
-  report.errors.push(String(error?.message||'PERF_UNKNOWN').replace(/[^A-Z0-9_:-]/gi,'').slice(0,100));
+  if(error?.sixReadinessHold)report.financialFocalReadinessHold=error.sixReadinessHold;
+  report.errors.push(error?.sixReadinessHold?'I66_SIX_RECEIPT_READINESS_WAIT_HOLD':
+    String(error?.message||'PERF_UNKNOWN').replace(/[^A-Z0-9_:-]/gi,'').slice(0,100));
   console.error('I66_PERF_HOLD:'+report.errors[0]);
   process.exitCode=1;
 }finally{

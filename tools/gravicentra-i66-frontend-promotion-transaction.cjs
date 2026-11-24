@@ -112,7 +112,45 @@ function validateCompositeProof(request,proof){
   assert.equal(request.target.files,p.expectedSiteFileCount,'COMPOSITE_FILE_COUNT');
   for(const key of ['sourceSha','artifactId','artifactDigest','buildId','buildRunId','hostingVersion'])
     assert.equal(request.previous[key],p.currentLive[key],'COMPOSITE_PREDECESSOR_'+key);
+  if(p.makeIngressComposite===true){
+    const binding=request.financialQa;
+    assert.equal(binding?.scopeId,'SIX_RECEIPT_CURRENT_BALANCE_READONLY','COMPOSITE_FINANCIAL_SCOPE_REQUIRED');
+    assert.ok(gitSha(binding.authorityBlob)&&gitSha(binding.parentAuthorityBlob));
+    assert.equal(binding.parentAuthorityBlob,request.approvalBlob,'COMPOSITE_FINANCIAL_PARENT_AUTHORITY_DRIFT');
+    assert.equal(binding.previewReceiptPath,p.financialPreviewQa?.receiptPath);
+    assert.equal(binding.previewReceiptBlob,p.financialPreviewQa?.receiptBlob);assert.ok(gitSha(binding.previewReceiptBlob));
+  }
   return proof;
+}
+function compositeFinancialUiReceipt(request,journal,report){
+  const b=request.financialQa;
+  return {schema:'GI_I66_FRONTEND_FINANCIAL_READONLY_UI_RECEIPT_V1',generation:journal.generation,scopeId:b.scopeId,
+    releaseScope:'COMPOSITE',authorityBlob:b.authorityBlob,parentAuthorityBlob:b.parentAuthorityBlob,
+    sourceSha:request.target.sourceSha,artifactDigest:request.target.artifactDigest,buildId:request.target.buildId,
+    physicalPhaseKey:journal.key,result:'PASS',readOnly:true,fullA04Accepted:false,fullA12Passed:false,
+    reportSha256:crypto.createHash('sha256').update(JSON.stringify(report,null,2)+'\n').digest('hex'),financialQa:report};
+}
+function validateCompositeFinancialUi(request,journal,observed,{committedReadback=false}={}){
+  assert.equal(journal.phase,committedReadback?'COMMITTED':'VERIFIED','COMPOSITE_FINANCIAL_QA_MUST_FOLLOW_VERIFIED');
+  assert.equal(observed?.result,'PASS');assert.equal(observed.scopeId,request.financialQa.scopeId);
+  assert.equal(observed.generation,request.generation);assert.equal(observed.physicalPhaseKey,journal.key);
+  assert.equal(observed.authorityBlob,request.financialQa.authorityBlob);assert.equal(observed.parentAuthorityBlob,request.approvalBlob);
+  for(const key of ['sourceSha','artifactDigest','buildId'])assert.equal(observed[key],request.target[key]);
+  assert.equal(observed.runId,journal.liveProof.runId);
+  assert.equal(observed.receiptPath,require('./gravicentra-i66-frontend-control.cjs').genName(journal.generation,'LIVE_UI'));
+  const report=observed.financialQa;
+  require('./gravicentra-i66-frontend-promotion-owner.cjs').validateFinancialReport(report,request.target,'live',
+    {authorityBlob:request.financialQa.authorityBlob,parentAuthorityBlob:request.approvalBlob,
+      physicalPhaseKey:journal.key,releaseScope:'COMPOSITE'});
+  assert.equal(report.frontendQaBefore.runId,journal.liveProof.runId);
+  for(const proof of [report.frontendQaBefore,report.frontendQaAfter])
+    assert.equal(proof.generation,journal.generation,'COMPOSITE_FINANCIAL_REPORT_GENERATION_DRIFT');
+  const receipt=compositeFinancialUiReceipt(request,journal,report);
+  assert.equal(observed.reportSha256,receipt.reportSha256,'COMPOSITE_FINANCIAL_REPORT_HASH_DRIFT');
+  assert.equal(observed.receiptBlob,require('./gravicentra-i66-frontend-control.cjs').blob(JSON.stringify(receipt,null,2)+'\n'),
+    'COMPOSITE_FINANCIAL_UI_BYTES_DRIFT');
+  const {financialQa,...compact}=observed;
+  return compact;
 }
 // Acceptance of an already executed, signed composite release. Deployment and
 // compensation remain owned by the exact LIVE workflow; this path never clones
@@ -141,6 +179,13 @@ async function acceptComposite(io,request,proof){
     if(!j)j=await io.cas(null,{phase:'VERIFIED',operation:'ACCEPT_EXECUTED_COMPOSITE_LIVE',key,
       generation:request.generation,request,preview,physical,liveProof:proof});
     await io.assertOwnership(j);
+    if(request.candidate.makeIngressComposite===true){
+      assert.equal(typeof io.financialLiveUiProof,'function','COMPOSITE_FINANCIAL_LIVE_UI_DRIVER_REQUIRED');
+      const ui=validateCompositeFinancialUi(request,j,await io.financialLiveUiProof(j));
+      if(j.financialUi)assert.deepEqual(j.financialUi,ui,'COMPOSITE_FINANCIAL_REPLAY_PROOF_DRIFT');
+      else j=await io.cas(j,{...j,financialUi:ui});
+      await io.assertOwnership(j);
+    }
     const receipt=await io.signedReceipt(j);
     assert.ok(receipt.verified&&gitSha(receipt.blob)&&gitSha(receipt.commit),'RELEASE_SIGNED_RECEIPT_ABSENT');
     assert.equal(await io.currentVersion(),request.target.hostingVersion,'COMPOSITE_LIVE_CHANGED_BEFORE_COMMIT');
@@ -153,4 +198,4 @@ async function acceptComposite(io,request,proof){
     throw error;
   }
 }
-module.exports={promote,acceptComposite,validateCompositeProof,validateRequest,verifyBytes,releaseBinding,digest};
+module.exports={promote,acceptComposite,validateCompositeProof,compositeFinancialUiReceipt,validateCompositeFinancialUi,validateRequest,verifyBytes,releaseBinding,digest};

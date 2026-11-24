@@ -1,0 +1,324 @@
+{
+  "schema": "GI_I66_COMPOSITE_FINANCIAL_OWNER_RECOVERY_V1",
+  "recordedAtUtc": "2026-11-24T11:03:18.481Z",
+  "gate": "I6.6",
+  "status": "LOCAL_SOURCE_CORRECTION_VERIFIED_SIGNED_SOURCE_QA_AND_V20_BUILD_PENDING",
+  "baseHead": "153b28142a8c43a4bb81a2357fbed17a440d2c8f",
+  "recoveredSource": "Prior composite_financial_qa_candidate: three existing owners were omitted from the composed source; their full delta is restored over preserved transport and exact bootstrap verification.",
+  "productionAcceptance": false,
+  "productSourceChanged": false,
+  "artifactPatched": false,
+  "newImmutableBuildRequired": true,
+  "findings": {
+    "missingWorkflowAction": "--verify-composite-financial-preview",
+    "missingFinancialLiveAcceptanceHook": true,
+    "invalidFinancialOwnerPathspecs": [
+      "functions",
+      "orbit360-platform",
+      ":(exclude)orbit360-platform/docs/recovery/orbit360-recovery-state-v1.json"
+    ],
+    "historicallyAbsentOptionalOwner": "storage.rules"
+  },
+  "corrections": {
+    "allFourWorkflowCliActionsDispatched": true,
+    "actualFinancialLiveCertifierTested": true,
+    "live48RequiredBeforeSigning": true,
+    "previewLiveFinancialSourceSnapshotEqualityRequired": true,
+    "parentAuthorityBlobStrict": true,
+    "readOnlyFinancialScopesOnly": true,
+    "fullGitPathspecCompositionDiffPreserved": true,
+    "untrackedProtectedPathsRejected": true,
+    "missingRequiredExplicitOwnerRejected": true,
+    "optionalStorageAbsenceExplicit": true,
+    "asyncChildSupervisionPreserved": true,
+    "exactExpectedHeadCasReadbackPreserved": true
+  },
+  "sequencing": {
+    "previewFinancial48": "After Make synthetic probe, replay/rejection, restore and final CLOSED binding; pin the final whole transport blob and keep it stable during before/after.",
+    "liveFinancial48": "After final protected Make configuration and an authentic financial-authority rebind in the same control CAS; require VERIFIED journal, then child48, signed UI receipt, signed release receipt, atomic close.",
+    "concurrentTransportMutationDuringFinancialReadbackAllowed": false
+  },
+  "localValidation": {
+    "compositionAndMakeTests": {
+      "passed": 273,
+      "failed": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "logSha256": "770773c23bc439b5ab53d5373d843171d5dc872de0d582cac49355868edf054f"
+    },
+    "actualFinancialCertifierLostResponse": {
+      "childKeepsParentResponsive": true,
+      "uiCasWrites": 1,
+      "independentReadbacks": 1,
+      "signatureVerifications": 1,
+      "physicalCloses": 1
+    },
+    "sourceTreeOwnerSelection": {
+      "sourceHead": "04155aa7bc80e177ee57e50223506e47194bbe3d",
+      "providerTreeEntries": 10027,
+      "providerTruncated": false,
+      "selectedRegularBlobCount": 114,
+      "source": "Authenticated GitHub exact tree metadata supplied by independent finance audit; no local production Git history claimed",
+      "optionalAbsent": [
+        "storage.rules"
+      ],
+      "status": "EXACT_REQUIRED_BLOB_SELECTION_PASS",
+      "pins": {
+        ".github/workflows/gravicentra-delta-66-exact-live-clone.yml": "35126531cfa17ba34c6117b905852c33dcedd391",
+        ".github/workflows/gravicentra-i66-current-exact-preview-cross-module-uat-20261119.yml": "1af12aaeef8178c0ff9e172f958e02991386601c",
+        ".github/workflows/gravicentra-i66-live-performance-readonly.yml": "12225700cec41aafabc477d60fe7f525ba957e12",
+        ".github/workflows/gravicentra-i66-preview-performance-readonly.yml": "6fb8e18e9280652b0541e2206b662d51515fa5e1",
+        ".github/workflows/gravicentra-i66-privileged-role-exact-live-promotion.yml": "a0ebd06feef87a25e868f6b64212b78be2e0e534",
+        ".github/workflows/gravicentra-i66-privileged-role-parity-source-qa.yml": "37d150c7bcfb884152409ebefe512bdab26e5df9",
+        ".github/workflows/gravicentra-i66-privileged-role-three-function-preview-uat.yml": "b6ee9c071b3e045e512884248ffbbe46ed6c1f1a",
+        ".github/workflows/gravicentra-release-delta-66-package.yml": "19540c5c5cab3384ec9fa819ba1685e6b55129e7",
+        ".github/workflows/gravicentra-release-lock-sync.yml": "379f7d4fef9daedfa0c060cadc7646ce788f7b6e",
+        "artifacts/orbit360-recovery/release-control/I6_6_A13_CHANNEL_SCOPE_AND_EXISTING_EXECUTORS_20261124.json": "7ce546736ac8d08b8ac922d19f3e6e4c2bac0021",
+        "artifacts/orbit360-recovery/release-control/I6_6_COMMUNICATION_TRACEABILITY_AND_DOCUMENT_INGRESS_OWNER_DECISION_20261124.json": "3bbfe4a19b9bb2db446bbfbb8f8be60da6ef8a18",
+        "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_TECHNICAL_PREVIEW_ROLLOVER_20261116.json": "d639ccf9161ecd996f79870f21ef2e3b43efcaef",
+        "artifacts/orbit360-recovery/release-control/I6_6_DAILY_PLAN_FREEZE_AND_SOURCE_INTAKE_RELOAD_20261117.json": "326749414df98e79f50ace2ea7b496edfff255e5",
+        "artifacts/orbit360-recovery/release-control/I6_6_DIRECTION_LIVE_V2_SCOPE_PROPOSAL_20261117.json": "c131fb241fdbf712b30d50eb99746294216844e7",
+        "artifacts/orbit360-recovery/release-control/I6_6_DIRECTION_PREVIEW_PROPOSAL_DIAGNOSTIC_RETRY_20261117.json": "7791cfcf81eea1edac612eb9b8f12cca217e4d09",
+        "artifacts/orbit360-recovery/release-control/I6_6_DIRECTION_PREVIEW_QA_NAVIGATION_RETRY_20261116.json": "d85042517f0bde059d49514beb443f8b544eaa8d",
+        "artifacts/orbit360-recovery/release-control/I6_6_DIRECTION_PREVIEW_V2_SCOPE_AUTHORIZATION_20261116.json": "4331eaf5150acd6907c086609116491a8b94311c",
+        "artifacts/orbit360-recovery/release-control/I6_6_DOCUMENTED_PREMIUM_CALENDAR_SOURCE_QA_20261117.json": "70d12038363aa8ee965562f8112f362cb210e17b",
+        "artifacts/orbit360-recovery/release-control/I6_6_FUTURE_PENDING_BALANCE_OWNER_CAUSAL_CORRECTION_20261124.json": "c05769d469b0a5e88e72e9e946095cb47bfc9d32",
+        "artifacts/orbit360-recovery/release-control/I6_6_MAKE_CANONICAL_RUNTIME_ACCESS_READBACK_20261124.json": "e359231b4813145aa05346e9936bac8a5f13a2a4",
+        "artifacts/orbit360-recovery/release-control/I6_6_META_WHATSAPP_ATTRIBUTION_READONLY_20261124.json": "ca24ec3265bc3b1b6c77a8ff63f37b9be913abbd",
+        "artifacts/orbit360-recovery/release-control/I6_6_PROPOSAL_DIAGNOSTIC_CAUSAL_RETRY_20261117.json": "be36b027f3207d3fcb584491089d08a4d4ff8e35",
+        "artifacts/orbit360-recovery/release-control/I6_6_QA_NAVIGATION_CAUSAL_RETRY_20261116.json": "400b8714861b71da2410d247f05844b3001c7f10",
+        "artifacts/orbit360-recovery/release-control/I6_6_SOURCE_INTAKE_V2_PRECISION_CAUSAL_SOURCE_QA_20261117.json": "f216a313ecfd7f443546e5d08f639063ec000587",
+        "artifacts/orbit360-recovery/release-control/I6_6_TECHNICAL_PREVIEW_DIAGNOSTIC_RETENTION_REBUILD_20261117.json": "5efdcb9b12b5f81a56db9855105a14d3779f5381",
+        "artifacts/orbit360-recovery/release-control/I6_6_TECHNICAL_PREVIEW_DOCUMENTED_SOURCE_AND_TRANSPORT_REBUILD_20261117.json": "6b24445b3c94d7289f5d9591273db951a25ceb4a",
+        "artifacts/orbit360-recovery/release-control/I6_6_TECHNICAL_PREVIEW_HYDRATION_AND_BALANCE_REBUILD_20261117.json": "be739a3279eb66a2beafe2c67fd51f05be08a17d",
+        "artifacts/orbit360-recovery/release-control/I6_6_TECHNICAL_PREVIEW_NETWORK_DIAGNOSTIC_REBUILD_20261117.json": "880daaa8ab1c2deefdd83b893b3aa4c94caeea5a",
+        "artifacts/orbit360-recovery/release-control/I6_6_TECHNICAL_PREVIEW_OBSERVABILITY_REBUILD_20261116.json": "d49672fcf4848a8f2a988d2045f8bb5cbe7f7993",
+        "artifacts/orbit360-recovery/release-control/I6_6_TECHNICAL_PREVIEW_ROLLOVER_CAUSAL_RETRY_20261116.json": "0d498caa200a94af11169b98456f7207ffe2bfdb",
+        "artifacts/orbit360-recovery/release-control/I6_6_TECHNICAL_PREVIEW_SOURCE_INTAKE_PRECISION_REBUILD_20261117.json": "4185f2618220eb81a22ba2e0c2c528e4669fd791",
+        "artifacts/orbit360-recovery/release-control/I6_6_TECHNICAL_PREVIEW_SOURCE_INTAKE_RELOAD_REBUILD_20261117.json": "200ec0df7d466579d60c09dc1549bfc9a9e828ac",
+        "firebase.json": "470d5ecc46faca20f7487bbfdb2031bbe592d890",
+        "firestore.rules": "35fba451bbbeb97dbae3f08303b786ddbcbdd29f",
+        "functions/product-active-role-contract.js": "09681f536c5cbbd36bcba6514d4829d2494b9387",
+        "tools/gravicentra-b4-003-post-auth-bootstrap-diagnostic.test.cjs": "88963a62a1b80c6742095dd51b78d9295a6ca076",
+        "tools/gravicentra-b4-003-protected-hydration.test.cjs": "901c948d55d3598fa91685254560dc4a2ebcf005",
+        "tools/gravicentra-governance-preflight-v1.mjs": "edce16bffa474aae01eb34cdbc5bec5b0b63017f",
+        "tools/gravicentra-i6-6-advisor-browser-observability.test.cjs": "a4fba5598331a2691ef3663d744f9f217895610f",
+        "tools/gravicentra-i6-6-advisor-payables-signed-uat.cjs": "076dd4a82444cd46e1e62999d11e8eb765ead0a9",
+        "tools/gravicentra-i6-6-advisor-startup-diagnostics.test.cjs": "2917f358cbf7add83d604c7c93fc68a14f43a9f2",
+        "tools/gravicentra-i6-6-assignment-detail-navigation.test.cjs": "49043851e468b37f54700172566670f778d61f13",
+        "tools/gravicentra-i6-6-carlos-paula-live-synthetic-ops-leads-uat.cjs": "cdab5a1f2e12dfce569dcda3474a7b68cf3d884c",
+        "tools/gravicentra-i6-6-carlos-real-signed-synthetic-preview-uat.cjs": "4bdcff0b62961e2c4905a73330609c10c70672c4",
+        "tools/gravicentra-i6-6-cobros-visible-snapshot-performance.test.cjs": "5f7efc67df5551368fe396beb26a5e7ea13ec5dc",
+        "tools/gravicentra-i6-6-composite-preview-admission.test.cjs": "e9814a87fe871c825d63eebd1f8a24d92270db13",
+        "tools/gravicentra-i6-6-current-live-five-role-route-readonly.cjs": "cb151d10e047f823d925d536f04a4bc8084ea7d9",
+        "tools/gravicentra-i6-6-delta-guard.mjs": "576eda7cd5767c8a7e3bd033f36a8805f06890e8",
+        "tools/gravicentra-i6-6-delta-test-revisions.cjs": "b99b4e8ac0def995efbc4f1fdb00b67efdc31a49",
+        "tools/gravicentra-i6-6-direction-live-legal-acceptance.test.cjs": "240a0924d1164971ed4d5aa088c239b4d93a6d71",
+        "tools/gravicentra-i6-6-direction-preview-i66-consent-scope.test.cjs": "777f665c015b63ca8db08bef6683050f8e339476",
+        "tools/gravicentra-i6-6-direction-preview-legal-acceptance.cjs": "b3a6539596fb9ed706f7a6e21aa982bf97129780",
+        "tools/gravicentra-i6-6-direction-preview-proposal-diagnostic-retry.test.cjs": "d70ef4a1416145ff5df2fe9a3007ccfaea87e432",
+        "tools/gravicentra-i6-6-direction-preview-qa-navigation-retry.test.cjs": "d6ad57e8516f9dbf239107c0e7263e9e9c44e5b7",
+        "tools/gravicentra-i6-6-documented-premium-terms.test.cjs": "e85efa5ce3b403b8840f522c7ded137362ce3f4f",
+        "tools/gravicentra-i6-6-documented-terms-signed-check.cjs": "35a026b8a439efb4c5557e04a13880da4cd6475f",
+        "tools/gravicentra-i6-6-documented-terms-signed-check.test.cjs": "a27fda43f87dd4d411f9844a159ce62d8504f8b2",
+        "tools/gravicentra-i6-6-financial-page-read-efficiency.test.cjs": "b090a37debd6e397d597410efe237083a8fff84f",
+        "tools/gravicentra-i6-6-five-role-assigned-selection.test.cjs": "6605e3a61adab866d5d9a20b60a3b0182335d99b",
+        "tools/gravicentra-i6-6-frontend-preview-authority.cjs": "b4e1e1fe26db3d69c6d3f40cd2405279cd642baf",
+        "tools/gravicentra-i6-6-live-proof-artifact-layout.test.cjs": "a1807bc3f6e2b0f91b47502e7f385cae65876ef3",
+        "tools/gravicentra-i6-6-make-lead-ingress-release.test.cjs": "eb800c9b5ac086609c03ff7a619dd364c3132ac6",
+        "tools/gravicentra-i6-6-operational-live-acceptance.test.cjs": "38ffd0f0f71ee299af54ed8a535e1dc9659c2da8",
+        "tools/gravicentra-i6-6-operational-release-candidate.cjs": "badcc35dc58ce606371437d8b4e0fd086bbcd7dc",
+        "tools/gravicentra-i6-6-performance-first-route-source-timeline.test.cjs": "5a9b7fccbbce89b85669bc6a8bbd82cc30481563",
+        "tools/gravicentra-i6-6-policy-preview-money-precision.test.cjs": "a3e2c29749845a3db1af58860203a300f6d0fb78",
+        "tools/gravicentra-i6-6-preview-candidate-binding.test.cjs": "7bdfc80ee9a10aded4f3ac123c4c2ecfbb475903",
+        "tools/gravicentra-i6-6-preview-channel-reuse-guard.cjs": "658d2a4e6f55d18bbaa43c85430947ae7d3eb532",
+        "tools/gravicentra-i6-6-preview-current-live-restore-39f54e2.test.cjs": "b01cb41a6f4e8c52c0e1f342c76aa6bd22decb54",
+        "tools/gravicentra-i6-6-preview-current-live-restore-47f4.test.cjs": "c18f0f8687ee16df435b3083103d45e1400ed85b",
+        "tools/gravicentra-i6-6-preview-current-live-restore.cjs": "e4f2bf4e43f7d33fbc4edaefe2bfa3c28e68e694",
+        "tools/gravicentra-i6-6-preview-failure-diagnostics-retention.test.cjs": "1377a2f1f6924a901cdd12b4ba3b05c4bc5ea3d9",
+        "tools/gravicentra-i6-6-proposal-application-signed-uat.cjs": "e58c0c275346b2caf95c5f267df1a1185f2756de",
+        "tools/gravicentra-i6-6-proposal-uat-diagnostics.cjs": "7299e11f62f25975d2811b47ec8d56da6a8f3a65",
+        "tools/gravicentra-i6-6-proposal-uat-diagnostics.test.cjs": "59a558de0e9eca7caef5ad4daf805b72976e6466",
+        "tools/gravicentra-i6-6-protected-role-policy-hydration.test.cjs": "d28c721a333bed95316cd31a092da3d3185df6a7",
+        "tools/gravicentra-i6-6-readonly-observer-authority.test.cjs": "4d03114cddcdd59f4af3e9e916bead8548351619",
+        "tools/gravicentra-i6-6-receipt-current-balance.test.cjs": "312750094960dd332903eaa8fcfd9f42469a19e6",
+        "tools/gravicentra-i6-6-receipt-edit-safe-diagnostics.test.cjs": "c4b27328a8c02f469ad0b43128c772d95d0ff53c",
+        "tools/gravicentra-i6-6-six-existing-receipts-ui-readonly.test.cjs": "b981267c9049974bbd7c6e6a1ff6c2e3546e0620",
+        "tools/gravicentra-i6-6-source-intake-preview-transport.test.cjs": "b9d07b978bb15d63b86b451d5974565a497a259e",
+        "tools/gravicentra-i6-6-source-intake-readiness.test.cjs": "f5294207d4d39fe46ba7d493d84f277d16d1b3bf",
+        "tools/gravicentra-i6-6-source-intake-ui.test.cjs": "377f5b3b1e3835e127733871486fdf675d7e47a5",
+        "tools/gravicentra-i6-6-source-intake-v2.test.cjs": "2c1a2cf07a27ec2ebdbf427d013262233617fbfa",
+        "tools/gravicentra-i6-6-source-lineage-preview-transport.test.cjs": "508d5021a281b4b9e6296ffe2ae341cb35cb480f",
+        "tools/gravicentra-i6-6-startup-readiness-diagnostics.cjs": "e5f7eac10f38e58679ac64d5a6d334820b3566cb",
+        "tools/gravicentra-i6-6-startup-readiness-diagnostics.test.cjs": "05ef466ca0dfea1d9944e82d83d6b54a359d5821",
+        "tools/gravicentra-i6-6-technical-preview-rollover.test.cjs": "99322fcacc256d72f82b9509092c1db05d0d1251",
+        "tools/gravicentra-i6-6-workflow-candidate-resolution.test.cjs": "54d243a16b66bfd1fb179b9db2005a2e62c40d50",
+        "tools/gravicentra-i66-cartera-a1-a4-readonly.cjs": "610799de5bb05180080bb85cba25eb46945ed630",
+        "tools/gravicentra-i66-cartera-a1-a4-readonly.test.cjs": "fcca252166acd4c61286f376181d5031a6037900",
+        "tools/gravicentra-i66-composite-acceptance.test.cjs": "3e80d7414b33d4c7748c7cff69bfca8d52dbc698",
+        "tools/gravicentra-i66-frontend-control.cjs": "c26da24150cd69f866d84d1ac631634111575112",
+        "tools/gravicentra-i66-frontend-control.test.cjs": "e1422efa6d115ad0be26389ee7dd3f89b5b4a864",
+        "tools/gravicentra-i66-frontend-hosting-io.cjs": "936e8aaa8681cd9c655611a17fa98b5647474c9f",
+        "tools/gravicentra-i66-frontend-promotion-owner.cjs": "a061cdd62c0b4f77069a1c5c4358cb5fd4d417aa",
+        "tools/gravicentra-i66-frontend-promotion-transaction.cjs": "b3c9e1d5bcc6ad2b95e53c6a2cff22b760f91fc7",
+        "tools/gravicentra-i66-frontend-promotion-transaction.test.cjs": "b80b1559b63d5f41606a0fdddd14087f1f4e5eee",
+        "tools/gravicentra-i66-greenapi-existing-config-readonly.cjs": "61147fd6a71d0c260eed486cfb4a2f1671aaabab",
+        "tools/gravicentra-i66-greenapi-provider-readiness.test.cjs": "85917ad592714b36a7b7ece81b8c8c0528dcef19",
+        "tools/gravicentra-i66-live-performance-readonly.mjs": "8849427a7dfab1fa7f35324111c20d26f069155b",
+        "tools/gravicentra-i66-make-firebase-project-iam-guard.cjs": "2cf83098a20e85b0879d0f4b341f8dd65de32345",
+        "tools/gravicentra-i66-make-lead-ingress-config.cjs": "cc3c46b4d5097da8172711d6ad5daa00c5027155",
+        "tools/gravicentra-i66-make-lead-ingress-scenario.cjs": "438a3e514a10a3876afb565c18c3ba6d4e75f221",
+        "tools/gravicentra-i66-make-lead-ingress-scenario.test.cjs": "0f252df8d21786d51761f21059897f1e7bdbfb1e",
+        "tools/gravicentra-i66-make-lead-ingress.test.cjs": "1570bdc7ce039a6cb49750fabc409fda6dc4fe8c",
+        "tools/gravicentra-i66-make-lead-protected-executor.cjs": "64ebca22b1ae8b91e4e5ede7e69f6cfad363bd5b",
+        "tools/gravicentra-i66-make-lead-protected-executor.test.cjs": "3f30c2e0ecb1d61f8a77f1dfeec9101d6a7d6dd4",
+        "tools/gravicentra-i66-make-lead-runtime-access.cjs": "2accbcf79d810a35718400a2a9ced9ab43bd7256",
+        "tools/gravicentra-i66-make-lead-runtime-access.test.cjs": "ba645829af998e0ec04dfe6097cb2b27c6c8b64c",
+        "tools/gravicentra-i66-make-release-scope.cjs": "7e12a9132bde60dfbff496db39a95e186a558465",
+        "tools/gravicentra-i66-make-release-scope.test.cjs": "0b92b42cc492665c88695ee2968e6508e6aa760e",
+        "tools/gravicentra-i66-privileged-role-exact-live-transport.mjs": "495b0b063619a32492f52a24cbc114213d75f0b5",
+        "tools/gravicentra-i66-privileged-role-signed-ui-permissions-readonly.cjs": "cfc866f5a36f9efd05090a6671f8c0444d52cc35"
+      }
+    },
+    "productionGitHistorySimulated": false,
+    "signedCiStillRequired": true,
+    "readonlyTimeoutDiagnostic": {
+      "files": [
+        {
+          "path": "tools/gravicentra-i66-live-performance-readonly.mjs",
+          "baseGitBlobSha": "8849427a7dfab1fa7f35324111c20d26f069155b",
+          "gitBlobSha": "983095bdf1a96a6b30c2e6337f5e21555a807f34"
+        },
+        {
+          "path": "tools/gravicentra-i6-6-six-existing-receipts-ui-readonly.test.cjs",
+          "baseGitBlobSha": "b981267c9049974bbd7c6e6a1ff6c2e3546e0620",
+          "gitBlobSha": "0630d491395264198689566cff73a0f82902b7a4"
+        }
+      ],
+      "validation": {
+        "tests": 40,
+        "pass": 39,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 1,
+        "todo": 0
+      },
+      "testLogSha256": "0be9cf312aeb713b6fd33e26b45b6a94ea967ccc2ddbd87c3a5feb7b225fef8e",
+      "sourceBaseHead": "04155aa7bc80e177ee57e50223506e47194bbe3d",
+      "waitTimeoutMs": 60000,
+      "waitAttempts": 1,
+      "diagnosticBudgetMs": 2000,
+      "diagnosticReadsOnlyAfterFailure": true,
+      "partialStagesRetained": 17,
+      "recoveredReadinessDoesNotBecomePass": true,
+      "providerErrorTextOmitted": true,
+      "realChromiumStillRequired": true
+    }
+  },
+  "preserved": {
+    "sixBackendProductPins": {
+      "functions/b4-003-scoped-related-reader.js": "439bea6d90ef9a6a03ca2539096cb626cc43695d",
+      "functions/bootstrap.js": "bd0837a9d5296a456e0575aec555b2971fdedcd7",
+      "functions/make-lead-ingress-bridge.js": "8b519ad21da032ffeeee7f9f9cc3e9c3fe6c1317",
+      "functions/product-lead-ingress-contract.js": "ee29ee1fb12b1a30bf24b7c2c2a8180a2f2ef937",
+      "functions/product-lead-ingress-owner-support.js": "0f07f1620e3968cacf684a88c895faa64eb8a1a1",
+      "functions/product-ops-leads-domain.js": "affde2677b4c997b89abdabf3af2cb920128935d"
+    },
+    "financialView": {
+      "path": "orbit360-platform/core/queries.js",
+      "gitBlobSha": "b77b65f86ef6ac2ab6dc157fdbc9ad5e34dbcdcc",
+      "causalReceiptPath": "artifacts/orbit360-recovery/release-control/I6_6_FUTURE_PENDING_BALANCE_OWNER_CAUSAL_CORRECTION_20261124.json",
+      "causalReceiptBlob": "c05769d469b0a5e88e72e9e946095cb47bfc9d32",
+      "financialQaScope": "SIX_RECEIPT_CURRENT_BALANCE_READONLY",
+      "requiredStagesPerPhase": 48,
+      "sameArtifactBothPhases": true,
+      "fullA04A12A14Acceptance": false
+    },
+    "acceptedGeneration": 3,
+    "acceptedArtifactId": 14873426438,
+    "canonicalBootstrapVerifierBlob": "7e12a9132bde60dfbff496db39a95e186a558465",
+    "allExistingCompositeFixtureCorrectionsRetained": true,
+    "fullA04Accepted": false,
+    "fullA12Passed": false,
+    "fullA14Passed": false,
+    "fullI66ProductionAccepted": false
+  },
+  "sourceFiles": [
+    {
+      "path": "tools/gravicentra-i66-frontend-promotion-owner.cjs",
+      "baseGitBlobSha": "a061cdd62c0b4f77069a1c5c4358cb5fd4d417aa",
+      "gitBlobSha": "7043053dbcccf9b2b5688c85ff8df140f3fedb7f",
+      "bytes": 71636
+    },
+    {
+      "path": "tools/gravicentra-i66-frontend-promotion-transaction.cjs",
+      "baseGitBlobSha": "b3c9e1d5bcc6ad2b95e53c6a2cff22b760f91fc7",
+      "gitBlobSha": "9a9449f04ac77b2f88c187df46bed85ff8a15b4f",
+      "bytes": 13501
+    },
+    {
+      "path": "tools/gravicentra-i66-frontend-control.cjs",
+      "baseGitBlobSha": "c26da24150cd69f866d84d1ac631634111575112",
+      "gitBlobSha": "588f7ae7bef517d6efb678cca54c64d180e071ee",
+      "bytes": 59317
+    },
+    {
+      "path": "tools/gravicentra-i66-composite-acceptance.test.cjs",
+      "baseGitBlobSha": "3e80d7414b33d4c7748c7cff69bfca8d52dbc698",
+      "gitBlobSha": "85d779d56fd58c4458640a2ff882e63e3ef4ce15",
+      "bytes": 40834
+    },
+    {
+      "path": "tools/gravicentra-i66-frontend-promotion-transaction.test.cjs",
+      "baseGitBlobSha": "b80b1559b63d5f41606a0fdddd14087f1f4e5eee",
+      "gitBlobSha": "e6c07996c173409aae2eafb906e3aee652ca44e4",
+      "bytes": 24180
+    },
+    {
+      "path": "tools/gravicentra-i66-make-firebase-project-iam-guard.cjs",
+      "baseGitBlobSha": "2cf83098a20e85b0879d0f4b341f8dd65de32345",
+      "gitBlobSha": "7835e50fcc89b14bdb0e540018efd35d675fe026",
+      "bytes": 4183
+    },
+    {
+      "path": "tools/gravicentra-i66-make-lead-protected-executor.test.cjs",
+      "baseGitBlobSha": "3f30c2e0ecb1d61f8a77f1dfeec9101d6a7d6dd4",
+      "gitBlobSha": "305ae1c7c1176c78d9727f236c3cb0bd3f75ecd4",
+      "bytes": 18988
+    },
+    {
+      "path": ".github/workflows/gravicentra-i66-privileged-role-three-function-preview-uat.yml",
+      "baseGitBlobSha": "b6ee9c071b3e045e512884248ffbbe46ed6c1f1a",
+      "gitBlobSha": "f2c12ec47498d7313ecf259e956183d183ef8b08",
+      "bytes": 35514
+    },
+    {
+      "path": ".github/workflows/gravicentra-i66-privileged-role-exact-live-promotion.yml",
+      "baseGitBlobSha": "a0ebd06feef87a25e868f6b64212b78be2e0e534",
+      "gitBlobSha": "708d9e5d063a76c8140e702c2f8fc05f2097d0be",
+      "bytes": 41535
+    },
+    {
+      "path": "tools/gravicentra-i66-live-performance-readonly.mjs",
+      "baseGitBlobSha": "8849427a7dfab1fa7f35324111c20d26f069155b",
+      "gitBlobSha": "983095bdf1a96a6b30c2e6337f5e21555a807f34",
+      "bytes": 85047
+    },
+    {
+      "path": "tools/gravicentra-i6-6-six-existing-receipts-ui-readonly.test.cjs",
+      "baseGitBlobSha": "b981267c9049974bbd7c6e6a1ff6c2e3546e0620",
+      "gitBlobSha": "0630d491395264198689566cff73a0f82902b7a4",
+      "bytes": 68790
+    }
+  ],
+  "independentPriorWorkInventory": {
+    "path": "artifacts/orbit360-recovery/release-control/I6_6_RELEASE_QA_TRANSPORT_PRIOR_WORK_INVENTORY_READONLY_20261124.json",
+    "gitBlobSha": "15926db7da76abc7c3feee725a7a00cb3b6b6937",
+    "localCopiesReviewed": 627,
+    "canonicalPaths": 148,
+    "reviewedReleasePaths": 29,
+    "unchanged": 18,
+    "laterCompatibleSuccessors": 8,
+    "omittedFinancialOwners": 3
+  }
+}

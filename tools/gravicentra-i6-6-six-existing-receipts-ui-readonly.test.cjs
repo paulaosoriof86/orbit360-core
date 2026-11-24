@@ -8,9 +8,9 @@ const bytes=fs.readFileSync(path.join(repo,authorityPath)),authority=JSON.parse(
 function harness(extra={}){
   const start=source.indexOf('// Existing bootstrap events only:'),end=source.indexOf('\nasync function run(){',start);
   assert.ok(start>0&&end>start);
-  const context={require,URL,need:(ok,code)=>{if(!ok)throw Error(code);},norm:x=>String(x||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase(),
+  const context={require,URL,URLSearchParams,setTimeout,clearTimeout,need:(ok,code)=>{if(!ok)throw Error(code);},norm:x=>String(x||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase(),
     fs:{readFileSync:()=>bytes},execFileSync:()=>bytes,pin:{sourceSha:'qa-source'},...extra};
-  vm.runInNewContext(source.slice(start,end)+'\nthis.probe={validateSixSourceRow,certifySixReceiptUi,inspectSixReceiptBrowser,installBootstrapObservation,sixReceiptAuthority,sixServerSnapshot,sixServerBalanceProof,focalHash,sixFinancialInputs,sixExpectedBrowserInputs,sixFinancialInputMetadata,sixFinancialInputDifferences,SIX_FINANCIAL_FIELDS,isSixReceiptBusinessWrite,visibleCivilDate,sixVisibleValueChecks,sixVisibleValueDiagnostic,collectSixVisibleResult,sixUiReloadValues,showSixReceiptBalance,runSixReceiptUi,findFinancialActors,runFrontendFinancialMatrix};',context);
+  vm.runInNewContext(source.slice(start,end)+'\nthis.probe={validateSixSourceRow,certifySixReceiptUi,inspectSixReceiptBrowser,installBootstrapObservation,sixReceiptAuthority,sixServerSnapshot,sixServerBalanceProof,focalHash,sixFinancialInputs,sixExpectedBrowserInputs,sixFinancialInputMetadata,sixFinancialInputDifferences,SIX_FINANCIAL_FIELDS,isSixReceiptBusinessWrite,visibleCivilDate,sixVisibleValueChecks,sixVisibleValueDiagnostic,collectSixVisibleResult,sixUiReloadValues,showSixReceiptBalance,inspectSixReadinessHold,sixDiagnosticErrorCounts,sixPartialStageCounts,sixBoundedDiagnosticRead,waitSixReceiptReady,runSixReceiptUi,findFinancialActors,runFrontendFinancialMatrix};',context);
   return context;
 }
 function sourceRow(e=authority.rows[0]){
@@ -385,20 +385,35 @@ async function frontendMatrixFlow(options={}){
   const actors=['operativo','direccion'].map(role=>({uid:'qa-'+role,allowedRole:role,requestedRole:role,actorSha256:crypto.hash('sha256',role)}));
   const fixtures=authority.rows.map(e=>uiFixture(e)),snapshot={clientId:'qa-client',policyFingerprint:'same',rows:fixtures.map(f=>({...f.server,
     serverBalanceProof:{sourceSha:target.sourceSha,ownerBlob:'a'.repeat(40),open:true,balanceCents:27826,source:'CARTERA_EXPLICIT'}}))};
-  let serverReads=0,authorityAfter=0,visited=0,closed=0,readingScrolls=0;const viewports=[];
+  let serverReads=0,authorityAfter=0,visited=0,closed=0,readingScrolls=0,diagnosticReads=0;const viewports=[],readinessWaits=[];
   const h=harness({phase,readMode:'six-frontend-release',frontendQa:before,report,pin:target,ORIGIN:report.origin,
     auth:{createCustomToken:async uid=>uid},financialOwner:{...owner,
       resolveFinancialQa:async()=>{authorityAfter++;if(options.authorityDrift)throw Error('FINANCIAL_QA_FINAL_AUTHORITY_DRIFT');return {...before,stage:'after'};},
       validateFinancialReport:(r,t,p,o)=>owner.validateFinancialReport(plain(r),t,p,o)}});
   h.findFinancialActors=async()=>actors;h.sixReceiptAuthority=()=>authority;
-  h.sixServerSnapshot=async()=>{serverReads++;return options.serverDrift&&serverReads>=10?{...snapshot,policyFingerprint:'changed'}:snapshot;};
+  h.sixServerSnapshot=async()=>{serverReads++;
+    if(options.readinessTimeout&&serverReads===5&&options.diagnosticServerFails)throw Error('Private after-read failure user@example.test token_ABC');
+    return (options.serverDrift&&serverReads>=10)||(options.readinessTimeout&&serverReads===5&&options.diagnosticServerDrift)?
+      {...snapshot,policyFingerprint:'changed'}:snapshot;};
   h.chromium={launch:async()=>({close:async()=>{},newContext:async({viewport})=>{
     viewports.push(viewport.width);let role='operativo',index=0,stage='BEFORE_RELOAD',route='receipt',firewall,balanceInView=false;
     const context={close:async()=>{closed++;},route:async(pattern,fn)=>{firewall=fn;},newPage:async()=>page};
-    const page={on:()=>{},goto:async()=>{},waitForFunction:async()=>{},
+    const page={on:()=>{},goto:async()=>{},waitForFunction:async(fn,arg,config)=>{
+      if(!String(fn).includes('data-rp-receipt-detail-id'))return;
+      readinessWaits.push({role,width:viewport.width,index,stage,timeout:config.timeout});
+      if(options.readinessTimeout&&role==='operativo'&&viewport.width===390&&index===2&&stage==='AFTER_RELOAD'){
+        const e=Error('page.waitForFunction: Timeout 60000ms exceeded private@example.test token_SECRET');e.name='TimeoutError';throw e;}
+    },
       locator:selector=>({count:async()=>1,isVisible:async()=>true,inputValue:async()=> 'GT',selectOption:async value=>{if(selector==='#rol-sel')role=value;},
         scrollIntoViewIfNeeded:async()=>{assert.match(selector,/data-rp-current-balance/);readingScrolls++;balanceInView=!options.scrollCannotReveal;}}),
       reload:async()=>{stage='AFTER_RELOAD';balanceInView=false;},evaluate:async(fn,arg)=>{
+        if(fn.name==='inspectSixReadinessHold'){
+          diagnosticReads++;if(options.diagnosticDomFails)throw Error('Private DOM read failed secret@example.test token_PRIVATE');
+          return {schema:'GI_I66_SIX_READINESS_DOM_FLAGS_V1',valueDisclosure:'NONE_STRUCTURAL_FLAGS_ONLY',
+            expectedDetailCount:options.diagnosticRecovered?1:0,allRequiredSourcesConfirmed:true,
+            readyPredicateAtCapture:options.diagnosticRecovered===true,viewport:{width:viewport.width,height:viewport.height},
+            route:{hashRoute:'cliente360',runtimeRoute:'cliente360',receiptMatches:true}};
+        }
         if(String(fn).includes('signInWithCustomToken'))return !options.authFailure;
         if(String(fn).includes("document.querySelector('#rol-sel')"))return arg;
         if(arg===undefined){route='cobros';return;}
@@ -414,8 +429,79 @@ async function frontendMatrixFlow(options={}){
       }};return context;
   }})};
   let error;try{await h.probe.runFrontendFinancialMatrix();}catch(e){error=e;}
-  return {h,report:plain(report),error,visited,serverReads,authorityAfter,viewports,closed,readingScrolls,owner,target};
+  return {h,report:plain(report),error,visited,serverReads,authorityAfter,viewports,closed,readingScrolls,owner,target,diagnosticReads,readinessWaits};
 }
+test('the observed third-mobile-receipt after-reload timeout keeps 17 partial stages, bounded diagnostics and HOLD without retry',async()=>{
+  const r=await frontendMatrixFlow({readinessTimeout:true}),d=r.error.sixReadinessHold;
+  assert.equal(r.error.name,'TimeoutError');assert.equal(r.report.status,'HOLD');assert.equal(r.report.stageCount,17);
+  assert.equal(r.visited,17);assert.deepEqual(r.viewports,[1365,390]);assert.equal(r.closed,2);
+  assert.equal(r.report.roles[0].financialFocal.observations.length,6);
+  assert.equal(r.report.roles[1].progress.observations.length,3);assert.equal(r.report.roles[1].progress.observations[2].afterCheck,undefined);
+  assert.deepEqual(plain(r.h.probe.sixPartialStageCounts(r.h.report)),{completed:17,passed:17});
+  assert.equal(r.readinessWaits.length,18);assert.ok(r.readinessWaits.every(x=>x.timeout===60000));
+  assert.equal(r.diagnosticReads,1);assert.equal(r.serverReads,5);assert.equal(r.authorityAfter,0);
+  assert.equal(d.stage,'AFTER_RELOAD');assert.equal(d.role,'operativo');assert.equal(d.viewportWidth,390);assert.equal(d.receiptOrdinal,3);
+  assert.equal(d.waitAttempts,1);assert.equal(d.retryPerformed,false);assert.equal(d.uiAccepted,false);
+  assert.equal(d.browser.flags.expectedDetailCount,0);assert.equal(d.browser.flags.allRequiredSourcesConfirmed,true);
+  assert.equal(d.serverFinancialReadback.serverUnchanged,true);assert.equal(d.serverFinancialReadback.rowCount,6);
+  assert.equal(r.report.roles[1].progress.sourceSnapshotAfter.length,6);
+  // Exercise the real outer catch: provider exception text is never published.
+  const start=source.lastIndexOf("}catch(error){\n  report.status='HOLD';")+1,end=source.indexOf('}finally{',start)+1;
+  assert.ok(start>0&&end>start);const processState={exitCode:0},printed=[];
+  vm.runInNewContext('try{throw failure;}'+source.slice(start,end),{failure:r.error,report:r.report,
+    process:processState,console:{error:x=>printed.push(x)}});
+  assert.equal(processState.exitCode,1);assert.deepEqual(r.report.errors,['I66_SIX_RECEIPT_READINESS_WAIT_HOLD']);
+  assert.equal(r.report.financialFocalReadinessHold.uiAccepted,false);
+  assert.doesNotMatch(JSON.stringify([r.report,printed]),/private@example|token_SECRET/);
+});
+test('a page that becomes ready during failure capture remains HOLD and is never retried or accepted',async()=>{
+  const r=await frontendMatrixFlow({readinessTimeout:true,diagnosticRecovered:true});
+  assert.equal(r.error.sixReadinessHold.browser.flags.readyPredicateAtCapture,true);
+  assert.equal(r.error.sixReadinessHold.uiAccepted,false);assert.equal(r.report.status,'HOLD');
+  assert.equal(r.visited,17);assert.equal(r.readinessWaits.length,18);assert.equal(r.diagnosticReads,1);
+});
+test('failed or changed diagnostic server readback cannot claim unchanged finances or replace the original timeout',async()=>{
+  const failed=await frontendMatrixFlow({readinessTimeout:true,diagnosticServerFails:true,diagnosticDomFails:true});
+  assert.equal(failed.error.name,'TimeoutError');assert.equal(failed.report.stageCount,17);
+  const d=failed.error.sixReadinessHold;assert.equal(d.serverFinancialReadback.status,'UNAVAILABLE');
+  assert.equal(d.browser.status,'UNAVAILABLE');assert.equal(d.serverFinancialReadback.serverUnchanged,undefined);
+  assert.equal(failed.report.roles[1].progress.sourceSnapshotAfter,undefined);
+  assert.doesNotMatch(JSON.stringify(d),/Private|secret@example|user@example|token_/);
+  const changed=await frontendMatrixFlow({readinessTimeout:true,diagnosticServerDrift:true});
+  assert.equal(changed.error.name,'TimeoutError');assert.equal(changed.error.sixReadinessHold.serverFinancialReadback.serverUnchanged,false);
+  assert.equal(changed.report.status,'HOLD');assert.equal(changed.visited,17);
+});
+test('timeout DOM capture exposes only allowlisted readiness, source, route and counter shapes',()=>{
+  const expected=authority.rows[2],privateValue='Private Person private@example.test token_SECRET',
+    actorUid='private-actor',clientId='private-client',policyId='private-policy';
+  const root={textContent:privateValue,querySelector:()=>null};
+  const status={serverConfirmedCollections:['clientes','polizas','carteraPrimas','cobros'],deniedCollections:['recibosEsperados'],
+    snapshotErrors:{recibosEsperados:privateValue,cobros:'functions/permission-denied',[privateValue]:privateValue},
+    queryPlans:{recibosEsperados:{ok:false,denied:true,hardError:true,errors:[privateValue]}}};
+  const Orbit={store:{_productStatus:()=>status,get:()=>({name:privateValue}),_protectedCandidate:true},
+    auth:{productUser:{uid:actorUid,tenantId:'alianzas-soluciones',email:privateValue}},
+    session:{rol:()=>privateValue},pais:'GT',route:{key:privateValue},productRuntimeBrowserProvidersP0:{},productAppP0:{}};
+  const h=harness({window:{Orbit},location:{hash:'#/cliente360?c='+clientId+'&r='+expected.receiptId+'&t=recibos&secret='+privateValue},
+    CSS:{escape:x=>x},innerWidth:390,innerHeight:844,document:{readyState:'complete',body:{innerHTML:privateValue},
+      getElementById:()=>root,querySelector:selector=>selector.includes('data-rp-receipt-detail-id')?null:root,
+      querySelectorAll:selector=>selector==='[data-rp-receipt-detail-id]'?[root]:[]}});
+  const d=plain(h.probe.inspectSixReadinessHold({expected,clientId,actorUid,policyId,expectedRole:'operativo'}));
+  assert.equal(d.expectedDetailCount,0);assert.equal(d.anyDetailCount,1);assert.equal(d.readyPredicateAtCapture,false);
+  assert.equal(d.sources.recibosEsperados.confirmed,false);assert.equal(d.sources.recibosEsperados.denied,true);
+  assert.equal(d.sources.recibosEsperados.errorClass,'UNCLASSIFIED_ERROR');assert.equal(d.sources.cobros.errorClass,'permission-denied');
+  assert.equal(d.sources.recibosEsperados.queryPlanErrorCount,1);assert.equal(d.activeRole,'OTHER');
+  assert.equal(d.route.hashRoute,'cliente360');assert.equal(d.route.runtimeRoute,'OTHER');assert.equal(d.route.otherParamCount,1);
+  assert.equal(d.route.clientMatches,true);assert.equal(d.route.receiptMatches,true);assert.equal(d.actorMatches,true);
+  assert.doesNotMatch(JSON.stringify(d),/Private Person|private@example|token_SECRET|private-actor|private-client|private-policy|rec_/);
+  const counts=plain(h.probe.sixDiagnosticErrorCounts(()=>({pageErrors:2,consoleErrors:3,blockedWrites:0,
+    httpClasses:{HTTP_401:4,HTTP_503:1,[privateValue]:5}})));
+  assert.deepEqual(counts,{available:true,pageErrors:2,consoleErrors:3,blockedWrites:0,httpClasses:{HTTP_401:4,HTTP_503:1}});
+});
+test('diagnostic deadline is bounded separately from the unchanged failed wait and never retries its read',async()=>{
+  const budgets=[];let reads=0;const h=harness({setTimeout:(fn,ms)=>{budgets.push(ms);return setTimeout(fn,0);},clearTimeout});
+  const result=await h.probe.sixBoundedDiagnosticRead(()=>{reads++;return new Promise(()=>{});},2000);
+  assert.deepEqual(plain(result),{status:'UNAVAILABLE',reason:'DIAGNOSTIC_DEADLINE'});assert.deepEqual(budgets,[2000]);assert.equal(reads,1);
+});
 test('the release matrix executes 48 actual receipt stages in Preview and LIVE across both actors and viewports',async()=>{
   for(const phase of ['preview','live']){
     const r=await frontendMatrixFlow({phase});assert.equal(r.error,undefined,r.error?.stack);

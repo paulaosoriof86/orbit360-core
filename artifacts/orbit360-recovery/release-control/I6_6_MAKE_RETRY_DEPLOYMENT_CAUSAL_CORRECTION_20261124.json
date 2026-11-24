@@ -1,0 +1,262 @@
+{
+  "schema": "GI_I66_MAKE_RETRY_DEPLOYMENT_CAUSAL_CORRECTION_V1",
+  "recordedAt": "2026-11-24T10:48:29.234890+00:00",
+  "status": "SOURCE_CORRECTION_LOCALLY_VERIFIED_AWAITING_NEW_IMMUTABLE_BUILD",
+  "gate": "I6.6",
+  "failedCandidate": {
+    "sourceSha": "04155aa7bc80e177ee57e50223506e47194bbe3d",
+    "artifactId": 14911361853,
+    "artifactDigest": "sha256:d0e721bcd56dd0d4bc4aa31d5579e8f1d140eb1990c7bbbb543014cbb40977b1",
+    "previewRunId": 45377039428,
+    "jobId": 138386140777,
+    "jobConclusion": "failure",
+    "closedArtifactCreated": false
+  },
+  "causalFailure": {
+    "firebaseCliVersion": "14.10.1",
+    "stage": "EXACT_FIVE_FUNCTION_PREVIEW_DEPLOY",
+    "providerMessage": "Pass the --force option to deploy functions with a failure policy",
+    "newRetryTarget": "orbit360MakeLeadIngressPreview",
+    "functionRegion": "us-east1",
+    "observedAt": "2026-11-24T10:42:27.812Z",
+    "newSourceBuildRequired": true
+  },
+  "verifiedDiagnosticArtifact": {
+    "artifactId": 14912271090,
+    "name": "gi-i66-make-preview-diagnostics-45377039428",
+    "sha256": "657a6ec2a16152f884033b9ba3ff6fae1c3db9cd82e6b4fc03183496d0a0db69",
+    "downloadDigestVerified": true,
+    "sourceReports": {
+      "before-deploy": {
+        "fileName": "v19-gi-make-preview-before-deploy.json",
+        "gitBlobSha": "19a102cb352e97b18840d36131190fd97988c4c5",
+        "sha256": "764769c942b93587b9380c16de4c8552add6a26179100cbd0ae5dfd40bff3fb2",
+        "report": {
+          "status": "PREVIEW_RUNTIME_VERIFIED_NO_SECRET_IAM_NEEDED",
+          "iamWrites": 0,
+          "eventarcReadiness": {
+            "schema": "GI_I66_MAKE_EVENTARC_PROJECT_IAM_READONLY_V1",
+            "status": "EVENTARC_RUNTIME_AND_PROJECT_IAM_READY",
+            "projectId": "ays-orbit-360-lab",
+            "cliVersion": "14.10.1",
+            "canonicalRuntime": "646761409743-compute@developer.gserviceaccount.com",
+            "canonicalRuntimeObserved": true,
+            "inventoryComplete": true,
+            "existingRecognizedEventServices": [
+              "firestore"
+            ],
+            "projectPolicyRead": true,
+            "projectPolicyDigest": "2c928d027f3632fc4e9fa2f591127952590746b2f02a588015a0fed97dc0590f",
+            "firstEventBindings": [
+              {
+                "role": "roles/iam.serviceAccountTokenCreator",
+                "member": "serviceAccount:service-646761409743@gcp-sa-pubsub.iam.gserviceaccount.com",
+                "present": true
+              },
+              {
+                "role": "roles/run.invoker",
+                "member": "serviceAccount:646761409743-compute@developer.gserviceaccount.com",
+                "present": true
+              },
+              {
+                "role": "roles/eventarc.eventReceiver",
+                "member": "serviceAccount:646761409743-compute@developer.gserviceaccount.com",
+                "present": true
+              }
+            ],
+            "cliWouldAddProjectBindings": false,
+            "queueRules": {
+              "status": "EXACT_CANONICAL_RULESET_SOURCE_MATCH",
+              "sourcePath": "firestore.rules",
+              "sourceBlob": "35fba451bbbeb97dbae3f08303b786ddbcbdd29f",
+              "rulesetName": "projects/ays-orbit-360-lab/rulesets/6b03deab-0ff4-4c5d-8e74-550982bafc34",
+              "rulesWrites": 0,
+              "contentPublished": false
+            },
+            "runtimeImpersonationVerified": true,
+            "runtimeEventarcPermissionsVerified": true,
+            "grantedRequiredPermissions": [
+              "eventarc.events.receiveEvent",
+              "run.routes.invoke"
+            ],
+            "permissionChecks": [
+              {
+                "permission": "eventarc.events.receiveEvent",
+                "resource": "projects/ays-orbit-360-lab",
+                "granted": true,
+                "status": "GRANTED",
+                "httpStatus": null,
+                "providerStatus": null
+              },
+              {
+                "permission": "run.routes.invoke",
+                "resource": "projects/ays-orbit-360-lab/locations/us-central1/services/orbit360opsleadscommand",
+                "granted": true,
+                "status": "GRANTED",
+                "httpStatus": null,
+                "providerStatus": null
+              },
+              {
+                "permission": "run.routes.invoke",
+                "resource": "projects/ays-orbit-360-lab/locations/us-east1/services/orbit360opsleadscommandpreview",
+                "granted": true,
+                "status": "GRANTED",
+                "httpStatus": null,
+                "providerStatus": null
+              }
+            ],
+            "failureStage": null,
+            "failureStatus": null,
+            "failureHttpStatus": null,
+            "failureProviderStatus": null,
+            "projectIamWrites": 0,
+            "secretIamWrites": 0,
+            "firestoreWrites": 0,
+            "providerRequests": 0,
+            "externalMessagesSent": 0,
+            "privatePolicyPublished": false,
+            "functionCount": 96,
+            "inventoryDigest": "c75bd181d77cd6cf4feb6e3ee9bde9b7f966235ab12553ca1e69ca7522c841fd",
+            "reportDigest": "9a38ad98878465f9d51836d2b9c518a477b575344d094c87c1f0526b3041d65f"
+          }
+        }
+      },
+      "rollback": {
+        "fileName": "v19-gi-make-preview-rollback.json",
+        "gitBlobSha": "3cd318616fc00710488f36a9049baef45b3a6194",
+        "sha256": "3a0f00a13b64ca3bb9046aec7feeb10c58a6de2c2dc2c44eba47ded0d8272c99",
+        "report": {
+          "schema": "GI_I66_MAKE_RELEASE_COMPENSATION_V1",
+          "phase": "preview",
+          "sourceSha": "04155aa7bc80e177ee57e50223506e47194bbe3d",
+          "artifactDigest": "sha256:d0e721bcd56dd0d4bc4aa31d5579e8f1d140eb1990c7bbbb543014cbb40977b1",
+          "status": "COMPENSATION_READBACK_VERIFIED",
+          "configuration": {
+            "status": "NO_CONFIGURATION_TRANSITION_RECORDED",
+            "configurationWrites": 0
+          },
+          "trigger": {
+            "status": "ABSENCE_READBACK_VERIFIED",
+            "functionDeletes": 0
+          },
+          "secretIam": null,
+          "canonicalLeadWrites": 0,
+          "externalMessagesSent": 0,
+          "failures": []
+        }
+      },
+      "snapshot-trigger": {
+        "fileName": "v19-gi-make-preview-snapshot-trigger.json",
+        "gitBlobSha": "fc11f42e6abce200cba009e5eafb2658ed974c22",
+        "sha256": "f816229fda67e3a3e3bc986075355a1934407bcaae7ae05e9e5c21835bac1193",
+        "report": {
+          "schema": "GI_I66_MAKE_TRIGGER_SNAPSHOT_V1",
+          "phase": "preview",
+          "sourceSha": "04155aa7bc80e177ee57e50223506e47194bbe3d",
+          "artifactDigest": "sha256:d0e721bcd56dd0d4bc4aa31d5579e8f1d140eb1990c7bbbb543014cbb40977b1",
+          "previousState": "ABSENT",
+          "function": null
+        }
+      }
+    }
+  },
+  "narrowClaims": {
+    "addedTriggerPreimage": "ABSENT",
+    "addedTriggerAfterFailure": "ABSENCE_READBACK_VERIFIED",
+    "triggerDeletes": 0,
+    "configurationTransition": "NO_CONFIGURATION_TRANSITION_RECORDED",
+    "configurationWrites": 0,
+    "projectIamWrites": 0,
+    "canonicalLeadWrites": 0,
+    "externalMessagesSent": 0,
+    "allFourExistingPreviewFunctionsUnchangedClaimed": false,
+    "allFourExistingPreviewFunctionsReinventoryRequired": true,
+    "nextCandidateFreshPreflightRequired": true
+  },
+  "correction": {
+    "forceOnlyExactFiveTargetsAndPhase": true,
+    "otherDeployBranchesUntouched": true,
+    "exactArgumentCountBefore": 8,
+    "exactArgumentCountAfter": 9,
+    "projectIamMutatorsBlocked": true,
+    "implicitFunctionDeletionBlocked": true,
+    "unsafeEventMigrationBlocked": true,
+    "pinnedPromptsSha256": "9f2b68fb48524860ef811213aabfd078efef22b4f666f35a050249c38312f506",
+    "retryProductSourceUnchanged": true,
+    "sixProductPinsUnchanged": true,
+    "files": [
+      {
+        "path": "tools/gravicentra-i66-make-firebase-project-iam-guard.cjs",
+        "baseGitBlobSha": "2cf83098a20e85b0879d0f4b341f8dd65de32345",
+        "gitBlobSha": "7835e50fcc89b14bdb0e540018efd35d675fe026",
+        "sha256": "e91c38db80e8d9be3e85c6f77be74b9bf3115a1150efc611ab49d2a17a2d7bc8",
+        "bytes": 4183
+      },
+      {
+        "path": "tools/gravicentra-i66-make-lead-protected-executor.test.cjs",
+        "baseGitBlobSha": "3f30c2e0ecb1d61f8a77f1dfeec9101d6a7d6dd4",
+        "gitBlobSha": "305ae1c7c1176c78d9727f236c3cb0bd3f75ecd4",
+        "sha256": "c1c2b719ad6d2f0d4723e4348252c030d19fbb8e6f83c9a354163c7fcc0ea49e",
+        "bytes": 18988
+      },
+      {
+        "path": ".github/workflows/gravicentra-i66-privileged-role-three-function-preview-uat.yml",
+        "baseGitBlobSha": "b6ee9c071b3e045e512884248ffbbe46ed6c1f1a",
+        "gitBlobSha": "f2c12ec47498d7313ecf259e956183d183ef8b08",
+        "sha256": "2029bb14c02af74230e379be230aaa31e7c18cc5e1858e99130e1b8d841585bf",
+        "bytes": 35514
+      },
+      {
+        "path": ".github/workflows/gravicentra-i66-privileged-role-exact-live-promotion.yml",
+        "baseGitBlobSha": "a0ebd06feef87a25e868f6b64212b78be2e0e534",
+        "gitBlobSha": "708d9e5d063a76c8140e702c2f8fc05f2097d0be",
+        "sha256": "fe43cddb655d8b57298df22b502944dbe225d5a3360b5b136d399d61354a0978",
+        "bytes": 41535
+      }
+    ]
+  },
+  "validation": {
+    "protectedExecutorAndScopeTests": {
+      "passed": 26,
+      "failed": 0,
+      "cancelled": 0,
+      "skipped": 0
+    },
+    "actualPinnedProviderPromptExecution": {
+      "status": "PINNED_RETRY_POLICY_CAUSAL_REPRODUCTION_PASS",
+      "cliVersion": "14.10.1",
+      "promptsSha256": "9f2b68fb48524860ef811213aabfd078efef22b4f666f35a050249c38312f506",
+      "originalNoninteractiveFailureReproduced": true,
+      "forceRetainsRetryPolicy": true,
+      "implicitDeletionRejected": true,
+      "unsafeEventMigrationRejected": true,
+      "originalFailurePolicyFunctionRetained": true,
+      "interactivePrompts": 0,
+      "networkCalls": 0
+    },
+    "newDeployVerified": false,
+    "authContextVerified": false,
+    "previewAccepted": false
+  },
+  "makeAfterFailure": {
+    "scenarioId": 10196136,
+    "writerModuleId": 3,
+    "writerDisabled": true,
+    "lastEdit": "2026-11-24T10:03:48.804Z",
+    "nextScheduledExecutionAtRead": "2026-11-24T10:49:53.226Z",
+    "originalRoutingPreserved": true,
+    "scheduleSeconds": 300,
+    "probeRunRequested": false,
+    "makeMutationsInFailedPreviewAttempt": 0
+  },
+  "primarySources": [
+    {
+      "url": "https://firebase.google.com/docs/functions/retries",
+      "usedFor": "Retry policy requires idempotent processing; retry true is preserved."
+    },
+    {
+      "url": "https://github.com/firebase/firebase-tools/blob/v14.10.1/src/deploy/functions/prompts.ts",
+      "usedFor": "Pinned local npm 14.10.1 lib/deploy/functions/prompts.js executed, source hash verified against extracted archive. Remote tagged source open unavailable."
+    }
+  ]
+}

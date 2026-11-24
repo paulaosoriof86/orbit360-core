@@ -296,6 +296,15 @@ function physicalGuard(control,state,transport,io){
     assert.deepEqual(journal.liveProof,proof,'COMPOSITE_JOURNAL_PROOF_DRIFT');
     require('./gravicentra-i66-frontend-promotion-transaction.cjs').validateCompositeProof(journal.request,proof);
     assert.deepEqual(receipt,compositeReceipt(journal,proof.runId),'COMPOSITE_SIGNED_RECEIPT_CONTENT_DRIFT');
+    if(journal.request.candidate.makeIngressComposite===true){
+      const financial=receipt.financialUi,uiText=read(financial.receiptPath),ui=JSON.parse(uiText);
+      assert.equal(blob(uiText),financial.receiptBlob,'COMPOSITE_FINANCIAL_RECEIPT_BYTES_DRIFT');
+      const verified=require('./gravicentra-i66-frontend-promotion-transaction.cjs').validateCompositeFinancialUi(
+        journal.request,journal,{...financial,financialQa:ui.financialQa},{committedReadback:true});
+      assert.deepEqual(verified,journal.financialUi,'COMPOSITE_COMMITTED_FINANCIAL_PROOF_DRIFT');
+      assert.deepEqual(receipt.financialPreviewUi,journal.request.candidate.financialPreviewQa);
+      assert.equal(blob(read(receipt.financialPreviewUi.receiptPath)),receipt.financialPreviewUi.receiptBlob);
+    }
     const backendCount=require('./gravicentra-i6-6-operational-release-candidate.cjs').targetsForCandidate(journal.request.candidate,'live').length;
     assert.equal(head.scope,'COMPOSITE');assert.equal(head.backendFunctionsChanged,backendCount);
     assert.equal(physical.scope,'COMPOSITE');assert.equal(physical.backendFunctionsChanged,backendCount);
@@ -416,6 +425,17 @@ function compositeReceipt(j,runId){
   assert.equal(runId,proof.runId,'COMPOSITE_RECEIPT_RUN_DRIFT');
   const proofPath=genName(j.generation,'LIVE_PROOF'),proofText=serial(proof);
   const makeIngress=require('./gravicentra-i66-make-release-scope.cjs').isMake(p);
+  if(makeIngress){
+    assert.equal(j.financialUi?.result,'PASS','COMPOSITE_FINANCIAL_LIVE_UI_REQUIRED_BEFORE_SIGNING');
+    assert.equal(j.financialUi.scopeId,'SIX_RECEIPT_CURRENT_BALANCE_READONLY');
+    assert.equal(j.financialUi.generation,j.generation);assert.equal(j.financialUi.physicalPhaseKey,j.key);
+    assert.equal(j.financialUi.authorityBlob,j.request.financialQa.authorityBlob);
+    assert.equal(j.financialUi.parentAuthorityBlob,j.request.approvalBlob);
+    assert.equal(j.financialUi.sourceSha,p.sourceSha);assert.equal(j.financialUi.artifactDigest,p.artifactDigest);
+    assert.equal(j.financialUi.buildId,p.buildId);assert.equal(j.financialUi.runId,runId);
+    assert.equal(j.financialUi.receiptPath,genName(j.generation,'LIVE_UI'));
+    assert.match(j.financialUi.receiptBlob,/^[a-f0-9]{40}$/);assert.match(j.financialUi.reportSha256,/^[a-f0-9]{64}$/);
+  }
   const backendCount=require('./gravicentra-i6-6-operational-release-candidate.cjs').targetsForCandidate(p,'live').length;
   const backend={generation:j.generation,gate:'I6.6',scope:'COMPOSITE',status:'SIGNED_LIVE_VERIFIED',
     sourceSha:p.sourceSha,artifactId:p.artifactId,artifactDigest:p.artifactDigest,buildId:p.buildId,
@@ -428,7 +448,8 @@ function compositeReceipt(j,runId){
     ui:{result:'PASS',buildId:p.buildId,receiptBlob:blob(proofText),source:'VALIDATED_SIGNED_COMPOSITE_LIVE_PROOF'},
     backendFunctionsChanged:backendCount,backendRevisions:proof.backendRevisions,backend,
     ...(makeIngress?{makeIngress:{status:'CLOSED_DEPLOYMENT_AUTH_CONTEXT_VERIFIED',active:false,a13RealLeadAccepted:false,
-      scopeContractBlob:p.makeIngress.scopeContractBlob,closedTrigger:proof.makeIngress.closedTrigger}}:{}),
+      scopeContractBlob:p.makeIngress.scopeContractBlob,closedTrigger:proof.makeIngress.closedTrigger},
+      financialUi:j.financialUi,financialPreviewUi:p.financialPreviewQa}:{}),
     liveProof:{path:proofPath,sha256:hash(proofText),gitBlobSha:blob(proofText)},runId};
 }
 function closeCompositeFiles(read,j,body){
@@ -491,6 +512,22 @@ function closeCompositeFiles(read,j,body){
       integrationConfigurationOutsideDataOnly:true,exactSecretIamWrites:j.liveProof.makeIngress.secretIamWrites};
     progress.makeIngressDeploymentAcceptance={...receipt.makeIngress,sourceSha:head.sourceSha,artifactDigest:head.artifactDigest,
       receiptPath:head.receiptPath,acceptanceScope:'RELEASE_TIME_ONLY',realLeadAcceptanceNotIncluded:true,fullA13Accepted:false};
+    progress.previousFrontendBalanceCorrection=progress.frontendBalanceCorrection;
+    progress.frontendBalanceCorrection={status:'LATEST_APPROVED_VERSION_LIVE_PASS_SCOPED_FULL_I66_OPEN',
+      scopeId:'SIX_RECEIPT_CURRENT_BALANCE_READONLY',generation:j.generation,sourceSha:head.sourceSha,
+      buildId:head.buildId,artifactId:head.artifactId,artifactDigest:head.artifactDigest,
+      preview:{...receipt.financialPreviewUi,stageCount:48,scopeOnly:true},
+      live:{...receipt.financialUi,stageCount:48,scopeOnly:true},sameArtifactBothPhases:true,
+      financialWritesDuringCertification:0,fullA04Accepted:false,fullA12Passed:false,fullA14Passed:false,fullI66ProductionAccepted:false};
+    progress.releaseExecution.financialUi=receipt.financialUi;
+    state.currentLiveSuccessorAcceptance.financialUi=receipt.financialUi;
+    continuation.frontendBalanceCorrection20261124=progress.frontendBalanceCorrection;
+    const a12=progress.shockObjectives.items.find(x=>x.id==='A12');assert.equal(a12.passForShock,false);
+    a12.status='FINANCIAL_COMMITS_PRESERVED_SIX_RECEIPT_BALANCE_SCOPED_LIVE_PASS_FULL_A12_OPEN';
+    a12.evidence+='; exact composed artifact: financial Preview48 and LIVE48 with two assigned roles, two viewports, actual reload and unchanged financial source snapshots; receipt '+receipt.financialUi.receiptPath;
+    a12.next='Preserve the accepted six-record balance proof and all committed financial batches. Continue only unresolved source, identity and reconciliation cases through their approved canonical owners; no reimport of the six records.';
+    progress.immediateExecution={...progress.immediateExecution,status:'COMPOSITE_ARTIFACT_AND_BALANCE_ACCEPTED_CLOSED_MAKE_ACTIVATION_PENDING',
+      financialFocal:a12.next,fullA04Passed:false,fullA12Passed:false,fullA14Passed:false,fullI66ProductionAccepted:false};
     delete transport.frontendPreviewRequest;
   }
   progress.recordedAtUtc=j.liveProof.recordedAtUtc;
@@ -614,8 +651,10 @@ async function verifyReadonlyObserver(resolution,{env=process.env,api,readMarker
   }
   const [control,state,transport]=await Promise.all([file(P.cp),file(P.state),file(P.transport),file(P.ledger)]);
   const head=control.i66FrontendReleaseHead;assert.ok(head,'READONLY_OBSERVER_REMOTE_PHYSICAL_HEAD_MISSING');
-  await Promise.all([file(genName(head.generation,'RECEIPT')),file(genName(head.generation,'JOURNAL')),
+  const [currentReceipt]=await Promise.all([file(genName(head.generation,'RECEIPT')),file(genName(head.generation,'JOURNAL')),
     ...(head.scope==='COMPOSITE'?[file(genName(head.generation,'LIVE_PROOF'))]:[])]);
+  if(currentReceipt.financialUi)await Promise.all([file(currentReceipt.financialUi.receiptPath),
+    file(currentReceipt.financialPreviewUi.receiptPath)]);
   const physical=physicalGuard(control,state,transport,{readFileSync:relative=>{
     assert.ok(files.has(relative),'READONLY_OBSERVER_UNEXPECTED_REMOTE_METADATA_PATH');return files.get(relative);
   }});

@@ -20,11 +20,44 @@ test('pinned Firebase CLI keeps IAM reads but cannot call either project role mu
 test('guarded deployment admits only the same five targets in the existing exact phase and project',()=>{
  const g=require('./gravicentra-i6-6-operational-release-candidate.cjs');
  for(const phase of ['preview','live']){
-  const args=['deploy','--only',g.MAKE_TARGETS[phase].map(t=>'functions:'+t.name).join(','),'--config','/runner/exact/firebase.json','--project','ays-orbit-360-lab','--non-interactive'];
+  const args=['deploy','--only',g.MAKE_TARGETS[phase].map(t=>'functions:'+t.name).join(','),'--config','/runner/exact/firebase.json','--project','ays-orbit-360-lab','--non-interactive','--force'];
   assert.equal(cliGuard.deploymentArgs(phase,args),args);
-  for(const mutate of [a=>a[0]='projects:addfirebase',a=>a[2]+=',functions:unrelated',a=>a[4]='relative.json',a=>a[6]='other-project',a=>a.push('--force')]){
+  for(const mutate of [a=>a[0]='projects:addfirebase',a=>a[2]+=',functions:unrelated',a=>a[4]='relative.json',a=>a[6]='other-project',a=>a.pop(),a=>a.push('--force'),a=>a[8]='--dry-run']){
    const altered=[...args];mutate(altered);assert.throws(()=>cliGuard.deploymentArgs(phase,altered));
   }
+ }
+});
+test('force keeps retry prompt intact but cannot confirm an implicit deletion or unsafe event migration',async()=>{
+ let retryCalls=0,otherPromptCalls=0;
+ const original=async options=>{assert.equal(options.force,true);retryCalls++;};
+ const prompts={promptForFailurePolicies:original,promptForFunctionDeletion:async()=>{otherPromptCalls++;return true;},
+  promptForUnsafeMigration:async rows=>{otherPromptCalls++;return rows;}};
+ cliGuard.guardDeployPrompts(prompts);
+ assert.equal(prompts.promptForFailurePolicies,original);await prompts.promptForFailurePolicies({force:true});
+ assert.equal(retryCalls,1);assert.equal(await prompts.promptForFunctionDeletion([],{force:true}),true);
+ await assert.rejects(prompts.promptForFunctionDeletion([{id:'unrelated'}],{force:true}),/IMPLICIT_FUNCTION_DELETION_FORBIDDEN/);
+ const safe=[{endpoint:{id:'same-target'},unsafe:false}];assert.equal(await prompts.promptForUnsafeMigration(safe,{force:true}),safe);
+ await assert.rejects(prompts.promptForUnsafeMigration([{endpoint:{id:'same-target'},unsafe:true}],{force:true}),/UNSAFE_EVENT_MIGRATION_FORBIDDEN/);
+ for(const key of ['promptForFunctionDeletion','promptForUnsafeMigration']){
+  await assert.rejects(prompts[key](null,{force:true}),/DEPLOYMENT_PLAN_REQUIRED/);
+  assert.throws(()=>{prompts[key]=async()=>true;},TypeError);
+ }
+ assert.equal(otherPromptCalls,0);
+});
+test('actual workflow Make invocations admit force only inside each exact five-target guarded deployment',()=>{
+ const workflows={preview:'gravicentra-i66-privileged-role-three-function-preview-uat.yml',live:'gravicentra-i66-privileged-role-exact-live-promotion.yml'};
+ for(const [phase,name] of Object.entries(workflows)){
+  const source=fs.readFileSync(path.join(__dirname,'../.github/workflows',name),'utf8');
+  const count=phase==='preview'?'PREVIEW_TARGET_COUNT':'LIVE_TARGET_COUNT';
+  const invocation=source.indexOf('node tools/gravicentra-i66-make-firebase-project-iam-guard.cjs');
+  const start=source.lastIndexOf('if test "$'+count+'" -eq 5;then',invocation);
+  const end=source.indexOf('elif test "$'+count+'" -eq 4;then',start);assert.ok(start>=0&&end>start);
+  const makeBranch=source.slice(start,end),rest=source.slice(0,start)+source.slice(end);
+  const command=makeBranch.match(/node tools\/gravicentra-i66-make-firebase-project-iam-guard\.cjs[^\n]*(?:\n[^\n]*){2}/)?.[0];
+  assert.ok(command);assert.equal((command.match(/--force/g)||[]).length,1);
+  assert.equal((rest.match(/--force/g)||[]).length,0,'Force escaped exact Make branch');
+  const args=command.split(String.fromCharCode(92,10)).join(' ').replace(/"\$[A-Z0-9_]+"/g,x=>x.includes('CONFIG')?'"/runner/exact/firebase.json"':x.includes('PROJECT')?'"ays-orbit-360-lab"':'"/runner/firebase-tools/lib/bin/firebase.js"').match(/"[^"]*"|[^\s]+/g).map(x=>x.replace(/^"|"$/g,''));
+  assert.equal(args[3],phase);cliGuard.deploymentArgs(phase,args.slice(4));
  }
 });
 test('project IAM readback is exact after deployment, tolerates only representation order and never repairs unrelated drift',async()=>{

@@ -233,7 +233,7 @@ jobs:
             node tools/gravicentra-i66-make-lead-protected-executor.cjs before-deploy preview
             node tools/gravicentra-i66-make-firebase-project-iam-guard.cjs "$I66_ROLE_FIREBASE_CLI" preview deploy \
             --only functions:orbit360ProductOperationalCommandPreview,functions:orbit360CobrosReconciliationCommandPreview,functions:orbit360ScopedPolicyReadPreview,functions:orbit360OpsLeadsCommandPreview,functions:orbit360MakeLeadIngressPreview \
-            --config "$I66_ROLE_PREVIEW_FIREBASE_CONFIG" --project "$PROJECT_ID" --non-interactive
+            --config "$I66_ROLE_PREVIEW_FIREBASE_CONFIG" --project "$PROJECT_ID" --non-interactive --force
           elif test "$PREVIEW_TARGET_COUNT" -eq 4;then
             node "$I66_ROLE_FIREBASE_CLI" deploy \
             --only functions:orbit360ProductOperationalCommandPreview,functions:orbit360CobrosReconciliationCommandPreview,functions:orbit360ScopedPolicyReadPreview,functions:orbit360OpsLeadsCommandPreview \
