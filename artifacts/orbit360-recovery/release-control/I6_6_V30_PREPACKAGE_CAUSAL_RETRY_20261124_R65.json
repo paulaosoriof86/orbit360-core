@@ -1,0 +1,93 @@
+{
+  "schema": "GI_I66_PREPACKAGE_CAUSAL_RETRY_V1",
+  "status": "SOURCE_QA_PASS_IMMUTABLE_BUILD_REQUESTED_ONLY",
+  "requestVersion": 30,
+  "sourceQaHead": "b67845000de4a8a2472ce3ea432118344c0c21e7",
+  "repositoryHead": "a0b5a9279f8aa1df033fb0f99dea86b79c6ab072",
+  "certifiedSourceIsAncestorWithIdenticalProduct": true,
+  "failedRequest": {
+    "version": 29,
+    "sourceSha": "6efd4d494cd56b6be87d2fee3cbfc0ba55e9f6a8",
+    "buildRunId": 45502038971,
+    "artifactCreated": false,
+    "receipt": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_6_V29_PREPACKAGE_QA_FAILURE_20261124_R62.json",
+      "gitBlobSha": "bc1fcc2865ed95d56008848242bd571a9fa185d6",
+      "sha256": "87f89eec769afabc417b330a23602d0d8354a52dea6e00989defd9ee50975cfb",
+      "requestVersion": 29,
+      "sourceSha": "6efd4d494cd56b6be87d2fee3cbfc0ba55e9f6a8",
+      "runId": 45502038971,
+      "status": "FAILED_BEFORE_PACKAGE",
+      "artifactCreated": false
+    }
+  },
+  "sourceQa": {
+    "path": "artifacts/orbit360-recovery/release-control/I6_6_V30_SIGNED_SOURCE_QA_AND_GOVERNANCE_20261124.json",
+    "gitBlobSha": "3320c4a1f3039d7bf709959d4aeb0053729ba121",
+    "sha256": "de411e3f5670a8954057a7757537752187de6ecf6612d3fa3ebccea93d617722"
+  },
+  "productPaths": [
+    "functions/b4-003-scoped-related-reader.js",
+    "functions/bootstrap.js",
+    "functions/cobros-reconciliation-domain.js",
+    "functions/make-lead-ingress-bridge.js",
+    "functions/payment-inference-engine.js",
+    "functions/product-lead-ingress-contract.js",
+    "functions/product-lead-ingress-owner-support.js",
+    "functions/product-ops-leads-domain.js",
+    "orbit360-platform/core/policy-receipts-engine.js",
+    "orbit360-platform/core/primas.js",
+    "orbit360-platform/core/product-hydration-required-optional-p0.js",
+    "orbit360-platform/core/queries.js",
+    "orbit360-platform/data/store-firestore-product-operational-p0.js",
+    "orbit360-platform/data/store-firestore-product-readonly-p0.js",
+    "orbit360-platform/modules/aseguradoras.js",
+    "orbit360-platform/modules/cobros.js",
+    "orbit360-platform/modules/config-domain-v20260804-bridge.js",
+    "orbit360-platform/modules/issuance-endosos-v1201-bridge.js",
+    "orbit360-platform/modules/policy-receipts-v1199-bridge.js",
+    "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js",
+    "orbit360-platform/modules/renewals-v1200-operational-bridge.js"
+  ],
+  "allProductBytesPreserved": true,
+  "backendTargets": 5,
+  "directFormsRecovery": {
+    "schema": "GI_I66_DIRECT_FORMS_RECOVERY_PREVIEW_EXTENSION_V1",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_DIRECT_FORMS_ASSIGNED_ROLES_AND_INSURER_EDITOR_CAUSAL_SOURCE_20261124.json",
+    "receiptBlob": "539a1c4be0635588f5c7ec187320a78ce4b91927",
+    "productPathBlobs": {
+      "orbit360-platform/modules/renewals-v1200-operational-bridge.js": "8395b86246cf9bd77523da0059a6e5318e0cfc80",
+      "orbit360-platform/modules/issuance-endosos-v1201-bridge.js": "6dabc32d0a012566eb7840ef8774aee3beb17817",
+      "orbit360-platform/modules/aseguradoras.js": "0ce40050387f68b2e3efaddc7717ace7cf3ae3ff"
+    }
+  },
+  "financialRecovery": {
+    "schema": "GI_I66_R51_FINANCIAL_RECOVERY_PREVIEW_EXTENSION_V1",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_R51_ASSIGNED_ROLES_INSURER_FINANCIAL_RECOVERY_SOURCE_20261124.json",
+    "receiptBlob": "4d989f8bb8705974209fe79d65a72d4f11e4a1f1",
+    "productPathBlobs": {
+      "functions/cobros-reconciliation-domain.js": "3d84423fd985841c6f9b230dcf729b41f2512556",
+      "functions/payment-inference-engine.js": "a3d6bf99288c0c309759dce954d48c1ecc4db9dc",
+      "orbit360-platform/core/primas.js": "0d5d343ef11760312092314b719fc82da0eaa147",
+      "orbit360-platform/modules/cobros.js": "e86ea782c6aacf97fe4ab4900ed40dec07537a22",
+      "orbit360-platform/modules/config-domain-v20260804-bridge.js": "b0c3d6e2399ab9a13a60ea473fc8cc1e9edd00f9",
+      "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js": "74298d8565902895e5b2d2a5de030ed08847243c"
+    }
+  },
+  "cancellationRecovery": {
+    "schema": "GI_I66_EFFECTIVE_CANCELLATION_PREVIEW_EXTENSION_V1",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_EFFECTIVE_CANCELLATION_ASSIGNED_ROLES_CAUSAL_SOURCE_20261124.json",
+    "receiptBlob": "c095cdf1cc648a009dde51a641062f3941ee4da1",
+    "productPathBlobs": {
+      "orbit360-platform/core/policy-receipts-engine.js": "698fbaa0d15989f1393f0c6ec1eefb9da8153d87",
+      "orbit360-platform/data/store-firestore-product-operational-p0.js": "d9b6806958da950f7a3aff28ca8b164220f827d6",
+      "orbit360-platform/modules/policy-receipts-v1199-bridge.js": "583b87763fe7931d211e8c67a4f08ef0265b0dfb",
+      "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js": "74298d8565902895e5b2d2a5de030ed08847243c"
+    }
+  },
+  "historicalSourceEvidencePreserved": true,
+  "backendPreviewAuthority": false,
+  "liveAuthority": false,
+  "realDataWrites": 0,
+  "deployments": 0
+}
