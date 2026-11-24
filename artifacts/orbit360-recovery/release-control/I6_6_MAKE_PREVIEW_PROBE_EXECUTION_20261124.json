@@ -1,0 +1,37 @@
+{
+  "schema": "GI_I66_MAKE_QUEUE_EXECUTION_RECEIPT_V1",
+  "status": "success",
+  "scenarioId": 10196136,
+  "connectionId": 14756714,
+  "module": "google-cloud-firestore:createDocument",
+  "moduleId": 3,
+  "executionId": "3ffad37195344d3c973edba315e1719f",
+  "documentName": "projects/ays-orbit-360-lab/databases/(default)/documents/tenants/alianzas-soluciones/previewLeadIngressRequests/t6CFQ8BWzU5JNcG3A4yk",
+  "documentCreateTime": "2026-11-24T11:42:06.766Z",
+  "externalMessagesSent": 0,
+  "stage": "PROBE",
+  "phase": "preview",
+  "startedAt": "2026-11-24T11:41:57.856Z",
+  "endedAt": "2026-11-24T11:42:13.807Z",
+  "queueOnly": true,
+  "canonicalLeadAcceptanceClaim": false,
+  "readback": {
+    "routingRestored": true,
+    "writerDisabled": true,
+    "readerConfigurationsUnchanged": true,
+    "scheduleSeconds": 300,
+    "queueModuleInvocations": 1,
+    "queueModuleErrors": 0,
+    "windowExecutions": [
+      {
+        "id": "3ffad37195344d3c973edba315e1719f",
+        "startedAt": "2026-11-24T11:42:05.834Z",
+        "startedBy": "auto",
+        "status": "success"
+      }
+    ],
+    "explicitScenarioRunRequested": true,
+    "providerLabelObserved": "auto"
+  },
+  "nonceSha256": "fd3d0de843e301bdce6d2197b2de0d45f25ae68bec14bd129ec8f56069603660"
+}
