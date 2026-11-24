@@ -27,7 +27,7 @@
     "activeGate": "I6.6",
     "closedHistoricalGate": "B4-007",
     "latestProvenLiveSource": "65c825b2808a615ca4195bdde6689dbdbe3193b2",
-    "currentWork": "I6.6: construir v18 una sola vez con fuente y QA firmadas; verificar el mismo artifact en Preview y LIVE, incluido saldo de seis recibos y contrato compuesto de cinco funciones con ingreso Make cerrado. Conservar E3 vigente hasta aceptación completa, los dos rollbacks E4/E5, los 155 pagos DIRECT registrados por Q78806.43 pendientes de aplicación y las 46 obligaciones documentadas nuevas por Q17908.06 (104 en el alcance auditado). Continuar correos por usuario y trazabilidad sin duplicar recepciones ni actividad canónica; no se declara aceptación global.",
+    "currentWork": "I6.6: construir v19 una sola vez con el verificador canónico corregido y QA firmadas; conservar v18 como build y Hosting Preview224 PASS sin prueba backend. Completar Preview de cinco funciones cerrado, saldo48 y LIVE del mismo nuevo artifact antes de aceptar. E3 permanece vigente;104 obligaciones en alcance auditado,46 nuevas documentadas y155 pagos DIRECT registrados pendientes de aplicación se preservan sin repetir escrituras.",
     "latestHostingPreviewEvidence": "artifacts/orbit360-recovery/release-control/I6_6_NETWORK_DIAGNOSTICS_PREVIEW_BUILD_20261117.json",
     "latestHostingPreviewSource": "1b65a790530d49fe1d1fb451f02838fd9a713c53",
     "operationsEvidenceReview": "artifacts/orbit360-recovery/release-control/I6_6_OPS_EVIDENCE_AND_PREVIEW_BINDING_REVIEW_20261116.json",
@@ -2061,18 +2061,18 @@
       "lastFinancialApplicationAtUtc": "2026-11-24T09:49:10.0274037Z"
     },
     "frontendBalanceCorrection20261124": {
-      "status": "COMPOSED_V18_SOURCE_AND_SIGNED_QA_FROZEN_BUILD_PREVIEW_PENDING",
-      "sourceQaHead": "d05a2cc82207773da6c8f9306fe8a91ca26cfd81",
-      "sourceQaRunId": 45372224633,
-      "guardRunId": 45372224612,
-      "causalDomJobId": 138369102568,
+      "status": "COMPOSED_V19_EXACT_CANONICAL_VERIFIER_SIGNED_QA_FROZEN_BUILD_PENDING",
+      "sourceQaHead": "31ed4207f8e73de1f3bdf08f6e56ebfcf2673116",
+      "sourceQaRunId": 45375595685,
+      "guardRunId": 45375595283,
+      "causalDomJobId": 138380905159,
       "causalQaPins": {
         "tools/gravicentra-i66-live-performance-readonly.mjs": "8849427a7dfab1fa7f35324111c20d26f069155b",
         "tools/gravicentra-i6-6-six-existing-receipts-ui-readonly.test.cjs": "b981267c9049974bbd7c6e6a1ff6c2e3546e0620",
         ".github/workflows/gravicentra-i66-privileged-role-parity-source-qa.yml": "37d150c7bcfb884152409ebefe512bdab26e5df9"
       },
       "manifestGitBlobSha": "677354250c84ef0a5af0b562e29586dfe1559553",
-      "requestVersion": 18,
+      "requestVersion": 19,
       "mode": "A13_A14_BALANCE_COMPOSITE_ARTIFACT_HOSTING_PREVIEW_ONLY",
       "productPath": "orbit360-platform/core/queries.js",
       "productGitBlobSha": "b77b65f86ef6ac2ab6dc157fdbc9ad5e34dbcdcc",
@@ -2092,7 +2092,51 @@
       "liveAccepted": false,
       "currentPhysicalGeneration": 3,
       "fullI66ProductionAccepted": false,
-      "next": "Build the exact newly frozen source once; require separate five-function Preview, scoped financial Preview48, same-artifact LIVE48 and composite signed commit before acceptance."
+      "next": "I6.6: construir v19 una sola vez con el verificador canónico corregido y QA firmadas; conservar v18 como build y Hosting Preview224 PASS sin prueba backend. Completar Preview de cinco funciones cerrado, saldo48 y LIVE del mismo nuevo artifact antes de aceptar. E3 permanece vigente;104 obligaciones en alcance auditado,46 nuevas documentadas y155 pagos DIRECT registrados pendientes de aplicación se preservan sin repetir escrituras.",
+      "priorImmutableV18": {
+        "status": "IMMUTABLE_BUILD_AND_HOSTING_PREVIEW_224_READBACK_PASS_BACKEND_PREVIEW_NOT_RUN",
+        "sourceSha": "99f2da6616f37dfad9d54ea2c81cb06cf536ef63",
+        "buildId": "gi-i66-99f2da6616f3-57f234755dc1",
+        "buildRunId": 45372999520,
+        "jobId": 138371984563,
+        "artifactId": 14909738272,
+        "artifactDigest": "sha256:39e8ec2183f9347ea41a94d887c81a5656403dc4d6746f9fd61993e856f2658c",
+        "tarDigest": "sha256:4b589ad0c68e151d003fcfcda2f641db752416b5802b3d45f4182f2a5b254fc5",
+        "previewUrl": "https://ays-orbit-360-lab--gi-i66-rc-45372999520-07y0gfca.web.app",
+        "previewChannel": "gi-i66-rc-45372999520",
+        "hostingVersion": null,
+        "hostingVersionNotExposedByBuildReceipt": true,
+        "exactManifestCounts": {
+          "site": 224,
+          "backend": 48,
+          "bundle": 274
+        },
+        "packageOutput": {
+          "buildId": "gi-i66-99f2da6616f3-57f234755dc1",
+          "buildBoundAssetCount": 138,
+          "hostedFileCount": 224,
+          "hostedPayloadDigest": "038d95b93460d3d042613e3ae2da78678283fb0479057bbc6cc5c06b719b0376",
+          "backendFileCount": 48,
+          "backendSourceDigest": "5df17c7e1e49107e0b9aff93c6986fb4aec2f18b76af1aa19a39cb3af6778a06",
+          "bundleFileCount": 274,
+          "bundleDigest": "dc7a26af78dbdbce665657c19f9b2bdc412c25cd24a5cc07ee6061f32fb797c7",
+          "reachableProductFiles": 217
+        },
+        "signedReadbackStep": {
+          "number": 12,
+          "name": "Preview readback all artifact files and confirm both LIVE origins are untouched",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "bothLiveOriginsFingerprintUnchanged": true,
+        "backendDeploys": 0,
+        "backendPreviewAccepted": false,
+        "liveAccepted": false
+      },
+      "verifierCausalReceipt": {
+        "path": "artifacts/orbit360-recovery/release-control/I6_6_CANONICAL_BOOTSTRAP_BUILD_VERIFIER_CORRECTION_20261124.json",
+        "gitBlobSha": "4e427530f367463ac6beda0aa8f14f09ce53c9b5"
+      }
     },
     "communicationIngressProgress20261124": {
       "status": "CANONICAL_WRITER_SOURCE_PREPARED_RUNTIME_AND_SIGNED_RELEASE_PENDING",
@@ -2348,6 +2392,40 @@
       ],
       "currentPhysicalGeneration": 3,
       "next": "Correct the observed release-transport failure inside the existing owner, then certify the next newly built composed artifact. Neither failed promotion is accepted."
+    },
+    "priorFrontendBalanceCorrectionBeforeV19_20261124": {
+      "status": "COMPOSED_V18_SOURCE_AND_SIGNED_QA_FROZEN_BUILD_PREVIEW_PENDING",
+      "sourceQaHead": "d05a2cc82207773da6c8f9306fe8a91ca26cfd81",
+      "sourceQaRunId": 45372224633,
+      "guardRunId": 45372224612,
+      "causalDomJobId": 138369102568,
+      "causalQaPins": {
+        "tools/gravicentra-i66-live-performance-readonly.mjs": "8849427a7dfab1fa7f35324111c20d26f069155b",
+        "tools/gravicentra-i6-6-six-existing-receipts-ui-readonly.test.cjs": "b981267c9049974bbd7c6e6a1ff6c2e3546e0620",
+        ".github/workflows/gravicentra-i66-privileged-role-parity-source-qa.yml": "37d150c7bcfb884152409ebefe512bdab26e5df9"
+      },
+      "manifestGitBlobSha": "677354250c84ef0a5af0b562e29586dfe1559553",
+      "requestVersion": 18,
+      "mode": "A13_A14_BALANCE_COMPOSITE_ARTIFACT_HOSTING_PREVIEW_ONLY",
+      "productPath": "orbit360-platform/core/queries.js",
+      "productGitBlobSha": "b77b65f86ef6ac2ab6dc157fdbc9ad5e34dbcdcc",
+      "causalObserverRunId": 45332501772,
+      "sourceReceipt": {
+        "path": "artifacts/orbit360-recovery/release-control/I6_6_A13_A14_TRANSPORT_COMPOSED_SOURCE_20261124.json",
+        "gitBlobSha": "09f858e4f33c8fd238df4e04460c9d97fb2a2e98"
+      },
+      "expectedPreviewStages": 48,
+      "expectedLiveStages": 48,
+      "frontendOnly": false,
+      "expectedBackendFunctions": 5,
+      "backendDeploys": 0,
+      "financialWritesByThisFreeze": 0,
+      "artifactBuilt": false,
+      "previewAccepted": false,
+      "liveAccepted": false,
+      "currentPhysicalGeneration": 3,
+      "fullI66ProductionAccepted": false,
+      "next": "Build the exact newly frozen source once; require separate five-function Preview, scoped financial Preview48, same-artifact LIVE48 and composite signed commit before acceptance."
     }
   },
   "b4003ActiveCertificationCursor20261106": {
@@ -5681,7 +5759,7 @@
     "i63LiveReadbackPass": true,
     "i63DeterministicDiffReady": true
   },
-  "nextAction": "I6.6: construir v18 una sola vez con fuente y QA firmadas; verificar el mismo artifact en Preview y LIVE, incluido saldo de seis recibos y contrato compuesto de cinco funciones con ingreso Make cerrado. Conservar E3 vigente hasta aceptación completa, los dos rollbacks E4/E5, los 155 pagos DIRECT registrados por Q78806.43 pendientes de aplicación y las 46 obligaciones documentadas nuevas por Q17908.06 (104 en el alcance auditado). Continuar correos por usuario y trazabilidad sin duplicar recepciones ni actividad canónica; no se declara aceptación global.",
+  "nextAction": "I6.6: construir v19 una sola vez con el verificador canónico corregido y QA firmadas; conservar v18 como build y Hosting Preview224 PASS sin prueba backend. Completar Preview de cinco funciones cerrado, saldo48 y LIVE del mismo nuevo artifact antes de aceptar. E3 permanece vigente;104 obligaciones en alcance auditado,46 nuevas documentadas y155 pagos DIRECT registrados pendientes de aplicación se preservan sin repetir escrituras.",
   "postproductionExitProgress": {
     "formalPercent": 60,
     "frozenMiniGates": 6,
@@ -25354,8 +25432,8 @@
   },
   "i66ActiveRecoveryCursor": {
     "status": "FROZEN_I66_SHOCK_EXECUTION_CONTINUES_NO_GATE_REPLACEMENT",
-    "currentEvidencePath": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_EXECUTION_PROGRESS_20261124_R31.json",
-    "currentEvidenceBlobSha": "5b06e8bf68bc5af478e07172cb73a887bc852fd8",
+    "currentEvidencePath": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_EXECUTION_PROGRESS_20261124_R32.json",
+    "currentEvidenceBlobSha": "66a14e63fadb91d28c0ac901a7859fb37079c0a0",
     "frozenPlanPath": "artifacts/orbit360-recovery/release-control/I6_6_PLAN_CHOQUE_FUNCIONAL_FINANCIERO_20261122.md",
     "frozenPlanBlobSha": "fbfd54d229a13101fbfb0dfc6e92a5fa524999b6",
     "fullInventoryPath": "artifacts/orbit360-recovery/release-control/I6_6_INVENTARIO_INTEGRAL_295_20261122.md",
@@ -25372,15 +25450,15 @@
     "financialRowsAppliedThisIteration": 104,
     "lastEvidenceDateLocal": "2026-11-24",
     "noNormativeProjectSourceChange": true,
-    "next": "I6.6: construir v18 una sola vez con fuente y QA firmadas; verificar el mismo artifact en Preview y LIVE, incluido saldo de seis recibos y contrato compuesto de cinco funciones con ingreso Make cerrado. Conservar E3 vigente hasta aceptación completa, los dos rollbacks E4/E5, los 155 pagos DIRECT registrados por Q78806.43 pendientes de aplicación y las 46 obligaciones documentadas nuevas por Q17908.06 (104 en el alcance auditado). Continuar correos por usuario y trazabilidad sin duplicar recepciones ni actividad canónica; no se declara aceptación global.",
+    "next": "I6.6: construir v19 una sola vez con el verificador canónico corregido y QA firmadas; conservar v18 como build y Hosting Preview224 PASS sin prueba backend. Completar Preview de cinco funciones cerrado, saldo48 y LIVE del mismo nuevo artifact antes de aceptar. E3 permanece vigente;104 obligaciones en alcance auditado,46 nuevas documentadas y155 pagos DIRECT registrados pendientes de aplicación se preservan sin repetir escrituras.",
     "lastFunctionalLiveUatRunId": 45074429319,
     "lastFunctionalLiveUatJobId": 137352857627,
     "lastFunctionalLiveScope": "TWO_ROLE_RENEWAL_INSURER_SYNTHETIC_PASS_REAL_ISSUANCE_AND_DOCUMENT_HOLD",
-    "previousEvidencePath": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_EXECUTION_PROGRESS_20261124_R30.json",
-    "previousEvidenceBlobSha": "3e96a53e146c4338d0d5712d9414cbe874a6f8f2",
+    "previousEvidencePath": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_EXECUTION_PROGRESS_20261124_R31.json",
+    "previousEvidenceBlobSha": "5b06e8bf68bc5af478e07172cb73a887bc852fd8",
     "lastFunctionalLiveUatStatus": "LIVE_PHYSICAL_STEPS_PASS_FIVE_ROLE_FINAL_COVERAGE_FAIL_CLOSED",
     "lastFinancialProtectedPreflightRunId": 45332501697,
-    "lastFinancialSourceStatus": "155_DIRECT_HISTORICAL_PAYMENTS_36_NEW_OBLIGATIONS_READBACK_VERIFIED_607_AND_302_NOT_FULLY_CLOSED",
+    "lastFinancialSourceStatus": "155_DIRECT_HISTORICAL_PAYMENTS_46_NEW_OBLIGATIONS_READBACK_VERIFIED_607_AND_302_NOT_FULLY_CLOSED",
     "lastFiveRoleMatrixRunId": 45298628816,
     "lastFiveRoleMatrixStatus": "PASS_SCOPED_GT_FIVE_ROLES_READONLY_FULL_A04_HOLD",
     "lastPerformanceEvidenceArtifactId": 14878846193,
@@ -25404,8 +25482,8 @@
     "financialRowsAppliedThisIterationScope": "Known prior 58 plus new 46 issuer schedule obligations (24 El Roble and 22 Universales; 104 total in this documented scope). Excludes 153 separately materialized historical paid receipts and seven corrections of existing obligations; not the full database count.",
     "financialHistoricalPaymentsAppliedThisContinuation": 155,
     "financialHistoricalPaidReceiptsMaterializedThisContinuation": 153,
-    "financialNewPendingObligationsThisContinuation": 36,
-    "moduleReleasedThisIterationScope": "V18 source and signed QA frozen; new immutable build and composite Preview/LIVE pending. Accepted physical release remains E3."
+    "financialNewPendingObligationsThisContinuation": 46,
+    "moduleReleasedThisIterationScope": "V18 Hosting Preview224 readback preserved; V19 corrected verifier and signed QA frozen for a new immutable build. Accepted physical release remains E3."
   },
   "i66PreversionedControlViewBlob": "de401082f688ce1c59f025f6f39e3c947dceaa35",
   "i66FrontendReleaseHead": {

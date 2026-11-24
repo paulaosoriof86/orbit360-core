@@ -1,0 +1,786 @@
+{
+  "schema": "GI_I66_NEW56_FOCAL_ORIGINAL_CROSSWALK_V1",
+  "status": "DOCUMENTARY_CROSSWALK_VERIFIED_NO_LIVE_WRITES",
+  "recordedAtUtc": "2026-11-24T10:33:30.800799+00:00",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "readSourceHead": "99f2da6616f37dfad9d54ea2c81cb06cf536ef63",
+  "source56": {
+    "path": "artifacts/orbit360-recovery/source-batches/I6_6_NEW_INSURER_SOURCE_DELTA_20261124.json",
+    "sha256": "68ebdc6f04e0ee5e4d7aa92b2a3bd9564f17a8a5e7b23528522cc6381f782805",
+    "gitBlob": "ebf7350a664c851fe82f28eae241efc76bba7e1e"
+  },
+  "beforeSnapshot": {
+    "runId": 45364013332,
+    "financialCensusSha256": "5932d2e4096d61828dc6ebcf0da49ad44dca821b0bf92c45abaa7f078faf0cfe",
+    "isCurrentWritePreimage": false,
+    "newReadRequiredBeforeWrite": true
+  },
+  "sourceDocuments": [
+    {
+      "localName": "mapfre57714-policy.pdf",
+      "driveFileId": "17-qRnEsQkKWac5oUaDIU9R_wGOg6yptu",
+      "sha256": "5f939c5020203cf9324bdb2c694c2e72cb359ee447a018988f2b6df360e979bb",
+      "bytes": 1071226,
+      "connectedDriveReadVerified": true,
+      "textInspectedPages": [
+        1,
+        4,
+        9,
+        10
+      ],
+      "visuallyInspectedPages": [
+        4
+      ],
+      "firebaseServiceAccountAccessReverified": false
+    },
+    {
+      "localName": "general136553-policy.pdf",
+      "driveFileId": "1ADHBFdQE7C2RouyA7f1vDJgTepXyYhIY",
+      "sha256": "bd3c8999e51dabb8981958f9b85fbf7706b8abdfc2427444f9f68b5c1dedbe86",
+      "bytes": 575054,
+      "connectedDriveReadVerified": true,
+      "textInspectedPages": [
+        15
+      ],
+      "visuallyInspectedPages": [
+        15
+      ],
+      "firebaseServiceAccountAccessReverified": false
+    },
+    {
+      "localName": "mapfre-cobros-20261122.xls",
+      "driveFileId": "1MaHarJLB2xRXBZE6mZ5oBjcyvBxbzcR1",
+      "sha256": "71a33d9e4cc1ffe52dceca992231c499460c342aa2fb0f28b025decdb4674c2a",
+      "bytes": 7062,
+      "connectedDriveReadVerified": true,
+      "textInspectedPages": [],
+      "visuallyInspectedPages": [],
+      "firebaseServiceAccountAccessReverified": false
+    },
+    {
+      "localName": "general-ingresos-20261123.xls",
+      "driveFileId": "1-AhnZMzkxHZ_uRglYmQsRSeYZLj1kOVi",
+      "sha256": "bb31f9565e19d013fa52e3027ca07a0f81cfe0c8d9cea71c633d50af6346b60b",
+      "bytes": 16320,
+      "connectedDriveReadVerified": true,
+      "textInspectedPages": [],
+      "visuallyInspectedPages": [],
+      "firebaseServiceAccountAccessReverified": false
+    },
+    {
+      "localName": "mapfre-commission-202610.html",
+      "driveFileId": "19U_xqMJmlitl8_muzZ8Jp__q0h0Dke1P",
+      "sha256": "235d23552a76f4ea90cc60fd71b44b68c76b009f97ec9f1456bacaa431e36a91",
+      "bytes": 6185,
+      "connectedDriveReadVerified": true,
+      "textInspectedPages": [],
+      "visuallyInspectedPages": [],
+      "firebaseServiceAccountAccessReverified": false
+    }
+  ],
+  "mapfre57714": {
+    "policyId": "pol_841e35aca5a66214ceaeeb4e3da9",
+    "policySha256": "7ffdf12434016b48ae6c0d68db7866ad618baab72b6c79d0331055e84ec67914",
+    "term": [
+      "2025-12-23",
+      "2026-12-23"
+    ],
+    "issuerPolicyGrossCents": 153317,
+    "fullIssuedSchedule": [
+      {
+        "installment": 1,
+        "totalInstallments": 12,
+        "requirement": "1993551",
+        "contractualDue": "2026-01-03",
+        "issuerGrossCents": 12777,
+        "receiptId": "rec_9cb44c03b489c210a12126d7",
+        "receiptSha256": "1dc68703872f9e4b75b41161291f5d8274446fd0224840575293c71124d667da",
+        "beforeGrossCents": 12776,
+        "beforeDates": {
+          "fechaLimite": "2026-01-07",
+          "fechaPago": "2026-01-08",
+          "paidDate": "2026-01-08"
+        },
+        "portfolioCount": 1,
+        "portfolios": [
+          {
+            "id": "car_rec_9cb44c03b489c210a12126d7",
+            "sha256": "857d221ff4561929c71d005b4cf91130e9154dc6256d2d8495048962006a8334"
+          }
+        ],
+        "existingPayments": [
+          {
+            "id": "cob_da691572f112280afe89ba4038ac",
+            "sha256": "f628299e04239d99d449174d37e4b2104217838ea8765bad86576a715f969743",
+            "amountCents": 12776
+          }
+        ],
+        "disposition": "PRESERVE_EXISTING_PAYMENT"
+      },
+      {
+        "installment": 2,
+        "totalInstallments": 12,
+        "requirement": "1993552",
+        "contractualDue": "2026-02-03",
+        "issuerGrossCents": 12777,
+        "receiptId": "rec_80c526fb7b3905217b438ddf",
+        "receiptSha256": "3f009c5e3a973422f0ed56576f5100d65e5dc2d96e42b484e69b47f6734fddf4",
+        "beforeGrossCents": 12776,
+        "beforeDates": {
+          "fechaLimite": "2026-02-02",
+          "fechaPago": "2026-02-02",
+          "paidDate": "2026-02-02"
+        },
+        "portfolioCount": 1,
+        "portfolios": [
+          {
+            "id": "car_rec_80c526fb7b3905217b438ddf",
+            "sha256": "99478dbf0f35ac81248477db748dc4c2ac9d791216ac4329196eec20ac1e9039"
+          }
+        ],
+        "existingPayments": [
+          {
+            "id": "cob_3f91bb42be1deaca58a042de7109",
+            "sha256": "b71a1177861b3ca849902021daa6f511a102fadca8610b94be15a27cfbeecb84",
+            "amountCents": 12776
+          }
+        ],
+        "disposition": "PRESERVE_EXISTING_PAYMENT"
+      },
+      {
+        "installment": 3,
+        "totalInstallments": 12,
+        "requirement": "1993553",
+        "contractualDue": "2026-03-03",
+        "issuerGrossCents": 12777,
+        "receiptId": "rec_27c17b886ea9e22578035c4f",
+        "receiptSha256": "3a08ce8a3ee6632a145cdae262dca7182d29f557ae24ea933f93666e4fdfc440",
+        "beforeGrossCents": 12776,
+        "beforeDates": {
+          "fechaLimite": "2026-03-05",
+          "fechaPago": "2026-03-03",
+          "paidDate": "2026-03-03"
+        },
+        "portfolioCount": 1,
+        "portfolios": [
+          {
+            "id": "car_rec_27c17b886ea9e22578035c4f",
+            "sha256": "ad0130d70e084978e2621bc0756a3ba312feb4235ea013dc9518550a892de008"
+          }
+        ],
+        "existingPayments": [
+          {
+            "id": "cob_24e69672dd34c4cb065d81722d3d",
+            "sha256": "acd257bc55c091e762207897f8440a9a0796f7d0dfc90effdf97384b21c52ce0",
+            "amountCents": 12776
+          }
+        ],
+        "disposition": "PRESERVE_EXISTING_PAYMENT"
+      },
+      {
+        "installment": 4,
+        "totalInstallments": 12,
+        "requirement": "1993554",
+        "contractualDue": "2026-04-03",
+        "issuerGrossCents": 12777,
+        "receiptId": "rec_e9bf3a55e6a7462c385b8aa4",
+        "receiptSha256": "017beacaeb6d0bc7f6de1daa3b867b11a1b123ef7806432b1c8f10196b508002",
+        "beforeGrossCents": 12776,
+        "beforeDates": {
+          "fechaLimite": "2026-04-02",
+          "fechaPago": "2026-05-04",
+          "paidDate": "2026-05-04"
+        },
+        "portfolioCount": 1,
+        "portfolios": [
+          {
+            "id": "car_rec_e9bf3a55e6a7462c385b8aa4",
+            "sha256": "45f403f108906da1c7b15a481af6e91f05550bc126d64dd336c8496ef585ab37"
+          }
+        ],
+        "existingPayments": [
+          {
+            "id": "cob_b8239bf1a9b85494081f2f4b0972",
+            "sha256": "5aa97c5fddd90c4559fb673618bbddd59825c184cf947e26a6a22ddaf964e143",
+            "amountCents": 12776
+          }
+        ],
+        "disposition": "PRESERVE_EXISTING_PAYMENT"
+      },
+      {
+        "installment": 5,
+        "totalInstallments": 12,
+        "requirement": "1993555",
+        "contractualDue": "2026-05-03",
+        "issuerGrossCents": 12777,
+        "receiptId": "rec_9820cfbc820fcebc33ea5545",
+        "receiptSha256": "bdc8eb3918b681159470487e1f578fdbdd00483ee19ff9becdaab407e5ff8fc2",
+        "beforeGrossCents": 12776,
+        "beforeDates": {
+          "fechaLimite": "2026-05-03",
+          "fechaPago": "2026-05-06",
+          "paidDate": "2026-05-06"
+        },
+        "portfolioCount": 1,
+        "portfolios": [
+          {
+            "id": "car_rec_9820cfbc820fcebc33ea5545",
+            "sha256": "202c2ee8b56131c8648401ace1450d9215c0602ea687c162def4c10987d49fbd"
+          }
+        ],
+        "existingPayments": [
+          {
+            "id": "cob_20aadad18143a546818ce4b96cd3",
+            "sha256": "3c1c9925e928ebabf9fb323b8db000bc7891d5ea8043e4d00cdea034e9ada253",
+            "amountCents": 12776
+          }
+        ],
+        "disposition": "PRESERVE_EXISTING_PAYMENT"
+      },
+      {
+        "installment": 6,
+        "totalInstallments": 12,
+        "requirement": "1993556",
+        "contractualDue": "2026-06-03",
+        "issuerGrossCents": 12777,
+        "receiptId": "rec_32c9cef0c2957b9d8094ec8a",
+        "receiptSha256": "c012d5b22cfb81aacf44809207873b4a92368e6995f38a4e4d6b6504fe81797b",
+        "beforeGrossCents": 12776,
+        "beforeDates": {
+          "fechaLimite": "2026-06-02",
+          "fechaPago": "2026-06-01",
+          "paidDate": "2026-06-01"
+        },
+        "portfolioCount": 1,
+        "portfolios": [
+          {
+            "id": "car_rec_32c9cef0c2957b9d8094ec8a",
+            "sha256": "7a7e3f7f583e789271897cf71ad7074812ecd9e1e3b14208c58366cc5308929f"
+          }
+        ],
+        "existingPayments": [
+          {
+            "id": "cob_7bae8897cd7b8c8faa35cda04d61",
+            "sha256": "f0787093e3a70892b0807deeed6669bd90e1234bc805721dd20a124b22e4f91c",
+            "amountCents": 12776
+          }
+        ],
+        "disposition": "PRESERVE_EXISTING_PAYMENT"
+      },
+      {
+        "installment": 7,
+        "totalInstallments": 12,
+        "requirement": "1993557",
+        "contractualDue": "2026-07-03",
+        "issuerGrossCents": 12777,
+        "receiptId": "rec_33efe89a816ffad9baa3bfdf",
+        "receiptSha256": "09d75fce69e863d9951c9ee9e8c1ff8d8d933a0aa18ed1ca0ccbef5dc8742695",
+        "beforeGrossCents": 12776,
+        "beforeDates": {
+          "fechaLimite": "2026-07-03"
+        },
+        "portfolioCount": 0,
+        "portfolios": [],
+        "existingPayments": [
+          {
+            "id": "cob_conc_3bae3bc2a6294f9b1b84100d",
+            "sha256": "febd73fe0773ae5ea1b0440daf735613eea46874c9d4c98a6de25cbb027b3315",
+            "amountCents": 12776
+          }
+        ],
+        "disposition": "PRESERVE_EXISTING_PAYMENT"
+      },
+      {
+        "installment": 8,
+        "totalInstallments": 12,
+        "requirement": "1993558",
+        "contractualDue": "2026-08-03",
+        "issuerGrossCents": 12777,
+        "receiptId": "rec_903fdb9a6e9503e1930c0ef8",
+        "receiptSha256": "a8723b7b21bcdee783aeb6ae202dd24ee5d31eb44b7e84930cd82a71398b88cf",
+        "beforeGrossCents": 12776,
+        "beforeDates": {
+          "fechaLimite": "2026-08-02",
+          "fechaPago": "2026-08-03",
+          "paidDate": "2026-08-03"
+        },
+        "portfolioCount": 1,
+        "portfolios": [
+          {
+            "id": "car_rec_903fdb9a6e9503e1930c0ef8",
+            "sha256": "9216dccb7131f16459ad9c49442a44c2fde4519a43566cd6df9e8d33a6caf0f4"
+          }
+        ],
+        "existingPayments": [
+          {
+            "id": "cob_948285490bb43fd4a1dfafa3b91d",
+            "sha256": "11b842c1f457858e50c0a95c01f079f891db0d5c751f0c184bd529ff8face45c",
+            "amountCents": 12776
+          }
+        ],
+        "disposition": "PRESERVE_EXISTING_PAYMENT"
+      },
+      {
+        "installment": 9,
+        "totalInstallments": 12,
+        "requirement": "1993559",
+        "contractualDue": "2026-09-03",
+        "issuerGrossCents": 12777,
+        "receiptId": "rec_583826b7c6709f88f616db34",
+        "receiptSha256": "f9060a4244c6ada84a93036ec5da15ffae04d6b255e70695cfc94cc626afb078",
+        "beforeGrossCents": 12776,
+        "beforeDates": {
+          "fechaLimite": "2026-09-02",
+          "fechaPago": "2026-09-03",
+          "paidDate": "2026-09-03"
+        },
+        "portfolioCount": 1,
+        "portfolios": [
+          {
+            "id": "car_rec_583826b7c6709f88f616db34",
+            "sha256": "3b4784fa2f739b2da8a9359d45420efc4f2e9c3d87afab90604bea5c54b233ab"
+          }
+        ],
+        "existingPayments": [
+          {
+            "id": "cob_cc2f4bb3e9cee56fb5e106aa5559",
+            "sha256": "0ed6a6de8276d41e3534441b83c5557c52e290b89da0c5cf4320a17e862da9ae",
+            "amountCents": 12776
+          }
+        ],
+        "disposition": "PRESERVE_EXISTING_PAYMENT"
+      },
+      {
+        "installment": 10,
+        "totalInstallments": 12,
+        "requirement": "1993560",
+        "contractualDue": "2026-10-03",
+        "issuerGrossCents": 12777,
+        "receiptId": "rec_f158c0b69f104189a49580c0",
+        "receiptSha256": "245d44650411fdb76d9703ea711861952611c3d604c125fab156de0c578709d2",
+        "beforeGrossCents": 12776,
+        "beforeDates": {
+          "fechaLimite": "2026-10-03"
+        },
+        "portfolioCount": 1,
+        "portfolios": [
+          {
+            "id": "rec_f158c0b69f104189a49580c0",
+            "sha256": "c6b5f3f742a64fb083e4555a08e2d9020cedc18f4d327570f54e32daa16b8a71"
+          }
+        ],
+        "existingPayments": [],
+        "disposition": "SOURCE_PROVEN_BINDING_PENDING_CURRENT_OWNER_PREFLIGHT"
+      },
+      {
+        "installment": 11,
+        "totalInstallments": 12,
+        "requirement": "1993561",
+        "contractualDue": "2026-11-03",
+        "issuerGrossCents": 12777,
+        "receiptId": "rec_94ab50a5f3ca8eac7aed5394",
+        "receiptSha256": "215dc1b0a5a371753c30366b76afb1515561d6e63f8b0265a647579021cd137e",
+        "beforeGrossCents": 12776,
+        "beforeDates": {
+          "fechaLimite": "2026-11-02"
+        },
+        "portfolioCount": 1,
+        "portfolios": [
+          {
+            "id": "rec_94ab50a5f3ca8eac7aed5394",
+            "sha256": "7c1c0bd9208e9190178c1b166c796208bb99033b7a29b240f24ca1698be856d4"
+          }
+        ],
+        "existingPayments": [],
+        "disposition": "SOURCE_PROVEN_BINDING_PENDING_CURRENT_OWNER_PREFLIGHT"
+      },
+      {
+        "installment": 12,
+        "totalInstallments": 12,
+        "requirement": "1993562",
+        "contractualDue": "2026-12-03",
+        "issuerGrossCents": 12770,
+        "receiptId": "rec_e1ca9f0595f750898899a3dd",
+        "receiptSha256": "b7c53c7b04ba4d9b9a4fbdfcaf1dbda2dd0d36b114ea44fd3b8a578e8b8a414e",
+        "beforeGrossCents": 12776,
+        "beforeDates": {
+          "fechaLimite": "2026-12-03"
+        },
+        "portfolioCount": 1,
+        "portfolios": [
+          {
+            "id": "rec_e1ca9f0595f750898899a3dd",
+            "sha256": "78b24067a992546f5f7f79e8cac724ab04da3bebe975d59d92791b8850fbec6a"
+          }
+        ],
+        "existingPayments": [],
+        "disposition": "SOURCE_PROVEN_BINDING_PENDING_CURRENT_OWNER_PREFLIGHT"
+      }
+    ],
+    "provenPaymentCandidates": [
+      {
+        "sourceFact": {
+          "policy": "3002400057714",
+          "rawPolicy": "3002400057714",
+          "product": "99RC",
+          "requirement": "1993560",
+          "installment": null,
+          "totalInstallments": null,
+          "due": "2026-10-03",
+          "paidDate": "2026-10-01",
+          "grossCents": 12777,
+          "netComponentCents": 7963,
+          "invoiceSeries": "0C2FAFDB",
+          "invoiceNumber": "4152705493",
+          "state": "COMMISSION_ANCHOR",
+          "paymentConfirmed": true,
+          "actualPaidDateEvidence": true,
+          "grossSource": "INSURER_VALOR_FACTURA_COLUMN",
+          "commissionSaleCents": 1194,
+          "commissionCollectionCents": 0,
+          "sourceId": "mapfre-commission-202610",
+          "sourceSha256": "235d23552a76f4ea90cc60fd71b44b68c76b009f97ec9f1456bacaa431e36a91",
+          "sourceDriveId": "19U_xqMJmlitl8_muzZ8Jp__q0h0Dke1P",
+          "sheet": "HTML",
+          "rowNumber": 2,
+          "insurer": "MAPFRE",
+          "currency": "GTQ",
+          "country": "GT",
+          "sourceRowSha256": "364d5ef550644771ee6dbb4d8bf7d1bed640aa34248441a7fe79de6be6f59236",
+          "sourceFactId": "stmt_5250964c3d5659d69d8e3513e077",
+          "holderWitness": "e8ec6efcce0c91ed8fd457661ea063efd2387469b2e9f3def045ffb7656b96e9",
+          "duplicateWitnessRowNumbers": []
+        },
+        "binding": {
+          "installment": 10,
+          "totalInstallments": 12,
+          "requirement": "1993560",
+          "contractualDue": "2026-10-03",
+          "issuerGrossCents": 12777,
+          "receiptId": "rec_f158c0b69f104189a49580c0",
+          "receiptSha256": "245d44650411fdb76d9703ea711861952611c3d604c125fab156de0c578709d2",
+          "beforeGrossCents": 12776,
+          "beforeDates": {
+            "fechaLimite": "2026-10-03"
+          },
+          "portfolioCount": 1,
+          "portfolios": [
+            {
+              "id": "rec_f158c0b69f104189a49580c0",
+              "sha256": "c6b5f3f742a64fb083e4555a08e2d9020cedc18f4d327570f54e32daa16b8a71"
+            }
+          ],
+          "existingPayments": [],
+          "disposition": "SOURCE_PROVEN_BINDING_PENDING_CURRENT_OWNER_PREFLIGHT"
+        },
+        "actualPaidDate": "2026-10-01",
+        "desiredSourceProvenGrossCents": 12777,
+        "newPaymentCandidateCount": 1,
+        "currentEligibility": "HOLD_OWNER_ADMISSION_AND_FRESH_CAS",
+        "interpretation": "The issued PDF proves the exact obligation and quota. The separate paid/commission statement proves payment. Do not classify the payment request in the PDF as a receipt of payment."
+      },
+      {
+        "sourceFact": {
+          "policy": "3002400057714",
+          "requirement": "1993561",
+          "installment": 11,
+          "totalInstallments": 12,
+          "rawInstallment": "11 DE 12",
+          "due": "2026-11-03",
+          "paidDate": "2026-11-04",
+          "grossCents": 12777,
+          "invoiceSeries": "929F2F2C",
+          "invoiceNumber": "2463124570",
+          "state": "PAID",
+          "holderWitness": "52bb3c96332c67f6db5a612f10f500ec6cb898db7473ac914570ff1133792d34",
+          "paymentConfirmed": true,
+          "actualPaidDateEvidence": true,
+          "sourceId": "mapfre-cobros-20261122",
+          "sourceSha256": "71a33d9e4cc1ffe52dceca992231c499460c342aa2fb0f28b025decdb4674c2a",
+          "sourceDriveId": "1MaHarJLB2xRXBZE6mZ5oBjcyvBxbzcR1",
+          "sheet": "HTML",
+          "rowNumber": 16,
+          "insurer": "MAPFRE",
+          "currency": "GTQ",
+          "country": "GT",
+          "sourceRowSha256": "3831485eda711f87f4fa9182bce5c128c5a8d5eb23439e47427a73dff395738b",
+          "sourceFactId": "stmt_89bc58a24b4c34507c60b8be22e4",
+          "duplicateWitnessRowNumbers": []
+        },
+        "binding": {
+          "installment": 11,
+          "totalInstallments": 12,
+          "requirement": "1993561",
+          "contractualDue": "2026-11-03",
+          "issuerGrossCents": 12777,
+          "receiptId": "rec_94ab50a5f3ca8eac7aed5394",
+          "receiptSha256": "215dc1b0a5a371753c30366b76afb1515561d6e63f8b0265a647579021cd137e",
+          "beforeGrossCents": 12776,
+          "beforeDates": {
+            "fechaLimite": "2026-11-02"
+          },
+          "portfolioCount": 1,
+          "portfolios": [
+            {
+              "id": "rec_94ab50a5f3ca8eac7aed5394",
+              "sha256": "7c1c0bd9208e9190178c1b166c796208bb99033b7a29b240f24ca1698be856d4"
+            }
+          ],
+          "existingPayments": [],
+          "disposition": "SOURCE_PROVEN_BINDING_PENDING_CURRENT_OWNER_PREFLIGHT"
+        },
+        "actualPaidDate": "2026-11-04",
+        "desiredSourceProvenGrossCents": 12777,
+        "newPaymentCandidateCount": 1,
+        "currentEligibility": "HOLD_OWNER_ADMISSION_AND_FRESH_CAS",
+        "interpretation": "The issued PDF proves the exact obligation and quota. The separate paid/commission statement proves payment. Do not classify the payment request in the PDF as a receipt of payment."
+      }
+    ],
+    "candidatePaymentCents": 25554,
+    "candidatePaymentCount": 2,
+    "preservedExistingPaymentCount": 9,
+    "lastPendingObligationCorrection": {
+      "receiptId": "rec_e1ca9f0595f750898899a3dd",
+      "requirement": "1993562",
+      "beforeGrossCents": 12776,
+      "afterGrossCents": 12770,
+      "grossDeltaCents": -6,
+      "afterContractualDue": "2026-12-03",
+      "paymentClaim": false,
+      "meaning": "Correct only the amount/reference/contractual date of the existing obligation after fresh unpaid preimage checks; the PDF is not proof that it remains unpaid."
+    }
+  },
+  "general136553": {
+    "policyId": "pol_9f0a4d94d04f534d072ec7f868e0",
+    "policySha256": "46f7afd6e1cbc164fdc8b9911adc2181320517123dca59d38efb96807461f88f",
+    "term": [
+      "2026-08-21",
+      "2027-08-21"
+    ],
+    "issuerPolicyGrossCents": 325860,
+    "issuerSchedule": [
+      {
+        "installment": 1,
+        "totalInstallments": 10,
+        "requirement": "14518453",
+        "contractualDue": "2026-08-21",
+        "netCents": 25300,
+        "expensesCents": 1265,
+        "financeCents": 2530,
+        "vatCents": 3491,
+        "grossCents": 32586
+      },
+      {
+        "installment": 2,
+        "totalInstallments": 10,
+        "requirement": "14518454",
+        "contractualDue": "2026-09-21",
+        "netCents": 25300,
+        "expensesCents": 1265,
+        "financeCents": 2530,
+        "vatCents": 3491,
+        "grossCents": 32586
+      },
+      {
+        "installment": 3,
+        "totalInstallments": 10,
+        "requirement": "14518455",
+        "contractualDue": "2026-10-21",
+        "netCents": 25300,
+        "expensesCents": 1265,
+        "financeCents": 2530,
+        "vatCents": 3491,
+        "grossCents": 32586
+      },
+      {
+        "installment": 4,
+        "totalInstallments": 10,
+        "requirement": "14518456",
+        "contractualDue": "2026-11-21",
+        "netCents": 25300,
+        "expensesCents": 1265,
+        "financeCents": 2530,
+        "vatCents": 3491,
+        "grossCents": 32586
+      },
+      {
+        "installment": 5,
+        "totalInstallments": 10,
+        "requirement": "14518457",
+        "contractualDue": "2026-12-21",
+        "netCents": 25300,
+        "expensesCents": 1265,
+        "financeCents": 2530,
+        "vatCents": 3491,
+        "grossCents": 32586
+      },
+      {
+        "installment": 6,
+        "totalInstallments": 10,
+        "requirement": "14518458",
+        "contractualDue": "2027-01-21",
+        "netCents": 25300,
+        "expensesCents": 1265,
+        "financeCents": 2530,
+        "vatCents": 3491,
+        "grossCents": 32586
+      },
+      {
+        "installment": 7,
+        "totalInstallments": 10,
+        "requirement": "14518459",
+        "contractualDue": "2027-02-21",
+        "netCents": 25300,
+        "expensesCents": 1265,
+        "financeCents": 2530,
+        "vatCents": 3491,
+        "grossCents": 32586
+      },
+      {
+        "installment": 8,
+        "totalInstallments": 10,
+        "requirement": "14518460",
+        "contractualDue": "2027-03-21",
+        "netCents": 25300,
+        "expensesCents": 1265,
+        "financeCents": 2530,
+        "vatCents": 3491,
+        "grossCents": 32586
+      },
+      {
+        "installment": 9,
+        "totalInstallments": 10,
+        "requirement": "14518461",
+        "contractualDue": "2027-04-21",
+        "netCents": 25300,
+        "expensesCents": 1265,
+        "financeCents": 2530,
+        "vatCents": 3491,
+        "grossCents": 32586
+      },
+      {
+        "installment": 10,
+        "totalInstallments": 10,
+        "requirement": "14518462",
+        "contractualDue": "2027-05-21",
+        "netCents": 25300,
+        "expensesCents": 1265,
+        "financeCents": 2530,
+        "vatCents": 3491,
+        "grossCents": 32586
+      }
+    ],
+    "currentReceiptCount": 12,
+    "currentGeneratedMonthlyGrossCents": 27155,
+    "existingPayments": [
+      {
+        "id": "cob_32dc8645828d5f5e568574e6decb",
+        "receiptId": "rec_i65_61763925bb59d37ee5e92ed2",
+        "sha256": "f36e223753a4f4565fcf2886b6bd90b27e66f92c8b54eb8a7e0eb691e34c82c4",
+        "amountCents": 27155,
+        "paidDate": "2026-11-17",
+        "applicationState": "PENDING_APPLICATION"
+      },
+      {
+        "id": "cob_36850d8183b3ae61a6d3a1df801f",
+        "receiptId": "rec_i65_83f375242c6073bb84b9b627",
+        "sha256": "2075ca6d95a1abf9869536290f21af7615fde5c466ce8ea11dc94f406b93662c",
+        "amountCents": 27155,
+        "paidDate": "2026-08-25",
+        "applicationState": "PENDING_APPLICATION"
+      },
+      {
+        "id": "cob_b9f3893699424bd6bcc59a75460a",
+        "receiptId": "rec_i65_ffd82c472ea0159675d2face",
+        "sha256": "bc7e7393a6dbbc97de6a808fee16c86fe97f5e1e2d2c947c0368774bdacf9a46",
+        "amountCents": 27155,
+        "paidDate": "2026-10-10",
+        "applicationState": "PENDING_APPLICATION"
+      }
+    ],
+    "novemberPaidFact": {
+      "policy": "1-AU-136553",
+      "endorsement": "0/2026",
+      "requirement": "14518455",
+      "installment": 3,
+      "totalInstallments": null,
+      "term": [
+        "2026-08-21",
+        "2027-08-21"
+      ],
+      "due": "2026-10-21",
+      "paidDate": "2026-11-17",
+      "grossCents": 32586,
+      "netCents": 25300,
+      "invoiceSeries": "1829B669",
+      "invoiceNumber": "2255048442",
+      "transaction": "10335781",
+      "state": "PAID",
+      "paymentConfirmed": true,
+      "actualPaidDateEvidence": true,
+      "holderWitness": "33ff1c2b9729b42436d8a001d52517f53988f1b20f48b8e1e69a43d2fc30c6c5",
+      "sourceId": "general-ingresos-20261123",
+      "sourceSha256": "bb31f9565e19d013fa52e3027ca07a0f81cfe0c8d9cea71c633d50af6346b60b",
+      "sourceDriveId": "1-AhnZMzkxHZ_uRglYmQsRSeYZLj1kOVi",
+      "sheet": "ac_rdl_cobros_por_agente",
+      "rowNumber": 13,
+      "insurer": "GENERAL",
+      "currency": "GTQ",
+      "country": "GT",
+      "sourceRowSha256": "fcf82f1d866c7484f19992c3bc816c174179c552eb366b0102034b9e1e959f0e",
+      "sourceFactId": "stmt_bf261de011ac99af71386daa05af",
+      "duplicateWitnessRowNumbers": []
+    },
+    "confirmedDuplicatePrevention": {
+      "existingCobroId": "cob_32dc8645828d5f5e568574e6decb",
+      "date": "2026-11-17",
+      "storedCents": 27155,
+      "issuerCents": 32586,
+      "newCobroAllowed": false
+    },
+    "disposition": "HOLD_CONTROLLED_SCHEDULE_AND_EXISTING_PAYMENT_RECONCILIATION",
+    "reason": "The original proves 10 x Q325.86. The CRM generated 12 x Q271.55, the same annual gross, and already stores three payments. Preserve their IDs and actual-payment provenance; no blind new payments or blanket repricing of historical Cobros."
+  },
+  "existingOwnerFrontier": [
+    {
+      "owner": "functions/cobros-source-intake-v2.js",
+      "gitBlob": "31bb921f5c58cd47af606ec43217b445be519c4a",
+      "issue": "The current matchesCanonicalInstallment ignores a legacy serie-only N/total; the recovered candidate already contains the causal shared parser correction, not yet deployed."
+    },
+    {
+      "owner": "functions/payment-inference-engine.js",
+      "gitBlob": "5bebc3d134a129c608125b36da0109dfc52b812f",
+      "issue": "The current receiptSequence reads digits in internal rec_* IDs before serie. The recovered candidate canonical-inference-candidate fixes this. A fresh source admission/owner preview must use the corrected owner, never fabricated receipt fields."
+    },
+    {
+      "owner": "functions/proposal-application-boundary.js",
+      "gitBlob": "4c9cbf708a0dc353ca213c806fcedb580f7a25ec",
+      "issue": "Commission evidence intentionally uses canonical premium; it must not silently apply the old Q127.76 when the actual Valor Factura and issued original prove Q127.77. Correct the authoritative obligation through its existing protected owner first."
+    },
+    {
+      "owner": "functions/cobros-source-intake-v2.js",
+      "gitBlob": "31bb921f5c58cd47af606ec43217b445be519c4a",
+      "issue": "INSURER_CONFIRMED_PAID_STATEMENT is not an accepted intake evidence type. It must not be mislabeled BANK_STATEMENT_MATCH or INVOICE_INSTALLMENT_N to bypass validation."
+    }
+  ],
+  "nextConcreteAction": "Reuse the existing protected financial identity reader for the two pinned policy IDs and original document witnesses, then prepare the exact existing-receipt correction and canonical proposal preview. Any source-owner correction remains separate from product release v19 and must pass its existing source gate.",
+  "preservation": {
+    "historicalDirectPayments": 155,
+    "historicalDirectApplicationState": "PENDING_APPLICATION",
+    "newPendingObligationsAlreadyApplied": 46,
+    "knownIssuedScheduleObligations": 104,
+    "repeatUniversales12289": false,
+    "repeatUniversales15590": false,
+    "repeatHistorical155": false
+  },
+  "afterState": {
+    "notExecuted": true,
+    "intendedEffectsRequireFreshReadback": true
+  },
+  "customerDataWrites": 0,
+  "externalMutations": 0,
+  "newPaymentEligibilityCertified": false,
+  "fullA12Passed": false,
+  "fullI66Passed": false
+}

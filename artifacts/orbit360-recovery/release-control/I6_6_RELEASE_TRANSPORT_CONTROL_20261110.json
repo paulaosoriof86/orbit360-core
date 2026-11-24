@@ -4821,12 +4821,12 @@
     "liveProofSha256": "4013a99719ba5f8bb3087a5e5f43c189a22daf55aabfcea37e8df5030bb5653c"
   },
   "frontendPreviewRequest": {
-    "version": 18,
+    "version": 19,
     "mode": "A13_A14_BALANCE_COMPOSITE_ARTIFACT_HOSTING_PREVIEW_ONLY",
-    "sourceQaHead": "d05a2cc82207773da6c8f9306fe8a91ca26cfd81",
+    "sourceQaHead": "31ed4207f8e73de1f3bdf08f6e56ebfcf2673116",
     "manifestBlob": "677354250c84ef0a5af0b562e29586dfe1559553",
-    "sourceQaRunId": 45372224633,
-    "guardRunId": 45372224612,
+    "sourceQaRunId": 45375595685,
+    "guardRunId": 45375595283,
     "previousReceiptBlob": "11fdb3bee494541513482666d6215f45cbad0567",
     "productPaths": [
       "functions/b4-003-scoped-related-reader.js",
@@ -4871,11 +4871,11 @@
     "realCustomerWritesAllowed": false,
     "liveDeployAuthorized": false,
     "releaseAfterPreviewAllowed": false,
-    "releaseMechanismSourceSha": "d05a2cc82207773da6c8f9306fe8a91ca26cfd81",
+    "releaseMechanismSourceSha": "31ed4207f8e73de1f3bdf08f6e56ebfcf2673116",
     "ownerInstruction": "Continue authorized recovery and existing parallel work; certify the exact newly composed source without losing prior acceptance, financial receipts, or communication rules.",
     "scope": "A13 closed machine-ingress plus A14 related-reader efficiency and canonical future-pending balance. Build once and publish Hosting Preview only; separate exact five-function Preview and LIVE gates remain required.",
-    "reason": "V17 reached 48 scoped UI stages but E4/E5 both rolled back after release receipt transport failure. Preserve E3; certify the repaired release owner and existing composed capabilities on a new immutable artifact.",
-    "causalReceipt": "artifacts/orbit360-recovery/release-control/I6_6_A13_A14_TRANSPORT_COMPOSED_SOURCE_20261124.json"
+    "reason": "The canonical V18 package passed immutable build and224-file Hosting readback. Its newly composed Make verifier compared raw bootstrap to a deterministic B4 build output; correct that existing verifier and rebuild once without editing V18 or changing any product source.",
+    "causalReceipt": "artifacts/orbit360-recovery/release-control/I6_6_CANONICAL_BOOTSTRAP_BUILD_VERIFIER_CORRECTION_20261124.json"
   },
   "previousPhysicalHostingRelease": {
     "sourceSha": "15e849bd606bd8c93e4c0471da1193e85004aecd",
@@ -6064,5 +6064,62 @@
     "scope": "I6.6 frontend-only canonical future-pending balance proof. Build once and publish Hosting Preview only. No backend, data, rules, or Auth changes.",
     "reason": "Signed E3 observation45332501772 proves the canonical producer emits futuro_pendiente while the read-model balance fallback rejects it. Correct exact known pending semantics with contradictory-payment guards, then verify48 real role/viewport/reload stages per phase on the SAME artifact.",
     "causalReceipt": "artifacts/orbit360-recovery/release-control/I6_6_FUTURE_PENDING_BALANCE_OWNER_CAUSAL_CORRECTION_20261124.json"
+  },
+  "priorFrontendPreviewRequestBeforeV19_20261124": {
+    "version": 18,
+    "mode": "A13_A14_BALANCE_COMPOSITE_ARTIFACT_HOSTING_PREVIEW_ONLY",
+    "sourceQaHead": "d05a2cc82207773da6c8f9306fe8a91ca26cfd81",
+    "manifestBlob": "677354250c84ef0a5af0b562e29586dfe1559553",
+    "sourceQaRunId": 45372224633,
+    "guardRunId": 45372224612,
+    "previousReceiptBlob": "11fdb3bee494541513482666d6215f45cbad0567",
+    "productPaths": [
+      "functions/b4-003-scoped-related-reader.js",
+      "functions/bootstrap.js",
+      "functions/make-lead-ingress-bridge.js",
+      "functions/product-lead-ingress-contract.js",
+      "functions/product-lead-ingress-owner-support.js",
+      "functions/product-ops-leads-domain.js",
+      "orbit360-platform/core/queries.js"
+    ],
+    "backendPaths": [
+      "functions/b4-003-scoped-related-reader.js",
+      "functions/bootstrap.js",
+      "functions/make-lead-ingress-bridge.js",
+      "functions/product-lead-ingress-contract.js",
+      "functions/product-lead-ingress-owner-support.js",
+      "functions/product-ops-leads-domain.js"
+    ],
+    "backendPathBlobs": {
+      "functions/b4-003-scoped-related-reader.js": "439bea6d90ef9a6a03ca2539096cb626cc43695d",
+      "functions/bootstrap.js": "bd0837a9d5296a456e0575aec555b2971fdedcd7",
+      "functions/make-lead-ingress-bridge.js": "8b519ad21da032ffeeee7f9f9cc3e9c3fe6c1317",
+      "functions/product-lead-ingress-contract.js": "ee29ee1fb12b1a30bf24b7c2c2a8180a2f2ef937",
+      "functions/product-lead-ingress-owner-support.js": "0f07f1620e3968cacf684a88c895faa64eb8a1a1",
+      "functions/product-ops-leads-domain.js": "affde2677b4c997b89abdabf3af2cb920128935d"
+    },
+    "backendPreviewRequired": true,
+    "backendLiveDeployAllowed": false,
+    "fiveFunctionExactPreviewRequired": true,
+    "scopeContractBlob": "7ce546736ac8d08b8ac922d19f3e6e4c2bac0021",
+    "balanceCorrection": {
+      "path": "orbit360-platform/core/queries.js",
+      "gitBlobSha": "b77b65f86ef6ac2ab6dc157fdbc9ad5e34dbcdcc",
+      "causalReceiptPath": "artifacts/orbit360-recovery/release-control/I6_6_FUTURE_PENDING_BALANCE_OWNER_CAUSAL_CORRECTION_20261124.json",
+      "causalReceiptBlob": "c05769d469b0a5e88e72e9e946095cb47bfc9d32",
+      "financialQaScope": "SIX_RECEIPT_CURRENT_BALANCE_READONLY",
+      "requiredStagesPerPhase": 48,
+      "sameArtifactBothPhases": true,
+      "fullA04A12A14Acceptance": false
+    },
+    "realDataWritesAllowed": false,
+    "realCustomerWritesAllowed": false,
+    "liveDeployAuthorized": false,
+    "releaseAfterPreviewAllowed": false,
+    "releaseMechanismSourceSha": "d05a2cc82207773da6c8f9306fe8a91ca26cfd81",
+    "ownerInstruction": "Continue authorized recovery and existing parallel work; certify the exact newly composed source without losing prior acceptance, financial receipts, or communication rules.",
+    "scope": "A13 closed machine-ingress plus A14 related-reader efficiency and canonical future-pending balance. Build once and publish Hosting Preview only; separate exact five-function Preview and LIVE gates remain required.",
+    "reason": "V17 reached 48 scoped UI stages but E4/E5 both rolled back after release receipt transport failure. Preserve E3; certify the repaired release owner and existing composed capabilities on a new immutable artifact.",
+    "causalReceipt": "artifacts/orbit360-recovery/release-control/I6_6_A13_A14_TRANSPORT_COMPOSED_SOURCE_20261124.json"
   }
 }

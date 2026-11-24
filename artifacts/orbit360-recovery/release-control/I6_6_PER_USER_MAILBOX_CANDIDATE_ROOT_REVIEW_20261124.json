@@ -1,0 +1,66 @@
+{
+  "schema": "GI_I66_PER_USER_MAIL_CANDIDATE_ROOT_REVIEW_V1",
+  "recordType": "SUBORDINATE_CANDIDATE_REVIEW_NOT_RELEASE_AUTHORITY",
+  "recordedAtUtc": "2026-11-24T10:33:45.257Z",
+  "activeGate": "I6.6",
+  "status": "ARCHIVED_CANDIDATE_NOT_APPLIED_CAUSAL_OBSERVATION_KEY_CORRECTION_AND_PROVIDER_PROOF_REQUIRED",
+  "snapshot": {
+    "path": "artifacts/orbit360-recovery/release-control/I6_6_PER_USER_MAILBOX_IMPLEMENTATION_CANDIDATE_20261124.json",
+    "gitBlobSha": "75ab4fbf36c9e15f10fba3258c4ac4e7f2916928",
+    "sha256": "ef48367a9322d088e9430693381981560371f19d106e79baa9bcb76caa638962",
+    "entryCount": 16
+  },
+  "canonicalOwnerDecision": {
+    "path": "artifacts/orbit360-recovery/release-control/I6_6_PER_USER_MAILBOX_CROSS_DELIVERY_OWNER_DECISION_20261124.json",
+    "gitBlobSha": "4eba3d0a6ccad98197082ffbb5078bc615efcb9b"
+  },
+  "preservedWork": {
+    "perUserReceptionAddressSeparateFromLogin": true,
+    "recipientPermissionsPreserved": true,
+    "oneCanonicalActivityAcrossUsers": true,
+    "privateReceptionPerUser": true,
+    "attachmentOriginalByteReservationAndSingleClaim": true,
+    "localTestsPassed": 140,
+    "localTestsAreNotLiveAcceptance": true,
+    "automaticNewLeadClassification": "PROPOSAL_NOT_WIRED",
+    "documentArchiveAndFinancialIntake": "NOT_EXECUTED"
+  },
+  "rootFinding": {
+    "code": "MAIL_STABLE_PROVIDER_OBSERVATION_MISSING_FROM_DELIVERY_KEY",
+    "owner": "functions/product-mail-delivery-ledger.js",
+    "observedCandidateKeyFields": [
+      "tenantId",
+      "ownerUid",
+      "mailboxSha256",
+      "messageKey"
+    ],
+    "missingStableScope": [
+      "providerConnection",
+      "folder",
+      "providerUid"
+    ],
+    "impact": "Two distinct provider deliveries of one canonical message to the same mailbox currently collapse into one private reception. Different owners are already separated. No production application has occurred.",
+    "requiredBehavior": [
+      "Same stable provider observation replay is NOOP.",
+      "Different stable provider UID, folder or connection retains a distinct private reception while canonical activity and attachment claims remain single.",
+      "Do not use execution timestamps or volatile transport fields as observation identity.",
+      "A canonical message collision retains traceable private review evidence without a business activity or attachment processing."
+    ],
+    "correctionPending": true
+  },
+  "providerHolds": [
+    "MAIL_SERVER_READER_NOT_CONFIGURED",
+    "MAIL_PROVIDER_PACKET_TRUNCATED",
+    "MAIL_AUTHENTICATED_BINARY_READER_REQUIRED"
+  ],
+  "releaseBoundary": {
+    "frozenCompositeVersion": 19,
+    "candidateCodeApplied": false,
+    "candidateBackendDeployed": false,
+    "userOnboardingFunctionOutsideFiveFunctionRelease": true,
+    "productionWrites": 0,
+    "mailboxBindingApplied": false,
+    "messagesSent": 0
+  },
+  "successionRule": "Preserve the snapshot unchanged as evidence. Its v18 wording describes its preparation context, not a requirement to promote v18. Apply a corrected successor only after the current composite release is accepted and after exact current preimage checks and successor source, Preview and LIVE proof. Never patch an immutable artifact or treat this review as a release grant."
+}

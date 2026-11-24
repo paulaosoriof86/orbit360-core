@@ -56,16 +56,16 @@
       "artifactDigest": "sha256:7cb782848a45083047c4899bc30c13bf5be46429607e42597d09342becfc9acc",
       "hostingVersion": "sites/ays-orbit-360-lab/versions/332999a55b189108"
     },
-    "evidencePath": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_EXECUTION_PROGRESS_20261124_R31.json",
-    "evidenceGitBlobSha": "5b06e8bf68bc5af478e07172cb73a887bc852fd8",
+    "evidencePath": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_EXECUTION_PROGRESS_20261124_R32.json",
+    "evidenceGitBlobSha": "66a14e63fadb91d28c0ac901a7859fb37079c0a0",
     "activeGate": "I6.6",
-    "currentWork": "I6.6: construir v18 una sola vez con fuente y QA firmadas; verificar el mismo artifact en Preview y LIVE, incluido saldo de seis recibos y contrato compuesto de cinco funciones con ingreso Make cerrado. Conservar E3 vigente hasta aceptación completa, los dos rollbacks E4/E5, los 155 pagos DIRECT registrados por Q78806.43 pendientes de aplicación y las 46 obligaciones documentadas nuevas por Q17908.06 (104 en el alcance auditado). Continuar correos por usuario y trazabilidad sin duplicar recepciones ni actividad canónica; no se declara aceptación global.",
-    "nextAction": "I6.6: construir v18 una sola vez con fuente y QA firmadas; verificar el mismo artifact en Preview y LIVE, incluido saldo de seis recibos y contrato compuesto de cinco funciones con ingreso Make cerrado. Conservar E3 vigente hasta aceptación completa, los dos rollbacks E4/E5, los 155 pagos DIRECT registrados por Q78806.43 pendientes de aplicación y las 46 obligaciones documentadas nuevas por Q17908.06 (104 en el alcance auditado). Continuar correos por usuario y trazabilidad sin duplicar recepciones ni actividad canónica; no se declara aceptación global.",
+    "currentWork": "I6.6: construir v19 una sola vez con el verificador canónico corregido y QA firmadas; conservar v18 como build y Hosting Preview224 PASS sin prueba backend. Completar Preview de cinco funciones cerrado, saldo48 y LIVE del mismo nuevo artifact antes de aceptar. E3 permanece vigente;104 obligaciones en alcance auditado,46 nuevas documentadas y155 pagos DIRECT registrados pendientes de aplicación se preservan sin repetir escrituras.",
+    "nextAction": "I6.6: construir v19 una sola vez con el verificador canónico corregido y QA firmadas; conservar v18 como build y Hosting Preview224 PASS sin prueba backend. Completar Preview de cinco funciones cerrado, saldo48 y LIVE del mismo nuevo artifact antes de aceptar. E3 permanece vigente;104 obligaciones en alcance auditado,46 nuevas documentadas y155 pagos DIRECT registrados pendientes de aplicación se preservan sin repetir escrituras.",
     "frontendPreviewRequest": {
-      "version": 18,
-      "sourceQaHead": "d05a2cc82207773da6c8f9306fe8a91ca26cfd81",
-      "sourceQaRunId": 45372224633,
-      "guardRunId": 45372224612
+      "version": 19,
+      "sourceQaHead": "31ed4207f8e73de1f3bdf08f6e56ebfcf2673116",
+      "sourceQaRunId": 45375595685,
+      "guardRunId": 45375595283
     }
   },
   "iterationProgressAuthority": "CONTROL_PLANE.json#gateState: I0-I5 certified in earlier release epoch; I6.6 active for current successor. Timestamped iterationN evidence snapshots remain immutable historical observations.",
@@ -564,7 +564,7 @@
     "phaseAIterationStatuses": "HISTORICAL_FIELDS_ABOVE_PRESERVED_UNTIL_FORMAL_GATE_EVIDENCE;_NO_NEW_PASS_INFERRED",
     "labDataWriteScope": "ONLY_35_AUTHORIZED_COUNTRY_FIELDS;_NO_AUGUST_REFRESH"
   },
-  "nextAction": "I6.6: construir v18 una sola vez con fuente y QA firmadas; verificar el mismo artifact en Preview y LIVE, incluido saldo de seis recibos y contrato compuesto de cinco funciones con ingreso Make cerrado. Conservar E3 vigente hasta aceptación completa, los dos rollbacks E4/E5, los 155 pagos DIRECT registrados por Q78806.43 pendientes de aplicación y las 46 obligaciones documentadas nuevas por Q17908.06 (104 en el alcance auditado). Continuar correos por usuario y trazabilidad sin duplicar recepciones ni actividad canónica; no se declara aceptación global.",
+  "nextAction": "I6.6: construir v19 una sola vez con el verificador canónico corregido y QA firmadas; conservar v18 como build y Hosting Preview224 PASS sin prueba backend. Completar Preview de cinco funciones cerrado, saldo48 y LIVE del mismo nuevo artifact antes de aceptar. E3 permanece vigente;104 obligaciones en alcance auditado,46 nuevas documentadas y155 pagos DIRECT registrados pendientes de aplicación se preservan sin repetir escrituras.",
   "sourceOfTruth": {
     "projectBoundaryPrevalentAddendum": "orbit360-platform/docs/recovery/ADDENDUM_PREVALENTE_CHATGPT_PROJECT_BOUNDARY_20260831.md",
     "mutableState": "orbit360-platform/docs/recovery/orbit360-recovery-state-v1.json",
@@ -4343,6 +4343,37 @@
           "sourceQaHead": "f0a0d8743cec6adfbcf19637e25200b66c01d4a8",
           "sourceQaRunId": 45350431726,
           "guardRunId": 45350431847
+        }
+      }
+    },
+    {
+      "reason": "ACTIVE_OWNER_PLAN_SUMMARY_SUPERSEDED",
+      "priorGitBlobSha": "600269843c3cb958fa1ba99e98af63f4750fee76",
+      "supersededByGeneration": 3,
+      "prior": {
+        "schema": "GI_I66_ACTIVE_OWNER_PLAN_CONTINUATION_V1",
+        "authorityPointer": "artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json#i66OperationalContinuation20261115",
+        "generation": 3,
+        "latestProvenLiveSource": "65c825b2808a615ca4195bdde6689dbdbe3193b2",
+        "latestPhysicalFrontendLiveReceipt": "artifacts/orbit360-recovery/release-control/I6_6_FRONTEND_E00003_RECEIPT.json",
+        "currentPhysicalFrontend": {
+          "generation": 3,
+          "sourceSha": "65c825b2808a615ca4195bdde6689dbdbe3193b2",
+          "buildId": "gi-i66-65c825b2808a-57f234755dc1",
+          "artifactId": 14873426438,
+          "artifactDigest": "sha256:7cb782848a45083047c4899bc30c13bf5be46429607e42597d09342becfc9acc",
+          "hostingVersion": "sites/ays-orbit-360-lab/versions/332999a55b189108"
+        },
+        "evidencePath": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_EXECUTION_PROGRESS_20261124_R31.json",
+        "evidenceGitBlobSha": "5b06e8bf68bc5af478e07172cb73a887bc852fd8",
+        "activeGate": "I6.6",
+        "currentWork": "I6.6: construir v18 una sola vez con fuente y QA firmadas; verificar el mismo artifact en Preview y LIVE, incluido saldo de seis recibos y contrato compuesto de cinco funciones con ingreso Make cerrado. Conservar E3 vigente hasta aceptación completa, los dos rollbacks E4/E5, los 155 pagos DIRECT registrados por Q78806.43 pendientes de aplicación y las 46 obligaciones documentadas nuevas por Q17908.06 (104 en el alcance auditado). Continuar correos por usuario y trazabilidad sin duplicar recepciones ni actividad canónica; no se declara aceptación global.",
+        "nextAction": "I6.6: construir v18 una sola vez con fuente y QA firmadas; verificar el mismo artifact en Preview y LIVE, incluido saldo de seis recibos y contrato compuesto de cinco funciones con ingreso Make cerrado. Conservar E3 vigente hasta aceptación completa, los dos rollbacks E4/E5, los 155 pagos DIRECT registrados por Q78806.43 pendientes de aplicación y las 46 obligaciones documentadas nuevas por Q17908.06 (104 en el alcance auditado). Continuar correos por usuario y trazabilidad sin duplicar recepciones ni actividad canónica; no se declara aceptación global.",
+        "frontendPreviewRequest": {
+          "version": 18,
+          "sourceQaHead": "d05a2cc82207773da6c8f9306fe8a91ca26cfd81",
+          "sourceQaRunId": 45372224633,
+          "guardRunId": 45372224612
         }
       }
     }
