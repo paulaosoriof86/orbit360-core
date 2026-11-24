@@ -1,0 +1,17 @@
+{
+  "schema": "GI_I66_FRONTEND_FINANCIAL_READONLY_PREVIEW_RECEIPT_V1",
+  "generation": 6,
+  "scopeId": "SIX_RECEIPT_CURRENT_BALANCE_READONLY",
+  "sourceSha": "48a7a6d4379759b6f32c7f2435e8e37c724989cc",
+  "buildId": "gi-i66-48a7a6d43797-57f234755dc1",
+  "artifactDigest": "sha256:531fddd76a010377bd9aa6c652d737dc584a99edc573c2aca313b56fd7efa405",
+  "result": "PASS",
+  "readOnly": true,
+  "fullA04Accepted": false,
+  "fullA12Passed": false,
+  "qaRunId": 45389300598,
+  "qaArtifactId": 14918527888,
+  "qaArtifactDigest": "sha256:02ff7542b43a757eba72231160a1d6a5b7ee376981dca8f56b2b296506ab0b8c",
+  "qaReportSha256": "cebf6af728b9259f28901cbd5313c7897b11a472cc1f4c6c11770a271e672654",
+  "previewReadOnlyAuthorityBlob": "797fb6222adfc051f719aa41d2a0b1c855f1a39b"
+}

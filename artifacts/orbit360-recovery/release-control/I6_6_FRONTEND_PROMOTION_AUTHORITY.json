@@ -1,6 +1,6 @@
 {
   "schema": "GI_I66_FRONTEND_AUTHORITY_V1",
-  "status": "DIRECTION_AUTHORIZED_EXACT_PREVIEW_READONLY",
+  "status": "DIRECTION_APPROVED_EXACT_PREVIEW",
   "gate": "I6.6",
   "approvedByDirection": true,
   "scopeId": "SIX_RECEIPT_CURRENT_BALANCE_READONLY",
@@ -16,13 +16,14 @@
     "buildId": "gi-i66-48a7a6d43797-57f234755dc1",
     "buildRunId": 45382606064,
     "previewUrl": "https://ays-orbit-360-lab--gi-i66-rc-45382606064-6302t2f6.web.app",
-    "previewChannel": "gi-i66-rc-45382606064"
+    "previewChannel": "gi-i66-rc-45382606064",
+    "previewUiRunId": 45389300598
   },
   "previousReceiptBlob": "11fdb3bee494541513482666d6215f45cbad0567",
   "previousHostingVersion": "sites/ays-orbit-360-lab/versions/332999a55b189108",
   "previousArtifactDigest": "sha256:7cb782848a45083047c4899bc30c13bf5be46429607e42597d09342becfc9acc",
-  "guardRun": 45388542976,
-  "guardHead": "f91dd591e1edfaaf252a7b97393cf7727a81170d",
+  "guardRun": 45389300587,
+  "guardHead": "09303a95fa0ec1198d2ec13599e2a304365ca3ee",
   "ownerPins": {
     ".github/workflows/gravicentra-delta-66-exact-live-clone.yml": "35126531cfa17ba34c6117b905852c33dcedd391",
     ".github/workflows/gravicentra-i66-live-performance-readonly.yml": "12225700cec41aafabc477d60fe7f525ba957e12",
@@ -45,5 +46,7 @@
     "tools/gravicentra-i66-frontend-promotion-transaction.cjs": "9a9449f04ac77b2f88c187df46bed85ff8a15b4f",
     "tools/gravicentra-i66-frontend-promotion-transaction.test.cjs": "e6c07996c173409aae2eafb906e3aee652ca44e4",
     "tools/gravicentra-i66-live-performance-readonly.mjs": "983095bdf1a96a6b30c2e6337f5e21555a807f34"
-  }
+  },
+  "previewReceiptPath": "artifacts/orbit360-recovery/release-control/I6_6_FRONTEND_E00006_PREVIEW_UI.json",
+  "previewReceiptBlob": "3aa2a801c056d98610b81dec3201c59080029837"
 }
