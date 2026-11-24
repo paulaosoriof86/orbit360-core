@@ -7026,31 +7026,9 @@
     "artifactDigest": "sha256:531fddd76a010377bd9aa6c652d737dc584a99edc573c2aca313b56fd7efa405",
     "approvedByDirection": true,
     "externalMessagesSent": 0,
-    "action": "ACTIVATE",
-    "version": 3,
-    "expectedConfigDigest": "a15dac7d6059d46b4ece337a00dca840b3fbbbef6bb40e6257307cc635caaf7d",
-    "expiresAt": "2026-11-24T11:58:34.955Z",
-    "qaFixture": {
-      "nonce": "026dddfbe9ece7c6b8daad85559db5122343de153e25c05ba78b013e614f1089",
-      "packet": {
-        "type": "incoming",
-        "typeMessage": "extendedTextMessage",
-        "idMessage": "I66_PREVIEW_MESSAGE_CBAC22FE9A8C4744",
-        "chatId": "50200034242@c.us",
-        "senderId": "50200034242@c.us",
-        "timestamp": 1795521143,
-        "senderContactName": "Prueba sintética de ingreso Make v18",
-        "isRead": false,
-        "isDeleted": false,
-        "isEdited": false,
-        "extendedTextMessage": {
-          "text": "Solicitud sintética de cotización para verificar el ingreso en Preview.",
-          "sourceType": "ad",
-          "sourceId": "I66_PREVIEW_AD_CBAC22FE9A8C4744",
-          "ctwaClid": "I66_PREVIEW_CTWA_CBAC22FE9A8C4744"
-        }
-      },
-      "providerPacketSha256": "6ef1c2cc687aff360f3b38799516d19e35235fa577fb2cf255e8676d27d4dc50"
-    }
+    "action": "CLOSE",
+    "version": 4,
+    "expectedConfigDigest": "16143f38ddfa30364b8cfff0bf1cdb474909def9c847d7d5892d3005c5075018",
+    "expiresAt": "2026-11-24T12:01:49.227Z"
   }
 }

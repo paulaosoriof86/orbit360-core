@@ -1,0 +1,38 @@
+{
+  "schema": "GI_I66_MAKE_ORGANIZATION_CREDIT_PAUSE_HOLD_V1",
+  "observedAtUtc": "2026-11-24T11:51:31.962Z",
+  "organizationId": 4090072,
+  "organizationName": "AyS - TyA",
+  "isPaused": true,
+  "serviceName": "Core",
+  "period": {
+    "lastReset": "2026-11-19T12:33:54.259Z",
+    "nextReset": "2026-12-19T12:33:54.259Z"
+  },
+  "credits": {
+    "included": 10000,
+    "extra": 4000,
+    "consumed": 14067,
+    "unused": -67,
+    "autoPurchasingActivated": false
+  },
+  "scenarioId": 10196136,
+  "scenarioIsActive": true,
+  "scenarioStatus": "paused",
+  "writerDisabled": true,
+  "createExecutionAttempted": false,
+  "canonicalLeadWrites": 0,
+  "externalMessagesSent": 0,
+  "billingChanges": 0,
+  "preservedClosedTriggerProof": {
+    "path": "gi-make-preview-closed-trigger.json",
+    "gitBlobSha": "6f088dc20ba9a60df704ea6b6eb845bf434ab9b7",
+    "artifactId": 14917580778
+  },
+  "previewConfigCurrentlyKnown": {
+    "state": "ACTIVE",
+    "syntheticFixtureOnly": true,
+    "afterDigest": "16143f38ddfa30364b8cfff0bf1cdb474909def9c847d7d5892d3005c5075018"
+  },
+  "next": "Use existing protected CLOSE or authorized withdrawal/compensation; no account-pause bypass or automatic billing change."
+}
