@@ -4274,6 +4274,25 @@
           }
         }
       ]
+    },
+    {
+      "id": "I6_6_DIRECT_FORMS_EXACT_PREVIEW_ADMISSION_QA_20261124",
+      "approvedByDirection": true,
+      "scope": "EXISTING_DECLARED_TESTS_ONLY",
+      "paths": [],
+      "receipt": "artifacts/orbit360-recovery/release-control/I6_6_DIRECT_FORMS_EXACT_PREVIEW_ADMISSION_QA_20261124.json",
+      "receiptGitBlobSha": "ebec9be25f650eeae2744c37b1c1e051164642a1",
+      "tests": [
+        {
+          "path": "tools/gravicentra-i6-6-composite-preview-admission.test.cjs",
+          "gitBlobSha": "407b7e6b150762e8de4b6c9cc0d8bf02f149be0e",
+          "replaces": {
+            "path": "tools/gravicentra-i6-6-composite-preview-admission.test.cjs",
+            "priorGitBlobSha": "6fc899bf4f087eec987d7c63c99cccc361e7273a",
+            "priorChangeId": "I6_6_STARTUP_PENDING_READ_RETRY_20261124"
+          }
+        }
+      ]
     }
   ]
 }

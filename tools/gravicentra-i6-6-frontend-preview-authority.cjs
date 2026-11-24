@@ -14,6 +14,20 @@ const STARTUP_PATHS=Object.freeze([
   'orbit360-platform/core/product-hydration-required-optional-p0.js',
   'orbit360-platform/data/store-firestore-product-readonly-p0.js'
 ]);
+const DIRECT_FORMS_RECEIPT_PATH=dir+'I6_6_DIRECT_RENEWAL_AND_ISSUED_ENDORSEMENT_CAUSAL_SOURCE_20261124.json';
+const DIRECT_FORMS_RECEIPT_BLOB='844dac30f829bbac5b5a1b4f960cf2d41de03061';
+const DIRECT_FORMS_PATHS=Object.freeze([
+  'orbit360-platform/modules/issuance-endosos-v1201-bridge.js',
+  'orbit360-platform/modules/renewals-v1200-operational-bridge.js'
+]);
+const DIRECT_FORMS_QA_PATHS=Object.freeze([
+  'tools/gravicentra-i6-6-carlos-paula-live-direct-renewal-synthetic-uat.cjs',
+  'tools/gravicentra-i6-6-direct-forms-signed-driver.test.cjs',
+  'tools/gravicentra-i6-6-issued-endorsement-direct-entry.test.cjs',
+  'tools/gravicentra-i6-6-operational-renewal-entry.test.cjs',
+  'tools/gravicentra-i6-6-ops-activity-direct-vehicle-endorsement.test.cjs',
+  'tools/gravicentra-i6-6-renewal-direct-form-entry.test.cjs'
+]);
 
 // A causal successor may retain the exact undeployed Make backend while
 // correcting these two existing startup owners. This does not widen either
@@ -59,6 +73,62 @@ function validateStartupRecovery(request,currentSource,previousRequest,{readBlob
   for(const ref of [request.sourceQaHead,'HEAD'])
     assert.equal(readBlob(ref,STARTUP_TEST_PATH),proof.gitBlobSha,'I66_STARTUP_CAUSAL_TEST_SOURCE_DRIFT');
   return [...STARTUP_PATHS];
+}
+
+// A separate closed extension admits only the two reported direct-form owners.
+// It preserves the exact pending Make/startup composition and does not change
+// how an older request without this extension is interpreted.
+function validateDirectFormsRecovery(request,currentSource,previousRequest,{readBlob,readJson}) {
+  if(!Object.hasOwn(request,'directFormsRecovery'))return [];
+  assert.equal(request.mode,makeScope.REQUEST_MODE,'I66_DIRECT_FORMS_EXISTING_MAKE_COMPOSITION_REQUIRED');
+  assert.match(request.sourceQaHead||'',/^[a-f0-9]{40}$/,'I66_DIRECT_FORMS_SOURCE_QA_PIN_REQUIRED');
+  const extension=request.directFormsRecovery;
+  assert.ok(extension&&typeof extension==='object'&&!Array.isArray(extension),'I66_DIRECT_FORMS_EXTENSION_REQUIRED');
+  assert.deepEqual(Object.keys(extension).sort(),['productPathBlobs','receiptBlob','receiptPath','schema'],
+    'I66_DIRECT_FORMS_EXACT_EXTENSION_FIELDS_REQUIRED');
+  assert.equal(extension.schema,'GI_I66_DIRECT_FORMS_RECOVERY_PREVIEW_EXTENSION_V1');
+  assert.equal(extension.receiptPath,DIRECT_FORMS_RECEIPT_PATH,'I66_DIRECT_FORMS_EXACT_RECEIPT_REQUIRED');
+  assert.equal(extension.receiptBlob,DIRECT_FORMS_RECEIPT_BLOB,'I66_DIRECT_FORMS_EXACT_RECEIPT_PIN_REQUIRED');
+  assert.deepEqual(Object.keys(extension.productPathBlobs||{}).sort(),DIRECT_FORMS_PATHS,'I66_DIRECT_FORMS_EXACT_PATHS_REQUIRED');
+  assert.equal(previousRequest?.mode,makeScope.REQUEST_MODE,'I66_DIRECT_FORMS_PREVIOUS_MAKE_REQUEST_REQUIRED');
+  assert.deepEqual(request.backendPaths,previousRequest.backendPaths,'I66_DIRECT_FORMS_PENDING_BACKEND_PATHS_CHANGED');
+  assert.deepEqual(request.backendPathBlobs,previousRequest.backendPathBlobs,'I66_DIRECT_FORMS_PENDING_BACKEND_PINS_CHANGED');
+  assert.ok(previousRequest.startupRecovery,'I66_DIRECT_FORMS_EXISTING_STARTUP_REQUIRED');
+  assert.deepEqual(request.startupRecovery,previousRequest.startupRecovery,'I66_DIRECT_FORMS_STARTUP_RECOVERY_CHANGED');
+  for(const ref of [request.sourceQaHead,'HEAD'])
+    assert.equal(readBlob(ref,DIRECT_FORMS_RECEIPT_PATH),extension.receiptBlob,'I66_DIRECT_FORMS_RECEIPT_SOURCE_DRIFT');
+  const receipt=readJson(request.sourceQaHead,DIRECT_FORMS_RECEIPT_PATH);
+  assert.equal(receipt.schema,'GI_I66_DIRECT_RENEWAL_AND_ISSUED_ENDORSEMENT_CAUSAL_SOURCE_QA_V1');
+  assert.equal(receipt.status,'SOURCE_FOCAL_REGRESSION_PASS_SIGNED_PREVIEW_LIVE_PENDING');
+  assert.equal(receipt.gate,'I6.6');assert.equal(receipt.classification,'PRODUCT');
+  assert.match(receipt.sourceBase||'',/^[a-f0-9]{40}$/,'I66_DIRECT_FORMS_CAUSAL_BASE_REQUIRED');
+  assert.equal(receipt.realDataWrites,0,'I66_DIRECT_FORMS_SOURCE_REAL_WRITES');
+  assert.equal(receipt.liveDeploys,0,'I66_DIRECT_FORMS_SOURCE_LIVE_DEPLOY');
+  assert.equal(receipt.tests?.renewalBaselineNewSuite?.expectedFailureReproduced,true,'I66_DIRECT_FORMS_CAUSAL_FAILURE_REQUIRED');
+  assert.ok(Number.isSafeInteger(receipt.tests?.renewalBaselineNewSuite?.fail)&&receipt.tests.renewalBaselineNewSuite.fail>0,'I66_DIRECT_FORMS_BASELINE_NOT_REPRODUCED');
+  for(const name of ['combinedSource','canonicalEndorsementDurableContract','signedDriverContracts']){
+    const result=receipt.tests?.[name];assert.ok(Number.isSafeInteger(result?.pass)&&result.pass>0,'I66_DIRECT_FORMS_SOURCE_TEST_NOT_PASSED');
+    assert.equal(result.fail,0,'I66_DIRECT_FORMS_SOURCE_TEST_FAILED');
+  }
+  assert.equal(receipt.tests?.signedUi,'PENDING');assert.equal(receipt.tests?.published,false);
+  assert.ok(Array.isArray(receipt.files),'I66_DIRECT_FORMS_RECEIPT_FILES_REQUIRED');
+  const sourceRows=receipt.files.filter(row=>row.path?.startsWith('orbit360-platform/'));
+  assert.deepEqual(sourceRows.map(row=>row.path).sort(),DIRECT_FORMS_PATHS,'I66_DIRECT_FORMS_RECEIPT_SCOPE_DRIFT');
+  const qaRows=receipt.files.filter(row=>row.path?.startsWith('tools/'));
+  assert.deepEqual(qaRows.map(row=>row.path).sort(),DIRECT_FORMS_QA_PATHS,'I66_DIRECT_FORMS_EXACT_QA_PATHS_REQUIRED');
+  for(const row of [...sourceRows,...qaRows]){
+    assert.deepEqual(Object.keys(row).sort(),['gitBlobSha','path','sha256'],'I66_DIRECT_FORMS_EXACT_SOURCE_ROW_REQUIRED');
+    assert.match(row.gitBlobSha||'',/^[a-f0-9]{40}$/);assert.match(row.sha256||'',/^[a-f0-9]{64}$/);
+    for(const ref of [request.sourceQaHead,'HEAD'])
+      assert.equal(readBlob(ref,row.path),row.gitBlobSha,'I66_DIRECT_FORMS_PRODUCT_OR_QA_SOURCE_DRIFT');
+    if(DIRECT_FORMS_PATHS.includes(row.path)){
+      assert.equal(extension.productPathBlobs[row.path],row.gitBlobSha,'I66_DIRECT_FORMS_REQUEST_BLOB_DRIFT');
+      const predecessor=readBlob(receipt.sourceBase,row.path);
+      assert.notEqual(row.gitBlobSha,predecessor,'I66_DIRECT_FORMS_CAUSAL_SOURCE_CHANGE_REQUIRED');
+      assert.equal(readBlob(currentSource,row.path),predecessor,'I66_DIRECT_FORMS_ACCEPTED_PREDECESSOR_DRIFT');
+    }
+  }
+  return [...DIRECT_FORMS_PATHS];
 }
 
 function previewRequestTransition(request, previousRequest) {
@@ -119,14 +189,17 @@ async function admitPreview(transport,api,readMarker) {
   const startupPaths=validateStartupRecovery(request,current.sourceSha,previous.frontendPreviewRequest,{
     readBlob:(ref,p)=>git('rev-parse',ref+':'+p),readJson:(ref,p)=>JSON.parse(git('show',ref+':'+p))
   });
+  const directFormsPaths=validateDirectFormsRecovery(request,current.sourceSha,previous.frontendPreviewRequest,{
+    readBlob:(ref,p)=>git('rev-parse',ref+':'+p),readJson:(ref,p)=>JSON.parse(git('show',ref+':'+p))
+  });
   const roots = ['orbit360-platform','functions','firebase.json','storage.rules','firestore.rules',
     'database.rules.json','tools/gravicentra-i6-1-preview-package.mjs',':(exclude)orbit360-platform/docs/recovery/orbit360-recovery-state-v1.json'];
   git('diff','--quiet',request.sourceQaHead,'HEAD','--',...roots);
   const paths=git('diff','--name-only',current.sourceSha,request.sourceQaHead,'--',...roots).split('\n');
   const frontendPath=p=>/^orbit360-platform\/(modules|core)\/[\w.-]+\.js$/.test(p);
   if(makeIngress){
-    assert.deepEqual(paths,[...makeScope.PRODUCT_PATHS,...startupPaths].sort(),'I66_MAKE_BALANCE_AND_BACKEND_EXACT_PRODUCT_DELTA_REQUIRED');
-    assert.deepEqual(paths.filter(p=>frontendPath(p)||startupPaths.includes(p)),[makeScope.FRONTEND_PATH,...startupPaths].sort(),
+    assert.deepEqual(paths,[...makeScope.PRODUCT_PATHS,...startupPaths,...directFormsPaths].sort(),'I66_MAKE_BALANCE_AND_BACKEND_EXACT_PRODUCT_DELTA_REQUIRED');
+    assert.deepEqual(paths.filter(p=>frontendPath(p)||startupPaths.includes(p)),[makeScope.FRONTEND_PATH,...startupPaths,...directFormsPaths].sort(),
       'I66_MAKE_NO_UNRELATED_FRONTEND_DELTA');
   }else if(composite){
     assert.ok(paths.some(frontendPath),'COMPOSITE_FRONTEND_MISSING');
@@ -154,4 +227,5 @@ async function admitPreview(transport,api,readMarker) {
   }
   return true;
 }
-module.exports={admitPreview,previewRequestTransition,validateStartupRecovery,STARTUP_PATHS,STARTUP_RECEIPT_PATH,STARTUP_TEST_PATH};
+module.exports={admitPreview,previewRequestTransition,validateStartupRecovery,STARTUP_PATHS,STARTUP_RECEIPT_PATH,STARTUP_TEST_PATH,
+  validateDirectFormsRecovery,DIRECT_FORMS_PATHS,DIRECT_FORMS_RECEIPT_PATH,DIRECT_FORMS_RECEIPT_BLOB,DIRECT_FORMS_QA_PATHS};

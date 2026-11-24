@@ -1,0 +1,28 @@
+{
+  "schema": "GI_I66_DECLARED_TEST_EXTENSION_V1",
+  "revisionId": "I6_6_DIRECT_FORMS_EXACT_PREVIEW_ADMISSION_QA_20261124",
+  "scope": "EXISTING_DECLARED_TESTS_ONLY",
+  "approvedByDirection": true,
+  "productSourceChanges": 0,
+  "productionAcceptanceClaimed": false,
+  "tests": [
+    {
+      "path": "tools/gravicentra-i6-6-composite-preview-admission.test.cjs",
+      "gitBlobSha": "407b7e6b150762e8de4b6c9cc0d8bf02f149be0e",
+      "replaces": {
+        "path": "tools/gravicentra-i6-6-composite-preview-admission.test.cjs",
+        "priorGitBlobSha": "6fc899bf4f087eec987d7c63c99cccc361e7273a",
+        "priorChangeId": "I6_6_STARTUP_PENDING_READ_RETRY_20261124"
+      }
+    }
+  ],
+  "reason": "Preserve historical Make/startup admission and require a closed source-and-receipt-pinned extension for the two already approved direct renewal/issued endorsement owners. Unknown paths, stale source, receipt drift and backend expansion remain rejected.",
+  "localValidation": {
+    "pass": 11,
+    "fail": 0
+  },
+  "authorityOwner": {
+    "path": "tools/gravicentra-i6-6-frontend-preview-authority.cjs",
+    "gitBlobSha": "c25a753c1787facaf588e6af32e62c4a77d007a9"
+  }
+}
