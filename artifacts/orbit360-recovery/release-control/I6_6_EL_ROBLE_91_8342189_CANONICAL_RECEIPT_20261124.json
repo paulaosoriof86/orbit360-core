@@ -1,0 +1,39 @@
+{
+  "schema": "GI_I66_COMMERCIAL_SOURCE_RECEIPT_V1",
+  "commitStatus": "COMMITTED_AND_SERVER_READ_BACK",
+  "protectedEnvironment": "gravicentra-live-data-writes",
+  "policy": "91-8342189",
+  "runId": 45330498425,
+  "jobId": 138231284166,
+  "preflightJobId": 138230282406,
+  "beforeDigest": "041bd5a1fce835d87369f12ce7d7315e524932b364c30f815fe52023da97475b",
+  "after": {
+    "newObligations": 12,
+    "predecessorsUpdated": 1,
+    "successorsCreated": 1,
+    "vehiclesLinked": 1,
+    "activitiesCreated": 1,
+    "auditsCreated": 1,
+    "portfolioRowsCreated": 12,
+    "physicalDocumentWrites": 29,
+    "directPayments": 0,
+    "inferredPayments": 0,
+    "pendingGrossCents": 336706,
+    "currency": "GTQ",
+    "policyIdDigest": "61a5f0d2624834817c1fb14816f15109bce4d6f4036b28096f7c61f9da604f92",
+    "auditIdDigest": "e20ad341770a5d8aad951572f8daf476c7501bb12661c576b657a61be1296270"
+  },
+  "protectedServerReadback": {
+    "runId": 45330498425,
+    "jobId": 138231284166,
+    "exactAfterTransaction": true,
+    "sourceReadbackDigest": "5517f4bc73143d96a49f3fdfc1f95ec1f29ab39b7eb417bf3034525b7ad37d9d",
+    "historicalVehiclesPreservedExactly": 1
+  },
+  "sourceReceipt": "artifacts/orbit360-recovery/release-control/I6_6_ROBLE_REMAINING_24_COMMERCIAL_SERVER_READBACK_20261124.json",
+  "sourceReceiptBlobSha": "c62300fab11d3f764ab011f957ede7fcf7c30c1d",
+  "sourcePdfSha256": "1814d67bd274ccecbb523666fc9cd52fd8928cd41b8cbec4a725804c0e41a9ad",
+  "sourceCommit": "38e19499431a67b6826ed3adec53bf3ddc682766",
+  "noNewWritesByReceiptPublication": true,
+  "uiAcceptanceClaimed": false
+}
