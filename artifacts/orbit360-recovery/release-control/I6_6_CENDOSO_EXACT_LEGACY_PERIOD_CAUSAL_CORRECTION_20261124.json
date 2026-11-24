@@ -1,0 +1,42 @@
+{
+  "schema": "GI_I66_CENDOSO_EXACT_LEGACY_PERIOD_CAUSAL_CORRECTION_V1",
+  "gate": "I6.6",
+  "dateGuatemala": "2026-11-23",
+  "sourceUnchanged": true,
+  "sourceCount": 607,
+  "diagnosticRunId": 45327844744,
+  "diagnosticResult": {
+    "alreadyPaidPreserved": 342,
+    "eligible": 0,
+    "trueExceptions": 265,
+    "missingPeriod": 177
+  },
+  "cause": "A legacy expected receipt stored its exact source installment period only in fechaLimite. Existing matching did not compare that value to source periodStart.",
+  "scope": "Existing exact expected receipt only. Never create receipt/policy/renewal, relax date tolerance, infer a reference, override an explicit contractual date, or reapply prior paid rows.",
+  "matchConditions": [
+    "All three contractual-date aliases materially empty",
+    "fechaLimite equals exact source periodStart",
+    "primaTotal equals source gross cents",
+    "numeric existing insurer receipt reference",
+    "all exact edition/country/currency/insurer/net-premium/CAS/idempotency guards preserved"
+  ],
+  "causalTest": {
+    "oldEligible": 0,
+    "newEligiblePotential": 2,
+    "independentNegativeReview": "PASS",
+    "negativeBoundaryCases": 11
+  },
+  "files": [
+    {
+      "path": "tools/gravicentra-i66-cendoso-paid-protected.cjs",
+      "gitBlobSha": "0cb5405a41aa52097eb51784c791a8ed095ada03"
+    },
+    {
+      "path": "tools/gravicentra-i66-cendoso-paid-protected.test.cjs",
+      "gitBlobSha": "41b99640aa9805fe0aac90dd3de72e6a2191fad9"
+    }
+  ],
+  "liveWritesClaimed": 0,
+  "protectedApplyRequired": true,
+  "preflightRequested": "I66_CENDOSO_PAID_BATCH_READY"
+}

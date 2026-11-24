@@ -49,6 +49,34 @@ assert.equal(assessCase(raw,[{...group,receipts:[{...receipt,estado:'Pagado'}],p
 assert.equal(assessCase(raw,[{...group,portfolio:[{...cartera,carteraActiva:false}]}]).ready.creatingPortfolio,false);
 assert.equal(assessCase(raw,[{...group,receipts:[{...receipt,primaNeta:100}]}]).code,'NET_PREMIUM_CHANGED_REQUIRES_COMMISSION_RECOMPUTE');
 assert.equal(assessCase(raw,[{...group,receipts:[{...receipt,monto:280}]}]).code,'GROSS_ALIASES_INCONSISTENT');
+// Reproduces the current two El Roble holds: the issuer's installment date
+// exists only in fechaLimite, while Cendoso separately records the later due.
+const issuerPeriodReceipt={...receipt,vence:'',fechaLimite:raw.receiptPeriodStart,
+  numeroReciboFuente:'4992323'};
+const issuerPeriodGroup={...group,receipts:[issuerPeriodReceipt]};
+assert.equal(assessCase(raw,[issuerPeriodGroup]).ready.match,
+  'LEGACY_INSURER_LIMIT_EXACT_SOURCE_PERIOD_GROSS_EQUAL');
+const issuerPeriodCase=patch=>assessCase(raw,[{...issuerPeriodGroup,
+  receipts:[{...issuerPeriodReceipt,...patch}]}]);
+assert.equal(issuerPeriodCase({fechaVencimientoContractual:'2026-03-06'}).code,
+  'RECEIPT_PERIOD_OR_DUE_NOT_FOUND','an explicit contractual date cannot be ignored');
+assert.equal(issuerPeriodCase({fechaVencimientoContractual:'not-a-date'}).code,
+  'RECEIPT_PERIOD_OR_DUE_NOT_FOUND','an invalid contractual value is not an absent field');
+assert.equal(issuerPeriodCase({fechaVencimientoContractual:'not-a-date',vence:'2026-03-06'}).code,
+  'RECEIPT_PERIOD_OR_DUE_NOT_FOUND','a malformed alias cannot hide another contractual date');
+assert.equal(issuerPeriodCase({fechaLimite:'2026-03-06'}).code,
+  'RECEIPT_PERIOD_OR_DUE_NOT_FOUND','no date proximity or same-month inference');
+assert.equal(issuerPeriodCase({primaTotal:296.85,monto:296.85,montoTotal:296.85}).code,
+  'RECEIPT_PERIOD_OR_DUE_NOT_FOUND','this fallback requires exact source gross');
+assert.equal(issuerPeriodCase({numeroReciboFuente:'5/12'}).code,
+  'RECEIPT_PERIOD_OR_DUE_NOT_FOUND','an internal installment label is not an issuer reference');
+assert.equal(issuerPeriodCase({numeroReciboFuente:''}).code,'RECEIPT_PERIOD_OR_DUE_NOT_FOUND');
+assert.equal(issuerPeriodCase({polizaId:'other-policy'}).code,'RECEIPT_PERIOD_OR_DUE_NOT_FOUND');
+assert.equal(issuerPeriodCase({monto:280}).code,'GROSS_ALIASES_INCONSISTENT');
+assert.equal(assessCase(raw,[{...issuerPeriodGroup,receipts:[issuerPeriodReceipt,
+  {...issuerPeriodReceipt,id:'another-receipt'}]}]).code,'MULTIPLE_RECEIPTS_FOR_PERIOD_OR_AMOUNT');
+assert.equal(assessCase(raw,[{...issuerPeriodGroup,
+  cobros:[{id:'existing-payment',reciboId:'r1',estado:'Pagado'}]}]).code,'ALREADY_PAID_WITH_COBRO_PRESERVE');
 assert.equal(assessCase(raw,[{...group,receipts:[{...receipt,primaTotal:280,monto:280,montoTotal:280}],
   portfolio:[{...cartera,primaTotal:280,monto:280,montoTotal:280}]}]).ready.grossCents,29684,
   'insurer/authorized source gross overrides consistent stale gross only with unique edition/period');

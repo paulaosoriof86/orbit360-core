@@ -106,6 +106,14 @@ function insurerMatches(source,live){
 }
 const receiptDue=r=>date(r.fechaVencimientoContractual||r.vence||r.fechaVencimiento);
 const operationalDue=r=>date(r.fechaLimite);
+// Older insurer statement rows persisted the exact installment-period date
+// only in fechaLimite. This is an exact source-period identity, not a date
+// tolerance: require an issuer reference and unchanged source gross, and never
+// override an explicit contractual due date to obtain a match.
+const legacyLimitMatchesSourcePeriod=(row,r)=>
+  !['fechaVencimientoContractual','vence','fechaVencimiento'].some(field=>str(r[field]))&&
+  operationalDue(r)===row.periodStart&&cents(r.primaTotal)===row.total&&
+  /^\d{6,20}$/.test(str(r.numeroReciboFuente));
 const isPaid=r=>paid(r)||/^PAID_/i.test(str(r.paymentState));
 const receiptIdentity=r=>({id:r.id,polizaId:str(r.polizaId),state:str(r.estado),
   due:receiptDue(r),limit:operationalDue(r),gross:cents(r.primaTotal),
@@ -134,6 +142,11 @@ function assess(row,groups){
     !/ANULADO|ANULADA|CANCELADA/.test(norm(r.estado))&&
     (receiptDue(r)===row.periodStart||receiptDue(r)===row.due||operationalDue(r)===row.due));
   let candidates=valid,matchedBy='PERIOD_DATE';
+  if(!candidates.length){
+    candidates=(g.receipts||[]).filter(r=>str(r.polizaId)===g.policy.id&&
+      !/ANULADO|ANULADA|CANCELADA/.test(norm(r.estado))&&legacyLimitMatchesSourcePeriod(row,r));
+    if(candidates.length)matchedBy='LEGACY_INSURER_LIMIT_EXACT_SOURCE_PERIOD';
+  }
   // Legacy receipt due dates can be operationally offset. The installment
   // ordinal inside one exact policy term, not a globally constant requirement
   // number, is the secondary identity. No need for the dates to be identical.
@@ -333,6 +346,9 @@ async function applyOne(db,oldPlan,source){
       [r,c].some(x=>x.conciliado===true||/^APPLIED_/.test(str(x.applicationState)))||
       [r,c].some(x=>date(x.fechaPago||x.paidDate)&&date(x.fechaPago||x.paidDate)!==oldPlan.paidDate)||
       !/^[a-f0-9]{64}$/.test(oldPlan.beforeHash))throw Error('POLICY_RECEIPT_PREIMAGE_CHANGED');
+    if(oldPlan.match.startsWith('LEGACY_INSURER_LIMIT_EXACT_SOURCE_PERIOD')&&
+      !legacyLimitMatchesSourcePeriod(sourceRow(row),r))
+      throw Error('LEGACY_INSURER_LIMIT_PREIMAGE_CHANGED');
     if(oldPlan.match.startsWith('SOURCE_PERIOD_MONTH_ORDINAL')){
       const delta=(+oldPlan.periodStart.slice(0,4)-+p.vigenciaInicio.slice(0,4))*12+
         (+oldPlan.periodStart.slice(5,7)-+p.vigenciaInicio.slice(5,7));
