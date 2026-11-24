@@ -1,0 +1,252 @@
+{
+  "schema": "GI_I66_MAKE_PREVIEW_SCENARIO_PREIMAGE_V1",
+  "observationTime": "2026-11-24T16:33:52Z",
+  "observationTimeBasis": "Clock observed in the same read-only batch as scenario structure, full module configuration and history.",
+  "candidateSourceSha": "31741e5150c5a2879dafd96351f6cce70ed05d78",
+  "candidateBuildRunId": 45438092615,
+  "scenario": {
+    "id": 10196136,
+    "name": "Gravicentra Insurance · AyS ACTIVA · lectura WA segura para leads",
+    "description": "Lector A&S para atribución de anuncios: solo chats individuales. Sin escritor ni envíos; no crear leads sin sourceType=ad y sourceId. I6.6.",
+    "teamId": 1975919,
+    "status": "active",
+    "isLockedForEditing": false,
+    "isWaitingOnIncompleteExecutions": false,
+    "incompleteExecutions": 0,
+    "lastEdit": "2026-11-24T16:17:10.444Z",
+    "nextScheduledExecution": "2026-11-24T16:37:22.108Z"
+  },
+  "trigger": {
+    "moduleId": 1,
+    "module": "green-api:LastIncomingMessages",
+    "kind": "scheduled",
+    "scheduling": {
+      "type": "indefinitely",
+      "interval": 300
+    }
+  },
+  "modules": [
+    {
+      "id": 1,
+      "module": "green-api:LastIncomingMessages",
+      "version": 1,
+      "label": "AyS Green API activa · últimos 15 minutos (solo lectura)",
+      "root": "main"
+    },
+    {
+      "id": 2,
+      "module": "green-api:getMessage",
+      "version": 1,
+      "label": "Comprobar procedencia del mensaje de chat individual",
+      "follows": 1,
+      "filter": {
+        "name": "Solo chats individuales e ID",
+        "conditions": [
+          [
+            {
+              "a": "{{1.chatId}}",
+              "b": "@c\\.us$",
+              "o": "text:pattern"
+            },
+            {
+              "a": "{{1.idMessage}}",
+              "o": "exist"
+            }
+          ]
+        ]
+      }
+    },
+    {
+      "id": 3,
+      "module": "google-cloud-firestore:createDocument",
+      "version": 1,
+      "label": "Ingreso AyS · sonda autenticada cerrada",
+      "follows": 2,
+      "disabled": true
+    }
+  ],
+  "connections": [
+    {
+      "id": 14749710,
+      "app": "green-api",
+      "usedByModules": [
+        1,
+        2
+      ],
+      "status": "ok"
+    },
+    {
+      "id": 14756714,
+      "app": "google-custom",
+      "usedByModules": [
+        3
+      ],
+      "status": "ok"
+    }
+  ],
+  "moduleConfigurations": [
+    {
+      "id": 1,
+      "module": "green-api:LastIncomingMessages",
+      "version": 1,
+      "config": {
+        "parameters": {
+          "minutes": 15,
+          "onlyFrom": false,
+          "__IMTCONN__": 14749710
+        },
+        "mapper": {
+          "limit": 100
+        }
+      }
+    },
+    {
+      "id": 2,
+      "module": "green-api:getMessage",
+      "version": 1,
+      "config": {
+        "parameters": {
+          "__IMTCONN__": 14749710
+        },
+        "mapper": {
+          "chatId": "{{1.chatId}}",
+          "idMessage": "{{1.idMessage}}"
+        }
+      }
+    },
+    {
+      "id": 3,
+      "module": "google-cloud-firestore:createDocument",
+      "version": 1,
+      "config": {
+        "parameters": {
+          "__IMTCONN__": 14756714
+        },
+        "mapper": {
+          "fields": [
+            {
+              "value": "GI_I66_MAKE_LEAD_PRINCIPAL_PROBE_V1",
+              "fieldName": "schema",
+              "valueType": "stringValue"
+            },
+            {
+              "value": "greenapi",
+              "fieldName": "provider",
+              "valueType": "stringValue"
+            },
+            {
+              "value": "alianzas-soluciones",
+              "fieldName": "tenantId",
+              "valueType": "stringValue"
+            },
+            {
+              "value": "GT",
+              "fieldName": "country",
+              "valueType": "stringValue"
+            },
+            {
+              "value": "710522720868",
+              "fieldName": "instanceId",
+              "valueType": "stringValue"
+            },
+            {
+              "value": 10196136,
+              "fieldName": "scenarioId",
+              "valueType": "integerValue"
+            },
+            {
+              "value": "935e15f15bce60f1b788458142239cbfc03e02b9e01341b75e667510eeef2c0c",
+              "fieldName": "nonce",
+              "valueType": "stringValue"
+            }
+          ],
+          "full_path": "projects/ays-orbit-360-lab/databases/(default)/documents/tenants/alianzas-soluciones/previewLeadIngressRequests",
+          "input_type": "manual"
+        }
+      }
+    }
+  ],
+  "executionHistorySnapshot": {
+    "requestedStatus": "all",
+    "listHasMore": true,
+    "returnedCount": 25,
+    "pendingReturned": [],
+    "sinceOriginalReactivation": [
+      {
+        "id": "24ac3870ec5a44db926db63743daab78",
+        "startedAt": "2026-11-24T16:32:24.257Z",
+        "status": "success",
+        "startedBy": "auto",
+        "duration": 7039,
+        "operations": 13,
+        "credits": 13,
+        "dataTransfer": 34607,
+        "isReplayable": true
+      },
+      {
+        "id": "2992d4e9689840a9bd7838fc03e432f5",
+        "startedAt": "2026-11-24T16:27:23.608Z",
+        "status": "success",
+        "startedBy": "auto",
+        "duration": 6325,
+        "operations": 11,
+        "credits": 11,
+        "dataTransfer": 17107,
+        "isReplayable": true
+      },
+      {
+        "id": "da71e77aaf0c458ebc10faafd680e631",
+        "startedAt": "2026-11-24T16:22:23.158Z",
+        "status": "success",
+        "startedBy": "auto",
+        "duration": 1139,
+        "operations": 3,
+        "credits": 3,
+        "dataTransfer": 7593,
+        "isReplayable": true
+      },
+      {
+        "id": "adf522476fa443e7890c4ee49b85016e",
+        "startedAt": "2026-11-24T16:17:23.117Z",
+        "status": "success",
+        "startedBy": "auto",
+        "duration": 467,
+        "operations": 1,
+        "credits": 1,
+        "dataTransfer": 9954,
+        "isReplayable": true
+      }
+    ]
+  },
+  "originalBaselineExact": true,
+  "toolFacts": [
+    {
+      "tool": "mcp__codex_apps__make_scenario_get",
+      "input": {
+        "scenarioId": 10196136
+      }
+    },
+    {
+      "tool": "mcp__codex_apps__make_scenario_module_get",
+      "input": {
+        "scenarioId": 10196136,
+        "moduleIds": [
+          1,
+          2,
+          3
+        ]
+      }
+    },
+    {
+      "tool": "mcp__codex_apps__make_scenario_execution_list",
+      "input": {
+        "scenarioId": 10196136,
+        "status": "all"
+      }
+    },
+    {
+      "tool": "clock__curr_time"
+    }
+  ],
+  "remoteMutations": 0
+}

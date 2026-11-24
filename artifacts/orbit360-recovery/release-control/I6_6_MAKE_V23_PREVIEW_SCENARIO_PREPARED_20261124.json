@@ -1,0 +1,167 @@
+{
+  "schema": "GI_I66_MAKE_V23_DISABLED_PROBE_PREPARATION_RECEIPT_V1",
+  "status": "PREPARED_ON_DEMAND_WRITER_DISABLED",
+  "recordedAt": "2026-11-24T16:50:42Z",
+  "sourceSha": "31741e5150c5a2879dafd96351f6cce70ed05d78",
+  "buildRunId": 45438092615,
+  "buildId": "gi-i66-31741e5150c5-57f234755dc1",
+  "artifactId": 14940808746,
+  "artifactDigest": "sha256:7770d117745170604bcdd860d7c44beea97027c869c674c6ac162d3a9160e7f4",
+  "previewUrl": "https://ays-orbit-360-lab--gi-i66-rc-45438092615-t56f38m9.web.app",
+  "scenarioId": 10196136,
+  "teamId": 1975919,
+  "preimageBinding": {
+    "path": "continuity-evidence/make-v23-scenario-preimage-163352.json",
+    "gitBlobSha": "74cfeda9c2dbb0d85a54054418319ad1bd47318d",
+    "sha256": "c5a5510bed28d79a1dfa166512b100384f71e3d66280b4019967f1d07cf1a2fc"
+  },
+  "scenario": {
+    "status": "active",
+    "lastEdit": "2026-11-24T16:49:51.444Z",
+    "isLockedForEditing": false,
+    "incompleteExecutions": 0
+  },
+  "trigger": {
+    "moduleId": 3,
+    "module": "google-cloud-firestore:createDocument",
+    "kind": "on-demand",
+    "scheduling": {
+      "type": "on-demand"
+    }
+  },
+  "modules": [
+    {
+      "id": 3,
+      "module": "google-cloud-firestore:createDocument",
+      "version": 1,
+      "label": "Ingreso AyS · sonda autenticada cerrada",
+      "root": "main",
+      "disabled": true
+    },
+    {
+      "id": 1,
+      "module": "green-api:LastIncomingMessages",
+      "version": 1,
+      "label": "AyS Green API activa · últimos 15 minutos (solo lectura)",
+      "follows": 3
+    },
+    {
+      "id": 2,
+      "module": "green-api:getMessage",
+      "version": 1,
+      "label": "Comprobar procedencia del mensaje de chat individual",
+      "follows": 1,
+      "filter": {
+        "name": "Solo chats individuales e ID",
+        "conditions": [
+          [
+            {
+              "a": "{{1.chatId}}",
+              "b": "@c\\.us$",
+              "o": "text:pattern"
+            },
+            {
+              "a": "{{1.idMessage}}",
+              "o": "exist"
+            }
+          ]
+        ]
+      }
+    }
+  ],
+  "connections": [
+    {
+      "id": 14756714,
+      "app": "google-custom",
+      "usedByModules": [
+        3
+      ],
+      "status": "ok"
+    },
+    {
+      "id": 14749710,
+      "app": "green-api",
+      "usedByModules": [
+        1,
+        2
+      ],
+      "status": "ok"
+    }
+  ],
+  "probePreparation": {
+    "owner": "tools/gravicentra-i66-make-lead-ingress-scenario.cjs::probeAtRoot",
+    "previewNonceSha256": "0f8f342606a9149cb7140b44dea0a6d6294051dd78bfac566eb7bad57ec8ce1b",
+    "privateBindingRechecked": true,
+    "exactNonceMatches": true,
+    "configDigest": "7983a969c39946782e859e9582df09e0255592dfb59e0e1995162b45de4cea02",
+    "mapperDigest": "312f5cc72e08279cb96a4a13e66e3458a49904bd19b88eff3c57414012683318",
+    "queue": "projects/ays-orbit-360-lab/databases/(default)/documents/tenants/alianzas-soluciones/previewLeadIngressRequests",
+    "writerConnectionId": 14756714,
+    "writerDisabled": true,
+    "writerFilterAbsent": true,
+    "readerConfigurationsExact": true,
+    "originalFilter2Exact": true
+  },
+  "readerConfigurations": [
+    {
+      "id": 1,
+      "module": "green-api:LastIncomingMessages",
+      "version": 1,
+      "config": {
+        "parameters": {
+          "minutes": 15,
+          "onlyFrom": false,
+          "__IMTCONN__": 14749710
+        },
+        "mapper": {
+          "limit": 100
+        }
+      }
+    },
+    {
+      "id": 2,
+      "module": "green-api:getMessage",
+      "version": 1,
+      "config": {
+        "parameters": {
+          "__IMTCONN__": 14749710
+        },
+        "mapper": {
+          "chatId": "{{1.chatId}}",
+          "idMessage": "{{1.idMessage}}"
+        }
+      }
+    }
+  ],
+  "actions": {
+    "rootUiSavedWhileInactive": true,
+    "uiSaveLastEdit": "2026-11-24T16:48:28.139Z",
+    "uiSaveDroppedWriterDisabled": true,
+    "casExpectedLastEdit": "2026-11-24T16:48:28.139Z",
+    "casApplied": [
+      {
+        "op": "module_disabled_set",
+        "moduleId": 3
+      },
+      {
+        "op": "module_config_set",
+        "moduleId": 3
+      }
+    ],
+    "casLastEdit": "2026-11-24T16:49:51.444Z",
+    "configAndDisabledVerifiedWhileInactive": true,
+    "activatedOnlyAfterReadback": true,
+    "structuralChangesViaApi": 0
+  },
+  "history": {
+    "from": "2026-11-24T16:44:17Z",
+    "executions": [],
+    "pendingCount": 0
+  },
+  "authorizationToExecute": false,
+  "scenarioRunCalls": 0,
+  "writerEnableCalls": 0,
+  "externalMessagesSent": 0,
+  "nextGate": "Wait for actual v23 CLOSED receipt and explicit root PROBE signal. Then one enable/run/disable sequence; no topology or schedule edits during probe window.",
+  "restoration": "Preserve original v23 preimage. Final original 1→2→3/300 UI restore only while inactive; API disabled3 readback/correction before any scheduled reactivation."
+}

@@ -1,0 +1,55 @@
+{
+  "schema": "GI_I66_DIRECTION_URGENT_COMPLETION_DECISION_V1",
+  "gate": "I6.6",
+  "receivedAtUtc": "2026-11-24T16:40:13.649484+00:00",
+  "timezone": "America/Guatemala",
+  "authority": "DIRECT_USER_INSTRUCTION_IN_CURRENT_CONVERSATION",
+  "status": "AUTHORIZED_WORK_REQUIRES_EXACT_EXECUTION_PROOFS",
+  "decisionId": "DIRECTION_I66_COMPLETE_APPLICATION_GLOBAL_TOLERANCE_DIRECT_RENEWAL_20261124",
+  "owner": "Direccion Paula",
+  "userInstructionVerbatim": "por qué seguimos solo con 2/14, en 2 días intensivos de trabajo esto es mínimo, estamos haciendo algo mal porque si era un plan de choque, era de rápido avance. Ya publica lo avanzado porque es urgente que el equipo empiece a trabajar completo en la plataforma. En un momento voy a empezarte a compartir los hallazgos que ellos van reportando y se deben solucionar de inmediato y publicar. Se corrigió la reparación del arranque realmente? lo que está pending application aplicarlo de una vez y dejar de acumular y dejar de dejar el trabajo parcial, debes completar todo. Yo realicé la recarga de make y eso no tiene que bloquear. la idea es que garantices que la creación de leads esté habilitada. La tolerancia aprobada se extiende a todas las aseguradoras y casos. por qué sigue pidiendo abrir esta ficha para renovar en firme cuando ya se tiene póloiza en lugar de abrir la misma ficha de póliza para renovar directamente con la información preliminar heredada y disponible para cambiar si se desea? esto no se supone que ya se había solucionad. retoma lo que estás haciendo pero soluciona esto de inmediato así como todo lo que te vaya reportando.",
+  "decisions": {
+    "publishCompletedApprovedWork": true,
+    "completePendingApplicationThroughCanonicalWriter": true,
+    "extendPreviouslyApprovedToleranceToAllInsurersAndCases": true,
+    "priorToleranceAuthority": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_6_DIRECCION_DECISIONES_FINANCIERAS_Y_PLAN_INTEGRAL_20261122.md",
+      "gitBlobSha": "53b08239aa8807378ec95a4b4704c5d97622bc84",
+      "decision": "D01",
+      "preserveOriginalThresholdAndCurrencySemantics": true
+    },
+    "makeCreditsRechargedNotCurrentBlocker": true,
+    "enableAndVerifyRealLeadCreationThroughExistingCommittedRelease": true,
+    "existingPolicyFirmRenewalUsesPolicyFormWithEditableInheritedData": true,
+    "bothReportedEntryPoints": [
+      "Renovaciones",
+      "Cliente360"
+    ],
+    "resolveNewTeamFindingsWithinActiveGate": true
+  },
+  "reportedRenewalEvidence": {
+    "uploadedFilename": "image(20261124-162733).png",
+    "imageSha256": "338b3cec1a2d95c0350ebd1ecbdd7cfcc831492a445bad3a4ff7410aa3d18b68",
+    "observedForm": "Datos de la gestion",
+    "observedSubmit": "Crear gestion en Ops",
+    "report": "Al intentar renovar tanto en renovaciones como en la pestaña del cliente me manda a crear esta OPS",
+    "rootCauseNotYetProven": true
+  },
+  "preservedBoundaries": {
+    "existingRepositoryBranchAndExecutors": true,
+    "exactArtifactAndSameArtifactPreviewLiveRequired": true,
+    "noMessageSending": true,
+    "noInventedPaymentsOrBankTransfers": true,
+    "exactPaymentAndObligationIdentityRequired": true,
+    "noNewAcceptanceFromAuthorizationAlone": true
+  },
+  "executionAtReceipt": {
+    "liveGeneration": 3,
+    "sourceCandidate": "31741e5150c5a2879dafd96351f6cce70ed05d78",
+    "immutableBuildRunId": 45438092615,
+    "fullShockCompleted": 2,
+    "fullShockTotal": 14,
+    "fullI66Accepted": false,
+    "newWritesClaimedByThisReceipt": 0
+  }
+}

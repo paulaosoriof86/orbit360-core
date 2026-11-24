@@ -1,0 +1,115 @@
+{
+  "schema": "GI_I66_R49_SIGNED_QA_READONLY_VERIFICATION_V1",
+  "status": "REQUIRED_SOURCE_LEGAL_AND_CONTROL_GATES_EXECUTED_SUCCESS",
+  "recordType": "SUBORDINATE_OBSERVATION_NOT_PRODUCT_OR_PREVIEW_ACCEPTANCE",
+  "recordedAtUtc": "2026-11-24T16:29:50.621Z",
+  "commit": "dd521ab149ba54d70eeca3c14875b9160b896ded",
+  "tree": "93d3167872205518fdc656633aaac96dd084b2af",
+  "branch": "recovery/fase-a-clean-20260831",
+  "sourceQa": {
+    "runId": 45436746052,
+    "event": "push",
+    "attempt": 1,
+    "headSha": "dd521ab149ba54d70eeca3c14875b9160b896ded",
+    "workflow": ".github/workflows/gravicentra-i66-privileged-role-parity-source-qa.yml",
+    "status": "completed",
+    "conclusion": "success",
+    "jobId": 138596508096,
+    "jobName": "signed-source-gate-no-production-writes",
+    "requiredSteps": [
+      {
+        "name": "Source test with 5 roles, 12 domain writers and explicit negative boundaries",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 4
+      },
+      {
+        "name": "Canonical source blob and historic release guard without re-opening B4",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 5
+      }
+    ],
+    "legalInvocation": "node --test tools/gravicentra-i6-6-direction-preview-i66-consent-scope.test.cjs tools/gravicentra-i6-6-direction-live-legal-acceptance.test.cjs",
+    "combinedLegalTapBlock": {
+      "tests": 242,
+      "passed": 242,
+      "failed": 0,
+      "skipped": 0,
+      "cancelled": 0,
+      "scopedExecutableCases": 27,
+      "scopedPositiveFourAndFive": 2,
+      "scopedFiveNegativeCases": 25,
+      "proof": "Actual TAP ok lines, not solely the echoed invocation or overall run conclusion."
+    },
+    "legalOwnerBlobs": {
+      "tools/gravicentra-i6-6-direction-preview-legal-acceptance.cjs": "af17ba22238b310d356a76c1a3349dc540974859",
+      "tools/gravicentra-i6-6-direction-preview-i66-consent-scope.test.cjs": "0025c64a4d9364fe35e7daa0c0d3e9f65b406379"
+    }
+  },
+  "controlPlaneGuard": {
+    "runId": 45436746039,
+    "event": "push",
+    "attempt": 1,
+    "headSha": "dd521ab149ba54d70eeca3c14875b9160b896ded",
+    "workflow": ".github/workflows/gravicentra-release-lock-sync.yml",
+    "status": "completed",
+    "conclusion": "success",
+    "jobId": 138596508591,
+    "jobName": "verify-control-plane",
+    "requiredStep": {
+      "name": "Fail closed through canonical shared governance preflight",
+      "status": "completed",
+      "conclusion": "success",
+      "number": 4
+    },
+    "observedFinalMarkers": [
+      "I6_6_DELTA_GUARD=PASS",
+      "I6_6_SOURCE_SHA=dd521ab149ba54d70eeca3c14875b9160b896ded",
+      "GRAVICENTRA_GOVERNANCE_PREFLIGHT=PASS",
+      "SAME_HEAD_GOVERNANCE_AND_GATE_GUARD=true"
+    ]
+  },
+  "availability": {
+    "jobId": 138596507879,
+    "jobName": "live-hosting-availability-readonly",
+    "conclusion": "success",
+    "observedAtUtc": "2026-11-24T16:24:46.115460+00:00",
+    "activeGeneration": 3,
+    "sourceSha": "65c825b2808a615ca4195bdde6689dbdbe3193b2",
+    "buildId": "gi-i66-65c825b2808a-57f234755dc1",
+    "fourHttpChecks200": true,
+    "bothMarkersExact": true,
+    "controlPlaneTransportAgree": true,
+    "readOnly": true
+  },
+  "skippedJobs": [
+    {
+      "runId": 45436746052,
+      "jobId": 138596510694,
+      "name": "synthetic-chromium-detach-causal-no-production-writes",
+      "conclusion": "skipped",
+      "countedAsExecutedProof": false
+    },
+    {
+      "runId": 45436746039,
+      "jobId": 138596511591,
+      "name": "b4003-firestore-emulator",
+      "conclusion": "skipped",
+      "countedAsExecutedProof": false
+    }
+  ],
+  "issuesForRequiredSourceAndControlGates": [],
+  "v22OverallStatus": "HOLD_UNCHANGED",
+  "previewOrLiveProductAcceptanceByThisEvidence": false,
+  "next": "Await exact v23 immutable build/artifact identity from root; read-only verification only.",
+  "localEvidenceFiles": [
+    "r49-source-qa-run.json",
+    "r49-source-qa-jobs.json",
+    "r49-control-guard-run.json",
+    "r49-control-guard-jobs.json",
+    "r49-source-legal-suite-excerpt.log",
+    "r49-control-guard-excerpt.log",
+    "r49-live-availability.json"
+  ]
+}

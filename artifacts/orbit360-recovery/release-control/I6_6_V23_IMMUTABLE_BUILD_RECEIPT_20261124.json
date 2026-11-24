@@ -1,0 +1,70 @@
+{
+  "schema": "GI_I66_V23_IMMUTABLE_BUILD_AND_EXACT_PREVIEW_READBACK_RECEIPT_V1",
+  "status": "IMMUTABLE_BUILD_AND_HOSTING_PREVIEW_READBACK_PASS_BACKEND_AND_UI_PENDING",
+  "activeGate": "I6.6",
+  "sourceSha": "31741e5150c5a2879dafd96351f6cce70ed05d78",
+  "buildId": "gi-i66-31741e5150c5-57f234755dc1",
+  "buildRunId": 45438092615,
+  "jobId": 138601477458,
+  "buildConclusion": "success",
+  "artifactId": 14940808746,
+  "artifactDigest": "sha256:7770d117745170604bcdd860d7c44beea97027c869c674c6ac162d3a9160e7f4",
+  "innerPackageSha256": "acd9a6c0650ce262d74bdec32a450918116238586e7cac9af713e05baa9c7e20",
+  "previewUrl": "https://ays-orbit-360-lab--gi-i66-rc-45438092615-t56f38m9.web.app",
+  "previewChannel": "gi-i66-rc-45438092615",
+  "siteFileCount": 224,
+  "readback": {
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_V23_IMMUTABLE_PACKAGE_READBACK_20261124.json",
+    "receiptGitBlobSha": "df9e47ee531db1dcafe7bd85793ef410eb1f9b07",
+    "reportSha256": "9afac9ecd8e12cb97fa45a2d21c419b2251c96444b9992a81393286ae876d2a9",
+    "artifactId": 14942128817,
+    "artifactDigest": "sha256:d4792d92e4c32ae73dfc8c4b67281a01957fbb03954177c06dded5f88f50b055",
+    "readinessAttempts": 1,
+    "markerReadinessElapsedMs": 202,
+    "matchedFiles": 224,
+    "liveFingerprints": [
+      {
+        "label": "FIREBASE_LIVE",
+        "status": "PASS",
+        "beforeSha256": "7a9a23d24f80cbb31858fdc5b3836b703f2f2120911e2f1dca8bfb5c2c92bb84",
+        "afterSha256": "7a9a23d24f80cbb31858fdc5b3836b703f2f2120911e2f1dca8bfb5c2c92bb84"
+      },
+      {
+        "label": "STAFF_LIVE",
+        "status": "PASS",
+        "beforeSha256": "7a9a23d24f80cbb31858fdc5b3836b703f2f2120911e2f1dca8bfb5c2c92bb84",
+        "afterSha256": "7a9a23d24f80cbb31858fdc5b3836b703f2f2120911e2f1dca8bfb5c2c92bb84"
+      }
+    ]
+  },
+  "sourceQa": {
+    "head": "dd521ab149ba54d70eeca3c14875b9160b896ded",
+    "runId": 45436746052,
+    "guardRunId": 45436746039,
+    "conclusion": "success",
+    "evidence": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_6_V23_SIGNED_SOURCE_QA_AND_GOVERNANCE_20261124.json",
+      "gitBlobSha": "194c43153cae326d9212a5869c28cf2512f465b7",
+      "sha256": "d7813cc0ab41a76629344044f7e2cf84c1cae27b003cdae7393f2049f2a05b3a"
+    }
+  },
+  "requestHeadGuard": {
+    "head": "31741e5150c5a2879dafd96351f6cce70ed05d78",
+    "runId": 45438092771,
+    "conclusion": "success"
+  },
+  "manifestBlob": "941497d0b161e04b0ec3e3eee5933139f176b6f5",
+  "correctedLegalOwnerBlob": "af17ba22238b310d356a76c1a3349dc540974859",
+  "correctedLegalScopeTestBlob": "0025c64a4d9364fe35e7daa0c0d3e9f65b406379",
+  "v22FailedFullPreviewPreserved": true,
+  "v22ArtifactPatchedOrRebuilt": false,
+  "productSourceChangedSinceV22": false,
+  "backendDeployments": 0,
+  "liveHostingDeployments": 0,
+  "financialWrites": 0,
+  "backendPreviewAccepted": false,
+  "financialPreview48Accepted": false,
+  "liveAccepted": false,
+  "fullI66Accepted": false,
+  "acceptedProductionRemains": "E3"
+}
