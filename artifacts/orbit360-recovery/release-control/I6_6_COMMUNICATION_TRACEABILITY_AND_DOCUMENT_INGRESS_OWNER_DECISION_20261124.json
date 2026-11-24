@@ -1,0 +1,126 @@
+{
+  "schema": "GI_I66_COMMUNICATION_TRACEABILITY_AND_DOCUMENT_INGRESS_OWNER_DECISION_V1",
+  "recordType": "ADDITIVE_PREVALENT_DIRECTION_INSTRUCTION_NOT_DEPLOYMENT_OR_LIVE_ACCEPTANCE",
+  "dateGuatemala": "2026-11-24",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "gate": "I6.6",
+  "objectives": [
+    "A05",
+    "A06",
+    "A10",
+    "A11",
+    "A13"
+  ],
+  "status": "OWNER_AUTHORIZED_IMPLEMENTATION_AND_CANONICAL_PROOF_PENDING",
+  "authority": {
+    "source": "DIRECTION_LITERAL_ACTIVE_PROJECT_MESSAGE_RELAYED_BY_ROOT",
+    "messageSha256": "7b96fc304a5fbb55277dee0bf0db208852cc049a84f5e73208ba17c404b46cc3",
+    "messageDigestEncoding": "UTF-8_WITHOUT_ADDED_NEWLINE",
+    "rawMessagePublished": false,
+    "scopeContractPath": "artifacts/orbit360-recovery/release-control/I6_6_A13_CHANNEL_SCOPE_AND_EXISTING_EXECUTORS_20261124.json",
+    "scopeContractBlobSha": "7ce546736ac8d08b8ac922d19f3e6e4c2bac0021",
+    "priorClassificationDecision": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_6_EMAIL_AUTOMATIC_CLASSIFICATION_OWNER_DECISION_20261124.json",
+      "blobSha": "04bc1ccbb1f640368e89cf3c53b3090c7438140b"
+    },
+    "priorSourcePrecedenceDecision": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_6_EMAIL_OPERATIONAL_SOURCE_PRECEDENCE_OWNER_DECISION_20261124.json",
+      "blobSha": "6f28fcdee72e367925620a42a4ac05b253b2feac"
+    },
+    "preservesExistingScopeAndDecisionChronology": true
+  },
+  "whatsApp": {
+    "primaryCommercialChannel": true,
+    "existingScenarioId": 10196136,
+    "leadCreationTrigger": "VERIFIED_INCOMING_MESSAGE_ATTRIBUTED_TO_AD",
+    "requiredSourceAttribution": [
+      "provider_message_id",
+      "sourceType=ad",
+      "sourceId"
+    ],
+    "optionalAttribution": [
+      "ctwaClid"
+    ],
+    "retainInitialMessage": true,
+    "retainInitialRequest": true,
+    "retainProductOnlyWhenSupportedByMessage": true,
+    "retainOriginalChannelAndAdSource": true,
+    "bodyMustComeFromVerifiedProviderReadback": true,
+    "canonicalOwner": "functions/product-ops-leads-domain.js",
+    "assignment": "pending_operations",
+    "noFictitiousHumanActor": true,
+    "plainPrivateChatWithoutAdNotAdmitted": true,
+    "metaCatalog": {
+      "allowedUse": "READ_ONLY_ENRICHMENT_OF_EXACT_AD_ID_ATTRIBUTION_WHEN_AVAILABLE",
+      "mustNotInventAdSource": true,
+      "mustNotWeakenGreenApiSourceProof": true,
+      "adCampaignOrBudgetChangesAuthorized": false
+    }
+  },
+  "email": {
+    "existingScenarioId": 10221181,
+    "existingConnectionId": 14756803,
+    "exactExistingClient": "LINK_MESSAGE_TO_CLIENTE360_EMAIL_SECTION_HISTORY_AND_ACTIVITY",
+    "exactExistingLead": "LINK_MESSAGE_AND_QUOTE_CORRESPONDENCE_TO_EXISTING_LEAD_WITH_TRACEABILITY",
+    "exactExistingOperationalCase": "LINK_MESSAGE_AND_DOCUMENT_TO_EXACT_AUTHORIZED_CASE",
+    "rareUnambiguousNewQuote": "CREATE_CANONICAL_LEAD_PENDING_OPERATIONS",
+    "designatedProspectSupplier": {
+      "designationNameSha256": "9b4d4ff02d95df9af7ccbf8b2f5732a587854751ceb0519a14081512b761d0d6",
+      "sourceRole": "DIRECTION_DESIGNATED_EXTERNAL_PROSPECT_SUPPLIER",
+      "identifySenderFromActualCorrespondence": true,
+      "prospectIdentity": "INDIVIDUAL_PROSPECT_DATA_INSIDE_CURRENT_MESSAGE_BODY",
+      "supplierSenderIsNotProspectIdentity": true,
+      "sameSupplierMayDeliverDifferentProspects": true,
+      "multipleProspectsMayBeDistinctWithinOneThread": true,
+      "stripQuotedHistoryForNewProspectClassification": true,
+      "preserveOriginalMessageEvidenceSeparately": true,
+      "deduplicateProspectsUsingCanonicalPhoneEmailAndSourceIdentity": true,
+      "conflictingProspectOrEntityIdentity": "REVIEW_NO_OVERWRITE"
+    },
+    "messageDedupe": "VERIFIED_MAILBOX_SCOPE_PLUS_MESSAGE_ID_AND_SOURCE_DIGEST_NOT_UID_ALONE",
+    "threadCorrelation": "ALL_REFERENCES_AND_IN_REPLY_TO_PLUS_EXACT_PERMITTED_ENTITY_OR_PROSPECT_MATCH",
+    "ambiguousRelation": "REVIEW_WITHOUT_AUTOMATIC_ENTITY_MUTATION",
+    "existingAssignmentsStagesAndAuditsMustBePreserved": true,
+    "bodyAndPersonalContactsMustNotBePublishedInRepoOrJobLogs": true
+  },
+  "attachmentsAndFinancialRouting": {
+    "originalMeans": "ACTUAL_RECEIVED_ATTACHMENT_BYTES_PRESERVED_WITH_ORIGINAL_HASH_AND_DURABLE_DRIVE_REFERENCE",
+    "requestSameDocumentAgainWhenAlreadyAccessible": false,
+    "associateToCliente360AndCorrectCase": true,
+    "includeHistoryActivityAndAssociatedEmailTrace": true,
+    "accountStatements": "EXISTING_CONCILIATIONS_INBOX_AND_SOURCE_INTAKE",
+    "invoices": "EXISTING_CANONICAL_INVOICE_AND_RECONCILIATION_PATH",
+    "canonicalEndpoint": "orbit360CobrosReconciliationCommand",
+    "canonicalOperations": [
+      "intake_source_run",
+      "preview_proposal_application",
+      "apply_proposal_application",
+      "reconcile_evidence"
+    ],
+    "inferenceOwner": "functions/payment-inference-engine.js",
+    "sourceIntakeOwner": "functions/cobros-source-intake-v2.js",
+    "automaticApplication": "ONLY_DIRECT_PROOF_OR_APPROVED_V7_RULE_WITH_UNIQUE_CANONICAL_MATCH_FRESH_CAS_AND_READBACK",
+    "invoiceOrAttachmentPresenceAloneIsNotProofOfPayment": true,
+    "ambiguousOrInsufficientFinancialProof": "OPS_REVIEW_WITH_SAME_DOCUMENT_CONTEXT_AND_EXACT_HOLD_REASON",
+    "invoiceAndAttachmentDuplicatesMustNotCreateRepeatedCobrosOrFiles": true,
+    "messageIdAndAttachmentProvenanceRemainInOuterMailAuthority": true,
+    "sourceIntakePayloadMustKeepItsExistingExactSchema": true,
+    "secondFinancialEngineAllowed": false,
+    "automaticExternalMessagesAllowed": false
+  },
+  "privacyAndRelease": {
+    "mailboxOwnerBindingAuthoritySeparate": true,
+    "mailboxScopeIsPerVerifiedUser": true,
+    "linkedBusinessMailVisibleOnlyThroughExistingAuthorizedEntityScopes": true,
+    "unrelatedPersonalMailboxMailMustNotLeakToTeam": true,
+    "fullPersonalMailboxPhaseBNotIncluded": true,
+    "publicReceiptContainsOnlyHashesAndOperationalMetadata": true,
+    "credentialsRequestedOrPublished": false,
+    "existingWritersAndProtectedGatesRetained": true,
+    "signedPreviewLiveReadbackReplayAndIsolationRequired": true
+  },
+  "canonicalWritesByThisReceipt": 0,
+  "messagesSent": 0,
+  "liveAccepted": false
+}

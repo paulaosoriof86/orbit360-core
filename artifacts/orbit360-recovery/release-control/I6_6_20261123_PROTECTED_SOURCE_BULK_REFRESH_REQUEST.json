@@ -77,6 +77,10 @@
       "pol_6537ecb219275945f57fc567610c",
       "pol_c0001022fe28c0fa04d405d4a5b8",
       "pol_4cc6dba30e87de60562e32306c3c"
-    ]
+    ],
+    "newStatementSource": {
+      "path": "artifacts/orbit360-recovery/source-batches/I6_6_NEW_INSURER_SOURCE_DELTA_20261124.json",
+      "sha256": "68ebdc6f04e0ee5e4d7aa92b2a3bd9564f17a8a5e7b23528522cc6381f782805"
+    }
   }
 }

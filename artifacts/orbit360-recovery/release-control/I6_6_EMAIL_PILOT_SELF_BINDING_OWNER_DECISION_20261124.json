@@ -1,0 +1,72 @@
+{
+  "schema": "GI_I66_EMAIL_PILOT_SELF_BINDING_OWNER_DECISION_V1",
+  "recordType": "ADDITIVE_OWNER_BINDING_AUTHORITY_NOT_RUNTIME_BINDING_OR_LIVE_ACCEPTANCE",
+  "dateGuatemala": "2026-11-24",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "gate": "I6.6",
+  "objective": "A13",
+  "status": "DIRECTION_CONFIRMED_EXISTING_PILOT_MAILBOX_AND_SELF_BINDING_PENDING_FRESH_IDENTITY_CAS",
+  "authority": {
+    "source": "DIRECTION_EXPLICIT_REQUEST_USER_INPUT_RESPONSE_ACTIVE_PROJECT_CONVERSATION",
+    "questionSummary": "Confirm that the existing authorized IMAP connection is the approved pilot mailbox and associate it with the Direction user who confirmed.",
+    "selectedResponseSha256": "9b50afd59222d48e78f2c7c76bd94df977b893adfadd77f5d83750237cc75383",
+    "confirmedExistingMailbox": true,
+    "confirmedBindToOwnPlatformUser": true,
+    "scopeContractPath": "artifacts/orbit360-recovery/release-control/I6_6_A13_CHANNEL_SCOPE_AND_EXISTING_EXECUTORS_20261124.json",
+    "scopeContractBlobSha": "7ce546736ac8d08b8ac922d19f3e6e4c2bac0021",
+    "classificationDecisionPath": "artifacts/orbit360-recovery/release-control/I6_6_EMAIL_OPERATIONAL_SOURCE_PRECEDENCE_OWNER_DECISION_20261124.json",
+    "classificationDecisionBlobSha": "6f28fcdee72e367925620a42a4ac05b253b2feac"
+  },
+  "mailbox": {
+    "scenarioId": 10221181,
+    "connectionId": 14756803,
+    "tenantId": "alianzas-soluciones",
+    "country": "GT",
+    "mailboxSha256": "9b663847979724e9491e1c655da32a7cb17a5f6ed26dba352de1eb811254b23f",
+    "provider": "HOSTDIME_IMAP",
+    "authorizationRequestStateObserved": "authorized",
+    "connectionApiReturnsLoginIdentity": false,
+    "loginIdentityAuthority": "DIRECTION_CONFIRMED_NOT_INFERRED_FROM_CONNECTOR_LABEL",
+    "credentialsRequestedAgain": false
+  },
+  "ownerIdentity": {
+    "selector": "EXACT_PREVIOUSLY_SIGNED_DIRECTION_UID_HASH_PLUS_FRESH_MEMBERSHIP_AND_AUTH",
+    "expectedUidSha256": "f612197b077c598edd61d757c1e2995be7a3b17300602ce4802bccefed216a72",
+    "priorPreviewRunId": 45351824251,
+    "priorPreviewReceiptPath": "artifacts/orbit360-recovery/release-control/I6_6_FRONTEND_E00004_PREVIEW_UI.json",
+    "priorPreviewReceiptBlobSha": "956e2676d2f9d6cfe18ed0af92784574862ae232",
+    "priorPreviewReportSha256": "2ab32afc294f97c2302ea0b3b5350d6b1d72eaf6f1f2aca4aae986734958327e",
+    "bothViewportsAuthenticatedWithSameAssignedDirectionActor": true,
+    "currentMembershipRevalidationRequired": true,
+    "currentAuthEnabledEmailVerifiedRequired": true,
+    "explicitDirectionRoleRequired": true,
+    "tenantCountryAndUidAliasConsistencyRequired": true,
+    "mailboxAddressNeedNotEqualLoginEmail": true
+  },
+  "sourceProbeBeforeOwnerConfirmation": {
+    "runId": 45359645104,
+    "jobId": 138326116305,
+    "memberExactMailboxCandidates": 0,
+    "advisorExactMailboxCandidates": 1,
+    "advisorMemberLinkCount": 2,
+    "ownershipBindingAccepted": false,
+    "doesNotAuthorizeChoosingEitherAdvisorLink": true
+  },
+  "runtimeRules": {
+    "actor": "AUTHENTICATED_INTEGRATION_NOT_IMPERSONATED_DIRECTION_USER",
+    "explicitOwnerMailboxScope": true,
+    "otherUsersCannotReadMailboxMessagesOrAttachmentsWithoutApprovedRelationshipAndPermissions": true,
+    "sourceEmailAloneDoesNotGrantFinancialOrLeadWrite": true,
+    "protectedConfigCasAndReadbackRequired": true,
+    "configurationMustRemainClosedUntilProviderAndCanonicalProofsPass": true,
+    "outboundAllowed": false,
+    "newConnectionAllowed": false
+  },
+  "rawHumanNamesOrEmailsIncluded": false,
+  "credentialsIncluded": false,
+  "mailboxBindingWrites": 0,
+  "canonicalWrites": 0,
+  "messagesSent": 0,
+  "liveAccepted": false
+}

@@ -1,0 +1,52 @@
+{
+  "schema": "GI_I66_UNIVERSALES_15590_SINGLE_FILE_READER_READBACK_V1",
+  "status": "EXACT_FILE_READER_PERMISSION_AND_UNCHANGED_BYTES_VERIFIED",
+  "observedAtUtc": "2026-11-24T09:00:05.809614+00:00",
+  "priorDiagnosticReceipt": {
+    "path": "artifacts/orbit360-recovery/release-control/I6_6_UNIVERSALES_ORIGINAL_ACCESS_READONLY_20261124.json",
+    "blobSha": "696ada5a642a3b8654fb34f6adc0541ade7a7d5c",
+    "runId": 45359645453
+  },
+  "original": {
+    "fileId": "1nHigtnI2GJlKePaeyVyXlB_giCyIH2ss",
+    "sha256": "78d78df726fa54c8ef2af5d728a50265db6956208b4a593eab433457f24b4e62",
+    "bytes": 437717,
+    "sameOriginalId": true,
+    "copiedOrReplacedInDrive": false
+  },
+  "access": {
+    "fileId": "1nHigtnI2GJlKePaeyVyXlB_giCyIH2ss",
+    "bytes": 437717,
+    "parentId": "1xFoRPn8VVn-GjpTZyJlACj35Mw0LaTKl",
+    "permissions": [
+      {
+        "type": "user",
+        "role": "owner",
+        "ownerPreserved": true
+      },
+      {
+        "type": "user",
+        "role": "reader",
+        "principal": "firebase-adminsdk-fbsvc@ays-orbit-360-lab.iam.gserviceaccount.com"
+      }
+    ],
+    "parentPermissions": [
+      {
+        "type": "user",
+        "role": "owner"
+      }
+    ]
+  },
+  "permissionMetadataSnapshotSha256": "9c81e75d8c124ed4ccc3ea5c5568e9420238b6860345810e5c9651db93cf927a",
+  "claimBoundary": "Owner-context metadata independently verifies the exact service-account reader permission and original bytes. A fresh read using that service identity is still required before the ten held15590 obligations are eligible in the protected workflow.",
+  "newServiceAccountReadTestPerformed": false,
+  "newFinancialApplyPerformed": false,
+  "firestoreWrites": 0,
+  "source302607Changed": false,
+  "preserved": {
+    "historicalPayments": 155,
+    "historicalPaymentsGrossCents": 7880643,
+    "newPendingObligationsAlreadyApplied": 36,
+    "newPendingGrossCents": 1001766
+  }
+}

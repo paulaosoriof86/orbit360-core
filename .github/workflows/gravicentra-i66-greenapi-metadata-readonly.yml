@@ -478,7 +478,7 @@ jobs:
         run: node tools/gravicentra-i66-greenapi-existing-config-readonly.cjs
       - name: Verify exact mailbox-owner census isolation without writes
         run: node --test tools/gravicentra-i66-mailbox-owner-readonly.test.cjs
-      - name: Inspect the existing pilot mailbox identity candidates without binding an owner
+      - name: Verify the owner-confirmed pilot mailbox against active membership and Auth without writes
         run: node tools/gravicentra-i66-mailbox-owner-readonly.cjs
       - name: Read canonical Ops runtime and exact required capabilities without granting access
         run: node tools/gravicentra-i66-make-lead-runtime-access.cjs preflight

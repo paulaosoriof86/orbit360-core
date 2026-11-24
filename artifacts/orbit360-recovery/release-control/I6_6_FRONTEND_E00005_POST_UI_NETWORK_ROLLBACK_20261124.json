@@ -1,0 +1,62 @@
+{
+  "schema": "GI_I66_FRONTEND_POST_UI_NETWORK_ROLLBACK_V1",
+  "gate": "I6.6",
+  "generation": 5,
+  "status": "EXACT_LIVE_UI_PASS_RELEASE_METADATA_FAILED_PREVIOUS_VERSION_RESTORED",
+  "sourceSha": "658246bb953c0c1b7aa6f54e98cd5c4e39c5b85d",
+  "buildId": "gi-i66-658246bb953c-57f234755dc1",
+  "artifactId": 14900297283,
+  "artifactDigest": "sha256:58a2286811ba8b5ce891d07a24bddabddd1700ca61cb6daccd71ef3fe248b0a7",
+  "execution": {
+    "runId": 45359645078,
+    "jobId": 138326116195,
+    "conclusion": "failure"
+  },
+  "liveUi": {
+    "status": "FRONTEND_SIX_RECEIPTS_TWO_ROLE_TWO_VIEW_READONLY_PASS",
+    "stageCount": 48,
+    "reportArtifactId": 14904343737,
+    "artifactDigest": "sha256:cfa1806ccee552f447cedd8f888e480a8bd50a7c6d9556461a6c6f90e222c35c",
+    "reportSha256": "d5e2b333c03197d1f969661707eac65f9613dfc7b6cc2dc492eca0fd3abb4f69",
+    "authorityBlob": "d8d9701d8569bffa811c406abba114b434495c80",
+    "physicalPhaseKey": "80bcfeac2331f54ce101586e2eabdc83542ff9ca860a7eac13139bd0f95c131a",
+    "sourceAndServerSnapshotsUnchanged": true,
+    "firestoreWrites": 0,
+    "businessActions": 0,
+    "paymentActions": 0
+  },
+  "failure": {
+    "classification": "RELEASE_COMPOSITION_PROVIDER_NETWORK",
+    "observedReason": "fetch failed",
+    "operation": "SAVE_SIGNED_LIVE_UI_RECEIPT",
+    "liveUiReceiptPersisted": false,
+    "releaseAccepted": false,
+    "productionTransportCause": "NOT_YET_PROVEN",
+    "previousAttemptSameObservedFailure": true
+  },
+  "rollback": {
+    "journalPath": "artifacts/orbit360-recovery/release-control/I6_6_FRONTEND_E00005_JOURNAL.json",
+    "journalBlob": "ebdaf3669db796b34501935a93b1b90b2b792c06",
+    "journalCommit": "ea23e9987d9808e5c7cf1ad1c08730769f3a763e",
+    "phase": "ROLLED_BACK",
+    "physical": {
+      "firebase": 224,
+      "custom": 224,
+      "sourceSha": "65c825b2808a615ca4195bdde6689dbdbe3193b2",
+      "buildId": "gi-i66-65c825b2808a-57f234755dc1",
+      "artifactDigest": "sha256:7cb782848a45083047c4899bc30c13bf5be46429607e42597d09342becfc9acc",
+      "hostingVersion": "sites/ays-orbit-360-lab/versions/332999a55b189108",
+      "manifestDigest": "sha256:da40e7ad3f453107a44fdc868a58ff469f91139252c0204f9fc298a8d9f02905"
+    }
+  },
+  "successor": {
+    "generation": 6,
+    "status": "CAUSAL_TRANSPORT_REPAIR_AND_NEW_COMPOSITE_ARTIFACT_REQUIRED",
+    "newSourceAndBuildRequired": true,
+    "previewAndLiveExactReadbackRequired": true,
+    "previousArtifactAccepted": false
+  },
+  "fullA04Accepted": false,
+  "fullA12Passed": false,
+  "globalGateAccepted": false
+}

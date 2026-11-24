@@ -13,6 +13,49 @@ const financialPolicyIds=new Set(['pol_7ab15779e3626402f1cb4349fa69','pol_243608
  'pol_6537ecb219275945f57fc567610c','pol_c0001022fe28c0fa04d405d4a5b8','pol_4cc6dba30e87de60562e32306c3c']);
 const stable=x=>Array.isArray(x)?x.map(stable):x&&typeof x==='object'?
  Object.fromEntries(Object.keys(x).sort().map(k=>[k,stable(x[k])])):x;
+const newStatementSource={path:'artifacts/orbit360-recovery/source-batches/I6_6_NEW_INSURER_SOURCE_DELTA_20261124.json',
+ sha256:'68ebdc6f04e0ee5e4d7aa92b2a3bd9564f17a8a5e7b23528522cc6381f782805'};
+function statementManifest(request){
+ if(!request.newStatementSource)return null;
+ assert.deepEqual(request.newStatementSource,newStatementSource,'STATEMENT_READONLY_SOURCE_SCOPE_DRIFT');
+ assert.ok(request.financialPolicyIds,'STATEMENT_FINANCIAL_CENSUS_REQUIRED');
+ const bytes=require('node:fs').readFileSync(require('node:path').join(__dirname,'..',newStatementSource.path));
+ assert.equal(crypto.createHash('sha256').update(bytes).digest('hex'),newStatementSource.sha256,'STATEMENT_SOURCE_BYTES_DRIFT');
+ const source=JSON.parse(bytes);assert.equal(source.schema,'GI_I66_NEW_INSURER_SOURCE_DELTA_20261124_V1');
+ assert.equal(source.tenantId,'alianzas-soluciones');assert.equal(source.projectId,'ays-orbit-360-lab');
+ assert.equal(source.liveWrites,0);assert.equal(source.facts.length,56);assert.equal(source.isolatedRows.length,22);
+ return source;
+}
+function statementPolicyMatches(request,arrays){
+ const source=statementManifest(request);if(!source)return [];
+ const clients=new Map(arrays.clientes.map(r=>[r.id,r]));
+ const insurerNames={MAPFRE:/mapfre/i,GENERAL:/^(?:aseguradora )?general(?: de seguros)?$/i,
+  UNIVERSALES:/universales/i,GYT:/G\s*(?:&|Y)\s*T/i};
+ const insurerMatch=(p,f)=>arrays.aseguradoras.some(a=>a.id===p.aseguradoraId&&
+  insurerNames[f.insurer]?.test(str(a.nombre||a.razonSocial))===true);
+ const related=(value,number,insurer)=>{
+  if(!str(value))return '';
+  const policyNorm=x=>str(x).normalize('NFD').toUpperCase().replace(/[^A-Z0-9$]/g,'');
+  if(policyNorm(value)===policyNorm(number))return 'FORMATTING_EQUIVALENT_DIAGNOSTIC_ONLY';
+  const serial=insurer==='UNIVERSALES'?/^\d{2}-\d{2}-\d{2}-(\d+)-\d+$/.exec(number):/([0-9]+)$/.exec(number);
+  return /^\d+$/.test(str(value))&&serial&&String(Number(value))===String(Number(serial[1]))?'BARE_NUMBER_UNVERIFIED':'';
+ };
+ const out=[];
+ for(const p of arrays.polizas){
+  const matched=source.facts.flatMap(f=>{
+   const sameInsurer=insurerMatch(p,f);if(!sameInsurer)return [];
+   const relations=Object.fromEntries(fields.filter(k=>related(p[k],f.policy,f.insurer)).map(k=>[k,related(p[k],f.policy,f.insurer)]));
+   const holder=clients.get(p.clienteId),sameHolder=holder&&holderMatch({sourcePdfSha256:f.sourceSha256,holderWitness:f.holderWitness},holder)===true;
+   if(!Object.keys(relations).length&&!sameHolder)return [];
+   return [{sourceFactId:f.sourceFactId,sourcePolicy:f.policy,insurerVerified:sameInsurer,holderWitnessMatches:!!sameHolder,
+    policyCountryMatchesSource:p.pais==='GT',
+    policyCurrencyMatchesSource:p.moneda===f.currency,sourceCurrency:f.currency,
+    numberRelations:relations,sourceTerm:f.term||null,sourceRequirement:f.requirement,sourceState:f.state}];
+  });
+  if(matched.length)out.push({policy:p,matches:matched});
+ }
+ assert.ok(out.length<=100,'STATEMENT_POLICY_DIAGNOSTIC_BOUNDARY');return out;
+}
 function validate(request){
  assert.equal(request.schema,'GI_I66_SOURCE_IDENTITY_READBACK_V1');
  assert.equal(request.enabled,true);assert.equal(request.writes,0);
@@ -23,6 +66,7 @@ function validate(request){
   assert.equal(request.financialPolicyIds.length,5,'FINANCIAL_IDENTITY_SCOPE_COUNT');
   assert.deepEqual(new Set(request.financialPolicyIds),financialPolicyIds,'FINANCIAL_IDENTITY_SCOPE_DRIFT');
  }
+ statementManifest(request);
  for(const t of request.documentaryTargets){
   assert.match(t.sourcePdfSha256,/^[a-f0-9]{64}$/);assert.match(t.holderWitness,/^[a-f0-9]{64}$/);
   assert.ok(safeId(t.sourceDriveId));
@@ -75,6 +119,9 @@ function select(request,c,check,arrays){
   add('polizas',id);const p=arrays.polizas.find(p=>p.id===id);
   if(p){add('clientes',p.clienteId);add('aseguradoras',p.aseguradoraId);}
  }
+ for(const {policy:p} of statementPolicyMatches(request,arrays)){
+  add('polizas',p.id);add('clientes',p.clienteId);add('aseguradoras',p.aseguradoraId);
+ }
  assert.ok(refs.size<=300,'IDENTITY_DIAGNOSTIC_REFERENCE_BOUNDARY');
  return [...refs.values()];
 }
@@ -87,7 +134,7 @@ function report(request,c,check,arrays,entries,preimageDigest,financialSnapshot,
  function policy(id){
   const e=record('polizas',id);if(!e||!e.exists)return {id:safeId(id),exists:false};
   const p=e.data,aliases=Object.fromEntries(fields.filter(f=>str(p[f])).map(f=>[f,
-   /^(?:[A-Za-z]{1,6}[ -]*)?\d[\d /.-]{0,70}$/.test(str(p[f]))?str(p[f]):'REDACTED_NON_POLICY_ALIAS']));
+   /^(?:[A-Za-z]{1,6}\$?[ -]*)?\d[\d /.-]{0,70}$/.test(str(p[f]))?str(p[f]):'REDACTED_NON_POLICY_ALIAS']));
   const allowedStates=/^(vigente|emitida|vencida|renovada|cancelada|anulada|activa|inactiva|suspendida|sin cobertura)$/i;
   const refs=[p.documentRef,p.sourceDocumentRef,...(Array.isArray(p.documentos)?p.documentos.map(d=>d?.fileId):[])];
   return {...witness(e),aliases,country:['GT','CO'].includes(p.pais)?p.pais:null,
@@ -149,19 +196,24 @@ function financialReport(request,snapshot,source,entries,policy){
  assert.equal(snapshot.sourceSha256,'649fa315a90b176b794abf6eef3d9f893d47de64cfe558d203a099c408692aa0');
  assert.ok(Array.isArray(snapshot.records)&&Array.isArray(snapshot.audits));
  const dateFields=['periodoInicioFuente','periodStart','receiptPeriodStart','periodoInicio','fechaInicio','inicioPeriodo',
-  'fechaVencimientoContractual','vence','fechaVencimiento','fechaLimite','fechaPago','paidDate','actualPaidDate'];
+  'fechaVencimientoContractual','vence','fechaVencimiento','fechaLimite','fechaPago','paidDate','actualPaidDate','inferredEffectiveDate','evidenceAsOfDate',
+  'applicationDate','fechaAplicacion','invoiceDate','fechaFactura'];
  const amountFields=['primaTotal','monto','montoTotal','grossAmount','amount','primaNeta','neta','netPremium','saldo','saldoPendiente','montoPagado'];
  const idFields=['polizaId','policyId','clienteId','clientId','asesorId','aseguradoraId','reciboId','receiptId','reciboEsperadoId',
-  'cobroId','sourceId','sourceRef','evidenceId','sourceCandidateId','auditId','operationId','requestId','documentRef','sourceDocumentRef'];
+  'cobroId','sourceId','sourceRef','evidenceId','sourceCandidateId','auditId','operationId','requestId','documentRef','sourceDocumentRef',
+  'applicationEvidenceRef','invoiceDocumentRef'];
  const referenceFields=['numeroReciboFuente','numeroReciboAseguradora','numeroRequerimiento','requerimiento','numeroRecibo',
-  'polizaNumero','numeroPoliza','policyNumber','policyNumberSource','numeroPolizaFuente','secuencia','numeroCuota','cuota','serie'];
+  'polizaNumero','numeroPoliza','policyNumber','policyNumberSource','numeroPolizaFuente','secuencia','numeroCuota','cuota','serie','totalCuotas','totalInstallments','anchorInstallment'];
+ const invoiceFields=['numeroFactura','invoiceNumber','factura','serieFactura','invoiceSeries'];
  const stateFields=['estado','estadoOperativo','paymentState','applicationState','paymentOrigin','paymentEvidenceType',
-  'directOrInferred','carteraTipo','estadoCartera','exigibilidad','actualPaidDateSource'];
- const booleanFields=['pagado','confirmado','inferredPaid','conciliado','conciliadoPago','carteraActiva','historicalExigible','saldoConciliado'];
+  'directOrInferred','carteraTipo','estadoCartera','exigibilidad','actualPaidDateSource','applicationEvidenceType','evidenceType'];
+ const booleanFields=['pagado','confirmado','inferredPaid','conciliado','conciliadoPago','carteraActiva','historicalExigible','saldoConciliado','applicationEvidenceVerified'];
  const knownStates=new Set(['PAID_DIRECT','PAID_INFERRED','PAID_REPORTED','PENDING','UNPAID','PAID','Pagado','Pendiente','Vencido','Cancelado','Anulado',
-  'DIRECT','INFERRED','REPORTED','PENDING_APPLICATION','APPLIED','CONFIRMED','RECONCILED','CRM_MIGRATED_DIRECT_PAYMENT',
+  'DIRECT','INFERRED','REPORTED','PENDING_APPLICATION','APPLIED','APPLIED_DIRECT','APPLIED_INFERRED','CONFIRMED','RECONCILED','CRM_MIGRATED_DIRECT_PAYMENT',
   'LEGACY_CENDOSO_FECHA_REAL_PAGADO','CENDOSO_FECHA_REAL_PAGADO','pagado_sin_saldo','historico_pagado_fuente',
-  'cerrada','exigible','futura','pendiente','pendiente_vencido','futuro_pendiente','cartera_activa']);
+  'cerrada','exigible','futura','pendiente','pendiente_vencido','futuro_pendiente','cartera_activa',
+  'INSURER_INVOICE','INSURER_STATEMENT','COMMISSION_STATEMENT','INVOICE_INSTALLMENT_N',
+  'COMMISSION_STATEMENT_INSTALLMENT_N','INSURER_STATEMENT_PENDING_FROM_N','BANK_STATEMENT_MATCH']);
  const val=(k,v)=>({type:typeof v,present:true,value:
   typeof v==='number'&&Number.isFinite(v)?v:typeof v==='string'&&/^[+-]?\d+(?:\.\d{1,8})?$/.test(v.trim())?v:null,
   ...(v!=null&&!['string','number'].includes(typeof v)?{valueSha256:sha(JSON.stringify(stable(v)))}:{})});
@@ -171,7 +223,10 @@ function financialReport(request,snapshot,source,entries,policy){
    day(r[k])||{type:typeof r[k],valueSha256:sha(JSON.stringify(stable(r[k])))}])),
   amounts:Object.fromEntries(amountFields.filter(k=>r[k]!=null).map(k=>[k,val(k,r[k])])),
   references:Object.fromEntries(referenceFields.filter(k=>r[k]!=null).map(k=>[k,
-   /^(?:[A-Za-z]{1,8}[ -]*)?\d[\d /.-]{0,70}$/.test(str(r[k]))||/^(?:rec|car|cob|pol)_[a-z0-9_]{6,150}$/.test(str(r[k]))?
+   /^(?:[A-Za-z]{1,8}\$?[ -]*)?\d[\d /.-]{0,70}$/.test(str(r[k]))||/^(?:rec|car|cob|pol)_[a-z0-9_]{6,150}$/.test(str(r[k]))?
+    str(r[k]):{valueSha256:sha(JSON.stringify(stable(r[k])))}])),
+  invoiceReferences:Object.fromEntries(invoiceFields.filter(k=>r[k]!=null).map(k=>[k,
+   /^(?:\d{1,30}|[A-Fa-f0-9]{8}(?:-\d{1,30})?|[A-Fa-f0-9]{8}(?:-[A-Fa-f0-9]{4}){3}-[A-Fa-f0-9]{12})$/.test(str(r[k]))?
     str(r[k]):{valueSha256:sha(JSON.stringify(stable(r[k])))}])),
   states:Object.fromEntries(stateFields.filter(k=>r[k]!=null).map(k=>[k,
    knownStates.has(str(r[k]))?str(r[k]):{type:typeof r[k],valueSha256:sha(JSON.stringify(stable(r[k])))}])),
@@ -187,16 +242,27 @@ function financialReport(request,snapshot,source,entries,policy){
   .some(ref=>[receipts.get(ref)?.polizaId,receipts.get(ref)?.policyId].includes(id));
  const targetSource=source.candidates.filter(r=>['AUTO-45580','VA-53105','91-8353989'].includes(r.policyNumberSource));
  const sourceIds=new Set(targetSource.map(r=>r.candidateId));
- const targets=request.financialPolicyIds.map(id=>{
+ const extra=statementPolicyMatches(request,Object.fromEntries(['polizas','clientes','aseguradoras'].map(collection=>
+  [collection,entries.filter(e=>e.collection===collection&&e.exists).map(e=>({...e.data,id:e.id}))])));
+ const targetIds=[...new Set([...request.financialPolicyIds,...extra.map(x=>x.policy.id)])];
+ const targets=targetIds.map(id=>{
   const found=snapshot.records.filter(r=>owns(r,id));assert.ok(found.length<=300,'FINANCIAL_POLICY_DIAGNOSTIC_BOUNDARY');
   const p=entries.find(e=>e.collection==='polizas'&&e.id===id)?.data||{};
   return {policy:policy(id),policyAmountFields:Object.fromEntries(amountFields.filter(k=>p[k]!=null).map(k=>[k,val(k,p[k])])),
    frequency:['Mensual','Pago Único','Contado','Anual','Trimestral','Semestral'].includes(p.frecuencia)?p.frecuencia:null,
+   declaredInstallments:/^\d{1,3}$/.test(str(p.cuotas))?Number(p.cuotas):null,
    counts:Object.fromEntries(['recibosEsperados','carteraPrimas','cobros'].map(k=>[k,found.filter(r=>r.collection===k).length])),
-   records:found.map(project)};
+   records:found.map(project),...(extra.some(x=>x.policy.id===id)?{newStatementMatches:extra.find(x=>x.policy.id===id).matches}:{})};
  });
- const relevantAudit=snapshot.audits.filter(a=>request.financialPolicyIds.includes(a.policyId)||sourceIds.has(a.sourceId));
+ const relevantAudit=snapshot.audits.filter(a=>targetIds.includes(a.policyId)||sourceIds.has(a.sourceId));
+ const delta=statementManifest(request),newRefs=new Set(delta?delta.facts.map(f=>f.requirement):[]);
+ const outside=snapshot.records.filter(r=>(idFields.some(k=>sourceIds.has(r[k]))||referenceFields.some(k=>newRefs.has(str(r[k]))))&&
+  !targetIds.some(id=>owns(r,id)));
+ assert.ok(outside.length<=300,'STATEMENT_OUTSIDE_TARGET_DIAGNOSTIC_BOUNDARY');
  return {complete:true,writes:0,sourceSha256:snapshot.sourceSha256,
+  ...(delta?{newStatementSource:{...newStatementSource,sourceFacts:delta.facts.length,
+   sourcePolicyCount:new Set(delta.facts.map(f=>f.insurer+'|'+f.policy)).size,matchingPolicyEditions:extra.length,
+   diagnosticOnly:true,noEligibilityEffect:true}}:{}),
   censusCounts:Object.fromEntries(['recibosEsperados','carteraPrimas','cobros'].map(k=>[k,snapshot.records.filter(r=>r.collection===k).length])),
   financialCensusSha256:sha(JSON.stringify(stable(snapshot.records))),targets,
   sourceCandidates:targetSource.map(r=>({sourceId:r.candidateId,policy:r.policyNumberSource,term:[r.coverageStart,r.coverageEnd],
@@ -204,8 +270,7 @@ function financialReport(request,snapshot,source,entries,policy){
    holdReasons:r.holdReasons,sourceRows:r.sourceRows})),
   auditWitnesses:relevantAudit.map(a=>({id:safeId(a.id),policyId:safeId(a.policyId),sourceId:safeId(a.sourceId),
    receiptId:safeId(a.receiptId),portfolioId:safeId(a.portfolioId),cobroId:safeId(a.cobroId),documentSha256:sha(JSON.stringify(stable(a)))})),
-  sourceLinkedOutsideTargets:snapshot.records.filter(r=>idFields.some(k=>sourceIds.has(r[k]))&&
-   !request.financialPolicyIds.some(id=>owns(r,id))).map(project)};
+  sourceLinkedOutsideTargets:outside.map(project)};
 }
 function appendEvidence(fs,runnerTemp,reports,execution){
  const path=require('node:path');assert.ok(path.isAbsolute(runnerTemp),'READONLY_ARTIFACT_ROOT_REQUIRED');
@@ -222,4 +287,5 @@ function appendEvidence(fs,runnerTemp,reports,execution){
  // The immutable eligibility plan file is never opened or changed here.
  return {file:'gi-i66-bulk-preflight.json',originalSourceReportSha256:sha(bytes)};
 }
-module.exports={validate,select,report,numberRelation,financialReport,financialPolicyIds,appendEvidence};
+module.exports={validate,select,report,numberRelation,financialReport,financialPolicyIds,appendEvidence,
+ newStatementSource,statementPolicyMatches};

@@ -1,0 +1,74 @@
+{
+  "schema": "GI_I66_PER_USER_MAILBOX_CROSS_DELIVERY_OWNER_DECISION_V1",
+  "recordType": "ADDITIVE_DIRECTION_SCOPE_NOT_RUNTIME_BINDING_OR_LIVE_ACCEPTANCE",
+  "dateGuatemala": "2026-11-24",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "gate": "I6.6",
+  "objectives": [
+    "A13",
+    "A10",
+    "A11"
+  ],
+  "status": "PER_USER_MAILBOX_AND_SINGLE_BUSINESS_MESSAGE_TRACEABILITY_AUTHORIZED_IMPLEMENTATION_PENDING",
+  "authority": {
+    "source": "DIRECTION_EXPLICIT_ACTIVE_PROJECT_CONVERSATION",
+    "messageSha256": "95f8e6dd85eb4ccd5fb5babc22ebe9c52ccfa7ad2450a16b13e1bbde9ec907d3",
+    "priorTraceabilityDecisionPath": "artifacts/orbit360-recovery/release-control/I6_6_COMMUNICATION_TRACEABILITY_AND_DOCUMENT_INGRESS_OWNER_DECISION_20261124.json",
+    "priorTraceabilityDecisionBlob": "3bbfe4a19b9bb2db446bbfbb8f8be60da6ef8a18",
+    "priorPilotBindingDecisionBlob": "17da2d0d297e0b0f010d2da763fd3d3a0f664c54",
+    "scopeContractBlob": "7ce546736ac8d08b8ac922d19f3e6e4c2bac0021",
+    "supersedesPriorDecisions": false
+  },
+  "perUserBinding": {
+    "eachUserHasOwnVerifiedMailboxBinding": true,
+    "pilotDoesNotImplyOwnershipOfOtherMailboxes": true,
+    "currentMembershipAuthCountryAndExplicitUserBindingRequired": true,
+    "machineActorNeverImpersonatesMailboxOwner": true,
+    "credentialsNotLoggedOrIncludedInPublicReceipts": true,
+    "allPersonalInboxPhaseBNotAuthorized": true
+  },
+  "deduplication": {
+    "deliveryScope": "tenant + verified mailbox binding + provider message observation",
+    "canonicalMessageScope": "tenant + Message-ID with exact authenticated sender and body/attachment content fingerprint",
+    "sameMessageIdCollisionIndexRequired": true,
+    "sameMessageIdChangedSenderBodyOrAttachments": "HOLD_WITH_NO_DUPLICATE_BUSINESS_ACTIVITY",
+    "crossMailboxCopies": "Retain separate private delivery receipts and one canonical business message/activity for the same exact source.",
+    "recipientAndTransportHeadersExcludedFromCanonicalContentFingerprint": true,
+    "mailboxUidAloneIsNotStableGlobalIdentity": true,
+    "missingMessageIdOrUnprovedContent": "REVIEW_DO_NOT_GUESS_CROSS_MAILBOX_IDENTITY",
+    "fullThreadIsNotOneLead": true,
+    "quotedHistoryDoesNotCreateNewProspects": true,
+    "supplierProspects": "Identify each current-body prospect separately; supplier sender and common thread never replace prospect identity.",
+    "concurrentDeliveriesRequireCanonicalNaturalKeyTransactionCas": true,
+    "repeatDeliveryCreatesNoSecondLeadActivityOrFinancialEvidence": true
+  },
+  "visibility": {
+    "privateDeliveryMetadataRemainsPerMailbox": true,
+    "canonicalBusinessVisibilityUsesExistingEntityRoleScope": true,
+    "copyingAnotherMailboxDoesNotGrantAccess": true,
+    "recipientsDoNotExpandCustomerOrLeadPermissions": true,
+    "sharedClientOrLeadHasOneTraceableMessageAndActivity": true,
+    "twoUserIsolationProofRequired": true
+  },
+  "labelsAndOrigins": {
+    "ownerRequestedGuidanceForNonAdSources": true,
+    "labelIsClassificationHintNotIdentityPaymentOrConsentProof": true,
+    "nonAdReferralOrKnownContactRequiresExplicitBusinessIntentAndExactPersonEvidence": true,
+    "doNotConvertEveryPrivateChatToLead": true,
+    "preserveVerifiedSourceAndInitialRequest": true,
+    "providerAdAttributionIsSeparateFromHumanLabel": true,
+    "newLabelTaxonomyNotYetRequiredByThisReceipt": true
+  },
+  "boundaries": {
+    "existingCanonicalLeadOpsAndFinancialOwnersRequired": true,
+    "newScenariosOrConnectionsAuthorizedHere": false,
+    "outboundAllowed": false,
+    "financialAutomaticApplicationOnlyApprovedDirectEvidenceUniqueMatchFreshCas": true,
+    "ambiguousFinancialOrIdentityCasesRouteToOperationsWithOriginalEvidence": true
+  },
+  "rawHumanNamesEmailsOrMessageBodiesIncluded": false,
+  "canonicalWritesByThisReceipt": 0,
+  "messagesSent": 0,
+  "liveAccepted": false
+}

@@ -338,6 +338,120 @@ test('focal read rejects an expanded policy scope, incomplete census, and altere
  assert.throws(()=>identityDiagnostic.financialReport(request,{complete:false},{candidates:[]},[],()=>({})),/COMPLETE_CENSUS/);
  assert.throws(()=>identityDiagnostic.financialReport(request,{complete:true,sourceSha256:'d'.repeat(64)},{candidates:[]},[],()=>({})));
 });
+test('new statement census projects the existing snapshot only; positive paid facts and duplicate/zero exclusions stay separate',async()=>{
+ const {c,f,request}=identityFixture();request.financialPolicyIds=[...identityDiagnostic.financialPolicyIds];
+ request.newStatementSource={...identityDiagnostic.newStatementSource};
+ f.aseguradoras.push({id:'mapfre',pais:'GT',nombre:'MAPFRE SEGUROS GUATEMALA',activo:true});
+ f.polizas.push({id:'pol_statement_match',numero:'SCIN 4394',pais:'GT',moneda:'GTQ',clienteId:'holder',aseguradoraId:'mapfre',
+  vigenciaInicio:'2026-09-01',vigenciaFin:'2027-04-01',estado:'Vigente',frecuencia:'Mensual'});
+ f.polizas.push({id:'pol_statement_other_insurer',numero:'SCIN-4394',pais:'GT',clienteId:'holder',aseguradoraId:'rob'});
+ f.polizas.push({id:'pol_statement_other_product',numero:'AUTO-4394',pais:'GT',clienteId:'holder',aseguradoraId:'mapfre'});
+ f.recibosEsperados=[{id:'rec_statement',polizaId:'pol_statement_match',clienteId:'holder',primaTotal:379.63,
+  numeroReciboFuente:'139187477',cuota:'3/7',secuencia:3,fechaVencimientoContractual:'2026-11-01',privateNote:'PRIVATE_UNPUBLISHED'}];
+ f.carteraPrimas=[{id:'car_statement',reciboId:'rec_statement',polizaId:'pol_statement_match',primaTotal:379.63,carteraActiva:true}];
+ f.cobros=[{id:'cob_statement',reciboId:'rec_statement',polizaId:'pol_statement_match',monto:379.63,
+  fechaPago:'2026-11-04',paymentState:'PAID_DIRECT',applicationState:'APPLIED_DIRECT',conciliado:true,
+  invoiceNumber:'E5886356-3528738277',applicationDate:'2026-11-04',invoiceSeries:'PRIVATE_INVOICE_NOTE'}];
+ const state=isolatedStore(f),before=JSON.stringify([...state.entries]),baseline=await executeProtected(c,state,'preflight');
+ const probe=await executeProtected(c,state,'preflight',{},originalMatcher,request);
+ assert.equal(probe.exitCode,0,probe.errors.join('\n'));assert.deepEqual(probe.report.results,baseline.report.results);
+ assert.deepEqual(probe.report.totals,baseline.report.totals);assert.equal(JSON.stringify([...state.entries]),before);
+ const d=probe.report.readonlyIdentityReadbacks[0].financial;
+ assert.equal(d.newStatementSource.sourceFacts,56);assert.equal(d.newStatementSource.noEligibilityEffect,true);
+ assert.equal(d.newStatementSource.matchingPolicyEditions,2);assert.equal(d.writes,0);
+ const target=d.targets.find(x=>x.policy.id==='pol_statement_match');assert.ok(target);
+ assert.equal(target.newStatementMatches.length,2);
+ assert.deepEqual(target.newStatementMatches.map(x=>x.sourceRequirement),['139187477','139187476']);
+ assert.deepEqual(target.counts,{recibosEsperados:1,carteraPrimas:1,cobros:1});
+ assert.equal(target.records.find(x=>x.collection==='cobros').states.applicationState,'APPLIED_DIRECT');
+ assert.equal(target.records.find(x=>x.collection==='cobros').invoiceReferences.invoiceNumber,'E5886356-3528738277');
+ assert.equal(target.records.find(x=>x.collection==='cobros').dates.applicationDate,'2026-11-04');
+ assert.match(target.records.find(x=>x.collection==='cobros').invoiceReferences.invoiceSeries.valueSha256,/^[a-f0-9]{64}$/);
+ assert.ok(!JSON.stringify(d).includes('PRIVATE_'));assert.ok(!d.targets.some(x=>/other_insurer|other_product/.test(x.policy.id)));
+ const replay=await executeProtected(c,state,'preflight',{},originalMatcher,request);
+ assert.deepEqual(replay.report.readonlyIdentityReadbacks,probe.report.readonlyIdentityReadbacks);
+ assert.equal(JSON.stringify([...state.entries]),before);
+ const bad=structuredClone(request);bad.newStatementSource.sha256='f'.repeat(64);
+ assert.throws(()=>identityDiagnostic.validate(bad),/SOURCE_SCOPE_DRIFT/);
+ const badPath=structuredClone(request);badPath.newStatementSource.path='../../private';
+ assert.throws(()=>identityDiagnostic.validate(badPath),/SOURCE_SCOPE_DRIFT/);
+ const badCensus=structuredClone(request);delete badCensus.financialPolicyIds;
+ assert.throws(()=>identityDiagnostic.validate(badCensus),/CENSUS_REQUIRED/);
+});
+test('the 56-fact supplement preserves the reviewed33, all source hashes, currencies and commission component boundaries',()=>{
+ const fs=require('node:fs'),path=require('node:path'),crypto=require('node:crypto');
+ const bytes=fs.readFileSync(path.join(__dirname,'..',identityDiagnostic.newStatementSource.path)),s=JSON.parse(bytes);
+ assert.equal(crypto.createHash('sha256').update(bytes).digest('hex'),identityDiagnostic.newStatementSource.sha256);
+ assert.equal(crypto.createHash('sha256').update(JSON.stringify(s.facts.slice(0,33))).digest('hex'),
+  '391663cf8fb425bd5157558b40b4a04d749fa4c38d9f913002a85f2a63c8047e');
+ assert.equal(s.sources.length,10);assert.equal(s.facts.length,56);assert.equal(s.isolatedRows.length,22);
+ assert.equal(s.facts.filter(f=>f.state==='COMMISSION_ANCHOR').length,20);
+ assert.equal(s.facts.filter(f=>f.state==='COMMISSION_ANCHOR'&&f.grossCents===null).length,11);
+ assert.equal(s.facts.filter(f=>f.state==='PAID').reduce((n,f)=>n+f.grossCents,0),730803);
+ assert.equal(s.facts.filter(f=>f.state==='PENDING').reduce((n,f)=>n+f.grossCents,0),2230053);
+ assert.equal(s.facts.filter(f=>f.currency==='USD').length,1);
+ assert.equal(s.facts.find(f=>f.currency==='USD').grossCents,21495);
+ assert.ok(s.sources.every(x=>x.fullContractualSequenceAttested===false));
+ assert.equal(new Set(s.facts.map(f=>f.sourceFactId)).size,56);
+ for(const f of s.facts){
+  const original=s.sources.find(x=>x.sourceId===f.sourceId);assert.ok(original);
+  assert.equal(f.sourceSha256,original.sha256);assert.equal(f.sourceDriveId,original.driveFileId);
+  assert.equal(f.currency,original.currency);assert.match(f.sourceRowSha256,/^[a-f0-9]{64}$/);
+  assert.equal(Object.hasOwn(f,'holder'),false);assert.equal(Object.hasOwn(f,'email'),false);
+ }
+ for(const req of ['37260363','39470706']){
+  assert.equal(s.facts.filter(f=>f.requirement===req).length,1);
+  const component=s.isolatedRows.find(f=>f.requirement===req);assert.ok(component);
+  assert.match(component.reason,/NO_SECOND_PAYMENT/);
+ }
+ assert.match(s.facts.find(f=>f.requirement==='37260364').knownPreservationBoundary,/NO_SECOND_COBRO/);
+ assert.equal(s.facts.find(f=>f.requirement==='39470706').grossCents,null,'do not derive first gross from annual/12');
+ assert.equal(s.facts.find(f=>f.requirement==='39470707').grossCents,76440,'second payment amount is explicit insurer source');
+ assert.equal(s.isolatedRows.filter(f=>f.reason==='ZERO_AMOUNT_IS_NOT_PAYMENT_PROOF').length,12);
+});
+test('additional insurer witnesses retain currency, missing-country, product symbol and bare-number boundaries',()=>{
+ const {f,request}=identityFixture();request.financialPolicyIds=[...identityDiagnostic.financialPolicyIds];
+ request.newStatementSource={...identityDiagnostic.newStatementSource};
+ f.aseguradoras.push({id:'gyt',nombre:'SEGUROS G&T',pais:'GT'},{id:'unknown',nombre:'OTHER INSURER',pais:'GT'});
+ f.polizas.push(
+  {id:'vime_gtq',numero:'VIME-18154',aseguradoraId:'gyt',pais:'GT',moneda:'GTQ'},
+  {id:'tlg_usd',numero:'TLG$-7529',aseguradoraId:'gyt',pais:'GT',moneda:'USD'},
+  {id:'tlg_wrong_currency',numero:'TLG$-7529',aseguradoraId:'gyt',pais:'GT',moneda:'GTQ'},
+  {id:'tlg_wrong_symbol',numero:'TLG-7529',aseguradoraId:'gyt',pais:'GT',moneda:'USD'},
+  {id:'same_number_other_insurer',numero:'VIME-18154',aseguradoraId:'unknown',pais:'GT',moneda:'GTQ'},
+  {id:'uni603_bare_country_missing',numero:'603',aseguradoraId:'uni',moneda:'GTQ'},
+  {id:'uni603_other_product',numero:'AUTO-603',aseguradoraId:'uni',pais:'GT',moneda:'GTQ'});
+ const found=identityDiagnostic.statementPolicyMatches(request,f),get=id=>found.find(x=>x.policy.id===id);
+ assert.ok(get('vime_gtq'));assert.ok(get('tlg_usd'));
+ assert.equal(get('tlg_usd').matches[0].policyCurrencyMatchesSource,true);
+ assert.equal(get('tlg_wrong_currency').matches[0].policyCurrencyMatchesSource,false);
+ assert.equal(get('tlg_wrong_currency').matches[0].sourceCurrency,'USD');
+ assert.equal(get('tlg_wrong_symbol'),undefined);assert.equal(get('same_number_other_insurer'),undefined);
+ assert.equal(get('uni603_other_product'),undefined);
+ const bare=get('uni603_bare_country_missing');assert.ok(bare);
+ assert.ok(bare.matches.every(x=>x.policyCountryMatchesSource===false&&x.numberRelations.numero==='BARE_NUMBER_UNVERIFIED'));
+ assert.deepEqual(bare.matches.map(x=>x.sourceRequirement),['39460326','39460327']);
+});
+test('a paid historical Cobro with closed portfolio remains pending application during the expanded read-only census',async()=>{
+ const {c,f,request}=identityFixture();request.financialPolicyIds=[...identityDiagnostic.financialPolicyIds];
+ request.newStatementSource={...identityDiagnostic.newStatementSource};
+ f.aseguradoras.push({id:'gyt',nombre:'SEGUROS G&T',pais:'GT'});
+ f.polizas.push({id:'historical_gyt',numero:'VIME-18154',aseguradoraId:'gyt',pais:'GT',moneda:'GTQ',clienteId:'holder'});
+ f.recibosEsperados=[{id:'historical_receipt',polizaId:'historical_gyt',pais:'GT',moneda:'GTQ',primaTotal:538.35,
+  paymentState:'PAID_DIRECT',applicationState:'PENDING_APPLICATION',saldo:0,carteraActiva:false,numeroReciboFuente:'E-994147961'}];
+ f.carteraPrimas=[{id:'historical_portfolio',reciboId:'historical_receipt',polizaId:'historical_gyt',pais:'GT',saldo:0,carteraActiva:false}];
+ f.cobros=[{id:'historical_payment',reciboId:'historical_receipt',polizaId:'historical_gyt',pais:'GT',monto:538.35,
+  fechaPago:'2026-10-01',paymentState:'PAID_DIRECT',applicationState:'PENDING_APPLICATION',
+  paymentEvidenceType:'LEGACY_CENDOSO_FECHA_REAL_PAGADO',applicationEvidenceVerified:false,conciliado:false}];
+ const state=isolatedStore(f),before=JSON.stringify([...state.entries]);
+ const probe=await executeProtected(c,state,'preflight',{},originalMatcher,request);assert.equal(probe.exitCode,0,probe.errors.join('\n'));
+ const d=probe.report.readonlyIdentityReadbacks[0].financial,t=d.targets.find(t=>t.policy.id==='historical_gyt');
+ assert.equal(d.writes,0);assert.equal(t.counts.cobros,1);assert.equal(JSON.stringify([...state.entries]),before);
+ const payment=t.records.find(r=>r.collection==='cobros');
+ assert.equal(payment.states.applicationState,'PENDING_APPLICATION');assert.equal(payment.flags.conciliado,false);
+ assert.equal(payment.flags.applicationEvidenceVerified,false);assert.match(payment.documentSha256,/^[a-f0-9]{64}$/);
+ assert.equal(t.newStatementMatches[0].sourceRequirement,'E-994147961');
+});
 test('private diagnostics are preserved in the existing artifact report while eligibility-plan bytes remain untouched',()=>{
  const report={status:'BULK_SOURCE_CASE_READBACK_ONLY_NO_WRITES',readOnly:true,readyCount:0,writes:0,chunks:[]};
  const original=JSON.stringify(report),files=new Map([['/test/gi-i66-bulk-preflight.json',original],['/test/gi-i66-bulk-plan.json',original]]);

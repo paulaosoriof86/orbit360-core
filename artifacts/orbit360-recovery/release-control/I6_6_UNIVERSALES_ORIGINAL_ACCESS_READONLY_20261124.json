@@ -1,0 +1,127 @@
+{
+  "schema": "GI_I66_PINNED_MEDICAL_ORIGINAL_ACCESS_READONLY_RECEIPT_V1",
+  "status": "READONLY_CAUSE_CONFIRMED_ZERO_WRITES",
+  "gate": "I6.6",
+  "observedAtUtc": "2026-11-24T08:50:54.0263059Z",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "sourceSha": "16bc80c5a14eb95fa5d411f8f50eb890bebbbbaf",
+  "runId": 45359645453,
+  "preflightJobId": 138326117781,
+  "runUrl": "https://github.com/paulaosoriof86/orbit360-core/actions/runs/45359645453",
+  "identity": {
+    "principal": "firebase-adminsdk-fbsvc@ays-orbit-360-lab.iam.gserviceaccount.com",
+    "scope": "https://www.googleapis.com/auth/drive.readonly",
+    "credentialContentsPublished": false
+  },
+  "observedOriginals": [
+    {
+      "policy": "04-05-01-12289-4",
+      "fileId": "1vCSFXQD5NDGYHOrT-kxPoFbiciqnLIRI",
+      "metadataHttp": 200,
+      "mediaHttp": 200,
+      "canDownload": true,
+      "metadataIdentityMatches": true,
+      "metadataIsPdf": true,
+      "bytes": 362099,
+      "expectedSha256": "6c360b74ef73c971f856a66eb4f4aa906ea8c303faafcfe972e027b16620fc7e",
+      "observedSha256": "6c360b74ef73c971f856a66eb4f4aa906ea8c303faafcfe972e027b16620fc7e",
+      "status": "ISSUER_ORIGINAL_BYTES_VERIFIED"
+    },
+    {
+      "policy": "04-05-01-15590-0",
+      "fileId": "1nHigtnI2GJlKePaeyVyXlB_giCyIH2ss",
+      "metadataHttp": 404,
+      "mediaHttp": 404,
+      "expectedSha256": "78d78df726fa54c8ef2af5d728a50265db6956208b4a593eab433457f24b4e62",
+      "status": "ISSUER_DOCUMENT_HTTP_404",
+      "pinRelaxed": false
+    }
+  ],
+  "ownerContextComparison": {
+    "source": "Google Drive get_file_metadata for exact files and immediate parent folders",
+    "snapshotSha256": "f8a58998a2ce600d0802d4faf465b9b801dadacc91fcd8a727e0b553c072cf19",
+    "15590FileAndParentOnlyOwner": true,
+    "15590OwnerCanShare": true,
+    "12289FileAndParentHaveAnyoneWriter": true,
+    "permissionChangesMadeByProbe": 0
+  },
+  "cause": "Exact15590 original exists in the owner context but the configured service identity receives404 for metadata and media. Owner-visible permission metadata contains no service-account reader. No source-byte mismatch or policy identity mismatch was observed; the read could not reach the bytes.",
+  "legacyOriginalReadStatuses": {
+    "D01": "ISSUER_DOCUMENT_HTTP_404",
+    "D02": "ISSUER_ORIGINAL_BYTES_VERIFIED",
+    "D03": "ISSUER_ORIGINAL_BYTES_VERIFIED"
+  },
+  "evidence": {
+    "kind": "DECODED_PROVIDER_JOB_LOG_WITH_ORIGINAL_REDACTIONS",
+    "decodedProviderLogSha256": "00be52e24595a9df477a39c9b015f2dd4c790419f2590d71ead018728beed653",
+    "decodedProviderLogBytes": 265429,
+    "observedMarkerLineHashes": {
+      "I66_DOCUMENTARY_PROTECTED_ORIGINAL_ACCESS=": "fa9896cc0b034ef6a303b610e42e4f22e1b55c41c75f155a8e5b588c7c775025",
+      "I66_MEDICAL_ORIGINAL_ACCESS_IDENTITY=": "08a64cf68e9dc0d74802dd65a17122c704c376ef220c290b91c9bc733df199b5",
+      "I66_MEDICAL_PINNED_ORIGINAL_ACCESS=": "de4695d6d289dbde8fd170de6a1c907158041b89f98665b52494b26033dcf735"
+    },
+    "githubRedactionMaskPreserved": true,
+    "redactedPayloadReconstructed": false,
+    "liveWriteArtifactClaimed": false
+  },
+  "jobs": [
+    {
+      "id": 138326117781,
+      "name": "preflight",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 138326491671,
+      "name": "protected-issued-roble-two-24",
+      "status": "completed",
+      "conclusion": "skipped"
+    },
+    {
+      "id": 138326491845,
+      "name": "protected-d03-statement-series",
+      "status": "completed",
+      "conclusion": "skipped"
+    },
+    {
+      "id": 138326491854,
+      "name": "protected-issued-documentary-successor",
+      "status": "completed",
+      "conclusion": "skipped"
+    },
+    {
+      "id": 138326491912,
+      "name": "protected-issued-d03-source-schedule",
+      "status": "completed",
+      "conclusion": "skipped"
+    },
+    {
+      "id": 138326491973,
+      "name": "protected-issued-d01-source-schedule",
+      "status": "completed",
+      "conclusion": "skipped"
+    },
+    {
+      "id": 138326492550,
+      "name": "protected-source-bulk-live",
+      "status": "completed",
+      "conclusion": "skipped"
+    }
+  ],
+  "protectedJobsSkipped": 6,
+  "dataWrites": 0,
+  "drivePermissionWrites": 0,
+  "sourceDocumentBytesChanged": false,
+  "originalCopied": false,
+  "nextActionScope": {
+    "fileId": "1nHigtnI2GJlKePaeyVyXlB_giCyIH2ss",
+    "principal": "firebase-adminsdk-fbsvc@ays-orbit-360-lab.iam.gserviceaccount.com",
+    "role": "reader",
+    "notify": false,
+    "folderPermissionChanges": false,
+    "publicPermissionChanges": false,
+    "afterActionRequiresSameIdentityOriginalReadAndSameSha256": true
+  },
+  "claimBoundary": "This is the observed pre-remediation access snapshot and a zero-write diagnostic receipt. It does not certify a permission grant or application of the ten held15590 obligations."
+}

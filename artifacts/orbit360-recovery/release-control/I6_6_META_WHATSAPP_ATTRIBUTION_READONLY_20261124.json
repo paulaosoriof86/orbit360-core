@@ -1,0 +1,88 @@
+{
+  "schema": "GI_I66_META_WHATSAPP_ATTRIBUTION_READONLY_V1",
+  "gate": "I6.6",
+  "dateGuatemala": "2026-11-24",
+  "status": "CONNECTED_AD_METADATA_VERIFIED_REAL_INBOUND_JOIN_PENDING",
+  "connector": "windsor.ai/facebook",
+  "accountId": "2031445257682103",
+  "dateRange": {
+    "from": "2026-11-17",
+    "through": "2026-11-24"
+  },
+  "scope": "BOUNDED_EXISTING_ACCOUNT_METADATA_READ_ONLY_NOT_COMPLETE_HISTORICAL_AD_INVENTORY",
+  "returnedRows": 1,
+  "ad": {
+    "ad_id": "120249969703720252",
+    "ad_name": "EMP-01 | Empresas | WA",
+    "adset_id": "120249969703750252",
+    "adset_name": "EMP-01 | EMPRESAS | GT | WA",
+    "campaign_id": "120249859829250252",
+    "campaign": "AYS_GT_META_PF_LIV_PES_WA_R1_202611",
+    "creative_id": "1304182775173871",
+    "adset_destination_type": "WHATSAPP",
+    "effective_object_story_id": "887584361095288_122150716857063843"
+  },
+  "creative": {
+    "id": "1304182775173871",
+    "title": "Primero, hablemos de su empresa.",
+    "bodySha256": "78072863a6de1f1f050ca9f6b9899b7d300f3a0f148dc590a156f5421cfec0cd",
+    "bodyPublished": false,
+    "linkUrlPresent": false,
+    "callToActionUrl": "https://api.whatsapp.com/send",
+    "specificProductVerified": false,
+    "approvedCatalogProductId": null,
+    "interpretation": "The observed creative asks about enterprise activity and needs. It does not establish a specific insurance product."
+  },
+  "sourceProof": {
+    "inventoryCanonicalJsonSha256": "1704db03b2f69b425abce2a9b8d145a234b3c46d84c1ff105947d9f80f014751",
+    "creativeCanonicalJsonSha256": "16f6cc13ce855bcf7b4a4317069d46c7bf9a59c9f0555f64216cbce7b605349e"
+  },
+  "providerReferences": [
+    {
+      "url": "https://green-api.com/en/docs/api/journals/GetMessage/",
+      "kind": "GREENAPI_OFFICIAL_CURRENT_PROVIDER_CONTRACT",
+      "fields": [
+        "idMessage",
+        "textMessage",
+        "extendedTextMessage.text",
+        "extendedTextMessage.description",
+        "extendedTextMessage.title",
+        "extendedTextMessage.sourceId",
+        "extendedTextMessage.sourceType",
+        "extendedTextMessage.sourceUrl",
+        "extendedTextMessage.ctwaClid",
+        "extendedTextMessage.sourceApp",
+        "extendedTextMessage.greetingMessageBody"
+      ]
+    },
+    {
+      "url": "https://developers.facebook.com/documentation/business-messaging/whatsapp/reference/webhooks/whatsapp-incoming-webhook-payload",
+      "kind": "META_OFFICIAL_INCOMING_MESSAGE_REFERRAL",
+      "fields": [
+        "source_id",
+        "source_type",
+        "source_url",
+        "body",
+        "headline",
+        "ctwa_clid"
+      ]
+    }
+  ],
+  "implementationBoundaries": {
+    "primaryLeadOriginProof": "INDEPENDENT_VERIFIED_GREENAPI_MESSAGE",
+    "enrichmentJoin": "EXACT_AD_ID_WITHIN_VERIFIED_CONNECTED_ACCOUNT",
+    "customerInitialMessageSeparateFromAdCopyAndAutomatedGreeting": true,
+    "preserveExistingLeadOnEnrichmentReplay": true,
+    "unknownOrConflictingAdMetadataMustNotInventProduct": true,
+    "metaUnavailableMustNotBlockOtherwiseVerifiedInboundLead": true,
+    "catalogLookupCreatesLeadByItself": false,
+    "realIncomingAdMatchedDuringThisRead": false,
+    "canonicalBusinessWrites": 0,
+    "campaignChanges": 0,
+    "budgetChanges": 0,
+    "conversionEventsSent": 0,
+    "customerDataSentToMeta": 0,
+    "messagesSent": 0,
+    "fullA13Accepted": false
+  }
+}

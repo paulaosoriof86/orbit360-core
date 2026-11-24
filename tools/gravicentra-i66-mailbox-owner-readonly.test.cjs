@@ -1,6 +1,7 @@
 'use strict';
 const test=require('node:test'),assert=require('node:assert/strict');
 const M=require('./gravicentra-i66-mailbox-owner-readonly.cjs');
+const crypto=require('node:crypto'),sha=v=>crypto.createHash('sha256').update(v).digest('hex');
 const row=()=>({id:'synthetic_member',data:{id:'synthetic_member',tenantId:M.TENANT,email:M.PILOT,status:'active',countries:['GT'],roles:['operativo'],correoAutorizado:true}});
 const auth=()=>({synthetic_member:{exists:true,uid:'synthetic_member',email:M.PILOT,emailVerified:true,disabled:false}});
 const report=(r=row(),a=auth())=>M.inspect({members:[r],advisors:[],authResults:a});
@@ -46,4 +47,24 @@ test('bounded projected census and narrowly matched Auth read make no writes',as
 test('truncated census and provider failures cannot become empty successful ownership',async()=>{
   assert.throws(()=>M.inspect({members:Array.from({length:201},row),advisors:[]}),/CENSUS_BOUND/);
   const r=report(row(),{});assert.equal(r.memberCandidates[0].authReadCompleted,false);assert.equal(r.exactActiveGtIdentityCandidates,0);
+});
+test('confirmed self-mailbox binding resolves the prior signed UID with the actual role owner, not mailbox/login equality',()=>{
+  const m=row();m.data.uid=m.id;m.data.email='login@example.test';m.data.roles=['direccion'];
+  const a=auth();a[m.id].email='login@example.test';
+  const r=M.inspect({members:[m],advisors:[],authResults:a,expectedDirectionUidSha256:sha(m.id)});
+  assert.equal(r.memberCandidatesCount,0);assert.equal(r.selfBindingVerification.currentVerifiedIdentityCount,1);
+  assert.equal(r.mailboxOwnershipBindingAccepted,false);assert.equal(r.canonicalWrites,0);
+});
+test('only explicit assigned Direction role plus current Auth and exact UID can confirm that identity',()=>{
+  for(const mutate of [m=>m.data.uid='other',m=>delete m.data.uid,m=>m.data.userId='other',m=>m.data.roles=['admin'],
+    m=>{m.data.roles=[];m.data.rol='direccion';},m=>m.data.estado='inactive',m=>m.data.countries=['CO']]){
+    const m=row();m.data.uid=m.id;m.data.roles=['direccion'];mutate(m);
+    const r=M.inspect({members:[m],advisors:[],authResults:auth(),expectedDirectionUidSha256:sha(m.id)});
+    assert.equal(r.selfBindingVerification.currentVerifiedIdentityCount,0);
+  }
+});
+test('another Direction user with the same role does not substitute for the signed owner UID',()=>{
+  const m=row();m.data.uid=m.id;m.data.roles=['direccion'];
+  const r=M.inspect({members:[m],advisors:[],authResults:auth(),expectedDirectionUidSha256:sha('different_user')});
+  assert.equal(r.selfBindingVerification.matchingMemberCount,0);assert.equal(r.mailboxOwnershipBindingAccepted,false);
 });
