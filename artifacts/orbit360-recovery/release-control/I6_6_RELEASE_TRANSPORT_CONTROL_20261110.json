@@ -4821,49 +4821,30 @@
     "liveProofSha256": "4013a99719ba5f8bb3087a5e5f43c189a22daf55aabfcea37e8df5030bb5653c"
   },
   "frontendPreviewRequest": {
-    "version": 14,
-    "mode": "COMPOSITE_ARTIFACT_HOSTING_PREVIEW_ONLY",
-    "sourceQaHead": "976a3705126b764d2fcd8d3eb5d368082dd75082",
-    "manifestBlob": "7f693bd0e1a7faaa6cbc95794ef5123c91c5efa4",
-    "sourceQaRunId": 45287058338,
-    "guardRunId": 45287058194,
-    "previousReceiptBlob": "d39f216defb2959b47087da84cc87b32b97faa94",
+    "version": 15,
+    "mode": "PREVIEW_HOSTING_ONLY",
+    "sourceQaHead": "c6401502e0a00843e0ea2e1e0494accfa3e40586",
+    "manifestBlob": "2d9d4e08648b562d9d51f1dd96ea97abc8b2bf69",
+    "sourceQaRunId": 45338141255,
+    "guardRunId": 45338141269,
+    "previousReceiptBlob": "11fdb3bee494541513482666d6215f45cbad0567",
     "productPaths": [
-      "functions/product-ops-leads-domain.js",
-      "orbit360-platform/core/auth-product-runtime-p0.js",
-      "orbit360-platform/core/backend-product-readonly-bootstrap-p0.js",
-      "orbit360-platform/core/ciclo.js",
-      "orbit360-platform/modules/cliente360.js",
-      "orbit360-platform/modules/cobros.js",
-      "orbit360-platform/modules/portal.js"
+      "orbit360-platform/core/queries.js"
     ],
-    "backendPaths": [
-      "functions/product-ops-leads-domain.js"
-    ],
-    "backendPathBlobs": {
-      "functions/product-ops-leads-domain.js": "b7921ca88343ced65bdad4cd9de26fa120647083"
-    },
-    "backendPreviewRequired": true,
+    "backendPaths": [],
+    "backendPathBlobs": {},
+    "backendPreviewRequired": false,
     "backendLiveDeployAllowed": false,
+    "fourFunctionExactPreviewRequired": false,
     "realDataWritesAllowed": false,
-    "immutableArtifactMustCoverBothFrontendAndBackend": true,
-    "ownerInstruction": "23-Nov Dirección: publish only current approved cumulative source after signed Preview and exact SAME digest; never deploy backend LIVE or production writes from this request.",
-    "scope": "I6.6 only: build one exact frontend+backend artifact; publish Hosting Preview only, then separately authorize scoped backend Preview tests. No LIVE.",
-    "reason": "V13 signed Preview passed; LIVE failed before mutation because a historical Preview test required current LIVE authorization to remain false. V14 preserves all product bytes and historical facts, fixes phase-scoped QA and linked test-only manifest revisions, freezes those release owners before a NEW immutable build.",
-    "opsLeadsPreviewFunction": "orbit360OpsLeadsCommandPreview",
-    "opsLeadsLiveFunction": "orbit360OpsLeadsCommand",
-    "fourFunctionExactPreviewRequired": true,
     "realCustomerWritesAllowed": false,
     "liveDeployAuthorized": false,
-    "previousPreviewFailureRun": 45277851717,
-    "previousPreviewFailureCheck": "I66_DOCUMENTED_TERMS_SIGNED_HOLD",
     "releaseAfterPreviewAllowed": false,
-    "releaseMechanismSourceSha": "976a3705126b764d2fcd8d3eb5d368082dd75082",
-    "previousBuildFailureRun": 45266197734,
-    "previousBuildFailureCheck": "FIXED_REQUEST_VERSION_ASSERTION",
-    "previousPreviewFailureStage": "FORM_FIELDS",
-    "previousLivePromotionFailureRun": 45284653398,
-    "previousLivePromotionFailureCheck": "HISTORICAL_PREVIEW_FLAGS_APPLIED_TO_CURRENT_AUTHORIZED_LIVE"
+    "releaseMechanismSourceSha": "c6401502e0a00843e0ea2e1e0494accfa3e40586",
+    "ownerInstruction": "Continue the authorized I6.6 causal correction and publish only after exact Preview and LIVE proof. Preserve all accepted financial writes and previous release evidence.",
+    "scope": "I6.6 frontend-only canonical future-pending balance proof. Build once and publish Hosting Preview only. No backend, data, rules, or Auth changes.",
+    "reason": "Signed E3 observation45332501772 proves the canonical producer emits futuro_pendiente while the read-model balance fallback rejects it. Correct exact known pending semantics with contradictory-payment guards, then verify48 real role/viewport/reload stages per phase on the SAME artifact.",
+    "causalReceipt": "artifacts/orbit360-recovery/release-control/I6_6_FUTURE_PENDING_BALANCE_OWNER_CAUSAL_CORRECTION_20261124.json"
   },
   "previousPhysicalHostingRelease": {
     "sourceSha": "15e849bd606bd8c93e4c0471da1193e85004aecd",
@@ -5886,6 +5867,51 @@
     }
   },
   "lastConsumedFrontendPreviewRequest": {
+    "version": 14,
+    "mode": "COMPOSITE_ARTIFACT_HOSTING_PREVIEW_ONLY",
+    "sourceQaHead": "976a3705126b764d2fcd8d3eb5d368082dd75082",
+    "manifestBlob": "7f693bd0e1a7faaa6cbc95794ef5123c91c5efa4",
+    "sourceQaRunId": 45287058338,
+    "guardRunId": 45287058194,
+    "previousReceiptBlob": "d39f216defb2959b47087da84cc87b32b97faa94",
+    "productPaths": [
+      "functions/product-ops-leads-domain.js",
+      "orbit360-platform/core/auth-product-runtime-p0.js",
+      "orbit360-platform/core/backend-product-readonly-bootstrap-p0.js",
+      "orbit360-platform/core/ciclo.js",
+      "orbit360-platform/modules/cliente360.js",
+      "orbit360-platform/modules/cobros.js",
+      "orbit360-platform/modules/portal.js"
+    ],
+    "backendPaths": [
+      "functions/product-ops-leads-domain.js"
+    ],
+    "backendPathBlobs": {
+      "functions/product-ops-leads-domain.js": "b7921ca88343ced65bdad4cd9de26fa120647083"
+    },
+    "backendPreviewRequired": true,
+    "backendLiveDeployAllowed": false,
+    "realDataWritesAllowed": false,
+    "immutableArtifactMustCoverBothFrontendAndBackend": true,
+    "ownerInstruction": "23-Nov Dirección: publish only current approved cumulative source after signed Preview and exact SAME digest; never deploy backend LIVE or production writes from this request.",
+    "scope": "I6.6 only: build one exact frontend+backend artifact; publish Hosting Preview only, then separately authorize scoped backend Preview tests. No LIVE.",
+    "reason": "V13 signed Preview passed; LIVE failed before mutation because a historical Preview test required current LIVE authorization to remain false. V14 preserves all product bytes and historical facts, fixes phase-scoped QA and linked test-only manifest revisions, freezes those release owners before a NEW immutable build.",
+    "opsLeadsPreviewFunction": "orbit360OpsLeadsCommandPreview",
+    "opsLeadsLiveFunction": "orbit360OpsLeadsCommand",
+    "fourFunctionExactPreviewRequired": true,
+    "realCustomerWritesAllowed": false,
+    "liveDeployAuthorized": false,
+    "previousPreviewFailureRun": 45277851717,
+    "previousPreviewFailureCheck": "I66_DOCUMENTED_TERMS_SIGNED_HOLD",
+    "releaseAfterPreviewAllowed": false,
+    "releaseMechanismSourceSha": "976a3705126b764d2fcd8d3eb5d368082dd75082",
+    "previousBuildFailureRun": 45266197734,
+    "previousBuildFailureCheck": "FIXED_REQUEST_VERSION_ASSERTION",
+    "previousPreviewFailureStage": "FORM_FIELDS",
+    "previousLivePromotionFailureRun": 45284653398,
+    "previousLivePromotionFailureCheck": "HISTORICAL_PREVIEW_FLAGS_APPLIED_TO_CURRENT_AUTHORIZED_LIVE"
+  },
+  "priorFrontendPreviewRequestBeforeV15_20261124": {
     "version": 14,
     "mode": "COMPOSITE_ARTIFACT_HOSTING_PREVIEW_ONLY",
     "sourceQaHead": "976a3705126b764d2fcd8d3eb5d368082dd75082",

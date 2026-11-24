@@ -27,7 +27,7 @@
     "activeGate": "I6.6",
     "closedHistoricalGate": "B4-007",
     "latestProvenLiveSource": "65c825b2808a615ca4195bdde6689dbdbe3193b2",
-    "currentWork": "I6.6: continuar las capacidades pendientes del plan congelado: A03 Acceso desde Chrome de Dirección; A04 Matriz completa de permisos reales Operativo/Admin/SuperAdmin/Dirección/Asesor; A05 Cliente360 edición, gestiones, actividad, notas y adjuntos; A06 Ops/Leads y oportunidad/inspección desde cliente existente; A07 Emisión de póliza nueva, asesor y primas de Sergio; A08 Renovación en firme, hija, calendarios y Kanban; A09 Sustitución de vehículo con endoso emitido exacto; A10 Cobros reales sin documentos y con factura en una operación; A11 Drive OAuth y subida/lectura de documentos real; A12 Lote incremental real aplicado y probado; A13 Leads WhatsApp/form/correo mediante Make escritor autorizado; A14 QA transversal módulos, viewport, rendimiento y reinicio. El artifact sha256:7cb782848a45083047c4899bc30c13bf5be46429607e42597d09342becfc9acc ya está aceptado; retomar sus pruebas pendientes y la operación autorizada, sin repetir su build ni promoción.",
+    "currentWork": "I6.6: construir una sola vez la corrección causal de saldo futuro pendiente y sus owners de QA congelados; probar 48 etapas en Preview, promover exactamente el mismo artifact y demostrar 48 etapas LIVE con lectura final y rollback. E3 sigue siendo el release físico hasta aceptación de su sucesor. Preservar 148 pagos históricos, 24 obligaciones nuevas y todas las pruebas previas; continuar los demás objetivos incompletos sin declararlos PASS.",
     "latestHostingPreviewEvidence": "artifacts/orbit360-recovery/release-control/I6_6_NETWORK_DIAGNOSTICS_PREVIEW_BUILD_20261117.json",
     "latestHostingPreviewSource": "1b65a790530d49fe1d1fb451f02838fd9a713c53",
     "operationsEvidenceReview": "artifacts/orbit360-recovery/release-control/I6_6_OPS_EVIDENCE_AND_PREVIEW_BINDING_REVIEW_20261116.json",
@@ -1898,6 +1898,27 @@
         "repeatAcceptedRecords": false
       },
       "fullA12Passed": false,
+      "fullI66ProductionAccepted": false
+    },
+    "frontendBalanceCorrection20261124": {
+      "status": "SOURCE_AND_QA_FROZEN_PREVIEW_BUILD_REQUESTED_NOT_DEPLOYED",
+      "sourceProductCommit": "95214f67dd607713b5a9b46e2af4ba58c6513cad",
+      "sourceQaHead": "c6401502e0a00843e0ea2e1e0494accfa3e40586",
+      "sourceQaRunId": 45338141255,
+      "guardRunId": 45338141269,
+      "productPath": "orbit360-platform/core/queries.js",
+      "productGitBlobSha": "b77b65f86ef6ac2ab6dc157fdbc9ad5e34dbcdcc",
+      "manifestGitBlobSha": "2d9d4e08648b562d9d51f1dd96ea97abc8b2bf69",
+      "requestVersion": 15,
+      "mode": "PREVIEW_HOSTING_ONLY",
+      "causalObserverRunId": 45332501772,
+      "expectedPreviewStages": 48,
+      "expectedLiveStages": 48,
+      "frontendOnly": true,
+      "backendDeploys": 0,
+      "financialWrites": 0,
+      "previewAccepted": false,
+      "liveAccepted": false,
       "fullI66ProductionAccepted": false
     }
   },
@@ -5232,7 +5253,7 @@
     "i63LiveReadbackPass": true,
     "i63DeterministicDiffReady": true
   },
-  "nextAction": "I6.6: continuar las capacidades pendientes del plan congelado: A03 Acceso desde Chrome de Dirección; A04 Matriz completa de permisos reales Operativo/Admin/SuperAdmin/Dirección/Asesor; A05 Cliente360 edición, gestiones, actividad, notas y adjuntos; A06 Ops/Leads y oportunidad/inspección desde cliente existente; A07 Emisión de póliza nueva, asesor y primas de Sergio; A08 Renovación en firme, hija, calendarios y Kanban; A09 Sustitución de vehículo con endoso emitido exacto; A10 Cobros reales sin documentos y con factura en una operación; A11 Drive OAuth y subida/lectura de documentos real; A12 Lote incremental real aplicado y probado; A13 Leads WhatsApp/form/correo mediante Make escritor autorizado; A14 QA transversal módulos, viewport, rendimiento y reinicio. El artifact sha256:7cb782848a45083047c4899bc30c13bf5be46429607e42597d09342becfc9acc ya está aceptado; retomar sus pruebas pendientes y la operación autorizada, sin repetir su build ni promoción.",
+  "nextAction": "I6.6: construir una sola vez la corrección causal de saldo futuro pendiente y sus owners de QA congelados; probar 48 etapas en Preview, promover exactamente el mismo artifact y demostrar 48 etapas LIVE con lectura final y rollback. E3 sigue siendo el release físico hasta aceptación de su sucesor. Preservar 148 pagos históricos, 24 obligaciones nuevas y todas las pruebas previas; continuar los demás objetivos incompletos sin declararlos PASS.",
   "postproductionExitProgress": {
     "formalPercent": 60,
     "frozenMiniGates": 6,
@@ -24905,8 +24926,8 @@
   },
   "i66ActiveRecoveryCursor": {
     "status": "FROZEN_I66_SHOCK_EXECUTION_CONTINUES_NO_GATE_REPLACEMENT",
-    "currentEvidencePath": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_EXECUTION_PROGRESS_20261124_R25.json",
-    "currentEvidenceBlobSha": "969982b9bd81b1a37283acf5cf5f3073a6351098",
+    "currentEvidencePath": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_EXECUTION_PROGRESS_20261124_R26.json",
+    "currentEvidenceBlobSha": "6e088bd2173aa79e474f1e601c6128c8876e0be9",
     "frozenPlanPath": "artifacts/orbit360-recovery/release-control/I6_6_PLAN_CHOQUE_FUNCIONAL_FINANCIERO_20261122.md",
     "frozenPlanBlobSha": "fbfd54d229a13101fbfb0dfc6e92a5fa524999b6",
     "fullInventoryPath": "artifacts/orbit360-recovery/release-control/I6_6_INVENTARIO_INTEGRAL_295_20261122.md",
@@ -24921,14 +24942,14 @@
     "moduleReleasedThisIteration": false,
     "financialDeltaCasesPrepared": 113,
     "financialRowsAppliedThisIteration": 82,
-    "lastEvidenceDateLocal": "2026-11-23",
+    "lastEvidenceDateLocal": "2026-11-24",
     "noNormativeProjectSourceChange": true,
-    "next": "I6.6: continuar las capacidades pendientes del plan congelado: A03 Acceso desde Chrome de Dirección; A04 Matriz completa de permisos reales Operativo/Admin/SuperAdmin/Dirección/Asesor; A05 Cliente360 edición, gestiones, actividad, notas y adjuntos; A06 Ops/Leads y oportunidad/inspección desde cliente existente; A07 Emisión de póliza nueva, asesor y primas de Sergio; A08 Renovación en firme, hija, calendarios y Kanban; A09 Sustitución de vehículo con endoso emitido exacto; A10 Cobros reales sin documentos y con factura en una operación; A11 Drive OAuth y subida/lectura de documentos real; A12 Lote incremental real aplicado y probado; A13 Leads WhatsApp/form/correo mediante Make escritor autorizado; A14 QA transversal módulos, viewport, rendimiento y reinicio. El artifact sha256:7cb782848a45083047c4899bc30c13bf5be46429607e42597d09342becfc9acc ya está aceptado; retomar sus pruebas pendientes y la operación autorizada, sin repetir su build ni promoción.",
+    "next": "I6.6: construir una sola vez la corrección causal de saldo futuro pendiente y sus owners de QA congelados; probar 48 etapas en Preview, promover exactamente el mismo artifact y demostrar 48 etapas LIVE con lectura final y rollback. E3 sigue siendo el release físico hasta aceptación de su sucesor. Preservar 148 pagos históricos, 24 obligaciones nuevas y todas las pruebas previas; continuar los demás objetivos incompletos sin declararlos PASS.",
     "lastFunctionalLiveUatRunId": 45074429319,
     "lastFunctionalLiveUatJobId": 137352857627,
     "lastFunctionalLiveScope": "TWO_ROLE_RENEWAL_INSURER_SYNTHETIC_PASS_REAL_ISSUANCE_AND_DOCUMENT_HOLD",
-    "previousEvidencePath": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_EXECUTION_PROGRESS_20261124_R24.json",
-    "previousEvidenceBlobSha": "9bd4efe30e235cb5cb883106353bdac1ed327dc3",
+    "previousEvidencePath": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_EXECUTION_PROGRESS_20261124_R25.json",
+    "previousEvidenceBlobSha": "969982b9bd81b1a37283acf5cf5f3073a6351098",
     "lastFunctionalLiveUatStatus": "LIVE_PHYSICAL_STEPS_PASS_FIVE_ROLE_FINAL_COVERAGE_FAIL_CLOSED",
     "lastFinancialProtectedPreflightRunId": 45332501697,
     "lastFinancialSourceStatus": "148_PAYMENTS_24_NEW_OBLIGATIONS_READBACK_PASS_302_REFRESH_214_UNCHANGED_88_ISOLATED_0_ELIGIBLE",
@@ -24956,7 +24977,7 @@
     "financialHistoricalPaymentsAppliedThisContinuation": 148,
     "financialHistoricalPaidReceiptsMaterializedThisContinuation": 146,
     "financialNewPendingObligationsThisContinuation": 24,
-    "moduleReleasedThisIterationScope": "This continuity published QA, protected writers, data receipts and progress; accepted E3 physical release remains unchanged."
+    "moduleReleasedThisIterationScope": "Source correction and QA owners frozen; E3 physical release remains unchanged until same-artifact successor acceptance."
   },
   "i66PreversionedControlViewBlob": "de401082f688ce1c59f025f6f39e3c947dceaa35",
   "i66FrontendReleaseHead": {
