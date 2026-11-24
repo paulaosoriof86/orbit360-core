@@ -9,6 +9,10 @@ const file=fs.readFileSync('tools/gravicentra-i6-6-frontend-preview-authority.cj
 const control=JSON.parse(fs.readFileSync('artifacts/orbit360-recovery/release-control/I6_6_RELEASE_TRANSPORT_CONTROL_20261110.json','utf8'));
 const req=control.frontendPreviewRequest;
 const git=(...args)=>execFileSync('git',args,{encoding:'utf8',maxBuffer:8*1024*1024}).trim();
+// Historical two-owner fixtures must remain anchored to their published request.
+// The current request above is still used by the real source-epoch checks.
+const historicalRequest28Source='74ae28c6e6e6b40f845567c9b00738a58307b3cb';
+const historicalRequest28=JSON.parse(git('show',historicalRequest28Source+':artifacts/orbit360-recovery/release-control/I6_6_RELEASE_TRANSPORT_CONTROL_20261110.json')).frontendPreviewRequest;
 const sha=p=>git('rev-parse',req.sourceQaHead+':'+p);
 const frontendPath=p=>/^orbit360-platform\/(modules|core)\/[\w.-]+\.js$/.test(p);
 // A retained request belongs to its signed source-QA epoch. Its historical
@@ -189,7 +193,7 @@ const clone=x=>JSON.parse(JSON.stringify(x));
 const financialOwner=require('./gravicentra-i6-6-frontend-preview-authority.cjs');
 function financialFixture(){
  const crypto=require('node:crypto'),h=x=>crypto.createHash('sha1').update(String(x)).digest('hex');
- const previous=clone(req),currentSource=h('synthetic accepted E3'),sourceQaHead=h('synthetic financial source');
+ const previous=clone(historicalRequest28),currentSource=h('synthetic accepted E3'),sourceQaHead=h('synthetic financial source');
  const paths=financialOwner.FINANCIAL_PATHS,authority=JSON.parse(fs.readFileSync(financialOwner.FINANCIAL_AUTHORITY_PATH));
  const receipt={schema:'GI_I66_R51_DOCUMENTARY_PAYMENT_FINANCIAL_RECOVERY_SOURCE_V1',status:'SOURCE_FOCAL_REGRESSION_PASS_SIGNED_PREVIEW_LIVE_PENDING',gate:'I6.6',classification:'PRODUCT',
   authority:{path:financialOwner.FINANCIAL_AUTHORITY_PATH,gitBlobSha:h('synthetic authority')},priorToleranceAuthority:clone(authority.decisions.priorToleranceAuthority),
@@ -359,8 +363,8 @@ test('the exact product union rejects any unauthorized path even when it resembl
  }
 });
 function directFormsFixture(){
- const previous=clone(req),head='74ae28c6e6e6b40f845567c9b00738a58307b3cb';
- const cp=JSON.parse(fs.readFileSync('artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json'));
+ const previous=clone(historicalRequest28),head='74ae28c6e6e6b40f845567c9b00738a58307b3cb';
+ const cp=JSON.parse(git('show',head+':artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json'));
  const currentSource=cp[cp.currentExecutionDecisionPointer].sourceSha;
  const receipt=JSON.parse(fs.readFileSync(DIRECT_FORMS_RECEIPT_PATH));
  const productPathBlobs=Object.fromEntries(receipt.files.filter(row=>DIRECT_FORMS_PATHS.includes(row.path)).map(row=>[row.path,row.gitBlobSha]));
@@ -646,4 +650,63 @@ test('insurer source and both predecessor identities plus new QA pins are checke
 });
 test('the historical source322 direct-forms receipt cannot approve the newer assigned-role driver bytes',()=>{
  const f=revisedDirectFormsFixture();assert.throws(()=>validateDirectFixture(f,{readBlob:(ref,p)=>[f.request.sourceQaHead,'HEAD'].includes(ref)&&qaRevision.DIRECT_FORMS_ASSIGNED_ROLES_CHANGED_QA.includes(p)?qaHash(fs.readFileSync(p)):f.readBlob(ref,p)}),/PRODUCT_OR_QA_SOURCE_DRIFT/);
+});
+
+
+// This continuity fixture is synthetic and reads the exact published receipts;
+// it is not a replacement control, signed source-QA result, or release authority.
+function assignedContinuityFixture(){
+ const f=assignedInsurerFixture();f.previous=clone(f.request);f.previous.version=29;f.request.version=30;return f;
+}
+test('historical two-owner fixtures remain bound to published request28 while current source-epoch checks keep the live control',()=>{
+ assert.equal(historicalRequest28.version,28);assert.equal(historicalRequest28.productPaths.length,11);
+ assert.deepEqual(Object.keys(historicalRequest28.directFormsRecovery.productPathBlobs).sort(),DIRECT_FORMS_PATHS);
+ assert.equal(historicalRequest28.directFormsQaProfile,undefined);
+ assert.equal(historicalRequest28.financialRecovery,undefined);assert.equal(historicalRequest28.cancellationRecovery,undefined);
+ for(const f of [financialFixture(),directFormsFixture()])assert.deepEqual(f.previous,historicalRequest28);
+ assert.equal(req,control.frontendPreviewRequest);
+});
+test('request30 retains the exact three-owner request29 successor and revalidates the twenty-one-owner composition',()=>{
+ const f=assignedContinuityFixture(),reads=[],original=f.readBlob;
+ f.readBlob=(ref,p)=>{reads.push([ref,p]);return original(ref,p);};
+ assert.equal(previewRequestTransition(f.request,f.previous),true);
+ const result=validateAssignedComposition(f);
+ assert.deepEqual(result.direct,qaRevision.exactPathUnion(DIRECT_FORMS_PATHS,[qaRevision.DIRECT_FORMS_INSURER_EDITOR_PATH]));
+ assert.equal(f.request.productPaths.length,21);assert.deepEqual(f.request.directFormsRecovery,f.previous.directFormsRecovery);
+ assert.equal(f.request.directFormsRecovery.receiptBlob,qaRevision.DIRECT_FORMS_ASSIGNED_ROLES_RECEIPT_BLOB);
+ for(const ref of [f.request.sourceQaHead,'HEAD'])for(const p of [qaRevision.DIRECT_FORMS_ASSIGNED_ROLES_RECEIPT_PATH,...result.direct,...qaRevision.DIRECT_FORMS_QA_REVISION_PATHS])
+  assert.ok(reads.some(row=>row[0]===ref&&row[1]===p),'continuity must revalidate '+ref+':'+p);
+ assert.deepEqual(f.request.backendPaths,makeScope.SOURCE_PATHS);assert.equal(f.request.fiveFunctionExactPreviewRequired,true);
+ assert.equal(f.request.backendLiveDeployAllowed,false);assert.equal(f.request.realDataWritesAllowed,false);
+});
+test('three-owner continuity rejects a changed predecessor extension, product map, profile, backend or startup',()=>{
+ const o=qaRevision,insurer=o.DIRECT_FORMS_INSURER_EDITOR_PATH;
+ const mutations=[
+  f=>{delete f.previous.directFormsRecovery.productPathBlobs[insurer];},
+  f=>{f.previous.directFormsRecovery.productPathBlobs['orbit360-platform/core/unapproved.js']='f'.repeat(40);},
+  f=>{f.previous.directFormsRecovery.productPathBlobs[insurer]='f'.repeat(40);},
+  f=>{f.previous.directFormsRecovery.productPathBlobs[DIRECT_FORMS_PATHS[0]]='f'.repeat(40);},
+  f=>{f.previous.directFormsRecovery.receiptPath=o.DIRECT_FORMS_QA_REVISION_RECEIPT_PATH;},
+  f=>{f.previous.directFormsRecovery.receiptBlob='f'.repeat(40);},
+  f=>{f.previous.directFormsRecovery.schema='OTHER';},
+  f=>{f.previous.directFormsRecovery.extra=true;},
+  f=>{delete f.previous.directFormsQaProfile;},f=>{f.previous.directFormsQaProfile='OTHER';},
+  f=>{delete f.request.directFormsQaProfile;},f=>{f.request.directFormsQaProfile='OTHER';},
+  f=>{f.request.directFormsRecovery.productPathBlobs[insurer]='f'.repeat(40);},
+  f=>{f.request.directFormsRecovery.productPathBlobs['orbit360-platform/core/unapproved.js']='f'.repeat(40);},
+  f=>{f.request.backendPathBlobs[makeScope.SOURCE_PATHS[0]]='f'.repeat(40);},
+  f=>{f.request.startupRecovery.receiptBlob='f'.repeat(40);},
+  f=>{f.request.backendLiveDeployAllowed=true;},f=>{f.request.realDataWritesAllowed=true;}
+ ];
+ for(const mutate of mutations){const f=assignedContinuityFixture();mutate(f);assert.throws(()=>validateAssignedComposition(f));}
+});
+test('three-owner continuity still rejects matching but false product maps and receipt or QA drift at source and HEAD',()=>{
+ const o=qaRevision;
+ for(const p of [o.DIRECT_FORMS_INSURER_EDITOR_PATH,...DIRECT_FORMS_PATHS]){
+  const f=assignedContinuityFixture();f.request.directFormsRecovery.productPathBlobs[p]='f'.repeat(40);f.previous.directFormsRecovery.productPathBlobs[p]='f'.repeat(40);
+  assert.throws(()=>validateAssignedComposition(f));
+ }
+ for(const ref of ['c'.repeat(40),'HEAD'])for(const p of [o.DIRECT_FORMS_ASSIGNED_ROLES_RECEIPT_PATH,o.DIRECT_FORMS_INSURER_EDITOR_PATH,...o.DIRECT_FORMS_QA_REVISION_PATHS]){
+  const f=assignedContinuityFixture();assert.throws(()=>validateAssignedComposition(f,{readBlob:(r,q)=>r===ref&&q===p?'f'.repeat(40):f.readBlob(r,q)}),/DRIFT/);
+ }
 });

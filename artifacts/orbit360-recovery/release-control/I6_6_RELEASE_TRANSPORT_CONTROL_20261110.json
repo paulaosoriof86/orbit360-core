@@ -8865,5 +8865,20 @@
     "path": "artifacts/orbit360-recovery/release-control/I6_6_V29_BUILD_REQUEST_CONTINUITY_20261124_R61.json",
     "gitBlobSha": "f8b154e1845c9ae3bc8cc494c46c02453b0e1947",
     "sha256": "ce49c21b7c28642f2c8a092300294846174e8dc82a981069e80e966607363a46"
-  }
+  },
+  "failedImmutableBuildAttempts": [
+    {
+      "version": 29,
+      "sourceSha": "6efd4d494cd56b6be87d2fee3cbfc0ba55e9f6a8",
+      "runId": 45502038971,
+      "attempt": 1,
+      "status": "FAILED_BEFORE_PACKAGE",
+      "artifactCreated": false,
+      "receipt": {
+        "path": "artifacts/orbit360-recovery/release-control/I6_6_V29_PREPACKAGE_QA_FAILURE_20261124_R62.json",
+        "gitBlobSha": "bc1fcc2865ed95d56008848242bd571a9fa185d6",
+        "sha256": "87f89eec769afabc417b330a23602d0d8354a52dea6e00989defd9ee50975cfb"
+      }
+    }
+  ]
 }

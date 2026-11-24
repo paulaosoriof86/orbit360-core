@@ -1,0 +1,42 @@
+{
+  "schema": "GI_I66_PREPACKAGE_QA_FAILURE_V1",
+  "status": "FAILED_BEFORE_ARTIFACT_OR_DEPLOY",
+  "gate": "I6.6",
+  "requestVersion": 29,
+  "sourceSha": "6efd4d494cd56b6be87d2fee3cbfc0ba55e9f6a8",
+  "buildRunId": 45502038971,
+  "attempt": 1,
+  "jobId": 138828118868,
+  "failedStep": 4,
+  "failedStepName": "Verify latest I6.6 source and historical B4 seals without reopening B4",
+  "providerUrl": "https://github.com/paulaosoriof86/orbit360-core/actions/runs/45502038971",
+  "conclusion": "failure",
+  "artifacts": 0,
+  "build29Artifact": null,
+  "hostingDeployments": 0,
+  "backendDeployments": 0,
+  "realDataWrites": 0,
+  "testOwner": "tools/gravicentra-i6-6-composite-preview-admission.test.cjs",
+  "observedTests": {
+    "total": 85,
+    "passed": 72,
+    "failed": 13,
+    "skipped": 0
+  },
+  "causalFinding": "Historical synthetic fixtures cloned the mutable active request. Request29 introduced the exact three-owner assigned-role form scope, which the two-owner historical fixtures inherited accidentally.",
+  "remedy": "Bind historical fixtures to their exact request28 source; retain actual request validation. Validate exact unchanged three-owner continuation for the next monotonically versioned request. Reseal source-only QA evidence preserving historical bytes and product scope.",
+  "sourceQaPredecessor": {
+    "head": "9da06674caf080e10f510d8a13a1d122d449dff2",
+    "sourceQaRunId": 45501592776,
+    "governanceRunId": 45501592707,
+    "validForItsOwnSourceOnly": true
+  },
+  "logEvidence": {
+    "sha256": "caf1c2356c55a4ffe6a9d5f29353c3d4c1bcf4257e3c28787985dc3500a79c85",
+    "gitBlobSha": "5a6908453f57ea2845199d424a3b6fa03c23366f",
+    "bytes": 178329
+  },
+  "acceptedPhysicalLiveUnchanged": true,
+  "acceptedGeneration": "E3",
+  "fullI66ProductionAccepted": false
+}

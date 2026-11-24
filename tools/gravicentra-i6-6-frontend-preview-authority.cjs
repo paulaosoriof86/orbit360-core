@@ -102,8 +102,21 @@ function validateAssignedRolesInsurerRevision(receipt,original,request,{readBlob
   return qa;
 }
 function validatePreservedDirectFormsProducts(request,currentSource,previousRequest,io){
-  assert.deepEqual(Object.keys(previousRequest.directFormsRecovery?.productPathBlobs||{}).sort(),DIRECT_FORMS_PATHS,'I66_EXISTING_TWO_DIRECT_FORM_PREIMAGES_REQUIRED');
-  for(const p of DIRECT_FORMS_PATHS)assert.equal(request.directFormsRecovery.productPathBlobs?.[p],previousRequest.directFormsRecovery.productPathBlobs[p],'I66_FINANCIAL_DIRECT_FORMS_PRODUCT_CHANGED');
+  const previous=previousRequest.directFormsRecovery,previousPaths=Object.keys(previous?.productPathBlobs||{}).sort();
+  if(previousPaths.length===DIRECT_FORMS_PATHS.length&&previous?.receiptPath!==DIRECT_FORMS_ASSIGNED_ROLES_RECEIPT_PATH&&previousRequest.directFormsQaProfile===undefined){
+    assert.deepEqual(previousPaths,DIRECT_FORMS_PATHS,'I66_EXISTING_TWO_DIRECT_FORM_PREIMAGES_REQUIRED');
+  }else{
+    // A retry may retain the already requested three-owner successor, but cannot
+    // add a path, replace any product, change its receipt, or drop the QA profile.
+    assert.deepEqual(previousPaths,exactPathUnion(DIRECT_FORMS_PATHS,[DIRECT_FORMS_INSURER_EDITOR_PATH]),'I66_DIRECT_FORMS_CONTINUITY_EXACT_THREE_PREIMAGES_REQUIRED');
+    assert.equal(previous.schema,'GI_I66_DIRECT_FORMS_RECOVERY_PREVIEW_EXTENSION_V1','I66_DIRECT_FORMS_CONTINUITY_SCHEMA_DRIFT');
+    assert.equal(previous.receiptPath,DIRECT_FORMS_ASSIGNED_ROLES_RECEIPT_PATH,'I66_DIRECT_FORMS_CONTINUITY_RECEIPT_PATH_DRIFT');
+    assert.equal(previous.receiptBlob,DIRECT_FORMS_ASSIGNED_ROLES_RECEIPT_BLOB,'I66_DIRECT_FORMS_CONTINUITY_RECEIPT_PIN_DRIFT');
+    assert.equal(previousRequest.directFormsQaProfile,DIRECT_FORMS_ASSIGNED_ROLES_PROFILE,'I66_DIRECT_FORMS_CONTINUITY_PREVIOUS_PROFILE_DRIFT');
+    assert.deepEqual(request.directFormsRecovery,previous,'I66_DIRECT_FORMS_CONTINUITY_EXTENSION_CHANGED');
+    assert.equal(request.directFormsQaProfile,previousRequest.directFormsQaProfile,'I66_DIRECT_FORMS_CONTINUITY_PROFILE_CHANGED');
+  }
+  for(const p of DIRECT_FORMS_PATHS)assert.equal(request.directFormsRecovery.productPathBlobs?.[p],previous.productPathBlobs[p],'I66_FINANCIAL_DIRECT_FORMS_PRODUCT_CHANGED');
   if(request.directFormsRecovery.receiptPath===DIRECT_FORMS_ASSIGNED_ROLES_RECEIPT_PATH||request.directFormsQaProfile!==undefined||Object.keys(request.directFormsRecovery.productPathBlobs).length!==DIRECT_FORMS_PATHS.length)
     validateDirectFormsRecovery(request,currentSource,previousRequest,io);
 }

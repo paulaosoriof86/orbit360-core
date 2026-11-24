@@ -1,0 +1,87 @@
+{
+  "schema": "GI_I66_EXISTING_FINANCIAL_AND_ADMISSION_TEST_REVISION_V1",
+  "revisionId": "I6_6_COMPOSITE_ADMISSION_HISTORICAL_FIXTURES_AND_REQUEST_CONTINUITY_QA_20261124",
+  "scope": "EXISTING_DECLARED_TESTS_ONLY",
+  "status": "SOURCE_QA_PASS_SIGNED_PREVIEW_LIVE_PENDING",
+  "productSourceChanges": 0,
+  "productionAcceptanceClaimed": false,
+  "tests": [
+    {
+      "path": "tools/gravicentra-i6-6-composite-preview-admission.test.cjs",
+      "gitBlobSha": "c6485d21daa40ea5a0521521163b67a375d6fd6d",
+      "replaces": {
+        "path": "tools/gravicentra-i6-6-composite-preview-admission.test.cjs",
+        "priorGitBlobSha": "e1dd83a9dc1cc63f04f68a1d10afeedfca758afa",
+        "priorChangeId": "I6_6_R51_ASSIGNED_ROLES_INSURER_COMPOSED_ADMISSION_QA_20261124"
+      }
+    }
+  ],
+  "causalFinding": {
+    "code": "HISTORICAL_ADMISSION_FIXTURES_READ_MUTABLE_CONTROL",
+    "correction": "Pin historical request28 and its sealed predecessor receipts; retain current-control tests and admit only identical sealed three-owner continuity after request29.",
+    "admissionOwner": {
+      "path": "tools/gravicentra-i6-6-frontend-preview-authority.cjs",
+      "previousGitBlobSha": "c6d557968818a10164211b03092aa604743cbc9c",
+      "gitBlobSha": "c1b38fcccdf4fae3bc23cfc6c5cf0a1e9dbd1230",
+      "sha256": "9e0c85ce1f3a809ff514e1e5e2bc5cf60bef118144d076a4838a23b953c125f9",
+      "scope": "EXACT_PREVIOUS_THREE_OWNER_EXTENSION_IDENTITY_WITH_FULL_RECEIPT_SOURCE_QA_HEAD_REVALIDATION"
+    },
+    "providerFailure": {
+      "sourceHead": "6efd4d494cd56b6be87d2fee3cbfc0ba55e9f6a8",
+      "runId": "45502038971",
+      "jobId": "138828118868",
+      "logSha256": "caf1c2356c55a4ffe6a9d5f29353c3d4c1bcf4257e3c28787985dc3500a79c85",
+      "failedTests": 13,
+      "packageCreated": false,
+      "hostingChanged": false
+    },
+    "baseline": {
+      "tests": 85,
+      "passed": 72,
+      "failed": 13,
+      "skipped": 0,
+      "reportSha256": "1c1f8393468645ec5f88bb038815191a71bc58de48d41f50ec1062ef17da1a22"
+    },
+    "corrected": {
+      "tests": 89,
+      "passed": 89,
+      "failed": 0,
+      "skipped": 0,
+      "reportSha256": "04cb424dffbee6ecab53d2e95d40d2e948ca85e6b8ddd0eee2c14138dcb34e24"
+    }
+  },
+  "preservation": {
+    "historicalReceipts": [
+      {
+        "sourcePath": "artifacts/orbit360-recovery/release-control/I6_6_R51_ASSIGNED_ROLES_INSURER_FINANCIAL_RECOVERY_SOURCE_20261124.json",
+        "archivePath": "artifacts/orbit360-recovery/release-control/I6_6_R51_ASSIGNED_ROLES_INSURER_FINANCIAL_RECOVERY_SOURCE_20261124_PRE_BUILD29_QA.json",
+        "gitBlobSha": "1d89b80f46afc83bc5cfda1c0147548fe5319347",
+        "sha256": "50e7c9e86862d40665cf413703105cba96fcd08fa47516bc7d709a4c4ee4e955",
+        "publishedSourceHead": "9da06674caf080e10f510d8a13a1d122d449dff2",
+        "failedBuildControlHead": "6efd4d494cd56b6be87d2fee3cbfc0ba55e9f6a8",
+        "sourceOnly": true,
+        "signedPreviewAccepted": false,
+        "signedLiveAccepted": false
+      },
+      {
+        "sourcePath": "artifacts/orbit360-recovery/release-control/I6_6_EFFECTIVE_CANCELLATION_ASSIGNED_ROLES_CAUSAL_SOURCE_20261124.json",
+        "archivePath": "artifacts/orbit360-recovery/release-control/I6_6_EFFECTIVE_CANCELLATION_ASSIGNED_ROLES_CAUSAL_SOURCE_20261124_PRE_BUILD29_QA.json",
+        "gitBlobSha": "966b69dacfc6b3f80c8b97e8f0507f98ae4466a5",
+        "sha256": "e25249b94b345f408022202d640d3f97c3d821d6014827015d4f76811461c904",
+        "publishedSourceHead": "9da06674caf080e10f510d8a13a1d122d449dff2",
+        "failedBuildControlHead": "6efd4d494cd56b6be87d2fee3cbfc0ba55e9f6a8",
+        "sourceOnly": true,
+        "signedPreviewAccepted": false,
+        "signedLiveAccepted": false
+      }
+    ],
+    "productPathsChanged": 0,
+    "backendTargetsChanged": 0,
+    "admissionOwnerChanges": 1,
+    "realDataWrites": 0,
+    "previousManifestRevisionsPreserved": true,
+    "originalFinancial60fccaPreserved": true,
+    "originalCancellation4dc8Preserved": true
+  },
+  "runtimeRequirement": "NEW_PROVIDER_SOURCE_QA_AND_BUILD_REQUIRED_BEFORE_SIGNED_PREVIEW_OR_LIVE"
+}

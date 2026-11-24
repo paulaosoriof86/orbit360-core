@@ -475,6 +475,148 @@ jobs:
           target.chmod(0o600)
           with open(os.environ['GITHUB_ENV'],'a') as env:env.write('GOOGLE_APPLICATION_CREDENTIALS='+str(target)+'\n')
           PYCONFIG
+      - name: Read the two exact Make grants and independent Functions and Cloud Run preimages without writes
+        shell: bash
+        run: |
+          set -euo pipefail
+          set +x
+          node - <<'MAKEREADONLY'
+          'use strict';
+          // Inlined into the existing read-only diagnostic job. No mutation entrypoint is called.
+          const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
+          const {createRequire}=require('node:module'),{execFileSync}=require('node:child_process');
+          const repo=process.cwd(),c=require(path.join(repo,'functions/product-lead-ingress-contract.js'));
+          const scope=require(path.join(repo,'tools/gravicentra-i66-make-release-scope.cjs'));
+          const executor=require(path.join(repo,'tools/gravicentra-i66-make-lead-protected-executor.cjs'));
+          const PROJECT='ays-orbit-360-lab',PHASES=['preview','live'];
+          const WORKFLOW='.github/workflows/gravicentra-i66-greenapi-metadata-readonly.yml';
+          const ownerPaths=['tools/gravicentra-i66-make-lead-protected-executor.cjs','tools/gravicentra-i66-make-release-scope.cjs',
+            'functions/product-lead-ingress-contract.js'];
+          const fnUrl=phase=>'https://cloudfunctions.googleapis.com/v2/projects/'+PROJECT+'/locations/'+scope.ADDED[phase].region+'/functions/'+scope.ADDED[phase].name;
+          const runUrl=phase=>'https://run.googleapis.com/v2/projects/'+PROJECT+'/locations/'+scope.ADDED[phase].region+'/services/'+scope.ADDED[phase].name.toLowerCase();
+          const grantPath=phase=>'tenants/'+c.TENANT+'/config/'+(phase==='preview'?'makeLeadIngressPreview':'makeLeadIngress');
+          const allowedUrls=new Set(PHASES.flatMap(phase=>[fnUrl(phase),runUrl(phase)]));
+          const hash=bytes=>require('node:crypto').createHash('sha256').update(bytes).digest('hex');
+          function errorCode(error){
+            const message=String(error?.message||'').split('\n')[0];
+            return /^(?:I66_MAKE_PREIMAGE|INGRESS)_[A-Z0-9_]+$/.test(message)?message:'I66_MAKE_PREIMAGE_READ_UNVERIFIED';
+          }
+          function readonlyClient(client,journal,now){
+            return {request:async options=>{
+              assert.deepEqual(Object.keys(options||{}).sort(),['method','url'],'I66_MAKE_PREIMAGE_EXACT_GET_OPTIONS');
+              assert.equal(options.method,'GET','I66_MAKE_PREIMAGE_GET_ONLY');
+              assert.ok(allowedUrls.has(options.url),'I66_MAKE_PREIMAGE_RESOURCE_DENIED');
+              const row={method:'GET',url:options.url,startedAtUtc:now(),httpStatus:null,responseSha256:null};journal.push(row);
+              try{
+                const response=await client.request({url:options.url,method:'GET',timeout:30000,retry:false});
+                row.httpStatus=Number(response.status||200);
+                assert.equal(row.httpStatus,200,'I66_MAKE_PREIMAGE_HTTP_STATUS');
+                assert.ok(response.data&&typeof response.data==='object'&&!Array.isArray(response.data),'I66_MAKE_PREIMAGE_OBJECT_REQUIRED');
+                const raw=Buffer.from(JSON.stringify(response.data));
+                assert.ok(raw.length<=1048576,'I66_MAKE_PREIMAGE_RESPONSE_BOUND');row.responseSha256=hash(raw);
+                return response;
+              }catch(error){
+                const status=Number(error?.response?.status);if(Number.isInteger(status)&&status>=100&&status<=599)row.httpStatus=status;
+                throw error;
+              }finally{row.completedAtUtc=now();}
+            }};
+          }
+          function grantProjection(snapshot,phase){
+            const expected=grantPath(phase);assert.equal(snapshot?.path,expected,'I66_MAKE_PREIMAGE_GRANT_PATH_DRIFT');
+            assert.equal(typeof snapshot.exists,'boolean','I66_MAKE_PREIMAGE_GRANT_EXISTENCE_REQUIRED');
+            if(!snapshot.exists)return {path:expected,exists:false,expectedDigest:'ABSENT',state:'ABSENT',enabled:false,updateTime:null,scopeVerified:true};
+            const value=snapshot.data;assert.ok(value&&typeof value==='object'&&!Array.isArray(value),'I66_MAKE_PREIMAGE_GRANT_OBJECT_REQUIRED');
+            assert.ok(Buffer.byteLength(JSON.stringify(value))<=100000,'I66_MAKE_PREIMAGE_GRANT_BOUND');
+            assert.ok(value.schema===c.GRANT_SCHEMA&&value.tenantId===c.TENANT&&value.country===c.COUNTRY&&value.phase===phase&&
+              value.provider==='greenapi'&&value.instanceId===c.INSTANCE&&value.scenarioId===c.SCENARIO&&
+              value.firestoreConnectionId===c.FIRESTORE_CONNECTION&&value.integrationId===c.INTEGRATION&&
+              value.operation==='create_business'&&value.module==='leads'&&value.sourceType==='ad'&&
+              value.externalSendAllowed===false&&value.policyWritesAllowed===false&&value.membershipWritesAllowed===false&&
+              value.authority?.scopeContractBlob===scope.CONTRACT_BLOB,'I66_MAKE_PREIMAGE_GRANT_SCOPE_DRIFT');
+            assert.ok(['CLOSED','BOUND','ACTIVE'].includes(value.state)&&typeof value.enabled==='boolean','I66_MAKE_PREIMAGE_GRANT_STATE_REQUIRED');
+            assert.match(value.authority.sourceSha||'',/^[a-f0-9]{40}$/,'I66_MAKE_PREIMAGE_GRANT_SOURCE_REQUIRED');
+            assert.match(value.authority.receiptBlobSha||'',/^[a-f0-9]{40}$/,'I66_MAKE_PREIMAGE_GRANT_RECEIPT_REQUIRED');
+            const time=snapshot.updateTime;
+            assert.deepEqual(Object.keys(time||{}).sort(),['nanoseconds','seconds'],'I66_MAKE_PREIMAGE_GRANT_UPDATE_TIME_REQUIRED');
+            assert.match(time.seconds,/^[0-9]+$/,'I66_MAKE_PREIMAGE_GRANT_UPDATE_TIME_REQUIRED');
+            assert.ok(Number.isSafeInteger(time.nanoseconds)&&time.nanoseconds>=0&&time.nanoseconds<1e9,'I66_MAKE_PREIMAGE_GRANT_UPDATE_TIME_REQUIRED');
+            return {path:expected,exists:true,expectedDigest:c.digest(value),state:value.state,enabled:value.enabled,
+              updateTime:time,scopeVerified:true,authoritySourceSha:value.authority.sourceSha,authorityReceiptBlob:value.authority.receiptBlobSha};
+          }
+          async function collect({sourceClient,readConfiguration,provenance,now=()=>new Date().toISOString()}){
+            const journal=[],auth=readonlyClient(sourceClient,journal,now),p={makeIngress:{runtimeAccess:{principal:scope.RUNTIME}}};
+            const report={schema:'GI_I66_MAKE_FUNCTION_TRAFFIC_AND_GRANTS_READONLY_V1',status:'PREIMAGES_UNVERIFIED_HOLD',
+              projectId:PROJECT,tenantId:c.TENANT,country:c.COUNTRY,scopeContractBlob:scope.CONTRACT_BLOB,
+              provenance,observedAtUtc:now(),phases:{},httpReads:journal,firestoreReads:0,
+              cloudWrites:0,configurationWrites:0,canonicalLeadWrites:0,iamWrites:0,externalMessagesSent:0,
+              privateBodiesPublished:false,releaseAuthority:false};
+            const readGrant=async phase=>{report.firestoreReads++;return grantProjection(await readConfiguration(grantPath(phase)),phase);};
+            for(const phase of PHASES){
+              const row={phase,status:'UNVERIFIED_HOLD',functionApi:null,cloudRunTraffic:null,grant:null,errorCode:null};report.phases[phase]=row;
+              try{
+                const before=await readGrant(phase),fn=await executor.optionalFunction(auth,p,phase);
+                if(fn){
+                  row.functionApi={state:'EXISTING_OBSERVED',projection:fn};
+                  row.cloudRunTraffic=await executor.deployedTraffic(auth,p,phase,fn);
+                }else{
+                  // A Functions 404 does not prove that a same-name Run service is absent.
+                  let absent=false;
+                  try{await auth.request({url:runUrl(phase),method:'GET'});}catch(error){if(Number(error?.response?.status)===404)absent=true;else throw error;}
+                  assert.equal(absent,true,'I66_MAKE_PREIMAGE_ORPHAN_RUN_SERVICE_REQUIRES_REVIEW');
+                  assert.equal(await executor.optionalFunction(auth,p,phase),null,'I66_MAKE_PREIMAGE_FUNCTION_APPEARED_DURING_READ');
+                  row.functionApi={state:'ABSENT',projection:null};row.cloudRunTraffic={state:'ABSENT',exactHttp404:true};
+                }
+                const after=await readGrant(phase);
+                assert.deepEqual(after,before,'I66_MAKE_PREIMAGE_GRANT_CHANGED_DURING_READ');row.grant=after;
+                row.status=!after.exists||after.state==='CLOSED'&&after.enabled===false?'OBSERVED_CLOSED_OR_ABSENT':'OBSERVED_REQUIRES_REVIEW';
+              }catch(error){row.errorCode=errorCode(error);}
+            }
+            if(PHASES.every(phase=>report.phases[phase].status==='OBSERVED_CLOSED_OR_ABSENT'))report.status='PREIMAGES_OBSERVED_CLOSED_OR_ABSENT';
+            else if(PHASES.every(phase=>report.phases[phase].status!=='UNVERIFIED_HOLD'))report.status='PREIMAGES_OBSERVED_REQUIRES_REVIEW';
+            report.completedAtUtc=now();report.reportDigest=c.digest(report);return report;
+          }
+          async function main(){
+            assert.equal(process.argv.length,2,'I66_MAKE_PREIMAGE_NO_ARGUMENTS');
+            assert.equal(process.env.GITHUB_REPOSITORY,'paulaosoriof86/orbit360-core','I66_MAKE_PREIMAGE_REPOSITORY_SCOPE');
+            assert.equal(process.env.GITHUB_REF,'refs/heads/recovery/fase-a-clean-20260831','I66_MAKE_PREIMAGE_BRANCH_SCOPE');
+            assert.match(process.env.GITHUB_SHA||'',/^[a-f0-9]{40}$/,'I66_MAKE_PREIMAGE_CHECKOUT_SOURCE_REQUIRED');
+            const credentials=JSON.parse(fs.readFileSync(process.env.GOOGLE_APPLICATION_CREDENTIALS));
+            assert.equal(credentials.type,'service_account');assert.equal(credentials.project_id,PROJECT);
+            const git=(...args)=>execFileSync('git',args,{encoding:'utf8'}).trim();
+            assert.equal(git('rev-parse','HEAD'),process.env.GITHUB_SHA,'I66_MAKE_PREIMAGE_CHECKOUT_DRIFT');
+            const requireFrom=createRequire(path.join(repo,'functions/package.json'));
+            const {GoogleAuth}=requireFrom('google-auth-library'),{initializeApp,applicationDefault,deleteApp}=requireFrom('firebase-admin/app');
+            const {getFirestore}=requireFrom('firebase-admin/firestore');
+            const app=initializeApp({projectId:PROJECT,credential:applicationDefault()},'i66-make-function-traffic-readonly');
+            const db=getFirestore(app),sourceClient=await new GoogleAuth({projectId:PROJECT,scopes:['https://www.googleapis.com/auth/cloud-platform']}).getClient();
+            try{
+              const report=await collect({sourceClient,provenance:{repository:'paulaosoriof86/orbit360-core',sourceSha:process.env.GITHUB_SHA,
+                workflowPath:WORKFLOW,workflowGitBlob:git('rev-parse','HEAD:'+WORKFLOW),runId:Number(process.env.GITHUB_RUN_ID),
+                runAttempt:Number(process.env.GITHUB_RUN_ATTEMPT),job:'existing_inbound_config',
+                ownerPins:Object.fromEntries(ownerPaths.map(p=>[p,git('rev-parse','HEAD:'+p)]))},readConfiguration:async document=>{
+                  assert.ok(PHASES.map(grantPath).includes(document),'I66_MAKE_PREIMAGE_GRANT_PATH_DENIED');
+                  const snapshot=await db.doc(document).get(),time=snapshot.updateTime;
+                  return {path:snapshot.ref.path,exists:snapshot.exists,data:snapshot.exists?snapshot.data():null,
+                    updateTime:time?{seconds:String(time.seconds),nanoseconds:time.nanoseconds}:null};
+                }});
+              const output=path.join(process.env.RUNNER_TEMP,'i66-make-preimages-sanitized.json');
+              fs.writeFileSync(output,JSON.stringify(report,null,2)+'\n',{mode:0o600});
+              console.log('I66_MAKE_FUNCTION_TRAFFIC_READONLY='+JSON.stringify({status:report.status,reportDigest:report.reportDigest,
+                firestoreReads:report.firestoreReads,httpReads:report.httpReads.length,cloudWrites:0,externalMessagesSent:0}));
+              if(report.status!=='PREIMAGES_OBSERVED_CLOSED_OR_ABSENT')process.exitCode=1;
+            }finally{await deleteApp(app);}
+          }
+          if(process.argv[1]==='-')main().catch(error=>{console.error(errorCode(error));process.exitCode=1;});
+          module.exports={collect,grantProjection,readonlyClient,fnUrl,runUrl,grantPath,errorCode};
+          MAKEREADONLY
+      - name: Retain the sanitized exact Make preimages only
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gi-i66-make-preimages-readonly-${{ github.run_id }}-attempt-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/i66-make-preimages-sanitized.json
+          if-no-files-found: error
+          retention-days: 14
       - name: Validate exact existing inbound configuration without payload or credential output
         shell: bash
         run: node tools/gravicentra-i66-greenapi-existing-config-readonly.cjs

@@ -93,8 +93,8 @@
     },
     {
       "path": "tools/gravicentra-i6-6-composite-preview-admission.test.cjs",
-      "gitBlobSha": "e1dd83a9dc1cc63f04f68a1d10afeedfca758afa",
-      "sha256": "4df611f4fa745b81d404c8c9cbd1811e679016a05cbaa33a020ed703c50f7961"
+      "gitBlobSha": "c6485d21daa40ea5a0521521163b67a375d6fd6d",
+      "sha256": "3fc58824c364a25398fdfd584f82477b70776c7bed711f565227c714d5835226"
     },
     {
       "path": "tools/gravicentra-i6-6-direct-forms-signed-driver.test.cjs",
@@ -108,8 +108,8 @@
     },
     {
       "path": "tools/gravicentra-i6-6-frontend-preview-authority.cjs",
-      "gitBlobSha": "c6d557968818a10164211b03092aa604743cbc9c",
-      "sha256": "f1978974a7e140b10947b9118e17765fb46148f51d44eecc50b2edf4272785e7"
+      "gitBlobSha": "c1b38fcccdf4fae3bc23cfc6c5cf0a1e9dbd1230",
+      "sha256": "9e0c85ce1f3a809ff514e1e5e2bc5cf60bef118144d076a4838a23b953c125f9"
     },
     {
       "path": "tools/gravicentra-i6-6-operational-release-candidate.cjs",
@@ -118,16 +118,16 @@
     }
   ],
   "localVerification": {
-    "passed": 124,
+    "passed": 128,
     "failed": 0,
     "skipped": 0,
     "tests": [
       {
         "path": "tools/gravicentra-i6-6-composite-preview-admission.test.cjs",
-        "passed": 85,
+        "passed": 89,
         "failed": 0,
         "skipped": 0,
-        "reportSha256": "d6018440207282f2868cd86353d1c57c3d83dd424b558e94ea5bb0dbe0c51bc7"
+        "reportSha256": "04cb424dffbee6ecab53d2e95d40d2e948ca85e6b8ddd0eee2c14138dcb34e24"
       },
       {
         "path": "tools/gravicentra-i6-6-effective-cancellation-direct-form.test.cjs",
@@ -147,6 +147,26 @@
   "sourceEvidenceContinuation": {
     "newAdmissionProof": true,
     "unchangedProductTestProofPreservedFromPublishedPredecessor": true,
+    "providerSourceQaPending": true,
+    "signedRuntimeEvidenceNotTransferred": true
+  },
+  "sourceQaRevision": {
+    "revisionId": "I6_6_COMPOSITE_ADMISSION_HISTORICAL_FIXTURES_AND_REQUEST_CONTINUITY_QA_20261124",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_COMPOSITE_ADMISSION_HISTORICAL_FIXTURES_AND_REQUEST_CONTINUITY_QA_20261124.json",
+    "receiptBlob": "39b1dfec26caa279f3ebb79d44740165d637fac1",
+    "historicalReceipt": {
+      "sourcePath": "artifacts/orbit360-recovery/release-control/I6_6_EFFECTIVE_CANCELLATION_ASSIGNED_ROLES_CAUSAL_SOURCE_20261124.json",
+      "archivePath": "artifacts/orbit360-recovery/release-control/I6_6_EFFECTIVE_CANCELLATION_ASSIGNED_ROLES_CAUSAL_SOURCE_20261124_PRE_BUILD29_QA.json",
+      "gitBlobSha": "966b69dacfc6b3f80c8b97e8f0507f98ae4466a5",
+      "sha256": "e25249b94b345f408022202d640d3f97c3d821d6014827015d4f76811461c904",
+      "publishedSourceHead": "9da06674caf080e10f510d8a13a1d122d449dff2",
+      "failedBuildControlHead": "6efd4d494cd56b6be87d2fee3cbfc0ba55e9f6a8",
+      "sourceOnly": true,
+      "signedPreviewAccepted": false,
+      "signedLiveAccepted": false
+    },
+    "scope": "HISTORICAL_FIXTURE_AND_EXACT_EXISTING_COMPOSITION_CONTINUITY_SOURCE_QA_RESEAL",
+    "productBytesPreserved": true,
     "providerSourceQaPending": true,
     "signedRuntimeEvidenceNotTransferred": true
   }
