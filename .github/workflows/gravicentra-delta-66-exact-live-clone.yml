@@ -383,7 +383,8 @@ jobs:
           echo "FIREBASE_CLI_BIN=$CLI" >> "$GITHUB_ENV"
           if [ "$I66_FRONTEND_FINANCIAL_QA" = '1' ]; then
             npm install --no-save --package-lock=false --ignore-scripts --no-audit --no-fund firebase-admin@13.4.0 playwright@1.55.0 >/dev/null
-            node node_modules/playwright/cli.js install --with-deps chromium >/dev/null
+            # Use the runner's native libraries; real browser QA remains mandatory.
+            node node_modules/playwright/cli.js install chromium >/dev/null
           else
             npm install --no-save --package-lock=false --ignore-scripts --no-audit --no-fund firebase-admin@13.4.0 >/dev/null
           fi

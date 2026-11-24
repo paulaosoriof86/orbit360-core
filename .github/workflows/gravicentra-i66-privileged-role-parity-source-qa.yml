@@ -156,7 +156,9 @@ jobs:
         run: |
           set -euo pipefail
           npm install --prefix "$RUNNER_TEMP/gi-i66-detach-deps" --no-package-lock --no-audit --no-fund playwright@1.55.0
-          node "$RUNNER_TEMP/gi-i66-detach-deps/node_modules/playwright/cli.js" install --with-deps chromium
+          # Ubuntu runner already provides Chromium's native libraries. The
+          # actual browser test below must still launch and execute; no skip.
+          node "$RUNNER_TEMP/gi-i66-detach-deps/node_modules/playwright/cli.js" install chromium
       - name: Prove real DOM detach recovery and persistent failure without credentials or business data
         run: |
           set -euo pipefail

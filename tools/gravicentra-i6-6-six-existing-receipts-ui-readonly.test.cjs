@@ -582,7 +582,7 @@ test('real Chromium DOM reproduces canonical detail detachment and preserves str
             if(kind==='hidden')balance.style.display='none';
             if(kind==='duplicate')balance.parentNode.appendChild(balance.cloneNode(true));
             if(kind==='wrong-identity')root.setAttribute('data-rp-receipt-detail-id','wrong-receipt');
-            if(kind==='overflow'){const wide=document.createElement('div');wide.style.width='3000px';root.appendChild(wide);}
+            if(kind==='overflow')document.body.style.minWidth='3000px';
           },kind);
           if(kind==='overflow'){
             await f.h.probe.showSixReceiptBalance(page,f.e,width,'AFTER_RELOAD');
