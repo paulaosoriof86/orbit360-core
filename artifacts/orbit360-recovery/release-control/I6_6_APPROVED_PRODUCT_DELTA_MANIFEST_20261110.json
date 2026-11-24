@@ -3957,6 +3957,41 @@
           }
         }
       ]
+    },
+    {
+      "id": "I6_6_CANONICAL_FUTURE_PENDING_BALANCE_PROOF_20261124",
+      "approvedByDirection": true,
+      "receipt": "artifacts/orbit360-recovery/release-control/I6_6_FUTURE_PENDING_BALANCE_OWNER_CAUSAL_CORRECTION_20261124.json",
+      "receiptGitBlobSha": "c05769d469b0a5e88e72e9e946095cb47bfc9d32",
+      "sourceStatus": "LOCAL_SOURCE_QA_PASS_NEW_IMMUTABLE_PREVIEW_AND_LIVE_REQUIRED",
+      "capabilityOwners": [
+        "RECEIPTS_READ_MODEL",
+        "CLIENTE_360_POLICY_RECEIPT_DETAIL",
+        "COBROS_PRIMARY_RUNTIME"
+      ],
+      "scope": "Recognize only the canonical future-pending unpaid state for unique contractual amount proof. Guard both linked records against contradictory payment evidence; preserve explicit amounts, zero, prior pending states and time-derived classification. Read-only projection; no backend or data mutation.",
+      "paths": [
+        {
+          "path": "orbit360-platform/core/queries.js",
+          "gitBlobSha": "b77b65f86ef6ac2ab6dc157fdbc9ad5e34dbcdcc",
+          "replaces": {
+            "path": "orbit360-platform/core/queries.js",
+            "priorGitBlobSha": "2ba6edc8a04e7cc6140db2bcad0ee213c17d785a",
+            "priorChangeId": "I6_6_OWNER_APPROVED_SOURCE_LINEAGE_SUCCESSOR_20261119"
+          }
+        }
+      ],
+      "tests": [
+        {
+          "path": "tools/gravicentra-i6-6-receipt-current-balance.test.cjs",
+          "gitBlobSha": "312750094960dd332903eaa8fcfd9f42469a19e6",
+          "replaces": {
+            "path": "tools/gravicentra-i6-6-receipt-current-balance.test.cjs",
+            "priorGitBlobSha": "600f437695725e3a8c69c6441faae5423b95cce9",
+            "priorChangeId": "I6_6_RECEIPT_CANONICAL_CURRENT_BALANCE_PRESENTATION_20261117"
+          }
+        }
+      ]
     }
   ],
   "i66R11PreviewBuildRequest20261113": {

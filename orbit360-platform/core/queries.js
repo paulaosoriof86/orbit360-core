@@ -219,7 +219,25 @@ Orbit.q = (function () {
     if(!expectedReceiptOpen(receipt)||receiptHasAppliedPayment(receipt)||
        row.cobroId||row.fechaPago||row.paidDate||row.conciliadoPago===true)return {value:null,source:'UNVERIFIED'};
     const state=textNorm(receipt.estadoOperativo||row.estadoOperativo).replace(/\s+/g,'_');
-    if(!['pendiente','pendiente_vencido'].includes(state))return {value:null,source:'UNVERIFIED'};
+    // The canonical receipt engine also emits futuro_pendiente for unpaid
+    // obligations. That stored time label does not expire their amount proof;
+    // calendarClassification derives current overdue/future status from dates.
+    if(!['pendiente','pendiente_vencido','futuro_pendiente'].includes(state))return {value:null,source:'UNVERIFIED'};
+    if(state==='futuro_pendiente'){
+      // This newly recognized pending enum cannot overrule contradictory
+      // payment evidence on either record. Explicit amounts above, including
+      // zero, and the two previously supported pending states are unchanged.
+      const evidence=[receipt,row].some(record=>{
+        const op=textNorm(record.estadoOperativo).replace(/\s+/g,'_');
+        return !portfolioOpen(record)||receiptHasAppliedPayment(record)||record.pagado===true||
+          record.inferredPaid===true||record.paidInferred===true||record.pagoReportado===true||
+          String(record.paymentState||'').trim()!==''||String(record.applicationState||'').trim()!==''||
+          String(record.directOrInferred||'').trim()!==''||String(record.reportado||'').trim()!==''||
+          !!(record.fechaPago||record.paidDate||record.fechaPagoReportada||record.cobroId)||
+          (op!==''&&!['pendiente','pendiente_vencido','futuro_pendiente'].includes(op));
+      });
+      if(evidence)return {value:null,source:'UNVERIFIED'};
+    }
     const amountReceipt=explicitNumber(receipt.primaTotal!=null?receipt.primaTotal:(receipt.montoTotal!=null?receipt.montoTotal:receipt.monto));
     const amountPortfolio=explicitNumber(row.primaTotal!=null?row.primaTotal:row.montoTotal);
     if(amountReceipt==null||amountReceipt<=0||

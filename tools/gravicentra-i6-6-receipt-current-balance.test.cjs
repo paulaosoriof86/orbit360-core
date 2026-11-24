@@ -13,7 +13,7 @@ const copy = value => JSON.parse(JSON.stringify(value));
 
 function harness(options = {}) {
   const opt = {mode: 'open', nominal: 125.5, receiptAmount: 125.5, explicitAmount: 125.5,
-    currency: 'GTQ', portfolioPresent: true, receiptDue: '2026-11-01', portfolioDue: '2026-11-01', ...options};
+    currency: 'GTQ', portfolioPresent: true, receiptDue: '2026-11-01', portfolioDue: '2026-11-01', asOf: '2026-11-17', ...options};
   const applied = ['direct', 'inferred'].includes(opt.mode);
   const paymentState = opt.mode === 'inferred' ? 'PAID_INFERRED' : opt.mode === 'reported' ? 'PAID_REPORTED' : 'PAID_DIRECT';
   const receipt = {id: 'fixture-receipt', polizaId: 'fixture-policy', clienteId: 'fixture-client',
@@ -40,6 +40,7 @@ function harness(options = {}) {
       estado: 'Vigente', cuotas: 1, vigenciaInicio: '2026-01-01', vigenciaFin: '2027-01-01'}],
     recibosEsperados: [receipt], carteraPrimas: opt.portfolioPresent ? [portfolio] : [],
     cobros: applied ? [payment] : [], vehiculos: [], comisiones: []};
+  if (opt.mutate) opt.mutate({receipt, portfolio, policy: data.polizas[0], data});
   if (opt.extraCurrency) {
     data.polizas.push({...data.polizas[0], id: 'fixture-policy-usd', moneda: 'USD'});
     data.recibosEsperados.push({...receipt, id: 'fixture-receipt-usd', polizaId: 'fixture-policy-usd', moneda: 'USD', primaTotal: 50});
@@ -59,7 +60,7 @@ function harness(options = {}) {
     createElement: () => ({style: {}, appendChild() {}, querySelectorAll: () => [], querySelector: () => null, setAttribute() {}, addEventListener() {}}),
     head: {appendChild() {}}};
   const ui = {finiteNumber: value => value == null || value === '' ? null : Number.isFinite(Number(value)) ? Number(value) : null,
-    today: () => '2026-11-17', daysFromNow: value => Math.round((Date.parse(value + 'T00:00:00Z') - Date.parse('2026-11-17T00:00:00Z')) / 86400000),
+    today: () => opt.asOf, daysFromNow: value => Math.round((Date.parse(value + 'T00:00:00Z') - Date.parse(opt.asOf + 'T00:00:00Z')) / 86400000),
     fmtDate: value => String(value), esc: value => String(value ?? ''), money: (value, currency) => currency + ' ' + Number(value).toFixed(2)};
   const Orbit = {store, ui, pais: 'GT', modules: {}, route: {params: {}}, session: {rol: () => 'Dirección'},
     tenantCanonicalPathsP0: {dataCollectionPath: (tenant, collection) => 'tenants/' + tenant + '/data/' + collection + '/items'}};
@@ -88,7 +89,8 @@ function harness(options = {}) {
   assert.equal(JSON.stringify(data), original, 'all nominal premiums, states, receipt and payment records are preserved');
   return {detailHtml, listHtml, detail: detailMatch && {state: detailMatch[1], text: detailMatch[2]},
     client: copy(client), global: copy(global), aging: copy(aging), native: copy(native),
-    label, proofCalls, writes, receipt: copy(receipt), portfolio: copy(portfolio)};
+    label, proofCalls, writes, receipt: copy(receipt), portfolio: copy(portfolio),
+    proof: copy(canonicalProof(portfolio, Orbit.q.portfolioAmountContext()))};
 }
 
 test('confirmed direct payment is zero debt in detail, native summary, client, global and aging', () => {
@@ -223,4 +225,135 @@ test('receipts table still shows nominal premium while the portfolio KPI shows c
   const h = harness({nominal: 200, receiptAmount: 200, explicitAmount: 80});
   assert.match(h.listHtml, /data-rp-currency="GTQ">Q 80\.00 GTQ/);
   assert.match(h.listHtml, /<td class="num"><div data-rp-currency="GTQ">Q 200\.00 GTQ/);
+});
+
+function futurePendingFixture(options = {}) {
+  const mutate = options.mutate;
+  return harness({nominal: 278.26, receiptAmount: 278.26, explicitAmount: null,
+    receiptDue: '2026-11-02', portfolioDue: '2026-11-02', asOf: '2026-11-24', ...options,
+    mutate(records) {
+      records.receipt.estadoOperativo = 'futuro_pendiente';
+      records.portfolio.estadoOperativo = 'futuro_pendiente';
+      if (mutate) mutate(records);
+    }});
+}
+
+test('canonical futuro_pendiente amount survives the calendar transition without rewriting its stored label', () => {
+  for (const [due, label, dueCents, futureCents] of [
+    ['2026-11-02', 'Vencido', 27826, 0], ['2026-11-24', 'Vence hoy', 0, 27826], ['2026-12-02', 'Por vencer', 0, 27826]
+  ]) {
+    const h = futurePendingFixture({receiptDue: due, portfolioDue: due});
+    assert.deepEqual(h.detail, {state: 'open', text: 'Q 278.26'}, due);
+    assert.equal(h.proof.source, 'MATCHED_EXPECTED_RECEIPT_CONTRACTUAL_AMOUNT');
+    assert.equal(h.label, label);assert.equal(h.receipt.estadoOperativo, 'futuro_pendiente');
+    assert.equal(h.portfolio.estadoOperativo, 'futuro_pendiente');
+    assert.equal(h.receipt.fechaLimite, due);assert.equal(h.portfolio.fechaLimite, due);
+    assert.equal(Math.round(h.global.byCurrency.GTQ.venc * 100), dueCents);
+    assert.equal(Math.round(h.global.byCurrency.GTQ.pend * 100), futureCents);
+    assert.equal(h.global.confirmedCount, 0);assert.equal(h.writes, 0);
+  }
+});
+
+test('new future-pending fallback rejects contradictory payment signals on either linked record', () => {
+  const signals = [
+    ['paymentState', 'PAID_DIRECT'], ['paymentState', 'PAID_INFERRED'], ['paymentState', 'PAID_REPORTED'],
+    ['paymentState', 'REPORTED_PENDING_OPERATIVE_VALIDATION'], ['applicationState', 'APPLIED_DIRECT'],
+    ['applicationState', 'APPLIED_INFERRED'], ['applicationState', 'PENDING_APPLICATION'],
+    ['inferredPaid', true], ['paidInferred', true], ['pagoReportado', true], ['pagado', true],
+    ['conciliado', true], ['conciliadoPago', true], ['fechaPago', '2026-11-10'], ['paidDate', '2026-11-10'],
+    ['fechaPagoReportada', '2026-11-10'], ['cobroId', 'existing-payment'], ['reportado', '2026-11-10'],
+    ['directOrInferred', 'INFERRED'], ['directOrInferred', 'DIRECT'],
+    ['estadoOperativo', 'pago_inferido'], ['estadoOperativo', 'pago_reportado'],
+    ['estadoOperativo', 'pago_reportado_asesor'], ['estadoOperativo', 'pago_reportado_aplicado'],
+    ['estadoOperativo', 'pago_reportado_asesor_aplicado'], ['estadoOperativo', 'requiere_validacion_estado']
+  ];
+  for (const side of ['receipt', 'portfolio']) for (const [field, value] of signals) {
+    const h = futurePendingFixture({mutate: records => { records[side][field] = value; }});
+    assert.equal(h.proof.value, null, side + '.' + field + '=' + value);
+    assert.equal(h.proof.source, 'UNVERIFIED');
+    assert.ok(['unverified', 'closed'].includes(h.detail.state));
+    assert.equal(h.client.vencido, 0);assert.equal(h.native.dueAmount, 0);
+    assert.equal(h.writes, 0);
+  }
+});
+
+test('future-pending extension retains unique relation, currency, nominal agreement and unknown-state guards', () => {
+  const bad = [
+    {portfolioDue: '2026-11-12'}, {nominal: 100},
+    {mutate: ({receipt}) => {receipt.polizaId = 'foreign-policy';}},
+    {mutate: ({receipt}) => {receipt.clienteId = 'foreign-client';}},
+    {mutate: ({receipt}) => {receipt.moneda = 'COP';}},
+    {mutate: ({portfolio}) => {portfolio.moneda = 'COP';}},
+    {mutate: ({policy}) => {policy.estado = 'Cancelada';}},
+    {mutate: ({portfolio, data}) => {data.carteraPrimas.push({...portfolio, id: 'duplicate-portfolio'});}},
+    {mutate: ({receipt, data}) => {data.cobros.push({id: 'linked-payment', reciboId: receipt.id, polizaId: receipt.polizaId});}},
+    {mutate: ({receipt, portfolio}) => {delete receipt.estadoOperativo;delete portfolio.estadoOperativo;}},
+    {mutate: ({receipt, portfolio}) => {receipt.estadoOperativo = portfolio.estadoOperativo = 'pendiente_futuro';}},
+    {mutate: ({receipt, portfolio}) => {receipt.estadoOperativo = portfolio.estadoOperativo = 'requiere_validacion_estado';}}
+  ];
+  for (const options of bad) {
+    const h = futurePendingFixture(options);
+    assert.equal(h.proof.value, null);assert.equal(h.proof.source, 'UNVERIFIED');
+    assert.equal(h.detail.state, 'unverified');assert.equal(h.writes, 0);
+  }
+});
+
+test('explicit zero and reported explicit balances retain their existing semantics before the new fallback', () => {
+  const zero = futurePendingFixture({explicitAmount: 0, mutate: ({receipt}) => {receipt.paymentState = 'PAID_REPORTED';}});
+  assert.equal(zero.proof.source, 'CARTERA_EXPLICIT');assert.equal(zero.proof.value, 0);
+  assert.deepEqual(zero.detail, {state: 'open', text: 'Q 0.00'});
+  const reported = futurePendingFixture({explicitAmount: 80, mode: 'reported'});
+  assert.equal(reported.proof.source, 'CARTERA_EXPLICIT');assert.equal(reported.proof.value, 80);
+  assert.deepEqual(reported.detail, {state: 'open', text: 'Q 80.00'});
+  assert.equal(reported.client.cobrado, 0);assert.equal(reported.receipt.primaTotal, 278.26);
+});
+
+function sixFuturePendingSchedule(ownerSource, cutoff = '2026-11-24') {
+  const dates = ['2026-11-02', '2026-12-02', '2027-01-02', '2027-02-02', '2027-03-02', '2027-04-02'];
+  const client = {id: 'six-client', pais: 'GT', moneda: 'GTQ'};
+  const policy = {id: 'six-policy', clienteId: client.id, pais: 'GT', moneda: 'GTQ', estado: 'Vigente',
+    vigenciaInicio: '2026-05-02', vigenciaFin: '2027-05-02'};
+  // Signed diagnostic shape: both canonical enums, no estado alias, no explicit
+  // monto/saldo, exact nominal amounts, unique relations and no payment records.
+  const receipts = dates.map((due, i) => ({id: 'six-receipt-' + i, polizaId: policy.id, clienteId: client.id,
+    pais: 'GT', moneda: 'GTQ', fechaLimite: due, fechaVencimientoContractual: due,
+    primaTotal: 278.26, estadoOperativo: 'futuro_pendiente'}));
+  const portfolios = receipts.map(r => ({id: 'six-portfolio-' + r.id, reciboId: r.id, polizaId: policy.id,
+    clienteId: client.id, pais: 'GT', moneda: 'GTQ', fechaLimite: r.fechaLimite,
+    primaTotal: 278.26, estadoOperativo: 'futuro_pendiente'}));
+  const data = {clientes: [client], polizas: [policy], recibosEsperados: receipts, carteraPrimas: portfolios,
+    cobros: [], comisiones: [], asesores: []}, before = JSON.stringify(data);
+  const store = {get: (k, id) => (data[k] || []).find(r => r.id === id) || null, all: k => data[k] || [],
+    where: (k, p) => (data[k] || []).filter(p), find: (k, p) => (data[k] || []).find(p)};
+  const ui = {finiteNumber: x => x == null || x === '' ? null : Number.isFinite(Number(x)) ? Number(x) : null,
+    today: () => cutoff, daysFromNow: v => Math.round((Date.parse(String(v).slice(0, 10) + 'T00:00:00Z') - Date.parse(cutoff + 'T00:00:00Z')) / 86400000)};
+  const Orbit = {store, ui, pais: 'GT'};
+  vm.runInNewContext(ownerSource, {window: {Orbit}, Orbit, Map, Set, Date, Number, String, Array});
+  const q = Orbit.q, ctx = q.portfolioAmountContext();
+  const result = {proofs: portfolios.map(r => q.portfolioAmountProof(r, ctx)),
+    classes: portfolios.map(r => q.portfolioClassification(r)), global: q.carteraGlobalPorMoneda(),
+    client: q.clienteResumen(client.id), indexed: q.clientesResumenIndex().get(client.id), aging: q.agingVencidoPorMoneda()};
+  assert.equal(JSON.stringify(data), before, 'query owner never rewrites amounts, dates, labels or payments');
+  return result;
+}
+
+test('signed six-row shape: old enum guard loses all amounts; corrected owner keeps one overdue and five future', () => {
+  const source = fs.readFileSync(queries, 'utf8'), current = sixFuturePendingSchedule(source);
+  assert.ok(current.proofs.every(p => p.value === 278.26 && p.source === 'MATCHED_EXPECTED_RECEIPT_CONTRACTUAL_AMOUNT'));
+  assert.equal(current.classes.filter(c => c.overdue).length, 1);assert.equal(current.classes.filter(c => c.future).length, 5);
+  assert.equal(Math.round(current.global.byCurrency.GTQ.venc * 100), 27826);
+  assert.equal(Math.round(current.global.byCurrency.GTQ.pend * 100), 139130);
+  for (const summary of [current.client, current.indexed]) {
+    assert.equal(Math.round(summary.vencido * 100), 27826);assert.equal(Math.round(summary.pendiente * 100), 139130);
+  }
+  assert.equal(Math.round(current.aging.byCurrency.GTQ['1-30'] * 100), 27826);assert.equal(current.global.confirmedCount, 0);
+  const today = sixFuturePendingSchedule(source, '2026-11-02');
+  assert.equal(today.classes[0].daysRemaining, 0);assert.equal(today.classes.filter(c => c.overdue).length, 0);
+  assert.equal(today.classes.filter(c => c.future).length, 6);assert.equal(Math.round(today.global.byCurrency.GTQ.pend * 100), 166956);
+  const originalGuard = source.replace("['pendiente','pendiente_vencido','futuro_pendiente'].includes(state)",
+    "['pendiente','pendiente_vencido'].includes(state)");
+  assert.notEqual(originalGuard, source);
+  const before = sixFuturePendingSchedule(originalGuard);
+  assert.ok(before.proofs.every(p => p.value === null && p.source === 'UNVERIFIED'));
+  assert.equal(before.global.byCurrency.GTQ.venc, 0);assert.equal(before.global.byCurrency.GTQ.pend, 0);
 });

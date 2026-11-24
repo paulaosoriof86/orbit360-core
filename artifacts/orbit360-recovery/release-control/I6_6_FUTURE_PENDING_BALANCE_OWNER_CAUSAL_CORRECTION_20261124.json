@@ -1,0 +1,105 @@
+{
+  "schema": "GI_I66_OWNER_APPROVED_CAUSAL_PRODUCT_DELTA_V1",
+  "gate": "I6.6",
+  "approvedByDirection": true,
+  "authorityBasis": "Paula current instruction to continue the recovery, correct the complete mechanism, preserve prior work, execute large financial batches and publish verified pending changes; existing frozen I6.6 owner authority. This is the causal correction of the proved six-receipt balance defect, not a new capability or data reimport.",
+  "recordedAtUtc": "2026-11-24T05:44:23.165Z",
+  "dateGuatemala": "2026-11-23",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "observedAcceptedSource": "65c825b2808a615ca4195bdde6689dbdbe3193b2",
+  "currentProductionSourceUnchangedByThisReceipt": true,
+  "evidence": {
+    "runId": 45332501772,
+    "jobId": 138236726700,
+    "artifactId": 14893555540,
+    "artifactDigest": "sha256:d991dcf312991aaa0bd9522925f42a0fbcc0ad21988d6ff339d744b3df0bdc7c",
+    "reportSha256": "d24326a3101f372fd43763e1485a64fc86724dd687dd9f9a0247b89b18df0abf",
+    "durableReceipt": "artifacts/orbit360-recovery/release-control/I6_6_POST_ACCEPTANCE_OBSERVER_RESULTS_RECONCILIATION_20261124_R2.json",
+    "durableReceiptBlob": "c1ba5d3882b01a61e4f0be39e6d087efb38ac62d",
+    "rows": 6,
+    "stages": 12,
+    "amountDateStatusChecksAllPass": true,
+    "reloadAllPass": true,
+    "serverUnchanged": true,
+    "writes": 0,
+    "remainingFailedChecks": [
+      "balanceVerified",
+      "balanceState"
+    ]
+  },
+  "cause": {
+    "producer": "orbit360-platform/core/policy-receipts-engine.js#portfolioState",
+    "producerGitBlobSha": "1a42767f5d1b7fc455e4a332b4d0e6eda2f87014",
+    "consumer": "orbit360-platform/core/queries.js#portfolioAmountProof",
+    "previousConsumerGitBlobSha": "2ba6edc8a04e7cc6140db2bcad0ee213c17d785a",
+    "canonicalEnum": "futuro_pendiente",
+    "description": "Canonical unpaid future state emitted by the accepted engine was omitted from the contractual amount proof allowlist. Stored time classification can age; calendarClassification derives current status from dates without rewriting records."
+  },
+  "correction": {
+    "productPaths": [
+      {
+        "path": "orbit360-platform/core/queries.js",
+        "gitBlobSha": "b77b65f86ef6ac2ab6dc157fdbc9ad5e34dbcdcc"
+      }
+    ],
+    "tests": [
+      {
+        "path": "tools/gravicentra-i6-6-receipt-current-balance.test.cjs",
+        "gitBlobSha": "312750094960dd332903eaa8fcfd9f42469a19e6"
+      }
+    ],
+    "recognizeOnlyCanonicalFuturePending": true,
+    "rejectContradictoryPaymentEvidenceOnBothDocuments": true,
+    "preserveExistingPendingStates": true,
+    "preserveExplicitAmountsIncludingZero": true,
+    "preserveUnknownStateHold": true,
+    "preserveUniqueRelationshipCountryCurrencyPolicyDateAndPaymentGuards": true,
+    "calendarAndDueDatesChanged": false,
+    "persistedDataChanged": false,
+    "backendChanged": false,
+    "qaAcceptanceRelaxed": false
+  },
+  "validation": {
+    "focusedTests": 23,
+    "focusedPassed": 23,
+    "historicalB4ChecksPassed": 16,
+    "historicalB4GitBlobRestored": "f5b25d9bae8771c0497db805ba471432fcd07a6d",
+    "observerUnchangedChecksPassed": 23,
+    "independentReview": {
+      "contradictoryScenariosRejected": 136,
+      "explicitAmountScenariosUnchanged": 272,
+      "historicalPendingStateScenariosUnchanged": 272,
+      "calendarAndLabelScenariosUnchanged": 136,
+      "positiveFutureTodayPastScenarios": 6,
+      "mutations": 0
+    },
+    "causalSix": {
+      "oldGuardUnverified": 6,
+      "correctedVerified": 6,
+      "grossPerRowCents": 27826,
+      "totalGrossCents": 166956,
+      "overdue": 1,
+      "future": 5,
+      "currency": "GTQ",
+      "todayIsNotOverdue": true,
+      "storedLabelsUnchanged": true
+    }
+  },
+  "supersededUnbuiltCandidate": {
+    "productBlob": "03d0895083a6b19b2ad395540c3eedd97d8ab19d",
+    "reason": "Pre-build adversarial review found contradictory inferred/reported payment signals. Final candidate adds a conservative guard only to the new state route.",
+    "built": false,
+    "publishedToProduction": false
+  },
+  "releaseRequirements": {
+    "scope": "FRONTEND_ONLY",
+    "newImmutableArtifactRequired": true,
+    "allQaOwnersFrozenBeforeBuild": true,
+    "signedPreviewRequired": true,
+    "sameDigestForLive": true,
+    "signedLiveRequired": true,
+    "zeroBusinessDataWrites": true,
+    "fullI66Accepted": false
+  }
+}
