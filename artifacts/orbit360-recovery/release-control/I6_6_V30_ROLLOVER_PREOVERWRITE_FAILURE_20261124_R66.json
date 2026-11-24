@@ -1,0 +1,65 @@
+{
+  "schema": "GI_I66_ROLLOVER_PREOVERWRITE_FAILURE_V1",
+  "status": "FAILED_AFTER_ARTIFACT_BEFORE_PREVIEW_OVERWRITE",
+  "gate": "I6.6",
+  "requestVersion": 30,
+  "sourceSha": "96bc5388c5c22c1df9256bd11cdb4209681779dc",
+  "buildRunId": 45510996597,
+  "attempt": 1,
+  "jobId": 138858490629,
+  "conclusion": "failure",
+  "failedStep": 10,
+  "failedStepName": "Publish exact immutable site only to isolated Hosting Preview",
+  "failureCode": "I66_TECHNICAL_ROLLOVER_SUCCESSOR_REQUEST_REQUIRED",
+  "providerUrl": "https://github.com/paulaosoriof86/orbit360-core/actions/runs/45510996597",
+  "artifact": {
+    "id": 14976066036,
+    "digest": "sha256:d31b59d7b5fd6804b79f624e119d81d8316ae2d7d57763e8b87740ac5f7c5bb0"
+  },
+  "artifacts": 1,
+  "previewOverwriteStarted": false,
+  "exactReadbackCompleted": false,
+  "hostingDeployments": 0,
+  "backendDeployments": 0,
+  "realDataWrites": 0,
+  "acceptedPhysicalLiveUnchanged": true,
+  "acceptedGeneration": "E3",
+  "fullI66ProductionAccepted": false,
+  "rolloverReceipt": {
+    "path": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_PHYSICAL_PREVIEW_V28_ROLLOVER_V4_20261124.json",
+    "sha256": "dd56c0a2a9ea19e261da36f53a62b3b7a29fbf7a9a54f20ad24dfa24d505c971"
+  },
+  "logEvidence": {
+    "sha256": "84367d54ce53e0c4d1e28ae0c643eb856569ad2fb6aefb5171dc65d40b3aea86",
+    "bytes": 2542098
+  },
+  "physicalMarkerReadback": {
+    "observedAtUtc": "2026-11-24T23:40:04.744456+00:00",
+    "proofSha256": "6201fe99d77ef3d51cf184a926178d794154881c87c413a82e24a5ee07153aa4",
+    "origins": [
+      {
+        "origin": "https://app.aysseguros.com",
+        "status": 200,
+        "bodySha256": "02479e8985b59f779e0ea6f931f781de3c7401019200256f1ecad6da390bca47",
+        "sourceSha": "65c825b2808a615ca4195bdde6689dbdbe3193b2",
+        "buildId": "gi-i66-65c825b2808a-57f234755dc1"
+      },
+      {
+        "origin": "https://ays-orbit-360-lab.web.app",
+        "status": 200,
+        "bodySha256": "02479e8985b59f779e0ea6f931f781de3c7401019200256f1ecad6da390bca47",
+        "sourceSha": "65c825b2808a615ca4195bdde6689dbdbe3193b2",
+        "buildId": "gi-i66-65c825b2808a-57f234755dc1"
+      },
+      {
+        "origin": "https://ays-orbit-360-lab--gi-i66-rc-45448470011-hrham9ah.web.app",
+        "status": 200,
+        "bodySha256": "8fab03a07bb93eff9d990e9e022d217c651d8cca8804af2a1ba73ff47c231d30",
+        "sourceSha": "74ae28c6e6e6b40f845567c9b00738a58307b3cb",
+        "buildId": "gi-i66-74ae28c6e6e6-57f234755dc1"
+      }
+    ]
+  },
+  "cause": "The V4 physical Preview profile still compared the active monotonic request number with29. The request30 build succeeded but quota fallback stopped at that comparison before any Preview overwrite.",
+  "remedy": "Validate each evidenced failed request and archived predecessor in a contiguous causal retry lineage, preserve exact V4/E3/V28 scope and backups, and include this owner/test in signed SourceQA before a new immutable build. Never patch artifact30."
+}

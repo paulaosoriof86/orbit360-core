@@ -1,0 +1,173 @@
+{
+  "schema": "GI_I66_EFFECTIVE_CANCELLATION_DIRECT_OR_OPS_CAUSAL_SOURCE_V1",
+  "status": "SOURCE_FOCAL_REGRESSION_PASS_SIGNED_PREVIEW_LIVE_PENDING",
+  "gate": "I6.6",
+  "classification": "PRODUCT",
+  "authority": {
+    "kind": "CURRENT_DIRECTION_USER_MESSAGE",
+    "date": "2026-11-24",
+    "instructionExcerpt": "reporte qué cancelaciones también estaba mandando a Ops en vez de cancelar en firme. Pedí que todas las gestiones con póliza se deben poder hacer tanto directamente como solicita la gestión por Ops",
+    "effectiveCancellationDirect": true,
+    "requestViaOpsPreserved": true,
+    "existingPolicyWriteAuthorityOnly": true,
+    "publicationInstruction": "Pero cuando yo te dé hallazgos tienes que solucionarlos y publicarlos de una vez."
+  },
+  "semantics": {
+    "country": "GT",
+    "directEffectiveCancellation": true,
+    "requestViaOpsPreserved": true,
+    "existingPolicyWriteAuthorityOnly": true,
+    "documentReferenceMotiveDateRequired": true,
+    "effectiveConfirmationRequired": true,
+    "sparseCanonicalPolicyWrite": true,
+    "canonicalServerReadbackRequired": true,
+    "idempotentReplay": true,
+    "policyFinancialFactsPreserved": true,
+    "receiptAndPaymentWrites": 0,
+    "noAutomaticCustomerNotice": true
+  },
+  "boundaries": {
+    "productOwners": 4,
+    "newBackendOwners": 0,
+    "backendTargets": 5,
+    "realDataWrites": 0,
+    "authOrRoleChanges": 0,
+    "bankMutations": 0,
+    "deployments": 0,
+    "signedPreview": "PENDING",
+    "signedLive": "PENDING"
+  },
+  "runtimeRequirement": {
+    "profile": "I66_EFFECTIVE_CANCELLATION_UI_SIGNED_QA_V1",
+    "preview": "SYNTHETIC_FORM_NO_CANONICAL_WRITE",
+    "live": "SYNTHETIC_CANONICAL_READBACK_RELOAD_REPLAY_FINANCIAL_PRESERVATION_CLEANUP",
+    "signedPreview": "PENDING",
+    "signedLive": "PENDING"
+  },
+  "productPaths": [
+    {
+      "path": "orbit360-platform/core/policy-receipts-engine.js",
+      "gitBlobSha": "698fbaa0d15989f1393f0c6ec1eefb9da8153d87",
+      "sha256": "38dc870c56c612805e5ea32ab32d8a125118d58726af19bbdec4d63ebc02508d",
+      "previousGitBlobSha": "1a42767f5d1b7fc455e4a332b4d0e6eda2f87014"
+    },
+    {
+      "path": "orbit360-platform/data/store-firestore-product-operational-p0.js",
+      "gitBlobSha": "d9b6806958da950f7a3aff28ca8b164220f827d6",
+      "sha256": "1e235d1600ad40f97818e39fff7ab67ec92a930441c9872ff7d6d0f7795408be",
+      "previousGitBlobSha": "0138ba3d11b767d38a664db76e8a4d4b2c948919"
+    },
+    {
+      "path": "orbit360-platform/modules/policy-receipts-v1199-bridge.js",
+      "gitBlobSha": "583b87763fe7931d211e8c67a4f08ef0265b0dfb",
+      "sha256": "ec9360d9b4e29a9154d589fb078d6a4a362a472d133310fdbeef790c13756c35",
+      "previousGitBlobSha": "7c273a429fff0ec2a88bfdf9bcbe50ff631cdb33"
+    },
+    {
+      "path": "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js",
+      "gitBlobSha": "74298d8565902895e5b2d2a5de030ed08847243c",
+      "sha256": "5f911e48fd9f78abd6fd5c88348fbb74032467e4a9c9fbc3fe7b3f53f2e0c343",
+      "previousGitBlobSha": "25f557054a37c7116fa88863a7357ed79d8a82e0"
+    }
+  ],
+  "qaPaths": [
+    {
+      "path": ".github/workflows/gravicentra-i66-privileged-role-exact-live-promotion.yml",
+      "gitBlobSha": "b8e2b138d0189e802f28ede7a1972966f184ca97",
+      "sha256": "a06c0d7b6683423201ce924ccc7ddd2f65aae75aa35a2534588f6f980553b2e0"
+    },
+    {
+      "path": ".github/workflows/gravicentra-i66-privileged-role-parity-source-qa.yml",
+      "gitBlobSha": "b2c5bef9fbd05ed6e562d19a5c744c396bdb9b8a",
+      "sha256": "d946caadc1ed244cd689f7699dd1df963f57018dd19943c1cdf77d48cdbc64ca"
+    },
+    {
+      "path": ".github/workflows/gravicentra-i66-privileged-role-three-function-preview-uat.yml",
+      "gitBlobSha": "65a1783cb52f8c7bccd9aefc84cb46ec10081de1",
+      "sha256": "05fa28c669a3bb0147b903210ad4ccfbd6e469b2706a483b8a02dbabcdb45002"
+    },
+    {
+      "path": "tools/gravicentra-i6-6-carlos-paula-live-direct-renewal-synthetic-uat.cjs",
+      "gitBlobSha": "49b5da17f6046deb52aebb2baf030d877f43b895",
+      "sha256": "5377ae18a7f32f71f65738f1b2d7a8db9474ca62c2ce6d080bac942149f23211"
+    },
+    {
+      "path": "tools/gravicentra-i6-6-composite-preview-admission.test.cjs",
+      "gitBlobSha": "c6485d21daa40ea5a0521521163b67a375d6fd6d",
+      "sha256": "3fc58824c364a25398fdfd584f82477b70776c7bed711f565227c714d5835226"
+    },
+    {
+      "path": "tools/gravicentra-i6-6-direct-forms-signed-driver.test.cjs",
+      "gitBlobSha": "c1e0af172d9d7fd535d22f6c45e8092c46ffeb24",
+      "sha256": "4596cc871bcdff22ef2f77657c053c2c81a623cc7e87bd6c8d2497b0fc439257"
+    },
+    {
+      "path": "tools/gravicentra-i6-6-effective-cancellation-direct-form.test.cjs",
+      "gitBlobSha": "8e0c1e3debf93523e044bc74559b50aad8dea644",
+      "sha256": "78b21e4806cf0cdad7105ad31dfcc6cb0a3a6a57b0866a41a872c65b24725c98"
+    },
+    {
+      "path": "tools/gravicentra-i6-6-frontend-preview-authority.cjs",
+      "gitBlobSha": "c1b38fcccdf4fae3bc23cfc6c5cf0a1e9dbd1230",
+      "sha256": "9e0c85ce1f3a809ff514e1e5e2bc5cf60bef118144d076a4838a23b953c125f9"
+    },
+    {
+      "path": "tools/gravicentra-i6-6-operational-release-candidate.cjs",
+      "gitBlobSha": "9e91c35bed88b98bc4a3805abb826d632e51b7bf",
+      "sha256": "e96df4186c9ceb73f7f148d3f99a5222f12d794fbd96a9591b507bfdac5e12d3"
+    }
+  ],
+  "localVerification": {
+    "passed": 128,
+    "failed": 0,
+    "skipped": 0,
+    "tests": [
+      {
+        "path": "tools/gravicentra-i6-6-composite-preview-admission.test.cjs",
+        "passed": 89,
+        "failed": 0,
+        "skipped": 0,
+        "reportSha256": "04cb424dffbee6ecab53d2e95d40d2e948ca85e6b8ddd0eee2c14138dcb34e24"
+      },
+      {
+        "path": "tools/gravicentra-i6-6-effective-cancellation-direct-form.test.cjs",
+        "passed": 39,
+        "failed": 0,
+        "skipped": 0,
+        "reportSha256": "47edc0ec84d006e85c3aaf4662c31f0b35e3034367d05b59d36c52e24b8ec779"
+      }
+    ]
+  },
+  "supersedes": {
+    "repositoryHead": "32229710311b6fc8fdb01d1e00c95ced32d2ebf8",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_EFFECTIVE_CANCELLATION_DIRECT_OR_OPS_CAUSAL_SOURCE_20261124.json",
+    "receiptBlob": "4dc8fe03cee4545a5b93db9816222b6e50fad66c",
+    "scope": "QA_COMPOSITION_ONLY_CANCELLATION_PRODUCT_BYTES_PRESERVED"
+  },
+  "sourceEvidenceContinuation": {
+    "newAdmissionProof": true,
+    "unchangedProductTestProofPreservedFromPublishedPredecessor": true,
+    "providerSourceQaPending": true,
+    "signedRuntimeEvidenceNotTransferred": true
+  },
+  "sourceQaRevision": {
+    "revisionId": "I6_6_COMPOSITE_ADMISSION_HISTORICAL_FIXTURES_AND_REQUEST_CONTINUITY_QA_20261124",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_COMPOSITE_ADMISSION_HISTORICAL_FIXTURES_AND_REQUEST_CONTINUITY_QA_20261124.json",
+    "receiptBlob": "39b1dfec26caa279f3ebb79d44740165d637fac1",
+    "historicalReceipt": {
+      "sourcePath": "artifacts/orbit360-recovery/release-control/I6_6_EFFECTIVE_CANCELLATION_ASSIGNED_ROLES_CAUSAL_SOURCE_20261124.json",
+      "archivePath": "artifacts/orbit360-recovery/release-control/I6_6_EFFECTIVE_CANCELLATION_ASSIGNED_ROLES_CAUSAL_SOURCE_20261124_PRE_BUILD29_QA.json",
+      "gitBlobSha": "966b69dacfc6b3f80c8b97e8f0507f98ae4466a5",
+      "sha256": "e25249b94b345f408022202d640d3f97c3d821d6014827015d4f76811461c904",
+      "publishedSourceHead": "9da06674caf080e10f510d8a13a1d122d449dff2",
+      "failedBuildControlHead": "6efd4d494cd56b6be87d2fee3cbfc0ba55e9f6a8",
+      "sourceOnly": true,
+      "signedPreviewAccepted": false,
+      "signedLiveAccepted": false
+    },
+    "scope": "HISTORICAL_FIXTURE_AND_EXACT_EXISTING_COMPOSITION_CONTINUITY_SOURCE_QA_RESEAL",
+    "productBytesPreserved": true,
+    "providerSourceQaPending": true,
+    "signedRuntimeEvidenceNotTransferred": true
+  }
+}

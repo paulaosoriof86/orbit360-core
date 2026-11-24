@@ -78,8 +78,8 @@
     },
     {
       "path": ".github/workflows/gravicentra-i66-privileged-role-parity-source-qa.yml",
-      "gitBlobSha": "b2c5bef9fbd05ed6e562d19a5c744c396bdb9b8a",
-      "sha256": "d946caadc1ed244cd689f7699dd1df963f57018dd19943c1cdf77d48cdbc64ca"
+      "gitBlobSha": "20b940f4d45b82a42b03393776945314096b86cd",
+      "sha256": "42c880cb6544083323cf2cc851221385af3ed3e1248d36d5516b301f482398e7"
     },
     {
       "path": ".github/workflows/gravicentra-i66-privileged-role-three-function-preview-uat.yml",
@@ -151,21 +151,25 @@
     "signedRuntimeEvidenceNotTransferred": true
   },
   "sourceQaRevision": {
-    "revisionId": "I6_6_COMPOSITE_ADMISSION_HISTORICAL_FIXTURES_AND_REQUEST_CONTINUITY_QA_20261124",
-    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_COMPOSITE_ADMISSION_HISTORICAL_FIXTURES_AND_REQUEST_CONTINUITY_QA_20261124.json",
-    "receiptBlob": "39b1dfec26caa279f3ebb79d44740165d637fac1",
+    "revisionId": "I6_6_SOURCE_QA_PREVIEW_ROLLOVER_COVERAGE_V31_20261124",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_SOURCE_QA_PREVIEW_ROLLOVER_COVERAGE_V31_20261124.json",
+    "receiptBlob": "540e319f1e7032ffd89207060edb5163c9dbe10f",
     "historicalReceipt": {
       "sourcePath": "artifacts/orbit360-recovery/release-control/I6_6_EFFECTIVE_CANCELLATION_ASSIGNED_ROLES_CAUSAL_SOURCE_20261124.json",
-      "archivePath": "artifacts/orbit360-recovery/release-control/I6_6_EFFECTIVE_CANCELLATION_ASSIGNED_ROLES_CAUSAL_SOURCE_20261124_PRE_BUILD29_QA.json",
-      "gitBlobSha": "966b69dacfc6b3f80c8b97e8f0507f98ae4466a5",
-      "sha256": "e25249b94b345f408022202d640d3f97c3d821d6014827015d4f76811461c904",
-      "publishedSourceHead": "9da06674caf080e10f510d8a13a1d122d449dff2",
-      "failedBuildControlHead": "6efd4d494cd56b6be87d2fee3cbfc0ba55e9f6a8",
+      "archivePath": "artifacts/orbit360-recovery/release-control/I6_6_EFFECTIVE_CANCELLATION_ASSIGNED_ROLES_CAUSAL_SOURCE_20261124_PRE_BUILD31_QA.json",
+      "gitBlobSha": "c095cdf1cc648a009dde51a641062f3941ee4da1",
+      "sha256": "cb3d7183efc5ee634668cf4f2f0379ba8ecdcd12edd73722d6be6c54d4d45269",
+      "publishedSourceHead": "96bc5388c5c22c1df9256bd11cdb4209681779dc",
       "sourceOnly": true,
       "signedPreviewAccepted": false,
       "signedLiveAccepted": false
     },
-    "scope": "HISTORICAL_FIXTURE_AND_EXACT_EXISTING_COMPOSITION_CONTINUITY_SOURCE_QA_RESEAL",
+    "previousRevision": {
+      "revisionId": "I6_6_COMPOSITE_ADMISSION_HISTORICAL_FIXTURES_AND_REQUEST_CONTINUITY_QA_20261124",
+      "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_COMPOSITE_ADMISSION_HISTORICAL_FIXTURES_AND_REQUEST_CONTINUITY_QA_20261124.json",
+      "receiptBlob": "39b1dfec26caa279f3ebb79d44740165d637fac1"
+    },
+    "scope": "EXISTING_PINNED_SOURCE_QA_WORKFLOW_ONLY",
     "productBytesPreserved": true,
     "providerSourceQaPending": true,
     "signedRuntimeEvidenceNotTransferred": true

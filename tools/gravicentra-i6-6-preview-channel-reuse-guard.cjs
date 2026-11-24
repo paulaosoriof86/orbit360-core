@@ -219,10 +219,10 @@ function validateTechnicalRolloverCandidate(p) {
   return technicalRolloverCandidatePin();
 }
 
-function validateTechnicalAuthorization(control, receiptText) {
+function validateTechnicalAuthorization(control, receiptText, retryIo) {
   if (physicalReleaseProfile(control?.currentTechnicalPreviewRollover) ||
       (typeof receiptText === 'string' && [PHYSICAL_RECEIPT_SHA256, PHYSICAL_V4_RECEIPT_SHA256].includes(technicalSha(receiptText))))
-    return validatePhysicalAuthorization(control, receiptText);
+    return validatePhysicalAuthorization(control, receiptText, retryIo);
   technicalFail(typeof receiptText === 'string' && technicalSha(receiptText) === TECHNICAL_RECEIPT_SHA256, 'EXACT_RECEIPT_BYTES_REQUIRED');
   const a = JSON.parse(receiptText), c = control || {};
   assert.deepEqual(c.currentTechnicalPreviewRollover,
@@ -248,7 +248,99 @@ function validateTechnicalAuthorization(control, receiptText) {
   return a;
 }
 
-function validatePhysicalAuthorization(control, receiptText) {
+// V4's first request is 29. A failed build may advance that same request only
+// through the already recorded, contiguous history; it does not grant a new
+// channel, product delta, backend scope or acceptance to a failed artifact.
+function validatePhysicalRetryChain(control, profile, suppliedIo = {}) {
+  const request = control.frontendPreviewRequest, first = profile.requestVersion;
+  const version = request?.version, attempts = control.failedImmutableBuildAttempts || [];
+  technicalFail(Number.isSafeInteger(version) && version >= first && Array.isArray(attempts), 'SUCCESSOR_REQUEST_REQUIRED');
+  technicalFail(!attempts.some(row => row.version >= version), 'FAILED_REQUEST_REPLAY');
+  if (version === first) return;
+  const failures = attempts.filter(row => row.version >= first);
+  technicalFail(failures.length === version - first &&
+    new Set(failures.map(row => row.version)).size === failures.length, 'SUCCESSOR_REQUEST_REQUIRED');
+  const repo = path.resolve(__dirname, '..');
+  const git = suppliedIo.git || ((...args) => execFileSync('git', args,
+    { cwd: repo, encoding: 'utf8', stdio: 'pipe', maxBuffer: 5 * 1024 * 1024 }).trim());
+  const readText = suppliedIo.readText || (relative => fs.readFileSync(path.join(repo, relative), 'utf8'));
+  const transportPath = 'artifacts/orbit360-recovery/release-control/I6_6_RELEASE_TRANSPORT_CONTROL_20261110.json';
+  const roots = ['orbit360-platform', 'functions', 'firebase.json', 'storage.rules', 'firestore.rules',
+    'database.rules.json', 'tools/gravicentra-i6-1-preview-package.mjs',
+    ':(exclude)orbit360-platform/docs/recovery/orbit360-recovery-state-v1.json'];
+  const scope = original => {
+    const result = structuredClone(original);
+    // These fields are recertified by the existing source/build admission gate.
+    // Financial/cancellation QA receipts may be resealed without product edits.
+    for (const key of ['version', 'sourceQaHead', 'manifestBlob', 'sourceQaRunId', 'guardRunId',
+      'releaseMechanismSourceSha', 'reason']) delete result[key];
+    for (const key of ['financialRecovery', 'financialRecoveryQa', 'cancellationRecovery', 'cancellationRecoveryQa'])
+      if (result[key]) delete result[key].receiptBlob;
+    return result;
+  };
+  technicalFail(/^[a-f0-9]{40}$/.test(request.sourceQaHead || ''), 'RETRY_SOURCE_QA_REQUIRED');
+  git('merge-base', '--is-ancestor', request.sourceQaHead, 'HEAD');
+  git('diff', '--quiet', request.sourceQaHead, 'HEAD', '--', ...roots);
+  const usedSources = new Set(), usedRuns = new Set();
+  let lastFailureSource;
+  for (let previous = first; previous < version; previous++) {
+    const keys = Object.keys(control).filter(key => new RegExp('^priorFrontendPreviewRequestBeforeV' +
+      (previous + 1) + '_[0-9]{8}$').test(key));
+    technicalFail(keys.length === 1 && control[keys[0]]?.version === previous, 'RETRY_HISTORY_REQUIRED');
+    const archived = control[keys[0]], failed = failures.find(row => row.version === previous);
+    technicalFail(failed && /^[a-f0-9]{40}$/.test(failed.sourceSha || '') &&
+      Number.isSafeInteger(failed.runId) && failed.runId > 0 &&
+      Number.isSafeInteger(failed.attempt) && failed.attempt > 0, 'RETRY_FAILURE_IDENTITY_REQUIRED');
+    technicalFail(!usedSources.has(failed.sourceSha) && !usedRuns.has(failed.runId), 'RETRY_FAILURE_REPLAY');
+    usedSources.add(failed.sourceSha); usedRuns.add(failed.runId);
+    const pin = failed.receipt || {};
+    technicalFail(/^artifacts\/orbit360-recovery\/release-control\/I6_6_[A-Z0-9_]+\.json$/.test(pin.path || '') &&
+      /^[a-f0-9]{40}$/.test(pin.gitBlobSha || '') && /^[a-f0-9]{64}$/.test(pin.sha256 || ''), 'RETRY_FAILURE_PIN_REQUIRED');
+    const text = readText(pin.path), bytes = Buffer.from(text);
+    assert.equal(technicalSha(bytes), pin.sha256, 'I66_TECHNICAL_ROLLOVER_RETRY_RECEIPT_SHA_DRIFT');
+    assert.equal(crypto.createHash('sha1').update('blob ' + bytes.length + '\0').update(bytes).digest('hex'),
+      pin.gitBlobSha, 'I66_TECHNICAL_ROLLOVER_RETRY_RECEIPT_BLOB_DRIFT');
+    const receipt = JSON.parse(text);
+    for (const [key, expected] of Object.entries({ gate: 'I6.6', requestVersion: previous,
+      sourceSha: failed.sourceSha, buildRunId: failed.runId, attempt: failed.attempt, conclusion: 'failure',
+      hostingDeployments: 0, backendDeployments: 0, realDataWrites: 0,
+      acceptedPhysicalLiveUnchanged: true, acceptedGeneration: 'E3', fullI66ProductionAccepted: false }))
+      assert.equal(receipt[key], expected, 'I66_TECHNICAL_ROLLOVER_RETRY_FAILURE_FACT_DRIFT_' + key);
+    technicalFail(/^[a-f0-9]{64}$/.test(receipt.logEvidence?.sha256 || ''), 'RETRY_FAILURE_LOG_REQUIRED');
+    if (failed.status === 'FAILED_BEFORE_PACKAGE') {
+      assert.equal(failed.artifactCreated, false, 'I66_TECHNICAL_ROLLOVER_RETRY_ARTIFACT_FACT_DRIFT');
+      assert.equal(receipt.schema, 'GI_I66_PREPACKAGE_QA_FAILURE_V1');
+      assert.equal(receipt.status, 'FAILED_BEFORE_ARTIFACT_OR_DEPLOY');
+      assert.equal(receipt.artifacts, 0); assert.equal(receipt.build29Artifact, null);
+    } else {
+      assert.equal(failed.status, 'FAILED_BEFORE_PREVIEW_OVERWRITE', 'I66_TECHNICAL_ROLLOVER_RETRY_FAILURE_PHASE_DENIED');
+      assert.equal(failed.artifactCreated, true, 'I66_TECHNICAL_ROLLOVER_RETRY_ARTIFACT_FACT_DRIFT');
+      assert.equal(receipt.schema, 'GI_I66_ROLLOVER_PREOVERWRITE_FAILURE_V1');
+      assert.equal(receipt.status, 'FAILED_AFTER_ARTIFACT_BEFORE_PREVIEW_OVERWRITE');
+      assert.equal(receipt.failureCode, 'I66_TECHNICAL_ROLLOVER_SUCCESSOR_REQUEST_REQUIRED');
+      assert.equal(receipt.previewOverwriteStarted, false, 'I66_TECHNICAL_ROLLOVER_RETRY_PREVIEW_OVERWRITE_DENIED');
+      assert.equal(receipt.exactReadbackCompleted, false, 'I66_TECHNICAL_ROLLOVER_RETRY_COMPLETED_READBACK_DENIED');
+      assert.equal(receipt.artifacts, 1);
+      technicalFail(Number.isSafeInteger(receipt.artifact?.id) && receipt.artifact.id > 0 &&
+        /^sha256:[a-f0-9]{64}$/.test(receipt.artifact?.digest || ''), 'RETRY_FAILED_ARTIFACT_IDENTITY_REQUIRED');
+      assert.deepEqual(receipt.rolloverReceipt,
+        { path: profile.receiptPath, sha256: profile.receiptSha256 }, 'I66_TECHNICAL_ROLLOVER_RETRY_PHYSICAL_RECEIPT_DRIFT');
+    }
+    const sourceControl = JSON.parse(git('show', failed.sourceSha + ':' + transportPath));
+    assert.deepEqual(archived, sourceControl.frontendPreviewRequest, 'I66_TECHNICAL_ROLLOVER_RETRY_ARCHIVED_REQUEST_DRIFT');
+    assert.deepEqual(sourceControl.currentTechnicalPreviewRollover, control.currentTechnicalPreviewRollover,
+      'I66_TECHNICAL_ROLLOVER_RETRY_ROLLOVER_SCOPE_DRIFT');
+    assert.deepEqual(sourceControl.currentPhysicalHostingRelease, control.currentPhysicalHostingRelease,
+      'I66_TECHNICAL_ROLLOVER_RETRY_LIVE_POINTER_DRIFT');
+    assert.deepEqual(scope(archived), scope(request), 'I66_TECHNICAL_ROLLOVER_RETRY_REQUEST_SCOPE_DRIFT');
+    if (lastFailureSource) git('merge-base', '--is-ancestor', lastFailureSource, failed.sourceSha);
+    git('merge-base', '--is-ancestor', failed.sourceSha, request.sourceQaHead);
+    git('diff', '--quiet', failed.sourceSha, request.sourceQaHead, '--', ...roots);
+    lastFailureSource = failed.sourceSha;
+  }
+}
+
+function validatePhysicalAuthorization(control, receiptText, retryIo) {
   const profile = physicalReleaseProfile(control?.currentTechnicalPreviewRollover);
   technicalFail(profile && typeof receiptText === 'string' && technicalSha(receiptText) === profile.receiptSha256, 'EXACT_RECEIPT_BYTES_REQUIRED');
   const a = JSON.parse(receiptText), c = control || {};
@@ -258,7 +350,8 @@ function validatePhysicalAuthorization(control, receiptText) {
   assert.equal(c.gate, 'I6.6'); assert.equal(c.historicalClosedGate, 'B4-007');
   assert.equal(c.status, 'OPERATIONAL_EXACT_LIVE_ACCEPTED_LOCKED', 'I66_TECHNICAL_ROLLOVER_PHYSICAL_GATE_REQUIRED');
   const request = c.frontendPreviewRequest;
-  assert.equal(request?.version, profile.requestVersion, 'I66_TECHNICAL_ROLLOVER_SUCCESSOR_REQUEST_REQUIRED');
+  if (profile.profileName === PHYSICAL_V4_PROFILE) validatePhysicalRetryChain(c, profile, retryIo);
+  else assert.equal(request?.version, profile.requestVersion, 'I66_TECHNICAL_ROLLOVER_SUCCESSOR_REQUEST_REQUIRED');
   assert.equal(request.mode, 'A13_A14_BALANCE_COMPOSITE_ARTIFACT_HOSTING_PREVIEW_ONLY');
   assert.equal(request.previousReceiptBlob, '11fdb3bee494541513482666d6215f45cbad0567');
   for (const key of ['realDataWritesAllowed', 'realCustomerWritesAllowed', 'liveDeployAuthorized',

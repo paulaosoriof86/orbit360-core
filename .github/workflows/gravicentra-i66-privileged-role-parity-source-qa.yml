@@ -15,6 +15,8 @@ on:
       - tools/gravicentra-i6-6-composite-preview-admission.test.cjs
       - tools/gravicentra-i6-6-preview-package-readback.cjs
       - tools/gravicentra-i6-6-preview-package-readback.test.cjs
+      - tools/gravicentra-i6-6-preview-channel-reuse-guard.cjs
+      - tools/gravicentra-i6-6-technical-preview-rollover.test.cjs
       - tools/gravicentra-i6-6-workflow-candidate-resolution.test.cjs
       - tools/gravicentra-i66-frontend-control.cjs
       - tools/gravicentra-i66-frontend-hosting-io.cjs
@@ -117,6 +119,7 @@ jobs:
           node --test tools/gravicentra-i6-6-composite-preview-admission.test.cjs tools/gravicentra-i6-6-workflow-candidate-resolution.test.cjs
           node --check tools/gravicentra-i6-6-preview-package-readback.cjs
           node --test tools/gravicentra-i6-6-preview-package-readback.test.cjs
+          node --test tools/gravicentra-i6-6-technical-preview-rollover.test.cjs
           node --test tools/gravicentra-i66-composite-acceptance.test.cjs tools/gravicentra-i66-frontend-control.test.cjs tools/gravicentra-i66-frontend-promotion-transaction.test.cjs
           node --test tools/gravicentra-i6-6-financial-page-read-efficiency.test.cjs tools/gravicentra-i6-6-make-lead-ingress-release.test.cjs
           node --test tools/gravicentra-i6-6-direction-preview-i66-consent-scope.test.cjs tools/gravicentra-i6-6-direction-live-legal-acceptance.test.cjs

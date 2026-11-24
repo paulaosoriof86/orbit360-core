@@ -1,0 +1,234 @@
+{
+  "schema": "GI_I66_R51_DOCUMENTARY_PAYMENT_FINANCIAL_RECOVERY_SOURCE_V1",
+  "status": "SOURCE_FOCAL_REGRESSION_PASS_SIGNED_PREVIEW_LIVE_PENDING",
+  "gate": "I6.6",
+  "classification": "PRODUCT",
+  "preparedAgainstRepositoryHead": "32229710311b6fc8fdb01d1e00c95ced32d2ebf8",
+  "previousPhysicalSourceSha": "65c825b2808a615ca4195bdde6689dbdbe3193b2",
+  "supersedes": {
+    "repositoryHead": "32229710311b6fc8fdb01d1e00c95ced32d2ebf8",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_R51_DOCUMENTARY_PAYMENT_FINANCIAL_RECOVERY_SOURCE_20261124.json",
+    "receiptBlob": "60fcca730463b28892f715a27dd89b20be255805",
+    "qaReceiptPath": "artifacts/orbit360-recovery/release-control/I6_6_R51_DOCUMENTARY_PAYMENT_AND_ADMISSION_QA_20261124.json",
+    "qaReceiptBlob": "9e21e7e71dc927da3546a34e60971f901eafe2b6",
+    "scope": "QA_COMPOSITION_ONLY_FINANCIAL_PRODUCT_BYTES_PRESERVED"
+  },
+  "authority": {
+    "path": "artifacts/orbit360-recovery/release-control/I6_6_DIRECTION_URGENT_COMPLETION_TOLERANCE_AND_DIRECT_RENEWAL_20261124.json",
+    "gitBlobSha": "c1e69da9d018a75c0a73c5dbf3a3495e9afcd550"
+  },
+  "priorToleranceAuthority": {
+    "path": "artifacts/orbit360-recovery/release-control/I6_6_DIRECCION_DECISIONES_FINANCIERAS_Y_PLAN_INTEGRAL_20261122.md",
+    "gitBlobSha": "53b08239aa8807378ec95a4b4704c5d97622bc84",
+    "decision": "D01",
+    "preserveOriginalThresholdAndCurrencySemantics": true
+  },
+  "semantics": {
+    "country": "GT",
+    "currency": "GTQ",
+    "documentaryVarianceCents": 5,
+    "allInsurers": true,
+    "realPaymentAmountDateOriginPreserved": true,
+    "paymentObligationMismatchHeld": true,
+    "bankSettlementExact": true,
+    "identityCountryCurrencyExact": true,
+    "noInventedPayments": true,
+    "noAutomaticCustomerNotice": true
+  },
+  "boundaries": {
+    "productOwners": 6,
+    "backendTargets": 5,
+    "realDataWrites": 0,
+    "authOrRoleChanges": 0,
+    "bankMutations": 0,
+    "deployments": 0,
+    "signedPreview": "PENDING",
+    "signedLive": "PENDING"
+  },
+  "productPaths": [
+    {
+      "path": "functions/cobros-reconciliation-domain.js",
+      "previousGitBlobSha": "add21a5888f61fceea5ffd7aef7cf7318a31225e",
+      "gitBlobSha": "3d84423fd985841c6f9b230dcf729b41f2512556",
+      "sha256": "32d92a9b3c13827f1f2d2073888b0ab833ebc4b18395d761765713077c173831"
+    },
+    {
+      "path": "functions/payment-inference-engine.js",
+      "previousGitBlobSha": "5bebc3d134a129c608125b36da0109dfc52b812f",
+      "gitBlobSha": "a3d6bf99288c0c309759dce954d48c1ecc4db9dc",
+      "sha256": "ac185dec4b3e1e83609cbc102e89021a6feacccb8ef53fdcfcbf59a99d0555c3"
+    },
+    {
+      "path": "orbit360-platform/core/primas.js",
+      "previousGitBlobSha": "fbd41a84bba4a5083027689a457b427dac88f36e",
+      "gitBlobSha": "0d5d343ef11760312092314b719fc82da0eaa147",
+      "sha256": "65c4ee0c74d8564700b5389775e51c992815cbaa0e42acc4842d64efee568e22"
+    },
+    {
+      "path": "orbit360-platform/modules/cobros.js",
+      "previousGitBlobSha": "b7813be360a778cd199579cc3898a0179f2e3c2a",
+      "gitBlobSha": "e86ea782c6aacf97fe4ab4900ed40dec07537a22",
+      "sha256": "c956d689c05ffa8972ece1b961447d70e07601c2c38b7192b92ac8b36b11643a"
+    },
+    {
+      "path": "orbit360-platform/modules/config-domain-v20260804-bridge.js",
+      "previousGitBlobSha": "30fa9845bb38a3dc0ff72771675fdf1e9aa25625",
+      "gitBlobSha": "b0c3d6e2399ab9a13a60ea473fc8cc1e9edd00f9",
+      "sha256": "d87ce4a2c21734f00cf66970588b3b5d4be0e8bdb40cb823e0f9b4e090ea3862"
+    },
+    {
+      "path": "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js",
+      "previousGitBlobSha": "25f557054a37c7116fa88863a7357ed79d8a82e0",
+      "gitBlobSha": "74298d8565902895e5b2d2a5de030ed08847243c",
+      "sha256": "5f911e48fd9f78abd6fd5c88348fbb74032467e4a9c9fbc3fe7b3f53f2e0c343"
+    }
+  ],
+  "finalManifestLineage": [
+    {
+      "path": "functions/cobros-reconciliation-domain.js",
+      "changeId": "I6_6_R51_DOCUMENTARY_TOLERANCE_AND_CANONICAL_DOCUMENTARY_PAYMENT_UI_20261124",
+      "receipt": "artifacts/orbit360-recovery/release-control/I6_6_DIRECTION_URGENT_COMPLETION_TOLERANCE_AND_DIRECT_RENEWAL_20261124.json"
+    },
+    {
+      "path": "functions/payment-inference-engine.js",
+      "changeId": "I6_6_R51_DOCUMENTARY_TOLERANCE_AND_CANONICAL_DOCUMENTARY_PAYMENT_UI_20261124",
+      "receipt": "artifacts/orbit360-recovery/release-control/I6_6_DIRECTION_URGENT_COMPLETION_TOLERANCE_AND_DIRECT_RENEWAL_20261124.json"
+    },
+    {
+      "path": "orbit360-platform/core/primas.js",
+      "changeId": "I6_6_R51_DOCUMENTARY_TOLERANCE_AND_CANONICAL_DOCUMENTARY_PAYMENT_UI_20261124",
+      "receipt": "artifacts/orbit360-recovery/release-control/I6_6_DIRECTION_URGENT_COMPLETION_TOLERANCE_AND_DIRECT_RENEWAL_20261124.json"
+    },
+    {
+      "path": "orbit360-platform/modules/cobros.js",
+      "changeId": "I6_6_SELECTED_PAYMENT_ATTACHMENT_PRESERVATION_20261124",
+      "receipt": "artifacts/orbit360-recovery/release-control/I6_6_SELECTED_PAYMENT_ATTACHMENT_PRESERVATION_20261124_SOURCE.json"
+    },
+    {
+      "path": "orbit360-platform/modules/config-domain-v20260804-bridge.js",
+      "changeId": "I6_6_R51_DOCUMENTARY_TOLERANCE_AND_CANONICAL_DOCUMENTARY_PAYMENT_UI_20261124",
+      "receipt": "artifacts/orbit360-recovery/release-control/I6_6_DIRECTION_URGENT_COMPLETION_TOLERANCE_AND_DIRECT_RENEWAL_20261124.json"
+    },
+    {
+      "path": "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js",
+      "changeId": "I6_6_EFFECTIVE_CANCELLATION_DIRECT_OR_OPS_20261124",
+      "receipt": "artifacts/orbit360-recovery/release-control/I6_6_EFFECTIVE_CANCELLATION_DIRECT_OR_OPS_CAUSAL_SOURCE_20261124.json"
+    }
+  ],
+  "qaPaths": [
+    {
+      "path": ".github/workflows/gravicentra-i66-privileged-role-parity-source-qa.yml",
+      "gitBlobSha": "b2c5bef9fbd05ed6e562d19a5c744c396bdb9b8a",
+      "sha256": "d946caadc1ed244cd689f7699dd1df963f57018dd19943c1cdf77d48cdbc64ca"
+    },
+    {
+      "path": "tools/gravicentra-i6-6-cobros-payment-failure-category.test.cjs",
+      "gitBlobSha": "a59e96726a6d8516e5218f34a8b1aa30c814cf89",
+      "sha256": "34d95cd6666df74a08ae00bcb151a8855341900b950404ad3c114b5a5e64326a"
+    },
+    {
+      "path": "tools/gravicentra-i6-6-composite-preview-admission.test.cjs",
+      "gitBlobSha": "c6485d21daa40ea5a0521521163b67a375d6fd6d",
+      "sha256": "3fc58824c364a25398fdfd584f82477b70776c7bed711f565227c714d5835226"
+    },
+    {
+      "path": "tools/gravicentra-i6-6-documentary-payment-ui.test.cjs",
+      "gitBlobSha": "8ae02feff6b6afe81cd080d35ef8eaa5385e524c",
+      "sha256": "a1df831faf2708900b57c1448d3eaed4ec200a5af40506d5429bf2f71a0e16b4"
+    },
+    {
+      "path": "tools/gravicentra-i6-6-frontend-preview-authority.cjs",
+      "gitBlobSha": "c1b38fcccdf4fae3bc23cfc6c5cf0a1e9dbd1230",
+      "sha256": "9e0c85ce1f3a809ff514e1e5e2bc5cf60bef118144d076a4838a23b953c125f9"
+    },
+    {
+      "path": "tools/gravicentra-i6-6-operational-release-candidate.cjs",
+      "gitBlobSha": "9e91c35bed88b98bc4a3805abb826d632e51b7bf",
+      "sha256": "e96df4186c9ceb73f7f148d3f99a5222f12d794fbd96a9591b507bfdac5e12d3"
+    },
+    {
+      "path": "tools/gravicentra-i6-6-proposal-application-signed-uat.cjs",
+      "gitBlobSha": "9b23ee835360ca5cc206684c17e27466a24c9270",
+      "sha256": "76d33a2ec2c8d8c65a3985fc27f87b9388a1b3706b7b7f0cff98b8b43671d20e"
+    },
+    {
+      "path": "tools/gravicentra-i6-6-proposal-application-signed-uat.test.cjs",
+      "gitBlobSha": "cbb8ae140a8fa88b53d3fac603625ca201403aea",
+      "sha256": "4bfd39e878cb23f360538b899a716f007b24f35122d6ab06d8f55f98e76cb119"
+    },
+    {
+      "path": "tools/gravicentra-i6-6-r51-documentary-variance.test.cjs",
+      "gitBlobSha": "637a2b5c5980d5dab850f61e2f67376130090a4a",
+      "sha256": "b1f3f1661318eb6c405e4a7ca58ead3c3177f06b80b2ced7e5746ac16a560306"
+    },
+    {
+      "path": "tools/gravicentra-i6-6-r51-payment-application-preservation.test.cjs",
+      "gitBlobSha": "b519081d11a4309d3eea6a58c7e6831bbecdd189",
+      "sha256": "ec52b3393fb0569af0b99dea7c59915c296a6061a1c6efc72b530cda4e6edb95"
+    }
+  ],
+  "localVerification": {
+    "passed": 105,
+    "failed": 0,
+    "skipped": 0,
+    "documentarySignedDriver": {
+      "passed": 16,
+      "failed": 0,
+      "skipped": 0,
+      "reportSha256": "d224fe0be8ff303b2883e9ea4f72d5cd9fe4d41405e2084e9fed94281cfb1965"
+    },
+    "composedAdmission": {
+      "passed": 89,
+      "failed": 0,
+      "skipped": 0,
+      "reportSha256": "04cb424dffbee6ecab53d2e95d40d2e948ca85e6b8ddd0eee2c14138dcb34e24"
+    },
+    "preservedCommonOwners": {
+      "passed": 169,
+      "failed": 0,
+      "skipped": 0,
+      "reportSha256": "faf37d8d69b9bf83d270a788da52a1a8ec19edf61357e816cc21d214f6dbec1b"
+    }
+  },
+  "runtimeRequirement": {
+    "driver": "tools/gravicentra-i6-6-proposal-application-signed-uat.cjs",
+    "profile": "I66_R51_DOCUMENTARY_PAYMENT_UI_SIGNED_QA_V1",
+    "role": "direccion",
+    "sources": [
+      "commission_statement",
+      "insurer_statement"
+    ],
+    "syntheticPaymentsPerPhase": 2,
+    "normalUiRequired": true,
+    "exactBeforeAfterReadback": true,
+    "reloadRequired": true,
+    "canonicalSameRequestReplayWrites": 0,
+    "restoreOwnedTargets": 14,
+    "uncertainWriteResponse": "HOLD_RETAIN_OWNED_NAMESPACE",
+    "realPaymentExecutions": 0
+  },
+  "completionAccounting": {
+    "previous155Payments": "APPLIED_DIRECT_PREEXISTING_R52_COMPLETION_NO_NEW_PAYMENTS",
+    "remainingSourceFacts": "TWO_MAPFRE_PLUS_SEVEN_DOCUMENTARY_HOLDS_NOT_NINE_NEW_PAYMENTS"
+  },
+  "sourceQaRevision": {
+    "revisionId": "I6_6_COMPOSITE_ADMISSION_HISTORICAL_FIXTURES_AND_REQUEST_CONTINUITY_QA_20261124",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_COMPOSITE_ADMISSION_HISTORICAL_FIXTURES_AND_REQUEST_CONTINUITY_QA_20261124.json",
+    "receiptBlob": "39b1dfec26caa279f3ebb79d44740165d637fac1",
+    "historicalReceipt": {
+      "sourcePath": "artifacts/orbit360-recovery/release-control/I6_6_R51_ASSIGNED_ROLES_INSURER_FINANCIAL_RECOVERY_SOURCE_20261124.json",
+      "archivePath": "artifacts/orbit360-recovery/release-control/I6_6_R51_ASSIGNED_ROLES_INSURER_FINANCIAL_RECOVERY_SOURCE_20261124_PRE_BUILD29_QA.json",
+      "gitBlobSha": "1d89b80f46afc83bc5cfda1c0147548fe5319347",
+      "sha256": "50e7c9e86862d40665cf413703105cba96fcd08fa47516bc7d709a4c4ee4e955",
+      "publishedSourceHead": "9da06674caf080e10f510d8a13a1d122d449dff2",
+      "failedBuildControlHead": "6efd4d494cd56b6be87d2fee3cbfc0ba55e9f6a8",
+      "sourceOnly": true,
+      "signedPreviewAccepted": false,
+      "signedLiveAccepted": false
+    },
+    "scope": "HISTORICAL_FIXTURE_AND_EXACT_EXISTING_COMPOSITION_CONTINUITY_SOURCE_QA_RESEAL",
+    "productBytesPreserved": true,
+    "providerSourceQaPending": true,
+    "signedRuntimeEvidenceNotTransferred": true
+  }
+}

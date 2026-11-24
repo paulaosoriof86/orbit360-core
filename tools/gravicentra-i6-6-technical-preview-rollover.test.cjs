@@ -1346,3 +1346,137 @@ test('V4 validates accepted E3 LIVE with the original exact workflow/head/attemp
   for (const [key, value] of [['head_sha', 'd'.repeat(40)], ['run_attempt', 2], ['path', '.github/workflows/other.yml'], ['conclusion', 'failure']])
     await assert.rejects(makeIo({ ...run, [key]: value }).validateAcceptedLive(a));
 });
+
+
+// The two failed builds are history, not mutable active-request fixtures. The
+// source30 snapshot is exact; synthetic receipt bytes below exercise only the
+// retry contract and never certify a provider run or a Hosting artifact.
+const retryTransportPath = 'artifacts/orbit360-recovery/release-control/I6_6_RELEASE_TRANSPORT_CONTROL_20261110.json';
+const retry30Source = '96bc5388c5c22c1df9256bd11cdb4209681779dc';
+const retry29Source = '6efd4d494cd56b6be87d2fee3cbfc0ba55e9f6a8';
+const retryRepo = path.resolve(__dirname, '..');
+const retryGitRead = (...args) => execFileSync('git', args, { cwd: retryRepo, encoding: 'utf8', stdio: 'pipe' }).trim();
+const retry30Control = JSON.parse(retryGitRead('show', retry30Source + ':' + retryTransportPath));
+const retry29Control = JSON.parse(retryGitRead('show', retry29Source + ':' + retryTransportPath));
+const retryBlob = text => crypto.createHash('sha1').update('blob ' + Buffer.byteLength(text) + '\0').update(text).digest('hex');
+function retry31Fixture() {
+  const control = clone(retry30Control), sourceQa = 'e'.repeat(40), calls = [];
+  control.priorFrontendPreviewRequestBeforeV31_20261124 = clone(control.frontendPreviewRequest);
+  control.frontendPreviewRequest.version = 31;
+  control.frontendPreviewRequest.sourceQaHead = sourceQa;
+  control.frontendPreviewRequest.releaseMechanismSourceSha = sourceQa;
+  control.frontendPreviewRequest.reason = 'Synthetic exact successor after both recorded failures.';
+  // Existing source admission still validates these new source-QA receipts.
+  for (const key of ['financialRecovery', 'financialRecoveryQa', 'cancellationRecovery', 'cancellationRecoveryQa'])
+    control.frontendPreviewRequest[key].receiptBlob = 'd'.repeat(40);
+  const failure = { schema: 'GI_I66_ROLLOVER_PREOVERWRITE_FAILURE_V1',
+    status: 'FAILED_AFTER_ARTIFACT_BEFORE_PREVIEW_OVERWRITE', gate: 'I6.6', requestVersion: 30,
+    sourceSha: retry30Source, buildRunId: 45510996597, attempt: 1, conclusion: 'failure',
+    failureCode: 'I66_TECHNICAL_ROLLOVER_SUCCESSOR_REQUEST_REQUIRED', artifacts: 1,
+    artifact: { id: 14976066036, digest: 'sha256:d31b59d7b5fd6804b79f624e119d81d8316ae2d7d57763e8b87740ac5f7c5bb0' },
+    previewOverwriteStarted: false, exactReadbackCompleted: false, hostingDeployments: 0,
+    backendDeployments: 0, realDataWrites: 0, acceptedPhysicalLiveUnchanged: true,
+    acceptedGeneration: 'E3', fullI66ProductionAccepted: false,
+    rolloverReceipt: { path: successfulPhysicalPin.receiptPath, sha256: successfulPhysicalPin.receiptSha256 },
+    logEvidence: { sha256: 'a'.repeat(64) }, syntheticContractFixture: true };
+  const failed = { version: 30, sourceSha: retry30Source, runId: failure.buildRunId, attempt: 1,
+    status: 'FAILED_BEFORE_PREVIEW_OVERWRITE', artifactCreated: true,
+    receipt: { path: 'artifacts/orbit360-recovery/release-control/I6_6_SYNTHETIC_RETRY_FAILURE_20261124.json' } };
+  control.failedImmutableBuildAttempts.push(failed);
+  const texts = new Map();
+  for (const row of retry30Control.failedImmutableBuildAttempts)
+    texts.set(row.receipt.path, fs.readFileSync(path.join(retryRepo, row.receipt.path), 'utf8'));
+  const seal = () => { const text = JSON.stringify(failure); texts.set(failed.receipt.path, text);
+    failed.receipt.sha256 = digest(text); failed.receipt.gitBlobSha = retryBlob(text); };
+  seal();
+  const sources = new Map([[retry29Source, clone(retry29Control)], [retry30Source, clone(retry30Control)]]);
+  const io = { readText(relative) { assert.ok(texts.has(relative), 'unexpected receipt read'); return texts.get(relative); },
+    git(...args) { calls.push(args);
+      if (args[0] === 'show') {
+        const [sha, p] = args[1].split(':'); assert.equal(p, retryTransportPath); assert.ok(sources.has(sha));
+        return JSON.stringify(sources.get(sha));
+      }
+      if (args[0] === 'merge-base') {
+        assert.equal(args[1], '--is-ancestor');
+        assert.ok((args[2] === sourceQa && args[3] === 'HEAD') ||
+          (args[2] === retry29Source && args[3] === retry30Source) ||
+          ([retry29Source, retry30Source].includes(args[2]) && args[3] === sourceQa));
+        return '';
+      }
+      assert.equal(args[0], 'diff'); assert.equal(args[1], '--quiet');
+      assert.ok(args.includes('functions') && args.includes('orbit360-platform') && args.includes('storage.rules'));
+      assert.ok(args.includes('tools/gravicentra-i6-1-preview-package.mjs'));
+      return '';
+    } };
+  return { control, failure, failed, texts, sources, calls, io, seal };
+}
+function checkRetry(f) { return api.validateAuthorization(f.control, successfulPhysicalText, f.io); }
+test('V4 accepts the sealed real request30 causal history instead of fixed request29 equality', () => {
+  const result = api.validateAuthorization(clone(retry30Control), successfulPhysicalText);
+  assert.equal(result.profile, successfulPhysicalReceipt.profile);
+  assert.deepEqual(result, successfulPhysicalReceipt);
+});
+test('V4 accepts contiguous29+30 failures for31 with recertified QA metadata and identical product scope', () => {
+  const f = retry31Fixture(), before = clone(f.control), result = checkRetry(f);
+  assert.deepEqual(f.control, before);
+  assert.deepEqual(result, successfulPhysicalReceipt);
+  assert.equal(result.previousCandidate.buildRunId, 45464287026);
+  assert.equal(result.protectedLive.sourceSha, '65c825b2808a615ca4195bdde6689dbdbe3193b2');
+  assert.equal(result.freshInventoryEvidence.totalChannels, 51);
+  assert.equal(f.calls.filter(row => row[0] === 'show').length, 2);
+  assert.equal(f.calls.filter(row => row[0] === 'merge-base').length, 4);
+  assert.equal(f.calls.filter(row => row[0] === 'diff').length, 3);
+});
+for (const [label, mutate, expected] of [
+  ['replaying already failed30', f => { f.control.frontendPreviewRequest.version = 30; }, /FAILED_REQUEST_REPLAY/],
+  ['skipping31 without its archived request and failure', f => { f.control.frontendPreviewRequest.version = 32; }, /SUCCESSOR_REQUEST_REQUIRED/],
+  ['missing29 failure', f => { f.control.failedImmutableBuildAttempts.shift(); }, /SUCCESSOR_REQUEST_REQUIRED/],
+  ['duplicate30 failure', f => { f.control.failedImmutableBuildAttempts.push(clone(f.failed)); }, /SUCCESSOR_REQUEST_REQUIRED/],
+  ['missing archived30', f => { delete f.control.priorFrontendPreviewRequestBeforeV31_20261124; }, /RETRY_HISTORY_REQUIRED/],
+  ['duplicate archived30', f => { f.control.priorFrontendPreviewRequestBeforeV31_20261125 = clone(f.control.priorFrontendPreviewRequestBeforeV31_20261124); }, /RETRY_HISTORY_REQUIRED/],
+  ['altered archived30 instead of its exact failed source', f => { f.control.priorFrontendPreviewRequestBeforeV31_20261124.reason += ' changed'; }, /RETRY_ARCHIVED_REQUEST_DRIFT/],
+  ['same failed run twice', f => { f.failed.runId = f.control.failedImmutableBuildAttempts[0].runId; }, /RETRY_FAILURE_REPLAY/],
+  ['source failure identity drift', f => { f.failure.sourceSha = 'b'.repeat(40); f.seal(); }, /RETRY_FAILURE_FACT_DRIFT_sourceSha/],
+  ['receipt SHA drift', f => { f.failed.receipt.sha256 = 'b'.repeat(64); }, /RETRY_RECEIPT_SHA_DRIFT/],
+  ['receipt blob drift', f => { f.failed.receipt.gitBlobSha = 'b'.repeat(40); }, /RETRY_RECEIPT_BLOB_DRIFT/],
+  ['receipt path traversal', f => { f.failed.receipt.path = '../failure.json'; }, /RETRY_FAILURE_PIN_REQUIRED/],
+  ['failure relabeled success', f => { f.failure.conclusion = 'success'; f.seal(); }, /RETRY_FAILURE_FACT_DRIFT_conclusion/],
+  ['unproven failure log', f => { delete f.failure.logEvidence; f.seal(); }, /RETRY_FAILURE_LOG_REQUIRED/],
+  ['postoverwrite failure', f => { f.failure.previewOverwriteStarted = true; f.seal(); }, /RETRY_PREVIEW_OVERWRITE_DENIED/],
+  ['readback claimed for failed30', f => { f.failure.exactReadbackCompleted = true; f.seal(); }, /RETRY_COMPLETED_READBACK_DENIED/],
+  ['Hosting deployment occurred', f => { f.failure.hostingDeployments = 1; f.seal(); }, /RETRY_FAILURE_FACT_DRIFT_hostingDeployments/],
+  ['backend deployment occurred', f => { f.failure.backendDeployments = 1; f.seal(); }, /RETRY_FAILURE_FACT_DRIFT_backendDeployments/],
+  ['customer write occurred', f => { f.failure.realDataWrites = 1; f.seal(); }, /RETRY_FAILURE_FACT_DRIFT_realDataWrites/],
+  ['artifact creation concealed', f => { f.failed.artifactCreated = false; }, /RETRY_ARTIFACT_FACT_DRIFT/],
+  ['failed artifact digest malformed', f => { f.failure.artifact.digest = 'unknown'; f.seal(); }, /RETRY_FAILED_ARTIFACT_IDENTITY_REQUIRED/],
+  ['different physical rollover receipt', f => { f.failure.rolloverReceipt.sha256 = 'b'.repeat(64); f.seal(); }, /RETRY_PHYSICAL_RECEIPT_DRIFT/],
+  ['different physical LIVE pointer', f => { f.sources.get(retry30Source).currentPhysicalHostingRelease.artifactId++; }, /RETRY_LIVE_POINTER_DRIFT/],
+  ['extra product path', f => { f.control.frontendPreviewRequest.productPaths.push('orbit360-platform/modules/unapproved.js'); }, /RETRY_REQUEST_SCOPE_DRIFT/],
+  ['changed product blob', f => { const q=f.control.frontendPreviewRequest.financialRecovery.productPathBlobs; q[Object.keys(q)[0]]='b'.repeat(40); }, /RETRY_REQUEST_SCOPE_DRIFT/],
+  ['changed backend blob', f => { const q=f.control.frontendPreviewRequest.backendPathBlobs; q[Object.keys(q)[0]]='b'.repeat(40); }, /RETRY_REQUEST_SCOPE_DRIFT/],
+  ['omitted direct forms QA', f => { delete f.control.frontendPreviewRequest.directFormsQa; }, /RETRY_REQUEST_SCOPE_DRIFT/],
+  ['different financial QA profile', f => { f.control.frontendPreviewRequest.financialRecoveryQa.profile = 'UNRESTRICTED'; }, /RETRY_REQUEST_SCOPE_DRIFT/],
+  ['different cancellation QA profile', f => { f.control.frontendPreviewRequest.cancellationRecoveryQa.profile = 'UNRESTRICTED'; }, /RETRY_REQUEST_SCOPE_DRIFT/],
+  ['different direct forms receipt', f => { f.control.frontendPreviewRequest.directFormsRecovery.receiptBlob = 'b'.repeat(40); }, /RETRY_REQUEST_SCOPE_DRIFT/],
+  ['different financial receipt path', f => { f.control.frontendPreviewRequest.financialRecovery.receiptPath += '.other'; }, /RETRY_REQUEST_SCOPE_DRIFT/],
+  ['new request authority flag', f => { f.control.frontendPreviewRequest.anyAdditionalWritesAllowed = true; }, /RETRY_REQUEST_SCOPE_DRIFT/]
+]) test('V4 monotonic retry rejects ' + label, () => {
+  const f = retry31Fixture(); mutate(f); assert.throws(() => checkRetry(f), expected);
+});
+for (const [label, select] of [
+  ['source QA not ancestor of checkout', row => row[0] === 'merge-base' && row[3] === 'HEAD'],
+  ['failed source not ancestor of source QA', row => row[0] === 'merge-base' && row[2] === retry30Source],
+  ['failed source sequence not monotonic', row => row[0] === 'merge-base' && row[2] === retry29Source && row[3] === retry30Source],
+  ['product drift between failure and source QA', row => row[0] === 'diff' && row[2] === retry30Source],
+  ['product drift after source QA', row => row[0] === 'diff' && row[3] === 'HEAD']
+]) test('V4 monotonic retry stops on real Git contract failure: ' + label, () => {
+  const f = retry31Fixture(), original = f.io.git;
+  f.io.git = (...args) => { if (select(args)) throw new Error('GIT_CONTRACT_FAILED'); return original(...args); };
+  assert.throws(() => checkRetry(f), /GIT_CONTRACT_FAILED/);
+});
+test('V4 retry owner and discriminating test are included in existing signed source QA', () => {
+  const text = fs.readFileSync(path.join(retryRepo, '.github/workflows/gravicentra-i66-privileged-role-parity-source-qa.yml'), 'utf8');
+  for (const p of ['tools/gravicentra-i6-6-preview-channel-reuse-guard.cjs', 'tools/gravicentra-i6-6-technical-preview-rollover.test.cjs'])
+    assert.ok(text.includes('      - ' + p + '\n'));
+  assert.match(text, /^\s+node --test tools\/gravicentra-i6-6-technical-preview-rollover\.test\.cjs$/m);
+});
