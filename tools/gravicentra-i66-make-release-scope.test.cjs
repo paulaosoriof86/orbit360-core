@@ -162,6 +162,107 @@ test('preexisting approved trigger requires its exact previous revision for safe
  assert.equal(s.validateInventoryBefore(p,'preview',rows,g.MAKE_TARGETS.preview),true);rows[4].revision='different';
  assert.throws(()=>s.validateInventoryBefore(p,'preview',rows,g.MAKE_TARGETS.preview));
 });
+function existingInventoryFixture(phase){
+ const {p}=fixture(),t=s.ADDED[phase];
+ const projection={...t,revision:t.name.toLowerCase()+'-00001-exact',runtimePrincipal:s.RUNTIME,eventType:s.EVENT_TYPE,
+  database:'(default)',document:'tenants/alianzas-soluciones/'+(phase==='preview'?'previewLeadIngressRequests':'leadIngressRequests')+'/{requestId}',
+  retryPolicy:'RETRY_POLICY_RETRY',trigger:'projects/ays-orbit-360-lab/locations/nam5/triggers/exact',
+  service:'projects/ays-orbit-360-lab/locations/'+t.region+'/services/'+t.name.toLowerCase()};
+ const fn={...projection,configurationDigest:require('../functions/product-lead-ingress-contract').digest(projection)};
+ p.makeIngress.targetBefore[phase]={...t,state:'EXISTING_APPROVED',revision:fn.revision,configurationDigest:fn.configurationDigest,receiptBlob:'c'.repeat(40)};
+ const snapshot={schema:'GI_I66_MAKE_TRIGGER_SNAPSHOT_V1',phase,sourceSha:p.sourceSha,artifactDigest:p.artifactDigest,
+  previousState:'EXISTING_APPROVED',function:fn};
+ const raw={status:'success',result:g.MAKE_TARGETS[phase].map(x=>({entryPoint:x.name,region:x.region,platform:'gcfv2'}))};
+ raw.result.push({entryPoint:'unrelatedFunction',region:'us-east1',uri:'https://unchanged.invalid'});
+ return{p,snapshot,raw};
+}
+test('CLI inventories without revisions require the exact API snapshot in both phases and preserve original evidence',()=>{
+ for(const phase of ['preview','live'])for(const arrayForm of [false,true]){
+  const {p,snapshot,raw:object}=existingInventoryFixture(phase),raw=arrayForm?object.result:object,before=clone(raw),targets=g.MAKE_TARGETS[phase];
+  assert.throws(()=>s.validateInventoryBefore(p,phase,raw,targets),'a missing CLI revision alone remains a failure');
+  assert.throws(()=>s.inventoryWithTriggerSnapshot(p,phase,raw),/AUTHENTICATED_TRIGGER_SNAPSHOT_REQUIRED/);
+  const verified=s.inventoryWithTriggerSnapshot(p,phase,raw,snapshot),rows=Array.isArray(verified)?verified:verified.result;
+  assert.equal(rows.find(r=>r.entryPoint===s.ADDED[phase].name).revision,snapshot.function.revision);
+  assert.equal(s.validateInventoryBefore(p,phase,verified,targets),true);
+  assert.deepEqual(raw,before,'the original CLI inventory must not be rewritten');
+  assert.deepEqual(rows.filter(r=>r.entryPoint!==s.ADDED[phase].name),(Array.isArray(raw)?raw:raw.result).filter(r=>r.entryPoint!==s.ADDED[phase].name));
+  const after=clone(object);assert.equal(s.validateInventoryAfter(p,phase,verified,after,targets),true);
+  after.result.at(-1).uri='https://changed.invalid';
+  assert.throws(()=>s.validateInventoryAfter(p,phase,verified,after,targets),/UNRELATED_FUNCTION_CHANGED/);
+ }
+});
+test('API supplementation rejects stale scope, altered projection, absence and conflicting CLI revisions',()=>{
+ for(const phase of ['preview','live']){
+  const {p,snapshot,raw}=existingInventoryFixture(phase);
+  for(const mutate of [v=>v.phase=phase==='preview'?'live':'preview',v=>v.sourceSha='f'.repeat(40),
+   v=>v.artifactDigest='sha256:'+'e'.repeat(64),v=>v.previousState='ABSENT',v=>v.function=null,
+   v=>v.function.name='anotherFunction',v=>v.function.region='other-region',v=>v.function.revision+='-changed',
+   v=>v.function.configurationDigest='d'.repeat(64),v=>v.function.runtimePrincipal='other@invalid',
+   v=>v.function.document='tenants/other/queue/{requestId}',v=>v.function.service+='/other']){
+   const altered=clone(snapshot);mutate(altered);assert.throws(()=>s.inventoryWithTriggerSnapshot(p,phase,raw,altered));
+  }
+  for(const field of ['revision','serviceConfig']){
+   const altered=clone(raw),row=altered.result.find(r=>r.entryPoint===s.ADDED[phase].name);
+   row[field]=field==='revision'?'different-real-revision':{revision:'different-real-revision'};
+   assert.throws(()=>s.inventoryWithTriggerSnapshot(p,phase,altered,snapshot),/CLI_API_REVISION_DISAGREEMENT/);
+  }
+  const empty=clone(raw);empty.result=empty.result.filter(r=>r.entryPoint!==s.ADDED[phase].name);
+  assert.throws(()=>s.inventoryWithTriggerSnapshot(p,phase,empty,snapshot),/FUNCTION_PREIMAGE_DRIFT/);
+  const duplicate=clone(raw);duplicate.result.push(clone(duplicate.result[4]));
+  assert.throws(()=>s.inventoryWithTriggerSnapshot(p,phase,duplicate,snapshot),/INVENTORY_DUPLICATE/);
+ }
+});
+test('an absent trigger requires exact API absence and cannot borrow an existing-trigger snapshot',()=>{
+ for(const phase of ['preview','live']){
+  const {p}=fixture(),raw=g.MAKE_TARGETS[phase].slice(0,4).map(t=>({entryPoint:t.name,region:t.region}));
+  const snapshot={schema:'GI_I66_MAKE_TRIGGER_SNAPSHOT_V1',phase,sourceSha:p.sourceSha,artifactDigest:p.artifactDigest,previousState:'ABSENT',function:null};
+  const verified=s.inventoryWithTriggerSnapshot(p,phase,raw,snapshot);
+  assert.equal(s.validateInventoryBefore(p,phase,verified,g.MAKE_TARGETS[phase]),true);
+  assert.throws(()=>s.inventoryWithTriggerSnapshot(p,phase,raw,{...snapshot,function:{revision:'invented'}}),/ABSENT_TRIGGER_SNAPSHOT_DRIFT/);
+ }
+});
+test('the actual Preview and LIVE workflow inventory blocks consume the API snapshot before and after deployment',()=>{
+ for(const phase of ['preview','live']){
+  const name=phase==='preview'?'gravicentra-i66-privileged-role-three-function-preview-uat.yml':'gravicentra-i66-privileged-role-exact-live-promotion.yml';
+  const text=fs.readFileSync(path.join(__dirname,'../.github/workflows',name),'utf8');
+  const start=phase==='preview'?'Verify exact authorized Preview callables then deploy only those':'Snapshot exact LIVE function revisions, inventory and previous Hosting version for rollback';
+  const section=text.slice(text.indexOf('- name: '+start));
+  assert.ok(section.indexOf('snapshot-trigger '+phase)<section.indexOf('validateInventoryBefore'),'the authenticated API snapshot must precede inventory validation');
+  const before=section.match(/node - <<'NODE'\n([\s\S]*?)\n          NODE/)[1];
+  const after=section.match(new RegExp("node - <<'"+(phase==='preview'?'PREVIEW_INVENTORY':'LIVE_INVENTORY')+"'\\n([\\s\\S]*?)\\n          "+(phase==='preview'?'PREVIEW_INVENTORY':'LIVE_INVENTORY')))[1];
+  const {p,raw,snapshot}=existingInventoryFixture(phase),calls=[];
+  const run=(code,proof=snapshot)=>vm.runInNewContext(code,{process:{env:{RUNNER_TEMP:'/runner'}},console:{log:()=>{}},require:mod=>{
+   if(mod==='node:assert/strict')return assert;
+   if(mod==='node:fs')return{readFileSync:file=>file===g.CONTROL?'{}':file==='/runner/gi-make-'+phase+'-snapshot-trigger.json'?JSON.stringify(proof):assert.fail('Unexpected file '+file)};
+   if(mod.endsWith('-functions-before.json')||mod.endsWith('-functions-after.json'))return clone(raw);
+   if(mod==='./tools/gravicentra-i6-6-operational-release-candidate.cjs')return{...g,candidateForPhase:()=>p};
+   if(mod==='./tools/gravicentra-i66-make-release-scope.cjs')return{...s,inventoryWithTriggerSnapshot:(...args)=>{
+    calls.push(args[1]);return s.inventoryWithTriggerSnapshot(...args);
+   }};
+   assert.fail('Unexpected require '+mod);
+  }});
+  run(before);run(after);assert.deepEqual(calls,[phase,phase]);
+  for(const code of [before,after])assert.throws(()=>run(code,{...snapshot,sourceSha:'f'.repeat(40)}),/SNAPSHOT_SOURCE_DRIFT/);
+ }
+});
+test('the actual LIVE rollback TSV guard binds effective traffic and service to the same API snapshot',()=>{
+ const text=fs.readFileSync(path.join(__dirname,'../.github/workflows/gravicentra-i66-privileged-role-exact-live-promotion.yml'),'utf8');
+ const code=text.match(/node - <<'MAKE_LIVE_PREIMAGE'\n([\s\S]*?)\n          MAKE_LIVE_PREIMAGE/)[1];
+ const {p,snapshot}=existingInventoryFixture('live');
+ const env={RUNNER_TEMP:'/runner',PROJECT_ID:'ays-orbit-360-lab',FN:s.ADDED.live.name,REGION:s.ADDED.live.region,
+  SERVICE:s.ADDED.live.name.toLowerCase(),OLD_REV:snapshot.function.revision};
+ const actual={serviceConfig:{service:snapshot.function.service,revision:snapshot.function.revision}};
+ const run=(values=env,proof=snapshot,functionReadback=actual)=>vm.runInNewContext(code,{process:{env:values},require:mod=>{
+  if(mod==='node:assert/strict')return assert;
+  if(mod==='node:fs')return{readFileSync:file=>file===g.CONTROL?'{}':JSON.stringify(file.endsWith('gi-role-before-fn.json')?functionReadback:proof)};
+  assert.equal(mod,'./tools/gravicentra-i6-6-operational-release-candidate.cjs');return{...g,candidateForPhase:()=>p};
+ }});
+ run();
+ for(const key of ['FN','REGION','SERVICE','OLD_REV'])assert.throws(()=>run({...env,[key]:env[key]+'-changed'}));
+ assert.throws(()=>run(env,{...snapshot,sourceSha:'f'.repeat(40)}));
+ assert.throws(()=>run(env,{...snapshot,artifactDigest:'sha256:'+'e'.repeat(64)}));
+ for(const key of ['service','revision'])assert.throws(()=>run(env,snapshot,{serviceConfig:{...actual.serviceConfig,[key]:actual.serviceConfig[key]+'-changed'}}));
+});
 test('Cloud Run traffic alone cannot certify AuthContext or queue authorization',()=>{
  const {p}=fixture();s.validateTrigger(p,'live',trigger(p,'live'));
  for(const mutate of [r=>r.realAuthContextObserved=false,r=>r.principalProbeDigest='',r=>r.eventType='google.cloud.firestore.document.v1.created',

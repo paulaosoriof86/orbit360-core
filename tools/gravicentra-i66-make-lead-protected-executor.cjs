@@ -114,6 +114,11 @@ async function rollbackCreatedTrigger({auth,p,phase,snapshot,postimage,deleteFun
     assert.ok(snapshot.function,'INGRESS_PREVIOUS_TRIGGER_SNAPSHOT_REQUIRED');
     const current=await deployedFunction(auth,p,phase);
     assert.equal(current.service,snapshot.function.service,'INGRESS_PREVIEW_ROLLBACK_SERVICE_CHANGED');
+    if(c.digest(current)===c.digest(snapshot.function))
+      return{status:'PREVIOUS_TRIGGER_UNCHANGED_NO_RESTORE_REQUIRED',functionDeletes:0,trafficWrites:0};
+    assert.equal(postimage?.schema,'GI_I66_MAKE_TRIGGER_POSTIMAGE_V1','INGRESS_TRIGGER_POSTIMAGE_REQUIRED_FOR_RESTORE');
+    assert.equal(postimage.phase,phase);assert.equal(postimage.sourceSha,p.sourceSha);assert.equal(postimage.artifactDigest,p.artifactDigest);
+    assert.deepEqual(current,postimage.function,'INGRESS_TRIGGER_ROLLBACK_POSTIMAGE_CHANGED');
     assert.equal(typeof restorePreviousRevision,'function');await restorePreviousRevision(snapshot.function);
     return{status:'EXACT_PREVIOUS_PREVIEW_REVISION_RESTORED',functionDeletes:0};
   }

@@ -152,6 +152,38 @@ function verifySourcePins(p){
 }
 const inventoryRows=x=>Array.isArray(x?.result)?x.result:Array.isArray(x)?x:[];
 const id=r=>String(r.entryPoint||r.id||r.name||'').split('/').pop();
+// Firebase CLI 14.10.1 omits the deployed revision from functions:list.
+// Supplement that inventory only with the exact authenticated v2 Function
+// snapshot produced by the protected executor. Never infer a revision from
+// the requested authority or treat a missing CLI field as a matching value.
+function inventoryWithTriggerSnapshot(p,phase,raw,snapshot){
+  const s=validateCandidate(p,phase),before=s.targetBefore[phase],extra=ADDED[phase];
+  assert.ok(Array.isArray(raw)||Array.isArray(raw?.result),'I66_MAKE_FUNCTION_INVENTORY_SHAPE');
+  assert.equal(snapshot?.schema,'GI_I66_MAKE_TRIGGER_SNAPSHOT_V1','I66_MAKE_AUTHENTICATED_TRIGGER_SNAPSHOT_REQUIRED');
+  assert.equal(snapshot.phase,phase,'I66_MAKE_TRIGGER_SNAPSHOT_PHASE_DRIFT');
+  assert.equal(snapshot.sourceSha,p.sourceSha,'I66_MAKE_TRIGGER_SNAPSHOT_SOURCE_DRIFT');
+  assert.equal(snapshot.artifactDigest,p.artifactDigest,'I66_MAKE_TRIGGER_SNAPSHOT_ARTIFACT_DRIFT');
+  assert.equal(snapshot.previousState,before.state,'I66_MAKE_TRIGGER_SNAPSHOT_PREIMAGE_DRIFT');
+  const result=structuredClone(raw),rows=inventoryRows(result),found=rows.filter(r=>id(r)===extra.name);
+  assert.equal(new Set(rows.map(id)).size,rows.length,'I66_MAKE_FUNCTION_INVENTORY_DUPLICATE');
+  if(before.state==='ABSENT'){
+    assert.equal(snapshot.function,null,'I66_MAKE_ABSENT_TRIGGER_SNAPSHOT_DRIFT');
+    assert.equal(found.length,0,'I66_MAKE_FUNCTION_PREIMAGE_DRIFT_'+extra.name);return result;
+  }
+  assert.equal(found.length,1,'I66_MAKE_FUNCTION_PREIMAGE_DRIFT_'+extra.name);
+  assert.equal(String(found[0].region||found[0].location||''),extra.region,'I66_MAKE_TRIGGER_INVENTORY_REGION_DRIFT');
+  const fn=snapshot.function;assert.ok(fn,'I66_MAKE_EXISTING_TRIGGER_SNAPSHOT_REQUIRED');
+  assert.equal(fn.name,extra.name,'I66_MAKE_TRIGGER_SNAPSHOT_NAME_DRIFT');
+  assert.equal(fn.region,extra.region,'I66_MAKE_TRIGGER_SNAPSHOT_REGION_DRIFT');
+  assert.equal(fn.revision,before.revision,'I66_MAKE_TRIGGER_SNAPSHOT_REVISION_DRIFT');
+  assert.equal(fn.configurationDigest,before.configurationDigest,'I66_MAKE_TRIGGER_SNAPSHOT_CONFIGURATION_DRIFT');
+  const {configurationDigest,...projection}=fn;
+  assert.equal(require('../functions/product-lead-ingress-contract').digest(projection),configurationDigest,
+    'I66_MAKE_TRIGGER_SNAPSHOT_CONTENT_DIGEST_DRIFT');
+  for(const revision of [found[0].serviceConfig?.revision,found[0].revision])
+    if(revision!==undefined&&revision!==null&&revision!=='')assert.equal(revision,fn.revision,'I66_MAKE_CLI_API_REVISION_DISAGREEMENT');
+  found[0].revision=fn.revision;return result;
+}
 function validateInventoryBefore(p,phase,raw,expected){
   const s=validateCandidate(p,phase),rows=inventoryRows(raw),extra=ADDED[phase];
   assert.equal(new Set(rows.map(id)).size,rows.length,'I66_MAKE_FUNCTION_INVENTORY_DUPLICATE');
@@ -218,4 +250,4 @@ function validateLiveProof(p,proof){
   return proof;
 }
 module.exports={SCOPE,REQUEST_MODE,CONTRACT_PATH,CONTRACT_BLOB,COMMUNICATION_DECISION_PATH,COMMUNICATION_DECISION_BLOB,META_RECEIPT_PATH,META_RECEIPT_BLOB,EVENT_TYPE,SECRET,RUNTIME,RUNTIME_RECEIPT_PATH,RUNTIME_RECEIPT_BLOB,RUNTIME_REPORT_DIGEST,SOURCE_PATHS,FRONTEND_PATH,FRONTEND_BLOB,PRODUCT_PATHS,PACKAGER_PATH,PACKAGER_BLOB,BALANCE_RECEIPT_PATH,BALANCE_RECEIPT_BLOB,BALANCE_CORRECTION,ADDED,PREVIEW_STATUS,LIVE_STATUS,
-  isMake,target,validatePackagedSourceBytes,validateScope,validateCandidate,verifySourcePins,validateInventoryBefore,validateInventoryAfter,validateTrigger,validatePreviewProof,validateLiveProof};
+  isMake,target,validatePackagedSourceBytes,validateScope,validateCandidate,verifySourcePins,inventoryWithTriggerSnapshot,validateInventoryBefore,validateInventoryAfter,validateTrigger,validatePreviewProof,validateLiveProof};

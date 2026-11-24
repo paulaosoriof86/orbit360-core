@@ -1,0 +1,152 @@
+{
+  "schema": "GI_I66_MAKE_EXISTING_TRIGGER_INVENTORY_CAUSAL_CORRECTION_V1",
+  "recordType": "SOURCE_QA_AND_RELEASE_TRANSPORT_CORRECTION_NOT_PREVIEW_OR_LIVE_ACCEPTANCE",
+  "dateUtc": "2026-11-24",
+  "recordedAtUtc": "2026-11-24T17:45:06.240Z",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "gate": "I6.6",
+  "status": "CAUSAL_CORRECTION_221_LOCAL_TESTS_PASS_REBUILD_AND_SIGNED_GATES_PENDING",
+  "approvedByDirection": true,
+  "authority": {
+    "directionDecisionPath": "artifacts/orbit360-recovery/release-control/I6_6_DIRECTION_URGENT_COMPLETION_TOLERANCE_AND_DIRECT_RENEWAL_20261124.json",
+    "scope": "Resume and complete existing Make ingress; correct reported execution findings inside the active gate without weakening exact source or artifact validation.",
+    "rootDelegation": "Exclusive causal correction and explicit v25 rebuild after discovering the validator owner and both workflows are pinned."
+  },
+  "sourceBeforeCorrection": "28722a397075f12904153e6c8b360003715723c5",
+  "failedAttempt": {
+    "runId": 45449426362,
+    "jobId": 138642277474,
+    "authorityHead": "28722a397075f12904153e6c8b360003715723c5",
+    "sourceSha": "60ac1ae2d765484ed40c820a942dcc0966385da7",
+    "artifactId": 14947396076,
+    "artifactDigest": "sha256:bb660ae7e6e97f9d83ea20b576d1a38bbd9ea5a691c27622a53a9eb50ef8330e",
+    "failedStep": 10,
+    "failedStepName": "Verify exact authorized Preview callables then deploy only those",
+    "error": "validateInventoryBefore expected orbit360makeleadingresspreview-00001-cuy but functions:list exposed no revision in either accepted field",
+    "actualRevisionField": "",
+    "expectedRevision": "orbit360makeleadingresspreview-00001-cuy",
+    "failureBeforeDeployment": true,
+    "closedInitializationExecuted": false,
+    "makeRunsForV24": 0,
+    "observationSha256": "2e3beace62245ccb7f31e70104c34b6397ad252e0971b00af48fe509535c0503",
+    "errorExcerpt": [
+      "2026-11-24T17:32:23.8576343Z AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:",
+      "2026-11-24T17:32:23.8576920Z + actual - expected",
+      "2026-11-24T17:32:23.8577183Z ",
+      "2026-11-24T17:32:23.8577384Z + ''",
+      "2026-11-24T17:32:23.8577824Z - 'orbit360makeleadingresspreview-00001-cuy'",
+      "2026-11-24T17:32:23.8578177Z ",
+      "2026-11-24T17:32:23.8578782Z     at Object.validateInventoryBefore (/home/runner/work/orbit360-core/orbit360-core/tools/gravicentra-i66-make-release-scope.cjs:162:37)",
+      "2026-11-24T17:32:23.8579525Z     at [stdin]:16:97",
+      "2026-11-24T17:32:23.8579978Z     at runScriptInThisContext (node:internal/vm:209:10)",
+      "2026-11-24T17:32:23.8580862Z     at node:internal/process/execution:446:12",
+      "2026-11-24T17:32:23.8581412Z     at [stdin]-wrapper:6:24",
+      "2026-11-24T17:32:23.8581867Z     at runScriptInContext (node:internal/process/execution:444:60)",
+      "2026-11-24T17:32:23.8582273Z     at evalFunction (node:internal/process/execution:279:30)",
+      "2026-11-24T17:32:23.8582654Z     at evalTypeScript (node:internal/process/execution:291:3)",
+      "2026-11-24T17:32:23.8582990Z     at node:internal/main/eval_stdin:53:5",
+      "2026-11-24T17:32:23.8583389Z     at Socket.<anonymous> (node:internal/process/execution:201:5) ***",
+      "2026-11-24T17:32:23.8583722Z   generatedMessage: true,",
+      "2026-11-24T17:32:23.8583965Z   code: 'ERR_ASSERTION',",
+      "2026-11-24T17:32:23.8584198Z   actual: '',",
+      "2026-11-24T17:32:23.8584493Z   expected: 'orbit360makeleadingresspreview-00001-cuy',",
+      "2026-11-24T17:32:23.8584803Z   operator: 'strictEqual',",
+      "2026-11-24T17:32:23.8585042Z   diff: 'simple'",
+      "2026-11-24T17:32:23.8585259Z ***",
+      "2026-11-24T17:32:23.8585369Z ",
+      "2026-11-24T17:32:23.8585471Z Node.js v22.23.5"
+    ]
+  },
+  "cause": "The existing-trigger path consumed the Firebase CLI functions:list projection as though it contained the Cloud Functions v2 deployed revision. That projection omitted both revision fields. The authenticated snapshot was scheduled after this validator and could not supply its verified revision.",
+  "correction": {
+    "preserveRawCliInventory": true,
+    "existingInventoryValidatorStillRequiresExactRevision": true,
+    "authenticatedApiSnapshotPrecedesInventory": true,
+    "adapter": "inventoryWithTriggerSnapshot",
+    "adapterBoundFields": [
+      "schema",
+      "phase",
+      "sourceSha",
+      "artifactDigest",
+      "previousState",
+      "name",
+      "region",
+      "revision",
+      "configurationDigest",
+      "full projection digest"
+    ],
+    "revisionSource": "Actual authenticated Cloud Functions v2 snapshot, never target authority alone",
+    "cliApiConflict": "REJECT",
+    "appliesTo": [
+      "PREVIEW_BEFORE",
+      "PREVIEW_AFTER",
+      "LIVE_BEFORE",
+      "LIVE_AFTER"
+    ],
+    "rollbackPreviewUnchanged": "No traffic mutation when authenticated current function equals the pre-deploy snapshot",
+    "rollbackPreviewChanged": "Restore requires the exact captured deployed postimage; unknown or concurrent revision is HOLD",
+    "liveRollbackTsv": "Effective Cloud Run revision and the second observed function service/revision must match the same authenticated snapshot before recording rollback TSV",
+    "liveParentAuthorityRule": "After LIVE Make operation commits, refresh financial authority parentAuthorityBlob to the final transport in the same commit before 48 LIVE observations; preserve target, ownerPins and Preview receipt."
+  },
+  "owners": [
+    {
+      "path": "tools/gravicentra-i66-make-release-scope.cjs",
+      "previousGitBlobSha": "7e12a9132bde60dfbff496db39a95e186a558465",
+      "gitBlobSha": "40c215ca67e17f9e1287ba562b0abfca1b55077d"
+    },
+    {
+      "path": "tools/gravicentra-i66-make-release-scope.test.cjs",
+      "previousGitBlobSha": "0b92b42cc492665c88695ee2968e6508e6aa760e",
+      "gitBlobSha": "738afba3eba061903cc7a2477e09a8049e102374"
+    },
+    {
+      "path": "tools/gravicentra-i66-make-lead-protected-executor.cjs",
+      "previousGitBlobSha": "64ebca22b1ae8b91e4e5ede7e69f6cfad363bd5b",
+      "gitBlobSha": "5beb3da00486eae3d2da1e14348cc67e2695bf50"
+    },
+    {
+      "path": "tools/gravicentra-i66-make-lead-protected-executor.test.cjs",
+      "previousGitBlobSha": "305ae1c7c1176c78d9727f236c3cb0bd3f75ecd4",
+      "gitBlobSha": "7c191d4f81cbd524af06b84dc023a2dc4bbdcbcc"
+    },
+    {
+      "path": ".github/workflows/gravicentra-i66-privileged-role-three-function-preview-uat.yml",
+      "previousGitBlobSha": "4fc32257ee59e645f9411507a0e12d4022ee55a2",
+      "gitBlobSha": "79f8b65437b8a41facf94e391ad5083593bb6822"
+    },
+    {
+      "path": ".github/workflows/gravicentra-i66-privileged-role-exact-live-promotion.yml",
+      "previousGitBlobSha": "f117c0136d53d570273cedd1f0c8d08416b27d87",
+      "gitBlobSha": "b8e2b138d0189e802f28ede7a1972966f184ca97"
+    }
+  ],
+  "verification": {
+    "tests": 221,
+    "passed": 221,
+    "failed": 0,
+    "skipped": 0,
+    "command": "node --test --test-reporter=tap tools/gravicentra-i66-make-release-scope.test.cjs tools/gravicentra-i66-make-lead-protected-executor.test.cjs tools/gravicentra-i6-6-make-lead-ingress-release.test.cjs tools/gravicentra-i6-6-composite-preview-admission.test.cjs tools/gravicentra-i6-6-workflow-candidate-resolution.test.cjs",
+    "testLogSha256": "81c22ca797d96f5ef0ffe38362d2877e17753aa727781a6af57e5e125bb20246",
+    "bothWorkflowYamlAndShellSyntax": "PASS",
+    "actualWorkflowNodeInventoryBlocksExecuted": true,
+    "actualLiveRollbackTsvBlockExecuted": true,
+    "localTestsAreNotRemoteAcceptance": true
+  },
+  "manifestBoundary": {
+    "path": "artifacts/orbit360-recovery/release-control/I6_6_APPROVED_PRODUCT_DELTA_MANIFEST_20261110.json",
+    "gitBlobSha": "a7d568678a350790b88870de12eed42c084cd438",
+    "changed": false,
+    "qaOnlyRevisionApplicable": false,
+    "reason": "None of these six existing pinned release/QA owners belongs to changes.tests or testRevisions; an invented revision would fail QA_REVISION_UNKNOWN_TEST. No declared product or test blob was changed."
+  },
+  "productSourceChanges": 0,
+  "sourcePinGuardRemovedOrRelaxed": false,
+  "v24ArtifactPatched": false,
+  "newBuildRequired": true,
+  "nextCandidateVersion": 25,
+  "canonicalLeadWrites": 0,
+  "financialWrites": 0,
+  "externalMessagesSent": 0,
+  "productionAcceptanceClaimed": false
+}

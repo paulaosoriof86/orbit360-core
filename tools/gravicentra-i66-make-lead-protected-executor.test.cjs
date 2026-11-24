@@ -106,6 +106,29 @@ test('unknown deployment, concurrent revision and unverified delete never claim 
  assert.equal(deletes,1);
  await assert.rejects(e.snapshotTrigger({auth:{request:async()=>{throw{response:{status:403}};}},p,phase:'live'}));
 });
+test('a pre-deploy failure with an unchanged existing Preview trigger performs no traffic write',async()=>{
+ const {p}=fixture(),phase='preview',current=functionRow(p,phase),projection=e.fnProjection(current,p,phase);
+ p.makeIngress.targetBefore.preview={...s.ADDED.preview,state:'EXISTING_APPROVED',revision:projection.revision,
+  configurationDigest:projection.configurationDigest,receiptBlob:'c'.repeat(40)};
+ const auth=authFor(()=>current),snapshot=await e.snapshotTrigger({auth,p,phase});let writes=0;
+ const result=await e.rollbackCreatedTrigger({auth,p,phase,snapshot,deleteFunction:()=>assert.fail(),restorePreviousRevision:async()=>{writes++;}});
+ assert.equal(result.status,'PREVIOUS_TRIGGER_UNCHANGED_NO_RESTORE_REQUIRED');assert.equal(result.trafficWrites,0);assert.equal(writes,0);
+});
+test('existing Preview rollback restores only its exact captured postimage and rejects an unknown or concurrent revision',async()=>{
+ const {p}=fixture(),phase='preview';let current=functionRow(p,phase),restored=0;const projection=e.fnProjection(current,p,phase);
+ p.makeIngress.targetBefore.preview={...s.ADDED.preview,state:'EXISTING_APPROVED',revision:projection.revision,
+  configurationDigest:projection.configurationDigest,receiptBlob:'c'.repeat(40)};
+ const auth=authFor(()=>current),snapshot=await e.snapshotTrigger({auth,p,phase});
+ current.serviceConfig.revision=current.serviceConfig.revision.replace('00001','00002');
+ const restorePreviousRevision=async fn=>{assert.deepEqual(fn,snapshot.function);restored++;};
+ await assert.rejects(e.rollbackCreatedTrigger({auth,p,phase,snapshot,restorePreviousRevision}),/POSTIMAGE_REQUIRED_FOR_RESTORE/);
+ const postimage=await e.captureTrigger({auth,p,phase,snapshot});
+ const result=await e.rollbackCreatedTrigger({auth,p,phase,snapshot,postimage,restorePreviousRevision});
+ assert.equal(result.status,'EXACT_PREVIOUS_PREVIEW_REVISION_RESTORED');assert.equal(restored,1);
+ current.serviceConfig.revision+='-concurrent';
+ await assert.rejects(e.rollbackCreatedTrigger({auth,p,phase,snapshot,postimage,restorePreviousRevision}),/POSTIMAGE_CHANGED/);
+ assert.equal(restored,1);
+});
 test('protected operation requires exact source, artifact, scope, fresh expiry and explicit action',()=>{
  const {p}=fixture(),now=Date.parse('2026-11-24T12:00:00Z'),op={schema:'GI_I66_MAKE_INGRESS_PROTECTED_OPERATION_V1',
   phase:'live',scopeContractBlob:s.CONTRACT_BLOB,sourceSha:p.sourceSha,artifactDigest:p.artifactDigest,approvedByDirection:true,

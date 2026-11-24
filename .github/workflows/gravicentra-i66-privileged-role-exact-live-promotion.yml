@@ -214,13 +214,21 @@ jobs:
           set -euo pipefail
           gcloud auth activate-service-account --key-file="$GOOGLE_APPLICATION_CREDENTIALS" --quiet >/dev/null
           gcloud config set project "$PROJECT_ID" --quiet >/dev/null
+          if test "$I66_MAKE_INGRESS" = true;then
+            node tools/gravicentra-i66-make-lead-protected-executor.cjs snapshot-trigger live
+          fi
           node - <<'NODE'
           const assert=require('node:assert/strict'),a=require(process.env.RUNNER_TEMP+'/gi-role-live-functions-before.json');
           const rows=Array.isArray(a.result)?a.result:Array.isArray(a)?a:[];
           const id=x=>String(x.entryPoint||x.id||x.name||'').split('/').pop();
           const g=require('./tools/gravicentra-i6-6-operational-release-candidate.cjs');
           const p=g.candidateForPhase(JSON.parse(require('node:fs').readFileSync(g.CONTROL,'utf8')),'live');
-          if(p.makeIngressComposite===true)require('./tools/gravicentra-i66-make-release-scope.cjs').validateInventoryBefore(p,'live',a,g.targetsForCandidate(p,'live'));
+          if(p.makeIngressComposite===true){
+            const make=require('./tools/gravicentra-i66-make-release-scope.cjs');
+            const snapshot=JSON.parse(require('node:fs').readFileSync(process.env.RUNNER_TEMP+'/gi-make-live-snapshot-trigger.json','utf8'));
+            const verified=make.inventoryWithTriggerSnapshot(p,'live',a,snapshot);
+            make.validateInventoryBefore(p,'live',verified,g.targetsForCandidate(p,'live'));
+          }
           for(const {name,region} of g.targetsForCandidate(p,'live')){
             if(p.makeIngressComposite===true&&name==='orbit360MakeLeadIngress'&&p.makeIngress.targetBefore.live.state==='ABSENT')continue;
             const match=rows.filter(x=>id(x)===name);assert.equal(match.length,1,'I66_ROLE_EXISTING_LIVE_TARGET_NOT_UNIQUE_'+name);
@@ -238,7 +246,6 @@ jobs:
           PAIRS='orbit360ProductOperationalCommand:us-central1 orbit360CobrosReconciliationCommand:us-central1 orbit360ScopedPolicyRead:us-east1'
           if test "$LIVE_TARGET_COUNT" -eq 5;then
             PAIRS="$PAIRS orbit360OpsLeadsCommand:us-central1 orbit360MakeLeadIngress:us-central1"
-            node tools/gravicentra-i66-make-lead-protected-executor.cjs snapshot-trigger live
           elif test "$LIVE_TARGET_COUNT" -eq 4;then
             PAIRS="$PAIRS orbit360OpsLeadsCommand:us-central1"
           elif test "$LIVE_TARGET_COUNT" -ne 3;then
@@ -269,6 +276,28 @@ jobs:
           process.stdout.write(rev);
           NODE
             )
+            if test "$FN" = orbit360MakeLeadIngress && test "$I66_MAKE_TRIGGER_PREVIOUS_STATE" = EXISTING_APPROVED;then
+              export OLD_REV
+              node - <<'MAKE_LIVE_PREIMAGE'
+          const fs=require('node:fs'),assert=require('node:assert/strict');
+          const g=require('./tools/gravicentra-i6-6-operational-release-candidate.cjs');
+          const candidate=g.candidateForPhase(JSON.parse(fs.readFileSync(g.CONTROL,'utf8')),'live');
+          const snapshot=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/gi-make-live-snapshot-trigger.json'));
+          const actual=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/gi-role-before-fn.json'));
+          assert.equal(snapshot.schema,'GI_I66_MAKE_TRIGGER_SNAPSHOT_V1');
+          assert.equal(snapshot.phase,'live');
+          assert.equal(snapshot.sourceSha,candidate.sourceSha);
+          assert.equal(snapshot.artifactDigest,candidate.artifactDigest);
+          assert.equal(snapshot.previousState,'EXISTING_APPROVED');
+          assert.equal(snapshot.function?.name,process.env.FN,'I66_MAKE_LIVE_PREIMAGE_FUNCTION_DRIFT');
+          assert.equal(snapshot.function?.region,process.env.REGION,'I66_MAKE_LIVE_PREIMAGE_REGION_DRIFT');
+          assert.equal(snapshot.function?.service,actual.serviceConfig?.service,'I66_MAKE_LIVE_PREIMAGE_SERVICE_DRIFT');
+          assert.equal(String(actual.serviceConfig?.service||'').split('/').at(-1),process.env.SERVICE,'I66_MAKE_LIVE_PREIMAGE_SERVICE_ID_DRIFT');
+          assert.equal(snapshot.function?.revision,actual.serviceConfig?.revision,'I66_MAKE_LIVE_PREIMAGE_API_REVISION_DRIFT');
+          assert.equal(snapshot.function?.revision,process.env.OLD_REV,'I66_MAKE_LIVE_PREIMAGE_EFFECTIVE_REVISION_DRIFT');
+          assert.equal(process.env.OLD_REV,candidate.makeIngress.targetBefore.live.revision,'I66_MAKE_LIVE_AUTHORIZED_REVISION_DRIFT');
+          MAKE_LIVE_PREIMAGE
+            fi
             printf '%s|%s|%s|%s\n' "$FN" "$REGION" "$SERVICE" "$OLD_REV" >> "$RUNNER_TEMP/gi-role-live-old-revisions.tsv"
           done
           EXPECTED_REVISIONS="$LIVE_TARGET_COUNT"
@@ -416,7 +445,12 @@ jobs:
           const g=require('./tools/gravicentra-i6-6-operational-release-candidate.cjs');
           const p=g.candidateForPhase(JSON.parse(require('node:fs').readFileSync(g.CONTROL,'utf8')),'live');
           const expected=g.targetsForCandidate(p,'live');
-          if(p.makeIngressComposite===true)require('./tools/gravicentra-i66-make-release-scope.cjs').validateInventoryAfter(p,'live',before,after,expected);
+          if(p.makeIngressComposite===true){
+            const make=require('./tools/gravicentra-i66-make-release-scope.cjs');
+            const snapshot=JSON.parse(require('node:fs').readFileSync(process.env.RUNNER_TEMP+'/gi-make-live-snapshot-trigger.json','utf8'));
+            const verified=make.inventoryWithTriggerSnapshot(p,'live',before,snapshot);
+            make.validateInventoryAfter(p,'live',verified,after,expected);
+          }
           else assert.deepEqual(rows(before).map(id).sort(),rows(after).map(id).sort(),'I66_ROLE_NON_TARGET_FUNCTION_INVENTORY_CHANGED');
           for(const {name,region} of expected){
             const found=rows(after).filter(r=>id(r)===name);

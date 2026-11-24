@@ -202,6 +202,10 @@ jobs:
       - name: Verify exact authorized Preview callables then deploy only those
         run: |
           set -euo pipefail
+          if test "$I66_MAKE_INGRESS" = true;then
+            gcloud auth activate-service-account --key-file="$GOOGLE_APPLICATION_CREDENTIALS" --quiet >/dev/null
+            node tools/gravicentra-i66-make-lead-protected-executor.cjs snapshot-trigger preview
+          fi
           node - <<'NODE'
           const fs=require('node:fs'),assert=require('node:assert/strict');
           const a=require(process.env.RUNNER_TEMP+'/gi-role-functions-before.json');
@@ -218,7 +222,12 @@ jobs:
             assert.ok(ops.length<=1,'I66_OPS_PREVIEW_DUPLICATE_OR_UNKNOWN');
             if(ops.length)assert.equal(String(ops[0].region||ops[0].location||''),'us-east1','I66_OPS_PREVIEW_REGION_DRIFT');
           }
-          if(scope?.makeIngressComposite===true)require('./tools/gravicentra-i66-make-release-scope.cjs').validateInventoryBefore(scope,'preview',a,g.targetsForCandidate(scope,'preview'));
+          if(scope?.makeIngressComposite===true){
+            const make=require('./tools/gravicentra-i66-make-release-scope.cjs');
+            const snapshot=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/gi-make-preview-snapshot-trigger.json','utf8'));
+            const verified=make.inventoryWithTriggerSnapshot(scope,'preview',a,snapshot);
+            make.validateInventoryBefore(scope,'preview',verified,g.targetsForCandidate(scope,'preview'));
+          }
           console.log('I66_HISTORICAL_THREE_PLUS_PINNED_OPS_PREVIEW_SCOPE_PASS');
           NODE
           PREVIEW_TARGET_COUNT="$(node - <<'PREVIEW_TARGETS'
@@ -228,8 +237,6 @@ jobs:
           PREVIEW_TARGETS
           )"
           if test "$PREVIEW_TARGET_COUNT" -eq 5;then
-            gcloud auth activate-service-account --key-file="$GOOGLE_APPLICATION_CREDENTIALS" --quiet >/dev/null
-            node tools/gravicentra-i66-make-lead-protected-executor.cjs snapshot-trigger preview
             node tools/gravicentra-i66-make-lead-protected-executor.cjs before-deploy preview
             node tools/gravicentra-i66-make-firebase-project-iam-guard.cjs "$I66_ROLE_FIREBASE_CLI" preview deploy \
             --only functions:orbit360ProductOperationalCommandPreview,functions:orbit360CobrosReconciliationCommandPreview,functions:orbit360ScopedPolicyReadPreview,functions:orbit360OpsLeadsCommandPreview,functions:orbit360MakeLeadIngressPreview \
@@ -255,7 +262,10 @@ jobs:
           const candidate=g.candidateForPhase(JSON.parse(require('node:fs').readFileSync(g.CONTROL,'utf8')),'preview');
           const beforeIds=rows(a).map(id).sort(),afterIds=rows(b).map(id).sort();
           if(candidate?.makeIngressComposite===true){
-            require('./tools/gravicentra-i66-make-release-scope.cjs').validateInventoryAfter(candidate,'preview',a,b,g.targetsForCandidate(candidate,'preview'));
+            const make=require('./tools/gravicentra-i66-make-release-scope.cjs');
+            const snapshot=JSON.parse(require('node:fs').readFileSync(process.env.RUNNER_TEMP+'/gi-make-preview-snapshot-trigger.json','utf8'));
+            const verified=make.inventoryWithTriggerSnapshot(candidate,'preview',a,snapshot);
+            make.validateInventoryAfter(candidate,'preview',verified,b,g.targetsForCandidate(candidate,'preview'));
           }else if(candidate?.opsLeadsComposite===true){
             const added=afterIds.filter(v=>!beforeIds.includes(v));
             assert.ok(added.length<=1&&added.every(v=>v==='orbit360OpsLeadsCommandPreview'),'I66_OPS_PREVIEW_INVENTORY_UNEXPECTED_NEW_FUNCTION');
