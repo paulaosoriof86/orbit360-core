@@ -1677,15 +1677,15 @@
             "receiptGitBlobSha": "11fdb3bee494541513482666d6215f45cbad0567",
             "receiptCommit": "f80c37e174406ccb489569b3bc7dd6073c2c4273"
           },
-          "qaSourceSha": "2309ddd27cba10725f7cce5a778afed505dbd1c4",
-          "sourceQaRunId": 45297461362,
-          "guardRunId": 45297461235,
+          "qaSourceSha": "febc81c04275cf8ecbb8b8b9a30952542fd169a9",
+          "sourceQaRunId": 45329546346,
+          "guardRunId": 45329546355,
           "qaPins": {
             ".github/workflows/gravicentra-i66-current-exact-preview-cross-module-uat-20261119.yml": "1af12aaeef8178c0ff9e172f958e02991386601c",
             ".github/workflows/gravicentra-i66-privileged-role-parity-source-qa.yml": "6a30bbd84977abb4ebd82c681b0a63f8f02821f3",
             ".github/workflows/gravicentra-release-lock-sync.yml": "379f7d4fef9daedfa0c060cadc7646ce788f7b6e",
             "functions/product-active-role-contract.js": "09681f536c5cbbd36bcba6514d4829d2494b9387",
-            "tools/gravicentra-governance-preflight-v1.mjs": "ae2eaeb12c7bc035f07ddabd00ce9693b2dde844",
+            "tools/gravicentra-governance-preflight-v1.mjs": "fbeda06fdd13e0351060f5fdec7f6b8dfcf580fe",
             "tools/gravicentra-i6-6-current-live-five-role-route-readonly.cjs": "cb151d10e047f823d925d536f04a4bc8084ea7d9",
             "tools/gravicentra-i6-6-delta-guard.mjs": "576eda7cd5767c8a7e3bd033f36a8805f06890e8",
             "tools/gravicentra-i6-6-delta-test-revisions.cjs": "b99b4e8ac0def995efbc4f1fdb00b67efdc31a49",
@@ -1693,7 +1693,7 @@
             "tools/gravicentra-i6-6-five-role-assigned-selection.test.cjs": "6605e3a61adab866d5d9a20b60a3b0182335d99b",
             "tools/gravicentra-i6-6-operational-release-candidate.cjs": "95d1221eeab7b5cc818dde314d5c8c0528823911",
             "tools/gravicentra-i6-6-readonly-observer-authority.test.cjs": "4d03114cddcdd59f4af3e9e916bead8548351619",
-            "tools/gravicentra-i66-frontend-control.cjs": "f8cda031f5b0d4458c0afa75a7fd7f6f6e9dd91f",
+            "tools/gravicentra-i66-frontend-control.cjs": "81b2f844856d188dd6cf915f10ee29b8daf08f98",
             "tools/gravicentra-i66-frontend-promotion-transaction.cjs": "7e99182ff7854be39c8c5e90056ec6ee69d09994"
           }
         },
@@ -1718,24 +1718,24 @@
             "receiptGitBlobSha": "11fdb3bee494541513482666d6215f45cbad0567",
             "receiptCommit": "f80c37e174406ccb489569b3bc7dd6073c2c4273"
           },
-          "qaSourceSha": "2309ddd27cba10725f7cce5a778afed505dbd1c4",
-          "sourceQaRunId": 45297461362,
-          "guardRunId": 45297461235,
+          "qaSourceSha": "febc81c04275cf8ecbb8b8b9a30952542fd169a9",
+          "sourceQaRunId": 45329546346,
+          "guardRunId": 45329546355,
           "qaPins": {
             ".github/workflows/gravicentra-i66-live-performance-readonly.yml": "12225700cec41aafabc477d60fe7f525ba957e12",
             ".github/workflows/gravicentra-i66-privileged-role-parity-source-qa.yml": "6a30bbd84977abb4ebd82c681b0a63f8f02821f3",
             ".github/workflows/gravicentra-release-lock-sync.yml": "379f7d4fef9daedfa0c060cadc7646ce788f7b6e",
-            "tools/gravicentra-governance-preflight-v1.mjs": "ae2eaeb12c7bc035f07ddabd00ce9693b2dde844",
+            "tools/gravicentra-governance-preflight-v1.mjs": "fbeda06fdd13e0351060f5fdec7f6b8dfcf580fe",
             "tools/gravicentra-i6-6-delta-guard.mjs": "576eda7cd5767c8a7e3bd033f36a8805f06890e8",
             "tools/gravicentra-i6-6-delta-test-revisions.cjs": "b99b4e8ac0def995efbc4f1fdb00b67efdc31a49",
             "tools/gravicentra-i6-6-direction-preview-legal-acceptance.cjs": "b3a6539596fb9ed706f7a6e21aa982bf97129780",
             "tools/gravicentra-i6-6-operational-release-candidate.cjs": "95d1221eeab7b5cc818dde314d5c8c0528823911",
             "tools/gravicentra-i6-6-performance-first-route-source-timeline.test.cjs": "5a9b7fccbbce89b85669bc6a8bbd82cc30481563",
             "tools/gravicentra-i6-6-readonly-observer-authority.test.cjs": "4d03114cddcdd59f4af3e9e916bead8548351619",
-            "tools/gravicentra-i6-6-six-existing-receipts-ui-readonly.test.cjs": "a29326af3341cba8ae08bbcc7125436adc7d901c",
-            "tools/gravicentra-i66-frontend-control.cjs": "f8cda031f5b0d4458c0afa75a7fd7f6f6e9dd91f",
+            "tools/gravicentra-i6-6-six-existing-receipts-ui-readonly.test.cjs": "18748af1a8884a01642c1491872e7f2ce8545bf2",
+            "tools/gravicentra-i66-frontend-control.cjs": "81b2f844856d188dd6cf915f10ee29b8daf08f98",
             "tools/gravicentra-i66-frontend-promotion-transaction.cjs": "7e99182ff7854be39c8c5e90056ec6ee69d09994",
-            "tools/gravicentra-i66-live-performance-readonly.mjs": "7ae8ed33d8bf8fb0ecd72d5da17ac3a808e7abee"
+            "tools/gravicentra-i66-live-performance-readonly.mjs": "03d23242205d4b926772842a6bd8ce01a60d51c5"
           }
         }
       }
