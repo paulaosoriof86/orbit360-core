@@ -1,0 +1,71 @@
+{
+  "schema": "GI_I66_MAKE_V28_RESTORED_REVISION_METADATA_CORRECTION_V1",
+  "recordedAtUtc": "2026-11-24T22:32:49.317Z",
+  "status": "R59_AND_R60_SUMMARY_TYPO_CORRECTED_FROM_ORIGINAL_ARTIFACT_AND_OWNER_NO_NEW_CLOUD_READ",
+  "previousRecords": [
+    {
+      "path": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_EXECUTION_PROGRESS_20261124_R59.json",
+      "gitBlobSha": "f8dc47df8c908307990bba69d5a2669b449923d0",
+      "sha256": "63ed7cd717098b5085ec57dc7f03a4156b258c743143bb772a84d2b427430efc"
+    },
+    {
+      "path": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_EXECUTION_PROGRESS_20261124_R60.json",
+      "gitBlobSha": "fdbf390b775f8917de725c8d4da3f74a52a1cb87",
+      "sha256": "c6d1565e49b83282066be003b77f2c9a35cd5c8fa48a1417434aa8d5a2a1db53"
+    },
+    {
+      "path": "artifacts/orbit360-recovery/release-control/I6_6_V28_COMPOSITE_PREVIEW_HOLD_AND_CONTINUITY_20261124_R59.json",
+      "gitBlobSha": "f26af4f9c56dace7708c8fedbc7a2fdee85ddcda",
+      "sha256": "1bbbbb7e4ad1cd019b8110ad9575626c004c1d17957ba92f96387b6ec4fdffec"
+    }
+  ],
+  "incorrectSummaryValue": "orbit360makeleadingresspreview-00002-cuy",
+  "correctedHistoricalRestoredTrafficRevision": "orbit360makeleadingresspreview-00001-cuy",
+  "sourceSha": "74ae28c6e6e6b40f845567c9b00738a58307b3cb",
+  "artifactDigest": "sha256:8dae2c413cc774be504e3aa224b4333e2968c176fc74116c6c5f42c0a6a46290",
+  "previewRunId": 45465410675,
+  "diagnosticArtifactId": 14955942051,
+  "diagnosticArchiveSha256": "d61a39b22e674579fde71258606e5e10abf8f9f3e2d3e30263ddae7ac41645d4",
+  "evidence": [
+    {
+      "artifactPath": "gi-make-preview-snapshot-trigger.json",
+      "sha256": "be67e919c10189599d84c8decfa41b285376267be593c9b5643fc771f2260272"
+    },
+    {
+      "artifactPath": "gi-make-preview-capture-trigger.json",
+      "sha256": "a43a66b5dc82ded575cb0a3643b2bf74e21105aa1ab6f2f032738e90c58edfe9"
+    },
+    {
+      "artifactPath": "gi-make-preview-rollback.json",
+      "sha256": "2eafa15f49d608f3b5ee57bee9553fea3b0d87ab1d24ed0299246179b317501f"
+    }
+  ],
+  "historicalOwner": {
+    "path": "tools/gravicentra-i66-make-lead-protected-executor.cjs",
+    "sourceSha": "74ae28c6e6e6b40f845567c9b00738a58307b3cb",
+    "executedWorkflowHeadSha": "5e8516ff24a8c269aabb1647e0e07cd4ea6a0ae0",
+    "bytesIdenticalAtExecutedWorkflowHead": true,
+    "gitBlobSha": "5beb3da00486eae3d2da1e14348cc67e2695bf50",
+    "sha256": "4ff767ccc11517a1a4b3eb9d0a4f6df31f754f39460e3c4e9a5811d4f102f361"
+  },
+  "ownerEvidenceLink": [
+    "The original snapshot records function.revision=00001-cuy, and the postimage repeats it as previousRevision while recording the new API revision 00002-wem.",
+    "The pinned historical rollbackCreatedTrigger passes snapshot.function to restorePreviousRevision. The historical callback updates traffic to fn.revision=100 and checks Cloud Run status.traffic for exactly that revision at 100 percent.",
+    "The original rollback reports COMPENSATION_READBACK_VERIFIED and EXACT_PREVIOUS_PREVIEW_REVISION_RESTORED after that callback. It does not embed a revision literal; the corrected historical target is linked through the pinned snapshot and owner."
+  ],
+  "limitations": {
+    "rollbackReceiptContainsRevisionLiteral": false,
+    "newCloudGetPerformed": false,
+    "contemporaneousApiAndTrafficAfterCompensationProven": false,
+    "snapshot28CapturedActualTrafficSeparately": false,
+    "currentApiRevisionOrTrafficAsserted": false,
+    "freshAuthenticatedApiAndActualTrafficSnapshotRequiredForSuccessor": true
+  },
+  "originalR59RecordsRewritten": false,
+  "originalR60RecordsRewritten": false,
+  "originalBuild28ConclusionChanged": false,
+  "originalFullPreview28ConclusionChanged": false,
+  "cloudWrites": 0,
+  "liveAuthorization": false,
+  "personalQaAuthorization": false
+}
