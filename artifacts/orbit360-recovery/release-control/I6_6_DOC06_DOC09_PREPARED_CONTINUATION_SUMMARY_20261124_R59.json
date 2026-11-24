@@ -1,0 +1,69 @@
+{
+  "schema": "GI_DOC06_DOC09_SANITIZED_PROPOSAL_SUMMARY_V1",
+  "status": "SCRATCH_ONLY_DOCUMENTARY_PROPOSAL_NO_MUTATION",
+  "sourceHead": "ab2b7be577759afaceae5faaf1bbdf1d0f2794a7",
+  "readback": {
+    "runId": 45364013332,
+    "attempt": 2,
+    "jobId": 138708388539,
+    "artifactId": 14956230418,
+    "artifactSha256": "7a42fa8f45087c17905f1ee16209bc74718878ea9bdd9ea02dc4f25904240d58",
+    "observedArtifactCreatedAtUtc": "2026-11-24T19:15:44Z",
+    "newCloudReads": 0,
+    "writes": 0,
+    "limitation": "Sanitized financial projections and digests, not full transaction preimages. Require raw records and updateTime in the protected read phase."
+  },
+  "privateProposalSha256": "f4e454c7d03e80b3efed55e526aa7c0e1100e90b5b566ee9ffefb069d103d1be",
+  "cases": [
+    {
+      "caseId": "DOC06",
+      "status": "HOLD_DOCUMENTED_TEN_INSTALLMENT_SCHEDULE_EXISTING_PAYMENT_CONFLICT",
+      "originalInstallments": 10,
+      "originalGrossCents": 325860,
+      "currentReceipts": 12,
+      "currentReceiptGrossCents": 331291,
+      "existingPaymentsPreserved": 3,
+      "existingPaymentGrossCents": 81465,
+      "existingPaymentsOutsideClosed155": true,
+      "newPaymentsAllowed": 0,
+      "sourcePaymentVsExistingDifferenceCents": 5431,
+      "conditionalResidualNotCertified": true,
+      "paidDateConflict": true
+    },
+    {
+      "caseId": "DOC09",
+      "status": "HOLD_MISSING_DOCUMENTED_RECEIPT_ON_EXISTING_POLICY",
+      "existingPolicyPreserved": 1,
+      "existingReceiptsPreserved": 10,
+      "existingPortfolioPreserved": 10,
+      "existingPayments": 0,
+      "singleDocumentedMissingInstallment": 2,
+      "documentedPaidCents": 76440,
+      "proposedReceiptCreates": 1,
+      "proposedPortfolioCreates": 1,
+      "paymentEligibilityCertified": false,
+      "newPaymentsActuallyCreated": 0
+    },
+    {
+      "caseId": "DOC07",
+      "status": "HOLD_ORIGINAL_DOCUMENT_AND_EXACT_IDENTITY_MISSING",
+      "paymentEligibilityCertified": false
+    }
+  ],
+  "invariants": {
+    "closed155Reapplied": false,
+    "mapfreObligationsRepeated": false,
+    "bankSettlementCreated": false,
+    "realFinancialWrites": 0,
+    "repoWrites": 0,
+    "newCloudReads": 0,
+    "R51ToleranceResolvesTheseCases": false,
+    "sourceChangeOrDeployAuthorizedByThisFile": false,
+    "previouslyAppliedUniversalesPaymentReapplied": false
+  },
+  "publicProjection": {
+    "sourceSha256": "79c010e99140277622a49460a242fbd734cb14a2cd586118fbe7ed78dd98627e",
+    "removedIdentifyingPolicyNumberFromInvariantKey": true,
+    "countsAndEvidenceUnchanged": true
+  }
+}

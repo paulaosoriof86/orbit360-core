@@ -1,0 +1,374 @@
+{
+  "schema": "GI_I66_FINANCIAL_PREPARATION_SANITIZED_CHECKPOINT_V1",
+  "status": "PREPARED_SOURCE_AND_DOCUMENTARY_CONTINUATION_PRESERVED_NOT_DEPLOYED",
+  "intendedProgressVersion": 59,
+  "reviewBaseHead": "ab2b7be577759afaceae5faaf1bbdf1d0f2794a7",
+  "sourcePreparationBaseHead": "5e8516ff24a8c269aabb1647e0e07cd4ea6a0ae0",
+  "storageLocation": "existing release-control/candidate-reviewed evidence directory",
+  "noNewOwnerOrMethodology": true,
+  "authority": {
+    "directionR51Path": "artifacts/orbit360-recovery/release-control/I6_6_DIRECTION_URGENT_COMPLETION_TOLERANCE_AND_DIRECT_RENEWAL_20261124.json",
+    "directionR51Blob": "c1e69da9d018a75c0a73c5dbf3a3495e9afcd550",
+    "closed155ReceiptPath": "artifacts/orbit360-recovery/release-control/I6_6_CENDOSO_155_APPLICATION_AND_MAPFRE_OBLIGATION_LIVE_20261124_R52.json",
+    "closed155ReceiptBlob": "65a83d3d36b6d7f131be5cb61c559aa417f5e48f"
+  },
+  "paymentState": {
+    "existing155ApplicationState": "APPLIED_DIRECT",
+    "existing155UniquePayments": 155,
+    "existing155GrossCentsPreserved": 7880643,
+    "existing155NewPaymentCreates": 0,
+    "mapfreObligationCorrectionsAlreadyCompleted": 2,
+    "mapfrePaymentExecutionsStillPending": 2,
+    "unresolvedDocumentaryFacts": 9,
+    "unresolvedBreakdown": {
+      "preparedCanonicalMapfreFacts": 2,
+      "otherDocumentaryHolds": 7
+    },
+    "nineFactsAreNotNineNewPayments": true,
+    "additionalPaymentEligibilityCertified": 0,
+    "newPaymentsExecutedByThisPreparation": 0,
+    "alreadyAppliedUniversalesFactExcluded": true,
+    "medicalSecondInstallmentIncludedWithinSevenHolds": true,
+    "source56Summary": {
+      "repositoryPath": "artifacts/orbit360-recovery/release-control/I6_6_SOURCE56_NINE_DOCUMENTARY_FACTS_SANITIZED_20261124_R59.json",
+      "sha256": "ffb98ee37b047d70b912c1ef8c1fe1ab650a7bc07f8a2fa4bcb848c5c0f2d7c2",
+      "gitBlobSha": "7a64be6dd06566de7c0a73f16a7f89e1b719a22c"
+    }
+  },
+  "caseContinuationSanitized": [
+    {
+      "caseId": "DOC-06",
+      "state": "HOLD_SCHEDULE_AND_EXISTING_PAYMENT_RECONCILIATION",
+      "originalInstallments": 10,
+      "currentReceipts": 12,
+      "existingPaymentsPreserved": 3,
+      "existingPaymentsOutsideClosed155": true,
+      "newPaymentCreatesAllowed": 0,
+      "requirements": [
+        "Full current CAS preimages; one prior obligation correction already exists.",
+        "Preserve actual payment money/date/provenance and retain the documented date conflict.",
+        "Verified same-owner residual/application semantics before any paid/zero-balance projection."
+      ]
+    },
+    {
+      "caseId": "DOC-09",
+      "state": "HOLD_DOCUMENTED_MISSING_RECEIPT_ON_EXISTING_EDITION",
+      "existingPolicyPreserved": 1,
+      "existingReceiptsPreserved": 10,
+      "existingPortfolioPreserved": 10,
+      "existingPaymentsObserved": 0,
+      "requiredInstallment": 2,
+      "requirements": [
+        "Verify exact source bytes and identity; exclude duplicate requirement/invoice/source across editions.",
+        "Narrow missing-receipt discriminator inside the existing source-bulk owner; preserve original policy and future obligations.",
+        "Normal documentary apply_payment UI with real authorized session, readback and replay; materializing only the obligation is incomplete."
+      ]
+    },
+    {
+      "caseId": "DOC-07",
+      "state": "HOLD_ORIGINAL_DOCUMENT_AND_EXACT_IDENTITY_MISSING",
+      "writeEligibilityCertified": false
+    }
+  ],
+  "sourceScope": {
+    "productOwners": 6,
+    "functionTargetsRemain": 5,
+    "newTests": [
+      "tools/gravicentra-i6-6-r51-payment-application-preservation.test.cjs",
+      "tools/gravicentra-i6-6-r51-documentary-variance.test.cjs",
+      "tools/gravicentra-i6-6-documentary-payment-ui.test.cjs"
+    ],
+    "testPins": [
+      {
+        "path": "tools/gravicentra-i6-6-r51-payment-application-preservation.test.cjs",
+        "candidateBlob": "b519081d11a4309d3eea6a58c7e6831bbecdd189",
+        "candidateSha256": "ec52b3393fb0569af0b99dea7c59915c296a6061a1c6efc72b530cda4e6edb95"
+      },
+      {
+        "path": "tools/gravicentra-i6-6-r51-documentary-variance.test.cjs",
+        "candidateBlob": "637a2b5c5980d5dab850f61e2f67376130090a4a",
+        "candidateSha256": "b1f3f1661318eb6c405e4a7ca58ead3c3177f06b80b2ced7e5746ac16a560306"
+      },
+      {
+        "path": "tools/gravicentra-i6-6-documentary-payment-ui.test.cjs",
+        "candidateBlob": "8ae02feff6b6afe81cd080d35ef8eaa5385e524c",
+        "candidateSha256": "a1df831faf2708900b57c1448d3eaed4ec200a5af40506d5429bf2f71a0e16b4"
+      },
+      {
+        "path": "tools/gravicentra-i6-6-cobros-payment-failure-category.test.cjs",
+        "candidateBlob": "a59e96726a6d8516e5218f34a8b1aa30c814cf89",
+        "candidateSha256": "34d95cd6666df74a08ae00bcb151a8855341900b950404ad3c114b5a5e64326a"
+      }
+    ],
+    "R51Scope": "GT/GTQ documentary variance up to5cents across insurers; preserve actual payments. Bank allocation, country, currency and identity remain exact.",
+    "residualBehavior": "Actual payment differing from obligation remains HOLD before financial writes, including differences within5cents.",
+    "documentaryUi": "Same canonical applyPayment owner; exact source/date/request identity and suppressed outbound notices.",
+    "urgentRenewalAndEndorsementOwnersModified": false,
+    "futureRebaseRequired": true
+  },
+  "recordedVerificationNotNewRuns": {
+    "r51NewCasesPassed": 103,
+    "r51ExistingRegressionsPassed": 183,
+    "independentSyntheticProbesPassed": 5,
+    "combinedNodeTestsPassed": 104,
+    "uiInternalPayloadGuardChecksInsideCombinedFile": 15,
+    "preservedOwnerNodeTestsPassed": 53,
+    "countryBoundaryPassed": true,
+    "authenticatedUiPerformed": false,
+    "previewOfFinancialSuccessorPerformed": false,
+    "liveOfFinancialSuccessorPerformed": false,
+    "numbersAreOverlappingGroupsDoNotAddAsUniqueTestTotal": true
+  },
+  "continuationDependencies": [
+    "Keep prepared patches separate from the urgent release; use the next source only through the current canonical release owners after the urgent transaction is accepted.",
+    "Re-read exact current HEAD/source-QA/manifest/predecessor and rebase drafts; preparation hashes do not authorize deployment.",
+    "Existing frontend authority needs a closed financial delta of six owners against the accepted release; do not append six paths to the obsolete E3 delta.",
+    "Preserve Make ability to create leads. If LIVE grant is ACTIVE, add explicit continuity in the same owners, preserving principal,activationNotBefore,dedupe and exact CAS. Do not close/reset it or relabel ACTIVE as CLOSED.",
+    "Read actual Cloud Functions revision and actual Cloud Run traffic separately before a successor; rollback must restore the observed traffic, not infer it from serviceConfig.revision.",
+    "Keep five backend targets; CobrosReconciliation is already included. No auth, rules or permission extension.",
+    "Publish and verify documentary UI before actual MAPFRE calls; obtain a genuine authorized session at execution, with no identity substitution.",
+    "Use new immutable source/artifact and the actual source-specific signed UI plus financial48 evidence; do not reuse earlier proof as acceptance."
+  ],
+  "privacy": {
+    "publicPatchCodeChangedForSanitization": false,
+    "knownPrivateLiteralDictionaryEntriesChecked": 91,
+    "knownPrivateLiteralMatches": 0,
+    "embeddedRealOperationalIds": 0,
+    "emails": 0,
+    "literalCustomerDriveReferences": 0,
+    "r46InTests": "The portable UI test reads the already committed R46 authority only in an isolated VM; no literal row/ID/email is embedded in its patch and no Cloud command is sent.",
+    "syntheticFixtureData": "Five-probe receipt and unit logs contain synthetic100/100.02 fixtures explicitly identified as tests, not real financial rows.",
+    "excluded": [
+      "private-proposals.json",
+      "all private payment-disposition matrices",
+      "private MAPFRE execution fields",
+      "raw Firestore records or preimages",
+      "bulk preflight/identity census reports and archives",
+      "raw Actions provider metadata with actor identities",
+      "private snapshots, session material, and whole candidate copies"
+    ],
+    "privateProposalSha256Only": "f4e454c7d03e80b3efed55e526aa7c0e1100e90b5b566ee9ffefb069d103d1be",
+    "privateMatrixSha256Only": "6219736e4cce9bdff3fafb0e192b2cbd0670c77434d40766337cd0b9feee29e9"
+  },
+  "preparedFiles": [
+    {
+      "repositoryPath": "artifacts/orbit360-recovery/release-control/candidate-reviewed/I6_6_R51_DOCUMENTARY_TOLERANCE_AND_PAYMENT_PRESERVATION_20261124.patch",
+      "sha256": "bfc36d6a6590cd6b881b635bdcdfd742f6e86145592250383cc8e1adef4a38db",
+      "gitBlobSha": "7b7865a659b923a777b356520097f0f43227e118",
+      "bytes": 93301,
+      "disposition": "PREPARED_EVIDENCE_ONLY_NOT_ACTIVE_OWNER",
+      "sourceSha256": "bfc36d6a6590cd6b881b635bdcdfd742f6e86145592250383cc8e1adef4a38db",
+      "byteIdenticalToSource": true,
+      "purpose": "Original frozen R51 patch; lineage, not a second application."
+    },
+    {
+      "repositoryPath": "artifacts/orbit360-recovery/release-control/candidate-reviewed/I6_6_DOCUMENTARY_PAYMENT_UI_20261124.patch",
+      "sha256": "3efb4c084023b8e9e781cd070b64231a0c2f281c38cbcdfbe639671c1313d257",
+      "gitBlobSha": "a21bcb2d01d19ffee89ec56159d46c3cd8fc4a90",
+      "bytes": 17264,
+      "disposition": "PREPARED_EVIDENCE_ONLY_NOT_ACTIVE_OWNER",
+      "sourceSha256": "3efb4c084023b8e9e781cd070b64231a0c2f281c38cbcdfbe639671c1313d257",
+      "byteIdenticalToSource": true,
+      "purpose": "Original documentary UI patch; lineage, not a second application."
+    },
+    {
+      "repositoryPath": "artifacts/orbit360-recovery/release-control/candidate-reviewed/I6_6_R51_DOCUMENTARY_UI_JOINT_PRODUCT_TESTS_20261124.patch",
+      "sha256": "2a612707605b0169d4aace91198383d712f5a9fa82a34c4697269d18a280a19a",
+      "gitBlobSha": "cc6e83b040a987eda20f8778fefb979c43f3dc60",
+      "bytes": 117737,
+      "disposition": "PREPARED_EVIDENCE_ONLY_NOT_ACTIVE_OWNER",
+      "sourceSha256": "2a612707605b0169d4aace91198383d712f5a9fa82a34c4697269d18a280a19a",
+      "byteIdenticalToSource": true,
+      "purpose": "Single composed six-product-owner and three-test proposal; apply this OR the originals, never both."
+    },
+    {
+      "repositoryPath": "artifacts/orbit360-recovery/release-control/candidate-reviewed/I6_6_R51_DOCUMENTARY_UI_SOURCE_QA_MANIFEST_DRAFT_20261124.patch",
+      "sha256": "91d7d39e9dc802353cf2dfe3a2c0fe1c064ab548c38b571011f7af3fe52bccf5",
+      "gitBlobSha": "ce4deca4c2ed3373a0cddb7d015e6f6fceaf6f02",
+      "bytes": 8219,
+      "disposition": "PREPARED_EVIDENCE_ONLY_NOT_ACTIVE_OWNER",
+      "sourceSha256": "91d7d39e9dc802353cf2dfe3a2c0fe1c064ab548c38b571011f7af3fe52bccf5",
+      "byteIdenticalToSource": true,
+      "purpose": "Draft support in existing QA/candidate/manifest owners. Rebase exact current pins before any execution."
+    },
+    {
+      "repositoryPath": "artifacts/orbit360-recovery/release-control/candidate-reviewed/I6_6_R51_DOCUMENTARY_UI_MANIFEST_ENTRY_DRAFT_20261124.json",
+      "sha256": "d729f92f00f44d3c49d112335fcc8a2561a35b5e8068d3fc81904e2df66d3b21",
+      "gitBlobSha": "e0eccc0b6de7632e2e67b59031b0456c8e5669af",
+      "bytes": 3783,
+      "disposition": "PREPARED_EVIDENCE_ONLY_NOT_ACTIVE_OWNER",
+      "sourceSha256": "d729f92f00f44d3c49d112335fcc8a2561a35b5e8068d3fc81904e2df66d3b21",
+      "byteIdenticalToSource": true,
+      "purpose": "Reviewable additive manifest entry; not inserted in the active manifest."
+    },
+    {
+      "repositoryPath": "artifacts/orbit360-recovery/release-control/candidate-reviewed/I6_6_R51_DOCUMENTARY_UI_COMPOSITION_20261124.json",
+      "sha256": "5ff833dd2b90e2bedcc8136e88c32ec5eeda1d93d9272717700b715a1ab584bc",
+      "gitBlobSha": "e12dd640542093609f7e21821d84cad4c1bf7fc4",
+      "bytes": 5746,
+      "disposition": "PREPARED_EVIDENCE_ONLY_NOT_ACTIVE_OWNER",
+      "sourceSha256": "5ff833dd2b90e2bedcc8136e88c32ec5eeda1d93d9272717700b715a1ab584bc",
+      "byteIdenticalToSource": true,
+      "purpose": "Original preparation snapshot. Its test-pending label predates the later frozen receipts; retain history."
+    },
+    {
+      "repositoryPath": "artifacts/orbit360-recovery/release-control/candidate-reviewed/I6_6_R51_DOCUMENTARY_UI_FREEZE_20261124.json",
+      "sha256": "c49bd3e7211118c7bd280667711612f3668b1f4732f1583b2360f9f3f6d4ef2e",
+      "gitBlobSha": "7b4318b07cac4bcc775ecc6bafb14b6bae8c0150",
+      "bytes": 2764,
+      "disposition": "PREPARED_EVIDENCE_ONLY_NOT_ACTIVE_OWNER",
+      "sourceSha256": "c49bd3e7211118c7bd280667711612f3668b1f4732f1583b2360f9f3f6d4ef2e",
+      "byteIdenticalToSource": true,
+      "purpose": "Original frozen proposal, not product/release acceptance."
+    },
+    {
+      "repositoryPath": "artifacts/orbit360-recovery/release-control/candidate-reviewed/I6_6_R51_SOURCE_VERIFICATION_20261124.json",
+      "sha256": "87529806c5df18e647c77bb6940c138ceb5eeb4f30db8b21ccc71dd5379d1a4a",
+      "gitBlobSha": "00ceda0d363cda74929db0c06347b2054656edec",
+      "bytes": 6751,
+      "disposition": "PREPARED_EVIDENCE_ONLY_NOT_ACTIVE_OWNER",
+      "sourceSha256": "87529806c5df18e647c77bb6940c138ceb5eeb4f30db8b21ccc71dd5379d1a4a",
+      "byteIdenticalToSource": true,
+      "purpose": "Recorded103new+183regression checks; no new test execution in this checkpoint."
+    },
+    {
+      "repositoryPath": "artifacts/orbit360-recovery/release-control/candidate-reviewed/I6_6_R51_INDEPENDENT_REVIEW_20261124.json",
+      "sha256": "c4fec8ca57bb11f292b96ad6d239d863547bbc477e237845492afe829bd6f41d",
+      "gitBlobSha": "2c6df168f8e9ebe4f4735bba654653714b9318d6",
+      "bytes": 3852,
+      "disposition": "PREPARED_EVIDENCE_ONLY_NOT_ACTIVE_OWNER",
+      "sourceSha256": "c4fec8ca57bb11f292b96ad6d239d863547bbc477e237845492afe829bd6f41d",
+      "byteIdenticalToSource": true,
+      "purpose": "Five independent synthetic probes. Numeric record snippets are synthetic fixture output, not customer financial records."
+    },
+    {
+      "repositoryPath": "artifacts/orbit360-recovery/release-control/candidate-reviewed/I6_6_DOCUMENTARY_PAYMENT_UI_LOCAL_GUARDS_20261124.json",
+      "sha256": "9854ce060dc96476da8dbdbdd91fb84c6c7939100e83c9fdd1d6d297327ea59e",
+      "gitBlobSha": "a4efcda98bdf5e9c6347d94af87be596cdeb9778",
+      "bytes": 1455,
+      "disposition": "PREPARED_EVIDENCE_ONLY_NOT_ACTIVE_OWNER",
+      "sourceSha256": "9854ce060dc96476da8dbdbdd91fb84c6c7939100e83c9fdd1d6d297327ea59e",
+      "byteIdenticalToSource": true,
+      "purpose": "Fifteen payload/guard checks. Authenticated UI remains unverified."
+    },
+    {
+      "repositoryPath": "artifacts/orbit360-recovery/release-control/candidate-reviewed/I6_6_R51_DOCUMENTARY_UI_COMBINED_SOURCE_RESULTS_20261124.json",
+      "sha256": "3d6bc8d777f55e301b79e0e814019a1cfefda26e6a9ae828d717b9e70009d036",
+      "gitBlobSha": "d89fa04df8ec4f43ef74ee7fb082f084c48cb821",
+      "bytes": 1474,
+      "disposition": "PREPARED_EVIDENCE_ONLY_NOT_ACTIVE_OWNER",
+      "sourceSha256": "3d6bc8d777f55e301b79e0e814019a1cfefda26e6a9ae828d717b9e70009d036",
+      "byteIdenticalToSource": true,
+      "purpose": "Recorded combined and preserved-owner test results, not a new run."
+    },
+    {
+      "repositoryPath": "artifacts/orbit360-recovery/release-control/candidate-reviewed/I6_6_R51_CANDIDATE_NEW_TESTS_20261124.tap",
+      "sha256": "b44ebe1305ddaa018826837c10ee8641bd9972fbb2f3a6722cd8d8ae461753f9",
+      "gitBlobSha": "8e92e4254c181727ed47d25925cb2a8a40aa3fc3",
+      "bytes": 22855,
+      "disposition": "PREPARED_EVIDENCE_ONLY_NOT_ACTIVE_OWNER",
+      "sourceSha256": "b44ebe1305ddaa018826837c10ee8641bd9972fbb2f3a6722cd8d8ae461753f9",
+      "byteIdenticalToSource": true,
+      "purpose": "Recorded103new test output."
+    },
+    {
+      "repositoryPath": "artifacts/orbit360-recovery/release-control/candidate-reviewed/I6_6_R51_PROPOSAL_APPLICATION_REGRESSION_20261124.log",
+      "sha256": "34977bb04c6cbac88a70011072b43188877a589fb8b6e9c4961f0b7d3ff5a5af",
+      "gitBlobSha": "6cc21f6e4552f9c976a688af86df9b90a8c071ed",
+      "bytes": 101,
+      "disposition": "PREPARED_EVIDENCE_ONLY_NOT_ACTIVE_OWNER",
+      "sourceSha256": "34977bb04c6cbac88a70011072b43188877a589fb8b6e9c4961f0b7d3ff5a5af",
+      "byteIdenticalToSource": true,
+      "purpose": "Recorded88existing checks."
+    },
+    {
+      "repositoryPath": "artifacts/orbit360-recovery/release-control/candidate-reviewed/I6_6_R51_BANK_EXACTNESS_REGRESSION_20261124.log",
+      "sha256": "035c2b8e5d5a317e37f704f13aa2d65773469657d941d5f3593c2abdd7babfec",
+      "gitBlobSha": "1a8a31b9e9a553435c9959bed6a1175d16b723cc",
+      "bytes": 91,
+      "disposition": "PREPARED_EVIDENCE_ONLY_NOT_ACTIVE_OWNER",
+      "sourceSha256": "035c2b8e5d5a317e37f704f13aa2d65773469657d941d5f3593c2abdd7babfec",
+      "byteIdenticalToSource": true,
+      "purpose": "Recorded17existing checks."
+    },
+    {
+      "repositoryPath": "artifacts/orbit360-recovery/release-control/candidate-reviewed/I6_6_R51_DOCUMENTED_TERMS_REGRESSION_20261124.tap",
+      "sha256": "87b2cd0551bb046b41ad390c6456a25bd8b57d64aab3392e8dbc09af7e544d12",
+      "gitBlobSha": "16fedc387a3108d6285bcc3118700e79c449af2b",
+      "bytes": 17797,
+      "disposition": "PREPARED_EVIDENCE_ONLY_NOT_ACTIVE_OWNER",
+      "sourceSha256": "87b2cd0551bb046b41ad390c6456a25bd8b57d64aab3392e8dbc09af7e544d12",
+      "byteIdenticalToSource": true,
+      "purpose": "Recorded78existing tests."
+    },
+    {
+      "repositoryPath": "artifacts/orbit360-recovery/release-control/candidate-reviewed/I6_6_R51_DOCUMENTARY_UI_COMBINED_TESTS_20261124.log",
+      "sha256": "e27aaa5040587bd0e9f88073b5241434128189161d5a340a0bd3ebbba6bc8161",
+      "gitBlobSha": "f45e859ad2a0b4706b8f43624c2eda23cd269958",
+      "bytes": 24150,
+      "disposition": "PREPARED_EVIDENCE_ONLY_NOT_ACTIVE_OWNER",
+      "sourceSha256": "e27aaa5040587bd0e9f88073b5241434128189161d5a340a0bd3ebbba6bc8161",
+      "byteIdenticalToSource": true,
+      "purpose": "Recorded104Node tests:103R51 plus UI file containing15internal checks."
+    },
+    {
+      "repositoryPath": "artifacts/orbit360-recovery/release-control/candidate-reviewed/I6_6_FINANCIAL_SUCCESSOR_PRESERVED_OWNERS_TESTS_20261124.log",
+      "sha256": "957956e4ee495536ffe931bb8388ea59f7827886a82ff45fb6bed60187ca91c7",
+      "gitBlobSha": "4522d13476906d4915501c1a9225055bae8b20fe",
+      "bytes": 13880,
+      "disposition": "PREPARED_EVIDENCE_ONLY_NOT_ACTIVE_OWNER",
+      "sourceSha256": "957956e4ee495536ffe931bb8388ea59f7827886a82ff45fb6bed60187ca91c7",
+      "byteIdenticalToSource": true,
+      "purpose": "Recorded53existing renewal/endorsement/manual payment/driver checks."
+    },
+    {
+      "repositoryPath": "artifacts/orbit360-recovery/release-control/candidate-reviewed/I6_6_FINANCIAL_SUCCESSOR_COUNTRY_BOUNDARY_20261124.log",
+      "sha256": "48a128069abbd8c91f795fc5538cd0bd806d2769e9371fb7a1daf8aefb8ca83e",
+      "gitBlobSha": "58a19fd03dca5bde645954afb83dfe49f8f1eb68",
+      "bytes": 649,
+      "disposition": "PREPARED_EVIDENCE_ONLY_NOT_ACTIVE_OWNER",
+      "sourceSha256": "48a128069abbd8c91f795fc5538cd0bd806d2769e9371fb7a1daf8aefb8ca83e",
+      "byteIdenticalToSource": true,
+      "purpose": "Recorded country-boundary check."
+    },
+    {
+      "repositoryPath": "artifacts/orbit360-recovery/release-control/candidate-reviewed/I6_6_R59_FINANCIAL_SUMMARY_RECONCILIATION_PREPARED_20261124.cjs",
+      "sha256": "276fe37fe4a1d380a71b2a4e8086daf8473f2a023a7d0d6920ee264b44f2f7e6",
+      "gitBlobSha": "f3eccc7c85c642254796174b9e5c4f10db62539d",
+      "bytes": 15132,
+      "disposition": "PREPARED_EVIDENCE_ONLY_NOT_ACTIVE_OWNER",
+      "sourceSha256": "276fe37fe4a1d380a71b2a4e8086daf8473f2a023a7d0d6920ee264b44f2f7e6",
+      "byteIdenticalToSource": true,
+      "purpose": "Prepared pure metadata transformation. No API, financial writer, workflow or alternate owner; root controls use."
+    },
+    {
+      "repositoryPath": "artifacts/orbit360-recovery/release-control/I6_6_SOURCE56_NINE_DOCUMENTARY_FACTS_SANITIZED_20261124_R59.json",
+      "sha256": "ffb98ee37b047d70b912c1ef8c1fe1ab650a7bc07f8a2fa4bcb848c5c0f2d7c2",
+      "gitBlobSha": "7a64be6dd06566de7c0a73f16a7f89e1b719a22c",
+      "bytes": 9171,
+      "disposition": "PREPARED_EVIDENCE_ONLY_NOT_ACTIVE_OWNER",
+      "sourceSha256": "bf18dacba5a3bc16b0488653b9d6d58f9aa9adf578d7394a076f519bbbc1c638",
+      "byteIdenticalToSource": false,
+      "purpose": "Public copy removes an identifying policy number from explanatory prose; counts, evidence and all hashes unchanged."
+    },
+    {
+      "repositoryPath": "artifacts/orbit360-recovery/release-control/candidate-reviewed/I6_6_R59_FINANCIAL_SUMMARY_HOOK_PREPARED_20261124.json",
+      "sha256": "e1bb80b762a3c5b77f18c2be581ac9930df9794ac3674f3a4d03c78b26839309",
+      "gitBlobSha": "cfa977ef3765e1d02b46b6e772019850425e11e9",
+      "bytes": 1043,
+      "disposition": "PREPARED_EVIDENCE_ONLY_NOT_ACTIVE_OWNER",
+      "purpose": "Exact public-copy hashes for the existing summary reconciliation helper."
+    }
+  ],
+  "invariants": {
+    "repoEdits": 0,
+    "cloudReads": 0,
+    "cloudWrites": 0,
+    "testsRerun": 0,
+    "financialMutations": 0,
+    "sourceApplied": false,
+    "manifestActivated": false,
+    "releaseAuthorizedByCheckpoint": false,
+    "financialScopeComplete": false
+  }
+}

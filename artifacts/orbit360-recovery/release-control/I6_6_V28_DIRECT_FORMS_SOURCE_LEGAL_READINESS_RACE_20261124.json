@@ -1,0 +1,69 @@
+{
+  "schema": "I66_DIRECT_FORMS_SOURCE_LEGAL_READINESS_RACE_DIAGNOSTIC_V1",
+  "sourceSha": "74ae28c6e6e6b40f845567c9b00738a58307b3cb",
+  "runId": 45465410675,
+  "status": "SOURCE_SCHEDULING_RACE_REPRODUCED_ACTUAL_RUN_INTERCEPTION_NOT_RETAINED",
+  "method": "EXISTING_UNIT_HARNESS_REAL_UNMODIFIED_PRODUCT_OWNERS_CONTROLLED_TIMER_NO_BROWSER_NO_NETWORK",
+  "beforeAuthScheduledLegalCallback": {
+    "started": true,
+    "authRestoring": false,
+    "legalOverlayCount": 0,
+    "acceptanceStorageEntries": 0
+  },
+  "afterAuthScheduledLegalCallback": {
+    "started": true,
+    "authRestoring": false,
+    "legalOverlayCount": 1,
+    "acceptanceStorageEntries": 0
+  },
+  "legalCallbackDelayMs": 350,
+  "legalOverlayZIndex": 262,
+  "renewalDecisionZIndex": 230,
+  "bothOverlaysFixedViewport": true,
+  "driverCreatesFreshContext": true,
+  "driverImmediateZeroGateCheck": true,
+  "driverOnlyDirectionConsentHelper": true,
+  "acceptanceActionsExecuted": 0,
+  "storageWrites": 0,
+  "realCustomerWrites": 0,
+  "actualFailedRun": {
+    "buttonResolved": true,
+    "clickTimeoutMs": 30000,
+    "operativeSyntheticRestored": true,
+    "actionabilityReasonRetained": false,
+    "screenshotRetained": false
+  },
+  "limitation": "The original signed run did not export hit-test/DOM or the full Playwright error. This proves the source sequencing defect; it does not retrospectively prove which element intercepted that run.",
+  "sourceIdentities": [
+    {
+      "path": "orbit360-platform/core/auth-product-runtime-p0.js",
+      "blob": "d44482c7ba9952e269f6c38249a561aefcf0eb37",
+      "sha256": "c77e25cbd6ca038410fb597b86205e56dfab8906dddd22c638f2ebab8452fdec"
+    },
+    {
+      "path": "orbit360-platform/core/product-app-p0.js",
+      "blob": "deefa4fb3d1fcfb853a50942602cec1e3d0d1372",
+      "sha256": "da0f270815c7693dc1d20867110ba8c993f489252737e0f11bf873eab1de7190"
+    },
+    {
+      "path": "orbit360-platform/core/legal.js",
+      "blob": "b1d22182d41e2a7fee3f542993d7154c2ead5eca",
+      "sha256": "b74a965b7be0d67862d82bcf73dacc0d5a8293dcf30cb4f5f3fdeaa6ee1c68a3"
+    },
+    {
+      "path": "orbit360-platform/modules/renewals-v1200-operational-bridge.js",
+      "blob": "8395b86246cf9bd77523da0059a6e5318e0cfc80",
+      "sha256": "7c981939230024d2ce3d31a2d504ecb38a151f73baeb1cd036da79a56d9e7c05"
+    },
+    {
+      "path": "orbit360-platform/styles/base.css",
+      "blob": "608ef0709144ffcbe748a7bd04e1bd16744def65",
+      "sha256": "760d3f67ff013a03be73f96d04e93d626ea6206fb5ed2ea5c1160a92f7600ed2"
+    },
+    {
+      "path": "tools/gravicentra-i6-6-carlos-paula-live-direct-renewal-synthetic-uat.cjs",
+      "blob": "1dd796790487a651533d7d230fef612aa8c0fee3",
+      "sha256": "1e3c36265761ecbbb1f4ed942c0a488feea8cebb1e80b48a9e472f9a8fd9444a"
+    }
+  ]
+}

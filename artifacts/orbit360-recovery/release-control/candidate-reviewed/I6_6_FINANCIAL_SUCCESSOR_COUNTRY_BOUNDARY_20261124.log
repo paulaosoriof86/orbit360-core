@@ -1,0 +1,14 @@
+I66_PAYMENT_COUNTRY_WRITE_BOUNDARY_SOURCE_TESTS_REGISTERED
+✔ direct and reconciliation writers both call the same authorization before state changes (0.606365ms)
+✔ GT-only and CO-only memberships reject cross-border payment (0.60983ms)
+✔ multi-country Operativo supports both countries without individual user exceptions (0.097115ms)
+✔ policy/receipt country contradictions and missing country fail before write (0.10748ms)
+✔ legacy country-empty membership semantics stay compatible only if policy country exists (0.14712ms)
+ℹ tests 5
+ℹ suites 0
+ℹ pass 5
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 6.394913

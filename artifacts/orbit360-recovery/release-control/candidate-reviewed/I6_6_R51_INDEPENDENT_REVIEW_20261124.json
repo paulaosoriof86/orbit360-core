@@ -1,0 +1,126 @@
+{
+  "schema": "GI_R51_INDEPENDENT_FIVE_PROBE_SOURCE_REVIEW_V1",
+  "status": "FIVE_PRIOR_REVIEW_PROBES_VERIFIED_FIXED_NOT_UI_OR_LIVE_ACCEPTANCE",
+  "observedAtUtc": "2026-11-24T18:51:44.035Z",
+  "patchSha256": "bfc36d6a6590cd6b881b635bdcdfd742f6e86145592250383cc8e1adef4a38db",
+  "candidateSourceGitBlobSha": "3d84423fd985841c6f9b230dcf729b41f2512556",
+  "candidateSourceSha256": "32d92a9b3c13827f1f2d2073888b0ab833ebc4b18395d761765713077c173831",
+  "unchangedIndependentProbeSha256": "0c5660b3fbed3e724ee1e6d322c67798010c26bb784ae1ffa3d4df1cf6c0e037",
+  "probeOutputSha256": "3d3c15f634d3b12939cc63ef1bcbfdcb43d9cb7b54adf19dae45f7247fc8fa05",
+  "cases": [
+    {
+      "name": "unknown_original_evidence_is_not_a_new_invoice",
+      "committed": true,
+      "writes": 5,
+      "changed": true,
+      "result": {
+        "amount": 100,
+        "applicationState": "APPLIED_DIRECT"
+      },
+      "cobro": {
+        "monto": 100,
+        "paymentEvidenceType": "CRM_MIGRATED_DIRECT",
+        "paymentSupportDocumentRef": "qa_original_payment_support"
+      },
+      "receipt": {
+        "monto": 100,
+        "primaTotal": 100,
+        "paymentState": "PAID_DIRECT"
+      }
+    },
+    {
+      "name": "legacy_without_cobro_or_active_portfolio_country_alias_conflict",
+      "committed": false,
+      "error": {
+        "code": "failed-precondition",
+        "message": "PAYMENT_FINANCIAL_IDENTITY_ALIASES_CONFLICT"
+      },
+      "writes": 0,
+      "changed": false,
+      "receipt": {
+        "monto": 100,
+        "primaTotal": 100,
+        "paymentState": "PAID_DIRECT"
+      }
+    },
+    {
+      "name": "receipt_amount_alias_conflict",
+      "committed": false,
+      "error": {
+        "code": "failed-precondition",
+        "message": "PAYMENT_RECORDED_AMOUNT_ALIASES_CONFLICT"
+      },
+      "writes": 0,
+      "changed": false,
+      "cobro": {
+        "monto": 100,
+        "paymentEvidenceType": "CRM_MIGRATED_DIRECT",
+        "evidenceType": "CRM_ORIGINAL",
+        "evidenceId": "qa_original_evidence",
+        "sourceRef": "qa_original_source",
+        "paymentSupportDocumentRef": "qa_original_payment_support"
+      },
+      "receipt": {
+        "monto": 100,
+        "primaTotal": 100.02,
+        "paymentState": "PAID_DIRECT"
+      }
+    },
+    {
+      "name": "portfolio_amount_alias_conflict",
+      "committed": false,
+      "error": {
+        "code": "failed-precondition",
+        "message": "PAYMENT_RECORDED_AMOUNT_ALIASES_CONFLICT"
+      },
+      "writes": 0,
+      "changed": false,
+      "cobro": {
+        "monto": 100,
+        "paymentEvidenceType": "CRM_MIGRATED_DIRECT",
+        "evidenceType": "CRM_ORIGINAL",
+        "evidenceId": "qa_original_evidence",
+        "sourceRef": "qa_original_source",
+        "paymentSupportDocumentRef": "qa_original_payment_support"
+      },
+      "receipt": {
+        "monto": 100,
+        "primaTotal": 100,
+        "paymentState": "PAID_DIRECT"
+      }
+    },
+    {
+      "name": "payment_support_only_in_original_alias",
+      "committed": true,
+      "writes": 5,
+      "changed": true,
+      "result": {
+        "amount": 100,
+        "applicationState": "APPLIED_DIRECT"
+      },
+      "cobro": {
+        "monto": 100,
+        "paymentEvidenceType": "CRM_MIGRATED_DIRECT",
+        "evidenceType": "CRM_ORIGINAL",
+        "evidenceId": "qa_original_evidence",
+        "sourceRef": "qa_original_source",
+        "soportePagoRef": "qa_original_payment_support"
+      },
+      "receipt": {
+        "monto": 100,
+        "primaTotal": 100,
+        "paymentState": "PAID_DIRECT"
+      }
+    }
+  ],
+  "independentCasesExecuted": 5,
+  "independentCasesPassed": 5,
+  "repositoryWrites": 0,
+  "proposalSourceWrites": 0,
+  "firebaseCalls": 0,
+  "realCustomerWrites": 0,
+  "deployments": 0,
+  "sourceFindingClosureOnly": true,
+  "authenticatedUiTestPerformed": false,
+  "liveAccepted": false
+}

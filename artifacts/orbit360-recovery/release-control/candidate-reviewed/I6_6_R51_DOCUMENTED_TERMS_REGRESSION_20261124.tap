@@ -1,0 +1,478 @@
+TAP version 13
+# Subtest: before-after: a separately documented amount gives exact 978.78 without changing IVA or net commission
+ok 1 - before-after: a separately documented amount gives exact 978.78 without changing IVA or net commission
+  ---
+  duration_ms: 4.737518
+  type: 'test'
+  ...
+# Subtest: before-after: exact documentary schedule survives atomic policy/receipt/portfolio commit and reload without payment
+ok 2 - before-after: exact documentary schedule survives atomic policy/receipt/portfolio commit and reload without payment
+  ---
+  duration_ms: 2.803152
+  type: 'test'
+  ...
+# Subtest: before-after: blank new form does not invent credit card or CAT
+ok 3 - before-after: blank new form does not invent credit card or CAT
+  ---
+  duration_ms: 9.604569
+  type: 'test'
+  ...
+# Subtest: actual new-policy form keeps optional documentary calendar in a closed details section
+ok 4 - actual new-policy form keeps optional documentary calendar in a closed details section
+  ---
+  duration_ms: 4.797408
+  type: 'test'
+  ...
+# Subtest: new form refuses a payment or issuance write without a user-selected real insurer
+ok 5 - new form refuses a payment or issuance write without a user-selected real insurer
+  ---
+  duration_ms: 3.895601
+  type: 'test'
+  ...
+# Subtest: before-after: actual new form commits documented charge and contractual date through the canonical owner
+ok 6 - before-after: actual new form commits documented charge and contractual date through the canonical owner
+  ---
+  duration_ms: 15.415939
+  type: 'test'
+  ...
+# Subtest: non-taxed cents prorate exactly and nonnegatively across 1 installments
+ok 7 - non-taxed cents prorate exactly and nonnegatively across 1 installments
+  ---
+  duration_ms: 0.71737
+  type: 'test'
+  ...
+# Subtest: non-taxed cents prorate exactly and nonnegatively across 2 installments
+ok 8 - non-taxed cents prorate exactly and nonnegatively across 2 installments
+  ---
+  duration_ms: 1.122424
+  type: 'test'
+  ...
+# Subtest: non-taxed cents prorate exactly and nonnegatively across 3 installments
+ok 9 - non-taxed cents prorate exactly and nonnegatively across 3 installments
+  ---
+  duration_ms: 1.305698
+  type: 'test'
+  ...
+# Subtest: non-taxed cents prorate exactly and nonnegatively across 4 installments
+ok 10 - non-taxed cents prorate exactly and nonnegatively across 4 installments
+  ---
+  duration_ms: 1.154963
+  type: 'test'
+  ...
+# Subtest: non-taxed cents prorate exactly and nonnegatively across 5 installments
+ok 11 - non-taxed cents prorate exactly and nonnegatively across 5 installments
+  ---
+  duration_ms: 1.083897
+  type: 'test'
+  ...
+# Subtest: non-taxed cents prorate exactly and nonnegatively across 6 installments
+ok 12 - non-taxed cents prorate exactly and nonnegatively across 6 installments
+  ---
+  duration_ms: 1.057067
+  type: 'test'
+  ...
+# Subtest: non-taxed cents prorate exactly and nonnegatively across 7 installments
+ok 13 - non-taxed cents prorate exactly and nonnegatively across 7 installments
+  ---
+  duration_ms: 1.13934
+  type: 'test'
+  ...
+# Subtest: non-taxed cents prorate exactly and nonnegatively across 8 installments
+ok 14 - non-taxed cents prorate exactly and nonnegatively across 8 installments
+  ---
+  duration_ms: 1.357776
+  type: 'test'
+  ...
+# Subtest: non-taxed cents prorate exactly and nonnegatively across 9 installments
+ok 15 - non-taxed cents prorate exactly and nonnegatively across 9 installments
+  ---
+  duration_ms: 1.042856
+  type: 'test'
+  ...
+# Subtest: non-taxed cents prorate exactly and nonnegatively across 10 installments
+ok 16 - non-taxed cents prorate exactly and nonnegatively across 10 installments
+  ---
+  duration_ms: 1.087182
+  type: 'test'
+  ...
+# Subtest: non-taxed cents prorate exactly and nonnegatively across 11 installments
+ok 17 - non-taxed cents prorate exactly and nonnegatively across 11 installments
+  ---
+  duration_ms: 1.062615
+  type: 'test'
+  ...
+# Subtest: non-taxed cents prorate exactly and nonnegatively across 12 installments
+ok 18 - non-taxed cents prorate exactly and nonnegatively across 12 installments
+  ---
+  duration_ms: 1.085911
+  type: 'test'
+  ...
+# Subtest: non-taxed cents prorate exactly and nonnegatively across 13 installments
+ok 19 - non-taxed cents prorate exactly and nonnegatively across 13 installments
+  ---
+  duration_ms: 1.232118
+  type: 'test'
+  ...
+# Subtest: non-taxed cents prorate exactly and nonnegatively across 14 installments
+ok 20 - non-taxed cents prorate exactly and nonnegatively across 14 installments
+  ---
+  duration_ms: 1.149295
+  type: 'test'
+  ...
+# Subtest: non-taxed cents prorate exactly and nonnegatively across 15 installments
+ok 21 - non-taxed cents prorate exactly and nonnegatively across 15 installments
+  ---
+  duration_ms: 1.106902
+  type: 'test'
+  ...
+# Subtest: non-taxed cents prorate exactly and nonnegatively across 16 installments
+ok 22 - non-taxed cents prorate exactly and nonnegatively across 16 installments
+  ---
+  duration_ms: 1.087743
+  type: 'test'
+  ...
+# Subtest: non-taxed cents prorate exactly and nonnegatively across 17 installments
+ok 23 - non-taxed cents prorate exactly and nonnegatively across 17 installments
+  ---
+  duration_ms: 1.682991
+  type: 'test'
+  ...
+# Subtest: non-taxed cents prorate exactly and nonnegatively across 18 installments
+ok 24 - non-taxed cents prorate exactly and nonnegatively across 18 installments
+  ---
+  duration_ms: 1.307911
+  type: 'test'
+  ...
+# Subtest: non-taxed cents prorate exactly and nonnegatively across 19 installments
+ok 25 - non-taxed cents prorate exactly and nonnegatively across 19 installments
+  ---
+  duration_ms: 1.106832
+  type: 'test'
+  ...
+# Subtest: non-taxed cents prorate exactly and nonnegatively across 20 installments
+ok 26 - non-taxed cents prorate exactly and nonnegatively across 20 installments
+  ---
+  duration_ms: 1.04536
+  type: 'test'
+  ...
+# Subtest: non-taxed cents prorate exactly and nonnegatively across 21 installments
+ok 27 - non-taxed cents prorate exactly and nonnegatively across 21 installments
+  ---
+  duration_ms: 1.078669
+  type: 'test'
+  ...
+# Subtest: non-taxed cents prorate exactly and nonnegatively across 22 installments
+ok 28 - non-taxed cents prorate exactly and nonnegatively across 22 installments
+  ---
+  duration_ms: 1.265728
+  type: 'test'
+  ...
+# Subtest: non-taxed cents prorate exactly and nonnegatively across 23 installments
+ok 29 - non-taxed cents prorate exactly and nonnegatively across 23 installments
+  ---
+  duration_ms: 1.276765
+  type: 'test'
+  ...
+# Subtest: non-taxed cents prorate exactly and nonnegatively across 24 installments
+ok 30 - non-taxed cents prorate exactly and nonnegatively across 24 installments
+  ---
+  duration_ms: 1.119259
+  type: 'test'
+  ...
+# Subtest: invalid non-taxed amount is rejected without a coercion to zero: -1
+ok 31 - invalid non-taxed amount is rejected without a coercion to zero: -1
+  ---
+  duration_ms: 1.212489
+  type: 'test'
+  ...
+# Subtest: invalid non-taxed amount is rejected without a coercion to zero: Infinity
+ok 32 - invalid non-taxed amount is rejected without a coercion to zero: Infinity
+  ---
+  duration_ms: 1.012501
+  type: 'test'
+  ...
+# Subtest: invalid non-taxed amount is rejected without a coercion to zero: NaN
+ok 33 - invalid non-taxed amount is rejected without a coercion to zero: NaN
+  ---
+  duration_ms: 1.070547
+  type: 'test'
+  ...
+# Subtest: invalid non-taxed amount is rejected without a coercion to zero: bad
+ok 34 - invalid non-taxed amount is rejected without a coercion to zero: bad
+  ---
+  duration_ms: 1.219129
+  type: 'test'
+  ...
+# Subtest: invalid non-taxed amount is rejected without a coercion to zero: true
+ok 35 - invalid non-taxed amount is rejected without a coercion to zero: true
+  ---
+  duration_ms: 1.619336
+  type: 'test'
+  ...
+# Subtest: invalid non-taxed amount is rejected without a coercion to zero: [object Object]
+ok 36 - invalid non-taxed amount is rejected without a coercion to zero: [object Object]
+  ---
+  duration_ms: 0.959942
+  type: 'test'
+  ...
+# Subtest: invalid non-taxed amount is rejected without a coercion to zero: 2.701
+ok 37 - invalid non-taxed amount is rejected without a coercion to zero: 2.701
+  ---
+  duration_ms: 0.932882
+  type: 'test'
+  ...
+# Subtest: invalid non-taxed amount is rejected without a coercion to zero: 2.70\\nBAD
+ok 38 - invalid non-taxed amount is rejected without a coercion to zero: 2.70\\nBAD
+  ---
+  duration_ms: 1.135675
+  type: 'test'
+  ...
+# Subtest: positive charge requires valid explicit concept and document {"cargoNoGravadoConcepto":""}
+ok 39 - positive charge requires valid explicit concept and document {"cargoNoGravadoConcepto":""}
+  ---
+  duration_ms: 1.060863
+  type: 'test'
+  ...
+# Subtest: positive charge requires valid explicit concept and document {"cargoNoGravadoDocumentRef":""}
+ok 40 - positive charge requires valid explicit concept and document {"cargoNoGravadoDocumentRef":""}
+  ---
+  duration_ms: 0.961645
+  type: 'test'
+  ...
+# Subtest: positive charge requires valid explicit concept and document {"cargoNoGravadoConcepto":{}}
+ok 41 - positive charge requires valid explicit concept and document {"cargoNoGravadoConcepto":{}}
+  ---
+  duration_ms: 0.956648
+  type: 'test'
+  ...
+# Subtest: positive charge requires valid explicit concept and document {"cargoNoGravadoDocumentRef":"bad\\nref"}
+ok 42 - positive charge requires valid explicit concept and document {"cargoNoGravadoDocumentRef":"bad\\nref"}
+  ---
+  duration_ms: 1.329924
+  type: 'test'
+  ...
+# Subtest: incomplete or malformed documentary calendar fails closed 0
+ok 43 - incomplete or malformed documentary calendar fails closed 0
+  ---
+  duration_ms: 1.427049
+  type: 'test'
+  ...
+# Subtest: incomplete or malformed documentary calendar fails closed 1
+ok 44 - incomplete or malformed documentary calendar fails closed 1
+  ---
+  duration_ms: 1.101192
+  type: 'test'
+  ...
+# Subtest: incomplete or malformed documentary calendar fails closed 2
+ok 45 - incomplete or malformed documentary calendar fails closed 2
+  ---
+  duration_ms: 2.752036
+  type: 'test'
+  ...
+# Subtest: incomplete or malformed documentary calendar fails closed 3
+ok 46 - incomplete or malformed documentary calendar fails closed 3
+  ---
+  duration_ms: 0.494328
+  type: 'test'
+  ...
+# Subtest: incomplete or malformed documentary calendar fails closed 4
+ok 47 - incomplete or malformed documentary calendar fails closed 4
+  ---
+  duration_ms: 0.454308
+  type: 'test'
+  ...
+# Subtest: incomplete or malformed documentary calendar fails closed 5
+ok 48 - incomplete or malformed documentary calendar fails closed 5
+  ---
+  duration_ms: 2.064285
+  type: 'test'
+  ...
+# Subtest: incomplete or malformed documentary calendar fails closed 6
+ok 49 - incomplete or malformed documentary calendar fails closed 6
+  ---
+  duration_ms: 0.483051
+  type: 'test'
+  ...
+# Subtest: incomplete or malformed documentary calendar fails closed 7
+ok 50 - incomplete or malformed documentary calendar fails closed 7
+  ---
+  duration_ms: 0.456622
+  type: 'test'
+  ...
+# Subtest: incomplete or malformed documentary calendar fails closed 8
+ok 51 - incomplete or malformed documentary calendar fails closed 8
+  ---
+  duration_ms: 0.521258
+  type: 'test'
+  ...
+# Subtest: incomplete or malformed documentary calendar fails closed 9
+ok 52 - incomplete or malformed documentary calendar fails closed 9
+  ---
+  duration_ms: 4.291152
+  type: 'test'
+  ...
+# Subtest: documented installment count must be a bounded positive integer 0
+ok 53 - documented installment count must be a bounded positive integer 0
+  ---
+  duration_ms: 0.695427
+  type: 'test'
+  ...
+# Subtest: documented installment count must be a bounded positive integer -1
+ok 54 - documented installment count must be a bounded positive integer -1
+  ---
+  duration_ms: 0.534437
+  type: 'test'
+  ...
+# Subtest: documented installment count must be a bounded positive integer 1.5
+ok 55 - documented installment count must be a bounded positive integer 1.5
+  ---
+  duration_ms: 0.542929
+  type: 'test'
+  ...
+# Subtest: documented installment count must be a bounded positive integer 25
+ok 56 - documented installment count must be a bounded positive integer 25
+  ---
+  duration_ms: 0.460317
+  type: 'test'
+  ...
+# Subtest: multiple documentary installments require a contiguous ordered complete sequence and exact total
+ok 57 - multiple documentary installments require a contiguous ordered complete sequence and exact total
+  ---
+  duration_ms: 1.132459
+  type: 'test'
+  ...
+# Subtest: legacy schedule remains unchanged when no documentary overlay or extra charge exists
+ok 58 - legacy schedule remains unchanged when no documentary overlay or extra charge exists
+  ---
+  duration_ms: 0.746524
+  type: 'test'
+  ...
+# Subtest: documentary text roundtrips exact sequence, references and independent operational limit
+ok 59 - documentary text roundtrips exact sequence, references and independent operational limit
+  ---
+  duration_ms: 0.606665
+  type: 'test'
+  ...
+# Subtest: idempotent replanning reuses receipt and portfolio IDs and never duplicates a commission
+ok 60 - idempotent replanning reuses receipt and portfolio IDs and never duplicates a commission
+  ---
+  duration_ms: 2.456696
+  type: 'test'
+  ...
+# Subtest: paid/reported canonical receipt prevents fee or contractual-date changes Pagado
+ok 61 - paid/reported canonical receipt prevents fee or contractual-date changes Pagado
+  ---
+  duration_ms: 2.149877
+  type: 'test'
+  ...
+# Subtest: paid/reported canonical receipt prevents fee or contractual-date changes Conciliado
+ok 62 - paid/reported canonical receipt prevents fee or contractual-date changes Conciliado
+  ---
+  duration_ms: 1.314421
+  type: 'test'
+  ...
+# Subtest: paid/reported canonical receipt prevents fee or contractual-date changes reported
+ok 63 - paid/reported canonical receipt prevents fee or contractual-date changes reported
+  ---
+  duration_ms: 1.311326
+  type: 'test'
+  ...
+# Subtest: operational deadline edit does not rewrite the contractual due date and survives unrelated replan
+ok 64 - operational deadline edit does not rewrite the contractual due date and survives unrelated replan
+  ---
+  duration_ms: 2.657334
+  type: 'test'
+  ...
+# Subtest: documented operational deadline may precede contractual due without moving the contractual calendar
+ok 65 - documented operational deadline may precede contractual due without moving the contractual calendar
+  ---
+  duration_ms: 1.234232
+  type: 'test'
+  ...
+# Subtest: individual receipt editor cannot mutate contractual charge/date independently of its policy
+ok 66 - individual receipt editor cannot mutate contractual charge/date independently of its policy
+  ---
+  duration_ms: 1.272108
+  type: 'test'
+  ...
+# Subtest: actual receipt editor/detail and policy read model display charge, provenance and both dates distinctly
+ok 67 - actual receipt editor/detail and policy read model display charge, provenance and both dates distinctly
+  ---
+  duration_ms: 9.009011
+  type: 'test'
+  ...
+# Subtest: existing managed role can create the documented plan without extra privileges Dirección
+ok 68 - existing managed role can create the documented plan without extra privileges Dirección
+  ---
+  duration_ms: 2.22526
+  type: 'test'
+  ...
+# Subtest: existing managed role can create the documented plan without extra privileges Operativo
+ok 69 - existing managed role can create the documented plan without extra privileges Operativo
+  ---
+  duration_ms: 2.856281
+  type: 'test'
+  ...
+# Subtest: existing managed role can create the documented plan without extra privileges Admin
+ok 70 - existing managed role can create the documented plan without extra privileges Admin
+  ---
+  duration_ms: 2.209817
+  type: 'test'
+  ...
+# Subtest: existing managed role can create the documented plan without extra privileges AdminTenant
+ok 71 - existing managed role can create the documented plan without extra privileges AdminTenant
+  ---
+  duration_ms: 2.291098
+  type: 'test'
+  ...
+# Subtest: existing managed role can create the documented plan without extra privileges SuperAdmin
+ok 72 - existing managed role can create the documented plan without extra privileges SuperAdmin
+  ---
+  duration_ms: 2.065922
+  type: 'test'
+  ...
+# Subtest: Asesor cannot use new fields to elevate policy-write permissions
+ok 73 - Asesor cannot use new fields to elevate policy-write permissions
+  ---
+  duration_ms: 1.05229
+  type: 'test'
+  ...
+# Subtest: policy import keeps assistance/extra charge separate and never derives conduct from payment method
+ok 74 - policy import keeps assistance/extra charge separate and never derives conduct from payment method
+  ---
+  duration_ms: 5.948906
+  type: 'test'
+  ...
+# Subtest: invalid documentary import row is rejected before any canonical write while a valid next row is retained
+ok 75 - invalid documentary import row is rejected before any canonical write while a valid next row is retained
+  ---
+  duration_ms: 6.189454
+  type: 'test'
+  ...
+# Subtest: issuance adapter preserves current documented terms and an explicitly unknown method/conduct
+ok 76 - issuance adapter preserves current documented terms and an explicitly unknown method/conduct
+  ---
+  duration_ms: 3.618608
+  type: 'test'
+  ...
+# Subtest: renewal never silently copies old documentary dates or drops a positive documented charge
+ok 77 - renewal never silently copies old documentary dates or drops a positive documented charge
+  ---
+  duration_ms: 2.269516
+  type: 'test'
+  ...
+# Subtest: issuance/renewal UI adapters collect the same canonical fields without copying old renewal dates
+ok 78 - issuance/renewal UI adapters collect the same canonical fields without copying old renewal dates
+  ---
+  duration_ms: 2.190829
+  type: 'test'
+  ...
+1..78
+# tests 78
+# suites 0
+# pass 78
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 239.668881

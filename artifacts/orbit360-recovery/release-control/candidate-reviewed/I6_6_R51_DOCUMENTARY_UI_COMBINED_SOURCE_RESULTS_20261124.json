@@ -1,0 +1,44 @@
+{
+  "status": "LOCAL_COMPOSED_SOURCE_RESULTS_NOT_PREVIEW_OR_LIVE_ACCEPTANCE",
+  "results": [
+    {
+      "name": "combined-r51-documentary-ui",
+      "exitCode": 0,
+      "log": "/workspace/scratch/166055cd45dc/payments-work/post-e7-joint-financial-5e8516ff/combined-r51-documentary-ui.log",
+      "sha256": "e27aaa5040587bd0e9f88073b5241434128189161d5a340a0bd3ebbba6bc8161",
+      "summary": [
+        "# tests 104",
+        "# pass 104",
+        "# fail 0",
+        "# skipped 0",
+        "# duration_ms 247.835958"
+      ],
+      "failureSummary": []
+    },
+    {
+      "name": "preserved-direct-forms-and-payment-contracts",
+      "exitCode": 0,
+      "log": "/workspace/scratch/166055cd45dc/payments-work/post-e7-joint-financial-5e8516ff/preserved-direct-forms-and-payment-contracts.log",
+      "sha256": "957956e4ee495536ffe931bb8388ea59f7827886a82ff45fb6bed60187ca91c7",
+      "summary": [
+        "# tests 53",
+        "# pass 53",
+        "# fail 0",
+        "# skipped 0",
+        "# duration_ms 194.700818"
+      ],
+      "failureSummary": []
+    },
+    {
+      "name": "payment-country-boundary",
+      "exitCode": 0,
+      "log": "/workspace/scratch/166055cd45dc/payments-work/post-e7-joint-financial-5e8516ff/payment-country-boundary.log",
+      "sha256": "48a128069abbd8c91f795fc5538cd0bd806d2769e9371fb7a1daf8aefb8ca83e",
+      "summary": [],
+      "failureSummary": []
+    }
+  ],
+  "repositoryWrites": 0,
+  "realCustomerWrites": 0,
+  "networkRequests": 0
+}

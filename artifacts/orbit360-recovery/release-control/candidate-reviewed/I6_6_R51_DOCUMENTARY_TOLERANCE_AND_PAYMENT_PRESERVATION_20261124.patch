@@ -1,0 +1,984 @@
+--- a/functions/cobros-reconciliation-domain.js
++++ b/functions/cobros-reconciliation-domain.js
+@@ -6,7 +6,7 @@
+ const { HttpsError, onCall } = require('firebase-functions/v2/https');
+ const { validateActiveLedgerContract } = require('./cobros-ledger-contract');
+ const { normalizeRole, resolveProductActiveRole } = require('./product-active-role-contract');
+-const { planEvidence } = require('./payment-inference-engine');
++const { planEvidence, documentaryAmountVariance } = require('./payment-inference-engine');
+ const proposalBoundary = require('./proposal-application-boundary');
+ const proposalAccess = require('./b4-003-scoped-access-boundary');
+ const sourceIntake = require('./cobros-source-intake-v2');
+@@ -427,6 +427,61 @@
+   return result;
+ }
+ 
++const RECORDED_PAYMENT_FIELDS = Object.freeze([
++  'paymentState', 'directOrInferred', 'paymentEvidenceType', 'paymentOrigin',
++  'evidenceId', 'evidenceType', 'sourceRef', 'evidenceAsOfDate',
++  'paidDate', 'fechaPago', 'paymentMethod', 'metodo', 'metodoPago',
++  'paymentSupportDocumentRef', 'soportePagoRef', 'inferredEffectiveDate',
++  'anchorInstallment', 'inferenceRuleId', 'confidence', 'inferenceProvenance'
++]);
++function recordedPaymentFacts(row) {
++  return Object.fromEntries(RECORDED_PAYMENT_FIELDS.filter(key => row && Object.prototype.hasOwnProperty.call(row,key) && row[key] !== undefined)
++    .map(key => [key, row[key]]));
++}
++function preserveRecordedPayment(target, row) {
++  // Missing/blank original provenance is not evidence from the new invoice.
++  // Keep confirmed state/date derivation, but strip every unproved new source,
++  // method, support or inference field before restoring its original presence.
++  const derivedStateOrDate = new Set(['paymentState','directOrInferred','paidDate','fechaPago']);
++  for (const key of RECORDED_PAYMENT_FIELDS) {
++    if (derivedStateOrDate.has(key)) {
++      if (row && row[key] != null && row[key] !== '') target[key]=row[key];
++    } else if (row && Object.prototype.hasOwnProperty.call(row,key) && row[key] !== undefined) target[key]=row[key];
++    else delete target[key];
++  }
++  return target;
++}
++function assertPaymentRecordAliases(record, monetary = false) {
++  const present=value=>value!=null&&text(value,500)!=='';
++  for (const [canonical,alias] of [['polizaId','policyId'],['clienteId','clientId'],['reciboId','receiptId'],
++      ['moneda','currency'],['moneda','divisa'],['pais','country'],['paymentSupportDocumentRef','soportePagoRef']]) {
++    const normalize=value=>canonical==='pais'?paymentCountry(value):canonical==='moneda'?text(value,12).toUpperCase():text(value,500);
++    if (present(record[canonical]) && present(record[alias]) && normalize(record[canonical])!==normalize(record[alias]))
++      throw new HttpsError('failed-precondition','PAYMENT_FINANCIAL_IDENTITY_ALIASES_CONFLICT');
++  }
++  if (monetary) {
++    // saldo is a balance, not an alias of a total when the total exists.
++    const keys=['monto','montoTotal','primaTotal'].filter(key=>present(record[key]));
++    if (!keys.length && present(record.saldo)) keys.push('saldo');
++    const amounts=keys.map(key=>Number(record[key]));
++    if (keys.some(key=>typeof record[key]==='boolean') ||
++        amounts.some(value=>!Number.isFinite(value)||value<0||Math.abs(value*100-Math.round(value*100))>1e-6)||
++        new Set(amounts.map(value=>Math.round(value*100))).size>1)
++      throw new HttpsError('failed-precondition','PAYMENT_RECORDED_AMOUNT_ALIASES_CONFLICT');
++  }
++}
++function assertPaymentIdentity(authz, policy, receipt, row, kind, amountMustMatch = true) {
++  assertPaymentRecordAliases(policy);
++  assertPaymentRecordAliases(receipt,true);
++  assertPaymentRecordAliases(row,true);
++  assertReconciliationFinancialTarget(authz, policy, receipt, row, kind, { amountMustMatch });
++  if (text(row.polizaId || row.policyId, 180) !== policy.id ||
++      text(row.clienteId || row.clientId, 180) !== text(receipt.clienteId || policy.clienteId, 180))
++    throw new HttpsError('failed-precondition', 'PAYMENT_EXACT_FINANCIAL_IDENTITY_REQUIRED');
++  if (row.paidDate && row.fechaPago && row.paidDate !== row.fechaPago)
++    throw new HttpsError('failed-precondition', 'PAYMENT_EXISTING_PAID_DATE_ALIASES_CONFLICT');
++}
++
+ async function applyPayment(authz, data, payload, operationName = 'apply_payment', previewOnly = false) {
+   const receiptId = id(payload.receiptId || payload.reciboId, 'reciboId');
+   const source = paymentSource(payload.sourceType || payload.fuentePago || 'manual');
+@@ -440,7 +495,15 @@
+   const paymentMethod = text(payload.paymentMethod || payload.metodoPago || payload.metodo, 180);
+   const paymentSupportDocumentRef = text(payload.paymentSupportDocumentRef || payload.soportePagoRef, 500);
+   const invoiceDocumentRef = text(payload.invoiceDocumentRef || payload.facturaRef, 500);
+-  const explicitAmount = money(payload.amount || payload.monto, 'Monto');
++  if (payload.amount != null && payload.monto != null && Number(payload.amount) !== Number(payload.monto))
++    throw new HttpsError('invalid-argument','PAYMENT_AMOUNT_ALIASES_CONFLICT');
++  if (payload.currency && payload.moneda && text(payload.currency,12).toUpperCase() !== text(payload.moneda,12).toUpperCase())
++    throw new HttpsError('invalid-argument','PAYMENT_CURRENCY_ALIASES_CONFLICT');
++  const explicitAmountInput = payload.amount != null ? payload.amount : payload.monto;
++  if (explicitAmountInput != null && explicitAmountInput !== '' && (typeof explicitAmountInput === 'boolean' ||
++      !Number.isFinite(Number(explicitAmountInput)) || Math.abs(Number(explicitAmountInput)*100-Math.round(Number(explicitAmountInput)*100)) > 1e-6))
++    throw new HttpsError('invalid-argument', 'PAYMENT_AMOUNT_PRECISION_INVALID');
++  const explicitAmount = money(explicitAmountInput, 'Monto');
+   const evidenceId = text(payload.evidenceId || payload.sourceRef || payload.documentRef, 500);
+   const evidenceType = text(payload.evidenceType || payload.tipoEvidencia, 120);
+   const anchorInstallment = Number(payload.anchorInstallment || payload.cuotaAncla || 0) || null;
+@@ -450,6 +513,8 @@
+   if (inferred && paidDate && payload.actualPaidDateEvidence !== true) {
+     throw new HttpsError('failed-precondition', 'Una inferencia no puede inventar fecha real de pago.');
+   }
++  if (payload.partialPayment === true || payload.reversal === true || payload.conflictingEvidence === true)
++    throw new HttpsError('failed-precondition', 'PAYMENT_CONTRADICTORY_OR_PARTIAL_EVIDENCE_REQUIRES_REVIEW');
+   const applicationEvidenceTypeInput = text(payload.applicationEvidenceType || payload.tipoEvidenciaAplicacion, 120).toUpperCase();
+   const applicationProved = Boolean(payload.forceReconciliation === true || applicationDate || invoiceNumber || invoiceDocumentRef || ['insurer_invoice','insurer_statement','commission_statement'].includes(source));
+   const receiptRef = tenantData(authz.tenantId, 'recibosEsperados').doc(receiptId);
+@@ -457,7 +522,8 @@
+     receiptId, source, inferred, paidDate, inferredEffectiveDate, evidenceAsOfDate, applicationDate, invoiceDate,
+     invoiceNumber, paymentMethod, paymentSupportDocumentRef, invoiceDocumentRef, amount: explicitAmount,
+     evidenceId, evidenceType, anchorInstallment, inferenceRuleId, confidence,
+-    forceReconciliation: payload.forceReconciliation === true, applicationEvidenceType: applicationEvidenceTypeInput
++    forceReconciliation: payload.forceReconciliation === true, applicationEvidenceType: applicationEvidenceTypeInput,
++    currency:text(payload.currency || payload.moneda,12).toUpperCase(), actualPaidDateEvidence:payload.actualPaidDateEvidence === true
+   };
+   const reqId = operationRequestId(authz.tenantId, operationName, reqPayload, data.requestId);
+   const reqRef = requestRef(authz.tenantId, reqId, previewOnly);
+@@ -478,8 +544,13 @@
+     const policySnap = await tx.get(policyRef);
+     if (!policySnap.exists) throw new HttpsError('failed-precondition', 'La póliza vinculada no existe.');
+     const policy = Object.assign({ id: policySnap.id }, policySnap.data() || {});
+-    assertPaymentCountryScope(authz, policy, receipt);
++    assertPaymentRecordAliases(policy);
++    assertPaymentRecordAliases(receipt,true);
++    const paymentCountryCode = assertPaymentCountryScope(authz, policy, receipt);
+     const clientId = id(receipt.clienteId || policy.clienteId, 'clienteId');
++    if (receipt.tenantId && receipt.tenantId !== authz.tenantId || policy.tenantId && policy.tenantId !== authz.tenantId ||
++        receipt.clienteId && policy.clienteId && receipt.clienteId !== policy.clienteId)
++      throw new HttpsError('failed-precondition', 'PAYMENT_POLICY_RECEIPT_IDENTITY_MISMATCH');
+     if (previewOnly) {
+       // Protect every root of the payment transaction, not just the submitted
+       // receipt ID. No authentic customer, policy or advisor relationship may
+@@ -526,9 +597,44 @@
+     if (!existingPaid && activePortfolioRows.length !== 1)
+       throw new HttpsError('failed-precondition', 'PAYMENT_ACTIVE_PORTFOLIO_REQUIRED: falta obligación activa única para aplicar el pago.');
+ 
+-    const amount = explicitAmount != null ? explicitAmount : receiptAmount(receipt);
+-    if (amount == null || amount <= 0) throw new HttpsError('failed-precondition', 'El recibo no tiene monto válido.');
++    const obligationAmount = receiptAmount(receipt);
++    const documentedAmount = explicitAmount != null ? explicitAmount : obligationAmount;
+     const receiptCurrency = text(receipt.moneda || policy.moneda, 12).toUpperCase();
++    if (!receiptCurrency || text(policy.moneda,12).toUpperCase() !== receiptCurrency ||
++        payload.currency && text(payload.currency,12).toUpperCase() !== receiptCurrency ||
++        payload.moneda && text(payload.moneda,12).toUpperCase() !== receiptCurrency)
++      throw new HttpsError('failed-precondition', 'PAYMENT_EXACT_CURRENCY_REQUIRED');
++    if (existingCobro) assertPaymentIdentity(authz, policy, receipt, existingCobro, 'COBRO', !cobroPaid);
++    for (const row of activePortfolioRows) assertPaymentIdentity(authz, policy, receipt, row.data(), 'PORTFOLIO');
++    // R51 concerns documentary rounding. It never reallocates a new bank or
++    // client payment, nor replaces a recorded paid amount with a later invoice.
++    const amount = cobroPaid ? Number(existingCobro.monto) : (existingPaid ? obligationAmount : documentedAmount);
++    if (!Number.isFinite(amount) || Math.abs(amount*100-Math.round(amount*100)) > 1e-6)
++      throw new HttpsError('failed-precondition', 'PAYMENT_RECORDED_AMOUNT_PRECISION_INVALID');
++    if (amount == null || amount <= 0 || obligationAmount == null || obligationAmount <= 0)
++      throw new HttpsError('failed-precondition', 'El recibo o el pago no tiene monto válido.');
++    if (Math.round(amount*100) !== Math.round(obligationAmount*100)) {
++      const code = existingPaid ? 'PAYMENT_EXISTING_RESIDUAL_REQUIRES_ALLOCATION' : 'PAYMENT_AMOUNT_REQUIRES_EXACT_ALLOCATION';
++      const residualAmount=(Math.round(obligationAmount*100)-Math.round(amount*100))/100;
++      const explanation=residualAmount>0?'Faltan '+receiptCurrency+' '+residualAmount.toFixed(2)+'.':'El pago supera la obligación en '+receiptCurrency+' '+Math.abs(residualAmount).toFixed(2)+'.';
++      throw new HttpsError('failed-precondition','Pago: '+receiptCurrency+' '+amount.toFixed(2)+'; obligación: '+receiptCurrency+' '+obligationAmount.toFixed(2)+'. '+explanation+' Se requiere asignar la diferencia antes de cerrar el recibo.', {reason:code,recordedPaymentAmount:amount,obligationAmount,
++        residualAmount,
++        residualCents:Math.round(obligationAmount*100)-Math.round(amount*100),currency:receiptCurrency,
++        financialWrites:0,roundingPolicyCannotSettleMoney:true});
++    }
++    const applicationEvidenceRef = evidenceId || invoiceDocumentRef || invoiceNumber;
++    const compare = (original, documented, originalRef, documentedRef) => documentaryAmountVariance({
++      kind:'APPLICATION_DOCUMENT',country:paymentCountryCode,currency:receiptCurrency,identityExact:true,
++      original:{amount:original,sourceRef:originalRef},documented:{amount:documented,sourceRef:documentedRef}
++    });
++    const applicationVariance = enrichment ? compare(amount,documentedAmount,
++      (cobroSnap.empty?'recibosEsperados/'+receiptId:'cobros/'+cobroSnap.docs[0].id)+'#monto',applicationEvidenceRef) : null;
++    const obligationVariance = enrichment ? compare(obligationAmount,documentedAmount,
++      'recibosEsperados/'+receiptId+'#monto',applicationEvidenceRef) : null;
++    if (enrichment && [applicationVariance,obligationVariance].some(v=>v.differenceCents!==0&&!v.accepted))
++      throw new HttpsError('failed-precondition', 'PAYMENT_APPLICATION_VARIANCE_REQUIRES_REVIEW');
++    if (legacyPaidReceiptReconciliation && Math.round(documentedAmount*100)!==Math.round(obligationAmount*100))
++      throw new HttpsError('failed-precondition', 'PAYMENT_LEGACY_ACTUAL_AMOUNT_UNPROVEN');
+     const cobroDoc = cobroSnap.empty ? null : cobroSnap.docs[0];
+     const cobroId = cobroDoc ? cobroDoc.id : deterministicCobroId(authz.tenantId, receiptId);
+     const cobroRef = tenantData(authz.tenantId, 'cobros').doc(cobroId);
+@@ -537,13 +643,21 @@
+     const beforeCobro = cobroDoc ? (cobroDoc.data() || {}) : {};
+     const advisorReported = advisorReportPending(receipt);
+     const existingPaidDate = text(beforeCobro.paidDate || beforeCobro.fechaPago || (existingPaid ? (receipt.paidDate || receipt.fechaPago) : ''), 32);
++    const receiptPaidDate = text(receipt.paidDate || receipt.fechaPago,32);
++    if (enrichment && (receipt.paidDate && receipt.fechaPago && receipt.paidDate !== receipt.fechaPago ||
++        receiptPaidDate && existingPaidDate && receiptPaidDate !== existingPaidDate))
++      throw new HttpsError('failed-precondition','PAYMENT_EXISTING_PAID_DATE_CONFLICT');
++    if (enrichment && receipt.paymentState && beforeCobro.paymentState && receipt.paymentState !== beforeCobro.paymentState)
++      throw new HttpsError('failed-precondition','PAYMENT_EXISTING_STATE_CONFLICT');
+     const existingApplicationDate = text(beforeCobro.applicationDate || beforeCobro.fechaAplicacion || (existingPaid ? receipt.applicationDate : ''), 32);
+     const reportPaidDate = advisorReported ? text(receipt.fechaPagoReportada || receipt.paidDate || receipt.fechaPago, 32) : '';
+-    const finalPaidDate = paidDate || reportPaidDate || existingPaidDate;
++    const finalPaidDate = enrichment ? (existingPaidDate || (payload.actualPaidDateEvidence === true ? paidDate : '')) : (paidDate || reportPaidDate || existingPaidDate);
+     const finalApplicationDate = applicationDate || existingApplicationDate;
+     const finalInvoiceDate = invoiceDate || text(beforeCobro.invoiceDate || (existingPaid ? receipt.invoiceDate : ''), 32);
+-    const finalPaymentMethod = paymentMethod || (advisorReported ? text(receipt.metodoPago || receipt.paymentMethod, 180) : '') || text(beforeCobro.paymentMethod || beforeCobro.metodo || (existingPaid ? (receipt.paymentMethod || receipt.metodoPago) : ''), 180);
+-    const finalPaymentSupportDocumentRef = paymentSupportDocumentRef || (advisorReported ? text(receipt.paymentSupportDocumentRef || receipt.soportePagoRef, 500) : '') || text(beforeCobro.paymentSupportDocumentRef || (existingPaid ? receipt.paymentSupportDocumentRef : ''), 500);
++    const existingPaymentMethod = text(beforeCobro.paymentMethod || beforeCobro.metodo || beforeCobro.metodoPago || (existingPaid ? (receipt.paymentMethod || receipt.metodo || receipt.metodoPago) : ''),180);
++    const finalPaymentMethod = enrichment ? existingPaymentMethod : (paymentMethod || (advisorReported ? text(receipt.metodoPago || receipt.paymentMethod,180) : '') || existingPaymentMethod);
++    const existingPaymentSupportDocumentRef = text(beforeCobro.paymentSupportDocumentRef || beforeCobro.soportePagoRef || (existingPaid ? (receipt.paymentSupportDocumentRef || receipt.soportePagoRef) : ''),500);
++    const finalPaymentSupportDocumentRef = enrichment ? existingPaymentSupportDocumentRef : (paymentSupportDocumentRef || (advisorReported ? text(receipt.paymentSupportDocumentRef || receipt.soportePagoRef,500) : '') || existingPaymentSupportDocumentRef);
+     const isApplicationEnrichment = existingPaid && applicationEvidenceSource;
+     const existingPaymentState = text(beforeCobro.paymentState || (existingPaid ? receipt.paymentState : ''), 80);
+     const existingDirectOrInferred = text(beforeCobro.directOrInferred || (existingPaid ? receipt.directOrInferred : '') || (existingPaymentState === 'PAID_INFERRED' ? 'INFERRED' : ''), 80);
+@@ -596,6 +710,20 @@
+     if (finalInvoiceDate) shared.invoiceDate = finalInvoiceDate;
+     if (invoiceNumber) shared.invoiceNumber = invoiceNumber;
+     if (invoiceDocumentRef) shared.invoiceDocumentRef = invoiceDocumentRef;
++    if (enrichment) {
++      preserveRecordedPayment(shared, cobroPaid ? beforeCobro : receipt);
++      shared.applicationAmount = documentedAmount;
++      shared.applicationEvidence = { sourceType:source,evidenceId,sourceRef:text(payload.sourceRef || payload.documentRef || applicationEvidenceRef,500),
++        evidenceType:applicationEvidenceType,evidenceAsOfDate,invoiceNumber,invoiceDocumentRef,
++        reportedPaidDate:paidDate,actualPaidDateEvidence:payload.actualPaidDateEvidence===true,applicationDate:finalApplicationDate,
++        reportedPaymentMethod:paymentMethod,reportedPaymentSupportDocumentRef:paymentSupportDocumentRef };
++      shared.documentaryAmountVariance = applicationVariance;
++      shared.documentaryObligationVariance = obligationVariance;
++      shared.paymentAmountComparison = { recordedPaymentAmount:amount,obligationAmount,documentedApplicationAmount:documentedAmount,
++        obligationMinusPaymentCents:Math.round(obligationAmount*100)-Math.round(amount*100),
++        obligationMinusPaymentAmount:(Math.round(obligationAmount*100)-Math.round(amount*100))/100,
++        currency:receiptCurrency,bankSettlementProved:false,amountAdjustmentCreated:false };
++    }
+ 
+     const cobro = Object.assign({}, beforeCobro, {
+       id: cobroId,
+@@ -637,7 +765,8 @@
+       receiptPatch.fechaPago = finalPaidDate;
+       if (source === 'client_reported') receiptPatch.fechaPagoReportada = finalPaidDate;
+     }
+-    if (paymentMethod) receiptPatch.metodoPago = paymentMethod;
++    if (finalPaymentMethod) receiptPatch.metodoPago = finalPaymentMethod;
++    if (enrichment) preserveRecordedPayment(receiptPatch, receipt);
+     if (invoiceNumber) receiptPatch.numeroFactura = invoiceNumber;
+ 
+     tx.set(cobroRef, cobro, { merge: true });
+@@ -668,7 +797,8 @@
+         updatedByUid: authz.actor.uid
+       };
+       if (finalPaidDate) portfolioPatch.fechaPago = finalPaidDate;
+-      if (inferredEffectiveDate) portfolioPatch.inferredEffectiveDate = inferredEffectiveDate;
++      if (shared.inferredEffectiveDate) portfolioPatch.inferredEffectiveDate = shared.inferredEffectiveDate;
++      if (enrichment) { portfolioPatch.paymentAmountComparison = shared.paymentAmountComparison; portfolioPatch.documentaryAmountVariance = applicationVariance; }
+       if (finalApplicationDate) portfolioPatch.applicationDate = finalApplicationDate;
+       tx.set(pRef, portfolioPatch, { merge: true });
+     }
+@@ -682,11 +812,14 @@
+       clientId,
+       paymentState,
+       applicationState,
++      amount,
++      ...(enrichment ? { applicationAmount:documentedAmount,documentaryAmountVariance:applicationVariance,paymentAmountComparison:shared.paymentAmountComparison } : {}),
++      paymentFactsDigest: digest(recordedPaymentFacts(cobro)),
+       paidDate: finalPaidDate || '',
+-      inferredEffectiveDate: inferredEffectiveDate || '',
++      inferredEffectiveDate: shared.inferredEffectiveDate || '',
+       applicationDate: finalApplicationDate || '',
+       invoiceDate: finalInvoiceDate || '',
+-      paymentOrigin,
++      ...(Object.prototype.hasOwnProperty.call(shared,'paymentOrigin')?{paymentOrigin:shared.paymentOrigin}:{}),
+       linkedManagementId: advisorReported ? text(receipt.linkedOpsManagementId, 180) : '',
+       invoiceNumber: invoiceNumber || text(beforeCobro.invoiceNumber || beforeCobro.numeroFactura, 180),
+       portfolioUpdated: activePortfolioRows.length === 1,
+@@ -705,6 +838,9 @@
+       cobroId,
+       payloadDigest: digest(reqPayload),
+       resultDigest: digest(committed),
++      ...(enrichment ? { recordedPaymentBefore:{amount,sourceCollection:cobroPaid?'cobros':'recibosEsperados',sourceId:cobroPaid?cobroId:receiptId,facts:recordedPaymentFacts(cobroPaid?beforeCobro:receipt)},
++        recordedPaymentAfter:{amount,facts:recordedPaymentFacts(cobro)},applicationEvidence:shared.applicationEvidence,
++        documentaryAmountVariance:applicationVariance,paymentAmountComparison:shared.paymentAmountComparison } : {}),
+       createdAt: technicalNow
+     }, { merge: false });
+     tx.set(reqRef, { status: 'committed', operation: operationName, eventId, payloadDigest: digest(reqPayload), result: committed, committedAt: technicalNow }, { merge: true });
+@@ -714,7 +850,11 @@
+   const [receiptReadback, cobroReadback] = await Promise.all([receiptRef.get(), tenantData(authz.tenantId, 'cobros').doc(result.cobroId).get()]);
+   if (!receiptReadback.exists || !cobroReadback.exists) throw new HttpsError('data-loss', 'No fue posible confirmar la persistencia del pago.');
+   const confirmedReceipt = receiptReadback.data() || {}, confirmedCobro = cobroReadback.data() || {};
+-  if (confirmedReceipt.paymentState !== result.paymentState || confirmedCobro.paymentState !== result.paymentState ||
++  if (result.amount != null && receiptAmount(confirmedCobro) !== result.amount ||
++      result.paymentFactsDigest && digest(recordedPaymentFacts(confirmedCobro)) !== result.paymentFactsDigest ||
++      result.documentaryAmountVariance && (digest(confirmedCobro.documentaryAmountVariance) !== digest(result.documentaryAmountVariance) ||
++        digest(confirmedReceipt.documentaryAmountVariance) !== digest(result.documentaryAmountVariance)) ||
++      confirmedReceipt.paymentState !== result.paymentState || confirmedCobro.paymentState !== result.paymentState ||
+       confirmedReceipt.applicationState !== result.applicationState || confirmedCobro.applicationState !== result.applicationState ||
+       confirmedReceipt.conciliado !== /^APPLIED_/.test(result.applicationState) || confirmedCobro.conciliado !== /^APPLIED_/.test(result.applicationState) ||
+       (result.invoiceDate && (confirmedReceipt.invoiceDate !== result.invoiceDate || confirmedCobro.invoiceDate !== result.invoiceDate)))
+@@ -749,7 +889,7 @@
+   return tenantId==='alianzas-soluciones'&&/^cobledgerqa_[a-z0-9_]{12,80}$/.test(text(payload.sourceRunId,180))&&
+     /^b3005qa_i66_proposal_[a-z0-9_]{12,100}$/.test(text(payload.proposalId,180))?text(payload.sourceRunId,180):'';
+ }
+-function assertReconciliationFinancialTarget(authz,policy,receipt,row,kind) {
++function assertReconciliationFinancialTarget(authz,policy,receipt,row,kind,options = {}) {
+   const currency=text(receipt.moneda||receipt.currency||policy.moneda,12).toUpperCase();
+   const rowCurrency=text(row.moneda||row.currency,12).toUpperCase();
+   const policyId=text(policy.id,180),clientId=text(receipt.clienteId||policy.clienteId,180);
+@@ -763,7 +903,7 @@
+   if((row.clienteId||row.clientId)&&text(row.clienteId||row.clientId,180)!==clientId)mismatch('cliente');
+   if(!rowCurrency||rowCurrency!==currency)mismatch('moneda');
+   let matchingAmount=false;try{matchingAmount=receiptAmount(row)===receiptAmount(receipt);}catch(_){}
+-  if(!matchingAmount)mismatch('importe');
++  if(options.amountMustMatch !== false && !matchingAmount)mismatch('importe');
+ }
+ async function proposalApplicationContext(authz, payload, read,requireWrite=false) {
+   const configSnap = await read(reconciliationConfigRef(authz.tenantId));
+@@ -1173,13 +1313,19 @@
+         evidenceAsOfDate: text(beforeCobro.evidenceAsOfDate, 32),
+         confidence: text(beforeCobro.confidence, 40) || 'HIGH'
+       } : null);
++      const recordedPaid = /^PAID_(DIRECT|REPORTED)$/.test(text(beforeCobro.paymentState,80)) ||
++        norm(beforeCobro.estado) === 'pagado' && text(beforeCobro.paymentState,80) !== 'PAID_INFERRED' && text(beforeCobro.directOrInferred,80) !== 'INFERRED';
++      if (recordedPaid) assertPaymentIdentity(authz,policy,receipt,beforeCobro,'COBRO');
+       const existingDirect = ['PAID_DIRECT','PAID_REPORTED'].includes(text(beforeCobro.paymentState, 80));
+-      const paymentState = isInferred && existingDirect ? text(beforeCobro.paymentState, 80) : target.paymentState;
+-      const applicationState = isInferred && text(beforeCobro.applicationState, 80) === 'APPLIED_DIRECT' ? 'APPLIED_DIRECT' : target.applicationState;
+-      const directOrInferred = isInferred && !existingDirect ? 'INFERRED' : 'DIRECT';
++      const paymentState = recordedPaid && text(beforeCobro.paymentState,80) ? text(beforeCobro.paymentState,80) : target.paymentState;
++      const applicationState = recordedPaid && /^APPLIED_/.test(text(beforeCobro.applicationState,80)) ? text(beforeCobro.applicationState,80) : target.applicationState;
++      const directOrInferred = recordedPaid && text(beforeCobro.directOrInferred,80) ? text(beforeCobro.directOrInferred,80) : (isInferred && !existingDirect ? 'INFERRED' : 'DIRECT');
+       // A commission figure is not the premium settled. The canonical receipt
+       // provides the payment amount for commission-based inference.
+-      const amount = (!isInferred && plan.evidenceType!=='COMMISSION_STATEMENT_INSTALLMENT_N' && evidencePayload.amount != null) ? evidencePayload.amount : receiptAmount(receipt);
++      const evidenceAmount = (!isInferred && plan.evidenceType!=='COMMISSION_STATEMENT_INSTALLMENT_N' && evidencePayload.amount != null) ? evidencePayload.amount : receiptAmount(receipt);
++      if (recordedPaid && Math.round(evidenceAmount*100)!==Math.round(receiptAmount(beforeCobro)*100))
++        throw new HttpsError('failed-precondition','EXISTING_PAYMENT_REQUIRES_APPLICATION_ENRICHMENT');
++      const amount = recordedPaid ? receiptAmount(beforeCobro) : evidenceAmount;
+       if (amount == null || amount <= 0) throw new HttpsError('failed-precondition', 'El recibo no tiene monto válido.');
+       const correctSourceTotal = !isInferred&&authorizedInvoiceTotal&&
+         Math.round(amount*100)!==Math.round(receiptAmount(receipt)*100);
+@@ -1189,7 +1335,8 @@
+         insurerTotalEvidenceType:'INVOICE_INSTALLMENT_N',
+         insurerTotalBefore:receiptAmount(receipt)
+       } : {};
+-      const paidDate = !isInferred && evidencePayload.paidDate && (plan.evidenceType === 'BANK_STATEMENT_MATCH' || evidencePayload.actualPaidDateEvidence === true) ? evidencePayload.paidDate : text(beforeCobro.paidDate || beforeCobro.fechaPago, 32);
++      const originalPaidDate = text(beforeCobro.paidDate || beforeCobro.fechaPago,32);
++      const paidDate = recordedPaid && originalPaidDate ? originalPaidDate : (!isInferred && evidencePayload.paidDate && (plan.evidenceType === 'BANK_STATEMENT_MATCH' || evidencePayload.actualPaidDateEvidence === true) ? evidencePayload.paidDate : originalPaidDate);
+       const applicationDate = !isInferred ? (evidencePayload.applicationDate || text(beforeCobro.applicationDate, 32)) : text(beforeCobro.applicationDate, 32);
+       const inferenceProvenance = isInferred ? {
+         evidenceType: plan.evidenceType,
+@@ -1233,6 +1380,12 @@
+       if (!isInferred && evidencePayload.paymentSupportDocumentRef) shared.paymentSupportDocumentRef = evidencePayload.paymentSupportDocumentRef;
+       if (!isInferred && evidencePayload.invoiceDocumentRef) shared.invoiceDocumentRef = evidencePayload.invoiceDocumentRef;
+       if (!isInferred && evidencePayload.paymentMethod) shared.paymentMethod = evidencePayload.paymentMethod;
++      if (recordedPaid) {
++        preserveRecordedPayment(shared,beforeCobro);
++        shared.reconciliationEvidence = {evidenceType:plan.evidenceType,evidenceId:plan.evidenceId,sourceRef:plan.sourceRef,
++          evidenceAsOfDate:plan.evidenceAsOfDate||'',documentedAmount:evidenceAmount,
++          reportedPaymentMethod:evidencePayload.paymentMethod||'',reportedPaymentSupportDocumentRef:evidencePayload.paymentSupportDocumentRef||''};
++      }
+ 
+       const cobro = Object.assign({}, beforeCobro, {
+         id: cobroId,
+@@ -1265,6 +1418,7 @@
+       }, shared,sourceTotalPatch);
+       if (paidDate) receiptPatch.fechaPago = paidDate;
+       if (!isInferred && evidencePayload.invoiceNumber) receiptPatch.numeroFactura = evidencePayload.invoiceNumber;
++      if (recordedPaid) preserveRecordedPayment(receiptPatch,receipt);
+       tx.set(tenantData(authz.tenantId, 'recibosEsperados').doc(receiptId), receiptPatch, { merge: true });
+       if (proposalRequest) beforeAfter.push(
+         {collection:'recibosEsperados',id:receiptId,before:receipt,after:auditAfter(Object.assign({},receipt,receiptPatch))},
+--- a/functions/payment-inference-engine.js
++++ b/functions/payment-inference-engine.js
+@@ -116,6 +116,48 @@
+   const idx = anchorIndex(evidence);
+   return { index: idx, matches: idx == null ? [] : receipts.filter(row => row.__sequence === idx) };
+ }
++function documentaryAmountVariance(input) {
++  input = input || {};
++  const left = input.original || {}, right = input.documented || {};
++  const country = String(input.country || '').trim().toUpperCase();
++  const currency = String(input.currency || '').trim().toUpperCase();
++  const cents = value => {
++    if (value == null || value === '' || typeof value === 'boolean') return null;
++    const amount = Number(value), result = Math.round(amount * 100);
++    return Number.isFinite(amount) && amount >= 0 && Number.isSafeInteger(result) &&
++      Math.abs(amount * 100 - result) <= 1e-6 ? result : null;
++  };
++  const originalCents = cents(left.amount), documentedCents = cents(right.amount);
++  const originalSourceRef = String(left.sourceRef || '').trim();
++  const documentedSourceRef = String(right.sourceRef || '').trim();
++  const kindApproved = ['CONTRACT_SCHEDULE', 'APPLICATION_DOCUMENT'].includes(input.kind);
++  const scopeApproved = country === 'GT' && currency === 'GTQ';
++  const identityExact = input.identityExact === true;
++  const sourcesPresent = !!originalSourceRef && !!documentedSourceRef;
++  const amountsValid = originalCents != null && documentedCents != null;
++  const eligible = kindApproved && scopeApproved && identityExact && sourcesPresent && amountsValid;
++  const differenceCents = amountsValid ? documentedCents - originalCents : null;
++  const withinTolerance = eligible && Math.abs(differenceCents) <= 5;
++  return {
++    schema: 'GI_R51_DOCUMENTARY_AMOUNT_VARIANCE_V1',
++    authorityRef: 'artifacts/orbit360-recovery/release-control/I6_6_DIRECTION_URGENT_COMPLETION_TOLERANCE_AND_DIRECT_RENEWAL_20261124.json#/decisions/extendPreviouslyApprovedToleranceToAllInsurersAndCases',
++    authorityBlob: 'c1e69da9d018a75c0a73c5dbf3a3495e9afcd550',
++    thresholdAuthorityRef: 'artifacts/orbit360-recovery/release-control/I6_6_DIRECCION_DECISIONES_FINANCIERAS_Y_PLAN_INTEGRAL_20261122.md#D01',
++    kind: String(input.kind || ''), country, currency, scopeApproved, identityExact, sourcesPresent, amountsValid,
++    eligible, accepted: withinTolerance,
++    reason: !kindApproved ? 'DOCUMENTARY_COMPARISON_KIND_REQUIRED' : !scopeApproved ? 'R51_GT_GTQ_SCOPE_REQUIRED'
++      : !identityExact ? 'DOCUMENTARY_EXACT_IDENTITY_REQUIRED' : !sourcesPresent ? 'DOCUMENTARY_SOURCE_REFERENCES_REQUIRED'
++      : !amountsValid ? 'DOCUMENTARY_AMOUNT_PRECISION_INVALID' : !withinTolerance ? 'DOCUMENTARY_VARIANCE_EXCEEDS_R51'
++      : differenceCents === 0 ? 'EXACT_DOCUMENTARY_AMOUNTS' : 'DOCUMENTARY_ROUNDING_VARIANCE',
++    originalAmount: originalCents == null ? null : originalCents / 100,
++    documentedAmount: documentedCents == null ? null : documentedCents / 100,
++    originalSourceRef, documentedSourceRef, differenceCents,
++    differenceAmount: differenceCents == null ? null : differenceCents / 100,
++    toleranceCents: scopeApproved && kindApproved ? 5 : 0,
++    amountsPreserved: true, bankSettlementProved: false
++  };
++}
++
+ function planEvidence(input) {
+   input = input || {};
+   const policy = input.policy || {}, evidence = input.evidence || {}, config = input.reconciliationConfig || {};
+@@ -299,5 +341,6 @@
+   evidenceKind,
+   installment,
+   receiptSequence,
+-  ruleForPolicy
++  ruleForPolicy,
++  documentaryAmountVariance
+ });
+--- a/orbit360-platform/core/primas.js
++++ b/orbit360-platform/core/primas.js
+@@ -275,12 +275,54 @@
+     return rows;
+   }
+ 
++  function documentaryAmountVariance(input) {
++    input = input || {};
++    const left = input.original || {}, right = input.documented || {};
++    const country = String(input.country || '').trim().toUpperCase();
++    const currency = String(input.currency || '').trim().toUpperCase();
++    const cents = value => {
++      if (value == null || value === '' || typeof value === 'boolean') return null;
++      const amount = Number(value), result = Math.round(amount * 100);
++      return Number.isFinite(amount) && amount >= 0 && Number.isSafeInteger(result) &&
++        Math.abs(amount * 100 - result) <= 1e-6 ? result : null;
++    };
++    const originalCents = cents(left.amount), documentedCents = cents(right.amount);
++    const originalSourceRef = String(left.sourceRef || '').trim();
++    const documentedSourceRef = String(right.sourceRef || '').trim();
++    const kindApproved = ['CONTRACT_SCHEDULE', 'APPLICATION_DOCUMENT'].includes(input.kind);
++    const scopeApproved = country === 'GT' && currency === 'GTQ';
++    const identityExact = input.identityExact === true;
++    const sourcesPresent = !!originalSourceRef && !!documentedSourceRef;
++    const amountsValid = originalCents != null && documentedCents != null;
++    const eligible = kindApproved && scopeApproved && identityExact && sourcesPresent && amountsValid;
++    const differenceCents = amountsValid ? documentedCents - originalCents : null;
++    const withinTolerance = eligible && Math.abs(differenceCents) <= 5;
++    return {
++      schema: 'GI_R51_DOCUMENTARY_AMOUNT_VARIANCE_V1',
++      authorityRef: 'artifacts/orbit360-recovery/release-control/I6_6_DIRECTION_URGENT_COMPLETION_TOLERANCE_AND_DIRECT_RENEWAL_20261124.json#/decisions/extendPreviouslyApprovedToleranceToAllInsurersAndCases',
++      authorityBlob: 'c1e69da9d018a75c0a73c5dbf3a3495e9afcd550',
++      thresholdAuthorityRef: 'artifacts/orbit360-recovery/release-control/I6_6_DIRECCION_DECISIONES_FINANCIERAS_Y_PLAN_INTEGRAL_20261122.md#D01',
++      kind: String(input.kind || ''), country, currency, scopeApproved, identityExact, sourcesPresent, amountsValid,
++      eligible, accepted: withinTolerance,
++      reason: !kindApproved ? 'DOCUMENTARY_COMPARISON_KIND_REQUIRED' : !scopeApproved ? 'R51_GT_GTQ_SCOPE_REQUIRED'
++        : !identityExact ? 'DOCUMENTARY_EXACT_IDENTITY_REQUIRED' : !sourcesPresent ? 'DOCUMENTARY_SOURCE_REFERENCES_REQUIRED'
++        : !amountsValid ? 'DOCUMENTARY_AMOUNT_PRECISION_INVALID' : !withinTolerance ? 'DOCUMENTARY_VARIANCE_EXCEEDS_R51'
++        : differenceCents === 0 ? 'EXACT_DOCUMENTARY_AMOUNTS' : 'DOCUMENTARY_ROUNDING_VARIANCE',
++      originalAmount: originalCents == null ? null : originalCents / 100,
++      documentedAmount: documentedCents == null ? null : documentedCents / 100,
++      originalSourceRef, documentedSourceRef, differenceCents,
++      differenceAmount: differenceCents == null ? null : differenceCents / 100,
++      toleranceCents: scopeApproved && kindApproved ? 5 : 0,
++      amountsPreserved: true, bankSettlementProved: false
++    };
++  }
++
+   /** ¿Esta forma de pago es de un solo pago aunque la frecuencia diga otra cosa? */
+   function esContado(frecuencia, forma) {
+     if (cuotasDe(frecuencia) === 1) return true;
+     return false; // tarjeta/visa cuotas fraccionada SÍ genera N recibos
+   }
+ 
+-  return { FRECUENCIAS, FORMAS_PAGO, CONDUCTOS, cuotasDe, cfgPais, desglose, recibos, esContado, r2,
++  return { FRECUENCIAS, FORMAS_PAGO, CONDUCTOS, cuotasDe, cfgPais, desglose, recibos, esContado, r2, documentaryAmountVariance,
+     cargoNoGravado, calendarioDocumentado, parseCalendarioDocumentado, formatCalendarioDocumentado, fechaCivilDocumentada };
+ })();
+--- a/orbit360-platform/modules/policy-receipts-v1199-detail-guard.js
++++ b/orbit360-platform/modules/policy-receipts-v1199-detail-guard.js
+@@ -97,7 +97,12 @@
+     normalized.sumaAsegurada = numberOrNull(first(normalized.sumaAsegurada, v.valorAsegurado));
+     return normalized;
+   }
+-  function reconciliationTolerance() {
++  function reconciliationTolerance(policy) {
++    const country=String(policy&&policy.pais||'').trim().toUpperCase(),currency=String(policy&&policy.moneda||'').trim().toUpperCase();
++    if(['GT','GUATEMALA'].includes(country)&&currency==='GTQ')return 0.05;
++    // Preserve the existing comparison setting outside the approved GTQ scope.
++    // This setting never authorizes a bank/payment allocation.
++
+     try {
+       const cfg = Orbit.domainConfig && typeof Orbit.domainConfig.peek === 'function' ? Orbit.domainConfig.peek('reconciliation') : {};
+       const n = Number(cfg && cfg.amountTolerance);
+@@ -295,22 +300,50 @@
+     const policy=S().get('polizas',policyId)||{},all=(S().all('recibosEsperados') || []).filter(r=>r.polizaId===policyId);
+     return receiptScheduleFromRows(policy,all);
+   }
++  function documentaryScheduleVariance(policy, schedule) {
++    const compare=Orbit.primas&&Orbit.primas.documentaryAmountVariance;
++    if(typeof compare!=='function')return null;
++    const rows=schedule&&schedule.rows||[],country=value=>{
++      const key=String(value||'').trim().toUpperCase();
++      return key==='GUATEMALA'?'GT':key==='COLOMBIA'?'CO':key;
++    },currency=String(policy&&policy.moneda||'').trim().toUpperCase();
++    const policyCountry=country(policy&&policy.pais),policyId=String(policy&&policy.id||'');
++    const expected=Number(policy&&policy.cuotas)||receiptPlanDenominator(rows[0]);
++    const ordinals=rows.map(receiptPlanOrdinal);
++    const identityExact=!!policyId&&rows.length>0&&expected===rows.length&&
++      new Set(rows.map(r=>r.id)).size===rows.length&&new Set(ordinals).size===rows.length&&
++      ordinals.every(n=>Number.isSafeInteger(n)&&n>0&&n<=expected)&&
++      !schedule.reviewRows.length&&['POLICY_CUOTAS','SINGLE_PHYSICAL_CALENDAR'].includes(schedule.calendarAuthority)&&
++      rows.every(r=>r.id&&String(r.polizaId||'')===policyId&&
++        country(r.pais)===policyCountry&&String(r.moneda||'').trim().toUpperCase()===currency&&
++        (!r.tenantId||!policy.tenantId||r.tenantId===policy.tenantId)&&
++        (!r.clienteId||!policy.clienteId||r.clienteId===policy.clienteId));
++    return compare({kind:'CONTRACT_SCHEDULE',country:policyCountry,currency,identityExact,
++      original:{amount:numberOrNull(first(policy.primaTotal,policy.prima)),
++        sourceRef:String(first(policy.primaFuente,policy.primaSourceRef,policy.sourceDocumentId,policy.sourceRef)||('polizas/'+policyId+'#primaTotal'))},
++      documented:{amount:numberOrNull(schedule.total),
++        sourceRef:rows.map(r=>'recibosEsperados/'+r.id+'#primaTotal').join(';')}
++    });
++  }
+   function financialIntegrityBatch(policies) {
+-    const selected=[].concat(policies||[]).filter(p=>p&&p.id),receiptsByPolicy=group(S().all('recibosEsperados')||[],'polizaId'),tol=reconciliationTolerance(),issues=[];
++    const selected=[].concat(policies||[]).filter(p=>p&&p.id),receiptsByPolicy=group(S().all('recibosEsperados')||[],'polizaId'),issues=[];
+     selected.forEach(p=>{
+       const sch=receiptScheduleFromRows(p,receiptsByPolicy.get(p.id)||[]),total=numberOrNull(first(p.primaTotal,p.prima)),schedule=numberOrNull(sch.total);
+       if(total==null||schedule==null)return;
+-      const delta=schedule-total;
+-      if(Math.abs(delta)<=tol)return;
++      const variance=documentaryScheduleVariance(p,sch),delta=variance&&variance.differenceAmount!=null?variance.differenceAmount:schedule-total;
++      const tol=variance&&variance.eligible?reconciliationTolerance(p):reconciliationTolerance();
++      if(variance&&variance.accepted)return;
++      if(!(variance&&variance.scopeApproved)&&Math.abs(delta)<=tol)return;
+       const explicitSource=first(p.primaFuente,p.primaSource,p.primaSourceRef,p.sourceDocumentId,p.sourceRef,p.importSource,p.fuente);
+       const contractualSource=explicitSource?String(explicitSource):(p.primaTotal!=null&&p.primaTotal!==''?'Póliza · prima total':p.prima!=null&&p.prima!==''?'Póliza · prima':'Fuente contractual no identificada');
+       let reason='';
+-      if(sch.reviewRows.length) reason='Hay '+sch.reviewRows.length+' recibo(s) con numeración o plan incompatible pendientes de validar; no forman parte del calendario activo hasta confirmar la fuente.';
++      if(variance&&variance.scopeApproved&&!variance.eligible) reason='La identidad, moneda o secuencia del calendario requiere revisión; la tolerancia documental no sustituye esas comprobaciones.';
++      else if(sch.reviewRows.length) reason='Hay '+sch.reviewRows.length+' recibo(s) con numeración o plan incompatible pendientes de validar; no forman parte del calendario activo hasta confirmar la fuente.';
+       else if(sch.calendarAuthority==='NO_DENOMINATOR') reason='Los recibos activos no confirman una secuencia N/N; valida periodicidad, cantidad de cuotas y montos antes de corregir.';
+       else if(sch.calendarAuthority==='AMBIGUOUS_FAIL_CLOSED') reason='Existen calendarios incompatibles y la plataforma no puede elegir uno por inferencia; valida la fuente que gobierna esta vigencia.';
+       else if(sch.shadowRows.length) reason='Se excluyeron '+sch.shadowRows.length+' registro(s) histórico(s) duplicado(s); el calendario activo aún '+(delta>0?'supera':'queda por debajo de')+' la prima contractual.';
+       else reason='El calendario activo '+(delta>0?'suma más':'suma menos')+' que la prima contractual; valida cuotas y montos contra la fuente antes de modificar.';
+-      issues.push({p,total,schedule,delta:Math.abs(delta)<0.0000001?0:delta,tolerance:tol,receipts:sch.rows.length,rows:sch.rows,reviewRows:sch.reviewRows.length,shadowRows:sch.shadowRows.length,calendarAuthority:sch.calendarAuthority,contractualSource,reason});
++      issues.push({p,total,schedule,documentaryVariance:variance,delta:Math.abs(delta)<0.0000001?0:delta,tolerance:tol,receipts:sch.rows.length,rows:sch.rows,reviewRows:sch.reviewRows.length,shadowRows:sch.shadowRows.length,calendarAuthority:sch.calendarAuthority,contractualSource,reason});
+     });
+     return issues.sort((a,b)=>Math.abs(b.delta)-Math.abs(a.delta));
+   }
+@@ -327,6 +360,7 @@
+       iva:numberOrNull(first(p.ivaMonto,p.iva,p.impuestos,p.impuestosIVA)) ?? sch.iva,
+       total:numberOrNull(first(p.primaTotal,p.prima)),
+       scheduleTotal:sch.total,
++      documentaryVariance:documentaryScheduleVariance(p,sch),
+       receipts:sch.rows,
+       shadowRows:sch.shadowRows,
+       shadowCount:sch.shadowRows.length
+@@ -467,7 +501,10 @@
+       ? `<a class="btn ghost" href="${back}">Abrir ficha del cliente</a>`
+       : '<div class="cfg-note" data-policy-client-scope-note="1">La póliza está disponible en tu alcance, pero la ficha del cliente no está autorizada o no figura en la lectura confirmada. No se han cambiado países, relaciones ni permisos.</div>';
+     const scheduleDelta = receiptsReady && pb.total != null && pb.scheduleTotal != null ? pb.scheduleTotal - pb.total : null;
+-    const scheduleTolerance = reconciliationTolerance();
++    const scheduleVariance=pb.documentaryVariance;
++    const scheduleTolerance = scheduleVariance&&scheduleVariance.eligible?reconciliationTolerance(p):reconciliationTolerance();
++    const scheduleNeedsReview=scheduleDelta!=null&&((scheduleVariance&&scheduleVariance.scopeApproved&&!scheduleVariance.eligible)||
++      (!(scheduleVariance&&scheduleVariance.accepted)&&Math.abs(scheduleDelta)>scheduleTolerance));
+     const canManage = canEditVehicle();
+     const renewAction = renewalEligible(p) ? `<button class="btn primary" onclick="Orbit.policyVehicleReadModelV1199c.startRenewal('${esc(p.id)}')">🔄 Renovar</button>` : '';
+     const endosoAction = Orbit.endorsements && Orbit.modules.cliente360 && typeof Orbit.modules.cliente360.endoso === 'function'
+@@ -507,7 +544,8 @@
+             ['Gastos de expedición', pb.expedition], ['Gastos financieros', pb.finance], ['Descuento / ajuste', pb.sourceAdjustment], ['Otros / asistencias', pb.other], ...(pb.taxable == null ? [] : [['Base imponible para IVA', pb.taxable]]), [ivaLabel, pb.iva], ['Cargo no gravado'+(p.cargoNoGravadoConcepto?' · '+p.cargoNoGravadoConcepto:''), pb.nonVat]
+           ].map(([k,v])=>`<div class="gi-premium-row"><span>${esc(k)}</span><b>${esc(moneyDetail(v,cur))}</b></div>`).join('')}</div>
+           ${p.cargoNoGravadoDocumentRef?`<div class="cfg-note">Documento del cargo no gravado: ${esc(p.cargoNoGravadoDocumentRef)}. No integra la base del IVA ni de la comisión sobre prima neta.</div>`:''}
+-          ${scheduleDelta!=null&&Math.abs(scheduleDelta)>scheduleTolerance?`<div class="badge warn gi-schedule-delta">Diferencia póliza vs calendario: ${esc(moneyDetail(scheduleDelta,cur))} · supera tolerancia ${esc(moneyDetail(scheduleTolerance,cur))} y requiere conciliación</div>`:''}
++          ${scheduleNeedsReview?`<div class="badge warn gi-schedule-delta">Diferencia póliza vs calendario: ${esc(moneyDetail(scheduleDelta,cur))} · ${scheduleVariance&&scheduleVariance.scopeApproved&&!scheduleVariance.eligible?'requiere validar identidad, moneda y secuencia del calendario':'supera tolerancia '+esc(moneyDetail(scheduleTolerance,cur))+' y requiere conciliación'}</div>`:''}
++          ${scheduleVariance&&scheduleVariance.accepted&&scheduleVariance.differenceCents!==0?`<div class="cfg-note" data-documentary-rounding-variance="1">Variación póliza vs calendario: ${esc(moneyDetail(scheduleVariance.differenceAmount,cur))}, dentro de la tolerancia de ${esc(moneyDetail(0.05,cur))}. Se conservan ambos importes; cada recibo mantiene su obligación original.</div>`:''}
+           <div class="gi-payment-subtitle">Condiciones de pago</div>
+           <div class="gi-payment-conditions">${grid([
+             field('Frecuencia', first(p.frecuencia, p.forma)), field('Forma de pago', p.formaPago), field('Conducto', p.conducto)
+@@ -727,7 +765,7 @@
+ 
+   Orbit.policyVehicleReadModelV1199c = {
+     version: '20260731.1', ownerRevision:'20260731.4-human-visual',
+-    policyVisual, vehicleVisual, rebuildIndexes, invalidate, numberOrNull, moneyDetail, policyCompleteness, isVehiclePolicy, receiptSchedule, financialIntegrityBatch, premiumBreakdown, reconciliationTolerance, openVehicleLinker, vehicleCandidates, renewalEligible, startRenewal, deletePolicy, deleteVehicle,
++    policyVisual, vehicleVisual, rebuildIndexes, invalidate, numberOrNull, moneyDetail, policyCompleteness, isVehiclePolicy, receiptSchedule, financialIntegrityBatch, premiumBreakdown, reconciliationTolerance, documentaryScheduleVariance, openVehicleLinker, vehicleCandidates, renewalEligible, startRenewal, deletePolicy, deleteVehicle,
+     fullPagePolicy: true, fullPageVehicle: true,
+     indexedClientSummary: true,
+     writesStore: false,
+--- a/orbit360-platform/modules/config-domain-v20260804-bridge.js
++++ b/orbit360-platform/modules/config-domain-v20260804-bridge.js
+@@ -152,7 +152,8 @@
+       ${toggle('rc-negative', cfg.holdOnNegative !== false, 'Líneas negativas a validación')}
+       ${toggle('rc-reversal', cfg.holdOnReversal !== false, 'Reversos a validación')}
+       ${toggle('rc-duplicate', cfg.holdOnDuplicate !== false, 'Duplicados a validación')}
+-      ${field('Tolerancia de monto', `<input id="rc-amount" type="number" step="0.01" min="0" class="o-sel" value="${Number(cfg.amountTolerance == null ? 0.02 : cfg.amountTolerance)}" style="width:130px">`)}
++      <div class="cfg-note" data-gtq-documentary-rounding="1"><b>Guatemala / GTQ: Q0.05.</b> Tolerancia para variaciones documentales de todas las aseguradoras. Se conservan los importes de cada fuente; los pagos se aplican por su importe real y moneda exacta.</div>
++      ${field('Tolerancia documental general', `<input id="rc-amount" type="number" step="0.01" min="0" class="o-sel" value="${Number(cfg.amountTolerance == null ? 0.02 : cfg.amountTolerance)}" style="width:130px">`)}
+       ${field('Tolerancia de fecha', `<input id="rc-days" type="number" min="0" class="o-sel" value="${Number(cfg.dateToleranceDays == null ? 7 : cfg.dateToleranceDays)}" style="width:130px"> días`)}
+       <div style="display:flex;justify-content:flex-end;margin-top:14px"><button class="btn primary" id="rc-save">Guardar reglas</button></div>`;
+ 
+--- /dev/null
++++ b/tools/gravicentra-i6-6-r51-payment-application-preservation.test.cjs
+@@ -0,0 +1,217 @@
++'use strict';
++// Execute the actual callable handler against an isolated transactional test
++// double. No Firebase SDK, credentials, network, or production writes.
++const assert=require('node:assert/strict');
++const fs=require('node:fs'),path=require('node:path'),vm=require('node:vm');
++const {createRequire}=require('node:module');
++const repo=process.env.R51_BASE_REPO || path.resolve(__dirname,'..');
++const root=process.env.R51_SOURCE_ROOT || repo;
++const fromDomain=createRequire(path.join(repo,'functions/cobros-reconciliation-domain.js'));
++const test=require('node:test');
++const contract=require(path.join(repo,'functions/cobros-ledger-contract'));
++const {digest}=require(path.join(repo,'functions/proposal-application-boundary'));
++const copy=x=>x==null?x:structuredClone(x);
++// Firestore field transforms are legal in map fields, but never inside arrays.
++// The previous in-memory transaction double accepted these invalid writes,
++// masking the production callable failure at application commit.
++function assertNoArrayTransforms(value,inArray=false){
++ assert.notEqual(value,undefined,'Firestore does not accept an undefined field value');
++ if(value&&typeof value==='object'&&value.__testServerTimestamp===true)
++  assert.equal(inArray,false,'Firestore FieldValue.serverTimestamp() cannot be used inside arrays');
++ if(Array.isArray(value))for(const item of value)assertNoArrayTransforms(item,true);
++ else if(value&&typeof value==='object')for(const item of Object.values(value))assertNoArrayTransforms(item,inArray);
++}
++let documents=new Map(),writeCount=0,transactionTail=Promise.resolve();
++class Ref{
++ constructor(parts,filters=[],max=Infinity){this.parts=parts;this.filters=filters;this.max=max;this.id=parts[parts.length-1];this.path=parts.join('/');}
++ collection(name){return new Ref([...this.parts,name]);} doc(id){return new Ref([...this.parts,id]);}
++ where(field,op,value){assert.equal(op,'==');return new Ref(this.parts,[...this.filters,[field,value]],this.max);}
++ limit(n){return new Ref(this.parts,this.filters,n);}
++ async get(){return snapshot(this,documents);}
++}
++function snapshot(ref,store){
++ if(ref.parts.length%2===0){const row=store.get(ref.path);return{id:ref.id,ref,exists:!!row,data:()=>copy(row)};}
++ const docs=[...store.entries()].filter(([key,row])=>key.startsWith(ref.path+'/')&&key.split('/').length===ref.parts.length+1&&ref.filters.every(([k,v])=>row[k]===v))
++  .slice(0,ref.max).map(([key,row])=>({id:key.split('/').pop(),ref:new Ref(key.split('/')),exists:true,data:()=>copy(row)}));
++ return{docs,size:docs.length,empty:docs.length===0};
++}
++const db={collection:name=>new Ref([name]),runTransaction:fn=>{
++ const pending=transactionTail.then(async()=>{
++  const working=new Map([...documents.entries()].map(([k,v])=>[k,copy(v)]));let writes=0,writing=false;
++  const tx={get:async ref=>{assert.equal(writing,false,'Firestore transactions must finish all reads before writes');return snapshot(ref,working);},
++   set:(ref,data,options)=>{assertNoArrayTransforms(data);writing=true;writes++;working.set(ref.path,options&&options.merge?Object.assign({},working.get(ref.path)||{},copy(data)):copy(data));}};
++  const out=await fn(tx);documents=working;writeCount+=writes;return out;
++ });
++ transactionTail=pending.catch(()=>{});return pending;
++}};
++class HttpsError extends Error{constructor(code,message,details){super(message);this.code=code;this.details=details;}}
++const exportsObject={};
++vm.runInNewContext(fs.readFileSync(path.join(root,'functions/cobros-reconciliation-domain.js'),'utf8'),{
++ exports:exportsObject,process:{env:{}},console,
++ require:name=>name==='./payment-inference-engine'?require(path.join(root,'functions/payment-inference-engine.js')):name==='firebase-admin/app'?{getApps:()=>[{}],initializeApp:()=>({})}:
++  name==='firebase-admin/firestore'?{getFirestore:()=>db,FieldValue:{serverTimestamp:()=>({__testServerTimestamp:true})}}:
++  name==='firebase-functions/v2/https'?{HttpsError,onCall:(_,handler)=>({run:handler})}:fromDomain(name)
++});
++const command=exportsObject.orbit360CobrosReconciliationCommand;
++const tenant='qa-r51',base='tenants/'+tenant,item=(c,id)=>base+'/data/'+c+'/items/'+id;
++const stored=(c,id)=>documents.get(item(c,id));
++function seed({paid=true,amount=100,obligation=100,insurer='qa_any_insurer',country='GT',currency='GTQ'}={}){
++ documents=new Map();writeCount=0;
++ documents.set(base+'/members/direction',{uid:'direction',tenantId:tenant,status:'active',roles:['Dirección'],countries:[country],dataScopes:{default:'all'}});
++ documents.set(base+'/config/reconciliation',{autoCommitHighConfidence:true,requireSameCurrency:true});
++ documents.set(item('polizas','qa_policy'),{id:'qa_policy',tenantId:tenant,clienteId:'qa_client',pais:country,moneda:currency,numero:'QA-R51-POLICY',cuotas:1,estado:'Vigente',aseguradoraId:insurer});
++ const facts={paymentState:'PAID_DIRECT',applicationState:'PENDING_APPLICATION',directOrInferred:'DIRECT',
++  paymentEvidenceType:'CRM_MIGRATED_DIRECT',paymentOrigin:'CRM_MIGRATED_DIRECT_PAYMENT',
++  evidenceType:'CRM_ORIGINAL',evidenceId:'qa_original_evidence',sourceRef:'qa_original_source',
++  evidenceAsOfDate:'2026-07-31',paidDate:'2026-07-15',fechaPago:'2026-07-15',
++  paymentMethod:'Transferencia original',metodoPago:'Transferencia original',paymentSupportDocumentRef:'qa_original_payment_support'};
++ documents.set(item('recibosEsperados','qa_receipt'),{id:'qa_receipt',tenantId:tenant,polizaId:'qa_policy',clienteId:'qa_client',pais:country,moneda:currency,monto:obligation,primaTotal:obligation,cuota:'1/1',vence:'2026-07-20',estado:paid?'Pagado':'Pendiente',...(paid?facts:{})});
++ documents.set(item('carteraPrimas','qa_portfolio'),{id:'qa_portfolio',tenantId:tenant,polizaId:'qa_policy',clienteId:'qa_client',reciboId:'qa_receipt',pais:country,moneda:currency,monto:obligation,saldo:obligation,estado:'Pendiente',carteraActiva:true,vence:'2026-07-20'});
++ if(paid)documents.set(item('cobros','qa_cobro'),{id:'qa_cobro',tenantId:tenant,polizaId:'qa_policy',clienteId:'qa_client',reciboId:'qa_receipt',pais:country,moneda:currency,monto:amount,estado:'Pagado',conciliado:false,...facts});
++}
++const call=(payload={},operation='reconcile_payment')=>command.run({auth:{uid:'direction',token:{}},data:{tenantId:tenant,activeRole:'Dirección',operation,reason:'Prueba sintética R51',payload:{receiptId:'qa_receipt',sourceType:'insurer_invoice',applicationDate:'2026-11-24',evidenceId:'qa_application_invoice',invoiceDocumentRef:'qa_invoice_document',invoiceNumber:'QA-001',amount:100,...payload}}});
++const finance=()=>copy([...documents.entries()].filter(([p])=>/\/(?:recibosEsperados|carteraPrimas|cobros)\//.test(p)));
++function actualProjection(){
++ const Orbit={ui:{today:()=> '2026-11-24',daysFromNow:()=>-1},store:{all:c=>[...documents.entries()].filter(([p])=>p.startsWith(item(c,''))).map(([,r])=>r),get:stored,where:(c,p)=>[...documents.entries()].filter(([k])=>k.startsWith(item(c,''))).map(([,r])=>r).filter(p)}};
++ vm.runInNewContext(fs.readFileSync(path.join(repo,'orbit360-platform/core/queries.js'),'utf8'),{Orbit,window:{Orbit}});
++ return{receiptOpen:Orbit.q.expectedReceiptClassification(stored('recibosEsperados','qa_receipt')).open,portfolioOpen:Orbit.q.portfolioOpen(stored('carteraPrimas','qa_portfolio'))};
++}
++for(const insurer of ['qa_mapfre','qa_el_roble','qa_unknown_insurer'])test('documentary two-cent application preserves all original payment facts for '+insurer,async()=>{
++ seed({insurer});const original=copy(stored('cobros','qa_cobro'));const result=await call({amount:100.02,paidDate:'2026-11-23',paymentMethod:'Método nuevo',paymentSupportDocumentRef:'qa_new_support'});
++ const payment=stored('cobros','qa_cobro'),receipt=stored('recibosEsperados','qa_receipt'),portfolio=stored('carteraPrimas','qa_portfolio');
++ assert.equal(payment.monto,100);assert.equal(receipt.monto,100);assert.equal(receipt.primaTotal,100);assert.equal(portfolio.monto,100);
++ for(const k of ['paidDate','fechaPago','paymentOrigin','paymentEvidenceType','evidenceId','sourceRef','evidenceType','evidenceAsOfDate','paymentMethod','paymentSupportDocumentRef'])assert.equal(payment[k],original[k],k);
++ assert.equal(receipt.paidDate,original.paidDate);assert.equal(receipt.evidenceId,original.evidenceId);
++ assert.equal(payment.applicationState,'APPLIED_DIRECT');assert.equal(payment.applicationAmount,100.02);
++ assert.equal(payment.applicationEvidence.evidenceId,'qa_application_invoice');assert.equal(payment.applicationEvidence.reportedPaidDate,'2026-11-23');
++ assert.equal(payment.documentaryAmountVariance.differenceCents,2);assert.equal(payment.documentaryAmountVariance.bankSettlementProved,false);
++ assert.equal(payment.paymentAmountComparison.obligationMinusPaymentCents,0);assert.equal(result.amount,100);
++ assert.equal([...documents.keys()].filter(p=>p.startsWith(item('cobros',''))).length,1);
++ const afterWrites=writeCount,again=await call({amount:100.02,paidDate:'2026-11-23',paymentMethod:'Método nuevo',paymentSupportDocumentRef:'qa_new_support'});
++ assert.equal(again.reused,true);assert.equal(writeCount,afterWrites);
++});
++test('five cents inclusive accepts a documentary fact while retaining equal payment and obligation',async()=>{seed();await call({amount:100.05});assert.equal(stored('cobros','qa_cobro').monto,100);assert.equal(stored('cobros','qa_cobro').documentaryAmountVariance.differenceCents,5);});
++test('negative five cents documents variance without a negative payment or changed obligation',async()=>{seed();await call({amount:99.95});assert.equal(stored('cobros','qa_cobro').monto,100);assert.equal(stored('recibosEsperados','qa_receipt').monto,100);assert.equal(stored('cobros','qa_cobro').documentaryAmountVariance.differenceCents,-5);});
++test('six cents documentary variance holds before all financial mutations',async()=>{seed();const before=finance();await assert.rejects(()=>call({amount:100.06}),e=>e.message==='PAYMENT_APPLICATION_VARIANCE_REQUIRES_REVIEW');assert.deepEqual(finance(),before);assert.equal(writeCount,0);});
++test('existing real100 versus obligation100.02 holds with explicit residual; no payment becomes100.02',async()=>{
++ seed({amount:100,obligation:100.02});const before=finance(),projection=actualProjection();
++ await assert.rejects(()=>call({amount:100.02,paidDate:'2026-11-23'}),e=>{assert.equal(e.details.reason,'PAYMENT_EXISTING_RESIDUAL_REQUIRES_ALLOCATION');assert.match(e.message,/Pago: GTQ 100.00; obligación: GTQ 100.02/);assert.match(e.message,/Faltan GTQ 0.02/);assert.equal(e.details.residualCents,2);assert.equal(e.details.residualAmount,0.02);assert.equal(e.details.financialWrites,0);return true;});
++ assert.deepEqual(finance(),before);assert.equal(writeCount,0);assert.deepEqual(actualProjection(),projection);assert.equal(projection.portfolioOpen,true);
++});
++for(const amount of [0,0.01,50,99.95,99.98,100.02,100.05,101])test('new actual payment '+amount+' cannot close a100 obligation under documentary tolerance',async()=>{
++ seed({paid:false});const before=finance();await assert.rejects(()=>call({amount,sourceType:'manual',applicationDate:'',invoiceNumber:'',invoiceDocumentRef:''},'apply_payment'));
++ assert.deepEqual(finance(),before);assert.equal(writeCount,0);assert.deepEqual(actualProjection(),{receiptOpen:true,portfolioOpen:true});assert.equal([...documents.keys()].filter(p=>p.startsWith(item('cobros',''))).length,0);
++});
++test('new exact payment remains usable and persists one paid event',async()=>{seed({paid:false});const r=await call({amount:100,sourceType:'manual',applicationDate:'',invoiceNumber:'',invoiceDocumentRef:'',paidDate:'2026-11-22'},'apply_payment');assert.equal(r.paymentState,'PAID_DIRECT');assert.equal(stored('recibosEsperados','qa_receipt').monto,100);assert.equal(stored('carteraPrimas','qa_portfolio').monto,100);assert.equal([...documents.values()].filter(r=>r.reciboId==='qa_receipt'&&r.paymentState==='PAID_DIRECT'&&r.id.startsWith('cob_')).length,1);});
++for(const [country,currency] of [['GT','USD'],['CO','COP'],['CO','GTQ']])test('does not extend five cents to '+country+'/'+currency,async()=>{seed({country,currency});const before=finance();await assert.rejects(()=>call({amount:100.05}),e=>e.message==='PAYMENT_APPLICATION_VARIANCE_REQUIRES_REVIEW');assert.deepEqual(finance(),before);assert.equal(writeCount,0);});
++for(const [field,value] of [['polizaId','qa_other_policy'],['clienteId','qa_other_client'],['tenantId','qa_other_tenant'],['pais','CO'],['moneda','USD']])test('no monetary tolerance for existing payment '+field+' mismatch',async()=>{seed();stored('cobros','qa_cobro')[field]=value;const before=finance();await assert.rejects(()=>call({amount:100.02}));assert.deepEqual(finance(),before);assert.equal(writeCount,0);});
++test('source currency cannot bypass a previous exact request by sharing its idempotency digest',async()=>{seed();await call();const before=finance(),writes=writeCount;await assert.rejects(()=>call({currency:'USD'}));assert.deepEqual(finance(),before);assert.equal(writeCount,writes);});
++for(const flag of ['partialPayment','reversal','conflictingEvidence'])test('contradictory '+flag+' cannot use rounding',async()=>{seed();const before=finance();await assert.rejects(()=>call({amount:100.02,[flag]:true}));assert.deepEqual(finance(),before);assert.equal(writeCount,0);});
++test('absent original paidDate is not invented from an unproven invoice date',async()=>{seed();for(const c of ['cobros','recibosEsperados']){const row=stored(c,c==='cobros'?'qa_cobro':'qa_receipt');delete row.paidDate;delete row.fechaPago;}await call({paidDate:'2026-11-23'});assert.equal(stored('cobros','qa_cobro').paidDate,undefined);assert.equal(stored('recibosEsperados','qa_receipt').paidDate,undefined);});
++test('paid date aliases conflicting in stored payment hold before mutation',async()=>{seed();stored('cobros','qa_cobro').fechaPago='2026-07-16';const before=finance();await assert.rejects(()=>call());assert.deepEqual(finance(),before);assert.equal(writeCount,0);});
++test('documentary sub-cent input is not silently rounded into policy',async()=>{seed();const before=finance();await assert.rejects(()=>call({amount:100.004}));assert.deepEqual(finance(),before);assert.equal(writeCount,0);});
++test('raw existing actual amount precision is not normalized by enrichment',async()=>{seed({amount:100.004});const before=finance();await assert.rejects(()=>call());assert.deepEqual(finance(),before);assert.equal(writeCount,0);});
++test('existing payment provenance also survives the alternate reconcile_evidence owner path',async()=>{
++ seed();const original=copy(stored('cobros','qa_cobro'));
++ const out=await command.run({auth:{uid:'direction',token:{}},data:{tenantId:tenant,activeRole:'Dirección',operation:'reconcile_evidence',reason:'Synthetic',payload:{policyId:'qa_policy',receiptId:'qa_receipt',evidenceType:'INVOICE_INSTALLMENT_N',evidenceId:'qa_later_invoice',evidenceAsOfDate:'2026-11-24',currency:'GTQ',amount:100,paidDate:'2026-11-23',actualPaidDateEvidence:true}}});
++ assert.equal(out.status,'AUTO_COMMITTED_HIGH_CONFIDENCE');const row=stored('cobros','qa_cobro');for(const k of ['monto','paidDate','fechaPago','paymentOrigin','paymentEvidenceType','evidenceId','sourceRef','evidenceAsOfDate'])assert.equal(row[k],original[k],k);assert.equal(row.reconciliationEvidence.evidenceId,'qa_later_invoice');assert.equal(stored('recibosEsperados','qa_receipt').evidenceId,original.evidenceId);
++});
++test('legacy paid receipt without a physical cobro retains its original payment provenance',async()=>{seed();documents.delete(item('cobros','qa_cobro'));const original=copy(stored('recibosEsperados','qa_receipt'));const result=await call();const row=stored('cobros',result.cobroId);assert.equal(row.monto,100);for(const k of ['paidDate','paymentOrigin','paymentEvidenceType','evidenceId','sourceRef','evidenceAsOfDate'])assert.equal(row[k],original[k],k);assert.equal(row.applicationEvidence.evidenceId,'qa_application_invoice');});
++test('conflicting amount aliases never become a monetary comparison',async()=>{seed();const before=finance();await assert.rejects(()=>call({amount:100,monto:100.02}),e=>e.message==='PAYMENT_AMOUNT_ALIASES_CONFLICT');assert.deepEqual(finance(),before);assert.equal(writeCount,0);});
++test('conflicting currency aliases cannot reuse an already committed request',async()=>{seed();await call({currency:'GTQ'});const before=finance(),n=writeCount;await assert.rejects(()=>call({currency:'GTQ',moneda:'USD'}),e=>e.message==='PAYMENT_CURRENCY_ALIASES_CONFLICT');assert.deepEqual(finance(),before);assert.equal(writeCount,n);});
++test('legacy enrichment references the actual source receipt instead of inventing a preexisting cobro id',async()=>{seed();documents.delete(item('cobros','qa_cobro'));const out=await call();assert.equal(stored('cobros',out.cobroId).documentaryAmountVariance.originalSourceRef,'recibosEsperados/qa_receipt#monto');});
++test('legacy payment without its event cannot invent a different paid amount from an invoice',async()=>{seed();documents.delete(item('cobros','qa_cobro'));const before=finance();await assert.rejects(()=>call({amount:100.02}),e=>e.message==='PAYMENT_LEGACY_ACTUAL_AMOUNT_UNPROVEN');assert.deepEqual(finance(),before);assert.equal(writeCount,0);});
++for(const [field,value] of [['policyId','qa_other_policy'],['clientId','qa_other_client'],['receiptId','qa_other_receipt'],['currency','USD'],['country','CO']])test('contradictory existing '+field+' alias holds before enrichment',async()=>{seed();stored('cobros','qa_cobro')[field]=value;const before=finance();await assert.rejects(()=>call({amount:100.02}),e=>e.message==='PAYMENT_FINANCIAL_IDENTITY_ALIASES_CONFLICT');assert.deepEqual(finance(),before);assert.equal(writeCount,0);});
++test('recorded monetary aliases with different amounts are not chosen by first-match order',async()=>{seed();stored('cobros','qa_cobro').montoTotal=100.02;const before=finance();await assert.rejects(()=>call(),e=>e.message==='PAYMENT_RECORDED_AMOUNT_ALIASES_CONFLICT');assert.deepEqual(finance(),before);assert.equal(writeCount,0);});
++test('equivalent country and currency labels preserve the existing valid application',async()=>{seed();Object.assign(stored('cobros','qa_cobro'),{country:'Guatemala',currency:'gtq'});const out=await call({amount:100.02});assert.equal(out.applicationState,'APPLIED_DIRECT');assert.equal(stored('cobros','qa_cobro').monto,100);});
++
++// Independent review found that absence itself must be preserved: an invoice
++// can supply application evidence, but cannot backfill unknown payment facts.
++for(const [label,original] of [['absent',undefined],['blank',''],['null',null]])test('enrichment preserves '+label+' original payment provenance separately from the new invoice',async()=>{
++ seed();const fields=['evidenceId','sourceRef','evidenceType','evidenceAsOfDate','paymentOrigin','paymentEvidenceType'];
++ for(const [collection,id] of [['cobros','qa_cobro'],['recibosEsperados','qa_receipt']])for(const field of fields){
++  const row=stored(collection,id);if(original===undefined)delete row[field];else row[field]=original;
++ }
++ const out=await call({amount:100.02,evidenceAsOfDate:'2026-11-24',sourceRef:'qa_application_source'});
++ assert.equal(out.applicationState,'APPLIED_DIRECT');
++ for(const [collection,id] of [['cobros','qa_cobro'],['recibosEsperados','qa_receipt']])for(const field of fields){
++  const row=stored(collection,id);assert.equal(row[field],original,collection+':'+field);
++  assert.equal(Object.hasOwn(row,field),original!==undefined,collection+':presence:'+field);
++ }
++ const row=stored('cobros','qa_cobro');assert.equal(row.monto,100);
++ assert.equal(row.applicationEvidence.evidenceId,'qa_application_invoice');
++ assert.equal(row.applicationEvidence.sourceRef,'qa_application_source');
++ assert.equal(row.applicationEvidence.evidenceAsOfDate,'2026-11-24');
++ assert.equal(stored('recibosEsperados','qa_receipt').monto,100);assert.equal(stored('carteraPrimas','qa_portfolio').monto,100);
++});
++test('unknown original method and support stay unknown while the application records the reported method and support',async()=>{
++ seed();const fields=['paymentMethod','metodo','metodoPago','paymentSupportDocumentRef','soportePagoRef'];
++ for(const [collection,id] of [['cobros','qa_cobro'],['recibosEsperados','qa_receipt']])for(const field of fields)delete stored(collection,id)[field];
++ await call({amount:100.02,paymentMethod:'Método de la factura',paymentSupportDocumentRef:'qa_invoice_support'});
++ for(const [collection,id] of [['cobros','qa_cobro'],['recibosEsperados','qa_receipt']])for(const field of fields)assert.equal(Object.hasOwn(stored(collection,id),field),false,collection+':'+field);
++ const evidence=stored('cobros','qa_cobro').applicationEvidence;
++ assert.equal(evidence.reportedPaymentMethod,'Método de la factura');assert.equal(evidence.reportedPaymentSupportDocumentRef,'qa_invoice_support');
++});
++test('original support present only as soportePagoRef cannot acquire a contradictory new canonical support',async()=>{
++ seed();for(const [collection,id] of [['cobros','qa_cobro'],['recibosEsperados','qa_receipt']]){
++  const row=stored(collection,id);delete row.paymentSupportDocumentRef;row.soportePagoRef='qa_original_payment_support';
++ }
++ await call({amount:100.02,paymentSupportDocumentRef:'qa_invoice_support'});
++ for(const [collection,id] of [['cobros','qa_cobro'],['recibosEsperados','qa_receipt']]){
++  const row=stored(collection,id);assert.equal(row.soportePagoRef,'qa_original_payment_support');assert.equal(Object.hasOwn(row,'paymentSupportDocumentRef'),false);
++ }
++ assert.equal(stored('cobros','qa_cobro').applicationEvidence.reportedPaymentSupportDocumentRef,'qa_invoice_support');
++});
++for(const collection of ['cobros','recibosEsperados'])test('existing contradictory support aliases in '+collection+' hold before any financial write',async()=>{
++ seed();stored(collection,collection==='cobros'?'qa_cobro':'qa_receipt').soportePagoRef='qa_different_original_support';
++ const before=finance();await assert.rejects(()=>call(),e=>e.message==='PAYMENT_FINANCIAL_IDENTITY_ALIASES_CONFLICT');assert.deepEqual(finance(),before);assert.equal(writeCount,0);
++});
++for(const [collection,id,field,value] of [
++ ['recibosEsperados','qa_receipt','country','CO'],['recibosEsperados','qa_receipt','currency','USD'],
++ ['recibosEsperados','qa_receipt','policyId','qa_other_policy'],['recibosEsperados','qa_receipt','clientId','qa_other_client'],
++ ['polizas','qa_policy','country','CO'],['polizas','qa_policy','currency','USD'],['polizas','qa_policy','clientId','qa_other_client']
++])test('legacy paid receipt without cobro or active portfolio cannot bypass '+collection+'.'+field+' identity aliases',async()=>{
++ seed();documents.delete(item('cobros','qa_cobro'));documents.delete(item('carteraPrimas','qa_portfolio'));stored(collection,id)[field]=value;
++ const before=finance();await assert.rejects(()=>call(),e=>e.message==='PAYMENT_FINANCIAL_IDENTITY_ALIASES_CONFLICT');
++ assert.deepEqual(finance(),before);assert.equal(writeCount,0);assert.equal([...documents.keys()].some(p=>p.startsWith(item('cobros',''))),false);
++});
++test('valid legacy receipt without cobro or portfolio still creates one exact canonical payment with original facts',async()=>{
++ seed();documents.delete(item('cobros','qa_cobro'));documents.delete(item('carteraPrimas','qa_portfolio'));
++ const original=copy(stored('recibosEsperados','qa_receipt')),out=await call(),payment=stored('cobros',out.cobroId);
++ assert.equal(payment.monto,100);assert.equal(payment.evidenceId,original.evidenceId);assert.equal(payment.paidDate,original.paidDate);
++ assert.equal([...documents.keys()].filter(p=>p.startsWith(item('cobros',''))).length,1);assert.equal(out.portfolioUpdated,false);
++});
++for(const [collection,id,key,value] of [
++ ['recibosEsperados','qa_receipt','primaTotal',100.02],['recibosEsperados','qa_receipt','montoTotal',101],
++ ['carteraPrimas','qa_portfolio','montoTotal',101],['carteraPrimas','qa_portfolio','primaTotal',100.02],
++ ['recibosEsperados','qa_receipt','monto',100.004],['carteraPrimas','qa_portfolio','monto',100.004],
++ ['recibosEsperados','qa_receipt','monto',true],['carteraPrimas','qa_portfolio','monto',-1]
++])test('contradictory or invalid '+collection+'.'+key+' amount holds for both existing and new payments',async()=>{
++ for(const paid of [true,false]){
++  seed({paid});stored(collection,id)[key]=value;const before=finance(),projection=actualProjection();
++  await assert.rejects(()=>call(),e=>e.message==='PAYMENT_RECORDED_AMOUNT_ALIASES_CONFLICT');
++  assert.deepEqual(finance(),before);assert.deepEqual(actualProjection(),projection);assert.equal(writeCount,0);
++ }
++});
++test('saldo remains a balance and is not falsely treated as an alias of the original obligation total',async()=>{
++ seed();stored('carteraPrimas','qa_portfolio').saldo=0;
++ const out=await call({amount:100.02});assert.equal(out.applicationState,'APPLIED_DIRECT');assert.equal(stored('carteraPrimas','qa_portfolio').monto,100);assert.equal(stored('carteraPrimas','qa_portfolio').saldo,0);
++});
++test('explicit actual-date evidence may fill an unknown payment date while preserving unknown source facts',async()=>{
++ seed();for(const [collection,id] of [['cobros','qa_cobro'],['recibosEsperados','qa_receipt']]){
++  const row=stored(collection,id);for(const field of ['paidDate','fechaPago','sourceRef','evidenceId'])delete row[field];
++ }
++ await call({paidDate:'2026-07-16',actualPaidDateEvidence:true});
++ for(const [collection,id] of [['cobros','qa_cobro'],['recibosEsperados','qa_receipt']]){
++  const row=stored(collection,id);assert.equal(row.paidDate,'2026-07-16');assert.equal(row.fechaPago,'2026-07-16');assert.equal(Object.hasOwn(row,'sourceRef'),false);assert.equal(Object.hasOwn(row,'evidenceId'),false);
++ }
++ assert.equal(stored('cobros','qa_cobro').applicationEvidence.actualPaidDateEvidence,true);
++});
++test('alternate reconcile_evidence also keeps unknown original provenance separate from the application invoice',async()=>{
++ seed();const fields=['evidenceId','sourceRef','evidenceType','evidenceAsOfDate','paymentMethod','metodo','metodoPago','paymentSupportDocumentRef','soportePagoRef'];
++ for(const [collection,id] of [['cobros','qa_cobro'],['recibosEsperados','qa_receipt']])for(const field of fields)delete stored(collection,id)[field];
++ const out=await command.run({auth:{uid:'direction',token:{}},data:{tenantId:tenant,activeRole:'Dirección',operation:'reconcile_evidence',reason:'Synthetic',payload:{policyId:'qa_policy',receiptId:'qa_receipt',evidenceType:'INVOICE_INSTALLMENT_N',evidenceId:'qa_later_invoice',evidenceAsOfDate:'2026-11-24',currency:'GTQ',amount:100,paymentMethod:'Método de factura',paymentSupportDocumentRef:'qa_invoice_support'}}});
++ assert.equal(out.status,'AUTO_COMMITTED_HIGH_CONFIDENCE');
++ for(const [collection,id] of [['cobros','qa_cobro'],['recibosEsperados','qa_receipt']])for(const field of fields)assert.equal(Object.hasOwn(stored(collection,id),field),false,collection+':'+field);
++ const evidence=stored('cobros','qa_cobro').reconciliationEvidence;assert.equal(evidence.evidenceId,'qa_later_invoice');assert.equal(evidence.reportedPaymentMethod,'Método de factura');assert.equal(evidence.reportedPaymentSupportDocumentRef,'qa_invoice_support');
++});
+--- /dev/null
++++ b/tools/gravicentra-i6-6-r51-documentary-variance.test.cjs
+@@ -0,0 +1,171 @@
++'use strict';
++// Real frontend owners, synthetic in-memory records only. No network, user
++// identity, operational payment or Firebase write. The optional private tar
++// selects exact preimages for reproducible before/after failure evidence.
++const test = require('node:test');
++const assert = require('node:assert/strict');
++const fs = require('node:fs');
++const path = require('node:path');
++const vm = require('node:vm');
++const cp = require('node:child_process');
++const repo=process.env.R51_BASE_REPO || path.resolve(__dirname,'..');
++const root=process.env.R51_SOURCE_ROOT || repo;
++const preimage = process.env.I66_DOCUMENTED_TERMS_PREIMAGE_ARCHIVE;
++const clone = value => JSON.parse(JSON.stringify(value));
++const ownerPaths = [
++  'core/primas.js', 'core/policy-receipts-engine.js', 'modules/policy-receipts-v1199-bridge.js',
++  'modules/policy-receipts-v1199-detail-guard.js', 'core/backend-lab-receipts-portfolio-native-bridge-v20260801.js',
++  'core/issuance-workflow-v1201.js', 'modules/issuance-endosos-v1201-bridge.js', 'core/importa.js'
++].map(p => 'orbit360-platform/' + p);
++function read(p) {
++  const proposed=path.join(root,p);return fs.readFileSync(fs.existsSync(proposed)?proposed:path.join(repo,p),'utf8');
++}
++const decode = value => String(value || '').replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&');
++const attrs = text => Object.fromEntries([...String(text).matchAll(/([:\w-]+)(?:\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s>]+)))?/g)].map(m => [m[1], decode(m[2] ?? m[3] ?? m[4] ?? '')]));
++class Element {
++  constructor(tag, doc, a = {}) {
++    this.tagName = tag.toUpperCase(); this.doc = doc; this.attrs = a; this.id = a.id || ''; this.value = a.value || '';
++    this.style = {}; this.listeners = {}; this.nodes = []; this.children = []; this.dataset = {}; this.disabled = 'disabled' in a;
++    this.textContent = ''; this.isConnected = true; this.classList = { add() {}, remove() {}, contains() { return false; } };
++    for (const [k,v] of Object.entries(a)) if (k.startsWith('data-')) this.dataset[k.slice(5).replace(/-([a-z])/g, (_,c) => c.toUpperCase())] = v;
++  }
++  set innerHTML(s) {
++    this.html = String(s);
++    if (this.tagName === 'SELECT') {
++      const options = [...this.html.matchAll(/<option\b([^>]*)>([\s\S]*?)<\/option>/g)].map(m => ({ a: attrs(m[1]), t: decode(m[2]) }));
++      const selected = options.find(o => 'selected' in o.a) || options[0]; this.value = selected ? (selected.a.value ?? selected.t) : ''; return;
++    }
++    this.nodes = [];
++    for (const m of this.html.matchAll(/<(input|select|textarea|button|div|small|label|span|a)\b([^>]*)>/g)) {
++      const a = attrs(m[2]); if (!a.id && !Object.keys(a).some(k => k.startsWith('data-'))) continue;
++      const el = new Element(m[1], this.doc, a); el.parentElement = this;
++      if (m[1] === 'select') el.innerHTML = this.html.slice(m.index + m[0].length).split('</select>')[0];
++      if (m[1] === 'textarea') el.value = decode(this.html.slice(m.index + m[0].length).split('</textarea>')[0]);
++      this.nodes.push(el);
++    }
++  }
++  get innerHTML() { return this.html || ''; }
++  matches(s) {
++    return String(s).split(',').some(part => {
++      const p = part.trim(); if (p.startsWith('#')) return this.id === p.slice(1);
++      if (/^[a-z]+$/i.test(p)) return this.tagName.toLowerCase() === p.toLowerCase();
++      const m = p.match(/^\[([:\w-]+)(?:=['"]?([^'"]*)['"]?)?\]$/);
++      return !!m && Object.hasOwn(this.attrs, m[1]) && (m[2] === undefined || this.attrs[m[1]] === m[2]);
++    });
++  }
++  querySelectorAll(s) { return this.nodes.concat(this.children).filter(el => el.matches(s)); }
++  querySelector(s) { return this.querySelectorAll(s)[0] || null; }
++  appendChild(el) { this.children.push(el); el.parentElement = this; if (el.id) this.doc.ids.set(el.id, el); return el; }
++  addEventListener(name, fn) { (this.listeners[name] ||= []).push(fn); }
++  async fire(name) { for (const fn of this.listeners[name] || []) await fn({ target: this, preventDefault() {}, stopPropagation() {} }); if (name === 'click' && this.onclick) await this.onclick(); }
++  insertAdjacentHTML(_position, html) { this.html = (this.html || '') + html; }
++  remove() { this.isConnected = false; this.doc.ids.delete(this.id); }
++  setAttribute(k,v) { this.attrs[k] = String(v); }
++  getAttribute(k) { return this.attrs[k] ?? null; }
++  focus() {} scrollIntoView() {}
++}
++function harness({ role = 'Dirección' } = {}) {
++  const doc = { ids: new Map(), createElement(tag) { return new Element(tag, this); }, getElementById(id) { return this.ids.get(id) || null; }, addEventListener() {}, dispatchEvent() {}, querySelectorAll() { return []; } };
++  doc.head = new Element('head', doc); doc.body = new Element('body', doc);
++  const rows = {
++    clientes: [{ id: 'qa_client', tenantId: 'qa_tenant', nombre: 'Cliente sintético', pais: 'GT', moneda: 'GTQ', asesorId: 'qa_advisor' }],
++    aseguradoras: [{ id: 'qa_insurer', tenantId: 'qa_tenant', nombre: 'Aseguradora sintética', pais: 'GT', paises: ['GT'], vinculada: true, comisiones: { AUTOMOVILES: 10 } }],
++    asesores: [{ id: 'qa_advisor', nombre: 'Asesor sintético', paises: ['GT'], shareCom: 60, comModo: 'comision' }],
++    polizas: [], recibosEsperados: [], carteraPrimas: [], vehiculos: [], cobros: [], actividades: [], gestiones: [],
++    comisiones: [{ id: 'qa_unrelated_collection_component', valor: 9.79, concepto: 'Componente sintético independiente' }], finmovs: []
++  };
++  const batches = [], toasts = [], cloneRows = () => clone(rows);
++  const store = {
++    all: c => rows[c] || [], get: (c,id) => (rows[c] || []).find(r => r.id === id) || null,
++    where: (c,predicate) => (rows[c] || []).filter(predicate), pref: (_k,d) => d, on() {},
++    insert(c,row) { (rows[c] ||= []).push(clone(row)); }, update(c,id,patch) { Object.assign(store.get(c,id),clone(patch)); },
++    async updateDurable(c,id,patch) { store.update(c,id,patch); return { ok: true }; },
++    async batchDurable(mutations, options) {
++      const next = cloneRows();
++      for (const m of mutations) {
++        assert.notEqual(m.action, 'remove', 'new contract never physically deletes a record');
++        const list = (next[m.collection] ||= []), index = list.findIndex(r => r.id === m.id);
++        if (m.action === 'insert') { assert.equal(index,-1,'no duplicate physical insert'); list.push(clone({ ...m.payload, id: m.id })); }
++        else { assert.ok(index >= 0, 'updated row exists'); Object.assign(list[index],clone(m.payload)); }
++      }
++      for (const [c,list] of Object.entries(next)) rows[c] = list;
++      batches.push(clone({ mutations, options })); return { ok: true, canonicalReadback: true, canonicalReadbackCount: mutations.length };
++    }
++  };
++  const norm = x => String(x || '').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]/g,'');
++  const Orbit = {
++    store, access: { norm, filter: (_c,x) => x, canView: () => true, can: () => role !== 'Asesor', canWrite: () => role !== 'Asesor', currencyFor: () => 'GTQ', tenantId: () => 'qa_tenant', activeRole: () => role, actorAdvisor: () => ({}), actorUser: () => ({ id: 'qa_actor', nombre: 'Actor sintético' }), audit() {} },
++    modules: { cliente360: { render() {}, verPoliza() {}, verVehiculo() {} }, polizas: { render() {} } },
++    ui: { today: () => '2026-11-17', esc: x => String(x ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;'), money: (n,c) => c + ' ' + Number(n).toFixed(2), toast: x => toasts.push(x) },
++    cat: { ramosDe: () => ['AUTOMOVILES'], subramosDe: () => ['AUTO'] }, paisCfg: () => ({ iva: 12, recargoFinanciero: 0, gastosEmision: 0 }), PAISES: [{ id: 'GT', moneda: 'GTQ' }],
++    session: { rol: () => role }, tenant: { id: 'qa_tenant' },
++    assignableAdvisorRoster: { list: async () => rows.asesores.map(a => ({ ...a, assignable: true, roleEligible: true, activo: true })) },
++    q: { portfolioDue: r => r.fechaLimite || r.vence || '', portfolioClassification: r => ({ open: r.carteraActiva !== false, overdue: true, future: false }), expectedReceiptClassification: () => ({ open: true, overdue: true, future: false }) },
++    endorsements: {}, ia: { disponible: () => false }
++  };
++  const context = vm.createContext({ Orbit, document: doc, console, Date, Math, URL, URLSearchParams,
++    location: { hostname: 'app.aysseguros.com', hash: '', pathname: '/' }, history: { replaceState() {} },
++    setTimeout() { return 0; }, clearTimeout() {}, setInterval() { return 0; }, clearInterval() {},
++    addEventListener() {}, dispatchEvent() {}, CustomEvent: class {} });
++  context.window = context;
++  const load = p => vm.runInContext(read(p), context, { filename: p });
++  load(ownerPaths[0]); load(ownerPaths[1]);
++  return { Orbit, context, doc, rows, store, batches, toasts, load, async newForm() {
++    load(ownerPaths[2]); Orbit.modules.cliente360.nuevaPoliza('qa_client'); await Promise.resolve(); await Promise.resolve();
++    const form = doc.getElementById('policy-v1199'); assert.ok(form); return { form, field: name => form.querySelector('[data-' + name + ']') };
++  } };
++}
++function raw(extra = {}) {
++  return { id: 'qa_policy', tenantId: 'qa_tenant', clienteId: 'qa_client', asesorId: 'qa_advisor', aseguradoraId: 'qa_insurer',
++    numero: 'QA-SYNTHETIC-POLICY', pais: 'GT', moneda: 'GTQ', ramo: 'AUTOMOVILES', producto: 'AUTO', estado: 'Vigente',
++    vigenciaInicio: '2026-10-20', vigenciaFin: '2027-10-20', frecuencia: 'Contado', cuotas: 1, formaPago: '', conducto: '',
++    primaNeta: 630, gastosEmision: 41.5, otros: 200, gastosFinan: 0, recargoFinPct: 0, ivaPct: 12,
++    comAseguradoraPct: 10, comVendedorPct: 60, ...extra };
++}
++const documented = () => ({ cargoNoGravadoMonto: 2.70, cargoNoGravadoConcepto: 'Bomberos', cargoNoGravadoDocumentRef: 'qa-issued-document',
++  vencimientosDocumentados: [{ secuencia: 1, fechaVencimiento: '2026-11-06', documentRef: 'qa-issued-document' }] });
++async function create(h, extra) { const result = await h.Orbit.policyReceipts.createPolicy(raw({ ...documented(), ...extra }), { operationId: 'qa_documented_create' }); assert.equal(result.ok,true,JSON.stringify(result)); return result; }
++
++function documentaryFixture({deltaCents=-5,country='GT',currency='GTQ',insurer='qa_any_insurer'}={}){
++ const h=harness();h.Orbit.domainConfig={peek:()=>({amountTolerance:0.02})};
++ const p=raw({primaTotal:4012.30,prima:4012.30,pais:country,moneda:currency,cuotas:2,frecuencia:'Semestral',aseguradoraId:insurer,sourceDocumentId:'qa_contract_document'});
++ h.rows.polizas.push(p);const totalCents=401230+deltaCents;
++ for(let i=0;i<2;i++){const amount=(i===0?Math.floor(totalCents/2):totalCents-Math.floor(totalCents/2))/100;h.rows.recibosEsperados.push({id:'qa_receipt_'+i,tenantId:p.tenantId,polizaId:p.id,clienteId:p.clienteId,pais:country,moneda:currency,cuota:(i+1)+'/2',monto:amount,primaTotal:amount,estado:'Pendiente',vence:'2026-11-24'});}
++ h.load(ownerPaths[3]);return{h,p,model:h.Orbit.policyVehicleReadModelV1199c};
++}
++for(const insurer of ['qa_mapfre','qa_el_roble','qa_new_insurer'])test('D01 4012.30 vs4012.25 is nonblocking for '+insurer+' and both source facts remain intact',()=>{
++ const {h,p,model}=documentaryFixture({insurer}),before=clone(h.rows);
++ assert.equal(model.financialIntegrityBatch([p]).length,0);const pb=model.premiumBreakdown(p);
++ assert.equal(pb.total,4012.30);assert.equal(pb.scheduleTotal,4012.25);assert.equal(pb.documentaryVariance.differenceCents,-5);
++ assert.equal(pb.documentaryVariance.accepted,true);assert.equal(pb.documentaryVariance.originalSourceRef,'qa_contract_document');
++ assert.match(pb.documentaryVariance.documentedSourceRef,/recibosEsperados\/qa_receipt_0#primaTotal/);assert.equal(pb.documentaryVariance.bankSettlementProved,false);
++ assert.deepEqual(h.rows,before);assert.equal(h.batches.length,0);
++});
++for(const deltaCents of [-5,-4,-3,-2,-1,0,1,2,3,4,5])test('integer-cent documentary boundary '+deltaCents+' remains nonblocking',()=>{const {p,model}=documentaryFixture({deltaCents});assert.equal(model.financialIntegrityBatch([p]).length,0);assert.equal(model.premiumBreakdown(p).documentaryVariance.differenceCents,deltaCents);});
++for(const deltaCents of [-6,6,-100,100])test('beyond approved documentary boundary '+deltaCents+' remains a visible issue',()=>{const {p,model}=documentaryFixture({deltaCents});const issues=model.financialIntegrityBatch([p]);assert.equal(issues.length,1);assert.equal(issues[0].tolerance,0.05);assert.equal(issues[0].documentaryVariance.accepted,false);});
++for(const [country,currency] of [['GT','USD'],['CO','COP'],['CO','GTQ'],['SV','USD']])test('documentary tolerance is not expanded outside '+country+'/'+currency,()=>{const {p,model}=documentaryFixture({country,currency});assert.equal(model.financialIntegrityBatch([p]).length,1);assert.equal(model.premiumBreakdown(p).documentaryVariance.scopeApproved,false);});
++for(const [field,value] of [['moneda','USD'],['pais','CO'],['tenantId','qa_other_tenant'],['clienteId','qa_other_client']])test('five cents cannot hide receipt '+field+' drift',()=>{const {h,p,model}=documentaryFixture();h.rows.recibosEsperados[0][field]=value;const issues=model.financialIntegrityBatch([p]);assert.equal(issues.length,1);assert.equal(model.premiumBreakdown(p).documentaryVariance.accepted,false);assert.equal(model.premiumBreakdown(p).documentaryVariance.identityExact,false);});
++test('duplicated installment sequence cannot be accepted as rounding',()=>{const {h,p,model}=documentaryFixture();h.rows.recibosEsperados[1].cuota='1/2';assert.equal(model.financialIntegrityBatch([p]).length,1);});
++test('a different policy edition is not accepted via monetary proximity',()=>{const {p,model}=documentaryFixture();const schedule=model.receiptSchedule(p.id);schedule.rows[0]={...schedule.rows[0],polizaId:'qa_other_edition'};assert.equal(model.documentaryScheduleVariance(p,schedule).identityExact,false);});
++test('configured generic0.09 cannot broaden the approved GTQ0.05 cap',()=>{const {h,p,model}=documentaryFixture({deltaCents:6});h.Orbit.domainConfig.peek=()=>({amountTolerance:0.09});const issues=model.financialIntegrityBatch([p]);assert.equal(issues.length,1);assert.equal(issues[0].tolerance,0.05);});
++test('policy detail displays accepted variance and both amounts without a collection or bank adjustment',()=>{
++ const {h,p}=documentaryFixture(),host=new Element('div',h.doc,{id:'host'});h.doc.ids.set('host',host);h.Orbit.route={params:{p:p.id}};
++ h.Orbit.modules.cliente360.render(host);assert.match(host.innerHTML,/data-documentary-rounding-variance="1"/);assert.match(host.innerHTML,/Q 4,012\.30/);assert.match(host.innerHTML,/Q 4,012\.25/);assert.match(host.innerHTML,/cada recibo mantiene su obligación original/);assert.doesNotMatch(host.innerHTML,/supera tolerancia/);assert.equal(h.rows.cobros.length,0);assert.equal(h.rows.finmovs.length,0);assert.equal(h.batches.length,0);
++});
++test('same strict documentary helper contract on browser and canonical server owner',()=>{
++ const {h}=documentaryFixture(),backend=require(path.join(root,'functions/payment-inference-engine.js'));
++ const base={kind:'CONTRACT_SCHEDULE',country:'GT',currency:'GTQ',identityExact:true,original:{amount:4012.30,sourceRef:'qa_contract'},documented:{amount:4012.25,sourceRef:'qa_schedule'}};
++ const cases=[base,{...base,country:'CO'},{...base,currency:'USD'},{...base,identityExact:false},{...base,kind:'BANK_STATEMENT_MATCH'},
++  {...base,documented:{amount:4012.24,sourceRef:'qa_schedule'}},{...base,documented:{amount:4012.304,sourceRef:'qa_schedule'}},
++  {...base,original:{amount:4012.30,sourceRef:''}},{...base,documented:{amount:true,sourceRef:'qa_schedule'}}];
++ for(const row of cases)assert.deepEqual(clone(h.Orbit.primas.documentaryAmountVariance(row)),backend.documentaryAmountVariance(row));
++ assert.equal(backend.documentaryAmountVariance({...base,kind:'BANK_STATEMENT_MATCH'}).accepted,false);
++});
++test('configuration renders the GTQ policy separately from generic comparison settings',async()=>{
++ const h=harness(),side=new Element('div',h.doc),body=new Element('div',h.doc),host={querySelector:s=>s==='.cfg-side'?side:s==='#cfg-body'?body:null};
++ side.insertBefore=button=>side.appendChild(button);let writes=0;
++ h.Orbit.domainConfig={get:async()=>({config:{amountTolerance:0.02}}),save:async()=>{writes++;return{};},defaults:()=>({})};
++ h.load('orbit360-platform/modules/config-domain-v20260804-bridge.js');h.Orbit.configDomainBridge.mount(host);
++ const button=side.children.find(el=>el.dataset.domainConfig==='reconciliation');assert.ok(button);await button.fire('click');await Promise.resolve();
++ assert.match(body.innerHTML,/Guatemala \/ GTQ: Q0.05/);assert.match(body.innerHTML,/todas las aseguradoras/);assert.match(body.innerHTML,/los pagos se aplican por su importe real y moneda exacta/);assert.equal(body.querySelector('#rc-amount').value,'0.02');assert.equal(writes,0);
++});

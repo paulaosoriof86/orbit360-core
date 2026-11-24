@@ -1,0 +1,67 @@
+{
+  "schema": "I66_V28_FINANCIAL_48_DIAGNOSTIC_NOT_RELEASE_ACCEPTANCE_V1",
+  "status": "SCOPED_48_READONLY_REPORT_VALIDATED_PACKAGE_NOT_ACCEPTED",
+  "releaseEligible": false,
+  "transferableToSuccessor": false,
+  "runId": 45468203410,
+  "jobId": 138708704268,
+  "workflowHead": "ab2b7be577759afaceae5faaf1bbdf1d0f2794a7",
+  "runConclusion": "success",
+  "artifactId": 14957546893,
+  "artifactDigest": "sha256:d1e8a691ca9502db06fd9077cf301804c1376e95e2bbed66a24a78f6f8e3e53c",
+  "reportSha256": "4813b4db593f247681d974a32c7ac2e53e11344625e772eecd123443c9f1ff56",
+  "sourceSha": "74ae28c6e6e6b40f845567c9b00738a58307b3cb",
+  "buildId": "gi-i66-74ae28c6e6e6-57f234755dc1",
+  "stageCount": 48,
+  "sourceArtifactId": 14953553588,
+  "reads": {
+    "roles": [
+      {
+        "role": "operativo",
+        "width": 1365
+      },
+      {
+        "role": "operativo",
+        "width": 390
+      },
+      {
+        "role": "direccion",
+        "width": 1365
+      },
+      {
+        "role": "direccion",
+        "width": 390
+      }
+    ],
+    "distinctObligations": 6,
+    "stagesPerObligation": 8,
+    "serverBeforeAfterIdentical": true,
+    "totalCurrentOutstandingCents": 166956
+  },
+  "writes": {
+    "firestore": 0,
+    "businessActions": 0,
+    "paymentActions": 0,
+    "syntheticFixtures": 0,
+    "pushNotifications": 0
+  },
+  "timing": {
+    "measurementStartedAt": "2026-11-24T19:15:40.8499762Z",
+    "directFormsFailureAt": "2026-11-24T19:18:38.5498065Z",
+    "makeCompensationStartedAt": "2026-11-24T19:18:38.5646807Z",
+    "measurementPassAt": "2026-11-24T19:27:16.2638577Z",
+    "workflowCompletedAt": "2026-11-24T19:27:19Z",
+    "makeCompensationVerifiedAt": "2026-11-24T19:18:46.1809893Z"
+  },
+  "authorityBlob": "ee3eca3fc1cdfc479e1385a79f04d870cccd8ef4",
+  "parentAuthorityBlob": "f0b95f7d4dddcb9082096896e522ccd76523fdc7",
+  "authorityBeforeAfterUnchanged": true,
+  "reason": "Preview signed functional gate failed on direct renewal before this financial run ended; Make compensation restored the previous exact Preview trigger revision during measurement. Financial readonly observations are retained without admitting the composed package or any successor.",
+  "acceptanceReceiptGenerated": false,
+  "liveAuthorityGenerated": false,
+  "cancelAttempt": {
+    "method": "gh run cancel",
+    "result": "CLI_AUTH_UNAVAILABLE_NO_CREDENTIAL_LOOKUP",
+    "fallback": "Root verified Cloud GitHub signed out; normal completion preserved"
+  }
+}

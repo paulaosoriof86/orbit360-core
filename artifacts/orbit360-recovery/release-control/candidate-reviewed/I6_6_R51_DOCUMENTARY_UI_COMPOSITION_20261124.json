@@ -1,0 +1,119 @@
+{
+  "schema": "GI_POST_E7_R51_DOCUMENTARY_UI_SCRATCH_COMPOSITION_V1",
+  "status": "JOINT_PATCH_COMPOSED_SOURCE_TESTS_PENDING_NOT_RELEASE_AUTHORITY",
+  "baseHead": "5e8516ff24a8c269aabb1647e0e07cd4ea6a0ae0",
+  "sourcePatchSha256": [
+    "bfc36d6a6590cd6b881b635bdcdfd742f6e86145592250383cc8e1adef4a38db",
+    "3efb4c084023b8e9e781cd070b64231a0c2f281c38cbcdfbe639671c1313d257"
+  ],
+  "jointProductAndTestsPatchSha256": "2a612707605b0169d4aace91198383d712f5a9fa82a34c4697269d18a280a19a",
+  "sourceQaPinsAndManifestPatchSha256": "91d7d39e9dc802353cf2dfe3a2c0fe1c064ab548c38b571011f7af3fe52bccf5",
+  "productOwners": 6,
+  "newTests": [
+    "tools/gravicentra-i6-6-r51-payment-application-preservation.test.cjs",
+    "tools/gravicentra-i6-6-r51-documentary-variance.test.cjs",
+    "tools/gravicentra-i6-6-documentary-payment-ui.test.cjs"
+  ],
+  "paths": [
+    {
+      "path": "functions/cobros-reconciliation-domain.js",
+      "beforeBlob": "add21a5888f61fceea5ffd7aef7cf7318a31225e",
+      "candidateBlob": "3d84423fd985841c6f9b230dcf729b41f2512556",
+      "candidateSha256": "32d92a9b3c13827f1f2d2073888b0ab833ebc4b18395d761765713077c173831"
+    },
+    {
+      "path": "functions/payment-inference-engine.js",
+      "beforeBlob": "5bebc3d134a129c608125b36da0109dfc52b812f",
+      "candidateBlob": "a3d6bf99288c0c309759dce954d48c1ecc4db9dc",
+      "candidateSha256": "ac185dec4b3e1e83609cbc102e89021a6feacccb8ef53fdcfcbf59a99d0555c3"
+    },
+    {
+      "path": "orbit360-platform/core/primas.js",
+      "beforeBlob": "fbd41a84bba4a5083027689a457b427dac88f36e",
+      "candidateBlob": "0d5d343ef11760312092314b719fc82da0eaa147",
+      "candidateSha256": "65c4ee0c74d8564700b5389775e51c992815cbaa0e42acc4842d64efee568e22"
+    },
+    {
+      "path": "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js",
+      "beforeBlob": "25f557054a37c7116fa88863a7357ed79d8a82e0",
+      "candidateBlob": "97d30b85b5c59b2c84b25dfe85aa0daeea4c74c2",
+      "candidateSha256": "fbb7c8faba442e0ea06eb8376e6ea3173892c423dd02198a23e07d5fa99fbb55"
+    },
+    {
+      "path": "orbit360-platform/modules/config-domain-v20260804-bridge.js",
+      "beforeBlob": "30fa9845bb38a3dc0ff72771675fdf1e9aa25625",
+      "candidateBlob": "b0c3d6e2399ab9a13a60ea473fc8cc1e9edd00f9",
+      "candidateSha256": "d87ce4a2c21734f00cf66970588b3b5d4be0e8bdb40cb823e0f9b4e090ea3862"
+    },
+    {
+      "path": "tools/gravicentra-i6-6-r51-payment-application-preservation.test.cjs",
+      "beforeBlob": null,
+      "candidateBlob": "b519081d11a4309d3eea6a58c7e6831bbecdd189",
+      "candidateSha256": "ec52b3393fb0569af0b99dea7c59915c296a6061a1c6efc72b530cda4e6edb95"
+    },
+    {
+      "path": "tools/gravicentra-i6-6-r51-documentary-variance.test.cjs",
+      "beforeBlob": null,
+      "candidateBlob": "637a2b5c5980d5dab850f61e2f67376130090a4a",
+      "candidateSha256": "b1f3f1661318eb6c405e4a7ca58ead3c3177f06b80b2ced7e5746ac16a560306"
+    },
+    {
+      "path": "orbit360-platform/modules/cobros.js",
+      "beforeBlob": "b7813be360a778cd199579cc3898a0179f2e3c2a",
+      "candidateBlob": "687be0b6b54352894f1a48b417cb990a6536f080",
+      "candidateSha256": "383406113f76b9534b2fb24567b19c1ebc6973fdaa41e86ff5389fa6f40cc02c"
+    },
+    {
+      "path": "tools/gravicentra-i6-6-documentary-payment-ui.test.cjs",
+      "beforeBlob": null,
+      "candidateBlob": "8ae02feff6b6afe81cd080d35ef8eaa5385e524c",
+      "candidateSha256": "a1df831faf2708900b57c1448d3eaed4ec200a5af40506d5429bf2f71a0e16b4"
+    },
+    {
+      "path": "tools/gravicentra-i6-6-cobros-payment-failure-category.test.cjs",
+      "beforeBlob": "491e11bda5c7b021478771e87f0b7ec682561cab",
+      "candidateBlob": "a59e96726a6d8516e5218f34a8b1aa30c814cf89",
+      "candidateSha256": "34d95cd6666df74a08ae00bcb151a8855341900b950404ad3c114b5a5e64326a"
+    },
+    {
+      "path": ".github/workflows/gravicentra-i66-privileged-role-parity-source-qa.yml",
+      "beforeBlob": "2abca7817678d92933ad334e1ed861cc9526d51d",
+      "candidateBlob": "1e77d1ddcf134be31802c7a15f1c111c80c4cf32",
+      "candidateSha256": "15e3b1af31a8622afca4295e0683934ab12b22927919d58a4b68f92c1c9f11a7"
+    },
+    {
+      "path": "tools/gravicentra-i6-6-operational-release-candidate.cjs",
+      "beforeBlob": "40466fa0b73bcea24b5e9a0f82c9c31f1e9a6090",
+      "candidateBlob": "7a8aac29dbf79c756789a1d7147fd3c0e430feac",
+      "candidateSha256": "74197351216631a650ff7d31129c3e61e140b2d09799c2666305bd4dd288d4e4"
+    },
+    {
+      "path": "artifacts/orbit360-recovery/release-control/I6_6_APPROVED_PRODUCT_DELTA_MANIFEST_20261110.json",
+      "beforeBlob": "a7d568678a350790b88870de12eed42c084cd438",
+      "candidateBlob": "1dc5082ff6efaaa59ab1a496045be54e8fd72597",
+      "candidateSha256": "65128758fe0f39ecb6f468f67b2baea36d457186a71a22849cc81fecedd4d606"
+    }
+  ],
+  "causalExistingTestAdaptation": {
+    "path": "tools/gravicentra-i6-6-cobros-payment-failure-category.test.cjs",
+    "cause": "The old regex required an inline manual object. The new form still invokes the same owner once for either input; the revised assertion now checks exact owner and exactly one call. All eight error-category behaviors remain unchanged."
+  },
+  "urgentOwnersPreserved": [
+    {
+      "path": "orbit360-platform/modules/renewals-v1200-operational-bridge.js",
+      "gitBlobSha": "8395b86246cf9bd77523da0059a6e5318e0cfc80"
+    },
+    {
+      "path": "orbit360-platform/modules/issuance-endosos-v1201-bridge.js",
+      "gitBlobSha": "6dabc32d0a012566eb7840ef8774aee3beb17817"
+    }
+  ],
+  "sharedRepositoryWrites": 0,
+  "commits": 0,
+  "workflowDispatches": 0,
+  "deployments": 0,
+  "businessWrites": 0,
+  "existingReleaseAdmissionExtensionStillRequired": true,
+  "postE7FreshMakeLivePreimageRequired": true,
+  "sourceQaOrPreviewOrLiveAccepted": false
+}

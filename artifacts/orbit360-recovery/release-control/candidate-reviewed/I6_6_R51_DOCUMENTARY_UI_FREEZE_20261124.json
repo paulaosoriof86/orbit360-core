@@ -1,0 +1,63 @@
+{
+  "schema": "GI_POST_E7_FINANCIAL_SCRATCH_FREEZE_V1",
+  "status": "FROZEN_SOURCE_COMPOSITION_WITH_RELEASE_CONTINUITY_REQUIREMENTS_NOT_INTEGRATED",
+  "baseHead": "5e8516ff24a8c269aabb1647e0e07cd4ea6a0ae0",
+  "files": [
+    {
+      "path": "/workspace/scratch/166055cd45dc/payments-work/post-e7-joint-financial-5e8516ff/joint-product-and-tests.patch",
+      "sha256": "2a612707605b0169d4aace91198383d712f5a9fa82a34c4697269d18a280a19a",
+      "bytes": 117737
+    },
+    {
+      "path": "/workspace/scratch/166055cd45dc/payments-work/post-e7-joint-financial-5e8516ff/source-qa-pins-and-manifest.proposed.patch",
+      "sha256": "91d7d39e9dc802353cf2dfe3a2c0fe1c064ab548c38b571011f7af3fe52bccf5",
+      "bytes": 8219
+    },
+    {
+      "path": "/workspace/scratch/166055cd45dc/payments-work/post-e7-joint-financial-5e8516ff/manifest-entry.proposed.json",
+      "sha256": "d729f92f00f44d3c49d112335fcc8a2561a35b5e8068d3fc81904e2df66d3b21",
+      "bytes": 3783
+    },
+    {
+      "path": "/workspace/scratch/166055cd45dc/payments-work/post-e7-joint-financial-5e8516ff/joint-composition.json",
+      "sha256": "5ff833dd2b90e2bedcc8136e88c32ec5eeda1d93d9272717700b715a1ab584bc",
+      "bytes": 5746
+    },
+    {
+      "path": "/workspace/scratch/166055cd45dc/payments-work/post-e7-joint-financial-5e8516ff/combined-source-test-results.json",
+      "sha256": "3d6bc8d777f55e301b79e0e814019a1cfefda26e6a9ae828d717b9e70009d036",
+      "bytes": 1474
+    },
+    {
+      "path": "/workspace/scratch/166055cd45dc/payments-work/post-e7-joint-financial-5e8516ff/combined-r51-documentary-ui.log",
+      "sha256": "e27aaa5040587bd0e9f88073b5241434128189161d5a340a0bd3ebbba6bc8161",
+      "bytes": 24150
+    },
+    {
+      "path": "/workspace/scratch/166055cd45dc/payments-work/post-e7-joint-financial-5e8516ff/preserved-direct-forms-and-payment-contracts.log",
+      "sha256": "957956e4ee495536ffe931bb8388ea59f7827886a82ff45fb6bed60187ca91c7",
+      "bytes": 13880
+    },
+    {
+      "path": "/workspace/scratch/166055cd45dc/payments-work/post-e7-joint-financial-5e8516ff/payment-country-boundary.log",
+      "sha256": "48a128069abbd8c91f795fc5538cd0bd806d2769e9371fb7a1daf8aefb8ca83e",
+      "bytes": 649
+    },
+    {
+      "path": "/workspace/scratch/166055cd45dc/payments-work/post-e7-joint-financial-5e8516ff/HANDOFF.md",
+      "sha256": "251bb16480977a500fff8e7dec0b5fb017d06787a92eaaacb718fa6c4a8142a7",
+      "bytes": 10721
+    }
+  ],
+  "productOwners": 6,
+  "targetsAdded": 0,
+  "urgentProductOwnersChanged": 0,
+  "repositoryWrites": 0,
+  "commits": 0,
+  "deployments": 0,
+  "financialMutations": 0,
+  "futureE7StateInvented": false,
+  "activeMakeMustRemainActive": true,
+  "activeMakeContinuityExtensionImplemented": false,
+  "newPreviewAndLiveAcceptanceClaimed": false
+}

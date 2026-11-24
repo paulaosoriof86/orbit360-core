@@ -1,0 +1,650 @@
+TAP version 13
+# PASS R46 exact two payloads and request IDs, without invented fields
+# PASS Missing explicit documentary review blocks before command
+# PASS Already paid receipt blocks new payment
+# PASS Inconsistent gross aliases are not silently corrected
+# PASS Actual payment date cannot be invented from the source cut
+# PASS Actual payment after document cut is rejected
+# PASS Invalid calendar dates are rejected
+# PASS Drive reference accepts exact original and rejects untrusted host
+# PASS Proposal application namespace cannot be forged in this form
+# PASS Generated operation ID is stable for replay and changes with evidence
+# PASS Manual payment remains outside documentary requirements
+# PASS Missing tenant identity blocks command preparation
+# PASS Amount precision and zero gross are rejected without rounding money
+# PASS Exact canonical response passes and contradictory responses require readback
+# PASS Documentary UI source explicitly gates notices and double submission
+# {"status":"DOCUMENTARY_PAYMENT_SOURCE_PAYLOAD_GUARDS_PASS_NOT_SIGNED_UI","checks":15,"networkRequests":0,"realCustomerWrites":0}
+# Subtest: tools/gravicentra-i6-6-documentary-payment-ui.test.cjs
+ok 1 - tools/gravicentra-i6-6-documentary-payment-ui.test.cjs
+  ---
+  duration_ms: 91.589582
+  type: 'test'
+  ...
+# Subtest: D01 4012.30 vs4012.25 is nonblocking for qa_mapfre and both source facts remain intact
+ok 2 - D01 4012.30 vs4012.25 is nonblocking for qa_mapfre and both source facts remain intact
+  ---
+  duration_ms: 6.891504
+  type: 'test'
+  ...
+# Subtest: D01 4012.30 vs4012.25 is nonblocking for qa_el_roble and both source facts remain intact
+ok 3 - D01 4012.30 vs4012.25 is nonblocking for qa_el_roble and both source facts remain intact
+  ---
+  duration_ms: 1.271187
+  type: 'test'
+  ...
+# Subtest: D01 4012.30 vs4012.25 is nonblocking for qa_new_insurer and both source facts remain intact
+ok 4 - D01 4012.30 vs4012.25 is nonblocking for qa_new_insurer and both source facts remain intact
+  ---
+  duration_ms: 1.975878
+  type: 'test'
+  ...
+# Subtest: integer-cent documentary boundary -5 remains nonblocking
+ok 5 - integer-cent documentary boundary -5 remains nonblocking
+  ---
+  duration_ms: 1.023257
+  type: 'test'
+  ...
+# Subtest: integer-cent documentary boundary -4 remains nonblocking
+ok 6 - integer-cent documentary boundary -4 remains nonblocking
+  ---
+  duration_ms: 0.995726
+  type: 'test'
+  ...
+# Subtest: integer-cent documentary boundary -3 remains nonblocking
+ok 7 - integer-cent documentary boundary -3 remains nonblocking
+  ---
+  duration_ms: 0.968486
+  type: 'test'
+  ...
+# Subtest: integer-cent documentary boundary -2 remains nonblocking
+ok 8 - integer-cent documentary boundary -2 remains nonblocking
+  ---
+  duration_ms: 1.163416
+  type: 'test'
+  ...
+# Subtest: integer-cent documentary boundary -1 remains nonblocking
+ok 9 - integer-cent documentary boundary -1 remains nonblocking
+  ---
+  duration_ms: 0.958911
+  type: 'test'
+  ...
+# Subtest: integer-cent documentary boundary 0 remains nonblocking
+ok 10 - integer-cent documentary boundary 0 remains nonblocking
+  ---
+  duration_ms: 1.002306
+  type: 'test'
+  ...
+# Subtest: integer-cent documentary boundary 1 remains nonblocking
+ok 11 - integer-cent documentary boundary 1 remains nonblocking
+  ---
+  duration_ms: 1.017509
+  type: 'test'
+  ...
+# Subtest: integer-cent documentary boundary 2 remains nonblocking
+ok 12 - integer-cent documentary boundary 2 remains nonblocking
+  ---
+  duration_ms: 1.429213
+  type: 'test'
+  ...
+# Subtest: integer-cent documentary boundary 3 remains nonblocking
+ok 13 - integer-cent documentary boundary 3 remains nonblocking
+  ---
+  duration_ms: 0.829238
+  type: 'test'
+  ...
+# Subtest: integer-cent documentary boundary 4 remains nonblocking
+ok 14 - integer-cent documentary boundary 4 remains nonblocking
+  ---
+  duration_ms: 0.815057
+  type: 'test'
+  ...
+# Subtest: integer-cent documentary boundary 5 remains nonblocking
+ok 15 - integer-cent documentary boundary 5 remains nonblocking
+  ---
+  duration_ms: 0.914665
+  type: 'test'
+  ...
+# Subtest: beyond approved documentary boundary -6 remains a visible issue
+ok 16 - beyond approved documentary boundary -6 remains a visible issue
+  ---
+  duration_ms: 0.976757
+  type: 'test'
+  ...
+# Subtest: beyond approved documentary boundary 6 remains a visible issue
+ok 17 - beyond approved documentary boundary 6 remains a visible issue
+  ---
+  duration_ms: 0.813263
+  type: 'test'
+  ...
+# Subtest: beyond approved documentary boundary -100 remains a visible issue
+ok 18 - beyond approved documentary boundary -100 remains a visible issue
+  ---
+  duration_ms: 0.786194
+  type: 'test'
+  ...
+# Subtest: beyond approved documentary boundary 100 remains a visible issue
+ok 19 - beyond approved documentary boundary 100 remains a visible issue
+  ---
+  duration_ms: 1.456754
+  type: 'test'
+  ...
+# Subtest: documentary tolerance is not expanded outside GT/USD
+ok 20 - documentary tolerance is not expanded outside GT/USD
+  ---
+  duration_ms: 0.971459
+  type: 'test'
+  ...
+# Subtest: documentary tolerance is not expanded outside CO/COP
+ok 21 - documentary tolerance is not expanded outside CO/COP
+  ---
+  duration_ms: 0.766494
+  type: 'test'
+  ...
+# Subtest: documentary tolerance is not expanded outside CO/GTQ
+ok 22 - documentary tolerance is not expanded outside CO/GTQ
+  ---
+  duration_ms: 0.732303
+  type: 'test'
+  ...
+# Subtest: documentary tolerance is not expanded outside SV/USD
+ok 23 - documentary tolerance is not expanded outside SV/USD
+  ---
+  duration_ms: 0.92461
+  type: 'test'
+  ...
+# Subtest: five cents cannot hide receipt moneda drift
+ok 24 - five cents cannot hide receipt moneda drift
+  ---
+  duration_ms: 0.953973
+  type: 'test'
+  ...
+# Subtest: five cents cannot hide receipt pais drift
+ok 25 - five cents cannot hide receipt pais drift
+  ---
+  duration_ms: 0.897599
+  type: 'test'
+  ...
+# Subtest: five cents cannot hide receipt tenantId drift
+ok 26 - five cents cannot hide receipt tenantId drift
+  ---
+  duration_ms: 1.424235
+  type: 'test'
+  ...
+# Subtest: five cents cannot hide receipt clienteId drift
+ok 27 - five cents cannot hide receipt clienteId drift
+  ---
+  duration_ms: 1.003027
+  type: 'test'
+  ...
+# Subtest: duplicated installment sequence cannot be accepted as rounding
+ok 28 - duplicated installment sequence cannot be accepted as rounding
+  ---
+  duration_ms: 1.459849
+  type: 'test'
+  ...
+# Subtest: a different policy edition is not accepted via monetary proximity
+ok 29 - a different policy edition is not accepted via monetary proximity
+  ---
+  duration_ms: 0.754926
+  type: 'test'
+  ...
+# Subtest: configured generic0.09 cannot broaden the approved GTQ0.05 cap
+ok 30 - configured generic0.09 cannot broaden the approved GTQ0.05 cap
+  ---
+  duration_ms: 0.80403
+  type: 'test'
+  ...
+# Subtest: policy detail displays accepted variance and both amounts without a collection or bank adjustment
+ok 31 - policy detail displays accepted variance and both amounts without a collection or bank adjustment
+  ---
+  duration_ms: 13.899371
+  type: 'test'
+  ...
+# Subtest: same strict documentary helper contract on browser and canonical server owner
+ok 32 - same strict documentary helper contract on browser and canonical server owner
+  ---
+  duration_ms: 2.22481
+  type: 'test'
+  ...
+# Subtest: configuration renders the GTQ policy separately from generic comparison settings
+ok 33 - configuration renders the GTQ policy separately from generic comparison settings
+  ---
+  duration_ms: 2.584817
+  type: 'test'
+  ...
+# Subtest: documentary two-cent application preserves all original payment facts for qa_mapfre
+ok 34 - documentary two-cent application preserves all original payment facts for qa_mapfre
+  ---
+  duration_ms: 11.142157
+  type: 'test'
+  ...
+# Subtest: documentary two-cent application preserves all original payment facts for qa_el_roble
+ok 35 - documentary two-cent application preserves all original payment facts for qa_el_roble
+  ---
+  duration_ms: 1.392799
+  type: 'test'
+  ...
+# Subtest: documentary two-cent application preserves all original payment facts for qa_unknown_insurer
+ok 36 - documentary two-cent application preserves all original payment facts for qa_unknown_insurer
+  ---
+  duration_ms: 0.980553
+  type: 'test'
+  ...
+# Subtest: five cents inclusive accepts a documentary fact while retaining equal payment and obligation
+ok 37 - five cents inclusive accepts a documentary fact while retaining equal payment and obligation
+  ---
+  duration_ms: 0.908926
+  type: 'test'
+  ...
+# Subtest: negative five cents documents variance without a negative payment or changed obligation
+ok 38 - negative five cents documents variance without a negative payment or changed obligation
+  ---
+  duration_ms: 0.855186
+  type: 'test'
+  ...
+# Subtest: six cents documentary variance holds before all financial mutations
+ok 39 - six cents documentary variance holds before all financial mutations
+  ---
+  duration_ms: 2.066654
+  type: 'test'
+  ...
+# Subtest: existing real100 versus obligation100.02 holds with explicit residual; no payment becomes100.02
+ok 40 - existing real100 versus obligation100.02 holds with explicit residual; no payment becomes100.02
+  ---
+  duration_ms: 5.114713
+  type: 'test'
+  ...
+# Subtest: new actual payment 0 cannot close a100 obligation under documentary tolerance
+ok 41 - new actual payment 0 cannot close a100 obligation under documentary tolerance
+  ---
+  duration_ms: 2.141255
+  type: 'test'
+  ...
+# Subtest: new actual payment 0.01 cannot close a100 obligation under documentary tolerance
+ok 42 - new actual payment 0.01 cannot close a100 obligation under documentary tolerance
+  ---
+  duration_ms: 2.205741
+  type: 'test'
+  ...
+# Subtest: new actual payment 50 cannot close a100 obligation under documentary tolerance
+ok 43 - new actual payment 50 cannot close a100 obligation under documentary tolerance
+  ---
+  duration_ms: 2.121005
+  type: 'test'
+  ...
+# Subtest: new actual payment 99.95 cannot close a100 obligation under documentary tolerance
+ok 44 - new actual payment 99.95 cannot close a100 obligation under documentary tolerance
+  ---
+  duration_ms: 1.99717
+  type: 'test'
+  ...
+# Subtest: new actual payment 99.98 cannot close a100 obligation under documentary tolerance
+ok 45 - new actual payment 99.98 cannot close a100 obligation under documentary tolerance
+  ---
+  duration_ms: 1.922208
+  type: 'test'
+  ...
+# Subtest: new actual payment 100.02 cannot close a100 obligation under documentary tolerance
+ok 46 - new actual payment 100.02 cannot close a100 obligation under documentary tolerance
+  ---
+  duration_ms: 5.241441
+  type: 'test'
+  ...
+# Subtest: new actual payment 100.05 cannot close a100 obligation under documentary tolerance
+ok 47 - new actual payment 100.05 cannot close a100 obligation under documentary tolerance
+  ---
+  duration_ms: 1.392108
+  type: 'test'
+  ...
+# Subtest: new actual payment 101 cannot close a100 obligation under documentary tolerance
+ok 48 - new actual payment 101 cannot close a100 obligation under documentary tolerance
+  ---
+  duration_ms: 1.305569
+  type: 'test'
+  ...
+# Subtest: new exact payment remains usable and persists one paid event
+ok 49 - new exact payment remains usable and persists one paid event
+  ---
+  duration_ms: 0.813023
+  type: 'test'
+  ...
+# Subtest: does not extend five cents to GT/USD
+ok 50 - does not extend five cents to GT/USD
+  ---
+  duration_ms: 0.424894
+  type: 'test'
+  ...
+# Subtest: does not extend five cents to CO/COP
+ok 51 - does not extend five cents to CO/COP
+  ---
+  duration_ms: 0.35513
+  type: 'test'
+  ...
+# Subtest: does not extend five cents to CO/GTQ
+ok 52 - does not extend five cents to CO/GTQ
+  ---
+  duration_ms: 0.369932
+  type: 'test'
+  ...
+# Subtest: no monetary tolerance for existing payment polizaId mismatch
+ok 53 - no monetary tolerance for existing payment polizaId mismatch
+  ---
+  duration_ms: 0.447418
+  type: 'test'
+  ...
+# Subtest: no monetary tolerance for existing payment clienteId mismatch
+ok 54 - no monetary tolerance for existing payment clienteId mismatch
+  ---
+  duration_ms: 0.647957
+  type: 'test'
+  ...
+# Subtest: no monetary tolerance for existing payment tenantId mismatch
+ok 55 - no monetary tolerance for existing payment tenantId mismatch
+  ---
+  duration_ms: 0.594698
+  type: 'test'
+  ...
+# Subtest: no monetary tolerance for existing payment pais mismatch
+ok 56 - no monetary tolerance for existing payment pais mismatch
+  ---
+  duration_ms: 0.57644
+  type: 'test'
+  ...
+# Subtest: no monetary tolerance for existing payment moneda mismatch
+ok 57 - no monetary tolerance for existing payment moneda mismatch
+  ---
+  duration_ms: 0.580486
+  type: 'test'
+  ...
+# Subtest: source currency cannot bypass a previous exact request by sharing its idempotency digest
+ok 58 - source currency cannot bypass a previous exact request by sharing its idempotency digest
+  ---
+  duration_ms: 3.016491
+  type: 'test'
+  ...
+# Subtest: contradictory partialPayment cannot use rounding
+ok 59 - contradictory partialPayment cannot use rounding
+  ---
+  duration_ms: 0.372566
+  type: 'test'
+  ...
+# Subtest: contradictory reversal cannot use rounding
+ok 60 - contradictory reversal cannot use rounding
+  ---
+  duration_ms: 0.297234
+  type: 'test'
+  ...
+# Subtest: contradictory conflictingEvidence cannot use rounding
+ok 61 - contradictory conflictingEvidence cannot use rounding
+  ---
+  duration_ms: 0.289743
+  type: 'test'
+  ...
+# Subtest: absent original paidDate is not invented from an unproven invoice date
+ok 62 - absent original paidDate is not invented from an unproven invoice date
+  ---
+  duration_ms: 1.767006
+  type: 'test'
+  ...
+# Subtest: paid date aliases conflicting in stored payment hold before mutation
+ok 63 - paid date aliases conflicting in stored payment hold before mutation
+  ---
+  duration_ms: 0.715328
+  type: 'test'
+  ...
+# Subtest: documentary sub-cent input is not silently rounded into policy
+ok 64 - documentary sub-cent input is not silently rounded into policy
+  ---
+  duration_ms: 0.3011
+  type: 'test'
+  ...
+# Subtest: raw existing actual amount precision is not normalized by enrichment
+ok 65 - raw existing actual amount precision is not normalized by enrichment
+  ---
+  duration_ms: 0.738221
+  type: 'test'
+  ...
+# Subtest: existing payment provenance also survives the alternate reconcile_evidence owner path
+ok 66 - existing payment provenance also survives the alternate reconcile_evidence owner path
+  ---
+  duration_ms: 4.526525
+  type: 'test'
+  ...
+# Subtest: legacy paid receipt without a physical cobro retains its original payment provenance
+ok 67 - legacy paid receipt without a physical cobro retains its original payment provenance
+  ---
+  duration_ms: 0.711572
+  type: 'test'
+  ...
+# Subtest: conflicting amount aliases never become a monetary comparison
+ok 68 - conflicting amount aliases never become a monetary comparison
+  ---
+  duration_ms: 0.215271
+  type: 'test'
+  ...
+# Subtest: conflicting currency aliases cannot reuse an already committed request
+ok 69 - conflicting currency aliases cannot reuse an already committed request
+  ---
+  duration_ms: 1.026022
+  type: 'test'
+  ...
+# Subtest: legacy enrichment references the actual source receipt instead of inventing a preexisting cobro id
+ok 70 - legacy enrichment references the actual source receipt instead of inventing a preexisting cobro id
+  ---
+  duration_ms: 0.579775
+  type: 'test'
+  ...
+# Subtest: legacy payment without its event cannot invent a different paid amount from an invoice
+ok 71 - legacy payment without its event cannot invent a different paid amount from an invoice
+  ---
+  duration_ms: 0.358796
+  type: 'test'
+  ...
+# Subtest: contradictory existing policyId alias holds before enrichment
+ok 72 - contradictory existing policyId alias holds before enrichment
+  ---
+  duration_ms: 0.409241
+  type: 'test'
+  ...
+# Subtest: contradictory existing clientId alias holds before enrichment
+ok 73 - contradictory existing clientId alias holds before enrichment
+  ---
+  duration_ms: 0.258636
+  type: 'test'
+  ...
+# Subtest: contradictory existing receiptId alias holds before enrichment
+ok 74 - contradictory existing receiptId alias holds before enrichment
+  ---
+  duration_ms: 0.256653
+  type: 'test'
+  ...
+# Subtest: contradictory existing currency alias holds before enrichment
+ok 75 - contradictory existing currency alias holds before enrichment
+  ---
+  duration_ms: 0.350463
+  type: 'test'
+  ...
+# Subtest: contradictory existing country alias holds before enrichment
+ok 76 - contradictory existing country alias holds before enrichment
+  ---
+  duration_ms: 0.271766
+  type: 'test'
+  ...
+# Subtest: recorded monetary aliases with different amounts are not chosen by first-match order
+ok 77 - recorded monetary aliases with different amounts are not chosen by first-match order
+  ---
+  duration_ms: 0.333438
+  type: 'test'
+  ...
+# Subtest: equivalent country and currency labels preserve the existing valid application
+ok 78 - equivalent country and currency labels preserve the existing valid application
+  ---
+  duration_ms: 0.651723
+  type: 'test'
+  ...
+# Subtest: enrichment preserves absent original payment provenance separately from the new invoice
+ok 79 - enrichment preserves absent original payment provenance separately from the new invoice
+  ---
+  duration_ms: 1.062025
+  type: 'test'
+  ...
+# Subtest: enrichment preserves blank original payment provenance separately from the new invoice
+ok 80 - enrichment preserves blank original payment provenance separately from the new invoice
+  ---
+  duration_ms: 0.617802
+  type: 'test'
+  ...
+# Subtest: enrichment preserves null original payment provenance separately from the new invoice
+ok 81 - enrichment preserves null original payment provenance separately from the new invoice
+  ---
+  duration_ms: 0.566395
+  type: 'test'
+  ...
+# Subtest: unknown original method and support stay unknown while the application records the reported method and support
+ok 82 - unknown original method and support stay unknown while the application records the reported method and support
+  ---
+  duration_ms: 1.385027
+  type: 'test'
+  ...
+# Subtest: original support present only as soportePagoRef cannot acquire a contradictory new canonical support
+ok 83 - original support present only as soportePagoRef cannot acquire a contradictory new canonical support
+  ---
+  duration_ms: 0.846613
+  type: 'test'
+  ...
+# Subtest: existing contradictory support aliases in cobros hold before any financial write
+ok 84 - existing contradictory support aliases in cobros hold before any financial write
+  ---
+  duration_ms: 0.33525
+  type: 'test'
+  ...
+# Subtest: existing contradictory support aliases in recibosEsperados hold before any financial write
+ok 85 - existing contradictory support aliases in recibosEsperados hold before any financial write
+  ---
+  duration_ms: 0.232848
+  type: 'test'
+  ...
+# Subtest: legacy paid receipt without cobro or active portfolio cannot bypass recibosEsperados.country identity aliases
+ok 86 - legacy paid receipt without cobro or active portfolio cannot bypass recibosEsperados.country identity aliases
+  ---
+  duration_ms: 0.235141
+  type: 'test'
+  ...
+# Subtest: legacy paid receipt without cobro or active portfolio cannot bypass recibosEsperados.currency identity aliases
+ok 87 - legacy paid receipt without cobro or active portfolio cannot bypass recibosEsperados.currency identity aliases
+  ---
+  duration_ms: 0.197865
+  type: 'test'
+  ...
+# Subtest: legacy paid receipt without cobro or active portfolio cannot bypass recibosEsperados.policyId identity aliases
+ok 88 - legacy paid receipt without cobro or active portfolio cannot bypass recibosEsperados.policyId identity aliases
+  ---
+  duration_ms: 0.17468
+  type: 'test'
+  ...
+# Subtest: legacy paid receipt without cobro or active portfolio cannot bypass recibosEsperados.clientId identity aliases
+ok 89 - legacy paid receipt without cobro or active portfolio cannot bypass recibosEsperados.clientId identity aliases
+  ---
+  duration_ms: 0.153269
+  type: 'test'
+  ...
+# Subtest: legacy paid receipt without cobro or active portfolio cannot bypass polizas.country identity aliases
+ok 90 - legacy paid receipt without cobro or active portfolio cannot bypass polizas.country identity aliases
+  ---
+  duration_ms: 0.133159
+  type: 'test'
+  ...
+# Subtest: legacy paid receipt without cobro or active portfolio cannot bypass polizas.currency identity aliases
+ok 91 - legacy paid receipt without cobro or active portfolio cannot bypass polizas.currency identity aliases
+  ---
+  duration_ms: 0.128011
+  type: 'test'
+  ...
+# Subtest: legacy paid receipt without cobro or active portfolio cannot bypass polizas.clientId identity aliases
+ok 92 - legacy paid receipt without cobro or active portfolio cannot bypass polizas.clientId identity aliases
+  ---
+  duration_ms: 0.141912
+  type: 'test'
+  ...
+# Subtest: valid legacy receipt without cobro or portfolio still creates one exact canonical payment with original facts
+ok 93 - valid legacy receipt without cobro or portfolio still creates one exact canonical payment with original facts
+  ---
+  duration_ms: 0.626544
+  type: 'test'
+  ...
+# Subtest: contradictory or invalid recibosEsperados.primaTotal amount holds for both existing and new payments
+ok 94 - contradictory or invalid recibosEsperados.primaTotal amount holds for both existing and new payments
+  ---
+  duration_ms: 3.72638
+  type: 'test'
+  ...
+# Subtest: contradictory or invalid recibosEsperados.montoTotal amount holds for both existing and new payments
+ok 95 - contradictory or invalid recibosEsperados.montoTotal amount holds for both existing and new payments
+  ---
+  duration_ms: 2.529505
+  type: 'test'
+  ...
+# Subtest: contradictory or invalid carteraPrimas.montoTotal amount holds for both existing and new payments
+ok 96 - contradictory or invalid carteraPrimas.montoTotal amount holds for both existing and new payments
+  ---
+  duration_ms: 2.645207
+  type: 'test'
+  ...
+# Subtest: contradictory or invalid carteraPrimas.primaTotal amount holds for both existing and new payments
+ok 97 - contradictory or invalid carteraPrimas.primaTotal amount holds for both existing and new payments
+  ---
+  duration_ms: 1.989428
+  type: 'test'
+  ...
+# Subtest: contradictory or invalid recibosEsperados.monto amount holds for both existing and new payments
+ok 98 - contradictory or invalid recibosEsperados.monto amount holds for both existing and new payments
+  ---
+  duration_ms: 1.817622
+  type: 'test'
+  ...
+# Subtest: contradictory or invalid carteraPrimas.monto amount holds for both existing and new payments
+ok 99 - contradictory or invalid carteraPrimas.monto amount holds for both existing and new payments
+  ---
+  duration_ms: 1.988518
+  type: 'test'
+  ...
+# Subtest: contradictory or invalid recibosEsperados.monto amount holds for both existing and new payments
+ok 100 - contradictory or invalid recibosEsperados.monto amount holds for both existing and new payments
+  ---
+  duration_ms: 2.374713
+  type: 'test'
+  ...
+# Subtest: contradictory or invalid carteraPrimas.monto amount holds for both existing and new payments
+ok 101 - contradictory or invalid carteraPrimas.monto amount holds for both existing and new payments
+  ---
+  duration_ms: 2.130259
+  type: 'test'
+  ...
+# Subtest: saldo remains a balance and is not falsely treated as an alias of the original obligation total
+ok 102 - saldo remains a balance and is not falsely treated as an alias of the original obligation total
+  ---
+  duration_ms: 0.664792
+  type: 'test'
+  ...
+# Subtest: explicit actual-date evidence may fill an unknown payment date while preserving unknown source facts
+ok 103 - explicit actual-date evidence may fill an unknown payment date while preserving unknown source facts
+  ---
+  duration_ms: 0.742999
+  type: 'test'
+  ...
+# Subtest: alternate reconcile_evidence also keeps unknown original provenance separate from the application invoice
+ok 104 - alternate reconcile_evidence also keeps unknown original provenance separate from the application invoice
+  ---
+  duration_ms: 0.831801
+  type: 'test'
+  ...
+1..104
+# tests 104
+# suites 0
+# pass 104
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 247.835958

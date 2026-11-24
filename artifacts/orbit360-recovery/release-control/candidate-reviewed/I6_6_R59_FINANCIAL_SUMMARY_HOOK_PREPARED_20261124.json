@@ -1,0 +1,14 @@
+{
+  "schema": "GI_R59_FINANCIAL_SUMMARY_PREPARED_PATH_BINDING_V1",
+  "status": "RELATIVE_PATH_BINDINGS_FOR_ROOT_NOT_EXECUTED_CONFIG",
+  "helperRepositoryPath": "artifacts/orbit360-recovery/release-control/candidate-reviewed/I6_6_R59_FINANCIAL_SUMMARY_RECONCILIATION_PREPARED_20261124.cjs",
+  "helperSha256": "276fe37fe4a1d380a71b2a4e8086daf8473f2a023a7d0d6920ee264b44f2f7e6",
+  "censusSummaryRepositoryPath": "artifacts/orbit360-recovery/release-control/I6_6_SOURCE56_NINE_DOCUMENTARY_FACTS_SANITIZED_20261124_R59.json",
+  "censusSummarySha256": "ffb98ee37b047d70b912c1ef8c1fe1ab650a7bc07f8a2fa4bcb848c5c0f2d7c2",
+  "previousProgressVersion": 58,
+  "nextProgressVersion": 59,
+  "previousProgressBlob": "0e75eb9edf5cdc3702f37a53bb1bf2f20ceb0fd4",
+  "conversion": "Root resolves these two repository paths to absolute files for the existing helper/integrator; preserve the helper/census hashes and baseline CAS. No active controls are changed by this file.",
+  "financialMutations": 0,
+  "changesOnlyCurrentSummariesAndPreservesHistory": true
+}

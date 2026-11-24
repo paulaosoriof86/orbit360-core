@@ -1,0 +1,30 @@
+{
+  "schema": "GI_DOCUMENTARY_PAYMENT_UI_ISOLATED_DRAFT_TEST_V1",
+  "status": "LOCAL_PAYLOAD_AND_GUARDS_PASS_UI_UNVERIFIED",
+  "passed": 15,
+  "checks": [
+    "R46 exact two payloads and request IDs, without invented fields",
+    "Missing explicit documentary review blocks before command",
+    "Already paid receipt blocks new payment",
+    "Inconsistent gross aliases are not silently corrected",
+    "Actual payment date cannot be invented from the source cut",
+    "Actual payment after document cut is rejected",
+    "Invalid calendar dates are rejected",
+    "Drive reference accepts exact original and rejects untrusted host",
+    "Proposal application namespace cannot be forged in this form",
+    "Generated operation ID is stable for replay and changes with evidence",
+    "Manual payment remains outside documentary requirements",
+    "Missing tenant identity blocks command preparation",
+    "Amount precision and zero gross are rejected without rounding money",
+    "Exact canonical response passes and contradictory responses require readback",
+    "Documentary UI source explicitly gates notices and double submission"
+  ],
+  "liveCalls": 0,
+  "remoteDataWrites": 0,
+  "notificationsSent": 0,
+  "authChanges": 0,
+  "productionAccepted": false,
+  "sourceEditedInRepository": false,
+  "browserTests": "NOT_COMPLETED",
+  "browserBlock": "Chromium local launch observed socket() Operation not permitted; no visual or signed UI PASS claimed."
+}

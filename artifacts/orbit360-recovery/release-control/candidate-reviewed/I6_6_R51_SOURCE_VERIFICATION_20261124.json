@@ -1,0 +1,138 @@
+{
+  "status": "FROZEN_SOURCE_PROPOSAL_INDEPENDENT_REVIEW_PASS_NOT_UI_OR_LIVE",
+  "baseSourceSha": "478c045c168c2e1b80f28a94094f4dbbbfdf1f81",
+  "patchCheckHead": "fbe7f289ce60cb3a8232d9c5886441c180cb72d4",
+  "authority": {
+    "r51Path": "artifacts/orbit360-recovery/release-control/I6_6_DIRECTION_URGENT_COMPLETION_TOLERANCE_AND_DIRECT_RENEWAL_20261124.json",
+    "r51Blob": "c1e69da9d018a75c0a73c5dbf3a3495e9afcd550",
+    "priorD01Blob": "53b08239aa8807378ec95a4b4704c5d97622bc84",
+    "paymentInferenceCanonicalLock": "artifacts/orbit360-recovery/release-control/I6_5_I6_6_PAYMENT_INFERENCE_RECONCILIATION_LOCK_V2_20260930.json"
+  },
+  "ownerPins": {
+    "functions/cobros-reconciliation-domain.js": {
+      "beforeBlob": "add21a5888f61fceea5ffd7aef7cf7318a31225e",
+      "candidateBlob": "3d84423fd985841c6f9b230dcf729b41f2512556",
+      "candidateSha256": "32d92a9b3c13827f1f2d2073888b0ab833ebc4b18395d761765713077c173831"
+    },
+    "functions/payment-inference-engine.js": {
+      "beforeBlob": "5bebc3d134a129c608125b36da0109dfc52b812f",
+      "candidateBlob": "a3d6bf99288c0c309759dce954d48c1ecc4db9dc",
+      "candidateSha256": "ac185dec4b3e1e83609cbc102e89021a6feacccb8ef53fdcfcbf59a99d0555c3"
+    },
+    "orbit360-platform/core/primas.js": {
+      "beforeBlob": "fbd41a84bba4a5083027689a457b427dac88f36e",
+      "candidateBlob": "0d5d343ef11760312092314b719fc82da0eaa147",
+      "candidateSha256": "65c4ee0c74d8564700b5389775e51c992815cbaa0e42acc4842d64efee568e22"
+    },
+    "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js": {
+      "beforeBlob": "25f557054a37c7116fa88863a7357ed79d8a82e0",
+      "candidateBlob": "97d30b85b5c59b2c84b25dfe85aa0daeea4c74c2",
+      "candidateSha256": "fbb7c8faba442e0ea06eb8376e6ea3173892c423dd02198a23e07d5fa99fbb55"
+    },
+    "orbit360-platform/modules/config-domain-v20260804-bridge.js": {
+      "beforeBlob": "30fa9845bb38a3dc0ff72771675fdf1e9aa25625",
+      "candidateBlob": "b0c3d6e2399ab9a13a60ea473fc8cc1e9edd00f9",
+      "candidateSha256": "d87ce4a2c21734f00cf66970588b3b5d4be0e8bdb40cb823e0f9b4e090ea3862"
+    }
+  },
+  "proposedTests": {
+    "tools/gravicentra-i6-6-r51-payment-application-preservation.test.cjs": {
+      "blob": "b519081d11a4309d3eea6a58c7e6831bbecdd189",
+      "sha256": "ec52b3393fb0569af0b99dea7c59915c296a6061a1c6efc72b530cda4e6edb95"
+    },
+    "tools/gravicentra-i6-6-r51-documentary-variance.test.cjs": {
+      "blob": "637a2b5c5980d5dab850f61e2f67376130090a4a",
+      "sha256": "b1f3f1661318eb6c405e4a7ca58ead3c3177f06b80b2ced7e5746ac16a560306"
+    }
+  },
+  "newTests": {
+    "baseline": {
+      "exitCode": 1,
+      "tests": 103,
+      "pass": 3,
+      "fail": 100,
+      "report": "/workspace/scratch/9c43cd389fa2/continuity-evidence/r51-general-tolerance-proposal/baseline-new-tests.tap"
+    },
+    "review-preimage": {
+      "exitCode": 1,
+      "tests": 103,
+      "pass": 79,
+      "fail": 24,
+      "report": "/workspace/scratch/9c43cd389fa2/continuity-evidence/r51-general-tolerance-proposal/review-preimage-new-tests.tap"
+    },
+    "candidate": {
+      "exitCode": 0,
+      "tests": 103,
+      "pass": 103,
+      "fail": 0,
+      "report": "/workspace/scratch/9c43cd389fa2/continuity-evidence/r51-general-tolerance-proposal/candidate-new-tests.tap"
+    }
+  },
+  "regression": {
+    "proposal-application-boundary.test.cjs": {
+      "status": "PASS",
+      "checks": 88,
+      "scope": "ACTUAL_CALLABLE_SYNTHETIC_TRANSACTION_DOUBLE",
+      "cloudWrites": 0
+    },
+    "inference-bank-exact-amount.test.cjs": {
+      "status": "PASS",
+      "checks": 17,
+      "scope": "BANK_EXACT_AMOUNT_CURRENCY_ONLY",
+      "businessWrites": 0
+    },
+    "documented-premium-terms.test.cjs": {
+      "tests": 78,
+      "pass": 78,
+      "fail": 0
+    }
+  },
+  "candidateTotalNewCases": 103,
+  "existingRegressions": 183,
+  "totalPassingTestsAndChecks": 286,
+  "patch": {
+    "path": "/workspace/scratch/9c43cd389fa2/continuity-evidence/r51-general-tolerance-proposal/r51-general-documentary-tolerance-and-payment-preservation.patch",
+    "sha256": "bfc36d6a6590cd6b881b635bdcdfd742f6e86145592250383cc8e1adef4a38db",
+    "gitApplyCheck": "PASS"
+  },
+  "repoFilesChangedByThisProposal": 0,
+  "repoCommits": 0,
+  "cloudWrites": 0,
+  "realCustomerWrites": 0,
+  "deployments": 0,
+  "urgentProductBuildIncluded": false,
+  "authenticatedUiTestPerformed": false,
+  "liveAccepted": false,
+  "priorIndependentReview": {
+    "reviewedPatchSha256": "8d070366568a0326d02799e372d497b034aecb2be5a472fcb109501b3e3df6b9",
+    "reviewedCobrosBlob": "06740c5e566b43209fdc58e5d37bdc76423642ab",
+    "reviewReportSha256": "92559139f6b539a72c5bb54661d4199f643a895346c7c3ce8eba6b0b594aed5a",
+    "correctedFindings": [
+      "Unknown, blank and null original provenance stays separate from new application evidence.",
+      "Identity alias validation runs even for a paid legacy receipt without cobro or active portfolio.",
+      "Receipt and portfolio monetary aliases and precision are validated before any transactional write."
+    ],
+    "nextReviewStatus": "FIVE_UNCHANGED_PROBES_PASS_ON_EXACT_NEW_PATCH"
+  },
+  "preservedBankChecks": [
+    "functions/payment-inference-engine.js BANK_STATEMENT_MATCH exact amount/currency",
+    "functions/proposal-application-boundary.js immutable source and bank exactness",
+    "functions/cobros-reconciliation-domain.js sourceIntakeBinding bank exactness"
+  ],
+  "newGuardExplicitlyIdentified": "PAYMENT_AMOUNT_REQUIRES_EXACT_ALLOCATION blocks a new positive payment different from the obligation; the old writer did not implement this guard.",
+  "existingPaymentResidual": "PAYMENT_EXISTING_RESIDUAL_REQUIRES_ALLOCATION reports exact residual in error details and commits zero financial writes, even inside five cents.",
+  "policyScope": "GT/GTQ documentary variations <=5 cents, all insurers, exact canonical identity and complete calendar. No payment settlement from tolerance.",
+  "integrationRequired": [
+    "Update the existing source QA workflow to run the two proposed tests.",
+    "Refresh existing product/financial owner pins and canonical manifests for the five source owners.",
+    "Use a subsequent immutable source/artifact; do not alter the urgent renewal and endorsement build.",
+    "Exercise existing authenticated payment UI and reload/readback for exact application, documentary rounding and residual HOLD in the active Preview/LIVE gates."
+  ],
+  "proposalFrozen": true,
+  "independentReview": {
+    "file": "/workspace/scratch/9c43cd389fa2/continuity-evidence/r51-general-tolerance-proposal/independent-validation.json",
+    "sha256": "c4fec8ca57bb11f292b96ad6d239d863547bbc477e237845492afe829bd6f41d",
+    "casesPassed": 5,
+    "status": "FIVE_PRIOR_REVIEW_PROBES_VERIFIED_FIXED_NOT_UI_OR_LIVE_ACCEPTANCE"
+  }
+}

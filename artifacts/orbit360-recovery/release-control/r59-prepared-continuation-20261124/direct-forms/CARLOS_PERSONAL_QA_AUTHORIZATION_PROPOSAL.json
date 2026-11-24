@@ -1,0 +1,88 @@
+{
+  "schema": "I66_CARLOS_OPERATIVO_PERSONAL_LEGAL_QA_AUTHORIZATION_PROPOSAL_V1",
+  "status": "PENDING_PERSONAL_AUTHORIZATION",
+  "authorizationGranted": false,
+  "personalDecisionObserved": false,
+  "proposalOnly": true,
+  "acceptanceImplemented": false,
+  "subject": {
+    "person": "Carlos Castro",
+    "activeRole": "Operativo",
+    "tenantId": "alianzas-soluciones",
+    "country": "GT",
+    "company": "Alianzas & Soluciones",
+    "exactUid": null,
+    "exactUidMustBeResolvedFromExistingMembership": true
+  },
+  "reviewedPresentation": {
+    "title": "Acuerdos legales",
+    "version": "2.0",
+    "type": "interno",
+    "clauses": [
+      "confidencialidad",
+      "tratamiento_datos",
+      "descargo_ia"
+    ],
+    "termsSha256": "485b07887091063cc7a5d1dc8f11a9bb547f2ef059490bb04d4acee73404f6b2",
+    "legalOwnerSha256": "b74a965b7be0d67862d82bcf73dacc0d5a8293dcf30cb4f5f3fdeaa6ee1c68a3",
+    "checkboxText": "He leído y acepto íntegramente los acuerdos anteriores.",
+    "buttonText": "Aceptar y continuar",
+    "exactReviewFile": "AVISO_LEGAL_Y_ALCANCE_QA.md",
+    "exactReviewSha256": "5192563d9e352e234d493aee1bae607760b42f965409762f3fb7a9bd431a13ae"
+  },
+  "requestedExecutionScope": {
+    "purpose": "Pruebas QA firmadas de renovación directa y registro de endoso emitido en las entradas reales, exclusivamente con los fixtures sintéticos autorizados y restauración comprobada.",
+    "preview": {
+      "origin": null,
+      "mustEqualBuiltSuccessorPreviewOrigin": true,
+      "currentChannelOriginForReview": "https://ays-orbit-360-lab--gi-i66-rc-45448470011-hrham9ah.web.app"
+    },
+    "live": {
+      "origin": "https://app.aysseguros.com",
+      "requiresSameExactSuccessorArtifact": true
+    },
+    "successorBinding": {
+      "requestVersion": null,
+      "sourceSha": null,
+      "buildId": null,
+      "buildRunId": null,
+      "artifactId": null,
+      "artifactDigest": null,
+      "mustBeCompletedAndVerifiedBeforeExecution": true
+    },
+    "otherActors": false,
+    "otherRoles": false,
+    "otherCountries": false,
+    "otherTermsOrVersions": false,
+    "futureSuccessors": false,
+    "authOrMembershipWrites": false,
+    "roleChanges": false,
+    "realCustomerWrites": false,
+    "payments": false,
+    "externalMessages": false,
+    "businessWrites": "Only previously authorized uniquely owned synthetic QA fixtures in the appropriate phase, with before/after and restore; Preview retains its readonly draft boundary.",
+    "storageSeeding": false,
+    "gateBypass": false,
+    "forceClick": false,
+    "timeoutIncrease": false
+  },
+  "currentAuthorityBoundary": {
+    "directionAuthorizationAppliesToCarlos": false,
+    "directionScopesOnly": "Paula / Dirección / GT",
+    "e4PersonalAcceptanceReported": true,
+    "e4Origin": "https://ays-orbit-360-lab--gi-i65-b4-e4-41711238558-wrf29bx0.web.app",
+    "e4TermsEqualReviewedCurrentTerms": true,
+    "e4AcceptanceRecordReused": false,
+    "e4ReceiptProvesCurrentOriginAcceptance": false
+  },
+  "executionRequirements": [
+    "Explicit applicable personal authorization must be present before any acceptance action for Carlos.",
+    "Do not infer authorization from the Direction scope, the E4 receipt, the urgency of release or this proposal.",
+    "Bind the reviewed decision to the exact future successor source/artifact and actual Preview origin before execution.",
+    "Verify the displayed country, company, clauses, version and terms digest; stop on any difference.",
+    "Retain signed UI/readback/reload and synthetic restoration evidence without claiming any real customer legal decision."
+  ],
+  "authorizationRecord": null,
+  "userQuote": null,
+  "acceptedAt": null
+}

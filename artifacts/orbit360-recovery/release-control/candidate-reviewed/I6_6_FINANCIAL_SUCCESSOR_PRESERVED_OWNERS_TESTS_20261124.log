@@ -1,0 +1,329 @@
+TAP version 13
+# Subtest: script compiles and retains canonical callable applyPayment once
+ok 1 - script compiles and retains canonical callable applyPayment once
+  ---
+  duration_ms: 3.347024
+  type: 'test'
+  ...
+# Subtest: Firebase permission denied is known failure without arbitrary server text
+ok 2 - Firebase permission denied is known failure without arbitrary server text
+  ---
+  duration_ms: 0.520647
+  type: 'test'
+  ...
+# Subtest: Firestore post-commit readback data-loss is uncertain, never assert no save
+ok 3 - Firestore post-commit readback data-loss is uncertain, never assert no save
+  ---
+  duration_ms: 0.289673
+  type: 'test'
+  ...
+# Subtest: network and timeout errors must request readback before retrying
+ok 4 - network and timeout errors must request readback before retrying
+  ---
+  duration_ms: 0.26813
+  type: 'test'
+  ...
+# Subtest: unknown and malformed errors are sanitized, fail closed and disclose no raw details
+ok 5 - unknown and malformed errors are sanitized, fail closed and disclose no raw details
+  ---
+  duration_ms: 0.271586
+  type: 'test'
+  ...
+# Subtest: known local domain availability failures are identifiable before a write
+ok 6 - known local domain availability failures are identifiable before a write
+  ---
+  duration_ms: 0.203424
+  type: 'test'
+  ...
+# Subtest: request ID is sanitized and bounded for Ops support
+ok 7 - request ID is sanitized and bounded for Ops support
+  ---
+  duration_ms: 0.255481
+  type: 'test'
+  ...
+# Subtest: catch displays status with category, request reference, and no unqualified no-save claim
+ok 8 - catch displays status with category, request reference, and no unqualified no-save claim
+  ---
+  duration_ms: 0.358275
+  type: 'test'
+  ...
+# Subtest: a server-confirmed previous payment is distinct from a missing active portfolio and an uncertain request
+ok 9 - a server-confirmed previous payment is distinct from a missing active portfolio and an uncertain request
+  ---
+  duration_ms: 0.37568
+  type: 'test'
+  ...
+# Subtest: signed driver binds phase, exact permitted origin, source and immutable package; no stale source fallback
+ok 10 - signed driver binds phase, exact permitted origin, source and immutable package; no stale source fallback
+  ---
+  duration_ms: 4.017745
+  type: 'test'
+  ...
+# Subtest: fixtures isolate both signed roles with expired UNKNOWN source, no seeded approval and no real adviser or accounts
+ok 11 - fixtures isolate both signed roles with expired UNKNOWN source, no seeded approval and no real adviser or accounts
+  ---
+  duration_ms: 5.493057
+  type: 'test'
+  ...
+# Subtest: no outbound profile rejects external, unknown and malformed channels before any business submission
+ok 12 - no outbound profile rejects external, unknown and malformed channels before any business submission
+  ---
+  duration_ms: 0.380668
+  type: 'test'
+  ...
+# Subtest: restoration accepts only unique synthetic lineage and signed management identity
+ok 13 - restoration accepts only unique synthetic lineage and signed management identity
+  ---
+  duration_ms: 0.733625
+  type: 'test'
+  ...
+# Subtest: client restore admits only canonical derived state and actor metadata; Preview seeds stay byte-equivalent
+ok 14 - client restore admits only canonical derived state and actor metadata; Preview seeds stay byte-equivalent
+  ---
+  duration_ms: 2.021657
+  type: 'test'
+  ...
+# Subtest: restoration checks identity before compare-and-delete and propagates version conflicts without fallback
+ok 15 - restoration checks identity before compare-and-delete and propagates version conflicts without fallback
+  ---
+  duration_ms: 0.58307
+  type: 'test'
+  ...
+# Subtest: restore barrier waits for the real writer pending counter before closing the session or allowing deletion
+ok 16 - restore barrier waits for the real writer pending counter before closing the session or allowing deletion
+  ---
+  duration_ms: 0.438604
+  type: 'test'
+  ...
+# Subtest: failed writer drain closes the browser but prevents restoration from claiming completion
+ok 17 - failed writer drain closes the browser but prevents restoration from claiming completion
+  ---
+  duration_ms: 0.213659
+  type: 'test'
+  ...
+# Subtest: public entry waits for the visible inherited form, edits without source writes, and never shortcuts the approval decision
+ok 18 - public entry waits for the visible inherited form, edits without source writes, and never shortcuts the approval decision
+  ---
+  duration_ms: 7.071592
+  type: 'test'
+  ...
+# Subtest: missing write adapter never satisfies the idle barrier
+ok 19 - missing write adapter never satisfies the idle barrier
+  ---
+  duration_ms: 0.370072
+  type: 'test'
+  ...
+# Subtest: signed report has exact phase coverage; readonly Preview cannot satisfy LIVE
+ok 20 - signed report has exact phase coverage; readonly Preview cannot satisfy LIVE
+  ---
+  duration_ms: 0.606445
+  type: 'test'
+  ...
+# Subtest: signed report rejects stale artifact, partial actors, wrong entry, errors, incomplete restoration and real/outbound writes
+ok 21 - signed report rejects stale artifact, partial actors, wrong entry, errors, incomplete restoration and real/outbound writes
+  ---
+  duration_ms: 1.342683
+  type: 'test'
+  ...
+# Subtest: signed report requires actual LIVE UI write/readback/reload/replay and refuses any Preview write PASS
+ok 22 - signed report requires actual LIVE UI write/readback/reload/replay and refuses any Preview write PASS
+  ---
+  duration_ms: 0.88437
+  type: 'test'
+  ...
+# Subtest: Operativo: issued beneficiary endorsement is applied from the policy form and its canonical management is closed
+ok 23 - Operativo: issued beneficiary endorsement is applied from the policy form and its canonical management is closed
+  ---
+  duration_ms: 10.705034
+  type: 'test'
+  ...
+# Subtest: Dirección: issued beneficiary endorsement is applied from the policy form and its canonical management is closed
+ok 24 - Dirección: issued beneficiary endorsement is applied from the policy form and its canonical management is closed
+  ---
+  duration_ms: 3.082971
+  type: 'test'
+  ...
+# Subtest: Admin: issued beneficiary endorsement is applied from the policy form and its canonical management is closed
+ok 25 - Admin: issued beneficiary endorsement is applied from the policy form and its canonical management is closed
+  ---
+  duration_ms: 3.233886
+  type: 'test'
+  ...
+# Subtest: AdminTenant: issued beneficiary endorsement is applied from the policy form and its canonical management is closed
+ok 26 - AdminTenant: issued beneficiary endorsement is applied from the policy form and its canonical management is closed
+  ---
+  duration_ms: 2.974979
+  type: 'test'
+  ...
+# Subtest: SuperAdmin: issued beneficiary endorsement is applied from the policy form and its canonical management is closed
+ok 27 - SuperAdmin: issued beneficiary endorsement is applied from the policy form and its canonical management is closed
+  ---
+  duration_ms: 4.467607
+  type: 'test'
+  ...
+# Subtest: Payment plan and risk correction inherit editable policy values and use their approved owners
+ok 28 - Payment plan and risk correction inherit editable policy values and use their approved owners
+  ---
+  duration_ms: 9.375411
+  type: 'test'
+  ...
+# Subtest: Vehicle substitution keeps its identification checks and the old risk history
+ok 29 - Vehicle substitution keeps its identification checks and the old risk history
+  ---
+  duration_ms: 3.618128
+  type: 'test'
+  ...
+# Subtest: Advisor and unsupported endorsement types retain request-only behavior
+ok 30 - Advisor and unsupported endorsement types retain request-only behavior
+  ---
+  duration_ms: 4.305384
+  type: 'test'
+  ...
+# Subtest: Missing issued evidence, empty beneficiaries and revoked role cannot create a request or modify a policy
+ok 31 - Missing issued evidence, empty beneficiaries and revoked role cannot create a request or modify a policy
+  ---
+  duration_ms: 4.724801
+  type: 'test'
+  ...
+# Subtest: A failed closeout is retried from the same form without repeating the committed policy change
+ok 32 - A failed closeout is retried from the same form without repeating the committed policy change
+  ---
+  duration_ms: 2.590305
+  type: 'test'
+  ...
+# Subtest: Conflicting existing request cannot be silently applied or overwritten
+ok 33 - Conflicting existing request cannot be silently applied or overwritten
+  ---
+  duration_ms: 1.858063
+  type: 'test'
+  ...
+# Subtest: A second click while the canonical request is pending cannot create a duplicate
+ok 34 - A second click while the canonical request is pending cannot create a duplicate
+  ---
+  duration_ms: 2.598167
+  type: 'test'
+  ...
+# I66_DIRECT_PAYMENT_OPTIONAL_DOCUMENT_NO_BLOCK_SOURCE_CONTRACT_PASS; signed runtime readback still required
+# Subtest: tools/gravicentra-i6-6-payment-optional-evidence.test.cjs
+ok 4 - tools/gravicentra-i6-6-payment-optional-evidence.test.cjs
+  ---
+  duration_ms: 72.488439
+  type: 'test'
+  ...
+# Subtest: Renovaciones / Operativo: expired UNKNOWN opens same inherited editable draft without Ops or writes
+ok 36 - Renovaciones / Operativo: expired UNKNOWN opens same inherited editable draft without Ops or writes
+  ---
+  duration_ms: 26.015491
+  type: 'test'
+  ...
+# Subtest: Renovaciones / Dirección: expired UNKNOWN opens same inherited editable draft without Ops or writes
+ok 37 - Renovaciones / Dirección: expired UNKNOWN opens same inherited editable draft without Ops or writes
+  ---
+  duration_ms: 3.341256
+  type: 'test'
+  ...
+# Subtest: Renovaciones / Admin: expired UNKNOWN opens same inherited editable draft without Ops or writes
+ok 38 - Renovaciones / Admin: expired UNKNOWN opens same inherited editable draft without Ops or writes
+  ---
+  duration_ms: 2.09085
+  type: 'test'
+  ...
+# Subtest: Renovaciones / AdminTenant: expired UNKNOWN opens same inherited editable draft without Ops or writes
+ok 39 - Renovaciones / AdminTenant: expired UNKNOWN opens same inherited editable draft without Ops or writes
+  ---
+  duration_ms: 2.819988
+  type: 'test'
+  ...
+# Subtest: Renovaciones / SuperAdmin: expired UNKNOWN opens same inherited editable draft without Ops or writes
+ok 40 - Renovaciones / SuperAdmin: expired UNKNOWN opens same inherited editable draft without Ops or writes
+  ---
+  duration_ms: 1.768629
+  type: 'test'
+  ...
+# Subtest: Cliente360 / Operativo: expired UNKNOWN opens same inherited editable draft without Ops or writes
+ok 41 - Cliente360 / Operativo: expired UNKNOWN opens same inherited editable draft without Ops or writes
+  ---
+  duration_ms: 1.956039
+  type: 'test'
+  ...
+# Subtest: Cliente360 / Dirección: expired UNKNOWN opens same inherited editable draft without Ops or writes
+ok 42 - Cliente360 / Dirección: expired UNKNOWN opens same inherited editable draft without Ops or writes
+  ---
+  duration_ms: 2.246132
+  type: 'test'
+  ...
+# Subtest: Cliente360 / Admin: expired UNKNOWN opens same inherited editable draft without Ops or writes
+ok 43 - Cliente360 / Admin: expired UNKNOWN opens same inherited editable draft without Ops or writes
+  ---
+  duration_ms: 2.230288
+  type: 'test'
+  ...
+# Subtest: Cliente360 / AdminTenant: expired UNKNOWN opens same inherited editable draft without Ops or writes
+ok 44 - Cliente360 / AdminTenant: expired UNKNOWN opens same inherited editable draft without Ops or writes
+  ---
+  duration_ms: 2.732748
+  type: 'test'
+  ...
+# Subtest: Cliente360 / SuperAdmin: expired UNKNOWN opens same inherited editable draft without Ops or writes
+ok 45 - Cliente360 / SuperAdmin: expired UNKNOWN opens same inherited editable draft without Ops or writes
+  ---
+  duration_ms: 2.851305
+  type: 'test'
+  ...
+# Subtest: Confirmed-renewable source also enters the same form immediately; existing approval is reused
+ok 46 - Confirmed-renewable source also enters the same form immediately; existing approval is reused
+  ---
+  duration_ms: 5.513918
+  type: 'test'
+  ...
+# Subtest: Annual dates recalculate from edited start, preserve document override and number remains editable
+ok 47 - Annual dates recalculate from edited start, preserve document override and number remains editable
+  ---
+  duration_ms: 1.870712
+  type: 'test'
+  ...
+# Subtest: Asesor and denied Operativo retain the review management path for UNKNOWN and cannot open direct issuance
+ok 48 - Asesor and denied Operativo retain the review management path for UNKNOWN and cannot open direct issuance
+  ---
+  duration_ms: 7.495004
+  type: 'test'
+  ...
+# Subtest: NO renewability, cancellation, successor and lineage conflicts do not become draft eligibility
+ok 49 - NO renewability, cancellation, successor and lineage conflicts do not become draft eligibility
+  ---
+  duration_ms: 12.079636
+  type: 'test'
+  ...
+# Subtest: No approval or issued support means no canonical management and no issuance
+ok 50 - No approval or issued support means no canonical management and no issuance
+  ---
+  duration_ms: 2.002959
+  type: 'test'
+  ...
+# Subtest: Both entries use the real canonical issuance owner after durable approval; edited inherited fields produce one linked successor
+ok 51 - Both entries use the real canonical issuance owner after durable approval; edited inherited fields produce one linked successor
+  ---
+  duration_ms: 16.084802
+  type: 'test'
+  ...
+# Subtest: Double submit waits for durable approval; rejected or absent readback retains the editable draft without issuance
+ok 52 - Double submit waits for durable approval; rejected or absent readback retains the editable draft without issuance
+  ---
+  duration_ms: 3.52497
+  type: 'test'
+  ...
+# Subtest: Permission or source outcome changed after draft opening cannot create approval or emit
+ok 53 - Permission or source outcome changed after draft opening cannot create approval or emit
+  ---
+  duration_ms: 8.139106
+  type: 'test'
+  ...
+1..53
+# tests 53
+# suites 0
+# pass 53
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 194.700818

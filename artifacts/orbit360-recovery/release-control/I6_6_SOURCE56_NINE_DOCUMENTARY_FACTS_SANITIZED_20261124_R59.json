@@ -1,0 +1,194 @@
+{
+  "schema": "GI_I66_EXISTING_SOURCE56_PAYMENT_DISPOSITION_SUMMARY_V1",
+  "status": "FRESH_EXISTING_READONLY_JOB_CONFIRMED_NINE_DOCUMENTARY_FACTS_REMAIN_OPEN",
+  "source": {
+    "path": "artifacts/orbit360-recovery/source-batches/I6_6_NEW_INSURER_SOURCE_DELTA_20261124.json",
+    "gitBlobSha": "ebf7350a664c851fe82f28eae241efc76bba7e1e",
+    "sha256": "68ebdc6f04e0ee5e4d7aa92b2a3bd9564f17a8a5e7b23528522cc6381f782805"
+  },
+  "artifact": {
+    "runId": 45364013332,
+    "runAttempt": 2,
+    "jobId": 138708388539,
+    "artifactId": 14956230418,
+    "archiveSha256": "7a42fa8f45087c17905f1ee16209bc74718878ea9bdd9ea02dc4f25904240d58",
+    "reportSha256": "5863ff5bbc2ddfee9eee998165ce194763f430ce89c6e757a2ab0fcfbf2c950f",
+    "observedAtUtc": "2026-11-24T19:15:44Z",
+    "financialCensusSha256": "5f74f657b88ba79170ef7c75572289904ed6dec4b8af4592b77326cd43fa8dd7",
+    "identityReportSha256": "ca2b3fd45ce4e80b3ffc1cc7d98455af3c2b73e04b9713656beee1b6b95aefe6",
+    "actualSourceSha": "7b8837886debc8af8b4cf2427f045f009e4822a6",
+    "mode": "case-readback",
+    "readOnly": true,
+    "writes": 0,
+    "protectedApplyJobsSkipped": 6,
+    "oldArtifactId": 14906940722,
+    "oldArtifactSha256": "aae609eb9b5f4f5284d6c9abaf1fb203a374b563436edffa9a02db0681c14f55",
+    "oldArtifactStillPresent": true,
+    "sourceFacts": 56,
+    "candidatePolicyEditions": 61,
+    "exactNineFactsSelectedAfterRead": true,
+    "fullDataCountsAreDiagnosticAndNotPaymentIncrements": true
+  },
+  "counts": {
+    "distinctDocumentaryFacts": 56,
+    "positivePaidSourceFacts": 9,
+    "positivePaidSourceGrossCents": 730803,
+    "extraMapfreCommissionAnchorInReviewedPaymentUnion": 1,
+    "reviewedUniquePaymentFacts": 10,
+    "excludedAlreadyAppliedPaymentFacts": 1,
+    "pendingUniquePaymentFacts": 9,
+    "preparedCanonicalMapfrePaymentFacts": 2,
+    "preparedCanonicalMapfreGrossCents": 25554,
+    "otherHeldPaymentFacts": 7,
+    "heldPaymentSourceGrossCents": 570091,
+    "eligibleAdditionalPaymentsCertified": 0,
+    "newPaymentsExecutedByThisReview": 0,
+    "documentaryAmountsAreNotIncrementalPaymentsOrBalances": true,
+    "heldIncludesNewMedicalPolicyPaidInstallment2": true,
+    "paidInstallment2NotCountedAsAdditionalEighthHold": true
+  },
+  "heldCases": [
+    {
+      "caseId": "DOC-01",
+      "insurer": "MAPFRE",
+      "sourceFactIdSha256": "bc4413585ef16dae0f8fcea13acf138c58e1feca3705397b8bac70c8386d39b0",
+      "disposition": "HOLD_DOCUMENTARY_SCHEDULE_CONFLICT",
+      "writeEligibilityCertified": false
+    },
+    {
+      "caseId": "DOC-02",
+      "insurer": "MAPFRE",
+      "sourceFactIdSha256": "6a3368bcb862a10e25083bae7c3933f6549814e567ccf54cfb66f6be37cf20fb",
+      "disposition": "HOLD_IDENTITY_INSTALLMENT_AND_EXISTING_PAYMENT_VARIANCE",
+      "writeEligibilityCertified": false
+    },
+    {
+      "caseId": "DOC-04",
+      "insurer": "MAPFRE",
+      "sourceFactIdSha256": "9509fb26aedde4f5a1627bc3ae9b4b0836fdf13d1e29050549ca7b7e7dbf9ef9",
+      "disposition": "HOLD_EXACT_IDENTITY_AND_RECEIPT_CALENDAR",
+      "writeEligibilityCertified": false
+    },
+    {
+      "caseId": "DOC-05",
+      "insurer": "GENERAL",
+      "sourceFactIdSha256": "40f4da2cd4ab5cf7bc89e09ae0e5847baed10f96dd8bebe663e676dccd7cd854",
+      "disposition": "HOLD_EXISTING_PAYMENT_AMOUNT_AND_SCHEDULE",
+      "writeEligibilityCertified": false
+    },
+    {
+      "caseId": "DOC-06",
+      "insurer": "GENERAL",
+      "sourceFactIdSha256": "f88f30188cbce3b4402058e84d826a0031d0dc11cf5739a59b2c39d242ae47ca",
+      "disposition": "HOLD_EXISTING_PAYMENT_AND_ISSUER_SCHEDULE_CORRECTION",
+      "writeEligibilityCertified": false
+    },
+    {
+      "caseId": "DOC-07",
+      "insurer": "UNIVERSALES",
+      "sourceFactIdSha256": "c83bf7268788ddc88b4661c7eefb397d8908c735e5be7e41e83a3a6208c90989",
+      "disposition": "HOLD_POLICY_EDITION_NOT_IDENTIFIED_IN_EXISTING_READBACK",
+      "writeEligibilityCertified": false
+    },
+    {
+      "caseId": "DOC-09",
+      "insurer": "UNIVERSALES",
+      "sourceFactIdSha256": "fa8f096ee58c3118cefcba18941ede12d1a1b4f598c2b0920244d3d20cd35eda",
+      "disposition": "HOLD_PAID_INSTALLMENT_OUTSIDE_COMPLETED_PENDING_OBLIGATION_SCOPE",
+      "writeEligibilityCertified": false
+    }
+  ],
+  "privateMatrixSha256": "6219736e4cce9bdff3fafb0e192b2cbd0670c77434d40766337cd0b9feee29e9",
+  "receiptReferences": [
+    {
+      "path": "artifacts/orbit360-recovery/source-batches/I6_6_NEW_INSURER_SOURCE_DELTA_20261124.json",
+      "gitBlobSha": "ebf7350a664c851fe82f28eae241efc76bba7e1e",
+      "sha256": "68ebdc6f04e0ee5e4d7aa92b2a3bd9564f17a8a5e7b23528522cc6381f782805"
+    },
+    {
+      "path": "artifacts/orbit360-recovery/release-control/I6_6_NEW_INSURER_56_FACTS_READONLY_CENSUS_20261124.json",
+      "gitBlobSha": "a7b9efcef60c936d13a0229fa738d12d648df08b",
+      "sha256": "5789d3aad88524223ec5643e746cdf4c659f68f97a9a8cd62721a9ae95fc01f3"
+    },
+    {
+      "path": "artifacts/orbit360-recovery/release-control/I6_6_NEW56_FOCAL_ORIGINAL_CROSSWALK_20261124.json",
+      "gitBlobSha": "b8af592f7cc9906ae7af3f81fc437e02e724b0a5",
+      "sha256": "81cc9b07fd9d94728e95b555e746657f1c143c3b99f6f5c2c0e9f738a3444be5"
+    },
+    {
+      "path": "artifacts/orbit360-recovery/release-control/I6_6_FOCAL_FINANCIAL_READONLY_PROBE_20261124.json",
+      "gitBlobSha": "6ff38abeeec9bf16470c8eed0192ef0f9c09a715",
+      "sha256": "766542954ac6d11ac78c78d9efc33e8e0d74405d79190e1cbe4c23b6bf03c12c"
+    },
+    {
+      "path": "artifacts/orbit360-recovery/release-control/I6_6_UNIVERSALES_15590_TEN_LIVE_READBACK_20261124.json",
+      "gitBlobSha": "76563e58c66843ed8a54254f1cec82515450d82b",
+      "sha256": "e92ebef483a0fa9dffcfb7a7b53fcc4e4454e30a8e64fe3704852b31df7d3bc9"
+    },
+    {
+      "path": "artifacts/orbit360-recovery/source-batches/I6_6_UNIVERSALES_TWO_ISSUED_MEDICAL_22_20261124.json",
+      "gitBlobSha": "d9b54304ec05f2eef6ec22894059a247cb680bfa",
+      "sha256": "84265751defc79ce50523da0e43205d1f773f2533c748ff9a1c6a3fba308ccec"
+    },
+    {
+      "path": "artifacts/orbit360-recovery/release-control/I6_6_MAPFRE_NEXT_CONTROLLED_PREFLIGHT_20261124_R46.json",
+      "gitBlobSha": "95fda346a8c427698940cdc941b1f934018560c4",
+      "sha256": "6e8003a6ecb3ac5eafbe417e044980668b8d16c8f07c9264082cc77996021162"
+    },
+    {
+      "path": "artifacts/orbit360-recovery/release-control/I6_6_CENDOSO_155_APPLICATION_AND_MAPFRE_OBLIGATION_LIVE_20261124_R52.json",
+      "gitBlobSha": "65a83d3d36b6d7f131be5cb61c559aa417f5e48f",
+      "sha256": "f2b7687e8395058d1c2d416df0060e65582b006c451557902bc718dff1faf0c3"
+    }
+  ],
+  "next": "Resolve nine distinct documentary payment facts: two MAPFRE canonical calls after already completed obligation CAS, plus seven identity/schedule/receipt HOLD cases. The medical second installment is included among those seven. Preserve the previously applied Universales payment. No new payment is admitted by this review.",
+  "existingReadonlyOwner": {
+    "workflow": ".github/workflows/gravicentra-i66-insurer-source-bulk-protected.yml",
+    "historicalRunId": 45364013332,
+    "historicalJobId": 138340948044,
+    "historicalMode": "case-readback",
+    "historicalReadonlyIsolation": true,
+    "exactNineIdentityModeAvailable": false,
+    "newJobDispatched": true,
+    "reason": "The implemented case-readback includes the complete56-fact census and five fixed financial policy IDs; the workflow has no exact-identity-list input. The separate MAPFRE reader is limited to the two canonical cases already fixed by R46.",
+    "executedRunAttempt": 2,
+    "executedJobId": 138708388539,
+    "readScopeExpandedByRootToExistingMode": true
+  },
+  "writes": 0,
+  "customerDataWrites": 0,
+  "fullFinancialScopeClosed": false,
+  "historicalArtifact": {
+    "runId": 45364013332,
+    "jobId": 138340948044,
+    "artifactId": 14906940722,
+    "archiveSha256": "aae609eb9b5f4f5284d6c9abaf1fb203a374b563436edffa9a02db0681c14f55",
+    "reportSha256": "d06ac820ef47c24472656bffbd6bc5269ff1da1bebfe41721ccf08a725c3b894",
+    "financialCensusSha256": "5932d2e4096d61828dc6ebcf0da49ad44dca821b0bf92c45abaa7f078faf0cfe",
+    "rereadExistingArtifactOnly": true,
+    "newCloudCensusPerformed": false
+  },
+  "freshReadonlyRefresh": {
+    "runId": 45364013332,
+    "runAttempt": 2,
+    "jobId": 138708388539,
+    "artifactId": 14956230418,
+    "archiveSha256": "7a42fa8f45087c17905f1ee16209bc74718878ea9bdd9ea02dc4f25904240d58",
+    "reportSha256": "5863ff5bbc2ddfee9eee998165ce194763f430ce89c6e757a2ab0fcfbf2c950f",
+    "observedAtUtc": "2026-11-24T19:15:44Z",
+    "financialCensusSha256": "5f74f657b88ba79170ef7c75572289904ed6dec4b8af4592b77326cd43fa8dd7",
+    "identityReportSha256": "ca2b3fd45ce4e80b3ffc1cc7d98455af3c2b73e04b9713656beee1b6b95aefe6",
+    "actualSourceSha": "7b8837886debc8af8b4cf2427f045f009e4822a6",
+    "mode": "case-readback",
+    "readOnly": true,
+    "writes": 0,
+    "protectedApplyJobsSkipped": 6,
+    "oldArtifactId": 14906940722,
+    "oldArtifactSha256": "aae609eb9b5f4f5284d6c9abaf1fb203a374b563436edffa9a02db0681c14f55",
+    "oldArtifactStillPresent": true,
+    "sourceFacts": 56,
+    "candidatePolicyEditions": 61,
+    "exactNineFactsSelectedAfterRead": true,
+    "fullDataCountsAreDiagnosticAndNotPaymentIncrements": true
+  }
+}
