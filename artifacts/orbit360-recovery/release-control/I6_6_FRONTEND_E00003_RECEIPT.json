@@ -1,0 +1,153 @@
+{
+  "schema": "GI_I66_SIGNED_COMPOSITE_RECEIPT_V1",
+  "scope": "COMPOSITE",
+  "generation": 3,
+  "target": {
+    "sourceSha": "65c825b2808a615ca4195bdde6689dbdbe3193b2",
+    "sourceTree": "e7f197675e7124caee45460fc131b526cd43dae1",
+    "manifestBlob": "7f693bd0e1a7faaa6cbc95794ef5123c91c5efa4",
+    "compositionBlob": "33bf80768cb6cb311f2975d282a5f50935f680aa",
+    "artifactId": 14873426438,
+    "artifactDigest": "sha256:7cb782848a45083047c4899bc30c13bf5be46429607e42597d09342becfc9acc",
+    "buildId": "gi-i66-65c825b2808a-57f234755dc1",
+    "buildRunId": 45287432665,
+    "previewUrl": "https://ays-orbit-360-lab--gi-i66-rc-45287432665-qxusovq3.web.app",
+    "previewChannel": "gi-i66-rc-45287432665",
+    "hostingVersion": "sites/ays-orbit-360-lab/versions/332999a55b189108",
+    "files": 224
+  },
+  "previous": {
+    "sourceSha": "15e849bd606bd8c93e4c0471da1193e85004aecd",
+    "sourceTree": "4567343f7e438f550a5deda200098124f330ccd2",
+    "manifestBlob": "098c127eb1c08a8d5fc3575c0ec38c6cb59f3858",
+    "compositionBlob": "33bf80768cb6cb311f2975d282a5f50935f680aa",
+    "artifactId": 14777966155,
+    "artifactDigest": "sha256:78a409a419e21648f2e074b49767d1dd55731140f8a83f6064b3ae1c8073b453",
+    "buildId": "gi-i66-15e849bd606b-57f234755dc1",
+    "buildRunId": 45081926149,
+    "previewUrl": "https://ays-orbit-360-lab--gi-i66-rc-45081926149-b9hkley0.web.app",
+    "hostingVersion": "sites/ays-orbit-360-lab/versions/e4e8f31b02ba2aef",
+    "files": 224
+  },
+  "authorization": "caef66ef2f20eb8ce71f1815985288bdcfd4a3d8",
+  "scopeId": "I66_COMPOSITE_FOUR_FUNCTIONS_SIGNED",
+  "preview": {
+    "files": 224,
+    "hostingVersion": "sites/ays-orbit-360-lab/versions/332999a55b189108",
+    "artifactDigest": "sha256:7cb782848a45083047c4899bc30c13bf5be46429607e42597d09342becfc9acc"
+  },
+  "physical": {
+    "firebase": 224,
+    "custom": 224,
+    "sourceSha": "65c825b2808a615ca4195bdde6689dbdbe3193b2",
+    "buildId": "gi-i66-65c825b2808a-57f234755dc1",
+    "artifactDigest": "sha256:7cb782848a45083047c4899bc30c13bf5be46429607e42597d09342becfc9acc",
+    "hostingVersion": "sites/ays-orbit-360-lab/versions/332999a55b189108",
+    "manifestDigest": "sha256:da40e7ad3f453107a44fdc868a58ff469f91139252c0204f9fc298a8d9f02905"
+  },
+  "ui": {
+    "result": "PASS",
+    "buildId": "gi-i66-65c825b2808a-57f234755dc1",
+    "receiptBlob": "908d59a07a5198a072f95046a5602bd4ddb04142",
+    "source": "VALIDATED_SIGNED_COMPOSITE_LIVE_PROOF"
+  },
+  "backendFunctionsChanged": 4,
+  "backendRevisions": [
+    {
+      "name": "orbit360ProductOperationalCommand",
+      "region": "us-central1",
+      "service": "orbit360productoperationalcommand",
+      "previousRevision": "orbit360productoperationalcommand-00071-rax",
+      "currentRevision": "orbit360productoperationalcommand-00072-mab",
+      "trafficPercent": 100,
+      "ready": true
+    },
+    {
+      "name": "orbit360CobrosReconciliationCommand",
+      "region": "us-central1",
+      "service": "orbit360cobrosreconciliationcommand",
+      "previousRevision": "orbit360cobrosreconciliationcommand-00019-cux",
+      "currentRevision": "orbit360cobrosreconciliationcommand-00021-zex",
+      "trafficPercent": 100,
+      "ready": true
+    },
+    {
+      "name": "orbit360ScopedPolicyRead",
+      "region": "us-east1",
+      "service": "orbit360scopedpolicyread",
+      "previousRevision": "orbit360scopedpolicyread-00013-gen",
+      "currentRevision": "orbit360scopedpolicyread-00014-nec",
+      "trafficPercent": 100,
+      "ready": true
+    },
+    {
+      "name": "orbit360OpsLeadsCommand",
+      "region": "us-central1",
+      "service": "orbit360opsleadscommand",
+      "previousRevision": "orbit360opsleadscommand-00013-fad",
+      "currentRevision": "orbit360opsleadscommand-00014-vep",
+      "trafficPercent": 100,
+      "ready": true
+    }
+  ],
+  "backend": {
+    "generation": 3,
+    "gate": "I6.6",
+    "scope": "COMPOSITE",
+    "status": "SIGNED_LIVE_VERIFIED",
+    "sourceSha": "65c825b2808a615ca4195bdde6689dbdbe3193b2",
+    "artifactId": 14873426438,
+    "artifactDigest": "sha256:7cb782848a45083047c4899bc30c13bf5be46429607e42597d09342becfc9acc",
+    "buildId": "gi-i66-65c825b2808a-57f234755dc1",
+    "functionsChanged": 4,
+    "revisions": [
+      {
+        "name": "orbit360ProductOperationalCommand",
+        "region": "us-central1",
+        "service": "orbit360productoperationalcommand",
+        "previousRevision": "orbit360productoperationalcommand-00071-rax",
+        "currentRevision": "orbit360productoperationalcommand-00072-mab",
+        "trafficPercent": 100,
+        "ready": true
+      },
+      {
+        "name": "orbit360CobrosReconciliationCommand",
+        "region": "us-central1",
+        "service": "orbit360cobrosreconciliationcommand",
+        "previousRevision": "orbit360cobrosreconciliationcommand-00019-cux",
+        "currentRevision": "orbit360cobrosreconciliationcommand-00021-zex",
+        "trafficPercent": 100,
+        "ready": true
+      },
+      {
+        "name": "orbit360ScopedPolicyRead",
+        "region": "us-east1",
+        "service": "orbit360scopedpolicyread",
+        "previousRevision": "orbit360scopedpolicyread-00013-gen",
+        "currentRevision": "orbit360scopedpolicyread-00014-nec",
+        "trafficPercent": 100,
+        "ready": true
+      },
+      {
+        "name": "orbit360OpsLeadsCommand",
+        "region": "us-central1",
+        "service": "orbit360opsleadscommand",
+        "previousRevision": "orbit360opsleadscommand-00013-fad",
+        "currentRevision": "orbit360opsleadscommand-00014-vep",
+        "trafficPercent": 100,
+        "ready": true
+      }
+    ],
+    "liveRunId": 45292163934,
+    "proofPath": "artifacts/orbit360-recovery/release-control/I6_6_FRONTEND_E00003_LIVE_PROOF.json",
+    "proofSha256": "4013a99719ba5f8bb3087a5e5f43c189a22daf55aabfcea37e8df5030bb5653c",
+    "rollbackHostingVersion": "sites/ays-orbit-360-lab/versions/e4e8f31b02ba2aef",
+    "fullI66ProductionAccepted": false
+  },
+  "liveProof": {
+    "path": "artifacts/orbit360-recovery/release-control/I6_6_FRONTEND_E00003_LIVE_PROOF.json",
+    "sha256": "4013a99719ba5f8bb3087a5e5f43c189a22daf55aabfcea37e8df5030bb5653c",
+    "gitBlobSha": "908d59a07a5198a072f95046a5602bd4ddb04142"
+  },
+  "runId": 45292163934
+}
