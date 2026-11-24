@@ -1,0 +1,208 @@
+{
+  "schema": "GI_I66_NEW_INSURER_56_FACTS_READONLY_CENSUS_RECEIPT_V1",
+  "status": "READONLY_CENSUS_COMPLETE_ZERO_WRITES_WITH_ISOLATED_READBACK_HOLD",
+  "gate": "I6.6",
+  "observedAtUtc": "2026-11-24T09:20:07.2103215Z",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "sourceSha": "7b8837886debc8af8b4cf2427f045f009e4822a6",
+  "runId": 45364013332,
+  "preflightJobId": 138340948044,
+  "runUrl": "https://github.com/paulaosoriof86/orbit360-core/actions/runs/45364013332",
+  "sourceBinding": {
+    "path": "artifacts/orbit360-recovery/source-batches/I6_6_NEW_INSURER_SOURCE_DELTA_20261124.json",
+    "gitBlobSha": "ebf7350a664c851fe82f28eae241efc76bba7e1e",
+    "sha256": "68ebdc6f04e0ee5e4d7aa92b2a3bd9564f17a8a5e7b23528522cc6381f782805",
+    "requestPath": "artifacts/orbit360-recovery/release-control/I6_6_20261123_PROTECTED_SOURCE_BULK_REFRESH_REQUEST.json",
+    "requestGitBlobSha": "c34db46213309757705de089d665a621f87e05b7",
+    "readerPath": "tools/gravicentra-i66-financial-identity-readback.cjs",
+    "readerGitBlobSha": "e4a08be43b3f188363b21f20c607d3601e05cfd2",
+    "immutableOriginals": 10,
+    "factCounts": {
+      "distinctSourceFacts": 56,
+      "positivePaidFacts": 9,
+      "positivePaidCents": 730803,
+      "pendingFacts": 27,
+      "pendingCents": 2230053,
+      "commissionAnchors": 20,
+      "commissionAnchorsWithoutSourceGross": 11,
+      "commissionGrossByCurrency": {
+        "GTQ": 539699,
+        "USD": 21495
+      },
+      "isolatedRows": 22,
+      "duplicatePaidRows": 1,
+      "zeroPaidRows": 12,
+      "commissionComponentsNotAdditionalPayments": 8,
+      "unresolvedLifeBonusRows": 1
+    },
+    "factCountsAreDocumentaryNotEligibleOrApplied": true
+  },
+  "actualReadback": {
+    "mode": "case-readback",
+    "status": "BULK_SOURCE_CASE_READBACK_ONLY_NO_WRITES",
+    "diagnosticOnly": true,
+    "noEligibilityEffect": true,
+    "complete": true,
+    "sourceFacts": 56,
+    "sourcePolicyNumbers": 26,
+    "matchingPolicyEditions": 56,
+    "financialTargetPolicies": 60,
+    "sourceLinkedOutsideTargets": 3,
+    "boundedIdentityCensus": {
+      "clientes": 401,
+      "aseguradoras": 16,
+      "polizas": 1442,
+      "vehiculos": 1157
+    },
+    "boundedFinancialCensus": {
+      "recibosEsperados": 2251,
+      "carteraPrimas": 2023,
+      "cobros": 520
+    },
+    "requestSha256": "c456d5b8d2d7004f55d46c397719a5accee921985cfdf21fd193583576392e3b",
+    "preimageDigest": "26585d23f530287d660d274c6bfc5ecd00b5228231811eaaf516d98b705eb4f3",
+    "financialCensusSha256": "5932d2e4096d61828dc6ebcf0da49ad44dca821b0bf92c45abaa7f078faf0cfe",
+    "identityReportSha256": "d09b00c64779419daabf153f177a4375cbc8a38bb830afc170ba470f19808095",
+    "referencedLegacyCendosoSourceSha256": "649fa315a90b176b794abf6eef3d9f893d47de64cfe558d203a099c408692aa0",
+    "matchingPolicyEditionsAreCandidatesNotIdentityApprovals": true
+  },
+  "outerCaseDiagnostic": {
+    "caseId": "ROBLE_NOV20_0043",
+    "inputRows": 1,
+    "readyCount": 0,
+    "unchangedCount": 0,
+    "exceptionCount": 1,
+    "writes": 0
+  },
+  "existingIssuedReadback": {
+    "source": "I66_ROBLE_TWO_24_PREFLIGHT decoded provider log",
+    "cases": 5,
+    "alreadyAppliedReadbackPass": 4,
+    "currentReadbackHolds": 1,
+    "writes": 0,
+    "results": [
+      {
+        "policy": "91-8324489",
+        "status": "ALREADY_APPLIED_READBACK_PASS",
+        "writes": 0
+      },
+      {
+        "policy": "91-8343059",
+        "status": "ALREADY_APPLIED_READBACK_PASS",
+        "writes": 0
+      },
+      {
+        "policy": "91-8323091",
+        "status": "ALREADY_APPLIED_READBACK_PASS",
+        "writes": 0
+      },
+      {
+        "policy": "91-8342189",
+        "status": "ALREADY_APPLIED_READBACK_PASS",
+        "writes": 0
+      },
+      {
+        "policy": "91-4140843",
+        "status": "HOLD",
+        "reason": "PRIVATE_TRANSACTION_OR_READBACK_HOLD",
+        "writes": 0
+      }
+    ],
+    "holdBoundary": "The current readback hold does not certify a reversal or negate the earlier committed existing-identity receipt. Its cause remains unclassified; this probe made no corrective writes.",
+    "priorCommittedReceiptPath": "artifacts/orbit360-recovery/release-control/I6_6_ROBLE_4140843_EXISTING_IDENTITY_LIVE_READBACK_20261124.json"
+  },
+  "medical15590Boundary": {
+    "driveVerificationStepConclusion": "skipped",
+    "medicalPlannerExecuted": false,
+    "serviceIdentityHttp200ProvenByThisRun": false,
+    "tenReadyProvenByThisRun": false,
+    "sourcePdfHashInDiagnosticIsInputPinNotDownloadProof": true,
+    "priorOwnerPermissionReadbackPath": "artifacts/orbit360-recovery/release-control/I6_6_UNIVERSALES_15590_SINGLE_FILE_READER_READBACK_20261124.json",
+    "nextRequiredEvidence": "Normal source302 preflight plus I66_VERIFY_ISSUED_ORIGINALS using the unchanged original hash; evaluate ten15590 rows and preserve the twelve12289 rows only from the actual outputs."
+  },
+  "evidence": {
+    "artifactId": 14906940722,
+    "artifactName": "gi-i66-source-bulk-preflight-45364013332",
+    "artifactZipSha256": "aae609eb9b5f4f5284d6c9abaf1fb203a374b563436edffa9a02db0681c14f55",
+    "artifactZipBytes": 128162,
+    "artifactDigestVerifiedBeforeExtraction": true,
+    "artifactFiles": [
+      {
+        "path": "gi-i66-bulk-plan.json",
+        "sha256": "39dd8eb6e41b712562bbd2e6b7c8a247a8a7df4d9c00b859b7e8c1c57fd6cd5b",
+        "bytes": 3934
+      },
+      {
+        "path": "gi-i66-bulk-preflight.json",
+        "sha256": "d06ac820ef47c24472656bffbd6bc5269ff1da1bebfe41721ccf08a725c3b894",
+        "bytes": 2122002
+      }
+    ],
+    "jobsSnapshotSha256": "8f84a67cee79385330bc5823bb2cae58c3a8c201f811223536eccff4143c2293",
+    "decodedProviderLogSha256": "23591e96271787772ac3d5593fa5bd5a84ead04e2013197213251bed104a68d8",
+    "decodedProviderLogBytes": 1097363,
+    "markerLineSha256IncludingOriginalLineEnding": "446761aa5fbed23e38332eda0384c4429ece67a7476b0e2543603936d1430201",
+    "githubRedactionMaskPreserved": true,
+    "redactedPayloadReconstructed": false,
+    "liveWriteArtifactClaimed": false
+  },
+  "jobs": [
+    {
+      "id": 138340948044,
+      "name": "preflight",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 138341637040,
+      "name": "protected-d03-statement-series",
+      "status": "completed",
+      "conclusion": "skipped"
+    },
+    {
+      "id": 138341637795,
+      "name": "protected-issued-d03-source-schedule",
+      "status": "completed",
+      "conclusion": "skipped"
+    },
+    {
+      "id": 138341637815,
+      "name": "protected-issued-roble-two-24",
+      "status": "completed",
+      "conclusion": "skipped"
+    },
+    {
+      "id": 138341637819,
+      "name": "protected-source-bulk-live",
+      "status": "completed",
+      "conclusion": "skipped"
+    },
+    {
+      "id": 138341638212,
+      "name": "protected-issued-documentary-successor",
+      "status": "completed",
+      "conclusion": "skipped"
+    },
+    {
+      "id": 138341638425,
+      "name": "protected-issued-d01-source-schedule",
+      "status": "completed",
+      "conclusion": "skipped"
+    }
+  ],
+  "protectedJobsSkipped": 6,
+  "customerDataWrites": 0,
+  "cobrosCreated": 0,
+  "receiptOrPortfolioWrites": 0,
+  "applicationOrReconciliationWrites": 0,
+  "drivePermissionWrites": 0,
+  "preservation": {
+    "previous155DirectPaymentsReapplied": false,
+    "previous36PendingObligationsReapplied": false,
+    "legacy302And607SourcesModified": false,
+    "known10738Installment9Reapplied": false,
+    "currencyConversionOrMissingGrossInference": false
+  },
+  "claimBoundary": "This receipt certifies a bounded diagnostic census over56 documentary facts and zero writes. It is neither a full302/607 postscan nor a56-row eligibility plan. Source amounts are not incremental live balances or applied payments. No new inference, application, reconciliation, pending obligation or permission grant is claimed."
+}

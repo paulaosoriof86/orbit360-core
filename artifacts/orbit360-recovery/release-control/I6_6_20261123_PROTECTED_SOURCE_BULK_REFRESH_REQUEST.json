@@ -1,9 +1,9 @@
 {
   "schema": "GI_I66_PROTECTED_SOURCE_BULK_REFRESH_REQUEST_V1",
-  "dateGuatemala": "2026-11-23",
+  "dateGuatemala": "2026-11-24",
   "gate": "I6.6",
   "authority": "Dirección confirms apply identity-proven financial delta urgently, without reasking D01-D06 or owner-attested decisions",
-  "requestedExecution": "EXISTING_WORKFLOW_READONLY_POST_COMMIT_CENSUS_302",
+  "requestedExecution": "EXISTING_WORKFLOW_NORMAL_302_PREFLIGHT_AFTER_15590_SINGLE_FILE_READER_GRANT",
   "workflow": ".github/workflows/gravicentra-i66-insurer-source-bulk-protected.yml",
   "sourceManifest": "artifacts/orbit360-recovery/source-batches/I6_6_SOURCE_BULK_20261120_MULTI_302.json",
   "branch": "recovery/fase-a-clean-20260831",
@@ -17,20 +17,20 @@
   },
   "businessOwnerApprovals": "artifacts/orbit360-recovery/release-control/I6_6_DIRECCION_DECISIONES_FINANCIERAS_Y_PLAN_INTEGRAL_20261122.md and I6_6_DIRECTION_119_EXCEPTIONS_20261122.json",
   "requires": "fresh actual Firestore preimages; unique tenant country insurer policy edition and receipt; write only rows with CAS deterministic proof; no duplicate applications; postimage readback and rollback receipts; HOLD uncertain cases",
-  "mustNot": "Preserve prior 58 obligations and newly committed 24; preserve original Cendoso 303+18+15, the later 2+146 paid facts, prior 110 source adjustments and six existing date corrections. No fabricated payments, no repeated writes, no full reimport.",
-  "workflowMayApplyReadyRows": false,
+  "mustNot": "Preserve all earlier58 obligations, the committed24Roble plus12Universales pending obligations, all155 direct historical payments (153 historical receipt/portfolio creations and2 existing-receipt payments), originalCendoso303+18+15, prior110 source adjustments, six existing date corrections and the committed4140843 existing-document correction. No repeated writes, fabricated payment, duplicate10738 installment9, full reimport, source56 application, vehicle change or change to the literal12289 SIN COBERTURA.",
+  "workflowMayApplyReadyRows": true,
   "writingAuthorizedOnlyAfterExistingProtectedGate": true,
   "customerWritesClaimedByThisReceipt": 0,
   "sourceQaNotLiveProof": true,
   "scope": "No new iteration, repo, Firebase, branch, rules, Auth, or general ledger reimport",
   "protectedWritesApprovedForThisRefresh": false,
-  "requestedAtUtc": "2026-11-24T05:18:55.042808+00:00",
+  "requestedAtUtc": "2026-11-24T09:29:54.728515+00:00",
   "afterCommercialReadbackRuns": [
     45330498452,
     45330498425
   ],
-  "previousRequestGitBlobSha": "a495d9815ad84f050f7cfd82f9454ec20a78b830",
-  "effectiveWriteBoundary": "The existing workflow reads marker and source manifest, not the fields in this JSON. This refresh requests preflight only; any unexpected eligible writes require a separate reviewed protected-environment approval, which is not authorized by this refresh.",
+  "previousRequestGitBlobSha": "c34db46213309757705de089d665a621f87e05b7",
+  "effectiveWriteBoundary": "Normal preflight over the unchanged source302 and existing medical documentary writer. The existing workflow uses commit markers, not these JSON fields. Any apply requires the existing protected-environment review of the actual immutable plan. Expected scope is ten15590 future obligations, with twelve12289 already committed and preserved; no payment, vehicle, source56 application or other ready row is authorized by this request without exact plan review.",
   "priorIndependentReadbackScope": "Historical snapshot before later writes; must not be reported as current. Fresh census output is required.",
   "readonlyIdentityReadback": {
     "schema": "GI_I66_SOURCE_IDENTITY_READBACK_V1",
@@ -82,5 +82,18 @@
       "path": "artifacts/orbit360-recovery/source-batches/I6_6_NEW_INSURER_SOURCE_DELTA_20261124.json",
       "sha256": "68ebdc6f04e0ee5e4d7aa92b2a3bd9564f17a8a5e7b23528522cc6381f782805"
     }
+  },
+  "documentaryRefreshExpectation": {
+    "schema": "GI_I66_MEDICAL_POST_ACCESS_PREFLIGHT_EXPECTATION_V1",
+    "status": "EXPECTED_NOT_YET_OBSERVED",
+    "sourceManifestUnchanged": true,
+    "original15590Sha256": "78d78df726fa54c8ef2af5d728a50265db6956208b4a593eab433457f24b4e62",
+    "expectedNewPendingRows": 10,
+    "expectedPendingCents": 789040,
+    "expected12289PriorPendingRowsPreserved": 12,
+    "expected12289LiteralStatus": "SIN COBERTURA",
+    "paymentsOrVehiclesRequested": 0,
+    "source56ApplicationRequested": false,
+    "actualPlanReadbackRequiredBeforeProtectedReview": true
   }
 }

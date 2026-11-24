@@ -1,0 +1,58 @@
+{
+  "schema": "GI_I66_EMAIL_PILOT_SELF_IDENTITY_READONLY_RECEIPT_V1",
+  "gate": "I6.6",
+  "objective": "A13",
+  "status": "EXACT_CONFIRMED_OWNER_IDENTITY_READBACK_PASS_BINDING_CONFIG_PENDING",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "sourceSha": "7b8837886debc8af8b4cf2427f045f009e4822a6",
+  "runId": 45364013323,
+  "jobId": 138340947491,
+  "jobConclusion": "success",
+  "step": "Verify the owner-confirmed pilot mailbox against active membership and Auth without writes",
+  "stepConclusion": "success",
+  "authority": {
+    "pilotBindingDecisionBlob": "17da2d0d297e0b0f010d2da763fd3d3a0f664c54",
+    "scopeContractBlob": "7ce546736ac8d08b8ac922d19f3e6e4c2bac0021",
+    "priorSignedPreviewReceiptBlob": "956e2676d2f9d6cfe18ed0af92784574862ae232"
+  },
+  "evidence": {
+    "kind": "DECODED_PROVIDER_JOB_LOG_OBSERVED_FIELDS",
+    "decodedProviderLogSha256": "4c8a38a5dad593dc2233ce8818b8e13a2fec776a9ac09cba67a5be3f871352ff",
+    "observedOutputLineSha256": "8cca94ce1d0c25f61e0a585fd777bb16871b557af2f931e3d10b7e6bc802f1ad",
+    "providerRedactionRetained": true,
+    "jsonPayloadReconstructed": false
+  },
+  "result": {
+    "expectedDirectionUidSha256": "f612197b077c598edd61d757c1e2995be7a3b17300602ce4802bccefed216a72",
+    "memberCensusCount": 11,
+    "advisorCensusCount": 10,
+    "matchingMemberCount": 1,
+    "currentVerifiedIdentityCount": 1,
+    "exactTenant": true,
+    "idAliasesConsistent": true,
+    "membershipUidExplicit": true,
+    "activeCountryGT": true,
+    "directionExplicitlyAssigned": true,
+    "authIdentityExactEnabledVerified": true,
+    "selectedFromPriorSignedDirectionActor": true,
+    "mailboxAddressNeedNotEqualLoginEmail": true
+  },
+  "boundaries": {
+    "providerLoginIdentityReturnedByConnectionApi": false,
+    "mailboxIdentityConfirmedByDirection": true,
+    "advisorTwoMemberLinksNotUsedAsOwnershipProof": true,
+    "mailboxOwnershipBindingAccepted": false,
+    "protectedConfigurationCasRequired": true,
+    "authenticatedIntegrationSourceStillRequired": true,
+    "canonicalLeadWriterAccepted": false,
+    "privateMailboxVisibilityAccepted": false,
+    "fullA13Accepted": false
+  },
+  "mailboxBindingWrites": 0,
+  "canonicalWrites": 0,
+  "authWrites": 0,
+  "mailReads": 0,
+  "messagesSent": 0,
+  "liveAccepted": false
+}

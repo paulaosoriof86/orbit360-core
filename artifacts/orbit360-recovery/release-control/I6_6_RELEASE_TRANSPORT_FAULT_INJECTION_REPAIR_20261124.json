@@ -1,0 +1,59 @@
+{
+  "schema": "GI_I66_RELEASE_TRANSPORT_FAULT_INJECTION_REPAIR_V1",
+  "gate": "I6.6",
+  "observedFailure": "E4 and E5 each passed 48 real LIVE read-only stages, then fetch failed while saving signed UI receipt, followed by verified rollback to E3.",
+  "exactProductionTransportCause": "NOT_PROVEN",
+  "specificStaleSocketReproduction": {
+    "runtime": "Node v24.22.3",
+    "attempts": [
+      "global fetch Undici7.30.2",
+      "external Undici6.28.0"
+    ],
+    "result": "NOT_REPRODUCED_ALL_SYNCHRONOUS_ASYNCHRONOUS_CLOSE_CASES_HTTP200",
+    "productionNodeMajor": 22,
+    "equivalenceClaimed": false
+  },
+  "repair": {
+    "longBrowserAndGovernanceChildProcesses": "AWAIT_ASYNCHRONOUS_SPAWN_WITH_EXISTING_DEADLINES",
+    "githubConnection": "CLOSE_EXPLICITLY",
+    "unknownCommitResult": "EXACT_EXPECTED_HEAD_PARENT_PATH_SET_BLOB_READBACK_THEN_SIGNATURE_REQUIRED",
+    "retryMaximumMutationAttempts": 3,
+    "retryOnlyAfterIndependentUnchangedHead": true,
+    "foreignOrUnreadableState": "HOLD_WITHOUT_RETRY_WRITE",
+    "credentialFreeDiagnostics": "ALLOWLISTED_CODE_ONLY"
+  },
+  "validation": {
+    "command": "node --test tools/gravicentra-i66-frontend-promotion-transaction.test.cjs",
+    "passed": 27,
+    "failed": 0,
+    "skipped": 0,
+    "newTransportCases": 8,
+    "realLocalhostHttpLossBeforeCommit": {
+      "posts": 2,
+      "commits": 1
+    },
+    "realLocalhostHttpLossAfterCommit": {
+      "posts": 1,
+      "commits": 1
+    },
+    "eventLoopHeartbeatDuringChild": true,
+    "githubWrites": 0,
+    "financialWrites": 0
+  },
+  "files": [
+    {
+      "path": "tools/gravicentra-i66-frontend-promotion-owner.cjs",
+      "baseBlob": "fe53d5e15f4c6f490580952883efda5e9f050a73",
+      "candidateBlob": "811bf30a2ac9f59b5ab2466830c69403c9f39654",
+      "sha256": "5ec31bab19c42ab3b3ad9be410cb87f400bd66ca431fa4dee7e8f7738d15ed3c"
+    },
+    {
+      "path": "tools/gravicentra-i66-frontend-promotion-transaction.test.cjs",
+      "baseBlob": "617e476d2888831c15b5a0ee6b23358e3abc331d",
+      "candidateBlob": "b80b1559b63d5f41606a0fdddd14087f1f4e5eee",
+      "sha256": "19a123659d0f71a67a6fcb263431f62ae9e373c262965f5612bd0e586450d439"
+    }
+  ],
+  "liveAccepted": false,
+  "newBuildAndPreviewLiveRequired": true
+}

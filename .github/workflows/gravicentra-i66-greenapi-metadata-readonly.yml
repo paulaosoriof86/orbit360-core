@@ -482,5 +482,7 @@ jobs:
         run: node tools/gravicentra-i66-mailbox-owner-readonly.cjs
       - name: Read canonical Ops runtime and exact required capabilities without granting access
         run: node tools/gravicentra-i66-make-lead-runtime-access.cjs preflight
+      - name: Inspect existing Eventarc prerequisites and reject any implicit project IAM expansion
+        run: node tools/gravicentra-i66-make-lead-runtime-access.cjs eventarc-preflight
 # I6.6 continuation 2026-11-24: distinguish exact runtime Secret RPC, parsing and scope outcomes with allowlisted booleans; no messages or writes.
 # I6.6 continuation: observe canonical Ops runtime, exact Firestore permissions and existing Secret access; zero mutations.

@@ -16,6 +16,27 @@ const functionsRequire=createRequire(path.resolve(__dirname,'../functions/packag
 const PROJECT='ays-orbit-360-lab';
 const SECRET=`projects/${PROJECT}/secrets/orbit360-greenapi-gt-alianzas-soluciones`;
 const ROLE='roles/secretmanager.secretAccessor';
+const PROJECT_NUMBER='646761409743',CANONICAL_RUNTIME=PROJECT_NUMBER+'-compute@developer.gserviceaccount.com';
+const REQUIRED_EVENTARC_PERMISSIONS=Object.freeze(['eventarc.events.receive','run.routes.invoke']);
+// firebase-tools@14.10.1 checkIam.ensureServiceAgentRoles requests these only
+// for the first recognized event service. This probe predicts that branch; it
+// never grants these project roles. The protected CLI also forbids the setter.
+const FIRST_EVENT_BINDINGS=Object.freeze([
+  {role:'roles/iam.serviceAccountTokenCreator',member:'serviceAccount:service-'+PROJECT_NUMBER+'@gcp-sa-pubsub.iam.gserviceaccount.com'},
+  {role:'roles/run.invoker',member:'serviceAccount:'+CANONICAL_RUNTIME},
+  {role:'roles/eventarc.eventReceiver',member:'serviceAccount:'+CANONICAL_RUNTIME}]);
+const EVENT_SERVICES=Object.freeze({
+  'google.cloud.pubsub.topic.v1.messagePublished':'pubsub',
+  'google.cloud.storage.object.v1.finalized':'storage','google.cloud.storage.object.v1.archived':'storage',
+  'google.cloud.storage.object.v1.deleted':'storage','google.cloud.storage.object.v1.metadataUpdated':'storage',
+  'google.firebase.firebasealerts.alerts.v1.published':'firebasealerts',
+  'providers/cloud.auth/eventTypes/user.beforeCreate':'auth','providers/cloud.auth/eventTypes/user.beforeSignIn':'auth',
+  'providers/cloud.auth/eventTypes/user.beforeSendEmail':'auth','providers/cloud.auth/eventTypes/user.beforeSendSms':'auth',
+  'google.firebase.database.ref.v1.written':'database','google.firebase.database.ref.v1.created':'database',
+  'google.firebase.database.ref.v1.updated':'database','google.firebase.database.ref.v1.deleted':'database',
+  'google.firebase.remoteconfig.remoteConfig.v1.updated':'remoteconfig','google.firebase.testlab.testMatrix.v1.completed':'testlab',
+  ...Object.fromEntries(['written','created','updated','deleted'].flatMap(x=>[
+    ['google.cloud.firestore.document.v1.'+x,'firestore'],['google.cloud.firestore.document.v1.'+x+'.withAuthContext','firestore']]))});
 const PRIOR_RUNTIME=`orbit360-secrets-lab@${PROJECT}.iam.gserviceaccount.com`;
 const REQUIRED_FIRESTORE_PERMISSIONS=Object.freeze(['datastore.databases.get','datastore.entities.get',
   'datastore.entities.list','datastore.entities.create','datastore.entities.update']);
@@ -26,7 +47,24 @@ const isRuntime=v=>typeof v==='string'&&(/^[a-z][a-z0-9-]{4,61}@ays-orbit-360-la
 const etagString=p=>Buffer.isBuffer(p?.etag)||p?.etag instanceof Uint8Array?Buffer.from(p.etag).toString('base64'):String(p?.etag||'');
 const clonePolicy=p=>({...p,bindings:(p.bindings||[]).map(b=>({...b,members:[...(b.members||[])],...(b.condition?{condition:{...b.condition}}:{})})),
   ...(p.auditConfigs?{auditConfigs:JSON.parse(JSON.stringify(p.auditConfigs))}:{}),etag:p.etag});
-const policyDigest=(p,includeEtag=true)=>c.digest({...p,...(!includeEtag?{etag:undefined}:{etag:etagString(p)})});
+// IAM bindings/principals and audit configuration entries have no evaluation
+// order. Canonicalize only those known collections for comparison; preserve
+// duplicates, every condition/unknown field, version and the opaque CAS etag.
+// The request payload is still the untouched clonePolicy result, never this
+// digest-only projection. https://docs.cloud.google.com/iam/docs/reference/rest/v1/Policy
+const unordered=values=>values.map(stable).sort((a,b)=>{
+  const x=JSON.stringify(a),y=JSON.stringify(b);return x<y?-1:x>y?1:0;
+});
+function policyComparison(p){
+  const out={...p};
+  if(Array.isArray(p?.bindings))out.bindings=unordered(p.bindings.map(binding=>({...binding,
+    ...(Array.isArray(binding?.members)?{members:unordered(binding.members)}:{})})));
+  if(Array.isArray(p?.auditConfigs))out.auditConfigs=unordered(p.auditConfigs.map(config=>({...config,
+    ...(Array.isArray(config?.auditLogConfigs)?{auditLogConfigs:unordered(config.auditLogConfigs.map(log=>({...log,
+      ...(Array.isArray(log?.exemptedMembers)?{exemptedMembers:unordered(log.exemptedMembers)}:{})})))}:{})})));
+  return out;
+}
+const policyDigest=(p,includeEtag=true)=>c.digest({...policyComparison(p),...(!includeEtag?{etag:undefined}:{etag:etagString(p)})});
 const unconditional=b=>b.role===ROLE&&!b.condition;
 function exactGrantPlan(policy,principal,authority){
   c.need(isRuntime(principal),'INGRESS_RUNTIME_PRINCIPAL_NOT_VERIFIED');
@@ -103,6 +141,78 @@ async function rollbackExact({client,plan,receipt}){
 function safeStatus(error){const code=Number(error?.code||error?.response?.status);
   return code===7||code===403?'PERMISSION_DENIED':code===16||code===401?'UNAUTHENTICATED':code===5||code===404?'NOT_FOUND':
     [4,13,14,429,500,502,503,504].includes(code)?'TRANSIENT_FAILURE':'UNCONFIRMED';}
+async function listEventInventory(sourceClient,version){
+  const rows=[],tokens=new Set();let pageToken='';
+  for(let page=0;page<20;page++){
+    const response=await sourceClient.request({url:`https://cloudfunctions.googleapis.com/${version}/projects/${PROJECT}/locations/-/functions`,method:'GET',
+      params:{pageSize:1000,...(version==='v2'?{filter:'environment="GEN_2"'}:{}),...(pageToken?{pageToken}:{})}});
+    const data=response.data||{};c.need(!data.unreachable?.length,'INGRESS_EVENT_INVENTORY_UNREACHABLE');
+    c.need(data.functions===undefined||Array.isArray(data.functions),'INGRESS_EVENT_INVENTORY_INVALID');
+    rows.push(...(data.functions||[]));c.need(rows.length<=1000,'INGRESS_EVENT_INVENTORY_BOUND_EXCEEDED');
+    if(!data.nextPageToken)return rows;
+    c.need(typeof data.nextPageToken==='string'&&!tokens.has(data.nextPageToken),'INGRESS_EVENT_INVENTORY_CURSOR_REPEATED');
+    pageToken=data.nextPageToken;tokens.add(pageToken);
+  }
+  throw Object.assign(Error('INGRESS_EVENT_INVENTORY_INCOMPLETE'),{code:'INGRESS_EVENT_INVENTORY_INCOMPLETE'});
+}
+function inventoryService(fn){
+  const labels=fn.labels||{};
+  if(labels['deployment-scheduled']||labels['deployment-taskqueue']||labels['deployment-callable']||labels['deployment-callabled'])return null;
+  if(['before-create','before-sign-in','before-send-email','before-send-sms'].includes(labels['deployment-blocking']))return 'auth';
+  return EVENT_SERVICES[fn.eventTrigger?.eventType]||null;
+}
+async function queueRulesReadback(sourceClient,readRulesSources=()=>['firestore.rules','firestore.b4-003-scoped-candidate.rules']
+  .map(sourcePath=>({sourcePath,bytes:require('node:fs').readFileSync(path.resolve(__dirname,'..',sourcePath))}))) {
+  const release=await sourceClient.request({url:`https://firebaserules.googleapis.com/v1/projects/${PROJECT}/releases/cloud.firestore`,method:'GET'});
+  const ruleset=release.data?.rulesetName;c.need(/^projects\/ays-orbit-360-lab\/rulesets\/[A-Za-z0-9-]+$/.test(ruleset||''),'INGRESS_RULESET_IDENTITY_UNVERIFIED');
+  const response=await sourceClient.request({url:'https://firebaserules.googleapis.com/v1/'+ruleset,method:'GET'}),files=response.data?.source?.files;
+  c.need(Array.isArray(files)&&files.length===1&&typeof files[0].content==='string','INGRESS_RULESET_SOURCE_UNVERIFIED');
+  const bytes=Buffer.from(files[0].content);c.need(bytes.length>0&&bytes.length<=200000,'INGRESS_RULESET_SOURCE_BOUND');
+  const gitBlob=value=>crypto.createHash('sha1').update('blob '+value.length+'\0').update(value).digest('hex'),sourceBlob=gitBlob(bytes);
+  const matches=readRulesSources().filter(r=>['firestore.rules','firestore.b4-003-scoped-candidate.rules'].includes(r.sourcePath)&&gitBlob(r.bytes)===sourceBlob);
+  c.need(matches.length===1,'INGRESS_DEPLOYED_QUEUE_RULES_SOURCE_NOT_UNIQUE');
+  return{status:'EXACT_CANONICAL_RULESET_SOURCE_MATCH',sourcePath:matches[0].sourcePath,sourceBlob,rulesetName:ruleset,rulesWrites:0,contentPublished:false};
+}
+async function eventarcPreflight({sourceClient,runtimeClientFor,readRulesSources}){
+  const report={schema:'GI_I66_MAKE_EVENTARC_PROJECT_IAM_READONLY_V1',status:'EVENTARC_PREREQUISITES_UNVERIFIED_HOLD',
+    projectId:PROJECT,cliVersion:'14.10.1',canonicalRuntime:CANONICAL_RUNTIME,canonicalRuntimeObserved:false,
+    inventoryComplete:false,existingRecognizedEventServices:[],projectPolicyRead:false,projectPolicyDigest:null,
+    firstEventBindings:[],cliWouldAddProjectBindings:null,queueRules:null,runtimeImpersonationVerified:false,
+    runtimeEventarcPermissionsVerified:false,grantedRequiredPermissions:[],failureStage:null,failureStatus:null,
+    projectIamWrites:0,secretIamWrites:0,firestoreWrites:0,providerRequests:0,externalMessagesSent:0,privatePolicyPublished:false};
+  let stage='CANONICAL_RUNTIME';
+  try{
+    for(const target of OPS){
+      const resource=`projects/${PROJECT}/locations/${target.region}/functions/${target.name}`;
+      const r=await sourceClient.request({url:'https://cloudfunctions.googleapis.com/v2/'+resource,method:'GET'});
+      c.need(r.data?.name===resource&&r.data.state==='ACTIVE'&&r.data.serviceConfig?.serviceAccountEmail===CANONICAL_RUNTIME,
+        'INGRESS_EVENTARC_CANONICAL_RUNTIME_CHANGED');
+    }
+    report.canonicalRuntimeObserved=true;stage='FUNCTION_INVENTORY';
+    const rows=[...await listEventInventory(sourceClient,'v1'),...await listEventInventory(sourceClient,'v2')];
+    report.inventoryComplete=true;report.functionCount=rows.length;
+    report.existingRecognizedEventServices=[...new Set(rows.map(inventoryService).filter(Boolean))].sort();
+    report.inventoryDigest=c.digest(rows.map(r=>({name:r.name,eventService:inventoryService(r),eventType:r.eventTrigger?.eventType||null})).sort((a,b)=>String(a.name).localeCompare(String(b.name))));
+    stage='PROJECT_POLICY_READ';
+    const r=await sourceClient.request({url:`https://cloudresourcemanager.googleapis.com/v1/projects/${PROJECT}:getIamPolicy`,method:'POST',
+      data:{options:{requestedPolicyVersion:3}}}),policy=r.data;
+    c.need(policy&&Array.isArray(policy.bindings)&&etagString(policy),'INGRESS_PROJECT_POLICY_UNVERIFIED');
+    report.projectPolicyRead=true;report.projectPolicyDigest=policyDigest(policy);
+    report.firstEventBindings=FIRST_EVENT_BINDINGS.map(required=>({...required,
+      present:policy.bindings.some(b=>b.role===required.role&&!b.condition&&Array.isArray(b.members)&&b.members.includes(required.member))}));
+    report.cliWouldAddProjectBindings=report.existingRecognizedEventServices.length===0&&report.firstEventBindings.some(b=>!b.present);
+    stage='QUEUE_RULES_READBACK';report.queueRules=await queueRulesReadback(sourceClient,readRulesSources);
+    stage='RUNTIME_EVENTARC_PERMISSIONS';
+    const runtime=await runtimeClientFor(CANONICAL_RUNTIME);await runtime.getAccessToken();report.runtimeImpersonationVerified=true;
+    const granted=await runtime.request({url:`https://cloudresourcemanager.googleapis.com/v1/projects/${PROJECT}:testIamPermissions`,
+      method:'POST',data:{permissions:[...REQUIRED_EVENTARC_PERMISSIONS]}});
+    report.grantedRequiredPermissions=REQUIRED_EVENTARC_PERMISSIONS.filter(p=>granted.data?.permissions?.includes(p));
+    report.runtimeEventarcPermissionsVerified=report.grantedRequiredPermissions.length===REQUIRED_EVENTARC_PERMISSIONS.length;
+    report.status=report.cliWouldAddProjectBindings?'UNAUTHORIZED_PROJECT_IAM_DELTA_WOULD_BE_REQUIRED_HOLD':
+      report.runtimeEventarcPermissionsVerified?'EVENTARC_RUNTIME_AND_PROJECT_IAM_READY':'EVENTARC_RUNTIME_PERMISSION_MISSING_HOLD';
+  }catch(error){report.failureStage=stage;report.failureStatus=safeStatus(error);}
+  return{...report,reportDigest:c.digest(report)};
+}
 async function preflight({sourceClient,runtimeClientFor,secretClientFor}){
   const functions=[];
   for(const target of OPS){
@@ -154,13 +264,15 @@ async function preflight({sourceClient,runtimeClientFor,secretClientFor}){
   return{...report,reportDigest:c.digest(report)};
 }
 async function main(){
-  c.need(process.argv.length===2||process.argv.length===3&&process.argv[2]==='preflight','INGRESS_RUNTIME_TOOL_READONLY_CLI');
+  c.need(process.argv.length===2||process.argv.length===3&&['preflight','eventarc-preflight'].includes(process.argv[2]),'INGRESS_RUNTIME_TOOL_READONLY_CLI');
   const {GoogleAuth,Impersonated}=functionsRequire('google-auth-library'),{SecretManagerServiceClient}=functionsRequire('@google-cloud/secret-manager');
   const auth=new GoogleAuth({projectId:PROJECT,scopes:['https://www.googleapis.com/auth/cloud-platform']}),sourceClient=await auth.getClient();
-  const report=await preflight({sourceClient,runtimeClientFor:async principal=>new Impersonated({sourceClient,targetPrincipal:principal,
+  const options={sourceClient,runtimeClientFor:async principal=>new Impersonated({sourceClient,targetPrincipal:principal,
     delegates:[],targetScopes:['https://www.googleapis.com/auth/cloud-platform'],lifetime:600}),
-    secretClientFor:async runtime=>new SecretManagerServiceClient({projectId:PROJECT,auth:new GoogleAuth({authClient:runtime,projectId:PROJECT})})});
-  console.log('I66_MAKE_RUNTIME_ACCESS_PREFLIGHT='+JSON.stringify(report));
+    secretClientFor:async runtime=>new SecretManagerServiceClient({projectId:PROJECT,auth:new GoogleAuth({authClient:runtime,projectId:PROJECT})})};
+  const eventarc=process.argv[2]==='eventarc-preflight',report=await (eventarc?eventarcPreflight(options):preflight(options));
+  console.log((eventarc?'I66_MAKE_EVENTARC_PROJECT_IAM_READONLY=':'I66_MAKE_RUNTIME_ACCESS_PREFLIGHT=')+JSON.stringify(report));
 }
 if(require.main===module)main().catch(()=>{console.error('I66_MAKE_RUNTIME_PREFLIGHT_UNCONFIRMED');process.exitCode=1;});
-module.exports={SCOPE,PROJECT,SECRET,ROLE,PRIOR_RUNTIME,OPS,REQUIRED_FIRESTORE_PERMISSIONS,isRuntime,policyDigest,exactGrantPlan,grantExact,rollbackExact,preflight};
+module.exports={SCOPE,PROJECT,SECRET,ROLE,PRIOR_RUNTIME,OPS,CANONICAL_RUNTIME,REQUIRED_FIRESTORE_PERMISSIONS,REQUIRED_EVENTARC_PERMISSIONS,FIRST_EVENT_BINDINGS,
+  isRuntime,policyDigest,exactGrantPlan,grantExact,rollbackExact,preflight,eventarcPreflight,listEventInventory,inventoryService,queueRulesReadback};

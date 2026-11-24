@@ -27,7 +27,7 @@
     "activeGate": "I6.6",
     "closedHistoricalGate": "B4-007",
     "latestProvenLiveSource": "65c825b2808a615ca4195bdde6689dbdbe3193b2",
-    "currentWork": "I6.6: construir v17 una sola vez con el mismo cambio causal de saldo y el observador corregido; exigir 48 etapas Preview y 48 LIVE sobre el mismo artifact. Preservar E3 hasta la promoción comprobada, los 148 pagos y las 24 obligaciones ya aplicados. Continuar correcciones financieras por evidencia exacta y Make hacia Leads mediante el owner canónico, manteniendo pendientes los objetivos sin prueba.",
+    "currentWork": "I6.6: conservar E3 vigente y los dos rollbacks E4/E5. Preservar 155 pagos históricos DIRECT por Q78806.43 pendientes de aplicación y 36 obligaciones documentadas por Q10017.66. Corregir el transporte del owner con evidencia causal, componer saldo + Make + lectura A14 en un nuevo artifact y exigir la aceptación firmada correspondiente. Continuar fuentes financieras nuevas mediante el motor canónico y correo por usuario con deduplicación y permisos; ningún nuevo PASS global se declara.",
     "latestHostingPreviewEvidence": "artifacts/orbit360-recovery/release-control/I6_6_NETWORK_DIAGNOSTICS_PREVIEW_BUILD_20261117.json",
     "latestHostingPreviewSource": "1b65a790530d49fe1d1fb451f02838fd9a713c53",
     "operationsEvidenceReview": "artifacts/orbit360-recovery/release-control/I6_6_OPS_EVIDENCE_AND_PREVIEW_BINDING_REVIEW_20261116.json",
@@ -1775,14 +1775,15 @@
     },
     "currentFinancialDataExecution20261124": {
       "schema": "GI_I66_CURRENT_FINANCIAL_EXECUTION_V1",
-      "recordedAtUtc": "2026-11-24T05:34:59.317Z",
+      "recordedAtUtc": "2026-11-24T09:30:41.410Z",
       "historicalPayments": {
-        "applied": 148,
-        "grossCents": 7663847,
+        "applied": 155,
+        "grossCents": 7880643,
         "currency": "GTQ",
         "runs": [
           45328403470,
-          45330498452
+          45330498452,
+          45350619705
         ],
         "receipts": [
           {
@@ -1792,51 +1793,125 @@
           {
             "path": "artifacts/orbit360-recovery/release-control/I6_6_CENDOSO_146_HISTORICAL_LIVE_READBACK_20261124.json",
             "gitBlobSha": "26cd08a97de7cafe3b9448e20f0a01eee9e5d2cc"
+          },
+          {
+            "path": "artifacts/orbit360-recovery/release-control/I6_6_CENDOSO_SEVEN_DISTINCT_LEGACY_LIVE_READBACK_20261124.json",
+            "gitBlobSha": "8c2d343d3bd0f8bb4c22d2a86e8b3ff19cb26bb0"
           }
         ],
         "currentDebtCreated": 0,
         "automaticReconciliations": 0,
         "newMoneyTransfers": 0,
-        "historicalClosedReceiptCreates": 146,
-        "historicalClosedPortfolioCreates": 146,
-        "confirmedUnreconciledCobrosCreated": 148,
-        "sourceIdOverlapBetweenNewLots": 0
+        "historicalClosedReceiptCreates": 153,
+        "historicalClosedPortfolioCreates": 153,
+        "confirmedUnreconciledCobrosCreated": 155,
+        "sourceIdOverlapBetweenNewLots": 0,
+        "directPayments": 155,
+        "inferredPayments": 0,
+        "applicationState": "PENDING_APPLICATION",
+        "directInferredScope": "These 155 source-confirmed historical payments only; not every prior CRM payment or a claim of insurer reconciliation."
       },
       "newPendingObligations": {
-        "obligations": 24,
-        "grossCents": 667812,
+        "obligations": 36,
+        "grossCents": 1001766,
         "currency": "GTQ",
-        "runId": 45330498425,
-        "jobId": 138231284166,
-        "receipt": {
-          "path": "artifacts/orbit360-recovery/release-control/I6_6_ROBLE_REMAINING_24_COMMERCIAL_SERVER_READBACK_20261124.json",
-          "gitBlobSha": "c62300fab11d3f764ab011f957ede7fcf7c30c1d"
-        },
-        "newPolicySuccessors": 2,
-        "receiptCreates": 24,
-        "portfolioCreates": 24,
-        "totalTechnicalWrites": 58,
+        "receiptCreates": 36,
+        "portfolioCreates": 36,
+        "newPolicySuccessors": 3,
+        "totalTechnicalWrites": 86,
         "paymentsCreated": 0,
-        "previousCasesPreserved": 2,
-        "previousObligationsPreserved": 24,
-        "isolatedRiskConflictCases": 1,
-        "uiKanbanAccepted": false
+        "uiKanbanAccepted": false,
+        "runs": [
+          45330498425,
+          45357085685
+        ],
+        "jobs": [
+          138231284166,
+          138317804770
+        ],
+        "receipts": [
+          {
+            "path": "artifacts/orbit360-recovery/release-control/I6_6_ROBLE_REMAINING_24_COMMERCIAL_SERVER_READBACK_20261124.json",
+            "gitBlobSha": "c62300fab11d3f764ab011f957ede7fcf7c30c1d"
+          },
+          {
+            "path": "artifacts/orbit360-recovery/release-control/I6_6_UNIVERSALES_12289_TWELVE_LIVE_READBACK_20261124.json",
+            "gitBlobSha": "cf63b1a77c3a8e997a11144e6713e76177e57d28"
+          }
+        ],
+        "previousRobleApplication": {
+          "obligations": 24,
+          "grossCents": 667812,
+          "currency": "GTQ",
+          "runId": 45330498425,
+          "jobId": 138231284166,
+          "receipt": {
+            "path": "artifacts/orbit360-recovery/release-control/I6_6_ROBLE_REMAINING_24_COMMERCIAL_SERVER_READBACK_20261124.json",
+            "gitBlobSha": "c62300fab11d3f764ab011f957ede7fcf7c30c1d"
+          },
+          "newPolicySuccessors": 2,
+          "receiptCreates": 24,
+          "portfolioCreates": 24,
+          "totalTechnicalWrites": 58,
+          "paymentsCreated": 0,
+          "previousCasesPreserved": 2,
+          "previousObligationsPreserved": 24,
+          "isolatedRiskConflictCases": 1,
+          "uiKanbanAccepted": false
+        },
+        "universalesApplication": {
+          "obligations": 12,
+          "grossCents": 333954,
+          "currency": "GTQ",
+          "technicalDocumentWrites": 28,
+          "policy": "04-05-01-12289-4",
+          "policyState": "SIN COBERTURA",
+          "coverageActiveInferred": false,
+          "cancellationExecuted": false,
+          "newCobros": 0,
+          "newVehicles": 0,
+          "runId": 45357085685,
+          "jobId": 138317804770,
+          "receipt": {
+            "path": "artifacts/orbit360-recovery/release-control/I6_6_UNIVERSALES_12289_TWELVE_LIVE_READBACK_20261124.json",
+            "gitBlobSha": "cf63b1a77c3a8e997a11144e6713e76177e57d28"
+          },
+          "remaining15590RowsHeld": 10,
+          "liveReplayPerformed": false,
+          "full302PostscanPerformed": false
+        },
+        "countScope": "24 El Roble plus 12 Universales obligations from disjoint protected applications. Historical prior24 Roble obligations stay outside this new36 count."
       },
       "previouslyCreatedIssuedScheduleObligations": 58,
-      "knownIssuedScheduleObligationsAfterThisExecution": 82,
-      "issuedScheduleCountScope": "Known prior 58 plus new 24 issuer schedule obligations. Excludes 146 separately materialized historical paid receipts and six updates of existing obligations; not the full database count.",
+      "knownIssuedScheduleObligationsAfterThisExecution": 94,
+      "issuedScheduleCountScope": "Known prior 58 plus new 36 issuer schedule obligations (24 El Roble and 12 Universales; 94 total in this documented scope). Excludes 153 separately materialized historical paid receipts and seven corrections of existing obligations (six earlier plus one identity correction); not the full database count.",
       "cendoso607Disposition": {
-        "basis": "Exact preflight plus 146 protected transaction readbacks, not a new post-apply full607 scan",
+        "basis": "Exact latest 607-row preflight plus seven protected transaction readbacks; not a full post-application census",
         "sourceRows": 607,
-        "preservedBefore146": 344,
-        "applied146": 146,
-        "isolatedExceptions": 117,
-        "coveredPaidFacts": 490,
+        "preservedBeforeLatestApply": 490,
+        "latestApplied": 7,
+        "isolatedExceptions": 110,
+        "coveredPaidFacts": 497,
+        "preflightRunId": 45350619705,
+        "preflightJobId": 138295832663,
+        "readbackJobId": 138296105238,
         "receipt": {
-          "path": "artifacts/orbit360-recovery/release-control/I6_6_CENDOSO_146_HISTORICAL_LIVE_READBACK_20261124.json",
-          "gitBlobSha": "26cd08a97de7cafe3b9448e20f0a01eee9e5d2cc"
+          "path": "artifacts/orbit360-recovery/release-control/I6_6_CENDOSO_SEVEN_DISTINCT_LEGACY_LIVE_READBACK_20261124.json",
+          "gitBlobSha": "8c2d343d3bd0f8bb4c22d2a86e8b3ff19cb26bb0"
         },
-        "full607Closed": false
+        "fullPostApplicationScanPerformed": false,
+        "full607Closed": false,
+        "exceptionCodes": {
+          "SOURCE_CURRENCY_NOT_GTQ": 29,
+          "EXACT_POLICY_EDITION_NOT_FOUND": 12,
+          "POLICY_NUMBER_NOT_FOUND": 32,
+          "NET_PREMIUM_CHANGED_REQUIRES_COMMISSION_RECOMPUTE": 8,
+          "MULTIPLE_POLICY_EDITIONS": 1,
+          "RECEIPT_PERIOD_OR_DUE_NOT_FOUND": 16,
+          "MULTIPLE_RECEIPTS_FOR_PERIOD_OR_AMOUNT": 2,
+          "HISTORICAL_EXISTING_POLICY_FINANCIAL_RECORD": 6,
+          "CONFLICTING_SOURCE_DATES": 4
+        }
       },
       "source302PostCommitCensus": {
         "sourceRows": 302,
@@ -1885,11 +1960,13 @@
         "historicalCreationChunkMaximum": 100,
         "actualHistoricalChunks": [
           100,
-          46
+          46,
+          7
         ],
         "actualHistoricalDocumentCreates": [
           400,
-          184
+          184,
+          28
         ],
         "exactPreimageCas": true,
         "deterministicIds": true,
@@ -1898,10 +1975,32 @@
         "repeatAcceptedRecords": false
       },
       "fullA12Passed": false,
-      "fullI66ProductionAccepted": false
+      "fullI66ProductionAccepted": false,
+      "existingIdentityCorrections": {
+        "cases": 1,
+        "updates": 3,
+        "auditCreates": 1,
+        "technicalWrites": 4,
+        "newObligations": 0,
+        "newPayments": 0,
+        "policyUpdates": 1,
+        "receiptUpdates": 1,
+        "portfolioUpdates": 1,
+        "grossDeltaCents": 0,
+        "preservedGrossCents": 374740,
+        "currency": "GTQ",
+        "runId": 45350431653,
+        "jobId": 138296533043,
+        "receipt": {
+          "path": "artifacts/orbit360-recovery/release-control/I6_6_ROBLE_4140843_EXISTING_IDENTITY_LIVE_READBACK_20261124.json",
+          "gitBlobSha": "efd35a7644518ff64c6a265d1a4866a8c18aec55"
+        },
+        "full302PostscanPerformed": false,
+        "earlierSixDateCorrectionsRemainSeparate": true
+      }
     },
     "frontendBalanceCorrection20261124": {
-      "status": "SOURCE_AND_QA_FROZEN_PREVIEW_BUILD_REQUESTED_NOT_DEPLOYED",
+      "status": "V17_PREVIEW48_PASS_E4_E5_LIVE48_NOT_COMMITTED_BOTH_ROLLED_BACK",
       "sourceProductCommit": "95214f67dd607713b5a9b46e2af4ba58c6513cad",
       "sourceQaHead": "f0a0d8743cec6adfbcf19637e25200b66c01d4a8",
       "sourceQaRunId": 45350431726,
@@ -1923,9 +2022,237 @@
       "frontendOnly": true,
       "backendDeploys": 0,
       "financialWrites": 0,
-      "previewAccepted": false,
+      "previewAccepted": true,
       "liveAccepted": false,
-      "fullI66ProductionAccepted": false
+      "fullI66ProductionAccepted": false,
+      "immutableTarget": {
+        "sourceSha": "658246bb953c0c1b7aa6f54e98cd5c4e39c5b85d",
+        "sourceTree": "4dd8647f9bd67529953c6fd36c73067785e2aba1",
+        "manifestBlob": "2d9d4e08648b562d9d51f1dd96ea97abc8b2bf69",
+        "compositionBlob": "33bf80768cb6cb311f2975d282a5f50935f680aa",
+        "artifactId": 14900297283,
+        "artifactDigest": "sha256:58a2286811ba8b5ce891d07a24bddabddd1700ca61cb6daccd71ef3fe248b0a7",
+        "buildId": "gi-i66-658246bb953c-57f234755dc1",
+        "buildRunId": 45351191795,
+        "previewUrl": "https://ays-orbit-360-lab--gi-i66-rc-45351191795-zqi3xeww.web.app",
+        "previewChannel": "gi-i66-rc-45351191795",
+        "previewUiRunId": 45351824251,
+        "hostingVersion": "sites/ays-orbit-360-lab/versions/9569c75160b4f3ab",
+        "files": 224
+      },
+      "preview": {
+        "status": "LATEST_APPROVED_VERSION_PREVIEW_PASS_SCOPED",
+        "runId": 45351824251,
+        "stages": 48,
+        "receipt": {
+          "path": "artifacts/orbit360-recovery/release-control/I6_6_FRONTEND_E00004_PREVIEW_UI.json",
+          "blobSha": "956e2676d2f9d6cfe18ed0af92784574862ae232"
+        },
+        "reportSha256": "2ab32afc294f97c2302ea0b3b5350d6b1d72eaf6f1f2aca4aae986734958327e"
+      },
+      "promotionAttempts": [
+        {
+          "generation": 4,
+          "status": "ROLLED_BACK_NOT_ACCEPTED",
+          "runId": 45355676984,
+          "jobId": 138312762792,
+          "receipt": {
+            "path": "artifacts/orbit360-recovery/release-control/I6_6_FRONTEND_E00004_POST_UI_NETWORK_ROLLBACK_20261124.json",
+            "blobSha": "5e7f8b6f7e6662f05bdc768e92577f3aee8851d5"
+          },
+          "journal": {
+            "path": "artifacts/orbit360-recovery/release-control/I6_6_FRONTEND_E00004_JOURNAL.json",
+            "blobSha": "393cfc09bb456690bc52d3f42f9472a278800da8",
+            "phase": "ROLLED_BACK"
+          },
+          "target": {
+            "sourceSha": "658246bb953c0c1b7aa6f54e98cd5c4e39c5b85d",
+            "sourceTree": "4dd8647f9bd67529953c6fd36c73067785e2aba1",
+            "manifestBlob": "2d9d4e08648b562d9d51f1dd96ea97abc8b2bf69",
+            "compositionBlob": "33bf80768cb6cb311f2975d282a5f50935f680aa",
+            "artifactId": 14900297283,
+            "artifactDigest": "sha256:58a2286811ba8b5ce891d07a24bddabddd1700ca61cb6daccd71ef3fe248b0a7",
+            "buildId": "gi-i66-658246bb953c-57f234755dc1",
+            "buildRunId": 45351191795,
+            "previewUrl": "https://ays-orbit-360-lab--gi-i66-rc-45351191795-zqi3xeww.web.app",
+            "previewChannel": "gi-i66-rc-45351191795",
+            "previewUiRunId": 45351824251,
+            "hostingVersion": "sites/ays-orbit-360-lab/versions/9569c75160b4f3ab",
+            "files": 224
+          },
+          "liveUi": {
+            "status": "FRONTEND_SIX_RECEIPTS_TWO_ROLE_TWO_VIEW_READONLY_PASS",
+            "stageCount": 48,
+            "reportSha256": "eb61d774ec669d1b70b23b88af1fb81495832c81c821a0acb94645dcdb87efde",
+            "reportArtifactId": 14903760100,
+            "artifactDigest": "sha256:3d6459d254af71eebb65ce4f0105f36760073292f1482af25e4c3447e29dd8a4",
+            "scopeOnly": true,
+            "acceptedRelease": false,
+            "firestoreWrites": 0
+          },
+          "observedFailure": {
+            "classification": "RELEASE_COMPOSITION_PROVIDER_NETWORK",
+            "observedReason": "fetch failed",
+            "operation": "SAVE_SIGNED_LIVE_UI_RECEIPT",
+            "liveUiReceiptPersisted": false,
+            "releaseAccepted": false
+          },
+          "rollback": {
+            "firebase": 224,
+            "custom": 224,
+            "sourceSha": "65c825b2808a615ca4195bdde6689dbdbe3193b2",
+            "buildId": "gi-i66-65c825b2808a-57f234755dc1",
+            "artifactDigest": "sha256:7cb782848a45083047c4899bc30c13bf5be46429607e42597d09342becfc9acc",
+            "hostingVersion": "sites/ays-orbit-360-lab/versions/332999a55b189108",
+            "manifestDigest": "sha256:da40e7ad3f453107a44fdc868a58ff469f91139252c0204f9fc298a8d9f02905"
+          },
+          "newLiveAcceptance": false
+        },
+        {
+          "generation": 5,
+          "status": "ROLLED_BACK_NOT_ACCEPTED",
+          "runId": 45359645078,
+          "jobId": 138326116195,
+          "receipt": {
+            "path": "artifacts/orbit360-recovery/release-control/I6_6_FRONTEND_E00005_POST_UI_NETWORK_ROLLBACK_20261124.json",
+            "blobSha": "01bfe400101adabf8994dcd65a78203511f2fe0c"
+          },
+          "journal": {
+            "path": "artifacts/orbit360-recovery/release-control/I6_6_FRONTEND_E00005_JOURNAL.json",
+            "blobSha": "ebdaf3669db796b34501935a93b1b90b2b792c06",
+            "phase": "ROLLED_BACK"
+          },
+          "target": {
+            "sourceSha": "658246bb953c0c1b7aa6f54e98cd5c4e39c5b85d",
+            "sourceTree": "4dd8647f9bd67529953c6fd36c73067785e2aba1",
+            "manifestBlob": "2d9d4e08648b562d9d51f1dd96ea97abc8b2bf69",
+            "compositionBlob": "33bf80768cb6cb311f2975d282a5f50935f680aa",
+            "artifactId": 14900297283,
+            "artifactDigest": "sha256:58a2286811ba8b5ce891d07a24bddabddd1700ca61cb6daccd71ef3fe248b0a7",
+            "buildId": "gi-i66-658246bb953c-57f234755dc1",
+            "buildRunId": 45351191795,
+            "previewUrl": "https://ays-orbit-360-lab--gi-i66-rc-45351191795-zqi3xeww.web.app",
+            "previewChannel": "gi-i66-rc-45351191795",
+            "previewUiRunId": 45351824251,
+            "hostingVersion": "sites/ays-orbit-360-lab/versions/9569c75160b4f3ab",
+            "files": 224
+          },
+          "liveUi": {
+            "status": "FRONTEND_SIX_RECEIPTS_TWO_ROLE_TWO_VIEW_READONLY_PASS",
+            "stageCount": 48,
+            "reportSha256": "d5e2b333c03197d1f969661707eac65f9613dfc7b6cc2dc492eca0fd3abb4f69",
+            "reportArtifactId": 14904343737,
+            "artifactDigest": "sha256:cfa1806ccee552f447cedd8f888e480a8bd50a7c6d9556461a6c6f90e222c35c",
+            "scopeOnly": true,
+            "acceptedRelease": false,
+            "firestoreWrites": 0
+          },
+          "observedFailure": {
+            "classification": "RELEASE_COMPOSITION_PROVIDER_NETWORK",
+            "observedReason": "fetch failed",
+            "operation": "SAVE_SIGNED_LIVE_UI_RECEIPT",
+            "liveUiReceiptPersisted": false,
+            "releaseAccepted": false,
+            "productionTransportCause": "NOT_YET_PROVEN",
+            "previousAttemptSameObservedFailure": true
+          },
+          "rollback": {
+            "firebase": 224,
+            "custom": 224,
+            "sourceSha": "65c825b2808a615ca4195bdde6689dbdbe3193b2",
+            "buildId": "gi-i66-65c825b2808a-57f234755dc1",
+            "artifactDigest": "sha256:7cb782848a45083047c4899bc30c13bf5be46429607e42597d09342becfc9acc",
+            "hostingVersion": "sites/ays-orbit-360-lab/versions/332999a55b189108",
+            "manifestDigest": "sha256:da40e7ad3f453107a44fdc868a58ff469f91139252c0204f9fc298a8d9f02905"
+          },
+          "newLiveAcceptance": false
+        }
+      ],
+      "currentPhysicalGeneration": 3,
+      "next": "Correct the observed release-transport failure inside the existing owner, then certify the next newly built composed artifact. Neither failed promotion is accepted."
+    },
+    "communicationIngressProgress20261124": {
+      "status": "CANONICAL_WRITER_SOURCE_PREPARED_RUNTIME_AND_SIGNED_RELEASE_PENDING",
+      "probeCommit": "6a93bb4a8cf962f148dde324bce48651473b246e",
+      "probeRunId": 45342932589,
+      "probeJobId": 138270601689,
+      "secretVersionAccessible": true,
+      "tenantCountryInstanceMatch": true,
+      "inboundBlockPresent": false,
+      "inboundEnabled": false,
+      "existingRoutingCandidatePresent": false,
+      "approvedAssignment": "pending_operations",
+      "scopeReceiptPath": "artifacts/orbit360-recovery/release-control/I6_6_A13_CHANNEL_SCOPE_AND_EXISTING_EXECUTORS_20261124.json",
+      "scopeReceiptBlobSha": "7ce546736ac8d08b8ac922d19f3e6e4c2bac0021",
+      "providerMessagesSent": 0,
+      "canonicalLeadWritesCertified": 0,
+      "scope": "Validate existing tenant, provider and machine identity before connecting the existing Make reader to the canonical Leads transaction. No human actor impersonation and no duplicate writer.",
+      "actualProviderReadiness": {
+        "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_MAKE_PROVIDER_RUNTIME_READINESS_20261124.json",
+        "receiptBlobSha": "9d4fa796cee274119a6426b6f5afb62b51c52cb5",
+        "runId": 45350040478,
+        "jobId": 138293911670,
+        "providerAuthorized": true,
+        "settingsIdentityMatches": true,
+        "runtimeSecretAccessVerified": false,
+        "runtimeSecretPermissionDenied": true,
+        "messagesSent": 0,
+        "firestoreWrites": 0
+      },
+      "communicationDecisions": {
+        "classification": {
+          "path": "artifacts/orbit360-recovery/release-control/I6_6_EMAIL_AUTOMATIC_CLASSIFICATION_OWNER_DECISION_20261124.json",
+          "blobSha": "04bc1ccbb1f640368e89cf3c53b3090c7438140b"
+        },
+        "sourcePrecedence": {
+          "path": "artifacts/orbit360-recovery/release-control/I6_6_EMAIL_OPERATIONAL_SOURCE_PRECEDENCE_OWNER_DECISION_20261124.json",
+          "blobSha": "6f28fcdee72e367925620a42a4ac05b253b2feac"
+        },
+        "traceability": {
+          "path": "artifacts/orbit360-recovery/release-control/I6_6_COMMUNICATION_TRACEABILITY_AND_DOCUMENT_INGRESS_OWNER_DECISION_20261124.json",
+          "blobSha": "3bbfe4a19b9bb2db446bbfbb8f8be60da6ef8a18"
+        },
+        "pilotBinding": {
+          "path": "artifacts/orbit360-recovery/release-control/I6_6_EMAIL_PILOT_SELF_BINDING_OWNER_DECISION_20261124.json",
+          "blobSha": "17da2d0d297e0b0f010d2da763fd3d3a0f664c54"
+        },
+        "perUserDelivery": {
+          "path": "artifacts/orbit360-recovery/release-control/I6_6_PER_USER_MAILBOX_CROSS_DELIVERY_OWNER_DECISION_20261124.json",
+          "blobSha": "4eba3d0a6ccad98197082ffbb5078bc615efcb9b"
+        }
+      },
+      "mailboxPilotConfirmedByDirection": true,
+      "mailboxBindingApplied": false,
+      "perUserMailboxesRequired": true,
+      "crossMailboxCanonicalActivityDedupeRequired": true,
+      "supplierCurrentBodyPerProspectRequired": true,
+      "initialRequestAndOriginRequired": true,
+      "automaticFinancialRoutingUsesExistingCanonicalPipelineOnly": true,
+      "outboundAllowed": false,
+      "liveAccepted": false,
+      "metaAttribution": {
+        "receipt": {
+          "path": "artifacts/orbit360-recovery/release-control/I6_6_META_WHATSAPP_ATTRIBUTION_READONLY_20261124.json",
+          "blobSha": "ca24ec3265bc3b1b6c77a8ff63f37b9be913abbd"
+        },
+        "status": "CONNECTED_AD_METADATA_VERIFIED_REAL_INBOUND_JOIN_PENDING",
+        "returnedAdRows": 1,
+        "exactSourceIdJoinRequired": true,
+        "actualIncomingMessageJoined": false,
+        "specificProductVerified": false,
+        "canonicalBusinessWrites": 0,
+        "campaignChanges": 0
+      },
+      "mailboxOwnerIdentity": {
+        "status": "EXACT_CONFIRMED_OWNER_IDENTITY_READBACK_PASS_BINDING_CONFIG_PENDING",
+        "receipt": {
+          "path": "artifacts/orbit360-recovery/release-control/I6_6_EMAIL_PILOT_SELF_IDENTITY_READONLY_RECEIPT_20261124.json",
+          "blobSha": "0f6fc9ed2ae5a0919ade786ad5817aed97e470be"
+        },
+        "runId": 45364013323,
+        "currentVerifiedIdentityCount": 1,
+        "mailboxBindingApplied": false
+      }
     }
   },
   "b4003ActiveCertificationCursor20261106": {
@@ -5259,7 +5586,7 @@
     "i63LiveReadbackPass": true,
     "i63DeterministicDiffReady": true
   },
-  "nextAction": "I6.6: construir v17 una sola vez con el mismo cambio causal de saldo y el observador corregido; exigir 48 etapas Preview y 48 LIVE sobre el mismo artifact. Preservar E3 hasta la promoción comprobada, los 148 pagos y las 24 obligaciones ya aplicados. Continuar correcciones financieras por evidencia exacta y Make hacia Leads mediante el owner canónico, manteniendo pendientes los objetivos sin prueba.",
+  "nextAction": "I6.6: conservar E3 vigente y los dos rollbacks E4/E5. Preservar 155 pagos históricos DIRECT por Q78806.43 pendientes de aplicación y 36 obligaciones documentadas por Q10017.66. Corregir el transporte del owner con evidencia causal, componer saldo + Make + lectura A14 en un nuevo artifact y exigir la aceptación firmada correspondiente. Continuar fuentes financieras nuevas mediante el motor canónico y correo por usuario con deduplicación y permisos; ningún nuevo PASS global se declara.",
   "postproductionExitProgress": {
     "formalPercent": 60,
     "frozenMiniGates": 6,
@@ -24932,8 +25259,8 @@
   },
   "i66ActiveRecoveryCursor": {
     "status": "FROZEN_I66_SHOCK_EXECUTION_CONTINUES_NO_GATE_REPLACEMENT",
-    "currentEvidencePath": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_EXECUTION_PROGRESS_20261124_R29.json",
-    "currentEvidenceBlobSha": "f02de5466da8b9a3c64b948390e366b8035d0f87",
+    "currentEvidencePath": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_EXECUTION_PROGRESS_20261124_R30.json",
+    "currentEvidenceBlobSha": "fbf2c4ad048d207985f5358a98ab21d2b7640137",
     "frozenPlanPath": "artifacts/orbit360-recovery/release-control/I6_6_PLAN_CHOQUE_FUNCIONAL_FINANCIERO_20261122.md",
     "frozenPlanBlobSha": "fbfd54d229a13101fbfb0dfc6e92a5fa524999b6",
     "fullInventoryPath": "artifacts/orbit360-recovery/release-control/I6_6_INVENTARIO_INTEGRAL_295_20261122.md",
@@ -24947,18 +25274,18 @@
     "shockObjectivesPct": 14.3,
     "moduleReleasedThisIteration": false,
     "financialDeltaCasesPrepared": 113,
-    "financialRowsAppliedThisIteration": 82,
+    "financialRowsAppliedThisIteration": 94,
     "lastEvidenceDateLocal": "2026-11-24",
     "noNormativeProjectSourceChange": true,
-    "next": "I6.6: construir v17 una sola vez con el mismo cambio causal de saldo y el observador corregido; exigir 48 etapas Preview y 48 LIVE sobre el mismo artifact. Preservar E3 hasta la promoción comprobada, los 148 pagos y las 24 obligaciones ya aplicados. Continuar correcciones financieras por evidencia exacta y Make hacia Leads mediante el owner canónico, manteniendo pendientes los objetivos sin prueba.",
+    "next": "I6.6: conservar E3 vigente y los dos rollbacks E4/E5. Preservar 155 pagos históricos DIRECT por Q78806.43 pendientes de aplicación y 36 obligaciones documentadas por Q10017.66. Corregir el transporte del owner con evidencia causal, componer saldo + Make + lectura A14 en un nuevo artifact y exigir la aceptación firmada correspondiente. Continuar fuentes financieras nuevas mediante el motor canónico y correo por usuario con deduplicación y permisos; ningún nuevo PASS global se declara.",
     "lastFunctionalLiveUatRunId": 45074429319,
     "lastFunctionalLiveUatJobId": 137352857627,
     "lastFunctionalLiveScope": "TWO_ROLE_RENEWAL_INSURER_SYNTHETIC_PASS_REAL_ISSUANCE_AND_DOCUMENT_HOLD",
-    "previousEvidencePath": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_EXECUTION_PROGRESS_20261124_R28.json",
-    "previousEvidenceBlobSha": "04a7fd7d1c80d5e0e1eabec573233240f1b37563",
+    "previousEvidencePath": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_EXECUTION_PROGRESS_20261124_R29.json",
+    "previousEvidenceBlobSha": "f02de5466da8b9a3c64b948390e366b8035d0f87",
     "lastFunctionalLiveUatStatus": "LIVE_PHYSICAL_STEPS_PASS_FIVE_ROLE_FINAL_COVERAGE_FAIL_CLOSED",
     "lastFinancialProtectedPreflightRunId": 45332501697,
-    "lastFinancialSourceStatus": "148_PAYMENTS_24_NEW_OBLIGATIONS_READBACK_PASS_302_REFRESH_214_UNCHANGED_88_ISOLATED_0_ELIGIBLE",
+    "lastFinancialSourceStatus": "155_DIRECT_HISTORICAL_PAYMENTS_36_NEW_OBLIGATIONS_READBACK_VERIFIED_607_AND_302_NOT_FULLY_CLOSED",
     "lastFiveRoleMatrixRunId": 45298628816,
     "lastFiveRoleMatrixStatus": "PASS_SCOPED_GT_FIVE_ROLES_READONLY_FULL_A04_HOLD",
     "lastPerformanceEvidenceArtifactId": 14878846193,
@@ -24979,11 +25306,11 @@
     "lastFinancialUiReadbackStatus": "SIX_EXACT_UI_DATES_AMOUNTS_STATUS_AND_RELOAD_PASS_CANONICAL_FUTURO_PENDIENTE_BALANCE_OWNER_HOLD",
     "lastObserverResultsReceipt": "artifacts/orbit360-recovery/release-control/I6_6_POST_ACCEPTANCE_OBSERVER_RESULTS_RECONCILIATION_20261124_R2.json",
     "lastObserverResultsReceiptGitBlobSha": "c1ba5d3882b01a61e4f0be39e6d087efb38ac62d",
-    "financialRowsAppliedThisIterationScope": "Known prior 58 plus new 24 issuer schedule obligations. Excludes 146 separately materialized historical paid receipts and six updates of existing obligations; not the full database count.",
-    "financialHistoricalPaymentsAppliedThisContinuation": 148,
-    "financialHistoricalPaidReceiptsMaterializedThisContinuation": 146,
-    "financialNewPendingObligationsThisContinuation": 24,
-    "moduleReleasedThisIterationScope": "v16 Preview HOLD preserved; corrected QA frozen for v17. Physical release E3 remains current."
+    "financialRowsAppliedThisIterationScope": "Known prior 58 plus new 36 issuer schedule obligations (24 El Roble and 12 Universales; 94 total in this documented scope). Excludes 153 separately materialized historical paid receipts and seven corrections of existing obligations (six earlier plus one identity correction); not the full database count.",
+    "financialHistoricalPaymentsAppliedThisContinuation": 155,
+    "financialHistoricalPaidReceiptsMaterializedThisContinuation": 153,
+    "financialNewPendingObligationsThisContinuation": 36,
+    "moduleReleasedThisIterationScope": "E3 remains current; E4/E5 signed UI results did not complete release. Financial data commits remain independently preserved."
   },
   "i66PreversionedControlViewBlob": "de401082f688ce1c59f025f6f39e3c947dceaa35",
   "i66FrontendReleaseHead": {
