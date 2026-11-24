@@ -1,0 +1,81 @@
+{
+  "schema": "GI_I66_MAKE_QUEUE_EXECUTION_RECEIPT_V1",
+  "status": "success",
+  "scenarioId": 10196136,
+  "connectionId": 14756714,
+  "module": "google-cloud-firestore:createDocument",
+  "moduleId": 3,
+  "executionId": "b81342550a5548389a834aa2c30fa911",
+  "documentName": "projects/ays-orbit-360-lab/databases/(default)/documents/tenants/alianzas-soluciones/previewLeadIngressRequests/TMGgWeNUNuvp1tnXE57f",
+  "documentCreateTime": "2026-11-24T16:03:53.930Z",
+  "externalMessagesSent": 0,
+  "stage": "REPLAY",
+  "phase": "preview",
+  "sourceSha": "68a37a8e6f5bef24299773d8bc73f2d567c786cf",
+  "artifactId": 14934674207,
+  "artifactDigest": "sha256:bb7bf72757801ba8312c30f196a33b6920f941240bff9ee3354a58542407cfb7",
+  "backendPreviewRunId": 45429218736,
+  "activeConfigurationDigest": "e23eccdae2d28aec70d07979e67323f05ecdf85d3f387d9267219770db5814b3",
+  "precedingProtectedCapture": {
+    "status": "CANONICAL_CREATE_READBACK_CAPTURED",
+    "snapshotId": "8aa8fca9c098f0dd9aea57d0aa6f83572135fe06d2e7bcc5fb7db73f0e716c42",
+    "reportBlob": "1e7a9ce7dc87f4d2d3b41fa20aa0511f8f69b905",
+    "reportSha256": "209814c1657746c65cd50a58eeb5e2d4139faf4078f9779496d93d37630ef643",
+    "confirmationReceivedBeforeStage": true
+  },
+  "finalizedPayloadFileSha256": "4d3c1690bd24902a2e8f142b9c4ea8a1541d552f918d1d36ee61f8cf69ba6707",
+  "providerPacketSha256": "0a8d21233074df95dac1dfb01f7254b89074884ed7fdeddc5c0dbc55f34020d0",
+  "packetTimestamp": 1795536088,
+  "queueEnvelopeDigest": "eb2c0133977a1308f994b1624f8925bd4fc17ba4a200d5a590ecc98368e56f1b",
+  "qaNonceSha256": "57065e523ebdee6908b38c13a78ca06e36bff48e057eefc715b12ebf0527e535",
+  "inputOutputMatchFinalEnvelope": true,
+  "replayMatchesCreateEnvelope": true,
+  "rejectChangesQaNonceOnly": false,
+  "freshAutoQueueDocument": true,
+  "startedAt": "2026-11-24T16:03:52.326Z",
+  "durationMs": 2291,
+  "queueModuleFinishedAt": "2026-11-24T16:03:54.027Z",
+  "queueOnly": true,
+  "providerFixtureIsSynthetic": true,
+  "canonicalLeadAcceptanceClaim": false,
+  "protectedCanonicalOutcomeVerificationPending": true,
+  "readback": {
+    "topology": [
+      3,
+      1,
+      2
+    ],
+    "scheduling": {
+      "type": "on-demand"
+    },
+    "scenarioStatus": "active",
+    "writerDisabled": true,
+    "lastEdit": "2026-11-24T16:03:59.704Z",
+    "queueModuleInvocations": 1,
+    "queueModuleErrors": 0,
+    "windowFrom": "2026-11-24T16:03:21Z",
+    "windowExecutions": [
+      {
+        "id": "b81342550a5548389a834aa2c30fa911",
+        "startedAt": "2026-11-24T16:03:52.326Z",
+        "status": "success",
+        "startedBy": "auto",
+        "duration": 2291,
+        "operations": 2,
+        "credits": 2,
+        "dataTransfer": 58497,
+        "isReplayable": true
+      }
+    ],
+    "explicitScenarioRunRequested": true,
+    "explicitScenarioRunCallCount": 1,
+    "stageMapperRetainedWhileDisabled": true
+  },
+  "evidence": {
+    "moduleReadCycle": 1,
+    "cycleSelectionBasis": "Provider inspect explicitly instructed cycle1; actual output matches exact executionId and finalized envelope.",
+    "payloadTruncated": false,
+    "onlyModule3PayloadRead": true,
+    "privateGreenApiMessageBodiesRead": false
+  }
+}
