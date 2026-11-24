@@ -229,7 +229,11 @@ test('control-only push fallback dispatches neither wrong phase nor an unguarded
           appendFileSync:(path,value)=>{assert.equal(path,'test-output');output.push(value);}
         };},process:{env:{GITHUB_OUTPUT:'test-output'}},console:{log:()=>{}}
       });
-      assert.deepEqual(output,['authorized='+String(status===expected)+'\n']);
+      const expectedOutputs=['authorized='+String(status===expected)+'\n'];
+      // The current LIVE workflow explicitly emits its two additional closed
+      // phase flags. A non-Make fixture must never authorize either operation.
+      if(job==='exact-role-live')expectedOutputs.push('make_ingress=false\n','configuration_operation=false\n');
+      assert.deepEqual(output,expectedOutputs);
     }
     assert.throws(()=>vm.runInNewContext(script,{require:()=>({readFileSync:()=>'{malformed'}),process:{env:{}},console:{log:()=>{}}}));
   }

@@ -4143,6 +4143,25 @@
           }
         }
       ]
+    },
+    {
+      "id": "I6_6_COMPOSED_WORKFLOW_PHASE_OUTPUT_QA_CORRECTION_20261124",
+      "approvedByDirection": true,
+      "scope": "EXISTING_DECLARED_TESTS_ONLY",
+      "paths": [],
+      "receipt": "artifacts/orbit360-recovery/release-control/I6_6_COMPOSED_WORKFLOW_PHASE_OUTPUT_QA_CORRECTION_20261124.json",
+      "receiptGitBlobSha": "26bd2d13edb8044fb646040ef150232a8b344e48",
+      "tests": [
+        {
+          "path": "tools/gravicentra-i6-6-operational-release-candidate.test.cjs",
+          "gitBlobSha": "18f5fbab9d7a41aadf5f6f467d0ecb39b48bec4f",
+          "replaces": {
+            "path": "tools/gravicentra-i6-6-operational-release-candidate.test.cjs",
+            "priorGitBlobSha": "c3267b4b263c9fbc1f76b3b8c79b8abb08803f4c",
+            "priorChangeId": "I6_6_AUTHENTICATED_INCREMENTAL_SOURCE_INTAKE_V2_20261117"
+          }
+        }
+      ]
     }
   ]
 }

@@ -1,0 +1,68 @@
+{
+  "schema": "GI_I66_DECLARED_TEST_WORKFLOW_PHASE_CORRECTION_V1",
+  "revisionId": "I6_6_COMPOSED_WORKFLOW_PHASE_OUTPUT_QA_CORRECTION_20261124",
+  "scope": "EXISTING_DECLARED_TESTS_ONLY",
+  "createdAtUtc": "2026-11-24T10:10:04+00:00",
+  "preparedAgainstHead": "587fa9c04982c9665ebb288047802c98c4f451e6",
+  "approvedByDirection": true,
+  "productSourceChanges": 0,
+  "productionAcceptanceClaimed": false,
+  "tests": [
+    {
+      "path": "tools/gravicentra-i6-6-operational-release-candidate.test.cjs",
+      "gitBlobSha": "18f5fbab9d7a41aadf5f6f467d0ecb39b48bec4f",
+      "replaces": {
+        "path": "tools/gravicentra-i6-6-operational-release-candidate.test.cjs",
+        "priorGitBlobSha": "c3267b4b263c9fbc1f76b3b8c79b8abb08803f4c",
+        "priorChangeId": "I6_6_AUTHENTICATED_INCREMENTAL_SOURCE_INTAKE_V2_20261117"
+      }
+    }
+  ],
+  "observedFailure": {
+    "sourceQaRunId": 45371601306,
+    "sourceQaJobId": 138366963711,
+    "guardRunId": 45371601185,
+    "guardJobId": 138366964997,
+    "test": "control-only push fallback dispatches neither wrong phase nor an unguarded deploy",
+    "error": "Strict expected output contained only authorized=true, while the current LIVE workflow additionally outputs make_ingress=false and configuration_operation=false.",
+    "cause": "The historical workflow test had not modeled the exact newly added closed phase flags."
+  },
+  "correction": "Retain strict output equality and every wrong-phase, missing-status and malformed-JSON negative. Preview must output only its authorized flag; LIVE must additionally output the exact make_ingress=false and configuration_operation=false flags for these non-Make fixtures. No workflow, deployment gate, scope, product function, financial semantics or permission changed.",
+  "localValidation": {
+    "command": [
+      "node",
+      "--test",
+      "--test-name-pattern=existing workflows|control-only push",
+      "tools/gravicentra-i6-6-operational-release-candidate.test.cjs"
+    ],
+    "tests": 2,
+    "passed": 2,
+    "failed": 0,
+    "cancelled": 0,
+    "skipped": 0,
+    "logSha256": "6eff0b342d0ea6851b709f222a3c2afd41c41856d3b714288103be82e4399322",
+    "scope": "Two affected workflow tests executed. Unchanged historical Git fixtures remain subject to actual signed CI; no simulated Git history was used."
+  },
+  "workflowAssumptionReview": {
+    "canonicalDeclaredTestsRead": 100,
+    "workflowReferencingTests": 9,
+    "otherExactOutputCountAssertionsFound": 0,
+    "additionalLocalSuitesBlockedByMissingSparseDependencies": 6,
+    "missingDependencyResultsNotProductFailures": true
+  },
+  "priorManifestBlob": "b522163e40a604ab27cbcc549006441026f11704",
+  "priorQaCorrections": [
+    {
+      "path": "artifacts/orbit360-recovery/release-control/I6_6_COMPOSED_SOURCE_QA_FIXTURE_CORRECTIONS_20261124.json",
+      "gitBlobSha": "e4baf52a8969a42d5a5f59a35ce48d6d5dd5a9de"
+    },
+    {
+      "path": "artifacts/orbit360-recovery/release-control/I6_6_MACHINE_INGRESS_SCOPE_VM_QA_DEPENDENCY_CORRECTION_20261124.json",
+      "gitBlobSha": "562b8c99540d9ff5ea926d28510eb4a703481a1b"
+    }
+  ],
+  "nextAction": "Use the same signed source QA, actual Chromium causal job and unchanged governance gate; freeze v18 only on a successful exact head.",
+  "newBusinessWrites": 0,
+  "newHostingWrites": 0,
+  "newBackendDeploys": 0
+}
