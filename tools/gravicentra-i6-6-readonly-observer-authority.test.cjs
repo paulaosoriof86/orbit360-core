@@ -139,3 +139,15 @@ test('actual topbar certificate rejects console and HTTP errors while preserving
   for(const change of [x=>x.auth.consoleErrors=1,x=>x.auth.httpErrorClasses={backend_403:1},x=>delete x.auth.httpErrorClasses,
     x=>x.globalTopbarSearch.first.timeMs=2200,x=>x.auth.pageErrors=1]){const bad=clone(good);change(bad);assert.throws(()=>run(bad));}
 });
+test('actual rejected workflow uses runner at job scope; corrected report binding uses the permitted step context',()=>{
+  const {execFileSync}=require('node:child_process'),file=owner.READONLY_PROFILES.fiveRoles.workflow;
+  const rejected=execFileSync('git',['show','d817c49b6f23ad50ae78f3b3ed26a76fb655f2e6:'+file],{encoding:'utf8'});
+  const current=fs.readFileSync(file,'utf8');
+  // GitHub Contexts reference: job.env permits github, needs, strategy, matrix,
+  // vars, secrets and inputs; runner becomes available in step.env.
+  const check=text=>{for(const match of text.matchAll(/\n    env:\n([\s\S]*?)(?=\n    steps:)/g))
+    assert.doesNotMatch(match[1],/\$\{\{[^\n]*\b(?:runner|steps|job|env)\./,'GITHUB_JOB_ENV_CONTEXT_UNAVAILABLE');};
+  assert.throws(()=>check(rejected),/GITHUB_JOB_ENV_CONTEXT_UNAVAILABLE/);assert.doesNotThrow(()=>check(current));
+  assert.match(current,/- name: Exercise five assigned roles[^\n]*\n        env:\n          I66_FIVE_ROLE_REPORT: \$\{\{ runner\.temp \}\}/);
+  check(fs.readFileSync(owner.READONLY_PROFILES.performance.workflow,'utf8'));
+});

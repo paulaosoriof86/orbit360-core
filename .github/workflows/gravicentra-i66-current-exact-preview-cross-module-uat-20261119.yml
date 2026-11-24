@@ -22,7 +22,6 @@ jobs:
     timeout-minutes: 15
     env:
       I66_LIVE_ORIGIN: https://app.aysseguros.com
-      I66_FIVE_ROLE_REPORT: ${{ runner.temp }}/gi-i66-five-role-live-matrix.json
       GITHUB_TOKEN: ${{ github.token }}
       SA_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
       SA_ALT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
@@ -59,6 +58,8 @@ jobs:
           npm install --no-save --package-lock=false --ignore-scripts --no-audit --no-fund firebase-admin@13.4.0 playwright@1.55.0 >/dev/null
           node node_modules/playwright/cli.js install --with-deps chromium >/dev/null
       - name: Exercise five assigned roles by normal UI selection and server read boundary
+        env:
+          I66_FIVE_ROLE_REPORT: ${{ runner.temp }}/gi-i66-five-role-live-matrix.json
         run: node tools/gravicentra-i6-6-current-live-five-role-route-readonly.cjs
       - name: Preserve bounded role diagnostics and actual route results on every outcome
         if: always()
