@@ -1,5 +1,5 @@
 {
-  "phase": "VERIFIED",
+  "phase": "ROLLED_BACK",
   "key": "32bf0a31259398a252be0a38cbdcdd2e4a6ab7ef3634390b93fbff357980c5e1",
   "generation": 6,
   "request": {
@@ -64,5 +64,15 @@
     "artifactDigest": "sha256:531fddd76a010377bd9aa6c652d737dc584a99edc573c2aca313b56fd7efa405",
     "hostingVersion": "sites/ays-orbit-360-lab/versions/fdbec659ed0f3b71",
     "manifestDigest": "sha256:5ef81bccb15adbe0bdc31d0b53f1986b591898b3290ee27b10ae4a1993dfd9b0"
-  }
+  },
+  "rollback": {
+    "firebase": 224,
+    "custom": 224,
+    "sourceSha": "65c825b2808a615ca4195bdde6689dbdbe3193b2",
+    "buildId": "gi-i66-65c825b2808a-57f234755dc1",
+    "artifactDigest": "sha256:7cb782848a45083047c4899bc30c13bf5be46429607e42597d09342becfc9acc",
+    "hostingVersion": "sites/ays-orbit-360-lab/versions/332999a55b189108",
+    "manifestDigest": "sha256:da40e7ad3f453107a44fdc868a58ff469f91139252c0204f9fc298a8d9f02905"
+  },
+  "reason": "RELEASE_SUBPROCESS_FAILED_1_null"
 }
