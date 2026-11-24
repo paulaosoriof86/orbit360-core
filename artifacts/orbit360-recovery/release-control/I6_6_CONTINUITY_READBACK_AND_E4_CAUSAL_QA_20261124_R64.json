@@ -1,0 +1,203 @@
+{
+  "schema": "GI_I66_CONTINUITY_READBACK_AND_E4_CAUSAL_QA_R64_V1",
+  "recordType": "ADDITIVE_SOURCE_QA_AND_CONTINUITY_EVIDENCE_NOT_RUNTIME_ACCEPTANCE",
+  "recordedAtUtc": "2026-11-24T23:13:05.230Z",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "activeGate": "I6.6",
+  "sourceBase": "b67845000de4a8a2472ce3ea432118344c0c21e7",
+  "sourceBaseTree": "901ae7cab39f2f0f18eea3b2bb117b058a56811b",
+  "previousProgress": {
+    "path": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_EXECUTION_PROGRESS_20261124_R63.json",
+    "gitBlobSha": "7bf8bc5ccbbd7ffa894b718e1e0d54880c0425aa",
+    "sha256": "03c31156f053774ebe39ff2d97842643151cad52c0c6ca216da93ec3cfe28583"
+  },
+  "exactPredecessorSignedSourceEvidence": {
+    "sourceSha": "b67845000de4a8a2472ce3ea432118344c0c21e7",
+    "observedAtUtc": "2026-11-24T23:13:05.230Z",
+    "sourceQa": {
+      "runId": 45506690080,
+      "jobId": 138843613546,
+      "url": "https://github.com/paulaosoriof86/orbit360-core/actions/runs/45506690080",
+      "conclusion": "success",
+      "compositeControlTransaction": {
+        "tests": 130,
+        "pass": 130,
+        "fail": 0,
+        "skipped": 0
+      },
+      "admission": {
+        "tests": 89,
+        "pass": 89,
+        "fail": 0,
+        "skipped": 0
+      },
+      "deltaGuard": "PASS",
+      "declaredProductPaths": 77,
+      "declaredDeltaTests": 109,
+      "artifactId": 14974000420,
+      "artifactDigest": "sha256:9b8a61d10df76d7de3bab1ad0b7b826bf2a3f8bbc58ea2547c402dd81102ce21",
+      "chromiumDomJob": "skipped",
+      "previewOrLiveAcceptance": false
+    },
+    "governance": {
+      "runId": 45506690057,
+      "jobId": 138843613183,
+      "url": "https://github.com/paulaosoriof86/orbit360-core/actions/runs/45506690057",
+      "conclusion": "success",
+      "finalMarker": "GRAVICENTRA_GOVERNANCE_PREFLIGHT=PASS",
+      "publicLiveReadbackScope": "EXISTING_E3_ONLY"
+    },
+    "advisorPaymentEmulator": {
+      "runId": 45506690234,
+      "jobId": 138843614385,
+      "url": "https://github.com/paulaosoriof86/orbit360-core/actions/runs/45506690234",
+      "conclusion": "success",
+      "project": "demo-gravicentra-i66-payments",
+      "checks": 122,
+      "methods": 7,
+      "liveWrites": 0,
+      "exitCode": 0
+    },
+    "build": {
+      "runId": 45506690069,
+      "url": "https://github.com/paulaosoriof86/orbit360-core/actions/runs/45506690069",
+      "conclusion": "success",
+      "scope": "GATE_ONLY",
+      "immutablePackage": "skipped",
+      "protectedReader": "skipped",
+      "artifactCount": 0,
+      "notAProductBuild": true
+    },
+    "e4": {
+      "runId": 45506690053,
+      "jobId": 138843613292,
+      "url": "https://github.com/paulaosoriof86/orbit360-core/actions/runs/45506690053",
+      "conclusion": "failure",
+      "correctedAnuladoTestPassed": true,
+      "remainingFailure": "TWO_HISTORICAL_CROSS_MODULE_TEST_ASSERTIONS",
+      "sourceCorrectionIncludedInR64": true
+    },
+    "evidenceOrigin": "GITHUB_PROVIDER_RUNS_JOB_LOGS_AND_SOURCE_QA_ARTIFACT_READBACK",
+    "passDoesNotTransferToModifiedSuccessor": true
+  },
+  "causalE4Verification": {
+    "schema": "GI_I66_E4_CROSS_MODULE_READBACK_TEST_CAUSAL_VERIFICATION_V1",
+    "status": "ISOLATED_TEST_FIX_VERIFIED_NOT_PUBLISHED",
+    "recordedAtUtc": "2026-11-24T23:11:27.471643Z",
+    "repository": "paulaosoriof86/orbit360-core",
+    "branch": "recovery/fase-a-clean-20260831",
+    "baseSha": "b67845000de4a8a2472ce3ea432118344c0c21e7",
+    "baseTree": "901ae7cab39f2f0f18eea3b2bb117b058a56811b",
+    "path": "tools/gravicentra-b4-003-cross-module-readback-contract.test.cjs",
+    "beforeGitBlobSha": "be99234f92de2c9952ec5e95fdef941845720b3f",
+    "afterGitBlobSha": "27e048b45f2bb1ac853c28d754db897a39ca4d8f",
+    "beforeSha256": "6ea0a3979c69ca1b58ce40eecb2a74c6a9bef38c0d102bbd4a82e5f7b74c04a3",
+    "afterSha256": "fae5e109b7428dfe03376d25759ee5b19a328e9fcd2eb4828b9a3bc89507565b",
+    "patchSha256": "6da6c4e8bfd192b5fe3c8f2095ed37332350c77bd7d7c20bd087c1b6e1cb2a5f",
+    "patchFile": "e4-cross-module-readback-fixture.patch",
+    "baseline": {
+      "command": "node --test --test-reporter=tap tools/gravicentra-b4-003-cross-module-readback-contract.test.cjs",
+      "exitCode": 1,
+      "tests": 8,
+      "pass": 6,
+      "fail": 2,
+      "cancelled": 0,
+      "skipped": 0,
+      "reportSha256": "2d23cf17042b5996d2d49ae11dad4495ca4e5fe60680eb50e12f98983335a718"
+    },
+    "candidate": {
+      "command": "node --test --test-reporter=tap tools/gravicentra-b4-003-cross-module-readback-contract.test.cjs",
+      "exitCode": 0,
+      "tests": 8,
+      "pass": 8,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "reportSha256": "207ce0ce686b6a0048c7cc1b58254737822650f0ad283b275aef4620b6281f24"
+    },
+    "nodeVersion": "v24.22.3",
+    "ciFailure": {
+      "runId": 45506690053,
+      "jobId": 138843613292,
+      "url": "https://github.com/paulaosoriof86/orbit360-core/actions/runs/45506690053/job/138843613292",
+      "headSha": "b67845000de4a8a2472ce3ea432118344c0c21e7",
+      "failedCases": [
+        1,
+        6
+      ]
+    },
+    "causeAndAuthority": [
+      {
+        "case": 1,
+        "cause": "Historical test expected finmovs in Conciliaciones route. Approved protected-bridge change intentionally loads only conciliaciones and conciliacionesPrimas there; finmovs is retained by Finanzas.",
+        "authorityReceipt": "artifacts/orbit360-recovery/release-control/I6_6_CONCILIACIONES_PROTECTED_BRIDGE_RECEIPT_20261111.json",
+        "authorityReceiptBlob": "01c0fec57505296698428274557a547650f7a807",
+        "authorityCommit": "30406dc6cc23684f8d97e6f25ff36dd6a7e0186d",
+        "authorityUrl": "https://github.com/paulaosoriof86/orbit360-core/commit/30406dc6cc23684f8d97e6f25ff36dd6a7e0186d",
+        "finanzasCommit": "6feff465889ae0dc60a4272cac430409c8eb5d58",
+        "finanzasUrl": "https://github.com/paulaosoriof86/orbit360-core/commit/6feff465889ae0dc60a4272cac430409c8eb5d58",
+        "correction": "Require the four durable optional collections, exact Conciliaciones proposal dependency set, Cronograma tasks and retained Finanzas finmovs dependency."
+      },
+      {
+        "case": 6,
+        "cause": "Regex required finmovs and tareas entries to be adjacent. Approved proposal entries were inserted between them; neither existing owner changed.",
+        "correction": "Parse the backend owner map and verify finmovs, conciliaciones, conciliacionesPrimas and tareas by key. Preserve existing frontend planner tenant/country constraints and writer assertion."
+      }
+    ],
+    "preservation": {
+      "testCount": 8,
+      "casesRemoved": 0,
+      "productChanges": 0,
+      "validatorChanges": 0,
+      "workflowChanges": 0,
+      "approvedBackendOwnersUnchanged": true,
+      "tenantCountryPlannerConstraintsPreserved": true,
+      "canonicalReaderWriterCollectionChecksUnchanged": true,
+      "fourInventoriedOwnershipExceptionsUnchanged": true,
+      "noNewPermissionsGranted": true,
+      "sharedCheckoutModified": false,
+      "continuityExactCheckoutModified": false,
+      "commitCreated": false,
+      "remoteWrites": false,
+      "ciReruns": false,
+      "runtimeOrReleaseAcceptanceClaimed": false
+    },
+    "limitations": [
+      "Verification is local source-only on the exact b678 snapshot. CI on a future integrated SHA remains pending.",
+      "No source product changes, server reads, emulator calls, builds, deployments or customer-data writes were performed."
+    ]
+  },
+  "activeA13Repair": {
+    "priorNextHistoricalOnly": "I6.6: fix the reproduced historical-request fixture dependency within the active gate, preserve the exact21 product owners and all completed financial work, then certify the corrected source and request version30 through the existing monotonically versioned immutable-build owner. No artifact29 exists. After exact224-file readback, complete the five-function signed Preview, financial48, and identical-artifact LIVE acceptance. Continue documentary payments and prospective lead work in parallel.",
+    "next": "I6.6 leads lane: prioritize prospective WhatsApp, web-form and per-user email ingestion; keep attribution and cross-recipient deduplication. Alice/Alys owns the retrospective September-to-current collection. Prepare its mass-import mapping by actual stage/source/owner and existing-client links through the canonical lead writer. Activate real Make ingress only after the same-artifact release is COMMITTED and verify one real eligible event, readback and replay; do not send external messages.",
+    "reason": "The inherited objective still requested a fixture correction already integrated; derive the active objective and mirrors from the actual leads continuation.",
+    "correctionAlreadyIntegratedAt": "b67845000de4a8a2472ce3ea432118344c0c21e7",
+    "fullA13Accepted": false
+  },
+  "privateFinancialSourcePreservation": {
+    "status": "EXISTING_PRIVATE_BACKUP_DOWNLOADED_AND_BYTE_VERIFIED",
+    "archiveSha256": "f8615431c2927af0ad3f7f1f26e5ceab4a83432560d99189657a5fa6c67a9692",
+    "archiveBytes": 16704133,
+    "exactMembers": 60,
+    "manifestEntries": 59,
+    "allManifestEntriesValid": true,
+    "allMembersMatchCurrentWork": true,
+    "contains114SourceObservations": true,
+    "contains27Policy108ReferenceQuery": true,
+    "extendedQueryExecuted": false,
+    "backupDuplicated": false,
+    "privateRawDataOrKeyCommitted": false
+  },
+  "effects": {
+    "productSourceChanges": 0,
+    "productionWrites": 0,
+    "financialWrites": 0,
+    "deployments": 0,
+    "newProductArtifacts": 0,
+    "previewRequestChanges": 0,
+    "formalGateCredit": 0,
+    "newRuntimeAcceptance": false
+  },
+  "pending": "Exact integrated successor SourceQA, canonical guard and E4 workflow must pass before the existing immutable request30 procedure; preserve the failed request29 and accepted E3."
+}

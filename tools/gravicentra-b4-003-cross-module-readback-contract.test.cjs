@@ -32,14 +32,19 @@ const membership = {
 const planner = window.Orbit.productQueryPlannerP0;
 const clientPolicy = window.Orbit.tenantAccessPolicyProductP0;
 
-test('Cronograma and Conciliaciones have every route-required durable collection in the configured universe', () => {
+test('Cronograma, Conciliaciones and Finanzas have their approved durable collections in the configured universe', () => {
   const optional = Array.from(cfg.optionalCollections);
-  for (const collection of ['tareas', 'finmovs']) {
+  for (const collection of ['tareas', 'finmovs', 'conciliaciones', 'conciliacionesPrimas']) {
     assert.ok(optional.includes(collection), `${collection}: absent from product config; _ensureCollections cannot hydrate it after reload`);
   }
   const router = read('orbit360-platform/core/router.js');
   assert.match(router, /cronograma:\s*\[[^\]]*'tareas'/);
-  assert.match(router, /conciliaciones:\s*\[[^\]]*'finmovs'/);
+  const match = router.match(/const REACTIVE_COLLECTIONS = (\{[\s\S]*?\});/);
+  assert.ok(match, 'approved route dependencies must remain observable');
+  const routes = vm.runInNewContext(`(${match[1]})`, {}, { timeout: 1000 });
+  // I6.6 bridge 30406dc reads formal proposals here; finmovs stays in Finanzas.
+  assert.deepEqual(Array.from(routes.conciliaciones).sort(), ['conciliaciones', 'conciliacionesPrimas']);
+  assert.ok(Array.from(routes.finanzas).includes('finmovs'), 'Finanzas must retain financial movements after reload');
 });
 
 test('every previously exposed reactive route can hydrate its declared collections after reload', () => {
@@ -113,7 +118,13 @@ test('protected frontend query plans agree with backend module owners, without w
   }
   const server = read('functions/b4-003-scoped-access-boundary.js');
   const writer = read('functions/product-operational-domain.js');
-  assert.match(server, /finmovs:'conciliaciones',tareas:'ops'/);
+  const match = server.match(/const modules=(\{[^;]+\});/);
+  assert.ok(match, 'protected backend collection owner map must remain observable');
+  const serverOwners = vm.runInNewContext(`(${match[1]})`, {}, { timeout: 1000 });
+  for (const [collection, moduleKey] of [
+    ['finmovs', 'conciliaciones'], ['conciliaciones', 'conciliaciones'],
+    ['conciliacionesPrimas', 'conciliaciones'], ['tareas', 'ops']
+  ]) assert.equal(serverOwners[collection], moduleKey, `${collection}: protected backend owner drift`);
   assert.match(writer, /tareas:\s*'ops'/);
 });
 
