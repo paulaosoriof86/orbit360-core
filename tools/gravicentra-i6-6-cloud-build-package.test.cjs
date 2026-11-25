@@ -164,6 +164,21 @@ test('native MD5 normalizes documented repeated FileHashes/Hash wrappers without
   for(const row of [{file_hash:[hash]},{file_hash:hash},{file_hash:[{file_hash:[hash]}]},{fileHash:[{fileHash:[hash]}]},{file_hash:{fileHash:[hash]}}])assert.equal(owner.nativeArtifactMd5(row),hash.value);
   for(const row of [{file_hash:[hash,hash]},{file_hash:[{file_hash:[hash,hash]}]},{file_hash:[hash],fileHash:[hash]},{file_hash:{fileHash:[hash],extra:true}},{file_hash:[{type:1,value:hash.value}]},{file_hash:[{type:2,value:'unverified'}]}])assert.throws(()=>owner.nativeArtifactMd5(row));
 });
+test('native protobuf bytes preserve the observed single base64 wrapper around ASCII MD5',()=>{
+  const md5='D2hL6PA9cKk6nBgVL/lYEA==';
+  const actual={file_hash:[{file_hash:[{type:2,value:'RDJoTDZQQTljS2s2bkJnVkwvbFlFQT09'}]}]};
+  assert.equal(owner.nativeArtifactMd5(actual),md5);
+  assert.equal(owner.nativeArtifactMd5({fileHash:[{type:'MD5',value:md5}]}),md5);
+  assert.equal(Buffer.from(owner.nativeArtifactMd5(actual),'base64').length,16);
+  for(const bad of [
+    Buffer.from(actual.file_hash[0].file_hash[0].value).toString('base64'),
+    Buffer.from('D2hL6PA9cKk6nBgVL/lYEA=\n').toString('base64'),
+    Buffer.from('D2hL6PA9cKk6nBgVL/lYEB==').toString('base64'),
+    'D2hL6PA9cKk6nBgVL/lYEB==',
+    Buffer.from('not-an-md5-value-at-all!').toString('base64'),
+    actual.file_hash[0].file_hash[0].value+'='
+  ])assert.throws(()=>owner.nativeArtifactMd5({file_hash:[{type:2,value:bad}]}),/NATIVE_MD5_ENCODING/);
+});
 test('the real execution log binds the exact archive SHA; duplicate or mismatched markers fail',()=>{
   const f=proofFixture(),marker={buildId:f.b.id,sourceSha:f.p.sourceSha,archiveSha256:f.proof.archiveSha256,scope:C.scope};
   const line=value=>'Step #0 - "'+C.stepId+'": I66_CLOUD_BUILD_PACKAGE_READY_FOR_PROVIDER_RETENTION '+JSON.stringify(value)+'\n';

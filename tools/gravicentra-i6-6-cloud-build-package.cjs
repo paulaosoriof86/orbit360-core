@@ -231,7 +231,12 @@ function nativeArtifactMd5(row){
     if(item.type!==undefined||item.value!==undefined){
       equal(Object.keys(item).sort(),['type','value'],'NATIVE_HASH_KEYS');
       need([2,'MD5'].includes(item.type)&&typeof item.value==='string','NATIVE_ARTIFACT_HASH_REQUIRED');
-      need(/^(?:[a-f0-9]{32}|[A-Za-z0-9+/]{22}==)$/.test(item.value),'NATIVE_MD5_ENCODING');return item.value;
+      if(/^[a-f0-9]{32}$/.test(item.value))return item.value;
+      // The actual Cloud Build manifest serializes its bytes value as base64
+      // around the ASCII base64 MD5. Decode exactly one such wrapper; the
+      // resulting 16-byte digest must retain a canonical base64 round trip.
+      const md5=/^[A-Za-z0-9+/]{32}$/.test(item.value)?Buffer.from(item.value,'base64').toString('utf8'):item.value;
+      need(/^[A-Za-z0-9+/]{22}==$/.test(md5)&&Buffer.from(md5,'base64').length===16&&Buffer.from(md5,'base64').toString('base64')===md5,'NATIVE_MD5_ENCODING');return md5;
     }
     const inner=['file_hash','fileHash'].filter(key=>item[key]!==undefined);
     equal(inner.length,1,'ONE_NATIVE_HASH_WRAPPER');equal(Object.keys(item),inner,'NATIVE_HASH_WRAPPER_KEYS');value=item[inner[0]];
