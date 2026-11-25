@@ -1,3 +1,4 @@
+# I6.6 DOC04: readonly run45523521293 verified4 originals and2 exact corrections; refresh preflight before the existing protected CAS.
 name: Gravicentra I6.6 Insurer Source Bulk Protected
 on:
   workflow_dispatch:

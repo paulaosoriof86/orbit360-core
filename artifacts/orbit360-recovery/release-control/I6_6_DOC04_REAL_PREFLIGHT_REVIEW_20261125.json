@@ -1,0 +1,49 @@
+{
+  "schema": "GI_I66_DOC04_REAL_PREFLIGHT_REVIEW_V1",
+  "status": "EXACT_ORIGINALS_AND_TWO_OBLIGATION_CORRECTIONS_READY_NO_PAYMENT_APPLIED",
+  "runId": 45523521293,
+  "runAttempt": 1,
+  "sourceSha": "5e4a348fa0cf22012b2bfd8950bd5ba410381bc9",
+  "jobId": 138901060268,
+  "artifactId": 14981112047,
+  "artifactSha256": "84649629b7075e2dee608f1e7772ef03a8cc8652a1e252132d9eb69728e5bebc",
+  "reportSha256": "616d2e6f463dc616013ce21ae20674244d6f9ebb3b099094ceb24bf75d6a97f9",
+  "observedAtUtc": "2026-11-25T01:09:10.999Z",
+  "profileId": "MAPFRE_DOC04_2453",
+  "originalsVerified": 4,
+  "holderEvidenceMatches": true,
+  "correctionEligibleCount": 2,
+  "globalHoldCount": 0,
+  "localHoldCount": 0,
+  "paymentWriteEligibleCount": 0,
+  "actualCloudWrites": 0,
+  "newPayments": 0,
+  "plannedExistingReceiptUpdates": 2,
+  "plannedExistingPortfolioUpdates": 2,
+  "plannedAuditCreate": 1,
+  "plannedPaymentWrites": 0,
+  "priorPaymentsPreserved": 4,
+  "installment12Excluded": true,
+  "entireCalendarAccepted": false,
+  "beforeHash": "6a9fd850a7e843e054d9a97f9b40c0a22414e2b79ce940b853767fb58345376c",
+  "beforeDataHash": "44e6451542798e03f64af5321ca5d93e1eaf1134e2c3bd8f220f996e514bc586",
+  "expectedAfterDataHash": "16ce427a380a48970cfc9e54df2d00c4398424f9a1788e4c8d3109cca37321fe",
+  "canonicalPlanHash": "44660e5a2b88ea5b31f0e70485a7f87c6aa65416dc6f7ba69e345705c3ab3ea0",
+  "canonicalPlanFileSha256": "1114e42d4658f4f3eb9b2cafeec0c1f92571f4f5d74b73e346cebd81b2de610c",
+  "pendingProtectedExecution": {
+    "workflow": ".github/workflows/gravicentra-i66-insurer-source-bulk-protected.yml",
+    "markers": [
+      "I66_MAPFRE_OBLIGATION_CAS",
+      "I66_MAPFRE_DOC04_2453"
+    ],
+    "preflightMode": "mapfre-cas-preflight",
+    "protectedMode": "mapfre-cas-apply",
+    "environment": "gravicentra-live-data-writes",
+    "executed": false
+  },
+  "limits": [
+    "This local plan is derived from the real read-only artifact; protected workflow must refresh its own preflight.",
+    "Correction changes obligations only. Canonical authenticated payment application and readback remain pending.",
+    "Historical R46 and 155 previously applied payments are not repeated."
+  ]
+}
