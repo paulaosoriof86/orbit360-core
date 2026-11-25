@@ -1,0 +1,55 @@
+{
+  "schema": "I6_6_SUBORDINATE_OPERATOR_READBACK",
+  "recordedAtUtc": "2026-11-25T16:46:41.915506+00:00",
+  "authorityCommit": "2e7b6a5332f24fcc58b45ff8358b68fe48eeca4e",
+  "authorityTree": "72a7171e69b280bf9f1ee25f969e63601ab756c2",
+  "requestVersion": 35,
+  "currentCheckpoint": "R85",
+  "githubAccount": "paulaosoriof86",
+  "gcloudAccount": "aysseguros2009@gmail.com",
+  "project": "ays-orbit-360-lab",
+  "retainedPackage": {
+    "uri": "gs://ays-orbit360-firestore-private-backup-646761409743/i66/packages/request-35/16e3a70baf4e31ef8453173990f32a398c65e59b/792b85b8-f1fb-4353-9ef8-b9f1e1f94065/gi-i66-exact-package.tar.gz",
+    "generation": "1795599998078235",
+    "sha256": "1c562090b276b5aee913f9109aed5903f0450ffb582d89e0347a69853c1223ec",
+    "bytes": 1851665
+  },
+  "hostingReadback": {
+    "method": "HTTP GET each manifest path with cache-busting query and identity encoding. SHA-256 over the response bytes. Manifest SHA-256 over UTF-8 sorted paths, each line: digest, two spaces, path and newline.",
+    "previewVersion": "a3887d6ea17a9393",
+    "liveVersion": "332999a55b189108",
+    "origins": {
+      "app.aysseguros.com": {
+        "files": 224,
+        "manifestSha256": "da40e7ad3f453107a44fdc868a58ff469f91139252c0204f9fc298a8d9f02905"
+      },
+      "ays-orbit-360-lab--gi-i66-rc-45518809761-eiytd3a3.web.app": {
+        "files": 224,
+        "manifestSha256": "fed0f027ad0a2d932d3e20e3e32ce366229f6a33470613ace107f433312f2a0f"
+      },
+      "ays-orbit-360-lab.web.app": {
+        "files": 224,
+        "manifestSha256": "da40e7ad3f453107a44fdc868a58ff469f91139252c0204f9fc298a8d9f02905"
+      }
+    },
+    "retainedE3Artifact": {
+      "uri": "gs://ays-orbit360-firestore-private-backup-646761409743/i66/github-artifact-staging/14873426438/7cb782848a45083047c4899bc30c13bf5be46429607e42597d09342becfc9acc/archive.zip",
+      "generation": "1795598973795028",
+      "sha256": "7cb782848a45083047c4899bc30c13bf5be46429607e42597d09342becfc9acc",
+      "bytes": 1824240
+    }
+  },
+  "methodOwners": {
+    "executionProvider": "CLOUD_BUILD",
+    "sourceSha": "16e3a70baf4e31ef8453173990f32a398c65e59b",
+    "mechanismSha": "2e7b6a5332f24fcc58b45ff8358b68fe48eeca4e",
+    "head": "2e7b6a5332f24fcc58b45ff8358b68fe48eeca4e",
+    "ownerCount": 36
+  },
+  "roleEvidence": "Release operator and provider transport only; no authenticated business action tested by this receipt.",
+  "productionChanged": false,
+  "businessWrites": 0,
+  "financialWrites": 0,
+  "signedFunctionalPreviewAcceptance": false,
+  "wholeGateAcceptance": false
+}
