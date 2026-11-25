@@ -1,0 +1,42 @@
+{
+  "recordType": "SUBORDINATE_PREVIEW_ADMISSION_PREFLIGHT",
+  "authorityHead": "9840b51b203cb4521da0f6b61763c8346514db23",
+  "sourceSha": "16e3a70baf4e31ef8453173990f32a398c65e59b",
+  "packageDigest": "sha256:1c562090b276b5aee913f9109aed5903f0450ffb582d89e0347a69853c1223ec",
+  "releaseReadback": {
+    "path": "artifacts/orbit360-recovery/release-control/I6_6_R85_EXACT_HOSTING_AND_METHOD_READBACK_20261125.json",
+    "gitBlobSha": "abfab52ae7dd2b860081d8b25071525124dfb795"
+  },
+  "providerBindingMechanism": "2e7b6a5332f24fcc58b45ff8358b68fe48eeca4e",
+  "project": "ays-orbit-360-lab",
+  "serviceAccount": "firebase-adminsdk-fbsvc@ays-orbit-360-lab.iam.gserviceaccount.com",
+  "effectiveSubmitterPermissions": [
+    "iam.serviceAccounts.actAs",
+    "cloudbuild.builds.get",
+    "cloudbuild.builds.create"
+  ],
+  "previewFunction": {
+    "revision": "orbit360makeleadingresspreview-00006-xaz",
+    "configurationDigest": "b91cb410f8c84199f762b270698bc951dabf7e775b91c541c65484b59283efe8",
+    "traffic": [
+      {
+        "revision": "orbit360makeleadingresspreview-00001-cuy",
+        "percent": 100
+      }
+    ],
+    "priorClosedTriggerReceipt": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_6_MAKE_V34_PREVIEW_CLOSED_TRIGGER_PROOF_20261124.json",
+      "gitBlobSha": "c6a6335db67373d06030a6cbf6413e8ccd804338"
+    }
+  },
+  "liveFunction": "ABSENT",
+  "previewGrant": {
+    "state": "CLOSED",
+    "enabled": false,
+    "digest": "85c66e5da953c264ade12519bb5ad00155830da30bb7572235ab8a62e0de0563"
+  },
+  "liveGrant": "ABSENT",
+  "businessWrites": 0,
+  "financialWrites": 0,
+  "externalMessages": 0
+}
