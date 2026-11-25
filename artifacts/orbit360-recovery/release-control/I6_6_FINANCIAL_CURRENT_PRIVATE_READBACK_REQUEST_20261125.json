@@ -1,0 +1,107 @@
+{
+  "schema": "GRAVICENTRA_I66_FINANCIAL_PRIVATE_READBACK_REQUEST_V1",
+  "profile": "I66_CURRENT_FINANCIAL_BASELINE_V1",
+  "status": "PREPARED_NOT_ACTIVE",
+  "projectId": "ays-orbit-360-lab",
+  "tenantId": "alianzas-soluciones",
+  "purpose": "NOVEMBER_RECENT_STATEMENT_RECONCILIATION_PREIMAGES_ONLY",
+  "source": {
+    "documentaryPeriod": "2026-11",
+    "sourceEvidenceDate": "2026-11-24",
+    "baselineObservation": "CURRENT_AT_CAPTURE_NOT_DOCUMENTARY_CUTOFF",
+    "sourceReceipt": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_6_NEW_INSURER_SOURCE_RECOVERY_SANITIZED_20261124_R63.json",
+      "gitBlobSha": "43c9918d2da47cb4753aaa392b581573d0b98173"
+    },
+    "privateReferenceQuery": {
+      "sha256": "46013562cc92dd4c8aa735745f91643ce3b4bd36f2c8280732ef657f43d684ee",
+      "bytes": 21219,
+      "policies": 27,
+      "references": 108,
+      "selectorsPublished": false
+    },
+    "latestStatementsCompletenessClaimed": false
+  },
+  "readScope": {
+    "collectionRoot": "tenants/alianzas-soluciones/data/{collection}/items",
+    "countryFilter": "NONE_WITHIN_AUTHORIZED_TENANT",
+    "coreProjection": "EXISTING_CANONICAL_FINANCIAL_DOCUMENT",
+    "directoryProjection": "EXISTING_FINANCIAL_CONFIGURATION_AND_IDENTITY",
+    "separateConfigCollection": false,
+    "directoryCredentialsExported": false,
+    "matchingPerformed": false,
+    "noEligibilityEffect": true,
+    "imports": false,
+    "externalMessages": false
+  },
+  "collections": [
+    "polizas",
+    "clientes",
+    "aseguradoras",
+    "recibosEsperados",
+    "carteraPrimas",
+    "cobros",
+    "asesores"
+  ],
+  "configSourceFields": {
+    "asesores": [
+      "comModo",
+      "shareCom",
+      "comValor"
+    ],
+    "aseguradoras": [
+      "comisionDefault",
+      "comisiones",
+      "comisionesProd"
+    ]
+  },
+  "authority": {
+    "sourceBaseHead": "9a699defebab9c122343fd1318db2e80bd06f5d7",
+    "controlPlanePath": "artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json",
+    "controlPlaneBlobSha": "b4496c86899b499024b4bdae5c2b985fcdf50883",
+    "recoveryStatePath": "orbit360-platform/docs/recovery/orbit360-recovery-state-v1.json",
+    "recoveryStateBlobSha": "d6addb9f216d633c25af3d447143bc3ce4bd3c8f",
+    "currentProgressPath": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_EXECUTION_PROGRESS_20261124_R74.json",
+    "currentProgressBlobSha": "13064b72dbd2a787b59597023e8e06ad04453563",
+    "activeGate": "I6.6",
+    "formalDataCutoff": "2026-07-31",
+    "executionCursor": "I6_6_SOURCE_PINNED_39_FILES_LIVE_CASES_PARTIAL_NO_AUTOMATIC_PAYMENT_WRITE",
+    "decisionPath": "artifacts/orbit360-recovery/release-control/I6_6_DIRECTION_OPERATIONAL_FINDINGS_AND_PROSPECTIVE_LEADS_20261124_R60.json",
+    "decisionBlobSha": "5905d1e85327124efd9afbde3755b9070c1c5501",
+    "sourceEvidencePath": "artifacts/orbit360-recovery/release-control/I6_6_NEW_INSURER_SOURCE_RECOVERY_SANITIZED_20261124_R63.json",
+    "sourceEvidenceBlobSha": "43c9918d2da47cb4753aaa392b581573d0b98173",
+    "cursorChanged": false
+  },
+  "executableFiles": {
+    "tools/gravicentra-i6-5-encrypted-live-snapshot.mjs": "3acdd4f706ab7ebb690fbf3ca2fbee18279b8c17",
+    ".github/workflows/gravicentra-recovery-i6-postsalida.yml": "4fbead498122236358c0d94bf99cc3f60f223ec5",
+    "tools/gravicentra-i66-financial-private-snapshot.test.mjs": "d88d6c1cec0288d460a77a479dc6246b594b3d7d",
+    "artifacts/orbit360-recovery/release-control/I6_6_FINANCIAL_CURRENT_SNAPSHOT_PUBLIC_KEY_20261125.pem": "f3dc43953ed9a51019a8159f6325f07cae8128d3"
+  },
+  "maxDocumentsPerCollection": 20000,
+  "publicKeyPath": "artifacts/orbit360-recovery/release-control/I6_6_FINANCIAL_CURRENT_SNAPSHOT_PUBLIC_KEY_20261125.pem",
+  "publicKeySha256": "51c54db8e9e76ac3fec99bad9556f49f6c8c7b263f42426a6bef07ec16860cfd",
+  "capabilities": {
+    "dataWrites": false,
+    "sourceDataApply": false,
+    "authWrites": false,
+    "membershipWrites": false,
+    "mintUserTokens": false,
+    "productWrites": false,
+    "deploy": false,
+    "governanceWrites": false,
+    "reimport": false,
+    "messages": false,
+    "iamWrites": false,
+    "backendChanges": false,
+    "outboxWrites": false,
+    "grantWrites": false,
+    "makeActivation": false,
+    "bankTransfers": false,
+    "paymentApplications": false,
+    "receiptCreates": false,
+    "operationalWrites": 0
+  },
+  "encryptedOnly": true,
+  "repositoryPlaintextForbidden": true
+}

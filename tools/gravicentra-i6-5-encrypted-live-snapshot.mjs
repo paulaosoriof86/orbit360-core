@@ -268,11 +268,11 @@ export function encryptAliceSnapshot(payload,publicKeyBytes){
 export function alicePublicReceipt(payload,envelope,encoded){
  return {schema:'GRAVICENTRA_I66_ALICE_PRIVATE_MATCHING_READBACK_RECEIPT_V1',status:'ENCRYPTED_GT_RISK_AND_TENANT_IDENTITY_CAPTURE_NOT_MATCHED_NOT_IMPORTED',profile:ALICE_PROFILE,sourceHeadSha:payload.headSha,authorityBaseHead:payload.authority.sourceBaseHead,currentProgressPath:payload.authority.currentProgressPath,currentProgressBlobSha:payload.authority.currentProgressBlobSha,workbookSha256:payload.source.workbookSha256,sourceLatestAdvanceVerified:false,counts:payload.counts,collections:payload.collections,readWindow:payload.readWindow,encryptedPayloadSha256:sha(encoded),plaintextSha256:envelope.plaintextSha256,publicKeySha256:envelope.publicKeySha256,requestPath:payload.requestPath,requestBlobSha:payload.requestBlobSha,requestSha256:payload.requestSha256,encryptedOnly:true,containsPlaintextPII:false,matchingPerformed:false,eligibleForImport:false,absenceInferenceAllowed:false,writes:0,operationalWrites:0,deploy:false,acceptanceGranted:false};
 }
-export function validateAliceTrigger({eventName,aliceFlag,octoberFlag,commitMessage,repository,branch,head,expectedSha,headCommitSha}){
+export function validateAliceTrigger({eventName,aliceFlag,octoberFlag,financialFlag,commitMessage,repository,branch,head,expectedSha,headCommitSha}){
  need(repository==='paulaosoriof86/orbit360-core'&&branch==='recovery/fase-a-clean-20260831','I66_ALICE_CANONICAL_TRIGGER_REQUIRED');
  need(/^[a-f0-9]{40}$/.test(head||'')&&head===expectedSha,'I66_ALICE_EXECUTION_SHA_MISMATCH');
  const message=String(commitMessage||''),markers=message.match(/(?:^|\s)\[alice-private-matching-readback\](?=\s|$)/g)||[];
- need(octoberFlag!=='true'&&!message.includes('[october-private-readback]'),'I66_ALICE_MIXED_READ_PROFILES_DENIED');
+ need(octoberFlag!=='true'&&financialFlag!=='true'&&!message.includes('[october-private-readback]')&&!message.includes('[i66-financial-private-readback]'),'I66_ALICE_MIXED_READ_PROFILES_DENIED');
  need(aliceFlag==='true'&&((eventName==='workflow_dispatch'&&markers.length<=1)||
   (eventName==='push'&&markers.length===1&&headCommitSha===head)),'I66_ALICE_EXPLICIT_PROFILE_REQUIRED');
  return {profile:ALICE_PROFILE,eventName,headSha:head,readOnly:true};
@@ -280,7 +280,7 @@ export function validateAliceTrigger({eventName,aliceFlag,octoberFlag,commitMess
 function loadAliceRequest(){
  const head=execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim();
  validateAliceTrigger({eventName:process.env.GITHUB_EVENT_NAME,aliceFlag:process.env.I66_ALICE_PRIVATE_READBACK,
-  octoberFlag:process.env.I65_OCTOBER_PRIVATE_READBACK,commitMessage:process.env.PRIVATE_READBACK_COMMIT_MESSAGE,
+  octoberFlag:process.env.I65_OCTOBER_PRIVATE_READBACK,financialFlag:process.env.I66_FINANCIAL_PRIVATE_READBACK,commitMessage:process.env.PRIVATE_READBACK_COMMIT_MESSAGE,
   repository:process.env.GITHUB_REPOSITORY,branch:process.env.GITHUB_REF_NAME,head,expectedSha:process.env.GITHUB_SHA,
   headCommitSha:process.env.PRIVATE_READBACK_HEAD_COMMIT_SHA});
  const requestBytes=fs.readFileSync(ALICE_REQUEST),request=JSON.parse(requestBytes),controlBytes=fs.readFileSync('artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json'),control=JSON.parse(controlBytes),stateBytes=fs.readFileSync(ALICE_STATE),state=JSON.parse(stateBytes);
@@ -303,6 +303,163 @@ async function runAlice(checkOnly){
   const payload=await captureAliceSnapshot({db:getFirestore(app),request,requestBytes,head}),envelope=encryptAliceSnapshot(payload,publicKeyBytes),encoded=JSON.stringify(envelope);
   fs.writeFileSync(output,encoded,{mode:0o600,flag:'wx'});fs.writeFileSync(receipt,JSON.stringify(alicePublicReceipt(payload,envelope,encoded),null,2)+'\n',{mode:0o600,flag:'wx'});
   console.log('I66_ALICE_ENCRYPTED_SNAPSHOT=CAPTURED_NOT_MATCHED_NOT_IMPORTED');console.log('I66_ALICE_SCOPED_COUNTS='+JSON.stringify(payload.counts));console.log('I66_ALICE_WRITES=0');
+ }finally{await deleteApp(app).catch(()=>{});}
+}
+
+// Current I6.6 financial evidence uses the existing financial projections and
+// encrypted transport. It does not reuse October's grant, period or source base.
+export const FINANCIAL_PROFILE='I66_CURRENT_FINANCIAL_BASELINE_V1';
+export const FINANCIAL_COLLECTIONS=OCTOBER_COLLECTIONS;
+export const FINANCIAL_REQUEST=OCTOBER_ROOT+'I6_6_FINANCIAL_CURRENT_PRIVATE_READBACK_REQUEST_20261125.json';
+export const FINANCIAL_PUBLIC_KEY=OCTOBER_ROOT+'I6_6_FINANCIAL_CURRENT_SNAPSHOT_PUBLIC_KEY_20261125.pem';
+export const FINANCIAL_TEST='tools/gravicentra-i66-financial-private-snapshot.test.mjs';
+export const FINANCIAL_EXECUTOR_PATHS=Object.freeze([OCTOBER_PATHS[0],OCTOBER_PATHS[1],FINANCIAL_TEST,FINANCIAL_PUBLIC_KEY]);
+export const FINANCIAL_DECISION=ALICE_DECISION;
+export const FINANCIAL_DECISION_BLOB=ALICE_DECISION_BLOB;
+export const FINANCIAL_SOURCE_RECEIPT=OCTOBER_ROOT+'I6_6_NEW_INSURER_SOURCE_RECOVERY_SANITIZED_20261124_R63.json';
+export const FINANCIAL_SOURCE_RECEIPT_BLOB='43c9918d2da47cb4753aaa392b581573d0b98173';
+export const FINANCIAL_CONFIG_FIELDS=Object.freeze({asesores:['comModo','shareCom','comValor'],aseguradoras:['comisionDefault','comisiones','comisionesProd']});
+export const FINANCIAL_SOURCE=Object.freeze({documentaryPeriod:'2026-11',sourceEvidenceDate:'2026-11-24',
+ baselineObservation:'CURRENT_AT_CAPTURE_NOT_DOCUMENTARY_CUTOFF',sourceReceipt:{path:FINANCIAL_SOURCE_RECEIPT,gitBlobSha:FINANCIAL_SOURCE_RECEIPT_BLOB},
+ privateReferenceQuery:{sha256:'46013562cc92dd4c8aa735745f91643ce3b4bd36f2c8280732ef657f43d684ee',bytes:21219,policies:27,references:108,selectorsPublished:false},
+ latestStatementsCompletenessClaimed:false});
+export const FINANCIAL_READ_SCOPE=Object.freeze({collectionRoot:'tenants/alianzas-soluciones/data/{collection}/items',
+ countryFilter:'NONE_WITHIN_AUTHORIZED_TENANT',coreProjection:'EXISTING_CANONICAL_FINANCIAL_DOCUMENT',
+ directoryProjection:'EXISTING_FINANCIAL_CONFIGURATION_AND_IDENTITY',separateConfigCollection:false,
+ directoryCredentialsExported:false,matchingPerformed:false,noEligibilityEffect:true,imports:false,externalMessages:false});
+export const FINANCIAL_FORBIDDEN=Object.freeze([...ALICE_FORBIDDEN,'bankTransfers','paymentApplications','receiptCreates']);
+export function validateFinancialRequest({request,requestBytes,control,controlBytes,state,stateBytes,progress,progressBytes,
+ decisionBytes,sourceReceiptBytes,publicKeyBytes,fileBytes,branch,head}){
+ need(branch==='recovery/fase-a-clean-20260831'&&/^[a-f0-9]{40}$/.test(head||''),'I66_FINANCIAL_CANONICAL_HEAD_REQUIRED');
+ aliceKeys(request,['schema','profile','status','projectId','tenantId','purpose','source','readScope','collections','configSourceFields',
+  'authority','executableFiles','maxDocumentsPerCollection','publicKeyPath','publicKeySha256','capabilities','encryptedOnly','repositoryPlaintextForbidden'],'I66_FINANCIAL_REQUEST_SHAPE');
+ need(request.schema==='GRAVICENTRA_I66_FINANCIAL_PRIVATE_READBACK_REQUEST_V1'&&request.profile===FINANCIAL_PROFILE&&
+  request.status==='AUTHORIZED_READ_ONLY_CURRENT_FINANCIAL_BASELINE','I66_FINANCIAL_PROFILE_NOT_ACTIVE');
+ need(request.projectId===PROJECT&&request.tenantId===TENANT&&request.purpose==='NOVEMBER_RECENT_STATEMENT_RECONCILIATION_PREIMAGES_ONLY','I66_FINANCIAL_TENANT_PURPOSE');
+ need(same(request.source,FINANCIAL_SOURCE)&&same(request.readScope,FINANCIAL_READ_SCOPE)&&same(request.collections,FINANCIAL_COLLECTIONS)&&
+  same(request.configSourceFields,FINANCIAL_CONFIG_FIELDS),'I66_FINANCIAL_EXACT_READ_SCOPE');
+ aliceKeys(request.capabilities,[...FINANCIAL_FORBIDDEN,'operationalWrites'],'I66_FINANCIAL_CAPABILITY_SHAPE');
+ need(FINANCIAL_FORBIDDEN.every(k=>request.capabilities[k]===false)&&request.capabilities.operationalWrites===0&&request.encryptedOnly===true&&
+  request.repositoryPlaintextForbidden===true,'I66_FINANCIAL_WRITE_OR_PLAINTEXT_DENIED');
+ need(Number.isInteger(request.maxDocumentsPerCollection)&&request.maxDocumentsPerCollection>0&&request.maxDocumentsPerCollection<=20000,'I66_FINANCIAL_DOCUMENT_BOUND');
+ const a=request.authority;
+ aliceKeys(a,['sourceBaseHead','controlPlanePath','controlPlaneBlobSha','recoveryStatePath','recoveryStateBlobSha','currentProgressPath','currentProgressBlobSha',
+  'activeGate','formalDataCutoff','executionCursor','decisionPath','decisionBlobSha','sourceEvidencePath','sourceEvidenceBlobSha','cursorChanged'],'I66_FINANCIAL_AUTHORITY_SHAPE');
+ need(/^[a-f0-9]{40}$/.test(a.sourceBaseHead||'')&&a.controlPlanePath==='artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json'&&
+  a.controlPlaneBlobSha===blob(controlBytes)&&a.recoveryStatePath===ALICE_STATE&&a.recoveryStateBlobSha===blob(stateBytes),'I66_FINANCIAL_CURRENT_CONTROL_BINDING');
+ need(same(JSON.parse(controlBytes),control)&&same(JSON.parse(stateBytes),state)&&same(JSON.parse(progressBytes),progress),'I66_FINANCIAL_AUTHORITY_BYTES');
+ need(a.activeGate==='I6.6'&&progress.activeGate==='I6.6'&&a.formalDataCutoff==='2026-07-31'&&state.currentIteration===6&&
+  state.dataCutoff===a.formalDataCutoff&&a.cursorChanged===false,'I66_FINANCIAL_CURRENT_CUTOFF');
+ need(/^I6_6_/.test(control.postproductionDataUpdateControl?.status||'')&&a.executionCursor===control.postproductionDataUpdateControl?.executionCursor&&
+  /^I6_6_/.test(a.executionCursor||''),'I66_FINANCIAL_CURRENT_CURSOR');
+ need(/^artifacts\/orbit360-recovery\/release-control\/I6_6_CURRENT_EXECUTION_PROGRESS_[0-9]{8}_R[0-9]+\.json$/.test(a.currentProgressPath||'')&&
+  control.i66ActiveRecoveryCursor?.currentEvidencePath===a.currentProgressPath&&control.i66ActiveRecoveryCursor?.currentEvidenceBlobSha===a.currentProgressBlobSha&&
+  blob(progressBytes)===a.currentProgressBlobSha,'I66_FINANCIAL_CURRENT_PROGRESS');
+ need(a.decisionPath===FINANCIAL_DECISION&&a.decisionBlobSha===FINANCIAL_DECISION_BLOB&&blob(decisionBytes)===FINANCIAL_DECISION_BLOB&&
+  progress.currentDirectionOperationalDecision?.path===FINANCIAL_DECISION&&progress.currentDirectionOperationalDecision?.gitBlobSha===FINANCIAL_DECISION_BLOB,'I66_FINANCIAL_CURRENT_DIRECTION_DECISION');
+ need(a.sourceEvidencePath===FINANCIAL_SOURCE_RECEIPT&&a.sourceEvidenceBlobSha===FINANCIAL_SOURCE_RECEIPT_BLOB&&blob(sourceReceiptBytes)===FINANCIAL_SOURCE_RECEIPT_BLOB&&
+  progress.newStatementSourceWork20261124?.currentRecoveredSource114?.receipt?.path===FINANCIAL_SOURCE_RECEIPT&&
+  progress.newStatementSourceWork20261124?.currentRecoveredSource114?.receipt?.gitBlobSha===FINANCIAL_SOURCE_RECEIPT_BLOB,'I66_FINANCIAL_CURRENT_SOURCE_EVIDENCE');
+ const evidence=JSON.parse(sourceReceiptBytes),query=evidence.preparedExtendedReadback;
+ need(query?.querySha256===request.source.privateReferenceQuery.sha256&&query.queryBytes===21219&&query.policySelectors===27&&query.references===108&&
+  evidence.sourceFacts?.sourceFactsAreNotIncrementalPayments===true&&evidence.existingApplicationProtection?.repeatExistingPayments===false,'I66_FINANCIAL_PRIVATE_QUERY_BINDING');
+ aliceKeys(request.executableFiles,FINANCIAL_EXECUTOR_PATHS,'I66_FINANCIAL_EXECUTOR_SET');
+ for(const p of FINANCIAL_EXECUTOR_PATHS)need(fileBytes[p]&&blob(fileBytes[p])===request.executableFiles[p],'I66_FINANCIAL_EXECUTOR_BYTES');
+ need(requestBytes&&same(JSON.parse(requestBytes),request),'I66_FINANCIAL_REQUEST_BYTES');
+ need(request.publicKeyPath===FINANCIAL_PUBLIC_KEY&&request.publicKeySha256===sha(publicKeyBytes)&&same(publicKeyBytes,fileBytes[FINANCIAL_PUBLIC_KEY]),'I66_FINANCIAL_RECIPIENT_KEY');
+ const key=crypto.createPublicKey(publicKeyBytes);need(key.asymmetricKeyType==='rsa'&&(key.asymmetricKeyDetails?.modulusLength||0)>=3072&&
+  (key.asymmetricKeyDetails?.modulusLength||0)<=8192,'I66_FINANCIAL_RECIPIENT_STRENGTH');
+ return request;
+}
+export function validateFinancialTrigger({eventName,financialFlag,aliceFlag,octoberFlag,commitMessage,repository,branch,head,expectedSha,headCommitSha}){
+ need(repository==='paulaosoriof86/orbit360-core'&&branch==='recovery/fase-a-clean-20260831','I66_FINANCIAL_CANONICAL_TRIGGER_REQUIRED');
+ need(/^[a-f0-9]{40}$/.test(head||'')&&head===expectedSha,'I66_FINANCIAL_EXECUTION_SHA_MISMATCH');
+ const message=String(commitMessage||''),markers=message.match(/(?:^|\s)\[i66-financial-private-readback\](?=\s|$)/g)||[];
+ need(aliceFlag!=='true'&&octoberFlag!=='true'&&!message.includes('[alice-private-matching-readback]')&&!message.includes('[october-private-readback]'),'I66_FINANCIAL_MIXED_READ_PROFILES_DENIED');
+ need(financialFlag==='true'&&((eventName==='workflow_dispatch'&&markers.length<=1)||
+  (eventName==='push'&&markers.length===1&&headCommitSha===head)),'I66_FINANCIAL_EXPLICIT_PROFILE_REQUIRED');
+ return {profile:FINANCIAL_PROFILE,eventName,headSha:head,readOnly:true};
+}
+export function validateFinancialModeIsolation(args,env){
+ const selected=env.I66_FINANCIAL_PRIVATE_READBACK==='true'||String(env.PRIVATE_READBACK_COMMIT_MESSAGE||'').includes('[i66-financial-private-readback]');
+ need(!selected||(args.length===1&&['--check-i66-financial-request','--i66-financial-readonly'].includes(args[0])),'I66_FINANCIAL_MIXED_READ_PROFILES_DENIED');
+}
+function financialTimestamp(value){return value&&/^[0-9]+$/.test(value.seconds||'')&&Number.isInteger(value.nanoseconds)&&value.nanoseconds>=0&&value.nanoseconds<1000000000;}
+export async function captureFinancialSnapshot({db,request,requestBytes,head}){
+ need(requestBytes&&same(JSON.parse(requestBytes),request),'I66_FINANCIAL_REQUEST_BYTES');
+ // Reuse the bounded reader/projection, taking only observational fields. Its
+ // historical period/base/manifest labels never enter this current payload.
+ const observed=await captureOctoberSnapshot({db,request,head});
+ const {counts,collections,data,readWindow,commissionConfiguration}=observed;
+ for(const name of FINANCIAL_COLLECTIONS){
+  let previous=null;
+  for(const row of data[name]){
+   need(previous===null||Buffer.compare(Buffer.from(row.id),Buffer.from(previous))>0,'I66_FINANCIAL_DUPLICATE_OR_UNORDERED_DOCUMENT');previous=row.id;
+   need(financialTimestamp(row.__snapshot.updateTimeExact),'I66_FINANCIAL_EXACT_UPDATE_TIME_REQUIRED');
+  }
+  need(financialTimestamp(collections[name].readTimeExact),'I66_FINANCIAL_EXACT_READ_TIME_REQUIRED');
+ }
+ return {schema:'GRAVICENTRA_I66_FINANCIAL_CURRENT_ENCRYPTED_SNAPSHOT_V1',profile:FINANCIAL_PROFILE,createdAt:observed.createdAt,
+  projectId:PROJECT,tenantId:TENANT,headSha:head,authority:request.authority,source:request.source,requestPath:FINANCIAL_REQUEST,
+  requestBlobSha:blob(requestBytes),requestSha256:sha(requestBytes),counts,collections,data,readScope:request.readScope,
+  readWindow:{...readWindow,newDocumentsAfterCollectionReadNotRuledOut:true},commissionConfiguration,
+  exactDocumentUpdateTimes:true,matchingPerformed:false,eligibleForWrite:false,absenceInferenceAllowed:false,
+  writes:0,operationalWrites:0,paymentsApplied:0,receiptsCreated:0};
+}
+export function encryptFinancialSnapshot(payload,publicKeyBytes){
+ const encrypted=encryptOctoberSnapshot(payload,publicKeyBytes);
+ return {...encrypted,schema:'GRAVICENTRA_I66_FINANCIAL_CURRENT_ENCRYPTED_ENVELOPE_V1',profile:FINANCIAL_PROFILE,
+  authorityBaseHead:payload.authority.sourceBaseHead,formalDataCutoff:payload.authority.formalDataCutoff,
+  sourceEvidenceDate:payload.source.sourceEvidenceDate,privateReferenceQuerySha256:payload.source.privateReferenceQuery.sha256,
+  requestPath:payload.requestPath,requestBlobSha:payload.requestBlobSha,requestSha256:payload.requestSha256};
+}
+export function financialPublicReceipt(payload,envelope,encoded){
+ return {schema:'GRAVICENTRA_I66_FINANCIAL_CURRENT_PRIVATE_READBACK_RECEIPT_V1',status:'ENCRYPTED_CURRENT_FINANCIAL_BASELINE_NOT_MATCHED_NOT_APPLIED',
+  profile:FINANCIAL_PROFILE,sourceHeadSha:payload.headSha,authorityBaseHead:payload.authority.sourceBaseHead,
+  currentProgressPath:payload.authority.currentProgressPath,currentProgressBlobSha:payload.authority.currentProgressBlobSha,
+  formalDataCutoff:payload.authority.formalDataCutoff,documentaryPeriod:payload.source.documentaryPeriod,sourceEvidenceDate:payload.source.sourceEvidenceDate,
+  privateReferenceQuerySha256:payload.source.privateReferenceQuery.sha256,counts:payload.counts,collections:payload.collections,readWindow:payload.readWindow,
+  encryptedPayloadSha256:sha(encoded),plaintextSha256:envelope.plaintextSha256,publicKeySha256:envelope.publicKeySha256,
+  requestPath:payload.requestPath,requestBlobSha:payload.requestBlobSha,requestSha256:payload.requestSha256,
+  encryptedOnly:true,containsPlaintextPII:false,exactDocumentUpdateTimes:true,matchingPerformed:false,eligibleForWrite:false,
+  absenceInferenceAllowed:false,writes:0,operationalWrites:0,paymentsApplied:0,receiptsCreated:0,deploy:false,acceptanceGranted:false};
+}
+function loadFinancialRequest(){
+ const head=execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim();
+ validateFinancialTrigger({eventName:process.env.GITHUB_EVENT_NAME,financialFlag:process.env.I66_FINANCIAL_PRIVATE_READBACK,
+  aliceFlag:process.env.I66_ALICE_PRIVATE_READBACK,octoberFlag:process.env.I65_OCTOBER_PRIVATE_READBACK,
+  commitMessage:process.env.PRIVATE_READBACK_COMMIT_MESSAGE,repository:process.env.GITHUB_REPOSITORY,branch:process.env.GITHUB_REF_NAME,
+  head,expectedSha:process.env.GITHUB_SHA,headCommitSha:process.env.PRIVATE_READBACK_HEAD_COMMIT_SHA});
+ const requestBytes=fs.readFileSync(FINANCIAL_REQUEST),request=JSON.parse(requestBytes),controlBytes=fs.readFileSync('artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json'),
+  control=JSON.parse(controlBytes),stateBytes=fs.readFileSync(ALICE_STATE),state=JSON.parse(stateBytes);
+ need(request?.authority?.currentProgressPath===control.i66ActiveRecoveryCursor?.currentEvidencePath,'I66_FINANCIAL_CURRENT_PROGRESS_PATH');
+ const progressBytes=fs.readFileSync(request.authority.currentProgressPath),progress=JSON.parse(progressBytes),decisionBytes=fs.readFileSync(FINANCIAL_DECISION),
+  sourceReceiptBytes=fs.readFileSync(FINANCIAL_SOURCE_RECEIPT),publicKeyBytes=fs.readFileSync(FINANCIAL_PUBLIC_KEY),
+  fileBytes=Object.fromEntries(FINANCIAL_EXECUTOR_PATHS.map(p=>[p,fs.readFileSync(p)]));
+ validateFinancialRequest({request,requestBytes,control,controlBytes,state,stateBytes,progress,progressBytes,decisionBytes,sourceReceiptBytes,
+  publicKeyBytes,fileBytes,branch:process.env.GITHUB_REF_NAME,head});
+ execFileSync('git',['merge-base','--is-ancestor',request.authority.sourceBaseHead,head],{stdio:'pipe'});
+ for(const p of [...FINANCIAL_EXECUTOR_PATHS,request.authority.controlPlanePath,ALICE_STATE,request.authority.currentProgressPath,FINANCIAL_DECISION,FINANCIAL_SOURCE_RECEIPT]){
+  const pinned=execFileSync('git',['show',request.authority.sourceBaseHead+':'+p],{maxBuffer:10000000});
+  need(blob(pinned)===blob(fs.readFileSync(p)),'I66_FINANCIAL_SOURCE_BASE_BYTES');
+ }
+ for(const p of [...FINANCIAL_EXECUTOR_PATHS,FINANCIAL_REQUEST,request.authority.controlPlanePath,ALICE_STATE,request.authority.currentProgressPath,FINANCIAL_DECISION,FINANCIAL_SOURCE_RECEIPT]){
+  const pinned=execFileSync('git',['show',head+':'+p],{maxBuffer:10000000});need(blob(pinned)===blob(fs.readFileSync(p)),'I66_FINANCIAL_CHECKOUT_BYTES');
+ }
+ return {request,requestBytes,publicKeyBytes,head};
+}
+async function runFinancial(checkOnly){
+ const {request,requestBytes,publicKeyBytes,head}=loadFinancialRequest();if(checkOnly){console.log('I66_FINANCIAL_READBACK_REQUEST=PASS');return;}
+ const output=process.env.I66_FINANCIAL_SNAPSHOT_FILE,receipt=process.env.I66_FINANCIAL_PUBLIC_RECEIPT_FILE,tmp=process.env.RUNNER_TEMP;
+ need(output&&receipt&&tmp&&path.resolve(output)!==path.resolve(receipt)&&[output,receipt].every(p=>path.resolve(p).startsWith(path.resolve(tmp)+path.sep)),
+  'I66_FINANCIAL_PRIVATE_RUNNER_OUTPUT_REQUIRED');
+ const {initializeApp,cert,deleteApp}=await import('firebase-admin/app'),{getFirestore}=await import('firebase-admin/firestore');
+ const app=initializeApp({credential:cert(sa()),projectId:PROJECT},'i66-financial-current-private-readback');
+ try{
+  const payload=await captureFinancialSnapshot({db:getFirestore(app),request,requestBytes,head}),envelope=encryptFinancialSnapshot(payload,publicKeyBytes),encoded=JSON.stringify(envelope);
+  fs.writeFileSync(output,encoded,{mode:0o600,flag:'wx'});
+  fs.writeFileSync(receipt,JSON.stringify(financialPublicReceipt(payload,envelope,encoded),null,2)+'\n',{mode:0o600,flag:'wx'});
+  console.log('I66_FINANCIAL_ENCRYPTED_SNAPSHOT=CAPTURED_NOT_MATCHED_NOT_APPLIED');console.log('I66_FINANCIAL_COUNTS='+JSON.stringify(payload.counts));console.log('I66_FINANCIAL_WRITES=0');
  }finally{await deleteApp(app).catch(()=>{});}
 }
 
@@ -350,6 +507,9 @@ try{
 }
 async function main(){
  const args=process.argv.slice(2);
+ validateFinancialModeIsolation(args,process.env);
+ if(args.length===1&&args[0]==='--check-i66-financial-request')return runFinancial(true);
+ if(args.length===1&&args[0]==='--i66-financial-readonly')return runFinancial(false);
  if(args.length===1&&args[0]==='--check-alice-gt-request')return runAlice(true);
  if(args.length===1&&args[0]==='--alice-gt-readonly')return runAlice(false);
  if(args.length===1&&args[0]==='--check-october-request')return runOctober(true);

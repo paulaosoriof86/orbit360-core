@@ -2,6 +2,10 @@ name: Gravicentra I6 Post-Salida
 on:
   workflow_dispatch:
    inputs:
+    private_i66_financial_readback:
+      description: "Explicit current I6.6 financial baseline; encrypted read only, every other job excluded"
+      type: boolean
+      default: false
     private_alice_matching_readback:
       description: "Explicit current I6.6 Alice GT matching profile; encrypted read only, every other job excluded"
       type: boolean
@@ -114,6 +118,9 @@ on:
     - 'artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B3_EXECUTION_LOCK_20260929.json'
     - 'artifacts/orbit360-recovery/release-control/I6_5_OCTOBER_RECONCILIATION_PRIVATE_READBACK_REQUEST_20261107.json'
     - 'tools/gravicentra-i6-5-encrypted-live-snapshot.mjs'
+    - 'tools/gravicentra-i66-financial-private-snapshot.test.mjs'
+    - 'artifacts/orbit360-recovery/release-control/I6_6_FINANCIAL_CURRENT_PRIVATE_READBACK_REQUEST_20261125.json'
+    - 'artifacts/orbit360-recovery/release-control/I6_6_FINANCIAL_CURRENT_SNAPSHOT_PUBLIC_KEY_20261125.pem'
     - 'tools/gravicentra-i6-6-alice-private-snapshot.test.mjs'
     - 'artifacts/orbit360-recovery/release-control/I6_6_ALICE_GT_PRIVATE_MATCHING_READBACK_REQUEST_20261124.json'
     - 'artifacts/orbit360-recovery/release-control/I6_6_ALICE_GT_MATCHING_PUBLIC_KEY_20261124.pem'
@@ -133,7 +140,7 @@ env:
   LEDGER: artifacts/orbit360-recovery/release-control/CAPABILITY_STATUS_LEDGER.json
 jobs:
   i64-code-defect-successor:
-   if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) && inputs.private_alice_matching_readback != true && !contains(github.event.head_commit.message || '', '[alice-private-matching-readback]') }}
+   if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) && inputs.private_alice_matching_readback != true && !contains(github.event.head_commit.message || '', '[alice-private-matching-readback]') && inputs.private_i66_financial_readback != true && !contains(github.event.head_commit.message || '', '[i66-financial-private-readback]') }}
    runs-on: ubuntu-24.04
    timeout-minutes: 50
    env:
@@ -534,7 +541,7 @@ jobs:
 
 
   i65-sync-code-defect-successor:
-   if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) && inputs.private_alice_matching_readback != true && !contains(github.event.head_commit.message || '', '[alice-private-matching-readback]') }}
+   if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) && inputs.private_alice_matching_readback != true && !contains(github.event.head_commit.message || '', '[alice-private-matching-readback]') && inputs.private_i66_financial_readback != true && !contains(github.event.head_commit.message || '', '[i66-financial-private-readback]') }}
    runs-on: ubuntu-24.04
    timeout-minutes: 50
    env:
@@ -943,7 +950,7 @@ jobs:
 
 
   i65-hydration-code-defect-successor:
-   if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) && inputs.private_alice_matching_readback != true && !contains(github.event.head_commit.message || '', '[alice-private-matching-readback]') }}
+   if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) && inputs.private_alice_matching_readback != true && !contains(github.event.head_commit.message || '', '[alice-private-matching-readback]') && inputs.private_i66_financial_readback != true && !contains(github.event.head_commit.message || '', '[i66-financial-private-readback]') }}
    runs-on: ubuntu-24.04
    timeout-minutes: 50
    env:
@@ -1417,7 +1424,7 @@ jobs:
 
 
   i65-hydration-diagnostic:
-   if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) && inputs.private_alice_matching_readback != true && !contains(github.event.head_commit.message || '', '[alice-private-matching-readback]') }}
+   if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) && inputs.private_alice_matching_readback != true && !contains(github.event.head_commit.message || '', '[alice-private-matching-readback]') && inputs.private_i66_financial_readback != true && !contains(github.event.head_commit.message || '', '[i66-financial-private-readback]') }}
    runs-on: ubuntu-24.04
    timeout-minutes: 30
    env:
@@ -1492,7 +1499,7 @@ jobs:
 
 
   i65-apply-public-key:
-   if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) && inputs.private_alice_matching_readback != true && !contains(github.event.head_commit.message || '', '[alice-private-matching-readback]') }}
+   if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) && inputs.private_alice_matching_readback != true && !contains(github.event.head_commit.message || '', '[alice-private-matching-readback]') && inputs.private_i66_financial_readback != true && !contains(github.event.head_commit.message || '', '[i66-financial-private-readback]') }}
    runs-on: ubuntu-24.04
    timeout-minutes: 10
    env:
@@ -1551,7 +1558,7 @@ jobs:
 
 
   i65-deterministic-apply:
-   if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) && inputs.private_alice_matching_readback != true && !contains(github.event.head_commit.message || '', '[alice-private-matching-readback]') }}
+   if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) && inputs.private_alice_matching_readback != true && !contains(github.event.head_commit.message || '', '[alice-private-matching-readback]') && inputs.private_i66_financial_readback != true && !contains(github.event.head_commit.message || '', '[i66-financial-private-readback]') }}
    runs-on: ubuntu-24.04
    timeout-minutes: 45
    env:
@@ -1692,7 +1699,7 @@ jobs:
        if-no-files-found: warn
        retention-days: 30
   i65-encrypted-diff-snapshot:
-   if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) && inputs.private_alice_matching_readback != true && !contains(github.event.head_commit.message || '', '[alice-private-matching-readback]') }}
+   if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) && inputs.private_alice_matching_readback != true && !contains(github.event.head_commit.message || '', '[alice-private-matching-readback]') && inputs.private_i66_financial_readback != true && !contains(github.event.head_commit.message || '', '[i66-financial-private-readback]') }}
    runs-on: ubuntu-24.04
    timeout-minutes: 20
    env:
@@ -1765,7 +1772,7 @@ jobs:
 
 
   i65-operational-closure-successor:
-   if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) && inputs.private_alice_matching_readback != true && !contains(github.event.head_commit.message || '', '[alice-private-matching-readback]') }}
+   if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) && inputs.private_alice_matching_readback != true && !contains(github.event.head_commit.message || '', '[alice-private-matching-readback]') && inputs.private_i66_financial_readback != true && !contains(github.event.head_commit.message || '', '[i66-financial-private-readback]') }}
    runs-on: ubuntu-24.04
    timeout-minutes: 50
    env:
@@ -2197,7 +2204,7 @@ jobs:
 
 
   i65-operational-closure-diagnostic:
-   if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) && inputs.private_alice_matching_readback != true && !contains(github.event.head_commit.message || '', '[alice-private-matching-readback]') }}
+   if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) && inputs.private_alice_matching_readback != true && !contains(github.event.head_commit.message || '', '[alice-private-matching-readback]') && inputs.private_i66_financial_readback != true && !contains(github.event.head_commit.message || '', '[i66-financial-private-readback]') }}
    runs-on: ubuntu-24.04
    timeout-minutes: 30
    env:
@@ -2242,7 +2249,7 @@ jobs:
        if-no-files-found: error
        retention-days: 7
   i65-live-readback:
-   if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) && inputs.private_alice_matching_readback != true && !contains(github.event.head_commit.message || '', '[alice-private-matching-readback]') }}
+   if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) && inputs.private_alice_matching_readback != true && !contains(github.event.head_commit.message || '', '[alice-private-matching-readback]') && inputs.private_i66_financial_readback != true && !contains(github.event.head_commit.message || '', '[i66-financial-private-readback]') }}
    runs-on: ubuntu-24.04
    timeout-minutes: 20
    env:
@@ -2324,7 +2331,7 @@ jobs:
 
 
   i63-readonly-completeness-audit:
-   if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) && inputs.private_alice_matching_readback != true && !contains(github.event.head_commit.message || '', '[alice-private-matching-readback]') }}
+   if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) && inputs.private_alice_matching_readback != true && !contains(github.event.head_commit.message || '', '[alice-private-matching-readback]') && inputs.private_i66_financial_readback != true && !contains(github.event.head_commit.message || '', '[i66-financial-private-readback]') }}
    runs-on: ubuntu-24.04
    timeout-minutes: 15
    env:
@@ -2369,7 +2376,7 @@ jobs:
        if-no-files-found: error
        retention-days: 7
   i63-identity-merge:
-   if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) && inputs.private_alice_matching_readback != true && !contains(github.event.head_commit.message || '', '[alice-private-matching-readback]') }}
+   if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) && inputs.private_alice_matching_readback != true && !contains(github.event.head_commit.message || '', '[alice-private-matching-readback]') && inputs.private_i66_financial_readback != true && !contains(github.event.head_commit.message || '', '[i66-financial-private-readback]') }}
    runs-on: ubuntu-24.04
    timeout-minutes: 25
    env:
@@ -2502,7 +2509,7 @@ jobs:
 
 
   i64-live-readback:
-   if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) && inputs.private_alice_matching_readback != true && !contains(github.event.head_commit.message || '', '[alice-private-matching-readback]') }}
+   if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) && inputs.private_alice_matching_readback != true && !contains(github.event.head_commit.message || '', '[alice-private-matching-readback]') && inputs.private_i66_financial_readback != true && !contains(github.event.head_commit.message || '', '[i66-financial-private-readback]') }}
    runs-on: ubuntu-24.04
    timeout-minutes: 20
    env:
@@ -2595,7 +2602,7 @@ jobs:
 
 
   i64-diff-snapshot:
-   if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) && inputs.private_alice_matching_readback != true && !contains(github.event.head_commit.message || '', '[alice-private-matching-readback]') }}
+   if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) && inputs.private_alice_matching_readback != true && !contains(github.event.head_commit.message || '', '[alice-private-matching-readback]') && inputs.private_i66_financial_readback != true && !contains(github.event.head_commit.message || '', '[i66-financial-private-readback]') }}
    runs-on: ubuntu-24.04
    timeout-minutes: 20
    env:
@@ -2644,7 +2651,7 @@ jobs:
        if-no-files-found: error
        retention-days: 7
   i64-deterministic-apply:
-   if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) && inputs.private_alice_matching_readback != true && !contains(github.event.head_commit.message || '', '[alice-private-matching-readback]') }}
+   if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) && inputs.private_alice_matching_readback != true && !contains(github.event.head_commit.message || '', '[alice-private-matching-readback]') && inputs.private_i66_financial_readback != true && !contains(github.event.head_commit.message || '', '[i66-financial-private-readback]') }}
    runs-on: ubuntu-24.04
    timeout-minutes: 45
    env:
@@ -2772,7 +2779,7 @@ jobs:
 
 
   i64-visual-correction:
-   if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) && inputs.private_alice_matching_readback != true && !contains(github.event.head_commit.message || '', '[alice-private-matching-readback]') }}
+   if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) && inputs.private_alice_matching_readback != true && !contains(github.event.head_commit.message || '', '[alice-private-matching-readback]') && inputs.private_i66_financial_readback != true && !contains(github.event.head_commit.message || '', '[i66-financial-private-readback]') }}
    runs-on: ubuntu-24.04
    timeout-minutes: 35
    env:
@@ -2893,7 +2900,7 @@ jobs:
 
 
   i65-forensic-b1-preview:
-   if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) && inputs.private_alice_matching_readback != true && !contains(github.event.head_commit.message || '', '[alice-private-matching-readback]') }}
+   if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) && inputs.private_alice_matching_readback != true && !contains(github.event.head_commit.message || '', '[alice-private-matching-readback]') && inputs.private_i66_financial_readback != true && !contains(github.event.head_commit.message || '', '[i66-financial-private-readback]') }}
    runs-on: ubuntu-24.04
    timeout-minutes: 50
    env:
@@ -3154,7 +3161,7 @@ jobs:
       continue-on-error: true
       run: echo "B1_R3_ONLY_AUTHORIZED_NORMALIZATION_AND_REVERSIBLE_TEST_WRITES"
   i65-b1-hosting-byte-diagnostic:
-   if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) && inputs.private_alice_matching_readback != true && !contains(github.event.head_commit.message || '', '[alice-private-matching-readback]') }}
+   if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) && inputs.private_alice_matching_readback != true && !contains(github.event.head_commit.message || '', '[alice-private-matching-readback]') && inputs.private_i66_financial_readback != true && !contains(github.event.head_commit.message || '', '[i66-financial-private-readback]') }}
    runs-on: ubuntu-24.04
    timeout-minutes: 5
    env:
@@ -3225,7 +3232,7 @@ jobs:
         PY
 
   i65-b1-advisor-identity-diagnostic:
-   if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) && inputs.private_alice_matching_readback != true && !contains(github.event.head_commit.message || '', '[alice-private-matching-readback]') }}
+   if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) && inputs.private_alice_matching_readback != true && !contains(github.event.head_commit.message || '', '[alice-private-matching-readback]') && inputs.private_i66_financial_readback != true && !contains(github.event.head_commit.message || '', '[i66-financial-private-readback]') }}
    runs-on: ubuntu-24.04
    timeout-minutes: 20
    env:
@@ -3276,7 +3283,7 @@ jobs:
        compression-level: 0
        retention-days: 14
   i65-b1-equipo-runtime-diagnostic:
-   if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) && inputs.private_alice_matching_readback != true && !contains(github.event.head_commit.message || '', '[alice-private-matching-readback]') }}
+   if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) && inputs.private_alice_matching_readback != true && !contains(github.event.head_commit.message || '', '[alice-private-matching-readback]') && inputs.private_i66_financial_readback != true && !contains(github.event.head_commit.message || '', '[i66-financial-private-readback]') }}
    runs-on: ubuntu-24.04
    timeout-minutes: 25
    env:
@@ -3329,7 +3336,7 @@ jobs:
        compression-level: 0
        retention-days: 14
   i65-b1-r6-directed-diagnostic:
-   if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) && inputs.private_alice_matching_readback != true && !contains(github.event.head_commit.message || '', '[alice-private-matching-readback]') }}
+   if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) && inputs.private_alice_matching_readback != true && !contains(github.event.head_commit.message || '', '[alice-private-matching-readback]') && inputs.private_i66_financial_readback != true && !contains(github.event.head_commit.message || '', '[i66-financial-private-readback]') }}
    runs-on: ubuntu-24.04
    timeout-minutes: 25
    env:
@@ -3384,7 +3391,7 @@ jobs:
        compression-level: 0
        retention-days: 14
   i65-b1-r7-auth-team-diagnostic:
-   if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) && inputs.private_alice_matching_readback != true && !contains(github.event.head_commit.message || '', '[alice-private-matching-readback]') }}
+   if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) && inputs.private_alice_matching_readback != true && !contains(github.event.head_commit.message || '', '[alice-private-matching-readback]') && inputs.private_i66_financial_readback != true && !contains(github.event.head_commit.message || '', '[i66-financial-private-readback]') }}
    runs-on: ubuntu-24.04
    timeout-minutes: 15
    env:
@@ -3436,7 +3443,7 @@ jobs:
        compression-level: 0
        retention-days: 14
   i65-b1-r7-bootstrap-diagnostic:
-   if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) && inputs.private_alice_matching_readback != true && !contains(github.event.head_commit.message || '', '[alice-private-matching-readback]') }}
+   if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) && inputs.private_alice_matching_readback != true && !contains(github.event.head_commit.message || '', '[alice-private-matching-readback]') && inputs.private_i66_financial_readback != true && !contains(github.event.head_commit.message || '', '[i66-financial-private-readback]') }}
    runs-on: ubuntu-24.04
    timeout-minutes: 20
    env:
@@ -3490,7 +3497,7 @@ jobs:
        compression-level: 0
        retention-days: 14
   i65-b1-r8-access-email-diagnostic:
-   if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) && inputs.private_alice_matching_readback != true && !contains(github.event.head_commit.message || '', '[alice-private-matching-readback]') }}
+   if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) && inputs.private_alice_matching_readback != true && !contains(github.event.head_commit.message || '', '[alice-private-matching-readback]') && inputs.private_i66_financial_readback != true && !contains(github.event.head_commit.message || '', '[i66-financial-private-readback]') }}
    runs-on: ubuntu-24.04
    timeout-minutes: 15
    env:
@@ -3539,7 +3546,7 @@ jobs:
        compression-level: 0
        retention-days: 14
   i65-forensic-b2-preview:
-   if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) && inputs.private_alice_matching_readback != true && !contains(github.event.head_commit.message || '', '[alice-private-matching-readback]') }}
+   if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) && inputs.private_alice_matching_readback != true && !contains(github.event.head_commit.message || '', '[alice-private-matching-readback]') && inputs.private_i66_financial_readback != true && !contains(github.event.head_commit.message || '', '[i66-financial-private-readback]') }}
    runs-on: ubuntu-24.04
    timeout-minutes: 35
    env:
@@ -3836,7 +3843,7 @@ jobs:
       run: echo "B2_PREVIEW_FAILED_NO_LIVE_NO_DATA_APPLY"
   i65-b2-authenticated-preview:
    needs: i65-forensic-b2-preview
-   if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) && inputs.private_alice_matching_readback != true && !contains(github.event.head_commit.message || '', '[alice-private-matching-readback]') && (always()) }}
+   if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) && inputs.private_alice_matching_readback != true && !contains(github.event.head_commit.message || '', '[alice-private-matching-readback]') && inputs.private_i66_financial_readback != true && !contains(github.event.head_commit.message || '', '[i66-financial-private-readback]') && (always()) }}
    runs-on: ubuntu-24.04
    timeout-minutes: 12
    env:
@@ -4114,7 +4121,7 @@ jobs:
       continue-on-error: true
       run: echo "B2_AUTHENTICATED_PROOF_FAILED_NO_LIVE_NO_REIMPORT_CLEANUP_REQUIRED"
   i65-b2-synthetic-cleanup:
-   if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) && inputs.private_alice_matching_readback != true && !contains(github.event.head_commit.message || '', '[alice-private-matching-readback]') }}
+   if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) && inputs.private_alice_matching_readback != true && !contains(github.event.head_commit.message || '', '[alice-private-matching-readback]') && inputs.private_i66_financial_readback != true && !contains(github.event.head_commit.message || '', '[i66-financial-private-readback]') }}
    runs-on: ubuntu-24.04
    timeout-minutes: 12
    env:
@@ -4189,7 +4196,7 @@ jobs:
         git push origin "HEAD:$GITHUB_REF_NAME"
 
   i65-b1-r10-rootcause-readonly:
-   if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) && inputs.private_alice_matching_readback != true && !contains(github.event.head_commit.message || '', '[alice-private-matching-readback]') }}
+   if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) && inputs.private_alice_matching_readback != true && !contains(github.event.head_commit.message || '', '[alice-private-matching-readback]') && inputs.private_i66_financial_readback != true && !contains(github.event.head_commit.message || '', '[i66-financial-private-readback]') }}
    runs-on: ubuntu-24.04
    timeout-minutes: 12
    env:
@@ -4260,7 +4267,7 @@ jobs:
        compression-level: 0
        retention-days: 30
   i65-b1-r11-route-trace-readonly:
-   if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) && inputs.private_alice_matching_readback != true && !contains(github.event.head_commit.message || '', '[alice-private-matching-readback]') }}
+   if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) && inputs.private_alice_matching_readback != true && !contains(github.event.head_commit.message || '', '[alice-private-matching-readback]') && inputs.private_i66_financial_readback != true && !contains(github.event.head_commit.message || '', '[i66-financial-private-readback]') }}
    runs-on: ubuntu-24.04
    timeout-minutes: 5
    env:
@@ -4310,7 +4317,7 @@ jobs:
        compression-level: 0
        retention-days: 30
   i65-b2-r3-oscar-readonly:
-   if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) && inputs.private_alice_matching_readback != true && !contains(github.event.head_commit.message || '', '[alice-private-matching-readback]') }}
+   if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) && inputs.private_alice_matching_readback != true && !contains(github.event.head_commit.message || '', '[alice-private-matching-readback]') && inputs.private_i66_financial_readback != true && !contains(github.event.head_commit.message || '', '[i66-financial-private-readback]') }}
    runs-on: ubuntu-24.04
    timeout-minutes: 8
    env:
@@ -4380,7 +4387,7 @@ jobs:
        retention-days: 30
   i65-b2-r52-human-fixture:
    needs: i65-b2-authenticated-preview
-   if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) && inputs.private_alice_matching_readback != true && !contains(github.event.head_commit.message || '', '[alice-private-matching-readback]') && (always()) }}
+   if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) && inputs.private_alice_matching_readback != true && !contains(github.event.head_commit.message || '', '[alice-private-matching-readback]') && inputs.private_i66_financial_readback != true && !contains(github.event.head_commit.message || '', '[i66-financial-private-readback]') && (always()) }}
    runs-on: ubuntu-24.04
    timeout-minutes: 12
    env:
@@ -4543,7 +4550,7 @@ jobs:
       run: echo "R52_FIXTURE_FAILED_NO_LIVE_NO_DATA_WRITE_NO_B3"
   i65-b2-r15-drive-human-fixture:
    needs: i65-b2-authenticated-preview
-   if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) && inputs.private_alice_matching_readback != true && !contains(github.event.head_commit.message || '', '[alice-private-matching-readback]') && (always()) }}
+   if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) && inputs.private_alice_matching_readback != true && !contains(github.event.head_commit.message || '', '[alice-private-matching-readback]') && inputs.private_i66_financial_readback != true && !contains(github.event.head_commit.message || '', '[i66-financial-private-readback]') && (always()) }}
    runs-on: ubuntu-24.04
    timeout-minutes: 12
    env:
@@ -4646,7 +4653,7 @@ jobs:
 
   i65-b2-r102-logo-readonly:
    needs: i65-b2-r15-drive-human-fixture
-   if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) && inputs.private_alice_matching_readback != true && !contains(github.event.head_commit.message || '', '[alice-private-matching-readback]') && (always() && needs.i65-b2-r15-drive-human-fixture.result == 'success') }}
+   if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) && inputs.private_alice_matching_readback != true && !contains(github.event.head_commit.message || '', '[alice-private-matching-readback]') && inputs.private_i66_financial_readback != true && !contains(github.event.head_commit.message || '', '[i66-financial-private-readback]') && (always() && needs.i65-b2-r15-drive-human-fixture.result == 'success') }}
    runs-on: ubuntu-24.04
    timeout-minutes: 12
    env:
@@ -4751,7 +4758,7 @@ jobs:
 
 
   i65-b2-google-auth-provider-remediation:
-   if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) && inputs.private_alice_matching_readback != true && !contains(github.event.head_commit.message || '', '[alice-private-matching-readback]') }}
+   if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) && inputs.private_alice_matching_readback != true && !contains(github.event.head_commit.message || '', '[alice-private-matching-readback]') && inputs.private_i66_financial_readback != true && !contains(github.event.head_commit.message || '', '[i66-financial-private-readback]') }}
    runs-on: ubuntu-24.04
    timeout-minutes: 12
    env:
@@ -4892,7 +4899,7 @@ jobs:
 
 
   i65-b2-r87-oauth-origin-discovery:
-   if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) && inputs.private_alice_matching_readback != true && !contains(github.event.head_commit.message || '', '[alice-private-matching-readback]') }}
+   if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) && inputs.private_alice_matching_readback != true && !contains(github.event.head_commit.message || '', '[alice-private-matching-readback]') && inputs.private_i66_financial_readback != true && !contains(github.event.head_commit.message || '', '[i66-financial-private-readback]') }}
    runs-on: ubuntu-24.04
    timeout-minutes: 15
    env:
@@ -5079,7 +5086,7 @@ jobs:
       run: echo "R87_DISCOVERY_FAILED_ROLLBACK_REQUIRED_NO_OAUTH_CLIENT_MUTATION_NO_LIVE_NO_B3"
   i65-b2-r77-r81-drive-durable-proof:
    needs: i65-b2-authenticated-preview
-   if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) && inputs.private_alice_matching_readback != true && !contains(github.event.head_commit.message || '', '[alice-private-matching-readback]') && (always()) }}
+   if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) && inputs.private_alice_matching_readback != true && !contains(github.event.head_commit.message || '', '[alice-private-matching-readback]') && inputs.private_i66_financial_readback != true && !contains(github.event.head_commit.message || '', '[i66-financial-private-readback]') && (always()) }}
    runs-on: ubuntu-24.04
    timeout-minutes: 12
    env:
@@ -5198,7 +5205,7 @@ jobs:
       run: echo "B2_R77_R81_FAILED_NO_LIVE_NO_B3_NO_REIMPORT_CLEANUP_REQUIRED"
   i65-b2-r91-r95-runtime-proof:
    needs: i65-b2-r77-r81-drive-durable-proof
-   if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) && inputs.private_alice_matching_readback != true && !contains(github.event.head_commit.message || '', '[alice-private-matching-readback]') && (always()) }}
+   if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) && inputs.private_alice_matching_readback != true && !contains(github.event.head_commit.message || '', '[alice-private-matching-readback]') && inputs.private_i66_financial_readback != true && !contains(github.event.head_commit.message || '', '[i66-financial-private-readback]') && (always()) }}
    runs-on: ubuntu-24.04
    timeout-minutes: 15
    env:
@@ -5318,7 +5325,7 @@ jobs:
       run: echo "B2_R91_R95_FAILED_NO_LIVE_NO_B3_NO_REIMPORT_CLEANUP_REQUIRED"
   i65-b2-r82-delete-runtime-proof:
    needs: i65-b2-r91-r95-runtime-proof
-   if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) && inputs.private_alice_matching_readback != true && !contains(github.event.head_commit.message || '', '[alice-private-matching-readback]') && (always()) }}
+   if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) && inputs.private_alice_matching_readback != true && !contains(github.event.head_commit.message || '', '[alice-private-matching-readback]') && inputs.private_i66_financial_readback != true && !contains(github.event.head_commit.message || '', '[i66-financial-private-readback]') && (always()) }}
    runs-on: ubuntu-24.04
    timeout-minutes: 15
    env:
@@ -5438,7 +5445,7 @@ jobs:
       run: echo "B2_R82_FAILED_NO_LIVE_NO_B3_NO_REIMPORT_CLEANUP_REQUIRED"
   i65-b2-drive-qa-fixture-cleanup:
    needs: i65-b2-r82-delete-runtime-proof
-   if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) && inputs.private_alice_matching_readback != true && !contains(github.event.head_commit.message || '', '[alice-private-matching-readback]') && (always()) }}
+   if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) && inputs.private_alice_matching_readback != true && !contains(github.event.head_commit.message || '', '[alice-private-matching-readback]') && inputs.private_i66_financial_readback != true && !contains(github.event.head_commit.message || '', '[i66-financial-private-readback]') && (always()) }}
    runs-on: ubuntu-24.04
    timeout-minutes: 10
    env:
@@ -5543,7 +5550,7 @@ jobs:
       if: ${{ failure() && steps.mode.outputs.run == 'true' }}
       run: echo "B2_DRIVE_QA_CLEANUP_FAILED_NO_LIVE_NO_B3_FINAL_VISUAL_BLOCKED"
   i65-b2-final-human-cleanup:
-   if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) && inputs.private_alice_matching_readback != true && !contains(github.event.head_commit.message || '', '[alice-private-matching-readback]') && (always()) }}
+   if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) && inputs.private_alice_matching_readback != true && !contains(github.event.head_commit.message || '', '[alice-private-matching-readback]') && inputs.private_i66_financial_readback != true && !contains(github.event.head_commit.message || '', '[i66-financial-private-readback]') && (always()) }}
    runs-on: ubuntu-24.04
    timeout-minutes: 12
    env:
@@ -5684,7 +5691,7 @@ jobs:
       if: ${{ failure() && steps.mode.outputs.run == 'true' }}
       run: echo "B2_FINAL_CLEANUP_FAILED_NO_B3_NO_LIVE_NO_REIMPORT"
   i65-b3-001-cobros-shell-preview:
-   if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) && inputs.private_alice_matching_readback != true && !contains(github.event.head_commit.message || '', '[alice-private-matching-readback]') && (always()) }}
+   if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) && inputs.private_alice_matching_readback != true && !contains(github.event.head_commit.message || '', '[alice-private-matching-readback]') && inputs.private_i66_financial_readback != true && !contains(github.event.head_commit.message || '', '[i66-financial-private-readback]') && (always()) }}
    runs-on: ubuntu-24.04
    timeout-minutes: 25
    env:
@@ -5903,7 +5910,7 @@ jobs:
       if: ${{ failure() && steps.mode.outputs.run == 'true' }}
       run: echo "B3_001_FAILED_NO_LIVE_NO_DATA_WRITE_NO_REIMPORT"
   i65-b3-002-performance-readonly:
-   if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) && inputs.private_alice_matching_readback != true && !contains(github.event.head_commit.message || '', '[alice-private-matching-readback]') }}
+   if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) && inputs.private_alice_matching_readback != true && !contains(github.event.head_commit.message || '', '[alice-private-matching-readback]') && inputs.private_i66_financial_readback != true && !contains(github.event.head_commit.message || '', '[i66-financial-private-readback]') }}
    runs-on: ubuntu-24.04
    timeout-minutes: 20
    env:
@@ -5979,7 +5986,7 @@ jobs:
       if: always() && steps.gate.outputs.run == 'true'
       run: echo "B3_002_DIAGNOSTIC_ONLY_NO_BUSINESS_WRITES_NO_REIMPORT_NO_LIVE"
   i65-b3-002-performance-successor:
-   if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) && inputs.private_alice_matching_readback != true && !contains(github.event.head_commit.message || '', '[alice-private-matching-readback]') && (always()) }}
+   if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) && inputs.private_alice_matching_readback != true && !contains(github.event.head_commit.message || '', '[alice-private-matching-readback]') && inputs.private_i66_financial_readback != true && !contains(github.event.head_commit.message || '', '[i66-financial-private-readback]') && (always()) }}
    runs-on: ubuntu-24.04
    timeout-minutes: 30
    env:
@@ -6241,7 +6248,7 @@ jobs:
       if: ${{ failure() && steps.mode.outputs.run == 'true' }}
       run: echo "B3_002_FAILED_NO_LIVE_NO_DATA_WRITE_NO_REIMPORT_NO_B4"
   i65-b3-003-kpi-aging-readonly:
-   if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) && inputs.private_alice_matching_readback != true && !contains(github.event.head_commit.message || '', '[alice-private-matching-readback]') && (always()) }}
+   if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) && inputs.private_alice_matching_readback != true && !contains(github.event.head_commit.message || '', '[alice-private-matching-readback]') && inputs.private_i66_financial_readback != true && !contains(github.event.head_commit.message || '', '[i66-financial-private-readback]') && (always()) }}
    runs-on: ubuntu-24.04
    timeout-minutes: 15
    env:
@@ -6303,7 +6310,7 @@ jobs:
       if: always() && steps.gate.outputs.run == 'true'
       run: echo "B3_003_DIAGNOSTIC_ONLY_NO_PRODUCT_MUTATION_NO_BUSINESS_WRITES_NO_REIMPORT_NO_LIVE"
   i65-b3-003-currency-aging-successor:
-   if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) && inputs.private_alice_matching_readback != true && !contains(github.event.head_commit.message || '', '[alice-private-matching-readback]') && (always()) }}
+   if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) && inputs.private_alice_matching_readback != true && !contains(github.event.head_commit.message || '', '[alice-private-matching-readback]') && inputs.private_i66_financial_readback != true && !contains(github.event.head_commit.message || '', '[i66-financial-private-readback]') && (always()) }}
    runs-on: ubuntu-24.04
    timeout-minutes: 30
    env:
@@ -6551,7 +6558,7 @@ jobs:
       if: ${{ failure() && steps.mode.outputs.run == 'true' }}
       run: echo "B3_003_FAILED_NO_LIVE_NO_DATA_WRITE_NO_REIMPORT_NO_B4"
   i65-b3-004-payment-owner-foundation:
-   if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) && inputs.private_alice_matching_readback != true && !contains(github.event.head_commit.message || '', '[alice-private-matching-readback]') }}
+   if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) && inputs.private_alice_matching_readback != true && !contains(github.event.head_commit.message || '', '[alice-private-matching-readback]') && inputs.private_i66_financial_readback != true && !contains(github.event.head_commit.message || '', '[i66-financial-private-readback]') }}
    runs-on: ubuntu-24.04
    timeout-minutes: 8
    steps:
@@ -6712,7 +6719,7 @@ jobs:
       run: echo "B3_004_PROVENANCE_FAILED_NO_DATA_WRITE_NO_REIMPORT_NO_LIVE"
   i65-b3-004-exact-preview:
    needs: i65-b3-004-payment-owner-foundation
-   if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) && inputs.private_alice_matching_readback != true && !contains(github.event.head_commit.message || '', '[alice-private-matching-readback]') && (always()) }}
+   if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) && inputs.private_alice_matching_readback != true && !contains(github.event.head_commit.message || '', '[alice-private-matching-readback]') && inputs.private_i66_financial_readback != true && !contains(github.event.head_commit.message || '', '[i66-financial-private-readback]') && (always()) }}
    runs-on: ubuntu-24.04
    timeout-minutes: 35
    env:
@@ -7092,7 +7099,7 @@ jobs:
       if: ${{ failure() && steps.gate.outputs.run == 'true' }}
       run: echo "B3_004_FAILED_NO_OPERATIONAL_DATA_WRITE_NO_REIMPORT_NO_LIVE_NO_B4"
   i65-b3-005-source-contract:
-   if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) && inputs.private_alice_matching_readback != true && !contains(github.event.head_commit.message || '', '[alice-private-matching-readback]') }}
+   if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) && inputs.private_alice_matching_readback != true && !contains(github.event.head_commit.message || '', '[alice-private-matching-readback]') && inputs.private_i66_financial_readback != true && !contains(github.event.head_commit.message || '', '[i66-financial-private-readback]') }}
    runs-on: ubuntu-24.04
    timeout-minutes: 10
    steps:
@@ -7186,7 +7193,7 @@ jobs:
       run: echo "B3_005_SOURCE_CONTRACT_FAILED_NO_OPERATIONAL_WRITE_NO_REIMPORT_NO_LIVE_NO_B3006"
   i65-b3-005-exact-preview:
    needs: i65-b3-005-source-contract
-   if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) && inputs.private_alice_matching_readback != true && !contains(github.event.head_commit.message || '', '[alice-private-matching-readback]') && (always()) }}
+   if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) && inputs.private_alice_matching_readback != true && !contains(github.event.head_commit.message || '', '[alice-private-matching-readback]') && inputs.private_i66_financial_readback != true && !contains(github.event.head_commit.message || '', '[i66-financial-private-readback]') && (always()) }}
    runs-on: ubuntu-24.04
    timeout-minutes: 35
    env:
@@ -7478,7 +7485,7 @@ jobs:
       run: echo "B3_005_FAILED_NO_OPERATIONAL_WRITE_NO_REIMPORT_NO_LIVE_NO_B3006"
   i65-b3-005-human-close:
    needs: i65-b3-005-exact-preview
-   if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) && inputs.private_alice_matching_readback != true && !contains(github.event.head_commit.message || '', '[alice-private-matching-readback]') && (always()) }}
+   if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) && inputs.private_alice_matching_readback != true && !contains(github.event.head_commit.message || '', '[alice-private-matching-readback]') && inputs.private_i66_financial_readback != true && !contains(github.event.head_commit.message || '', '[i66-financial-private-readback]') && (always()) }}
    runs-on: ubuntu-24.04
    timeout-minutes: 12
    env:
@@ -7644,7 +7651,7 @@ jobs:
       if: ${{ failure() && steps.gate.outputs.run == 'true' }}
       run: echo "B3_005_HUMAN_CLOSE_FAILED_NO_LIVE_NO_REIMPORT_NO_B3006_WRITES"
   i65-b3-006-exact-preview:
-   if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) && inputs.private_alice_matching_readback != true && !contains(github.event.head_commit.message || '', '[alice-private-matching-readback]') }}
+   if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) && inputs.private_alice_matching_readback != true && !contains(github.event.head_commit.message || '', '[alice-private-matching-readback]') && inputs.private_i66_financial_readback != true && !contains(github.event.head_commit.message || '', '[i66-financial-private-readback]') }}
    runs-on: ubuntu-24.04
    timeout-minutes: 35
    env:
@@ -7714,7 +7721,7 @@ jobs:
       if: failure() && steps.b3006.outputs.run == 'true'
       run: echo "B3_006_FAILED_NO_OPERATIONAL_REIMPORT_NO_LIVE_NO_B3007_WRITES"
   i65-encrypted-current-october-readback:
-   if: ${{ github.repository == 'paulaosoriof86/orbit360-core' && github.ref == 'refs/heads/recovery/fase-a-clean-20260831' && ((inputs.private_alice_matching_readback == true || contains(github.event.head_commit.message || '', '[alice-private-matching-readback]')) || inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) }}
+   if: ${{ github.repository == 'paulaosoriof86/orbit360-core' && github.ref == 'refs/heads/recovery/fase-a-clean-20260831' && ((inputs.private_alice_matching_readback == true || contains(github.event.head_commit.message || '', '[alice-private-matching-readback]')) || inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]') || inputs.private_i66_financial_readback == true || contains(github.event.head_commit.message || '', '[i66-financial-private-readback]')) }}
    permissions:
     contents: read
     actions: read
@@ -7731,16 +7738,28 @@ jobs:
        node-version: '22'
     - name: Preserve governance and validate exact private read authority
       env:
+       I66_FINANCIAL_PRIVATE_READBACK: ${{ (inputs.private_i66_financial_readback == true || contains(github.event.head_commit.message || '', '[i66-financial-private-readback]')) }}
        I66_ALICE_PRIVATE_READBACK: ${{ (inputs.private_alice_matching_readback == true || contains(github.event.head_commit.message || '', '[alice-private-matching-readback]')) }}
-       I65_OCTOBER_PRIVATE_READBACK: ${{ inputs.private_october_readback }}
+       I65_OCTOBER_PRIVATE_READBACK: ${{ (inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) }}
        PRIVATE_READBACK_COMMIT_MESSAGE: ${{ github.event.head_commit.message || '' }}
        PRIVATE_READBACK_HEAD_COMMIT_SHA: ${{ github.event.head_commit.id || '' }}
       run: |
         set -euo pipefail
+        case "$GITHUB_EVENT_NAME" in workflow_dispatch|push) ;; *) exit 41;; esac
+        node - <<'NODE'
+        const names=['I65_OCTOBER_PRIVATE_READBACK','I66_ALICE_PRIVATE_READBACK','I66_FINANCIAL_PRIVATE_READBACK'];
+        const flags=names.map(name=>process.env[name]);
+        if(flags.some(flag=>!['true','false'].includes(flag))||flags.filter(flag=>flag==='true').length!==1){
+          console.error('I66_PRIVATE_READBACK_MIXED_OR_MISSING_PROFILE');process.exit(42);
+        }
+        NODE
         node tools/gravicentra-governance-preflight-v1.mjs --mode=i6
-        node --test tools/gravicentra-i6-5-october-private-snapshot.test.mjs tools/gravicentra-i6-6-alice-private-snapshot.test.mjs
-        if [ "$I66_ALICE_PRIVATE_READBACK" = "true" ]; then
-          case "$GITHUB_EVENT_NAME" in workflow_dispatch|push) ;; *) exit 41;; esac
+        node --test tools/gravicentra-i6-5-october-private-snapshot.test.mjs tools/gravicentra-i6-6-alice-private-snapshot.test.mjs tools/gravicentra-i66-financial-private-snapshot.test.mjs
+        if [ "$I66_FINANCIAL_PRIVATE_READBACK" = "true" ]; then
+          test "$I65_OCTOBER_PRIVATE_READBACK" != "true"
+          test "$I66_ALICE_PRIVATE_READBACK" != "true"
+          node tools/gravicentra-i6-5-encrypted-live-snapshot.mjs --check-i66-financial-request
+        elif [ "$I66_ALICE_PRIVATE_READBACK" = "true" ]; then
           test "$I65_OCTOBER_PRIVATE_READBACK" != "true"
           case "$PRIVATE_READBACK_COMMIT_MESSAGE" in *'[october-private-readback]'*) exit 42;; esac
           node tools/gravicentra-i6-5-encrypted-live-snapshot.mjs --check-alice-gt-request
@@ -7750,7 +7769,7 @@ jobs:
     - name: Install existing readback dependency
       run: npm install --no-save --package-lock=false --ignore-scripts --no-audit --no-fund firebase-admin@13.4.0 >/dev/null
     - name: Capture only the authorized canonical baseline into encrypted bytes
-      if: inputs.private_alice_matching_readback != true && !contains(github.event.head_commit.message || '', '[alice-private-matching-readback]')
+      if: inputs.private_alice_matching_readback != true && !contains(github.event.head_commit.message || '', '[alice-private-matching-readback]') && inputs.private_i66_financial_readback != true && !contains(github.event.head_commit.message || '', '[i66-financial-private-readback]')
       env:
        SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
        SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
@@ -7759,7 +7778,7 @@ jobs:
        I65_DIFF_PUBLIC_RECEIPT_FILE: ${{ runner.temp }}/i65-october-private-readback-receipt.json
       run: node tools/gravicentra-i6-5-encrypted-live-snapshot.mjs --october-readonly
     - name: Preserve encrypted baseline and non-PII execution receipt
-      if: inputs.private_alice_matching_readback != true && !contains(github.event.head_commit.message || '', '[alice-private-matching-readback]')
+      if: inputs.private_alice_matching_readback != true && !contains(github.event.head_commit.message || '', '[alice-private-matching-readback]') && inputs.private_i66_financial_readback != true && !contains(github.event.head_commit.message || '', '[i66-financial-private-readback]')
       uses: actions/upload-artifact@v4
       with:
        name: gravicentra-i6-5-encrypted-current-october-baseline-${{ github.run_id }}
@@ -7769,8 +7788,33 @@ jobs:
        compression-level: 0
        if-no-files-found: error
        retention-days: 1
+    - name: Capture current authorized financial baseline into encrypted bytes
+      if: (inputs.private_i66_financial_readback == true || contains(github.event.head_commit.message || '', '[i66-financial-private-readback]'))
+      env:
+       SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+       SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+       SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+       I66_FINANCIAL_PRIVATE_READBACK: ${{ (inputs.private_i66_financial_readback == true || contains(github.event.head_commit.message || '', '[i66-financial-private-readback]')) }}
+       I66_ALICE_PRIVATE_READBACK: ${{ (inputs.private_alice_matching_readback == true || contains(github.event.head_commit.message || '', '[alice-private-matching-readback]')) }}
+       I65_OCTOBER_PRIVATE_READBACK: ${{ (inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) }}
+       PRIVATE_READBACK_COMMIT_MESSAGE: ${{ github.event.head_commit.message || '' }}
+       PRIVATE_READBACK_HEAD_COMMIT_SHA: ${{ github.event.head_commit.id || '' }}
+       I66_FINANCIAL_SNAPSHOT_FILE: ${{ runner.temp }}/i66-financial-current.enc.json
+       I66_FINANCIAL_PUBLIC_RECEIPT_FILE: ${{ runner.temp }}/i66-financial-current-receipt.json
+      run: node tools/gravicentra-i6-5-encrypted-live-snapshot.mjs --i66-financial-readonly
+    - name: Preserve financial encrypted artifact and aggregate receipt only
+      if: (inputs.private_i66_financial_readback == true || contains(github.event.head_commit.message || '', '[i66-financial-private-readback]'))
+      uses: actions/upload-artifact@v4
+      with:
+       name: gravicentra-i6-6-financial-encrypted-current-${{ github.run_id }}-${{ github.run_attempt }}
+       path: |
+         ${{ runner.temp }}/i66-financial-current.enc.json
+         ${{ runner.temp }}/i66-financial-current-receipt.json
+       compression-level: 0
+       if-no-files-found: error
+       retention-days: 1
     - name: Capture current GT identity matching projection into encrypted bytes
-      if: (inputs.private_alice_matching_readback == true || contains(github.event.head_commit.message || '', '[alice-private-matching-readback]'))
+      if: (inputs.private_alice_matching_readback == true || contains(github.event.head_commit.message || '', '[alice-private-matching-readback]')) && inputs.private_i66_financial_readback != true && !contains(github.event.head_commit.message || '', '[i66-financial-private-readback]')
       env:
        SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
        SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
@@ -7783,7 +7827,7 @@ jobs:
        I66_ALICE_PUBLIC_RECEIPT_FILE: ${{ runner.temp }}/i66-alice-gt-matching-receipt.json
       run: node tools/gravicentra-i6-5-encrypted-live-snapshot.mjs --alice-gt-readonly
     - name: Preserve Alice encrypted artifact and aggregate receipt only
-      if: (inputs.private_alice_matching_readback == true || contains(github.event.head_commit.message || '', '[alice-private-matching-readback]'))
+      if: (inputs.private_alice_matching_readback == true || contains(github.event.head_commit.message || '', '[alice-private-matching-readback]')) && inputs.private_i66_financial_readback != true && !contains(github.event.head_commit.message || '', '[i66-financial-private-readback]')
       uses: actions/upload-artifact@v4
       with:
        name: gravicentra-i6-6-alice-gt-encrypted-current-${{ github.run_id }}-${{ github.run_attempt }}
