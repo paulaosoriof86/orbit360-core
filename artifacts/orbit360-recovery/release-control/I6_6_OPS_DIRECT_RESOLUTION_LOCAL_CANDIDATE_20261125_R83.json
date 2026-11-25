@@ -1,0 +1,435 @@
+{
+  "schema": "GI_I66_LOCAL_OPS_DIRECT_RESOLUTION_CHECKPOINT_R83_V1",
+  "recordType": "RECOVERABLE_LOCAL_SOURCE_EVIDENCE_NOT_RELEASE_AUTHORITY",
+  "recordedAtUtc": "2026-11-25T07:41:25.166078Z",
+  "product": "Gravicentra Insurance",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "activeGate": "I6.6",
+  "status": "SOURCE_LOCAL_VERIFIED_PENDING_SIGNED_PREVIEW_LIVE",
+  "sourceBase": "02ab462c1b999456859af68dab3fcabbcfd777c2",
+  "expectedRemoteHead": "02ab462c1b999456859af68dab3fcabbcfd777c2",
+  "priorProgress": {
+    "path": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_EXECUTION_PROGRESS_20261124_R82.json",
+    "gitBlobSha": "51f1265aa651129c98629c137cada777fc9cb3aa",
+    "sha256": "2c965defe80ed22555256536bcb36ebb30936a523b49ee72102d1ea0f077281c",
+    "bytes": 829660
+  },
+  "snapshot": {
+    "bundle": {
+      "path": "artifacts/orbit360-recovery/release-control/i6-6-p0-checkpoints/I6_6_OPS_DIRECT_RESOLUTION_LOCAL_CANDIDATE_20261125_R83.tar.gz.b64.md",
+      "gitBlobSha": "09c129e28f04333564974826a91fb9706a4089a2",
+      "sha256": "a758421da3f94b904d8100e07de3b3ca5f352df890fe441ea9b37856e4d56597",
+      "bytes": 320167
+    },
+    "archiveSha256": "59b967bc8864dbf9ce0de421365d39e49834d6e2c4f6e9d093a82b7a924bd4e5",
+    "archiveBytes": 237752,
+    "memberCount": 34,
+    "manifestMember": "manifest.json",
+    "manifestSha256": "0232f9a278a40fb9a0f567b25560a8a28e852709af90ada4c5c982ed3a93f7a7",
+    "sourcePatchMember": "source-candidate.patch",
+    "sourcePatchSha256": "cb2d6bcca69bfb84bc6c9d3a18e02bad94459bcfc722559a09052f2b95b4f566",
+    "sourcePathCount": 17,
+    "classification": {
+      "productOwners": 9,
+      "signedQaDrivers": 2,
+      "tests": 5,
+      "sourceQaWorkflow": 1
+    },
+    "sourcePins": [
+      {
+        "path": ".github/workflows/gravicentra-i66-privileged-role-parity-source-qa.yml",
+        "beforeBlob": "20b940f4d45b82a42b03393776945314096b86cd",
+        "beforeSha256": "42c880cb6544083323cf2cc851221385af3ed3e1248d36d5516b301f482398e7",
+        "afterBlob": "abebc2ac065f294c9408053477ecaeb9df182617",
+        "afterSha256": "1d1a6be3d922fda995b4f0c879ee100da10616f9c41230cd8624f82e182f1d9c",
+        "bytes": 14629,
+        "snapshotMember": "source/.github/workflows/gravicentra-i66-privileged-role-parity-source-qa.yml"
+      },
+      {
+        "path": "functions/product-ops-leads-domain.js",
+        "beforeBlob": "affde2677b4c997b89abdabf3af2cb920128935d",
+        "beforeSha256": "c89247322f9577fb0098512ee48bd6108c4fa62e556a02f6a5487d8ecb666ff6",
+        "afterBlob": "68ce837466beca8b201e5c387ec74f8f8b18b160",
+        "afterSha256": "d2d496583f0f2d4e126bf9d227915fc00c7b9ecfd31ce15508961fc324c1d839",
+        "bytes": 77227,
+        "snapshotMember": "source/functions/product-ops-leads-domain.js"
+      },
+      {
+        "path": "orbit360-platform/core/ciclo.js",
+        "beforeBlob": "ab4b5c0c35abcc2d815d50296f741bf319b0e42d",
+        "beforeSha256": "b87a337d82dc6dea7252b0498bd01a2c7b3f238e294f1b570741b3ceccfe1719",
+        "afterBlob": "42b5c009ee6157afc6f217f7e853174a62e3a44e",
+        "afterSha256": "71d3f00be82101e3949e0e7887d1ed7cdf99098632556a18b179e2c5ae673b6f",
+        "bytes": 144800,
+        "snapshotMember": "source/orbit360-platform/core/ciclo.js"
+      },
+      {
+        "path": "orbit360-platform/core/issuance-workflow-v1201.js",
+        "beforeBlob": "716c66579e077bced15d2150010eef792bf2d9c3",
+        "beforeSha256": "230d810719fc0f0a19ae0be1984944d22be2aa55475bf11633bb7c15638e7e17",
+        "afterBlob": "918021ebc6e1ba55a0d14b0c187f31e8ad74bd40",
+        "afterSha256": "576c0fa3b9128f535514bb11ae274ed7ad7b00bcced1fe966987df848910fb20",
+        "bytes": 31676,
+        "snapshotMember": "source/orbit360-platform/core/issuance-workflow-v1201.js"
+      },
+      {
+        "path": "orbit360-platform/data/store-firestore-product-operational-p0.js",
+        "beforeBlob": "d9b6806958da950f7a3aff28ca8b164220f827d6",
+        "beforeSha256": "1e235d1600ad40f97818e39fff7ab67ec92a930441c9872ff7d6d0f7795408be",
+        "afterBlob": "3c3a691ea28ebbca3eb3762e2ddd8696cb14df5a",
+        "afterSha256": "80de80937f7f09172481cda827cda4b07a05154a1b74b26a336223b838701adc",
+        "bytes": 72081,
+        "snapshotMember": "source/orbit360-platform/data/store-firestore-product-operational-p0.js"
+      },
+      {
+        "path": "orbit360-platform/modules/issuance-endosos-v1201-bridge.js",
+        "beforeBlob": "6dabc32d0a012566eb7840ef8774aee3beb17817",
+        "beforeSha256": "668040348d92085d0948375ce8f72a7c0748cfa88b72aa3382b4783bbc30d89b",
+        "afterBlob": "3e3fa4cff395f78744681fe3fabfbdaf14d4ccdb",
+        "afterSha256": "3171980401e1036939417c227665cc79501e32c5ed47f19a646054273a976b60",
+        "bytes": 82928,
+        "snapshotMember": "source/orbit360-platform/modules/issuance-endosos-v1201-bridge.js"
+      },
+      {
+        "path": "orbit360-platform/modules/issuance-endosos-v1201-refinements.js",
+        "beforeBlob": "e31c9ac4334cd61c95fa2edff17acbc1a6682515",
+        "beforeSha256": "b07697eae9250dada8059f7e2d8bb2fb9ece33363df7fc4d03bb6935ffac31d3",
+        "afterBlob": "4e1f8e9079af9872737536b0c3e7bc1b5b7c3719",
+        "afterSha256": "ef44f9c0cb151f9b2c1aeb710bd44febd6acbdec340efb21d5add0a87d1cd43f",
+        "bytes": 3186,
+        "snapshotMember": "source/orbit360-platform/modules/issuance-endosos-v1201-refinements.js"
+      },
+      {
+        "path": "orbit360-platform/modules/ops-workflows-v1201-bridge.js",
+        "beforeBlob": "de8af1c093edeea995b065b17295b811a9c609a0",
+        "beforeSha256": "dc08dfb41ff646463c9394c059a63961a062333b5d6ef117ba17b47226e63eed",
+        "afterBlob": "829f0e668f2fa5f95e02925eab15b4e98369b912",
+        "afterSha256": "db625e61f4994f27c2d190dc8758955504c6887b180c5cb98f8945128fe44061",
+        "bytes": 11823,
+        "snapshotMember": "source/orbit360-platform/modules/ops-workflows-v1201-bridge.js"
+      },
+      {
+        "path": "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js",
+        "beforeBlob": "74298d8565902895e5b2d2a5de030ed08847243c",
+        "beforeSha256": "5f911e48fd9f78abd6fd5c88348fbb74032467e4a9c9fbc3fe7b3f53f2e0c343",
+        "afterBlob": "fd9e80524b7b8f8b9ad4043ff1a61408ad97f5a2",
+        "afterSha256": "3919b533e0b3df9a6cce815cf0679a31c9914461c44753a205e1f83fd3ee1385",
+        "bytes": 66095,
+        "snapshotMember": "source/orbit360-platform/modules/policy-receipts-v1199-detail-guard.js"
+      },
+      {
+        "path": "orbit360-platform/modules/siniestros.js",
+        "beforeBlob": "b32cfcd9594ad116a8bb6135d80ce7142441bbd3",
+        "beforeSha256": "6beb41925d9f12bf2fcd00edae84f29f1c81d36d3eac205984417ef415ed0743",
+        "afterBlob": "f006347826625e545c6d2b62804aea450690e3be",
+        "afterSha256": "4d4d4404bc2349273e8c5c8e2c4bdf74726c25b58257acbee8008e4dcb924a38",
+        "bytes": 19821,
+        "snapshotMember": "source/orbit360-platform/modules/siniestros.js"
+      },
+      {
+        "path": "tools/gravicentra-i6-6-carlos-paula-live-synthetic-ops-leads-uat.cjs",
+        "beforeBlob": "cdab5a1f2e12dfce569dcda3474a7b68cf3d884c",
+        "beforeSha256": "f20efc22a1977f89244d15deed22b92e27db79217d673ffc9814da4cfee427d2",
+        "afterBlob": "f3c55f341f25aed0676b2aa57f99145bf6873a9d",
+        "afterSha256": "81e4c01c62b4cfd177fdf01d9f40828bc89ca0b9bf8ee914032f8c398665f74b",
+        "bytes": 18748,
+        "snapshotMember": "source/tools/gravicentra-i6-6-carlos-paula-live-synthetic-ops-leads-uat.cjs"
+      },
+      {
+        "path": "tools/gravicentra-i6-6-carlos-real-signed-synthetic-preview-uat.cjs",
+        "beforeBlob": "4bdcff0b62961e2c4905a73330609c10c70672c4",
+        "beforeSha256": "a68fa7418c1f91ad53bb404a1305acae46849e91596975c653409cbfe1d52549",
+        "afterBlob": "5cfa4ca555034a6528d9f2701b636078fd1aba68",
+        "afterSha256": "e1450de0f0741fea69886108c4daaa8445c047f9c913042b09fcdbaf9bbfa341",
+        "bytes": 15895,
+        "snapshotMember": "source/tools/gravicentra-i6-6-carlos-real-signed-synthetic-preview-uat.cjs"
+      },
+      {
+        "path": "tools/gravicentra-i6-6-issued-endorsement-direct-entry.test.cjs",
+        "beforeBlob": "ed25c788bb6c314ac48ec0b32a89cad48016967c",
+        "beforeSha256": "e5d72fd823c3e816274ea714f1cfdfebd4429829d3f02116da0cbd25d3f9653c",
+        "afterBlob": "bdaa166230e42111833cdcf16f0fc497987321e6",
+        "afterSha256": "46fff85d90c02e5d5c49e18d4a2e6f10bcfb3f2adbfaa959e18c09c97cfa3a90",
+        "bytes": 19388,
+        "snapshotMember": "source/tools/gravicentra-i6-6-issued-endorsement-direct-entry.test.cjs"
+      },
+      {
+        "path": "tools/gravicentra-i6-6-ops-resolution-signed-proof.test.cjs",
+        "beforeBlob": null,
+        "beforeSha256": null,
+        "afterBlob": "b314b7c4abf442499d48174f6b496dcd6fb30d9e",
+        "afterSha256": "860bb777af5931bb71b4967f10973dc93eb09a2f8f20caf0b2bae93f2a8c404b",
+        "bytes": 3299,
+        "snapshotMember": "source/tools/gravicentra-i6-6-ops-resolution-signed-proof.test.cjs"
+      },
+      {
+        "path": "tools/gravicentra-i6-6-ops-resolution-ui.test.cjs",
+        "beforeBlob": null,
+        "beforeSha256": null,
+        "afterBlob": "c938bc6ebd0271915aa77500d38511ff2bc74979",
+        "afterSha256": "dd6e93d2d59e6b6bbfc480af2bd3de18669785e1a82880addd76f231dfcce796",
+        "bytes": 18103,
+        "snapshotMember": "source/tools/gravicentra-i6-6-ops-resolution-ui.test.cjs"
+      },
+      {
+        "path": "tools/gravicentra-i6-6-ops-resolution.test.cjs",
+        "beforeBlob": null,
+        "beforeSha256": null,
+        "afterBlob": "5bf19249c0827ba236f6c6b34ac7a79bcf5bb338",
+        "afterSha256": "aa08fef53a3f5fee5bbdb9d8a1b3c768252c1286b220113afc7b2a26fa22c8e4",
+        "bytes": 22325,
+        "snapshotMember": "source/tools/gravicentra-i6-6-ops-resolution.test.cjs"
+      },
+      {
+        "path": "tools/gravicentra-i6-6-renewal-direct-form-entry.test.cjs",
+        "beforeBlob": "ffc053cbca92d73e2d07e8b806144e4e6e7c5327",
+        "beforeSha256": "0dec6075413989a19f0720a1e052f47e9944bffd1caccf3df358de2cbb07db6d",
+        "afterBlob": "833402544565d4ceb40879fa7f898ceb2dd4a65d",
+        "afterSha256": "b22e51252a6b954d0639efd873e0af78984b34d34b6604aa160fb760e224624b",
+        "bytes": 15953,
+        "snapshotMember": "source/tools/gravicentra-i6-6-renewal-direct-form-entry.test.cjs"
+      }
+    ]
+  },
+  "sourceBehavior": {
+    "ops": "Same management ID; canonical policy effect evidence for typed operations; explicit administrative outcome without a policy mutation claim; same guard on Estado=Resuelta; transactional result/activity/audit; legitimate issuance rejection/cancellation; persisted final claim before claim follow-up closure.",
+    "directEntry": "Firm operations and optional Ops requests remain distinct; opening waits for the native management modal and current ID/scope; existing endorsement uses its existing owner instead of creating another request.",
+    "reconciliation": "Order-independent command-map/proof comparison preserves keys, values, types and array order. The signed readback owns proximaAccion; a matching snapshot cannot clear pending before acknowledgement and must match the verified proof afterwards.",
+    "preserved": "Tenant/country/role boundaries, policy writers, legacy unresolved proof visibility, audit, notification affordance after readback and idempotent retry are retained."
+  },
+  "validation": {
+    "integratedLocal": {
+      "tests": 279,
+      "passed": 279,
+      "failed": 0,
+      "skipped": 0,
+      "testFiles": 9,
+      "scope": "LOCAL_SYNTHETIC_SOURCE_TESTS_ONLY",
+      "logMember": "evidence/ops-direct-integrated-source-tests.log",
+      "logSha256": "021eecce37ec48e163b4aaeafa682e1131029318031f932a56fd184c3e8b16b1"
+    },
+    "independentReview": {
+      "status": "PASS",
+      "scope": "CHECKPOINT_EVIDENCE_PRESERVATION_ONLY_NO_SOURCE_OR_RELEASE_ACTIVATION",
+      "candidatePatchSha256": "e7d02d3ff5e01074ff36ae9e2eecc2c38712ecb1e6db363e994ae8d1d9427a9d",
+      "independentMechanismReview": {
+        "reviewer": "frentes_urgentes",
+        "blockingFindings": 0,
+        "localTestsPassed": 89,
+        "failed": 0,
+        "skipped": 0,
+        "source": "Final review reported to publication owner root"
+      },
+      "productIntegrationReadback": {
+        "reviewer": "root",
+        "candidateBlobsVerified": 24,
+        "candidateBlobsTotal": 24,
+        "gitDiffCheck": "PASS",
+        "sourceIntegratedPassed": 279,
+        "sourceIntegratedFailed": 0,
+        "sourceIntegratedSkipped": 0,
+        "originalReconciliationReproPassed": 2,
+        "originalReconciliationReproCases": 2
+      },
+      "incrementalReconciliationIndependentRerunByFrentesClaimed": false,
+      "reviewerFrentesFinalDecisionPending": false,
+      "providerExecuted": false,
+      "signedPreviewAccepted": false,
+      "signedLiveAccepted": false
+    },
+    "signedQaWorkflowPreparation": {
+      "evidenceMember": "evidence/ops-source-qa-workflow-proof.json",
+      "status": "PARSED_AND_LOCAL_PATH_TRIGGER_COVERAGE_ONLY"
+    },
+    "reconciliationRegression": {
+      "baseline": "2 retained failures; pending still shadowed canonical snapshots",
+      "candidate": "Both original repro cases now reconcile; four new discriminating tests included",
+      "selectedTests": 55,
+      "selectedPassed": 55,
+      "selectedFailed": 0,
+      "selectedSkipped": 0
+    },
+    "proofBoundary": "Local synthetic transactional/DOM/provider tests. No new emulator, signed CI, signed Preview, LIVE or production acceptance is claimed for this candidate."
+  },
+  "publicationReady": true,
+  "admissionPreparation": {
+    "status": "PREPARED_ONLY_NOT_APPLIED",
+    "bundle": {
+      "path": "artifacts/orbit360-recovery/release-control/i6-6-p0-checkpoints/I6_6_OPS_DIRECT_ADMISSION_PREPARATION_20261125_R83.tar.gz.b64.md",
+      "gitBlobSha": "52b9e3b89860e438b5a242c10c38e855462ae022",
+      "sha256": "c53b89bd8b39a854567a82caf767c5a0fd21305034c76196dabb743b8a34cb47",
+      "bytes": 309550
+    },
+    "archiveSha256": "0f34a7edf6774e3b62fce3b4e9a0fbb628be91baf844e1522f099000274267d3",
+    "archiveBytes": 229857,
+    "memberCount": 12,
+    "manifestMember": "manifest.json",
+    "proofMember": "evidence/ops-direct-admission-rollover-candidate-proof.json",
+    "proofSha256": "447091fa5be36153cca008d206163b791a7506d5899571ccc2db492c0561a253",
+    "additionalPreparedPaths": 7,
+    "composedCandidatePaths": 24,
+    "composedPatchMember": "patches/ops-direct-full-candidate-02ab.patch",
+    "composedPatchSha256": "e7d02d3ff5e01074ff36ae9e2eecc2c38712ecb1e6db363e994ae8d1d9427a9d",
+    "ownPatchMember": "patches/ops-direct-admission-rollover-candidate.patch",
+    "ownPatchSha256": "0cedddb6b0e174bfa79ab0d04c5dadc8f0d13426f5ca8ee1033457aca996e0ff",
+    "localMechanismTests": {
+      "passed": 787,
+      "failed": 0,
+      "skipped": 0,
+      "scope": "Offline real owner functions with synthetic future acceptance/provider data; the full existing rollover regression suite is retained. No actual COMMITTED35 or provider outcome is claimed.",
+      "logSha256": "f832f62e1acd11d33ce747cb48e7b31a912aa86ce4e853fe7e2794e59f2f4a7a"
+    },
+    "requiredRuntime": [
+      {
+        "step": 1,
+        "required": "Finish the existing request35 through its current gates. Obtain real immutable artifact and exact Preview/LIVE five-function, 63/113 direct-form and 48-stage financial evidence. Commit the existing physical acceptance transaction."
+      },
+      {
+        "step": 2,
+        "required": "Capture the immutable post-acceptance Git head and exact CP/state/transport blobs. Existing physicalGuard must validate both that snapshot and current state, including COMMITTED journal, signed receipt/proofs, backend revisions, ledger and consumed request35/candidate."
+      },
+      {
+        "step": 3,
+        "required": "Read a fresh complete inventory after the accepted LIVE proof using the existing read-only inventory workflow. Retain exact run/attempt/job/GET timestamps, archive artifact ID/digest and gi-channels-before.json SHA256 plus ordered complete metadata digest. Preserve the actual whole-run conclusion; a historical identity step may remain failed."
+      },
+      {
+        "step": 4,
+        "required": "Create a new source-pinned I6_6_COMMITTED_CHANNEL_SUCCESSOR_E{generation}_{date}.json receipt from those actual identities. Preserve the prior rollover receipt byte-for-byte. Require identical accepted Preview channel/origin/creation time, newly accepted Hosting version/artifact and two LIVE origins. No template in this candidate pretends to fill unavailable values."
+      },
+      {
+        "step": 5,
+        "required": "Apply candidate only after acceptance; seal the final product/QA hashes, append the supplied manifest/testRevisions, and obtain actual same-head signed SourceQA and guard. The subsequent request uses consumed.version+1 and the exact new manifest/source scope; no request is created by this preparation."
+      },
+      {
+        "step": 6,
+        "required": "Existing build produces one new immutable artifact. Only an actual HTTP429 channel-quota response can enter rollover. Before overwrite, validate signed inventory archive/raw bytes, fresh complete inventory, old/new/dual-LIVE archive digests and full 224-file readbacks; retain every other channel. Preview/LIVE acceptance and controlled writes remain separately gated."
+      }
+    ],
+    "limitations": [
+      "No provider runtime execution or authenticated browser evidence is included for this new candidate.",
+      "No retry of a failed successor is newly authorized by the generic accepted transition; it requires a separate preserved causal failure disposition through the existing gate.",
+      "No mailbox/IMAP/email completion or Make activation is included.",
+      "COMMITTED35 and the post-acceptance inventory do not exist in the preparation; activation stays fail-closed until real evidence is supplied."
+    ],
+    "approvedProductManifestUnchanged": true,
+    "signedReceiptsNotRenewedByThisCheckpoint": true,
+    "recoveryVerification": {
+      "composedPatchRecoveredFiles": 24,
+      "exactPostimages": 24,
+      "status": "PASS"
+    },
+    "nextRequestNotIssuedByCheckpoint": true,
+    "nextRequestTechnicalAuthorityRequiresCommitted35": true
+  },
+  "providerHold": {
+    "proofMember": "evidence/v35-resume-attempt2-proof.json",
+    "requestVersion": 35,
+    "sourceSha": "16e3a70baf4e31ef8453173990f32a398c65e59b",
+    "runId": 45549464538,
+    "runAttempt": 2,
+    "updatedAtUtc": "2026-11-25T07:19:00Z",
+    "conclusion": "failure",
+    "gateJobId": 139044679400,
+    "gateStepCount": 0,
+    "immutablePackageJobId": 139044696600,
+    "immutablePackageConclusion": "skipped",
+    "artifactCount": 0,
+    "lastExplicitProviderReasonReceipt": "artifacts/orbit360-recovery/release-control/I6_6_V35_PROVIDER_BILLING_HOLD_20261125_R82.json",
+    "currentAttemptAnnotationIndependentlyRead": false,
+    "currentBillingUnlockConfirmed": false,
+    "currentFailureAttributedToNewAnnotation": false
+  },
+  "mailboxBoundary": {
+    "proofMember": "evidence/runtime-proof-reusable.json",
+    "scenarioId": 10221181,
+    "executionId": "7a6c3c143f9a4e9b953b97f34bf04fd3",
+    "appliedLastEdit": "2026-11-25T07:14:59.748Z",
+    "status": "MAKE_READ_EXISTING_MESSAGE_UID_READBACK_PASS_SERVER_TO_MAKE_AND_CANONICAL_INGESTION_PENDING",
+    "requiredInput": "messageUid",
+    "outputFieldCount": 22,
+    "attachmentCount": 1,
+    "attachmentBytes": 19406,
+    "providerChecksumMatches": true,
+    "markSeen": false,
+    "firestoreWrites": 0,
+    "externalMessages": 0,
+    "backendReaderConfigured": false,
+    "senderAuthenticationVerified": false,
+    "fullMailLiveAccepted": false
+  },
+  "releaseBoundary": {
+    "frozenRequestVersion": 35,
+    "frozenRequestSource": "16e3a70baf4e31ef8453173990f32a398c65e59b",
+    "localCandidateIncludedInRequest35": false,
+    "transportChanged": false,
+    "approvedProductPinsChanged": false,
+    "nextRequestCreated": false,
+    "newArtifactCreated": false,
+    "acceptedLiveHeadUnchanged": true,
+    "productSourceAppliedByCheckpoint": false,
+    "sourcePatchRequiresExistingSuccessorAdmissionAndSignedQaBeforeAnyDifferentRelease": true,
+    "nextReleaseRequestNotIssued": true,
+    "nextRequestTechnicalAuthorityRequiresCommitted35": true,
+    "userAuthorizedPreparedOpsFixAndGatedPublication": true,
+    "newUserApprovalRequiredForThisBoundedPreparedRelease": false,
+    "authorizationScope": "The bounded prepared Ops/direct-operation fix and its publication through the existing technical gates are user-authorized. This does not issue a new request or extend authority to unrelated writers, data changes or external messages."
+  },
+  "financialAndLeadPreservation": {
+    "authority": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_EXECUTION_PROGRESS_20261124_R82.json",
+    "financialWrites": 0,
+    "newPayments": 0,
+    "historical155AppliedDirectPreserved": true,
+    "financialCompletionReceiptsUnchanged": true,
+    "doc07AlreadyAppliedDateReviewOnly": true,
+    "noLeadImportOrIdentityAssignment": true
+  },
+  "protectedPreimages": {
+    "artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json": {
+      "path": "artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json",
+      "gitBlobSha": "0cec2e339c028f847edcd605199eb14b55a53afe",
+      "sha256": "6797c28a4a5b6c79b2455ebd0ba7af81511eeb2462b398d4663e86f144c9710c",
+      "bytes": 1363197
+    },
+    "artifacts/orbit360-recovery/release-control/CAPABILITY_STATUS_LEDGER.json": {
+      "path": "artifacts/orbit360-recovery/release-control/CAPABILITY_STATUS_LEDGER.json",
+      "gitBlobSha": "ed0508518c6a99129ceecf492e9bb92ada9909f3",
+      "sha256": "bf865625f617085b9576d9ca5b6b89a5b6c77fe2d1a8839ea93a43ae54a4d31a",
+      "bytes": 37475
+    },
+    "artifacts/orbit360-recovery/release-control/I6_6_RELEASE_TRANSPORT_CONTROL_20261110.json": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_6_RELEASE_TRANSPORT_CONTROL_20261110.json",
+      "gitBlobSha": "0819653e3510f99b124d4e7afe24aedd926619b9",
+      "sha256": "67008d244c74da8957378508d3e83dfdafd5ce5df598158c0dc9a6ceb13e76db",
+      "bytes": 583275
+    },
+    "artifacts/orbit360-recovery/release-control/I6_6_APPROVED_PRODUCT_DELTA_MANIFEST_20261110.json": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_6_APPROVED_PRODUCT_DELTA_MANIFEST_20261110.json",
+      "gitBlobSha": "feae243f1e30f3d40a3e9e2ff01ff3c86b5d10a0",
+      "sha256": "1f968415c37146322cea3a43ec38efce0d87d27fd54f68133c0000c958271bfd",
+      "bytes": 234588
+    },
+    "orbit360-platform/docs/recovery/orbit360-recovery-state-v1.json": {
+      "path": "orbit360-platform/docs/recovery/orbit360-recovery-state-v1.json",
+      "gitBlobSha": "6f519f0e341ccaf780e282a802c3dd0533d6b3af",
+      "sha256": "ccd2ba3d2bd9bf990d0e86935fb59f0085c81aca907111e7acee04bd5027da41",
+      "bytes": 464844
+    }
+  },
+  "scope": "Preserve pending work and current evidence inside the existing gate; no product deployment, request mutation or new gate credit.",
+  "completePreparedCandidate": {
+    "coreFiles": 17,
+    "additionalPreparedAdmissionFiles": 7,
+    "totalPaths": 24,
+    "twoPackagesOneCandidate": true,
+    "sourceBase": "02ab462c1b999456859af68dab3fcabbcfd777c2",
+    "sourceAppliedToAuthority": false
+  },
+  "checkpointVerification": {
+    "coreExactSnapshots": 17,
+    "composedCandidateExactRecovery": 24,
+    "controlOwnerAndFinancialProjectionInvariants": "PASS_BEFORE_FINAL_POINTER_REGENERATION",
+    "remoteCasExpectedHead": "02ab462c1b999456859af68dab3fcabbcfd777c2",
+    "publicationViaRefMutationPerformedByThisScript": false
+  }
+}

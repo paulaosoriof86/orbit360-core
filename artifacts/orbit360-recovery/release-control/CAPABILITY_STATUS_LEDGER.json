@@ -8,7 +8,7 @@
   "branch": "recovery/fase-a-clean-20260831",
   "controlPlanePath": "artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json",
   "lineageLockPath": "artifacts/orbit360-recovery/release-control/CAPABILITY_LINEAGE_LOCK.json",
-  "previousLedgerBlobSha": "09c98a60b3221da29931ea32611fcf528c7f8af7",
+  "previousLedgerBlobSha": "ed0508518c6a99129ceecf492e9bb92ada9909f3",
   "previousLedgerEvidencePreservedByGitHistory": true,
   "releaseBinding": {
     "sourceSha": "4bf67a3738751fe2432a130fd23254a6f1c7d16e",
@@ -95,7 +95,8 @@
   "semantics": {
     "LATEST_APPROVED_VERSION_PREVIEW_PASS": "The frozen capability acceptance contract is physically supported on the certified Preview by current-release evidence and/or sealed monotonic receipts explicitly preserved across causal successor transitions.",
     "NOT_STARTED_I5_BLOCKED": "Live acceptance cannot begin before I5.",
-    "LATEST_APPROVED_VERSION_LIVE_PASS": "The capability is covered by terminal I5 LIVE acceptance on the exact certified release, with public/authenticated checks and a transversal matrix before and after the controlled synthetic write cleanup."
+    "LATEST_APPROVED_VERSION_LIVE_PASS": "The capability is covered by terminal I5 LIVE acceptance on the exact certified release, with public/authenticated checks and a transversal matrix before and after the controlled synthetic write cleanup.",
+    "SOURCE_LOCAL_VERIFIED_PENDING_SIGNED_PREVIEW_LIVE": "Exact local source and causal test evidence retained; not applied to the release source, not an immutable release artifact, and not signed Preview/LIVE acceptance."
   },
   "capabilities": [
     {
@@ -881,5 +882,15 @@
     "proofSha256": "4013a99719ba5f8bb3087a5e5f43c189a22daf55aabfcea37e8df5030bb5653c",
     "rollbackHostingVersion": "sites/ays-orbit-360-lab/versions/e4e8f31b02ba2aef",
     "fullI66ProductionAccepted": false
+  },
+  "i66PendingLocalSourceCandidate": {
+    "status": "SOURCE_LOCAL_VERIFIED_PENDING_SIGNED_PREVIEW_LIVE",
+    "receipt": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_6_OPS_DIRECT_RESOLUTION_LOCAL_CANDIDATE_20261125_R83.json",
+      "gitBlobSha": "58e291ee5317ba627fbaf2477f772c9550ea9582",
+      "sha256": "8bd0d43e5d005dadd652baa438de9aadacbd16fb8b736bc7dd6a2377f677f021"
+    },
+    "notReleaseAuthority": true,
+    "acceptedCapabilityStatusesUnchanged": true
   }
 }
