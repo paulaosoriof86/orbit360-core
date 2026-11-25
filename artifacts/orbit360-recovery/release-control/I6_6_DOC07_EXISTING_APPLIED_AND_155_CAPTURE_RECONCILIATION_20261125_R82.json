@@ -1,0 +1,229 @@
+{
+  "schema": "GI_I66_DOC07_EXISTING_PAYMENT_AND_155_CAPTURE_RECONCILIATION_R82_V1",
+  "recordType": "SANITIZED_ADDITIVE_OFFLINE_EVIDENCE_NOT_PAYMENT_EXECUTION_OR_RELEASE_ACCEPTANCE",
+  "observedAtUtc": "2026-11-25T05:07:09.899093+00:00",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "gate": "I6.6",
+  "status": "155_ORIGINAL_PAYMENTS_AND_465_FINANCIAL_RECORDS_PRESERVED_DOC07_ALREADY_APPLIED_DATE_REVIEW_OPEN",
+  "capture": {
+    "runId": 45535291906,
+    "jobId": 138940287629,
+    "artifactId": 14986452361,
+    "artifactArchiveSha256": "9fdeee62c1757d64f9b2a9cbb574a808fd6c8065b330e719ac6eb5f4c7d8dc5f",
+    "sourceHeadSha": "bdcf12e9eb24f9fb95ebd244802139e13d2a7802",
+    "plaintextSha256": "e01893dd9307be434d56b7c8b442237eea39945c7f9882bd5bec5353e28123d8",
+    "encryptedPayloadSha256": "ad44084767a9ae55edaf85e662a979f6560ce29ac43b94c9d17906fa8481bdfe",
+    "receipt": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_6_FINANCIAL_CURRENT_CAPTURE_45535291906_20261125.json",
+      "gitBlobSha": "9a65afe153ff46ffc4f04aeff10ca0b8e4f01403",
+      "sha256": "94e79611a55c438de848463a0e15312a303c96e5c5b302667ff660f98e36a1a8"
+    },
+    "documents": 6772,
+    "collectionCounts": {
+      "polizas": 1444,
+      "clientes": 450,
+      "aseguradoras": 33,
+      "recibosEsperados": 2271,
+      "carteraPrimas": 2043,
+      "cobros": 521,
+      "asesores": 10
+    },
+    "readWindow": {
+      "startedAt": "2026-11-25T02:49:20.093Z",
+      "completedAt": "2026-11-25T02:49:23.648Z",
+      "atomicAcrossCollections": false,
+      "newDocumentsAfterCollectionReadNotRuledOut": true
+    },
+    "freshCapturePerformedByThisReview": false
+  },
+  "originalApplicationAuthority": {
+    "receipt": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_6_CENDOSO_155_APPLICATION_AND_MAPFRE_OBLIGATION_LIVE_20261124_R52.json",
+      "gitBlobSha": "65a83d3d36b6d7f131be5cb61c559aa417f5e48f",
+      "sha256": "f2b7687e8395058d1c2d416df0060e65582b006c451557902bc718dff1faf0c3"
+    },
+    "targetManifest": {
+      "path": "artifacts/orbit360-recovery/source-batches/I6_6_CENDOSO_155_EXISTING_DIRECT_APPLICATION_TARGETS_20261124.json",
+      "gitBlobSha": "cf8cc98224c070c1cc2acfd56de1cbf715b8f747",
+      "sha256": "8619d7953c05b7a82eeb0c837796064bc8e46fe5bc12c051345f3e5152a2ec66"
+    },
+    "sourceSha256": "649fa315a90b176b794abf6eef3d9f893d47de64cfe558d203a099c408692aa0",
+    "acceptedLiveRuns": [
+      {
+        "runId": 45443954812,
+        "commit": "e8db3c5cd372bd986ee62093af8b7c4cb9588cf1",
+        "acceptedApplications": 153,
+        "artifact": {
+          "artifactId": 14945322937,
+          "name": "gi-i66-cendoso-paid-live-45443954812",
+          "archiveSha256": "377b4a44e9dcb5bee3142fac637014e2f9e53e372c4328e86f11a3fc2e1d5307",
+          "digestIndependentlyVerified": true
+        }
+      },
+      {
+        "runId": 45447045899,
+        "commit": "cd417c18cbdcb22b07f4044a34eeded750d6f676",
+        "acceptedApplications": 2,
+        "artifact": {
+          "artifactId": 14947160409,
+          "name": "gi-i66-cendoso-paid-live-45447045899",
+          "archiveSha256": "69a943f8c786585ba0de346f1ddb5973d4ca6ced33bfa74fb0686456b68fb247",
+          "digestIndependentlyVerified": true
+        }
+      }
+    ],
+    "historicalAll155SinglePostCompletionCensusClaimedPreserved": false,
+    "historicalR52ReceiptEdited": false
+  },
+  "currentCaptureVerification20261125": {
+    "status": "ORIGINAL_155_ID_SET_AND_465_FINANCIAL_RECORDS_VERIFIED_WITHIN_CAPTURE",
+    "targetCount": 155,
+    "exactOriginalTargetIdSetCovered": true,
+    "financialRecordCount": 465,
+    "receiptCount": 155,
+    "portfolioCount": 155,
+    "cobroCount": 155,
+    "registeredPaymentGrossCents": 7880643,
+    "currency": "GTQ",
+    "applicationState": "APPLIED_DIRECT",
+    "paymentState": "PAID_DIRECT",
+    "paymentOrigin": "CRM_MIGRATED_DIRECT_PAYMENT",
+    "directOrInferred": "DIRECT",
+    "amountChangesCents": 0,
+    "paidDateChanges": 0,
+    "businessFieldDriftCount": 0,
+    "unexpectedPostimageFieldDifferences": 0,
+    "duplicateReceiptOrSourceLinks": 0,
+    "originalPreimagesComparedToOwnerApplicationPatch": true,
+    "applicationPatchOwner": {
+      "path": "tools/gravicentra-i66-cendoso-paid-protected.cjs",
+      "gitBlobSha": "3e6ddef7117e4c78bfaf74fb1ef998a5a52dd3bd",
+      "sha256": "8c04dcf82611d7e6682f430107699438d50d99561f07e80fac743320417cfb00"
+    },
+    "timestampNormalization": "Firestore {_seconds,_nanoseconds} values were compared as the ISO representation used by the captured payload; representation-only differences were not treated as business writes. Exact updateTime metadata remains retained separately.",
+    "applicationTimeComparison": "Recorded application timestamps are used to reproduce the existing owner patch and checked for consistency with preserved record fields; transaction audit afterHashes were not fetched again.",
+    "originalAndApplicationAuditsRecaptured": false,
+    "newApplications": 0,
+    "reapplied": 0,
+    "newPayments": 0,
+    "newReceipts": 0,
+    "financialWrites": 0,
+    "cloudReads": 0,
+    "atomicAcrossCollections": false,
+    "signedUiVisibilityVerifiedByThisReview": false
+  },
+  "doc07": {
+    "status": "ALREADY_APPLIED_DATE_REVIEW_OPEN",
+    "wholeDocumentaryCaseClosed": false,
+    "newPaymentAllowed": false,
+    "newPolicyEditionAllowed": false,
+    "sourceManifest": {
+      "path": "artifacts/orbit360-recovery/source-batches/I6_6_NEW_INSURER_SOURCE_DELTA_20261124.json",
+      "gitBlobSha": "ebf7350a664c851fe82f28eae241efc76bba7e1e",
+      "sha256": "68ebdc6f04e0ee5e4d7aa92b2a3bd9564f17a8a5e7b23528522cc6381f782805"
+    },
+    "sourceFactIdSha256": "c83bf7268788ddc88b4661c7eefb397d8908c735e5be7e41e83a3a6208c90989",
+    "sourcePdfSha256": "28762cf44ea50f1a2aa2ebc7285413c97286a54e600c345639aea75017d472a7",
+    "sourceDriveId": "13CIEJd0yEUTvnM3zomCZIzmDFhC5xoh_",
+    "sourcePage": 1,
+    "sourceLayoutRow": 13,
+    "matchingOwner": {
+      "path": "tools/gravicentra-i66-financial-identity-readback.cjs",
+      "gitBlobSha": "de3267452af06a635ce5db516af889eb696e5892",
+      "sha256": "b8785f2f9ccaadb5ac6b72f1ce84e70fd3c4e430b48eb0f551434f8d06b86567"
+    },
+    "causalFinding": "The previous generic statement comparator omitted the existing edition because the source and canonical policy serial use different leading-zero formatting. Existing numberRelation returns EXACT_FULL_NUMBER after preserving all three prefix segments and the endorsement suffix.",
+    "uniqueCanonicalPolicyEdition": true,
+    "uniqueInvoiceNumberMatchesExistingPayment": true,
+    "invoiceValuePublished": false,
+    "sameInstallmentAmountAndActualPaidDate": true,
+    "matchedFinancialRecords": 3,
+    "paymentState": "PAID_DIRECT",
+    "applicationState": "APPLIED_DIRECT",
+    "existingApplicationAtUtc": "2026-11-17T06:50:51.664Z",
+    "originalManualPaymentProvenancePreserved": true,
+    "includedInOriginal155": false,
+    "additionalApplicationCountClaimed": 0,
+    "dateReview": {
+      "status": "OPEN",
+      "documentaryContractualDue": "2026-11-01",
+      "storedVence": "2026-10-31",
+      "storedFechaLimite": "2026-11-15",
+      "contractualDueFieldPresent": false,
+      "differenceObservedOnly": true,
+      "datesChanged": 0,
+      "originalIssuedPolicyLocated": false,
+      "issuerPaidStatementProvesThisSingleDocumentaryDue": true,
+      "originalIssuedCalendarRequiredBeforeFullScheduleOrOperationalDueCorrection": true,
+      "existingBulkOwner": {
+        "path": "tools/gravicentra-i66-source-bulk-plan.cjs",
+        "gitBlobSha": "ac11d052490b1b014ea94fa6ab764a3dc3e8e38b",
+        "sha256": "84f9f95073738bc7c6b1ea61bcee09963ea55152933ff43c2aff116f28c7690a"
+      },
+      "actualOfflineOwnerDisposition": "PAID_REQUIRES_COBRO_PROOF_AND_WRITER",
+      "currentOwnerEligible": false,
+      "sourceStateRemains": "PAID",
+      "protectedOwnerExtensionOrExplicitSupportedMetadataModeRequired": true,
+      "guardBypassAllowed": false
+    },
+    "newPayments": 0,
+    "newObligations": 0,
+    "newEditions": 0,
+    "newWrites": 0
+  },
+  "currentDispositionScope": {
+    "priorSanitizedReceipt": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_6_SOURCE56_NINE_DOCUMENTARY_FACTS_SANITIZED_20261124_R59.json",
+      "gitBlobSha": "7a64be6dd06566de7c0a73f16a7f89e1b719a22c",
+      "sha256": "ffb98ee37b047d70b912c1ef8c1fe1ab650a7bc07f8a2fa4bcb848c5c0f2d7c2"
+    },
+    "reviewedUniquePaymentFacts": 10,
+    "previousExcludedAlreadyAppliedPaymentFacts": 1,
+    "currentExcludedAlreadyAppliedPaymentFacts": 2,
+    "previousPendingApplicationResolutionFacts": 9,
+    "currentPendingApplicationResolutionFacts": 8,
+    "preparedCanonicalMapfrePaymentFacts": 2,
+    "applicationResolutionHeldFacts": 6,
+    "distinctDocumentaryCasesStillOpen": 7,
+    "alreadyAppliedCaseWithDateReviewOpen": 1,
+    "doc07CountedAsNewPayment": false,
+    "countBoundary": "DOC07 leaves the new-payment/application queue because its payment already exists. It remains among the seven open documentary cases solely for date review. This does not imply eight eligible payments, a new applied payment, changed balances or production acceptance.",
+    "historicalSourcePinsAndReceiptCountsModified": false,
+    "originalSourceGrossAmountsModified": false
+  },
+  "privateEvidenceDigests": {
+    "preserved-155-pairs-verified.private.json": "e424344a7c59e9a87a3e845ba1b267bc55c63a2989f723a68717fc915d641feb",
+    "doc07-existing-applied-source-binding.private.json": "384433a133e6087eb9e2b34631d21bb3c25bbd8865aa8714834996c193111b31",
+    "doc07-date-review-proposal.private.json": "946045ea427ffb08924183c798a579478dca5e85bc596eb696a455b02f00df0b",
+    "drive-focal-search.private.json": "cb7a9e0159448a6d8afabfd5460997e185167642c7768bfc7077ae58b7ec950e"
+  },
+  "preservation": {
+    "financial48AndSixRobleNotReexecuted": true,
+    "original155NotReapplied": true,
+    "doc08AlreadyAppliedPreserved": true,
+    "historicalR52NoWriteReplayEvidencePreserved": true,
+    "historicalR59AndSource56PinsPreserved": true,
+    "operationalDocumentsImported": 0,
+    "makeWrites": 0,
+    "notifications": 0,
+    "hostingDeploys": 0,
+    "releaseAcceptanceChanges": 0
+  },
+  "limitations": [
+    "This is a comparison against an existing authenticated capture taken over approximately 3.6 seconds, not an atomic multi-collection snapshot or a fresh current-time read.",
+    "The capture excludes operationalRequests, reconciliationRequests, reconciliationEvents and actividades; this review does not renew transaction-audit certification.",
+    "No conclusion is made about mutations after the capture window or current signed browser rendering.",
+    "DOC07 payment identity is resolved; its documentary date review remains open. The current bulk owner rejects PAID source rows, so no date mutation is executable through that mode.",
+    "No new financial application, data refresh, Preview acceptance, LIVE acceptance or shock-plan closure is claimed."
+  ],
+  "privacy": {
+    "customerNames": false,
+    "phoneNumbers": false,
+    "policyNumbers": false,
+    "accountData": false,
+    "invoiceNumbers": false,
+    "rawPrivateDocuments": false,
+    "canonicalFinancialDocumentIdsPublished": false
+  }
+}

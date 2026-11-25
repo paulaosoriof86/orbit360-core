@@ -1,0 +1,161 @@
+{
+  "schema": "GI_I66_ALICE_LATER_WORKBOOK_DELTA_R82_V1",
+  "status": "OFFLINE_SOURCE_DELTA_REVIEW_COMPLETE_NO_IMPORT",
+  "createdAtUtc": "2026-11-25T05:18:36.558219+00:00",
+  "sourceWorkbooks": {
+    "advance10": {
+      "sha256": "0686eb96bdcc82d90284f3740cf3bd8b91910ac99da184d3856d6d8330e94bdb",
+      "bytes": 23264,
+      "libraryCreatedAtUtcReported": "2026-11-24T22:09:45Z"
+    },
+    "laterDelivery": {
+      "sha256": "d7fd9fa2455652faee76a04612a11e8d528fc4af481c08d1701dc6635d50be81",
+      "bytes": 23844,
+      "libraryCreatedAtUtcReported": "2026-11-24T22:28:06.574952Z",
+      "finalOrApprovedStatusProved": false
+    },
+    "originalBytesPreserved": true,
+    "filenameOrDeliveryNoteProvesApproval": false
+  },
+  "comparison": {
+    "allSheetsAndPopulatedCellsRead": true,
+    "worksheets": 5,
+    "sourceRows": 64,
+    "sourceRowsBySheet": {
+      "Sin respuesta": 18,
+      "Respondieron": 35,
+      "Cerrados con póliza": 11
+    },
+    "changedCells": 16,
+    "changedLeadDataCells": 10,
+    "changedLeadRows": 2,
+    "changedLeadCoordinates": [
+      "Respondieron!D7",
+      "Respondieron!G7",
+      "Respondieron!H7",
+      "Respondieron!I7",
+      "Respondieron!J7",
+      "Respondieron!L7",
+      "Respondieron!M7",
+      "Respondieron!N7",
+      "Respondieron!J10",
+      "Respondieron!N10"
+    ],
+    "addedCriteriaCells": 6,
+    "addedCriteriaRows": 3,
+    "addedCriteriaRange": "Alcance y criterios!A19:B21",
+    "newRows": 0,
+    "removedRows": 0,
+    "reorderedRows": 0,
+    "unchangedDrafts": 62,
+    "namePhoneCountryAndReferenceDateUnchangedForAll64": true,
+    "formulaCells": 0,
+    "makeAndGreenApiSheetChanged": false
+  },
+  "classification": {
+    "historicalAdvance10AndSupplementPreserved": {
+      "preliminaryCreateDrafts": 44,
+      "reviewRows": 3,
+      "excludedFromNewOpenLead": 17
+    },
+    "laterSourceDerivedDrafts": {
+      "preliminaryCreateDrafts": 43,
+      "reviewRows": 4,
+      "excludedFromNewOpenLead": 17,
+      "actionCounts": {
+        "CREATE_BUSINESS_PRELIMINARY_NO_IDENTITY_MATCH_OBSERVED": 42,
+        "HOLD_MULTI_PRODUCT_AND_ISSUANCE_RECONCILIATION": 1,
+        "HOLD_NO_NEW_OPEN_LEAD": 17,
+        "HOLD_CLIENT_IDENTITY_AND_RISK_RELATION": 1,
+        "HOLD_POSSIBLE_IDENTITY_DUPLICATE": 2,
+        "CREATE_BUSINESS_PRELIMINARY_EXISTING_CLIENT_DISTINCT_RISK": 1
+      }
+    },
+    "theseAreDraftCountsNotWrites": true,
+    "deltaReason": "One preliminary create is now held to reconcile a selected school-accident plan with unverified issuance and a separate medical-cover query. The other changed source row identifies its quotation insurer but retains its existing identity/risk hold."
+  },
+  "stableIdentityBoundary": {
+    "recordKeysPreserved": 64,
+    "canonicalEntityIdsAssigned": 0,
+    "canonicalRequestIdsAssigned": 0,
+    "identityKeyProposalsPreservedForChangedRows": 2,
+    "opportunitySeedsRetainedAsUnboundHistoricalProposals": true,
+    "newSeedGeneratedFromWorkbookHashOrProductWording": false,
+    "distinctRiskSplitAutomaticallyCreated": false
+  },
+  "captureEvidenceInheritedWithoutNewQueries": {
+    "baseRunId": 45517303032,
+    "baseReadWindow": {
+      "startedAt": "2026-11-25T00:22:41.571Z",
+      "completedAt": "2026-11-25T00:23:01.115Z",
+      "atomicAcrossCollections": false,
+      "newDocumentsAfterPageReadNotRuledOut": true
+    },
+    "supplementRunId": 45547180877,
+    "supplementArtifactId": 14991599663,
+    "supplementReadWindow": {
+      "startedAt": "2026-11-25T04:32:31.754Z",
+      "completedAt": "2026-11-25T04:32:32.359Z",
+      "atomicAcrossCollections": false,
+      "newDocumentsAfterPageReadNotRuledOut": true
+    },
+    "exactHistoricalQaFixtureIdsReviewed": 3,
+    "supplementNewMatches": 0,
+    "supplementReread": false,
+    "workflowConfigurationExists": false,
+    "notificationSuppressionCertified": false,
+    "cadenceFalseAloneSuppressesNotificationOutbox": false,
+    "fullCurrentStateFreshnessCertified": false,
+    "qaFixtureReviewReopened": false,
+    "baseSnapshotSha256": "6da0cbd8b9ae92f09770fcd03dee1b0ae471698e1c6393637637b3a5fa7af435",
+    "supplementSnapshotSha256": "ffdbf4781ffd92c9f6ef7d4818c98290f549286c3fb2b38c2f2a6932c0a6b6e3"
+  },
+  "outboundBoundary": {
+    "workflowConfigurationAbsentAtSupplementCapture": true,
+    "notificationOutboxHoldStillOpen": true,
+    "cadenceFalseAloneSuppressesNotificationOutbox": false,
+    "safeNotificationSuppressionCertified": false
+  },
+  "limits": [
+    "The workbook states visible WhatsApp Beta coverage from 2026-09-01 to 2026-11-24; exhaustive historical coverage and final source acceptance are not independently proved.",
+    "The third medical quotation PDF remains unavailable; its insurer and contents are not inferred.",
+    "Quotation and issuance statements are workbook evidence; this review did not independently read the source quotations or establish an issued school policy.",
+    "Existing captures are non-atomic and do not prove present-time deduplication freshness.",
+    "Identity proposals and opportunity seeds remain unbound; no opportunity split or canonical entity/request ID was created."
+  ],
+  "operationCounts": {
+    "newCrmQueries": 0,
+    "imports": 0,
+    "crmWrites": 0,
+    "makeWrites": 0,
+    "configurationWrites": 0,
+    "externalNotifications": 0,
+    "rootCheckoutEdits": 0
+  },
+  "privateEvidenceBindings": {
+    "priorDrafts": {
+      "sha256": "3784986f87c8cb6c507bcf62275c6f3fbc15757194858f2cc8ae0f5dbb4147e6",
+      "bytes": 163895
+    },
+    "priorMatchingSummary": {
+      "sha256": "918f8e33c579435120c19d1e93d68c729e065322c3d14291ed07daf77218c0e3",
+      "bytes": 3210
+    },
+    "baseMatching": {
+      "sha256": "e6af1b80c4ec10d17b4b39f1be9b8cedfbf2a8071f9a54fae1d8572972ab8128",
+      "bytes": 248449
+    },
+    "sourceCellDiff": {
+      "sha256": "9c7c785f382ed9830d94de9b0a3953122a1ccc94bb15a0c8f9926c7d43d18aff",
+      "bytes": 450433
+    },
+    "targetedDrafts": {
+      "sha256": "0414dfeaea3c2acd75df3cb34cee7df15fb30c4bd414ec174ca22e280111e45c",
+      "bytes": 168813
+    },
+    "sourceUpdates": {
+      "sha256": "082097598667b83fd4ca9a4a00462ba5e4cbf5cd01a220e28f8f7d64d35adeb7",
+      "bytes": 10902
+    }
+  }
+}

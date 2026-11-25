@@ -1,0 +1,135 @@
+{
+  "schema": "GI_I66_V35_PROVIDER_BILLING_HOLD_V1",
+  "status": "PROVIDER_BILLING_BLOCK_BEFORE_RUNNER_START_NO_ARTIFACT",
+  "activeGate": "I6.6",
+  "recordedAtUtc": "2026-11-25T05:00:37.592Z",
+  "sourceHead": "16e3a70baf4e31ef8453173990f32a398c65e59b",
+  "sourceQaHead": "d5ab4764fe234e5c2c95f05107022c0abae2568b",
+  "requestVersion": 35,
+  "providerRun": {
+    "runId": 45549464538,
+    "runAttempt": 1,
+    "headSha": "16e3a70baf4e31ef8453173990f32a398c65e59b",
+    "workflowPath": ".github/workflows/gravicentra-release-delta-66-package.yml",
+    "branch": "recovery/fase-a-clean-20260831",
+    "status": "completed",
+    "conclusion": "failure",
+    "createdAt": "2026-11-25T04:50:10Z",
+    "updatedAt": "2026-11-25T04:50:14Z",
+    "url": "https://github.com/paulaosoriof86/orbit360-core/actions/runs/45549464538",
+    "gateJob": {
+      "id": 138986886981,
+      "status": "completed",
+      "conclusion": "failure",
+      "steps": 0,
+      "runnerSetupExecuted": false,
+      "logsAvailable": false
+    },
+    "immutablePackageJob": {
+      "id": 138986903851,
+      "status": "completed",
+      "conclusion": "skipped",
+      "steps": 0,
+      "packageExecuted": false
+    },
+    "protectedReaderJob": {
+      "id": 138986903619,
+      "status": "completed",
+      "conclusion": "skipped",
+      "steps": 0
+    },
+    "artifactCount": 0
+  },
+  "providerAnnotation": {
+    "text": "The job was not started because your account is locked due to a billing issue.",
+    "observedBy": "ROOT_BROWSER_UI",
+    "surface": "Chrome",
+    "tabId": 31,
+    "url": "https://github.com/paulaosoriof86/orbit360-core/actions/runs/45549464538",
+    "providedToThisPreparationByParent": true,
+    "independentChildBrowserRead": false
+  },
+  "classification": {
+    "providerInfrastructureHold": true,
+    "applicationSourceExecuted": false,
+    "sourceGateExecuted": false,
+    "immutableBuildExecuted": false,
+    "productRegressionProven": false,
+    "immutableArtifactFailure": false,
+    "newArtifactCreated": false,
+    "hostingDeploymentExecuted": false,
+    "backendDeploymentExecuted": false,
+    "financialWriterExecuted": false
+  },
+  "sourceQaPreserved": {
+    "status": "SIGNED_SOURCE_QA_AND_GOVERNANCE_PASS",
+    "sourceHead": "d5ab4764fe234e5c2c95f05107022c0abae2568b",
+    "sourceQaRunId": 45548703476,
+    "governanceRunId": 45548703495,
+    "sourceChangedByCheckpoint": false
+  },
+  "retainedImmutable34": {
+    "sourceSha": "a06e5b692595a863a6c6f6b223d895d874abb90e",
+    "buildRunId": 45539669479,
+    "artifactId": 14987684993,
+    "artifactDigest": "sha256:08706bc64a5ca578fcf3fb305354adc1ba8a55347421f4226406f5092c3f46a0",
+    "buildConclusion": "success",
+    "localAndHostedFiles": 224,
+    "makeSyntheticProof": "PASS",
+    "signedPreviewConclusion": "failure",
+    "reclassifiedAsFailedBuild": false
+  },
+  "preservation": {
+    "request35Exact": true,
+    "transportBytesExact": true,
+    "acceptedProduction": "E3",
+    "financial48AuthorityBytesExact": true,
+    "all155AppliedPaymentsUnchanged": true,
+    "financialCaptureRunId": 45535291906,
+    "financialCaptureDocuments": 6772,
+    "financialCountersChanged": false,
+    "make34ProofUnchanged": true,
+    "makeWriterDisabled": true,
+    "realMakeIngressActivated": false
+  },
+  "resume": {
+    "sameRunId": 45549464538,
+    "sameSourceHead": "16e3a70baf4e31ef8453173990f32a398c65e59b",
+    "sameRequestVersion": 35,
+    "condition": "GITHUB_PROVIDER_BILLING_LOCK_RESOLVED",
+    "nextAction": "Resolve the GitHub account billing lock, confirm Actions can start runners, then rerun the same existing workflow run45549464538 at source16e3a70baf4e31ef8453173990f32a398c65e59b for request35. Recover the actual successful attempt and immutable-package job, artifacts and exact224-file readback; refresh the existing bounded Make and Hosting preimages when resuming. Continue the already approved five-function signed Preview,63/113 direct-form and documentary-payment tests, financial48 and same-artifact LIVE gates.",
+    "freshPreimagesRequired": true,
+    "freshMakeDiagnostic": {
+      "existingRunId": 45548703462,
+      "pinnedSourceHead": "d5ab4764fe234e5c2c95f05107022c0abae2568b",
+      "newActualAttemptAndArtifactRequired": true,
+      "reason": "Rerun the existing source-pinned read-only workflow so its diagnostic source remains an ancestor of the unchanged build35 source; do not relabel a cached report as fresh."
+    },
+    "freshHostingInventoryRequired": true,
+    "newRequest36Required": false,
+    "newProductSourceRequired": false,
+    "newBuildRunRequestedByCheckpoint": false,
+    "rerunDispatchedByCheckpoint": false
+  },
+  "evidence": {
+    "run": {
+      "path": "/workspace/scratch/166055cd45dc/continuity-evidence/v35-release-preparation/provider-billing-hold/run.json",
+      "sha256": "cf0ed531b42e7259f7e6806fd3ff03be1f8cdc43ad7642b7d9d1d74cbbac6be0"
+    },
+    "jobs": {
+      "path": "/workspace/scratch/166055cd45dc/continuity-evidence/v35-release-preparation/provider-billing-hold/jobs.json",
+      "sha256": "f64c0925baec4b6310c115667cca273361cc9656c3138918fbbbee5d40c55960"
+    },
+    "artifacts": {
+      "path": "/workspace/scratch/166055cd45dc/continuity-evidence/v35-release-preparation/provider-billing-hold/artifacts.json",
+      "sha256": "fb09a9699b26ad536855bb4263ff01baa31a107d9af48b348e96cb4a9eb2b8d9"
+    }
+  },
+  "cloudWrites": 0,
+  "realDataWrites": 0,
+  "sourcePublication": false,
+  "newReleaseAuthority": false,
+  "newPreviewAcceptance": false,
+  "newLiveAcceptance": false,
+  "fullI66ProductionAccepted": false
+}

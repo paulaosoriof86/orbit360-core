@@ -1,0 +1,117 @@
+{
+  "schema": "GI_I66_FINANCIAL_114_ZERO_PADDING_SCOPED_REVIEW_V1",
+  "checkpoint": "R82",
+  "status": "CLOSED_NO_ADDITIONAL_EXACT_FULL_NUMBER_MATCHES_IN_EXISTING_114_27_108_UNIVERSE",
+  "computedAtUtc": "2026-11-25T05:09:24.483Z",
+  "sourceReviewSha256": "957580dda35682c7c81d4443edc2bc7229fb59b4b45ebfc0cb32ca5bab69bab1",
+  "capture": {
+    "sourceSha": "bdcf12e9eb24f9fb95ebd244802139e13d2a7802",
+    "runId": 45535291906,
+    "documents": 6772,
+    "policies": 1444,
+    "sha256": "e01893dd9307be434d56b7c8b442237eea39945c7f9882bd5bec5353e28123d8",
+    "readWindow": {
+      "startedAt": "2026-11-25T02:49:20.093Z",
+      "completedAt": "2026-11-25T02:49:23.648Z",
+      "atomicAcrossCollections": false,
+      "newDocumentsAfterCollectionReadNotRuledOut": true
+    }
+  },
+  "scope": {
+    "sourceObservations": 114,
+    "queriedReferences": 108,
+    "sourceDocumentDuplicates": 6,
+    "targets": 27,
+    "approvedAliases": 108,
+    "sourcePolicyGroups": 31
+  },
+  "method": {
+    "referenceOwner": {
+      "path": "tools/gravicentra-i66-cartera-a5-a6-readonly.cjs",
+      "gitBlobSha": "509f445a9602fc9579b209c0a00106443561998f",
+      "sha256": "0af36848db3ef26a8f14bf99b6d92f83b121a0cfa78f50bc09a7671af94c1985"
+    },
+    "canonicalNumberRelationOwner": {
+      "path": "tools/gravicentra-i66-financial-identity-readback.cjs",
+      "gitBlobSha": "de3267452af06a635ce5db516af889eb696e5892",
+      "sha256": "b8785f2f9ccaadb5ac6b72f1ce84e70fd3c4e430b48eb0f551434f8d06b86567"
+    },
+    "canonicalFunction": "numberRelation",
+    "acceptedRelation": "EXACT_FULL_NUMBER",
+    "baselineOwnerReplayedAgainstSameCapture": true,
+    "baselineReferenceTargetsExactlyReproduced": true,
+    "policyNumberNormalizerAdded": false,
+    "sourcePrefixesAdded": false,
+    "sourceAliasesAdded": false,
+    "manualIdentityMatches": false,
+    "statement56MatchingNotRepeated": true,
+    "protected155Or465AuditNotRepeated": true
+  },
+  "result": {
+    "additionalExactFullNumberMatches": 0,
+    "identityChanges": 0,
+    "duplicateChanges": 0,
+    "dateOrTermChanges": 0,
+    "amountChanges": 0,
+    "paymentEligibilityChanges": 0,
+    "fullNumberCompatibleSourcePolicyGroups": 0,
+    "fullNumberCompatibleExistingAliases": 0
+  },
+  "preserved": {
+    "sourceDocumentDuplicatesBefore": 6,
+    "sourceDocumentDuplicatesAfter": 6,
+    "originalAdjudicationUnchanged": true,
+    "additionalExactAliasWitnessTargets": [
+      "T27"
+    ],
+    "inferencesNotRecomputed": true
+  },
+  "conclusion": "The source56 leading-zero defect in complete prefixed policy numbers does not add an identity in this separate 114-observation cohort. Its retained source numbers and approved aliases use serial/AUTO/VA formats, outside the exact full-number form handled by the existing numberRelation. This closes only this scoped comparison; it does not certify every insurer number grammar or clear the existing documentary/edition/duplicate exceptions.",
+  "limits": {
+    "sameCapturedUniverseOnly": true,
+    "freshProviderReadPerformed": false,
+    "allInsurerNumberGrammarsCertified": false,
+    "existingDocumentaryEditionOrDuplicateExceptionsCleared": false,
+    "source56OrProtected155Or465AuditRepeated": false,
+    "rootRepositoryWrites": 0,
+    "sourceEdits": 0,
+    "cloudQueries": 0,
+    "cloudWrites": 0,
+    "paymentsApplied": 0,
+    "receiptsCreated": 0,
+    "eligibleForWrite": false,
+    "absenceInferenceAllowed": false,
+    "writePlan": null,
+    "extraSearchesRequired": false
+  },
+  "inputs": [
+    {
+      "key": "capture",
+      "sha256": "e01893dd9307be434d56b7c8b442237eea39945c7f9882bd5bec5353e28123d8"
+    },
+    {
+      "key": "query",
+      "sha256": "46013562cc92dd4c8aa735745f91643ce3b4bd36f2c8280732ef657f43d684ee"
+    },
+    {
+      "key": "sourceFacts",
+      "sha256": "36691b67db3aa2e714a9da88c109acd41a9afdc1139f1f1c0bd39126a26e6389"
+    },
+    {
+      "key": "baselineReference",
+      "sha256": "94ff32fc6b998ec5b80051145175b9a2c1e432756594764c72d8a415b4360d88"
+    },
+    {
+      "key": "adjudication",
+      "sha256": "5cbb99ba9754700f325b66c274e13cd46c16816321df06ee3251a2e13ac3d4fc"
+    },
+    {
+      "key": "unified",
+      "sha256": "9dde03961e005a8a9c708eff9db3d177b98d46075ccd7a3303039a3fbc13a581"
+    },
+    {
+      "key": "source56",
+      "sha256": "68ebdc6f04e0ee5e4d7aa92b2a3bd9564f17a8a5e7b23528522cc6381f782805"
+    }
+  ]
+}
