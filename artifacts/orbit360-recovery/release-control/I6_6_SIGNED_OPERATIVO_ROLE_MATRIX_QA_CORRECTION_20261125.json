@@ -1,0 +1,152 @@
+{
+  "schema": "GI_I66_SIGNED_OPERATIVO_ROLE_MATRIX_QA_CORRECTION_V1",
+  "revisionId": "I6_6_SIGNED_OPERATIVO_ROLE_MATRIX_QA_CORRECTION_20261125",
+  "scope": "EXISTING_DECLARED_TESTS_ONLY",
+  "status": "SOURCE_ONLY_CAUSAL_REGRESSION_VERIFIED_PREVIEW_AND_LIVE_PENDING",
+  "recordedAtUtc": "2026-11-25T04:33:30.883459+00:00",
+  "baseSourceHead": "cc8df6223fb5cd7031823020965e4f3ffe4ff81f",
+  "activeGate": "I6.6",
+  "productSourceChanges": 0,
+  "productionAcceptanceClaimed": false,
+  "approvedConfiguration": {
+    "path": "artifacts/orbit360-recovery/release-control/I6_6_OPERATIVO_ROLE_MATRIX_AND_BROWSER_INSURER_WRITE_READBACK_20261124.json",
+    "gitBlobSha": "76754d8c1acb4c9fa5d393bf1bd27913e4971e43",
+    "independentReadbackRunId": 43374139073,
+    "independentReadbackRunAttempt": 3,
+    "independentReadbackJobId": 138780806007,
+    "approvedChanges": [
+      "Operativo.cancelaciones.ver=false->true",
+      "Operativo.cancelaciones.editar=false->true",
+      "Operativo.comisiones.ver=false->true",
+      "Operativo.comisiones.editar=false->true"
+    ],
+    "scopeBeforeAndAfter": "all",
+    "memberAssignmentsUnchanged": true
+  },
+  "causalFailure": {
+    "workflow": ".github/workflows/gravicentra-i66-privileged-role-three-function-preview-uat.yml",
+    "runId": 45542808183,
+    "runAttempt": 1,
+    "jobId": 138965227802,
+    "workflowHeadSha": "c959e688004db9e659348c55ad096cc361ec7061",
+    "sourceSha": "a06e5b692595a863a6c6f6b223d895d874abb90e",
+    "failedStep": 15,
+    "observedAtUtc": "2026-11-25T04:11:08.2383614Z",
+    "safeCode": "I66_OPERATIVO_SIGNED_TENANT_HIDDEN_MODULE_EXPOSED_cancelaciones_true_false_",
+    "logSha256": "59cdbfb3c04ce6254142e70c20881618bcae8d6cf5d1f1f6a98e2730db8ff1e0",
+    "policyBackendSource": "protected",
+    "policyClientSource": "protected",
+    "observedModuleCount": 10,
+    "observedGrantForEachModule": {
+      "view": true,
+      "create": true,
+      "edit": true,
+      "scope": "all"
+    },
+    "productFormCrudReached": false,
+    "directFormsReached": false
+  },
+  "qaOwnerCorrection": {
+    "path": "tools/gravicentra-i66-privileged-role-signed-ui-permissions-readonly.cjs",
+    "priorGitBlobSha": "cfc866f5a36f9efd05090a6671f8c0444d52cc35",
+    "gitBlobSha": "b4453e733589635a1d4e30cefae159a6fc59fcd4",
+    "purpose": "Assert the existing approved visibility for Operativo cancellation and commission modules, require the same persisted view/edit decisions in Equipo, and retain existing visible-module create/edit/scope checks.",
+    "createsPermissions": false,
+    "rolePolicyWrites": 0,
+    "membershipWrites": 0,
+    "authChanges": 0,
+    "advisorNegativeAssertionsChanged": false,
+    "explicitNegativeHydrationFixturePreserved": true
+  },
+  "causalVerification": {
+    "predecessor": "EXPECTED_FAIL_REPRODUCED_WITH_ORIGINAL_QA_OWNER",
+    "predecessorExitCode": 1,
+    "predecessorFailure": "I66_OPERATIVO_SIGNED_TENANT_HIDDEN_MODULE_EXPOSED_cancelaciones",
+    "predecessorLogSha256": "ba9b714e4693983073092439a12aaf1091b0576216ac3416b05e509693453478",
+    "correctedSourceTests": 118,
+    "correctedPassed": 118,
+    "correctedFailed": 0,
+    "correctedSkipped": 0,
+    "correctedLogSha256": "7f14ecef9c39f5d06da6a3a9ca014e7d14cb0df3caf7e4638d1838e95cc36900",
+    "syntaxCheckedFiles": 2,
+    "testFiles": [
+      "tools/gravicentra-i6-6-privileged-role-portfolio-parity.test.cjs",
+      "tools/gravicentra-i6-6-privileged-role-writer-transaction.test.cjs",
+      "tools/gravicentra-i6-6-equipo-protected-role-defaults.test.cjs",
+      "tools/gravicentra-i6-6-protected-role-policy-hydration.test.cjs"
+    ],
+    "networkAccess": false,
+    "businessDataWrites": 0
+  },
+  "pinContinuity": {
+    "existingOwnerPathCount": 141,
+    "ownerPathListChanged": false,
+    "changedListedOwner": "tools/gravicentra-i66-privileged-role-signed-ui-permissions-readonly.cjs",
+    "existingManifestTestRevision": "tools/gravicentra-i6-6-privileged-role-portfolio-parity.test.cjs",
+    "historicalProductChangesRewritten": false,
+    "newImmutableArtifactRequired": true,
+    "priorArtifactPatched": false,
+    "successorSourceQaRequired": true,
+    "currentPreview34RolloverEvidenceRequired": true,
+    "sameArtifactPreviewAndLiveRequired": true
+  },
+  "tests": [
+    {
+      "path": "tools/gravicentra-i6-6-privileged-role-portfolio-parity.test.cjs",
+      "gitBlobSha": "e0c7e2d31637fc2df2ac2632f637fb7ef3e21936",
+      "replaces": {
+        "path": "tools/gravicentra-i6-6-privileged-role-portfolio-parity.test.cjs",
+        "priorGitBlobSha": "d03e289d61d040f7d3aebfac359755b9f7ee247e",
+        "priorChangeId": "I6_6_OPERATIVO_SUPERIORS_BUSINESS_WRITE_ROLE_PARITY_P0"
+      }
+    }
+  ],
+  "releaseClaims": {
+    "wholePreviewAccepted": false,
+    "livePublished": false,
+    "liveAccepted": false,
+    "fullI66ProductionAccepted": false
+  },
+  "previousReviewedSourceHead": "5281fc1da11ceac81e783e8f100bc20202c5205b",
+  "preservedProductSource": {
+    "currentProductOwnerCount": 21,
+    "allProductBlobsUnchanged": true,
+    "productPaths": [
+      "functions/b4-003-scoped-related-reader.js",
+      "functions/bootstrap.js",
+      "functions/cobros-reconciliation-domain.js",
+      "functions/make-lead-ingress-bridge.js",
+      "functions/payment-inference-engine.js",
+      "functions/product-lead-ingress-contract.js",
+      "functions/product-lead-ingress-owner-support.js",
+      "functions/product-ops-leads-domain.js",
+      "orbit360-platform/core/policy-receipts-engine.js",
+      "orbit360-platform/core/primas.js",
+      "orbit360-platform/core/product-hydration-required-optional-p0.js",
+      "orbit360-platform/core/queries.js",
+      "orbit360-platform/data/store-firestore-product-operational-p0.js",
+      "orbit360-platform/data/store-firestore-product-readonly-p0.js",
+      "orbit360-platform/modules/aseguradoras.js",
+      "orbit360-platform/modules/cobros.js",
+      "orbit360-platform/modules/config-domain-v20260804-bridge.js",
+      "orbit360-platform/modules/issuance-endosos-v1201-bridge.js",
+      "orbit360-platform/modules/policy-receipts-v1199-bridge.js",
+      "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js",
+      "orbit360-platform/modules/renewals-v1200-operational-bridge.js"
+    ]
+  },
+  "preservedFunctionalReceipts": [
+    {
+      "path": "artifacts/orbit360-recovery/release-control/I6_6_DIRECT_FORMS_ASSIGNED_ROLES_AND_INSURER_EDITOR_CAUSAL_SOURCE_20261124.json",
+      "gitBlobSha": "539a1c4be0635588f5c7ec187320a78ce4b91927"
+    },
+    {
+      "path": "artifacts/orbit360-recovery/release-control/I6_6_R51_ASSIGNED_ROLES_INSURER_FINANCIAL_RECOVERY_SOURCE_20261124.json",
+      "gitBlobSha": "751c2f916b5f9ea80e7957ec82a0aec7c8cde6f0"
+    },
+    {
+      "path": "artifacts/orbit360-recovery/release-control/I6_6_EFFECTIVE_CANCELLATION_ASSIGNED_ROLES_CAUSAL_SOURCE_20261124.json",
+      "gitBlobSha": "4f34b910f251cc2eab4212dce09986f22231f1ab"
+    }
+  ]
+}

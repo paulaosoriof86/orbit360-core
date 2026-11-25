@@ -1,0 +1,105 @@
+{
+  "schema": "GI_I66_V7_ROLLOVER_CAUSAL_SOURCE_PREPARATION_V1",
+  "status": "PREPARED_FOR_SINGLE_ROOT_INTEGRATION_NOT_PUBLISHED",
+  "baseHead": "cc8df6223fb5cd7031823020965e4f3ffe4ff81f",
+  "files": [
+    {
+      "path": "tools/gravicentra-i6-6-preview-channel-reuse-guard.cjs",
+      "beforeBlob": "3f7607892a8fc54a115d88916cef39a42818e82e",
+      "afterBlob": "d08fbd1d96f60ebaeeb1a3b76d034375e9d95845",
+      "sha256": "038fc58a17aba0749963fd9f3459b7f70b4e69edc557265c36574ee0032f6fd8",
+      "bytes": 113017
+    },
+    {
+      "path": "tools/gravicentra-i6-6-technical-preview-rollover.test.cjs",
+      "beforeBlob": "bca5aeaf7a86e1e9a842e2c4d327f60d254d676e",
+      "afterBlob": "72719e47d986b9a9040dc85fa0ac09cf94136cde",
+      "sha256": "425fcf3f4a2f54254ec8390a95c16beb3ff6cdf33ff2013be35d48203e42ac1a",
+      "bytes": 160740
+    },
+    {
+      "path": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_PHYSICAL_PREVIEW_V34_ROLLOVER_V7_20261125.json",
+      "beforeBlob": null,
+      "afterBlob": "7f6c782d2055e8b362ff3eb87d5164cbfb8dee2e",
+      "sha256": "a9f70d459a6152aaae60cec0683818956a39c564acbcd76efc40e2f76a013bf7",
+      "bytes": 9885
+    }
+  ],
+  "patch": {
+    "path": "/workspace/scratch/166055cd45dc/continuity-evidence/v35-v7-preview-rollover/v7-owner-tests-receipt.patch",
+    "sha256": "837d2f91a264782b22a279c52ea23e9fd826052369ea7db4cde919d5dfe252d8",
+    "bytes": 37798
+  },
+  "localTests": {
+    "command": "node --test --test-name-pattern='^(V7|V6 explicit selector|V6 admits34)' --test-reporter=tap tools/gravicentra-i6-6-technical-preview-rollover.test.cjs",
+    "path": "/workspace/scratch/166055cd45dc/continuity-evidence/v35-v7-preview-rollover/v7-targeted-tests.tap",
+    "sha256": "183c3f585d9d46ec83f9d6ed4513056ebf8cb9aa4643efa8b8995cd8cfb9172b",
+    "tests": 44,
+    "pass": 44,
+    "fail": 0,
+    "cancelled": 0,
+    "skipped": 0,
+    "todo": 0,
+    "v7Cases": 42,
+    "historicalV6Cases": 2,
+    "fullSuiteRepeated": false
+  },
+  "causalReplay": {
+    "path": "/workspace/scratch/166055cd45dc/continuity-evidence/v35-v7-preview-rollover/observed-inventory-causal-replay.json",
+    "sha256": "8cf0ad37a461a0e0173904af7720cd993a920b6b017e1c88a9c9ca152345e9fb",
+    "inventoryRun": 45454934099,
+    "inventoryAttempt": 6,
+    "inventoryRows": 51,
+    "driftRejections": 8,
+    "unchangedOtherChannels": 50,
+    "baselineRejected": true,
+    "syntheticRequest35NotActualSourceQA": true,
+    "verifiedBackupArchives": 3,
+    "localManifestFilesEach": 224,
+    "freshHostedReadbackNotClaimedByPreparation": true
+  },
+  "existingPreparer": {
+    "path": "/workspace/scratch/166055cd45dc/continuity-evidence/v35-release-preparation/prepare-causal-successor-request.cjs",
+    "sha256": "fd841a3a7104f0e7b701e8c4d9857c57702b9781899933dc6751cd8fdbb5ee90",
+    "owner": "root",
+    "notModifiedOrExecutedByThisPatch": true,
+    "actualSourceQaStillRequired": true,
+    "stateWritesDuringReview": 0
+  },
+  "existingOwnership": {
+    "ownerAndTestAlreadySourcePinned": true,
+    "sourceQaTriggerAlreadyIncludesBothPaths": true,
+    "sourceQaRunsSameTestOwner": true,
+    "manifestChangedByThisPatch": false,
+    "deltaGuardChanged": false,
+    "workflowChanged": false,
+    "functionalReceiptsChanged": false,
+    "receiptPinnedByOwnerLiteralShaAndBlob": true
+  },
+  "scope": {
+    "productOwnersCount": 21,
+    "productOwnersChanged": 0,
+    "firstRequest": 35,
+    "previousBuildMustRemainSuccess": 34,
+    "signedPreview34RemainsFailed": true,
+    "syntheticMakePreview34PassPreserved": true,
+    "signedReadonlyRoleGuardExecuted": true,
+    "productFormCrudExecuted": false,
+    "directFormsExecuted": false,
+    "compensationOnlyClosedGrantAndPreviousTraffic": true,
+    "functionMetadataRestored": false,
+    "fiveFunctionsRestored": false,
+    "historicalV6ReceiptBytesUnchanged": true,
+    "build34AndR80ReceiptBytesUnchanged": true,
+    "wholeInventoryExactRequiredBeforeReplacement": true,
+    "backup34AndE3And224HostedFilesRequiredAtRuntime": true,
+    "rolloverOnlyAfterNewChannelQuotaResponse": true,
+    "productionRemainsE3": true
+  },
+  "cloudReadonlyInventoryExecutions": 1,
+  "cloudWrites": 0,
+  "deployments": 0,
+  "refWrites": 0,
+  "runtimeAcceptance": false,
+  "artifact34Patched": false
+}

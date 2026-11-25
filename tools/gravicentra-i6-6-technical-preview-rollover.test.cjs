@@ -1994,3 +1994,156 @@ for (const [label, change] of [
 ]) test('V6 after-readback rejects ' + label + ' drift', () => {
   const f = v6AfterFixture(); change(f); assert.throws(() => validateAfter(f));
 });
+
+// V7 starts from the successful immutable34 and the separately closed R80 signed
+// Preview. These local request35 fixtures do not grant runtime acceptance.
+const v7ReceiptPath = 'artifacts/orbit360-recovery/release-control/I6_6_CURRENT_PHYSICAL_PREVIEW_V34_ROLLOVER_V7_20261125.json';
+const v7Text = fs.readFileSync(path.join(retryRepo, v7ReceiptPath), 'utf8');
+const v7Receipt = JSON.parse(v7Text);
+const v7Selector = { receiptPath: v7ReceiptPath,
+  receiptSha256: 'a9f70d459a6152aaae60cec0683818956a39c564acbcd76efc40e2f76a013bf7' };
+const v7Original = JSON.parse(retryGitRead('show', v7Receipt.sourceBaseHead + ':' + retryTransportPath));
+const v7ClosedSource = 'cc8df6223fb5cd7031823020965e4f3ffe4ff81f';
+const v7Closed = JSON.parse(retryGitRead('show', v7ClosedSource + ':' + retryTransportPath));
+function v7Fixture() {
+  const control = clone(v7Closed), calls = [];
+  control.priorFrontendPreviewRequestBeforeV35_20261125 = clone(v7Original.frontendPreviewRequest);
+  control.priorTechnicalPreviewRolloverBeforeV35 = clone(v7Original.currentTechnicalPreviewRollover);
+  control.currentTechnicalPreviewRollover = clone(v7Selector);
+  control.frontendPreviewRequest = { ...clone(v7Original.frontendPreviewRequest), version: 35,
+    sourceQaHead: v7ClosedSource, reason: 'Synthetic causal transport fixture; signed source QA is separately required.' };
+  return { control, calls, io: {
+    git(...args) { calls.push(args); return retryGitRead(...args); },
+    readText: p => fs.readFileSync(path.join(retryRepo, p), 'utf8')
+  } };
+}
+const checkV7 = f => api.validateAuthorization(f.control, v7Text, f.io);
+const v7Prior = f => f.control.closedFailedPreviewAttempts.find(x => x.sourceSha === v7Receipt.sourceBaseHead);
+test('V7 explicit selector pins actual34 and keeps historical V4/V6 unchanged', () => {
+  assert.equal(digest(v7Text), v7Selector.receiptSha256);
+  assert.equal(retryBlob(v7Text), '7f6c782d2055e8b362ff3eb87d5164cbfb8dee2e');
+  assert.deepEqual(guard.currentPhysicalRolloverCandidatePin(), successfulPhysicalPin);
+  assert.equal(guard.currentPhysicalRolloverCandidatePin(v6Selector).previousArtifactId, 14983831110);
+  const selected = guard.currentPhysicalRolloverCandidatePin(v7Selector);
+  assert.equal(selected.previousArtifactId, 14987684993);
+  assert.equal(selected.previousSourceSha, 'a06e5b692595a863a6c6f6b223d895d874abb90e');
+  assert.equal(selected.channel, v7Receipt.channel.id);
+  selected.channel = 'live';
+  assert.equal(guard.currentPhysicalRolloverCandidatePin(v7Selector).channel, v7Receipt.channel.id);
+});
+for (const [label, change] of [
+  ['hash', s => { s.receiptSha256 = 'a'.repeat(64); }],
+  ['path', s => { s.receiptPath += '.other'; }],
+  ['extra authority', s => { s.allowDrift = true; }]
+]) test('V7 selector rejects ' + label, () => {
+  const selector = clone(v7Selector); change(selector);
+  assert.throws(() => guard.currentPhysicalRolloverCandidatePin(selector));
+});
+test('V7 admits35 from successful34 and closed failed Preview with limited verified compensation', () => {
+  const f = v7Fixture(), before = clone(f.control);
+  assert.deepEqual(checkV7(f), v7Receipt); assert.deepEqual(f.control, before);
+  assert.equal(f.control.frontendPreviewRequest.productPaths.length, 21);
+  assert.equal(f.control.frontendPreviewRequest.fiveFunctionExactPreviewRequired, true);
+  assert.ok(!f.control.failedImmutableBuildAttempts.some(x => x.version === 34));
+  assert.equal(v7Prior(f).compensationVerified, true);
+  assert.equal(v7Prior(f).functionMetadataRestored, false);
+  assert.equal(v7Prior(f).overallPackageAccepted, false);
+  assert.equal(v7Prior(f).makePreviewProofAccepted, true);
+  assert.equal(v7Receipt.signedPreviewFailurePreserved.productFormCrudExecuted, false);
+  assert.equal(f.calls.filter(x => x[0] === 'diff').length, 2);
+  assert.equal(v7Receipt.build34Verification.technicalRolloverUsed, true);
+});
+test('V7 accepts the emitted35 disposition while preserving the exact closed34 receipt', () => {
+  const f = v7Fixture(); Object.assign(f.control.failedFrontendPreviewRequestDisposition, {
+    successorRequestCreated: true, successorRequestVersion: 35,
+    successorSourceQaHead: f.control.frontendPreviewRequest.sourceQaHead });
+  assert.deepEqual(checkV7(f), v7Receipt);
+});
+for (const [label, change] of [
+  ['successful34 reclassified as failed', f => { f.control.failedImmutableBuildAttempts.push({ version: 34 }); }],
+  ['successful34 run reused in a failed row', f => { f.control.failedImmutableBuildAttempts.push({ version: 9, runId: 45539669479 }); }],
+  ['missing closed Preview34', f => { f.control.closedFailedPreviewAttempts = []; }],
+  ['duplicate closed Preview34', f => { f.control.closedFailedPreviewAttempts.push(clone(v7Prior(f))); }],
+  ['failed build label', f => { v7Prior(f).buildStatus = 'FAILURE'; }],
+  ['false signed Preview PASS', f => { v7Prior(f).previewStatus = 'PASS'; }],
+  ['lost passing Make proof', f => { v7Prior(f).makePreviewProofAccepted = false; }],
+  ['false compensation HOLD', f => { v7Prior(f).compensationVerified = false; }],
+  ['broadened compensation scope', f => { v7Prior(f).compensationScope = 'ALL_BACKEND_FUNCTIONS'; }],
+  ['false Function metadata restoration', f => { v7Prior(f).functionMetadataRestored = true; }],
+  ['false five-function restoration', f => { v7Prior(f).allFiveBackendFunctionsRestored = true; }],
+  ['unwithdrawn backend authority', f => { v7Prior(f).activeAuthorizationWithdrawn = false; }],
+  ['changed artifact', f => { v7Prior(f).artifactId++; }],
+  ['changed failure receipt', f => { v7Prior(f).receipt.gitBlobSha = 'a'.repeat(40); }],
+  ['missing request34 archive', f => { delete f.control.priorFrontendPreviewRequestBeforeV35_20261125; }],
+  ['duplicate request34 archive', f => { f.control.priorFrontendPreviewRequestBeforeV35_20261124 = clone(f.control.priorFrontendPreviewRequestBeforeV35_20261125); }],
+  ['edited request34 archive', f => { f.control.priorFrontendPreviewRequestBeforeV35_20261125.reason += ' edited'; }],
+  ['lost historical V6 pin', f => { delete f.control.priorTechnicalPreviewRolloverBeforeV35; }],
+  ['changed product scope', f => { f.control.frontendPreviewRequest.productPaths.pop(); }],
+  ['lost financial UI scope', f => { delete f.control.frontendPreviewRequest.financialRecoveryQa; }],
+  ['lost cancellation UI scope', f => { delete f.control.frontendPreviewRequest.cancellationRecoveryQa; }],
+  ['pending Make authority', f => { f.control.makeIngressProtectedOperation = {}; }],
+  ['changed LIVE pointer', f => { f.control.currentPhysicalHostingRelease.artifactId++; }],
+  ['request36 without failed35 evidence', f => { f.control.frontendPreviewRequest.version = 36; }]
+]) test('V7 closed successor rejects ' + label, () => {
+  const f = v7Fixture(); change(f); assert.throws(() => checkV7(f));
+});
+for (const target of [v7ReceiptPath, v7Receipt.build34Verification.path,
+  v7Receipt.signedPreviewFailurePreserved.receipt.path]) {
+  test('V7 rejects changed exact evidence bytes: ' + path.basename(target), () => {
+    const f = v7Fixture(), read = f.io.readText;
+    f.io.readText = p => read(p) + (p === target ? ' ' : '');
+    assert.throws(() => checkV7(f), /V7_RECEIPT_SHA_DRIFT/);
+  });
+}
+for (const operation of ['merge-base', 'diff']) test('V7 refuses ' + operation + ' continuity failure', () => {
+  const f = v7Fixture(), run = f.io.git;
+  f.io.git = (...args) => { if (args[0] === operation) throw Error('synthetic Git continuity failure'); return run(...args); };
+  assert.throws(() => checkV7(f), /synthetic Git continuity failure/);
+});
+test('V7 candidate requires new immutable source and cannot reuse successful backup34 or33', () => {
+  const p = { sourceSha: 'a'.repeat(40), buildRunId: 45540000001, previewChannelId: v7Receipt.channel.id,
+    previewUrl: v7Receipt.channel.origin, previewRollover: guard.currentPhysicalRolloverCandidatePin(v7Selector) };
+  assert.deepEqual(api.validateCandidateReuse(p), p.previewRollover);
+  for (const change of [c => { c.sourceSha = v7Receipt.sourceBaseHead; }, c => { c.buildRunId = 45539669479; },
+    c => { c.sourceSha = v6Receipt.sourceBaseHead; }, c => { c.buildRunId = 45527330623; },
+    c => { c.previewUrl = successfulPhysicalPin.origin; }]) {
+    const c = clone(p); change(c); assert.throws(() => api.validateCandidateReuse(c));
+  }
+});
+test('V7 keeps whole-success artifact validation for backup34 and E3', () => {
+  for (const expected of [v7Receipt.previousCandidate, v7Receipt.protectedLive]) {
+    const run = { id: expected.buildRunId, run_attempt: expected.buildRunAttempt, head_sha: expected.sourceSha,
+      head_branch: v7Receipt.branch, path: '.github/workflows/gravicentra-release-delta-66-package.yml',
+      status: 'completed', conclusion: 'success' };
+    const artifact = { id: expected.artifactId, name: 'gi-i66-immutable-' + expected.sourceSha,
+      digest: expected.artifactDigest, expired: false, size_in_bytes: 1024,
+      workflow_run: { id: expected.buildRunId, head_sha: expected.sourceSha, head_branch: v7Receipt.branch } };
+    assert.doesNotThrow(() => api.validateArtifact(run, artifact, expected));
+    assert.throws(() => api.validateArtifact({ ...run, conclusion: 'failure' }, artifact, expected));
+    assert.throws(() => api.validateArtifact({ ...run, run_attempt: run.run_attempt + 1 }, artifact, expected));
+  }
+});
+function v7AfterFixture() {
+  const f = afterInventoriesFixture(); f.authorization = clone(v7Receipt);
+  for (const inventory of [f.initial, f.first, f.final]) {
+    const target = inventory.result[0];
+    target.name = 'sites/ays-orbit-360-lab/channels/' + v7Receipt.channel.id;
+    target.createTime = v7Receipt.channel.createdAt;
+  }
+  f.initial.result[0].release.version.name = v7Receipt.channel.expectedVersion;
+  return f;
+}
+test('V7 after-readback preserves every field in the other50 channels and the exact receipt', () => {
+  const f = v7AfterFixture(), before = clone(f);
+  assert.equal(validateAfter(f).otherChannelsUnchanged, 50); assert.deepEqual(f, before);
+  f.authorization.constraints.noLiveChanges = false;
+  assert.throws(() => validateAfter(f), /V7_AFTER_AUTHORITY_DRIFT/);
+});
+for (const [label, change] of [
+  ['target version', f => { f.final.result[0].release.version.name += '-other'; }],
+  ['target config', f => { f.final.result[0].release.version.config.rewrites[0].path = '/other.html'; }],
+  ['unknown target field', f => { f.final.result[0].unapproved = true; }],
+  ['other channel', f => { f.final.result[2].release.version.name += '-other'; }]
+]) test('V7 after-readback rejects ' + label + ' drift', () => {
+  const f = v7AfterFixture(); change(f); assert.throws(() => validateAfter(f));
+});

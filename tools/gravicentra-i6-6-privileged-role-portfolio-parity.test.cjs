@@ -105,3 +105,69 @@ test('Asesor remains own-only, with no privilege inheritance',()=>{
 });
 
 console.log('I66_PRIVILEGED_ROLE_PORTFOLIO_PARITY_SYNTHETIC_NO_LIVE_WRITES');
+
+// Execute the actual read-only driver's assertion blocks, without loading its
+// Firebase/Playwright entrypoint. This fixture reproduces Preview34's protected
+// rights, which must agree with the previously persisted role configuration.
+const signedUi=source('tools/gravicentra-i66-privileged-role-signed-ui-permissions-readonly.cjs');
+function assertionBlock(start,end){
+  const from=signedUi.indexOf(start),to=signedUi.indexOf(end,from);
+  assert.ok(from>=0&&to>from,'signed permission assertion boundaries must exist');
+  return signedUi.slice(from,to);
+}
+const signedAssertions=assertionBlock('    for(const [module,grant] of Object.entries(rights.rights)){',
+  "    console.log('I66_SIGNED_'+actor.role.toUpperCase()+'_VISIBLE_MODULES_CREATE_EDIT_ALL_PASS");
+const equipoAssertions=assertionBlock("      const critical=['cliente360'",
+  "      console.log('I66_SIGNED_PREVIEW_EQUIPOS_PROTECTED_MATRIX_");
+const signedEssential=['cliente360','polizas','renovaciones','cobros','ops','leads','aseguradoras'];
+const observedModules=[...signedEssential,'siniestros','cancelaciones','comisiones'];
+const observedRights=()=>Object.fromEntries(observedModules.map(module=>[module,{view:true,create:true,edit:true,scope:'all'}]));
+const checkSigned=(rights,role='operativo')=>vm.runInNewContext(signedAssertions,
+  {assert,essential:signedEssential,actor:{role},rights:{rights}});
+const observedEquipo=()=>Object.fromEntries(['Dirección','SuperAdmin','AdminTenant','Admin','Operativo']
+  .map(role=>[role,Object.fromEntries(observedModules.map(module=>[module,{ver:true,editar:true}]))]));
+const checkEquipo=current=>vm.runInNewContext(equipoAssertions,{assert,current});
+
+test('signed QA accepts Preview34 rights only against the already approved Operativo matrix',()=>{
+  const receipt=JSON.parse(source('artifacts/orbit360-recovery/release-control/I6_6_OPERATIVO_ROLE_MATRIX_AND_BROWSER_INSURER_WRITE_READBACK_20261124.json'));
+  assert.equal(receipt.roleConfiguration.scopeAfter,'all');
+  assert.equal(receipt.roleConfiguration.memberAssignmentsUnchanged,true);
+  assert.equal(receipt.roleConfiguration.independentReadback.conclusion,'success');
+  assert.deepEqual(receipt.roleConfiguration.independentReadback.approvedModulesChecked.slice().sort(),observedModules.slice().sort());
+  assert.deepEqual(receipt.roleConfiguration.independentReadback.explicitRestrictions,[]);
+  for(const module of ['cancelaciones','comisiones'])for(const capability of ['ver','editar'])
+    assert.deepEqual(receipt.roleConfiguration.beforeAfter.find(x=>x.module===module&&x.capability===capability),
+      {module,capability,before:false,after:true});
+  checkSigned(observedRights());
+  checkSigned(observedRights(),'direccion');
+  checkEquipo(observedEquipo());
+});
+
+for(const module of ['cancelaciones','comisiones']){
+  test('signed QA rejects lost approved visibility or a missing module: '+module,()=>{
+    const hidden=observedRights();hidden[module].view=false;
+    assert.throws(()=>checkSigned(hidden),/I66_OPERATIVO_SIGNED_APPROVED_MODULE_INVISIBLE/);
+    const missing=observedRights();delete missing[module];
+    assert.throws(()=>checkSigned(missing),/I66_OPERATIVO_SIGNED_APPROVED_MODULE_INVISIBLE/);
+  });
+  for(const capability of ['create','edit'])test('signed QA still rejects denied '+capability+': '+module,()=>{
+    const denied=observedRights();denied[module][capability]=false;
+    assert.throws(()=>checkSigned(denied),/I66_SIGNED_ROLE_VISIBLE_MODULE_WRITE_DENIED/);
+  });
+  test('signed QA still rejects a reduced portfolio: '+module,()=>{
+    const limited=observedRights();limited[module].scope='own';
+    assert.throws(()=>checkSigned(limited),/I66_SIGNED_ROLE_VISIBLE_PORTFOLIO_NOT_ALL/);
+  });
+  for(const capability of ['ver','editar'])test('Equipo QA rejects lost Operativo '+capability+': '+module,()=>{
+    const denied=observedEquipo();denied.Operativo[module][capability]=false;
+    assert.throws(()=>checkEquipo(denied),/I66_EQUIPOS_PROTECTED_MATRIX_(?:VIEW|EDIT)_DENIED_Operativo/);
+    const missing=observedEquipo();delete missing.Operativo[module];
+    assert.throws(()=>checkEquipo(missing),/I66_EQUIPOS_PROTECTED_MATRIX_VIEW_DENIED_Operativo/);
+  });
+}
+test('signed QA keeps the previous essential-module checks for both actors',()=>{
+  for(const role of ['operativo','direccion'])for(const module of signedEssential){
+    const denied=observedRights();denied[module].view=false;
+    assert.throws(()=>checkSigned(denied,role),/I66_SIGNED_ROLE_ESSENTIAL_MODULE_INVISIBLE/);
+  }
+});

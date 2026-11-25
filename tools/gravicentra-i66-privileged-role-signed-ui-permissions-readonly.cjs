@@ -84,9 +84,11 @@ async function checkActor(browser,actor){
         assert.ok(grant.create&&grant.edit,'I66_SIGNED_ROLE_VISIBLE_MODULE_WRITE_DENIED_'+actor.role+'_'+module);
         if(module!=='renovaciones')assert.equal(grant.scope,'all','I66_SIGNED_ROLE_VISIBLE_PORTFOLIO_NOT_ALL_'+actor.role+'_'+module);
       }
-      if(actor.role==='operativo'&&['cancelaciones','comisiones'].includes(module))
-        assert.equal(grant.view,false,'I66_OPERATIVO_SIGNED_TENANT_HIDDEN_MODULE_EXPOSED_'+module);
     }
+    // The approved 2026-11-24 protected matrix now enables both modules for
+    // Operativo. Verify that persisted decision; never mutate role policy here.
+    if(actor.role==='operativo')for(const module of ['cancelaciones','comisiones'])
+      assert.equal(rights.rights[module]?.view,true,'I66_OPERATIVO_SIGNED_APPROVED_MODULE_INVISIBLE_'+module);
     const count=Object.values(rights.rights).filter(x=>x.view).length;
     assert.ok(count>=7,'I66_SIGNED_ROLE_MIN_SEVEN_VISIBLE_MODULES_REQUIRED');
     console.log('I66_SIGNED_'+actor.role.toUpperCase()+'_VISIBLE_MODULES_CREATE_EDIT_ALL_PASS count='+count+' origin='+(ORIGIN===PREVIEW?'preview':'live')+' writes=0');
@@ -119,7 +121,8 @@ async function checkActor(browser,actor){
       const critical=['cliente360','polizas','renovaciones','cobros','ops','leads','aseguradoras'];
       const testedRoles=['Dirección','SuperAdmin','AdminTenant','Admin','Operativo'];
       for(const role of testedRoles){
-        for(const moduleKey of critical){
+        const required=role==='Operativo'?[...critical,'cancelaciones','comisiones']:critical;
+        for(const moduleKey of required){
           const grant=current[role]?.[moduleKey]||{};
           assert.equal(grant.ver,true,'I66_EQUIPOS_PROTECTED_MATRIX_VIEW_DENIED_'+role+'_'+moduleKey);
           assert.equal(grant.editar,true,'I66_EQUIPOS_PROTECTED_MATRIX_EDIT_DENIED_'+role+'_'+moduleKey);
@@ -131,7 +134,7 @@ async function checkActor(browser,actor){
         for(const [moduleKey,v]of visible)assert.equal(v.editar,true,
           'I66_EQUIPOS_PRIVILEGED_VISIBLE_READ_ONLY_'+role+'_'+moduleKey);
       }
-      console.log('I66_SIGNED_PREVIEW_EQUIPOS_PROTECTED_MATRIX_5_ROLES_7_CRITICAL_ALL_VIEW_EDIT_PASS noWrites=true');
+      console.log('I66_SIGNED_PREVIEW_EQUIPOS_PROTECTED_MATRIX_5_ROLES_7_CRITICAL_ALL_VIEW_EDIT_PASS operativoAddedModules=cancelaciones,comisiones noWrites=true');
     }
   }finally{await context.close();}
 }

@@ -4641,6 +4641,25 @@
           }
         }
       ]
+    },
+    {
+      "id": "I6_6_SIGNED_OPERATIVO_ROLE_MATRIX_QA_CORRECTION_20261125",
+      "approvedByDirection": true,
+      "scope": "EXISTING_DECLARED_TESTS_ONLY",
+      "paths": [],
+      "receipt": "artifacts/orbit360-recovery/release-control/I6_6_SIGNED_OPERATIVO_ROLE_MATRIX_QA_CORRECTION_20261125.json",
+      "receiptGitBlobSha": "ef39256662bf4a2610afa97ddfecd3be95ea9758",
+      "tests": [
+        {
+          "path": "tools/gravicentra-i6-6-privileged-role-portfolio-parity.test.cjs",
+          "gitBlobSha": "e0c7e2d31637fc2df2ac2632f637fb7ef3e21936",
+          "replaces": {
+            "path": "tools/gravicentra-i6-6-privileged-role-portfolio-parity.test.cjs",
+            "priorGitBlobSha": "d03e289d61d040f7d3aebfac359755b9f7ee247e",
+            "priorChangeId": "I6_6_OPERATIVO_SUPERIORS_BUSINESS_WRITE_ROLE_PARITY_P0"
+          }
+        }
+      ]
     }
   ]
 }
