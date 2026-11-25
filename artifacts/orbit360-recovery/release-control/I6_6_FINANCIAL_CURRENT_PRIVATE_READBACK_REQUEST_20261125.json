@@ -1,7 +1,7 @@
 {
   "schema": "GRAVICENTRA_I66_FINANCIAL_PRIVATE_READBACK_REQUEST_V1",
   "profile": "I66_CURRENT_FINANCIAL_BASELINE_V1",
-  "status": "PREPARED_NOT_ACTIVE",
+  "status": "AUTHORIZED_READ_ONLY_CURRENT_FINANCIAL_BASELINE",
   "projectId": "ays-orbit-360-lab",
   "tenantId": "alianzas-soluciones",
   "purpose": "NOVEMBER_RECENT_STATEMENT_RECONCILIATION_PREIMAGES_ONLY",
@@ -56,13 +56,13 @@
     ]
   },
   "authority": {
-    "sourceBaseHead": "9a699defebab9c122343fd1318db2e80bd06f5d7",
+    "sourceBaseHead": "0a1803c215d9c0744b399f0ad9d377ceb7a1ce69",
     "controlPlanePath": "artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json",
-    "controlPlaneBlobSha": "b4496c86899b499024b4bdae5c2b985fcdf50883",
+    "controlPlaneBlobSha": "b5c5d31f0cc0ec23ace78c5db7a48e0bd0498989",
     "recoveryStatePath": "orbit360-platform/docs/recovery/orbit360-recovery-state-v1.json",
-    "recoveryStateBlobSha": "d6addb9f216d633c25af3d447143bc3ce4bd3c8f",
-    "currentProgressPath": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_EXECUTION_PROGRESS_20261124_R74.json",
-    "currentProgressBlobSha": "13064b72dbd2a787b59597023e8e06ad04453563",
+    "recoveryStateBlobSha": "6940d73fe3baff4cb394c345f49c6d98ba7dd108",
+    "currentProgressPath": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_EXECUTION_PROGRESS_20261124_R77.json",
+    "currentProgressBlobSha": "1a746160f56a71604c5f53210859769b50412a74",
     "activeGate": "I6.6",
     "formalDataCutoff": "2026-07-31",
     "executionCursor": "I6_6_SOURCE_PINNED_39_FILES_LIVE_CASES_PARTIAL_NO_AUTOMATIC_PAYMENT_WRITE",
