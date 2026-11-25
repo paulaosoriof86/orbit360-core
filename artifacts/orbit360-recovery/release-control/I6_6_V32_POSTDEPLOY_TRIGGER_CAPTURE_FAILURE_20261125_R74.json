@@ -1,0 +1,157 @@
+{
+  "schema": "GI_I66_V32_POSTDEPLOY_TRIGGER_CAPTURE_FAILURE_AND_CONTINUITY_V1",
+  "status": "BUILD_AND_224_HOSTING_PASS_SIGNED_PREVIEW_FAILED_TRIGGER_CAPTURE_AND_COMPENSATION_UNVERIFIED",
+  "activeGate": "I6.6",
+  "recordedAtUtc": "2026-11-25T00:49:17.966Z",
+  "target": {
+    "sourceSha": "12db222244dd2b02f3d8148470b28a798cacaca0",
+    "artifactId": 14979094222,
+    "artifactDigest": "sha256:0426b4e4d008bc5f2c145b2ee34928c1fc93f733a28e93ff94babc1edd32ea53",
+    "buildId": "gi-i66-12db222244dd-57f234755dc1",
+    "buildRunId": 45518809761,
+    "previewUrl": "https://ays-orbit-360-lab--gi-i66-rc-45518809761-eiytd3a3.web.app",
+    "previewChannel": "gi-i66-rc-45518809761"
+  },
+  "signedPreview": {
+    "runId": 45519726701,
+    "runAttempt": 1,
+    "headSha": "0a1ae764d000f2562e736b68a762527d5046cd0e",
+    "jobId": 138888314175,
+    "conclusion": "failure",
+    "failedSteps": [
+      10,
+      18
+    ],
+    "signedUiExecuted": false,
+    "wholeRunAccepted": false
+  },
+  "observedDeployment": {
+    "previewFunctionsDeployed": 5,
+    "inventoryReadback": "PASS_COUNT_5",
+    "liveHostingFingerprintsUnchangedDuringRun": true,
+    "livePromotionExecuted": false,
+    "makeClosedDeploymentReceiptPresent": false,
+    "makeTriggerPostimagePresent": false,
+    "makeProbeExecuted": false,
+    "canonicalLeadWrites": 0,
+    "externalMessagesSent": 0
+  },
+  "failure": {
+    "safeCode": "I66_MAKE_PROTECTED_EXECUTION_HOLD",
+    "boundary": "After exact five-function deployment readback, before a completed capture-trigger receipt; initialize-closed success was not observed.",
+    "exactProviderAssertion": "NOT_RETAINED_BY_EXISTING_ERROR_HANDLER",
+    "rootCause": "FRESH_FUNCTION_API_NEW_REVISION_WITH_TRAFFIC_STILL_ON_PREVIOUS_REVISION",
+    "freshObservation": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_6_MAKE_FUNCTION_TRAFFIC_AND_GRANTS_READONLY_45505420941_A2_20261125.json",
+      "gitBlobSha": "ff79b4aaa6aa2485cc074f0708fb3de3295adf38",
+      "sha256": "286c0954eacc0b5666ccc7e24c5ff12fe83f6cad51ee746383558d9501957fb4"
+    },
+    "observedApiRevision": "orbit360makeleadingresspreview-00004-sum",
+    "observedTraffic": {
+      "schema": "GI_I66_MAKE_CLOUD_RUN_TRAFFIC_V1",
+      "phase": "preview",
+      "service": "projects/ays-orbit-360-lab/locations/us-east1/services/orbit360makeleadingresspreview",
+      "serviceUid": "2cb4dc4b-ad08-442e-bf39-4fc0803bd111",
+      "generation": "4",
+      "observedFrom": "CLOUD_RUN_V2_TRAFFIC_STATUSES",
+      "targets": [
+        {
+          "revision": "orbit360makeleadingresspreview-00001-cuy",
+          "percent": 100
+        }
+      ],
+      "observationDigest": "ee8568ce533710c81965419ab18831c2bdc48c9ca6711c7a7402e13001139665"
+    },
+    "closedGrant": {
+      "path": "tenants/alianzas-soluciones/config/makeLeadIngressPreview",
+      "exists": true,
+      "expectedDigest": "a020555d0efc3e9cf68baf5b2b309eeb3fc004fadbf0e2539aff680a00a9aae4",
+      "state": "CLOSED",
+      "enabled": false,
+      "updateTime": {
+        "seconds": "1795547589",
+        "nanoseconds": 852062000
+      },
+      "scopeVerified": true,
+      "authoritySourceSha": "74ae28c6e6e6b40f845567c9b00738a58307b3cb",
+      "authorityReceiptBlob": "7bd5db8be25b7085d6b73dbf965d6b343a24a186"
+    },
+    "noBlindDeployOrBuildRetry": true
+  },
+  "compensation": {
+    "schema": "GI_I66_MAKE_RELEASE_COMPENSATION_V1",
+    "phase": "preview",
+    "sourceSha": "12db222244dd2b02f3d8148470b28a798cacaca0",
+    "artifactDigest": "sha256:0426b4e4d008bc5f2c145b2ee34928c1fc93f733a28e93ff94babc1edd32ea53",
+    "status": "HOLD",
+    "configuration": {
+      "status": "NO_CONFIGURATION_TRANSITION_RECORDED",
+      "configurationWrites": 0
+    },
+    "trigger": null,
+    "secretIam": null,
+    "canonicalLeadWrites": 0,
+    "externalMessagesSent": 0,
+    "failures": [
+      "TRIGGER_ROLLBACK_UNVERIFIED"
+    ]
+  },
+  "preDeploymentTrigger": {
+    "schema": "GI_I66_MAKE_TRIGGER_SNAPSHOT_V1",
+    "phase": "preview",
+    "sourceSha": "12db222244dd2b02f3d8148470b28a798cacaca0",
+    "artifactDigest": "sha256:0426b4e4d008bc5f2c145b2ee34928c1fc93f733a28e93ff94babc1edd32ea53",
+    "previousState": "EXISTING_APPROVED",
+    "function": {
+      "name": "orbit360MakeLeadIngressPreview",
+      "region": "us-east1",
+      "revision": "orbit360makeleadingresspreview-00002-wem",
+      "runtimePrincipal": "646761409743-compute@developer.gserviceaccount.com",
+      "eventType": "google.cloud.firestore.document.v1.created.withAuthContext",
+      "database": "(default)",
+      "document": "tenants/alianzas-soluciones/previewLeadIngressRequests/{requestId}",
+      "retryPolicy": "RETRY_POLICY_RETRY",
+      "trigger": "projects/ays-orbit-360-lab/locations/nam5/triggers/orbit360makeleadingresspreview-265013",
+      "service": "projects/ays-orbit-360-lab/locations/us-east1/services/orbit360makeleadingresspreview",
+      "configurationDigest": "246509d58fcc8cfd5d5bbb93871c1d1dee24e5538ff8b12e8d0389cbc8d1917e"
+    },
+    "traffic": {
+      "schema": "GI_I66_MAKE_CLOUD_RUN_TRAFFIC_V1",
+      "phase": "preview",
+      "service": "projects/ays-orbit-360-lab/locations/us-east1/services/orbit360makeleadingresspreview",
+      "serviceUid": "2cb4dc4b-ad08-442e-bf39-4fc0803bd111",
+      "generation": "3",
+      "observedFrom": "CLOUD_RUN_V2_TRAFFIC_STATUSES",
+      "targets": [
+        {
+          "revision": "orbit360makeleadingresspreview-00001-cuy",
+          "percent": 100
+        }
+      ],
+      "observationDigest": "ec3c6a053cfe9af776d0d9340a0ae829b867fa5b1aa33816cf5903de60285a69"
+    }
+  },
+  "evidence": {
+    "logSha256": "c5e97f014483c170e801fe1f30d7993bdbf925aa0c5ae5e469e88ae08724722f",
+    "makeArtifact": {
+      "id": 14979662552,
+      "digest": "sha256:8d3dac8865607f4cfd02b3b537c51eb631e21cdcfa0564536f0e6d673f1c76b4"
+    },
+    "generalArtifact": {
+      "id": 14979408969,
+      "digest": "sha256:86916496a93131d9d0c3f6c44a02358b00ca85986f921960dd6ea312163a9a6b"
+    },
+    "preservedMakeReports": [
+      "gi-make-preview-before-deploy.json",
+      "gi-make-preview-snapshot-trigger.json",
+      "gi-make-preview-rollback.json"
+    ]
+  },
+  "acceptedProductionRemains": "E3",
+  "artifactPatched": false,
+  "artifactRebuilt": false,
+  "newBuildRequested": false,
+  "newLiveAcceptance": false,
+  "financialPaymentsCreated": 0,
+  "fullI66ProductionAccepted": false
+}
