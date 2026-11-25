@@ -256,12 +256,14 @@ async function main(){
  const uiCausalEvidence=Object.fromEntries(UI_CAUSAL_FIELDS.map(key=>[key,false]));let uiApplicationObserver=null,intakeDiagnosticsStop=null;
  let stage='BOOT';const enter=name=>{stage=safeStage(name);};
  const admin=require('firebase-admin'),{chromium}=require('playwright');
- const credentialPath=process.env.GOOGLE_APPLICATION_CREDENTIALS;
- const credential=credentialPath?JSON.parse(fs.readFileSync(credentialPath,'utf8')):
-   ['SA_LAB','SA_LAB_ALT','SA_ALT','SA_DEFAULT'].map(key=>{try{return JSON.parse(process.env[key]||'');}catch{return null;}})
-    .find(value=>value?.type==='service_account'&&value.project_id===PROJECT&&value.private_key);
- assert.ok(credential?.type==='service_account'&&credential.project_id===PROJECT&&credential.private_key,'I66_PROPOSAL_CONFIGURED_CREDENTIAL_REQUIRED');
- admin.initializeApp({credential:admin.credential.cert(credential),projectId:PROJECT});
+ await require('./gravicentra-i66-signed-qa-runtime-auth.cjs').initializeSignedQaAdmin(admin,{getLegacyCredential:()=>{
+   const credentialPath=process.env.GOOGLE_APPLICATION_CREDENTIALS;
+   const credential=credentialPath?JSON.parse(fs.readFileSync(credentialPath,'utf8')):
+     ['SA_LAB','SA_LAB_ALT','SA_ALT','SA_DEFAULT'].map(key=>{try{return JSON.parse(process.env[key]||'');}catch{return null;}})
+      .find(value=>value?.type==='service_account'&&value.project_id===PROJECT&&value.private_key);
+   assert.ok(credential?.type==='service_account'&&credential.project_id===PROJECT&&credential.private_key,'I66_PROPOSAL_CONFIGURED_CREDENTIAL_REQUIRED');
+   return credential;
+ }});
  const db=admin.firestore(),auth=admin.auth(),tenant=db.collection('tenants').doc(TENANT);
  const items=c=>tenant.collection('data').doc(c).collection('items'),item=(c,id)=>items(c).doc(id);
  const nonce=Date.now().toString(36)+'_'+crypto.randomBytes(5).toString('hex'),runId='cobledgerqa_'+nonce;

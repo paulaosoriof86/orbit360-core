@@ -44,16 +44,43 @@ need(ORIGIN===(phase==='preview'?APPROVED_PREVIEW:LIVE),'I66_PERF_ORIGIN_NOT_APP
 if(process.env.I66_APPROVED_LIVE_SOURCE_SHA)
   need(process.env.I66_APPROVED_LIVE_SOURCE_SHA===pin.sourceSha,'I66_PERF_SOURCE_ENV_DRIFT');
 const DRIVER='tools/gravicentra-i66-live-performance-readonly.mjs';
-if(phase==='preview')need(fs.readFileSync(DRIVER).equals(execFileSync('git',['show',pin.sourceSha+':'+DRIVER])),
-  'I66_PERF_DRIVER_SOURCE_BYTES_DRIFT');
-const app=getApps()[0]||initializeApp({credential:applicationDefault(),projectId:PROJECT});
+async function initializePerformanceReadonlyAdmin(){
+  const provider=String(process.env.GRAVICENTRA_BUILD_PROVIDER||'').trim();
+  if(!provider){
+    if(phase==='preview')need(fs.readFileSync(DRIVER).equals(execFileSync('git',['show',pin.sourceSha+':'+DRIVER])),
+      'I66_PERF_DRIVER_SOURCE_BYTES_DRIFT');
+    return getApps()[0]||initializeApp({credential:applicationDefault(),projectId:PROJECT});
+  }
+  need(provider==='CLOUD_BUILD','I66_PERF_PROVIDER_UNSUPPORTED');
+  need(readMode==='six-frontend-release'&&frontendQa?.executionProvider===provider,
+    'I66_PERF_NATIVE_FINANCIAL_AUTHORITY_REQUIRED');
+  need(/^[a-f0-9]{40}$/.test(frontendQa.workflowHeadSha||''),'I66_PERF_NATIVE_AUTHORITY_HEAD_REQUIRED');
+  need(frontendQa.runId===process.env.GRAVICENTRA_CLOUD_BUILD_ID,'I66_PERF_NATIVE_RUN_DRIFT');
+  const candidate=release.candidateForPhase(transport,
+    phase==='live'||transport.status==='OPERATIONAL_EXACT_LIVE_PROMOTION_AUTHORIZED'?'live':'preview');
+  need(candidate.executionProvider===provider,'I66_PERF_NATIVE_CANDIDATE_REQUIRED');
+  for(const key of ['sourceSha','buildId','buildRunId','artifactId','artifactDigest'])
+    need(candidate[key]===pin[key],'I66_PERF_NATIVE_TARGET_DRIFT_'+key);
+  // The native owner verifies the exact source-to-mechanism delta. It does not
+  // replace any product owner or waive the immutable package binding.
+  release.verifyPinnedOwners(candidate,{head:'HEAD',cwd:process.cwd()});
+  need(getApps().length===0,'I66_PERF_NATIVE_PREINITIALIZED_APP_FORBIDDEN');
+  const identity=await require('./gravicentra-i66-signed-qa-runtime-auth.cjs').verifyCloudBuildRuntime();
+  need(identity.buildId===frontendQa.runId&&identity.projectId===PROJECT,'I66_PERF_NATIVE_RUNTIME_DRIFT');
+  // Admin SDK uses metadata ADC and IAM signBlob for the existing actors. No
+  // service-account key, credential export, new actor or business write.
+  return initializeApp({credential:applicationDefault(),projectId:identity.projectId,
+    serviceAccountId:identity.serviceAccount});
+}
+const app=await initializePerformanceReadonlyAdmin();
 const db=getFirestore(app),auth=getAuth(app);
 const report={
   schema:'GI_I66_BROWSER_PERFORMANCE_READONLY_V2',project:PROJECT,tenant:TENANT,
   origin:ORIGIN,gate:'I6.6',
   sourceSha:pin.sourceSha,buildId:pin.buildId,releaseArtifactId:pin.artifactId,
   releaseArtifactDigest:pin.artifactDigest,releaseBuildRunId:pin.buildRunId,phase,
-  workflowHeadSha:process.env.GITHUB_SHA||'',
+  workflowHeadSha:frontendQa?.executionProvider==='CLOUD_BUILD'?frontendQa.workflowHeadSha:process.env.GITHUB_SHA||'',
+  ...(frontendQa?.executionProvider==='CLOUD_BUILD'?{executionProvider:'CLOUD_BUILD'}:{}),
   readOnly:true,firestoreWrites:0,businessActions:0,paymentActions:0,
   syntheticFixtures:0,pushNotifications:0,roleChanged:false,
   auth:{},routes:[],mobile:{},errors:[],notes:[]

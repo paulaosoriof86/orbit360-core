@@ -118,7 +118,12 @@ function validateCandidate(p,phase){
     assert.match(String(qa?.receiptPath||''),/^artifacts\/orbit360-recovery\/release-control\/I6_6_[A-Z0-9_]+\.json$/,'I66_MAKE_FINANCIAL_PREVIEW_RECEIPT_REQUIRED');
     sha40(qa.receiptBlob,'I66_MAKE_FINANCIAL_PREVIEW_RECEIPT_PIN');
     sha40(qa.previewReadOnlyAuthorityBlob,'I66_MAKE_FINANCIAL_PREVIEW_AUTHORITY_PIN');
-    for(const key of ['qaRunId','qaArtifactId'])assert.ok(Number.isSafeInteger(qa[key])&&qa[key]>0,'I66_MAKE_FINANCIAL_PREVIEW_RUN_OR_ARTIFACT_REQUIRED');
+    const provider=require('./gravicentra-i6-6-cloud-build-operational.cjs');
+    if(provider.provider(p)){
+      assert.equal(qa.executionProvider,'CLOUD_BUILD','I66_MAKE_FINANCIAL_NATIVE_PROVIDER_REQUIRED');
+      provider.executionId(p,qa.qaRunId,'FINANCIAL_PREVIEW_RUN');provider.artifactRef(qa.qaArtifactId);
+      if(phase==='live')assert.equal(qa.qaRunId,p.previewQa?.runId,'I66_MAKE_FINANCIAL_SAME_NATIVE_PREVIEW_EXECUTION_REQUIRED');
+    }else for(const key of ['qaRunId','qaArtifactId'])assert.ok(Number.isSafeInteger(qa[key])&&qa[key]>0,'I66_MAKE_FINANCIAL_PREVIEW_RUN_OR_ARTIFACT_REQUIRED');
     assert.match(String(qa.qaArtifactDigest||''),/^sha256:[a-f0-9]{64}$/,'I66_MAKE_FINANCIAL_PREVIEW_ARTIFACT_DIGEST');
     sha64(qa.qaReportSha256,'I66_MAKE_FINANCIAL_PREVIEW_REPORT_DIGEST');
   }

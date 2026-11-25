@@ -21,6 +21,7 @@ const PREVIOUS_BUILD=operational?.currentLive.buildId||'gi-i66-7e9b2b915535-57f2
 const LIVE=['https://ays-orbit-360-lab.web.app','https://app.aysseguros.com'];
 const root=process.env.I66_PACKAGE_ROOT||'',cli=process.env.FIREBASE_CLI_BIN||'';
 const credential=process.env.GOOGLE_APPLICATION_CREDENTIALS||'';
+const provider=String(process.env.GRAVICENTRA_BUILD_PROVIDER||'').trim();
 const evidencePath=path.join(process.env.RUNNER_TEMP||process.cwd(),'i66-role-live-exact-proof.json');
 const need=(v,s)=>{if(!v)throw Error(s);};
 const digest=b=>crypto.createHash('sha256').update(b).digest('hex');
@@ -91,7 +92,9 @@ async function getVersion(channel){
   return v;
 }
 try{
-  need(root&&fs.existsSync(cli)&&fs.existsSync(credential),'I66_ROLE_RELEASE_PRECONDITIONS_MISSING');
+  need(!provider||provider==='CLOUD_BUILD','I66_ROLE_RELEASE_PROVIDER_UNSUPPORTED');
+  need(root&&fs.existsSync(cli)&&(provider==='CLOUD_BUILD'||fs.existsSync(credential)),'I66_ROLE_RELEASE_PRECONDITIONS_MISSING');
+  if(provider==='CLOUD_BUILD')await require('./gravicentra-i66-signed-qa-runtime-auth.cjs').verifyCloudBuildRuntime();
   need(process.env.I66_ROLE_SOURCE_SHA===SOURCE&&process.env.I66_ROLE_PREVIEW_ORIGIN===PREVIEW,
     'I66_ROLE_SOURCE_OR_PREVIEW_PIN_DRIFT');
   const pkg=JSON.parse(fs.readFileSync(path.join(root,'bundle/site/__recovery__/build.json'),'utf8'));
@@ -104,7 +107,7 @@ try{
     new RegExp('^gi-i66-'+SOURCE.slice(0,12)+'-').test(pkg.buildId),'I66_ROLE_IMMUTABLE_BUILD_NOT_CERTIFIED');
   const rows=manifestRows();
   evidence.previewFiles=await verify(PREVIEW,rows);
-  google=await new GoogleAuth({keyFile:credential,scopes:['https://www.googleapis.com/auth/firebase.hosting']}).getClient();
+  google=await new GoogleAuth({...(provider==='CLOUD_BUILD'?{}:{keyFile:credential}),scopes:['https://www.googleapis.com/auth/firebase.hosting']}).getClient();
   const [beforeSite,beforeCustom,old,preview]=await Promise.all([
     marker(LIVE[0]),marker(LIVE[1]),getVersion('live'),getVersion(CHANNEL)
   ]);

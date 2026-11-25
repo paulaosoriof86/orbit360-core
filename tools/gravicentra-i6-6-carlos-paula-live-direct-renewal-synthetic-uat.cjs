@@ -824,10 +824,12 @@ async function restoreCancellationAudit(tenant,item,identity){
 }
 async function main(){
   const cfg=configuration(),admin=require('firebase-admin'),{chromium}=require('playwright');
-  const credential=['SA_LAB','SA_ALT','SA_DEFAULT'].map(k=>process.env[k]).filter(Boolean).map(x=>{try{return JSON.parse(x);}catch{return null;}})
-    .find(x=>x?.type==='service_account'&&x.project_id==='ays-orbit-360-lab'&&x.private_key);
-  assert.ok(credential,'I66_RENEWAL_SIGNED_AUTHORITY_MISSING');
-  admin.initializeApp({credential:admin.credential.cert(credential),projectId:'ays-orbit-360-lab'});
+  await require('./gravicentra-i66-signed-qa-runtime-auth.cjs').initializeSignedQaAdmin(admin,{getLegacyCredential:()=>{
+    const credential=['SA_LAB','SA_ALT','SA_DEFAULT'].map(k=>process.env[k]).filter(Boolean).map(x=>{try{return JSON.parse(x);}catch{return null;}})
+      .find(x=>x?.type==='service_account'&&x.project_id==='ays-orbit-360-lab'&&x.private_key);
+    assert.ok(credential,'I66_RENEWAL_SIGNED_AUTHORITY_MISSING');
+    return credential;
+  }});
   const db=admin.firestore(),auth=admin.auth(),tenant=db.collection('tenants').doc(TENANT);
   const collection=c=>tenant.collection('data').doc(c).collection('items'),item=(c,id)=>collection(c).doc(id);
   const suffix=Date.now().toString(36)+'_'+crypto.randomBytes(4).toString('hex');

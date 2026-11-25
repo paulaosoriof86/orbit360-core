@@ -7,6 +7,7 @@ const crypto=require('node:crypto');
 const fs=require('node:fs');
 const path=require('node:path');
 const os=require('node:os');
+const {initializeSignedQaAdmin}=require('./gravicentra-i66-signed-qa-runtime-auth.cjs');
 const contract=require('../functions/advisor-commission-payable-contract');
 const assignment=require('../functions/advisor-assignment-correction-contract');
 const {acceptDirectionPreviewLegal,assertDirectionLiveLegalAuthority,acceptDirectionLiveLegal,LEGAL_FAILURE_CHECKS,safeLegalFailureSubstage}=require('./gravicentra-i6-6-direction-preview-legal-acceptance.cjs');
@@ -846,7 +847,7 @@ async function main(){
     }
     pass('EXACT_SOURCE_AND_IMMUTABLE_BUILD_MARKER');
     stage='FIXTURE_SETUP';
-    admin=require('firebase-admin');admin.initializeApp({credential:admin.credential.cert(configuredCredential(process.env)),projectId:PROJECT});
+    admin=require('firebase-admin');await initializeSignedQaAdmin(admin,{getLegacyCredential:()=>configuredCredential(process.env)});
     db=admin.firestore();tenant=db.collection('tenants').doc(TENANT);
     const [members,advisors]=await Promise.all([tenant.collection('members').limit(150).get(),rowRef('asesores','unused').parent.limit(400).get()]);
     assert.ok(members.size<150&&advisors.size<400,'ADVISOR_UAT_ACTOR_BOUND_EXCEEDED');

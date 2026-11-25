@@ -7,6 +7,68 @@ const {fixture,trigger}=require('./gravicentra-i66-make-release-scope.test.cjs')
 const cliGuard=require('./gravicentra-i66-make-firebase-project-iam-guard.cjs');
 const access=require('./gravicentra-i66-make-lead-runtime-access.cjs');
 const clone=v=>structuredClone(v),ROOT='tenants/'+c.TENANT;
+test('native Make execution rejects unknown providers, mismatches and fabricated GitHub context',()=>{
+ const native={executionProvider:'CLOUD_BUILD'},env={GRAVICENTRA_BUILD_PROVIDER:'CLOUD_BUILD'};
+ assert.equal(e.nativeExecution(native,env),true);assert.equal(e.nativeExecution({},{}),false);
+ for(const [p,v]of [[{executionProvider:'LOCAL'},{}],[{},env],[native,{}],[native,{...env,GRAVICENTRA_BUILD_PROVIDER:'LOCAL'}],
+  [native,{...env,GITHUB_ACTIONS:'true'}],[native,{...env,GITHUB_REPOSITORY:'paulaosoriof86/orbit360-core'}]])assert.throws(()=>e.nativeExecution(p,v),/INGRESS_(EXECUTION_PROVIDER|NATIVE_GITHUB_CONTEXT)/);
+});
+test('legacy Make execution keeps exact repository and branch guards without native identity calls',async()=>{
+ const env={GITHUB_REPOSITORY:'paulaosoriof86/orbit360-core',GITHUB_REF_NAME:'recovery/fase-a-clean-20260831'};
+ const noNative=()=>{throw Error('NATIVE_MUST_NOT_RUN');};
+ assert.equal(await e.verifyExecutionRuntime({},{env,phase:'preview',action:'snapshot-trigger',verifyNative:noNative,verifyOwners:noNative}),null);
+ for(const field of ['GITHUB_REPOSITORY','GITHUB_REF_NAME'])await assert.rejects(e.verifyExecutionRuntime({},{env:{...env,[field]:'wrong'},verifyNative:noNative}));
+});
+test('native Make execution waits for real provider authority after exact owner pin validation',async()=>{
+ const p={executionProvider:'CLOUD_BUILD',sourceSha:'1'.repeat(40)},calls=[],identity={provider:'CLOUD_BUILD',buildId:'synthetic-test-only'};
+ let finish;const authority=new Promise(resolve=>{finish=resolve;});
+ const pending=e.verifyExecutionRuntime(p,{env:{GRAVICENTRA_BUILD_PROVIDER:'CLOUD_BUILD'},cwd:'/exact-checkout',phase:'preview',action:'capture-trigger',
+  verifyOwners:(value,options)=>{assert.equal(value,p);assert.deepEqual(options,{head:'HEAD',cwd:'/exact-checkout'});calls.push('pins');},
+  verifyNative:async(value,options)=>{assert.equal(value,p);assert.deepEqual(options,{phase:'preview',action:'capture-trigger'});calls.push('provider-start');await authority;calls.push('provider-complete');return identity;}});
+ assert.deepEqual(calls,['pins','provider-start']);finish();assert.equal(await pending,identity);assert.deepEqual(calls,['pins','provider-start','provider-complete']);
+});
+test('native pin or provider failure cannot fall back to legacy authority',async()=>{
+ const p={executionProvider:'CLOUD_BUILD'},env={GRAVICENTRA_BUILD_PROVIDER:'CLOUD_BUILD'};let providerCalls=0;
+ const pinError=Error('PIN_TEST_DENIED');
+ await assert.rejects(e.verifyExecutionRuntime(p,{env,verifyOwners:()=>{throw pinError;},verifyNative:()=>{providerCalls++;}}),error=>error===pinError);
+ assert.equal(providerCalls,0);const nativeError=Error('NATIVE_TEST_DENIED');
+ await assert.rejects(e.verifyExecutionRuntime(p,{env,verifyOwners:()=>{},verifyNative:()=>{providerCalls++;throw nativeError;}}),error=>error===nativeError);
+ assert.equal(providerCalls,1);
+});
+function authorityRefreshHarness({native=true,pinFailure,fetchFailure,legacyDiff=''}={}){
+ const p={sourceSha:'1'.repeat(40),...(native?{executionProvider:'CLOUD_BUILD'}:{})},head='2'.repeat(40),calls=[],pins=[],control={status:'TEST_ONLY_CONTROL'},bytes=Buffer.from(JSON.stringify(control));
+ const exec=(command,args,options)=>{assert.equal(command,'git');calls.push({args,options});
+  if(args.includes('fetch')){if(fetchFailure)throw fetchFailure;return Buffer.alloc(0);}
+  if(args[0]==='rev-parse')return head+'\n';if(args[0]==='merge-base')return Buffer.alloc(0);
+  if(args[0]==='diff')return legacyDiff;if(args[0]==='show')return bytes;throw Error('UNEXPECTED_GIT_TEST_OPERATION');};
+ return {p,head,calls,pins,control,bytes,options:{cwd:'/exact-checkout',exec,
+  env:native?{GRAVICENTRA_BUILD_PROVIDER:'CLOUD_BUILD'}:{GH_TOKEN:'SYNTHETIC_TEST_ONLY'},
+  verifyOwners:(value,options)=>{pins.push({value,options});if(pinFailure)throw pinFailure;}}};
+}
+test('native authority refresh uses only the same public repository and validates fetched head before reading control',()=>{
+ const h=authorityRefreshHarness(),result=e.refreshAuthority(h.p,h.options);
+ assert.deepEqual(h.calls[0].args,['fetch','--no-tags','https://github.com/paulaosoriof86/orbit360-core.git','recovery/fase-a-clean-20260831']);
+ assert.equal(result.head,h.head);assert.deepEqual(result.control,h.control);assert.equal(result.authorityBlob,crypto.createHash('sha1').update('blob '+h.bytes.length+'\0').update(h.bytes).digest('hex'));
+ assert.deepEqual(h.pins,[{value:h.p,options:{head:h.head,cwd:'/exact-checkout'}}]);
+ assert.ok(h.calls.every(call=>call.options.cwd==='/exact-checkout'));assert.ok(h.calls.every(call=>!call.args.includes('-c')));
+});
+test('native refresh rejects changed owner pins before reading candidate or operation authority',()=>{
+ const error=Error('NATIVE_QA_PIN_DRIFT'),h=authorityRefreshHarness({pinFailure:error});
+ assert.throws(()=>e.refreshAuthority(h.p,h.options),value=>value===error);assert.equal(h.pins.length,1);assert.ok(!h.calls.some(call=>call.args[0]==='show'));
+});
+test('native public fetch failure is terminal and never borrows a GitHub token',()=>{
+ const error=Error('PUBLIC_READ_DENIED'),h=authorityRefreshHarness({fetchFailure:error});h.options.env.GH_TOKEN='MUST_NOT_BE_USED';
+ assert.throws(()=>e.refreshAuthority(h.p,h.options),value=>value===error);assert.equal(h.calls.length,1);assert.deepEqual(h.pins,[]);
+ assert.ok(!JSON.stringify(h.calls).includes('MUST_NOT_BE_USED'));assert.ok(!h.calls[0].args.includes('-c'));
+});
+test('legacy refresh still requires configured GitHub credential and rejects changed source or QA',()=>{
+ const missing=authorityRefreshHarness({native:false});missing.options.env={};
+ assert.throws(()=>e.refreshAuthority(missing.p,missing.options),/INGRESS_GITHUB_READ_CREDENTIAL_REQUIRED/);assert.equal(missing.calls.length,0);
+ const legacy=authorityRefreshHarness({native:false});e.refreshAuthority(legacy.p,legacy.options);
+ assert.equal(legacy.calls[0].args[0],'-c');assert.ok(legacy.calls[0].args[1].startsWith('http.https://github.com/.extraheader=Authorization: basic '));assert.deepEqual(legacy.pins,[]);
+ const changed=authorityRefreshHarness({native:false,legacyDiff:'functions/bootstrap.js\n'});
+ assert.throws(()=>e.refreshAuthority(changed.p,changed.options),/INGRESS_SOURCE_OR_QA_CHANGED_DURING_CONFIGURATION/);assert.ok(!changed.calls.some(call=>call.args[0]==='show'));
+});
 test('pinned Firebase CLI keeps IAM reads but cannot call either project role mutator',async()=>{
  let writes=0,reads=0;const rm={getIamPolicy:async()=>{reads++;return{etag:'existing'};},
   setIamPolicy:async()=>{writes++;},addServiceAccountToRoles:async()=>{writes++;}};

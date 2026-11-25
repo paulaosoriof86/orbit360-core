@@ -28,6 +28,7 @@ const SAFE_FAILURE_CODES=new Set([
   'INGRESS_DEPLOYED_REVISION_REQUIRED','INGRESS_DEPLOYED_RULESET_FILES_UNEXPECTED','INGRESS_DEPLOYED_RULES_BYTES_CHANGED',
   'INGRESS_DEPLOYED_RUNTIME_DRIFT','INGRESS_EVENTARC_AND_PROJECT_IAM_PREFLIGHT_HOLD','INGRESS_EVENTARC_BEFORE_PROOF_REQUIRED',
   'INGRESS_EVENT_FILTERS_REQUIRED','INGRESS_EVENT_RETRY_REQUIRED','INGRESS_EXACT_PACKAGE_REQUIRED',
+  'INGRESS_EXECUTION_PROVIDER_UNKNOWN','INGRESS_EXECUTION_PROVIDER_MISMATCH','INGRESS_NATIVE_GITHUB_CONTEXT_FORBIDDEN','INGRESS_NATIVE_PIN_OWNER_REQUIRED',
   'INGRESS_FUNCTION_CHANGED_DURING_TRAFFIC_READ','INGRESS_GITHUB_READ_CREDENTIAL_REQUIRED','INGRESS_IAM_UNKNOWN_COMMIT_REQUIRES_RECONCILIATION',
   'INGRESS_OPERATION_AUTHORITY_EXPIRED','INGRESS_OPERATION_CURRENT_ARTIFACT_REQUIRED','INGRESS_OPERATION_CURRENT_BACKEND_REQUIRED',
   'INGRESS_OPERATION_CURRENT_CANDIDATE_CHANGED','INGRESS_OPERATION_CURRENT_SOURCE_REQUIRED','INGRESS_OPERATION_FIVE_TARGET_RECEIPT_REQUIRED',
@@ -747,17 +748,48 @@ async function operate({db,auth,p,phase,op,authorityBlob,read=fs.readFileSync,re
   }
   throw Object.assign(Error('INGRESS_OPERATION_NEEDS_READBACK_OWNER'),{code:'INGRESS_OPERATION_NEEDS_READBACK_OWNER'});
 }
-function refreshAuthority(p){
-  const token=process.env.GH_TOKEN;assert.ok(token,'INGRESS_GITHUB_READ_CREDENTIAL_REQUIRED');
-  // No token is echoed, persisted or placed in a shell command.
-  const header='Authorization: basic '+Buffer.from('x-access-token:'+token).toString('base64');
-  execFileSync('git',['-c','http.https://github.com/.extraheader='+header,'fetch','--no-tags',
-    'https://github.com/paulaosoriof86/orbit360-core.git','recovery/fase-a-clean-20260831'],{stdio:'pipe',timeout:30000});
-  const head=execFileSync('git',['rev-parse','FETCH_HEAD'],{encoding:'utf8'}).trim();
-  execFileSync('git',['merge-base','--is-ancestor',p.sourceSha,head],{stdio:'pipe'});
-  assert.equal(execFileSync('git',['diff','--name-only',p.sourceSha,head,'--',...g.PINNED_OWNER_PATHS],{encoding:'utf8'}).trim(),'',
+function nativeExecution(p,env=process.env){
+  assert.ok(p?.executionProvider===undefined||p.executionProvider==='CLOUD_BUILD','INGRESS_EXECUTION_PROVIDER_UNKNOWN');
+  const selected=env.GRAVICENTRA_BUILD_PROVIDER;
+  assert.ok(selected===undefined||selected===''||selected==='CLOUD_BUILD','INGRESS_EXECUTION_PROVIDER_UNKNOWN');
+  const native=p.executionProvider==='CLOUD_BUILD';
+  assert.equal(native,selected==='CLOUD_BUILD','INGRESS_EXECUTION_PROVIDER_MISMATCH');
+  if(native)for(const key of Object.keys(env))if(key.startsWith('GITHUB_'))
+    assert.ok(!env[key],'INGRESS_NATIVE_GITHUB_CONTEXT_FORBIDDEN');
+  return native;
+}
+async function verifyExecutionRuntime(p,{phase,action,env=process.env,cwd=process.cwd(),verifyNative,verifyOwners=g.verifyPinnedOwners}={}){
+  if(!nativeExecution(p,env)){
+    assert.equal(env.GITHUB_REPOSITORY,'paulaosoriof86/orbit360-core');
+    assert.equal(env.GITHUB_REF_NAME,'recovery/fase-a-clean-20260831');
+    return null;
+  }
+  // The operational provider owner verifies real Build UUID/config/plan,
+  // authority head and SDK runtime identity before any SDK/provider operation.
+  // Its exact closed QA allowlist keeps frozen product source separate from
+  // mechanism-only credential changes; it does not widen product pins.
+  assert.equal(typeof verifyOwners,'function','INGRESS_NATIVE_PIN_OWNER_REQUIRED');
+  verifyOwners(p,{head:'HEAD',cwd});
+  const verify=verifyNative||require('./gravicentra-i6-6-cloud-build-operational.cjs').verifyRuntimeAuthority;
+  return await verify(p,{phase,action});
+}
+function refreshAuthority(p,{env=process.env,cwd=process.cwd(),exec=execFileSync,verifyOwners=g.verifyPinnedOwners}={}){
+  const native=nativeExecution(p,env),remote='https://github.com/paulaosoriof86/orbit360-core.git',branch='recovery/fase-a-clean-20260831';
+  let args=['fetch','--no-tags',remote,branch];
+  if(!native){
+    const token=env.GH_TOKEN;assert.ok(token,'INGRESS_GITHUB_READ_CREDENTIAL_REQUIRED');
+    // Preserve the existing authenticated GitHub path; the native runtime
+    // reads this same public repository without any borrowed GitHub identity.
+    const header='Authorization: basic '+Buffer.from('x-access-token:'+token).toString('base64');
+    args=['-c','http.https://github.com/.extraheader='+header,...args];
+  }
+  exec('git',args,{cwd,stdio:'pipe',timeout:30000});
+  const head=exec('git',['rev-parse','FETCH_HEAD'],{cwd,encoding:'utf8'}).trim();
+  exec('git',['merge-base','--is-ancestor',p.sourceSha,head],{cwd,stdio:'pipe'});
+  if(native){assert.equal(typeof verifyOwners,'function','INGRESS_NATIVE_PIN_OWNER_REQUIRED');verifyOwners(p,{head,cwd});}
+  else assert.equal(exec('git',['diff','--name-only',p.sourceSha,head,'--',...g.PINNED_OWNER_PATHS],{cwd,encoding:'utf8'}).trim(),'',
     'INGRESS_SOURCE_OR_QA_CHANGED_DURING_CONFIGURATION');
-  const read=file=>execFileSync('git',['show',head+':'+file]);
+  const read=file=>exec('git',['show',head+':'+file],{cwd});
   return{head,read,control:JSON.parse(read(g.CONTROL)),authorityBlob:gitBlob(read(g.CONTROL))};
 }
 async function waitConfiguration({db,auth,p,phase,requireFrom,stopAtProbe=false,deadlineMs=Date.now()+20*60*1000}){
@@ -835,10 +867,11 @@ async function rollback({db,auth,p,phase,requireFrom,authorityBlob,directory=pro
   return report;
 }
 async function main(){
-  assert.equal(process.env.GITHUB_REPOSITORY,'paulaosoriof86/orbit360-core');assert.equal(process.env.GITHUB_REF_NAME,'recovery/fase-a-clean-20260831');
   const [action,phase]=process.argv.slice(2);assert.ok(['before-deploy','snapshot-trigger','capture-trigger','initialize-closed','operate','wait-probe','wait-config','rollback'].includes(action));
-  const control=JSON.parse(fs.readFileSync(g.CONTROL)),p=resolveCandidate(control,phase,action==='operate');scope.verifySourcePins(p);
-  assert.equal(execFileSync('git',['diff','--name-only',p.sourceSha,'HEAD','--',...g.PINNED_OWNER_PATHS],{encoding:'utf8'}).trim(),'',
+  const control=JSON.parse(fs.readFileSync(g.CONTROL)),p=resolveCandidate(control,phase,action==='operate');
+  await verifyExecutionRuntime(p,{phase,action});
+  scope.verifySourcePins(p);
+  if(p.executionProvider!=='CLOUD_BUILD')assert.equal(execFileSync('git',['diff','--name-only',p.sourceSha,'HEAD','--',...g.PINNED_OWNER_PATHS],{encoding:'utf8'}).trim(),'',
     'INGRESS_CHECKOUT_SOURCE_OR_QA_CHANGED');
   const root=process.env.I66_PACKAGE_ROOT;assert.ok(root,'INGRESS_EXACT_PACKAGE_REQUIRED');
   const requireFrom=createRequire(path.join(root,'bundle/backend/package.json'));
@@ -883,4 +916,4 @@ module.exports={trafficV1Url,trafficV1Preimage,trafficV1Data,trafficV1Request,fn
   optionalFunction,snapshotTrigger,captureTrigger,rollbackCreatedTrigger,closeForRollback,rollback,
   proveCurrentDeployment,configAuthority,verifyProbeReadback,runtimeServices,beforeDeploy,initializeClosed,operate,
   verifyProjectIamUnchanged,validateProjectIamReadback,
-  proofContext,canonicalRefs,snapshotRefs,readResult,inspectCanonical,captureOrVerify,refreshAuthority,waitConfiguration};
+  proofContext,canonicalRefs,snapshotRefs,readResult,inspectCanonical,captureOrVerify,nativeExecution,verifyExecutionRuntime,refreshAuthority,waitConfiguration};

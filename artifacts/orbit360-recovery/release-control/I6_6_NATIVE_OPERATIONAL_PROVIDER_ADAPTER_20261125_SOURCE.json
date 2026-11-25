@@ -1,0 +1,332 @@
+{
+  "schema": "GI_I66_NATIVE_OPERATIONAL_PROVIDER_ADAPTER_PREPARATION_V1",
+  "status": "LOCAL_IMPLEMENTATION_AND_INDEPENDENT_REVIEW_PASS_RUNTIME_NOT_EXECUTED",
+  "baseCommit": "5f4ceda972b05e4b1687e12dbd4cdc95084fc217",
+  "baseTree": "6a7feea0958162908802b38e66cb86a6253be632",
+  "candidateTree": "642a8d0ecb8e925a1cef8c62ade23b05b94b1691",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "productSourceSha": "16e3a70baf4e31ef8453173990f32a398c65e59b",
+  "requestVersion": 35,
+  "patch": {
+    "path": "/workspace/scratch/866014daf534/cloud-build35-native-release-final.patch",
+    "sha256": "5e4e857d046c19a926f24b988f25d799bec4e4997c5b77512d091d7a7db85001",
+    "bytes": 246132,
+    "fileCount": 26
+  },
+  "snapshot": "/workspace/scratch/866014daf534/cloud-build35-native-release-final",
+  "files": [
+    {
+      "path": "tools/gravicentra-i6-6-cloud-build-operational.cjs",
+      "beforeBlob": null,
+      "afterBlob": "0a5e9f2df0c65d306b9c9ae9efb9902bd78e3a23",
+      "sha256": "25b631fcef594c1a30ba18d9eea53e73d1acd59ca511b07c3ba4a59ca6a6f0cc",
+      "bytes": 63650
+    },
+    {
+      "path": "tools/gravicentra-i6-6-cloud-build-operational.test.cjs",
+      "beforeBlob": null,
+      "afterBlob": "d93f70c8f22dfa5c303b54a42673121eba8fadce",
+      "sha256": "bf690df05521c0f84f3a9b806c547696b93c7e87069ef322f8e5cbf315336fc0",
+      "bytes": 24525
+    },
+    {
+      "path": "tools/gravicentra-i6-6-operational-release-candidate.cjs",
+      "beforeBlob": "9e91c35bed88b98bc4a3805abb826d632e51b7bf",
+      "afterBlob": "c0f40e30a714d7f02148694853c44b9c9ab09ea0",
+      "sha256": "965e130cee3d8f1f5a56d6299fe10f9e3e1caff8165c4fda78091fa1a933d496",
+      "bytes": 67121
+    },
+    {
+      "path": "tools/gravicentra-i66-make-release-scope.cjs",
+      "beforeBlob": "40c215ca67e17f9e1287ba562b0abfca1b55077d",
+      "afterBlob": "685c107180ede11f13c34f961d52afcf484df8ef",
+      "sha256": "c905cc3c07d99784aef5840863ab7b55c785c19b7b8777e208cce43a75f737c0",
+      "bytes": 22206
+    },
+    {
+      "path": "tools/gravicentra-i66-make-lead-protected-executor.cjs",
+      "beforeBlob": "a9bb334cebed6332dfbe46a757c23424d45ba17d",
+      "afterBlob": "a7154c2196c468403a739f9d8a5b9a48581634e1",
+      "sha256": "98d9b23952ae7fb5ed6546bd48a79e2fed624a932e43102131f14aade6295275",
+      "bytes": 78548
+    },
+    {
+      "path": "tools/gravicentra-i66-make-lead-protected-executor.test.cjs",
+      "beforeBlob": "8587b408de5bafae576d038adeaeb1fb2c6bd245",
+      "afterBlob": "6cda3709e9309eef0ec48a2bcae1a4699ff1c868",
+      "sha256": "cf70ebe5be06776ea6395e4fb1de535771727933c629a8527245719fb5d934e0",
+      "bytes": 66042
+    },
+    {
+      "path": "tools/gravicentra-i66-signed-qa-runtime-auth.cjs",
+      "beforeBlob": null,
+      "afterBlob": "3e1cf099f026898ea0bbfcae75d540e2873c852c",
+      "sha256": "2095da4aeab15efb98b2af48758c8e7bb7e1348c1cbab6a3f57fcea1a3d19471",
+      "bytes": 3908
+    },
+    {
+      "path": "tools/gravicentra-i66-signed-qa-runtime-auth.test.cjs",
+      "beforeBlob": null,
+      "afterBlob": "2a736f7ead04ce9493885d5b8f282a4e0479f066",
+      "sha256": "bc6ce1adb269dc4d24a11dfab9836c1fa3f4f81c93f4ba8f2d3c1fb4c3c4f77f",
+      "bytes": 10418
+    },
+    {
+      "path": "tools/gravicentra-i66-privileged-role-signed-ui-permissions-readonly.cjs",
+      "beforeBlob": "b4453e733589635a1d4e30cefae159a6fc59fcd4",
+      "afterBlob": "56e6e38dff30b9ccf9ca190bc7c0049413599f40",
+      "sha256": "89954c126e9bd97c4d11bc435ccd614a6c90a5dd0ba68a28848932b5e9059394",
+      "bytes": 10185
+    },
+    {
+      "path": "tools/gravicentra-i6-6-carlos-real-signed-synthetic-preview-uat.cjs",
+      "beforeBlob": "4bdcff0b62961e2c4905a73330609c10c70672c4",
+      "afterBlob": "8886304d9cb5db87059804d6df6ac6606230ee05",
+      "sha256": "6ca45719a14ba8ec93e22d20449ea1b81fe543ebb1e6ec2103fbf1d5dc24ca26",
+      "bytes": 13930
+    },
+    {
+      "path": "tools/gravicentra-i6-6-advisor-payables-signed-uat.cjs",
+      "beforeBlob": "076dd4a82444cd46e1e62999d11e8eb765ead0a9",
+      "afterBlob": "a3eb9a6fce12bb042f2f6c68173357f937d20cf7",
+      "sha256": "d983594b224115626500aa5dbda8ad9daf93ed138fb8426015dc9d78488bd502",
+      "bytes": 105755
+    },
+    {
+      "path": "tools/gravicentra-i6-6-proposal-application-signed-uat.cjs",
+      "beforeBlob": "9b23ee835360ca5cc206684c17e27466a24c9270",
+      "afterBlob": "9f6eab1278c6b4fb935e423dd52db2330441b772",
+      "sha256": "3e0b02806068af2147562e576dbe8abbfcc80f669dcc747afe677c8f0b9f8867",
+      "bytes": 65339
+    },
+    {
+      "path": "tools/gravicentra-i6-6-carlos-paula-live-direct-renewal-synthetic-uat.cjs",
+      "beforeBlob": "49b5da17f6046deb52aebb2baf030d877f43b895",
+      "afterBlob": "6d75eea2086e0e6f227e6db41bffc1332fffa05a",
+      "sha256": "b356af9ae5d6f19567b6b44b4ce29dadbffb27e66defe36a86f19b0b57de5cc7",
+      "bytes": 102839
+    },
+    {
+      "path": "tools/gravicentra-i6-6-carlos-paula-live-synthetic-ops-leads-uat.cjs",
+      "beforeBlob": "cdab5a1f2e12dfce569dcda3474a7b68cf3d884c",
+      "afterBlob": "dd53a6056731d4b1c28c48d9efc67953f17a8d94",
+      "sha256": "16fd3c9a5b5e5bd32af3cb1f94a5367618b8be3216448e5b449823d66cd6e4b7",
+      "bytes": 17285
+    },
+    {
+      "path": "tools/gravicentra-i66-privileged-role-exact-live-transport.mjs",
+      "beforeBlob": "495b0b063619a32492f52a24cbc114213d75f0b5",
+      "afterBlob": "10f2a585ea654246c51b5242eda1cd6fd7e41720",
+      "sha256": "1fce0741f5ad767b3c49c89331cfc891bc93bf7937127253802373000add45b6",
+      "bytes": 8223
+    },
+    {
+      "path": "tools/gravicentra-i66-privileged-role-exact-live-transport-adc.test.cjs",
+      "beforeBlob": null,
+      "afterBlob": "7ba17d73e2e97eac8fd2153561aec771069d37a9",
+      "sha256": "f29cab379272109e869fe1fc446bcaa6b462bcc544400e542e922182f896b968",
+      "bytes": 9023
+    },
+    {
+      "path": "tools/gravicentra-i66-live-performance-readonly.mjs",
+      "beforeBlob": "ae25d4088eec88e172dc6b4fcfb09f2a7dffea25",
+      "afterBlob": "f5d6bc5a13d6b9a3798c7d1332267535f9667c94",
+      "sha256": "1bed32f4da210ecf28624b2c16f38becafda56c0ee26026ba45c39ad04578f3c",
+      "bytes": 99769
+    },
+    {
+      "path": "tools/gravicentra-i6-6-native-financial-readonly-adc.test.cjs",
+      "beforeBlob": null,
+      "afterBlob": "bf6848fbd15f60134528a0b731fa5f0da3eb129f",
+      "sha256": "648b55b3bc5d95415812907e896847f169e4d297101f95d72ece30d76f6ffb14",
+      "bytes": 8007
+    },
+    {
+      "path": "tools/gravicentra-i66-frontend-promotion-owner.cjs",
+      "beforeBlob": "7043053dbcccf9b2b5688c85ff8df140f3fedb7f",
+      "afterBlob": "43a43d12a359b3026c3f3913bbbbfee78d0653aa",
+      "sha256": "af2663d79003cdef683ad0a8805cab472ccc769133d2ffdfcafe4b1f377f4423",
+      "bytes": 75464
+    },
+    {
+      "path": "tools/gravicentra-i66-frontend-promotion-transaction.cjs",
+      "beforeBlob": "9a9449f04ac77b2f88c187df46bed85ff8a15b4f",
+      "afterBlob": "4e0dfeea5f74d932c7586cfcc315cbeef6e69065",
+      "sha256": "8ec0f6f7025f3df7b4b999f6cc91cb491db5ada1f162ab5958cbc7ddfefd2114",
+      "bytes": 14605
+    },
+    {
+      "path": "tools/gravicentra-i66-frontend-hosting-io.cjs",
+      "beforeBlob": "936e8aaa8681cd9c655611a17fa98b5647474c9f",
+      "afterBlob": "8397f5b181e5bf339ed1e061d690e78276ba3640",
+      "sha256": "700f4309e6dd2060093c3d230e427e77b1878c338a211fe20b6f4c5500ec178b",
+      "bytes": 6125
+    },
+    {
+      "path": "tools/gravicentra-i66-frontend-control.cjs",
+      "beforeBlob": "f1f21bc42b44b0b6262e1bfafe4780216ca01132",
+      "afterBlob": "449094d6ef47abf7cc98d269a2534c9b95dbe6f6",
+      "sha256": "6f76f2ea030269932fa4b2ec33b80c5c7e7c887d232d0ad625d824a48d8efcea",
+      "bytes": 68119
+    },
+    {
+      "path": "tools/gravicentra-i6-6-cloud-build-signed-cas.cjs",
+      "beforeBlob": null,
+      "afterBlob": "f1d74b76e966b2642da868de84c802e52dab2ee7",
+      "sha256": "ffa3f8b48fcb3e06919d3a9ca182f41229eb0935b8377f876348fc4891ec81a0",
+      "bytes": 11485
+    },
+    {
+      "path": "tools/gravicentra-i6-6-cloud-build-signed-cas.test.cjs",
+      "beforeBlob": null,
+      "afterBlob": "5c2cfca89980725846522af23fa4c5514ed1066c",
+      "sha256": "731c79c0b39538741bf7a2ca7e1ee054bc9b3b0e8066a53ea3ecc8532117a148",
+      "bytes": 11688
+    },
+    {
+      "path": "tools/gravicentra-i6-6-native-promotion-artifact-binding.test.cjs",
+      "beforeBlob": null,
+      "afterBlob": "9611b705c5c68a9589bcd27b607b7b2372fb9102",
+      "sha256": "f83f7bfc78ca79aeb9735a79cbc4a6332ad00fb87611bc48225d72fb738cdd7b",
+      "bytes": 7899
+    },
+    {
+      "path": "tools/gravicentra-i6-6-carlos-paula-live-synthetic-ops-leads-uat-adc.test.cjs",
+      "beforeBlob": null,
+      "afterBlob": "e5845abace321de868dc8dc2eea5dc1d14d48e4d",
+      "sha256": "3f443d575e1d1f1e8ba7a674ad0a0cbe1fdd94cee3da06f414d537ecb69855a0",
+      "bytes": 6153
+    }
+  ],
+  "localRuntime": "v24.22.3",
+  "logs": [
+    {
+      "path": "/workspace/scratch/866014daf534/cloud-build35-native-operational-final-tests.log",
+      "sha256": "b35c6d54ac3a8a99b63df689f37f58a5a6c82608d2c295be57d1720da023c732",
+      "bytes": 3667,
+      "counts": {
+        "tests": 44,
+        "pass": 44,
+        "fail": 0,
+        "skipped": 0
+      }
+    },
+    {
+      "path": "/workspace/scratch/866014daf534/cloud-build35-native-operational-final-integrated-tests.log",
+      "sha256": "3f8d2326967bb8c141709fbd0c37d02fcde4a32bd4c226b0b466eb996eaa4a0f",
+      "bytes": 42321,
+      "counts": {
+        "tests": 447,
+        "pass": 447,
+        "fail": 0,
+        "skipped": 0
+      }
+    },
+    {
+      "path": "/workspace/scratch/866014daf534/cloud-build35-native-candidate-baseline.log",
+      "sha256": "5190cd6f129d67fa8f29e53bccf2b2ae0af0275d1bf35eecaa21066f5ad2bf73",
+      "bytes": 1385,
+      "counts": {
+        "tests": 1,
+        "pass": 0,
+        "fail": 1,
+        "skipped": 0
+      }
+    },
+    {
+      "path": "/workspace/scratch/866014daf534/cloud-build35-native-candidate-after.log",
+      "sha256": "f7854b78c8b42e6022dbf175b766514f249710403e2e73d4e7b0150289bee205",
+      "bytes": 243,
+      "counts": {
+        "tests": 1,
+        "pass": 1,
+        "fail": 0,
+        "skipped": 0
+      }
+    },
+    {
+      "path": "/workspace/scratch/866014daf534/cloud-build35-operational-review-closures.log",
+      "sha256": "4217d383989331532b80873ef5f6337e9d849f564ccab3e9b67fd4fdd9b52c48",
+      "bytes": 977,
+      "counts": {
+        "tests": 7,
+        "pass": 7,
+        "fail": 0,
+        "skipped": 0
+      }
+    },
+    {
+      "path": "/workspace/scratch/866014daf534/cloud-build35-operational-review-final-delta.log",
+      "sha256": "21aae2df0e97ffa04b7a08b807b668d20ba34e177d6336d98f50a3e59e54e266",
+      "bytes": 376,
+      "counts": {
+        "tests": 2,
+        "pass": 2,
+        "fail": 0,
+        "skipped": 0
+      }
+    },
+    {
+      "path": "/workspace/scratch/866014daf534/native-workflow-control-env-review.log",
+      "sha256": "407f6ce60aae57c54b76e6060ba05ae6bcddf12d6412ceeb1cb18fba8183e102",
+      "bytes": 13273,
+      "counts": {
+        "tests": 130,
+        "pass": 130,
+        "fail": 0,
+        "skipped": 0
+      }
+    }
+  ],
+  "causalBaseline": {
+    "test": "native candidate preserves five targets and every existing semantic gate with actual typed provider identities",
+    "beforeSource": "16e3a70baf4e31ef8453173990f32a398c65e59b",
+    "beforePass": 0,
+    "beforeFail": 1,
+    "beforeCause": "I66_OPERATIONAL_BUILD_RUN_PIN rejects an authentic Cloud Build UUID",
+    "afterPass": 1,
+    "afterFail": 0
+  },
+  "scope": {
+    "productPathsChanged": 0,
+    "checkpointStateTransportChanged": 0,
+    "approvedProductManifestChanged": 0,
+    "hostingPackageRebuilt": false,
+    "request35Changed": false,
+    "previousReceiptsChanged": false,
+    "newRepositoryOrFirebase": false,
+    "githubIdentifiersInvented": false,
+    "githubSignatureBypass": false,
+    "newIamGrants": false,
+    "runtimeProviderWrites": 0
+  },
+  "invariants": [
+    "Same retained immutable package and SHA256/generation; no build or archive patch",
+    "Actual Cloud Build UUID/config/resolved source/SDK principal/image digests and native GCS objects/time windows/hash/log marker",
+    "Unchanged five-function target lists, explicit secret-only IAM scope and Make CLOSED/probe/config/synthetic restore gates",
+    "Literal Preview/LIVE workflow blocks from frozen source; 63/113 direct-form profiles and 48 financial stages preserved",
+    "Same actual Preview build binds signed and financial evidence",
+    "Full public Git history and exact mechanism before/postimages before action; concurrent branch drift holds",
+    "Real GitHub verified signature, exact parent/tree/blob set for each existing CAS transition",
+    "COMMITTED only after backend/readback/signed/financial proofs; full I6.6 remains open"
+  ],
+  "runtimePending": [
+    "Publish mechanism code by parent CAS and retain its actual commit SHA",
+    "Compose existing operational/financial authority from authentic package/Hosting receipts and current backend/Make preimages; no fake nonce, function revision, financial or signed evidence",
+    "Coordinate browser/provider access; root observed another protected console session",
+    "SDK ADC effective permissions and custom-token signing on actual worker",
+    "Actual backend Preview, Make controls, signed drivers and financial48",
+    "Authenticated GitHub signed CAS path for existing journal/receipt transitions",
+    "Promote same retained artifact and five functions; signed LIVE113/financial48/backend100percent/readback; original rollback and COMMITTED"
+  ],
+  "upstreamActualEvidenceReportedByParent": {
+    "packageBuildId": "792b85b8-f1fb-4353-9ef8-b9f1e1f94065",
+    "packageSha256": "1c562090b276b5aee913f9109aed5903f0450ffb582d89e0347a69853c1223ec",
+    "packageGeneration": "1795599998078235",
+    "hostingBuildId": "cab7f997-b499-4b84-9ed1-e546b33af1b2",
+    "hostingVersion": "sites/ays-orbit-360-lab/versions/a3887d6ea17a9393",
+    "status": "EXACT_EXISTING_PREVIEW_RETAINED_READBACK_PASS_SIGNED_QA_PENDING",
+    "notClaimedAsNewAdapterRuntimePass": true
+  }
+}

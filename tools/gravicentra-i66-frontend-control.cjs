@@ -376,10 +376,10 @@ function physicalGuard(control,state,transport,io){
   assert.equal(head.hostedFilesEachOrigin,target.files,'I66_HEAD_FILE_COUNT_DRIFT');
   assert.equal(receipt.preview.files,target.files,'I66_PREVIEW_FILE_COUNT_DRIFT');
   assert.equal(receipt.preview.hostingVersion,target.hostingVersion,'I66_PREVIEW_VERSION_DRIFT');
-  for(const key of ['sourceSha','sourceTree','manifestBlob','compositionBlob','artifactId','artifactDigest','buildId','buildRunId','previewUrl','hostingVersion']){
+  for(const key of ['executionProvider','sourceSha','sourceTree','manifestBlob','compositionBlob','artifactId','artifactDigest','buildId','buildRunId','previewUrl','hostingVersion']){
     assert.equal(head[key],target[key],'I66_HEAD_TARGET_DRIFT_'+key);
   }
-  for(const key of ['sourceSha','buildId','artifactId','artifactDigest'])assert.equal(physical[key],target[key],'I66_TRANSPORT_TARGET_DRIFT_'+key);
+  for(const key of ['executionProvider','sourceSha','buildId','artifactId','artifactDigest'])assert.equal(physical[key],target[key],'I66_TRANSPORT_TARGET_DRIFT_'+key);
   assert.equal(physical.liveHostingVersion,target.hostingVersion);
   assert.equal(physical.previewRunId,target.buildRunId);
   assert.equal(physical.readbackEachOrigin,target.files,'I66_TRANSPORT_FILE_COUNT_DRIFT');
@@ -447,7 +447,7 @@ function closeFiles(read,j,body){
     changes[P.legacy]=legacy;cp.i66PreversionedControlViewBlob=blob(serial(legacy));
   }
   const receiptPath=genName(n,'RECEIPT');
-  const head={generation:n,gate:'I6.6',scope:'FRONTEND_ONLY',status:'FOCAL_FRONTEND_LIVE_UI_VERIFIED',sourceSha:t.sourceSha,sourceTree:t.sourceTree,
+  const head={generation:n,gate:'I6.6',scope:'FRONTEND_ONLY',...(t.executionProvider===undefined?{}:{executionProvider:t.executionProvider}),status:'FOCAL_FRONTEND_LIVE_UI_VERIFIED',sourceSha:t.sourceSha,sourceTree:t.sourceTree,
     compositionBlob:t.compositionBlob,manifestBlob:t.manifestBlob,artifactId:t.artifactId,artifactDigest:t.artifactDigest,
     hostingVersion:t.hostingVersion,buildId:t.buildId,hostedFilesEachOrigin:t.files,previewUrl:t.previewUrl,buildRunId:t.buildRunId,
     rollback:j.request.previous.hostingVersion,receiptPath,receiptGitBlobSha:body.receipt.blob,receiptCommit:body.receipt.commit,
@@ -458,7 +458,7 @@ function closeFiles(read,j,body){
   cp.nextAction='I6.6 continúa después de la publicación focal '+t.buildId+'. '+c.next;
   state.currentExecutionDecisionPointer=P.cp+'#i66FrontendReleaseHead';state.currentPhysicalFrontend=head;
   transport.previousPhysicalHostingRelease=transport.currentPhysicalHostingRelease;
-  transport.currentPhysicalHostingRelease={sourceSha:t.sourceSha,buildId:t.buildId,artifactId:t.artifactId,artifactDigest:t.artifactDigest,
+  transport.currentPhysicalHostingRelease={...(t.executionProvider===undefined?{}:{executionProvider:t.executionProvider}),sourceSha:t.sourceSha,buildId:t.buildId,artifactId:t.artifactId,artifactDigest:t.artifactDigest,
     previewRunId:t.buildRunId,signedPreviewRunId:t.previewUiRunId||null,liveCloneRunId:body.receipt.runId,liveHostingVersion:t.hostingVersion,
     readbackEachOrigin:t.files,receipt:receiptPath,backendFunctionsChanged:0,fullI66ProductionAccepted:false,status:head.status};
   cp.i66OperationalContinuation20261115.currentPhysicalHostingRelease=transport.currentPhysicalHostingRelease;
@@ -539,12 +539,12 @@ function compositeReceipt(j,runId){
     assert.match(j.financialUi.receiptBlob,/^[a-f0-9]{40}$/);assert.match(j.financialUi.reportSha256,/^[a-f0-9]{64}$/);
   }
   const backendCount=require('./gravicentra-i6-6-operational-release-candidate.cjs').targetsForCandidate(p,'live').length;
-  const backend={generation:j.generation,gate:'I6.6',scope:'COMPOSITE',status:'SIGNED_LIVE_VERIFIED',
+  const backend={generation:j.generation,gate:'I6.6',scope:'COMPOSITE',status:'SIGNED_LIVE_VERIFIED',...(p.executionProvider===undefined?{}:{executionProvider:p.executionProvider}),
     sourceSha:p.sourceSha,artifactId:p.artifactId,artifactDigest:p.artifactDigest,buildId:p.buildId,
     functionsChanged:backendCount,revisions:proof.backendRevisions,liveRunId:proof.runId,
     proofPath,proofSha256:hash(proofText),rollbackHostingVersion:proof.previousHostingVersion,
     fullI66ProductionAccepted:false};
-  return {schema:'GI_I66_SIGNED_COMPOSITE_RECEIPT_V1',scope:'COMPOSITE',generation:j.generation,
+  return {schema:'GI_I66_SIGNED_COMPOSITE_RECEIPT_V1',scope:'COMPOSITE',generation:j.generation,...(p.executionProvider===undefined?{}:{executionProvider:p.executionProvider}),
     target:j.request.target,previous:j.request.previous,authorization:j.request.approvalBlob,
     scopeId:makeIngress?'I66_COMPOSITE_FIVE_FUNCTIONS_CLOSED_MAKE_SIGNED':'I66_COMPOSITE_FOUR_FUNCTIONS_SIGNED',preview:j.preview,physical:j.physical,
     ui:{result:'PASS',buildId:p.buildId,receiptBlob:blob(proofText),source:'VALIDATED_SIGNED_COMPOSITE_LIVE_PROOF'},
@@ -585,6 +585,7 @@ function closeCompositeFiles(read,j,body){
   continuation.legalSuccessorAcceptance='COMPOSITE_PREVIEW_AND_LIVE_IDENTICAL_V2_NORMAL_UI_RELOAD_VERIFIED';
   if(state.currentLiveSuccessorAcceptance)state.previousLiveSuccessorAcceptance=state.currentLiveSuccessorAcceptance;
   state.currentLiveSuccessorAcceptance={status:'CURRENT_COMPOSITE_EXACT_SIGNED_LIVE_PASS_FULL_I66_HOLD',
+    ...(head.executionProvider===undefined?{}:{executionProvider:head.executionProvider}),
     gate:'I6.6',scope:'COMPOSITE',generation:j.generation,sourceSha:head.sourceSha,buildId:head.buildId,
     buildRunId:head.buildRunId,artifactId:head.artifactId,artifactDigest:head.artifactDigest,hostingVersion:head.hostingVersion,
     liveRunId:receipt.runId,receipt:head.receiptPath,receiptGitBlobSha:head.receiptGitBlobSha,
@@ -597,6 +598,7 @@ function closeCompositeFiles(read,j,body){
   progress.consumedPreviewRequest=transport.frontendPreviewRequest;
   transport.lastConsumedFrontendPreviewRequest=transport.frontendPreviewRequest;
   progress.releaseExecution={status:makeIngress?'COMPOSITE_FIVE_FUNCTIONS_CLOSED_INGRESS_SIGNED_LIVE_ACCEPTED':'COMPOSITE_FOUR_FUNCTIONS_SIGNED_LIVE_ACCEPTED',
+    ...(head.executionProvider===undefined?{}:{executionProvider:head.executionProvider}),
     sourceSha:head.sourceSha,buildId:head.buildId,buildRunId:head.buildRunId,
     artifactId:head.artifactId,artifactDigest:head.artifactDigest,artifactBuilt:true,
     previewSignedPass:true,livePromoted:true,signedPreviewRunId:j.request.candidate.previewQa.runId,
@@ -616,6 +618,7 @@ function closeCompositeFiles(read,j,body){
       receiptPath:head.receiptPath,acceptanceScope:'RELEASE_TIME_ONLY',realLeadAcceptanceNotIncluded:true,fullA13Accepted:false};
     progress.previousFrontendBalanceCorrection=progress.frontendBalanceCorrection;
     progress.frontendBalanceCorrection={status:'LATEST_APPROVED_VERSION_LIVE_PASS_SCOPED_FULL_I66_OPEN',
+      ...(head.executionProvider===undefined?{}:{executionProvider:head.executionProvider}),
       scopeId:'SIX_RECEIPT_CURRENT_BALANCE_READONLY',generation:j.generation,sourceSha:head.sourceSha,
       buildId:head.buildId,artifactId:head.artifactId,artifactDigest:head.artifactDigest,
       preview:{...receipt.financialPreviewUi,stageCount:48,scopeOnly:true},

@@ -7,7 +7,14 @@ const artDigest=x=>/^sha256:[a-f0-9]{64}$/.test(x);
 const version=x=>/^sites\/ays-orbit-360-lab\/versions\/[a-zA-Z0-9_-]+$/.test(x);
 function releaseBinding(release) {
   assert.ok(gitSha(release.sourceSha)&&gitSha(release.sourceTree)&&gitSha(release.manifestBlob)&&gitSha(release.compositionBlob),'RELEASE_SOURCE_BINDING');
-  assert.ok(artDigest(release.artifactDigest)&&Number.isSafeInteger(release.artifactId)&&release.artifactId>0,'RELEASE_ARTIFACT_BINDING');
+  assert.ok(artDigest(release.artifactDigest),'RELEASE_ARTIFACT_BINDING');
+  if(release.executionProvider===undefined){
+    assert.ok(Number.isSafeInteger(release.artifactId)&&release.artifactId>0,'RELEASE_ARTIFACT_BINDING');
+  }else{
+    assert.equal(release.executionProvider,'CLOUD_BUILD','RELEASE_EXECUTION_PROVIDER_UNKNOWN');
+    require('./gravicentra-i6-6-cloud-build-preview.cjs').artifactIdentity(
+      release.sourceSha,release.buildRunId,release.artifactId,release.artifactDigest);
+  }
   assert.ok(version(release.hostingVersion)&&release.buildId&&Number.isSafeInteger(release.files)&&release.files>0,'RELEASE_HOSTING_BINDING');
   return release;
 }
@@ -101,6 +108,8 @@ function validateCompositeProof(request,proof){
   assert.equal(request.scope,'COMPOSITE','COMPOSITE_SCOPE_REQUIRED');
   const g=require('./gravicentra-i6-6-operational-release-candidate.cjs'),p=request.candidate;
   assert.equal(p?.opsLeadsComposite,true,'COMPOSITE_FOUR_FUNCTION_CANDIDATE_REQUIRED');
+  assert.equal(request.target.executionProvider,p.executionProvider,'COMPOSITE_TARGET_IDENTITY_executionProvider');
+  assert.equal(request.previous.executionProvider,p.currentLive?.executionProvider,'COMPOSITE_PREDECESSOR_executionProvider');
   g.validateLiveProof(p,proof);
   const count=g.targetsForCandidate(p,'live').length;
   assert.equal(proof.backendRevisions.length,count,p.makeIngressComposite===true?'COMPOSITE_FIVE_EFFECTIVE_REVISIONS_REQUIRED':'COMPOSITE_FOUR_EFFECTIVE_REVISIONS_REQUIRED');
@@ -124,7 +133,10 @@ function validateCompositeProof(request,proof){
 }
 function compositeFinancialUiReceipt(request,journal,report){
   const b=request.financialQa;
+  if(request.target.executionProvider!==undefined)
+    assert.equal(request.target.executionProvider,'CLOUD_BUILD','RELEASE_EXECUTION_PROVIDER_UNKNOWN');
   return {schema:'GI_I66_FRONTEND_FINANCIAL_READONLY_UI_RECEIPT_V1',generation:journal.generation,scopeId:b.scopeId,
+    ...(request.target.executionProvider===undefined?{}:{executionProvider:request.target.executionProvider}),
     releaseScope:'COMPOSITE',authorityBlob:b.authorityBlob,parentAuthorityBlob:b.parentAuthorityBlob,
     sourceSha:request.target.sourceSha,artifactDigest:request.target.artifactDigest,buildId:request.target.buildId,
     physicalPhaseKey:journal.key,result:'PASS',readOnly:true,fullA04Accepted:false,fullA12Passed:false,
@@ -139,6 +151,8 @@ function validateCompositeFinancialUi(request,journal,observed,{committedReadbac
   assert.equal(observed.runId,journal.liveProof.runId);
   assert.equal(observed.receiptPath,require('./gravicentra-i66-frontend-control.cjs').genName(journal.generation,'LIVE_UI'));
   const report=observed.financialQa;
+  assert.equal(observed.executionProvider,request.target.executionProvider,'COMPOSITE_FINANCIAL_UI_PROVIDER_DRIFT');
+  assert.equal(report?.executionProvider,request.target.executionProvider,'COMPOSITE_FINANCIAL_REPORT_PROVIDER_DRIFT');
   require('./gravicentra-i66-frontend-promotion-owner.cjs').validateFinancialReport(report,request.target,'live',
     {authorityBlob:request.financialQa.authorityBlob,parentAuthorityBlob:request.approvalBlob,
       physicalPhaseKey:journal.key,releaseScope:'COMPOSITE'});

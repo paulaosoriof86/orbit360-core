@@ -197,13 +197,19 @@ const checkBuildId = (v,source,label) => {
   assert.match(v,new RegExp('^gi-i66-'+source.slice(0,12)+'-[a-f0-9]{12}$'),label);
 };
 function previewIdentity(p) {
-  checkId(p.buildRunId,'I66_OPERATIONAL_BUILD_RUN_PIN');
+  const cloud=require('./gravicentra-i6-6-cloud-build-operational.cjs');
+  cloud.executionId(p,p.buildRunId,'BUILD_RUN_PIN');
+  if(cloud.native(p))cloud.validateBinding(p);
   checkSha(p.sourceSha,'I66_OPERATIONAL_SOURCE_PIN');
   // Retain the historical channel and permit only the separately source-pinned
   // current-task rollover. Otherwise a new endpoint belongs to this build run.
   const historical=p.previewUrl===PREVIEW&&p.previewChannelId===CHANNEL;
   if(!historical){
-    if(p.previewRollover!==undefined){
+    if(cloud.native(p)){
+      // Native provider evidence pins the same authorized existing channel,
+      // immutable package and complete prior rollover without numeric run IDs.
+      cloud.validateBinding(p);
+    }else if(p.previewRollover!==undefined){
       require('./gravicentra-i6-6-preview-channel-reuse-guard.cjs').validateTechnicalRolloverCandidate(p);
     }else assert.equal(p.previewChannelId,'gi-i66-rc-'+p.buildRunId,'I66_OPERATIONAL_PREVIEW_CHANNEL_RUN_DRIFT');
     assert.match(String(p.previewUrl||''),new RegExp('^https://'+SITE+'--'+p.previewChannelId+'-[a-z0-9]+\\.web\\.app$'),'I66_OPERATIONAL_PREVIEW_ORIGIN_DRIFT');
@@ -323,8 +329,10 @@ function candidateForPhase(control,phase) {
   assert.equal(p.approvedByDirection,true);
   assert.equal(p.status,phase==='preview'?'EXACT_BACKEND_PREVIEW_SIGNED_QA_AUTHORIZED':'EXACT_PREVIEW_SIGNED_LIVE_AUTHORIZED');
   checkSha(p.sourceSha,'I66_OPERATIONAL_SOURCE_PIN');
-  checkId(p.buildRunId,'I66_OPERATIONAL_BUILD_RUN_PIN');
-  checkId(p.artifactId,'I66_OPERATIONAL_ARTIFACT_PIN');
+  const nativeOwner=require('./gravicentra-i6-6-cloud-build-operational.cjs');
+  nativeOwner.executionId(p,p.buildRunId,'BUILD_RUN_PIN');
+  if(nativeOwner.native(p))nativeOwner.validateBinding(p);
+  else checkId(p.artifactId,'I66_OPERATIONAL_ARTIFACT_PIN');
   checkDigest(p.artifactDigest,'I66_OPERATIONAL_DIGEST_PIN');
   previewIdentity(p);
   if(p.previewRollover!==undefined)
@@ -377,9 +385,11 @@ function candidateForPhase(control,phase) {
   assert.notEqual(p.sourceSha,backup.sourceSha,'I66_OPERATIONAL_ALREADY_LIVE_SOURCE');
   if(phase==='live'){
     const q=p.previewQa||{};
-    checkId(q.runId,'I66_OPERATIONAL_PREVIEW_QA_RUN');
+    nativeOwner.executionId(p,q.runId,'PREVIEW_QA_RUN');
+    if(nativeOwner.native(p))assert.equal(q.executionProvider,'CLOUD_BUILD','I66_NATIVE_PREVIEW_PROOF_PROVIDER');
     checkSha(q.headSha,'I66_OPERATIONAL_PREVIEW_QA_HEAD');
-    checkId(q.receiptArtifactId,'I66_OPERATIONAL_PREVIEW_QA_RECEIPT');
+    if(nativeOwner.native(p))nativeOwner.artifactRef(q.receiptArtifactId);
+    else checkId(q.receiptArtifactId,'I66_OPERATIONAL_PREVIEW_QA_RECEIPT');
     checkDigest(q.receiptArtifactDigest,'I66_OPERATIONAL_PREVIEW_QA_RECEIPT_DIGEST');
     assert.equal(q.status,'SIGNED_DRIVERS_DURABLE_READBACK_RELOAD_RESTORE_PASS');
   }
@@ -414,6 +424,8 @@ function continuationForPreflight(control,state,transport) {
   return phase;
 }
 function validateArtifact(p,run,artifact) {
+  if(require('./gravicentra-i6-6-cloud-build-operational.cjs').provider(p))
+    return require('./gravicentra-i6-6-cloud-build-operational.cjs').validatePackageMetadata(p,run,artifact);
   assert.equal(run.id,p.buildRunId);assert.equal(run.conclusion,'success');
   assert.equal(run.head_sha,p.sourceSha);assert.equal(run.path,BUILD_WORKFLOW);
   assert.equal(artifact.id,p.artifactId);assert.equal(artifact.expired,false);
@@ -422,6 +434,8 @@ function validateArtifact(p,run,artifact) {
   assert.equal(artifact.name,'gi-i66-immutable-'+p.sourceSha);
 }
 function validatePreviewQa(p,run,artifact) {
+  if(require('./gravicentra-i6-6-cloud-build-operational.cjs').provider(p))
+    return require('./gravicentra-i6-6-cloud-build-operational.cjs').validatePreviewMetadata(p,run,artifact);
   const q=p.previewQa;
   assert.equal(run.id,q.runId);assert.equal(run.conclusion,'success');
   assert.equal(run.path,PREVIEW_WORKFLOW);assert.equal(run.head_sha,q.headSha);
@@ -430,6 +444,8 @@ function validatePreviewQa(p,run,artifact) {
   assert.equal(artifact.name,'gi-i66-operational-preview-proof-'+q.runId);
 }
 function validateProof(p,proof) {
+  const nativeOwner=require('./gravicentra-i6-6-cloud-build-operational.cjs');
+  if(nativeOwner.provider(p)){assert.equal(proof.executionProvider,p.executionProvider);nativeOwner.executionId(p,proof.runId,'SIGNED_PREVIEW_RUN');checkSha(proof.headSha,'I66_NATIVE_PREVIEW_HEAD');}
   assert.equal(proof.schema,'I6_6_OPERATIONAL_SIGNED_PREVIEW_PROOF_V1');
   assert.equal(proof.status,'SIGNED_DRIVERS_DURABLE_READBACK_RELOAD_RESTORE_PASS');
   for(const key of ['sourceSha','buildRunId','artifactId','artifactDigest','previewUrl','previewChannelId'])assert.equal(proof[key],p[key]);
@@ -543,7 +559,9 @@ function focusedReportsFromDisk(p,phase,env=process.env){
   }
   return focused;
 }
-function verifyPinnedOwners(p) {
+function verifyPinnedOwners(p,options={}) {
+  if(require('./gravicentra-i6-6-cloud-build-operational.cjs').provider(p))
+    return require('./gravicentra-i6-6-cloud-build-operational.cjs').verifyPinnedOwners(p,options);
   if(p.cancellationQa===true){
     const binding=p.cancellationRecoveryQa;
     for(const ref of [p.sourceSha,'HEAD'])assert.equal(execFileSync('git',['rev-parse',ref+':'+binding.receiptPath],{encoding:'utf8'}).trim(),binding.receiptBlob,'I66_CANCELLATION_CAUSAL_RECEIPT_SOURCE_DRIFT');
@@ -581,6 +599,10 @@ async function main(){
   const p=candidateForPhase(control,phase);
   assertDirectFormsPersonalAuthority(p,phase.toUpperCase()); // Before any backend/Make deployment.
   verifyPinnedOwners(p);
+  if(require('./gravicentra-i6-6-cloud-build-operational.cjs').native(p)){
+    await require('./gravicentra-i6-6-cloud-build-operational.cjs').admitRuntime(p,phase);
+    console.log('I66_OPERATIONAL_'+phase.toUpperCase()+'_NATIVE_SOURCE_ARTIFACT_AUTHORITY_PASS');return;
+  }
   const api='https://api.github.com/repos/paulaosoriof86/orbit360-core/actions/';
   const [run,artifact]=await Promise.all([fetchJson(api+'runs/'+p.buildRunId),fetchJson(api+'artifacts/'+p.artifactId)]);
   validateArtifact(p,run,artifact);
@@ -608,7 +630,9 @@ function validateLiveProof(p,proof){
   assert.equal(proof.status,makeScope.isMake(p)?makeScope.LIVE_STATUS:p.opsLeadsComposite===true?'SAME_ARTIFACT_FOUR_FUNCTIONS_SIGNED_LIVE_READBACK_RELOAD_RESTORE_PASS':LIVE_SIGNED_STATUS,'I66_OPERATIONAL_LIVE_NOT_ACCEPTED');
   for(const key of ['sourceSha','buildId','buildRunId','artifactId','artifactDigest'])assert.equal(proof[key],p[key],'I66_OPERATIONAL_LIVE_IDENTITY_'+key);
   checkBuildId(proof.buildId,p.sourceSha,'I66_OPERATIONAL_LIVE_BUILD_ID');
-  checkId(proof.runId,'I66_OPERATIONAL_LIVE_RUN_ID');checkSha(proof.headSha,'I66_OPERATIONAL_LIVE_RUN_HEAD');
+  const nativeOwner=require('./gravicentra-i6-6-cloud-build-operational.cjs');
+  nativeOwner.executionId(p,proof.runId,'LIVE_RUN_ID');if(nativeOwner.native(p))assert.equal(proof.executionProvider,p.executionProvider);
+  checkSha(proof.headSha,'I66_OPERATIONAL_LIVE_RUN_HEAD');
   assert.equal(proof.previewChannel,p.previewChannelId);
   assert.deepEqual(proof.previewQa,p.previewQa,'I66_OPERATIONAL_LIVE_PREVIEW_PROOF_IDENTITY');
   assert.deepEqual(proof.previousLive,p.currentLive,'I66_OPERATIONAL_LIVE_ROLLBACK_IDENTITY');
@@ -766,5 +790,5 @@ function acceptedForPreflight(control,state,transport,latest,io=fs){
   assert.equal(latest.previousLiveVersionForRollback,r11.hostingVersion);
   return {status:ACCEPTED_STATUS,sourceSha:p.sourceSha,receipt:ACCEPTANCE_RECEIPT};
 }
-module.exports={CONTROL,SITE,PREVIEW,CHANNEL,LIVE,TARGETS,COMPOSITE_TARGETS,MAKE_TARGETS,targetsForCandidate,DRIVERS,PROPOSAL_QA_ISOLATION,ADVISOR_QA_ISOLATION,PINNED_OWNER_PATHS,SIGNED_OBSERVABILITY_PROFILE,previewIdentity,validateBuildMarker,signedMatrixBinding,candidateForPhase,continuationForPreflight,validateArtifact,validatePreviewQa,validateProof,validateFocusedReports,validateFinancialRecoverySummary,signedObservabilityReports,focusedReportsFromDisk,assertDirectFormsPersonalAuthority,envFor,ACCEPTANCE_KEY,ACCEPTANCE_RECEIPT,ACCEPTANCE_PROOF,ACCEPTED_STATUS,LIVE_SIGNED_STATUS,validateLiveProof,acceptedForPreflight};
+module.exports={CONTROL,SITE,PREVIEW,CHANNEL,LIVE,TARGETS,COMPOSITE_TARGETS,MAKE_TARGETS,targetsForCandidate,DRIVERS,PROPOSAL_QA_ISOLATION,ADVISOR_QA_ISOLATION,PINNED_OWNER_PATHS,SIGNED_OBSERVABILITY_PROFILE,previewIdentity,validateBuildMarker,signedMatrixBinding,candidateForPhase,continuationForPreflight,validateArtifact,validatePreviewQa,validateProof,validateFocusedReports,validateFinancialRecoverySummary,signedObservabilityReports,focusedReportsFromDisk,assertDirectFormsPersonalAuthority,verifyPinnedOwners,envFor,ACCEPTANCE_KEY,ACCEPTANCE_RECEIPT,ACCEPTANCE_PROOF,ACCEPTED_STATUS,LIVE_SIGNED_STATUS,validateLiveProof,acceptedForPreflight};
 if(require.main===module)main().catch(error=>{console.error(String(error.message||error));process.exitCode=1;});

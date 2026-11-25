@@ -6,18 +6,31 @@ const {promote,acceptComposite}=require('./gravicentra-i66-frontend-promotion-tr
 const {hosting}=require('./gravicentra-i66-frontend-hosting-io.cjs');
 const repository='paulaosoriof86/orbit360-core',branch='recovery/fase-a-clean-20260831';
 const repoUrl='https://api.github.com/repos/'+repository+'/';
-const runId=Number(process.env.GITHUB_RUN_ID);
+const nativeProvider=()=>process.env.GRAVICENTRA_BUILD_PROVIDER==='CLOUD_BUILD';
+const nativeOwner=()=>require('./gravicentra-i6-6-cloud-build-operational.cjs');
+const executionHead=()=>nativeProvider()?process.env.I66_NATIVE_AUTHORITY_HEAD:process.env.GITHUB_SHA;
+const runId=nativeProvider()?process.env.GRAVICENTRA_CLOUD_BUILD_ID:Number(process.env.GITHUB_RUN_ID);
+async function assertExecution(phase,action,p){
+  if(nativeProvider()){
+    const g=require('./gravicentra-i6-6-operational-release-candidate.cjs');
+    const candidate=p||g.candidateForPhase(JSON.parse(fs.readFileSync(g.CONTROL,'utf8')),phase);
+    return nativeOwner().verifyRuntimeAuthority(candidate,{phase,action});
+  }
+  assert.ok(!process.env.GRAVICENTRA_BUILD_PROVIDER,'RELEASE_UNKNOWN_PROVIDER');
+  assert.equal(process.env.GITHUB_REPOSITORY,repository);assert.equal(process.env.GITHUB_REF_NAME,branch);
+  assert.ok(Number.isSafeInteger(runId)&&runId>0);return null;
+}
 const git=(...args)=>execFileSync('git',args,{encoding:'utf8',maxBuffer:25*1024*1024}).trimEnd();
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 const jsonAt=(sha,p)=>JSON.parse(git('show',sha+':'+p));
 const blobAt=(sha,p)=>git('rev-parse',sha+':'+p);
 const optional=(sha,p)=>{try{return jsonAt(sha,p);}catch(e){if(!existsAt(sha,p))return null;throw e;}};
 function existsAt(sha,p){try{execFileSync('git',['cat-file','-e',sha+':'+p],{stdio:'ignore'});return true;}catch{return false;}}
-function remote(){git('fetch','--quiet','origin','refs/heads/'+branch);return git('rev-parse','FETCH_HEAD');}
+function remote(){git('fetch','--quiet',nativeProvider()?nativeOwner().C.repositoryUrl:'origin','refs/heads/'+branch);return git('rev-parse','FETCH_HEAD');}
 async function api(url,options={}){
   // Long browser/guard subprocesses must not leave a reused GitHub connection
   // as the only route to recording an otherwise proven release.
-  const r=await fetch(url,{...options,headers:{Authorization:'Bearer '+process.env.GITHUB_TOKEN,'User-Agent':'Gravicentra-Release-Owner',
+  const r=await fetch(url,{...options,headers:{...(process.env.GITHUB_TOKEN?{Authorization:'Bearer '+process.env.GITHUB_TOKEN}:{}),'User-Agent':'Gravicentra-Release-Owner',
     Accept:'application/vnd.github+json',...options.headers,Connection:'close'},signal:AbortSignal.timeout(60000)});assert.ok(r.ok,'GITHUB_PROVIDER_HTTP_'+r.status);return r;
 }
 const github=async(p,raw=false)=>{const r=await api(repoUrl+p);return raw?r:r.json();};
@@ -71,6 +84,12 @@ async function commitWithReadback({write,readback,verifySignature,pause=sleep,di
   throw last;
 }
 async function casCommit(head,headline,entries){
+  if(nativeProvider()){
+    const runtime=await assertExecution('live','accept-live');
+    return require('./gravicentra-i6-6-cloud-build-signed-cas.cjs').requestSignedCas({head,headline,entries,allowedPaths:Object.keys(entries),
+      execution:{buildId:runtime.buildId,sourceSha:runtime.plan.sourceSha,phase:'live',authorityHead:runtime.workflowHeadSha},
+      io:await nativeOwner().signedCasIo(runtime)});
+  }
   const mutation='mutation($input:CreateCommitOnBranchInput!){createCommitOnBranch(input:$input){commit{oid}}}';
   const input={branch:{repositoryNameWithOwner:repository,branchName:branch},expectedHeadOid:head,message:{headline},
     fileChanges:{additions:Object.entries(entries).map(([p,obj])=>({path:p,contents:Buffer.from(serial(obj)).toString('base64')}))}};
@@ -106,7 +125,7 @@ const financialPins=[FINANCIAL_DRIVER,FINANCIAL_PREVIEW_WORKFLOW,
   'tools/gravicentra-i66-frontend-promotion-transaction.test.cjs','tools/gravicentra-i66-frontend-control.test.cjs',
   'functions/product-active-role-contract.js'];
 const financialTargetKeys=['sourceSha','artifactId','artifactDigest','buildId','buildRunId','previewUrl','previewChannel'];
-const financialTarget=t=>Object.fromEntries(financialTargetKeys.map(k=>[k,t[k]]));
+const financialTarget=t=>({...Object.fromEntries(financialTargetKeys.map(k=>[k,t[k]])),...(t.executionProvider===undefined?{}:{executionProvider:t.executionProvider})});
 // These three entries are Git pathspecs, not file identities. Their complete
 // trees remain protected by assertFinancialComposition, including files that
 // are not individually listed as QA owners. storage.rules is historically
@@ -149,6 +168,7 @@ function pinSet(head,scope,releaseScope){
 // Read-only verification has no button/write requirement. Its evidence remains
 // tied to the exact artifact, two existing assigned roles and four real views.
 function validateFinancialReport(report,target,phase,{authorityBlob,physicalPhaseKey,releaseScope,parentAuthorityBlob}={}){
+  if(nativeOwner().provider(target))assert.equal(report.executionProvider,'CLOUD_BUILD','FINANCIAL_NATIVE_REPORT_PROVIDER');
   assert.equal(report.schema,'GI_I66_BROWSER_PERFORMANCE_READONLY_V2');
   assert.equal(report.status,'FRONTEND_SIX_RECEIPTS_TWO_ROLE_TWO_VIEW_READONLY_PASS');
   assert.equal(report.phase,phase);assert.equal(report.scopeId,FINANCIAL_SCOPE);
@@ -250,7 +270,8 @@ function validateFinancialAuthority({raw,authorityBlob,physical,journal,phase,at
   assert.equal(raw.previousArtifactDigest,physical.artifactDigest);
   const t=raw.target;assert.match(t.sourceSha||'',/^[a-f0-9]{40}$/);assert.notEqual(t.sourceSha,physical.sourceSha);
   assert.match(t.artifactDigest||'',/^sha256:[a-f0-9]{64}$/);assert.notEqual(t.artifactDigest,physical.artifactDigest);
-  for(const k of ['artifactId','buildRunId'])assert.ok(Number.isSafeInteger(t[k])&&t[k]>0);
+  if(nativeOwner().provider(t))require('./gravicentra-i6-6-cloud-build-preview.cjs').artifactIdentity(t.sourceSha,t.buildRunId,t.artifactId,t.artifactDigest);
+  else for(const k of ['artifactId','buildRunId'])assert.ok(Number.isSafeInteger(t[k])&&t[k]>0);
   assert.match(t.buildId||'',/^gi-i66-[a-z0-9-]+$/);
   assert.match(t.previewUrl||'',/^https:\/\/ays-orbit-360-lab--gi-i66-[a-z0-9-]+\.web\.app$/);
   assert.match(t.previewChannel||'',/^gi-i66-[a-z0-9-]+$/);
@@ -275,9 +296,13 @@ function validateFinancialAuthority({raw,authorityBlob,physical,journal,phase,at
   return financialTarget(t);
 }
 async function resolveFinancialQa(phase,{env=process.env,api:readApi=github,io=fs,gitRead=(...a)=>execFileSync('git',a,{maxBuffer:25*1024*1024}),readMarker,stage='before',expected}={}){
-  assert.equal(env.GITHUB_REPOSITORY,repository);assert.equal(env.GITHUB_REF_NAME,branch);
-  assert.ok(['before','after'].includes(stage));assert.match(env.GITHUB_SHA||'',/^[a-f0-9]{40}$/);
-  const executionRun=Number(env.GITHUB_RUN_ID);assert.ok(Number.isSafeInteger(executionRun)&&executionRun>0);
+  const cloud=env.GRAVICENTRA_BUILD_PROVIDER==='CLOUD_BUILD';
+  assert.ok(!env.GRAVICENTRA_BUILD_PROVIDER||cloud,'FINANCIAL_QA_UNKNOWN_PROVIDER');
+  if(!cloud){assert.equal(env.GITHUB_REPOSITORY,repository);assert.equal(env.GITHUB_REF_NAME,branch);}
+  const workflowHead=cloud?env.I66_NATIVE_AUTHORITY_HEAD:env.GITHUB_SHA;
+  assert.ok(['before','after'].includes(stage));assert.match(workflowHead||'',/^[a-f0-9]{40}$/);
+  const executionRun=cloud?env.GRAVICENTRA_CLOUD_BUILD_ID:Number(env.GITHUB_RUN_ID);
+  if(cloud)assert.ok(nativeOwner().uuid(executionRun),'FINANCIAL_QA_NATIVE_UUID');else assert.ok(Number.isSafeInteger(executionRun)&&executionRun>0);
   const remoteRef=await readApi('git/ref/heads/'+branch),head=remoteRef.object?.sha;assert.match(head||'',/^[a-f0-9]{40}$/);
   const files=new Map();
   async function file(relative){
@@ -306,22 +331,37 @@ async function resolveFinancialQa(phase,{env=process.env,api:readApi=github,io=f
   const authorityBlob=blob(files.get(P.authority)),target=validateFinancialAuthority({raw,authorityBlob,physical,journal,phase,attemptHistory,
     parentAuthority:tr,parentAuthorityBlob});
   const selected=releaseScope==='COMPOSITE'?financialQaOwnerSelection(target.sourceSha,{gitRead}):null;
-  if(selected){assert.deepEqual(selected.pins,raw.ownerPins,'FINANCIAL_QA_FROZEN_TREE_OWNER_DRIFT');
-    assertFinancialComposition(target.sourceSha,env.GITHUB_SHA,{gitRead});}
+  const g=require('./gravicentra-i6-6-operational-release-candidate.cjs');
+  const nativeCandidate=cloud?g.candidateForPhase(tr,phase):null;
+  let runtime;
+  if(cloud){
+    assert.equal(releaseScope,'COMPOSITE','FINANCIAL_QA_NATIVE_COMPOSITE_REQUIRED');
+    runtime=await nativeOwner().verifyRuntimeAuthority(nativeCandidate,{phase,action:'financial-readonly',env});
+    nativeOwner().fetchAuthorityHead(head,{gitRead});
+    g.verifyPinnedOwners(nativeCandidate,{head,cwd:process.cwd()});
+  }
+  if(selected){
+    const expectedPins=cloud?Object.fromEntries(selected.paths.map(p=>[p,nativeCandidate.providerBinding.mechanism.files[p]?.blob||selected.pins[p]])):selected.pins;
+    assert.deepEqual(expectedPins,raw.ownerPins,'FINANCIAL_QA_FROZEN_TREE_OWNER_DRIFT');
+    if(!cloud)assertFinancialComposition(target.sourceSha,workflowHead,{gitRead});
+  }
   for(const p of selected?.paths||financialQaPaths(releaseScope)){
     const bytes=io.readFileSync(p);assert.equal(blob(bytes),raw.ownerPins[p],'FINANCIAL_QA_EXECUTING_OWNER_DRIFT_'+p);
-    assert.ok(Buffer.from(bytes).equals(Buffer.from(gitRead('show',target.sourceSha+':'+p))),'FINANCIAL_QA_BUILD_OWNER_DRIFT_'+p);
+    const ownerSource=cloud&&nativeCandidate.providerBinding.mechanism.files[p]?nativeCandidate.providerBinding.mechanism.commit:target.sourceSha;
+    assert.ok(Buffer.from(bytes).equals(Buffer.from(gitRead('show',ownerSource+':'+p))),'FINANCIAL_QA_BUILD_OWNER_DRIFT_'+p);
   }
   gitRead('merge-base','--is-ancestor',physical.sourceSha,target.sourceSha);
-  gitRead('merge-base','--is-ancestor',target.sourceSha,env.GITHUB_SHA);
+  gitRead('merge-base','--is-ancestor',target.sourceSha,workflowHead);
+  if(!cloud){
   const [execution,build,artifact]=await Promise.all([readApi('actions/runs/'+executionRun),readApi('actions/runs/'+target.buildRunId),readApi('actions/artifacts/'+target.artifactId)]);
   assert.deepEqual([execution.id,execution.path,execution.head_sha,execution.head_branch,execution.status],
     [executionRun,phase==='preview'?FINANCIAL_PREVIEW_WORKFLOW:
-      releaseScope==='COMPOSITE'?COMPOSITE_FINANCIAL_LIVE_WORKFLOW:FINANCIAL_LIVE_WORKFLOW,env.GITHUB_SHA,branch,'in_progress']);
+      releaseScope==='COMPOSITE'?COMPOSITE_FINANCIAL_LIVE_WORKFLOW:FINANCIAL_LIVE_WORKFLOW,workflowHead,branch,'in_progress']);
   assert.deepEqual([build.id,build.path,build.head_sha,build.head_branch,build.status,build.conclusion],
     [target.buildRunId,'.github/workflows/gravicentra-release-delta-66-package.yml',target.sourceSha,branch,'completed','success']);
   assert.deepEqual([artifact.id,artifact.digest,artifact.workflow_run?.id,artifact.workflow_run?.head_sha,artifact.expired],
     [target.artifactId,target.artifactDigest,target.buildRunId,target.sourceSha,false]);
+  }
   if(!readMarker)readMarker=async origin=>{
     const r=await fetch(origin+'/__recovery__/build.json',{headers:{'cache-control':'no-cache'},redirect:'error',signal:AbortSignal.timeout(30000)});
     assert.equal(r.status,200);return r.json();
@@ -332,13 +372,14 @@ async function resolveFinancialQa(phase,{env=process.env,api:readApi=github,io=f
     assert.deepEqual([m.sourceSha,m.buildId,m.gate,m.product],[pin.sourceSha,pin.buildId,'I6.6','Gravicentra Insurance'],'FINANCIAL_QA_HOSTED_MARKER_DRIFT');}
   const proof={schema:'GI_I66_FRONTEND_FINANCIAL_QA_AUTHORITY_V1',stage,phase,scopeId:FINANCIAL_SCOPE,
     generation:raw.generation,target,authorityBlob,physicalPhaseKey:journal?.key||null,
-    runId:executionRun,workflowHeadSha:env.GITHUB_SHA,remoteControlHead:head,readOnly:true,
+    runId:executionRun,workflowHeadSha:workflowHead,remoteControlHead:head,readOnly:true,...(cloud?{executionProvider:'CLOUD_BUILD'}:{}),
     ...(releaseScope==='COMPOSITE'?{releaseScope,parentAuthorityBlob}:{})};
   if(expected)for(const key of ['phase','scopeId','generation','target','authorityBlob','physicalPhaseKey','runId','workflowHeadSha','releaseScope','parentAuthorityBlob'])
     assert.deepEqual(proof[key],expected[key],'FINANCIAL_QA_FINAL_AUTHORITY_DRIFT_'+key);
   return proof;
 }
 async function readFinancialPreviewReport(qa,target,{releaseScope,parentAuthorityBlob}={}){
+  if(nativeOwner().provider(target))return nativeOwner().readFinancialPreview(qa,target,{releaseScope,parentAuthorityBlob});
   for(const k of ['qaRunId','qaArtifactId'])assert.ok(Number.isSafeInteger(qa[k])&&qa[k]>0);
   assert.match(qa.qaArtifactDigest||'',/^sha256:[a-f0-9]{64}$/);assert.match(qa.qaReportSha256||'',/^[a-f0-9]{64}$/);
   const [run,artifact,jobs]=await Promise.all([github('actions/runs/'+qa.qaRunId),github('actions/artifacts/'+qa.qaArtifactId),
@@ -403,13 +444,19 @@ async function compositeFinancialPreviewAt(head,candidate,raw){
   return {qa,report};
 }
 async function verifyCompositeFinancialPreview(){
-  assert.equal(process.env.GITHUB_REPOSITORY,repository);assert.equal(process.env.GITHUB_REF_NAME,branch);
+  await assertExecution('live','verify-preview');
   const h=remote(),tr=jsonAt(h,P.transport),raw=jsonAt(h,P.authority);
   const candidate=require('./gravicentra-i6-6-operational-release-candidate.cjs').candidateForPhase(tr,'live');
   compositeFinancialBinding(raw,blobAt(h,P.authority),tr,blobAt(h,P.transport),candidate);
   assert.deepEqual(pinSet(h,FINANCIAL_SCOPE,'COMPOSITE'),raw.ownerPins,'COMPOSITE_FINANCIAL_EXECUTING_OWNER_DRIFT');
-  assert.deepEqual(financialQaOwnerSelection(candidate.sourceSha).pins,raw.ownerPins,'COMPOSITE_FINANCIAL_BUILT_OWNER_DRIFT');
-  assertFinancialComposition(candidate.sourceSha,process.env.GITHUB_SHA);
+  if(nativeProvider()){
+    require('./gravicentra-i6-6-operational-release-candidate.cjs').verifyPinnedOwners(candidate,{head:h,cwd:process.cwd()});
+    const selected=financialQaOwnerSelection(candidate.sourceSha);
+    assert.deepEqual(Object.fromEntries(selected.paths.map(p=>[p,candidate.providerBinding.mechanism.files[p]?.blob||selected.pins[p]])),raw.ownerPins,'COMPOSITE_FINANCIAL_BUILT_OWNER_DRIFT');
+  }else{
+    assert.deepEqual(financialQaOwnerSelection(candidate.sourceSha).pins,raw.ownerPins,'COMPOSITE_FINANCIAL_BUILT_OWNER_DRIFT');
+    assertFinancialComposition(candidate.sourceSha,executionHead());
+  }
   await compositeFinancialPreviewAt(h,candidate,raw);
   console.log('I66_COMPOSITE_FINANCIAL_PREVIEW_48_VERIFIED_READONLY');
 }
@@ -429,6 +476,7 @@ async function certifyCompositeFinancialLive({request,journal,validateCurrent,pr
       previewParentAuthorityBlob:preview.qa.parentAuthorityBlob,authorityBlob:binding.authorityBlob,parentAuthorityBlob:binding.parentAuthorityBlob,
       physicalPhaseKey:journal.key});
     return {result:'PASS',scopeId:FINANCIAL_SCOPE,generation:journal.generation,buildId:request.target.buildId,
+      ...(request.target.executionProvider===undefined?{}:{executionProvider:request.target.executionProvider}),
       sourceSha:request.target.sourceSha,artifactDigest:request.target.artifactDigest,authorityBlob:binding.authorityBlob,
       parentAuthorityBlob:binding.parentAuthorityBlob,physicalPhaseKey:journal.key,receiptPath:uiPath,receiptBlob:blob(serial(ui)),
       reportSha256:ui.reportSha256,runId,financialQa:ui.financialQa};
@@ -442,6 +490,7 @@ async function certifyCompositeFinancialLive({request,journal,validateCurrent,pr
       GI_I66_PERF_PHASE:'live',GI_I66_READONLY_MODE:'six-frontend-release',GI_I66_PERF_REPORT:output}});
   const reportBytes=fs.readFileSync(output),report=JSON.parse(reportBytes);
   const ui={schema:'GI_I66_FRONTEND_FINANCIAL_READONLY_UI_RECEIPT_V1',generation:journal.generation,scopeId:FINANCIAL_SCOPE,
+    ...(request.target.executionProvider===undefined?{}:{executionProvider:request.target.executionProvider}),
     releaseScope:'COMPOSITE',authorityBlob:binding.authorityBlob,parentAuthorityBlob:binding.parentAuthorityBlob,
     sourceSha:request.target.sourceSha,artifactDigest:request.target.artifactDigest,buildId:request.target.buildId,
     physicalPhaseKey:journal.key,result:'PASS',readOnly:true,fullA04Accepted:false,fullA12Passed:false,
@@ -465,7 +514,7 @@ function assertCompositeRollbackAllowed(attempt,journal,context){
   // `null` means proven absence; an unavailable/indeterminate read must throw.
   assert.notEqual(journal,undefined,'COMPOSITE_ROLLBACK_JOURNAL_READ_INDETERMINATE');
   const {runId:expectedRunId,sourceSha,previous,transport}=context;
-  assert.ok(Number.isSafeInteger(expectedRunId)&&expectedRunId>0);
+  nativeOwner().executionId(context,expectedRunId,'ROLLBACK_RUN');
   assert.match(sourceSha,/^[0-9a-f]{40}$/);
   if(attempt){
     assert.ok(Number.isSafeInteger(attempt.generation)&&attempt.generation>0);
@@ -489,7 +538,7 @@ function assertCompositeRollbackAllowed(attempt,journal,context){
   assert.equal(physical.liveHostingVersion,previous.hostingVersion,'COMPOSITE_ROLLBACK_PREDECESSOR_VERSION_DRIFT');
 }
 async function authorizeCompositeRollback(){
-  assert.equal(process.env.GITHUB_REPOSITORY,repository);assert.equal(process.env.GITHUB_REF_NAME,branch);
+  await assertExecution('live','rollback');
   const file=path.join(process.env.RUNNER_TEMP,'gi-i66-composite-acceptance-attempt.json');
   const attempt=fs.existsSync(file)?JSON.parse(fs.readFileSync(file,'utf8')):null,h=remote();
   let journal=null;
@@ -498,7 +547,7 @@ async function authorizeCompositeRollback(){
     assert.ok(listed===''||listed===jp,'COMPOSITE_ROLLBACK_JOURNAL_LOOKUP_INVALID');
     if(listed)journal=jsonAt(h,jp);
   }
-  assertCompositeRollbackAllowed(attempt,journal,{runId,sourceSha:process.env.I66_ROLE_SOURCE_SHA,
+  assertCompositeRollbackAllowed(attempt,journal,{runId,...(nativeProvider()?{executionProvider:'CLOUD_BUILD'}:{}),sourceSha:process.env.I66_ROLE_SOURCE_SHA,
     previous:{sourceSha:process.env.I66_PREVIOUS_SOURCE_SHA,buildId:process.env.I66_PREVIOUS_BUILD_ID,
       hostingVersion:process.env.I66_PREVIOUS_HOSTING_VERSION},transport:jsonAt(h,P.transport)});
   console.log('I66_COMPOSITE_PHYSICAL_ROLLBACK_AUTHORIZED_BEFORE_COMMIT');
@@ -672,12 +721,11 @@ async function run(){
   console.log('I66_FRONTEND_FINAL_PHASE='+result.phase+' GENERATION='+raw.generation);
 }
 async function runCompositeAcceptance(){
-  assert.equal(process.env.GITHUB_REPOSITORY,repository);assert.equal(process.env.GITHUB_REF_NAME,branch);
-  assert.ok(Number.isSafeInteger(runId)&&runId>0);
+  await assertExecution('live','accept-live');
   const g=require('./gravicentra-i6-6-operational-release-candidate.cjs');
   const proof=JSON.parse(fs.readFileSync(path.join(process.env.RUNNER_TEMP,'i66-role-live-exact-proof.json'),'utf8'));
   assert.equal(proof.runId,runId,'COMPOSITE_CURRENT_RUN_PROOF_REQUIRED');
-  assert.equal(proof.headSha,process.env.GITHUB_SHA,'COMPOSITE_CURRENT_RUN_HEAD_REQUIRED');
+  assert.equal(proof.headSha,executionHead(),'COMPOSITE_CURRENT_RUN_HEAD_REQUIRED');
   const {GoogleAuth}=require('google-auth-library');
   const auth=await new GoogleAuth({scopes:['https://www.googleapis.com/auth/firebase.hosting']}).getClient();
   const provider=hosting(auth,github),boot=remote(),initial=jsonAt(boot,P.transport),cp=jsonAt(boot,P.cp);
@@ -705,6 +753,7 @@ async function runCompositeAcceptance(){
       buildId:previous.buildId,buildRunId:previous.buildRunId,previewUrl:previous.previewUrl,
       hostingVersion:previous.hostingVersion,files:previous.hostedFilesEachOrigin},
     target:{sourceSha:candidate.sourceSha,sourceTree:git('rev-parse',candidate.sourceSha+'^{tree}'),
+      ...(candidate.executionProvider===undefined?{}:{executionProvider:candidate.executionProvider}),
       manifestBlob:blobAt(candidate.sourceSha,P.manifest),compositionBlob:blobAt(candidate.sourceSha,P.composition),
       artifactId:candidate.artifactId,artifactDigest:candidate.artifactDigest,buildId:candidate.buildId,
       buildRunId:candidate.buildRunId,previewUrl:candidate.previewUrl,previewChannel:candidate.previewChannelId,
@@ -718,7 +767,8 @@ async function runCompositeAcceptance(){
       assert.equal(blobAt(h,P.authority),financialBinding.authorityBlob,'COMPOSITE_FINANCIAL_AUTHORITY_REPLACED');
       assert.deepEqual(compositeFinancialBinding(jsonAt(h,P.authority),blobAt(h,P.authority),jsonAt(h,P.transport),approvalBlob,candidate),financialBinding);
     }
-    assert.equal(git('diff','--name-only',candidate.sourceSha,h,'--',...g.PINNED_OWNER_PATHS),'','COMPOSITE_SOURCE_OR_QA_OWNER_DRIFT');
+    if(nativeProvider())g.verifyPinnedOwners(candidate,{head:h,cwd:process.cwd()});
+    else assert.equal(git('diff','--name-only',candidate.sourceSha,h,'--',...g.PINNED_OWNER_PATHS),'','COMPOSITE_SOURCE_OR_QA_OWNER_DRIFT');
     const tr=jsonAt(h,P.transport),control=jsonAt(h,P.cp),head=control.i66FrontendReleaseHead;
     assert.deepEqual(g.candidateForPhase(tr,'live'),candidate,'COMPOSITE_LIVE_AUTHORIZATION_DRIFT');
     assert.equal(head.generation,initial.frontendReleaseSequence,'RELEASE_GENERATION_CAS');
@@ -766,6 +816,8 @@ async function runCompositeAcceptance(){
     validateProofs:async()=>{
       const head=remote();validateCurrent(head);
       if(needsFinancial)financialPreview=await compositeFinancialPreviewAt(head,candidate,jsonAt(head,P.authority));
+      if(nativeProvider()){await nativeOwner().admitRuntime(candidate,'live');}
+      else{
       const [build,artifact,qa,qaArtifact,current]=await Promise.all([
         github('actions/runs/'+candidate.buildRunId),github('actions/artifacts/'+candidate.artifactId),
         github('actions/runs/'+candidate.previewQa.runId),github('actions/artifacts/'+candidate.previewQa.receiptArtifactId),
@@ -774,6 +826,7 @@ async function runCompositeAcceptance(){
       assert.equal(current.head_sha,proof.headSha);assert.equal(current.head_branch,branch);
       assert.equal(current.path,'.github/workflows/gravicentra-i66-privileged-role-exact-live-promotion.yml');
       assert.ok(current.status==='in_progress'||(current.status==='completed'&&current.conclusion==='success'),'COMPOSITE_LIVE_RUN_NOT_EXECUTING');
+      }
       verifyBackend();
     },
     verifyLive:provider.live,verifyPreview:provider.preview,currentVersion:()=>provider.current('live'),
@@ -821,7 +874,7 @@ async function runCompositeAcceptance(){
   console.log('I66_COMPOSITE_FINAL_PHASE='+result.phase+' GENERATION='+generation+' BACKEND_FUNCTIONS='+g.targetsForCandidate(candidate,'live').length);
 }
 async function recordCompositeRollback(){
-  assert.equal(process.env.GITHUB_REPOSITORY,repository);assert.equal(process.env.GITHUB_REF_NAME,branch);
+  await assertExecution('live','record-rollback');
   const file=path.join(process.env.RUNNER_TEMP,'gi-i66-composite-acceptance-attempt.json');
   if(!fs.existsSync(file))return;
   const attempt=JSON.parse(fs.readFileSync(file,'utf8')),jp=genName(attempt.generation,'JOURNAL'),h=remote(),j=optional(h,jp);

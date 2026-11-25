@@ -16,6 +16,11 @@ function hosting(auth,github){
   }
   async function packageData(r){
     if(packages.has(r.artifactDigest))return packages.get(r.artifactDigest);
+    const native=process.env.GRAVICENTRA_BUILD_PROVIDER==='CLOUD_BUILD';
+    assert.ok(!process.env.GRAVICENTRA_BUILD_PROVIDER||native,'HOSTING_UNKNOWN_PROVIDER');
+    let tar;
+    if(native){tar=await require('./gravicentra-i6-6-cloud-build-operational.cjs').packageTarForBinding(r);}
+    else{
     const meta=await github('actions/artifacts/'+r.artifactId);
     assert.equal(meta.digest,r.artifactDigest);assert.equal(meta.workflow_run.head_sha,r.sourceSha);
     assert.equal(meta.workflow_run.id,r.buildRunId);assert.equal(meta.expired,false);
@@ -29,8 +34,10 @@ function hosting(auth,github){
       assert.ok(!found[0].startsWith('/')&&found[0].split('/').every(x=>x&&x!=='.'&&x!=='..'));
       return execFileSync('unzip',['-p',file,found[0]],{maxBuffer:160*1024*1024});
     }
-    const tar=extract('gi-i66-exact-package.tar.gz'),tarPath=path.join(tmp,'package.tar.gz');
+    tar=extract('gi-i66-exact-package.tar.gz');
     assert.equal(hash(tar),extract('gi-i66-exact-package.sha256').toString().trim().split(/\s+/)[0]);
+    }
+    const tarRoot=fs.mkdtempSync(path.join(process.env.RUNNER_TEMP||os.tmpdir(),'i66-verified-tar-')),tarPath=path.join(tarRoot,'package.tar.gz');
     fs.writeFileSync(tarPath,tar,{mode:0o600});
     const listing=execFileSync('tar',['-tzf',tarPath],{encoding:'utf8'}).trim().split('\n');
     function member(name){const matches=listing.filter(p=>p.replace(/^\.\//,'')===name);assert.equal(matches.length,1);return execFileSync('tar',['-xOzf',tarPath,matches[0]],{maxBuffer:10*1024*1024});}

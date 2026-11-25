@@ -6,6 +6,7 @@ const assert=require('node:assert/strict');
 const crypto=require('node:crypto');
 const admin=require('firebase-admin');
 const {chromium}=require('playwright');
+const {initializeSignedQaAdmin}=require('./gravicentra-i66-signed-qa-runtime-auth.cjs');
 const LIVE='https://app.aysseguros.com',TENANT='alianzas-soluciones';
 // Historical UAT keeps its original pin. A new exact-artifact LIVE gate may
 // explicitly select its own certified source without mutating customer data.
@@ -13,13 +14,15 @@ const SHA=process.env.I66_APPROVED_LIVE_SOURCE_SHA||'1dd675ed59ac51fd122915ca805
 assert.match(SHA,/^[0-9a-f]{40}$/,'I66_LIVE_UAT_SOURCE_PIN_REQUIRED');
 const norm=x=>String(x||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();
 const hash=x=>crypto.createHash('sha256').update(x).digest('hex');
-const tokenSecrets=['SA_LAB','SA_ALT','SA_DEFAULT'].map(k=>process.env[k]).filter(Boolean)
-  .map(x=>{try{return JSON.parse(x);}catch{return null;}})
-  .find(x=>x&&x.type==='service_account'&&x.project_id==='ays-orbit-360-lab'&&x.private_key);
-assert.ok(tokenSecrets,'I66_LIVE_SIGNED_PROJECT_AUTHORITY_MISSING');
+function existingCredential(){
+  const tokenSecrets=['SA_LAB','SA_ALT','SA_DEFAULT'].map(k=>process.env[k]).filter(Boolean)
+    .map(x=>{try{return JSON.parse(x);}catch{return null;}})
+    .find(x=>x&&x.type==='service_account'&&x.project_id==='ays-orbit-360-lab'&&x.private_key);
+  assert.ok(tokenSecrets,'I66_LIVE_SIGNED_PROJECT_AUTHORITY_MISSING');
+  return tokenSecrets;
+}
 assert.equal(process.env.I66_LIVE_ORIGIN,LIVE,'I66_LIVE_ORIGIN_NOT_STAFF_DOMAIN');
-admin.initializeApp({credential:admin.credential.cert(tokenSecrets),projectId:'ays-orbit-360-lab'});
-const db=admin.firestore(),auth=admin.auth(),tenant=db.collection('tenants').doc(TENANT);
+let db,auth,tenant;
 const items=(c,id)=>tenant.collection('data').doc(c).collection('items').doc(id);
 const meta=(c,id)=>tenant.collection(c).doc(id);
 const suffix=Date.now().toString(36)+'_'+crypto.randomBytes(4).toString('hex');
@@ -230,6 +233,8 @@ async function actorUat(browser,actor){
   }
 }
 (async()=>{
+  await initializeSignedQaAdmin(admin,{getLegacyCredential:existingCredential});
+  db=admin.firestore();auth=admin.auth();tenant=db.collection('tenants').doc(TENANT);
   const r=await fetch(LIVE+'/__recovery__/build.json',{headers:{'cache-control':'no-cache'}});
   assert.ok(r.ok);const marker=await r.json();
   assert.equal(marker.sourceSha,SHA,'I66_LIVE_EXACT_ARTIFACT_NOT_SERVED');
