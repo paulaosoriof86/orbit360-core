@@ -34,7 +34,14 @@ function saveReport(file,report){
 }
 function loadPackage(options,readFile){
   need(safeSource(options.sourceSha),'I66_READBACK_SOURCE_REQUIRED');
-  need(Number.isSafeInteger(Number(options.artifactId))&&Number(options.artifactId)>0,'I66_READBACK_ARTIFACT_REQUIRED');
+  if(options.executionProvider==='CLOUD_BUILD'){
+    try{require('./gravicentra-i6-6-cloud-build-preview.cjs').artifactIdentity(
+      options.sourceSha,options.buildRunId,options.artifactId,options.artifactDigest);}
+    catch{throw new ReadbackError('I66_READBACK_CLOUD_ARTIFACT_IDENTITY_REQUIRED');}
+  }else{
+    need(options.executionProvider===undefined,'I66_READBACK_PROVIDER_UNKNOWN');
+    need(Number.isSafeInteger(Number(options.artifactId))&&Number(options.artifactId)>0,'I66_READBACK_ARTIFACT_REQUIRED');
+  }
   need(safeDigest(options.artifactDigest),'I66_READBACK_DIGEST_REQUIRED');
   need(typeof options.previewChannel==='string'&&/^gi-i66-rc-[0-9]+$/.test(options.previewChannel),'I66_READBACK_CHANNEL_REQUIRED');
   const origin=String(options.previewUrl||'');
@@ -74,7 +81,8 @@ async function runReadback(options,deps={}){
   const readinessMs=options.readinessMs??POLICY.readinessMs,requestTimeoutMs=options.requestTimeoutMs??POLICY.requestTimeoutMs;
   const started=now();
   const report={schema:'GI_I66_PREVIEW_PACKAGE_READBACK_V1',status:'IN_PROGRESS',stage:'PREFLIGHT',
-    sourceSha:safeSource(options.sourceSha),artifactId:Number.isSafeInteger(Number(options.artifactId))?Number(options.artifactId):null,
+    sourceSha:safeSource(options.sourceSha),artifactId:options.executionProvider==='CLOUD_BUILD'?options.artifactId:Number.isSafeInteger(Number(options.artifactId))?Number(options.artifactId):null,
+    ...(options.executionProvider===undefined?{}:{executionProvider:options.executionProvider,buildRunId:options.buildRunId}),
     artifactDigest:safeDigest(options.artifactDigest),readinessDeadlineMs:readinessMs,
     expectedFiles:POLICY.expectedFiles,verifiedFiles:0,readinessAttempts:[],files:[],live:[],
     noDeploymentPerformed:true,noArtifactMutation:true,appStartupAcceptance:false};
@@ -207,7 +215,8 @@ function optionsFromEnvironment(env){
   const artifactDigest=typeof rawDigest==='string'&&/^[a-f0-9]{64}$/.test(rawDigest)?'sha256:'+rawDigest:rawDigest;
   return {packageRoot:path.join(temp,'gi-i66-package'),fingerprintRoot:temp,
     reportPath:path.join(temp,'gi-i66-preview-package-readback.json'),previewUrl:env.PREVIEW_URL,
-    previewChannel:env.PREVIEW_CHANNEL,sourceSha:env.SOURCE_SHA,artifactId:env.ARTIFACT_ID,artifactDigest};
+    previewChannel:env.PREVIEW_CHANNEL,sourceSha:env.SOURCE_SHA,artifactId:env.ARTIFACT_ID,artifactDigest,
+    ...(env.GRAVICENTRA_BUILD_PROVIDER===undefined?{}:{executionProvider:env.GRAVICENTRA_BUILD_PROVIDER,buildRunId:env.I66_PACKAGE_BUILD_ID})};
 }
 async function main(env=process.env){
   const options=optionsFromEnvironment(env);

@@ -53,6 +53,17 @@ test('224 exact manifest files and both predeploy LIVE fingerprints are required
     assert.equal([...url.searchParams.keys()].join(','),'__gi_i66_rb');
   }
 });
+test('explicit Cloud Build artifact keeps all 224 byte checks and dual LIVE checks',async()=>{
+  const f=fixture(),id='12345678-1234-4234-8234-123456789035';
+  f.options.executionProvider='CLOUD_BUILD';f.options.buildRunId=id;
+  f.options.artifactId='gs://ays-orbit360-firestore-private-backup-646761409743/i66/packages/request-35/'+f.options.sourceSha+'/'+id+'/gi-i66-exact-package.tar.gz#10000000000001';
+  const r=await api.runReadback(f.options,f.deps);assert.equal(r.status,'PASS');assert.equal(r.verifiedFiles,224);assert.equal(r.live.length,2);assert.equal(r.artifactId,f.options.artifactId);assert.equal(r.buildRunId,id);assert.equal(r.executionProvider,'CLOUD_BUILD');
+});
+test('Cloud provider cannot coerce a GitHub numeric artifact or unknown provider into admission',async()=>{
+  const f=fixture();f.options.executionProvider='CLOUD_BUILD';f.options.buildRunId='12345678-1234-4234-8234-123456789035';
+  await held(f,'I66_READBACK_CLOUD_ARTIFACT_IDENTITY_REQUIRED');
+  const unknown=fixture();unknown.options.executionProvider='UNVERIFIED';await held(unknown,'I66_READBACK_PROVIDER_UNKNOWN');
+});
 test('the actual upload-artifact bare digest is normalized by the CLI environment boundary only',async()=>{
   const f=fixture(),env={RUNNER_TEMP:'/virtual',PREVIEW_URL:f.options.previewUrl,PREVIEW_CHANNEL:f.options.previewChannel,
     SOURCE_SHA:f.options.sourceSha,ARTIFACT_ID:String(f.options.artifactId),ARTIFACT_DIGEST:'c'.repeat(64)};
