@@ -234,3 +234,25 @@ test('native financial report retains all 48 real-view obligations and exact pro
   for(const change of [x=>delete x.executionProvider,x=>x.executionProvider='GITHUB_ACTIONS',x=>x.releaseArtifactId=123,x=>x.stageCount=47,x=>x.workflowHeadSha='f'.repeat(40),x=>x.roles[0].financialFocal.observations[0].afterReload.balanceCents=27825,x=>x.firestoreWrites=1]){const bad=clone(report);change(bad);assert.throws(()=>owner.validateFinancialReport(bad,target,'preview',options));}
 });
 module.exports={candidate,plan,build,hostingPlan};
+
+test('assigned-role native preflight fetches the canonical remote and requires the sealed current owners before consent',t=>{
+  const driver=require('./gravicentra-i6-6-carlos-paula-live-direct-renewal-synthetic-uat.cjs');
+  const p=candidate().p,head='a'.repeat(40),actions=[];
+  t.mock.method(g,'candidateForPhase',()=>p);
+  const verify=t.mock.method(g,'verifyPinnedOwners',(observed,options)=>{
+    assert.equal(observed,p);assert.equal(options.head,head);
+    throw Error('I66_DIRECT_FORMS_ROLE_TEST_REJECTED_UNVERIFIED_OWNER');
+  });
+  const git=(_program,args)=>{
+    actions.push(args);
+    if(args[0]==='fetch'||args[0]==='merge-base')return '';
+    if(args[0]==='rev-parse')return head;
+    if(args[0]==='show'&&args[1]===head+':'+g.CONTROL)return '{}';
+    throw Error('UNEXPECTED_GIT_READ');
+  };
+  const cfg={phase:'PREVIEW',source:p.sourceSha,origin:p.previewUrl};
+  assert.throws(()=>driver.readCurrentPaulaRoleAuthority({cfg,candidate:p},{execFileSync:git}),/TEST_REJECTED_UNVERIFIED_OWNER/);
+  assert.equal(verify.mock.callCount(),1);
+  assert.deepEqual(actions[0],['fetch','--no-tags','--quiet',n.C.repositoryUrl,'refs/heads/'+n.C.branch]);
+  assert.ok(actions.some(args=>args[0]==='merge-base'&&args[2]===p.sourceSha&&args[3]===head));
+});

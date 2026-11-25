@@ -488,11 +488,25 @@ function readCurrentPaulaRoleAuthority({cfg,candidate},io={}){
   const git=(...args)=>exec('git',args,{encoding:'utf8',stdio:['ignore','pipe','pipe'],maxBuffer:4*1024*1024});
   try{
     const guard=require('./gravicentra-i6-6-operational-release-candidate.cjs'),legal=require('./gravicentra-i6-6-direction-preview-legal-acceptance.cjs');
-    git('fetch','--no-tags','--quiet','origin','refs/heads/'+PERSONAL_LEGAL.branch);
+    const provider=require('./gravicentra-i6-6-cloud-build-operational.cjs');
+    const cloud=candidate ? provider.provider(candidate) : process.env.GRAVICENTRA_BUILD_PROVIDER===provider.C.provider;
+    const upstream=cloud ? provider.C.repositoryUrl : 'origin';
+    git('fetch','--no-tags','--quiet',upstream,'refs/heads/'+PERSONAL_LEGAL.branch);
     const head=git('rev-parse','FETCH_HEAD').trim();assert.match(head,/^[a-f0-9]{40}$/,'I66_DIRECT_FORMS_ROLE_CURRENT_HEAD');
     git('merge-base','--is-ancestor',cfg.source,head);
-    assert.equal(git('diff','--name-only',cfg.source,head,'--',...guard.PINNED_OWNER_PATHS).trim(),'','I66_DIRECT_FORMS_ROLE_SOURCE_OR_OWNER_DRIFT');
     const sourceBytes=p=>git('show',cfg.source+':'+p),currentBytes=p=>git('show',head+':'+p);
+    const controlBytes=currentBytes(guard.CONTROL);
+    if(cloud){
+      const current=guard.candidateForPhase(JSON.parse(controlBytes),cfg.phase.toLowerCase());
+      assert.equal(provider.provider(current),true,'I66_DIRECT_FORMS_ROLE_CURRENT_PROVIDER_REQUIRED');
+      if(candidate)assert.deepEqual(candidate,current,'I66_DIRECT_FORMS_ROLE_CURRENT_CANDIDATE_DRIFT');
+      assert.equal(current.sourceSha,cfg.source,'I66_DIRECT_FORMS_ROLE_SOURCE_DRIFT');
+      // The native owner checks every changed product or QA path against the sealed
+      // mechanism, including base, admitted, current and on-disk bytes.
+      guard.verifyPinnedOwners(current,{head});
+    }else{
+      assert.equal(git('diff','--name-only',cfg.source,head,'--',...guard.PINNED_OWNER_PATHS).trim(),'','I66_DIRECT_FORMS_ROLE_SOURCE_OR_OWNER_DRIFT');
+    }
     const previewReceiptBytes=currentBytes(legal.I66_SCOPE.receiptPath);
     assert.equal(previewReceiptBytes,sourceBytes(legal.I66_SCOPE.receiptPath),'I66_DIRECT_FORMS_ROLE_DIRECTION_AUTHORITY_DRIFT');
     assert.equal(personalHash(sourceBytes(PERSONAL_LEGAL.legalOwnerPath)),PERSONAL_LEGAL.legalOwnerSha256,'I66_DIRECT_FORMS_ROLE_TERMS_DRIFT');
@@ -502,7 +516,7 @@ function readCurrentPaulaRoleAuthority({cfg,candidate},io={}){
       assert.equal(liveReceiptBytes,sourceBytes(legal.LIVE_SCOPE.authorizationPath),'I66_DIRECT_FORMS_ROLE_DIRECTION_AUTHORITY_DRIFT');
       assert.equal(proposalBytes,sourceBytes(legal.LIVE_SCOPE.proposalPath),'I66_DIRECT_FORMS_ROLE_DIRECTION_AUTHORITY_DRIFT');
     }
-    return validatePaulaRoleAuthority({cfg,candidate,controlHeadSha:head,controlBytes:currentBytes(guard.CONTROL),previewReceiptBytes,liveReceiptBytes,proposalBytes});
+    return validatePaulaRoleAuthority({cfg,candidate,controlHeadSha:head,controlBytes,previewReceiptBytes,liveReceiptBytes,proposalBytes});
   }catch(error){
     if(/^I66_DIRECT_FORMS_ROLE_[A-Z0-9_]+$/.test(error?.message||''))throw error;
     throw Error('I66_DIRECT_FORMS_ROLE_CURRENT_AUTHORITY_UNAVAILABLE');
