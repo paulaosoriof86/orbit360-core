@@ -10711,31 +10711,14 @@
     "artifactDigest": "sha256:08706bc64a5ca578fcf3fb305354adc1ba8a55347421f4226406f5092c3f46a0",
     "approvedByDirection": true,
     "externalMessagesSent": 0,
-    "action": "ACTIVATE",
-    "version": 3,
-    "expectedConfigDigest": "fb872230e01439cca80ed468340f2f835c7ed741c7e5f564f77b879dbfc89fd8",
-    "expiresAt": "2026-11-25T04:15:14.567Z",
-    "qaFixture": {
-      "nonce": "439b7bb2e30695132d3f510ecf1709cefda358b22b3315615df7add9ce30f878",
-      "packet": {
-        "type": "incoming",
-        "typeMessage": "extendedTextMessage",
-        "idMessage": "I66_V34_SYNTHETIC_45542808183",
-        "chatId": "50255550000@c.us",
-        "senderId": "50255550000@c.us",
-        "timestamp": 1795579514,
-        "senderContactName": "Persona sintética Gravicentra v34",
-        "isRead": false,
-        "isDeleted": false,
-        "isEdited": false,
-        "extendedTextMessage": {
-          "text": "Solicitud sintética de información de cobertura para validar la integración v34.",
-          "sourceType": "ad",
-          "sourceId": "AD_SYNTHETIC_V34_45542808183",
-          "ctwaClid": "I66_SYNTHETIC_CTWA_V34"
-        }
-      },
-      "providerPacketSha256": "325da35a23e7d3dfc38111e5ab0b53945a5163194e107426f15ee302eac41f52"
+    "action": "CAPTURE_AFTER_CREATE",
+    "version": 4,
+    "expectedConfigDigest": "b31ad2ce21bd48af6328d5b023cd8a6d684cf8c6bc2e0b1f4e3e6005066eddae",
+    "expiresAt": "2026-11-25T04:18:29.990Z",
+    "createExecutionReceipt": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_6_MAKE_V34_PREVIEW_CREATE_EXECUTION_20261124.json",
+      "gitBlobSha": "26eda46b7d3c2a730c9db6edca93d557791c10d2",
+      "sha256": "00abec8c121cd7623d7ebb034e6aedeeaaf9bc5b04e415ee5cc45ff501297f56"
     }
   }
 }

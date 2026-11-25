@@ -1,0 +1,61 @@
+{
+  "schema": "GI_I66_MAKE_QUEUE_EXECUTION_RECEIPT_V1",
+  "status": "success",
+  "scenarioId": 10196136,
+  "connectionId": 14756714,
+  "module": "google-cloud-firestore:createDocument",
+  "moduleId": 3,
+  "executionId": "4158664eadae41628d3ef26a4957f380",
+  "documentName": "projects/ays-orbit-360-lab/databases/(default)/documents/tenants/alianzas-soluciones/previewLeadIngressRequests/HbV0Xx83G1X80aLtlvrg",
+  "documentCreateTime": "2026-11-25T04:03:16.719Z",
+  "externalMessagesSent": 0,
+  "stage": "CREATE",
+  "phase": "preview",
+  "sourceSha": "a06e5b692595a863a6c6f6b223d895d874abb90e",
+  "artifactId": 14987684993,
+  "artifactDigest": "sha256:08706bc64a5ca578fcf3fb305354adc1ba8a55347421f4226406f5092c3f46a0",
+  "buildRunId": 45539669479,
+  "backendPreviewRunId": 45542808183,
+  "activeConfigurationDigest": "b31ad2ce21bd48af6328d5b023cd8a6d684cf8c6bc2e0b1f4e3e6005066eddae",
+  "activeConfigurationAuditPath": "leadIngressConfigurationAudit/f0b2f99da3df24b699a40c77f7f126bebee698811ca0e7583733c6327685a12e",
+  "activeConfigurationAuditDigest": "76660c04f770ed2bd2adb7473af2bbc84adcb5623e7c69c73c556a8e5cb03313",
+  "activeGrantReadExecution": "ff9c13918fe3435fbeb75c5452d4628c",
+  "finalizedPayloadFileSha256": "50d99de8ac596342da843457644ccc5a031417345027bd7040fb006545e207ec",
+  "providerPacketSha256": "325da35a23e7d3dfc38111e5ab0b53945a5163194e107426f15ee302eac41f52",
+  "packetTimestamp": 1795579514,
+  "queueEnvelopeDigest": "406733d9f095860d2eda138d7289191cf46bb09e32570aa40e9e73a05156815c",
+  "qaNonceSha256": "7bcc168647e0a4f7245e37c910c967fc9b8b1152d9744094a180eeda640040d0",
+  "inputOutputMatchFinalEnvelope": true,
+  "startedAt": "2026-11-25T04:03:15.806Z",
+  "durationMs": 2116,
+  "queueModuleFinishedAt": "2026-11-25T04:03:16.801Z",
+  "queueOnly": true,
+  "providerFixtureIsSynthetic": true,
+  "canonicalLeadAcceptanceClaim": false,
+  "protectedCanonicalReadbackPending": true,
+  "readback": {
+    "topology": [
+      3,
+      1,
+      2
+    ],
+    "scheduling": {
+      "type": "on-demand"
+    },
+    "scenarioStatus": "active",
+    "writerDisabled": true,
+    "lastEdit": "2026-11-25T04:03:20.543Z",
+    "queueModuleInvocations": 1,
+    "queueModuleErrors": 0,
+    "explicitScenarioRunRequested": true,
+    "explicitScenarioRunCallCount": 1,
+    "stageMapperRetainedWhileDisabled": true
+  },
+  "evidence": {
+    "moduleReadCycle": 1,
+    "cycleSelectionBasis": "Provider inspect explicitly instructed cycle1; exact executionId and final envelope match input and output.",
+    "payloadTruncated": false,
+    "onlyModule3PayloadRead": true,
+    "privateGreenApiMessageBodiesRead": false
+  }
+}
