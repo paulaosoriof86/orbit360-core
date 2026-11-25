@@ -239,3 +239,79 @@ test('successful real child retains PASS and complete file without emitting fail
     assert.equal(result.status,'PASS');assert.equal(result.exitCode,0);assert.equal(captured,'');assert.equal(fs.readFileSync(log,'utf8'),'SYNTHETIC_CHECK_PASS\n');
   }finally{process.stderr.write=oldWrite;console.error=oldError;fs.rmSync(temp,{recursive:true,force:true});}
 });
+
+function requestHarness(responses){
+  const calls=[],diagnostics=[],pauses=[];
+  return {calls,diagnostics,pauses,context:{operation:'GITHUB_RUN',pause:async ms=>{pauses.push(ms);},emit:value=>diagnostics.push(value),
+    fetch:async(url,options)=>{calls.push({url,options});const response=responses[Math.min(calls.length-1,responses.length-1)];
+      if(response instanceof Error)throw response;return response;}}};
+}
+const jsonResponse=(value,status=200)=>({status,ok:status>=200&&status<300,headers:{get:()=>null},json:async()=>value});
+const transientError=code=>Object.assign(new TypeError('fetch failed PRIVATE_PROVIDER_DETAIL'),{cause:{code}});
+test('provider GET recovers one transient socket error with bounded diagnostics and unchanged request',async()=>{
+  const h=requestHarness([transientError('UND_ERR_SOCKET'),jsonResponse({id:35})]);
+  const value=await owner.requestJson('https://api.github.com/private-path?secret=PRIVATE_QUERY',
+    {headers:{Authorization:'Bearer PRIVATE_AUTH'}},h.context);
+  assert.deepEqual(value,{id:35});assert.equal(h.calls.length,2);assert.deepEqual(h.pauses,[250]);
+  assert.deepEqual(h.calls[0].options.headers,h.calls[1].options.headers);
+  for(const call of h.calls){assert.equal(call.options.redirect,'error');assert.ok(call.options.signal instanceof AbortSignal);}
+  assert.notEqual(h.calls[0].options.signal,h.calls[1].options.signal);
+  const row=JSON.parse(h.diagnostics[0].slice(h.diagnostics[0].indexOf('{')));
+  assert.deepEqual(row,{operation:'GITHUB_RUN',method:'GET',hostname:'api.github.com',attempt:1,httpStatus:null,causeCode:'UND_ERR_SOCKET',retry:true});
+  assert.ok(!h.diagnostics.join('\n').includes('PRIVATE_'));
+});
+test('provider GET exhausts after three explicit transient failures without printing message or query',async()=>{
+  const h=requestHarness([transientError('ECONNRESET')]);
+  await assert.rejects(owner.requestJson('https://api.github.com/private-path?PRIVATE_QUERY',{},h.context),error=>
+    error.message==='I66_CLOUD_BUILD_REQUEST_FAILED_GITHUB_RUN_GET_api.github.com_ECONNRESET');
+  assert.equal(h.calls.length,3);assert.deepEqual(h.pauses,[250,1000]);assert.equal(h.diagnostics.length,3);
+  assert.equal(JSON.parse(h.diagnostics[2].slice(h.diagnostics[2].indexOf('{'))).retry,false);
+  assert.ok(!h.diagnostics.join('\n').includes('PRIVATE_'));
+});
+for(const status of [403,429,500])test('provider GET does not retry HTTP '+status+' or consume its private error body',async()=>{
+  let bodyRead=false;const response=jsonResponse(null,status);response.json=async()=>{bodyRead=true;throw Error('PRIVATE_HTTP_BODY');};
+  const h=requestHarness([response]);
+  await assert.rejects(owner.requestJson('https://cloudbuild.googleapis.com/private-path?PRIVATE_QUERY',{},
+    {...h.context,operation:'CLOUD_BUILD_METADATA'}),new RegExp('HTTP_STATUS_'+status));
+  assert.equal(h.calls.length,1);assert.deepEqual(h.pauses,[]);assert.equal(bodyRead,false);
+  assert.ok(!h.diagnostics.join('\n').includes('PRIVATE_'));
+});
+test('conditional claim POST with lost response remains exactly one attempt and never falls back to GET',async()=>{
+  const h=requestHarness([transientError('UND_ERR_SOCKET')]);
+  await assert.rejects(owner.requestJson('https://storage.googleapis.com/upload?ifGenerationMatch=0&name=PRIVATE_OBJECT',
+    {method:'POST',headers:{Authorization:'Bearer PRIVATE_AUTH'},body:'PRIVATE_CLAIM'},
+    {...h.context,operation:'PACKAGE_CLAIM_CREATE'}),/REQUEST_FAILED_PACKAGE_CLAIM_CREATE_POST_storage.googleapis.com_UND_ERR_SOCKET/);
+  assert.equal(h.calls.length,1);assert.equal(h.calls[0].options.method,'POST');assert.deepEqual(h.pauses,[]);
+  assert.equal(JSON.parse(h.diagnostics[0].slice(h.diagnostics[0].indexOf('{'))).retry,false);
+  assert.ok(!h.diagnostics.join('\n').includes('PRIVATE_'));
+});
+test('conditional claim conflict is terminal and retains the CAS precondition',async()=>{
+  const h=requestHarness([jsonResponse(null,412)]),url='https://storage.googleapis.com/upload?ifGenerationMatch=0';
+  await assert.rejects(owner.requestJson(url,{method:'POST',body:'CLAIM'},{...h.context,operation:'PACKAGE_CLAIM_CREATE'}),/HTTP_STATUS_412/);
+  assert.equal(h.calls.length,1);assert.equal(h.calls[0].url,url);assert.deepEqual(h.pauses,[]);
+});
+test('invalid JSON, unknown transport errors and TLS errors are terminal and redact exception details',async()=>{
+  const malformed=jsonResponse(null);malformed.json=async()=>{throw new SyntaxError('PRIVATE_BODY');};
+  for(const [failure,code] of [[malformed,'INVALID_JSON'],[new TypeError('PRIVATE_UNKNOWN'),'UNCLASSIFIED_TRANSPORT_ERROR'],
+    [transientError('CERT_HAS_EXPIRED'),'CERT_HAS_EXPIRED']]){
+    const h=requestHarness([failure]);
+    await assert.rejects(owner.requestJson('https://api.github.com/private',{},h.context),new RegExp(code));
+    assert.equal(h.calls.length,1);assert.deepEqual(h.pauses,[]);assert.ok(!h.diagnostics.join('\n').includes('PRIVATE_'));
+  }
+});
+test('metadata retry still requires Google header and exact runtime identity; token never appears in diagnostics',async()=>{
+  const env={GRAVICENTRA_BUILD_PROVIDER:'CLOUD_BUILD',GRAVICENTRA_CLOUD_BUILD_ID:'12345678-1234-1234-1234-123456789abc',
+    GRAVICENTRA_CLOUD_BUILD_SERVICE_ACCOUNT:owner.C.serviceAccount};
+  const token='PRIVATE_SYNTHETIC_ACCESS_TOKEN_FOR_TEST';
+  const values=[owner.C.projectId,owner.C.projectNumber,owner.C.serviceAccount,{token_type:'Bearer',access_token:token}];
+  const responses=values.map(value=>({...jsonResponse(value),headers:{get:()=> 'Google'},text:async()=>value}));
+  const h=requestHarness([transientError('EAI_AGAIN'),...responses]);
+  const identity=await owner.workerIdentity(env,h.context);
+  assert.equal(identity.buildId,env.GRAVICENTRA_CLOUD_BUILD_ID);assert.equal(identity.headers.Authorization,'Bearer '+token);
+  assert.equal(h.calls.length,5);assert.deepEqual(h.pauses,[250]);assert.ok(!h.diagnostics.join('\n').includes(token));
+  const denied=requestHarness([{...responses[0],headers:{get:()=>null}}]);
+  await assert.rejects(owner.workerIdentity(env,denied.context),/AUTHENTIC_METADATA_REQUIRED/);
+  assert.equal(denied.calls.length,1);assert.deepEqual(denied.pauses,[]);
+  const wrong=requestHarness([{...responses[0],text:async()=> 'wrong-project'}]);
+  await assert.rejects(owner.workerIdentity(env,wrong.context),/METADATA_PROJECT/);assert.equal(wrong.calls.length,1);
+});

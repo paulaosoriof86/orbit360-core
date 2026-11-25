@@ -287,19 +287,64 @@ function validateExecutionLog(p,b,proof,bytes){
   return marker;
 }
 
-async function requestJson(url,options={}){
-  const response=await fetch(url,{...options,redirect:'error',signal:AbortSignal.timeout(45000)});
-  need(response.ok,'HTTP_'+response.status+'_'+new URL(url).hostname);
-  return response.json();
+const TRANSIENT_READ_CODES=new Set(['ECONNRESET','ECONNREFUSED','EPIPE','ETIMEDOUT','EAI_AGAIN','ENETUNREACH','EHOSTUNREACH',
+  'UND_ERR_SOCKET','UND_ERR_CONNECT_TIMEOUT','UND_ERR_HEADERS_TIMEOUT','UND_ERR_BODY_TIMEOUT','REQUEST_TIMEOUT']);
+const TERMINAL_REQUEST_CODES=new Set(['ENOTFOUND','CERT_HAS_EXPIRED','UNABLE_TO_VERIFY_LEAF_SIGNATURE','DEPTH_ZERO_SELF_SIGNED_CERT',
+  'ERR_TLS_CERT_ALTNAME_INVALID','ERR_INVALID_URL','UND_ERR_INVALID_ARG']);
+const REQUEST_CONTEXTS=new Set(['PROVIDER_JSON','CLOUD_BUILD_METADATA','GITHUB_RUN','GITHUB_JOBS','GITHUB_ARTIFACTS','GITHUB_ACTIONS_READ',
+  'HOSTING_BUILD_MARKER','METADATA_PROJECT','METADATA_PROJECT_NUMBER','METADATA_PRINCIPAL','METADATA_TOKEN','PACKAGE_CLAIM_CREATE']);
+function requestCauseCode(error){
+  // Never expose an exception message, URL, request options or nested provider
+  // response. Only known transport codes may leave this boundary.
+  const candidates=[error?.code,error?.cause?.code,...[].concat(error?.cause?.errors||[]).slice(0,4).map(x=>x?.code)];
+  const code=candidates.find(value=>TRANSIENT_READ_CODES.has(value)||TERMINAL_REQUEST_CODES.has(value));
+  if(code)return code;
+  if(error?.name==='TimeoutError')return 'REQUEST_TIMEOUT';
+  if(error?.name==='SyntaxError')return 'INVALID_JSON';
+  return 'UNCLASSIFIED_TRANSPORT_ERROR';
 }
-async function workerIdentity(env=process.env){
+async function providerRequest(url,options={},context={}){
+  const method=String(options.method||'GET').toUpperCase(),hostname=new URL(url).hostname;
+  const operation=REQUEST_CONTEXTS.has(context.operation)?context.operation:'PROVIDER_JSON';
+  const fetcher=context.fetch||globalThis.fetch,emit=context.emit||console.error;
+  const pause=context.pause||(ms=>new Promise(resolve=>setTimeout(resolve,ms)));
+  const attempts=method==='GET'?3:1;
+  for(let attempt=1;attempt<=attempts;attempt++){
+    let httpStatus=null,code;
+    try{
+      const response=await fetcher(url,{...options,redirect:'error',signal:AbortSignal.timeout(context.timeoutMs||45000)});
+      httpStatus=response.status;
+      if(!response.ok){code='HTTP_STATUS';throw Error('HTTP_STATUS');}
+      if(context.metadata&&(response.redirected===true||response.headers?.get('metadata-flavor')!=='Google')){
+        code='AUTHENTIC_METADATA_REQUIRED';throw Error('AUTHENTIC_METADATA_REQUIRED');
+      }
+      return await (context.format==='text'?response.text():response.json());
+    }catch(error){
+      code=code||requestCauseCode(error);
+      // Only an idempotent GET with an explicit transient transport cause can
+      // retry. HTTP denials/statuses, parse failures and the conditional claim
+      // POST remain single-attempt failures, even after a lost response.
+      const retry=method==='GET'&&TRANSIENT_READ_CODES.has(code)&&attempt<attempts;
+      emit('I66_CLOUD_BUILD_PROVIDER_REQUEST_FAILURE '+JSON.stringify({operation,method,hostname,attempt,
+        httpStatus:Number.isInteger(httpStatus)&&httpStatus>=100&&httpStatus<=599?httpStatus:null,causeCode:code,retry}));
+      if(!retry)throw Error('I66_CLOUD_BUILD_REQUEST_FAILED_'+operation+'_'+method+'_'+hostname+'_'+code+(httpStatus?'_'+httpStatus:''));
+      await pause(attempt===1?250:1000);
+    }
+  }
+}
+async function requestJson(url,options={},context={}){
+  return providerRequest(url,options,{...context,format:'json'});
+}
+async function workerIdentity(env=process.env,requestContext={}){
   equal(env.GRAVICENTRA_BUILD_PROVIDER,C.provider,'RUNTIME_PROVIDER');need(uuid(env.GRAVICENTRA_CLOUD_BUILD_ID),'RUNTIME_UUID');
   equal(env.GRAVICENTRA_CLOUD_BUILD_SERVICE_ACCOUNT,C.serviceAccount,'RUNTIME_SA');
   for(const name of Object.keys(env))if(name.startsWith('GITHUB_')||['GOOGLE_APPLICATION_CREDENTIALS','CLOUDSDK_AUTH_CREDENTIAL_FILE_OVERRIDE','GCE_METADATA_HOST','GCE_METADATA_IP','GCE_METADATA_ROOT','FIRESTORE_EMULATOR_HOST','FIREBASE_AUTH_EMULATOR_HOST','STORAGE_EMULATOR_HOST'].includes(name))need(!env[name],'NO_FAKE_OR_OVERRIDDEN_IDENTITY_'+name);
   const base='http://metadata.google.internal/computeMetadata/v1/';
   async function metadata(suffix,asJson=false){
-    const r=await fetch(base+suffix,{headers:{'Metadata-Flavor':'Google'},redirect:'error',signal:AbortSignal.timeout(10000)});
-    need(r.ok&&r.headers.get('metadata-flavor')==='Google','AUTHENTIC_METADATA_REQUIRED');return asJson?r.json():r.text();
+    const operation={'project/project-id':'METADATA_PROJECT','project/numeric-project-id':'METADATA_PROJECT_NUMBER',
+      'instance/service-accounts/default/email':'METADATA_PRINCIPAL','instance/service-accounts/default/token':'METADATA_TOKEN'}[suffix];
+    return providerRequest(base+suffix,{headers:{'Metadata-Flavor':'Google'}},
+      {...requestContext,operation,metadata:true,timeoutMs:10000,format:asJson?'json':'text'});
   }
   equal((await metadata('project/project-id')).trim(),C.projectId,'METADATA_PROJECT');
   equal((await metadata('project/numeric-project-id')).trim(),C.projectNumber,'METADATA_PROJECT_NUMBER');
@@ -331,7 +376,7 @@ async function worker(p){
   equal([process.env.I66_PRODUCT_SOURCE_SHA,process.env.I66_MECHANISM_SOURCE_SHA,process.env.I66_REQUEST_VERSION],[p.sourceSha,p.mechanismSha,String(p.requestVersion)],'RUNTIME_SOURCE_SUBSTITUTIONS');
   const root=process.cwd(),identity=await workerIdentity();
   const buildApi='https://cloudbuild.googleapis.com/v1/projects/'+C.projectId+'/locations/'+C.region+'/builds/'+identity.buildId;
-  const running=await requestJson(buildApi,{headers:identity.headers});validateBuild(p,running,{finished:false});
+  const running=await requestJson(buildApi,{headers:identity.headers},{operation:'CLOUD_BUILD_METADATA'});validateBuild(p,running,{finished:false});
   for(const [file,pin] of Object.entries(p.pins)){const bytes=fs.readFileSync(path.join(root,file));equal(blob(bytes),pin.blob,'MECHANISM_BLOB');equal(sha(bytes),pin.sha256,'MECHANISM_SHA256');}
   const temp=path.join(root,'gi-i66-work-'+identity.buildId),source=path.join(temp,'source');
   fs.mkdirSync(temp,{recursive:false});
@@ -349,7 +394,8 @@ async function worker(p){
   const signed=workflowBlocks(workflow.toString('utf8')),blocks=runtimeBlocks(signed);
   equal(Object.fromEntries(Object.entries(signed).map(([k,v])=>[k,sha(v)])),p.blocks,'WORKFLOW_BLOCKS_CHANGED');
   const apiReads=[],markers=[];
-  const github=async suffix=>{const value=await requestJson('https://api.github.com/repos/'+C.repository+'/actions/'+suffix,{headers:{Accept:'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28'}});apiReads.push({suffix,value});return value;};
+  const github=async suffix=>{const operation=suffix.includes('/jobs')?'GITHUB_JOBS':suffix.includes('artifacts')?'GITHUB_ARTIFACTS':/^runs\/[0-9]+$/.test(suffix)?'GITHUB_RUN':'GITHUB_ACTIONS_READ';
+    const value=await requestJson('https://api.github.com/repos/'+C.repository+'/actions/'+suffix,{headers:{Accept:'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28'}},{operation});apiReads.push({suffix,value});return value;};
   const old=p.unexecutedGithubBuild;
   validateOriginalFailure(p,await github('runs/'+old.runId),await github('runs/'+old.runId+'/attempts/'+old.attempt+'/jobs?per_page=100'),await github('runs/'+old.runId+'/artifacts?per_page=100'));
   const env={...process.env,SOURCE_SHA:p.sourceSha,PROJECT_ID:C.projectId,HOSTING_SITE:C.projectId,TENANT_HINT:'alianzas-soluciones',
@@ -363,7 +409,7 @@ async function worker(p){
   shell('gate',F.gate);
   const startedAt=new Date().toISOString(),previous=process.cwd();
   let eligible;
-  try{process.chdir(source);eligible=await require(path.join(source,C.admission)).admitPreview(transport,github,async origin=>{const value=await requestJson(origin+'/__recovery__/build.json',{cache:'no-store'});markers.push({origin,value});return value;});}finally{process.chdir(previous);}
+  try{process.chdir(source);eligible=await require(path.join(source,C.admission)).admitPreview(transport,github,async origin=>{const value=await requestJson(origin+'/__recovery__/build.json',{cache:'no-store'},{operation:'HOSTING_BUILD_MARKER'});markers.push({origin,value});return value;});}finally{process.chdir(previous);}
   equal(eligible,true,'EXISTING_ADMISSION_DENIED');
   write(path.join(root,F.admission),{provider:C.provider,sourceSha:p.sourceSha,eligible,apiReads,markers});
   checks.admission={status:'PASS',exitCode:0,startedAt,endedAt:new Date().toISOString(),file:F.admission};
@@ -388,7 +434,7 @@ async function worker(p){
   // this executor never deletes a claim or silently builds a second package.
   const lock={schema:'GI_I66_CLOUD_BUILD_PACKAGE_CLAIM_V1',provider:C.provider,sourceSha:p.sourceSha,requestVersion:p.requestVersion,buildId:identity.buildId,mechanismSha:p.mechanismSha,planSha256:digest(p),createdAt:new Date().toISOString()};
   const refreshedIdentity=await workerIdentity();equal(refreshedIdentity.buildId,identity.buildId,'RUNTIME_IDENTITY_CHANGED');
-  const lockMeta=await requestJson('https://storage.googleapis.com/upload/storage/v1/b/'+C.bucket+'/o?uploadType=media&ifGenerationMatch=0&name='+encodeURIComponent(lockName(p)),{method:'POST',headers:{...refreshedIdentity.headers,'Content-Type':'application/json'},body:JSON.stringify(lock)+'\n'});
+  const lockMeta=await requestJson('https://storage.googleapis.com/upload/storage/v1/b/'+C.bucket+'/o?uploadType=media&ifGenerationMatch=0&name='+encodeURIComponent(lockName(p)),{method:'POST',headers:{...refreshedIdentity.headers,'Content-Type':'application/json'},body:JSON.stringify(lock)+'\n'},{operation:'PACKAGE_CLAIM_CREATE'});
   equal(lockMeta.name,lockName(p),'BUILD_CLAIM_PATH');need(generation(lockMeta.generation),'BUILD_CLAIM_GENERATION');
   shell('build',F.build);shell('archive',F.build,true);
   equal(git(source,'status','--porcelain','--untracked-files=no'),'','PRODUCT_CHECKOUT_MUTATED');
@@ -460,5 +506,5 @@ function main(args=process.argv.slice(2)){
   else if(command==='verify'){const [planFile,buildId,out]=rest;need(rest.length===3,'USAGE_VERIFY_PLAN_UUID_OUT');console.log(JSON.stringify(verify(json(planFile),buildId,out)));}
   else throw Error('I66_CLOUD_BUILD_USAGE prepare <sourceSha> <unexecutedGithubRunId> <attempt> <newOutputDirectory> | verify <plan.json> <realBuildUuid> <newOutputDirectory>');
 }
-module.exports={C,N,F,sha,blob,digest,runBlock,workflowBlocks,runtimeBlocks,validatePlan,makePlan,configFor,artifactPrefix,lockName,validateBuild,validateOriginalFailure,validateObject,validateObjectTime,parseArtifactManifest,nativeArtifactMd5,artifactRows,validateWorkerProof,validateExecutionLog,execLogged,workerIdentity,worker,verify,main};
+module.exports={C,N,F,sha,blob,digest,runBlock,workflowBlocks,runtimeBlocks,validatePlan,makePlan,configFor,artifactPrefix,lockName,validateBuild,validateOriginalFailure,validateObject,validateObjectTime,parseArtifactManifest,nativeArtifactMd5,artifactRows,validateWorkerProof,validateExecutionLog,requestCauseCode,providerRequest,requestJson,execLogged,workerIdentity,worker,verify,main};
 if(require.main===module)Promise.resolve().then(()=>main()).catch(error=>{console.error(String(error.message||error));process.exitCode=Number.isInteger(error.exitCode)&&error.exitCode>0&&error.exitCode<256?error.exitCode:1;});
