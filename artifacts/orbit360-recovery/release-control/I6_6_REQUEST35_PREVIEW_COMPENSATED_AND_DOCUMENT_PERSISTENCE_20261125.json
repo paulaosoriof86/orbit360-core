@@ -1,0 +1,124 @@
+{
+  "schema": "GI_I66_SCOPED_OPERATIONAL_ATTEMPT_AND_SOURCE_CHECKPOINT_V1",
+  "parentAuthority": "1c805da6f6f855e1971696ae79189990f080f2e5",
+  "activeGate": "I6.6",
+  "frozenSource": "16e3a70baf4e31ef8453173990f32a398c65e59b",
+  "frozenArchiveSha256": "1c562090b276b5aee913f9109aed5903f0450ffb582d89e0347a69853c1223ec",
+  "sourceChangedInFrozenRequest": false,
+  "request35": {
+    "phase": "preview",
+    "build": "9723b53c-8f8b-4f6e-80b6-960c2fcb8674",
+    "status": "FAILURE",
+    "reason": "INGRESS_CONFIGURATION_PROOF_PENDING",
+    "claimGeneration": "1795629238200879",
+    "actualCompensation": "COMPENSATION_READBACK_VERIFIED",
+    "configuration": "CLOSED_CONFIG_READBACK_VERIFIED",
+    "trigger": "EXACT_PREVIOUS_PREVIEW_REVISION_RESTORED",
+    "rollbackFailures": [],
+    "canonicalLeadWrites": 0,
+    "externalMessagesSent": 0,
+    "livePromotion": false,
+    "signedPreviewAccepted": false,
+    "canReuseOriginalClaim": false,
+    "records": {
+      "privateBucket": "ays-orbit360-firestore-private-backup-646761409743",
+      "prefix": "i66/operational-attempts/9723b53c-8f8b-4f6e-80b6-960c2fcb8674/",
+      "hold.json": {
+        "bytes": 21617,
+        "generation": "1795630563546835",
+        "sha256": "2431e63d63d007d89800c63c7d59b8a33fdd86c778aacd9048de0d10d2a62684"
+      },
+      "hold-execution.log": {
+        "bytes": 430273,
+        "generation": "1795630563278908",
+        "sha256": "afc91b4f010a2e86a27b78d6493dd211f2958b3dbb47587b89e0ad82ad8e4953"
+      }
+    }
+  },
+  "live": {
+    "source": "65c825b2808a615ca4195bdde6689dbdbe3193b2",
+    "hostingVersion": "332999a55b189108",
+    "liveOrigins": [
+      "app.aysseguros.com",
+      "ays-orbit-360-lab.web.app"
+    ],
+    "exactReadbackFilesPerOrigin": 224,
+    "role": "Direccion",
+    "receiptBefore": "ONE_ALREADY_APPLIED_RECONCILED_28840_CENTS_BALANCE_ZERO",
+    "singleUiAttemptUtc": "2026-11-25T18:18:28.961Z",
+    "error": "document-upload-failed",
+    "driveUploadAndFinancialRequestsDuringAttempt": 0,
+    "sourcePdfBytes": 60935,
+    "sourcePdfSha256": "63c7ce49e5655a78673547f43565387122225947a2cf1b5e7fd5aaabc0d4448f",
+    "originalDriveArchiveReadback": "MATCHED_SOURCE_SHA256_IN_CUSTOMER_INSURER_SUBFOLDER",
+    "receiptPdfLinked": false,
+    "customerFinancialWrites": 0,
+    "rootFolderDirectDriveSharing": "DIRECTION_RETAINED_EXISTING_LINK_SHARING",
+    "grantedOauthScope": "Google Drive",
+    "bootstrapCustomDomain": {
+      "utc": "2026-11-25T18:45:26.471607Z",
+      "status": 403,
+      "administrativeConnection": "REMAINS_REQUIRED",
+      "sourceFinding": "E3 OAuth origin validation omits app.aysseguros.com. The same check accepts both official Firebase LIVE domains."
+    }
+  },
+  "candidate": {
+    "status": "ISOLATED_SOURCE_CHECKPOINT_PENDING_ADMISSION_SIGNED_PREVIEW_LIVE",
+    "base": "1c805da6f6f855e1971696ae79189990f080f2e5",
+    "patch": "artifacts/orbit360-recovery/release-control/i6-6-p0-checkpoints/I6_6_PAYMENT_DRIVE_PERSISTENCE_AND_ADVISOR_SCOPE_20261125.patch.gz.b64.md",
+    "patchBytes": 44046,
+    "patchSha256": "4802a9ff65fc47db5f02a5f66e4c8817c84410019754a80613ddfebc740390ec",
+    "retainedFileSha256": "a4a3cedeceee73c3dc9f44b7d3af05ec12a5f2fade3b26ce1c759111dd6fd902",
+    "sourcePins": [
+      {
+        "path": "functions/cobros-reconciliation-domain.js",
+        "before": "3d84423fd985841c6f9b230dcf729b41f2512556",
+        "after": "c7aa1aa4e26dfacfc3c1beb60ac7943b68dae957"
+      },
+      {
+        "path": "functions/document-drive-domain.js",
+        "before": "928dc218aa09be4648552f84502e50f4c0d65227",
+        "after": "1ff94196f1cf29b61bf3f26968e15cb42bf5e91b"
+      },
+      {
+        "path": "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js",
+        "before": "1866fd392be49b8506c83d1392092a715b3983dd",
+        "after": "170ff33f6f9a52aefb6f5162e69e1aa81e318b6a"
+      },
+      {
+        "path": "orbit360-platform/core/cobros-reconciliation-domain-client.js",
+        "before": "1e4b42f2096d6f89de2eae63e98ea5e775db0917",
+        "after": "d4eca6171819fb9419a0673b89d9ba1ba7eee95a"
+      },
+      {
+        "path": "tools/gravicentra-i6-6-payment-document-recovery.test.cjs",
+        "before": null,
+        "after": "84ece6f676d8c3d8c52847130d89e621d88752a8"
+      },
+      {
+        "path": "tools/gravicentra-i6-6-r51-payment-application-preservation.test.cjs",
+        "before": "b519081d11a4309d3eea6a58c7e6831bbecdd189",
+        "after": "5a36ce16e3f1b224789aa62aae7ee0b2e3e98087"
+      }
+    ],
+    "localTests": {
+      "total": 110,
+      "passed": 110,
+      "failed": 0,
+      "scopes": [
+        "payment persistence with original actor and role",
+        "read-only recovery after lost acknowledgement and reload",
+        "Drive move retry and single document binding",
+        "advisor own-client scope and root visibility",
+        "official LIVE OAuth origins and Preview separation"
+      ]
+    },
+    "initialFinding": "Acknowledgement loss can quarantine a committed invoice in both E3 and request35."
+  },
+  "temporarySigningKey": {
+    "providerInventoryConfirmedAfterRemoval": 0,
+    "privateKeyRemoved": true
+  },
+  "releaseNext": "Admit the exact compensated retry through the release owner, preserving the consumed claim. Coordinate Make scenario evidence in the protected window. Resume existing LIVE promotion only after signed Preview and readback.",
+  "fullI66ProductionAccepted": false
+}
