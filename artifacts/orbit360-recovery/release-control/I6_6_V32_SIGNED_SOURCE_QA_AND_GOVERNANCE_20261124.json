@@ -1,0 +1,31 @@
+{
+  "schema": "GI_I66_V32_SOURCE_QA_AND_GOVERNANCE_VERIFICATION_V1",
+  "status": "SIGNED_SOURCE_QA_AND_GOVERNANCE_PASS",
+  "branch": "recovery/fase-a-clean-20260831",
+  "sourceHead": "df5fad2ff345a3c52913fdd8f8d6d4fd4f8abb20",
+  "verifiedAt": "2026-11-25T00:31:20.754Z",
+  "sourceQa": {
+    "workflow": ".github/workflows/gravicentra-i66-privileged-role-parity-source-qa.yml",
+    "headSha": "df5fad2ff345a3c52913fdd8f8d6d4fd4f8abb20",
+    "status": "completed",
+    "conclusion": "success",
+    "runId": 45517949876,
+    "jobId": 138882158137,
+    "sourceSuiteStep": 4,
+    "lineageGuardStep": 5,
+    "providerUrl": "https://github.com/paulaosoriof86/orbit360-core/actions/runs/45517949876"
+  },
+  "governance": {
+    "workflow": ".github/workflows/gravicentra-release-lock-sync.yml",
+    "headSha": "df5fad2ff345a3c52913fdd8f8d6d4fd4f8abb20",
+    "status": "completed",
+    "conclusion": "success",
+    "runId": 45517949953,
+    "preflightJobId": 138882160121,
+    "availabilityJobId": 138882160704,
+    "preflightStep": 4,
+    "canonicalPreflight": "PROVIDER_STEP_SUCCESS_VERIFIED",
+    "providerUrl": "https://github.com/paulaosoriof86/orbit360-core/actions/runs/45517949953"
+  },
+  "noRuntimeAcceptanceClaim": true
+}
