@@ -142,6 +142,39 @@ test('MAPFRE retains committed-but-unverified status after a postcommit outage a
 const stable=x=>Array.isArray(x)?x.map(stable):x&&typeof x==='object'?
   Object.fromEntries(Object.keys(x).sort().map(k=>[k,stable(x[k])])):x;
 const objectHash=x=>hash(JSON.stringify(stable(x)));
+// Exercise the actual backend normalizer, stopping before the first transaction.
+// The observer never supplies its own expected digest to this independent probe.
+async function canonicalRequestPayload(payload){
+  const fs=require('node:fs'),path=require('node:path'),vm=require('node:vm');
+  const source=path.resolve(__dirname,'../functions/cobros-reconciliation-domain.js');
+  const fromDomain=require('node:module').createRequire(source),exportsObject={};
+  const ref={collection(){return this;},doc(){return this;}};
+  class HttpsError extends Error{constructor(code,message){super(message);this.code=code;}}
+  const code=fs.readFileSync(source,'utf8')+`
+    operationRequestId=(_tenant,_operation,requestPayload)=>{const e=new Error('SYNTHETIC_PAYLOAD_CAPTURE');e.canonicalPayload=requestPayload;throw e;};
+    exports.captureCanonicalPayload=payload=>applyPayment({tenantId:'synthetic-mapfre-tenant'},
+      {requestId:'synthetic-mapfre-request'},payload);
+  `;
+  vm.runInNewContext(code,{exports:exportsObject,process:{env:{}},console,require:name=>
+    name==='firebase-admin/app'?{getApps:()=>[{}],initializeApp:()=>({})}:
+    name==='firebase-admin/firestore'?{getFirestore:()=>({collection:()=>ref,
+      runTransaction:()=>{throw Error('NO_TRANSACTION_PERMITTED_IN_PAYLOAD_PROBE');}}),FieldValue:{}}:
+    name==='firebase-functions/v2/https'?{HttpsError,onCall:(_,handler)=>handler}:fromDomain(name)},
+    {filename:source});
+  try{await exportsObject.captureCanonicalPayload(clone(payload));assert.fail('canonical probe did not stop before transaction');}
+  catch(error){assert.equal(error.message,'SYNTHETIC_PAYLOAD_CAPTURE');return clone(error.canonicalPayload);}
+}
+test('MAPFRE observer digest equals the real backend normalizer for documentary date evidence and currency',async()=>{
+  for(const original of reader.mapfreBinding().preflight.twoCases){
+    for(const fields of [{},{currency:' gtq '},{moneda:'gtq'},{actualPaidDateEvidence:false}]){
+      const target=clone(original);Object.assign(target.pendingConditionalCanonicalCall.payload,fields);
+      const canonical=await canonicalRequestPayload(target.pendingConditionalCanonicalCall.payload);
+      assert.equal(reader.mapfreCanonicalPayloadDigest(target),objectHash(canonical));
+      assert.equal(canonical.actualPaidDateEvidence,target.pendingConditionalCanonicalCall.payload.actualPaidDateEvidence===true);
+      assert.equal(canonical.currency,fields.currency||fields.moneda?'GTQ':'');
+    }
+  }
+});
 async function canonicalPaymentFixture(){
   const f=fixture(),p=await plan(f),corrected=await apply(f,p),s=f.binding.preflight.scope;
   for(const t of f.binding.preflight.twoCases){
@@ -160,7 +193,7 @@ async function canonicalPaymentFixture(){
       policyId:s.policyId,clientId:s.clientId,paymentState:'PAID_DIRECT',applicationState:'APPLIED_DIRECT',
       paidDate:body.paidDate,invoiceNumber:body.invoiceNumber,portfolioUpdated:true,serverOwned:true,idempotent:true};
     const eventId='payevt_'+hash(s.tenantId+'|'+t.receiptId+'|'+request.requestId).slice(0,28);
-    const payloadDigest=reader.mapfreCanonicalPayloadDigest(t);
+    const payloadDigest=objectHash(await canonicalRequestPayload(body));
     f.db.put(root+'/reconciliationRequests/'+request.requestId,{status:'committed',operation:'apply_payment',eventId,payloadDigest,result});
     f.db.put(root+'/reconciliationEvents/'+eventId,{operation:'apply_payment',requestId:request.requestId,
       receiptId:t.receiptId,cobroId:request.expectedNewCobroIdIfAbsent,payloadDigest,resultDigest:objectHash(result),actor:{uid:'synthetic-authorized-actor'}});
@@ -190,4 +223,16 @@ test('MAPFRE final observer rejects wrong invoice, invented dates, duplicate pay
     const f=await canonicalPaymentFixture();mutate(f);const count=f.db.writes,r=await paymentReview(f);
     assert.equal(r.status,'MAPFRE_PAYMENT_READBACK_HOLD');assert.ok(r.verifiedPayments<2);assert.equal(f.db.writes,count);
   }
+});
+
+test('MAPFRE observer rejects the legacy digest missing currency and actual date evidence',async()=>{
+  const f=await canonicalPaymentFixture(),before=clone([...f.db.docs]),writes=f.db.writes;
+  for(const target of f.binding.preflight.twoCases){
+    const body=await canonicalRequestPayload(target.pendingConditionalCanonicalCall.payload);
+    delete body.currency;delete body.actualPaidDateEvidence;
+    f.db.docs.get(root+'/reconciliationRequests/'+target.pendingConditionalCanonicalCall.requestId).payloadDigest=objectHash(body);
+  }
+  const r=await paymentReview(f);
+  assert.equal(r.status,'MAPFRE_PAYMENT_READBACK_HOLD');assert.equal(r.verifiedPayments,0);
+  assert.equal(f.db.writes,writes);assert.equal(f.db.docs.size,before.length);
 });

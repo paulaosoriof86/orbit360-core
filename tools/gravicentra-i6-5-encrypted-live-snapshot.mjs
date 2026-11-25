@@ -136,6 +136,176 @@ async function runOctober(checkOnly){
   console.log('I65_OCTOBER_ENCRYPTED_SNAPSHOT=CAPTURED');console.log('I65_OCTOBER_COUNTS='+JSON.stringify(payload.counts));console.log('I65_OCTOBER_WRITES=0');
  }finally{await deleteApp(app).catch(()=>{});}
 }
+// A separate current I6.6 read profile in this same encrypted reader. It never
+// invokes, edits, or reactivates the historical October authority.
+export const ALICE_PROFILE='ALICE_GT_MATCHING_MINIMAL_V1';
+export const ALICE_COLLECTIONS=Object.freeze(['negocios','clientes','polizas']);
+export const ALICE_REQUEST=OCTOBER_ROOT+'I6_6_ALICE_GT_PRIVATE_MATCHING_READBACK_REQUEST_20261124.json';
+export const ALICE_PUBLIC_KEY=OCTOBER_ROOT+'I6_6_ALICE_GT_MATCHING_PUBLIC_KEY_20261124.pem';
+export const ALICE_TEST='tools/gravicentra-i6-6-alice-private-snapshot.test.mjs';
+export const ALICE_EXECUTOR_PATHS=Object.freeze([OCTOBER_PATHS[0],OCTOBER_PATHS[1],ALICE_TEST,ALICE_PUBLIC_KEY]);
+export const ALICE_WORKBOOK_SHA256='0686eb96bdcc82d90284f3740cf3bd8b91910ac99da184d3856d6d8330e94bdb';
+const ALICE_STATE='orbit360-platform/docs/recovery/orbit360-recovery-state-v1.json';
+const ALICE_DECISION=OCTOBER_ROOT+'I6_6_DIRECTION_OPERATIONAL_FINDINGS_AND_PROSPECTIVE_LEADS_20261124_R60.json';
+const ALICE_DECISION_BLOB='5905d1e85327124efd9afbde3755b9070c1c5501';
+const ALICE_COUNTRY_FIELDS=Object.freeze(['tenantId','pais','country']);
+const ALICE_COMMON=Object.freeze(['id','tenantId','pais','country','nombre','name','telefono','phone','celular','whatsapp','movil','telefonoPrincipal','telefonoMovil','email','correo','asesorId','advisorId','createdAt','creado','updatedAt','actualizado','archivado','deleted','eliminado','activo','active','visible']);
+export const ALICE_FIELDS=Object.freeze({
+ negocios:Object.freeze([...ALICE_COMMON,'tipo','clienteId','clientId','clienteIdCreado','polizaId','policyId','commercialIdentityId','sourceOpportunityId','producto','product','ramo','line','plan','etapa','stage','estado','status','canal','origen','puntoIngreso','aseguradoraId','aseguradoraIds','cadenciaActiva']),
+ clientes:Object.freeze([...ALICE_COMMON,'tipo','razonSocial','tipoIdentificacion','identificacion','nit','dpi','identityKey','mergedIntoClientId','fusionado','estadoOperativo']),
+ polizas:Object.freeze([...ALICE_COMMON,'numero','numeroPoliza','policyNumber','noPoliza','clienteId','clientId','producto','product','ramo','line','plan','estado','status','aseguradoraId','negocioId','sourceBusinessId','renovacionDe','polizaAnteriorId','vigenciaInicio','vigenciaFin'])
+});
+export const ALICE_READ_SCOPE=Object.freeze({riskCountry:'GT',riskCollections:['negocios','polizas'],clientIdentityCollection:'clientes',clientIdentityCountryFilter:'NONE_WITHIN_AUTHORIZED_TENANT',clientCountryIsNotRiskCountry:true,phonePrefixIsNotCountry:true,countryAliasFields:['pais','country'],countryDirectoryFields:ALICE_COUNTRY_FIELDS,nonGtRiskIdentityFieldsRead:false,missingOrConflictingRiskCountry:'EXCLUDE_AND_HOLD_ABSENCE_INFERENCE',missingOrConflictingClientCountry:'PRESERVE_MINIMAL_IDENTITY_AND_HOLD_COUNTRY_DECISION',fullDocuments:false,matchingOnly:true,imports:false,externalMessages:false});
+const ALICE_FORBIDDEN=Object.freeze([...FORBIDDEN,'iamWrites','backendChanges','outboxWrites','grantWrites','makeActivation']);
+function aliceKeys(value,expected,code){need(value&&typeof value==='object'&&!Array.isArray(value)&&same(Object.keys(value).sort(),[...expected].sort()),code);}
+export function validateAliceRequest({request,requestBytes,control,controlBytes,state,stateBytes,progress,progressBytes,decisionBytes,publicKeyBytes,fileBytes,branch,head}){
+ need(branch==='recovery/fase-a-clean-20260831'&&/^[a-f0-9]{40}$/.test(head||''),'I66_ALICE_CANONICAL_HEAD_REQUIRED');
+ aliceKeys(request,['schema','profile','status','projectId','tenantId','riskCountry','source','readScope','collections','fieldProjection','authority','executableFiles','maxDocumentsPerCollection','pageSize','identityBatchSize','publicKeyPath','publicKeySha256','capabilities','encryptedOnly','repositoryPlaintextForbidden'],'I66_ALICE_REQUEST_SHAPE');
+ need(request.schema==='GRAVICENTRA_I66_ALICE_PRIVATE_MATCHING_REQUEST_V1'&&request.profile===ALICE_PROFILE&&request.status==='AUTHORIZED_READ_ONLY_MATCHING','I66_ALICE_PROFILE_NOT_ACTIVE');
+ need(request.projectId===PROJECT&&request.tenantId===TENANT&&request.riskCountry==='GT','I66_ALICE_TENANT_COUNTRY');
+ aliceKeys(request.source,['workbookSha256','advance','declaredCutoff','declaredCoverageStart','latestAdvanceVerified'],'I66_ALICE_SOURCE_SHAPE');
+ need(same(request.source,{workbookSha256:ALICE_WORKBOOK_SHA256,advance:10,declaredCutoff:'2026-11-24',declaredCoverageStart:'2026-09-01',latestAdvanceVerified:false}),'I66_ALICE_WORKBOOK_BINDING');
+ need(same(request.collections,ALICE_COLLECTIONS)&&same(request.fieldProjection,ALICE_FIELDS)&&same(request.readScope,ALICE_READ_SCOPE),'I66_ALICE_READ_SCOPE');
+ aliceKeys(request.capabilities,[...ALICE_FORBIDDEN,'operationalWrites'],'I66_ALICE_CAPABILITY_SHAPE');
+ need(ALICE_FORBIDDEN.every(k=>request.capabilities[k]===false)&&request.capabilities.operationalWrites===0&&request.encryptedOnly===true&&request.repositoryPlaintextForbidden===true,'I66_ALICE_WRITE_OR_PLAINTEXT_DENIED');
+ need(Number.isInteger(request.maxDocumentsPerCollection)&&request.maxDocumentsPerCollection>0&&request.maxDocumentsPerCollection<=20000&&Number.isInteger(request.pageSize)&&request.pageSize>0&&request.pageSize<=500&&request.identityBatchSize===10,'I66_ALICE_PAGINATION_BOUNDS');
+ const a=request.authority;
+ aliceKeys(a,['sourceBaseHead','controlPlanePath','controlPlaneBlobSha','recoveryStatePath','recoveryStateBlobSha','currentProgressPath','currentProgressBlobSha','activeGate','formalDataCutoff','executionCursor','decisionPath','decisionBlobSha','cursorChanged'],'I66_ALICE_AUTHORITY_SHAPE');
+ need(/^[a-f0-9]{40}$/.test(a.sourceBaseHead||'')&&a.controlPlanePath==='artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json'&&a.controlPlaneBlobSha===blob(controlBytes)&&a.recoveryStatePath===ALICE_STATE&&a.recoveryStateBlobSha===blob(stateBytes),'I66_ALICE_CURRENT_CONTROL_BINDING');
+ need(a.activeGate==='I6.6'&&a.formalDataCutoff==='2026-07-31'&&state.currentIteration===6&&state.dataCutoff===a.formalDataCutoff&&a.cursorChanged===false,'I66_ALICE_CURRENT_CUTOFF');
+ need(/^I6_6_/.test(control.postproductionDataUpdateControl?.status||'')&&a.executionCursor===control.postproductionDataUpdateControl?.executionCursor&&/^I6_6_/.test(a.executionCursor||''),'I66_ALICE_CURRENT_CURSOR');
+ need(/^artifacts\/orbit360-recovery\/release-control\/I6_6_CURRENT_EXECUTION_PROGRESS_[0-9]{8}_R[0-9]+\.json$/.test(a.currentProgressPath||'')&&control.i66ActiveRecoveryCursor?.currentEvidencePath===a.currentProgressPath&&control.i66ActiveRecoveryCursor?.currentEvidenceBlobSha===a.currentProgressBlobSha&&blob(progressBytes)===a.currentProgressBlobSha,'I66_ALICE_CURRENT_PROGRESS');
+ need(a.decisionPath===ALICE_DECISION&&a.decisionBlobSha===ALICE_DECISION_BLOB&&blob(decisionBytes)===ALICE_DECISION_BLOB&&progress.prospectiveLeadPriority?.decision?.path===ALICE_DECISION&&progress.prospectiveLeadPriority?.decision?.gitBlobSha===ALICE_DECISION_BLOB,'I66_ALICE_CURRENT_LEAD_DECISION');
+ aliceKeys(request.executableFiles,ALICE_EXECUTOR_PATHS,'I66_ALICE_EXECUTOR_SET');
+ for(const p of ALICE_EXECUTOR_PATHS)need(fileBytes[p]&&blob(fileBytes[p])===request.executableFiles[p],'I66_ALICE_EXECUTOR_BYTES');
+ need(requestBytes&&same(JSON.parse(requestBytes),request),'I66_ALICE_REQUEST_BYTES');
+ need(request.publicKeyPath===ALICE_PUBLIC_KEY&&request.publicKeySha256===sha(publicKeyBytes)&&same(publicKeyBytes,fileBytes[ALICE_PUBLIC_KEY]),'I66_ALICE_RECIPIENT_KEY');
+ const key=crypto.createPublicKey(publicKeyBytes);need(key.asymmetricKeyType==='rsa'&&(key.asymmetricKeyDetails?.modulusLength||0)>=3072,'I66_ALICE_RECIPIENT_STRENGTH');
+ return request;
+}
+function aliceCountryValue(value){
+ if(typeof value!=='string')return null;
+ const valueNormalized=value.normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim().toUpperCase();
+ if(['GT','GUATEMALA'].includes(valueNormalized))return 'GT';
+ if(['CO','COLOMBIA'].includes(valueNormalized))return 'CO';
+ return valueNormalized||null;
+}
+export function classifyAliceCountry(raw){
+ need(!raw.tenantId||raw.tenantId===TENANT,'I66_ALICE_DOCUMENT_TENANT');
+ const values=['pais','country'].filter(k=>raw[k]!=null&&raw[k]!=='').map(k=>aliceCountryValue(raw[k]));
+ if(!values.length||values.some(v=>v===null))return 'MISSING';
+ if(new Set(values).size!==1)return 'CONFLICT';
+ return ['GT','CO'].includes(values[0])?values[0]:'OTHER';
+}
+function aliceSafeValue(value){
+ if(value==null||typeof value==='boolean')return {ok:true,value};
+ if(typeof value==='number')return {ok:Number.isFinite(value)&&Number.isSafeInteger(value),value};
+ if(typeof value==='string')return {ok:value.length<=1000,value};
+ if(value instanceof Date||typeof value?.toDate==='function')return {ok:true,value:canon(value)};
+ if(Array.isArray(value)&&value.length<=25&&value.every(x=>typeof x==='string'&&x.length<=320))return {ok:true,value:[...value]};
+ return {ok:false};
+}
+export function projectAliceRecord(collection,document){
+ need(ALICE_COLLECTIONS.includes(collection),'I66_ALICE_COLLECTION_DENIED');
+ const raw=document.data()||{},id=String(document.id||'');
+ const countryClass=classifyAliceCountry(raw);
+ need(id&&(collection==='clientes'||countryClass==='GT'),'I66_ALICE_GT_RISK_OR_TENANT_IDENTITY_REQUIRED');
+ const data={},heldFields=[];
+ for(const key of ALICE_FIELDS[collection])if(Object.prototype.hasOwnProperty.call(raw,key)){
+  const v=aliceSafeValue(raw[key]);if(v.ok)data[key]=v.value;else heldFields.push(key);
+ }
+ const storedId=data.id??null;data.id=id;data.tenantId=TENANT;
+ return {...data,canonicalDocumentId:id,__snapshot:{storedId,idMismatch:storedId!=null&&String(storedId)!==id,projection:collection==='clientes'?'TENANT_CLIENT_IDENTITY_CONTACT_COUNTRY_ONLY':'GT_RISK_IDENTITY_RELATION_STAGE_PRODUCT_ONLY',countryClass,clientCountryIsNotRiskCountry:collection==='clientes',projectedDataSha256:sha(JSON.stringify(stable(data))),projectionHeldFields:heldFields,createTimeExact:exactTime(document.createTime),updateTimeExact:exactTime(document.updateTime),readTimeExact:exactTime(document.readTime)}};
+}
+function aliceCollection(db,name){need(ALICE_COLLECTIONS.includes(name),'I66_ALICE_COLLECTION_DENIED');return db.collection('tenants').doc(TENANT).collection('data').doc(name).collection('items');}
+export async function captureAliceSnapshot({db,request,requestBytes,head,now=()=>new Date().toISOString()}){
+ need(requestBytes&&same(JSON.parse(requestBytes),request),'I66_ALICE_REQUEST_BYTES');
+ const startedAt=now(),data={},collections={};
+ for(const name of ALICE_COLLECTIONS){
+  const ref=aliceCollection(db,name),selected=[],counts={scanned:0,gt:0,co:0,otherCountry:0,missingCountry:0,conflictingCountry:0},pages=[];
+  let lastId=null,exhausted=false;
+  while(!exhausted){
+   const pageLimit=Math.min(request.pageSize,request.maxDocumentsPerCollection-counts.scanned+1);
+   let query=ref.orderBy('__name__').select(...ALICE_COUNTRY_FIELDS).limit(pageLimit);
+   if(lastId!==null)query=query.startAfter(lastId);
+   const snap=await query.get();need(Array.isArray(snap.docs)&&snap.docs.length<=pageLimit,'I66_ALICE_DIRECTORY_PAGE');
+   for(const doc of snap.docs){
+    const id=String(doc.id||'');need(id&&(!lastId||Buffer.compare(Buffer.from(id),Buffer.from(lastId))>0),'I66_ALICE_PAGINATION_DUPLICATE_OR_ORDER');
+    lastId=id;counts.scanned++;need(counts.scanned<=request.maxDocumentsPerCollection,'I66_ALICE_DOCUMENT_BOUND_EXCEEDED');
+    const raw=doc.data()||{},country=classifyAliceCountry(raw);
+    counts[country==='GT'?'gt':country==='CO'?'co':country==='OTHER'?'otherCountry':country==='MISSING'?'missingCountry':'conflictingCountry']++;
+    if(name==='clientes'||country==='GT'){
+     const updateTimeExact=exactTime(doc.updateTime);need(updateTimeExact,'I66_ALICE_UPDATE_TIME_REQUIRED');
+     selected.push({id,updateTimeExact});
+    }
+   }
+   exhausted=snap.docs.length<pageLimit;
+   pages.push({count:snap.docs.length,readTimeExact:exactTime(snap.readTime),exhausted});
+  }
+  const result=[];
+  for(let i=0;i<selected.length;i+=request.identityBatchSize){
+   const wanted=selected.slice(i,i+request.identityBatchSize),byId=new Map(wanted.map(x=>[x.id,x]));
+   const snap=await ref.where('__name__','in',[...byId.keys()]).select(...ALICE_FIELDS[name]).get();
+   need(Array.isArray(snap.docs)&&snap.docs.length===wanted.length,'I66_ALICE_IDENTITY_DISAPPEARED');
+   const seen=new Set();
+   for(const doc of snap.docs){
+    need(byId.has(doc.id)&&!seen.has(doc.id),'I66_ALICE_UNREQUESTED_OR_DUPLICATE_IDENTITY');seen.add(doc.id);
+    need(same(exactTime(doc.updateTime),byId.get(doc.id).updateTimeExact),'I66_ALICE_CHANGED_DURING_CAPTURE');
+    result.push(projectAliceRecord(name,doc));
+   }
+  }
+  result.sort((a,b)=>Buffer.compare(Buffer.from(a.id),Buffer.from(b.id)));data[name]=result;
+  const projectionHolds=result.filter(x=>x.__snapshot.projectionHeldFields.length||x.__snapshot.idMismatch).length;
+  collections[name]={...counts,exported:result.length,projectionHolds,pages:pages.length,paginationComplete:exhausted,readTimes:pages.map(p=>p.readTimeExact),identityReadbackExact:true,countryFilterApplied:name!=='clientes',scope:name==='clientes'?'SAME_TENANT_CLIENT_IDENTITY_ALL_OBSERVED_COUNTRIES':'GT_RISK_ONLY',countryFactsComplete:counts.missingCountry===0&&counts.conflictingCountry===0,identityIndexCompleteForQueriedPages:name==='clientes',absenceInferenceAllowed:false};
+ }
+ const counts=Object.fromEntries(ALICE_COLLECTIONS.map(k=>[k,data[k].length]));
+ return {schema:'GRAVICENTRA_I66_ALICE_ENCRYPTED_MATCHING_SNAPSHOT_V1',profile:ALICE_PROFILE,createdAt:now(),projectId:PROJECT,tenantId:TENANT,riskCountry:'GT',clientIdentityCountryFilter:'NONE_WITHIN_AUTHORIZED_TENANT',headSha:head,authority:request.authority,requestPath:ALICE_REQUEST,requestBlobSha:blob(requestBytes),requestSha256:sha(requestBytes),source:request.source,readWindow:{startedAt,completedAt:now(),atomicAcrossCollections:false,newDocumentsAfterPageReadNotRuledOut:true},counts,collections,data,completeForQueriedPages:true,matchingPerformed:false,eligibleForImport:false,absenceInferenceAllowed:false,writes:0,operationalWrites:0};
+}
+export function encryptAliceSnapshot(payload,publicKeyBytes){
+ const encrypted=encryptOctoberSnapshot(payload,publicKeyBytes);
+ return {...encrypted,schema:'GRAVICENTRA_I66_ALICE_ENCRYPTED_ENVELOPE_V1',profile:ALICE_PROFILE,authorityBaseHead:payload.authority.sourceBaseHead,workbookSha256:payload.source.workbookSha256,requestPath:payload.requestPath,requestBlobSha:payload.requestBlobSha,requestSha256:payload.requestSha256};
+}
+export function alicePublicReceipt(payload,envelope,encoded){
+ return {schema:'GRAVICENTRA_I66_ALICE_PRIVATE_MATCHING_READBACK_RECEIPT_V1',status:'ENCRYPTED_GT_RISK_AND_TENANT_IDENTITY_CAPTURE_NOT_MATCHED_NOT_IMPORTED',profile:ALICE_PROFILE,sourceHeadSha:payload.headSha,authorityBaseHead:payload.authority.sourceBaseHead,currentProgressPath:payload.authority.currentProgressPath,currentProgressBlobSha:payload.authority.currentProgressBlobSha,workbookSha256:payload.source.workbookSha256,sourceLatestAdvanceVerified:false,counts:payload.counts,collections:payload.collections,readWindow:payload.readWindow,encryptedPayloadSha256:sha(encoded),plaintextSha256:envelope.plaintextSha256,publicKeySha256:envelope.publicKeySha256,requestPath:payload.requestPath,requestBlobSha:payload.requestBlobSha,requestSha256:payload.requestSha256,encryptedOnly:true,containsPlaintextPII:false,matchingPerformed:false,eligibleForImport:false,absenceInferenceAllowed:false,writes:0,operationalWrites:0,deploy:false,acceptanceGranted:false};
+}
+export function validateAliceTrigger({eventName,aliceFlag,octoberFlag,commitMessage,repository,branch,head,expectedSha,headCommitSha}){
+ need(repository==='paulaosoriof86/orbit360-core'&&branch==='recovery/fase-a-clean-20260831','I66_ALICE_CANONICAL_TRIGGER_REQUIRED');
+ need(/^[a-f0-9]{40}$/.test(head||'')&&head===expectedSha,'I66_ALICE_EXECUTION_SHA_MISMATCH');
+ const message=String(commitMessage||''),markers=message.match(/(?:^|\s)\[alice-private-matching-readback\](?=\s|$)/g)||[];
+ need(octoberFlag!=='true'&&!message.includes('[october-private-readback]'),'I66_ALICE_MIXED_READ_PROFILES_DENIED');
+ need(aliceFlag==='true'&&((eventName==='workflow_dispatch'&&markers.length<=1)||
+  (eventName==='push'&&markers.length===1&&headCommitSha===head)),'I66_ALICE_EXPLICIT_PROFILE_REQUIRED');
+ return {profile:ALICE_PROFILE,eventName,headSha:head,readOnly:true};
+}
+function loadAliceRequest(){
+ const head=execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim();
+ validateAliceTrigger({eventName:process.env.GITHUB_EVENT_NAME,aliceFlag:process.env.I66_ALICE_PRIVATE_READBACK,
+  octoberFlag:process.env.I65_OCTOBER_PRIVATE_READBACK,commitMessage:process.env.PRIVATE_READBACK_COMMIT_MESSAGE,
+  repository:process.env.GITHUB_REPOSITORY,branch:process.env.GITHUB_REF_NAME,head,expectedSha:process.env.GITHUB_SHA,
+  headCommitSha:process.env.PRIVATE_READBACK_HEAD_COMMIT_SHA});
+ const requestBytes=fs.readFileSync(ALICE_REQUEST),request=JSON.parse(requestBytes),controlBytes=fs.readFileSync('artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json'),control=JSON.parse(controlBytes),stateBytes=fs.readFileSync(ALICE_STATE),state=JSON.parse(stateBytes);
+ need(request?.authority?.currentProgressPath===control.i66ActiveRecoveryCursor?.currentEvidencePath,'I66_ALICE_CURRENT_PROGRESS_PATH');
+ const progressBytes=fs.readFileSync(request.authority.currentProgressPath),progress=JSON.parse(progressBytes),decisionBytes=fs.readFileSync(ALICE_DECISION),publicKeyBytes=fs.readFileSync(ALICE_PUBLIC_KEY),fileBytes=Object.fromEntries(ALICE_EXECUTOR_PATHS.map(p=>[p,fs.readFileSync(p)]));
+ validateAliceRequest({request,requestBytes,control,controlBytes,state,stateBytes,progress,progressBytes,decisionBytes,publicKeyBytes,fileBytes,branch:process.env.GITHUB_REF_NAME,head});
+ execFileSync('git',['merge-base','--is-ancestor',request.authority.sourceBaseHead,head],{stdio:'pipe'});
+ for(const p of [...ALICE_EXECUTOR_PATHS,ALICE_REQUEST,request.authority.controlPlanePath,ALICE_STATE,request.authority.currentProgressPath,ALICE_DECISION]){
+  const pinned=execFileSync('git',['show',head+':'+p],{maxBuffer:10000000});need(blob(pinned)===blob(fs.readFileSync(p)),'I66_ALICE_CHECKOUT_BYTES');
+ }
+ return {request,requestBytes,publicKeyBytes,head};
+}
+async function runAlice(checkOnly){
+ const {request,requestBytes,publicKeyBytes,head}=loadAliceRequest();if(checkOnly){console.log('I66_ALICE_READBACK_REQUEST=PASS');return;}
+ const output=process.env.I66_ALICE_SNAPSHOT_FILE,receipt=process.env.I66_ALICE_PUBLIC_RECEIPT_FILE,tmp=process.env.RUNNER_TEMP;
+ need(output&&receipt&&tmp&&output!==receipt&&[output,receipt].every(p=>path.resolve(p).startsWith(path.resolve(tmp)+path.sep)),'I66_ALICE_PRIVATE_RUNNER_OUTPUT_REQUIRED');
+ const {initializeApp,cert,deleteApp}=await import('firebase-admin/app'),{getFirestore}=await import('firebase-admin/firestore');
+ const app=initializeApp({credential:cert(sa()),projectId:PROJECT},'i66-alice-private-matching');
+ try{
+  const payload=await captureAliceSnapshot({db:getFirestore(app),request,requestBytes,head}),envelope=encryptAliceSnapshot(payload,publicKeyBytes),encoded=JSON.stringify(envelope);
+  fs.writeFileSync(output,encoded,{mode:0o600,flag:'wx'});fs.writeFileSync(receipt,JSON.stringify(alicePublicReceipt(payload,envelope,encoded),null,2)+'\n',{mode:0o600,flag:'wx'});
+  console.log('I66_ALICE_ENCRYPTED_SNAPSHOT=CAPTURED_NOT_MATCHED_NOT_IMPORTED');console.log('I66_ALICE_SCOPED_COUNTS='+JSON.stringify(payload.counts));console.log('I66_ALICE_WRITES=0');
+ }finally{await deleteApp(app).catch(()=>{});}
+}
+
 async function runLegacy(){
  const {initializeApp,cert,deleteApp}=await import('firebase-admin/app'),{getFirestore}=await import('firebase-admin/firestore');
 const app=initializeApp({credential:cert(sa()),projectId:PROJECT},'i65-diff-snapshot');
@@ -180,10 +350,12 @@ try{
 }
 async function main(){
  const args=process.argv.slice(2);
+ if(args.length===1&&args[0]==='--check-alice-gt-request')return runAlice(true);
+ if(args.length===1&&args[0]==='--alice-gt-readonly')return runAlice(false);
  if(args.length===1&&args[0]==='--check-october-request')return runOctober(true);
  if(args.length===1&&args[0]==='--october-readonly')return runOctober(false);
  need(args.length===0,'I65_SNAPSHOT_MODE_DENIED');return runLegacy();
 }
 if(process.argv[1]&&path.resolve(process.argv[1])===fileURLToPath(import.meta.url)){
- try{await main();}catch(error){const text=String(error?.message||''),code=/^I65_[A-Z0-9_]+$/.test(text)?text:/^[a-z0-9_/-]{1,80}$/i.test(String(error?.code||''))?String(error.code):'READBACK_FAILED';console.error('I65_SNAPSHOT_HOLD:'+code);process.exitCode=42;}
+ try{await main();}catch(error){const text=String(error?.message||''),code=/^I6[56]_[A-Z0-9_]+$/.test(text)?text:/^[a-z0-9_/-]{1,80}$/i.test(String(error?.code||''))?String(error.code):'READBACK_FAILED';console.error('I65_SNAPSHOT_HOLD:'+code);process.exitCode=42;}
 }

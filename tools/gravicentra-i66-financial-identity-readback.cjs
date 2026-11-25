@@ -435,7 +435,8 @@ function mapfreCanonicalPayloadDigest(target){
   inferredEffectiveDate:'',evidenceAsOfDate:p.evidenceAsOfDate,applicationDate:'',invoiceDate:'',
   invoiceNumber:p.invoiceNumber,paymentMethod:'',paymentSupportDocumentRef:p.paymentSupportDocumentRef,
   invoiceDocumentRef:'',amount:p.amount,evidenceId:p.evidenceId,evidenceType:p.evidenceType,
-  anchorInstallment:null,inferenceRuleId:'',confidence:'',forceReconciliation:false,applicationEvidenceType:''})));
+  anchorInstallment:null,inferenceRuleId:'',confidence:'',forceReconciliation:false,applicationEvidenceType:'',
+  currency:String(p.currency || p.moneda || '').trim().slice(0,12).toUpperCase(),actualPaidDateEvidence:p.actualPaidDateEvidence===true})));
 }
 function mapfrePaymentReview(binding,snapshot,originals,aux){
  const {moneyCents}=require('./gravicentra-i66-source-bulk-plan.cjs'),s=binding.preflight.scope;
