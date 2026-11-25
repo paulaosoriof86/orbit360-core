@@ -156,19 +156,30 @@ export const ALICE_FIELDS=Object.freeze({
  polizas:Object.freeze([...ALICE_COMMON,'numero','numeroPoliza','policyNumber','noPoliza','clienteId','clientId','producto','product','ramo','line','plan','estado','status','aseguradoraId','negocioId','sourceBusinessId','renovacionDe','polizaAnteriorId','vigenciaInicio','vigenciaFin'])
 });
 export const ALICE_READ_SCOPE=Object.freeze({riskCountry:'GT',riskCollections:['negocios','polizas'],clientIdentityCollection:'clientes',clientIdentityCountryFilter:'NONE_WITHIN_AUTHORIZED_TENANT',clientCountryIsNotRiskCountry:true,phonePrefixIsNotCountry:true,countryAliasFields:['pais','country'],countryDirectoryFields:ALICE_COUNTRY_FIELDS,nonGtRiskIdentityFieldsRead:false,missingOrConflictingRiskCountry:'EXCLUDE_AND_HOLD_ABSENCE_INFERENCE',missingOrConflictingClientCountry:'PRESERVE_MINIMAL_IDENTITY_AND_HOLD_COUNTRY_DECISION',fullDocuments:false,matchingOnly:true,imports:false,externalMessages:false});
+export const ALICE_SUPPLEMENT_PROFILE='ALICE_MISSING_BUSINESS_OUTBOUND_MINIMAL_V1';
+export const ALICE_OUTBOUND_FIELDS=Object.freeze(['version','notificationChannels','portalResponseEnabled','cadenceEnabled']);
+export const ALICE_SUPPLEMENT_PREDECESSOR=Object.freeze({runId:45517303032,runAttempt:1,sourceHeadSha:'4e8322fb230a270f79791ed408ad954254ce1870',artifactId:14978841517,artifactSha256:'79d4f108de8882fa46239bf3ea15cb1d543631fa2b01ea9b363e549bd771b4f1',requestBlobSha:'f397fe85f5abe172446eb61b6f71e913e70d39b2',encryptedPayloadSha256:'1f9b41cddfde35e9e1f2050b038c1a23b457cd295005012c58bed9304076388e',plaintextSha256:'6da0cbd8b9ae92f09770fcd03dee1b0ae471698e1c6393637637b3a5fa7af435',publicReceiptSha256:'e11870edf31c64fdda94385f651106f5f3d5f6485795f15dc7275e65e93f3ff9',businessesScanned:16,missingCountryBusinesses:3,conflictingCountryBusinesses:0,clientIdentitiesAlreadyCaptured:450,gtPoliciesAlreadyCaptured:1319});
+export const ALICE_SUPPLEMENT_SCOPE=Object.freeze({riskCountry:'GT',riskCountryInferred:false,businessCollection:'negocios',countryDirectoryFields:ALICE_COUNTRY_FIELDS,identityCountryClasses:['MISSING','CONFLICT'],expectedUnknownBusinessCount:3,maxUnknownBusinessIdentities:3,otherBusinessIdentitiesRead:false,clientIdentitiesReread:false,policyIdentitiesReread:false,clientCountryIsNotRiskCountry:true,phonePrefixIsNotCountry:true,outboundConfigurationPath:'tenants/alianzas-soluciones/config/workflow',outboundConfigurationFields:ALICE_OUTBOUND_FIELDS,fullDocuments:false,matchingOnly:true,imports:false,externalMessages:false,configurationDefaultsApplied:false,outboundSuppressionCertified:false});
 const ALICE_FORBIDDEN=Object.freeze([...FORBIDDEN,'iamWrites','backendChanges','outboxWrites','grantWrites','makeActivation']);
 function aliceKeys(value,expected,code){need(value&&typeof value==='object'&&!Array.isArray(value)&&same(Object.keys(value).sort(),[...expected].sort()),code);}
+function aliceSupplementContract(request){
+ need(request.profile===ALICE_SUPPLEMENT_PROFILE&&same(request.collections,['negocios'])&&same(request.fieldProjection,{negocios:ALICE_FIELDS.negocios})&&same(request.readScope,ALICE_SUPPLEMENT_SCOPE),'I66_ALICE_SUPPLEMENT_READ_SCOPE');
+ need(same(request.predecessorCapture,ALICE_SUPPLEMENT_PREDECESSOR),'I66_ALICE_SUPPLEMENT_PREDECESSOR');
+ need(Number.isInteger(request.maxDocumentsPerCollection)&&request.maxDocumentsPerCollection>0&&request.maxDocumentsPerCollection<=100&&Number.isInteger(request.pageSize)&&request.pageSize>0&&request.pageSize<=25&&request.identityBatchSize===3,'I66_ALICE_SUPPLEMENT_BOUNDS');
+}
 export function validateAliceRequest({request,requestBytes,control,controlBytes,state,stateBytes,progress,progressBytes,decisionBytes,publicKeyBytes,fileBytes,branch,head}){
  need(branch==='recovery/fase-a-clean-20260831'&&/^[a-f0-9]{40}$/.test(head||''),'I66_ALICE_CANONICAL_HEAD_REQUIRED');
- aliceKeys(request,['schema','profile','status','projectId','tenantId','riskCountry','source','readScope','collections','fieldProjection','authority','executableFiles','maxDocumentsPerCollection','pageSize','identityBatchSize','publicKeyPath','publicKeySha256','capabilities','encryptedOnly','repositoryPlaintextForbidden'],'I66_ALICE_REQUEST_SHAPE');
- need(request.schema==='GRAVICENTRA_I66_ALICE_PRIVATE_MATCHING_REQUEST_V1'&&request.profile===ALICE_PROFILE&&request.status==='AUTHORIZED_READ_ONLY_MATCHING','I66_ALICE_PROFILE_NOT_ACTIVE');
+ const supplement=request?.profile===ALICE_SUPPLEMENT_PROFILE;
+ aliceKeys(request,['schema','profile','status','projectId','tenantId','riskCountry','source','readScope','collections','fieldProjection','authority','executableFiles','maxDocumentsPerCollection','pageSize','identityBatchSize','publicKeyPath','publicKeySha256','capabilities','encryptedOnly','repositoryPlaintextForbidden',...(supplement?['predecessorCapture']:[])],'I66_ALICE_REQUEST_SHAPE');
+ need(request.schema==='GRAVICENTRA_I66_ALICE_PRIVATE_MATCHING_REQUEST_V1'&&[ALICE_PROFILE,ALICE_SUPPLEMENT_PROFILE].includes(request.profile)&&request.status==='AUTHORIZED_READ_ONLY_MATCHING','I66_ALICE_PROFILE_NOT_ACTIVE');
  need(request.projectId===PROJECT&&request.tenantId===TENANT&&request.riskCountry==='GT','I66_ALICE_TENANT_COUNTRY');
  aliceKeys(request.source,['workbookSha256','advance','declaredCutoff','declaredCoverageStart','latestAdvanceVerified'],'I66_ALICE_SOURCE_SHAPE');
  need(same(request.source,{workbookSha256:ALICE_WORKBOOK_SHA256,advance:10,declaredCutoff:'2026-11-24',declaredCoverageStart:'2026-09-01',latestAdvanceVerified:false}),'I66_ALICE_WORKBOOK_BINDING');
- need(same(request.collections,ALICE_COLLECTIONS)&&same(request.fieldProjection,ALICE_FIELDS)&&same(request.readScope,ALICE_READ_SCOPE),'I66_ALICE_READ_SCOPE');
+ if(supplement)aliceSupplementContract(request);
+ else need(same(request.collections,ALICE_COLLECTIONS)&&same(request.fieldProjection,ALICE_FIELDS)&&same(request.readScope,ALICE_READ_SCOPE),'I66_ALICE_READ_SCOPE');
  aliceKeys(request.capabilities,[...ALICE_FORBIDDEN,'operationalWrites'],'I66_ALICE_CAPABILITY_SHAPE');
  need(ALICE_FORBIDDEN.every(k=>request.capabilities[k]===false)&&request.capabilities.operationalWrites===0&&request.encryptedOnly===true&&request.repositoryPlaintextForbidden===true,'I66_ALICE_WRITE_OR_PLAINTEXT_DENIED');
- need(Number.isInteger(request.maxDocumentsPerCollection)&&request.maxDocumentsPerCollection>0&&request.maxDocumentsPerCollection<=20000&&Number.isInteger(request.pageSize)&&request.pageSize>0&&request.pageSize<=500&&request.identityBatchSize===10,'I66_ALICE_PAGINATION_BOUNDS');
+ if(!supplement)need(Number.isInteger(request.maxDocumentsPerCollection)&&request.maxDocumentsPerCollection>0&&request.maxDocumentsPerCollection<=20000&&Number.isInteger(request.pageSize)&&request.pageSize>0&&request.pageSize<=500&&request.identityBatchSize===10,'I66_ALICE_PAGINATION_BOUNDS');
  const a=request.authority;
  aliceKeys(a,['sourceBaseHead','controlPlanePath','controlPlaneBlobSha','recoveryStatePath','recoveryStateBlobSha','currentProgressPath','currentProgressBlobSha','activeGate','formalDataCutoff','executionCursor','decisionPath','decisionBlobSha','cursorChanged'],'I66_ALICE_AUTHORITY_SHAPE');
  need(/^[a-f0-9]{40}$/.test(a.sourceBaseHead||'')&&a.controlPlanePath==='artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json'&&a.controlPlaneBlobSha===blob(controlBytes)&&a.recoveryStatePath===ALICE_STATE&&a.recoveryStateBlobSha===blob(stateBytes),'I66_ALICE_CURRENT_CONTROL_BINDING');
@@ -210,16 +221,27 @@ export function projectAliceRecord(collection,document){
  const raw=document.data()||{},id=String(document.id||'');
  const countryClass=classifyAliceCountry(raw);
  need(id&&(collection==='clientes'||countryClass==='GT'),'I66_ALICE_GT_RISK_OR_TENANT_IDENTITY_REQUIRED');
+ return projectAliceIdentity(collection,document,countryClass);
+}
+function projectAliceIdentity(collection,document,countryClass){
+ const raw=document.data()||{},id=String(document.id||'');
  const data={},heldFields=[];
  for(const key of ALICE_FIELDS[collection])if(Object.prototype.hasOwnProperty.call(raw,key)){
   const v=aliceSafeValue(raw[key]);if(v.ok)data[key]=v.value;else heldFields.push(key);
  }
  const storedId=data.id??null;data.id=id;data.tenantId=TENANT;
- return {...data,canonicalDocumentId:id,__snapshot:{storedId,idMismatch:storedId!=null&&String(storedId)!==id,projection:collection==='clientes'?'TENANT_CLIENT_IDENTITY_CONTACT_COUNTRY_ONLY':'GT_RISK_IDENTITY_RELATION_STAGE_PRODUCT_ONLY',countryClass,clientCountryIsNotRiskCountry:collection==='clientes',projectedDataSha256:sha(JSON.stringify(stable(data))),projectionHeldFields:heldFields,createTimeExact:exactTime(document.createTime),updateTimeExact:exactTime(document.updateTime),readTimeExact:exactTime(document.readTime)}};
+ return {...data,canonicalDocumentId:id,__snapshot:{storedId,idMismatch:storedId!=null&&String(storedId)!==id,projection:collection==='clientes'?'TENANT_CLIENT_IDENTITY_CONTACT_COUNTRY_ONLY':countryClass==='GT'?'GT_RISK_IDENTITY_RELATION_STAGE_PRODUCT_ONLY':'UNKNOWN_RISK_COUNTRY_IDENTITY_ONLY_NO_COUNTRY_INFERENCE',countryClass,clientCountryIsNotRiskCountry:collection==='clientes',projectedDataSha256:sha(JSON.stringify(stable(data))),projectionHeldFields:heldFields,createTimeExact:exactTime(document.createTime),updateTimeExact:exactTime(document.updateTime),readTimeExact:exactTime(document.readTime)}};
+}
+export function projectAliceUnknownBusiness(document){
+ const raw=document.data()||{},countryClass=classifyAliceCountry(raw);
+ need(String(document.id||'')&&['MISSING','CONFLICT'].includes(countryClass),'I66_ALICE_UNKNOWN_BUSINESS_SCOPE');
+ return projectAliceIdentity('negocios',document,countryClass);
 }
 function aliceCollection(db,name){need(ALICE_COLLECTIONS.includes(name),'I66_ALICE_COLLECTION_DENIED');return db.collection('tenants').doc(TENANT).collection('data').doc(name).collection('items');}
 export async function captureAliceSnapshot({db,request,requestBytes,head,now=()=>new Date().toISOString()}){
  need(requestBytes&&same(JSON.parse(requestBytes),request),'I66_ALICE_REQUEST_BYTES');
+ if(request.profile===ALICE_SUPPLEMENT_PROFILE)return captureAliceSupplement({db,request,requestBytes,head,now});
+ need(request.profile===ALICE_PROFILE,'I66_ALICE_PROFILE_NOT_ACTIVE');
  const startedAt=now(),data={},collections={};
  for(const name of ALICE_COLLECTIONS){
   const ref=aliceCollection(db,name),selected=[],counts={scanned:0,gt:0,co:0,otherCountry:0,missingCountry:0,conflictingCountry:0},pages=[];
@@ -261,12 +283,77 @@ export async function captureAliceSnapshot({db,request,requestBytes,head,now=()=
  const counts=Object.fromEntries(ALICE_COLLECTIONS.map(k=>[k,data[k].length]));
  return {schema:'GRAVICENTRA_I66_ALICE_ENCRYPTED_MATCHING_SNAPSHOT_V1',profile:ALICE_PROFILE,createdAt:now(),projectId:PROJECT,tenantId:TENANT,riskCountry:'GT',clientIdentityCountryFilter:'NONE_WITHIN_AUTHORIZED_TENANT',headSha:head,authority:request.authority,requestPath:ALICE_REQUEST,requestBlobSha:blob(requestBytes),requestSha256:sha(requestBytes),source:request.source,readWindow:{startedAt,completedAt:now(),atomicAcrossCollections:false,newDocumentsAfterPageReadNotRuledOut:true},counts,collections,data,completeForQueriedPages:true,matchingPerformed:false,eligibleForImport:false,absenceInferenceAllowed:false,writes:0,operationalWrites:0};
 }
+function aliceCountryMetadata(raw){
+ const data={},heldFields=[];
+ for(const key of ['pais','country'])if(Object.hasOwn(raw,key)){
+  const value=aliceSafeValue(raw[key]);if(value.ok)data[key]=value.value;else heldFields.push(key);
+ }
+ return {data,heldFields,sha256:sha(JSON.stringify(stable(data)))};
+}
+async function captureAliceOutboundConfiguration(db){
+ const snap=await db.collection('tenants').doc(TENANT).collection('config').where('__name__','==','workflow').select(...ALICE_OUTBOUND_FIELDS).limit(2).get();
+ need(Array.isArray(snap.docs)&&snap.docs.length<=1&&snap.docs.every(d=>d.id==='workflow'),'I66_ALICE_OUTBOUND_CONFIGURATION_SCOPE');
+ const doc=snap.docs[0],holds=[],data={},heldFields=[];
+ if(doc){
+  need(exactTime(doc.updateTime),'I66_ALICE_OUTBOUND_UPDATE_TIME_REQUIRED');
+  const raw=doc.data()||{};
+  for(const key of ALICE_OUTBOUND_FIELDS)if(Object.hasOwn(raw,key)){
+   const v=raw[key],allowed=v===null||(key==='notificationChannels'?Array.isArray(v)&&v.length<=25&&v.every(x=>typeof x==='string'&&x.length<=80):key==='version'?typeof v==='string'&&v.length<=120:typeof v==='boolean');
+   if(allowed)data[key]=v;else heldFields.push(key);
+  }
+  if(heldFields.length)holds.push('OUTBOUND_CONFIGURATION_PROJECTION_HOLD');
+  if(!Array.isArray(data.notificationChannels))holds.push('OUTBOUND_CHANNELS_NOT_EXPLICIT_ARRAY');
+ }else holds.push('OUTBOUND_CONFIGURATION_MISSING');
+ return {path:ALICE_SUPPLEMENT_SCOPE.outboundConfigurationPath,exists:!!doc,projectedFields:ALICE_OUTBOUND_FIELDS,data,missingFields:ALICE_OUTBOUND_FIELDS.filter(k=>!Object.hasOwn(data,k)),heldFields,updateTimeExact:exactTime(doc?.updateTime),readTimeExact:exactTime(snap.readTime),projectedDataSha256:sha(JSON.stringify(stable(data))),defaultsApplied:false,cadenceDisablesOutbox:false,notificationSuppressionCertified:false,requiresCanonicalWritePlanReview:true,holds};
+}
+export async function captureAliceSupplement({db,request,requestBytes,head,now=()=>new Date().toISOString()}){
+ need(requestBytes&&same(JSON.parse(requestBytes),request),'I66_ALICE_REQUEST_BYTES');aliceSupplementContract(request);
+ const startedAt=now(),ref=aliceCollection(db,'negocios'),directory=[],selected=[],pages=[],holds=[];
+ const totals={scanned:0,gt:0,co:0,otherCountry:0,missingCountry:0,conflictingCountry:0};
+ let lastId=null,exhausted=false;
+ while(!exhausted){
+  const pageLimit=Math.min(request.pageSize,request.maxDocumentsPerCollection-totals.scanned+1);
+  let query=ref.orderBy('__name__').select(...ALICE_COUNTRY_FIELDS).limit(pageLimit);
+  if(lastId!==null)query=query.startAfter(lastId);
+  const snap=await query.get();need(Array.isArray(snap.docs)&&snap.docs.length<=pageLimit,'I66_ALICE_DIRECTORY_PAGE');
+  for(const doc of snap.docs){
+   const id=String(doc.id||'');need(id&&(!lastId||Buffer.compare(Buffer.from(id),Buffer.from(lastId))>0),'I66_ALICE_PAGINATION_DUPLICATE_OR_ORDER');
+   lastId=id;totals.scanned++;need(totals.scanned<=request.maxDocumentsPerCollection,'I66_ALICE_DOCUMENT_BOUND_EXCEEDED');
+   const raw=doc.data()||{},countryClass=classifyAliceCountry(raw),updateTimeExact=exactTime(doc.updateTime);need(updateTimeExact,'I66_ALICE_UPDATE_TIME_REQUIRED');
+   const country=aliceCountryMetadata(raw),entry={id,country:country.data,countryClass,countryProjectionHeldFields:country.heldFields,countryProjectionSha256:country.sha256,updateTimeExact};
+   directory.push(entry);totals[countryClass==='GT'?'gt':countryClass==='CO'?'co':countryClass==='OTHER'?'otherCountry':countryClass==='MISSING'?'missingCountry':'conflictingCountry']++;
+   if(['MISSING','CONFLICT'].includes(countryClass))selected.push(entry);
+  }
+  exhausted=snap.docs.length<pageLimit;pages.push({count:snap.docs.length,readTimeExact:exactTime(snap.readTime),exhausted});
+ }
+ const identities=[];
+ if(selected.length!==ALICE_SUPPLEMENT_SCOPE.expectedUnknownBusinessCount)holds.push('UNKNOWN_BUSINESS_COUNT_CHANGED_NO_IDENTITY_READS');
+ else{
+  const byId=new Map(selected.map(x=>[x.id,x])),snap=await ref.where('__name__','in',[...byId.keys()]).select(...ALICE_FIELDS.negocios).get();
+  need(Array.isArray(snap.docs)&&snap.docs.length===selected.length,'I66_ALICE_IDENTITY_DISAPPEARED');
+  const seen=new Set();
+  for(const doc of snap.docs){
+   need(byId.has(doc.id)&&!seen.has(doc.id),'I66_ALICE_UNREQUESTED_OR_DUPLICATE_IDENTITY');seen.add(doc.id);
+   const expected=byId.get(doc.id),raw=doc.data()||{};
+   need(same(exactTime(doc.updateTime),expected.updateTimeExact),'I66_ALICE_CHANGED_DURING_CAPTURE');
+   need(classifyAliceCountry(raw)===expected.countryClass&&aliceCountryMetadata(raw).sha256===expected.countryProjectionSha256,'I66_ALICE_COUNTRY_CHANGED_DURING_CAPTURE');
+   identities.push(projectAliceUnknownBusiness(doc));
+  }
+ }
+ identities.sort((a,b)=>Buffer.compare(Buffer.from(a.id),Buffer.from(b.id)));
+ const projectionHolds=identities.filter(x=>x.__snapshot.projectionHeldFields.length||x.__snapshot.idMismatch).length;
+ if(projectionHolds)holds.push('BUSINESS_IDENTITY_PROJECTION_HOLD');
+ const configuration=await captureAliceOutboundConfiguration(db);holds.push(...configuration.holds);
+ const collections={negocios:{...totals,exported:identities.length,projectionHolds,pages:pages.length,paginationComplete:exhausted,readTimes:pages.map(p=>p.readTimeExact),identityReadbackExact:identities.length===3,scope:'CURRENT_UNKNOWN_COUNTRY_BUSINESSES_ONLY',identityIndexCompleteForQueriedPages:false,countryFactsComplete:false,absenceInferenceAllowed:false}};
+ return {schema:'GRAVICENTRA_I66_ALICE_ENCRYPTED_MATCHING_SNAPSHOT_V1',profile:ALICE_SUPPLEMENT_PROFILE,createdAt:now(),projectId:PROJECT,tenantId:TENANT,riskCountry:'GT',riskCountryInferred:false,headSha:head,authority:request.authority,requestPath:ALICE_REQUEST,requestBlobSha:blob(requestBytes),requestSha256:sha(requestBytes),source:request.source,predecessorCapture:request.predecessorCapture,readWindow:{startedAt,completedAt:now(),atomicAcrossCollections:false,newDocumentsAfterPageReadNotRuledOut:true},counts:{negocios:identities.length,workflowConfiguration:configuration.exists?1:0},collections,directory:{negocios:directory},data:{negocios:identities},outboundConfiguration:configuration,reusedPreviousClientAndPolicyProjection:true,previousClientOrPolicyReads:0,holds,completeForQueriedPages:true,matchingPerformed:false,eligibleForImport:false,absenceInferenceAllowed:false,writes:0,operationalWrites:0};
+}
 export function encryptAliceSnapshot(payload,publicKeyBytes){
  const encrypted=encryptOctoberSnapshot(payload,publicKeyBytes);
- return {...encrypted,schema:'GRAVICENTRA_I66_ALICE_ENCRYPTED_ENVELOPE_V1',profile:ALICE_PROFILE,authorityBaseHead:payload.authority.sourceBaseHead,workbookSha256:payload.source.workbookSha256,requestPath:payload.requestPath,requestBlobSha:payload.requestBlobSha,requestSha256:payload.requestSha256};
+ return {...encrypted,schema:'GRAVICENTRA_I66_ALICE_ENCRYPTED_ENVELOPE_V1',profile:payload.profile,authorityBaseHead:payload.authority.sourceBaseHead,workbookSha256:payload.source.workbookSha256,requestPath:payload.requestPath,requestBlobSha:payload.requestBlobSha,requestSha256:payload.requestSha256};
 }
 export function alicePublicReceipt(payload,envelope,encoded){
- return {schema:'GRAVICENTRA_I66_ALICE_PRIVATE_MATCHING_READBACK_RECEIPT_V1',status:'ENCRYPTED_GT_RISK_AND_TENANT_IDENTITY_CAPTURE_NOT_MATCHED_NOT_IMPORTED',profile:ALICE_PROFILE,sourceHeadSha:payload.headSha,authorityBaseHead:payload.authority.sourceBaseHead,currentProgressPath:payload.authority.currentProgressPath,currentProgressBlobSha:payload.authority.currentProgressBlobSha,workbookSha256:payload.source.workbookSha256,sourceLatestAdvanceVerified:false,counts:payload.counts,collections:payload.collections,readWindow:payload.readWindow,encryptedPayloadSha256:sha(encoded),plaintextSha256:envelope.plaintextSha256,publicKeySha256:envelope.publicKeySha256,requestPath:payload.requestPath,requestBlobSha:payload.requestBlobSha,requestSha256:payload.requestSha256,encryptedOnly:true,containsPlaintextPII:false,matchingPerformed:false,eligibleForImport:false,absenceInferenceAllowed:false,writes:0,operationalWrites:0,deploy:false,acceptanceGranted:false};
+ const supplement=payload.profile===ALICE_SUPPLEMENT_PROFILE;
+ return {schema:'GRAVICENTRA_I66_ALICE_PRIVATE_MATCHING_READBACK_RECEIPT_V1',status:supplement?'ENCRYPTED_UNKNOWN_BUSINESS_AND_OUTBOUND_CAPTURE_NOT_MATCHED_NOT_IMPORTED':'ENCRYPTED_GT_RISK_AND_TENANT_IDENTITY_CAPTURE_NOT_MATCHED_NOT_IMPORTED',profile:payload.profile,sourceHeadSha:payload.headSha,authorityBaseHead:payload.authority.sourceBaseHead,currentProgressPath:payload.authority.currentProgressPath,currentProgressBlobSha:payload.authority.currentProgressBlobSha,workbookSha256:payload.source.workbookSha256,sourceLatestAdvanceVerified:false,counts:payload.counts,collections:payload.collections,...(supplement?{predecessorCapture:payload.predecessorCapture,holdCodes:payload.holds,previousClientOrPolicyReads:payload.previousClientOrPolicyReads,outboundConfigurationObserved:payload.outboundConfiguration.exists,outboundConfigurationProjectionSha256:payload.outboundConfiguration.projectedDataSha256,notificationSuppressionCertified:false}:{}),readWindow:payload.readWindow,encryptedPayloadSha256:sha(encoded),plaintextSha256:envelope.plaintextSha256,publicKeySha256:envelope.publicKeySha256,requestPath:payload.requestPath,requestBlobSha:payload.requestBlobSha,requestSha256:payload.requestSha256,encryptedOnly:true,containsPlaintextPII:false,matchingPerformed:false,eligibleForImport:false,absenceInferenceAllowed:false,writes:0,operationalWrites:0,deploy:false,acceptanceGranted:false};
 }
 export function validateAliceTrigger({eventName,aliceFlag,octoberFlag,financialFlag,commitMessage,repository,branch,head,expectedSha,headCommitSha}){
  need(repository==='paulaosoriof86/orbit360-core'&&branch==='recovery/fase-a-clean-20260831','I66_ALICE_CANONICAL_TRIGGER_REQUIRED');
