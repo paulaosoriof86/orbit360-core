@@ -1,0 +1,416 @@
+{
+  "recordType": "SUBORDINATE_SOURCE_REPAIR_EVIDENCE_NOT_RELEASE_GATE_AUTHORITY",
+  "status": "SOURCE_PREPARED_LOCAL_TESTS_PASS_CANONICAL_ADMISSION_AND_RUNTIME_PENDING",
+  "observedAtUtc": "2026-11-25T15:43:00.384Z",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "baseCommit": "f69687740f96f33b1f443ea9cfc9e9bd21c01083",
+  "baseTree": "9ab177b081bc88ada6bf41d58cddc8a8cfc62a94",
+  "authorityPins": [
+    {
+      "path": "artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json",
+      "gitBlobSha": "257cec8a2cf7640c66e19b84386a42558e534333"
+    },
+    {
+      "path": "orbit360-platform/docs/recovery/orbit360-recovery-state-v1.json",
+      "gitBlobSha": "39ee72cddd162bde812cab7b4c27d6a7800fd20a"
+    },
+    {
+      "path": "artifacts/orbit360-recovery/release-control/I6_6_RELEASE_TRANSPORT_CONTROL_20261110.json",
+      "gitBlobSha": "0819653e3510f99b124d4e7afe24aedd926619b9"
+    },
+    {
+      "path": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_EXECUTION_PROGRESS_20261124_R84.json",
+      "gitBlobSha": "2035f2b1cc95638b9deaa416a1250b32b0a38814"
+    }
+  ],
+  "activeGateObserved": "I6.6",
+  "requestVersionObserved": 35,
+  "productSourceObserved": "16e3a70baf4e31ef8453173990f32a398c65e59b",
+  "sourceOfLiveObservation": "Pinned repository receipts only; no new provider or authenticated UI observation in this work.",
+  "lastRecordedLive": {
+    "generation": 3,
+    "sourceSha": "65c825b2808a615ca4195bdde6689dbdbe3193b2",
+    "artifactDigest": "sha256:7cb782848a45083047c4899bc30c13bf5be46429607e42597d09342becfc9acc",
+    "hostingVersion": "sites/ays-orbit-360-lab/versions/332999a55b189108",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_FRONTEND_E00003_RECEIPT.json",
+    "fullI66ProductionAccepted": false
+  },
+  "frozenNativeTransportEvidence": {
+    "provider": "GOOGLE_CLOUD_BUILD",
+    "requestVersion": 35,
+    "sourceSha": "16e3a70baf4e31ef8453173990f32a398c65e59b",
+    "disposition": "CURRENT_REQUEST",
+    "package": {
+      "buildId": "792b85b8-f1fb-4353-9ef8-b9f1e1f94065",
+      "status": "SUCCESS",
+      "readbackCertified": true,
+      "artifact": {
+        "uri": "gs://ays-orbit360-firestore-private-backup-646761409743/i66/packages/request-35/16e3a70baf4e31ef8453173990f32a398c65e59b/792b85b8-f1fb-4353-9ef8-b9f1e1f94065/gi-i66-exact-package.tar.gz",
+        "generation": "1795599998078235",
+        "sha256": "1c562090b276b5aee913f9109aed5903f0450ffb582d89e0347a69853c1223ec",
+        "bytes": 1851665
+      }
+    },
+    "hostingPreview": {
+      "buildId": "cab7f997-b499-4b84-9ed1-e546b33af1b2",
+      "status": "SUCCESS",
+      "readbackCertified": true,
+      "hostingVersion": "sites/ays-orbit-360-lab/versions/a3887d6ea17a9393"
+    },
+    "signedFunctionalAcceptanceEstablished": false,
+    "liveAcceptanceEstablished": false,
+    "acceptanceScope": "TRANSPORT_EVIDENCE_ONLY"
+  },
+  "findings": [
+    {
+      "id": "ACTIVE_PROVIDER_STATUS",
+      "observed": "Four active objectives retain V35_PROVIDER_BILLING_HOLD_SIGNED_RUNTIME_PENDING despite pinned native package and existing Hosting Preview readback.",
+      "cause": "Previous validation checked equality of copied objectives and projections but did not bind their blocking cause to the current provider evidence.",
+      "correction": "Resolve request/source/artifact/exact historical bytes; reject only a contradictory billing status bound to this same request. Do not infer signed functional or LIVE acceptance."
+    },
+    {
+      "id": "DEPLOY_COMMAND_TIMEOUT",
+      "observed": "execLogged applied 1700000ms to the entire deploy command although the frozen five-function workflow job allows 5100000ms.",
+      "correction": "Take the deploy command budget from the exact original workflow, subtract elapsed provider runtime, and cap at the provider deadline. Preserve defaults for other commands.",
+      "limit": "This corrects the deploy command budget only. It is not proof of an earlier production timeout or of a completed native runtime."
+    },
+    {
+      "id": "MULTI_CHECKPOINT_EVIDENCE",
+      "observed": "R84 references without explicit blob pins cease to be authoritative after more than one successor checkpoint.",
+      "correction": "Pin five successor references to immutable R84 bytes, require exact path/fragment, reject conflicting pins and do not traverse unbounded history."
+    }
+  ],
+  "files": [
+    {
+      "path": "tools/gravicentra-i6-6-cloud-build-operational.cjs",
+      "beforeBlob": "0a5e9f2df0c65d306b9c9ae9efb9902bd78e3a23",
+      "afterBlob": "217b8882d82257c70dbc76b3669c07314e48174a",
+      "sha256": "41f91a2867587be9333daca4d6c43cd2e8c465d3b7290f47bd383312d8abf26c",
+      "bytes": 65981
+    },
+    {
+      "path": "tools/gravicentra-i6-6-cloud-build-operational.test.cjs",
+      "beforeBlob": "d93f70c8f22dfa5c303b54a42673121eba8fadce",
+      "afterBlob": "388c131bfa1bc341bd2813173e2309ca2e98841f",
+      "sha256": "1a7e9fc825757dc1298a8fa6b7fb6e7dd86db14f777bdd434751851d435dcbfa",
+      "bytes": 27920
+    },
+    {
+      "path": "tools/gravicentra-i6-6-cloud-build-package.cjs",
+      "beforeBlob": "215d5b24c27d2cfb301c732f7a724b6365128ab5",
+      "afterBlob": "fdd876d27757e916e313a884485ca9ea5700c087",
+      "sha256": "890fd12724604a97380d43e77594b79a20a209c2be5847d472e0680104f2bc0b",
+      "bytes": 45918
+    },
+    {
+      "path": "tools/gravicentra-i6-6-cloud-build-package.test.cjs",
+      "beforeBlob": "df3a9def74310875af20aa11301310de8fcdd8a7",
+      "afterBlob": "85cc41a02b1f365b4d819dab25c99006949fb713",
+      "sha256": "fe13d9120a2024a7bf362a13e1f82ed319c42d035939401465748d6053372fc6",
+      "bytes": 29703
+    },
+    {
+      "path": "tools/gravicentra-i66-frontend-control.cjs",
+      "beforeBlob": "449094d6ef47abf7cc98d269a2534c9b95dbe6f6",
+      "afterBlob": "0fc6f26aa1566ff24ce4300443018f46e12d5b75",
+      "sha256": "e8f1cad5d47b3cea5217bc2f69f9b7f18ebf25dc741b1ff60b38cb1cb9a0eee7",
+      "bytes": 78507
+    },
+    {
+      "path": "tools/gravicentra-i66-frontend-control.test.cjs",
+      "beforeBlob": "53ca073f7c6d5db36513caccb010bece47a42919",
+      "afterBlob": "090b765b4c21917b6792000cc98d130a285d9556",
+      "sha256": "73b75a0bcc26f559601026f3a3f533bf79ffd662cebffcd10d0eb12688fdc746",
+      "bytes": 52151
+    },
+    {
+      "path": "AGENTS.md",
+      "beforeBlob": null,
+      "afterBlob": "390a805ee19c7a111fa712552db4b5dc7dd6a29b",
+      "sha256": "7ec215ff5162d505aaad74f19ab9c13ebd7406e83e8793f65247dc2442fea1a3",
+      "bytes": 5404
+    }
+  ],
+  "localVerification": {
+    "nodeVersion": "v24.22.3",
+    "totalTests": 218,
+    "pass": 218,
+    "fail": 0,
+    "skipped": 0,
+    "logs": [
+      {
+        "name": "mechanism-native-tests.log",
+        "sha256": "f1c4eb876ce7490c9f4f0c449f0a8ca160454866f3c23856d6ea62bdfa30d894",
+        "bytes": 12470,
+        "tests": 159,
+        "pass": 159,
+        "fail": 0,
+        "skipped": 0
+      },
+      {
+        "name": "mechanism-continuity-tests.log",
+        "sha256": "08d4fc90b5a67c85b954fcf06f5c69198f416087f5f9686b3160cb72e7576f9a",
+        "bytes": 6248,
+        "tests": 59,
+        "pass": 59,
+        "fail": 0,
+        "skipped": 0
+      }
+    ],
+    "commands": [
+      "node --test tools/gravicentra-i6-6-cloud-build-package.test.cjs tools/gravicentra-i6-6-cloud-build-operational.test.cjs tools/gravicentra-i6-6-cloud-build-signed-cas.test.cjs",
+      "node --test tools/gravicentra-i66-frontend-control.test.cjs",
+      "git diff --check"
+    ],
+    "realStateInMemoryReconciliation": {
+      "status": "PASS_IN_MEMORY_ONLY",
+      "validators": [
+        "assertExecutionProgress",
+        "assertOwnerPlanContinuation",
+        "assertActiveFinancialAndPlanProjections",
+        "assertActiveReleaseProgress",
+        "executionSnapshot"
+      ],
+      "originalR84Unchanged": true,
+      "financialProofsUnchanged": true,
+      "liveHeadUnchanged": true,
+      "allFourPassFlagsRemainFalse": true,
+      "checkpointWritten": false
+    },
+    "fullGovernancePreflightExecuted": false,
+    "signedRoleUiExecuted": false,
+    "providerRuntimeExecuted": false
+  },
+  "staticSourceSynchronization": {
+    "sourceFiles": [
+      {
+        "canonicalName": "00_DOCUMENTO_MAESTRO_EVERGREEN_V3.md",
+        "expectedGitBlobSha": "02104f71e91f5b87b770c06076c0be73904a4e0e",
+        "matchedAttachedFiles": [
+          "25-00_DOCUMENTO_MAESTRO_EVERGREEN_V3.md"
+        ],
+        "exact": true
+      },
+      {
+        "canonicalName": "01_ADDENDUM_GOBIERNO_SINCRONIZACION_Y_NOTIFICACION_V3.md",
+        "expectedGitBlobSha": "52e8120c696a22520aa2a5629b1727bb185d4444",
+        "matchedAttachedFiles": [
+          "06-01_ADDENDUM_GOBIERNO_SINCRONIZACION_Y_NOTIFICACION_V3-1-1-.md"
+        ],
+        "exact": true
+      },
+      {
+        "canonicalName": "02_MATRIZ_CRITERIOS_FASE_A_EVERGREEN_V3.md",
+        "expectedGitBlobSha": "ef7a98f0b0a7ac5c88a382dcb7593a5b81cea6fc",
+        "matchedAttachedFiles": [
+          "05-02_MATRIZ_CRITERIOS_FASE_A_EVERGREEN_V3-1-1-.md"
+        ],
+        "exact": true
+      },
+      {
+        "canonicalName": "03_MANIFIESTO_CAPACIDADES_FASE_A_EVERGREEN_V3.json",
+        "expectedGitBlobSha": "245636b29bd1e1dd6e28b79b01390a9983f3b0a8",
+        "matchedAttachedFiles": [
+          "04-03_MANIFIESTO_CAPACIDADES_FASE_A_EVERGREEN_V3-1-1-.json"
+        ],
+        "exact": true
+      },
+      {
+        "canonicalName": "04_LEEME_REANUDACION_Y_AUTORIDAD_V3.md",
+        "expectedGitBlobSha": "805cffe8ccc3cf21cfca7cde0c471c3dfbed8e0d",
+        "matchedAttachedFiles": [
+          "03-04_LEEME_REANUDACION_Y_AUTORIDAD_V3-1-.md"
+        ],
+        "exact": true
+      },
+      {
+        "canonicalName": "06_ADDENDUM_FASE_A_POSTSALIDA_I6_EVERGREEN_V4.md",
+        "expectedGitBlobSha": "4bcb87748e3fa425a5870238572c56e399bc01ac",
+        "matchedAttachedFiles": [
+          "01-06_ADDENDUM_FASE_A_POSTSALIDA_I6_EVERGREEN_V4-1-.md"
+        ],
+        "exact": true
+      },
+      {
+        "canonicalName": "07_ADDENDUM_ACTUALIZACION_INCREMENTAL_DELTA_EVERGREEN_V5_2026-09-16.md",
+        "expectedGitBlobSha": "637556b30de4dc346ef55e284c83175fabb921b8",
+        "matchedAttachedFiles": [
+          "22-07_ADDENDUM_ACTUALIZACION_INCREMENTAL_DELTA_EVERGREEN_V5_2026-09-16.md"
+        ],
+        "exact": true
+      },
+      {
+        "canonicalName": "09_ADDENDUM_COMPOSICION_CANONICA_Y_LEDGER_HALLAZGOS_EVERGREEN_V6_2026-09-24.md",
+        "expectedGitBlobSha": "40b57682f89fc134bc95c5806b71a34bc4119882",
+        "matchedAttachedFiles": [
+          "23-09_ADDENDUM_COMPOSICION_CANONICA_Y_LEDGER_HALLAZGOS_EVERGREEN_V6_2026-09-24.md"
+        ],
+        "exact": true
+      },
+      {
+        "canonicalName": "11_ADDENDUM_PAGOS_COBROS_CONCILIACION_FECHAS_INFERENCIA_EVERGREEN_V7_2026-09-26.md",
+        "expectedGitBlobSha": "b51eb0f37f48a4fcab0336b8b300c559b0f76714",
+        "matchedAttachedFiles": [
+          "24-11_ADDENDUM_PAGOS_COBROS_CONCILIACION_FECHAS_INFERENCIA_EVERGREEN_V7_2026-09-26.md"
+        ],
+        "exact": true
+      }
+    ],
+    "staticSourcesExact": true,
+    "productPathsChanged": []
+  },
+  "executionGuide": {
+    "path": "AGENTS.md",
+    "scope": "Subordinate repository consumer of existing authority, no new gate or approval.",
+    "explicitPublicationDecision": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_6_DIRECTION_OPERATIONAL_FINDINGS_AND_PROSPECTIVE_LEADS_20261124_R60.json",
+      "gitBlobSha": "5905d1e85327124efd9afbde3755b9070c1c5501",
+      "pointer": "decisions.publishEachVerifiedCausalCorrectionImmediately",
+      "value": true
+    }
+  },
+  "admission": {
+    "automaticCherryPickSafe": false,
+    "reason": "The new continuity guard intentionally rejects unreconciled R84. Code and active checkpoint delta must enter atomically. Any concurrent canonical commit can also invalidate Work signed CAS.",
+    "coordination": "Use the next existing writer boundary when no native handoff or promotion owns the exact branch parent. Preparing this tree does not acquire a release lock or move a branch.",
+    "doNotOverwriteCurrentAuthorityFromThisSnapshot": true,
+    "liveStateRevalidation": "Read current HEAD, active cursor, transport, source and accepted LIVE before applying. If Work has advanced, derive only the still-applicable causal delta from its actual evidence; do not roll back its progress or revive request35.",
+    "onUnchangedR84": {
+      "preconditions": {
+        "currentReceipt": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_EXECUTION_PROGRESS_20261124_R84.json",
+        "currentReceiptBlob": "2035f2b1cc95638b9deaa416a1250b32b0a38814",
+        "requestVersion": 35,
+        "sourceSha": "16e3a70baf4e31ef8453173990f32a398c65e59b",
+        "packageArtifact": {
+          "uri": "gs://ays-orbit360-firestore-private-backup-646761409743/i66/packages/request-35/16e3a70baf4e31ef8453173990f32a398c65e59b/792b85b8-f1fb-4353-9ef8-b9f1e1f94065/gi-i66-exact-package.tar.gz",
+          "generation": "1795599998078235",
+          "sha256": "1c562090b276b5aee913f9109aed5903f0450ffb582d89e0347a69853c1223ec",
+          "bytes": 1851665
+        }
+      },
+      "objectiveStatusUpdates": [
+        {
+          "id": "A03",
+          "expect": "V35_PROVIDER_BILLING_HOLD_SIGNED_RUNTIME_PENDING",
+          "set": "NATIVE_PACKAGE_AND_HOSTING_VERIFIED_SIGNED_RUNTIME_PENDING",
+          "passForShockMustRemain": false
+        },
+        {
+          "id": "A08",
+          "expect": "V35_PROVIDER_BILLING_HOLD_SIGNED_RUNTIME_PENDING",
+          "set": "NATIVE_PACKAGE_AND_HOSTING_VERIFIED_SIGNED_RUNTIME_PENDING",
+          "passForShockMustRemain": false
+        },
+        {
+          "id": "A12",
+          "expect": "V35_PROVIDER_BILLING_HOLD_SIGNED_RUNTIME_PENDING",
+          "set": "NATIVE_PACKAGE_AND_HOSTING_VERIFIED_SIGNED_RUNTIME_PENDING",
+          "passForShockMustRemain": false
+        },
+        {
+          "id": "A14",
+          "expect": "V35_PROVIDER_BILLING_HOLD_SIGNED_RUNTIME_PENDING",
+          "set": "NATIVE_PACKAGE_AND_HOSTING_VERIFIED_SIGNED_RUNTIME_PENDING",
+          "passForShockMustRemain": false
+        }
+      ],
+      "referencePinUpdates": [
+        {
+          "pointer": "pendingImmutableBuild.nativeExecutionEvidence",
+          "expectPath": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_EXECUTION_PROGRESS_20261124_R84.json",
+          "expectFragment": "nativePackageExecution20261125",
+          "setGitBlobSha": "2035f2b1cc95638b9deaa416a1250b32b0a38814"
+        },
+        {
+          "pointer": "currentSuccessorPlan.providerExecution",
+          "expectPath": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_EXECUTION_PROGRESS_20261124_R84.json",
+          "expectFragment": "nativePackageExecution20261125",
+          "setGitBlobSha": "2035f2b1cc95638b9deaa416a1250b32b0a38814"
+        },
+        {
+          "pointer": "pendingImmutableBuild.hostingPreviewContinuation",
+          "expectPath": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_EXECUTION_PROGRESS_20261124_R84.json",
+          "expectFragment": "nativeHostingPreviewExecution20261125",
+          "setGitBlobSha": "2035f2b1cc95638b9deaa416a1250b32b0a38814"
+        },
+        {
+          "pointer": "currentSuccessorPlan.hostingPreviewExecution",
+          "expectPath": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_EXECUTION_PROGRESS_20261124_R84.json",
+          "expectFragment": "nativeHostingPreviewExecution20261125",
+          "setGitBlobSha": "2035f2b1cc95638b9deaa416a1250b32b0a38814"
+        },
+        {
+          "pointer": "currentSuccessorPlan.artifactIdentity",
+          "expectPath": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_EXECUTION_PROGRESS_20261124_R84.json",
+          "expectFragment": "nativePackageExecution20261125.artifact",
+          "setGitBlobSha": "2035f2b1cc95638b9deaa416a1250b32b0a38814"
+        }
+      ],
+      "historicalReceiptMutation": false,
+      "ownerOperations": [
+        "Clone the active progress in memory and allocate the next append-only receipt through the existing cursor mechanism; do not reserve or overwrite a numbered checkpoint from this preparation.",
+        "Apply the four exact status transitions and five explicit reference pins after checking their preimages.",
+        "Call synchronizeExecutionProgress(progress) to regenerate remainingExecutionLanes and updateDiscipline.nextIncomplete.",
+        "Keep current release, financial, signed QA, and historical evidence unchanged; retain passForShock=false for all four objectives.",
+        "Set previousEvidencePath/previousEvidenceBlobSha to the actual predecessor on both new progress and cursor; bind cursor.currentEvidencePath/currentEvidenceBlobSha to the new receipt.",
+        "Regenerate executionSynchronization from current transport if that transport changed in the same authorized transition.",
+        "Call synchronizeOwnerPlanContinuation(control,state,transport) and validate all active projections before the atomic commit.",
+        "Run the existing governance and admission gates on the completed current tree. Do not publish the guard alone with old active statuses."
+      ]
+    },
+    "nativeMechanismBinding": {
+      "owner": "tools/gravicentra-i6-6-cloud-build-operational.cjs",
+      "operations": [
+        "mechanismManifest(cwd, actualFrozenProductSource, admittedMechanismCommit)",
+        "bindingFromHosting(cwd, retainedHostingPlan, exactHostingReceipt, admittedMechanismCommit)",
+        "verifyPinnedOwners(currentCandidate)"
+      ],
+      "preserveFrozenProductRequest": true,
+      "preservePackageBytesAndDigest": true,
+      "preserveExistingHostingVersion": true,
+      "retainExactBeforeAndAfterOwnerPins": true,
+      "changeToClosedAllowlist": "Only tools/gravicentra-i66-frontend-control.test.cjs is newly listed; no general widening.",
+      "noRebuildClaimWithoutExactBindingProof": true
+    },
+    "executionAfterAdmission": "Continue the already authorized native release and existing signed Preview/LIVE/readback gates; verify the repaired mechanism in that real cycle. Do not invent another business approval or count local tests as live acceptance.",
+    "separateComponents": "The timeout repair is a distinct causal change. If the continuity component is admitted later, keep its guard and checkpoint correction together; do not delay an already verified independent release merely to combine all source repairs.",
+    "signedCasActuatorPreflight": {
+      "contractOwner": "tools/gravicentra-i6-6-cloud-build-signed-cas.cjs",
+      "existingRequirement": "A real authenticated actuator must create the requested single-parent, exact-tree, exact-message commit with GitHub verification.verified=true before CAS readback can complete.",
+      "localAuthenticatedGhAvailable": false,
+      "availableCreateCommitToolGuaranteesSignature": false,
+      "currentBaseCommitVerification": {
+        "sha": "f69687740f96f33b1f443ea9cfc9e9bd21c01083",
+        "verified": false,
+        "reason": "unsigned",
+        "source": "GitHub branch and commit REST readback on 2026-11-25"
+      },
+      "actionForCurrentReleaseOperator": "Demonstrate the existing authenticated signing actuator before starting LIVE. Preparing source commits through the exposed create_commit tool does not prove this capability. Keep the exact signed-CAS and rollback contract; do not use an unsigned closure or weaken verification.",
+      "newPermissionOrGateCreated": false,
+      "nativeLiveCycleProvenHere": false
+    }
+  },
+  "unchanged": {
+    "productPaths": true,
+    "firestoreData": true,
+    "payments": true,
+    "driveDocuments": true,
+    "hosting": true,
+    "backendDeployments": true,
+    "workflowBytes": true,
+    "rollbackContract": true,
+    "signedCasContract": true,
+    "staticNormativeSources": true,
+    "canonicalBranchRef": true,
+    "physicalControlPlane": true,
+    "physicalCurrentReceipt": true,
+    "transportAuthority": true
+  },
+  "claims": {
+    "productionDeployed": false,
+    "productionRolePass": false,
+    "wholeSystemSynchronized": false,
+    "wholeGateClosed": false
+  }
+}

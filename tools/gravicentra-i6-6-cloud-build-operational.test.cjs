@@ -57,6 +57,32 @@ test('two real native steps keep SDK metadata identity distinct from immutable p
   b.steps[0].args[3]=b.steps[0].args[3].replaceAll('$$','$');assert.equal(n.validateBuild(p,b),b);
   const working=clone(b);working.status='WORKING';delete working.finishTime;delete working.results;assert.equal(n.validateBuild(p,working,{finished:false}),working);assert.throws(()=>n.validateBuild(p,working));
 });
+test('native deployment keeps the exact workflow job budget and the provider remaining deadline',()=>{
+  const now=Date.parse('2026-11-25T12:10:00Z'),runtime={startTime:'2026-11-25T12:00:00Z',timeout:'10800s'};
+  for(const [phase,withoutMake] of [['preview',55],['live',65]]){
+    const workflow=fs.readFileSync(path.join(root,phase==='preview'?n.C.previewWorkflow:n.C.liveWorkflow),'utf8');
+    assert.equal(n.workflowTimeoutMs(workflow,phase,true),85*60*1000);
+    assert.equal(n.workflowTimeoutMs(workflow,phase,false),withoutMake*60*1000);
+    assert.equal(n.deploymentTimeoutMs(workflow,phase,true,runtime,now),75*60*1000);
+    assert.equal(n.deploymentTimeoutMs(workflow,phase,false,runtime,now),(withoutMake-10)*60*1000);
+    assert.equal(n.deploymentTimeoutMs(workflow,phase,true,{...runtime,timeout:'900s'},now),5*60*1000);
+    assert.throws(()=>n.deploymentTimeoutMs(workflow,phase,true,runtime,now+75*60*1000),/DEPLOYMENT_BUDGET_EXHAUSTED/);
+    assert.throws(()=>n.deploymentTimeoutMs(workflow,phase,true,{...runtime,timeout:'600s'},now),/DEPLOYMENT_BUDGET_EXHAUSTED/);
+    for(const value of [{...runtime,startTime:'missing'},{...runtime,timeout:'0s'},{...runtime,timeout:'Infinity'},{...runtime,startTime:'2026-11-25T12:11:00Z'}])
+      assert.throws(()=>n.deploymentTimeoutMs(workflow,phase,true,value,now),/PROVIDER_TIMEOUT/);
+  }
+});
+test('workflow budget cannot be guessed from another job or an unrecognized expression',()=>{
+  const workflow=fs.readFileSync(path.join(root,n.C.liveWorkflow),'utf8');
+  const expression="${{ needs.phase.outputs.make_ingress == 'true' && 85 || 65 }}";
+  assert.ok(workflow.includes(expression));
+  for(const replacement of ['0','Infinity','${{ arbitrary.value }}','9007199254740991'])
+    assert.throws(()=>n.workflowTimeoutMs(workflow.replace(expression,replacement),'live',true),/WORKFLOW_TIMEOUT/);
+  assert.throws(()=>n.workflowTimeoutMs(workflow.replace('  exact-role-live:','  another-job:'),'live',true),/WORKFLOW_TIMEOUT_JOB/);
+  assert.throws(()=>n.workflowTimeoutMs(workflow.replace('    timeout-minutes: '+expression,'    timeout-minutes: 85\n    timeout-minutes: 85'),'live',true),/WORKFLOW_TIMEOUT_UNIQUE/);
+  assert.equal(n.workflowTimeoutMs(workflow.replace(expression,'85'),'live',false),85*60*1000);
+  assert.throws(()=>n.workflowTimeoutMs(workflow,'invalid',true),/WORKFLOW_TIMEOUT_PHASE/);
+});
 for(const [label,change] of [
   ['phase-only SUCCESS',b=>b.steps=[]],['skipped native step',b=>b.steps[1].status='SKIPPED'],['ignored failure',b=>b.steps[1].allowFailure=true],
   ['different executor source',b=>b.source.gitSource.revision='f'.repeat(40)],['different resolved source',b=>b.sourceProvenance.resolvedGitSource.revision='f'.repeat(40)],
@@ -146,6 +172,34 @@ test('real Git preimages close native admission against product, working owner, 
     f.put(n.C.tool,'unsealed executing mechanism\n');assert.throws(()=>n.verifyPinnedOwners(f.p,{cwd:f.repo}),/EXECUTING_MECHANISM_OWNER/);f.git('checkout','--',n.C.tool);
     const historical=f.p.financialRecoveryQa;assert.ok(historical);f.put(historical.receiptPath,'{}\n');f.commit('synthetic forbidden historical rewrite');assert.throws(()=>n.verifyPinnedOwners(f.p,{cwd:f.repo}),/HISTORICAL_RECEIPT_CURRENT|UNADMITTED_SOURCE_OR_QA_CHANGE/);f.git('reset','--hard',f.head);
     const undeclared=g.PINNED_OWNER_PATHS.find(x=>x.startsWith('tools/')&&x.endsWith('.test.cjs')&&!n.MECHANISM_PATHS.includes(x));assert.ok(undeclared);f.put(undeclared,'// unadmitted source QA\n');f.commit('synthetic undeclared QA mutation');assert.throws(()=>n.verifyPinnedOwners(f.p,{cwd:f.repo}),/UNADMITTED_SOURCE_OR_QA_CHANGE/);
+  }finally{f.cleanup();}
+});
+test('historical admission fixture permits only its recorded predecessor and successor',()=>{
+  const mechanism=candidate().p.providerBinding.mechanism;
+  const file='tools/gravicentra-i6-6-composite-preview-admission.test.cjs';
+  const receipt=JSON.parse(fs.readFileSync('artifacts/orbit360-recovery/release-control/I6_6_ASSIGNED_ROLES_HISTORICAL_FIXTURE_PROVIDER_QA_20261125.json','utf8'));
+  const revision=receipt.tests.find(test=>test.path===file);
+  const bytes=fs.readFileSync(file);
+  assert.equal(pkg.blob(bytes),revision.gitBlobSha);
+  mechanism.files[file]={beforeBlob:revision.replaces.priorGitBlobSha,blob:revision.gitBlobSha,sha256:pkg.sha(bytes)};
+  assert.equal(n.validateMechanism(mechanism,mechanism.sourceSha),mechanism);
+  for(const key of ['beforeBlob','blob']){
+    const bad=clone(mechanism);bad.files[file][key]='1'.repeat(40);
+    assert.throws(()=>n.validateMechanism(bad,bad.sourceSha),/HISTORICAL_ADMISSION_FIXTURE_EXACT_REVISION/);
+  }
+});
+test('continuity owner regression test is admissible only with its exact mechanism preimage and current bytes',()=>{
+  const f=realGitFixture(),file='tools/gravicentra-i66-frontend-control.test.cjs';
+  try{
+    assert.ok(n.MECHANISM_PATHS.includes(file));assert.ok(g.PINNED_OWNER_PATHS.includes(file));
+    const bytes=Buffer.from('// synthetic continuity regression test\n');f.put(file,bytes);
+    f.p.providerBinding.mechanism.commit=f.commit('synthetic continuity QA mechanism successor');
+    f.p.providerBinding.mechanism.files[file]={beforeBlob:null,blob:pkg.blob(bytes),sha256:pkg.sha(bytes)};
+    assert.equal(n.verifyPinnedOwners(f.p,{cwd:f.repo}).ownerCount,5);
+    const omitted=clone(f.p);delete omitted.providerBinding.mechanism.files[file];
+    assert.throws(()=>n.verifyPinnedOwners(omitted,{cwd:f.repo}),/UNADMITTED_SOURCE_OR_QA_CHANGE/);
+    f.put(file,'// unsealed continuity test bytes\n');
+    assert.throws(()=>n.verifyPinnedOwners(f.p,{cwd:f.repo}),/EXECUTING_MECHANISM_OWNER/);
   }finally{f.cleanup();}
 });
 test('shallow provider checkout fetches canonical public history before pins without changing the executing HEAD or bytes',()=>{

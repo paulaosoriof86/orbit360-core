@@ -359,10 +359,11 @@ async function workerIdentity(env=process.env,requestContext={}){
   // Access tokens are used only in memory for the same project's provider APIs.
   return {buildId:env.GRAVICENTRA_CLOUD_BUILD_ID,headers:{Authorization:'Bearer '+token.access_token}};
 }
-function execLogged(command,args,{cwd,env,log,append=false}){
+function execLogged(command,args,{cwd,env,log,append=false,timeoutMs=1700000}){
+  need(Number.isSafeInteger(timeoutMs)&&timeoutMs>0&&timeoutMs<=2147483647,'COMMAND_TIMEOUT');
   const fd=fs.openSync(log,append?'a':'wx',0o600),startedAt=new Date().toISOString();
   let result;
-  try{result=spawnSync(command,args,{cwd,env,stdio:['ignore',fd,fd],timeout:1700000});}finally{fs.closeSync(fd);}
+  try{result=spawnSync(command,args,{cwd,env,stdio:['ignore',fd,fd],timeout:timeoutMs});}finally{fs.closeSync(fd);}
   if(result.error||result.status!==0){
     // Native artifacts upload only on success. Preserve the causal check tail
     // in the provider's private log even when no artifact is retained. This

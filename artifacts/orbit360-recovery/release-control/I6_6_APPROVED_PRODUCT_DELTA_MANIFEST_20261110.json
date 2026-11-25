@@ -4660,6 +4660,25 @@
           }
         }
       ]
+    },
+    {
+      "id": "I6_6_ASSIGNED_ROLES_HISTORICAL_FIXTURE_PROVIDER_QA_20261125",
+      "approvedByDirection": true,
+      "scope": "EXISTING_DECLARED_TESTS_ONLY",
+      "paths": [],
+      "receipt": "artifacts/orbit360-recovery/release-control/I6_6_ASSIGNED_ROLES_HISTORICAL_FIXTURE_PROVIDER_QA_20261125.json",
+      "receiptGitBlobSha": "11630efd8b63f3e841dddebc2b1c5a8ea26e4dac",
+      "tests": [
+        {
+          "path": "tools/gravicentra-i6-6-composite-preview-admission.test.cjs",
+          "gitBlobSha": "3978f19272a435984207b40f928398fa8046f0b3",
+          "replaces": {
+            "path": "tools/gravicentra-i6-6-composite-preview-admission.test.cjs",
+            "priorGitBlobSha": "c6485d21daa40ea5a0521521163b67a375d6fd6d",
+            "priorChangeId": "I6_6_COMPOSITE_ADMISSION_HISTORICAL_FIXTURES_AND_REQUEST_CONTINUITY_QA_20261124"
+          }
+        }
+      ]
     }
   ]
 }

@@ -1,0 +1,40 @@
+{
+  "schema": "GI_I66_EXISTING_FINANCIAL_AND_ADMISSION_TEST_REVISION_V1",
+  "revisionId": "I6_6_ASSIGNED_ROLES_HISTORICAL_FIXTURE_PROVIDER_QA_20261125",
+  "scope": "EXISTING_DECLARED_TESTS_ONLY",
+  "productSourceChanges": 0,
+  "productionAcceptanceClaimed": false,
+  "tests": [
+    {
+      "path": "tools/gravicentra-i6-6-composite-preview-admission.test.cjs",
+      "gitBlobSha": "3978f19272a435984207b40f928398fa8046f0b3",
+      "replaces": {
+        "path": "tools/gravicentra-i6-6-composite-preview-admission.test.cjs",
+        "priorGitBlobSha": "c6485d21daa40ea5a0521521163b67a375d6fd6d",
+        "priorChangeId": "I6_6_COMPOSITE_ADMISSION_HISTORICAL_FIXTURES_AND_REQUEST_CONTINUITY_QA_20261124"
+      }
+    }
+  ],
+  "evidence": {
+    "baseCommit": "f69687740f96f33b1f443ea9cfc9e9bd21c01083",
+    "fixtureSource": "9da06674caf080e10f510d8a13a1d122d449dff2",
+    "driver": "tools/gravicentra-i6-6-carlos-paula-live-direct-renewal-synthetic-uat.cjs",
+    "publishedDriverBlob": "49b5da17f6046deb52aebb2baf030d877f43b895",
+    "nativeDriverBlob": "6d75eea2086e0e6f227e6db41bffc1332fffa05a",
+    "baseline": {
+      "total": 89,
+      "passCount": 85,
+      "failCount": 4,
+      "skipped": 0
+    },
+    "corrected": {
+      "total": 89,
+      "passCount": 89,
+      "failCount": 0,
+      "skipped": 0
+    },
+    "cause": "The historical assigned-role fixture read newer provider-specific QA files from the working tree. Read its source, receipts and QA from their published commit. Production validation, negative pin tests and current request source checks stay active.",
+    "signedPreview": false,
+    "live": false
+  }
+}

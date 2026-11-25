@@ -508,20 +508,23 @@ test('revised QA receipt preserves the same pending backend and startup invarian
 
 
 // Source322 successor requests below are offline fixtures. Actual historical
-// receipt bytes are read by immutable commit; prospective QA hashes are mapped
-// to scratch source only to test admission, never to claim provider acceptance.
+// successor QA bytes are read from the published assigned-role source. Runtime
+// provider adaptations at a later HEAD belong to their own validation.
 function assignedInsurerFixture(){
  const f=directFormsFixture(),o=qaRevision,head='c'.repeat(40),base=o.COMPOSED_PUBLISHED_SOURCE;
  const h=x=>require('node:crypto').createHash('sha1').update(String(x)).digest('hex');
+ const assignedSource='9da06674caf080e10f510d8a13a1d122d449dff2';
+ const assignedBlob=p=>git('rev-parse',assignedSource+':'+p);
+ const assignedText=p=>execFileSync('git',['show',assignedSource+':'+p],{encoding:'utf8'});
  const historical=p=>JSON.parse(git('show',base+':'+p));
- f.request.sourceQaHead=head;f.receipt=JSON.parse(fs.readFileSync(o.DIRECT_FORMS_ASSIGNED_ROLES_RECEIPT_PATH));
- f.insurerReceipt=JSON.parse(fs.readFileSync(o.DIRECT_FORMS_INSURER_EDITOR_RECEIPT_PATH));
+ f.request.sourceQaHead=head;f.receipt=JSON.parse(assignedText(o.DIRECT_FORMS_ASSIGNED_ROLES_RECEIPT_PATH));
+ f.insurerReceipt=JSON.parse(assignedText(o.DIRECT_FORMS_INSURER_EDITOR_RECEIPT_PATH));
  f.oldDirectReceipt=historical(o.DIRECT_FORMS_QA_REVISION_RECEIPT_PATH);
  f.oldFinancialReceipt=historical(o.FINANCIAL_RECEIPT_PATH);
  f.oldCancellationReceipt=historical(o.CANCELLATION_RECEIPT_PATH);
  f.financialReceipt=clone(f.oldFinancialReceipt);f.financialReceipt.supersedes=clone(o.FINANCIAL_SUCCESSOR_PREDECESSOR);
  f.cancellationReceipt=clone(f.oldCancellationReceipt);f.cancellationReceipt.supersedes=clone(o.CANCELLATION_SUCCESSOR_PREDECESSOR);
- for(const receipt of [f.financialReceipt,f.cancellationReceipt])for(const row of receipt.qaPaths)row.gitBlobSha=qaHash(fs.readFileSync(row.path));
+ for(const receipt of [f.financialReceipt,f.cancellationReceipt])for(const row of receipt.qaPaths)row.gitBlobSha=assignedBlob(row.path);
  f.request.directFormsRecovery={schema:'GI_I66_DIRECT_FORMS_RECOVERY_PREVIEW_EXTENSION_V1',receiptPath:o.DIRECT_FORMS_ASSIGNED_ROLES_RECEIPT_PATH,
    receiptBlob:o.DIRECT_FORMS_ASSIGNED_ROLES_RECEIPT_BLOB,productPathBlobs:{...f.previous.directFormsRecovery.productPathBlobs,[o.DIRECT_FORMS_INSURER_EDITOR_PATH]:f.insurerReceipt.productPaths[0].gitBlobSha}};
  f.request.directFormsQaProfile=o.DIRECT_FORMS_ASSIGNED_ROLES_PROFILE;
@@ -540,7 +543,7 @@ function assignedInsurerFixture(){
   const insurer=[...f.insurerReceipt.productPaths,...f.insurerReceipt.testPaths].find(row=>row.path===p);
   if(insurer)return insurer.gitBlobSha;
   if(o.FINANCIAL_PATHS.includes(p)||o.CANCELLATION_PATHS.includes(p))return git('rev-parse',base+':'+p);
-  if(p===o.DIRECT_FORMS_INSURER_EDITOR_RECEIPT_PATH||NEXT_QA_PATHS.includes(p)||o.FINANCIAL_QA_PATHS.includes(p)||o.CANCELLATION_QA_PATHS.includes(p))return qaHash(fs.readFileSync(p));
+  if(p===o.DIRECT_FORMS_INSURER_EDITOR_RECEIPT_PATH||NEXT_QA_PATHS.includes(p)||o.FINANCIAL_QA_PATHS.includes(p)||o.CANCELLATION_QA_PATHS.includes(p))return assignedBlob(p);
   return git('rev-parse',base+':'+p);
  };
  f.readJson=(ref,p)=>{
@@ -556,7 +559,7 @@ function assignedInsurerFixture(){
   if(p===o.CANCELLATION_SUCCESSOR_RECEIPT_PATH)return f.cancellationReceipt;
   return historical(p);
  };
- f.readText=(ref,p)=>{assert.equal(ref,head);return fs.readFileSync(p,'utf8');};
+ f.readText=(ref,p)=>{assert.equal(ref,head);return assignedText(p);};
  return f;
 }
 function validateAssignedComposition(f,deps={}){

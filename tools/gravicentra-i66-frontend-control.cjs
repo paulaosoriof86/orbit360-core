@@ -99,6 +99,147 @@ function assertRetiredReleaseContinuation(control,progress){
     }
   }
 }
+// Resolve the active provider from pinned evidence, never from the name of an
+// older workflow or from a copied objective status. This is a read-only view;
+// transport readback is not signed functional Preview or LIVE acceptance.
+function resolveNativeExecutionProgress(control,progress,io){
+  const pending=progress.pendingImmutableBuild,plan=progress.currentSuccessorPlan;
+  if(pending?.provider!=='GOOGLE_CLOUD_BUILD'&&!pending?.nativeExecutionEvidence)return null;
+  assert.equal(pending.provider,'GOOGLE_CLOUD_BUILD','I66_NATIVE_PROGRESS_PROVIDER_DRIFT');
+  const cursor=control.i66ActiveRecoveryCursor;
+  assert.ok(cursor&&plan,'I66_NATIVE_PROGRESS_ACTIVE_AUTHORITY_MISSING');
+  const safePath=p=>typeof p==='string'&&/^artifacts\/orbit360-recovery\/release-control\/[A-Za-z0-9_.-]+\.json$/.test(p);
+  assert.ok(safePath(cursor.currentEvidencePath),'I66_NATIVE_PROGRESS_CURSOR_PATH_INVALID');
+  const activeBytes=io.readFileSync(cursor.currentEvidencePath,'utf8');
+  assert.equal(blob(activeBytes),cursor.currentEvidenceBlobSha,'I66_NATIVE_PROGRESS_CURSOR_BLOB_DRIFT');
+  assert.deepEqual(JSON.parse(activeBytes),progress,'I66_NATIVE_PROGRESS_CURSOR_CONTENT_DRIFT');
+  const cache=new Map([[cursor.currentEvidencePath,progress]]);
+  const pins=new Map([[cursor.currentEvidencePath,cursor.currentEvidenceBlobSha]]);
+  const sameRef=(a,b,label)=>{
+    assert.ok(a&&b,'I66_NATIVE_PROGRESS_REFERENCE_MISSING_'+label);
+    assert.equal(a.path,b.path,'I66_NATIVE_PROGRESS_REFERENCE_PATH_DRIFT_'+label);
+    assert.equal(a.fragment,b.fragment,'I66_NATIVE_PROGRESS_REFERENCE_FRAGMENT_DRIFT_'+label);
+    if(a.gitBlobSha&&b.gitBlobSha)
+      assert.equal(a.gitBlobSha,b.gitBlobSha,'I66_NATIVE_PROGRESS_REFERENCE_PIN_DRIFT_'+label);
+    // Equivalent references may share an explicit pin; resolve that side first
+    // without walking past the immediately preceding checkpoint for authority.
+    return resolve(a.gitBlobSha?a:b,label);
+  };
+  function resolve(ref,label){
+    assert.ok(ref&&safePath(ref.path),'I66_NATIVE_PROGRESS_REFERENCE_PATH_INVALID_'+label);
+    const parts=String(ref.fragment||'').split('.');
+    assert.ok(parts.length&&parts.every(k=>/^[A-Za-z][A-Za-z0-9_]*$/.test(k)&&
+      !['__proto__','constructor','prototype'].includes(k)),'I66_NATIVE_PROGRESS_REFERENCE_FRAGMENT_INVALID_'+label);
+    const pin=ref.gitBlobSha||(ref.path===cursor.currentEvidencePath?cursor.currentEvidenceBlobSha:
+      ref.path===progress.previousEvidencePath?progress.previousEvidenceBlobSha:null);
+    assert.match(String(pin||''),/^[a-f0-9]{40}$/,'I66_NATIVE_PROGRESS_REFERENCE_PIN_REQUIRED_'+label);
+    if(!cache.has(ref.path)){
+      const bytes=io.readFileSync(ref.path,'utf8');
+      assert.equal(blob(bytes),pin,'I66_NATIVE_PROGRESS_REFERENCE_BLOB_DRIFT_'+label);
+      cache.set(ref.path,JSON.parse(bytes));pins.set(ref.path,pin);
+    }else assert.equal(pins.get(ref.path),pin,'I66_NATIVE_PROGRESS_REFERENCE_BLOB_DRIFT_'+label);
+    let value=cache.get(ref.path);
+    for(const key of parts){
+      assert.ok(value&&Object.hasOwn(value,key),'I66_NATIVE_PROGRESS_REFERENCE_NOT_FOUND_'+label);
+      value=value[key];
+    }
+    assert.ok(value&&typeof value==='object','I66_NATIVE_PROGRESS_REFERENCE_VALUE_INVALID_'+label);
+    return value;
+  }
+  const transport=JSON.parse(io.readFileSync(P.transport,'utf8'));
+  const consumed=transport.lastConsumedFrontendRelease;
+  const isConsumed=consumed?.previewRequestVersion===pending.version;
+  const request=isConsumed?transport.lastConsumedFrontendPreviewRequest:transport.frontendPreviewRequest;
+  assert.ok(request&&Number.isSafeInteger(request.version)&&request.version>0,'I66_NATIVE_PROGRESS_REQUEST_REQUIRED');
+  assert.equal(pending.version,request.version,'I66_NATIVE_PROGRESS_REQUEST_DRIFT');
+  assert.equal(plan.plannedRequestVersion,request.version,'I66_NATIVE_PROGRESS_PLAN_REQUEST_DRIFT');
+  assert.match(String(pending.sourceSha||''),/^[a-f0-9]{40}$/,'I66_NATIVE_PROGRESS_SOURCE_REQUIRED');
+  assert.equal(plan.sourceSha,pending.sourceSha,'I66_NATIVE_PROGRESS_PLAN_SOURCE_DRIFT');
+  for(const row of [pending,plan])for(const key of ['sourceQaHead','sourceQaRunId','guardRunId'])
+    assert.equal(row[key],request[key],'I66_NATIVE_PROGRESS_REQUEST_BINDING_DRIFT_'+key);
+  const packaged=sameRef(pending.nativeExecutionEvidence,plan.providerExecution,'PACKAGE');
+  const bind=(proof,label)=>{
+    assert.equal(proof.provider,'GOOGLE_CLOUD_BUILD','I66_NATIVE_PROGRESS_PROVIDER_DRIFT_'+label);
+    assert.equal(proof.requestVersion,request.version,'I66_NATIVE_PROGRESS_REQUEST_DRIFT_'+label);
+    assert.equal(proof.sourceSha,pending.sourceSha,'I66_NATIVE_PROGRESS_SOURCE_DRIFT_'+label);
+    assert.match(String(proof.buildId||''),/^[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}$/i,
+      'I66_NATIVE_PROGRESS_BUILD_ID_INVALID_'+label);
+  };
+  bind(packaged,'PACKAGE');
+  assert.equal(packaged.scope,'PACKAGE_ONLY','I66_NATIVE_PROGRESS_PACKAGE_SCOPE_DRIFT');
+  assert.equal(pending.providerBuildId,packaged.buildId,'I66_NATIVE_PROGRESS_PACKAGE_BUILD_DRIFT');
+  assert.equal(pending.providerStatus,packaged.status,'I66_NATIVE_PROGRESS_PROVIDER_STATUS_DRIFT');
+  const packageCertified=packaged.status==='SUCCESS'&&packaged.finalResultObserved===true&&
+    packaged.artifactCreated===true&&packaged.artifactReadbackVerified===true;
+  function artifact(value,label){
+    assert.ok(value&&/^gs:\/\/[^/\s]+\/[^\s]+$/.test(value.uri||''),'I66_NATIVE_PROGRESS_ARTIFACT_URI_INVALID_'+label);
+    assert.match(String(value.generation||''),/^[1-9][0-9]*$/,'I66_NATIVE_PROGRESS_ARTIFACT_GENERATION_INVALID_'+label);
+    assert.match(String(value.sha256||''),/^[a-f0-9]{64}$/,'I66_NATIVE_PROGRESS_ARTIFACT_DIGEST_INVALID_'+label);
+    assert.ok(Number.isSafeInteger(value.bytes)&&value.bytes>0,'I66_NATIVE_PROGRESS_ARTIFACT_SIZE_INVALID_'+label);
+    return Object.fromEntries(['uri','generation','sha256','bytes'].map(k=>[k,value[k]]));
+  }
+  let packageArtifact=null;
+  if(packaged.artifact||packageCertified){
+    packageArtifact=artifact(packaged.artifact,'PACKAGE');
+    assert.deepEqual(artifact(resolve(plan.artifactIdentity,'ARTIFACT'),'PLAN'),packageArtifact,
+      'I66_NATIVE_PROGRESS_PLAN_ARTIFACT_DRIFT');
+  }
+  if(isConsumed){
+    const head=control.i66FrontendReleaseHead;
+    assert.ok(packageCertified&&head,'I66_NATIVE_PROGRESS_CONSUMED_PROOF_REQUIRED');
+    assert.equal(consumed.sourceSha,pending.sourceSha,'I66_NATIVE_PROGRESS_CONSUMED_SOURCE_DRIFT');
+    assert.equal(consumed.artifactDigest,'sha256:'+packageArtifact.sha256,'I66_NATIVE_PROGRESS_CONSUMED_ARTIFACT_DRIFT');
+    for(const key of ['generation','sourceSha','artifactDigest','receiptPath'])
+      assert.equal(consumed[key],head[key],'I66_NATIVE_PROGRESS_CONSUMED_HEAD_DRIFT_'+key);
+    assert.deepEqual(progress.consumedPreviewRequest,request,'I66_NATIVE_PROGRESS_CONSUMED_REQUEST_DRIFT');
+  }
+  // These receipts certify transport only. A later signed acceptance must use
+  // its own existing proof path instead of changing the meaning of this view.
+  for(const key of ['previewAccepted','liveAccepted','releaseAcceptance'])
+    assert.equal(packaged[key],false,'I66_NATIVE_PROGRESS_PACKAGE_ACCEPTANCE_SCOPE_'+key);
+  let hosting=null;
+  if(plan.hostingPreviewExecution||pending.hostingPreviewContinuation){
+    const proof=sameRef(pending.hostingPreviewContinuation,plan.hostingPreviewExecution,'HOSTING');bind(proof,'HOSTING');
+    assert.equal(proof.scope,'EXISTING_HOSTING_PREVIEW_ONLY_SIGNED_QA_AND_LIVE_PENDING',
+      'I66_NATIVE_PROGRESS_HOSTING_SCOPE_DRIFT');
+    sameRef(proof.packageEvidence,plan.providerExecution,'HOSTING_PACKAGE');
+    assert.equal(proof.packageBuildId,packaged.buildId,'I66_NATIVE_PROGRESS_HOSTING_PACKAGE_BUILD_DRIFT');
+    assert.deepEqual(artifact(proof.packageArtifact,'HOSTING'),packageArtifact,'I66_NATIVE_PROGRESS_HOSTING_ARTIFACT_DRIFT');
+    assert.equal(proof.samePackageArtifactRequired,true,'I66_NATIVE_PROGRESS_SAME_PACKAGE_REQUIRED');
+    assert.equal(proof.signedFunctionalPreviewAccepted,false,'I66_NATIVE_PROGRESS_HOSTING_ACCEPTANCE_SCOPE');
+    for(const key of ['backendDeploys','liveDeploys','businessWrites'])
+      assert.equal(proof[key],0,'I66_NATIVE_PROGRESS_HOSTING_EFFECT_SCOPE_'+key);
+    const readbackCertified=proof.status==='SUCCESS'&&proof.finalResultObserved===true&&proof.hostingReadbackVerified===true;
+    if(readbackCertified){
+      assert.equal(packageCertified,true,'I66_NATIVE_PROGRESS_HOSTING_WITHOUT_CERTIFIED_PACKAGE');
+      assert.match(String(proof.hostingVersion||''),/^sites\/[^/]+\/versions\/[A-Za-z0-9_-]+$/,
+        'I66_NATIVE_PROGRESS_HOSTING_VERSION_REQUIRED');
+    }
+    hosting={buildId:proof.buildId,status:proof.status,readbackCertified,hostingVersion:proof.hostingVersion||null};
+  }
+  return {provider:'GOOGLE_CLOUD_BUILD',requestVersion:request.version,sourceSha:pending.sourceSha,
+    disposition:isConsumed?'CONSUMED_EXACT_RELEASE_HISTORY':'CURRENT_REQUEST',
+    package:{buildId:packaged.buildId,status:packaged.status,readbackCertified:packageCertified,artifact:packageArtifact},
+    hostingPreview:hosting,signedFunctionalAcceptanceEstablished:false,liveAcceptanceEstablished:false,
+    acceptanceScope:'TRANSPORT_EVIDENCE_ONLY'};
+}
+function assertNativeExecutionProgress(control,progress,io){
+  const native=resolveNativeExecutionProgress(control,progress,io);
+  if(!native?.package.readbackCertified||native.disposition==='CONSUMED_EXACT_RELEASE_HISTORY')return native;
+  const statuses=(progress.shockObjectives?.items||[]).filter(x=>x.passForShock!==true)
+    .map(row=>['objective.'+row.id,row.status]);
+  for(const row of progress.parallelLanes||[])statuses.push(['parallel.'+row.id,row.status]);
+  for(const key of ['pendingImmutableBuild','currentSuccessorPlan','immediateExecution'])
+    statuses.push([key,progress[key]?.status]);
+  for(const [name,status] of statuses){
+    // A different request or an unbound financial/provider lane can remain on
+    // GitHub Actions. Only the explicitly version-bound blocker is contradicted
+    // by the native package evidence for this same request.
+    const bound=String(status||'').match(/^V([1-9][0-9]*)_PROVIDER_BILLING_HOLD(?:_|$)/);
+    assert.ok(!bound||Number(bound[1])!==native.requestVersion,'I66_NATIVE_PROGRESS_STALE_PROVIDER_BILLING_'+name);
+  }
+  return native;
+}
 const observerTargetKeys=['generation','sourceSha','buildId','artifactId','artifactDigest','hostingVersion'];
 const observerCursorKeys=cursor=>Object.keys(cursor).filter(key=>/^(lastObserverResults|lastFiveRoleMatrix|lastPerformance|lastFinancialUiReadback)/.test(key));
 const observerSummaryKeys=progress=>Object.keys(progress).filter(key=>/^current(SignedRoleMatrix|LivePerformance)\d{8}$/.test(key));
@@ -303,6 +444,7 @@ function assertExecutionProgress(control,progress,io){
   const projection=executionProgressProjection(progress),cursor=control.i66ActiveRecoveryCursor||{};
   assert.deepEqual(progress.remainingExecutionLanes,projection.remainingExecutionLanes,'I66_PROGRESS_REMAINING_LANES_DRIFT');
   assert.deepEqual(progress.updateDiscipline?.nextIncomplete,projection.nextIncomplete,'I66_PROGRESS_NEXT_INCOMPLETE_DRIFT');
+  assertNativeExecutionProgress(control,progress,io);
   assertRetiredReleaseContinuation(control,progress);
   const observations=progress.postAcceptanceObserverResults;
   if(!observations&&!cursor.lastObserverResultsReceipt){
@@ -784,5 +926,6 @@ async function verifyReadonlyObserver(resolution,{env=process.env,api,readMarker
     productWrites:0,syntheticWrites:0,releaseTransitions:0,hostedMarkersVerified:origins};
 }
 module.exports={P,genName,serial,blob,physicalGuard,closeFiles,executionSnapshot,executionProgressProjection,synchronizeExecutionProgress,archiveExecutionObservers,assertExecutionProgress,assertRetiredReleaseContinuation,
+  resolveNativeExecutionProgress,assertNativeExecutionProgress,
   ownerPlanContinuationProjection,synchronizeOwnerPlanContinuation,assertOwnerPlanContinuation,assertActiveFinancialAndPlanProjections,assertActiveReleaseProgress,
   compositeReceipt,closeCompositeFiles,READONLY_PROFILES,readonlyObserverPaths,readonlyObserverTarget,resolveReadonlyObserver,verifyReadonlyObserver};

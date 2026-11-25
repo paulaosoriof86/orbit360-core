@@ -4,6 +4,7 @@ const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const path=require('node:path');
 const os=require('node:os');
+const Module=require('node:module');
 const owner=require('./gravicentra-i6-6-cloud-build-package.cjs');
 const {C,N,F}=owner;
 const copy=value=>JSON.parse(JSON.stringify(value));
@@ -253,6 +254,29 @@ test('successful real child retains PASS and complete file without emitting fail
     const result=owner.execLogged(process.execPath,['-e','console.log("SYNTHETIC_CHECK_PASS")'],{cwd:temp,env:process.env,log});
     assert.equal(result.status,'PASS');assert.equal(result.exitCode,0);assert.equal(captured,'');assert.equal(fs.readFileSync(log,'utf8'),'SYNTHETIC_CHECK_PASS\n');
   }finally{process.stderr.write=oldWrite;console.error=oldError;fs.rmSync(temp,{recursive:true,force:true});}
+});
+
+test('logged child preserves its default budget and forwards an explicit bounded operational budget',()=>{
+  const temp=fs.mkdtempSync(path.join(os.tmpdir(),'i66-cloud-timeout-'));
+  const file=path.join(__dirname,'gravicentra-i6-6-cloud-build-package.cjs'),loaded=new Module(file,module),calls=[];
+  const originalRequire=loaded.require.bind(loaded);
+  loaded.filename=file;loaded.paths=Module._nodeModulePaths(__dirname);
+  loaded.require=name=>name==='node:child_process'?{...originalRequire(name),spawnSync:(command,args,options)=>{
+    calls.push({command,args,options});return {status:0,signal:null};
+  }}:originalRequire(name);
+  loaded._compile(fs.readFileSync(file,'utf8'),file);
+  try{
+    const defaults=loaded.exports.execLogged('synthetic-child',[],{cwd:temp,env:{},log:path.join(temp,'default.log')});
+    const explicit=loaded.exports.execLogged('synthetic-child',[],{cwd:temp,env:{},log:path.join(temp,'operational.log'),timeoutMs:85*60*1000});
+    assert.equal(defaults.status,'PASS');assert.equal(explicit.status,'PASS');
+    assert.equal(calls[0].options.timeout,1700000);
+    assert.equal(calls[1].options.timeout,85*60*1000,'the operational deployment must not inherit the shorter package-command limit');
+    for(const timeoutMs of [0,-1,NaN,Infinity,1.5,'5100000',Number.MAX_SAFE_INTEGER]){
+      const before=calls.length,log=path.join(temp,'invalid.log');
+      assert.throws(()=>loaded.exports.execLogged('synthetic-child',[],{cwd:temp,env:{},log,timeoutMs}),/COMMAND_TIMEOUT/);
+      assert.equal(calls.length,before);assert.equal(fs.existsSync(log),false);
+    }
+  }finally{fs.rmSync(temp,{recursive:true,force:true});}
 });
 
 function requestHarness(responses){

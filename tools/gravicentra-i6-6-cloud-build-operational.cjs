@@ -20,7 +20,9 @@ const F=Object.freeze({proof:'gi-i66-native-operational-proof.json',signed:'gi-i
 // A finite mechanism revision. Product owners, approved receipts, rules and
 // functional profiles never belong to this set. Every admitted byte is pinned
 // to a real mechanism commit and its real preimage at the package source.
+const HISTORICAL_ADMISSION_TEST='tools/gravicentra-i6-6-composite-preview-admission.test.cjs';
 const MECHANISM_PATHS=Object.freeze([
+  HISTORICAL_ADMISSION_TEST,
   C.tool,C.test,pkg.C.tool,pkg.C.test,pkg.C.branding,pkg.C.brandingTest,
   preview.C.tool,preview.C.test,preview.C.readback,preview.C.readbackTest,
   'tools/gravicentra-i6-6-operational-release-candidate.cjs',
@@ -36,6 +38,7 @@ const MECHANISM_PATHS=Object.freeze([
   'tools/gravicentra-i66-live-performance-readonly.mjs','tools/gravicentra-i6-6-native-financial-readonly-adc.test.cjs',
   'tools/gravicentra-i66-frontend-promotion-owner.cjs','tools/gravicentra-i66-frontend-promotion-transaction.cjs',
   'tools/gravicentra-i66-frontend-hosting-io.cjs','tools/gravicentra-i66-frontend-control.cjs',
+  'tools/gravicentra-i66-frontend-control.test.cjs',
   'tools/gravicentra-i6-6-cloud-build-signed-cas.cjs','tools/gravicentra-i6-6-cloud-build-signed-cas.test.cjs',
   'tools/gravicentra-i6-6-native-promotion-artifact-binding.test.cjs',
   'tools/gravicentra-i6-6-carlos-paula-live-synthetic-ops-leads-uat-adc.test.cjs'
@@ -65,6 +68,10 @@ function validateMechanism(m,sourceSha){
   const keys=Object.keys(m.files);need(keys.length>0&&keys.every(p=>MECHANISM_PATHS.includes(p)),'CLOSED_MECHANISM_FILES');
   for(const p of [C.tool,C.test,'tools/gravicentra-i6-6-operational-release-candidate.cjs','tools/gravicentra-i66-signed-qa-runtime-auth.cjs'])need(Object.hasOwn(m.files,p),'REQUIRED_MECHANISM_'+p);
   for(const row of Object.values(m.files)){equal(Object.keys(row).sort(),['beforeBlob','blob','sha256'],'MECHANISM_PIN_KEYS');need((row.beforeBlob===null||sha40(row.beforeBlob))&&sha40(row.blob)&&sha64(row.sha256),'MECHANISM_PIN_HASH');need(row.beforeBlob!==row.blob,'ONLY_CHANGED_MECHANISM_PINS');}
+  // Request 35 admits only the published fixture revision. Both identities are
+  // recorded in I6_6_ASSIGNED_ROLES_HISTORICAL_FIXTURE_PROVIDER_QA_20261125.
+  const fixture=m.files[HISTORICAL_ADMISSION_TEST];
+  if(fixture)equal([fixture.beforeBlob,fixture.blob],['c6485d21daa40ea5a0521521163b67a375d6fd6d','3978f19272a435984207b40f928398fa8046f0b3'],'HISTORICAL_ADMISSION_FIXTURE_EXACT_REVISION');
   return m;
 }
 function validateBinding(p){
@@ -207,6 +214,33 @@ function blockNames(phase){return phase==='preview'?{
   deploy:'Deploy exact authorized LIVE backend revisions and clone exact Preview artifact with automatic rollback'
 }:{};}
 function workflowBlocks(text,phase){return Object.fromEntries(Object.entries(blockNames(phase)).map(([key,name])=>[key,pkg.runBlock(text,name)]));}
+function workflowTimeoutMs(text,phase,makeIngress){
+  need(PHASES.includes(phase)&&typeof makeIngress==='boolean','WORKFLOW_TIMEOUT_PHASE');
+  const job=phase==='preview'?'exact-preview-only':'exact-role-live';
+  const headers=[...text.matchAll(/^  ([A-Za-z0-9_-]+):\s*$/gm)],matches=headers.filter(row=>row[1]===job);
+  equal(matches.length,1,'WORKFLOW_TIMEOUT_JOB');
+  const start=matches[0].index,next=headers.find(row=>row.index>start);
+  const section=text.slice(start,next?.index??text.length);
+  const rows=[...section.matchAll(/^    timeout-minutes:[ \t]*(.+)[ \t]*$/gm)];
+  equal(rows.length,1,'WORKFLOW_TIMEOUT_UNIQUE');
+  const value=rows[0][1].trim(),literal=/^([1-9][0-9]*)$/.exec(value);
+  const conditional=/^\$\{\{\s*needs\.phase\.outputs\.make_ingress\s*==\s*'true'\s*&&\s*([1-9][0-9]*)\s*\|\|\s*([1-9][0-9]*)\s*\}\}$/.exec(value);
+  need(literal||conditional,'WORKFLOW_TIMEOUT_EXPRESSION');
+  const minutes=Number(literal?literal[1]:conditional[makeIngress?1:2]),ms=minutes*60*1000;
+  need(Number.isSafeInteger(ms)&&ms>0&&ms<=2147483647,'WORKFLOW_TIMEOUT_RANGE');return ms;
+}
+function deploymentTimeoutMs(text,phase,makeIngress,build,nowMs=Date.now()){
+  // This command contains the original deployment, signed QA, metadata CAS
+  // and rollback. Preserve that job's remaining budget, not the shorter
+  // package-command default; the real provider deadline remains an upper bound.
+  const budget=workflowTimeoutMs(text,phase,makeIngress),duration=/^([1-9][0-9]*)s$/.exec(build?.timeout||'');
+  need(duration,'PROVIDER_TIMEOUT_REQUIRED');
+  const providerMs=Number(duration[1])*1000,startedAt=Date.parse(build?.startTime);
+  need(Number.isSafeInteger(providerMs)&&providerMs>0&&Number.isFinite(startedAt)&&
+    Number.isSafeInteger(nowMs)&&nowMs>=startedAt,'PROVIDER_TIMEOUT_CLOCK');
+  const remaining=Math.min(budget,providerMs)-(nowMs-startedAt);
+  need(Number.isSafeInteger(remaining)&&remaining>0,'DEPLOYMENT_BUDGET_EXHAUSTED');return remaining;
+}
 function replaceExact(text,before,after,count=1){equal(text.split(before).length-1,count,'EXACT_PROVIDER_SUBSTITUTION');return text.replaceAll(before,after);}
 function runtimeBlocks(original,phase){
   const blocks={...original};
@@ -253,6 +287,7 @@ function makePlan(cwd,phase){
   const authorityHead=git(cwd,'rev-parse','HEAD');equal(git(cwd,'status','--porcelain','--untracked-files=no'),'','CLEAN_AUTHORITY_CHECKOUT');
   verifyPinnedOwners(p,{head:authorityHead,cwd});
   const workflow=phase==='preview'?C.previewWorkflow:C.liveWorkflow,bytes=gitBytes(cwd,p.sourceSha,workflow),blocks=workflowBlocks(bytes.toString(),phase);runtimeBlocks(blocks,phase);
+  workflowTimeoutMs(bytes.toString(),phase,p.makeIngressComposite===true);
   equal(gitBytes(cwd,authorityHead,workflow),bytes,'ORIGINAL_WORKFLOW_UNCHANGED');
   const financial='artifacts/orbit360-recovery/release-control/I6_6_FRONTEND_PROMOTION_AUTHORITY.json';
   const raw=json(path.join(cwd,financial));equal(raw.releaseScope,'COMPOSITE','FINANCIAL_COMPOSITE_SCOPE');equal(raw.scopeId,'SIX_RECEIPT_CURRENT_BALANCE_READONLY','FINANCIAL_SCOPE');
@@ -400,7 +435,7 @@ async function worker(plan){
   equal(git(cwd,'status','--porcelain','--untracked-files=no'),'','CLEAN_EXECUTING_CHECKOUT');write(path.join(cwd,'.i66-native-plan.json'),plan);
   const identity=await auth.verifyCloudBuildRuntime();ensureHistory(plan,{cwd});
   const p=candidateAt(plan,cwd),g=require('./gravicentra-i6-6-operational-release-candidate.cjs');g.assertDirectFormsPersonalAuthority(p,plan.phase.toUpperCase());
-  await verifyRuntimeAuthority(p,{phase:plan.phase,action:'worker'});
+  const runtime=await verifyRuntimeAuthority(p,{phase:plan.phase,action:'worker'});
   const temp=fs.mkdtempSync(path.join(os.tmpdir(),'i66-native-'+plan.phase+'-'));
   const env={...process.env,...Object.fromEntries(Object.entries(g.envFor(p)).map(([k,v])=>[k,String(v)])),RUNNER_TEMP:temp,SITE:C.projectId,
     I66_NATIVE_ENV_FILE:path.join(temp,'provider-output.env'),I66_FROZEN_SOURCE_ROOT:path.join(temp,'source'),
@@ -411,8 +446,9 @@ async function worker(plan){
   const original=workflowBlocks(workflow.toString(),plan.phase),blocks=runtimeBlocks(original,plan.phase);
   equal(Object.fromEntries(Object.entries(original).map(([k,v])=>[k,sha(v)])),plan.blocks,'SIGNED_WORKFLOW_BLOCKS');
   const checks={},log=path.join(cwd,F.log);write(log,'');
-  const command=(file,args,opts={})=>pkg.execLogged(file,args,{cwd:opts.cwd||cwd,env:{...env,...opts.env},log,append:true});
-  const shell=name=>{checks[name]={...command('bash',['-euo','pipefail','-c',blocks[name]]),signedBlockSha256:sha(original[name]),executedBlockSha256:sha(blocks[name])};consumeNativeEnv(env.I66_NATIVE_ENV_FILE,env);Object.assign(process.env,env);};
+  const command=(file,args,opts={})=>pkg.execLogged(file,args,{cwd:opts.cwd||cwd,env:{...env,...opts.env},log,append:true,timeoutMs:opts.timeoutMs});
+  const shell=name=>{const timeoutMs=name==='deploy'?deploymentTimeoutMs(workflow.toString(),plan.phase,p.makeIngressComposite===true,runtime.build):undefined;
+    checks[name]={...command('bash',['-euo','pipefail','-c',blocks[name]],{timeoutMs}),signedBlockSha256:sha(original[name]),executedBlockSha256:sha(blocks[name])};consumeNativeEnv(env.I66_NATIVE_ENV_FILE,env);Object.assign(process.env,env);};
   // Every historical guard still sees the exact full source commit. This clone
   // is validation input only; the package is never rebuilt or overlaid.
   command('git',['clone','--quiet','--single-branch','--branch',C.branch,'--no-tags',C.repositoryUrl,env.I66_FROZEN_SOURCE_ROOT]);
@@ -527,5 +563,5 @@ async function main(args=process.argv.slice(2)){
   if(args[0]==='verify-runtime'&&args.length===2){const g=require('./gravicentra-i6-6-operational-release-candidate.cjs'),p=g.candidateForPhase(json(g.CONTROL),args[1]);return verifyRuntimeAuthority(p,{phase:args[1],action:'worker'});}
   throw Error('I66_NATIVE_OPERATIONAL_USE_BIND_PREPARE_WORKER_VERIFY');
 }
-module.exports={C,F,MECHANISM_PATHS,PRODUCT_PATHS,PHASES,ACTIONS,native,provider,uuid,executionId,artifactRef,validateMechanism,validateBinding,verifyPinnedOwners,ensureHistory,fetchAuthorityHead,validatePlan,prefix,configFor,validateBuild,sdkHeaders,verifyRuntimeAuthority,blockNames,workflowBlocks,runtimeBlocks,mechanismManifest,bindingFromHosting,makePlan,validatePackageMetadata,planFromBuild,validatePreviewMetadata,readPreviewAcceptance,readNativeFiles,verifiedPackage,admitRuntime,packageTarForBinding,signedCasIo,candidateAt,mandatoryChecks,validateOperationalProof,readFinancialPreview,lockName,ENV_OUTPUTS,consumeNativeEnv,branchGuard,retainMake,worker,gcloudReadIo,verify,main};
+module.exports={C,F,MECHANISM_PATHS,PRODUCT_PATHS,PHASES,ACTIONS,native,provider,uuid,executionId,artifactRef,validateMechanism,validateBinding,verifyPinnedOwners,ensureHistory,fetchAuthorityHead,validatePlan,prefix,configFor,validateBuild,sdkHeaders,verifyRuntimeAuthority,blockNames,workflowBlocks,workflowTimeoutMs,deploymentTimeoutMs,runtimeBlocks,mechanismManifest,bindingFromHosting,makePlan,validatePackageMetadata,planFromBuild,validatePreviewMetadata,readPreviewAcceptance,readNativeFiles,verifiedPackage,admitRuntime,packageTarForBinding,signedCasIo,candidateAt,mandatoryChecks,validateOperationalProof,readFinancialPreview,lockName,ENV_OUTPUTS,consumeNativeEnv,branchGuard,retainMake,worker,gcloudReadIo,verify,main};
 if(require.main===module)Promise.resolve().then(()=>main()).catch(error=>{console.error(String(error.message||'I66_NATIVE_OPERATIONAL_HOLD').split('\n')[0]);process.exitCode=1;});

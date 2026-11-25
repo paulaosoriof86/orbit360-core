@@ -8,6 +8,155 @@ const {P,genName,physicalGuard,blob}=owner;
 const read=p=>JSON.parse(fs.readFileSync(p,'utf8'));
 const serial=value=>JSON.stringify(value,null,2)+'\n';
 
+function nativeContinuationFixture(){
+  const evidencePath='artifacts/orbit360-recovery/release-control/I6_6_NATIVE_PROGRESS_TEST.json';
+  const ref=fragment=>({path:evidencePath,fragment});
+  const sourceSha='1'.repeat(40),sourceQaHead='2'.repeat(40);
+  const request={version:7,sourceQaHead,sourceQaRunId:101,guardRunId:102};
+  const artifact={uri:'gs://example-private-evidence/packages/immutable.tar.gz',generation:'100',sha256:'3'.repeat(64),bytes:1234};
+  const packaged={provider:'GOOGLE_CLOUD_BUILD',scope:'PACKAGE_ONLY',requestVersion:7,sourceSha,
+    buildId:'aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee',status:'SUCCESS',finalResultObserved:true,
+    artifactCreated:true,artifactReadbackVerified:true,artifact,previewAccepted:false,liveAccepted:false,releaseAcceptance:false};
+  const hosting={provider:'GOOGLE_CLOUD_BUILD',scope:'EXISTING_HOSTING_PREVIEW_ONLY_SIGNED_QA_AND_LIVE_PENDING',
+    requestVersion:7,sourceSha,buildId:'11111111-2222-3333-4444-555555555555',status:'SUCCESS',
+    finalResultObserved:true,hostingReadbackVerified:true,hostingVersion:'sites/example/versions/retained',
+    packageBuildId:packaged.buildId,packageArtifact:structuredClone(artifact),packageEvidence:ref('nativePackageEvidence'),
+    samePackageArtifactRequired:true,signedFunctionalPreviewAccepted:false,backendDeploys:0,liveDeploys:0,businessWrites:0};
+  const p={shockObjectives:{items:[{id:'OPEN_FLOW',title:'Operational flow',
+    status:'V7_PROVIDER_BILLING_HOLD_SIGNED_RUNTIME_PENDING',evidence:'Retained request and provider proof',
+    next:'Complete exact signed runtime gates.',passForShock:false}]},
+    pendingImmutableBuild:{...request,sourceSha,provider:'GOOGLE_CLOUD_BUILD',providerBuildId:packaged.buildId,
+      providerStatus:'SUCCESS',nativeExecutionEvidence:ref('nativePackageEvidence'),hostingPreviewContinuation:ref('nativeHostingEvidence')},
+    currentSuccessorPlan:{...request,plannedRequestVersion:7,sourceSha,providerExecution:ref('nativePackageEvidence'),
+      artifactIdentity:ref('nativePackageEvidence.artifact'),hostingPreviewExecution:ref('nativeHostingEvidence'),
+      signedPreviewAccepted:false,signedLiveAccepted:false},
+    nativePackageEvidence:packaged,nativeHostingEvidence:hosting,
+    historicalBillingReceipt:{status:'V7_PROVIDER_BILLING_HOLD_SIGNED_RUNTIME_PENDING',provider:'GITHUB_ACTIONS'}};
+  const cp={i66ActiveRecoveryCursor:{currentEvidencePath:evidencePath}},transport={frontendPreviewRequest:request};
+  const files=new Map();
+  const io={readFileSync:path=>{
+    if(path===P.transport)return serial(transport);
+    assert.ok(files.has(path),'UNEXPECTED_NATIVE_FIXTURE_READ:'+path);return files.get(path);
+  }};
+  const bind=()=>{const bytes=serial(p);files.set(cp.i66ActiveRecoveryCursor.currentEvidencePath,bytes);
+    cp.i66ActiveRecoveryCursor.currentEvidenceBlobSha=blob(bytes);};
+  owner.synchronizeExecutionProgress(p);bind();
+  const reconcile=()=>{p.shockObjectives.items[0].status='NATIVE_TRANSPORT_CERTIFIED_SIGNED_RUNTIME_PENDING';
+    owner.synchronizeExecutionProgress(p);bind();};
+  return {cp,p,transport,files,io,bind,reconcile,resolve:()=>owner.resolveNativeExecutionProgress(cp,p,io),
+    verify:()=>owner.assertExecutionProgress(cp,p,io)};
+}
+test('native continuation rejects a stale billing blocker even when all copied projections agree',()=>{
+  const f=nativeContinuationFixture(),before=serial({cp:f.cp,p:f.p});
+  assert.deepEqual(f.p.remainingExecutionLanes,owner.executionProgressProjection(f.p).remainingExecutionLanes);
+  const derived=f.resolve();
+  assert.equal(derived.package.readbackCertified,true);assert.equal(derived.hostingPreview.readbackCertified,true);
+  assert.equal(derived.signedFunctionalAcceptanceEstablished,false);assert.equal(derived.liveAcceptanceEstablished,false);
+  assert.throws(f.verify,/I66_NATIVE_PROGRESS_STALE_PROVIDER_BILLING_objective.OPEN_FLOW/);
+  assert.equal(serial({cp:f.cp,p:f.p}),before);
+});
+test('native continuation accepts the corrected pending state without changing proof or advancing acceptance',()=>{
+  const f=nativeContinuationFixture(),proof=serial([f.p.nativePackageEvidence,f.p.nativeHostingEvidence,f.p.historicalBillingReceipt]);
+  f.reconcile();const before=serial(f.p);assert.doesNotThrow(f.verify);
+  assert.equal(serial(f.p),before);assert.equal(f.p.shockObjectives.items[0].passForShock,false);
+  assert.equal(f.p.currentSuccessorPlan.signedPreviewAccepted,false);assert.equal(f.p.currentSuccessorPlan.signedLiveAccepted,false);
+  assert.equal(serial([f.p.nativePackageEvidence,f.p.nativeHostingEvidence,f.p.historicalBillingReceipt]),proof);
+});
+test('native continuation preserves a distinct request billing hold and an unrelated unbound Actions lane',()=>{
+  const f=nativeContinuationFixture();f.reconcile();
+  f.p.parallelLanes=[{id:'OTHER_REQUEST',status:'V8_PROVIDER_BILLING_HOLD_SIGNED_RUNTIME_PENDING'},
+    {id:'FINANCIAL_WRITER',provider:'GITHUB_ACTIONS',status:'PROVIDER_BILLING_HOLD_PROTECTED_FINANCIAL_WRITER_PENDING'}];
+  f.p.shockObjectives.items.push({id:'OTHER_FLOW',title:'Independent provider operation',
+    status:'V8_PROVIDER_BILLING_HOLD_SIGNED_RUNTIME_PENDING',evidence:'Separate request evidence',
+    next:'Keep the independent provider hold.',passForShock:false});
+  owner.synchronizeExecutionProgress(f.p);f.bind();const before=serial(f.p);
+  assert.doesNotThrow(f.verify);assert.equal(serial(f.p),before);
+  f.p.parallelLanes[0].status='V7_PROVIDER_BILLING_HOLD_SIGNED_RUNTIME_PENDING';f.bind();
+  assert.throws(f.verify,/I66_NATIVE_PROGRESS_STALE_PROVIDER_BILLING_parallel.OTHER_REQUEST/);
+});
+test('native continuation rejects request source and immutable package substitutions independently',()=>{
+  const mutations=[
+    [f=>f.p.nativePackageEvidence.requestVersion++,/REQUEST_DRIFT_PACKAGE/],
+    [f=>f.transport.frontendPreviewRequest.version++,/REQUEST_DRIFT/],
+    [f=>f.p.nativePackageEvidence.sourceSha='4'.repeat(40),/SOURCE_DRIFT_PACKAGE/],
+    [f=>f.p.nativeHostingEvidence.sourceSha='4'.repeat(40),/SOURCE_DRIFT_HOSTING/],
+    [f=>f.p.nativeHostingEvidence.requestVersion++,/REQUEST_DRIFT_HOSTING/],
+    [f=>f.p.nativeHostingEvidence.packageArtifact.sha256='5'.repeat(64),/HOSTING_ARTIFACT_DRIFT/],
+    [f=>f.p.nativeHostingEvidence.packageArtifact.generation='101',/HOSTING_ARTIFACT_DRIFT/],
+    [f=>f.p.nativeHostingEvidence.packageBuildId='66666666-7777-8888-9999-aaaaaaaaaaaa',/HOSTING_PACKAGE_BUILD_DRIFT/],
+    [f=>f.p.currentSuccessorPlan.sourceSha='4'.repeat(40),/PLAN_SOURCE_DRIFT/],
+    [f=>f.p.currentSuccessorPlan.sourceQaHead='4'.repeat(40),/REQUEST_BINDING_DRIFT_sourceQaHead/]
+  ];
+  for(const [mutate,error] of mutations){const f=nativeContinuationFixture();f.reconcile();mutate(f);f.bind();assert.throws(f.verify,error);}
+});
+test('native continuation requires the exact active cursor and safe pinned fragment references',()=>{
+  for(const [mutate,error] of [
+    [f=>f.cp.i66ActiveRecoveryCursor.currentEvidenceBlobSha='0'.repeat(40),/CURSOR_BLOB_DRIFT/],
+    [f=>{f.p.pendingImmutableBuild.nativeExecutionEvidence.fragment='nativeHostingEvidence';f.bind();},/REFERENCE_FRAGMENT_DRIFT_PACKAGE/],
+    [f=>{f.p.pendingImmutableBuild.nativeExecutionEvidence.path='../other.json';f.bind();},/REFERENCE_PATH_DRIFT_PACKAGE/],
+    [f=>{f.p.pendingImmutableBuild.nativeExecutionEvidence.gitBlobSha='0'.repeat(40);f.bind();},/REFERENCE_BLOB_DRIFT_PACKAGE/],
+    [f=>{f.p.currentSuccessorPlan.artifactIdentity.fragment='constructor.prototype';f.bind();},/REFERENCE_FRAGMENT_INVALID_ARTIFACT/],
+    [f=>{f.p.currentSuccessorPlan.artifactIdentity={path:f.cp.i66ActiveRecoveryCursor.currentEvidencePath,fragment:'nativeHostingEvidence.packageArtifact'};
+      f.p.nativeHostingEvidence.packageArtifact.sha256='6'.repeat(64);f.bind();},/PLAN_ARTIFACT_DRIFT/]
+  ]){const f=nativeContinuationFixture();f.reconcile();mutate(f);assert.throws(f.verify,error);}
+});
+test('native continuation reads immutable prior evidence by its pinned path and rejects edited historical bytes',()=>{
+  const f=nativeContinuationFixture(),priorPath=f.cp.i66ActiveRecoveryCursor.currentEvidencePath;
+  const priorBytes=f.files.get(priorPath),priorBlob=blob(priorBytes);
+  f.cp.i66ActiveRecoveryCursor.currentEvidencePath=priorPath.replace('_TEST.json','_SUCCESSOR_TEST.json');
+  f.p.previousEvidencePath=priorPath;f.p.previousEvidenceBlobSha=priorBlob;f.reconcile();
+  assert.doesNotThrow(f.verify);assert.equal(f.files.get(priorPath),priorBytes);
+  f.files.set(priorPath,priorBytes+' ');assert.throws(f.verify,/REFERENCE_BLOB_DRIFT_PACKAGE/);
+});
+test('native continuation rejects a false functional acceptance or undeclared hosting effects in transport-only proof',()=>{
+  for(const [mutate,error] of [
+    [f=>f.p.nativePackageEvidence.liveAccepted=true,/PACKAGE_ACCEPTANCE_SCOPE_liveAccepted/],
+    [f=>f.p.nativeHostingEvidence.signedFunctionalPreviewAccepted=true,/HOSTING_ACCEPTANCE_SCOPE/],
+    [f=>f.p.nativeHostingEvidence.businessWrites=1,/HOSTING_EFFECT_SCOPE_businessWrites/]
+  ]){const f=nativeContinuationFixture();f.reconcile();mutate(f);f.bind();assert.throws(f.verify,error);}
+});
+test('native continuation does not infer certification from a submitted or unread package',()=>{
+  const f=nativeContinuationFixture();
+  Object.assign(f.p.nativePackageEvidence,{status:'WORKING',finalResultObserved:false,artifactCreated:false,artifactReadbackVerified:false});
+  f.p.pendingImmutableBuild.providerStatus='WORKING';delete f.p.nativePackageEvidence.artifact;
+  delete f.p.currentSuccessorPlan.artifactIdentity;delete f.p.currentSuccessorPlan.hostingPreviewExecution;
+  delete f.p.pendingImmutableBuild.hostingPreviewContinuation;f.bind();
+  const result=f.resolve();assert.equal(result.package.readbackCertified,false);assert.equal(result.hostingPreview,null);
+  assert.equal(result.liveAcceptanceEstablished,false);assert.doesNotThrow(f.verify);
+});
+test('native continuation leaves legacy and unrelated archived provider evidence unchanged',()=>{
+  const cp={},p={priorNativeExecution:{provider:'GOOGLE_CLOUD_BUILD',status:'SUCCESS'},
+    pendingImmutableBuild:{provider:'GITHUB_ACTIONS',version:8}};
+  const before=serial({cp,p});
+  assert.equal(owner.resolveNativeExecutionProgress(cp,p,{readFileSync:()=>assert.fail('LEGACY_MUST_NOT_READ_NATIVE_AUTHORITY')}),null);
+  assert.equal(serial({cp,p}),before);
+});
+function consumeNativeFixture(f){
+  const request=structuredClone(f.transport.frontendPreviewRequest);
+  f.transport.lastConsumedFrontendPreviewRequest=request;
+  f.transport.lastConsumedFrontendRelease={generation:4,previewRequestVersion:request.version,
+    sourceSha:f.p.pendingImmutableBuild.sourceSha,artifactDigest:'sha256:'+f.p.nativePackageEvidence.artifact.sha256,
+    receiptPath:genName(4,'RECEIPT')};
+  f.cp.i66FrontendReleaseHead=structuredClone(f.transport.lastConsumedFrontendRelease);
+  f.p.consumedPreviewRequest=structuredClone(request);delete f.transport.frontendPreviewRequest;f.bind();
+}
+test('native continuation recognizes exact consumed request history without blocking composite closure or transferring PASS',()=>{
+  const f=nativeContinuationFixture();consumeNativeFixture(f);
+  const result=f.resolve();assert.equal(result.disposition,'CONSUMED_EXACT_RELEASE_HISTORY');
+  assert.equal(result.liveAcceptanceEstablished,false);assert.doesNotThrow(f.verify);
+  assert.equal(f.p.shockObjectives.items[0].passForShock,false);
+  assert.equal(f.p.shockObjectives.items[0].status,'V7_PROVIDER_BILLING_HOLD_SIGNED_RUNTIME_PENDING');
+});
+test('native continuation rejects consumed request history for another source digest or release head',()=>{
+  for(const [mutate,error] of [
+    [f=>f.transport.lastConsumedFrontendRelease.sourceSha='4'.repeat(40),/CONSUMED_SOURCE_DRIFT/],
+    [f=>f.transport.lastConsumedFrontendRelease.artifactDigest='sha256:'+'5'.repeat(64),/CONSUMED_ARTIFACT_DRIFT/],
+    [f=>f.cp.i66FrontendReleaseHead.generation++,/CONSUMED_HEAD_DRIFT_generation/],
+    [f=>f.transport.lastConsumedFrontendPreviewRequest.version++,/REQUEST_DRIFT/],
+    [f=>delete f.transport.lastConsumedFrontendRelease,/REQUEST_REQUIRED/]
+  ]){const f=nativeContinuationFixture();consumeNativeFixture(f);mutate(f);f.bind();assert.throws(f.verify,error);}
+});
+
 function retiredContinuationFixture(){
   const cp=read(P.cp),progress=read('artifacts/orbit360-recovery/release-control/I6_6_CURRENT_EXECUTION_PROGRESS_20261124_R60.json');
   return {cp,progress,verify:()=>owner.assertRetiredReleaseContinuation(cp,progress)};
@@ -81,11 +230,11 @@ test('execution snapshot tracks request, scoped Preview and operational candidat
   assert.deepEqual(owner.executionSnapshot({status:'LOCKED'}),{transportStatus:'LOCKED',previewRequest:null,scopedPreview:null,operationalCandidate:null});
 });
 
-function progressModel(){
+function progressModel(progressPath='artifacts/orbit360-recovery/release-control/I6_6_CURRENT_EXECUTION_PROGRESS_20261124_R23.json'){
   // Keep this causal fixture bound to its immutable observed result. A later
   // legitimate role, batch or objective completion must not be forced back to
   // today's 140 checks or today's twelve open lanes by a historical test.
-  const progress=read('artifacts/orbit360-recovery/release-control/I6_6_CURRENT_EXECUTION_PROGRESS_20261124_R23.json');
+  const progress=read(progressPath);
   const observations=progress.postAcceptanceObserverResults,receipt=read(observations.receiptPath);
   const {fiveRoles:role,performance,financialSixReceiptUi:financial}=observations;
   const cp={i66FrontendReleaseHead:structuredClone(receipt.target),i66ActiveRecoveryCursor:{
@@ -288,10 +437,112 @@ test('canonical preflight keeps the active progress check after composite E3 bec
   assert.doesNotThrow(run);p.remainingExecutionLanes[0].evidence='obsolete E3 summary';
   assert.throws(run,/I66_PROGRESS_REMAINING_LANES_DRIFT/);
 });
-test('active progress accepts only the checked-out objective and observer projections',()=>{
-  const control=read(P.cp);
-  if(control.i66FrontendReleaseHead)
-    owner.assertExecutionProgress(control,read(control.i66ActiveRecoveryCursor.currentEvidencePath),fs);
+function observedNativeProgressFixture(){
+  // Preserve the physically observed R84 regression independently of any later
+  // request or release. Only the in-memory successor is corrected by this test.
+  const evidencePath='artifacts/orbit360-recovery/release-control/I6_6_CURRENT_EXECUTION_PROGRESS_20261124_R84.json';
+  const f=progressModel(evidencePath),transport={frontendPreviewRequest:structuredClone(f.progress.executionSynchronization.previewRequest)};
+  const bind=()=>{f.cp.i66ActiveRecoveryCursor.currentEvidencePath=evidencePath;
+    f.cp.i66ActiveRecoveryCursor.currentEvidenceBlobSha=blob(serial(f.progress));};
+  const io={readFileSync:(p,enc)=>p===evidencePath?serial(f.progress):p===P.transport?serial(transport):fs.readFileSync(p,enc)};
+  bind();return {...f,io,bind,evidencePath,verify:()=>owner.assertExecutionProgress(f.cp,f.progress,io)};
+}
+test('native continuation reproduces the pinned R84 provider drift despite internally consistent projections',()=>{
+  const f=observedNativeProgressFixture(),before=fs.readFileSync(f.evidencePath,'utf8');
+  const current=owner.resolveNativeExecutionProgress(f.cp,f.progress,f.io);
+  assert.equal(current.requestVersion,35);assert.equal(current.package.readbackCertified,true);
+  assert.equal(current.hostingPreview.readbackCertified,true);
+  assert.deepEqual(f.progress.remainingExecutionLanes,owner.executionProgressProjection(f.progress).remainingExecutionLanes);
+  assert.throws(f.verify,/I66_NATIVE_PROGRESS_STALE_PROVIDER_BILLING_objective.A03/);
+  assert.equal(fs.readFileSync(f.evidencePath,'utf8'),before);
+});
+test('native continuation R84 correction changes four pending statuses and preserves all acceptance and historical proof',()=>{
+  const f=observedNativeProgressFixture(),before=structuredClone(f.progress),disk=fs.readFileSync(f.evidencePath,'utf8');
+  const ids=['A03','A08','A12','A14'];
+  for(const id of ids){
+    const row=f.progress.shockObjectives.items.find(x=>x.id===id);
+    assert.equal(row.status,'V35_PROVIDER_BILLING_HOLD_SIGNED_RUNTIME_PENDING');
+    row.status='NATIVE_PACKAGE_AND_HOSTING_VERIFIED_SIGNED_RUNTIME_PENDING';
+  }
+  owner.synchronizeExecutionProgress(f.progress);f.bind();assert.doesNotThrow(f.verify);
+  for(const key of ['officialProgress','nativePackageExecution20261125','nativeHostingPreviewExecution20261125',
+    'financialWork','releasedFrontend','releasedBackend','v35ProviderBillingHold'])assert.deepEqual(f.progress[key],before[key]);
+  for(const id of ids)assert.equal(f.progress.shockObjectives.items.find(x=>x.id===id).passForShock,false);
+  assert.equal(f.progress.currentSuccessorPlan.signedPreviewAccepted,false);
+  assert.equal(f.progress.currentSuccessorPlan.signedLiveAccepted,false);
+  assert.equal(fs.readFileSync(f.evidencePath,'utf8'),disk);
+});
+function multihopNativeProgressFixture(){
+  const evidencePath='artifacts/orbit360-recovery/release-control/I6_6_CURRENT_EXECUTION_PROGRESS_20261124_R84.json';
+  const original=fs.readFileSync(evidencePath,'utf8'),originalBlob=blob(original),f=progressModel(evidencePath);
+  const p=f.progress,transport={frontendPreviewRequest:structuredClone(p.executionSynchronization.previewRequest)};
+  const files=new Map([[evidencePath,original]]),reads=[];
+  const io={readFileSync:(path,enc)=>{reads.push(path);
+    return path===P.transport?serial(transport):files.has(path)?files.get(path):fs.readFileSync(path,enc);}};
+  const refs={packagePending:p.pendingImmutableBuild.nativeExecutionEvidence,packagePlan:p.currentSuccessorPlan.providerExecution,
+    hostingPending:p.pendingImmutableBuild.hostingPreviewContinuation,hostingPlan:p.currentSuccessorPlan.hostingPreviewExecution,
+    artifact:p.currentSuccessorPlan.artifactIdentity};
+  for(const ref of Object.values(refs)){
+    assert.equal(ref.path,evidencePath);ref.gitBlobSha=originalBlob;
+  }
+  for(const row of p.shockObjectives.items.filter(row=>['A03','A08','A12','A14'].includes(row.id)))
+    row.status='NATIVE_PACKAGE_AND_HOSTING_VERIFIED_SIGNED_RUNTIME_PENDING';
+  owner.synchronizeExecutionProgress(p);
+  Object.assign(f.cp.i66ActiveRecoveryCursor,{currentEvidencePath:evidencePath,currentEvidenceBlobSha:originalBlob});
+  const bind=()=>{const bytes=serial(p);files.set(f.cp.i66ActiveRecoveryCursor.currentEvidencePath,bytes);
+    f.cp.i66ActiveRecoveryCursor.currentEvidenceBlobSha=blob(bytes);};
+  const advance=path=>{p.previousEvidencePath=f.cp.i66ActiveRecoveryCursor.currentEvidencePath;
+    p.previousEvidenceBlobSha=f.cp.i66ActiveRecoveryCursor.currentEvidenceBlobSha;
+    f.cp.i66ActiveRecoveryCursor.currentEvidencePath=path;bind();};
+  const intermediatePath=evidencePath.replace('_R84.json','_R85_IN_MEMORY_TEST.json');advance(intermediatePath);
+  const consume=()=>{
+    const request=structuredClone(transport.frontendPreviewRequest),generation=f.cp.i66FrontendReleaseHead.generation+1;
+    const head={...f.cp.i66FrontendReleaseHead,generation,sourceSha:p.pendingImmutableBuild.sourceSha,
+      artifactDigest:'sha256:'+p.nativePackageExecution20261125.artifact.sha256,receiptPath:genName(generation,'RECEIPT')};
+    owner.archiveExecutionObservers(f.cp,p,head,path=>JSON.parse(io.readFileSync(path,'utf8')));
+    f.cp.i66FrontendReleaseHead=head;
+    transport.lastConsumedFrontendPreviewRequest=request;
+    transport.lastConsumedFrontendRelease={generation,previewRequestVersion:request.version,sourceSha:head.sourceSha,
+      artifactDigest:head.artifactDigest,receiptPath:head.receiptPath};
+    p.consumedPreviewRequest=structuredClone(request);delete transport.frontendPreviewRequest;
+    advance(genName(generation,'FOCAL_PROGRESS'));
+  };
+  return {...f,io,refs,files,reads,evidencePath,original,originalBlob,intermediatePath,bind,consume,
+    verify:()=>owner.assertExecutionProgress(f.cp,p,io),resolve:()=>owner.resolveNativeExecutionProgress(f.cp,p,io)};
+}
+test('native continuation keeps pinned R84 proof through two checkpoints and exact consumed closure',()=>{
+  const f=multihopNativeProgressFixture();assert.doesNotThrow(f.verify);
+  assert.equal(f.resolve().disposition,'CURRENT_REQUEST');f.consume();assert.doesNotThrow(f.verify);
+  assert.equal(f.progress.previousEvidencePath,f.intermediatePath);
+  assert.equal(f.resolve().disposition,'CONSUMED_EXACT_RELEASE_HISTORY');
+  for(const ref of Object.values(f.refs))assert.equal(ref.gitBlobSha,f.originalBlob);
+  for(const key of ['nativePackageExecution20261125','nativeHostingPreviewExecution20261125'])
+    assert.deepEqual(f.progress[key],JSON.parse(f.original)[key]);
+  for(const id of ['A03','A08','A12','A14'])assert.equal(f.progress.shockObjectives.items.find(row=>row.id===id).passForShock,false);
+  assert.equal(f.progress.currentObserverStatus.acceptanceTransferred,false);
+  assert.equal(f.resolve().signedFunctionalAcceptanceEstablished,false);assert.equal(f.resolve().liveAcceptanceEstablished,false);
+  assert.equal(f.files.get(f.evidencePath),f.original);assert.equal(fs.readFileSync(f.evidencePath,'utf8'),f.original);
+});
+test('native continuation requires pins for every external proof group without traversing older checkpoints',()=>{
+  for(const [keys,label] of [[['packagePending','packagePlan'],'PACKAGE'],[['hostingPending','hostingPlan'],'HOSTING'],[['artifact'],'ARTIFACT']]){
+    const f=multihopNativeProgressFixture();f.consume();
+    for(const key of keys)delete f.refs[key].gitBlobSha;
+    f.bind();f.reads.length=0;
+    assert.throws(f.verify,new RegExp('I66_NATIVE_PROGRESS_REFERENCE_PIN_REQUIRED_'+label));
+    assert.equal(f.reads.includes(f.intermediatePath),false,'DO_NOT_SEARCH_PREVIOUS_CHECKPOINT_FOR_MISSING_PIN');
+  }
+});
+test('native continuation shares a matching explicit pin before resolving the unpinned side',()=>{
+  const f=multihopNativeProgressFixture();f.consume();
+  delete f.refs.packagePending.gitBlobSha;delete f.refs.hostingPending.gitBlobSha;f.bind();
+  assert.doesNotThrow(f.verify);assert.equal(f.resolve().disposition,'CONSUMED_EXACT_RELEASE_HISTORY');
+  assert.equal(JSON.parse(f.original).nativeHostingPreviewExecution20261125.packageEvidence.gitBlobSha,undefined);
+});
+test('native continuation rejects conflicting multi-checkpoint pins even for already cached R84 proof',()=>{
+  for(const [key,label] of [['packagePending','PIN_DRIFT_PACKAGE'],['hostingPending','PIN_DRIFT_HOSTING'],['artifact','BLOB_DRIFT_ARTIFACT']]){
+    const f=multihopNativeProgressFixture();f.consume();f.refs[key].gitBlobSha='0'.repeat(40);f.bind();
+    assert.throws(f.verify,new RegExp('I66_NATIVE_PROGRESS_REFERENCE_'+label));
+  }
 });
 function currentFinancialProjectionFixture(){
   const cp=read(P.cp),progress=read(cp.i66ActiveRecoveryCursor.currentEvidencePath);
