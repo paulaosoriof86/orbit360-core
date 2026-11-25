@@ -79,16 +79,36 @@ function functionRow(p,phase='live'){
       {attribute:'document',value:`${ROOT}/${phase==='preview'?c.PREVIEW_QUEUE:c.QUEUE}/{requestId}`,operator:'match-path-pattern'}]}};
 }
 function runServiceRow(fn,{revision=fn.serviceConfig.revision,generation='1',type='TRAFFIC_TARGET_ALLOCATION_TYPE_REVISION'}={}){
- return{name:fn.serviceConfig.service,uid:'12345678-1234-4234-8234-123456789abc',generation,observedGeneration:generation,
+ return{name:fn.serviceConfig.service,etag:'etag-'+generation,uid:'12345678-1234-4234-8234-123456789abc',generation,observedGeneration:generation,
   terminalCondition:{state:'CONDITION_SUCCEEDED'},reconciling:false,
   latestReadyRevision:fn.serviceConfig.revision,trafficStatuses:[{type,revision,percent:100}]};
 }
-const authFor=(get,getTraffic)=>({request:async op=>{
+function runV1ServiceRow(fn,traffic){
+ return{apiVersion:'serving.knative.dev/v1',kind:'Service',metadata:{name:fn.serviceConfig.service.split('/').at(-1),namespace:'646761409743',
+  uid:traffic.uid,generation:Number(traffic.generation),resourceVersion:'rv-'+traffic.generation+'-'+String(traffic.etag),
+  annotations:{'fixture.private':'PRIVATE_ANNOTATION'},labels:{'fixture.private':'PRIVATE_LABEL'}},
+  spec:{template:{metadata:{name:fn.serviceConfig.revision,annotations:{'fixture.private':'PRIVATE_TEMPLATE'}},
+   spec:{containers:[{image:'PRIVATE_EXISTING_IMAGE',env:[{name:'PRIVATE_KEY',value:'PRIVATE_ENV'}]}]}},
+   traffic:traffic.trafficStatuses.map(t=>({revisionName:t.revision,percent:t.percent,latestRevision:false}))},
+  status:{observedGeneration:Number(traffic.observedGeneration),traffic:traffic.trafficStatuses.map(t=>({revisionName:t.revision,percent:t.percent,...(t.tag?{tag:t.tag}:{})}))}};
+}
+const authFor=(get,getTraffic,getV1)=>({request:async op=>{
  assert.equal(op.method,'GET');const value=get();if(value===null)throw{response:{status:404}};
  if(op.url==='https://cloudfunctions.googleapis.com/v2/'+value.name)return{data:clone(value)};
+ const traffic=getTraffic?getTraffic():runServiceRow(value);
+ if(op.url.includes('/apis/serving.knative.dev/v1/')){
+  const region=value.name.split('/')[3],name=value.serviceConfig.service.split('/').at(-1);
+  assert.equal(op.url,'https://'+region+'-run.googleapis.com/apis/serving.knative.dev/v1/namespaces/ays-orbit-360-lab/services/'+name);
+  return{data:clone(getV1?getV1():runV1ServiceRow(value,traffic))};
+ }
  assert.match(op.url,/^https:\/\/run\.googleapis\.com\/v2\/projects\/ays-orbit-360-lab\/locations\/(us-east1|us-central1)\/services\/orbit360makeleadingress(preview)?$/);
- return{data:clone(getTraffic?getTraffic():runServiceRow(value))};
+ return{data:clone(traffic)};
 }});
+function closedGrantFixture(p,phase){
+ const f=makeReadbacks().f,grant={...f.grant,state:'CLOSED',enabled:false};f.db.seed(f.grantPath,grant);
+ p.makeIngress.closedConfiguration[phase].expectedDigest=c.digest(grant);
+ return{db:f.db,grantPath:f.grantPath,grant};
+}
 test('deployment proof uses real AuthContext event filters, runtime and revision, independent of Cloud Run traffic',()=>{
  const {p}=fixture(),row=functionRow(p),proof=e.fnProjection(row,p,'live');assert.equal(proof.eventType,s.EVENT_TYPE);
  for(const mutate of [r=>r.name+='wrong',r=>r.state='DEPLOYING',r=>r.serviceConfig.serviceAccountEmail='another',
@@ -128,6 +148,7 @@ test('existing Preview rollback restores only its exact captured postimage and r
  const {p}=fixture(),phase='preview';let current=functionRow(p,phase),restored=0;const projection=e.fnProjection(current,p,phase);
  p.makeIngress.targetBefore.preview={...s.ADDED.preview,state:'EXISTING_APPROVED',revision:projection.revision,
   configurationDigest:projection.configurationDigest,receiptBlob:'c'.repeat(40)};
+ const {db}=closedGrantFixture(p,phase);
  let traffic=runServiceRow(current);const auth=authFor(()=>current,()=>traffic),snapshot=await e.snapshotTrigger({auth,p,phase});
  current.serviceConfig.revision=current.serviceConfig.revision.replace('00001','00002');
  traffic=runServiceRow(current,{generation:'2'});
@@ -136,12 +157,12 @@ test('existing Preview rollback restores only its exact captured postimage and r
    revision:snapshot.traffic.targets[0].revision,percent:100});restored++;
   traffic=runServiceRow(current,{revision:target.revision,generation:'3'});
  };
- await assert.rejects(e.rollbackCreatedTrigger({auth,p,phase,snapshot,restorePreviousRevision}),/POSTIMAGE_REQUIRED_FOR_RESTORE/);
+ await assert.rejects(e.rollbackCreatedTrigger({db,auth,p,phase,snapshot,restorePreviousRevision}),/POSTIMAGE_REQUIRED_FOR_RESTORE/);
  const postimage=await e.captureTrigger({auth,p,phase,snapshot});
- const result=await e.rollbackCreatedTrigger({auth,p,phase,snapshot,postimage,restorePreviousRevision});
+ const result=await e.rollbackCreatedTrigger({db,auth,p,phase,snapshot,postimage,restorePreviousRevision});
  assert.equal(result.status,'EXACT_PREVIOUS_PREVIEW_REVISION_RESTORED');assert.equal(restored,1);
  current.serviceConfig.revision+='-concurrent';
- await assert.rejects(e.rollbackCreatedTrigger({auth,p,phase,snapshot,postimage,restorePreviousRevision}),/POSTIMAGE_CHANGED/);
+ await assert.rejects(e.rollbackCreatedTrigger({db,auth,p,phase,snapshot,postimage,restorePreviousRevision}),/POSTIMAGE_CHANGED/);
  assert.equal(restored,1);
 });
 function trafficRollbackFixture(){
@@ -151,9 +172,11 @@ function trafficRollbackFixture(){
  p.makeIngress.targetBefore.preview={...s.ADDED.preview,state:'EXISTING_APPROVED',revision:projection.revision,
   configurationDigest:projection.configurationDigest,receiptBlob:'c'.repeat(40)};
  let traffic=runServiceRow(current,{revision:'orbit360makeleadingresspreview-00001-cuy',generation:'8'});
- const calls=[],inner=authFor(()=>current,()=>traffic);
+ const closed=closedGrantFixture(p,phase);let v1Override=null;
+ const v1=()=>v1Override||runV1ServiceRow(current,traffic);
+ const calls=[],inner=authFor(()=>current,()=>traffic,v1);
  const auth={request:async op=>{calls.push(clone(op));return inner.request(op);}};
- return{p,phase,auth,calls,get current(){return current;},get traffic(){return traffic;},
+ return{p,phase,auth,calls,...closed,pause:async()=>{},get v1(){return v1();},setV1(row){v1Override=row;},get current(){return current;},get traffic(){return traffic;},
   deploy(){current.serviceConfig.revision='orbit360makeleadingresspreview-00003-new';traffic=runServiceRow(current,{generation:'9'});},
   setTraffic(value){traffic=value;},setFunction(value){current=value;}};
 }
@@ -220,7 +243,7 @@ for(const [label,mutate] of [
 });
 test('a stale serving revision without a fresh provider etag cannot authorize alignment or acceptance',async()=>{
  const f=trafficRollbackFixture(),snapshot=await e.snapshotTrigger(f);f.deploy();
- f.setTraffic(runServiceRow(f.current,{revision:'orbit360makeleadingresspreview-00001-cuy',generation:'9'}));
+ f.setTraffic(runServiceRow(f.current,{revision:'orbit360makeleadingresspreview-00001-cuy',generation:'9'}));delete f.traffic.etag;
   await assert.rejects(e.captureTrigger({...f,snapshot}),/TRAFFIC_CAS_ETAG_REQUIRED/);
 });
 for(const [label,mutate] of [
@@ -376,21 +399,27 @@ test('predeployment gate rejects ACTIVE or changed config before any runtime/IAM
 async function routingCaptureFixture(){
  const f=trafficRollbackFixture(),snapshot=await e.snapshotTrigger(f);f.deploy();
  f.setTraffic({...runServiceRow(f.current,{revision:snapshot.traffic.targets[0].revision,generation:'9'}),etag:'"routing-before"'});
- const x={f,p:f.p,phase:f.phase,snapshot,patches:[],diagnostics:[],postimages:[],reads:[],pauses:[],beforeRead:null,
+ const grantFixture=makeReadbacks(),db=grantFixture.f.db,grantPath=grantFixture.f.grantPath;
+ const grant={...grantFixture.f.grant,state:'CLOSED',enabled:false};db.seed(grantPath,grant);
+ f.p.makeIngress.closedConfiguration[f.phase].expectedDigest=c.digest(grant);
+ const x={f,p:f.p,phase:f.phase,snapshot,db,grantPath,grant,grantReads:0,beforeGrantRead:null,
+  patches:[],diagnostics:[],postimages:[],reads:[],pauses:[],beforeRead:null,
   patch:async()=>{f.setTraffic({...runServiceRow(f.current,{generation:'10'}),etag:'"routing-after"'});return{data:{name:'projects/ays-orbit-360-lab/locations/us-east1/operations/fixture-only',done:false}};}};
+ const snap=db.snap.bind(db);db.snap=p=>{if(p===grantPath){x.grantReads++;if(x.beforeGrantRead)x.beforeGrantRead(x.grantReads);}return snap(p);};
  x.auth={request:async op=>{
-  if(op.method==='PATCH'){x.patches.push(clone(op));return x.patch(op);}
+  if(op.method==='PUT'){x.patches.push(clone(op));return x.patch(op);}
   x.reads.push(clone(op));if(x.beforeRead)await x.beforeRead(op);return f.auth.request(op);
  }};
- x.args=()=>({auth:x.auth,p:x.p,phase:x.phase,snapshot:x.snapshot,
+ x.args=()=>({db:x.db,auth:x.auth,p:x.p,phase:x.phase,snapshot:x.snapshot,
   retainDiagnostic:r=>x.diagnostics.push(clone(r)),retainPostimage:r=>x.postimages.push(clone(r)),pause:async ms=>x.pauses.push(ms)});
  return x;
 }
-test('capture routes only the exact postdeploy revision through one traffic-only etag CAS and real serving readback',async()=>{
- const x=await routingCaptureFixture(),result=await e.captureTrigger(x.args());
+test('capture routes only the exact postdeploy revision through one full-preimage V1 resourceVersion CAS and real serving readback',async()=>{
+ const x=await routingCaptureFixture(),before=clone(x.f.v1),result=await e.captureTrigger(x.args());
  assert.equal(x.patches.length,1);
- assert.deepEqual(x.patches[0],{url:'https://run.googleapis.com/v2/'+x.snapshot.traffic.service+'?updateMask=traffic',method:'PATCH',
-  data:{name:x.snapshot.traffic.service,etag:'"routing-before"',traffic:[{type:'TRAFFIC_TARGET_ALLOCATION_TYPE_REVISION',revision:x.f.current.serviceConfig.revision,percent:100}]}});
+ const expected=clone(before);delete expected.status;expected.spec.traffic=[{revisionName:x.f.current.serviceConfig.revision,percent:100,latestRevision:false}];
+ assert.deepEqual(x.patches[0],{url:'https://us-east1-run.googleapis.com/apis/serving.knative.dev/v1/namespaces/ays-orbit-360-lab/services/orbit360makeleadingresspreview',method:'PUT',
+  data:expected,timeout:30000,retry:false,maxRedirects:0});
  assert.equal(result.status,'DEPLOYED_REVISION_SERVING_VERIFIED');assert.equal(result.routing.trafficWrites,1);
  assert.equal(result.traffic.targets[0].revision,result.function.revision);assert.equal(result.traffic.generation,'10');
  assert.equal(x.diagnostics.at(-1).status,'DEPLOYED_REVISION_SERVING_VERIFIED');
@@ -406,7 +435,7 @@ test('capture retains a classified assertion and observed prior route before ref
  assert.ok(x.diagnostics.at(-1).observations.some(o=>o.kind==='POSTDEPLOY_PAIR'));
  assert.equal(x.postimages.at(-1).status,'OBSERVED_NOT_ACCEPTED');
 });
-for(const status of [409,412])test('a traffic etag conflict '+status+' is HOLD without a second PATCH or refreshed mutation token',async()=>{
+for(const status of [409,412])test('a traffic etag conflict '+status+' is HOLD without a second PUT or refreshed mutation token',async()=>{
  const x=await routingCaptureFixture();x.patch=async()=>{throw{response:{status}};};
  await assert.rejects(e.captureTrigger(x.args()),/INGRESS_TRAFFIC_CAS_CONFLICT/);
  assert.equal(x.patches.length,1);assert.equal(x.diagnostics.at(-1).routing.trafficWrites,0);
@@ -429,7 +458,7 @@ for(const [label,mutate,code]of[
  const x=await routingCaptureFixture();mutate(x);await assert.rejects(e.captureTrigger(x.args()),new RegExp(code));
  assert.equal(x.patches.length,0);assert.equal(x.diagnostics.at(-1).status,'HOLD');
 });
-for(const change of ['etag','traffic','function'])test('capture rereads and rejects a concurrent '+change+' change before PATCH',async()=>{
+for(const change of ['etag','traffic','function'])test('capture rereads and rejects a concurrent '+change+' change before PUT',async()=>{
  const x=await routingCaptureFixture();let reads=0;
  x.beforeRead=async op=>{if(op.url.startsWith('https://run.googleapis.com/')&&++reads===2){
   if(change==='etag')x.f.traffic.etag='"changed"';
@@ -446,7 +475,7 @@ test('a pending traffic operation is observed until ready without repeating the 
  const result=await e.captureTrigger(x.args());assert.equal(result.routing.trafficWrites,1);assert.equal(x.patches.length,1);assert.equal(x.pauses.length,1);
  assert.ok(x.diagnostics.at(-1).observations.some(o=>o.kind==='CLOUD_RUN_RESPONSE'&&o.reconciling===true));
 });
-test('a successful PATCH response with no serving change remains HOLD and never claims acceptance',async()=>{
+test('a successful PUT response with no serving change remains HOLD and never claims acceptance',async()=>{
  const x=await routingCaptureFixture();x.patch=async()=>({data:{done:true}});
  await assert.rejects(e.captureTrigger(x.args()),/DEPLOYED_REVISION_NOT_SERVING/);
  assert.equal(x.patches.length,1);assert.equal(x.pauses.length,29);assert.equal(x.diagnostics.at(-1).routing.trafficWrites,null);
@@ -457,7 +486,7 @@ for(const [label,change,code]of[
  ['recreated service',x=>{x.f.traffic.uid='87654321-4321-4321-8321-cba987654321';},'SERVICE_RECREATED'],
  ['extra generation',x=>{x.f.traffic.generation=x.f.traffic.observedGeneration='11';},'ROUTING_GENERATION_CHANGED'],
  ['concurrent function',x=>{x.f.current.serviceConfig.revision='orbit360makeleadingresspreview-00009-other';},'FUNCTION_CHANGED_DURING_TRAFFIC_READ']
-])test('post-PATCH '+label+' is retained diagnostically but never becomes rollback write authority',async()=>{
+])test('post-PUT '+label+' is retained diagnostically but never becomes rollback write authority',async()=>{
  const x=await routingCaptureFixture(),normal=x.patch;x.patch=async op=>{const r=await normal(op);change(x);return r;};
  await assert.rejects(e.captureTrigger(x.args()),new RegExp(code));assert.equal(x.patches.length,1);
  assert.equal(x.postimages.at(-1).traffic.targets[0].revision,x.snapshot.traffic.targets[0].revision);
@@ -495,4 +524,159 @@ test('failure classification retains only a safe guard token and never an assert
  assert.equal(e.safeFailureCode(error),'INGRESS_DEPLOYED_REVISION_NOT_SERVING');
  assert.equal(e.safeFailureCode({code:'INGRESS_ROLLBACK_UNVERIFIED',message:'private'}),'INGRESS_ROLLBACK_UNVERIFIED');
  assert.equal(e.safeFailureCode(Error('private provider value')),'I66_MAKE_PROTECTED_EXECUTION_HOLD');
+});
+
+
+for(const [label,change,code] of [
+ ['ACTIVE grant with matching digest',x=>{const grant={...x.grant,state:'ACTIVE',enabled:true};x.db.seed(x.grantPath,grant);x.p.makeIngress.closedConfiguration.preview.expectedDigest=c.digest(grant);},'INGRESS_TRAFFIC_GRANT_MUST_BE_CLOSED'],
+ ['enabled CLOSED grant with matching digest',x=>{const grant={...x.grant,enabled:true};x.db.seed(x.grantPath,grant);x.p.makeIngress.closedConfiguration.preview.expectedDigest=c.digest(grant);},'INGRESS_TRAFFIC_GRANT_MUST_BE_CLOSED'],
+ ['changed CLOSED preimage',x=>x.db.seed(x.grantPath,{...x.grant,maxSourceAgeSeconds:1200}),'INGRESS_TRAFFIC_GRANT_PREIMAGE_CHANGED'],
+ ['unexpected absence',x=>x.db.seed(x.grantPath,undefined),'INGRESS_TRAFFIC_GRANT_PREIMAGE_CHANGED'],
+ ['unexpected existing grant',x=>{x.p.makeIngress.closedConfiguration.preview.expectedDigest='ABSENT';},'INGRESS_TRAFFIC_GRANT_PREIMAGE_CHANGED'],
+ ['invalid expected digest',x=>{x.p.makeIngress.closedConfiguration.preview.expectedDigest='not-a-digest';},'INGRESS_TRAFFIC_GRANT_AUTHORITY_REQUIRED']
+])test('CLOSED capture amendment: rejects '+label+' before traffic PUT',async()=>{
+ const x=await routingCaptureFixture();change(x);
+ await assert.rejects(e.captureTrigger(x.args()),new RegExp(code));assert.equal(x.patches.length,0);
+ assert.equal(x.diagnostics.at(-1).errorCode,code);assert.equal(x.diagnostics.at(-1).routing.trafficWrites,0);
+});
+test('CLOSED capture amendment: grant race after routing preimage is caught before PUT',async()=>{
+ const x=await routingCaptureFixture();let routingReads=0;
+ x.beforeRead=async op=>{if(op.url.startsWith('https://run.googleapis.com/')&&++routingReads===2)
+  x.db.seed(x.grantPath,{...x.grant,state:'ACTIVE',enabled:true});};
+ await assert.rejects(e.captureTrigger(x.args()),/INGRESS_TRAFFIC_GRANT_PREIMAGE_CHANGED/);
+ assert.equal(routingReads,2);assert.equal(x.patches.length,0);
+ assert.equal(x.diagnostics.at(-1).routing.attempted,false);
+});
+test('CLOSED capture amendment: exact CLOSED preimage is read immediately before PUT and after verified traffic',async()=>{
+ const x=await routingCaptureFixture(),normal=x.patch;
+ x.patch=async op=>{assert.equal(x.grantReads,1);assert.equal(x.diagnostics.at(-1).routing.closedGrantBefore.digest,c.digest(x.grant));return normal(op);};
+ const result=await e.captureTrigger(x.args());assert.equal(x.patches.length,1);assert.equal(x.grantReads,2);
+ assert.deepEqual(result.routing.closedGrantAfter,result.routing.closedGrantBefore);
+ assert.equal(result.routing.trafficWrites,1);assert.equal(result.status,'DEPLOYED_REVISION_SERVING_VERIFIED');
+});
+test('CLOSED capture amendment: an exactly authorized ABSENT grant stays absent without configuration writes',async()=>{
+ const x=await routingCaptureFixture();x.db.seed(x.grantPath,undefined);x.p.makeIngress.closedConfiguration.preview.expectedDigest='ABSENT';
+ const writes=x.db.writes.length,result=await e.captureTrigger(x.args());
+ assert.equal(result.routing.closedGrantBefore.digest,'ABSENT');assert.equal(result.routing.closedGrantBefore.exists,false);
+ assert.equal(result.routing.closedGrantAfter.digest,'ABSENT');assert.equal(x.db.writes.length,writes);
+ assert.equal(x.patches.length,1);assert.equal(x.grantReads,2);
+});
+test('CLOSED capture amendment: post-PUT grant change holds acceptance and preserves exact applied routing',async()=>{
+ const x=await routingCaptureFixture(),normal=x.patch;
+ x.patch=async op=>{const result=await normal(op);x.db.seed(x.grantPath,{...x.grant,state:'ACTIVE',enabled:true});return result;};
+ await assert.rejects(e.captureTrigger(x.args()),/INGRESS_TRAFFIC_GRANT_PREIMAGE_CHANGED/);
+ assert.equal(x.patches.length,1);assert.equal(x.diagnostics.at(-1).routing.trafficWrites,1);
+ assert.equal(x.diagnostics.at(-1).status,'HOLD');assert.equal(x.postimages.at(-1).status,'OBSERVED_NOT_ACCEPTED');
+ assert.equal(x.postimages.at(-1).traffic.targets[0].revision,x.f.current.serviceConfig.revision);
+ assert.ok(!x.postimages.some(p=>p.status==='DEPLOYED_REVISION_SERVING_VERIFIED'));
+});
+test('CLOSED capture amendment: no grant reader cannot authorize a traffic write',async()=>{
+ const x=await routingCaptureFixture();await assert.rejects(e.captureTrigger({...x.args(),db:undefined}),/INGRESS_TRAFFIC_GRANT_READER_REQUIRED/);
+ assert.equal(x.patches.length,0);
+});
+test('CLOSED capture amendment: finite safe codes reject unknown prefixed values and retain known invariants',()=>{
+ for(const unknown of ['INGRESS_PRIVATE_TOKEN_123','INGRESS_'+ 'A'.repeat(5000)]){
+  assert.equal(e.safeFailureCode({code:unknown,message:'private provider value'}),'I66_MAKE_PROTECTED_EXECUTION_HOLD');
+  assert.equal(e.safeFailureCode(Error(unknown+' private provider value')),'I66_MAKE_PROTECTED_EXECUTION_HOLD');
+ }
+ for(const code of ['INGRESS_DEPLOYED_REVISION_NOT_SERVING','INGRESS_TRAFFIC_CAS_CONFLICT','INGRESS_TRAFFIC_GRANT_MUST_BE_CLOSED']){
+  assert.equal(e.safeFailureCode({code,message:'private provider value'}),code);
+  let error;try{assert.equal('private actual','private expected',code);}catch(caught){error=caught;}
+  assert.equal(e.safeFailureCode(error),code);
+ }
+});
+
+for(const phase of ['preview','live'])test('V1 causal: full preimage is immutable and only traffic/status change within exact '+phase+' scope',()=>{
+ const {p}=fixture(),raw=functionRow(p,phase),fn=e.fnProjection(raw,p,phase),run=runServiceRow(raw),traffic=e.trafficProjection(run,fn,phase);
+ const v1=runV1ServiceRow(raw,run),before=clone(v1),request=e.trafficV1Request(v1,traffic,phase,fn.revision);
+ const expected=clone(before);delete expected.status;expected.spec.traffic=[{revisionName:fn.revision,percent:100,latestRevision:false}];
+ assert.deepEqual(request.data,expected);assert.deepEqual(v1,before);assert.equal(request.method,'PUT');
+ assert.equal(request.url,'https://'+(phase==='preview'?'us-east1':'us-central1')+'-run.googleapis.com/apis/serving.knative.dev/v1/namespaces/ays-orbit-360-lab/services/orbit360makeleadingress'+(phase==='preview'?'preview':''));
+ assert.equal(request.retry,false);assert.equal(request.maxRedirects,0);assert.ok(!request.url.includes('?'));
+ request.data.spec.template.spec.containers[0].image='changed';request.data.metadata.resourceVersion='changed';assert.deepEqual(v1,before);
+ assert.throws(()=>e.trafficV1Request(v1,traffic,phase==='preview'?'live':'preview',fn.revision),/SCOPE_DENIED/);
+ assert.throws(()=>e.trafficV1Request(v1,traffic,phase,'foreign-revision'),/REVISION_SCOPE_DENIED/);
+});
+for(const [label,change]of[
+ ['missing resourceVersion',x=>delete x.metadata.resourceVersion],['invalid resourceVersion',x=>{x.metadata.resourceVersion='bad\nversion';}],
+ ['wrong service UID',x=>{x.metadata.uid='87654321-4321-4321-8321-cba987654321';}],['wrong namespace',x=>{x.metadata.namespace='foreign';}],
+ ['wrong generation',x=>{x.metadata.generation++;}],['missing template',x=>delete x.spec.template],
+ ['different serving revision',x=>{x.status.traffic[0].revisionName='orbit360makeleadingresspreview-00009-other';}]
+])test('V1 causal: refuses '+label+' without a transport write',async()=>{
+ const x=await routingCaptureFixture(),v1=clone(x.f.v1);change(v1);x.f.setV1(v1);
+ await assert.rejects(e.captureTrigger(x.args()));assert.equal(x.patches.length,0);
+ assert.equal(x.diagnostics.at(-1).status,'HOLD');assert.ok(x.diagnostics.at(-1).observations.some(r=>r.kind==='CLOUD_RUN_V1_RESPONSE'));
+});
+for(const kind of ['resourceVersion','template'])test('V1 causal: fresh '+kind+' race aborts capture before the only PUT',async()=>{
+ const x=await routingCaptureFixture();let v1Reads=0;
+ x.beforeRead=async op=>{if(op.url.includes('/apis/serving.knative.dev/v1/')&&++v1Reads===2){
+  const value=clone(x.f.v1);if(kind==='resourceVersion')value.metadata.resourceVersion='concurrent-version';
+  else value.spec.template.spec.containers[0].image='PRIVATE_CONCURRENT_IMAGE';x.f.setV1(value);
+ }};
+ await assert.rejects(e.captureTrigger(x.args()),/INGRESS_TRAFFIC_CAS_PREIMAGE_CHANGED/);
+ assert.equal(v1Reads,2);assert.equal(x.patches.length,0);assert.equal(x.grantReads,0);
+ assert.ok(!JSON.stringify(x.diagnostics).includes('PRIVATE_CONCURRENT_IMAGE'));
+});
+test('V1 causal: post-PUT template drift is retained as hashed evidence and cannot authorize acceptance or rollback',async()=>{
+ const x=await routingCaptureFixture(),normal=x.patch;
+ x.patch=async request=>{const result=await normal(request),v1=clone(x.f.v1);v1.spec.template.spec.containers[0].image='PRIVATE_OTHER_TEMPLATE';x.f.setV1(v1);return result;};
+ await assert.rejects(e.captureTrigger(x.args()),/INGRESS_TRAFFIC_V1_TEMPLATE_CHANGED/);
+ assert.equal(x.patches.length,1);assert.equal(x.diagnostics.at(-1).routing.trafficWrites,null);
+ assert.ok(x.diagnostics.at(-1).observations.some(r=>r.kind==='POST_ROUTING_PAIR'));
+ assert.equal(x.postimages.at(-1).traffic.targets[0].revision,x.snapshot.traffic.targets[0].revision);
+ assert.ok(!JSON.stringify(x.diagnostics).includes('PRIVATE_OTHER_TEMPLATE'));
+});
+async function preparedV1Rollback(){
+ const x=await routingCaptureFixture(),postimage=await e.captureTrigger(x.args());
+ x.patch=async request=>{assert.equal(request.method,'PUT');assert.equal(request.data.spec.traffic[0].revisionName,x.snapshot.traffic.targets[0].revision);
+  assert.deepEqual(request.data.spec.template,x.f.v1.spec.template);
+  assert.equal(request.data.metadata.resourceVersion,x.f.v1.metadata.resourceVersion);
+  x.f.setTraffic({...runServiceRow(x.f.current,{revision:x.snapshot.traffic.targets[0].revision,generation:'11'}),etag:'rollback-after'});
+  return{status:200,data:clone(x.f.v1)};};
+ return{x,postimage};
+}
+test('V1 causal: default rollback transport uses one exact V1 PUT and a repeated rollback is a verified zero-write no-op',async()=>{
+ const {x,postimage}=await preparedV1Rollback(),result=await e.rollbackCreatedTrigger({...x.args(),postimage});
+ assert.equal(result.trafficWrites,1);assert.equal(x.patches.length,2);assert.equal(result.restoredRevision,x.snapshot.traffic.targets[0].revision);
+ assert.equal(x.patches[1].data.status,undefined);assert.equal(x.patches[1].retry,false);assert.equal(x.patches[1].maxRedirects,0);
+ const again=await e.rollbackCreatedTrigger({...x.args(),postimage});assert.equal(again.trafficWrites,0);assert.equal(again.functionMetadataRestored,false);
+ assert.equal(x.patches.length,2);assert.equal(x.f.current.serviceConfig.revision,postimage.function.revision);
+});
+for(const kind of ['resourceVersion','template','serviceUid'])test('V1 causal: rollback '+kind+' race cannot authorize PUT',async()=>{
+ const {x,postimage}=await preparedV1Rollback();let v1Reads=0;
+ x.beforeRead=async op=>{if(op.url.includes('/apis/serving.knative.dev/v1/')&&++v1Reads===2){
+  const value=clone(x.f.v1);if(kind==='resourceVersion')value.metadata.resourceVersion='concurrent-version';
+  if(kind==='template')value.spec.template.spec.containers[0].image='PRIVATE_CHANGED';
+  if(kind==='serviceUid')value.metadata.uid='87654321-4321-4321-8321-cba987654321';x.f.setV1(value);
+ }};
+ await assert.rejects(e.rollbackCreatedTrigger({...x.args(),postimage}));assert.equal(x.patches.length,1);
+});
+for(const status of [409,412])test('V1 causal: rollback conflict '+status+' does not retry or refresh the mutation preimage',async()=>{
+ const {x,postimage}=await preparedV1Rollback(),observed=[];x.patch=async()=>{throw{response:{status}};};
+ await assert.rejects(e.rollbackCreatedTrigger({...x.args(),postimage,observe:r=>observed.push(clone(r))}),/INGRESS_TRAFFIC_CAS_CONFLICT/);
+ assert.equal(x.patches.length,2);assert.equal(observed.at(-1).trafficWrites,0);assert.equal(x.pauses.length,0);
+});
+test('V1 causal: rollback grant change after PUT holds while preserving the restored traffic observation',async()=>{
+ const {x,postimage}=await preparedV1Rollback(),normal=x.patch,observed=[];
+ x.patch=async request=>{const result=await normal(request);x.db.seed(x.grantPath,{...x.grant,state:'ACTIVE',enabled:true});return result;};
+ await assert.rejects(e.rollbackCreatedTrigger({...x.args(),postimage,observe:r=>observed.push(clone(r))}),/INGRESS_TRAFFIC_GRANT_PREIMAGE_CHANGED/);
+ assert.equal(x.patches.length,2);assert.ok(observed.some(r=>r.kind==='ROLLBACK_TRAFFIC_POSTIMAGE'&&r.traffic.targets[0].revision===x.snapshot.traffic.targets[0].revision));
+});
+for(const initial of ['CLOSED','ACTIVE'])test('V1 causal: rollback coordinator binds the '+initial+' closure result digest instead of obsolete predeploy grant',async()=>{
+ const {x,postimage}=await preparedV1Rollback(),dir=fs.mkdtempSync(path.join(os.tmpdir(),'gi-v1-rollback-binding-'));
+ const grant={...x.grant,state:initial,enabled:initial==='ACTIVE',closedAt:'changed-since-predeploy',
+  authority:{...x.grant.authority,sourceSha:x.p.sourceSha},deployedFunction:{...x.grant.deployedFunction,revision:postimage.function.revision}};
+ x.db.seed(x.grantPath,grant);const expected=c.digest(grant);assert.notEqual(expected,x.p.makeIngress.closedConfiguration.preview.expectedDigest);
+ const deployment={phase:'preview',sourceSha:x.p.sourceSha,artifactDigest:x.p.artifactDigest,
+  function:postimage.function,rules:{queueRulesDenyClient:true},config:{afterDigest:expected}};
+ try{
+  for(const [name,value]of Object.entries({'initialize-closed':deployment,'last-operation':{afterDigest:expected},'snapshot-trigger':x.snapshot,'capture-trigger':postimage}))
+   fs.writeFileSync(path.join(dir,'gi-make-preview-'+name+'.json'),JSON.stringify(value));
+  const result=await e.rollback({db:x.db,auth:x.auth,p:x.p,phase:'preview',authorityBlob:'a'.repeat(40),directory:dir});
+  assert.equal(result.status,'COMPENSATION_READBACK_VERIFIED');assert.equal(result.trigger.trafficWrites,1);
+  assert.equal(result.trigger.closedGrantBefore.digest,result.configuration.afterDigest);
+  assert.notEqual(result.trigger.closedGrantBefore.digest,x.p.makeIngress.closedConfiguration.preview.expectedDigest);
+  assert.equal(result.configuration.configurationWrites,initial==='ACTIVE'?1:0);assert.equal(x.patches.length,2);
+  assert.equal(x.db.documents.get(x.grantPath).state,'CLOSED');assert.equal(x.db.documents.get(x.grantPath).enabled,false);
+ }finally{fs.rmSync(dir,{recursive:true,force:true});}
 });

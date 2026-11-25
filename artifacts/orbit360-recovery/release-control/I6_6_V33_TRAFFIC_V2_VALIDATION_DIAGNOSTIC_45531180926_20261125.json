@@ -1,0 +1,179 @@
+{
+  "schema": "GI_I66_PREVIEW33_TRAFFIC_CONFLICT_READONLY_V1",
+  "status": "DIAGNOSTIC_HOLD",
+  "provenance": {
+    "repository": "paulaosoriof86/orbit360-core",
+    "sourceSha": "35003c9e0211fa907472978c731b533e372b3262",
+    "runId": 45531180926,
+    "runAttempt": 1,
+    "job": "existing_inbound_config",
+    "workflowPath": ".github/workflows/gravicentra-i66-greenapi-metadata-readonly.yml",
+    "workflowGitBlob": "fc3f7d658e3c284f3d2f26a953abec7d9d67d267",
+    "ownerPins": {
+      "tools/gravicentra-i66-make-lead-protected-executor.cjs": "9620fc1aefeb30e95c57aca0b87896c3e9fefc59",
+      "tools/gravicentra-i66-make-release-scope.cjs": "40c215ca67e17f9e1287ba562b0abfca1b55077d",
+      "functions/product-lead-ingress-contract.js": "ee29ee1fb12b1a30bf24b7c2c2a8180a2f2ef937"
+    },
+    "freshPreimageReportDigest": "3860ff5efd0aee9e79aa6a58878d3fc4ae4e9813dbb54ddd80a3a826b646a6b0"
+  },
+  "observedFailure": {
+    "revision": "orbit360makeleadingresspreview-00005-juw",
+    "trafficRevision": "orbit360makeleadingresspreview-00001-cuy",
+    "uid": "2cb4dc4b-ad08-442e-bf39-4fc0803bd111",
+    "generation": "5",
+    "fnDigest": "e49c9ad346ef99bc9510d05a3cf61dcb50c953658b9959153ba756d4e07cf4a3",
+    "trafficDigest": "1a2ddf6fce5df2060de48d339b87f67d63986a432460069f5949950c14e83e50",
+    "grantDigest": "a020555d0efc3e9cf68baf5b2b309eeb3fc004fadbf0e2539aff680a00a9aae4",
+    "failureRunId": 45528595084,
+    "failureJobId": 138918077657,
+    "failureSourceSha": "504829b30e1a3e0fde97bdef54fe3d0636e1344e",
+    "failureArtifactId": 14982534576,
+    "failureArtifactDigest": "sha256:6cd65439f2c6ed9fcb0b574c611010d1e626ad48f9b0f55d2914cc3785c5087c",
+    "observationSha256": "56a2a9219aa3f28f05e6a7c9f6abb34bb518a764719bb9d47caa4610ece088e9",
+    "requestSha256": "1f11a18159772c99443f383beaca5586ee9d508d2c39accbb18c6c5293421735",
+    "etagSha256": "91cd15d3683c5d8fd25df1e7a6df54063c001b26bce73791816a6cbe7daed1bc",
+    "from": "2026-11-25T01:52:48Z",
+    "to": "2026-11-25T01:53:04Z"
+  },
+  "startedAtUtc": "2026-11-25T02:11:57.485Z",
+  "audit": {
+    "httpStatus": 403,
+    "filterSha256": "6b37d55a56c2afc527724f3385a62bdd4f427b6288efc204c05ca964981d7225",
+    "paginationPresent": false,
+    "rows": [],
+    "error": {
+      "code": 403,
+      "status": "PERMISSION_DENIED",
+      "message": "Permission denied for all log views",
+      "messageSha256": "f63d7dd29b85101a309f8855b7db386e75e13e937eed6b448615211f7a3f5521",
+      "messageTruncated": false
+    }
+  },
+  "dryValidation": {
+    "httpStatus": 409,
+    "validateOnly": true,
+    "allowMissing": false,
+    "forceNewRevision": false,
+    "targetRevision": "orbit360makeleadingresspreview-00005-juw",
+    "updateMask": "traffic",
+    "requestEtagSha256": "91cd15d3683c5d8fd25df1e7a6df54063c001b26bce73791816a6cbe7daed1bc",
+    "acceptedForValidation": false,
+    "operationDone": null,
+    "provider": {
+      "code": 409,
+      "status": "ALREADY_EXISTS",
+      "message": "Revision named [OPAQUE_VALUE_REDACTED] with different configuration already exists.",
+      "messageSha256": "cacff3841b6a09a7b3097c4fefa6a157308397179237e078efe1319fa516e9cf",
+      "messageTruncated": false
+    },
+    "reproducesOriginal409": true,
+    "originalFailureCauseProvenByThisReplay": false
+  },
+  "before": {
+    "apiRevision": "orbit360makeleadingresspreview-00005-juw",
+    "functionConfigurationDigest": "e49c9ad346ef99bc9510d05a3cf61dcb50c953658b9959153ba756d4e07cf4a3",
+    "functionResponseSha256": "cc3516223b7d5e7bce37afd8e13339a96f20b79fa4e71ea9ea9ac8f2a386f1a7",
+    "runResponseSha256": "73118820e2163413cc2e4001e644706715b7f682ec24ea9874ffe1c89605aca7",
+    "traffic": {
+      "schema": "GI_I66_MAKE_CLOUD_RUN_TRAFFIC_V1",
+      "phase": "preview",
+      "service": "projects/ays-orbit-360-lab/locations/us-east1/services/orbit360makeleadingresspreview",
+      "serviceUid": "2cb4dc4b-ad08-442e-bf39-4fc0803bd111",
+      "generation": "5",
+      "observedFrom": "CLOUD_RUN_V2_TRAFFIC_STATUSES",
+      "targets": [
+        {
+          "revision": "orbit360makeleadingresspreview-00001-cuy",
+          "percent": 100
+        }
+      ],
+      "observationDigest": "1a2ddf6fce5df2060de48d339b87f67d63986a432460069f5949950c14e83e50"
+    },
+    "etagSha256": "91cd15d3683c5d8fd25df1e7a6df54063c001b26bce73791816a6cbe7daed1bc"
+  },
+  "after": {
+    "apiRevision": "orbit360makeleadingresspreview-00005-juw",
+    "functionConfigurationDigest": "e49c9ad346ef99bc9510d05a3cf61dcb50c953658b9959153ba756d4e07cf4a3",
+    "functionResponseSha256": "24d4d35205c17519cff7799680309d4853ae98a3b3906b51b7206e7b0310eded",
+    "runResponseSha256": "73118820e2163413cc2e4001e644706715b7f682ec24ea9874ffe1c89605aca7",
+    "traffic": {
+      "schema": "GI_I66_MAKE_CLOUD_RUN_TRAFFIC_V1",
+      "phase": "preview",
+      "service": "projects/ays-orbit-360-lab/locations/us-east1/services/orbit360makeleadingresspreview",
+      "serviceUid": "2cb4dc4b-ad08-442e-bf39-4fc0803bd111",
+      "generation": "5",
+      "observedFrom": "CLOUD_RUN_V2_TRAFFIC_STATUSES",
+      "targets": [
+        {
+          "revision": "orbit360makeleadingresspreview-00001-cuy",
+          "percent": 100
+        }
+      ],
+      "observationDigest": "1a2ddf6fce5df2060de48d339b87f67d63986a432460069f5949950c14e83e50"
+    },
+    "etagSha256": "91cd15d3683c5d8fd25df1e7a6df54063c001b26bce73791816a6cbe7daed1bc"
+  },
+  "identicalPrePostResponses": null,
+  "httpCalls": [
+    {
+      "method": "POST",
+      "url": "https://logging.googleapis.com/v2/entries:list",
+      "startedAtUtc": "2026-11-25T02:11:57.486Z",
+      "httpStatus": 403,
+      "responseSha256": "a49d0befa142c429091d1725fca3f5ff20b56c143d3ee2b854d0bcc13992d070",
+      "completedAtUtc": "2026-11-25T02:11:57.706Z"
+    },
+    {
+      "method": "GET",
+      "url": "https://cloudfunctions.googleapis.com/v2/projects/ays-orbit-360-lab/locations/us-east1/functions/orbit360MakeLeadIngressPreview",
+      "startedAtUtc": "2026-11-25T02:11:57.707Z",
+      "httpStatus": 200,
+      "responseSha256": "8ad1f2424cbda543a94a3be29dc8a8fbdda0232380d1c5128f3b3f9e854d2d3a",
+      "completedAtUtc": "2026-11-25T02:11:58.032Z"
+    },
+    {
+      "method": "GET",
+      "url": "https://run.googleapis.com/v2/projects/ays-orbit-360-lab/locations/us-east1/services/orbit360makeleadingresspreview",
+      "startedAtUtc": "2026-11-25T02:11:58.032Z",
+      "httpStatus": 200,
+      "responseSha256": "9150862c45ff29f2a2a23be2a3cf2d1e772666eba395e2b334aec125c88a1d22",
+      "completedAtUtc": "2026-11-25T02:11:58.179Z"
+    },
+    {
+      "method": "PATCH",
+      "url": "https://run.googleapis.com/v2/projects/ays-orbit-360-lab/locations/us-east1/services/orbit360makeleadingresspreview?updateMask=traffic&validateOnly=true&allowMissing=false&forceNewRevision=false",
+      "startedAtUtc": "2026-11-25T02:11:58.187Z",
+      "httpStatus": 409,
+      "responseSha256": "3fb0ba1f76ab857e45d527801a732d1a451588c3dadc762508fa4f2e0b2559d3",
+      "completedAtUtc": "2026-11-25T02:11:58.441Z"
+    },
+    {
+      "method": "GET",
+      "url": "https://cloudfunctions.googleapis.com/v2/projects/ays-orbit-360-lab/locations/us-east1/functions/orbit360MakeLeadIngressPreview",
+      "startedAtUtc": "2026-11-25T02:11:58.442Z",
+      "httpStatus": 200,
+      "responseSha256": "a987da9901c10236401527f562e897dfb92fec628d8b4d26c206b630e608055b",
+      "completedAtUtc": "2026-11-25T02:11:58.772Z"
+    },
+    {
+      "method": "GET",
+      "url": "https://run.googleapis.com/v2/projects/ays-orbit-360-lab/locations/us-east1/services/orbit360makeleadingresspreview",
+      "startedAtUtc": "2026-11-25T02:11:58.772Z",
+      "httpStatus": 200,
+      "responseSha256": "9150862c45ff29f2a2a23be2a3cf2d1e772666eba395e2b334aec125c88a1d22",
+      "completedAtUtc": "2026-11-25T02:11:58.903Z"
+    }
+  ],
+  "persistentMutationRequests": 0,
+  "cloudWrites": 0,
+  "configurationWrites": 0,
+  "canonicalLeadWrites": 0,
+  "iamWrites": 0,
+  "externalMessagesSent": 0,
+  "rawRequestsPublished": false,
+  "rawResponsesPublished": false,
+  "releaseAuthority": false,
+  "errorCode": "I66_TRAFFIC_DIAGNOSTIC_FUNCTION_CHANGED_DURING_VALIDATION",
+  "completedAtUtc": "2026-11-25T02:11:58.905Z",
+  "reportDigest": "acbb8e78429385b4f82b78c6488bb3c2a86dd75bbf743fb6325bd9d40209cb9c"
+}

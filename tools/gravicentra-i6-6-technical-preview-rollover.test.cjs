@@ -1844,3 +1844,153 @@ test('V5 continuation34 rejects missing or altered archived32 disposition', () =
     const f = v5Retry34Fixture(); change(f.control); assert.throws(() => checkV5(f));
   }
 });
+
+// V6 starts from the successful immutable33 and the separately closed R77 signed
+// Preview. These local request34 fixtures do not grant runtime acceptance.
+const v6ReceiptPath = 'artifacts/orbit360-recovery/release-control/I6_6_CURRENT_PHYSICAL_PREVIEW_V33_ROLLOVER_V6_20261125.json';
+const v6Text = fs.readFileSync(path.join(retryRepo, v6ReceiptPath), 'utf8');
+const v6Receipt = JSON.parse(v6Text);
+const v6Selector = { receiptPath: v6ReceiptPath,
+  receiptSha256: 'a755e24a6ed549d2c5aa4b567b6a3be4a49ff0b2218e1c31988e85dd812ef5c2' };
+const v6Original = JSON.parse(retryGitRead('show', v6Receipt.sourceBaseHead + ':' + retryTransportPath));
+const v6ClosedSource = 'bdcf12e9eb24f9fb95ebd244802139e13d2a7802';
+const v6Closed = JSON.parse(retryGitRead('show', v6ClosedSource + ':' + retryTransportPath));
+function v6Fixture() {
+  const control = clone(v6Closed), calls = [];
+  control.priorFrontendPreviewRequestBeforeV34_20261125 = clone(v6Original.frontendPreviewRequest);
+  control.priorTechnicalPreviewRolloverBeforeV34 = clone(v6Original.currentTechnicalPreviewRollover);
+  control.currentTechnicalPreviewRollover = clone(v6Selector);
+  control.frontendPreviewRequest = { ...clone(v6Original.frontendPreviewRequest), version: 34,
+    sourceQaHead: v6ClosedSource, reason: 'Synthetic causal transport fixture; signed source QA is separately required.' };
+  return { control, calls, io: {
+    git(...args) { calls.push(args); return retryGitRead(...args); },
+    readText: p => fs.readFileSync(path.join(retryRepo, p), 'utf8')
+  } };
+}
+const checkV6 = f => api.validateAuthorization(f.control, v6Text, f.io);
+const v6Prior = f => f.control.closedFailedPreviewAttempts.find(x => x.sourceSha === v6Receipt.sourceBaseHead);
+test('V6 explicit selector pins actual33 and keeps historical V4/V5 unchanged', () => {
+  assert.equal(digest(v6Text), v6Selector.receiptSha256);
+  assert.equal(retryBlob(v6Text), '3d386d78278090d2a4a8efc016c1d3dd63a3c155');
+  assert.deepEqual(guard.currentPhysicalRolloverCandidatePin(), successfulPhysicalPin);
+  assert.equal(guard.currentPhysicalRolloverCandidatePin(v5Selector).previousArtifactId, 14979094222);
+  const selected = guard.currentPhysicalRolloverCandidatePin(v6Selector);
+  assert.equal(selected.previousArtifactId, 14983831110);
+  assert.equal(selected.previousSourceSha, '63bf7d9e9ba7710cab73bffee010987c784d92aa');
+  assert.equal(selected.channel, v6Receipt.channel.id);
+  selected.channel = 'live';
+  assert.equal(guard.currentPhysicalRolloverCandidatePin(v6Selector).channel, v6Receipt.channel.id);
+});
+for (const [label, change] of [
+  ['hash', s => { s.receiptSha256 = 'a'.repeat(64); }],
+  ['path', s => { s.receiptPath += '.other'; }],
+  ['extra authority', s => { s.allowDrift = true; }]
+]) test('V6 selector rejects ' + label, () => {
+  const selector = clone(v6Selector); change(selector);
+  assert.throws(() => guard.currentPhysicalRolloverCandidatePin(selector));
+});
+test('V6 admits34 from successful33 and closed failed Preview with limited verified compensation', () => {
+  const f = v6Fixture(), before = clone(f.control);
+  assert.deepEqual(checkV6(f), v6Receipt); assert.deepEqual(f.control, before);
+  assert.equal(f.control.frontendPreviewRequest.productPaths.length, 21);
+  assert.equal(f.control.frontendPreviewRequest.fiveFunctionExactPreviewRequired, true);
+  assert.ok(!f.control.failedImmutableBuildAttempts.some(x => x.version === 33));
+  assert.equal(v6Prior(f).compensationVerified, true);
+  assert.equal(v6Prior(f).functionMetadataRestored, false);
+  assert.equal(v6Prior(f).overallPackageAccepted, false);
+  assert.equal(f.calls.filter(x => x[0] === 'diff').length, 2);
+  assert.equal(v6Receipt.build33Verification.technicalRolloverUsed, true);
+});
+test('V6 accepts the emitted34 disposition while preserving the exact closed33 receipt', () => {
+  const f = v6Fixture(); Object.assign(f.control.failedFrontendPreviewRequestDisposition, {
+    successorRequestCreated: true, successorRequestVersion: 34,
+    successorSourceQaHead: f.control.frontendPreviewRequest.sourceQaHead });
+  assert.deepEqual(checkV6(f), v6Receipt);
+});
+for (const [label, change] of [
+  ['successful33 reclassified as failed', f => { f.control.failedImmutableBuildAttempts.push({ version: 33 }); }],
+  ['successful33 run reused in a failed row', f => { f.control.failedImmutableBuildAttempts.push({ version: 9, runId: 45527330623 }); }],
+  ['missing closed Preview33', f => { f.control.closedFailedPreviewAttempts = []; }],
+  ['duplicate closed Preview33', f => { f.control.closedFailedPreviewAttempts.push(clone(v6Prior(f))); }],
+  ['failed build label', f => { v6Prior(f).buildStatus = 'FAILURE'; }],
+  ['false signed Preview PASS', f => { v6Prior(f).previewStatus = 'PASS'; }],
+  ['false compensation HOLD', f => { v6Prior(f).compensationVerified = false; }],
+  ['broadened compensation scope', f => { v6Prior(f).compensationScope = 'ALL_BACKEND_FUNCTIONS'; }],
+  ['false Function metadata restoration', f => { v6Prior(f).functionMetadataRestored = true; }],
+  ['false five-function restoration', f => { v6Prior(f).allFiveBackendFunctionsRestored = true; }],
+  ['unwithdrawn backend authority', f => { v6Prior(f).activeAuthorizationWithdrawn = false; }],
+  ['changed artifact', f => { v6Prior(f).artifactId++; }],
+  ['changed failure receipt', f => { v6Prior(f).receipt.gitBlobSha = 'a'.repeat(40); }],
+  ['missing request33 archive', f => { delete f.control.priorFrontendPreviewRequestBeforeV34_20261125; }],
+  ['duplicate request33 archive', f => { f.control.priorFrontendPreviewRequestBeforeV34_20261124 = clone(f.control.priorFrontendPreviewRequestBeforeV34_20261125); }],
+  ['edited request33 archive', f => { f.control.priorFrontendPreviewRequestBeforeV34_20261125.reason += ' edited'; }],
+  ['lost historical V5 pin', f => { delete f.control.priorTechnicalPreviewRolloverBeforeV34; }],
+  ['changed product scope', f => { f.control.frontendPreviewRequest.productPaths.pop(); }],
+  ['lost financial UI scope', f => { delete f.control.frontendPreviewRequest.financialRecoveryQa; }],
+  ['lost cancellation UI scope', f => { delete f.control.frontendPreviewRequest.cancellationRecoveryQa; }],
+  ['pending Make authority', f => { f.control.makeIngressProtectedOperation = {}; }],
+  ['changed LIVE pointer', f => { f.control.currentPhysicalHostingRelease.artifactId++; }],
+  ['request35 without failed34 evidence', f => { f.control.frontendPreviewRequest.version = 35; }]
+]) test('V6 closed successor rejects ' + label, () => {
+  const f = v6Fixture(); change(f); assert.throws(() => checkV6(f));
+});
+for (const target of [v6ReceiptPath, v6Receipt.build33Verification.path,
+  v6Receipt.signedPreviewFailurePreserved.receipt.path]) {
+  test('V6 rejects changed exact evidence bytes: ' + path.basename(target), () => {
+    const f = v6Fixture(), read = f.io.readText;
+    f.io.readText = p => read(p) + (p === target ? ' ' : '');
+    assert.throws(() => checkV6(f), /V6_RECEIPT_SHA_DRIFT/);
+  });
+}
+for (const operation of ['merge-base', 'diff']) test('V6 refuses ' + operation + ' continuity failure', () => {
+  const f = v6Fixture(), run = f.io.git;
+  f.io.git = (...args) => { if (args[0] === operation) throw Error('synthetic Git continuity failure'); return run(...args); };
+  assert.throws(() => checkV6(f), /synthetic Git continuity failure/);
+});
+test('V6 candidate requires new immutable source and cannot reuse successful backup33 or32', () => {
+  const p = { sourceSha: 'a'.repeat(40), buildRunId: 45540000001, previewChannelId: v6Receipt.channel.id,
+    previewUrl: v6Receipt.channel.origin, previewRollover: guard.currentPhysicalRolloverCandidatePin(v6Selector) };
+  assert.deepEqual(api.validateCandidateReuse(p), p.previewRollover);
+  for (const change of [c => { c.sourceSha = v6Receipt.sourceBaseHead; }, c => { c.buildRunId = 45527330623; },
+    c => { c.sourceSha = v5Receipt.sourceBaseHead; }, c => { c.buildRunId = 45518809761; },
+    c => { c.previewUrl = successfulPhysicalPin.origin; }]) {
+    const c = clone(p); change(c); assert.throws(() => api.validateCandidateReuse(c));
+  }
+});
+test('V6 keeps whole-success artifact validation for backup33 and E3', () => {
+  for (const expected of [v6Receipt.previousCandidate, v6Receipt.protectedLive]) {
+    const run = { id: expected.buildRunId, run_attempt: expected.buildRunAttempt, head_sha: expected.sourceSha,
+      head_branch: v6Receipt.branch, path: '.github/workflows/gravicentra-release-delta-66-package.yml',
+      status: 'completed', conclusion: 'success' };
+    const artifact = { id: expected.artifactId, name: 'gi-i66-immutable-' + expected.sourceSha,
+      digest: expected.artifactDigest, expired: false, size_in_bytes: 1024,
+      workflow_run: { id: expected.buildRunId, head_sha: expected.sourceSha, head_branch: v6Receipt.branch } };
+    assert.doesNotThrow(() => api.validateArtifact(run, artifact, expected));
+    assert.throws(() => api.validateArtifact({ ...run, conclusion: 'failure' }, artifact, expected));
+    assert.throws(() => api.validateArtifact({ ...run, run_attempt: run.run_attempt + 1 }, artifact, expected));
+  }
+});
+function v6AfterFixture() {
+  const f = afterInventoriesFixture(); f.authorization = clone(v6Receipt);
+  for (const inventory of [f.initial, f.first, f.final]) {
+    const target = inventory.result[0];
+    target.name = 'sites/ays-orbit-360-lab/channels/' + v6Receipt.channel.id;
+    target.createTime = v6Receipt.channel.createdAt;
+  }
+  f.initial.result[0].release.version.name = v6Receipt.channel.expectedVersion;
+  return f;
+}
+test('V6 after-readback preserves every field in the other50 channels and the exact receipt', () => {
+  const f = v6AfterFixture(), before = clone(f);
+  assert.equal(validateAfter(f).otherChannelsUnchanged, 50); assert.deepEqual(f, before);
+  f.authorization.constraints.noLiveChanges = false;
+  assert.throws(() => validateAfter(f), /V6_AFTER_AUTHORITY_DRIFT/);
+});
+for (const [label, change] of [
+  ['target version', f => { f.final.result[0].release.version.name += '-other'; }],
+  ['target config', f => { f.final.result[0].release.version.config.rewrites[0].path = '/other.html'; }],
+  ['unknown target field', f => { f.final.result[0].unapproved = true; }],
+  ['other channel', f => { f.final.result[2].release.version.name += '-other'; }]
+]) test('V6 after-readback rejects ' + label + ' drift', () => {
+  const f = v6AfterFixture(); change(f); assert.throws(() => validateAfter(f));
+});

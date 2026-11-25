@@ -1,0 +1,149 @@
+{
+  "schema": "GI_I66_MAKE_V1_RESOURCE_VERSION_CAUSAL_SOURCE_V1",
+  "status": "CAUSAL_SOURCE_PREPARED_SIGNED_SOURCE_QA_AND_RUNTIME_PENDING",
+  "recordedAtUtc": "2026-11-25T03:06:20.875284+00:00",
+  "baseHead": "bdcf12e9eb24f9fb95ebd244802139e13d2a7802",
+  "activeGate": "I6.6",
+  "failureReceipt": {
+    "path": "artifacts/orbit360-recovery/release-control/I6_6_V33_POSTDEPLOY_TRAFFIC_PATCH_FAILURE_20261125_R77.json",
+    "gitBlobSha": "601da20afcd7561e6c380b14a653e4f74418e435"
+  },
+  "causeEvidence": [
+    {
+      "path": "artifacts/orbit360-recovery/release-control/I6_6_V33_TRAFFIC_V2_VALIDATION_DIAGNOSTIC_45531180926_20261125.json",
+      "gitBlobSha": "446823347435e99a6ed50021fc4c376a6ef79280",
+      "sha256": "c8e7478080d3d75cae08bc93361e66fd5252dd9c5937f168d6a18fa2f1e6afda",
+      "runId": 45531180926,
+      "artifactId": 14985640513,
+      "artifactDigest": "sha256:9e1877066a88b81a24bf30936d316daa6a79b9bb76aafd8ed7116430363996bc",
+      "status": "DIAGNOSTIC_HOLD"
+    },
+    {
+      "path": "artifacts/orbit360-recovery/release-control/I6_6_V33_TRAFFIC_V1_DRYRUN_DIAGNOSTIC_45535291919_20261125.json",
+      "gitBlobSha": "17c0276eff85b939499dc98165db77a03d95e542",
+      "sha256": "07ee42d1177433adea4c6177acad831b5bbaa5b07b23a2f7e0552531fcdfc3a6",
+      "runId": 45535291919,
+      "artifactId": 14986017788,
+      "artifactDigest": "sha256:f31e08d11b3b042df6f99676c773c556797578978447e2410723812a9ad16574",
+      "status": "V1_DRY_RUN_RESPONSE_OBSERVED_NO_PERSISTENCE_NOT_RELEASE_AUTHORITY"
+    }
+  ],
+  "providerObservation": {
+    "v2ValidateOnlyHttpStatus": 409,
+    "v2Status": "ALREADY_EXISTS",
+    "exactMessageSha256": "cacff3841b6a09a7b3097c4fefa6a157308397179237e078efe1319fa516e9cf",
+    "meaning": "Provider rejected traffic-only V2 update because revision orbit360makeleadingresspreview-00005-juw already exists with different configuration. No etag staleness proven.",
+    "v1FullServiceDryRunHttpStatus": 200,
+    "v1DryRunAccepted": true,
+    "persistentTrafficCorrectionAlreadyPerformed": false,
+    "functionOrderDifference": "V1 diagnostic independently retained exact Functions diff; only the three unchanged eventFilters reordered. Raw hash pair equals earlier V2 diagnostic pair in reverse order. This explains that raw-equality HOLD by hash equivalence, independently of the409 provider rejection."
+  },
+  "implementation": {
+    "existingOwnerOnly": true,
+    "v1Method": "PUT",
+    "v1UrlForm": "https://<exact-phase-region>-run.googleapis.com/apis/serving.knative.dev/v1/namespaces/ays-orbit-360-lab/services/<exact-phase-service>",
+    "body": "Clone full current V1 preimage including metadata/resourceVersion/template; remove only status and replace spec.traffic with exact revision at100/latestRevision:false.",
+    "captureTarget": "Exact newly deployed Functions revision; old serving revision cannot become new artifact acceptance.",
+    "rollbackTarget": "Previously observed traffic revision; keep current template; never substitute prior Functions API revision.",
+    "cas": "Independent V2/V1 reads; exact current serviceUID/generation/observed traffic; fresh equality of complete V1 preimage and V2 response digest/etag before final closed grant read and resourceVersion PUT.",
+    "post": "Retain safe independent routing observations before rejecting assertions; retain exact verified routing postimage before grant-after HOLD.",
+    "rollbackGrant": "Coordinator derives digest from its verified or produced closeForRollback.afterDigest, or original source-pinned predeploy digest when no transition existed. No CLI override.",
+    "verifiedNoOpsPreserved": true,
+    "liveExistingRestoreDelegationUnchanged": true,
+    "historicalAbsentDeletionContractPreserved": true,
+    "mutationRetries": 0,
+    "persistentFallbacks": 0,
+    "maxRedirects": 0,
+    "readOnlyReconciliationPollsMaximum": 30,
+    "providerConflicts": "409/412 HOLD with zero committed writes; no token refresh/retry. Ambiguous transport retains unknown write count.",
+    "gcloudUpdateTrafficRemovedFromMain": true,
+    "freshGrantIsNotAtomicCrossServiceLock": true,
+    "rawV1PreimagesPublished": false
+  },
+  "changedPaths": [
+    {
+      "path": ".github/workflows/gravicentra-i66-greenapi-metadata-readonly.yml",
+      "beforeBlob": "57c16f784f0f12725efe5407d86fa6f0a7b0e055",
+      "beforeSha256": "cf7a1460c2bd3725c927f709f345396f137c0d914c394184ef974ba478d79380",
+      "afterBlob": "41000cccaba58a69ac8949008516e2b725079939",
+      "afterSha256": "d5bba382fa5c797a4827c8ff4722f93c9d0e0f58d6b1ca06158579c032f9f032",
+      "afterBytes": 82381
+    },
+    {
+      "path": "tools/gravicentra-i66-make-lead-protected-executor.cjs",
+      "beforeBlob": "9620fc1aefeb30e95c57aca0b87896c3e9fefc59",
+      "beforeSha256": "f5dd042a3cf346f4653306a0d2870147032ca4f348800382964e17d5f56fdc3c",
+      "afterBlob": "a9bb334cebed6332dfbe46a757c23424d45ba17d",
+      "afterSha256": "36daf326d57d440545ffa1c36373f885230ce7fdd1b18f209d68663b04a9117a",
+      "afterBytes": 76465
+    },
+    {
+      "path": "tools/gravicentra-i66-make-lead-protected-executor.test.cjs",
+      "beforeBlob": "ffb8449bb9a0964950c35c49739178b181a33c9f",
+      "beforeSha256": "fb842bc0c623f91288ff70a8b9dd4df3b7dbcc774363b8e0b9af549b2e7ba02d",
+      "afterBlob": "8587b408de5bafae576d038adeaeb1fb2c6bd245",
+      "afterSha256": "271f8b0319bfb3bb9439e87c0dde3d8b26d7ee9456f1e21e22f2ea4c5559525d",
+      "afterBytes": 59694
+    }
+  ],
+  "preservedFreshGrantAmendment": {
+    "baseOwnerBlob": "9620fc1aefeb30e95c57aca0b87896c3e9fefc59",
+    "appliedOwnerBlob": "addc45b1ea1873634b801a46c9a72996227141d8",
+    "verifiedBeforeV1Edits": true,
+    "retainedProtections": [
+      "source-pinned fresh CLOSED/disabled or exact ABSENT grant immediately before traffic mutation",
+      "post-read grant equality after retained postimage",
+      "finite explicit safe invariant code allowlist"
+    ]
+  },
+  "localVerification": {
+    "targetedLegacyAndFreshGrant": {
+      "pass": 16,
+      "fail": 0
+    },
+    "newV1Causal": {
+      "pass": 21,
+      "fail": 0
+    },
+    "existingMakeFocusedEntry": {
+      "path": "tools/gravicentra-i6-6-make-lead-ingress-release.test.cjs",
+      "pass": 245,
+      "fail": 0,
+      "skipped": 0
+    },
+    "logs": {
+      "first-targeted-check.tap": {
+        "sha256": "58ce5ca60839e886d2e09499acd0e1abd42c9500de6d8505b8790055cdd88c79"
+      },
+      "v1-causal-tests.tap": {
+        "sha256": "0e445de6afe1dca22af2959e8f9d838ac9c25534d24267665b89a76ace80fcab"
+      },
+      "make-focused-group.tap": {
+        "sha256": "acb4b2657247f701d11c5e75b9e9ebdad85d5d8264ccbd5949f5946a2ea70b93"
+      }
+    },
+    "independentStaticRollbackReview": {
+      "ownerBlob": "a9bb334cebed6332dfbe46a757c23424d45ba17d",
+      "reportSha256": "d86543a585b65176386677fe59affa337cdb5f5f921fd46bdf66b7cd92bb759c",
+      "additionalCausalBlockers": 0,
+      "runtimeAcceptance": false
+    }
+  },
+  "primaryReferences": [
+    "https://docs.cloud.google.com/run/docs/reference/rest/v1/namespaces.services/replaceService",
+    "https://docs.cloud.google.com/run/docs/reference/rest/v2/projects.locations.services/patch"
+  ],
+  "scope": {
+    "productFilesChanged": 0,
+    "backendFilesChanged": 0,
+    "newCloudMutationPerformedByPreparation": 0,
+    "sourceOwnerChangedRequiresNewImmutableArtifact": true,
+    "previousSuccessfulBuild33Preserved": true,
+    "failedSignedPreview33Preserved": true,
+    "currentPhysicalLive": "E3",
+    "sourceQaAccepted": false,
+    "previewRuntimeAccepted": false,
+    "liveAccepted": false,
+    "fullI66Accepted": false
+  }
+}

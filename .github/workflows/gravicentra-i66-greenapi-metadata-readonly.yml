@@ -647,7 +647,7 @@ jobs:
             etagSha256:'91cd15d3683c5d8fd25df1e7a6df54063c001b26bce73791816a6cbe7daed1bc',
             from:'2026-11-25T01:52:48Z',to:'2026-11-25T01:53:04Z'};
           const OWNER_PINS={
-            'tools/gravicentra-i66-make-lead-protected-executor.cjs':'9620fc1aefeb30e95c57aca0b87896c3e9fefc59',
+            'tools/gravicentra-i66-make-lead-protected-executor.cjs':'a9bb334cebed6332dfbe46a757c23424d45ba17d',
             'tools/gravicentra-i66-make-release-scope.cjs':'40c215ca67e17f9e1287ba562b0abfca1b55077d',
             'functions/product-lead-ingress-contract.js':'ee29ee1fb12b1a30bf24b7c2c2a8180a2f2ef937'};
           const hash=x=>crypto.createHash('sha256').update(x).digest('hex');

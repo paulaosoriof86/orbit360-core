@@ -1,0 +1,337 @@
+{
+  "schema": "GI_I66_PREVIEW33_TRAFFIC_V1_DRY_RUN_V1",
+  "status": "V1_DRY_RUN_RESPONSE_OBSERVED_NO_PERSISTENCE_NOT_RELEASE_AUTHORITY",
+  "profile": "V1_EXACT_REPLACEMENT_DRY_RUN_ONLY",
+  "provenance": {
+    "repository": "paulaosoriof86/orbit360-core",
+    "sourceSha": "bdcf12e9eb24f9fb95ebd244802139e13d2a7802",
+    "runId": 45535291919,
+    "runAttempt": 1,
+    "job": "existing_inbound_config",
+    "workflowPath": ".github/workflows/gravicentra-i66-greenapi-metadata-readonly.yml",
+    "workflowGitBlob": "57c16f784f0f12725efe5407d86fa6f0a7b0e055",
+    "ownerPins": {
+      "tools/gravicentra-i66-make-lead-protected-executor.cjs": "9620fc1aefeb30e95c57aca0b87896c3e9fefc59",
+      "tools/gravicentra-i66-make-release-scope.cjs": "40c215ca67e17f9e1287ba562b0abfca1b55077d",
+      "functions/product-lead-ingress-contract.js": "ee29ee1fb12b1a30bf24b7c2c2a8180a2f2ef937"
+    },
+    "freshPreimageReportDigest": "46783f507bf82b5c8daa963054d6c01792dfa86f6311603fc6d18ca8d64a5017"
+  },
+  "observedFailure": {
+    "revision": "orbit360makeleadingresspreview-00005-juw",
+    "trafficRevision": "orbit360makeleadingresspreview-00001-cuy",
+    "uid": "2cb4dc4b-ad08-442e-bf39-4fc0803bd111",
+    "generation": "5",
+    "fnDigest": "e49c9ad346ef99bc9510d05a3cf61dcb50c953658b9959153ba756d4e07cf4a3",
+    "trafficDigest": "1a2ddf6fce5df2060de48d339b87f67d63986a432460069f5949950c14e83e50",
+    "grantDigest": "a020555d0efc3e9cf68baf5b2b309eeb3fc004fadbf0e2539aff680a00a9aae4",
+    "failureRunId": 45528595084,
+    "failureJobId": 138918077657,
+    "failureSourceSha": "504829b30e1a3e0fde97bdef54fe3d0636e1344e",
+    "failureArtifactId": 14982534576,
+    "failureArtifactDigest": "sha256:6cd65439f2c6ed9fcb0b574c611010d1e626ad48f9b0f55d2914cc3785c5087c",
+    "observationSha256": "56a2a9219aa3f28f05e6a7c9f6abb34bb518a764719bb9d47caa4610ece088e9",
+    "requestSha256": "1f11a18159772c99443f383beaca5586ee9d508d2c39accbb18c6c5293421735",
+    "etagSha256": "91cd15d3683c5d8fd25df1e7a6df54063c001b26bce73791816a6cbe7daed1bc",
+    "from": "2026-11-25T01:52:48Z",
+    "to": "2026-11-25T01:53:04Z"
+  },
+  "startedAtUtc": "2026-11-25T02:46:20.221Z",
+  "before": {
+    "functionHttpStatus": 200,
+    "runV2HttpStatus": 200,
+    "runV1HttpStatus": 200,
+    "functionResponseSha256": "24d4d35205c17519cff7799680309d4853ae98a3b3906b51b7206e7b0310eded",
+    "runResponseSha256": "73118820e2163413cc2e4001e644706715b7f682ec24ea9874ffe1c89605aca7",
+    "v1ResponseSha256": "b361db86da181523d3b47995fc525e7811034211a325a85fe4c4ff36e19a6532",
+    "etagSha256": "91cd15d3683c5d8fd25df1e7a6df54063c001b26bce73791816a6cbe7daed1bc",
+    "resourceVersionSha256": "78a2bd2372c7a4a0bf6c8857e5b36c076e20266a6014014b7b2328b8737ec10e",
+    "templateSha256": "7d38b988cc5f40ae6ecd8fdce2419a3ca1a0bb5019043ebc8ad1711d43049b63",
+    "grant": {
+      "pathMatchesExpected": true,
+      "exists": true,
+      "expectedDigest": "a020555d0efc3e9cf68baf5b2b309eeb3fc004fadbf0e2539aff680a00a9aae4",
+      "state": "CLOSED",
+      "enabled": false,
+      "updateTimeSha256": "33091c57801c65ee727fb4dbfeb4cfa4628be9025340528e2256722d8a8856a2"
+    }
+  },
+  "after": {
+    "functionHttpStatus": 200,
+    "runV2HttpStatus": 200,
+    "runV1HttpStatus": 200,
+    "functionResponseSha256": "cc3516223b7d5e7bce37afd8e13339a96f20b79fa4e71ea9ea9ac8f2a386f1a7",
+    "runResponseSha256": "73118820e2163413cc2e4001e644706715b7f682ec24ea9874ffe1c89605aca7",
+    "v1ResponseSha256": "b361db86da181523d3b47995fc525e7811034211a325a85fe4c4ff36e19a6532",
+    "etagSha256": "91cd15d3683c5d8fd25df1e7a6df54063c001b26bce73791816a6cbe7daed1bc",
+    "resourceVersionSha256": "78a2bd2372c7a4a0bf6c8857e5b36c076e20266a6014014b7b2328b8737ec10e",
+    "templateSha256": "7d38b988cc5f40ae6ecd8fdce2419a3ca1a0bb5019043ebc8ad1711d43049b63",
+    "grant": {
+      "pathMatchesExpected": true,
+      "exists": true,
+      "expectedDigest": "a020555d0efc3e9cf68baf5b2b309eeb3fc004fadbf0e2539aff680a00a9aae4",
+      "state": "CLOSED",
+      "enabled": false,
+      "updateTimeSha256": "33091c57801c65ee727fb4dbfeb4cfa4628be9025340528e2256722d8a8856a2"
+    }
+  },
+  "comparisons": {
+    "functions": {
+      "rawEqual": false,
+      "projectionEqual": true,
+      "eventFiltersOrderOnly": true,
+      "effectiveEqual": true,
+      "beforeProjectionSha256": "433292447db183c6f8cb24318705bade63c57f6c21644401c79703044e806cbf",
+      "afterProjectionSha256": "433292447db183c6f8cb24318705bade63c57f6c21644401c79703044e806cbf",
+      "projectionErrorCode": null,
+      "diff": {
+        "changed": true,
+        "changes": [
+          {
+            "path": [
+              "eventTrigger",
+              "eventFilters",
+              0,
+              "attribute"
+            ],
+            "before": {
+              "present": true,
+              "type": "string",
+              "sha256": "21c67c24326dd4f52ca8ab4ee2e5f676c5a136e76ed8b34f3d8bfb65f651c3cf"
+            },
+            "after": {
+              "present": true,
+              "type": "string",
+              "sha256": "c664670b10d6de79c5aa1711e1d470907125878fa14bbb52c356482498e6aab6"
+            }
+          },
+          {
+            "path": [
+              "eventTrigger",
+              "eventFilters",
+              1,
+              "attribute"
+            ],
+            "before": {
+              "present": true,
+              "type": "string",
+              "sha256": "c664670b10d6de79c5aa1711e1d470907125878fa14bbb52c356482498e6aab6"
+            },
+            "after": {
+              "present": true,
+              "type": "string",
+              "sha256": "64ac8e615520cd1ae43ab0d47cfc9e750a82d13f9c47d468dab7cd8c982b7859"
+            }
+          },
+          {
+            "path": [
+              "eventTrigger",
+              "eventFilters",
+              1,
+              "operator"
+            ],
+            "before": {
+              "present": false,
+              "type": "absent",
+              "sha256": null
+            },
+            "after": {
+              "present": true,
+              "type": "string",
+              "sha256": "85bb55e675ac6f9613dbee89e8bc8cf4cf8e4915108d5944602985ba60130753"
+            }
+          },
+          {
+            "path": [
+              "eventTrigger",
+              "eventFilters",
+              1,
+              "value"
+            ],
+            "before": {
+              "present": true,
+              "type": "string",
+              "sha256": "9c3bd901d8fbc6f815cef04511789dca43c782f294aaa6b0b24efa0f18bd4123"
+            },
+            "after": {
+              "present": true,
+              "type": "string",
+              "sha256": "56afeef29794acb3743e4e8b930c8507031fd2710d97df20bf2a3e172e9b036b"
+            }
+          },
+          {
+            "path": [
+              "eventTrigger",
+              "eventFilters",
+              2,
+              "attribute"
+            ],
+            "before": {
+              "present": true,
+              "type": "string",
+              "sha256": "64ac8e615520cd1ae43ab0d47cfc9e750a82d13f9c47d468dab7cd8c982b7859"
+            },
+            "after": {
+              "present": true,
+              "type": "string",
+              "sha256": "21c67c24326dd4f52ca8ab4ee2e5f676c5a136e76ed8b34f3d8bfb65f651c3cf"
+            }
+          },
+          {
+            "path": [
+              "eventTrigger",
+              "eventFilters",
+              2,
+              "operator"
+            ],
+            "before": {
+              "present": true,
+              "type": "string",
+              "sha256": "85bb55e675ac6f9613dbee89e8bc8cf4cf8e4915108d5944602985ba60130753"
+            },
+            "after": {
+              "present": false,
+              "type": "absent",
+              "sha256": null
+            }
+          },
+          {
+            "path": [
+              "eventTrigger",
+              "eventFilters",
+              2,
+              "value"
+            ],
+            "before": {
+              "present": true,
+              "type": "string",
+              "sha256": "56afeef29794acb3743e4e8b930c8507031fd2710d97df20bf2a3e172e9b036b"
+            },
+            "after": {
+              "present": true,
+              "type": "string",
+              "sha256": "9c3bd901d8fbc6f815cef04511789dca43c782f294aaa6b0b24efa0f18bd4123"
+            }
+          }
+        ],
+        "truncated": false,
+        "maxChanges": 64,
+        "maxDepth": 12
+      }
+    },
+    "runV2Equal": true,
+    "runV1Equal": true,
+    "grantEqual": true,
+    "runV2Diff": {
+      "changed": false,
+      "changes": [],
+      "truncated": false,
+      "maxChanges": 64,
+      "maxDepth": 12
+    },
+    "v1Diff": {
+      "changed": false,
+      "changes": [],
+      "truncated": false,
+      "maxChanges": 64,
+      "maxDepth": 12
+    }
+  },
+  "audit": {
+    "skipped": true,
+    "reason": "V1_PROFILE_NO_AUDIT_OR_V2_VALIDATION"
+  },
+  "dryValidation": {
+    "httpStatus": 200,
+    "dryRun": "all",
+    "method": "PUT",
+    "targetRevision": "orbit360makeleadingresspreview-00005-juw",
+    "requestSha256": "d7c357c39c59022d68adfb03330cab12f7e3d99db19108f5ab927d4b32cfa29d",
+    "requestResourceVersionSha256": "78a2bd2372c7a4a0bf6c8857e5b36c076e20266a6014014b7b2328b8737ec10e",
+    "requestTemplateSha256": "7d38b988cc5f40ae6ecd8fdce2419a3ca1a0bb5019043ebc8ad1711d43049b63",
+    "acceptedForValidation": true,
+    "responseSha256": "727fbc8c726018a37bf4e2e41136a14597fda2a0b2eefa192da61e8461dcc2ea",
+    "provider": {
+      "code": null,
+      "status": null,
+      "messageSha256": null,
+      "messageLength": null,
+      "targetRevisionMentioned": false,
+      "detailsPresent": false
+    },
+    "originalFailureCauseProvenByThisReplay": false
+  },
+  "httpCalls": [
+    {
+      "method": "GET",
+      "url": "https://cloudfunctions.googleapis.com/v2/projects/ays-orbit-360-lab/locations/us-east1/functions/orbit360MakeLeadIngressPreview",
+      "startedAtUtc": "2026-11-25T02:46:20.222Z",
+      "httpStatus": 200,
+      "responseSha256": "a987da9901c10236401527f562e897dfb92fec628d8b4d26c206b630e608055b",
+      "completedAtUtc": "2026-11-25T02:46:20.671Z"
+    },
+    {
+      "method": "GET",
+      "url": "https://run.googleapis.com/v2/projects/ays-orbit-360-lab/locations/us-east1/services/orbit360makeleadingresspreview",
+      "startedAtUtc": "2026-11-25T02:46:20.671Z",
+      "httpStatus": 200,
+      "responseSha256": "9150862c45ff29f2a2a23be2a3cf2d1e772666eba395e2b334aec125c88a1d22",
+      "completedAtUtc": "2026-11-25T02:46:20.823Z"
+    },
+    {
+      "method": "GET",
+      "url": "https://us-east1-run.googleapis.com/apis/serving.knative.dev/v1/namespaces/ays-orbit-360-lab/services/orbit360makeleadingresspreview",
+      "startedAtUtc": "2026-11-25T02:46:20.823Z",
+      "httpStatus": 200,
+      "responseSha256": "b76b5f859823805e95ca353c7ec0d278e828bc69afabbf5d4404dfc09df59066",
+      "completedAtUtc": "2026-11-25T02:46:20.990Z"
+    },
+    {
+      "method": "PUT",
+      "url": "https://us-east1-run.googleapis.com/apis/serving.knative.dev/v1/namespaces/ays-orbit-360-lab/services/orbit360makeleadingresspreview?dryRun=all",
+      "startedAtUtc": "2026-11-25T02:46:21.344Z",
+      "httpStatus": 200,
+      "responseSha256": "a0eee19589cf5f5557191501745975c56aeb992a6aa28bb67a4315ede5e8dbf2",
+      "completedAtUtc": "2026-11-25T02:46:21.656Z"
+    },
+    {
+      "method": "GET",
+      "url": "https://cloudfunctions.googleapis.com/v2/projects/ays-orbit-360-lab/locations/us-east1/functions/orbit360MakeLeadIngressPreview",
+      "startedAtUtc": "2026-11-25T02:46:21.656Z",
+      "httpStatus": 200,
+      "responseSha256": "8ad1f2424cbda543a94a3be29dc8a8fbdda0232380d1c5128f3b3f9e854d2d3a",
+      "completedAtUtc": "2026-11-25T02:46:22.015Z"
+    },
+    {
+      "method": "GET",
+      "url": "https://run.googleapis.com/v2/projects/ays-orbit-360-lab/locations/us-east1/services/orbit360makeleadingresspreview",
+      "startedAtUtc": "2026-11-25T02:46:22.015Z",
+      "httpStatus": 200,
+      "responseSha256": "9150862c45ff29f2a2a23be2a3cf2d1e772666eba395e2b334aec125c88a1d22",
+      "completedAtUtc": "2026-11-25T02:46:22.154Z"
+    },
+    {
+      "method": "GET",
+      "url": "https://us-east1-run.googleapis.com/apis/serving.knative.dev/v1/namespaces/ays-orbit-360-lab/services/orbit360makeleadingresspreview",
+      "startedAtUtc": "2026-11-25T02:46:22.154Z",
+      "httpStatus": 200,
+      "responseSha256": "b76b5f859823805e95ca353c7ec0d278e828bc69afabbf5d4404dfc09df59066",
+      "completedAtUtc": "2026-11-25T02:46:22.241Z"
+    }
+  ],
+  "grantReads": 2,
+  "identicalPrePostResponses": false,
+  "effectivePrePostUnchanged": true,
+  "persistentMutationRequests": 0,
+  "cloudWrites": 0,
+  "configurationWrites": 0,
+  "canonicalLeadWrites": 0,
+  "iamWrites": 0,
+  "externalMessagesSent": 0,
+  "rawRequestsPublished": false,
+  "rawResponsesPublished": false,
+  "releaseAuthority": false,
+  "errorCode": null,
+  "completedAtUtc": "2026-11-25T02:46:22.313Z",
+  "reportDigest": "4d664af5b61310de8589bcb93659a6f7e1c3458429a20c37e15178f31181e788"
+}
