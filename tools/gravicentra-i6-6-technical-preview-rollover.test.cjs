@@ -1480,3 +1480,184 @@ test('V4 retry owner and discriminating test are included in existing signed sou
     assert.ok(text.includes('      - ' + p + '\n'));
   assert.match(text, /^\s+node --test tools\/gravicentra-i6-6-technical-preview-rollover\.test\.cjs$/m);
 });
+
+
+// Exact V28 statistics settlement. Raw provider inventories remain private;
+// these synthetic inventories exercise the same complete-structure comparison.
+// The separate local evidence compares both real archive hashes with this owner.
+const statisticsReceiptPath = 'artifacts/orbit360-recovery/release-control/I6_6_V4_OBSERVED_PREVIEW_STATISTICS_CAUSAL_SOURCE_20261125.json';
+const statisticsReceiptText = fs.readFileSync(path.join(retryRepo, statisticsReceiptPath), 'utf8');
+const statisticsReceipt = JSON.parse(statisticsReceiptText);
+function statisticsContracts() {
+  const filename = path.join(__dirname, 'gravicentra-i6-6-preview-channel-reuse-guard.cjs'), mod = { exports: {} };
+  return new Function('require', 'module', 'exports', '__dirname',
+    fs.readFileSync(filename, 'utf8') + `
+    return { observed: validateObservedV4Statistics, evidence: readV4StatisticsEvidence,
+      runtime(config) {
+        technicalEnvironment=()=>config.environment;
+        technicalRuntimeIo=()=>config.io;
+        if(config.channels)validateTechnicalChannels=config.channels;
+        technicalLoadBundle=()=>config.bundle;
+        return {prepare:runtimePrepareTechnicalRollover,finish:runtimeFinishTechnicalRollover};
+      }};`)(require, mod, mod.exports, __dirname);
+}
+function statisticsFixture() {
+  const baseline = afterInventoriesFixture().initial;
+  const target = baseline.result[0];
+  target.name = 'sites/ays-orbit-360-lab/channels/' + statisticsReceipt.target.channelId;
+  target.release.name = target.name + '/releases/synthetic-baseline';
+  target.release.version.name = statisticsReceipt.target.version;
+  const settled = clone(baseline), currentTarget = settled.result.find(row => row.name === target.name);
+  Object.assign(currentTarget.release.version, statisticsReceipt.transition.after);
+  const receipt = clone(statisticsReceipt);
+  receipt.baselineEvidence.orderedChannelMetadataSha256 = api.inventoryDigest(baseline);
+  receipt.observed.orderedChannelMetadataSha256 = api.inventoryDigest(settled);
+  return { baseline, settled, receipt, target: currentTarget, evidence: clone(receipt.baselineEvidence) };
+}
+test('V4 observed statistics source receipt and exact failure31 are source-pinned without accepting the failed package', () => {
+  const receipt = statisticsContracts().evidence();
+  assert.equal(digest(statisticsReceiptText), '596a1b80bbf82b7e56dcfd4809942e25cc6bbedce2fecfa477833e92a2b636c2');
+  assert.equal(retryBlob(statisticsReceiptText), '2057d981ce6c71650ebae491d6b85a179e5baea3');
+  assert.deepEqual(receipt, statisticsReceipt);
+  assert.equal(receipt.v4Receipt.sha256, successfulPhysicalPin.receiptSha256);
+  assert.equal(receipt.baselineEvidence.orderedChannelMetadataSha256, 'cb29e689c3908709a446817a26dd6e56eba608f977295946732621c137ddc6f8');
+  assert.equal(receipt.observed.orderedChannelMetadataSha256, '0925cb520ee142fee9fee970fad626f8da1bfce9a8e8be4a31e48f73a0b5c5c8');
+  assert.equal(receipt.observed.wholeRunConclusion, 'failure');
+  assert.equal(receipt.observed.inventoryReadConclusion, 'success');
+  assert.equal(receipt.failedBuild31.originalRawInventoryRetained, false);
+  assert.equal(receipt.failedBuild31.laterObservationDoesNotReconstructOriginalRaw, true);
+  assert.equal(receipt.constraints.archiveAndHosted224FileReadbacksStillRequired, true);
+  assert.equal(receipt.constraints.firebaseFileCount226IsNotThePackageManifest224Count, true);
+});
+for (const [label, target] of [['settlement receipt', statisticsReceiptPath], ['failure31 receipt', statisticsReceipt.failedBuild31.receiptPath]])
+  test('V4 statistics fails closed on altered ' + label + ' bytes before any transition', () => {
+    const read = p => fs.readFileSync(path.join(retryRepo, p), 'utf8') + (p === target ? ' ' : '');
+    assert.throws(() => statisticsContracts().evidence(read), /RECEIPT_SHA_DRIFT/);
+  });
+test('V4 statistics permits only the complete observed two-field transition and does not mutate raw evidence', () => {
+  const f=statisticsFixture(), before=clone(f);
+  assert.equal(statisticsContracts().observed(f.settled,f.evidence,f.receipt),true);
+  assert.deepEqual(f,before);
+  assert.equal(api.validateInventoryPreimage(f.baseline,f.evidence),true);
+});
+for(const [label,mutate] of [
+  ['missing fileCount', f=>{delete f.target.release.version.fileCount;}],
+  ['missing versionBytes', f=>{delete f.target.release.version.versionBytes;}],
+  ['different fileCount', f=>{f.target.release.version.fileCount='224';}],
+  ['numeric instead of string statistic', f=>{f.target.release.version.fileCount=226;}],
+  ['different versionBytes', f=>{f.target.release.version.versionBytes='1659836';}],
+  ['different version identity', f=>{f.target.release.version.name='sites/ays-orbit-360-lab/versions/other';}],
+  ['different finalized status', f=>{f.target.release.version.status='CREATED';}],
+  ['target config edit', f=>{f.target.release.version.config.cleanUrls=true;}],
+  ['target expiry edit', f=>{f.target.expireTime='2099-01-01T00:00:00Z';}],
+  ['target release edit', f=>{f.target.release.releaseTime='2099-01-01T00:00:00Z';}],
+  ['target actor edit', f=>{f.target.release.releaseUser.email='different@example.invalid';}],
+  ['unknown target field', f=>{f.target.futureUnreviewedField=true;}],
+  ['other channel metadata edit', f=>{f.settled.result.find(r=>r!==f.target).futureUnreviewedField=true;}],
+  ['other channel statistic edit', f=>{f.settled.result.find(r=>r!==f.target).release.version.fileCount='226';}],
+  ['missing channel', f=>{f.settled.result.pop();}],
+  ['extra channel', f=>{f.settled.result.push({name:'sites/ays-orbit-360-lab/channels/extra'});}],
+])test('V4 statistics rejects unobserved '+label,()=>{
+  const f=statisticsFixture();mutate(f);
+  assert.throws(()=>statisticsContracts().observed(f.settled,f.evidence,f.receipt));
+});
+for(const [label,mutate] of [
+  ['configuration',f=>{f.target.release.version.config.cleanUrls=true;}],
+  ['another channel',f=>{f.settled.result.find(r=>r!==f.target).futureUnreviewedField=true;}],
+  ['unknown target field',f=>{f.target.futureUnreviewedField=true;}]
+])test('V4 normalized original hash still rejects '+label+' even if the observed-hash input is replaced',()=>{
+  const f=statisticsFixture();mutate(f);f.receipt.observed.orderedChannelMetadataSha256=api.inventoryDigest(f.settled);
+  assert.throws(()=>statisticsContracts().observed(f.settled,f.evidence,f.receipt),/NORMALIZED_BASELINE_DRIFT/);
+});
+test('V4 statistics cannot borrow another baseline receipt or broaden generic inventory comparison',()=>{
+  const f=statisticsFixture();f.evidence.runId++;
+  assert.throws(()=>statisticsContracts().observed(f.settled,f.evidence,f.receipt),/BASELINE_EVIDENCE_DRIFT/);
+  assert.throws(()=>api.validateInventoryPreimage(f.settled,statisticsFixture().evidence),/AUTHORIZED_INVENTORY_DRIFT/);
+});
+function retry32Fixture(){
+  const source='b4793a9def951fd1abc1afb494edb8a5cae1b5a8';
+  const original=JSON.parse(retryGitRead('show',source+':'+retryTransportPath)),control=clone(original);
+  control.priorFrontendPreviewRequestBeforeV32_20261125=clone(control.frontendPreviewRequest);
+  Object.assign(control.frontendPreviewRequest,{version:32,sourceQaHead:'e'.repeat(40),releaseMechanismSourceSha:'e'.repeat(40),reason:'Synthetic contract continuation after exact failed31.'});
+  const exact=statisticsReceipt.failedBuild31;
+  const failed={version:31,sourceSha:exact.sourceSha,runId:exact.buildRunId,attempt:exact.attempt,
+    status:'FAILED_BEFORE_PREVIEW_OVERWRITE',artifactCreated:true,receipt:{path:exact.receiptPath,gitBlobSha:exact.receiptGitBlobSha,sha256:exact.receiptSha256}};
+  control.failedImmutableBuildAttempts.push(failed);
+  const texts=new Map([...control.failedImmutableBuildAttempts.map(r=>r.receipt.path),statisticsReceiptPath]
+    .map(p=>[p,fs.readFileSync(path.join(retryRepo,p),'utf8')]));
+  const sources=new Map(control.failedImmutableBuildAttempts.map(r=>[r.sourceSha,JSON.parse(retryGitRead('show',r.sourceSha+':'+retryTransportPath))]));
+  const calls=[];const io={readText:p=>{assert.ok(texts.has(p));return texts.get(p);},git:(...args)=>{
+    calls.push(args);if(args[0]==='show'){const [s,p]=args[1].split(':');assert.equal(p,retryTransportPath);assert.ok(sources.has(s));return JSON.stringify(sources.get(s));}
+    if(args[0]==='merge-base'){assert.equal(args[1],'--is-ancestor');return '';}
+    assert.equal(args[0],'diff');assert.equal(args[1],'--quiet');assert.ok(args.includes('functions')&&args.includes('orbit360-platform'));return '';
+  }};
+  const changeFailure=mutate=>{const value=JSON.parse(texts.get(exact.receiptPath));mutate(value);const text=JSON.stringify(value);texts.set(exact.receiptPath,text);failed.receipt.gitBlobSha=retryBlob(text);failed.receipt.sha256=digest(text);};
+  return{control,failed,texts,sources,calls,io,changeFailure};
+}
+test('V4 retry32 accepts only the exact pinned failed31 plus29/30 and preserves whole-success artifact gates',()=>{
+  const f=retry32Fixture();assert.deepEqual(api.validateAuthorization(f.control,successfulPhysicalText,f.io),successfulPhysicalReceipt);
+  assert.equal(f.calls.filter(a=>a[0]==='show').length,3);
+  const a=successfulPhysicalFixture();a.run.conclusion='failure';
+  assert.throws(()=>api.validateArtifact(a.run,a.artifact,a.a.previousCandidate),/BACKUP_BUILD_NOT_SUCCESS/);
+  assert.throws(()=>candidateGuard.validateArtifact({buildRunId:a.run.id,sourceSha:a.run.head_sha,artifactId:a.artifact.id,artifactDigest:a.artifact.digest},a.run,a.artifact));
+});
+for(const [label,mutate] of [
+  ['replay31',f=>{f.control.frontendPreviewRequest.version=31;}],
+  ['missing31 failure',f=>{f.control.failedImmutableBuildAttempts.pop();}],
+  ['missing archived31',f=>{delete f.control.priorFrontendPreviewRequestBeforeV32_20261125;}],
+  ['relabelled inventory cause',f=>f.changeFailure(r=>{r.failureCode='I66_TECHNICAL_ROLLOVER_SUCCESSOR_REQUEST_REQUIRED';})],
+  ['prepackage instead of retained package',f=>{f.failed.status='FAILED_BEFORE_PACKAGE';f.changeFailure(r=>{r.schema='GI_I66_PREPACKAGE_QA_FAILURE_V1';r.status='FAILED_BEFORE_ARTIFACT_OR_DEPLOY';r.artifacts=0;r.build29Artifact=null;});}],
+  ['different artifact',f=>f.changeFailure(r=>{r.artifact.id++;})],
+  ['claimed recovered original inventory',f=>f.changeFailure(r=>{r.diagnosticArtifact.rawInventoryRetained=true;})],
+  ['diagnostic nonzero writes',f=>f.changeFailure(r=>{r.diagnosticArtifact.allWrites=1;})],
+  ['altered secondary receipt',f=>{f.texts.set(statisticsReceiptPath,statisticsReceiptText+' ');}]
+])test('V4 retry32 rejects '+label,()=>{const f=retry32Fixture();mutate(f);assert.throws(()=>api.validateAuthorization(f.control,successfulPhysicalText,f.io));});
+
+// Exercise the real prepare/finish flow with local filesystem + closed fake I/O.
+// Only external boundaries are replaced. Failures must leave the exact returned
+// inventory and its checksum before any later validation/readback can throw.
+function retainedInventoryHarness(){
+ const base=fs.mkdtempSync(path.join(os.tmpdir(),'gi-v4-retain-')),root=path.join(base,'rollover');
+ const f=afterInventoriesFixture(),a=clone(successfulPhysicalReceipt),rawZip=Buffer.from('synthetic verified archive'),tar=Buffer.from('synthetic tar');
+ a.channel.id=f.authorization.channel.id;
+ const zipDigest='sha256:'+digest(rawZip),newCandidate={sourceSha:'e'.repeat(40),buildRunId:45530000000,artifactId:99900001,artifactDigest:zipDigest,expectedSiteFileCount:224};
+ a.previousCandidate.artifactDigest=zipDigest;a.protectedLive.artifactDigest=zipDigest;
+ const bundle={manifest:[{relative:'index.html',hash:'a'.repeat(64)}],marker:{sourceSha:newCandidate.sourceSha},tarSha256:digest(tar),zipSha256:digest(rawZip),artifactId:newCandidate.artifactId};
+ const queue=[f.initial,f.initial],calls=[];
+ const io={inventory:()=>{calls.push('inventory');assert.ok(queue.length);return clone(queue.shift());},metadata:async()=>{calls.push('metadata');return{artifact:{}};},validateAcceptedLive:async()=>{calls.push('live-proof');},backup:async()=>{calls.push('backup');return bundle;},readback:async()=>{calls.push('readback');return{files:224};}};
+ let channelCalls=0;const config={environment:{receiptText:successfulPhysicalText,control:successfulPhysicalFixture().control,authorization:a,profile:{...successfulPhysicalPin,expectedSiteFileCount:224},root},io,bundle,
+ channels:()=>{channelCalls++;if(config.failChannelCall===channelCalls)throw Error('I66_TECHNICAL_ROLLOVER_AUTHORIZED_INVENTORY_DRIFT');}};
+ const env={RUNNER_TEMP:base,SOURCE_SHA:newCandidate.sourceSha,GITHUB_RUN_ID:String(newCandidate.buildRunId),ARTIFACT_ID:String(newCandidate.artifactId),ARTIFACT_DIGEST:zipDigest,PREVIEW_CHANNEL:a.channel.id,PREVIEW_URL:a.channel.origin};
+ fs.writeFileSync(path.join(base,'gi-i66-preview-result.json'),'HTTP Error: 429 channel quota');fs.writeFileSync(path.join(base,'gi-i66-exact-package.tar.gz'),tar);
+ function finishSetup(){
+  fs.mkdirSync(root);const bytes=JSON.stringify(f.initial,null,2)+'\n';fs.writeFileSync(path.join(root,'inventory-before.json'),bytes);
+  const before={status:'PREPARED_READONLY_NOT_ACCEPTED',receiptSha256:successfulPhysicalPin.receiptSha256,sourceSha:env.SOURCE_SHA,buildRunId:Number(env.GITHUB_RUN_ID),channelId:a.channel.id,inventorySha256:digest(bytes),newCandidate};
+  fs.writeFileSync(path.join(root,'before.json'),JSON.stringify(before));
+  for(const label of ['previous-preview','protected-live','new-candidate']){fs.mkdirSync(path.join(root,label));fs.writeFileSync(path.join(root,label,'verified-backup.zip'),rawZip);}
+  // Retain the synthetic exact target for finish; these are local flow fixtures.
+  a.channel.createdAt=f.authorization.channel.createdAt;a.channel.expectedVersion=f.authorization.channel.expectedVersion;
+ }
+ const runtime=statisticsContracts().runtime(config);
+ return{base,root,f,a,queue,calls,config,env,runtime,finishSetup,clean:()=>fs.rmSync(base,{recursive:true,force:true})};
+}
+for(const number of [1,2])test('prepare retains inventory '+(number===1?'initial':'fresh')+' and checksum before a HOLD',async()=>{
+ const h=retainedInventoryHarness();try{
+  h.config.failChannelCall=number;await assert.rejects(h.runtime.prepare(h.env),/AUTHORIZED_INVENTORY_DRIFT/);
+  const report=JSON.parse(fs.readFileSync(path.join(h.root,'before.json'))),name=number===1?'inventory-before.json':'inventory-before-fresh.json';
+  const bytes=fs.readFileSync(path.join(h.root,name));assert.equal(digest(bytes),report[number===1?'inventorySha256':'freshInventorySha256']);
+  assert.deepEqual(JSON.parse(bytes),h.f.initial);assert.equal(report.status,'HOLD');assert.equal(report.previewWrites,0);
+  if(number===1)assert.deepEqual(h.calls,['inventory']);
+ }finally{h.clean();}
+});
+test('finish retains first returned inventory and checksum before target validation fails',async()=>{
+ const h=retainedInventoryHarness();try{h.finishSetup();h.queue.splice(0,h.queue.length,{status:'success',result:[]});
+  await assert.rejects(h.runtime.finish(h.env),/INVENTORY_MISSING/);const r=JSON.parse(fs.readFileSync(path.join(h.root,'after.json')));
+  const b=fs.readFileSync(path.join(h.root,'inventory-after-first.json'));assert.equal(digest(b),r.firstInventorySha256);assert.equal(r.status,'HOLD');assert.deepEqual(h.calls,['inventory']);
+ }finally{h.clean();}
+});
+test('finish retains final returned inventory and checksum before concurrent metadata drift fails',async()=>{
+ const h=retainedInventoryHarness();try{h.finishSetup();const final=clone(h.f.final);final.result[0].unknownFutureField=true;h.queue.splice(0,h.queue.length,h.f.first,final);
+  await assert.rejects(h.runtime.finish(h.env),/TARGET_CONTENT_IDENTITY_CHANGED/);const r=JSON.parse(fs.readFileSync(path.join(h.root,'after.json')));
+  const b=fs.readFileSync(path.join(h.root,'inventory-after-final.json'));assert.equal(digest(b),r.finalInventorySha256);assert.deepEqual(JSON.parse(b),final);assert.equal(r.status,'HOLD');
+ }finally{h.clean();}
+});

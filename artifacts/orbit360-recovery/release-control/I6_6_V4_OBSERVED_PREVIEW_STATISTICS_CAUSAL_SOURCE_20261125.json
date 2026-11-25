@@ -1,0 +1,131 @@
+{
+  "schema": "GI_I66_V4_EXACT_OUTPUT_STATISTICS_SETTLEMENT_V1",
+  "status": "SOURCE_CORRECTION_ONLY_NEW_SIGNED_BUILD_REQUIRED",
+  "gate": "I6.6",
+  "classification": "EXACT_OBSERVED_PROVIDER_OUTPUT_STATISTICS_NOT_CONTENT_CHANGE",
+  "v4Receipt": {
+    "path": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_PHYSICAL_PREVIEW_V28_ROLLOVER_V4_20261124.json",
+    "gitBlobSha": "73615b75a1c95903cab82ca73126601278cf1f8c",
+    "sha256": "dd56c0a2a9ea19e261da36f53a62b3b7a29fbf7a9a54f20ad24dfa24d505c971"
+  },
+  "target": {
+    "channelId": "gi-i66-rc-45448470011",
+    "origin": "https://ays-orbit-360-lab--gi-i66-rc-45448470011-hrham9ah.web.app",
+    "version": "sites/ays-orbit-360-lab/versions/4d23b74c673db5df",
+    "status": "FINALIZED",
+    "sourceSha": "74ae28c6e6e6b40f845567c9b00738a58307b3cb"
+  },
+  "baselineEvidence": {
+    "runId": 45464287026,
+    "runAttempt": 1,
+    "workflowHeadSha": "74ae28c6e6e6b40f845567c9b00738a58307b3cb",
+    "jobId": 138695088715,
+    "workflowPath": ".github/workflows/gravicentra-release-delta-66-package.yml",
+    "wholeRun": "SUCCESS",
+    "wholeJob": "SUCCESS",
+    "artifactId": 14953218123,
+    "artifactDigest": "sha256:04bfde7a7f8296c98cc3d5d911e6e3de4a8318c4b28643590115c535ca847331",
+    "observedAtUtc": "2026-11-24T18:57:18.973Z",
+    "totalChannels": 51,
+    "finalInventorySha256": "5ef9467bd32f3614f3562d8eca08236fc8a9b7888f3f39511ab200227e5a3350",
+    "orderedChannelMetadataSha256": "cb29e689c3908709a446817a26dd6e56eba608f977295946732621c137ddc6f8",
+    "afterReportSha256": "2ea6fe94bff6d21e009f48ba809af286743e81184c5188b19695037afe99e9f8",
+    "firstAndFinalInventoriesIdentical": true,
+    "statisticsTransitions": [],
+    "otherChannelsIdenticalFullMetadata": 50,
+    "dualLiveUnchanged": true,
+    "inventoryReadWrites": 0,
+    "freshRuntimeInventoryRequiredAgain": true,
+    "publicEvidence": "Private raw inventory stays in the exact Actions artifact. Source contains only hashes and sanitized summaries; runtime compares every channel metadata field with a fresh complete inventory."
+  },
+  "observed": {
+    "runId": 45454934099,
+    "runAttempt": 3,
+    "jobId": 138873974631,
+    "workflowHeadSha": "89b10b8eff6512d83ff77f00759e15e25c0412fa",
+    "workflowPath": ".github/workflows/gravicentra-i66-preview-channel-inventory-readonly.yml",
+    "workflowSha256": "048009e2ca6d6c0a4f8ced9cf141c94d913e6148a53b041cf598f9939d41040e",
+    "wholeRunConclusion": "failure",
+    "inventoryReadStep": 5,
+    "inventoryReadConclusion": "success",
+    "markerStep": 6,
+    "markerConclusion": "failure",
+    "markerFailureCode": "I66_CURRENT_BUILD_MARKER_SOURCE_DRIFT_PREVIEW_V24",
+    "retentionStep": 7,
+    "retentionConclusion": "success",
+    "artifactId": 14975904699,
+    "artifactDigest": "sha256:7ad039fdd84401bce6c32547d0f00fb1ff50f759e284ea69f2e859a4b305681a",
+    "artifactCreatedAtUtc": "2026-11-25T00:08:10Z",
+    "inventoryArchiveEntry": "gi-channels-before.json",
+    "inventorySha256": "44a42eabe38202194468669e789901ada3a36c2a20efb713fcce2e40caf9bbfb",
+    "orderedChannelMetadataSha256": "0925cb520ee142fee9fee970fad626f8da1bfce9a8e8be4a31e48f73a0b5c5c8",
+    "totalChannels": 51,
+    "otherChannelsUnchangedFullMetadata": 50,
+    "rawInventoryPublishedInGit": false,
+    "archiveDigestVerified": true,
+    "providerUrl": "https://github.com/paulaosoriof86/orbit360-core/actions/runs/45454934099/attempts/3"
+  },
+  "transition": {
+    "onlyRemovedPathsForBaselineComparison": [
+      "release.version.fileCount",
+      "release.version.versionBytes"
+    ],
+    "before": {
+      "fileCount": {
+        "present": false
+      },
+      "versionBytes": {
+        "present": false
+      }
+    },
+    "after": {
+      "fileCount": "226",
+      "versionBytes": "1659835"
+    },
+    "removeOnlyTheseTwoFieldsMustReproduceFullBaselineOrderedDigest": true,
+    "allOtherChannelAndTargetFieldsExact": true
+  },
+  "failedBuild31": {
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_V31_ROLLOVER_PREOVERWRITE_FAILURE_20261125.json",
+    "receiptGitBlobSha": "8d28df11d36ff0c320a6b09e6dd2563b69a52b59",
+    "receiptSha256": "6065531d933d5e4a9f1e16ae10c46b22fd7a1881327b011ef41686bc9370296f",
+    "sourceSha": "b4793a9def951fd1abc1afb494edb8a5cae1b5a8",
+    "requestVersion": 31,
+    "buildRunId": 45514195497,
+    "attempt": 1,
+    "jobId": 138869415047,
+    "failureCode": "I66_TECHNICAL_ROLLOVER_AUTHORIZED_INVENTORY_DRIFT",
+    "originalConclusionRemainsFailure": true,
+    "originalRawInventoryRetained": false,
+    "laterObservationDoesNotReconstructOriginalRaw": true,
+    "noArtifactAcceptanceOrReuseGranted": true
+  },
+  "officialSemantics": {
+    "url": "https://firebase.google.com/docs/reference/hosting/rest/v1beta1/sites.versions",
+    "fields": [
+      "fileCount",
+      "versionBytes"
+    ],
+    "type": "string(int64)",
+    "outputOnly": true,
+    "calculatedAfterFinalized": true,
+    "finalizedContentNoLongerMutable": true
+  },
+  "constraints": {
+    "v4OriginalBytesUnchanged": true,
+    "noGenericStatisticsExclusion": true,
+    "exactObservedValuesOnly": true,
+    "allOther50ChannelsFullMetadataExact": true,
+    "newSourceAndArtifactRequired": true,
+    "wholeBuildSuccessStillRequired": true,
+    "archiveAndHosted224FileReadbacksStillRequired": true,
+    "firebaseFileCount226IsNotThePackageManifest224Count": true,
+    "noNewPermissionOrCloudWriter": true,
+    "noLiveAcceptanceGranted": true,
+    "noOriginalFailureRelabelled": true
+  },
+  "realDataWrites": 0,
+  "cloudMutationsByThisSourceReceipt": 0,
+  "signedFunctionalPass": false,
+  "productAccepted": false
+}

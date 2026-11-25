@@ -1,0 +1,78 @@
+{
+  "schema": "GI_I66_ROLLOVER_PREOVERWRITE_FAILURE_V1",
+  "status": "FAILED_AFTER_ARTIFACT_BEFORE_PREVIEW_OVERWRITE",
+  "gate": "I6.6",
+  "requestVersion": 31,
+  "sourceSha": "b4793a9def951fd1abc1afb494edb8a5cae1b5a8",
+  "buildRunId": 45514195497,
+  "attempt": 1,
+  "jobId": 138869415047,
+  "conclusion": "failure",
+  "failedStep": 10,
+  "failedStepName": "Publish exact immutable site only to isolated Hosting Preview",
+  "failureCode": "I66_TECHNICAL_ROLLOVER_AUTHORIZED_INVENTORY_DRIFT",
+  "providerUrl": "https://github.com/paulaosoriof86/orbit360-core/actions/runs/45514195497",
+  "artifact": {
+    "id": 14975539429,
+    "digest": "sha256:25d335a75d7703ea7f32a2c721497c81ab641c07e6701d9f31c761384a1365ba"
+  },
+  "artifacts": 1,
+  "previewOverwriteStarted": false,
+  "exactReadbackCompleted": false,
+  "hostingDeployments": 0,
+  "backendDeployments": 0,
+  "realDataWrites": 0,
+  "acceptedPhysicalLiveUnchanged": true,
+  "acceptedGeneration": "E3",
+  "fullI66ProductionAccepted": false,
+  "rolloverReceipt": {
+    "path": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_PHYSICAL_PREVIEW_V28_ROLLOVER_V4_20261124.json",
+    "sha256": "dd56c0a2a9ea19e261da36f53a62b3b7a29fbf7a9a54f20ad24dfa24d505c971"
+  },
+  "logEvidence": {
+    "sha256": "e2f5c0e60f7836352d259e31adeceec2b575757569794852bbd694fd04db740a",
+    "bytes": 2558168
+  },
+  "physicalMarkerReadback": {
+    "observedAtUtc": "2026-11-25T00:12:19.107989+00:00",
+    "proofSha256": "fceb8bb80958579057a1ad0630f861ec1526516151186dcc3eff43cc23369450",
+    "origins": [
+      {
+        "origin": "https://app.aysseguros.com",
+        "status": 200,
+        "bodySha256": "02479e8985b59f779e0ea6f931f781de3c7401019200256f1ecad6da390bca47",
+        "sourceSha": "65c825b2808a615ca4195bdde6689dbdbe3193b2",
+        "buildId": "gi-i66-65c825b2808a-57f234755dc1",
+        "gate": "I6.6"
+      },
+      {
+        "origin": "https://ays-orbit-360-lab.web.app",
+        "status": 200,
+        "bodySha256": "02479e8985b59f779e0ea6f931f781de3c7401019200256f1ecad6da390bca47",
+        "sourceSha": "65c825b2808a615ca4195bdde6689dbdbe3193b2",
+        "buildId": "gi-i66-65c825b2808a-57f234755dc1",
+        "gate": "I6.6"
+      },
+      {
+        "origin": "https://ays-orbit-360-lab--gi-i66-rc-45448470011-hrham9ah.web.app",
+        "status": 200,
+        "bodySha256": "8fab03a07bb93eff9d990e9e022d217c651d8cca8804af2a1ba73ff47c231d30",
+        "sourceSha": "74ae28c6e6e6b40f845567c9b00738a58307b3cb",
+        "buildId": "gi-i66-74ae28c6e6e6-57f234755dc1",
+        "gate": "I6.6"
+      }
+    ]
+  },
+  "cause": "The exact V4 channel inventory digest comparison rejected the current inventory before any Preview overwrite. The returned raw inventory was not retained before that validation threw. A later read-only inventory reproduces the rejection with two settled output-only fields of the unchanged V28 version; it does not reconstruct the unretained build31 inventory.",
+  "remedy": "Retain inventory evidence before validation. Source-pin only the separately evidenced V28 output-statistics transition, preserve every other channel field and the V4 original receipt, then certify the changed owner and test before issuing a new immutable source digest. Preserve the failure and never patch artifact31.",
+  "artifactCountMeaning": "Immutable release packages; one additional diagnostic archive is recorded separately.",
+  "diagnosticArtifact": {
+    "id": 14977546409,
+    "digest": "sha256:2b6d2ed24cf1a29decc00ca547a77f5bab220060e4f40dc29da17a6262989ad4",
+    "beforeReportSha256": "45a480b922610ebef0eba81ae97f498f350ed69db8a1e3370cba5571c5a4e145",
+    "beforeStatus": "HOLD",
+    "checks": [],
+    "allWrites": 0,
+    "rawInventoryRetained": false
+  }
+}

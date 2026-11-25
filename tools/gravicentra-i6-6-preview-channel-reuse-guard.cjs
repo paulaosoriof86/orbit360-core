@@ -141,6 +141,11 @@ const PHYSICAL_V4_SOURCE = '74ae28c6e6e6b40f845567c9b00738a58307b3cb';
 const PHYSICAL_V4_BUILD = 45464287026;
 const PHYSICAL_V4_ARTIFACT = 14953553588;
 const PHYSICAL_V4_DIGEST = 'sha256:8dae2c413cc774be504e3aa224b4333e2968c176fc74116c6c5f42c0a6a46290';
+// One independently observed settlement of V28's output-only statistics. This
+// source pin is not a generic exclusion of fileCount/versionBytes from identity.
+const PHYSICAL_V4_STATISTICS_RECEIPT = 'artifacts/orbit360-recovery/release-control/I6_6_V4_OBSERVED_PREVIEW_STATISTICS_CAUSAL_SOURCE_20261125.json';
+const PHYSICAL_V4_STATISTICS_SHA256 = '596a1b80bbf82b7e56dcfd4809942e25cc6bbedce2fecfa477833e92a2b636c2';
+const PHYSICAL_V4_STATISTICS_BLOB = '2057d981ce6c71650ebae491d6b85a179e5baea3';
 const isPhysicalProfile = a => [PHYSICAL_PROFILE, PHYSICAL_V4_PROFILE].includes(a?.profile);
 const PHYSICAL_LIVE_SOURCE = '65c825b2808a615ca4195bdde6689dbdbe3193b2';
 const PHYSICAL_LIVE_WORKFLOW = '.github/workflows/gravicentra-i66-privileged-role-exact-live-promotion.yml';
@@ -151,6 +156,20 @@ const technicalDigest = value => {
   technicalFail(/^[a-f0-9]{64}$/.test(result), 'DIGEST_INVALID');
   return 'sha256:' + result;
 };
+
+function readV4StatisticsEvidence(readText = relative => fs.readFileSync(path.join(__dirname, '..', relative), 'utf8')) {
+  const text = readText(PHYSICAL_V4_STATISTICS_RECEIPT), bytes = Buffer.from(text);
+  assert.equal(technicalSha(bytes), PHYSICAL_V4_STATISTICS_SHA256, 'I66_TECHNICAL_ROLLOVER_STATISTICS_RECEIPT_SHA_DRIFT');
+  assert.equal(crypto.createHash('sha1').update('blob ' + bytes.length + '\0').update(bytes).digest('hex'),
+    PHYSICAL_V4_STATISTICS_BLOB, 'I66_TECHNICAL_ROLLOVER_STATISTICS_RECEIPT_BLOB_DRIFT');
+  const receipt = JSON.parse(text), failure = receipt.failedBuild31;
+  assert.equal(receipt.schema, 'GI_I66_V4_EXACT_OUTPUT_STATISTICS_SETTLEMENT_V1');
+  const failureText = readText(failure.receiptPath), failureBytes = Buffer.from(failureText);
+  assert.equal(technicalSha(failureBytes), failure.receiptSha256, 'I66_TECHNICAL_ROLLOVER_STATISTICS_FAILURE_RECEIPT_SHA_DRIFT');
+  assert.equal(crypto.createHash('sha1').update('blob ' + failureBytes.length + '\0').update(failureBytes).digest('hex'),
+    failure.receiptGitBlobSha, 'I66_TECHNICAL_ROLLOVER_STATISTICS_FAILURE_RECEIPT_BLOB_DRIFT');
+  return receipt;
+}
 
 function technicalRolloverCandidatePin() {
   return {
@@ -307,6 +326,15 @@ function validatePhysicalRetryChain(control, profile, suppliedIo = {}) {
       acceptedPhysicalLiveUnchanged: true, acceptedGeneration: 'E3', fullI66ProductionAccepted: false }))
       assert.equal(receipt[key], expected, 'I66_TECHNICAL_ROLLOVER_RETRY_FAILURE_FACT_DRIFT_' + key);
     technicalFail(/^[a-f0-9]{64}$/.test(receipt.logEvidence?.sha256 || ''), 'RETRY_FAILURE_LOG_REQUIRED');
+    const knownInventoryFailure = previous === 31 || receipt.failureCode === 'I66_TECHNICAL_ROLLOVER_AUTHORIZED_INVENTORY_DRIFT';
+    if (knownInventoryFailure) {
+      const exact = readV4StatisticsEvidence(readText).failedBuild31;
+      assert.deepEqual(pin, { path: exact.receiptPath, gitBlobSha: exact.receiptGitBlobSha, sha256: exact.receiptSha256 },
+        'I66_TECHNICAL_ROLLOVER_RETRY_EXACT_INVENTORY_FAILURE_REQUIRED');
+      assert.deepEqual([previous, failed.sourceSha, failed.runId, failed.attempt, receipt.jobId, receipt.failureCode, failed.status],
+        [exact.requestVersion, exact.sourceSha, exact.buildRunId, exact.attempt, exact.jobId, exact.failureCode, 'FAILED_BEFORE_PREVIEW_OVERWRITE'],
+        'I66_TECHNICAL_ROLLOVER_RETRY_INVENTORY_FAILURE_IDENTITY_DRIFT');
+    }
     if (failed.status === 'FAILED_BEFORE_PACKAGE') {
       assert.equal(failed.artifactCreated, false, 'I66_TECHNICAL_ROLLOVER_RETRY_ARTIFACT_FACT_DRIFT');
       assert.equal(receipt.schema, 'GI_I66_PREPACKAGE_QA_FAILURE_V1');
@@ -317,7 +345,7 @@ function validatePhysicalRetryChain(control, profile, suppliedIo = {}) {
       assert.equal(failed.artifactCreated, true, 'I66_TECHNICAL_ROLLOVER_RETRY_ARTIFACT_FACT_DRIFT');
       assert.equal(receipt.schema, 'GI_I66_ROLLOVER_PREOVERWRITE_FAILURE_V1');
       assert.equal(receipt.status, 'FAILED_AFTER_ARTIFACT_BEFORE_PREVIEW_OVERWRITE');
-      assert.equal(receipt.failureCode, 'I66_TECHNICAL_ROLLOVER_SUCCESSOR_REQUEST_REQUIRED');
+      if (!knownInventoryFailure) assert.equal(receipt.failureCode, 'I66_TECHNICAL_ROLLOVER_SUCCESSOR_REQUEST_REQUIRED');
       assert.equal(receipt.previewOverwriteStarted, false, 'I66_TECHNICAL_ROLLOVER_RETRY_PREVIEW_OVERWRITE_DENIED');
       assert.equal(receipt.exactReadbackCompleted, false, 'I66_TECHNICAL_ROLLOVER_RETRY_COMPLETED_READBACK_DENIED');
       assert.equal(receipt.artifacts, 1);
@@ -429,6 +457,28 @@ const technicalCanonical = value => Array.isArray(value) ? value.map(technicalCa
   : value && typeof value === 'object' ? Object.fromEntries(Object.keys(value).sort().map(key => [key, technicalCanonical(value[key])])) : value;
 const technicalInventoryDigest = inventory => technicalSha(JSON.stringify(technicalCanonical(technicalOrderedRows(inventory))));
 
+// The caller supplies only the receipt whose bytes were source-pinned above.
+// Even the observed settled digest must reduce to the COMPLETE original digest
+// after removing exactly these two target fields. Inputs remain unchanged.
+function validateObservedV4Statistics(inventory, evidence, receipt) {
+  assert.deepEqual(evidence, receipt.baselineEvidence, 'I66_TECHNICAL_ROLLOVER_STATISTICS_BASELINE_EVIDENCE_DRIFT');
+  assert.equal(technicalInventoryDigest(inventory), receipt.observed.orderedChannelMetadataSha256,
+    'I66_TECHNICAL_ROLLOVER_UNOBSERVED_INVENTORY_DRIFT');
+  const copy = structuredClone(inventory), rows = technicalRows(copy);
+  const targets = rows.filter(row => technicalChannelIdentity(row) === receipt.target.channelId);
+  assert.equal(targets.length, 1, 'I66_TECHNICAL_ROLLOVER_STATISTICS_TARGET_NOT_UNIQUE');
+  const target = targets[0], version = target.release?.version;
+  assert.equal(technicalVersion(target), receipt.target.version, 'I66_TECHNICAL_ROLLOVER_STATISTICS_VERSION_DRIFT');
+  assert.equal(version?.status, 'FINALIZED', 'I66_TECHNICAL_ROLLOVER_STATISTICS_TARGET_NOT_FINALIZED');
+  for (const key of ['fileCount', 'versionBytes']) {
+    assert.equal(version[key], receipt.transition.after[key], 'I66_TECHNICAL_ROLLOVER_UNOBSERVED_STATISTIC_' + key);
+    delete version[key];
+  }
+  assert.equal(technicalInventoryDigest(copy), evidence.orderedChannelMetadataSha256,
+    'I66_TECHNICAL_ROLLOVER_STATISTICS_NORMALIZED_BASELINE_DRIFT');
+  return true;
+}
+
 function validateTechnicalInventoryPreimage(inventory, evidence) {
   technicalFail((!inventory.status || inventory.status === 'success') && !inventory.error &&
     !inventory.result?.error, 'INVENTORY_API_ERROR');
@@ -436,8 +486,11 @@ function validateTechnicalInventoryPreimage(inventory, evidence) {
   const rows = technicalRows(inventory), ids = rows.map(technicalChannelIdentity);
   technicalFail(new Set(ids).size === ids.length, 'DUPLICATE_OR_EMPTY_CHANNEL');
   assert.equal(rows.length, evidence.totalChannels, 'I66_TECHNICAL_ROLLOVER_CHANNEL_COUNT_DRIFT');
-  assert.equal(technicalInventoryDigest(inventory), evidence.orderedChannelMetadataSha256,
-    'I66_TECHNICAL_ROLLOVER_AUTHORIZED_INVENTORY_DRIFT');
+  const actual = technicalInventoryDigest(inventory);
+  if (actual !== evidence.orderedChannelMetadataSha256 &&
+      evidence.orderedChannelMetadataSha256 === 'cb29e689c3908709a446817a26dd6e56eba608f977295946732621c137ddc6f8')
+    return validateObservedV4Statistics(inventory, evidence, readV4StatisticsEvidence());
+  assert.equal(actual, evidence.orderedChannelMetadataSha256, 'I66_TECHNICAL_ROLLOVER_AUTHORIZED_INVENTORY_DRIFT');
   return true;
 }
 
@@ -969,11 +1022,12 @@ async function runtimePrepareTechnicalRollover(env = process.env) {
     backendWrites: 0, businessDataWrites: 0, channelDeletions: 0, authRulesIamWrites: 0, productAccepted: false, checks: [] };
   const io = technicalRuntimeIo(env, root, a);
   try {
-    const initial = io.inventory(); validateTechnicalChannels(control, receiptText, initial);
-    report.totalChannels = technicalRows(initial).length;
+    const initial = io.inventory();
     const initialText = JSON.stringify(initial, null, 2) + '\n';
     fs.writeFileSync(path.join(root, 'inventory-before.json'), initialText, { flag: 'wx', mode: 0o600 });
     report.inventorySha256 = technicalSha(initialText);
+    validateTechnicalChannels(control, receiptText, initial);
+    report.totalChannels = technicalRows(initial).length;
     const [oldMeta, liveMeta, newMeta] = await Promise.all([io.metadata(a.previousCandidate), io.metadata(a.protectedLive), io.metadata(expectedNew, { currentBuild: true })]);
     if (oldMeta.residualInventory) {
       const untouched = value => technicalOrderedRows(value).filter(row => technicalChannelId(row) !== a.channel.id);
@@ -993,7 +1047,10 @@ async function runtimePrepareTechnicalRollover(env = process.env) {
       next: { artifactId: next.artifactId, zipSha256: next.zipSha256, tarSha256: next.tarSha256, marker: next.marker } };
     report.readbacks = [await io.readback(a.channel.origin, previous)];
     for (const origin of TECHNICAL_LIVE_ORIGINS) report.readbacks.push(await io.readback(origin, live));
-    const fresh = io.inventory(); validateTechnicalChannels(control, receiptText, fresh);
+    const fresh = io.inventory();
+    technicalWriteJson(path.join(root, 'inventory-before-fresh.json'), fresh);
+    report.freshInventorySha256 = technicalSha(fs.readFileSync(path.join(root, 'inventory-before-fresh.json')));
+    validateTechnicalChannels(control, receiptText, fresh);
     assert.deepEqual(technicalOrderedRows(fresh), technicalOrderedRows(initial), 'I66_TECHNICAL_ROLLOVER_CONCURRENT_BEFORE_CHANGE');
     report.checks = ['EXACT_AUTHORITY_AND_QUOTA', 'PREVIOUS_LIVE_AND_NEW_ARCHIVES_DIGEST_VERIFIED', 'PREVIOUS_AND_DUAL_LIVE_' + profile.expectedSiteFileCount + '_FILES_EACH_EXACT', 'NEW_LOCAL_PACKAGE_EQUALS_UPLOADED_ARCHIVE', 'FRESH_INVENTORY_UNCHANGED'];
     report.status = 'PREPARED_READONLY_NOT_ACCEPTED'; report.recordedAtUtc = new Date().toISOString();

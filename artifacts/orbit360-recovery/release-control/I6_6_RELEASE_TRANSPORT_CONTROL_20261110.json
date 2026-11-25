@@ -8892,6 +8892,19 @@
         "gitBlobSha": "1931aa51b12cfc23c1d2f3327f63d55b853d0050",
         "sha256": "7c1d29c8eaaad4785720c25c940da35911250e443fb4f374f147e40756ca7dff"
       }
+    },
+    {
+      "version": 31,
+      "sourceSha": "b4793a9def951fd1abc1afb494edb8a5cae1b5a8",
+      "runId": 45514195497,
+      "attempt": 1,
+      "status": "FAILED_BEFORE_PREVIEW_OVERWRITE",
+      "artifactCreated": true,
+      "receipt": {
+        "path": "artifacts/orbit360-recovery/release-control/I6_6_V31_ROLLOVER_PREOVERWRITE_FAILURE_20261125.json",
+        "gitBlobSha": "8d28df11d36ff0c320a6b09e6dd2563b69a52b59",
+        "sha256": "6065531d933d5e4a9f1e16ae10c46b22fd7a1881327b011ef41686bc9370296f"
+      }
     }
   ],
   "priorFrontendPreviewRequestBeforeV30_20261124": {
