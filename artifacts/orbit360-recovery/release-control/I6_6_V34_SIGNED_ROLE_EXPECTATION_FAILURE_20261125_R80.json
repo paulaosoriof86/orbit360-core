@@ -1,0 +1,284 @@
+{
+  "schema": "GI_I66_V34_SIGNED_ROLE_EXPECTATION_FAILURE_AND_CONTINUITY_V1",
+  "status": "BUILD_AND_224_HOSTING_PASS_MAKE_PREVIEW_PASS_SIGNED_ROLE_GUARD_FAILED_COMPENSATION_VERIFIED",
+  "activeGate": "I6.6",
+  "recordedAtUtc": "2026-11-25T04:30:54.265Z",
+  "target": {
+    "sourceSha": "a06e5b692595a863a6c6f6b223d895d874abb90e",
+    "artifactId": 14987684993,
+    "artifactDigest": "sha256:08706bc64a5ca578fcf3fb305354adc1ba8a55347421f4226406f5092c3f46a0",
+    "buildId": "gi-i66-a06e5b692595-57f234755dc1",
+    "buildRunId": 45539669479,
+    "previewUrl": "https://ays-orbit-360-lab--gi-i66-rc-45518809761-eiytd3a3.web.app",
+    "previewChannel": "gi-i66-rc-45518809761"
+  },
+  "immutableBuild": {
+    "conclusion": "success",
+    "receipt": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_6_V34_IMMUTABLE_BUILD_RECEIPT_20261124.json",
+      "gitBlobSha": "244b5c47d0c43297dbe22d7c707093c661fc6bf1",
+      "sha256": "5d1ea1a534435769432154ac26956653282463ac4f6505ae8e893c16f1a81d21"
+    },
+    "siteFiles": 224,
+    "readbackFiles": 224,
+    "artifactPatched": false
+  },
+  "signedPreview": {
+    "runId": 45542808183,
+    "runAttempt": 1,
+    "headSha": "c959e688004db9e659348c55ad096cc361ec7061",
+    "jobId": 138965227802,
+    "conclusion": "failure",
+    "successfulStepsBeforeFailure": [
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14
+    ],
+    "failedSteps": [
+      15
+    ],
+    "compensationStep": 18,
+    "compensationStepConclusion": "success",
+    "skippedSteps": [
+      16,
+      17
+    ],
+    "signedReadonlyRoleGuardExecuted": true,
+    "productFormCrudExecuted": false,
+    "directFormsExecuted": false,
+    "wholeRunAccepted": false
+  },
+  "observedDeployment": {
+    "previewFunctionsDeployed": 5,
+    "inventoryReadback": "PASS_COUNT_5",
+    "liveHostingFingerprintsUnchangedDuringRun": true,
+    "livePromotionExecuted": false,
+    "makeClosedDeploymentReceiptPresent": true,
+    "makeTriggerCaptureAccepted": true,
+    "makeProbeExecuted": true,
+    "makePreviewProofAccepted": true,
+    "realLeadAccepted": false,
+    "externalMessagesSent": 0
+  },
+  "failure": {
+    "safeCode": "I66_OPERATIVO_SIGNED_TENANT_HIDDEN_MODULE_EXPOSED_cancelaciones_true_false_",
+    "boundary": "The first signed read-only role driver completed package and Operativo rights reads, then required cancelaciones/comisiones to be hidden. The observed approved Operativo matrix exposes those modules. The subsequent synthetic CRUD, direct-form and documentary drivers did not execute.",
+    "causalOwner": "tools/gravicentra-i66-privileged-role-signed-ui-permissions-readonly.cjs",
+    "cause": "STALE_HIDDEN_MODULE_EXPECTATION_CONTRADICTS_APPROVED_OPERATIVO_MATRIX",
+    "productFormSaveFailureProven": false,
+    "sourceCorrectionUnderReview": true,
+    "newBuildIssuedByThisCheckpoint": false
+  },
+  "makePreview": {
+    "status": "PASS_SYNTHETIC_ONLY",
+    "proof": {
+      "sha256": "8bd1937a025e71d5b047bdfa8137fceef5cee4714e0f5f8fb88eabcc49ec7484",
+      "gitBlobSha": "ea5e67557d90a72326bc0a74c510057cfeb32f6f"
+    },
+    "providerArtifactId": 14990922302,
+    "createdCanonicalLeads": 1,
+    "replayCanonicalWrites": 0,
+    "rejectCanonicalWrites": 0,
+    "syntheticDocumentsRestored": 5,
+    "syntheticRestoreComplete": true,
+    "queueExecutions": [
+      {
+        "stage": "PROBE",
+        "path": "artifacts/orbit360-recovery/release-control/I6_6_MAKE_V34_PREVIEW_PROBE_EXECUTION_20261124.json",
+        "gitBlobSha": "a3e546914d6dff2208663f734989dc7ff487c0b7",
+        "sha256": "9606042738dd8cf8d95597b57a738064c6b2bf8c02dc13b7007c042c27426e26",
+        "executionId": "8493beba84e9446ebbf9bbb0b314491b"
+      },
+      {
+        "stage": "CREATE",
+        "path": "artifacts/orbit360-recovery/release-control/I6_6_MAKE_V34_PREVIEW_CREATE_EXECUTION_20261124.json",
+        "gitBlobSha": "26eda46b7d3c2a730c9db6edca93d557791c10d2",
+        "sha256": "00abec8c121cd7623d7ebb034e6aedeeaaf9bc5b04e415ee5cc45ff501297f56",
+        "executionId": "4158664eadae41628d3ef26a4957f380"
+      },
+      {
+        "stage": "REPLAY",
+        "path": "artifacts/orbit360-recovery/release-control/I6_6_MAKE_V34_PREVIEW_REPLAY_EXECUTION_20261124.json",
+        "gitBlobSha": "d347aac0db4b89592b1d6a460fb5eb028b9b1fd3",
+        "sha256": "5efea2af7ecf9db0cede42c36bb10b3b4931342ba74b196bf9ca2be7de7f20e2",
+        "executionId": "9934689810114b54aed7092bfffbb889"
+      },
+      {
+        "stage": "REJECT",
+        "path": "artifacts/orbit360-recovery/release-control/I6_6_MAKE_V34_PREVIEW_REJECT_EXECUTION_20261124.json",
+        "gitBlobSha": "09f56569d37e4b979163487ccb993a1ddb82daca",
+        "sha256": "d479dcb662fd5acf53fe6104f62e185adc4aea61723d445847f3d8b3c97c17e8",
+        "executionId": "fe5badde83b44fcf93c050e7276a3ebf"
+      }
+    ],
+    "closedConfigDigest": "85c66e5da953c264ade12519bb5ad00155830da30bb7572235ab8a62e0de0563",
+    "realLeadAccepted": false,
+    "externalMessagesSent": 0
+  },
+  "compensation": {
+    "status": "COMPENSATION_READBACK_VERIFIED",
+    "configuration": {
+      "status": "CLOSED_CONFIG_READBACK_VERIFIED",
+      "configurationWrites": 0,
+      "afterDigest": "85c66e5da953c264ade12519bb5ad00155830da30bb7572235ab8a62e0de0563"
+    },
+    "trigger": {
+      "status": "EXACT_PREVIOUS_PREVIEW_REVISION_RESTORED",
+      "functionDeletes": 0,
+      "trafficWrites": 1,
+      "restoredRevision": "orbit360makeleadingresspreview-00001-cuy",
+      "trafficReadbackDigest": "3534d16850f4257d0a056d2304e44109699ed2953cba1851e5896c8ff2ba9f74",
+      "trafficV1": {
+        "responseSha256": "602ddc77cfdfba7d888c2b68fc1b85a80ddd2a20c79563b42c1bfc3d0b14d7bf",
+        "service": "projects/ays-orbit-360-lab/locations/us-east1/services/orbit360makeleadingresspreview",
+        "serviceUid": "2cb4dc4b-ad08-442e-bf39-4fc0803bd111",
+        "generation": "8",
+        "resourceVersionSha256": "e6bcf0883ffcab7b5876f863891df897f03de457d5965efb57f6897b27f9b0e5",
+        "templateSha256": "a60a89227628120db7866319887baf36e74c0cccad6823ff01eae0133981ed38"
+      },
+      "closedGrantBefore": {
+        "exists": true,
+        "digest": "85c66e5da953c264ade12519bb5ad00155830da30bb7572235ab8a62e0de0563",
+        "state": "CLOSED"
+      },
+      "closedGrantAfter": {
+        "exists": true,
+        "digest": "85c66e5da953c264ade12519bb5ad00155830da30bb7572235ab8a62e0de0563",
+        "state": "CLOSED"
+      }
+    },
+    "functionApiRevisionObservedAfterRollback": "orbit360makeleadingresspreview-00006-xaz",
+    "functionMetadataRestored": false,
+    "allFiveBackendFunctionsRestored": false,
+    "failures": [],
+    "readback": {
+      "sha256": "21382cc4d5e72f2f82678c46d93888a23a21358fc76e7564a87cb1a20d8a9c56",
+      "gitBlobSha": "61e117eafbddfc84bc6423c8604f65fc0b647dcb"
+    }
+  },
+  "makeScenarioCurrent": {
+    "writerScenarioId": 10196136,
+    "status": "active",
+    "trigger": "on-demand",
+    "writerModuleId": 3,
+    "writerDisabled": true,
+    "writerLastEdit": "2026-11-25T04:08:30.749Z",
+    "observerScenarioId": 10228826,
+    "observerBefore": "active",
+    "observerAfter": "inactive",
+    "observerDeactivatedThisContinuation": true,
+    "observerStatusOnlyChanged": true,
+    "observerReadbackSha256": "725ecd127cc0d1dc16a227817888fd97d943b4dd77b51e275064eb73e8e5b1b3",
+    "observedAtUtc": "2026-11-25 04:28:44 UTC",
+    "ingressScenarioChangedByThisCheckpoint": false,
+    "makeExecutionsByThisCheckpoint": 0
+  },
+  "evidence": {
+    "logSha256": "59cdbfb3c04ce6254142e70c20881618bcae8d6cf5d1f1f6a98e2730db8ff1e0",
+    "makeArtifact": {
+      "id": 14990922302,
+      "digest": "sha256:acc8b2bad87f7bd005bc189010365503d7fe2eee539ce6efad393a39003fc1ec"
+    },
+    "generalArtifact": {
+      "id": 14991630855,
+      "digest": "sha256:b302dae75acadd290c98d61a6b8ed846539803a36cba89c9c44b1e4f34e2590a"
+    },
+    "preservedMakeReports": {
+      "gi-make-preview-before-deploy.json": {
+        "sha256": "2ee16ef2d2950e9761cc8b51e645bf7ecde3afecb3e853e538d4fbb1089531d9",
+        "gitBlobSha": "d013ee85dda68147188fd599150a9ded2fd90f56"
+      },
+      "gi-make-preview-capture-trigger-observation.json": {
+        "sha256": "c9546769ce1668b76c27b44b0b1e558b08f389f62f2b56b584f6c468f7471388",
+        "gitBlobSha": "3b182b9211b105fdd9797c4a5cfaa73a3c3e095e"
+      },
+      "gi-make-preview-capture-trigger.json": {
+        "sha256": "60354320549f86018eb14f84688e5b0585319704139757855b862fbdbf489ac4",
+        "gitBlobSha": "fde048df24eafc8b83dbb7cecaa0f3017e1450cc"
+      },
+      "gi-make-preview-closed-trigger.json": {
+        "sha256": "ba3f485d18bc3c9a428c385f6045b1a6bb5f32a0c64235b711160fe1521f9853",
+        "gitBlobSha": "c6a6335db67373d06030a6cbf6413e8ccd804338"
+      },
+      "gi-make-preview-initialize-closed.json": {
+        "sha256": "cad4a11fca54a5df086886b8398a605d46fd9a729d4a4100d3e05056bf5c3b83",
+        "gitBlobSha": "a083c1d66a1bd7c0f3a5ac7182e688334889ada9"
+      },
+      "gi-make-preview-last-operation.json": {
+        "sha256": "a57bb2607f2369b64b85636bdeffd64297b92361ee2e8b0cc02461b6304a597c",
+        "gitBlobSha": "ee7bd5b3e8c6390d69868bf9894e11b29e6f45c0"
+      },
+      "gi-make-preview-operation-1.json": {
+        "sha256": "ba3f485d18bc3c9a428c385f6045b1a6bb5f32a0c64235b711160fe1521f9853",
+        "gitBlobSha": "c6a6335db67373d06030a6cbf6413e8ccd804338"
+      },
+      "gi-make-preview-operation-2.json": {
+        "sha256": "111a122f049eee695cc324c1241fc69f4d73e552581ea24016385cde61c18bb8",
+        "gitBlobSha": "23c3e92632c309b4b0c54e820ee3003b4467b2e8"
+      },
+      "gi-make-preview-operation-3.json": {
+        "sha256": "4378f67dfb787532247172a11757f3d1d4ec158e6e729b4035497198fc945629",
+        "gitBlobSha": "f8b61d9050eb0deb983742ab1720504724fe40a8"
+      },
+      "gi-make-preview-operation-4.json": {
+        "sha256": "9b8625ca8e350b88b45b17a40b6e252a2a5822297fa9f2b8e08ec4c91627116b",
+        "gitBlobSha": "0664290096e1ba05130a3f16a6f3724c6c1448da"
+      },
+      "gi-make-preview-operation-5.json": {
+        "sha256": "8bd1937a025e71d5b047bdfa8137fceef5cee4714e0f5f8fb88eabcc49ec7484",
+        "gitBlobSha": "ea5e67557d90a72326bc0a74c510057cfeb32f6f"
+      },
+      "gi-make-preview-proof.json": {
+        "sha256": "051d14a8853cf24a890e35ddfb3d27bb15ac109b4c5455811a6e24c78afd5d74",
+        "gitBlobSha": "8a4c976356f71d02bd52c9d345f5484e60111276"
+      },
+      "gi-make-preview-rollback.json": {
+        "sha256": "21382cc4d5e72f2f82678c46d93888a23a21358fc76e7564a87cb1a20d8a9c56",
+        "gitBlobSha": "61e117eafbddfc84bc6423c8604f65fc0b647dcb"
+      },
+      "gi-make-preview-snapshot-trigger.json": {
+        "sha256": "8cb0f73da6dcd1c3fff6e4a0f8e065d341640ea50ad1657e93cb08cda510ee27",
+        "gitBlobSha": "6ccf88b95d06791627b0c36f2882765610020a7e"
+      },
+      "gi-make-preview-wait-config.json": {
+        "sha256": "051d14a8853cf24a890e35ddfb3d27bb15ac109b4c5455811a6e24c78afd5d74",
+        "gitBlobSha": "8a4c976356f71d02bd52c9d345f5484e60111276"
+      },
+      "gi-make-preview-wait-probe.json": {
+        "sha256": "ba3f485d18bc3c9a428c385f6045b1a6bb5f32a0c64235b711160fe1521f9853",
+        "gitBlobSha": "c6a6335db67373d06030a6cbf6413e8ccd804338"
+      }
+    },
+    "guardDidNotProduceDownstreamUiReports": [
+      {
+        "owner": "ADVISOR",
+        "status": "REPORT_NOT_FOUND"
+      },
+      {
+        "owner": "PROPOSAL",
+        "status": "REPORT_NOT_FOUND"
+      },
+      {
+        "owner": "DIRECT_FORMS",
+        "status": "REPORT_NOT_FOUND"
+      }
+    ]
+  },
+  "acceptedProductionRemains": "E3",
+  "artifactPatched": false,
+  "artifactRebuilt": false,
+  "newBuildRequested": false,
+  "newProductSourceCreated": false,
+  "newLiveAcceptance": false,
+  "financialPaymentsCreated": 0,
+  "financial6772CapturePreserved": true,
+  "fullI66ProductionAccepted": false
+}
