@@ -429,7 +429,7 @@ jobs:
        retention-days: 30
     - name: Seal technical LIVE pending Paula visual
       if: steps.mode.outputs.mode == 'release'
-      env:
+      env: &e4
        BUILD_ID: ${{ steps.build.outputs.build_id }}
        HOSTED_FILE_COUNT: ${{ steps.build.outputs.hosted_file_count }}
        HOSTED_PAYLOAD_DIGEST: ${{ steps.build.outputs.hosted_payload_digest }}
@@ -544,7 +544,7 @@ jobs:
    if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) && inputs.private_alice_matching_readback != true && !contains(github.event.head_commit.message || '', '[alice-private-matching-readback]') && inputs.private_i66_financial_readback != true && !contains(github.event.head_commit.message || '', '[i66-financial-private-readback]') }}
    runs-on: ubuntu-24.04
    timeout-minutes: 50
-   env:
+   env: &e5
     SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
     SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
     SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
@@ -614,7 +614,7 @@ jobs:
 
     - name: Select existing Firebase authority
       if: steps.mode.outputs.mode == 'release'
-      run: |
+      run: &r4 |
         set -euo pipefail
         ROOT="$RUNNER_TEMP/i65-auth"; mkdir -p "$ROOT"; export ROOT
         python3 - <<'PY'
@@ -707,7 +707,7 @@ jobs:
        TARGET_URL: ${{ steps.preview.outputs.preview_url }}
        EXPECTED_BUILD_ID: ${{ steps.build.outputs.build_id }}
        EXPECTED_DIGEST: ${{ steps.build.outputs.hosted_payload_digest }}
-      run: |
+      run: &r1 |
         set -euo pipefail
         export MANIFEST="$RUNNER_TEMP/i65-package/evidence/site-manifest.sha256"
         python3 - <<'PY'
@@ -765,7 +765,7 @@ jobs:
     - name: Bind rollback to previous certified artifact and promote exact Preview channel
       if: steps.mode.outputs.mode == 'release'
       id: promote
-      run: |
+      run: &r5 |
         set -euo pipefail
         RB=$(node -e "const c=require('./'+process.env.CONTROL);process.stdout.write(String(c.certifiedCandidate?.previewChannelId||''))")
         test -n "$RB" || { echo I65_PREVIOUS_CERTIFIED_PREVIEW_CHANNEL_MISSING >&2; exit 43; }
@@ -787,7 +787,7 @@ jobs:
        TARGET_URL: ${{ env.PRODUCTION_URL }}
        EXPECTED_BUILD_ID: ${{ steps.build.outputs.build_id }}
        EXPECTED_DIGEST: ${{ steps.build.outputs.hosted_payload_digest }}
-      run: |
+      run: &r2 |
         set -euo pipefail
         export MANIFEST="$RUNNER_TEMP/i65-package/evidence/site-manifest.sha256"
         python3 - <<'PY'
@@ -842,21 +842,7 @@ jobs:
        retention-days: 30
     - name: Seal I6.5 synchronized read path LIVE
       if: steps.mode.outputs.mode == 'release'
-      env:
-       BUILD_ID: ${{ steps.build.outputs.build_id }}
-       HOSTED_FILE_COUNT: ${{ steps.build.outputs.hosted_file_count }}
-       HOSTED_PAYLOAD_DIGEST: ${{ steps.build.outputs.hosted_payload_digest }}
-       BACKEND_FILE_COUNT: ${{ steps.build.outputs.backend_file_count }}
-       BACKEND_SOURCE_DIGEST: ${{ steps.build.outputs.backend_source_digest }}
-       BUNDLE_FILE_COUNT: ${{ steps.build.outputs.bundle_file_count }}
-       BUNDLE_DIGEST: ${{ steps.build.outputs.bundle_digest }}
-       PREVIEW_CHANNEL_ID: ${{ steps.preview.outputs.channel_id }}
-       PREVIEW_URL: ${{ steps.preview.outputs.preview_url }}
-       ROLLBACK_CHANNEL_ID: ${{ steps.promote.outputs.rollback_channel }}
-       ARTIFACT_ID: ${{ steps.buildart.outputs.artifact-id }}
-       ARTIFACT_DIGEST: ${{ steps.buildart.outputs.artifact-digest }}
-       LIVE_EVIDENCE_ARTIFACT_ID: ${{ steps.liveart.outputs.artifact-id }}
-       LIVE_EVIDENCE_ARTIFACT_DIGEST: ${{ steps.liveart.outputs.artifact-digest }}
+      env: *e4
       run: |
         set -euo pipefail
         node - <<'NODE'
@@ -953,12 +939,7 @@ jobs:
    if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) && inputs.private_alice_matching_readback != true && !contains(github.event.head_commit.message || '', '[alice-private-matching-readback]') && inputs.private_i66_financial_readback != true && !contains(github.event.head_commit.message || '', '[i66-financial-private-readback]') }}
    runs-on: ubuntu-24.04
    timeout-minutes: 50
-   env:
-    SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
-    SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
-    SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
-    SOURCE_INTAKE: artifacts/orbit360-recovery/release-control/I6_5_RECIBOS_CARTERA_SOURCE_INTAKE_20260918.json
-    REGISTRY: artifacts/orbit360-recovery/release-control/DATA_UPDATE_MECHANISM_REGISTRY.json
+   env: *e5
    steps:
     - uses: actions/checkout@v4
       with:
@@ -1028,29 +1009,7 @@ jobs:
 
     - name: Select existing Firebase authority
       if: steps.mode.outputs.mode == 'release'
-      run: |
-        set -euo pipefail
-        ROOT="$RUNNER_TEMP/i65-auth"; mkdir -p "$ROOT"; export ROOT
-        python3 - <<'PY'
-        import json,os,pathlib
-        rows=[]
-        for i,k in enumerate(['SA_DEFAULT','SA_ORBIT360_LAB','SA_ORBIT_360_LAB']):
-            try:d=json.loads(os.environ.get(k,''))
-            except:continue
-            if d.get('type')=='service_account' and d.get('project_id')=='ays-orbit-360-lab' and d.get('private_key') and d.get('client_email'):
-                p=pathlib.Path(os.environ['ROOT'])/f'{i}.json';p.write_text(json.dumps(d));p.chmod(0o600);rows.append(str(p))
-        if not rows:raise SystemExit('I65_NO_SERVICE_ACCOUNT')
-        pathlib.Path(os.environ['ROOT']+'/files').write_text('\n'.join(rows)+'\n')
-        PY
-        SEL=''
-        while read -r F; do
-          if GOOGLE_APPLICATION_CREDENTIALS="$F" npx --yes firebase-tools@14.10.1 hosting:sites:get "$HOSTING_SITE" --project "$PROJECT_ID" --non-interactive --json >/dev/null 2>&1; then SEL="$F"; break; fi
-        done < "$ROOT/files"
-        test -n "$SEL" || { echo I65_FIREBASE_AUTH_NOT_PROVEN >&2; exit 42; }
-        cp "$SEL" "$RUNNER_TEMP/i65-sa.json"
-        chmod 600 "$RUNNER_TEMP/i65-sa.json"
-        echo "GOOGLE_APPLICATION_CREDENTIALS=$RUNNER_TEMP/i65-sa.json" >> "$GITHUB_ENV"
-
+      run: *r4
     - name: Materialize immutable package once
       if: steps.mode.outputs.mode == 'release'
       id: build
@@ -1098,7 +1057,7 @@ jobs:
     - name: Deploy exact package to isolated Preview
       if: steps.mode.outputs.mode == 'release'
       id: preview
-      run: |
+      run: &r3 |
         set -euo pipefail
         cd "$RUNNER_TEMP/i65-package/bundle"
         npx --yes firebase-tools@14.10.1 hosting:channel:list --site "$HOSTING_SITE" --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/i65-preview-channels.json"
@@ -1156,41 +1115,7 @@ jobs:
        TARGET_URL: ${{ steps.preview.outputs.preview_url }}
        EXPECTED_BUILD_ID: ${{ steps.build.outputs.build_id }}
        EXPECTED_DIGEST: ${{ steps.build.outputs.hosted_payload_digest }}
-      run: |
-        set -euo pipefail
-        export MANIFEST="$RUNNER_TEMP/i65-package/evidence/site-manifest.sha256"
-        python3 - <<'PY'
-        import hashlib,json,os,time,urllib.error,urllib.parse,urllib.request
-        rows=[tuple(x.split('  ',1)) for x in open(os.environ['MANIFEST']).read().splitlines() if x.strip()]
-        base=os.environ['TARGET_URL'].rstrip('/')
-        last_bad=[];last_marker=None
-        def read_once(req):
-            with urllib.request.urlopen(req,timeout=30) as r:return r.read()
-        for attempt in range(1,9):
-            bad=[];stamp=str(attempt)+'-'+str(int(time.time()))
-            for want,rel in rows:
-                try:
-                    req=urllib.request.Request(base+'/'+urllib.parse.quote(rel,safe='/')+'?i65='+os.environ['EXPECTED_DIGEST'][:16]+'-'+stamp,headers={'Accept-Encoding':'identity','Cache-Control':'no-cache, no-store','Pragma':'no-cache'})
-                    got=hashlib.sha256(read_once(req)).hexdigest()
-                except (urllib.error.HTTPError,urllib.error.URLError) as e:
-                    got='HTTP_ERROR:'+type(e).__name__
-                if got!=want:bad.append((rel,want,got))
-            marker=None
-            try:
-                marker=json.loads(read_once(urllib.request.Request(base+'/__recovery__/build.json?i65='+stamp,headers={'Cache-Control':'no-cache, no-store','Pragma':'no-cache'})))
-            except Exception as e:
-                marker={'error':type(e).__name__}
-            marker_ok=marker.get('sourceSha')==os.environ['GITHUB_SHA'] and marker.get('buildId')==os.environ['EXPECTED_BUILD_ID'] and marker.get('gate')=='I6.5'
-            if not bad and marker_ok:
-                print('I65_PREVIEW_READBACK='+str(len(rows)))
-                print('I65_PREVIEW_PROPAGATION_ATTEMPT='+str(attempt))
-                break
-            last_bad=bad;last_marker=marker
-            if attempt<8:time.sleep(3)
-        else:
-            raise SystemExit('I65_PREVIEW_READBACK_MISMATCH:'+json.dumps({'bad':last_bad[:3],'marker':last_marker},ensure_ascii=False))
-        PY
-
+      run: *r1
     - name: Preview I6.5 code-defect proof
       if: steps.mode.outputs.mode == 'release'
       env:
@@ -1214,62 +1139,14 @@ jobs:
     - name: Bind rollback to previous certified artifact and promote exact Preview channel
       if: steps.mode.outputs.mode == 'release'
       id: promote
-      run: |
-        set -euo pipefail
-        RB=$(node -e "const c=require('./'+process.env.CONTROL);process.stdout.write(String(c.certifiedCandidate?.previewChannelId||''))")
-        test -n "$RB" || { echo I65_PREVIOUS_CERTIFIED_PREVIEW_CHANNEL_MISSING >&2; exit 43; }
-        echo "rollback_channel=$RB" >> "$GITHUB_OUTPUT"
-        npx --yes firebase-tools@14.10.1 hosting:channel:list --site "$HOSTING_SITE" --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/i65-channels.json"
-        export RB
-        node - <<'NODE'
-        const fs=require('node:fs'),d=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/i65-channels.json','utf8'));
-        const raw=JSON.stringify(d);
-        if(!raw.includes(process.env.RB))throw new Error('I65_PREVIOUS_CERTIFIED_PREVIEW_CHANNEL_NOT_FOUND');
-        NODE
-        npx --yes firebase-tools@14.10.1 hosting:clone "$HOSTING_SITE:${{ steps.preview.outputs.channel_id }}" "$HOSTING_SITE:live" --project "$PROJECT_ID" --non-interactive
-        echo "promoted=true" >> "$GITHUB_OUTPUT"
-        echo I65_SAME_ARTIFACT_PROMOTION=PASS
-
+      run: *r5
     - name: Exact LIVE readback
       if: steps.mode.outputs.mode == 'release'
       env:
        TARGET_URL: ${{ env.PRODUCTION_URL }}
        EXPECTED_BUILD_ID: ${{ steps.build.outputs.build_id }}
        EXPECTED_DIGEST: ${{ steps.build.outputs.hosted_payload_digest }}
-      run: |
-        set -euo pipefail
-        export MANIFEST="$RUNNER_TEMP/i65-package/evidence/site-manifest.sha256"
-        python3 - <<'PY'
-        import hashlib,json,os,time,urllib.parse,urllib.request
-        rows=[tuple(x.split('  ',1)) for x in open(os.environ['MANIFEST']).read().splitlines() if x.strip()]
-        base=os.environ['TARGET_URL'].rstrip('/')
-        last_bad=[];last_marker=None
-        for attempt in range(1,13):
-            bad=[]
-            stamp=str(attempt)+'-'+str(int(time.time()))
-            for want,rel in rows:
-                try:
-                    req=urllib.request.Request(base+'/'+urllib.parse.quote(rel,safe='/')+'?i65live='+os.environ['EXPECTED_DIGEST'][:16]+'-'+stamp,headers={'Accept-Encoding':'identity','Cache-Control':'no-cache, no-store','Pragma':'no-cache'})
-                    with urllib.request.urlopen(req,timeout=30) as rr:got=hashlib.sha256(rr.read()).hexdigest()
-                except Exception as e:
-                    got='HTTP_ERROR:'+type(e).__name__
-                if got!=want:bad.append((rel,want,got))
-            marker=None
-            try:
-                with urllib.request.urlopen(urllib.request.Request(base+'/__recovery__/build.json?i65live='+stamp,headers={'Cache-Control':'no-cache, no-store','Pragma':'no-cache'}),timeout=30) as rr:marker=json.loads(rr.read())
-            except Exception as e:
-                marker={'error':type(e).__name__}
-            marker_ok=marker.get('sourceSha')==os.environ['GITHUB_SHA'] and marker.get('buildId')==os.environ['EXPECTED_BUILD_ID'] and marker.get('gate')=='I6.5'
-            if not bad and marker_ok:
-                print('I65_LIVE_READBACK='+str(len(rows)))
-                print('I65_LIVE_PROPAGATION_ATTEMPT='+str(attempt))
-                break
-            last_bad=bad;last_marker=marker
-            if attempt<12:time.sleep(5)
-        else:
-            raise SystemExit('I65_LIVE_READBACK_MISMATCH:'+json.dumps({'bad':last_bad[:3],'marker':last_marker},ensure_ascii=False))
-        PY
-
+      run: *r2
     - name: LIVE I6.5 code-defect proof
       if: steps.mode.outputs.mode == 'release'
       env:
@@ -1775,12 +1652,7 @@ jobs:
    if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) && inputs.private_alice_matching_readback != true && !contains(github.event.head_commit.message || '', '[alice-private-matching-readback]') && inputs.private_i66_financial_readback != true && !contains(github.event.head_commit.message || '', '[i66-financial-private-readback]') }}
    runs-on: ubuntu-24.04
    timeout-minutes: 50
-   env:
-    SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
-    SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
-    SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
-    SOURCE_INTAKE: artifacts/orbit360-recovery/release-control/I6_5_RECIBOS_CARTERA_SOURCE_INTAKE_20260918.json
-    REGISTRY: artifacts/orbit360-recovery/release-control/DATA_UPDATE_MECHANISM_REGISTRY.json
+   env: *e5
    steps:
     - uses: actions/checkout@v4
       with:
@@ -1880,29 +1752,7 @@ jobs:
 
     - name: Select existing Firebase authority
       if: steps.mode.outputs.mode == 'release'
-      run: |
-        set -euo pipefail
-        ROOT="$RUNNER_TEMP/i65-auth"; mkdir -p "$ROOT"; export ROOT
-        python3 - <<'PY'
-        import json,os,pathlib
-        rows=[]
-        for i,k in enumerate(['SA_DEFAULT','SA_ORBIT360_LAB','SA_ORBIT_360_LAB']):
-            try:d=json.loads(os.environ.get(k,''))
-            except:continue
-            if d.get('type')=='service_account' and d.get('project_id')=='ays-orbit-360-lab' and d.get('private_key') and d.get('client_email'):
-                p=pathlib.Path(os.environ['ROOT'])/f'{i}.json';p.write_text(json.dumps(d));p.chmod(0o600);rows.append(str(p))
-        if not rows:raise SystemExit('I65_NO_SERVICE_ACCOUNT')
-        pathlib.Path(os.environ['ROOT']+'/files').write_text('\n'.join(rows)+'\n')
-        PY
-        SEL=''
-        while read -r F; do
-          if GOOGLE_APPLICATION_CREDENTIALS="$F" npx --yes firebase-tools@14.10.1 hosting:sites:get "$HOSTING_SITE" --project "$PROJECT_ID" --non-interactive --json >/dev/null 2>&1; then SEL="$F"; break; fi
-        done < "$ROOT/files"
-        test -n "$SEL" || { echo I65_FIREBASE_AUTH_NOT_PROVEN >&2; exit 42; }
-        cp "$SEL" "$RUNNER_TEMP/i65-sa.json"
-        chmod 600 "$RUNNER_TEMP/i65-sa.json"
-        echo "GOOGLE_APPLICATION_CREDENTIALS=$RUNNER_TEMP/i65-sa.json" >> "$GITHUB_ENV"
-
+      run: *r4
     - name: Materialize immutable package once
       if: steps.mode.outputs.mode == 'release'
       id: build
@@ -1950,99 +1800,14 @@ jobs:
     - name: Deploy exact package to isolated Preview
       if: steps.mode.outputs.mode == 'release'
       id: preview
-      run: |
-        set -euo pipefail
-        cd "$RUNNER_TEMP/i65-package/bundle"
-        npx --yes firebase-tools@14.10.1 hosting:channel:list --site "$HOSTING_SITE" --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/i65-preview-channels.json"
-        export CHANNELS_JSON="$RUNNER_TEMP/i65-preview-channels.json"
-        node - <<'NODE' > "$RUNNER_TEMP/i65-preview-channel-candidates.txt"
-        const fs=require('node:fs'),d=JSON.parse(fs.readFileSync(process.env.CHANNELS_JSON,'utf8')),ids=new Set();
-        function walk(v,k){
-          if(v==null)return;
-          if(typeof v==='string'){
-            const m=v.match(/\/channels\/([^/]+)$/);if(m)ids.add(m[1]);
-            if((k==='channelId'||k==='id')&&/^[a-z0-9-]+$/i.test(v)&&v!=='live')ids.add(v);
-            return;
-          }
-          if(Array.isArray(v)){for(const x of v)walk(x,'');return;}
-          if(typeof v==='object')for(const [kk,x] of Object.entries(v))walk(x,kk);
-        }
-        walk(d,'');
-        for(const id of [...ids].filter(x=>x&&x!=='live').sort())console.log(id);
-        NODE
-        CHANNEL_ID=''
-        while IFS= read -r CANDIDATE; do
-          test -n "$CANDIDATE" || continue
-          if ! git -C "$GITHUB_WORKSPACE" grep -F -q -- "$CANDIDATE"; then
-            CHANNEL_ID="$CANDIDATE"
-            break
-          fi
-        done < "$RUNNER_TEMP/i65-preview-channel-candidates.txt"
-        test -n "$CHANNEL_ID" || { echo I65_NO_UNREFERENCED_PREVIEW_CHANNEL_AVAILABLE >&2; cat "$RUNNER_TEMP/i65-preview-channel-candidates.txt" >&2; exit 44; }
-        echo "I65_REUSING_UNREFERENCED_PREVIEW_CHANNEL=$CHANNEL_ID"
-        set +e
-        node "$FIREBASE_CLI_BIN" hosting:channel:deploy "$CHANNEL_ID" --config firebase.json --project "$PROJECT_ID" --expires 7d --non-interactive --json > "$RUNNER_TEMP/preview.json" 2> "$RUNNER_TEMP/preview.err"
-        RC=$?
-        set -e
-        if [ "$RC" -ne 0 ]; then
-          echo "I65_PREVIEW_DEPLOY_FAILED_RC=$RC" >&2
-          test ! -s "$RUNNER_TEMP/preview.err" || cat "$RUNNER_TEMP/preview.err" >&2
-          test ! -s "$RUNNER_TEMP/preview.json" || cat "$RUNNER_TEMP/preview.json" >&2
-          exit "$RC"
-        fi
-        export DEPLOY="$RUNNER_TEMP/preview.json"
-        PREVIEW_URL=$(python3 - <<'PY'
-        import os,re
-        raw=open(os.environ['DEPLOY']).read();prod='https://'+os.environ['HOSTING_SITE']+'.web.app'
-        urls=[u.rstrip('/') for u in re.findall(r'https://[A-Za-z0-9._-]+\.web\.app',raw) if u.rstrip('/')!=prod]
-        if not urls:raise SystemExit('I65_PREVIEW_URL_NOT_FOUND')
-        print(urls[-1])
-        PY
-        )
-        echo "channel_id=$CHANNEL_ID" >> "$GITHUB_OUTPUT"
-        echo "preview_url=$PREVIEW_URL" >> "$GITHUB_OUTPUT"
-
+      run: *r3
     - name: Exact Preview readback
       if: steps.mode.outputs.mode == 'release'
       env:
        TARGET_URL: ${{ steps.preview.outputs.preview_url }}
        EXPECTED_BUILD_ID: ${{ steps.build.outputs.build_id }}
        EXPECTED_DIGEST: ${{ steps.build.outputs.hosted_payload_digest }}
-      run: |
-        set -euo pipefail
-        export MANIFEST="$RUNNER_TEMP/i65-package/evidence/site-manifest.sha256"
-        python3 - <<'PY'
-        import hashlib,json,os,time,urllib.error,urllib.parse,urllib.request
-        rows=[tuple(x.split('  ',1)) for x in open(os.environ['MANIFEST']).read().splitlines() if x.strip()]
-        base=os.environ['TARGET_URL'].rstrip('/')
-        last_bad=[];last_marker=None
-        def read_once(req):
-            with urllib.request.urlopen(req,timeout=30) as r:return r.read()
-        for attempt in range(1,9):
-            bad=[];stamp=str(attempt)+'-'+str(int(time.time()))
-            for want,rel in rows:
-                try:
-                    req=urllib.request.Request(base+'/'+urllib.parse.quote(rel,safe='/')+'?i65='+os.environ['EXPECTED_DIGEST'][:16]+'-'+stamp,headers={'Accept-Encoding':'identity','Cache-Control':'no-cache, no-store','Pragma':'no-cache'})
-                    got=hashlib.sha256(read_once(req)).hexdigest()
-                except (urllib.error.HTTPError,urllib.error.URLError) as e:
-                    got='HTTP_ERROR:'+type(e).__name__
-                if got!=want:bad.append((rel,want,got))
-            marker=None
-            try:
-                marker=json.loads(read_once(urllib.request.Request(base+'/__recovery__/build.json?i65='+stamp,headers={'Cache-Control':'no-cache, no-store','Pragma':'no-cache'})))
-            except Exception as e:
-                marker={'error':type(e).__name__}
-            marker_ok=marker.get('sourceSha')==os.environ['GITHUB_SHA'] and marker.get('buildId')==os.environ['EXPECTED_BUILD_ID'] and marker.get('gate')=='I6.5'
-            if not bad and marker_ok:
-                print('I65_PREVIEW_READBACK='+str(len(rows)))
-                print('I65_PREVIEW_PROPAGATION_ATTEMPT='+str(attempt))
-                break
-            last_bad=bad;last_marker=marker
-            if attempt<8:time.sleep(3)
-        else:
-            raise SystemExit('I65_PREVIEW_READBACK_MISMATCH:'+json.dumps({'bad':last_bad[:3],'marker':last_marker},ensure_ascii=False))
-        PY
-
+      run: *r1
     - name: Preview I6.5 operational closure proof
       if: steps.mode.outputs.mode == 'release'
       env:
@@ -2066,62 +1831,14 @@ jobs:
     - name: Bind rollback to previous certified artifact and promote exact Preview channel
       if: steps.mode.outputs.mode == 'release'
       id: promote
-      run: |
-        set -euo pipefail
-        RB=$(node -e "const c=require('./'+process.env.CONTROL);process.stdout.write(String(c.certifiedCandidate?.previewChannelId||''))")
-        test -n "$RB" || { echo I65_PREVIOUS_CERTIFIED_PREVIEW_CHANNEL_MISSING >&2; exit 43; }
-        echo "rollback_channel=$RB" >> "$GITHUB_OUTPUT"
-        npx --yes firebase-tools@14.10.1 hosting:channel:list --site "$HOSTING_SITE" --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/i65-channels.json"
-        export RB
-        node - <<'NODE'
-        const fs=require('node:fs'),d=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/i65-channels.json','utf8'));
-        const raw=JSON.stringify(d);
-        if(!raw.includes(process.env.RB))throw new Error('I65_PREVIOUS_CERTIFIED_PREVIEW_CHANNEL_NOT_FOUND');
-        NODE
-        npx --yes firebase-tools@14.10.1 hosting:clone "$HOSTING_SITE:${{ steps.preview.outputs.channel_id }}" "$HOSTING_SITE:live" --project "$PROJECT_ID" --non-interactive
-        echo "promoted=true" >> "$GITHUB_OUTPUT"
-        echo I65_SAME_ARTIFACT_PROMOTION=PASS
-
+      run: *r5
     - name: Exact LIVE readback
       if: steps.mode.outputs.mode == 'release'
       env:
        TARGET_URL: ${{ env.PRODUCTION_URL }}
        EXPECTED_BUILD_ID: ${{ steps.build.outputs.build_id }}
        EXPECTED_DIGEST: ${{ steps.build.outputs.hosted_payload_digest }}
-      run: |
-        set -euo pipefail
-        export MANIFEST="$RUNNER_TEMP/i65-package/evidence/site-manifest.sha256"
-        python3 - <<'PY'
-        import hashlib,json,os,time,urllib.parse,urllib.request
-        rows=[tuple(x.split('  ',1)) for x in open(os.environ['MANIFEST']).read().splitlines() if x.strip()]
-        base=os.environ['TARGET_URL'].rstrip('/')
-        last_bad=[];last_marker=None
-        for attempt in range(1,13):
-            bad=[]
-            stamp=str(attempt)+'-'+str(int(time.time()))
-            for want,rel in rows:
-                try:
-                    req=urllib.request.Request(base+'/'+urllib.parse.quote(rel,safe='/')+'?i65live='+os.environ['EXPECTED_DIGEST'][:16]+'-'+stamp,headers={'Accept-Encoding':'identity','Cache-Control':'no-cache, no-store','Pragma':'no-cache'})
-                    with urllib.request.urlopen(req,timeout=30) as rr:got=hashlib.sha256(rr.read()).hexdigest()
-                except Exception as e:
-                    got='HTTP_ERROR:'+type(e).__name__
-                if got!=want:bad.append((rel,want,got))
-            marker=None
-            try:
-                with urllib.request.urlopen(urllib.request.Request(base+'/__recovery__/build.json?i65live='+stamp,headers={'Cache-Control':'no-cache, no-store','Pragma':'no-cache'}),timeout=30) as rr:marker=json.loads(rr.read())
-            except Exception as e:
-                marker={'error':type(e).__name__}
-            marker_ok=marker.get('sourceSha')==os.environ['GITHUB_SHA'] and marker.get('buildId')==os.environ['EXPECTED_BUILD_ID'] and marker.get('gate')=='I6.5'
-            if not bad and marker_ok:
-                print('I65_LIVE_READBACK='+str(len(rows)))
-                print('I65_LIVE_PROPAGATION_ATTEMPT='+str(attempt))
-                break
-            last_bad=bad;last_marker=marker
-            if attempt<12:time.sleep(5)
-        else:
-            raise SystemExit('I65_LIVE_READBACK_MISMATCH:'+json.dumps({'bad':last_bad[:3],'marker':last_marker},ensure_ascii=False))
-        PY
-
+      run: *r2
     - name: LIVE I6.5 operational closure proof
       if: steps.mode.outputs.mode == 'release'
       env:
@@ -2903,7 +2620,7 @@ jobs:
    if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) && inputs.private_alice_matching_readback != true && !contains(github.event.head_commit.message || '', '[alice-private-matching-readback]') && inputs.private_i66_financial_readback != true && !contains(github.event.head_commit.message || '', '[i66-financial-private-readback]') }}
    runs-on: ubuntu-24.04
    timeout-minutes: 50
-   env:
+   env: &e1
     SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
     SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
     SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
@@ -3235,11 +2952,7 @@ jobs:
    if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) && inputs.private_alice_matching_readback != true && !contains(github.event.head_commit.message || '', '[alice-private-matching-readback]') && inputs.private_i66_financial_readback != true && !contains(github.event.head_commit.message || '', '[i66-financial-private-readback]') }}
    runs-on: ubuntu-24.04
    timeout-minutes: 20
-   env:
-    SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
-    SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
-    SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
-    B1_LOCK: artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B1_EXECUTION_LOCK_20260919.json
+   env: *e1
    steps:
     - uses: actions/checkout@v4
       with:
@@ -3286,11 +2999,7 @@ jobs:
    if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) && inputs.private_alice_matching_readback != true && !contains(github.event.head_commit.message || '', '[alice-private-matching-readback]') && inputs.private_i66_financial_readback != true && !contains(github.event.head_commit.message || '', '[i66-financial-private-readback]') }}
    runs-on: ubuntu-24.04
    timeout-minutes: 25
-   env:
-    SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
-    SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
-    SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
-    B1_LOCK: artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B1_EXECUTION_LOCK_20260919.json
+   env: *e1
    steps:
     - uses: actions/checkout@v4
       with:
@@ -3339,11 +3048,7 @@ jobs:
    if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) && inputs.private_alice_matching_readback != true && !contains(github.event.head_commit.message || '', '[alice-private-matching-readback]') && inputs.private_i66_financial_readback != true && !contains(github.event.head_commit.message || '', '[i66-financial-private-readback]') }}
    runs-on: ubuntu-24.04
    timeout-minutes: 25
-   env:
-    SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
-    SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
-    SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
-    B1_LOCK: artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B1_EXECUTION_LOCK_20260919.json
+   env: *e1
    steps:
     - uses: actions/checkout@v4
       with:
@@ -3394,11 +3099,7 @@ jobs:
    if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) && inputs.private_alice_matching_readback != true && !contains(github.event.head_commit.message || '', '[alice-private-matching-readback]') && inputs.private_i66_financial_readback != true && !contains(github.event.head_commit.message || '', '[i66-financial-private-readback]') }}
    runs-on: ubuntu-24.04
    timeout-minutes: 15
-   env:
-    SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
-    SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
-    SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
-    B1_LOCK: artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B1_EXECUTION_LOCK_20260919.json
+   env: *e1
    steps:
     - uses: actions/checkout@v4
       with:
@@ -3446,11 +3147,7 @@ jobs:
    if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) && inputs.private_alice_matching_readback != true && !contains(github.event.head_commit.message || '', '[alice-private-matching-readback]') && inputs.private_i66_financial_readback != true && !contains(github.event.head_commit.message || '', '[i66-financial-private-readback]') }}
    runs-on: ubuntu-24.04
    timeout-minutes: 20
-   env:
-    SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
-    SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
-    SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
-    B1_LOCK: artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B1_EXECUTION_LOCK_20260919.json
+   env: *e1
    steps:
     - uses: actions/checkout@v4
       with:
@@ -3500,11 +3197,7 @@ jobs:
    if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) && inputs.private_alice_matching_readback != true && !contains(github.event.head_commit.message || '', '[alice-private-matching-readback]') && inputs.private_i66_financial_readback != true && !contains(github.event.head_commit.message || '', '[i66-financial-private-readback]') }}
    runs-on: ubuntu-24.04
    timeout-minutes: 15
-   env:
-    SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
-    SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
-    SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
-    B1_LOCK: artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B1_EXECUTION_LOCK_20260919.json
+   env: *e1
    steps:
     - uses: actions/checkout@v4
       with:
@@ -3549,7 +3242,7 @@ jobs:
    if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) && inputs.private_alice_matching_readback != true && !contains(github.event.head_commit.message || '', '[alice-private-matching-readback]') && inputs.private_i66_financial_readback != true && !contains(github.event.head_commit.message || '', '[i66-financial-private-readback]') }}
    runs-on: ubuntu-24.04
    timeout-minutes: 35
-   env:
+   env: &e2
     SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
     SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
     SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
@@ -3846,11 +3539,7 @@ jobs:
    if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) && inputs.private_alice_matching_readback != true && !contains(github.event.head_commit.message || '', '[alice-private-matching-readback]') && inputs.private_i66_financial_readback != true && !contains(github.event.head_commit.message || '', '[i66-financial-private-readback]') && (always()) }}
    runs-on: ubuntu-24.04
    timeout-minutes: 12
-   env:
-    SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
-    SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
-    SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
-    B2_LOCK: artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B2_EXECUTION_LOCK_20260920.json
+   env: *e2
    steps:
     - uses: actions/checkout@v4
       with:
@@ -4124,11 +3813,7 @@ jobs:
    if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) && inputs.private_alice_matching_readback != true && !contains(github.event.head_commit.message || '', '[alice-private-matching-readback]') && inputs.private_i66_financial_readback != true && !contains(github.event.head_commit.message || '', '[i66-financial-private-readback]') }}
    runs-on: ubuntu-24.04
    timeout-minutes: 12
-   env:
-    SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
-    SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
-    SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
-    B2_LOCK: artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B2_EXECUTION_LOCK_20260920.json
+   env: *e2
    steps:
     - uses: actions/checkout@v4
       with:
@@ -4199,11 +3884,7 @@ jobs:
    if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) && inputs.private_alice_matching_readback != true && !contains(github.event.head_commit.message || '', '[alice-private-matching-readback]') && inputs.private_i66_financial_readback != true && !contains(github.event.head_commit.message || '', '[i66-financial-private-readback]') }}
    runs-on: ubuntu-24.04
    timeout-minutes: 12
-   env:
-    SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
-    SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
-    SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
-    B1_LOCK: artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B1_EXECUTION_LOCK_20260919.json
+   env: *e1
    steps:
     - uses: actions/checkout@v4
       with:
@@ -4270,11 +3951,7 @@ jobs:
    if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) && inputs.private_alice_matching_readback != true && !contains(github.event.head_commit.message || '', '[alice-private-matching-readback]') && inputs.private_i66_financial_readback != true && !contains(github.event.head_commit.message || '', '[i66-financial-private-readback]') }}
    runs-on: ubuntu-24.04
    timeout-minutes: 5
-   env:
-    SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
-    SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
-    SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
-    B1_LOCK: artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B1_EXECUTION_LOCK_20260919.json
+   env: *e1
    steps:
     - uses: actions/checkout@v4
       with:
@@ -4320,11 +3997,7 @@ jobs:
    if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) && inputs.private_alice_matching_readback != true && !contains(github.event.head_commit.message || '', '[alice-private-matching-readback]') && inputs.private_i66_financial_readback != true && !contains(github.event.head_commit.message || '', '[i66-financial-private-readback]') }}
    runs-on: ubuntu-24.04
    timeout-minutes: 8
-   env:
-    SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
-    SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
-    SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
-    B2_LOCK: artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B2_EXECUTION_LOCK_20260920.json
+   env: *e2
    steps:
     - uses: actions/checkout@v4
       with:
@@ -4553,11 +4226,7 @@ jobs:
    if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) && inputs.private_alice_matching_readback != true && !contains(github.event.head_commit.message || '', '[alice-private-matching-readback]') && inputs.private_i66_financial_readback != true && !contains(github.event.head_commit.message || '', '[i66-financial-private-readback]') && (always()) }}
    runs-on: ubuntu-24.04
    timeout-minutes: 12
-   env:
-    SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
-    SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
-    SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
-    B2_LOCK: artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B2_EXECUTION_LOCK_20260920.json
+   env: *e2
    steps:
     - uses: actions/checkout@v4
       with:
@@ -5694,7 +5363,7 @@ jobs:
    if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) && inputs.private_alice_matching_readback != true && !contains(github.event.head_commit.message || '', '[alice-private-matching-readback]') && inputs.private_i66_financial_readback != true && !contains(github.event.head_commit.message || '', '[i66-financial-private-readback]') && (always()) }}
    runs-on: ubuntu-24.04
    timeout-minutes: 25
-   env:
+   env: &e3
     SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
     SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
     SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
@@ -5989,12 +5658,7 @@ jobs:
    if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) && inputs.private_alice_matching_readback != true && !contains(github.event.head_commit.message || '', '[alice-private-matching-readback]') && inputs.private_i66_financial_readback != true && !contains(github.event.head_commit.message || '', '[i66-financial-private-readback]') && (always()) }}
    runs-on: ubuntu-24.04
    timeout-minutes: 30
-   env:
-    SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
-    SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
-    SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
-    B3_LOCK: artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B3_EXECUTION_LOCK_20260929.json
-    FINDINGS: artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json
+   env: *e3
    steps:
     - uses: actions/checkout@v4
       with:
@@ -6313,12 +5977,7 @@ jobs:
    if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) && inputs.private_alice_matching_readback != true && !contains(github.event.head_commit.message || '', '[alice-private-matching-readback]') && inputs.private_i66_financial_readback != true && !contains(github.event.head_commit.message || '', '[i66-financial-private-readback]') && (always()) }}
    runs-on: ubuntu-24.04
    timeout-minutes: 30
-   env:
-    SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
-    SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
-    SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
-    B3_LOCK: artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B3_EXECUTION_LOCK_20260929.json
-    FINDINGS: artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json
+   env: *e3
    steps:
     - uses: actions/checkout@v4
       with:
@@ -6722,12 +6381,7 @@ jobs:
    if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) && inputs.private_alice_matching_readback != true && !contains(github.event.head_commit.message || '', '[alice-private-matching-readback]') && inputs.private_i66_financial_readback != true && !contains(github.event.head_commit.message || '', '[i66-financial-private-readback]') && (always()) }}
    runs-on: ubuntu-24.04
    timeout-minutes: 35
-   env:
-    SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
-    SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
-    SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
-    B3_LOCK: artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B3_EXECUTION_LOCK_20260929.json
-    FINDINGS: artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json
+   env: *e3
    steps:
     - uses: actions/checkout@v4
       with:

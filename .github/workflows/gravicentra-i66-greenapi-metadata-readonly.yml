@@ -618,8 +618,8 @@ jobs:
           path: ${{ runner.temp }}/i66-make-preimages-sanitized.json
           if-no-files-found: error
           retention-days: 14
-      - name: Diagnose only the exact Preview33 traffic conflict with logs and validation-only API
-        if: github.event_name == 'push' && contains(github.event.head_commit.message, 'I66_MAKE_TRAFFIC_409_READONLY_R33')
+      - name: Diagnose the exact Preview33 traffic conflict using the explicitly selected validation profile
+        if: github.event_name == 'push' && (contains(github.event.head_commit.message, 'I66_MAKE_TRAFFIC_409_READONLY_R33') || contains(github.event.head_commit.message, 'I66_MAKE_TRAFFIC_V1_DRYRUN_R33'))
         shell: bash
         run: |
           set -euo pipefail
@@ -779,17 +779,194 @@ jobs:
             }catch(error){report.errorCode=code(error);}
             report.completedAtUtc=now();report.reportDigest=contract.digest(report);return report;
           }
+          
+          // Explicit V1 validation profile in the same workflow, never a persistent API call.
+          const V1_MARKER='I66_MAKE_TRAFFIC_V1_DRYRUN_R33';
+          const V1_RUN_URL='https://'+REGION+'-run.googleapis.com/apis/serving.knative.dev/v1/namespaces/'+PROJECT+'/services/'+NAME;
+          const V1_VALIDATE_URL=V1_RUN_URL+'?dryRun=all';
+          const GRANT_PATH='tenants/alianzas-soluciones/config/makeLeadIngressPreview';
+          const clone=value=>structuredClone(value);
+          const plainObject=value=>value!==null&&typeof value==='object'&&!Array.isArray(value);
+          const V1_TRAFFIC=Object.freeze([{revisionName:EXPECTED.revision,percent:100,latestRevision:false}]);
+          function v1Service(row){
+            assert.ok(plainObject(row),'I66_TRAFFIC_DIAGNOSTIC_V1_SERVICE_REQUIRED');
+            assert.equal(row.apiVersion,'serving.knative.dev/v1','I66_TRAFFIC_DIAGNOSTIC_V1_API_VERSION');
+            assert.equal(row.kind,'Service','I66_TRAFFIC_DIAGNOSTIC_V1_KIND');
+            const m=row.metadata;
+            assert.ok(plainObject(m)&&m.name===NAME&&[PROJECT,'646761409743'].includes(m.namespace),'I66_TRAFFIC_DIAGNOSTIC_V1_SCOPE');
+            assert.equal(m.uid,EXPECTED.uid,'I66_TRAFFIC_DIAGNOSTIC_V1_UID');
+            assert.equal(String(m.generation),EXPECTED.generation,'I66_TRAFFIC_DIAGNOSTIC_V1_GENERATION');
+            assert.ok(typeof m.resourceVersion==='string'&&m.resourceVersion.length>0&&m.resourceVersion.length<=512&&
+              !/[\x00-\x1f\x7f]/.test(m.resourceVersion),'I66_TRAFFIC_DIAGNOSTIC_V1_RESOURCE_VERSION_REQUIRED');
+            assert.ok(plainObject(row.spec)&&plainObject(row.spec.template),'I66_TRAFFIC_DIAGNOSTIC_V1_TEMPLATE_REQUIRED');
+            assert.ok(Array.isArray(row.status?.traffic)&&row.status.traffic.length===1,'I66_TRAFFIC_DIAGNOSTIC_V1_TRAFFIC');
+            const target=row.status.traffic[0];
+            assert.equal(target.revisionName,EXPECTED.trafficRevision,'I66_TRAFFIC_DIAGNOSTIC_V1_TRAFFIC');
+            assert.equal(target.percent,100,'I66_TRAFFIC_DIAGNOSTIC_V1_TRAFFIC');
+            assert.ok(target.tag===undefined||target.tag==='','I66_TRAFFIC_DIAGNOSTIC_V1_TRAFFIC');
+            return row;
+          }
+          function v1Data(preimage){
+            v1Service(preimage);const data=clone(preimage);
+            delete data.status;data.spec.traffic=clone(V1_TRAFFIC);
+            assert.deepEqual(data.metadata,preimage.metadata,'I66_TRAFFIC_DIAGNOSTIC_V1_METADATA_CHANGED');
+            assert.deepEqual(data.spec.template,preimage.spec.template,'I66_TRAFFIC_DIAGNOSTIC_V1_TEMPLATE_CHANGED');
+            return data;
+          }
+          function limitedV1Client(client,journal,now){
+            let bound=null,puts=0;
+            return {bindPreimage(value){assert.equal(bound,null,'I66_TRAFFIC_DIAGNOSTIC_V1_BIND_ONCE');bound=clone(v1Service(value));},
+              request:async options=>{
+                if(options?.method==='GET'){
+                  assert.deepEqual(Object.keys(options).sort(),['method','url'],'I66_TRAFFIC_DIAGNOSTIC_GET_SHAPE');
+                  assert.ok([FN_URL,RUN_URL,V1_RUN_URL].includes(options.url),'I66_TRAFFIC_DIAGNOSTIC_GET_RESOURCE');
+                }else{
+                  assert.deepEqual(Object.keys(options||{}).sort(),['data','method','url'],'I66_TRAFFIC_DIAGNOSTIC_V1_REQUEST_SHAPE');
+                  assert.equal(options.method,'PUT','I66_TRAFFIC_DIAGNOSTIC_V1_METHOD_DENIED');
+                  assert.equal(options.url,V1_VALIDATE_URL,'I66_TRAFFIC_DIAGNOSTIC_V1_DRY_RUN_REQUIRED');
+                  assert.ok(bound,'I66_TRAFFIC_DIAGNOSTIC_V1_PREIMAGE_REQUIRED');
+                  assert.deepEqual(options.data,v1Data(bound),'I66_TRAFFIC_DIAGNOSTIC_V1_EXACT_REPLACEMENT_REQUIRED');
+                  assert.equal(puts,0,'I66_TRAFFIC_DIAGNOSTIC_V1_SINGLE_VALIDATION_ONLY');puts++;
+                }
+                const entry={method:options.method,url:options.url,startedAtUtc:now(),httpStatus:null,responseSha256:null};journal.push(entry);
+                let response;
+                try{response=await client.request({...clone(options),timeout:30000,retry:false,maxRedirects:0});}
+                catch(error){if(error?.response)response=error.response;else throw Error('I66_TRAFFIC_DIAGNOSTIC_NETWORK_UNVERIFIED');}
+                entry.httpStatus=Number(response.status);
+                assert.ok(Number.isInteger(entry.httpStatus)&&entry.httpStatus>=100&&entry.httpStatus<=599,'I66_TRAFFIC_DIAGNOSTIC_HTTP_STATUS');
+                assert.ok(plainObject(response.data),'I66_TRAFFIC_DIAGNOSTIC_RESPONSE_OBJECT');
+                const encoded=Buffer.from(JSON.stringify(response.data));
+                assert.ok(encoded.length<=1048576,'I66_TRAFFIC_DIAGNOSTIC_RESPONSE_BOUND');
+                entry.responseSha256=hash(encoded);entry.completedAtUtc=now();return response;
+              }};
+          }
+          const DIFF_FIELDS=new Set(['name','description','state','environment','url','labels','buildConfig','serviceConfig','eventTrigger','eventFilters',
+            'eventType','retryPolicy','trigger','triggerRegion','serviceAccountEmail','attribute','value','operator','revision','service',
+            'allTrafficOnLatestRevision','uri','ingressSettings','availableMemory','availableCpu','maxInstanceCount','minInstanceCount','timeoutSeconds',
+            'environmentVariables','secretEnvironmentVariables','secretVolumes','runtime','entryPoint','source','storageSource','bucket','object',
+            'generation','updateTime','createTime','build','dockerRepository','automaticUpdatePolicy','securityLevel','kmsKeyName','vpcConnector',
+            'vpcConnectorEgressSettings','satisfiesPzs','satisfiesPzi','detached','stateMessages','apiVersion','kind','metadata','spec','status','template',
+            'traffic','revisionName','latestRevision','percent','tag','uid','namespace','resourceVersion','annotations','conditions','type','message']);
+          function structuralDiff(before,after,digest){
+            const changes=[],limit=64,maxDepth=12;let truncated=false;
+            const type=x=>x===undefined?'absent':x===null?'null':Array.isArray(x)?'array':typeof x;
+            const summary=x=>({present:x!==undefined,type:type(x),sha256:x===undefined?null:digest(x)});
+            function visit(a,b,segments=[],depth=0,dynamic=false){
+              if(type(a)===type(b)&&(a===undefined||digest(a)===digest(b)))return;
+              if(changes.length>=limit){truncated=true;return;}
+              if(depth<maxDepth&&plainObject(a)&&plainObject(b)){
+                for(const key of [...new Set([...Object.keys(a),...Object.keys(b)])].sort()){
+                  const segment=!dynamic&&DIFF_FIELDS.has(key)?key:'key-sha256:'+hash(key);
+                  visit(a[key],b[key],[...segments,segment],depth+1,['labels','annotations','environmentVariables'].includes(key));
+                }
+              }else if(depth<maxDepth&&Array.isArray(a)&&Array.isArray(b)&&a.length===b.length){
+                for(let i=0;i<a.length;i++)visit(a[i],b[i],[...segments,i],depth+1,false);
+              }else changes.push({path:segments,before:summary(a),after:summary(b)});
+            }
+            visit(before,after);return {changed:changes.length>0||truncated,changes,truncated,maxChanges:limit,maxDepth};
+          }
+          function functionEquality(before,after,executor,contract,p){
+            const diff=structuralDiff(before,after,contract.digest),rawEqual=contract.digest(before)===contract.digest(after);
+            let beforeProjection=null,afterProjection=null,projectionEqual=false,eventFiltersOrderOnly=false,projectionErrorCode=null;
+            try{
+              beforeProjection=executor.fnProjection(before,p,'preview');afterProjection=executor.fnProjection(after,p,'preview');
+              projectionEqual=contract.digest(beforeProjection)===contract.digest(afterProjection);
+              const normalize=value=>{const result=clone(value);result.eventTrigger.eventFilters.sort((a,b)=>a.attribute.localeCompare(b.attribute));return result;};
+              eventFiltersOrderOnly=!rawEqual&&!diff.truncated&&projectionEqual&&contract.digest(normalize(before))===contract.digest(normalize(after));
+            }catch(error){projectionErrorCode=code(error);}
+            return {rawEqual,projectionEqual,eventFiltersOrderOnly,effectiveEqual:rawEqual||eventFiltersOrderOnly,
+              beforeProjectionSha256:beforeProjection?contract.digest(beforeProjection):null,
+              afterProjectionSha256:afterProjection?contract.digest(afterProjection):null,projectionErrorCode,diff};
+          }
+          function safeV1Provider(data){
+            const e=data?.error||{},allowed=new Set(['OK','CANCELLED','UNKNOWN','INVALID_ARGUMENT','DEADLINE_EXCEEDED','NOT_FOUND','ALREADY_EXISTS',
+              'PERMISSION_DENIED','RESOURCE_EXHAUSTED','FAILED_PRECONDITION','ABORTED','OUT_OF_RANGE','UNIMPLEMENTED','INTERNAL','UNAVAILABLE','DATA_LOSS','UNAUTHENTICATED']);
+            return {code:Number.isSafeInteger(e.code)?e.code:null,status:allowed.has(e.status)?e.status:null,
+              messageSha256:typeof e.message==='string'?hash(e.message):null,messageLength:typeof e.message==='string'?e.message.length:null,
+              targetRevisionMentioned:typeof e.message==='string'?e.message.includes(EXPECTED.revision):false,
+              detailsPresent:Array.isArray(e.details)&&e.details.length>0};
+          }
+          async function collectV1({client,readGrant,executor,contract,provenance,now=()=>new Date().toISOString()}){
+            const journal=[],auth=limitedV1Client(client,journal,now),p={makeIngress:{runtimeAccess:{principal:provenance.runtimePrincipal}}};
+            const {runtimePrincipal,...publicProvenance}=provenance;
+            const report={schema:'GI_I66_PREVIEW33_TRAFFIC_V1_DRY_RUN_V1',status:'DIAGNOSTIC_HOLD',profile:'V1_EXACT_REPLACEMENT_DRY_RUN_ONLY',
+              provenance:publicProvenance,observedFailure:EXPECTED,startedAtUtc:now(),before:null,after:null,comparisons:null,
+              audit:{skipped:true,reason:'V1_PROFILE_NO_AUDIT_OR_V2_VALIDATION'},dryValidation:null,httpCalls:journal,grantReads:0,
+              identicalPrePostResponses:null,effectivePrePostUnchanged:null,persistentMutationRequests:0,cloudWrites:0,configurationWrites:0,
+              canonicalLeadWrites:0,iamWrites:0,externalMessagesSent:0,rawRequestsPublished:false,rawResponsesPublished:false,releaseAuthority:false,errorCode:null};
+            const take=async()=>{
+              const fn=await auth.request({method:'GET',url:FN_URL}),run=await auth.request({method:'GET',url:RUN_URL}),v1=await auth.request({method:'GET',url:V1_RUN_URL});
+              assert.equal(typeof readGrant,'function','I66_TRAFFIC_DIAGNOSTIC_GRANT_READER_REQUIRED');report.grantReads++;
+              return {fn,run,v1,grant:await readGrant(GRANT_PATH)};
+            };
+            const grantSafe=x=>({pathMatchesExpected:x?.path===GRANT_PATH,exists:x?.exists===true,
+              expectedDigest:plainObject(x?.data)?contract.digest(x.data):null,
+              state:['CLOSED','BOUND','ACTIVE'].includes(x?.data?.state)?x.data.state:null,
+              enabled:typeof x?.data?.enabled==='boolean'?x.data.enabled:null,
+              updateTimeSha256:x?.updateTime?contract.digest(x.updateTime):null});
+            const summary=x=>({functionHttpStatus:x.fn.status,runV2HttpStatus:x.run.status,runV1HttpStatus:x.v1.status,
+              functionResponseSha256:contract.digest(x.fn.data),runResponseSha256:contract.digest(x.run.data),v1ResponseSha256:contract.digest(x.v1.data),
+              etagSha256:typeof x.run.data.etag==='string'?hash(x.run.data.etag):null,
+              resourceVersionSha256:typeof x.v1.data.metadata?.resourceVersion==='string'?hash(x.v1.data.metadata.resourceVersion):null,
+              templateSha256:x.v1.data.spec?.template?contract.digest(x.v1.data.spec.template):null,grant:grantSafe(x.grant)});
+            const requireExact=x=>{
+              assert.ok(x.fn.status===200&&x.run.status===200&&x.v1.status===200,'I66_TRAFFIC_DIAGNOSTIC_V1_PREIMAGE_READ');
+              const fn=executor.fnProjection(x.fn.data,p,'preview'),traffic=executor.trafficProjection(x.run.data,fn,'preview');
+              assert.equal(fn.revision,EXPECTED.revision,'I66_TRAFFIC_DIAGNOSTIC_API_REVISION_DRIFT');
+              assert.equal(fn.configurationDigest,EXPECTED.fnDigest,'I66_TRAFFIC_DIAGNOSTIC_FUNCTION_CONFIG_DRIFT');
+              assert.equal(traffic.observationDigest,EXPECTED.trafficDigest,'I66_TRAFFIC_DIAGNOSTIC_TRAFFIC_DRIFT');
+              validateData(x.run.data.etag);v1Service(x.v1.data);
+              const g=x.grant,safe=grantSafe(g);
+              assert.ok(safe.pathMatchesExpected&&g.exists===true&&plainObject(g.data),'I66_TRAFFIC_DIAGNOSTIC_GRANT_SCOPE');
+              assert.equal(safe.expectedDigest,EXPECTED.grantDigest,'I66_TRAFFIC_DIAGNOSTIC_GRANT_DIGEST');
+              assert.ok(g.data.state==='CLOSED'&&g.data.enabled===false,'I66_TRAFFIC_DIAGNOSTIC_GRANT_CLOSED');
+              assert.ok(g.updateTime&&/^[0-9]+$/.test(g.updateTime.seconds)&&Number.isInteger(g.updateTime.nanoseconds)&&
+                g.updateTime.nanoseconds>=0&&g.updateTime.nanoseconds<1e9,'I66_TRAFFIC_DIAGNOSTIC_GRANT_TIME');
+            };
+            try{
+              const before=await take();report.before=summary(before);requireExact(before);auth.bindPreimage(before.v1.data);
+              const data=v1Data(before.v1.data);
+              try{
+                const response=await auth.request({method:'PUT',url:V1_VALIDATE_URL,data});
+                report.dryValidation={httpStatus:response.status,dryRun:'all',method:'PUT',targetRevision:EXPECTED.revision,
+                  requestSha256:contract.digest(data),requestResourceVersionSha256:hash(before.v1.data.metadata.resourceVersion),
+                  requestTemplateSha256:contract.digest(data.spec.template),acceptedForValidation:response.status>=200&&response.status<300&&!response.data.error,
+                  responseSha256:contract.digest(response.data),provider:safeV1Provider(response.data),originalFailureCauseProvenByThisReplay:false};
+              }finally{
+                const after=await take();report.after=summary(after);
+                const functions=functionEquality(before.fn.data,after.fn.data,executor,contract,p);
+                const runV2Equal=contract.digest(before.run.data)===contract.digest(after.run.data),runV1Equal=contract.digest(before.v1.data)===contract.digest(after.v1.data),
+                  grantEqual=contract.digest(before.grant)===contract.digest(after.grant);
+                report.comparisons={functions,runV2Equal,runV1Equal,grantEqual,
+                  runV2Diff:structuralDiff(before.run.data,after.run.data,contract.digest),v1Diff:structuralDiff(before.v1.data,after.v1.data,contract.digest)};
+                report.identicalPrePostResponses=functions.rawEqual&&runV2Equal&&runV1Equal&&grantEqual;
+                report.effectivePrePostUnchanged=functions.effectiveEqual&&runV2Equal&&runV1Equal&&grantEqual;
+                // Retain every independent equality/diff above before any rejecting assertion.
+                requireExact(after);
+                assert.ok(functions.effectiveEqual,'I66_TRAFFIC_DIAGNOSTIC_FUNCTION_CHANGED_DURING_VALIDATION');
+                assert.ok(runV2Equal,'I66_TRAFFIC_DIAGNOSTIC_SERVICE_CHANGED_DURING_VALIDATION');
+                assert.ok(runV1Equal,'I66_TRAFFIC_DIAGNOSTIC_V1_SERVICE_CHANGED_DURING_VALIDATION');
+                assert.ok(grantEqual,'I66_TRAFFIC_DIAGNOSTIC_GRANT_CHANGED_DURING_VALIDATION');
+              }
+              report.status='V1_DRY_RUN_RESPONSE_OBSERVED_NO_PERSISTENCE_NOT_RELEASE_AUTHORITY';
+            }catch(error){report.errorCode=code(error);}
+            report.completedAtUtc=now();report.reportDigest=contract.digest(report);return report;
+          }
+          
           function validateTrigger(env,event){
             assert.equal(env.GITHUB_REPOSITORY,'paulaosoriof86/orbit360-core','I66_TRAFFIC_DIAGNOSTIC_REPOSITORY');
             assert.equal(env.GITHUB_REF,'refs/heads/recovery/fase-a-clean-20260831','I66_TRAFFIC_DIAGNOSTIC_BRANCH');
             assert.equal(env.GITHUB_EVENT_NAME,'push','I66_TRAFFIC_DIAGNOSTIC_PUSH_REQUIRED');
             assert.match(env.GITHUB_SHA||'',/^[a-f0-9]{40}$/,'I66_TRAFFIC_DIAGNOSTIC_SOURCE_REQUIRED');
             assert.equal(event?.head_commit?.id,env.GITHUB_SHA,'I66_TRAFFIC_DIAGNOSTIC_EVENT_SOURCE_DRIFT');
-            assert.ok(event.head_commit.message.includes(MARKER),'I66_TRAFFIC_DIAGNOSTIC_MARKER_REQUIRED');
+            const message=String(event.head_commit.message||''),v1=message.includes(V1_MARKER),v2=message.includes(MARKER);
+            assert.ok(v1!==v2,'I66_TRAFFIC_DIAGNOSTIC_SINGLE_PROFILE_REQUIRED');
+            if(v1)assert.match(message,new RegExp('(?:^|\\s)'+V1_MARKER+'(?=\\s|$)'),'I66_TRAFFIC_DIAGNOSTIC_V1_MARKER_REQUIRED');
+            return v1?'V1_DRYRUN':'V2_VALIDATE';
           }
           async function main(){
             assert.equal(process.argv.length,2,'I66_TRAFFIC_DIAGNOSTIC_NO_ARGUMENTS');
-            validateTrigger(process.env,JSON.parse(fs.readFileSync(process.env.GITHUB_EVENT_PATH)));
+            const mode=validateTrigger(process.env,JSON.parse(fs.readFileSync(process.env.GITHUB_EVENT_PATH)));
             const repo=process.cwd(),git=(...args)=>execFileSync('git',args,{encoding:'utf8'}).trim();
             assert.equal(git('rev-parse','HEAD'),process.env.GITHUB_SHA,'I66_TRAFFIC_DIAGNOSTIC_CHECKOUT_DRIFT');
             for(const [file,pin] of Object.entries(OWNER_PINS))assert.equal(git('rev-parse','HEAD:'+file),pin,'I66_TRAFFIC_DIAGNOSTIC_OWNER_PIN_DRIFT');
@@ -810,20 +987,31 @@ jobs:
             const executor=require(path.join(repo,'tools/gravicentra-i66-make-lead-protected-executor.cjs'));
             const scope=require(path.join(repo,'tools/gravicentra-i66-make-release-scope.cjs'));
             const client=await new GoogleAuth({projectId:PROJECT,scopes:['https://www.googleapis.com/auth/cloud-platform']}).getClient();
-            const report=await collect({client,executor,contract,provenance:{repository:process.env.GITHUB_REPOSITORY,sourceSha:process.env.GITHUB_SHA,
+            const collectionArgs={client,executor,contract,provenance:{repository:process.env.GITHUB_REPOSITORY,sourceSha:process.env.GITHUB_SHA,
               runId:Number(process.env.GITHUB_RUN_ID),runAttempt:Number(process.env.GITHUB_RUN_ATTEMPT),job:'existing_inbound_config',
               workflowPath:WORKFLOW,workflowGitBlob:git('rev-parse','HEAD:'+WORKFLOW),ownerPins:OWNER_PINS,runtimePrincipal:scope.RUNTIME,
-              freshPreimageReportDigest:previous.reportDigest}});
+              freshPreimageReportDigest:previous.reportDigest}};
+            let report;
+            if(mode==='V1_DRYRUN'){
+              const {initializeApp,applicationDefault,deleteApp}=requireFrom('firebase-admin/app'),{getFirestore}=requireFrom('firebase-admin/firestore');
+              const app=initializeApp({projectId:PROJECT,credential:applicationDefault()},'i66-make-traffic-v1-dryrun');
+              try{const db=getFirestore(app);report=await collectV1({...collectionArgs,readGrant:async document=>{
+                assert.equal(document,GRANT_PATH,'I66_TRAFFIC_DIAGNOSTIC_GRANT_SCOPE');
+                const snap=await db.doc(document).get(),time=snap.updateTime;
+                return {path:snap.ref.path,exists:snap.exists,data:snap.exists?snap.data():null,
+                  updateTime:time?{seconds:String(time.seconds),nanoseconds:time.nanoseconds}:null};
+              }});}finally{await deleteApp(app);}
+            }else report=await collect(collectionArgs);
             fs.writeFileSync(path.join(process.env.RUNNER_TEMP,'i66-make-traffic-conflict-sanitized.json'),JSON.stringify(report,null,2)+'\n',{mode:0o600});
             console.log('I66_MAKE_TRAFFIC_CONFLICT_READONLY='+JSON.stringify({status:report.status,reportDigest:report.reportDigest,
               auditHttpStatus:report.audit?.httpStatus,dryValidationHttpStatus:report.dryValidation?.httpStatus,cloudWrites:0,externalMessagesSent:0}));
             if(report.status==='DIAGNOSTIC_HOLD')process.exitCode=1;
           }
           if(process.argv[1]==='-')main().catch(error=>{console.error(code(error));process.exitCode=1;});
-          module.exports={EXPECTED,OWNER_PINS,FN_URL,RUN_URL,LOG_URL,VALIDATE_URL,MARKER,logsRequest,validateData,limitedClient,auditRows,collect,validateTrigger,cleanMessage,safeError};
+          module.exports={V1_MARKER,V1_RUN_URL,V1_VALIDATE_URL,GRANT_PATH,V1_TRAFFIC,v1Service,v1Data,limitedV1Client,structuralDiff,functionEquality,safeV1Provider,collectV1,EXPECTED,OWNER_PINS,FN_URL,RUN_URL,LOG_URL,VALIDATE_URL,MARKER,logsRequest,validateData,limitedClient,auditRows,collect,validateTrigger,cleanMessage,safeError};
           TRAFFICCONFLICTREADONLY
       - name: Retain only sanitized Preview33 traffic conflict evidence
-        if: always() && github.event_name == 'push' && contains(github.event.head_commit.message, 'I66_MAKE_TRAFFIC_409_READONLY_R33')
+        if: always() && github.event_name == 'push' && (contains(github.event.head_commit.message, 'I66_MAKE_TRAFFIC_409_READONLY_R33') || contains(github.event.head_commit.message, 'I66_MAKE_TRAFFIC_V1_DRYRUN_R33'))
         uses: actions/upload-artifact@v4
         with:
           name: gi-i66-make-traffic-conflict-readonly-${{ github.run_id }}-attempt-${{ github.run_attempt }}
