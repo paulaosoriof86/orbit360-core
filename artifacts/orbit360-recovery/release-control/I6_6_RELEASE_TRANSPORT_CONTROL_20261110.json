@@ -55,8 +55,8 @@
     "livePromotionAuthorizedByThisPreviewRequest": false
   },
   "currentTechnicalPreviewRollover": {
-    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_PHYSICAL_PREVIEW_V33_ROLLOVER_V6_20261125.json",
-    "receiptSha256": "a755e24a6ed549d2c5aa4b567b6a3be4a49ff0b2218e1c31988e85dd812ef5c2"
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_PHYSICAL_PREVIEW_V34_ROLLOVER_V7_20261125.json",
+    "receiptSha256": "a9f70d459a6152aaae60cec0683818956a39c564acbcd76efc40e2f76a013bf7"
   },
   "directionSameTermsPreviewScope": {
     "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_DIRECTION_PREVIEW_V2_SCOPE_AUTHORIZATION_20261116.json",
@@ -4821,12 +4821,12 @@
     "liveProofSha256": "4013a99719ba5f8bb3087a5e5f43c189a22daf55aabfcea37e8df5030bb5653c"
   },
   "frontendPreviewRequest": {
-    "version": 34,
+    "version": 35,
     "mode": "A13_A14_BALANCE_COMPOSITE_ARTIFACT_HOSTING_PREVIEW_ONLY",
-    "sourceQaHead": "22a4d5f2240107c58e0ef96a6c6ca71d80afff7c",
-    "manifestBlob": "0e43bdb9cc7fa28f48e505b8218727fe006d6031",
-    "sourceQaRunId": 45538613640,
-    "guardRunId": 45538613691,
+    "sourceQaHead": "d5ab4764fe234e5c2c95f05107022c0abae2568b",
+    "manifestBlob": "feae243f1e30f3d40a3e9e2ff01ff3c86b5d10a0",
+    "sourceQaRunId": 45548703476,
+    "guardRunId": 45548703495,
     "previousReceiptBlob": "11fdb3bee494541513482666d6215f45cbad0567",
     "productPaths": [
       "functions/b4-003-scoped-related-reader.js",
@@ -4885,10 +4885,10 @@
     "realCustomerWritesAllowed": false,
     "liveDeployAuthorized": false,
     "releaseAfterPreviewAllowed": false,
-    "releaseMechanismSourceSha": "22a4d5f2240107c58e0ef96a6c6ca71d80afff7c",
+    "releaseMechanismSourceSha": "d5ab4764fe234e5c2c95f05107022c0abae2568b",
     "ownerInstruction": "Continue authorized recovery and existing parallel work; certify the exact newly composed source without losing prior acceptance, financial receipts, or communication rules.",
     "scope": "Existing A13/A14, balance and startup composition plus the two approved direct-form owners. Build one immutable package; Preview and LIVE must include the signed direct-form evidence for their respective scopes.",
-    "reason": "Retry the exact immutable product after the existing Make release owner was corrected to apply exact Cloud Run V1 traffic changes with the full Service preimage and resourceVersion, fresh CLOSED grant checks, preserved observations and verified rollback; the exact current Preview33 inventory and immutable backups authorize a new bounded rollover while signed Preview33 stays failed and only its observed traffic compensation is verified. Preserve the predecessor build outcome, failed signed Preview where applicable, immutable artifact and all prior receipts. Product bytes,21 owners,five backend targets,assigned Paula roles,63/113 direct-form checks and documentary payment semantics remain unchanged. A new immutable artifact is required because the release owner changed; no prior artifact is patched.",
+    "reason": "Retry the exact immutable product after the signed read-only role guard was corrected to require the approved Operativo visibility and writes for cancelaciones and comisiones, including the protected Equipo matrix; the actual Make34 synthetic PASS and successful immutable build remain preserved, and the exact current physical Preview34 inventory and immutable backups authorize only the existing bounded rollover. Preserve the predecessor build outcome, failed signed Preview where applicable, immutable artifact and all prior receipts. Product bytes,21 owners,five backend targets,assigned Paula roles,63/113 direct-form checks and documentary payment semantics remain unchanged. A new immutable artifact is required because the pinned release or QA owner changed; no prior artifact is patched.",
     "causalReceipt": "artifacts/orbit360-recovery/release-control/I6_6_DIRECT_RENEWAL_AND_ISSUED_ENDORSEMENT_CAUSAL_SOURCE_20261124.json",
     "startupRecovery": {
       "schema": "GI_I66_STARTUP_RECOVERY_PREVIEW_EXTENSION_V1",
@@ -8652,7 +8652,9 @@
       "gitBlobSha": "87d85580bbf539206673b2bb9c43e0f866d50403",
       "sha256": "761ae3dc96dfff4f88be802e0b03e9095cc5db7135c7a4a0fcb9088030fc9f4b"
     },
-    "successorRequestCreated": false
+    "successorRequestCreated": true,
+    "successorRequestVersion": 35,
+    "successorSourceQaHead": "d5ab4764fe234e5c2c95f05107022c0abae2568b"
   },
   "priorFrontendPreviewRequestBeforeV20_20261124": {
     "version": 19,
@@ -10773,5 +10775,150 @@
     "successorRequestCreated": true,
     "successorRequestVersion": 34,
     "successorSourceQaHead": "22a4d5f2240107c58e0ef96a6c6ca71d80afff7c"
+  },
+  "priorFrontendPreviewRequestBeforeV35_20261124": {
+    "version": 34,
+    "mode": "A13_A14_BALANCE_COMPOSITE_ARTIFACT_HOSTING_PREVIEW_ONLY",
+    "sourceQaHead": "22a4d5f2240107c58e0ef96a6c6ca71d80afff7c",
+    "manifestBlob": "0e43bdb9cc7fa28f48e505b8218727fe006d6031",
+    "sourceQaRunId": 45538613640,
+    "guardRunId": 45538613691,
+    "previousReceiptBlob": "11fdb3bee494541513482666d6215f45cbad0567",
+    "productPaths": [
+      "functions/b4-003-scoped-related-reader.js",
+      "functions/bootstrap.js",
+      "functions/cobros-reconciliation-domain.js",
+      "functions/make-lead-ingress-bridge.js",
+      "functions/payment-inference-engine.js",
+      "functions/product-lead-ingress-contract.js",
+      "functions/product-lead-ingress-owner-support.js",
+      "functions/product-ops-leads-domain.js",
+      "orbit360-platform/core/policy-receipts-engine.js",
+      "orbit360-platform/core/primas.js",
+      "orbit360-platform/core/product-hydration-required-optional-p0.js",
+      "orbit360-platform/core/queries.js",
+      "orbit360-platform/data/store-firestore-product-operational-p0.js",
+      "orbit360-platform/data/store-firestore-product-readonly-p0.js",
+      "orbit360-platform/modules/aseguradoras.js",
+      "orbit360-platform/modules/cobros.js",
+      "orbit360-platform/modules/config-domain-v20260804-bridge.js",
+      "orbit360-platform/modules/issuance-endosos-v1201-bridge.js",
+      "orbit360-platform/modules/policy-receipts-v1199-bridge.js",
+      "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js",
+      "orbit360-platform/modules/renewals-v1200-operational-bridge.js"
+    ],
+    "backendPaths": [
+      "functions/b4-003-scoped-related-reader.js",
+      "functions/bootstrap.js",
+      "functions/make-lead-ingress-bridge.js",
+      "functions/product-lead-ingress-contract.js",
+      "functions/product-lead-ingress-owner-support.js",
+      "functions/product-ops-leads-domain.js"
+    ],
+    "backendPathBlobs": {
+      "functions/b4-003-scoped-related-reader.js": "439bea6d90ef9a6a03ca2539096cb626cc43695d",
+      "functions/bootstrap.js": "bd0837a9d5296a456e0575aec555b2971fdedcd7",
+      "functions/make-lead-ingress-bridge.js": "8b519ad21da032ffeeee7f9f9cc3e9c3fe6c1317",
+      "functions/product-lead-ingress-contract.js": "ee29ee1fb12b1a30bf24b7c2c2a8180a2f2ef937",
+      "functions/product-lead-ingress-owner-support.js": "0f07f1620e3968cacf684a88c895faa64eb8a1a1",
+      "functions/product-ops-leads-domain.js": "affde2677b4c997b89abdabf3af2cb920128935d"
+    },
+    "backendPreviewRequired": true,
+    "backendLiveDeployAllowed": false,
+    "fiveFunctionExactPreviewRequired": true,
+    "scopeContractBlob": "7ce546736ac8d08b8ac922d19f3e6e4c2bac0021",
+    "balanceCorrection": {
+      "path": "orbit360-platform/core/queries.js",
+      "gitBlobSha": "b77b65f86ef6ac2ab6dc157fdbc9ad5e34dbcdcc",
+      "causalReceiptPath": "artifacts/orbit360-recovery/release-control/I6_6_FUTURE_PENDING_BALANCE_OWNER_CAUSAL_CORRECTION_20261124.json",
+      "causalReceiptBlob": "c05769d469b0a5e88e72e9e946095cb47bfc9d32",
+      "financialQaScope": "SIX_RECEIPT_CURRENT_BALANCE_READONLY",
+      "requiredStagesPerPhase": 48,
+      "sameArtifactBothPhases": true,
+      "fullA04A12A14Acceptance": false
+    },
+    "realDataWritesAllowed": false,
+    "realCustomerWritesAllowed": false,
+    "liveDeployAuthorized": false,
+    "releaseAfterPreviewAllowed": false,
+    "releaseMechanismSourceSha": "22a4d5f2240107c58e0ef96a6c6ca71d80afff7c",
+    "ownerInstruction": "Continue authorized recovery and existing parallel work; certify the exact newly composed source without losing prior acceptance, financial receipts, or communication rules.",
+    "scope": "Existing A13/A14, balance and startup composition plus the two approved direct-form owners. Build one immutable package; Preview and LIVE must include the signed direct-form evidence for their respective scopes.",
+    "reason": "Retry the exact immutable product after the existing Make release owner was corrected to apply exact Cloud Run V1 traffic changes with the full Service preimage and resourceVersion, fresh CLOSED grant checks, preserved observations and verified rollback; the exact current Preview33 inventory and immutable backups authorize a new bounded rollover while signed Preview33 stays failed and only its observed traffic compensation is verified. Preserve the predecessor build outcome, failed signed Preview where applicable, immutable artifact and all prior receipts. Product bytes,21 owners,five backend targets,assigned Paula roles,63/113 direct-form checks and documentary payment semantics remain unchanged. A new immutable artifact is required because the release owner changed; no prior artifact is patched.",
+    "causalReceipt": "artifacts/orbit360-recovery/release-control/I6_6_DIRECT_RENEWAL_AND_ISSUED_ENDORSEMENT_CAUSAL_SOURCE_20261124.json",
+    "startupRecovery": {
+      "schema": "GI_I66_STARTUP_RECOVERY_PREVIEW_EXTENSION_V1",
+      "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_STARTUP_PENDING_READ_RETRY_CAUSAL_SOURCE_20261124.json",
+      "receiptBlob": "bdfbdb3a1764883579907797b0b198debda773e0",
+      "productPathBlobs": {
+        "orbit360-platform/core/product-hydration-required-optional-p0.js": "f2f42ef536b00b89c7198710a20aadb633a7eb29",
+        "orbit360-platform/data/store-firestore-product-readonly-p0.js": "fa8e507c03aba7bc7e99214c3b4e695f2c5fe222"
+      }
+    },
+    "directFormsRecovery": {
+      "schema": "GI_I66_DIRECT_FORMS_RECOVERY_PREVIEW_EXTENSION_V1",
+      "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_DIRECT_FORMS_ASSIGNED_ROLES_AND_INSURER_EDITOR_CAUSAL_SOURCE_20261124.json",
+      "receiptBlob": "539a1c4be0635588f5c7ec187320a78ce4b91927",
+      "productPathBlobs": {
+        "orbit360-platform/modules/renewals-v1200-operational-bridge.js": "8395b86246cf9bd77523da0059a6e5318e0cfc80",
+        "orbit360-platform/modules/issuance-endosos-v1201-bridge.js": "6dabc32d0a012566eb7840ef8774aee3beb17817",
+        "orbit360-platform/modules/aseguradoras.js": "0ce40050387f68b2e3efaddc7717ace7cf3ae3ff"
+      }
+    },
+    "directFormsQa": true,
+    "causalInventoryReceipt": "artifacts/orbit360-recovery/release-control/I6_6_MAKE_EXISTING_TRIGGER_INVENTORY_CAUSAL_CORRECTION_20261124.json",
+    "causalInventoryReceiptBlob": "eaafff795b68dd86188487d3f5b126bd92da1b24",
+    "causalQuotaReceipt": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_PHYSICAL_PREVIEW_V28_ROLLOVER_V4_20261124.json",
+    "causalQuotaReceiptSha256": "dd56c0a2a9ea19e261da36f53a62b3b7a29fbf7a9a54f20ad24dfa24d505c971",
+    "directFormsQaProfile": "PAULA_ASSIGNED_ROLES_EFFECTIVE_FORMS_V1",
+    "financialRecovery": {
+      "schema": "GI_I66_R51_FINANCIAL_RECOVERY_PREVIEW_EXTENSION_V1",
+      "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_R51_ASSIGNED_ROLES_INSURER_FINANCIAL_RECOVERY_SOURCE_20261124.json",
+      "receiptBlob": "751c2f916b5f9ea80e7957ec82a0aec7c8cde6f0",
+      "productPathBlobs": {
+        "functions/cobros-reconciliation-domain.js": "3d84423fd985841c6f9b230dcf729b41f2512556",
+        "functions/payment-inference-engine.js": "a3d6bf99288c0c309759dce954d48c1ecc4db9dc",
+        "orbit360-platform/core/primas.js": "0d5d343ef11760312092314b719fc82da0eaa147",
+        "orbit360-platform/modules/cobros.js": "e86ea782c6aacf97fe4ab4900ed40dec07537a22",
+        "orbit360-platform/modules/config-domain-v20260804-bridge.js": "b0c3d6e2399ab9a13a60ea473fc8cc1e9edd00f9",
+        "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js": "74298d8565902895e5b2d2a5de030ed08847243c"
+      }
+    },
+    "financialRecoveryQa": {
+      "profile": "I66_R51_DOCUMENTARY_PAYMENT_UI_SIGNED_QA_V1",
+      "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_R51_ASSIGNED_ROLES_INSURER_FINANCIAL_RECOVERY_SOURCE_20261124.json",
+      "receiptBlob": "751c2f916b5f9ea80e7957ec82a0aec7c8cde6f0"
+    },
+    "cancellationRecovery": {
+      "schema": "GI_I66_EFFECTIVE_CANCELLATION_PREVIEW_EXTENSION_V1",
+      "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_EFFECTIVE_CANCELLATION_ASSIGNED_ROLES_CAUSAL_SOURCE_20261124.json",
+      "receiptBlob": "4f34b910f251cc2eab4212dce09986f22231f1ab",
+      "productPathBlobs": {
+        "orbit360-platform/core/policy-receipts-engine.js": "698fbaa0d15989f1393f0c6ec1eefb9da8153d87",
+        "orbit360-platform/data/store-firestore-product-operational-p0.js": "d9b6806958da950f7a3aff28ca8b164220f827d6",
+        "orbit360-platform/modules/policy-receipts-v1199-bridge.js": "583b87763fe7931d211e8c67a4f08ef0265b0dfb",
+        "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js": "74298d8565902895e5b2d2a5de030ed08847243c"
+      }
+    },
+    "cancellationRecoveryQa": {
+      "profile": "I66_EFFECTIVE_CANCELLATION_UI_SIGNED_QA_V1",
+      "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_EFFECTIVE_CANCELLATION_ASSIGNED_ROLES_CAUSAL_SOURCE_20261124.json",
+      "receiptBlob": "4f34b910f251cc2eab4212dce09986f22231f1ab"
+    }
+  },
+  "priorTechnicalPreviewRolloverBeforeV35": {
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_PHYSICAL_PREVIEW_V33_ROLLOVER_V6_20261125.json",
+    "receiptSha256": "a755e24a6ed549d2c5aa4b567b6a3be4a49ff0b2218e1c31988e85dd812ef5c2"
+  },
+  "priorFailedFrontendPreviewRequestDispositionBeforeV35": {
+    "version": 34,
+    "status": "BUILD_SUCCEEDED_MAKE_PASSED_SIGNED_ROLE_GUARD_FAILED_SCOPED_AUTHORIZATION_WITHDRAWN",
+    "requestRetainedExactly": true,
+    "receipt": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_6_V34_SIGNED_ROLE_EXPECTATION_FAILURE_20261125_R80.json",
+      "gitBlobSha": "87d85580bbf539206673b2bb9c43e0f866d50403",
+      "sha256": "761ae3dc96dfff4f88be802e0b03e9095cc5db7135c7a4a0fcb9088030fc9f4b"
+    },
+    "successorRequestCreated": false
   }
 }
