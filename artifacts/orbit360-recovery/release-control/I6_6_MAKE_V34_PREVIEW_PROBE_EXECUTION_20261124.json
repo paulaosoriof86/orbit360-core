@@ -1,0 +1,61 @@
+{
+  "schema": "GI_I66_MAKE_QUEUE_EXECUTION_RECEIPT_V1",
+  "status": "success",
+  "scenarioId": 10196136,
+  "connectionId": 14756714,
+  "module": "google-cloud-firestore:createDocument",
+  "moduleId": 3,
+  "executionId": "8493beba84e9446ebbf9bbb0b314491b",
+  "documentName": "projects/ays-orbit-360-lab/databases/(default)/documents/tenants/alianzas-soluciones/previewLeadIngressRequests/NDuXp70AiMBoSulEydFU",
+  "documentCreateTime": "2026-11-25T03:56:40.201Z",
+  "externalMessagesSent": 0,
+  "stage": "PROBE",
+  "phase": "preview",
+  "sourceSha": "a06e5b692595a863a6c6f6b223d895d874abb90e",
+  "artifactId": 14987684993,
+  "artifactDigest": "sha256:08706bc64a5ca578fcf3fb305354adc1ba8a55347421f4226406f5092c3f46a0",
+  "buildRunId": 45539669479,
+  "backendPreviewRunId": 45542808183,
+  "closedConfigurationDigest": "9f40390ce2e6b9993a7871bdb95ada6d9f89c4c8eae8da9c9813c7421662db2a",
+  "closedConfigurationRecordedAt": "2026-11-25T03:54:43.804Z",
+  "closedProbeDeadline": "2026-11-25T03:59:43.804Z",
+  "startedAt": "2026-11-25T03:56:39.291Z",
+  "durationMs": 1322,
+  "queueModuleFinishedAt": "2026-11-25T03:56:40.282Z",
+  "queueOnly": true,
+  "canonicalLeadAcceptanceClaim": false,
+  "authContextProven": false,
+  "authContextVerificationPending": true,
+  "nonceSha256": "053d100df943da74784885c0f06aef2d06334ed753b63ac216cf0ef239322f6e",
+  "inputAndOutputNonceMatch": true,
+  "readback": {
+    "topology": [
+      3,
+      1,
+      2
+    ],
+    "scheduling": {
+      "type": "on-demand"
+    },
+    "scenarioStatus": "active",
+    "writerDisabled": true,
+    "lastEdit": "2026-11-25T03:56:54.416Z",
+    "queueModuleInvocations": 1,
+    "queueModuleErrors": 0,
+    "explicitScenarioRunRequested": true,
+    "explicitScenarioRunCallCount": 1,
+    "stageMapperRetainedWhileDisabled": true
+  },
+  "evidence": {
+    "moduleReadCycle": 1,
+    "cycleSelectionBasis": "Actual provider inspection for the exact execution and complete input/output records.",
+    "inputRecordError": false,
+    "outputRecordError": false,
+    "truncated": false,
+    "actualOutputDocumentVerified": true,
+    "onlyModule3PayloadRead": true,
+    "privateGreenApiMessageBodiesRead": false,
+    "closedGrantReadExecution": "7f4df2c816f949cbb72a746749e689a5",
+    "closedGrantReadDigest": "9f40390ce2e6b9993a7871bdb95ada6d9f89c4c8eae8da9c9813c7421662db2a"
+  }
+}
