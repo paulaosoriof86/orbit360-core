@@ -56,11 +56,11 @@
       "artifactDigest": "sha256:7cb782848a45083047c4899bc30c13bf5be46429607e42597d09342becfc9acc",
       "hostingVersion": "sites/ays-orbit-360-lab/versions/332999a55b189108"
     },
-    "evidencePath": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_EXECUTION_PROGRESS_20261124_R83.json",
-    "evidenceGitBlobSha": "f85ecd82f9e828ebfff0ffdbfde5b780c9ade817",
+    "evidencePath": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_EXECUTION_PROGRESS_20261124_R84.json",
+    "evidenceGitBlobSha": "2035f2b1cc95638b9deaa416a1250b32b0a38814",
     "activeGate": "I6.6",
-    "currentWork": "Continue I6.6 using the focused lanes in the active R83 evidence: L2 preserves and admits the locally verified Ops/direct-operation candidate; L3 resumes frozen request35 only after provider runner availability; L4 preserves155 APPLIED_DIRECT and resolves only the existing eligible financial queue; L5 preserves the Alice delta and completes the server-to-Make/canonical-ingestion boundary. Source evidence does not confer signed Preview/LIVE or whole-gate acceptance.",
-    "nextAction": "Continue I6.6 using the focused lanes in the active R83 evidence: L2 preserves and admits the locally verified Ops/direct-operation candidate; L3 resumes frozen request35 only after provider runner availability; L4 preserves155 APPLIED_DIRECT and resolves only the existing eligible financial queue; L5 preserves the Alice delta and completes the server-to-Make/canonical-ingestion boundary. Source evidence does not confer signed Preview/LIVE or whole-gate acceptance.",
+    "currentWork": "Continue I6.6 through the active R84 lanes: L3 preserves certified package35 and its exact existing Hosting Preview, then completes provider admission and exact backend, signed Preview, financial48 and same-artifact LIVE/COMMITTED gates; L2 preserves the verified Ops/direct and display candidates for subsequent admission and signed runtime proof; L4 preserves the155 APPLIED_DIRECT obligations and the separately confirmed unique-payment incident with PDF pending; L5 retains the existing leads and server-to-Make boundary. Package and Hosting transport certification do not certify signed functional Preview, LIVE or whole-gate acceptance.",
+    "nextAction": "Continue I6.6 through the active R84 lanes: L3 preserves certified package35 and its exact existing Hosting Preview, then completes provider admission and exact backend, signed Preview, financial48 and same-artifact LIVE/COMMITTED gates; L2 preserves the verified Ops/direct and display candidates for subsequent admission and signed runtime proof; L4 preserves the155 APPLIED_DIRECT obligations and the separately confirmed unique-payment incident with PDF pending; L5 retains the existing leads and server-to-Make boundary. Package and Hosting transport certification do not certify signed functional Preview, LIVE or whole-gate acceptance.",
     "frontendPreviewRequest": {
       "version": 35,
       "sourceQaHead": "d5ab4764fe234e5c2c95f05107022c0abae2568b",
@@ -564,7 +564,7 @@
     "phaseAIterationStatuses": "HISTORICAL_FIELDS_ABOVE_PRESERVED_UNTIL_FORMAL_GATE_EVIDENCE;_NO_NEW_PASS_INFERRED",
     "labDataWriteScope": "ONLY_35_AUTHORIZED_COUNTRY_FIELDS;_NO_AUGUST_REFRESH"
   },
-  "nextAction": "Continue I6.6 using the focused lanes in the active R83 evidence: L2 preserves and admits the locally verified Ops/direct-operation candidate; L3 resumes frozen request35 only after provider runner availability; L4 preserves155 APPLIED_DIRECT and resolves only the existing eligible financial queue; L5 preserves the Alice delta and completes the server-to-Make/canonical-ingestion boundary. Source evidence does not confer signed Preview/LIVE or whole-gate acceptance.",
+  "nextAction": "Continue I6.6 through the active R84 lanes: L3 preserves certified package35 and its exact existing Hosting Preview, then completes provider admission and exact backend, signed Preview, financial48 and same-artifact LIVE/COMMITTED gates; L2 preserves the verified Ops/direct and display candidates for subsequent admission and signed runtime proof; L4 preserves the155 APPLIED_DIRECT obligations and the separately confirmed unique-payment incident with PDF pending; L5 retains the existing leads and server-to-Make boundary. Package and Hosting transport certification do not certify signed functional Preview, LIVE or whole-gate acceptance.",
   "sourceOfTruth": {
     "projectBoundaryPrevalentAddendum": "orbit360-platform/docs/recovery/ADDENDUM_PREVALENTE_CHATGPT_PROJECT_BOUNDARY_20260831.md",
     "mutableState": "orbit360-platform/docs/recovery/orbit360-recovery-state-v1.json",

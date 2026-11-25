@@ -27,7 +27,7 @@
     "activeGate": "I6.6",
     "closedHistoricalGate": "B4-007",
     "latestProvenLiveSource": "65c825b2808a615ca4195bdde6689dbdbe3193b2",
-    "currentWork": "Continue I6.6 using the focused lanes in the active R83 evidence: L2 preserves and admits the locally verified Ops/direct-operation candidate; L3 resumes frozen request35 only after provider runner availability; L4 preserves155 APPLIED_DIRECT and resolves only the existing eligible financial queue; L5 preserves the Alice delta and completes the server-to-Make/canonical-ingestion boundary. Source evidence does not confer signed Preview/LIVE or whole-gate acceptance.",
+    "currentWork": "Continue I6.6 through the active R84 lanes: L3 preserves certified package35 and its exact existing Hosting Preview, then completes provider admission and exact backend, signed Preview, financial48 and same-artifact LIVE/COMMITTED gates; L2 preserves the verified Ops/direct and display candidates for subsequent admission and signed runtime proof; L4 preserves the155 APPLIED_DIRECT obligations and the separately confirmed unique-payment incident with PDF pending; L5 retains the existing leads and server-to-Make boundary. Package and Hosting transport certification do not certify signed functional Preview, LIVE or whole-gate acceptance.",
     "latestHostingPreviewEvidence": "artifacts/orbit360-recovery/release-control/I6_6_NETWORK_DIAGNOSTICS_PREVIEW_BUILD_20261117.json",
     "latestHostingPreviewSource": "1b65a790530d49fe1d1fb451f02838fd9a713c53",
     "operationsEvidenceReview": "artifacts/orbit360-recovery/release-control/I6_6_OPS_EVIDENCE_AND_PREVIEW_BINDING_REVIEW_20261116.json",
@@ -79,7 +79,7 @@
     },
     "documentaryFocalReadbackEvidence": "artifacts/orbit360-recovery/release-control/I6_6_EXISTING_CLIENT_INDEPENDENT_GESTIONES_READBACK_20261116.json",
     "signedPreviewEvidence": "artifacts/orbit360-recovery/release-control/I6_6_NETWORK_DIAGNOSTICS_SIGNED_PREVIEW_PASS_20261117.json",
-    "nextSourceWork": "I6.6 Ops lane: recover the exact17-path local candidate and its admission preparation from the R83 receipt. The integrated local279/279 and resolved-snapshot regression are source evidence. Preserve same management ID, canonical policy-effect proof, administrative outcome, role/country scope, audit and reload. The bounded prepared fix and gated publication are already user-authorized; no new user approval is required. Integrate through the existing owner/admission succession after frozen request35 reaches the required COMMITTED technical precedent, then prove exact source QA and signed Preview/LIVE before crediting runtime acceptance; do not repeat the already-corrected local defects.",
+    "nextSourceWork": "I6.6 Ops lane: preserve the exact24-path Ops/direct candidate and its279/279 local integrated proof in the R83 receipt. Integrate only through the existing owner/admission succession after request35 reaches its required COMMITTED technical precedent, then prove exact source QA and signed Preview/LIVE. The four separately preserved display paths require the same source/admission and runtime validation. These bounded corrections are already user-authorized; do not request a new business approval or repeat their completed causal diagnosis.",
     "latestSignedQaOutcome": {
       "status": "CURRENT_OPERATIONAL_EXACT_SIGNED_LIVE_PASS_FULL_I66_HOLD",
       "sourceSha": "1b65a790530d49fe1d1fb451f02838fd9a713c53",
@@ -3421,6 +3421,27 @@
       "path": "artifacts/orbit360-recovery/release-control/I6_6_OPS_DIRECT_RESOLUTION_LOCAL_CANDIDATE_20261125_R83.json",
       "gitBlobSha": "58e291ee5317ba627fbaf2477f772c9550ea9582",
       "sha256": "8bd0d43e5d005dadd652baa438de9aadacbd16fb8b736bc7dd6a2377f677f021"
+    },
+    "localDisplayCandidate20261125": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_6_PAYMENT_INVOICE_DISPLAY_LOCAL_CANDIDATE_20261125_SOURCE.json",
+      "gitBlobSha": "ffa855e624cb863ed42b8f522e642dc59215f36e",
+      "sha256": "c63d83bca887dd8625695326d4323837a5a433e9e816db8e29b4a8b0b96ba42c"
+    },
+    "nativePackageExecution20261125": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_EXECUTION_PROGRESS_20261124_R84.json",
+      "fragment": "nativePackageExecution20261125"
+    },
+    "nativeHostingPreviewExecution20261125": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_EXECUTION_PROGRESS_20261124_R84.json",
+      "fragment": "nativeHostingPreviewExecution20261125"
+    },
+    "continuityCoordinationRisk20261125": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_EXECUTION_PROGRESS_20261124_R84.json",
+      "fragment": "continuityCoordinationRisk20261125"
+    },
+    "paymentDocumentIncident20261125": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_EXECUTION_PROGRESS_20261124_R84.json",
+      "fragment": "paymentDocumentIncident20261125"
     }
   },
   "b4003ActiveCertificationCursor20261106": {
@@ -6754,7 +6775,7 @@
     "i63LiveReadbackPass": true,
     "i63DeterministicDiffReady": true
   },
-  "nextAction": "Continue I6.6 using the focused lanes in the active R83 evidence: L2 preserves and admits the locally verified Ops/direct-operation candidate; L3 resumes frozen request35 only after provider runner availability; L4 preserves155 APPLIED_DIRECT and resolves only the existing eligible financial queue; L5 preserves the Alice delta and completes the server-to-Make/canonical-ingestion boundary. Source evidence does not confer signed Preview/LIVE or whole-gate acceptance.",
+  "nextAction": "Continue I6.6 through the active R84 lanes: L3 preserves certified package35 and its exact existing Hosting Preview, then completes provider admission and exact backend, signed Preview, financial48 and same-artifact LIVE/COMMITTED gates; L2 preserves the verified Ops/direct and display candidates for subsequent admission and signed runtime proof; L4 preserves the155 APPLIED_DIRECT obligations and the separately confirmed unique-payment incident with PDF pending; L5 retains the existing leads and server-to-Make boundary. Package and Hosting transport certification do not certify signed functional Preview, LIVE or whole-gate acceptance.",
   "postproductionExitProgress": {
     "formalPercent": 60,
     "frozenMiniGates": 6,
@@ -26427,8 +26448,8 @@
   },
   "i66ActiveRecoveryCursor": {
     "status": "FROZEN_I66_SHOCK_EXECUTION_CONTINUES_NO_GATE_REPLACEMENT",
-    "currentEvidencePath": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_EXECUTION_PROGRESS_20261124_R83.json",
-    "currentEvidenceBlobSha": "f85ecd82f9e828ebfff0ffdbfde5b780c9ade817",
+    "currentEvidencePath": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_EXECUTION_PROGRESS_20261124_R84.json",
+    "currentEvidenceBlobSha": "2035f2b1cc95638b9deaa416a1250b32b0a38814",
     "frozenPlanPath": "artifacts/orbit360-recovery/release-control/I6_6_PLAN_CHOQUE_FUNCIONAL_FINANCIERO_20261122.md",
     "frozenPlanBlobSha": "fbfd54d229a13101fbfb0dfc6e92a5fa524999b6",
     "fullInventoryPath": "artifacts/orbit360-recovery/release-control/I6_6_INVENTARIO_INTEGRAL_295_20261122.md",
@@ -26445,12 +26466,12 @@
     "financialRowsAppliedThisIteration": 104,
     "lastEvidenceDateLocal": "2026-11-25",
     "noNormativeProjectSourceChange": true,
-    "next": "Continue I6.6 using the focused lanes in the active R83 evidence: L2 preserves and admits the locally verified Ops/direct-operation candidate; L3 resumes frozen request35 only after provider runner availability; L4 preserves155 APPLIED_DIRECT and resolves only the existing eligible financial queue; L5 preserves the Alice delta and completes the server-to-Make/canonical-ingestion boundary. Source evidence does not confer signed Preview/LIVE or whole-gate acceptance.",
+    "next": "Continue I6.6 through the active R84 lanes: L3 preserves certified package35 and its exact existing Hosting Preview, then completes provider admission and exact backend, signed Preview, financial48 and same-artifact LIVE/COMMITTED gates; L2 preserves the verified Ops/direct and display candidates for subsequent admission and signed runtime proof; L4 preserves the155 APPLIED_DIRECT obligations and the separately confirmed unique-payment incident with PDF pending; L5 retains the existing leads and server-to-Make boundary. Package and Hosting transport certification do not certify signed functional Preview, LIVE or whole-gate acceptance.",
     "lastFunctionalLiveUatRunId": 45074429319,
     "lastFunctionalLiveUatJobId": 137352857627,
     "lastFunctionalLiveScope": "TWO_ROLE_RENEWAL_INSURER_SYNTHETIC_PASS_REAL_ISSUANCE_AND_DOCUMENT_HOLD",
-    "previousEvidencePath": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_EXECUTION_PROGRESS_20261124_R82.json",
-    "previousEvidenceBlobSha": "51f1265aa651129c98629c137cada777fc9cb3aa",
+    "previousEvidencePath": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_EXECUTION_PROGRESS_20261124_R83.json",
+    "previousEvidenceBlobSha": "f85ecd82f9e828ebfff0ffdbfde5b780c9ade817",
     "lastFunctionalLiveUatStatus": "LIVE_PHYSICAL_STEPS_PASS_FIVE_ROLE_FINAL_COVERAGE_FAIL_CLOSED",
     "lastFinancialProtectedPreflightRunId": 45332501697,
     "lastFinancialSourceStatus": "155_EXISTING_PAYMENTS_465_RECORDS_CAPTURE_VERIFIED_2_CANONICAL_CALLS_6_APPLICATION_CASES_DOC07_ALREADY_APPLIED_DATE_REVIEW_OPEN",
@@ -26478,17 +26499,22 @@
     "financialHistoricalPaymentsAppliedThisContinuation": 155,
     "financialHistoricalPaidReceiptsMaterializedThisContinuation": 153,
     "financialNewPendingObligationsThisContinuation": 46,
-    "moduleReleasedThisIterationScope": "R83 preserves a local source candidate and bounded provider/Make evidence. No source deployment, new module acceptance or financial write.",
+    "moduleReleasedThisIterationScope": "R84 records exact native package and existing Hosting Preview readback certification. No product or module functional acceptance, backend or LIVE deployment, or financial write.",
     "lastLivePromotionAttemptRunId": 45391827840,
     "lastLivePromotionAttemptStatus": "ROLLED_BACK",
-    "nextAction": "Continue I6.6 using the focused lanes in the active R83 evidence: L2 preserves and admits the locally verified Ops/direct-operation candidate; L3 resumes frozen request35 only after provider runner availability; L4 preserves155 APPLIED_DIRECT and resolves only the existing eligible financial queue; L5 preserves the Alice delta and completes the server-to-Make/canonical-ingestion boundary. Source evidence does not confer signed Preview/LIVE or whole-gate acceptance.",
+    "nextAction": "Continue I6.6 through the active R84 lanes: L3 preserves certified package35 and its exact existing Hosting Preview, then completes provider admission and exact backend, signed Preview, financial48 and same-artifact LIVE/COMMITTED gates; L2 preserves the verified Ops/direct and display candidates for subsequent admission and signed runtime proof; L4 preserves the155 APPLIED_DIRECT obligations and the separately confirmed unique-payment incident with PDF pending; L5 retains the existing leads and server-to-Make boundary. Package and Hosting transport certification do not certify signed functional Preview, LIVE or whole-gate acceptance.",
     "lastFunctionalPreviewRunId": 45542808183,
     "lastFunctionalPreviewStatus": "BUILD_AND_224_HOSTING_PASS_MAKE_PREVIEW_PASS_SIGNED_ROLE_GUARD_FAILED_COMPENSATION_VERIFIED",
-    "lastBuildAttemptRunId": 45549464538,
-    "lastBuildAttemptStatus": "REQUEST35_ATTEMPT2_FAILED_BEFORE_RUNNER_0_ARTIFACTS",
+    "lastBuildAttemptStatus": "IMMUTABLE_PACKAGE_RETAINED_READBACK_PASS_NO_DEPLOY",
     "lastRetainedArtifactId": 14976066036,
     "lastRetainedArtifactDigest": "sha256:d31b59d7b5fd6804b79f624e119d81d8316ae2d7d57763e8b87740ac5f7c5bb0",
-    "lastLeadSourceStatus": "ALICE64_SOURCE_REVIEW_COMPLETE_43_PRELIMINARY_4_REVIEW_17_EXCLUDED_IMPORT_AND_REAL_INGRESS_PENDING"
+    "lastLeadSourceStatus": "ALICE64_SOURCE_REVIEW_COMPLETE_43_PRELIMINARY_4_REVIEW_17_EXCLUDED_IMPORT_AND_REAL_INGRESS_PENDING",
+    "lastGitHubBuildAttemptRunId": 45549464538,
+    "lastGitHubBuildAttemptStatus": "REQUEST35_ATTEMPT2_FAILED_BEFORE_RUNNER_0_ARTIFACTS",
+    "lastBuildAttemptProvider": "GOOGLE_CLOUD_BUILD",
+    "lastBuildAttemptId": "792b85b8-f1fb-4353-9ef8-b9f1e1f94065",
+    "lastHostingPreviewAttemptId": "cab7f997-b499-4b84-9ed1-e546b33af1b2",
+    "lastHostingPreviewAttemptStatus": "EXACT_EXISTING_PREVIEW_RETAINED_READBACK_PASS_SIGNED_QA_PENDING"
   },
   "i66PreversionedControlViewBlob": "de401082f688ce1c59f025f6f39e3c947dceaa35",
   "i66FrontendReleaseHead": {

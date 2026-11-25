@@ -1,0 +1,220 @@
+{
+  "schema": "GI_I66_LOCAL_PAYMENT_DISPLAY_SANITIZED_CHECKPOINT_V1",
+  "recordType": "SANITIZED_SOURCE_CHECKPOINT_ONLY",
+  "recordedAtUtc": "2026-11-25T09:04:26.300062+00:00",
+  "product": "Gravicentra Insurance",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "activeGate": "I6.6",
+  "sourceBase": "b09da092a9ff8ae90d4c8ecff06317636b40a11d",
+  "status": "SOURCE_LOCAL_VERIFIED_PENDING_ADMISSION_SIGNED_PREVIEW_LIVE",
+  "priorPreparedOpsCandidate": "artifacts/orbit360-recovery/release-control/I6_6_OPS_DIRECT_RESOLUTION_LOCAL_CANDIDATE_20261125_R83.json",
+  "relationshipToPriorCandidate": "Additional isolated display preparation. The preserved Ops/direct candidate remains byte-exact and is not activated by this receipt.",
+  "snapshot": {
+    "bundle": {
+      "path": "artifacts/orbit360-recovery/release-control/i6-6-p0-checkpoints/I6_6_PAYMENT_INVOICE_DISPLAY_LOCAL_CANDIDATE_20261125_SOURCE.tar.gz.b64.md",
+      "gitBlobSha": "725ede1c6a83dcfacc59e3db19a17ab34ad60dde",
+      "sha256": "8c246e596cab9d21f1514a044083186042c3e5a6700736a529a253bfa51a1b29",
+      "bytes": 85364
+    },
+    "archiveSha256": "df8cf06b4e8282344d5f33728430eec608c4e431761eb6a386d545e22ed1fd73",
+    "archiveBytes": 63066,
+    "memberCount": 7,
+    "manifestMember": "manifest.json",
+    "manifestSha256": "1f7044719cc05f522e1a812acc6bd4662cccf4b3069661d8537c5f852772e928",
+    "sourcePatchMember": "source-candidate.patch",
+    "sourcePatchSha256": "a6da620c35c02395c0cd1383610132b5f1820302fa24665c36fac8ab4330d007",
+    "genericProofMember": "proof-generic.json",
+    "genericProofSha256": "f79fd0cfde66bcadab265af6a097b3b7f0eb0fd83153c50089e97a852d3d05f0",
+    "sourcePathCount": 4,
+    "productOwners": 2,
+    "testFilesAdded": 2,
+    "sourcePins": [
+      {
+        "path": "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js",
+        "beforeBlob": "1866fd392be49b8506c83d1392092a715b3983dd",
+        "beforeSha256": "a2821a0948abff9ef5ddddf13ea36968628a14f378924246d9165b6934d356ec",
+        "afterBlob": "108e1787d725a7a0dc2bbde3293c5eb61d04fe52",
+        "afterSha256": "793d2b65a674b41fce4361c7b95858e0167e5837670cb918342e08c1256cc50d",
+        "bytes": 71789,
+        "snapshotMember": "source/orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js"
+      },
+      {
+        "path": "tools/gravicentra-i6-6-receipt-list-ordinal-display.test.cjs",
+        "beforeBlob": null,
+        "beforeSha256": null,
+        "afterBlob": "51066fefb00df1a60662ce03d0327e0d58e7e5d7",
+        "afterSha256": "ddaf4418a2567fa4460ec7c77c2697f370b62da46f788bc2ccd3c2c4d8544cfb",
+        "bytes": 5775,
+        "snapshotMember": "source/tools/gravicentra-i6-6-receipt-list-ordinal-display.test.cjs"
+      },
+      {
+        "path": "orbit360-platform/modules/cobros.js",
+        "beforeBlob": "e86ea782c6aacf97fe4ab4900ed40dec07537a22",
+        "beforeSha256": "c956d689c05ffa8972ece1b961447d70e07601c2c38b7192b92ac8b36b11643a",
+        "afterBlob": "65aae3301eb3f0727389c6874b1f12d9f699d320",
+        "afterSha256": "0b7ff9495120a3813b578a356fc498892f2c8bb6c32d6aa392bfe45e4a779132",
+        "bytes": 123678,
+        "snapshotMember": "source/orbit360-platform/modules/cobros.js"
+      },
+      {
+        "path": "tools/gravicentra-i6-6-cobro-receipt-breakdown-display.test.cjs",
+        "beforeBlob": null,
+        "beforeSha256": null,
+        "afterBlob": "1f2cb4ca5340858400a5755a4747519d9ffbcc45",
+        "afterSha256": "97592632c99c01ac6ddf8ff8c0ce425b8539847093f5b33fddcf66b5a0de4734",
+        "bytes": 7649,
+        "snapshotMember": "source/tools/gravicentra-i6-6-cobro-receipt-breakdown-display.test.cjs"
+      }
+    ]
+  },
+  "sourceBehavior": [
+    "Receipt list reuses the existing ordinal helper. Internal installment and official-source reference remain separate fields.",
+    "Cobro detail preserves explicit component values and reads missing components only from the exact linked receipt when policy, client, currency and payment amount match.",
+    "Missing components remain unknown. Explicit zero remains zero. The existing transactional money formatter preserves cents."
+  ],
+  "validation": {
+    "ordinalBaseline": {
+      "tests": 6,
+      "passed": 3,
+      "failed": 3,
+      "skipped": 0,
+      "privateLogSha256": "6dfbe5259f7b8629a7a849c7ad678e764c084f3780f0059258013863da4c8903"
+    },
+    "breakdownBaseline": {
+      "tests": 10,
+      "passed": 0,
+      "failed": 10,
+      "skipped": 0,
+      "privateLogSha256": "0433c2b5de1219062689e0c67bd288fc12891c28a747d48242a487cbaf1b6cd2"
+    },
+    "candidateCombined": {
+      "tests": 38,
+      "passed": 38,
+      "failed": 0,
+      "skipped": 0,
+      "testFiles": 4,
+      "includes": "10 breakdown tests, 6 ordinal tests, 21 attachment regressions and the existing sparse-patch regression file.",
+      "privateLogSha256": "4a81842d0c075a2e82feb0c64ffe9fb43e9b04599a22785b5464d7965e27ffbe"
+    },
+    "sourceDiffCheck": "PASS",
+    "exactPatchReverseCheck": "PASS",
+    "signedSourceQa": "REQUIRED",
+    "signedPreview": "REQUIRED",
+    "sameArtifactLive": "REQUIRED"
+  },
+  "sanitizedIncident": {
+    "provenance": "Authenticated canonical readback and LIVE observations reported by the publication owner; no real-case read or write occurred in these local tests.",
+    "aggregateCounts": {
+      "paidCobros": 1,
+      "portfolioRows": 1,
+      "reconciliationEvents": 1
+    },
+    "requestStatus": "committed",
+    "paymentState": "PAID_DIRECT",
+    "applicationState": "APPLIED_DIRECT",
+    "invoiceFieldsPersisted": true,
+    "invoiceDocumentReferencePresent": false,
+    "paymentSupportDocumentReferencePresent": false,
+    "physicalPdfVerified": false,
+    "pdfStatus": "PENDING_USER_PROVIDED_PDF",
+    "operationalDecision": "Preserve the unique committed payment. Documentary completion must not apply a second payment or invent a source reference.",
+    "privateEvidence": {
+      "status": "DURABLY_RETAINED_PRIVATE_GENERATION_AND_HASH_VERIFIED",
+      "references": [
+        {
+          "uri": "gs://ays-orbit360-firestore-private-backup-646761409743/i66/incident-evidence/20261125/payment-document-case01/source-reference-readback.json",
+          "generation": "1795597882332485",
+          "bytes": 9567,
+          "sha256": "93de7a63a4317b6f59bc70c7cf5014fbdc9673bfabf8762146404f86d990580c"
+        },
+        {
+          "uri": "gs://ays-orbit360-firestore-private-backup-646761409743/i66/incident-evidence/20261125/payment-document-case01/canonical-payment-readback.json",
+          "generation": "1795597887969846",
+          "bytes": 7648,
+          "sha256": "ae13dac72d4d85c524becfa040a7656dbfc2d61f2be2e7571e9e0e67a44e7465"
+        },
+        {
+          "uri": "gs://ays-orbit360-firestore-private-backup-646761409743/i66/incident-evidence/20261125/payment-document-case01/transport-and-component-readback.json",
+          "generation": "1795597893528656",
+          "bytes": 3459,
+          "sha256": "7e4c1c0c075dbe494c61a7460410f87d0fb09fbe843954074069aff4ebdeab4b"
+        }
+      ],
+      "verification": {
+        "reportedBy": "root",
+        "method": "Existing private bucket policy checked; retained objects downloaded and rehashed against original evidence.",
+        "objectsVerified": 3,
+        "objectsExpected": 3,
+        "result": "PASS",
+        "verifiedIndependentlyByCheckpointPreparer": false
+      },
+      "archivePreservation": "The immutable generic proof records its creation-time pending reference. This outer candidate now binds the subsequently retained private evidence without rewriting the archive."
+    }
+  },
+  "privacy": {
+    "realClientPolicyCobroInvoiceIdentifiersIncluded": false,
+    "rawRuntimeLogsIncluded": false,
+    "rawTestLogsIncluded": false,
+    "publicArchiveContainsOnlySourcePatchManifestAndGenericProof": true,
+    "privateRuntimeEvidenceIncludedInPublicArchive": false,
+    "privateEvidenceReferencesLinked": true
+  },
+  "releaseBoundary": {
+    "frozenRequestVersion": 35,
+    "frozenRequestSource": "16e3a70baf4e31ef8453173990f32a398c65e59b",
+    "localCandidateIncludedInRequest35": false,
+    "transportChanged": false,
+    "approvedProductPinsChanged": false,
+    "productSourceAppliedByCheckpoint": false,
+    "newArtifactCreated": false,
+    "nextReleaseRequestIssued": false,
+    "acceptedLiveHeadUnchanged": true,
+    "existingSuccessorAdmissionAndSignedQaRequired": true,
+    "preparedDisplayFixUserAuthorized": true,
+    "newUserApprovalRequiredForThisBoundedFix": false
+  },
+  "protectedPreimages": {
+    "artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json": {
+      "path": "artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json",
+      "gitBlobSha": "208a5c542485806d153259513c2ed97e4c939d2d",
+      "sha256": "017c3df196ce12ea6cad750bfcfc1e0c1ee0e2ac950929326015292f8fc48cf1",
+      "bytes": 1350494
+    },
+    "orbit360-platform/docs/recovery/orbit360-recovery-state-v1.json": {
+      "path": "orbit360-platform/docs/recovery/orbit360-recovery-state-v1.json",
+      "gitBlobSha": "2630ac0ab9fe877c7d4443787b567a25ab75fd25",
+      "sha256": "90d2af581344439e413df39a8ad87d6eaa264cc3ff59ed80e27dd08a5c173154",
+      "bytes": 455298
+    },
+    "artifacts/orbit360-recovery/release-control/I6_6_RELEASE_TRANSPORT_CONTROL_20261110.json": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_6_RELEASE_TRANSPORT_CONTROL_20261110.json",
+      "gitBlobSha": "0819653e3510f99b124d4e7afe24aedd926619b9",
+      "sha256": "67008d244c74da8957378508d3e83dfdafd5ce5df598158c0dc9a6ceb13e76db",
+      "bytes": 583275
+    },
+    "artifacts/orbit360-recovery/release-control/I6_6_APPROVED_PRODUCT_DELTA_MANIFEST_20261110.json": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_6_APPROVED_PRODUCT_DELTA_MANIFEST_20261110.json",
+      "gitBlobSha": "feae243f1e30f3d40a3e9e2ff01ff3c86b5d10a0",
+      "sha256": "1f968415c37146322cea3a43ec38efce0d87d27fd54f68133c0000c958271bfd",
+      "bytes": 234588
+    },
+    "artifacts/orbit360-recovery/release-control/I6_6_FRONTEND_E00003_RECEIPT.json": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_6_FRONTEND_E00003_RECEIPT.json",
+      "gitBlobSha": "11fdb3bee494541513482666d6215f45cbad0567",
+      "sha256": "f1383321eb416bf393f822fdb98c91c1f5679faf99b97de6a25f83465c80f997",
+      "bytes": 6215
+    }
+  },
+  "checkpointVerification": {
+    "deterministicArchiveReproduced": true,
+    "exactSnapshotRecovery": "4/4",
+    "isolatedPatchAppliedAndPostimagesVerified": "4/4",
+    "sourceDiffCheck": "PASS",
+    "privateCaseTokenScan": "PASS",
+    "actualPublicationPerformed": false,
+    "cpOrStateMutated": false
+  },
+  "publicationReady": true,
+  "publicationReadyScope": "CHECKPOINT_EVIDENCE_ONLY_NO_PRODUCT_OR_RELEASE_ACTIVATION"
+}
